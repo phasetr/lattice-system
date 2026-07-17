@@ -52,8 +52,11 @@ theorem totalSpinSOp3_mulVec_staggeredRaising_eigenvec (A : Λ → Bool)
     Matrix.mulVec_smul, add_smul, one_smul]
 
 /-- **Single lowering step**: if `Ŝ³_tot v = λ v` then `Ŝ³_tot (Ô⁻ v) = (λ − 1) (Ô⁻ v)` (the
-staggered lowering operator decrements the total magnetization by one). -/
-private theorem totalSpinSOp3_mulVec_staggeredLowering_eigenvec (A : Λ → Bool)
+staggered lowering operator decrements the total magnetization by one).  Public because the coherent
+second-moment PR reuses it (mirror of the raising step) to compute the two-step sector eigenvalues
+of `Ô⁻Ô⁻`, `Ô⁺Ô⁻`, `Ô⁻Ô⁺` on the tower states (see
+`BoseEinsteinCondensateCoherentSecondMoment.lean`). -/
+theorem totalSpinSOp3_mulVec_staggeredLowering_eigenvec (A : Λ → Bool)
     {v : (Λ → Fin (N + 1)) → ℂ} {lam : ℂ}
     (hv : (totalSpinSOp3 Λ N).mulVec v = lam • v) :
     (totalSpinSOp3 Λ N).mulVec ((staggeredLoweringOpS A N).mulVec v)
