@@ -11870,12 +11870,18 @@ exactly the states annihilated by every bond projection.  The axiom \texttt{tasa
 states that, for $1<L$ (so the bond $\{x,\texttt{ringSucc}\,x\}$ is genuinely two-site rather than a
 one-site self-interaction), a state $\Phi$ satisfies $\hat P_2[\hat S_x+\hat S_{x+1}]\,\Phi=0$
 (eq.~7.1.19) at the periodic bond $\{x,\texttt{ringSucc}\,x\}$ \emph{iff} it has the
-valence-bond-solid singlet-tensor
-form (eq.~7.1.20), recorded through the uninterpreted marker \texttt{IsVBSGroundForm} (the
-duplicated-$S=\tfrac12$ / Schwinger-boson singlet construction is not yet formalized).  The AKLT
-ground space is then the VBS state in which every bond carries a singlet (Kennedy--Lieb--Tasaki
-1988).  The affine identity is proved; the deep singlet characterization is a documented axiom.
-Chapters~3--10 backfill.
+valence-bond-solid singlet-tensor form (eq.~7.1.20), now the \emph{concrete} predicate
+\texttt{IsVBSGroundForm}.  The marker is realized through the Weyl symmetrization
+$\mathrm{Sym}^2(\mathbb{C}^2)\cong\mathrm{spin}\text{-}1$ (eq.~7.1.22, \texttt{spin1SymEmbed}): the
+four bond vectors $\Psi_{\sigma\sigma'}$ (\texttt{vbsBondVec}, a singlet on the inner qubits with
+outer qubits $\sigma,\sigma'$) span the total-spin-$\le 1$ subspace
+$W\subset\mathbb{C}^3\otimes\mathbb{C}^3$ ($\dim W=4$, \texttt{vbsBondSubspace}), and
+\texttt{IsVBSGroundForm} asserts that every two-site bond slice (\texttt{bondSlice}) of $\Phi$ lies
+in $W$.  Being defined through $W$ alone (no reference to $\hat P_2$), it makes the equivalence
+non-tautological.  The AKLT ground space is then the VBS state in which every bond carries a singlet
+(Kennedy--Lieb--Tasaki 1988).  The affine identity and the concrete marker are proved; the
+tensor-slice discharge of \texttt{tasaki\_lemma\_7\_4} is staged over the following PRs, so the
+equivalence itself is (for now) a documented axiom.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§7.2.1 Hidden antiferromagnetic order / string order parameter} (den
