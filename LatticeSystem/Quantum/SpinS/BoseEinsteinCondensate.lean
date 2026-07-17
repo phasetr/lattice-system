@@ -179,7 +179,17 @@ This is the BEC counterpart of the Anderson-tower Theorem 4.6; the construction 
 are bundled into `IsBECTowerConstants` (the energy increment is **cubic** in `|M|`, not quadratic as
 in
 Theorem 4.6).  Like Theorem 4.6 the bound is conditional on ODLRO (`q₀ > 0`), so it is vacuous where
-ODLRO is absent.  Proved in Koma–Tasaki [21]; recorded as a documented axiom. -/
+ODLRO is absent.  Proved in Koma–Tasaki [21]; recorded as a documented axiom.
+
+**Half-filling kernel discharged.**  The `μ = 0` (half-filling) case is proved axiom-free as the
+theorem `tasaki_5_2_bec_tower_half_filling` (predicate `IsBECTowerConstantsHalfFilling`,
+`BoseEinsteinCondensateTower.lean`), whose `#print axioms` is `[propext, Classical.choice,
+Quot.sound]` only.  The general-`μ` statement stays a documented axiom because at `μ ≠ 0` a ground
+state has `Ŝ_tot^{(3)} Φ = s₀ ≠ 0`, so the reused variational bricks
+(denominator/numerator/non-vanishing) — all requiring the half-filling `Ŝ_tot^{(3)} = 0` sector —
+no longer close, and the general-`μ` bound rests on the Koma–Tasaki [21] `d`-dimensional
+reflection-positivity/infrared machinery, the same RP-intractability exception as Theorem 5.1
+(`tasaki_5_1_xy_odlro_half_filling`), intractable at project scale. -/
 axiom tasaki_5_2_bec_tower (d : ℕ) (hd : 2 ≤ d) (μ q₀ : ℝ) (hq₀ : 0 < q₀) :
     ∃ C₁ C₂ : ℝ, IsBECTowerConstants d μ q₀ C₁ C₂
 

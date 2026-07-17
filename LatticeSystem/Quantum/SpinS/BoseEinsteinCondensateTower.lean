@@ -396,4 +396,29 @@ theorem becTowerConstantsHalfFilling_of_planar_lro (d : ℕ) (hd : 1 ≤ d) (q�
       linarith [hc', mul_le_mul_of_nonneg_left hm23 hCQpos.le]
     linarith [hcub]
 
+/-- **Tasaki Theorem 5.2 at half filling (`μ = 0`), PROVED axiom-free** (eq. (5.3.4), footnote 8,
+p. 141).  For the spin-`1/2` XY model (the `u ↑ ∞` hard-core boson model) on the `d`-dimensional
+hypercubic torus with `d ≥ 2`, at half filling `ρ = 1/2` (the `μ = 0`, `Ŝ_tot^{(3)} = 0` sector),
+there exist constants `C₁, C₂ > 0` such that `IsBECTowerConstantsHalfFilling d q₀ C₁ C₂` holds: for
+every even `L ≥ 2` and every ground state `Φ_GS` of the half-filling Hamiltonian `Ĥ_0 = 2 Ĥ_XY` in
+the `Ŝ_tot^{(3)} = 0` sector exhibiting the two XY-plane ODLRO bounds (`α = 1, 2`) with parameter
+`q₀`, the bosonic tower states `Γ_M = (Ô_L^{sgn M})^{|M|} Φ_GS` (for `|M| ≤ C₁ L^{d/2}`) are
+**nonvanishing and** low-lying with the **cubic** energy increment
+`⟨Γ_M, Ĥ_0 Γ_M⟩ / ⟨Γ_M, Γ_M⟩ ≤ E₀ + C₂ |M|³ / L^d`.
+
+This is the axiom-free half-filling kernel of Theorem 5.2: it closes the existential of
+`becTowerConstantsHalfFilling_of_planar_lro`, whose `#print axioms` is `[propext, Classical.choice,
+Quot.sound]` only.  The general-`μ` statement is kept as the faithful documented axiom
+`tasaki_5_2_bec_tower`: at `μ ≠ 0` a ground state carries `Ŝ_tot^{(3)} Φ = s₀ ≠ 0`, so the reused
+variational bricks (denominator, numerator, non-vanishing) — all requiring the half-filling sector —
+no longer close, and the general-`μ` bound rests on the Koma–Tasaki [21] `d`-dimensional
+reflection-positivity/infrared machinery, the same RP-intractability exception as Theorem 5.1,
+intractable at project scale.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §5.3, Theorem 5.2, eq. (5.3.4), footnote 8, p. 141 (Koma–Tasaki [21]). -/
+theorem tasaki_5_2_bec_tower_half_filling (d : ℕ) (hd : 2 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
+    ∃ C₁ C₂ : ℝ, IsBECTowerConstantsHalfFilling d q₀ C₁ C₂ :=
+  becTowerConstantsHalfFilling_of_planar_lro d (by omega) q₀ hq₀
+
 end LatticeSystem.Quantum
