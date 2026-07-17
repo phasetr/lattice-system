@@ -11488,7 +11488,25 @@ each $\|\hat S_y^{(3)}\|\le N/2$, over a window of $\le2r+1$ sites (\texttt{wind
 signed displacement injects $W_x$ into $\{-r,\dots,r\}$, injectivity from
 \texttt{dvd\_sub\_signedRingDisp}).  This uniform $O(1/L)$ bound feeds the $O(\|\hat M_x\|^2)$
 second-order twist-conjugation bound (PR-6/PR-7), whose sum over the $L$ sites gives the Lemma~6.4
-$C/L$.  Chapters~3--10 backfill.
+$C/L$.  PR-6 (CRUX B, PR~\#5076,
+\texttt{Quantum/SpinS/LiebSchultzMattisTaylorBound.lean}): the \emph{second-order Taylor
+superoperator norm bound} \texttt{symmetricDifference\_conj\_norm\_le} ---
+$\|e^{+iM}Xe^{-iM}+e^{-iM}Xe^{+iM}-2X\|\le 8\,\|M\|^2\,\|X\|$ for Hermitian $M$
+(eqs.~6.2.28--6.2.30, pp.~164--165).  Setting $A:=-iM$ (anti-Hermitian, $A^{\dagger}=-A$), the
+matrix conjugation $f(t)=e^{tA}Xe^{-tA}$ (\texttt{expConjOp}) has derivative
+$f'(t)=e^{tA}\lbrack A,X\rbrack e^{-tA}$ (\texttt{hasDerivAt\_expConjOp}, product rule +
+\texttt{hasDerivAt\_exp\_smul\_const}), so $f''(t)=e^{tA}\lbrack A,\lbrack A,X\rbrack\rbrack e^{-tA}$;
+unitary conjugation preserves the $L^2$ operator norm (\texttt{manyBodyOperatorNormS\_expConjOp},
+consuming the PR-2 \texttt{manyBodyOperatorNormS\_unitary\_conj}), whence
+$\|f''(t)\|=\|\lbrack A,\lbrack A,X\rbrack\rbrack\|\le 4\|M\|^2\|X\|$.  The symmetric combination
+$F(t)=f(t)+f(-t)$ has $F'(0)=0$ and $\|F''\|\le2\|\lbrack A,\lbrack A,X\rbrack\rbrack\|$, so two
+applications of the segment mean-value inequality
+\texttt{norm\_image\_sub\_le\_of\_norm\_deriv\_le\_segment'} give
+$\|F(1)-F(0)\|=\|f(1)+f(-1)-2f(0)\|\le 8\|M\|^2\|X\|$.  The $O(\|M\|^2)$ order (not $O(\|M\|)$) is
+essential: the first-order term cancels in the symmetric difference, turning the per-site $O(1/L^2)$
+into the summed $O(1/L)$.  This replaces the book's $\mathrm{ad}(\hat M_x)$ eigen-monomial
+decomposition (6.2.29) by a finite-dimensional Taylor remainder (a sound weaker constant; the axiom
+only needs $C=C(N,r,h_0)$).  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§6.3 Proposition 6.5} (the $S=1$ chain on the hidden-AFM subspace; Tasaki §6.3,
