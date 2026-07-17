@@ -69,19 +69,6 @@ theorem lsmTwistOperator_unitary' (L N : ℕ) :
   rw [lsmTwistOperator_eq_exp]
   exact exp_neg_I_smul_mul_conjTranspose_of_isHermitian (lsmGenerator_isHermitian L N)
 
-/-- **The twisted state's Rayleigh quotient equals the conjugated Hamiltonian's Rayleigh quotient.**
-By unitarity of `Û_LSM`, `⟨Φ_LSM, Ĥ Φ_LSM⟩ / ⟨Φ_LSM, Φ_LSM⟩ = ⟨Φ_GS, Û† Ĥ Û Φ_GS⟩ / ⟨Φ_GS,
-Φ_GS⟩`. -/
-theorem expectationRatioRe_lsmTrialState (L N : ℕ) (Φ : (Fin L → Fin (N + 1)) → ℂ) :
-    expectationRatioRe (afmHeisenbergChainHamiltonianS L N) (lsmTrialState L N Φ) =
-      expectationRatioRe ((lsmTwistOperator L N).conjTranspose *
-        afmHeisenbergChainHamiltonianS L N * lsmTwistOperator L N) Φ := by
-  unfold expectationRatioRe lsmTrialState
-  congr 2
-  · rw [star_mulVec_dotProduct, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
-  · rw [star_mulVec_dotProduct, Matrix.mulVec_mulVec, lsmTwistOperator_unitary,
-      Matrix.one_mulVec]
-
 /-- The **LSM phase** `Σ_x θ_x (S − σ_x)` at a configuration `σ` (`θ_x = 2π(x+1)/L`), the diagonal
 entry of the twist generator `G`. -/
 noncomputable def lsmPhase (L N : ℕ) (σ : Fin L → Fin (N + 1)) : ℂ :=
@@ -335,41 +322,35 @@ theorem lsmConjHamiltonian_symm_sub_apply (L N : ℕ) (σ τ : Fin L → Fin (N 
   push_cast
   ring
 
-/-- For a nonzero **eigenvector** `Φ` of the (real-eigenvalue) Hamiltonian at eigenvalue `E`, the
-real Rayleigh quotient is exactly `E`. -/
-theorem expectationRatioRe_of_eigenvector (L N : ℕ) (Φ : (Fin L → Fin (N + 1)) → ℂ) (E : ℝ)
-    (hne : Φ ≠ 0)
-    (heig : (afmHeisenbergChainHamiltonianS L N).mulVec Φ = (E : ℂ) • Φ) :
-    expectationRatioRe (afmHeisenbergChainHamiltonianS L N) Φ = E := by
-  have hpos : 0 < (star Φ ⬝ᵥ Φ).re :=
-    dotProduct_star_self_re_pos hne
-  unfold expectationRatioRe
-  rw [heig, dotProduct_smul, smul_eq_mul, Complex.re_ofReal_mul, mul_div_assoc,
-    div_self (ne_of_gt hpos), mul_one]
+/-! ## Symmetrised-sum variational reduction for an arbitrary Hamiltonian `Ĥ` (Tasaki eq. (6.2.25))
 
-/-- **Energy difference as a Rayleigh quotient of the conjugated minus bare Hamiltonian.**
-For a ground-state eigenvector `Φ` at energy `E_GS`,
-`expectationRatioRe Φ_LSM − E_GS = ⟨Φ, (Û† Ĥ Û − Ĥ) Φ⟩.re / ⟨Φ, Φ⟩.re`. -/
-theorem expectationRatioRe_lsmTrialState_sub (L N : ℕ) (Φ : (Fin L → Fin (N + 1)) → ℂ) (E_GS : ℝ)
-    (hne : Φ ≠ 0)
-    (heig : (afmHeisenbergChainHamiltonianS L N).mulVec Φ = (E_GS : ℂ) • Φ) :
-    expectationRatioRe (afmHeisenbergChainHamiltonianS L N) (lsmTrialState L N Φ) - E_GS =
-      (star Φ ⬝ᵥ ((lsmTwistOperator L N).conjTranspose * afmHeisenbergChainHamiltonianS L N *
-          lsmTwistOperator L N - afmHeisenbergChainHamiltonianS L N).mulVec Φ).re /
-        (star Φ ⬝ᵥ Φ).re := by
-  have hpos : 0 < (star Φ ⬝ᵥ Φ).re :=
-    dotProduct_star_self_re_pos hne
-  rw [expectationRatioRe_lsmTrialState, ← expectationRatioRe_of_eigenvector L N Φ E_GS hne heig]
-  unfold expectationRatioRe
-  rw [Matrix.sub_mulVec, dotProduct_sub, Complex.sub_re, sub_div]
+The outer step of Tasaki's Lemma 6.4 (§6.2, eq. (6.2.25), p. 164) reduces the trial-state energy gap
+to the Rayleigh quotient of the *symmetrised* twisted operator `Û† Ĥ Û + Û Ĥ Û† − 2 Ĥ`.  This step
+uses nothing specific to the antiferromagnetic Heisenberg chain — only the unitarity of the global
+LSM twist `Û_LSM` and that `Φ` is a ground-state eigenvector of `Ĥ`.  We record it here for an
+**arbitrary** operator `Ĥ : ManyBodyOpS (Fin L) N`, so that the generalized Lemma 6.4 (for
+`Ĥ = Σ_x ĥ_x`, `IsShortRangeU1Chain`) and the original Heisenberg-chain instance are both
+specializations.  The Heisenberg-chain forms consumed elsewhere are re-derived at the end. -/
 
-/-- **The anti-twisted state's Rayleigh quotient** (the `−θ` twist `Û† Φ`) equals the
-anti-conjugated Hamiltonian's Rayleigh quotient. -/
-theorem expectationRatioRe_lsmAntiTrialState (L N : ℕ) (Φ : (Fin L → Fin (N + 1)) → ℂ) :
-    expectationRatioRe (afmHeisenbergChainHamiltonianS L N)
-        ((lsmTwistOperator L N).conjTranspose.mulVec Φ) =
-      expectationRatioRe (lsmTwistOperator L N * afmHeisenbergChainHamiltonianS L N *
-        (lsmTwistOperator L N).conjTranspose) Φ := by
+/-- **The twisted state's Rayleigh quotient equals the conjugated Hamiltonian's Rayleigh quotient**
+(arbitrary `Ĥ`).  By unitarity of `Û_LSM`,
+`⟨Φ_LSM, Ĥ Φ_LSM⟩ / ⟨Φ_LSM, Φ_LSM⟩ = ⟨Φ, Û† Ĥ Û Φ⟩ / ⟨Φ, Φ⟩`. -/
+theorem expectationRatioRe_lsmTrialState_general (L N : ℕ) (H : ManyBodyOpS (Fin L) N)
+    (Φ : (Fin L → Fin (N + 1)) → ℂ) :
+    expectationRatioRe H (lsmTrialState L N Φ) =
+      expectationRatioRe ((lsmTwistOperator L N).conjTranspose * H * lsmTwistOperator L N) Φ := by
+  unfold expectationRatioRe lsmTrialState
+  congr 2
+  · rw [star_mulVec_dotProduct, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
+  · rw [star_mulVec_dotProduct, Matrix.mulVec_mulVec, lsmTwistOperator_unitary,
+      Matrix.one_mulVec]
+
+/-- **The anti-twisted state's Rayleigh quotient equals the anti-conjugated Hamiltonian's Rayleigh
+quotient** (arbitrary `Ĥ`, the `−θ` twist `Û† Φ`). -/
+theorem expectationRatioRe_lsmAntiTrialState_general (L N : ℕ) (H : ManyBodyOpS (Fin L) N)
+    (Φ : (Fin L → Fin (N + 1)) → ℂ) :
+    expectationRatioRe H ((lsmTwistOperator L N).conjTranspose.mulVec Φ) =
+      expectationRatioRe (lsmTwistOperator L N * H * (lsmTwistOperator L N).conjTranspose) Φ := by
   unfold expectationRatioRe
   congr 2
   · rw [star_mulVec_dotProduct, Matrix.conjTranspose_conjTranspose, Matrix.mulVec_mulVec,
@@ -377,23 +358,79 @@ theorem expectationRatioRe_lsmAntiTrialState (L N : ℕ) (Φ : (Fin L → Fin (N
   · rw [star_mulVec_dotProduct, Matrix.conjTranspose_conjTranspose, Matrix.mulVec_mulVec,
       lsmTwistOperator_unitary', Matrix.one_mulVec]
 
-/-- **Anti-twist energy difference** as a Rayleigh quotient: for a ground-state eigenvector `Φ`,
-`expectationRatioRe (Û† Φ) − E_GS = ⟨Φ, (Û Ĥ Û† − Ĥ) Φ⟩.re / ⟨Φ, Φ⟩.re`. -/
-theorem expectationRatioRe_lsmAntiTrialState_sub (L N : ℕ) (Φ : (Fin L → Fin (N + 1)) → ℂ)
-    (E_GS : ℝ) (hne : Φ ≠ 0)
-    (heig : (afmHeisenbergChainHamiltonianS L N).mulVec Φ = (E_GS : ℂ) • Φ) :
-    expectationRatioRe (afmHeisenbergChainHamiltonianS L N)
-        ((lsmTwistOperator L N).conjTranspose.mulVec Φ) - E_GS =
-      (star Φ ⬝ᵥ (lsmTwistOperator L N * afmHeisenbergChainHamiltonianS L N *
-          (lsmTwistOperator L N).conjTranspose - afmHeisenbergChainHamiltonianS L N).mulVec Φ).re /
-        (star Φ ⬝ᵥ Φ).re := by
-  rw [expectationRatioRe_lsmAntiTrialState, ← expectationRatioRe_of_eigenvector L N Φ E_GS hne heig]
+/-- For a nonzero **eigenvector** `Φ` of an arbitrary `Ĥ` at real eigenvalue `E`, the real Rayleigh
+quotient is exactly `E`. -/
+theorem expectationRatioRe_of_eigenvector_general (L N : ℕ) (H : ManyBodyOpS (Fin L) N)
+    (Φ : (Fin L → Fin (N + 1)) → ℂ) (E : ℝ) (hne : Φ ≠ 0)
+    (heig : H.mulVec Φ = (E : ℂ) • Φ) :
+    expectationRatioRe H Φ = E := by
+  have hpos : 0 < (star Φ ⬝ᵥ Φ).re := dotProduct_star_self_re_pos hne
+  unfold expectationRatioRe
+  rw [heig, dotProduct_smul, smul_eq_mul, Complex.re_ofReal_mul, mul_div_assoc,
+    div_self (ne_of_gt hpos), mul_one]
+
+/-- **Energy difference as a Rayleigh quotient of the conjugated minus bare Hamiltonian** (arbitrary
+`Ĥ`).  For a ground-state eigenvector `Φ` at energy `E_GS`,
+`expectationRatioRe Φ_LSM − E_GS = ⟨Φ, (Û† Ĥ Û − Ĥ) Φ⟩.re / ⟨Φ, Φ⟩.re`. -/
+theorem expectationRatioRe_lsmTrialState_sub_general (L N : ℕ) (H : ManyBodyOpS (Fin L) N)
+    (Φ : (Fin L → Fin (N + 1)) → ℂ) (E_GS : ℝ) (hne : Φ ≠ 0)
+    (heig : H.mulVec Φ = (E_GS : ℂ) • Φ) :
+    expectationRatioRe H (lsmTrialState L N Φ) - E_GS =
+      (star Φ ⬝ᵥ ((lsmTwistOperator L N).conjTranspose * H *
+          lsmTwistOperator L N - H).mulVec Φ).re / (star Φ ⬝ᵥ Φ).re := by
+  rw [expectationRatioRe_lsmTrialState_general,
+    ← expectationRatioRe_of_eigenvector_general L N H Φ E_GS hne heig]
   unfold expectationRatioRe
   rw [Matrix.sub_mulVec, dotProduct_sub, Complex.sub_re, sub_div]
 
-/-- **Symmetrised (`±θ` averaged) energy difference**: the sum of the two twist-direction energy
-differences equals the Rayleigh quotient of the symmetrised operator `Û† Ĥ Û + Û Ĥ Û† − 2 Ĥ`,
-in which the imaginary (current) contribution has cancelled. -/
+/-- **Anti-twist energy difference** as a Rayleigh quotient (arbitrary `Ĥ`): for a ground-state
+eigenvector `Φ`, `expectationRatioRe (Û† Φ) − E_GS = ⟨Φ, (Û Ĥ Û† − Ĥ) Φ⟩.re / ⟨Φ, Φ⟩.re`. -/
+theorem expectationRatioRe_lsmAntiTrialState_sub_general (L N : ℕ) (H : ManyBodyOpS (Fin L) N)
+    (Φ : (Fin L → Fin (N + 1)) → ℂ) (E_GS : ℝ) (hne : Φ ≠ 0)
+    (heig : H.mulVec Φ = (E_GS : ℂ) • Φ) :
+    expectationRatioRe H ((lsmTwistOperator L N).conjTranspose.mulVec Φ) - E_GS =
+      (star Φ ⬝ᵥ (lsmTwistOperator L N * H *
+          (lsmTwistOperator L N).conjTranspose - H).mulVec Φ).re / (star Φ ⬝ᵥ Φ).re := by
+  rw [expectationRatioRe_lsmAntiTrialState_general,
+    ← expectationRatioRe_of_eigenvector_general L N H Φ E_GS hne heig]
+  unfold expectationRatioRe
+  rw [Matrix.sub_mulVec, dotProduct_sub, Complex.sub_re, sub_div]
+
+/-- **Symmetrised (`±θ` averaged) energy difference** (arbitrary `Ĥ`, Tasaki eq. (6.2.25), p. 164):
+the sum of the two twist-direction energy differences equals the Rayleigh quotient of the
+symmetrised operator `Û† Ĥ Û + Û Ĥ Û† − 2 Ĥ`, in which the imaginary (current) contribution has
+cancelled. -/
+theorem lsm_energy_diff_symm_sum_general (L N : ℕ) (H : ManyBodyOpS (Fin L) N)
+    (Φ : (Fin L → Fin (N + 1)) → ℂ) (E_GS : ℝ) (hne : Φ ≠ 0)
+    (heig : H.mulVec Φ = (E_GS : ℂ) • Φ) :
+    (expectationRatioRe H (lsmTrialState L N Φ) - E_GS) +
+        (expectationRatioRe H ((lsmTwistOperator L N).conjTranspose.mulVec Φ) - E_GS) =
+      (star Φ ⬝ᵥ ((lsmTwistOperator L N).conjTranspose * H * lsmTwistOperator L N +
+          lsmTwistOperator L N * H * (lsmTwistOperator L N).conjTranspose -
+          2 • H).mulVec Φ).re / (star Φ ⬝ᵥ Φ).re := by
+  rw [expectationRatioRe_lsmTrialState_sub_general L N H Φ E_GS hne heig,
+    expectationRatioRe_lsmAntiTrialState_sub_general L N H Φ E_GS hne heig, ← add_div]
+  congr 1
+  rw [← Complex.add_re, ← dotProduct_add, ← Matrix.add_mulVec]
+  congr 3
+  rw [two_smul]
+  abel
+
+/-- **Variational lower bound (`Δ₋ ≥ 0`)** for an arbitrary Hermitian `Ĥ`: the ground energy
+lower-bounds the real Rayleigh quotient of *any* nonzero vector.  Chains
+`E_GS ≤ hermitianMinEigenvalue ≤ expectationRatioRe`: the minimum eigenvalue is in the spectrum
+(so `≥ E_GS` by minimality) and lower-bounds every Rayleigh quotient
+(`hermitianMinEigenvalue_le_expectationRatioRe`). -/
+theorem groundEnergy_le_expectationRatioRe_general (L N : ℕ) (H : ManyBodyOpS (Fin L) N)
+    (hH : H.IsHermitian) (E_GS : ℝ) (hmin : IsGroundEnergy H E_GS)
+    {Ψ : (Fin L → Fin (N + 1)) → ℂ} (hΨ : Ψ ≠ 0) :
+    E_GS ≤ expectationRatioRe H Ψ := by
+  obtain ⟨v, hv0, hveig⟩ := exists_nonzero_eigenvector_hermitianMinEigenvalue hH
+  exact le_trans (hmin.2 _ ⟨v, hv0, hveig⟩) (hermitianMinEigenvalue_le_expectationRatioRe hH hΨ)
+
+/-- **Symmetrised (`±θ` averaged) energy difference** for the antiferromagnetic Heisenberg chain
+(Tasaki eq. (6.2.25)); the `Ĥ = afmHeisenbergChainHamiltonianS L N` instance of
+`lsm_energy_diff_symm_sum_general`, consumed by the Theorem 6.3 gap proof. -/
 theorem lsm_energy_diff_symm_sum (L N : ℕ) (Φ : (Fin L → Fin (N + 1)) → ℂ) (E_GS : ℝ)
     (hne : Φ ≠ 0)
     (heig : (afmHeisenbergChainHamiltonianS L N).mulVec Φ = (E_GS : ℂ) • Φ) :
@@ -404,34 +441,18 @@ theorem lsm_energy_diff_symm_sum (L N : ℕ) (Φ : (Fin L → Fin (N + 1)) → �
             lsmTwistOperator L N +
           lsmTwistOperator L N * afmHeisenbergChainHamiltonianS L N *
             (lsmTwistOperator L N).conjTranspose -
-          2 • afmHeisenbergChainHamiltonianS L N).mulVec Φ).re / (star Φ ⬝ᵥ Φ).re := by
-  rw [expectationRatioRe_lsmTrialState_sub L N Φ E_GS hne heig,
-    expectationRatioRe_lsmAntiTrialState_sub L N Φ E_GS hne heig, ← add_div]
-  congr 1
-  rw [← Complex.add_re, ← dotProduct_add, ← Matrix.add_mulVec]
-  congr 3
-  rw [two_smul]
-  abel
+          2 • afmHeisenbergChainHamiltonianS L N).mulVec Φ).re / (star Φ ⬝ᵥ Φ).re :=
+  lsm_energy_diff_symm_sum_general L N (afmHeisenbergChainHamiltonianS L N) Φ E_GS hne heig
 
-/-- **Variational lower bound (`Δ₋ ≥ 0`)**: the ground energy lower-bounds the real Rayleigh
-quotient of *any* nonzero vector.  Chains `E_GS ≤ hermitianMinEigenvalue ≤ expectationRatioRe`:
-the minimum eigenvalue is in the spectrum (so `≥ E_GS` by minimality) and lower-bounds every
-Rayleigh quotient. -/
+/-- **Variational lower bound (`Δ₋ ≥ 0`)** for the antiferromagnetic Heisenberg chain; the
+`Ĥ = afmHeisenbergChainHamiltonianS L N` instance of `groundEnergy_le_expectationRatioRe_general`,
+consumed by the Theorem 6.3 gap proof. -/
 theorem groundEnergy_le_expectationRatioRe (L N : ℕ) (E_GS : ℝ)
     (hmin : IsGroundEnergy (afmHeisenbergChainHamiltonianS L N) E_GS)
     {Ψ : (Fin L → Fin (N + 1)) → ℂ} (hΨ : Ψ ≠ 0) :
-    E_GS ≤ expectationRatioRe (afmHeisenbergChainHamiltonianS L N) Ψ := by
-  have hM : (afmHeisenbergChainHamiltonianS L N).IsHermitian :=
-    afmHeisenbergChainHamiltonianS_isHermitian L N
-  have hpos : 0 < (star Ψ ⬝ᵥ Ψ).re := dotProduct_star_self_re_pos hΨ
-  have hvar := hermitianMinEigenvalue_mul_dotProduct_re_le_rayleighOnVec hM Ψ
-  have h1 : hermitianMinEigenvalue hM ≤
-      expectationRatioRe (afmHeisenbergChainHamiltonianS L N) Ψ := by
-    unfold expectationRatioRe rayleighOnVec at *
-    rw [le_div_iff₀ hpos]
-    exact hvar
-  obtain ⟨v, hv0, hveig⟩ := exists_nonzero_eigenvector_hermitianMinEigenvalue hM
-  exact le_trans (hmin.2 _ ⟨v, hv0, hveig⟩) h1
+    E_GS ≤ expectationRatioRe (afmHeisenbergChainHamiltonianS L N) Ψ :=
+  groundEnergy_le_expectationRatioRe_general L N (afmHeisenbergChainHamiltonianS L N)
+    (afmHeisenbergChainHamiltonianS_isHermitian L N) E_GS hmin hΨ
 
 /-! ## P4: bond operator identity for the symmetrised twist -/
 

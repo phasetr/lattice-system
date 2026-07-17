@@ -1,3 +1,4 @@
+import LatticeSystem.Quantum.SpinS.AndersonTower
 import LatticeSystem.Quantum.SpinS.HermitianVariationalLowerBound
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
@@ -299,5 +300,21 @@ theorem onSiteS_mul_onSiteS_dotProduct_re_abs_le {Λ : Type*} [Fintype Λ] [Deci
 theorem one_sub_cos_le_half_sq (x : ℝ) : 1 - Real.cos x ≤ x ^ 2 / 2 := by
   have h := Real.one_sub_sq_div_two_le_cos (x := x)
   nlinarith [h]
+
+/-- **The minimum eigenvalue lower-bounds every real Rayleigh quotient** (generic `Matrix ι ι ℂ`,
+Hermitian `H`): `hermitianMinEigenvalue hH ≤ expectationRatioRe H v` for any nonzero `v`.  This is
+the shared core of the variational lower bound; the minimality step (`E₀ ≤ hermitianMinEigenvalue`)
+is supplied separately by each caller, so both the ground-energy (`IsGroundEnergy`) form
+`groundEnergy_le_expectationRatioRe_general` and the spectral-minimizer form
+`minimizerEigenvalue_le_expectationRatioRe` derive from it without repeating the
+`hermitianMinEigenvalue_mul_dotProduct_re_le_rayleighOnVec` chain. -/
+theorem hermitianMinEigenvalue_le_expectationRatioRe {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Nonempty ι] {H : Matrix ι ι ℂ} (hH : H.IsHermitian) {v : ι → ℂ} (hv : v ≠ 0) :
+    hermitianMinEigenvalue hH ≤ expectationRatioRe H v := by
+  have hpos : 0 < (star v ⬝ᵥ v).re := dotProduct_star_self_re_pos hv
+  have hvar := hermitianMinEigenvalue_mul_dotProduct_re_le_rayleighOnVec hH v
+  unfold expectationRatioRe rayleighOnVec at *
+  rw [le_div_iff₀ hpos]
+  exact hvar
 
 end LatticeSystem.Quantum
