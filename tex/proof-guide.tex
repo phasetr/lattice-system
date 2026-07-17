@@ -11206,7 +11206,16 @@ are orthogonal: the Hermitian $\hat S^{(3)}_{\mathrm{tot}}$ has distinct real ei
 \texttt{towerState\_unitNormalize\_inner\_eq\_zero\_of\_ne} (the normalized $\Gamma_M$, $O=1$
 consumption form), reusing the §4.2 sector commutators $[\hat S^{(3)}_{\mathrm{tot}},\hat
 O_L^\pm]=\pm\hat O_L^\pm$ (\texttt{\#print axioms} =
-\texttt{propext}/\texttt{Classical.choice}/\texttt{Quot.sound} only).  The
+\texttt{propext}/\texttt{Classical.choice}/\texttt{Quot.sound} only).  \emph{PR-3} (\#5064,
+\texttt{Quantum/SpinS/BoseEinsteinCondensateCoherentMatrixElement.lean}): the off-diagonal matrix
+elements that survive the sector collapse for the raising operator $\hat O_L^+$ ---
+\texttt{becOffDiagonal\_ne\_adjacent\_eq\_zero} ($\langle\Gamma_{M'},\hat O_L^+\,\Gamma_M\rangle=0$
+for $M'\neq M+1$, since $\hat O_L^+\Gamma_M$ lies in the $\hat S^{(3)}_{\mathrm{tot}}=M+1$ sector) and
+\texttt{becOffDiagonal\_eq\_norm\_ratio} (on the raising side $M\ge0$, both tower states nonzero, the
+single surviving adjacent element is the real norm ratio $\langle\Gamma_{M+1},\hat
+O_L^+\,\Gamma_M\rangle=\sqrt{D_{M+1}/D_M}$, $D_M=\|(\hat O_L^+)^M\Phi\|^2$, because there $\hat
+O_L^+\,\mathtt{towerState}\,M\,\Phi=\mathtt{towerState}\,(M{+}1)\,\Phi$ exactly, so $\hat
+O_L^+\Gamma_M\parallel\Gamma_{M+1}$); std3 only.  The
 general-$\mu$ \texttt{tasaki\_5\_3\_bec\_u1\_ssb} stays a documented axiom ($d$-dim RP-intractability,
 Koma--Tasaki [21]), the same two-track policy as Theorem~5.2.  Chapters~3--10 backfill.
 
