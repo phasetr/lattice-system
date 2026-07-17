@@ -11447,7 +11447,16 @@ Tasaki remarks that for half-odd-integer $S$ with a translation-invariant ground
 orthogonality argument then yields $0\le E_{1\mathrm{st}}-E_{\mathrm{GS}}\le C/L$ (as in
 Theorem~6.3); that gap consequence is \emph{not} formalized here, since the formal Lemma 6.2
 (\texttt{lsm\_ground\_twist\_orthogonal}) is specialized to the antiferromagnetic Heisenberg chain.
-Recorded as a documented axiom.  Chapters~3--10 backfill.
+Recorded as a documented axiom.  \emph{Discharge infrastructure} (PR~\#5072): the \emph{centered
+local twist generator} $\hat M_x=\texttt{localTwistGen}\,L\,N\,r\,x
+:=\sum_{y\in W_x}(2\pi/L)\,\delta(x,y)\,\hat S_y^{(3)}$ (eq.~6.2.27) over the range-$r$ window
+$\texttt{window}\,L\,r\,x=\{y:\mathtt{ringDist}\,x\,y\le r\}$, with $\delta(x,y)=
+\texttt{signedRingDisp}\,L\,x\,y$ the \emph{ring-distance-centered} signed displacement
+($|\delta|=\mathtt{ringDist}$, avoiding the $2\pi$ seam jump of the raw angle $\theta_y=2\pi(y+1)/L$
+on wrapping windows); $\hat M_x$ is Hermitian, so the \emph{local twist operator}
+$\hat U_x=\texttt{localTwistOperator}\,L\,N\,r\,x:=\exp(-i\hat M_x)$ is unitary.  The generic norm
+lemma \texttt{manyBodyOperatorNormS\_unitary\_conj} ($\|UYU^{\dagger}\|=\|Y\|$ for unitary $U$) is
+added for the forthcoming second-order twist-conjugation bound.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§6.3 Proposition 6.5} (the $S=1$ chain on the hidden-AFM subspace; Tasaki §6.3,

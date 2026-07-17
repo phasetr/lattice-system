@@ -2,6 +2,7 @@ import LatticeSystem.Quantum.SpinS.AndersonTower
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Analysis.Normed.Module.FiniteDimension
 import Mathlib.Analysis.CStarAlgebra.Matrix
+import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 
 /-!
 # Tasaki §4.2.2: the order-operator algebra and Lemma 4.14
@@ -191,6 +192,81 @@ theorem manyBodyOperatorNormS_diagonal_le {v : (Λ → Fin (N + 1)) → ℂ} {C 
   exact (pi_norm_le_iff_of_nonneg hC).2 h
 
 end L2Wrappers
+
+/-- The many-body `L²` operator norm of the identity is `1` (the bundled `toEuclideanCLM` sends `1`
+to the identity endomorphism, whose operator norm is `1` on the nontrivial space). -/
+@[simp] theorem manyBodyOperatorNormS_one :
+    manyBodyOperatorNormS (1 : ManyBodyOpS Λ N) = 1 := by
+  rw [manyBodyOperatorNormS_eq_toEuclideanCLM, map_one, norm_one]
+
+/-- **Unitary conjugation preserves the many-body `L²` operator norm**: if `UᴴU = 1` then
+`‖U Y Uᴴ‖ = ‖Y‖`.  The forward bound is two submultiplicative steps with `‖U‖ = 1` (from the
+`C*`-identity `‖UᴴU‖ = ‖U‖²` and `‖1‖ = 1`) and `‖Uᴴ‖ = ‖U‖`; the reverse bound rewrites
+`Y = Uᴴ (U Y Uᴴ) U = (UᴴU) Y (UᴴU)`.  Consumed by the second-order twist-conjugation bound of the
+generalized Lieb–Schultz–Mattis Lemma 6.4 (Tasaki §6.2). -/
+theorem manyBodyOperatorNormS_unitary_conj {U Y : ManyBodyOpS Λ N}
+    (hU : Matrix.conjTranspose U * U = 1) :
+    manyBodyOperatorNormS (U * Y * Matrix.conjTranspose U) = manyBodyOperatorNormS Y := by
+  have hUnorm : manyBodyOperatorNormS U = 1 := by
+    have h := manyBodyOperatorNormS_conjTranspose_mul_self U
+    rw [hU, manyBodyOperatorNormS_one] at h
+    rw [← Real.sqrt_sq (manyBodyOperatorNormS_nonneg U), ← h, Real.sqrt_one]
+  have hY : Matrix.conjTranspose U * (U * Y * Matrix.conjTranspose U) * U = Y := by
+    calc Matrix.conjTranspose U * (U * Y * Matrix.conjTranspose U) * U
+        = (Matrix.conjTranspose U * U) * (Y * (Matrix.conjTranspose U * U)) := by
+          simp only [mul_assoc]
+      _ = Y := by rw [hU, one_mul, mul_one]
+  refine le_antisymm ?_ ?_
+  · calc manyBodyOperatorNormS (U * Y * Matrix.conjTranspose U)
+        ≤ manyBodyOperatorNormS (U * Y) * manyBodyOperatorNormS (Matrix.conjTranspose U) :=
+          manyBodyOperatorNormS_mul_le _ _
+      _ ≤ manyBodyOperatorNormS U * manyBodyOperatorNormS Y
+            * manyBodyOperatorNormS (Matrix.conjTranspose U) :=
+          mul_le_mul_of_nonneg_right (manyBodyOperatorNormS_mul_le _ _)
+            (manyBodyOperatorNormS_nonneg _)
+      _ = manyBodyOperatorNormS Y := by rw [manyBodyOperatorNormS_conjTranspose, hUnorm]; ring
+  · calc manyBodyOperatorNormS Y
+        = manyBodyOperatorNormS
+            (Matrix.conjTranspose U * (U * Y * Matrix.conjTranspose U) * U) := by rw [hY]
+      _ ≤ manyBodyOperatorNormS (Matrix.conjTranspose U * (U * Y * Matrix.conjTranspose U))
+            * manyBodyOperatorNormS U := manyBodyOperatorNormS_mul_le _ _
+      _ ≤ manyBodyOperatorNormS (Matrix.conjTranspose U)
+            * manyBodyOperatorNormS (U * Y * Matrix.conjTranspose U) * manyBodyOperatorNormS U :=
+          mul_le_mul_of_nonneg_right (manyBodyOperatorNormS_mul_le _ _)
+            (manyBodyOperatorNormS_nonneg _)
+      _ = manyBodyOperatorNormS (U * Y * Matrix.conjTranspose U) := by
+          rw [manyBodyOperatorNormS_conjTranspose, hUnorm]; ring
+
+section MatrixExpUnitary
+
+variable {n : Type*} [Fintype n] [DecidableEq n]
+
+/-- **Adjoint of a Hermitian-generated unitary**: for a Hermitian `G`, the adjoint of `exp(−i G)` is
+`exp(+i G)` (`Matrix.exp_conjTranspose` plus `Gᴴ = G`).  The generic fact underlying the LSM twist
+operators `Û_LSM = exp(−i G)` and the local twist operators `Û_x = exp(−i M̂_x)`. -/
+theorem conjTranspose_exp_neg_I_smul_of_isHermitian {G : Matrix n n ℂ} (hG : G.IsHermitian) :
+    (NormedSpace.exp (-Complex.I • G)).conjTranspose = NormedSpace.exp (Complex.I • G) := by
+  rw [← Matrix.exp_conjTranspose, Matrix.conjTranspose_smul, hG.eq]
+  congr 1
+  rw [Complex.star_def, map_neg, Complex.conj_I, neg_neg]
+
+/-- **A Hermitian-generated exponential is unitary** (`Ûᴴ Û = 1`): for a Hermitian `G`,
+`exp(−iG)ᴴ exp(−iG) = exp(iG) exp(−iG) = exp(0) = 1`.  The two exponents commute (both scalar
+multiples of `G`), so `Matrix.exp_add_of_commute` collapses the product. -/
+theorem conjTranspose_mul_exp_neg_I_smul_of_isHermitian {G : Matrix n n ℂ} (hG : G.IsHermitian) :
+    (NormedSpace.exp (-Complex.I • G)).conjTranspose * NormedSpace.exp (-Complex.I • G) = 1 := by
+  rw [conjTranspose_exp_neg_I_smul_of_isHermitian hG, ← Matrix.exp_add_of_commute]
+  · rw [show Complex.I • G + -Complex.I • G = (0 : Matrix n n ℂ) by rw [neg_smul, add_neg_cancel]]
+    exact NormedSpace.exp_zero
+  · exact (Commute.refl G).smul_left Complex.I |>.smul_right (-Complex.I)
+
+/-- **A Hermitian-generated exponential is unitary** (`Û Ûᴴ = 1`, companion identity): for a
+Hermitian `G`, `exp(−iG) exp(−iG)ᴴ = 1`, by one-sided-inverse commutativity of square matrices. -/
+theorem exp_neg_I_smul_mul_conjTranspose_of_isHermitian {G : Matrix n n ℂ} (hG : G.IsHermitian) :
+    NormedSpace.exp (-Complex.I • G) * (NormedSpace.exp (-Complex.I • G)).conjTranspose = 1 :=
+  mul_eq_one_comm.mpr (conjTranspose_mul_exp_neg_I_smul_of_isHermitian hG)
+
+end MatrixExpUnitary
 
 /-- The site-embedded image of a diagonal single-site matrix is again diagonal, with entry indexed
 by the local configuration value `σ i`. -/

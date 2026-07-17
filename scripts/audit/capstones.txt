@@ -267,3 +267,23 @@ tasaki_5_2_bec_tower_half_filling
 # consumed by the discharge theorem.  The unused `Ô⁻Ô⁻`/`Ô⁺Ô⁻` collapses were DELETED (the final
 # proof recovers those bands via `becCoherent_LL_eq_conj_RR`/`becCoherent_RL_eq_LR`).
 tasaki_5_3_bec_u1_ssb_half_filling
+
+# TEMPORARY (Tasaki §6.2 Lemma 6.4 discharge arc, tracker #5070, PR #5072 = PR-2).
+# PR-2 infrastructure leaves that are legitimately zero-referenced *until later PRs of the same
+# arc consume them*; listed here only for the duration of the arc, with explicit DELIST
+# conditions.  None is decorative: all lie on the Lemma 6.4 critical path (backward-chained).
+#
+# `localTwistOperator_conjTranspose` / `localTwistOperator_unitary` / `localTwistOperator_unitary'`
+# — the adjoint `Û_x† = exp(+i M̂_x)` and the two-sided unitarity `Û_x† Û_x = Û_x Û_x† = 1` of the
+# centered local twist operator `Û_x = exp(−i M̂_x)` (`localTwistGen`, eqs. 6.2.26–6.2.27); each now
+# derives from the generic `*_exp_neg_I_smul_of_isHermitian` lemmas (so they no longer reference one
+# another).  Consumed by the global→local twist reduction (PR-4, `Û ĥ_x Û† = Û_x ĥ_x Û_x†`) and the
+# second-order conjugation bound (PR-6).  DELIST when PR-4/PR-6 reference them.
+localTwistOperator_conjTranspose
+localTwistOperator_unitary
+localTwistOperator_unitary'
+#
+# `manyBodyOperatorNormS_unitary_conj` — unitary conjugation preserves the L² operator norm
+# (`‖U Y Uᴴ‖ = ‖Y‖`).  Consumed by the second-order symmetric-difference twist bound (PR-6:
+# `‖f(t)‖ = ‖X‖`, `‖f''(t)‖ = ‖⁅M,⁅M,X⁆⁆‖`).  DELIST when PR-6 references it.
+manyBodyOperatorNormS_unitary_conj
