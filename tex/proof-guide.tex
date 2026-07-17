@@ -11198,8 +11198,15 @@ coherent-state Rayleigh numerator double-sum expansion
 \texttt{becCoherentState\_dotProduct\_mulVec},
 $\langle\Xi_\theta,\hat O\,\Xi_\theta\rangle=(2M_{\max}+1)^{-1}\sum_{M',M}\overline{e^{-iM'\theta}}\,
 e^{-iM\theta}\,\langle\Gamma_{M'},\hat O\,\Gamma_M\rangle$ (the algebraic core of eqs.~(5.3.6)--(5.3.8),
-p.~141), the step before the sector orthogonality of the $\Gamma_M$ collapses the double sum
-(\texttt{\#print axioms} = \texttt{propext}/\texttt{Classical.choice}/\texttt{Quot.sound} only).  The
+p.~141).  \emph{PR-2} (\#5063, \texttt{Quantum/SpinS/BoseEinsteinCondensateSector.lean}): the
+total-$\hat S^{(3)}$ sector structure that collapses that double sum ---
+\texttt{towerState\_totalSpin3\_eigenvector} ($\hat S^{(3)}_{\mathrm{tot}}\Gamma_M=M\,\Gamma_M$ at
+half filling, eq.~(5.3.3)), \texttt{towerState\_inner\_eq\_zero\_of\_ne} (distinct-$M$ tower states
+are orthogonal: the Hermitian $\hat S^{(3)}_{\mathrm{tot}}$ has distinct real eigenvalues), and
+\texttt{towerState\_unitNormalize\_inner\_eq\_zero\_of\_ne} (the normalized $\Gamma_M$, $O=1$
+consumption form), reusing the §4.2 sector commutators $[\hat S^{(3)}_{\mathrm{tot}},\hat
+O_L^\pm]=\pm\hat O_L^\pm$ (\texttt{\#print axioms} =
+\texttt{propext}/\texttt{Classical.choice}/\texttt{Quot.sound} only).  The
 general-$\mu$ \texttt{tasaki\_5\_3\_bec\_u1\_ssb} stays a documented axiom ($d$-dim RP-intractability,
 Koma--Tasaki [21]), the same two-track policy as Theorem~5.2.  Chapters~3--10 backfill.
 
