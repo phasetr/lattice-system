@@ -9,6 +9,7 @@ import LatticeSystem.Math.HermitianMaxEigenvalue
 import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorMarshallCore
 import LatticeSystem.Quantum.SpinS.DressedHeisenbergRaiseLowerCore
 import LatticeSystem.Quantum.SpinS.RaiseLower
+import LatticeSystem.Quantum.SpinS.RingDistance
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Analysis.Matrix.Order
 import Mathlib.Analysis.Matrix.Spectrum
@@ -87,11 +88,6 @@ spectrum of the restricted chain from the zeros from the orthogonal complement o
 def hhafRealSpectrum (L : ℕ) : Set ℝ :=
   {E : ℝ | ∃ Φ : (Fin L → Fin 3) → ℂ, Φ ≠ 0 ∧ (hhafProjection L).mulVec Φ = Φ ∧
     (hhafRestrictedChainHamiltonianS L).mulVec Φ = (E : ℂ) • Φ}
-
-/-- The **ring distance** between sites `x, y` on `Fin L`: the shorter of the two cyclic arc lengths
-`(y − x) mod L` and `(x − y) mod L`. -/
-def ringDist (L : ℕ) (x y : Fin L) : ℕ :=
-  min ((y.val + L - x.val) % L) ((x.val + L - y.val) % L)
 
 /-- The **normalized two-point correlation** `⟨Φ, Ŝ_x · Ŝ_y Φ⟩ / ⟨Φ, Φ⟩` of the spin-1 chain (real
 part; `Ŝ_x · Ŝ_y` is Hermitian). -/
