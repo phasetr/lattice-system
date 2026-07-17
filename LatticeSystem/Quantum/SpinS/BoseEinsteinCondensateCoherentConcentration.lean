@@ -23,8 +23,11 @@ half-filling `Ŝ^{(3)}_tot Φ = 0`, so it is directly instantiable by the BEC gr
 If `m∗` were a free parameter one could take `m∗ := 0` together with a genuine long-range-ordered
 family (`q₀ > 0`), making `√(2 q₀) ≤ 0` FALSE and `False` derivable (cf. the
 `Axiom ∀ must hold for all` discipline; the `SU(2)` sibling documents the same trap).  We instead
-pin `m∗` to the genuine coherent order parameter: `IsRealizingBECCoherentFamily` requires
-`⟨Ξ_0, Ô^{(1)} Ξ_0⟩ / L^d → m∗` (eq. (5.3.7) at `θ = 0`), fixing `m∗` as the true SSB order
+pin `m∗` to the genuine coherent order parameter: `IsRealizingBECCoherentFamily` requires the
+**uniform window-ratio concentration** (math-note §3.4, refinement 2) — eventually every one-step
+ratio `r_M = ⟨Γ_{M+1}, Ô⁺ Γ_M⟩ / L^d` in the (slow) window is within `ε` of `m∗` — which subsumes
+the `θ = 0` mean pinning `⟨Ξ_0, Ô^{(1)} Ξ_0⟩ / L^d → m∗` (eq. (5.3.7)) and additionally drives the
+second-moment concentration (eq. (5.3.8)) from the same source, fixing `m∗` as the true SSB order
 parameter.  The pinned bound `m∗ ≥ √(2 q₀)` is then the genuine "easy half" of the Koma–Tasaki
 concentration mechanism (the base ratio `→ 2 q₀`); the matching *equality* `m∗² = 2 q₀`
 (Conjecture 4.12's `U(1)` analogue) is a strictly stronger separate statement never asserted here.
@@ -46,7 +49,13 @@ open Matrix
 family `Φ L` at chemical potential `μ = 0`, together with a slow window `M_win`, so that the order
 parameter `m∗` is *pinned* to the genuine coherent order parameter and cannot be a free variable.
 
-For a slowly diverging window (`Tendsto M_win atTop atTop`), eventually in even `L`:
+The window `M_win` is a **slow window** (`IsSlowBECWindow d C₁ M_win`: monotone, diverging, and
+eventually within the nonvanishing tower range `M_win L ≤ C₁ L^{d/2}` — the same binding the
+`SU(2)` sibling and `IsBECCoherentSSBConstants` impose).  A bare `Tendsto M_win atTop atTop` is
+**insufficient**: a fast window outrunning `C₁ L^{d/2}` would dilute the normalization denominator
+and admit a false witness pinning `m∗` below `√(2 q₀)`, an over-quantification defect.
+
+Eventually in even `L`:
 * `Φ L` is a nonzero minimizer of the `μ = 0` chemical-potential XY Hamiltonian
   (`xyChemicalPotentialHamiltonianS d L 0`);
 * `Φ L` sits at half filling (`Ŝ^{(3)}_tot Φ = 0`; unlike the `SU(2)` family, axis-`1` singlet and
@@ -54,13 +63,19 @@ For a slowly diverging window (`Tendsto M_win atTop atTop`), eventually in even 
 * the two planar axes carry ODLRO with constant `q₀` (`⟨(Ô^{(α)})²⟩ / V² ≥ q₀`, `α = 1, 2`);
 * the tower states are nonzero across the window (`|M| ≤ C₁ L^{d/2}`), so the `Γ_M` normalize.
 
-The **pinning conjunct** fixes `m∗` as the exact coherent order parameter: at `θ = 0` the
-coherent-state moment density converges, `⟨Ξ_0, Ô^{(1)} Ξ_0⟩ / L^d → m∗` (eq. (5.3.7) at
-`θ = 0`, `cos 0 = 1`).  Together with `0 < m∗` this makes `m∗` the genuine SSB order parameter, the
-value the documented axiom `becMStar_ge_sqrt_twoQ` bounds below by `√(2 q₀)`. -/
+The **pinning conjunct** fixes `m∗` as the exact coherent order parameter by the **uniform
+window-ratio concentration** (math-note §3.4, 2026-07-17 refinement 2): eventually, for *every* `M`
+in the raising window, the one-step off-diagonal ratio `r_M = ⟨Γ_{M+1}, Ô⁺ Γ_M⟩ / L^d` is within
+`ε` of `m∗`.  This uniform form is strictly stronger than the `θ = 0` mean pinning
+`⟨Ξ_0, Ô^{(1)} Ξ_0⟩ / L^d → m∗` (which it subsumes, that mean being the window average of the
+`r_M`) and is exactly what lets *both* the first moments (eq. (5.3.7)) and the second moments
+(eq. (5.3.8), the window sums `S₂ = avg r_M²`, `S₁₁ = avg r_M r_{M+1}` — see math-note §2⑤)
+converge to `m∗` / `m∗²` **axiom-free** from a single concentration source.  Together with
+`0 < m∗` this makes `m∗` the genuine SSB order parameter, the value the documented axiom
+`becMStar_ge_sqrt_twoQ` bounds below by `√(2 q₀)`. -/
 def IsRealizingBECCoherentFamily (d : ℕ) (q₀ mStar C₁ : ℝ)
     (Φ : (L : ℕ) → (HypercubicTorus d L → Fin 2) → ℂ) (E₀ : ℕ → ℂ) (Mwin : ℕ → ℕ) : Prop :=
-  Filter.Tendsto Mwin Filter.atTop Filter.atTop ∧
+  IsSlowBECWindow d C₁ Mwin ∧
   (∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
     (xyChemicalPotentialHamiltonianS d L 0).mulVec (Φ L) = E₀ L • Φ L ∧
     (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin 2) → ℂ, Ψ ≠ 0 →
@@ -72,8 +87,11 @@ def IsRealizingBECCoherentFamily (d : ℕ) (q₀ mStar C₁ : ℝ)
     (∀ M : ℤ, (M.natAbs : ℝ) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →
       towerState (torusParitySublattice d L) 1 M (Φ L) ≠ 0)) ∧
   (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
-    |expectationRatioRe (staggeredOrderOp1S (torusParitySublattice d L) 1)
-        (becCoherentState d L 0 (Mwin L) (Φ L)) / (L : ℝ) ^ d - mStar| < ε) ∧
+    ∀ M : ℤ, -(Mwin L : ℤ) ≤ M → M < (Mwin L : ℤ) →
+      ‖(star (unitNormalize (towerState (torusParitySublattice d L) 1 (M + 1) (Φ L))) ⬝ᵥ
+            (staggeredRaisingOpS (torusParitySublattice d L) 1).mulVec
+              (unitNormalize (towerState (torusParitySublattice d L) 1 M (Φ L))))
+            / ((L : ℝ) ^ d : ℂ) - (mStar : ℂ)‖ < ε) ∧
   0 < mStar
 
 /-- **Tasaki Theorem 5.3 (the `U(1)` order-parameter lower bound `m∗ ≥ √(2 q₀)`), AXIOM.**  Tasaki
@@ -85,8 +103,9 @@ This is the BEC half-filling counterpart of the `SU(2)` concentration axiom
 `orderSqMoment_ratio_le_mStarSq_family` and of the `p̂`-mirror `mStar_eq_phat_ratio_limit`; per the
 2026-07-12 no-overreach boundary the Koma–Tasaki [66] concentration mechanism is deferred with
 parity to those axioms rather than rebuilt.  `m∗` is **pinned** to its genuine value by
-`IsRealizingBECCoherentFamily` (`hFamily`): the coherent moment density converges to `m∗`
-(eq. (5.3.7) at `θ = 0`), so `m∗` is the true SSB order parameter and the bound is the genuine
+`IsRealizingBECCoherentFamily` (`hFamily`): the uniform window-ratio concentration forces every
+one-step ratio `r_M → m∗` in the slow window, so `m∗` is the true SSB order parameter and the bound
+is the genuine
 "easy half" (`m∗² ≥ 2 q₀`) of [66], never the still-open equality `m∗² = 2 q₀`.  A free `m∗`
 would make the statement FALSE (`m∗ := 0` with `q₀ > 0`), hence the family pinning.  The family is
 unsatisfiable in `d = 1` (Corollary 4.3), so the axiom is vacuous there. -/
