@@ -288,3 +288,11 @@ tasaki_lemma_6_4_general_trial_energy_bound
 # state (§7.1.2, Theorem 7.1) and the §7.2.8 string order.  DELIST when the Theorem 7.1 / §7.2.8
 # arc consumes it as `⊗_x spin1SymEmbed` (or DELETE if that arc takes a different route).
 spin1SymEmbed
+
+# TEMPORARY (Lemma 7.4 arc, tracker #5078, PR-2): the forward kernel inclusion
+# `W ⊆ ker P̂₂^{loc}` (`vbsBondSubspace_le_ker`, AKLTBondProjection.lean).  Proves that each VBS
+# bond vector `Ψ_{σσ'}` is annihilated by the single-bond spin-2 projection `bondSpin2ProjectionS
+# (0 : Fin 2) 1` on ℂ³⊗ℂ³ (Tasaki §7.1.3, eqs. (7.1.19)–(7.1.20), p. 186; axiom-free, std3).  Not
+# yet consumed: PR-3 supplies the reverse inclusion (`ker = W`, dim 4) and DELISTs this into the
+# kernel-equality lemma.
+vbsBondSubspace_le_ker
