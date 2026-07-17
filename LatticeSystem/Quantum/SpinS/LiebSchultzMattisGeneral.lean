@@ -1,6 +1,6 @@
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattis
 import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
-import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrder
+import LatticeSystem.Quantum.SpinS.RingDistance
 
 /-!
 # Tasaki §6.2: the generalized Lieb–Schultz–Mattis variational bound (Lemma 6.4)

@@ -69,6 +69,7 @@ import LatticeSystem.Quantum.SpinS.TransverseBondEnergyExpectation
 import LatticeSystem.Quantum.SpinS.ExpectationNormBound
 import LatticeSystem.Quantum.SpinS.OscillatorStrengthForm
 import LatticeSystem.Quantum.SpinS.RingBondSumGeneral
+import LatticeSystem.Quantum.SpinS.RingDistance
 import LatticeSystem.Quantum.SpinS.RingHamiltonianCommutatorBondSum
 import LatticeSystem.Quantum.SpinS.RingHamiltonianCommutatorClosed
 import LatticeSystem.Quantum.SpinS.SingleBondCommutatorNorm
