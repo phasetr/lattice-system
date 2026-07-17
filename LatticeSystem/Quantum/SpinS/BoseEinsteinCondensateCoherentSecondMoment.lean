@@ -19,15 +19,16 @@ collapses to a single window band carrying the phase `e^{+2iθ}`, `1`, `1`, `e^{
 
 * `becCoherent_band_collapse` / `becCoherent_diagonal_collapse`: the generic Cesàro collapse for a
   sector-shift-`k` operator (`k = ±2` off-diagonal band with phase `e^{ikθ}`, `k = 0` diagonal);
-* `becCoherent_raisingRaising_collapse` / `becCoherent_loweringLowering_collapse`: the two
-  off-diagonal bands `⟨Ξ_θ, Ô⁺Ô⁺ Ξ_θ⟩`, `⟨Ξ_θ, Ô⁻Ô⁻ Ξ_θ⟩` (phases `e^{±2iθ}`);
-* `becCoherent_raisingLowering_collapse` / `becCoherent_loweringRaising_collapse`: the two diagonal
-  bands `⟨Ξ_θ, Ô⁺Ô⁻ Ξ_θ⟩`, `⟨Ξ_θ, Ô⁻Ô⁺ Ξ_θ⟩`;
+* `becCoherent_raisingRaising_collapse`: the off-diagonal band `⟨Ξ_θ, Ô⁺Ô⁺ Ξ_θ⟩` (phase `e^{+2iθ}`);
+* `becCoherent_loweringRaising_collapse`: the diagonal band `⟨Ξ_θ, Ô⁻Ô⁺ Ξ_θ⟩`;
 * `becCoherent_secondMoment1_eq` / `becCoherent_secondMoment2_eq`: the exact operator-square split
-  `⟨Ξ_θ, (Ô^{(α)})² Ξ_θ⟩` into a `¼`-weighted combination of those four band sums.
+  `⟨Ξ_θ, (Ô^{(α)})² Ξ_θ⟩` into a `¼`-weighted combination of the four band expectations.
 
-The reduction of these band sums to `(m∗ cos θ)²` (via the norm ratios `r_M` and the window
-concentration) is deferred to the assembly PR; here everything is an exact finite-`L` identity.
+The two remaining bands are recovered from these by the exact identities `⟨Ξ, Ô⁺Ô⁻ Ξ⟩ = ⟨Ξ, Ô⁻Ô⁺ Ξ⟩`
+(`becCoherent_RL_eq_LR`) and `⟨Ξ, Ô⁻Ô⁻ Ξ⟩ = conj ⟨Ξ, Ô⁺Ô⁺ Ξ⟩` (`becCoherent_LL_eq_conj_RR`) in the
+assembly, so the whole second moment reduces to the two collapsed bands.  The reduction of those
+band sums to `(m∗ cos θ)²` (via the norm ratios `r_M` and the window concentration) is done in the
+concentration/assembly modules; here everything is an exact finite-`L` identity.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §5.3, Theorem 5.3, eq. (5.3.8), pp. 141–142 (Koma–Tasaki [21]).
@@ -238,56 +239,6 @@ theorem becCoherent_raisingRaising_collapse (d L : ℕ) [NeZero L] (θ : ℝ) (M
   have h2 := totalSpinSOp3_mulVec_staggeredRaising_eigenvec (torusParitySublattice d L) h1
   rw [← Matrix.mulVec_mulVec, h2,
     show ((M : ℂ) + 1 + 1) = ((M + 2 : ℤ) : ℂ) from by push_cast; ring]
-
-/-- **`Ô⁻Ô⁻` band of the coherent second moment** (Tasaki §5.3, eq. (5.3.8)): the coherent
-expectation of `Ô⁻Ô⁻` collapses to the phase `e^{−2iθ}` times the window average of the `−2`-band
-elements `⟨Γ_{M−2}, Ô⁻Ô⁻ Γ_M⟩` (`Ô⁻Ô⁻` lowers the total magnetization by two). -/
-theorem becCoherent_loweringLowering_collapse (d L : ℕ) [NeZero L] (θ : ℝ) (Mmax : ℕ)
-    (Φ : (HypercubicTorus d L → Fin 2) → ℂ)
-    (hsing : (totalSpinSOp3 (HypercubicTorus d L) 1).mulVec Φ = 0) :
-    star (becCoherentState d L θ Mmax Φ) ⬝ᵥ
-        (staggeredLoweringOpS (torusParitySublattice d L) 1
-          * staggeredLoweringOpS (torusParitySublattice d L) 1).mulVec
-          (becCoherentState d L θ Mmax Φ)
-      = Complex.exp (((-2 : ℤ) : ℝ) * θ * Complex.I) * ((2 * (Mmax : ℝ) + 1 : ℝ) : ℂ)⁻¹ *
-          ∑ M ∈ (Finset.Icc (-(Mmax : ℤ)) (Mmax : ℤ)).filter
-              (fun M => -(Mmax : ℤ) ≤ M + (-2) ∧ M + (-2) ≤ (Mmax : ℤ)),
-            star (unitNormalize (towerState (torusParitySublattice d L) 1 (M + (-2)) Φ)) ⬝ᵥ
-              (staggeredLoweringOpS (torusParitySublattice d L) 1
-                * staggeredLoweringOpS (torusParitySublattice d L) 1).mulVec
-                (unitNormalize (towerState (torusParitySublattice d L) 1 M Φ)) := by
-  refine becCoherent_band_collapse d L θ Mmax Φ (-2) _ ?_
-  intro M M' hMM'
-  refine becBand_ne_eq_zero_of_intEigen (torusParitySublattice d L) _ ?_ hMM' hsing
-  have h0 := towerState_totalSpin3_eigenvector (torusParitySublattice d L) M hsing
-  have h1 := totalSpinSOp3_mulVec_staggeredLowering_eigenvec (torusParitySublattice d L) h0
-  have h2 := totalSpinSOp3_mulVec_staggeredLowering_eigenvec (torusParitySublattice d L) h1
-  rw [← Matrix.mulVec_mulVec, h2,
-    show ((M : ℂ) - 1 - 1) = ((M + (-2) : ℤ) : ℂ) from by push_cast; ring]
-
-/-- **`Ô⁺Ô⁻` band of the coherent second moment** (Tasaki §5.3, eq. (5.3.8)): the coherent
-expectation of `Ô⁺Ô⁻` collapses to the window average of the diagonal elements `⟨Γ_M, Ô⁺Ô⁻ Γ_M⟩`
-(`Ô⁺Ô⁻` preserves the total magnetization). -/
-theorem becCoherent_raisingLowering_collapse (d L : ℕ) [NeZero L] (θ : ℝ) (Mmax : ℕ)
-    (Φ : (HypercubicTorus d L → Fin 2) → ℂ)
-    (hsing : (totalSpinSOp3 (HypercubicTorus d L) 1).mulVec Φ = 0) :
-    star (becCoherentState d L θ Mmax Φ) ⬝ᵥ
-        (staggeredRaisingOpS (torusParitySublattice d L) 1
-          * staggeredLoweringOpS (torusParitySublattice d L) 1).mulVec
-          (becCoherentState d L θ Mmax Φ)
-      = ((2 * (Mmax : ℝ) + 1 : ℝ) : ℂ)⁻¹ *
-          ∑ M ∈ Finset.Icc (-(Mmax : ℤ)) (Mmax : ℤ),
-            star (unitNormalize (towerState (torusParitySublattice d L) 1 M Φ)) ⬝ᵥ
-              (staggeredRaisingOpS (torusParitySublattice d L) 1
-                * staggeredLoweringOpS (torusParitySublattice d L) 1).mulVec
-                (unitNormalize (towerState (torusParitySublattice d L) 1 M Φ)) := by
-  refine becCoherent_diagonal_collapse d L θ Mmax Φ _ ?_
-  intro M M' hMM'
-  refine becBand_ne_eq_zero_of_intEigen (torusParitySublattice d L) _ ?_ hMM' hsing
-  have h0 := towerState_totalSpin3_eigenvector (torusParitySublattice d L) M hsing
-  have h1 := totalSpinSOp3_mulVec_staggeredLowering_eigenvec (torusParitySublattice d L) h0
-  have h2 := totalSpinSOp3_mulVec_staggeredRaising_eigenvec (torusParitySublattice d L) h1
-  rw [← Matrix.mulVec_mulVec, h2, show ((M : ℂ) - 1 + 1) = ((M : ℤ) : ℂ) from by ring]
 
 /-- **`Ô⁻Ô⁺` band of the coherent second moment** (Tasaki §5.3, eq. (5.3.8)): the coherent
 expectation of `Ô⁻Ô⁺` collapses to the window average of the diagonal elements `⟨Γ_M, Ô⁻Ô⁺ Γ_M⟩`

@@ -250,110 +250,20 @@ tanakaSSB_field_lowerBound
 # does not consume it and the general-`μ` axiom carries no proof.
 tasaki_5_2_bec_tower_half_filling
 
-# TEMPORARY arc-tips (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
-# discharge arc, PR-1 (#5062, tracker #5061, `Quantum/SpinS/BoseEinsteinCondensate.lean`).
-# `IsBECCoherentSSBConstantsHalfFilling` is the μ=0 half-filling discharge-target predicate (the
-# kernel of `IsBECCoherentSSBConstants`, adding the `Ŝ³_tot = 0` sector conjunct); it is consumed by
-# the final discharge theorem `tasaki_5_3_bec_u1_ssb_half_filling` (a later arc PR).
-# (`becCoherentState_dotProduct_mulVec`, the double-sum expansion, was DELISTED in PR-4 (#5065) once
-# `becCoherent_complexMoment_raising` consumed it.)  Zero-referenced until the final discharge PR.
-IsBECCoherentSSBConstantsHalfFilling
-
-# TEMPORARY arc-tips (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
-# discharge arc, PR-2 (#5063, tracker #5061, `Quantum/SpinS/BoseEinsteinCondensateSector.lean`).
-# Total-`Ŝ³` sector structure of the coherent tower states: `towerState_totalSpin3_eigenvector`
-# (`Ŝ³_tot Γ_M = M Γ_M` at half filling, eq. (5.3.3)), `towerState_inner_eq_zero_of_ne` (distinct-`M`
-# tower states are orthogonal — Hermitian `Ŝ³_tot`, distinct real eigenvalues), and
-# `towerState_unitNormalize_inner_eq_zero_of_ne` (the normalized `Γ_M` form consumed by the `O = 1`
-# diagonalization of `becCoherentState_dotProduct_mulVec`). Zero-referenced until the coherent-moment
-# arc PRs collapse the double sum. RE-EVALUATE/DELIST when consumed.
-towerState_totalSpin3_eigenvector
-towerState_inner_eq_zero_of_ne
-towerState_unitNormalize_inner_eq_zero_of_ne
-
-# TEMPORARY arc-tips (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
-# discharge arc, PR-3 (#5064, tracker #5061,
-# `Quantum/SpinS/BoseEinsteinCondensateCoherentMatrixElement.lean`).  Off-diagonal matrix elements of
-# the coherent tower states for the raising operator `Ô⁺`.  (`becOffDiagonal_ne_adjacent_eq_zero` —
-# `⟨Γ_{M'}, Ô⁺ Γ_M⟩ = 0` for `M' ≠ M+1`, eq. (5.3.3) — was DELISTED in PR-4 (#5065) once
-# `becCoherent_complexMoment_raising` consumed it to collapse the double sum.)  The surviving
-# adjacent-band norm ratios remain zero-referenced until the r_M window mean is assembled:
-# `becOffDiagonal_eq_norm_ratio` (the single surviving adjacent element is the norm ratio
-# `⟨Γ_{M+1}, Ô⁺ Γ_M⟩ = √(D_{M+1}/D_M)` on the raising side `M ≥ 0`, eq. (5.3.6)) and its lowering-side
-# mirror `becOffDiagonal_eq_norm_ratio_neg` (for `M ≤ −1` the same `Ô⁺`-sandwiched element is the
-# *inverse* ratio `√(D_M/D_{M+1})`, via `(Ô⁺)ᴴ = Ô⁻` adjoint reversal + lowering recursion; math-note
-# §2② 2026-07-17 refinement).  Their `Ô⁻` mirrors (added in PR-4 (#5065) for full eq. (5.3.6)
-# ± coverage) are `becOffDiagonal_lowering_eq_norm_ratio` (`⟨Γ_{M−1}, Ô⁻ Γ_M⟩ = √(D_{M−1}/D_M)` on
-# `M ≤ 0`, lowering recursion) and `becOffDiagonal_lowering_eq_norm_ratio_pos` (`√(D_M/D_{M−1})` on
-# `M ≥ 1`, via `(Ô⁻)ᴴ = Ô⁺` adjoint reversal).  All four DELISTED in PR-5 (#5066): the window-mean
-# symmetrisation `becOffDiagonal_lowering_shift_eq` consumes them (each lowering element equals the
-# raising element one step down, both being the same real norm ratio).
-
-# TEMPORARY arc-tip (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
-# discharge arc, PR-4 (#5065, tracker #5061,
-# `Quantum/SpinS/BoseEinsteinCondensateCoherentMoment.lean`).
-# `becCoherent_complexMoment_raising` (`⟨Ξ_θ, Ô⁺ Ξ_θ⟩ = e^{iθ} (2M_max+1)^{-1}
-# Σ_{M=−M_max}^{M_max−1} ⟨Γ_{M+1}, Ô⁺ Γ_M⟩`, eq. (5.3.6)) and its `Ô⁻` mirror
-# `becCoherent_complexMoment_lowering` were DELISTED in PR-5 (#5066): the coherent window means
-# `becCoherent_mean1`/`becCoherent_mean2` consume both to form the `cos θ`/`sin θ` representation.
-
-# TEMPORARY arc-tips (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
-# discharge arc, PR-5 (#5066, tracker #5061,
-# `Quantum/SpinS/BoseEinsteinCondensateCoherentMoment.lean`).  The coherent window means (Tasaki §5.3,
-# eq. (5.3.7), p. 141): `becCoherent_mean1` gives `⟨Ξ_θ, Ô^{(1)} Ξ_θ⟩ = cos θ · (2M_max+1)^{-1}
-# Σ_{M=−M_max}^{M_max−1} ⟨Γ_{M+1}, Ô⁺ Γ_M⟩` and `becCoherent_mean2` the `sin θ` counterpart for
-# `Ô^{(2)}`, via the Cartesian decompositions `staggeredOrderOp1S_eq_half_smul`/`_eq_smul`, the ± complex
-# moments (PR-4), the lowering→raising window symmetrisation
-# `becCoherent_loweringWindow_eq_raisingWindow`, and `½(e^{iθ}+e^{−iθ}) = cos θ` /
-# `(2i)^{-1}(e^{iθ}−e^{−iθ}) = sin θ`.  Both zero-referenced until the assembly PR feeds them into the
-# `m∗ cos θ` / `m∗ sin θ` limit. RE-EVALUATE/DELIST when consumed.
-becCoherent_mean1
-becCoherent_mean2
-
-# TEMPORARY arc-tip (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
-# discharge arc, PR-6 (#5067, tracker #5061,
-# `Quantum/SpinS/BoseEinsteinCondensateCoherentConcentration.lean`).  The order-parameter
-# concentration lower bound `m∗ ≥ √(2q₀)` (Tasaki §5.3, "As in Theorem 4.11 … we can prove the bound
-# m∗ ≥ √(2q₀). See (4.2.39)", pp. 141–142), recorded as a documented axiom `becMStar_ge_sqrt_twoQ` —
-# the BEC half-filling counterpart of the SU(2) concentration axiom
-# `orderSqMoment_ratio_le_mStarSq_family` (Theorem 4.11) and the `p̂`-mirror
-# `mStar_eq_phat_ratio_limit`, with the U(1) planar factor √2 (two axes α=1,2, base ratio → 2q₀) in
-# place of the SU(2) √3; per the 2026-07-12 no-overreach boundary the Koma–Tasaki [66] concentration
-# mechanism is deferred with parity to those axioms, not rebuilt.  `m∗` is pinned to its genuine value
-# by the new predicate `IsRealizingBECCoherentFamily` (consumed by the axiom signature, hence not
-# zero-referenced), the U(1) planar analogue of `IsRealizingTanakaGroundStateFamily` (drops the
-# axis-1 singlet + reversal invariance, keeps only half filling `Ŝ³_tot Φ = 0`).  Its window is a
-# `IsSlowBECWindow d C₁ Mwin` (monotone + diverging + eventually `Mwin L ≤ C₁ L^{d/2}` — a bare
-# `Tendsto Mwin atTop atTop` is insufficient: a fast window outrunning `C₁ L^{d/2}` dilutes the
-# normalization and admits a false witness pinning `m∗` below `√(2q₀)`), and `m∗` is pinned by the
-# uniform window-ratio concentration (eventually `∀ M in window, ‖r_M − m∗‖ < ε`,
-# `r_M = ⟨Γ_{M+1}, Ô⁺ Γ_M⟩/L^d`; math-note §3.4 refinement 2), which subsumes the θ=0 mean limit and
-# drives the eq. 5.3.8 second moments axiom-free from one source.  A free `m∗` would make the bound
-# FALSE (`m∗:=0`, `q₀>0`), hence the
-# family pinning; only the easy half `m∗² ≥ 2q₀` is asserted, never the still-open `m∗² = 2q₀`.  The
-# axiom is DECLARED but not yet consumed (the final discharge that uses it is a later arc PR), so it is
-# a documented-axiom capstone (axioms are legitimately zero-referenced until consumed).
-# RE-EVALUATE/DELIST when the discharge theorem consumes it.
-becMStar_ge_sqrt_twoQ
-
-# TEMPORARY arc-tips (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
-# discharge arc, PR-6b (#5068, tracker #5061,
-# `Quantum/SpinS/BoseEinsteinCondensateCoherentSecondMoment.lean`).  Exact finite-L band
-# representation of the coherent second moments (Tasaki §5.3, eq. (5.3.8), p. 141),
-# `⟨Ξ_θ, (Ô^{(α)})² Ξ_θ⟩`, entirely axiom-free (std3 only, carrying no concentration axiom).  The
-# four band expectations `becCoherent_raisingRaising_collapse`/`_loweringLowering_collapse`
-# (off-diagonal, phases `e^{±2iθ}`) and `becCoherent_raisingLowering_collapse`/`_loweringRaising_collapse`
-# (diagonal) collapse the coherent double sum `becCoherentState_dotProduct_mulVec` (PR-1) to the single
-# surviving sector band via the two-step orthogonality `becBand_ne_eq_zero_of_intEigen` and the generic
-# `becCoherent_band_collapse`/`becCoherent_diagonal_collapse` (which ARE consumed, hence not listed).
-# `becCoherent_secondMoment1_eq`/`becCoherent_secondMoment2_eq` are the exact `¼`/`−¼`-weighted
-# operator-square splits of `(Ô^{(1)})²`/`(Ô^{(2)})²` into those four products
-# (`staggeredOrderOp1S_sq_eq`/`_sq_eq`).  All six are zero-referenced until the band-value reduction
-# (`r_M` products, diagonal `2r_M²` + Lemma 4.14 commutator remainder) and assembly PR feed them into
-# the `(m∗ cos θ)²`/`(m∗ sin θ)²` limits (eq. 5.3.8). RE-EVALUATE/DELIST when consumed.
-becCoherent_raisingRaising_collapse
-becCoherent_loweringLowering_collapse
-becCoherent_raisingLowering_collapse
-becCoherent_loweringRaising_collapse
-becCoherent_secondMoment1_eq
-becCoherent_secondMoment2_eq
+# V1 book capstone: Tasaki §5.3 Theorem 5.3 (BEC U(1) symmetry breaking) at half filling (`μ = 0`),
+# the discharge target `tasaki_5_3_bec_u1_ssb_half_filling`
+# (`Quantum/SpinS/BoseEinsteinCondensateCoherentAssembly.lean`, tracker #5061, final arc PR #5069):
+# `∃ C₁, IsBECCoherentSSBConstantsHalfFilling d q₀ C₁` — the `U(1)` coherent state fully breaks the
+# phase symmetry (eqs. (5.3.6)–(5.3.8): magnetization means `m∗ cos θ`/`m∗ sin θ`, complex moments
+# `m∗ e^{±iθ}`, squared moments `(m∗ cos θ)²`/`(m∗ sin θ)²`) and `m∗ ≥ √(2 q₀)`.  `#print axioms` =
+# std3 + `becMStar_ge_sqrt_twoQ` (the documented `√2` concentration bound, U(1) planar sibling of the
+# SU(2) `√3` Theorem 4.11); the `hRealizing` hypothesis carries the Koma–Tasaki [21] window-ratio
+# concentration (deferred with parity to the SU(2) sibling).  A book-capstone, legitimately
+# zero-referenced.  The general-`μ` statement stays the documented axiom `tasaki_5_3_bec_u1_ssb`.
+#
+# The §5.3 arc scaffolding (PR-1..PR-6b: `IsBECCoherentSSBConstantsHalfFilling`, the tower
+# eigenvector/orthogonality lemmas, `becCoherent_mean1`/`mean2`, `becMStar_ge_sqrt_twoQ`, the band
+# collapses, `becCoherent_secondMoment{1,2}_eq`) was DELISTED in this final PR: every entry is now
+# consumed by the discharge theorem.  The unused `Ô⁻Ô⁻`/`Ô⁺Ô⁻` collapses were DELETED (the final
+# proof recovers those bands via `becCoherent_LL_eq_conj_RR`/`becCoherent_RL_eq_LR`).
+tasaki_5_3_bec_u1_ssb_half_filling

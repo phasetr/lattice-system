@@ -11188,8 +11188,9 @@ form (footnote~9: the $\lim$ is to be interpreted properly), the construction is
 \texttt{IsBECCoherentSSBConstants}, and the statement is conditional on ODLRO.  Proved by
 Koma--Tasaki~[21]; recorded as a documented axiom.
 
-\emph{Half-filling discharge arc OPEN} (tracker \#5061).  As for Theorem~5.2, the $\mu=0$ kernel is
-being discharged as the theorem \texttt{tasaki\_5\_3\_bec\_u1\_ssb\_half\_filling}, with the
+\emph{Half-filling discharge arc COMPLETE (conditional)} (tracker \#5061).  As for Theorem~5.2, the
+$\mu=0$ kernel is discharged as the theorem \texttt{tasaki\_5\_3\_bec\_u1\_ssb\_half\_filling}, with
+the
 half-filling predicate \texttt{IsBECCoherentSSBConstantsHalfFilling} --- the $\mu=0$ kernel of
 \texttt{IsBECCoherentSSBConstants} adding the inner premise conjunct $\hat
 S^{(3)}_{\mathrm{tot}}\Phi=0$ (the Theorem~5.1 half-filling sector), mirroring
@@ -11294,6 +11295,30 @@ $\hat O^+\hat O^-$, $\hat O^-\hat O^+$, $\hat O^-\hat O^-$ (coefficients $\tfrac
 yielding the exact splits \texttt{becCoherent\_secondMoment1\_eq}/\texttt{becCoherent\_secondMoment2\_eq}.
 The band-value reduction ($r_M$ products / diagonal $2r_M^2$ + Lemma~4.14 commutator remainder) and
 the $(m^\ast\cos\theta)^2$/$(m^\ast\sin\theta)^2$ limits are the assembly sequel; std3 only.
+\emph{PR-7} (\#5069, \texttt{Quantum/SpinS/BoseEinsteinCondensateCoherentSecondMomentConcentration.lean},
+\texttt{...CoherentAssembly.lean}): the final discharge.  The diagonal $\hat O^-\hat O^+$ band collapses
+to $\lVert\rho_M\rVert^2$ ($M\ge0$) and, via the exact commutator $\hat O^+\hat O^--\hat O^-\hat
+O^+=2\hat S^{(3)}$, to $\lVert\rho_{M-1}\rVert^2-2M$ ($M\le-1$, the $-2M/(L^d)^2$ residual uniformly
+small in the slow window $M_{\mathrm{win}}\le C_1 L^{d/2}$, $L^{d/2}\le L^d$); the off-diagonal $\hat
+O^+\hat O^+$ band factors to $\rho_{M+1}\rho_M$.  Each concentrates on $m^\ast{}^2$/$e^{2i\theta}m^\ast{}^2$
+by the uniform window-ratio pinning (a generic Ces\`aro engine \texttt{becWindowAvg\_of\_termwise} with
+an $O(K)$ bad set), giving $\langle\Xi_\theta,\hat O^-\hat O^+\Xi_\theta\rangle/(L^d)^2\to m^\ast{}^2$
+(\texttt{becLR\_moment\_limit}) and $\langle\hat O^+\hat O^+\rangle/(L^d)^2\to e^{2i\theta}m^\ast{}^2$
+(\texttt{becRR\_moment\_limit}); the remaining two bands follow from $\langle\hat O^+\hat
+O^-\rangle=\langle\hat O^-\hat O^+\rangle$ (\texttt{becCoherent\_RL\_eq\_LR}, since $\langle\Xi,\hat
+S^{(3)}\Xi\rangle=0$) and $\langle\hat O^-\hat O^-\rangle=\overline{\langle\hat O^+\hat O^+\rangle}$
+(\texttt{becCoherent\_LL\_eq\_conj\_RR}).  With $\cos^2\theta=\tfrac14(e^{2i\theta}+2+e^{-2i\theta})$ and
+its $\sin^2$ companion, the four bands assemble to the squared-moment limits (eq.~(5.3.8)), completing
+all six symmetry-breaking conjuncts.  The discharge is \emph{conditional}, with the same double
+structure as Proposition~4.10: \texttt{\#print axioms} = std3 $+$
+\texttt{becMStar\_ge\_sqrt\_twoQ} (the documented $\sqrt2$ bound), \emph{and} the theorem
+additionally requires the explicit hypothesis \texttt{hRealizing} --- the Koma--Tasaki~[66] uniform
+window-ratio concentration input (existence of a realizing BEC coherent family pinning $m^\ast$),
+carried as a hypothesis rather than an axiom (parity with Proposition~4.10 carrying Conjecture~4.12
+as an explicit hypothesis alongside its own $\hat o^2$-concentration axiom).  The per-family
+$m^\ast$ and slow window $M_{\max}$ are quantified outside $\forall\theta$ (a single order
+parameter per family).  Requires $d\ge2$ (BEC long-range order, vacuous otherwise); the general-$\mu$
+statement stays the documented axiom \texttt{tasaki\_5\_3\_bec\_u1\_ssb}.
 Chapters~3--10 backfill.
 
 \medskip

@@ -270,10 +270,17 @@ existential window matches Tasaki's "if `M_max` diverges not too rapidly" and Th
 * (5.3.7) `⟨Ξ_θ, Ô_L^{(1)} Ξ_θ⟩ / L^d → mStar cos θ` and `⟨Ξ_θ, Ô_L^{(2)} Ξ_θ⟩ / L^d → mStar sin θ`;
 * (5.3.8) `⟨Ξ_θ, (Ô_L^{(1)})² Ξ_θ⟩ / (L^d)² → (mStar cos θ)²` and the `(2)` analog
   `→ (mStar sin θ)²`;
-* (5.3.6) the complex moments `⟨Ξ_θ, Ô_L^± Ξ_θ⟩ / L^d → mStar e^{±iθ}`. -/
-def IsBECCoherentSSBConstants (d : ℕ) (μ q₀ C₁ mStar : ℝ) : Prop :=
-  0 < C₁ ∧ 0 ≤ q₀ ∧ 0 < mStar ∧ Real.sqrt (2 * q₀) ≤ mStar ∧
-    ∀ (θ : ℝ) (Φ : (L : ℕ) → (HypercubicTorus d L → Fin 2) → ℂ) (E₀ : ℕ → ℂ),
+* (5.3.6) the complex moments `⟨Ξ_θ, Ô_L^± Ξ_θ⟩ / L^d → mStar e^{±iθ}`.
+
+**Per-family `∃ mStar` (2026-07-17 correction).**  `mStar` is bound existentially *inside* the
+per-family conclusion (not a predicate parameter fixed before the `∀ θ Φ E₀`): the old
+family-independent-`mStar` form was over-quantified (a single `mStar` cannot satisfy the two-sided
+equality limits for two families with distinct order parameters `m∗(family) ≥ √(2 q₀)`), the same
+over-quantification signature as the Even-`L` axiom incident.  The genuine order parameter is pinned
+per family (as in `mStar_eq_phat_ratio_limit`), so this form is faithful and satisfiable. -/
+def IsBECCoherentSSBConstants (d : ℕ) (μ q₀ C₁ : ℝ) : Prop :=
+  0 < C₁ ∧ 0 ≤ q₀ ∧
+    ∀ (Φ : (L : ℕ) → (HypercubicTorus d L → Fin 2) → ℂ) (E₀ : ℕ → ℂ),
       (∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
         (xyChemicalPotentialHamiltonianS d L μ).mulVec (Φ L) = E₀ L • Φ L ∧
         (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin 2) → ℂ, Ψ ≠ 0 →
@@ -283,8 +290,11 @@ def IsBECCoherentSSBConstants (d : ℕ) (μ q₀ C₁ mStar : ℝ) : Prop :=
           ((staggeredOrderOpAxisS α (torusParitySublattice d L) 1) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2) ∧
         (∀ M : ℤ, (M.natAbs : ℝ) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →
           towerState (torusParitySublattice d L) 1 M (Φ L) ≠ 0)) →
-      -- there exists a *sufficiently slowly* diverging window for which the SSB limits hold
+      -- the genuine order parameter `mStar ≥ √(2 q₀)` and its slow window are pinned **per family**
+      -- (a single `mStar`, `Mmax` serving every phase `θ`, quantified outside `∀ θ`)
+      ∃ mStar : ℝ, 0 < mStar ∧ Real.sqrt (2 * q₀) ≤ mStar ∧
       ∃ Mmax : ℕ → ℕ, IsSlowBECWindow d C₁ Mmax ∧
+      ∀ θ : ℝ,
       -- (5.3.7): the magnetization-density moments converge to a classical vector of length mStar
       (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
         |expectationRatioRe (staggeredOrderOp1S (torusParitySublattice d L) 1)
@@ -332,10 +342,16 @@ the discharge target: at `μ = 0` the reused variational bricks (tower non-vanis
 sector orthogonality, the U(1) two-axis base ratio) all require the half-filling
 `Ŝ_tot^{(3)} = 0` sector.  A general-`μ` ground state has `Ŝ_tot^{(3)} Φ = s₀ ≠ 0`, so those
 bricks no longer close, and this predicate is a genuinely stronger statement (not `α`-equivalent to
-`IsBECCoherentSSBConstants`), mirroring the Theorem 5.2 half-filling kernel. -/
-def IsBECCoherentSSBConstantsHalfFilling (d : ℕ) (q₀ C₁ mStar : ℝ) : Prop :=
-  0 < C₁ ∧ 0 ≤ q₀ ∧ 0 < mStar ∧ Real.sqrt (2 * q₀) ≤ mStar ∧
-    ∀ (θ : ℝ) (Φ : (L : ℕ) → (HypercubicTorus d L → Fin 2) → ℂ) (E₀ : ℕ → ℂ),
+`IsBECCoherentSSBConstants`), mirroring the Theorem 5.2 half-filling kernel.
+
+**Per-family `∃ mStar` (2026-07-17 correction).**  As in `IsBECCoherentSSBConstants`, `mStar` is
+bound existentially inside the per-family conclusion (not a predicate parameter); the old
+family-independent-`mStar` form was over-quantified (a single `mStar` cannot meet the two-sided
+equality limits for two families with distinct order parameters), so the discharge would be
+impossible.  The genuine order parameter is pinned per family. -/
+def IsBECCoherentSSBConstantsHalfFilling (d : ℕ) (q₀ C₁ : ℝ) : Prop :=
+  0 < C₁ ∧ 0 ≤ q₀ ∧
+    ∀ (Φ : (L : ℕ) → (HypercubicTorus d L → Fin 2) → ℂ) (E₀ : ℕ → ℂ),
       (∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
         (xyChemicalPotentialHamiltonianS d L 0).mulVec (Φ L) = E₀ L • Φ L ∧
         (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin 2) → ℂ, Ψ ≠ 0 →
@@ -346,8 +362,11 @@ def IsBECCoherentSSBConstantsHalfFilling (d : ℕ) (q₀ C₁ mStar : ℝ) : Pro
           ((staggeredOrderOpAxisS α (torusParitySublattice d L) 1) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2) ∧
         (∀ M : ℤ, (M.natAbs : ℝ) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →
           towerState (torusParitySublattice d L) 1 M (Φ L) ≠ 0)) →
-      -- there exists a *sufficiently slowly* diverging window for which the SSB limits hold
+      -- the genuine order parameter `mStar ≥ √(2 q₀)` and its slow window are pinned **per family**
+      -- (a single `mStar`, `Mmax` serving every phase `θ`, quantified outside `∀ θ`)
+      ∃ mStar : ℝ, 0 < mStar ∧ Real.sqrt (2 * q₀) ≤ mStar ∧
       ∃ Mmax : ℕ → ℕ, IsSlowBECWindow d C₁ Mmax ∧
+      ∀ θ : ℝ,
       -- (5.3.7): the magnetization-density moments converge to a classical vector of length mStar
       (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
         |expectationRatioRe (staggeredOrderOp1S (torusParitySublattice d L) 1)
@@ -384,9 +403,23 @@ This is the BEC counterpart of the Tanaka full-symmetry-breaking Theorem 4.9; th
 constants are bundled into `IsBECCoherentSSBConstants` (`μ` parametrizes the density, as in Theorem
 5.2).  Conditional on ODLRO (`q₀ > 0`); the realizing ground-state family supplies the nonvanishing
 tower states needed to normalize the `Γ_M`.  Proved in Koma–Tasaki [21]; recorded as a documented
-axiom. -/
+axiom.
+
+**Corrected to the per-family `∃ mStar` form (2026-07-17)**: the order parameter `mStar` is bound
+inside `IsBECCoherentSSBConstants` per family (was a family-independent `∃ mStar` outside the
+family quantifier — an over-quantification that could make the two-sided equality limits FALSE for
+two families with distinct order parameters).  This restores the documented-axiom `∀`-truth
+discipline (every instance is genuinely true), the same fix pattern as the Even-`L` restriction.
+The **half-filling kernel** `μ = 0` is discharged *conditionally* as the theorem
+`tasaki_5_3_bec_u1_ssb_half_filling` (`BoseEinsteinCondensateCoherentAssembly.lean`), whose
+`#print axioms` is `std3 + becMStar_ge_sqrt_twoQ` **and** which additionally requires the
+explicit `hRealizing` hypothesis (the Koma–Tasaki [66] uniform window-ratio concentration
+input, carried as a hypothesis with parity to the `SU(2)` Proposition 4.10's Conjecture 4.12).
+The general-`μ` statement stays a documented axiom because at `μ ≠ 0` a ground state has
+`Ŝ_tot^{(3)} Φ = s₀ ≠ 0`, breaking the reused half-filling variational bricks (same
+RP-intractability exception as Theorems 5.1/5.2). -/
 axiom tasaki_5_3_bec_u1_ssb (d : ℕ) (hd : 2 ≤ d) (μ q₀ : ℝ) (hq₀ : 0 < q₀) :
-    ∃ C₁ mStar : ℝ, IsBECCoherentSSBConstants d μ q₀ C₁ mStar
+    ∃ C₁ : ℝ, IsBECCoherentSSBConstants d μ q₀ C₁
 
 /-! ## Theorem 5.4: symmetry breaking in coupled Bose–Einstein condensates -/
 
