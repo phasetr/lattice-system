@@ -11477,7 +11477,18 @@ $U(1)$-invariance (\texttt{commute\_totalSpinSOp3\_apply\_eq\_zero\_of\_mag\_ne}
 magnetization, so the global and local phase differences agree \emph{modulo} $2\pi$
 (\texttt{twistPhase\_gap}): the mean-angle term drops by $U(1)$ and the residual $2\pi\cdot(\text{integer})$
 is the periodic-seam winding \texttt{ringWrap} (the spinor two-valued $\exp(2\pi i\,m)=1$ global
-scalar).  Chapters~3--10 backfill.
+scalar).  PR-5 (PR~\#5075, \texttt{Quantum/SpinS/LiebSchultzMattisGeneratorNorm.lean}): the
+\emph{centered generator norm bound} \texttt{localTwistGen\_manyBodyOperatorNormS\_le} ---
+$\|\hat M_x\|\le\pi\,r\,(2r+1)\,N/L=:B/L$ (eq.~6.2.27).  By the finite-sum triangle inequality and
+scalar homogeneity of \texttt{manyBodyOperatorNormS},
+$\|\hat M_x\|\le\sum_{y\in W_x}|(2\pi/L)\delta(x,y)|\,\|\hat S_y^{(3)}\|$; each coefficient is
+$\le2\pi r/L$ (the centering gives $|\delta|=\mathtt{ringDist}\le r$ via
+\texttt{natAbs\_signedRingDisp\_eq\_ringDist}, so the raw angle's $2\pi$ seam spread is avoided) and
+each $\|\hat S_y^{(3)}\|\le N/2$, over a window of $\le2r+1$ sites (\texttt{window\_card\_le}: the
+signed displacement injects $W_x$ into $\{-r,\dots,r\}$, injectivity from
+\texttt{dvd\_sub\_signedRingDisp}).  This uniform $O(1/L)$ bound feeds the $O(\|\hat M_x\|^2)$
+second-order twist-conjugation bound (PR-6/PR-7), whose sum over the $L$ sites gives the Lemma~6.4
+$C/L$.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§6.3 Proposition 6.5} (the $S=1$ chain on the hidden-AFM subspace; Tasaki §6.3,
