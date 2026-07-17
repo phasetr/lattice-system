@@ -11464,7 +11464,20 @@ gap $\bigl(\langle\Phi_{\mathrm{LSM}},\hat H\Phi_{\mathrm{LSM}}\rangle/\langle\P
 of $\hat U^{\dagger}\hat H\hat U+\hat U\hat H\hat U^{\dagger}-2\hat H$) and
 \texttt{groundEnergy\_le\_expectationRatioRe\_general} ($E_{\mathrm{GS}}\le$ any Rayleigh quotient of a
 Hermitian $\hat H$); the Heisenberg-chain forms are now thin specializations, so the reduction applies
-verbatim to $\hat H=\sum_x\hat h_x$.  Chapters~3--10 backfill.
+verbatim to $\hat H=\sum_x\hat h_x$.  PR-4 (CRUX A, PR~\#5074,
+\texttt{Quantum/SpinS/LiebSchultzMattisGlobalLocalReduction.lean}): the \emph{global$\to$local twist
+reduction} (eq.~6.2.27) \texttt{twistConj\_eq\_localGen} ---
+$\hat U_{\mathrm{LSM}}^{\dagger}\hat h_x\hat U_{\mathrm{LSM}}=\exp(+i\hat M_x)\,\hat h_x\,\exp(-i\hat
+M_x)$, with the $\hat U\leftrightarrow\hat U^{\dagger}$ mirror \texttt{twistConj'\_eq\_localGen}.  Both
+the global generator and $\hat M_x$ are diagonal, so conjugation acts on each $(\sigma',\sigma)$ entry
+of $\hat h_x$ by the scalar $\exp(\pm i(\varphi_{\sigma'}-\varphi_{\sigma}))$; whenever
+$\hat h_x[\sigma',\sigma]\neq0$ the commutant locality (\texttt{isLocalRangeR\_apply\_eq\_zero\_of\_far},
+using the distinct $\hat S^{(3)}$ eigenvalues) forces $\sigma'_y=\sigma_y$ off the window and
+$U(1)$-invariance (\texttt{commute\_totalSpinSOp3\_apply\_eq\_zero\_of\_mag\_ne}) forces equal total
+magnetization, so the global and local phase differences agree \emph{modulo} $2\pi$
+(\texttt{twistPhase\_gap}): the mean-angle term drops by $U(1)$ and the residual $2\pi\cdot(\text{integer})$
+is the periodic-seam winding \texttt{ringWrap} (the spinor two-valued $\exp(2\pi i\,m)=1$ global
+scalar).  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§6.3 Proposition 6.5} (the $S=1$ chain on the hidden-AFM subspace; Tasaki §6.3,

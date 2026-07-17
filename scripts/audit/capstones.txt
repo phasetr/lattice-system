@@ -277,8 +277,10 @@ tasaki_5_3_bec_u1_ssb_half_filling
 # — the adjoint `Û_x† = exp(+i M̂_x)` and the two-sided unitarity `Û_x† Û_x = Û_x Û_x† = 1` of the
 # centered local twist operator `Û_x = exp(−i M̂_x)` (`localTwistGen`, eqs. 6.2.26–6.2.27); each now
 # derives from the generic `*_exp_neg_I_smul_of_isHermitian` lemmas (so they no longer reference one
-# another).  Consumed by the global→local twist reduction (PR-4, `Û ĥ_x Û† = Û_x ĥ_x Û_x†`) and the
-# second-order conjugation bound (PR-6).  DELIST when PR-4/PR-6 reference them.
+# another).  The PR-4 global→local twist reduction states (★) in the `exp(±i M̂_x)` form
+# (`NormedSpace.exp (±Complex.I • localTwistGen …)`, math-note verbatim), so it does NOT reference
+# these operator-form unitarity lemmas; they are consumed by the PR-6 second-order conjugation bound
+# (which needs the operator `Û_x` and its unitarity).  DELIST when PR-6 references them.
 localTwistOperator_conjTranspose
 localTwistOperator_unitary
 localTwistOperator_unitary'
@@ -287,3 +289,14 @@ localTwistOperator_unitary'
 # (`‖U Y Uᴴ‖ = ‖Y‖`).  Consumed by the second-order symmetric-difference twist bound (PR-6:
 # `‖f(t)‖ = ‖X‖`, `‖f''(t)‖ = ‖⁅M,⁅M,X⁆⁆‖`).  DELIST when PR-6 references it.
 manyBodyOperatorNormS_unitary_conj
+
+# TEMPORARY (Tasaki §6.2 Lemma 6.4 discharge arc, tracker #5070, PR #5074 = PR-4).
+# The two terminal tips of the PR-4 global→local twist reduction (CRUX A, eq. (6.2.27),
+# `Quantum/SpinS/LiebSchultzMattisGlobalLocalReduction.lean`): the global LSM twist conjugation of a
+# local term `ĥ_x` equals its conjugation by the centered local twist generator `M̂_x`,
+# `Û_LSM† ĥ_x Û_LSM = exp(+i M̂_x) ĥ_x exp(−i M̂_x)` (`twistConj_eq_localGen`) and its `Û ↔ Û†`
+# mirror (`twistConj'_eq_localGen`).  Both directions lie on the Lemma 6.4 critical path (the PR-7
+# symmetrised difference `Û†ĥÛ + ÛĥÛ† − 2ĥ` consumes both) and are legitimately zero-referenced until
+# then.  RE-EVALUATE/DELIST when consumed by PR-7.
+twistConj_eq_localGen
+twistConj'_eq_localGen
