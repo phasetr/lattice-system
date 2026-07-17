@@ -11215,7 +11215,12 @@ for $M'\neq M+1$, since $\hat O_L^+\Gamma_M$ lies in the $\hat S^{(3)}_{\mathrm{
 single surviving adjacent element is the real norm ratio $\langle\Gamma_{M+1},\hat
 O_L^+\,\Gamma_M\rangle=\sqrt{D_{M+1}/D_M}$, $D_M=\|(\hat O_L^+)^M\Phi\|^2$, because there $\hat
 O_L^+\,\mathtt{towerState}\,M\,\Phi=\mathtt{towerState}\,(M{+}1)\,\Phi$ exactly, so $\hat
-O_L^+\Gamma_M\parallel\Gamma_{M+1}$); std3 only.  The
+O_L^+\Gamma_M\parallel\Gamma_{M+1}$), together with its lowering-side mirror
+\texttt{becOffDiagonal\_eq\_norm\_ratio\_neg} (for $M\le-1$ the same $\hat O_L^+$-sandwiched element
+is the \emph{inverse} ratio $\langle\Gamma_{M+1},\hat O_L^+\,\Gamma_M\rangle=\sqrt{D_M/D_{M+1}}$,
+since there the tower is built with $\hat O_L^-$ and the identity $(\hat O_L^+)^{\mathsf H}=\hat
+O_L^-$ (adjoint reversal) plus the lowering recursion $\hat O_L^-\,\mathtt{towerState}\,(M{+}1)\,\Phi
+=\mathtt{towerState}\,M\,\Phi$ collapse the sandwich to $\|\Gamma_M\|^2$); std3 only.  The
 general-$\mu$ \texttt{tasaki\_5\_3\_bec\_u1\_ssb} stays a documented axiom ($d$-dim RP-intractability,
 Koma--Tasaki [21]), the same two-track policy as Theorem~5.2.  Chapters~3--10 backfill.
 
