@@ -154,6 +154,7 @@ import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensate
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateAlgebra
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateDenominator
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateMoment
+import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateSector
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateTower
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateXYNumerator
 import LatticeSystem.Quantum.SpinS.HeisenbergEquilibrium

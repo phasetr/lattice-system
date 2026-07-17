@@ -261,3 +261,15 @@ tasaki_5_2_bec_tower_half_filling
 # Both zero-referenced until those downstream PRs land. RE-EVALUATE/DELIST when consumed.
 IsBECCoherentSSBConstantsHalfFilling
 becCoherentState_dotProduct_mulVec
+
+# TEMPORARY arc-tips (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
+# discharge arc, PR-2 (#5063, tracker #5061, `Quantum/SpinS/BoseEinsteinCondensateSector.lean`).
+# Total-`Ŝ³` sector structure of the coherent tower states: `towerState_totalSpin3_eigenvector`
+# (`Ŝ³_tot Γ_M = M Γ_M` at half filling, eq. (5.3.3)), `towerState_inner_eq_zero_of_ne` (distinct-`M`
+# tower states are orthogonal — Hermitian `Ŝ³_tot`, distinct real eigenvalues), and
+# `towerState_unitNormalize_inner_eq_zero_of_ne` (the normalized `Γ_M` form consumed by the `O = 1`
+# diagonalization of `becCoherentState_dotProduct_mulVec`). Zero-referenced until the coherent-moment
+# arc PRs collapse the double sum. RE-EVALUATE/DELIST when consumed.
+towerState_totalSpin3_eigenvector
+towerState_inner_eq_zero_of_ne
+towerState_unitNormalize_inner_eq_zero_of_ne
