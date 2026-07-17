@@ -11186,7 +11186,22 @@ m_\ast e^{\pm i\theta}$ --- with the order parameter $m_\ast\ge\sqrt{2q_0}$ (the
 bound, companion of Theorem~4.11's $\sqrt3$).  The limits are stated in the sound eventual-$\varepsilon$
 form (footnote~9: the $\lim$ is to be interpreted properly), the construction is bundled into
 \texttt{IsBECCoherentSSBConstants}, and the statement is conditional on ODLRO.  Proved by
-Koma--Tasaki~[21]; recorded as a documented axiom.  Chapters~3--10 backfill.
+Koma--Tasaki~[21]; recorded as a documented axiom.
+
+\emph{Half-filling discharge arc OPEN} (tracker \#5061).  As for Theorem~5.2, the $\mu=0$ kernel is
+being discharged as the theorem \texttt{tasaki\_5\_3\_bec\_u1\_ssb\_half\_filling}, with the
+half-filling predicate \texttt{IsBECCoherentSSBConstantsHalfFilling} --- the $\mu=0$ kernel of
+\texttt{IsBECCoherentSSBConstants} adding the inner premise conjunct $\hat
+S^{(3)}_{\mathrm{tot}}\Phi=0$ (the Theorem~5.1 half-filling sector), mirroring
+\texttt{IsBECTowerConstantsHalfFilling}.  \emph{PR-1} (\#5062): the predicate together with the
+coherent-state Rayleigh numerator double-sum expansion
+\texttt{becCoherentState\_dotProduct\_mulVec},
+$\langle\Xi_\theta,\hat O\,\Xi_\theta\rangle=(2M_{\max}+1)^{-1}\sum_{M',M}\overline{e^{-iM'\theta}}\,
+e^{-iM\theta}\,\langle\Gamma_{M'},\hat O\,\Gamma_M\rangle$ (the algebraic core of eqs.~(5.3.6)--(5.3.8),
+p.~141), the step before the sector orthogonality of the $\Gamma_M$ collapses the double sum
+(\texttt{\#print axioms} = \texttt{propext}/\texttt{Classical.choice}/\texttt{Quot.sound} only).  The
+general-$\mu$ \texttt{tasaki\_5\_3\_bec\_u1\_ssb} stays a documented axiom ($d$-dim RP-intractability,
+Koma--Tasaki [21]), the same two-track policy as Theorem~5.2.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{Theorem 5.4} (symmetry breaking in coupled Bose--Einstein condensates; Tasaki §5.5,
