@@ -300,3 +300,13 @@ manyBodyOperatorNormS_unitary_conj
 # then.  RE-EVALUATE/DELIST when consumed by PR-7.
 twistConj_eq_localGen
 twistConj'_eq_localGen
+
+# TEMPORARY (Tasaki §6.2 Lemma 6.4 discharge arc, tracker #5070, PR #5075 = PR-5).
+# `localTwistGen_manyBodyOperatorNormS_le` (`Quantum/SpinS/LiebSchultzMattisGeneratorNorm.lean`): the
+# centered local twist generator norm bound `‖M̂_x‖ ≤ π r (2r+1) N / L` (eq. (6.2.27), p. 164).  This
+# `O(1/L)` bound lies on the Lemma 6.4 critical path: the second-order symmetric-difference twist
+# bound (PR-6/PR-7) is `O(‖M̂_x‖²)`, so summing `8‖M̂_x‖²h₀ ≤ 8(B/L)²h₀` over the `L` sites gives the
+# final `C/L`.  Legitimately zero-referenced until PR-7 consumes it.  RE-EVALUATE/DELIST when
+# consumed by PR-7.  (Its helpers `window_card_le` / `natAbs_signedRingDisp_eq_ringDist` are already
+# referenced here, so are not listed.)
+localTwistGen_manyBodyOperatorNormS_le

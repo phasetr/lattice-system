@@ -117,6 +117,15 @@ def signedRingDisp (L : ℕ) (x y : Fin L) : ℤ :=
     then (((y.val + L - x.val) % L : ℕ) : ℤ)
     else -(((x.val + L - y.val) % L : ℕ) : ℤ)
 
+/-- The signed cyclic displacement has absolute value equal to the ring distance,
+`|δ(x,y)| = ringDist L x y` (Tasaki §6.2): the sign only records the shorter-arc direction while the
+magnitude is the ring distance itself.  Consumed by the `M̂_x` norm bound (PR-5) and the window
+cardinality bound. -/
+theorem natAbs_signedRingDisp_eq_ringDist (L : ℕ) (x y : Fin L) :
+    (signedRingDisp L x y).natAbs = ringDist L x y := by
+  unfold signedRingDisp ringDist
+  split_ifs with h <;> omega
+
 /-- The **centered local twist generator** `M̂_x := Σ_{y∈W_x} (2π/L)·δ(x,y) · Ŝ_y^{(3)}` (Tasaki
 §6.2, eq. (6.2.27)), summed over the range-`r` window `W_x = window L r x` with the
 ring-distance-centered angle coefficient `(2π/L)·signedRingDisp L x y`.  It is the local generator
