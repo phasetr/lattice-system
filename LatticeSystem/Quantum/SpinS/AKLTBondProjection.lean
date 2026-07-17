@@ -131,10 +131,12 @@ def IsVBSGroundForm (L : ℕ) (x : Fin L) (Φ : (Fin L → Fin 3) → ℂ) : Pro
 
 /-! ## Forward kernel inclusion `W ⊆ ker P̂₂^{loc}` (Lemma 7.4, PR-2)
 
-The four bond vectors `Ψ_{σσ'}` have total spin `≤ 1`, hence lie in the kernel of the single-bond
-spin-2 projection `P̂₂^{loc} = bondSpin2ProjectionS (0 : Fin 2) 1` on `ℂ³ ⊗ ℂ³` (`Λ = Fin 2`,
-`L = 2`).  This is Tasaki's forward direction (7.1.20) ⇒ (7.1.19), verified here by an explicit
-`9`-dimensional linear-algebra computation. -/
+The four bond vectors `Ψ_{σσ'}` have total spin `≤ 1`, hence lie in the
+kernel of the single-bond spin-2 projection
+`P̂₂^{loc} = bondSpin2ProjectionS (0 : Fin 2) 1` on `ℂ³ ⊗ ℂ³`
+(`Λ = Fin 2`, `L = 2`).  This is Tasaki's forward direction
+(7.1.20) ⇒ (7.1.19), verified here by an explicit `9`-dimensional
+linear-algebra computation. -/
 
 /-- Enumeration of a sum over the `9` two-site configurations `Fin 2 → Fin 3`. -/
 private lemma sum_fin2_fin3 (f : (Fin 2 → Fin 3) → ℂ) :
@@ -186,7 +188,8 @@ private lemma minus2 (i j : Fin 3) :
     rcases hj with hj | hj <;> rw [hj] <;> norm_num
   · rw [spinSOpMinus_apply_other 2 h, if_neg h]
 
-/-- `Ŝ^{(3)}` entries at `N = 2`: diagonal `1 − k` (magnetic quantum number), off-diagonal `0`. -/
+/-- `Ŝ^{(3)}` entries at `N = 2`: diagonal `1 − k` (magnetic quantum
+number), off-diagonal `0`. -/
 private lemma three2 (i j : Fin 3) :
     spinSOp3 2 i j = if i = j then (1 : ℂ) - (i.val : ℂ) else 0 := by
   unfold spinSOp3
@@ -196,8 +199,9 @@ private lemma three2 (i j : Fin 3) :
   · rfl
 
 /-- Imaginary-free form of the two-site dot product on `Fin 2`:
-`Ŝ_0 · Ŝ_1 = ½ (Ŝ^+ ⊗ Ŝ^- + Ŝ^- ⊗ Ŝ^+) + Ŝ^{(3)} ⊗ Ŝ^{(3)}`, eliminating `Ŝ^{(1)}, Ŝ^{(2)}`
-(and hence `I`) so the kernel computation stays over rational multiples of `√2`. -/
+`Ŝ_0 · Ŝ_1 = ½ (Ŝ^+ ⊗ Ŝ^- + Ŝ^- ⊗ Ŝ^+) + Ŝ^{(3)} ⊗ Ŝ^{(3)}`,
+eliminating `Ŝ^{(1)}, Ŝ^{(2)}` (and hence `I`) so the kernel computation
+stays over rational multiples of `√2`. -/
 private lemma spinSDot_fin2_apply' (σ' σ : Fin 2 → Fin 3) :
     spinSDot (0 : Fin 2) 1 2 σ' σ =
       (1 / 2 : ℂ) * (spinSOpPlus 2 (σ' 0) (σ 0) * spinSOpMinus 2 (σ' 1) (σ 1)
@@ -211,15 +215,6 @@ private lemma spinSDot_fin2_apply' (σ' σ : Fin 2 → Fin 3) :
   ring_nf
   rw [Complex.I_sq]
   ring
-
-/-- `(√2)² = 2` inside `ℂ`, used to clear the radicals from the kernel computation. -/
-private lemma sqrt2_sq : ((Real.sqrt 2 : ℝ) : ℂ) ^ 2 = 2 := by
-  rw [← Complex.ofReal_pow, Real.sq_sqrt (by norm_num)]; norm_num
-
-/-- `√2 · √2 = 2` inside `ℂ` (product form), used to clear the radicals from the kernel
-computation. -/
-private lemma sqrt2_mul : ((Real.sqrt 2 : ℝ) : ℂ) * ((Real.sqrt 2 : ℝ) : ℂ) = 2 := by
-  rw [← Complex.ofReal_mul, Real.mul_self_sqrt (by norm_num)]; norm_num
 
 /-- The image `Ŝ_0 · Ŝ_1 |Ψ_{↑↓}⟩` of the mixed bond vector `Ψ_{↑↓} = vbsBondVec 0 1`
 (`2|+,-⟩ − |0,0⟩`) under the two-site dot product: `−3|+,-⟩ + 2|0,0⟩ − |-,+⟩`. -/
@@ -253,8 +248,8 @@ private lemma bondLocal_expand :
         + (1 / 3 : ℂ) • 1 := rfl
 
 set_option maxHeartbeats 1000000 in -- `9`-dim single mulVec exceeds the default heartbeat budget
-/-- `Ŝ_0 · Ŝ_1 |Ψ_{↑↑}⟩ = −|Ψ_{↑↑}⟩`: the aligned bond vector is a spin-1 eigenvector
-(eigenvalue `−1`). -/
+/-- `Ŝ_0 · Ŝ_1 |Ψ_{↑↑}⟩ = −|Ψ_{↑↑}⟩`: the aligned bond vector is a
+spin-1 eigenvector (eigenvalue `−1`). -/
 private lemma dot_mulVec_upUp :
     (spinSDot (0 : Fin 2) 1 2).mulVec (vbsBondVec 0 0) = -(vbsBondVec 0 0) := by
   funext idx
@@ -268,10 +263,11 @@ private lemma dot_mulVec_upUp :
       Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
-    norm_num [sqrt2_mul, sqrt2_sq]
+    norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
 
 set_option maxHeartbeats 1000000 in -- `9`-dim single mulVec exceeds the default heartbeat budget
-/-- `Ŝ_0 · Ŝ_1 |Ψ_{↓↓}⟩ = −|Ψ_{↓↓}⟩`: the anti-aligned bond vector is a spin-1 eigenvector. -/
+/-- `Ŝ_0 · Ŝ_1 |Ψ_{↓↓}⟩ = −|Ψ_{↓↓}⟩`: the aligned bond vector is a
+spin-1 eigenvector. -/
 private lemma dot_mulVec_dnDn :
     (spinSDot (0 : Fin 2) 1 2).mulVec (vbsBondVec 1 1) = -(vbsBondVec 1 1) := by
   funext idx
@@ -285,7 +281,7 @@ private lemma dot_mulVec_dnDn :
       Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
-    norm_num [sqrt2_mul, sqrt2_sq]
+    norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
 
 set_option maxHeartbeats 1000000 in -- `9`-dim single mulVec exceeds the default heartbeat budget
 /-- First dot-product image of the mixed bond vector `Ψ_{↑↓}` (`vbsBondVec 0 1`). -/
@@ -302,7 +298,7 @@ private lemma dot_mulVec_upDn :
       Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
-    norm_num [sqrt2_mul, sqrt2_sq]
+    norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
 
 set_option maxHeartbeats 1000000 in -- `9`-dim single mulVec exceeds the default heartbeat budget
 /-- Second dot-product image of `Ψ_{↑↓}`: `Ŝ_0 · Ŝ_1 |dotImageUpDn⟩ = dotImage2UpDn`. -/
@@ -319,7 +315,7 @@ private lemma dot_mulVec2_upDn :
       Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
-    norm_num [sqrt2_mul, sqrt2_sq]
+    norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
 
 set_option maxHeartbeats 1000000 in -- `9`-dim single mulVec exceeds the default heartbeat budget
 /-- First dot-product image of the mixed bond vector `Ψ_{↓↑}` (`vbsBondVec 1 0`). -/
@@ -336,7 +332,7 @@ private lemma dot_mulVec_dnUp :
       Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
-    norm_num [sqrt2_mul, sqrt2_sq]
+    norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
 
 set_option maxHeartbeats 1000000 in -- `9`-dim single mulVec exceeds the default heartbeat budget
 /-- Second dot-product image of `Ψ_{↓↑}`: `Ŝ_0 · Ŝ_1 |dotImageDnUp⟩ = dotImage2DnUp`. -/
@@ -353,10 +349,11 @@ private lemma dot_mulVec2_dnUp :
       Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
-    norm_num [sqrt2_mul, sqrt2_sq]
+    norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
 
-/-- The aligned bond vector `Ψ_{↑↑}` lies in the kernel of the local spin-2 projection: the spin-1
-eigenvalue `−1` gives `P̂₂^{loc}(−1) = ½(−1) + ⅙(−1)² + ⅓ = 0`. -/
+/-- The aligned bond vector `Ψ_{↑↑}` lies in the kernel of the local
+spin-2 projection: the spin-1 eigenvalue `−1` gives
+`P̂₂^{loc}(−1) = ½(−1) + ⅙(−1)² + ⅓ = 0`. -/
 private lemma bondLocal_mulVec_upUp :
     (bondSpin2ProjectionS (0 : Fin 2) 1).mulVec (vbsBondVec 0 0) = 0 := by
   rw [bondLocal_expand]
@@ -367,7 +364,7 @@ private lemma bondLocal_mulVec_upUp :
   simp only [Pi.add_apply, Pi.smul_apply, Pi.neg_apply, smul_eq_mul, Pi.zero_apply]
   ring
 
-/-- The anti-aligned bond vector `Ψ_{↓↓}` lies in the kernel of the local spin-2 projection. -/
+/-- The aligned bond vector `Ψ_{↓↓}` lies in the kernel of the local spin-2 projection. -/
 private lemma bondLocal_mulVec_dnDn :
     (bondSpin2ProjectionS (0 : Fin 2) 1).mulVec (vbsBondVec 1 1) = 0 := by
   rw [bondLocal_expand]
@@ -378,8 +375,9 @@ private lemma bondLocal_mulVec_dnDn :
   simp only [Pi.add_apply, Pi.smul_apply, Pi.neg_apply, smul_eq_mul, Pi.zero_apply]
   ring
 
-/-- The mixed bond vector `Ψ_{↑↓}` lies in the kernel: `(Ŝ·Ŝ)² + 3(Ŝ·Ŝ) + 2` annihilates it,
-which is `6 P̂₂^{loc}` (the spin-0 ⊕ spin-1 part). -/
+/-- The mixed bond vector `Ψ_{↑↓}` lies in the kernel:
+`(Ŝ·Ŝ)² + 3(Ŝ·Ŝ) + 2` annihilates it, which is `6 P̂₂^{loc}`
+(the spin-0 ⊕ spin-1 part). -/
 private lemma bondLocal_mulVec_upDn :
     (bondSpin2ProjectionS (0 : Fin 2) 1).mulVec (vbsBondVec 0 1) = 0 := by
   rw [bondLocal_expand]
@@ -416,8 +414,9 @@ private lemma bondLocal_mulVec_dnUp :
     norm_num
 
 /-- **Forward direction of Lemma 7.4 (7.1.20) ⇒ (7.1.19), per bond vector.**  Each VBS bond vector
-`Ψ_{σσ'}` is annihilated by the single-bond spin-2 projection `P̂₂^{loc}` on `ℂ³ ⊗ ℂ³`, since it has
-total spin `≤ 1` (Tasaki §7.1.3, p. 186). -/
+`Ψ_{σσ'}` is annihilated by the single-bond spin-2 projection
+`P̂₂^{loc}` on `ℂ³ ⊗ ℂ³`, since it has total spin `≤ 1`
+(Tasaki §7.1.3, p. 186). -/
 theorem bondLocal_mulVec_vbsBondVec (σ σ' : Fin 2) :
     (bondSpin2ProjectionS (0 : Fin 2) 1).mulVec (vbsBondVec σ σ') = 0 := by
   fin_cases σ <;> fin_cases σ'
@@ -429,8 +428,8 @@ theorem bondLocal_mulVec_vbsBondVec (σ σ' : Fin 2) :
 /-- **Kernel inclusion `W ⊆ ker P̂₂^{loc}` (Lemma 7.4, forward).**  The VBS bond subspace `W`
 (`vbsBondSubspace`, the span of the four `Ψ_{σσ'}`) is contained in the kernel of the single-bond
 spin-2 projection `bondSpin2ProjectionS (0 : Fin 2) 1` on `ℂ³ ⊗ ℂ³` (Tasaki §7.1.3, eqs.
-(7.1.19)–(7.1.20), p. 186).  The reverse inclusion (hence equality, `dim = 4`) is discharged in the
-following PR. -/
+(7.1.19)–(7.1.20), p. 186).  The reverse inclusion (hence equality,
+`dim = 4`) is discharged in the following PR. -/
 theorem vbsBondSubspace_le_ker :
     vbsBondSubspace ≤
       LinearMap.ker (Matrix.mulVecLin (bondSpin2ProjectionS (0 : Fin 2) 1)) := by

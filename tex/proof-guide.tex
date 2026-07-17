@@ -11881,11 +11881,13 @@ in $W$.  Being defined through $W$ alone (no reference to $\hat P_2$), it makes 
 non-tautological.  The forward direction (7.1.20~$\Rightarrow$~7.1.19) at a single bond,
 \texttt{vbsBondSubspace\_le\_ker} (\emph{proved}, axiom-free/\texttt{std3}), shows
 $W\subseteq\ker\bigl(\texttt{bondSpin2ProjectionS}\,(0:\mathrm{Fin}\,2)\,1\bigr)$ on
-$\mathbb{C}^3\otimes\mathbb{C}^3$ by an explicit $9$-dimensional computation: each
-$\Psi_{\sigma\sigma'}$ is a total-spin-$\le1$ eigenvector of $C=\hat S_0\!\cdot\!\hat S_1$ (the
-aligned/anti-aligned vectors have $C=-1$; the two mixed vectors mix spin-$0$ and spin-$1$), hence is
-annihilated by $\tfrac12 C+\tfrac16 C^2+\tfrac13$.  The AKLT ground space is then the VBS state in
-which every bond carries a singlet (Kennedy--Lieb--Tasaki 1988).  The affine identity, the concrete
+$\mathbb{C}^3\otimes\mathbb{C}^3$ by an explicit $9$-dimensional computation.  The two aligned
+vectors are eigenvectors of $C=\hat S_0\!\cdot\!\hat S_1$ with eigenvalue $-1$.  The two mixed
+vectors are spin-$0$/spin-$1$ mixtures rather than eigenvectors of $C$, but
+\texttt{bondSpin2ProjectionS} annihilates them because its defining polynomial
+$\tfrac12 C+\tfrac16 C^2+\tfrac13$ vanishes on both sectors and has eigenvalue $1$ only on the
+spin-$2$ sector.  The AKLT ground space is then the VBS state in which every bond carries a singlet
+(Kennedy--Lieb--Tasaki 1988).  The affine identity, the concrete
 marker, and the forward kernel inclusion are proved; the full tensor-slice discharge of
 \texttt{tasaki\_lemma\_7\_4} (reverse inclusion $\ker=W$ and the multi-site slice) is staged over
 the following PRs, so the equivalence itself is (for now) a documented axiom.  Chapters~3--10
