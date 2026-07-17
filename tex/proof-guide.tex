@@ -11167,9 +11167,24 @@ residual ZZ term is bounded by a reduced replica \texttt{zz\_tower\_numerator\_b
 $\hat H_{\mathrm{ZZ}}$ locality obtained directly from
 \texttt{iterOrderComm\_norm\_le\_of\_localSum}, with the \emph{same} $24dN^3$/$96dN^4/V$ aggregates),
 giving the identical $O(M^2/V)$ moment-factor shape; the assembled \texttt{xy\_tower\_numerator\_bound}
-is the \texttt{Term1} numerator (half filling, $N=1$) consumed by the PR-5 tower assembly.  The
-\texttt{tasaki\_5\_2\_bec\_tower}
-axiom is to be discharged (axiom$\to$theorem) at the final PR of the arc.  Chapters~3--10 backfill.
+is the \texttt{Term1} numerator (half filling, $N=1$) consumed by the PR-5 tower assembly.  PR-5
+(\#5051) adds the half-filling predicate \texttt{IsBECTowerConstantsHalfFilling} (the $\mu=0$ kernel of
+\texttt{IsBECTowerConstants}, with an inner premise conjunct $\hat S^{(3)}_{\mathrm{tot}}\Phi=0$) and the
+axiom-free tower-energy assembly (\texttt{Quantum/SpinS/BoseEinsteinCondensateTower.lean}): at $\mu=0$
+the chemical-potential Hamiltonian collapses to $\hat H_0=2\hat H_{\mathrm{XY}}$
+(\texttt{xyChemicalPotentialHamiltonianS\_zero}), so the variational gap
+(\texttt{variational\_gap\_le\_double\_commutator}) is bounded by the pure-XY numerator
+\texttt{xy\_tower\_numerator\_bound} (no residual first-order $\mu$-term), and the denominator
+$\tfrac12 P_M\le\|(\hat o^{\pm})^M\Phi\|^2$ (\texttt{tower\_denominator\_lower\_bound}) cancels the
+$P_M$, giving the quadratic trial bound $E_0+8\cdot\texttt{towerEnergyCoeff}$
+(\texttt{becTowerState\_pos/neg\_rayleigh\_bound\_halfFilling}); \texttt{towerEnergyCoeff\_le} sharpens
+this to $O(M^2/L^d)$ and the rounding $M^2\le|M|^3$ ($|M|\ge1$) casts it into the faithful cubic
+increment $C_2|M|^3/L^d$ of eq.~(5.3.4) (footnote~8: the cubic is Tasaki's deliberately weakened form),
+with the nonvanishing conjunct from PR-4; \texttt{becTowerConstantsHalfFilling\_of\_planar\_lro}
+constructs the explicit $C_1,C_2>0$.  Only the half-filling kernel is discharged axiom-free: the
+general-$\mu$ \texttt{tasaki\_5\_2\_bec\_tower} stays a documented axiom (its bound rests on the
+Koma--Tasaki [21] reflection-positivity/infrared machinery, intractable at project scale, so the
+general-$\mu$ $\mu$-term algebra of PR-1/PR-3 remains for that axiom).  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{Theorem 5.3} (U(1) symmetry-breaking states of hard-core bosons; Tasaki §5.3,
