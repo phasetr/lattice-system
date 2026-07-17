@@ -36,7 +36,7 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 /-- **Raising recursion of the tower states** (`M ≥ 0`): `Ô⁺ towerState M Φ = towerState (M+1) Φ`.
 Both states are built with the raising operator, so applying one more `Ô⁺` advances the tower by one
 step (`(Ô⁺)^{|M|+1} = (Ô⁺)^{|M+1|}`). -/
-private theorem staggeredRaisingOpS_mulVec_towerState_of_nonneg (A : Λ → Bool) {M : ℤ}
+theorem staggeredRaisingOpS_mulVec_towerState_of_nonneg (A : Λ → Bool) {M : ℤ}
     (hM : 0 ≤ M) {Φ : (Λ → Fin (N + 1)) → ℂ} :
     (staggeredRaisingOpS A N).mulVec (towerState A N M Φ) = towerState A N (M + 1) Φ := by
   have hnat : (M + 1).natAbs = M.natAbs + 1 := by
@@ -59,7 +59,7 @@ private theorem towerState_eq_loweringPow_of_nonpos (A : Λ → Bool) {M : ℤ} 
 
 /-- **Lowering recursion of the tower states** (`M ≤ 0`): `Ô⁻ towerState M Φ = towerState (M−1) Φ`
 (mirror of `staggeredRaisingOpS_mulVec_towerState_of_nonneg`; `(Ô⁻)^{|M|+1} = (Ô⁻)^{|M−1|}`). -/
-private theorem staggeredLoweringOpS_mulVec_towerState_of_nonpos (A : Λ → Bool) {M : ℤ}
+theorem staggeredLoweringOpS_mulVec_towerState_of_nonpos (A : Λ → Bool) {M : ℤ}
     (hM : M ≤ 0) {Φ : (Λ → Fin (N + 1)) → ℂ} :
     (staggeredLoweringOpS A N).mulVec (towerState A N M Φ) = towerState A N (M - 1) Φ := by
   have hnat : (M - 1).natAbs = M.natAbs + 1 := by
