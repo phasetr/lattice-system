@@ -11188,8 +11188,9 @@ form (footnote~9: the $\lim$ is to be interpreted properly), the construction is
 \texttt{IsBECCoherentSSBConstants}, and the statement is conditional on ODLRO.  Proved by
 Koma--Tasaki~[21]; recorded as a documented axiom.
 
-\emph{Half-filling discharge arc COMPLETE} (tracker \#5061).  As for Theorem~5.2, the $\mu=0$ kernel
-is discharged as the theorem \texttt{tasaki\_5\_3\_bec\_u1\_ssb\_half\_filling}, with the
+\emph{Half-filling discharge arc COMPLETE (conditional)} (tracker \#5061).  As for Theorem~5.2, the
+$\mu=0$ kernel is discharged as the theorem \texttt{tasaki\_5\_3\_bec\_u1\_ssb\_half\_filling}, with
+the
 half-filling predicate \texttt{IsBECCoherentSSBConstantsHalfFilling} --- the $\mu=0$ kernel of
 \texttt{IsBECCoherentSSBConstants} adding the inner premise conjunct $\hat
 S^{(3)}_{\mathrm{tot}}\Phi=0$ (the Theorem~5.1 half-filling sector), mirroring
@@ -11308,10 +11309,16 @@ O^-\rangle=\langle\hat O^-\hat O^+\rangle$ (\texttt{becCoherent\_RL\_eq\_LR}, si
 S^{(3)}\Xi\rangle=0$) and $\langle\hat O^-\hat O^-\rangle=\overline{\langle\hat O^+\hat O^+\rangle}$
 (\texttt{becCoherent\_LL\_eq\_conj\_RR}).  With $\cos^2\theta=\tfrac14(e^{2i\theta}+2+e^{-2i\theta})$ and
 its $\sin^2$ companion, the four bands assemble to the squared-moment limits (eq.~(5.3.8)), completing
-all six symmetry-breaking conjuncts.  The realizing-family concentration is carried by the explicit
-hypothesis \texttt{hRealizing}; \texttt{\#print axioms} = std3 $+$
-\texttt{becMStar\_ge\_sqrt\_twoQ}.  Requires $d\ge2$ (BEC long-range order, vacuous otherwise); the
-general-$\mu$ statement stays the documented axiom \texttt{tasaki\_5\_3\_bec\_u1\_ssb}.
+all six symmetry-breaking conjuncts.  The discharge is \emph{conditional}, with the same double
+structure as Proposition~4.10: \texttt{\#print axioms} = std3 $+$
+\texttt{becMStar\_ge\_sqrt\_twoQ} (the documented $\sqrt2$ bound), \emph{and} the theorem
+additionally requires the explicit hypothesis \texttt{hRealizing} --- the Koma--Tasaki~[66] uniform
+window-ratio concentration input (existence of a realizing BEC coherent family pinning $m^\ast$),
+carried as a hypothesis rather than an axiom (parity with Proposition~4.10 carrying Conjecture~4.12
+as an explicit hypothesis alongside its own $\hat o^2$-concentration axiom).  The per-family
+$m^\ast$ and slow window $M_{\max}$ are quantified outside $\forall\theta$ (a single order
+parameter per family).  Requires $d\ge2$ (BEC long-range order, vacuous otherwise); the general-$\mu$
+statement stays the documented axiom \texttt{tasaki\_5\_3\_bec\_u1\_ssb}.
 Chapters~3--10 backfill.
 
 \medskip

@@ -549,7 +549,7 @@ private theorem becCoherent_secondMoment2_limit (d : ℕ) (hd : 1 ≤ d) (q₀ m
 
 /-! ### Theorem 5.3 (half-filling kernel): assembly of the `U(1)` symmetry-breaking limits -/
 
-/-- **Tasaki Theorem 5.3, half-filling kernel (PROVED).**  Discharges the predicate
+/-- **Tasaki Theorem 5.3, half-filling kernel (DISCHARGED, conditional).**  Discharges the predicate
 `IsBECCoherentSSBConstantsHalfFilling d q₀ C₁` (the `μ = 0` kernel of Theorem 5.3): for the `U(1)`
 coherent state `Ξ_θ` built over the hard-core-boson tower, the order-operator density behaves as a
 classical planar vector of length `m∗` in the direction `θ`, with vanishing fluctuation — the
@@ -557,14 +557,18 @@ first-order magnetization means `⟨Ô^{(1)}⟩/L^d → m∗ cos θ`, `⟨Ô^{(2
 (eq. (5.3.7)), the complex moments `⟨Ô^±⟩/L^d → m∗ e^{±iθ}` (eq. (5.3.6)), and the squared moments
 `⟨(Ô^{(α)})²⟩/(L^d)² → (m∗ cos θ)² / (m∗ sin θ)²` (eq. (5.3.8)) — and `m∗ ≥ √(2 q₀)`.
 
-The `hRealizing` hypothesis packages the Koma–Tasaki [21] uniform window-ratio concentration
-(deferred with parity to the `SU(2)` sibling per the 2026-07-12 no-overreach boundary): it upgrades
-any half-filling ODLRO ground-state family to a realizing BEC coherent family
-(`IsRealizingBECCoherentFamily`) pinning the genuine order parameter `m∗`.  Given that, every SSB
-limit is discharged axiom-free from the exact finite-`L` band collapses and the window
-concentration, and `m∗ ≥ √(2 q₀)` is the documented axiom `becMStar_ge_sqrt_twoQ`; hence `#print
-axioms` is
-`std3 + becMStar_ge_sqrt_twoQ`.  Requires `d ≥ 2` (BEC long-range order, vacuous otherwise).
+**Conditional discharge, same double structure as Proposition 4.10** (documented axiom + explicit
+hypothesis).  `#print axioms` is `std3 + becMStar_ge_sqrt_twoQ` (the documented `√2` order-parameter
+bound, `U(1)` planar sibling of the `SU(2)` `√3` Theorem 4.11), **and** the theorem additionally
+requires the explicit hypothesis `hRealizing`: for every half-filling ODLRO ground-state family
+there exists a realizing BEC coherent family (`IsRealizingBECCoherentFamily`) pinning the genuine
+order parameter `m∗`.  `hRealizing` is exactly the Koma–Tasaki [66] concentration input — the
+**uniform window-ratio pinning** (`r_M = ⟨Γ_{M+1}, Ô⁺ Γ_M⟩/L^d → m∗` uniformly over the slow window)
+— carried as a hypothesis rather than an axiom (deferred with parity to the `SU(2)` sibling per the
+2026-07-12 no-overreach boundary; this mirrors Proposition 4.10 carrying Conjecture 4.12 as an
+explicit hypothesis alongside its own `ô²`-concentration axiom).  Given `hRealizing`, every SSB
+limit is discharged from the exact finite-`L` band collapses and the window concentration.
+Requires `d ≥ 2` (BEC long-range order, vacuous otherwise).
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §5.3, Theorem 5.3, eqs. (5.3.5)–(5.3.8), pp. 141–142 (Koma–Tasaki [21]). -/
@@ -583,15 +587,15 @@ theorem tasaki_5_3_bec_u1_ssb_half_filling (d : ℕ) (hd : 2 ≤ d) (q₀ : ℝ)
           towerState (torusParitySublattice d L) 1 M (Φ L) ≠ 0)) →
       ∃ mStar : ℝ, ∃ Mwin : ℕ → ℕ, IsRealizingBECCoherentFamily d q₀ mStar C₁ Φ E₀ Mwin) :
     ∃ C₁' : ℝ, IsBECCoherentSSBConstantsHalfFilling d q₀ C₁' := by
-  refine ⟨C₁, hC₁, hq₀.le, fun θ Φ E₀ hbody => ?_⟩
+  refine ⟨C₁, hC₁, hq₀.le, fun Φ E₀ hbody => ?_⟩
   obtain ⟨mStar, Mwin, hFam⟩ := hRealizing Φ E₀ hbody
   refine ⟨mStar, hFam.2.2.2,
-    becMStar_ge_sqrt_twoQ d (by omega) q₀ mStar C₁ hq₀ hC₁ Φ E₀ Mwin hFam, Mwin, hFam.1,
-    becCoherent_mean1_limit d q₀ mStar C₁ θ Φ E₀ Mwin hFam,
-    becCoherent_mean2_limit d q₀ mStar C₁ θ Φ E₀ Mwin hFam,
-    becCoherent_secondMoment1_limit d (by omega) q₀ mStar C₁ hC₁ θ Φ E₀ Mwin hFam,
-    becCoherent_secondMoment2_limit d (by omega) q₀ mStar C₁ hC₁ θ Φ E₀ Mwin hFam,
-    becCoherent_complexRaising_limit d q₀ mStar C₁ θ Φ E₀ Mwin hFam,
-    becCoherent_complexLowering_limit d q₀ mStar C₁ θ Φ E₀ Mwin hFam⟩
+    becMStar_ge_sqrt_twoQ d (by omega) q₀ mStar C₁ hq₀ hC₁ Φ E₀ Mwin hFam, Mwin, hFam.1, fun θ => ⟨
+      becCoherent_mean1_limit d q₀ mStar C₁ θ Φ E₀ Mwin hFam,
+      becCoherent_mean2_limit d q₀ mStar C₁ θ Φ E₀ Mwin hFam,
+      becCoherent_secondMoment1_limit d (by omega) q₀ mStar C₁ hC₁ θ Φ E₀ Mwin hFam,
+      becCoherent_secondMoment2_limit d (by omega) q₀ mStar C₁ hC₁ θ Φ E₀ Mwin hFam,
+      becCoherent_complexRaising_limit d q₀ mStar C₁ θ Φ E₀ Mwin hFam,
+      becCoherent_complexLowering_limit d q₀ mStar C₁ θ Φ E₀ Mwin hFam⟩⟩
 
 end LatticeSystem.Quantum
