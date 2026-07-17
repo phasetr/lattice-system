@@ -214,6 +214,43 @@ noncomputable def becCoherentState (d L : ℕ) [NeZero L] (θ : ℝ) (Mmax : ℕ
       Complex.exp (-(M : ℝ) * θ * Complex.I) •
         unitNormalize (towerState (torusParitySublattice d L) 1 M Φ)
 
+/-- **Bilinear double-sum expansion of a coherent-state Rayleigh numerator** (Tasaki §5.3, the
+algebraic core of eqs. (5.3.6)–(5.3.8), p. 141).  For any operator `O`, the sesquilinear form of the
+`U(1)` coherent state `Ξ_θ` (`becCoherentState`, eq. (5.3.5)) expands over the tower window as
+`⟨Ξ_θ, O Ξ_θ⟩ = (2 M_max + 1)^{-1} Σ_{M',M} conj(e^{−iM'θ}) e^{−iMθ} ⟨Γ_{M'}, O Γ_M⟩`, where
+`Γ_M = unitNormalize (towerState … M Φ)`.  The prefactor `(2 M_max + 1)^{-1}` is `|c|²` for the real
+normalization scalar `c = (√(2 M_max + 1))^{-1}` (self-conjugate as it is real).  This is the purely
+algebraic step, prior to the sector orthogonality of the `Γ_M` (a later arc PR) collapsing the
+double sum to its diagonal/adjacent band; taking `O = 1` gives the self inner product used for the
+`‖Ξ_θ‖ = 1` normalization. -/
+theorem becCoherentState_dotProduct_mulVec (d L : ℕ) [NeZero L] (θ : ℝ) (Mmax : ℕ)
+    (Φ : (HypercubicTorus d L → Fin 2) → ℂ)
+    (O : Matrix (HypercubicTorus d L → Fin 2) (HypercubicTorus d L → Fin 2) ℂ) :
+    star (becCoherentState d L θ Mmax Φ) ⬝ᵥ O.mulVec (becCoherentState d L θ Mmax Φ)
+      = ((2 * (Mmax : ℝ) + 1 : ℝ) : ℂ)⁻¹ *
+        ∑ M' ∈ Finset.Icc (-(Mmax : ℤ)) (Mmax : ℤ),
+          ∑ M ∈ Finset.Icc (-(Mmax : ℤ)) (Mmax : ℤ),
+            (starRingEnd ℂ) (Complex.exp (-(M' : ℝ) * θ * Complex.I))
+              * Complex.exp (-(M : ℝ) * θ * Complex.I)
+              * (star (unitNormalize (towerState (torusParitySublattice d L) 1 M' Φ))
+                  ⬝ᵥ O.mulVec (unitNormalize (towerState (torusParitySublattice d L) 1 M Φ))) := by
+  have hs : (0 : ℝ) ≤ 2 * (Mmax : ℝ) + 1 := by positivity
+  set c : ℂ := ((Real.sqrt (2 * (Mmax : ℝ) + 1) : ℝ) : ℂ)⁻¹ with hc
+  have hcoef : star c * c = ((2 * (Mmax : ℝ) + 1 : ℝ) : ℂ)⁻¹ := by
+    have hstar : star c = c := by
+      rw [hc, star_inv₀]; congr 1; exact Complex.conj_ofReal _
+    rw [hstar, hc, ← mul_inv, ← Complex.ofReal_mul, Real.mul_self_sqrt hs]
+  rw [becCoherentState, Matrix.mulVec_smul, star_smul, smul_dotProduct, dotProduct_smul,
+    smul_eq_mul, smul_eq_mul, ← mul_assoc, hcoef]
+  congr 1
+  rw [Matrix.mulVec_sum, star_sum, sum_dotProduct]
+  refine Finset.sum_congr rfl fun M' _ => ?_
+  rw [dotProduct_sum]
+  refine Finset.sum_congr rfl fun M _ => ?_
+  rw [Matrix.mulVec_smul, star_smul, smul_dotProduct, dotProduct_smul, smul_eq_mul,
+    smul_eq_mul, starRingEnd_apply]
+  ring
+
 /-- A **slow `M_max` window** (Tasaki §5.3): an increasing cutoff `M_max(L)` that diverges to
 infinity "not too rapidly", staying within the tower range `M_max(L) ≤ C₁ L^{d/2}` for large `L`. -/
 def IsSlowBECWindow (d : ℕ) (C₁ : ℝ) (Mmax : ℕ → ℕ) : Prop :=
@@ -242,6 +279,69 @@ def IsBECCoherentSSBConstants (d : ℕ) (μ q₀ C₁ mStar : ℝ) : Prop :=
         (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin 2) → ℂ, Ψ ≠ 0 →
           (xyChemicalPotentialHamiltonianS d L μ).mulVec Ψ = E • Ψ → (E₀ L).re ≤ E.re) ∧
         Φ L ≠ 0 ∧
+        (∀ α : Fin 3, α ≠ 2 → q₀ ≤ expectationRatioRe
+          ((staggeredOrderOpAxisS α (torusParitySublattice d L) 1) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2) ∧
+        (∀ M : ℤ, (M.natAbs : ℝ) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →
+          towerState (torusParitySublattice d L) 1 M (Φ L) ≠ 0)) →
+      -- there exists a *sufficiently slowly* diverging window for which the SSB limits hold
+      ∃ Mmax : ℕ → ℕ, IsSlowBECWindow d C₁ Mmax ∧
+      -- (5.3.7): the magnetization-density moments converge to a classical vector of length mStar
+      (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+        |expectationRatioRe (staggeredOrderOp1S (torusParitySublattice d L) 1)
+            (becCoherentState d L θ (Mmax L) (Φ L)) / (L : ℝ) ^ d - mStar * Real.cos θ| < ε) ∧
+      (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+        |expectationRatioRe (staggeredOrderOp2S (torusParitySublattice d L) 1)
+            (becCoherentState d L θ (Mmax L) (Φ L)) / (L : ℝ) ^ d - mStar * Real.sin θ| < ε) ∧
+      -- (5.3.8): the squared moments converge to the squared classical components
+      (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+        |expectationRatioRe ((staggeredOrderOp1S (torusParitySublattice d L) 1) ^ 2)
+            (becCoherentState d L θ (Mmax L) (Φ L)) / ((L : ℝ) ^ d) ^ 2
+          - (mStar * Real.cos θ) ^ 2| < ε) ∧
+      (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+        |expectationRatioRe ((staggeredOrderOp2S (torusParitySublattice d L) 1) ^ 2)
+            (becCoherentState d L θ (Mmax L) (Φ L)) / ((L : ℝ) ^ d) ^ 2
+          - (mStar * Real.sin θ) ^ 2| < ε) ∧
+      -- (5.3.6): the complex order-operator moments rotate as e^{±iθ}
+      (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+        ‖expectationRatioComplex (staggeredRaisingOpS (torusParitySublattice d L) 1)
+            (becCoherentState d L θ (Mmax L) (Φ L)) / ((L : ℝ) ^ d : ℂ)
+          - (mStar : ℂ) * Complex.exp ((θ : ℂ) * Complex.I)‖ < ε) ∧
+      (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+        ‖expectationRatioComplex (staggeredLoweringOpS (torusParitySublattice d L) 1)
+            (becCoherentState d L θ (Mmax L) (Φ L)) / ((L : ℝ) ^ d : ℂ)
+          - (mStar : ℂ) * Complex.exp (-(θ : ℂ) * Complex.I)‖ < ε)
+
+/-- **The half-filling BEC coherent-state SSB constants predicate** (Tasaki Theorem 5.3,
+eqs. (5.3.5)–(5.3.8), pp. 141–142).  `IsBECCoherentSSBConstantsHalfFilling d q₀ C₁ mStar` is the
+`μ = 0` (half-filling) kernel of `IsBECCoherentSSBConstants`: it fixes the chemical potential to
+`μ = 0` (so the coherent state is built over the `Ĥ_0 = 2 Ĥ_XY` ground-state tower) and adds, as an
+inner premise conjunct, the half-filling sector condition `Ŝ_tot^{(3)} Φ_L = 0` (the same sector
+hypothesis as Theorems 5.1/5.2, `tasaki_5_1_xy_odlro_half_filling` and
+`IsBECTowerConstantsHalfFilling`).
+Under these hypotheses — a realizing family `Φ_L` of nonzero minimal-energy eigenvectors of
+`Ĥ_0 = 2 Ĥ_XY` in the `Ŝ_tot^{(3)} = 0` sector exhibiting the two XY-plane ODLRO bounds (`α = 1, 2`)
+with parameter `q₀` and nonvanishing tower states throughout `|M| ≤ C₁ L^{d/2}` — there exists a
+sufficiently slowly diverging window `M_max` (`IsSlowBECWindow`) for which the coherent state `Ξ_θ`
+(`becCoherentState`, eq. (5.3.5)) exhibits the same symmetry-breaking limits as
+`IsBECCoherentSSBConstants`, and `√(2 q₀) ≤ mStar` (the `U(1)` `√2` bound, eq. (5.3.6)).
+
+Unlike the general-`μ` `IsBECCoherentSSBConstants` (kept as the faithful documented axiom
+`tasaki_5_3_bec_u1_ssb`, whose general-`μ` limits rest on the Koma–Tasaki [21]
+reflection-positivity/infrared machinery, intractable at project scale), this half-filling kernel is
+the discharge target: at `μ = 0` the reused variational bricks (tower non-vanishing/denominator,
+sector orthogonality, the U(1) two-axis base ratio) all require the half-filling
+`Ŝ_tot^{(3)} = 0` sector.  A general-`μ` ground state has `Ŝ_tot^{(3)} Φ = s₀ ≠ 0`, so those
+bricks no longer close, and this predicate is a genuinely stronger statement (not `α`-equivalent to
+`IsBECCoherentSSBConstants`), mirroring the Theorem 5.2 half-filling kernel. -/
+def IsBECCoherentSSBConstantsHalfFilling (d : ℕ) (q₀ C₁ mStar : ℝ) : Prop :=
+  0 < C₁ ∧ 0 ≤ q₀ ∧ 0 < mStar ∧ Real.sqrt (2 * q₀) ≤ mStar ∧
+    ∀ (θ : ℝ) (Φ : (L : ℕ) → (HypercubicTorus d L → Fin 2) → ℂ) (E₀ : ℕ → ℂ),
+      (∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
+        (xyChemicalPotentialHamiltonianS d L 0).mulVec (Φ L) = E₀ L • Φ L ∧
+        (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin 2) → ℂ, Ψ ≠ 0 →
+          (xyChemicalPotentialHamiltonianS d L 0).mulVec Ψ = E • Ψ → (E₀ L).re ≤ E.re) ∧
+        Φ L ≠ 0 ∧
+        (totalSpinSOp3 (HypercubicTorus d L) 1).mulVec (Φ L) = 0 ∧
         (∀ α : Fin 3, α ≠ 2 → q₀ ≤ expectationRatioRe
           ((staggeredOrderOpAxisS α (torusParitySublattice d L) 1) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2) ∧
         (∀ M : ℤ, (M.natAbs : ℝ) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →

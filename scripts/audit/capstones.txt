@@ -249,3 +249,15 @@ tanakaSSB_field_lowerBound
 # `BoseEinsteinCondensateNumerator.lean`) was DELETED with its file since the half-filling discharge
 # does not consume it and the general-`μ` axiom carries no proof.
 tasaki_5_2_bec_tower_half_filling
+
+# TEMPORARY arc-tips (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
+# discharge arc, PR-1 (#5062, tracker #5061, `Quantum/SpinS/BoseEinsteinCondensate.lean`).
+# `IsBECCoherentSSBConstantsHalfFilling` is the μ=0 half-filling discharge-target predicate (the
+# kernel of `IsBECCoherentSSBConstants`, adding the `Ŝ³_tot = 0` sector conjunct); it is consumed by
+# the final discharge theorem `tasaki_5_3_bec_u1_ssb_half_filling` (a later arc PR).
+# `becCoherentState_dotProduct_mulVec` is the coherent-state Rayleigh numerator double-sum expansion
+# `⟨Ξ_θ,O Ξ_θ⟩ = (2M_max+1)^{-1} Σ_{M',M} conj(e^{-iM'θ})e^{-iMθ}⟨Γ_{M'},O Γ_M⟩` (Tasaki §5.3,
+# eqs. (5.3.6)–(5.3.8), p. 141), the algebraic core consumed by the coherent-moment / sector arc PRs.
+# Both zero-referenced until those downstream PRs land. RE-EVALUATE/DELIST when consumed.
+IsBECCoherentSSBConstantsHalfFilling
+becCoherentState_dotProduct_mulVec
