@@ -18,7 +18,7 @@ Tasaki proves the analogous `p̂`-field concentration only by *citing* it: §4.2
 states the `p̂`-ratio concentration is "elementary, proof omitted; see [66]" (Koma–Tasaki), and
 eqs. (4.2.59)–(4.2.61) then instruct the reader to *repeat the `p̂` argument* for the `ô²` field,
 yielding `lim_n lim_L ⟨(ô²)^{n+1}⟩/(⟨(ô²)^n⟩·V²) = (m∗)²`.  The `p̂`-side mirror
-`mStar_eq_phat_ratio_limit` (`OrderOperatorAlgebra.lean:908`) is already recorded as a documented
+`mStar_eq_phat_ratio_limit` (`OrderOperatorAlgebra.lean:813`) is already recorded as a documented
 axiom.  Per the 2026-07-12 no-overreach boundary (preventing both omission and overreach), this
 `ô²` concentration sub-arc is deferred **with parity** to that `p̂` mirror rather than rebuilding
 the 6–9 PR [66]/Koma–Tasaki concentration machinery; Conjecture 4.12 stays an explicit hypothesis,
@@ -40,7 +40,7 @@ open Filter in
 AXIOM.**  §4.2.2 eq. (4.2.40) states the `p̂` concentration "elementary, proof omitted; see [66]"
 (Koma–Tasaki); eqs. (4.2.59)–(4.2.61) then say to *repeat the `p̂` argument* for the `ô²` field,
 giving `lim_n lim_L ⟨(ô²)^{n+1}⟩/(⟨(ô²)^n⟩·V²) = (m∗)²`.  The `p̂`-side mirror
-`mStar_eq_phat_ratio_limit` (`OrderOperatorAlgebra.lean:908`) is already a documented axiom; per the
+`mStar_eq_phat_ratio_limit` (`OrderOperatorAlgebra.lean:813`) is already a documented axiom; per the
 2026-07-12 no-overreach boundary this `ô²` concentration sub-arc is deferred with parity to that
 mirror.  We state only the `limsup`-**upper** direction actually consumed by the squeeze (the
 `liminf`-lower is free from log-convexity plus the base ratio `orderSqMoment_baseRatio_tendsto`):

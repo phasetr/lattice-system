@@ -35,6 +35,7 @@ import LatticeSystem.Math.SubmoduleFinrankLeOne
 import LatticeSystem.Math.MatrixAnalysis.LieProduct
 import LatticeSystem.Math.PosSemidef.Basics
 import LatticeSystem.Math.MatrixAnalysis.EigenvalueMonotone
+import LatticeSystem.Math.MatrixAnalysis.HermitianExpUnitary
 import LatticeSystem.Math.MatrixAnalysis.TraceExpMonotone
 import LatticeSystem.Math.FrustrationFree
 import LatticeSystem.Math.PosSemidef.Kernel
@@ -171,6 +172,7 @@ import LatticeSystem.Quantum.SpinS.HeisenbergEquilibrium
 import LatticeSystem.Quantum.SpinS.HypercubicBoxModel
 import LatticeSystem.Quantum.SpinS.HypercubicBoxThermodynamicLimit
 import LatticeSystem.Quantum.SpinS.InfiniteVolumeGroundState
+import LatticeSystem.Quantum.SpinS.ManyBodyOperatorNorm
 import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
 import LatticeSystem.Quantum.SpinS.AndersonTowerEnergyBound
 import LatticeSystem.Quantum.SpinS.AndersonTowerLocality

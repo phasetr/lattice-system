@@ -47,7 +47,7 @@ a `ℂ`-algebra `A`, the `M`-th power of the smul-linear combination `∑ α, c 
 over index tuples `f : Fin M → ι`, each contributing the scalar product `∏ j, c (f j)` times the
 **ordered** operator product `(List.ofFn fun j => O (f j)).prod`.  Operator order is preserved
 exactly (no commutators). **Note**: this is a generalization of `add_pow_eq_sum_ofFn`
-(OrderOperatorAlgebra.lean, line 703), which specializes to `ι = Bool` (binary choice). -/
+(OrderOperatorAlgebra.lean, line 619), which specializes to `ι = Bool` (binary choice). -/
 theorem pow_sum_smul_eq_sum_smul_prod {ι A : Type*} [Fintype ι]
     [Ring A] [Algebra ℂ A] (c : ι → ℂ) (O : ι → A) (M : ℕ) :
     (∑ α, c α • O α) ^ M

@@ -6,6 +6,14 @@
 #         that the textual gate cannot see).
 # Add a name only after confirming the finding is a genuine false positive.
 
+# V1 move-only false positives (#5084): these public foundational API endpoints were
+# already present in OrderOperatorAlgebra.lean on main and are moved byte-for-byte to
+# ManyBodyOperatorNorm.lean by the declaration-preserving module split. The diff-scoped
+# gate sees their new host file as new declarations even though the reviewed public API
+# is unchanged. They are legitimate zero-reference endpoints of the norm API.
+manyBodyOperatorNormS_pow_le
+manyBodyOperatorNormS_list_prod_le
+
 # V2 false positive: 60-line truncation artifact. The two theorems below share a
 # long common hypothesis prefix (AnisotropicHeisenbergSpinSCaseIIBlockPFMin.lean
 # :361 and :446); the gate truncates the compared statement at 60 lines before
