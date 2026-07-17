@@ -11426,18 +11426,18 @@ $E_1-E_0\le8\pi^2S^2/L$.  Lemmas 6.1 and 6.2 are likewise proved theorems.  Chap
 
 \medskip
 \noindent\textbf{§6.2 Lemma 6.4} (generalized LSM variational bound; Tasaki §6.2,
-eqs.~(6.2.23)--(6.2.24), pp.~162--163; documented axiom,
-\texttt{Quantum/SpinS/LiebSchultzMattisGeneral.lean}, Issue \#4485).  Lemma 6.1 generalizes to
+eqs.~(6.2.23)--(6.2.24), pp.~162--163; PROVED, \texttt{\#print axioms} = std3, PR~\#5077,
+\texttt{Quantum/SpinS/LiebSchultzMattisGeneralDischarge.lean}, Issue \#4485).  Lemma 6.1 generalizes to
 \emph{any} short-ranged $U(1)$-invariant chain Hamiltonian $\hat H=\sum_x\hat h_x$ (eq.~6.2.23).  The
 class \texttt{IsShortRangeU1Chain} bundles the assumptions: each $\hat h_x$ is \emph{self-adjoint}
 (so $\sum_x\hat h_x$ is a genuine Hamiltonian), $r$-local (\texttt{IsLocalRangeR}, now the
 \emph{commutant-form} locality \texttt{def}: $\hat h_x$ commutes with every single-site operator
 farther than $r$ from $x$, equivalent to $\mathrm{supp}(\hat h_x)\subseteq\{y:\mathtt{ringDist}\,x\,y
 \le r\}$ by the factor double-commutant theorem; strong form chosen to keep the shared Theorem~7.3
-hypothesis faithful; discharge arc OPEN, PR~\#5071), bounded $\|\hat h_x\|\le h_0$ in the $L^2$
+hypothesis faithful; discharge arc COMPLETE, axiom-free, PR~\#5071--\#5077), bounded $\|\hat h_x\|\le h_0$ in the $L^2$
 operator norm
 (\texttt{manyBodyOperatorNormS}), and $U(1)$-invariant ($[\hat h_x,\hat S_{\mathrm{tot}}^{(3)}]=0$,
-\texttt{Commute}).  The axiom
+\texttt{Commute}).  The theorem
 \texttt{tasaki\_lemma\_6\_4\_general\_trial\_energy\_bound} states the existence of a constant $C>0$,
 depending only on $S,r,h_0$, such that for \emph{any} ground state $\Phi_{\mathrm{GS}}$ (uniqueness
 not assumed) the twisted trial state obeys $\langle\Phi_{\mathrm{LSM}},\hat H\Phi_{\mathrm{LSM}}
@@ -11447,14 +11447,14 @@ Tasaki remarks that for half-odd-integer $S$ with a translation-invariant ground
 orthogonality argument then yields $0\le E_{1\mathrm{st}}-E_{\mathrm{GS}}\le C/L$ (as in
 Theorem~6.3); that gap consequence is \emph{not} formalized here, since the formal Lemma 6.2
 (\texttt{lsm\_ground\_twist\_orthogonal}) is specialized to the antiferromagnetic Heisenberg chain.
-Recorded as a documented axiom.  \emph{Discharge infrastructure} (PR~\#5072): the \emph{centered
+\emph{Discharge infrastructure} (PR~\#5072): the \emph{centered
 local twist generator} $\hat M_x=\texttt{localTwistGen}\,L\,N\,r\,x
 :=\sum_{y\in W_x}(2\pi/L)\,\delta(x,y)\,\hat S_y^{(3)}$ (eq.~6.2.27) over the range-$r$ window
 $\texttt{window}\,L\,r\,x=\{y:\mathtt{ringDist}\,x\,y\le r\}$, with $\delta(x,y)=
 \texttt{signedRingDisp}\,L\,x\,y$ the \emph{ring-distance-centered} signed displacement
 ($|\delta|=\mathtt{ringDist}$, avoiding the $2\pi$ seam jump of the raw angle $\theta_y=2\pi(y+1)/L$
-on wrapping windows); $\hat M_x$ is Hermitian, so the \emph{local twist operator}
-$\hat U_x=\texttt{localTwistOperator}\,L\,N\,r\,x:=\exp(-i\hat M_x)$ is unitary.  The generic norm
+on wrapping windows); $\hat M_x$ is Hermitian (\texttt{localTwistGen\_isHermitian}), so
+$\exp(\pm i\hat M_x)$ are unitary conjugators.  The generic norm
 lemma \texttt{manyBodyOperatorNormS\_unitary\_conj} ($\|UYU^{\dagger}\|=\|Y\|$ for unitary $U$) is
 added for the forthcoming second-order twist-conjugation bound.  PR-3 (PR~\#5073): the \emph{outer
 variational reduction} (eq.~6.2.25) is generalized to an \emph{arbitrary} Hamiltonian
@@ -11506,7 +11506,23 @@ $\|F(1)-F(0)\|=\|f(1)+f(-1)-2f(0)\|\le 8\|M\|^2\|X\|$.  The $O(\|M\|^2)$ order (
 essential: the first-order term cancels in the symmetric difference, turning the per-site $O(1/L^2)$
 into the summed $O(1/L)$.  This replaces the book's $\mathrm{ad}(\hat M_x)$ eigen-monomial
 decomposition (6.2.29) by a finite-dimensional Taylor remainder (a sound weaker constant; the axiom
-only needs $C=C(N,r,h_0)$).  Chapters~3--10 backfill.
+only needs $C=C(N,r,h_0)$).  PR-7 (final discharge, PR~\#5077,
+\texttt{Quantum/SpinS/LiebSchultzMattisGeneralDischarge.lean}): the \emph{assembly} turns the former
+axiom into the proved theorem \texttt{tasaki\_lemma\_6\_4\_general\_trial\_energy\_bound}
+(\texttt{\#print axioms} = std3).  With $\Delta_+:=\langle\Phi_{\mathrm{LSM}},\hat H\Phi_{\mathrm{LSM}}
+\rangle/\langle\cdot\rangle-E_{\mathrm{GS}}$ and $\Delta_-$ the back-twist difference, $\Delta_+\le
+\Delta_++\Delta_-$ ($\Delta_-\ge0$ by \texttt{groundEnergy\_le\_expectationRatioRe\_general}), and the
+$\pm\theta$-symmetrised sum (\texttt{lsm\_energy\_diff\_symm\_sum\_general}) equals the Rayleigh
+quotient of $\hat U^{\dagger}\hat H\hat U+\hat U\hat H\hat U^{\dagger}-2\hat H=\sum_x(\hat U^{\dagger}
+\hat h_x\hat U+\hat U\hat h_x\hat U^{\dagger}-2\hat h_x)$; each summand reduces (CRUX A
+\texttt{twistConj\_eq\_localGen}/\texttt{twistConj'\_eq\_localGen}) to a local-generator conjugation,
+bounded (CRUX B \texttt{symmetricDifference\_conj\_norm\_le}) by $8\|\hat M_x\|^2\|\hat h_x\|\le
+8(B/L)^2h_0$ (\texttt{localTwistGen\_manyBodyOperatorNormS\_le} + \texttt{norm\_le}), summing over the
+$L$ sites to $8B^2h_0/L$; the Rayleigh quotient is $\le\|\cdot\|$
+(\texttt{expectationRatioRe\_le\_manyBodyOperatorNormS}, operator Cauchy--Schwarz), giving
+$\Delta_+\le C/L$ with $C=8B^2|h_0|+1$.  The unused operator-form unitarity lemmas
+\texttt{localTwistOperator\_*} were \emph{deleted} (the per-site bound stays in the $\exp(\pm i\hat
+M_x)$ form).  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§6.3 Proposition 6.5} (the $S=1$ chain on the hidden-AFM subspace; Tasaki §6.3,
