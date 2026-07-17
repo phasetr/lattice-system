@@ -26,14 +26,6 @@ open Matrix
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
-private theorem star_dotProduct_self_re_pos {n : Type*} [Fintype n]
-    {v : n → ℂ} (hv : v ≠ 0) : 0 < (star v ⬝ᵥ v).re := by
-  rw [star_dotProduct_self_eq, Complex.ofReal_re]
-  obtain ⟨i, hi⟩ := Function.ne_iff.mp hv
-  exact Finset.sum_pos' (fun j _ => Complex.normSq_nonneg _)
-    ⟨i, Finset.mem_univ i, lt_of_le_of_ne (Complex.normSq_nonneg _)
-      (Ne.symm (by simpa [Complex.normSq_eq_zero] using hi))⟩
-
 /-- **Sublattice Casimir dominates `S^3(S^3+1)`**: for a simultaneous eigenvector `v ≠ 0`
 of `(Ŝ_A)²` (eigenvalue `γ`) and `Ŝ_A^(3)` (eigenvalue `q`), `(q(q+1)).re ≤ γ.re`.  From
 `(Ŝ_A)² = Ŝ_A^- Ŝ_A^+ + Ŝ_A^(3)(Ŝ_A^(3)+1)` and `‖Ŝ_A^+ v‖² ≥ 0`. -/
@@ -68,7 +60,7 @@ theorem sublatticeSpinSquaredS_re_ge_sublatticeSpinSOp3_mul_succ (A : V → Bool
   set z : ℝ := ∑ i, Complex.normSq (v i) with hzdef
   set S : ℝ := ∑ i, Complex.normSq ((sublatticeSpinSOpPlus N A).mulVec v i) with hSdef
   have hz_pos : 0 < z := by
-    have := star_dotProduct_self_re_pos hv_ne
+    have := dotProduct_star_self_re_pos hv_ne
     rwa [star_dotProduct_self_eq, Complex.ofReal_re] at this
   have hS_nn : 0 ≤ S := Finset.sum_nonneg (fun i _ => Complex.normSq_nonneg _)
   have hre := congrArg Complex.re hquad
@@ -113,7 +105,7 @@ theorem sublatticeSpinSquaredS_re_ge_sublatticeSpinSOp3_mul_pred (A : V → Bool
   set z : ℝ := ∑ i, Complex.normSq (v i) with hzdef
   set S : ℝ := ∑ i, Complex.normSq ((sublatticeSpinSOpMinus N A).mulVec v i) with hSdef
   have hz_pos : 0 < z := by
-    have := star_dotProduct_self_re_pos hv_ne
+    have := dotProduct_star_self_re_pos hv_ne
     rwa [star_dotProduct_self_eq, Complex.ofReal_re] at this
   have hS_nn : 0 ≤ S := Finset.sum_nonneg (fun i _ => Complex.normSq_nonneg _)
   have hre := congrArg Complex.re hquad

@@ -83,16 +83,6 @@ theorem dotProduct_star_self_eq_ofReal {n : Type*} [Fintype n] (v : n → ℂ) :
   refine Finset.sum_congr rfl (fun i _ => ?_)
   rw [← Complex.normSq_eq_conj_mul_self]
 
-/-- For a nonzero vector `v`, the squared norm `(⟨v, v⟩).re = Σ_i |v_i|²` is strictly positive. -/
-theorem dotProduct_star_self_re_pos {n : Type*} [Fintype n] {v : n → ℂ} (hv : v ≠ 0) :
-    0 < (dotProduct (star v) v).re := by
-  classical
-  obtain ⟨i₀, hi₀⟩ := Function.ne_iff.mp hv
-  rw [Pi.zero_apply] at hi₀
-  rw [dotProduct_star_self_eq_ofReal, Complex.ofReal_re]
-  refine Finset.sum_pos' (fun i _ => Complex.normSq_nonneg _) ⟨i₀, Finset.mem_univ _, ?_⟩
-  exact (Complex.normSq_pos).mpr hi₀
-
 /-! ## The trial-state Rayleigh quotient -/
 
 /-- **The on-site interaction scales linearly in `U`**: `Ĥ_int(U) = U • Ĥ_int(1)`. -/
