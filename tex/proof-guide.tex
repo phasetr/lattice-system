@@ -11277,7 +11277,24 @@ asserted, never the still-open equality $m^{\ast 2}=2q_0$.  The axiom is declare
 consumed (the discharge using it is a later arc PR), so all PR-6 declarations stay std3, and it is
 vacuous in $d=1$ (Corollary~4.3).  The
 general-$\mu$ \texttt{tasaki\_5\_3\_bec\_u1\_ssb} stays a documented axiom ($d$-dim RP-intractability,
-Koma--Tasaki [21]), the same two-track policy as Theorem~5.2.  Chapters~3--10 backfill.
+Koma--Tasaki [21]), the same two-track policy as Theorem~5.2.
+\emph{PR-6b} (\#5068, \texttt{Quantum/SpinS/BoseEinsteinCondensateCoherentSecondMoment.lean}): the
+exact finite-$L$ band representation of the coherent second moments (eq.~5.3.8),
+$\langle\Xi_\theta,(\hat O_L^{(\alpha)})^2\,\Xi_\theta\rangle$, entirely axiom-free (std3 only, no
+concentration axiom).  The two-step sector orthogonality \texttt{becBand\_ne\_eq\_zero\_of\_intEigen}
+(generalising \texttt{becOffDiagonal\_ne\_adjacent\_eq\_zero} to a shift-$j$ eigenvalue) and the
+generic Cesàro collapses \texttt{becCoherent\_band\_collapse} ($k=\pm2$, phase $e^{ik\theta}$) /
+\texttt{becCoherent\_diagonal\_collapse} ($k=0$) reduce the coherent double sum to the single
+surviving sector band, giving the four band expectations
+\texttt{becCoherent\_raisingRaising\_collapse}/\texttt{loweringLowering\_collapse} (off-diagonal,
+phases $e^{\pm2i\theta}$) and \texttt{becCoherent\_raisingLowering\_collapse}/\texttt{loweringRaising\_collapse}
+(diagonal); the operator-square splits \texttt{staggeredOrderOp1S\_sq\_eq}/\texttt{staggeredOrderOp2S\_sq\_eq}
+expand $(\hat O_L^{(1)})^2$/$(\hat O_L^{(2)})^2$ into the four two-step products $\hat O^+\hat O^+$,
+$\hat O^+\hat O^-$, $\hat O^-\hat O^+$, $\hat O^-\hat O^-$ (coefficients $\tfrac14$/$-\tfrac14$),
+yielding the exact splits \texttt{becCoherent\_secondMoment1\_eq}/\texttt{becCoherent\_secondMoment2\_eq}.
+The band-value reduction ($r_M$ products / diagonal $2r_M^2$ + Lemma~4.14 commutator remainder) and
+the $(m^\ast\cos\theta)^2$/$(m^\ast\sin\theta)^2$ limits are the assembly sequel; std3 only.
+Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{Theorem 5.4} (symmetry breaking in coupled Bose--Einstein condensates; Tasaki §5.5,

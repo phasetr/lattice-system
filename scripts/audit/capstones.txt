@@ -335,3 +335,25 @@ becCoherent_mean2
 # a documented-axiom capstone (axioms are legitimately zero-referenced until consumed).
 # RE-EVALUATE/DELIST when the discharge theorem consumes it.
 becMStar_ge_sqrt_twoQ
+
+# TEMPORARY arc-tips (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
+# discharge arc, PR-6b (#5068, tracker #5061,
+# `Quantum/SpinS/BoseEinsteinCondensateCoherentSecondMoment.lean`).  Exact finite-L band
+# representation of the coherent second moments (Tasaki §5.3, eq. (5.3.8), p. 141),
+# `⟨Ξ_θ, (Ô^{(α)})² Ξ_θ⟩`, entirely axiom-free (std3 only, carrying no concentration axiom).  The
+# four band expectations `becCoherent_raisingRaising_collapse`/`_loweringLowering_collapse`
+# (off-diagonal, phases `e^{±2iθ}`) and `becCoherent_raisingLowering_collapse`/`_loweringRaising_collapse`
+# (diagonal) collapse the coherent double sum `becCoherentState_dotProduct_mulVec` (PR-1) to the single
+# surviving sector band via the two-step orthogonality `becBand_ne_eq_zero_of_intEigen` and the generic
+# `becCoherent_band_collapse`/`becCoherent_diagonal_collapse` (which ARE consumed, hence not listed).
+# `becCoherent_secondMoment1_eq`/`becCoherent_secondMoment2_eq` are the exact `¼`/`−¼`-weighted
+# operator-square splits of `(Ô^{(1)})²`/`(Ô^{(2)})²` into those four products
+# (`staggeredOrderOp1S_sq_eq`/`_sq_eq`).  All six are zero-referenced until the band-value reduction
+# (`r_M` products, diagonal `2r_M²` + Lemma 4.14 commutator remainder) and assembly PR feed them into
+# the `(m∗ cos θ)²`/`(m∗ sin θ)²` limits (eq. 5.3.8). RE-EVALUATE/DELIST when consumed.
+becCoherent_raisingRaising_collapse
+becCoherent_loweringLowering_collapse
+becCoherent_raisingLowering_collapse
+becCoherent_loweringRaising_collapse
+becCoherent_secondMoment1_eq
+becCoherent_secondMoment2_eq
