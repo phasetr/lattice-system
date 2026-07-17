@@ -11456,7 +11456,15 @@ $\texttt{window}\,L\,r\,x=\{y:\mathtt{ringDist}\,x\,y\le r\}$, with $\delta(x,y)
 on wrapping windows); $\hat M_x$ is Hermitian, so the \emph{local twist operator}
 $\hat U_x=\texttt{localTwistOperator}\,L\,N\,r\,x:=\exp(-i\hat M_x)$ is unitary.  The generic norm
 lemma \texttt{manyBodyOperatorNormS\_unitary\_conj} ($\|UYU^{\dagger}\|=\|Y\|$ for unitary $U$) is
-added for the forthcoming second-order twist-conjugation bound.  Chapters~3--10 backfill.
+added for the forthcoming second-order twist-conjugation bound.  PR-3 (PR~\#5073): the \emph{outer
+variational reduction} (eq.~6.2.25) is generalized to an \emph{arbitrary} Hamiltonian
+$\hat H:\texttt{ManyBodyOpS}$ --- \texttt{lsm\_energy\_diff\_symm\_sum\_general} (the symmetrised twist
+gap $\bigl(\langle\Phi_{\mathrm{LSM}},\hat H\Phi_{\mathrm{LSM}}\rangle/\langle\Phi_{\mathrm{LSM}},
+\Phi_{\mathrm{LSM}}\rangle-E_{\mathrm{GS}}\bigr)$ summed over $\pm\theta$ equals the Rayleigh quotient
+of $\hat U^{\dagger}\hat H\hat U+\hat U\hat H\hat U^{\dagger}-2\hat H$) and
+\texttt{groundEnergy\_le\_expectationRatioRe\_general} ($E_{\mathrm{GS}}\le$ any Rayleigh quotient of a
+Hermitian $\hat H$); the Heisenberg-chain forms are now thin specializations, so the reduction applies
+verbatim to $\hat H=\sum_x\hat h_x$.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§6.3 Proposition 6.5} (the $S=1$ chain on the hidden-AFM subspace; Tasaki §6.3,

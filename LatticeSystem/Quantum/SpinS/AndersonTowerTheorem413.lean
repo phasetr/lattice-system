@@ -52,27 +52,21 @@ theorem staggeredFieldHamiltonianS_isHermitian (d L N : ℕ) [NeZero L] (h : ℝ
 /-- **Minimum-eigenvalue Rayleigh lower bound (generic).**  For a Hermitian `H` whose eigenvalue
 `E₀` is the spectral minimum (`hmin`: every eigenvalue's real part dominates `E₀.re`), the real
 Rayleigh quotient of *any* nonzero vector `v` is at least `E₀.re`.  Chains
-`E₀.re ≤ hermitianMinEigenvalue H ≤ expectationRatioRe H v` via
-`hermitianMinEigenvalue_mul_dotProduct_re_le_rayleighOnVec` and the minimum-eigenvalue eigenvector.
-Generic form of `groundEnergy_le_expectationRatioRe`, used for both `Ĥ` and `Ĥ_h`. -/
+`E₀.re ≤ hermitianMinEigenvalue H ≤ expectationRatioRe H v`: the minimality step feeds `hmin` at the
+minimum-eigenvalue eigenvector, and the Rayleigh step is the shared core
+`hermitianMinEigenvalue_le_expectationRatioRe`.  Spectral-minimizer companion of the ground-energy
+form `groundEnergy_le_expectationRatioRe_general`, used for both `Ĥ` and `Ĥ_h`. -/
 theorem minimizerEigenvalue_le_expectationRatioRe {ι : Type*} [Fintype ι] [Nonempty ι]
     {H : Matrix ι ι ℂ} (hH : H.IsHermitian) (E₀ : ℂ)
     (hmin : ∀ E : ℂ, ∀ Ψ : ι → ℂ, Ψ ≠ 0 → H.mulVec Ψ = E • Ψ → E₀.re ≤ E.re)
     {v : ι → ℂ} (hv : v ≠ 0) :
     E₀.re ≤ expectationRatioRe H v := by
   classical
-  have hpos : 0 < (star v ⬝ᵥ v).re := dotProduct_star_self_re_pos hv
-  have hvar := hermitianMinEigenvalue_mul_dotProduct_re_le_rayleighOnVec hH v
-  have h1 : hermitianMinEigenvalue hH ≤ expectationRatioRe H v := by
-    unfold expectationRatioRe
-    rw [le_div_iff₀ hpos]
-    unfold rayleighOnVec at hvar
-    exact hvar
   obtain ⟨w, hw0, hweig⟩ := exists_nonzero_eigenvector_hermitianMinEigenvalue hH
   have h2 : E₀.re ≤ hermitianMinEigenvalue hH := by
     have := hmin ((hermitianMinEigenvalue hH : ℝ) : ℂ) w hw0 hweig
     rwa [Complex.ofReal_re] at this
-  exact le_trans h2 h1
+  exact le_trans h2 (hermitianMinEigenvalue_le_expectationRatioRe hH hv)
 
 /-- **Rayleigh-quotient operator linearity in a real staggered field.**  For real `c`,
 `expectationRatioRe (O₁ − c • O₂) v = expectationRatioRe O₁ v − c · expectationRatioRe O₂ v` (common
@@ -89,8 +83,8 @@ theorem expectationRatioRe_sub_smul_real {ι : Type*} [Fintype ι]
 
 /-- **Rayleigh quotient of an eigenvector equals the eigenvalue's real part (generic).**  For a
 nonzero eigenvector `v` of `H` at (complex) eigenvalue `E`, `expectationRatioRe H v = E.re`, since
-`⟨v, v⟩` is real so `⟨v, E v⟩.re = E.re · ⟨v, v⟩.re`.  Generic companion of the chain-specific
-`expectationRatioRe_of_eigenvector`. -/
+`⟨v, v⟩` is real so `⟨v, E v⟩.re = E.re · ⟨v, v⟩.re`.  Generic companion of the real-eigenvalue
+`expectationRatioRe_of_eigenvector_general`. -/
 theorem expectationRatioRe_eigenvalue_re {ι : Type*} [Fintype ι]
     (H : Matrix ι ι ℂ) (v : ι → ℂ) (E : ℂ) (hne : v ≠ 0)
     (heig : H.mulVec v = E • v) :
