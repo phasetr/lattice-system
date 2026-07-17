@@ -309,3 +309,29 @@ towerState_unitNormalize_inner_eq_zero_of_ne
 # `m∗ cos θ` / `m∗ sin θ` limit. RE-EVALUATE/DELIST when consumed.
 becCoherent_mean1
 becCoherent_mean2
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
+# discharge arc, PR-6 (#5067, tracker #5061,
+# `Quantum/SpinS/BoseEinsteinCondensateCoherentConcentration.lean`).  The order-parameter
+# concentration lower bound `m∗ ≥ √(2q₀)` (Tasaki §5.3, "As in Theorem 4.11 … we can prove the bound
+# m∗ ≥ √(2q₀). See (4.2.39)", pp. 141–142), recorded as a documented axiom `becMStar_ge_sqrt_twoQ` —
+# the BEC half-filling counterpart of the SU(2) concentration axiom
+# `orderSqMoment_ratio_le_mStarSq_family` (Theorem 4.11) and the `p̂`-mirror
+# `mStar_eq_phat_ratio_limit`, with the U(1) planar factor √2 (two axes α=1,2, base ratio → 2q₀) in
+# place of the SU(2) √3; per the 2026-07-12 no-overreach boundary the Koma–Tasaki [66] concentration
+# mechanism is deferred with parity to those axioms, not rebuilt.  `m∗` is pinned to its genuine value
+# by the new predicate `IsRealizingBECCoherentFamily` (consumed by the axiom signature, hence not
+# zero-referenced), the U(1) planar analogue of `IsRealizingTanakaGroundStateFamily` (drops the
+# axis-1 singlet + reversal invariance, keeps only half filling `Ŝ³_tot Φ = 0`).  Its window is a
+# `IsSlowBECWindow d C₁ Mwin` (monotone + diverging + eventually `Mwin L ≤ C₁ L^{d/2}` — a bare
+# `Tendsto Mwin atTop atTop` is insufficient: a fast window outrunning `C₁ L^{d/2}` dilutes the
+# normalization and admits a false witness pinning `m∗` below `√(2q₀)`), and `m∗` is pinned by the
+# uniform window-ratio concentration (eventually `∀ M in window, ‖r_M − m∗‖ < ε`,
+# `r_M = ⟨Γ_{M+1}, Ô⁺ Γ_M⟩/L^d`; math-note §3.4 refinement 2), which subsumes the θ=0 mean limit and
+# drives the eq. 5.3.8 second moments axiom-free from one source.  A free `m∗` would make the bound
+# FALSE (`m∗:=0`, `q₀>0`), hence the
+# family pinning; only the easy half `m∗² ≥ 2q₀` is asserted, never the still-open `m∗² = 2q₀`.  The
+# axiom is DECLARED but not yet consumed (the final discharge that uses it is a later arc PR), so it is
+# a documented-axiom capstone (axioms are legitimately zero-referenced until consumed).
+# RE-EVALUATE/DELIST when the discharge theorem consumes it.
+becMStar_ge_sqrt_twoQ
