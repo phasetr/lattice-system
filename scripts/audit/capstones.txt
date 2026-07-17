@@ -273,3 +273,18 @@ becCoherentState_dotProduct_mulVec
 towerState_totalSpin3_eigenvector
 towerState_inner_eq_zero_of_ne
 towerState_unitNormalize_inner_eq_zero_of_ne
+
+# TEMPORARY arc-tips (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
+# discharge arc, PR-3 (#5064, tracker #5061,
+# `Quantum/SpinS/BoseEinsteinCondensateCoherentMatrixElement.lean`).  Off-diagonal matrix elements of
+# the coherent tower states for the raising operator `Ô⁺`: `becOffDiagonal_ne_adjacent_eq_zero`
+# (`⟨Γ_{M'}, Ô⁺ Γ_M⟩ = 0` for `M' ≠ M+1`, since `Ô⁺ Γ_M` sits in sector `M+1`, eq. (5.3.3)) and
+# `becOffDiagonal_eq_norm_ratio` (the single surviving adjacent element is the norm ratio
+# `⟨Γ_{M+1}, Ô⁺ Γ_M⟩ = √(D_{M+1}/D_M)` on the raising side `M ≥ 0`, eq. (5.3.6)) and its lowering-side
+# mirror `becOffDiagonal_eq_norm_ratio_neg` (for `M ≤ −1` the same `Ô⁺`-sandwiched element is the
+# *inverse* ratio `√(D_M/D_{M+1})`, via `(Ô⁺)ᴴ = Ô⁻` adjoint reversal + lowering recursion; math-note
+# §2② 2026-07-17 refinement).  Zero-referenced until the coherent-moment arc PR feeds them into the
+# Cesàro window average. RE-EVALUATE/DELIST when consumed.
+becOffDiagonal_ne_adjacent_eq_zero
+becOffDiagonal_eq_norm_ratio
+becOffDiagonal_eq_norm_ratio_neg

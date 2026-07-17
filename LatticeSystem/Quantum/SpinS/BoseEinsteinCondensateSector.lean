@@ -32,8 +32,10 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 /-! ### Single-step and iterated magnetization shift -/
 
 /-- **Single raising step**: if `Ŝ³_tot v = λ v` then `Ŝ³_tot (Ô⁺ v) = (λ + 1) (Ô⁺ v)` (the
-staggered raising operator increments the total magnetization by one). -/
-private theorem totalSpinSOp3_mulVec_staggeredRaising_eigenvec (A : Λ → Bool)
+staggered raising operator increments the total magnetization by one).  Public because the coherent
+off-diagonal matrix-element PR reuses it on `Ô⁺ towerState M Φ` (see
+`BoseEinsteinCondensateCoherentMatrixElement.lean`). -/
+theorem totalSpinSOp3_mulVec_staggeredRaising_eigenvec (A : Λ → Bool)
     {v : (Λ → Fin (N + 1)) → ℂ} {lam : ℂ}
     (hv : (totalSpinSOp3 Λ N).mulVec v = lam • v) :
     (totalSpinSOp3 Λ N).mulVec ((staggeredRaisingOpS A N).mulVec v)
