@@ -11238,7 +11238,18 @@ adjoint-derived \texttt{becOffDiagonal\_lowering\_ne\_adjacent\_eq\_zero} ($(\ha
 H}=\hat O_L^+$), with both-branch lowering norm ratios
 \texttt{becOffDiagonal\_lowering\_eq\_norm\_ratio} ($M\le0$) and
 \texttt{becOffDiagonal\_lowering\_eq\_norm\_ratio\_pos} ($M\ge1$); the window means converge to
-$m_\ast$ in a later PR; std3 only.  The
+$m_\ast$ in a later PR; std3 only.  \emph{PR-5} (\#5066,
+\texttt{Quantum/SpinS/BoseEinsteinCondensateCoherentMoment.lean}): the axis window means (eq.~5.3.7)
+--- \texttt{becCoherent\_mean1} gives $\langle\Xi_\theta,\hat O_L^{(1)}\,\Xi_\theta\rangle=\cos\theta
+\cdot(2M_{\max}{+}1)^{-1}\sum_{M=-M_{\max}}^{M_{\max}-1}\langle\Gamma_{M+1},\hat O_L^+\,\Gamma_M\rangle$
+and \texttt{becCoherent\_mean2} the $\sin\theta$ counterpart for $\hat O_L^{(2)}$, using the Cartesian
+decompositions \texttt{staggeredOrderOp1S\_eq\_half\_smul}/\texttt{staggeredOrderOp2S\_eq\_smul}
+($\hat O_L^{(1)}=\tfrac12(\hat O_L^++\hat O_L^-)$, $\hat O_L^{(2)}=(2i)^{-1}(\hat O_L^+-\hat O_L^-)$,
+now public), the $\pm$ complex moments (PR-4), the lowering$\to$raising window symmetrisation
+\texttt{becCoherent\_loweringWindow\_eq\_raisingWindow} (reindex $M\mapsto M-1$, each lowering element
+equalling the raising element one step down --- \texttt{becOffDiagonal\_lowering\_shift\_eq}), and the
+Euler identities $\tfrac12(e^{i\theta}+e^{-i\theta})=\cos\theta$,
+$(2i)^{-1}(e^{i\theta}-e^{-i\theta})=\sin\theta$; std3 only.  The
 general-$\mu$ \texttt{tasaki\_5\_3\_bec\_u1\_ssb} stays a documented axiom ($d$-dim RP-intractability,
 Koma--Tasaki [21]), the same two-track policy as Theorem~5.2.  Chapters~3--10 backfill.
 

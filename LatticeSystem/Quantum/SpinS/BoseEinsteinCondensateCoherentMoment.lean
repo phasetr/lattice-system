@@ -179,4 +179,134 @@ theorem becCoherent_complexMoment_lowering (d L : ℕ) [NeZero L] (θ : ℝ) (Mm
     ← Finset.mul_sum]
   ring
 
+/-- **Adjacent lowering element equals the shifted raising element** (Tasaki §5.3, eq. (5.3.3)): for
+nonzero neighbouring tower states the lowering off-diagonal element `⟨Γ_{M−1}, Ô⁻ Γ_M⟩` equals the
+raising element `⟨Γ_{(M−1)+1}, Ô⁺ Γ_{M−1}⟩` one step down the tower.  Both evaluate to the same
+real norm ratio (`√(D_{M−1}/D_M)` for `M ≤ 0`, `√(D_M/D_{M−1})` for `M ≥ 1`); this is the per-term
+identity that symmetrises the lowering window sum onto the raising window in
+`becCoherent_mean1`/`becCoherent_mean2`. -/
+private theorem becOffDiagonal_lowering_shift_eq {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
+    (A : Λ → Bool) {M : ℤ} {Φ : (Λ → Fin (N + 1)) → ℂ}
+    (htM : towerState A N M Φ ≠ 0) (htMm1 : towerState A N (M - 1) Φ ≠ 0) :
+    star (unitNormalize (towerState A N (M - 1) Φ)) ⬝ᵥ
+        (staggeredLoweringOpS A N).mulVec (unitNormalize (towerState A N M Φ))
+      = star (unitNormalize (towerState A N (M - 1 + 1) Φ)) ⬝ᵥ
+        (staggeredRaisingOpS A N).mulVec (unitNormalize (towerState A N (M - 1) Φ)) := by
+  have hshift : M - 1 + 1 = M := by ring
+  have htMm1' : towerState A N (M - 1 + 1) Φ ≠ 0 := by rw [hshift]; exact htM
+  by_cases hM : M ≤ 0
+  · rw [becOffDiagonal_lowering_eq_norm_ratio A hM htM htMm1,
+      becOffDiagonal_eq_norm_ratio_neg A (show M - 1 ≤ -1 by omega) htMm1 htMm1', hshift]
+  · rw [becOffDiagonal_lowering_eq_norm_ratio_pos A (show (1 : ℤ) ≤ M by omega) htM htMm1,
+      becOffDiagonal_eq_norm_ratio A (show (0 : ℤ) ≤ M - 1 by omega) htMm1 htMm1', hshift]
+
+/-- **Lowering window sum equals the raising window sum** (Tasaki §5.3, eq. (5.3.7) symmetrisation):
+reindexing `M ↦ M − 1` maps the lowering window `Ioc(−M_max, M_max)` bijectively onto the raising
+window `Ico(−M_max, M_max)`, and each lowering element equals the raising element one step down
+(`becOffDiagonal_lowering_shift_eq`).  This lets the coherent means `becCoherent_mean1`/`mean2`
+express both `Ô⁺` and `Ô⁻` contributions over the single raising window sum, so their phase factors
+combine to `cos θ`/`sin θ`. -/
+theorem becCoherent_loweringWindow_eq_raisingWindow (d L : ℕ) [NeZero L] (Mmax : ℕ)
+    (Φ : (HypercubicTorus d L → Fin 2) → ℂ)
+    (hne : ∀ M : ℤ, -(Mmax : ℤ) ≤ M → M ≤ (Mmax : ℤ) →
+        towerState (torusParitySublattice d L) 1 M Φ ≠ 0) :
+    (∑ M ∈ Finset.Ioc (-(Mmax : ℤ)) (Mmax : ℤ),
+        star (unitNormalize (towerState (torusParitySublattice d L) 1 (M - 1) Φ)) ⬝ᵥ
+          (staggeredLoweringOpS (torusParitySublattice d L) 1).mulVec
+            (unitNormalize (towerState (torusParitySublattice d L) 1 M Φ)))
+      = ∑ M ∈ Finset.Ico (-(Mmax : ℤ)) (Mmax : ℤ),
+        star (unitNormalize (towerState (torusParitySublattice d L) 1 (M + 1) Φ)) ⬝ᵥ
+          (staggeredRaisingOpS (torusParitySublattice d L) 1).mulVec
+            (unitNormalize (towerState (torusParitySublattice d L) 1 M Φ)) := by
+  refine Finset.sum_nbij' (fun M => M - 1) (fun k => k + 1) ?_ ?_ ?_ ?_ ?_
+  · intro M hM; simp only [Finset.mem_Ioc] at hM; simp only [Finset.mem_Ico]; omega
+  · intro k hk; simp only [Finset.mem_Ico] at hk; simp only [Finset.mem_Ioc]; omega
+  · intro M _; ring
+  · intro k _; ring
+  · intro M hM
+    rw [Finset.mem_Ioc] at hM
+    exact becOffDiagonal_lowering_shift_eq (torusParitySublattice d L)
+      (hne M (by omega) (by omega)) (hne (M - 1) (by omega) (by omega))
+
+/-- **Coherent window mean of the `1`-axis order operator** (Tasaki §5.3, eq. (5.3.7)): at half
+filling (`Ŝ³_tot Φ = 0`), with the tower states nonzero across the window, the coherent-state
+expectation of `Ô^{(1)} = ½(Ô⁺ + Ô⁻)` is `cos θ` times the raising window average,
+`⟨Ξ_θ, Ô^{(1)} Ξ_θ⟩ = cos θ · (2 M_max + 1)^{-1} Σ_{M=−M_max}^{M_max−1} ⟨Γ_{M+1}, Ô⁺ Γ_M⟩`.
+
+From the Cartesian decomposition `staggeredOrderOp1S_eq_half_smul`, the two complex moments
+`becCoherent_complexMoment_raising`/`_lowering` contribute `e^{iθ}` and `e^{−iθ}` times the raising
+and lowering window sums; symmetrising the lowering sum onto the raising window
+(`becCoherent_loweringWindow_eq_raisingWindow`) makes the two share one real window sum, and
+`½(e^{iθ} + e^{−iθ}) = cos θ` (`Complex.two_cos`). -/
+theorem becCoherent_mean1 (d L : ℕ) [NeZero L] (θ : ℝ) (Mmax : ℕ)
+    (Φ : (HypercubicTorus d L → Fin 2) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) 1).mulVec Φ = 0)
+    (hne : ∀ M : ℤ, -(Mmax : ℤ) ≤ M → M ≤ (Mmax : ℤ) →
+        towerState (torusParitySublattice d L) 1 M Φ ≠ 0) :
+    star (becCoherentState d L θ Mmax Φ) ⬝ᵥ
+        (staggeredOrderOp1S (torusParitySublattice d L) 1).mulVec
+          (becCoherentState d L θ Mmax Φ)
+      = (Real.cos θ : ℂ) * ((2 * (Mmax : ℝ) + 1 : ℝ) : ℂ)⁻¹ *
+          ∑ M ∈ Finset.Ico (-(Mmax : ℤ)) (Mmax : ℤ),
+            star (unitNormalize (towerState (torusParitySublattice d L) 1 (M + 1) Φ)) ⬝ᵥ
+              (staggeredRaisingOpS (torusParitySublattice d L) 1).mulVec
+                (unitNormalize (towerState (torusParitySublattice d L) 1 M Φ)) := by
+  have hcos : (2 : ℂ)⁻¹ * (Complex.exp (θ * Complex.I) + Complex.exp (-θ * Complex.I))
+      = (Real.cos θ : ℂ) := by
+    rw [Complex.ofReal_cos, ← Complex.two_cos]; ring
+  rw [staggeredOrderOp1S_eq_half_smul]
+  simp only [Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul, Matrix.add_mulVec,
+    dotProduct_add]
+  rw [becCoherent_complexMoment_raising d L θ Mmax Φ hsing,
+    becCoherent_complexMoment_lowering d L θ Mmax Φ hsing,
+    becCoherent_loweringWindow_eq_raisingWindow d L Mmax Φ hne]
+  set S := ∑ M ∈ Finset.Ico (-(Mmax : ℤ)) (Mmax : ℤ),
+      star (unitNormalize (towerState (torusParitySublattice d L) 1 (M + 1) Φ)) ⬝ᵥ
+        (staggeredRaisingOpS (torusParitySublattice d L) 1).mulVec
+          (unitNormalize (towerState (torusParitySublattice d L) 1 M Φ)) with hS
+  linear_combination (((2 * (Mmax : ℝ) + 1 : ℝ) : ℂ)⁻¹ * S) * hcos
+
+/-- **Coherent window mean of the `2`-axis order operator** (Tasaki §5.3, eq. (5.3.7)): at half
+filling (`Ŝ³_tot Φ = 0`), with the tower states nonzero across the window, the coherent-state
+expectation of `Ô^{(2)} = (2i)^{-1}(Ô⁺ − Ô⁻)` is `sin θ` times the same raising window average,
+`⟨Ξ_θ, Ô^{(2)} Ξ_θ⟩ = sin θ · (2 M_max + 1)^{-1} Σ_{M=−M_max}^{M_max−1} ⟨Γ_{M+1}, Ô⁺ Γ_M⟩`.
+
+Mirror of `becCoherent_mean1` through the Cartesian decomposition `staggeredOrderOp2S_eq_smul`: the
+raising/lowering complex moments contribute `e^{iθ}` and `e^{−iθ}` times the (symmetrised) real
+window sum, and `(2i)^{-1}(e^{iθ} − e^{−iθ}) = sin θ` (`Complex.two_sin`, `Complex.I_sq`). -/
+theorem becCoherent_mean2 (d L : ℕ) [NeZero L] (θ : ℝ) (Mmax : ℕ)
+    (Φ : (HypercubicTorus d L → Fin 2) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) 1).mulVec Φ = 0)
+    (hne : ∀ M : ℤ, -(Mmax : ℤ) ≤ M → M ≤ (Mmax : ℤ) →
+        towerState (torusParitySublattice d L) 1 M Φ ≠ 0) :
+    star (becCoherentState d L θ Mmax Φ) ⬝ᵥ
+        (staggeredOrderOp2S (torusParitySublattice d L) 1).mulVec
+          (becCoherentState d L θ Mmax Φ)
+      = (Real.sin θ : ℂ) * ((2 * (Mmax : ℝ) + 1 : ℝ) : ℂ)⁻¹ *
+          ∑ M ∈ Finset.Ico (-(Mmax : ℤ)) (Mmax : ℤ),
+            star (unitNormalize (towerState (torusParitySublattice d L) 1 (M + 1) Φ)) ⬝ᵥ
+              (staggeredRaisingOpS (torusParitySublattice d L) 1).mulVec
+                (unitNormalize (towerState (torusParitySublattice d L) 1 M Φ)) := by
+  have hmul : (2 * Complex.I) * (Real.sin θ : ℂ)
+      = Complex.exp (θ * Complex.I) - Complex.exp (-θ * Complex.I) := by
+    have h2s := Complex.two_sin (θ : ℂ)
+    have hIsq := Complex.I_sq
+    rw [Complex.ofReal_sin]
+    linear_combination Complex.I * h2s
+      + (Complex.exp (-(θ : ℂ) * Complex.I) - Complex.exp ((θ : ℂ) * Complex.I)) * hIsq
+  have hsin : (2 * Complex.I)⁻¹ * (Complex.exp (θ * Complex.I) - Complex.exp (-θ * Complex.I))
+      = (Real.sin θ : ℂ) := by
+    rw [← hmul, inv_mul_cancel_left₀ (mul_ne_zero two_ne_zero Complex.I_ne_zero)]
+  rw [staggeredOrderOp2S_eq_smul]
+  simp only [Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul, Matrix.sub_mulVec,
+    dotProduct_sub]
+  rw [becCoherent_complexMoment_raising d L θ Mmax Φ hsing,
+    becCoherent_complexMoment_lowering d L θ Mmax Φ hsing,
+    becCoherent_loweringWindow_eq_raisingWindow d L Mmax Φ hne]
+  set S := ∑ M ∈ Finset.Ico (-(Mmax : ℤ)) (Mmax : ℤ),
+      star (unitNormalize (towerState (torusParitySublattice d L) 1 (M + 1) Φ)) ⬝ᵥ
+        (staggeredRaisingOpS (torusParitySublattice d L) 1).mulVec
+          (unitNormalize (towerState (torusParitySublattice d L) 1 M Φ)) with hS
+  linear_combination (((2 * (Mmax : ℝ) + 1 : ℝ) : ℂ)⁻¹ * S) * hsin
+
 end LatticeSystem.Quantum

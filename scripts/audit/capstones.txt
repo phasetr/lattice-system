@@ -285,22 +285,27 @@ towerState_unitNormalize_inner_eq_zero_of_ne
 # §2② 2026-07-17 refinement).  Their `Ô⁻` mirrors (added in PR-4 (#5065) for full eq. (5.3.6)
 # ± coverage) are `becOffDiagonal_lowering_eq_norm_ratio` (`⟨Γ_{M−1}, Ô⁻ Γ_M⟩ = √(D_{M−1}/D_M)` on
 # `M ≤ 0`, lowering recursion) and `becOffDiagonal_lowering_eq_norm_ratio_pos` (`√(D_M/D_{M−1})` on
-# `M ≥ 1`, via `(Ô⁻)ᴴ = Ô⁺` adjoint reversal).  RE-EVALUATE/DELIST when consumed.
-becOffDiagonal_eq_norm_ratio
-becOffDiagonal_eq_norm_ratio_neg
-becOffDiagonal_lowering_eq_norm_ratio
-becOffDiagonal_lowering_eq_norm_ratio_pos
+# `M ≥ 1`, via `(Ô⁻)ᴴ = Ô⁺` adjoint reversal).  All four DELISTED in PR-5 (#5066): the window-mean
+# symmetrisation `becOffDiagonal_lowering_shift_eq` consumes them (each lowering element equals the
+# raising element one step down, both being the same real norm ratio).
 
 # TEMPORARY arc-tip (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
 # discharge arc, PR-4 (#5065, tracker #5061,
 # `Quantum/SpinS/BoseEinsteinCondensateCoherentMoment.lean`).
-# `becCoherent_complexMoment_raising` is the exact finite-`L` Cesàro window representation
-# `⟨Ξ_θ, Ô⁺ Ξ_θ⟩ = e^{iθ} (2M_max+1)^{-1} Σ_{M=−M_max}^{M_max−1} ⟨Γ_{M+1}, Ô⁺ Γ_M⟩` (Tasaki §5.3,
-# eq. (5.3.6), p. 141): the coherent double sum collapsed to the adjacent band with the telescoped
-# phase `e^{iθ}` factored out.  Its `Ô⁻` mirror `becCoherent_complexMoment_lowering`
-# (`⟨Ξ_θ, Ô⁻ Ξ_θ⟩ = e^{−iθ} (2M_max+1)^{-1} Σ_{M=−M_max+1}^{M_max} ⟨Γ_{M−1}, Ô⁻ Γ_M⟩`, collapsed by
-# `becOffDiagonal_lowering_ne_adjacent_eq_zero`) completes the ± pair of eq. (5.3.6).  Both
-# zero-referenced until the mean/second-moment PRs (5.3.7/5.3.8) feed them into the `m∗ e^{±iθ}`
-# limit. RE-EVALUATE/DELIST when consumed (PR-5/6).
-becCoherent_complexMoment_raising
-becCoherent_complexMoment_lowering
+# `becCoherent_complexMoment_raising` (`⟨Ξ_θ, Ô⁺ Ξ_θ⟩ = e^{iθ} (2M_max+1)^{-1}
+# Σ_{M=−M_max}^{M_max−1} ⟨Γ_{M+1}, Ô⁺ Γ_M⟩`, eq. (5.3.6)) and its `Ô⁻` mirror
+# `becCoherent_complexMoment_lowering` were DELISTED in PR-5 (#5066): the coherent window means
+# `becCoherent_mean1`/`becCoherent_mean2` consume both to form the `cos θ`/`sin θ` representation.
+
+# TEMPORARY arc-tips (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
+# discharge arc, PR-5 (#5066, tracker #5061,
+# `Quantum/SpinS/BoseEinsteinCondensateCoherentMoment.lean`).  The coherent window means (Tasaki §5.3,
+# eq. (5.3.7), p. 141): `becCoherent_mean1` gives `⟨Ξ_θ, Ô^{(1)} Ξ_θ⟩ = cos θ · (2M_max+1)^{-1}
+# Σ_{M=−M_max}^{M_max−1} ⟨Γ_{M+1}, Ô⁺ Γ_M⟩` and `becCoherent_mean2` the `sin θ` counterpart for
+# `Ô^{(2)}`, via the Cartesian decompositions `staggeredOrderOp1S_eq_half_smul`/`_eq_smul`, the ± complex
+# moments (PR-4), the lowering→raising window symmetrisation
+# `becCoherent_loweringWindow_eq_raisingWindow`, and `½(e^{iθ}+e^{−iθ}) = cos θ` /
+# `(2i)^{-1}(e^{iθ}−e^{−iθ}) = sin θ`.  Both zero-referenced until the assembly PR feeds them into the
+# `m∗ cos θ` / `m∗ sin θ` limit. RE-EVALUATE/DELIST when consumed.
+becCoherent_mean1
+becCoherent_mean2
