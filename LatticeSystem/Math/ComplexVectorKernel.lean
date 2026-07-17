@@ -46,6 +46,17 @@ theorem star_dotProduct_self_eq {n : Type*} [Fintype n] (v : n → ℂ) :
   refine Finset.sum_congr rfl (fun i _ => ?_)
   rw [Pi.star_apply, Complex.star_def, mul_comm, Complex.mul_conj]
 
+/-- For a nonzero vector `v`, the squared norm `(star v ⬝ᵥ v).re = ∑ ‖v_i‖²` is strictly
+positive. -/
+theorem dotProduct_star_self_re_pos {n : Type*} [Fintype n] {v : n → ℂ} (hv : v ≠ 0) :
+    0 < (star v ⬝ᵥ v).re := by
+  classical
+  obtain ⟨i₀, hi₀⟩ := Function.ne_iff.mp hv
+  rw [Pi.zero_apply] at hi₀
+  rw [star_dotProduct_self_eq, Complex.ofReal_re]
+  exact Finset.sum_pos' (fun i _ => Complex.normSq_nonneg _)
+    ⟨i₀, Finset.mem_univ _, Complex.normSq_pos.mpr hi₀⟩
+
 /-- The conjugated quadratic form `⟨v, Mᴴ M v⟩ = ‖M v‖²` is a non-negative real. -/
 theorem star_dotProduct_conjTranspose_mul_mulVec_eq {n : Type*} [Fintype n]
     (M : Matrix n n ℂ) (v : n → ℂ) :

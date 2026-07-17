@@ -30,20 +30,6 @@ namespace LatticeSystem.Quantum
 open Matrix NormedSpace
 open scoped ComplexOrder
 
-/-- For a nonzero vector, the squared norm `⟨v, v⟩.re = Σ_i |v_i|²` is strictly positive. -/
-theorem dotProduct_star_self_re_pos {ι : Type*} [Fintype ι] {v : ι → ℂ} (hv : v ≠ 0) :
-    0 < (star v ⬝ᵥ v).re := by
-  classical
-  obtain ⟨i₀, hi₀⟩ := Function.ne_iff.mp hv
-  rw [Pi.zero_apply] at hi₀
-  have hsum : (star v ⬝ᵥ v) = ((∑ i, Complex.normSq (v i) : ℝ) : ℂ) := by
-    simp only [dotProduct, Pi.star_apply, RCLike.star_def]
-    push_cast
-    exact Finset.sum_congr rfl (fun i _ => (Complex.normSq_eq_conj_mul_self ..).symm)
-  rw [hsum, Complex.ofReal_re]
-  exact Finset.sum_pos' (fun i _ => Complex.normSq_nonneg _)
-    ⟨i₀, Finset.mem_univ _, Complex.normSq_pos.mpr hi₀⟩
-
 /-- Complex exponentials multiply by adding exponents (forward rewrite helper, `a b` explicit so the
 `Commute` witness is resolved inside the proof — avoids metavariable issues in `←` rewrites). -/
 theorem cexp_mul_cexp (a b : ℂ) :
