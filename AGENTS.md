@@ -5,10 +5,10 @@ Instructions for AI agents (Codex CLI, etc.) operating in this repository.
 This file is auto-loaded by Codex CLI on every invocation. **Read it
 end-to-end and follow it strictly** before doing anything else.
 
-## Always-read files (in this order)
+## Required startup sources
 
 Before answering any request — review, edit, refactor, or otherwise — load
-the following on-disk files and obey their instructions:
+the following on-disk sources and obey their instructions:
 
 1. **`CLAUDE.local.md`** at the repository root. This is the authoritative
    source for project conventions, workflow rules, approval boundaries,
@@ -27,24 +27,38 @@ the following on-disk files and obey their instructions:
    - `.self-local/docs/refactoring-plan-2026-04-22.md` — refactor plan
      and cadence history (§A.4; `CLAUDE.local.md` supersedes any stale
      threshold text there, and the current threshold is 20 PRs)
-   - `.self-local/SESSION-RESUME.md` — current in-flight state and the
-     "Next concrete step" marker; **read first when resuming**
 
 3. The committed project documents:
    - `README.md` — project introduction
    - `docs/index.md` — public-facing roadmap and theorem index
    - `tex/proof-guide.tex` — public-facing mathematical exposition
 
+## Active-work state
+
+Active work state has one governance chain, in this order:
+
+1. the tracking GitHub Issue is authoritative;
+2. `.self-local/issues/<number>.md` is its synchronized local mirror;
+3. the Issue TaskList records completed, current, and next work.
+
+Every active task must name exactly one tracking Issue, keep its local mirror
+synchronized, and maintain a non-empty TaskList or `Next` item. Historical
+handover notes, generated captures, transcripts, and `.self-local/work/`
+records are evidence only; they are not current planning or restart inputs.
+
+## Resume only through Issue governance
+
+When starting or resuming work, identify the active tracking Issue from the
+canonical/master/thread Issue hierarchy, read the GitHub Issue first, then
+read `.self-local/issues/<number>.md`, confirm that the mirror is synchronized,
+and continue from the first incomplete TaskList item or the explicit `Next`
+item. If the Issue and mirror disagree, synchronize the mirror before doing
+implementation work. Do not create an alternative checkpoint or infer current
+work from a historical handover.
+
 ## Hard rules (echoed from `CLAUDE.local.md`; obey even if it is missing)
 
 - **All changes go through pull requests.** Never push directly to `main`.
-- **Do not stop at a refactor-checkpoint resume.** If the execution
-  environment exposes an AI-callable session-clear operation, the agent must
-  invoke it itself. If it does not, the agent must emulate a fresh session by
-  rereading `CLAUDE.local.md`, `.self-local/SESSION-RESUME.md`, the referenced
-  `.self-local/docs/*` files, `README.md`, `docs/index.md`, and
-  `tex/proof-guide.tex`, then continue from the recorded "Next concrete step".
-  Never ask the user to perform the clear action.
 - **Do not skip pre-commit / pre-push hooks** (`--no-verify` etc.) unless
   the user explicitly asks for it.
 - **Do not run destructive git operations** (`push --force`, `reset --hard`,
