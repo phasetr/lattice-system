@@ -192,6 +192,50 @@ theorem manyBodyOperatorNormS_diagonal_le {v : (Λ → Fin (N + 1)) → ℂ} {C 
 
 end L2Wrappers
 
+/-- The many-body `L²` operator norm of the identity is `1` (the bundled `toEuclideanCLM` sends `1`
+to the identity endomorphism, whose operator norm is `1` on the nontrivial space). -/
+@[simp] theorem manyBodyOperatorNormS_one :
+    manyBodyOperatorNormS (1 : ManyBodyOpS Λ N) = 1 := by
+  rw [manyBodyOperatorNormS_eq_toEuclideanCLM, map_one, norm_one]
+
+/-- **Unitary conjugation preserves the many-body `L²` operator norm**: if `UᴴU = 1` then
+`‖U Y Uᴴ‖ = ‖Y‖`.  The forward bound is two submultiplicative steps with `‖U‖ = 1` (from the
+`C*`-identity `‖UᴴU‖ = ‖U‖²` and `‖1‖ = 1`) and `‖Uᴴ‖ = ‖U‖`; the reverse bound rewrites
+`Y = Uᴴ (U Y Uᴴ) U = (UᴴU) Y (UᴴU)`.  Consumed by the second-order twist-conjugation bound of the
+generalized Lieb–Schultz–Mattis Lemma 6.4 (Tasaki §6.2). -/
+theorem manyBodyOperatorNormS_unitary_conj {U Y : ManyBodyOpS Λ N}
+    (hU : Matrix.conjTranspose U * U = 1) :
+    manyBodyOperatorNormS (U * Y * Matrix.conjTranspose U) = manyBodyOperatorNormS Y := by
+  have hUnorm : manyBodyOperatorNormS U = 1 := by
+    have h := manyBodyOperatorNormS_conjTranspose_mul_self U
+    rw [hU, manyBodyOperatorNormS_one] at h
+    rw [← Real.sqrt_sq (manyBodyOperatorNormS_nonneg U), ← h, Real.sqrt_one]
+  have hY : Matrix.conjTranspose U * (U * Y * Matrix.conjTranspose U) * U = Y := by
+    calc Matrix.conjTranspose U * (U * Y * Matrix.conjTranspose U) * U
+        = (Matrix.conjTranspose U * U) * (Y * (Matrix.conjTranspose U * U)) := by
+          simp only [mul_assoc]
+      _ = Y := by rw [hU, one_mul, mul_one]
+  refine le_antisymm ?_ ?_
+  · calc manyBodyOperatorNormS (U * Y * Matrix.conjTranspose U)
+        ≤ manyBodyOperatorNormS (U * Y) * manyBodyOperatorNormS (Matrix.conjTranspose U) :=
+          manyBodyOperatorNormS_mul_le _ _
+      _ ≤ manyBodyOperatorNormS U * manyBodyOperatorNormS Y
+            * manyBodyOperatorNormS (Matrix.conjTranspose U) :=
+          mul_le_mul_of_nonneg_right (manyBodyOperatorNormS_mul_le _ _)
+            (manyBodyOperatorNormS_nonneg _)
+      _ = manyBodyOperatorNormS Y := by rw [manyBodyOperatorNormS_conjTranspose, hUnorm]; ring
+  · calc manyBodyOperatorNormS Y
+        = manyBodyOperatorNormS
+            (Matrix.conjTranspose U * (U * Y * Matrix.conjTranspose U) * U) := by rw [hY]
+      _ ≤ manyBodyOperatorNormS (Matrix.conjTranspose U * (U * Y * Matrix.conjTranspose U))
+            * manyBodyOperatorNormS U := manyBodyOperatorNormS_mul_le _ _
+      _ ≤ manyBodyOperatorNormS (Matrix.conjTranspose U)
+            * manyBodyOperatorNormS (U * Y * Matrix.conjTranspose U) * manyBodyOperatorNormS U :=
+          mul_le_mul_of_nonneg_right (manyBodyOperatorNormS_mul_le _ _)
+            (manyBodyOperatorNormS_nonneg _)
+      _ = manyBodyOperatorNormS (U * Y * Matrix.conjTranspose U) := by
+          rw [manyBodyOperatorNormS_conjTranspose, hUnorm]; ring
+
 /-- The site-embedded image of a diagonal single-site matrix is again diagonal, with entry indexed
 by the local configuration value `σ i`. -/
 theorem onSiteS_diagonal (i : Λ) (w : Fin (N + 1) → ℂ) :
