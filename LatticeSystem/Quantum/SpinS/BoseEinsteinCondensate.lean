@@ -130,6 +130,44 @@ def IsBECTowerConstants (d : ℕ) (μ q₀ C₁ C₂ : ℝ) : Prop :=
               (towerState (torusParitySublattice d L) 1 M Φ) ≤
             E₀.re + C₂ * (M.natAbs : ℝ) ^ 3 / (L : ℝ) ^ d
 
+/-- **The half-filling BEC tower constants predicate** (Tasaki Theorem 5.2, eq. (5.3.4), footnote 8,
+p. 141).  `IsBECTowerConstantsHalfFilling d q₀ C₁ C₂` is the `μ = 0` (half-filling) kernel of
+`IsBECTowerConstants`: it fixes the chemical potential to `μ = 0` (so the `Ĥ_μ = 2 Ĥ_XY` energy
+carries no `−μ Ŝ_tot^{(3)}` term) and adds, as an inner premise conjunct, the half-filling sector
+condition `Ŝ_tot^{(3)} Φ = 0` (the same sector hypothesis as Theorem 5.1
+`tasaki_5_1_xy_odlro_half_filling`).  Under these hypotheses — `Φ_GS` a nonzero minimal-energy
+eigenvector of `Ĥ_0 = 2 Ĥ_XY` in the `Ŝ_tot^{(3)} = 0` sector exhibiting the two XY-plane ODLRO
+bounds (`α = 1, 2`) with parameter `q₀`, and `|M| ≤ C₁ L^{d/2}` — the tower state
+`Γ_M = (Ô_L^{sgn M})^{|M|} Φ_GS` is **nonvanishing and** low-lying with the **cubic** energy
+increment `towerState ≠ 0 ∧ ⟨Γ_M, Ĥ_0 Γ_M⟩ / ⟨Γ_M, Γ_M⟩ ≤ E₀ + C₂ |M|³ / L^d`.
+
+Unlike the general-`μ` `IsBECTowerConstants` (kept as the faithful documented axiom
+`tasaki_5_2_bec_tower`, whose general-`μ` bound rests on the Koma–Tasaki [21]
+reflection-positivity/infrared machinery, intractable at project scale), this half-filling kernel is
+discharged **axiom-free**: at `μ = 0` the variational numerator is the pure XY double commutator
+(`xy_tower_numerator_bound`), so the Anderson-tower engine (Theorem 4.6) applies with the XY-plane
+`p̂`-moment recursion in place of the `SU(2)` isotropy base.  The extra `Ŝ_tot^{(3)} Φ = 0` conjunct
+is required because the reused denominator/numerator bricks all need the half-filling sector; a
+general-`μ` ground state has `Ŝ_tot^{(3)} Φ = s₀ ≠ 0`, so this predicate is a genuinely stronger
+statement (not `α`-equivalent to `IsBECTowerConstants`). -/
+def IsBECTowerConstantsHalfFilling (d : ℕ) (q₀ C₁ C₂ : ℝ) : Prop :=
+  0 < C₁ ∧ 0 < C₂ ∧
+    ∀ (L : ℕ) [NeZero L], 2 ≤ L → Even L →
+      ∀ (Φ : (HypercubicTorus d L → Fin 2) → ℂ) (E₀ : ℂ) (M : ℤ),
+        (xyChemicalPotentialHamiltonianS d L 0).mulVec Φ = E₀ • Φ →
+        (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin 2) → ℂ, Ψ ≠ 0 →
+          (xyChemicalPotentialHamiltonianS d L 0).mulVec Ψ = E • Ψ → E₀.re ≤ E.re) →
+        Φ ≠ 0 →
+        (totalSpinSOp3 (HypercubicTorus d L) 1).mulVec Φ = 0 →
+        (∀ α : Fin 3, α ≠ 2 →
+          q₀ ≤ expectationRatioRe
+            ((staggeredOrderOpAxisS α (torusParitySublattice d L) 1) ^ 2) Φ / ((L : ℝ) ^ d) ^ 2) →
+        (M.natAbs : ℝ) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →
+        towerState (torusParitySublattice d L) 1 M Φ ≠ 0 ∧
+          expectationRatioRe (xyChemicalPotentialHamiltonianS d L 0)
+              (towerState (torusParitySublattice d L) 1 M Φ) ≤
+            E₀.re + C₂ * (M.natAbs : ℝ) ^ 3 / (L : ℝ) ^ d
+
 /-- **Tasaki Theorem 5.2 (low-lying tower states of hard-core bosons), AXIOM.**  Suppose the ground
 state `Φ_GS` of the chemical-potential XY Hamiltonian `Ĥ_μ` (5.3.2) exhibits ODLRO with some
 constant `q₀ > 0` (Theorem 5.1, eq. (5.2.5)).  Then there are constants `C₁, C₂ > 0` — depending

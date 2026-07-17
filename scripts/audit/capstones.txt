@@ -234,60 +234,42 @@ orderSqMoment_geom_tendsto
 # Book-capstone tip (Thm 4.13 is the §4.2.1 SSB payoff); the energy companion below is now consumed here.
 tanakaSSB_field_lowerBound
 
-# TEMPORARY arc foundations (temp-then-delist lifecycle) — Tasaki §5.3 Theorem 5.2 (BEC low-lying
-# tower states) discharge arc PR-1 (#5051), `Quantum/SpinS/BoseEinsteinCondensateAlgebra.lean`.  These
-# two Hamiltonian-independent foundation lemmas are proved axiom-free (`#print axioms` =
-# propext/Classical.choice/Quot.sound only) and are consumed by the later PRs of the same arc:
-#   - `xyChemicalPotentialHamiltonianS_isHermitian` (Ĥ_μ Hermitian) — PR-3/PR-5 double-commutator gap;
-#   - `totalSpinSOp3_commutator_towerPow` ([Ŝ³_tot, tower]=M·tower, §4-a) — PR-3 −μ Ŝ³_tot term.
-# Zero-referenced foundation tips until consumed downstream.  RE-EVALUATE/DELIST when consumed.
-# (The former `Ldhalf_bridge` entry was DELISTED: it moved to the generic real-analysis home
+# TEMPORARY arc foundation (temp-then-delist lifecycle) — Tasaki §5.3 Theorem 5.2 (BEC low-lying
+# tower states) discharge arc PR-1 (#5051), `Quantum/SpinS/BoseEinsteinCondensateAlgebra.lean`.  The
+# tower-operator sector eigenvalue `[Ŝ³_tot, (Ô_L^{sgn M})^{|M|}]=M·(Ô_L^{sgn M})^{|M|}` (§4-a),
+# proved axiom-free (`#print axioms` = propext/Classical.choice/Quot.sound only).  This is the
+# `−μ Ŝ³_tot` (general-`μ`) double-commutator input; the axiom-free discharge is limited to the
+# half-filling kernel `μ = 0` (PR-5, `becTowerConstantsHalfFilling_of_planar_lro`), where the `μ`-term
+# vanishes, so this lemma is NOT consumed by the half-filling assembly.  It supports the general-`μ`
+# algebra of the documented axiom `tasaki_5_2_bec_tower`.  RE-EVALUATE at PR-6.  (The former
+# `xyChemicalPotentialHamiltonianS_isHermitian` entry was DELISTED: consumed by PR-5
+# `becTowerState_pos/neg_rayleigh_bound_halfFilling` as the variational-gap self-adjointness input.
+# The former `Ldhalf_bridge` entry was DELISTED: it moved to the generic real-analysis home
 # `Math/Analysis/RealRpowNatSqrt.lean` as `LatticeSystem.Math.Ldhalf_bridge` and is now genuinely
 # consumed by the two Anderson-tower sites `AndersonTowerTheorem46.lean` / `AndersonTowerTanakaCapstone.lean`.)
-xyChemicalPotentialHamiltonianS_isHermitian
 totalSpinSOp3_commutator_towerPow
 
 # TEMPORARY arc-tip (temp-then-delist lifecycle) — Tasaki §5.3 Theorem 5.2 (BEC low-lying tower
-# states) discharge arc PR-2 (#5051), `Quantum/SpinS/BoseEinsteinCondensateMoment.lean`.  The
-# U(1)-planar base entry `2 q₀ ‖Φ‖² ≤ ⟨Φ, p̂ Φ⟩` (Tasaki §5.3 eq. (5.2.5) → eq. (4.2.37) base,
-# p. 139/105) driven directly by the two XY-plane ODLRO hypotheses (α = 1, 2), replacing the SU(2)
-# singlet/isotropy base of Theorem 4.6 (`phatMoment_one_ge_of_lro`).  Proved axiom-free
-# (`#print axioms` = propext/Classical.choice/Quot.sound only).  Zero-referenced until PR-4/PR-5 feed
-# it into the singlet-free recursion `phatMoment_succ_ratio` for the tower denominator lower bound.
-# RE-EVALUATE/DELIST when consumed by PR-4/PR-5.
-phatMoment_one_ge_of_planar_lro
-
-# TEMPORARY arc-tip (temp-then-delist lifecycle) — Tasaki §5.3 Theorem 5.2 (BEC low-lying tower
 # states) discharge arc PR-3 (#5056), `Quantum/SpinS/BoseEinsteinCondensateNumerator.lean`.  The exact
-# variational-numerator algebra of the `−μ Ŝ³_tot` term: the double commutator of
-# `Ĥ_μ = 2 Ĥ_XY − μ Ŝ³_tot` with the tower operator splits as
-# `[Aᴴ,[Ĥ_μ,A]] = [Aᴴ,[2 Ĥ_XY,A]] − (μM)·[Aᴴ,A]` (`chemicalPotential_double_commutator_muTerm`,
-# §4-b), with real-part numerator `⟨Φ,[Aᴴ,[2 Ĥ_XY,A]]Φ⟩ − μM(‖AΦ‖²−‖AᴴΦ‖²)`
-# (`chemicalPotential_numerator_muTerm`, §4-c); the `[Ŝ³_tot,A]=M·A` input is PR-1's
-# `totalSpinSOp3_commutator_towerPow`.  Proved axiom-free (`#print axioms` =
-# propext/Classical.choice/Quot.sound only).  Zero-referenced until the PR-5 assembly feeds them into
-# `variational_gap_le_double_commutator` for the cubic energy bound.  RE-EVALUATE/DELIST when consumed
-# by PR-5.
+# real-part variational numerator of the `−μ Ŝ³_tot` term
+# `⟨Φ,[Aᴴ,[2 Ĥ_XY,A]]Φ⟩ − μM(‖AΦ‖²−‖AᴴΦ‖²)` (`chemicalPotential_numerator_muTerm`, §4-c), from the
+# split `[Aᴴ,[Ĥ_μ,A]] = [Aᴴ,[2 Ĥ_XY,A]] − (μM)·[Aᴴ,A]` with the `[Ŝ³_tot,A]=M·A` input.  Proved
+# axiom-free (`#print axioms` = propext/Classical.choice/Quot.sound only).  This is the general-`μ`
+# variational algebra; the PR-5 half-filling assembly fixes `μ = 0`, where the `μ`-term vanishes, so
+# this lemma is NOT consumed by the half-filling discharge.  It supports the general-`μ` algebra of
+# the documented axiom `tasaki_5_2_bec_tower`.  RE-EVALUATE at PR-6.
 chemicalPotential_numerator_muTerm
 
 # TEMPORARY arc-tip (temp-then-delist lifecycle) — Tasaki §5.3 Theorem 5.2 (BEC low-lying tower
-# states) discharge arc PR-4 (#5057), `Quantum/SpinS/BoseEinsteinCondensateDenominator.lean`.  The
-# non-vanishing of the tower state `Γ_M = (Ô_L^{sgn M})^{|M|} Φ ≠ 0` (first conjunct of
-# `IsBECTowerConstants`): derived from the geometric denominator lower bound
-# `½ (2 q₀)^{|M|} m₀ ≤ ‖(ô^±)^{|M|} Φ‖²` (`becTowerDenominator_geom_lower_raising`/`_lowering`, which
-# are themselves referenced here, hence not zero-ref tips) via the scalar `V^{|M|} ≠ 0`.  Proved
-# axiom-free (`#print axioms` = propext/Classical.choice/Quot.sound only).  Zero-referenced until the
-# PR-5 assembly feeds it into `IsBECTowerConstants`.  RE-EVALUATE/DELIST when consumed by PR-5.
-becTowerState_ne_zero_of_planar_lro
-
-# TEMPORARY arc-tip (temp-then-delist lifecycle) — Tasaki §5.3 Theorem 5.2 (BEC low-lying tower
-# states) discharge arc PR-4b (#5058), `Quantum/SpinS/BoseEinsteinCondensateXYNumerator.lean`.  The
-# XY-planar variational numerator bound `|Re⟨Φ,[Aᴴ,[2 Ĥ_XY,A]]Φ⟩| ≤ 4·(O(M²/V) shape)`
-# (`xy_tower_numerator_bound`): the pure-XY numerator (half filling, N=1) obtained from the
-# definitional split `Ĥ_XY = Ĥ_Heis − Ĥ_ZZ` (`xyHamiltonianS_eq_heisenberg_sub_zz`) with the
-# Heisenberg term reusing `tower_numerator_bound` verbatim and the ZZ residual bounded by the reduced
-# replica `zz_tower_numerator_bound` (both referenced here, hence not zero-ref tips).  Proved
-# axiom-free (`#print axioms` = propext/Classical.choice/Quot.sound only).  Zero-referenced until the
-# PR-5 assembly feeds it into the tower Rayleigh/cubic energy bound.  RE-EVALUATE/DELIST when consumed
-# by PR-5.
-xy_tower_numerator_bound
+# states) discharge arc PR-5 (#5051), `Quantum/SpinS/BoseEinsteinCondensateTower.lean`.  The
+# construction of the half-filling BEC tower constants `∃ C₁ C₂, IsBECTowerConstantsHalfFilling d q₀
+# C₁ C₂` (`becTowerConstantsHalfFilling_of_planar_lro`, Tasaki §5.3 eq. (5.3.4), footnote 8, p. 141):
+# the `μ = 0` variational assembly (`variational_gap_le_double_commutator` + PR-4b
+# `xy_tower_numerator_bound` numerator + `tower_denominator_lower_bound` denominator), rounded from
+# the quadratic `O(M²/L^d)` trial bound (`becTowerState_pos/neg_rayleigh_bound_halfFilling`,
+# `towerEnergyCoeff_le`) to the faithful cubic `C₂|M|³/L^d` via `M² ≤ |M|³`.  Proved axiom-free
+# (`#print axioms` = propext/Classical.choice/Quot.sound only).  Zero-referenced until the PR-6 final
+# theorem `tasaki_5_2_bec_tower_half_filling` closes the `∃`.  RE-EVALUATE/DELIST when consumed by
+# PR-6.  (The former PR-2 `phatMoment_one_ge_of_planar_lro`, PR-4 `becTowerState_ne_zero_of_planar_lro`
+# and PR-4b `xy_tower_numerator_bound` entries were DELISTED: all consumed here by the PR-5 assembly.)
+becTowerConstantsHalfFilling_of_planar_lro
