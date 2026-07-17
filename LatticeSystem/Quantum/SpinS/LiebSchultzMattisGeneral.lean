@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattis
 import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
+import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrder
 
 /-!
 # Tasaki §6.2: the generalized Lieb–Schultz–Mattis variational bound (Lemma 6.4)
@@ -25,8 +26,9 @@ short-ranged chains.  We do **not** formalize that gap consequence here: the for
 deriving it for a general `IsShortRangeU1Chain` would require a separate generalized orthogonality
 lemma.
 
-We record the locality of each `ĥ_x` through the (uninterpreted) marker predicate `IsLocalRangeR`,
-the norm bound through the `L²` operator norm `manyBodyOperatorNormS`, and `U(1)`-invariance through
+We record the locality of each `ĥ_x` through the commutant-form locality predicate `IsLocalRangeR`
+(`ĥ_x` commutes with every single-site operator farther than `r` from `x`), the norm bound through
+the `L²` operator norm `manyBodyOperatorNormS`, and `U(1)`-invariance through
 `Commute (ĥ_x) Ŝ_tot^{(3)}`, all bundled into `IsShortRangeU1Chain`.  Lemma 6.4 itself (the `C/L`
 variational bound, eq. (6.2.24)) is the documented axiom recorded here.
 
@@ -38,12 +40,19 @@ namespace LatticeSystem.Quantum
 
 open Matrix
 
-/-- **Locality marker** `IsLocalRangeR L N r x op`: the operator `op` acts only on the sites within
-distance `r` of `x` on the ring `Fin L` (with periodic boundary conditions).  A full
-local-observable framework is heavier than Lemma 6.4 needs, so the locality is recorded here as an
-uninterpreted
-predicate (a hypothesis constraining the chain, never asserted of arbitrary operators). -/
-axiom IsLocalRangeR (L N r : ℕ) (x : Fin L) (op : ManyBodyOpS (Fin L) N) : Prop
+/-- **Locality marker (commutant form)** `IsLocalRangeR L N r x op`: the operator `op` acts only on
+the sites within ring-distance `r` of `x` on `Fin L` (periodic boundary conditions), recorded as the
+commutant condition that `op` commutes with *every* single-site operator `onSiteS y A` placed at a
+site `y` strictly farther than `r` from `x`.  For a full matrix algebra this is equivalent, by the
+factor double-commutant theorem, to `support(op) ⊆ {y : ringDist L x y ≤ r}`, so it is genuine
+spatial locality (not merely "enough for Lemma 6.4").  The strong commutant form is deliberate: this
+predicate is *shared* as the locality hypothesis of the intentional §7.1.3 Theorem 7.3 axiom
+(`IsAKLTPerturbation.local_range`); a weaker form would enlarge that hypothesis class and make
+`aklt_theorem_7_3` claim more, risking unsoundness.  For `y` within range the condition is vacuous,
+so `op` may act arbitrarily on the local window. -/
+def IsLocalRangeR (L N r : ℕ) (x : Fin L) (op : ManyBodyOpS (Fin L) N) : Prop :=
+  ∀ y : Fin L, r < ringDist L x y →
+    ∀ A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ, Commute op (onSiteS y A)
 
 /-- **A short-ranged `U(1)`-invariant chain** of local terms `ĥ_x` (Tasaki eq. (6.2.23) and the
 assumptions below it): each `ĥ_x` is self-adjoint (`hermitian`, so `Ĥ = Σ_x ĥ_x` is a genuine

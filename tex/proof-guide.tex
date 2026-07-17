@@ -11430,8 +11430,12 @@ eqs.~(6.2.23)--(6.2.24), pp.~162--163; documented axiom,
 \texttt{Quantum/SpinS/LiebSchultzMattisGeneral.lean}, Issue \#4485).  Lemma 6.1 generalizes to
 \emph{any} short-ranged $U(1)$-invariant chain Hamiltonian $\hat H=\sum_x\hat h_x$ (eq.~6.2.23).  The
 class \texttt{IsShortRangeU1Chain} bundles the assumptions: each $\hat h_x$ is \emph{self-adjoint}
-(so $\sum_x\hat h_x$ is a genuine Hamiltonian), $r$-local (\texttt{IsLocalRangeR}, an uninterpreted
-locality marker), bounded $\|\hat h_x\|\le h_0$ in the $L^2$ operator norm
+(so $\sum_x\hat h_x$ is a genuine Hamiltonian), $r$-local (\texttt{IsLocalRangeR}, now the
+\emph{commutant-form} locality \texttt{def}: $\hat h_x$ commutes with every single-site operator
+farther than $r$ from $x$, equivalent to $\mathrm{supp}(\hat h_x)\subseteq\{y:\mathtt{ringDist}\,x\,y
+\le r\}$ by the factor double-commutant theorem; strong form chosen to keep the shared Theorem~7.3
+hypothesis faithful; discharge arc OPEN, PR~\#5071), bounded $\|\hat h_x\|\le h_0$ in the $L^2$
+operator norm
 (\texttt{manyBodyOperatorNormS}), and $U(1)$-invariant ($[\hat h_x,\hat S_{\mathrm{tot}}^{(3)}]=0$,
 \texttt{Commute}).  The axiom
 \texttt{tasaki\_lemma\_6\_4\_general\_trial\_energy\_bound} states the existence of a constant $C>0$,
@@ -11762,8 +11766,10 @@ backfill.
 p.~180; documented axiom, \texttt{Quantum/SpinS/AKLTStability.lean}, Issue \#4485).  The gapped AKLT
 phase is stable under small local perturbations $\hat H_\varepsilon=\hat H_{\mathrm{AKLT}}+
 \varepsilon\sum_x\hat v_x$ (\texttt{perturbedAKLTHamiltonianS}, eq.~7.1.4).  The perturbation class
-\texttt{IsAKLTPerturbation} bundles: each $\hat v_x$ self-adjoint, $r$-local (\texttt{IsLocalRangeR}),
-uniformly bounded ($\texttt{manyBodyOperatorNormS}\le v_0$), and translation covariant
+\texttt{IsAKLTPerturbation} bundles: each $\hat v_x$ self-adjoint, $r$-local (\texttt{IsLocalRangeR},
+now the commutant-form \texttt{def} shared with §6.2 Lemma 6.4 --- genuine spatial locality, keeping
+this hypothesis faithful), uniformly bounded ($\texttt{manyBodyOperatorNormS}\le v_0$), and
+translation covariant
 ($\hat v_x=\hat T^x\hat v_o\hat T^{-x}$, recorded by the uninterpreted marker
 \texttt{IsTranslationCovariant}).  The axiom \texttt{aklt\_theorem\_7\_3} states that for range $r$
 bounded by $v_0$ there is $\varepsilon_0>0$ such that for every $|\varepsilon|<\varepsilon_0$ there are

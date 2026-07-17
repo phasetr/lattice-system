@@ -70,7 +70,7 @@ def IsZ2Z2Invariant (H : ManyBodyOpS (Fin L) 2) : Prop :=
 /-- **Short-range-interaction marker** `HasShortRangeInteraction H r`: the open-chain Hamiltonian
 `H`
 is a sum of local terms each acting within range `r`.  A faithful definition needs the local-term
-decomposition; it is kept as an uninterpreted predicate (cf. `IsLocalRangeR`). -/
+decomposition; it is kept as an uninterpreted predicate (cf. the commutant-form `IsLocalRangeR`). -/
 axiom HasShortRangeInteraction (H : ManyBodyOpS (Fin L) 2) (r : ℕ) : Prop
 
 /-- `H` **has some short-range interaction**: it is range-`r` local for some `r`. -/

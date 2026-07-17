@@ -49,7 +49,9 @@ bounded by `v₀` in the `L²` operator norm (`bounded`), and translation covari
 structure IsAKLTPerturbation (L r : ℕ) (v₀ : ℝ) (v : Fin L → ManyBodyOpS (Fin L) 2) : Prop where
   /-- Each local term `v_x` is self-adjoint. -/
   hermitian : ∀ x, (v x).IsHermitian
-  /-- Each local term `v_x` acts only on sites within range `r` of `x`. -/
+  /-- Each local term `v_x` acts only on sites within range `r` of `x` (genuine spatial locality via
+  the commutant-form `IsLocalRangeR`: `v_x` commutes with every single-site operator farther than
+  `r` from `x`; the strong form keeps this Theorem 7.3 hypothesis faithful). -/
   local_range : ∀ x, IsLocalRangeR L 2 r x (v x)
   /-- Each local term is bounded in the `L²` operator norm by `v₀`. -/
   bounded : ∀ x, manyBodyOperatorNormS (v x) ≤ v₀
