@@ -280,3 +280,11 @@ tasaki_5_3_bec_u1_ssb_half_filling
 # `localTwistOperator_unitary'` (and the def `localTwistOperator`) were DELETED — the per-site bound
 # stays in the `exp(±i M̂_x)` form, so they had no consumer (Thm 5.3 arc precedent).
 tasaki_lemma_6_4_general_trial_energy_bound
+
+# TEMPORARY (Lemma 7.4 arc, tracker #5078, PR-1): the Weyl symmetrization embedding
+# `Sym²(ℂ²) ≅ spin-1` (Tasaki eq. (7.1.22), AKLTBondProjection.lean).  Standard reusable substrate
+# defined in PR-1 but not yet consumed within the Lemma 7.4 discharge (which uses the rationalized
+# `vbsBondVec`/`vbsBondSubspace` directly); it is the shared symmetrization map for the global VBS
+# state (§7.1.2, Theorem 7.1) and the §7.2.8 string order.  DELIST when the Theorem 7.1 / §7.2.8
+# arc consumes it as `⊗_x spin1SymEmbed` (or DELETE if that arc takes a different route).
+spin1SymEmbed
