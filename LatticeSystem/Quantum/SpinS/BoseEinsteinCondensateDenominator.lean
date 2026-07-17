@@ -27,9 +27,9 @@ whenever `q₀ > 0` and `m₀ > 0`.  These are consumed by the later assembly PR
 eq. (5.3.4) divides the numerator by this denominator; the non-vanishing supplies the first conjunct
 of `IsBECTowerConstants`).
 
-The chemical-potential Hamiltonian is `μ = 0` here (half filling); the general-`μ` odd
-moment-difference term is localized to the later `BECSectorCurvatureBound` predicate, not the
-denominator.
+The chemical-potential Hamiltonian is `μ = 0` here (half filling), so the denominator bound needs
+only the half-filling `Ŝ_tot^{(3)} = 0` sector; the general-`μ` case stays the documented axiom
+`tasaki_5_2_bec_tower`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §5.3, Theorem 5.2, eqs. (5.2.5)/(5.3.3)/(5.3.4), pp. 139–141 (Koma–Tasaki [21]); the
