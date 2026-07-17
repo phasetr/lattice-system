@@ -107,8 +107,10 @@ theorem diagonal_magParitySignS_mul_staggeredLoweringOpS (A : Λ → Bool) :
     rw [magParitySignS_of_magEig_add_one heq]; ring
 
 /-- The `1`-axis order operator is the half-sum of the raising and lowering order operators:
-`Ô_L^{(1)} = ½(Ô_L⁺ + Ô_L⁻)` (Cartesian decomposition, imaginary parts cancel). -/
-private theorem staggeredOrderOp1S_eq_half_smul (A : Λ → Bool) :
+`Ô_L^{(1)} = ½(Ô_L⁺ + Ô_L⁻)` (Cartesian decomposition, imaginary parts cancel).  Public: consumed
+by the §5.3 coherent window mean `becCoherent_mean1` (eq. (5.3.7)), reused verbatim to avoid a
+duplicate Cartesian-decomposition lemma. -/
+theorem staggeredOrderOp1S_eq_half_smul (A : Λ → Bool) :
     staggeredOrderOp1S A N
       = (2 : ℂ)⁻¹ • (staggeredRaisingOpS A N + staggeredLoweringOpS A N) := by
   have hsum : staggeredRaisingOpS A N + staggeredLoweringOpS A N
@@ -116,6 +118,20 @@ private theorem staggeredOrderOp1S_eq_half_smul (A : Λ → Bool) :
     rw [staggeredRaisingOpS_eq_cartesian, staggeredLoweringOpS_eq_cartesian]
     module
   rw [hsum, smul_smul, inv_mul_cancel₀ (two_ne_zero), one_smul]
+
+/-- The `2`-axis order operator is the scaled difference of the raising/lowering order operators:
+`Ô_L^{(2)} = (2i)⁻¹(Ô_L⁺ − Ô_L⁻)` (Cartesian decomposition, real parts cancel).  Public and
+colocated with `staggeredOrderOp1S_eq_half_smul`: consumed both by the `Û`-anticommutation
+`diagonal_magParitySignS_mul_staggeredOrderOp2S` (Thm 4.9 fluctuation) and by the §5.3 coherent
+window mean `becCoherent_mean2` (eq. (5.3.7)), so it lives here in the common Cartesian file to
+avoid a duplicate lemma. -/
+theorem staggeredOrderOp2S_eq_smul (A : Λ → Bool) :
+    staggeredOrderOp2S A N
+      = (2 * Complex.I)⁻¹ • (staggeredRaisingOpS A N - staggeredLoweringOpS A N) := by
+  have h : staggeredRaisingOpS A N - staggeredLoweringOpS A N
+      = (2 * Complex.I) • staggeredOrderOp2S A N := by
+    rw [staggeredRaisingOpS_eq_cartesian, staggeredLoweringOpS_eq_cartesian]; module
+  rw [h, smul_smul, inv_mul_cancel₀ (mul_ne_zero two_ne_zero Complex.I_ne_zero), one_smul]
 
 /-- `Û Ô_L^{(1)} = -Ô_L^{(1)} Û`: the parity operator anticommutes with the `1`-axis order operator,
 combining the raising and lowering sign flips through `Ô_L^{(1)} = ½(Ô_L⁺ + Ô_L⁻)`. -/

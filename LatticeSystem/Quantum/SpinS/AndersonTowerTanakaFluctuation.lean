@@ -464,16 +464,6 @@ theorem staggeredOrderOp2S_isHermitian {Λ : Type*} [Fintype Λ] [DecidableEq Λ
     · simp [h, IsSelfAdjoint, star_one]
     · simp [h, IsSelfAdjoint]
 
-/-- `Ô^{(2)} = (2i)⁻¹(Ô⁺ − Ô⁻)` (Cartesian decomposition, real parts cancel). -/
-private theorem staggeredOrderOp2S_eq_smul {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
-    (A : Λ → Bool) (N : ℕ) :
-    staggeredOrderOp2S A N
-      = (2 * Complex.I)⁻¹ • (staggeredRaisingOpS A N - staggeredLoweringOpS A N) := by
-  have h : staggeredRaisingOpS A N - staggeredLoweringOpS A N
-      = (2 * Complex.I) • staggeredOrderOp2S A N := by
-    rw [staggeredRaisingOpS_eq_cartesian, staggeredLoweringOpS_eq_cartesian]; module
-  rw [h, smul_smul, inv_mul_cancel₀ (mul_ne_zero two_ne_zero Complex.I_ne_zero), one_smul]
-
 /-- `Û Ô^{(2)} = -Ô^{(2)} Û`: the parity operator anticommutes with the `2`-axis order operator
 (both raising and lowering flip sign under `Û`, so does their difference `2i Ô^{(2)}`). -/
 private theorem diagonal_magParitySignS_mul_staggeredOrderOp2S {Λ : Type*} [Fintype Λ]
