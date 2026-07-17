@@ -282,9 +282,14 @@ towerState_unitNormalize_inner_eq_zero_of_ne
 # `⟨Γ_{M+1}, Ô⁺ Γ_M⟩ = √(D_{M+1}/D_M)` on the raising side `M ≥ 0`, eq. (5.3.6)) and its lowering-side
 # mirror `becOffDiagonal_eq_norm_ratio_neg` (for `M ≤ −1` the same `Ô⁺`-sandwiched element is the
 # *inverse* ratio `√(D_M/D_{M+1})`, via `(Ô⁺)ᴴ = Ô⁻` adjoint reversal + lowering recursion; math-note
-# §2② 2026-07-17 refinement).  RE-EVALUATE/DELIST when consumed.
+# §2② 2026-07-17 refinement).  Their `Ô⁻` mirrors (added in PR-4 (#5065) for full eq. (5.3.6)
+# ± coverage) are `becOffDiagonal_lowering_eq_norm_ratio` (`⟨Γ_{M−1}, Ô⁻ Γ_M⟩ = √(D_{M−1}/D_M)` on
+# `M ≤ 0`, lowering recursion) and `becOffDiagonal_lowering_eq_norm_ratio_pos` (`√(D_M/D_{M−1})` on
+# `M ≥ 1`, via `(Ô⁻)ᴴ = Ô⁺` adjoint reversal).  RE-EVALUATE/DELIST when consumed.
 becOffDiagonal_eq_norm_ratio
 becOffDiagonal_eq_norm_ratio_neg
+becOffDiagonal_lowering_eq_norm_ratio
+becOffDiagonal_lowering_eq_norm_ratio_pos
 
 # TEMPORARY arc-tip (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
 # discharge arc, PR-4 (#5065, tracker #5061,
@@ -292,6 +297,10 @@ becOffDiagonal_eq_norm_ratio_neg
 # `becCoherent_complexMoment_raising` is the exact finite-`L` Cesàro window representation
 # `⟨Ξ_θ, Ô⁺ Ξ_θ⟩ = e^{iθ} (2M_max+1)^{-1} Σ_{M=−M_max}^{M_max−1} ⟨Γ_{M+1}, Ô⁺ Γ_M⟩` (Tasaki §5.3,
 # eq. (5.3.6), p. 141): the coherent double sum collapsed to the adjacent band with the telescoped
-# phase `e^{iθ}` factored out.  Zero-referenced until the mean/second-moment PRs (5.3.7/5.3.8) feed it
-# into the `m∗ e^{iθ}` limit. RE-EVALUATE/DELIST when consumed (PR-5/6).
+# phase `e^{iθ}` factored out.  Its `Ô⁻` mirror `becCoherent_complexMoment_lowering`
+# (`⟨Ξ_θ, Ô⁻ Ξ_θ⟩ = e^{−iθ} (2M_max+1)^{-1} Σ_{M=−M_max+1}^{M_max} ⟨Γ_{M−1}, Ô⁻ Γ_M⟩`, collapsed by
+# `becOffDiagonal_lowering_ne_adjacent_eq_zero`) completes the ± pair of eq. (5.3.6).  Both
+# zero-referenced until the mean/second-moment PRs (5.3.7/5.3.8) feed them into the `m∗ e^{±iθ}`
+# limit. RE-EVALUATE/DELIST when consumed (PR-5/6).
 becCoherent_complexMoment_raising
+becCoherent_complexMoment_lowering

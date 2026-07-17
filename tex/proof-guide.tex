@@ -11230,8 +11230,15 @@ collapsed to the adjacent band $M'=M+1$ by \texttt{becOffDiagonal\_ne\_adjacent\
 surviving phase $\overline{e^{-i(M+1)\theta}}\,e^{-iM\theta}$ telescopes to the common factor
 $e^{i\theta}$ (independent of the sign of $M$), and the $M=M_{\max}$ term drops because $M_{\max}+1$
 lies outside the window; each summand $\langle\Gamma_{M+1},\hat O_L^+\,\Gamma_M\rangle$ is the real
-nonnegative $r_M$ (raising-side $\sqrt{D_{M+1}/D_M}$, lowering-side $\sqrt{D_M/D_{M+1}}$), whose
-window mean converges to $m_\ast$ in a later PR; std3 only.  The
+nonnegative $r_M$ (raising-side $\sqrt{D_{M+1}/D_M}$, lowering-side $\sqrt{D_M/D_{M+1}}$).  Its
+$\hat O_L^-$ mirror \texttt{becCoherent\_complexMoment\_lowering} gives $\langle\Xi_\theta,\hat
+O_L^-\,\Xi_\theta\rangle=e^{-i\theta}\,(2M_{\max}{+}1)^{-1}\sum_{M=-M_{\max}+1}^{M_{\max}}
+\langle\Gamma_{M-1},\hat O_L^-\,\Gamma_M\rangle$, collapsed to the band $M'=M-1$ by the
+adjoint-derived \texttt{becOffDiagonal\_lowering\_ne\_adjacent\_eq\_zero} ($(\hat O_L^-)^{\mathsf
+H}=\hat O_L^+$), with both-branch lowering norm ratios
+\texttt{becOffDiagonal\_lowering\_eq\_norm\_ratio} ($M\le0$) and
+\texttt{becOffDiagonal\_lowering\_eq\_norm\_ratio\_pos} ($M\ge1$); the window means converge to
+$m_\ast$ in a later PR; std3 only.  The
 general-$\mu$ \texttt{tasaki\_5\_3\_bec\_u1\_ssb} stays a documented axiom ($d$-dim RP-intractability,
 Koma--Tasaki [21]), the same two-track policy as Theorem~5.2.  Chapters~3--10 backfill.
 
