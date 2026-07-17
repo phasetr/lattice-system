@@ -255,12 +255,9 @@ tasaki_5_2_bec_tower_half_filling
 # `IsBECCoherentSSBConstantsHalfFilling` is the μ=0 half-filling discharge-target predicate (the
 # kernel of `IsBECCoherentSSBConstants`, adding the `Ŝ³_tot = 0` sector conjunct); it is consumed by
 # the final discharge theorem `tasaki_5_3_bec_u1_ssb_half_filling` (a later arc PR).
-# `becCoherentState_dotProduct_mulVec` is the coherent-state Rayleigh numerator double-sum expansion
-# `⟨Ξ_θ,O Ξ_θ⟩ = (2M_max+1)^{-1} Σ_{M',M} conj(e^{-iM'θ})e^{-iMθ}⟨Γ_{M'},O Γ_M⟩` (Tasaki §5.3,
-# eqs. (5.3.6)–(5.3.8), p. 141), the algebraic core consumed by the coherent-moment / sector arc PRs.
-# Both zero-referenced until those downstream PRs land. RE-EVALUATE/DELIST when consumed.
+# (`becCoherentState_dotProduct_mulVec`, the double-sum expansion, was DELISTED in PR-4 (#5065) once
+# `becCoherent_complexMoment_raising` consumed it.)  Zero-referenced until the final discharge PR.
 IsBECCoherentSSBConstantsHalfFilling
-becCoherentState_dotProduct_mulVec
 
 # TEMPORARY arc-tips (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
 # discharge arc, PR-2 (#5063, tracker #5061, `Quantum/SpinS/BoseEinsteinCondensateSector.lean`).
@@ -277,14 +274,24 @@ towerState_unitNormalize_inner_eq_zero_of_ne
 # TEMPORARY arc-tips (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
 # discharge arc, PR-3 (#5064, tracker #5061,
 # `Quantum/SpinS/BoseEinsteinCondensateCoherentMatrixElement.lean`).  Off-diagonal matrix elements of
-# the coherent tower states for the raising operator `Ô⁺`: `becOffDiagonal_ne_adjacent_eq_zero`
-# (`⟨Γ_{M'}, Ô⁺ Γ_M⟩ = 0` for `M' ≠ M+1`, since `Ô⁺ Γ_M` sits in sector `M+1`, eq. (5.3.3)) and
+# the coherent tower states for the raising operator `Ô⁺`.  (`becOffDiagonal_ne_adjacent_eq_zero` —
+# `⟨Γ_{M'}, Ô⁺ Γ_M⟩ = 0` for `M' ≠ M+1`, eq. (5.3.3) — was DELISTED in PR-4 (#5065) once
+# `becCoherent_complexMoment_raising` consumed it to collapse the double sum.)  The surviving
+# adjacent-band norm ratios remain zero-referenced until the r_M window mean is assembled:
 # `becOffDiagonal_eq_norm_ratio` (the single surviving adjacent element is the norm ratio
 # `⟨Γ_{M+1}, Ô⁺ Γ_M⟩ = √(D_{M+1}/D_M)` on the raising side `M ≥ 0`, eq. (5.3.6)) and its lowering-side
 # mirror `becOffDiagonal_eq_norm_ratio_neg` (for `M ≤ −1` the same `Ô⁺`-sandwiched element is the
 # *inverse* ratio `√(D_M/D_{M+1})`, via `(Ô⁺)ᴴ = Ô⁻` adjoint reversal + lowering recursion; math-note
-# §2② 2026-07-17 refinement).  Zero-referenced until the coherent-moment arc PR feeds them into the
-# Cesàro window average. RE-EVALUATE/DELIST when consumed.
-becOffDiagonal_ne_adjacent_eq_zero
+# §2② 2026-07-17 refinement).  RE-EVALUATE/DELIST when consumed.
 becOffDiagonal_eq_norm_ratio
 becOffDiagonal_eq_norm_ratio_neg
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §5.3 Theorem 5.3 (BEC U(1) SSB) half-filling
+# discharge arc, PR-4 (#5065, tracker #5061,
+# `Quantum/SpinS/BoseEinsteinCondensateCoherentMoment.lean`).
+# `becCoherent_complexMoment_raising` is the exact finite-`L` Cesàro window representation
+# `⟨Ξ_θ, Ô⁺ Ξ_θ⟩ = e^{iθ} (2M_max+1)^{-1} Σ_{M=−M_max}^{M_max−1} ⟨Γ_{M+1}, Ô⁺ Γ_M⟩` (Tasaki §5.3,
+# eq. (5.3.6), p. 141): the coherent double sum collapsed to the adjacent band with the telescoped
+# phase `e^{iθ}` factored out.  Zero-referenced until the mean/second-moment PRs (5.3.7/5.3.8) feed it
+# into the `m∗ e^{iθ}` limit. RE-EVALUATE/DELIST when consumed (PR-5/6).
+becCoherent_complexMoment_raising

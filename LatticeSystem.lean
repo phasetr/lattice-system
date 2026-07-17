@@ -153,6 +153,7 @@ import LatticeSystem.Quantum.SpinS.AndersonTowerSphereGroundState
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensate
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateAlgebra
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateCoherentMatrixElement
+import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateCoherentMoment
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateDenominator
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateMoment
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateSector
