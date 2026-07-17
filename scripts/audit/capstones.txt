@@ -268,55 +268,15 @@ tasaki_5_2_bec_tower_half_filling
 # proof recovers those bands via `becCoherent_LL_eq_conj_RR`/`becCoherent_RL_eq_LR`).
 tasaki_5_3_bec_u1_ssb_half_filling
 
-# TEMPORARY (Tasaki §6.2 Lemma 6.4 discharge arc, tracker #5070, PR #5072 = PR-2).
-# PR-2 infrastructure leaves that are legitimately zero-referenced *until later PRs of the same
-# arc consume them*; listed here only for the duration of the arc, with explicit DELIST
-# conditions.  None is decorative: all lie on the Lemma 6.4 critical path (backward-chained).
-#
-# `localTwistOperator_conjTranspose` / `localTwistOperator_unitary` / `localTwistOperator_unitary'`
-# — the adjoint `Û_x† = exp(+i M̂_x)` and the two-sided unitarity `Û_x† Û_x = Û_x Û_x† = 1` of the
-# centered local twist operator `Û_x = exp(−i M̂_x)` (`localTwistGen`, eqs. 6.2.26–6.2.27); each now
-# derives from the generic `*_exp_neg_I_smul_of_isHermitian` lemmas (so they no longer reference one
-# another).  BOTH the PR-4 reduction (★) and the PR-6 CRUX B second-order bound
-# (`symmetricDifference_conj_norm_le`) are stated in the generic `exp(±i M̂_x)` /
-# anti-Hermitian-generator form (`NormedSpace.exp (±Complex.I • …)`), so NEITHER references the
-# operator-form (`localTwistOperator`) unitarity lemmas.  RE-EVALUATE at PR-7 assembly: if the
-# per-site bound stays in the `exp(±i M̂_x)` form (as `twistConj_eq_localGen` + CRUX B compose
-# directly), these operator-form lemmas are unconsumed and should be removed then; otherwise DELIST
-# when PR-7 references them.  (Design note flagged to orchestrator.)
-localTwistOperator_conjTranspose
-localTwistOperator_unitary
-localTwistOperator_unitary'
-
-# TEMPORARY (Tasaki §6.2 Lemma 6.4 discharge arc, tracker #5070, PR #5074 = PR-4).
-# The two terminal tips of the PR-4 global→local twist reduction (CRUX A, eq. (6.2.27),
-# `Quantum/SpinS/LiebSchultzMattisGlobalLocalReduction.lean`): the global LSM twist conjugation of a
-# local term `ĥ_x` equals its conjugation by the centered local twist generator `M̂_x`,
-# `Û_LSM† ĥ_x Û_LSM = exp(+i M̂_x) ĥ_x exp(−i M̂_x)` (`twistConj_eq_localGen`) and its `Û ↔ Û†`
-# mirror (`twistConj'_eq_localGen`).  Both directions lie on the Lemma 6.4 critical path (the PR-7
-# symmetrised difference `Û†ĥÛ + ÛĥÛ† − 2ĥ` consumes both) and are legitimately zero-referenced until
-# then.  RE-EVALUATE/DELIST when consumed by PR-7.
-twistConj_eq_localGen
-twistConj'_eq_localGen
-
-# TEMPORARY (Tasaki §6.2 Lemma 6.4 discharge arc, tracker #5070, PR #5075 = PR-5).
-# `localTwistGen_manyBodyOperatorNormS_le` (`Quantum/SpinS/LiebSchultzMattisGeneratorNorm.lean`): the
-# centered local twist generator norm bound `‖M̂_x‖ ≤ π r (2r+1) N / L` (eq. (6.2.27), p. 164).  This
-# `O(1/L)` bound lies on the Lemma 6.4 critical path: the second-order symmetric-difference twist
-# bound (PR-6/PR-7) is `O(‖M̂_x‖²)`, so summing `8‖M̂_x‖²h₀ ≤ 8(B/L)²h₀` over the `L` sites gives the
-# final `C/L`.  Legitimately zero-referenced until PR-7 consumes it.  RE-EVALUATE/DELIST when
-# consumed by PR-7.  (Its helpers `window_card_le` / `natAbs_signedRingDisp_eq_ringDist` are already
-# referenced here, so are not listed.)
-localTwistGen_manyBodyOperatorNormS_le
-
-# TEMPORARY (Tasaki §6.2 Lemma 6.4 discharge arc, tracker #5070, PR #5076 = PR-6 = CRUX B).
-# `symmetricDifference_conj_norm_le` (`Quantum/SpinS/LiebSchultzMattisTaylorBound.lean`): the
-# second-order Taylor superoperator norm bound
-# `‖exp(+iM) X exp(−iM) + exp(−iM) X exp(+iM) − 2X‖ ≤ 8‖M‖²‖X‖` (eqs. (6.2.28)–(6.2.30), pp.164–165),
-# the terminal CRUX B tip.  Its helpers (`expConjOp` / `hasDerivAt_expConjOp` /
-# `manyBodyOperatorNormS_expConjOp` / `manyBodyOperatorNormS_comm_le`) are already referenced within
-# the file, so are not listed; `manyBodyOperatorNormS_expConjOp` consumes the PR-2
-# `manyBodyOperatorNormS_unitary_conj` (now delisted).  On the Lemma 6.4 critical path: PR-7 composes
-# it with `twistConj_eq_localGen` (M=M̂_x, X=ĥ_x) + `localTwistGen_manyBodyOperatorNormS_le`.
-# Legitimately zero-referenced until PR-7 consumes it.  RE-EVALUATE/DELIST when consumed by PR-7.
-symmetricDifference_conj_norm_le
+# Tasaki §6.2 Lemma 6.4 (generalized LSM variational bound; tracker #5070) — COMPLETE, axiom-free.
+# The final discharge theorem `tasaki_lemma_6_4_general_trial_energy_bound`
+# (`Quantum/SpinS/LiebSchultzMattisGeneralDischarge.lean`, PR #5077 = PR-7) is a proved capstone
+# (`#print axioms` = std3): for any short-ranged U(1)-invariant chain `Ĥ = Σ_x ĥ_x`, the LSM trial
+# state satisfies `⟨Φ_LSM,ĤΦ_LSM⟩/⟨Φ_LSM,Φ_LSM⟩ − E_GS ≤ C/L` (eq. 6.2.24, C = 8B²|h₀|+1).  The
+# whole PR-2..PR-6 arc infrastructure was DELISTED in this final PR: `twistConj_eq_localGen` /
+# `twistConj'_eq_localGen` (CRUX A), `localTwistGen_manyBodyOperatorNormS_le`,
+# `symmetricDifference_conj_norm_le` (CRUX B) are now all consumed by the discharge theorem.  The
+# operator-form unitarity lemmas `localTwistOperator_conjTranspose` / `localTwistOperator_unitary` /
+# `localTwistOperator_unitary'` (and the def `localTwistOperator`) were DELETED — the per-site bound
+# stays in the `exp(±i M̂_x)` form, so they had no consumer (Thm 5.3 arc precedent).
+tasaki_lemma_6_4_general_trial_energy_bound
