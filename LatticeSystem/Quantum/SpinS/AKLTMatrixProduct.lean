@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.AKLT
+import LatticeSystem.Quantum.SpinS.MPSTheorem75Defs
 
 /-!
 # Tasaki §7.2.2: matrix product representation of the AKLT model (Theorems 7.5, 7.6)
@@ -23,10 +23,9 @@ product *representation* is essentially unique — two injective collections gen
 are related by a gauge `A^σ = (θ/c) U B^σ U†` with `U` unitary and `|θ| = 1`.  This uniqueness
 underlies the classification of symmetry-protected topological phases (§8.3.4).
 
-The transfer matrix, the ordered products, the normalization, the spanning conditions, and the
-spectral primitivity condition (iii) are all *defined concretely* here.  Theorem 7.5 (whose proof is
-Perron–Frobenius theory for the completely positive transfer map) and Theorem 7.6 (unproven in the
-book) are recorded as documented axioms.
+The transfer matrix, ordered products, normalization, spanning conditions, and spectral primitivity
+condition are imported from `MPSTheorem75Defs`.  The legacy Theorem 7.5 axiom is retained during its
+staged replacement; Theorem 7.6, which is unproven in the book, remains a documented axiom.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §7.2.2, Theorems 7.5–7.6, eqs. (7.2.36), (7.2.41)–(7.2.42), pp. 202–203; M. Fannes, B.
@@ -35,65 +34,9 @@ Nachtergaele, R. F. Werner, Commun. Math. Phys. **144**, 443 (1992).
 
 namespace LatticeSystem.Quantum
 
-open Matrix Module
+open Matrix
 
 variable {D N : ℕ}
-
-/-- A collection of MPS matrices `(A^σ)_{σ = 0,…,N}` of bond dimension `D` for a spin-`S` site
-(`N = 2S`): each `A^σ` is a `D × D` complex matrix. -/
-abbrev MPSMatrices (D N : ℕ) : Type :=
-  Fin (N + 1) → Matrix (Fin D) (Fin D) ℂ
-
-/-- The **transfer matrix** `Ã` of an MPS (eq. (7.2.42)): the `D² × D²` matrix with entries
-`Ã_{(α,β),(α',β')} = Σ_σ \overline{A^σ_{α,α'}} A^σ_{β,β'}`.  Its spectrum controls the decay of
-correlations in the matrix product state. -/
-noncomputable def mpsTransferMatrix (A : MPSMatrices D N) :
-    Matrix (Fin D × Fin D) (Fin D × Fin D) ℂ :=
-  Matrix.of fun p q => ∑ σ : Fin (N + 1), star (A σ p.1 q.1) * A σ p.2 q.2
-
-/-- The **ordered product** `A^{σ_1} A^{σ_2} ⋯ A^{σ_ℓ}` of MPS matrices along a list of spin labels
-(left-to-right matrix multiplication; the empty list gives the identity). -/
-noncomputable def orderedProd (A : MPSMatrices D N) :
-    List (Fin (N + 1)) → Matrix (Fin D) (Fin D) ℂ
-  | [] => 1
-  | σ :: ss => A σ * orderedProd A ss
-
-/-- The MPS matrices **span at length `ℓ`**: the ordered products `A^{σ_1} ⋯ A^{σ_ℓ}` over all spin
-sequences of length `ℓ` span the whole space of `D × D` matrices (condition behind Theorem 7.5(i),
-(ii)). -/
-def mpsProductsSpanAt (A : MPSMatrices D N) (ℓ : ℕ) : Prop :=
-  Submodule.span ℂ {M : Matrix (Fin D) (Fin D) ℂ |
-    ∃ σs : List (Fin (N + 1)), σs.length = ℓ ∧ M = orderedProd A σs} = ⊤
-
-/-- **Normalization (eq. (7.2.41))** `Σ_σ A^σ (A^σ)† = λ I` for a positive real `λ`. -/
-def IsMPSNormalized (A : MPSMatrices D N) (lam : ℝ) : Prop :=
-  0 < lam ∧
-    (∑ σ : Fin (N + 1), A σ * (A σ).conjTranspose) = (lam : ℂ) • (1 : Matrix (Fin D) (Fin D) ℂ)
-
-/-- **Theorem 7.5(i)**: the ordered products span all `D × D` matrices at *some* length `ℓ₀`. -/
-def MPSSpansEventually (A : MPSMatrices D N) : Prop :=
-  ∃ ℓ₀ : ℕ, mpsProductsSpanAt A ℓ₀
-
-/-- **Theorem 7.5(ii)**: the ordered products span all `D × D` matrices at *every* length `ℓ ≥ ℓ₀`
-for some `ℓ₀`. -/
-def MPSSpansForAllLarge (A : MPSMatrices D N) : Prop :=
-  ∃ ℓ₀ : ℕ, ∀ ℓ : ℕ, ℓ₀ ≤ ℓ → mpsProductsSpanAt A ℓ
-
-/-- **Theorem 7.5(iii): primitive transfer spectrum.**  `λ` is a nondegenerate eigenvalue of the
-transfer matrix `Ã` (its eigenspace is one-dimensional) and every other eigenvalue is strictly
-smaller in modulus, `|λ_j| < λ`.  This is the spectral-gap condition characterizing an injective
-(primitive) MPS. -/
-noncomputable def HasPrimitiveTransferSpectrum (A : MPSMatrices D N) (lam : ℝ) : Prop :=
-  (lam : ℂ) ∈ spectrum ℂ (mpsTransferMatrix A) ∧
-    finrank ℂ (LinearMap.ker
-      ((mpsTransferMatrix A).mulVecLin - (lam : ℂ) • LinearMap.id)) = 1 ∧
-    ∀ μ : ℂ, μ ∈ spectrum ℂ (mpsTransferMatrix A) → μ ≠ (lam : ℂ) → ‖μ‖ < lam
-
-/-- A collection of MPS matrices is **injective (primitive)** if it is normalized (eq. (7.2.41)) and
-satisfies the three equivalent conditions of Theorem 7.5. -/
-def IsInjectiveMPS (A : MPSMatrices D N) (lam : ℝ) : Prop :=
-  IsMPSNormalized A lam ∧ MPSSpansEventually A ∧ MPSSpansForAllLarge A ∧
-    HasPrimitiveTransferSpectrum A lam
 
 /-- **Tasaki Theorem 7.5 (injective matrix product states), AXIOM.**  For a normalized collection of
 MPS matrices (eq. (7.2.41), `λ > 0`) of positive bond dimension, the three conditions are

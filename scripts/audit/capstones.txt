@@ -285,3 +285,9 @@ tasaki_lemma_6_4_general_trial_energy_bound
 # Tasaki, 1st ed. (2020), Lemma 7.4, eqs. (7.1.19)–(7.1.21), pp. 186–187.
 # Proved with std3 only; this is the terminal textbook endpoint, not a temporary entry.
 tasaki_lemma_7_4
+
+# TEMPORARY DAG node: Tasaki §7.2.2 Theorem 7.5 (tracker #5088), the proved implication
+# `(i) ↔ (ii)` under normalization. It is zero-referenced only during the staged replacement of
+# the legacy `mps_theorem_7_5` axiom. Commit 5 consumes this theorem in the corrected final theorem;
+# DELIST it in that commit.
+mps_spans_eventually_iff_spans_for_all_large
