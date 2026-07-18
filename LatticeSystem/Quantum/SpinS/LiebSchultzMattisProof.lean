@@ -1,6 +1,6 @@
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattis
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisProofCore
-import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
+import LatticeSystem.Math.MatrixAnalysis.HermitianExpUnitary
 import LatticeSystem.Quantum.SpinS.HermitianVariationalLowerBound
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds

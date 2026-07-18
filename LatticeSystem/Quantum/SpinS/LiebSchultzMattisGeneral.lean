@@ -1,5 +1,5 @@
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattis
-import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
+import LatticeSystem.Quantum.SpinS.ManyBodyOperatorNorm
 import LatticeSystem.Quantum.SpinS.RingDistance
 
 /-!

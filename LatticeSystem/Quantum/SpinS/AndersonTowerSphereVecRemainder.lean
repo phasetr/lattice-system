@@ -1,5 +1,5 @@
 import LatticeSystem.Quantum.SpinS.AndersonTowerPinch
-import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
+import LatticeSystem.Quantum.SpinS.ManyBodyOperatorNorm
 
 /-!
 # Tasaki §4.2.2 Proposition 4.10: the pinch vector remainder bound (PR-6b-ii)

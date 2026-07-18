@@ -10386,7 +10386,8 @@ unsatisfiable in $d=1$, hence vacuous there.  Combined with Theorem~4.11 ($m^\as
 yields strict positivity.  Chapters~3--10 backfill.
 
 \noindent\textbf{Lemma 4.14} (Tasaki §4.2.2, eqs.~(4.2.30)--(4.2.34), pp.~104--105; \textbf{PROVED
-axiom-free}, \texttt{Quantum/SpinS/OrderOperatorAlgebra.lean}, Issues \#4485/\#4769).  The
+axiom-free}, \texttt{Quantum/SpinS/ManyBodyOperatorNorm.lean} /
+\texttt{Quantum/SpinS/OrderOperatorAlgebra.lean}, Issues \#4485/\#4769).  The
 order-operator algebra estimate underlying the tower proofs.  With the per-volume order operators
 $\hat o^{\pm}=\hat O_L^{\pm}/V$ ($V=L^d$, \texttt{staggeredOrderDensityOpS}) and $\hat
 p=\tfrac12(\hat o^+\hat o^-+\hat o^-\hat o^+)$ (\texttt{staggeredPhatS}, eq.~(4.2.31)), and the
@@ -10527,7 +10528,7 @@ where $2j = \begin{cases} M & \text{if } M \text{ is even} \\ M+1 & \text{if } M
 
 \medskip\noindent\textbf{Operator-norm $\to$ mulVec vector bound infrastructure} (Tasaki §4.2.2,
 Proposition 4.10 arc PR-6b-i; \textbf{PROVED axiom-free},
-\texttt{Quantum/SpinS/OrderOperatorAlgebra.lean} /
+\texttt{Quantum/SpinS/ManyBodyOperatorNorm.lean} /
 \texttt{Quantum/SpinS/AndersonTowerCartWordReBand.lean}, Issue \#4974, PR \#5040).
 The generic linear-algebra bridge from operator-norm bounds to vector-norm
 bounds feeding the Bochner solid-angle interchange and sphere-average vector
@@ -11454,9 +11455,11 @@ $\texttt{window}\,L\,r\,x=\{y:\mathtt{ringDist}\,x\,y\le r\}$, with $\delta(x,y)
 \texttt{signedRingDisp}\,L\,x\,y$ the \emph{ring-distance-centered} signed displacement
 ($|\delta|=\mathtt{ringDist}$, avoiding the $2\pi$ seam jump of the raw angle $\theta_y=2\pi(y+1)/L$
 on wrapping windows); $\hat M_x$ is Hermitian (\texttt{localTwistGen\_isHermitian}), so
-$\exp(\pm i\hat M_x)$ are unitary conjugators.  The generic norm
+$\exp(\pm i\hat M_x)$ are unitary conjugators through the generic identities in
+\texttt{Math/MatrixAnalysis/HermitianExpUnitary.lean}.  The generic norm
 lemma \texttt{manyBodyOperatorNormS\_unitary\_conj} ($\|UYU^{\dagger}\|=\|Y\|$ for unitary $U$) is
-added for the forthcoming second-order twist-conjugation bound.  PR-3 (PR~\#5073): the \emph{outer
+provided by \texttt{Quantum/SpinS/ManyBodyOperatorNorm.lean} for the forthcoming second-order
+twist-conjugation bound.  PR-3 (PR~\#5073): the \emph{outer
 variational reduction} (eq.~6.2.25) is generalized to an \emph{arbitrary} Hamiltonian
 $\hat H:\texttt{ManyBodyOpS}$ --- \texttt{lsm\_energy\_diff\_symm\_sum\_general} (the symmetrised twist
 gap $\bigl(\langle\Phi_{\mathrm{LSM}},\hat H\Phi_{\mathrm{LSM}}\rangle/\langle\Phi_{\mathrm{LSM}},

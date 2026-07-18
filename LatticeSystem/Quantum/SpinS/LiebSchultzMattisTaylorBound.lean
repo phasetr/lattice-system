@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisGeneratorNorm
+import LatticeSystem.Quantum.SpinS.ManyBodyOperatorNorm
 import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.Analysis.Calculus.MeanValue
 
