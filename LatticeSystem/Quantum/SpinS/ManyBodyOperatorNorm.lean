@@ -79,23 +79,6 @@ theorem manyBodyOperatorNormS_mul_le (M₁ M₂ : ManyBodyOpS Λ N) :
     manyBodyOperatorNormS_eq_toEuclideanCLM, map_mul]
   exact norm_mul_le _ _
 
-/-- **Power submultiplicativity** of the many-body `L²` operator norm (for `n > 0`). -/
-theorem manyBodyOperatorNormS_pow_le (M : ManyBodyOpS Λ N) {n : ℕ} (hn : 0 < n) :
-    manyBodyOperatorNormS (M ^ n) ≤ manyBodyOperatorNormS M ^ n := by
-  rw [manyBodyOperatorNormS_eq_toEuclideanCLM, map_pow, manyBodyOperatorNormS_eq_toEuclideanCLM]
-  exact norm_pow_le' _ hn
-
-/-- **List-product submultiplicativity**: the norm of an ordered product is at most the product of
-the norms.  Used to bound `balancedOrderProductS`. -/
-theorem manyBodyOperatorNormS_list_prod_le (l : List (ManyBodyOpS Λ N)) :
-    manyBodyOperatorNormS l.prod ≤ (l.map manyBodyOperatorNormS).prod := by
-  induction l with
-  | nil => simp [manyBodyOperatorNormS_eq_toEuclideanCLM]
-  | cons a t ih =>
-    rw [List.prod_cons, List.map_cons, List.prod_cons]
-    refine le_trans (manyBodyOperatorNormS_mul_le a t.prod) ?_
-    exact mul_le_mul_of_nonneg_left ih (manyBodyOperatorNormS_nonneg a)
-
 /-- **Finite-sum triangle inequality** for the many-body `L²` operator norm. -/
 theorem manyBodyOperatorNormS_sum_le {ι : Type*} (s : Finset ι) (f : ι → ManyBodyOpS Λ N) :
     manyBodyOperatorNormS (∑ x ∈ s, f x) ≤ ∑ x ∈ s, manyBodyOperatorNormS (f x) := by
