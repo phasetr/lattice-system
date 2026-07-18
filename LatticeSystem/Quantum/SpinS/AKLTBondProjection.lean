@@ -17,15 +17,13 @@ projection as a polynomial in `Ŝ_x · Ŝ_{x+1}`:
 (7.1.20) — built (after duplicating each `S = 1` site into two `S = 1/2` spins) from a singlet pair
 on the bond `{x, x+1}` tensored with an arbitrary state on the rest of the chain.
 
-The bond projection and the affine identity (7.1.5) are *defined and proved* here.  The VBS
-singlet-tensor form (7.1.20) is realized **concretely** by the Weyl symmetrization
-`Sym²(ℂ²) ≅ spin-1` (eq. (7.1.22)): each `S = 1` site is the symmetric part of two `S = 1/2` spins,
-and the four bond
-vectors `Ψ_{σσ'}` obtained by placing a singlet on the inner qubits span the total-spin `≤ 1`
-subspace `W ⊂ ℂ³ ⊗ ℂ³` (`vbsBondSubspace`).  The predicate `IsVBSGroundForm` is then the concrete
-statement that every two-site bond slice of `Φ` lies in `W`; being defined through `W` alone (with
-no reference to `P̂₂`), it makes Lemma 7.4 a non-tautological equivalence.  The equivalence itself
-(`tasaki_lemma_7_4`) is kept as a documented axiom in this PR pending the tensor-slice discharge.
+The bond projection and the affine identity (7.1.5) are *defined and proved* here.  The four
+concrete bond vectors `Ψ_{σσ'}` obtained by placing a singlet on the inner qubits span the
+total-spin `≤ 1` subspace `W ⊂ ℂ³ ⊗ ℂ³` (`vbsBondSubspace`).  The predicate
+`IsVBSGroundForm` is the concrete statement that every two-site bond slice of `Φ` lies in `W`;
+being defined through `W` alone (with no reference to `P̂₂`), it makes Lemma 7.4 a
+non-tautological equivalence.  The local kernel computation proves `ker P̂₂^{loc} = W`, and the
+global tensor-slice identity then proves `tasaki_lemma_7_4`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §7.1.2–§7.1.3, Lemma 7.4, eqs. (7.1.5)–(7.1.6), (7.1.19)–(7.1.20), pp. 181–187; T. Kennedy,
@@ -57,19 +55,6 @@ theorem aklt_bond_term_eq_bondSpin2Projection (x y : Fin L) :
       (2 : ℂ) • bondSpin2ProjectionS x y - (2 / 3 : ℂ) • (1 : ManyBodyOpS (Fin L) 2) := by
   simp only [bondSpin2ProjectionS, smul_add, smul_smul]
   norm_num
-
-/-- The **Weyl symmetrization embedding** `Sym²(ℂ²) ≅ spin-1` (Tasaki eq. (7.1.22), p. 187): the map
-sending the two duplicated `S = 1/2` spins on one site to the physical `S = 1` state,
-`|↑↑⟩ ↦ |+⟩`, `|↓↓⟩ ↦ |−⟩`, `|↑↓⟩, |↓↑⟩ ↦ (1/√2)|0⟩`.  The qubit basis `Fin 2` is `↑ = 0`, `↓ = 1`;
-the spin-1 basis `Fin 3` is `|+⟩ = 0`, `|0⟩ = 1`, `|−⟩ = 2` (the `spinSOp3 = diag(1,0,−1)`
-convention).  This is the shared substrate used both by the global VBS state (§7.1.2) and by the
-§7.2.8 string order, so it is defined once here for reuse. -/
-noncomputable def spin1SymEmbed : Matrix (Fin 3) (Fin 2 × Fin 2) ℂ :=
-  fun m q =>
-    if m = 0 ∧ q = (0, 0) then 1
-    else if m = 2 ∧ q = (1, 1) then 1
-    else if m = 1 ∧ (q = (0, 1) ∨ q = (1, 0)) then (((Real.sqrt 2)⁻¹ : ℝ) : ℂ)
-    else 0
 
 /-- The four **VBS bond vectors** `Ψ_{σσ'}` on a single bond of the duplicated `S = 1` chain (Tasaki
 eqs. (7.1.19)–(7.1.20), p. 186): the two-site spin-1 states obtained by putting the outer qubits
@@ -428,8 +413,8 @@ theorem bondLocal_mulVec_vbsBondVec (σ σ' : Fin 2) :
 /-- **Kernel inclusion `W ⊆ ker P̂₂^{loc}` (Lemma 7.4, forward).**  The VBS bond subspace `W`
 (`vbsBondSubspace`, the span of the four `Ψ_{σσ'}`) is contained in the kernel of the single-bond
 spin-2 projection `bondSpin2ProjectionS (0 : Fin 2) 1` on `ℂ³ ⊗ ℂ³` (Tasaki §7.1.3, eqs.
-(7.1.19)–(7.1.20), p. 186).  The reverse inclusion (hence equality,
-`dim = 4`) is discharged in the following PR. -/
+(7.1.19)–(7.1.20), p. 186).  The reverse inclusion follows below from the local rank and
+nullity computation. -/
 theorem vbsBondSubspace_le_ker :
     vbsBondSubspace ≤
       LinearMap.ker (Matrix.mulVecLin (bondSpin2ProjectionS (0 : Fin 2) 1)) := by
@@ -438,7 +423,330 @@ theorem vbsBondSubspace_le_ker :
   simp only [SetLike.mem_coe, LinearMap.mem_ker, Matrix.mulVecLin_apply]
   exact bondLocal_mulVec_vbsBondVec p.1 p.2
 
-/-- **Tasaki Lemma 7.4 (local VBS ground-state characterization), AXIOM.**  A state `Φ` of the
+/-! ## The local kernel `ker P̂₂^{loc} = W` (Lemma 7.4) -/
+
+/-- The four VBS bond vectors `Ψ_{σσ'}` are linearly independent.  Their coefficients are
+successively isolated by the product-basis coordinates `|+,0⟩`, `|+,−⟩`, `|−,+⟩`, and
+`|0,−⟩`. -/
+theorem vbsBondVec_linearIndependent :
+    LinearIndependent ℂ (fun p : Fin 2 × Fin 2 => vbsBondVec p.1 p.2) := by
+  rw [Fintype.linearIndependent_iff]
+  intro c hc p
+  have h00 := congrFun hc ![0, 1]
+  have h01 := congrFun hc ![0, 2]
+  have h10 := congrFun hc ![2, 0]
+  have h11 := congrFun hc ![1, 2]
+  simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, vbsBondVec, Pi.zero_apply,
+    Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue] at h00 h01 h10 h11
+  rw [Fintype.sum_prod_type] at h00 h01 h10 h11
+  simp only [Fin.sum_univ_two] at h00 h01 h10 h11
+  rcases p with ⟨p₀, p₁⟩
+  fin_cases p₀ <;> fin_cases p₁
+  · norm_num at h00 ⊢
+    simpa using h00
+  · norm_num at h01 ⊢
+    simpa using h01
+  · norm_num at h10 ⊢
+    simpa using h10
+  · norm_num at h11 ⊢
+    simpa using h11
+
+/-- The VBS bond subspace `W`, spanned by the four independent vectors `Ψ_{σσ'}`, has complex
+dimension four. -/
+theorem finrank_vbsBondSubspace :
+    Module.finrank ℂ vbsBondSubspace = 4 := by
+  rw [vbsBondSubspace, finrank_span_eq_card vbsBondVec_linearIndependent]
+  norm_num
+
+set_option maxHeartbeats 2000000 in
+-- The explicit five-vector rank computation exceeds the default heartbeat budget.
+/-- The single-bond spin-2 projection has rank exactly five.  The lower bound uses five
+independent spin-2 vectors selected from the total-magnetization sectors `2, 1, 0, −1, −2`.
+The upper bound follows from `W ≤ ker P̂₂^{loc}` and rank-nullity. -/
+theorem bondLocal_rank :
+    Matrix.rank (bondSpin2ProjectionS (0 : Fin 2) 1) = 5 := by
+  let P := bondSpin2ProjectionS (0 : Fin 2) 1
+  let basisVec : (Fin 2 → Fin 3) → ((Fin 2 → Fin 3) → ℂ) :=
+    fun a => Pi.single a 1
+  let w : Fin 5 → ((Fin 2 → Fin 3) → ℂ) :=
+    ![basisVec ![0, 0],
+      basisVec ![0, 1] + basisVec ![1, 0],
+      basisVec ![0, 2] + (2 : ℂ) • basisVec ![1, 1] + basisVec ![2, 0],
+      basisVec ![1, 2] + basisVec ![2, 1],
+      basisVec ![2, 2]]
+  have hLIw : LinearIndependent ℂ w := by
+    rw [Fintype.linearIndependent_iff]
+    intro c hc i
+    have h0 := congrFun hc ![0, 0]
+    have h1 := congrFun hc ![0, 1]
+    have h2 := congrFun hc ![1, 1]
+    have h3 := congrFun hc ![1, 2]
+    have h4 := congrFun hc ![2, 2]
+    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply,
+      Fin.sum_univ_five, w, Matrix.cons_val_zero, Matrix.cons_val_one, Pi.add_apply,
+      basisVec, Pi.single_apply, Pi.smul_apply, Fin.isValue] at h0 h1 h2 h3 h4
+    fin_cases i <;> norm_num at h0 h1 h2 h3 h4 ⊢
+    · simpa using h0
+    · simpa using h1
+    · simpa using h2
+    · simpa using h3
+    · simpa using h4
+  have hdot (i : Fin 5) : (spinSDot (0 : Fin 2) 1 2).mulVec (w i) = w i := by
+    funext idx
+    obtain ⟨a, b, hidx⟩ : ∃ a b : Fin 3, idx = ![a, b] :=
+      ⟨idx 0, idx 1, by funext k; fin_cases k <;> rfl⟩
+    subst hidx
+    rw [Matrix.mulVec, dotProduct, sum_fin2_fin3]
+    fin_cases i <;> fin_cases a <;> fin_cases b <;>
+      simp only [w, basisVec, spinSDot_fin2_apply', plus2, minus2, three2,
+        Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue] <;>
+      (try simp) <;>
+      norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
+  have hfix (i : Fin 5) : P.mulVec (w i) = w i := by
+    change (bondSpin2ProjectionS (0 : Fin 2) 1).mulVec (w i) = w i
+    rw [bondLocal_expand]
+    simp only [Matrix.add_mulVec, Matrix.smul_mulVec, ← Matrix.mulVec_mulVec,
+      Matrix.one_mulVec, hdot]
+    funext idx
+    simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+    ring
+  have hLI : LinearIndependent ℂ (fun i : Fin 5 => P.mulVec (w i)) := by
+    simpa only [hfix] using hLIw
+  have hspan :
+      Submodule.span ℂ (Set.range fun i : Fin 5 => P.mulVec (w i)) ≤
+        LinearMap.range (Matrix.mulVecLin P) := by
+    rw [Submodule.span_le]
+    rintro _ ⟨i, rfl⟩
+    exact ⟨w i, rfl⟩
+  have hlower : 5 ≤ Matrix.rank P := by
+    rw [Matrix.rank]
+    calc
+      5 = Module.finrank ℂ
+          (Submodule.span ℂ (Set.range fun i : Fin 5 => P.mulVec (w i))) := by
+            rw [finrank_span_eq_card hLI]
+            norm_num
+      _ ≤ Module.finrank ℂ (LinearMap.range (Matrix.mulVecLin P)) :=
+        Submodule.finrank_mono hspan
+  have hker : 4 ≤ Module.finrank ℂ (LinearMap.ker (Matrix.mulVecLin P)) := by
+    rw [← finrank_vbsBondSubspace]
+    exact Submodule.finrank_mono vbsBondSubspace_le_ker
+  have hnullity := (Matrix.mulVecLin P).finrank_range_add_finrank_ker
+  have hdim : Module.finrank ℂ ((Fin 2 → Fin 3) → ℂ) = 9 := by
+    rw [Module.finrank_pi ℂ]
+    norm_num
+  rw [hdim] at hnullity
+  have hupper : Matrix.rank P ≤ 5 := by
+    rw [Matrix.rank]
+    omega
+  exact le_antisymm hupper hlower
+
+/-- The kernel of the single-bond spin-2 projection has complex dimension four. -/
+theorem finrank_bondLocal_ker :
+    Module.finrank ℂ
+      (LinearMap.ker (Matrix.mulVecLin (bondSpin2ProjectionS (0 : Fin 2) 1))) = 4 := by
+  have hnullity :=
+    (Matrix.mulVecLin (bondSpin2ProjectionS (0 : Fin 2) 1)).finrank_range_add_finrank_ker
+  change Matrix.rank (bondSpin2ProjectionS (0 : Fin 2) 1) +
+      Module.finrank ℂ
+        (LinearMap.ker (Matrix.mulVecLin (bondSpin2ProjectionS (0 : Fin 2) 1))) =
+      Module.finrank ℂ ((Fin 2 → Fin 3) → ℂ) at hnullity
+  rw [bondLocal_rank, Module.finrank_pi ℂ] at hnullity
+  norm_num at hnullity
+  omega
+
+/-- The kernel of the local spin-2 bond projection is exactly the four-dimensional VBS bond
+subspace `W`.  The reverse inclusion is forced by equal finite dimensions from the previously
+proved forward inclusion `vbsBondSubspace_le_ker`. -/
+theorem bondLocal_ker_eq_vbsBondSubspace :
+    LinearMap.ker (Matrix.mulVecLin (bondSpin2ProjectionS (0 : Fin 2) 1)) =
+      vbsBondSubspace := by
+  refine (Submodule.eq_of_le_of_finrank_le vbsBondSubspace_le_ker ?_).symm
+  rw [finrank_bondLocal_ker, finrank_vbsBondSubspace]
+
+/-! ## Global bond action on two-site slices -/
+
+/-- The global spin-2 projection on the periodic bond `{x, ringSucc x}` acts on every fixed-rest
+bond slice as the local two-site spin-2 projection.  This holds for every genuine bond `1 < L`,
+including the wrap bond and both ordered bonds when `L = 2`. -/
+theorem bondSlice_bondSpin2ProjectionS_mulVec
+    (hL : 1 < L) (x : Fin L) (Φ : (Fin L → Fin 3) → ℂ) (τ : Fin L → Fin 3) :
+    bondSlice x ((bondSpin2ProjectionS x (ringSucc x)).mulVec Φ) τ =
+      (bondSpin2ProjectionS (0 : Fin 2) 1).mulVec (bondSlice x Φ τ) := by
+  have hxy : x ≠ ringSucc x := by
+    intro h
+    have hv := congrArg Fin.val h
+    simp only [ringSucc] at hv
+    by_cases hx : x.val + 1 < L
+    · rw [Nat.mod_eq_of_lt hx] at hv
+      omega
+    · have heq : x.val + 1 = L := by omega
+      rw [heq, Nat.mod_self] at hv
+      omega
+  have hOnSite {ι : Type} [Fintype ι] [DecidableEq ι]
+      (i : ι) (A : Matrix (Fin 3) (Fin 3) ℂ)
+      (Ψ : (ι → Fin 3) → ℂ) (q : ι → Fin 3) :
+      (onSiteS i A : ManyBodyOpS ι 2).mulVec Ψ q =
+        ∑ t : Fin 3, A (q i) t * Ψ (Function.update q i t) := by
+    rw [Matrix.mulVec, dotProduct]
+    simp only [onSiteS_apply]
+    have hterm (σ : ι → Fin 3) :
+        (if ∀ k, k ≠ i → q k = σ k then A (q i) (σ i) else 0) * Ψ σ =
+          if σ = Function.update q i (σ i) then A (q i) (σ i) * Ψ σ else 0 := by
+      by_cases hσ : σ = Function.update q i (σ i)
+      · have hoff : ∀ k, k ≠ i → q k = σ k := by
+          intro k hki
+          rw [hσ, Function.update_of_ne hki]
+        rw [if_pos hσ, if_pos hoff]
+      · have hoff : ¬ ∀ k, k ≠ i → q k = σ k := by
+          intro hall
+          apply hσ
+          funext k
+          by_cases hki : k = i
+          · subst k
+            rw [Function.update_self]
+          · rw [Function.update_of_ne hki]
+            exact (hall k hki).symm
+        rw [if_neg hσ, if_neg hoff, zero_mul]
+    rw [Finset.sum_congr rfl (fun σ _ => hterm σ), ← Finset.sum_filter]
+    symm
+    refine Finset.sum_bij (fun (t : Fin 3) _ => Function.update q i t) ?_ ?_ ?_ ?_
+    · intro t _
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+      funext k
+      by_cases hki : k = i
+      · subst k
+        rw [Function.update_self, Function.update_self]
+      · rw [Function.update_of_ne hki, Function.update_of_ne hki]
+    · intro s _ t _ hst
+      have := congrFun hst i
+      simpa only [Function.update_self] using this
+    · intro σ hσ
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hσ
+      exact ⟨σ i, Finset.mem_univ _, hσ.symm⟩
+    · intro t _
+      simp only [Function.update_self]
+  have hglue_update_left (a : Fin 2 → Fin 3) (ρ : Fin L → Fin 3) (t : Fin 3) :
+      Function.update (glueBond x a ρ) x t =
+        glueBond x (Function.update a 0 t) ρ := by
+    funext k
+    by_cases hkx : k = x
+    · subst k
+      simp [glueBond]
+    · by_cases hky : k = ringSucc x
+      · subst k
+        rw [Function.update_of_ne hxy.symm]
+        simp [glueBond, hxy.symm]
+      · simp [glueBond, hkx, hky, Function.update_of_ne]
+  have hglue_update_right (a : Fin 2 → Fin 3) (ρ : Fin L → Fin 3) (t : Fin 3) :
+      Function.update (glueBond x a ρ) (ringSucc x) t =
+        glueBond x (Function.update a 1 t) ρ := by
+    funext k
+    by_cases hkx : k = x
+    · subst k
+      rw [Function.update_of_ne hxy]
+      simp [glueBond]
+    · by_cases hky : k = ringSucc x
+      · subst k
+        simp [glueBond, hxy.symm]
+      · simp [glueBond, hkx, hky, Function.update_of_ne]
+  have hSliceLeft (A : Matrix (Fin 3) (Fin 3) ℂ)
+      (Ψ : (Fin L → Fin 3) → ℂ) (ρ : Fin L → Fin 3) :
+      bondSlice x ((onSiteS x A : ManyBodyOpS (Fin L) 2).mulVec Ψ) ρ =
+        (onSiteS (0 : Fin 2) A : ManyBodyOpS (Fin 2) 2).mulVec
+          (bondSlice x Ψ ρ) := by
+    funext a
+    simp only [bondSlice]
+    rw [hOnSite x A Ψ (glueBond x a ρ),
+      hOnSite (0 : Fin 2) A (bondSlice x Ψ ρ) a]
+    apply Finset.sum_congr rfl
+    intro t _
+    rw [show glueBond x a ρ x = a 0 by simp [glueBond], hglue_update_left]
+    rfl
+  have hSliceRight (A : Matrix (Fin 3) (Fin 3) ℂ)
+      (Ψ : (Fin L → Fin 3) → ℂ) (ρ : Fin L → Fin 3) :
+      bondSlice x ((onSiteS (ringSucc x) A : ManyBodyOpS (Fin L) 2).mulVec Ψ) ρ =
+        (onSiteS (1 : Fin 2) A : ManyBodyOpS (Fin 2) 2).mulVec
+          (bondSlice x Ψ ρ) := by
+    funext a
+    simp only [bondSlice]
+    rw [hOnSite (ringSucc x) A Ψ (glueBond x a ρ),
+      hOnSite (1 : Fin 2) A (bondSlice x Ψ ρ) a]
+    apply Finset.sum_congr rfl
+    intro t _
+    rw [show glueBond x a ρ (ringSucc x) = a 1 by simp [glueBond, hxy.symm],
+      hglue_update_right]
+    rfl
+  have hSlicePair (A B : Matrix (Fin 3) (Fin 3) ℂ)
+      (Ψ : (Fin L → Fin 3) → ℂ) (ρ : Fin L → Fin 3) :
+      bondSlice x
+          (((onSiteS x A * onSiteS (ringSucc x) B :
+            ManyBodyOpS (Fin L) 2).mulVec Ψ)) ρ =
+        (onSiteS (0 : Fin 2) A * onSiteS (1 : Fin 2) B :
+          ManyBodyOpS (Fin 2) 2).mulVec (bondSlice x Ψ ρ) := by
+    rw [← Matrix.mulVec_mulVec, hSliceLeft, hSliceRight, Matrix.mulVec_mulVec]
+  have hSliceAdd (Ψ Ψ' : (Fin L → Fin 3) → ℂ) (ρ : Fin L → Fin 3) :
+      bondSlice x (Ψ + Ψ') ρ = bondSlice x Ψ ρ + bondSlice x Ψ' ρ := rfl
+  have hSliceSmul (c : ℂ) (Ψ : (Fin L → Fin 3) → ℂ) (ρ : Fin L → Fin 3) :
+      bondSlice x (c • Ψ) ρ = c • bondSlice x Ψ ρ := rfl
+  have hSliceDot (Ψ : (Fin L → Fin 3) → ℂ) (ρ : Fin L → Fin 3) :
+      bondSlice x ((spinSDot x (ringSucc x) 2).mulVec Ψ) ρ =
+        (spinSDot (0 : Fin 2) 1 2).mulVec (bondSlice x Ψ ρ) := by
+    rw [spinSDot_def, spinSDot_def, Matrix.add_mulVec, Matrix.add_mulVec,
+      Matrix.add_mulVec, Matrix.add_mulVec, hSliceAdd, hSliceAdd,
+      hSlicePair, hSlicePair, hSlicePair]
+  rw [bondSpin2ProjectionS, Matrix.add_mulVec, Matrix.add_mulVec,
+    Matrix.smul_mulVec, Matrix.smul_mulVec, Matrix.smul_mulVec,
+    hSliceAdd, hSliceAdd, hSliceSmul, hSliceSmul, hSliceSmul,
+    ← Matrix.mulVec_mulVec, Matrix.one_mulVec, hSliceDot, hSliceDot]
+  rw [bondSpin2ProjectionS, Matrix.add_mulVec, Matrix.add_mulVec,
+    Matrix.smul_mulVec, Matrix.smul_mulVec, Matrix.smul_mulVec,
+    ← Matrix.mulVec_mulVec, Matrix.one_mulVec]
+  rw [hSliceDot]
+
+/-- The global bond spin-2 projection annihilates a chain state exactly when every fixed-rest
+two-site bond slice belongs to the kernel of the local spin-2 projection.  The equivalence is
+uniform in the periodic bond, including the wrap bond and the two-site ring. -/
+theorem bondSpin2ProjectionS_mulVec_eq_zero_iff_bondSlice_mem_ker
+    (hL : 1 < L) (x : Fin L) (Φ : (Fin L → Fin 3) → ℂ) :
+    (bondSpin2ProjectionS x (ringSucc x)).mulVec Φ = 0 ↔
+      ∀ τ : Fin L → Fin 3,
+        bondSlice x Φ τ ∈
+          LinearMap.ker (Matrix.mulVecLin (bondSpin2ProjectionS (0 : Fin 2) 1)) := by
+  constructor
+  · intro hΦ τ
+    rw [LinearMap.mem_ker, Matrix.mulVecLin_apply,
+      ← bondSlice_bondSpin2ProjectionS_mulVec hL x Φ τ, hΦ]
+    rfl
+  · intro hslice
+    funext q
+    let a : Fin 2 → Fin 3 := ![q x, q (ringSucc x)]
+    have hglue : glueBond x a q = q := by
+      have hxy : x ≠ ringSucc x := by
+        intro h
+        have hv := congrArg Fin.val h
+        simp only [ringSucc] at hv
+        by_cases hx : x.val + 1 < L
+        · rw [Nat.mod_eq_of_lt hx] at hv
+          omega
+        · have heq : x.val + 1 = L := by omega
+          rw [heq, Nat.mod_self] at hv
+          omega
+      funext k
+      by_cases hkx : k = x
+      · subst k
+        simp [a, glueBond]
+      · by_cases hky : k = ringSucc x
+        · subst k
+          simp [a, glueBond, hxy.symm]
+        · simp [glueBond, hkx, hky]
+    have haction :=
+      congrFun (bondSlice_bondSpin2ProjectionS_mulVec hL x Φ q) a
+    have hker := hslice q
+    rw [LinearMap.mem_ker, Matrix.mulVecLin_apply] at hker
+    rw [hker] at haction
+    simpa only [bondSlice, hglue, Pi.zero_apply] using haction
+
+/-- **Tasaki Lemma 7.4 (local VBS ground-state characterization), PROVED.**  A state `Φ` of the
 `S = 1` chain is annihilated by the bond projection onto total spin 2 at the (periodic) bond
 `{x, x+1}`, `P̂₂[Ŝ_x + Ŝ_{x+1}] Φ = 0` (eq. (7.1.19)), if and only if `Φ` has the valence-bond-solid
 singlet-tensor form (7.1.20) on that bond (`IsVBSGroundForm`).
@@ -447,13 +755,14 @@ This is the local characterization that drives the Kennedy–Lieb–Tasaki uniqu
 lies in the AKLT ground space iff it is annihilated by *every* bond projection, i.e. iff every bond
 carries a singlet pair (the VBS state).  The concrete bond projection and the affine identity
 (7.1.5) are proved above; the singlet form (7.1.20) is now the concrete predicate `IsVBSGroundForm`
-(bond slices in the VBS subspace `W`).  The forward/backward tensor-slice discharge of this
-equivalence is staged over the following PRs, so it is kept here as a documented axiom.  The
-hypothesis
+(bond slices in the VBS subspace `W`).  The proof combines the global bond-slice equivalence with
+the proved local identity `ker P̂₂^{loc} = W`.  The hypothesis
 `1 < L` ensures the bond `{x, ringSucc x}` is genuinely two-site: on the degenerate one-site ring
 `L = 1` one has `ringSucc x = x`, so the operator would be a single-site self-interaction rather
 than the two-site bond projection of Lemma 7.4. -/
-axiom tasaki_lemma_7_4 (hL : 1 < L) (x : Fin L) (Φ : (Fin L → Fin 3) → ℂ) :
-    (bondSpin2ProjectionS x (ringSucc x)).mulVec Φ = 0 ↔ IsVBSGroundForm L x Φ
+theorem tasaki_lemma_7_4 (hL : 1 < L) (x : Fin L) (Φ : (Fin L → Fin 3) → ℂ) :
+    (bondSpin2ProjectionS x (ringSucc x)).mulVec Φ = 0 ↔ IsVBSGroundForm L x Φ := by
+  simpa only [IsVBSGroundForm, bondLocal_ker_eq_vbsBondSubspace] using
+    bondSpin2ProjectionS_mulVec_eq_zero_iff_bondSlice_mem_ker hL x Φ
 
 end LatticeSystem.Quantum

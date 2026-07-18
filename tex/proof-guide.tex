@@ -11861,40 +11861,43 @@ nonzero one-point functions, and $L\ge3$ excludes the degenerate small rings.  P
 cluster expansion; recorded as a documented axiom.  Chapters~3--10 backfill.
 
 \medskip
-\noindent\textbf{§7.1.3 Lemma 7.4} (local VBS ground-state characterization; Tasaki §7.1.2--§7.1.3,
-eqs.~(7.1.5), (7.1.19)--(7.1.20), pp.~181--187; \texttt{Quantum/SpinS/AKLTBondProjection.lean}, Issue
-\#4485).  The AKLT interaction is the bond projection onto total spin $2$.  For two $S=1$ spins,
-\texttt{bondSpin2ProjectionS} defines $\hat P_2[\hat S_x+\hat S_y]=\tfrac12(\hat S_x\!\cdot\!\hat S_y)
-+\tfrac16(\hat S_x\!\cdot\!\hat S_y)^2+\tfrac13$, and the lemma
-\texttt{aklt\_bond\_term\_eq\_bondSpin2Projection} \emph{proves} the affine identity (eq.~7.1.5)
-$\hat S_x\!\cdot\!\hat S_y+\tfrac13(\hat S_x\!\cdot\!\hat S_y)^2=2\hat P_2[\hat S_x+\hat S_y]-\tfrac23$,
-so the AKLT local term penalizes only the spin-$2$ component of each bond and the ground states are
-exactly the states annihilated by every bond projection.  The axiom \texttt{tasaki\_lemma\_7\_4}
-states that, for $1<L$ (so the bond $\{x,\texttt{ringSucc}\,x\}$ is genuinely two-site rather than a
-one-site self-interaction), a state $\Phi$ satisfies $\hat P_2[\hat S_x+\hat S_{x+1}]\,\Phi=0$
-(eq.~7.1.19) at the periodic bond $\{x,\texttt{ringSucc}\,x\}$ \emph{iff} it has the
-valence-bond-solid singlet-tensor form (eq.~7.1.20), now the \emph{concrete} predicate
-\texttt{IsVBSGroundForm}.  The marker is realized through the Weyl symmetrization
-$\mathrm{Sym}^2(\mathbb{C}^2)\cong\mathrm{spin}\text{-}1$ (eq.~7.1.22, \texttt{spin1SymEmbed}): the
-four bond vectors $\Psi_{\sigma\sigma'}$ (\texttt{vbsBondVec}, a singlet on the inner qubits with
-outer qubits $\sigma,\sigma'$) span the total-spin-$\le 1$ subspace
-$W\subset\mathbb{C}^3\otimes\mathbb{C}^3$ ($\dim W=4$, \texttt{vbsBondSubspace}), and
-\texttt{IsVBSGroundForm} asserts that every two-site bond slice (\texttt{bondSlice}) of $\Phi$ lies
-in $W$.  Being defined through $W$ alone (no reference to $\hat P_2$), it makes the equivalence
-non-tautological.  The forward direction (7.1.20~$\Rightarrow$~7.1.19) at a single bond,
-\texttt{vbsBondSubspace\_le\_ker} (\emph{proved}, axiom-free/\texttt{std3}), shows
-$W\subseteq\ker\bigl(\texttt{bondSpin2ProjectionS}\,(0:\mathrm{Fin}\,2)\,1\bigr)$ on
-$\mathbb{C}^3\otimes\mathbb{C}^3$ by an explicit $9$-dimensional computation.  The two aligned
-vectors are eigenvectors of $C=\hat S_0\!\cdot\!\hat S_1$ with eigenvalue $-1$.  The two mixed
-vectors are spin-$0$/spin-$1$ mixtures rather than eigenvectors of $C$, but
-\texttt{bondSpin2ProjectionS} annihilates them because its defining polynomial
-$\tfrac12 C+\tfrac16 C^2+\tfrac13$ vanishes on both sectors and has eigenvalue $1$ only on the
-spin-$2$ sector.  The AKLT ground space is then the VBS state in which every bond carries a singlet
-(Kennedy--Lieb--Tasaki 1988).  The affine identity, the concrete
-marker, and the forward kernel inclusion are proved; the full tensor-slice discharge of
-\texttt{tasaki\_lemma\_7\_4} (reverse inclusion $\ker=W$ and the multi-site slice) is staged over
-the following PRs, so the equivalence itself is (for now) a documented axiom.  Chapters~3--10
-backfill.
+\noindent\textbf{§7.1.3 Lemma 7.4} (local VBS ground-state characterization; Tasaki, 1st ed. (2020),
+Lemma 7.4, eqs.~(7.1.19)--(7.1.21), pp.~186--187;
+\texttt{Quantum/SpinS/AKLTBondProjection.lean}, Issue \#5078; \emph{proved},
+axiom-free/\texttt{std3}, PR pending).  For $1<L$, the theorem
+\texttt{tasaki\_lemma\_7\_4} retains the statement of the former axiom: a state $\Phi$ satisfies
+$\hat P_2[\hat S_x+\hat S_{x+1}]\Phi=0$ on the periodic bond
+$\{x,\texttt{ringSucc}(x)\}$ if and only if it has the valence-bond-solid singlet-tensor form
+\texttt{IsVBSGroundForm} on that bond.  This concrete predicate contains no reference to
+$\hat P_2$.  It requires every fixed-rest-configuration two-site slice
+\texttt{bondSlice} $x$ $\Phi$ $\tau$ to lie in the subspace
+$W=\texttt{vbsBondSubspace}$ spanned by the four singlet bond vectors
+\texttt{vbsBondVec} $\sigma$ $\sigma'$.
+
+The local proof is an explicit finite-dimensional chain.  The formal linear-independence theorem
+proves that the four generators are independent, and \texttt{finrank\_vbsBondSubspace} identifies
+$\dim W=4$.  Five independent fixed
+vectors in the range of the local projection prove
+$\operatorname{rank}\hat P_2^{\mathrm{loc}}\geq5$.  The intermediate inclusion
+$W\subseteq\ker\hat P_2^{\mathrm{loc}}$, the equality $\dim W=4$, the ambient dimension $9$, and
+rank--nullity prove $\operatorname{rank}\hat P_2^{\mathrm{loc}}\leq5$.
+\texttt{bondLocal\_rank} records $\operatorname{rank}\hat P_2^{\mathrm{loc}}=5$.
+A second rank--nullity calculation gives $\dim\ker\hat P_2^{\mathrm{loc}}=4$ in
+\texttt{finrank\_bondLocal\_ker}.  The equal dimensions and the intermediate inclusion identify
+$\ker\hat P_2^{\mathrm{loc}}=W$ in \texttt{bondLocal\_ker\_eq\_vbsBondSubspace}.
+The equality proof genuinely consumes the intermediate inclusion rather than duplicating its
+four-vector computation.
+
+The global reduction is uniform in the bond.  For every $x$, state $\Phi$, and rest configuration
+$\tau$, \texttt{bondSlice\_bondSpin2ProjectionS\_mulVec} identifies the slice of the global action
+with the local $9\times9$ action.  This identity includes the periodic wrap bond and both ordered
+bonds when $L=2$.  The theorem
+\texttt{bondSpin2ProjectionS\_mulVec\_eq\_zero\_iff\_bondSlice\_mem\_ker} proves that the global
+bond projection annihilates $\Phi$ exactly when every slice lies in the local kernel.  Rewriting
+that kernel as $W$ completes \texttt{tasaki\_lemma\_7\_4}.  The separate proved affine identity
+\texttt{aklt\_bond\_term\_eq\_bondSpin2Projection} (eq.~(7.1.5), p.~181) explains why the AKLT local
+interaction penalizes precisely the spin-$2$ component, while the Lemma 7.4 proof itself uses the
+local kernel equality and the tensor-slice equivalence.
 
 \medskip
 \noindent\textbf{§7.2.1 Hidden antiferromagnetic order / string order parameter} (den
