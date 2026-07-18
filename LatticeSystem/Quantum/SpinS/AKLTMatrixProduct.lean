@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.MPSTheorem75Defs
+import LatticeSystem.Quantum.SpinS.MPSTheorem75
 
 /-!
 # Tasaki §7.2.2: matrix product representation of the AKLT model (Theorems 7.5, 7.6)
@@ -24,8 +24,9 @@ are related by a gauge `A^σ = (θ/c) U B^σ U†` with `U` unitary and `|θ| = 
 underlies the classification of symmetry-protected topological phases (§8.3.4).
 
 The transfer matrix, ordered products, normalization, spanning conditions, and spectral primitivity
-condition are imported from `MPSTheorem75Defs`.  The legacy Theorem 7.5 axiom is retained during its
-staged replacement; Theorem 7.6, which is unproven in the book, remains a documented axiom.
+condition and corrected Theorem 7.5 are imported from `MPSTheorem75`. The formal theorem makes
+explicit the faithful dual eigenmatrix condition omitted from the printed statement. Theorem 7.6,
+which is unproven in the book, remains a documented axiom.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §7.2.2, Theorems 7.5–7.6, eqs. (7.2.36), (7.2.41)–(7.2.42), pp. 202–203; M. Fannes, B.
@@ -37,19 +38,6 @@ namespace LatticeSystem.Quantum
 open Matrix
 
 variable {D N : ℕ}
-
-/-- **Tasaki Theorem 7.5 (injective matrix product states), AXIOM.**  For a normalized collection of
-MPS matrices (eq. (7.2.41), `λ > 0`) of positive bond dimension, the three conditions are
-equivalent:
-(i) the ordered products span all `D × D` matrices at some length (`MPSSpansEventually`); (ii) they
-span at every sufficiently large length (`MPSSpansForAllLarge`); (iii) `λ` is a nondegenerate
-top eigenvalue of the transfer matrix with a spectral gap (`HasPrimitiveTransferSpectrum`).  The
-proof is Perron–Frobenius theory for the completely positive transfer map; recorded as a documented
-axiom. -/
-axiom mps_theorem_7_5 (A : MPSMatrices D N) (lam : ℝ) (hD : 0 < D)
-    (hnorm : IsMPSNormalized A lam) :
-    (MPSSpansEventually A ↔ MPSSpansForAllLarge A) ∧
-      (MPSSpansForAllLarge A ↔ HasPrimitiveTransferSpectrum A lam)
 
 /-- Two MPS matrix collections **generate the same matrix product state** (eq. (7.2.36) for all
 chain lengths and boundary conditions).  A faithful definition needs the explicit MPS state

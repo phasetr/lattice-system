@@ -25,8 +25,9 @@ variable {D : ℕ}
 
 /-- The concrete finite Kraus transfer `X ↦ Σσ Aσ X Aσᴴ`.
 
-This theorem-specific endpoint is consumed by `MPSTheorem75Choi` and
-`MPSTheorem75Peripheral`. -/
+This theorem-specific endpoint is consumed by `MPSTheorem75Choi`,
+`MPSTheorem75Peripheral`, and the unit reverse adapter
+`mpsSpansForAllLarge_of_unit_faithful_primitive` in `MPSTheorem75`. -/
 noncomputable def finiteKrausMap {ι : Type*} [Fintype ι]
     (A : ι → CStarMatrix (Fin D) (Fin D) ℂ) :
     Module.End ℂ (CStarMatrix (Fin D) (Fin D) ℂ) where
