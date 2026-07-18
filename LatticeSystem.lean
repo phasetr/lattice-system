@@ -86,6 +86,11 @@ import LatticeSystem.Quantum.SpinS.NoLongRangeOrder1D
 import LatticeSystem.Quantum.SpinS.HaldaneConjecture
 import LatticeSystem.Quantum.SpinS.AKLT
 import LatticeSystem.Quantum.SpinS.AKLTBondProjection
+import LatticeSystem.Quantum.SpinS.MPSTheorem75Defs
+import LatticeSystem.Quantum.SpinS.MPSTheorem75Linear
+import LatticeSystem.Quantum.SpinS.MPSTheorem75Choi
+import LatticeSystem.Quantum.SpinS.MPSTheorem75Peripheral
+import LatticeSystem.Quantum.SpinS.MPSTheorem75
 import LatticeSystem.Quantum.SpinS.AKLTMatrixProduct
 import LatticeSystem.Quantum.SpinS.AKLTInfiniteChain
 import LatticeSystem.Quantum.SpinS.AKLTStability
