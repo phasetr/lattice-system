@@ -9,24 +9,25 @@ notions control its structure:
 
 * the **transfer matrix** (eq. (7.2.42)) `Ã_{α,β;α',β'} = Σ_σ \overline{A^σ_{α,α'}} A^σ_{β,β'}`, a
   `D² × D²` matrix whose spectrum governs the correlations;
-* **injectivity** (primitivity): the matrices are normalized, `Σ_σ A^σ (A^σ)† = λ I` (eq. (7.2.41),
-  `λ > 0`), and satisfy the equivalent spanning/spectral conditions of Theorem 7.5.
+* **injectivity** (primitivity): the matrices are normalized,
+  `Σ_σ A^σ (A^σ)† = λ I` (eq. (7.2.41), `λ > 0`), and satisfy the corrected faithful-dual
+  spanning/spectral conditions formalized below.
 
-**Theorem 7.5** (injective matrix product states): for normalized `(A^σ)`, the following are
-equivalent — (i) the ordered products `A^{σ_1} ⋯ A^{σ_{ℓ₀}}` span all `D × D` matrices for some
-`ℓ₀`; (ii) they span for every `ℓ ≥ ℓ₀`; (iii) `λ` is a nondegenerate eigenvalue of the transfer
-matrix `Ã` and every other eigenvalue is strictly smaller in modulus.  Injectivity implies
-exponentially decaying correlations (no macroscopic superposition).
+**Printed Theorem 7.5** (injective matrix product states) claims that normalization alone makes
+the following conditions equivalent: (i) the ordered products span all `D × D` matrices at some
+length; (ii) they span at every sufficiently large length; (iii) `λ` is a nondegenerate transfer
+eigenvalue and every other eigenvalue has strictly smaller modulus. This claim is false. The
+corrected formalization additionally assumes `HasFaithfulDualEigenmatrix`. See `MPSTheorem75`,
+`docs/index.md`, and `tex/proof-guide.tex` for the counterexample and the corrected statement.
 
 **Theorem 7.6** (Fannes–Nachtergaele–Werner, stated without proof in the book): the injective matrix
 product *representation* is essentially unique — two injective collections generating the same MPS
 are related by a gauge `A^σ = (θ/c) U B^σ U†` with `U` unitary and `|θ| = 1`.  This uniqueness
 underlies the classification of symmetry-protected topological phases (§8.3.4).
 
-The transfer matrix, ordered products, normalization, spanning conditions, and spectral primitivity
-condition and corrected Theorem 7.5 are imported from `MPSTheorem75`. The formal theorem makes
-explicit the faithful dual eigenmatrix condition omitted from the printed statement. Theorem 7.6,
-which is unproven in the book, remains a documented axiom.
+The transfer matrix, ordered products, normalization, spanning conditions, spectral primitivity
+condition, and corrected Theorem 7.5 are imported from `MPSTheorem75`. Theorem 7.6, which is
+unproven in the book, remains a documented axiom.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §7.2.2, Theorems 7.5–7.6, eqs. (7.2.36), (7.2.41)–(7.2.42), pp. 202–203; M. Fannes, B.
