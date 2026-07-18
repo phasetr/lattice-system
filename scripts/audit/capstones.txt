@@ -292,10 +292,10 @@ tasaki_lemma_7_4
 # DELIST it in that commit.
 mps_spans_eventually_iff_spans_for_all_large
 
-# TEMPORARY internal DAG endpoint: Tasaki §7.2.2 Theorem 7.5 (tracker #5088), the uniform power
-# bound for the concrete positive-unital finite Kraus transfer. Commit 4 consumes this endpoint in
-# `MPSTheorem75Peripheral`; DELIST it in that commit.
-norm_finiteKrausMap_pow_le
+# TEMPORARY internal DAG endpoint: Tasaki §7.2.2 Theorem 7.5 (tracker #5088), the proved forward
+# unit-normalized faithful word-span-to-primitive-spectrum route. Commit 5 consumes this endpoint
+# in the corrected `MPSTheorem75` assembly; DELIST it in that commit.
+has_primitive_transfer_spectrum_of_unit_faithful_spanning
 
 # TEMPORARY internal DAG endpoint: Tasaki §7.2.2 Theorem 7.5 (tracker #5088), the reverse
 # unit-normalized faithful spectral-gap-to-eventual-span route. Commit 5 consumes this endpoint in
