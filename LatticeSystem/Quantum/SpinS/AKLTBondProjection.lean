@@ -438,6 +438,145 @@ theorem vbsBondSubspace_le_ker :
   simp only [SetLike.mem_coe, LinearMap.mem_ker, Matrix.mulVecLin_apply]
   exact bondLocal_mulVec_vbsBondVec p.1 p.2
 
+/-! ## The local kernel `ker P̂₂^{loc} = W` (Lemma 7.4, final PR) -/
+
+/-- The four VBS bond vectors `Ψ_{σσ'}` are linearly independent.  Their coefficients are
+successively isolated by the product-basis coordinates `|+,0⟩`, `|+,−⟩`, `|−,+⟩`, and
+`|0,−⟩`. -/
+theorem vbsBondVec_linearIndependent :
+    LinearIndependent ℂ (fun p : Fin 2 × Fin 2 => vbsBondVec p.1 p.2) := by
+  rw [Fintype.linearIndependent_iff]
+  intro c hc p
+  have h00 := congrFun hc ![0, 1]
+  have h01 := congrFun hc ![0, 2]
+  have h10 := congrFun hc ![2, 0]
+  have h11 := congrFun hc ![1, 2]
+  simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, vbsBondVec, Pi.zero_apply,
+    Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue] at h00 h01 h10 h11
+  rw [Fintype.sum_prod_type] at h00 h01 h10 h11
+  simp only [Fin.sum_univ_two] at h00 h01 h10 h11
+  rcases p with ⟨p₀, p₁⟩
+  fin_cases p₀ <;> fin_cases p₁
+  · norm_num at h00 ⊢
+    simpa using h00
+  · norm_num at h01 ⊢
+    simpa using h01
+  · norm_num at h10 ⊢
+    simpa using h10
+  · norm_num at h11 ⊢
+    simpa using h11
+
+/-- The VBS bond subspace `W`, spanned by the four independent vectors `Ψ_{σσ'}`, has complex
+dimension four. -/
+theorem finrank_vbsBondSubspace :
+    Module.finrank ℂ vbsBondSubspace = 4 := by
+  rw [vbsBondSubspace, finrank_span_eq_card vbsBondVec_linearIndependent]
+  norm_num
+
+set_option maxHeartbeats 2000000 in
+/-- The single-bond spin-2 projection has rank exactly five.  The lower bound uses five
+independent spin-2 vectors selected from the total-magnetization sectors `2, 1, 0, −1, −2`.
+The upper bound follows from `W ≤ ker P̂₂^{loc}` and rank-nullity. -/
+theorem bondLocal_rank :
+    Matrix.rank (bondSpin2ProjectionS (0 : Fin 2) 1) = 5 := by
+  let P := bondSpin2ProjectionS (0 : Fin 2) 1
+  let basisVec : (Fin 2 → Fin 3) → ((Fin 2 → Fin 3) → ℂ) :=
+    fun a => Pi.single a 1
+  let w : Fin 5 → ((Fin 2 → Fin 3) → ℂ) :=
+    ![basisVec ![0, 0],
+      basisVec ![0, 1] + basisVec ![1, 0],
+      basisVec ![0, 2] + (2 : ℂ) • basisVec ![1, 1] + basisVec ![2, 0],
+      basisVec ![1, 2] + basisVec ![2, 1],
+      basisVec ![2, 2]]
+  have hLIw : LinearIndependent ℂ w := by
+    rw [Fintype.linearIndependent_iff]
+    intro c hc i
+    have h0 := congrFun hc ![0, 0]
+    have h1 := congrFun hc ![0, 1]
+    have h2 := congrFun hc ![1, 1]
+    have h3 := congrFun hc ![1, 2]
+    have h4 := congrFun hc ![2, 2]
+    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply,
+      Fin.sum_univ_five, w, Matrix.cons_val_zero, Matrix.cons_val_one, Pi.add_apply,
+      basisVec, Pi.single_apply, Pi.smul_apply, Fin.isValue] at h0 h1 h2 h3 h4
+    fin_cases i <;> norm_num at h0 h1 h2 h3 h4 ⊢
+    · simpa using h0
+    · simpa using h1
+    · simpa using h2
+    · simpa using h3
+    · simpa using h4
+  have hdot (i : Fin 5) : (spinSDot (0 : Fin 2) 1 2).mulVec (w i) = w i := by
+    funext idx
+    obtain ⟨a, b, hidx⟩ : ∃ a b : Fin 3, idx = ![a, b] :=
+      ⟨idx 0, idx 1, by funext k; fin_cases k <;> rfl⟩
+    subst hidx
+    rw [Matrix.mulVec, dotProduct, sum_fin2_fin3]
+    fin_cases i <;> fin_cases a <;> fin_cases b <;>
+      simp only [w, basisVec, spinSDot_fin2_apply', plus2, minus2, three2,
+        Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue] <;>
+      (try simp) <;>
+      norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
+  have hfix (i : Fin 5) : P.mulVec (w i) = w i := by
+    change (bondSpin2ProjectionS (0 : Fin 2) 1).mulVec (w i) = w i
+    rw [bondLocal_expand]
+    simp only [Matrix.add_mulVec, Matrix.smul_mulVec, ← Matrix.mulVec_mulVec,
+      Matrix.one_mulVec, hdot]
+    funext idx
+    simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+    ring
+  have hLI : LinearIndependent ℂ (fun i : Fin 5 => P.mulVec (w i)) := by
+    simpa only [hfix] using hLIw
+  have hspan :
+      Submodule.span ℂ (Set.range fun i : Fin 5 => P.mulVec (w i)) ≤
+        LinearMap.range (Matrix.mulVecLin P) := by
+    rw [Submodule.span_le]
+    rintro _ ⟨i, rfl⟩
+    exact ⟨w i, rfl⟩
+  have hlower : 5 ≤ Matrix.rank P := by
+    rw [Matrix.rank]
+    calc
+      5 = Module.finrank ℂ
+          (Submodule.span ℂ (Set.range fun i : Fin 5 => P.mulVec (w i))) := by
+            rw [finrank_span_eq_card hLI]
+            norm_num
+      _ ≤ Module.finrank ℂ (LinearMap.range (Matrix.mulVecLin P)) :=
+        Submodule.finrank_mono hspan
+  have hker : 4 ≤ Module.finrank ℂ (LinearMap.ker (Matrix.mulVecLin P)) := by
+    rw [← finrank_vbsBondSubspace]
+    exact Submodule.finrank_mono vbsBondSubspace_le_ker
+  have hnullity := (Matrix.mulVecLin P).finrank_range_add_finrank_ker
+  have hdim : Module.finrank ℂ ((Fin 2 → Fin 3) → ℂ) = 9 := by
+    rw [Module.finrank_pi ℂ]
+    norm_num
+  rw [hdim] at hnullity
+  have hupper : Matrix.rank P ≤ 5 := by
+    rw [Matrix.rank]
+    omega
+  exact le_antisymm hupper hlower
+
+/-- The kernel of the single-bond spin-2 projection has complex dimension four. -/
+theorem finrank_bondLocal_ker :
+    Module.finrank ℂ
+      (LinearMap.ker (Matrix.mulVecLin (bondSpin2ProjectionS (0 : Fin 2) 1))) = 4 := by
+  have hnullity :=
+    (Matrix.mulVecLin (bondSpin2ProjectionS (0 : Fin 2) 1)).finrank_range_add_finrank_ker
+  change Matrix.rank (bondSpin2ProjectionS (0 : Fin 2) 1) +
+      Module.finrank ℂ
+        (LinearMap.ker (Matrix.mulVecLin (bondSpin2ProjectionS (0 : Fin 2) 1))) =
+      Module.finrank ℂ ((Fin 2 → Fin 3) → ℂ) at hnullity
+  rw [bondLocal_rank, Module.finrank_pi ℂ] at hnullity
+  norm_num at hnullity
+  omega
+
+/-- The kernel of the local spin-2 bond projection is exactly the four-dimensional VBS bond
+subspace `W`.  The reverse inclusion is forced by equal finite dimensions from the previously
+proved forward inclusion `vbsBondSubspace_le_ker`. -/
+theorem bondLocal_ker_eq_vbsBondSubspace :
+    LinearMap.ker (Matrix.mulVecLin (bondSpin2ProjectionS (0 : Fin 2) 1)) =
+      vbsBondSubspace := by
+  refine (Submodule.eq_of_le_of_finrank_le vbsBondSubspace_le_ker ?_).symm
+  rw [finrank_bondLocal_ker, finrank_vbsBondSubspace]
+
 /-- **Tasaki Lemma 7.4 (local VBS ground-state characterization), AXIOM.**  A state `Φ` of the
 `S = 1` chain is annihilated by the bond projection onto total spin 2 at the (periodic) bond
 `{x, x+1}`, `P̂₂[Ŝ_x + Ŝ_{x+1}] Φ = 0` (eq. (7.1.19)), if and only if `Φ` has the valence-bond-solid
