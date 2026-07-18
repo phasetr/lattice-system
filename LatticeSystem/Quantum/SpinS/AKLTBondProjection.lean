@@ -474,6 +474,7 @@ theorem finrank_vbsBondSubspace :
   norm_num
 
 set_option maxHeartbeats 2000000 in
+-- The explicit five-vector rank computation exceeds the default heartbeat budget.
 /-- The single-bond spin-2 projection has rank exactly five.  The lower bound uses five
 independent spin-2 vectors selected from the total-magnetization sectors `2, 1, 0, −1, −2`.
 The upper bound follows from `W ≤ ker P̂₂^{loc}` and rank-nullity. -/
@@ -576,6 +577,189 @@ theorem bondLocal_ker_eq_vbsBondSubspace :
       vbsBondSubspace := by
   refine (Submodule.eq_of_le_of_finrank_le vbsBondSubspace_le_ker ?_).symm
   rw [finrank_bondLocal_ker, finrank_vbsBondSubspace]
+
+/-! ## Global bond action on two-site slices -/
+
+/-- The global spin-2 projection on the periodic bond `{x, ringSucc x}` acts on every fixed-rest
+bond slice as the local two-site spin-2 projection.  This holds for every genuine bond `1 < L`,
+including the wrap bond and both ordered bonds when `L = 2`. -/
+theorem bondSlice_bondSpin2ProjectionS_mulVec
+    (hL : 1 < L) (x : Fin L) (Φ : (Fin L → Fin 3) → ℂ) (τ : Fin L → Fin 3) :
+    bondSlice x ((bondSpin2ProjectionS x (ringSucc x)).mulVec Φ) τ =
+      (bondSpin2ProjectionS (0 : Fin 2) 1).mulVec (bondSlice x Φ τ) := by
+  have hxy : x ≠ ringSucc x := by
+    intro h
+    have hv := congrArg Fin.val h
+    simp only [ringSucc] at hv
+    by_cases hx : x.val + 1 < L
+    · rw [Nat.mod_eq_of_lt hx] at hv
+      omega
+    · have heq : x.val + 1 = L := by omega
+      rw [heq, Nat.mod_self] at hv
+      omega
+  have hOnSite {ι : Type} [Fintype ι] [DecidableEq ι]
+      (i : ι) (A : Matrix (Fin 3) (Fin 3) ℂ)
+      (Ψ : (ι → Fin 3) → ℂ) (q : ι → Fin 3) :
+      (onSiteS i A : ManyBodyOpS ι 2).mulVec Ψ q =
+        ∑ t : Fin 3, A (q i) t * Ψ (Function.update q i t) := by
+    rw [Matrix.mulVec, dotProduct]
+    simp only [onSiteS_apply]
+    have hterm (σ : ι → Fin 3) :
+        (if ∀ k, k ≠ i → q k = σ k then A (q i) (σ i) else 0) * Ψ σ =
+          if σ = Function.update q i (σ i) then A (q i) (σ i) * Ψ σ else 0 := by
+      by_cases hσ : σ = Function.update q i (σ i)
+      · have hoff : ∀ k, k ≠ i → q k = σ k := by
+          intro k hki
+          rw [hσ, Function.update_of_ne hki]
+        rw [if_pos hσ, if_pos hoff]
+      · have hoff : ¬ ∀ k, k ≠ i → q k = σ k := by
+          intro hall
+          apply hσ
+          funext k
+          by_cases hki : k = i
+          · subst k
+            rw [Function.update_self]
+          · rw [Function.update_of_ne hki]
+            exact (hall k hki).symm
+        rw [if_neg hσ, if_neg hoff, zero_mul]
+    rw [Finset.sum_congr rfl (fun σ _ => hterm σ), ← Finset.sum_filter]
+    symm
+    refine Finset.sum_bij (fun (t : Fin 3) _ => Function.update q i t) ?_ ?_ ?_ ?_
+    · intro t _
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+      funext k
+      by_cases hki : k = i
+      · subst k
+        rw [Function.update_self, Function.update_self]
+      · rw [Function.update_of_ne hki, Function.update_of_ne hki]
+    · intro s _ t _ hst
+      have := congrFun hst i
+      simpa only [Function.update_self] using this
+    · intro σ hσ
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hσ
+      exact ⟨σ i, Finset.mem_univ _, hσ.symm⟩
+    · intro t _
+      simp only [Function.update_self]
+  have hglue_update_left (a : Fin 2 → Fin 3) (ρ : Fin L → Fin 3) (t : Fin 3) :
+      Function.update (glueBond x a ρ) x t =
+        glueBond x (Function.update a 0 t) ρ := by
+    funext k
+    by_cases hkx : k = x
+    · subst k
+      simp [glueBond]
+    · by_cases hky : k = ringSucc x
+      · subst k
+        rw [Function.update_of_ne hxy.symm]
+        simp [glueBond, hxy.symm]
+      · simp [glueBond, hkx, hky, Function.update_of_ne]
+  have hglue_update_right (a : Fin 2 → Fin 3) (ρ : Fin L → Fin 3) (t : Fin 3) :
+      Function.update (glueBond x a ρ) (ringSucc x) t =
+        glueBond x (Function.update a 1 t) ρ := by
+    funext k
+    by_cases hkx : k = x
+    · subst k
+      rw [Function.update_of_ne hxy]
+      simp [glueBond]
+    · by_cases hky : k = ringSucc x
+      · subst k
+        simp [glueBond, hxy.symm]
+      · simp [glueBond, hkx, hky, Function.update_of_ne]
+  have hSliceLeft (A : Matrix (Fin 3) (Fin 3) ℂ)
+      (Ψ : (Fin L → Fin 3) → ℂ) (ρ : Fin L → Fin 3) :
+      bondSlice x ((onSiteS x A : ManyBodyOpS (Fin L) 2).mulVec Ψ) ρ =
+        (onSiteS (0 : Fin 2) A : ManyBodyOpS (Fin 2) 2).mulVec
+          (bondSlice x Ψ ρ) := by
+    funext a
+    simp only [bondSlice]
+    rw [hOnSite x A Ψ (glueBond x a ρ),
+      hOnSite (0 : Fin 2) A (bondSlice x Ψ ρ) a]
+    apply Finset.sum_congr rfl
+    intro t _
+    rw [show glueBond x a ρ x = a 0 by simp [glueBond], hglue_update_left]
+    rfl
+  have hSliceRight (A : Matrix (Fin 3) (Fin 3) ℂ)
+      (Ψ : (Fin L → Fin 3) → ℂ) (ρ : Fin L → Fin 3) :
+      bondSlice x ((onSiteS (ringSucc x) A : ManyBodyOpS (Fin L) 2).mulVec Ψ) ρ =
+        (onSiteS (1 : Fin 2) A : ManyBodyOpS (Fin 2) 2).mulVec
+          (bondSlice x Ψ ρ) := by
+    funext a
+    simp only [bondSlice]
+    rw [hOnSite (ringSucc x) A Ψ (glueBond x a ρ),
+      hOnSite (1 : Fin 2) A (bondSlice x Ψ ρ) a]
+    apply Finset.sum_congr rfl
+    intro t _
+    rw [show glueBond x a ρ (ringSucc x) = a 1 by simp [glueBond, hxy.symm],
+      hglue_update_right]
+    rfl
+  have hSlicePair (A B : Matrix (Fin 3) (Fin 3) ℂ)
+      (Ψ : (Fin L → Fin 3) → ℂ) (ρ : Fin L → Fin 3) :
+      bondSlice x
+          (((onSiteS x A * onSiteS (ringSucc x) B :
+            ManyBodyOpS (Fin L) 2).mulVec Ψ)) ρ =
+        (onSiteS (0 : Fin 2) A * onSiteS (1 : Fin 2) B :
+          ManyBodyOpS (Fin 2) 2).mulVec (bondSlice x Ψ ρ) := by
+    rw [← Matrix.mulVec_mulVec, hSliceLeft, hSliceRight, Matrix.mulVec_mulVec]
+  have hSliceAdd (Ψ Ψ' : (Fin L → Fin 3) → ℂ) (ρ : Fin L → Fin 3) :
+      bondSlice x (Ψ + Ψ') ρ = bondSlice x Ψ ρ + bondSlice x Ψ' ρ := rfl
+  have hSliceSmul (c : ℂ) (Ψ : (Fin L → Fin 3) → ℂ) (ρ : Fin L → Fin 3) :
+      bondSlice x (c • Ψ) ρ = c • bondSlice x Ψ ρ := rfl
+  have hSliceDot (Ψ : (Fin L → Fin 3) → ℂ) (ρ : Fin L → Fin 3) :
+      bondSlice x ((spinSDot x (ringSucc x) 2).mulVec Ψ) ρ =
+        (spinSDot (0 : Fin 2) 1 2).mulVec (bondSlice x Ψ ρ) := by
+    rw [spinSDot_def, spinSDot_def, Matrix.add_mulVec, Matrix.add_mulVec,
+      Matrix.add_mulVec, Matrix.add_mulVec, hSliceAdd, hSliceAdd,
+      hSlicePair, hSlicePair, hSlicePair]
+  rw [bondSpin2ProjectionS, Matrix.add_mulVec, Matrix.add_mulVec,
+    Matrix.smul_mulVec, Matrix.smul_mulVec, Matrix.smul_mulVec,
+    hSliceAdd, hSliceAdd, hSliceSmul, hSliceSmul, hSliceSmul,
+    ← Matrix.mulVec_mulVec, Matrix.one_mulVec, hSliceDot, hSliceDot]
+  rw [bondSpin2ProjectionS, Matrix.add_mulVec, Matrix.add_mulVec,
+    Matrix.smul_mulVec, Matrix.smul_mulVec, Matrix.smul_mulVec,
+    ← Matrix.mulVec_mulVec, Matrix.one_mulVec]
+  rw [hSliceDot]
+
+/-- The global bond spin-2 projection annihilates a chain state exactly when every fixed-rest
+two-site bond slice belongs to the kernel of the local spin-2 projection.  The equivalence is
+uniform in the periodic bond, including the wrap bond and the two-site ring. -/
+theorem bondSpin2ProjectionS_mulVec_eq_zero_iff_bondSlice_mem_ker
+    (hL : 1 < L) (x : Fin L) (Φ : (Fin L → Fin 3) → ℂ) :
+    (bondSpin2ProjectionS x (ringSucc x)).mulVec Φ = 0 ↔
+      ∀ τ : Fin L → Fin 3,
+        bondSlice x Φ τ ∈
+          LinearMap.ker (Matrix.mulVecLin (bondSpin2ProjectionS (0 : Fin 2) 1)) := by
+  constructor
+  · intro hΦ τ
+    rw [LinearMap.mem_ker, Matrix.mulVecLin_apply,
+      ← bondSlice_bondSpin2ProjectionS_mulVec hL x Φ τ, hΦ]
+    rfl
+  · intro hslice
+    funext q
+    let a : Fin 2 → Fin 3 := ![q x, q (ringSucc x)]
+    have hglue : glueBond x a q = q := by
+      have hxy : x ≠ ringSucc x := by
+        intro h
+        have hv := congrArg Fin.val h
+        simp only [ringSucc] at hv
+        by_cases hx : x.val + 1 < L
+        · rw [Nat.mod_eq_of_lt hx] at hv
+          omega
+        · have heq : x.val + 1 = L := by omega
+          rw [heq, Nat.mod_self] at hv
+          omega
+      funext k
+      by_cases hkx : k = x
+      · subst k
+        simp [a, glueBond]
+      · by_cases hky : k = ringSucc x
+        · subst k
+          simp [a, glueBond, hxy.symm]
+        · simp [glueBond, hkx, hky]
+    have haction :=
+      congrFun (bondSlice_bondSpin2ProjectionS_mulVec hL x Φ q) a
+    have hker := hslice q
+    rw [LinearMap.mem_ker, Matrix.mulVecLin_apply] at hker
+    rw [hker] at haction
+    simpa only [bondSlice, hglue, Pi.zero_apply] using haction
 
 /-- **Tasaki Lemma 7.4 (local VBS ground-state characterization), AXIOM.**  A state `Φ` of the
 `S = 1` chain is annihilated by the bond projection onto total spin 2 at the (periodic) bond
