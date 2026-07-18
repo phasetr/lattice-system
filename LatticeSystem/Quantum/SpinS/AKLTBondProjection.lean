@@ -17,15 +17,13 @@ projection as a polynomial in `Ŝ_x · Ŝ_{x+1}`:
 (7.1.20) — built (after duplicating each `S = 1` site into two `S = 1/2` spins) from a singlet pair
 on the bond `{x, x+1}` tensored with an arbitrary state on the rest of the chain.
 
-The bond projection and the affine identity (7.1.5) are *defined and proved* here.  The VBS
-singlet-tensor form (7.1.20) is realized **concretely** by the Weyl symmetrization
-`Sym²(ℂ²) ≅ spin-1` (eq. (7.1.22)): each `S = 1` site is the symmetric part of two `S = 1/2` spins,
-and the four bond
-vectors `Ψ_{σσ'}` obtained by placing a singlet on the inner qubits span the total-spin `≤ 1`
-subspace `W ⊂ ℂ³ ⊗ ℂ³` (`vbsBondSubspace`).  The predicate `IsVBSGroundForm` is then the concrete
-statement that every two-site bond slice of `Φ` lies in `W`; being defined through `W` alone (with
-no reference to `P̂₂`), it makes Lemma 7.4 a non-tautological equivalence.  The equivalence itself
-(`tasaki_lemma_7_4`) is kept as a documented axiom in this PR pending the tensor-slice discharge.
+The bond projection and the affine identity (7.1.5) are *defined and proved* here.  The four
+concrete bond vectors `Ψ_{σσ'}` obtained by placing a singlet on the inner qubits span the
+total-spin `≤ 1` subspace `W ⊂ ℂ³ ⊗ ℂ³` (`vbsBondSubspace`).  The predicate
+`IsVBSGroundForm` is the concrete statement that every two-site bond slice of `Φ` lies in `W`;
+being defined through `W` alone (with no reference to `P̂₂`), it makes Lemma 7.4 a
+non-tautological equivalence.  The local kernel computation proves `ker P̂₂^{loc} = W`, and the
+global tensor-slice identity then proves `tasaki_lemma_7_4`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §7.1.2–§7.1.3, Lemma 7.4, eqs. (7.1.5)–(7.1.6), (7.1.19)–(7.1.20), pp. 181–187; T. Kennedy,
@@ -57,19 +55,6 @@ theorem aklt_bond_term_eq_bondSpin2Projection (x y : Fin L) :
       (2 : ℂ) • bondSpin2ProjectionS x y - (2 / 3 : ℂ) • (1 : ManyBodyOpS (Fin L) 2) := by
   simp only [bondSpin2ProjectionS, smul_add, smul_smul]
   norm_num
-
-/-- The **Weyl symmetrization embedding** `Sym²(ℂ²) ≅ spin-1` (Tasaki eq. (7.1.22), p. 187): the map
-sending the two duplicated `S = 1/2` spins on one site to the physical `S = 1` state,
-`|↑↑⟩ ↦ |+⟩`, `|↓↓⟩ ↦ |−⟩`, `|↑↓⟩, |↓↑⟩ ↦ (1/√2)|0⟩`.  The qubit basis `Fin 2` is `↑ = 0`, `↓ = 1`;
-the spin-1 basis `Fin 3` is `|+⟩ = 0`, `|0⟩ = 1`, `|−⟩ = 2` (the `spinSOp3 = diag(1,0,−1)`
-convention).  This is the shared substrate used both by the global VBS state (§7.1.2) and by the
-§7.2.8 string order, so it is defined once here for reuse. -/
-noncomputable def spin1SymEmbed : Matrix (Fin 3) (Fin 2 × Fin 2) ℂ :=
-  fun m q =>
-    if m = 0 ∧ q = (0, 0) then 1
-    else if m = 2 ∧ q = (1, 1) then 1
-    else if m = 1 ∧ (q = (0, 1) ∨ q = (1, 0)) then (((Real.sqrt 2)⁻¹ : ℝ) : ℂ)
-    else 0
 
 /-- The four **VBS bond vectors** `Ψ_{σσ'}` on a single bond of the duplicated `S = 1` chain (Tasaki
 eqs. (7.1.19)–(7.1.20), p. 186): the two-site spin-1 states obtained by putting the outer qubits
@@ -428,8 +413,8 @@ theorem bondLocal_mulVec_vbsBondVec (σ σ' : Fin 2) :
 /-- **Kernel inclusion `W ⊆ ker P̂₂^{loc}` (Lemma 7.4, forward).**  The VBS bond subspace `W`
 (`vbsBondSubspace`, the span of the four `Ψ_{σσ'}`) is contained in the kernel of the single-bond
 spin-2 projection `bondSpin2ProjectionS (0 : Fin 2) 1` on `ℂ³ ⊗ ℂ³` (Tasaki §7.1.3, eqs.
-(7.1.19)–(7.1.20), p. 186).  The reverse inclusion (hence equality,
-`dim = 4`) is discharged in the following PR. -/
+(7.1.19)–(7.1.20), p. 186).  The reverse inclusion follows below from the local rank and
+nullity computation. -/
 theorem vbsBondSubspace_le_ker :
     vbsBondSubspace ≤
       LinearMap.ker (Matrix.mulVecLin (bondSpin2ProjectionS (0 : Fin 2) 1)) := by
@@ -438,7 +423,7 @@ theorem vbsBondSubspace_le_ker :
   simp only [SetLike.mem_coe, LinearMap.mem_ker, Matrix.mulVecLin_apply]
   exact bondLocal_mulVec_vbsBondVec p.1 p.2
 
-/-! ## The local kernel `ker P̂₂^{loc} = W` (Lemma 7.4, final PR) -/
+/-! ## The local kernel `ker P̂₂^{loc} = W` (Lemma 7.4) -/
 
 /-- The four VBS bond vectors `Ψ_{σσ'}` are linearly independent.  Their coefficients are
 successively isolated by the product-basis coordinates `|+,0⟩`, `|+,−⟩`, `|−,+⟩`, and
@@ -761,7 +746,7 @@ theorem bondSpin2ProjectionS_mulVec_eq_zero_iff_bondSlice_mem_ker
     rw [hker] at haction
     simpa only [bondSlice, hglue, Pi.zero_apply] using haction
 
-/-- **Tasaki Lemma 7.4 (local VBS ground-state characterization), AXIOM.**  A state `Φ` of the
+/-- **Tasaki Lemma 7.4 (local VBS ground-state characterization), PROVED.**  A state `Φ` of the
 `S = 1` chain is annihilated by the bond projection onto total spin 2 at the (periodic) bond
 `{x, x+1}`, `P̂₂[Ŝ_x + Ŝ_{x+1}] Φ = 0` (eq. (7.1.19)), if and only if `Φ` has the valence-bond-solid
 singlet-tensor form (7.1.20) on that bond (`IsVBSGroundForm`).
@@ -770,13 +755,14 @@ This is the local characterization that drives the Kennedy–Lieb–Tasaki uniqu
 lies in the AKLT ground space iff it is annihilated by *every* bond projection, i.e. iff every bond
 carries a singlet pair (the VBS state).  The concrete bond projection and the affine identity
 (7.1.5) are proved above; the singlet form (7.1.20) is now the concrete predicate `IsVBSGroundForm`
-(bond slices in the VBS subspace `W`).  The forward/backward tensor-slice discharge of this
-equivalence is staged over the following PRs, so it is kept here as a documented axiom.  The
-hypothesis
+(bond slices in the VBS subspace `W`).  The proof combines the global bond-slice equivalence with
+the proved local identity `ker P̂₂^{loc} = W`.  The hypothesis
 `1 < L` ensures the bond `{x, ringSucc x}` is genuinely two-site: on the degenerate one-site ring
 `L = 1` one has `ringSucc x = x`, so the operator would be a single-site self-interaction rather
 than the two-site bond projection of Lemma 7.4. -/
-axiom tasaki_lemma_7_4 (hL : 1 < L) (x : Fin L) (Φ : (Fin L → Fin 3) → ℂ) :
-    (bondSpin2ProjectionS x (ringSucc x)).mulVec Φ = 0 ↔ IsVBSGroundForm L x Φ
+theorem tasaki_lemma_7_4 (hL : 1 < L) (x : Fin L) (Φ : (Fin L → Fin 3) → ℂ) :
+    (bondSpin2ProjectionS x (ringSucc x)).mulVec Φ = 0 ↔ IsVBSGroundForm L x Φ := by
+  simpa only [IsVBSGroundForm, bondLocal_ker_eq_vbsBondSubspace] using
+    bondSpin2ProjectionS_mulVec_eq_zero_iff_bondSlice_mem_ker hL x Φ
 
 end LatticeSystem.Quantum
