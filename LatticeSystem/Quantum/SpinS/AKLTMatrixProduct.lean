@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.MPSTheorem75
+import LatticeSystem.Quantum.SpinS.MPSTheorem76Defs
 
 /-!
 # Tasaki §7.2.2: matrix product representation of the AKLT model (Theorems 7.5, 7.6)
@@ -39,13 +40,6 @@ namespace LatticeSystem.Quantum
 open Matrix
 
 variable {D N : ℕ}
-
-/-- Two MPS matrix collections **generate the same matrix product state** (eq. (7.2.36) for all
-chain lengths and boundary conditions).  A faithful definition needs the explicit MPS state
-vectors; it is kept as an uninterpreted predicate so the uniqueness theorem applies only to
-genuinely equal
-states. -/
-axiom GeneratesSameMPS (A B : MPSMatrices D N) : Prop
 
 /-- **Tasaki Theorem 7.6 (uniqueness of the injective MPS representation,
 Fannes–Nachtergaele–Werner), AXIOM.**  Two injective collections `(A^σ)`, `(B^σ)` that generate the
