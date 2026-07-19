@@ -97,7 +97,8 @@ private theorem norm_positivePower_le
 /-- Powers of a positive unital finite Kraus transfer are uniformly bounded by four.
 
 This theorem-specific endpoint is consumed by `MPSTheorem75Peripheral` to bound the transfer
-spectrum by the closed unit disk. -/
+spectrum by the closed unit disk and by `MPSTheorem76Unitary` to force equality of the two
+positive normalization constants. -/
 theorem norm_finiteKrausMap_pow_le [NeZero D]
     {ι : Type*} [Fintype ι]
     (A : ι → CStarMatrix (Fin D) (Fin D) ℂ)

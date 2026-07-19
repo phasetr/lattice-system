@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.MPSTheorem75
+import LatticeSystem.Quantum.SpinS.MPSTheorem76Unitary
 
 /-!
 # Tasaki §7.2.2: matrix product representation of the AKLT model (Theorems 7.5, 7.6)
@@ -20,18 +21,19 @@ eigenvalue and every other eigenvalue has strictly smaller modulus. This claim i
 corrected formalization additionally assumes `HasFaithfulDualEigenmatrix`. See `MPSTheorem75`,
 `docs/index.md`, and `tex/proof-guide.tex` for the counterexample and the corrected statement.
 
-**Theorem 7.6** (Fannes–Nachtergaele–Werner, stated without proof in the book): the injective matrix
-product *representation* is essentially unique — two injective collections generating the same MPS
-are related by a gauge `A^σ = (θ/c) U B^σ U†` with `U` unitary and `|θ| = 1`.  This uniqueness
-underlies the classification of symmetry-protected topological phases (§8.3.4).
+**Theorem 7.6** (Fannes–Nachtergaele–Werner): if two injective collections have identical periodic
+trace coefficients at every chain length, then there is a unitary `U`, unique up to phase, such
+that `B^σ = U† A^σ U` for every `σ`. This uniqueness underlies the classification of
+symmetry-protected topological phases (§8.3.4).
 
 The transfer matrix, ordered products, normalization, spanning conditions, spectral primitivity
-condition, and corrected Theorem 7.5 are imported from `MPSTheorem75`. Theorem 7.6, which is
-unproven in the book, remains a documented axiom.
+condition, and corrected Theorem 7.5 are imported from `MPSTheorem75`. Theorem 7.6 is proved from
+the finite-dimensional algebra and unitary-gauge substrate in `MPSTheorem76Unitary`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §7.2.2, Theorems 7.5–7.6, eqs. (7.2.36), (7.2.41)–(7.2.42), pp. 202–203; M. Fannes, B.
-Nachtergaele, R. F. Werner, Commun. Math. Phys. **144**, 443 (1992).
+2020), §7.2.2, Theorem 7.6, eqs. (7.2.43)–(7.2.44), p. 203; M. Fannes, B. Nachtergaele, and
+R. F. Werner, “Finitely correlated pure states,” *Journal of Functional Analysis* **120** (1994),
+511–534.
 -/
 
 namespace LatticeSystem.Quantum
@@ -40,27 +42,27 @@ open Matrix
 
 variable {D N : ℕ}
 
-/-- Two MPS matrix collections **generate the same matrix product state** (eq. (7.2.36) for all
-chain lengths and boundary conditions).  A faithful definition needs the explicit MPS state
-vectors; it is kept as an uninterpreted predicate so the uniqueness theorem applies only to
-genuinely equal
-states. -/
-axiom GeneratesSameMPS (A B : MPSMatrices D N) : Prop
+/-- **Tasaki Theorem 7.6 (uniqueness of the injective MPS representation).**
+Two injective MPS collections with identical periodic trace coefficients at every length are
+related by a unitary gauge, and that unitary is unique up to phase.
 
-/-- **Tasaki Theorem 7.6 (uniqueness of the injective MPS representation,
-Fannes–Nachtergaele–Werner), AXIOM.**  Two injective collections `(A^σ)`, `(B^σ)` that generate the
-same matrix product state are
-related by a **unitary gauge transformation**: there is a unitary `U` such that `A^σ = U B^σ U†` for
-every `σ` (eq. (7.2.44); no additional rescaling — a nonzero scalar would multiply the length-`L`
-amplitudes by its `L`-th power and so change the state).  The injective matrix product
-representation is therefore essentially unique (up to unitary gauge), the fact underlying the
-classification of symmetry-protected topological phases (§8.3.4).  Stated without proof in the book;
-recorded as a
-documented axiom. -/
-axiom mps_theorem_7_6 (A B : MPSMatrices D N) (lamA lamB : ℝ)
-    (hA : IsInjectiveMPS A lamA) (hB : IsInjectiveMPS B lamB) (hsame : GeneratesSameMPS A B) :
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §7.2.2, Theorem 7.6, eqs. (7.2.43)–(7.2.44), p. 203; M. Fannes, B. Nachtergaele, and
+R. F. Werner, *Journal of Functional Analysis* **120** (1994), 511–534. -/
+theorem mps_theorem_7_6
+    (A B : MPSMatrices D N) (lamA lamB : ℝ)
+    (hA : IsInjectiveMPS A lamA)
+    (hB : IsInjectiveMPS B lamB)
+    (hsame : GeneratesSameMPS A B) :
     ∃ U : Matrix (Fin D) (Fin D) ℂ,
       U ∈ Matrix.unitaryGroup (Fin D) ℂ ∧
-        ∀ σ : Fin (N + 1), A σ = U * B σ * U.conjTranspose
+      (∀ σ, B σ = U.conjTranspose * A σ * U) ∧
+      ∀ V : Matrix (Fin D) (Fin D) ℂ,
+        V ∈ Matrix.unitaryGroup (Fin D) ℂ →
+        (∀ σ, B σ = V.conjTranspose * A σ * V) →
+        ∃ z : ℂ, ‖z‖ = 1 ∧ V = z • U := by
+  obtain ⟨U, hgauge, hunique⟩ :=
+    MPSTheorem76.Internal.exists_unitary_gauge_data A B lamA lamB hA hB hsame
+  exact ⟨U, U.property, hgauge, hunique⟩
 
 end LatticeSystem.Quantum
