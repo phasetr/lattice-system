@@ -291,3 +291,8 @@ tasaki_lemma_7_4
 # three-condition equivalence while exposing the faithful dual eigenmatrix hypothesis omitted from
 # the source. It is the terminal theorem-unit endpoint, proved with Standard 3 only.
 mps_theorem_7_5
+
+# PERMANENT V1 book capstone: Tasaki §7.2.2 Theorem 7.6 (unitary-gauge
+# uniqueness, Issue #5090), proved with Standard 3 axioms only.
+# Legitimately zero-referenced terminal book theorem.
+mps_theorem_7_6
