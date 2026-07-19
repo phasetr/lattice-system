@@ -129,11 +129,22 @@ def token_counter(blob):
     return Counter(_TOKEN_RE.findall(blob))
 
 
+def last_seg(name):
+    """Return the final identifier segment of a bare or qualified Lean name."""
+    return name.rsplit(".", 1)[-1]
+
+
 def load_allowlist():
     if not os.path.exists(ALLOWLIST):
         return set()
-    return {ln.strip() for ln in open(ALLOWLIST, encoding="utf-8")
+    return {last_seg(ln.strip())
+            for ln in open(ALLOWLIST, encoding="utf-8")
             if ln.strip() and not ln.startswith("#")}
+
+
+def is_allowlisted(name, allow):
+    """Test allowlist membership after normalizing a parsed declaration name."""
+    return last_seg(name) in allow
 
 
 def strip_comments(text):
@@ -271,12 +282,10 @@ def main():
     # last segment, so a qualified decl (e.g. Matrix.foo, referenced as `foo` or
     # `Matrix.foo`) is audited too; sharing a last segment only makes this more
     # conservative (never a false block), it does not open a bypass.
-    def last_seg(n):
-        return n.rsplit(".", 1)[-1]
     ndecl_last = Counter(last_seg(d[0]) for d in decls)
     v1 = []
     for name, stmt, f, ln, is_simp in scope:
-        if is_simp or name in allow:
+        if is_simp or is_allowlisted(name, allow):
             continue
         seg = last_seg(name)
         if counts.get(seg, 0) - ndecl_last[seg] <= 0:
@@ -290,7 +299,7 @@ def main():
     v2 = []
     seen = set()
     for name, stmt, f, ln, _ in scope:
-        if not stmt or stmt in seen or name in allow:
+        if not stmt or stmt in seen or is_allowlisted(name, allow):
             continue
         others = [g for g in stmt_map.get(stmt, []) if (g[0], g[1], g[2]) != (name, f, ln)]
         if others:

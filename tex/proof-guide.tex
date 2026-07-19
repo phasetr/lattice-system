@@ -11900,24 +11900,44 @@ interaction penalizes precisely the spin-$2$ component, while the Lemma 7.4 proo
 local kernel equality and the tensor-slice equivalence.
 
 \medskip
-\noindent\textbf{§7.2.1 Hidden antiferromagnetic order / string order parameter} (den
-Nijs--Rommelse; Tasaki §7.2.1, eqs.~(7.2.6)--(7.2.8), pp.~192--194;
-\texttt{Quantum/SpinS/AKLTStringOrder.lean}, Issue \#4485).  The AKLT VBS ground state carries no
-Néel order but a subtle \emph{hidden} antiferromagnetic order, measured by the den Nijs--Rommelse
-string order parameter.  \texttt{spinSStringPhaseS1} is the single-site string phase
-$e^{i\pi\hat S^z}=\mathrm{diag}(-1,1,-1)$ for $S=1$ (entry $(-1)^{k+1}$); \texttt{stringOperatorS}
-$x\,y$ is the diagonal string operator $\exp\!\big(i\pi\sum_{x<z<y}\hat S_z^{(3)}\big)$, acting on a
-configuration $\sigma$ by $\prod_{x<z<y}(-1)^{\sigma_z+1}$; and \texttt{stringCorrelationS}
-$x\,y\,\Phi=-\langle\Phi|\hat S_x^{(3)}\exp(i\pi\sum\hat S^{(3)})\hat S_y^{(3)}|\Phi\rangle$ is the
-den Nijs--Rommelse string correlation $S^{(3)}_{x,y}$ (eq.~7.2.6, with the leading minus; the raw
-expectation is negative, $\to-\tfrac49$ for the VBS state, so the minus makes it positive, and
-$O_{\mathrm{string}}^{(3)}=\lim_{d}\lim_{L}S^{(3)}_{x,y}$).  The axiom
-\texttt{aklt\_string\_order\_7\_2\_8} states that for the AKLT VBS ground-state family (carried by the
-uninterpreted marker \texttt{IsAKLTVBSGroundStateFamily}) the string order parameter equals
-$O_{\mathrm{string}}^{(3)}(\Phi_{\mathrm{VBS}})=\tfrac49>0$ (eq.~7.2.8, written in the explicit
-double-$\varepsilon$ form with the inner thermodynamic limit $L\uparrow\infty$ taken first).  The
-positive string order is the hidden antiferromagnetic order of the Haldane phase (equal in all three
-directions by SU(2) invariance, while the Néel order vanishes).  Recorded as a documented axiom.
+\noindent\textbf{§7.2.1 Hidden antiferromagnetic order / string order parameter}
+(den Nijs--Rommelse; Tasaki, \emph{Physics and Mathematics of Quantum
+Many-Body Systems}, 1st ed., Springer, 2020, §7.2.1, corrected
+eqs.~(7.2.6)--(7.2.8), pp.~193--194; §7.2.2,
+eqs.~(7.2.12)--(7.2.25), pp.~195--198; Problem 7.2.2.c--d, p.~200,
+and solutions (S.73)--(S.76), pp.~507--508; Issue \#5092).
+The unnormalized periodic state \texttt{akltVBSState} is the spin-one,
+bond-dimension-two trace-product MPS formed from the matrices
+\texttt{akltVBSMatrices}.  The concrete phase
+\texttt{spinSStringPhaseS1} is
+$e^{i\pi\hat S^z} = \mathrm{diag}(-1,1,-1)$, and
+\texttt{stringOperatorS} is its product over the strict interval $x < z < y$.
+The axis-indexed definitions \texttt{stringOperatorAxisS} and
+\texttt{stringCorrelationAxisS} use the existing spin-component selector
+for every $\alpha \in \{0,1,2\}$.  Equation~(7.2.6) contributes exactly one
+leading minus to the normalized Rayleigh ratio.  The official author
+erratum at
+\url{https://haltasaki.github.io/books/pmqmbs/AddendaErrata.pdf}
+removes the extra minus on the right-hand side of eq.~(7.2.7).
+
+The proof of \texttt{aklt\_string\_order\_7\_2\_8} first evaluates the
+axis-three finite correlation by an explicit doubled transfer matrix.
+The periodic norm and endpoint--phase--endpoint contraction give the
+finite ratio, and its decaying eigenvalue yields the uniform
+thermodynamic estimate.  Explicit spin-one physical rotations and
+spin-half auxiliary gauges fix \texttt{akltVBSState} and conjugate the
+complete finite string observable, which identifies the correlations in
+axes one and two with the axis-three correlation.  The theorem proves the
+corrected full three-axis value
+$O_{\mathrm{string}}^{(\alpha)}(\Phi_{\mathrm{VBS}}) = \tfrac49$ in the
+explicit iterated-$\varepsilon$ form, with the inner
+$L\uparrow\infty$ limit before the separation limit.  The proof uses only
+the Standard~3 axioms and has no logical dependency on Theorems 7.1,
+7.5, or 7.6.  The implementation is split across
+\texttt{AKLTStringOrderDefs.lean},
+\texttt{AKLTStringOrderTransfer.lean},
+\texttt{AKLTStringOrderCovariance.lean}, and
+\texttt{AKLTStringOrder.lean}.
 Chapters~3--10 backfill.
 
 \medskip

@@ -97,6 +97,10 @@ import LatticeSystem.Quantum.SpinS.MPSTheorem76Unitary
 import LatticeSystem.Quantum.SpinS.AKLTMatrixProduct
 import LatticeSystem.Quantum.SpinS.AKLTInfiniteChain
 import LatticeSystem.Quantum.SpinS.AKLTStability
+import LatticeSystem.Quantum.SpinS.SiteComponent
+import LatticeSystem.Quantum.SpinS.AKLTStringOrderDefs
+import LatticeSystem.Quantum.SpinS.AKLTStringOrderTransfer
+import LatticeSystem.Quantum.SpinS.AKLTStringOrderCovariance
 import LatticeSystem.Quantum.SpinS.AKLTStringOrder
 import LatticeSystem.Quantum.SpinS.ClusterState
 import LatticeSystem.Quantum.SpinS.GeneralAKLT
