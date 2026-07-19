@@ -91,6 +91,9 @@ import LatticeSystem.Quantum.SpinS.MPSTheorem75Linear
 import LatticeSystem.Quantum.SpinS.MPSTheorem75Choi
 import LatticeSystem.Quantum.SpinS.MPSTheorem75Peripheral
 import LatticeSystem.Quantum.SpinS.MPSTheorem75
+import LatticeSystem.Quantum.SpinS.MPSTheorem76Defs
+import LatticeSystem.Quantum.SpinS.MPSTheorem76Algebra
+import LatticeSystem.Quantum.SpinS.MPSTheorem76Unitary
 import LatticeSystem.Quantum.SpinS.AKLTMatrixProduct
 import LatticeSystem.Quantum.SpinS.AKLTInfiniteChain
 import LatticeSystem.Quantum.SpinS.AKLTStability
