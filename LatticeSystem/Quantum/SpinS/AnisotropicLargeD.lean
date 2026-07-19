@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.AKLTStability
+import LatticeSystem.Quantum.SpinS.SiteComponent
 
 /-!
 # Tasaki §8.1.1: the large-`D` phase of the anisotropic `S = 1` chain (Theorem 8.1)
@@ -46,11 +47,6 @@ nearest-neighbour Heisenberg term plus the single-ion `D (Ŝ^{(3)})²` term. -/
 noncomputable def anisotropicChainHamiltonianS (L : ℕ) (D : ℝ) : ManyBodyOpS (Fin L) 2 :=
   heisenbergHamiltonianS (ringCoupling L) 2 +
     (D : ℂ) • ∑ x : Fin L, spinSSiteOp3 x 2 * spinSSiteOp3 x 2
-
-/-- The site-`x` spin component `Ŝ_x^{(α)}` selected by `α : Fin 3` (`0 ↦ Ŝ^{(1)}`, `1 ↦ Ŝ^{(2)}`,
-`2 ↦ Ŝ^{(3)}`), used to state the correlation decay for all three spin directions. -/
-noncomputable def spinSSiteComponentS (α : Fin 3) (x : Fin L) : ManyBodyOpS (Fin L) 2 :=
-  ![spinSSiteOp1 x 2, spinSSiteOp2 x 2, spinSSiteOp3 x 2] α
 
 /-- **Tasaki Theorem 8.1 (large-`D` phase: gap and exponential clustering), AXIOM.**  There is a
 threshold `D₀ > 0` such that for every anisotropy `D ≥ D₀` there are positive constants `ΔE₀, C, ξ`

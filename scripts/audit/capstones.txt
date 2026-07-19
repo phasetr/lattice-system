@@ -286,6 +286,12 @@ tasaki_lemma_6_4_general_trial_energy_bound
 # Proved with std3 only; this is the terminal textbook endpoint, not a temporary entry.
 tasaki_lemma_7_4
 
+# Permanent V1 book capstone: `LatticeSystem.Quantum.aklt_string_order_7_2_8`
+# (Tasaki §7.2.1, eq. (7.2.8), pp. 193–194, with the corrected sign convention
+# from the official erratum to eq. (7.2.7); tracker #5092).
+# Proved with Standard 3 only; this terminal book calculation is legitimately zero-referenced.
+LatticeSystem.Quantum.aklt_string_order_7_2_8
+
 # Permanent V1 book capstone: corrected Tasaki §7.2.2 Theorem 7.5 (1st ed., eqs.
 # (7.2.41)–(7.2.42), pp. 202–203; tracker #5088). The proved theorem preserves the printed
 # three-condition equivalence while exposing the faithful dual eigenmatrix hypothesis omitted from
