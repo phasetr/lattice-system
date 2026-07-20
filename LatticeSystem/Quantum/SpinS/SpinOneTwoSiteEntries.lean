@@ -8,7 +8,8 @@ operators on the two-site index type `Λ = Fin 2`, i.e. on `ℂ³ ⊗ ℂ³`:
 
 * the enumeration of a sum over the nine two-site configurations `Fin 2 → Fin 3`
   (`sum_fin2_fin3`);
-* the single-site ladder and `Ŝ^{(3)}` entries at `N = 2` (`plus2`, `minus2`, `three2`);
+* the single-site ladder and `Ŝ^{(3)}` entries at `N = 2` (`spinSOpPlus_two_apply`,
+  `spinSOpMinus_two_apply`, `spinSOp3_two_apply`);
 * the two-site dot product `Ŝ_0 · Ŝ_1` as a plain tensor of single-site operators
   (`spinSDot_fin2_apply`) and in its imaginary-free ladder form
   `½ (Ŝ⁺ ⊗ Ŝ⁻ + Ŝ⁻ ⊗ Ŝ⁺) + Ŝ^{(3)} ⊗ Ŝ^{(3)}` (`spinSDot_fin2_apply'`).
@@ -58,7 +59,7 @@ lemma spinSDot_fin2_apply (σ' σ : Fin 2 → Fin 3) :
 
 /-- Raising-operator entries at `N = 2` (`Ŝ^+` on the spin-1 ladder): `√2` on the two raising
 pairs, `0` otherwise. -/
-lemma plus2 (i j : Fin 3) :
+lemma spinSOpPlus_two_apply (i j : Fin 3) :
     spinSOpPlus 2 i j =
       if i.val + 1 = j.val then ((Real.sqrt 2 : ℝ) : ℂ) else 0 := by
   by_cases h : i.val + 1 = j.val
@@ -69,7 +70,7 @@ lemma plus2 (i j : Fin 3) :
 
 /-- Lowering-operator entries at `N = 2` (`Ŝ^-` on the spin-1 ladder): `√2` on the two lowering
 pairs, `0` otherwise. -/
-lemma minus2 (i j : Fin 3) :
+lemma spinSOpMinus_two_apply (i j : Fin 3) :
     spinSOpMinus 2 i j =
       if j.val + 1 = i.val then ((Real.sqrt 2 : ℝ) : ℂ) else 0 := by
   by_cases h : j.val + 1 = i.val
@@ -80,7 +81,7 @@ lemma minus2 (i j : Fin 3) :
 
 /-- `Ŝ^{(3)}` entries at `N = 2`: diagonal `1 − k` (magnetic quantum
 number), off-diagonal `0`. -/
-lemma three2 (i j : Fin 3) :
+lemma spinSOp3_two_apply (i j : Fin 3) :
     spinSOp3 2 i j = if i = j then (1 : ℂ) - (i.val : ℂ) else 0 := by
   unfold spinSOp3
   rw [Matrix.diagonal_apply]

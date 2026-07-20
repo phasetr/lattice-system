@@ -123,7 +123,8 @@ kernel of the single-bond spin-2 projection
 (`Λ = Fin 2`, `L = 2`).  This is Tasaki's forward direction
 (7.1.20) ⇒ (7.1.19), verified here by an explicit `9`-dimensional
 linear-algebra computation.  The entry-level formulas for the spin-1 operators used throughout
-(`sum_fin2_fin3`, `spinSDot_fin2_apply`, `plus2`, `minus2`, `three2`, `spinSDot_fin2_apply'`)
+(`sum_fin2_fin3`, `spinSDot_fin2_apply`, `spinSDot_fin2_apply'`, `spinSOpPlus_two_apply`,
+`spinSOpMinus_two_apply`, `spinSOp3_two_apply`)
 live in `LatticeSystem.Quantum.SpinS.SpinOneTwoSiteEntries`. -/
 
 /-- The image `Ŝ_0 · Ŝ_1 |Ψ_{↑↓}⟩` of the mixed bond vector `Ψ_{↑↓} = vbsBondVec 0 1`
@@ -170,7 +171,8 @@ private lemma dot_mulVec_upUp :
   simp only [vbsBondVec, Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue]
   fin_cases a <;> fin_cases b <;>
     simp only [Pi.neg_apply, vbsBondVec, spinSDot_fin2_apply', Matrix.cons_val_zero,
-      Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
+      Matrix.cons_val_one, spinSOpPlus_two_apply, spinSOpMinus_two_apply, spinSOp3_two_apply,
+      Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
     norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
@@ -188,7 +190,8 @@ private lemma dot_mulVec_dnDn :
   simp only [vbsBondVec, Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue]
   fin_cases a <;> fin_cases b <;>
     simp only [Pi.neg_apply, vbsBondVec, spinSDot_fin2_apply', Matrix.cons_val_zero,
-      Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
+      Matrix.cons_val_one, spinSOpPlus_two_apply, spinSOpMinus_two_apply, spinSOp3_two_apply,
+      Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
     norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
@@ -205,7 +208,8 @@ private lemma dot_mulVec_upDn :
   simp only [vbsBondVec, Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue]
   fin_cases a <;> fin_cases b <;>
     simp only [dotImageUpDn, spinSDot_fin2_apply', Matrix.cons_val_zero,
-      Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
+      Matrix.cons_val_one, spinSOpPlus_two_apply, spinSOpMinus_two_apply, spinSOp3_two_apply,
+      Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
     norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
@@ -222,7 +226,8 @@ private lemma dot_mulVec2_upDn :
   simp only [dotImageUpDn, Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue]
   fin_cases a <;> fin_cases b <;>
     simp only [dotImage2UpDn, spinSDot_fin2_apply', Matrix.cons_val_zero,
-      Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
+      Matrix.cons_val_one, spinSOpPlus_two_apply, spinSOpMinus_two_apply, spinSOp3_two_apply,
+      Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
     norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
@@ -239,7 +244,8 @@ private lemma dot_mulVec_dnUp :
   simp only [vbsBondVec, Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue]
   fin_cases a <;> fin_cases b <;>
     simp only [dotImageDnUp, spinSDot_fin2_apply', Matrix.cons_val_zero,
-      Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
+      Matrix.cons_val_one, spinSOpPlus_two_apply, spinSOpMinus_two_apply, spinSOp3_two_apply,
+      Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
     norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
@@ -256,7 +262,8 @@ private lemma dot_mulVec2_dnUp :
   simp only [dotImageDnUp, Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue]
   fin_cases a <;> fin_cases b <;>
     simp only [dotImage2DnUp, spinSDot_fin2_apply', Matrix.cons_val_zero,
-      Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
+      Matrix.cons_val_one, spinSOpPlus_two_apply, spinSOpMinus_two_apply, spinSOp3_two_apply,
+      Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
     norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
@@ -423,7 +430,8 @@ theorem bondLocal_rank :
     subst hidx
     rw [Matrix.mulVec, dotProduct, sum_fin2_fin3]
     fin_cases i <;> fin_cases a <;> fin_cases b <;>
-      simp only [w, basisVec, spinSDot_fin2_apply', plus2, minus2, three2,
+      simp only [w, basisVec, spinSDot_fin2_apply', spinSOpPlus_two_apply,
+        spinSOpMinus_two_apply, spinSOp3_two_apply,
         Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue] <;>
       (try simp) <;>
       norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
