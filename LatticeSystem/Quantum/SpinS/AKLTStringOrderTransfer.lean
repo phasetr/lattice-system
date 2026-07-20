@@ -715,7 +715,7 @@ private theorem state_norm_exact (L : ℕ) :
 
 /-- The frozen periodic akltVBSState has a strictly positive squared norm once the
 ring contains at least two sites. -/
-private theorem state_norm_pos (L : ℕ) (hL : 2 ≤ L) :
+theorem state_norm_pos (L : ℕ) (hL : 2 ≤ L) :
     0 < vecNormSqRe (akltVBSState L) := by
   rw [state_norm_exact]
   have hfactor :
