@@ -302,3 +302,22 @@ mps_theorem_7_5
 # uniqueness, Issue #5090), proved with Standard 3 axioms only.
 # Legitimately zero-referenced terminal book theorem.
 mps_theorem_7_6
+
+# TEMPORARY arc-tips (temp-then-delist lifecycle) — Tasaki §7.1.4 Knabe gap (tracker #5094),
+# `Quantum/SpinS/ManyBodySpectralGap.lean`.  The §7.1.4 landing was split in two on the user's
+# instruction: this PR lands ONLY the model-independent spectral lemmas (so that the LSM ring gap
+# can drop its two duplicated `private` helpers and its inline first-excited block right now),
+# while the AKLT Knabe certificate modules — the consumers of the three entries below — land in a
+# separate PR (their build cost is being decided separately).  Consumers, once that lands:
+#   * `realSpectrum_ge_of_sq_sub_smul_posSemidef` — the Knabe spectral step `H ≥ 0`, `H² − γH ≥ 0`
+#     ⟹ nonzero spectrum `≥ γ` (Knabe, J. Stat. Phys. 52 (1988), 627–638; Tasaki pp. 188–190),
+#     consumed by the AKLT ring-gap assembly;
+#   * `isPositiveSpectralGap_affine` / `isGroundEnergy_affine` — transport of gap and ground energy
+#     along `H ↦ aH + b·1` (`a > 0`), consumed when the projector-sum normalisation of the AKLT
+#     Hamiltonian is converted back to the physical one.  These two share a `private` helper and so
+#     must land together.
+# RE-EVALUATE/DELIST when the §7.1.4 AKLT modules land (or SUNSET the decls if that landing is
+# abandoned): they must not stay zero-referenced permanently.
+realSpectrum_ge_of_sq_sub_smul_posSemidef
+isPositiveSpectralGap_affine
+isGroundEnergy_affine
