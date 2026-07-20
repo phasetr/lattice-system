@@ -12,43 +12,13 @@ import LatticeSystem.Quantum.SpinS.LiebSchultzMattisOrthogonality
 import LatticeSystem.Quantum.SpinS.HermitianSecondEigenvalue
 import LatticeSystem.Quantum.SpinS.HermitianGapExists
 import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrder
+import LatticeSystem.Quantum.SpinS.ManyBodySpectralGap
 
 namespace LatticeSystem.Quantum
 
 open Matrix Module
 
 variable {L N : ℕ}
-
-/-- Each Hermitian eigenvalue of the ring Hamiltonian is realised by a nonzero eigenvector, hence
-lies in the real spectrum. -/
-private theorem afm_eigenvalues_mem_realSpectrum (L N : ℕ) (i : (Fin L → Fin (N + 1))) :
-    (afmHeisenbergChainHamiltonianS_isHermitian L N).eigenvalues i ∈
-      realSpectrum (afmHeisenbergChainHamiltonianS L N) := by
-  set hM := afmHeisenbergChainHamiltonianS_isHermitian L N
-  refine ⟨⇑(hM.eigenvectorBasis i), ?_, ?_⟩
-  · intro h
-    exact hM.eigenvectorBasis.orthonormal.ne_zero i ((WithLp.ofLp_eq_zero (p := 2)).mp h)
-  · rw [hM.mulVec_eigenvectorBasis i]; exact (Complex.coe_smul _ _).symm
-
-/-- Every element of the real spectrum of the ring Hamiltonian is one of the Hermitian
-eigenvalues. -/
-private theorem afm_mem_realSpectrum_eq_eigenvalue (L N : ℕ) {E : ℝ}
-    (hE : E ∈ realSpectrum (afmHeisenbergChainHamiltonianS L N)) :
-    ∃ j, (afmHeisenbergChainHamiltonianS_isHermitian L N).eigenvalues j = E := by
-  set hM := afmHeisenbergChainHamiltonianS_isHermitian L N
-  obtain ⟨Φ, hΦ_ne, hΦ_eig⟩ := hE
-  have h_has : Module.End.HasEigenvalue (Matrix.toLin' (afmHeisenbergChainHamiltonianS L N))
-      (E : ℂ) := by
-    refine Module.End.hasEigenvalue_of_hasEigenvector ⟨?_, hΦ_ne⟩
-    rw [Module.End.mem_eigenspace_iff, Matrix.toLin'_apply]; exact hΦ_eig
-  have h_spec : (E : ℂ) ∈ spectrum ℂ (Matrix.toLin' (afmHeisenbergChainHamiltonianS L N)) :=
-    h_has.mem_spectrum
-  rw [Matrix.spectrum_toLin'] at h_spec
-  have h_real : E ∈ spectrum ℝ (afmHeisenbergChainHamiltonianS L N) := by
-    rw [← spectrum.algebraMap_mem_iff ℂ (R := ℝ)]; exact h_spec
-  rw [hM.spectrum_real_eq_range_eigenvalues] at h_real
-  obtain ⟨j, hj⟩ := h_real
-  exact ⟨j, hj⟩
 
 /-- The LSM trial state is nonzero (the twist operator is unitary). -/
 private theorem lsmTrialState_ne_zero (L N : ℕ) {Φ : (Fin L → Fin (N + 1)) → ℂ} (hΦ : Φ ≠ 0) :
@@ -104,7 +74,7 @@ theorem lieb_schultz_mattis_affleck_lieb (L N : ℕ) (hL : RingLengthEven L) (hN
     afm_ring_ground_state_data L N hLeven hL2 hN
   -- (A) `E₀` lower-bounds every eigenvalue
   have hle : ∀ i, E₀ ≤ hM.eigenvalues i := fun i =>
-    hground.2 _ (afm_eigenvalues_mem_realSpectrum L N i)
+    hground.2 _ (eigenvalues_mem_realSpectrum hM i)
   -- (B) the state has dimension ≥ 2
   have hcard : 2 ≤ Fintype.card (Fin L → Fin (N + 1)) := by
     rw [Fintype.card_fun, Fintype.card_fin, Fintype.card_fin]
@@ -114,30 +84,11 @@ theorem lieb_schultz_mattis_affleck_lieb (L N : ℕ) (hL : RingLengthEven L) (hN
   -- (C) some eigenvalue lies strictly above `E₀`
   obtain ⟨i₀, hi₀⟩ := hermitian_exists_eigenvalue_gt hM hcard hle hfin
   -- (D) `E₁` = least eigenvalue strictly above `E₀`
-  set S : Finset (Fin L → Fin (N + 1)) := Finset.univ.filter (fun i => E₀ < hM.eigenvalues i)
-    with hSdef
-  have hi₀S : i₀ ∈ S := by rw [hSdef]; exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, hi₀⟩
-  have himg_ne : (S.image hM.eigenvalues).Nonempty := ⟨_, Finset.mem_image_of_mem _ hi₀S⟩
-  set E₁ := (S.image hM.eigenvalues).min' himg_ne with hE₁def
-  obtain ⟨i₁, hi₁S, hi₁⟩ := Finset.mem_image.mp ((S.image hM.eigenvalues).min'_mem himg_ne)
-  have hE₀E₁ : E₀ < E₁ := by
-    rw [hE₁def, ← hi₁]
-    rw [hSdef] at hi₁S
-    exact (Finset.mem_filter.mp hi₁S).2
-  have hE₁_spec : E₁ ∈ realSpectrum M := by
-    rw [hE₁def, ← hi₁]; exact afm_eigenvalues_mem_realSpectrum L N i₁
-  have hE₁_lb : ∀ i, hM.eigenvalues i ≠ E₀ → E₁ ≤ hM.eigenvalues i := by
-    intro i hi
-    have hgt : E₀ < hM.eigenvalues i := lt_of_le_of_ne (hle i) (Ne.symm hi)
-    refine (S.image hM.eigenvalues).min'_le _ (Finset.mem_image_of_mem _ ?_)
-    rw [hSdef]; exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, hgt⟩
-  have hE₁_min : ∀ E ∈ realSpectrum M, E₀ < E → E₁ ≤ E := by
-    intro E hE hE₀
-    obtain ⟨j, hj⟩ := afm_mem_realSpectrum_eq_eigenvalue L N hE
-    rw [← hj]
-    refine (S.image hM.eigenvalues).min'_le _ (Finset.mem_image_of_mem _ ?_)
-    rw [hSdef]
-    exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, by rw [hj]; exact hE₀⟩
+  obtain ⟨E₁, _hE₁_spec, _hE₀E₁, hE₁_min, hgap⟩ :=
+    exists_isPositiveSpectralGap hM hground ⟨_, eigenvalues_mem_realSpectrum hM i₀, hi₀⟩
+  -- the spectrum-form minimality of `E₁`, in the eigenvalue-index form the variational bound needs
+  have hE₁_lb : ∀ i, hM.eigenvalues i ≠ E₀ → E₁ ≤ hM.eigenvalues i := fun i hi =>
+    hE₁_min _ (eigenvalues_mem_realSpectrum hM i) (lt_of_le_of_ne (hle i) (Ne.symm hi))
   -- (E) uniqueness ⟹ orthogonality + low trial energy
   have huniq := afm_ground_uniqueness L N hΦ_ne hΦ_eig hfin
   have horth : star Φ_GS ⬝ᵥ lsmTrialState L N Φ_GS = 0 :=
@@ -154,7 +105,7 @@ theorem lieb_schultz_mattis_affleck_lieb (L N : ℕ) (hL : RingLengthEven L) (hN
     rw [expectationRatioRe, le_div_iff₀ hD]
     exact hvar
   -- (G) assemble the gap
-  refine ⟨E₁ - E₀, ⟨E₀, E₁, hground, hE₁_spec, hE₀E₁, rfl, hE₁_min⟩, ?_⟩
+  refine ⟨E₁ - E₀, hgap, ?_⟩
   linarith [hE₁_le_ratio, henergy]
 
 end LatticeSystem.Quantum
