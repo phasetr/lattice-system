@@ -33,7 +33,7 @@ private noncomputable def evalWords (A : MPSMatrices D N) (ℓ : ℕ) :
   Finsupp.linearCombination ℂ (wordEval A)
 
 /-- Ordered MPS products turn list concatenation into matrix multiplication. -/
-private theorem orderedProd_append (A : MPSMatrices D N)
+theorem orderedProd_append (A : MPSMatrices D N)
     (u v : List (Fin (N + 1))) :
     orderedProd A (u ++ v) = orderedProd A u * orderedProd A v := by
   induction u with
