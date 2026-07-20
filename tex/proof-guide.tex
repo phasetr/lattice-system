@@ -11423,7 +11423,14 @@ expansion; orthogonality to $\varphi_0$ kills the $E_0$ components since the gro
 one-dimensional); the existence of an eigenvalue strictly above $E_0$
 (\texttt{hermitian\_exists\_eigenvalue\_gt}, \texttt{HermitianGapExists.lean}, since otherwise
 $M=E_0\cdot1$ would force a full-dimensional ground line) defines $E_1$; and Lemmas 6.1/6.2 bound
-$E_1-E_0\le8\pi^2S^2/L$.  Lemmas 6.1 and 6.2 are likewise proved theorems.  Chapters~3--10 backfill.
+$E_1-E_0\le8\pi^2S^2/L$.  The step that actually produces $E_1$ from that existence statement now
+lives in the model-free module \texttt{ManyBodySpectralGap.lean} (PR~\#5097): for an arbitrary
+chain operator \texttt{exists\_isPositiveSpectralGap} takes the least eigenvalue lying strictly
+above $E_0$ and returns \texttt{IsPositiveSpectralGap} together with its minimality over the whole
+real spectrum, while \texttt{eigenvalues\_mem\_realSpectrum} is the eigenvalue $\to$
+\texttt{realSpectrum} bridge; the ring proof consumes both in place of the private helpers and the
+inline minimum construction it used to carry, and bridges the spectrum-form minimality back to the
+eigenvalue-index form required by \texttt{hermitian\_second\_eigenvalue\_variational}.  Lemmas 6.1 and 6.2 are likewise proved theorems.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§6.2 Lemma 6.4} (generalized LSM variational bound; Tasaki §6.2,

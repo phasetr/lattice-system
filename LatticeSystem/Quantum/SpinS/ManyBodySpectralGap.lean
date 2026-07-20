@@ -18,8 +18,9 @@ For a Hermitian chain operator `H : ManyBodyOpS (Fin L) N` this module relates t
 eigenvalue family `hH.eigenvalues` to the `realSpectrum` of `H`
 (`Quantum/SpinS/HaldaneConjecture.lean`) and constructs the first excited eigenvalue.
 
-* `eigenvalues_mem_realSpectrum` / `exists_eigenvalues_eq_of_mem_realSpectrum` — the eigenvalue ↔
-  real-spectrum bridge, in both directions.
+* `eigenvalues_mem_realSpectrum` — the eigenvalue → real-spectrum direction of the bridge (the
+  converse, `exists_eigenvalues_eq_of_mem_realSpectrum`, is `private`: it is only used to feed the
+  constructor below).
 * `exists_isPositiveSpectralGap` — if some point of the real spectrum lies strictly above the
   ground energy, there is a smallest such point and hence a positive spectral gap.
 
@@ -45,8 +46,8 @@ theorem eigenvalues_mem_realSpectrum {H : ManyBodyOpS (Fin L) N} (hH : H.IsHermi
   · rw [hH.mulVec_eigenvectorBasis i]; exact (Complex.coe_smul _ _).symm
 
 /-- Every element of the real spectrum of a Hermitian chain operator is one of its Hermitian
-eigenvalues. -/
-theorem exists_eigenvalues_eq_of_mem_realSpectrum {H : ManyBodyOpS (Fin L) N}
+eigenvalues.  `private`: its only consumer is `exists_isPositiveSpectralGap` below. -/
+private theorem exists_eigenvalues_eq_of_mem_realSpectrum {H : ManyBodyOpS (Fin L) N}
     (hH : H.IsHermitian) {E : ℝ} (hE : E ∈ realSpectrum H) : ∃ j, hH.eigenvalues j = E := by
   obtain ⟨Φ, hΦ_ne, hΦ_eig⟩ := hE
   have h_has : Module.End.HasEigenvalue (Matrix.toLin' H) (E : ℂ) := by
