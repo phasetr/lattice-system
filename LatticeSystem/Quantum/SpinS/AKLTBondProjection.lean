@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.AKLT
+import LatticeSystem.Quantum.SpinS.SpinOneTwoSiteEntries
 
 /-!
 # Tasaki §7.1.3: the bond spin-2 projection and the local VBS characterization (Lemma 7.4)
@@ -121,85 +122,10 @@ kernel of the single-bond spin-2 projection
 `P̂₂^{loc} = bondSpin2ProjectionS (0 : Fin 2) 1` on `ℂ³ ⊗ ℂ³`
 (`Λ = Fin 2`, `L = 2`).  This is Tasaki's forward direction
 (7.1.20) ⇒ (7.1.19), verified here by an explicit `9`-dimensional
-linear-algebra computation. -/
-
-/-- Enumeration of a sum over the `9` two-site configurations `Fin 2 → Fin 3`. -/
-private lemma sum_fin2_fin3 (f : (Fin 2 → Fin 3) → ℂ) :
-    ∑ σ : Fin 2 → Fin 3, f σ =
-      f ![0, 0] + f ![0, 1] + f ![0, 2] + f ![1, 0] + f ![1, 1] + f ![1, 2]
-        + f ![2, 0] + f ![2, 1] + f ![2, 2] := by
-  rw [← (finTwoArrowEquiv (Fin 3)).symm.sum_comp f, Fintype.sum_prod_type,
-    Fin.sum_univ_three]
-  simp only [Fin.sum_univ_three, finTwoArrowEquiv_symm_apply]
-  ring
-
-/-- On `Λ = Fin 2` the off-bond delta of the two-site dot product is vacuous, so
-`Ŝ_0 · Ŝ_1` is the plain tensor `∑_α Ŝ^{(α)} ⊗ Ŝ^{(α)}` of single-site operators. -/
-private lemma spinSDot_fin2_apply (σ' σ : Fin 2 → Fin 3) :
-    spinSDot (0 : Fin 2) 1 2 σ' σ =
-      spinSOp1 2 (σ' 0) (σ 0) * spinSOp1 2 (σ' 1) (σ 1)
-        + spinSOp2 2 (σ' 0) (σ 0) * spinSOp2 2 (σ' 1) (σ 1)
-        + spinSOp3 2 (σ' 0) (σ 0) * spinSOp3 2 (σ' 1) (σ 1) := by
-  have hne : (0 : Fin 2) ≠ 1 := by decide
-  have hvac : ∀ k : Fin 2, k ≠ 0 → k ≠ 1 → σ' k = σ k := by
-    intro k h0 h1; fin_cases k
-    · exact absurd rfl h0
-    · exact absurd rfl h1
-  rw [spinSDot_def]
-  simp only [Matrix.add_apply]
-  rw [onSiteS_mul_onSiteS_apply_eq hne, onSiteS_mul_onSiteS_apply_eq hne,
-    onSiteS_mul_onSiteS_apply_eq hne]
-  simp only [if_pos hvac]
-
-/-- Raising-operator entries at `N = 2` (`Ŝ^+` on the spin-1 ladder): `√2` on the two raising
-pairs, `0` otherwise. -/
-private lemma plus2 (i j : Fin 3) :
-    spinSOpPlus 2 i j =
-      if i.val + 1 = j.val then ((Real.sqrt 2 : ℝ) : ℂ) else 0 := by
-  by_cases h : i.val + 1 = j.val
-  · rw [spinSOpPlus_apply_raise 2 h, if_pos h]
-    have hj : j.val = 1 ∨ j.val = 2 := by omega
-    rcases hj with hj | hj <;> rw [hj] <;> norm_num
-  · rw [spinSOpPlus_apply_other 2 h, if_neg h]
-
-/-- Lowering-operator entries at `N = 2` (`Ŝ^-` on the spin-1 ladder): `√2` on the two lowering
-pairs, `0` otherwise. -/
-private lemma minus2 (i j : Fin 3) :
-    spinSOpMinus 2 i j =
-      if j.val + 1 = i.val then ((Real.sqrt 2 : ℝ) : ℂ) else 0 := by
-  by_cases h : j.val + 1 = i.val
-  · rw [spinSOpMinus_apply_lower 2 h, if_pos h]
-    have hj : j.val = 0 ∨ j.val = 1 := by omega
-    rcases hj with hj | hj <;> rw [hj] <;> norm_num
-  · rw [spinSOpMinus_apply_other 2 h, if_neg h]
-
-/-- `Ŝ^{(3)}` entries at `N = 2`: diagonal `1 − k` (magnetic quantum
-number), off-diagonal `0`. -/
-private lemma three2 (i j : Fin 3) :
-    spinSOp3 2 i j = if i = j then (1 : ℂ) - (i.val : ℂ) else 0 := by
-  unfold spinSOp3
-  rw [Matrix.diagonal_apply]
-  split
-  · norm_num
-  · rfl
-
-/-- Imaginary-free form of the two-site dot product on `Fin 2`:
-`Ŝ_0 · Ŝ_1 = ½ (Ŝ^+ ⊗ Ŝ^- + Ŝ^- ⊗ Ŝ^+) + Ŝ^{(3)} ⊗ Ŝ^{(3)}`,
-eliminating `Ŝ^{(1)}, Ŝ^{(2)}` (and hence `I`) so the kernel computation
-stays over rational multiples of `√2`. -/
-private lemma spinSDot_fin2_apply' (σ' σ : Fin 2 → Fin 3) :
-    spinSDot (0 : Fin 2) 1 2 σ' σ =
-      (1 / 2 : ℂ) * (spinSOpPlus 2 (σ' 0) (σ 0) * spinSOpMinus 2 (σ' 1) (σ 1)
-        + spinSOpMinus 2 (σ' 0) (σ 0) * spinSOpPlus 2 (σ' 1) (σ 1))
-        + spinSOp3 2 (σ' 0) (σ 0) * spinSOp3 2 (σ' 1) (σ 1) := by
-  rw [spinSDot_fin2_apply, spinSOp1, spinSOp2]
-  simp only [Matrix.smul_apply, Matrix.add_apply, Matrix.sub_apply, smul_eq_mul]
-  have hI : (1 : ℂ) / (2 * Complex.I) = -Complex.I / 2 := by
-    rw [mul_comm, ← div_div, Complex.div_I]; ring
-  rw [hI]
-  ring_nf
-  rw [Complex.I_sq]
-  ring
+linear-algebra computation.  The entry-level formulas for the spin-1 operators used throughout
+(`sum_fin2_fin3`, `spinSDot_fin2_apply`, `spinSDot_fin2_apply'`, `spinSOpPlus_two_apply`,
+`spinSOpMinus_two_apply`, `spinSOp3_two_apply`)
+live in `LatticeSystem.Quantum.SpinS.SpinOneTwoSiteEntries`. -/
 
 /-- The image `Ŝ_0 · Ŝ_1 |Ψ_{↑↓}⟩` of the mixed bond vector `Ψ_{↑↓} = vbsBondVec 0 1`
 (`2|+,-⟩ − |0,0⟩`) under the two-site dot product: `−3|+,-⟩ + 2|0,0⟩ − |-,+⟩`. -/
@@ -245,7 +171,8 @@ private lemma dot_mulVec_upUp :
   simp only [vbsBondVec, Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue]
   fin_cases a <;> fin_cases b <;>
     simp only [Pi.neg_apply, vbsBondVec, spinSDot_fin2_apply', Matrix.cons_val_zero,
-      Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
+      Matrix.cons_val_one, spinSOpPlus_two_apply, spinSOpMinus_two_apply, spinSOp3_two_apply,
+      Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
     norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
@@ -263,7 +190,8 @@ private lemma dot_mulVec_dnDn :
   simp only [vbsBondVec, Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue]
   fin_cases a <;> fin_cases b <;>
     simp only [Pi.neg_apply, vbsBondVec, spinSDot_fin2_apply', Matrix.cons_val_zero,
-      Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
+      Matrix.cons_val_one, spinSOpPlus_two_apply, spinSOpMinus_two_apply, spinSOp3_two_apply,
+      Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
     norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
@@ -280,7 +208,8 @@ private lemma dot_mulVec_upDn :
   simp only [vbsBondVec, Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue]
   fin_cases a <;> fin_cases b <;>
     simp only [dotImageUpDn, spinSDot_fin2_apply', Matrix.cons_val_zero,
-      Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
+      Matrix.cons_val_one, spinSOpPlus_two_apply, spinSOpMinus_two_apply, spinSOp3_two_apply,
+      Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
     norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
@@ -297,7 +226,8 @@ private lemma dot_mulVec2_upDn :
   simp only [dotImageUpDn, Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue]
   fin_cases a <;> fin_cases b <;>
     simp only [dotImage2UpDn, spinSDot_fin2_apply', Matrix.cons_val_zero,
-      Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
+      Matrix.cons_val_one, spinSOpPlus_two_apply, spinSOpMinus_two_apply, spinSOp3_two_apply,
+      Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
     norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
@@ -314,7 +244,8 @@ private lemma dot_mulVec_dnUp :
   simp only [vbsBondVec, Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue]
   fin_cases a <;> fin_cases b <;>
     simp only [dotImageDnUp, spinSDot_fin2_apply', Matrix.cons_val_zero,
-      Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
+      Matrix.cons_val_one, spinSOpPlus_two_apply, spinSOpMinus_two_apply, spinSOp3_two_apply,
+      Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
     norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
@@ -331,7 +262,8 @@ private lemma dot_mulVec2_dnUp :
   simp only [dotImageDnUp, Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue]
   fin_cases a <;> fin_cases b <;>
     simp only [dotImage2DnUp, spinSDot_fin2_apply', Matrix.cons_val_zero,
-      Matrix.cons_val_one, plus2, minus2, three2, Fin.isValue, Fin.val_zero,
+      Matrix.cons_val_one, spinSOpPlus_two_apply, spinSOpMinus_two_apply, spinSOp3_two_apply,
+      Fin.isValue, Fin.val_zero,
       Fin.val_one, Fin.val_two] <;>
     (try simp) <;>
     norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
@@ -498,7 +430,8 @@ theorem bondLocal_rank :
     subst hidx
     rw [Matrix.mulVec, dotProduct, sum_fin2_fin3]
     fin_cases i <;> fin_cases a <;> fin_cases b <;>
-      simp only [w, basisVec, spinSDot_fin2_apply', plus2, minus2, three2,
+      simp only [w, basisVec, spinSDot_fin2_apply', spinSOpPlus_two_apply,
+        spinSOpMinus_two_apply, spinSOp3_two_apply,
         Matrix.cons_val_zero, Matrix.cons_val_one, Fin.isValue] <;>
       (try simp) <;>
       norm_num [← Complex.ofReal_mul, Real.mul_self_sqrt]
