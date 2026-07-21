@@ -47,8 +47,55 @@ cannot be resolved (it falls back to `origin/main`, else blocks).
 python3 scripts/audit_gate.py --diff main   # new decls vs main (what the hook runs)
 python3 scripts/audit_gate.py --full        # whole-repo report (Tier-2 cleanup)
 scripts/audit-helpers.sh dead-decls         # zero-reference theorem/lemma candidates
+scripts/audit-helpers.sh undocumented-dead [FILE|-]   # of those, the ones the
+                                            # docs do not record ('-' = stdin)
 scripts/audit-helpers.sh oversize 700       # files over a line threshold
 ```
+
+## Documented-name matching (compressed family notation)
+
+A zero-reference declaration that `docs/index.md` / `tex/proof-guide.tex` write up
+(with its Tasaki equation number) is a book-facing result, not dead code. Both
+documents record whole families in a **compressed notation**, so matching them with
+an exact grep is wrong — in the Wave-1 sweep it mis-reported 49 of 50 candidates as
+undocumented, and deleting them would have erased Tasaki Problem 2.2.a / 2.2.b.
+
+`scripts/audit/docs_names.py` expands the four compressions the two documents
+actually use (TeX `\_ \{ \}` escaping and `\texttt{...}` are undone first):
+
+| notation | example | expands to |
+|---|---|---|
+| brace | `spinOnePiRot{1,2,3}_sq` | `spinOnePiRot1_sq`, `…2_sq`, `…3_sq` (cross product over several groups; an empty alternative as in `_{,complement_}` is allowed) |
+| slash | `spinOneOpPlus/Minus_conjTranspose`, `spinHalfRot1/2/3_pi` | both members. The left side is kept verbatim; the right side is an abbreviation, so the left is cut exactly where the right continues it — before a trailing digit run for `1/2/3`, before the trailing camelCase segment for `Plus/Minus`, after the last `_` for `pos/neg`. `L` + the right side from its first `_` on covers the other direction |
+| continuation | `complexConjugationSpinHalf_sq` / `_add`, `tJConfigOf_tJSiteHop_up/_down` | a code span (or slash side) starting with `_` continues the previous name, replacing whole `_`-segments; the number replaced varies, so every `_`-boundary head is tried (never a cut inside a segment). A continuation that also *ends* with `_` is an infix replacement and keeps the base's tail (`…_horizontal_adjacent_eq_…` / `_vertical_adjacent_`) |
+| star | `spinOnePiRot{1,2,3}_comm_*` | prefix match — only when the `*` follows `_` or `.`, so prose/markdown `word*` is not a family. The anchoring separator is also dropped from the prefix, because `spinHalfOp_*` is how the docs abbreviate `spinHalfOp1/2/3` |
+
+Guards against over-broad readings (the index feeds a *deletion* sweep, so a
+manufactured name is as harmful as a missed one): a name enters the index only if
+it is identifier-shaped (`_` or a camelCase hump), so prose words do not;
+a slash token without `_` is a path or prose (`AngularMomentum/Ladder`,
+`add/sub`); a wildcard right side is never read standalone (`…/sub_*` must not
+yield `sub_*`); and neither a slash nor a continuation may cut inside a name
+segment (`spinHalfRot1/2/3_…` must not yield `spin2_*`, `rightGauge_conj_…` must
+not be cut down to `right`). Every notation and every crossing of two notations
+has a positive and a negative case in the test file. Namespace wildcards
+(`CollatzWielandt.*`) only match qualified names, so they do not cover the bare
+last segments the sweep works with.
+
+```sh
+python3 scripts/audit/docs_names.py --expand          # the whole documented index
+python3 scripts/audit/docs_names.py --check NAME...   # documented / undocumented
+python3 scripts/audit/docs_names.py --filter LIST|-   # drop documented lines
+python3 scripts/audit/test_docs_names.py              # expansion regression tests
+```
+
+The two document paths are resolved against the **repo root**, not the CWD, and a
+missing document (or an empty index) is a hard error — silently indexing nothing
+would report every declaration as undocumented, i.e. as deletable.
+
+This affects only the **sweep's** classification; `audit_gate.py`'s V1/V2/V3
+decisions are untouched (the gate exempts capstones via
+`scripts/audit/capstones.txt`, not via the docs).
 
 `scripts/audit/capstones.txt` is the allowlist (one name per line) that exempts a name
 from **both** checks: genuine zero-reference book theorems (V1), and declarations a
