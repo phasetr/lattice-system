@@ -28,11 +28,11 @@ namespace LatticeSystem.Quantum
 open Matrix
 open scoped ComplexOrder
 
-/-! ## Canonical configuration and the `±`-spin count -/
+/-! ## Canonical configuration and the `±`-spin count
 
-/-- The **canonical** all-`0`-spin hidden-AFM configuration (`σ ≡ 1`, every site spin `0`), the base
-case of the kink reduction. -/
-def hhafCanonical (L : ℕ) : hhafConfig L := ⟨fun _ => 1, fun _ _ h => (h.2.1 rfl).elim⟩
+The canonical all-`0`-spin configuration `hhafCanonical` (the base case of the kink reduction) is
+defined in `HiddenAntiferromagneticOrder.lean`, where it also witnesses a vanishing diagonal entry.
+-/
 
 /-- A site is never in its own (left-endpoint) open cyclic arc. -/
 theorem not_inCyclicOpen_self_left {L : ℕ} (x y : Fin L) : ¬ InCyclicOpen x y x := by

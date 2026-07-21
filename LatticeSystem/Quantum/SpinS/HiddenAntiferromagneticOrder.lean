@@ -465,8 +465,10 @@ theorem diag_le_hhafMaxEnergy (L : ℕ) (σ : hhafConfig L) :
 
 /-! ## Concrete diagonal witnesses for non-scalarity -/
 
-/-- The hidden-AFM configuration with every site carrying spin `0` (`σ_x = 1`). -/
-def hhafAllZeroSpinConfig (L : ℕ) : hhafConfig L :=
+/-- The **canonical** hidden-AFM configuration with every site carrying spin `0` (`σ ≡ 1`).  It
+serves both as the diagonal witness of vanishing energy here and as the base case of the kink
+reduction in the Perron–Frobenius uniqueness route. -/
+def hhafCanonical (L : ℕ) : hhafConfig L :=
   ⟨fun _ => 1, fun _ _ h => (h.2.1 rfl).elim⟩
 
 /-- The raw domain-wall hidden-AFM configuration: site `0` carries `+1` (`σ = 0`), site `1`
@@ -521,19 +523,19 @@ private theorem ringCoupling_self_eq_zero {L : ℕ} (hL : 2 ≤ L) (x : Fin L) :
 
 /-- At the all-zero-spin hidden-AFM configuration, the restricted diagonal entry is `0`. -/
 theorem hhafAllZeroSpin_diag_re_eq_zero (L : ℕ) (hL : 2 ≤ L) :
-    ((hhafRestrictedMatrix L) (hhafAllZeroSpinConfig L) (hhafAllZeroSpinConfig L)).re = 0 := by
+    ((hhafRestrictedMatrix L) (hhafCanonical L) (hhafCanonical L)).re = 0 := by
   rw [hhafRestrictedMatrix, Matrix.submatrix_apply, afmHeisenbergChainHamiltonianS,
     heisenbergHamiltonianS_apply_diag]
   change (∑ x : Fin L, ∑ y : Fin L,
     ringCoupling L x y *
       (if x = y then (2 : ℂ) * (2 + 2) / 4
-       else ((2 : ℂ) / 2 - ((hhafAllZeroSpinConfig L).1 x).val) *
-        ((2 : ℂ) / 2 - ((hhafAllZeroSpinConfig L).1 y).val))).re = 0
+       else ((2 : ℂ) / 2 - ((hhafCanonical L).1 x).val) *
+        ((2 : ℂ) / 2 - ((hhafCanonical L).1 y).val))).re = 0
   have hsum : (∑ x : Fin L, ∑ y : Fin L,
       ringCoupling L x y *
         (if x = y then (2 : ℂ) * (2 + 2) / 4
-         else ((2 : ℂ) / 2 - ((hhafAllZeroSpinConfig L).1 x).val) *
-          ((2 : ℂ) / 2 - ((hhafAllZeroSpinConfig L).1 y).val))) = 0 := by
+         else ((2 : ℂ) / 2 - ((hhafCanonical L).1 x).val) *
+          ((2 : ℂ) / 2 - ((hhafCanonical L).1 y).val))) = 0 := by
     refine Finset.sum_eq_zero fun x _ => ?_
     refine Finset.sum_eq_zero fun y _ => ?_
     by_cases hxy : x = y
@@ -541,7 +543,7 @@ theorem hhafAllZeroSpin_diag_re_eq_zero (L : ℕ) (hL : 2 ≤ L) :
       rw [if_pos rfl, ringCoupling_self_eq_zero hL x]
       simp
     · rw [if_neg hxy]
-      simp [hhafAllZeroSpinConfig]
+      simp [hhafCanonical]
   rw [hsum]
   rfl
 
@@ -657,9 +659,9 @@ theorem hhafMinEnergy_lt_hhafMaxEnergy (L : ℕ) (_hLeven : Even L) (hL : 2 ≤ 
         ((hhafRestrictedMatrix L) (hhafDomainWallConfig L) (hhafDomainWallConfig L)).re :=
       hhafMinEnergy_le_diag L (hhafDomainWallConfig L)
     _ < 0 := hhafDomainWall_diag_re_neg L hL
-    _ = ((hhafRestrictedMatrix L) (hhafAllZeroSpinConfig L) (hhafAllZeroSpinConfig L)).re := by
+    _ = ((hhafRestrictedMatrix L) (hhafCanonical L) (hhafCanonical L)).re := by
       rw [hhafAllZeroSpin_diag_re_eq_zero L hL]
-    _ ≤ hhafMaxEnergy L := diag_le_hhafMaxEnergy L (hhafAllZeroSpinConfig L)
+    _ ≤ hhafMaxEnergy L := diag_le_hhafMaxEnergy L (hhafCanonical L)
 
 /-! ## Positive spectral gap on `H_HAF` -/
 
