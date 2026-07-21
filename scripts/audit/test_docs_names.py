@@ -156,6 +156,70 @@ class TestProseAndTex(ExpansionCase):
         self.assertNotDocumented(t, "fermionUpProjection_commute_fermionDownProjection")
 
 
+class TestCrossings(ExpansionCase):
+    """The notations combine, and every bug so far has been at a crossing."""
+
+    def test_digit_alternation_slash(self):
+        # `X1/2/3_suffix` is the commonest slash family in the docs (9 uses of
+        # `spinHalfRot1/2/3` alone) and needs a digit-aware cut of the left side.
+        t = "| `spinHalfRot1/2/3_pi` | the pi-rotations |"
+        self.assertDocumented(t, "spinHalfRot1_pi", "spinHalfRot2_pi",
+                              "spinHalfRot3_pi")
+        self.assertNotDocumented(t, "spinHalfRot4_pi", "spinHalfRot1_zero")
+
+    def test_digit_alternation_with_two_digit_sides(self):
+        t = "`neelStateOfS_totalSpinSOp1/2_expectation`"
+        self.assertDocumented(t, "neelStateOfS_totalSpinSOp1_expectation",
+                              "neelStateOfS_totalSpinSOp2_expectation")
+        self.assertNotDocumented(t, "neelStateOfS_totalSpinSOp3_expectation")
+
+    def test_digit_alternation_of_a_trailing_index(self):
+        t = "`spinReversalS_conj_spinSOp1/2`"
+        self.assertDocumented(t, "spinReversalS_conj_spinSOp1",
+                              "spinReversalS_conj_spinSOp2")
+        self.assertNotDocumented(t, "spinReversalS_2", "spinReversalS_conj_2")
+
+    def test_slash_times_wildcard_does_not_manufacture_broad_prefixes(self):
+        # The cut must follow the digit, not any earlier boundary: `spin` + `2/3…`
+        # used to register the wildcard `spin2_*`.
+        t = "| `spinHalfRot1/2/3_pi_conj_spinHalfOp_*` | conjugation |"
+        self.assertDocumented(t, "spinHalfRot2_pi_conj_spinHalfOp1",
+                              "spinHalfRot3_pi_conj_spinHalfOp3")
+        self.assertNotDocumented(t, "spin2_bogus_dead_lemma",
+                                 "spinHalf2_bogus_dead_lemma")
+
+    def test_slash_times_wildcard_on_a_word_alternation(self):
+        t = "| `spinOneOpPlus/Minus_mulVec_*` | ladder actions |"
+        self.assertDocumented(t, "spinOneOpPlus_mulVec_spinOneZero",
+                              "spinOneOpMinus_mulVec_spinOneMinus")
+        self.assertNotDocumented(t, "spinMinus_mulVec_bogus",
+                                 "spinOneOpPlus_conjTranspose")
+
+    def test_slash_times_continuation_inside_one_token(self):
+        self.assertDocumented("`tJConfigOf_tJSiteHop_up/_down`",
+                              "tJConfigOf_tJSiteHop_up", "tJConfigOf_tJSiteHop_down")
+        self.assertDocumented("`preservesTJFillingW_smul/_add/_sub`",
+                              "preservesTJFillingW_smul", "preservesTJFillingW_add",
+                              "preservesTJFillingW_sub")
+
+    def test_brace_times_wildcard(self):
+        t = "| `spinHalfRot{1,2,3}_half_pi_conj_spinHalfOp_*` | half-turn conj |"
+        self.assertDocumented(t, "spinHalfRot1_half_pi_conj_spinHalfOp2",
+                              "spinHalfRot3_half_pi_conj_spinHalfOp1")
+        self.assertNotDocumented(t, "spinHalfRot1_halfPi_mul_adjoint")
+
+    def test_brace_times_continuation(self):
+        t = "| `rot3D{1,2,3}Pi_sq` / `_comm_*` |"
+        self.assertDocumented(t, "rot3D1Pi_sq", "rot3D2Pi_comm_rot3D3Pi")
+        self.assertNotDocumented(t, "rot3D1_bogus")
+
+    def test_continuation_times_wildcard(self):
+        t = "| `sublatticeSpinSOpPlus_add_sublatticeSpinSOpMinus` / `_sub_*` |"
+        self.assertDocumented(t, "sublatticeSpinSOpPlus_sub_sublatticeSpinSOpMinus")
+        self.assertNotDocumented(t, "sublattice_sub_bogus_dead_lemma",
+                                 "sublatticeSpin_sub_bogus_dead_lemma")
+
+
 class TestIndexSafety(unittest.TestCase):
     def test_missing_document_is_fatal(self):
         with self.assertRaises(SystemExit):

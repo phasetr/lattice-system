@@ -97,17 +97,41 @@ def identifier_shaped(name: str) -> bool:
     return "_" in name or bool(CAMEL_RE.search(name))
 
 
-def _boundaries(s: str) -> list[int]:
-    """Indices of name-boundary positions in `s` (0, either side of `_`, camelCase
-    humps). Both sides of `_` are boundaries because the separator may belong to
-    the shared prefix (`becTowerState_` + `neg...`) or to the shared suffix
-    (`spinOneOpPlus` + `_conjTranspose`)."""
-    out = [0]
-    for i in range(1, len(s)):
-        if (s[i] == "_" or s[i - 1] == "_"
-                or (s[i].isupper() and not s[i - 1].isupper())):
-            out.append(i)
-    return out
+def _segment_starts(s: str) -> list[int]:
+    """Indices where a `_`-delimited segment of `s` starts (including 0)."""
+    return [0] + [i for i in range(1, len(s)) if s[i - 1] == "_"]
+
+
+def _segment_ends(s: str) -> list[int]:
+    """Indices of the `_` separators of `s`, i.e. where a segment ends."""
+    return [i for i, c in enumerate(s) if c == "_"]
+
+
+def _head_cut(left: str, right: str) -> int:
+    """Where `left` must be cut so that `right` continues the same family, or -1.
+
+    The cut is dictated by what `right` starts with, which is the piece it
+    replaces in `left`: a digit replaces `left`'s trailing digit run
+    (`spinHalfRot1` / `2/3_pi`), an uppercase letter replaces its trailing
+    camelCase segment (`spinOneOpPlus` / `Minus_…`), a lowercase letter replaces
+    its trailing `_`-segment (`becTowerState_pos` / `neg_…`). Taking every
+    boundary instead would manufacture over-broad readings (`spin` + `2/3_…`).
+    """
+    if not left or not right:
+        return -1
+    c = right[0]
+    if c.isdigit():
+        i = len(left)
+        while i > 0 and left[i - 1].isdigit():
+            i -= 1
+        return i if i < len(left) else -1
+    if c.isupper():
+        for i in range(len(left) - 1, 0, -1):
+            if left[i].isupper() and not left[i - 1].isupper():
+                return i
+        return -1
+    starts = [i for i in _segment_starts(left) if i > 0]
+    return starts[-1] if starts else -1
 
 
 def expand_braces(token: str) -> list[str]:
@@ -129,13 +153,16 @@ def expand_braces(token: str) -> list[str]:
 def expand_slash(token: str) -> list[str]:
     """Expand one `A/B` alternation, restoring the abbreviated side.
 
-    `L/R` yields `L` itself (the left alternative is always spelled out in full,
-    as in `..._basisVec_all_up/down`), `L + t` for every boundary-suffix `t` of
-    `R`, and `p + R` for every NON-EMPTY boundary-prefix `p` of `L`; recursion
-    handles a second slash. `R` alone is emitted only when it carries no `*`:
-    a wildcard right side is an abbreviated fragment, and reading it standalone
-    manufactures the over-broad `sub_*` out of `.../sub_*`, which would mark
-    every `sub_…` declaration in the tree as documented.
+    At most three readings are produced, one per role of the two sides:
+      * `L` itself — the left alternative is always spelled out in full
+        (`..._basisVec_all_up/down`, `spinHalfRot1/2/3_pi`);
+      * `L` + the shared tail of `R`, i.e. `R` from its first `_` on
+        (`spinOneOpPlus` + `_conjTranspose`);
+      * `L` cut where `R` continues it, + `R` (see `_head_cut`).
+    Recursion handles a second slash (`1/2/3`). `R` alone is emitted only when it
+    carries no `*`: a wildcard right side is an abbreviated fragment, and reading
+    it standalone manufactures the over-broad `sub_*` out of `.../sub_*`, which
+    would mark every `sub_…` declaration in the tree as documented.
     """
     i = token.find("/")
     if i < 0:
@@ -146,12 +173,24 @@ def expand_slash(token: str) -> list[str]:
     if not left or not right:
         return []
     names = {left}
+    if right.startswith("_"):
+        # `tJConfigOf_tJSiteHop_up/_down`, `preservesTJFillingW_smul/_add/_sub`:
+        # the continuation notation written inside a single token.
+        names |= set(expand_continuation(left, right))
+        out = []
+        for n in names:
+            out.extend(expand_slash(n))
+        return out[:EXPANSION_CAP]
     if "*" not in right:
         # The right alternative may stand alone when it is a complete name
         # (`angRaise/angLower_normSq`), never when it is a wildcard fragment.
         names.add(right)
-    names |= {left + right[j:] for j in _boundaries(right) if j > 0}
-    names |= {left[:p] + right for p in _boundaries(left) if p > 0}
+    j = right.find("_")
+    if j > 0:
+        names.add(left + right[j:])
+    p = _head_cut(left, right)
+    if p > 0:
+        names.add(left[:p] + right)
     out = []
     for n in names:
         out.extend(expand_slash(n))
@@ -161,18 +200,18 @@ def expand_slash(token: str) -> list[str]:
 def expand_continuation(base: str, suffix: str) -> list[str]:
     """Apply a leading-underscore continuation `suffix` to `base`.
 
-    `base` keeps a boundary prefix and the segments after it are replaced by
-    `suffix`. A `suffix` that also ends with `_` is an infix replacement, so a
-    boundary tail of `base` is re-appended.
+    `base` keeps whole `_`-segments and the ones after them are replaced by
+    `suffix` — how many are replaced varies (`_add` after `…SpinHalf_sq` drops
+    one, `_sub_*` after `…Plus_add_…Minus` replaces an inner one), so every
+    `_`-boundary head is kept. Cutting inside a segment is not: reducing
+    `rightGauge_conj_…` to `right` would manufacture the wildcard `right_theta_*`.
+    A `suffix` that also ends with `_` is an infix replacement, so a `_`-segment
+    tail of `base` is re-appended.
     """
-    # A head must itself be identifier-shaped: cutting a family name down to its
-    # first word (`rightGauge_conj_…` -> `right`) is never the intended reading and
-    # yields over-broad names such as the wildcard `right_theta_*`.
-    heads = [base[:p] for p in _boundaries(base) + [len(base)]
-             if p > 0 and not base[:p].endswith("_") and identifier_shaped(base[:p])]
+    heads = [base[:p] for p in _segment_ends(base) + [len(base)] if p > 0]
     if not suffix.endswith("_"):
         return [h + suffix for h in heads][:EXPANSION_CAP]
-    tails = [base[q:] for q in _boundaries(base) if q < len(base) and base[q] != "_"]
+    tails = [base[q:] for q in _segment_starts(base) if q < len(base)]
     return [h + suffix + t for h in heads for t in tails][:EXPANSION_CAP]
 
 
@@ -183,9 +222,13 @@ def _record(name: str, exact: set, prefixes: set) -> None:
         return
     if name.endswith("*"):
         stem = name[:-1]
-        # A family wildcard is anchored on a separator; `word*` is prose.
+        # A family wildcard is anchored on a separator; `word*` is prose. The
+        # separator itself is dropped as well, because `spinHalfOp_*` is how the
+        # docs abbreviate the family `spinHalfOp1/2/3` (no `_` before the digit).
         if stem and stem[-1] in "_." and "*" not in stem and identifier_shaped(stem):
             prefixes.add(stem)
+            if identifier_shaped(stem[:-1]):
+                prefixes.add(stem[:-1])
         return
     if "*" in name:
         return

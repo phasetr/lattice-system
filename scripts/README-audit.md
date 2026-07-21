@@ -66,17 +66,19 @@ actually use (TeX `\_ \{ \}` escaping and `\texttt{...}` are undone first):
 | notation | example | expands to |
 |---|---|---|
 | brace | `spinOnePiRot{1,2,3}_sq` | `spinOnePiRot1_sq`, `…2_sq`, `…3_sq` (cross product over several groups; an empty alternative as in `_{,complement_}` is allowed) |
-| slash | `spinOneOpPlus/Minus_conjTranspose` | `spinOneOpPlus_conjTranspose`, `spinOneOpMinus_conjTranspose` (the abbreviated side is restored by cutting at `_`/camelCase boundaries) |
-| continuation | `complexConjugationSpinHalf_sq` / `_add` | a following code span starting with `_` continues the previous one, replacing its trailing segments. A continuation that also *ends* with `_` is an infix replacement and keeps the base's tail (`…_horizontal_adjacent_eq_…` / `_vertical_adjacent_`) |
-| star | `spinOnePiRot{1,2,3}_comm_*` | prefix match — only when the `*` follows `_` or `.`, so prose/markdown `word*` is not a family |
+| slash | `spinOneOpPlus/Minus_conjTranspose`, `spinHalfRot1/2/3_pi` | both members. The left side is kept verbatim; the right side is an abbreviation, so the left is cut exactly where the right continues it — before a trailing digit run for `1/2/3`, before the trailing camelCase segment for `Plus/Minus`, after the last `_` for `pos/neg`. `L` + the right side from its first `_` on covers the other direction |
+| continuation | `complexConjugationSpinHalf_sq` / `_add`, `tJConfigOf_tJSiteHop_up/_down` | a code span (or slash side) starting with `_` continues the previous name, replacing whole `_`-segments; the number replaced varies, so every `_`-boundary head is tried (never a cut inside a segment). A continuation that also *ends* with `_` is an infix replacement and keeps the base's tail (`…_horizontal_adjacent_eq_…` / `_vertical_adjacent_`) |
+| star | `spinOnePiRot{1,2,3}_comm_*` | prefix match — only when the `*` follows `_` or `.`, so prose/markdown `word*` is not a family. The anchoring separator is also dropped from the prefix, because `spinHalfOp_*` is how the docs abbreviate `spinHalfOp1/2/3` |
 
 Guards against over-broad readings (the index feeds a *deletion* sweep, so a
 manufactured name is as harmful as a missed one): a name enters the index only if
 it is identifier-shaped (`_` or a camelCase hump), so prose words do not;
 a slash token without `_` is a path or prose (`AngularMomentum/Ladder`,
 `add/sub`); a wildcard right side is never read standalone (`…/sub_*` must not
-yield `sub_*`); and a continuation head must itself be identifier-shaped
-(`rightGauge_conj_…` must not be cut down to `right`). Namespace wildcards
+yield `sub_*`); and neither a slash nor a continuation may cut inside a name
+segment (`spinHalfRot1/2/3_…` must not yield `spin2_*`, `rightGauge_conj_…` must
+not be cut down to `right`). Every notation and every crossing of two notations
+has a positive and a negative case in the test file. Namespace wildcards
 (`CollatzWielandt.*`) only match qualified names, so they do not cover the bare
 last segments the sweep works with.
 

@@ -31,7 +31,10 @@ case "$cmd" in
       | while read -r name; do
           n=$(grep -rEw "$name" "$ROOT" '--include=*.lean' | wc -l | tr -d ' ')
           # The declaration line is always one occurrence; total <=1 means zero-ref.
-          [ "$n" -le 1 ] && echo "$name"
+          # `if` rather than `[ ... ] && echo`: as the body's last command the
+          # latter exits 1 for every referenced name, which under `set -e` aborts
+          # the loop at the first one and silently truncates the list.
+          if [ "$n" -le 1 ]; then echo "$name"; fi
         done
     ;;
   undocumented-dead)
