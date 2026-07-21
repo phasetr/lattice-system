@@ -8,7 +8,8 @@
 #
 # usage:
 #   scripts/audit-helpers.sh dead-decls        # zero-reference theorem/lemma candidates
-#   scripts/audit-helpers.sh undocumented-dead # of those, the ones absent from docs/tex
+#   scripts/audit-helpers.sh undocumented-dead [FILE|-]  # of those, the ones the
+#                                              # docs do not record ('-' = stdin)
 #   scripts/audit-helpers.sh oversize [N]      # files over N lines (default 700)
 #   scripts/audit-helpers.sh suffix-hints      # name hints for hunting duplicates
 set -euo pipefail
@@ -37,12 +38,15 @@ case "$cmd" in
     # Zero-reference AND not written up in docs/index.md / tex/proof-guide.tex.
     # The docs record whole families in a compressed notation, so the match must
     # expand it (scripts/audit/docs_names.py); an exact grep mis-reports
-    # `spinOneRot{1,2,3}_zero` and friends as undocumented. Reads a precomputed
-    # list ("[file:line] name" per line) on stdin, else recomputes dead-decls.
-    if [ -t 0 ]; then
-      "$0" dead-decls | python3 "$HERE/audit/docs_names.py" --filter -
+    # `spinOneRot{1,2,3}_zero` and friends as undocumented.
+    # With FILE ('-' = stdin) it filters a precomputed list ("… name" per line);
+    # with no argument it recomputes dead-decls (slow). The source is an explicit
+    # argument, never a tty test, so this behaves the same under CI/automation.
+    SRC="${1:-}"
+    if [ -n "$SRC" ]; then
+      python3 "$HERE/audit/docs_names.py" --filter "$SRC"
     else
-      python3 "$HERE/audit/docs_names.py" --filter -
+      "$0" dead-decls | python3 "$HERE/audit/docs_names.py" --filter -
     fi
     ;;
   oversize)

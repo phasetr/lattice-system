@@ -47,7 +47,8 @@ cannot be resolved (it falls back to `origin/main`, else blocks).
 python3 scripts/audit_gate.py --diff main   # new decls vs main (what the hook runs)
 python3 scripts/audit_gate.py --full        # whole-repo report (Tier-2 cleanup)
 scripts/audit-helpers.sh dead-decls         # zero-reference theorem/lemma candidates
-scripts/audit-helpers.sh undocumented-dead  # of those, the ones absent from docs/tex
+scripts/audit-helpers.sh undocumented-dead [FILE|-]   # of those, the ones the
+                                            # docs do not record ('-' = stdin)
 scripts/audit-helpers.sh oversize 700       # files over a line threshold
 ```
 
@@ -59,24 +60,36 @@ documents record whole families in a **compressed notation**, so matching them w
 an exact grep is wrong — in the Wave-1 sweep it mis-reported 49 of 50 candidates as
 undocumented, and deleting them would have erased Tasaki Problem 2.2.a / 2.2.b.
 
-`scripts/audit/docs_names.py` expands the three compressions the two documents
+`scripts/audit/docs_names.py` expands the four compressions the two documents
 actually use (TeX `\_ \{ \}` escaping and `\texttt{...}` are undone first):
 
 | notation | example | expands to |
 |---|---|---|
 | brace | `spinOnePiRot{1,2,3}_sq` | `spinOnePiRot1_sq`, `…2_sq`, `…3_sq` (cross product over several groups; an empty alternative as in `_{,complement_}` is allowed) |
 | slash | `spinOneOpPlus/Minus_conjTranspose` | `spinOneOpPlus_conjTranspose`, `spinOneOpMinus_conjTranspose` (the abbreviated side is restored by cutting at `_`/camelCase boundaries) |
+| continuation | `complexConjugationSpinHalf_sq` / `_add` | a following code span starting with `_` continues the previous one, replacing its trailing segments. A continuation that also *ends* with `_` is an infix replacement and keeps the base's tail (`…_horizontal_adjacent_eq_…` / `_vertical_adjacent_`) |
 | star | `spinOnePiRot{1,2,3}_comm_*` | prefix match — only when the `*` follows `_` or `.`, so prose/markdown `word*` is not a family |
 
-A slash token without `_` is treated as a path or prose (`AngularMomentum/Ladder`)
-and not expanded. Namespace wildcards (`CollatzWielandt.*`) only match qualified
-names, so they do not cover the bare last segments the sweep works with.
+Guards against over-broad readings (the index feeds a *deletion* sweep, so a
+manufactured name is as harmful as a missed one): a name enters the index only if
+it is identifier-shaped (`_` or a camelCase hump), so prose words do not;
+a slash token without `_` is a path or prose (`AngularMomentum/Ladder`,
+`add/sub`); a wildcard right side is never read standalone (`…/sub_*` must not
+yield `sub_*`); and a continuation head must itself be identifier-shaped
+(`rightGauge_conj_…` must not be cut down to `right`). Namespace wildcards
+(`CollatzWielandt.*`) only match qualified names, so they do not cover the bare
+last segments the sweep works with.
 
 ```sh
 python3 scripts/audit/docs_names.py --expand          # the whole documented index
 python3 scripts/audit/docs_names.py --check NAME...   # documented / undocumented
-python3 scripts/audit/docs_names.py --filter LIST     # drop documented lines
+python3 scripts/audit/docs_names.py --filter LIST|-   # drop documented lines
+python3 scripts/audit/test_docs_names.py              # expansion regression tests
 ```
+
+The two document paths are resolved against the **repo root**, not the CWD, and a
+missing document (or an empty index) is a hard error — silently indexing nothing
+would report every declaration as undocumented, i.e. as deletable.
 
 This affects only the **sweep's** classification; `audit_gate.py`'s V1/V2/V3
 decisions are untouched (the gate exempts capstones via
