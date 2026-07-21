@@ -2,7 +2,6 @@ import LatticeSystem.Quantum.SpinS.SpinSRotation1
 import LatticeSystem.Quantum.SpinS.AxisSwapGaugeEquiv
 import LatticeSystem.Quantum.SpinS.Hermitian
 import LatticeSystem.Quantum.SpinS.CyclicCommutator
-import LatticeSystem.Quantum.SpinS.CyclicCommutator31
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergStructuralGeneralN
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergAxisSwapMinEigenvalue
 import LatticeSystem.Quantum.SpinS.BareAnisotropicEigLeTwoConditional

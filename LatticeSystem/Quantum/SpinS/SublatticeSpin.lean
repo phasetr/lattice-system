@@ -2,8 +2,6 @@ import LatticeSystem.Quantum.SpinS.TotalSpin
 import LatticeSystem.Quantum.SpinS.TotalSquared
 import LatticeSystem.Quantum.SpinS.MultiSiteCommutator
 import LatticeSystem.Quantum.SpinS.CyclicCommutator
-import LatticeSystem.Quantum.SpinS.CyclicCommutator23
-import LatticeSystem.Quantum.SpinS.CyclicCommutator31
 import LatticeSystem.Quantum.SpinS.AllAlignedState
 import LatticeSystem.Quantum.ManyBody
 

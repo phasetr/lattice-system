@@ -1,7 +1,5 @@
 import LatticeSystem.Quantum.SpinS.MultiSite
 import LatticeSystem.Quantum.SpinS.CyclicCommutator
-import LatticeSystem.Quantum.SpinS.CyclicCommutator23
-import LatticeSystem.Quantum.SpinS.CyclicCommutator31
 
 /-!
 # Multi-site spin-`S` same-site commutators
