@@ -12,10 +12,6 @@ inputs into the collapse of the moment ratio driving Tasaki eq. (4.2.60):
 * **`orderSqMoment_geom_lower`** — the concentration-**independent** lower bound
   `s_0^n ≤ T_n` (`s_0 = R_1 / (R_0 · V²)`), obtained by iterating log-convexity
   (`orderSqMoment_sq_le`) from the exact base ratio through `real_logConvex_geometric_lower`;
-* **`orderSqMoment_geom_tendsto`** — for each fixed `n`, `T_n → (m∗)^{2n}` as `L ↑ ∞` (even `L`),
-  a squeeze of the lower bound (above, driven by the base ratio limit
-  `orderSqMoment_baseRatio_tendsto` to `(m∗)²`) against the concentration upper bound
-  (`orderSqMoment_ratio_le_mStarSq`, documented axiom) telescoped through `T_{n+1} = s_n · T_n`;
 * **`orderSq_collapse_ratio_tendsto_one`** — the collapse tip: for each fixed `j`,
   `R_j / (√R_{2j} · √R_0) → 1` (the RHS of the L5-a identity `orderSq_collapse_vecNormSqRe`
   `= 2 (1 − R_j / (√R_{2j} √R_0))` therefore tends to `0`).  This is scale invariance:
@@ -236,41 +232,6 @@ private theorem geom_tendsto_filter (d N : ℕ) (hd : 1 ≤ d)
   rw [abs_lt] at hlow ⊢
   exact ⟨by linarith [hlow.1, hlen], by linarith [hup, hcont']⟩
 
-/-- **Fixed-`n` geometric moment limit** (Prop 4.10, L5-b-iii): for a total-spin-singlet
-ground-state family `Φ` with long-range order, **conditional on Conjecture 4.12** (`hconj`), for
-each fixed `n` the `V²`-normalised `ô²`-moment `T_n = R_n / (R_0 · V^{2n})` tends to `(m∗)^{2n}`:
-
-`∀ ε > 0, ∃ L₀, ∀ L ≥ L₀ (even, ≥ 2), |R_n / (R_0 · V^{2n}) − (m∗)^{2n}| < ε`,
-
-where `R_k = orderSqMoment d L N Φ k` and `V² = (L^d)²`.  Proof: a squeeze of the log-convex lower
-bound `s_0^n ≤ T_n` (`orderSqMoment_geom_lower`, driven to `(m∗)^{2n}` by the base ratio limit
-`orderSqMoment_baseRatio_tendsto`) against the concentration upper bound
-`orderSqMoment_ratio_le_mStarSq` telescoped through `T_{n+1} = s_n · T_n`. -/
-theorem orderSqMoment_geom_tendsto (d N : ℕ) (hd : 1 ≤ d)
-    (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ)
-    (hsinglet : ∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
-      (totalSpinSOp3 (HypercubicTorus d L) N).mulVec (Φ L) = 0 ∧
-        (totalSpinSOp1 (HypercubicTorus d L) N).mulVec (Φ L) = 0)
-    (qStar mStar : ℝ)
-    (hlim3 : ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
-      |(star (Φ L) ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
-          staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ L))).re /
-          ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2) - qStar| < ε)
-    (hconj : IsConjecture412Equality mStar qStar)
-    (hR : ∃ Lr : ℕ, ∀ (n L : ℕ) [NeZero L], Lr ≤ L → 2 ≤ L → Even L →
-      0 < orderSqMoment d L N (Φ L) n) (n : ℕ) :
-    ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
-      |orderSqMoment d L N (Φ L) n /
-          (orderSqMoment d L N (Φ L) 0 * (((L : ℝ) ^ d) ^ 2) ^ n) - (mStar ^ 2) ^ n| < ε := by
-  have hF := geom_tendsto_filter d N hd Φ hsinglet qStar mStar hlim3 hconj hR n
-  intro ε hε
-  have hev := Metric.tendsto_nhds.mp hF ε hε
-  rw [eventually_evenAtTop] at hev
-  obtain ⟨L₀, hL₀⟩ := hev
-  refine ⟨max L₀ 2, fun L _ hL h2 hev => ?_⟩
-  have hd' := hL₀ L (le_trans (le_max_left _ _) hL) hev
-  rwa [normOrderSqMoment_eq, Real.dist_eq] at hd'
-
 /-! ### The collapse-ratio tip -/
 
 /-- **Moment collapse ratio tends to one** (Prop 4.10, L5-b-iii tip, Tasaki eq. (4.2.60) RHS):
@@ -283,7 +244,7 @@ where `R_k = orderSqMoment d L N Φ k`.  Equivalently (with the L5-a identity
 `orderSq_collapse_vecNormSqRe = 2 (1 − R_j / (√R_{2j} √R_0))`) the collapse distance
 `‖unitNormalize ((ô²)ʲ Φ) − Φ̂‖²` tends to `0`.  Proof: scale invariance
 `R_j / (√R_{2j} √R_0) = T_j / √T_{2j}` with `T_n = R_n / (R_0 · V^{2n})`, then
-`T_j → (m∗)^{2j}`, `√T_{2j} → √((m∗)^{4j}) = (m∗)^{2j}` (`orderSqMoment_geom_tendsto`), so the ratio
+`T_j → (m∗)^{2j}`, `√T_{2j} → √((m∗)^{4j}) = (m∗)^{2j}` (`geom_tendsto_filter`), so the ratio
 tends to `(m∗)^{2j} / (m∗)^{2j} = 1` (`m∗ > 0`). -/
 theorem orderSq_collapse_ratio_tendsto_one (d N : ℕ) (hd : 1 ≤ d)
     (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ)
