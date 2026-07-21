@@ -1,6 +1,5 @@
 import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
-import LatticeSystem.Quantum.SpinS.CyclicCommutator31
-import LatticeSystem.Quantum.SpinS.CyclicCommutator23
+import LatticeSystem.Quantum.SpinS.CyclicCommutator
 import LatticeSystem.Math.PosSemidef.Basics
 import Mathlib.Algebra.QuadraticDiscriminant
 

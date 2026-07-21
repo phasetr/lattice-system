@@ -27,8 +27,6 @@ import LatticeSystem.Tests.SpinSCasimirEigenvalue
 import LatticeSystem.Tests.SpinSCasimirInvariance
 import LatticeSystem.Tests.SpinSCartan3
 import LatticeSystem.Tests.SpinSCyclicCommutator
-import LatticeSystem.Tests.SpinSCyclicCommutator23
-import LatticeSystem.Tests.SpinSCyclicCommutator31
 import LatticeSystem.Tests.SpinSDiagProjOrtho
 import LatticeSystem.Tests.SpinSAevalDiagonal
 import LatticeSystem.Tests.SpinSLagrangeFormula

@@ -10,8 +10,7 @@ double commutator entering the infrared / f-sum-rule bound on the staggered two-
 -/
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
 import LatticeSystem.Quantum.SpinS.MultiSiteCommutator
-import LatticeSystem.Quantum.SpinS.CyclicCommutator23
-import LatticeSystem.Quantum.SpinS.CyclicCommutator31
+import LatticeSystem.Quantum.SpinS.CyclicCommutator
 
 namespace LatticeSystem.Quantum
 
