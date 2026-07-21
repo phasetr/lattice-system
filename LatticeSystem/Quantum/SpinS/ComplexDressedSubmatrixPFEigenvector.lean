@@ -1,7 +1,6 @@
 import LatticeSystem.Quantum.SpinS.DressedSubmatrixPFEigenvectorStructural
 import LatticeSystem.Quantum.SpinS.MagConfig
 import LatticeSystem.Quantum.SpinS.ComplexDressedParityBlockFinrank
-import LatticeSystem.Quantum.SpinS.SubmatrixMinEigenvalue
 
 /-!
 # Existence of complex PF eigenvector for the (complex) dressed-Ĥ' submatrix

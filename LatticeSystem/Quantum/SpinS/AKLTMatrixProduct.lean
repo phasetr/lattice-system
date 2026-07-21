@@ -1,4 +1,3 @@
-import LatticeSystem.Quantum.SpinS.MPSTheorem75
 import LatticeSystem.Quantum.SpinS.MPSTheorem76Unitary
 
 /-!

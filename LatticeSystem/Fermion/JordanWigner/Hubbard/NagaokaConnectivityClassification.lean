@@ -1,4 +1,3 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.NagaokaConnectivity
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NagaokaStateQuiver
 
 /-!

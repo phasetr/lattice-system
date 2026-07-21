@@ -1,5 +1,4 @@
 import LatticeSystem.Quantum.SpinS.Magnetization
-import LatticeSystem.Quantum.SpinS.MultiSiteDotOffDiag
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
 import LatticeSystem.Quantum.SpinS.MultiSiteDotComm
 import LatticeSystem.Quantum.SpinS.TotalSpin

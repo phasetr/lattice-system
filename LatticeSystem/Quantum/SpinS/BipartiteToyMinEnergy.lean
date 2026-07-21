@@ -1,5 +1,4 @@
 import LatticeSystem.Quantum.SpinS.ToyHamiltonianJointEigenspace
-import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeel
 
 /-!
 # Predicted toy-Hamiltonian ground-state subspace and minimum energy

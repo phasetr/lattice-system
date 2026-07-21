@@ -1,4 +1,3 @@
-import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorEigenvalueUnique
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralMagSectorPF
 
 /-!

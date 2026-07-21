@@ -1,5 +1,4 @@
 import LatticeSystem.Math.RayleighPosSemidefKernel
-import LatticeSystem.Math.PosSemidef.Basics
 
 /-!
 # Tasaki Appendix A.2.3: zeros of the energy form are kernel vectors (Lemma A.11)

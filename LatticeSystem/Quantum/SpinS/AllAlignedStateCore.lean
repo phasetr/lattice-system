@@ -1,5 +1,4 @@
 import LatticeSystem.Quantum.SpinS.Heisenberg
-import LatticeSystem.Quantum.SpinS.MultiSiteCasimir
 import LatticeSystem.Quantum.SpinS.Magnetization
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
 import LatticeSystem.Quantum.SpinS.LadderBoundary

@@ -1,4 +1,3 @@
-import LatticeSystem.Quantum.SpinS.ParityReachConcentrateAB
 import LatticeSystem.Quantum.SpinS.ParityReachTransferIter
 
 /-!

@@ -9,7 +9,6 @@ is the Marshall gauge relative to the *shifted* reflection plane.  Combined with
 covariance of `θ`, this carries the single-axis chessboard to every bond of the ring, the step
 needed to assemble the Dyson–Lieb–Simon Gaussian domination from the fixed-plane estimate.
 -/
-import LatticeSystem.Quantum.SpinS.RingReflectionGibbsChessboard
 import LatticeSystem.Quantum.SpinS.RingTranslationGibbs
 
 namespace LatticeSystem.Quantum

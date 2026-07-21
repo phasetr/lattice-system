@@ -1,4 +1,3 @@
-import LatticeSystem.Math.MatrixAnalysis.HermitianExpUnitary
 import LatticeSystem.Quantum.SpinS.ManyBodyOperatorNorm
 
 /-!

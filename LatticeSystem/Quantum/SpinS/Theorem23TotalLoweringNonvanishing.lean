@@ -1,6 +1,5 @@
 import LatticeSystem.Quantum.SpinS.CasimirRearrangement
 import LatticeSystem.Quantum.SpinS.TotalSpin
-import LatticeSystem.Quantum.SpinS.Magnetization
 import LatticeSystem.Math.ComplexVectorKernel
 
 /-!

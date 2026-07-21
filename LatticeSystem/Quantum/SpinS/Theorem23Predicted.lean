@@ -1,4 +1,3 @@
-import LatticeSystem.Quantum.SpinS.Theorem23PredictedEndpoint
 import LatticeSystem.Quantum.SpinS.Theorem23LocalRaisedSiteSum
 
 

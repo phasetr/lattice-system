@@ -1,6 +1,5 @@
 import LatticeSystem.Quantum.SpinS.AndersonTower
 import LatticeSystem.Quantum.SpinS.HermitianVariationalLowerBound
-import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
 import Mathlib.LinearAlgebra.Matrix.PosDef
 import Mathlib.Analysis.Complex.Order

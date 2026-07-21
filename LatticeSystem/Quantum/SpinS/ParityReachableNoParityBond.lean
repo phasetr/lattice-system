@@ -1,4 +1,3 @@
-import LatticeSystem.Quantum.SpinS.ParityReachableMatrixPow
 import LatticeSystem.Quantum.SpinS.ParityReachableSymm
 
 /-!

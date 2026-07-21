@@ -1,7 +1,6 @@
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateCoherentSecondMoment
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateCoherentMoment
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateCoherentConcentration
-import LatticeSystem.Quantum.SpinS.AndersonTowerCartWordReBand
 import LatticeSystem.Quantum.SpinS.AndersonTowerEnergyBoundSU2
 
 /-!

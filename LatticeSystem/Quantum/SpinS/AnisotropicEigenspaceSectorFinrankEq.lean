@@ -1,6 +1,5 @@
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergMagSectorEmbeddingLift
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergMagSectorInverseLift
-import LatticeSystem.Quantum.SpinS.MagSectorLinearEquiv
 
 /-!
 # Anisotropic sector matrix eigenspace and full Hilbert eigenspace finrank transfer

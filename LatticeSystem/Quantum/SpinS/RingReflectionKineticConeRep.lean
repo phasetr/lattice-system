@@ -9,7 +9,6 @@ a single cone generator (`θ(L)·L`, `L = exp X` left-supported), so the kinetic
 **cone-representable** (`coneRep_exp_add`).  Combined with the RP-weight cone, this is the kinetic
 building block that the Trotter expansion of `e^{-βH}` consumes.
 -/
-import LatticeSystem.Quantum.SpinS.RingReflectionRPWeightCone
 import LatticeSystem.Quantum.SpinS.RingReflectionExpSupport
 import Mathlib.Analysis.Matrix.Normed
 

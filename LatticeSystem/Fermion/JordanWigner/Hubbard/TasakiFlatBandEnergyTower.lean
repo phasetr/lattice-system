@@ -1,7 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandZeroEnergy
-import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandMultiplet
 import LatticeSystem.Fermion.JordanWigner.Hubbard.EffectiveHamiltonianSpinSymmetry
-import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinTotHermitian
 
 /-!
 # Tasaki §11.3.1: flat-band SU(2) lowering symmetry and the energy tower

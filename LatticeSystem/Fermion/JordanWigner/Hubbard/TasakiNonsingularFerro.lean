@@ -1,5 +1,4 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandModel
-import LatticeSystem.Fermion.JordanWigner.Hubbard.SectorMinEnergy
 
 /-!
 # Tasaki §11.4.3: ferromagnetism in the non-singular Hubbard model (Theorem 11.20)

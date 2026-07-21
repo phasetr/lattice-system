@@ -1,6 +1,5 @@
 import LatticeSystem.Math.CStarAlgebra.State
 import Mathlib.Analysis.InnerProductSpace.Adjoint
-import Mathlib.Analysis.CStarAlgebra.GelfandNaimarkSegal
 
 /-!
 # Tasaki Appendix A.7: the GNS construction (Theorem A.28)

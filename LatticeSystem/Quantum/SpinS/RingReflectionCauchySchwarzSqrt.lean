@@ -10,7 +10,6 @@ valid for a reflection-invariant reflection-positive trace weight `M` and left-s
 the Dyson–Lieb–Simon spreading argument toward Gaussian domination.
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionChessboard
-import Mathlib.Analysis.SpecialFunctions.Sqrt
 
 namespace LatticeSystem.Quantum
 

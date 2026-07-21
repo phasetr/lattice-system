@@ -1,7 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaTheoremCore
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinTotHermitian
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinChargeCommutation
-import LatticeSystem.Fermion.JordanWigner.Hubbard.TJFillingSpinCompress
 import LatticeSystem.Fermion.JordanWigner.Hubbard.ChargesCore
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandMultiplet
 

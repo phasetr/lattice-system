@@ -2,7 +2,6 @@ import LatticeSystem.Quantum.SpinS.DressedAnisotropicMatrixOnMagSector
 import LatticeSystem.Math.HermitianMinEqOfShiftPF
 import LatticeSystem.Quantum.SpinS.MatrixSimilaritySpectrum
 import LatticeSystem.Quantum.SpinS.HermitianMinSimilarInvariance
-import LatticeSystem.Quantum.SpinS.ParityBlockDressedFinrank
 
 /-!
 # Anisotropic sector Perron--Frobenius bound at the Hermitian minimum

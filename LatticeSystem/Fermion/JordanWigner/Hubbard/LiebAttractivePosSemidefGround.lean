@@ -5,7 +5,6 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveEnergyReconcile
 import LatticeSystem.Quantum.SpinS.HermitianVariationalLowerBound
 import LatticeSystem.Quantum.SpinS.HermitianVariationalEquality
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
-import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowUVariational
 
 /-!
 # A positive-semidefinite-`W` ground state (Tasaki §10.2.4)
