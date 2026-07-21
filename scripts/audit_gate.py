@@ -21,6 +21,14 @@ What it blocks (the *entity*, not the name — renaming never bypasses it):
      imports exempt). The longLine syntax linter cannot be a lakefile build error
      downstream (it registers only after `import Mathlib`), so it is enforced here
      textually on the diff. Existing long lines are grandfathered (ratchet).
+  V4 newly unreachable module: a module that the build roots (`defaultTargets` in
+     `lakefile.toml`) reached at the base ref but no longer reach at HEAD. Lake's
+     roots carry no glob, so an unreached module is never compiled — it silently
+     leaves the warning / `#print axioms` / sorry-free perimeter while the build
+     stays green. Each side uses its own lakefile's roots, so deleting a build
+     root is caught too; unreadable roots fail closed rather than no-op.
+     Pre-existing orphans are grandfathered (ratchet), see
+     `reachability_regressions`.
 
 Non-blocking (report only; forced splits are disallowed):
   oversize files are listed but never affect the exit code.
@@ -172,10 +180,14 @@ def resolve_base(base):
 
 
 def head_dirty_lean():
-    """True if the working tree's *.lean differ from HEAD — including modified,
+    """True if the working tree's sources differ from HEAD — including modified,
     staged, deleted AND untracked files (the glob later reads the working tree,
-    so any of these would desync it from the pushed HEAD state)."""
-    r = subprocess.run(["git", "status", "--porcelain", "--", "*.lean"],
+    so any of these would desync it from the pushed HEAD state).
+
+    The lake configuration counts as a source here: V4 reads the build roots out
+    of it, so an uncommitted `defaultTargets` edit would otherwise be trusted and
+    could excuse an orphan that the pushed state still has."""
+    r = subprocess.run(["git", "status", "--porcelain", "--", "*.lean", *LAKEFILES],
                        capture_output=True, text=True)
     return bool(r.stdout.strip())
 
@@ -242,6 +254,203 @@ def added_long_lines(base, limit=100):
     return out
 
 
+# --- V4: build-root reachability -------------------------------------------
+#
+# `lakefile.toml` lists explicit roots with no glob, so lake compiles exactly the
+# import-closure of those roots. A module outside that closure is not built at
+# all: it cannot produce a warning, `#print axioms` never sees it, and a `sorry`
+# in it would not surface. Deleting the single in-repo import of a module is
+# therefore a silent, green-build regression (it happened in PR #5099), which
+# neither the build nor V1/V2/V3 can see.
+
+# Lake's build configuration, in LAKE'S OWN PRECEDENCE ORDER: `.lean` first.
+# Lean v4.29.0 (this repo's lean-toolchain), lake/Lake/Load/Package.lean,
+# `loadPackageCore`, lines 68-76:
+#
+#     let relLeanFile := cfg.relConfigFile.addExtension "lean"
+#     ...
+#     if let some configFile <- resolvePath? leanFile then
+#       if (<- tomlFile.pathExists) then
+#         logInfo s!"{name}: {relLeanFile} and {relTomlFile} are both present; \
+#                    using {relLeanFile}"
+#
+# so when both files exist lake builds from `lakefile.lean` and ignores the TOML.
+# Reading the TOML first would let an added `lakefile.lean` silently re-target the
+# build while the gate kept reporting on roots lake no longer uses (measured: a
+# `.lean` config with a single default target drops 117 modules from the closure).
+# `lakefile.lean` itself is not parsed (see `roots_from_lakefile`), so this order
+# makes the both-present case fail closed instead of no-op. Keep in sync with lake.
+LAKEFILES = ("lakefile.lean", "lakefile.toml")
+IMPORT_RE = re.compile(r'^\s*import\s+([A-Za-z_][\w.\'À-￿]*)')
+# Accept both TOML string forms; a silent [] here would turn V4 into a no-op.
+_TARGETS_RE = re.compile(r'^\s*defaultTargets\s*=\s*\[([^\]]*)\]', re.MULTILINE)
+_TARGET_RE = re.compile(r'"([^"]+)"|\'([^\']+)\'')
+
+
+def module_of_path(path):
+    """`LatticeSystem/Quantum/Foo.lean` -> `LatticeSystem.Quantum.Foo`."""
+    return path[:-len(".lean")].replace(os.sep, "/").replace("/", ".")
+
+
+def path_of_module(mod):
+    """Inverse of `module_of_path` (the repo-relative source path)."""
+    return mod.replace(".", "/") + ".lean"
+
+
+def build_roots(text):
+    """Root module names from a `lakefile.toml`'s `defaultTargets`.
+
+    A target is either a `lean_lib` name or a module name; with no `globs` set a
+    library's root module is its own name, so both read the same here. Returns []
+    when nothing can be read (no `defaultTargets`, or a `lakefile.lean` this
+    regex cannot parse) — callers must treat [] as *fail closed*, never as
+    "no roots, nothing to check"."""
+    m = _TARGETS_RE.search(text)
+    if not m:
+        return []
+    return [a or b for a, b in _TARGET_RE.findall(m.group(1))]
+
+
+def roots_from_lakefile(path, text):
+    """Build roots for the lake configuration at `path`, or [] if unreadable.
+
+    Only `lakefile.toml` is understood. A `lakefile.lean` returns [] even if its
+    text happened to match, because the Lean DSL expresses targets in ways this
+    regex cannot see — callers fail closed, which is the honest answer for a
+    format the gate does not support."""
+    if not path or not path.endswith(".toml"):
+        return []
+    return build_roots(text or "")
+
+
+def lakefile_worktree():
+    """(path, text) of the checked-out lake configuration, or (None, None)."""
+    for p in LAKEFILES:
+        if os.path.exists(p):
+            with open(p, encoding="utf-8") as fh:
+                return p, fh.read()
+    return None, None
+
+
+def lakefile_at_ref(ref):
+    """(path, text) of the lake configuration stored in `ref`, or (None, None)."""
+    for p in LAKEFILES:
+        r = subprocess.run(["git", "show", f"{ref}:{p}"],
+                           capture_output=True, text=True)
+        if r.returncode == 0:
+            return p, r.stdout
+    return None, None
+
+
+def imports_of_text(text):
+    """In-repo `import`s of one Lean source, ignoring commented-out ones.
+
+    Block (`/- -/`, `/-- -/`, `/-! -/`) and line comments are skipped, so an
+    `import` quoted inside a docstring is not read as a real edge."""
+    deps = []
+    depth = 0
+    for line in text.splitlines():
+        start_depth = depth
+        depth = max(0, depth + line.count("/-") - line.count("-/"))
+        if start_depth > 0 or line.lstrip().startswith("--"):
+            continue
+        m = IMPORT_RE.match(line)
+        if m and (m.group(1) == ROOT or m.group(1).startswith(ROOT + ".")):
+            deps.append(m.group(1))
+    return deps
+
+
+def _source_paths(paths):
+    """Keep the Lean sources that make up the library: `ROOT/**/*.lean` plus the
+    umbrella `ROOT.lean` at the repo top level (a build root itself, so it must
+    be a node of the graph)."""
+    return sorted(p for p in paths
+                  if p.endswith(".lean")
+                  and (p.startswith(ROOT + "/") or p == f"{ROOT}.lean"))
+
+
+def import_graph_worktree():
+    """{module: [imported modules]} for the checked-out tree."""
+    files = lean_files()
+    if os.path.exists(f"{ROOT}.lean"):
+        files = [f"{ROOT}.lean"] + files
+    graph = {}
+    for f in _source_paths(files):
+        with open(f, encoding="utf-8") as fh:
+            graph[module_of_path(f)] = imports_of_text(fh.read())
+    return graph
+
+
+def import_graph_at_ref(ref):
+    """Same as `import_graph_worktree` but read out of `ref`.
+
+    Two git processes, no checkout and no temp tree: `ls-tree` for the node set
+    and one `cat-file --batch` for every blob. Both are `check=True` — a git
+    failure must propagate, since an empty graph would silently pass V4."""
+    listing = subprocess.run(
+        ["git", "ls-tree", "-r", "--name-only", "-z", ref],
+        capture_output=True, text=True, check=True).stdout.split("\0")
+    files = _source_paths(p for p in listing if p)
+    if not files:
+        return {}
+    batch = subprocess.run(
+        ["git", "cat-file", "--batch"],
+        input="".join(f"{ref}:{p}\n" for p in files).encode(),
+        capture_output=True, check=True).stdout
+    graph = {}
+    pos = 0
+    for p in files:
+        nl = batch.index(b"\n", pos)
+        header = batch[pos:nl].decode()
+        if header.endswith("missing"):  # cannot happen after ls-tree; fail loudly
+            raise RuntimeError(f"git cat-file: {header}")
+        size = int(header.split()[2])
+        graph[module_of_path(p)] = imports_of_text(
+            batch[nl + 1:nl + 1 + size].decode("utf-8"))
+        pos = nl + 1 + size + 1  # blob content is followed by a newline
+    return graph
+
+
+def reachable_modules(graph, roots):
+    """Modules in the import-closure of `roots` (roots absent from the graph are
+    simply not reachable — a missing root file cannot pull anything in)."""
+    seen = set()
+    stack = [r for r in roots if r in graph]
+    while stack:
+        m = stack.pop()
+        if m in seen:
+            continue
+        seen.add(m)
+        stack.extend(d for d in graph.get(m, ()) if d not in seen)
+    return seen
+
+
+def unreachable_modules(graph, roots):
+    """Modules present in the tree that no build root reaches."""
+    return set(graph) - reachable_modules(graph, roots)
+
+
+def reachability_regressions(base_graph, base_roots, head_graph, head_roots):
+    """Modules unreachable at HEAD that were reachable at the base ref.
+
+    Each side uses *its own* roots: the base closure is computed with the base
+    ref's `defaultTargets` and the HEAD closure with HEAD's. Applying HEAD's
+    roots to both would make deleting a build root invisible — the strictly
+    worse version of the PR #5099 regression, since it orphans a whole subtree
+    at once.
+
+    The baseline is *recomputed from the base ref* rather than checked in: a
+    committed orphan list would go stale the moment a module is wired up or
+    renamed, and a stale baseline either blocks legitimate work or silently
+    stops blocking. Deriving it from the base ref keeps the check a ratchet
+    (pre-existing orphans never fire) that automatically tightens as debt is
+    repaid. A module added in this diff and left unwired is also caught, since
+    it is unreachable at HEAD and was not unreachable at base (it did not
+    exist)."""
+    return sorted(unreachable_modules(head_graph, head_roots)
+                  - unreachable_modules(base_graph, base_roots))
+
+
 def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "--diff"
     base = sys.argv[2] if len(sys.argv) > 2 else "main"
@@ -257,25 +466,48 @@ def main():
     if mode == "--diff":
         # Fail closed: never audit nothing because a ref/tree is missing.
         if head_dirty_lean():
-            print("[audit-gate] BLOCKED: uncommitted *.lean changes. Commit them so"
-                  " the gate audits the pushed (HEAD) state, then push.")
+            print("[audit-gate] BLOCKED: uncommitted *.lean / lakefile changes."
+                  " Commit them so the gate audits the pushed (HEAD) state, then"
+                  " push.")
             return 2
         resolved = resolve_base(base)
         if resolved is None:
             print(f"[audit-gate] BLOCKED: base ref '{base}' (and origin/main) not"
                   " found; cannot determine new declarations.")
             return 2
+        # V4 reads the build roots from *each side's own* lakefile; unreadable
+        # roots fail closed, exactly like an unresolvable base ref, because an
+        # empty root list would silently turn the reachability check into a no-op.
+        base_lf, base_lf_text = lakefile_at_ref(resolved)
+        head_lf, head_lf_text = lakefile_worktree()
+        base_roots = roots_from_lakefile(base_lf, base_lf_text)
+        head_roots = roots_from_lakefile(head_lf, head_lf_text)
+        for side, ref, lf, rts in (("base", resolved, base_lf, base_roots),
+                                   ("HEAD", "HEAD", head_lf, head_roots)):
+            if not rts:
+                where = lf or f"no {' / '.join(LAKEFILES)}"
+                print(f"[audit-gate] BLOCKED: no build roots readable at {side}"
+                      f" ({ref}: {where}); cannot tell which modules lake compiles."
+                      " Restore a parseable 'defaultTargets = [...]', or teach"
+                      " build_roots() the new format — never leave V4 a no-op.")
+                return 2
         try:
             targets = added_decl_targets(resolved)  # {(name, file, lineno)}
             long_lines = added_long_lines(resolved)  # [(file, lineno, width)]
+            orphaned = reachability_regressions(
+                import_graph_at_ref(resolved), base_roots,
+                import_graph_worktree(), head_roots)
         except subprocess.CalledProcessError as e:
             print(f"[audit-gate] BLOCKED: git diff against '{resolved}' failed: {e}")
             return 2
+        roots = head_roots
         scope = [d for d in decls if (d[0], d[2], d[3]) in targets]
         scope_label = f"new decls vs {resolved}"
     else:
         scope = decls
         long_lines = []  # width is only ratcheted on the diff, not scanned whole-repo
+        roots = roots_from_lakefile(*lakefile_worktree())
+        orphaned = []  # whole-repo orphans are reported below, never blocking
         scope_label = "whole repo"
 
     # V1 decorative declaration (zero reference). Count references by the name's
@@ -315,6 +547,17 @@ def main():
     over.sort(reverse=True)
 
     print(f"[audit-gate] scope = {scope_label}; allowlist = {len(allow)} names")
+    if mode != "--diff":
+        if not roots:
+            print("[audit-gate] (non-blocking) no build roots readable from"
+                  f" {' / '.join(LAKEFILES)}; reachability not reported")
+        stale = sorted(unreachable_modules(import_graph_worktree(), roots)) if roots \
+            else []
+        if stale:
+            print(f"[audit-gate] (non-blocking) modules unreachable from"
+                  f" {'+'.join(roots)}: {len(stale)}")
+            for m in stale:
+                print(f"   {path_of_module(m)}")
     if over:
         print(f"[audit-gate] (non-blocking) oversize >{OVERSIZE}: "
               + ", ".join(f"{f}({n})" for n, f in over[:5]))
@@ -342,6 +585,14 @@ def main():
               " enforced in this hook because it cannot be a lakefile build error)")
         for f, ln, w in long_lines:
             print(f"   {f}:{ln}  ({w} cols)")
+    if orphaned:
+        fail = True
+        print("\nV4 newly unreachable module: no build root imports it any more, so"
+              " lake stops compiling it (green build, no warnings, no #print axioms)")
+        for m in orphaned:
+            print(f"   {path_of_module(m)}  ({m})")
+        print(f"   -> restore the import, or wire it into a root reached by"
+              f" {'+'.join(roots)}")
 
     if fail and mode == "--diff":
         print("\n[audit-gate] BLOCKED. Resolve the entities above before pushing.")

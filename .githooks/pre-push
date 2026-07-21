@@ -33,8 +33,9 @@ done
 cd "$root"
 if ! python3 "$gate" --diff main; then
   echo "" >&2
-  echo "pre-push: hard gate blocked the push. Remove the decorative/duplicate" >&2
-  echo "declaration above (rename does NOT help; delete or merge the entity)." >&2
-  echo "A genuine capstone goes in scripts/audit/capstones.txt." >&2
+  echo "pre-push: hard gate blocked the push. Fix the entity reported above:" >&2
+  echo "a decorative/duplicate declaration is deleted or merged (renaming does NOT" >&2
+  echo "help; a genuine capstone goes in scripts/audit/capstones.txt); a long line" >&2
+  echo "is wrapped; a newly unreachable module is re-imported from a build root." >&2
   exit 1
 fi

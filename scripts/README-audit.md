@@ -16,6 +16,60 @@ both decidable from text):
   imports exempt). Enforced in this hook, not as a build error: the longLine syntax
   linter registers only after `import Mathlib`, so a lakefile option for it is silently
   ignored (verified). Existing long lines are grandfathered (ratchet).
+- **Newly unreachable module**: a module the build roots reached at the base ref but
+  no longer reach at `HEAD` (see below).
+
+## Build-root reachability
+
+`lakefile.toml`'s `defaultTargets` (`LatticeSystem`, `LatticeSystem.Tests`) carry no
+glob, so lake compiles exactly the **import-closure of those roots**. A module outside
+that closure is not compiled at all: it cannot emit a warning, `#print axioms` never
+reaches it, and a `sorry` in it would not surface — while the build stays green.
+
+That is not hypothetical. In PR #5099 one deleted `import` line (the only in-repo
+reference to the module) dropped `AnisotropicHeisenbergCrossingDualSectorGroundExplicit`
+and `AnisotropicHeisenbergParametricGapCrossingGeneric` out of the build. Both are
+book results written up in `docs/index.md` (Tasaki §2.5 Theorem 2.4, obligation (2)).
+Neither the build, nor V1/V2/V3, nor codex caught it; a human reviewer did.
+
+The gate parses the roots out of `lakefile.toml` (never hardcoded), walks the `import`
+graph from them at **both** the base ref and `HEAD`, and blocks any module that was
+reachable at base and is not at `HEAD`. A module added by the diff and left unwired is
+caught too (unreachable at `HEAD`, absent at base).
+
+Each side uses **its own lakefile's roots** — the base closure with the base ref's
+`defaultTargets`, the `HEAD` closure with `HEAD`'s. Sharing `HEAD`'s roots would make
+*deleting a build root* invisible, which is the strictly worse form of #5099: dropping
+`LatticeSystem.Tests` from `defaultTargets` orphans 1,198 modules in one line.
+
+Unreadable roots **fail closed** (`BLOCKED`, exit 2), exactly like an unresolvable base
+ref. An empty root list would make every module trivially unreachable-at-both-ends and
+turn V4 into a silent no-op, i.e. a gate that always passes — worse than no gate. This
+covers a deleted `defaultTargets` line and a migration to `lakefile.lean` (the Lean DSL
+is not parsed; a `.lean` lakefile always fails closed, even if its text happens to match
+the TOML shape). Both TOML quote styles are understood, so the alternative spelling
+still reads the roots rather than falling back to the no-op.
+
+The lakefile is looked up in **lake's own precedence order — `lakefile.lean` first**
+(Lean v4.29.0, `lake/Lake/Load/Package.lean:68-76`: with both present lake logs
+"are both present; using lakefile.lean"). Reading the TOML first would let an added
+`.lean` config silently re-target the build while the gate went on reporting against
+roots lake no longer uses.
+
+The lakefile also counts as a source for the "uncommitted changes" fail-closed rule:
+V4 reads the roots from the working tree, so an uncommitted `defaultTargets` edit would
+otherwise excuse an orphan that the pushed state still has.
+
+The baseline is **recomputed from the base ref every run**, not stored in a file: a
+committed orphan list goes stale on the first rewire or rename, and a stale baseline
+either blocks legitimate work or quietly stops blocking. Recomputing keeps the check a
+ratchet — existing orphans never fire, and the bar rises automatically as debt is paid.
+
+The base-ref graph is read straight out of git (`ls-tree` + `cat-file --batch`, both
+checked for failure), so there is no checkout and no temp tree. Imports inside block or
+line comments are not edges.
+
+`--full` lists every module unreachable from the roots (report only, never blocking).
 
 `def`/`abbrev` duplication depends on the body (same type but different value is not a
 duplicate), which text cannot decide soundly, and α-renamed duplicates are also
@@ -87,6 +141,9 @@ python3 scripts/audit/docs_names.py --expand          # the whole documented ind
 python3 scripts/audit/docs_names.py --check NAME...   # documented / undocumented
 python3 scripts/audit/docs_names.py --filter LIST|-   # drop documented lines
 python3 scripts/audit/test_docs_names.py              # expansion regression tests
+python3 scripts/audit/test_audit_gate_reachability.py # V4 reachability regression tests
+                                            # (drives the gate's exit code in a
+                                            # throwaway git worktree; ~45 s)
 ```
 
 The two document paths are resolved against the **repo root**, not the CWD, and a
@@ -114,6 +171,21 @@ conservative — it must never block legitimate work:
   false negatives (a missed dead decl), never false positives.
 - V2 duplicate detection is textual (`α`-renamed binders that differ in spelling
   are not matched).
+- V4 reachability treats `LatticeSystem.Tests` as a root because lake does, so a
+  production module kept alive only by a test import counts as reachable. That is the
+  build's own notion, not a statement that the wiring is good; the test-only cases are
+  the `lean-audit-tier2` subagent's job.
+- V4 reads plain `import`; `public import` (Lean's module system) is not yet an edge.
+  The repo has none today, and adopting it needs a matching change here first —
+  otherwise a module reachable only through a `public import` is unreachable at *both*
+  refs and so permanently grandfathered. Tracked in #5098.
+- V4's base is the resolved base ref (`origin/main`), not the merge base that V1–V3's
+  three-dot diff uses. On a branch behind `main` this can flag a module `main` orphaned
+  independently; the reverse direction is grandfathered, so it never passes silently.
+  Tracked in #5098.
+- Like V1/V2, V4 is vacuous if the source tree indexes to nothing (a mistyped
+  `LEAN_SRC_ROOT`, or deleting the whole root directory): with an empty HEAD graph
+  there is no module left to call unreachable. The gate reports on the tree it can see.
 
 These residual cases are the job of the `lean-audit-tier1`/`tier2` subagents, which
 read statements and resolve names; the gate is the cheap deterministic first line.
