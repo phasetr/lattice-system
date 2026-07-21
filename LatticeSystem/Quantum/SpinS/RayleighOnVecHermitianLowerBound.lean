@@ -1,6 +1,3 @@
-import LatticeSystem.Quantum.SpinS.RayleighOnDiagonal
-import LatticeSystem.Quantum.SpinS.RayleighUnitarySimilarity
-import LatticeSystem.Quantum.SpinS.RayleighOnVecBddBelow
 import Mathlib.Analysis.Matrix.Spectrum
 
 /-!

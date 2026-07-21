@@ -8,7 +8,6 @@ Combined with the per-bond commutator case analysis (left/right endpoint, off-bo
 spin-current divergence `[Ĥ, Ŝ_z^{(3)}]` to the two bonds incident to `z`, the quantity entering the
 double commutator of the infrared / f-sum-rule bound.
 -/
-import LatticeSystem.Quantum.SpinS.SingleBondSpinSOp3Commutator
 import LatticeSystem.Quantum.SpinS.HeisenbergCore
 
 namespace LatticeSystem.Quantum

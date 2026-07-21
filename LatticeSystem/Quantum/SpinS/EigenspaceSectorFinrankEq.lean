@@ -1,6 +1,5 @@
 import LatticeSystem.Quantum.SpinS.SectorEmbeddingComplexEigval
 import LatticeSystem.Quantum.SpinS.SectorRestrictionComplexEigval
-import LatticeSystem.Quantum.SpinS.MagSectorLinearEquiv
 
 /-!
 # Sector matrix eigenspace and full Hilbert eigenspace ⊓ sector subspace: finrank equality

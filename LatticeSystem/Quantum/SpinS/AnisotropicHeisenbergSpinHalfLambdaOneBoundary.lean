@@ -1,4 +1,3 @@
-import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergReduction
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergFullMinEigenvalueContinuous
 import LatticeSystem.Quantum.SpinS.Theorem24SU2GlobalUniquenessFromMLM
 import LatticeSystem.Quantum.SpinS.Theorem24ZeroMagnetizationFromUniqueness

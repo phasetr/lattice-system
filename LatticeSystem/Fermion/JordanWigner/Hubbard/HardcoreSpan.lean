@@ -1,5 +1,4 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreBasis
-import LatticeSystem.Fermion.JordanWigner.Hubbard.HopConfig
 
 /-!
 # Span of the one-hole hard-core sector by the basis states

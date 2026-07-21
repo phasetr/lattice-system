@@ -1,5 +1,4 @@
 import LatticeSystem.Quantum.SpinS.ParityReachable
-import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphCore
 
 set_option linter.unusedSectionVars false
 set_option linter.unusedSimpArgs false

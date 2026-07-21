@@ -1,4 +1,3 @@
-import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinSCaseIIConditionalBridge
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinSTargetFromStrictGap
 
 /-!

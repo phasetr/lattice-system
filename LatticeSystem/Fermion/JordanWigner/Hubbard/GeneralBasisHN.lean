@@ -1,6 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandFilling
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandOccBasis
-import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
 
 /-!
 # General basis of the `N`-electron space `H_N` (Tasaki Lemma 9.4)

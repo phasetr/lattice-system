@@ -1,6 +1,5 @@
 import LatticeSystem.Quantum.ManyBody
 import LatticeSystem.Quantum.Pauli
-import LatticeSystem.Fermion.Mode
 
 /-!
 # Jordan–Wigner string (Tasaki §2 / standard JW mapping)

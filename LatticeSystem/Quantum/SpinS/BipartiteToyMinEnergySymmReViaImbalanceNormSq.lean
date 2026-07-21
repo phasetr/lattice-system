@@ -1,5 +1,4 @@
 import LatticeSystem.Quantum.SpinS.BipartiteToyMinEnergySymmViaImbalance
-import LatticeSystem.Quantum.SpinS.BipartiteImbalanceWeightAbs
 
 /-!
 # Symm-energy real part via `‖bipartiteImbalanceWeight‖²`

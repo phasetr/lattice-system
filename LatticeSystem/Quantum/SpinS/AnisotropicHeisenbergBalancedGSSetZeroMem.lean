@@ -1,5 +1,4 @@
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergBalancedGSSetClosed
-import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergFullMinLeSectorMin
 
 /-!
 # `0 ∈ balancedGSSet` from the strict-GS axiom at `(1, 0)`

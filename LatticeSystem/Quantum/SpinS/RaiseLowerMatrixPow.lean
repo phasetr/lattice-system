@@ -1,5 +1,4 @@
 import LatticeSystem.Quantum.SpinS.RaiseLower
-import LatticeSystem.Quantum.MarshallLiebMattis.MatrixPowPath
 
 /-!
 # Matrix-power positivity from raise/lower reachability

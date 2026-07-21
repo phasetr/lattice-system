@@ -1,6 +1,5 @@
 import LatticeSystem.Quantum.SpinS.HermitianMinLeOfEigenvector
 import LatticeSystem.Quantum.SpinS.SingleClusterHamiltonianEnergy
-import LatticeSystem.Quantum.SpinS.SingleClusterCoupledSectorEnergy
 import LatticeSystem.Quantum.SpinS.SingleClusterLeafCasimirBound
 
 /-!
