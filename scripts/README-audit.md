@@ -47,8 +47,40 @@ cannot be resolved (it falls back to `origin/main`, else blocks).
 python3 scripts/audit_gate.py --diff main   # new decls vs main (what the hook runs)
 python3 scripts/audit_gate.py --full        # whole-repo report (Tier-2 cleanup)
 scripts/audit-helpers.sh dead-decls         # zero-reference theorem/lemma candidates
+scripts/audit-helpers.sh undocumented-dead  # of those, the ones absent from docs/tex
 scripts/audit-helpers.sh oversize 700       # files over a line threshold
 ```
+
+## Documented-name matching (compressed family notation)
+
+A zero-reference declaration that `docs/index.md` / `tex/proof-guide.tex` write up
+(with its Tasaki equation number) is a book-facing result, not dead code. Both
+documents record whole families in a **compressed notation**, so matching them with
+an exact grep is wrong — in the Wave-1 sweep it mis-reported 49 of 50 candidates as
+undocumented, and deleting them would have erased Tasaki Problem 2.2.a / 2.2.b.
+
+`scripts/audit/docs_names.py` expands the three compressions the two documents
+actually use (TeX `\_ \{ \}` escaping and `\texttt{...}` are undone first):
+
+| notation | example | expands to |
+|---|---|---|
+| brace | `spinOnePiRot{1,2,3}_sq` | `spinOnePiRot1_sq`, `…2_sq`, `…3_sq` (cross product over several groups; an empty alternative as in `_{,complement_}` is allowed) |
+| slash | `spinOneOpPlus/Minus_conjTranspose` | `spinOneOpPlus_conjTranspose`, `spinOneOpMinus_conjTranspose` (the abbreviated side is restored by cutting at `_`/camelCase boundaries) |
+| star | `spinOnePiRot{1,2,3}_comm_*` | prefix match — only when the `*` follows `_` or `.`, so prose/markdown `word*` is not a family |
+
+A slash token without `_` is treated as a path or prose (`AngularMomentum/Ladder`)
+and not expanded. Namespace wildcards (`CollatzWielandt.*`) only match qualified
+names, so they do not cover the bare last segments the sweep works with.
+
+```sh
+python3 scripts/audit/docs_names.py --expand          # the whole documented index
+python3 scripts/audit/docs_names.py --check NAME...   # documented / undocumented
+python3 scripts/audit/docs_names.py --filter LIST     # drop documented lines
+```
+
+This affects only the **sweep's** classification; `audit_gate.py`'s V1/V2/V3
+decisions are untouched (the gate exempts capstones via
+`scripts/audit/capstones.txt`, not via the docs).
 
 `scripts/audit/capstones.txt` is the allowlist (one name per line) that exempts a name
 from **both** checks: genuine zero-reference book theorems (V1), and declarations a

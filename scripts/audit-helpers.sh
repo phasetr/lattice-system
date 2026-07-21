@@ -8,9 +8,12 @@
 #
 # usage:
 #   scripts/audit-helpers.sh dead-decls        # zero-reference theorem/lemma candidates
+#   scripts/audit-helpers.sh undocumented-dead # of those, the ones absent from docs/tex
 #   scripts/audit-helpers.sh oversize [N]      # files over N lines (default 700)
 #   scripts/audit-helpers.sh suffix-hints      # name hints for hunting duplicates
 set -euo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 ROOT="${LEAN_SRC_ROOT:-LatticeSystem}"
 SUFFIX_HINTS='_structural|_legacy|_alt|_mirror|_doubled|_factored|_twin|_copy|_old|_aux2|_aux3|_variant|_tmp'
@@ -29,6 +32,18 @@ case "$cmd" in
           # The declaration line is always one occurrence; total <=1 means zero-ref.
           [ "$n" -le 1 ] && echo "$name"
         done
+    ;;
+  undocumented-dead)
+    # Zero-reference AND not written up in docs/index.md / tex/proof-guide.tex.
+    # The docs record whole families in a compressed notation, so the match must
+    # expand it (scripts/audit/docs_names.py); an exact grep mis-reports
+    # `spinOneRot{1,2,3}_zero` and friends as undocumented. Reads a precomputed
+    # list ("[file:line] name" per line) on stdin, else recomputes dead-decls.
+    if [ -t 0 ]; then
+      "$0" dead-decls | python3 "$HERE/audit/docs_names.py" --filter -
+    else
+      python3 "$HERE/audit/docs_names.py" --filter -
+    fi
     ;;
   oversize)
     N="${1:-700}"
