@@ -1,5 +1,4 @@
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.WindowTransportD6c
-import Mathlib
 
 /-!
 # Gate D6d Stage C: Knabe aggregation and the `L`-uniform bound `(Ĥ')² ≥ (1/10) Ĥ'`
