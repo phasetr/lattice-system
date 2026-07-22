@@ -23,7 +23,6 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-! ## Case-(ii) target wrappers from parity-block path bounds -/
 
-set_option linter.style.longLine false in
 /-- **General spin-S case-(ii) target ground eigenspace `finrank <= 1` from
 pathwise axis-swapped parity-block submatrix simplicity**. -/
 theorem anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_axisSwapped_submatrix_blocks_path
@@ -94,10 +93,9 @@ theorem anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_axisSwapped_subm
     (caseII_path_global_finrank_bound_of_axisSwapped_submatrix_blocks_le_one
       (Λ := Λ) (N := N) (J := J) hJ_star hJself h_even h_odd)
 
-set_option linter.style.longLine false in
 /-- **General spin-S case-(ii) target ground states have zero total
 magnetization from pathwise axis-swapped parity-block submatrix simplicity**. -/
-theorem anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_axisSwapped_submatrix_blocks_path
+theorem aHeisS_case_ii_target_zeroMag_of_axisSwapped_submat_blocks_path
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)

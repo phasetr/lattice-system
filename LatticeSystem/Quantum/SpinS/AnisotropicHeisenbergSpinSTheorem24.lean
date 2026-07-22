@@ -25,7 +25,6 @@ open Matrix Module Set
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-set_option linter.style.longLine false in
 /-- **General spin-`S`, `2 <= N`, Tasaki Theorem 2.4 target uniqueness wrapper**:
 the target ground eigenspace has `finrank <= 1` throughout the parameter
 region covered by the already proved case-(i), SU(2)-boundary, and case-(ii)
@@ -84,26 +83,25 @@ theorem anisotropicHeisenbergS_tasaki24_target_finrank_le_one_of_MLM_casimir_lad
   · rcases h_lambda_one with ⟨hlam_eq, hD_nonneg⟩
     subst lam
     rcases lt_or_eq_of_le hD_nonneg with hD_pos | hD_zero
-    · exact anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_lambda_one_D_pos_general
+    · exact aHeisS_target_finrank_le_one_of_MLM_casLadder_t23_pf_lam1_D_pos_gen
         (Λ := Λ) (N := N) A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym
         hc_axis_strict hA_ne hB_ne hN c_mlm c_toy hT23 hc_heis_strict
         hc_toy_strict h_card_eq M_balanced h_balanced h_centered_nonzero hD_pos
     · rw [← hD_zero]
-      exact anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_lambda_one_D_zero_general
+      exact aHeisS_target_finrank_le_one_of_MLM_casLadder_t23_pf_lam1_D_zero_gen
         (Λ := Λ) (N := N) A hJim hJnn hJpos hJbip hJ_star hJ_sym hA_ne hB_ne
         hN_one c_mlm c_toy hT23 hc_heis_strict hc_toy_strict h_card_eq
   · rcases h_case_ii with ⟨hlam_case_ii, hD_case_ii⟩
-    exact anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_total_reachability_MLM_casimir_ladder_t23_pf
+    exact aHeisS_case_ii_target_finrank_le_one_of_totReach_MLM_casLadder_t23_pf
       (Λ := Λ) (N := N) A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym
       hA_ne hB_ne hN M_balanced h_balanced h_centered_nonzero
       c_mlm c_toy hT23 hc_heis_strict hc_toy_strict h_card_eq
       hlam_case_ii hD_case_ii
 
-set_option linter.style.longLine false in
 /-- **General spin-`S`, `2 <= N`, Tasaki Theorem 2.4 zero-magnetization
 wrapper**: every non-zero target ground state has zero total `S^3`
 magnetization throughout the packaged parameter region. -/
-theorem anisotropicHeisenbergS_tasaki24_target_zero_magnetization_of_MLM_casimir_ladder_t23_pf_general
+theorem aHeisS_tasaki24_target_zeroMag_of_MLM_casLadder_t23_pf_gen
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)

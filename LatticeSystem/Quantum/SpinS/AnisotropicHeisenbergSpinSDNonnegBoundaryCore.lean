@@ -24,10 +24,9 @@ open Matrix Module Set
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 
-set_option linter.style.longLine false in
 /-- General spin-`S` PF positive eigenvector for the unshifted dressed
 axis-swapped parity-block submatrix under `D.re >= 0`. -/
-theorem dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists_D_nonneg
+theorem dressedAxisSwapReMatParity_pos_eigenvector_exists_D_nonneg
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -71,7 +70,6 @@ theorem dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenv
   have heq2 : Matrix.mulVec M v = c • v - μ • v := by linear_combination -hAv
   rw [heq2, sub_smul]
 
-set_option linter.style.longLine false in
 /-- General spin-`S` dressed submatrix Hermitian minimum identification under
 `D.re >= 0`. -/
 theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf_D_nonneg
@@ -98,7 +96,7 @@ theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalu
         (dressedAxisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
           (Λ := Λ) (N := N) A hJim hlam hDim p) := by
   obtain ⟨ν, v, hv_pos, hAv⟩ :=
-    dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists_D_nonneg
+    dressedAxisSwapReMatParity_pos_eigenvector_exists_D_nonneg
       A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDnn hc_strict
       hA_ne hB_ne hN p
   refine ⟨ν, v, hv_pos, hAv, ?_⟩
@@ -157,7 +155,6 @@ theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalu
     hermitianMinEigenvalue_eq_of_spectrum_eq _ _ h_spec_eq
   linarith [h_min_lift, h_min_bridge]
 
-set_option linter.style.longLine false in
 /-- General spin-`S` bare submatrix Hermitian minimum identification under
 `D.re >= 0`. -/
 theorem axisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf_D_nonneg
@@ -191,10 +188,9 @@ theorem axisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf
   rw [bare_dressed_submatrix_hermitianMinEigenvalue_eq A hJim hlam hDim p]
   exact hν_eq
 
-set_option linter.style.longLine false in
 /-- General spin-`S` bare parity-block submatrix `finrank <= 1` at its
 Hermitian minimum under `D.re >= 0`. -/
-theorem axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue_D_nonneg
+theorem axisSwapAHeisS_submat_finrank_le_one_at_hMinEig_D_nonneg
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -275,7 +271,6 @@ theorem axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianM
   exact axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_min_conditional
     hJim hlam hDim p ν h_finrank_bare hν_eq
 
-set_option linter.style.longLine false in
 /-- General spin-`S` anisotropic `H` eigenspace `finrank <= 2` at
 `min(per-block mins)` under `D.re >= 0`. -/
 theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_unconditional_D_nonneg_general
@@ -301,11 +296,11 @@ theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_unconditional_D_nonneg_
             (axisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
               (Λ := Λ) (N := N) hJim hlam hDim 1)) : ℝ) : ℂ)) ≤ 2 := by
   have h0 :=
-    axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue_D_nonneg
+    axisSwapAHeisS_submat_finrank_le_one_at_hMinEig_D_nonneg
       A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDnn hc_strict hA_ne hB_ne
       hN 0
   have h1 :=
-    axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue_D_nonneg
+    axisSwapAHeisS_submat_finrank_le_one_at_hMinEig_D_nonneg
       A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDnn hc_strict hA_ne hB_ne
       hN 1
   exact anisotropicHeisenbergS_eigenspace_finrank_le_two_at_min_block_mins_general

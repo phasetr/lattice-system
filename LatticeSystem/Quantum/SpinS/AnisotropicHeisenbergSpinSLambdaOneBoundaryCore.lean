@@ -25,10 +25,9 @@ open Matrix Module Set
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 
-set_option linter.style.longLine false in
 /-- General spin-`S` PF positive eigenvector for the unshifted dressed
 axis-swapped parity-block submatrix at `lambda = 1`, `D.re > 0`. -/
-theorem dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists_lambda_one_D_pos
+theorem dressedAxisSwapReMatParity_pos_eigenvector_exists_lam1_D_pos
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -71,10 +70,9 @@ theorem dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenv
   have heq2 : Matrix.mulVec M v = c • v - μ • v := by linear_combination -hAv
   rw [heq2, sub_smul]
 
-set_option linter.style.longLine false in
 /-- General spin-`S` dressed submatrix Hermitian minimum identification at
 `lambda = 1`, `D.re > 0`. -/
-theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf_lambda_one_D_pos
+theorem dressedAxisSwapAHeisS_submat_hMinEig_eq_pf_lam1_D_pos
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -100,7 +98,7 @@ theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalu
   have hOneReNeg : -1 ≤ (1 : ℂ).re := by norm_num
   have hOneReLe : (1 : ℂ).re ≤ 1 := by norm_num
   obtain ⟨ν, v, hv_pos, hAv⟩ :=
-    dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists_lambda_one_D_pos
+    dressedAxisSwapReMatParity_pos_eigenvector_exists_lam1_D_pos
       A hJim hJnn hJpos hJself hJbip hDim hDpos hc_strict hA_ne hB_ne hN p
   refine ⟨ν, v, hv_pos, hAv, ?_⟩
   set M_real : Matrix (parityConfigS Λ N p) (parityConfigS Λ N p) ℝ :=
@@ -159,7 +157,6 @@ theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalu
     hermitianMinEigenvalue_eq_of_spectrum_eq _ _ h_spec_eq
   linarith [h_min_lift, h_min_bridge]
 
-set_option linter.style.longLine false in
 /-- General spin-`S` bare submatrix Hermitian minimum identification at
 `lambda = 1`, `D.re > 0`. -/
 theorem axisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf_lambda_one_D_pos
@@ -186,16 +183,15 @@ theorem axisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf
           (Λ := Λ) (N := N) hJim (show ((1 : ℂ).im = 0) from by norm_num) hDim p) := by
   have hOneIm : ((1 : ℂ).im = 0) := by norm_num
   obtain ⟨ν, v, hv_pos, hAv, hν_eq⟩ :=
-    dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf_lambda_one_D_pos
+    dressedAxisSwapAHeisS_submat_hMinEig_eq_pf_lam1_D_pos
       A hJim hJnn hJpos hJself hJbip hDim hDpos hc_strict hA_ne hB_ne hN p
   refine ⟨ν, v, hv_pos, hAv, ?_⟩
   rw [bare_dressed_submatrix_hermitianMinEigenvalue_eq A hJim hOneIm hDim p]
   exact hν_eq
 
-set_option linter.style.longLine false in
 /-- General spin-`S` bare parity-block submatrix `finrank <= 1` at its
 Hermitian minimum at `lambda = 1`, `D.re > 0`. -/
-theorem axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue_lambda_one_D_pos
+theorem axisSwapAHeisS_submat_finrank_le_one_at_hMinEig_lam1_D_pos
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -300,10 +296,10 @@ theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_unconditional_lambda_on
               (Λ := Λ) (N := N) hJim (show ((1 : ℂ).im = 0) from by norm_num) hDim 1)) : ℝ) : ℂ)) ≤ 2 := by
   have hOneIm : ((1 : ℂ).im = 0) := by norm_num
   have h0 :=
-    axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue_lambda_one_D_pos
+    axisSwapAHeisS_submat_finrank_le_one_at_hMinEig_lam1_D_pos
       A hJim hJnn hJpos hJself hJbip hDim hDpos hc_strict hA_ne hB_ne hN 0
   have h1 :=
-    axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue_lambda_one_D_pos
+    axisSwapAHeisS_submat_finrank_le_one_at_hMinEig_lam1_D_pos
       A hJim hJnn hJpos hJself hJbip hDim hDpos hc_strict hA_ne hB_ne hN 1
   exact anisotropicHeisenbergS_eigenspace_finrank_le_two_at_min_block_mins_general
     hJim hOneIm hDim hJself h0 h1

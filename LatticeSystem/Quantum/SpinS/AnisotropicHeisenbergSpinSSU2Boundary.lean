@@ -20,10 +20,9 @@ open Matrix Module
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-set_option linter.style.longLine false in
 /-- General spin-`S` target uniqueness at the SU(2) point `(lambda, D) = (1, 0)`
 from the Theorem 2.3 MLM/Casimir/Perron-Frobenius endpoint. -/
-theorem anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_lambda_one_D_zero_general
+theorem aHeisS_target_finrank_le_one_of_MLM_casLadder_t23_pf_lam1_D_zero_gen
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -63,11 +62,10 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_p
   exact anisotropicHeisenbergS_SU2_ground_eigenspace_finrank_le_one_of_heisenberg_general
     (Λ := Λ) (N := N) hJ_star hμ_min huniq_heis
 
-set_option linter.style.longLine false in
 /-- General spin-`S` zero total `S^3` magnetization at the SU(2) point
 `(lambda, D) = (1, 0)` from the Theorem 2.3 MLM/Casimir/Perron-Frobenius
 endpoint. -/
-theorem anisotropicHeisenbergS_target_zero_magnetization_of_MLM_casimir_ladder_t23_pf_lambda_one_D_zero_general
+theorem aHeisS_target_zeroMag_of_MLM_casLadder_t23_pf_lam1_D_zero_gen
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -94,7 +92,7 @@ theorem anisotropicHeisenbergS_target_zero_magnetization_of_MLM_casimir_ladder_t
     (totalSpinSOp3 Λ N).mulVec Φ = 0 := by
   classical
   have huniq :=
-    anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_lambda_one_D_zero_general
+    aHeisS_target_finrank_le_one_of_MLM_casLadder_t23_pf_lam1_D_zero_gen
       A hJim hJnn hJpos hJbip hJ_star hJ_sym hA_ne hB_ne hN
       c_mlm c_toy hT23 hc_heis_strict hc_toy_strict h_card_eq
   exact anisotropicHeisenbergS_unique_groundState_has_zero_magnetization
