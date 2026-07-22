@@ -25,7 +25,6 @@ open Matrix Module Set
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-set_option linter.style.longLine false in
 /-- Path-global case-(ii) full `finrank <= 2` from total reachability and the
 MLM/Casimir/Theorem 2.3 SU(2) endpoint. -/
 theorem caseII_path_global_finrank_bound_of_total_reachability_MLM_casimir_ladder_t23_pf
@@ -61,7 +60,7 @@ theorem caseII_path_global_finrank_bound_of_total_reachability_MLM_casimir_ladde
   classical
   have hN_one : 1 ≤ N := by omega
   have h_SU2_unique :=
-    anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_lambda_one_D_zero_general
+    aHeisS_target_finrank_le_one_of_MLM_casLadder_t23_pf_lam1_D_zero_gen
       (Λ := Λ) (N := N) A hJim hJnn hJpos hJbip hJ_star hJ_sym hA_ne hB_ne hN_one
       c_mlm c_toy hT23 hc_heis_strict hc_toy_strict h_card_eq
   exact caseII_path_global_finrank_bound_of_total_reachability_and_su2_unique
@@ -69,10 +68,9 @@ theorem caseII_path_global_finrank_bound_of_total_reachability_MLM_casimir_ladde
     (caseII_coupling_eq_zero_of_not_bipartiteCompleteGraph_adj (Λ := Λ) A hJself hJbip)
     hJ_star hA_ne hB_ne hN hlam_case_ii hD_case_ii h_SU2_unique
 
-set_option linter.style.longLine false in
 /-- General spin-`S` case-(ii) target ground eigenspace `finrank <= 1` from
 total reachability and the MLM/Casimir/Theorem 2.3 SU(2) endpoint. -/
-theorem anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_total_reachability_MLM_casimir_ladder_t23_pf
+theorem aHeisS_case_ii_target_finrank_le_one_of_totReach_MLM_casLadder_t23_pf
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -106,7 +104,7 @@ theorem anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_total_reachabili
   classical
   have hN_one : 1 ≤ N := by omega
   have h_SU2_unique :=
-    anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_lambda_one_D_zero_general
+    aHeisS_target_finrank_le_one_of_MLM_casLadder_t23_pf_lam1_D_zero_gen
       (Λ := Λ) (N := N) A hJim hJnn hJpos hJbip hJ_star hJ_sym hA_ne hB_ne hN_one
       c_mlm c_toy hT23 hc_heis_strict hc_toy_strict h_card_eq
   have h_GS_at_SU2_base :=
@@ -150,11 +148,10 @@ theorem anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_total_reachabili
       (caseII_coupling_eq_zero_of_not_bipartiteCompleteGraph_adj (Λ := Λ) A hJself hJbip)
       hJ_star hA_ne hB_ne hN hlam_case_ii hD_case_ii h_SU2_unique)
 
-set_option linter.style.longLine false in
 /-- General spin-`S` case-(ii) target ground states have zero total
 magnetization from total reachability and the MLM/Casimir/Theorem 2.3 SU(2)
 endpoint. -/
-theorem anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_total_reachability_MLM_casimir_ladder_t23_pf
+theorem aHeisS_case_ii_target_zeroMag_of_totReach_MLM_casLadder_t23_pf
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -188,7 +185,7 @@ theorem anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_total_reacha
           ℝ) : ℂ) • Φ) :
     (totalSpinSOp3 Λ N).mulVec Φ = 0 := by
   have huniq :=
-    anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_total_reachability_MLM_casimir_ladder_t23_pf
+    aHeisS_case_ii_target_finrank_le_one_of_totReach_MLM_casLadder_t23_pf
       (Λ := Λ) (N := N) A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym hA_ne hB_ne hN
       M_balanced h_balanced h_centered_nonzero c_mlm c_toy hT23 hc_heis_strict
       hc_toy_strict h_card_eq hlam_case_ii hD_case_ii

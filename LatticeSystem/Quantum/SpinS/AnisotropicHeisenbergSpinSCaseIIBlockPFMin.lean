@@ -192,7 +192,7 @@ theorem anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_block_pf_min
       (Λ := Λ) (N := N) (J := J) hJim hJself hJ_star h_even_pf h_odd_pf with
     ⟨h_even, h_odd⟩
   exact
-      anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_axisSwapped_submatrix_blocks_path
+      aHeisS_case_ii_target_zeroMag_of_axisSwapped_submat_blocks_path
     (Λ := Λ) (N := N) A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym hA_ne hB_ne hN
     M_balanced h_balanced hlam_case_ii hD_case_ii h_centered_nonzero
     h_strict_gap_at_SU2 h_GS_at_SU2 h_even h_odd hΦ_ne hΦ_gs

@@ -17,7 +17,6 @@ open Matrix Module Set
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-set_option linter.style.longLine false in
 /-- General spin-`S` obligation (2) from only SU(2) global uniqueness, with
 target `D' >= 0`. -/
 theorem anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_only_D_nonneg_general
@@ -81,7 +80,6 @@ theorem anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_only_D_nonneg_g
     M_balanced M_orig h_balanced hM_orig_ne h_centered_nonzero
     hlam'_lb hlam'_ub hD' h_violation_orig h_strict_gap_at_SU2
 
-set_option linter.style.longLine false in
 /-- General spin-`S` target strict gap from SU(2) global uniqueness, with
 target `D' >= 0`. -/
 theorem anisotropicHeisenbergS_strict_gap_all_M_of_SU2_global_unique_D_nonneg_general
@@ -133,7 +131,6 @@ theorem anisotropicHeisenbergS_strict_gap_all_M_of_SU2_global_unique_D_nonneg_ge
   simp only [anisotropicHeisenbergParametricPath_one] at hpath
   exact hpath
 
-set_option linter.style.longLine false in
 /-- General spin-`S` target uniqueness from SU(2) global uniqueness in the
 case-(i) `D' >= 0` boundary strip. -/
 theorem anisotropicHeisenbergS_target_finrank_le_one_of_SU2_global_unique_D_nonneg_general
@@ -204,10 +201,9 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_SU2_global_unique_D_nonn
     A hJim hJnn hJpos hJbip hJ_star hJ_sym hA_ne hB_ne hN
     M_balanced h_balanced h_strict_gap h_global_two
 
-set_option linter.style.longLine false in
 /-- General spin-`S` target ground states have zero magnetization from SU(2)
 global uniqueness in the case-(i) `D' >= 0` boundary strip. -/
-theorem anisotropicHeisenbergS_target_groundState_zero_magnetization_of_SU2_global_unique_D_nonneg_general
+theorem aHeisS_target_gState_zeroMag_of_su2Uniq_D_nonneg_gen
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -256,7 +252,6 @@ theorem anisotropicHeisenbergS_target_groundState_zero_magnetization_of_SU2_glob
         ℝ) : ℂ)
     huniq hΦ_ne hΦ_eig
 
-set_option linter.style.longLine false in
 /-- General spin-`S` target uniqueness from the MLM/Casimir SU(2) endpoint in
 the case-(i) `D' >= 0` boundary strip. -/
 theorem anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general
@@ -321,10 +316,9 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_p
     M_balanced h_balanced h_centered_nonzero h_SU2_global_unique
     hlam'_lb hlam'_ub hD'
 
-set_option linter.style.longLine false in
 /-- General spin-`S` target zero-magnetization from the MLM/Casimir SU(2)
 endpoint in the case-(i) `D' >= 0` boundary strip. -/
-theorem anisotropicHeisenbergS_target_zero_magnetization_of_MLM_casimir_ladder_t23_pf_D_nonneg_general
+theorem aHeisS_target_zeroMag_of_MLM_casLadder_t23_pf_D_nonneg_gen
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
