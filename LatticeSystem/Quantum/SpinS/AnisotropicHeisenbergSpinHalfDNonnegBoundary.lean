@@ -335,10 +335,9 @@ theorem spinHalf_anisotropicHeisenbergS_obligation_2_of_MLM_casimir_ladder_t23_p
     M_balanced M_orig h_balanced hM_orig_ne h_centered_nonzero
     hlam'_lb hlam'_ub hD' h_violation_orig h_SU2_global_unique
 
-set_option linter.style.longLine false in
 /-- Spin-`1/2` obligation (2) strict-gap form from the MLM/Casimir endpoint and
 Theorem 2.3 sector PF, with target `D' >= 0`. -/
-theorem spinHalf_anisotropicHeisenbergS_obligation_2_strict_gap_of_MLM_casimir_ladder_t23_pf_D_nonneg
+theorem spinHalf_aHeisS_oblig2_strict_gap_of_MLM_casLadder_t23_pf_D_nonneg
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -380,7 +379,6 @@ theorem spinHalf_anisotropicHeisenbergS_obligation_2_strict_gap_of_MLM_casimir_l
       M_balanced M_orig h_balanced hM_orig_ne h_centered_nonzero
       hlam'_lb hlam'_ub hD' h_violation_orig)
 
-set_option linter.style.longLine false in
 /-- Spin-`1/2` strict gap for every non-balanced sector, with target
 `D' >= 0`. -/
 theorem spinHalf_anisotropicHeisenbergS_strict_gap_all_M_of_MLM_casimir_ladder_t23_pf_D_nonneg
@@ -423,7 +421,7 @@ theorem spinHalf_anisotropicHeisenbergS_strict_gap_all_M_of_MLM_casimir_ladder_t
     have hbound := magSumS_le σ.val
     rw [σ.property] at hbound
     exact Nat.lt_succ_of_le hbound
-  exact spinHalf_anisotropicHeisenbergS_obligation_2_strict_gap_of_MLM_casimir_ladder_t23_pf_D_nonneg
+  exact spinHalf_aHeisS_oblig2_strict_gap_of_MLM_casLadder_t23_pf_D_nonneg
     A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym hc_axis_strict hA_ne hB_ne
     c_mlm c_toy hT23 hc_heis_strict hc_toy_strict h_card_eq
     M_balanced M h_balanced hM_ne h_centered_nonzero
@@ -591,10 +589,9 @@ theorem spinHalf_anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_lad
     J (lam' : ℂ) (D' : ℂ) ((μ_full : ℝ) : ℂ)
     h_two hΦ_admis0 hΦ_ne hΦ_eig_full h_admis_pf
 
-set_option linter.style.longLine false in
 /-- Spin-`1/2` target ground states have zero magnetization in the case-(i)
 `D' >= 0` boundary strip. -/
-theorem spinHalf_anisotropicHeisenbergS_target_groundState_zero_magnetization_of_MLM_casimir_ladder_t23_pf_D_nonneg
+theorem spinHalf_aHeisS_target_gState_zeroMag_of_MLM_casLadder_t23_pf_D_nonneg
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)

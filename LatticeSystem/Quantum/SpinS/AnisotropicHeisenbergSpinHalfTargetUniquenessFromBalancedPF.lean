@@ -101,12 +101,11 @@ theorem spinHalf_anisotropicHeisenbergS_balanced_sector_pf_at_target
   rw [hmin_eq]
   exact hraw
 
-set_option linter.style.longLine false in
 /-- **Spin-1/2 target ground eigenspace `finrank <= 1` from balanced-sector PF**:
 assuming Perron--Frobenius simplicity for the balanced sector at the target
 point, the PR #4029 balanced-full ground-energy equality, global `finrank <= 2`,
 and the admissible-sector bridge give full ground-state uniqueness. -/
-theorem spinHalf_anisotropicHeisenbergS_target_finrank_le_one_of_balanced_sector_pf_and_MLM_casimir_ladder_t23_pf
+theorem spinHalf_aHeisS_target_finrank_le_one_of_balSec_pf_and_MLM_casLadder_t23_pf
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -209,11 +208,10 @@ theorem spinHalf_anisotropicHeisenbergS_target_finrank_le_one_of_balanced_sector
     J (lam' : ℂ) (D' : ℂ) ((μ_full : ℝ) : ℂ)
     h_two hΦ_admis0 hΦ_ne hΦ_eig_full h_admis_pf
 
-set_option linter.style.longLine false in
 /-- **Spin-1/2 target ground state has zero magnetization from balanced-sector PF**:
 the target uniqueness theorem above composed with the existing
 uniqueness-implies-zero-magnetization theorem. -/
-theorem spinHalf_anisotropicHeisenbergS_target_groundState_zero_magnetization_of_balanced_sector_pf_and_MLM_casimir_ladder_t23_pf
+theorem spinHalf_aHeisS_target_gState_zeroMag_of_balSec_pf_and_MLM_casLadder_t23_pf
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -256,7 +254,7 @@ theorem spinHalf_anisotropicHeisenbergS_target_groundState_zero_magnetization_of
     (totalSpinSOp3 Λ 1).mulVec Φ = 0 := by
   classical
   have huniq :=
-    spinHalf_anisotropicHeisenbergS_target_finrank_le_one_of_balanced_sector_pf_and_MLM_casimir_ladder_t23_pf
+    spinHalf_aHeisS_target_finrank_le_one_of_balSec_pf_and_MLM_casLadder_t23_pf
       A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym hc_axis_strict hA_ne hB_ne
       c_mlm c_toy hT23 hc_heis_strict hc_toy_strict h_card_eq
       M_balanced h_balanced h_centered_nonzero hlam'_lb hlam'_ub hD' h_balanced_sector_pf
@@ -266,7 +264,6 @@ theorem spinHalf_anisotropicHeisenbergS_target_groundState_zero_magnetization_of
       (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star 1 lam' D') : ℝ) : ℂ)
     huniq hΦ_ne hΦ_gs
 
-set_option linter.style.longLine false in
 /-- **Spin-1/2 target ground eigenspace `finrank <= 1` without a balanced-sector
 PF callback**: the callback is supplied by
 `spinHalf_anisotropicHeisenbergS_balanced_sector_pf_at_target`. -/
@@ -309,15 +306,14 @@ theorem spinHalf_anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_lad
       A hJim hJnn hJpos hJbip hJ_star hJ_sym hA_ne hB_ne M_balanced
       (lam' := lam') (D' := D')
   exact
-    spinHalf_anisotropicHeisenbergS_target_finrank_le_one_of_balanced_sector_pf_and_MLM_casimir_ladder_t23_pf
+    spinHalf_aHeisS_target_finrank_le_one_of_balSec_pf_and_MLM_casLadder_t23_pf
       A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym hc_axis_strict hA_ne hB_ne
       c_mlm c_toy hT23 hc_heis_strict hc_toy_strict h_card_eq
       M_balanced h_balanced h_centered_nonzero hlam'_lb hlam'_ub hD' hpf
 
-set_option linter.style.longLine false in
 /-- **Spin-1/2 target ground state has zero magnetization without a
 balanced-sector PF callback**. -/
-theorem spinHalf_anisotropicHeisenbergS_target_groundState_zero_magnetization_of_MLM_casimir_ladder_t23_pf
+theorem spinHalf_aHeisS_target_gState_zeroMag_of_MLM_casLadder_t23_pf
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -358,7 +354,7 @@ theorem spinHalf_anisotropicHeisenbergS_target_groundState_zero_magnetization_of
       A hJim hJnn hJpos hJbip hJ_star hJ_sym hA_ne hB_ne M_balanced
       (lam' := lam') (D' := D')
   exact
-    spinHalf_anisotropicHeisenbergS_target_groundState_zero_magnetization_of_balanced_sector_pf_and_MLM_casimir_ladder_t23_pf
+    spinHalf_aHeisS_target_gState_zeroMag_of_balSec_pf_and_MLM_casLadder_t23_pf
       A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym hc_axis_strict hA_ne hB_ne
       c_mlm c_toy hT23 hc_heis_strict hc_toy_strict h_card_eq
       M_balanced h_balanced h_centered_nonzero hlam'_lb hlam'_ub hD' hpf

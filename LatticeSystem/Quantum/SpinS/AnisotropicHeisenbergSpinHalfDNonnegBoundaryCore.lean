@@ -60,7 +60,7 @@ theorem shiftedDressedAxisSwappedReMatrix_apply_pos_of_parityStepS_spinHalf_D_no
 
 /-- Spin-`1/2` block matrix power positivity from parity reachability with
 nonnegative `D`. -/
-theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_pow_apply_pos_of_parityReachable_spinHalf_D_nonneg
+theorem shiftedDressedReMatParity_pow_apply_pos_of_parityReach_spinHalf_D_nonneg
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -93,7 +93,7 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_pow_apply_pos_of_parityRe
 
 /-- Spin-`1/2` parity-block shifted PF matrix irreducibility under reachability
 totality, with `D.re >= 0`. -/
-theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_parityReachable_total_spinHalf_D_nonneg
+theorem shiftedDressedReMatParity_irred_of_parityReach_total_spinHalf_D_nonneg
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -124,7 +124,7 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_parityRe
     exact shiftedDressedAxisSwappedReMatrixOnParityBlock_diag_pos A J lam D 1 p (hc_strict σ'.1)
   · have hreach := hreach_total σ' σ hsig
     obtain ⟨k, hk⟩ :=
-      shiftedDressedAxisSwappedReMatrixOnParityBlock_pow_apply_pos_of_parityReachable_spinHalf_D_nonneg
+      shiftedDressedReMatParity_pow_apply_pos_of_parityReach_spinHalf_D_nonneg
         A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDnn hc_le p hreach
     have hk_pos : 0 < k := by
       rcases Nat.eq_zero_or_pos k with hk0 | hkp
@@ -150,7 +150,7 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_spinHalf_D_
     (p : ℕ)
     [Nonempty (parityConfigS Λ 1 p)] :
     (shiftedDressedAxisSwappedReMatrixOnParityBlock A J lam D 1 c p).IsIrreducible := by
-  refine shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_parityReachable_total_spinHalf_D_nonneg
+  refine shiftedDressedReMatParity_irred_of_parityReach_total_spinHalf_D_nonneg
     A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDnn hc_strict p ?_
   intro σ' σ _hne
   refine parityReachableS_total A hA_ne hB_ne (by norm_num : 1 ≤ 1) ?_
@@ -162,7 +162,7 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_spinHalf_D_
 
 /-- Spin-`1/2` PF positive eigenvector for the unshifted dressed parity-block
 submatrix with nonnegative `D`. -/
-theorem dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists_spinHalf_D_nonneg
+theorem dressedAxisSwapReMatParity_pos_eigenvector_exists_spinHalf_D_nonneg
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -204,10 +204,9 @@ theorem dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenv
   have heq2 : Matrix.mulVec M v = c • v - μ • v := by linear_combination -hAv
   rw [heq2, sub_smul]
 
-set_option linter.style.longLine false in
 /-- Spin-`1/2` dressed submatrix Hermitian minimum identification with
 nonnegative `D`. -/
-theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf_spinHalf_D_nonneg
+theorem dressedAxisSwapAHeisS_submat_hMinEig_eq_pf_spinHalf_D_nonneg
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -230,7 +229,7 @@ theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalu
         (dressedAxisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
           (Λ := Λ) (N := 1) A hJim hlam hDim p) := by
   obtain ⟨ν, v, hv_pos, hAv⟩ :=
-    dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists_spinHalf_D_nonneg
+    dressedAxisSwapReMatParity_pos_eigenvector_exists_spinHalf_D_nonneg
       A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDnn
       hc_strict hA_ne hB_ne p
   refine ⟨ν, v, hv_pos, hAv, ?_⟩
@@ -289,7 +288,6 @@ theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalu
     hermitianMinEigenvalue_eq_of_spectrum_eq _ _ h_spec_eq
   linarith [h_min_lift, h_min_bridge]
 
-set_option linter.style.longLine false in
 /-- Spin-`1/2` bare submatrix Hermitian minimum identification with
 nonnegative `D`. -/
 theorem axisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf_spinHalf_D_nonneg
@@ -315,17 +313,16 @@ theorem axisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf
         (axisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
           (Λ := Λ) (N := 1) hJim hlam hDim p) := by
   obtain ⟨ν, v, hv_pos, hAv, hν_eq⟩ :=
-    dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf_spinHalf_D_nonneg
+    dressedAxisSwapAHeisS_submat_hMinEig_eq_pf_spinHalf_D_nonneg
       A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDnn hc_strict hA_ne hB_ne
       p
   refine ⟨ν, v, hv_pos, hAv, ?_⟩
   rw [bare_dressed_submatrix_hermitianMinEigenvalue_eq A hJim hlam hDim p]
   exact hν_eq
 
-set_option linter.style.longLine false in
 /-- Spin-`1/2` bare parity-block submatrix `finrank <= 1` at its Hermitian
 minimum with nonnegative `D`. -/
-theorem axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue_spinHalf_D_nonneg
+theorem axisSwapAHeisS_submat_finrank_le_one_at_hMinEig_spinHalf_D_nonneg
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -405,7 +402,6 @@ theorem axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianM
   exact axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_min_conditional
     hJim hlam hDim p ν h_finrank_bare hν_eq
 
-set_option linter.style.longLine false in
 /-- Spin-`1/2` anisotropic `H` eigenspace `finrank <= 2` at
 `min(per-block mins)` with nonnegative `D`. -/
 theorem spinHalf_anisotropicHeisenbergS_eigenspace_finrank_le_two_truly_unconditional_D_nonneg
@@ -430,10 +426,10 @@ theorem spinHalf_anisotropicHeisenbergS_eigenspace_finrank_le_two_truly_uncondit
             (axisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
               (Λ := Λ) (N := 1) hJim hlam hDim 1)) : ℝ) : ℂ)) ≤ 2 := by
   have h0 :=
-    axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue_spinHalf_D_nonneg
+    axisSwapAHeisS_submat_finrank_le_one_at_hMinEig_spinHalf_D_nonneg
       A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDnn hc_strict hA_ne hB_ne 0
   have h1 :=
-    axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue_spinHalf_D_nonneg
+    axisSwapAHeisS_submat_finrank_le_one_at_hMinEig_spinHalf_D_nonneg
       A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDnn hc_strict hA_ne hB_ne 1
   exact spinHalf_anisotropicHeisenbergS_eigenspace_finrank_le_two_at_min_block_mins
     hJim hlam hDim hJself h0 h1

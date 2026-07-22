@@ -105,10 +105,9 @@ theorem spinHalf_anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_MLM_cas
       (caseII_coupling_eq_zero_of_not_bipartiteCompleteGraph_adj (Λ := Λ) A hJself hJbip)
       hJ_star hA_ne hB_ne (by norm_num : 1 ≤ 1) hlam_gt hD_case_ii h_SU2_unique)
 
-set_option linter.style.longLine false in
 /-- Spin-`1/2` strict case-(ii) target ground states have zero total
 magnetization. -/
-theorem spinHalf_anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_MLM_casimir_ladder_t23_pf
+theorem spinHalf_aHeisS_case_ii_target_zeroMag_of_MLM_casLadder_t23_pf
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -217,10 +216,9 @@ theorem spinHalf_anisotropicHeisenbergS_tasaki24_target_finrank_le_one_of_MLM_ca
         (Λ := Λ) A hJim hJnn hJpos hJbip hJ_star hJ_sym hA_ne hB_ne
         c_mlm c_toy hT23 hc_heis_strict hc_toy_strict h_card_eq D
 
-set_option linter.style.longLine false in
 /-- Spin-`1/2` Tasaki Theorem 2.4 zero-magnetization wrapper over the exact
 case-(i) and case-(ii) parameter region currently proved for `N = 1`. -/
-theorem spinHalf_anisotropicHeisenbergS_tasaki24_target_zero_magnetization_of_MLM_casimir_ladder_t23_pf
+theorem spinHalf_aHeisS_tasaki24_target_zeroMag_of_MLM_casLadder_t23_pf
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)

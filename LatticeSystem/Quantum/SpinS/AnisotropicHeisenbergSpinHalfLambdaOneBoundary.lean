@@ -281,10 +281,9 @@ theorem spinHalf_anisotropicHeisenbergS_lambda_one_finrank_le_one_of_MLM_casimir
   exact spinHalf_anisotropicHeisenbergS_lambda_one_finrank_le_one_of_heisenberg
     (Λ := Λ) hJ_star D h_heis_unique_at_min
 
-set_option linter.style.longLine false in
 /-- Spin-1/2 `lambda = 1` target ground states have zero total
 magnetization. -/
-theorem spinHalf_anisotropicHeisenbergS_lambda_one_groundState_zero_magnetization_of_MLM_casimir_ladder_t23_pf
+theorem spinHalf_aHeisS_lam1_gState_zeroMag_of_MLM_casLadder_t23_pf
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
