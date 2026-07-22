@@ -230,3 +230,5 @@ doc comment remains the primary source for its contents.
 | `CPlusCDaggerAnticomm.lean` | cross-site `{c_i+c_i†, c_j+c_j†} = 0` |
 | `CMinusCDaggerAnticomm.lean` | cross-site `{c_i−c_i†, c_j−c_j†}=0`, `{+,−}=0` |
 | `NumberCommutePauliOfNe.lean` | `Commute n_i (c_j ± c_j†)` for `i ≠ j` |
+
+(Refactor Phase 2 PR 14, plan v4 §3.1. JordanWigner extraction complete.)
