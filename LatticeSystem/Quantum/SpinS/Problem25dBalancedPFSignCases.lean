@@ -19,7 +19,6 @@ variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-! ## Balanced PF sign endpoint -/
 
-set_option linter.style.longLine false in
 /-- Problem 2.5.d balanced Perron--Frobenius sign endpoint: the concrete
 balanced PF vector from the Theorem 2.3 / Theorem 2.4 endpoint satisfies the
 original two-spin correlation sign cases after bipartite-gauge conversion. -/

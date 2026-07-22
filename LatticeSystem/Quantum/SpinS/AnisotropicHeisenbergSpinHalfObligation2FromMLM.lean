@@ -52,7 +52,6 @@ private theorem anisotropicHeisenbergS_SU2_ground_eigenspace_finrank_le_one_of_h
   rw [hmin]
   exact huniq
 
-set_option linter.style.longLine false in
 /-- **Spin-1/2 obligation (2) from the MLM/Casimir SU(2) endpoint**: the
 deformation contradiction follows from the Theorem 2.3 common-energy endpoint
 and the balanced zero-Casimir ladder obstruction, without an abstract
@@ -126,7 +125,6 @@ theorem spinHalf_anisotropicHeisenbergS_obligation_2_of_MLM_casimir_ladder
     M_balanced M_orig h_balanced hM_orig_ne h_centered_nonzero
     hlam'_lb hlam'_ub hD' h_violation_orig h_SU2_global_unique
 
-set_option linter.style.longLine false in
 /-- **Spin-1/2 obligation (2) from the MLM/Casimir endpoint with sector PF
 constructed from Theorem 2.3**: this is the same deformation contradiction as
 `spinHalf_anisotropicHeisenbergS_obligation_2_of_MLM_casimir_ladder`, but the
@@ -194,7 +192,6 @@ theorem spinHalf_anisotropicHeisenbergS_obligation_2_of_MLM_casimir_ladder_t23_p
     M_balanced M_orig h_balanced hM_orig_ne h_centered_nonzero
     hlam'_lb hlam'_ub hD' h_violation_orig
 
-set_option linter.style.longLine false in
 /-- **Spin-1/2 obligation (2) strict gap from the MLM/Casimir endpoint with
 Theorem 2.3 sector PF**: at the target point of the deformation path, every
 non-balanced sector has strictly larger minimum energy than the balanced

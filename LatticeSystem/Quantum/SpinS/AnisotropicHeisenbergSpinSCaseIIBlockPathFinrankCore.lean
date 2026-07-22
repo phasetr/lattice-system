@@ -19,7 +19,6 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-! ## Path-global finrank from parity-block path bounds -/
 
-set_option linter.style.longLine false in
 /-- **General spin-S case-(ii) path-global `finrank <= 2` input from
 axis-swapped parity-block submatrix simplicity**.
 

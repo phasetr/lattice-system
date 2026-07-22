@@ -40,7 +40,6 @@ theorem sublatticeSpinSquaredS_commute_totalSpinSOpMinus (A : Λ → Bool) :
     ((sublatticeSpinSquaredS_commute_totalSpinSOp2 (Λ := Λ) N A).smul_right
       Complex.I)
 
-set_option linter.style.longLine false in
 /-- **Ŝ^+_tot-invariance of the predicted GS subspace**. -/
 theorem bipartiteToyGroundStateSubspacePredicted_totalSpinSOpPlus_invariant
     (A : Λ → Bool) (N : ℕ) :
@@ -86,7 +85,6 @@ theorem bipartiteToyGroundStateSubspacePredicted_totalSpinSOpPlus_invariant
             (Λ := Λ) (N := N) (fun x => ! A x)).symm.eq]]
     rw [h_B, Matrix.mulVec_smul]
 
-set_option linter.style.longLine false in
 /-- **Ŝ^-_tot-invariance of the predicted GS subspace**. -/
 theorem bipartiteToyGroundStateSubspacePredicted_totalSpinSOpMinus_invariant
     (A : Λ → Bool) (N : ℕ) :

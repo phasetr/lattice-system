@@ -285,7 +285,6 @@ theorem
     rw [← hcomm]
   rw [hterm]
 
-set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 re-embedded source-sector cross-ladder
 site sums**: after the two lowered components are known to lie in the
 successor magnetization eigenspace, re-embed their sector restrictions

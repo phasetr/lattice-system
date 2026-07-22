@@ -23,7 +23,6 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-! ## Argmin first-crossing contradiction from a first-crossing `finrank <= 2` bound -/
 
-set_option linter.style.longLine false in
 /-- **General spin-S case-(ii) argmin first-crossing contradiction from a
 first-crossing `finrank <= 2` bound**.
 

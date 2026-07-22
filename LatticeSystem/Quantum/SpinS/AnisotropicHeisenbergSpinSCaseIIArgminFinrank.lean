@@ -21,7 +21,6 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-! ## Case-(ii) target wrappers from first-crossing `finrank <= 2` bounds -/
 
-set_option linter.style.longLine false in
 /-- **General spin-S case-(ii) target ground eigenspace `finrank <= 1` from
 first-crossing `finrank <= 2` bounds**. -/
 theorem anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_first_crossing_finrank_bound
@@ -87,7 +86,6 @@ theorem anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_first_crossing_f
       hlam_case_ii hD_case_ii h_centered_nonzero h_strict_gap_at_SU2
       h_GS_at_SU2 h_finrank_at_first_crossing)
 
-set_option linter.style.longLine false in
 /-- **General spin-S case-(ii) target ground states have zero total
 magnetization from first-crossing `finrank <= 2` bounds**. -/
 theorem anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_first_crossing_finrank_bound

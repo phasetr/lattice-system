@@ -22,7 +22,6 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-! ## First-crossing finrank from path-global finrank -/
 
-set_option linter.style.longLine false in
 /-- **General spin-S case-(ii) first-crossing finrank input from a path-global
 finrank bound**.
 
@@ -70,7 +69,6 @@ theorem caseII_first_crossing_finrank_bound_of_path_global_finrank_bound
 
 /-! ## Case-(ii) target wrappers from path-global finrank -/
 
-set_option linter.style.longLine false in
 /-- **General spin-S case-(ii) target ground eigenspace `finrank <= 1` from a
 path-global `finrank <= 2` bound**. -/
 theorem anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_path_global_finrank_bound
@@ -125,7 +123,6 @@ theorem anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_path_global_finr
     (caseII_first_crossing_finrank_bound_of_path_global_finrank_bound
       (Λ := Λ) (N := N) (J := J) hJ_star M_balanced h_path_global_finrank)
 
-set_option linter.style.longLine false in
 /-- **General spin-S case-(ii) target ground states have zero total
 magnetization from a path-global `finrank <= 2` bound**. -/
 theorem anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_path_global_finrank_bound

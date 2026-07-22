@@ -22,7 +22,6 @@ namespace LatticeSystem.Quantum
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-set_option linter.style.longLine false in
 /-- **`Ŝ_A^-`-invariance of the maximal sublattice-Casimir eigenspace**. -/
 theorem sublatticeMaxCasimirEigenspace_sublatticeSpinSOpMinus_invariant (A : Λ → Bool) (M : ℂ) :
     Submodule.map (sublatticeSpinSOpMinus N A).mulVecLin
@@ -37,7 +36,6 @@ theorem sublatticeMaxCasimirEigenspace_sublatticeSpinSOpMinus_invariant (A : Λ 
         (sublatticeSpinSquaredS_commute_sublatticeSpinSOpMinus (Λ := Λ) (N := N) A).symm.eq]]
   rw [hv, Matrix.mulVec_smul]
 
-set_option linter.style.longLine false in
 /-- **`Ŝ_A^+`-invariance of the maximal sublattice-Casimir eigenspace**. -/
 theorem sublatticeMaxCasimirEigenspace_sublatticeSpinSOpPlus_invariant (A : Λ → Bool) (M : ℂ) :
     Submodule.map (sublatticeSpinSOpPlus N A).mulVecLin

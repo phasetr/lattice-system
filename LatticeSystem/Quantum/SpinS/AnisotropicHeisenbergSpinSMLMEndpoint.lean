@@ -55,7 +55,6 @@ theorem anisotropicHeisenbergS_SU2_ground_eigenspace_finrank_le_one_of_heisenber
   rw [hmin]
   exact huniq
 
-set_option linter.style.longLine false in
 /-- **General spin-S target uniqueness from the MLM/Casimir SU(2) endpoint**:
 Theorem 2.3 supplies the SU(2)-point Heisenberg ground-eigenspace uniqueness,
 which is transported to the anisotropic SU(2) point and then fed to the

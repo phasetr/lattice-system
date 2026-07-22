@@ -45,7 +45,6 @@ theorem anisotropicHeisenbergParametricPath_eq_zero_of_fst_eq_one_of_one_lt
 
 /-! ## `N = 1` non-corner path-global input -/
 
-set_option linter.style.longLine false in
 /-- Strict case-(ii) non-corner parity-block PF/min callback with only
 `1 <= N`.  The `lambda = 1`, `D < 0` branch is impossible because the target
 satisfies `1 < lambda`, so the proof never needs the ion-only totality
@@ -128,7 +127,6 @@ theorem axisSwappedParityBlockPFMinAt_of_total_reachability_noncorner_lambda_gt_
       linarith
     · exact False.elim (hnot_corner ⟨hlam_path_eq.symm, hD_path_eq⟩)
 
-set_option linter.style.longLine false in
 /-- Non-corner strict case-(ii) parity-block full-min bound with only
 `1 <= N`, using the strict-target path geometry to avoid the ion-only branch. -/
 theorem axisSwappedSubmatrix_full_min_finrank_le_one_of_total_reachability_noncorner_lambda_gt_one
@@ -170,7 +168,6 @@ theorem axisSwappedSubmatrix_full_min_finrank_le_one_of_total_reachability_nonco
     (D := (anisotropicHeisenbergParametricPath lam D t).2)
     p hp ν hν_bound hν_eq_min
 
-set_option linter.style.longLine false in
 /-- Path-global full `finrank <= 2` for strict spin-`S` case-(ii) targets
 from reachability available under `1 <= N`, plus the SU(2) corner callback. -/
 theorem caseII_path_global_finrank_bound_of_total_reachability_and_corner_lambda_gt_one
@@ -232,7 +229,6 @@ theorem caseII_path_global_finrank_bound_of_total_reachability_and_corner_lambda
           (anisotropicHeisenbergParametricPath lam D t).2) : ℝ) : ℂ)
       h_even h_odd
 
-set_option linter.style.longLine false in
 /-- Path-global full `finrank <= 2` for strict case-(ii) targets, using a
 single full SU(2)-corner uniqueness callback. -/
 theorem caseII_path_global_finrank_bound_of_total_reachability_and_su2_unique_lambda_gt_one

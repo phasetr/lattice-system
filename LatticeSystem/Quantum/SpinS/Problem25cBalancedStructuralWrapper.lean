@@ -18,7 +18,6 @@ open Matrix Module
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
-set_option linter.style.longLine false in
 /-- Problem 2.5.c balanced structural wrapper: in the balanced bipartite
 antiferromagnetic case, the structural Theorem 2.3 proof supplies the MLM/SU(2)
 uniqueness endpoint, so every normalized non-zero Heisenberg ground-state

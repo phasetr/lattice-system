@@ -25,7 +25,6 @@ namespace LatticeSystem.Quantum
 open Matrix Module Set LatticeSystem.Math.PerronFrobenius
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
-set_option linter.style.longLine false in
 /-- Spin-`1/2` obligation (2) under a single SU(2)-point strict-gap axiom,
 with target `D' >= 0`. -/
 theorem spinHalf_anisotropicHeisenbergS_obligation_2_single_axiom_D_nonneg
@@ -124,7 +123,6 @@ theorem spinHalf_anisotropicHeisenbergS_obligation_2_single_axiom_D_nonneg
     M_balanced M_chosen h_balanced hM_chosen_centered_ne hlam'_lb hlam'_ub hD'
     hM_chosen_cross h_strict_chosen axiom_GS_at_SU2 h_below
 
-set_option linter.style.longLine false in
 /-- Spin-`1/2` obligation (2) from SU(2) global uniqueness with target
 `D' >= 0`. -/
 theorem spinHalf_anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_D_nonneg
@@ -189,7 +187,6 @@ theorem spinHalf_anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_D_nonn
     M_balanced M_orig h_balanced hM_orig_ne h_centered_nonzero
     hlam'_lb hlam'_ub hD' h_violation_orig h_strict_gap_at_SU2
 
-set_option linter.style.longLine false in
 /-- Spin-`1/2` obligation (2) from only SU(2) global uniqueness with target
 `D' >= 0`. -/
 theorem spinHalf_anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_only_D_nonneg
@@ -259,7 +256,6 @@ private theorem anisotropicHeisenbergS_SU2_ground_eigenspace_finrank_le_one_of_h
   rw [hmin]
   exact huniq
 
-set_option linter.style.longLine false in
 /-- Spin-`1/2` obligation (2) from the MLM/Casimir endpoint with target
 `D' >= 0`. -/
 theorem spinHalf_anisotropicHeisenbergS_obligation_2_of_MLM_casimir_ladder_t23_pf_D_nonneg
@@ -427,7 +423,6 @@ theorem spinHalf_anisotropicHeisenbergS_strict_gap_all_M_of_MLM_casimir_ladder_t
     M_balanced M h_balanced hM_ne h_centered_nonzero
     hlam'_lb hlam'_ub hD'
 
-set_option linter.style.longLine false in
 /-- Spin-`1/2` balanced sector is the full target ground sector, with target
 `D' >= 0`. -/
 theorem spinHalf_anisotropicHeisenbergS_balanced_eq_full_of_MLM_casimir_ladder_t23_pf_D_nonneg
@@ -485,7 +480,6 @@ theorem spinHalf_anisotropicHeisenbergS_balanced_eq_full_of_MLM_casimir_ladder_t
   exact hermitianMinEigenvalue_balanced_eq_full_of_strict_gap
     hJ_star 1 M_balanced lam' D' h_strict_gap
 
-set_option linter.style.longLine false in
 /-- Spin-`1/2` target ground eigenspace `finrank <= 1` in the case-(i)
 `D' >= 0` boundary strip. -/
 theorem spinHalf_anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg

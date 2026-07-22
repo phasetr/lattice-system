@@ -222,7 +222,6 @@ theorem spinHalf_anisotropicHeisenbergS_lambda_one_finrank_le_one_of_heisenberg
   rw [hfin_shift]
   simpa [hH0_def] using h_heis_unique
 
-set_option linter.style.longLine false in
 /-- Spin-1/2 `lambda = 1` target uniqueness from the Theorem 2.3 MLM/Casimir
 endpoint.  The single-ion term is a scalar shift, so no strict-region
 Perron--Frobenius parity-block irreducibility is used. -/

@@ -257,7 +257,6 @@ theorem tasaki23_marshallPositive_magSectorEmbedding_ne_zero
     exact (ne_of_gt hpos) hprod_zero
   exact (Complex.ofReal_ne_zero.mpr hreal_ne) happly
 
-set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 Marshall-positive sector Casimir
 non-vanishing, lowering direction**: a Marshall-positive sector vector
 with a non-endpoint total-Casimir eigenvalue has non-zero total-lowering
@@ -287,7 +286,6 @@ theorem t23_totSpinSOpMinus_mulVec_marshPos_magSecEmb_ne_zero_of_cas_ne_kernelVa
     tasaki23_totalSpinSOpMinus_mulVec_magSectorEmbedding_ne_zero_of_casimir_ne_kernel_value
       hΦ_cas hγ_ne (tasaki23_marshallPositive_magSectorEmbedding_ne_zero A hv_pos)
 
-set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 Marshall-positive sector Casimir
 non-vanishing, raising direction**: a Marshall-positive sector vector
 with a non-endpoint total-Casimir eigenvalue has non-zero total-raising
