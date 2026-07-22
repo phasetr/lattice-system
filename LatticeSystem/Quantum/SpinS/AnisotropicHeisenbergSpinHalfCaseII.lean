@@ -152,7 +152,6 @@ theorem spinHalf_aHeisS_case_ii_target_zeroMag_of_MLM_casLadder_t23_pf
 
 /-! ## Exact spin-1/2 parameter-region wrapper -/
 
-set_option linter.style.longLine false in
 /-- Spin-`1/2` Tasaki Theorem 2.4 target uniqueness wrapper over the exact
 case-(i) and case-(ii) parameter region currently proved for `N = 1`. -/
 theorem spinHalf_anisotropicHeisenbergS_tasaki24_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf
@@ -194,7 +193,8 @@ theorem spinHalf_anisotropicHeisenbergS_tasaki24_target_finrank_le_one_of_MLM_ca
   classical
   rcases h_region with h_case_i | h_boundary_or_case_ii
   · rcases h_case_i with ⟨hlam_lb, hlam_ub, hD_nonneg⟩
-    exact spinHalf_anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg
+    exact
+      spinHalf_anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg
       (Λ := Λ) A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym hc_axis_strict
       hA_ne hB_ne c_mlm c_toy hT23 hc_heis_strict hc_toy_strict h_card_eq
       M_balanced h_balanced h_centered_nonzero hlam_lb hlam_ub hD_nonneg
@@ -206,7 +206,8 @@ theorem spinHalf_anisotropicHeisenbergS_tasaki24_target_finrank_le_one_of_MLM_ca
       c_mlm c_toy hT23 hc_heis_strict hc_toy_strict h_card_eq D
   · rcases h_case_ii with ⟨hlam_case_ii, hD_case_ii⟩
     rcases lt_or_eq_of_le hlam_case_ii with hlam_gt | hlam_eq
-    · exact spinHalf_anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf
+    · exact
+        spinHalf_anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf
         (Λ := Λ) A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym hA_ne hB_ne
         M_balanced h_balanced h_centered_nonzero c_mlm c_toy hT23 hc_heis_strict
         hc_toy_strict h_card_eq hlam_gt hD_case_ii

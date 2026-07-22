@@ -3,7 +3,6 @@ import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfDNonnegBoundaryC
 set_option linter.unusedSectionVars false
 set_option linter.unusedSimpArgs false
 set_option linter.unusedVariables false
-set_option linter.style.longLine false
 
 /-!
 # Spin-1/2 `D >= 0` boundary for Theorem 2.4 parity-block finrank
@@ -233,16 +232,18 @@ theorem spinHalf_anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_only_D
 
 /-- Transport Heisenberg ground-line uniqueness at the SU(2) point to the
 anisotropic Hamiltonian written with `(lambda, D) = (1, 0)`. -/
-private theorem anisotropicHeisenbergS_SU2_ground_eigenspace_finrank_le_one_of_heisenberg_D_nonneg_aux
+private theorem aHeisS_SU2_ground_eigenspace_finrank_le_one_of_heisenberg_D_nonneg_aux
     {J : Λ → Λ → ℂ} (hJ_star : ∀ x y, star (J x y) = J x y)
     [Nonempty (Λ → Fin (1 + 1))]
     {μ : ℝ}
-    (hμ : hermitianMinEigenvalue (heisenbergHamiltonianS_isHermitian_of_real (Λ := Λ) hJ_star 1) = μ)
+    (hμ : hermitianMinEigenvalue
+      (heisenbergHamiltonianS_isHermitian_of_real (Λ := Λ) hJ_star 1) = μ)
     (huniq :
       finrank ℂ ↥(End.eigenspace (Matrix.toLin' (heisenbergHamiltonianS (Λ := Λ) J 1))
         (μ : ℂ)) ≤ 1) :
     finrank ℂ ↥(End.eigenspace (Matrix.toLin' (anisotropicHeisenbergS (Λ := Λ) J 1 0 1))
-      ((hermitianMinEigenvalue (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star 1 1 0) :
+      ((hermitianMinEigenvalue
+        (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star 1 1 0) :
         ℝ) : ℂ)) ≤ 1 := by
   have hmin :
       hermitianMinEigenvalue (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star 1 1 0) =
@@ -324,7 +325,7 @@ theorem spinHalf_anisotropicHeisenbergS_obligation_2_of_MLM_casimir_ladder_t23_p
         ((hermitianMinEigenvalue
           (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star 1 1 0) :
             ℝ) : ℂ)) ≤ 1 :=
-    anisotropicHeisenbergS_SU2_ground_eigenspace_finrank_le_one_of_heisenberg_D_nonneg_aux
+    aHeisS_SU2_ground_eigenspace_finrank_le_one_of_heisenberg_D_nonneg_aux
       (Λ := Λ) hJ_star hμ_min huniq_heis
   exact spinHalf_anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_only_D_nonneg
     A hJim hJnn hJpos hJself hJbip hc_axis_strict hA_ne hB_ne hJ_star

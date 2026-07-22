@@ -21,7 +21,6 @@ namespace LatticeSystem.Quantum
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-set_option linter.style.longLine false in
 /-- **`Ŝ³_tot`-invariance of the joint sublattice-Casimir eigenspace**. -/
 theorem jointSublatticeCasimirEigenspace_totalSpinSOp3_invariant (A : Λ → Bool) (N : ℕ) :
     Submodule.map (totalSpinSOp3 Λ N).mulVecLin
@@ -44,7 +43,8 @@ theorem jointSublatticeCasimirEigenspace_totalSpinSOp3_invariant (A : Λ → Boo
     rw [show (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec ((totalSpinSOp3 Λ N).mulVec v) =
         (totalSpinSOp3 Λ N).mulVec ((sublatticeSpinSquaredS N (fun x => ! A x)).mulVec v) from by
       rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec,
-          (sublatticeSpinSquaredS_commute_totalSpinSOp3 (Λ := Λ) (N := N) (fun x => ! A x)).symm.eq]]
+          (sublatticeSpinSquaredS_commute_totalSpinSOp3 (Λ := Λ) (N := N)
+            (fun x => ! A x)).symm.eq]]
     rw [h_B, Matrix.mulVec_smul]
 
 end LatticeSystem.Quantum

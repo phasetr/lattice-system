@@ -270,7 +270,6 @@ theorem axisSwapAHeisS_submat_finrank_le_one_at_hMinEig_lam1_D_pos
   exact axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_min_conditional
     hJim hOneIm hDim p ν h_finrank_bare hν_eq
 
-set_option linter.style.longLine false in
 /-- General spin-`S` anisotropic `H` eigenspace `finrank <= 2` at
 `min(per-block mins)` at `lambda = 1`, `D.re > 0`. -/
 theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_unconditional_lambda_one_D_pos_general
@@ -293,7 +292,8 @@ theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_unconditional_lambda_on
               (Λ := Λ) (N := N) hJim (show ((1 : ℂ).im = 0) from by norm_num) hDim 0))
           (hermitianMinEigenvalue
             (axisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
-              (Λ := Λ) (N := N) hJim (show ((1 : ℂ).im = 0) from by norm_num) hDim 1)) : ℝ) : ℂ)) ≤ 2 := by
+              (Λ := Λ) (N := N) hJim (show ((1 : ℂ).im = 0) from by norm_num) hDim 1))
+                : ℝ) : ℂ)) ≤ 2 := by
   have hOneIm : ((1 : ℂ).im = 0) := by norm_num
   have h0 :=
     axisSwapAHeisS_submat_finrank_le_one_at_hMinEig_lam1_D_pos
@@ -304,7 +304,6 @@ theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_unconditional_lambda_on
   exact anisotropicHeisenbergS_eigenspace_finrank_le_two_at_min_block_mins_general
     hJim hOneIm hDim hJself h0 h1
 
-set_option linter.style.longLine false in
 /-- General spin-`S` anisotropic `H` eigenspace `finrank <= 2` at its global
 Hermitian minimum at `lambda = 1`, `D.re > 0`. -/
 theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_lambda_one_D_pos_general
@@ -330,7 +329,8 @@ theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_lambda_on
   classical
   have hOneIm : ((1 : ℂ).im = 0) := by norm_num
   have hOneStar : star (1 : ℂ) = (1 : ℂ) := by norm_num
-  have hbound := anisotropicHeisenbergS_eigenspace_finrank_le_two_unconditional_lambda_one_D_pos_general
+  have hbound :=
+    anisotropicHeisenbergS_eigenspace_finrank_le_two_unconditional_lambda_one_D_pos_general
     A hJim hJnn hJpos hJself hJbip hDim hDpos hc_strict hA_ne hB_ne hN
   have hblock_eq := hermitianMinEigenvalue_axisSwapped_eq_min_block_mins
     (Λ := Λ) (N := N) hJim hOneIm hDim hJself
