@@ -42,12 +42,11 @@ theorem shiftedDressedAxisSwappedReMatrix_apply_pos_of_ionParityStepS_lambda_one
   · exact shiftedDressedAxisSwappedReMatrix_apply_pos_of_singleIonStepS
       A hJself hDim hDpos c hSI
 
-set_option linter.style.longLine false in
 /-- **Block matrix power positivity from ion-only parity reachability at
 `lambda = 1`, `D > 0`**.  For any ion-only reachable pair of parity-block
 configurations, some power of the shifted parity-block submatrix is strictly
 positive at that pair. -/
-theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_pow_apply_pos_of_ionParityReachable_lambda_one
+theorem shiftedDressedReMatParity_pow_apply_pos_of_ionParityReach_lam1
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
