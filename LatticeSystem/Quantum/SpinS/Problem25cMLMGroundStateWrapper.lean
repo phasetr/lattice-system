@@ -57,7 +57,7 @@ theorem singleSiteSpinSquareExpectationS_all_axes_eq_of_tasaki23_balanced_MLM_gr
       singleSiteSpinSquareExpectationS x (spinSOp3 N) Φ =
         (N : ℂ) * (N + 2) / 12 := by
   obtain ⟨μ, hmin_eq, _hsectors_singleton, huniq⟩ :=
-    exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_casimir_ladder_t23_pf
+    exists_t23_commonE_and_heisHamS_fullEig_finrank_le_one_of_casLadder_t23_pf
       (V := V) A N c c_toy hT23 hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite
       hJ_pos hc_strict hc_strict_toy h_card_eq hN hcardA hcardB
   have hΦμ : (heisenbergHamiltonianS J N).mulVec Φ = (μ : ℂ) • Φ := by
