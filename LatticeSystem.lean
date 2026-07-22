@@ -1,5 +1,6 @@
 import LatticeSystem.Math.AnticommuteCommute
 import LatticeSystem.Math.MvPolynomial.BilinearFactorCoprime
+import LatticeSystem.Math.MvPolynomial.WeylSpinOneMap
 import LatticeSystem.Math.ComplexVectorKernel
 import LatticeSystem.Math.FinCases
 import LatticeSystem.Math.GramEigenspaceCorrespondence
