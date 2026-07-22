@@ -103,14 +103,13 @@ theorem tasaki23_sublatticeSpinSquaredS_mulVec_of_mem_bipartiteToyGroundStateSub
   rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hmem
   simpa using hmem
 
-set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS complement-sublattice Casimir
 bridge**: membership in the predicted toy ground-state subspace gives
 the maximum `¬A`-sublattice Casimir eigenvector identity.
 
 This is the complement companion to
 `tasaki23_sublatticeSpinSquaredS_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted`. -/
-theorem tasaki23_sublatticeSpinSquaredS_complement_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+theorem t23_sublatSpinS2_complement_mulVec_of_mem_bipToyGSPred
     (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
     (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
     (sublatticeSpinSquaredS N (fun x => !A x)).mulVec Ψ =

@@ -337,11 +337,10 @@ theorem totalSpinSOpPlus_mulVec_eq_zero_of_totalSpinSSquared_mulVec_eq_zero_of_m
       rw [Matrix.mulVec_mulVec]
       exact hMP)
 
-set_option linter.style.longLine false in
 /-- A zero-total-Casimir vector in the zero magnetization sector is killed by
 `Ŝ⁻_tot`.  This is the singlet lowest-weight half of the equality-case
 obstruction. -/
-theorem totalSpinSOpMinus_mulVec_eq_zero_of_totalSpinSSquared_mulVec_eq_zero_of_mem_zero_magSubspaceS
+theorem totSpinSOpMinus_mulVecZero_of_totSpinS2_mulVecZero_of_mem_zero_magSubS
     {Ψ : (V → Fin (N + 1)) → ℂ}
     (hΨ_mem : Ψ ∈ magSubspaceS V N 0)
     (hΨ_cas : (totalSpinSSquared V N).mulVec Ψ = 0) :
@@ -394,7 +393,7 @@ theorem not_exists_totalSpinSOpPlus_image_of_zero_casimir_zero_magSubspaceS
     False := by
   have hminus :
       (totalSpinSOpMinus V N).mulVec Ψ = 0 :=
-    totalSpinSOpMinus_mulVec_eq_zero_of_totalSpinSSquared_mulVec_eq_zero_of_mem_zero_magSubspaceS
+    totSpinSOpMinus_mulVecZero_of_totSpinS2_mulVecZero_of_mem_zero_magSubS
       hΨ_mem hΨ_cas
   exact hΨ_ne (eq_zero_of_eq_mulVec_and_conjTranspose_mulVec_eq_zero
     (totalSpinSOpPlus V N) (u := Υ) (w := Ψ) hΨ_eq

@@ -175,7 +175,6 @@ theorem exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace
       (V := V) (N := N) J M0 hJ_real hstrict hpf
   exact ⟨μ, hmin_eq, by simpa [M0, hM0def] using hsectors_singleton, huniq⟩
 
-set_option linter.style.longLine false in
 /-- **Packaged MLM-to-SU(2) uniqueness endpoint from the Casimir ladder
 obstruction**: the preceding endpoint no longer needs an abstract strict
 outside-sector callback once the balanced zero-Casimir ladder obstruction is
@@ -184,7 +183,7 @@ balanced PF vector; the balanced PF/Casimir lift makes that vector a non-zero
 zero-Casimir full eigenvector; and
 `tasaki23_strict_hOutside_of_card_eq_zero_casimir_ladder_obstruction` constructs
 the strict outside-sector ordering consumed by the PR #4020 endpoint. -/
-theorem exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_casimir_ladder
+theorem exists_t23_commonE_and_heisHamS_fullEig_finrank_le_one_of_casLadder
     (A : V → Bool) (N : ℕ) {J : V → V → ℂ} (c c_toy : ℝ)
     (hT23 : tasaki_2_5_theorem_2_3 A N J c)
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -330,14 +329,13 @@ theorem exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace
     A N c hT23 hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos hc_strict
     h_card_eq hN hcardA hcardB h_sector_pf hstrict
 
-set_option linter.style.longLine false in
 /-- **Packaged MLM-to-SU(2) uniqueness endpoint with sector PF constructed
 from Theorem 2.3**: this removes the final balanced-sector PF simplicity
 callback from the preceding Casimir-ladder endpoint.
 The balanced sector matrix `finrank <= 1` bound is obtained directly from the
 Theorem 2.3 Marshall-positive sector witness by Perron--Frobenius geometric
 simplicity. -/
-theorem exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_casimir_ladder_t23_pf
+theorem exists_t23_commonE_and_heisHamS_fullEig_finrank_le_one_of_casLadder_t23_pf
     (A : V → Bool) (N : ℕ) {J : V → V → ℂ} (c c_toy : ℝ)
     (hT23 : tasaki_2_5_theorem_2_3 A N J c)
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -362,7 +360,7 @@ theorem exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace
       finrank ℂ ↥(End.eigenspace (Matrix.toLin'
         (heisenbergHamiltonianS (Λ := V) J N)) (μ : ℂ)) ≤ 1 := by
   exact
-    exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_casimir_ladder
+    exists_t23_commonE_and_heisHamS_fullEig_finrank_le_one_of_casLadder
       (V := V) A N c c_toy hT23 hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite
       hJ_pos hc_strict hc_strict_toy h_card_eq hN hcardA hcardB
       (fun μ hmin_eq =>

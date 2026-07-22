@@ -70,7 +70,7 @@ theorem twoSpinCorrelationS_bipartite_signed_re_pos_of_tasaki23_balanced_pf_cros
   classical
   set M0 := (Finset.univ.filter (fun z : V => A z = true)).card * N with hM0def
   obtain ⟨μ, hmin_eq, _hsectors_singleton, huniq⟩ :=
-    exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_casimir_ladder_t23_pf
+    exists_t23_commonE_and_heisHamS_fullEig_finrank_le_one_of_casLadder_t23_pf
       (V := V) A N c c_toy hT23 hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite
       hJ_pos hc_strict hc_strict_toy h_card_eq hN hcardA hcardB
   obtain ⟨μ0, hmin_eq0, hsector, _hglobal⟩ :=

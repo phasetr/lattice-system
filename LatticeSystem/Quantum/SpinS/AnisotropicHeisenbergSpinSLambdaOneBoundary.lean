@@ -576,7 +576,7 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_p
     obtain ⟨b, hb⟩ := hB_ne
     exact Nat.succ_le_of_lt (Finset.card_pos.mpr ⟨b, by simp [hb]⟩)
   obtain ⟨μ, hμ_min, _hsectors, huniq_heis⟩ :=
-    exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_casimir_ladder_t23_pf
+    exists_t23_commonE_and_heisHamS_fullEig_finrank_le_one_of_casLadder_t23_pf
       (V := Λ) A N c_mlm c_toy hT23 hJim hJ_star hJ_sym hJnn hJ_bipartite_zero
       hJpos hc_heis_strict hc_toy_strict h_card_eq hN1 hcardA hcardB
   have h_SU2_global_unique :

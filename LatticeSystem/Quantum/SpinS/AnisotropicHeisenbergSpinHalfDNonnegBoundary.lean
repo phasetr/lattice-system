@@ -319,7 +319,7 @@ theorem spinHalf_anisotropicHeisenbergS_obligation_2_of_MLM_casimir_ladder_t23_p
         (V := Λ) A 1 c_mlm hT23 hJim hJ_star hJ_sym hJnn hJ_bipartite_zero
         hJpos hc_heis_strict h_card_eq (by norm_num) hcardA hcardB hmin_eq
   obtain ⟨μ, hμ_min, _hsectors, huniq_heis⟩ :=
-    LatticeSystem.Quantum.exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_casimir_ladder
+    LatticeSystem.Quantum.exists_t23_commonE_and_heisHamS_fullEig_finrank_le_one_of_casLadder
       (V := Λ) A 1 c_mlm c_toy hT23 hJim hJ_star hJ_sym hJnn hJ_bipartite_zero
       hJpos hc_heis_strict hc_toy_strict h_card_eq (by norm_num) hcardA hcardB h_sector_pf
   have h_SU2_global_unique :

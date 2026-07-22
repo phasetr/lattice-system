@@ -181,7 +181,6 @@ theorem totalSpinSOpPlus_mulVec_mem_saturatedFerromagnetJointEigenspace_inf_magS
   · rw [mem_magSubspaceS_iff]
     exact totalSpinSOp3_mulVec_totalSpinSOpPlus_mulVec_eigenvec hM
 
-set_option linter.style.longLine false in
 /-- **Injectivity of `Ŝ^+_tot` on `joint ⊓ H_M` away from the highest
 weight**: for any `v ∈ saturatedFerromagnetJointEigenspace J N ⊓
 magSubspaceS V N M` with `M ≠ m_max = |V|·N/2`, if
@@ -200,7 +199,7 @@ is the hypothesis; together they force `v = 0`.
 This is the kernel-trivial step for the chain
 `dim(joint ⊓ H_M) ≤ dim(joint ⊓ H_{M+1})` toward Tasaki §2.4
 Theorem 2.1. -/
-theorem totalSpinSOpPlus_mulVec_eq_zero_imp_eq_zero_of_mem_saturatedFerromagnetJointEigenspace_inf_magSubspaceS
+theorem totSpinSOpPlus_mulVecZero_imp_eq_zero_of_mem_satFerroJE_inf_magSubS
     [Nonempty V]
     {J : V → V → ℂ} {M : ℂ}
     (hMne : M ≠ (Fintype.card V : ℂ) * (N : ℂ) / 2)
@@ -291,12 +290,11 @@ noncomputable def totalSpinSOpPlusJointMagShift
     ext
     simp [Matrix.mulVec_smul]
 
-set_option linter.style.longLine false in
 /-- **`Ŝ^+_tot` is injective on `joint ⊓ H_M` away from the highest
 weight, as a linear map between the joint-magnetisation sectors**.
 
 Direct consequence of the kernel-trivial result
-`totalSpinSOpPlus_mulVec_eq_zero_imp_eq_zero_of_mem_saturatedFerromagnetJointEigenspace_inf_magSubspaceS`. -/
+`totSpinSOpPlus_mulVecZero_imp_eq_zero_of_mem_satFerroJE_inf_magSubS`. -/
 theorem totalSpinSOpPlusJointMagShift_injective [Nonempty V]
     (J : V → V → ℂ) {M : ℂ}
     (hMne : M ≠ (Fintype.card V : ℂ) * (N : ℂ) / 2) :
@@ -317,7 +315,7 @@ theorem totalSpinSOpPlusJointMagShift_injective [Nonempty V]
         ⊓ magSubspaceS V N M := by
     exact Submodule.sub_mem _ a.property b.property
   have h0 :=
-    totalSpinSOpPlus_mulVec_eq_zero_imp_eq_zero_of_mem_saturatedFerromagnetJointEigenspace_inf_magSubspaceS
+    totSpinSOpPlus_mulVecZero_imp_eq_zero_of_mem_satFerroJE_inf_magSubS
       hMne hmem hsub
   exact sub_eq_zero.mp h0
 

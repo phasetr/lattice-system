@@ -265,7 +265,7 @@ image after zero-extension.
 
 This is the lowering sector-embedded Casimir criterion with the
 non-zero hypothesis discharged from strict Marshall positivity. -/
-theorem tasaki23_totalSpinSOpMinus_mulVec_marshallPositive_magSectorEmbedding_ne_zero_of_casimir_ne_kernel_value
+theorem t23_totSpinSOpMinus_mulVec_marshPos_magSecEmb_ne_zero_of_cas_ne_kernelVal
     (A : V → Bool) {N M : ℕ} [Nonempty (magConfigS V N M)]
     {γ : ℂ} {v : magConfigS V N M → ℝ}
     (hΦ_cas :
@@ -296,7 +296,7 @@ image after zero-extension.
 This is the raising companion to
 `tasaki23_totalSpinSOpMinus_mulVec_marshallPositive_magSectorEmbedding_ne_zero`
 `_of_casimir_ne_kernel_value`. -/
-theorem tasaki23_totalSpinSOpPlus_mulVec_marshallPositive_magSectorEmbedding_ne_zero_of_casimir_ne_kernel_value
+theorem t23_totSpinSOpPlus_mulVec_marshPos_magSecEmb_ne_zero_of_cas_ne_kernelVal
     (A : V → Bool) {N M : ℕ} [Nonempty (magConfigS V N M)]
     {γ : ℂ} {v : magConfigS V N M → ℝ}
     (hΦ_cas :
