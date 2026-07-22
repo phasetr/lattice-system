@@ -250,15 +250,6 @@ theorem sectorProjE4_of_mem_ne (k j : ℕ) (hjk : j ≠ k) (v : ManyBodyVecE2 Λ
   · rw [if_pos h, hv' σ (by omega)]
   · rw [if_neg h]
 
-omit [DecidableEq Λ] in
-/-- The magnetisation index of a configuration is at most `|Λ|N`. -/
-private theorem magSumS_leE4 (σ : Λ → Fin (N + 1)) : magSumS σ ≤ Fintype.card Λ * N := by
-  unfold magSumS
-  calc ∑ x : Λ, (σ x).val
-      ≤ ∑ _x : Λ, N := Finset.sum_le_sum fun x _ => Nat.lt_succ_iff.mp (σ x).isLt
-    _ = Fintype.card Λ * N := by
-        rw [Finset.sum_const, Finset.card_univ, smul_eq_mul]
-
 /-- Components of a finite sum of many-body vectors. -/
 private theorem ofLp_sumE4 {ι : Type*} (s : Finset ι) (f : ι → ManyBodyVecE2 Λ N)
     (σ : Λ → Fin (N + 1)) :
@@ -277,7 +268,7 @@ theorem sum_sectorProjE4 (v : ManyBodyVecE2 Λ N) :
   refine WithLp.ofLp_injective 2 (funext fun σ => ?_)
   rw [ofLp_sumE4]
   have hmem : magSumS σ ∈ Finset.range (Fintype.card Λ * N + 1) :=
-    Finset.mem_range.mpr (Nat.lt_succ_of_le (magSumS_leE4 Λ N σ))
+    Finset.mem_range.mpr (Nat.lt_succ_of_le (magSumS_le σ))
   rw [Finset.sum_eq_single (magSumS σ)
     (fun j _ hj => by rw [ofLp_sectorProjE4, if_neg (Ne.symm hj)])
     (fun h => absurd hmem h), ofLp_sectorProjE4, if_pos rfl]
@@ -289,7 +280,7 @@ theorem exists_sectorProjE4_ne_zero (v : ManyBodyVecE2 Λ N) (hv : v ≠ 0) :
   · have h0 : WithLp.ofLp v = WithLp.ofLp (0 : ManyBodyVecE2 Λ N) := funext hall
     exact absurd (WithLp.ofLp_injective 2 h0) hv
   · obtain ⟨σ, hσ⟩ := not_forall.mp hall
-    refine ⟨magSumS σ, magSumS_leE4 Λ N σ, fun h => hσ ?_⟩
+    refine ⟨magSumS σ, magSumS_le σ, fun h => hσ ?_⟩
     have h' := congrFun (congrArg WithLp.ofLp h) σ
     rw [ofLp_sectorProjE4, if_pos rfl] at h'
     exact h'
