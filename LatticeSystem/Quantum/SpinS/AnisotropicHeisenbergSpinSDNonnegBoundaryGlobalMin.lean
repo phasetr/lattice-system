@@ -25,7 +25,6 @@ open Matrix Module Set
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 /-! ## Deformation-path and target wrappers with `D >= 0` -/
 
-set_option linter.style.longLine false in
 /-- General spin-`S` anisotropic `H` eigenspace `finrank <= 2` at its global
 Hermitian minimum under `D.re >= 0`. -/
 theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_D_nonneg_general
@@ -69,7 +68,6 @@ theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_D_nonneg_
   rw [henergy_eq] at hbound
   exact hbound
 
-set_option linter.style.longLine false in
 /-- General spin-`S` `finrank <= 2` at the global minimum along the
 parametric path, with target `D' >= 0`. -/
 theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_path_D_nonneg_general
@@ -126,7 +124,6 @@ theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_path_D_no
     hlam_t_im hlb_t hub_t hD_t_im hDnn_t
     (hc_strict lam_t D_t) hA_ne hB_ne hN hJ_star hlam_t_star hD_t_star
 
-set_option linter.style.longLine false in
 /-- General spin-`S` deformation contradiction capstone with target
 `D' >= 0`. -/
 theorem anisotropicHeisenbergS_obligation_2_axiomatic_sup_crossing_hne_D_nonneg_general
@@ -225,7 +222,6 @@ theorem anisotropicHeisenbergS_obligation_2_axiomatic_sup_crossing_hne_D_nonneg_
     h_finrank hΦ_bal_ne h_balanced hΦ_bal_eig
     hΦ_M_ne hM_ne_balanced hΦ_M_eig
 
-set_option linter.style.longLine false in
 /-- General spin-`S` obligation (2) under a single SU(2)-point strict-gap
 axiom, with target `D' >= 0`. -/
 theorem anisotropicHeisenbergS_obligation_2_single_axiom_D_nonneg_general

@@ -23,7 +23,6 @@ namespace LatticeSystem.Quantum
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-set_option linter.style.longLine false in
 /-- **Predicted GS ⊆ (Ŝ_tot)² eigenspace at target**: definitional
 projection onto the first joint Casimir component. -/
 theorem bipartiteToyGroundStateSubspacePredicted_le_totalSpinSSquaredEigenspace
@@ -42,7 +41,6 @@ theorem bipartiteToyGroundStateSubspacePredicted_le_totalSpinSSquaredEigenspace
   obtain ⟨⟨h_tot, _⟩, _⟩ := hv
   exact h_tot
 
-set_option linter.style.longLine false in
 /-- **Predicted GS ⊆ (Ŝ_A)² eigenspace at target**. -/
 theorem bipartiteToyGroundStateSubspacePredicted_le_sublatticeSpinSquaredSEigenspace
     (A : Λ → Bool) (N : ℕ) :
@@ -56,7 +54,6 @@ theorem bipartiteToyGroundStateSubspacePredicted_le_sublatticeSpinSquaredSEigens
   obtain ⟨⟨_, h_A⟩, _⟩ := hv
   exact h_A
 
-set_option linter.style.longLine false in
 /-- **Predicted GS ⊆ (Ŝ_¬A)² eigenspace at target**. -/
 theorem bipartiteToyGroundStateSubspacePredicted_le_sublatticeSpinSquaredS_complementEigenspace
     (A : Λ → Bool) (N : ℕ) :

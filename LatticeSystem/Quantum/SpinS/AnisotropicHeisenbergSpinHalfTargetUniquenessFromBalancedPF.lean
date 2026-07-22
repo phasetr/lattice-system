@@ -31,7 +31,6 @@ open Matrix Module
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
-set_option linter.style.longLine false in
 /-- **Spin-1/2 balanced-sector Perron--Frobenius simplicity at the target point**:
 the anisotropic target sector matrix has a one-dimensional ground eigenspace in
 the balanced magnetization sector. -/

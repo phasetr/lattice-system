@@ -22,7 +22,6 @@ open Matrix Module
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
-set_option linter.style.longLine false in
 /-- Problem 2.5.c balanced MLM ground-state wrapper: if the balanced Theorem 2.3
 endpoint supplies one-dimensionality of the SU(2)-point Heisenberg ground
 eigenspace, then any normalized non-zero vector at the Hermitian minimum has all

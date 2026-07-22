@@ -19,7 +19,6 @@ variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-! ## Balanced PF cross-sublattice sign endpoint -/
 
-set_option linter.style.longLine false in
 /-- Problem 2.5.d balanced Perron--Frobenius cross endpoint: for the concrete
 balanced PF vector from the Theorem 2.3 / Theorem 2.4 endpoint, every
 cross-sublattice pair has negative original two-spin correlation real part. -/

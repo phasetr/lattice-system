@@ -531,7 +531,6 @@ theorem spinHalf_anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_
     hlam_t_im hlb_t hub_t hD_t_im hDnn_t
     (hc_strict lam_t D_t) hA_ne hB_ne hJ_star hlam_t_star hD_t_star
 
-set_option linter.style.longLine false in
 /-- The deformation contradiction capstone with target `D' >= 0`. -/
 theorem spinHalf_anisotropicHeisenbergS_obligation_2_axiomatic_sup_crossing_hne_D_nonneg
     (A : Λ → Bool) {J : Λ → Λ → ℂ}

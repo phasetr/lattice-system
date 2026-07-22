@@ -22,7 +22,6 @@ variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-! ## Balanced PF endpoint -/
 
-set_option linter.style.longLine false in
 /-- Problem 2.5.d balanced Perron--Frobenius endpoint: the balanced Theorem 2.3
 PF vector, rewritten in the sector-supported Marshall form, has strictly
 positive signed two-spin correlation for every cross-sublattice pair. -/

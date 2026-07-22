@@ -22,7 +22,6 @@ open Matrix
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
-set_option linter.style.longLine false in
 /-- **Spin-1/2 strict gap for all non-balanced sectors from Theorem 2.3 PF**:
 the PR #4028 strict-gap theorem, repackaged with an arbitrary non-empty sector
 `M` instead of a fixed `M_orig`. -/
@@ -72,7 +71,6 @@ theorem spinHalf_anisotropicHeisenbergS_strict_gap_all_M_of_MLM_casimir_ladder_t
     M_balanced M h_balanced hM_ne h_centered_nonzero
     hlam'_lb hlam'_ub hD'
 
-set_option linter.style.longLine false in
 /-- **Spin-1/2 balanced sector is the target ground sector from Theorem 2.3 PF**:
 the balanced sector minimum at `(lambda', D')` equals the full anisotropic
 Hamiltonian ground energy. -/

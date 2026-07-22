@@ -25,7 +25,6 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-! ## Spin-1/2 target wrappers -/
 
-set_option linter.style.longLine false in
 /-- Spin-`1/2` strict case-(ii) target ground eigenspace `finrank <= 1` from
 the MLM/Casimir/Theorem 2.3 endpoint. -/
 theorem spinHalf_anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf

@@ -56,7 +56,6 @@ theorem twoSpinCorrelationS_bipartite_signed_re_pos_of_marshall_cross_eigenphase
 
 /-! ## Balanced MLM ground-state wrapper -/
 
-set_option linter.style.longLine false in
 /-- Problem 2.5.d balanced MLM ground-state wrapper: the balanced
 Marshall--Lieb--Mattis/SU(2) endpoint supplies one-dimensionality of the
 Heisenberg ground eigenspace, so a normalized non-zero Marshall-positive
