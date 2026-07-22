@@ -3,14 +3,14 @@ import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfTargetUniqueness
 set_option linter.unusedSectionVars false
 set_option linter.unusedSimpArgs false
 set_option linter.unusedVariables false
-set_option linter.style.longLine false
 
 /-!
 # Spin-1/2 `D >= 0` boundary for Theorem 2.4 — parity-block core
 
 Foundational layer of the spin-1/2 `D >= 0` parity-block Perron--Frobenius route (Tasaki §2.5
 Theorem 2.4, Issue #412): single-ion `±2` impossibility at spin 1/2, shifted-dressed parity-block
-positivity / irreducibility, the PF positive eigenvector, the Hermitian-min-eigenvalue = PF identity,
+positivity / irreducibility, the PF positive eigenvector, the
+Hermitian-min-eigenvalue = PF identity,
 the parity-block `finrank <= 1` and the global `finrank <= 2` (truly unconditional / at-global-min /
 path) theorems.
 
@@ -434,7 +434,6 @@ theorem spinHalf_anisotropicHeisenbergS_eigenspace_finrank_le_two_truly_uncondit
   exact spinHalf_anisotropicHeisenbergS_eigenspace_finrank_le_two_at_min_block_mins
     hJim hlam hDim hJself h0 h1
 
-set_option linter.style.longLine false in
 /-- Spin-`1/2` anisotropic `H` eigenspace `finrank <= 2` at its global
 Hermitian minimum with nonnegative `D`. -/
 theorem spinHalf_anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_D_nonneg
@@ -456,7 +455,8 @@ theorem spinHalf_anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_
       ((hermitianMinEigenvalue
         (anisotropicHeisenbergS_isHermitian_of_real (Λ := Λ) (N := 1)
           hJ_star hlam_star hD_star) : ℝ) : ℂ)) ≤ 2 := by
-  have hbound := spinHalf_anisotropicHeisenbergS_eigenspace_finrank_le_two_truly_unconditional_D_nonneg
+  have hbound :=
+    spinHalf_anisotropicHeisenbergS_eigenspace_finrank_le_two_truly_unconditional_D_nonneg
     A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDnn hc_strict hA_ne hB_ne
   have hblock_eq := hermitianMinEigenvalue_axisSwapped_eq_min_block_mins
     (Λ := Λ) (N := 1) hJim hlam hDim hJself

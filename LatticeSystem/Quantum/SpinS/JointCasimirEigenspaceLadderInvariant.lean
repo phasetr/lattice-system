@@ -22,7 +22,6 @@ namespace LatticeSystem.Quantum
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-set_option linter.style.longLine false in
 /-- **`Ŝ⁺_tot`-invariance of the joint sublattice-Casimir eigenspace**. -/
 theorem jointSublatticeCasimirEigenspace_totalSpinSOpPlus_invariant (A : Λ → Bool) (N : ℕ) :
     Submodule.map (totalSpinSOpPlus Λ N).mulVecLin
@@ -45,10 +44,10 @@ theorem jointSublatticeCasimirEigenspace_totalSpinSOpPlus_invariant (A : Λ → 
     rw [show (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec ((totalSpinSOpPlus Λ N).mulVec v) =
         (totalSpinSOpPlus Λ N).mulVec ((sublatticeSpinSquaredS N (fun x => ! A x)).mulVec v) from by
       rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec,
-          (sublatticeSpinSquaredS_commute_totalSpinSOpPlus (Λ := Λ) (N := N) (fun x => ! A x)).symm.eq]]
+          (sublatticeSpinSquaredS_commute_totalSpinSOpPlus (Λ := Λ) (N := N)
+            (fun x => ! A x)).symm.eq]]
     rw [h_B, Matrix.mulVec_smul]
 
-set_option linter.style.longLine false in
 /-- **`Ŝ⁻_tot`-invariance of the joint sublattice-Casimir eigenspace**. -/
 theorem jointSublatticeCasimirEigenspace_totalSpinSOpMinus_invariant (A : Λ → Bool) (N : ℕ) :
     Submodule.map (totalSpinSOpMinus Λ N).mulVecLin
@@ -69,9 +68,11 @@ theorem jointSublatticeCasimirEigenspace_totalSpinSOpMinus_invariant (A : Λ →
   · rw [SetLike.mem_coe, Module.End.mem_eigenspace_iff,
         Matrix.mulVecLin_apply, Matrix.mulVecLin_apply]
     rw [show (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec ((totalSpinSOpMinus Λ N).mulVec v) =
-        (totalSpinSOpMinus Λ N).mulVec ((sublatticeSpinSquaredS N (fun x => ! A x)).mulVec v) from by
+        (totalSpinSOpMinus Λ N).mulVec
+          ((sublatticeSpinSquaredS N (fun x => ! A x)).mulVec v) from by
       rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec,
-          (sublatticeSpinSquaredS_commute_totalSpinSOpMinus (Λ := Λ) (N := N) (fun x => ! A x)).symm.eq]]
+          (sublatticeSpinSquaredS_commute_totalSpinSOpMinus (Λ := Λ) (N := N)
+            (fun x => ! A x)).symm.eq]]
     rw [h_B, Matrix.mulVec_smul]
 
 end LatticeSystem.Quantum
