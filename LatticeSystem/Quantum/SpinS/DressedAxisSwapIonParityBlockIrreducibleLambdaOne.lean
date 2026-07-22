@@ -22,12 +22,11 @@ open Matrix
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-set_option linter.style.longLine false in
 /-- **Ion-only shifted parity-block irreducibility under reachability totality**.
 If every two distinct configurations in a parity block are connected by
 ion-only parity moves, then the shifted parity-block matrix is irreducible at
 `lambda = 1`, `D > 0`. -/
-theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_ionParityReachable_total_lambda_one
+theorem shiftedDressedReMatParity_irred_of_ionParityReach_total_lam1
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -57,7 +56,7 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_ionParit
     exact shiftedDressedAxisSwappedReMatrixOnParityBlock_diag_pos A J 1 D N p (hc_strict σ'.1)
   · have hreach := hreach_total σ' σ hsig
     obtain ⟨k, hk⟩ :=
-      shiftedDressedAxisSwappedReMatrixOnParityBlock_pow_apply_pos_of_ionParityReachable_lambda_one
+      shiftedDressedReMatParity_pow_apply_pos_of_ionParityReach_lam1
         A hJim hJnn hJpos hJself hJbip hDim hDpos hc_le p hreach
     have hk_pos : 0 < k := by
       rcases Nat.eq_zero_or_pos k with hk0 | hkp
@@ -67,7 +66,6 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_ionParit
       · exact hkp
     exact ⟨k, hk_pos, hk⟩
 
-set_option linter.style.longLine false in
 /-- **Ion-only shifted parity-block irreducibility at `lambda = 1`, `D > 0`**.
 The ion-only reachability totality theorem discharges the conditional totality
 hypothesis on the bipartite complete graph. -/
@@ -85,7 +83,7 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_lambda_one_
     (p : ℕ)
     [Nonempty (parityConfigS Λ N p)] :
     (shiftedDressedAxisSwappedReMatrixOnParityBlock A J 1 D N c p).IsIrreducible := by
-  refine shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_ionParityReachable_total_lambda_one
+  refine shiftedDressedReMatParity_irred_of_ionParityReach_total_lam1
     A hJim hJnn hJpos hJself hJbip hDim hDpos hc_strict p ?_
   intro σ' σ _hne
   refine ionParityReachableS_total A hA_ne hB_ne hN ?_
