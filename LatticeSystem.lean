@@ -122,6 +122,7 @@ import LatticeSystem.Quantum.SpinS.AKLTKnabe.Sl2LadderSectorsE3
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.Sl2SubmoduleProbeE2
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.TotalSpinCommuteE1b
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.WindowReductionE4
+import LatticeSystem.Quantum.SpinS.AKLTKnabe.WindowTransportD6c
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattis
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisProof
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisProofCore
