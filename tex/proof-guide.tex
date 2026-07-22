@@ -11916,6 +11916,32 @@ shared module \texttt{Quantum/SpinS/SpinOneTwoSiteEntries.lean}, so that the Kna
 gap estimates of §7.1 can reuse them without duplicating any declaration.
 
 \medskip
+\noindent\textbf{§7.1.4 Knabe's argument for the AKLT gap} (Tasaki, 1st ed. (2020), §7.1.4,
+pp.~188--190; S.~Knabe, \emph{J.~Stat.~Phys.} \textbf{52}, 627 (1988);
+\texttt{Quantum/SpinS/AKLTKnabe/KnabeGapD7d.lean}, Issue \#5094; \emph{proved},
+axiom-free/\texttt{std3}, PR \#5122).  For every ring of length $L=n+1\geq5$ with \emph{no
+parity restriction}, the capstone theorem \texttt{aklt\_knabe\_ring\_gap} proves the spectral gap
+of the $S=1$ AKLT ring.  Specifically, it establishes:
+\begin{enumerate}
+\item the \emph{existence} of the explicit periodic valence-bond-solid state $|\Phi_{\mathrm{VBS}}\rangle = \texttt{akltVBSState}(L)$ as a nonzero eigenvector at the ground energy $E_0 = -\frac{2}{3}L$;
+\item a \emph{spectral gap} $\geq \frac{1}{5}$, uniformly in $L$ (no $L$-dependence).
+\end{enumerate}
+
+These two results are the \textbf{existence and gap conjuncts (1) and (5)} of Tasaki's Theorem~7.1
+(pp.~177--179).  \textbf{Crucial:} this capstone does \textbf{not} establish uniqueness of the ground
+state (§7.1.3, conjunct (3)) or the correlation function decay (§7.1.2, conjunct (2)), so the axiom
+\texttt{aklt\_theorem\_7\_1} (the complete Theorem~7.1) remains in place.
+
+The proof synthesizes three prior gates: the Knabe operator inequality $({\hat H}')^2 \geq
+\frac{1}{10}{\hat H}'$ (Gate D6d, an aggregation of bond-projector squares), the frustration-freeness
+of the VBS state with respect to ring bond projections $\hat P_2[\hat S_x + \hat S_{x+1}]$, and the
+normalisation identity $\hat H_{\mathrm{AKLT}} = 2\hat H}' - \frac{2}{3}L \cdot \mathbb{I}$ (eq.~7.1.5),
+which lifts the $\frac{1}{10}$ gap of $\hat H}'$ to $\frac{1}{5}$ for the rescaled AKLT Hamiltonian.
+The result is a single finite-volume certificate: for any $L \geq 5$, the VBS state is the unique
+ground state with explicit energy $-\frac{2}{3}L$, and the first excited state is at least $\frac{1}{5}$
+above it.
+
+\medskip
 \noindent\textbf{§7.2.1 Hidden antiferromagnetic order / string order parameter}
 (den Nijs--Rommelse; Tasaki, \emph{Physics and Mathematics of Quantum
 Many-Body Systems}, 1st ed., Springer, 2020, §7.2.1, corrected
