@@ -13,15 +13,12 @@ assembly (block ④-III) consumes.  Nothing here mentions the AKLT model, spin `
 length: everything is stated for an arbitrary chain operator `H : ManyBodyOpS (Fin L) N` and its
 `realSpectrum` (`Quantum/SpinS/HaldaneConjecture.lean:56`).
 
-* **S1** `eigenvalues_mem_realSpectrum` / `exists_eigenvalues_eq_of_mem_realSpectrum` — the
-  eigenvalue ↔ real-spectrum bridge for an arbitrary Hermitian chain operator.  These generalise
-  the two `private` helpers `afm_eigenvalues_mem_realSpectrum` /
-  `afm_mem_realSpectrum_eq_eigenvalue` of `Quantum/SpinS/LiebSchultzMattisRingGap.lean:24,35`,
-  which are the same statements specialised to `afmHeisenbergChainHamiltonianS L N`; when this
-  block lands in production those two are to be deleted and their two call sites rewired here
-  (no duplicate declarations).
-* **S2** `exists_isPositiveSpectralGap` — the generic *first excited eigenvalue* constructor,
-  extracted from the inline block (D) of `LiebSchultzMattisRingGap.lean:117–140`.
+The eigenvalue ↔ real-spectrum bridge (`eigenvalues_mem_realSpectrum`,
+`exists_eigenvalues_eq_of_mem_realSpectrum`) and the generic first-excited-eigenvalue constructor
+(`exists_isPositiveSpectralGap`) live in the production module
+`Quantum/SpinS/ManyBodySpectralGap.lean` and are *not* duplicated here.  On top of them this module
+provides:
+
 * **S3** `realSpectrum_nonneg_of_posSemidef` — a positive-semidefinite operator has nonnegative
   real spectrum.
 * **S4** `realSpectrum_ge_of_sq_sub_smul_posSemidef` — **Knabe's spectral step**: if `H ≥ 0` and
@@ -44,70 +41,6 @@ open Matrix
 open scoped ComplexOrder
 
 variable {L N : ℕ}
-
-/-! ### S1 — the eigenvalue ↔ real-spectrum bridge (generic Hermitian) -/
-
-/-- **S1a.**  Each Hermitian eigenvalue of a chain operator is realised by a nonzero eigenvector,
-hence lies in its real spectrum.  (Generic form of the `private`
-`afm_eigenvalues_mem_realSpectrum` of `LiebSchultzMattisRingGap.lean:24`.) -/
-theorem eigenvalues_mem_realSpectrum {H : ManyBodyOpS (Fin L) N} (hH : H.IsHermitian)
-    (i : Fin L → Fin (N + 1)) : hH.eigenvalues i ∈ realSpectrum H := by
-  refine ⟨⇑(hH.eigenvectorBasis i), ?_, ?_⟩
-  · intro h
-    exact hH.eigenvectorBasis.orthonormal.ne_zero i ((WithLp.ofLp_eq_zero (p := 2)).mp h)
-  · rw [hH.mulVec_eigenvectorBasis i]; exact (Complex.coe_smul _ _).symm
-
-/-- **S1b.**  Every element of the real spectrum of a Hermitian chain operator is one of its
-Hermitian eigenvalues.  (Generic form of the `private` `afm_mem_realSpectrum_eq_eigenvalue` of
-`LiebSchultzMattisRingGap.lean:35`.) -/
-theorem exists_eigenvalues_eq_of_mem_realSpectrum {H : ManyBodyOpS (Fin L) N}
-    (hH : H.IsHermitian) {E : ℝ} (hE : E ∈ realSpectrum H) : ∃ j, hH.eigenvalues j = E := by
-  obtain ⟨Φ, hΦ_ne, hΦ_eig⟩ := hE
-  have h_has : Module.End.HasEigenvalue (Matrix.toLin' H) (E : ℂ) := by
-    refine Module.End.hasEigenvalue_of_hasEigenvector ⟨?_, hΦ_ne⟩
-    rw [Module.End.mem_eigenspace_iff, Matrix.toLin'_apply]; exact hΦ_eig
-  have h_spec : (E : ℂ) ∈ spectrum ℂ (Matrix.toLin' H) := h_has.mem_spectrum
-  rw [Matrix.spectrum_toLin'] at h_spec
-  have h_real : E ∈ spectrum ℝ H := by
-    rw [← spectrum.algebraMap_mem_iff ℂ (R := ℝ)]; exact h_spec
-  rw [hH.spectrum_real_eq_range_eigenvalues] at h_real
-  obtain ⟨j, hj⟩ := h_real
-  exact ⟨j, hj⟩
-
-/-! ### S2 — the generic first-excited-eigenvalue constructor -/
-
-/-- **S2.**  If `E₀` is the ground energy of a Hermitian chain operator `H` and *some* point of the
-real spectrum lies strictly above `E₀`, then there is a smallest such point `E₁`, and `H` has the
-positive spectral gap `E₁ − E₀`.  (Generic form of the inline block (D) of
-`LiebSchultzMattisRingGap.lean:117–140`.) -/
-theorem exists_isPositiveSpectralGap {H : ManyBodyOpS (Fin L) N} (hH : H.IsHermitian) {E₀ : ℝ}
-    (hground : IsGroundEnergy H E₀) (hgt : ∃ E ∈ realSpectrum H, E₀ < E) :
-    ∃ E₁ : ℝ, E₁ ∈ realSpectrum H ∧ E₀ < E₁ ∧ (∀ E ∈ realSpectrum H, E₀ < E → E₁ ≤ E) ∧
-      IsPositiveSpectralGap H (E₁ - E₀) := by
-  classical
-  obtain ⟨E, hE_spec, hE_gt⟩ := hgt
-  obtain ⟨i₀, hi₀eq⟩ := exists_eigenvalues_eq_of_mem_realSpectrum hH hE_spec
-  have hi₀ : E₀ < hH.eigenvalues i₀ := by rw [hi₀eq]; exact hE_gt
-  set S : Finset (Fin L → Fin (N + 1)) := Finset.univ.filter (fun i => E₀ < hH.eigenvalues i)
-    with hSdef
-  have hi₀S : i₀ ∈ S := by rw [hSdef]; exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, hi₀⟩
-  have himg_ne : (S.image hH.eigenvalues).Nonempty := ⟨_, Finset.mem_image_of_mem _ hi₀S⟩
-  set E₁ := (S.image hH.eigenvalues).min' himg_ne with hE₁def
-  obtain ⟨i₁, hi₁S, hi₁⟩ := Finset.mem_image.mp ((S.image hH.eigenvalues).min'_mem himg_ne)
-  have hE₀E₁ : E₀ < E₁ := by
-    rw [hE₁def, ← hi₁]
-    rw [hSdef] at hi₁S
-    exact (Finset.mem_filter.mp hi₁S).2
-  have hE₁_spec : E₁ ∈ realSpectrum H := by
-    rw [hE₁def, ← hi₁]; exact eigenvalues_mem_realSpectrum hH i₁
-  have hE₁_min : ∀ F ∈ realSpectrum H, E₀ < F → E₁ ≤ F := by
-    intro F hF hF₀
-    obtain ⟨j, hj⟩ := exists_eigenvalues_eq_of_mem_realSpectrum hH hF
-    rw [← hj]
-    refine (S.image hH.eigenvalues).min'_le _ (Finset.mem_image_of_mem _ ?_)
-    rw [hSdef]
-    exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, by rw [hj]; exact hF₀⟩
-  exact ⟨E₁, hE₁_spec, hE₀E₁, hE₁_min, E₀, E₁, hground, hE₁_spec, hE₀E₁, rfl, hE₁_min⟩
 
 /-! ### S3, S4 — positive semidefiniteness and Knabe's spectral step -/
 
