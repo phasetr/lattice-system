@@ -106,6 +106,11 @@ import LatticeSystem.Quantum.SpinS.ClusterState
 import LatticeSystem.Quantum.SpinS.GeneralAKLT
 import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrder
 import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrderUniqueness
+import LatticeSystem.Quantum.SpinS.AKLTKnabe.BlockDischargeE6
+import LatticeSystem.Quantum.SpinS.AKLTKnabe.BlockDischargeE6a
+import LatticeSystem.Quantum.SpinS.AKLTKnabe.BlockDischargeE6b
+import LatticeSystem.Quantum.SpinS.AKLTKnabe.BlockDischargeE6c
+import LatticeSystem.Quantum.SpinS.AKLTKnabe.BlockDischargeE6d
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.BondProjectionAlgebraD6b
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.FrustrationFreeD7c
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.GenericSpectralD7b
