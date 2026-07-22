@@ -115,6 +115,7 @@ import LatticeSystem.Quantum.SpinS.AKLTKnabe.BondProjectionAlgebraD6b
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.FrustrationFreeD7c
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.GenericSpectralD7b
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.HighestWeightBoundE5
+import LatticeSystem.Quantum.SpinS.AKLTKnabe.KnabeAggregationD6d
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.P2OperatorBridgeD5b
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.Sector2BaseNarrow
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.SiteBlockEmbeddingD5b
