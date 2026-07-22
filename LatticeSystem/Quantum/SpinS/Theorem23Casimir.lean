@@ -294,8 +294,7 @@ with a non-endpoint total-Casimir eigenvalue has non-zero total-raising
 image after zero-extension.
 
 This is the raising companion to
-`tasaki23_totalSpinSOpMinus_mulVec_marshallPositive_magSectorEmbedding_ne_zero`
-`_of_casimir_ne_kernel_value`. -/
+`t23_totSpinSOpMinus_mulVec_marshPos_magSecEmb_ne_zero_of_cas_ne_kernelVal`. -/
 theorem t23_totSpinSOpPlus_mulVec_marshPos_magSecEmb_ne_zero_of_cas_ne_kernelVal
     (A : V → Bool) {N M : ℕ} [Nonempty (magConfigS V N M)]
     {γ : ℂ} {v : magConfigS V N M → ℝ}
