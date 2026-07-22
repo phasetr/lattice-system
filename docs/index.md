@@ -64,6 +64,11 @@ The companion page [Deprecation window](deprecations.html) tracks
 currently-deprecated public declarations, the `since` date,
 recommended replacement, and earliest-removal window.
 
+The companion page
+[Jordan–Wigner façade module overview](jordan-wigner-overview.html)
+gives the per-sub-file overview table for the
+`LatticeSystem/Fermion/JordanWigner/` re-export hub.
+
 ## Roadmap
 
 | Phase | Scope | Status |
