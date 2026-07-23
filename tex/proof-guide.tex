@@ -12410,8 +12410,8 @@ rank--nullity comparison $7+9=16$; it uses only the Standard~3 axioms.
 
 At the Gate~L stage, this result was local to one two-site spin-$3/2$
 bond and did not itself construct the finite-volume honeycomb VBS state.
-The subsequent finite-state slice below supplies that construction and its
-nonzeroness, but not global frustration-freeness, finite-volume uniqueness,
+The subsequent finite-state slice below supplies that construction, its
+nonzeroness, and global frustration-freeness, but not finite-volume uniqueness,
 the correlation bound (7.3.9), or infinite-volume uniqueness.  In particular,
 \texttt{tasaki\_theorem\_7\_7} remains a documented axiom.
 \par\smallskip
@@ -12494,15 +12494,42 @@ finite-volume uniqueness, correlation decay, a spectral gap, and
 infinite-volume uniqueness remain outside this slice.
 \par\smallskip
 
+\noindent\textbf{Zero-energy ground state of the finite honeycomb AKLT Hamiltonian}
+(Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems}, 1st ed.,
+Springer, 2020, §7.3.2, Lemma~A.9, p.~469; \path{Quantum/SpinS/HoneycombAKLTZeroEnergy.lean}, Issue \#5133).
+The theorem \texttt{honeycombVBSState\_adj\_bond\_annihilated} extends the
+per-bond annihilation result to every ordered adjacent pair $(x,y)$, using the
+forward-dart and reverse-dart coverage plus the bond-projection symmetry
+\texttt{bondMaxSpinProjectionS\_comm}.
+The capstone \texttt{honeycombVBSState\_isGeneralGraphVBSGroundState} assembles the
+per-bond ingredients into the \emph{full frustration-free zero-energy
+ground-state property} via the $\varepsilon\equiv 0$ specialization of Tasaki's
+Lemma~A.9 (\texttt{frustration\_free\_isGroundState}): each local bond term is
+positive semidefinite (\texttt{bondMaxSpinProjectionS\_three\_posSemidef}) and
+annihilates the state, so their sum is positive semidefinite and annihilates the
+state; the prefactor $\tfrac12$ recovers \texttt{regularGraphAKLTHamiltonianS}.
+Thus for $m\ge 2$ the finite honeycomb VBS state realizes
+\[
+\texttt{IsGeneralGraphVBSGroundState}\ (\text{honeycombTorusGraph}\ m)\ 3\ (\text{honeycombVBSState}\ m),
+\]
+the ground-state hypothesis of Tasaki Theorem 7.7 on the canonical honeycomb
+torus. Correlation decay (eq.~7.3.9) and infinite-volume uniqueness remain
+unproved; \texttt{tasaki\_theorem\_7\_7} remains an axiom.
+
+\par\smallskip
+
 The axiom
 \texttt{tasaki\_theorem\_7\_7} states that for the hexagonal lattice
 (marker \texttt{IsHexagonalLatticeAKLT}) with VBS ground state $\Phi$
-(marker \texttt{IsGeneralGraphVBSGroundState}) there are size-independent $C,\xi>0$ with the
+satisfying the concrete \textbf{frustration-free zero-energy property}
+\texttt{IsGeneralGraphVBSGroundState} (def: the Hamiltonian is positive semidefinite, $\Phi$ is annihilated
+by it, and $\Phi$ is nonzero) there are size-independent $C,\xi>0$ with the
 sign-alternating exponential decay $0\le(-1)^{D(x,y)}\langle\hat S_x\!\cdot\!\hat S_y\rangle\le
 Ce^{-D(x,y)/\xi}$ ($D=G.\mathrm{dist}$, eq.~7.3.9) and the translation-invariant infinite-volume
 ground state is unique (marker \texttt{HasUniqueInfiniteVolumeVBSGroundState}).  The hexagonal
-restriction is essential (general-graph decay can fail).  Casimir, projector and Hamiltonian are
-concrete; Theorem 7.7 is a documented axiom.  Chapters~3--10 backfill.
+restriction is essential (general-graph decay can fail).  Casimir, projector, and Hamiltonian are
+concrete; the zero-energy ground-state property is proven; Theorem 7.7 is a documented axiom (correlation decay
+and infinite-volume uniqueness remain unproven).  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§7.3.3 Briegel--Raussendorf (cluster / graph) state} (Theorem 7.8; Tasaki §7.3.3,
