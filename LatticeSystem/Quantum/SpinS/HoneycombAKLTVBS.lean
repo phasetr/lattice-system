@@ -53,7 +53,7 @@ private theorem honeycombDart_colors
   · exact Or.inr ⟨hfst, hsnd⟩
 
 /-- A forward honeycomb dart ends on sublattice `B`. -/
-private theorem HoneycombForwardDart.snd_eq_true
+theorem HoneycombForwardDart.snd_eq_true
     (d : HoneycombForwardDart m) :
     d.1.snd.2 = true := by
   rcases honeycombDart_colors d.1 with h | h
@@ -120,12 +120,26 @@ def honeycombIncidenceSpin
     Fin.rev (ν ⟨d.symm, honeycombDart_symm_fst_eq_false d hd⟩)
 
 /-- On a forward dart, the source incidence is the stored virtual bit. -/
-private theorem honeycombIncidenceSpin_forward
+theorem honeycombIncidenceSpin_forward
     (ν : HoneycombVirtualConfig m) (d : HoneycombForwardDart m) :
     honeycombIncidenceSpin ν d.1 = ν d := by
   rw [honeycombIncidenceSpin, dif_pos d.2]
   apply congrArg ν
   exact Subtype.ext rfl
+
+/-- On the reverse of a forward dart, the target incidence carries the
+reversed virtual bit. -/
+theorem honeycombIncidenceSpin_reverse
+    (ν : HoneycombVirtualConfig m) (d : HoneycombForwardDart m) :
+    honeycombIncidenceSpin ν d.1.symm = Fin.rev (ν d) := by
+  have hcolor : d.1.symm.fst.2 ≠ false := by
+    change d.1.snd.2 ≠ false
+    rw [d.snd_eq_true]
+    decide
+  rw [honeycombIncidenceSpin, dif_neg hcolor]
+  apply congrArg (fun e => Fin.rev (ν e))
+  apply Subtype.ext
+  rfl
 
 /-- Number of down virtual incidences at a physical site. -/
 def honeycombVirtualDownCount [NeZero m]

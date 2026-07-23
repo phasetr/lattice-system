@@ -12455,9 +12455,43 @@ is
 (\sqrt{2}^{-1})^{\lvert D^+_m\rvert} \neq 0,
 \]
 which proves \texttt{honeycombVBSState\_ne\_zero}.  The proof uses only the
-Standard~3 axioms.  Bond annihilation, zero energy, finite-volume
-uniqueness, correlation decay, a spectral gap, and infinite-volume
-uniqueness remain outside this finite-state slice.
+Standard~3 axioms.
+\par\smallskip
+
+\noindent\textbf{Per-bond annihilation for the finite honeycomb VBS state}
+(Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems},
+1st ed., Springer, 2020, §7.3.2, eq.~(7.3.7), p.~210;
+\path{Quantum/SpinS/HoneycombAKLTBondAnnihilation.lean}, Issue \#5132).
+For a forward dart \(d\), let
+\(\operatorname{slice}_{d,\tau}(\Phi)\) freeze every coefficient away from
+the two endpoints.  The generic block-embedding bridge gives
+\[
+\widehat P_3[d.\mathrm{fst}+d.\mathrm{snd}]\Phi = 0
+\quad\Longleftrightarrow\quad
+\operatorname{slice}_{d,\tau}(\Phi) \in W_{3/2}
+\quad\text{for every }\tau.
+\]
+The proof splits each virtual configuration into the selected singlet bit
+and an assignment \(\mu\) on all remaining forward darts.  The two bit
+values have opposite singlet signs.  Their endpoint down counts are
+\(a,b+1\) and \(a+1,b\), respectively, while every spectator count is
+unchanged.  After the common spectator symmetrizer factor is extracted,
+each fixed-\(\mu\) fibre is therefore a scalar multiple of
+\(v_{a,b}\).  Hence
+\[
+\operatorname{slice}_{d,\tau}
+  (\texttt{honeycombVBSState m})
+= \sum_{\mu}c_{\mu,\tau}v_{a(\mu),b(\mu)}
+\in W_{3/2}.
+\]
+This proves \texttt{honeycombVBSState\_twoSiteSlice\_mem} and
+\texttt{honeycombVBSState\_bond\_annihilated}.  The formal orientation is
+the chosen \(A\)-to-\(B\) direction; the forward-dart equivalence supplies
+one such representative for every undirected bond.  Thus the theorem is
+the per-bond ingredient of eq.~(7.3.7), not a proof identifying or summing
+the full Hamiltonian.  Positive semidefiniteness of that sum, zero energy,
+finite-volume uniqueness, correlation decay, a spectral gap, and
+infinite-volume uniqueness remain outside this slice.
 \par\smallskip
 
 The axiom
