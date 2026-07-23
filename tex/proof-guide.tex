@@ -11941,6 +11941,44 @@ The result is a single finite-volume certificate: for any $L \geq 5$, the VBS st
 $-\frac{2}{3}L$, and the first excited state is at least $\frac{1}{5}$ above it.
 
 \medskip
+\noindent\textbf{§7.1.3 The uniqueness of the AKLT ground state} (Tasaki, 1st ed. (2020), §7.1.3,
+Lemma 7.4 and eqs.~(7.1.22)--(7.1.25), pp.~186--188; proof due to Kennedy--Lieb--Tasaki~[41],
+polynomial representation Arovas--Auerbach--Haldane~[10];
+\texttt{Quantum/SpinS/AKLTUniqueness/GroundStateUnique.lean}; \emph{proved}, axiom-free/\texttt{std3},
+PR \#5128).  The independent theorem \texttt{aklt\_ring\_ground\_state\_unique} discharges the
+\textbf{uniqueness conjunct} (§7.1.3) of Tasaki's Theorem~7.1: for every ring of length $L=n+1\geq3$, any
+nonzero eigenvector $\Psi$ of $\hat H_{\mathrm{AKLT}}$ at the ground energy $-\frac23 L$ is a scalar
+multiple of the explicit VBS state, $\exists c,\ \Psi = c\cdot\texttt{akltVBSState}(L)$ --- i.e.\ the
+ground space is one-dimensional.  \textbf{Over-claim guard:} this establishes \emph{only} uniqueness;
+the §7.1.2 correlation function (conjunct (2)) is not addressed, so the documented axiom
+\texttt{aklt\_theorem\_7\_1} \textbf{remains in place}, exactly as with the Knabe-gap capstone above.
+
+The proof follows Tasaki's Weyl (Schwinger-boson) / UFD route in two stages.  \emph{Spectral bridge}
+(\texttt{ground\_eigen\_isVBSGroundForm}, frustration-freeness, Lemma A.10): the normalisation
+identity $\hat H_{\mathrm{AKLT}} = 2{\hat H}' - \frac23 L$ turns the eigen-equation into
+${\hat H}'\Psi = 0$, so $\Psi$ is a zero mode of every bond projection
+(\texttt{frustration\_free\_local\_eigen}), hence has the singlet form \texttt{IsVBSGroundForm} at
+every bond (Lemma 7.4).  \emph{Polynomial one-dimensionality} (Stage~C): the injective, degree-$2L$
+homogeneous Weyl map \texttt{weylMap} (eq.~(7.1.22), file
+\texttt{Math/MvPolynomial/WeylSpinOneMap.lean}, with the essential $\sqrt2$ Clebsch--Gordan weight)
+sends each bond singlet into the ideal of the bilinear bond factor
+$f_x = u_x v_{x+1} - v_x u_{x+1}$ (\texttt{bondFactor}, file
+\texttt{Math/MvPolynomial/BilinearFactorCoprime.lean}), so
+\texttt{fBond\_dvd\_weylMap\_of\_isVBSGroundForm} gives $f_x \mid \texttt{weylMap}\,\Psi$ at each bond.
+Distinct cyclic bonds are relatively prime (\texttt{fBond\_isRelPrime}, using the double-shift
+combinatorics \texttt{ringSucc\_ringSucc\_ne} valid for $L\geq3$ --- coprimality breaks at $L=2$),
+whence $\prod_x f_x \mid \texttt{weylMap}\,\Psi$ (\texttt{prod\_dvd\_of\_pairwise\_isRelPrime}); the
+degree count $\deg(\prod_x f_x) = 2L = \deg(\texttt{weylMap}\,\Psi)$
+(\texttt{totalDegree\_prod\_of\_isDomain}, eq.~(7.1.25)) forces
+$\texttt{weylMap}\,\Psi = C c \cdot \prod_x f_x$
+(\texttt{weylMap\_ground\_form\_eq\_const\_smul\_prod}).  Applying this to $\Psi$ and to
+$\texttt{akltVBSState}(L)$ (whose Weyl image is nonzero, so its constant $c_0\neq0$) and cancelling the
+common product yields $\texttt{weylMap}\,\Psi = \texttt{weylMap}\,((c/c_0)\cdot\texttt{akltVBSState}(L))$;
+injectivity of \texttt{weylMap} concludes $\Psi = (c/c_0)\cdot\texttt{akltVBSState}(L)$.  The whole
+argument is finite-dimensional spectral theory plus multivariate-polynomial UFD factorization --- no
+operator algebra and no infinite volume (Theorem~7.2 is a separate infinite-chain statement).
+
+\medskip
 \noindent\textbf{§7.2.1 Hidden antiferromagnetic order / string order parameter}
 (den Nijs--Rommelse; Tasaki, \emph{Physics and Mathematics of Quantum
 Many-Body Systems}, 1st ed., Springer, 2020, §7.2.1, corrected
