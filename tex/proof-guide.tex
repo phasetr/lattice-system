@@ -12020,6 +12020,56 @@ the Standard~3 axioms and has no logical dependency on Theorems 7.1,
 Chapters~3--10 backfill.
 
 \medskip
+\noindent\textbf{§7.2.2 The exponential decay of the AKLT correlation
+function} (Tasaki, \emph{Physics and Mathematics of Quantum Many-Body
+Systems}, 1st ed., Springer, 2020, §7.2.2,
+eqs.~(7.2.26)--(7.2.34), pp.~197--200, and eq.~(7.1.2), p.~178;
+PR \#5130).
+The capstone \texttt{aklt\_correlation\_decay} discharges the
+\emph{correlation-function conjunct} of Tasaki Theorem 7.1 as an
+independent theorem: for the explicit periodic valence-bond-solid state
+$\texttt{akltVBSState}(n+1)$ and any two fixed sites $x, y \in \mathbb{N}$
+with $1 \le \mathrm{dist}(x,y)$, the ground-state Rayleigh quotient of
+$\hat S_x \cdot \hat S_y$ decays with alternating sign,
+$\langle \Phi, \hat S_x\!\cdot\!\hat S_y\,\Phi\rangle /
+\langle \Phi, \Phi\rangle \to 4\,(-3)^{-|x-y|}$
+as the ring length $L = n+1 \uparrow \infty$ (sound eventual-$\varepsilon$
+form, the fixed $\mathbb{N}$-sites embedded by \texttt{chainSite}).
+This discharges only the correlation conjunct; the documented axiom
+\texttt{aklt\_theorem\_7\_1} (which additionally bundles existence, gap,
+and uniqueness) \emph{remains in place}, its consolidation being tracked
+separately.  With this theorem, all four assertions of Theorem 7.1 are
+now individually discharged as standalone theorems: existence and gap
+(\texttt{aklt\_knabe\_ring\_gap}, §7.1.4), uniqueness
+(\texttt{aklt\_ring\_ground\_state\_unique}, §7.1.3), and correlation
+decay here.
+
+The proof is the string-free specialization of the §7.2.1 calculation.
+Replacing the interior phase block by the ordinary transfer, the plain
+axis-three contraction $\mathrm{Tr}[\tilde A^a \tilde B \tilde A^b \tilde
+B \tilde A^c]$ (\texttt{endpoint\_ordinary\_endpoint\_closed},
+eq.~(7.2.31)) has the exact finite numerator
+$-\tfrac14\bigl[(3/4)^b(-1/4)^{a+c} + (-1/4)^b(3/4)^{a+c}\bigr]$; dividing
+by the periodic norm $(3/4)^L + 3(-1/4)^L$ and letting $L\uparrow\infty$
+(the common eigenvalue power cancels) gives the axis-three limit
+$\tfrac43(-1/3)^{|x-y|}$ (\texttt{Internal.plainAxis3Epsilon},
+eq.~(7.2.33)).  The single-site rotation covariance of the VBS state
+(\texttt{Internal.spinComponentCorrelation\_akltVBSState\_eq\_three},
+eq.~(7.2.34)) makes the three axes equal, so
+$\texttt{expectationRatioRe}(\hat S_x\!\cdot\!\hat S_y)$ equals
+$3\times$ the axis-three correlation
+(\texttt{spinSDot\_eq\_sum\_component} plus additivity
+\texttt{expectationRatioRe\_sum}), and
+$3\cdot\tfrac43(-1/3)^r = 4(-3)^{-r}$.  The calculation is
+finite-dimensional transfer-matrix linear algebra plus a geometric-series
+thermodynamic limit and single-site rotation covariance, using only the
+Standard~3 axioms and with no logical dependency on
+\texttt{aklt\_theorem\_7\_1}.  The implementation is
+\texttt{AKLTCorrelationDecay.lean}, on top of
+\texttt{AKLTStringOrderTransfer.lean} and
+\texttt{AKLTStringOrderCovariance.lean}.
+
+\medskip
 \noindent\textbf{§7.2.2 Matrix product representation} (Theorems 7.5--7.6;
 Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems}, 1st ed.
 (Springer, 2020), §7.2.2, Theorem 7.5, eqs.~(7.2.36),

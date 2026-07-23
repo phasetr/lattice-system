@@ -109,6 +109,7 @@ import LatticeSystem.Quantum.SpinS.AKLTStringOrderDefs
 import LatticeSystem.Quantum.SpinS.AKLTStringOrderTransfer
 import LatticeSystem.Quantum.SpinS.AKLTStringOrderCovariance
 import LatticeSystem.Quantum.SpinS.AKLTStringOrder
+import LatticeSystem.Quantum.SpinS.AKLTCorrelationDecay
 import LatticeSystem.Quantum.SpinS.ClusterState
 import LatticeSystem.Quantum.SpinS.GeneralAKLT
 import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrder

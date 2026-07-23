@@ -769,4 +769,101 @@ theorem Internal.stringCorrelationAxisS_akltVBSState_eq_three
       stringCorrelationS x y (akltVBSState L)
     exact stringCorrelationAxisS_two x y (akltVBSState L)
 
+/-! ## Plain (no string phase) axis covariance for the two-point correlation -/
+
+/-- A two-sided many-body rotation carrying the third-axis site operators to
+axis `α` carries the plain two-point correlation to axis `α`.  This is the
+string-free specialization of `stringCorrelationAxisS_eq_two_of_rotation`
+(the single-site conjugation is independent of the string operator). -/
+private theorem spinComponentCorrelation_eq_two_of_rotation
+    (α : Fin 3) (x y : Fin L)
+    (U Uinv : ManyBodyOpS (Fin L) 2)
+    (hUUinv : U * Uinv = 1)
+    (hUinvAdj : Uinv.conjTranspose = U)
+    (hstate : U.mulVec (akltVBSState L) = akltVBSState L)
+    (hsite : ∀ z : Fin L,
+      Uinv * spinSSiteComponentS (2 : Fin 3) z * U =
+        spinSSiteComponentS α z) :
+    expectationRatioRe
+        (spinSSiteComponentS α x * spinSSiteComponentS α y) (akltVBSState L) =
+      expectationRatioRe
+        (spinSSiteComponentS (2 : Fin 3) x * spinSSiteComponentS (2 : Fin 3) y)
+        (akltVBSState L) := by
+  set Othree :=
+    spinSSiteComponentS (2 : Fin 3) x * spinSSiteComponentS (2 : Fin 3) y with hOthree
+  have hobservable :
+      spinSSiteComponentS α x * spinSSiteComponentS α y = Uinv * Othree * U := by
+    rw [← hsite x, ← hsite y, hOthree]
+    rw [show
+      (Uinv * spinSSiteComponentS (2 : Fin 3) x * U) *
+          (Uinv * spinSSiteComponentS (2 : Fin 3) y * U) =
+        Uinv * spinSSiteComponentS (2 : Fin 3) x * (U * Uinv) *
+          spinSSiteComponentS (2 : Fin 3) y * U by noncomm_ring]
+    rw [hUUinv]
+    simp only [mul_one]
+    noncomm_ring
+  have hnumerator :
+      star (akltVBSState L) ⬝ᵥ
+          (spinSSiteComponentS α x * spinSSiteComponentS α y).mulVec
+            (akltVBSState L) =
+        star (akltVBSState L) ⬝ᵥ Othree.mulVec (akltVBSState L) := by
+    rw [hobservable, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hstate]
+    rw [show
+      star (akltVBSState L) ⬝ᵥ Uinv.mulVec (Othree.mulVec (akltVBSState L)) =
+        star (Uinv.conjTranspose.mulVec (akltVBSState L)) ⬝ᵥ
+          Othree.mulVec (akltVBSState L) by
+        rw [Matrix.star_mulVec, Matrix.conjTranspose_conjTranspose,
+          Matrix.dotProduct_mulVec]]
+    rw [hUinvAdj, hstate]
+  unfold expectationRatioRe
+  rw [hnumerator]
+
+/-- Every finite periodic AKLT VBS plain two-point correlation agrees exactly
+with its axis-three correlation (Tasaki eq. (7.2.34), rotation invariance). -/
+theorem Internal.spinComponentCorrelation_akltVBSState_eq_three
+    (α : Fin 3) (L : ℕ) (x y : Fin L) :
+    expectationRatioRe
+        (spinSSiteComponentS α x * spinSSiteComponentS α y) (akltVBSState L) =
+      expectationRatioRe
+        (spinSSiteComponentS (2 : Fin 3) x * spinSSiteComponentS (2 : Fin 3) y)
+        (akltVBSState L) := by
+  fin_cases α
+  · change expectationRatioRe
+        (spinSSiteComponentS (0 : Fin 3) x * spinSSiteComponentS (0 : Fin 3) y)
+        (akltVBSState L) = _
+    apply spinComponentCorrelation_eq_two_of_rotation (0 : Fin 3) x y
+      (manyBodyTensorS (fun _ : Fin L => axisThreetoOne))
+      (manyBodyTensorS (fun _ : Fin L => axisOnetoThree))
+    · rw [manyBodyTensorS_mul]
+      simpa [axisThreetoOne_mul_inverse] using
+        manyBodyTensorS_one (Λ := Fin L) (N := 2)
+    · apply manyBodyTensorS_conjTranspose_const
+      rw [← axisThreetoOne_conjTranspose, Matrix.conjTranspose_conjTranspose]
+    · exact axisThreetoOne_state_invariant L
+    · intro z
+      rw [show spinSSiteComponentS (2 : Fin 3) z =
+          onSiteS z (spinSOp3 2) by rfl]
+      rw [manyBodyTensorS_conj_onSiteS axisOnetoThree_mul_inverse]
+      rw [axisOnetoThree_conj_spinSOp3]
+      rfl
+  · change expectationRatioRe
+        (spinSSiteComponentS (1 : Fin 3) x * spinSSiteComponentS (1 : Fin 3) y)
+        (akltVBSState L) = _
+    apply spinComponentCorrelation_eq_two_of_rotation (1 : Fin 3) x y
+      (manyBodyTensorS (fun _ : Fin L => axisThreetoTwo))
+      (manyBodyTensorS (fun _ : Fin L => axisTwotoThree))
+    · rw [manyBodyTensorS_mul]
+      simpa [axisThreetoTwo_mul_inverse] using
+        manyBodyTensorS_one (Λ := Fin L) (N := 2)
+    · apply manyBodyTensorS_conjTranspose_const
+      rw [← axisThreetoTwo_conjTranspose, Matrix.conjTranspose_conjTranspose]
+    · exact axisThreetoTwo_state_invariant L
+    · intro z
+      rw [show spinSSiteComponentS (2 : Fin 3) z =
+          onSiteS z (spinSOp3 2) by rfl]
+      rw [manyBodyTensorS_conj_onSiteS axisTwotoThree_mul_inverse]
+      rw [axisTwotoThree_conj_spinSOp3]
+      rfl
+  · rfl
+
 end LatticeSystem.Quantum.AKLTStringOrder
