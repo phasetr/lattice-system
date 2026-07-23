@@ -88,6 +88,7 @@ import LatticeSystem.Quantum.SpinS.NoLongRangeOrder1D
 import LatticeSystem.Quantum.SpinS.HaldaneConjecture
 import LatticeSystem.Quantum.SpinS.AKLT
 import LatticeSystem.Quantum.SpinS.AKLTBondProjection
+import LatticeSystem.Quantum.SpinS.AKLTUniqueness.LocalBondDivisibility
 import LatticeSystem.Quantum.SpinS.MPSTheorem75Defs
 import LatticeSystem.Quantum.SpinS.MPSTheorem75Linear
 import LatticeSystem.Quantum.SpinS.MPSTheorem75Choi
