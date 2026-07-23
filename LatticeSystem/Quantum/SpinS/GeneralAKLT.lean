@@ -91,15 +91,13 @@ noncomputable def regularGraphAKLTHamiltonianS (G : SimpleGraph Λ) [DecidableRe
     if G.Adj x y then bondMaxSpinProjectionS x y N else 0
 
 /-- **Hexagonal-lattice predicate** `IsHexagonalLatticeAKLT G`: the graph `G` is isomorphic to a
-honeycomb torus `honeycombTorusGraph m` for some `m`, i.e. `G` is the (periodic) hexagonal lattice,
-on which every site has coordination number 3, giving the uniform `S = 3/2` (`N = 3`) AKLT model of
-eq. (7.3.8).  This replaces the earlier uninterpreted marker with the explicit honeycomb
-construction of `LatticeSystem.Lattice.honeycombTorusGraph` (a finite, 3-regular,
-bipartite torus, Tasaki §7.3.2, eq. (7.3.8), footnote 42, p. 211), so Theorem 7.7's decay statement
-applies only to the hexagonal lattice (where it holds), not to an arbitrary graph (where it can
-fail). -/
+nondegenerate honeycomb torus `honeycombTorusGraph m` for some `m ≥ 2`.  The lower bound ensures
+that the three nominal neighbours of every site are distinct, so the torus is genuinely
+3-regular and carries the uniform `S = 3/2` (`N = 3`) AKLT model.  This is the periodic
+hexagonal-lattice setting of Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
+1st ed., Springer, 2020, §7.3.2, eq. (7.3.8), Theorem 7.7, footnote 42, pp. 210–211. -/
 def IsHexagonalLatticeAKLT (G : SimpleGraph Λ) : Prop :=
-  ∃ m : ℕ, Nonempty (G ≃g LatticeSystem.Lattice.honeycombTorusGraph m)
+  ∃ m : ℕ, 2 ≤ m ∧ Nonempty (G ≃g LatticeSystem.Lattice.honeycombTorusGraph m)
 
 /-- **General-graph VBS ground-state marker** `IsGeneralGraphVBSGroundState G N Φ`: the state `Φ` is
 the valence-bond-solid ground state (eq. (7.3.6)) of the generalized AKLT Hamiltonian on `G`.  Kept
