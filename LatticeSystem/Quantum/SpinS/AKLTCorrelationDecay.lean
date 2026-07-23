@@ -11,7 +11,8 @@ ring `Fin (n + 1)` and any two fixed sites `x, y` with `|x − y| ≥ 1`,
 
 `⟨Φ_VBS, Ŝ_x · Ŝ_y Φ_VBS⟩ / ⟨Φ_VBS, Φ_VBS⟩ → 4 (−3)^{−|x − y|}` as `L = n + 1 ↑ ∞`,
 
-stated in the sound eventual-`ε` form used by the `aklt_theorem_7_1` axiom.
+stated in the sound eventual-`ε` form used in the `aklt_theorem_7_1` theorem
+(`AKLTTheorem71.lean`).
 
 The proof combines the plain (no interior string phase) axis-three transfer
 computation (`AKLTStringOrderTransfer`, eqs. (7.2.31)–(7.2.33)) with the
@@ -19,9 +20,9 @@ single-site rotation covariance of the VBS state (`AKLTStringOrderCovariance`,
 eq. (7.2.34)), which turns the full inner product `Ŝ_x · Ŝ_y` into three times
 its axis-three component.
 
-This discharges conjunct 6 as a standalone theorem; the documented axiom
-`aklt_theorem_7_1` (which additionally bundles existence, gap and uniqueness) is
-left untouched, its consolidation being tracked separately.
+This discharges conjunct 6 as a standalone theorem; this result now forms part of the theorem
+`aklt_theorem_7_1` (in `AKLTTheorem71.lean`), which bundles this correlation result together with
+existence, gap, and uniqueness.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 1st ed., Springer, 2020, §7.2.2, eqs. (7.2.26)–(7.2.34), pp. 197–200.
@@ -106,8 +107,8 @@ and any two fixed sites `x, y` with `|x − y| ≥ 1`, the ground-state Rayleigh
 quotient of `Ŝ_x · Ŝ_y` decays with alternating sign to `4 (−3)^{−|x − y|}` as
 the ring length `L = n + 1 ↑ ∞` (sound eventual-`ε` form).  This is the sixth and
 last assertion of the AKLT main theorem, discharged here as a standalone theorem
-(the axiom `aklt_theorem_7_1`, which also bundles existence, gap and uniqueness,
-is untouched). -/
+that is now composed together with the other conjuncts in the `aklt_theorem_7_1`
+theorem in `AKLTTheorem71.lean`. -/
 theorem aklt_correlation_decay :
     ∀ (x y : ℕ), 1 ≤ Nat.dist x y → ∀ ε : ℝ, 0 < ε → ∃ n₁ : ℕ, ∀ n : ℕ, n₁ ≤ n →
       |expectationRatioRe (spinSDot (chainSite n x) (chainSite n y) 2)

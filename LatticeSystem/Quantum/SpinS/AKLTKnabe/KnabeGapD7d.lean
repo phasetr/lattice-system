@@ -265,8 +265,8 @@ normalisation of eq. (7.1.5) transported by S5; the shift `−(2/3)L` cancels in
 difference and only moves the ground energy.
 
 This is Tasaki's own §7.1.4 theorem; it supplies the *existence* and *gap* conjuncts of
-Theorem 7.1 but neither ground-state uniqueness (§7.1.3) nor the correlation function (7.1.2), so
-the axiom `aklt_theorem_7_1` stays in place.
+Theorem 7.1, now part of the complete `aklt_theorem_7_1` theorem (in `AKLTTheorem71.lean`),
+composed together with the uniqueness (§7.1.3) and correlation (§7.2.2) results.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §7.1.4, pp. 188–190; S. Knabe, J. Stat. Phys. **52**, 627 (1988). -/
