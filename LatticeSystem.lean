@@ -381,6 +381,7 @@ import LatticeSystem.Quantum.SpinS.Problem25cMLMGroundStateWrapper
 import LatticeSystem.Quantum.SpinS.Problem25cBalancedStructuralWrapper
 import LatticeSystem.Quantum.SpinS.SingleSiteXYExpectation
 import LatticeSystem.Lattice.Graph
+import LatticeSystem.Lattice.HoneycombLattice
 import LatticeSystem.Lattice.HypercubicLattice
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli

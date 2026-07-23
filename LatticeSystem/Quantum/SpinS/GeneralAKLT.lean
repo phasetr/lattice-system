@@ -1,5 +1,7 @@
 import LatticeSystem.Quantum.SpinS.AKLT
 import LatticeSystem.Quantum.SpinS.AndersonTower
+import LatticeSystem.Lattice.HoneycombLattice
+import Mathlib.Combinatorics.SimpleGraph.Maps
 
 /-!
 # Tasaki §7.3.2: the AKLT model on a general graph and Theorem 7.7
@@ -33,10 +35,10 @@ the VBS ground state has exponentially decaying, sign-alternating spin correlati
 with `D` the graph distance and `C, ξ > 0` independent of system size, and the translation-invariant
 infinite-volume ground state is unique.
 
-The Casimir, the bond projection, and the generalized Hamiltonian are *defined concretely*.  The
-hexagonal lattice, the VBS ground state, and the infinite-volume uniqueness are carried by
-uninterpreted markers, and Theorem 7.7 (whose proof rests on the explicit VBS /
-reflection-positivity
+The Casimir, the bond projection, the generalized Hamiltonian, and the hexagonal lattice
+(`IsHexagonalLatticeAKLT`, via the explicit honeycomb torus `honeycombTorusGraph`) are *defined
+concretely*.  The VBS ground state and the infinite-volume uniqueness are carried by uninterpreted
+markers, and Theorem 7.7 (whose proof rests on the explicit VBS / reflection-positivity
 analysis) is a documented axiom.  The decay statement is restricted to the hexagonal lattice: on
 general graphs it can fail (the correlations need not decay in every dimension).
 
@@ -88,12 +90,16 @@ noncomputable def regularGraphAKLTHamiltonianS (G : SimpleGraph Λ) [DecidableRe
   (1 / 2 : ℂ) • ∑ x : Λ, ∑ y : Λ,
     if G.Adj x y then bondMaxSpinProjectionS x y N else 0
 
-/-- **Hexagonal-lattice marker** `IsHexagonalLatticeAKLT G`: the graph `G` is the (periodic)
-hexagonal lattice, on which every site has coordination number 3, giving the uniform `S = 3/2`
-(`N = 3`) AKLT model of eq. (7.3.8).  A faithful definition needs the explicit hexagonal embedding;
-it is kept as an uninterpreted predicate so Theorem 7.7's decay statement applies only to the
-hexagonal lattice (where it holds), not to an arbitrary graph (where it can fail). -/
-axiom IsHexagonalLatticeAKLT (G : SimpleGraph Λ) : Prop
+/-- **Hexagonal-lattice predicate** `IsHexagonalLatticeAKLT G`: the graph `G` is isomorphic to a
+honeycomb torus `honeycombTorusGraph m` for some `m`, i.e. `G` is the (periodic) hexagonal lattice,
+on which every site has coordination number 3, giving the uniform `S = 3/2` (`N = 3`) AKLT model of
+eq. (7.3.8).  This replaces the earlier uninterpreted marker with the explicit honeycomb
+construction of `LatticeSystem.Lattice.honeycombTorusGraph` (a finite, 3-regular,
+bipartite torus, Tasaki §7.3.2, eq. (7.3.8), footnote 42, p. 211), so Theorem 7.7's decay statement
+applies only to the hexagonal lattice (where it holds), not to an arbitrary graph (where it can
+fail). -/
+def IsHexagonalLatticeAKLT (G : SimpleGraph Λ) : Prop :=
+  ∃ m : ℕ, Nonempty (G ≃g LatticeSystem.Lattice.honeycombTorusGraph m)
 
 /-- **General-graph VBS ground-state marker** `IsGeneralGraphVBSGroundState G N Φ`: the state `Φ` is
 the valence-bond-solid ground state (eq. (7.3.6)) of the generalized AKLT Hamiltonian on `G`.  Kept
