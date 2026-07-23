@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.SpinThreeHalfBondProjection
 import LatticeSystem.Quantum.SpinS.TwoSiteSliceS
+import LatticeSystem.Quantum.SpinS.AKLTKnabe.BondProjectionAlgebraD6b
 
 /-!
 # Embedding the local spin-three-half AKLT bond certificate
@@ -13,6 +14,7 @@ namespace LatticeSystem.Quantum
 
 open Matrix
 open AKLTExactCertificateSector234Sequential
+open scoped ComplexOrder
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
@@ -52,6 +54,16 @@ theorem bondMaxSpinProjectionS_three_eq_onEmbS
   simp only [Function.comp_apply, bondCasimirS, sub_eq_add_neg,
     onEmbS_add, onEmbS_smul, onEmbS_neg, onEmbS_one,
     spinSDot_eq_onEmbS hxy 3]
+
+/-- The arbitrary-bond spin-three projector `P̂_3[Ŝ_x + Ŝ_y]` is positive
+semidefinite: it is the block embedding of the certified local `16 × 16`
+maximal-spin projector, which is itself positive semidefinite, and the
+embedding preserves positive semidefiniteness. -/
+theorem bondMaxSpinProjectionS_three_posSemidef {x y : Λ} (hxy : x ≠ y) :
+    (bondMaxSpinProjectionS x y 3).PosSemidef := by
+  rw [bondMaxSpinProjectionS_three_eq_onEmbS hxy]
+  exact onEmbS_posSemidef (injective_bondEmb hxy)
+    bondMaxSpinProjectionS_three_local_posSemidef
 
 /-- The arbitrary-bond spin-three projector annihilates a many-body vector
 exactly when every two-site slice belongs to the certified local VBS bond

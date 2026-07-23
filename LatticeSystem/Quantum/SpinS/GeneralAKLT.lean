@@ -52,6 +52,7 @@ Tasaki, Commun. Math. Phys. **115**, 477 (1988); T. Kennedy, E. H. Lieb, H. Tasa
 namespace LatticeSystem.Quantum
 
 open Matrix
+open scoped ComplexOrder
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
@@ -72,6 +73,14 @@ noncomputable def bondMaxSpinProjectionS (x y : Λ) (N : ℕ) : ManyBodyOpS Λ N
   (List.ofFn fun j : Fin N =>
     ((N : ℂ) * (N + 1) - ((j : ℂ) * (j + 1)))⁻¹ •
       (bondCasimirS x y N - ((j : ℂ) * (j + 1)) • (1 : ManyBodyOpS Λ N))).prod
+
+/-- **Symmetry of the bond projection**: `P̂_N[Ŝ_x + Ŝ_y] = P̂_N[Ŝ_y + Ŝ_x]`.  The projector is a
+polynomial in the bond Casimir `Ĉ = bondCasimirS x y N`, which depends on the two sites only through
+the symmetric Heisenberg operator `Ŝ_x · Ŝ_y = Ŝ_y · Ŝ_x` (`spinSDot_comm`); hence swapping the two
+endpoints leaves it unchanged. -/
+theorem bondMaxSpinProjectionS_comm (x y : Λ) (N : ℕ) :
+    (bondMaxSpinProjectionS x y N : ManyBodyOpS Λ N) = bondMaxSpinProjectionS y x N := by
+  simp only [bondMaxSpinProjectionS, bondCasimirS, spinSDot_comm x y]
 
 /-- The **regular-graph (uniform-spin) AKLT Hamiltonian** on a graph `G`:
 `Ĥ_AKLT = Σ_{{x,y}∈B} P̂_N[Ŝ_x + Ŝ_y]`, summed over the bonds of `G`, with a *single global* spin
@@ -99,10 +108,17 @@ hexagonal-lattice setting of Hal Tasaki, *Physics and Mathematics of Quantum Man
 def IsHexagonalLatticeAKLT (G : SimpleGraph Λ) : Prop :=
   ∃ m : ℕ, 2 ≤ m ∧ Nonempty (G ≃g LatticeSystem.Lattice.honeycombTorusGraph m)
 
-/-- **General-graph VBS ground-state marker** `IsGeneralGraphVBSGroundState G N Φ`: the state `Φ` is
-the valence-bond-solid ground state (eq. (7.3.6)) of the generalized AKLT Hamiltonian on `G`.  Kept
-as an uninterpreted predicate (the explicit graph VBS construction is not formalized). -/
-axiom IsGeneralGraphVBSGroundState (G : SimpleGraph Λ) (N : ℕ) (Φ : (Λ → Fin (N + 1)) → ℂ) : Prop
+/-- **General-graph zero-energy VBS ground state** `IsGeneralGraphVBSGroundState G N Φ`: the state
+`Φ` is a frustration-free zero-energy ground state of the regular-graph AKLT Hamiltonian
+`regularGraphAKLTHamiltonianS G N` (eq. (7.3.6)–(7.3.8)).  Concretely the three conjuncts state that
+the Hamiltonian is positive semidefinite (energy bounded below by `0`), that `Φ` is annihilated by
+it (`Ĥ Φ = 0`, so `Φ` attains the energy-`0` bottom of the spectrum), and that `Φ` is nonzero.
+Correlation decay and infinite-volume uniqueness are *not* part of this predicate; they are the
+content of `tasaki_theorem_7_7`. -/
+def IsGeneralGraphVBSGroundState (G : SimpleGraph Λ) [DecidableRel G.Adj] (N : ℕ)
+    (Φ : (Λ → Fin (N + 1)) → ℂ) : Prop :=
+  (regularGraphAKLTHamiltonianS G N).PosSemidef ∧
+    (regularGraphAKLTHamiltonianS G N).mulVec Φ = 0 ∧ Φ ≠ 0
 
 /-- **Infinite-volume uniqueness marker** `HasUniqueInfiniteVolumeVBSGroundState G N`: the
 translation-invariant infinite-volume ground state of the generalized AKLT model on `G` (in the
@@ -123,7 +139,7 @@ and the translation-invariant infinite-volume ground state is **unique**
 graphs
 the correlations need not decay.  Proved by Affleck–Kennedy–Lieb–Tasaki and Kennedy–Lieb–Tasaki via
 the explicit VBS analysis; recorded as a documented axiom. -/
-axiom tasaki_theorem_7_7 (G : SimpleGraph Λ) (Φ : (Λ → Fin 4) → ℂ)
+axiom tasaki_theorem_7_7 (G : SimpleGraph Λ) [DecidableRel G.Adj] (Φ : (Λ → Fin 4) → ℂ)
     (hG : IsHexagonalLatticeAKLT G) (hΦ : IsGeneralGraphVBSGroundState G 3 Φ) :
     (∃ C ξ : ℝ, 0 < C ∧ 0 < ξ ∧ ∀ x y : Λ,
       0 ≤ (-1 : ℝ) ^ (G.dist x y) * expectationRatioRe (spinSDot x y 3) Φ ∧
