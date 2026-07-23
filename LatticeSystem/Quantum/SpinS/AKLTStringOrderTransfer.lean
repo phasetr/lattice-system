@@ -380,6 +380,58 @@ private theorem endpoint_phase_endpoint_closed (a b c : ℕ) :
   norm_num [div_eq_mul_inv]
   ring
 
+/-- The endpoint–ordinary–endpoint contraction has the frozen closed form; this
+is the plain (no interior phase) axis-three numerator of Tasaki eq. (7.2.31),
+obtained from `endpoint_phase_endpoint_closed` by replacing the interior
+`phaseTransfer` block with the ordinary transfer. -/
+private theorem endpoint_ordinary_endpoint_closed (a b c : ℕ) :
+    (Matrix.trace
+      (ordinaryTransfer ^ a * endpointTransfer * ordinaryTransfer ^ b *
+        endpointTransfer * ordinaryTransfer ^ c)).re =
+      -(1 / 4 : ℝ) *
+        ((3 / 4 : ℝ) ^ b * (-1 / 4 : ℝ) ^ (a + c) +
+          (-1 / 4 : ℝ) ^ b * (3 / 4 : ℝ) ^ (a + c)) := by
+  have hnegDivRe (n : ℕ) :
+      (((-1 / 4 : ℂ) ^ n).re) = (-1 / 4 : ℝ) ^ n := by
+    rw [show (-1 / 4 : ℂ) = ((-1 / 4 : ℝ) : ℂ) by
+      norm_num [div_eq_mul_inv]]
+    rw [← Complex.ofReal_pow, Complex.ofReal_re]
+  have hnegDivIm (n : ℕ) : (((-1 / 4 : ℂ) ^ n).im) = 0 := by
+    rw [show (-1 / 4 : ℂ) = ((-1 / 4 : ℝ) : ℂ) by
+      norm_num [div_eq_mul_inv]]
+    rw [← Complex.ofReal_pow, Complex.ofReal_im]
+  have hposRe (n : ℕ) :
+      (((3 / 4 : ℂ) ^ n).re) = (3 / 4 : ℝ) ^ n := by
+    rw [show (3 / 4 : ℂ) = ((3 / 4 : ℝ) : ℂ) by
+      norm_num [div_eq_mul_inv]]
+    rw [← Complex.ofReal_pow, Complex.ofReal_re]
+  have hposIm (n : ℕ) : (((3 / 4 : ℂ) ^ n).im) = 0 := by
+    rw [show (3 / 4 : ℂ) = ((3 / 4 : ℝ) : ℂ) by
+      norm_num [div_eq_mul_inv]]
+    rw [← Complex.ofReal_pow, Complex.ofReal_im]
+  rw [ordinaryTransfer_pow, ordinaryTransfer_pow, ordinaryTransfer_pow,
+    endpointTransfer_entries]
+  rw [Matrix.trace, Fintype.sum_prod_type]
+  simp only [Matrix.diag]
+  simp only [Matrix.mul_apply]
+  simp_rw [Fintype.sum_prod_type]
+  unfold diagonalPairProjector
+  simp only [Matrix.add_apply, Matrix.smul_apply, Matrix.sub_apply, smul_eq_mul]
+  simp only [one_div, mul_ite, mul_zero, Fin.isValue, Prod.mk.injEq,
+    mul_neg, Fin.sum_univ_two, and_true, zero_ne_one, and_false, false_and,
+    ↓reduceIte, one_ne_zero, true_and, add_zero, zero_add, ite_mul, zero_mul,
+    neg_mul, ne_eq, not_false_eq_true, Matrix.one_apply_ne, zero_sub,
+    Matrix.one_apply_eq, sub_self, neg_zero, Complex.add_re,
+    Complex.mul_re, Complex.neg_re, Complex.inv_re, Complex.re_ofNat,
+    Complex.normSq_ofNat, div_self_mul_self', Complex.inv_im,
+    Complex.im_ofNat, zero_div, sub_zero, Complex.add_im, Complex.neg_im,
+    Complex.mul_im, Complex.sub_re, Complex.one_re, Complex.sub_im,
+    Complex.one_im, neg_sub, neg_add_rev]
+  rw [hnegDivRe a, hnegDivRe b, hnegDivRe c, hnegDivIm a, hnegDivIm b,
+    hnegDivIm c, hposRe a, hposRe b, hposRe c, hposIm a, hposIm b, hposIm c]
+  norm_num [div_eq_mul_inv]
+  ring
+
 /-- The tail weight after the left endpoint is phase, right endpoint, then
 ordinary transfer. -/
 private noncomputable def afterEndpointTransfer (y z : ℕ) :
@@ -833,5 +885,309 @@ theorem Internal.axis3Epsilon :
     (le_trans (le_max_left 2 N) hL) x y hx hxy]
   have hdist := hN L (le_trans (le_max_right 2 N) hL)
   simpa only [Real.dist_eq, sub_zero] using hdist
+
+/-! ## Plain (no interior phase) axis-three correlation, Tasaki §7.2.2 -/
+
+/-- The tail weight after the left endpoint for the plain correlation: the right
+endpoint at `y`, ordinary transfer elsewhere. -/
+private noncomputable def afterPlainEndpointTransfer (y z : ℕ) :
+    Matrix (Fin 2 × Fin 2) (Fin 2 × Fin 2) ℂ :=
+  if z = y then endpointTransfer else ordinaryTransfer
+
+/-- The transfer word following the left endpoint has the right endpoint and an
+ordinary suffix, with no interior phase. -/
+private theorem afterPlainEndpointTransfer_prod (L y : ℕ) (hy : y < L) :
+    ((List.range L).map (afterPlainEndpointTransfer y)).prod =
+      ordinaryTransfer ^ y * endpointTransfer * ordinaryTransfer ^ (L - y - 1) := by
+  induction L generalizing y with
+  | zero => omega
+  | succ L ih =>
+      rw [List.range_succ_eq_map, List.map_cons, List.prod_cons]
+      cases y with
+      | zero =>
+          simp only [afterPlainEndpointTransfer, ↓reduceIte]
+          rw [show (List.map (afterPlainEndpointTransfer 0)
+              (List.map Nat.succ (List.range L))).prod = ordinaryTransfer ^ L by
+            rw [List.map_map]
+            convert range_const_prod ordinaryTransfer L using 2]
+          simp
+      | succ y =>
+          have hyL : y < L := by omega
+          rw [show (List.map (afterPlainEndpointTransfer (y + 1))
+              (List.map Nat.succ (List.range L))).prod =
+                ordinaryTransfer ^ y * endpointTransfer *
+                  ordinaryTransfer ^ (L - y - 1) by
+            rw [List.map_map]
+            convert ih y hyL using 2
+            ext z
+            simp [afterPlainEndpointTransfer]]
+          unfold afterPlainEndpointTransfer
+          rw [if_neg (by omega : ¬ ((0 : ℕ) = y + 1)), pow_succ']
+          rw [show L + 1 - (y + 1) - 1 = L - y - 1 by omega]
+          noncomm_ring
+
+/-- The full natural-index transfer word for a plain ordered window: endpoints
+at `x` and `y`, ordinary transfer elsewhere. -/
+private noncomputable def plainTransferAt (x y z : ℕ) :
+    Matrix (Fin 2 × Fin 2) (Fin 2 × Fin 2) ℂ :=
+  if z = x then endpointTransfer
+  else if z = y then endpointTransfer
+  else ordinaryTransfer
+
+/-- Every plain ordered-window transfer word splits into ordinary prefix,
+endpoint, ordinary block, endpoint, and ordinary suffix. -/
+private theorem plainTransferAt_prod (L x y : ℕ) (hxy : x < y) (hy : y < L) :
+    ((List.range L).map (plainTransferAt x y)).prod =
+      ordinaryTransfer ^ x * endpointTransfer * ordinaryTransfer ^ (y - x - 1) *
+        endpointTransfer * ordinaryTransfer ^ (L - y - 1) := by
+  induction L generalizing x y with
+  | zero => omega
+  | succ L ih =>
+      rw [List.range_succ_eq_map, List.map_cons, List.prod_cons]
+      cases x with
+      | zero =>
+          obtain ⟨y, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (by omega : y ≠ 0)
+          have hyL : y < L := by omega
+          rw [show (List.map (plainTransferAt 0 (y + 1))
+              (List.map Nat.succ (List.range L))).prod =
+                ordinaryTransfer ^ y * endpointTransfer *
+                  ordinaryTransfer ^ (L - y - 1) by
+            rw [List.map_map]
+            convert afterPlainEndpointTransfer_prod L y hyL using 2
+            ext z
+            simp [plainTransferAt, afterPlainEndpointTransfer]]
+          unfold plainTransferAt
+          simp only [↓reduceIte, pow_zero, one_mul]
+          rw [show L + 1 - (y + 1) - 1 = L - y - 1 by omega]
+          noncomm_ring
+      | succ x =>
+          cases y with
+          | zero => omega
+          | succ y =>
+              have hxy' : x < y := by omega
+              have hyL : y < L := by omega
+              rw [show (List.map (plainTransferAt (x + 1) (y + 1))
+                  (List.map Nat.succ (List.range L))).prod =
+                    ordinaryTransfer ^ x * endpointTransfer *
+                      ordinaryTransfer ^ (y - x - 1) * endpointTransfer *
+                        ordinaryTransfer ^ (L - y - 1) by
+                rw [List.map_map]
+                convert ih x y hxy' hyL using 2
+                ext z
+                simp [plainTransferAt]]
+              unfold plainTransferAt
+              rw [if_neg (by omega : ¬ (0 = x + 1)),
+                if_neg (by omega : ¬ (0 = y + 1)), pow_succ']
+              rw [show y + 1 - (x + 1) - 1 = y - x - 1 by omega]
+              rw [show L + 1 - (y + 1) - 1 = L - y - 1 by omega]
+              noncomm_ring
+
+/-- The configuration weight for the plain axis-three observable: the frozen
+magnetic weight at the two endpoints and `1` elsewhere. -/
+private noncomputable def plainWeight {L : ℕ} (x y z : Fin L) (σ : Fin 3) : ℂ :=
+  if z.val = x.val then (1 - (σ : ℕ) : ℂ)
+  else if z.val = y.val then (1 - (σ : ℕ) : ℂ)
+  else 1
+
+/-- The weighted local transfer for the plain weight agrees with the
+natural-index plain transfer word. -/
+private theorem weightedTransfer_plainWeight {L : ℕ} (x y z : Fin L) :
+    weightedTransfer (plainWeight x y z) = plainTransferAt x.val y.val z.val := by
+  unfold plainWeight plainTransferAt ordinaryTransfer endpointTransfer
+  split_ifs <;> rfl
+
+/-- The plain weighted-transfer list for an ordered window has the exact
+five-block factorization consumed by the closed-form contraction. -/
+private theorem weightedTransfer_plainWeight_prod {L : ℕ} (x y : Fin L)
+    (hxy : x.val < y.val) :
+    (List.ofFn fun z : Fin L => weightedTransfer (plainWeight x y z)).prod =
+      ordinaryTransfer ^ x.val * endpointTransfer *
+        ordinaryTransfer ^ (y.val - x.val - 1) * endpointTransfer *
+          ordinaryTransfer ^ (L - y.val - 1) := by
+  rw [List.ofFn_eq_map]
+  simp_rw [weightedTransfer_plainWeight x y]
+  rw [show
+    List.map (fun z : Fin L => plainTransferAt x.val y.val z.val) (List.finRange L) =
+      List.map (plainTransferAt x.val y.val) (List.range L) by
+    rw [← List.map_coe_finRange_eq_range, List.map_map]
+    congr 1]
+  exact plainTransferAt_prod L x.val y.val hxy y.isLt
+
+/-- The product of local plain weights is the product of the two endpoint
+magnetic weights. -/
+private theorem plainWeight_prod {L : ℕ} (x y : Fin L) (hxy : x.val < y.val)
+    (σ : Fin L → Fin 3) :
+    (∏ z, plainWeight x y z (σ z)) =
+      (1 - ((σ x).val : ℂ)) * (1 - ((σ y).val : ℂ)) := by
+  classical
+  have hxy_ne : x ≠ y := fun h => by subst y; omega
+  have hrest :
+      (∏ z ∈ (Finset.univ.erase x).erase y, plainWeight x y z (σ z)) = 1 := by
+    apply Finset.prod_eq_one
+    intro z hz
+    simp only [Finset.mem_erase, Finset.mem_univ, and_true] at hz
+    have hzxv : ¬ z.val = x.val := fun h => hz.2 (Fin.ext h)
+    have hzyv : ¬ z.val = y.val := fun h => hz.1 (Fin.ext h)
+    simp [plainWeight, hzxv, hzyv]
+  calc
+    (∏ z, plainWeight x y z (σ z))
+        = plainWeight x y x (σ x) *
+            ∏ z ∈ Finset.univ.erase x, plainWeight x y z (σ z) :=
+          (Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ x)).symm
+    _ = plainWeight x y x (σ x) *
+          (plainWeight x y y (σ y) *
+            ∏ z ∈ (Finset.univ.erase x).erase y, plainWeight x y z (σ z)) := by
+          congr 1
+          exact (Finset.mul_prod_erase (Finset.univ.erase x)
+            (fun z => plainWeight x y z (σ z)) (by
+              simp only [Finset.mem_erase, Finset.mem_univ, and_true]
+              exact Ne.symm hxy_ne)).symm
+    _ = _ := by
+      rw [hrest, mul_one,
+        show plainWeight x y x (σ x) = 1 - ((σ x).val : ℂ) by simp [plainWeight],
+        show plainWeight x y y (σ y) = 1 - ((σ y).val : ℂ) by
+          simp [plainWeight, show ¬ y.val = x.val by omega]]
+
+/-- The concrete plain axis-three two-point observable is diagonal with the
+product of the frozen endpoint magnetic weights. -/
+private theorem plainObservable_eq_diagonal {L : ℕ} (x y : Fin L)
+    (hxy : x.val < y.val) :
+    spinSSiteOp3 x 2 * spinSSiteOp3 y 2 =
+      Matrix.diagonal fun σ => ∏ z, plainWeight x y z (σ z) := by
+  rw [spinSSiteOp3_def, spinSSiteOp3_def, spinSOp3_two_eq_diagonal,
+    onSite_diagonal, onSite_diagonal, Matrix.diagonal_mul_diagonal]
+  congr 1
+  funext σ
+  rw [plainWeight_prod x y hxy σ]
+
+/-- The unnormalized raw plain axis-three numerator has the frozen exact
+finite-volume closed form (Tasaki eq. (7.2.31)). -/
+private theorem rawPlainNumerator_exact {L : ℕ} (x y : Fin L)
+    (hxy : x.val < y.val) :
+    (star (akltVBSState L) ⬝ᵥ
+      (spinSSiteOp3 x 2 * spinSSiteOp3 y 2).mulVec (akltVBSState L)).re =
+      -(1 / 4 : ℝ) *
+        ((3 / 4 : ℝ) ^ (y.val - x.val - 1) *
+            (-1 / 4 : ℝ) ^ (x.val + (L - y.val - 1)) +
+          (-1 / 4 : ℝ) ^ (y.val - x.val - 1) *
+            (3 / 4 : ℝ) ^ (x.val + (L - y.val - 1))) := by
+  rw [plainObservable_eq_diagonal x y hxy]
+  simp only [dotProduct, Matrix.mulVec_diagonal, Pi.star_apply]
+  have h := weighted_state_contraction L (fun z σ => plainWeight x y z σ)
+  rw [weightedTransfer_plainWeight_prod x y hxy] at h
+  rw [show (∑ σ, star (akltVBSState L σ) *
+      ((∏ z, plainWeight x y z (σ z)) * akltVBSState L σ)) =
+      ∑ σ, (∏ z, plainWeight x y z (σ z)) *
+        star (akltVBSState L σ) * akltVBSState L σ by
+      apply Finset.sum_congr rfl
+      intro σ _
+      ring, h]
+  rw [endpoint_ordinary_endpoint_closed]
+
+/-- The frozen normalized ratio value of the plain axis-three correlation with
+outer combined gap `p = a + c` and interior gap `q = b`. -/
+private noncomputable def plainAxis3Ratio (p q : ℕ) : ℝ :=
+  (-(4 / 9 : ℝ) * ((-1 / 3 : ℝ) ^ p + (-1 / 3 : ℝ) ^ q)) /
+    (1 + 3 * (-1 / 3 : ℝ) ^ (p + q + 2))
+
+/-- The raw transfer numerator over the exact norm equals the normalized ratio
+value; the eigenvalue power `(3/4)^{a+b+c}` cancels. -/
+private theorem plainRatio_real_identity (p q L : ℕ) (hL : p + q + 2 = L) :
+    (-(1 / 4 : ℝ) *
+        ((3 / 4 : ℝ) ^ q * (-1 / 4 : ℝ) ^ p + (-1 / 4 : ℝ) ^ q * (3 / 4 : ℝ) ^ p)) /
+        ((3 / 4 : ℝ) ^ L + 3 * (-1 / 4 : ℝ) ^ L) =
+      (-(4 / 9 : ℝ) * ((-1 / 3 : ℝ) ^ p + (-1 / 3 : ℝ) ^ q)) /
+        (1 + 3 * (-1 / 3 : ℝ) ^ (p + q + 2)) := by
+  subst hL
+  have h1 : (3 / 4 : ℝ) ^ (p + q + 2) + 3 * (-1 / 4 : ℝ) ^ (p + q + 2) ≠ 0 := by
+    rw [← state_norm_exact (p + q + 2)]
+    exact ne_of_gt (state_norm_pos (p + q + 2) (by omega))
+  have h2 : (1 : ℝ) + 3 * (-1 / 3 : ℝ) ^ (p + q + 2) ≠ 0 :=
+    ne_of_gt (ratioDenominator_pos (p + q + 2) (by omega))
+  rw [div_eq_div_iff h1 h2]
+  have e_p : (-1 / 4 : ℝ) ^ p = (3 / 4 : ℝ) ^ p * (-1 / 3 : ℝ) ^ p := by
+    rw [← mul_pow]; norm_num
+  have e_q : (-1 / 4 : ℝ) ^ q = (3 / 4 : ℝ) ^ q * (-1 / 3 : ℝ) ^ q := by
+    rw [← mul_pow]; norm_num
+  simp only [pow_add, e_p, e_q]
+  norm_num
+  ring
+
+/-- The finite-volume plain axis-three correlation has the frozen normalized
+closed form as the ratio value `plainAxis3Ratio`. -/
+private theorem plainAxis3_akltVBSState_exact {L : ℕ}
+    (x y : Fin L) (hxy : x.val < y.val) :
+    expectationRatioRe (spinSSiteOp3 x 2 * spinSSiteOp3 y 2) (akltVBSState L) =
+      plainAxis3Ratio (x.val + (L - y.val - 1)) (y.val - x.val - 1) := by
+  unfold expectationRatioRe
+  rw [rawPlainNumerator_exact x y hxy,
+    show (star (akltVBSState L) ⬝ᵥ akltVBSState L).re = vecNormSqRe (akltVBSState L) from rfl,
+    state_norm_exact L]
+  unfold plainAxis3Ratio
+  exact plainRatio_real_identity (x.val + (L - y.val - 1)) (y.val - x.val - 1) L
+    (by have := x.isLt; have := y.isLt; omega)
+
+/-- As the outer gap `p → ∞` (with interior gap `q` fixed), the plain
+axis-three ratio value converges to the thermodynamic limit `-(4/9)(-1/3)^q`. -/
+private theorem plainAxis3Ratio_tendsto (q : ℕ) :
+    Filter.Tendsto (fun p => plainAxis3Ratio p q) Filter.atTop
+      (nhds (-(4 / 9 : ℝ) * (-1 / 3 : ℝ) ^ q)) := by
+  have hρ : Filter.Tendsto (fun p : ℕ => (-1 / 3 : ℝ) ^ p) Filter.atTop (nhds 0) :=
+    tendsto_pow_atTop_nhds_zero_of_abs_lt_one (by norm_num)
+  have hfun : (fun p => plainAxis3Ratio p q) =
+      fun p => (-(4 / 9 : ℝ) * ((-1 / 3 : ℝ) ^ p + (-1 / 3 : ℝ) ^ q)) /
+        (1 + 3 * (-1 / 3 : ℝ) ^ (q + 2) * (-1 / 3 : ℝ) ^ p) := by
+    funext p
+    unfold plainAxis3Ratio
+    rw [show p + q + 2 = (q + 2) + p by ring, pow_add, ← mul_assoc]
+  rw [hfun]
+  have hnum :
+      Filter.Tendsto
+        (fun p => -(4 / 9 : ℝ) * ((-1 / 3 : ℝ) ^ p + (-1 / 3 : ℝ) ^ q))
+        Filter.atTop (nhds (-(4 / 9 : ℝ) * (0 + (-1 / 3 : ℝ) ^ q))) :=
+    (hρ.add (tendsto_const_nhds (x := (-1 / 3 : ℝ) ^ q))).const_mul (-(4 / 9 : ℝ))
+  have hden :
+      Filter.Tendsto
+        (fun p => 1 + 3 * (-1 / 3 : ℝ) ^ (q + 2) * (-1 / 3 : ℝ) ^ p)
+        Filter.atTop (nhds (1 + 3 * (-1 / 3 : ℝ) ^ (q + 2) * 0)) :=
+    tendsto_const_nhds.add (hρ.const_mul (3 * (-1 / 3 : ℝ) ^ (q + 2)))
+  have hlim := hnum.div hden (by simp)
+  have hval : (-(4 / 9 : ℝ) * (0 + (-1 / 3 : ℝ) ^ q)) /
+      (1 + 3 * (-1 / 3 : ℝ) ^ (q + 2) * 0) = -(4 / 9 : ℝ) * (-1 / 3 : ℝ) ^ q := by
+    simp
+  rw [← hval]
+  exact hlim
+
+/-- Composing with the diverging outer gap `L ↦ x + (L - y - 1)`, the plain
+axis-three ratio value converges as the ring length `L → ∞`. -/
+private theorem plainAxis3Ratio_tendsto_shift (q x y : ℕ) :
+    Filter.Tendsto (fun L => plainAxis3Ratio (x + (L - y - 1)) q) Filter.atTop
+      (nhds (-(4 / 9 : ℝ) * (-1 / 3 : ℝ) ^ q)) := by
+  have hcomp : Filter.Tendsto (fun L : ℕ => x + (L - y - 1)) Filter.atTop Filter.atTop := by
+    apply Filter.tendsto_atTop_atTop.2
+    intro b
+    exact ⟨b + y + 1, fun n hn => by omega⟩
+  exact (plainAxis3Ratio_tendsto q).comp hcomp
+
+/-- The finite-volume plain axis-three correlation is uniformly within any
+positive tolerance of `-(4/9)(-1/3)^{|x-y|-1}` for all sufficiently large rings
+(Tasaki eq. (7.2.33)). -/
+theorem Internal.plainAxis3Epsilon (x y : ℕ) (hxy : x < y) :
+    ∀ ε : ℝ, 0 < ε →
+      ∃ L₀ : ℕ, 2 ≤ L₀ ∧
+        ∀ L : ℕ, L₀ ≤ L → ∀ xf yf : Fin L, xf.val = x → yf.val = y →
+          |expectationRatioRe (spinSSiteOp3 xf 2 * spinSSiteOp3 yf 2) (akltVBSState L)
+            - -(4 / 9 : ℝ) * (-1 / 3 : ℝ) ^ (y - x - 1)| < ε := by
+  intro ε hε
+  obtain ⟨N, hN⟩ :=
+    (Metric.tendsto_atTop.mp (plainAxis3Ratio_tendsto_shift (y - x - 1) x y)) ε hε
+  refine ⟨max 2 (y + 1 + N), le_max_left _ _, ?_⟩
+  intro L hL xf yf hxf hyf
+  have hxy' : xf.val < yf.val := by rw [hxf, hyf]; exact hxy
+  have hbig : y + 1 + N ≤ L := le_trans (le_max_right 2 (y + 1 + N)) hL
+  rw [plainAxis3_akltVBSState_exact xf yf hxy', hxf, hyf]
+  have hdist := hN L (by omega)
+  rw [Real.dist_eq] at hdist
+  exact hdist
 
 end LatticeSystem.Quantum.AKLTStringOrder
