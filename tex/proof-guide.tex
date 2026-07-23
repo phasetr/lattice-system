@@ -12358,7 +12358,64 @@ the \emph{regular (uniform-spin) specialization} of eq.~(7.3.7) --- a single glo
 bond projecting to $J=N$ --- which equals eq.~(7.3.7) exactly on an $N$-regular graph (the
 site-dependent spins $\bar S_x=\deg(x)/2$ of the non-regular case are not expressible in
 \texttt{ManyBodyOpS}~$\Lambda\,N$); on the 3-regular hexagonal lattice ($S=3/2$, $N=3$) it is
-$\sum_{\mathrm{bonds}}\hat P_3$ (eq.~7.3.8), the setting of Theorem 7.7.  The axiom
+$\sum_{\mathrm{bonds}}\hat P_3$ (eq.~7.3.8), the setting of Theorem 7.7.
+
+\par\smallskip
+\noindent\textbf{Local spin-\(3/2\) VBS bond certificate}
+(Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems}, 1st ed.,
+Springer, 2020, §7.3.2, eqs.~(7.3.6)--(7.3.8), pp.~210--211;
+\path{Quantum/SpinS/SpinThreeHalfBondProjection.lean}, Issue \#5132).
+For $a,b\in\{0,1,2\}$, \texttt{spinThreeHalfVBSBondVec a b} is the
+two-site physical vector obtained from one normalized virtual singlet and
+endpoint symmetrization with two remaining virtual spin-halves at each
+endpoint.  No unit-norm claim is made for the resulting physical vector.
+The definitions may be summarized as
+\[
+\begin{aligned}
+v_{a,b}
+  &=\texttt{spinThreeHalfVBSBondVec a b},\\
+W_{3/2}
+  &=\operatorname{span}_{\mathbb{C}}
+      \{v_{a,b}\mid a,b\in\{0,1,2\}\},\\
+P_3
+  &=\texttt{spinThreeHalfBondMaxProjection}\\
+  &=\texttt{bondMaxSpinProjectionS 0 1 3}.
+\end{aligned}
+\]
+Here $W_{3/2}$ is \texttt{spinThreeHalfVBSBondSubspace}, while $P_3$ is the
+concrete $16\times16$ Lagrange--Casimir projector onto total bond spin
+$J=3$.  The theorems
+\path{spinThreeHalfVBSBondVec_linearIndependent} and
+\path{spinThreeHalfVBSBondVec_annihilated} prove that the nine vectors
+$v_{a,b}$ are linearly independent and satisfy $P_3v_{a,b}=0$.
+
+\path{bondMaxSpinProjectionS_three_local_rank} gives
+$\operatorname{rank}P_3=7$.
+
+\path{finrank_spinThreeHalfBondLocal_ker} gives
+$\dim_{\mathbb{C}}\ker P_3=9$.
+
+\path{spinThreeHalfBondLocal_ker_eq_vbsBondSubspace} identifies
+$\ker P_3$ exactly with $W_{3/2}$.
+
+\path{bondMaxSpinProjectionS_three_local_isHermitian} proves Hermiticity.
+
+\path{bondMaxSpinProjectionS_three_local_idempotent} proves idempotence.
+
+\path{bondMaxSpinProjectionS_three_local_posSemidef} proves positive
+semidefiniteness.
+
+The proof is an explicit seven-sector matrix certificate followed by the
+rank--nullity comparison $7+9=16$; it uses only the Standard~3 axioms.
+
+This result is local to one two-site spin-$3/2$ bond.  It does not construct
+the finite-volume honeycomb VBS state, prove global frustration-freeness or
+finite-volume uniqueness, establish the correlation bound (7.3.9), or prove
+infinite-volume uniqueness.  In particular,
+\texttt{tasaki\_theorem\_7\_7} remains a documented axiom.
+\par\smallskip
+
+The axiom
 \texttt{tasaki\_theorem\_7\_7} states that for the hexagonal lattice
 (marker \texttt{IsHexagonalLatticeAKLT}) with VBS ground state $\Phi$
 (marker \texttt{IsGeneralGraphVBSGroundState}) there are size-independent $C,\xi>0$ with the
