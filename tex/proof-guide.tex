@@ -11816,20 +11816,25 @@ combining with the previously established minimality, gap, and decay clauses, th
 
 \medskip
 \noindent\textbf{§7.1.1 Theorem 7.1} (the AKLT main theorem; Tasaki §7.1.1, eqs.~(7.1.1)--(7.1.2),
-pp.~177--179; documented axiom, \texttt{Quantum/SpinS/AKLT.lean}, Issue \#4485).  The
-Affleck--Kennedy--Lieb--Tasaki model is the $S=1$ chain $\hat H_{\mathrm{AKLT}}=\sum_x\{\hat
-S_x\!\cdot\!\hat S_{x+1}+\tfrac13(\hat S_x\!\cdot\!\hat S_{x+1})^2\}$ (\texttt{akltHamiltonianS},
-eq.~7.1.1, periodic, $SU(2)$-invariant; the biquadratic term places it outside Marshall--Lieb--Mattis).
-The axiom \texttt{aklt\_theorem\_7\_1} states that for all sufficiently large chains (length $L=n+1$,
-any parity) the model has a \emph{unique ground state} $\Phi$ (the valence-bond-solid VBS state), a
-\emph{spectral gap} bounded below by a positive $L$-independent constant $\Delta E_0$
-(\texttt{IsPositiveSpectralGap}, $\Delta E_0\le\mathrm{gap}$), and the \emph{exact correlation}
+pp.~177--179; \emph{proved}, axiom-free/\texttt{std3}, \texttt{Quantum/SpinS/AKLTTheorem71.lean},
+PR \#5131).  The Affleck--Kennedy--Lieb--Tasaki model is the $S=1$ chain
+$\hat H_{\mathrm{AKLT}}=\sum_x\{\hat S_x\!\cdot\!\hat S_{x+1}+\tfrac13(\hat S_x\!\cdot\!\hat
+S_{x+1})^2\}$ (\texttt{akltHamiltonianS}, eq.~7.1.1, periodic, $SU(2)$-invariant; the biquadratic term
+places it outside Marshall--Lieb--Mattis).  The theorem \texttt{aklt\_theorem\_7\_1} (formerly a
+documented axiom) states that for all sufficiently large chains (length $L=n+1$, any parity) the model
+has a \emph{unique ground state} $\Phi$ (the valence-bond-solid VBS state), a \emph{spectral gap}
+bounded below by a positive $L$-independent constant $\Delta E_0=1/5$ (\texttt{IsPositiveSpectralGap},
+$\Delta E_0\le\mathrm{gap}$), and the \emph{exact correlation}
 $\langle\Phi,\hat S_x\!\cdot\!\hat S_y\Phi\rangle/\langle\Phi,\Phi\rangle\to 4(-3)^{-|x-y|}$
 (eq.~7.1.2, sign-alternating exponential decay) for fixed sites with $|x-y|\ge1$ as $L\uparrow\infty$
 (fixed $\mathbb N$-sites embedded by \texttt{chainSite}, sound eventual-$\varepsilon$ form).  Both
-$\Delta E_0$ and the ground-state family $\Phi$ are quantified outermost.  Proved via the explicit VBS
-state and its matrix-product representation (Affleck--Kennedy--Lieb--Tasaki, 1987); recorded as a
-documented axiom.  Chapters~3--10 backfill.
+$\Delta E_0$ and the ground-state family $\Phi$ are quantified outermost.  The proof is a pure
+composition of the three independently discharged conjunct-theorems: existence, eigenvalue, ground
+energy and gap from \texttt{aklt\_knabe\_ring\_gap} (§7.1.4), uniqueness from
+\texttt{aklt\_ring\_ground\_state\_unique} (§7.1.3), and correlation decay from
+\texttt{aklt\_correlation\_decay} (§7.2.2), with witnesses $\Delta E_0=1/5$,
+$\Phi\,n=\texttt{akltVBSState}\,(n+1)$, $E_0\,n=-(2/3)(n+1)$, $n_0=\max(n_K,2)$.  No operator algebra
+and no infinite volume enter; the documented axiom is retired.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§7.1.3 Theorem 7.2} (the AKLT model on the infinite chain, Matsui; Tasaki §7.1.3,
@@ -11928,9 +11933,9 @@ of the $S=1$ AKLT ring.  Specifically, it establishes:
 \end{enumerate}
 
 These two results are the \textbf{existence and gap conjuncts (1) and (5)} of Tasaki's Theorem~7.1
-(pp.~177--179).  \textbf{Crucial:} this capstone does \textbf{not} establish uniqueness of the ground
-state (§7.1.3, conjunct (3)) or the correlation function decay (§7.1.2, conjunct (2)), so the axiom
-\texttt{aklt\_theorem\_7\_1} (the complete Theorem~7.1) remains in place.
+(pp.~177--179); together with the uniqueness (§7.1.3) and correlation-decay (§7.1.2) conjuncts they
+are composed into the now-\emph{theorem} \texttt{aklt\_theorem\_7\_1}
+(\texttt{Quantum/SpinS/AKLTTheorem71.lean}, PR \#5131), which is thereby fully axiom-free.
 
 The proof synthesizes three prior gates: the Knabe operator inequality $({\hat H}')^2 \geq
 \frac{1}{10}{\hat H}'$ (Gate D6d, an aggregation of bond-projector squares), the frustration-freeness
@@ -11949,9 +11954,9 @@ PR \#5128).  The independent theorem \texttt{aklt\_ring\_ground\_state\_unique} 
 \textbf{uniqueness conjunct} (§7.1.3) of Tasaki's Theorem~7.1: for every ring of length $L=n+1\geq3$, any
 nonzero eigenvector $\Psi$ of $\hat H_{\mathrm{AKLT}}$ at the ground energy $-\frac23 L$ is a scalar
 multiple of the explicit VBS state, $\exists c,\ \Psi = c\cdot\texttt{akltVBSState}(L)$ --- i.e.\ the
-ground space is one-dimensional.  \textbf{Over-claim guard:} this establishes \emph{only} uniqueness;
-the §7.1.2 correlation function (conjunct (2)) is not addressed, so the documented axiom
-\texttt{aklt\_theorem\_7\_1} \textbf{remains in place}, exactly as with the Knabe-gap capstone above.
+ground space is one-dimensional.  This is conjunct (4) of Tasaki's Theorem~7.1; it is composed with
+the existence/gap (§7.1.4) and correlation (§7.2.2) conjuncts into the now-\emph{theorem}
+\texttt{aklt\_theorem\_7\_1} (\texttt{Quantum/SpinS/AKLTTheorem71.lean}, PR \#5131).
 
 The proof follows Tasaki's Weyl (Schwinger-boson) / UFD route in two stages.  \emph{Spectral bridge}
 (\texttt{ground\_eigen\_isVBSGroundForm}, frustration-freeness, Lemma A.10): the normalisation
@@ -12035,14 +12040,14 @@ $\langle \Phi, \hat S_x\!\cdot\!\hat S_y\,\Phi\rangle /
 \langle \Phi, \Phi\rangle \to 4\,(-3)^{-|x-y|}$
 as the ring length $L = n+1 \uparrow \infty$ (sound eventual-$\varepsilon$
 form, the fixed $\mathbb{N}$-sites embedded by \texttt{chainSite}).
-This discharges only the correlation conjunct; the documented axiom
-\texttt{aklt\_theorem\_7\_1} (which additionally bundles existence, gap,
-and uniqueness) \emph{remains in place}, its consolidation being tracked
-separately.  With this theorem, all four assertions of Theorem 7.1 are
-now individually discharged as standalone theorems: existence and gap
-(\texttt{aklt\_knabe\_ring\_gap}, §7.1.4), uniqueness
-(\texttt{aklt\_ring\_ground\_state\_unique}, §7.1.3), and correlation
-decay here.
+This is the correlation conjunct (6) of Tasaki Theorem 7.1.  With this
+theorem, all four assertions of Theorem 7.1 are discharged as standalone
+theorems --- existence and gap (\texttt{aklt\_knabe\_ring\_gap}, §7.1.4),
+uniqueness (\texttt{aklt\_ring\_ground\_state\_unique}, §7.1.3), and
+correlation decay here (§7.2.2) --- and composed into the
+now-\emph{theorem} \texttt{aklt\_theorem\_7\_1}
+(\texttt{Quantum/SpinS/AKLTTheorem71.lean}, PR \#5131), which is thereby
+fully axiom-free.
 
 The proof is the string-free specialization of the §7.2.1 calculation.
 Replacing the interior phase block by the ordinary transfer, the plain

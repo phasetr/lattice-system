@@ -3,8 +3,8 @@
 
 This file discharges the **uniqueness conjunct** of the AKLT main theorem (Tasaki Theorem 7.1,
 `aklt_theorem_7_1`, conjunct (4)) as an independent theorem, mirroring the Knabe-gap precedent
-`aklt_knabe_ring_gap` (the documented axiom `aklt_theorem_7_1` is left untouched, since the
-correlation function §7.1.2 remains axiomatic).
+`aklt_knabe_ring_gap`. This result now forms part of the theorem `aklt_theorem_7_1` (in
+`AKLTTheorem71.lean`), composed together with the gap and correlation results.
 
 Two ingredients are assembled:
 
@@ -73,11 +73,11 @@ theorem ground_eigen_isVBSGroundForm [NeZero L] (hL : 2 ≤ L) (Ψ : (Fin L → 
 energy `E₀ = −(2/3)(n+1)` is a scalar multiple of the explicit valence-bond-solid state
 `akltVBSState (n+1)`: the ground space is one-dimensional.
 
-This is exactly conjunct (4) of the documented axiom `aklt_theorem_7_1`, proved independently (the
-axiom, whose remaining content is the §7.1.2 correlation function, is left in place — cf. the
-Knabe-gap precedent `aklt_knabe_ring_gap`).  The proof combines the spectral bridge
-(`ground_eigen_isVBSGroundForm`) with the polynomial one-dimensionality
-(`weylMap_ground_form_eq_const_smul_prod`) and injectivity of the Weyl map (`weylMap_injective`),
+This is exactly conjunct (4) of the theorem `aklt_theorem_7_1` (in `AKLTTheorem71.lean`), proved
+independently and now composed together with the gap and correlation results (cf. the Knabe-gap
+precedent `aklt_knabe_ring_gap`). The proof combines the spectral bridge
+(`ground_eigen_isVBSGroundForm`) with polynomial one-dimensionality
+(`weylMap_ground_form_eq_const_smul_prod`) and Weyl-map injectivity (`weylMap_injective`),
 following Kennedy–Lieb–Tasaki [41].
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
