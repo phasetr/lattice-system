@@ -1,5 +1,7 @@
 import LatticeSystem.Quantum.SpinS.AKLT
 import LatticeSystem.Quantum.SpinS.AndersonTower
+import LatticeSystem.Lattice.HoneycombLattice
+import Mathlib.Combinatorics.SimpleGraph.Maps
 
 /-!
 # Tasaki §7.3.2: the AKLT model on a general graph and Theorem 7.7
@@ -33,10 +35,10 @@ the VBS ground state has exponentially decaying, sign-alternating spin correlati
 with `D` the graph distance and `C, ξ > 0` independent of system size, and the translation-invariant
 infinite-volume ground state is unique.
 
-The Casimir, the bond projection, and the generalized Hamiltonian are *defined concretely*.  The
-hexagonal lattice, the VBS ground state, and the infinite-volume uniqueness are carried by
-uninterpreted markers, and Theorem 7.7 (whose proof rests on the explicit VBS /
-reflection-positivity
+The Casimir, the bond projection, the generalized Hamiltonian, and the hexagonal lattice
+(`IsHexagonalLatticeAKLT`, via the explicit honeycomb torus `honeycombTorusGraph`) are *defined
+concretely*.  The VBS ground state and the infinite-volume uniqueness are carried by uninterpreted
+markers, and Theorem 7.7 (whose proof rests on the explicit VBS / reflection-positivity
 analysis) is a documented axiom.  The decay statement is restricted to the hexagonal lattice: on
 general graphs it can fail (the correlations need not decay in every dimension).
 
@@ -50,6 +52,7 @@ Tasaki, Commun. Math. Phys. **115**, 477 (1988); T. Kennedy, E. H. Lieb, H. Tasa
 namespace LatticeSystem.Quantum
 
 open Matrix
+open scoped ComplexOrder
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
@@ -71,6 +74,14 @@ noncomputable def bondMaxSpinProjectionS (x y : Λ) (N : ℕ) : ManyBodyOpS Λ N
     ((N : ℂ) * (N + 1) - ((j : ℂ) * (j + 1)))⁻¹ •
       (bondCasimirS x y N - ((j : ℂ) * (j + 1)) • (1 : ManyBodyOpS Λ N))).prod
 
+/-- **Symmetry of the bond projection**: `P̂_N[Ŝ_x + Ŝ_y] = P̂_N[Ŝ_y + Ŝ_x]`.  The projector is a
+polynomial in the bond Casimir `Ĉ = bondCasimirS x y N`, which depends on the two sites only through
+the symmetric Heisenberg operator `Ŝ_x · Ŝ_y = Ŝ_y · Ŝ_x` (`spinSDot_comm`); hence swapping the two
+endpoints leaves it unchanged. -/
+theorem bondMaxSpinProjectionS_comm (x y : Λ) (N : ℕ) :
+    (bondMaxSpinProjectionS x y N : ManyBodyOpS Λ N) = bondMaxSpinProjectionS y x N := by
+  simp only [bondMaxSpinProjectionS, bondCasimirS, spinSDot_comm x y]
+
 /-- The **regular-graph (uniform-spin) AKLT Hamiltonian** on a graph `G`:
 `Ĥ_AKLT = Σ_{{x,y}∈B} P̂_N[Ŝ_x + Ŝ_y]`, summed over the bonds of `G`, with a *single global* spin
 `S = N/2` on every site and each bond projecting to the maximal total spin `J = N`.  Implemented as
@@ -88,17 +99,26 @@ noncomputable def regularGraphAKLTHamiltonianS (G : SimpleGraph Λ) [DecidableRe
   (1 / 2 : ℂ) • ∑ x : Λ, ∑ y : Λ,
     if G.Adj x y then bondMaxSpinProjectionS x y N else 0
 
-/-- **Hexagonal-lattice marker** `IsHexagonalLatticeAKLT G`: the graph `G` is the (periodic)
-hexagonal lattice, on which every site has coordination number 3, giving the uniform `S = 3/2`
-(`N = 3`) AKLT model of eq. (7.3.8).  A faithful definition needs the explicit hexagonal embedding;
-it is kept as an uninterpreted predicate so Theorem 7.7's decay statement applies only to the
-hexagonal lattice (where it holds), not to an arbitrary graph (where it can fail). -/
-axiom IsHexagonalLatticeAKLT (G : SimpleGraph Λ) : Prop
+/-- **Hexagonal-lattice predicate** `IsHexagonalLatticeAKLT G`: the graph `G` is isomorphic to a
+nondegenerate honeycomb torus `honeycombTorusGraph m` for some `m ≥ 2`.  The lower bound ensures
+that the three nominal neighbours of every site are distinct, so the torus is genuinely
+3-regular and carries the uniform `S = 3/2` (`N = 3`) AKLT model.  This is the periodic
+hexagonal-lattice setting of Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
+1st ed., Springer, 2020, §7.3.2, eq. (7.3.8), Theorem 7.7, footnote 42, pp. 210–211. -/
+def IsHexagonalLatticeAKLT (G : SimpleGraph Λ) : Prop :=
+  ∃ m : ℕ, 2 ≤ m ∧ Nonempty (G ≃g LatticeSystem.Lattice.honeycombTorusGraph m)
 
-/-- **General-graph VBS ground-state marker** `IsGeneralGraphVBSGroundState G N Φ`: the state `Φ` is
-the valence-bond-solid ground state (eq. (7.3.6)) of the generalized AKLT Hamiltonian on `G`.  Kept
-as an uninterpreted predicate (the explicit graph VBS construction is not formalized). -/
-axiom IsGeneralGraphVBSGroundState (G : SimpleGraph Λ) (N : ℕ) (Φ : (Λ → Fin (N + 1)) → ℂ) : Prop
+/-- **General-graph zero-energy VBS ground state** `IsGeneralGraphVBSGroundState G N Φ`: the state
+`Φ` is a frustration-free zero-energy ground state of the regular-graph AKLT Hamiltonian
+`regularGraphAKLTHamiltonianS G N` (eq. (7.3.6)–(7.3.8)).  Concretely the three conjuncts state that
+the Hamiltonian is positive semidefinite (energy bounded below by `0`), that `Φ` is annihilated by
+it (`Ĥ Φ = 0`, so `Φ` attains the energy-`0` bottom of the spectrum), and that `Φ` is nonzero.
+Correlation decay and infinite-volume uniqueness are *not* part of this predicate; they are the
+content of `tasaki_theorem_7_7`. -/
+def IsGeneralGraphVBSGroundState (G : SimpleGraph Λ) [DecidableRel G.Adj] (N : ℕ)
+    (Φ : (Λ → Fin (N + 1)) → ℂ) : Prop :=
+  (regularGraphAKLTHamiltonianS G N).PosSemidef ∧
+    (regularGraphAKLTHamiltonianS G N).mulVec Φ = 0 ∧ Φ ≠ 0
 
 /-- **Infinite-volume uniqueness marker** `HasUniqueInfiniteVolumeVBSGroundState G N`: the
 translation-invariant infinite-volume ground state of the generalized AKLT model on `G` (in the
@@ -107,24 +127,59 @@ of Definition 4.17) is unique.  The full statement lives in the quasi-local C*-a
 kept as an uninterpreted predicate per the operator-algebra policy. -/
 axiom HasUniqueInfiniteVolumeVBSGroundState (G : SimpleGraph Λ) (N : ℕ) : Prop
 
-/-- **Tasaki Theorem 7.7 (hexagonal AKLT correlations and uniqueness), AXIOM.**  For the `S = 3/2`
-(`N = 3`) AKLT model on the hexagonal lattice `G` (`IsHexagonalLatticeAKLT`), with VBS ground state
-`Φ` (`IsGeneralGraphVBSGroundState`): there are positive constants `C, ξ` — independent of system
-size — such that the spin correlation is **sign-alternating and exponentially decaying** in the
-graph
-distance `D(x,y) = G.dist x y` (eq. (7.3.9))
+/-- **Tasaki Theorem 7.7 (hexagonal AKLT correlations and uniqueness), AXIOM.**  There are positive
+constants `C, ξ` — quantified *outside* both the vertex type `Λ` and the graph `G` (the whole
+`∀ {Λ} [Fintype Λ] [DecidableEq Λ] (G : SimpleGraph Λ) …` block sits inside `∃ C ξ`), so a *single*
+`C, ξ` serves **every** hexagonal lattice regardless of its vertex type, i.e. across **all sizes**
+`honeycombTorusGraph m`.  This is Tasaki's genuinely **size-independent** `C, ξ`: because each torus
+`honeycombTorusGraph m` has its own vertex type, binding `Λ` inside `∃ C ξ` (rather than letting the
+file-level `variable {Λ}` auto-bind it *outside*, which would allow a size-dependent choice) is what
+makes the constants faithfully system-size-independent — such that for every hexagonal lattice `G`
+(`IsHexagonalLatticeAKLT`, i.e. isomorphic to a nondegenerate honeycomb torus) with the `S = 3/2`
+(`N = 3`) AKLT model, **some** zero-energy VBS ground state `Φ`
+(`IsGeneralGraphVBSGroundState G 3 Φ`) exists whose spin correlation is **sign-alternating and
+exponentially decaying** in the graph distance `D(x,y) = G.dist x y` (eq. (7.3.9))
 `0 ≤ (−1)^{D(x,y)} ⟨Ŝ_x·Ŝ_y⟩ ≤ C e^{−D(x,y)/ξ}`,
 and the translation-invariant infinite-volume ground state is **unique**
-(`HasUniqueInfiniteVolumeVBSGroundState`).  The hexagonal restriction is essential: on general
-graphs
-the correlations need not decay.  Proved by Affleck–Kennedy–Lieb–Tasaki and Kennedy–Lieb–Tasaki via
-the explicit VBS analysis; recorded as a documented axiom. -/
-axiom tasaki_theorem_7_7 (G : SimpleGraph Λ) (Φ : (Λ → Fin 4) → ℂ)
-    (hG : IsHexagonalLatticeAKLT G) (hΦ : IsGeneralGraphVBSGroundState G 3 Φ) :
-    (∃ C ξ : ℝ, 0 < C ∧ 0 < ξ ∧ ∀ x y : Λ,
-      0 ≤ (-1 : ℝ) ^ (G.dist x y) * expectationRatioRe (spinSDot x y 3) Φ ∧
-        (-1 : ℝ) ^ (G.dist x y) * expectationRatioRe (spinSDot x y 3) Φ ≤
-          C * Real.exp (-(G.dist x y : ℝ) / ξ)) ∧
-    HasUniqueInfiniteVolumeVBSGroundState G 3
+(`HasUniqueInfiniteVolumeVBSGroundState`, which is `Φ`-independent).
+
+The *intended* witness `Φ` is, mathematically, the canonical VBS state `honeycombVBSState m`
+transported along the isomorphism `G ≃g honeycombTorusGraph m` supplied by
+`IsHexagonalLatticeAKLT G`; its zero-energy ground-state property is *proved only on the canonical
+torus itself* by the **parallel axiom-free theorem**
+`honeycombVBSState_isGeneralGraphVBSGroundState`
+(`IsGeneralGraphVBSGroundState (honeycombTorusGraph m) 3 (honeycombVBSState m)`, `#print axioms` =
+std3).  That theorem is a genuine axiom-free fact about the canonical torus, but it does **not**
+discharge or reduce this axiom: the `∃ Φ` conjunct is not type-fixed to `honeycombVBSState`, and its
+transport to a general hexagon `G` is not proved here.  Stating the ground state existentially
+(`∃ Φ, IsGeneralGraphVBSGroundState G 3 Φ ∧ …`) rather than universally (`∀ Φ, … → …`) is what keeps
+the axiom sound: the finite honeycomb torus ground state may be degenerate, so a `∀ Φ` claim would
+be *false* on the non-VBS kernel vectors, whereas the single VBS witness suffices for Tasaki's
+content and is faithful to the Kennedy–Lieb–Tasaki analysis, which computes the correlations of
+*that* VBS state.
+
+The correlation decay (eq. (7.3.9)) and the infinite-volume uniqueness are recorded as **documented
+axioms**: their proofs (Affleck–Kennedy–Lieb–Tasaki, Kennedy–Lieb–Tasaki [41]) rest on the explicit
+two-dimensional VBS / reflection-positivity correlation analysis, for which there is no
+implementation base in this repository or in mathlib (a genuine real-implementation dependency).  By
+contrast the ground-state hypothesis conjunct is **not** logically discharged for a general hexagon
+either: `honeycombVBSState_isGeneralGraphVBSGroundState` establishes it only on the canonical
+`honeycombTorusGraph m` (the parallel axiom-free fact above), not for every
+`IsHexagonalLatticeAKLT G`, so the `∃ Φ` premise stated here is not reduced by it.  The hexagonal
+restriction is essential: on general graphs the correlations need not decay.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §7.3.2, Theorem 7.7, eqs. (7.3.6)–(7.3.9), pp. 210–212; I. Affleck, T. Kennedy, E. H. Lieb,
+H. Tasaki, Commun. Math. Phys. **115**, 477 (1988); T. Kennedy, E. H. Lieb, H. Tasaki, J. Stat.
+Phys. **53**, 383 (1988) ([41]). -/
+axiom tasaki_theorem_7_7 :
+    ∃ C ξ : ℝ, 0 < C ∧ 0 < ξ ∧
+      ∀ {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (G : SimpleGraph Λ) [DecidableRel G.Adj],
+        IsHexagonalLatticeAKLT G →
+          (∃ Φ : (Λ → Fin 4) → ℂ, IsGeneralGraphVBSGroundState G 3 Φ ∧ ∀ x y : Λ,
+            0 ≤ (-1 : ℝ) ^ (G.dist x y) * expectationRatioRe (spinSDot x y 3) Φ ∧
+              (-1 : ℝ) ^ (G.dist x y) * expectationRatioRe (spinSDot x y 3) Φ ≤
+                C * Real.exp (-(G.dist x y : ℝ) / ξ)) ∧
+            HasUniqueInfiniteVolumeVBSGroundState G 3
 
 end LatticeSystem.Quantum

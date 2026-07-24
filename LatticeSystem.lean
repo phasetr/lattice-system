@@ -113,8 +113,12 @@ import LatticeSystem.Quantum.SpinS.AKLTCorrelationDecay
 import LatticeSystem.Quantum.SpinS.AKLTTheorem71
 import LatticeSystem.Quantum.SpinS.ClusterState
 import LatticeSystem.Quantum.SpinS.GeneralAKLT
+import LatticeSystem.Quantum.SpinS.HoneycombAKLTBondAnnihilation
+import LatticeSystem.Quantum.SpinS.HoneycombAKLTVBS
+import LatticeSystem.Quantum.SpinS.HoneycombAKLTZeroEnergy
 import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrder
 import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrderUniqueness
+import LatticeSystem.Quantum.SpinS.SpinThreeHalfBondProjection
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.BlockDischargeE6
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.BlockDischargeE6a
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.BlockDischargeE6b
@@ -381,6 +385,7 @@ import LatticeSystem.Quantum.SpinS.Problem25cMLMGroundStateWrapper
 import LatticeSystem.Quantum.SpinS.Problem25cBalancedStructuralWrapper
 import LatticeSystem.Quantum.SpinS.SingleSiteXYExpectation
 import LatticeSystem.Lattice.Graph
+import LatticeSystem.Lattice.HoneycombLattice
 import LatticeSystem.Lattice.HypercubicLattice
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli

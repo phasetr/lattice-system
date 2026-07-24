@@ -12358,15 +12358,182 @@ the \emph{regular (uniform-spin) specialization} of eq.~(7.3.7) --- a single glo
 bond projecting to $J=N$ --- which equals eq.~(7.3.7) exactly on an $N$-regular graph (the
 site-dependent spins $\bar S_x=\deg(x)/2$ of the non-regular case are not expressible in
 \texttt{ManyBodyOpS}~$\Lambda\,N$); on the 3-regular hexagonal lattice ($S=3/2$, $N=3$) it is
-$\sum_{\mathrm{bonds}}\hat P_3$ (eq.~7.3.8), the setting of Theorem 7.7.  The axiom
-\texttt{tasaki\_theorem\_7\_7} states that for the hexagonal lattice
-(marker \texttt{IsHexagonalLatticeAKLT}) with VBS ground state $\Phi$
-(marker \texttt{IsGeneralGraphVBSGroundState}) there are size-independent $C,\xi>0$ with the
-sign-alternating exponential decay $0\le(-1)^{D(x,y)}\langle\hat S_x\!\cdot\!\hat S_y\rangle\le
-Ce^{-D(x,y)/\xi}$ ($D=G.\mathrm{dist}$, eq.~7.3.9) and the translation-invariant infinite-volume
-ground state is unique (marker \texttt{HasUniqueInfiniteVolumeVBSGroundState}).  The hexagonal
-restriction is essential (general-graph decay can fail).  Casimir, projector and Hamiltonian are
-concrete; Theorem 7.7 is a documented axiom.  Chapters~3--10 backfill.
+$\sum_{\mathrm{bonds}}\hat P_3$ (eq.~7.3.8), the setting of Theorem 7.7.
+
+\par\smallskip
+\noindent\textbf{Local spin-\(3/2\) VBS bond certificate}
+(Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems}, 1st ed.,
+Springer, 2020, §7.3.2, eqs.~(7.3.6)--(7.3.8), pp.~210--211;
+\path{Quantum/SpinS/SpinThreeHalfBondProjection.lean}, Issue \#5132).
+For $a,b\in\{0,1,2\}$, \texttt{spinThreeHalfVBSBondVec a b} is the
+two-site physical vector obtained from one normalized virtual singlet and
+endpoint symmetrization with two remaining virtual spin-halves at each
+endpoint.  No unit-norm claim is made for the resulting physical vector.
+The definitions may be summarized as
+\[
+\begin{aligned}
+v_{a,b}
+  &=\texttt{spinThreeHalfVBSBondVec a b},\\
+W_{3/2}
+  &=\operatorname{span}_{\mathbb{C}}
+      \{v_{a,b}\mid a,b\in\{0,1,2\}\},\\
+P_3
+  &=\texttt{spinThreeHalfBondMaxProjection}\\
+  &=\texttt{bondMaxSpinProjectionS 0 1 3}.
+\end{aligned}
+\]
+Here $W_{3/2}$ is \texttt{spinThreeHalfVBSBondSubspace}, while $P_3$ is the
+concrete $16\times16$ Lagrange--Casimir projector onto total bond spin
+$J=3$.  The theorems
+\path{spinThreeHalfVBSBondVec_linearIndependent} and
+\path{spinThreeHalfVBSBondVec_annihilated} prove that the nine vectors
+$v_{a,b}$ are linearly independent and satisfy $P_3v_{a,b}=0$.
+
+\path{bondMaxSpinProjectionS_three_local_rank} gives
+$\operatorname{rank}P_3=7$.
+
+\path{finrank_spinThreeHalfBondLocal_ker} gives
+$\dim_{\mathbb{C}}\ker P_3=9$.
+
+\path{spinThreeHalfBondLocal_ker_eq_vbsBondSubspace} identifies
+$\ker P_3$ exactly with $W_{3/2}$.
+
+\path{bondMaxSpinProjectionS_three_local_isHermitian} proves Hermiticity.
+
+\path{bondMaxSpinProjectionS_three_local_idempotent} proves idempotence.
+
+\path{bondMaxSpinProjectionS_three_local_posSemidef} proves positive
+semidefiniteness.
+
+The proof is an explicit seven-sector matrix certificate followed by the
+rank--nullity comparison $7+9=16$; it uses only the Standard~3 axioms.
+
+At the Gate~L stage, this result was local to one two-site spin-$3/2$
+bond and did not itself construct the finite-volume honeycomb VBS state.
+The subsequent finite-state slice below supplies that construction, its
+nonzeroness, and global frustration-freeness, but not finite-volume uniqueness,
+the correlation bound (7.3.9), or infinite-volume uniqueness.  In particular,
+\texttt{tasaki\_theorem\_7\_7} remains a documented axiom.
+\par\smallskip
+
+\noindent\textbf{Finite honeycomb VBS amplitude and nonzeroness}
+(Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems},
+1st ed., Springer, 2020, §7.3.2, eq.~(7.3.6), p.~210; periodic
+bipartition in footnote~42, p.~211;
+\path{Quantum/SpinS/HoneycombAKLTVBS.lean}, Issue \#5132).
+Write \(D^+_m\) for \texttt{HoneycombForwardDart m}, using the formalization's
+chosen orientation from the \(A\) sublattice to the \(B\) sublattice.  The equivalence
+\texttt{honeycombForwardDartEquivEdgeSet} proves that \(D^+_m\) contains
+exactly one dart above every undirected edge.  A virtual configuration
+\(\nu \colon D^+_m \to \{0,1\}\) assigns a bit to each normalized singlet.  Its
+incidence spin is the stored bit at the \(A\) end and its
+\texttt{Fin.rev} at the \(B\) end.
+
+For a physical configuration
+\(\sigma \colon \texttt{HoneycombVertex m} \to \texttt{Fin 4}\), the finite
+amplitude \texttt{honeycombVBSState m} is
+\[
+\left(\prod_x
+\binom{3}{\sigma_x}^{-1/2}\right)
+\sum_{\nu\ \mathrm{realizes}\ \sigma}
+2^{-\lvert D^+_m\rvert/2}
+(-1)^{\#\{d \in D^+_m \colon \nu_d = 1\}}.
+\]
+Thus the definition is the literal finite sum obtained from normalized
+edge singlets and normalized on-site symmetric spin-\(3/2\) basis
+embeddings.  It does not claim that the resulting global vector has unit
+norm.
+
+For \(m \geq 2\), evaluate this amplitude on the configuration with physical
+down count \(0\) on \(A\) and \(3\) on \(B\).  Its unique realizing virtual
+configuration has every forward bit equal to zero: an \(A\)-site forces
+each incident forward bit to vanish, while 3-regularity gives three reversed
+down incidences at every \(B\)-site.  Both endpoint binomial coefficients
+are \(1\), and the singlet sign is positive.  Consequently the coefficient
+is
+\[
+(\sqrt{2}^{-1})^{\lvert D^+_m\rvert} \neq 0,
+\]
+which proves \texttt{honeycombVBSState\_ne\_zero}.  The proof uses only the
+Standard~3 axioms.
+\par\smallskip
+
+\noindent\textbf{Per-bond annihilation for the finite honeycomb VBS state}
+(Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems},
+1st ed., Springer, 2020, §7.3.2, eq.~(7.3.7), p.~210;
+\path{Quantum/SpinS/HoneycombAKLTBondAnnihilation.lean}, Issue \#5132).
+For a forward dart \(d\), let
+\(\operatorname{slice}_{d,\tau}(\Phi)\) freeze every coefficient away from
+the two endpoints.  The generic block-embedding bridge gives
+\[
+\widehat P_3[d.\mathrm{fst}+d.\mathrm{snd}]\Phi = 0
+\quad\Longleftrightarrow\quad
+\operatorname{slice}_{d,\tau}(\Phi) \in W_{3/2}
+\quad\text{for every }\tau.
+\]
+The proof splits each virtual configuration into the selected singlet bit
+and an assignment \(\mu\) on all remaining forward darts.  The two bit
+values have opposite singlet signs.  Their endpoint down counts are
+\(a,b+1\) and \(a+1,b\), respectively, while every spectator count is
+unchanged.  After the common spectator symmetrizer factor is extracted,
+each fixed-\(\mu\) fibre is therefore a scalar multiple of
+\(v_{a,b}\).  Hence
+\[
+\operatorname{slice}_{d,\tau}
+  (\texttt{honeycombVBSState m})
+= \sum_{\mu}c_{\mu,\tau}v_{a(\mu),b(\mu)}
+\in W_{3/2}.
+\]
+This proves \texttt{honeycombVBSState\_twoSiteSlice\_mem} and
+\texttt{honeycombVBSState\_bond\_annihilated}.  The formal orientation is
+the chosen \(A\)-to-\(B\) direction; the forward-dart equivalence supplies
+one such representative for every undirected bond.  Thus the theorem is
+the per-bond ingredient of eq.~(7.3.7), not a proof identifying or summing
+the full Hamiltonian.  Positive semidefiniteness of that sum, zero energy,
+finite-volume uniqueness, correlation decay, a spectral gap, and
+infinite-volume uniqueness remain outside this slice.
+\par\smallskip
+
+\noindent\textbf{Zero-energy ground state of the finite honeycomb AKLT Hamiltonian}
+(Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems}, 1st ed.,
+Springer, 2020, §7.3.2, Lemma~A.9, p.~469; \path{Quantum/SpinS/HoneycombAKLTZeroEnergy.lean}, Issue \#5133).
+The theorem \texttt{honeycombVBSState\_adj\_bond\_annihilated} extends the
+per-bond annihilation result to every ordered adjacent pair $(x,y)$, using the
+forward-dart and reverse-dart coverage plus the bond-projection symmetry
+\texttt{bondMaxSpinProjectionS\_comm}.
+The capstone \texttt{honeycombVBSState\_isGeneralGraphVBSGroundState} assembles the
+per-bond ingredients into the \emph{full frustration-free zero-energy
+ground-state property} via the $\varepsilon\equiv 0$ specialization of Tasaki's
+Lemma~A.9 (\texttt{frustration\_free\_isGroundState}): each local bond term is
+positive semidefinite (\texttt{bondMaxSpinProjectionS\_three\_posSemidef}) and
+annihilates the state, so their sum is positive semidefinite and annihilates the
+state; the prefactor $\tfrac12$ recovers \texttt{regularGraphAKLTHamiltonianS}.
+Thus for $m\ge 2$ the finite honeycomb VBS state realizes
+\[
+\texttt{IsGeneralGraphVBSGroundState}\ (\text{honeycombTorusGraph}\ m)\ 3\ (\text{honeycombVBSState}\ m),
+\]
+the ground-state hypothesis of Tasaki Theorem 7.7 on the canonical honeycomb
+torus. Correlation decay (eq.~7.3.9) and infinite-volume uniqueness remain
+unproved; \texttt{tasaki\_theorem\_7\_7} remains an axiom.
+
+\par\smallskip
+
+The documented axiom
+\texttt{tasaki\_theorem\_7\_7} (Tasaki Theorem 7.7, \S7.3.2, eqs.~(7.3.6)--(7.3.9), pp.~210--212)
+asserts that for every hexagonal lattice (marker \texttt{IsHexagonalLatticeAKLT}), there exist \emph{size-independent constants} $C,\xi>0$ (quantified outside all lattice instances) and a VBS ground state~$\Phi$
+satisfying the concrete \textbf{frustration-free zero-energy property}
+\texttt{IsGeneralGraphVBSGroundState} (def: the Hamiltonian is positive semidefinite, $\Phi$ is annihilated
+by it, and $\Phi$ is nonzero) that realizes \emph{both} the sign-alternating exponential decay
+$$0\le(-1)^{D(x,y)}\langle\hat S_x\!\cdot\!\hat S_y\rangle_\Phi\le Ce^{-D(x,y)/\xi}$$
+(eq.~7.3.9, $D=G.\mathrm{dist}$) \emph{and} the translation-invariant infinite-volume
+uniqueness (marker \texttt{HasUniqueInfiniteVolumeVBSGroundState}).  The axiom's $\exists\Phi$ witness is not type-fixed; any state satisfying the predicates may fulfill the existential.  The hexagonal
+restriction is essential (general-graph decay can fail).  \textbf{Parallel axiom-free theorem:}
+independently, on the specific canonical honeycomb torus $\texttt{honeycombTorusGraph}(m)$ ($m \ge 2$), the concrete \texttt{honeycombVBSState}$(m)$ is proven to be a \emph{zero-energy VBS ground state} by the theorem \texttt{honeycombVBSState\_isGeneralGraphVBSGroundState} (\S7.3.2, line~724,
+with $\#\!\mathrm{print}$ axioms $=$ std3).  This theorem provides a genuine axiom-free fact about the canonical torus but \textbf{does not discharge or reduce the axiom's claim} on general hexagons (correlation decay and infinite-volume uniqueness remain unproven).  \textbf{Axiom reason (documented):}
+for a general hexagonal lattice, the correlation decay (eq.~7.3.9) and infinite-volume uniqueness remain unproven due to real
+implementation dependency --- rigorous 2D honeycomb correlation analysis (Kennedy--Lieb--Tasaki
+complex-analysis foundation, [41]) is absent from the repo and mathlib.  Theorem 7.7 is
+a documented axiom for the decay estimate and infinite-volume uniqueness on general hexagons.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§7.3.3 Briegel--Raussendorf (cluster / graph) state} (Theorem 7.8; Tasaki §7.3.3,
