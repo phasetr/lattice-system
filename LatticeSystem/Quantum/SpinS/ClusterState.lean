@@ -689,14 +689,21 @@ theorem realSpectrum_conj_eq {L N : ℕ} {V Vinv D : ManyBodyOpS (Fin L) N}
 /-! ## The cluster state and Theorem 7.8 -/
 
 /-- The **cluster state** `Φ_C = Û_C W e₀ = V e₀`: the all-plus product state sent through the
-controlled-`Z` unitary (eq. (7.3.29)). -/
+controlled-`Z` unitary (eq. (7.3.29)).  This vector is the **unnormalized ray representative** of
+the cluster state: it omits the normalization factor `2^{-L/2}` of Tasaki eq. (7.3.29), keeping all
+components in the Gaussian integers (`±1`, with `‖·‖² = 2^L`) so as to avoid `√2`.  This is a
+deliberate choice; every claim in this file (ground energy, spectral gap, uniqueness) is invariant
+under scalar multiplication (scale-invariant), so the absence of normalization does not affect any
+conclusion. -/
 noncomputable def clusterStateVec (G : SimpleGraph (Fin L)) [DecidableRel G.Adj] :
     (Fin L → Fin 2) → ℂ :=
   (clusterV G).mulVec (basisVecS (fun _ => (0 : Fin 2)))
 
 /-- **Cluster-state predicate** `IsClusterState G Φ`: `Φ` is the Briegel–Raussendorf / graph state
 of `G` (eq. (7.3.29)), the explicit vector `clusterStateVec G = Û_C · (all-plus)` obtained from the
-controlled-`Z` construction. -/
+controlled-`Z` construction.  The equality is with the **unnormalized ray representative**
+`clusterStateVec G` (the `2^{-L/2}` factor of eq. (7.3.29) is omitted), which is harmless here since
+all downstream claims are scale-invariant. -/
 def IsClusterState (G : SimpleGraph (Fin L)) [DecidableRel G.Adj]
     (Φ : (Fin L → Fin 2) → ℂ) : Prop :=
   Φ = clusterStateVec G
