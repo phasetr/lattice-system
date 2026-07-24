@@ -17,7 +17,6 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (S
 §7.1.3 "The Uniqueness of the Ground State", pp. 186–188, eq. (7.1.25).
 -/
 import Mathlib.RingTheory.Coprime.Lemmas
-import Mathlib.RingTheory.Polynomial.UniqueFactorization
 import Mathlib.Algebra.MvPolynomial.NoZeroDivisors
 import Mathlib.Algebra.MvPolynomial.Degrees
 
