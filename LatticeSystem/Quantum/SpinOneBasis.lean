@@ -128,9 +128,10 @@ theorem spinOneOpMinus_mulVec_spinOneMinus :
 
 The unique non-trivial entries on either side are at indices `(0, 1)`
 and `(1, 2)` for `Ŝ^+` (resp. `(1, 0)` and `(2, 1)` for `Ŝ^-`). At
-those entries the right-hand side reduces to `2·invSqrt2 = √2` via
-`sqrt2_mul_sqrt2` already declared just below. We use that fact in
-the `linear_combination` proof. -/
+those entries the right-hand side reduces to `2·invSqrt2 = √2`. Each
+proof establishes the identity `√2 · √2 = 2` inline (as the local
+hypotheses `h2` / `hsq`) and closes the entrywise goals with
+`field_simp` and `ring_nf`. -/
 
 /-- `Ŝ^+ = Ŝ^(1) + i·Ŝ^(2)` for `S = 1`. -/
 theorem spinOneOpPlus_eq_add :
@@ -181,11 +182,6 @@ theorem spinOneOpMinus_conjTranspose :
   ext i j
   fin_cases i <;> fin_cases j <;>
     simp [spinOneOpPlus, spinOneOpMinus, Matrix.conjTranspose_apply]
-
-/-- `√2 · √2 = 2` in `ℂ`; used when simplifying entries of `spinOneOpPlus` and `spinOneOpMinus`. -/
-private lemma sqrt2_mul_sqrt2 : (Real.sqrt 2 : ℂ) * (Real.sqrt 2 : ℂ) = 2 := by
-  rw [← Complex.ofReal_mul, Real.mul_self_sqrt (by norm_num : (0:ℝ) ≤ 2)]
-  norm_num
 
 /-! ## S = 1 π-rotation matrices (Tasaki eq (2.1.33))
 
