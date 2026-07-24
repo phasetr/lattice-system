@@ -128,10 +128,15 @@ kept as an uninterpreted predicate per the operator-algebra policy. -/
 axiom HasUniqueInfiniteVolumeVBSGroundState (G : SimpleGraph Λ) (N : ℕ) : Prop
 
 /-- **Tasaki Theorem 7.7 (hexagonal AKLT correlations and uniqueness), AXIOM.**  There are positive
-constants `C, ξ` — hoisted outside the universal quantifier over graphs `G`, so they are genuinely
-**independent of the system** `G`, capturing Tasaki's "`C, ξ` independent of system size" — such
-that for every hexagonal lattice `G` (`IsHexagonalLatticeAKLT`, i.e. isomorphic to a nondegenerate
-honeycomb torus) with the `S = 3/2` (`N = 3`) AKLT model, **some** zero-energy VBS ground state `Φ`
+constants `C, ξ` — quantified *outside* both the vertex type `Λ` and the graph `G` (the whole
+`∀ {Λ} [Fintype Λ] [DecidableEq Λ] (G : SimpleGraph Λ) …` block sits inside `∃ C ξ`), so a *single*
+`C, ξ` serves **every** hexagonal lattice regardless of its vertex type, i.e. across **all sizes**
+`honeycombTorusGraph m`.  This is Tasaki's genuinely **size-independent** `C, ξ`: because each torus
+`honeycombTorusGraph m` has its own vertex type, binding `Λ` inside `∃ C ξ` (rather than letting the
+file-level `variable {Λ}` auto-bind it *outside*, which would allow a size-dependent choice) is what
+makes the constants faithfully system-size-independent — such that for every hexagonal lattice `G`
+(`IsHexagonalLatticeAKLT`, i.e. isomorphic to a nondegenerate honeycomb torus) with the `S = 3/2`
+(`N = 3`) AKLT model, **some** zero-energy VBS ground state `Φ`
 (`IsGeneralGraphVBSGroundState G 3 Φ`) exists whose spin correlation is **sign-alternating and
 exponentially decaying** in the graph distance `D(x,y) = G.dist x y` (eq. (7.3.9))
 `0 ≤ (−1)^{D(x,y)} ⟨Ŝ_x·Ŝ_y⟩ ≤ C e^{−D(x,y)/ξ}`,
@@ -162,11 +167,12 @@ H. Tasaki, Commun. Math. Phys. **115**, 477 (1988); T. Kennedy, E. H. Lieb, H. T
 Phys. **53**, 383 (1988) ([41]). -/
 axiom tasaki_theorem_7_7 :
     ∃ C ξ : ℝ, 0 < C ∧ 0 < ξ ∧
-      ∀ (G : SimpleGraph Λ) [DecidableRel G.Adj], IsHexagonalLatticeAKLT G →
-        (∃ Φ : (Λ → Fin 4) → ℂ, IsGeneralGraphVBSGroundState G 3 Φ ∧ ∀ x y : Λ,
-          0 ≤ (-1 : ℝ) ^ (G.dist x y) * expectationRatioRe (spinSDot x y 3) Φ ∧
-            (-1 : ℝ) ^ (G.dist x y) * expectationRatioRe (spinSDot x y 3) Φ ≤
-              C * Real.exp (-(G.dist x y : ℝ) / ξ)) ∧
-          HasUniqueInfiniteVolumeVBSGroundState G 3
+      ∀ {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (G : SimpleGraph Λ) [DecidableRel G.Adj],
+        IsHexagonalLatticeAKLT G →
+          (∃ Φ : (Λ → Fin 4) → ℂ, IsGeneralGraphVBSGroundState G 3 Φ ∧ ∀ x y : Λ,
+            0 ≤ (-1 : ℝ) ^ (G.dist x y) * expectationRatioRe (spinSDot x y 3) Φ ∧
+              (-1 : ℝ) ^ (G.dist x y) * expectationRatioRe (spinSDot x y 3) Φ ≤
+                C * Real.exp (-(G.dist x y : ℝ) / ξ)) ∧
+            HasUniqueInfiniteVolumeVBSGroundState G 3
 
 end LatticeSystem.Quantum
