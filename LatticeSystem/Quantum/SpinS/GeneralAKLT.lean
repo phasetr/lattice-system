@@ -143,10 +143,15 @@ exponentially decaying** in the graph distance `D(x,y) = G.dist x y` (eq. (7.3.9
 and the translation-invariant infinite-volume ground state is **unique**
 (`HasUniqueInfiniteVolumeVBSGroundState`, which is `Φ`-independent).
 
-The witness `Φ` is, mathematically, the canonical VBS state `honeycombVBSState m` transported along
-the isomorphism `G ≃g honeycombTorusGraph m` supplied by `IsHexagonalLatticeAKLT G`; its zero-energy
-ground-state property on the canonical torus is *proved* in
-`honeycombVBSState_isGeneralGraphVBSGroundState`.  Stating the ground state existentially
+The *intended* witness `Φ` is, mathematically, the canonical VBS state `honeycombVBSState m`
+transported along the isomorphism `G ≃g honeycombTorusGraph m` supplied by
+`IsHexagonalLatticeAKLT G`; its zero-energy ground-state property is *proved only on the canonical
+torus itself* by the **parallel axiom-free theorem**
+`honeycombVBSState_isGeneralGraphVBSGroundState`
+(`IsGeneralGraphVBSGroundState (honeycombTorusGraph m) 3 (honeycombVBSState m)`, `#print axioms` =
+std3).  That theorem is a genuine axiom-free fact about the canonical torus, but it does **not**
+discharge or reduce this axiom: the `∃ Φ` conjunct is not type-fixed to `honeycombVBSState`, and its
+transport to a general hexagon `G` is not proved here.  Stating the ground state existentially
 (`∃ Φ, IsGeneralGraphVBSGroundState G 3 Φ ∧ …`) rather than universally (`∀ Φ, … → …`) is what keeps
 the axiom sound: the finite honeycomb torus ground state may be degenerate, so a `∀ Φ` claim would
 be *false* on the non-VBS kernel vectors, whereas the single VBS witness suffices for Tasaki's
@@ -157,9 +162,11 @@ The correlation decay (eq. (7.3.9)) and the infinite-volume uniqueness are recor
 axioms**: their proofs (Affleck–Kennedy–Lieb–Tasaki, Kennedy–Lieb–Tasaki [41]) rest on the explicit
 two-dimensional VBS / reflection-positivity correlation analysis, for which there is no
 implementation base in this repository or in mathlib (a genuine real-implementation dependency).  By
-contrast the ground-state hypothesis conjunct is *not* deferred: it is discharged by
-`honeycombVBSState_isGeneralGraphVBSGroundState`.  The hexagonal restriction is essential: on
-general graphs the correlations need not decay.
+contrast the ground-state hypothesis conjunct is **not** logically discharged for a general hexagon
+either: `honeycombVBSState_isGeneralGraphVBSGroundState` establishes it only on the canonical
+`honeycombTorusGraph m` (the parallel axiom-free fact above), not for every
+`IsHexagonalLatticeAKLT G`, so the `∃ Φ` premise stated here is not reduced by it.  The hexagonal
+restriction is essential: on general graphs the correlations need not decay.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §7.3.2, Theorem 7.7, eqs. (7.3.6)–(7.3.9), pp. 210–212; I. Affleck, T. Kennedy, E. H. Lieb,
