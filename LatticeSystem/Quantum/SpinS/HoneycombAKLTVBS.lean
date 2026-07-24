@@ -62,7 +62,7 @@ theorem HoneycombForwardDart.snd_eq_true
     exact Bool.noConfusion hfalse
 
 /-- Reversing a non-forward honeycomb dart gives a forward dart. -/
-private theorem honeycombDart_symm_fst_eq_false
+theorem honeycombDart_symm_fst_eq_false
     (d : (honeycombTorusGraph m).Dart)
     (hd : d.fst.2 ≠ false) :
     d.symm.fst.2 = false := by

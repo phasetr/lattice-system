@@ -80,16 +80,6 @@ private theorem honeycombExtendBondRest_apply_of_ne
   classical
   simp [honeycombExtendBondRest, he]
 
-/-- Reversing a dart whose source is on sublattice `B` gives a forward
-honeycomb dart. -/
-private theorem honeycombDart_symm_fst_eq_false_local
-    (e : (honeycombTorusGraph m).Dart)
-    (he : e.fst.2 ≠ false) :
-    e.symm.fst.2 = false := by
-  rcases honeycombTorusGraph_adj.mp e.adj with h | h
-  · exact (he h.1).elim
-  · exact h.2.1
-
 /-- The complete virtual sum splits into an off-bond assignment and the
 selected singlet bit without duplication. -/
 private theorem sum_honeycombVirtualConfig_eq_sum_rest_bit [NeZero m]
@@ -129,7 +119,7 @@ private theorem honeycombIncidenceSpin_extend_of_ne
   · rw [honeycombIncidenceSpin, dif_neg hf,
       honeycombIncidenceSpin, dif_neg hf]
     have hne :
-        (⟨e.symm, honeycombDart_symm_fst_eq_false_local e hf⟩ :
+        (⟨e.symm, honeycombDart_symm_fst_eq_false e hf⟩ :
           HoneycombForwardDart m) ≠ d := by
       intro h
       have hval := congrArg Subtype.val h
@@ -137,9 +127,9 @@ private theorem honeycombIncidenceSpin_extend_of_ne
       have := congrArg SimpleGraph.Dart.symm hval
       simpa using this
     rw [honeycombExtendBondRest_apply_of_ne d
-        ⟨e.symm, honeycombDart_symm_fst_eq_false_local e hf⟩ hne,
+        ⟨e.symm, honeycombDart_symm_fst_eq_false e hf⟩ hne,
       honeycombExtendBondRest_apply_of_ne d
-        ⟨e.symm, honeycombDart_symm_fst_eq_false_local e hf⟩ hne]
+        ⟨e.symm, honeycombDart_symm_fst_eq_false e hf⟩ hne]
 
 /-- The set of down-spin outgoing incidences at a vertex. -/
 private def honeycombDownDarts [NeZero m]
