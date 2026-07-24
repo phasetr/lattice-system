@@ -70,35 +70,6 @@ private theorem honeycombDart_symm_fst_eq_false
   · exact (hd h.1).elim
   · exact h.2
 
-/-- Every edge has exactly one `A → B` dart representative. -/
-noncomputable def honeycombForwardDartEquivEdgeSet (m : ℕ) :
-    HoneycombForwardDart m ≃ (honeycombTorusGraph m).edgeSet := by
-  classical
-  refine Equiv.ofBijective
-    (fun d => ⟨d.1.edge, d.1.edge_mem⟩) ⟨?_, ?_⟩
-  · intro d e hde
-    apply Subtype.ext
-    rcases (SimpleGraph.dart_edge_eq_iff d.1 e.1).mp
-        (Subtype.ext_iff.mp hde) with h | h
-    · exact h
-    · exfalso
-      have hsnd : e.1.snd.2 = true := e.snd_eq_true
-      have hcolor : d.1.fst.2 = true := by
-        rw [h]
-        exact hsnd
-      have hfalse : false = true := d.2.symm.trans hcolor
-      exact Bool.noConfusion hfalse
-  · rintro ⟨edge, hedge⟩
-    obtain ⟨v, w⟩ := edge
-    let d : (honeycombTorusGraph m).Dart := ⟨(v, w), hedge⟩
-    by_cases hd : d.fst.2 = false
-    · refine ⟨⟨d, hd⟩, ?_⟩
-      apply Subtype.ext
-      rfl
-    · refine ⟨⟨d.symm, honeycombDart_symm_fst_eq_false d hd⟩, ?_⟩
-      apply Subtype.ext
-      exact d.edge_symm
-
 /-- The finite type of forward-oriented honeycomb darts when the torus
 size is nonzero. -/
 instance [NeZero m] : Fintype (HoneycombForwardDart m) := by
