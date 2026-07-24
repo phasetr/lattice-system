@@ -12526,13 +12526,13 @@ satisfying the concrete \textbf{frustration-free zero-energy property}
 by it, and $\Phi$ is nonzero) that realizes \emph{both} the sign-alternating exponential decay
 $$0\le(-1)^{D(x,y)}\langle\hat S_x\!\cdot\!\hat S_y\rangle_\Phi\le Ce^{-D(x,y)/\xi}$$
 (eq.~7.3.9, $D=G.\mathrm{dist}$) \emph{and} the translation-invariant infinite-volume
-uniqueness (marker \texttt{HasUniqueInfiniteVolumeVBSGroundState}).  The hexagonal
-restriction is essential (general-graph decay can fail).  \textbf{Canonical-torus hypothesis proven:}
-on the specific canonical honeycomb torus $\texttt{honeycombTorusGraph}(m)$ ($m \ge 2$), the zero-energy ground-state property is proven as a theorem (\S7.3.2, line~724,
-\texttt{honeycombVBSState\_isGeneralGraphVBSGroundState} with $\#\!\mathrm{print}$ axioms $=$ std3).  \textbf{Axiom reason (documented):}
+uniqueness (marker \texttt{HasUniqueInfiniteVolumeVBSGroundState}).  The axiom's $\exists\Phi$ witness is not type-fixed; any state satisfying the predicates may fulfill the existential.  The hexagonal
+restriction is essential (general-graph decay can fail).  \textbf{Parallel axiom-free theorem:}
+independently, on the specific canonical honeycomb torus $\texttt{honeycombTorusGraph}(m)$ ($m \ge 2$), the concrete \texttt{honeycombVBSState}$(m)$ is proven to be a \emph{zero-energy VBS ground state} by the theorem \texttt{honeycombVBSState\_isGeneralGraphVBSGroundState} (\S7.3.2, line~724,
+with $\#\!\mathrm{print}$ axioms $=$ std3).  This theorem provides a genuine axiom-free fact about the canonical torus but \textbf{does not discharge or reduce the axiom's claim} on general hexagons (correlation decay and infinite-volume uniqueness remain unproven).  \textbf{Axiom reason (documented):}
 for a general hexagonal lattice, the correlation decay (eq.~7.3.9) and infinite-volume uniqueness remain unproven due to real
 implementation dependency --- rigorous 2D honeycomb correlation analysis (Kennedy--Lieb--Tasaki
-complex-analysis foundation, [41]) is absent from the repo and mathlib.  The ground-state existence on the canonical torus, however, is a proven ingredient; Theorem 7.7 is
+complex-analysis foundation, [41]) is absent from the repo and mathlib.  Theorem 7.7 is
 a documented axiom for the decay estimate and infinite-volume uniqueness on general hexagons.  Chapters~3--10 backfill.
 
 \medskip
