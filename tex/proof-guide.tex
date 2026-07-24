@@ -12518,18 +12518,24 @@ unproved; \texttt{tasaki\_theorem\_7\_7} remains an axiom.
 
 \par\smallskip
 
-The axiom
-\texttt{tasaki\_theorem\_7\_7} states that for the hexagonal lattice
-(marker \texttt{IsHexagonalLatticeAKLT}) with VBS ground state $\Phi$
+The documented axiom
+\texttt{tasaki\_theorem\_7\_7} (Tasaki Theorem 7.7, \S7.3.2, eqs.~(7.3.6)--(7.3.9), pp.~210--212)
+states that there exist \emph{size-independent constants} $C,\xi>0$ such that for every hexagonal
+lattice (marker \texttt{IsHexagonalLatticeAKLT}), there exists a VBS ground state~$\Phi$
 satisfying the concrete \textbf{frustration-free zero-energy property}
 \texttt{IsGeneralGraphVBSGroundState} (def: the Hamiltonian is positive semidefinite, $\Phi$ is annihilated
-by it, and $\Phi$ is nonzero) there are size-independent $C,\xi>0$ with the
-sign-alternating exponential decay $0\le(-1)^{D(x,y)}\langle\hat S_x\!\cdot\!\hat S_y\rangle\le
-Ce^{-D(x,y)/\xi}$ ($D=G.\mathrm{dist}$, eq.~7.3.9) and the translation-invariant infinite-volume
-ground state is unique (marker \texttt{HasUniqueInfiniteVolumeVBSGroundState}).  The hexagonal
-restriction is essential (general-graph decay can fail).  Casimir, projector, and Hamiltonian are
-concrete; the zero-energy ground-state property is proven; Theorem 7.7 is a documented axiom (correlation decay
-and infinite-volume uniqueness remain unproven).  Chapters~3--10 backfill.
+by it, and $\Phi$ is nonzero) that realizes \emph{both} the sign-alternating exponential decay
+$$0\le(-1)^{D(x,y)}\langle\hat S_x\!\cdot\!\hat S_y\rangle_\Phi\le Ce^{-D(x,y)/\xi}$$
+(eq.~7.3.9, $D=G.\mathrm{dist}$) \emph{and} the translation-invariant infinite-volume
+uniqueness (marker \texttt{HasUniqueInfiniteVolumeVBSGroundState}).  The hexagonal
+restriction is essential (general-graph decay can fail).  \textbf{Hypothesis discharged:}
+the zero-energy ground-state predicate is proven as a theorem (\S7.3.2, line~724,
+\texttt{honeycombVBSState\_isGeneralGraphVBSGroundState}).  \textbf{Axiom reason (documented):}
+correlation decay (eq.~7.3.9) and infinite-volume uniqueness remain unproven due to real
+implementation dependency --- rigorous 2D honeycomb correlation analysis (Kennedy--Lieb--Tasaki
+complex-analysis foundation, [41]) is absent from the repo and mathlib.  Casimir, projector,
+and finite-volume Hamiltonian are concrete; the hypothesis conjunct is proven; Theorem 7.7 is
+a documented axiom for the analytic crux and infinite-volume uniqueness.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§7.3.3 Briegel--Raussendorf (cluster / graph) state} (Theorem 7.8; Tasaki §7.3.3,
