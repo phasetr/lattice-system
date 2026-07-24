@@ -701,10 +701,6 @@ def IsClusterState (G : SimpleGraph (Fin L)) [DecidableRel G.Adj]
     (Φ : (Fin L → Fin 2) → ℂ) : Prop :=
   Φ = clusterStateVec G
 
-/-- The cluster state satisfies its own predicate (non-vacuity witness). -/
-theorem isClusterState_clusterStateVec (G : SimpleGraph (Fin L)) [DecidableRel G.Adj] :
-    IsClusterState G (clusterStateVec G) := rfl
-
 /-- The cluster state is nonzero. -/
 theorem clusterStateVec_ne_zero (G : SimpleGraph (Fin L)) [DecidableRel G.Adj] :
     clusterStateVec G ≠ 0 := by
