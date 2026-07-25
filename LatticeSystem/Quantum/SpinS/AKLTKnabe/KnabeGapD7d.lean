@@ -147,13 +147,12 @@ theorem ringProjHamiltonianS_ne_zero (hL : 2 ≤ L) : ringProjHamiltonianS L ≠
     rintro v ⟨⟨p, q⟩, rfl⟩
     simp only [SetLike.mem_coe, LinearMap.mem_ker, LinearMap.proj_apply]
     fin_cases p <;> fin_cases q <;> simp +decide [vbsBondVec]
-  have hglue : glueBond (0 : Fin L) (fun _ => 0) (fun _ => 0) = (fun _ => (0 : Fin 3)) := by
-    funext k
-    simp only [glueBond]
-    split_ifs <;> rfl
+  have hglue : glueTwoSitesS (0 : Fin L) (ringSucc 0) (fun _ => (0 : Fin 3))
+      (fun _ => (0 : Fin 3)) = fun _ => (0 : Fin 3) :=
+    glueTwoSitesS_eq_self _ rfl rfl
   have hval := LinearMap.mem_ker.mp (hker hmem)
   rw [LinearMap.proj_apply] at hval
-  simp only [bondSlice, hglue, hδ, Pi.single_eq_same] at hval
+  simp only [bondSlice, twoSiteSliceS, hglue, hδ, Pi.single_eq_same] at hval
   exact one_ne_zero hval
 
 /-! ### G4/G5 — ground energy `0` and the gap `1/10` of the projector Hamiltonian -/

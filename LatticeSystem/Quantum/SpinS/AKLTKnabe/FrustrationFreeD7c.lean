@@ -142,7 +142,7 @@ private lemma glueBond_shift [NeZero L] (x : Fin L) (a : Fin 2 → Fin 3)
       exact add_right_cancel h'
     · intro h
       rw [h, add_comm]
-  simp only [glueBond, ringSucc_eq_add_one, zero_add]
+  simp only [glueBond, glueTwoSitesS, ringSucc_eq_add_one, zero_add]
   by_cases h0 : k = 0
   · rw [if_pos (hA.mpr h0), if_pos h0]
   · rw [if_neg fun h => h0 (hA.mp h), if_neg h0]
@@ -176,9 +176,9 @@ theorem exists_bondSlice_eq_trace [NeZero L] (hL : 1 < L) (x : Fin L) (τ : Fin 
       = akltVBSState (m + 2) (glueBond 0 a fun j => τ (j + x)) := by
     rw [← hfun, akltVBSState_shift]
   have hg0 : (glueBond (0 : Fin (m + 2)) a fun j => τ (j + x)) 0 = a 0 := by
-    simp [glueBond]
+    simp [glueBond, glueTwoSitesS]
   have hg1 : (glueBond (0 : Fin (m + 2)) a fun j => τ (j + x)) 1 = a 1 := by
-    simp [glueBond, ringSucc_eq_add_one, h10]
+    simp [glueBond, glueTwoSitesS, ringSucc_eq_add_one, h10]
   have hgs : ∀ i : Fin m, (glueBond (0 : Fin (m + 2)) a fun j => τ (j + x)) i.succ.succ
       = τ (i.succ.succ + x) := by
     intro i
@@ -186,7 +186,7 @@ theorem exists_bondSlice_eq_trace [NeZero L] (hL : 1 < L) (x : Fin L) (τ : Fin 
     have hne1 : (i.succ.succ : Fin (m + 2)) ≠ 1 := by
       rw [← Fin.succ_zero_eq_one]
       exact fun h => Fin.succ_ne_zero i (Fin.succ_inj.mp h)
-    simp [glueBond, ringSucc_eq_add_one, hne0, hne1]
+    simp [glueBond, glueTwoSitesS, ringSucc_eq_add_one, hne0, hne1]
   have hlist : List.ofFn (glueBond (0 : Fin (m + 2)) a fun j => τ (j + x))
       = a 0 :: a 1 :: List.ofFn (fun i : Fin m => τ (i.succ.succ + x)) := by
     rw [List.ofFn_succ, List.ofFn_succ]

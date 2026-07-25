@@ -127,7 +127,7 @@ theorem weylMono_glueBond_split (hL : 1 < L) (a : Fin 2 → Fin 3) (r : Fin L �
     obtain ⟨hyr, hy'⟩ := hy
     rw [Finset.mem_erase] at hy'
     obtain ⟨hyx, -⟩ := hy'
-    simp [glueBond, hyx, hyr]
+    simp [glueBond, glueTwoSitesS, hyx, hyr]
   have hrest : restMono x (glueBond x a r) = restMono x r := by
     have he : (∑ y ∈ (Finset.univ.erase x).erase (ringSucc x), mdSite y (glueBond x a r y))
         = ∑ y ∈ (Finset.univ.erase x).erase (ringSucc x), mdSite y (r y) :=
@@ -137,8 +137,9 @@ theorem weylMono_glueBond_split (hL : 1 < L) (a : Fin 2 → Fin 3) (r : Fin L �
       Finset.prod_congr rfl (fun y hy => by rw [hgr y hy])
     rw [restMono, restMono, he, hc]
   have hbond : (![glueBond x a r x, glueBond x a r (ringSucc x)] : Fin 2 → Fin 3) = a := by
-    have h0 : glueBond x a r x = a 0 := by simp [glueBond]
-    have h1 : glueBond x a r (ringSucc x) = a 1 := by simp [glueBond, Ne.symm hxne]
+    have h0 : glueBond x a r x = a 0 := by simp [glueBond, glueTwoSitesS]
+    have h1 : glueBond x a r (ringSucc x) = a 1 := by
+      simp [glueBond, glueTwoSitesS, Ne.symm hxne]
     rw [h0, h1]; funext i; fin_cases i <;> simp
   rw [weylMono_bond_rest_split x hL (glueBond x a r), hrest, hbond]
 
@@ -156,12 +157,12 @@ theorem weylMap_eq_bondSlice_sum (hL : 1 < L) (Φ : (Fin L → Fin 3) → ℂ) :
   refine ⟨fun r => if r x = 0 ∧ r (ringSucc x) = 0 then restMono x r else 0, ?_⟩
   have hxne : x ≠ ringSucc x := ne_ringSucc hL x
   have gb_x : ∀ (a : Fin 2 → Fin 3) (r : Fin L → Fin 3), glueBond x a r x = a 0 :=
-    fun a r => by simp [glueBond]
+    fun a r => by simp [glueBond, glueTwoSitesS]
   have gb_rs : ∀ (a : Fin 2 → Fin 3) (r : Fin L → Fin 3), glueBond x a r (ringSucc x) = a 1 :=
-    fun a r => by simp [glueBond, Ne.symm hxne]
+    fun a r => by simp [glueBond, glueTwoSitesS, Ne.symm hxne]
   have gb_rest : ∀ (a : Fin 2 → Fin 3) (r : Fin L → Fin 3) (k : Fin L),
       k ≠ x → k ≠ ringSucc x → glueBond x a r k = r k :=
-    fun a r k hkx hkr => by simp [glueBond, hkx, hkr]
+    fun a r k hkx hkr => by simp [glueBond, glueTwoSitesS, hkx, hkr]
   -- Rewrite each summand: expand the inner Weyl map and factor through `weylMono_glueBond_split`.
   have step1 : ∀ r : Fin L → Fin 3,
       (if r x = 0 ∧ r (ringSucc x) = 0 then restMono x r else 0)
