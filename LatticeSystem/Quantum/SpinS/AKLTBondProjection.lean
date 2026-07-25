@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.AKLT
 import LatticeSystem.Quantum.SpinS.SpinOneTwoSiteEntries
+import LatticeSystem.Quantum.SpinS.TwoSiteConfig
 
 /-!
 # Tasaki §7.1.3: the bond spin-2 projection and the local VBS characterization (Lemma 7.4)
@@ -41,6 +42,17 @@ variable {L : ℕ}
 the periodic bond `{x, x+1}`. -/
 def ringSucc (x : Fin L) : Fin L :=
   ⟨(x.val + 1) % L, Nat.mod_lt _ x.pos⟩
+
+/-- On a chain of length `> 1` the cyclic successor `ringSucc x = x + 1 (mod L)` of a site differs
+from the site itself, so the bond `{x, ringSucc x}` is genuinely two-site. -/
+theorem ne_ringSucc (hL : 1 < L) (x : Fin L) : x ≠ ringSucc x := by
+  intro h
+  have hv := congrArg Fin.val h
+  simp only [ringSucc] at hv
+  by_cases hx : x.val + 1 < L
+  · rw [Nat.mod_eq_of_lt hx] at hv; omega
+  · have heq : x.val + 1 = L := by omega
+    rw [heq, Nat.mod_self] at hv; omega
 
 /-- The **bond projection onto total spin 2** `P̂₂[Ŝ_x + Ŝ_y]` for two adjacent `S = 1` spins, as
 the polynomial `½ (Ŝ_x · Ŝ_y) + ⅙ (Ŝ_x · Ŝ_y)² + ⅓` in the bond Heisenberg operator (the inverse of
@@ -94,16 +106,22 @@ noncomputable def vbsBondSubspace : Submodule ℂ ((Fin 2 → Fin 3) → ℂ) :=
 bond values `a : Fin 2 → Fin 3` on the sites `{x, x+1}` (`a 0` on the left endpoint `x`, `a 1` on
 the right endpoint `ringSucc x`) and keeps the rest-of-chain configuration `τ` elsewhere.  This
 realizes the change of variables `≅ (bond 2 sites) × (rest)` used to reduce the global bond operator
-to the local `9 × 9` problem (Tasaki eqs. (7.1.20)–(7.1.21), p. 186). -/
+to the local `9 × 9` problem (Tasaki eqs. (7.1.20)–(7.1.21), p. 186).
+
+It is the specialization of the general two-site gluing `glueTwoSitesS` to the periodic ring bond
+`{x, ringSucc x}` of the `S = 1` chain. -/
 def glueBond (x : Fin L) (a : Fin 2 → Fin 3) (τ : Fin L → Fin 3) : Fin L → Fin 3 :=
-  fun k => if k = x then a 0 else if k = ringSucc x then a 1 else τ k
+  glueTwoSitesS x (ringSucc x) a τ
 
 /-- The **two-site bond slice** of a chain state `Φ` at the bond `{x, x+1}` for a fixed
 rest-of-chain configuration `τ`: the vector `a ↦ Φ (glueBond x a τ)` obtained by freezing
-every site outside the bond to `τ` (Tasaki eqs. (7.1.20)–(7.1.21), p. 186). -/
+every site outside the bond to `τ` (Tasaki eqs. (7.1.20)–(7.1.21), p. 186).
+
+It is the specialization of the general two-site slice `twoSiteSliceS` to the periodic ring bond
+`{x, ringSucc x}` of the `S = 1` chain. -/
 def bondSlice (x : Fin L) (Φ : (Fin L → Fin 3) → ℂ) (τ : Fin L → Fin 3) :
     (Fin 2 → Fin 3) → ℂ :=
-  fun a => Φ (glueBond x a τ)
+  twoSiteSliceS x (ringSucc x) Φ τ
 
 /-- **The VBS singlet-form predicate** `IsVBSGroundForm L x Φ` (Tasaki eqs. (7.1.19)–(7.1.20),
 p. 186), now a concrete definition: the state `Φ` of the `S = 1` chain has the valence-bond-solid
@@ -505,16 +523,7 @@ theorem bondSlice_bondSpin2ProjectionS_mulVec
     (hL : 1 < L) (x : Fin L) (Φ : (Fin L → Fin 3) → ℂ) (τ : Fin L → Fin 3) :
     bondSlice x ((bondSpin2ProjectionS x (ringSucc x)).mulVec Φ) τ =
       (bondSpin2ProjectionS (0 : Fin 2) 1).mulVec (bondSlice x Φ τ) := by
-  have hxy : x ≠ ringSucc x := by
-    intro h
-    have hv := congrArg Fin.val h
-    simp only [ringSucc] at hv
-    by_cases hx : x.val + 1 < L
-    · rw [Nat.mod_eq_of_lt hx] at hv
-      omega
-    · have heq : x.val + 1 = L := by omega
-      rw [heq, Nat.mod_self] at hv
-      omega
+  have hxy : x ≠ ringSucc x := ne_ringSucc hL x
   have hOnSite {ι : Type} [Fintype ι] [DecidableEq ι]
       (i : ι) (A : Matrix (Fin 3) (Fin 3) ℂ)
       (Ψ : (ι → Fin 3) → ℂ) (q : ι → Fin 3) :
@@ -558,18 +567,20 @@ theorem bondSlice_bondSpin2ProjectionS_mulVec
       exact ⟨σ i, Finset.mem_univ _, hσ.symm⟩
     · intro t _
       simp only [Function.update_self]
+  have hbs (Ψ : (Fin L → Fin 3) → ℂ) (ρ : Fin L → Fin 3) (a : Fin 2 → Fin 3) :
+      bondSlice x Ψ ρ a = Ψ (glueBond x a ρ) := rfl
   have hglue_update_left (a : Fin 2 → Fin 3) (ρ : Fin L → Fin 3) (t : Fin 3) :
       Function.update (glueBond x a ρ) x t =
         glueBond x (Function.update a 0 t) ρ := by
     funext k
     by_cases hkx : k = x
     · subst k
-      simp [glueBond]
+      simp [glueBond, glueTwoSitesS]
     · by_cases hky : k = ringSucc x
       · subst k
         rw [Function.update_of_ne hxy.symm]
-        simp [glueBond, hxy.symm]
-      · simp [glueBond, hkx, hky, Function.update_of_ne]
+        simp [glueBond, glueTwoSitesS, hxy.symm]
+      · simp [glueBond, glueTwoSitesS, hkx, hky, Function.update_of_ne]
   have hglue_update_right (a : Fin 2 → Fin 3) (ρ : Fin L → Fin 3) (t : Fin 3) :
       Function.update (glueBond x a ρ) (ringSucc x) t =
         glueBond x (Function.update a 1 t) ρ := by
@@ -577,23 +588,24 @@ theorem bondSlice_bondSpin2ProjectionS_mulVec
     by_cases hkx : k = x
     · subst k
       rw [Function.update_of_ne hxy]
-      simp [glueBond]
+      simp [glueBond, glueTwoSitesS]
     · by_cases hky : k = ringSucc x
       · subst k
-        simp [glueBond, hxy.symm]
-      · simp [glueBond, hkx, hky, Function.update_of_ne]
+        simp [glueBond, glueTwoSitesS, hxy.symm]
+      · simp [glueBond, glueTwoSitesS, hkx, hky, Function.update_of_ne]
   have hSliceLeft (A : Matrix (Fin 3) (Fin 3) ℂ)
       (Ψ : (Fin L → Fin 3) → ℂ) (ρ : Fin L → Fin 3) :
       bondSlice x ((onSiteS x A : ManyBodyOpS (Fin L) 2).mulVec Ψ) ρ =
         (onSiteS (0 : Fin 2) A : ManyBodyOpS (Fin 2) 2).mulVec
           (bondSlice x Ψ ρ) := by
     funext a
-    simp only [bondSlice]
+    simp only [hbs]
     rw [hOnSite x A Ψ (glueBond x a ρ),
       hOnSite (0 : Fin 2) A (bondSlice x Ψ ρ) a]
     apply Finset.sum_congr rfl
     intro t _
-    rw [show glueBond x a ρ x = a 0 by simp [glueBond], hglue_update_left]
+    rw [show glueBond x a ρ x = a 0 by simp [glueBond, glueTwoSitesS],
+      hglue_update_left]
     rfl
   have hSliceRight (A : Matrix (Fin 3) (Fin 3) ℂ)
       (Ψ : (Fin L → Fin 3) → ℂ) (ρ : Fin L → Fin 3) :
@@ -601,12 +613,13 @@ theorem bondSlice_bondSpin2ProjectionS_mulVec
         (onSiteS (1 : Fin 2) A : ManyBodyOpS (Fin 2) 2).mulVec
           (bondSlice x Ψ ρ) := by
     funext a
-    simp only [bondSlice]
+    simp only [hbs]
     rw [hOnSite (ringSucc x) A Ψ (glueBond x a ρ),
       hOnSite (1 : Fin 2) A (bondSlice x Ψ ρ) a]
     apply Finset.sum_congr rfl
     intro t _
-    rw [show glueBond x a ρ (ringSucc x) = a 1 by simp [glueBond, hxy.symm],
+    rw [show glueBond x a ρ (ringSucc x) = a 1 by
+        simp [glueBond, glueTwoSitesS, hxy.symm],
       hglue_update_right]
     rfl
   have hSlicePair (A B : Matrix (Fin 3) (Fin 3) ℂ)
@@ -653,31 +666,14 @@ theorem bondSpin2ProjectionS_mulVec_eq_zero_iff_bondSlice_mem_ker
   · intro hslice
     funext q
     let a : Fin 2 → Fin 3 := ![q x, q (ringSucc x)]
-    have hglue : glueBond x a q = q := by
-      have hxy : x ≠ ringSucc x := by
-        intro h
-        have hv := congrArg Fin.val h
-        simp only [ringSucc] at hv
-        by_cases hx : x.val + 1 < L
-        · rw [Nat.mod_eq_of_lt hx] at hv
-          omega
-        · have heq : x.val + 1 = L := by omega
-          rw [heq, Nat.mod_self] at hv
-          omega
-      funext k
-      by_cases hkx : k = x
-      · subst k
-        simp [a, glueBond]
-      · by_cases hky : k = ringSucc x
-        · subst k
-          simp [a, glueBond, hxy.symm]
-        · simp [glueBond, hkx, hky]
+    have hglue : glueTwoSitesS x (ringSucc x) a q = q :=
+      glueTwoSitesS_eq_self q rfl rfl
     have haction :=
       congrFun (bondSlice_bondSpin2ProjectionS_mulVec hL x Φ q) a
     have hker := hslice q
     rw [LinearMap.mem_ker, Matrix.mulVecLin_apply] at hker
     rw [hker] at haction
-    simpa only [bondSlice, hglue, Pi.zero_apply] using haction
+    simpa only [bondSlice, twoSiteSliceS, hglue, Pi.zero_apply] using haction
 
 /-- **Tasaki Lemma 7.4 (local VBS ground-state characterization), PROVED.**  A state `Φ` of the
 `S = 1` chain is annihilated by the bond projection onto total spin 2 at the (periodic) bond

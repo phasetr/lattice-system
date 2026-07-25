@@ -1,11 +1,13 @@
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.SiteBlockEmbeddingD5b
+import LatticeSystem.Quantum.SpinS.TwoSiteConfig
 
 /-!
 # Two-site slices of finite spin configurations
 
-This module restricts a many-body coefficient vector to the fibre obtained by
-fixing every spectator site.  It also proves that a two-site block embedding
-acts independently on every such fibre.
+The restriction `twoSiteSliceS` of a many-body coefficient vector to the fibre
+obtained by fixing every spectator site is defined in
+`LatticeSystem.Quantum.SpinS.TwoSiteConfig`.  This module proves that a two-site
+block embedding acts independently on every such fibre.
 -/
 
 namespace LatticeSystem.Quantum
@@ -14,20 +16,6 @@ open Matrix
 open AKLTExactCertificateSector234Sequential
 
 variable {Λ : Type*} [DecidableEq Λ]
-
-/-- Replace the values at two distinct sites by a prescribed two-site
-configuration, leaving every spectator value unchanged. -/
-def glueTwoSitesS {N : ℕ} (x y : Λ)
-    (a : Fin 2 → Fin (N + 1)) (τ : Λ → Fin (N + 1)) :
-    Λ → Fin (N + 1) :=
-  fun k => if k = x then a 0 else if k = y then a 1 else τ k
-
-/-- The two-site coefficient slice obtained by fixing the spectator
-configuration `τ`. -/
-def twoSiteSliceS {N : ℕ} (x y : Λ)
-    (Φ : (Λ → Fin (N + 1)) → ℂ) (τ : Λ → Fin (N + 1)) :
-    (Fin 2 → Fin (N + 1)) → ℂ :=
-  fun a => Φ (glueTwoSitesS x y a τ)
 
 /-- Two-site gluing agrees with the fibre inverse used by `onEmbS`. -/
 private theorem glueTwoSitesS_eq_extend {N : ℕ} {x y : Λ}
@@ -145,15 +133,7 @@ theorem onEmbS_mulVec_eq_zero_iff_twoSiteSlices {N : ℕ} {x y : Λ}
     funext q
     let ι : Fin 2 → Λ := ![x, y]
     let a : Fin 2 → Fin (N + 1) := q ∘ ι
-    have hι : Function.Injective ι := injective_bondEmb hxy
-    have hglue : glueTwoSitesS x y a q = q := by
-      rw [glueTwoSitesS_eq_extend (hxy := hxy)]
-      funext k
-      by_cases hk : ∃ i, ι i = k
-      · obtain ⟨i, rfl⟩ := hk
-        rw [hι.extend_apply]
-        rfl
-      · rw [Function.extend_apply' _ _ _ hk]
+    have hglue : glueTwoSitesS x y a q = q := glueTwoSitesS_eq_self q rfl rfl
     have haction :=
       congrFun (twoSiteSliceS_onEmbS_mulVec hxy A Φ q) a
     rw [hslice q] at haction
