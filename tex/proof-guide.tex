@@ -11919,6 +11919,12 @@ $\hat S_0\!\cdot\!\hat S_1=\tfrac12(\hat S^+\!\otimes\hat S^-+\hat S^-\!\otimes\
 \texttt{spinSDot\_fin2\_apply'} --- are model-independent linear algebra and are stated in the
 shared module \texttt{Quantum/SpinS/SpinOneTwoSiteEntries.lean}, so that the Knabe-type finite-size
 gap estimates of §7.1 can reuse them without duplicating any declaration.
+Likewise, the underlying gluing combinatorics --- overwriting a spectator configuration at two
+sites (\texttt{glueTwoSitesS}), the resulting two-site coefficient slice
+(\texttt{twoSiteSliceS}), and the identity \texttt{glueTwoSitesS\_eq\_self} recording that gluing a
+configuration with its own values at those two sites is the identity --- are hoisted into the leaf
+module \texttt{Quantum/SpinS/TwoSiteConfig.lean}, with \texttt{glueBond} and \texttt{bondSlice}
+kept as thin specializations to the periodic-chain bond $\{x,\mathrm{ringSucc}\,x\}$.
 
 \medskip
 \noindent\textbf{§7.1.4 Knabe's argument for the AKLT gap} (Tasaki, 1st ed. (2020), §7.1.4,
