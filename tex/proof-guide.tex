@@ -13465,11 +13465,15 @@ has the Marshall sign structure
   Marshall-positive sector-supported eigenvectors at the same $\mu$.
 \end{enumerate}
 
-\textbf{Lean entry point}:
-\texttt{LatticeSystem/Quantum/SpinS/MagSectorEmbedding.lean},
-theorem
-\texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full}
-(\#869).
+\textbf{Lean entry point}: the outline above is packaged in Lean as a single
+bundled theorem, namely
+\texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full},
+which PR~\#869 introduced and which is carried today, in the
+\texttt{h\_intermediate}-free structural form of PR~\#3891, by the module
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23StructuralMLMFull.lean}.  The
+sector~$\leftrightarrow$~full-Hilbert-space lift lemmas that this module imports
+for the last item of the outline are in
+\texttt{LatticeSystem/Quantum/SpinS/MagSectorEmbedding.lean}.
 
 \subsection*{Removed chronicle: the \texorpdfstring{$\gamma$-4}{gamma-4} step
              log for Tasaki §2.5 Theorem 2.3, unbalanced case}
@@ -13481,11 +13485,12 @@ Theorem~2.3 in the unbalanced case $|A| \neq |B|$ (H.~Tasaki, \emph{Physics and
 Mathematics of Quantum Many-Body Systems}, Springer 2020, §2.5 Theorem~2.3,
 p.~42).  It consisted of 218 individual ``Step~$n$ (PR~\#\dots)'' entries, one
 per merged pull request, one summary entry for Steps~219--261
-(PRs~\#3012--\#3054), and 57 further run-in bold headings for the threading
-layers that came after, recording the conditional wrappers, callback-threaded
-energy-interval chains, predecessor-coefficient lemmas, lowered and raised
-site-sum dominance sources, and toy-Hamiltonian predicted-ground-state layers
-of that development.
+(PRs~\#3012--\#3054), and 57 further run-in bold headings: the \textbf{Goal}
+statement that opened the subsection ahead of Step~1, and 56 headings for the
+threading layers that came after the Step entries, recording the conditional
+wrappers, callback-threaded energy-interval chains, predecessor-coefficient
+lemmas, lowered and raised site-sum dominance sources, and toy-Hamiltonian
+predicted-ground-state layers of that development.
 
 \textbf{Why it is gone.}  The chronicle carried 226 distinct \texttt{.lean} file
 references, of which 194 name files that no longer exist, and every one of those
@@ -13517,7 +13522,9 @@ modules ended in ``etc.''.  Four wildcard patterns were used as well:
 and the suffix-less \texttt{LatticeSystem.Quantum.SpinS.Theorem23*} and
 \texttt{Theorem23Structural*}, which do match surviving modules.
 
-\textbf{What this note does \emph{not} say.}  The removal is stated
+\textbf{What this note does \emph{not} say.}  The Phase-C removal --- the one
+performed by commit \texttt{7b65d59e}, not either of the other two removals named
+above, commits \texttt{f7947dfc} and \texttt{f91a7f26} --- is stated
 extensionally: it covers exactly those modules of the chronicle that commit
 \texttt{7b65d59e} deleted, and that commit's diff is the authoritative list.  It
 is not a claim about any name family.  Deleted wrappers shared name stems with
