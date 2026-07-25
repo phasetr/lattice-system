@@ -12,8 +12,8 @@ set_option linter.unusedVariables false
 Core (foundational) layer: the sublattice spin operators, total-spin
 decomposition, Hermiticity, cross-sublattice commutativity, the sublattice
 SU(2) algebra, and the sublattice Casimir self-invariance / inter-sublattice /
-total-spin commutation results.  The sublattice ladder operators, Cartan
-relations, edge cases, and reverse identities are in `SublatticeSpin`.
+total-spin commutation results.  The sublattice ladder operators and the
+Cartan relations are in `SublatticeSpin`.
 -/
 
 namespace LatticeSystem.Quantum

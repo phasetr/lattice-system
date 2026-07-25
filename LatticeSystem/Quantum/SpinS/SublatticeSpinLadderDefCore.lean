@@ -7,9 +7,8 @@ Foundational layer extracted from `SublatticeSpinLadderDef.lean` for build speed
 This file defines the sublattice ladder operators (raising / lowering on a sublattice `A`)
 and proves the sublattice Cartan relations among them.
 
-The empty/full sublattice edge cases, the reverse identities, and the sublattice axis
-squared as a `conjTranspose` product are kept in the capstone module
-`SublatticeSpinLadderDef.lean`.
+The sublattice axis squared as a `conjTranspose` product is kept in the capstone
+module `SublatticeSpinLadderDef.lean`.
 -/
 
 namespace LatticeSystem.Quantum
