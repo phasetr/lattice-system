@@ -30,17 +30,6 @@ open LatticeSystem.Quantum LatticeSystem.Math
 
 variable {L : ℕ}
 
-/-- On a chain of length `> 1` the cyclic successor `ringSucc x = x + 1 (mod L)` of a site differs
-from the site itself, so the bond `{x, ringSucc x}` is genuinely two-site. -/
-theorem ne_ringSucc (hL : 1 < L) (x : Fin L) : x ≠ ringSucc x := by
-  intro h
-  have hv := congrArg Fin.val h
-  simp only [ringSucc] at hv
-  by_cases hx : x.val + 1 < L
-  · rw [Nat.mod_eq_of_lt hx] at hv; omega
-  · have heq : x.val + 1 = L := by omega
-    rw [heq, Nat.mod_self] at hv; omega
-
 variable (x : Fin L)
 
 /-- The bond embedding `emb : Fin 2 × Fin 2 → Fin L × Fin 2` sending the local left site `0 ↦ x`

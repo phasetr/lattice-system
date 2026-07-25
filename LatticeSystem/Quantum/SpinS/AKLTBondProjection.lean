@@ -42,6 +42,17 @@ the periodic bond `{x, x+1}`. -/
 def ringSucc (x : Fin L) : Fin L :=
   ⟨(x.val + 1) % L, Nat.mod_lt _ x.pos⟩
 
+/-- On a chain of length `> 1` the cyclic successor `ringSucc x = x + 1 (mod L)` of a site differs
+from the site itself, so the bond `{x, ringSucc x}` is genuinely two-site. -/
+theorem ne_ringSucc (hL : 1 < L) (x : Fin L) : x ≠ ringSucc x := by
+  intro h
+  have hv := congrArg Fin.val h
+  simp only [ringSucc] at hv
+  by_cases hx : x.val + 1 < L
+  · rw [Nat.mod_eq_of_lt hx] at hv; omega
+  · have heq : x.val + 1 = L := by omega
+    rw [heq, Nat.mod_self] at hv; omega
+
 /-- The **bond projection onto total spin 2** `P̂₂[Ŝ_x + Ŝ_y]` for two adjacent `S = 1` spins, as
 the polynomial `½ (Ŝ_x · Ŝ_y) + ⅙ (Ŝ_x · Ŝ_y)² + ⅓` in the bond Heisenberg operator (the inverse of
 the affine identity (7.1.5)). -/
@@ -505,16 +516,7 @@ theorem bondSlice_bondSpin2ProjectionS_mulVec
     (hL : 1 < L) (x : Fin L) (Φ : (Fin L → Fin 3) → ℂ) (τ : Fin L → Fin 3) :
     bondSlice x ((bondSpin2ProjectionS x (ringSucc x)).mulVec Φ) τ =
       (bondSpin2ProjectionS (0 : Fin 2) 1).mulVec (bondSlice x Φ τ) := by
-  have hxy : x ≠ ringSucc x := by
-    intro h
-    have hv := congrArg Fin.val h
-    simp only [ringSucc] at hv
-    by_cases hx : x.val + 1 < L
-    · rw [Nat.mod_eq_of_lt hx] at hv
-      omega
-    · have heq : x.val + 1 = L := by omega
-      rw [heq, Nat.mod_self] at hv
-      omega
+  have hxy : x ≠ ringSucc x := ne_ringSucc hL x
   have hOnSite {ι : Type} [Fintype ι] [DecidableEq ι]
       (i : ι) (A : Matrix (Fin 3) (Fin 3) ℂ)
       (Ψ : (ι → Fin 3) → ℂ) (q : ι → Fin 3) :
@@ -654,16 +656,7 @@ theorem bondSpin2ProjectionS_mulVec_eq_zero_iff_bondSlice_mem_ker
     funext q
     let a : Fin 2 → Fin 3 := ![q x, q (ringSucc x)]
     have hglue : glueBond x a q = q := by
-      have hxy : x ≠ ringSucc x := by
-        intro h
-        have hv := congrArg Fin.val h
-        simp only [ringSucc] at hv
-        by_cases hx : x.val + 1 < L
-        · rw [Nat.mod_eq_of_lt hx] at hv
-          omega
-        · have heq : x.val + 1 = L := by omega
-          rw [heq, Nat.mod_self] at hv
-          omega
+      have hxy : x ≠ ringSucc x := ne_ringSucc hL x
       funext k
       by_cases hkx : k = x
       · subst k
