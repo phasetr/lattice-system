@@ -1,23 +1,36 @@
 import LatticeSystem.Quantum.SpinS.MultiSiteCasimirCore
 
 /-!
-# Multi-site spin-`S` Casimir decomposition (Tasaki §2.4 / §2.5 setup)
+# Two-site Casimir-to-bond eigenvalue conversion (Tasaki §2.4 / §2.5 setup)
 
-This file proves the **diagonal/off-diagonal decomposition** of the
-total spin-`S` Casimir `(Ŝ_tot)²` on the multi-site Hilbert space:
+This file converts `(Ŝ_tot)²`-eigenvectors into `Ŝ_0 · Ŝ_1`-eigenvectors
+on the two-site (`Λ = Fin 2`) spin-`S` Hilbert space, using the solved
+operator identity
+
+  `Ŝ_0 · Ŝ_1 = (1/2) · (Ŝ_tot)² − (N(N+2)/4) · 1`
+
+of `spinSDot_fin_two_eq`. The three theorems proved here are:
+
+* `spinSDot_fin_two_mulVec_of_totalSpinSSquared_eigenvec`: every
+  `(Ŝ_tot)²`-eigenvector at `λ` is an `Ŝ_0 · Ŝ_1`-eigenvector at
+  `λ/2 − N(N+2)/4`;
+* `smul_spinSDot_fin_two_mulVec_of_totalSpinSSquared_eigenvec`: hence
+  it is a `J • (Ŝ_0 · Ŝ_1)`-eigenvector at `J · (λ/2 − N(N+2)/4)` for
+  any coupling `J : ℂ`;
+* `spinSDot_fin_two_mulVec_of_totalSpinSSquared_zero`: the singlet
+  case `λ = 0` gives eigenvalue `−N(N+2)/4 = −S(S+1)`, the
+  operator-level form of Tasaki Problem 2.5.a in the single-bond
+  (`z = 1`) case.
+
+The underlying **diagonal/off-diagonal decomposition**
 
   `(Ŝ_tot)² = Σ_x (Ŝ_x · Ŝ_x) + Σ_{x ≠ y} (Ŝ_x · Ŝ_y)
            = |Λ| · (N(N+2)/4) · 1 + Σ_{x ≠ y} (Ŝ_x · Ŝ_y)`
 
-starting from the existing identity
-`totalSpinSSquared_eq_sum_spinSDot`. Specialising to `Λ = Fin 2`
-gives the **two-site Casimir-Heisenberg identity**
-
-  `(Ŝ_tot)² = (N(N+2)/2) · 1 + 2 · (Ŝ_0 · Ŝ_1)`
-
-which solves for `Ŝ_0 · Ŝ_1` as a polynomial in `(Ŝ_tot)²` — the
-operator-level form of Tasaki Problem 2.5.a in the single-bond
-(`z = 1`) case.
+and its `Λ = Fin 2` specialisation
+`(Ŝ_tot)² = (N(N+2)/2) · 1 + 2 · (Ŝ_0 · Ŝ_1)` are **not** in this
+file: they live in the imported `MultiSiteCasimirCore.lean`, split out
+for build speed by PR #4696.
 
 Tracked as part of Tasaki §2.5 spin-`S` infrastructure (Issue #412).
 -/
