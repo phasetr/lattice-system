@@ -69,6 +69,25 @@ The companion page
 gives the per-sub-file overview table for the
 `LatticeSystem/Fermion/JordanWigner/` re-export hub.
 
+### Deleted routes: what this index used to document
+
+Three abandoned proof routes had one index row per declaration.  Their modules
+were deleted, so the rows described declarations and files that no longer
+exist; the 590 affected rows were removed (PR #5143, issue #5140).  What was
+there, and how it went away:
+
+| Route the rows described | Heading they sat under | Removed by |
+|---|---|---|
+| Later γ-4 layers: predicted ground-state subspace and minimum energy of the bipartite toy model (`bipartiteToyGroundStateSubspacePredicted*`, `bipartiteToyMinEnergyPredicted*`, `bipartiteImbalanceWeight*`), Néel-state toy-Hamiltonian expectations (`neelStateOfS*`, `heisenbergToyHamiltonianS*`) and their spin-`1/2` mirrors (`neelStateOf*`) | Total spin operator (Tasaki §2.2 eq. (2.2.7), (2.2.8)) — 540 rows | PR #3919 (`7b65d59e`, "delete 525 orphan modules, 35,002 lines"): 480 of the 482 modules those rows named; the other 2 paths are files that still exist |
+| Callback-threaded `Theorem23*` chain toward `tasaki_2_5_theorem_2_3` (energy-interval chains, lowering/raising predecessor coefficients, joint cross-ladder wrappers) | Spin-`S` Marshall–Lieb–Mattis on the magnetization sector (Tasaki §2.5 Theorem 2.2 generic S, sector form) — 25 rows | PR #3645 (`f7947dfc`, "delete unsound saturated-ladder Theorem 2.3 route", 40 wrapper modules) for 8 modules; PR #3919 for the other 14 |
+| Saturated ferromagnetic ladder-iterate state (`ladderIterateUp_*`, `allAlignedStateS` / `totalSpinSOp{Plus,Minus}` expectation variants, `saturatedFerromagnetJointEigenspace*`) | Spin-`S` saturated ferromagnetic state (Tasaki §2.4 generalised) — 25 rows | PR #3919, all 25 modules |
+
+The surviving parts keep their rows: the earlier γ-4 steps (sublattice
+operators, sublattice Casimir, SU(2) commutation) and the sound per-sector
+Perron–Frobenius route to `tasaki_2_5_theorem_2_3`.  Deleted names of the form
+`tasaki_2_5_theorem_2_3_of_..._threaded_...` belonged to the abandoned route
+and are not the live capstone `tasaki_2_5_theorem_2_3`.
+
 ## Roadmap
 
 | Phase | Scope | Status |
