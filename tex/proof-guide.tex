@@ -13487,19 +13487,35 @@ energy-interval chains, predecessor-coefficient lemmas, lowered and raised
 site-sum dominance sources, and toy-Hamiltonian predicted-ground-state layers
 of that development.
 
-\textbf{Why it is gone.}  The chronicle named 226 Lean modules, of which 194 no
-longer exist, and every one of those 194 was removed by a single commit:
-PR~\#3919, commit \texttt{7b65d59e}, a Phase-C refactor that deleted 525 orphan
-modules and 35{,}002 lines of dead code in one step.  The chronicle therefore
-described files and declarations that are gone, and all 194 of its unresolved
-file references were stale.  The other 32 modules it named do still exist.  Of
-those, 31 carry declarations and are still represented in the per-declaration
-index \texttt{docs/index.md}; the remaining one is \texttt{LatticeSystem.lean},
-the import-graph root, which declares nothing and therefore has no index row of
-its own.  Besides those 226 named modules the chronicle also used two wildcard
-patterns, \texttt{BipartiteToyMinEnergyPredicted*.lean} and
-\texttt{NeelStateOfSExpectation*.lean}; neither matches any file that exists
-today, so no surviving module goes unaccounted for by the count above.
+\textbf{Why it is gone.}  The chronicle carried 226 distinct \texttt{.lean} file
+references, of which 194 name files that no longer exist, and every one of those
+194 was removed by a single commit: PR~\#3919, commit \texttt{7b65d59e}, a
+Phase-C refactor that deleted 525 orphan modules and 35{,}002 lines of dead code
+in one step.  The chronicle therefore described files and declarations that are
+gone, and all 194 of those unresolved file references were stale.  The other 32
+references name files that do still exist.  Of those 32, 31 carry declarations
+that the per-declaration index \texttt{docs/index.md} still lists by declaration
+name (that index is keyed by declaration, so it does not spell out a file name on
+every row); the remaining one is \texttt{LatticeSystem.lean}, the import-graph
+root, which declares nothing and therefore has no index row of its own.
+
+\textbf{What that 226 is a count of.}  It counts \texttt{.lean} file references,
+so modules the chronicle named without that suffix are outside it.  In dotted
+module form it named four modules under \texttt{LatticeSystem.Quantum.SpinS},
+namely \texttt{Theorem23Final}, \texttt{Theorem23FinalLoweredSiteSum},
+\texttt{Theorem23FinalLoweredSiteSumLeft} and
+\texttt{Theorem23FinalLoweredMarshall}; these are four of the 40 modules of the
+unsound route that PR~\#3645, commit \texttt{f7947dfc}, removed, on which see
+below.  By bare module stem it named \texttt{Theorem23} and four modules of the
+predicted-Casimir threading chain, all five deleted by PR~\#3922, commit
+\texttt{f91a7f26}; and it named \texttt{Theorem23Predicted} and
+\texttt{Theorem23PredictedEndpoint}, which still exist.  Its suffix-less naming
+is not a closed enumeration either: its own list of the pruned predicted-Casimir
+modules ended in ``etc.''.  Four wildcard patterns were used as well:
+\texttt{BipartiteToyMinEnergyPredicted*.lean} and
+\texttt{NeelStateOfSExpectation*.lean}, which match no file that exists today,
+and the suffix-less \texttt{LatticeSystem.Quantum.SpinS.Theorem23*} and
+\texttt{Theorem23Structural*}, which do match surviving modules.
 
 \textbf{What this note does \emph{not} say.}  The removal is stated
 extensionally: it covers exactly those modules of the chronicle that commit
@@ -13543,7 +13559,10 @@ coupling} (p.~\pageref{subsec:tasaki-2-5-theorem-2-3-toy-done}): the sound
 Perron--Frobenius route for the standard bipartite coupling, and, for a general
 bipartite $J$ positive on the complete bipartite graph, the sorry-free capstone
 \texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_bipartiteCompletePositive}, which
-carries no \texttt{hOutside} hypothesis.  The Theorem~2.2
+carries no \texttt{hOutside} hypothesis but does keep the canonical orientation
+\(|\bar A|\le|A|\), a non-empty $\bar A$ with $N\ge1$, and a constant
+$c_{\rm toy}$ strictly above every diagonal entry of the dressed toy-coupling
+matrix.  The Theorem~2.2
 sector statement is the preceding subsection, \emph{Marshall--Lieb--Mattis
 Theorem 2.2 (Tasaki §2.5) --- formalisation outline}.  The per-declaration index
 of everything that survives is \texttt{docs/index.md} itself.  Which of its rows
