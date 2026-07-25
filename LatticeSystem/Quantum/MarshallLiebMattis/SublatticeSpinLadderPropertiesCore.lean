@@ -1,3 +1,4 @@
+import LatticeSystem.Quantum.MagnetizationSubspaceCore
 import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeSpin
 
 /-!
