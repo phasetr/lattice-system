@@ -90,10 +90,20 @@ every one of those stems (`bipartiteToyGroundStateSubspacePredicted`,
 `bipartiteToyMinEnergyPredicted`, `bipartiteImbalanceWeight`, `neelStateOf`,
 `neelStateOfS`, `heisenbergToyHamiltonianS`, `ladderIterateUp`,
 `allAlignedStateS`, `totalSpinSOpPlus`/`totalSpinSOpMinus`,
-`saturatedFerromagnetJointEigenspace`, and the `Theorem23*` module family) is
-still a live declaration prefix with surviving variants, and those survivors
-keep their own rows in this index — for `ladderIterateUp_*` the survivors are
-even the majority.  Only the variants enumerated above are gone.  Likewise,
+`saturatedFerromagnetJointEigenspace`) is still a live declaration prefix with
+surviving variants, and the `Theorem23*` module family is still 56 live modules
+under `Quantum/SpinS/` (no declaration name carries that prefix).  Most of those
+survivors keep their own rows in this index, but not all: of the 201 live
+public declarations under the declaration stems just listed, 158 are named
+verbatim in some row's first column, two only inside another row's prose, one
+only inside the stem list just given, and 40 are named verbatim nowhere in this
+file, though some of that last group are still named indirectly inside this
+file's own abbreviated forms (brace families such as `_totalSpinSOp{1,2,3}` and
+suffix elisions such as `/ _sq`).
+For `ladderIterateUp_*` the survivors are even the
+majority of the stem's variants: of the 17 declarations with that prefix that
+the tree held before these deletions, 11 are still present.  Only the variants
+enumerated above are gone.  Likewise,
 deleted names of the form `tasaki_2_5_theorem_2_3_of_..._threaded_...` belonged
 to the abandoned route and are not the live capstone `tasaki_2_5_theorem_2_3`.
 
