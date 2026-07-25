@@ -91,9 +91,14 @@ every one of those stems (`bipartiteToyGroundStateSubspacePredicted`,
 `neelStateOfS`, `heisenbergToyHamiltonianS`, `ladderIterateUp`,
 `allAlignedStateS`, `totalSpinSOpPlus`/`totalSpinSOpMinus`,
 `saturatedFerromagnetJointEigenspace`, and the `Theorem23*` module family) is
-still a live declaration prefix with surviving variants, and those survivors
-keep their own rows in this index — for `ladderIterateUp_*` the survivors are
-even the majority.  Only the variants enumerated above are gone.  Likewise,
+still a live declaration prefix with surviving variants.  Most of those
+survivors keep their own rows in this index, but not all: of the 201 live
+public declarations under the declaration stems just listed, 158 are named in
+some row's first column, three only inside another row's prose, and 40 are not
+named in this file at all.  For `ladderIterateUp_*` the survivors are even the
+majority of the stem's variants: of the 17 declarations with that prefix that
+the tree held before these deletions, 11 are still present.  Only the variants
+enumerated above are gone.  Likewise,
 deleted names of the form `tasaki_2_5_theorem_2_3_of_..._threaded_...` belonged
 to the abandoned route and are not the live capstone `tasaki_2_5_theorem_2_3`.
 
