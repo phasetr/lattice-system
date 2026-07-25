@@ -16065,107 +16065,6 @@ $\texttt{joint} = \texttt{span}(\texttt{ladderIterateUp})$ and hence
 $\dim_\mathbb{C}(\texttt{joint}) = 2m_{\max} + 1$, completing
 Tasaki §2.4 Theorem 2.1.
 
-\textbf{Ladder span finrank (PR~\#904)}: the new file
-\texttt{Quantum/SpinS/SaturatedLadderSpan.lean} applies mathlib's
-\texttt{finrank\_span\_eq\_card} to the LI family of \#896,
-yielding
-\texttt{ladderIterateUp\_span\_finrank\_eq\_succ\_card\_mul\_N}:
-$\dim_\mathbb{C} \texttt{Submodule.span} = |V|\cdot N + 1 =
-2m_{\max} + 1$. The span is contained in the joint eigenspace
-of \#903 via \texttt{Submodule.span\_le}.
-
-\textbf{Finrank-equality corollary (PR~\#2769)}: in
-\texttt{Quantum/SpinS/SaturatedLadderSpan.lean},
-\texttt{saturatedFerromagnetJointEigenspace\_finrank\_eq} promotes
-the lower bound of \#903 to the operator-level equality
-$\dim_\mathbb{C}(\texttt{joint J N}) = |V|\cdot N + 1 = 2m_{\max}+1$
-by rewriting through \#2768's \texttt{\_eq\_span\_ladderIterateUp}
-and applying the span-finrank result of \#904. Identifies the
-saturated-ferromagnet joint eigenspace as the unique
-$(2m_{\max}+1)$-dimensional irreducible $SU(2)$ representation at
-the operator level.
-
-\textbf{$\hat S^-_{\rm tot}$ invariance (PR~\#2770)}: the new file
-\texttt{Quantum/SpinS/SaturatedLadderLoweringInvariant.lean} adds
-the operational lowering-side $su(2)$ statement.
-Per-iterate action:
-\texttt{totalSpinSOpMinus\_mulVec\_ladderIterateUp\_interior} gives
-$\hat S^-_{\rm tot}\cdot\texttt{ladderIterateUp V N }k =
-\texttt{ladderIterateUp V N }\langle k+1, \cdot\rangle$ for $k+1 <
-|V|\cdot N + 1$ (definitionally from the iterate definition plus
-$\texttt{pow\_succ'}$);
-\texttt{totalSpinSOpMinus\_mulVec\_ladderIterateUp\_last} gives
-$\hat S^-_{\rm tot}\cdot\texttt{ladderIterateUp V N }(\texttt{Fin.last})
-= 0$ (boundary annihilation via \#905). Lifted via
-\texttt{Submodule.map\_span} + \texttt{Submodule.span\_le} on
-\#2768's $\texttt{joint} = \texttt{span}(\texttt{ladderIterateUp})$
-to the global invariance
-$\texttt{Submodule.map}\,\hat S^-_{\rm tot}.\texttt{mulVecLin}\,
-(\texttt{joint J N}) \le \texttt{joint J N}$. Combined with the
-finrank equality of \#2769 and the raising-side annihilation of
-\#907, this identifies the joint eigenspace as the
-$(2m_{\max}+1)$-dimensional spin-$m_{\max}$ representation of
-$su(2)$ under the total-spin generators.
-
-\textbf{$\hat S^+_{\rm tot}$ invariance (PR~\#2771)}: the new file
-\texttt{Quantum/SpinS/SaturatedLadderRaisingInvariant.lean}
-completes the operational $su(2)$ statement on the raising side.
-Per-iterate action:
-\texttt{totalSpinSOpPlus\_mulVec\_ladderIterateUp\_zero} gives
-$\hat S^+_{\rm tot}\cdot\texttt{ladderIterateUp V N }\langle 0,
-\cdot\rangle = 0$ (top-weight annihilation, via PR \#877's
-\texttt{totalSpinSOpPlus\_mulVec\_allAlignedStateS\_zero});
-\texttt{totalSpinSOpPlus\_mulVec\_ladderIterateUp\_succ} gives
-$\hat S^+_{\rm tot}\cdot\texttt{ladderIterateUp V N }\langle j+1,
-\cdot\rangle = ((j+1)\cdot(|V|\cdot N - j))\cdot
-\texttt{ladderIterateUp V N }\langle j, \cdot\rangle$ (Casimir-
-rearrangement scalar identity from PRs \#882, \#887, \#894 packaged
-as
-\texttt{totalSpinSOpPlus\_mulVec\_totalSpinSOpMinus\_pow\_succ\_allAlignedStateS\_zero}).
-Lifted via the same
-\texttt{Submodule.map\_span} + \texttt{Submodule.span\_le} pattern
-of PR \#2770 to the global invariance
-$\texttt{Submodule.map}\,\hat S^+_{\rm tot}.\texttt{mulVecLin}\,
-(\texttt{joint J N}) \le \texttt{joint J N}$. Together with
-\#2770, this establishes invariance of \texttt{joint J N} under
-both $su(2)$ ladder generators, completing the operational
-identification with the $(2m_{\max}+1)$-dim spin-$m_{\max}$
-irreducible representation.
-
-\textbf{Full Cartesian $su(2)$ closure (PR~\#2772)}: the new file
-\texttt{Quantum/SpinS/SaturatedLadderCartesianInvariant.lean}
-completes the operational $su(2)$-module structure of the
-saturated joint eigenspace. Two total-operator identities lift the
-single-site definitions of \texttt{spinSOp1} / \texttt{spinSOp2}:
-$\hat S^{(1)}_{\rm tot} = (1/2)(\hat S^+_{\rm tot} +
-\hat S^-_{\rm tot})$
-(\texttt{totalSpinSOp1\_eq\_one\_half\_smul\_plus\_add\_minus}) and
-$\hat S^{(2)}_{\rm tot} = (1/(2 i))(\hat S^+_{\rm tot} -
-\hat S^-_{\rm tot})$
-(\texttt{totalSpinSOp2\_eq\_one\_over\_two\_I\_smul\_plus\_sub\_minus}),
-both via \texttt{onSiteS\_smul} + \texttt{onSiteS\_add/sub}.
-The $\hat S^{(1)}_{\rm tot}$ and $\hat S^{(2)}_{\rm tot}$
-invariances
-(\texttt{saturatedFerromagnetJointEigenspace\_totalSpinSOp\{1,2\}\_invariant})
-reduce via these decompositions to the ladder invariances of PRs
-\#2770 / \#2771 plus submodule add/sub/smul closure. The
-$\hat S^{(3)}_{\rm tot}$ case
-(\texttt{saturatedFerromagnetJointEigenspace\_totalSpinSOp3\_invariant})
-is independent: each ladder iterate is an
-$\hat S^z_{\rm tot}$-eigenvector at eigenvalue $m_{\max}-k$
-(\texttt{ladderIterateUp\_mem\_eigenspace}), so its
-$\hat S^z_{\rm tot}$-image is a scalar multiple of the same
-iterate, still in $\texttt{span}(\texttt{ladderIterateUp}) =
-\texttt{joint J N}$ (\#2768). The three together establish
-invariance under all $su(2)$ generators acting through the
-total-spin operators, completing the operational identification of
-the saturated joint eigenspace with the $(2m_{\max}+1)$-dim
-irreducible representation of $su(2)$ at top weight $m_{\max}$.
-This finishes the operational closure of Tasaki §2.4 Theorem 2.1
-on top of \#2768 (joint = span ladder), \#2769 (finrank
-$= 2m_{\max}+1$), \#2770 ($\hat S^-_{\rm tot}$ invariance), and
-\#2771 ($\hat S^+_{\rm tot}$ invariance).
-
 \textbf{Boundary annihilation (PR~\#905)}: the new file
 \texttt{Quantum/SpinS/LadderBoundaryAnnihilation.lean} caps the
 ladder at exactly $2m_{\max}+1$ non-zero terms by proving
@@ -16200,38 +16099,6 @@ diagonality of $\hat S^z_{\rm tot}$, this yields
 \{$|\sigma_{\top/\bot}\rangle$\}}. Analytic counterpart of PR \#885's
 combinatorial cardinality.
 
-\textbf{Maximal-lowering iterate identification (PR~\#909)}: the new
-file \texttt{Quantum/SpinS/LadderBottom.lean} combines PR \#887's
-eigenvalue identity at $k = |V|\cdot N$ ($-m_{\max}$ eigenvalue)
-with PR \#908's extremal subspace identification, giving
-\texttt{totalSpinSOpMinus\_pow\_card\_mul\_N\_allAlignedStateS\_zero\_eq\_smul\_last}:
-there exists a non-zero $c\in\mathbb{C}$ with
-$(\hat S^-_{\rm tot})^{|V|\cdot N}\,|\sigma_\top\rangle =
-c\,|\sigma_\bot\rangle$. Non-vanishing of $c$ uses PR \#895.
-A symmetric span-membership statement is provided for the raising
-side; the non-zero scalar version is in PR \#910.
-
-\textbf{Symmetric inductive non-vanishing for raising side
-(PR~\#910)}: the new file
-\texttt{Quantum/SpinS/IterateInductiveNonvanishingPlus.lean} mirrors
-PR \#895 using PR \#894's MinusPlus Casimir rearrangement
-$\hat S^- \hat S^+ = \hat S_{\rm tot}^2 - (\hat S^z_{\rm tot})^2 -
-\hat S^z_{\rm tot}$. The same eigenvalue scalar $(k+1)(2m_{\max}-k)$
-arises with the raising-side $\hat S^z_{\rm tot}$ eigenvalue
-$-m_{\max}+k$ (PR \#887 raising side), giving
-\texttt{totalSpinSOpPlus\_pow\_allAlignedStateS\_last\_ne\_zero} for
-$k\leq|V|\cdot N$ and the non-zero scalar identification
-\texttt{totalSpinSOpPlus\_pow\_card\_mul\_N\_allAlignedStateS\_last\_eq\_smul\_zero}.
-
-\textbf{Round-trip identity (PR~\#912)}: the new file
-\texttt{Quantum/SpinS/LadderRoundTrip.lean} composes \#909 (lowering
-reaches $c_1\,|\sigma_\bot\rangle$) with \#910 (raising from
-$|\sigma_\bot\rangle$ reaches $c_2\,|\sigma_\top\rangle$) to give
-\texttt{totalSpinSOpPlus\_pow\_mulVec\_totalSpinSOpMinus\_pow\_allAlignedStateS\_zero\_eq\_smul}:
-the round-trip $(\hat S^+_{\rm tot})^{|V|\cdot N}\,(\hat S^-_{\rm tot})^{|V|\cdot N}\,|\sigma_\top\rangle$
-returns to a non-zero $c_1c_2\cdot|\sigma_\top\rangle$. The
-saturated-ferromagnet ladder closes on itself.
-
 \textbf{Expectation values on all-aligned states (PR~\#913)}: the new
 file \texttt{Quantum/SpinS/AllAlignedStateExpectations.lean} computes
 the inner-product expectation values
@@ -16247,38 +16114,6 @@ the explicit $J = m_{\max}$ quantum numbers.
 the off-diagonal case: distinct configurations $\sigma\neq\tau$
 give orthogonal basis vectors. Bundled in Kronecker form
 \texttt{basisVecS\_inner\_kronecker}.
-
-\textbf{Ladder iterate expectation values (PR~\#915)}: the new file
-\texttt{Quantum/SpinS/IterateExpectations.lean} packages the
-eigenvalue identities (\#881 H, \#882 Casimir, \#887 $\hat S^z$)
-into the inner-product form
-$\langle v_k, A\,v_k\rangle = \alpha\,\langle v_k, v_k\rangle$ for
-each iterate $v_k = (\hat S^-_{\rm tot})^k\,|\sigma_\top\rangle$ and
-$A\in\{\hat S^z_{\rm tot}, \hat S_{\rm tot}^2, H\}$ with the
-corresponding eigenvalue $\alpha$.
-
-\textbf{basisVecS spans + linearly independent (PR~\#917)}: the new
-file \texttt{Quantum/SpinS/BasisVecSBasis.lean} proves
-\texttt{basisVecS\_span\_eq\_top} (via
-\texttt{fun\_eq\_sum\_smul\_basisVecS}) and
-\texttt{basisVecS\_linearIndependent} (via pointwise evaluation of
-zero-sums). These structural facts identify
-\texttt{basisVecS} as a basis of the multi-site Hilbert space.
-
-\textbf{Multi-site dimension formula (PR~\#918)}: the new file
-\texttt{Quantum/SpinS/MultiSiteFinrank.lean} proves
-\texttt{multiSiteSpinS\_finrank}: $\dim_\mathbb{C} ((V \to
-\textsf{Fin}\,(N+1)) \to \mathbb{C}) = (N+1)^{|V|}$. Direct from
-mathlib's \texttt{Module.finrank\_fintype\_fun\_eq\_card} +
-\texttt{Fintype.card\_fun} + \texttt{Fintype.card\_fin}. The
-standard quantum-mechanical dimension formula $(2S+1)^{|\Lambda|}$.
-
-\textbf{basisSpinS as Module.Basis (PR~\#919)}: the new file
-\texttt{Quantum/SpinS/BasisSpinS.lean} bundles \#917 into a
-\texttt{Module.Basis (V $\to$ Fin (N+1)) $\mathbb{C}$
-((V $\to$ Fin (N+1)) $\to$ $\mathbb{C}$)} via
-\texttt{Module.Basis.mk}, with the apply equality
-\texttt{basisSpinS V N $\sigma$ = basisVecS $\sigma$}.
 
 \textbf{Universal single-site Casimir expectation (PR~\#920)}: the
 new file \texttt{Quantum/SpinS/SingleSiteCasimirExpectation.lean}
@@ -17020,47 +16855,6 @@ configuration $\sigma$ (transverse operators are purely off-diagonal,
 the saturated-ferromagnet $|c..c\rangle$ has per-axis spin profile
 $(0, 0, N/2-c)$ — only the z-component is non-zero.
 
-\textbf{Singlet correlation sum (PR~\#929)}: the new file
-\texttt{Quantum/SpinS/SingletCorrelationSum.lean} proves that for
-any singlet state $\Phi$ ($\hat{S}_{\rm tot}^2\,\Phi = 0$),
-$\sum_{x, y}\langle\Phi, \hat{S}_x\cdot\hat{S}_y\,\Phi\rangle = 0$.
-Direct combination of \texttt{totalSpinSSquared\_eq\_sum\_spinSDot}
-with \texttt{Matrix.sum\_mulVec} + \texttt{dotProduct\_sum} linearity
-and \texttt{dotProduct\_zero}.
-
-\textbf{Universal correlation = Casimir expectation (PR~\#930)}:
-the new file \texttt{Quantum/SpinS/CorrelationSumCasimir.lean}
-generalises \#929 to ANY state:
-$\sum_{x, y}\langle\Phi, \hat{S}_x\cdot\hat{S}_y\,\Phi\rangle =
-\langle\Phi, \hat{S}_{\rm tot}^2\,\Phi\rangle$. Specialised to
-$|\sigma_\top\rangle$ and $|\sigma_\bot\rangle$ gives the Casimir
-eigenvalue $m_{\max}(m_{\max}+1)$.
-
-\textbf{Eigenvector correlation sum (PR~\#931)}: the new file
-\texttt{Quantum/SpinS/CorrelationEigenvector.lean} parameterises
-the result of \#930 by the eigenvalue: for $\hat{S}_{\rm tot}^2\Phi
-= \lambda\,\Phi$, $\sum_{x, y}\langle\Phi, \hat{S}_x\cdot\hat{S}_y\,\Phi\rangle
-= \lambda\,\langle\Phi, \Phi\rangle$. For normalized $\Phi$, the
-sum equals $\lambda$.
-
-\textbf{Off-diagonal correlation sum (PR~\#933)}: the new file
-\texttt{Quantum/SpinS/CorrelationOffDiagonal.lean} introduces the
-universal diagonal sum
-$\sum_x\langle\Phi, \hat{S}_x\cdot\hat{S}_x\,\Phi\rangle =
-|V|\cdot S(S+1)\cdot\langle\Phi,\Phi\rangle$ (from \#920) and
-subtracts from \#931 to give: for $\hat{S}_{\rm tot}^2\Phi =
-\lambda\,\Phi$, $\sum_{x\neq y}\langle\Phi, \hat{S}_x\cdot\hat{S}_y\,\Phi\rangle
-= (\lambda - |V|\cdot S(S+1))\cdot\langle\Phi,\Phi\rangle$.
-
-\textbf{Saturated off-diagonal correlation sum (PR~\#934)}: the
-new file
-\texttt{Quantum/SpinS/SaturatedOffDiagonalCorrelation.lean}
-specialises \#933 to $|\sigma_{\top/\bot}\rangle$ using \#882
-(Casimir at $k=0$) + \#913 (normalization), yielding
-$\sum_{x\neq y}\langle|\sigma_\top\rangle,
-\hat{S}_x\cdot\hat{S}_y\,|\sigma_\top\rangle\rangle =
-m_{\max}(m_{\max}+1) - |V|\cdot S(S+1) = N^2\,|V|(|V|-1)/4$.
-
 \textbf{Fermion $\leftrightarrow$ spin-`S` bridge at $N = 1$
 (PR~\#936)}: the new file
 \texttt{Fermion/SpinSBridge.lean} composes the existing
@@ -17092,14 +16886,6 @@ new file \texttt{Quantum/SpinS/SpinSDotAllAlignedLast.lean} mirrors
 \hat{S}^-$, $0 \leftrightarrow N$ swap. The $(3)(3)$ coefficient
 $(-N/2)^2$ also gives $N^2/4$.
 
-\textbf{Per-pair correlation expectation (PR~\#941)}: the new file
-\texttt{Quantum/SpinS/PerPairCorrelationExpectation.lean} packages
-\#939/\#940 with the normalization (\#913):
-$\langle|\sigma_{\top/\bot}\rangle, \hat{S}_x\cdot\hat{S}_y\,
-|\sigma_{\top/\bot}\rangle\rangle = N^2/4 = S^2$ for $x \neq y$.
-The total off-diagonal sum then equals $|V|\cdot(|V|-1)\cdot S^2$,
-matching \#934.
-
 \textbf{Heisenberg expectation on saturated states (PR~\#943)}: the
 new file \texttt{Quantum/SpinS/SaturatedHeisenbergExpectation.lean}
 gives the H-eigenvalue expectation:
@@ -17107,12 +16893,6 @@ $\langle|\sigma_\top\rangle, H\,|\sigma_\top\rangle\rangle =
 \texttt{saturatedFerromagnetEigenvalueS}\,J\,N$ (defined as
 $H(\sigma_\top, \sigma_\top)$ in \#899). Symmetric for
 $|\sigma_\bot\rangle$, with eigenvalue $H(\sigma_\bot, \sigma_\bot)$.
-
-\textbf{Uniform-J Heisenberg equals Casimir (PR~\#945)}: the new
-file \texttt{Quantum/SpinS/HeisenbergUniformCasimir.lean} proves
-\texttt{heisenbergHamiltonianS (fun \_ \_ => 1) N = totalSpinSSquared V N}.
-Direct from the definition $H = \sum_{x, y} J\,\hat{S}_x\cdot\hat{S}_y$
-+ \texttt{totalSpinSSquared\_eq\_sum\_spinSDot}.
 
 \textbf{H-diagonal symmetry (PR~\#946)}: the new file
 \texttt{Quantum/SpinS/SaturatedHeisenbergSymmetric.lean} shows
@@ -17122,23 +16902,6 @@ $H(\sigma_\bot, \sigma_\bot) =
 the eigenvalue on a non-zero eigenvector (via
 \texttt{allAlignedStateS\_ne\_zero}) extracts
 $E = H(\sigma_\top, \sigma_\top) = H(\sigma_\bot, \sigma_\bot)$.
-
-\textbf{Symmetric H expectation cleanup (PR~\#948)}: the new file
-\texttt{Quantum/SpinS/SaturatedHeisenbergExpectationClean.lean}
-chains \#943 and \#946 to give the clean form
-$\langle|\sigma_\bot\rangle, H\,|\sigma_\bot\rangle\rangle =
-\texttt{saturatedFerromagnetEigenvalueS}\,J\,N$, matching the
-$|\sigma_\top\rangle$ statement.
-
-\textbf{Uniform-J saturated eigenvalue equals Casimir (PR~\#949)}:
-the new file
-\texttt{Quantum/SpinS/SaturatedHeisenbergUniformEigenvalue.lean}
-proves
-$\texttt{saturatedFerromagnetEigenvalueS}\,(\lambda\_\_, 1)\,N =
-\texttt{saturatedFerromagnetCasimirEigenvalueS}\,V\,N =
-m_{\max}(m_{\max}+1)$. Direct from \#945 ($H_{\rm uniform} =
-\hat{S}_{\rm tot}^2$) plus the diagonal entry of $\hat{S}_{\rm tot}^2$
-at $\sigma_\top$.
 
 \textbf{Explicit form of saturated FM eigenvalue (PR~\#951)}: the
 new file
@@ -17155,40 +16918,11 @@ In the Tasaki §2.5 Theorem~2.3 chain, the same explicit formula gives
 the saturated ferromagnetic energy is represented by its real part as a real
 scalar.
 
-\textbf{Explicit uniform-J eigenvalue simplification (PR~\#953)}:
-the new file
-\texttt{Quantum/SpinS/SaturatedExplicitUniformSimp.lean} combines
-\#951 (explicit form) with \#949 (uniform = Casimir) to give
-the closed-form simplification
-$\sum_x \sum_y (\textsf{if}\ x=y\ \textsf{then}\ N(N+2)/4\
-\textsf{else}\ (N/2)^2) = m_{\max}(m_{\max}+1)$.
-
-\textbf{Explicit H expectation on saturated states (PR~\#954)}: the
-new file \texttt{Quantum/SpinS/HExpectationExplicit.lean} chains
-\#943/\#948 with \#951 to give the explicit combinatorial form of
-$\langle|\sigma_{\top/\bot}\rangle, H\,|\sigma_{\top/\bot}\rangle\rangle$
-in terms of the $J(x,y)$ couplings.
-
 \textbf{Distinct constant-spin states are different (PR~\#956)}:
 the new file \texttt{Quantum/SpinS/AllAlignedStateDistinct.lean}
 proves \texttt{allAlignedConfigS\_injective} (when $V$ is non-empty)
 and the corresponding \texttt{allAlignedStateS\_ne\_of\_ne}.
 Used as a building block for the LI of the all-aligned family.
-
-\textbf{All-aligned states form a LI family (PR~\#957)}: the new
-file \texttt{Quantum/SpinS/AllAlignedStateLI.lean} proves
-\texttt{allAlignedStateS\_linearIndependent}: the
-$(N+1)$-element family $\{|c..c\rangle : c \in \textsf{Fin}\,(N+1)\}$
-is linearly independent over $\mathbb{C}$. Direct application of
-\texttt{Module.End.eigenvectors\_linearIndependent'} with the
-injective $\hat{S}^z_{\rm tot}$ eigenvalue function
-$c \mapsto |V|\cdot N/2 - |V|\cdot c$.
-
-\textbf{All-aligned span finrank (PR~\#959)}: the new file
-\texttt{Quantum/SpinS/AllAlignedStateSpan.lean} applies
-\texttt{finrank\_span\_eq\_card} to PR \#957's LI family,
-yielding $\dim_\mathbb{C}\,\texttt{Submodule.span}\,\mathbb{C}\,
-(\textsf{Set.range}\,\texttt{allAlignedStateS}) = N + 1$.
 
 \textbf{All-aligned states orthogonal (PR~\#960)}: the new file
 \texttt{Quantum/SpinS/AllAlignedStateOrthogonal.lean} proves
@@ -17948,6 +17682,54 @@ Generalises by induction (with the higher-$k$ extension of
 PR~\#890) to the full $(2m_{\max}+1)$-vector family
 $\{(\hat S^\mp_{\rm tot})^k\,|\sigma_{\top/\bot}\rangle:
  k=0,\ldots,2m_{\max}\}$.
+
+\textbf{Removed entries (PR~\#5145, issue~\#5140).}  Twenty-five per-PR entries of
+this subsection were removed because each of them names exactly one module and
+none of those modules exists any more: the entries for PRs~\#904, \#909, \#910,
+\#912, \#915, \#917, \#918, \#919, \#929, \#930, \#931, \#933, \#934, \#941,
+\#945, \#948, \#949, \#953, \#954, \#957, \#959, \#2769, \#2770, \#2771 and
+\#2772.  Between them those 25 entries named 24 distinct modules under
+\texttt{LatticeSystem/Quantum/SpinS/} --- the entries for \#904 and \#2769 named
+the same one --- and every one of those 24 was removed by one single commit, the
+same one that the $\gamma$-4 chronicle note earlier in this section records:
+PR~\#3919, commit \texttt{7b65d59e}, the Phase-C refactor that deleted 525 orphan
+modules and 35{,}002 lines of dead code in one step.  Of the declarations those
+entries stated as their subjects, these five have no occurrence anywhere under
+\texttt{LatticeSystem/} today: the ladder-span finrank
+\texttt{ladderIterateUp\_span\_finrank\_eq\_succ\_card\_mul\_N}, the basis span
+\texttt{basisVecS\_span\_eq\_top}, the joint-eigenspace finrank
+\texttt{saturatedFerromagnetJointEigenspace\_finrank\_eq}, the multi-site finrank
+\texttt{multiSiteSpinS\_finrank}, and
+\texttt{allAlignedStateS\_linearIndependent}.
+
+\textbf{What this note does \emph{not} say.}  The Phase-C removal is stated
+extensionally: it covers exactly those modules of the 25 removed entries that
+commit \texttt{7b65d59e} deleted, and that commit's diff is the authoritative
+list.  It is not a claim about any name family.  Declarations that those entries
+cited as inputs are still present under \texttt{LatticeSystem/} and are
+\emph{not} covered by this note --- among them \texttt{onSiteS\_add},
+\texttt{onSiteS\_smul}, \texttt{fun\_eq\_sum\_smul\_basisVecS},
+\texttt{spinSOp1}, \texttt{spinSOp2},
+\texttt{totalSpinSSquared\_eq\_sum\_spinSDot} and
+\texttt{ladderIterateUp\_mem\_eigenspace}, the last of which shares its name stem
+with removed ladder lemmas and survives all the same.  No declaration that
+currently exists is documented by this note, nor claimed by it to have been
+deleted; the per-declaration record for the survivors is \texttt{docs/index.md}.
+
+\textbf{Where those results stand today.}  Three citations of PR~\#904 survive
+above, in the \#2759 entry and in the \#2768 closure entry: as the
+span-equals-joint argument, as the reverse inclusion fed to
+\texttt{le\_antisymm}, and in the list of inputs to the operator-level form of
+the theorem.  Those citations are to the historical pull request, which did the
+work described; only its module and its own entry here are gone.  The span
+identification it supplied is carried today by the theorem
+\texttt{saturatedFerromagnetJointEigenspace\_eq\_span\_ladderIterateUp} that the
+surviving \emph{Tasaki §2.4 Theorem 2.1 closure (PR~\#2768)} entry already
+names; the dimension equality that PR~\#2769 packaged went with its module, and
+what the sources state today is the lower bound
+\texttt{saturatedFerromagnetJointEigenspace\_finrank\_ge\_succ\_card\_mul\_N}.
+The theorem being closed is H.~Tasaki, \emph{Physics and Mathematics of Quantum
+Many-Body Systems}, Springer 2020, §2.4 Theorem~2.1, p.~34.
 
 \subsection*{DONE: Tasaki Problem 2.2.c}
 
