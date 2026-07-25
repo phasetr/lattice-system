@@ -4078,6 +4078,11 @@ The key results eliminating the sorry from \texttt{exists\_pos\_eigenvec\_max}.
   Ref: Seneta \S1.2 (pp.~27--28); MCMC \texttt{Irreducible.lean}.
 \end{itemize}
 
+\noindent
+Full reference for the two items above and for the ``Seneta \S1.2'' citations
+elsewhere in this guide: Seneta, \emph{Non-negative Matrices and Markov Chains},
+3rd ed., Springer 2006, \S1.2, pp.~27--28.
+
 \subsection{Strictly positive max eigenvector (\texttt{exists\_pos\_eigenvec\_max})}
 
 \textbf{Statement.}
@@ -13484,11 +13489,17 @@ of that development.
 
 \textbf{Why it is gone.}  The chronicle named 226 Lean modules, of which 194 no
 longer exist, and every one of those 194 was removed by a single commit:
-PR~\#3919, commit \texttt{7b65d59e} (``Refactor (Phase C): delete 525 orphan
-modules, 35{,}002 lines dead code''), which deleted them as orphans.  The
-chronicle therefore described files and declarations that are gone, and all 194
-of its unresolved file references were stale.  The other 32 modules it named do
-still exist, and each keeps its per-declaration entry in \texttt{docs/index.md}.
+PR~\#3919, commit \texttt{7b65d59e}, a Phase-C refactor that deleted 525 orphan
+modules and 35{,}002 lines of dead code in one step.  The chronicle therefore
+described files and declarations that are gone, and all 194 of its unresolved
+file references were stale.  The other 32 modules it named do still exist.  Of
+those, 31 carry declarations and are still represented in the per-declaration
+index \texttt{docs/index.md}; the remaining one is \texttt{LatticeSystem.lean},
+the import-graph root, which declares nothing and therefore has no index row of
+its own.  Besides those 226 named modules the chronicle also used two wildcard
+patterns, \texttt{BipartiteToyMinEnergyPredicted*.lean} and
+\texttt{NeelStateOfSExpectation*.lean}; neither matches any file that exists
+today, so no surviving module goes unaccounted for by the count above.
 
 \textbf{What this note does \emph{not} say.}  The removal is stated
 extensionally: it covers exactly those modules of the chronicle that commit
@@ -13518,7 +13529,12 @@ $V=\{a,b\}$, $A=\{a\}$, $B=\{b\}$, step $M=0\to1$).  Its 40 conditional-wrapper
 modules were removed by PR~\#3645, commit \texttt{f7947dfc}.  The \emph{sound}
 route keeps the per-sector Perron--Frobenius ground state and chains sectors by
 SU(2) invariance $[\hat H,\hat S^-_{\rm tot}]=0$; the outside-sector lower bound
-comes from the toy-Hamiltonian Casimir argument.  See
+comes from the toy-Hamiltonian Casimir argument.  The overlap step of that
+argument is Tasaki's eq.~(2.5.12) (p.~41, in the proof of Theorem~2.2, of which
+the proof of Theorem~2.3 is a modification): the toy ground state has the same
+Marshall-positive expansion, so its overlap with the antiferromagnetic ground
+state cannot vanish, which with the uniqueness inside the sector pins that
+state's total Casimir.  See
 \texttt{.self-local/docs/tasaki-2-5-pf-route-design.md} and Issue~\#3542.
 
 \textbf{Where the current account is.}  The state of Theorem~2.3 today is the
@@ -13528,9 +13544,10 @@ Perron--Frobenius route for the standard bipartite coupling, together with the
 one remaining gap towards a general bipartite $J$ (Lieb--Mattis energy
 monotonicity \texttt{hOutside}) and its in-progress route.  The Theorem~2.2
 sector statement is the preceding subsection, \emph{Marshall--Lieb--Mattis
-Theorem 2.2 (Tasaki §2.5) --- formalisation outline}.  The per-declaration
-index, including which rows of the deleted routes were pruned, is the ``Deleted
-routes'' section of \texttt{docs/index.md}.  The label
+Theorem 2.2 (Tasaki §2.5) --- formalisation outline}.  The per-declaration index
+of everything that survives is \texttt{docs/index.md} itself.  Which of its rows
+were pruned when the deleted routes went, and what those rows used to document,
+is recorded separately in that file's ``Deleted routes'' section.  The label
 \texttt{subsec:mlm-theorem-2-3} of the removed subsection is kept on this note,
 so any later cross-reference to it still resolves; nothing referenced it when
 the chronicle was removed.
