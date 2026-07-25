@@ -90,8 +90,9 @@ every one of those stems (`bipartiteToyGroundStateSubspacePredicted`,
 `bipartiteToyMinEnergyPredicted`, `bipartiteImbalanceWeight`, `neelStateOf`,
 `neelStateOfS`, `heisenbergToyHamiltonianS`, `ladderIterateUp`,
 `allAlignedStateS`, `totalSpinSOpPlus`/`totalSpinSOpMinus`,
-`saturatedFerromagnetJointEigenspace`, and the `Theorem23*` module family) is
-still a live declaration prefix with surviving variants.  Most of those
+`saturatedFerromagnetJointEigenspace`) is still a live declaration prefix with
+surviving variants, and the `Theorem23*` module family is still 56 live modules
+under `Quantum/SpinS/` (no declaration name carries that prefix).  Most of those
 survivors keep their own rows in this index, but not all: of the 201 live
 public declarations under the declaration stems just listed, 158 are named in
 some row's first column, three only inside another row's prose, and 40 are not
