@@ -84,9 +84,18 @@ there, and how it went away:
 
 The surviving parts keep their rows: the earlier γ-4 steps (sublattice
 operators, sublattice Casimir, SU(2) commutation) and the sound per-sector
-Perron–Frobenius route to `tasaki_2_5_theorem_2_3`.  Deleted names of the form
-`tasaki_2_5_theorem_2_3_of_..._threaded_...` belonged to the abandoned route
-and are not the live capstone `tasaki_2_5_theorem_2_3`.
+Perron–Frobenius route to `tasaki_2_5_theorem_2_3`.  The globs in the table
+above name **the deleted variant families, not the stems they are built on**:
+every one of those stems (`bipartiteToyGroundStateSubspacePredicted`,
+`bipartiteToyMinEnergyPredicted`, `bipartiteImbalanceWeight`, `neelStateOf`,
+`neelStateOfS`, `heisenbergToyHamiltonianS`, `ladderIterateUp`,
+`allAlignedStateS`, `totalSpinSOpPlus`/`totalSpinSOpMinus`,
+`saturatedFerromagnetJointEigenspace`, and the `Theorem23*` module family) is
+still a live declaration prefix with surviving variants, and those survivors
+keep their own rows in this index — for `ladderIterateUp_*` the survivors are
+even the majority.  Only the variants enumerated above are gone.  Likewise,
+deleted names of the form `tasaki_2_5_theorem_2_3_of_..._threaded_...` belonged
+to the abandoned route and are not the live capstone `tasaki_2_5_theorem_2_3`.
 
 ## Roadmap
 
@@ -754,6 +763,8 @@ The shared `manyBodyOperatorNormS` algebra and unitary-conjugation API is hosted
 | `toricCodeHamiltonianS` / `tasaki_theorem_8_9` | **§8.4 Topological order: Kitaev's toric code** (Theorem 8.9, Bravyi–Hastings–Michalakis; eqs. (8.4.1), (8.4.19)): a gapped phase whose degeneracy is protected by topology, not symmetry. Qubits live on the edges `ToricEdge L = (ZMod L × ZMod L) × Fin 2` of an `L×L` torus (`2L²` edges); `starEdges`/`plaquetteEdges` are the 4-edge stars `A_v`/plaquettes `B_p`; `sigmaZS`/`sigmaXS` = `σ^z`/`σ^x`. `toricCodeHamiltonianS L = −Σ_v ∏_{A_v} σ^z − Σ_p ∏_{B_p} σ^x` (eq. 8.4.1, commuting stabilizers, gap ≥ 2, 4-fold degenerate on the torus). `perturbedToricHamiltonianS L ε V = Ĥ_tc + ε Σ_x V_x` (eq. 8.4.19). `tasaki_theorem_8_9` (**AXIOM**): for range-`r` perturbations there are **L-independent** `ε₀,Δ>0` such that for `|ε|≤ε₀`, all `L≥2` (nontrivial torus), and any local perturbation (`IsToricPerturbation`), the perturbed Hamiltonian has **four near-degenerate ground states** separated by `Δ` (`HasFourNearlyDegenerateGroundStates`) — topological 4-fold degeneracy stable under arbitrary perturbation, no symmetry needed. Lattice + stabilizers + both Hamiltonians concrete | `Quantum/SpinS/ToricCode.lean` |
 
 ### Total spin operator (Tasaki §2.2 eq. (2.2.7), (2.2.8))
+
+> **Pruned rows (PR #5143, issue #5140).** 540 rows of the later γ-4 layers were removed from this section; see [Deleted routes](#deleted-routes-what-this-index-used-to-document) for what they documented.
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, §2.2 eqs. (2.2.7) and (2.2.8), p. 22.
@@ -1567,8 +1578,13 @@ or4nge19/MCMC: `MCMC/PF/LinearAlgebra/Matrix/PerronFrobenius/`.
 > modules of that route were removed; their detailed rows below were deleted with
 > them. The **sound** route keeps the per-sector Perron–Frobenius ground state
 > (`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`, sorry-free) and chains sectors by
-> SU(2) invariance `[Ĥ, Ŝ⁻_tot] = 0`; some rows below still reference helper
-> lemmas from the removed route pending re-documentation. See
+> SU(2) invariance `[Ĥ, Ŝ⁻_tot] = 0`. The rows below that still name helper
+> lemmas from the removed route now carry an explicit deletion note on the dead
+> name (`deleted in PR #3645 (unsound saturated-ladder Theorem 2.3 route)`,
+> or `deleted in PR #3919 (bulk orphan-module deletion)` for names that outlived
+> that route and went with the later bulk deletion); the
+> [Deleted routes](#deleted-routes-what-this-index-used-to-document) section
+> above lists the deleted variant families. See
 > `.self-local/docs/tasaki-2-5-pf-route-design.md` and Issue #3542.
 
 Generic-spin (`N = 2S`) version of Tasaki §2.5 Theorem 2.2 applied to the
@@ -1980,6 +1996,8 @@ Systems*, Springer 2020, §2.5 Theorem 2.2 (pp. 39–43), Theorem 2.3
 Perron–Frobenius theorem.
 
 ### Spin-`S` saturated ferromagnetic state (Tasaki §2.4 generalised)
+
+> **Pruned rows (PR #5143, issue #5140).** 25 rows of the ladder-iterate route were removed from this section; see [Deleted routes](#deleted-routes-what-this-index-used-to-document) for what they documented.
 
 Generic-spin (`N = 2S`) version of Tasaki §2.4 P1i for the
 **saturated ferromagnet**: the all-aligned (constant-spin) basis
