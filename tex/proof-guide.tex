@@ -17700,9 +17700,10 @@ none of those modules exists any more: the entries for PRs~\#904, \#909, \#910,
 the same one --- and every one of those 24 was removed by one single commit, the
 same one that the $\gamma$-4 chronicle note earlier in this section records:
 PR~\#3919, commit \texttt{7b65d59e}, the Phase-C refactor that deleted 525 orphan
-modules and 35{,}002 lines of dead code in one step.  Of the declarations those
-entries stated as their subjects, these five have no occurrence anywhere under
-\texttt{LatticeSystem/} today: the ladder-span finrank
+modules and 35{,}002 lines of dead code in one step.  Of the declaration names
+those entries mention --- subjects and cited inputs alike, module file names
+aside --- twenty have no occurrence anywhere under \texttt{LatticeSystem/}
+today; these five are among them: the ladder-span finrank
 \texttt{ladderIterateUp\_span\_finrank\_eq\_succ\_card\_mul\_N}, the basis span
 \texttt{basisVecS\_span\_eq\_top}, the joint-eigenspace finrank
 \texttt{saturatedFerromagnetJointEigenspace\_finrank\_eq}, the multi-site finrank
@@ -17721,7 +17722,13 @@ cited as inputs are still present under \texttt{LatticeSystem/} and are
 \texttt{ladderIterateUp\_mem\_eigenspace}, the last of which shares its name stem
 with removed ladder lemmas and survives all the same.  No declaration that
 currently exists is documented by this note, nor claimed by it to have been
-deleted; the per-declaration record for the survivors is \texttt{docs/index.md}.
+deleted.  Of the seven survivors just named, four are recorded in
+\texttt{docs/index.md}: \texttt{spinSOp1} and \texttt{spinSOp2} share a row
+there, \texttt{ladderIterateUp\_mem\_eigenspace} sits in the ladder-family row,
+and \texttt{totalSpinSSquared\_eq\_sum\_spinSDot} appears there only inside the
+row of its leaf-level mirror \texttt{leafSpinSSquared\_eq\_sum\_spinSDot}.  The
+other three, \texttt{onSiteS\_add}, \texttt{onSiteS\_smul} and
+\texttt{fun\_eq\_sum\_smul\_basisVecS}, have no mention in that file at all.
 
 \textbf{Where those results stand today.}  Three citations of PR~\#904 survive
 above, in the \#2759 entry and in the \#2768 closure entry: as the
