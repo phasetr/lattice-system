@@ -43,8 +43,4 @@ noncomputable def fermionSpinDot (N : ℕ) (i j : Fin (N + 1)) : ManyBodyOp (Fin
 theorem fermionTotalSpinPlus_eq_sum_siteSpinPlus (N : ℕ) :
     fermionTotalSpinPlus N = ∑ i : Fin (N + 1), fermionSiteSpinPlus N i := rfl
 
-/-- The total spin lowering operator is the sum of the per-site ones. -/
-theorem fermionTotalSpinMinus_eq_sum_siteSpinMinus (N : ℕ) :
-    fermionTotalSpinMinus N = ∑ i : Fin (N + 1), fermionSiteSpinMinus N i := rfl
-
 end LatticeSystem.Fermion
