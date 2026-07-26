@@ -135,15 +135,6 @@ theorem dressedHeisenbergS_zero_J
   unfold dressedHeisenbergS heisenbergHamiltonianS
   simp
 
-/-- For trivial spin (`N = 0`, `S = 0`), every dressed Heisenberg
-matrix element vanishes (the underlying Heisenberg is zero). -/
-theorem dressedHeisenbergS_N_zero
-    (A : V → Bool) (J : V → V → ℂ) (σ σ' : V → Fin 1) :
-    dressedHeisenbergS A J 0 σ σ' = 0 := by
-  unfold dressedHeisenbergS
-  rw [heisenbergHamiltonianS_N_zero (Λ := V) J]
-  simp
-
 /-- Dressed Heisenberg is additive in the coupling. -/
 theorem dressedHeisenbergS_add_J
     (A : V → Bool) (J J' : V → V → ℂ) (N : ℕ) (σ σ' : V → Fin (N + 1)) :
@@ -205,103 +196,6 @@ noncomputable def dressedHeisenbergSMatrix
 theorem dressedHeisenbergSMatrix_apply
     (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ σ' : V → Fin (N + 1)) :
     dressedHeisenbergSMatrix A J N σ σ' = dressedHeisenbergS A J N σ σ' := rfl
-
-/-- The dressed Heisenberg matrix as a product: `dressed σ' σ =
-sign(σ') · sign(σ) · heisenberg σ' σ`. -/
-theorem dressedHeisenbergSMatrix_apply_eq_smul
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ' σ : V → Fin (N + 1)) :
-    dressedHeisenbergSMatrix A J N σ' σ =
-      marshallSignS A σ' * marshallSignS A σ *
-        (heisenbergHamiltonianS J N) σ' σ := by
-  rfl
-
-/-- Applying the dressed Heisenberg matrix to a basis vector and
-reading the result at configuration `τ` yields the matrix element
-`dressedMatrix τ σ`. -/
-theorem dressedHeisenbergSMatrix_mulVec_basisVecS_apply
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ τ : V → Fin (N + 1)) :
-    (dressedHeisenbergSMatrix A J N).mulVec (basisVecS σ) τ =
-      dressedHeisenbergSMatrix A J N τ σ := by
-  classical
-  change ∑ σ' : V → Fin (N + 1),
-      dressedHeisenbergSMatrix A J N τ σ' * basisVecS σ σ' =
-        dressedHeisenbergSMatrix A J N τ σ
-  simp_rw [basisVecS_apply, mul_ite, mul_one, mul_zero]
-  rw [Finset.sum_ite_eq' Finset.univ σ
-      (fun σ' => dressedHeisenbergSMatrix A J N τ σ')]
-  simp
-
-/-- Like the plain Heisenberg, the dressed matrix element vanishes
-when the two configurations have different magnetization quantum
-numbers. The Marshall sign factors do not change the support. -/
-theorem dressedHeisenbergSMatrix_apply_eq_zero_of_mag_ne
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
-    {σ' σ : V → Fin (N + 1)}
-    (h : magEigenvalueS σ ≠ magEigenvalueS σ') :
-    dressedHeisenbergSMatrix A J N σ' σ = 0 := by
-  rw [dressedHeisenbergSMatrix_apply_eq_smul]
-  rw [heisenbergHamiltonianS_apply_eq_zero_of_mag_ne (Λ := V) J N h]
-  ring
-
-/-- The dressed Heisenberg matrix applied to a basis state lies in
-the magnetization subspace `magSubspaceS V N (magEigenvalueS σ)`. -/
-theorem dressedHeisenbergSMatrix_mulVec_basisVecS_mem_magSubspaceS
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ : V → Fin (N + 1)) :
-    (dressedHeisenbergSMatrix A J N).mulVec (basisVecS σ) ∈
-      magSubspaceS V N (magEigenvalueS σ) := by
-  rw [mem_magSubspaceS_iff]
-  funext τ
-  classical
-  change ∑ ρ, (totalSpinSOp3 V N) τ ρ *
-      (dressedHeisenbergSMatrix A J N).mulVec (basisVecS σ) ρ =
-    (magEigenvalueS σ •
-      (dressedHeisenbergSMatrix A J N).mulVec (basisVecS σ)) τ
-  rw [Finset.sum_eq_single τ]
-  · rw [totalSpinSOp3_apply_diag,
-        dressedHeisenbergSMatrix_mulVec_basisVecS_apply,
-        Pi.smul_apply, smul_eq_mul,
-        dressedHeisenbergSMatrix_mulVec_basisVecS_apply]
-    by_cases hmag : magEigenvalueS τ = magEigenvalueS σ
-    · rw [hmag]
-    · have hzero := dressedHeisenbergSMatrix_apply_eq_zero_of_mag_ne
-        A J N (Ne.symm hmag)
-      rw [hzero]; ring
-  · intro ρ _ hρ
-    rw [totalSpinSOp3_apply_off_diag (Ne.symm hρ), zero_mul]
-  · intro hτ; exact (hτ (Finset.mem_univ τ)).elim
-
-/-- The dressed Heisenberg matrix commutes with `Ŝ_tot^{(3)}`. -/
-theorem dressedHeisenbergSMatrix_commute_totalSpinSOp3
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) :
-    Commute (dressedHeisenbergSMatrix A J N) (totalSpinSOp3 V N) := by
-  unfold Commute SemiconjBy
-  ext σ' σ
-  classical
-  -- Compute LHS: ∑ τ, dressed σ' τ * S^z τ σ collapses to dressed σ' σ * magEig σ.
-  have hL : (dressedHeisenbergSMatrix A J N * totalSpinSOp3 V N) σ' σ =
-      dressedHeisenbergSMatrix A J N σ' σ * magEigenvalueS σ := by
-    rw [Matrix.mul_apply]
-    rw [Finset.sum_eq_single σ
-      (fun τ _ hτ => by
-        rw [show (totalSpinSOp3 V N) τ σ = 0 from
-          totalSpinSOp3_apply_off_diag hτ]; ring)
-      (fun hσ => (hσ (Finset.mem_univ σ)).elim)]
-    rw [totalSpinSOp3_apply_diag]
-  have hR : (totalSpinSOp3 V N * dressedHeisenbergSMatrix A J N) σ' σ =
-      magEigenvalueS σ' * dressedHeisenbergSMatrix A J N σ' σ := by
-    rw [Matrix.mul_apply]
-    rw [Finset.sum_eq_single σ'
-      (fun τ _ hτ => by
-        rw [show (totalSpinSOp3 V N) σ' τ = 0 from
-          totalSpinSOp3_apply_off_diag (Ne.symm hτ)]; ring)
-      (fun hσ => (hσ (Finset.mem_univ σ')).elim)]
-    rw [totalSpinSOp3_apply_diag]
-  rw [hL, hR]
-  by_cases hmag : magEigenvalueS σ = magEigenvalueS σ'
-  · rw [hmag]; ring
-  · have hzero := dressedHeisenbergSMatrix_apply_eq_zero_of_mag_ne
-      A J N hmag
-    rw [hzero]; ring
 
 /-- For real coupling, the dressed matrix is Hermitian. -/
 theorem dressedHeisenbergSMatrix_isHermitian
