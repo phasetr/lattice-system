@@ -285,21 +285,6 @@ theorem magSumS_const_zero :
   simp
 
 omit [DecidableEq Λ] in
-/-- `magSumS σ = 0` iff `σ x = 0` for every `x : Λ`. -/
-theorem magSumS_eq_zero_iff (σ : Λ → Fin (N + 1)) :
-    magSumS σ = 0 ↔ ∀ x : Λ, σ x = 0 := by
-  unfold magSumS
-  rw [Finset.sum_eq_zero_iff]
-  constructor
-  · intro h x
-    have := h x (Finset.mem_univ x)
-    apply Fin.ext
-    exact this
-  · intro h x _
-    rw [h x]
-    rfl
-
-omit [DecidableEq Λ] in
 /-- `magEigenvalueS σ ∈ ℝ`: the eigenvalue is real-valued (its
 imaginary part is zero). The eigenvalue is constructed as
 `(|Λ| · N : ℂ)/2 - magSumS σ`, both terms real. -/
@@ -350,47 +335,6 @@ theorem magEigenvalueS_eq_iff (σ σ' : Λ → Fin (N + 1)) :
     rw [h]
 
 omit [DecidableEq Λ] in
-/-- For `N = 0` (`S = 0`), `magSumS σ = 0` always (the only Fin 1
-value is 0). -/
-theorem magSumS_of_N_zero (σ : Λ → Fin 1) :
-    magSumS σ = 0 := by
-  apply (magSumS_eq_zero_iff (N := 0) σ).mpr
-  intro x
-  apply Fin.ext
-  have := (σ x).isLt
-  omega
-
-omit [DecidableEq Λ] in
-/-- For `N = 0` (`S = 0`), `magEigenvalueS σ = 0` always. -/
-theorem magEigenvalueS_of_N_zero (σ : Λ → Fin 1) :
-    magEigenvalueS σ = 0 := by
-  unfold magEigenvalueS
-  rw [magSumS_of_N_zero σ]
-  push_cast
-  ring
-
-omit [DecidableEq Λ] in
-/-- `magSumS σ` over an empty lattice is `0`. -/
-theorem magSumS_of_isEmpty [IsEmpty Λ] (σ : Λ → Fin (N + 1)) :
-    magSumS σ = 0 := by
-  unfold magSumS
-  rw [Finset.sum_empty.symm]
-  congr 1
-  exact Finset.eq_empty_of_isEmpty _
-
-omit [DecidableEq Λ] in
-/-- `magEigenvalueS σ = 0` over an empty lattice. -/
-theorem magEigenvalueS_of_isEmpty [IsEmpty Λ] (σ : Λ → Fin (N + 1)) :
-    magEigenvalueS σ = 0 := by
-  unfold magEigenvalueS
-  rw [magSumS_of_isEmpty σ]
-  have : (Fintype.card Λ : ℂ) = 0 := by
-    have : Fintype.card Λ = 0 := Fintype.card_eq_zero
-    exact_mod_cast this
-  rw [this]
-  ring
-
-omit [DecidableEq Λ] in
 /-- `magEigenvalueS (fun _ => 0) = (|Λ| · N : ℂ)/2`. -/
 theorem magEigenvalueS_const_zero :
     magEigenvalueS (fun _ : Λ => (0 : Fin (N + 1))) =
@@ -413,14 +357,5 @@ theorem magEigenvalueS_const (s : Fin (N + 1)) :
   push_cast
   ring
 
-omit [DecidableEq Λ] in
-/-- `magEigenvalueS` at the lowest-weight all-`Fin.last N` config:
-`-((|Λ| · N : ℂ)/2)`, the minimum eigenvalue of `Ŝ_tot^{(3)}`. -/
-theorem magEigenvalueS_const_last :
-    magEigenvalueS (fun _ : Λ => (Fin.last N : Fin (N + 1))) =
-      -((Fintype.card Λ : ℂ) * (N : ℂ) / 2) := by
-  rw [magEigenvalueS_const]
-  simp [Fin.val_last]
-  ring
 
 end LatticeSystem.Quantum
