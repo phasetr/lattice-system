@@ -280,9 +280,9 @@ theorem exists_common_neighbor_of_triangle {V : Type*} (G : SimpleGraph V) {w α
   · exact absurd rfl hyz
 
 /-- **A length-3 closed walk: its three bonds and that its support is exactly the three vertices.**
-Refines `exists_triangle_adj_of_walk_length_three` by also certifying that every vertex on the walk
-is one of the three triangle vertices `z', a, b` — needed to place the exchange-bond endpoints
-`y, z` among them. -/
+A walk `z' → z'` of length 3 decomposes as three consecutive adjacencies `z'—a`, `a—b`, `b—z'`, and
+every vertex on the walk is one of the three triangle vertices `z', a, b` — the latter is needed to
+place the exchange-bond endpoints `y, z` among them. -/
 theorem walk_length_three_support_mem {V : Type*} (G : SimpleGraph V) {z' : V}
     (c : G.Walk z' z') (hlen : c.length = 3) :
     ∃ a b : V, G.Adj z' a ∧ G.Adj a b ∧ G.Adj b z' ∧
