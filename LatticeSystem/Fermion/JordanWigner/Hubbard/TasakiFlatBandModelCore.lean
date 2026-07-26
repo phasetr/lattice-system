@@ -110,17 +110,6 @@ noncomputable def flatBandBCreation (K : ℕ) (ν : ℝ) (u : Fin (K + 1))
   ∑ x : Fin (2 * K + 2), (flatBandBeta K ν u x : ℂ) •
     fermionMultiCreation (2 * (2 * K + 1) + 1) (spinfulIndex (2 * K + 1) x σ)
 
-/-- `flatBandACreation` is the adjoint of `flatBandAAnnihilation`. -/
-theorem flatBandACreation_eq_conjTranspose (K : ℕ) (ν : ℝ) (p : Fin (K + 1))
-    (σ : Fin 2) :
-    (flatBandAAnnihilation K ν p σ)ᴴ = flatBandACreation K ν p σ := by
-  unfold flatBandAAnnihilation flatBandACreation
-  rw [Matrix.conjTranspose_sum]
-  refine Finset.sum_congr rfl (fun x _ => ?_)
-  rw [Matrix.conjTranspose_smul, fermionMultiAnnihilation_conjTranspose]
-  congr 1
-  simp [Complex.conj_ofReal]
-
 /-- `flatBandBCreation` is the adjoint of `flatBandBAnnihilation`. -/
 theorem flatBandBCreation_eq_conjTranspose (K : ℕ) (ν : ℝ) (u : Fin (K + 1))
     (σ : Fin 2) :
