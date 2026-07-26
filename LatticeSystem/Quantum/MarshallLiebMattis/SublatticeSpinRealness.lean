@@ -10,8 +10,8 @@ behaviour changes — every theorem keeps its original namespace `LatticeSystem.
 statement, so call sites elsewhere see no diff.
 
 Contents:
-* `sublatticeSpinHalfOp{2,3}_sq_eq_conjTranspose_mul` — squared sublattice axis operator as a
-  Hermitian conjugate-product, directly from `sublatticeSpinHalfOp{2,3}_isHermitian`.
+* `sublatticeSpinHalfOp3_sq_eq_conjTranspose_mul` — the squared sublattice axis-3 operator as a
+  Hermitian conjugate-product, directly from `sublatticeSpinHalfOp3_isHermitian`.
 * Matrix-element realness for the axis-1, axis-3 sublattice operators (with single-site +
   on-site building blocks).
 * Matrix-element realness for the sublattice ladder operators `Ŝ_A^±` (with single-site + on-site
