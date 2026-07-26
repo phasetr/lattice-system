@@ -33,24 +33,6 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 omit [Fintype V] in
-/-- **Helper: `configUpdateTwo` overwrite at the same two sites**.  Updating a config that itself
-came from a prior two-site update at the same sites is the same as updating from the original. -/
-theorem configUpdateTwo_configUpdateTwo
-    (σ : V → Fin (N + 1)) {a b : V} (hab : a ≠ b) (va vb va' vb' : Fin (N + 1)) :
-    configUpdateTwo (configUpdateTwo σ a b va vb) a b va' vb' =
-      configUpdateTwo σ a b va' vb' := by
-  funext j
-  by_cases hja : j = a
-  · subst hja
-    rw [configUpdateTwo_at_a, configUpdateTwo_at_a]
-  · by_cases hjb : j = b
-    · subst hjb
-      rw [configUpdateTwo_at_b _ hab, configUpdateTwo_at_b _ hab]
-    · rw [configUpdateTwo_agree _ _ _ _ _ _ hja hjb,
-          configUpdateTwo_agree _ _ _ _ _ _ hja hjb,
-          configUpdateTwo_agree _ _ _ _ _ _ hja hjb]
-
-omit [Fintype V] in
 /-- **Flipped-case reduction via a single elementary move** that simultaneously flips both
 per-endpoint parities, restated as: given an intermediate config `σ'` reachable from `σ` whose
 `(a₀, b₀)` values now align in parity with `(m_A', m_B')` and whose off-`{a₀, b₀}` sites match

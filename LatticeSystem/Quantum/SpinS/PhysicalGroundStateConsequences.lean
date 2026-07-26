@@ -32,14 +32,6 @@ namespace InfiniteSpinSystem.IsPhysicalGroundState
 
 variable {S : InfiniteSpinSystem d A} {εGS : ℝ} {ω : WeakDual ℂ A}
 
-/-- A translation-invariant infinite-volume ground state that is ergodic is a
-physical ground state. -/
-theorem of_isInfiniteVolumeGroundState_isErgodic
-    (hgs : InfiniteSpinSystem.IsInfiniteVolumeGroundState S εGS ω)
-    (herg : InfiniteSpinSystem.IsErgodic S ω) :
-    InfiniteSpinSystem.IsPhysicalGroundState S εGS ω :=
-  ⟨hgs, herg⟩
-
 /-- A physical ground state is an infinite-volume ground state. -/
 theorem isInfiniteVolumeGroundState
     (hω : InfiniteSpinSystem.IsPhysicalGroundState S εGS ω) :

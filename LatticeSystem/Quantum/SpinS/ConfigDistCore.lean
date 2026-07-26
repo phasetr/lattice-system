@@ -23,11 +23,6 @@ def configDistS (σ σ' : V → Fin (N + 1)) : ℕ :=
   ∑ x : V, Nat.dist (σ x).val (σ' x).val
 
 omit [DecidableEq V] in
-/-- Definitional unfolding of `configDistS`. -/
-theorem configDistS_def (σ σ' : V → Fin (N + 1)) :
-    configDistS σ σ' = ∑ x : V, Nat.dist (σ x).val (σ' x).val := rfl
-
-omit [DecidableEq V] in
 /-- Configuration distance is zero iff the two configurations agree
 everywhere. -/
 theorem configDistS_eq_zero_iff (σ σ' : V → Fin (N + 1)) :

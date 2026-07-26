@@ -52,18 +52,6 @@ theorem oneFlippedUpConfig_apply_self (V : Type*) [DecidableEq V]
   unfold oneFlippedUpConfig
   rw [if_pos rfl]
 
-/-- The one-flipped configuration disagrees with the all-up
-configuration at the flipped site. -/
-theorem oneFlippedUpConfig_ne_allAlignedConfigS_zero (V : Type*)
-    [DecidableEq V] (x_0 : V) (hN : 0 < N) :
-    oneFlippedUpConfig V x_0 hN ≠ allAlignedConfigS V N 0 := by
-  intro heq
-  have h0 : oneFlippedUpConfig V x_0 hN x_0 = (0 : Fin (N + 1)) := by
-    rw [heq]; rfl
-  rw [oneFlippedUpConfig_apply_self] at h0
-  have hv := congrArg Fin.val h0
-  simp at hv
-
 /-- **Explicit value of `Ŝ_{tot}^- · |σ_⊤⟩` at a one-flipped
 configuration**: for any pivot site `x_0 : V` and any `0 < N`,
 
@@ -200,19 +188,6 @@ theorem oneFlippedDownConfig_apply_self (V : Type*) [DecidableEq V]
     oneFlippedDownConfig V x_0 hN x_0 = ⟨N - 1, by omega⟩ := by
   unfold oneFlippedDownConfig
   rw [if_pos rfl]
-
-/-- The one-flipped (down) configuration disagrees with the all-down
-configuration at the flipped site. -/
-theorem oneFlippedDownConfig_ne_allAlignedConfigS_last (V : Type*)
-    [DecidableEq V] (x_0 : V) (hN : 0 < N) :
-    oneFlippedDownConfig V x_0 hN ≠ allAlignedConfigS V N (Fin.last N) := by
-  intro heq
-  have h0 : oneFlippedDownConfig V x_0 hN x_0 = (Fin.last N : Fin (N + 1)) := by
-    rw [heq]; rfl
-  rw [oneFlippedDownConfig_apply_self] at h0
-  have hval := congrArg Fin.val h0
-  simp [Fin.last] at hval
-  omega
 
 /-- **Explicit value of `Ŝ_{tot}^+ · |σ_⊥⟩` at a one-raised
 configuration**: for any pivot site `x_0 : V` and any `0 < N`,

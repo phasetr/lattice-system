@@ -51,32 +51,6 @@ noncomputable def onSiteSLinearMap {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N
   map_add' := fun A B => onSiteS_add i A B
   map_smul' := fun c A => onSiteS_smul i c A
 
-/-- **`onSiteS i` commutes with the matrix exponential**: `onSiteS i (exp A) = exp(onSiteS i A)`.
-Via `NormedSpace.map_exp` for the continuous ring hom `onSiteSRingHom i` (Frobenius norms). -/
-theorem onSiteS_exp_eq_exp_onSiteS {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ} (i : Λ)
-    (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
-    onSiteS i (NormedSpace.exp A) = NormedSpace.exp (onSiteS i A : ManyBodyOpS Λ N) := by
-  letI iAddSrc : NormedAddCommGroup (Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :=
-    Matrix.frobeniusNormedAddCommGroup
-  letI _iSpaceSrc : NormedSpace ℂ (Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :=
-    Matrix.frobeniusNormedSpace
-  letI iRingSrc : NormedRing (Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :=
-    Matrix.frobeniusNormedRing
-  letI iAlgSrc : NormedAlgebra ℚ (Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :=
-    Matrix.frobeniusNormedAlgebra
-  letI _iAddTgt : NormedAddCommGroup (ManyBodyOpS Λ N) := Matrix.frobeniusNormedAddCommGroup
-  letI _iSpaceTgt : NormedSpace ℂ (ManyBodyOpS Λ N) := Matrix.frobeniusNormedSpace
-  letI iRingTgt : NormedRing (ManyBodyOpS Λ N) := Matrix.frobeniusNormedRing
-  letI iAlgTgt : Algebra ℚ (ManyBodyOpS Λ N) :=
-    (Matrix.frobeniusNormedAlgebra (R := ℚ)).toAlgebra
-  haveI iComplSrc : CompleteSpace (Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :=
-    FiniteDimensional.complete ℂ (Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
-  have hcont : Continuous (onSiteSRingHom (Λ := Λ) (N := N) i) :=
-    (onSiteSLinearMap (Λ := Λ) (N := N) i).continuous_of_finiteDimensional
-  exact @NormedSpace.map_exp (Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) (ManyBodyOpS Λ N)
-    iRingSrc iAlgSrc iComplSrc iRingTgt iAlgTgt _ _ _
-    (onSiteSRingHom (Λ := Λ) (N := N) i) hcont A
-
 /-- **Generic PSD expectation bound**: if `b•1 − A` is positive semidefinite then the real
 Rayleigh form of `A` is bounded by `b ‖ψ‖²`. -/
 theorem dotProduct_mulVec_re_le_of_posSemidef {ι : Type*} [Fintype ι] [DecidableEq ι]

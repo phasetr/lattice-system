@@ -46,22 +46,6 @@ theorem spinSOp1_onSiteS_commutator_spinSOp2_onSiteS (x : Λ) :
       Complex.I • onSiteS x (spinSOp3 N) := by
   rw [onSiteS_commutator_same, spinSOp1_commutator_spinSOp2, onSiteS_smul]
 
-/-- Same-site SU(2) cyclic commutator at axis `(2, 3) → 1`. -/
-theorem spinSOp2_onSiteS_commutator_spinSOp3_onSiteS (x : Λ) :
-    (onSiteS x (spinSOp2 N) * onSiteS x (spinSOp3 N)
-        - onSiteS x (spinSOp3 N) * onSiteS x (spinSOp2 N) :
-        ManyBodyOpS Λ N) =
-      Complex.I • onSiteS x (spinSOp1 N) := by
-  rw [onSiteS_commutator_same, spinSOp2_commutator_spinSOp3, onSiteS_smul]
-
-/-- Same-site SU(2) cyclic commutator at axis `(3, 1) → 2`. -/
-theorem spinSOp3_onSiteS_commutator_spinSOp1_onSiteS (x : Λ) :
-    (onSiteS x (spinSOp3 N) * onSiteS x (spinSOp1 N)
-        - onSiteS x (spinSOp1 N) * onSiteS x (spinSOp3 N) :
-        ManyBodyOpS Λ N) =
-      Complex.I • onSiteS x (spinSOp2 N) := by
-  rw [onSiteS_commutator_same, spinSOp3_commutator_spinSOp1, onSiteS_smul]
-
 /-! ## Total-spin commutators for arbitrary spin -/
 
 /-- General total-spin commutator: if `[A, B] = I • C` then

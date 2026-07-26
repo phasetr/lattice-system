@@ -34,14 +34,6 @@ variable {d : ℕ} {A : Type*} [CStarAlgebra A]
 
 namespace InfiniteSpinSystem.TranslationInvariant
 
-/-- A translation-invariant state is unchanged by an even translation:
-`ω(τ_x a) = ω(a)` for `x ∈ ℤᵈ_even`. -/
-theorem transl_apply {S : InfiniteSpinSystem d A} {ω : WeakDual ℂ A}
-    (hω : InfiniteSpinSystem.TranslationInvariant S ω) (a : A)
-    {x : Fin d → ℤ} (hx : InfiniteSpinSystem.evenSite x) :
-    ω (S.transl x a) = ω a :=
-  hω a x hx
-
 /-- Even-translation invariance of a bond spin–spin expectation:
 `ω(Ŝ_{y+x} · Ŝ_{z+x}) = ω(Ŝ_y · Ŝ_z)` for `x ∈ ℤᵈ_even`. -/
 theorem spinDot_add_right_apply {S : InfiniteSpinSystem d A} {ω : WeakDual ℂ A}

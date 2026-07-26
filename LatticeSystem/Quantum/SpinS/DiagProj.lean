@@ -51,17 +51,6 @@ noncomputable def spinSDiagProj (N : ℕ) (k : Fin (N + 1)) :
   unfold spinSDiagProj
   simp [Matrix.diagonal]
 
-/-- The projector vanishes off the `(k, k)` diagonal. -/
-theorem spinSDiagProj_apply_off (k : Fin (N + 1)) {i j : Fin (N + 1)}
-    (h : ¬ (i = j ∧ i = k)) :
-    spinSDiagProj N k i j = 0 := by
-  unfold spinSDiagProj
-  by_cases hij : i = j
-  · subst hij
-    rw [Matrix.diagonal_apply_eq]
-    simp [show i ≠ k from fun heq => h ⟨rfl, heq⟩]
-  · rw [Matrix.diagonal_apply_ne _ hij]
-
 /-! ## Action of `Ŝ^{(3)} − λ_j • 1` on the projector -/
 
 /-- The shifted operator `Ŝ^{(3)} − λ_j • 1` is itself a diagonal

@@ -98,18 +98,6 @@ theorem onSiteS_neg (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
   rw [show ((-1 : ℂ) • onSiteS (N := N) i A : ManyBodyOpS Λ N) =
         -onSiteS i A from by rw [neg_smul, one_smul]]
 
-/-- Power identity: `(onSiteS i A)^k = onSiteS i (A^k)`. -/
-theorem onSiteS_pow (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
-    (k : ℕ) :
-    (onSiteS i A : ManyBodyOpS Λ N) ^ k = onSiteS i (A ^ k) := by
-  induction k with
-  | zero =>
-    simp only [pow_zero]
-    exact (onSiteS_one i).symm
-  | succ k ih =>
-    rw [pow_succ, ih, onSiteS_mul_onSiteS_same]
-    rw [pow_succ]
-
 /-- Commute version of distinct-site commutativity. -/
 theorem onSiteS_commute_of_ne {i j : Λ} (hij : i ≠ j)
     (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :

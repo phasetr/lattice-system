@@ -51,13 +51,6 @@ noncomputable def bipartiteImbalanceWeight (A : Λ → Bool) (N : ℕ) : ℂ :=
     ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) *
     ((N : ℂ) / 2)
 
-/-- Unfold lemma for `bipartiteImbalanceWeight`. -/
-theorem bipartiteImbalanceWeight_def (A : Λ → Bool) (N : ℕ) :
-    bipartiteImbalanceWeight (Λ := Λ) A N =
-      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) -
-        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) *
-        ((N : ℂ) / 2) := rfl
-
 /-- **Bridge**: the `Ŝ_tot^{(3)}` eigenvalue of the Néel
 configuration on sublattice `A` equals
 `bipartiteImbalanceWeight A N`. Restates

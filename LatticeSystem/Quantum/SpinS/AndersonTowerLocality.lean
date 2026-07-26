@@ -394,25 +394,6 @@ theorem torusNNCoupling_total_norm_le (d L : ℕ) [NeZero L] :
         rw [Finset.sum_const, Finset.card_univ, card_hypercubicTorus, nsmul_eq_mul]
         push_cast; ring
 
-/-! ### R2 plumbing (P9-4) -/
-
-/-- **Generic order-density commutator bound** `‖[ô^b, G]‖ ≤ 2N‖G‖` for any operator `G`. -/
-theorem orderDensity_commutator_general_norm_le (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (b : Bool)
-    (G : ManyBodyOpS (HypercubicTorus d L) N) :
-    manyBodyOperatorNormS
-      (staggeredOrderDensityOpS d L N b * G - G * staggeredOrderDensityOpS d L N b)
-      ≤ 2 * (N : ℝ) * manyBodyOperatorNormS G := by
-  have hd := staggeredOrderDensityOpS_manyBodyOperatorNormS_le d L N b hN
-  have hG := manyBodyOperatorNormS_nonneg G
-  refine le_trans (manyBodyOperatorNormS_sub_le _ _) ?_
-  have h1 : manyBodyOperatorNormS (staggeredOrderDensityOpS d L N b * G)
-      ≤ (N : ℝ) * manyBodyOperatorNormS G :=
-    le_trans (manyBodyOperatorNormS_mul_le _ _) (mul_le_mul_of_nonneg_right hd hG)
-  have h2 : manyBodyOperatorNormS (G * staggeredOrderDensityOpS d L N b)
-      ≤ manyBodyOperatorNormS G * (N : ℝ) :=
-    le_trans (manyBodyOperatorNormS_mul_le _ _) (mul_le_mul_of_nonneg_left hd hG)
-  nlinarith [h1, h2]
-
 /-- **Operator Cauchy–Schwarz** `|Re⟨u, G v⟩| ≤ ‖G‖ ‖u‖₂ ‖v‖₂` (the `L²`-operator-norm form). -/
 theorem abs_re_dotProduct_mulVec_le_norm_mul (G : ManyBodyOpS Λ N)
     (u v : (Λ → Fin (N + 1)) → ℂ) :
