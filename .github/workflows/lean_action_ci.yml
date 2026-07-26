@@ -17,7 +17,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      # lean-action's own `actions/cache/restore` and `actions/cache/save`
+      # steps are gated by the single `use-github-cache` input (see
+      # https://github.com/leanprover/lean-action/blob/v1/action.yml), so
+      # there is no way to ask lean-action itself for "restore but don't
+      # save". On pull_request runs we therefore restore the `.lake` cache
+      # here (same key scheme lean-action uses internally) and then tell
+      # lean-action not to touch the cache at all, so it neither restores
+      # again (this step already did it) nor saves at the end of the job.
+      # This avoids PR runs evicting the `main`-branch cache entry via LRU
+      # in the shared 10 GB repo cache quota (see #5098).
+      - uses: actions/cache/restore@v5
+        if: github.event_name == 'pull_request'
+        with:
+          path: .lake
+          key: lake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lake-manifest.json') }}-${{ github.sha }}
+          restore-keys: |
+            lake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lake-manifest.json') }}
       - uses: leanprover/lean-action@v1
+        with:
+          use-github-cache: ${{ github.event_name != 'pull_request' }}
 
   # API docs generation (doc-gen4 via docgen-action) is currently
   # DISABLED because it was taking unreasonably long on every push
