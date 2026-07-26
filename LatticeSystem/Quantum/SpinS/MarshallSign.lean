@@ -32,11 +32,6 @@ noncomputable def marshallDressedBasisS [DecidableEq V]
     (A : V → Bool) (σ : V → Fin (N + 1)) : (V → Fin (N + 1)) → ℂ :=
   marshallSignS A σ • basisVecS σ
 
-/-- Definitional unfolding of `marshallDressedBasisS`. -/
-theorem marshallDressedBasisS_def [DecidableEq V]
-    (A : V → Bool) (σ : V → Fin (N + 1)) :
-    marshallDressedBasisS A σ = marshallSignS A σ • basisVecS σ := rfl
-
 /-- Component formula: `marshallDressedBasisS A σ τ` is
 `marshallSignS A σ` if `τ = σ`, else `0`. -/
 theorem marshallDressedBasisS_apply [DecidableEq V]
@@ -71,22 +66,6 @@ theorem marshallDressedBasisS_const_zero [DecidableEq V]
       basisVecS (fun _ : V => (0 : Fin (N + 1))) := by
   unfold marshallDressedBasisS
   rw [marshallSignS_const_zero, one_smul]
-
-/-- For `N = 0` (`S = 0`), the Marshall-dressed basis vector equals
-the plain basis vector. -/
-theorem marshallDressedBasisS_N_zero [DecidableEq V]
-    (A : V → Bool) (σ : V → Fin 1) :
-    marshallDressedBasisS A σ = basisVecS σ := by
-  unfold marshallDressedBasisS
-  rw [marshallSignS_N_zero, one_smul]
-
-/-- For an empty lattice, the Marshall-dressed basis vector equals
-the plain basis vector (Marshall sign is `1`). -/
-theorem marshallDressedBasisS_of_isEmpty [DecidableEq V] [IsEmpty V]
-    (A : V → Bool) (σ : V → Fin (N + 1)) :
-    marshallDressedBasisS A σ = basisVecS σ := by
-  unfold marshallDressedBasisS
-  rw [marshallSignS_of_isEmpty, one_smul]
 
 /-- **Orthonormality of the Marshall-dressed basis**:
 
@@ -150,70 +129,5 @@ theorem marshallDressedBasisS_ne_zero [DecidableEq V]
   have h0 : marshallDressedBasisS A σ σ = 0 := by rw [h]; rfl
   rw [marshallDressedBasisS_self] at h0
   exact marshallSignS_ne_zero A σ h0
-
-/-- The Marshall-dressed basis vector at its own configuration has
-norm 1: `‖marshallDressedBasisS A σ σ‖ = 1`. -/
-theorem marshallDressedBasisS_self_norm [DecidableEq V]
-    (A : V → Bool) (σ : V → Fin (N + 1)) :
-    ‖marshallDressedBasisS A σ σ‖ = 1 := by
-  rw [marshallDressedBasisS_self, marshallSignS_norm]
-
-/-- Component-wise norm of the Marshall-dressed basis equals the
-component-wise norm of the plain basis (since dressing only changes
-sign): `‖marshallDressedBasisS A σ τ‖ = ‖basisVecS σ τ‖`. -/
-theorem marshallDressedBasisS_norm_eq_basisVecS [DecidableEq V]
-    (A : V → Bool) (σ τ : V → Fin (N + 1)) :
-    ‖marshallDressedBasisS A σ τ‖ = ‖(basisVecS σ τ : ℂ)‖ := by
-  unfold marshallDressedBasisS
-  rw [Pi.smul_apply, smul_eq_mul, norm_mul]
-  rw [marshallSignS_norm, one_mul]
-
-/-- The Marshall-dressed basis vector lies in the supremum of all
-magnetization subspaces (since it lies in `magSubspaceS V N (magEigenvalueS σ)`
-which is included in `⨆ M, magSubspaceS V N M`). -/
-theorem marshallDressedBasisS_mem_iSup_magSubspaceS [DecidableEq V]
-    (A : V → Bool) (σ : V → Fin (N + 1)) :
-    (marshallDressedBasisS A σ : (V → Fin (N + 1)) → ℂ) ∈
-      ⨆ M : ℂ, magSubspaceS V N M :=
-  Submodule.mem_iSup_of_mem (magEigenvalueS σ)
-    (marshallDressedBasisS_mem_magSubspaceS A σ)
-
-/-- **Marshall-dressed basis is `±basisVecS`**: depending on whether
-the Marshall sign is `+1` or `-1`, the dressed basis vector equals
-`+basisVecS σ` or `-basisVecS σ`. -/
-theorem marshallDressedBasisS_eq_or [DecidableEq V]
-    (A : V → Bool) (σ : V → Fin (N + 1)) :
-    marshallDressedBasisS A σ = basisVecS σ ∨
-      marshallDressedBasisS A σ = -basisVecS σ := by
-  unfold marshallDressedBasisS
-  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
-  · left; rw [h, one_smul]
-  · right; rw [h, neg_smul, one_smul]
-
-/-- **Inverse decomposition**: every plain basis vector is
-`marshallSignS A σ` times the corresponding Marshall-dressed basis
-vector. (This is `marshallSignS_smul_marshallDressedBasisS` restated
-with sides swapped for use as a rewrite from `basisVecS` toward
-`marshallDressedBasisS`.) -/
-theorem basisVecS_eq_marshallSignS_smul_marshallDressedBasisS
-    [DecidableEq V] (A : V → Bool) (σ : V → Fin (N + 1)) :
-    (basisVecS σ : (V → Fin (N + 1)) → ℂ) =
-      marshallSignS A σ • marshallDressedBasisS A σ :=
-  (marshallSignS_smul_marshallDressedBasisS A σ).symm
-
-/-- **Marshall-dressed basis decomposition** of any vector:
-`v = Σ_σ (marshallSignS A σ * v(σ)) • marshallDressedBasisS A σ`.
-Substituting `basisVecS σ = marshallSignS A σ • marshallDressedBasisS A σ`
-into `fun_eq_sum_smul_basisVecS`. -/
-theorem fun_eq_sum_smul_marshallDressedBasisS [DecidableEq V]
-    (A : V → Bool) (v : (V → Fin (N + 1)) → ℂ) :
-    v = ∑ σ : V → Fin (N + 1),
-      (marshallSignS A σ * v σ) • marshallDressedBasisS A σ := by
-  conv_lhs => rw [fun_eq_sum_smul_basisVecS v]
-  refine Finset.sum_congr rfl ?_
-  intro σ _
-  rw [basisVecS_eq_marshallSignS_smul_marshallDressedBasisS A σ]
-  rw [smul_smul]
-  rw [mul_comm (v σ) (marshallSignS A σ)]
 
 end LatticeSystem.Quantum
