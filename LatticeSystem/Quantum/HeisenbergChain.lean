@@ -106,17 +106,6 @@ theorem openChainCoupling_apply (N : ℕ) (J : ℝ) (x y : Fin (N + 1)) :
   · rw [SimpleGraph.pathGraph_adj] at h
     rw [if_neg (by rwa [SimpleGraph.pathGraph_adj]), if_neg h]
 
-/-- Explicit if-form for `periodicChainCoupling`. -/
-theorem periodicChainCoupling_apply (N : ℕ) (J : ℝ) (x y : Fin (N + 2)) :
-    periodicChainCoupling N J x y
-      = if x + 1 = y ∨ y + 1 = x then -(J : ℂ) else 0 := by
-  unfold periodicChainCoupling LatticeSystem.Lattice.couplingOf
-  by_cases h : (SimpleGraph.cycleGraph (N + 2)).Adj x y
-  · rw [if_pos h,
-      if_pos ((LatticeSystem.Lattice.cycleGraph_adj_iff N x y).mp h)]
-  · rw [if_neg h, if_neg (fun h' => h
-      ((LatticeSystem.Lattice.cycleGraph_adj_iff N x y).mpr h'))]
-
 /-! ## Hermiticity -/
 
 /-- A Heisenberg Hamiltonian with real symmetric coupling is Hermitian. -/
