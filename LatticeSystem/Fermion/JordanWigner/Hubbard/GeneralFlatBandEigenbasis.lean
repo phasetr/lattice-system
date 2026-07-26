@@ -7,8 +7,11 @@ For a Hermitian hopping matrix `T`, the orthonormal eigenbasis `T.IsHermitian.ei
 (on `EuclideanSpace ℂ (Fin (M+1))`) transports to a `Module.Basis` of the plain coordinate space
 `Fin (M+1) → ℂ`, on which the general occupation basis (`GeneralFlatBandOccBasis.lean`) is built.
 Its orthonormality yields the **dual canonical anticommutation relation**
-`{Ĉ_σ(ē_j), Ĉ†_τ(e_k)} = δ_{jk}δ_{στ}·1`, the exact occupation-detection algebra used to peel a flat
-band ground state into its zero-eigenvalue (flat-band) modes (eq. (11.3.46)).
+`{Ĉ_σ(ē_j), Ĉ†_τ(e_k)} = δ_{jk}δ_{στ}·1`, the exact occupation-detection algebra from which
+`GeneralFlatBandSpanning.lean` forms the eigenmode number operator
+`n̂_{j,σ} = Ĉ†_σ(e_j) Ĉ_σ(ē_j)` and resolves a flat-band ground state into its zero-eigenvalue
+(flat-band) modes (eq. (11.3.46)).  The smeared-annihilator vacuum kill `Ĉ_σ(φ)|vac⟩ = 0`
+recorded here is the other half of that computation.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed.), §11.3.4, eq. (11.3.46).  Tracked in Issue #4363.
@@ -89,15 +92,5 @@ theorem spinfulAnnihilationFromVector_mulVec_vacuum (φ : Fin (M + 1) → ℂ) (
   rw [spinfulAnnihilationFromVector, Matrix.sum_mulVec]
   refine Finset.sum_eq_zero fun x _ => ?_
   rw [Matrix.smul_mulVec, fermionMultiAnnihilation_mulVec_vacuum, smul_zero]
-
-/-- **The single peeled contribution** of position `i` when the eigenbasis annihilator `Ĉ_σ(ē_j)`
-passes through a general mode monomial: amplitude `δ_{j,(qs[i]).1}·δ_{σ,(qs[i]).2}` (the dual CAR
-Kronecker delta) and Koszul sign `(-1)^i`, leaving the monomial with the `i`-th mode removed. -/
-noncomputable def eigenModePeelTerm (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ))
-    (j : Fin (M + 1)) (σ : Fin 2) (qs : List (Fin (M + 1) × Fin 2)) (i : Fin qs.length) :
-    (Fin (2 * M + 2) → Fin 2) → ℂ :=
-  ((-1 : ℂ) ^ (i : ℕ)) •
-    ((if j = (qs.get i).1 ∧ σ = (qs.get i).2 then (1 : ℂ) else 0) •
-      generalModeMonomial e (qs.eraseIdx i))
 
 end LatticeSystem.Fermion
