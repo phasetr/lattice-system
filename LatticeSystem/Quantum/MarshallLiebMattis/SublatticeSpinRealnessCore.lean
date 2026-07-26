@@ -17,6 +17,7 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
 /-! ## Sublattice axis-3 squared as conjTranspose product -/
 
+/-- `(Ŝ_A^(3))² = (Ŝ_A^(3))ᴴ * Ŝ_A^(3)`. Direct from Hermiticity. -/
 theorem sublatticeSpinHalfOp3_sq_eq_conjTranspose_mul (A : Λ → Bool) :
     sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp3 A =
       (sublatticeSpinHalfOp3 A).conjTranspose * sublatticeSpinHalfOp3 A := by
