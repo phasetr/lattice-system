@@ -82,21 +82,6 @@ noncomputable def generalOccMonomial (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M
     (f : Fin (M + 1) × Fin 2 → Fin 2) : (Fin (2 * M + 2) → Fin 2) → ℂ :=
   generalModeMonomial e (generalOccFinset f).toList
 
-/-- `generalOccMonomial f` lies in the monomial span. -/
-theorem generalOccMonomial_mem (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ))
-    (f : Fin (M + 1) × Fin 2 → Fin 2) :
-    generalOccMonomial e f ∈ generalModeFockSubmodule e :=
-  generalModeMonomial_mem _ _
-
-/-- Setting mode `q` to occupied inserts it into the occupied finset. -/
-theorem generalOccFinset_update_one (f : Fin (M + 1) × Fin 2 → Fin 2)
-    {q : Fin (M + 1) × Fin 2} :
-    generalOccFinset (Function.update f q 1) = insert q (generalOccFinset f) := by
-  ext q'
-  simp only [generalOccFinset, Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert,
-    Function.update_apply]
-  by_cases h : q' = q <;> simp [h]
-
 /-- A list-monomial with a repeated mode vanishes. -/
 theorem generalModeMonomial_eq_zero_of_not_nodup
     (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (l : List (Fin (M + 1) × Fin 2))

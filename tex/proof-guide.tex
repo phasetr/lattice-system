@@ -7878,6 +7878,19 @@ $\hat C_\sigma(\bar e_j)\,|qs\rangle = \sum_i (-1)^i\,\delta_{j,(qs_i)_1}\delta_
 sign), and annihilates a monomial not containing it.  This is the occupation-detection engine for
 the eq.~(11.3.46) hard direction (a flat-band ground state, annihilated by every nonzero-eigenvalue
 mode $\hat C_\sigma(\bar e_j)$, has occupation only on the flat band), completed in the next PR.
+(The whole peel layer — the two peel lemmas and the per-position peel-term summand definition
+they were proved with (one of the two stated with it directly, the other only using it inside its
+proof) — was later removed as unused: the PR4 completion below detects occupation
+through the eigenmode \emph{number} operator $\hat n_{j,\sigma}$, built from the same dual CAR.  Of
+this PR the transported eigenbasis (\texttt{eigenbasisAsBasis}, with its defining equation
+\texttt{eigenbasisAsBasis\_apply}), its coordinate orthonormality
+(\texttt{eigenbasisAsBasis\_orthonormal\_sum}), the dual CAR itself
+(\texttt{eigenbasis\_dual\_annihilation\_creation\_anticomm}) and the smeared-annihilator vacuum
+kill $\hat C_\sigma(\varphi)|\mathrm{vac}\rangle=0$
+(\texttt{spinfulAnnihilationFromVector\_mulVec\_vacuum}) remain in
+\texttt{GeneralFlatBandEigenbasis.lean} — all but the coordinate-orthonormality one still consumed
+by \texttt{GeneralFlatBandSpanning.lean}, while the coordinate-orthonormality lemma is instead
+consumed by \texttt{HubbardImpossibilityLowUTrialCore.lean}.)
 
 \medskip\noindent\textbf{Theorem 11.17 PR4, eq.~(11.3.46) Fock spanning, hard direction (Tasaki
 §11.3.4, Issue \#4363, \texttt{GeneralFlatBandSpanning.lean}).}  The flat-band ground state at

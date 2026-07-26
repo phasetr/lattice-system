@@ -6,7 +6,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandDoubleOcc
 # Tasaki §11.3.1: α-spin occupation configs and the double-annihilation core (toward block ≤ 1)
 
 The foundational layer of the no-double-occupancy spin-swap coefficient relation: the
-position-independent Koszul sign identity, the orbital-spin ↔ occupation config map
+orbital-spin ↔ occupation config map
 `flatBandAlphaSpinOcc`, its occupied-mode/`Ŝ^z`-weight structure, the canonical orbital list
 `flatBandAlphaSpinList`, and the double-annihilation `ĉ_{int(p)↓} ĉ_{int(p)↑}` actions on the
 canonical α-monomials (aligned / swapped / same-spin) together with the β-free extension lemmas.
@@ -23,14 +23,6 @@ open Matrix LatticeSystem.Quantum
 open scoped BigOperators
 
 variable {K : ℕ} {ν : ℝ}
-
-/-- **Position-independent relative Koszul sign for a two-mode erase.**  Whatever the lengths of the
-list segments before / between the two erased modes, the two ways of erasing them (in the two spin
-orders) differ by an overall sign of `−1`: both sides reduce to `(-1)^(2m+n)`. -/
-theorem koszul_two_erase_sign_split (m n : ℕ) :
-    (-1 : ℂ) ^ m * (-1 : ℂ) ^ (m + n) = -((-1 : ℂ) ^ (m + n + 1) * (-1 : ℂ) ^ m) := by
-  rw [← pow_add, ← pow_add, show m + n + 1 + m = m + (m + n) + 1 by ring, pow_succ]
-  ring
 
 /-- **Orbital-spin → occupation config.**  An up/down assignment `s : Fin (K+1) → Fin 2` of the
 `K+1` flat-band orbitals (`s p` the chosen spin) maps to the occupation config that occupies the
@@ -209,32 +201,6 @@ theorem flatBand_cDownUp_swap (K : ℕ) (ν : ℝ) (p : Fin (K + 1))
   rw [← neg_smul]
   congr 1
   ring
-
-/-- **The `α`-spin occupation list, with the overlapping pair pulled to the front.**  For
-`s p = ↑`, `s (p+1) = ↓` the occupation list is a permutation of `(inl p, ↑) :: (inl(p+1), ↓) ::
-rest`, where `rest` is the rest of the occupied modes (the other orbitals, shared with the spin-swap
-of `s`). -/
-theorem flatBandAlphaSpinOcc_toList_perm (K : ℕ) (s : Fin (K + 1) → Fin 2) (p : Fin (K + 1))
-    (hsp : s p = 0) (hsp1 : s (p + 1) = 1) (hp1 : p + 1 ≠ p) :
-    (occFinset (flatBandAlphaSpinOcc K s)).toList.Perm
-      ((Sum.inl p, (0 : Fin 2)) :: (Sum.inl (p + 1), (1 : Fin 2)) ::
-        (((occFinset (flatBandAlphaSpinOcc K s)).erase (Sum.inl p, (0 : Fin 2))).erase
-          (Sum.inl (p + 1), (1 : Fin 2))).toList) := by
-  classical
-  set occ := occFinset (flatBandAlphaSpinOcc K s) with hocc
-  set a : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 := (Sum.inl p, (0 : Fin 2)) with ha
-  set b : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 := (Sum.inl (p + 1), (1 : Fin 2)) with hb
-  have hmem0 : a ∈ occ := (mem_occFinset_alphaSpinOcc s _).mpr ⟨p, by rw [ha, hsp]⟩
-  have hne : b ≠ a := fun h => hp1 (Sum.inl_injective (congrArg Prod.fst h))
-  have hmem1 : b ∈ occ.erase a :=
-    Finset.mem_erase.mpr ⟨hne, (mem_occFinset_alphaSpinOcc s _).mpr ⟨p + 1, by rw [hb, hsp1]⟩⟩
-  have h1 : occ.toList.Perm (a :: (occ.erase a).toList) := by
-    have h := Finset.toList_insert (Finset.notMem_erase a occ)
-    rwa [Finset.insert_erase hmem0] at h
-  have h2 : (occ.erase a).toList.Perm (b :: ((occ.erase a).erase b).toList) := by
-    have h := Finset.toList_insert (Finset.notMem_erase b (occ.erase a))
-    rwa [Finset.insert_erase hmem1] at h
-  exact h1.trans (h2.cons _)
 
 /-- Moving one leading creation past the next two negates twice (back to `+`):
 `monomial(c::a::b::l) = monomial(a::b::c::l)`. -/
@@ -533,9 +499,8 @@ theorem flatBand_cDownUp_extSite_double (K : ℕ) (ν : ℝ) (q : Fin (K + 1))
 
 /-- **Pulling two occupied modes to the front of an occupation `toList`.**  For any config `f` and
 two distinct occupied modes `a, b`, the `toList` enumeration is a permutation of `a :: b :: r`,
-where `r` lists the remaining occupied modes.  (Generalises `flatBandAlphaSpinOcc_toList_perm` to an
-arbitrary config and mode pair; used for both the external double-occupancy and the internal
-coefficient readings.) -/
+where `r` lists the remaining occupied modes.  (Used for both the external double-occupancy and the
+internal coefficient readings.) -/
 theorem occFinset_toList_perm_two_front
     (f : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 → Fin 2)
     (a b : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2)

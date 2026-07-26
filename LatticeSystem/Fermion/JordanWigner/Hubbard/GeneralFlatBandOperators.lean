@@ -37,20 +37,6 @@ noncomputable def generalFlatBandAnnihilation (μ : Fin (M + 1) → Fin (M + 1) 
     (z : Fin (M + 1)) (σ : Fin 2) : ManyBodyOp (Fin (2 * M + 2)) :=
   spinfulAnnihilationFromVector M (μ z) σ
 
-/-- Unfolding lemma: `â†_{z,σ}` is the `μ_z`-weighted sum of the site creation operators. -/
-theorem generalFlatBandCreation_eq_sum (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
-    (z : Fin (M + 1)) (σ : Fin 2) :
-    generalFlatBandCreation μ z σ
-      = ∑ x : Fin (M + 1), μ z x • fermionMultiCreation (2 * M + 1) (spinfulIndex M x σ) :=
-  rfl
-
-/-- Unfolding lemma: `â_{z,σ}` is the `μ_z`-weighted sum of the site annihilation operators. -/
-theorem generalFlatBandAnnihilation_eq_sum (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
-    (z : Fin (M + 1)) (σ : Fin 2) :
-    generalFlatBandAnnihilation μ z σ
-      = ∑ x : Fin (M + 1), μ z x • fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ) :=
-  rfl
-
 /-- **The spinful canonical anticommutation relation at general site count**:
 `{ĉ_{x,σ}, ĉ†_{y,τ}} = [x = y ∧ σ = τ]` on `M + 1` physical sites.  The general-`M` form of
 `spinful_annihilation_creation_anticomm` (which is its `M = 2K+1` delta-chain instance); the

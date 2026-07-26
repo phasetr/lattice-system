@@ -25,8 +25,7 @@ creation/annihilation operators is a later layer.
 
 ## Main results
 
-* `permutationOperator_mulVec_basisVec` / `permutationOperator_refl` — the basis
-  action and the identity at `π = refl`.
+* `permutationOperator_mulVec_basisVec` — the basis action.
 * `hubbardBlockToSpinfulPermutationOperator_mulVec_basisVec` — the basis action,
   carrying a block config to its interleaved relabeling.
 * `hubbardBlockToSpinfulPermutationOperator_conjTranspose_mul` /
@@ -65,21 +64,6 @@ theorem permutationOperator_mulVec_basisVec (π : Equiv.Perm (Fin M))
     sum_mul_basisVec σ (fun ρ => permutationOperator π τ ρ)
   rw [h, permutationOperator, Matrix.of_apply, Pi.smul_apply, smul_eq_mul, basisVec]
   split_ifs with hτ <;> simp
-
-/-- The signed permutation operator at `π = refl` is the identity. -/
-theorem permutationOperator_refl (M : ℕ) :
-    permutationOperator (Equiv.refl (Fin M)) = 1 := by
-  ext τ σ
-  have hsign : translationJwSign (Equiv.refl (Fin M)) σ = 1 := by
-    unfold translationJwSign
-    rw [Finset.filter_false_of_mem, Finset.card_empty, pow_zero]
-    rintro p _ ⟨hlt, -, -, hgt⟩
-    exact absurd (hlt.trans hgt) (lt_irrefl _)
-  rw [permutationOperator, Matrix.of_apply, Equiv.refl_symm]
-  simp only [Equiv.coe_refl, Function.comp_id, Matrix.one_apply]
-  split_ifs with h
-  · exact hsign
-  · rfl
 
 /-- The signed permutation operator is unitary (`Uᴴ U = 1`). -/
 theorem permutationOperator_conjTranspose_mul (π : Equiv.Perm (Fin M)) :

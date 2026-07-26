@@ -5,15 +5,15 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandGroundAnnihilat
 # Ground-state Fock spanning, eq. (11.3.46) (Tasaki §11.3.4, toward Theorem 11.17)
 
 A flat-band Hubbard ground state at filling `N = D₀` lies in the Fock span of the flat-band
-(zero-eigenvalue) modes.  Using the spectral eigenbasis of the hopping matrix `T` and the
-eigenbasis-annihilation peel (`GeneralFlatBandEigenbasis.lean`): a ground state is annihilated by
-`Ĉ_σ(ē_j)` for every nonzero-eigenvalue mode `j` (PR1), and the peel shows that such an annihilator
-detects occupation of mode `(j, σ)`; so the ground state's occupation lives entirely on the flat
-band.
+(zero-eigenvalue) modes.  Using the spectral eigenbasis of the hopping matrix `T` and its dual
+canonical anticommutation relation (`GeneralFlatBandEigenbasis.lean`): a ground state is annihilated
+by `Ĉ_σ(ē_j)` for every nonzero-eigenvalue mode `j` (PR1), and the eigenmode number operator
+`n̂_{j,σ}` detects occupation of mode `(j, σ)`; so the ground state's occupation lives entirely on
+the flat band.
 
 This module records the algebraic inputs: the eigenvalue equation for the transported eigenbasis,
-the resulting ground-state annihilation, and the vanishing of the peel on a monomial not containing
-the probed mode.
+the resulting ground-state annihilation, and the diagonal action of the eigenmode number operator on
+the general occupation basis.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed.), §11.3.4, eq. (11.3.46).  Tracked in Issue #4363.
@@ -49,22 +49,6 @@ theorem groundState_eigenModeAnnihilation_eq_zero
   spinfulAnnihilation_starEigenvector_mulVec_eq_zero_of_groundState M T U hT hU hΦ σ
     (lam := (hT.1.eigenvalues j : ℂ)) (Complex.ofReal_ne_zero.mpr hj)
     (eigenbasisAsBasis_mulVec hT.1 j)
-
-/-- **The eigenmode annihilator kills a monomial not containing its mode**: if `(j, σ) ∉ qs`,
-then `Ĉ_σ(ē_j)|qs⟩ = 0` (every peel amplitude is the Kronecker delta `δ_{(j,σ),(qs[i])}`, which
-vanishes since `(j,σ)` is absent). -/
-theorem eigenModeAnnihilation_mulVec_generalModeMonomial_eq_zero_of_not_mem
-    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : T.IsHermitian) (j : Fin (M + 1)) (σ : Fin 2)
-    (qs : List (Fin (M + 1) × Fin 2)) (h : (j, σ) ∉ qs) :
-    (spinfulAnnihilationFromVector M (star (eigenbasisAsBasis hT j : Fin (M + 1) → ℂ)) σ).mulVec
-        (generalModeMonomial (eigenbasisAsBasis hT) qs) = 0 := by
-  rw [eigenModeAnnihilation_peel]
-  refine Finset.sum_eq_zero fun i _ => ?_
-  have hne : ¬ (j = (qs.get i).1 ∧ σ = (qs.get i).2) := by
-    rintro ⟨h1, h2⟩
-    exact h (show (j, σ) ∈ qs from by
-      rw [show (j, σ) = qs.get i from Prod.ext h1 h2]; exact List.get_mem qs i)
-  rw [eigenModePeelTerm, if_neg hne, zero_smul, smul_zero]
 
 /-- **The eigenmode number operator** `n̂_{j,σ} = Ĉ†_σ(e_j)·Ĉ_σ(ē_j)` counts the occupation of the
 eigenmode `(j, σ)`. -/

@@ -13,7 +13,7 @@ contributes at most one ground state at the global minimum, and the full
 coefficient-space ground eigenspace therefore has `finrank ≤ N+1`.
 
 * [`hermitianMinEigenvalue_sector_eq_neg_pf`] — sector min `= −μ`.
-* [`hermitianMinEigenvalue_tasakiEffMatrix_le_sector`] — `min M ≤ min M_m`.
+* [`hermitianMinEigenvalue_mapFull_le_sector`] — `min M ≤ min M_m`.
 * [`sector_map_eigenspace_finrank_le_one_at`] — per-sector `≤ 1` at the min.
 * [`tasakiEffMatrix_ground_finrank_le_N_add_one`] — the `≤ N+1` bound.
 
@@ -71,43 +71,6 @@ theorem hermitianMinEigenvalue_sector_eq_neg_pf (N : ℕ)
   have hmin := hermitianMinEigenvalue_lift_eq_sub_pf hsymM 0 hBnn hBsymm h_eig hv_pos
   rwa [zero_sub] at hmin
 
-/-- **The global one-hole minimum is `≤` each sector minimum.**  For a non-empty
-connected sector, a Perron ground eigenvector of `−M_m` lifts (zero-extended,
-complexified) to a genuine eigenvector of the full `Ĥ_eff` matrix at the sector
-minimum `−μ`, so the global minimum `hermitianMinEigenvalue M` is `≤ −μ`.
-Combined with [`hermitianMinEigenvalue_sector_eq_neg_pf`] this gives
-`min M ≤ min M_m` — the variational (principal-submatrix) inequality. -/
-theorem hermitianMinEigenvalue_tasakiEffMatrix_le_sector (N : ℕ)
-    (t : Fin (N + 1) → Fin (N + 1) → ℝ) (m : ℤ)
-    [Nonempty (HoleMagSector N m)]
-    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0)
-    (hpos : ∀ i j, 0 ≤ t i j)
-    (hconn : (nagaokaPFMatrixOnSector N t m).IsIrreducible) :
-    ∃ μ : ℝ,
-      LatticeSystem.Quantum.hermitianMinEigenvalue
-        (tasakiEffMatrix_isHermitian N (fun i j => (t i j : ℂ)) 0
-          (tasakiEffMatrix_hJ_of_real htsym) (by simp)) ≤ -μ ∧
-      LatticeSystem.Quantum.hermitianMinEigenvalue
-        (isHermitian_map_ofReal_of_isSymm
-          (tasakiEffReMatrixOnSector_isSymm N t m htsym htdiag)) = -μ := by
-  obtain ⟨μ, v, hAv, hv_pos, hmineq⟩ :=
-    hermitianMinEigenvalue_sector_eq_neg_pf N t m htsym htdiag hpos hconn
-  refine ⟨μ, ?_, hmineq⟩
-  have hMv : tasakiEffReMatrixOnSector N t m *ᵥ v = (-μ) • v := by
-    have hneg : (-tasakiEffReMatrixOnSector N t m) *ᵥ v = μ • v := hAv
-    rw [neg_mulVec] at hneg
-    rw [neg_smul]; exact neg_eq_iff_eq_neg.mp hneg
-  have hembed := tasakiEffReMatrix_mulVec_sectorEmbed_of_eigen N t hMv
-  have hcx := matrix_eigenvec_map_ofReal hembed
-  rw [← tasakiEffMatrix_eq_map_tasakiEffReMatrix N t 0 htdiag] at hcx
-  have hw_ne : (fun p => ((sectorEmbed N m v p : ℝ) : ℂ)) ≠ 0 := by
-    intro h
-    have h0 := congrFun h (Classical.arbitrary (HoleMagSector N m)).val
-    simp only [Pi.zero_apply, Complex.ofReal_eq_zero, sectorEmbed,
-      dif_pos (Classical.arbitrary (HoleMagSector N m)).property] at h0
-    exact absurd h0 (ne_of_gt (hv_pos _))
-  exact hermitian_min_eigenvalue_le_of_eigenvector_exists _ hw_ne hcx
-
 /-- **Each sector contributes at most one ground state at the global minimum.**
 At any energy `E ≤ min M_m`, the (complex) sector eigenspace is at most
 one-dimensional: if `E < min M_m` it is `⊥` (energy below the spectrum); if
@@ -155,8 +118,7 @@ theorem tasakiEffReMatrix_map_eq_zero_of_holeSpinMag_ne (N : ℕ)
 /-- **Complex block invariance: restricting a complex eigenvector to a sector.**
 If the complex-cast `Ĥ_eff` matrix has `M c = E c`, then the restriction of `c`
 to magnetization sector `m` is an eigenvector of the complex sector matrix at
-`E`.  (Complex analogue of `tasakiEffReMatrixOnSector_mulVec_restriction_of_eigen`;
-uses block-diagonality.) -/
+`E`.  (Uses block-diagonality in magnetization.) -/
 theorem tasakiEffMatrixOnSector_map_mulVec_restriction_of_eigen (N : ℕ)
     (t : Fin (N + 1) → Fin (N + 1) → ℝ) {m : ℤ} {E : ℂ}
     {c : (x : Fin (N + 1)) × HoleSpin N x → ℂ}
