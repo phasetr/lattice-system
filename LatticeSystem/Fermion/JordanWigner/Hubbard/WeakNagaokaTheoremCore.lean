@@ -12,13 +12,12 @@ highest-weight identification, the energy degeneracy of the spin-lowering multip
 the SU(2) ladder commutator `[Ŝ⁺, Ŝ⁻] = 2 Ŝ^z` with the Casimir–lowering commutation.
 
 The raising-after-lowering Casimir identities, the multiplet non-vanishing / linear
-independence, the whole-tower energy degeneracy, and the weak Nagaoka spin multiplet
-(plus the ferromagnetic-hole highest-weight state) are kept in the capstone module
-`WeakNagaokaTheorem.lean`.
+independence, the whole-tower energy degeneracy, and the weak Nagaoka spin multiplet are
+kept in the capstone module `WeakNagaokaTheorem.lean`.
 
-To let the capstone reuse the hole-state spin data across the module boundary,
-`ferroHoleConfig` and `fermionTotalSpinZ_mulVec_ferroHole` are module-public here; the
-remaining hole-state helper lemmas stay `private`.
+`ferroHoleConfig` and `fermionTotalSpinZ_mulVec_ferroHole` are module-public: they carry
+the hole-state spin data consumed by the all-up Tasaki basis state and by the `Ŝ^z` tower
+below. The remaining hole-state helper lemmas stay `private`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed., Springer, 2020), §9.3.3 (Theorem 11.5 core).
@@ -47,7 +46,7 @@ theorem fermionMultiNumber_mulVec_basisVec (N : ℕ) (j : Fin (N + 1))
   · rw [hcj, show Function.update c j 1 = c from by rw [← hcj]; exact Function.update_eq_self _ _]
     simp [spinHalfOpMinus, spinHalfOpPlus, Matrix.mul_apply, Fin.sum_univ_two]
 
-/-! ## The ferromagnetic hole state is maximal-spin -/
+/-! ## The ferromagnetic hole state is a highest-weight state -/
 
 /-- The ferromagnetic hole configuration: hole at `x`, every other site spin-up. -/
 def ferroHoleConfig (N : ℕ) (x : Fin (N + 1)) : Fin (2 * N + 2) → Fin 2 :=
@@ -113,20 +112,6 @@ private theorem fermionTotalSpinPlus_mulVec_ferroHole (N : ℕ) (x : Fin (N + 1)
   intro k _
   rw [← Matrix.mulVec_mulVec, fermionMultiAnnihilation_mulVec_basisVec,
     if_neg (by rw [ferroHole_down_zero]; decide), Matrix.mulVec_zero]
-
-/-- **The ferromagnetic hole state is maximal-spin** (the `S_tot = S_max` part
-of Theorem 11.5): `(Ŝ_tot)² |Φ_{x,(↑)}⟩ = S_max(S_max+1) |Φ_{x,(↑)}⟩` with
-`S_max = N/2`. -/
-theorem fermionTotalSpinSquared_mulVec_ferroHole (N : ℕ) (x : Fin (N + 1)) :
-    (fermionTotalSpinSquared N).mulVec (basisVec (ferroHoleConfig N x)) =
-      ((N : ℂ) / 2 * ((N : ℂ) / 2 + 1)) • basisVec (ferroHoleConfig N x) := by
-  unfold fermionTotalSpinSquared
-  rw [Matrix.add_mulVec, ← Matrix.mulVec_mulVec, fermionTotalSpinPlus_mulVec_ferroHole,
-    Matrix.mulVec_zero, zero_add, ← Matrix.mulVec_mulVec, Matrix.add_mulVec,
-    Matrix.one_mulVec, fermionTotalSpinZ_mulVec_ferroHole, Matrix.mulVec_add,
-    Matrix.mulVec_smul, fermionTotalSpinZ_mulVec_ferroHole, smul_smul, ← add_smul]
-  congr 1
-  ring
 
 /-! ## The all-up Tasaki basis state is a highest-weight maximal-spin state -/
 

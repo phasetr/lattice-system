@@ -8,11 +8,13 @@ This file builds toward Tasaki Theorem 11.5: for a Hubbard model with
 among the ground states of the effective Hamiltonian there are at least
 `(2 S_max + 1)` states with total spin `S_tot = S_max = N/2`.
 
-The first ingredient (this commit) is that the *ferromagnetic hole state*
-`|Φ_{x,(↑)}⟩` — the one-hole state with every occupied site spin-up — lies in
-the maximal-spin sector: `(Ŝ_tot)² |Φ_{x,(↑)}⟩ = S_max(S_max+1) |Φ_{x,(↑)}⟩`
-with `S_max = N/2`. Indeed `Ŝ^+_tot` annihilates it (no down electrons to
-raise) and `Ŝ^z_tot` acts with eigenvalue `N/2` (the `N` up electrons).
+This file supplies the abstract half of that statement: for *any* nonzero
+highest-weight state `v` (`Ŝ^+_tot v = 0`, `Ŝ^z_tot v = (N/2) v`) the
+spin-lowering tower `(Ŝ^-_tot)^k v` (`k = 0, …, N`) is nonzero, linearly
+independent, energy-degenerate, and confined to the maximal-spin sector
+`S_tot = S_max = N/2`; this is packaged as `weakNagaoka_spinMultiplet`. The
+concrete highest-weight ground state fed into it is built in
+`WeakNagaokaGroundState.lean`.
 
 Tracked in Issue #4130. Reference: Tasaki, *Physics and Mathematics of Quantum
 Many-Body Systems*, 1st edition, §11.2.1, Theorem 11.5, pp. 382-385.
@@ -215,25 +217,5 @@ theorem weakNagaoka_spinMultiplet (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) →
   refine ⟨spinMinusPow_linearIndependent N v hv hsz hcas, fun k => ?_, fun k => ?_⟩
   · exact hubbardEffectiveHamiltonian_mulVec_spinMinusPow N t U hJ hU v E hE (k : ℕ)
   · exact fermionTotalSpinSquared_mulVec_spinMinusPow N v _ (k : ℕ) hcas
-
-/-! ## The ferromagnetic hole state is a highest-weight maximal-spin state -/
-
-/-- The localized ferromagnetic hole state `|Φ_{x,(↑)}⟩` is a nonzero
-highest-weight maximal-spin state: `Ŝ^+_tot` annihilates it, `Ŝ^z_tot` acts with
-`N/2`, and `(Ŝ_tot)²` with `S_max(S_max+1)`. Hence its `N + 1` spin-lowering
-descendants are linearly independent (instance of
-`spinMinusPow_linearIndependent`). It is *not* in general an `Ĥ_eff`-eigenvector
-(the hole is localized), so the full degeneracy statement
-`weakNagaoka_spinMultiplet` applies to the Perron–Frobenius ground state rather
-than to this localized state. -/
-theorem spinMinusPow_ferroHole_linearIndependent (N : ℕ) (x : Fin (N + 1)) :
-    LinearIndependent ℂ (fun k : Fin (N + 1) =>
-      ((fermionTotalSpinMinus N) ^ (k : ℕ)).mulVec (basisVec (ferroHoleConfig N x))) := by
-  refine spinMinusPow_linearIndependent N (basisVec (ferroHoleConfig N x)) ?_
-    (fermionTotalSpinZ_mulVec_ferroHole N x) (fermionTotalSpinSquared_mulVec_ferroHole N x)
-  intro h
-  have h2 := congrFun h (ferroHoleConfig N x)
-  rw [Pi.zero_apply, basisVec_self] at h2
-  exact one_ne_zero h2
 
 end LatticeSystem.Fermion
