@@ -26,7 +26,6 @@ intersection a submonoid.
 
 ## Main theorems
 
-* `mem_SU2_iff` — membership unfolds to `unitary ∧ det = 1`.
 * `spinHalfRot{1,2,3}_mem_SU2` — each axis rotation lies in `SU(2)`.
 * `spinHalfEulerProduct_mem_SU2` — the Euler-angle product lies in `SU(2)`.
 
@@ -45,11 +44,6 @@ def SU2 : Submonoid (Matrix (Fin 2) (Fin 2) ℂ) where
   one_mem' := ⟨one_mem _, by simp⟩
   mul_mem' := fun {U V} hU hV =>
     ⟨mul_mem hU.1 hV.1, by rw [Matrix.det_mul, hU.2, hV.2, mul_one]⟩
-
-/-- Membership in `SU2` unfolds to unitarity and unit determinant. -/
-theorem mem_SU2_iff (U : Matrix (Fin 2) (Fin 2) ℂ) :
-    U ∈ SU2 ↔ U ∈ unitary (Matrix (Fin 2) (Fin 2) ℂ) ∧ Matrix.det U = 1 :=
-  Iff.rfl
 
 /-! ## Spin-1/2 rotations are unitary -/
 
