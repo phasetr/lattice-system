@@ -44,13 +44,6 @@ theorem jwStringAbstract_sq (i : Λ) :
   intro j _
   rw [onSite_mul_onSite_same, pauliZ_mul_self, onSite_one]
 
-/-- The abstract JW string on `Λ = Fin (N+1)` coincides with the
-existing `Fin (N+1)`-specific `jwString N i` definitionally: the
-`LinearOrder (Fin (N+1))` instance's `<` matches `j.val < i.val`. -/
-theorem jwStringAbstract_eq_jwString (N : ℕ) (i : Fin (N + 1)) :
-    jwStringAbstract i = jwString N i :=
-  rfl
-
 /-! ## Abstract fermion creation / annihilation / number operators -/
 
 open LatticeSystem.Quantum in
@@ -69,26 +62,6 @@ open LatticeSystem.Quantum in
 /-- Abstract fermion site-occupation number `n_i = c_i† · c_i`. -/
 noncomputable def fermionNumberAbstract (i : Λ) : ManyBodyOp Λ :=
   fermionCreationAbstract i * fermionAnnihilationAbstract i
-
-/-- Bridge: abstract annihilation on `Fin (N+1)` equals the
-existing `fermionMultiAnnihilation`. -/
-theorem fermionAnnihilationAbstract_eq_fermionMultiAnnihilation
-    (N : ℕ) (i : Fin (N + 1)) :
-    fermionAnnihilationAbstract i = fermionMultiAnnihilation N i :=
-  rfl
-
-/-- Bridge: abstract creation on `Fin (N+1)` equals the existing
-`fermionMultiCreation`. -/
-theorem fermionCreationAbstract_eq_fermionMultiCreation
-    (N : ℕ) (i : Fin (N + 1)) :
-    fermionCreationAbstract i = fermionMultiCreation N i :=
-  rfl
-
-/-- Bridge for the number operator. -/
-theorem fermionNumberAbstract_eq_fermionMultiNumber
-    (N : ℕ) (i : Fin (N + 1)) :
-    fermionNumberAbstract i = fermionMultiNumber N i :=
-  rfl
 
 /-- The JW string at site `i` commutes with any single-site
 operator at the same site `i`: the string only touches sites
