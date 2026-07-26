@@ -7878,6 +7878,10 @@ $\hat C_\sigma(\bar e_j)\,|qs\rangle = \sum_i (-1)^i\,\delta_{j,(qs_i)_1}\delta_
 sign), and annihilates a monomial not containing it.  This is the occupation-detection engine for
 the eq.~(11.3.46) hard direction (a flat-band ground state, annihilated by every nonzero-eigenvalue
 mode $\hat C_\sigma(\bar e_j)$, has occupation only on the flat band), completed in the next PR.
+(The two peel lemmas were later removed as unused: the PR4 completion below detects occupation
+through the eigenmode \emph{number} operator $\hat n_{j,\sigma}$, built from the same dual CAR, so
+of this PR only the transported eigenbasis, its coordinate orthonormality and the dual CAR itself
+remain in \texttt{GeneralFlatBandEigenbasis.lean}.)
 
 \medskip\noindent\textbf{Theorem 11.17 PR4, eq.~(11.3.46) Fock spanning, hard direction (Tasaki
 §11.3.4, Issue \#4363, \texttt{GeneralFlatBandSpanning.lean}).}  The flat-band ground state at
