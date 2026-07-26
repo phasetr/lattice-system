@@ -155,8 +155,7 @@ theorem tasakiEffReMatrix_map_eq_zero_of_holeSpinMag_ne (N : ℕ)
 /-- **Complex block invariance: restricting a complex eigenvector to a sector.**
 If the complex-cast `Ĥ_eff` matrix has `M c = E c`, then the restriction of `c`
 to magnetization sector `m` is an eigenvector of the complex sector matrix at
-`E`.  (Complex analogue of `tasakiEffReMatrixOnSector_mulVec_restriction_of_eigen`;
-uses block-diagonality.) -/
+`E`.  (Uses block-diagonality in magnetization.) -/
 theorem tasakiEffMatrixOnSector_map_mulVec_restriction_of_eigen (N : ℕ)
     (t : Fin (N + 1) → Fin (N + 1) → ℝ) {m : ℤ} {E : ℂ}
     {c : (x : Fin (N + 1)) × HoleSpin N x → ℂ}
