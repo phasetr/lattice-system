@@ -115,14 +115,6 @@ private theorem tJME_sum {ι : Type*} (N : ℕ) (s s' : Fin (N + 1) → Fin 3)
   · intro a t' ha ih
     rw [Finset.sum_insert ha, tJME_add, ih, Finset.sum_insert ha]
 
-/-- The matrix element respects operator negation. -/
-private theorem tJME_neg (N : ℕ) (s s' : Fin (N + 1) → Fin 3)
-    (op : ManyBodyOp (Fin (2 * N + 2))) :
-    tJME N s s' (-op) = -tJME N s s' op := by
-  unfold tJME
-  rw [Matrix.neg_mulVec]
-  simp only [Pi.neg_apply, mul_neg, Finset.sum_neg_distrib]
-
 /-! ### Per-bond off-diagonal reduction -/
 
 /-- **The per-bond interaction off-diagonal reduces to the ladder pair.**  For `s' ≠ s` the density
