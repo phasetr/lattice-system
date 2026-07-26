@@ -30,7 +30,20 @@ jobs:
       - uses: actions/cache/restore@v5
         if: github.event_name == 'pull_request'
         with:
-          path: .lake
+          # This must be byte-identical to what lean-action renders for its own
+          # cache steps: `${{ inputs.lake-package-directory }}/.lake` with the
+          # default `lake-package-directory: .`, i.e. `./.lake`.
+          # `actions/cache` folds the RAW `path` string into the cache "version"
+          # sha256 (`@actions/cache` cacheUtils.ts `getCacheVersion`), and
+          # `actions/cache@v5` only trims/drops empty entries -- it does not
+          # normalise the path. So `.lake` and `./.lake` are DIFFERENT cache
+          # entries even when the key string is identical.
+          # An earlier revision of this step used `.lake` and missed 100% of the
+          # time: run 30195931217 logged "Cache not found for input keys" and took
+          # 41m44s (full 4577-job build), while run 30195910709 with `./.lake`
+          # logged "Cache hit for restore-key" and took 2m04s -- same
+          # actions/cache SHA, same key string, only the path differed.
+          path: ./.lake
           key: lake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lake-manifest.json') }}-${{ github.sha }}
           restore-keys: |
             lake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lake-manifest.json') }}
