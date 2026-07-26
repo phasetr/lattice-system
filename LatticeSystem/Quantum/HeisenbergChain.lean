@@ -106,7 +106,12 @@ theorem openChainCoupling_apply (N : ℕ) (J : ℝ) (x y : Fin (N + 1)) :
   · rw [SimpleGraph.pathGraph_adj] at h
     rw [if_neg (by rwa [SimpleGraph.pathGraph_adj]), if_neg h]
 
-/-- Explicit if-form for `periodicChainCoupling`. -/
+/-- Explicit if-form for `periodicChainCoupling`: retained as the
+witness for the public TeX definition environment (`tex/proof-guide.tex`,
+definition `periodicChainCoupling`), which states this if-form as the
+defining formula for `J_per`. It is the only declaration asserting that
+if-form, so it must not be dropped as unreferenced; it mirrors
+`openChainCoupling_apply` for the open-boundary case. -/
 theorem periodicChainCoupling_apply (N : ℕ) (J : ℝ) (x y : Fin (N + 2)) :
     periodicChainCoupling N J x y
       = if x + 1 = y ∨ y + 1 = x then -(J : ℂ) else 0 := by

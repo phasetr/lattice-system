@@ -152,6 +152,13 @@ example (J h : ℝ) :
   quantumIsingHamiltonian_eq_isingHamiltonianGeneric 0 J h
 
 example (J h : ℝ) :
+    quantumIsingHamiltonian 1 J h
+      = isingHamiltonianGeneric
+          (couplingOf (SimpleGraph.pathGraph 2) (-(J : ℂ) / 2))
+          (h : ℂ) :=
+  quantumIsingHamiltonian_eq_isingHamiltonianGeneric 1 J h
+
+example (J h : ℝ) :
     quantumIsingHamiltonian 2 J h
       = isingHamiltonianGeneric
           (couplingOf (SimpleGraph.pathGraph 3) (-(J : ℂ) / 2))

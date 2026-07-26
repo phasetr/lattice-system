@@ -1,10 +1,10 @@
 import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeSpin
 
 /-!
-# Sublattice spin realness: axis-squared and axis-1/3 (foundation)
+# Sublattice spin realness: axis-3 squared and axis-1/3 (foundation)
 
 Foundational layer extracted from `SublatticeSpinRealness.lean` for build speed.  This file
-proves the sublattice axis squared as a `conjTranspose` product and the matrix-element realness
+proves the sublattice axis-3 squared as a `conjTranspose` product and the matrix-element realness
 of the sublattice axis-1 / axis-3 operators.
 
 The sublattice ladder matrix-element realness is kept in the capstone module
@@ -15,19 +15,9 @@ namespace LatticeSystem.Quantum
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
-/-! ## Sublattice axis squared as conjTranspose product -/
+/-! ## Sublattice axis-3 squared as conjTranspose product -/
 
-/-- `(Ŝ_A^(1))² = (Ŝ_A^(1))ᴴ * Ŝ_A^(1)`. Direct from Hermiticity. -/
-theorem sublatticeSpinHalfOp1_sq_eq_conjTranspose_mul (A : Λ → Bool) :
-    sublatticeSpinHalfOp1 A * sublatticeSpinHalfOp1 A =
-      (sublatticeSpinHalfOp1 A).conjTranspose * sublatticeSpinHalfOp1 A := by
-  rw [(sublatticeSpinHalfOp1_isHermitian A).eq]
-
-theorem sublatticeSpinHalfOp2_sq_eq_conjTranspose_mul (A : Λ → Bool) :
-    sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp2 A =
-      (sublatticeSpinHalfOp2 A).conjTranspose * sublatticeSpinHalfOp2 A := by
-  rw [(sublatticeSpinHalfOp2_isHermitian A).eq]
-
+/-- `(Ŝ_A^(3))² = (Ŝ_A^(3))ᴴ * Ŝ_A^(3)`. Direct from Hermiticity. -/
 theorem sublatticeSpinHalfOp3_sq_eq_conjTranspose_mul (A : Λ → Bool) :
     sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp3 A =
       (sublatticeSpinHalfOp3 A).conjTranspose * sublatticeSpinHalfOp3 A := by

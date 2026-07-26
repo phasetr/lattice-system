@@ -222,13 +222,6 @@ private lemma fin2_forall_ne_zero (τ κ : Fin 2 → Fin 2) :
   · intro h; exact h 1 (by decide)
   · intro h k hk; fin_cases k <;> simp_all
 
-/-- On `Fin 2`, agreement away from `1` is equivalent to agreement at `0`. -/
-private lemma fin2_forall_ne_one (τ κ : Fin 2 → Fin 2) :
-    (∀ k, k ≠ (1 : Fin 2) → τ k = κ k) ↔ τ 0 = κ 0 := by
-  constructor
-  · intro h; exact h 0 (by decide)
-  · intro h k hk; fin_cases k <;> simp_all
-
 /-- Equality of functions `Fin 2 → Fin 2` reduces to pointwise equality at `0` and `1`. -/
 private lemma fin2_eq_iff (σ τ : Fin 2 → Fin 2) :
     σ = τ ↔ σ 0 = τ 0 ∧ σ 1 = τ 1 := by
