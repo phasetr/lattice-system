@@ -45,6 +45,16 @@ theorem nonsingularHubbardHamiltonian_isHermitian (K : ℕ) (ν t ζ : ℝ)
     ((hubbardKinetic_isHermitian (2 * K + 1) hP).smul
       (isSelfAdjoint_iff.mpr (Complex.conj_ofReal ζ)))
 
+/-- **`[Ĥ, N̂] = 0`**: the non-singular Hubbard Hamiltonian conserves the total particle
+number. -/
+theorem nonsingularHubbardHamiltonian_commute_fermionTotalNumber (K : ℕ) (ν t ζ : ℝ)
+    (tPert : Fin (2 * K + 2) → Fin (2 * K + 2) → ℂ) (U : ℝ) :
+    Commute (nonsingularHubbardHamiltonian K ν t ζ tPert U)
+      (fermionTotalNumber (2 * (2 * K + 1) + 1)) := by
+  unfold nonsingularHubbardHamiltonian
+  exact (flatBandHamiltonian_commute_fermionTotalNumber K ν t U).add_left
+    ((hubbardKinetic_commute_fermionTotalNumber (2 * K + 1) tPert).smul_left _)
+
 /-- **`[Ŝ^+_tot, Ĥ] = 0`**: the non-singular Hubbard Hamiltonian is SU(2) invariant (raising
 operator).  The flat-band part and the spin-summed perturbation hopping are both
 spin-symmetric. -/

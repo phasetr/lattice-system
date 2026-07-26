@@ -64,6 +64,16 @@ theorem hubbardUpOccupationDiag_posSemidef (N : ℕ) (x : Fin (N + 1)) :
   · simp [h]
   · simp [h, zero_le_one]
 
+/-- The hole-occupation diagonal is positive-semidefinite (entries `0` or `1`). -/
+theorem hubbardHoleOccupationDiag_posSemidef (N : ℕ) (x : Fin (N + 1)) :
+    (hubbardHoleOccupationDiag N x).PosSemidef := by
+  unfold hubbardHoleOccupationDiag
+  refine Matrix.PosSemidef.diagonal ?_
+  intro hc
+  rcases show hc x = 0 ∨ hc x = 1 from by omega with h | h
+  · simp [h, zero_le_one]
+  · simp [h]
+
 /-- The diagonal-sandwich trace expansion: `tr(Cᴴ · diag d · C · diag e)` is the
 weighted sum of the squared magnitudes `Σ_{i,j} d_i e_j |C_{i,j}|²`. -/
 theorem trace_conjTranspose_mul_diagonal_mul_diagonal_eq_sum_normSq {ι : Type*}
