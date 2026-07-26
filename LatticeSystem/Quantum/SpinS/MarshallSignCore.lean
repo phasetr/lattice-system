@@ -252,13 +252,6 @@ theorem marshallSignS_mul_of_agree_off_site_A_false_lower
   rw [marshallSignS_mul_of_agree_off_site A x h]
   rw [if_neg (by simp [hAx])]
 
-/-- The Marshall sign equals its inverse: `(marshallSignS A σ)⁻¹ = marshallSignS A σ`. -/
-theorem marshallSignS_inv (A : V → Bool) (σ : V → Fin (N + 1)) :
-    (marshallSignS A σ)⁻¹ = marshallSignS A σ := by
-  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
-  · rw [h]; simp
-  · rw [h]; simp
-
 /-- Imaginary part of the Marshall sign is zero. -/
 theorem marshallSignS_im (A : V → Bool) (σ : V → Fin (N + 1)) :
     (marshallSignS A σ).im = 0 := by

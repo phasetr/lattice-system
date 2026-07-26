@@ -139,12 +139,6 @@ theorem onSiteS_supportedOn (x : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ
   fun _z hz B => onSiteS_commute_of_ne
     (Ne.symm (fun h => hz (Finset.mem_singleton.mpr h))) A B
 
-/-- The per-site raising/lowering operators are supported on their site. -/
-theorem siteOrderOp_supportedOn (b : Bool) (x : Λ) : SupportedOn {x} (siteOrderOp b x N) := by
-  cases b with
-  | true => exact onSiteS_supportedOn x (spinSOpPlus N)
-  | false => exact onSiteS_supportedOn x (spinSOpMinus N)
-
 /-- The bond operator `Ŝ_x·Ŝ_y` is supported on the bond `{x, y}`. -/
 theorem spinSDot_supportedOn (x y : Λ) : SupportedOn {x, y} (spinSDot x y N) := by
   intro z hz B

@@ -31,11 +31,6 @@ variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 def magConfigS (V : Type*) [Fintype V] (N M : ℕ) :=
   { σ : V → Fin (N + 1) // magSumS σ = M }
 
-omit [DecidableEq V] in
-/-- A magConfig has magSumS equal to its tag. -/
-theorem magConfigS_magSumS {M : ℕ} (σ : magConfigS V N M) :
-    magSumS σ.1 = M := σ.2
-
 instance magConfigS_instDecidableEq {M : ℕ} :
     DecidableEq (magConfigS V N M) := fun _ _ => Subtype.instDecidableEq _ _
 

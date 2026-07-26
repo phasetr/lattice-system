@@ -35,9 +35,4 @@ instance parityConfigS_instFintype {p : ℕ} : Fintype (parityConfigS Λ N p) :=
   classical
   apply Subtype.fintype
 
-omit [DecidableEq Λ] in
-/-- The magnetization parity of a configuration is `0` or `1`. -/
-theorem magSumS_parity_lt_two (σ : Λ → Fin (N + 1)) : magSumS σ % 2 < 2 :=
-  Nat.mod_lt _ (by norm_num)
-
 end LatticeSystem.Quantum

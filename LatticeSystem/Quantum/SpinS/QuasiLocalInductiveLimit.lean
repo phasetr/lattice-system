@@ -57,12 +57,6 @@ theorem boxLocalTowerSup_le_localAlg : D.boxLocalTowerSup ≤ S.localAlg := by
 theorem boxLocalSubalgebra_directed : Directed (· ≤ ·) D.boxLocalSubalgebra :=
   D.boxLocalSubalgebra_mono.directed_le
 
-/-- Any two box subalgebras are dominated by a common one (directedness, explicit). -/
-theorem exists_boxLocalSubalgebra_le_pair (m n : ℕ) :
-    ∃ k : ℕ, D.boxLocalSubalgebra m ≤ D.boxLocalSubalgebra k ∧
-      D.boxLocalSubalgebra n ≤ D.boxLocalSubalgebra k :=
-  D.boxLocalSubalgebra_directed m n
-
 /-- **Exhaustion hypothesis** (`def : Prop`, not asserted): the box-local tower
 exhausts the local algebra, `A_loc ≤ A_box`.  The reverse (easy) inclusion is
 `boxLocalTowerSup_le_localAlg`; this direction is the operator-algebraic content

@@ -33,12 +33,6 @@ namespace InfiniteSpinSystem
 (Tasaki eqs. (4.3.4)–(4.3.6)). -/
 noncomputable def bulkVolume (d n : ℕ) : ℝ := (2 * (n : ℝ)) ^ d
 
-/-- The tail volumes `(2(n+1))ᵈ` are positive (so the densities are well-defined
-on the tail, avoiding the empty `n = 0` box). -/
-theorem bulkVolume_succ_pos (d n : ℕ) : 0 < bulkVolume d (n + 1) := by
-  refine pow_pos ?_ d
-  positivity
-
 /-- The real volume normalization equals the cardinality of the box `Λ_n`:
 `|Λ_n| = (2n)ᵈ`. -/
 theorem latticeBox_card_real (d n : ℕ) :

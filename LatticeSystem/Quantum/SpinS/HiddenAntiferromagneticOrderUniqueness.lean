@@ -163,10 +163,6 @@ noncomputable def hhafDressedMatrixPM1 (L : ℕ) :
     Matrix (hhafConfigPM1 L) (hhafConfigPM1 L) ℝ :=
   (hhafDressedMatrix L).submatrix Subtype.val Subtype.val
 
-/-- The magnetization-`±1` sector dressed matrix is symmetric. -/
-theorem hhafDressedMatrixPM1_isSymm (L : ℕ) : (hhafDressedMatrixPM1 L).IsSymm :=
-  (hhafDressedMatrix_isSymm L).submatrix Subtype.val
-
 /-- The magnetization-`±1` sector dressed matrix has **vanishing diagonal** (single-`±` Ising
 energy is zero). -/
 theorem hhafDressedMatrixPM1_diag_eq_zero (L : ℕ) (hL : 2 ≤ L) (σ : hhafConfigPM1 L) :

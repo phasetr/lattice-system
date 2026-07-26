@@ -282,14 +282,6 @@ theorem lsmConjHamiltonian_apply (L N : ℕ) (σ τ : Fin L → Fin (N + 1)) :
     NormedSpace.exp_add_of_commute (Commute.all _ _)]
   ring
 
-/-- **Energy-difference matrix element**: `(Û† Ĥ Û − Ĥ)_{στ} = (e^{i(φ_σ − φ_τ)} − 1) Ĥ_{στ}`. -/
-theorem lsmConjHamiltonian_sub_apply (L N : ℕ) (σ τ : Fin L → Fin (N + 1)) :
-    ((lsmTwistOperator L N).conjTranspose * afmHeisenbergChainHamiltonianS L N *
-        lsmTwistOperator L N - afmHeisenbergChainHamiltonianS L N) σ τ =
-      (NormedSpace.exp (Complex.I • (lsmPhase L N σ - lsmPhase L N τ)) - 1) *
-        afmHeisenbergChainHamiltonianS L N σ τ := by
-  rw [Matrix.sub_apply, lsmConjHamiltonian_apply, sub_one_mul]
-
 /-- **Anti-conjugated-Hamiltonian matrix element** (the `−θ` twist): `(Û Ĥ Û†)_{στ} =
 e^{−i(φ_σ − φ_τ)} Ĥ_{στ}`. -/
 theorem lsmConjHamiltonianAnti_apply (L N : ℕ) (σ τ : Fin L → Fin (N + 1)) :

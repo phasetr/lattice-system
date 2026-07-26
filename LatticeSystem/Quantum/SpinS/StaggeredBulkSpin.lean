@@ -70,13 +70,6 @@ theorem staggeredBulkSpin_eq_sum (S : InfiniteSpinSystem d A) (u : Fin d → ℤ
   refine Finset.sum_congr rfl fun x _ => ?_
   rw [map_sub, S.transl_spin, S.transl_spin, zero_add]
 
-/-- The expectation of the staggered bulk density factors through the bulk volume. -/
-theorem staggeredBulkSpinDensity_apply (S : InfiniteSpinSystem d A) (ω : WeakDual ℂ A)
-    (u : Fin d → ℤ) (α : Fin 3) (n : ℕ) :
-    ω (staggeredBulkSpinDensity S u α n) =
-      ((bulkVolume d n : ℂ)⁻¹) * ω (staggeredBulkSpin S u α n) :=
-  bulkDensity_apply S ω (staggeredCellSpin S u α) n
-
 /-- `staggeredSign` of the origin is `+1` (the A-site). -/
 theorem staggeredSign_zero : staggeredSign (0 : Fin d → ℤ) = 1 := by
   simp [staggeredSign]
@@ -84,14 +77,6 @@ theorem staggeredSign_zero : staggeredSign (0 : Fin d → ℤ) = 1 := by
 namespace TranslationInvariant
 
 variable {S : InfiniteSpinSystem d A} {ω : WeakDual ℂ A}
-
-/-- In a translation-invariant state the staggered bulk expectation is the even-box
-cardinality times the cell expectation. -/
-theorem staggeredBulkSpin_apply_eq_card_mul
-    (hω : InfiniteSpinSystem.TranslationInvariant S ω) (u : Fin d → ℤ) (α : Fin 3) (n : ℕ) :
-    ω (staggeredBulkSpin S u α n) =
-      ((evenLatticeBox d n).card : ℂ) * ω (staggeredCellSpin S u α) :=
-  hω.bulkOp_apply_eq_card_mul (staggeredCellSpin S u α) n
 
 /-- In a translation-invariant state and `n ≥ 1`, the staggered bulk density is
 half the cell expectation. -/
