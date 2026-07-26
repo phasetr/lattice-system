@@ -170,19 +170,6 @@ theorem heisenberg_dotProduct_right (d L N : ℕ) [NeZero L]
       = E₀ * (star Φ ⬝ᵥ X.mulVec Φ) := by
   rw [← Matrix.mulVec_mulVec, hev, Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul]
 
-/-- **Left `Ĥ`-elimination.**  For Hermitian `Ĥ` with `Ĥ Φ = E₀ Φ`, an `Ĥ` factored on the left
-collapses to `conj E₀`: `⟨Φ, (Ĥ X) Φ⟩ = conj(E₀) ⟨Φ, X Φ⟩`. -/
-theorem heisenberg_dotProduct_left (d L N : ℕ) [NeZero L]
-    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ)
-    (hev : (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ = E₀ • Φ)
-    (X : ManyBodyOpS (HypercubicTorus d L) N) :
-    star Φ ⬝ᵥ (heisenbergHamiltonianS (torusNNCoupling d L) N * X).mulVec Φ
-      = (starRingEnd ℂ) E₀ * (star Φ ⬝ᵥ X.mulVec Φ) := by
-  rw [← Matrix.mulVec_mulVec, star_dotProduct_mulVec_conjTranspose,
-    (heisenbergHamiltonianS_torus_isHermitian d L N).eq, hev, star_smul, smul_dotProduct,
-    smul_eq_mul]
-  rfl
-
 /-! ### Surfacing `d̂` via the Jacobi identity (LSp77 reordering core) -/
 
 /-- **Jacobi identity surfacing `d̂`.**  The nested commutator `[[Ĥ, ô⁺], ô⁻]` equals
@@ -229,12 +216,6 @@ theorem heisenberg_order_nested_eq_neg_orderDoubleComm (d L N : ℕ) [NeZero L] 
             * heisenbergHamiltonianS (torusNNCoupling d L) N)
       = - orderDoubleComm d L N := by
   rw [heisenberg_order_jacobi, heisenberg_orderCommutator_commute, zero_sub]
-
-/-- **Operator Leibniz rule for commutators.**  `[X·Y, Z] = X·[Y, Z] + [X, Z]·Y`. -/
-theorem commutator_mul_left_eq {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
-    (X Y Z : ManyBodyOpS Λ N) :
-    X * Y * Z - Z * (X * Y) = X * (Y * Z - Z * Y) + (X * Z - Z * X) * Y := by
-  noncomm_ring
 
 /-- **Anti-expansion of `(ô⁻)^M` against an operator.**  `(ô⁻)^M X − X (ô⁻)^M` telescopes into a
 signed sum of single `[X, ô⁻]` insertions between powers of `ô⁻`. -/

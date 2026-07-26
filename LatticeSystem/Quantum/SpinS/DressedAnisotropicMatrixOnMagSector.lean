@@ -37,19 +37,6 @@ theorem anisotropicHeisenbergSReMatrixOnMagSector_apply
     anisotropicHeisenbergSReMatrixOnMagSector J lam D N M σ τ =
       (anisotropicHeisenbergS_magSector_submatrix (Λ := Λ) J lam D N M σ τ).re := rfl
 
-/-- The complexification of the real anisotropic sector matrix is the bare
-complex sector matrix when all entries are real. -/
-theorem anisotropicHeisenbergSReMatrixOnMagSector_map_eq_submatrix
-    {J : Λ → Λ → ℂ} (hJim : ∀ x y, (J x y).im = 0)
-    {lam : ℂ} (hlam : lam.im = 0) {D : ℂ} (hDim : D.im = 0) (N M : ℕ) :
-    (anisotropicHeisenbergSReMatrixOnMagSector (Λ := Λ) J lam D N M).map
-        ((↑) : ℝ → ℂ) =
-      anisotropicHeisenbergS_magSector_submatrix (Λ := Λ) J lam D N M := by
-  ext σ τ
-  rw [Matrix.map_apply, anisotropicHeisenbergSReMatrixOnMagSector_apply]
-  exact Complex.ext (by simp) (by
-    simp [anisotropicHeisenbergS_magSector_submatrix_im_zero hJim hlam hDim M σ τ])
-
 /-- The Marshall-dressed real anisotropic Hamiltonian on a fixed magnetization
 sector. -/
 noncomputable def dressedAnisotropicHeisenbergSReMatrixOnMagSector
@@ -148,13 +135,6 @@ theorem shiftedDressedAnisotropicHeisenbergSReMatrixOnMagSector_apply
     (σ τ : magConfigS Λ N M) :
     shiftedDressedAnisotropicHeisenbergSReMatrixOnMagSector A J lam D N M c σ τ =
       (c • 1 - dressedAnisotropicHeisenbergSReMatrixOnMagSector A J lam D N M) σ τ := rfl
-
-/-- The shifted dressed anisotropic sector matrix is definitionally
-`c • 1 - dressed`. -/
-theorem shiftedDressedAnisotropicHeisenbergSReMatrixOnMagSector_eq_smul_sub_dressed
-    (A : Λ → Bool) (J : Λ → Λ → ℂ) (lam D : ℂ) (N M : ℕ) (c : ℝ) :
-    shiftedDressedAnisotropicHeisenbergSReMatrixOnMagSector A J lam D N M c =
-      c • 1 - dressedAnisotropicHeisenbergSReMatrixOnMagSector A J lam D N M := rfl
 
 /-- Diagonal entries of the shifted dressed anisotropic sector matrix. -/
 theorem shiftedDressedAnisotropicHeisenbergSReMatrixOnMagSector_apply_diag

@@ -29,10 +29,6 @@ def wordChargeZ (w : List Bool) : ℤ := (w.map orderSignZ).sum
 
 @[simp] theorem wordChargeZ_nil : wordChargeZ ([] : List Bool) = 0 := by simp [wordChargeZ]
 
-theorem wordChargeZ_cons (b : Bool) (w : List Bool) :
-    wordChargeZ (b :: w) = orderSignZ b + wordChargeZ w := by
-  simp [wordChargeZ]
-
 /-- One order-density commutator `[ô^b, G] = ô^b G − G ô^b`. -/
 noncomputable def orderComm [NeZero L] (b : Bool)
     (G : ManyBodyOpS (HypercubicTorus d L) N) : ManyBodyOpS (HypercubicTorus d L) N :=
@@ -115,24 +111,6 @@ theorem orderWordProd_comm_eq_telescope [NeZero L] (w : List Bool)
 
 /-! ### Step B: the symmetric-split central bound (R2 commit 3) -/
 
-/-- **Step B (central Cauchy–Schwarz, symmetric split).**  When the inserted operator sits exactly
-at the center of a length-`2n` order word (equal left/right words `w`), the geometric mean of the
-two half-radicands collapses to a single moment: `|Re⟨Φ, ô^w G ô^w Φ⟩| ≤ (3/2)‖G‖ P_{|w|}`.  This
-is the target shape of the Anderson-tower numerator; the centering telescope (Step A) reduces an
-arbitrarily placed `G` to this symmetric form plus decayed error terms. -/
-theorem renormalized_inserted_product_bound_symm (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
-    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
-    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
-    (hm0 : 0 < phatMoment d L N Φ 0)
-    (hlro : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1)
-    (G : ManyBodyOpS (HypercubicTorus d L) N) (w : List Bool)
-    (hcond : 3 * (N : ℝ) * ((w.length + w.length : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d) :
-    |(star Φ ⬝ᵥ (orderWordProd d L N w * G * orderWordProd d L N w).mulVec Φ).re|
-      ≤ 3 / 2 * manyBodyOperatorNormS G * phatMoment d L N Φ w.length := by
-  have hbd := renormalized_inserted_product_bound d L N hN Φ hsing hm0 hlro G w w hcond
-  have hPnn : 0 ≤ phatMoment d L N Φ w.length := phatMoment_nonneg d L N Φ w.length
-  rwa [Real.sqrt_mul_self hPnn] at hbd
-
 /-! ### The single centering step (R2 commit 4) -/
 
 /-- Operator-level append identity for the word product. -/
@@ -174,15 +152,6 @@ theorem inserted_centering_step_re_le [NeZero L] (wₗ' wᵣ : List Bool) (a : B
   exact abs_add_le _ _
 
 /-! ### Bridging the local-decay class through one centering step (R2 commit 5) -/
-
-/-- A single order-density commutator of a depth-`≥1` local operator decays by `2ζo₀/V`:
-`‖orderComm a G‖ ≤ (2ζo₀/V) g₀`. -/
-theorem IsR2LocalUpTo.orderComm_norm_le [NeZero L] {K : ℕ} {ζ o₀ g₀ : ℝ}
-    {G : ManyBodyOpS (HypercubicTorus d L) N} (h : IsR2LocalUpTo K ζ o₀ g₀ G)
-    (a : Bool) (hK : 1 ≤ K) :
-    manyBodyOperatorNormS (orderComm a G) ≤ (2 * ζ * o₀) / (L : ℝ) ^ d * g₀ := by
-  have hb := h.norm_iter [a] (by simpa using hK)
-  simpa [iterOrderComm, pow_one] using hb
 
 /-- **Recursive class membership.**  If `G` is in the local-decay class up to depth `K+1`, then each
 order-density commutator `orderComm a G` is in the class up to depth `K` with the decayed constant

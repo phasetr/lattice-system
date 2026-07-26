@@ -36,10 +36,6 @@ basis configurations `σ : Λ → Fin (N + 1)`. -/
 abbrev ManyBodyOpS (Λ : Type*) (N : ℕ) : Type _ :=
   Matrix (Λ → Fin (N + 1)) (Λ → Fin (N + 1)) ℂ
 
-/-- Definitional unfolding: `ManyBodyOpS Λ N = Matrix (Λ → Fin (N+1)) (Λ → Fin (N+1)) ℂ`. -/
-theorem ManyBodyOpS_def (Λ : Type*) (N : ℕ) :
-    ManyBodyOpS Λ N = Matrix (Λ → Fin (N + 1)) (Λ → Fin (N + 1)) ℂ := rfl
-
 /-- The site-embedded operator `onSiteS i A` acts as `A` on site `i`
 and as the identity on every other site. Its matrix element is
 `A (σ' i) (σ i)` when `σ'` and `σ` agree at every site other than
@@ -48,12 +44,6 @@ def onSiteS (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
     ManyBodyOpS Λ N :=
   fun σ' σ =>
     if (∀ k, k ≠ i → σ' k = σ k) then A (σ' i) (σ i) else 0
-
-/-- Definitional unfolding of `onSiteS`. -/
-theorem onSiteS_def (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
-    (onSiteS (N := N) i A : ManyBodyOpS Λ N) =
-      (fun σ' σ =>
-        if (∀ k, k ≠ i → σ' k = σ k) then A (σ' i) (σ i) else 0) := rfl
 
 /-- Unfolding the matrix element of `onSiteS i A`. -/
 theorem onSiteS_apply (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
@@ -76,14 +66,6 @@ theorem onSiteS_apply_of_off_site_agree
     (h : ∀ k, k ≠ i → σ' k = σ k) :
     onSiteS i A σ' σ = A (σ' i) (σ i) := by
   rw [onSiteS_apply, if_pos h]
-
-/-- The diagonal matrix element on the same configuration. -/
-theorem onSiteS_apply_diag
-    (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
-    (σ : Λ → Fin (N + 1)) :
-    onSiteS i A σ σ = A (σ i) (σ i) := by
-  rw [onSiteS_apply_of_off_site_agree]
-  intro _ _; rfl
 
 /-- If every entry of `A` has zero imaginary part, every entry of
 `onSiteS i A` has zero imaginary part. -/

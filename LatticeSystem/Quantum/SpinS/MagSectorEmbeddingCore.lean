@@ -152,14 +152,6 @@ def magSectorRestrictionLinearMap (M : ℕ) :
   map_add' := magSectorRestriction_add
   map_smul' := magSectorRestriction_smul
 
-/-- The composition `restriction ∘ embedding = id` as a linear-map
-identity (lifts the round-trip `magSectorRestriction_magSectorEmbedding`). -/
-theorem magSectorRestrictionLinearMap_comp_magSectorEmbeddingLinearMap (M : ℕ) :
-    (magSectorRestrictionLinearMap (V := V) (N := N) M).comp
-      (magSectorEmbeddingLinearMap M) = LinearMap.id := by
-  ext Φ τ
-  exact congrFun (magSectorRestriction_magSectorEmbedding Φ) τ
-
 /-! ## Characterisation of the image of `magSectorEmbedding`
 
 A full-Hilbert-space vector lies in the image of the magnetization-`M`
@@ -181,20 +173,6 @@ theorem magSectorEmbedding_magSectorRestriction_of_supported {M : ℕ}
   by_cases h : magSumS σ = M
   · exact magSectorEmbedding_magSectorRestriction_apply_of_mem f h
   · rw [magSectorEmbedding_apply_of_not_mem _ h, hf σ h]
-
-/-- **Image characterisation**: a vector `f` is in the image of
-`magSectorEmbedding (M := M)` iff `f` is supported on the
-magnetization-`M` sector. -/
-theorem mem_range_magSectorEmbedding_iff_supported {M : ℕ}
-    (f : (V → Fin (N + 1)) → ℂ) :
-    (∃ Φ : magConfigS V N M → ℂ, magSectorEmbedding Φ = f) ↔
-      (∀ σ, magSumS σ ≠ M → f σ = 0) := by
-  constructor
-  · rintro ⟨Φ, rfl⟩ σ h
-    exact magSectorEmbedding_apply_of_not_mem Φ h
-  · intro hf
-    exact ⟨magSectorRestriction f,
-      magSectorEmbedding_magSectorRestriction_of_supported hf⟩
 
 /-! ## Kernel of `magSectorRestriction` -/
 
@@ -228,21 +206,6 @@ gives the basic ingredients of the magnetization-sector decomposition
 (Lifting this to a formal internal `DirectSum` / `Submodule.IsInternal`
 statement is a separate downstream packaging step and is not done here.)
 -/
-
-/-- **Sector disjointness**: a vector simultaneously supported on
-sectors `M₁` and `M₂` (with `M₁ ≠ M₂`) is identically zero. -/
-theorem eq_zero_of_supported_on_two_sectors {M₁ M₂ : ℕ}
-    (hM : M₁ ≠ M₂)
-    {f : (V → Fin (N + 1)) → ℂ}
-    (h₁ : ∀ σ, magSumS σ ≠ M₁ → f σ = 0)
-    (h₂ : ∀ σ, magSumS σ ≠ M₂ → f σ = 0) :
-    f = 0 := by
-  funext σ
-  rcases eq_or_ne (magSumS σ) M₁ with hσ₁ | hσ₁
-  · -- magSumS σ = M₁ ≠ M₂, so apply h₂ at σ.
-    have hσ₂ : magSumS σ ≠ M₂ := hσ₁ ▸ hM
-    exact h₂ σ hσ₂
-  · exact h₁ σ hσ₁
 
 /-- The intersection of the images of two distinct sector embeddings is
 trivial: if `magSectorEmbedding Φ₁ = magSectorEmbedding Φ₂` for
@@ -306,12 +269,6 @@ theorem magSectorSlice_apply_of_not_mem (M : ℕ)
     magSectorSlice M f σ = 0 := by
   unfold magSectorSlice
   rw [if_neg h]
-
-/-- The sector slice is supported on the sector. -/
-theorem magSectorSlice_supported (M : ℕ)
-    (f : (V → Fin (N + 1)) → ℂ) :
-    ∀ σ, magSumS σ ≠ M → magSectorSlice M f σ = 0 :=
-  fun _ h => magSectorSlice_apply_of_not_mem M f h
 
 /-- The sector slice equals the embedding of the sector restriction. -/
 theorem magSectorSlice_eq_magSectorEmbedding (M : ℕ)
