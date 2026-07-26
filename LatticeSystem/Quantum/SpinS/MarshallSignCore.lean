@@ -60,22 +60,6 @@ theorem marshallSignS_eq_neg_one_pow_of_A_true (σ : V → Fin (N + 1)) :
   simp only [if_true]
   rw [← Finset.prod_pow_eq_pow_sum]
 
-/-- Marshall sign over an empty lattice is `1`. -/
-theorem marshallSignS_of_isEmpty [IsEmpty V]
-    (A : V → Bool) (σ : V → Fin (N + 1)) :
-    marshallSignS A σ = 1 := by
-  unfold marshallSignS
-  rw [show (Finset.univ : Finset V) = ∅ from Finset.eq_empty_of_isEmpty _]
-  exact Finset.prod_empty
-
-/-- For `N = 0` (`S = 0`), the only configuration is the constant
-zero, so the Marshall sign is always `1`. -/
-theorem marshallSignS_N_zero (A : V → Bool) (σ : V → Fin 1) :
-    marshallSignS A σ = 1 := by
-  have : σ = (fun _ => (0 : Fin 1)) := by
-    funext x; apply Fin.ext; have := (σ x).isLt; omega
-  rw [this, marshallSignS_const_zero]
-
 /-- Product of two Marshall signs at the same sublattice indicator
 factors site-wise: each `A`-site contributes `(-1)^((σ x).val + (σ' x).val)`. -/
 theorem marshallSignS_mul (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
@@ -132,13 +116,6 @@ theorem marshallSignS_eq_one_or_neg_one
   · right
     have := add_eq_zero_iff_eq_neg.mp h2
     rw [this]
-
-/-- The norm of the Marshall sign is `1`. -/
-theorem marshallSignS_norm (A : V → Bool) (σ : V → Fin (N + 1)) :
-    ‖marshallSignS A σ‖ = 1 := by
-  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
-  · rw [h, norm_one]
-  · rw [h]; simp
 
 /-- **Marshall sign factorization on two-site differences**: when
 configurations `σ', σ` agree at every site except possibly `x` and
