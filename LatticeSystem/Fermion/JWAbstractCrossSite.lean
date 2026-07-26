@@ -123,26 +123,6 @@ theorem jwStringAbstract_anticomm_onSite_pos_spinHalfOpPlus
     _ = 0 * M := by rw [neg_add_cancel]
     _ = 0 := Matrix.zero_mul _
 
-/-- Companion anticommutator at an interior site with the lowering
-operator: for every `i j : Λ` with `i < j`,
-
-  `σ^-_i · jwStringAbstract j + jwStringAbstract j · σ^-_i = 0`.
-
-Derived from the `σ^+_i` version by matrix `conjTranspose`, using
-`jwStringAbstract_isHermitian` and `(σ^+)† = σ^-`. -/
-theorem jwStringAbstract_anticomm_onSite_pos_spinHalfOpMinus
-    (i j : Λ) (hij : i < j) :
-    onSite i spinHalfOpMinus * jwStringAbstract j +
-      jwStringAbstract j * onSite i spinHalfOpMinus = 0 := by
-  have h := jwStringAbstract_anticomm_onSite_pos_spinHalfOpPlus i j hij
-  have h2 := congrArg Matrix.conjTranspose h
-  simp only [Matrix.conjTranspose_add, Matrix.conjTranspose_mul,
-    Matrix.conjTranspose_zero, (jwStringAbstract_isHermitian j).eq] at h2
-  have hplus : (onSite i spinHalfOpPlus)ᴴ = onSite i spinHalfOpMinus := by
-    rw [onSite_conjTransposeAbstract, spinHalfOpPlus_conjTranspose]
-  rw [hplus] at h2
-  exact (add_comm _ _).trans h2
-
 /-- Two abstract Jordan-Wigner strings commute. Both are built as
 `Finset.noncommProd` over subsets of `Λ` of `k ↦ onSite k pauliZ`;
 every cross pair lies at distinct sites so `onSite_mul_onSite_of_ne`
