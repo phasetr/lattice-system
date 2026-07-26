@@ -17,12 +17,6 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
 /-! ## Sublattice axis squared as conjTranspose product -/
 
-/-- `(Ŝ_A^(1))² = (Ŝ_A^(1))ᴴ * Ŝ_A^(1)`. Direct from Hermiticity. -/
-theorem sublatticeSpinHalfOp1_sq_eq_conjTranspose_mul (A : Λ → Bool) :
-    sublatticeSpinHalfOp1 A * sublatticeSpinHalfOp1 A =
-      (sublatticeSpinHalfOp1 A).conjTranspose * sublatticeSpinHalfOp1 A := by
-  rw [(sublatticeSpinHalfOp1_isHermitian A).eq]
-
 theorem sublatticeSpinHalfOp2_sq_eq_conjTranspose_mul (A : Λ → Bool) :
     sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp2 A =
       (sublatticeSpinHalfOp2 A).conjTranspose * sublatticeSpinHalfOp2 A := by
