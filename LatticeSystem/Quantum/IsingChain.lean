@@ -441,17 +441,6 @@ theorem quantumIsingHamiltonian_eq_isingHamiltonianGeneric
     = -((h : ℂ) • ∑ x : Fin (N + 1), onSite x pauliX)
   simp only [spinX, neg_smul]
 
-/-- N=1 corollary of the generic bridge (PR #185 milestone kept
-for direct reference). -/
-theorem quantumIsingHamiltonian_one_eq_isingHamiltonianGeneric
-    (J h : ℝ) :
-    quantumIsingHamiltonian 1 J h
-      = isingHamiltonianGeneric
-          (LatticeSystem.Lattice.couplingOf
-            (SimpleGraph.pathGraph 2) (-(J : ℂ) / 2))
-          (h : ℂ) :=
-  quantumIsingHamiltonian_eq_isingHamiltonianGeneric 1 J h
-
 /-- Bridge: `quantumIsingGibbsState = isingGibbsStateOnGraph` on
 `pathGraph (N+1)` with edge weight `-J/2`. Direct corollary of the
 chain Hamiltonian bridge. -/
