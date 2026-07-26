@@ -246,14 +246,6 @@ noncomputable def gibbsCovarianceSymm (β : ℝ) (H A B : ManyBodyOp Λ) : ℂ :
   (2 : ℂ)⁻¹ * gibbsExpectation β H (A * B + B * A)
     - gibbsExpectation β H A * gibbsExpectation β H B
 
-/-- Unfolding lemma:
-`Cov^s_β(A, B) = (1/2) · ⟨A · B + B · A⟩_β − ⟨A⟩_β · ⟨B⟩_β`. -/
-theorem gibbsCovarianceSymm_eq (β : ℝ) (H A B : ManyBodyOp Λ) :
-    gibbsCovarianceSymm β H A B =
-      (2 : ℂ)⁻¹ * gibbsExpectation β H (A * B + B * A)
-        - gibbsExpectation β H A * gibbsExpectation β H B :=
-  rfl
-
 /-- Self symmetric-covariance is the variance:
 `Cov^s_β(O, O) = Var_β(O)`. The anticommutator `O · O + O · O = 2(O · O)`
 collapses the (1/2) prefactor. -/
