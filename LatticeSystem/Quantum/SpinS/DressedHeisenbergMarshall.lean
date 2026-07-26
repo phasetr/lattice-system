@@ -219,34 +219,5 @@ theorem dressedHeisenbergS_apply_re_nonpos_bipartite_y_lowering
   have h2J : 0 ≤ 2 * (J x y).re := by linarith
   nlinarith
 
-/-- The real-part dressed Heisenberg matrix entry vanishes when the
-two configurations have different magnetization quantum numbers. -/
-theorem dressedHeisenbergSReMatrix_apply_eq_zero_of_mag_ne
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
-    {σ' σ : V → Fin (N + 1)}
-    (h : magEigenvalueS σ ≠ magEigenvalueS σ') :
-    dressedHeisenbergSReMatrix A J N σ' σ = 0 := by
-  rw [dressedHeisenbergSReMatrix_apply]
-  have hzero : dressedHeisenbergS A J N σ' σ = 0 :=
-    dressedHeisenbergSMatrix_apply_eq_zero_of_mag_ne A J N h
-  rw [hzero]; simp
-
-/-- magSumS-based version: when two configurations have different
-`magSumS` values, the dressed real-matrix entry vanishes. (Equivalent
-to the `magEigenvalueS`-based version via bijection.) -/
-theorem dressedHeisenbergSReMatrix_apply_eq_zero_of_magSumS_ne
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
-    {σ' σ : V → Fin (N + 1)}
-    (h : magSumS σ ≠ magSumS σ') :
-    dressedHeisenbergSReMatrix A J N σ' σ = 0 := by
-  apply dressedHeisenbergSReMatrix_apply_eq_zero_of_mag_ne
-  unfold magEigenvalueS
-  intro heq
-  apply h
-  -- magEig σ = magEig σ' ⟹ magSum σ = magSum σ'.
-  have : ((magSumS σ : ℂ)) = ((magSumS σ' : ℂ)) := by linear_combination -heq
-  exact_mod_cast this
-
-
 end LatticeSystem.Quantum
 

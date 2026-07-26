@@ -137,44 +137,6 @@ theorem tower_numerator_double_commutator_le (d L N : ℕ) [NeZero L]
   rw [hre]
   linarith
 
-/-! ### Numerator expansion (P9-7) -/
-
-/-- The `false`-outer double commutator `[ô⁻,[Ĥ,ô⁺]]` is the conjugate transpose of the `true`-outer
-one, hence carries the same `g₀/V` bound: `‖[ô⁻,[Ĥ,ô⁺]]‖ ≤ 96 d N⁴ / V`. -/
-theorem orderDensity_double_commutator_false_norm_le (d L N : ℕ) [NeZero L] (hL : 2 ≤ L)
-    (hN : 1 ≤ N) :
-    manyBodyOperatorNormS
-      (staggeredOrderDensityOpS d L N false
-          * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
-            - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
-        - (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
-            - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
-          * staggeredOrderDensityOpS d L N false)
-      ≤ 96 * (d : ℝ) * (N : ℝ) ^ 4 / (L : ℝ) ^ d := by
-  have hHerm := (heisenbergHamiltonianS_torus_isHermitian d L N).eq
-  have hconj : (staggeredOrderDensityOpS d L N false
-          * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
-            - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
-        - (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
-            - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
-          * staggeredOrderDensityOpS d L N false)
-      = Matrix.conjTranspose
-          (staggeredOrderDensityOpS d L N true
-              * (heisenbergHamiltonianS (torusNNCoupling d L) N
-                  * staggeredOrderDensityOpS d L N false
-                - staggeredOrderDensityOpS d L N false
-                  * heisenbergHamiltonianS (torusNNCoupling d L) N)
-            - (heisenbergHamiltonianS (torusNNCoupling d L) N
-                  * staggeredOrderDensityOpS d L N false
-                - staggeredOrderDensityOpS d L N false
-                  * heisenbergHamiltonianS (torusNNCoupling d L) N)
-              * staggeredOrderDensityOpS d L N true) := by
-    simp only [Matrix.conjTranspose_sub, Matrix.conjTranspose_mul, hHerm,
-      staggeredOrderDensityOpS_conjTranspose, Bool.not_true, Bool.not_false]
-    noncomm_ring
-  rw [hconj, manyBodyOperatorNormS_conjTranspose]
-  exact orderDensity_double_commutator_norm_le d L N hL hN
-
 /-! ### Capstone feeders (P9-8) -/
 
 /-- The nonnegative-`M` tower state is `V^M` times the per-volume order-density power on `Φ`:
