@@ -343,13 +343,6 @@ theorem hubbardCycleHamiltonian_isHermitian (N : ℕ) (J U : ℝ) :
     (hubbardCycleHamiltonian N J U).IsHermitian :=
   hubbardHamiltonianOnGraph_isHermitian N _ (by simp) (by simp)
 
-/-- Charge conservation for the periodic Hubbard chain. -/
-theorem hubbardCycleHamiltonian_commute_fermionTotalNumber
-    (N : ℕ) (J U : ℝ) :
-    Commute (hubbardCycleHamiltonian N J U)
-      (fermionTotalNumber (2 * N + 1)) :=
-  hubbardHamiltonianOnGraph_commute_fermionTotalNumber N _ _ _
-
 /-- Gibbs state of the periodic Hubbard chain. -/
 noncomputable def hubbardCycleGibbsState (N : ℕ) (β : ℝ) (J U : ℝ) :
     ManyBodyOp (Fin (2 * N + 2)) :=
