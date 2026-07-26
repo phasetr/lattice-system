@@ -62,32 +62,6 @@ theorem rayleighOnVec_one_eq_normSq {ι : Type*} [Fintype ι] [DecidableEq ι]
   rw [EuclideanSpace.inner_eq_star_dotProduct] at h
   simpa using h
 
-open scoped ComplexOrder in
-/-- **Generic sector lower bound from a global energy bound.**  If `0 ≤ rayleighOnVec (H + c·1) φ`
-for every vector and `0 ≤ c`, then every spin sector's minimum energy is at least `−c`:
-`−c ≤ sectorMinEnergy H twoS`.  (On a unit sector vector `rayleighOnVec (H + c·1) = rayleighOnVec H
-+ c`, so `rayleighOnVec H ≥ −c`; the infimum inherits the bound, and an empty sector gives the junk
-value `0 ≥ −c`.) -/
-theorem sectorMinEnergy_ge_of_add_const_rayleigh_nonneg {M : ℕ}
-    (H : ManyBodyOp (Fin (2 * M + 2))) (c : ℝ) (hc : 0 ≤ c)
-    (hpos : ∀ φ, 0 ≤ rayleighOnVec (H + (c : ℂ) • (1 : ManyBodyOp (Fin (2 * M + 2)))) φ)
-    (filling twoS : ℕ) :
-    -c ≤ sectorMinEnergy H filling twoS := by
-  unfold sectorMinEnergy
-  by_cases hne : Nonempty (spinSector (M := M) filling twoS)
-  · refine le_ciInf (fun φ => ?_)
-    have hu : ‖(φ : EuclideanSpace ℂ (Fin (2 * M + 2) → Fin 2))‖ = 1 := φ.2.1
-    have hsplit : rayleighOnVec (H + (c : ℂ) • 1) (φ : EuclideanSpace ℂ _).ofLp
-        = rayleighOnVec H (φ : EuclideanSpace ℂ _).ofLp + c := by
-      rw [rayleighOnVec_add_matrix, rayleighOnVec_real_smul, rayleighOnVec_one_eq_normSq, hu]
-      norm_num
-    have hge := hpos (φ : EuclideanSpace ℂ _).ofLp
-    rw [hsplit] at hge
-    linarith
-  · have : IsEmpty (spinSector (M := M) filling twoS) := not_nonempty_iff.mp hne
-    rw [Real.iInf_of_isEmpty]
-    linarith
-
 /-- The squared `dotProduct` self-pairing of a unit `EuclideanSpace` vector is `1`. -/
 theorem star_dotProduct_self_of_norm_one {ι : Type*} [Fintype ι]
     (φ : EuclideanSpace ℂ ι) (hu : ‖φ‖ = 1) : star φ.ofLp ⬝ᵥ φ.ofLp = (1 : ℂ) := by
