@@ -15,9 +15,15 @@ The raising-after-lowering Casimir identities, the multiplet non-vanishing / lin
 independence, the whole-tower energy degeneracy, and the weak Nagaoka spin multiplet are
 kept in the capstone module `WeakNagaokaTheorem.lean`.
 
-`ferroHoleConfig` and `fermionTotalSpinZ_mulVec_ferroHole` are module-public: they carry
-the hole-state spin data consumed by the all-up Tasaki basis state and by the `Ŝ^z` tower
-below. The remaining hole-state helper lemmas stay `private`.
+Visibility, as it currently stands: `ferroHoleConfig` and `fermionTotalSpinZ_mulVec_ferroHole`
+are non-`private`, and every use of either is inside this module — there is no cross-module
+reference to either. `ferroHoleConfig` occurs in the *statement* of the non-`private`
+`fermionTotalSpinZ_mulVec_spinMinusPow_ferroHole` below; `fermionTotalSpinZ_mulVec_ferroHole`
+occurs only inside proofs, so nothing at present requires it to be non-`private`. The two are
+coupled — making `ferroHoleConfig` `private` would put a `private` constant into the statement
+of that non-`private` theorem — so any change has to treat them together; the visibility
+cleanup is left to the refactoring pass tracked in #5098. The remaining hole-state helper
+lemmas stay `private`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed., Springer, 2020), §9.3.3 (Theorem 11.5 core).
@@ -113,7 +119,7 @@ private theorem fermionTotalSpinPlus_mulVec_ferroHole (N : ℕ) (x : Fin (N + 1)
   rw [← Matrix.mulVec_mulVec, fermionMultiAnnihilation_mulVec_basisVec,
     if_neg (by rw [ferroHole_down_zero]; decide), Matrix.mulVec_zero]
 
-/-! ## The all-up Tasaki basis state is a highest-weight maximal-spin state -/
+/-! ## The all-up Tasaki basis state is a highest-weight state -/
 
 /-- `Ŝ^+_tot` annihilates the all-up Tasaki basis state
 `|Φ^T_{x,↑}⟩ = ε • |Φ_{x,↑}⟩` (no down electrons to raise). -/

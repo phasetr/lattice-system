@@ -8,13 +8,22 @@ This file builds toward Tasaki Theorem 11.5: for a Hubbard model with
 among the ground states of the effective Hamiltonian there are at least
 `(2 S_max + 1)` states with total spin `S_tot = S_max = N/2`.
 
-This file supplies the abstract half of that statement: for *any* nonzero
-highest-weight state `v` (`Ŝ^+_tot v = 0`, `Ŝ^z_tot v = (N/2) v`) the
-spin-lowering tower `(Ŝ^-_tot)^k v` (`k = 0, …, N`) is nonzero, linearly
-independent, energy-degenerate, and confined to the maximal-spin sector
-`S_tot = S_max = N/2`; this is packaged as `weakNagaoka_spinMultiplet`. The
-concrete highest-weight ground state fed into it is built in
-`WeakNagaokaGroundState.lean`.
+This file supplies the abstract half of that statement, in two steps.
+*The spin-lowering tower*: for **any** nonzero highest-weight state `v`
+(`Ŝ^+_tot v = 0`, `Ŝ^z_tot v = (N/2) v`) the states `(Ŝ^-_tot)^k v`
+(`k = 0, …, N`) are nonzero (`spinMinusPow_ne_zero`), linearly independent
+(`spinMinusPow_linearIndependent`), and confined to the maximal-spin sector
+`S_tot = S_max = N/2`; no Hamiltonian hypothesis enters here.
+*Theorem 11.5 core*: if **in addition** `v` is an `Ĥ_eff`-eigenvector at energy
+`E`, then the whole tower is `Ĥ_eff`-degenerate at `E`. This second, stronger
+statement is what `weakNagaoka_spinMultiplet` packages; its three conjuncts are
+linear independence, energy degeneracy, and the maximal-spin sector.
+Nonvanishing is *not* one of them (it follows from linear independence, and is
+stated on its own as `spinMinusPow_ne_zero`). The `Ĥ_eff`-eigenvector hypothesis
+cannot be dropped: a *localized* ferromagnetic hole state is highest-weight but
+is not in general an `Ĥ_eff`-eigenvector, so its tower need not be degenerate.
+The concrete highest-weight ground state fed into `weakNagaoka_spinMultiplet` is
+built in `WeakNagaokaGroundState.lean`.
 
 Tracked in Issue #4130. Reference: Tasaki, *Physics and Mathematics of Quantum
 Many-Body Systems*, 1st edition, §11.2.1, Theorem 11.5, pp. 382-385.
