@@ -1453,7 +1453,7 @@ Systems*, §3.5, p. 89.
 | `heisenbergHamiltonian_couplingOf_isHermitian` | **graph-centric** Hermiticity: for any `SimpleGraph G` and real edge weight `J : ℂ`, the Heisenberg Hamiltonian `heisenbergHamiltonian (couplingOf G J)` is Hermitian. The chain instances are corollaries via the bridge theorems | `Quantum/HeisenbergChain.lean` |
 | `heisenbergHamiltonianOnGraph G J` | named wrapper = `heisenbergHamiltonian (couplingOf G J)` (parallel to `isingHamiltonianOnGraph`) | `Quantum/HeisenbergChain.lean` |
 | `heisenbergHamiltonianOnGraph_isHermitian` / `_commute_totalSpinHalfOp{1,2,3}` / `_commute_totalSpinHalfSquared` | corollaries re-exposed under the named wrapper | `Quantum/HeisenbergChain.lean` |
-| `openChainHeisenbergGibbsState_eq_onGraph` / `periodicChainHeisenbergGibbsState_eq_onGraph` | rfl bridges: chain Gibbs = graph Gibbs on pathGraph/cycleGraph | `Quantum/HeisenbergChain.lean` |
+| `openChainHeisenbergGibbsState_eq_onGraph` / `periodicChainHeisenbergGibbsState_eq_onGraph` | rfl bridges: chain Gibbs = graph Gibbs on pathGraph/cycleGraph | `Quantum/HeisenbergChain/Gibbs.lean` |
 | `quantumIsingGibbsState_eq_isingGibbsStateOnGraph` | chain Ising Gibbs = `isingGibbsStateOnGraph (pathGraph (N+1)) β (-J/2) h` | `Quantum/IsingChain.lean` |
 | `isingCycleGibbsState_commute_hamiltonian` | the periodic Ising Gibbs state commutes with the periodic Ising Hamiltonian (free corollary of `gibbsState_commute_hamiltonian`) | `Quantum/IsingChain.lean` |
 | `isingCycleGibbsExpectation_zero` / `_im_of_isHermitian` / `_commutator_hamiltonian` / `_hamiltonian_im` / `_hamiltonian_pow_im` / `isingCycle_partitionFn_im` / `_ofReal_re_eq` / `isingCycleGibbsState_pow_trace` | periodic-Ising expectation companions of the open-chain `quantumIsingGibbsExpectation*` family: β = 0 closed form, real-valuedness for Hermitian observables, conservation `⟨[H, A]⟩ = 0`, energy / energy-power expectations real, partition-function real, real-cast `((⟨O⟩_β).re : ℂ) = ⟨O⟩_β`, Rényi-n trace `Tr(ρ_β^n) = Z(nβ) / Z(β)^n` | `Quantum/IsingChain.lean` |
@@ -1506,37 +1506,37 @@ Systems*, §3.5, p. 89.
 | `openChainHeisenbergGibbsExpectation_self_eq` | open-chain energy expectation as a sum over open-boundary bonds | `Quantum/HeisenbergChain.lean` |
 | `periodicChainHeisenbergGibbsExpectation_self_eq` | periodic-chain energy expectation as a sum over periodic-boundary bonds | `Quantum/HeisenbergChain.lean` |
 | `openChainHeisenbergGibbsState β J N` | `gibbsState β (heisenbergHamiltonian (openChainCoupling N J))` (open-chain Gibbs state) | `Quantum/HeisenbergChain.lean` |
-| `openChainHeisenbergGibbsState_isHermitian` | the open-chain Heisenberg Gibbs state `ρ_β` is Hermitian | `Quantum/HeisenbergChain.lean` |
-| `openChainHeisenbergGibbsState_commute_hamiltonian` | `[ρ_β, H_open] = 0` | `Quantum/HeisenbergChain.lean` |
-| `openChainHeisenbergGibbsExpectation_zero` | high-temperature closed form `⟨A⟩_0 = (1/dim) · Tr A` | `Quantum/HeisenbergChain.lean` |
-| `openChainHeisenbergGibbsExpectation_im_of_isHermitian` | for Hermitian `O`, `(⟨O⟩_β).im = 0` | `Quantum/HeisenbergChain.lean` |
-| `openChainHeisenbergGibbsExpectation_commutator_hamiltonian` | conservation `⟨[H_open, A]⟩_β = 0` | `Quantum/HeisenbergChain.lean` |
-| `openChainHeisenbergGibbsExpectation_hamiltonian_im` | `(⟨H_open⟩_β).im = 0` (energy expectation is real) | `Quantum/HeisenbergChain.lean` |
-| `openChainHeisenbergGibbsExpectation_mul_hamiltonian_im` | for Hermitian `O`, `(⟨H_open · O⟩_β).im = 0` | `Quantum/HeisenbergChain.lean` |
-| `openChainHeisenbergGibbsExpectation_hamiltonian_sq_im` | `(⟨H_open^2⟩_β).im = 0` (energy-squared expectation real) | `Quantum/HeisenbergChain.lean` |
-| `openChainHeisenbergGibbsExpectation_hamiltonian_pow_im` | `(⟨H_open^n⟩_β).im = 0` for any `n : ℕ` | `Quantum/HeisenbergChain.lean` |
-| `openChainHeisenbergGibbsExpectation_anticommutator_im` | for Hermitian `A, B`, `(⟨A·B + B·A⟩_β).im = 0` | `Quantum/HeisenbergChain.lean` |
-| `openChainHeisenbergGibbsExpectation_commutator_re` | for Hermitian `A, B`, `(⟨A·B − B·A⟩_β).re = 0` | `Quantum/HeisenbergChain.lean` |
-| `openChainHeisenbergGibbsHamiltonianVariance_im` | `(Var_β(H_open)).im = 0` (energy variance real) | `Quantum/HeisenbergChain.lean` |
-| `openChainHeisenberg_partitionFn_im` | `(partitionFn β H_open).im = 0` | `Quantum/HeisenbergChain.lean` |
-| `openChainHeisenbergGibbsExpectation_ofReal_re_eq` | for Hermitian `O`, `((⟨O⟩_β).re : ℂ) = ⟨O⟩_β` | `Quantum/HeisenbergChain.lean` |
-| `openChainHeisenbergGibbsState_pow_trace` | `Tr(ρ_β^n) = Z(nβ) / Z(β)^n` for the open-chain Hamiltonian | `Quantum/HeisenbergChain.lean` |
+| `openChainHeisenbergGibbsState_isHermitian` | the open-chain Heisenberg Gibbs state `ρ_β` is Hermitian | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `openChainHeisenbergGibbsState_commute_hamiltonian` | `[ρ_β, H_open] = 0` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `openChainHeisenbergGibbsExpectation_zero` | high-temperature closed form `⟨A⟩_0 = (1/dim) · Tr A` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `openChainHeisenbergGibbsExpectation_im_of_isHermitian` | for Hermitian `O`, `(⟨O⟩_β).im = 0` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `openChainHeisenbergGibbsExpectation_commutator_hamiltonian` | conservation `⟨[H_open, A]⟩_β = 0` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `openChainHeisenbergGibbsExpectation_hamiltonian_im` | `(⟨H_open⟩_β).im = 0` (energy expectation is real) | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `openChainHeisenbergGibbsExpectation_mul_hamiltonian_im` | for Hermitian `O`, `(⟨H_open · O⟩_β).im = 0` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `openChainHeisenbergGibbsExpectation_hamiltonian_sq_im` | `(⟨H_open^2⟩_β).im = 0` (energy-squared expectation real) | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `openChainHeisenbergGibbsExpectation_hamiltonian_pow_im` | `(⟨H_open^n⟩_β).im = 0` for any `n : ℕ` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `openChainHeisenbergGibbsExpectation_anticommutator_im` | for Hermitian `A, B`, `(⟨A·B + B·A⟩_β).im = 0` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `openChainHeisenbergGibbsExpectation_commutator_re` | for Hermitian `A, B`, `(⟨A·B − B·A⟩_β).re = 0` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `openChainHeisenbergGibbsHamiltonianVariance_im` | `(Var_β(H_open)).im = 0` (energy variance real) | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `openChainHeisenberg_partitionFn_im` | `(partitionFn β H_open).im = 0` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `openChainHeisenbergGibbsExpectation_ofReal_re_eq` | for Hermitian `O`, `((⟨O⟩_β).re : ℂ) = ⟨O⟩_β` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `openChainHeisenbergGibbsState_pow_trace` | `Tr(ρ_β^n) = Z(nβ) / Z(β)^n` for the open-chain Hamiltonian | `Quantum/HeisenbergChain/Gibbs.lean` |
 | `periodicChainHeisenbergGibbsState β J N` | analogous Gibbs state for the periodic-chain Hamiltonian | `Quantum/HeisenbergChain.lean` |
-| `periodicChainHeisenbergGibbsState_isHermitian` | periodic-chain Gibbs state Hermiticity | `Quantum/HeisenbergChain.lean` |
-| `periodicChainHeisenbergGibbsState_commute_hamiltonian` | `[ρ_β, H_periodic] = 0` | `Quantum/HeisenbergChain.lean` |
-| `periodicChainHeisenbergGibbsExpectation_zero` | periodic-chain high-temperature closed form | `Quantum/HeisenbergChain.lean` |
-| `periodicChainHeisenbergGibbsExpectation_im_of_isHermitian` | for Hermitian `O`, `(⟨O⟩_β).im = 0` | `Quantum/HeisenbergChain.lean` |
-| `periodicChainHeisenbergGibbsExpectation_commutator_hamiltonian` | conservation `⟨[H_periodic, A]⟩_β = 0` | `Quantum/HeisenbergChain.lean` |
-| `periodicChainHeisenbergGibbsExpectation_hamiltonian_im` | `(⟨H_periodic⟩_β).im = 0` (energy expectation is real) | `Quantum/HeisenbergChain.lean` |
-| `periodicChainHeisenbergGibbsExpectation_mul_hamiltonian_im` | for Hermitian `O`, `(⟨H_periodic · O⟩_β).im = 0` | `Quantum/HeisenbergChain.lean` |
-| `periodicChainHeisenbergGibbsExpectation_hamiltonian_sq_im` | `(⟨H_periodic^2⟩_β).im = 0` (energy-squared expectation real) | `Quantum/HeisenbergChain.lean` |
-| `periodicChainHeisenbergGibbsExpectation_hamiltonian_pow_im` | `(⟨H_periodic^n⟩_β).im = 0` for any `n : ℕ` | `Quantum/HeisenbergChain.lean` |
-| `periodicChainHeisenbergGibbsExpectation_anticommutator_im` | for Hermitian `A, B`, `(⟨A·B + B·A⟩_β).im = 0` | `Quantum/HeisenbergChain.lean` |
-| `periodicChainHeisenbergGibbsExpectation_commutator_re` | for Hermitian `A, B`, `(⟨A·B − B·A⟩_β).re = 0` | `Quantum/HeisenbergChain.lean` |
-| `periodicChainHeisenbergGibbsHamiltonianVariance_im` | `(Var_β(H_periodic)).im = 0` (energy variance real) | `Quantum/HeisenbergChain.lean` |
-| `periodicChainHeisenberg_partitionFn_im` | `(partitionFn β H_periodic).im = 0` | `Quantum/HeisenbergChain.lean` |
-| `periodicChainHeisenbergGibbsExpectation_ofReal_re_eq` | for Hermitian `O`, `((⟨O⟩_β).re : ℂ) = ⟨O⟩_β` | `Quantum/HeisenbergChain.lean` |
-| `periodicChainHeisenbergGibbsState_pow_trace` | `Tr(ρ_β^n) = Z(nβ) / Z(β)^n` for the periodic-chain Hamiltonian | `Quantum/HeisenbergChain.lean` |
+| `periodicChainHeisenbergGibbsState_isHermitian` | periodic-chain Gibbs state Hermiticity | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `periodicChainHeisenbergGibbsState_commute_hamiltonian` | `[ρ_β, H_periodic] = 0` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `periodicChainHeisenbergGibbsExpectation_zero` | periodic-chain high-temperature closed form | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `periodicChainHeisenbergGibbsExpectation_im_of_isHermitian` | for Hermitian `O`, `(⟨O⟩_β).im = 0` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `periodicChainHeisenbergGibbsExpectation_commutator_hamiltonian` | conservation `⟨[H_periodic, A]⟩_β = 0` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `periodicChainHeisenbergGibbsExpectation_hamiltonian_im` | `(⟨H_periodic⟩_β).im = 0` (energy expectation is real) | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `periodicChainHeisenbergGibbsExpectation_mul_hamiltonian_im` | for Hermitian `O`, `(⟨H_periodic · O⟩_β).im = 0` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `periodicChainHeisenbergGibbsExpectation_hamiltonian_sq_im` | `(⟨H_periodic^2⟩_β).im = 0` (energy-squared expectation real) | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `periodicChainHeisenbergGibbsExpectation_hamiltonian_pow_im` | `(⟨H_periodic^n⟩_β).im = 0` for any `n : ℕ` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `periodicChainHeisenbergGibbsExpectation_anticommutator_im` | for Hermitian `A, B`, `(⟨A·B + B·A⟩_β).im = 0` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `periodicChainHeisenbergGibbsExpectation_commutator_re` | for Hermitian `A, B`, `(⟨A·B − B·A⟩_β).re = 0` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `periodicChainHeisenbergGibbsHamiltonianVariance_im` | `(Var_β(H_periodic)).im = 0` (energy variance real) | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `periodicChainHeisenberg_partitionFn_im` | `(partitionFn β H_periodic).im = 0` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `periodicChainHeisenbergGibbsExpectation_ofReal_re_eq` | for Hermitian `O`, `((⟨O⟩_β).re : ℂ) = ⟨O⟩_β` | `Quantum/HeisenbergChain/Gibbs.lean` |
+| `periodicChainHeisenbergGibbsState_pow_trace` | `Tr(ρ_β^n) = Z(nβ) / Z(β)^n` for the periodic-chain Hamiltonian | `Quantum/HeisenbergChain/Gibbs.lean` |
 | `openChainHeisenbergHamiltonian_two_site_eq` | for `N = 1` (the 2-site open chain on `Fin 2`), `H_open = -2J · spinHalfDot 0 1` (explicit one-bond reduction; Tasaki §2.4 simplest concrete instance) | `Quantum/HeisenbergChain.lean` |
 | `openChainHeisenbergHamiltonian_two_site_mulVec_basisVec_all_up` | `H_open(N=1) · |↑↑⟩ = -(J/2) · |↑↑⟩` — `|↑↑⟩` lies in the `S = 1` triplet sector and is an exact eigenvector with eigenvalue `-J/2` (this is the ferromagnetic ground state for `J < 0`) | `Quantum/HeisenbergChain.lean` |
 | `openChainHeisenbergHamiltonian_two_site_mulVec_basisVec_singlet` | `H_open(N=1) · (|↑↓⟩ - |↓↑⟩) = (3J/2) · (|↑↓⟩ - |↓↑⟩)` — singlet eigenvalue, the antiferromagnetic ground state for `J > 0` (Tasaki §2.5 concrete instance) | `Quantum/HeisenbergChain.lean` |
@@ -2291,37 +2291,37 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionMultiAnnihilation_creation_anticomm_lt` | mixed `{c_i, c_j†} = 0` for `i < j` — same structure as `_anticomm_lt` but with `σ^-_j` at site `j` | `Fermion/JordanWigner.lean` |
 | `fermionMultiCreation_annihilation_anticomm_lt` | mixed dual `{c_i†, c_j} = 0` for `i < j` (adjoint of the above) | `Fermion/JordanWigner.lean` |
 | `spinHalfOpPlus_mul_self` / `spinHalfOpPlus_mul_spinHalfOpMinus_mul_spinHalfOpPlus` | Pauli helper identities `σ^+ σ^+ = 0` and `σ^+ σ^- σ^+ = σ^+` | `Quantum/SpinHalfBasis.lean` |
-| `fermionMultiNumber_commutator_fermionMultiAnnihilation_self` | `[n_i, c_i] = -c_i` (number / annihilation commutator) | `Fermion/JordanWigner.lean` |
-| `fermionMultiNumber_commutator_fermionMultiCreation_self` | `[n_i, c_i†] = c_i†` (number / creation commutator, dual via adjoint) | `Fermion/JordanWigner.lean` |
+| `fermionMultiNumber_commutator_fermionMultiAnnihilation_self` | `[n_i, c_i] = -c_i` (number / annihilation commutator) | `Fermion/JordanWigner/Number.lean` |
+| `fermionMultiNumber_commutator_fermionMultiCreation_self` | `[n_i, c_i†] = c_i†` (number / creation commutator, dual via adjoint) | `Fermion/JordanWigner/Number.lean` |
 | `spinHalfOpMinus_mul_spinHalfOpPlus_commute_pauliZ` | matrix identity: `Commute (σ^- σ^+) σ^z` (both diagonal in the computational basis) | `Quantum/SpinHalfBasis.lean` |
-| `fermionMultiNumber_commute_fermionMultiAnnihilation_of_ne` | `Commute (n_i) (c_j)` for `i ≠ j` — the number operator at site `i` commutes with any annihilation at a different site, via the `n σ^z = σ^z n` matrix commutativity absorbing the JW-string `σ^z_i` factor | `Fermion/JordanWigner.lean` |
-| `fermionMultiNumber_commute_fermionMultiCreation_of_ne` | dual: `Commute (n_i) (c_j†)` for `i ≠ j` via adjoint | `Fermion/JordanWigner.lean` |
-| `fermionTotalNumber_commutator_fermionMultiAnnihilation` | `[N̂, c_j] = -c_j` — the total particle-number operator shifts annihilation down by one (sum of diagonal `[n_j, c_j] = -c_j` with vanishing off-diagonal terms) | `Fermion/JordanWigner.lean` |
-| `fermionTotalNumber_commutator_fermionMultiCreation` | dual: `[N̂, c_j†] = c_j†` (via adjoint) | `Fermion/JordanWigner.lean` |
-| `fermionTotalNumber_commute_hopping` | `Commute N̂ (c_i† · c_j)` — the hopping operator preserves total particle number (shifts cancel: `[N̂, c_i†] = c_i†` and `[N̂, c_j] = -c_j`) | `Fermion/JordanWigner.lean` |
-| `fermionMultiNumber_commute_fermionTotalNumber` | `Commute (n_i) (N̂)` — site occupation commutes with the total particle number (sum of pairwise commuting `[n_i, n_j] = 0`) | `Fermion/JordanWigner.lean` |
-| `fermionDensityDensity_commute_fermionTotalNumber` | `Commute (n_i · n_j) (N̂)` — the density-density operator preserves total particle number, foundational for Hubbard-style on-site interactions | `Fermion/JordanWigner.lean` |
-| `fermionHopping`, `fermionHopping_commute_fermionTotalNumber` | the general single-particle hopping `H_hop = Σ_{i,j} t_{i,j} c_i† c_j` and the proof that it commutes with `N̂` (charge conservation of the kinetic Hamiltonian) | `Fermion/JordanWigner.lean` |
-| `fermionDensityInteraction`, `fermionDensityInteraction_commute_fermionTotalNumber` | the general density–density interaction `V_int = Σ_{i,j} V_{i,j} n_i n_j` and the proof that it commutes with `N̂` (paired with `H_hop` this gives charge conservation for any Hubbard-type Hamiltonian) | `Fermion/JordanWigner.lean` |
-| `fermionGenericHamiltonian`, `fermionGenericHamiltonian_commute_fermionTotalNumber` | the canonical charge-conserving fermion Hamiltonian `H = H_hop + V_int` and the proof that `[H, N̂] = 0`, the unified statement of charge conservation for single-species Hubbard / extended Hubbard models | `Fermion/JordanWigner.lean` |
-| `fermionMultiNumber_mul_isHermitian` | `(n_i · n_j)` is Hermitian for any sites (commuting Hermitian factors) | `Fermion/JordanWigner.lean` |
-| `fermionDensityInteraction_isHermitian` | `V_int = Σ V_{ij} n_i n_j` is Hermitian when every coupling entry is real (`star V_{ij} = V_{ij}`) | `Fermion/JordanWigner.lean` |
-| `fermionHoppingTerm_conjTranspose` | `(c_i† · c_j)ᴴ = c_j† · c_i` (single hopping term) | `Fermion/JordanWigner.lean` |
-| `fermionHopping_isHermitian` | `H_hop = Σ t_{ij} c_i† c_j` is Hermitian when `t` is Hermitian (`star (t i j) = t j i`); proved via term-wise conjTranspose + `Finset.sum_comm` for the index swap | `Fermion/JordanWigner.lean` |
-| `fermionGenericHamiltonian_isHermitian` | `H = H_hop + V_int` is Hermitian when `t` is Hermitian and `V` is entry-wise real; one-line corollary of the two summand Hermiticities via `Matrix.IsHermitian.add` | `Fermion/JordanWigner.lean` |
+| `fermionMultiNumber_commute_fermionMultiAnnihilation_of_ne` | `Commute (n_i) (c_j)` for `i ≠ j` — the number operator at site `i` commutes with any annihilation at a different site, via the `n σ^z = σ^z n` matrix commutativity absorbing the JW-string `σ^z_i` factor | `Fermion/JordanWigner/Number.lean` |
+| `fermionMultiNumber_commute_fermionMultiCreation_of_ne` | dual: `Commute (n_i) (c_j†)` for `i ≠ j` via adjoint | `Fermion/JordanWigner/Number.lean` |
+| `fermionTotalNumber_commutator_fermionMultiAnnihilation` | `[N̂, c_j] = -c_j` — the total particle-number operator shifts annihilation down by one (sum of diagonal `[n_j, c_j] = -c_j` with vanishing off-diagonal terms) | `Fermion/JordanWigner/Number.lean` |
+| `fermionTotalNumber_commutator_fermionMultiCreation` | dual: `[N̂, c_j†] = c_j†` (via adjoint) | `Fermion/JordanWigner/Number.lean` |
+| `fermionTotalNumber_commute_hopping` | `Commute N̂ (c_i† · c_j)` — the hopping operator preserves total particle number (shifts cancel: `[N̂, c_i†] = c_i†` and `[N̂, c_j] = -c_j`) | `Fermion/JordanWigner/Number.lean` |
+| `fermionMultiNumber_commute_fermionTotalNumber` | `Commute (n_i) (N̂)` — site occupation commutes with the total particle number (sum of pairwise commuting `[n_i, n_j] = 0`) | `Fermion/JordanWigner/Number.lean` |
+| `fermionDensityDensity_commute_fermionTotalNumber` | `Commute (n_i · n_j) (N̂)` — the density-density operator preserves total particle number, foundational for Hubbard-style on-site interactions | `Fermion/JordanWigner/Number.lean` |
+| `fermionHopping`, `fermionHopping_commute_fermionTotalNumber` | the general single-particle hopping `H_hop = Σ_{i,j} t_{i,j} c_i† c_j` and the proof that it commutes with `N̂` (charge conservation of the kinetic Hamiltonian) | `Fermion/JordanWigner/Number.lean` |
+| `fermionDensityInteraction`, `fermionDensityInteraction_commute_fermionTotalNumber` | the general density–density interaction `V_int = Σ_{i,j} V_{i,j} n_i n_j` and the proof that it commutes with `N̂` (paired with `H_hop` this gives charge conservation for any Hubbard-type Hamiltonian) | `Fermion/JordanWigner/Number.lean` |
+| `fermionGenericHamiltonian`, `fermionGenericHamiltonian_commute_fermionTotalNumber` | the canonical charge-conserving fermion Hamiltonian `H = H_hop + V_int` and the proof that `[H, N̂] = 0`, the unified statement of charge conservation for single-species Hubbard / extended Hubbard models | `Fermion/JordanWigner/Number.lean` |
+| `fermionMultiNumber_mul_isHermitian` | `(n_i · n_j)` is Hermitian for any sites (commuting Hermitian factors) | `Fermion/JordanWigner/Number.lean` |
+| `fermionDensityInteraction_isHermitian` | `V_int = Σ V_{ij} n_i n_j` is Hermitian when every coupling entry is real (`star V_{ij} = V_{ij}`) | `Fermion/JordanWigner/Number.lean` |
+| `fermionHoppingTerm_conjTranspose` | `(c_i† · c_j)ᴴ = c_j† · c_i` (single hopping term) | `Fermion/JordanWigner/Number.lean` |
+| `fermionHopping_isHermitian` | `H_hop = Σ t_{ij} c_i† c_j` is Hermitian when `t` is Hermitian (`star (t i j) = t j i`); proved via term-wise conjTranspose + `Finset.sum_comm` for the index swap | `Fermion/JordanWigner/Number.lean` |
+| `fermionGenericHamiltonian_isHermitian` | `H = H_hop + V_int` is Hermitian when `t` is Hermitian and `V` is entry-wise real; one-line corollary of the two summand Hermiticities via `Matrix.IsHermitian.add` | `Fermion/JordanWigner/Number.lean` |
 | `fermionGenericGibbsState N β t V` | Gibbs state `gibbsState β (H_hop + V_int)` for the Hubbard-skeleton Hamiltonian | `Fermion/JordanWigner.lean` |
-| `fermionGenericGibbsState_isHermitian` | Hermiticity (when `t` is Hermitian and `V` is real) | `Fermion/JordanWigner.lean` |
-| `fermionGenericGibbsState_commute_hamiltonian` | `Commute ρ_β H` (always true for the Gibbs state of any operator with itself) | `Fermion/JordanWigner.lean` |
+| `fermionGenericGibbsState_isHermitian` | Hermiticity (when `t` is Hermitian and `V` is real) | `Fermion/JordanWigner/Number.lean` |
+| `fermionGenericGibbsState_commute_hamiltonian` | `Commute ρ_β H` (always true for the Gibbs state of any operator with itself) | `Fermion/JordanWigner/Number.lean` |
 | `fermionMultiVacuum N` | the JW vacuum on `Fin (N+1)` modes — the all-up many-body basis vector `|↑↑…↑⟩` | `Fermion/JordanWigner.lean` |
-| `fermionMultiAnnihilation_mulVec_vacuum` | every annihilation operator kills the vacuum: `(c_i).mulVec (fermionMultiVacuum N) = 0` | `Fermion/JordanWigner.lean` |
-| `fermionMultiNumber_mulVec_vacuum` | each `n_i · |vac⟩ = 0` (since `n_i = c_i† c_i` and `c_i |vac⟩ = 0`) | `Fermion/JordanWigner.lean` |
-| `fermionTotalNumber_mulVec_vacuum` | the vacuum is an `N̂`-eigenstate of eigenvalue 0 | `Fermion/JordanWigner.lean` |
-| `fermionHopping_mulVec_vacuum` | `H_hop · |vac⟩ = 0` (each `c_i† c_j |vac⟩ = c_i† 0 = 0`) | `Fermion/JordanWigner.lean` |
-| `fermionDensityInteraction_mulVec_vacuum` | `V_int · |vac⟩ = 0` (each `n_i n_j |vac⟩ = n_i 0 = 0`) | `Fermion/JordanWigner.lean` |
-| `fermionGenericHamiltonian_mulVec_vacuum` | `H · |vac⟩ = 0` for the full Hubbard skeleton (linearity) | `Fermion/JordanWigner.lean` |
-| `fermionTotalNumber_mulVec_singleParticle` | `c_i† |vac⟩` is an `N̂`-eigenstate of eigenvalue 1 (uses `[N̂, c_i†] = c_i†` and `N̂ |vac⟩ = 0`) | `Fermion/JordanWigner.lean` |
+| `fermionMultiAnnihilation_mulVec_vacuum` | every annihilation operator kills the vacuum: `(c_i).mulVec (fermionMultiVacuum N) = 0` | `Fermion/JordanWigner/Number.lean` |
+| `fermionMultiNumber_mulVec_vacuum` | each `n_i · |vac⟩ = 0` (since `n_i = c_i† c_i` and `c_i |vac⟩ = 0`) | `Fermion/JordanWigner/Number.lean` |
+| `fermionTotalNumber_mulVec_vacuum` | the vacuum is an `N̂`-eigenstate of eigenvalue 0 | `Fermion/JordanWigner/Number.lean` |
+| `fermionHopping_mulVec_vacuum` | `H_hop · |vac⟩ = 0` (each `c_i† c_j |vac⟩ = c_i† 0 = 0`) | `Fermion/JordanWigner/Number.lean` |
+| `fermionDensityInteraction_mulVec_vacuum` | `V_int · |vac⟩ = 0` (each `n_i n_j |vac⟩ = n_i 0 = 0`) | `Fermion/JordanWigner/Number.lean` |
+| `fermionGenericHamiltonian_mulVec_vacuum` | `H · |vac⟩ = 0` for the full Hubbard skeleton (linearity) | `Fermion/JordanWigner/Number.lean` |
+| `fermionTotalNumber_mulVec_singleParticle` | `c_i† |vac⟩` is an `N̂`-eigenstate of eigenvalue 1 (uses `[N̂, c_i†] = c_i†` and `N̂ |vac⟩ = 0`) | `Fermion/JordanWigner/Number.lean` |
 | `fermionTotalNumber_mulVec_twoParticle` | `c_i† c_j† |vac⟩` is an `N̂`-eigenstate of eigenvalue 2 (Leibniz on the commutator gives `[N̂, c_i† c_j†] = 2 c_i† c_j†`) | `Fermion/JordanWigner.lean` |
-| `fermionTotalNumber_mulVec_eigenstate_of_commute` | generic charge-eigenstate helper: if `[N̂, X] = α X` and `N̂ v = 0` then `N̂ (X v) = α (X v)`; abstracts the single- and two-particle constructions | `Fermion/JordanWigner.lean` |
+| `fermionTotalNumber_mulVec_eigenstate_of_commute` | generic charge-eigenstate helper: if `[N̂, X] = α X` and `N̂ v = 0` then `N̂ (X v) = α (X v)`; abstracts the single- and two-particle constructions | `Fermion/JordanWigner/Number.lean` |
 | `spinfulIndex N i σ` | bijection `(i, σ : Fin 2) ↦ 2 * i + σ ∈ Fin (2*N+2)`, embedding two-species data into a single-species JW chain | `Fermion/JordanWigner.lean` |
 | `spinfulIndex_eq_iff`, `exists_spinfulIndex` | shared injectivity (`spinfulIndex N a r = spinfulIndex N b s ↔ a = b ∧ r = s`) and decomposition (`∃ a r, k = spinfulIndex N a r`) of the spinful index | `Fermion/JordanWigner.lean` |
 | `fermionUpAnnihilation`, `fermionDownAnnihilation`, `fermionUpCreation`, `fermionDownCreation` | spinful annihilation / creation operators as wrappers around the underlying single-species operators at `2i` (up) and `2i+1` (down) | `Fermion/JordanWigner.lean` |
