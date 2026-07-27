@@ -4,8 +4,6 @@ import LatticeSystem.Quantum.SpinS.WeightPreservingExpectationSum
 import LatticeSystem.Quantum.SpinS.AnisotropicSectorProjectionEigenvector
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergReduction
 
-set_option linter.unusedSectionVars false
-
 /-!
 # Tasaki §4.1 Theorem 4.4 (Shen–Qiu–Tian): universal-form assembly infrastructure
 

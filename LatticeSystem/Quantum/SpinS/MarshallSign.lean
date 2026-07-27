@@ -1,9 +1,5 @@
 import LatticeSystem.Quantum.SpinS.MarshallSignCore
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Spin-S Marshall-dressed basis (capstone)
 

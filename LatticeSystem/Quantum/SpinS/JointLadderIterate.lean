@@ -1,9 +1,5 @@
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterate
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Joint (two-sublattice) ladder iterates of the all-up state
 

@@ -2,6 +2,8 @@ import LatticeSystem.Math.PerronFrobeniusPrimitive
 import LatticeSystem.Math.CollatzWielandt
 import Mathlib.LinearAlgebra.Matrix.Irreducible.Defs
 
+set_option linter.unusedDecidableInType false
+
 /-!
 # Perron-Frobenius: positive eigenvector via Collatz-Wielandt
 
@@ -29,8 +31,6 @@ nonneg matrices using the Collatz-Wielandt maximizer argument.
 -/
 
 namespace LatticeSystem.Math.PerronFrobeniusMain
-
-set_option linter.unusedDecidableInType false
 
 open Matrix Finset LatticeSystem.Math.CollatzWielandt
 

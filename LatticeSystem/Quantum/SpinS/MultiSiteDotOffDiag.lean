@@ -1,9 +1,5 @@
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # `spinSDot` off-diagonal matrix elements on raising/lowering pairs
 (build-speed companion)
@@ -172,7 +168,6 @@ theorem spinSDot_apply_eq_lowering_raising_explicit
   rw [spinSOpMinus_apply_lower N hx, spinSOpPlus_apply_raise N hy]
   ring
 
-
 /-- Symmetric: for `x ≠ y` and configurations `σ', σ` agreeing off
 `{x, y}`, the matrix element of `Ŝ_x · Ŝ_y` has non-negative real
 part on the lowering/raising pair `(σ x).val + 1 = (σ' x).val`. -/
@@ -207,7 +202,6 @@ theorem spinSDot_apply_re_nonneg_of_raising_lowering_y
   simp only [one_div, Complex.zero_re, add_zero, inv_pos, Nat.ofNat_pos,
     mul_nonneg_iff_of_pos_left, ge_iff_le]
   positivity
-
 
 /-- **One-site difference vanishing**: for `x ≠ y` and configurations
 `σ', σ` agreeing off a single site `z`, the matrix element of
@@ -436,6 +430,5 @@ theorem spinSDot_apply_eq_zero_of_off_two_site_agree_diff_at_y_not_pm1
   rw [spinSOpMinus_apply_other N hm]
   rw [spinSOpPlus_apply_other N hp]
   ring
-
 
 end LatticeSystem.Quantum

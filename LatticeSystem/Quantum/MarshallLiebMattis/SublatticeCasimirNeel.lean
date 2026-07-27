@@ -5,11 +5,6 @@ import LatticeSystem.Quantum.NeelState
 import LatticeSystem.Quantum.MagnetizationSubspaceCore
 import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeCasimirNeelCore
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
-
 /-!
 # Sublattice Casimir eigenvalues on the Néel state
 

@@ -1,10 +1,6 @@
 import LatticeSystem.Quantum.SpinS.Magnetization
 import LatticeSystem.Quantum.SpinS.TotalSpin
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Spin-`S` Marshall sign on a bipartite sublattice
 (Tasaki §2.5 Phase B-β β-4h)
@@ -336,6 +332,5 @@ theorem marshallSignS_star (A : V → Bool) (σ : V → Fin (N + 1)) :
     rw [star_pow]
     rw [show star (-1 : ℂ) = -1 from by simp]
   · simp [hAx]
-
 
 end LatticeSystem.Quantum

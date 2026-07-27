@@ -1,9 +1,5 @@
 import LatticeSystem.Fermion.SpinSBridge
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Fermion number operator as `1/2 − Ŝ^{(3)}` at spin-`S` (`N = 1`)
 

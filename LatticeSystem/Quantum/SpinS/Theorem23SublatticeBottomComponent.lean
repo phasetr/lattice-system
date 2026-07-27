@@ -3,10 +3,6 @@ import LatticeSystem.Quantum.SpinS.SublatticeMagShift
 import LatticeSystem.Quantum.SpinS.SublatticeSpinLadderDef
 import LatticeSystem.Quantum.SpinS.JointLadderIterateSublatticeMag
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # The bottom sublattice-`A` magnetization component is `Ŝ_A^-`-killed
 

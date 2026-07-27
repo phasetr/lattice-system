@@ -1,8 +1,6 @@
 import LatticeSystem.Quantum.SpinS.ConfigDist
 import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
 
-set_option linter.unusedSectionVars false
-
 /-!
 # Connected-graph spin-`S` configuration reachability
 (Tasaki §4.4 prerequisite — Issue #4609 PR1)

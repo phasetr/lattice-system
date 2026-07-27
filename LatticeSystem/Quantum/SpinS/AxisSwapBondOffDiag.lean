@@ -1,10 +1,6 @@
 import LatticeSystem.Quantum.SpinS.AxisSwapLadderForm
 import LatticeSystem.Quantum.SpinS.AxisSwapLadderEntry
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Off-diagonal structure of the axis-swapped anisotropic bond
 

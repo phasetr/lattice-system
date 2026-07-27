@@ -1,5 +1,7 @@
 import LatticeSystem.Quantum.NeelState.TimeReversal
 
+set_option linter.deprecated false
+
 /-!
 # Marshall sign — generic graph-centric + chain / 2D / 3D specialisations (Tasaki §2.5)
 
@@ -122,7 +124,6 @@ noncomputable def marshallSignCubicConfig (K L M : ℕ)
 -- flip + Marshall × time-reversal) reference the deprecated names;
 -- suppress the deprecation linter for the rest of this file so the
 -- existing API continues to compile cleanly.
-set_option linter.deprecated false
 
 /-! ## Bridges to the generic `marshallSignOf` -/
 

@@ -1,10 +1,6 @@
 import LatticeSystem.Quantum.SpinS.JointLadderIterateNonvanishing
 import LatticeSystem.Quantum.SpinS.JointLadderIterateSublatticeMag
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Linear independence of the diagonal joint-ladder family
 

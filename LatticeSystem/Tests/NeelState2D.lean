@@ -9,7 +9,6 @@ Split out of `Tests/NeelState.lean` for build speed; the 1D chain tests remain t
 -- The marshallSign{Chain,Square,Cubic}Config regression tests below intentionally
 -- exercise the deprecated specialised helpers (thin wrappers over the generic
 -- marshallSignOf); silence the deprecation linter for this test file.
-set_option linter.deprecated false
 
 namespace LatticeSystem.Tests.NeelState
 
@@ -237,8 +236,6 @@ of `2026-04-22` (Phase 3 PR P3-4). The tests below intentionally
 exercise the deprecated names to confirm backward compatibility,
 so the deprecation linter is silenced for the remainder of this
 file. -/
-
-set_option linter.deprecated false
 
 example (K : ℕ) :
     marshallSignChainConfig K (neelChainConfig K) = 1 :=

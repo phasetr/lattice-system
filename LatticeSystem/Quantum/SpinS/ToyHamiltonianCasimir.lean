@@ -3,8 +3,6 @@ import LatticeSystem.Quantum.SpinS.ToyHamiltonian
 import LatticeSystem.Quantum.SpinS.AllAlignedState
 import LatticeSystem.Quantum.SpinS.LadderBoundary
 
-set_option linter.unusedSectionVars false
-
 /-!
 # Spin-`S` toy Hamiltonian as a cross-sublattice spin dot product
 

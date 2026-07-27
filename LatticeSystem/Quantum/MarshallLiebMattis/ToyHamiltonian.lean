@@ -1,8 +1,6 @@
 import LatticeSystem.Quantum.SpinDot
 import LatticeSystem.Quantum.HeisenbergChain
 
-set_option linter.unusedSectionVars false
-
 /-!
 # Toy Hamiltonian for the Marshall–Lieb–Mattis theorem (Tasaki §2.5 p. 40)
 

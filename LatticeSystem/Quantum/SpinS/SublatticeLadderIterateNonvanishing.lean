@@ -1,9 +1,5 @@
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIdentity
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Non-vanishing of the sublattice ladder iterates
 

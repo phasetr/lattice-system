@@ -1,9 +1,5 @@
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Alternative bipartite over/under transport (lower-z path)
 
