@@ -28,17 +28,6 @@ defined as `re (∑ i j, conj (ψ i) * M i j * ψ j) = re ⟨ψ, M ψ⟩`. -/
 noncomputable def rayleighOnVec (M : Matrix n n ℂ) (ψ : n → ℂ) : ℝ :=
   (dotProduct (star ψ) (M.mulVec ψ)).re
 
-/-- The Rayleigh-on-vec quotient is continuous in `M` for any fixed `ψ`.
-This is the entry point for `rayleighInf` continuity via the parametrised iInf. -/
-theorem continuous_rayleighOnVec_matrix (ψ : n → ℂ) :
-    Continuous (fun M : Matrix n n ℂ => rayleighOnVec M ψ) := by
-  unfold rayleighOnVec
-  refine Complex.continuous_re.comp ?_
-  -- dotProduct (star ψ) (M.mulVec ψ) = ∑ i, conj (ψ i) * (∑ j, M i j * ψ j)
-  refine continuous_finset_sum _ (fun i _ => ?_)
-  refine continuous_const.mul ?_
-  refine continuous_finset_sum _ (fun j _ => ?_)
-  exact (continuous_apply_apply i j).mul continuous_const
 
 /-- The Rayleigh-on-vec quotient is jointly continuous in `(M, ψ)` (as a function
 of `Matrix n n ℂ × (n → ℂ)`). -/
