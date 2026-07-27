@@ -406,6 +406,15 @@ theorem sum_mul_basisVec (σ : Λ → Fin 2)
     rw [basisVec_of_ne hτ, mul_zero])]
   rw [basisVec_self, mul_one]
 
+/-- `M.mulVec (basisVec σ') σ = M σ σ'`. The dotProduct collapses to
+the unique non-zero summand at `τ = σ'`. -/
+theorem mulVec_basisVec_apply (M : ManyBodyOp Λ)
+    (σ σ' : Λ → Fin 2) :
+    M.mulVec (basisVec σ') σ = M σ σ' := by
+  change dotProduct (fun j => M σ j) (basisVec σ') = M σ σ'
+  unfold dotProduct
+  rw [sum_mul_basisVec σ' (M σ)]
+
 /-- Selector sum (left-multiplied): `∑ τ, basisVec σ τ · f τ = f σ`. -/
 theorem basisVec_sum_mul (σ : Λ → Fin 2)
     (f : (Λ → Fin 2) → ℂ) :
