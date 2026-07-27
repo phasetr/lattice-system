@@ -1,7 +1,7 @@
 import LatticeSystem.Quantum.SpinS.MarshallSignCore
 
 /-!
-# Spin-S Marshall-dressed basis (capstone)
+# Spin-S Marshall-dressed basis
 
 Continues MarshallSignCore with the Marshall-dressed basis. Tracked in #412.
 -/
