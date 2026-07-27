@@ -42,7 +42,6 @@ private theorem bipartite_pos_on_graph (A : Λ → Bool) :
   rw [bipartiteGraphFromA_adj] at hadj
   exact bipartiteCoupling_pos_of_diff_sublattice A hadj
 
-set_option linter.unusedSectionVars false in
 omit [DecidableEq Λ] [Fintype Λ] in
 /-- The bipartite graph is bipartite-respecting: each edge crosses
 the sublattice partition. -/
