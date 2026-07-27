@@ -183,7 +183,6 @@ theorem exists_raiseLowerReachableS_bipartite_of_over_under_eq_sublattice
     exact configDistS_decrease_of_over_under hxy hover hunder
 /-! ## Preconnectedness of `bipartiteCompleteGraphOf` -/
 
-set_option linter.unusedSectionVars false in
 omit [DecidableEq V] [Fintype V] in
 /-- The bipartite-complete graph `bipartiteCompleteGraphOf A` is
 preconnected when both sublattices are non-empty. Any two `x, y ∈ V`
