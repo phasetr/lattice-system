@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.StringBasisVecAction
 import LatticeSystem.Fermion.JordanWigner.Operators
+import LatticeSystem.Quantum.TotalSpin
 
 /-!
 # Action of Jordan–Wigner annihilation/creation operators on basis states
@@ -47,52 +48,6 @@ theorem jwSign_update_eq (N : ℕ) (j : Fin (N + 1)) (c : Fin (N + 1) → Fin 2)
     simp only [Finset.mem_filter] at hk
     exact absurd (h ▸ hk.2) (by omega)
   rw [Function.update_of_ne hkj]
-
-/-! ## Action of `σ^±` on a basis state -/
-
-/-- The raising matrix `σ^+ = !![0,1;0,0]` lowers the site-`j` occupation:
-`σ^+_j |c⟩ = |c with j ↦ 0⟩` if `c j = 1`, else `0`. -/
-theorem onSite_spinHalfOpPlus_mulVec_basisVec (N : ℕ) (j : Fin (N + 1))
-    (c : Fin (N + 1) → Fin 2) :
-    (onSite j spinHalfOpPlus).mulVec (basisVec c) =
-      if c j = 1 then basisVec (Function.update c j 0) else 0 := by
-  rw [onSite_mulVec_basisVec]
-  funext τ
-  by_cases hcj : c j = 1
-  · rw [hcj, if_pos rfl]
-    rw [Fintype.sum_eq_single (0 : Fin 2) (fun k hk => by
-      fin_cases k <;> simp_all [spinHalfOpPlus])]
-    simp [spinHalfOpPlus]
-  · rw [if_neg hcj]
-    have hcj0 : c j = 0 := by
-      have h2 := (c j).isLt
-      exact Fin.ext (by have : (c j).val ≠ 1 := fun h => hcj (Fin.ext h); omega)
-    apply Finset.sum_eq_zero
-    intro k _
-    rw [hcj0]
-    fin_cases k <;> simp [spinHalfOpPlus]
-
-/-- The lowering matrix `σ^- = !![0,0;1,0]` raises the site-`j` occupation:
-`σ^-_j |c⟩ = |c with j ↦ 1⟩` if `c j = 0`, else `0`. -/
-theorem onSite_spinHalfOpMinus_mulVec_basisVec (N : ℕ) (j : Fin (N + 1))
-    (c : Fin (N + 1) → Fin 2) :
-    (onSite j spinHalfOpMinus).mulVec (basisVec c) =
-      if c j = 0 then basisVec (Function.update c j 1) else 0 := by
-  rw [onSite_mulVec_basisVec]
-  funext τ
-  by_cases hcj : c j = 0
-  · rw [hcj, if_pos rfl]
-    rw [Fintype.sum_eq_single (1 : Fin 2) (fun k hk => by
-      fin_cases k <;> simp_all [spinHalfOpMinus])]
-    simp [spinHalfOpMinus]
-  · rw [if_neg hcj]
-    have hcj1 : c j = 1 := by
-      have h2 := (c j).isLt
-      exact Fin.ext (by have : (c j).val ≠ 0 := fun h => hcj (Fin.ext h); omega)
-    apply Finset.sum_eq_zero
-    intro k _
-    rw [hcj1]
-    fin_cases k <;> simp [spinHalfOpMinus]
 
 /-! ## Action of annihilation/creation on a basis state -/
 

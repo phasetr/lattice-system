@@ -97,22 +97,6 @@ theorem fermionMultiAnnihilation_sq (N : ℕ) (i : Fin (N + 1)) :
 
 /-! ## JW string Hermiticity and adjoint of multi-mode operators -/
 
-/-- The conjugate transpose distributes through `onSite`:
-`(onSite i A)ᴴ = onSite i Aᴴ`. Holds entrywise since the `onSite`
-matrix element is `A (σ' i) (σ i)` (or `0`), and conjTranspose acts
-entrywise as `star`. -/
-lemma onSite_conjTranspose {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
-    (i : Λ) (A : Matrix (Fin 2) (Fin 2) ℂ) :
-    (onSite i A : ManyBodyOp Λ)ᴴ = onSite i Aᴴ := by
-  ext σ' σ
-  simp only [Matrix.conjTranspose_apply, onSite_apply]
-  by_cases h : ∀ k, k ≠ i → σ' k = σ k
-  · have h' : ∀ k, k ≠ i → σ k = σ' k := fun k hki => (h k hki).symm
-    rw [if_pos h, if_pos h']
-  · have h' : ¬ (∀ k, k ≠ i → σ k = σ' k) :=
-      fun hp => h (fun k hki => (hp k hki).symm)
-    rw [if_neg h, if_neg h', star_zero]
-
 /-- The Jordan–Wigner string is Hermitian: `(jwString N i)ᴴ = jwString N i`. -/
 theorem jwString_isHermitian (N : ℕ) (i : Fin (N + 1)) :
     (jwString N i).IsHermitian := by
