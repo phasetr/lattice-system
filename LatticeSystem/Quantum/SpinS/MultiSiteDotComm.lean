@@ -23,16 +23,6 @@ open Matrix Complex
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
-/-- The Leibniz rule for commutators of products: `[A·B, T] = A·[B,T] + [A,T]·B`. -/
-private lemma leibniz_commutatorS {N : ℕ} (A B T : ManyBodyOpS Λ N) :
-    A * B * T - T * (A * B) = A * (B * T - T * B) + (A * T - T * A) * B := by
-  rw [mul_sub, sub_mul]
-  have h1 : A * (T * B) = A * T * B := (mul_assoc A T B).symm
-  have h2 : A * B * T = A * (B * T) := mul_assoc A B T
-  have h3 : T * (A * B) = T * A * B := (mul_assoc T A B).symm
-  rw [h1, h2, h3]
-  abel
-
 /-- **SU(2) invariance, axis 3**: `[Ŝ_x · Ŝ_y, Ŝ_tot^{(3)}] = 0`.
 
 Spin-`S` generalisation of Tasaki §2.2 eq. (2.2.17), axis 3. -/

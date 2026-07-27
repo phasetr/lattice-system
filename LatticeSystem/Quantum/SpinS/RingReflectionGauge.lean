@@ -15,6 +15,7 @@ import LatticeSystem.Quantum.SpinS.ManyBodyTensorConj
 import LatticeSystem.Quantum.SpinS.Operators
 import LatticeSystem.Quantum.SpinHalfRotation
 import LatticeSystem.Quantum.SpinS.SpinHalfSpecialization
+import LatticeSystem.Quantum.SpinS.AxisSwapUnitarySpinHalf
 
 namespace LatticeSystem.Quantum
 
@@ -86,13 +87,6 @@ theorem rightGauge_conj_onSiteS (z : Fin (2 * n)) (A : Matrix (Fin (N + 1)) (Fin
   split <;> simp
 
 end AxisTwoPiRotS
-
-/-- Generic conjugation swap: from `A Ainv = 1` and `Ainv X A = Y`, deduce `A Y Ainv = X`. -/
-private theorem unitary_conj_swap {m : Type*} [Fintype m] [DecidableEq m]
-    {A Ainv X Y : Matrix m m ℂ} (hAAinv : A * Ainv = 1) (h : Ainv * X * A = Y) :
-    A * Y * Ainv = X := by
-  have hrw : A * Y * Ainv = (A * Ainv) * X * (A * Ainv) := by rw [← h]; noncomm_ring
-  rw [hrw, hAAinv, one_mul, mul_one]
 
 /-- **The explicit spin-1/2 axis-2 `π`-rotation gauge**, making `AxisTwoPiRotS` non-vacuous at
 `N = 1`: the rotation `Û^{(2)}_π` (`spinHalfRot2 π`), which fixes `Ŝ^2` and negates `Ŝ^1`, `Ŝ^3`. -/

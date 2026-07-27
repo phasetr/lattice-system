@@ -27,7 +27,7 @@ open Matrix Module
 /-- Generic conjugation swap: from `A Ainv = 1` and `Ainv X A = Y`, deduce `A Y Ainv = X`.
 This turns an adjoint-conjugation lemma `Û†ŜÛ = …` (with `Ainv = Û†`) into the forward form
 `ÛŜÛ† = …`. -/
-private theorem unitary_conj_swap {n : Type*} [Fintype n] [DecidableEq n]
+theorem unitary_conj_swap {n : Type*} [Fintype n] [DecidableEq n]
     {A Ainv X Y : Matrix n n ℂ} (hAAinv : A * Ainv = 1) (h : Ainv * X * A = Y) :
     A * Y * Ainv = X := by
   have hrw : A * Y * Ainv = (A * Ainv) * X * (A * Ainv) := by rw [← h]; noncomm_ring
