@@ -61,70 +61,6 @@ variable {n : Type*} [Fintype n]
 
 /-! ## Strictly positive max eigenvector (irreducible case) -/
 
-/-- The propagation argument: if `Av = μ • v`, `v ≥ 0`, `v ≠ 0`, and `A` is irreducible,
-then `v > 0`.  Proof uses `isIrreducible_iff_exists_pow_pos` to reach every vertex. -/
-private lemma pos_of_nonneg_eigenvec
-    {A : Matrix n n ℝ} (hIrred : A.IsIrreducible)
-    {μ : ℝ} {v : n → ℝ}
-    (hAv : A *ᵥ v = μ • v) (hv_nonneg : ∀ i, 0 ≤ v i) (hv_ne : v ≠ 0) :
-    ∀ i, 0 < v i := by
-  classical
-  intro i
-  by_contra hi
-  simp only [not_lt] at hi
-  have hi0 : v i = 0 := le_antisymm hi (hv_nonneg i)
-  -- (A *ᵥ v) i = 0
-  have hAvi : (A *ᵥ v) i = 0 := by
-    have := congr_fun hAv i
-    simp only [Pi.smul_apply, smul_eq_mul] at this
-    rw [hi0, mul_zero] at this; exact this
-  -- Each A i j * v j = 0 (nonneg terms sum to 0 → each is 0)
-  have hTermZero : ∀ j, A i j * v j = 0 := by
-    have hTerms : ∀ j, 0 ≤ A i j * v j :=
-      fun j => mul_nonneg (hIrred.nonneg i j) (hv_nonneg j)
-    have hSum0 : ∑ j : n, A i j * v j = 0 := by
-      have hrow : (A *ᵥ v) i = ∑ j : n, A i j * v j := by simp [mulVec, dotProduct]
-      linarith [hrow.symm ▸ hAvi]
-    intro j
-    apply le_antisymm _ (hTerms j)
-    have := Finset.single_le_sum (fun k _ => hTerms k) (mem_univ j)
-    linarith [hSum0]
-  -- A^k *ᵥ v = μ^k • v for all k (proved before intro j to avoid IH pollution)
-  have hApow : ∀ m, A ^ m *ᵥ v = μ ^ m • v := by
-    intro m
-    induction m with
-    | zero => simp
-    | succ p ih =>
-      calc A ^ (p + 1) *ᵥ v
-          = A ^ p *ᵥ (A *ᵥ v) := by rw [pow_succ, mulVec_mulVec]
-        _ = A ^ p *ᵥ (μ • v) := by rw [hAv]
-        _ = μ • (A ^ p *ᵥ v) := by rw [mulVec_smul]
-        _ = μ • μ ^ p • v := by rw [ih]
-        _ = μ ^ (p + 1) • v := by rw [smul_smul]; congr 1; ring
-  -- Use irreducibility: ∀ j, ∃ k > 0, (A^k) i j > 0
-  have hAll : ∀ j, v j = 0 := by
-    intro j
-    obtain ⟨k, _, hAk_pos⟩ :=
-      (Matrix.isIrreducible_iff_exists_pow_pos hIrred.nonneg).mp hIrred i j
-    have hApow_i : ∑ l : n, (A ^ k) i l * v l = 0 := by
-      have hrow : (A ^ k *ᵥ v) i = ∑ l : n, (A ^ k) i l * v l := by
-        simp [mulVec, dotProduct]
-      have h := congr_fun (hApow k) i
-      simp only [Pi.smul_apply, smul_eq_mul] at h
-      rw [hi0, mul_zero] at h; linarith [hrow.symm ▸ h]
-    have hAk_nonneg : ∀ l, 0 ≤ (A ^ k) i l :=
-      fun l => Matrix.pow_apply_nonneg hIrred.nonneg k i l
-    have hTermNonneg : ∀ l, 0 ≤ (A ^ k) i l * v l :=
-      fun l => mul_nonneg (hAk_nonneg l) (hv_nonneg l)
-    have hTermJ : (A ^ k) i j * v j = 0 := by
-      apply le_antisymm _ (hTermNonneg j)
-      have := Finset.single_le_sum (fun l _ => hTermNonneg l) (mem_univ j)
-      linarith [hApow_i]
-    rcases (mul_eq_zero.mp hTermJ) with h | h
-    · linarith [hAk_pos]
-    · exact h
-  exact hv_ne (funext hAll)
-
 /-- For an irreducible nonneg Hermitian matrix, the max eigenvalue has a
 strictly positive eigenvector.
 
@@ -183,7 +119,8 @@ theorem pos_eigenvec_unique [Nonempty n]
   -- u = 0 by propagation (u is nonneg, u i₀ = 0, A *ᵥ u = μ • u, A irreducible)
   have hu_zero : u = 0 := by
     by_contra h
-    have := pos_of_nonneg_eigenvec hIrred hu_eig hu_nonneg h i₀
+    have := LatticeSystem.Math.PerronFrobeniusMain.pos_of_nonneg_eigenvec
+      hIrred hu_eig hu_nonneg h i₀
     linarith [hu0 ▸ this]
   ext i
   have := congr_fun hu_zero i

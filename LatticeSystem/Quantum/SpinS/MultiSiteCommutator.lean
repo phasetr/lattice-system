@@ -31,6 +31,11 @@ open Matrix Complex
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
+/-- The Leibniz rule for commutators of products: `[A·B, T] = A·[B,T] + [A,T]·B`. -/
+theorem leibniz_commutatorS (A B T : ManyBodyOpS Λ N) :
+    A * B * T - T * (A * B) = A * (B * T - T * B) + (A * T - T * A) * B := by
+  rw [mul_sub, sub_mul, mul_assoc, mul_assoc, mul_assoc]; abel
+
 /-- Same-site commutator: `[onSiteS i A, onSiteS i B] = onSiteS i [A, B]`. -/
 theorem onSiteS_commutator_same (i : Λ)
     (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
