@@ -51,17 +51,6 @@ open Matrix Complex
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
-/-! ## Helper: matrix entry from `mulVec` -/
-
-/-- `M.mulVec (basisVec σ') σ = M σ σ'`. The dotProduct collapses to
-the unique non-zero summand at `τ = σ'`. -/
-private theorem mulVec_basisVec_apply (M : ManyBodyOp Λ)
-    (σ σ' : Λ → Fin 2) :
-    M.mulVec (basisVec σ') σ = M σ σ' := by
-  change dotProduct (fun j => M σ j) (basisVec σ') = M σ σ'
-  unfold dotProduct
-  rw [sum_mul_basisVec σ' (M σ)]
-
 /-! ## Factorisation of the dressed bilinear pairing -/
 
 /-- For any operator `M` and any pair of configurations `σ, σ'`,

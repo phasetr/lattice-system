@@ -45,13 +45,6 @@ private theorem jwSign_mul_self (j : Fin (M + 1)) (c : Fin (M + 1) → Fin 2) :
     jwSign M j c * jwSign M j c = 1 := by
   rw [jwSign_eq_neg_one_pow, ← pow_add, ← two_mul, pow_mul]; norm_num
 
-/-- A column of a matrix as a basis action: `A.mulVec (basisVec σ) τ = A τ σ`. -/
-private theorem mulVec_basisVec_apply
-    (A : Matrix (Fin (M + 1) → Fin 2) (Fin (M + 1) → Fin 2) ℂ)
-    (σ τ : Fin (M + 1) → Fin 2) :
-    A.mulVec (basisVec σ) τ = A τ σ :=
-  sum_mul_basisVec σ (fun ρ => A τ ρ)
-
 /-- **The Jordan–Wigner sign cocycle.**  Under the hop-allowed condition (source
 `π q` occupied, target `π p` empty after the move), the PR13 composite conjugation
 sign collapses to the single bare hop sign at the permuted orbitals:

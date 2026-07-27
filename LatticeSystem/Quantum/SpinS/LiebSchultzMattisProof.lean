@@ -8,6 +8,7 @@ import Mathlib.LinearAlgebra.Matrix.PosDef
 import Mathlib.Analysis.Complex.Order
 import LatticeSystem.Quantum.SpinS.AxisSwapUnitarySSpinSCore
 import LatticeSystem.Quantum.SpinS.Problem25cZAxisRotationInput
+import LatticeSystem.Quantum.SpinS.Problem25cZAxisRotationCommutation
 import LatticeSystem.Math.PosSemidef.Basics
 import LatticeSystem.Math.ComplexVectorKernel
 import Mathlib.Analysis.InnerProductSpace.PiL2
@@ -131,17 +132,6 @@ theorem lsmTwistOperator_conjTranspose_eq_diagonal (L N : ℕ) :
   · subst h; simp only [Matrix.diagonal_apply_eq, Pi.coe_exp, Pi.smul_apply]
   · rw [Matrix.diagonal_apply_ne _ h, Matrix.diagonal_apply_ne _ h]
 
-/-- The single-site `Ŝ³`-rotation `spinSRot3 N θ = exp(−iθ Ŝ³)` is **diagonal** with entries
-`exp(−iθ (N/2 − k))`. -/
-private theorem spinSRot3_eq_diagonal (N : ℕ) (θ : ℝ) :
-    spinSRot3 N θ = Matrix.diagonal (fun k : Fin (N + 1) =>
-      NormedSpace.exp ((-((θ : ℂ) * Complex.I)) • ((N : ℂ) / 2 - (k.val : ℂ)))) := by
-  rw [spinSRot3, spinSOp3, ← Matrix.diagonal_smul, Matrix.exp_diagonal]
-  ext a b
-  by_cases h : a = b
-  · subst h; simp only [Matrix.diagonal_apply_eq, Pi.coe_exp, Pi.smul_apply]
-  · rw [Matrix.diagonal_apply_ne _ h, Matrix.diagonal_apply_ne _ h]
-
 /-- **Single-site `Ŝ³`-rotation conjugation, matrix element**:
 `(R(−θ) A R(θ))_{ab} = e^{iθ(b−a)} A_{ab}` (`R = spinSRot3`). -/
 theorem spinSRot3_conj_apply (N : ℕ) (θ : ℝ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
@@ -151,7 +141,7 @@ theorem spinSRot3_conj_apply (N : ℕ) (θ : ℝ) (A : Matrix (Fin (N + 1)) (Fin
   rw [spinSRot3_eq_diagonal, spinSRot3_eq_diagonal, Matrix.mul_diagonal, Matrix.diagonal_mul,
     mul_right_comm, cexp_mul_cexp]
   congr 2
-  simp only [smul_eq_mul]
+  unfold spinSOp3Eigen
   push_cast
   ring
 
