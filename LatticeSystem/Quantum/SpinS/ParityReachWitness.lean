@@ -1,10 +1,6 @@
 import LatticeSystem.Quantum.SpinS.ParityReachable
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphCore
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Concrete witness constructors for `ParityReachableS` on the bipartite complete graph
 

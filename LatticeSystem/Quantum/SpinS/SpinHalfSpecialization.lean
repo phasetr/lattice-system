@@ -3,10 +3,6 @@ import LatticeSystem.Quantum.SpinHalfBasis
 import LatticeSystem.Quantum.SpinHalf
 import LatticeSystem.Quantum.Pauli
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Spin-`S` specialisation at `N = 1`: equals spin-`1/2`
 

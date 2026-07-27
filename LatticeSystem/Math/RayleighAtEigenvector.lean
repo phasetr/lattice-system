@@ -1,10 +1,6 @@
 import Mathlib.Analysis.Matrix.Spectrum
 import Mathlib.LinearAlgebra.Matrix.DotProduct
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Rayleigh quotient at an eigenvector
 

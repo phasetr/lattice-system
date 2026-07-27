@@ -1,8 +1,5 @@
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfTargetUniquenessFromBalancedPF
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfDNonnegBoundaryCore
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
 
 /-!
 # Spin-1/2 `D >= 0` boundary for Theorem 2.4 parity-block finrank

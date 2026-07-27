@@ -1,7 +1,5 @@
 import LatticeSystem.Quantum.MarshallLiebMattis.SpinDotOffBond
 
-set_option linter.unusedSectionVars false
-
 /-!
 # Heisenberg matrix entry on swap-related configurations
 

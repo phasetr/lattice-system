@@ -4,10 +4,7 @@ import LatticeSystem.Quantum.SpinS.MultiSiteMatrixElement
 import LatticeSystem.Quantum.SpinS.Magnetization
 import LatticeSystem.Quantum.SpinS.BasisVecSOrthonormal
 
-set_option linter.unusedSectionVars false
 set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 
 /-!
 # Spin-`S` Néel state and sublattice Casimir eigenvalues
@@ -183,7 +180,6 @@ theorem neelStateOfS_complement_orthogonal
         (neelStateOfS (fun x : Λ => ! A x) N) = 0 := by
   unfold neelStateOfS
   exact basisVecS_inner_of_ne (fun h => neelConfigOfS_ne_complement A N hN h.symm)
-
 
 /-- `Ŝ_tot^(3) · |Φ_Néel⟩ = ((|A| − |¬A|)·N/2) · |Φ_Néel⟩`. The spin-`S`
 Néel state is a `Ŝ_tot^(3)`-eigenvector with magnetization
@@ -397,6 +393,5 @@ theorem sublatticeSpinSOp3_cross_complement_mulVec_neelStateOfS
   rw [smul_smul]
   congr 1
   ring
-
 
 end LatticeSystem.Quantum

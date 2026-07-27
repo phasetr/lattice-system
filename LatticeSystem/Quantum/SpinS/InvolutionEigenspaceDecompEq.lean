@@ -1,9 +1,5 @@
 import LatticeSystem.Quantum.SpinS.MagParityEigenspaceDecomp
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Eigenspace finrank decomposition under a commuting involution: equality version
 

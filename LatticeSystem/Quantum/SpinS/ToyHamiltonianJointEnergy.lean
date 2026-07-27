@@ -1,9 +1,5 @@
 import LatticeSystem.Quantum.SpinS.ToyHamiltonianCasimir
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Toy-Hamiltonian energy on a joint Casimir eigenvector
 

@@ -1,9 +1,5 @@
 import Mathlib.Combinatorics.SimpleGraph.Basic
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # The complete bipartite graph induced by a sublattice indicator (foundation)
 

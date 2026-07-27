@@ -4,10 +4,6 @@ import LatticeSystem.Quantum.SpinS.DressedAxisSwapPFMatrix
 import LatticeSystem.Quantum.SpinS.ParityBlockUnshiftedFinrank
 import LatticeSystem.Quantum.SpinS.ParityBlockDressedFinrank
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Structural (j.1) PF positive eigenvector (no `h_intermediate`)
 

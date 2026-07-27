@@ -1,9 +1,5 @@
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfTargetUniquenessFromBalancedPF
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Spin-1/2 `D >= 0` boundary for Theorem 2.4 — parity-block core
 
@@ -626,6 +622,5 @@ theorem spinHalf_anisotropicHeisenbergS_obligation_2_axiomatic_sup_crossing_hne_
       ((anisotropicHeisenbergParametricPath lam' D' t).2 : ℂ) _
     h_finrank hΦ_bal_ne h_balanced hΦ_bal_eig
     hΦ_M_ne hM_ne_balanced hΦ_M_eig
-
 
 end LatticeSystem.Quantum

@@ -1,7 +1,5 @@
 import LatticeSystem.Quantum.MarshallLiebMattis.SpinDotSwapEntry
 
-set_option linter.unusedSectionVars false
-
 /-!
 # Off-bond non-equality for `basisSwap`-related configurations
 

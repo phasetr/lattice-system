@@ -1,9 +1,5 @@
 import LatticeSystem.Quantum.SpinS.HermitianEigenspaceBotBelowMin
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Hermitian min eigenvalue `≤ μ` when an eigenvector at `μ` exists
 

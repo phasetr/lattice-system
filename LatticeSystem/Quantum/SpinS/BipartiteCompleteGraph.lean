@@ -2,10 +2,6 @@ import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphCore
 import LatticeSystem.Quantum.SpinS.ConfigDist
 import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # The complete bipartite graph induced by a sublattice indicator
 (Tasaki §2.5 Phase B-γ γ-3 final preparation)

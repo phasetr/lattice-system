@@ -3,10 +3,6 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralGeneralFinal
 import LatticeSystem.Quantum.SpinS.Theorem23PFConstancyCasimir
 import LatticeSystem.Quantum.SpinS.ConnectedTheorem23Core
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Tasaki §2.5 Theorem 2.3 for a general CONNECTED bipartite coupling
 

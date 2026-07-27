@@ -1,7 +1,5 @@
 import LatticeSystem.Quantum.SpinS.BlockDiagSubmatrixBridge
 
-set_option linter.unusedSectionVars false
-
 /-!
 # Reverse direction of block-diag bridge: submatrix eig embeds into full eig ⊓ ker(P)
 

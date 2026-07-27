@@ -1,9 +1,5 @@
 import LatticeSystem.Quantum.SpinS.ParityReachShuffle
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Iterated `n`-unit shuffles for `ParityReachableS`
 

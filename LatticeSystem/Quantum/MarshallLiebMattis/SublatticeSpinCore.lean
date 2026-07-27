@@ -1,10 +1,7 @@
 import LatticeSystem.Quantum.TotalSpin
 import LatticeSystem.Quantum.TotalSpin.Casimir
 
-set_option linter.unusedSectionVars false
 set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 
 /-!
 # Sublattice spin operators for the MLM toy Hamiltonian — core
@@ -21,7 +18,6 @@ namespace LatticeSystem.Quantum
 open Matrix
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
-
 
 /-! ## Sublattice spin operators -/
 
@@ -618,6 +614,5 @@ theorem sublatticeSpinHalfSquared_commute_totalSpinHalfSquared (A : Λ → Bool)
   have h2 := sublatticeSpinHalfSquared_commute_totalSpinHalfOp2 A
   have h3 := sublatticeSpinHalfSquared_commute_totalSpinHalfOp3 A
   exact ((h1.mul_right h1).add_right (h2.mul_right h2)).add_right (h3.mul_right h3)
-
 
 end LatticeSystem.Quantum

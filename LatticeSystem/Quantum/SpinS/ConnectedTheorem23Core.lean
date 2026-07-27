@@ -2,10 +2,6 @@ import LatticeSystem.Quantum.SpinS.ConnectedSectorIrreducible
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralGeneralFinal
 import LatticeSystem.Quantum.SpinS.Theorem23PFConstancyCasimir
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Tasaki §2.5 Theorem 2.3 for a general CONNECTED bipartite coupling
 
@@ -606,6 +602,5 @@ theorem tasaki23_sector_lift_and_casimir_of_irreducible
   exact tasaki23_pf_groundState_casimir_eq_predicted_sector_of_irreducible
     (N := N) (M := M) A c c_toy horient hsB hM hJ_real hc_strict_toy
     hA_ne hB_ne hN hIrred hv_pos hH
-
 
 end LatticeSystem.Quantum

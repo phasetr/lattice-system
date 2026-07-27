@@ -11,11 +11,6 @@ import LatticeSystem.Quantum.SpinS.AllAlignedStateOrthogonal
 import LatticeSystem.Quantum.SpinS.SingleSiteTransverseMeanZero
 import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeelCore
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
-
 /-!
 # Spin-`S` Néel state and sublattice Casimir eigenvalues
 
@@ -369,6 +364,5 @@ theorem sublatticeSpinSOpComplementPlus_minus_mulVec_neelStateOfS
   rw [← Matrix.mulVec_mulVec]
   rw [sublatticeSpinSOpMinus_complement_mulVec_neelStateOfS]
   rw [Matrix.mulVec_zero]
-
 
 end LatticeSystem.Quantum

@@ -4,10 +4,7 @@ import LatticeSystem.Quantum.MarshallLiebMattis.ToyHamiltonianCasimir
 import LatticeSystem.Quantum.NeelState
 import LatticeSystem.Quantum.MagnetizationSubspaceCore
 
-set_option linter.unusedSectionVars false
 set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 
 /-!
 # Sublattice Casimir eigenvalues on the Néel state
@@ -563,6 +560,5 @@ theorem totalSpinHalfOp3_mulVec_neelStateOf (A : Λ → Bool) :
   rw [magnetization_neelConfigOf]
   push_cast
   ring_nf
-
 
 end LatticeSystem.Quantum

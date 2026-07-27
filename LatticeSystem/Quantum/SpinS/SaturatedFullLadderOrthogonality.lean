@@ -1,10 +1,8 @@
 import LatticeSystem.Quantum.SpinS.SaturatedFullLadderLI
 import LatticeSystem.Quantum.SpinS.TotalSpin
 
-set_option linter.unusedSectionVars false
 set_option linter.unusedSimpArgs false
 set_option linter.unusedVariables false
-
 
 /-!
 # Pairwise orthogonality of the saturated-ferromagnet ladder iterates

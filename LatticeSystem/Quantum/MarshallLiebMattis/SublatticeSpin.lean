@@ -1,11 +1,6 @@
 import LatticeSystem.Quantum.TotalSpin
 import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeSpinCore
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
-
 /-!
 # Sublattice spin operators for the MLM toy Hamiltonian
 

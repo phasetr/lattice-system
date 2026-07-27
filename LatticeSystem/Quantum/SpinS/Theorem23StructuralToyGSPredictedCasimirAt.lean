@@ -4,10 +4,6 @@ import LatticeSystem.Quantum.SpinS.Theorem23ToyGSPredictedCasimir
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralMagSectorPF
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralPFJointCasimir
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Structural toy ground state has predicted total Casimir (no `h_intermediate`)
 

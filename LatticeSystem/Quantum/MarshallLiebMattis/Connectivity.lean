@@ -1,8 +1,6 @@
 import LatticeSystem.Quantum.MarshallLiebMattis.MarshallSignTrick
 import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
 
-set_option linter.unusedSectionVars false
-
 /-!
 # Connectivity of magnetization-zero configurations
 (Tasaki §2.5, p. 41–42, "Property (iii)" in the proof of Theorem 2.2)

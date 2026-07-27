@@ -1,8 +1,6 @@
 import LatticeSystem.Quantum.SpinS.ConnectedDressedPF
 import LatticeSystem.Quantum.SpinS.ShiftedDressedMatrix
 
-set_option linter.unusedSectionVars false
-
 /-!
 # Connected-graph sector irreducibility for the Theorem 2.3 chain
 

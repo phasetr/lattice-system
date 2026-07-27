@@ -238,8 +238,6 @@ exercise the deprecated names to confirm backward compatibility,
 so the deprecation linter is silenced for the remainder of this
 file. -/
 
-set_option linter.deprecated false
-
 example (K : ℕ) :
     marshallSignChainConfig K (neelChainConfig K) = 1 :=
   marshallSignChainConfig_neelChainConfig K

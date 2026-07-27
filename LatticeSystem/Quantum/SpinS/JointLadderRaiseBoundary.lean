@@ -1,9 +1,5 @@
 import LatticeSystem.Quantum.SpinS.JointLadderRaiseB
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedSimpArgs false
-set_option linter.unusedVariables false
-
 /-!
 # Boundary annihilation of the joint ladder iterates under raising
 
