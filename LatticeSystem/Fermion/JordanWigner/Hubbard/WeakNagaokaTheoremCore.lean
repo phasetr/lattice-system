@@ -15,15 +15,8 @@ The raising-after-lowering Casimir identities, the multiplet non-vanishing / lin
 independence, the whole-tower energy degeneracy, and the weak Nagaoka spin multiplet are
 kept in the capstone module `WeakNagaokaTheorem.lean`.
 
-Visibility, as it currently stands: `ferroHoleConfig` and `fermionTotalSpinZ_mulVec_ferroHole`
-are non-`private`, and every use of either is inside this module — there is no cross-module
-reference to either. `ferroHoleConfig` occurs in the *statement* of the non-`private`
-`fermionTotalSpinZ_mulVec_spinMinusPow_ferroHole` below; `fermionTotalSpinZ_mulVec_ferroHole`
-occurs only inside proofs, so nothing at present requires it to be non-`private`. The two are
-coupled — making `ferroHoleConfig` `private` would put a `private` constant into the statement
-of that non-`private` theorem — so any change has to treat them together; the visibility
-cleanup is left to the refactoring pass tracked in #5098. The remaining hole-state helper
-lemmas stay `private`.
+`ferroHoleConfig` and `fermionTotalSpinZ_mulVec_ferroHole` are `private`: every use of
+either is inside this module, so there is no cross-module reference to either.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed., Springer, 2020), §9.3.3 (Theorem 11.5 core).
@@ -55,7 +48,7 @@ theorem fermionMultiNumber_mulVec_basisVec (N : ℕ) (j : Fin (N + 1))
 /-! ## The ferromagnetic hole state is a highest-weight state -/
 
 /-- The ferromagnetic hole configuration: hole at `x`, every other site spin-up. -/
-def ferroHoleConfig (N : ℕ) (x : Fin (N + 1)) : Fin (2 * N + 2) → Fin 2 :=
+private def ferroHoleConfig (N : ℕ) (x : Fin (N + 1)) : Fin (2 * N + 2) → Fin 2 :=
   hubbardOneHoleConfig N x (fun _ => true)
 
 /-- The number of spin-up occupied sites in the ferromagnetic hole state is `N`. -/
@@ -100,7 +93,7 @@ private theorem fermionTotalDownNumber_mulVec_ferroHole (N : ℕ) (x : Fin (N + 
   simp
 
 /-- `Ŝ^z_tot` acts on the ferromagnetic hole state with eigenvalue `N/2 = S_max`. -/
-theorem fermionTotalSpinZ_mulVec_ferroHole (N : ℕ) (x : Fin (N + 1)) :
+private theorem fermionTotalSpinZ_mulVec_ferroHole (N : ℕ) (x : Fin (N + 1)) :
     (fermionTotalSpinZ N).mulVec (basisVec (ferroHoleConfig N x)) =
       ((N : ℂ) / 2) • basisVec (ferroHoleConfig N x) := by
   unfold fermionTotalSpinZ
@@ -178,18 +171,6 @@ theorem fermionTotalSpinZ_mulVec_spinMinusPow (N : ℕ)
     rw [hexp, Matrix.mulVec_mulVec, hcomm, Matrix.sub_mulVec, ← Matrix.mulVec_mulVec, ih,
       Matrix.mulVec_smul, Nat.cast_succ]
     module
-
-/-- `Ŝ^z_tot` acts on the `k`-fold lowered ferromagnetic hole state with
-eigenvalue `N/2 − k` (instance of the abstract `Ŝ^z` tower at the maximal-spin
-ferromagnetic hole state; distinct eigenvalues power the linear independence). -/
-theorem fermionTotalSpinZ_mulVec_spinMinusPow_ferroHole (N : ℕ) (x : Fin (N + 1))
-    (k : ℕ) :
-    (fermionTotalSpinZ N).mulVec
-        (((fermionTotalSpinMinus N) ^ k).mulVec (basisVec (ferroHoleConfig N x))) =
-      ((N : ℂ) / 2 - k) •
-        (((fermionTotalSpinMinus N) ^ k).mulVec (basisVec (ferroHoleConfig N x))) :=
-  fermionTotalSpinZ_mulVec_spinMinusPow N (basisVec (ferroHoleConfig N x)) k
-    (fermionTotalSpinZ_mulVec_ferroHole N x)
 
 /-! ## The SU(2) ladder commutator `[Ŝ⁺, Ŝ⁻] = 2 Ŝ^z` -/
 
