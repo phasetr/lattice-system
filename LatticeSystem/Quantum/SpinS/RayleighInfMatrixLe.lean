@@ -35,13 +35,4 @@ theorem rayleighInfMatrix_le_hermitianMinEigenvalue
   rayleighInfMatrix_le_hermitianMinEigenvalue_of_bddBelow hM
     (rayleighOnVec_bddBelow_on_unit_sphere M)
 
-omit [DecidableEq n] [Nonempty n] in
-/-- **Unconditional upper bound at a unit vector**: for Hermitian `M` and any unit `v`,
-`rayleighInfMatrix M ≤ rayleighOnVec M v`. -/
-theorem rayleighInfMatrix_le_rayleighOnVec
-    (M : Matrix n n ℂ) {v : n → ℂ} (hunit : dotProduct (star v) v = 1) :
-    rayleighInfMatrix M ≤ rayleighOnVec M v :=
-  rayleighInfMatrix_le_rayleighOnVec_of_bddBelow M
-    (rayleighOnVec_bddBelow_on_unit_sphere M) hunit
-
 end LatticeSystem.Quantum

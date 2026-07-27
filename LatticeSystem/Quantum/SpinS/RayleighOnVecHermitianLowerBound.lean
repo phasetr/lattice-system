@@ -38,16 +38,4 @@ theorem eigenvectorUnitary_mul_conjTranspose_eq_one
         Matrix n n ℂ) from rfl]
   exact h.2
 
-omit [Nonempty n] in
-/-- The Hermitian eigenvectorUnitary `U` is unitary: `Uᴴ * U = 1`. -/
-theorem eigenvectorUnitary_conjTranspose_mul_eq_one
-    {M : Matrix n n ℂ} (hM : M.IsHermitian) :
-    (Matrix.IsHermitian.eigenvectorUnitary hM : Matrix n n ℂ).conjTranspose *
-      (Matrix.IsHermitian.eigenvectorUnitary hM : Matrix n n ℂ) = 1 := by
-  have h := (Matrix.IsHermitian.eigenvectorUnitary hM).property
-  rw [show (Matrix.IsHermitian.eigenvectorUnitary hM :
-        Matrix n n ℂ).conjTranspose = star (Matrix.IsHermitian.eigenvectorUnitary hM :
-        Matrix n n ℂ) from rfl]
-  exact h.1
-
 end LatticeSystem.Quantum
