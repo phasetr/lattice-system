@@ -1,4 +1,3 @@
-import LatticeSystem.Quantum.SpinS.AKLT
 import LatticeSystem.Quantum.SpinS.HaldaneConjecture
 import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
 
