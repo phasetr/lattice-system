@@ -1,7 +1,6 @@
-import LatticeSystem.Quantum.SpinS.AxisSwapLadderForm
-import LatticeSystem.Quantum.SpinS.AllAlignedStateMagShift
 import LatticeSystem.Quantum.SpinS.MultiSiteCommutator
 import LatticeSystem.Quantum.SpinS.Algebra
+import LatticeSystem.Quantum.SpinS.Magnetization
 
 /-!
 # Magnetization shifts of the axis-swapped ladder bond terms (parity preservation)
