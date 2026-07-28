@@ -1,4 +1,4 @@
-import Mathlib.Analysis.Matrix.PosDef
+import Mathlib.LinearAlgebra.Matrix.PosDef
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 
 /-!
