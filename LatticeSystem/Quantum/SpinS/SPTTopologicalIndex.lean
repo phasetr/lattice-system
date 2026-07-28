@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.SPTPhase
+import LatticeSystem.Quantum.SpinS.MultiSiteCore
 
 /-!
 # Tasaki §8.3.2–§8.3.3: protecting symmetries and "topological" indices for SPT phases
