@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.AKLTMatrixProduct
+import Mathlib.Data.Real.Basic
 
 /-!
 # Tasaki §8.3.4: the matrix-product "topological" index (Theorem 8.7, Corollary 8.5)
@@ -37,8 +37,6 @@ Rev. B **83**, 035107 (2011).
 -/
 
 namespace LatticeSystem.Quantum
-
-open Matrix
 
 /-- **Projective-representation marker** `IsProjectiveRep G φ`: the symmetry group `G` acts on the
 auxiliary space by a projective representation `v̂(·)` whose phase function (2-cocycle) is
