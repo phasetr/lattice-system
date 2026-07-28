@@ -3,7 +3,6 @@ import LatticeSystem.Quantum.SpinS.DressedHeisenbergMarshall
 import LatticeSystem.Quantum.SpinS.DressedHeisenbergOffXY
 import LatticeSystem.Quantum.SpinS.DressedHeisenbergRaiseLower
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphCore
-import LatticeSystem.Quantum.SpinS.RaiseLowerMatrixPow
 
 /-!
 # Shifted dressed Heisenberg matrix: non-negativity and strict positivity (foundation)
