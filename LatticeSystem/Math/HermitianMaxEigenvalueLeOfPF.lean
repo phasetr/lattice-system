@@ -1,4 +1,4 @@
-import LatticeSystem.Math.RealEigenvalueLePF
+import LatticeSystem.Math.CollatzWielandtUpperBoundSymmetric
 import LatticeSystem.Math.HermitianMaxEigenvalue
 import Mathlib.Analysis.Matrix.Spectrum
 import Mathlib.LinearAlgebra.Matrix.Symmetric
