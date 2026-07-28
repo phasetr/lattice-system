@@ -1,5 +1,4 @@
-import LatticeSystem.Quantum.SpinS.DressedSubmatrixPFAtMin
-import LatticeSystem.Quantum.SpinS.ComplexDressedParityBlockFinrank
+import LatticeSystem.Quantum.SpinS.SubmatrixMinEigenvalue
 
 /-!
 # Per-block bound `finrank ≤ 1` at `hermitianMinEigenvalue` (conditional)
