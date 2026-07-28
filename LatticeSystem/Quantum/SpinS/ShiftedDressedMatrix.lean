@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.ShiftedDressedMatrixCore
+import LatticeSystem.Quantum.SpinS.RaiseLowerMatrixPow
 
 /-!
 # The shifted dressed Heisenberg matrix
