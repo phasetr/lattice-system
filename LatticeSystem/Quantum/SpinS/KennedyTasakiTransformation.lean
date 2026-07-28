@@ -1,4 +1,7 @@
-import LatticeSystem.Quantum.SpinS.AnisotropicLargeD
+import LatticeSystem.Quantum.SpinS.SiteComponent
+import Mathlib.Topology.Instances.Matrix
+import Mathlib.Analysis.Normed.Algebra.Exponential
+import Mathlib.Analysis.CStarAlgebra.Classes
 
 /-!
 # Tasaki §8.2.2–§8.2.3: the Kennedy–Tasaki transformation and Proposition 8.4
