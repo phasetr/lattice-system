@@ -1,4 +1,5 @@
-import LatticeSystem.Quantum.SpinS.AKLT
+import Mathlib.Analysis.CStarAlgebra.Classes
+import LatticeSystem.Quantum.SpinS.MultiSite
 
 /-!
 # Tasaki §8.4: topological order in Kitaev's toric code model (Theorem 8.9)
