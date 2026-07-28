@@ -1,5 +1,5 @@
-import Mathlib.Analysis.Matrix.Spectrum
-import Mathlib.LinearAlgebra.Matrix.DotProduct
+import Mathlib.Data.Matrix.Mul
+import Mathlib.Analysis.Normed.Ring.Basic
 
 /-!
 # Rayleigh quotient at an eigenvector
