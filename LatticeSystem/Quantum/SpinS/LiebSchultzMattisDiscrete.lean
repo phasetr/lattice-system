@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.SPTMatrixProductIndex
+import LatticeSystem.Quantum.SpinS.MultiSiteCore
 
 /-!
 # Tasaki §8.3.5: a Lieb–Schultz–Mattis-type theorem without continuous symmetry (Theorem 8.6)
