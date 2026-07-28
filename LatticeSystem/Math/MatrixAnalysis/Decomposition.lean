@@ -1,6 +1,6 @@
 import Mathlib.LinearAlgebra.UnitaryGroup
 import Mathlib.LinearAlgebra.Matrix.PosDef
-import Mathlib.Analysis.Matrix.Order
+import Mathlib.Analysis.CStarAlgebra.Classes
 import Mathlib.Analysis.Matrix.Spectrum
 import Mathlib.Analysis.Matrix.PosDef
 import Mathlib.Analysis.SpecialFunctions.Sqrt
