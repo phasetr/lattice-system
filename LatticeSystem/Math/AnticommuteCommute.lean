@@ -1,4 +1,5 @@
-import Mathlib.Algebra.Ring.Basic
+import Mathlib.Algebra.Group.Basic
+import Mathlib.Algebra.Ring.Defs
 
 /-!
 # From anticommutation to commutation of even products
