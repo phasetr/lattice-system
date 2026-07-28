@@ -1,6 +1,6 @@
 import Mathlib.LinearAlgebra.UnitaryGroup
-import Mathlib.LinearAlgebra.Matrix.PosDef
-import Mathlib.Analysis.Matrix.Order
+import Mathlib.LinearAlgebra.Matrix.Hermitian
+import Mathlib.Analysis.CStarAlgebra.Classes
 
 /-!
 # Tasaki Appendix A.6: Wigner's theorem (Theorems A.21, A.22)
