@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.JointCasimirEigenspaceLadderInvariant
+import LatticeSystem.Quantum.SpinS.PredictedGSFinrankLtJointCasimirFinrank
 
 /-!
 # `Ŝ³_tot`-invariance of the joint sublattice-Casimir eigenspace
