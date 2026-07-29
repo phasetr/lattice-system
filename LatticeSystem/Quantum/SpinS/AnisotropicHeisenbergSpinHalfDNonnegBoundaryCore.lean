@@ -1,4 +1,13 @@
-import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfTargetUniquenessFromBalancedPF
+import LatticeSystem.Math.HermitianMinEqOfShiftPF
+import LatticeSystem.Quantum.SpinS.AxisSwappedBlockMinEq
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergAxisSwapMinEigenvalue
+import LatticeSystem.Quantum.SpinS.BareSubmatrixBoundAtMin
+import LatticeSystem.Quantum.SpinS.MarshallSubmatrixMinEq
+import LatticeSystem.Quantum.SpinS.BareAnisotropicMinLeTwo
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergBalancedMinEqFullAtSInf
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergPerMCrossingEqualityAtSInf
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergParametricPathStaysInRegion
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergCrossingContradictionConditional
 
 /-!
 # Spin-1/2 `D >= 0` boundary for Theorem 2.4 — parity-block core
