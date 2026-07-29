@@ -1,9 +1,5 @@
-import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingUniqueness
-import LatticeSystem.Quantum.SpinS.StrictHOutsideFerrimagnetic
-import LatticeSystem.Quantum.SpinS.ConnectedSectorFinrankLeOne
-import LatticeSystem.Quantum.SpinS.Theorem24SU2GlobalUniquenessFromMLMCore
+import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrder
 import LatticeSystem.Quantum.SpinS.Theorem24SU2GlobalUniquenessFromMLMCoreSectors
-import LatticeSystem.Quantum.SpinS.FerrimagneticLROUniversal
 
 /-!
 # Tasaki §6.2 Theorem 6.3: ground-state uniqueness of the AFM Heisenberg ring
