@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.BipartiteToyMinEnergy
+import Mathlib.Analysis.RCLike.Basic
 
 /-!
 # Arithmetic core of the toy-Hamiltonian minimum-energy bound
