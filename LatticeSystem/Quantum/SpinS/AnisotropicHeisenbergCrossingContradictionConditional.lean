@@ -1,5 +1,4 @@
-import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergMagSectorGroundEigenvector
-import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergParametricMinEigenvalue
+import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
 import LatticeSystem.Quantum.SpinS.Theorem24FinrankLeTwoContradiction
 
 /-!
