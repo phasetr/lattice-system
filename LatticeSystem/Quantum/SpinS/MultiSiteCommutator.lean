@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.MultiSite
+import LatticeSystem.Quantum.SpinS.MultiSiteCore
 import LatticeSystem.Quantum.SpinS.CyclicCommutator
 
 /-!
