@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23ToyMinEnergyArith
+import Mathlib.Analysis.RCLike.Basic
 
 /-!
 # Strict (equality) form of the arithmetic core
