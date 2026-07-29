@@ -7,7 +7,7 @@ one-dimensional eigenspace, then some eigenvalue lies strictly above `E₀`: oth
 equals `E₀`, forcing `M = E₀ · 1` and hence a full-dimensional `E₀`-eigenspace, contradicting the
 one-dimensionality.  This furnishes the first-excited energy `E₁` of the spectral gap.
 -/
-import LatticeSystem.Quantum.SpinS.HermitianVariationalLowerBound
+import LatticeSystem.Quantum.SpinS.RayleighOnVecHermitianLowerBound
 import Mathlib.LinearAlgebra.Eigenspace.Matrix
 
 namespace LatticeSystem.Quantum
