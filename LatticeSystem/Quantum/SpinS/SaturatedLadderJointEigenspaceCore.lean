@@ -7,7 +7,7 @@ import LatticeSystem.Quantum.SpinS.CasimirRearrangement
 import LatticeSystem.Quantum.SpinS.LadderBoundaryAnnihilation
 import LatticeSystem.Quantum.SpinS.MagnetizationDirectSum
 import LatticeSystem.Quantum.SpinS.IterateInductiveNonvanishing
-import LatticeSystem.Quantum.SpinS.ToyHamiltonianCasimir
+import Mathlib.LinearAlgebra.Dual.Lemmas
 
 /-!
 # The saturated-ferromagnet ladder lies in the joint
