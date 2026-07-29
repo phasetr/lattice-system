@@ -1,6 +1,5 @@
 import LatticeSystem.Quantum.SpinS.AKLTKnabe.Sl2SubmoduleProbeE2
 import LatticeSystem.Quantum.SpinS.MultiSiteCartanPlusMinus
-import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
 
 /-!
 # Gate E3: the `sl₂` ladder algebra and the magnetisation-sector structure
