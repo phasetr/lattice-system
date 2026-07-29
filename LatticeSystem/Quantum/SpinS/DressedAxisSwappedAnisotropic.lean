@@ -1,5 +1,5 @@
 import LatticeSystem.Quantum.SpinS.AxisSwappedAnisotropicHeisenberg
-import LatticeSystem.Quantum.SpinS.MarshallSign
+import LatticeSystem.Quantum.SpinS.MarshallSignCore
 import LatticeSystem.Quantum.SpinS.GaugeEigenspaceFinrank
 
 /-!
