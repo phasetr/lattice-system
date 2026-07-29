@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeel
+import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeelCore
 import Mathlib.LinearAlgebra.Matrix.ToLin
 
 /-!
