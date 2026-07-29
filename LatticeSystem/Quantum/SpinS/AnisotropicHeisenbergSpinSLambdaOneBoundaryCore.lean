@@ -2,7 +2,7 @@ import LatticeSystem.Quantum.SpinS.AxisSwapUnitarySSpinS
 import LatticeSystem.Quantum.SpinS.BareSubmatrixBoundAtMin
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapIonParityBlockIrreducibleLambdaOne
 import LatticeSystem.Quantum.SpinS.DressedBareSubmatrixMinEqPFStructural
-import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinSMLMEndpoint
+import LatticeSystem.Quantum.SpinS.AxisSwappedBlockMinEq
 /-!
 # General spin-S `lambda = 1`, `D > 0` boundary for the parity-block capstone — core lemmas
 
