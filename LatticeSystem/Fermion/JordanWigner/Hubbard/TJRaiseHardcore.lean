@@ -1,4 +1,4 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.NagaokaConnectivity
+import LatticeSystem.Fermion.JordanWigner.Hubbard.EffectiveHamiltonianSpinSymmetry
 
 /-!
 # Tasaki 11.5: the raising operator preserves the hard-core subspace (Prop 11.24 E3b PR5c)
