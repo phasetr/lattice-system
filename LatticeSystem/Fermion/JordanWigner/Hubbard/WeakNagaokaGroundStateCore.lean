@@ -1,7 +1,5 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaTheorem
+import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaTheoremCore
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreSpan
-import LatticeSystem.Quantum.SpinS.HermitianVariationalEquality
-import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 
 /-!
 # Tasaki Theorem 11.5: existence of the ferromagnetic ground state
