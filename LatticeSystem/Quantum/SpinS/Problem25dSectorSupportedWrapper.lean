@@ -1,5 +1,5 @@
 import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
-import LatticeSystem.Quantum.SpinS.Problem25dGroundStatePhaseWrapper
+import LatticeSystem.Quantum.SpinS.Problem25dLongitudinalComponentEquality
 
 /-!
 # Tasaki Problem 2.5.d: sector-supported correlation wrapper
