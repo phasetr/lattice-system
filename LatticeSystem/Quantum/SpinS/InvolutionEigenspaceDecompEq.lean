@@ -1,4 +1,5 @@
-import LatticeSystem.Quantum.SpinS.MagParityEigenspaceDecomp
+import Mathlib.Analysis.Complex.Basic
+import Mathlib.LinearAlgebra.Eigenspace.Basic
 
 /-!
 # Eigenspace finrank decomposition under a commuting involution: equality version
