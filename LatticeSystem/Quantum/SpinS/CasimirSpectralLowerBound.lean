@@ -1,4 +1,5 @@
-import LatticeSystem.Quantum.SpinS.CasimirSpectralBound
+import LatticeSystem.Quantum.SpinS.SaturatedLadderJointEigenspaceCore
+import LatticeSystem.Quantum.SpinS.Theorem23Casimir
 
 /-!
 # Total-Casimir magnetization lower bound `(Ŝ_tot)² ≥ m(m+1)`
