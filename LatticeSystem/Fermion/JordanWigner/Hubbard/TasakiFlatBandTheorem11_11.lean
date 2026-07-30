@@ -3,40 +3,25 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinSymmetry
 import Mathlib.LinearAlgebra.Eigenspace.Basic
 
 /-!
-# Tasaki Theorem 11.11: the flat-band ferromagnetic ground states (capstone)
+# Tasaki Theorem 11.11 support: particle number and the multiplet/ground submodules
 
-This file assembles Tasaki's flat-band ferromagnetism theorem (§11.3.1, Theorem
-11.11) for the half-filled sector `N_e = |E| = K + 1`.
+This file provides supporting lemmas and definitions for Tasaki's flat-band
+ferromagnetism theorem (§11.3.1, Theorem 11.11) in the half-filled sector
+`N_e = |E| = K + 1`:
 
-**Existence** (fully proven in earlier files): the `K + 2 = 2 S_max + 1` lowered
-states `(Ŝ^-_tot)^k |Φα,all↑⟩` are linearly independent, all carry total spin
-`S_tot = S_max = (K+1)/2`, and are all zero-energy ground states (`Ĥ ≥ 0`).
+* `flatBandTotalNumber_commutator_ACreation` — `[N̂, â†_{p,↑}] = â†_{p,↑}`.
+* `flatBandTotalNumber_mulVec_alphaAllUpState` — `N̂ |Φα,all↑⟩ = (K + 1) |Φα,all↑⟩`.
+* `flatBandFerromagneticMultipletSubmodule` — the span of the `K + 2 = 2 S_max + 1`
+  lowered states `(Ŝ^-_tot)^k |Φα,all↑⟩`.
+* `flatBandHalfFilledGroundSubmodule` — the zero-energy (`ker Ĥ`) states in the
+  `N_e = K + 1` particle-number sector.
 
-**Uniqueness**: the ground subspace is *exactly* this multiplet.  The structural
-inputs are proven (frustration-freeness, `[Ĥ, N̂] = 0`, the `b̂`-kernel and
-`α`-Fock subspaces, `α`-Fock ⊆ `b̂`-kernel).  The remaining classification step —
-that a half-filled zero-energy state, having no `β`-occupation and no double
-occupancy, is spatially symmetric and hence in the maximal-spin multiplet — is
-Tasaki's Appendix A representation-theoretic argument (Lemmas A.10/A.11).  It
-requires the Fock-space change of basis for the *non-orthogonal* `{α} ∪ {β}`
-single-particle basis and the symmetric-tensor/SU(2) classification, neither of
-which is currently available in this development.  Following the same policy used
-for Theorem 11.8 / Lemma 11.9 (`NagaokaConnectivityClassification.lean`), this one
-classification statement is introduced as a single, clearly documented `axiom`
-(`flatBand_zeroEnergy_halfFilled_mem_ferromagneticMultipletSpan`), and the full
-theorem is assembled from it together with the proven existence side.
-
-## Deferred axiom rationale
-
-The axiom states exactly Tasaki's uniqueness conclusion for §11.3.1: in the
-half-filled sector, every zero-energy state lies in the ferromagnetic lowering
-multiplet of `|Φα,all↑⟩`.  Its proof in Tasaki uses Appendix A (frustration-free
-PSD-sum kernel + symmetric-state ⇒ maximal-spin); a faithful Lean proof is a
-multi-week effort with no existing supporting machinery.  The capstone theorems
-below depend on this single axiom; the existence half does not.
+The capstone theorem identifying these two submodules
+(`flatBand_theorem_11_11_groundSubmodule_eq_multipletSpan`) is proved,
+axiom-free, in `TasakiFlatBandClassification.lean`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
-(1st ed.), §11.3.1, Theorem 11.11, Appendix A (Lemmas A.10/A.11).
+(1st ed.), §11.3.1, Theorem 11.11.
 -/
 
 namespace LatticeSystem.Fermion
