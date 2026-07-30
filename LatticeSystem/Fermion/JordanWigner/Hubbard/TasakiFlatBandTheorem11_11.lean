@@ -1,5 +1,6 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandAlphaFockKernel
-import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinChargeCommutation
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandGroundState
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinSymmetry
+import Mathlib.LinearAlgebra.Eigenspace.Basic
 
 /-!
 # Tasaki Theorem 11.11: the flat-band ferromagnetic ground states (capstone)
