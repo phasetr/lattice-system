@@ -1,4 +1,4 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.TJModel
+import LatticeSystem.Fermion.JordanWigner.Hubbard.Graph
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorBasis
 
 /-!
