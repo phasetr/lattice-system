@@ -1,5 +1,5 @@
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinSCaseIIConditionalBridge
-import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinSCaseIIBlockPathFinrank
+import LatticeSystem.Quantum.SpinS.AxisSwapUnitarySSpinS
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinSCaseIIParityBlockPFMin
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergAxisSwapMinEigenvalue
 import LatticeSystem.Quantum.SpinS.AxisSwappedBlockMinEq
