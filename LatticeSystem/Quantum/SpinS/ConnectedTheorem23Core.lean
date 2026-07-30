@@ -1,15 +1,14 @@
-import LatticeSystem.Quantum.SpinS.ConnectedSectorIrreducible
-import LatticeSystem.Quantum.SpinS.Theorem23StructuralGeneralFinal
-import LatticeSystem.Quantum.SpinS.Theorem23PFConstancyCasimir
+import LatticeSystem.Quantum.SpinS.Theorem23StructuralToyGSPredictedCasimirAt
 
 /-!
 # Tasaki §2.5 Theorem 2.3 for a general CONNECTED bipartite coupling
 
-(Issue #4609, PR3): extends the complete-bipartite
+(Issue #4609, PR3), core layer.  The extension of the complete-bipartite
 `tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive`
 (`Theorem23StructuralGeneralFinal.lean`) to a general *connected* bipartite
-coupling `J`, positive only on the edges of a connected bipartite graph `G` and
-vanishing off `G`.
+coupling `J` — positive only on the edges of a connected bipartite graph `G` and
+vanishing off `G` — is assembled in `ConnectedTheorem23.lean`; this module supplies
+the graph-agnostic chain that assembly consumes.
 
 ## Strategy
 
@@ -23,9 +22,11 @@ parameterise the whole PF-consuming chain by the *irreducibility result*
        (shiftedDressedSReMatrixOnMagSector A J N c M).IsIrreducible`
 
 as a hypothesis (the `_of_irreducible` variants below), making each chain lemma
-graph-agnostic.  For the connected case we feed
-`isIrreducible_shiftedDressedSReMatrixOnMagSector_connected` (PR3 Step 1);
-the complete case still feeds `isIrreducible_shiftedDressedSReMatrixOnMagSector`.
+graph-agnostic.  The witnesses themselves are supplied by the caller:
+`isIrreducible_shiftedDressedSReMatrixOnMagSector_connected`
+(`ConnectedSectorIrreducible.lean`, PR3 Step 1) for the connected case, and
+`isIrreducible_shiftedDressedSReMatrixOnMagSector`
+(`Theorem23StructuralReach.lean`) for the complete case.
 
 The remaining ingredients of the assembly — `tasaki23_general_hOutside`,
 `tasaki23_eigenvalue_ge_common`, `tasaki23_pf_sector_energy_eq_of_casimir`, and
@@ -34,11 +35,14 @@ a connected `J` satisfies, so they are reused unchanged.
 
 ## Output
 
-`tasaki_2_5_theorem_2_3_data_of_connected` proves the *data* conclusion of
+The `_of_irreducible` variants below, through
+`tasaki23_sector_lift_and_casimir_of_irreducible`.  `ConnectedTheorem23.lean`
+feeds them the connected irreducibility witness and derives
+`tasaki_2_5_theorem_2_3_data_of_connected`, the *data* conclusion of
 `tasaki_2_5_theorem_2_3` (the `∃ μ, (per-sector ground states) ∧ (global min)`
-body) directly from the connected hypotheses, dropping the complete-bipartite
-`hJ_pos` premise (which a connected `J` cannot satisfy).  This is the usable
-input for discharging the §4.1 Theorem 4.4 axiom.
+body), dropping the complete-bipartite `hJ_pos` premise (which a connected `J`
+cannot satisfy).  This is the usable input for discharging the §4.1 Theorem 4.4
+axiom.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, §2.5 Theorem 2.3, p. 42; E. Lieb, D. Mattis,
