@@ -1,27 +1,18 @@
-import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeel
+import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeelCore
 import LatticeSystem.Quantum.SpinS.MultiSiteMatrixElement
+import LatticeSystem.Quantum.SpinS.SingleSiteTransverseMeanZero
 
 /-!
 # Spin-`S` `(Ŝ_tot)²` Casimir on arbitrary `basisVecS σ`
 (γ-4 step 218 and downstream)
 
-This file is the build-speed companion to
-`SublatticeCasimirNeel.lean`. It hosts the late section
-"Spin-`S` `(Ŝ_tot)²` Casimir on arbitrary `basisVecS σ`"
-(originally lines 2429..2811 of the parent file) — including
-expectation formulas at the Néel configuration and complement
-mirrors used by `NeelBipartiteWeight.lean` and
-`NeelToyHamiltonianViaCasimir.lean`.
-
-Splitting this trailing section out drops the parent file from
-~2812 lines to ~2428 lines. The 16 theorems plus the private
-helper `spinSDot_apply_diag_unified` are physically relocated
-here, so consumers that previously did
-`import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeel` and
-referred to these names must now import this companion module
-instead. All in-repo callers
-(`NeelBipartiteWeight.lean`, `NeelToyHamiltonianViaCasimir.lean`)
-were updated in the same PR.
+This file hosts the section "Spin-`S` `(Ŝ_tot)²` Casimir on
+arbitrary `basisVecS σ`", historically split out of
+`SublatticeCasimirNeel.lean` for build-speed reasons —
+including expectation formulas at the Néel configuration and
+complement mirrors. It depends on `SublatticeCasimirNeelCore`
+and `SingleSiteTransverseMeanZero`, and the sole in-repo
+importer is `NeelBipartiteWeight.lean`.
 
 References:
 - H. Tasaki, *Physics and Mathematics of Quantum Many-Body
