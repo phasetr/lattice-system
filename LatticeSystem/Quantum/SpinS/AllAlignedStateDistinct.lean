@@ -1,5 +1,4 @@
-import LatticeSystem.Quantum.SpinS.AllAlignedState
-import LatticeSystem.Quantum.SpinS.BasisVecSOrthonormal
+import LatticeSystem.Quantum.SpinS.AllAlignedStateCore
 
 /-!
 # Distinct constant-spin states are different
@@ -10,7 +9,8 @@ states `|c₁..c₁⟩` and `|c₂..c₂⟩` are distinct vectors.
 This follows from `allAlignedConfigS V N c₁ ≠ allAlignedConfigS V N c₂`
 when `c₁ ≠ c₂` (different constants on a non-empty `V`), combined
 with the injectivity of `basisVecS` (different configs give different
-basis vectors, via `basisVecS_inner_of_ne` from PR #914).
+basis vectors, via `basisVecS_self` and `basisVecS_of_ne` from
+`LatticeSystem.Quantum.SpinS.MultiSite`).
 
 Tracked as part of Tasaki §2.4 / §2.5 spin-`S` infrastructure
 (Issue #412).
