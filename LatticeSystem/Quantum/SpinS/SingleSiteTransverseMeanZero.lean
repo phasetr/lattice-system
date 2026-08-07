@@ -1,5 +1,4 @@
-import LatticeSystem.Quantum.SpinS.AllAlignedStateExpectations
-import LatticeSystem.Quantum.SpinS.BasisVecSOrthonormal
+import LatticeSystem.Quantum.SpinS.AllAlignedStateCore
 
 /-!
 # Transverse single-site spin operators have zero expectation on
