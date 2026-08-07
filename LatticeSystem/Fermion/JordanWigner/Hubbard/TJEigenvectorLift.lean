@@ -1,5 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJOperatorLift
-import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorGroundState
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TJExchangeBondSum
 
 /-!
 # Tasaki 11.5: the t-J eigenvector lift from the sector PF eigenvector (Prop 11.24 PR-E1d)
