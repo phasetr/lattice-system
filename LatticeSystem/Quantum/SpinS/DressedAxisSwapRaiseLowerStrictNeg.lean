@@ -1,7 +1,7 @@
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBondReStrictNeg
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapOffDiag
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapPFMatrix
-import LatticeSystem.Quantum.SpinS.HeisenbergRaiseLower
+import LatticeSystem.Quantum.SpinS.RaiseLower
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphCore
 
 /-!
