@@ -1,5 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Heisenberg
-import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
+import LatticeSystem.Quantum.SpinS.MultiSiteDot
 
 /-!
 # Tasaki §4.1: ferrimagnetic long-range order on an asymmetric bipartite lattice (Theorem 4.4)
