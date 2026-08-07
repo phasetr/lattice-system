@@ -26,7 +26,8 @@ This file holds the statement data (`mielkeFlatBandDim`, `mielkeSingleElectronOp
   half-filling `N = D`, the ground states are the maximal-spin `(2S_max+1)`-fold
   multiplet with `S_tot = S_max = N/2`.  *Tasaki states it without proof* ("We state
   it without a proof"), so it remains a **documented axiom**, matching the policy for
-  Theorem 11.8 / Lemma 11.9 and the §11.3.1 classification axiom.
+  Theorem 11.8 / Lemma 11.9 (the §11.3.1 Theorem 11.11 classification is, by contrast,
+  proved axiom-free in `TasakiFlatBandClassification.lean`).
 
 `D(Λ̃,B̃) = |B̃| − |Λ̃| + 1` if `(Λ̃,B̃)` is bipartite, else `|B̃| − |Λ̃|`.
 

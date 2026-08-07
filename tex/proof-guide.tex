@@ -7576,14 +7576,12 @@ ground state carries total spin $S_{\rm tot} = S_{\max} = (K+1)/2$
 \rangle$ is zero-energy ($\hat H \geq 0$) and carries $N_e = K+1$
 ($\hat N|\Phi_\alpha\rangle = (K+1)|\Phi_\alpha\rangle$, preserved by the
 number-conserving tower $[\hat S^-_{\rm tot}, \hat N] = 0$). The $\leq$ (uniqueness)
-direction uses a \emph{single documented axiom}
-\texttt{flatBand\_zeroEnergy\_halfFilled\_mem\_ferromagneticMultipletSpan}: Tasaki's
-Appendix~A classification (no $\beta$-occupation + no double occupancy $\Rightarrow$
-spatially symmetric $\Rightarrow$ maximal spin), deferred under the same policy as
-Theorem 11.8, because a faithful proof needs the Fock-space
-factorisation of the non-orthogonal $\{\alpha\}\cup\{\beta\}$ basis and the
-symmetric-tensor/SU(2) classification. The existence half does \emph{not} depend on
-this axiom.
+direction is proved axiom-free via a dimension-route reduction (below) to a sharp
+finite-dimensional linear-algebra statement encoding Tasaki's Appendix~A classification
+(no $\beta$-occupation + no double occupancy $\Rightarrow$ spatially symmetric
+$\Rightarrow$ maximal spin), using the Fock-space factorisation of the non-orthogonal
+$\{\alpha\}\cup\{\beta\}$ basis and the symmetric-tensor/SU(2) classification. The
+existence half likewise needs no axiom.
 
 \medskip
 \noindent\textbf{Dimension-route reduction of the classification axiom (Issue
@@ -8232,9 +8230,8 @@ ferromagnetism, $S_{\max}=N/2$).  The discharge (in \texttt{NonsingularFerromagn
 downstream of the $\hat h_p$ lemmas) is the book-faithful reduction: Lemma 11.22 fixes parameters
 $\mathtt{lam}=c_\lambda s$, $\kappa=c_\kappa$ making every $\hat h_p\ge0$ once $t/s\ge T$, $U/s\ge V$,
 and Lemma 11.21 turns that frustration-freeness into saturated ferromagnetism.  Thus Theorem 11.20
-rests on the analytic Lemma 11.22 and the Theorem 11.11 classification axiom
-(\texttt{flatBand\_zeroEnergy\_halfFilled\_mem\_ferromagneticMultipletSpan}); both are documented
-axioms.  The proof-internal numbered lemmas are recorded:
+rests on the analytic Lemma 11.22 (documented axiom) and the axiom-free Theorem 11.11
+classification (\texttt{TasakiFlatBandClassification.lean}).  The proof-internal numbered lemmas are recorded:
 \texttt{nonsingularLocalHamiltonian}~$K\,\nu\,s\,t\,U\,\mathtt{lam}\,\kappa\,i$ is the local
 Hamiltonian $\hat h_p$ (eq.~(11.4.48), $d=1$, on $p=i$ and its neighbours,
 \texttt{NonsingularLocalHamiltonian.lean}), and
