@@ -405,9 +405,12 @@ Tasaki's proof (§11.4.3): Lemma 11.22 (`nonsingular_lemma_11_22`) supplies para
 `t/s ≥ T`, `U/s ≥ V`; the proved Lemma 11.21 (`nonsingular_exhibitsFerromagnetism`) then turns that
 frustration-freeness into saturated ferromagnetism (via the reduction to Theorem 11.11).  This
 discharges the former `axiom tasaki_theorem_11_20` *and* the former `axiom nonsingular_lemma_11_21`.
-`#print axioms` confirms `tasaki_theorem_11_20` now rests on `nonsingular_lemma_11_22` (the analytic
-positivity Lemma 11.22) and the existing Theorem 11.11 classification axiom
-`flatBand_zeroEnergy_halfFilled_mem_ferromagneticMultipletSpan` (no `sorryAx`, no Lemma 11.21).  The
+`#print axioms` confirms `tasaki_theorem_11_20` rests only on `nonsingular_lemma_11_22`
+(the analytic positivity Lemma 11.22, a documented axiom) beyond
+`propext`/`Classical.choice`/`Quot.sound` (no `sorryAx`, no `nonsingular_lemma_11_21`,
+since the Theorem 11.11 classification it depends on via
+`nonsingular_exhibitsFerromagnetism` — `TasakiFlatBandClassification.lean` — is itself
+axiom-free).  The
 `1 ≤ K` hypothesis (genuine periodic chain) is required by the all-up-state annihilation
 `tasakiNonsingularHamiltonian_mulVec_alphaAllUpState`. -/
 theorem tasaki_theorem_11_20 (ν : ℝ) (hν : 0 < ν) :

@@ -13,7 +13,8 @@ annihilated by `b̂_{u,σ}` because `b̂_{u,σ}` anticommutes with every `â†_
 the ordered product to the vacuum.  (The hard reverse inclusion
 `flatBandBKernelSubmodule ⊆ flatBandAlphaFockSubmodule` — no `β`-occupation forces
 the state into the flat band — needs the Fock-space factorisation of the
-non-orthogonal `{α} ∪ {β}` basis and is deferred.)
+non-orthogonal `{α} ∪ {β}` basis; this is proved, axiom-free, in
+`flatBandBKernelSubmodule_le_alphaFockSubmodule` (`TasakiFlatBandUniqueness.lean`).)
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed.), §11.3.1, eq. (11.3.7).

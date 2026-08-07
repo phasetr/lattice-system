@@ -17,10 +17,11 @@ i.e. the flat-band Hamiltonian (`t Σ b̂†b̂ + U Σ n̂↑n̂↓`) minus `s` 
 **Theorem 11.20** (`d = 1` version): for every `ν > 0` there are thresholds (depending only
 on `ν`, not on the system size) such that, once `t/s` and `U/s` are large enough, the model
 exhibits ferromagnetism (`E_min(S_max) < E_min(S)` for all `S ≠ S_max = N/2`; the ground
-states are the `2S_max+1 = N+1`-fold maximal-spin multiplet).  Tasaki's proof (via the
-frustration-free local Hamiltonians `ĥ_p` on `4d+1` sites — Lemmas 11.21, 11.22 — reducing
-to Theorem 11.11) is deep and deferred; this is a documented axiom (Theorem 11.8 / 11.13 /
-11.15 / 11.18 / 11.19 policy).
+states are the `2S_max+1 = N+1`-fold maximal-spin multiplet).  This file only sets up the
+model; the theorem itself (`tasaki_theorem_11_20`) is **proved** in
+`NonsingularFerromagnetism.lean`, via the frustration-free local Hamiltonians `ĥ_p` on
+`4d+1` sites (Lemma 11.21, proved; Lemma 11.22, documented axiom) reducing to the
+axiom-free Theorem 11.11 classification (`TasakiFlatBandClassification.lean`).
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed.), §11.4.3, eqs. (11.4.37)/(11.4.38), Theorem 11.20, Lemmas 11.21–11.22
