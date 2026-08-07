@@ -1,5 +1,5 @@
 import LatticeSystem.Quantum.SpinS.ConnectedSectorIrreducible
-import LatticeSystem.Quantum.SpinS.Theorem23StructuralGeneralFinal
+import LatticeSystem.Quantum.SpinS.Theorem23GeneralHOutside
 import LatticeSystem.Quantum.SpinS.Theorem23PFConstancyCasimir
 import LatticeSystem.Quantum.SpinS.ConnectedTheorem23Core
 
