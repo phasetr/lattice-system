@@ -97,9 +97,10 @@ biconnected base lattice `(Λ̃,B̃)`, the Hubbard model on its line graph at
 half-filling `N = D(Λ̃,B̃)` (with `t, U > 0`) has ground states that all carry
 total spin `S_tot = S_max = N/2`, unique apart from the `2S_max + 1 = N + 1`-fold
 multiplet degeneracy.  Tasaki states this without proof, so it is a documented
-axiom (matching the Theorem 11.8 / §11.3.1 classification policy): the ground
-subspace has `finrank = N + 1` and every ground state is a `(Ŝ_tot)²` eigenvector
-at `S_max(S_max + 1)`. -/
+axiom (matching the Theorem 11.8 / Lemma 11.9 policy; the §11.3.1 Theorem 11.11
+classification is, by contrast, proved axiom-free in
+`TasakiFlatBandClassification.lean`): the ground subspace has `finrank = N + 1`
+and every ground state is a `(Ŝ_tot)²` eigenvector at `S_max(S_max + 1)`. -/
 axiom mielke_theorem_11_13 {Nbase M : ℕ} (Gbase : SimpleGraph (Fin (Nbase + 1)))
     [DecidableRel Gbase.Adj] (G : SimpleGraph (Fin (M + 1))) [DecidableRel G.Adj]
     (t U : ℝ) (ht : 0 < t) (hU : 0 < U)
