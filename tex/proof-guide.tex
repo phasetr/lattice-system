@@ -7581,14 +7581,16 @@ finite-dimensional linear-algebra statement encoding Tasaki's Appendix~A classif
 (no $\beta$-occupation + no double occupancy $\Rightarrow$ spatially symmetric
 $\Rightarrow$ maximal spin), using the dimension method (Theorem 11.26 style) and a
 swap-invariance coordinate argument on the occupation basis
-(\texttt{flatBand\_block\_finrank\_le\_one}) rather than an explicit Fock-space
-factorisation or symmetric-tensor/SU(2) construction. The existence half likewise
+(\texttt{flatBand\_block\_finrank\_le\_one}), built on the Fock-space
+factorisation of the non-orthogonal $\{\alpha\}\cup\{\beta\}$ basis (above)
+rather than a symmetric-tensor/SU(2) construction. The existence half likewise
 needs no axiom.
 
 \medskip
-\noindent\textbf{Dimension-route reduction of the classification axiom (Issue
-\#4346, \texttt{TasakiFlatBandClassification.lean}).}  Toward discharging the axiom,
-the uniqueness $\leq$ half is reduced to a sharp finite-dimensional linear-algebra
+\noindent\textbf{Dimension-route discharge of the classification axiom (Issue
+\#4346, \texttt{TasakiFlatBandClassification.lean}).}  The former classification
+axiom is discharged by reducing the uniqueness $\leq$ half to a sharp
+finite-dimensional linear-algebra
 statement, following the dimension method of Theorem 11.26 rather than an explicit
 symmetric-tensor construction. The multiplet has the expected dimension
 $\operatorname{finrank}\texttt{flatBandFerromagneticMultipletSubmodule}=K+2$
@@ -8244,8 +8246,9 @@ discharged in \texttt{NonsingularFerromagnetism.lean}, while \textbf{Lemma 11.22
 \textbf{Lemma 11.23} (\texttt{nonsingular\_lemma\_11\_23}: the $t,U\uparrow\infty$ limit
 positivity below $S_{\max}$) remain documented axioms (genuine eigenvalue-continuity perturbation
 theory mathlib lacks); Theorem 11.20 is proved from 11.21 (proved) and 11.22.
-Discharging Lemma 11.21, the \emph{frustration-free decomposition} eq.~(11.4.46) is now
-proved (\texttt{NonsingularFrustrationFree.lean}): \texttt{tasakiNonsingular\_eq\_sum\_localHamiltonian}
+Separately from discharging Lemma 11.21, the \emph{frustration-free decomposition}
+eq.~(11.4.46) is also now proved (\texttt{NonsingularFrustrationFree.lean}):
+\texttt{tasakiNonsingular\_eq\_sum\_localHamiltonian}
 shows, for every $\mathtt{lam},\kappa$,
 $\hat H = \bigl(\sum_i\hat h_{p}^{(i)}\bigr) - (K{+}1)(1{+}2\nu^2)s\cdot\mathbf 1
 + \mathtt{lam}\cdot\bigl(\sum_u\hat N^\beta_u + \sum_x\hat n_{x\uparrow}\hat n_{x\downarrow}\bigr)$.

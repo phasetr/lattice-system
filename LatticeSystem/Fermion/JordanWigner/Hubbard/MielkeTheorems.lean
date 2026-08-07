@@ -26,7 +26,7 @@ This file holds the statement data (`mielkeFlatBandDim`, `mielkeSingleElectronOp
   half-filling `N = D`, the ground states are the maximal-spin `(2S_max+1)`-fold
   multiplet with `S_tot = S_max = N/2`.  *Tasaki states it without proof* ("We state
   it without a proof"), so it remains a **documented axiom**, matching the policy for
-  Theorem 11.8 / Lemma 11.9 (the §11.3.1 Theorem 11.11 classification is, by contrast,
+  Theorem 11.8 (the §11.3.1 Theorem 11.11 classification is, by contrast,
   proved axiom-free in `TasakiFlatBandClassification.lean`).
 
 `D(Λ̃,B̃) = |B̃| − |Λ̃| + 1` if `(Λ̃,B̃)` is bipartite, else `|B̃| − |Λ̃|`.
@@ -97,7 +97,7 @@ biconnected base lattice `(Λ̃,B̃)`, the Hubbard model on its line graph at
 half-filling `N = D(Λ̃,B̃)` (with `t, U > 0`) has ground states that all carry
 total spin `S_tot = S_max = N/2`, unique apart from the `2S_max + 1 = N + 1`-fold
 multiplet degeneracy.  Tasaki states this without proof, so it is a documented
-axiom (matching the Theorem 11.8 / Lemma 11.9 policy; the §11.3.1 Theorem 11.11
+axiom (matching the Theorem 11.8 policy; the §11.3.1 Theorem 11.11
 classification is, by contrast, proved axiom-free in
 `TasakiFlatBandClassification.lean`): the ground subspace has `finrank = N + 1`
 and every ground state is a `(Ŝ_tot)²` eigenvector at `S_max(S_max + 1)`. -/

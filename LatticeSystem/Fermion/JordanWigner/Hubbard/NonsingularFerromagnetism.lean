@@ -407,8 +407,10 @@ frustration-freeness into saturated ferromagnetism (via the reduction to Theorem
 discharges the former `axiom tasaki_theorem_11_20` *and* the former `axiom nonsingular_lemma_11_21`.
 `#print axioms` confirms `tasaki_theorem_11_20` rests only on `nonsingular_lemma_11_22`
 (the analytic positivity Lemma 11.22, a documented axiom) beyond
-`propext`/`Classical.choice`/`Quot.sound`; the Theorem 11.11 classification
-(`TasakiFlatBandClassification.lean`) is axiom-free (no `sorryAx`, no Lemma 11.21).  The
+`propext`/`Classical.choice`/`Quot.sound` (no `sorryAx`, no `nonsingular_lemma_11_21`,
+since the Theorem 11.11 classification it depends on via
+`nonsingular_exhibitsFerromagnetism` — `TasakiFlatBandClassification.lean` — is itself
+axiom-free).  The
 `1 ≤ K` hypothesis (genuine periodic chain) is required by the all-up-state annihilation
 `tasakiNonsingularHamiltonian_mulVec_alphaAllUpState`. -/
 theorem tasaki_theorem_11_20 (ν : ℝ) (hν : 0 < ν) :
