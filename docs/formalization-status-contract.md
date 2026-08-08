@@ -173,7 +173,10 @@ The staged and rendered checkers require a bijection among catalogue record
 IDs, generated filenames, permalinks, rendered directories, and full record
 articles. They reject a full article outside its canonical detail page and
 also reject stripped-identity definition lists, typed-field attributes, or
-unknown record-like containers on projections. They reject an
+unknown record-like containers on projections. The unique typed generated
+container is exact catalogue-derived output: additive tags, text, or whitespace
+inside it are invalid, while prose outside the marker remains hand-written.
+They reject an
 extra or missing output, a path or permalink collision, a wrong projection
 link, or any missing/extra/reordered projection member. These human-rendering
 rules do not alter the version 1 manifest, canonical records, or machine API.

@@ -138,9 +138,9 @@ def metadata(aggregate: dict[str, Any], revision: str) -> list[str]:
     """Return the visible provenance header shared by every generated view."""
     authoritative = aggregate["catalog_state"] == "authoritative"
     authority_notice = (
-        "> The validated version 1 catalogue is authoritative for formalization status."
+        "The validated version 1 catalogue is authoritative for formalization status."
         if authoritative
-        else "> The interim legacy catalogue remains authoritative until Issue #5228."
+        else "The interim legacy catalogue remains authoritative until Issue #5228."
     )
     authority_href = (
         "/lattice-system/formalization-status/v1/catalog.json"
@@ -153,8 +153,9 @@ def metadata(aggregate: dict[str, Any], revision: str) -> list[str]:
         else "Current authority: complete interim legacy catalogue"
     )
     return [
-        "> **Generated formalization-status view.** Do not edit this section by hand.",
-        authority_notice,
+        '<p data-generated-notice="editing">Generated formalization-status view. '
+        "Do not edit this section by hand.</p>",
+        f'<p data-generated-notice="authority">{authority_notice}</p>',
         "",
         '<ul data-generated-metadata="true">',
         f'<li data-meta="catalog-state">Catalogue state: {html_text(aggregate["catalog_state"])}</li>',
@@ -319,7 +320,7 @@ def render_marker(
     if kind == "overview" and argument is None:
         lines.extend(
             (
-                "## Generated catalogue snapshot",
+                '<h2 data-heading-kind="overview">Generated catalogue snapshot</h2>',
                 "",
                 '<ul data-index="overview">',
                 index_row(
@@ -362,7 +363,7 @@ def render_marker(
         for record in records:
             label = human_status(record)
             counts[label] = counts.get(label, 0) + 1
-        lines.extend(("## Generated status projections", "", '<ul data-index="status">'))
+        lines.extend(('<h2 data-heading-kind="status">Generated status projections</h2>', "", '<ul data-index="status">'))
         for label in sorted(counts):
             lines.append(
                 index_row(
@@ -376,9 +377,9 @@ def render_marker(
                 for record in records
                 if human_status(record) == label
             )
-        lines.extend(("</ul>", "", "The three machine status dimensions are visible only on each canonical record page.", ""))
+        lines.extend(("</ul>", "", '<p data-generated-notice="note">The three machine status dimensions are visible only on each canonical record page.</p>', ""))
     elif kind == "source-index" and argument is None:
-        lines.extend(("## Generated source index", "", '<ul data-index="sources">'))
+        lines.extend(('<h2 data-heading-kind="source-index">Generated source index</h2>', "", '<ul data-index="sources">'))
         for source_id, source in sorted(sources.items()):
             count = sum(source_for_record(record, source_items, source_id) for record in records)
             lines.append(
@@ -416,10 +417,10 @@ def render_marker(
         lines.extend(projection_lines(selected, "source", argument))
     elif kind == "project-original" and argument is None:
         selected = [record for record in records if record["origin"] == "project_original"]
-        lines.extend(("## Generated project-original foundation projection", ""))
+        lines.extend(('<h2 data-heading-kind="project-original">Generated project-original foundation projection</h2>', ""))
         lines.extend(projection_lines(selected, "source", "foundations"))
     elif kind == "topic-index" and argument is None:
-        lines.extend(("## Generated topic index", "", '<ul data-index="topics">'))
+        lines.extend(('<h2 data-heading-kind="topic-index">Generated topic index</h2>', "", '<ul data-index="topics">'))
         for topic_id, topic in sorted(topics.items()):
             count = sum(topic_id in record["topic_ids"] for record in records)
             lines.append(
@@ -450,14 +451,16 @@ def render_marker(
         matching = [record for record in records if record["id"] == argument]
         if len(matching) != 1:
             raise ValueError(f"unknown generated record marker: {argument}")
-        lines.extend(("## Canonical record detail", ""))
+        lines.extend(('<h2 data-heading-kind="record-detail">Canonical record detail</h2>', ""))
         lines.extend(record_lines(matching[0], source_items, sources))
     else:
         raise ValueError(f"unknown generated marker specification: {specification}")
 
     return (
         f"<!-- formalization-status-generated:start {specification} -->\n"
+        + f'<div data-formalization-generated="{html_text(specification)}">\n'
         + "\n".join(lines).rstrip()
+        + "\n</div>"
         + "\n<!-- formalization-status-generated:end -->"
     )
 

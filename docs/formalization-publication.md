@@ -43,7 +43,11 @@ Source, topic, project-original, and status pages contain only exact counts and
 compact links to those canonical details; they contain no record definition
 lists. The projection grammar also rejects record-like `article`, `dl`, `dt`,
 or `dd` structures, typed-field attributes, and unknown `record-*` containers,
-even when canonical article identity attributes have been stripped. Their
+even when canonical article identity attributes have been stripped. Every
+generated marker owns one typed container whose complete staged serialization
+and live serialization must match the catalogue-derived output exactly;
+arbitrary tags, text, or whitespace inside that region are rejected while
+hand-written prose outside the marker remains allowed. Their
 projection rows retain `record-<record-id>` as an explicit element
 ID, preserving the four prototype records' already published source/topic
 fragments while changing the fragment target from a duplicated detail block to
@@ -164,7 +168,9 @@ overview/source/topic/status projections, schema version 1,
 a supported matching catalogue state (`prototype` or `authoritative`),
 the exact closed top-level key sets and generator identity/version pairs
 (`validate_formalization_status.py` version 2 and
-`generate_formalization_site.py` version 2), matching input digests, a published schema equal to
+`generate_formalization_site.py` version 2), recursive catalogue validation by
+the same dependency-free schema evaluator used during generation, matching
+input digests, a published schema equal to
 the checked-out canonical schema, and a publication revision equal to the
 triggering `main` SHA. Redirects are rejected before following, every response
 has an eight-MiB hard limit, and one 240-second absolute deadline bounds complete

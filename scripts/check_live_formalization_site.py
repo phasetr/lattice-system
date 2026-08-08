@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import html
 import json
 import re
 import time
@@ -19,9 +18,9 @@ from check_generated_site import (
     PageParser,
     assert_metadata,
     canonical_record_href,
+    expected_marker_body,
     expected_overview_index_rows,
     expected_projection_rows,
-    expected_record_structure,
     expected_source_index_rows,
     expected_status_index_rows,
     expected_topic_index_rows,
@@ -30,8 +29,10 @@ from check_generated_site import (
     records_for_topic,
     reject_authority_contradictions,
     require_index_rows,
+    require_generated_ownership,
     validate_record_blocks,
 )
+from validate_formalization_status import Validation, validate_schema_instance
 
 
 PAGES_BASE = "https://phasetr.github.io/lattice-system/"
@@ -239,6 +240,26 @@ def expected_human_endpoints(catalog: dict[str, object]) -> tuple[str, ...]:
     )
 
 
+def endpoint_marker_specification(endpoint: str) -> str:
+    """Map one fetched human endpoint to its exact generated marker owner."""
+    fixed = {
+        "formalization/": "overview",
+        "formalization/status/": "status",
+        "formalization/sources/": "source-index",
+        "formalization/sources/foundations/": "project-original",
+        "formalization/topics/": "topic-index",
+    }
+    if endpoint in fixed:
+        return fixed[endpoint]
+    match = re.fullmatch(r"formalization/(sources|topics|records)/([^/]+)/", endpoint)
+    if match is None:
+        raise ValueError(f"unknown human endpoint marker ownership: {endpoint}")
+    kind = {"sources": "source", "topics": "topic", "records": "record"}[
+        match.group(1)
+    ]
+    return f"{kind} {match.group(2)}"
+
+
 def require_projection_surface(
     pages: dict[str, PageParser], catalog: dict[str, object]
 ) -> None:
@@ -373,11 +394,37 @@ def verify_responses(
         raise ValueError("checkout canonical schema is invalid UTF-8 JSON") from error
     if schema != canonical_schema:
         raise ValueError("published schema differs from the checkout canonical schema")
+    aggregate_schema = canonical_schema.get("$defs", {}).get("aggregate")
+    if not isinstance(aggregate_schema, dict):
+        raise ValueError("checkout canonical schema lacks the aggregate contract")
+    schema_validation = Validation()
+    validate_schema_instance(
+        catalog,
+        aggregate_schema,
+        canonical_schema,
+        "published catalogue",
+        schema_validation,
+    )
+    if schema_validation.errors:
+        raise ValueError(
+            "published catalogue violates the canonical schema: "
+            + "; ".join(schema_validation.errors)
+        )
 
     pages = {
         endpoint: parse_human(responses[endpoint], endpoint)
         for endpoint in expected_human_endpoints(catalog)
     }
+    for endpoint, parser in pages.items():
+        specification = endpoint_marker_specification(endpoint)
+        require_generated_ownership(parser, endpoint, specification)
+        rendered_marker = (
+            f"<!-- formalization-status-generated:start {specification} -->\n"
+            + expected_marker_body(specification, catalog, revision)
+            + "<!-- formalization-status-generated:end -->"
+        ).encode()
+        if responses[endpoint].body.count(rendered_marker) != 1:
+            raise ValueError(f"{endpoint}: generated owned region is not exact")
     reject_authority_contradictions(
         catalog,
         [(endpoint, " ".join(parser.text)) for endpoint, parser in pages.items()],
@@ -473,34 +520,6 @@ def fixture_responses(
     if record_count < len(COMPATIBILITY_RECORD_IDS):
         raise ValueError("live fixture must retain every pinned compatibility record")
     digest = "a" * 64
-    catalog_href = "/lattice-system/formalization-status/v1/catalog.json"
-    schema_href = "/lattice-system/formalization-status/v1/schema.json"
-    publication_href = "/lattice-system/formalization-status/v1/publication.json"
-    authority_href = (
-        catalog_href
-        if catalog_state == "authoritative"
-        else "/lattice-system/formalization/legacy/"
-    )
-    authority_label = (
-        "Current authority: validated version 1 catalogue"
-        if catalog_state == "authoritative"
-        else "Current authority: complete interim legacy catalogue"
-    )
-    metadata = (
-        '<p>Generated formalization-status view.</p><ul data-generated-metadata="true">'
-        f'<li data-meta="catalog-state">Catalogue state: {catalog_state}</li>'
-        '<li data-meta="schema-version">Schema version: 1</li>'
-        f'<li data-meta="input-sha256">Input SHA-256: {digest}</li>'
-        f'<li data-meta="revision">Deploy revision: {revision}</li>'
-        f'<li data-meta="catalog-link" data-href="{catalog_href}">'
-        f'<a href="{catalog_href}">Machine data: version 1 catalogue</a></li>'
-        f'<li data-meta="schema-link" data-href="{schema_href}">'
-        f'<a href="{schema_href}">Schema: version 1 schema</a></li>'
-        f'<li data-meta="publication-link" data-href="{publication_href}">'
-        f'<a href="{publication_href}">Build metadata: publication sidecar</a></li>'
-        f'<li data-meta="authority-link" data-href="{authority_href}">'
-        f'<a href="{authority_href}">{authority_label}</a></li></ul>'
-    )
     records = []
     for index, record_id in enumerate(COMPATIBILITY_RECORD_IDS):
         records.append(
@@ -539,7 +558,9 @@ def fixture_responses(
         "generated_by": "scripts/validate_formalization_status.py",
         "generator_version": 2,
         "input_sha256": digest,
-        "sources": [{"id": "book", "title": "Book"}],
+        "sources": [
+            {"authors": ["Fixture Author"], "id": "book", "title": "Book", "year": 2026}
+        ],
         "source_items": [
             {
                 "equations": [],
@@ -552,69 +573,29 @@ def fixture_responses(
                 "title": "Book result",
             }
         ],
-        "topics": [{"id": "spin", "label": "Spin"}],
+        "topics": [{"description": "Spin fixture", "id": "spin", "label": "Spin"}],
         "records": records,
     }
 
-    def rows_html(
-        rows: list[tuple[str, tuple[tuple[str, str], ...], str | None, str]]
-    ) -> str:
-        """Render independent exact structured rows for the live fixture."""
-        result = []
-        for kind, attributes, anchor_href, visible in rows:
-            rendered = []
-            for key, value in attributes:
-                name = "id" if key == "id" else f"data-{key}"
-                rendered.append(f' {name}="{html.escape(value, quote=True)}"')
-            content = html.escape(visible, quote=False)
-            if anchor_href is not None:
-                content = (
-                    f'<a href="{html.escape(anchor_href, quote=True)}">{content}</a>'
-                )
-            result.append(
-                f'<li data-row-kind="{kind}"{"".join(rendered)}>{content}</li>'
-            )
-        return "".join(result)
+    from generate_formalization_site import render_marker
 
-    def record_html(record: dict[str, object]) -> str:
-        """Render an independent full record article from checker expectations."""
-        heading, fields = expected_record_structure(record, catalog)  # type: ignore[arg-type]
-        body = [
-            f'<article id="record-{record["id"]}" data-record-id="{record["id"]}">',
-            f'<h3 data-field="summary">{html.escape(heading)}</h3><dl>',
-        ]
-        for label, name, attributes, value in fields:
-            extra = "".join(
-                f' data-{key}="{html.escape(item, quote=True)}"'
-                for key, item in attributes
-            )
-            body.append(
-                f'<dt data-label-for="{name}">{html.escape(label)}</dt>'
-                f'<dd data-field="{name}"{extra}>{html.escape(value)}</dd>'
-            )
-        body.append("</dl></article>")
-        return "".join(body)
-
-    human: dict[str, str] = {
-        "formalization/": metadata
-        + rows_html(expected_overview_index_rows(catalog)),  # type: ignore[arg-type]
-        "formalization/status/": metadata
-        + rows_html(expected_status_index_rows(catalog)),  # type: ignore[arg-type]
-        "formalization/sources/": metadata
-        + rows_html(expected_source_index_rows(catalog)),  # type: ignore[arg-type]
-        "formalization/topics/": metadata
-        + rows_html(expected_topic_index_rows(catalog)),  # type: ignore[arg-type]
-        "formalization/sources/book/": metadata
-        + rows_html(expected_projection_rows(records, "source", "book")),
-        "formalization/sources/foundations/": metadata
-        + rows_html(expected_projection_rows([], "source", "foundations")),
-        "formalization/topics/spin/": metadata
-        + rows_html(expected_projection_rows(records, "topic", "spin")),
+    specifications = {
+        "formalization/": "overview",
+        "formalization/status/": "status",
+        "formalization/sources/": "source-index",
+        "formalization/topics/": "topic-index",
+        "formalization/sources/book/": "source book",
+        "formalization/sources/foundations/": "project-original",
+        "formalization/topics/spin/": "topic spin",
+        **{
+            f"formalization/records/{record_id}/": f"record {record_id}"
+            for record_id in COMPATIBILITY_RECORD_IDS
+        },
     }
-    for record in records:
-        if record["id"] not in COMPATIBILITY_RECORD_IDS:
-            continue
-        human[f'formalization/records/{record["id"]}/'] = metadata + record_html(record)
+    human = {
+        endpoint: render_marker(specification, catalog, revision)
+        for endpoint, specification in specifications.items()
+    }
     publication = {
         "schema_version": 1,
         "catalog_state": catalog_state,
@@ -628,7 +609,10 @@ def fixture_responses(
         JSON_ENDPOINTS[0]: ("application/json", json.dumps(catalog).encode()),
         JSON_ENDPOINTS[1]: (
             "application/json",
-            json.dumps({"$id": PAGES_BASE + JSON_ENDPOINTS[1]}).encode(),
+            (
+                Path(__file__).resolve().parents[1]
+                / "formalization-status/v1/schema.json"
+            ).read_bytes(),
         ),
         JSON_ENDPOINTS[2]: ("application/json", json.dumps(publication).encode()),
     }
@@ -717,17 +701,28 @@ def run_self_tests() -> None:
             ),
         ),
     ]
-    leaked_projection = dict(fixture)
-    leaked_response = leaked_projection["formalization/sources/book/"]
-    leaked_projection["formalization/sources/book/"] = Response(
-        leaked_response.status,
-        leaked_response.content_type,
-        leaked_response.body
-        + b"<article><h3>Stripped identity</h3><dl><dt>Implementation state</dt>"
-        + b"<dd>implemented</dd></dl></article>",
-        leaked_response.final_url,
+    projection_end = b'</div>\n<!-- formalization-status-generated:end -->'
+    negative_fixtures.extend(
+        [
+            (
+                "stripped-identity full record projection leak",
+                changed_response(
+                    "formalization/sources/book/",
+                    projection_end,
+                    b"<article><h3>Stripped identity</h3><dl><dt>Implementation state</dt>"
+                    b"<dd>implemented</dd></dl></article>\n" + projection_end,
+                ),
+            ),
+            (
+                "unowned paragraph in generated projection",
+                changed_response(
+                    "formalization/sources/book/",
+                    projection_end,
+                    b"<p>poison</p>\n" + projection_end,
+                ),
+            ),
+        ]
     )
-    negative_fixtures.append(("stripped-identity full record projection leak", leaked_projection))
 
     def changed_json(
         endpoint: str, key: str, value: object | None, remove: bool = False
@@ -776,6 +771,62 @@ def run_self_tests() -> None:
             ),
         ]
     )
+
+    def changed_nested_catalog(
+        collection: str, field: str, value: object | None, remove: bool = False
+    ) -> dict[str, Response]:
+        """Mutate one nested catalogue object without changing route identities."""
+        changed = dict(fixture)
+        response = changed[JSON_ENDPOINTS[0]]
+        payload = json.loads(response.body)
+        target = payload[collection][0]
+        if remove:
+            target.pop(field)
+        else:
+            target[field] = value
+        changed[JSON_ENDPOINTS[0]] = Response(
+            response.status,
+            response.content_type,
+            json.dumps(payload).encode(),
+            response.final_url,
+        )
+        return changed
+
+    nested_schema_mutations = []
+    for collection, required_field, typed_field, wrong_value in (
+        ("records", "summary", "capstone", "false"),
+        ("sources", "authors", "title", []),
+        ("source_items", "pages", "equations", "none"),
+        ("topics", "label", "label", []),
+    ):
+        nested_schema_mutations.extend(
+            [
+                (
+                    f"additional nested {collection} field",
+                    changed_nested_catalog(collection, "unexpected", True),
+                ),
+                (
+                    f"missing nested {collection} field",
+                    changed_nested_catalog(
+                        collection, required_field, None, remove=True
+                    ),
+                ),
+                (
+                    f"wrong nested {collection} field type",
+                    changed_nested_catalog(collection, typed_field, wrong_value),
+                ),
+            ]
+        )
+    for label, changed in nested_schema_mutations:
+        try:
+            verify_responses(changed, PAGES_BASE, revision, canonical_schema)
+        except ValueError as error:
+            if "violates the canonical schema" not in str(error):
+                raise AssertionError(
+                    f"nested schema mutation failed for an unrelated reason: {label}: {error}"
+                ) from error
+        else:
+            raise AssertionError(f"nested schema mutation was accepted: {label}")
     wrong_revision = dict(json.loads(fixture[JSON_ENDPOINTS[2]].body))
     wrong_revision["revision"] = "2" * 40
     revision_fixture = dict(fixture)
@@ -962,8 +1013,8 @@ def run_self_tests() -> None:
             "additive metadata",
             mutate(
                 "formalization/",
-                b"catalogue</a></li></ul>",
-                b'catalogue</a></li><li data-meta="poison">Poison: true</li></ul>',
+                b"legacy catalogue</a></li>\n</ul>",
+                b'legacy catalogue</a></li>\n<li data-meta="poison">Poison: true</li>\n</ul>',
             ),
         ),
     )

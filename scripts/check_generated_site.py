@@ -37,11 +37,22 @@ AUTHORITATIVE_FORBIDDEN_PHRASES = (
 class PageParser(html.parser.HTMLParser):
     """Parse exact record grammar plus scoped metadata and index structures."""
 
-    def __init__(self, generated_marker_scoped: bool = False) -> None:
+    def __init__(
+        self,
+        generated_marker_scoped: bool = False,
+        require_generated_container: bool = False,
+    ) -> None:
         """Initialize parsing, optionally limiting record grammar to marker comments."""
         super().__init__(convert_charrefs=True)
         self.generated_marker_scoped = generated_marker_scoped
+        self.require_generated_container = require_generated_container
         self.generated_scope_active = not generated_marker_scoped
+        self.generated_container_specs: list[str] = []
+        self.current_generated_container: str | None = None
+        self.unowned_generated_tags: list[str] = []
+        self.unowned_generated_text: list[str] = []
+        self.current_generated_notice: tuple[str, list[str]] | None = None
+        self.generated_notices: list[tuple[str, str]] = []
         self.ids: list[str] = []
         self.links: list[str] = []
         self.text: list[str] = []
@@ -80,6 +91,38 @@ class PageParser(html.parser.HTMLParser):
         if structured_active and tag == "li":
             raise ValueError("structured metadata/index rows cannot be nested")
         identifier = attributes.get("id")
+        if self.require_generated_container and self.generated_scope_active:
+            if self.current_generated_container is None:
+                specification = attributes.get("data-formalization-generated")
+                if (
+                    tag == "div"
+                    and specification
+                    and set(attributes) == {"data-formalization-generated"}
+                ):
+                    self.current_generated_container = specification
+                    self.generated_container_specs.append(specification)
+                else:
+                    self.unowned_generated_tags.append(tag)
+            elif tag == "div":
+                self.unowned_generated_tags.append(tag)
+            elif tag == "p":
+                notice = attributes.get("data-generated-notice")
+                if (
+                    notice not in {"editing", "authority", "note"}
+                    or set(attributes) != {"data-generated-notice"}
+                    or self.current_generated_notice is not None
+                ):
+                    self.unowned_generated_tags.append(tag)
+                else:
+                    self.current_generated_notice = (notice, [])
+            elif tag == "ul":
+                if not (
+                    attributes == {"data-generated-metadata": "true"}
+                    or (set(attributes) == {"data-index"} and bool(attributes["data-index"]))
+                ):
+                    self.unowned_generated_tags.append(tag)
+            elif tag not in {"li", "a", "h2", "article", "h3", "dl", "dt", "dd"}:
+                self.unowned_generated_tags.append(tag)
         exact_article_start = (
             tag == "article"
             and bool(attributes.get("data-record-id"))
@@ -229,12 +272,19 @@ class PageParser(html.parser.HTMLParser):
     def handle_data(self, data: str) -> None:
         """Collect rendered text for generated-metadata assertions."""
         self.text.append(data)
+        generated_text_claimed = False
+        if self.current_generated_notice is not None:
+            self.current_generated_notice[1].append(data)
+            generated_text_claimed = True
         if self.current_heading is not None:
             self.current_heading.append(data)
+            generated_text_claimed = True
         if self.current_label is not None and self.record_phase == "in-label":
             self.current_label[1].append(data)
+            generated_text_claimed = True
         if self.current_record_field is not None:
             self.current_record_field[2].append(data)
+            generated_text_claimed = True
         if (
             self.current_record is not None
             and self.current_heading is None
@@ -244,19 +294,33 @@ class PageParser(html.parser.HTMLParser):
         ):
             raise ValueError(f"generated record {self.current_record} has untyped visible text")
         if self.current_metadata is not None:
+            generated_text_claimed = True
             if self.current_metadata[1] is not None and not self.structured_in_anchor and data.strip():
                 raise ValueError("linked metadata row has text outside its direct anchor")
             self.current_metadata[2].append(data)
         if self.current_index_row is not None:
+            generated_text_claimed = True
             encoded_href = dict(self.current_index_row[1]).get("href")
             if encoded_href is not None and not self.structured_in_anchor and data.strip():
                 raise ValueError("linked index row has text outside its direct anchor")
             self.current_index_row[2].append(data)
         if self.current_dynamic_heading is not None:
             self.current_dynamic_heading[2].append(data)
+            generated_text_claimed = True
+        if (
+            self.generated_scope_active
+            and self.current_generated_container is not None
+            and data.strip()
+            and not generated_text_claimed
+        ):
+            self.unowned_generated_text.append(data.strip())
 
     def handle_endtag(self, tag: str) -> None:
         """Finish one normalized rendered list item."""
+        if tag == "p" and self.current_generated_notice is not None:
+            kind, parts = self.current_generated_notice
+            self.generated_notices.append((kind, normalized_rendered_text(parts)))
+            self.current_generated_notice = None
         if tag == "a" and (self.current_metadata is not None or self.current_index_row is not None):
             if not self.structured_in_anchor:
                 raise ValueError("structured row has a mismatched anchor end")
@@ -329,6 +393,8 @@ class PageParser(html.parser.HTMLParser):
             kind, attributes, parts = self.current_dynamic_heading
             self.dynamic_headings.append((kind, attributes, normalized_rendered_text(parts)))
             self.current_dynamic_heading = None
+        if tag == "div" and self.current_generated_container is not None:
+            self.current_generated_container = None
 
     def handle_comment(self, data: str) -> None:
         """Stop record capture at the generated-section boundary."""
@@ -727,7 +793,13 @@ def marker_body(path: Path, specification: str) -> str:
 def parse_record_html(body: str, label: str) -> PageParser:
     """Parse structured raw or rendered HTML and reject duplicate identities."""
     generated_marker_scoped = "formalization-status-generated:start " in body
-    parser = PageParser(generated_marker_scoped=generated_marker_scoped)
+    require_generated_container = (
+        generated_marker_scoped or "data-formalization-generated=" in body
+    )
+    parser = PageParser(
+        generated_marker_scoped=generated_marker_scoped,
+        require_generated_container=require_generated_container,
+    )
     parser.feed(body)
     duplicates = sorted({identifier for identifier in parser.ids if parser.ids.count(identifier) > 1})
     if duplicates:
@@ -738,10 +810,46 @@ def parse_record_html(body: str, label: str) -> PageParser:
         or parser.current_metadata is not None
         or parser.current_index_row is not None
         or parser.structured_in_anchor
+        or parser.current_generated_notice is not None
+        or parser.current_generated_container is not None
         or (generated_marker_scoped and parser.generated_scope_active)
     ):
         raise ValueError(f"{label}: unclosed generated record structure")
     return parser
+
+
+def expected_marker_body(
+    specification: str, catalog: dict[str, Any], revision: str
+) -> str:
+    """Render and extract the generator's exact owned marker serialization."""
+    from generate_formalization_site import render_marker
+
+    rendered = render_marker(specification, catalog, revision)
+    prefix = f"<!-- formalization-status-generated:start {specification} -->\n"
+    suffix = "\n<!-- formalization-status-generated:end -->"
+    if not rendered.startswith(prefix) or not rendered.endswith(suffix):
+        raise ValueError(f"generator returned malformed marker {specification}")
+    return rendered[len(prefix) : -len(suffix)] + "\n"
+
+
+def require_generated_ownership(
+    parser: PageParser, label: str, expected_specification: str | None = None
+) -> None:
+    """Reject content outside the one typed generator-owned container."""
+    if not parser.require_generated_container:
+        return
+    if len(parser.generated_container_specs) != 1:
+        raise ValueError(f"{label}: expected exactly one typed generated container")
+    if (
+        expected_specification is not None
+        and parser.generated_container_specs != [expected_specification]
+    ):
+        raise ValueError(f"{label}: generated container specification differs")
+    if parser.unowned_generated_tags or parser.unowned_generated_text:
+        raise ValueError(
+            f"{label}: generated region contains unowned tags/text: "
+            f"{parser.unowned_generated_tags}, {parser.unowned_generated_text}"
+        )
 
 
 def validate_record_blocks(
@@ -751,6 +859,7 @@ def validate_record_blocks(
     label: str,
 ) -> None:
     """Require exact membership, heading, attributes, order, and field values."""
+    require_generated_ownership(parser, label)
     if parser.record_like_outside_canonical:
         raise ValueError(
             f"{label}: record-like structure exists outside the exact canonical article: "
@@ -967,6 +1076,7 @@ def require_index_rows(
     allow_canonical_record: bool = False,
 ) -> None:
     """Require exact structured dynamic-row membership, attributes, order, and text."""
+    require_generated_ownership(parser, label)
     if parser.record_like_outside_canonical:
         raise ValueError(
             f"{label}: record-like structure is forbidden outside an exact canonical article: "
@@ -1250,7 +1360,16 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
             text,
         ):
             body = match.group(2)
+            if body != expected_marker_body(match.group(1), catalog, revision):
+                raise ValueError(
+                    f"staged marker {match.group(1)} differs from exact generated serialization"
+                )
             body_parser = parse_record_html(body, f"staged marker {match.group(1)}")
+            require_generated_ownership(
+                body_parser,
+                f"staged marker {match.group(1)}",
+                match.group(1),
+            )
             marker_parsers.append(body_parser)
             assert_metadata(
                 body_parser,
@@ -1399,6 +1518,13 @@ def check_scaled_human_fixture(
             if specification in parsed_markers:
                 raise ValueError(f"scaled fixture duplicates marker {specification}")
             parser = parse_record_html(body, f"scaled marker {specification}")
+            if body != expected_marker_body(specification, catalog, revision):
+                raise ValueError(
+                    f"scaled marker {specification} differs from exact generated serialization"
+                )
+            require_generated_ownership(
+                parser, f"scaled marker {specification}", specification
+            )
             assert_metadata(parser, catalog, revision, f"scaled marker {specification}")
             parsed_markers[specification] = parser
     expected_specs = {"overview", "project-original", "source-index", "status", "topic-index"}
@@ -1734,6 +1860,16 @@ def run_staged_mutation_tests(
                 "<!-- formalization-status-generated:end -->",
                 f'<section id="record-{record_id}"><dl><dt>Status</dt>'
                 "<dd>implemented</dd></dl></section>\n"
+                "<!-- formalization-status-generated:end -->",
+                1,
+            ),
+        ),
+        (
+            "source projection unowned paragraph",
+            source_relative,
+            source_text.replace(
+                "</div>\n<!-- formalization-status-generated:end -->",
+                "<p>poison</p>\n</div>\n"
                 "<!-- formalization-status-generated:end -->",
                 1,
             ),
@@ -2262,12 +2398,14 @@ def run_self_tests() -> None:
         )
         rendered_stripped_record_html = (
             '<article class="page-layout"><!-- formalization-status-generated:start source fixture -->'
+            '<div data-formalization-generated="source fixture">'
             + stripped_record_html
-            + "<!-- formalization-status-generated:end --></article>"
+            + "</div><!-- formalization-status-generated:end --></article>"
         )
         require_index_rows(
             parse_record_html(
                 '<article class="page-layout"><!-- formalization-status-generated:start source fixture -->'
+                '<div data-formalization-generated="source fixture"></div>'
                 "<!-- formalization-status-generated:end --></article>",
                 "clean rendered marker scope",
             ),
