@@ -1089,12 +1089,16 @@ def check_workflow_invariants(repo_root: Path) -> None:
     if len(jobs) != 2:
         raise ValueError("formalization workflow lacks one jobs block")
     job_names = re.findall(r"(?m)^  ([A-Za-z0-9_-]+):\n    ", jobs[1])
-    if job_names != ["build", "deploy"]:
+    if job_names != ["build", "deploy", "verify-publication"]:
         raise ValueError(
-            f"formalization workflow must contain exactly build then deploy: {job_names}"
+            "formalization workflow must contain exactly build, deploy, then "
+            f"verify-publication: {job_names}"
         )
     workflow_block = jobs[0]
-    build_block, deploy_block = jobs[1].split("\n  deploy:\n", 1)
+    build_block, remaining_jobs = jobs[1].split("\n  deploy:\n", 1)
+    deploy_block, verify_block = remaining_jobs.split(
+        "\n  verify-publication:\n", 1
+    )
     if "concurrency:" in workflow_block or "concurrency:" in build_block:
         raise ValueError("Pages concurrency must be scoped only to the deploy job")
     for token in lean_forbidden:
@@ -1110,6 +1114,7 @@ def check_workflow_invariants(repo_root: Path) -> None:
         "actions/jekyll-build-pages@v1",
         "actions/upload-pages-artifact@v4",
         "timeout-minutes: 5",
+        "python3 scripts/check_live_formalization_site.py --self-test",
         "cmp .self-local/tmp/catalog.json "
         ".self-local/tmp/formalization-site-a/source/formalization-status/v1/catalog.json",
         "--expected-catalog .self-local/tmp/catalog.json",
@@ -1142,6 +1147,39 @@ def check_workflow_invariants(repo_root: Path) -> None:
     for token in deploy_required:
         if token not in deploy_block:
             raise ValueError(f"Pages deploy job lacks required invariant: {token}")
+    verify_required = (
+        "if: github.event_name == 'push' && github.ref == 'refs/heads/main'",
+        "needs: deploy",
+        "timeout-minutes: 5",
+        "permissions:\n      contents: read",
+        "uses: actions/checkout@v6",
+        "python3 scripts/check_live_formalization_site.py",
+        "--base-url https://phasetr.github.io/lattice-system/",
+        '--revision "$GITHUB_SHA"',
+        "--attempts 7",
+        "--initial-delay 5",
+        "--timeout 10",
+    )
+    for token in verify_required:
+        if token not in verify_block:
+            raise ValueError(
+                f"live publication verification lacks required invariant: {token}"
+            )
+    for token in (*competing_tokens, "environment:", "concurrency:"):
+        if token in verify_block:
+            raise ValueError(
+                f"live publication verification has forbidden capability: {token}"
+            )
+    verify_permissions = re.findall(
+        r"(?m)^    permissions:\n((?:      [^\n]+\n)+)", verify_block
+    )
+    if verify_permissions != ["      contents: read\n"]:
+        raise ValueError(
+            "live publication verification permissions must be exactly contents: read"
+        )
+    strict_guard = "if: github.event_name == 'push' && github.ref == 'refs/heads/main'"
+    if pages.count(strict_guard) != 2:
+        raise ValueError("deploy and live verification must share the exact main-push guard")
     if pages.count("actions/deploy-pages@v4") != 1:
         raise ValueError("formalization workflow must have exactly one Pages deploy action")
     if pages.count("concurrency:") != 1 or pages.count("group: pages") != 1:
