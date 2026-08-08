@@ -47,6 +47,10 @@ not included in `catalog.json`, so the stable machine artifact is deterministic
 for unchanged canonical inputs. While the catalogue state is `prototype`, the
 [complete interim legacy catalogue](/lattice-system/formalization/legacy/)
 remains authoritative until Issue #5228 performs the audited cutover.
+When the state becomes `authoritative`, the same generated metadata instead
+links to and names the validated version 1 catalogue as the current authority.
+The staged and rendered checkers derive this choice from `catalog_state`; a
+state flip with stale prototype authority prose is rejected.
 
 Stable publication paths are:
 
@@ -71,6 +75,7 @@ python3 scripts/validate_formalization_status.py --self-test \
   --emit-aggregate .self-local/tmp/catalog.json \
   --emit-lean-check .self-local/tmp/formalization-axioms.lean
 lake env lean .self-local/tmp/formalization-axioms.lean
+python3 scripts/check_formalization_cutover.py --self-test
 python3 scripts/generate_formalization_site.py --self-test \
   --output-dir .self-local/tmp/formalization-site \
   --revision LOCAL
@@ -122,7 +127,8 @@ three versioned JSON resources (`catalog.json`, `schema.json`, and
 `https://phasetr.github.io/lattice-system/` base. The standard-library checker
 requires HTTP 200 and the expected content type, exact generated metadata and
 catalog-derived ordered overview/source/topic/status rows, schema version 1,
-prototype catalogue state, matching input digests, a published schema equal to
+a supported matching catalogue state (`prototype` or `authoritative`),
+matching input digests, a published schema equal to
 the checked-out canonical schema, and a publication revision equal to the
 triggering `main` SHA. Redirects are rejected before following, every response
 has a two-MiB hard limit, and one 240-second absolute deadline bounds complete

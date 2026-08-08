@@ -469,17 +469,30 @@ def required_page(site: Path, relative: str, pages: dict[Path, PageParser]) -> P
 
 def assert_metadata(parser: PageParser, catalog: dict[str, Any], revision: str, label: str) -> None:
     """Require visible state, schema, digest, revision, and generated notice."""
+    authoritative = catalog["catalog_state"] == "authoritative"
+    authority_phrase = (
+        "validated version 1 catalogue"
+        if authoritative
+        else "complete interim legacy catalogue"
+    )
     text = " ".join(" ".join(parser.text).split())
     for expected in (
         "Generated formalization-status view",
-        "complete interim legacy catalogue",
+        authority_phrase,
     ):
         if expected not in text:
             raise ValueError(f"{label}: missing generated metadata {expected!r}")
     catalog_href = f"{BASEURL}/formalization-status/v1/catalog.json"
     schema_href = f"{BASEURL}/formalization-status/v1/schema.json"
     publication_href = f"{BASEURL}/formalization-status/v1/publication.json"
-    authority_href = f"{BASEURL}/formalization/legacy/"
+    authority_href = (
+        catalog_href if authoritative else f"{BASEURL}/formalization/legacy/"
+    )
+    authority_label = (
+        "Current authority: validated version 1 catalogue"
+        if authoritative
+        else "Current authority: complete interim legacy catalogue"
+    )
     expected_rows = [
         ("catalog-state", None, None, f"Catalogue state: {catalog['catalog_state']}"),
         ("schema-version", None, None, f"Schema version: {catalog['schema_version']}"),
@@ -497,7 +510,7 @@ def assert_metadata(parser: PageParser, catalog: dict[str, Any], revision: str, 
             "authority-link",
             authority_href,
             authority_href,
-            "Current authority: complete interim legacy catalogue",
+            authority_label,
         ),
     ]
     if parser.metadata_rows != expected_rows:
@@ -716,7 +729,7 @@ def expected_overview_index_rows(
                 ("topic-count", str(len(catalog["topics"]))),
             ),
             None,
-            f"This prototype snapshot contains {len(catalog['records'])} records, "
+            f"This {catalog['catalog_state']} snapshot contains {len(catalog['records'])} records, "
             f"{len(catalog['sources'])} sources, and {len(catalog['topics'])} topics.",
         )
     ]
@@ -1968,6 +1981,31 @@ def run_self_tests() -> None:
             {"catalog_state": "prototype", "input_sha256": "0" * 64, "schema_version": 1},
             "r",
             "metadata collision fixture",
+        )
+        authoritative_metadata = (
+            metadata_fixture.replace(
+                "complete interim legacy catalogue",
+                "validated version 1 catalogue",
+            )
+            .replace("Catalogue state: prototype", "Catalogue state: authoritative")
+            .replace(
+                'data-href="/lattice-system/formalization/legacy/"',
+                'data-href="/lattice-system/formalization-status/v1/catalog.json"',
+            )
+            .replace(
+                'href="/lattice-system/formalization/legacy/"',
+                'href="/lattice-system/formalization-status/v1/catalog.json"',
+            )
+        )
+        assert_metadata(
+            parse_record_html(authoritative_metadata, "authoritative metadata fixture"),
+            {
+                "catalog_state": "authoritative",
+                "input_sha256": "0" * 64,
+                "schema_version": 1,
+            },
+            "r",
+            "authoritative metadata fixture",
         )
         require_structure_rejection(
             metadata_fixture.replace(

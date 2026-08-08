@@ -281,6 +281,8 @@ enums, Lean names, and module/path patterns already impose stricter grammars.
 - `catalog_state` (`prototype` until #5228, then `authoritative`);
 - the registry paths;
 - an explicit sorted `record_shards` list;
+- an optional fixed `cutover_baseline` path, which can only be
+  `cutover-baseline.json` and is mandatory in authoritative state;
 - the stable human and machine publication roots.
 
 The deterministic aggregate records `catalog_state`, `generated_by`,
@@ -288,7 +290,8 @@ The deterministic aggregate records `catalog_state`, `generated_by`,
 `source_items`, `sources`, and `topics`; every aggregate array is sorted by
 stable ID. `input_sha256` hashes the canonical manifest first, followed by its
 listed canonical inputs (schema, registries, then explicitly listed shards),
-all with path framing. The generated aggregate is not a manifest input, so no
+followed by the cutover baseline when owned, all with path framing. The
+generated aggregate is not a manifest input, so no
 self-reference arises. Including the manifest ensures `catalog_state`, shard
 ownership, and publication-root changes alter the digest. Repeated generation
 from unchanged inputs must produce identical bytes. Prototype records are included only when
@@ -306,6 +309,51 @@ resolution, and deterministic output. Neither layer replaces the other. The
 startup parity check is deliberately narrower than structural validation: it
 guards constants and conditional rules duplicated by semantic code or the
 generator, while closed vocabularies and patterns are derived from the schema.
+
+## Cutover baseline and staged governance draft
+
+The optional `cutover-baseline.json` is historical coverage evidence, not a
+second status database. It reconstructs exactly 2,052 catalogue rows from
+`docs/index.md` at commit
+`6519099024bf156b87ac0c807c6633c513792581`. Every row stores its ordinal,
+former source line, exact UTF-8 row SHA-256, one closed outcome, and sorted
+mapped record IDs. A `mapped` row maps one or more exact structured records and
+has no reason. A `not_a_declaration` row maps none and supplies a concise
+reason. This permits grouped Markdown rows to expand without pretending that
+every historical table entry was one Lean declaration.
+
+The baseline also stores sorted, disjoint `cutover_record_ids` and
+`non_legacy_record_ids`. The former is exactly the union of all row mappings
+and the latter. Normally a record already present in the prototype maps to its
+legacy row; prototype age is not an exemption. At cutover every cutover ID must
+exist in the validated catalogue. After cutover, new records may be added
+without rewriting historical evidence, but deletion of any cutover ID remains
+an error. The cutover checker and validator share the exact pinned-row
+reconstruction while retaining separate manifest/catalogue entry points.
+The validator names the four records published by the accepted prototype and
+requires each to occur in a legacy-row mapping rather than the non-legacy set.
+
+The post-cutover authority and theorem-PR rules are staged here for review but
+do not take effect while `catalog_state` is `prototype`:
+
+1. Lean source owns declaration existence, kind, statement, namespace, and
+   actual axiom closure.
+2. Validated manifest-owned records own formalization status, capstone identity,
+   provenance, topics, and declared non-standard axiom dependencies.
+3. Generated human and machine views are publication artifacts and are never
+   edited as status input.
+4. `tex/proof-guide.tex` and hand-written explanatory pages own mathematical
+   motivation and proof narrative; they may repeat names and citations for
+   exposition, but do not own progress state.
+5. Tracking Issues and synchronized mirrors own current/next work. Designated
+   history pages and Git history own historical narrative.
+
+After the atomic authority flip, every theorem PR updates its canonical record
+and registries/shards when needed, runs schema, exact Lean-axiom, cutover,
+generation, and rendered-view gates, and updates the proof guide for the
+required mathematical exposition. Generated views remain uncommitted. Until
+that flip, theorem PRs continue to update the complete legacy catalogue and
+the proof guide under the existing repository rules.
 
 ## Publication contract for Issue #5229
 
@@ -377,6 +425,9 @@ library and checks:
 - deterministic aggregate generation and input digest.
 - inline-render safety for every human-view field, including newline and
   control-character regressions.
+- optional strict cutover-baseline structure, exact pinned hashes and row
+  outcomes, mapping/non-legacy disjointness and reachability, and immutable
+  cutover-record retention; authoritative state requires that evidence.
 
 The current prototype exercises non-Tasaki data through the Nielsen--Chuang
 cross-check of the Tasaki Pauli presentation, Tasaki's attribution of Theorem

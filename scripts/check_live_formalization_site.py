@@ -201,10 +201,12 @@ def verify_responses(
     if catalog.get("schema_version") != 1 or publication.get("schema_version") != 1:
         raise ValueError("catalog/publication schema_version must both equal 1")
     if (
-        catalog.get("catalog_state") != "prototype"
-        or publication.get("catalog_state") != "prototype"
+        catalog.get("catalog_state") not in {"prototype", "authoritative"}
+        or publication.get("catalog_state") != catalog.get("catalog_state")
     ):
-        raise ValueError("catalog/publication catalog_state must both equal prototype")
+        raise ValueError(
+            "catalog/publication catalog_state must match a supported catalogue state"
+        )
     if not isinstance(digest, str) or SHA256_RE.fullmatch(digest) is None:
         raise ValueError("catalog input_sha256 is invalid")
     if publication.get("input_sha256") != digest:
@@ -292,19 +294,29 @@ def verify_with_retry(
     raise ValueError(f"live publication check failed after {attempts} attempt(s): {last_error}")
 
 
-def fixture_responses(revision: str) -> dict[str, Response]:
+def fixture_responses(
+    revision: str, catalog_state: str = "prototype"
+) -> dict[str, Response]:
     """Build a coherent in-memory publication for dependency-free self-tests."""
     digest = "a" * 64
     catalog_href = "/lattice-system/formalization-status/v1/catalog.json"
     schema_href = "/lattice-system/formalization-status/v1/schema.json"
     publication_href = "/lattice-system/formalization-status/v1/publication.json"
-    authority_href = "/lattice-system/formalization/legacy/"
+    authoritative = catalog_state == "authoritative"
+    authority_href = (
+        catalog_href if authoritative else "/lattice-system/formalization/legacy/"
+    )
+    authority_label = (
+        "Current authority: validated version 1 catalogue"
+        if authoritative
+        else "Current authority: complete interim legacy catalogue"
+    )
     book_href = "/lattice-system/formalization/sources/book/"
     foundations_href = "/lattice-system/formalization/sources/foundations/"
     topic_href = "/lattice-system/formalization/topics/spin/"
     metadata = (
         '<p>Generated formalization-status view.</p><ul data-generated-metadata="true">'
-        '<li data-meta="catalog-state">Catalogue state: prototype</li>'
+        f'<li data-meta="catalog-state">Catalogue state: {catalog_state}</li>'
         '<li data-meta="schema-version">Schema version: 1</li>'
         f'<li data-meta="input-sha256">Input SHA-256: {digest}</li>'
         f'<li data-meta="revision">Deploy revision: {revision}</li>'
@@ -315,13 +327,12 @@ def fixture_responses(revision: str) -> dict[str, Response]:
         f'<li data-meta="publication-link" data-href="{publication_href}">'
         f'<a href="{publication_href}">Build metadata: publication sidecar</a></li>'
         f'<li data-meta="authority-link" data-href="{authority_href}">'
-        f'<a href="{authority_href}">Current authority: complete interim legacy '
-        "catalogue</a></li></ul>"
+        f'<a href="{authority_href}">{authority_label}</a></li></ul>'
     )
     human = {
         "formalization/": metadata
         + '<ul><li data-row-kind="overview-counts" data-record-count="1" '
-        + 'data-source-count="1" data-topic-count="1">This prototype snapshot '
+        + f'data-source-count="1" data-topic-count="1">This {catalog_state} snapshot '
         + "contains 1 records, 1 sources, and 1 topics.</li></ul>"
         + '<ul><li data-row-kind="overview-navigation" data-navigation-id="sources" '
         + 'data-href="/lattice-system/formalization/sources/"><a '
@@ -355,7 +366,7 @@ def fixture_responses(revision: str) -> dict[str, Response]:
     }
     catalog = {
         "schema_version": 1,
-        "catalog_state": "prototype",
+        "catalog_state": catalog_state,
         "input_sha256": digest,
         "sources": [{"id": "book", "title": "Book"}],
         "source_items": [{"id": "book-item", "source_id": "book"}],
@@ -376,7 +387,7 @@ def fixture_responses(revision: str) -> dict[str, Response]:
     }
     publication = {
         "schema_version": 1,
-        "catalog_state": "prototype",
+        "catalog_state": catalog_state,
         "input_sha256": digest,
         "revision": revision,
     }
@@ -401,6 +412,13 @@ def run_self_tests() -> None:
     fixture = fixture_responses(revision)
     canonical_schema = fixture[JSON_ENDPOINTS[1]].body
     verify_responses(fixture, PAGES_BASE, revision, canonical_schema)
+    authoritative_fixture = fixture_responses(revision, "authoritative")
+    verify_responses(
+        authoritative_fixture,
+        PAGES_BASE,
+        revision,
+        authoritative_fixture[JSON_ENDPOINTS[1]].body,
+    )
     mutations: list[tuple[str, dict[str, Response]]] = []
 
     def mutate(endpoint: str, old: bytes, new: bytes) -> dict[str, Response]:

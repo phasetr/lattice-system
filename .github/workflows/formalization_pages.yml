@@ -24,6 +24,7 @@ jobs:
           date +%s > .self-local/tmp/formalization-pages-start
           python3 scripts/check_docs_hierarchy.py
           python3 scripts/validate_formalization_status.py --self-test --emit-aggregate .self-local/tmp/catalog.json
+          python3 scripts/check_formalization_cutover.py --self-test
           python3 scripts/check_live_formalization_site.py --self-test
 
       - name: Generate the staged site twice

@@ -13,11 +13,21 @@ import sys
 from pathlib import Path
 from typing import Any, Iterable
 
+from formalization_cutover import (
+    CUTOVER_BASELINE_KEYS,
+    LEGACY_ROW_KEYS,
+    reconstruct_legacy_rows,
+    self_test as cutover_self_test,
+    validate_cutover_baseline,
+    validate_cutover_requirement,
+)
+
 
 SCHEMA_VERSION = 1
 GENERATOR_VERSION = 2
 MANIFEST_KEYS = {
     "catalog_state",
+    "cutover_baseline",
     "human_publication_root",
     "machine_publication_root",
     "record_shards",
@@ -25,6 +35,7 @@ MANIFEST_KEYS = {
     "schema",
     "schema_version",
 }
+MANIFEST_REQUIRED_KEYS = MANIFEST_KEYS - {"cutover_baseline"}
 REGISTRY_KEYS = {"source_items", "sources", "topics"}
 SHARD_KEYS = {"records", "schema_version", "source_id", "source_unit"}
 RELATION_RANK = {
@@ -199,7 +210,9 @@ class Contract:
         checks = (
             ("aggregate", expected_aggregate, expected_aggregate),
             ("declaration_record", expected_record, expected_record),
-            ("manifest", MANIFEST_KEYS, MANIFEST_KEYS),
+            ("cutover_baseline", CUTOVER_BASELINE_KEYS, CUTOVER_BASELINE_KEYS),
+            ("cutover_legacy_row", LEGACY_ROW_KEYS, LEGACY_ROW_KEYS),
+            ("manifest", MANIFEST_KEYS, MANIFEST_REQUIRED_KEYS),
             ("record_shard", SHARD_KEYS, SHARD_KEYS),
             ("source", expected_source, expected_source_required),
             ("source_item", expected_item, expected_item),
@@ -279,6 +292,14 @@ class Contract:
             manifest_shards.get("type") == "array"
             and manifest_shards.get("uniqueItems") is True,
             "schema parity: manifest shard-array constraints drifted",
+        )
+        baseline_rows = self.defs["cutover_baseline"]["properties"]["legacy_rows"]
+        self.validation.require(
+            baseline_rows.get("minItems") == 2052
+            and baseline_rows.get("maxItems") == 2052
+            and self.defs["manifest"]["properties"].get("cutover_baseline", {}).get("const")
+            == "cutover-baseline.json",
+            "schema parity: cutover baseline cardinality/path drifted",
         )
         self.validation.require(
             self.declaration_kinds
@@ -1939,6 +1960,58 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
         malformed_members_validation,
     )
     check(bool(malformed_members_validation.errors), "malformed registry members were accepted")
+
+    baseline_rows = [
+        {
+            **row,
+            "mapped_record_ids": [],
+            "outcome": "not_a_declaration",
+            "reason": "Schema self-test fixture.",
+        }
+        for row in reconstruct_legacy_rows(repo_root)
+    ]
+    baseline_rows[0].update(
+        mapped_record_ids=["fixture-record"], outcome="mapped", reason=None
+    )
+    baseline_fixture = {
+        "baseline_commit": "6519099024bf156b87ac0c807c6633c513792581",
+        "baseline_path": "docs/index.md",
+        "cutover_record_ids": ["fixture-record"],
+        "legacy_rows": baseline_rows,
+        "non_legacy_record_ids": [],
+        "schema_version": 1,
+    }
+    baseline_schema_validation = Validation()
+    validate_schema_instance(
+        baseline_fixture,
+        contract.schema,
+        contract.schema,
+        "cutover baseline self-test",
+        baseline_schema_validation,
+    )
+    check(
+        not baseline_schema_validation.errors,
+        "valid cutover baseline schema fixture was rejected",
+    )
+    for label, mutation in (
+        ("short row array", lambda value: value["legacy_rows"].pop()),
+        (
+            "mapped row without IDs",
+            lambda value: value["legacy_rows"][0].update(mapped_record_ids=[]),
+        ),
+        ("unknown field", lambda value: value.update(unknown=True)),
+    ):
+        mutated = copy.deepcopy(baseline_fixture)
+        mutation(mutated)
+        mutation_validation = Validation()
+        validate_schema_instance(
+            mutated,
+            contract.schema,
+            contract.schema,
+            f"cutover baseline mutation: {label}",
+            mutation_validation,
+        )
+        check(bool(mutation_validation.errors), f"cutover schema accepted {label}")
     return failures
 
 
@@ -1962,7 +2035,7 @@ def main() -> int:
     if not isinstance(manifest, dict):
         validation.errors.append("manifest.json: expected object")
         return report_errors(validation.errors)
-    validation.keys(manifest, MANIFEST_KEYS, MANIFEST_KEYS, "manifest.json")
+    validation.keys(manifest, MANIFEST_KEYS, MANIFEST_REQUIRED_KEYS, "manifest.json")
     validation.require(manifest.get("schema_version") == SCHEMA_VERSION, "manifest.json: bad version")
     schema_path = manifest.get("schema")
     safe_schema_path = safe_expected_relative_path(
@@ -1984,6 +2057,8 @@ def main() -> int:
     if args.self_test:
         for failure in run_self_tests(contract, repo_root):
             validation.errors.append(f"self-test: {failure}")
+        for failure in cutover_self_test(repo_root):
+            validation.errors.append(f"cutover self-test: {failure}")
     catalog_states = contract.enum("catalog_state")
     validation.require(manifest.get("catalog_state") in catalog_states, "manifest.json: bad catalog state")
     registries = manifest.get("registries")
@@ -2021,11 +2096,26 @@ def main() -> int:
             isinstance(value, str) and value.startswith("/lattice-system/") and value.endswith("/"),
             f"manifest.json.{field}: invalid publication root",
         )
+    baseline_declared = manifest.get("cutover_baseline")
+    validation.errors.extend(
+        validate_cutover_requirement(manifest.get("catalog_state"), baseline_declared)
+    )
+    safe_baseline_path: Path | None = None
+    if baseline_declared is not None:
+        safe_baseline_path = safe_expected_relative_path(
+            root,
+            baseline_declared,
+            "cutover-baseline.json",
+            "manifest.json.cutover_baseline",
+            validation,
+        )
     listed_paths = [schema_path]
     listed_paths.extend(
         safe_registry_paths[key][0] for key in sorted(safe_registry_paths)
     )
     listed_paths.extend(shard for shard in shards if shard in safe_shard_paths)
+    if isinstance(baseline_declared, str) and safe_baseline_path is not None:
+        listed_paths.append(baseline_declared)
     expected_json = {"manifest.json", *listed_paths}
     actual_json = {str(path.relative_to(root)) for path in root.rglob("*.json")}
     validation.require(
@@ -2038,6 +2128,8 @@ def main() -> int:
         **{declared: safe for declared, safe in safe_registry_paths.values()},
         **safe_shard_paths,
     }
+    if isinstance(baseline_declared, str) and safe_baseline_path is not None:
+        safe_listed_paths[baseline_declared] = safe_baseline_path
     for path in listed_paths[1:]:
         safe_path = safe_listed_paths.get(path)
         if safe_path is None:
@@ -2059,6 +2151,13 @@ def main() -> int:
         topics,
         validation,
     )
+    if isinstance(baseline_declared, str):
+        baseline = data.get(baseline_declared)
+        if baseline is not None:
+            for error in validate_cutover_baseline(
+                baseline, records, reconstruct_legacy_rows(repo_root)
+            ):
+                validation.errors.append(error)
     validate_prototype_coverage(
         manifest.get("catalog_state"), shard_data, records, source_items, validation
     )

@@ -63,6 +63,148 @@
         "prototype"
       ]
     },
+    "cutover_baseline": {
+      "additionalProperties": false,
+      "properties": {
+        "baseline_commit": {
+          "const": "6519099024bf156b87ac0c807c6633c513792581"
+        },
+        "baseline_path": {
+          "const": "docs/index.md"
+        },
+        "cutover_record_ids": {
+          "items": {
+            "$ref": "#/$defs/stable_id"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "legacy_rows": {
+          "items": {
+            "$ref": "#/$defs/cutover_legacy_row"
+          },
+          "maxItems": 2052,
+          "minItems": 2052,
+          "type": "array"
+        },
+        "non_legacy_record_ids": {
+          "items": {
+            "$ref": "#/$defs/stable_id"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "schema_version": {
+          "const": 1
+        }
+      },
+      "required": [
+        "baseline_commit",
+        "baseline_path",
+        "cutover_record_ids",
+        "legacy_rows",
+        "non_legacy_record_ids",
+        "schema_version"
+      ],
+      "type": "object"
+    },
+    "cutover_legacy_row": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "mapped"
+              }
+            },
+            "required": [
+              "outcome"
+            ]
+          },
+          "then": {
+            "properties": {
+              "mapped_record_ids": {
+                "minItems": 1
+              },
+              "reason": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "not_a_declaration"
+              }
+            },
+            "required": [
+              "outcome"
+            ]
+          },
+          "then": {
+            "properties": {
+              "mapped_record_ids": {
+                "maxItems": 0
+              },
+              "reason": {
+                "$ref": "#/$defs/inline_text"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "legacy_source_line": {
+          "maximum": 2730,
+          "minimum": 239,
+          "type": "integer"
+        },
+        "mapped_record_ids": {
+          "items": {
+            "$ref": "#/$defs/stable_id"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "ordinal": {
+          "maximum": 2052,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "outcome": {
+          "enum": [
+            "mapped",
+            "not_a_declaration"
+          ]
+        },
+        "reason": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/inline_text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "row_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "legacy_source_line",
+        "mapped_record_ids",
+        "ordinal",
+        "outcome",
+        "reason",
+        "row_sha256"
+      ],
+      "type": "object"
+    },
     "declaration_kind": {
       "enum": [
         "abbrev",
@@ -414,6 +556,9 @@
         "catalog_state": {
           "$ref": "#/$defs/catalog_state"
         },
+        "cutover_baseline": {
+          "const": "cutover-baseline.json"
+        },
         "human_publication_root": {
           "pattern": "^/lattice-system/.+/$",
           "type": "string"
@@ -754,6 +899,9 @@
   "oneOf": [
     {
       "$ref": "#/$defs/aggregate"
+    },
+    {
+      "$ref": "#/$defs/cutover_baseline"
     },
     {
       "$ref": "#/$defs/manifest"

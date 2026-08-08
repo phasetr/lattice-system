@@ -133,9 +133,25 @@ def human_status(record: dict[str, Any]) -> str:
 
 def metadata(aggregate: dict[str, Any], revision: str) -> list[str]:
     """Return the visible provenance header shared by every generated view."""
+    authoritative = aggregate["catalog_state"] == "authoritative"
+    authority_notice = (
+        "> The validated version 1 catalogue is authoritative for formalization status."
+        if authoritative
+        else "> The interim legacy catalogue remains authoritative until Issue #5228."
+    )
+    authority_href = (
+        "/lattice-system/formalization-status/v1/catalog.json"
+        if authoritative
+        else "/lattice-system/formalization/legacy/"
+    )
+    authority_label = (
+        "Current authority: validated version 1 catalogue"
+        if authoritative
+        else "Current authority: complete interim legacy catalogue"
+    )
     return [
         "> **Generated formalization-status view.** Do not edit this section by hand.",
-        "> The interim legacy catalogue remains authoritative until Issue #5228.",
+        authority_notice,
         "",
         '<ul data-generated-metadata="true">',
         f'<li data-meta="catalog-state">Catalogue state: {html_text(aggregate["catalog_state"])}</li>',
@@ -145,7 +161,7 @@ def metadata(aggregate: dict[str, Any], revision: str) -> list[str]:
         '<li data-meta="catalog-link" data-href="/lattice-system/formalization-status/v1/catalog.json"><a href="/lattice-system/formalization-status/v1/catalog.json">Machine data: version 1 catalogue</a></li>',
         '<li data-meta="schema-link" data-href="/lattice-system/formalization-status/v1/schema.json"><a href="/lattice-system/formalization-status/v1/schema.json">Schema: version 1 schema</a></li>',
         '<li data-meta="publication-link" data-href="/lattice-system/formalization-status/v1/publication.json"><a href="/lattice-system/formalization-status/v1/publication.json">Build metadata: publication sidecar</a></li>',
-        '<li data-meta="authority-link" data-href="/lattice-system/formalization/legacy/"><a href="/lattice-system/formalization/legacy/">Current authority: complete interim legacy catalogue</a></li>',
+        f'<li data-meta="authority-link" data-href="{authority_href}"><a href="{authority_href}">{authority_label}</a></li>',
         "</ul>",
         "",
     ]
@@ -264,7 +280,7 @@ def render_marker(
                         "source-count": len(sources),
                         "topic-count": len(topics),
                     },
-                    f"This prototype snapshot contains {len(records)} records, "
+                    f"This {aggregate['catalog_state']} snapshot contains {len(records)} records, "
                     f"{len(sources)} sources, and {len(topics)} topics.",
                 ),
                 "</ul>",
@@ -337,14 +353,26 @@ def render_marker(
         selected = [record for record in records if source_for_record(record, source_items, argument)]
         lines.extend(("## Generated records related to this source", ""))
         if not selected:
-            lines.extend(("No prototype record currently has a typed relation to this source.", ""))
+            lines.extend(
+                (
+                    f"No {aggregate['catalog_state']} record currently has a typed "
+                    "relation to this source.",
+                    "",
+                )
+            )
         for record in selected:
             lines.extend(record_lines(record, source_items, sources, argument))
     elif kind == "project-original" and argument is None:
         selected = [record for record in records if record["origin"] == "project_original"]
         lines.extend(("## Generated project-original foundation records", ""))
         if not selected:
-            lines.extend(("No project-original record is present in this prototype catalogue.", ""))
+            lines.extend(
+                (
+                    "No project-original record is present in this "
+                    f"{aggregate['catalog_state']} catalogue.",
+                    "",
+                )
+            )
         for record in selected:
             lines.extend(record_lines(record, source_items, sources))
     elif kind == "topic-index" and argument is None:
