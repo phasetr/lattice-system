@@ -63,6 +63,334 @@
         "prototype"
       ]
     },
+    "cutover_baseline": {
+      "additionalProperties": false,
+      "properties": {
+        "baseline_commit": {
+          "const": "6519099024bf156b87ac0c807c6633c513792581"
+        },
+        "baseline_path": {
+          "const": "docs/index.md"
+        },
+        "cutover_record_ids": {
+          "items": {
+            "$ref": "#/$defs/stable_id"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "legacy_rows": {
+          "items": {
+            "$ref": "#/$defs/cutover_legacy_row"
+          },
+          "maxItems": 2052,
+          "minItems": 2052,
+          "type": "array"
+        },
+        "non_legacy_record_ids": {
+          "items": {
+            "$ref": "#/$defs/stable_id"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "schema_version": {
+          "const": 1
+        }
+      },
+      "required": [
+        "baseline_commit",
+        "baseline_path",
+        "cutover_record_ids",
+        "legacy_rows",
+        "non_legacy_record_ids",
+        "schema_version"
+      ],
+      "type": "object"
+    },
+    "cutover_certificate": {
+      "additionalProperties": false,
+      "properties": {
+        "baseline_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "cutover_record_ids_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "exceptional_mappings": {
+          "items": {
+            "$ref": "#/$defs/cutover_exceptional_mapping"
+          },
+          "type": "array"
+        },
+        "legacy_mapping_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "non_record_ordinals": {
+          "items": {
+            "maximum": 2052,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "retired_declarations": {
+          "items": {
+            "$ref": "#/$defs/cutover_retired_declaration"
+          },
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1
+        }
+      },
+      "required": [
+        "baseline_sha256",
+        "cutover_record_ids_sha256",
+        "exceptional_mappings",
+        "legacy_mapping_sha256",
+        "non_record_ordinals",
+        "retired_declarations",
+        "schema_version"
+      ],
+      "type": "object"
+    },
+    "cutover_exceptional_mapping": {
+      "additionalProperties": false,
+      "properties": {
+        "expected_lean_names": {
+          "items": {
+            "$ref": "#/$defs/lean_name"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "ordinal": {
+          "maximum": 2052,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "row_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "expected_lean_names",
+        "ordinal",
+        "row_sha256"
+      ],
+      "type": "object"
+    },
+    "cutover_legacy_row": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "retired"
+              }
+            },
+            "required": [
+              "outcome"
+            ]
+          },
+          "then": {
+            "properties": {
+              "disposition": {
+                "const": "retired_declarations"
+              },
+              "mapped_record_ids": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "mapped"
+              }
+            },
+            "required": [
+              "outcome"
+            ]
+          },
+          "then": {
+            "properties": {
+              "disposition": {
+                "type": "null"
+              },
+              "mapped_record_ids": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "not_a_declaration"
+              }
+            },
+            "required": [
+              "outcome"
+            ]
+          },
+          "then": {
+            "properties": {
+              "disposition": {
+                "const": "non_declaration"
+              },
+              "mapped_record_ids": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "disposition": {
+          "oneOf": [
+            {
+              "const": "non_declaration"
+            },
+            {
+              "const": "retired_declarations"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "legacy_declaration_refs": {
+          "items": {
+            "$ref": "#/$defs/inline_text"
+          },
+          "type": "array"
+        },
+        "legacy_first_cell": {
+          "$ref": "#/$defs/inline_text"
+        },
+        "legacy_grouping_syntax": {
+          "items": {
+            "enum": [
+              "abbreviated",
+              "brace",
+              "multiple",
+              "plain_etc",
+              "signature",
+              "slash",
+              "wildcard"
+            ]
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "legacy_plain_text": {
+          "pattern": "^(?![\\s\\S]*[\\u0000-\\u001F\\u007F-\\u009F])[\\s\\S]*$",
+          "type": "string"
+        },
+        "legacy_source_line": {
+          "maximum": 2730,
+          "minimum": 239,
+          "type": "integer"
+        },
+        "mapped_record_ids": {
+          "items": {
+            "$ref": "#/$defs/stable_id"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "ordinal": {
+          "maximum": 2052,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "outcome": {
+          "enum": [
+            "mapped",
+            "not_a_declaration",
+            "retired"
+          ]
+        },
+        "row_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "disposition",
+        "legacy_declaration_refs",
+        "legacy_first_cell",
+        "legacy_grouping_syntax",
+        "legacy_plain_text",
+        "legacy_source_line",
+        "mapped_record_ids",
+        "ordinal",
+        "outcome",
+        "row_sha256"
+      ],
+      "type": "object"
+    },
+    "cutover_retired_declaration": {
+      "additionalProperties": false,
+      "properties": {
+        "deletion_commit": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        "former_lean_name": {
+          "$ref": "#/$defs/lean_name"
+        },
+        "former_path": {
+          "pattern": "^LatticeSystem/[A-Za-z0-9_./-]+\\.lean$",
+          "type": "string"
+        },
+        "legacy_leaf": {
+          "pattern": "^[A-Za-z_\\u0080-\\uFFFF][A-Za-z0-9_'\\u0080-\\uFFFF]*$",
+          "type": "string"
+        },
+        "ordinal": {
+          "maximum": 2052,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "reason": {
+          "$ref": "#/$defs/inline_text"
+        },
+        "replacement_record_ids": {
+          "items": {
+            "$ref": "#/$defs/stable_id"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "row_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "deletion_commit",
+        "former_lean_name",
+        "former_path",
+        "legacy_leaf",
+        "ordinal",
+        "reason",
+        "row_sha256"
+      ],
+      "type": "object"
+    },
     "declaration_kind": {
       "enum": [
         "abbrev",
@@ -414,6 +742,12 @@
         "catalog_state": {
           "$ref": "#/$defs/catalog_state"
         },
+        "cutover_baseline": {
+          "const": "cutover-baseline.json"
+        },
+        "cutover_certificate": {
+          "const": "cutover-certificate.json"
+        },
         "human_publication_root": {
           "pattern": "^/lattice-system/.+/$",
           "type": "string"
@@ -754,6 +1088,12 @@
   "oneOf": [
     {
       "$ref": "#/$defs/aggregate"
+    },
+    {
+      "$ref": "#/$defs/cutover_baseline"
+    },
+    {
+      "$ref": "#/$defs/cutover_certificate"
     },
     {
       "$ref": "#/$defs/manifest"

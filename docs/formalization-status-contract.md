@@ -281,6 +281,9 @@ enums, Lean names, and module/path patterns already impose stricter grammars.
 - `catalog_state` (`prototype` until #5228, then `authoritative`);
 - the registry paths;
 - an explicit sorted `record_shards` list;
+- optional paired fixed `cutover_baseline` and `cutover_certificate` paths,
+  which can only name `cutover-baseline.json` and
+  `cutover-certificate.json` and are mandatory in authoritative state;
 - the stable human and machine publication roots.
 
 The deterministic aggregate records `catalog_state`, `generated_by`,
@@ -288,7 +291,9 @@ The deterministic aggregate records `catalog_state`, `generated_by`,
 `source_items`, `sources`, and `topics`; every aggregate array is sorted by
 stable ID. `input_sha256` hashes the canonical manifest first, followed by its
 listed canonical inputs (schema, registries, then explicitly listed shards),
-all with path framing. The generated aggregate is not a manifest input, so no
+followed by the cutover baseline and certificate when owned, all with path
+framing. Present/absent and order regressions are tested independently. The
+generated aggregate is not a manifest input, so no
 self-reference arises. Including the manifest ensures `catalog_state`, shard
 ownership, and publication-root changes alter the digest. Repeated generation
 from unchanged inputs must produce identical bytes. Prototype records are included only when
@@ -306,6 +311,119 @@ resolution, and deterministic output. Neither layer replaces the other. The
 startup parity check is deliberately narrower than structural validation: it
 guards constants and conditional rules duplicated by semantic code or the
 generator, while closed vocabularies and patterns are derived from the schema.
+
+## Cutover baseline and staged governance draft
+
+The optional `cutover-baseline.json` is historical coverage evidence, not a
+second status database. It reconstructs exactly 2,052 catalogue rows from
+`docs/index.md` at commit
+`6519099024bf156b87ac0c807c6633c513792581`. Every row stores its ordinal,
+former source line, exact UTF-8 row SHA-256, one closed outcome, and sorted
+mapped record IDs. It also stores the exact backtick declaration references
+extracted from the former first table cell. A `mapped` row maps one or more
+exact structured records and has no disposition; normal mappings must bind the
+record's exact Lean leaf name to one of those references, including the audited
+unambiguous single brace or slash groups, comma-separated cells, and
+multiple-backtick references. A single reference containing more than one
+group is never assigned Cartesian, zipped, paired, or cyclic semantics by the
+checker. The exact
+first-cell text, text outside backticks (including literal `etc.`), and derived
+closed grouping-syntax tags are also pinned. Mechanically expandable groups
+require equality between the complete expanded leaf set and the coverage set;
+mapping only the first member is rejected. A row may bind exact retired
+declaration evidence: its complete expected legacy set must equal the
+disjoint union of current mapped leaves and certified retired leaves. Mixed
+rows remain `mapped` and must retain at least one current record. A pure-retired
+row uses the closed `retired` outcome, no current record IDs, and the
+`retired_declarations` disposition. A `not_a_declaration` row
+maps none and uses only the closed
+`non_declaration` disposition. Such a row is accepted only when its exact
+legacy cell has no declaration reference and its ordinal occurs in the paired
+certificate. A free-form explanation or `waived` disposition cannot turn a
+declaration-bearing row into a non-record. This permits grouped Markdown rows to expand without
+pretending that every historical table entry was one Lean declaration.
+
+The baseline also stores sorted, disjoint `cutover_record_ids` and
+`non_legacy_record_ids`. The former is exactly the union of all row mappings
+and the latter. Normally a record already present in the prototype maps to its
+legacy row; prototype age is not an exemption. At cutover every cutover ID must
+exist in the validated catalogue. After cutover, new records may be added
+without rewriting historical evidence, but deletion of any cutover ID remains
+an error. The cutover checker and validator share the exact pinned-row
+reconstruction while retaining separate manifest/catalogue entry points.
+The validator names the four records published by the accepted prototype and
+requires each to occur in a legacy-row mapping rather than the non-legacy set.
+
+For grouping syntax such as plain `etc.`, wildcards, legacy abbreviations,
+multiple groups in one reference, declaration signatures with arguments, or
+prose/symbolic backtick tokens that cannot be expanded deterministically as
+Lean identifiers, the certificate stores the row
+ordinal, exact row hash, and the complete sorted fully qualified expected Lean
+names. Those names must equal the mapped and certified-retired declarations
+bidirectionally and must also equal an independently audited, code-pinned set
+for that ordinal. The baseline and certificate therefore cannot self-certify a
+different interpretation by changing both mappings and expected names together.
+An exceptional ordinal absent from the code-pinned evidence is rejected. Future
+migration PRs must deliberately extend that reviewed table as they add audited
+non-mechanical mappings. Such an exception is rejected for a nongrouped row,
+and unused or missing exceptional entries are errors.
+
+Retirement is not a free-form escape from coverage. Each certificate entry
+binds one exact row hash, ordinal, legacy leaf, former fully qualified Lean
+name, former `LatticeSystem/**/*.lean` path, and a
+40-hex deletion commit plus a nonempty reason. The validator proves that the
+commit is in current history, changes that exact path, the parent version
+declares the exact fully qualified name, the commit version removes it (or the
+file), and the current Lean tree and current catalogue no longer declare it.
+The shared source inventory tracks nested namespaces, leading attributes, and
+declaration modifiers rather than relying on terminal-name substring scans.
+Optional sorted replacement record IDs must exist. Entries are sorted and unique
+by ordinal/leaf; wrong-row, survivor, fabricated-history, overlapping-current,
+missing, extra, and unused retirement evidence is rejected. This model applies
+uniformly to any number of absent historical leaves, including mixed rows whose
+other declarations survive.
+
+The paired certificate hashes the exact canonical baseline bytes, the sorted
+cutover-ID projection, and the complete ordinal/outcome/disposition/mapping/row
+hash projection. It also freezes the sorted non-record and exceptional-mapping
+ordinal/name evidence and the complete deletion-history evidence. While the catalogue remains a prototype, introducing
+this pair
+is a freeze gate: the current record-ID set must equal `cutover_record_ids`, so
+an omitted current record is rejected. The atomic cutover PR must pin the
+canonical certificate's SHA-256 in the validator while changing state to
+`authoritative`. Thereafter the certificate fingerprint is independent of the
+editable baseline fields: shrinking cutover IDs, remapping rows, or replacing
+the certificate fails. Authoritative catalogues may add post-cutover records,
+but must retain every certified cutover ID. Changing the pinned fingerprint is
+an explicit new audited cutover, not routine catalogue maintenance.
+
+JSON Schema keeps both manifest evidence fields structurally optional because
+prototype catalogues before the freeze own neither file. Runtime semantics
+require the pair together and require both in authoritative state; schema
+conditional tests and runtime state-transition tests cover that deliberate
+division.
+
+The post-cutover authority and theorem-PR rules are staged here for review but
+do not take effect while `catalog_state` is `prototype`:
+
+1. Lean source owns declaration existence, kind, statement, namespace, and
+   actual axiom closure.
+2. Validated manifest-owned records own formalization status, capstone identity,
+   provenance, topics, and declared non-standard axiom dependencies.
+3. Generated human and machine views are publication artifacts and are never
+   edited as status input.
+4. `tex/proof-guide.tex` and hand-written explanatory pages own mathematical
+   motivation and proof narrative; they may repeat names and citations for
+   exposition, but do not own progress state.
+5. Tracking Issues and synchronized mirrors own current/next work. Designated
+   history pages and Git history own historical narrative.
+
+After the atomic authority flip, every theorem PR updates its canonical record
+and registries/shards when needed, runs schema, exact Lean-axiom, cutover,
+generation, and rendered-view gates, and updates the proof guide for the
+required mathematical exposition. Generated views remain uncommitted. Until
+that flip, theorem PRs continue to update the complete legacy catalogue and
+the proof guide under the existing repository rules.
 
 ## Publication contract for Issue #5229
 
@@ -377,6 +495,9 @@ library and checks:
 - deterministic aggregate generation and input digest.
 - inline-render safety for every human-view field, including newline and
   control-character regressions.
+- optional strict cutover-baseline structure, exact pinned hashes and row
+  outcomes, mapping/non-legacy disjointness and reachability, and immutable
+  cutover-record retention; authoritative state requires that evidence.
 
 The current prototype exercises non-Tasaki data through the Nielsen--Chuang
 cross-check of the Tasaki Pauli presentation, Tasaki's attribution of Theorem

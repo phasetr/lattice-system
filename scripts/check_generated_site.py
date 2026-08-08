@@ -20,6 +20,18 @@ from urllib.parse import unquote, urlsplit
 BASEURL = "/lattice-system"
 DIGEST_RE = re.compile(r"[0-9a-f]{64}")
 REPO_ROOT = Path(__file__).resolve().parents[1]
+AUTHORITATIVE_FORBIDDEN_PHRASES = (
+    "catalogue state: prototype",
+    "complete interim legacy catalogue",
+    "interim legacy catalogue remains authoritative",
+    "accepted prototype contract",
+    "the json catalogue is a non-authoritative prototype",
+    "prototype navigation only",
+    "remains incomplete and non-authoritative until the governance cutover",
+    "this remains prototype-only status data",
+    "until issue #5228",
+    "version 1 structured catalogue is not yet complete or authoritative",
+)
 
 
 class PageParser(html.parser.HTMLParser):
@@ -360,6 +372,31 @@ def load_catalog(path: Path) -> tuple[dict[str, Any], bytes]:
     return data, raw
 
 
+def manifest_input_names(manifest: dict[str, Any]) -> list[str]:
+    """Return the exact validator input order, including paired cutover evidence."""
+    listed = [manifest["schema"]]
+    listed.extend(manifest["registries"][key] for key in sorted(manifest["registries"]))
+    listed.extend(manifest["record_shards"])
+    baseline = manifest.get("cutover_baseline")
+    certificate = manifest.get("cutover_certificate")
+    if (baseline is None) != (certificate is None):
+        raise ValueError("manifest cutover baseline and certificate must be paired")
+    if baseline is not None:
+        listed.extend([baseline, certificate])
+    return listed
+
+
+def framed_input_digest(inputs: list[tuple[str, bytes]]) -> str:
+    """Hash canonical manifest inputs with the validator's exact path framing."""
+    digest = hashlib.sha256()
+    for name, raw in inputs:
+        digest.update(name.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(raw)
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
 def recompute_input_digest(catalog: dict[str, Any]) -> None:
     """Independently recompute aggregate content and the framed input digest."""
     root = REPO_ROOT / "formalization-status/v1"
@@ -375,19 +412,13 @@ def recompute_input_digest(catalog: dict[str, Any]) -> None:
             raise ValueError(f"manifest input escapes the catalogue root: {name!r}")
         return candidate
 
-    listed = [manifest["schema"]]
-    listed.extend(manifest["registries"][key] for key in sorted(manifest["registries"]))
-    listed.extend(manifest["record_shards"])
-    digest = hashlib.sha256()
-    for name, raw in [
+    listed = manifest_input_names(manifest)
+    digest_inputs = [
         ("manifest.json", manifest_raw),
         *[(name, input_path(name).read_bytes()) for name in listed],
-    ]:
-        digest.update(name.encode("utf-8"))
-        digest.update(b"\0")
-        digest.update(raw)
-        digest.update(b"\0")
-    if digest.hexdigest() != catalog["input_sha256"]:
+    ]
+    digest = framed_input_digest(digest_inputs)
+    if digest != catalog["input_sha256"]:
         raise ValueError("expected catalogue input_sha256 does not match canonical manifest inputs")
     registries = {
         key: json.loads(input_path(path).read_text(encoding="utf-8"))
@@ -400,7 +431,7 @@ def recompute_input_digest(catalog: dict[str, Any]) -> None:
         "catalog_state": manifest["catalog_state"],
         "generated_by": "scripts/validate_formalization_status.py",
         "generator_version": 2,
-        "input_sha256": digest.hexdigest(),
+        "input_sha256": digest,
         "records": sorted(records, key=lambda item: item["id"]),
         "schema_version": manifest["schema_version"],
         "source_items": sorted(registries["source_items"]["source_items"], key=lambda item: item["id"]),
@@ -467,19 +498,47 @@ def required_page(site: Path, relative: str, pages: dict[Path, PageParser]) -> P
     return pages[path]
 
 
+def reject_authority_contradictions(
+    catalog: dict[str, Any], texts: list[tuple[str, str]]
+) -> None:
+    """Reject stale prototype/legacy-authority claims across an authoritative tree."""
+    if catalog.get("catalog_state") != "authoritative":
+        return
+    for label, text in texts:
+        lowered = " ".join(text.lower().split())
+        for phrase in AUTHORITATIVE_FORBIDDEN_PHRASES:
+            if phrase in lowered:
+                raise ValueError(
+                    f"{label}: authoritative publication contains stale authority prose {phrase!r}"
+                )
+
+
 def assert_metadata(parser: PageParser, catalog: dict[str, Any], revision: str, label: str) -> None:
     """Require visible state, schema, digest, revision, and generated notice."""
+    authoritative = catalog["catalog_state"] == "authoritative"
+    authority_phrase = (
+        "validated version 1 catalogue"
+        if authoritative
+        else "complete interim legacy catalogue"
+    )
     text = " ".join(" ".join(parser.text).split())
     for expected in (
         "Generated formalization-status view",
-        "complete interim legacy catalogue",
+        authority_phrase,
     ):
         if expected not in text:
             raise ValueError(f"{label}: missing generated metadata {expected!r}")
     catalog_href = f"{BASEURL}/formalization-status/v1/catalog.json"
     schema_href = f"{BASEURL}/formalization-status/v1/schema.json"
     publication_href = f"{BASEURL}/formalization-status/v1/publication.json"
-    authority_href = f"{BASEURL}/formalization/legacy/"
+    authority_href = (
+        catalog_href if authoritative else f"{BASEURL}/formalization/legacy/"
+    )
+    authority_label = (
+        "Current authority: validated version 1 catalogue"
+        if authoritative
+        else "Current authority: complete interim legacy catalogue"
+    )
     expected_rows = [
         ("catalog-state", None, None, f"Catalogue state: {catalog['catalog_state']}"),
         ("schema-version", None, None, f"Schema version: {catalog['schema_version']}"),
@@ -497,7 +556,7 @@ def assert_metadata(parser: PageParser, catalog: dict[str, Any], revision: str, 
             "authority-link",
             authority_href,
             authority_href,
-            "Current authority: complete interim legacy catalogue",
+            authority_label,
         ),
     ]
     if parser.metadata_rows != expected_rows:
@@ -716,7 +775,7 @@ def expected_overview_index_rows(
                 ("topic-count", str(len(catalog["topics"]))),
             ),
             None,
-            f"This prototype snapshot contains {len(catalog['records'])} records, "
+            f"This {catalog['catalog_state']} snapshot contains {len(catalog['records'])} records, "
             f"{len(catalog['sources'])} sources, and {len(catalog['topics'])} topics.",
         )
     ]
@@ -834,6 +893,13 @@ def check_built_site(
         raise ValueError("publication sidecar metadata does not match the build")
 
     pages = parse_site(site)
+    reject_authority_contradictions(
+        catalog,
+        [
+            (str(path.relative_to(site)), " ".join(parser.text))
+            for path, parser in pages.items()
+        ],
+    )
     check_links(site, pages)
     overview = required_page(site, "formalization/index.html", pages)
     status = required_page(site, "formalization/status/index.html", pages)
@@ -950,6 +1016,13 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
     if publication.get("input_sha256") != catalog["input_sha256"]:
         raise ValueError("staged publication sidecar has the wrong catalogue digest")
     generated_files = sorted((source / "formalization").rglob("*.md"))
+    reject_authority_contradictions(
+        catalog,
+        [
+            (str(path.relative_to(source)), path.read_text(encoding="utf-8"))
+            for path in sorted(source.rglob("*.md"))
+        ],
+    )
     marker_specs: set[str] = set()
     for path in generated_files:
         text = path.read_text(encoding="utf-8")
@@ -1578,6 +1651,74 @@ def run_staged_mutation_tests(
 
 def run_self_tests() -> None:
     """Exercise duplicate-ID, unsafe-path, fragment, and byte-mismatch failures."""
+    manifest_fixture = {
+        "schema": "schema.json",
+        "registries": {"topics": "topics.json", "sources": "sources.json"},
+        "record_shards": ["records/a.json"],
+    }
+    expected_without_cutover = [
+        "schema.json",
+        "sources.json",
+        "topics.json",
+        "records/a.json",
+    ]
+    if manifest_input_names(manifest_fixture) != expected_without_cutover:
+        raise AssertionError("manifest digest order without cutover evidence drifted")
+    with_cutover = {
+        **manifest_fixture,
+        "cutover_baseline": "cutover-baseline.json",
+        "cutover_certificate": "cutover-certificate.json",
+    }
+    if manifest_input_names(with_cutover) != [
+        *expected_without_cutover,
+        "cutover-baseline.json",
+        "cutover-certificate.json",
+    ]:
+        raise AssertionError("manifest digest order with cutover evidence drifted")
+    absent_manifest_raw = canonical_json(manifest_fixture)
+    absent_digest = framed_input_digest(
+        [("manifest.json", absent_manifest_raw),
+         *[(name, name.encode("utf-8")) for name in expected_without_cutover]]
+    )
+    present_names = manifest_input_names(with_cutover)
+    present_manifest_raw = canonical_json(with_cutover)
+    present_digest = framed_input_digest(
+        [("manifest.json", present_manifest_raw),
+         *[(name, name.encode("utf-8")) for name in present_names]]
+    )
+    reordered_names = [*present_names[:-2], *reversed(present_names[-2:])]
+    reordered_digest = framed_input_digest(
+        [("manifest.json", present_manifest_raw),
+         *[(name, name.encode("utf-8")) for name in reordered_names]]
+    )
+    if len({absent_digest, present_digest, reordered_digest}) != 3:
+        raise AssertionError("cutover digest presence/order is not cryptographically visible")
+    for incomplete in (
+        {**manifest_fixture, "cutover_baseline": "cutover-baseline.json"},
+        {**manifest_fixture, "cutover_certificate": "cutover-certificate.json"},
+    ):
+        try:
+            manifest_input_names(incomplete)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("unpaired optional cutover digest input was accepted")
+    reject_authority_contradictions(
+        {"catalog_state": "prototype"},
+        [("prototype fixture", "The interim legacy catalogue remains authoritative")],
+    )
+    for phrase in AUTHORITATIVE_FORBIDDEN_PHRASES:
+        try:
+            reject_authority_contradictions(
+                {"catalog_state": "authoritative"},
+                [("authoritative contradiction fixture", phrase)],
+            )
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(
+                f"authoritative stale-authority phrase was accepted: {phrase}"
+            )
     assert publication_file(
         Path("/tmp/site"), "/lattice-system/formalization/"
     ) == Path("/tmp/site/formalization/index.html").resolve()
@@ -1968,6 +2109,31 @@ def run_self_tests() -> None:
             {"catalog_state": "prototype", "input_sha256": "0" * 64, "schema_version": 1},
             "r",
             "metadata collision fixture",
+        )
+        authoritative_metadata = (
+            metadata_fixture.replace(
+                "complete interim legacy catalogue",
+                "validated version 1 catalogue",
+            )
+            .replace("Catalogue state: prototype", "Catalogue state: authoritative")
+            .replace(
+                'data-href="/lattice-system/formalization/legacy/"',
+                'data-href="/lattice-system/formalization-status/v1/catalog.json"',
+            )
+            .replace(
+                'href="/lattice-system/formalization/legacy/"',
+                'href="/lattice-system/formalization-status/v1/catalog.json"',
+            )
+        )
+        assert_metadata(
+            parse_record_html(authoritative_metadata, "authoritative metadata fixture"),
+            {
+                "catalog_state": "authoritative",
+                "input_sha256": "0" * 64,
+                "schema_version": 1,
+            },
+            "r",
+            "authoritative metadata fixture",
         )
         require_structure_rejection(
             metadata_fixture.replace(
