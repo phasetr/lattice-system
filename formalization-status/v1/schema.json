@@ -119,14 +119,11 @@
           "pattern": "^[0-9a-f]{64}$",
           "type": "string"
         },
-        "exceptional_mapping_ordinals": {
+        "exceptional_mappings": {
           "items": {
-            "maximum": 2052,
-            "minimum": 1,
-            "type": "integer"
+            "$ref": "#/$defs/cutover_exceptional_mapping"
           },
-          "type": "array",
-          "uniqueItems": true
+          "type": "array"
         },
         "legacy_mapping_sha256": {
           "pattern": "^[0-9a-f]{64}$",
@@ -148,10 +145,38 @@
       "required": [
         "baseline_sha256",
         "cutover_record_ids_sha256",
-        "exceptional_mapping_ordinals",
+        "exceptional_mappings",
         "legacy_mapping_sha256",
         "non_record_ordinals",
         "schema_version"
+      ],
+      "type": "object"
+    },
+    "cutover_exceptional_mapping": {
+      "additionalProperties": false,
+      "properties": {
+        "expected_lean_names": {
+          "items": {
+            "$ref": "#/$defs/lean_name"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "ordinal": {
+          "maximum": 2052,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "row_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "expected_lean_names",
+        "ordinal",
+        "row_sha256"
       ],
       "type": "object"
     },
@@ -220,6 +245,27 @@
           },
           "type": "array"
         },
+        "legacy_first_cell": {
+          "$ref": "#/$defs/inline_text"
+        },
+        "legacy_grouping_syntax": {
+          "items": {
+            "enum": [
+              "abbreviated",
+              "brace",
+              "multiple",
+              "plain_etc",
+              "slash",
+              "wildcard"
+            ]
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "legacy_plain_text": {
+          "pattern": "^(?![\\s\\S]*[\\u0000-\\u001F\\u007F-\\u009F])[\\s\\S]*$",
+          "type": "string"
+        },
         "legacy_source_line": {
           "maximum": 2730,
           "minimum": 239,
@@ -251,6 +297,9 @@
       "required": [
         "disposition",
         "legacy_declaration_refs",
+        "legacy_first_cell",
+        "legacy_grouping_syntax",
+        "legacy_plain_text",
         "legacy_source_line",
         "mapped_record_ids",
         "ordinal",

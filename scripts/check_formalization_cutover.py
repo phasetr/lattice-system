@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from formalization_cutover import (
+    exceptional_mapping_map,
     reconstruct_legacy_rows,
     self_test,
     validate_cutover_baseline,
@@ -70,13 +71,16 @@ def main() -> int:
                     records,
                 )
             )
+            exceptional_mappings, _exceptional_errors = exceptional_mapping_map(
+                certificate.get("exceptional_mappings")
+            )
             failures.extend(
                 validate_cutover_baseline(
                     baseline,
                     records,
                     reconstruct_legacy_rows(repo_root),
                     set(certificate.get("non_record_ordinals", [])),
-                    set(certificate.get("exceptional_mapping_ordinals", [])),
+                    exceptional_mappings,
                 )
             )
     if failures:

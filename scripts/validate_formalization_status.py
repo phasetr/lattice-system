@@ -16,7 +16,9 @@ from typing import Any, Iterable
 from formalization_cutover import (
     CUTOVER_BASELINE_KEYS,
     CUTOVER_CERTIFICATE_KEYS,
+    CUTOVER_EXCEPTIONAL_MAPPING_KEYS,
     LEGACY_ROW_KEYS,
+    exceptional_mapping_map,
     reconstruct_legacy_rows,
     self_test as cutover_self_test,
     validate_cutover_baseline,
@@ -215,6 +217,11 @@ class Contract:
             ("declaration_record", expected_record, expected_record),
             ("cutover_baseline", CUTOVER_BASELINE_KEYS, CUTOVER_BASELINE_KEYS),
             ("cutover_certificate", CUTOVER_CERTIFICATE_KEYS, CUTOVER_CERTIFICATE_KEYS),
+            (
+                "cutover_exceptional_mapping",
+                CUTOVER_EXCEPTIONAL_MAPPING_KEYS,
+                CUTOVER_EXCEPTIONAL_MAPPING_KEYS,
+            ),
             ("cutover_legacy_row", LEGACY_ROW_KEYS, LEGACY_ROW_KEYS),
             ("manifest", MANIFEST_KEYS, MANIFEST_REQUIRED_KEYS),
             ("record_shard", SHARD_KEYS, SHARD_KEYS),
@@ -2021,6 +2028,16 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
             "non-record row without disposition",
             lambda value: value["legacy_rows"][1].update(disposition=None),
         ),
+        (
+            "unclosed waived disposition",
+            lambda value: value["legacy_rows"][1].update(disposition="waived"),
+        ),
+        (
+            "unknown grouping syntax",
+            lambda value: value["legacy_rows"][1].update(
+                legacy_grouping_syntax=["unknown"]
+            ),
+        ),
         ("unknown field", lambda value: value.update(unknown=True)),
     ):
         mutated = copy.deepcopy(baseline_fixture)
@@ -2037,7 +2054,7 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
     certificate_fixture = {
         "baseline_sha256": "0" * 64,
         "cutover_record_ids_sha256": "1" * 64,
-        "exceptional_mapping_ordinals": [],
+        "exceptional_mappings": [],
         "legacy_mapping_sha256": "2" * 64,
         "non_record_ordinals": [2],
         "schema_version": 1,
@@ -2059,6 +2076,18 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
         ("duplicate ordinal", lambda value: value.update(non_record_ordinals=[2, 2])),
         ("out-of-range ordinal", lambda value: value.update(non_record_ordinals=[2053])),
         ("bad digest", lambda value: value.update(baseline_sha256="bad")),
+        (
+            "malformed exceptional mapping",
+            lambda value: value.update(
+                exceptional_mappings=[
+                    {
+                        "expected_lean_names": ["not-qualified"],
+                        "ordinal": 1,
+                        "row_sha256": "0" * 64,
+                    }
+                ]
+            ),
+        ),
         ("unknown field", lambda value: value.update(unknown=True)),
     ):
         mutated = copy.deepcopy(certificate_fixture)
@@ -2242,13 +2271,15 @@ def main() -> int:
                 )
             )
             non_record_ordinals = certificate.get("non_record_ordinals", [])
-            exceptional_ordinals = certificate.get("exceptional_mapping_ordinals", [])
+            exceptional_mappings, _exceptional_errors = exceptional_mapping_map(
+                certificate.get("exceptional_mappings")
+            )
             for error in validate_cutover_baseline(
                 baseline,
                 records,
                 reconstruct_legacy_rows(repo_root),
                 set(non_record_ordinals) if isinstance(non_record_ordinals, list) else set(),
-                set(exceptional_ordinals) if isinstance(exceptional_ordinals, list) else set(),
+                exceptional_mappings,
             ):
                 validation.errors.append(error)
     validate_prototype_coverage(

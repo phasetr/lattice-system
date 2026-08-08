@@ -27,6 +27,9 @@ CUTOVER_BASELINE_KEYS = {
 LEGACY_ROW_KEYS = {
     "disposition",
     "legacy_declaration_refs",
+    "legacy_first_cell",
+    "legacy_grouping_syntax",
+    "legacy_plain_text",
     "legacy_source_line",
     "mapped_record_ids",
     "ordinal",
@@ -38,10 +41,15 @@ DISPOSITIONS = {"non_declaration"}
 CUTOVER_CERTIFICATE_KEYS = {
     "baseline_sha256",
     "cutover_record_ids_sha256",
-    "exceptional_mapping_ordinals",
+    "exceptional_mappings",
     "legacy_mapping_sha256",
     "non_record_ordinals",
     "schema_version",
+}
+CUTOVER_EXCEPTIONAL_MAPPING_KEYS = {
+    "expected_lean_names",
+    "ordinal",
+    "row_sha256",
 }
 # PR E must replace this with the SHA-256 of the independently audited canonical
 # certificate in the same atomic change that flips the catalogue authority.
@@ -77,11 +85,28 @@ def reconstruct_legacy_rows(repo_root: Path) -> list[dict[str, Any]]:
             continue
         if source_line < len(lines) and _is_separator(lines[source_line]):
             continue
+        first_cell = line.removeprefix("| ").split(" | ", 1)[0]
+        references = re.findall(r"`([^`]+)`", first_cell)
+        plain_text = re.sub(r"`[^`]*`", "", first_cell).strip()
+        grouping_syntax: list[str] = []
+        if any("{" in ref or "}" in ref for ref in references):
+            grouping_syntax.append("brace")
+        if any("/" in ref for ref in references):
+            grouping_syntax.append("slash")
+        if any("*" in ref for ref in references):
+            grouping_syntax.append("wildcard")
+        if re.search(r"\betc\.", plain_text, flags=re.IGNORECASE):
+            grouping_syntax.append("plain_etc")
+        if len(references) > 1 or "," in plain_text:
+            grouping_syntax.append("multiple")
+        if any(ref.startswith("_") for ref in references):
+            grouping_syntax.append("abbreviated")
         rows.append(
             {
-                "legacy_declaration_refs": re.findall(
-                    r"`([^`]+)`", line.removeprefix("| ").split(" | ", 1)[0]
-                ),
+                "legacy_declaration_refs": references,
+                "legacy_first_cell": first_cell,
+                "legacy_grouping_syntax": sorted(grouping_syntax),
+                "legacy_plain_text": plain_text,
                 "legacy_source_line": source_line,
                 "ordinal": len(rows) + 1,
                 "row_sha256": hashlib.sha256(line.encode("utf-8")).hexdigest(),
@@ -125,6 +150,67 @@ def _legacy_ref_matches_leaf(reference: str, leaf: str) -> bool:
     return leaf in {prefix + choice + suffix for choice in choices}
 
 
+def _expand_braces(value: str) -> list[str] | None:
+    """Expand deterministic comma-separated brace products in one legacy name."""
+    match = re.search(r"\{([^{}]+)\}", value)
+    if match is None:
+        return [value]
+    choices = match.group(1).split(",")
+    if not choices or any(not re.fullmatch(r"[A-Za-z0-9_']+", item) for item in choices):
+        return None
+    expanded: list[str] = []
+    for choice in choices:
+        children = _expand_braces(value[: match.start()] + choice + value[match.end() :])
+        if children is None:
+            return None
+        expanded.extend(children)
+    return expanded
+
+
+def _expand_slash(value: str) -> list[str] | None:
+    """Expand deterministic camel-case or numeric slash products."""
+    if "/" not in value:
+        return [value]
+    match = re.fullmatch(
+        r"([^/]*)([A-Z][a-z0-9']*|[0-9]+)"
+        r"((?:/(?:[A-Z][a-z0-9']*|[0-9]+))+)(.*)",
+        value,
+    )
+    if match is None:
+        return None
+    prefix, first_choice, alternatives, suffix = match.groups()
+    choices = [first_choice, *alternatives.removeprefix("/").split("/")]
+    result: list[str] = []
+    for choice in choices:
+        children = _expand_slash(prefix + choice + suffix)
+        if children is None:
+            return None
+        result.extend(children)
+    return result
+
+
+def expand_legacy_leaves(row: dict[str, Any]) -> set[str] | None:
+    """Expand mechanically complete legacy references, or require a certificate."""
+    syntax = set(row.get("legacy_grouping_syntax", []))
+    if syntax & {"abbreviated", "plain_etc", "wildcard"}:
+        return None
+    result: set[str] = set()
+    for raw_reference in row.get("legacy_declaration_refs", []):
+        reference_token = raw_reference.split(None, 1)[0]
+        if reference_token.endswith(".lean") or re.match(r"[0-9]", reference_token):
+            return None
+        reference = reference_token.rsplit(".", 1)[-1]
+        brace_expanded = _expand_braces(reference)
+        if brace_expanded is None:
+            return None
+        for expanded in brace_expanded:
+            slash_expanded = _expand_slash(expanded)
+            if slash_expanded is None:
+                return None
+            result.update(slash_expanded)
+    return result if result else None
+
+
 def certificate_projection(baseline: dict[str, Any]) -> tuple[list[str], list[dict[str, Any]]]:
     """Return the immutable ID and row-mapping projections covered by a certificate."""
     cutover_ids = baseline.get("cutover_record_ids", [])
@@ -155,12 +241,12 @@ def validate_cutover_baseline(
     records: Iterable[dict[str, Any]],
     expected_rows: list[dict[str, Any]],
     allowed_non_record_ordinals: set[int] | None = None,
-    exceptional_mapping_ordinals: set[int] | None = None,
+    exceptional_mappings: dict[int, dict[str, Any]] | None = None,
 ) -> list[str]:
     """Validate exhaustive historical coverage and irreversible cutover IDs."""
     errors: list[str] = []
     allowed_non_record_ordinals = allowed_non_record_ordinals or set()
-    exceptional_mapping_ordinals = exceptional_mapping_ordinals or set()
+    exceptional_mappings = exceptional_mappings or {}
     record_map = {
         record.get("id"): record
         for record in records
@@ -209,6 +295,9 @@ def validate_cutover_baseline(
             errors.append(f"{location}: field contract differs")
         for field in (
             "legacy_declaration_refs",
+            "legacy_first_cell",
+            "legacy_grouping_syntax",
+            "legacy_plain_text",
             "ordinal",
             "legacy_source_line",
             "row_sha256",
@@ -230,24 +319,34 @@ def validate_cutover_baseline(
                 errors.append(f"{location}: mapped outcome requires at least one record ID")
             if disposition is not None:
                 errors.append(f"{location}: mapped outcome requires a null disposition")
-            references = row.get("legacy_declaration_refs")
-            if not isinstance(references, list):
-                references = []
-            for record_id in mapped:
-                record = record_map.get(record_id, {})
-                lean_name = record.get("lean_name")
-                leaf = lean_name.rsplit(".", 1)[-1] if isinstance(lean_name, str) else ""
-                if not any(_legacy_ref_matches_leaf(ref, leaf) for ref in references):
-                    grouped_reference = not references or any(
-                        any(marker in ref for marker in ("/", "{", "}", ","))
-                        for ref in references
+            mapped_names = {
+                record_map.get(record_id, {}).get("lean_name") for record_id in mapped
+            }
+            mapped_names.discard(None)
+            mapped_leaves = {
+                name.rsplit(".", 1)[-1] for name in mapped_names if isinstance(name, str)
+            }
+            mechanically_expected = expand_legacy_leaves(row)
+            if mechanically_expected is not None:
+                if mapped_leaves != mechanically_expected:
+                    errors.append(
+                        f"{location}: mapped Lean leaves differ from the complete expanded legacy references"
                     )
-                    if index not in exceptional_mapping_ordinals or not grouped_reference:
-                        errors.append(
-                            f"{location}: mapped record {record_id} is not bound to a legacy declaration reference"
-                        )
-                    else:
-                        needed_exceptional_ordinals.add(index)
+            else:
+                entry = exceptional_mappings.get(index)
+                if not row.get("legacy_grouping_syntax") or entry is None:
+                    errors.append(
+                        f"{location}: non-expandable grouped mapping lacks exact certificate evidence"
+                    )
+                elif (
+                    entry.get("row_sha256") != row.get("row_sha256")
+                    or set(entry.get("expected_lean_names", [])) != mapped_names
+                ):
+                    errors.append(
+                        f"{location}: exceptional certificate names/hash differ from mapped records"
+                    )
+                else:
+                    needed_exceptional_ordinals.add(index)
         elif outcome == "not_a_declaration":
             if mapped:
                 errors.append(f"{location}: not_a_declaration outcome cannot map records")
@@ -263,7 +362,7 @@ def validate_cutover_baseline(
         errors.append(
             "cutover baseline: certificate non-record ordinals differ from row outcomes"
         )
-    if needed_exceptional_ordinals != exceptional_mapping_ordinals:
+    if needed_exceptional_ordinals != set(exceptional_mappings):
         errors.append(
             "cutover baseline: certificate exceptional-mapping ordinals differ from required bindings"
         )
@@ -293,6 +392,40 @@ def _sorted_unique_ordinals(value: Any) -> bool:
         and all(isinstance(item, int) and 1 <= item <= BASELINE_ROW_COUNT for item in value)
         and value == sorted(set(value))
     )
+
+
+def exceptional_mapping_map(value: Any) -> tuple[dict[int, dict[str, Any]], list[str]]:
+    """Validate and index exact certificate evidence for non-expandable groups."""
+    errors: list[str] = []
+    result: dict[int, dict[str, Any]] = {}
+    if not isinstance(value, list):
+        return {}, ["cutover certificate: exceptional_mappings must be an array"]
+    ordinals: list[int] = []
+    for index, entry in enumerate(value, 1):
+        location = f"cutover certificate exceptional mapping {index}"
+        if not isinstance(entry, dict) or set(entry) != CUTOVER_EXCEPTIONAL_MAPPING_KEYS:
+            errors.append(f"{location}: field contract differs")
+            continue
+        ordinal = entry.get("ordinal")
+        names = entry.get("expected_lean_names")
+        if not isinstance(ordinal, int) or not 1 <= ordinal <= BASELINE_ROW_COUNT:
+            errors.append(f"{location}: invalid ordinal")
+            continue
+        ordinals.append(ordinal)
+        if (
+            not _sorted_unique_strings(names)
+            or not names
+            or any(not name.startswith("LatticeSystem.") for name in names)
+        ):
+            errors.append(f"{location}: expected Lean names must be nonempty sorted exact names")
+        if not isinstance(entry.get("row_sha256"), str) or SHA256_RE.fullmatch(
+            entry["row_sha256"]
+        ) is None:
+            errors.append(f"{location}: invalid row SHA-256")
+        result[ordinal] = entry
+    if ordinals != sorted(set(ordinals)):
+        errors.append("cutover certificate: exceptional mappings must be sorted unique ordinals")
+    return result, errors
 
 
 def validate_cutover_certificate(
@@ -326,12 +459,13 @@ def validate_cutover_certificate(
     for field, expected in expected_hashes.items():
         if certificate.get(field) != expected:
             errors.append(f"cutover certificate: {field} does not bind the baseline")
-    for field in ("exceptional_mapping_ordinals", "non_record_ordinals"):
-        if not _sorted_unique_ordinals(certificate.get(field)):
-            errors.append(f"cutover certificate: {field} must be sorted unique ordinals")
-    if set(certificate.get("exceptional_mapping_ordinals", [])) & set(
-        certificate.get("non_record_ordinals", [])
-    ):
+    exceptional_map, exceptional_errors = exceptional_mapping_map(
+        certificate.get("exceptional_mappings")
+    )
+    errors.extend(exceptional_errors)
+    if not _sorted_unique_ordinals(certificate.get("non_record_ordinals")):
+        errors.append("cutover certificate: non_record_ordinals must be sorted unique ordinals")
+    if set(exceptional_map) & set(certificate.get("non_record_ordinals", [])):
         errors.append("cutover certificate: exceptional mappings and non-record rows overlap")
     current_ids = {
         record.get("id")
@@ -378,21 +512,44 @@ def self_test(repo_root: Path) -> list[str]:
     rows = reconstruct_legacy_rows(repo_root)
     fixture_rows: list[dict[str, Any]] = []
     records: list[dict[str, Any]] = []
+    record_by_name: dict[str, str] = {}
     non_record_ordinals: list[int] = []
+    exceptional_entries: list[dict[str, Any]] = []
     for row in rows:
-        references = row["legacy_declaration_refs"]
-        if references:
-            record_id = f"fixture-row-{row['ordinal']:04d}"
+        expected_leaves = expand_legacy_leaves(row)
+        expected_names: list[str]
+        if expected_leaves is not None:
+            expected_names = sorted(
+                f"LatticeSystem.Fixture.{leaf}" for leaf in expected_leaves
+            )
+        elif row["legacy_grouping_syntax"]:
+            base = f"LatticeSystem.Fixture.exceptional_{row['ordinal']:04d}"
+            expected_names = [base + "_a", base + "_b"]
+            exceptional_entries.append(
+                {
+                    "expected_lean_names": expected_names,
+                    "ordinal": row["ordinal"],
+                    "row_sha256": row["row_sha256"],
+                }
+            )
+        else:
+            expected_names = []
+        if expected_names:
+            mapped_ids: list[str] = []
+            for lean_name in expected_names:
+                record_id = record_by_name.get(lean_name)
+                if record_id is None:
+                    record_id = f"fixture-record-{len(records) + 1:04d}"
+                    record_by_name[lean_name] = record_id
+                    records.append({"id": record_id, "lean_name": lean_name})
+                mapped_ids.append(record_id)
             fixture_rows.append(
                 {
                     **row,
                     "disposition": None,
-                    "mapped_record_ids": [record_id],
+                    "mapped_record_ids": sorted(set(mapped_ids)),
                     "outcome": "mapped",
                 }
-            )
-            records.append(
-                {"id": record_id, "lean_name": f"LatticeSystem.Fixture.{references[0]}"}
             )
         else:
             fixture_rows.append(
@@ -433,7 +590,7 @@ def self_test(repo_root: Path) -> list[str]:
     certificate = {
         "baseline_sha256": sha256_bytes(baseline_raw),
         "cutover_record_ids_sha256": sha256_bytes(canonical_bytes(ids)),
-        "exceptional_mapping_ordinals": [],
+        "exceptional_mappings": exceptional_entries,
         "legacy_mapping_sha256": sha256_bytes(canonical_bytes(mappings)),
         "non_record_ordinals": non_record_ordinals,
         "schema_version": 1,
@@ -444,7 +601,7 @@ def self_test(repo_root: Path) -> list[str]:
         records,
         rows,
         set(non_record_ordinals),
-        set(),
+        {entry["ordinal"]: entry for entry in exceptional_entries},
     )
     certificate_errors = validate_cutover_certificate(
         certificate,
@@ -460,6 +617,151 @@ def self_test(repo_root: Path) -> list[str]:
             f"baseline={baseline_errors}, certificate={certificate_errors}"
         )
 
+    mapped_row_index = next(
+        index for index, row in enumerate(baseline["legacy_rows"])
+        if row["outcome"] == "mapped"
+    )
+    non_record_row_index = next(
+        index for index, row in enumerate(baseline["legacy_rows"])
+        if row["outcome"] == "not_a_declaration"
+    )
+    runtime_row_mutations = (
+        (
+            "mapped row without IDs",
+            mapped_row_index,
+            {"mapped_record_ids": []},
+        ),
+        (
+            "mapped row with non-record disposition",
+            mapped_row_index,
+            {"disposition": "non_declaration"},
+        ),
+        (
+            "non-record row with mapped IDs",
+            non_record_row_index,
+            {"mapped_record_ids": [records[0]["id"]]},
+        ),
+        (
+            "non-record row without disposition",
+            non_record_row_index,
+            {"disposition": None},
+        ),
+        (
+            "non-record row with waived disposition",
+            non_record_row_index,
+            {"disposition": "waived"},
+        ),
+    )
+    for label, row_index, mutation in runtime_row_mutations:
+        mutated = copy.deepcopy(baseline)
+        mutated["legacy_rows"][row_index].update(mutation)
+        if not validate_cutover_baseline(
+            mutated,
+            records,
+            rows,
+            set(non_record_ordinals),
+            {entry["ordinal"]: entry for entry in exceptional_entries},
+        ):
+            failures.append(f"runtime row conditional accepted {label}")
+
+    etc_row = next(
+        row for row in fixture_rows if "plain_etc" in row["legacy_grouping_syntax"]
+    )
+    etc_entry = next(
+        entry for entry in exceptional_entries if entry["ordinal"] == etc_row["ordinal"]
+    )
+    if len(set(etc_entry["expected_lean_names"])) < 2:
+        failures.append("plain etc. grouped-row fixture did not bind multiple exact names")
+
+    missing_group_member = copy.deepcopy(baseline)
+    hermitian_row = next(
+        row
+        for row in missing_group_member["legacy_rows"]
+        if row["legacy_first_cell"] == "`pauliX/Y/Z_isHermitian`"
+    )
+    hermitian_row["mapped_record_ids"] = hermitian_row["mapped_record_ids"][:1]
+    if not validate_cutover_baseline(
+        missing_group_member,
+        records,
+        rows,
+        set(non_record_ordinals),
+        {entry["ordinal"]: entry for entry in exceptional_entries},
+    ):
+        failures.append("slash expansion accepted missing Y/Z group members")
+
+    expected_group_expansions = {
+        "`spinHalfOp{1,2,3}`": {
+            "spinHalfOp1",
+            "spinHalfOp2",
+            "spinHalfOp3",
+        },
+        "`spinHalfOpPlus/Minus_conjTranspose`": {
+            "spinHalfOpMinus_conjTranspose",
+            "spinHalfOpPlus_conjTranspose",
+        },
+        "`spinHalfOpPlus/Minus_mulVec_spinHalfUp/Down`": {
+            "spinHalfOpMinus_mulVec_spinHalfDown",
+            "spinHalfOpMinus_mulVec_spinHalfUp",
+            "spinHalfOpPlus_mulVec_spinHalfDown",
+            "spinHalfOpPlus_mulVec_spinHalfUp",
+        },
+        (
+            "`spinHalfRot1_half_pi_conj_spinHalfOp{2,3}` / "
+            "`spinHalfRot2_half_pi_conj_spinHalfOp{3,1}` / "
+            "`spinHalfRot3_half_pi_conj_spinHalfOp{1,2}`"
+        ): {
+            "spinHalfRot1_half_pi_conj_spinHalfOp2",
+            "spinHalfRot1_half_pi_conj_spinHalfOp3",
+            "spinHalfRot2_half_pi_conj_spinHalfOp1",
+            "spinHalfRot2_half_pi_conj_spinHalfOp3",
+            "spinHalfRot3_half_pi_conj_spinHalfOp1",
+            "spinHalfRot3_half_pi_conj_spinHalfOp2",
+        },
+    }
+    for first_cell, expected_expansion in expected_group_expansions.items():
+        source_row = next(row for row in rows if row["legacy_first_cell"] == first_cell)
+        if expand_legacy_leaves(source_row) != expected_expansion:
+            failures.append(f"deterministic slash expansion drifted for {first_cell}")
+
+    uncertified_group = {
+        entry["ordinal"]: entry
+        for entry in exceptional_entries
+        if entry["ordinal"] != etc_row["ordinal"]
+    }
+    if not validate_cutover_baseline(
+        baseline,
+        records,
+        rows,
+        set(non_record_ordinals),
+        uncertified_group,
+    ):
+        failures.append("non-expandable etc. group was accepted without certificate evidence")
+
+    nongrouped = copy.deepcopy(baseline)
+    exact_row = next(
+        row
+        for row in nongrouped["legacy_rows"]
+        if not row["legacy_grouping_syntax"] and row["outcome"] == "mapped"
+    )
+    wrong_record = records[-1]
+    exact_row["mapped_record_ids"] = [wrong_record["id"]]
+    forged_exception = {
+        **{entry["ordinal"]: entry for entry in exceptional_entries},
+        exact_row["ordinal"]: {
+            "expected_lean_names": [wrong_record["lean_name"]],
+            "ordinal": exact_row["ordinal"],
+            "row_sha256": exact_row["row_sha256"],
+        },
+    }
+    if not validate_cutover_baseline(
+        nongrouped,
+        records,
+        rows,
+        set(non_record_ordinals),
+        forged_exception,
+    ):
+        failures.append("nongrouped mismatched row was accepted through certificate evidence")
+
     all_non_record = copy.deepcopy(baseline)
     for row in all_non_record["legacy_rows"]:
         if not any(record_id in PROTOTYPE_RECORD_IDS for record_id in row["mapped_record_ids"]):
@@ -473,7 +775,7 @@ def self_test(repo_root: Path) -> list[str]:
         records,
         rows,
         set(range(1, BASELINE_ROW_COUNT + 1)),
-        set(),
+        {entry["ordinal"]: entry for entry in exceptional_entries},
     ):
         failures.append("all-rows-non-record-except-prototype fixture was accepted")
 

@@ -323,11 +323,16 @@ mapped record IDs. It also stores the exact backtick declaration references
 extracted from the former first table cell. A `mapped` row maps one or more
 exact structured records and has no disposition; normal mappings must bind the
 record's exact Lean leaf name to one of those references, including the audited
-slash shorthand. A `not_a_declaration` row maps none and uses only the closed
+brace, slash, comma-separated, and multiple-backtick shorthands. The exact
+first-cell text, text outside backticks (including literal `etc.`), and derived
+closed grouping-syntax tags are also pinned. Mechanically expandable groups
+require equality between the complete expanded leaf set and mapped record
+leaves; mapping only the first member is rejected. A `not_a_declaration` row
+maps none and uses only the closed
 `non_declaration` disposition. Such a row is accepted only when its exact
 legacy cell has no declaration reference and its ordinal occurs in the paired
-certificate. A free-form explanation cannot turn a declaration-bearing row
-into a non-record. This permits grouped Markdown rows to expand without
+certificate. A free-form explanation or `waived` disposition cannot turn a
+declaration-bearing row into a non-record. This permits grouped Markdown rows to expand without
 pretending that every historical table entry was one Lean declaration.
 
 The baseline also stores sorted, disjoint `cutover_record_ids` and
@@ -341,10 +346,18 @@ reconstruction while retaining separate manifest/catalogue entry points.
 The validator names the four records published by the accepted prototype and
 requires each to occur in a legacy-row mapping rather than the non-legacy set.
 
+For grouping syntax such as plain `etc.`, wildcards, or legacy abbreviations
+that cannot be expanded deterministically, the certificate stores the row
+ordinal, exact row hash, and the complete sorted fully qualified expected Lean
+names. Those names must equal the mapped declarations bidirectionally. Such an
+exception is rejected for a nongrouped row, and unused or missing exceptional
+entries are errors.
+
 The paired certificate hashes the exact canonical baseline bytes, the sorted
 cutover-ID projection, and the complete ordinal/outcome/disposition/mapping/row
 hash projection. It also freezes the sorted non-record and exceptional-mapping
-ordinal lists. While the catalogue remains a prototype, introducing this pair
+ordinal/name evidence. While the catalogue remains a prototype, introducing
+this pair
 is a freeze gate: the current record-ID set must equal `cutover_record_ids`, so
 an omitted current record is rejected. The atomic cutover PR must pin the
 canonical certificate's SHA-256 in the validator while changing state to
@@ -353,6 +366,12 @@ editable baseline fields: shrinking cutover IDs, remapping rows, or replacing
 the certificate fails. Authoritative catalogues may add post-cutover records,
 but must retain every certified cutover ID. Changing the pinned fingerprint is
 an explicit new audited cutover, not routine catalogue maintenance.
+
+JSON Schema keeps both manifest evidence fields structurally optional because
+prototype catalogues before the freeze own neither file. Runtime semantics
+require the pair together and require both in authoritative state; schema
+conditional tests and runtime state-transition tests cover that deliberate
+division.
 
 The post-cutover authority and theorem-PR rules are staged here for review but
 do not take effect while `catalog_state` is `prototype`:

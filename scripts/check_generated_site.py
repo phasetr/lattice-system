@@ -24,7 +24,9 @@ AUTHORITATIVE_FORBIDDEN_PHRASES = (
     "catalogue state: prototype",
     "complete interim legacy catalogue",
     "interim legacy catalogue remains authoritative",
+    "the json catalogue is a non-authoritative prototype",
     "prototype navigation only",
+    "this remains prototype-only status data",
     "until issue #5228",
     "version 1 structured catalogue is not yet complete or authoritative",
 )
@@ -382,6 +384,17 @@ def manifest_input_names(manifest: dict[str, Any]) -> list[str]:
     return listed
 
 
+def framed_input_digest(inputs: list[tuple[str, bytes]]) -> str:
+    """Hash canonical manifest inputs with the validator's exact path framing."""
+    digest = hashlib.sha256()
+    for name, raw in inputs:
+        digest.update(name.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(raw)
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
 def recompute_input_digest(catalog: dict[str, Any]) -> None:
     """Independently recompute aggregate content and the framed input digest."""
     root = REPO_ROOT / "formalization-status/v1"
@@ -398,16 +411,12 @@ def recompute_input_digest(catalog: dict[str, Any]) -> None:
         return candidate
 
     listed = manifest_input_names(manifest)
-    digest = hashlib.sha256()
-    for name, raw in [
+    digest_inputs = [
         ("manifest.json", manifest_raw),
         *[(name, input_path(name).read_bytes()) for name in listed],
-    ]:
-        digest.update(name.encode("utf-8"))
-        digest.update(b"\0")
-        digest.update(raw)
-        digest.update(b"\0")
-    if digest.hexdigest() != catalog["input_sha256"]:
+    ]
+    digest = framed_input_digest(digest_inputs)
+    if digest != catalog["input_sha256"]:
         raise ValueError("expected catalogue input_sha256 does not match canonical manifest inputs")
     registries = {
         key: json.loads(input_path(path).read_text(encoding="utf-8"))
@@ -420,7 +429,7 @@ def recompute_input_digest(catalog: dict[str, Any]) -> None:
         "catalog_state": manifest["catalog_state"],
         "generated_by": "scripts/validate_formalization_status.py",
         "generator_version": 2,
-        "input_sha256": digest.hexdigest(),
+        "input_sha256": digest,
         "records": sorted(records, key=lambda item: item["id"]),
         "schema_version": manifest["schema_version"],
         "source_items": sorted(registries["source_items"]["source_items"], key=lambda item: item["id"]),
@@ -1664,6 +1673,24 @@ def run_self_tests() -> None:
         "cutover-certificate.json",
     ]:
         raise AssertionError("manifest digest order with cutover evidence drifted")
+    absent_manifest_raw = canonical_json(manifest_fixture)
+    absent_digest = framed_input_digest(
+        [("manifest.json", absent_manifest_raw),
+         *[(name, name.encode("utf-8")) for name in expected_without_cutover]]
+    )
+    present_names = manifest_input_names(with_cutover)
+    present_manifest_raw = canonical_json(with_cutover)
+    present_digest = framed_input_digest(
+        [("manifest.json", present_manifest_raw),
+         *[(name, name.encode("utf-8")) for name in present_names]]
+    )
+    reordered_names = [*present_names[:-2], *reversed(present_names[-2:])]
+    reordered_digest = framed_input_digest(
+        [("manifest.json", present_manifest_raw),
+         *[(name, name.encode("utf-8")) for name in reordered_names]]
+    )
+    if len({absent_digest, present_digest, reordered_digest}) != 3:
+        raise AssertionError("cutover digest presence/order is not cryptographically visible")
     for incomplete in (
         {**manifest_fixture, "cutover_baseline": "cutover-baseline.json"},
         {**manifest_fixture, "cutover_certificate": "cutover-certificate.json"},
