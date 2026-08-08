@@ -1,0 +1,74 @@
+---
+layout: page
+title: "Appendix status and axiomatization policy"
+permalink: /limitations/documented-axioms/
+---
+
+# Appendix status and axiomatization policy
+
+> This current policy text was moved losslessly from the former monolithic index. Declaration-level status remains authoritative in the interim legacy catalogue until #5228.
+
+<!-- legacy-source:start:155:216 -->
+### Appendix A: status and axiomatization policy
+
+Tasaki's **Appendix A is fully formalized in book order (A.1–A.28)**, and the
+entire Tasaki text up to and including Chapter 11 (§11.5) plus this appendix is
+now covered. The appendix splits into two kinds of items:
+
+- **Proved (axiom-free)** — the linear-algebra and angular-momentum core that
+  `mathlib` supports directly: **A.1** (the Lie product / Trotter formula, proved
+  from scratch in a complete normed `ℝ`-algebra), **A.12** (the strong-coupling
+  effective Hamiltonian limit, by the `v⁻¹`-squeeze + kernel-pairing continuity
+  argument), **A.4–A.6**
+  (positive-semidefinite basics + unique
+  PSD square root), **A.7–A.8** (Weyl eigenvalue monotonicity via Courant–Fischer,
+  and the trace-exp monotonicity through the spectral mapping for `exp`),
+  **A.9–A.11** (frustration-free Hamiltonians, energy-form
+  kernels), **A.13–A.16** (angular-momentum quantization `J = n/2`, the ladder,
+  and SU(2)-multiplet degeneracy), **A.17** (spin-0/half sector via the common
+  eigenvector of commuting Hermitians), **A.18** (Perron–Frobenius for a real
+  symmetric matrix, via the project's Collatz–Wielandt development and the
+  variational `|w|`-argument), and **A.19–A.20** (polar + singular-value
+  decompositions from the spectral theorem).
+- **Documented axioms (faithful statements, deferred proofs)** — the
+  operator-algebraic **A.21–A.28** (Wigner's
+  theorem, states, Banach–Alaoglu, ground states of infinite systems, the GNS
+  construction).
+
+**Value judgment / policy.** The documented axioms above are kept as *faithful,
+book-order statements* — they record exactly what Tasaki proves — but they are
+**not active proof targets** of this project. They fall into two categories:
+
+- **Operator-algebraic results** (Appendix A.21–A.28): the heavy functional-analytic and
+operator-algebraic structures (states on the quasi-local C\*-algebra, weak-∗
+compactness, ground states, GNS, Wigner) belong to a dedicated operator-algebra /
+functional-analysis development; such a development may well be carried out
+**separately** (for instance contributed to `mathlib`), and these axioms simply
+**wait for that implementation**.
+
+- **Perturbation-theoretic results** (e.g., **Lemma 10.1** (Tasaki §10.1, degenerate
+perturbation theory) and singular-perturbation arguments in Chapter 10): the analytic
+proofs of weak-coupling continuation and adiabatic following for eigenstate families
+are **not undertaken** as an active project goal; such techniques naturally belong to
+a separate analytic-perturbation development. **Theorem 10.4** (Lieb's repulsive-Hubbard
+half-filling ground state) currently has its entire content axiomatized: the global minimum
+energy, ground-state degeneracy, and total-spin values are all undischarged. (The fixed-Ŝ³-sector
+ground-state uniqueness has been proved; full theorem discharge is tracked in Issue #5004.)
+
+- **Book theorems that Tasaki states without proof** (results he quotes from the
+external literature rather than proving in the text): **Theorem 10.11** (Kubo–Kishi
+finite-temperature charge/pairing susceptibility bound, Tasaki §10.2.5, citing
+Kubo–Kishi, *Phys. Rev. B* **41**, 4866 (1990)) and **Theorem 11.13** (Mielke's
+flat-band ferromagnetism, `mielke_theorem_11_13`) are recorded as **faithful documented
+axioms** on the concrete finite-volume operators (here the Duhamel susceptibilities),
+matching the "Tasaki states it without proof" policy — the reproving of the cited
+external work is not an active project goal.
+
+Accordingly the project's policy is to **axiomatize only the appendix and
+perturbation-theory results that Tasaki's formalized main development actually uses**,
+to **prove** the remaining ones where `mathlib` provides the tools, and otherwise to
+leave a faithful axiom in place rather than invest in large bespoke developments whose
+natural home is elsewhere. The `#print axioms` of every theorem in the repository makes
+the precise dependency on these documented axioms auditable.
+
+<!-- legacy-source:end:155:216 -->

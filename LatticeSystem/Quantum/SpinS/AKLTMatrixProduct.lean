@@ -18,7 +18,8 @@ the following conditions equivalent: (i) the ordered products span all `D × D` 
 length; (ii) they span at every sufficiently large length; (iii) `λ` is a nondegenerate transfer
 eigenvalue and every other eigenvalue has strictly smaller modulus. This claim is false. The
 corrected formalization additionally assumes `HasFaithfulDualEigenmatrix`. See `MPSTheorem75`,
-`docs/index.md`, and `tex/proof-guide.tex` for the counterexample and the corrected statement.
+the [legacy AKLT catalogue](https://phasetr.github.io/lattice-system/formalization/legacy/19-the-aklt-model-tasaki-7-1/),
+and `tex/proof-guide.tex` for the counterexample and the corrected statement.
 
 **Theorem 7.6** (Fannes–Nachtergaele–Werner): if two injective collections have identical periodic
 trace coefficients at every chain length, then there is a unitary `U`, unique up to phase, such

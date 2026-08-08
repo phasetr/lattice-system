@@ -11896,7 +11896,7 @@ cluster expansion; recorded as a documented axiom.  Chapters~3--10 backfill.
 \noindent\textbf{§7.1.3 Lemma 7.4} (local VBS ground-state characterization; Tasaki, 1st ed. (2020),
 Lemma 7.4, eqs.~(7.1.19)--(7.1.21), pp.~186--187;
 \texttt{Quantum/SpinS/AKLTBondProjection.lean}, Issue \#5078; \emph{proved},
-axiom-free/\texttt{std3}, PR pending).  For $1<L$, the theorem
+axiom-free/\texttt{std3}, PR \#5087).  For $1<L$, the theorem
 \texttt{tasaki\_lemma\_7\_4} retains the statement of the former axiom: a state $\Phi$ satisfies
 $\hat P_2[\hat S_x+\hat S_{x+1}]\Phi=0$ on the periodic bond
 $\{x,\texttt{ringSucc}(x)\}$ if and only if it has the valence-bond-solid singlet-tensor form
@@ -12159,7 +12159,7 @@ theorem mps_theorem_7_5
       (Iff (MPSSpansForAllLarge A)
         (HasPrimitiveTransferSpectrum A lam))
 \end{Verbatim}
-This is proved axiom-free with Standard~3 axioms only (PR pending).
+This is proved axiom-free with Standard~3 axioms only (PR \#5089).
 The five book-facing nodes are:
 \begin{Verbatim}
 mpsDualTransferMap
@@ -13514,10 +13514,13 @@ Phase-C refactor that deleted 525 orphan modules and 35{,}002 lines of dead code
 in one step.  The chronicle therefore described files and declarations that are
 gone, and all 194 of those unresolved file references were stale.  The other 32
 references name files that do still exist.  Of those 32, 31 carry declarations
-that the per-declaration index \texttt{docs/index.md} still lists by declaration
-name (that index is keyed by declaration, so it does not spell out a file name on
-every row); the remaining one is \texttt{LatticeSystem.lean}, the import-graph
-root, which declares nothing and therefore has no index row of its own.
+that the complete interim catalogue under
+\texttt{docs/formalization/legacy/} still lists by declaration name (that
+catalogue is keyed by declaration, so it does not spell out a file name on every
+row); the remaining one is \texttt{LatticeSystem.lean}, the import-graph root,
+which declares nothing and therefore has no catalogue row of its own.  The root
+\texttt{docs/index.md} provides landing-page navigation rather than the
+declaration-level status record.
 
 \textbf{What that 226 is a count of.}  It counts \texttt{.lean} file references,
 so modules the chronicle named without that suffix are outside it.  In dotted
@@ -13554,8 +13557,9 @@ standard bipartite coupling, and parts of the \texttt{bipartiteToy\dots} and
 \texttt{saturatedFerromagnetJointEigenspace\_eq\_span\_ladderIterateUp}, the
 declaration that carries the saturated-ladder span result today.  No declaration
 that currently exists is documented by this note, nor claimed by it to have been
-deleted; and \texttt{docs/index.md} records only part of what survives.  Of the 56
-public declarations the names above resolve to today --- 20
+deleted; and the complete interim catalogue under
+\texttt{docs/formalization/legacy/} records only part of what survives.  Of the
+56 public declarations the names above resolve to today --- 20
 \texttt{tasaki23\_pf\_\dots}, 21 \texttt{bipartiteToy\dots}, 11
 \texttt{ladderIterateUp\dots}, and four spelled out in full --- it names,
 verbatim, 43 in a key column, the Theorem~2.2 ground-state theorem only in
@@ -13592,11 +13596,13 @@ carries no \texttt{hOutside} hypothesis but does keep the canonical orientation
 $c_{\rm toy}$ strictly above every diagonal entry of the dressed toy-coupling
 matrix.  The Theorem~2.2
 sector statement is the preceding subsection, \emph{Marshall--Lieb--Mattis
-Theorem 2.2 (Tasaki §2.5) --- formalisation outline}.  The per-declaration
-record for the survivors is \texttt{docs/index.md} itself, which --- as counted
-earlier in this note --- names most of them but not all.  Which of its rows
-were pruned when the deleted routes went, and what those rows used to document,
-is recorded separately in that file's ``Deleted routes'' section.  The label
+Theorem 2.2 (Tasaki §2.5) --- formalisation outline}.  The interim
+per-declaration record for the survivors is the complete catalogue under
+\texttt{docs/formalization/legacy/}, which --- as counted earlier in this note
+--- names most of them but not all.  Which of its former rows were pruned when
+the deleted routes went, and what those rows used to document, is recorded in
+\texttt{docs/history/deleted-routes.md}.  The root \texttt{docs/index.md}
+provides landing-page navigation to these records.  The label
 \texttt{subsec:mlm-theorem-2-3} of the removed subsection is kept on this note,
 so any later cross-reference to it still resolves; nothing referenced it when
 the chronicle was removed.
@@ -15532,7 +15538,9 @@ imports the abstract Hamiltonian and energy companion, and
         \(y\in N_G(x)\) gives the off-block zero theorem, saying different
         outside restrictions do not couple, and the block-equality theorem,
         identifying each fixed-outside block with the option-star Hamiltonian.
-        The exact Lean names are listed in \texttt{docs/index.md}.
+        The exact Lean names are listed in the complete interim catalogue under
+        \texttt{docs/formalization/legacy/}.  The root \texttt{docs/index.md}
+        provides landing-page navigation.
   \item Problem 2.5.b graph-local product lower-bound bridge.  The full
         configuration space around \(x\) is reindexed as
         \[
@@ -15551,8 +15559,8 @@ imports the abstract Hamiltonian and energy companion, and
         product-coordinate graph-local star.  Reindex-invariance lemmas for
         matrix-vector multiplication, norms, and Rayleigh numerators transfer
         the same lower bound back to the original same-Hilbert-space
-        graph-local star.  The exact Lean names are listed in
-        \texttt{docs/index.md}.
+        graph-local star.  The exact Lean names are listed in the complete
+        interim catalogue under \texttt{docs/formalization/legacy/}.
   \item Problem 2.5.b option-star and graph-local sum wrapper.  The canonical
         option-star Hamiltonian is Hermitian because it is the transported
         single-cluster Hamiltonian along
@@ -15603,7 +15611,8 @@ imports the abstract Hamiltonian and energy companion, and
         side.  Isolated centers are intentionally excluded because their
         local star Hamiltonian is zero, whereas the closed formula would
         contribute a negative number.
-        The exact Lean names are listed in \texttt{docs/index.md}.  This is
+        The exact Lean names are listed in the complete interim catalogue under
+        \texttt{docs/formalization/legacy/}.  This is
         the graph-local form of Tasaki's Problem~2.5.b lower-bound argument
         (Tasaki, Springer 2020, Problem~2.5.b, p.~38; solution p.~497).
 \end{itemize}
@@ -17744,13 +17753,15 @@ cited as inputs are still present under \texttt{LatticeSystem/} and are
 \texttt{ladderIterateUp\_mem\_eigenspace}, the last of which shares its name stem
 with removed ladder lemmas and survives all the same.  No declaration that
 currently exists is documented by this note, nor claimed by it to have been
-deleted.  Of the seven survivors just named, four are recorded in
-\texttt{docs/index.md}: \texttt{spinSOp1} and \texttt{spinSOp2} share a row
-there, \texttt{ladderIterateUp\_mem\_eigenspace} sits in the ladder-family row,
-and \texttt{totalSpinSSquared\_eq\_sum\_spinSDot} appears there only inside the
-row of its leaf-level mirror \texttt{leafSpinSSquared\_eq\_sum\_spinSDot}.  The
+deleted.  Of the seven survivors just named, four are recorded in the complete
+interim catalogue under \texttt{docs/formalization/legacy/}:
+\texttt{spinSOp1} and \texttt{spinSOp2} share a row there,
+\texttt{ladderIterateUp\_mem\_eigenspace} sits in the ladder-family row, and
+\texttt{totalSpinSSquared\_eq\_sum\_spinSDot} appears there only inside the row
+of its leaf-level mirror \texttt{leafSpinSSquared\_eq\_sum\_spinSDot}.  The
 other three, \texttt{onSiteS\_add}, \texttt{onSiteS\_smul} and
-\texttt{fun\_eq\_sum\_smul\_basisVecS}, have no mention in that file at all.
+\texttt{fun\_eq\_sum\_smul\_basisVecS}, have no mention anywhere in that
+catalogue.  The root \texttt{docs/index.md} provides landing-page navigation.
 
 \textbf{Where those results stand today.}  Three citations of PR~\#904 survive
 above, in the \#2759 entry and in the \#2768 closure entry: as the

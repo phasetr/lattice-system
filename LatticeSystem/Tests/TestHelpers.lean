@@ -26,7 +26,7 @@ intentionally minimal: most tests will rely on `decide` /
 - **G. small exhaustive**: `Fin 2/3/4` enumerated by `fin_cases`.
 
 See `docs/refactoring-conventions.md` §1
-([project page](https://phasetr.github.io/lattice-system/refactoring-conventions/#1-test-methods-per-refactor-plan-v4-§21))
+([project page](https://phasetr.github.io/lattice-system/refactoring-conventions/#test-methods-per-refactor-plan-v4-21))
 for the full method matrix and review checklist.
 -/
 

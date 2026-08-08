@@ -104,5 +104,5 @@ surface alongside the source library `LatticeSystem`.
 
 Test methods (A-G) and the per-module Tests/source mapping
 follow `docs/refactoring-conventions.md` §1
-([project page](https://phasetr.github.io/lattice-system/refactoring-conventions/#1-test-methods-per-refactor-plan-v4-§21)).
+([project page](https://phasetr.github.io/lattice-system/refactoring-conventions/#test-methods-per-refactor-plan-v4-21)).
 -/
