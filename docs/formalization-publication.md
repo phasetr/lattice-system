@@ -33,6 +33,13 @@ Dynamic source, topic, and status index rows use the same escaped raw-HTML
 boundary with explicit identity, label, and count attributes. Braces are
 numeric HTML entities in staged source, preventing catalogue text from opening
 a Liquid expression while preserving the canonical visible text after parsing.
+Before rendering, the generator also assigns an explicit Kramdown ID to every
+heading targeted by an internal fragment link. This preserves the audited
+legacy migration fragments even when inline code or Unicode would make
+Kramdown's implicit heading-ID behavior differ between source assumptions and
+rendered HTML. The staged checker requires each referenced fragment to have
+such an explicit pin; the rendered checker still verifies the resulting HTML
+ID and rejects duplicates.
 
 The generated views visibly report the catalogue state, schema version, input
 SHA-256, and build revision. The build revision is presentation metadata and is

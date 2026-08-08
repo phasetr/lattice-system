@@ -311,6 +311,44 @@ def regular_file_bytes(root: Path) -> int:
     return total
 
 
+def check_staged_fragment_pins(source: Path) -> None:
+    """Require every staged internal fragment to have an explicit render-stable ID."""
+    pages: dict[str, tuple[Path, str, set[str]]] = {}
+    texts: list[str] = []
+    for path in sorted(source.rglob("*.md")):
+        text = path.read_text(encoding="utf-8")
+        texts.append(text)
+        permalink = re.search(r"(?m)^permalink:\s*(\S+)\s*$", text)
+        if permalink is None:
+            continue
+        route = permalink.group(1).strip('"')
+        explicit = re.findall(r'<a\s+id="([^"]+)"\s*></a>', text)
+        pinned = re.findall(r"(?m)^#{1,6} .*\n\{:\s+#([^ }]+)\s*\}$", text)
+        stable = [*explicit, *pinned]
+        duplicates = sorted({item for item in stable if stable.count(item) > 1})
+        if duplicates:
+            raise ValueError(
+                f"staged page has duplicate explicit fragment pins: "
+                f"{path.relative_to(source)}: {duplicates}"
+            )
+        pages[route] = (path, text, set(stable))
+
+    url_pattern = re.compile(r"/lattice-system/[^\s)\"]+#[^\s)\"]+")
+    for text in texts:
+        for raw_url in url_pattern.findall(text):
+            split = urlsplit(raw_url)
+            route = unquote(split.path).removeprefix(BASEURL)
+            fragment = unquote(split.fragment)
+            target = pages.get(route)
+            if target is None:
+                raise ValueError(f"staged internal fragment target is missing: {raw_url}")
+            if fragment not in target[2]:
+                raise ValueError(
+                    f"staged internal fragment lacks an explicit render-stable pin: {raw_url} "
+                    f"in {target[0].relative_to(source)}"
+                )
+
+
 def load_catalog(path: Path) -> tuple[dict[str, Any], bytes]:
     """Load and require canonical aggregate JSON."""
     raw = path.read_bytes()
@@ -871,6 +909,7 @@ def check_built_site(
 def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision: str) -> None:
     """Perform pre-Jekyll checks on a generated staged source tree."""
     source = ensure_tree(source_dir)
+    check_staged_fragment_pins(source)
     expected_path = expected_catalog_path.resolve(strict=True)
     if source in expected_path.parents:
         raise ValueError("expected catalogue must be generated independently outside the staged source")
@@ -1394,6 +1433,23 @@ def run_staged_mutation_tests(
                     1,
                 ),
             ),
+        )
+    )
+    fragment_relative = (
+        "formalization/legacy/"
+        "04-3d-rotation-matrices-general-tasaki-2-1-eq-2-1-11.md"
+    )
+    fragment_text = (source / fragment_relative).read_text(encoding="utf-8")
+    fragment_pin = (
+        "{: #legacy-catalogue-3d-rotation-matrices-r-general--tasaki-21-eq-2111}\n"
+    )
+    if fragment_pin not in fragment_text:
+        raise AssertionError("staged fragment-pin mutation fixture is absent")
+    mutation_cases.append(
+        (
+            "missing render-stable legacy fragment pin",
+            fragment_relative,
+            fragment_text.replace(fragment_pin, "", 1),
         )
     )
     for label, relative, mutated_text in mutation_cases:

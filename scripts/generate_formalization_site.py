@@ -14,6 +14,7 @@ import sys
 import tempfile
 from pathlib import Path
 from typing import Any
+from urllib.parse import unquote, urlsplit
 
 
 GENERATOR_VERSION = 1
@@ -26,6 +27,7 @@ OWNERSHIP_MARKER_RE = re.compile(
     r"^<!-- formalization-status-generated:end -->$"
 )
 REVISION_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._/-]{0,199}")
+BASEURL = "/lattice-system"
 
 
 def html_text(value: Any) -> str:
@@ -35,6 +37,73 @@ def html_text(value: Any) -> str:
         .replace("{", "&#123;")
         .replace("}", "&#125;")
     )
+
+
+def kramdown_heading_id(heading: str) -> str:
+    """Compute the repository's audited Kramdown basic heading identifier."""
+    heading = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", heading)
+    heading = re.sub(r"<[^>]*>", "", heading)
+    heading = re.sub(r"^[^A-Za-z]+", "", heading)
+    heading = re.sub(r"[^A-Za-z0-9 -]", "", heading)
+    return heading.replace(" ", "-").lower()
+
+
+def pin_referenced_fragments(source_root: Path) -> int:
+    """Pin every referenced internal fragment to an explicit Kramdown heading ID."""
+    pages: dict[str, Path] = {}
+    texts: dict[Path, str] = {}
+    for path in sorted(source_root.rglob("*.md")):
+        text = path.read_text(encoding="utf-8")
+        texts[path] = text
+        match = re.search(r"(?m)^permalink:\s*(\S+)\s*$", text)
+        if match:
+            route = match.group(1).strip('"')
+            if route in pages:
+                raise ValueError(f"duplicate staged permalink while pinning fragments: {route}")
+            pages[route] = path
+
+    targets: dict[Path, set[str]] = {}
+    url_pattern = re.compile(r"/lattice-system/[^\s)\"]+#[^\s)\"]+")
+    for text in texts.values():
+        for raw_url in url_pattern.findall(text):
+            split = urlsplit(raw_url)
+            route = unquote(split.path).removeprefix(BASEURL)
+            fragment = unquote(split.fragment)
+            target = pages.get(route)
+            if target is None:
+                raise ValueError(f"internal fragment target has no staged permalink: {raw_url}")
+            targets.setdefault(target, set()).add(fragment)
+
+    pinned = 0
+    for path, fragments in sorted(targets.items()):
+        text = texts[path]
+        explicit = set(re.findall(r'<a\s+id="([^"]+)"\s*></a>', text))
+        explicit.update(re.findall(r"(?m)^\{:\s+#([^ }]+)\s*\}$", text))
+        pending = fragments - explicit
+        if not pending:
+            continue
+        lines = text.splitlines(keepends=True)
+        insertions: dict[int, str] = {}
+        for index, line in enumerate(lines):
+            match = re.match(r"^#{1,6} (.*?)(?:\r?\n)?$", line)
+            if match and kramdown_heading_id(match.group(1)) in pending:
+                fragment = kramdown_heading_id(match.group(1))
+                insertions[index] = fragment
+                pending.remove(fragment)
+        if pending:
+            raise ValueError(
+                f"referenced fragments lack explicit anchors or matching headings in "
+                f"{path.relative_to(source_root)}: {sorted(pending)}"
+            )
+        rendered: list[str] = []
+        for index, line in enumerate(lines):
+            rendered.append(line)
+            if index in insertions:
+                rendered.append(f"{{: #{insertions[index]}}}\n")
+                pinned += 1
+        with path.open("w", encoding="utf-8", newline="\n") as output:
+            output.write("".join(rendered))
+    return pinned
 
 
 def locator(item: dict[str, Any]) -> str:
@@ -533,6 +602,36 @@ def run_self_tests(repo_root: Path) -> None:
             pass
         else:
             raise AssertionError("marker ownership accepted a missing marker")
+        target = temporary / "target.md"
+        target.write_text(
+            "---\npermalink: /target/\n---\n"
+            "# Legacy catalogue: 3D rotation matrices `R^(α)_θ` (general θ)\n",
+            encoding="utf-8",
+        )
+        reference = temporary / "reference.md"
+        reference.write_text(
+            "---\npermalink: /reference/\n---\n"
+            "[target](/lattice-system/target/"
+            "#legacy-catalogue-3d-rotation-matrices-r-general-)\n",
+            encoding="utf-8",
+        )
+        assert pin_referenced_fragments(temporary) == 1
+        assert (
+            "{: #legacy-catalogue-3d-rotation-matrices-r-general-}\n"
+            in target.read_text(encoding="utf-8")
+        )
+        assert pin_referenced_fragments(temporary) == 0
+        reference.write_text(
+            "---\npermalink: /reference/\n---\n"
+            "[missing](/lattice-system/target/#missing-fragment)\n",
+            encoding="utf-8",
+        )
+        try:
+            pin_referenced_fragments(temporary)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("fragment pinning accepted an unresolved heading fragment")
         (temporary / "formalization-status/v1").mkdir(parents=True)
         try:
             validate_marker_ownership(temporary, set())
@@ -570,6 +669,7 @@ def main() -> int:
         output.mkdir(parents=True)
         source = output / "source"
         shutil.copytree(repo_root / "docs", source)
+        pinned_fragment_count = pin_referenced_fragments(source)
         machine = source / "formalization-status" / "v1"
         machine.mkdir(parents=True)
         aggregate_path = machine / "catalog.json"
@@ -608,6 +708,7 @@ def main() -> int:
                     "generator_version": GENERATOR_VERSION,
                     "input_sha256": aggregate["input_sha256"],
                     "marker_count": marker_count,
+                    "pinned_fragment_count": pinned_fragment_count,
                     "revision": args.revision,
                     "source_tree_sha256": tree_digest.hexdigest(),
                 },
