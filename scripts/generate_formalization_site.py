@@ -269,9 +269,26 @@ def render_marker(
                 ),
                 "</ul>",
                 "",
-                "- [Browse generated source projections](/lattice-system/formalization/sources/)",
-                "- [Browse generated topic projections](/lattice-system/formalization/topics/)",
-                "- [Browse generated status summary](/lattice-system/formalization/status/)",
+                '<ul data-index="overview-navigation">',
+                index_row(
+                    "overview-navigation",
+                    {"navigation-id": "sources"},
+                    "Browse generated source projections",
+                    "/lattice-system/formalization/sources/",
+                ),
+                index_row(
+                    "overview-navigation",
+                    {"navigation-id": "topics"},
+                    "Browse generated topic projections",
+                    "/lattice-system/formalization/topics/",
+                ),
+                index_row(
+                    "overview-navigation",
+                    {"navigation-id": "status"},
+                    "Browse generated status summary",
+                    "/lattice-system/formalization/status/",
+                ),
+                "</ul>",
                 "",
             )
         )

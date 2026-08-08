@@ -121,10 +121,13 @@ three versioned JSON resources (`catalog.json`, `schema.json`, and
 `publication.json`) below the fixed
 `https://phasetr.github.io/lattice-system/` base. The standard-library checker
 requires HTTP 200 and the expected content type, exact generated metadata and
-source/topic/status navigation, schema version 1, prototype catalogue state,
-matching input digests, the stable schema identifier, and a publication
-revision equal to the triggering `main` SHA. Its bounded retries accommodate
-Pages propagation without any agent-side polling. Pull-request and manual runs
+catalog-derived ordered overview/source/topic/status rows, schema version 1,
+prototype catalogue state, matching input digests, a published schema equal to
+the checked-out canonical schema, and a publication revision equal to the
+triggering `main` SHA. Redirects are rejected before following, every response
+has a two-MiB hard limit, and one 240-second absolute deadline bounds complete
+snapshot retries within the five-minute job. These retries accommodate Pages
+propagation without any agent-side polling. Pull-request and manual runs
 exercise only its in-memory self-tests and skip the live job. Run those tests
 locally with:
 

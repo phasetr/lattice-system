@@ -4,15 +4,26 @@
 from __future__ import annotations
 
 import argparse
-import html.parser
 import json
 import re
 import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Callable
 from urllib.parse import urljoin
+
+from check_generated_site import (
+    PageParser,
+    assert_metadata,
+    expected_overview_index_rows,
+    expected_source_index_rows,
+    expected_status_index_rows,
+    expected_topic_index_rows,
+    parse_record_html,
+    require_index_rows,
+)
 
 
 PAGES_BASE = "https://phasetr.github.io/lattice-system/"
@@ -30,6 +41,8 @@ JSON_ENDPOINTS = (
 ENDPOINTS = (*HUMAN_ENDPOINTS, *JSON_ENDPOINTS)
 SHA256_RE = re.compile(r"[0-9a-f]{64}")
 REVISION_RE = re.compile(r"[0-9a-f]{40}")
+MAX_BODY_BYTES = 2 * 1024 * 1024
+MAX_DEADLINE_SECONDS = 240
 
 
 @dataclass(frozen=True)
@@ -42,73 +55,15 @@ class Response:
     final_url: str
 
 
-class HumanPageParser(html.parser.HTMLParser):
-    """Collect generated metadata and structured navigation from one human page."""
-
-    def __init__(self) -> None:
-        super().__init__(convert_charrefs=True)
-        self.metadata: dict[str, str] = {}
-        self.metadata_links: dict[str, str] = {}
-        self.indexes: dict[str, list[tuple[str, dict[str, str], str | None]]] = {}
-        self.links: list[str] = []
-        self.text: list[str] = []
-        self.current_meta: tuple[str, str | None, list[str]] | None = None
-        self.current_index: str | None = None
-        self.current_row: tuple[str, dict[str, str], list[str]] | None = None
-
-    def handle_starttag(
-        self, tag: str, attrs: list[tuple[str, str | None]]
-    ) -> None:
-        """Track metadata, index rows, and links from start tags."""
-        values = {key: value or "" for key, value in attrs}
-        if tag == "ul" and "data-index" in values:
-            self.current_index = values["data-index"]
-            self.indexes.setdefault(self.current_index, [])
-        elif tag == "li" and "data-meta" in values:
-            self.current_meta = (
-                values["data-meta"],
-                values.get("data-href"),
-                [],
-            )
-        elif tag == "li" and self.current_index and "data-row-kind" in values:
-            data = {
-                key[5:]: value
-                for key, value in values.items()
-                if key.startswith("data-") and key != "data-row-kind"
-            }
-            self.current_row = (values["data-row-kind"], data, [])
-        elif tag == "a" and "href" in values:
-            self.links.append(values["href"])
-
-    def handle_data(self, data: str) -> None:
-        """Collect visible text for generated-notice and metadata checks."""
-        self.text.append(data)
-        if self.current_meta is not None:
-            self.current_meta[2].append(data)
-        if self.current_row is not None:
-            self.current_row[2].append(data)
-
-    def handle_endtag(self, tag: str) -> None:
-        """Finish structured metadata and index rows at their closing tags."""
-        if tag == "li" and self.current_meta is not None:
-            key, href, text = self.current_meta
-            if key in self.metadata:
-                raise ValueError(f"duplicate generated metadata field: {key}")
-            self.metadata[key] = " ".join("".join(text).split())
-            if href is not None:
-                self.metadata_links[key] = href
-            self.current_meta = None
-        elif tag == "li" and self.current_row is not None:
-            if self.current_index is None:
-                raise ValueError("structured index row closed outside an index")
-            kind, data, _ = self.current_row
-            self.indexes[self.current_index].append((kind, data, data.get("href")))
-            self.current_row = None
-        elif tag == "ul" and self.current_index is not None:
-            self.current_index = None
-
-
 Fetcher = Callable[[str, float], Response]
+
+
+class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Reject redirects so every stable endpoint must itself return HTTP 200."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # type: ignore[no-untyped-def]
+        """Disable urllib's default redirect following."""
+        return None
 
 
 def validate_base_url(base_url: str) -> str:
@@ -116,6 +71,17 @@ def validate_base_url(base_url: str) -> str:
     if base_url != PAGES_BASE:
         raise ValueError(f"base URL must be exactly {PAGES_BASE}")
     return base_url
+
+
+def validate_declared_length(value: str, url: str) -> int:
+    """Parse and bound an HTTP Content-Length value before reading the body."""
+    try:
+        declared_length = int(value)
+    except ValueError as error:
+        raise ValueError(f"{url}: invalid Content-Length") from error
+    if declared_length < 0 or declared_length > MAX_BODY_BYTES:
+        raise ValueError(f"{url}: Content-Length exceeds the byte limit")
+    return declared_length
 
 
 def fetch_url(url: str, timeout: float) -> Response:
@@ -127,11 +93,18 @@ def fetch_url(url: str, timeout: float) -> Response:
             "User-Agent": "lattice-system-publication-check/1",
         },
     )
-    with urllib.request.urlopen(request, timeout=timeout) as response:
+    opener = urllib.request.build_opener(NoRedirectHandler())
+    with opener.open(request, timeout=timeout) as response:
+        content_length = response.headers.get("Content-Length")
+        if content_length is not None:
+            validate_declared_length(content_length, url)
+        body = response.read(MAX_BODY_BYTES + 1)
+        if len(body) > MAX_BODY_BYTES:
+            raise ValueError(f"{url}: response body exceeds the byte limit")
         return Response(
             status=response.status,
             content_type=response.headers.get_content_type(),
-            body=response.read(),
+            body=body,
             final_url=response.geturl(),
         )
 
@@ -153,7 +126,7 @@ def parse_json(response: Response, endpoint: str) -> dict[str, object]:
     return value
 
 
-def parse_human(response: Response, endpoint: str) -> HumanPageParser:
+def parse_human(response: Response, endpoint: str) -> PageParser:
     """Require an exact successful HTML response and parse generated structures."""
     if response.status != 200:
         raise ValueError(f"{endpoint}: expected HTTP 200, got {response.status}")
@@ -163,99 +136,66 @@ def parse_human(response: Response, endpoint: str) -> HumanPageParser:
         source = response.body.decode("utf-8")
     except UnicodeDecodeError as error:
         raise ValueError(f"{endpoint}: invalid UTF-8 HTML") from error
-    parser = HumanPageParser()
-    parser.feed(source)
-    parser.close()
-    return parser
+    return parse_record_html(source, endpoint)
 
 
 def require_metadata(
-    parser: HumanPageParser, endpoint: str, digest: str, revision: str
+    parser: PageParser, endpoint: str, catalog: dict[str, object], revision: str
 ) -> None:
-    """Require exact generated state, schema, digest, revision, and machine links."""
-    expected = {
-        "catalog-state": "Catalogue state: prototype",
-        "schema-version": "Schema version: 1",
-        "input-sha256": f"Input SHA-256: {digest}",
-        "revision": f"Deploy revision: {revision}",
-    }
-    for key, value in expected.items():
-        if parser.metadata.get(key) != value:
-            raise ValueError(f"{endpoint}: wrong generated metadata {key}")
-    expected_links = {
-        "catalog-link": "/lattice-system/formalization-status/v1/catalog.json",
-        "schema-link": "/lattice-system/formalization-status/v1/schema.json",
-        "publication-link": "/lattice-system/formalization-status/v1/publication.json",
-        "authority-link": "/lattice-system/formalization/legacy/",
-    }
-    for key, href in expected_links.items():
-        if parser.metadata_links.get(key) != href or href not in parser.links:
-            raise ValueError(f"{endpoint}: wrong or missing generated link {key}")
+    """Require the exact ordered metadata grammar and generated notice."""
+    assert_metadata(parser, catalog, revision, endpoint)
     visible = " ".join("".join(parser.text).split())
     if "Generated formalization-status view." not in visible:
         raise ValueError(f"{endpoint}: generated notice is missing")
 
 
 def require_navigation(
-    pages: dict[str, HumanPageParser], catalog: dict[str, object]
+    pages: dict[str, PageParser], catalog: dict[str, object]
 ) -> None:
-    """Require exact overview, source, topic, and status navigation structures."""
-    overview_links = {
-        "/lattice-system/formalization/status/",
-        "/lattice-system/formalization/sources/",
-        "/lattice-system/formalization/topics/",
-    }
-    if not overview_links.issubset(set(pages["formalization/"].links)):
-        raise ValueError("formalization/: generated overview navigation is incomplete")
-
-    sources = catalog.get("sources")
-    topics = catalog.get("topics")
-    if not isinstance(sources, list) or not isinstance(topics, list):
-        raise ValueError("catalog: sources and topics must be arrays")
-    source_ids = {item.get("id") for item in sources if isinstance(item, dict)}
-    topic_ids = {item.get("id") for item in topics if isinstance(item, dict)}
-    if None in source_ids or None in topic_ids:
-        raise ValueError("catalog: source/topic IDs must be present")
-    expected_source_links = {
-        f"/lattice-system/formalization/sources/{source_id}/"
-        for source_id in source_ids
-    } | {"/lattice-system/formalization/sources/foundations/"}
-    source_rows = pages["formalization/sources/"].indexes.get("sources")
-    if source_rows is None:
-        raise ValueError("formalization/sources/: generated source index is missing")
-    actual_source_links = {href for _, _, href in source_rows}
-    if actual_source_links != expected_source_links:
-        raise ValueError("formalization/sources/: source navigation does not match catalog")
-
-    expected_topic_links = {
-        f"/lattice-system/formalization/topics/{topic_id}/" for topic_id in topic_ids
-    }
-    topic_rows = pages["formalization/topics/"].indexes.get("topics")
-    if topic_rows is None:
-        raise ValueError("formalization/topics/: generated topic index is missing")
-    actual_topic_links = {href for _, _, href in topic_rows}
-    if actual_topic_links != expected_topic_links:
-        raise ValueError("formalization/topics/: topic navigation does not match catalog")
-
-    status_rows = pages["formalization/status/"].indexes.get("status")
-    if not status_rows or any(href is not None for _, _, href in status_rows):
-        raise ValueError("formalization/status/: generated status summary is invalid")
+    """Require exact ordered overview, source, topic, and status rows."""
+    overview = pages["formalization/"]
+    require_index_rows(
+        overview,
+        expected_overview_index_rows(catalog),
+        "formalization/",
+    )
+    require_index_rows(
+        pages["formalization/sources/"],
+        expected_source_index_rows(catalog),
+        "formalization/sources/",
+    )
+    require_index_rows(
+        pages["formalization/topics/"],
+        expected_topic_index_rows(catalog),
+        "formalization/topics/",
+    )
+    require_index_rows(
+        pages["formalization/status/"],
+        expected_status_index_rows(catalog),
+        "formalization/status/",
+    )
 
 
 def verify_responses(
-    responses: dict[str, Response], base_url: str, revision: str
+    responses: dict[str, Response],
+    base_url: str,
+    revision: str,
+    canonical_schema_bytes: bytes,
 ) -> None:
     """Validate all seven endpoint responses as one coherent publication."""
     validate_base_url(base_url)
     if set(responses) != set(ENDPOINTS):
         raise ValueError("live response set does not match the seven required endpoints")
     for endpoint, response in responses.items():
+        if len(response.body) > MAX_BODY_BYTES:
+            raise ValueError(f"{endpoint}: response body exceeds the byte limit")
         expected_url = urljoin(base_url, endpoint)
         if response.final_url != expected_url:
             raise ValueError(f"{endpoint}: unexpected redirect to {response.final_url}")
 
     catalog = parse_json(responses[JSON_ENDPOINTS[0]], JSON_ENDPOINTS[0])
-    schema = parse_json(responses[JSON_ENDPOINTS[1]], JSON_ENDPOINTS[1])
+    schema_response = responses[JSON_ENDPOINTS[1]]
+    schema = parse_json(schema_response, JSON_ENDPOINTS[1])
     publication = parse_json(responses[JSON_ENDPOINTS[2]], JSON_ENDPOINTS[2])
     digest = catalog.get("input_sha256")
     if catalog.get("schema_version") != 1 or publication.get("schema_version") != 1:
@@ -271,24 +211,39 @@ def verify_responses(
         raise ValueError("catalog/publication input_sha256 values differ")
     if publication.get("revision") != revision:
         raise ValueError("publication revision does not equal the required main SHA")
-    if schema.get("$id") != PAGES_BASE + "formalization-status/v1/schema.json":
-        raise ValueError("published schema $id does not match its stable URL")
+    try:
+        canonical_schema = json.loads(canonical_schema_bytes.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError("checkout canonical schema is invalid UTF-8 JSON") from error
+    if schema != canonical_schema:
+        raise ValueError("published schema differs from the checkout canonical schema")
 
     pages = {
         endpoint: parse_human(responses[endpoint], endpoint)
         for endpoint in HUMAN_ENDPOINTS
     }
     for endpoint, parser in pages.items():
-        require_metadata(parser, endpoint, digest, revision)
+        require_metadata(parser, endpoint, catalog, revision)
     require_navigation(pages, catalog)
 
 
-def fetch_publication(base_url: str, timeout: float, fetcher: Fetcher) -> dict[str, Response]:
-    """Fetch each required endpoint exactly once for one verification attempt."""
-    return {
-        endpoint: fetcher(urljoin(base_url, endpoint), timeout)
-        for endpoint in ENDPOINTS
-    }
+def fetch_publication(
+    base_url: str,
+    timeout: float,
+    fetcher: Fetcher,
+    deadline_at: float,
+    monotonic: Callable[[], float],
+) -> dict[str, Response]:
+    """Fetch one coherent seven-endpoint snapshot within the absolute deadline."""
+    responses = {}
+    for endpoint in ENDPOINTS:
+        remaining = deadline_at - monotonic()
+        if remaining <= 0:
+            raise ValueError("live publication deadline expired during a snapshot")
+        responses[endpoint] = fetcher(
+            urljoin(base_url, endpoint), min(timeout, remaining)
+        )
+    return responses
 
 
 def verify_with_retry(
@@ -297,10 +252,13 @@ def verify_with_retry(
     attempts: int,
     initial_delay: float,
     timeout: float,
+    deadline: float,
+    canonical_schema_bytes: bytes,
     fetcher: Fetcher = fetch_url,
     sleep: Callable[[float], None] = time.sleep,
+    monotonic: Callable[[], float] = time.monotonic,
 ) -> None:
-    """Retry a complete live verification with bounded exponential backoff."""
+    """Retry coherent verification within one workflow-safe absolute deadline."""
     validate_base_url(base_url)
     if REVISION_RE.fullmatch(revision) is None:
         raise ValueError("revision must be a 40-character lowercase hexadecimal SHA")
@@ -308,17 +266,29 @@ def verify_with_retry(
         raise ValueError("attempts must be between 1 and 10")
     if not 0 <= initial_delay <= 30 or not 1 <= timeout <= 30:
         raise ValueError("retry delay/timeout is outside the safe bound")
+    if not 1 <= deadline <= MAX_DEADLINE_SECONDS:
+        raise ValueError(f"deadline must be between 1 and {MAX_DEADLINE_SECONDS} seconds")
+    deadline_at = monotonic() + deadline
     last_error: Exception | None = None
     for attempt in range(attempts):
         try:
             verify_responses(
-                fetch_publication(base_url, timeout, fetcher), base_url, revision
+                fetch_publication(
+                    base_url, timeout, fetcher, deadline_at, monotonic
+                ),
+                base_url,
+                revision,
+                canonical_schema_bytes,
             )
             return
         except (ValueError, OSError, urllib.error.URLError) as error:
             last_error = error
             if attempt + 1 < attempts:
-                sleep(min(initial_delay * (2**attempt), 30))
+                remaining = deadline_at - monotonic()
+                delay = min(initial_delay * (2**attempt), 30, remaining)
+                if delay <= 0:
+                    break
+                sleep(delay)
     raise ValueError(f"live publication check failed after {attempts} attempt(s): {last_error}")
 
 
@@ -339,38 +309,70 @@ def fixture_responses(revision: str) -> dict[str, Response]:
         f'<li data-meta="input-sha256">Input SHA-256: {digest}</li>'
         f'<li data-meta="revision">Deploy revision: {revision}</li>'
         f'<li data-meta="catalog-link" data-href="{catalog_href}">'
-        f'<a href="{catalog_href}">catalog</a></li>'
+        f'<a href="{catalog_href}">Machine data: version 1 catalogue</a></li>'
         f'<li data-meta="schema-link" data-href="{schema_href}">'
-        f'<a href="{schema_href}">schema</a></li>'
+        f'<a href="{schema_href}">Schema: version 1 schema</a></li>'
         f'<li data-meta="publication-link" data-href="{publication_href}">'
-        f'<a href="{publication_href}">publication</a></li>'
+        f'<a href="{publication_href}">Build metadata: publication sidecar</a></li>'
         f'<li data-meta="authority-link" data-href="{authority_href}">'
-        f'<a href="{authority_href}">authority</a></li></ul>'
+        f'<a href="{authority_href}">Current authority: complete interim legacy '
+        "catalogue</a></li></ul>"
     )
     human = {
         "formalization/": metadata
-        + '<a href="/lattice-system/formalization/status/">status</a>'
-        + '<a href="/lattice-system/formalization/sources/">sources</a>'
-        + '<a href="/lattice-system/formalization/topics/">topics</a>',
+        + '<ul><li data-row-kind="overview-counts" data-record-count="1" '
+        + 'data-source-count="1" data-topic-count="1">This prototype snapshot '
+        + "contains 1 records, 1 sources, and 1 topics.</li></ul>"
+        + '<ul><li data-row-kind="overview-navigation" data-navigation-id="sources" '
+        + 'data-href="/lattice-system/formalization/sources/"><a '
+        + 'href="/lattice-system/formalization/sources/">Browse generated source '
+        + "projections</a></li>"
+        + '<li data-row-kind="overview-navigation" data-navigation-id="topics" '
+        + 'data-href="/lattice-system/formalization/topics/"><a '
+        + 'href="/lattice-system/formalization/topics/">Browse generated topic '
+        + "projections</a></li>"
+        + '<li data-row-kind="overview-navigation" data-navigation-id="status" '
+        + 'data-href="/lattice-system/formalization/status/"><a '
+        + 'href="/lattice-system/formalization/status/">Browse generated status '
+        + "summary</a></li></ul>",
         "formalization/status/": metadata
         + '<ul data-index="status"><li data-row-kind="status" '
-        + 'data-status-label="proved" data-record-count="1">proved</li></ul>',
+        + 'data-status-label="proved" data-record-count="1">proved: 1</li></ul>',
         "formalization/sources/": metadata
         + '<ul data-index="sources"><li data-row-kind="source" '
-        + f'data-href="{book_href}"><a href="{book_href}">book</a></li>'
+        + 'data-source-id="book" data-source-title="Book" data-record-count="1" '
+        + f'data-href="{book_href}"><a href="{book_href}">'
+        + "Book: 1 related record(s)</a></li>"
         + '<li data-row-kind="project-original" '
+        + 'data-source-id="foundations" data-record-count="0" '
         + f'data-href="{foundations_href}"><a href="{foundations_href}">'
-        + "foundations</a></li></ul>",
+        + "Project-original foundations: 0 record(s)</a></li></ul>",
         "formalization/topics/": metadata
         + '<ul data-index="topics"><li data-row-kind="topic" '
-        + f'data-href="{topic_href}"><a href="{topic_href}">spin</a></li></ul>',
+        + 'data-topic-id="spin" data-topic-label="Spin" data-record-count="1" '
+        + f'data-href="{topic_href}"><a href="{topic_href}">'
+        + "Spin: 1 record(s)</a></li></ul>",
     }
     catalog = {
         "schema_version": 1,
         "catalog_state": "prototype",
         "input_sha256": digest,
-        "sources": [{"id": "book"}],
-        "topics": [{"id": "spin"}],
+        "sources": [{"id": "book", "title": "Book"}],
+        "source_items": [{"id": "book-item", "source_id": "book"}],
+        "topics": [{"id": "spin", "label": "Spin"}],
+        "records": [
+            {
+                "id": "record",
+                "origin": "literature",
+                "implementation_state": "complete",
+                "declaration_kind": "theorem",
+                "trust_state": "proved",
+                "source_relations": [
+                    {"source_item_id": "book-item", "relation": "formalizes"}
+                ],
+                "topic_ids": ["spin"],
+            }
+        ],
     }
     publication = {
         "schema_version": 1,
@@ -397,29 +399,177 @@ def run_self_tests() -> None:
     """Exercise positive, retry, and representative semantic failure paths."""
     revision = "1" * 40
     fixture = fixture_responses(revision)
-    verify_responses(fixture, PAGES_BASE, revision)
+    canonical_schema = fixture[JSON_ENDPOINTS[1]].body
+    verify_responses(fixture, PAGES_BASE, revision, canonical_schema)
     mutations: list[tuple[str, dict[str, Response]]] = []
-    wrong_revision = dict(json.loads(fixture[JSON_ENDPOINTS[2]].body))
-    wrong_revision["revision"] = "2" * 40
-    for label, endpoint, replacement in (
-        ("wrong revision", JSON_ENDPOINTS[2], json.dumps(wrong_revision).encode()),
-        ("wrong content type", JSON_ENDPOINTS[0], fixture[JSON_ENDPOINTS[0]].body),
-        (
-            "missing navigation",
-            "formalization/",
-            fixture["formalization/"].body.replace(
-                b"/formalization/topics/", b"/formalization/missing/"
-            ),
-        ),
-    ):
+
+    def mutate(endpoint: str, old: bytes, new: bytes) -> dict[str, Response]:
+        """Replace one exact byte sequence in one fixture response."""
         changed = dict(fixture)
         original = changed[endpoint]
-        content_type = "text/plain" if label == "wrong content type" else original.content_type
-        changed[endpoint] = Response(200, content_type, replacement, original.final_url)
-        mutations.append((label, changed))
+        if original.body.count(old) != 1:
+            raise AssertionError(f"self-test mutation target is not unique: {old!r}")
+        changed[endpoint] = Response(
+            original.status,
+            original.content_type,
+            original.body.replace(old, new, 1),
+            original.final_url,
+        )
+        return changed
+
+    wrong_revision = dict(json.loads(fixture[JSON_ENDPOINTS[2]].body))
+    wrong_revision["revision"] = "2" * 40
+    source_row_start = b'<li data-row-kind="source"'
+    source_body = fixture["formalization/sources/"].body
+    source_row = source_row_start + source_body.split(source_row_start, 1)[1].split(
+        b"</li>", 1
+    )[0] + b"</li>"
+    status_row_start = b'<li data-row-kind="status"'
+    status_body = fixture["formalization/status/"].body
+    status_row = status_row_start + status_body.split(status_row_start, 1)[1].split(
+        b"</li>", 1
+    )[0] + b"</li>"
+    catalog_meta_start = b'<li data-meta="catalog-link"'
+    overview_body = fixture["formalization/"].body
+    catalog_meta = catalog_meta_start + overview_body.split(
+        catalog_meta_start, 1
+    )[1].split(b"</li>", 1)[0] + b"</li>"
+    schema_poison = dict(json.loads(canonical_schema))
+    schema_poison["poison"] = True
+    wrong_source_anchor = mutate(
+        "formalization/sources/",
+        b'<a href="/lattice-system/formalization/sources/book/">',
+        b'<a href="/lattice-system/formalization/sources/wrong/">',
+    )
+    unrelated_anchor = dict(wrong_source_anchor)
+    unrelated_original = unrelated_anchor["formalization/sources/"]
+    unrelated_anchor["formalization/sources/"] = Response(
+        200,
+        unrelated_original.content_type,
+        unrelated_original.body
+        + b'<a href="/lattice-system/formalization/sources/book/">unrelated</a>',
+        unrelated_original.final_url,
+    )
+
+    semantic_mutations = (
+        (
+            "missing navigation",
+            mutate(
+                "formalization/",
+                b'<a href="/lattice-system/formalization/topics/">',
+                b'<a href="/lattice-system/formalization/missing/">',
+            ),
+        ),
+        (
+            "wrong count",
+            mutate(
+                "formalization/sources/",
+                b'data-record-count="1"',
+                b'data-record-count="2"',
+            ),
+        ),
+        (
+            "wrong label",
+            mutate(
+                "formalization/topics/",
+                b'data-topic-label="Spin"',
+                b'data-topic-label="Wrong"',
+            ),
+        ),
+        (
+            "wrong visible label",
+            mutate(
+                "formalization/topics/",
+                b">Spin: 1 record(s)</a>",
+                b">Wrong: 1 record(s)</a>",
+            ),
+        ),
+        (
+            "wrong kind",
+            mutate(
+                "formalization/sources/",
+                b'data-row-kind="source"',
+                b'data-row-kind="topic"',
+            ),
+        ),
+        (
+            "duplicate source row",
+            mutate("formalization/sources/", source_row, source_row + source_row),
+        ),
+        (
+            "duplicate status row",
+            mutate("formalization/status/", status_row, status_row + status_row),
+        ),
+        (
+            "extra status row",
+            mutate(
+                "formalization/status/",
+                status_row,
+                status_row
+                + b'<li data-row-kind="status" data-status-label="extra" '
+                + b'data-record-count="1">extra: 1</li>',
+            ),
+        ),
+        (
+            "wrong clickable href",
+            wrong_source_anchor,
+        ),
+        (
+            "unrelated anchor satisfaction",
+            unrelated_anchor,
+        ),
+        (
+            "duplicate metadata",
+            mutate("formalization/", catalog_meta, catalog_meta + catalog_meta),
+        ),
+        (
+            "additive metadata",
+            mutate(
+                "formalization/",
+                b"catalogue</a></li></ul>",
+                b'catalogue</a></li><li data-meta="poison">Poison: true</li></ul>',
+            ),
+        ),
+    )
+    mutations.extend(semantic_mutations)
+
+    changed_revision = dict(fixture)
+    original_publication = changed_revision[JSON_ENDPOINTS[2]]
+    changed_revision[JSON_ENDPOINTS[2]] = Response(
+        200,
+        original_publication.content_type,
+        json.dumps(wrong_revision).encode(),
+        original_publication.final_url,
+    )
+    mutations.append(("wrong revision", changed_revision))
+    wrong_type = dict(fixture)
+    original_catalog = wrong_type[JSON_ENDPOINTS[0]]
+    wrong_type[JSON_ENDPOINTS[0]] = Response(
+        200, "text/plain", original_catalog.body, original_catalog.final_url
+    )
+    mutations.append(("wrong content type", wrong_type))
+    poisoned_schema = dict(fixture)
+    original_schema = poisoned_schema[JSON_ENDPOINTS[1]]
+    poisoned_schema[JSON_ENDPOINTS[1]] = Response(
+        200,
+        original_schema.content_type,
+        json.dumps(schema_poison).encode(),
+        original_schema.final_url,
+    )
+    mutations.append(("schema poisoning", poisoned_schema))
+    oversized = dict(fixture)
+    original_overview = oversized["formalization/"]
+    oversized["formalization/"] = Response(
+        200,
+        original_overview.content_type,
+        b"x" * (MAX_BODY_BYTES + 1),
+        original_overview.final_url,
+    )
+    mutations.append(("oversized body", oversized))
+
     for label, changed in mutations:
         try:
-            verify_responses(changed, PAGES_BASE, revision)
+            verify_responses(changed, PAGES_BASE, revision, canonical_schema)
         except ValueError:
             pass
         else:
@@ -427,14 +577,25 @@ def run_self_tests() -> None:
     missing = dict(fixture)
     missing.pop(JSON_ENDPOINTS[2])
     try:
-        verify_responses(missing, PAGES_BASE, revision)
+        verify_responses(missing, PAGES_BASE, revision, canonical_schema)
     except ValueError:
         pass
     else:
         raise AssertionError("publication with fewer than seven endpoints was accepted")
 
+    if NoRedirectHandler().redirect_request(None, None, 302, "", {}, PAGES_BASE) is not None:
+        raise AssertionError("redirect handler unexpectedly followed a redirect")
+    for declared in (str(MAX_BODY_BYTES + 1), "-1", "invalid"):
+        try:
+            validate_declared_length(declared, PAGES_BASE)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"unsafe Content-Length was accepted: {declared}")
+
     calls = 0
     sleeps: list[float] = []
+    clock = [0.0]
 
     def flaky_fetcher(url: str, timeout: float) -> Response:
         """Fail one complete attempt before serving the coherent fixture."""
@@ -451,11 +612,88 @@ def run_self_tests() -> None:
         attempts=2,
         initial_delay=1,
         timeout=1,
+        deadline=10,
+        canonical_schema_bytes=canonical_schema,
         fetcher=flaky_fetcher,
-        sleep=sleeps.append,
+        sleep=lambda delay: (sleeps.append(delay), clock.__setitem__(0, clock[0] + delay)),
+        monotonic=lambda: clock[0],
     )
     if sleeps != [1]:
         raise AssertionError("bounded retry self-test used an unexpected delay")
+
+    persistent_calls = 0
+
+    def persistent_failure(url: str, timeout: float) -> Response:
+        """Always fail to prove retry exhaustion is bounded and rejected."""
+        nonlocal persistent_calls
+        persistent_calls += 1
+        raise urllib.error.URLError("persistent failure")
+
+    exhaustion_clock = [0.0]
+    try:
+        verify_with_retry(
+            PAGES_BASE,
+            revision,
+            attempts=3,
+            initial_delay=1,
+            timeout=1,
+            deadline=10,
+            canonical_schema_bytes=canonical_schema,
+            fetcher=persistent_failure,
+            sleep=lambda delay: exhaustion_clock.__setitem__(
+                0, exhaustion_clock[0] + delay
+            ),
+            monotonic=lambda: exhaustion_clock[0],
+        )
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("persistent live publication failure was accepted")
+    if persistent_calls != 3 or exhaustion_clock[0] != 3:
+        raise AssertionError("persistent failure did not use bounded retry exhaustion")
+
+    deadline_clock = [0.0]
+
+    def deadline_fetcher(url: str, timeout: float) -> Response:
+        """Advance time so one coherent snapshot exceeds its deadline."""
+        endpoint = url.removeprefix(PAGES_BASE)
+        deadline_clock[0] += 1
+        return fixture[endpoint]
+
+    try:
+        verify_with_retry(
+            PAGES_BASE,
+            revision,
+            attempts=1,
+            initial_delay=0,
+            timeout=1,
+            deadline=2,
+            canonical_schema_bytes=canonical_schema,
+            fetcher=deadline_fetcher,
+            sleep=lambda delay: None,
+            monotonic=lambda: deadline_clock[0],
+        )
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("snapshot exceeding the absolute deadline was accepted")
+    if deadline_clock[0] != 2:
+        raise AssertionError("deadline did not stop the coherent snapshot promptly")
+    try:
+        verify_with_retry(
+            PAGES_BASE,
+            revision,
+            attempts=1,
+            initial_delay=0,
+            timeout=1,
+            deadline=MAX_DEADLINE_SECONDS + 1,
+            canonical_schema_bytes=canonical_schema,
+            fetcher=deadline_fetcher,
+        )
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("workflow-unsafe retry deadline was accepted")
 
 
 def parse_args() -> argparse.Namespace:
@@ -466,6 +704,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--attempts", type=int, default=7)
     parser.add_argument("--initial-delay", type=float, default=5)
     parser.add_argument("--timeout", type=float, default=10)
+    parser.add_argument("--deadline", type=float, default=240)
+    parser.add_argument("--canonical-schema", type=Path)
     parser.add_argument("--self-test", action="store_true")
     return parser.parse_args()
 
@@ -477,12 +717,17 @@ def main() -> int:
         if args.self_test:
             run_self_tests()
         if args.revision is not None:
+            if args.canonical_schema is None:
+                raise ValueError("--revision requires --canonical-schema")
+            canonical_schema_bytes = args.canonical_schema.read_bytes()
             verify_with_retry(
                 args.base_url,
                 args.revision,
                 args.attempts,
                 args.initial_delay,
                 args.timeout,
+                args.deadline,
+                canonical_schema_bytes,
             )
         elif not args.self_test:
             raise ValueError("--revision is required unless --self-test is used")

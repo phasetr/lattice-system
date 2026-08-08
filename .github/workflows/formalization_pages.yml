@@ -126,6 +126,8 @@ jobs:
           python3 scripts/check_live_formalization_site.py \
             --base-url https://phasetr.github.io/lattice-system/ \
             --revision "$GITHUB_SHA" \
+            --canonical-schema formalization-status/v1/schema.json \
             --attempts 7 \
             --initial-delay 5 \
-            --timeout 10
+            --timeout 10 \
+            --deadline 240

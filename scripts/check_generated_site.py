@@ -703,6 +703,40 @@ def expected_source_index_rows(
     return rows
 
 
+def expected_overview_index_rows(
+    catalog: dict[str, Any],
+) -> list[tuple[str, tuple[tuple[str, str], ...], str | None, str]]:
+    """Independently derive exact overview counts and navigation rows."""
+    rows = [
+        (
+            "overview-counts",
+            (
+                ("record-count", str(len(catalog["records"]))),
+                ("source-count", str(len(catalog["sources"]))),
+                ("topic-count", str(len(catalog["topics"]))),
+            ),
+            None,
+            f"This prototype snapshot contains {len(catalog['records'])} records, "
+            f"{len(catalog['sources'])} sources, and {len(catalog['topics'])} topics.",
+        )
+    ]
+    for navigation_id, visible in (
+        ("sources", "Browse generated source projections"),
+        ("topics", "Browse generated topic projections"),
+        ("status", "Browse generated status summary"),
+    ):
+        href = f"{BASEURL}/formalization/{navigation_id}/"
+        rows.append(
+            (
+                "overview-navigation",
+                (("href", href), ("navigation-id", navigation_id)),
+                href,
+                visible,
+            )
+        )
+    return rows
+
+
 def expected_topic_index_rows(
     catalog: dict[str, Any],
 ) -> list[tuple[str, tuple[tuple[str, str], ...], str | None, str]]:
@@ -814,19 +848,7 @@ def check_built_site(
         assert_metadata(parser, catalog, revision, label)
     require_index_rows(
         overview,
-        [
-            (
-                "overview-counts",
-                (
-                    ("record-count", str(len(catalog["records"]))),
-                    ("source-count", str(len(catalog["sources"]))),
-                    ("topic-count", str(len(catalog["topics"]))),
-                ),
-                None,
-                f"This prototype snapshot contains {len(catalog['records'])} records, "
-                f"{len(catalog['sources'])} sources, and {len(catalog['topics'])} topics.",
-            )
-        ],
+        expected_overview_index_rows(catalog),
         "built overview",
     )
     require_index_rows(source_index, expected_source_index_rows(catalog), "built source index")
@@ -1031,19 +1053,7 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
     )
     require_index_rows(
         overview_parser,
-        [
-            (
-                "overview-counts",
-                (
-                    ("record-count", str(len(catalog["records"]))),
-                    ("source-count", str(len(catalog["sources"]))),
-                    ("topic-count", str(len(catalog["topics"]))),
-                ),
-                None,
-                f"This prototype snapshot contains {len(catalog['records'])} records, "
-                f"{len(catalog['sources'])} sources, and {len(catalog['topics'])} topics.",
-            )
-        ],
+        expected_overview_index_rows(catalog),
         "staged overview",
     )
     status_parser = parse_record_html(
@@ -1156,9 +1166,11 @@ def check_workflow_invariants(repo_root: Path) -> None:
         "python3 scripts/check_live_formalization_site.py",
         "--base-url https://phasetr.github.io/lattice-system/",
         '--revision "$GITHUB_SHA"',
+        "--canonical-schema formalization-status/v1/schema.json",
         "--attempts 7",
         "--initial-delay 5",
         "--timeout 10",
+        "--deadline 240",
     )
     for token in verify_required:
         if token not in verify_block:
