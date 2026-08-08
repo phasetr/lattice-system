@@ -281,8 +281,9 @@ enums, Lean names, and module/path patterns already impose stricter grammars.
 - `catalog_state` (`prototype` until #5228, then `authoritative`);
 - the registry paths;
 - an explicit sorted `record_shards` list;
-- an optional fixed `cutover_baseline` path, which can only be
-  `cutover-baseline.json` and is mandatory in authoritative state;
+- optional paired fixed `cutover_baseline` and `cutover_certificate` paths,
+  which can only name `cutover-baseline.json` and
+  `cutover-certificate.json` and are mandatory in authoritative state;
 - the stable human and machine publication roots.
 
 The deterministic aggregate records `catalog_state`, `generated_by`,
@@ -290,7 +291,8 @@ The deterministic aggregate records `catalog_state`, `generated_by`,
 `source_items`, `sources`, and `topics`; every aggregate array is sorted by
 stable ID. `input_sha256` hashes the canonical manifest first, followed by its
 listed canonical inputs (schema, registries, then explicitly listed shards),
-followed by the cutover baseline when owned, all with path framing. The
+followed by the cutover baseline and certificate when owned, all with path
+framing. Present/absent and order regressions are tested independently. The
 generated aggregate is not a manifest input, so no
 self-reference arises. Including the manifest ensures `catalog_state`, shard
 ownership, and publication-root changes alter the digest. Repeated generation
@@ -317,10 +319,16 @@ second status database. It reconstructs exactly 2,052 catalogue rows from
 `docs/index.md` at commit
 `6519099024bf156b87ac0c807c6633c513792581`. Every row stores its ordinal,
 former source line, exact UTF-8 row SHA-256, one closed outcome, and sorted
-mapped record IDs. A `mapped` row maps one or more exact structured records and
-has no reason. A `not_a_declaration` row maps none and supplies a concise
-reason. This permits grouped Markdown rows to expand without pretending that
-every historical table entry was one Lean declaration.
+mapped record IDs. It also stores the exact backtick declaration references
+extracted from the former first table cell. A `mapped` row maps one or more
+exact structured records and has no disposition; normal mappings must bind the
+record's exact Lean leaf name to one of those references, including the audited
+slash shorthand. A `not_a_declaration` row maps none and uses only the closed
+`non_declaration` disposition. Such a row is accepted only when its exact
+legacy cell has no declaration reference and its ordinal occurs in the paired
+certificate. A free-form explanation cannot turn a declaration-bearing row
+into a non-record. This permits grouped Markdown rows to expand without
+pretending that every historical table entry was one Lean declaration.
 
 The baseline also stores sorted, disjoint `cutover_record_ids` and
 `non_legacy_record_ids`. The former is exactly the union of all row mappings
@@ -332,6 +340,19 @@ an error. The cutover checker and validator share the exact pinned-row
 reconstruction while retaining separate manifest/catalogue entry points.
 The validator names the four records published by the accepted prototype and
 requires each to occur in a legacy-row mapping rather than the non-legacy set.
+
+The paired certificate hashes the exact canonical baseline bytes, the sorted
+cutover-ID projection, and the complete ordinal/outcome/disposition/mapping/row
+hash projection. It also freezes the sorted non-record and exceptional-mapping
+ordinal lists. While the catalogue remains a prototype, introducing this pair
+is a freeze gate: the current record-ID set must equal `cutover_record_ids`, so
+an omitted current record is rejected. The atomic cutover PR must pin the
+canonical certificate's SHA-256 in the validator while changing state to
+`authoritative`. Thereafter the certificate fingerprint is independent of the
+editable baseline fields: shrinking cutover IDs, remapping rows, or replacing
+the certificate fails. Authoritative catalogues may add post-cutover records,
+but must retain every certified cutover ID. Changing the pinned fingerprint is
+an explicit new audited cutover, not routine catalogue maintenance.
 
 The post-cutover authority and theorem-PR rules are staged here for review but
 do not take effect while `catalog_state` is `prototype`:

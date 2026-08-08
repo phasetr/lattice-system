@@ -22,6 +22,7 @@ from check_generated_site import (
     expected_status_index_rows,
     expected_topic_index_rows,
     parse_record_html,
+    reject_authority_contradictions,
     require_index_rows,
 )
 
@@ -224,6 +225,10 @@ def verify_responses(
         endpoint: parse_human(responses[endpoint], endpoint)
         for endpoint in HUMAN_ENDPOINTS
     }
+    reject_authority_contradictions(
+        catalog,
+        [(endpoint, " ".join(parser.text)) for endpoint, parser in pages.items()],
+    )
     for endpoint, parser in pages.items():
         require_metadata(parser, endpoint, catalog, revision)
     require_navigation(pages, catalog)
@@ -419,6 +424,25 @@ def run_self_tests() -> None:
         revision,
         authoritative_fixture[JSON_ENDPOINTS[1]].body,
     )
+    stale_authoritative = dict(authoritative_fixture)
+    stale_overview = stale_authoritative["formalization/"]
+    stale_authoritative["formalization/"] = Response(
+        stale_overview.status,
+        stale_overview.content_type,
+        stale_overview.body + b"<p>The interim legacy catalogue remains authoritative.</p>",
+        stale_overview.final_url,
+    )
+    try:
+        verify_responses(
+            stale_authoritative,
+            PAGES_BASE,
+            revision,
+            authoritative_fixture[JSON_ENDPOINTS[1]].body,
+        )
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("authoritative live page accepted stale legacy-authority prose")
     mutations: list[tuple[str, dict[str, Response]]] = []
 
     def mutate(endpoint: str, old: bytes, new: bytes) -> dict[str, Response]:

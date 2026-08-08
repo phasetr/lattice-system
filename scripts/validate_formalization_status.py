@@ -15,10 +15,12 @@ from typing import Any, Iterable
 
 from formalization_cutover import (
     CUTOVER_BASELINE_KEYS,
+    CUTOVER_CERTIFICATE_KEYS,
     LEGACY_ROW_KEYS,
     reconstruct_legacy_rows,
     self_test as cutover_self_test,
     validate_cutover_baseline,
+    validate_cutover_certificate,
     validate_cutover_requirement,
 )
 
@@ -28,6 +30,7 @@ GENERATOR_VERSION = 2
 MANIFEST_KEYS = {
     "catalog_state",
     "cutover_baseline",
+    "cutover_certificate",
     "human_publication_root",
     "machine_publication_root",
     "record_shards",
@@ -35,7 +38,7 @@ MANIFEST_KEYS = {
     "schema",
     "schema_version",
 }
-MANIFEST_REQUIRED_KEYS = MANIFEST_KEYS - {"cutover_baseline"}
+MANIFEST_REQUIRED_KEYS = MANIFEST_KEYS - {"cutover_baseline", "cutover_certificate"}
 REGISTRY_KEYS = {"source_items", "sources", "topics"}
 SHARD_KEYS = {"records", "schema_version", "source_id", "source_unit"}
 RELATION_RANK = {
@@ -211,6 +214,7 @@ class Contract:
             ("aggregate", expected_aggregate, expected_aggregate),
             ("declaration_record", expected_record, expected_record),
             ("cutover_baseline", CUTOVER_BASELINE_KEYS, CUTOVER_BASELINE_KEYS),
+            ("cutover_certificate", CUTOVER_CERTIFICATE_KEYS, CUTOVER_CERTIFICATE_KEYS),
             ("cutover_legacy_row", LEGACY_ROW_KEYS, LEGACY_ROW_KEYS),
             ("manifest", MANIFEST_KEYS, MANIFEST_REQUIRED_KEYS),
             ("record_shard", SHARD_KEYS, SHARD_KEYS),
@@ -300,6 +304,11 @@ class Contract:
             and self.defs["manifest"]["properties"].get("cutover_baseline", {}).get("const")
             == "cutover-baseline.json",
             "schema parity: cutover baseline cardinality/path drifted",
+        )
+        self.validation.require(
+            self.defs["manifest"]["properties"].get("cutover_certificate", {}).get("const")
+            == "cutover-certificate.json",
+            "schema parity: cutover certificate path drifted",
         )
         self.validation.require(
             self.declaration_kinds
@@ -1966,12 +1975,12 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
             **row,
             "mapped_record_ids": [],
             "outcome": "not_a_declaration",
-            "reason": "Schema self-test fixture.",
+            "disposition": "non_declaration",
         }
         for row in reconstruct_legacy_rows(repo_root)
     ]
     baseline_rows[0].update(
-        mapped_record_ids=["fixture-record"], outcome="mapped", reason=None
+        mapped_record_ids=["fixture-record"], outcome="mapped", disposition=None
     )
     baseline_fixture = {
         "baseline_commit": "6519099024bf156b87ac0c807c6633c513792581",
@@ -1991,13 +2000,26 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
     )
     check(
         not baseline_schema_validation.errors,
-        "valid cutover baseline schema fixture was rejected",
+        "valid cutover baseline schema fixture was rejected: "
+        f"{baseline_schema_validation.errors}",
     )
     for label, mutation in (
         ("short row array", lambda value: value["legacy_rows"].pop()),
         (
             "mapped row without IDs",
             lambda value: value["legacy_rows"][0].update(mapped_record_ids=[]),
+        ),
+        (
+            "mapped row with non-record disposition",
+            lambda value: value["legacy_rows"][0].update(disposition="non_declaration"),
+        ),
+        (
+            "non-record row with mapped IDs",
+            lambda value: value["legacy_rows"][1].update(mapped_record_ids=["fixture-record"]),
+        ),
+        (
+            "non-record row without disposition",
+            lambda value: value["legacy_rows"][1].update(disposition=None),
         ),
         ("unknown field", lambda value: value.update(unknown=True)),
     ):
@@ -2012,6 +2034,44 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
             mutation_validation,
         )
         check(bool(mutation_validation.errors), f"cutover schema accepted {label}")
+    certificate_fixture = {
+        "baseline_sha256": "0" * 64,
+        "cutover_record_ids_sha256": "1" * 64,
+        "exceptional_mapping_ordinals": [],
+        "legacy_mapping_sha256": "2" * 64,
+        "non_record_ordinals": [2],
+        "schema_version": 1,
+    }
+    certificate_schema_validation = Validation()
+    validate_schema_instance(
+        certificate_fixture,
+        contract.schema,
+        contract.schema,
+        "cutover certificate self-test",
+        certificate_schema_validation,
+    )
+    check(
+        not certificate_schema_validation.errors,
+        "valid cutover certificate schema fixture was rejected: "
+        f"{certificate_schema_validation.errors}",
+    )
+    for label, mutation in (
+        ("duplicate ordinal", lambda value: value.update(non_record_ordinals=[2, 2])),
+        ("out-of-range ordinal", lambda value: value.update(non_record_ordinals=[2053])),
+        ("bad digest", lambda value: value.update(baseline_sha256="bad")),
+        ("unknown field", lambda value: value.update(unknown=True)),
+    ):
+        mutated = copy.deepcopy(certificate_fixture)
+        mutation(mutated)
+        mutation_validation = Validation()
+        validate_schema_instance(
+            mutated,
+            contract.schema,
+            contract.schema,
+            f"cutover certificate mutation: {label}",
+            mutation_validation,
+        )
+        check(bool(mutation_validation.errors), f"cutover certificate schema accepted {label}")
     return failures
 
 
@@ -2097,8 +2157,11 @@ def main() -> int:
             f"manifest.json.{field}: invalid publication root",
         )
     baseline_declared = manifest.get("cutover_baseline")
+    certificate_declared = manifest.get("cutover_certificate")
     validation.errors.extend(
-        validate_cutover_requirement(manifest.get("catalog_state"), baseline_declared)
+        validate_cutover_requirement(
+            manifest.get("catalog_state"), baseline_declared, certificate_declared
+        )
     )
     safe_baseline_path: Path | None = None
     if baseline_declared is not None:
@@ -2109,6 +2172,15 @@ def main() -> int:
             "manifest.json.cutover_baseline",
             validation,
         )
+    safe_certificate_path: Path | None = None
+    if certificate_declared is not None:
+        safe_certificate_path = safe_expected_relative_path(
+            root,
+            certificate_declared,
+            "cutover-certificate.json",
+            "manifest.json.cutover_certificate",
+            validation,
+        )
     listed_paths = [schema_path]
     listed_paths.extend(
         safe_registry_paths[key][0] for key in sorted(safe_registry_paths)
@@ -2116,6 +2188,8 @@ def main() -> int:
     listed_paths.extend(shard for shard in shards if shard in safe_shard_paths)
     if isinstance(baseline_declared, str) and safe_baseline_path is not None:
         listed_paths.append(baseline_declared)
+    if isinstance(certificate_declared, str) and safe_certificate_path is not None:
+        listed_paths.append(certificate_declared)
     expected_json = {"manifest.json", *listed_paths}
     actual_json = {str(path.relative_to(root)) for path in root.rglob("*.json")}
     validation.require(
@@ -2130,6 +2204,8 @@ def main() -> int:
     }
     if isinstance(baseline_declared, str) and safe_baseline_path is not None:
         safe_listed_paths[baseline_declared] = safe_baseline_path
+    if isinstance(certificate_declared, str) and safe_certificate_path is not None:
+        safe_listed_paths[certificate_declared] = safe_certificate_path
     for path in listed_paths[1:]:
         safe_path = safe_listed_paths.get(path)
         if safe_path is None:
@@ -2151,11 +2227,28 @@ def main() -> int:
         topics,
         validation,
     )
-    if isinstance(baseline_declared, str):
+    if isinstance(baseline_declared, str) and isinstance(certificate_declared, str):
         baseline = data.get(baseline_declared)
-        if baseline is not None:
+        certificate = data.get(certificate_declared)
+        if baseline is not None and certificate is not None:
+            validation.errors.extend(
+                validate_cutover_certificate(
+                    certificate,
+                    input_raw[certificate_declared],
+                    baseline,
+                    input_raw[baseline_declared],
+                    manifest.get("catalog_state"),
+                    records,
+                )
+            )
+            non_record_ordinals = certificate.get("non_record_ordinals", [])
+            exceptional_ordinals = certificate.get("exceptional_mapping_ordinals", [])
             for error in validate_cutover_baseline(
-                baseline, records, reconstruct_legacy_rows(repo_root)
+                baseline,
+                records,
+                reconstruct_legacy_rows(repo_root),
+                set(non_record_ordinals) if isinstance(non_record_ordinals, list) else set(),
+                set(exceptional_ordinals) if isinstance(exceptional_ordinals, list) else set(),
             ):
                 validation.errors.append(error)
     validate_prototype_coverage(

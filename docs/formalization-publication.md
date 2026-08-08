@@ -50,7 +50,11 @@ remains authoritative until Issue #5228 performs the audited cutover.
 When the state becomes `authoritative`, the same generated metadata instead
 links to and names the validated version 1 catalogue as the current authority.
 The staged and rendered checkers derive this choice from `catalog_state`; a
-state flip with stale prototype authority prose is rejected.
+state flip with stale prototype authority prose is rejected. In authoritative
+state they scan every staged Markdown page and every rendered HTML page for the
+closed stale-authority phrases exercised by negative tests, rather than merely
+checking that the generated metadata itself is correct. The live checker
+applies the same rule to all four fetched human entry points.
 
 Stable publication paths are:
 

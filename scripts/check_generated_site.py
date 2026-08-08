@@ -20,6 +20,14 @@ from urllib.parse import unquote, urlsplit
 BASEURL = "/lattice-system"
 DIGEST_RE = re.compile(r"[0-9a-f]{64}")
 REPO_ROOT = Path(__file__).resolve().parents[1]
+AUTHORITATIVE_FORBIDDEN_PHRASES = (
+    "catalogue state: prototype",
+    "complete interim legacy catalogue",
+    "interim legacy catalogue remains authoritative",
+    "prototype navigation only",
+    "until issue #5228",
+    "version 1 structured catalogue is not yet complete or authoritative",
+)
 
 
 class PageParser(html.parser.HTMLParser):
@@ -360,6 +368,20 @@ def load_catalog(path: Path) -> tuple[dict[str, Any], bytes]:
     return data, raw
 
 
+def manifest_input_names(manifest: dict[str, Any]) -> list[str]:
+    """Return the exact validator input order, including paired cutover evidence."""
+    listed = [manifest["schema"]]
+    listed.extend(manifest["registries"][key] for key in sorted(manifest["registries"]))
+    listed.extend(manifest["record_shards"])
+    baseline = manifest.get("cutover_baseline")
+    certificate = manifest.get("cutover_certificate")
+    if (baseline is None) != (certificate is None):
+        raise ValueError("manifest cutover baseline and certificate must be paired")
+    if baseline is not None:
+        listed.extend([baseline, certificate])
+    return listed
+
+
 def recompute_input_digest(catalog: dict[str, Any]) -> None:
     """Independently recompute aggregate content and the framed input digest."""
     root = REPO_ROOT / "formalization-status/v1"
@@ -375,9 +397,7 @@ def recompute_input_digest(catalog: dict[str, Any]) -> None:
             raise ValueError(f"manifest input escapes the catalogue root: {name!r}")
         return candidate
 
-    listed = [manifest["schema"]]
-    listed.extend(manifest["registries"][key] for key in sorted(manifest["registries"]))
-    listed.extend(manifest["record_shards"])
+    listed = manifest_input_names(manifest)
     digest = hashlib.sha256()
     for name, raw in [
         ("manifest.json", manifest_raw),
@@ -465,6 +485,21 @@ def required_page(site: Path, relative: str, pages: dict[Path, PageParser]) -> P
     if path not in pages:
         raise ValueError(f"required generated page is missing: {relative}")
     return pages[path]
+
+
+def reject_authority_contradictions(
+    catalog: dict[str, Any], texts: list[tuple[str, str]]
+) -> None:
+    """Reject stale prototype/legacy-authority claims across an authoritative tree."""
+    if catalog.get("catalog_state") != "authoritative":
+        return
+    for label, text in texts:
+        lowered = " ".join(text.lower().split())
+        for phrase in AUTHORITATIVE_FORBIDDEN_PHRASES:
+            if phrase in lowered:
+                raise ValueError(
+                    f"{label}: authoritative publication contains stale authority prose {phrase!r}"
+                )
 
 
 def assert_metadata(parser: PageParser, catalog: dict[str, Any], revision: str, label: str) -> None:
@@ -847,6 +882,13 @@ def check_built_site(
         raise ValueError("publication sidecar metadata does not match the build")
 
     pages = parse_site(site)
+    reject_authority_contradictions(
+        catalog,
+        [
+            (str(path.relative_to(site)), " ".join(parser.text))
+            for path, parser in pages.items()
+        ],
+    )
     check_links(site, pages)
     overview = required_page(site, "formalization/index.html", pages)
     status = required_page(site, "formalization/status/index.html", pages)
@@ -963,6 +1005,13 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
     if publication.get("input_sha256") != catalog["input_sha256"]:
         raise ValueError("staged publication sidecar has the wrong catalogue digest")
     generated_files = sorted((source / "formalization").rglob("*.md"))
+    reject_authority_contradictions(
+        catalog,
+        [
+            (str(path.relative_to(source)), path.read_text(encoding="utf-8"))
+            for path in sorted(source.rglob("*.md"))
+        ],
+    )
     marker_specs: set[str] = set()
     for path in generated_files:
         text = path.read_text(encoding="utf-8")
@@ -1591,6 +1640,56 @@ def run_staged_mutation_tests(
 
 def run_self_tests() -> None:
     """Exercise duplicate-ID, unsafe-path, fragment, and byte-mismatch failures."""
+    manifest_fixture = {
+        "schema": "schema.json",
+        "registries": {"topics": "topics.json", "sources": "sources.json"},
+        "record_shards": ["records/a.json"],
+    }
+    expected_without_cutover = [
+        "schema.json",
+        "sources.json",
+        "topics.json",
+        "records/a.json",
+    ]
+    if manifest_input_names(manifest_fixture) != expected_without_cutover:
+        raise AssertionError("manifest digest order without cutover evidence drifted")
+    with_cutover = {
+        **manifest_fixture,
+        "cutover_baseline": "cutover-baseline.json",
+        "cutover_certificate": "cutover-certificate.json",
+    }
+    if manifest_input_names(with_cutover) != [
+        *expected_without_cutover,
+        "cutover-baseline.json",
+        "cutover-certificate.json",
+    ]:
+        raise AssertionError("manifest digest order with cutover evidence drifted")
+    for incomplete in (
+        {**manifest_fixture, "cutover_baseline": "cutover-baseline.json"},
+        {**manifest_fixture, "cutover_certificate": "cutover-certificate.json"},
+    ):
+        try:
+            manifest_input_names(incomplete)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("unpaired optional cutover digest input was accepted")
+    reject_authority_contradictions(
+        {"catalog_state": "prototype"},
+        [("prototype fixture", "The interim legacy catalogue remains authoritative")],
+    )
+    for phrase in AUTHORITATIVE_FORBIDDEN_PHRASES:
+        try:
+            reject_authority_contradictions(
+                {"catalog_state": "authoritative"},
+                [("authoritative contradiction fixture", phrase)],
+            )
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(
+                f"authoritative stale-authority phrase was accepted: {phrase}"
+            )
     assert publication_file(
         Path("/tmp/site"), "/lattice-system/formalization/"
     ) == Path("/tmp/site/formalization/index.html").resolve()

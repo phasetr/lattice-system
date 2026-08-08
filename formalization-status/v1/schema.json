@@ -108,6 +108,53 @@
       ],
       "type": "object"
     },
+    "cutover_certificate": {
+      "additionalProperties": false,
+      "properties": {
+        "baseline_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "cutover_record_ids_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "exceptional_mapping_ordinals": {
+          "items": {
+            "maximum": 2052,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "legacy_mapping_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "non_record_ordinals": {
+          "items": {
+            "maximum": 2052,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "schema_version": {
+          "const": 1
+        }
+      },
+      "required": [
+        "baseline_sha256",
+        "cutover_record_ids_sha256",
+        "exceptional_mapping_ordinals",
+        "legacy_mapping_sha256",
+        "non_record_ordinals",
+        "schema_version"
+      ],
+      "type": "object"
+    },
     "cutover_legacy_row": {
       "additionalProperties": false,
       "allOf": [
@@ -124,11 +171,11 @@
           },
           "then": {
             "properties": {
+              "disposition": {
+                "type": "null"
+              },
               "mapped_record_ids": {
                 "minItems": 1
-              },
-              "reason": {
-                "type": "null"
               }
             }
           }
@@ -146,17 +193,33 @@
           },
           "then": {
             "properties": {
+              "disposition": {
+                "const": "non_declaration"
+              },
               "mapped_record_ids": {
                 "maxItems": 0
-              },
-              "reason": {
-                "$ref": "#/$defs/inline_text"
               }
             }
           }
         }
       ],
       "properties": {
+        "disposition": {
+          "oneOf": [
+            {
+              "const": "non_declaration"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "legacy_declaration_refs": {
+          "items": {
+            "$ref": "#/$defs/inline_text"
+          },
+          "type": "array"
+        },
         "legacy_source_line": {
           "maximum": 2730,
           "minimum": 239,
@@ -180,27 +243,18 @@
             "not_a_declaration"
           ]
         },
-        "reason": {
-          "oneOf": [
-            {
-              "$ref": "#/$defs/inline_text"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
         "row_sha256": {
           "pattern": "^[0-9a-f]{64}$",
           "type": "string"
         }
       },
       "required": [
+        "disposition",
+        "legacy_declaration_refs",
         "legacy_source_line",
         "mapped_record_ids",
         "ordinal",
         "outcome",
-        "reason",
         "row_sha256"
       ],
       "type": "object"
@@ -559,6 +613,9 @@
         "cutover_baseline": {
           "const": "cutover-baseline.json"
         },
+        "cutover_certificate": {
+          "const": "cutover-certificate.json"
+        },
         "human_publication_root": {
           "pattern": "^/lattice-system/.+/$",
           "type": "string"
@@ -902,6 +959,9 @@
     },
     {
       "$ref": "#/$defs/cutover_baseline"
+    },
+    {
+      "$ref": "#/$defs/cutover_certificate"
     },
     {
       "$ref": "#/$defs/manifest"

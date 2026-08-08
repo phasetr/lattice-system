@@ -13,11 +13,12 @@ from formalization_cutover import (
     reconstruct_legacy_rows,
     self_test,
     validate_cutover_baseline,
+    validate_cutover_certificate,
     validate_cutover_requirement,
 )
 
 
-def read_json(path: Path) -> Any:
+def read_json(path: Path) -> tuple[Any, bytes]:
     """Read one UTF-8 JSON document without accepting duplicate object keys."""
     def object_pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
         result: dict[str, Any] = {}
@@ -27,8 +28,8 @@ def read_json(path: Path) -> Any:
             result[key] = value
         return result
 
-    with path.open(encoding="utf-8") as source:
-        return json.load(source, object_pairs_hook=object_pairs)
+    raw = path.read_bytes()
+    return json.loads(raw.decode("utf-8"), object_pairs_hook=object_pairs), raw
 
 
 def main() -> int:
@@ -39,22 +40,43 @@ def main() -> int:
     repo_root = Path(__file__).resolve().parents[1]
     root = repo_root / "formalization-status" / "v1"
     failures = self_test(repo_root) if args.self_test else []
-    manifest = read_json(root / "manifest.json")
+    manifest, _manifest_raw = read_json(root / "manifest.json")
     baseline_name = manifest.get("cutover_baseline")
-    failures.extend(validate_cutover_requirement(manifest.get("catalog_state"), baseline_name))
-    if baseline_name is not None:
+    certificate_name = manifest.get("cutover_certificate")
+    failures.extend(
+        validate_cutover_requirement(
+            manifest.get("catalog_state"), baseline_name, certificate_name
+        )
+    )
+    if baseline_name is not None and certificate_name is not None:
         if baseline_name != "cutover-baseline.json":
             failures.append("manifest cutover baseline path is not fixed")
+        elif certificate_name != "cutover-certificate.json":
+            failures.append("manifest cutover certificate path is not fixed")
         else:
             records: list[dict[str, Any]] = []
             for shard in manifest.get("record_shards", []):
-                shard_data = read_json(root / shard)
+                shard_data, _shard_raw = read_json(root / shard)
                 records.extend(shard_data.get("records", []))
+            baseline, baseline_raw = read_json(root / baseline_name)
+            certificate, certificate_raw = read_json(root / certificate_name)
+            failures.extend(
+                validate_cutover_certificate(
+                    certificate,
+                    certificate_raw,
+                    baseline,
+                    baseline_raw,
+                    manifest.get("catalog_state"),
+                    records,
+                )
+            )
             failures.extend(
                 validate_cutover_baseline(
-                    read_json(root / baseline_name),
+                    baseline,
                     records,
                     reconstruct_legacy_rows(repo_root),
+                    set(certificate.get("non_record_ordinals", [])),
+                    set(certificate.get("exceptional_mapping_ordinals", [])),
                 )
             )
     if failures:
