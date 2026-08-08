@@ -60,6 +60,68 @@ PROTOTYPE_RECORD_IDS = {
     "tasaki-2020-theorem-3-1-finite-dimensional-core",
     "tasaki-2020-theorem-4-2-shastry-no-ssb",
 }
+PINNED_EXCEPTIONAL_EXPECTED_NAMES = {
+    # One cyclic triple, not a 3 × 3 Cartesian product.
+    20: (
+        "LatticeSystem.Quantum.spinHalfRot1_pi_anticomm_spinHalfRot2_pi",
+        "LatticeSystem.Quantum.spinHalfRot2_pi_anticomm_spinHalfRot3_pi",
+        "LatticeSystem.Quantum.spinHalfRot3_pi_anticomm_spinHalfRot1_pi",
+    ),
+    # Two paired ladder/base-state declarations, not a 2 × 2 product.
+    432: (
+        "LatticeSystem.Quantum.totalSpinHalfOpMinus_pow_basisVec_all_up_mem_magnetizationSubspace",
+        "LatticeSystem.Quantum.totalSpinHalfOpPlus_pow_basisVec_all_down_mem_magnetizationSubspace",
+    ),
+    # This row is explicitly audited as the four-member Cartesian product.
+    471: (
+        "LatticeSystem.Quantum.neelSquareState_inner_szsz_horizontal_adjacent_eq_neg_one_quarter",
+        "LatticeSystem.Quantum.neelSquareState_inner_szsz_horizontal_wrap_eq_neg_one_quarter",
+        "LatticeSystem.Quantum.neelSquareState_inner_szsz_vertical_adjacent_eq_neg_one_quarter",
+        "LatticeSystem.Quantum.neelSquareState_inner_szsz_vertical_wrap_eq_neg_one_quarter",
+    ),
+    1237: (
+        "LatticeSystem.Quantum.onSiteS_spinSOpMinus_mul_onSiteS_spinSOpMinus_mulVec_mem_magSubspaceS",
+        "LatticeSystem.Quantum.onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_mulVec_mem_magSubspaceS",
+        "LatticeSystem.Quantum.onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_mulVec_mem_magSubspaceS",
+        "LatticeSystem.Quantum.onSiteS_spinSOpPlus_mul_onSiteS_spinSOpPlus_mulVec_mem_magSubspaceS",
+        "LatticeSystem.Quantum.totalSpinSOp3_mul_onSiteS_spinSOpMinus",
+        "LatticeSystem.Quantum.totalSpinSOp3_mul_onSiteS_spinSOpPlus",
+    ),
+    1239: (
+        "LatticeSystem.Quantum.onSiteS_mul_onSiteS_apply_im_zero_of_real",
+        "LatticeSystem.Quantum.onSiteS_mul_onSiteS_apply_re_nonneg_of_real_nonneg",
+        "LatticeSystem.Quantum.onSiteS_spinSOpMinus_mul_onSiteS_spinSOpMinus_apply_im_zero_re_nonneg",
+        "LatticeSystem.Quantum.onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_apply_im_zero_re_nonneg",
+        "LatticeSystem.Quantum.onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_apply_im_zero_re_nonneg",
+        "LatticeSystem.Quantum.onSiteS_spinSOpPlus_mul_onSiteS_spinSOpPlus_apply_im_zero_re_nonneg",
+    ),
+    1269: (
+        "LatticeSystem.Quantum.dressedAxisSwapped_bond_re_neg_bipartite_x_of_raiseLower_witness",
+        "LatticeSystem.Quantum.dressedAxisSwapped_bond_re_neg_bipartite_y_of_raiseLower_witness",
+    ),
+    # Five zipped spin-S/spin-half declarations, not a 5 × 5 product.
+    1592: (
+        "LatticeSystem.Quantum.spinSOp1_one_eq_spinHalfOp1",
+        "LatticeSystem.Quantum.spinSOp2_one_eq_spinHalfOp2",
+        "LatticeSystem.Quantum.spinSOp3_one_eq_spinHalfOp3",
+        "LatticeSystem.Quantum.spinSOpMinus_one_eq_spinHalfOpMinus",
+        "LatticeSystem.Quantum.spinSOpPlus_one_eq_spinHalfOpPlus",
+    ),
+    1905: (
+        "LatticeSystem.Fermion.hubbardOnSiteInteractionSiteReflectionCoeffAction",
+        "LatticeSystem.Fermion.hubbardOnSiteInteractionSiteReflectionCoeffWeight",
+        "LatticeSystem.Fermion.spinReflectionCoeff_attractiveHubbardInteraction",
+        "LatticeSystem.Fermion.spinReflectionCoeff_hubbardOnSiteInteractionSite",
+    ),
+    1907: (
+        "LatticeSystem.Fermion.hubbardBlock_betweenSum_down",
+        "LatticeSystem.Fermion.hubbardBlock_betweenSum_up",
+        "LatticeSystem.Fermion.hubbardBlock_downHop_jwSign_backward",
+        "LatticeSystem.Fermion.hubbardBlock_downHop_jwSign_forward",
+        "LatticeSystem.Fermion.hubbardBlock_upHop_jwSign_backward",
+        "LatticeSystem.Fermion.hubbardBlock_upHop_jwSign_forward",
+    ),
+}
 SHA256_RE = re.compile(r"[0-9a-f]{64}")
 STABLE_ID_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 
@@ -99,8 +161,10 @@ def reconstruct_legacy_rows(repo_root: Path) -> list[dict[str, Any]]:
             grouping_syntax.append("plain_etc")
         if len(references) > 1 or "," in plain_text:
             grouping_syntax.append("multiple")
-        if any(ref.startswith("_") for ref in references):
+        if any(ref.startswith("_") or "..." in ref or "…" in ref for ref in references):
             grouping_syntax.append("abbreviated")
+        if any(any(character.isspace() for character in ref) for ref in references):
+            grouping_syntax.append("signature")
         rows.append(
             {
                 "legacy_declaration_refs": references,
@@ -189,6 +253,28 @@ def _expand_slash(value: str) -> list[str] | None:
     return result
 
 
+def _slash_group_count(value: str) -> int | None:
+    """Count deterministic slash groups without choosing cross-group semantics."""
+    count = 0
+    remaining = value
+    while "/" in remaining:
+        match = re.fullmatch(
+            r"([^/]*)([A-Z][a-z0-9']*|[0-9]+)"
+            r"((?:/(?:[A-Z][a-z0-9']*|[0-9]+))+)(.*)",
+            remaining,
+        )
+        if match is None:
+            return None
+        count += 1
+        remaining = match.group(4)
+    return count
+
+
+def _is_lean_identifier_leaf(value: str) -> bool:
+    """Recognize one nonempty Lean-like identifier, excluding prose notation."""
+    return bool(value) and value.replace("'", "").isidentifier()
+
+
 def expand_legacy_leaves(row: dict[str, Any]) -> set[str] | None:
     """Expand mechanically complete legacy references, or require a certificate."""
     syntax = set(row.get("legacy_grouping_syntax", []))
@@ -196,16 +282,27 @@ def expand_legacy_leaves(row: dict[str, Any]) -> set[str] | None:
         return None
     result: set[str] = set()
     for raw_reference in row.get("legacy_declaration_refs", []):
-        reference_token = raw_reference.split(None, 1)[0]
+        if not raw_reference or any(character.isspace() for character in raw_reference):
+            return None
+        reference_token = raw_reference
         if reference_token.endswith(".lean") or re.match(r"[0-9]", reference_token):
             return None
         reference = reference_token.rsplit(".", 1)[-1]
+        slash_groups = _slash_group_count(reference)
+        if (
+            reference.count("{") != reference.count("}")
+            or slash_groups is None
+            or reference.count("{") + slash_groups > 1
+        ):
+            return None
         brace_expanded = _expand_braces(reference)
         if brace_expanded is None:
             return None
         for expanded in brace_expanded:
             slash_expanded = _expand_slash(expanded)
             if slash_expanded is None:
+                return None
+            if any(not _is_lean_identifier_leaf(leaf) for leaf in slash_expanded):
                 return None
             result.update(slash_expanded)
     return result if result else None
@@ -523,8 +620,12 @@ def self_test(repo_root: Path) -> list[str]:
                 f"LatticeSystem.Fixture.{leaf}" for leaf in expected_leaves
             )
         elif row["legacy_grouping_syntax"]:
-            base = f"LatticeSystem.Fixture.exceptional_{row['ordinal']:04d}"
-            expected_names = [base + "_a", base + "_b"]
+            pinned_names = PINNED_EXCEPTIONAL_EXPECTED_NAMES.get(row["ordinal"])
+            if pinned_names is None:
+                base = f"LatticeSystem.Fixture.exceptional_{row['ordinal']:04d}"
+                expected_names = [base + "_a", base + "_b"]
+            else:
+                expected_names = list(pinned_names)
             exceptional_entries.append(
                 {
                     "expected_lean_names": expected_names,
@@ -699,12 +800,6 @@ def self_test(repo_root: Path) -> list[str]:
             "spinHalfOpMinus_conjTranspose",
             "spinHalfOpPlus_conjTranspose",
         },
-        "`spinHalfOpPlus/Minus_mulVec_spinHalfUp/Down`": {
-            "spinHalfOpMinus_mulVec_spinHalfDown",
-            "spinHalfOpMinus_mulVec_spinHalfUp",
-            "spinHalfOpPlus_mulVec_spinHalfDown",
-            "spinHalfOpPlus_mulVec_spinHalfUp",
-        },
         (
             "`spinHalfRot1_half_pi_conj_spinHalfOp{2,3}` / "
             "`spinHalfRot2_half_pi_conj_spinHalfOp{3,1}` / "
@@ -722,6 +817,52 @@ def self_test(repo_root: Path) -> list[str]:
         source_row = next(row for row in rows if row["legacy_first_cell"] == first_cell)
         if expand_legacy_leaves(source_row) != expected_expansion:
             failures.append(f"deterministic slash expansion drifted for {first_cell}")
+
+    invalid_reference_fixtures = (
+        ("empty", ""),
+        ("unbalanced brace", "fixture{A,B"),
+        ("whitespace-truncated signature", "fixtureName argument"),
+        ("Unicode ellipsis", "…fixtureName"),
+        ("prose symbolic notation", "Ŝ⁺Ŝ⁻"),
+    )
+    for label, reference in invalid_reference_fixtures:
+        invalid_row = {
+            **rows[4],
+            "legacy_declaration_refs": [reference],
+            "legacy_grouping_syntax": [],
+        }
+        if expand_legacy_leaves(invalid_row) is not None:
+            failures.append(f"invalid {label} reference expanded mechanically")
+
+    exceptional_by_ordinal = {
+        entry["ordinal"]: entry for entry in exceptional_entries
+    }
+    for ordinal, expected_names in PINNED_EXCEPTIONAL_EXPECTED_NAMES.items():
+        if expand_legacy_leaves(rows[ordinal - 1]) is not None:
+            failures.append(f"pinned ambiguous/prose row {ordinal} expanded mechanically")
+        entry = exceptional_by_ordinal.get(ordinal)
+        if entry is None or entry["expected_lean_names"] != list(expected_names):
+            failures.append(f"pinned exceptional mapping drifted for row {ordinal}")
+            continue
+        for label, names in (
+            ("missing", list(expected_names[:-1])),
+            (
+                "extra",
+                sorted([*expected_names, f"LatticeSystem.Fixture.extra_{ordinal}"]),
+            ),
+        ):
+            mutated_evidence = copy.deepcopy(exceptional_by_ordinal)
+            mutated_evidence[ordinal]["expected_lean_names"] = names
+            if not validate_cutover_baseline(
+                baseline,
+                records,
+                rows,
+                set(non_record_ordinals),
+                mutated_evidence,
+            ):
+                failures.append(
+                    f"pinned exceptional row {ordinal} accepted {label} certificate names"
+                )
 
     uncertified_group = {
         entry["ordinal"]: entry

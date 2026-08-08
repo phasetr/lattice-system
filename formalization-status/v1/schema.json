@@ -255,6 +255,7 @@
               "brace",
               "multiple",
               "plain_etc",
+              "signature",
               "slash",
               "wildcard"
             ]

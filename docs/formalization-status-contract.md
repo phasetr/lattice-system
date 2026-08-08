@@ -323,7 +323,10 @@ mapped record IDs. It also stores the exact backtick declaration references
 extracted from the former first table cell. A `mapped` row maps one or more
 exact structured records and has no disposition; normal mappings must bind the
 record's exact Lean leaf name to one of those references, including the audited
-brace, slash, comma-separated, and multiple-backtick shorthands. The exact
+unambiguous single brace or slash groups, comma-separated cells, and
+multiple-backtick references. A single reference containing more than one
+group is never assigned Cartesian, zipped, paired, or cyclic semantics by the
+checker. The exact
 first-cell text, text outside backticks (including literal `etc.`), and derived
 closed grouping-syntax tags are also pinned. Mechanically expandable groups
 require equality between the complete expanded leaf set and mapped record
@@ -346,8 +349,10 @@ reconstruction while retaining separate manifest/catalogue entry points.
 The validator names the four records published by the accepted prototype and
 requires each to occur in a legacy-row mapping rather than the non-legacy set.
 
-For grouping syntax such as plain `etc.`, wildcards, or legacy abbreviations
-that cannot be expanded deterministically, the certificate stores the row
+For grouping syntax such as plain `etc.`, wildcards, legacy abbreviations,
+multiple groups in one reference, declaration signatures with arguments, or
+prose/symbolic backtick tokens that cannot be expanded deterministically as
+Lean identifiers, the certificate stores the row
 ordinal, exact row hash, and the complete sorted fully qualified expected Lean
 names. Those names must equal the mapped declarations bidirectionally. Such an
 exception is rejected for a nongrouped row, and unused or missing exceptional
