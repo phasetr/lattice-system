@@ -220,6 +220,12 @@ All items below are formally proved with **zero `sorry`**. Full
 mathematical statements and proof sketches are in
 [`tex/proof-guide.tex`](https://github.com/phasetr/lattice-system/blob/main/tex/proof-guide.tex).
 
+The [formalization-status data contract](/lattice-system/formalization-status-contract/) and
+its representative version 1 catalogue are available for review. The catalogue
+is a non-authoritative prototype until the governance cutover tracked by issue
+[#5228](https://github.com/phasetr/lattice-system/issues/5228); this page remains
+the current formalization-status and capstone authority during migration.
+
 ### Single-site Pauli operators
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body

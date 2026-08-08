@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "authors": [
+        "Michael A. Nielsen",
+        "Isaac L. Chuang"
+      ],
+      "edition": "10th Anniversary Edition",
+      "id": "nielsen-chuang-2010",
+      "publication": "Cambridge University Press",
+      "title": "Quantum Computation and Quantum Information",
+      "url": "https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE",
+      "year": 2010
+    },
+    {
+      "authors": [
+        "B. S. Shastry"
+      ],
+      "id": "shastry-1992",
+      "publication": "Journal of Physics A: Mathematical and General 25, L249-L253",
+      "title": "Bounds for correlation functions of the Heisenberg antiferromagnet",
+      "year": 1992
+    },
+    {
+      "authors": [
+        "K. Tanaka",
+        "K. Takeda",
+        "T. Idogaki"
+      ],
+      "id": "tanaka-takeda-idogaki-2004",
+      "publication": "Journal of Magnetism and Magnetic Materials 272-276, 908-909",
+      "title": "Absence of spontaneous symmetry breaking in the ground state of one-dimensional spin-orbital model",
+      "year": 2004
+    },
+    {
+      "authors": [
+        "Hal Tasaki"
+      ],
+      "edition": "1st edition",
+      "id": "tasaki-2020",
+      "publication": "Graduate Texts in Physics, Springer",
+      "title": "Physics and Mathematics of Quantum Many-Body Systems",
+      "url": "https://link.springer.com/book/10.1007/978-3-030-41265-4",
+      "year": 2020
+    }
+  ]
+}

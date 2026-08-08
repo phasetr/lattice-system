@@ -1,0 +1,35 @@
+{
+  "records": [
+    {
+      "axiom_dependencies": [],
+      "capstone": false,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-section-2-1-pauli-x-involutive",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.pauliX_mul_self",
+      "module": "LatticeSystem.Quantum.Pauli",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "source_coverage": "complete",
+      "source_path": "LatticeSystem/Quantum/Pauli.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-section-2-1-pauli"
+        },
+        {
+          "relation": "cross_checks",
+          "source_item_id": "nielsen-chuang-2010-exercise-2-41"
+        }
+      ],
+      "summary": "The Pauli X matrix squares to the identity.",
+      "topic_ids": [
+        "quantum-spin"
+      ],
+      "trust_state": "axiom_free"
+    }
+  ],
+  "schema_version": 1,
+  "source_id": "tasaki-2020",
+  "source_unit": "chapter-02"
+}
