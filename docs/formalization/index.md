@@ -14,7 +14,11 @@ Browse the intended human information architecture:
 - [By topic](/lattice-system/formalization/topics/)
 - [Complete interim legacy catalogue](/lattice-system/formalization/legacy/)
 - [Version 1 data contract](/lattice-system/formalization-status-contract/)
+- [Publication and local-reproduction runbook](/lattice-system/formalization-publication/)
 
 Issue #5229 will generate and publish source and topic views from one catalogue.
 Issue #5228 will populate and audit the complete structured records before they
 become authoritative.
+
+<!-- formalization-status-generated:start overview -->
+<!-- formalization-status-generated:end -->

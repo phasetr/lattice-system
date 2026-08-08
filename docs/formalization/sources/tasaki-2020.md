@@ -25,3 +25,6 @@ being reclassified.
 - [Chapter 10](/lattice-system/formalization/sources/tasaki-2020/chapter-10/)
 - [Chapter 11](/lattice-system/formalization/sources/tasaki-2020/chapter-11/)
 - [Appendix A](/lattice-system/formalization/sources/tasaki-2020/appendix-a/)
+
+<!-- formalization-status-generated:start source tasaki-2020 -->
+<!-- formalization-status-generated:end -->

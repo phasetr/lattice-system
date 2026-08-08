@@ -19,3 +19,6 @@ These grouped links are a navigation projection over explicit legacy headings. T
 - [Spin-`S` Marshall–Lieb–Mattis on the magnetization sector (Tasaki §2.5 Theorem 2.2 generic S, sector form) — part 2 of 4](/lattice-system/formalization/legacy/27-spin-marshall-lieb-mattis-on-the-magnetization-sector-tasa-part-02/#legacy-catalogue-spin-s-marshallliebmattis-on-the-magnetization-sector-tasaki-25-theorem-22-generic-s-sector-form-part-2-of-4)
 - [Spin-`S` Marshall–Lieb–Mattis on the magnetization sector (Tasaki §2.5 Theorem 2.2 generic S, sector form) — part 3 of 4](/lattice-system/formalization/legacy/27-spin-marshall-lieb-mattis-on-the-magnetization-sector-tasa-part-03/#legacy-catalogue-spin-s-marshallliebmattis-on-the-magnetization-sector-tasaki-25-theorem-22-generic-s-sector-form-part-3-of-4)
 - [Spin-`S` Marshall–Lieb–Mattis on the magnetization sector (Tasaki §2.5 Theorem 2.2 generic S, sector form) — part 4 of 4](/lattice-system/formalization/legacy/27-spin-marshall-lieb-mattis-on-the-magnetization-sector-tasa-part-04/#legacy-catalogue-spin-s-marshallliebmattis-on-the-magnetization-sector-tasaki-25-theorem-22-generic-s-sector-form-part-4-of-4)
+
+<!-- formalization-status-generated:start topic symmetry-breaking -->
+<!-- formalization-status-generated:end -->

@@ -269,6 +269,12 @@ contain no insignificant trailing spaces. Arrays whose order is not semantic
 are sorted and duplicate-free. The validator reparses and reserializes every
 file to enforce byte-for-byte canonical JSON.
 
+Strings rendered inline in generated human views are non-empty, single-line
+text. The schema and semantic validator reject CR, LF, C0/C1 control
+characters, and DEL in record summaries, source metadata, source-item locator
+strings and titles, equations, and topic labels/descriptions. Stable IDs,
+enums, Lean names, and module/path patterns already impose stricter grammars.
+
 `manifest.json` declares:
 
 - `schema_version: 1`;
@@ -369,6 +375,8 @@ library and checks:
 - representative prototype coverage across at least two Tasaki chapters and
   a typed non-Tasaki relation, with a proved capstone and a documented axiom;
 - deterministic aggregate generation and input digest.
+- inline-render safety for every human-view field, including newline and
+  control-character regressions.
 
 The current prototype exercises non-Tasaki data through the Nielsen--Chuang
 cross-check of the Tasaki Pauli presentation, Tasaki's attribution of Theorem

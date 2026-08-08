@@ -48,6 +48,8 @@ see the
 ## Documentation
 
 - Project page: [https://phasetr.github.io/lattice-system/](https://phasetr.github.io/lattice-system/)
+- Formalization-status data contract and publication runbook:
+  [repository documentation](https://github.com/phasetr/lattice-system/blob/main/docs/formalization-publication.md)
 - API documentation (doc-gen4): **currently disabled** because the
   docs-generation CI job was consistently slow (often >1h per push
   to `main`). To build the API docs locally, run

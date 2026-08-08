@@ -16,3 +16,6 @@ These grouped links are a navigation projection over explicit legacy headings. T
 - [Heisenberg chain (Tasaki §3.5) — part 1 of 2](/lattice-system/formalization/legacy/25-heisenberg-chain-tasaki-3-5-part-01/#legacy-catalogue-heisenberg-chain-tasaki-35-part-1-of-2)
 - [Heisenberg chain (Tasaki §3.5) — part 2 of 2](/lattice-system/formalization/legacy/25-heisenberg-chain-tasaki-3-5-part-02/#legacy-catalogue-heisenberg-chain-tasaki-35-part-2-of-2)
 - [Perron-Frobenius theorem (`Math/PerronFrobenius.lean`, `Math/PerronFrobeniusPrimitive.lean`, `Math/CollatzWielandt.lean`, `Math/PerronFrobeniusMain.lean`)](/lattice-system/formalization/legacy/26-perron-frobenius-theorem/#legacy-catalogue-perron-frobenius-theorem-mathperronfrobeniuslean-mathperronfrobeniusprimitivelean-mathcollatzwielandtlean-mathperronfrobeniusmainlean)
+
+<!-- formalization-status-generated:start topic low-energy-spectrum -->
+<!-- formalization-status-generated:end -->
