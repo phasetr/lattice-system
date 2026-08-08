@@ -108,9 +108,11 @@ Only the deploy job has `pages: write` and `id-token: write`; the workflow top
 level and build job remain `contents: read`, and Lean CI remains read-only with
 doc-gen4 disabled. The deploy job owns the `github-pages` environment and uses
 `actions/deploy-pages@v4`, the version documented by GitHub for the
-`actions/upload-pages-artifact@v4` artifact service. Workflow concurrency uses
-the single `pages` group without cancelling an in-progress deployment. This is
-the repository's only Pages deployment owner.
+`actions/upload-pages-artifact@v4` artifact service. The guarded deploy job
+alone uses the `pages` concurrency group without cancelling an in-progress
+deployment. Pull-request and manual builds remain outside that group, so they
+cannot replace a pending `main` deployment. This is the repository's only
+Pages deployment owner.
 
 The build job has a five-minute timeout. The exact sum of rendered regular-file
 `st_size` values is reported as **rendered uncompressed bytes** after symlinks
