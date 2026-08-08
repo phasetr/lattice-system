@@ -302,14 +302,76 @@ def approved_changes(text: str) -> str:
     )
 
 
-def prose_tokens(text: str) -> list[str]:
-    """Compare content/order while ignoring Markdown/table layout and whitespace."""
-    return re.findall(r"[\w]+", approved_changes(text), flags=re.UNICODE)
+MOVED_PROSE_LINK_REWRITES = (
+    ("(refactoring-conventions.html)", "(/lattice-system/refactoring-conventions/)"),
+    (
+        "(deprecations.html#remaining-linter-suppressions)",
+        "(/lattice-system/deprecations/#remaining-linter-suppressions)",
+    ),
+    ("(deprecations.html)", "(/lattice-system/deprecations/)"),
+    ("(jordan-wigner-overview.html)", "(/lattice-system/jordan-wigner-overview/)"),
+    (
+        "](#deleted-routes-what-this-index-used-to-document)",
+        "](/lattice-system/history/deleted-routes/#deleted-routes-what-this-index-used-to-document)",
+    ),
+)
+MOVED_PROSE_LINK_REWRITE_COUNTS = (1, 1, 1, 1, 3)
 
 
 def whitespace_normalized(text: str) -> str:
     """Normalize whitespace only; preserve punctuation, operators, Markdown, and Unicode."""
     return re.sub(r"\s+", " ", text).strip()
+
+
+def apply_moved_prose_link_rewrites(text: str, counts: list[int] | None = None) -> str:
+    """Apply only the seven audited old-public-link migrations to baseline prose."""
+    for index, (old, new) in enumerate(MOVED_PROSE_LINK_REWRITES):
+        if counts is not None:
+            counts[index] += text.count(old)
+        text = text.replace(old, new)
+    return text
+
+
+def reconstruct_roadmap_prose(current: str, baseline_line: str) -> str:
+    """Invert the known heading/list layout used for one former roadmap row."""
+    cells = baseline_line.removeprefix("| ").removesuffix(" |\n").split(" | ", 2)
+    phase, scope, _status = (cells[0], "", cells[1]) if len(cells) == 2 else cells
+    lines = current.splitlines()
+    heading = f"## {phase}: {scope}" if scope else f"## {phase}"
+    if lines and lines[0] == heading:
+        lines = lines[1:]
+    payload = []
+    for line in lines:
+        payload.append(line[2:] if line.startswith("- ") else line)
+    return " ".join(part for part in (phase, scope, "\n".join(payload)) if part)
+
+
+def normalize_current_moved_prose(start: int, end: int, current: str, old_lines: list[str]) -> str:
+    """Invert only documented presentation wrappers and two governance corrections."""
+    if start == end and 114 <= start <= 153:
+        current = reconstruct_roadmap_prose(current, old_lines[start - 1])
+    current = current.replace(
+        "The catalogue below includes proved results, conditional results, and documented axioms as recorded, with **zero `sorry`**.",
+        "All items below are formally proved with **zero `sorry`**.",
+    )
+    current = current.replace(
+        "**Phase A (historical scaffold; implementation recorded at the time)**",
+        "**Phase A (current, this PR)**",
+    )
+    return whitespace_normalized(current)
+
+
+def moved_prose_negative_self_tests() -> None:
+    baseline = "**Moved prose:** a ≤ b = c → d; [link](/stable/)"
+    if whitespace_normalized(baseline) != whitespace_normalized(baseline.replace("  ", "\n")):
+        fail("moved-prose positive whitespace self-test failed")
+    for mutated in (
+        baseline.replace("≤", "≥"),
+        baseline.replace("=", "≠", 1),
+        baseline.replace("→", "←"),
+    ):
+        if whitespace_normalized(baseline) == whitespace_normalized(mutated):
+            fail("moved-prose punctuation/operator mutation was not rejected")
 
 
 def long_record_fidelity(
@@ -387,6 +449,7 @@ def public_target(
 
 def main() -> None:
     long_record_negative_self_tests()
+    moved_prose_negative_self_tests()
     old_text = baseline_index()
     old_lines = old_text.splitlines(keepends=True)
     permalink_to_page: dict[str, Path] = {}
@@ -602,8 +665,9 @@ def main() -> None:
         cursor = end + 1
     if cursor != 2732:
         fail(f"catalogue source-marker coverage ends at {cursor - 1}, expected 2731")
-    expected_token_stream: list[str] = []
-    actual_token_stream: list[str] = []
+    expected_prose_stream: list[str] = []
+    actual_prose_stream: list[str] = []
+    rewrite_counts = [0] * len(MOVED_PROSE_LINK_REWRITES)
     for source_range in sorted(markers):
         start, end = source_range
         expected = "".join(old_lines[start - 1 : end])
@@ -617,12 +681,26 @@ def main() -> None:
         current = "".join(text for _page, text in sorted(markers[source_range], key=lambda item: str(item[0])))
         if 217 <= start <= 2731:
             current = "\n".join(line for line in current.splitlines() if not line.startswith("|"))
-        expected_token_stream.extend(prose_tokens(expected))
-        actual_token_stream.extend(prose_tokens(current))
-    if expected_token_stream != actual_token_stream:
-        first = next((i for i, pair in enumerate(zip(expected_token_stream, actual_token_stream)) if pair[0] != pair[1]), None)
-        fail(f"normalized moved-content parity differs: expected={len(expected_token_stream)} tokens, actual={len(actual_token_stream)}, first_difference={first}")
-    prose_digest = hashlib.sha256("\0".join(actual_token_stream).encode()).hexdigest()
+        expected_prose_stream.append(
+            whitespace_normalized(apply_moved_prose_link_rewrites(expected, rewrite_counts))
+        )
+        actual_prose_stream.append(normalize_current_moved_prose(start, end, current, old_lines))
+    if tuple(rewrite_counts) != MOVED_PROSE_LINK_REWRITE_COUNTS:
+        fail(
+            "audited moved-prose link rewrite counts differ: "
+            f"expected={MOVED_PROSE_LINK_REWRITE_COUNTS}, actual={tuple(rewrite_counts)}"
+        )
+    if expected_prose_stream != actual_prose_stream:
+        first = next(
+            (i for i, pair in enumerate(zip(expected_prose_stream, actual_prose_stream)) if pair[0] != pair[1]),
+            None,
+        )
+        fail(
+            "whitespace-normalized exact moved-prose parity differs: "
+            f"segments={len(expected_prose_stream)}, first_difference={first}"
+        )
+    prose_chars = sum(len(item) for item in actual_prose_stream)
+    prose_digest = hashlib.sha256("\0".join(actual_prose_stream).encode()).hexdigest()
 
     # Migration map must reproduce anchor, old line, verbatim heading, and a real destination.
     migration = (DOCS / "formalization" / "migration-map.md").read_text()
@@ -725,7 +803,7 @@ def main() -> None:
         f"{len(PAGES)} pages, {len(permalink_to_page)} permalinks, "
         f"{len(expected_rows)} catalogue rows in exact order, "
         f"{len(expected_long_lines)} long records in whitespace-normalized exact parity, "
-        f"{len(expected_token_stream)} moved-content tokens sha256={prose_digest}, "
+        f"{prose_chars} whitespace-normalized moved-prose characters sha256={prose_digest}, "
         f"{len(expected_headings)} exact migration entries/root stubs, "
         f"source/topic legacy links={source_links}/{topic_links}, "
         f"max={max_bytes[0]} bytes ({max_bytes[1].relative_to(ROOT)}), "
