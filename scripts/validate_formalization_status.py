@@ -845,20 +845,59 @@ def expected_module(source_path: str) -> str:
 
 
 def source_declares(path: Path, kind: str, lean_name: str) -> bool:
-    """Check source syntax for the stated named declaration kind."""
+    """Check source syntax for the stated fully qualified declaration name."""
     keyword = "def" if kind == "definition" else kind
-    short_name = lean_name.rsplit(".", 1)[-1]
     try:
         source = path.read_text(encoding="utf-8")
     except OSError:
         return False
+    # Remove nested block comments while retaining newlines for command boundaries.
+    cleaned: list[str] = []
+    index = 0
+    comment_depth = 0
+    while index < len(source):
+        if source.startswith("/-", index):
+            comment_depth += 1
+            cleaned.extend("  ")
+            index += 2
+        elif comment_depth and source.startswith("-/", index):
+            comment_depth -= 1
+            cleaned.extend("  ")
+            index += 2
+        else:
+            character = source[index]
+            cleaned.append("\n" if comment_depth and character == "\n" else character if not comment_depth else " ")
+            index += 1
+    lines = [line.split("--", 1)[0] for line in "".join(cleaned).splitlines()]
     attributes = r"(?:@\[[^\]\n]*\]\s*)*"
-    modifiers = r"(?:(?:private|protected|noncomputable|unsafe)\s+)*"
-    pattern = re.compile(
-        rf"(?m)^\s*{attributes}{modifiers}{re.escape(keyword)}\s+"
-        rf"{re.escape(short_name)}(?:\s|\()"
+    modifiers = r"(?:(?:private|protected|noncomputable|unsafe|public)\s+)*"
+    declaration = re.compile(
+        rf"^\s*{attributes}{modifiers}{re.escape(keyword)}\s+([^\s(:{{\[]+)"
     )
-    return pattern.search(source) is not None
+    command = re.compile(r"^\s*(namespace|section|end)(?:\s+([^\s]+))?")
+    frames: list[tuple[str, list[str]]] = []
+    for line in lines:
+        command_match = command.match(line)
+        if command_match:
+            command_kind, command_name = command_match.groups()
+            if command_kind == "namespace" and command_name:
+                frames.append(("namespace", command_name.split(".")))
+            elif command_kind == "section":
+                frames.append(("section", []))
+            elif command_kind == "end" and frames:
+                frames.pop()
+            continue
+        declaration_match = declaration.match(line)
+        if declaration_match:
+            declared = declaration_match.group(1)
+            namespace = [part for frame_kind, parts in frames if frame_kind == "namespace" for part in parts]
+            if declared.startswith("_root_."):
+                full_name = declared.removeprefix("_root_.")
+            else:
+                full_name = ".".join([*namespace, *declared.split(".")])
+            if full_name == lean_name:
+                return True
+    return False
 
 
 def validate_state_dimensions(record: dict[str, Any], location: str, validation: Validation) -> None:
@@ -1231,12 +1270,34 @@ def aggregate(
 
 
 def lean_check(records: Iterable[dict[str, Any]]) -> str:
-    """Generate Lean name and recurring axiom-dependency checks."""
+    """Generate authoritative defining-module, name, and axiom checks."""
     modules = sorted({record["module"] for record in records})
-    names = sorted({record["lean_name"] for record in records})
-    lines = [*(f"import {module}" for module in modules), ""]
-    for name in names:
-        lines.extend((f"#check {name}", f"#print axioms {name}"))
+    declarations = sorted({(record["lean_name"], record["module"]) for record in records})
+    lines = ["import Lean", *(f"import {module}" for module in modules), ""]
+    lines.extend(
+        (
+            "open Lean Elab Command",
+            "",
+            "elab \"#assert_decl_module \" decl:ident \" in \" expected:ident : command => do",
+            "  let env ← getEnv",
+            "  let declName := decl.getId",
+            "  let expectedModule := expected.getId",
+            "  let some moduleIdx := env.getModuleIdxFor? declName",
+            "    | throwError \"declaration has no imported defining module: {declName}\"",
+            "  let actualModule := env.header.moduleNames[moduleIdx.toNat]!",
+            "  unless actualModule == expectedModule do",
+            "    throwError \"declaration {declName} belongs to {actualModule}, expected {expectedModule}\"",
+            "",
+        )
+    )
+    for name, module in declarations:
+        lines.extend(
+            (
+                f"#assert_decl_module {name} in {module}",
+                f"#check {name}",
+                f"#print axioms {name}",
+            )
+        )
     lines.append("")
     return "\n".join(lines)
 
@@ -1272,6 +1333,26 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
             "LatticeSystem.Lattice.spacingOf",
         ),
         "same-line @[simp] def spacingOf was not detected",
+    )
+    duplicate_name = (
+        "LatticeSystem.Quantum.InfiniteSpinSystem.IsPhysicalGroundState."
+        "boxLocalHamiltonian_apply"
+    )
+    check(
+        source_declares(
+            repo_root / "LatticeSystem/Quantum/SpinS/PhysicalGroundStateConsequences.lean",
+            "theorem",
+            duplicate_name,
+        ),
+        "fully qualified duplicate-name fixture was not found in its defining file",
+    )
+    check(
+        not source_declares(
+            repo_root / "LatticeSystem/Quantum/SpinS/BoxLocalEnergyDensity.lean",
+            "theorem",
+            duplicate_name,
+        ),
+        "terminal-name collision was accepted from the wrong namespace and file",
     )
     value = {"b": 1, "a": 2}
     check(canonical_json(json.loads(canonical_json(value))) == canonical_json(value), "canonical JSON unstable")

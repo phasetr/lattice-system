@@ -356,8 +356,9 @@ library and checks:
 - canonical JSON encoding and explicit manifest ownership;
 - generic evaluation of the used JSON Schema subset and strict object keys;
 - version, orthogonal status dimensions, stable-ID, uniqueness, and array rules;
-- fully qualified Lean names, module/path correspondence, source-file
-  existence, and matching declaration syntax;
+- fully qualified Lean names, module/path correspondence, namespace-aware
+  source declaration syntax, and an authoritative generated Lean assertion
+  that each imported declaration belongs to its recorded defining module;
 - source, source-item, topic, typed provenance, and source-origin integrity;
 - implementation/coverage/trust, kind, capstone, and resolved-axiom invariants;
 - representative prototype coverage across at least two Tasaki chapters and
@@ -376,8 +377,9 @@ either non-Tasaki paper.
 
 `--emit-aggregate PATH` writes the canonical aggregate to a repo-local scratch
 path for reproducibility checks. `--emit-lean-check PATH` writes a temporary
-Lean file importing the referenced modules and running `#check` and
-`#print axioms` for every name. `--self-test` runs committed dependency-free
+Lean file importing the referenced modules, asserting each declaration's
+defining module through `Lean.Environment.getModuleIdxFor?`, and running
+`#check` and `#print axioms` for every name. `--self-test` runs committed dependency-free
 positive, negative, name-grammar, status-exclusivity, equation-order,
 dependency-resolution, schema-evaluation, parity, and path-escape regressions. Generated scratch belongs
 under `.self-local/tmp/` and is not committed.
