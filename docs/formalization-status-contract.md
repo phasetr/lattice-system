@@ -17,18 +17,20 @@ records under `formalization-status/v1/`. A dependency-free validator enforces
 the contract. Human source pages, topic indexes, status summaries, and the
 published machine aggregate will eventually be generated from those records.
 
-During the prototype and catalogue-migration stages, `docs/index.md` remains the
-authority named by current project governance. The prototype is evidence that
-the contract can represent existing content; it is not a second status ledger.
-Issue #5228 must explicitly change the authority chain after the catalogue is
-complete, publication is deployed, and an audit finds no material discrepancy.
+During the prototype and catalogue-migration stages, the complete legacy
+catalogue tree under `docs/formalization/legacy/` remains the authority named by
+current project governance. The concise `docs/index.md` landing page is not a
+status ledger. The prototype is evidence that the contract can represent
+existing content; it is not a second status ledger. Issue #5228 must explicitly
+change the authority chain after the catalogue is complete, publication is
+deployed, and an audit finds no material discrepancy.
 
 ## Existing roles and consumers
 
-The current `docs/index.md` combines several roles whose update and consumption
-patterns differ:
+The former monolithic `docs/index.md` combined several roles whose update and
+consumption patterns differ. Issue #5227 moved them into the staged hierarchy:
 
-| Current role | Information carried | Human consumers | Machine or workflow consumers | Problem |
+| Former role | Information carried | Human consumers | Machine or workflow consumers | Problem |
 |---|---|---|---|---|
 | Landing page | Project purpose, scope, links, API-doc status | Site visitors, contributors | Jekyll Pages | Buried by a multi-thousand-line catalogue |
 | Roadmap | Phase state, completed work, cumulative PR narrative | Maintainer | Agents selecting or reviewing work | Individual table cells have become historical logs |
@@ -49,8 +51,9 @@ Other status-bearing surfaces are intentionally not replaced wholesale:
 - `README.md` is a concise project introduction and points readers to the
   published project page. It is not a theorem-status database.
 - `docs/refactoring-conventions.md`, `CLAUDE.local.md`, and agent instructions
-  currently require `docs/index.md` to be consulted for documentation and
-  capstone checks. Issue #5228 owns changing those consumers.
+  currently require the complete legacy catalogue tree to be consulted for
+  documentation and capstone checks. Issue #5228 owns changing those consumers
+  to validated structured records.
 - `.github/workflows/lean_action_ci.yml` currently owns the Lean CI and records
   that doc-gen4 is disabled. Issue #5229 owns status-site generation and Pages
   publication; this contract does not edit workflows.
@@ -77,8 +80,10 @@ the output. A mismatch is fixed in canonical input or the generator, not in a
 generated view.
 
 Until cutover, the first row above remains true, while formalization status and
-capstone authority remain in `docs/index.md`. The manifest therefore requires
-`catalog_state` and version 1 permits only `prototype` or `authoritative`.
+capstone authority remain in the losslessly partitioned
+`docs/formalization/legacy/` catalogue. Neither the landing page nor the JSON
+prototype is authoritative. The manifest therefore requires `catalog_state`
+and version 1 permits only `prototype` or `authoritative`.
 
 ## Directory and sharding model
 
@@ -395,7 +400,7 @@ general JSON-Schema engine, but no dependency may be installed implicitly;
 
 | Issue | Inputs from this contract | Owned result | Exit condition relevant to the next issue |
 |---|---|---|---|
-| #5227 | Source-first model, topic projection, authority boundary, stable human root | Split human hierarchy and preserve/redirect relevant existing links and anchors | Human navigation can render the complete catalogue without duplicating status truth |
+| #5227 | Source-first model, topic projection, authority boundary, stable human root | Split human hierarchy, preserve/redirect relevant existing links and anchors, and move interim Markdown authority losslessly to the legacy catalogue tree | Human navigation reaches the complete legacy catalogue without duplicating status truth |
 | #5229 | Manifest, validator, deterministic aggregate, stable URLs, CI publication contract | PR build/validation, recurring `#print axioms` comparison, and `main` deployment of human and machine artifacts | One deployment owner; stable artifacts published with digest/revision metadata; cost recorded; doc-gen4 remains disabled |
 | #5228 | Closed statuses, explicit capstones, ID/rename rules, authority table, all generated/audit surfaces | Full catalogue migration, discrepancy audit, consumer/governance cutover | Prototype becomes authoritative only after complete coverage and audited agreement |
 

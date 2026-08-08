@@ -46,8 +46,9 @@ is eligible for removal. Removal proceeds as a separate
   re-stated against the replacement or removed.
 - [ ] The `#guard_msgs` deprecation-warning capture test for the
   removed declaration is also removed.
-- [ ] `docs/index.md` and this `deprecations.md` page are updated
-  to drop the entry.
+- [ ] The authoritative page under `docs/formalization/legacy/` and this
+  `deprecations.md` page are updated to drop the entry. Issue #5228 alone
+  changes that catalogue update path.
 
 The companion theorems on a deprecated name (e.g.,
 `marshallSignChainConfig_neelChainConfig`,

@@ -4,7 +4,7 @@ import LatticeSystem.Lattice.Scale
 # Test coverage for the `LatticeWithSpacing` type-level tag
 
 Regression tests for Phase A of the continuum-limit preparation
-plan (see the [Continuum-limit roadmap](https://phasetr.github.io/lattice-system/#continuum-limit-roadmap)
+plan (see the [Continuum-limit roadmap](https://phasetr.github.io/lattice-system/continuum-limit-roadmap/)
 section of the project page). These `example` blocks pin down:
 
 1. the default `spacing := 1` instance on `Fin (N + 1)`,

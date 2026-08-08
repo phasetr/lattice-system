@@ -98,8 +98,9 @@ When to use: any time the new sub-file would need to import the
 original file's content (which, if not renamed, would be the
 façade).
 
-Origin: PR #317 (SpinDot/Hamiltonian extraction). See
-`docs/index.md` Phase 2 entries for cumulative usage.
+Origin: PR #317 (SpinDot/Hamiltonian extraction). See the
+[cumulative roadmap history](/lattice-system/history/roadmap/) Phase 2 entries
+for cumulative usage.
 
 ### Façade variant: content + extensions (no façade)
 
@@ -150,7 +151,7 @@ Examples:
 - PR #332 lifted `spinHalfSign_mul_antiparallel` from
   `private lemma` to public `theorem` so the new generic
   `inner_neelStateOf_szsz_neelStateOf_antiparallel` could use it.
-  Also documented in `docs/index.md` per §6 below.
+  Also documented in the interim legacy catalogue per §6 below.
 - During Phase 2 several `_aux` private lemmas had to be lifted
   when their parent file was split (e.g., `prod_alternating_neg_one`,
   `onSite_conjTranspose`). Each PR body explicitly documented the
@@ -290,16 +291,18 @@ deprecation warning text itself is captured by `#guard_msgs`
 
 For every PR adding `def` / `theorem` / `lemma`, the same PR must:
 
-1. Update `docs/index.md` table (Lean name + statement + file +
-   citation).
-2. Update Roadmap line if applicable.
+1. Update the authoritative page in
+   [`docs/formalization/legacy/`](/lattice-system/formalization/legacy/)
+   (Lean name + statement + file + citation). This is the interim update path
+   until Issue #5228 performs the structured-data cutover.
+2. Update the tracking Issue or roadmap page if applicable.
 3. Update `tex/proof-guide.tex` if relevant.
 
 This is enforced by review and not by CI.
 
 ### Review check — public doc sync
 
-- [ ] `docs/index.md` updated (or PR explicitly notes "no
+- [ ] The authoritative legacy catalogue page is updated (or the PR explicitly notes "no
   user-visible API").
 - [ ] References to Tasaki / mathlib added where applicable.
 

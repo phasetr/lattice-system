@@ -5,7 +5,8 @@ import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeSpinRealnessCore
 
 Companion file split off from `MarshallLiebMattis.SublatticeSpin` (1074 → ~918 + 158 lines) to
 shrink that module's compilation footprint.  All declarations here are leaves: they have no
-downstream Lean consumers in the repository (only `docs/index.md` references some by name).  No
+downstream Lean consumers in the repository (only the interim catalogue under
+`docs/formalization/legacy/` references some by name).  No
 behaviour changes — every theorem keeps its original namespace `LatticeSystem.Quantum`, name, and
 statement, so call sites elsewhere see no diff.
 

@@ -24,8 +24,8 @@ altering any existing definition:
 No geometric embedding (lattice points in `ℝ^d`), no coupling
 rescaling, no lattice sequence, and no continuum-limit target object
 is defined here. Those are phases B-D of the
-[Continuum-limit roadmap](https://phasetr.github.io/lattice-system/#continuum-limit-roadmap)
-in `docs/index.md`, and will be introduced only when a concrete
+[Continuum-limit roadmap](https://phasetr.github.io/lattice-system/continuum-limit-roadmap/),
+and will be introduced only when a concrete
 theorem needs them.
 
 The separation follows the codex consultation (2026-04-22): add
@@ -48,7 +48,7 @@ definition in the library consumes it, and the default instance for
 
 The class exists so that future work on the continuum limit
 (`a → 0`, cf. the
-[Continuum-limit roadmap](https://phasetr.github.io/lattice-system/#continuum-limit-roadmap))
+[Continuum-limit roadmap](https://phasetr.github.io/lattice-system/continuum-limit-roadmap/))
 has a type-level handle on `a`: rescaling of coupling constants,
 lattice sequences `a_n → 0`, and renormalisation-group
 transformations will all be expressed in terms of `spacing`. -/
