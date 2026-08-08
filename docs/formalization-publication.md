@@ -1,0 +1,118 @@
+---
+layout: page
+title: "Formalization-status publication"
+permalink: /formalization-publication/
+---
+
+# Formalization-status publication
+
+This page is the reproduction and ownership runbook for the lightweight
+formalization-status site. It is separate from doc-gen4, which remains disabled.
+
+## Architecture and authority
+
+The manifest-listed JSON under `formalization-status/v1/` is validated first.
+The generator creates one revision-independent canonical aggregate and injects
+human source, topic, overview, and status projections into a copied Jekyll
+source tree. Generated source and rendered output live only under
+`.self-local/tmp/`; neither is committed.
+
+Before copying documentation, the generator reserves the machine publication
+root and requires every committed generated marker to occur exactly once with
+an empty body. Explanatory prose remains outside those markers. The checker
+accepts a separately emitted validator aggregate, recomputes its framed input
+digest, and requires byte equality plus exact record membership and visible
+field agreement in every source and topic projection. Each generated record is
+raw HTML with an escaped heading and an ordered definition list of visible
+`data-label-for` labels paired with typed `data-field` values. The checker
+compares the complete heading, labels, field names, field values, typed citation
+attributes, direct-child grammar, and order independently; missing, duplicate,
+unrecognized, reordered, or contradictory additive fields are rejected in both
+staged source and rendered HTML.
+Dynamic source, topic, and status index rows use the same escaped raw-HTML
+boundary with explicit identity, label, and count attributes. Braces are
+numeric HTML entities in staged source, preventing catalogue text from opening
+a Liquid expression while preserving the canonical visible text after parsing.
+Before rendering, the generator also assigns an explicit Kramdown ID to every
+heading targeted by an internal fragment link. This preserves the audited
+legacy migration fragments even when inline code or Unicode would make
+Kramdown's implicit heading-ID behavior differ between source assumptions and
+rendered HTML. The staged checker requires each referenced fragment to have
+such an explicit pin; the rendered checker still verifies the resulting HTML
+ID and rejects duplicates.
+
+The generated views visibly report the catalogue state, schema version, input
+SHA-256, and build revision. The build revision is presentation metadata and is
+not included in `catalog.json`, so the stable machine artifact is deterministic
+for unchanged canonical inputs. While the catalogue state is `prototype`, the
+[complete interim legacy catalogue](/lattice-system/formalization/legacy/)
+remains authoritative until Issue #5228 performs the audited cutover.
+
+Stable publication paths are:
+
+- Human catalogue: `/lattice-system/formalization/`
+- Version 1 machine catalogue:
+  `/lattice-system/formalization-status/v1/catalog.json`
+- Version 1 schema: `/lattice-system/formalization-status/v1/schema.json`
+- Build metadata sidecar:
+  `/lattice-system/formalization-status/v1/publication.json`
+
+Within version 1 these paths and field meanings follow the compatibility policy
+in the [data contract](/lattice-system/formalization-status-contract/).
+
+## Reproduction
+
+From the repository root, using the existing Python and Lean runtimes:
+
+```sh
+mkdir -p .self-local/tmp
+python3 scripts/check_docs_hierarchy.py
+python3 scripts/validate_formalization_status.py --self-test \
+  --emit-aggregate .self-local/tmp/catalog.json \
+  --emit-lean-check .self-local/tmp/formalization-axioms.lean
+lake env lean .self-local/tmp/formalization-axioms.lean
+python3 scripts/generate_formalization_site.py --self-test \
+  --output-dir .self-local/tmp/formalization-site \
+  --revision LOCAL
+python3 scripts/check_generated_site.py --self-test \
+  --source-dir .self-local/tmp/formalization-site/source \
+  --expected-catalog .self-local/tmp/catalog.json \
+  --revision LOCAL
+```
+
+The generated Lean file uses `Lean.collectAxioms` to compare actual non-standard
+axioms exactly with each record's `axiom_dependencies`. It ignores only
+`propext`, `Classical.choice`, and `Quot.sound`; `sorryAx` is never ignored. Its
+committed generator regression includes both an undeclared actual dependency
+and a declared-but-unused dependency.
+
+The repository declares the `github-pages` gem in `docs/Gemfile`, but the local
+bundle is not currently available in the project environment. The missing gems
+were not installed for this work. Consequently, the exact local Jekyll command
+is not claimed as available; the workflow uses the declared Pages build action,
+then runs the rendered-site checker. The dependency-free staged-source check
+above is the local pre-Jekyll reproduction path.
+
+## CI ownership and cost boundary
+
+Before this work, GitHub Pages reported `build_type=workflow`, but the active
+workflow list contained no Pages owner; the doc-gen4 block in Lean CI was and
+remains commented out. PR A introduces a build-only workflow that runs on every
+pull request, pushes to `main`, and manual dispatches. It validates and uploads
+an artifact but has no publication job or publication capability. PR B alone
+may establish the sole deployment owner after build evidence is accepted. At
+all times there must be exactly one such owner; Lean CI must never own Pages.
+
+The build job has a five-minute timeout. The exact sum of rendered regular-file
+`st_size` values is reported as **rendered uncompressed bytes** after symlinks
+and non-regular entries are rejected. A value at or below 10 MiB is within the
+normal budget; a larger value requires review, and a value above 25 MiB fails.
+The compressed artifact size reported by the Actions API is a separate metric
+and is recorded from the PR run rather than inferred from the rendered tree.
+The workflow writes the uncompressed value to its step summary. The first PR
+run supplies the currently pending Jekyll runtime and uploaded-artifact
+evidence; record those observed values in Issue #5229 before accepting PR A or
+enabling PR B.
+
+These thresholds apply only to the lightweight status site. They neither hide
+nor relax the separate decision that doc-gen4 is too expensive to re-enable.

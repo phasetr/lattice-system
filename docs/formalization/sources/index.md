@@ -11,3 +11,6 @@ permalink: /formalization/sources/
 - [Tasaki (2020), by chapter](/lattice-system/formalization/sources/tasaki-2020/)
 - [Other literature](/lattice-system/formalization/sources/other-literature/)
 - [Project-original and source-neutral foundations](/lattice-system/formalization/sources/foundations/)
+
+<!-- formalization-status-generated:start source-index -->
+<!-- formalization-status-generated:end -->

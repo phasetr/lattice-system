@@ -12,3 +12,6 @@ These links project explicit citations from the interim legacy authority. The li
 
 - [Horsch–von der Linden low-lying states (Tasaki §3.4, Theorem 3.1) — part 1 of 2](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-01/#legacy-catalogue-horschvon-der-linden-low-lying-states-tasaki-34-theorem-31-part-1-of-2)
 - [Horsch–von der Linden low-lying states (Tasaki §3.4, Theorem 3.1) — part 2 of 2](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-02/#legacy-catalogue-horschvon-der-linden-low-lying-states-tasaki-34-theorem-31-part-2-of-2)
+
+<!-- formalization-status-generated:start source tanaka-takeda-idogaki-2004 -->
+<!-- formalization-status-generated:end -->

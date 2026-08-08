@@ -34,6 +34,11 @@ RELATION_RANK = {
     "supports": 2,
     "cross_checks": 3,
 }
+INLINE_TEXT_PATTERN = r"^(?![\s\S]*[\u0000-\u001F\u007F-\u009F])[\s\S]+$"
+HTTPS_URL_PATTERN = (
+    r"^(?![\s\S]*[\u0000-\u001F\u007F-\u009F])https://[\s\S]+$"
+)
+INLINE_TEXT_RE = re.compile(INLINE_TEXT_PATTERN)
 
 
 class Validation:
@@ -88,6 +93,7 @@ class Contract:
         self.lean_name = self.pattern("lean_name")
         self.module_name = self.pattern("module_name")
         self.source_path = self.pattern("source_path")
+        self.inline_text = self.pattern("inline_text")
 
     def enum(self, name: str) -> set[str]:
         """Read a closed vocabulary from the JSON Schema."""
@@ -312,7 +318,8 @@ class Contract:
         source_url = self.defs["source"]["properties"].get("url", {})
         self.validation.require(
             "url" not in self.defs["source"]["required"]
-            and source_url.get("pattern") == "^https://",
+            and source_url.get("pattern")
+            == HTTPS_URL_PATTERN,
             "schema parity: source URL must be optional and HTTPS when present",
         )
         year = self.defs["source"]["properties"].get("year", {})
@@ -324,9 +331,35 @@ class Contract:
         self.validation.require(
             authors.get("minItems") == 1
             and authors.get("type") == "array"
-            and authors.get("items", {}).get("minLength") == 1,
+            and authors.get("items", {}).get("$ref") == "#/$defs/inline_text",
             "schema parity: source authors constraints drifted",
         )
+        self.validation.require(
+            self.defs.get("inline_text")
+            == {"pattern": INLINE_TEXT_PATTERN, "type": "string"},
+            "schema parity: inline-render text contract drifted",
+        )
+        inline_refs = (
+            record_properties.get("summary"),
+            self.defs["source"]["properties"].get("edition"),
+            self.defs["source"]["properties"].get("publication"),
+            self.defs["source"]["properties"].get("title"),
+            self.defs["source_item"]["properties"]["equations"].get("items"),
+            self.defs["source_item"]["properties"].get("title"),
+            self.defs["topic"]["properties"].get("description"),
+            self.defs["topic"]["properties"].get("label"),
+        )
+        self.validation.require(
+            all(node == {"$ref": "#/$defs/inline_text"} for node in inline_refs),
+            "schema parity: an inline-rendered field bypasses inline_text",
+        )
+        for field in ("item_number", "pages", "section"):
+            alternatives = self.defs["source_item"]["properties"][field].get("oneOf")
+            self.validation.require(
+                alternatives
+                == [{"$ref": "#/$defs/inline_text"}, {"type": "null"}],
+                f"schema parity: source-item {field} bypasses inline_text",
+            )
 
         def implication(field: str, value: Any, then: dict[str, Any]) -> dict[str, Any]:
             return {
@@ -682,6 +715,13 @@ def require_string(value: Any, location: str, validation: Validation) -> bool:
     return passed
 
 
+def require_inline_text(value: Any, location: str, validation: Validation) -> bool:
+    """Require non-empty single-line text without ASCII control characters."""
+    passed = isinstance(value, str) and INLINE_TEXT_RE.fullmatch(value) is not None
+    validation.require(passed, f"{location}: expected non-empty inline text without control characters")
+    return passed
+
+
 def require_sorted_unique_strings(
     values: Any,
     location: str,
@@ -759,7 +799,10 @@ def validate_sources(
         validation.require(
             isinstance(authors, list)
             and bool(authors)
-            and all(isinstance(author, str) and bool(author) for author in authors),
+            and all(
+                isinstance(author, str) and INLINE_TEXT_RE.fullmatch(author) is not None
+                for author in authors
+            ),
             f"{location}.authors: expected non-empty string array",
         )
         year = source.get("year")
@@ -769,10 +812,12 @@ def validate_sources(
         )
         for field in ("edition", "publication", "title"):
             if field in source:
-                require_string(source[field], f"{location}.{field}", validation)
+                require_inline_text(source[field], f"{location}.{field}", validation)
         if "url" in source:
             validation.require(
-                isinstance(source["url"], str) and source["url"].startswith("https://"),
+                isinstance(source["url"], str)
+                and source["url"].startswith("https://")
+                and INLINE_TEXT_RE.fullmatch(source["url"]) is not None,
                 f"{location}.url: expected HTTPS URL",
             )
     return sources
@@ -809,11 +854,15 @@ def validate_source_items(
         )
         for field in ("item_number", "pages", "section"):
             validation.require(
-                item.get(field) is None or isinstance(item.get(field), str) and bool(item[field]),
-                f"{location}.{field}: expected non-empty string or null",
+                item.get(field) is None
+                or isinstance(item.get(field), str)
+                and INLINE_TEXT_RE.fullmatch(item[field]) is not None,
+                f"{location}.{field}: expected inline text or null",
             )
-        require_string(item.get("title"), f"{location}.title", validation)
+        require_inline_text(item.get("title"), f"{location}.title", validation)
         require_unique_strings_preserve_order(item.get("equations"), f"{location}.equations", validation)
+        for index, equation in enumerate(item.get("equations", [])) if isinstance(item.get("equations"), list) else []:
+            require_inline_text(equation, f"{location}.equations[{index}]", validation)
     return items
 
 
@@ -834,8 +883,8 @@ def validate_topics(
     for identifier, topic in topics.items():
         location = f"topics.json.topics[{identifier}]"
         validation.keys(topic, properties, required, location)
-        require_string(topic.get("description"), f"{location}.description", validation)
-        require_string(topic.get("label"), f"{location}.label", validation)
+        require_inline_text(topic.get("description"), f"{location}.description", validation)
+        require_inline_text(topic.get("label"), f"{location}.label", validation)
     return topics
 
 
@@ -1023,7 +1072,7 @@ def validate_record(
             isinstance(topic_id, str) and topic_id in topic_ids,
             f"{location}.topic_ids: unknown {topic_id}",
         )
-    require_string(record.get("summary"), f"{location}.summary", validation)
+    require_inline_text(record.get("summary"), f"{location}.summary", validation)
     anchor = record.get("proof_guide_anchor")
     validation.require(
         anchor is None or isinstance(anchor, str) and contract.stable_id.fullmatch(anchor) is not None,
@@ -1270,13 +1319,22 @@ def aggregate(
 
 
 def lean_check(records: Iterable[dict[str, Any]]) -> str:
-    """Generate authoritative defining-module, name, and axiom checks."""
+    """Generate authoritative defining-module, name, and exact axiom checks."""
     modules = sorted({record["module"] for record in records})
-    declarations = sorted({(record["lean_name"], record["module"]) for record in records})
+    declarations = sorted(
+        {
+            (
+                record["lean_name"],
+                record["module"],
+                tuple(record["axiom_dependencies"]),
+            )
+            for record in records
+        }
+    )
     lines = ["import Lean", *(f"import {module}" for module in modules), ""]
     lines.extend(
         (
-            "open Lean Elab Command",
+            "open Lean Meta Elab Command",
             "",
             "elab \"#assert_decl_module \" decl:ident \" in \" expected:ident : command => do",
             "  let env ← getEnv",
@@ -1288,13 +1346,57 @@ def lean_check(records: Iterable[dict[str, Any]]) -> str:
             "  unless actualModule == expectedModule do",
             "    throwError \"declaration {declName} belongs to {actualModule}, expected {expectedModule}\"",
             "",
+            "/-- Require the actual non-standard axiom set to equal the declared set. -/",
+            "private def assertExactAxioms (declName : Name) (expectedNames : Array Name) : CommandElabM Unit := do",
+            "  let collected ← Lean.collectAxioms declName",
+            "  let actual := collected.filter fun name =>",
+            "    name != ``propext && name != ``Classical.choice && name != ``Quot.sound",
+            "  let missing := expectedNames.filter fun name => !actual.contains name",
+            "  let undeclared := actual.filter fun name => !expectedNames.contains name",
+            "  unless missing.isEmpty && undeclared.isEmpty do",
+            "    throwError \"axiom mismatch for {declName}; undeclared actual axioms: "
+            "{undeclared}; declared but unused axioms: {missing}\"",
+            "",
+            "elab \"#assert_axioms \" decl:ident \" [\" expected:ident,* \"]\" : command => do",
+            "  let declName ← liftCoreM <| realizeGlobalConstNoOverloadWithInfo decl",
+            "  assertExactAxioms declName (expected.getElems.map Syntax.getId)",
+            "",
+            "/-- Test fixture for the exact generated axiom gate. -/",
+            "axiom FormalizationStatusGateFixture.dependency : True",
+            "",
+            "/-- Test fixture whose dependency set is exactly one project axiom. -/",
+            "theorem FormalizationStatusGateFixture.consumer : True :=",
+            "  FormalizationStatusGateFixture.dependency",
+            "",
+            "/-- A second fixture used to reject a declared but unused dependency. -/",
+            "axiom FormalizationStatusGateFixture.unused : True",
+            "",
+            "#assert_axioms FormalizationStatusGateFixture.consumer [FormalizationStatusGateFixture.dependency]",
+            "",
+            "elab \"#self_test_exact_axiom_gate\" : command => do",
+            "  let undeclaredRejected ← try",
+            "    assertExactAxioms ``FormalizationStatusGateFixture.consumer #[]",
+            "    pure false",
+            "  catch _ => pure true",
+            "  let unusedRejected ← try",
+            "    assertExactAxioms ``FormalizationStatusGateFixture.consumer",
+            "      #[``FormalizationStatusGateFixture.dependency, ``FormalizationStatusGateFixture.unused]",
+            "    pure false",
+            "  catch _ => pure true",
+            "  unless undeclaredRejected && unusedRejected do",
+            "    throwError \"exact axiom gate negative fixtures were not rejected\"",
+            "",
+            "#self_test_exact_axiom_gate",
+            "",
         )
     )
-    for name, module in declarations:
+    for name, module, dependencies in declarations:
+        dependency_list = ", ".join(dependencies)
         lines.extend(
             (
                 f"#assert_decl_module {name} in {module}",
                 f"#check {name}",
+                f"#assert_axioms {name} [{dependency_list}]",
                 f"#print axioms {name}",
             )
         )
@@ -1316,6 +1418,24 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
     def check(condition: bool, message: str) -> None:
         if not condition:
             failures.append(message)
+
+    exact_gate_fixture = lean_check(
+        [
+            {
+                "axiom_dependencies": ["LatticeSystem.Axiom.fact"],
+                "lean_name": "LatticeSystem.Consumer.result",
+                "module": "LatticeSystem.Consumer",
+            }
+        ]
+    )
+    check("Lean.collectAxioms" in exact_gate_fixture, "generated Lean lacks actual axiom collection")
+    check(
+        "#assert_axioms LatticeSystem.Consumer.result [LatticeSystem.Axiom.fact]"
+        in exact_gate_fixture,
+        "generated Lean lacks the declared exact dependency set",
+    )
+    check("#self_test_exact_axiom_gate" in exact_gate_fixture, "generated Lean lacks negative gate fixtures")
+    check("erase ``sorryAx" not in exact_gate_fixture, "generated Lean incorrectly ignores sorryAx")
 
     check(contract.lean_name.fullmatch("LatticeSystem.Quantum.state'") is not None, "apostrophe Lean name rejected")
     check(contract.lean_name.fullmatch("LatticeSystem.Quantum.σ_mul") is not None, "Unicode Lean name rejected")
@@ -1536,6 +1656,12 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
                 "minItems", 0
             ),
         ),
+        (
+            "inline text control pattern",
+            lambda schema: schema["$defs"]["inline_text"].__setitem__(
+                "pattern", "^unsafe$"
+            ),
+        ),
     ):
         mutated = copy.deepcopy(contract.schema)
         mutate(mutated)
@@ -1546,12 +1672,10 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
 
     structural_mutations: tuple[tuple[str, Any, Any, Any], ...] = (
         (
-            "summary minLength",
-            lambda schema: schema["$defs"]["declaration_record"]["properties"]["summary"].__setitem__(
-                "minLength", 2
-            ),
-            lambda schema: schema["$defs"]["declaration_record"]["properties"]["summary"],
-            "x",
+            "inline text newline pattern",
+            lambda schema: schema["$defs"]["inline_text"].__setitem__("pattern", "^safe$"),
+            lambda schema: schema["$defs"]["inline_text"],
+            "line one\nline two",
         ),
         (
             "manifest human_publication_root pattern",
@@ -1562,22 +1686,6 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
                 "human_publication_root"
             ],
             "/lattice-system/formalization/",
-        ),
-        (
-            "source title minLength",
-            lambda schema: schema["$defs"]["source"]["properties"]["title"].__setitem__(
-                "minLength", 2
-            ),
-            lambda schema: schema["$defs"]["source"]["properties"]["title"],
-            "x",
-        ),
-        (
-            "source-item title minLength",
-            lambda schema: schema["$defs"]["source_item"]["properties"]["title"].__setitem__(
-                "minLength", 2
-            ),
-            lambda schema: schema["$defs"]["source_item"]["properties"]["title"],
-            "x",
         ),
         (
             "axiom_free maxItems",
@@ -1604,6 +1712,71 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
         structural_validation = Validation()
         validate_schema_instance(fixture, select(mutated), mutated, label, structural_validation)
         check(bool(structural_validation.errors), f"schema mutation was not enforced: {label}")
+
+    for bad_inline in (
+        "\nleading line",
+        "trailing line\n",
+        "line one\nline two",
+        "tab\ttext",
+        "control\x01text",
+        "delete\x7ftext",
+        "c1-control\x85text",
+    ):
+        inline_validation = Validation()
+        require_inline_text(bad_inline, "inline fixture", inline_validation)
+        check(bool(inline_validation.errors), f"inline control text was accepted: {bad_inline!r}")
+        schema_inline_validation = Validation()
+        validate_schema_instance(
+            bad_inline,
+            contract.defs["inline_text"],
+            contract.schema,
+            "inline fixture",
+            schema_inline_validation,
+        )
+        check(
+            bool(schema_inline_validation.errors),
+            f"schema accepted inline control text: {bad_inline!r}",
+        )
+
+    for bad_url in (
+        "\nhttps://example.invalid",
+        "https://example.invalid\n",
+        "https://example.\ninvalid",
+        "https://example.invalid\x85",
+        "https://example.invalid\x7f",
+    ):
+        semantic_url_validation = Validation()
+        validate_sources(
+            {
+                "schema_version": 1,
+                "sources": [
+                    {
+                        "authors": ["A. Author"],
+                        "id": "url-fixture",
+                        "url": bad_url,
+                        "year": 2000,
+                    }
+                ],
+            },
+            contract,
+            semantic_url_validation,
+        )
+        check(
+            bool(semantic_url_validation.errors),
+            f"semantic validator accepted URL control text: {bad_url!r}",
+        )
+        schema_url_validation = Validation()
+        validate_schema_instance(
+            bad_url,
+            contract.defs["source"]["properties"]["url"],
+            contract.schema,
+            "URL fixture",
+            schema_url_validation,
+        )
+        check(
+            bool(schema_url_validation.errors),
+            f"schema evaluator accepted URL control text: {bad_url!r}",
+        )
 
     aggregate_schema = copy.deepcopy(contract.schema)
     aggregate_schema["$defs"]["aggregate"]["properties"].pop("input_sha256")

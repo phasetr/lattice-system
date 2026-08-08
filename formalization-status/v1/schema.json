@@ -361,8 +361,7 @@
           "uniqueItems": true
         },
         "summary": {
-          "minLength": 1,
-          "type": "string"
+          "$ref": "#/$defs/inline_text"
         },
         "topic_ids": {
           "items": {
@@ -400,6 +399,10 @@
         "implemented",
         "in_progress"
       ]
+    },
+    "inline_text": {
+      "pattern": "^(?![\\s\\S]*[\\u0000-\\u001F\\u007F-\\u009F])[\\s\\S]+$",
+      "type": "string"
     },
     "lean_name": {
       "pattern": "^LatticeSystem(?:\\.[A-Za-z_\\u0080-\\uFFFF][A-Za-z0-9_'\\u0080-\\uFFFF]*)+$",
@@ -515,29 +518,25 @@
       "properties": {
         "authors": {
           "items": {
-            "minLength": 1,
-            "type": "string"
+            "$ref": "#/$defs/inline_text"
           },
           "minItems": 1,
           "type": "array"
         },
         "edition": {
-          "minLength": 1,
-          "type": "string"
+          "$ref": "#/$defs/inline_text"
         },
         "id": {
           "$ref": "#/$defs/stable_id"
         },
         "publication": {
-          "minLength": 1,
-          "type": "string"
+          "$ref": "#/$defs/inline_text"
         },
         "title": {
-          "minLength": 1,
-          "type": "string"
+          "$ref": "#/$defs/inline_text"
         },
         "url": {
-          "pattern": "^https://",
+          "pattern": "^(?![\\s\\S]*[\\u0000-\\u001F\\u007F-\\u009F])https://[\\s\\S]+$",
           "type": "string"
         },
         "year": {
@@ -566,8 +565,7 @@
       "properties": {
         "equations": {
           "items": {
-            "minLength": 1,
-            "type": "string"
+            "$ref": "#/$defs/inline_text"
           },
           "type": "array",
           "uniqueItems": true
@@ -590,8 +588,7 @@
         "item_number": {
           "oneOf": [
             {
-              "minLength": 1,
-              "type": "string"
+              "$ref": "#/$defs/inline_text"
             },
             {
               "type": "null"
@@ -601,8 +598,7 @@
         "pages": {
           "oneOf": [
             {
-              "minLength": 1,
-              "type": "string"
+              "$ref": "#/$defs/inline_text"
             },
             {
               "type": "null"
@@ -612,8 +608,7 @@
         "section": {
           "oneOf": [
             {
-              "minLength": 1,
-              "type": "string"
+              "$ref": "#/$defs/inline_text"
             },
             {
               "type": "null"
@@ -624,8 +619,7 @@
           "$ref": "#/$defs/stable_id"
         },
         "title": {
-          "minLength": 1,
-          "type": "string"
+          "$ref": "#/$defs/inline_text"
         }
       },
       "required": [
@@ -712,15 +706,13 @@
       "additionalProperties": false,
       "properties": {
         "description": {
-          "minLength": 1,
-          "type": "string"
+          "$ref": "#/$defs/inline_text"
         },
         "id": {
           "$ref": "#/$defs/stable_id"
         },
         "label": {
-          "minLength": 1,
-          "type": "string"
+          "$ref": "#/$defs/inline_text"
         }
       },
       "required": [

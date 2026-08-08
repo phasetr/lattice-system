@@ -11,3 +11,6 @@ permalink: /formalization/sources/nielsen-chuang-2010/
 These links project explicit citations from the interim legacy authority. The linked page may be mixed-source and retains that label.
 
 - [Single-site Pauli operators](/lattice-system/formalization/legacy/01-single-site-pauli-operators/#legacy-catalogue-single-site-pauli-operators)
+
+<!-- formalization-status-generated:start source nielsen-chuang-2010 -->
+<!-- formalization-status-generated:end -->

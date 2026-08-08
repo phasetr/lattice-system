@@ -14,6 +14,8 @@ infinite graphs remain available for the thermodynamic and continuum limits.
 
 - [Formalization catalogue](/lattice-system/formalization/) — browse by source
   or topic and find the complete interim catalogue.
+- [Formalization-status publication](/lattice-system/formalization-publication/)
+  — stable human/machine paths, generation architecture, and reproduction.
 - [Current roadmap](/lattice-system/roadmap/) — active direction and the
   authoritative tracking Issues.
 - [Limitations and documented axioms](/lattice-system/limitations/) — current

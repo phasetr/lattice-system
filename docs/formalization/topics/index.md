@@ -14,3 +14,6 @@ They must never contain a second hand-maintained status table.
 - [Low-energy spectrum](/lattice-system/formalization/topics/low-energy-spectrum/)
 - [Quantum spin](/lattice-system/formalization/topics/quantum-spin/)
 - [Symmetry breaking](/lattice-system/formalization/topics/symmetry-breaking/)
+
+<!-- formalization-status-generated:start topic-index -->
+<!-- formalization-status-generated:end -->

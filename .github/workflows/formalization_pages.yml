@@ -1,0 +1,90 @@
+name: Formalization Pages build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Validate documentation hierarchy and catalogue
+        run: |
+          mkdir -p .self-local/tmp
+          date +%s > .self-local/tmp/formalization-pages-start
+          python3 scripts/check_docs_hierarchy.py
+          python3 scripts/validate_formalization_status.py --self-test --emit-aggregate .self-local/tmp/catalog.json
+
+      - name: Generate the staged site twice
+        run: |
+          python3 scripts/generate_formalization_site.py --self-test --output-dir .self-local/tmp/formalization-site-a --revision "$GITHUB_SHA"
+          python3 scripts/generate_formalization_site.py --output-dir .self-local/tmp/formalization-site-b --revision "$GITHUB_SHA"
+          diff -r .self-local/tmp/formalization-site-a .self-local/tmp/formalization-site-b
+          cmp .self-local/tmp/catalog.json .self-local/tmp/formalization-site-a/source/formalization-status/v1/catalog.json
+          python3 scripts/check_generated_site.py --self-test --source-dir .self-local/tmp/formalization-site-a/source --expected-catalog .self-local/tmp/catalog.json --revision "$GITHUB_SHA"
+
+      - name: Check all JSON inputs and generated machine files
+        run: |
+          python3 - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          tracked = subprocess.check_output(["git", "ls-files", "*.json"], text=True).splitlines()
+          generated = [
+              ".self-local/tmp/formalization-site-a/source/formalization-status/v1/catalog.json",
+              ".self-local/tmp/formalization-site-a/source/formalization-status/v1/publication.json",
+              ".self-local/tmp/formalization-site-a/source/formalization-status/v1/schema.json",
+          ]
+          for name in [*tracked, *generated]:
+              with Path(name).open(encoding="utf-8") as source:
+                  json.load(source)
+          print(f"parsed {len(tracked) + len(generated)} JSON files")
+          PY
+
+      - name: Configure Pages build
+        uses: actions/configure-pages@v5
+
+      - name: Build Jekyll artifact
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./.self-local/tmp/formalization-site-a/source
+          destination: ./.self-local/tmp/formalization-site-a/site
+
+      - name: Check rendered site and publication budget
+        run: |
+          python3 scripts/check_generated_site.py --site-dir .self-local/tmp/formalization-site-a/site --source-dir .self-local/tmp/formalization-site-a/source --expected-catalog .self-local/tmp/catalog.json --revision "$GITHUB_SHA"
+          RENDERED_BYTES=$(python3 scripts/check_generated_site.py --print-regular-file-bytes .self-local/tmp/formalization-site-a/site)
+          STARTED_AT=$(cat .self-local/tmp/formalization-pages-start)
+          ELAPSED_SECONDS=$(( $(date +%s) - STARTED_AT ))
+          {
+            echo "## Formalization Pages build metrics"
+            echo
+            echo "- Rendered uncompressed bytes: $RENDERED_BYTES"
+            echo "- Validation and build seconds: $ELAPSED_SECONDS"
+            echo "- Review threshold: 10485760 bytes"
+            echo "- Hard limit: 26214400 bytes"
+            echo "- Job timeout: 5 minutes"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$RENDERED_BYTES" -gt 26214400 ]; then
+            echo "Rendered uncompressed output exceeds the 25 MiB hard limit" >&2
+            exit 1
+          fi
+          if [ "$RENDERED_BYTES" -gt 10485760 ]; then
+            echo "::warning::Rendered uncompressed output exceeds the 10 MiB review threshold"
+          fi
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./.self-local/tmp/formalization-site-a/site
