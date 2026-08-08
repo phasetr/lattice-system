@@ -37,8 +37,11 @@ AUTHORITATIVE_FORBIDDEN_PHRASES = (
 class PageParser(html.parser.HTMLParser):
     """Parse exact record grammar plus scoped metadata and index structures."""
 
-    def __init__(self) -> None:
+    def __init__(self, generated_marker_scoped: bool = False) -> None:
+        """Initialize parsing, optionally limiting record grammar to marker comments."""
         super().__init__(convert_charrefs=True)
+        self.generated_marker_scoped = generated_marker_scoped
+        self.generated_scope_active = not generated_marker_scoped
         self.ids: list[str] = []
         self.links: list[str] = []
         self.text: list[str] = []
@@ -63,6 +66,7 @@ class PageParser(html.parser.HTMLParser):
         self.structured_anchor_href: str | None = None
         self.structured_in_anchor = False
         self.dynamic_headings: list[tuple[str, tuple[tuple[str, str], ...], str]] = []
+        self.record_like_outside_canonical: list[str] = []
         self.current_dynamic_heading: tuple[
             str, tuple[tuple[str, str], ...], list[str]
         ] | None = None
@@ -76,9 +80,47 @@ class PageParser(html.parser.HTMLParser):
         if structured_active and tag == "li":
             raise ValueError("structured metadata/index rows cannot be nested")
         identifier = attributes.get("id")
+        exact_article_start = (
+            tag == "article"
+            and bool(attributes.get("data-record-id"))
+            and identifier == f"record-{attributes.get('data-record-id')}"
+            and set(attributes) == {"id", "data-record-id"}
+        )
+        exact_projection_row = (
+            tag == "li"
+            and attributes.get("data-row-kind") == "record-projection"
+            and bool(attributes.get("data-record-id"))
+            and identifier == f"record-{attributes.get('data-record-id')}"
+            and set(attributes)
+            == {
+                "id",
+                "data-row-kind",
+                "data-record-id",
+                "data-href",
+                "data-projection-kind",
+                "data-projection-id",
+            }
+        )
+        record_like = (
+            tag in {"article", "dl", "dt", "dd"}
+            or any(key in attributes for key in ("data-field", "data-label-for", "data-record-id"))
+            or bool(identifier and identifier.startswith("record-"))
+        )
+        if (
+            self.generated_scope_active
+            and self.current_record is None
+            and record_like
+            and not exact_article_start
+            and not exact_projection_row
+        ):
+            self.record_like_outside_canonical.append(tag)
         if identifier is not None:
             self.ids.append(identifier)
-        if tag == "article" and attributes.get("data-record-id") is not None:
+        if (
+            self.generated_scope_active
+            and tag == "article"
+            and attributes.get("data-record-id") is not None
+        ):
             record_id = attributes["data-record-id"] or ""
             if identifier != f"record-{record_id}" or not record_id:
                 raise ValueError("generated record article has inconsistent identity attributes")
@@ -290,8 +332,17 @@ class PageParser(html.parser.HTMLParser):
 
     def handle_comment(self, data: str) -> None:
         """Stop record capture at the generated-section boundary."""
-        if data.strip() == "formalization-status-generated:end" and self.current_record is not None:
-            raise ValueError(f"generated record {self.current_record} crosses its marker boundary")
+        comment = data.strip()
+        if comment.startswith("formalization-status-generated:start "):
+            if self.generated_marker_scoped and self.generated_scope_active:
+                raise ValueError("generated marker sections cannot be nested")
+            self.generated_scope_active = True
+        elif comment == "formalization-status-generated:end":
+            if self.current_record is not None:
+                raise ValueError(f"generated record {self.current_record} crosses its marker boundary")
+            if self.generated_marker_scoped and not self.generated_scope_active:
+                raise ValueError("generated marker section has an unmatched end")
+            self.generated_scope_active = False
 
 
 def canonical_json(value: Any) -> bytes:
@@ -675,7 +726,8 @@ def marker_body(path: Path, specification: str) -> str:
 
 def parse_record_html(body: str, label: str) -> PageParser:
     """Parse structured raw or rendered HTML and reject duplicate identities."""
-    parser = PageParser()
+    generated_marker_scoped = "formalization-status-generated:start " in body
+    parser = PageParser(generated_marker_scoped=generated_marker_scoped)
     parser.feed(body)
     duplicates = sorted({identifier for identifier in parser.ids if parser.ids.count(identifier) > 1})
     if duplicates:
@@ -686,6 +738,7 @@ def parse_record_html(body: str, label: str) -> PageParser:
         or parser.current_metadata is not None
         or parser.current_index_row is not None
         or parser.structured_in_anchor
+        or (generated_marker_scoped and parser.generated_scope_active)
     ):
         raise ValueError(f"{label}: unclosed generated record structure")
     return parser
@@ -698,6 +751,11 @@ def validate_record_blocks(
     label: str,
 ) -> None:
     """Require exact membership, heading, attributes, order, and field values."""
+    if parser.record_like_outside_canonical:
+        raise ValueError(
+            f"{label}: record-like structure exists outside the exact canonical article: "
+            f"{parser.record_like_outside_canonical}"
+        )
     expected_ids = {record["id"] for record in expected_records}
     actual_ids = set(parser.record_fields)
     if actual_ids != expected_ids or set(parser.record_headings) != expected_ids:
@@ -905,8 +963,17 @@ def require_index_rows(
     parser: PageParser,
     expected: list[tuple[str, tuple[tuple[str, str], ...], str | None, str]],
     label: str,
+    *,
+    allow_canonical_record: bool = False,
 ) -> None:
     """Require exact structured dynamic-row membership, attributes, order, and text."""
+    if parser.record_like_outside_canonical:
+        raise ValueError(
+            f"{label}: record-like structure is forbidden outside an exact canonical article: "
+            f"{parser.record_like_outside_canonical}"
+        )
+    if parser.record_fields and not allow_canonical_record:
+        raise ValueError(f"{label}: canonical record article is forbidden on this page")
     if parser.index_rows != expected:
         raise ValueError(
             f"{label}: structured index rows differ; expected {expected!r}, "
@@ -1095,7 +1162,9 @@ def check_built_site(
         )
         assert_metadata(detail, catalog, revision, f"record {record_id}")
         validate_record_blocks(detail, [record], catalog, f"built record {record_id}")
-        require_index_rows(detail, [], f"built record {record_id}")
+        require_index_rows(
+            detail, [], f"built record {record_id}", allow_canonical_record=True
+        )
         detail_pages[record_id] = detail
         anchor = f"record-{record['id']}"
         href = canonical_record_href(record_id)
@@ -1295,7 +1364,12 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
         detail_body = marker_body(detail_path, f"record {record_id}")
         detail_parser = parse_record_html(detail_body, f"staged record {record_id}")
         validate_record_blocks(detail_parser, [record], catalog, f"staged record {record_id}")
-        require_index_rows(detail_parser, [], f"staged record {record_id}")
+        require_index_rows(
+            detail_parser,
+            [],
+            f"staged record {record_id}",
+            allow_canonical_record=True,
+        )
     for parser in marker_parsers:
         for record_id in parser.record_fields:
             if record_id not in full_truth_occurrences:
@@ -1305,6 +1379,102 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
         raise ValueError(
             f"staged full record truth must occur exactly once: {full_truth_occurrences}"
         )
+
+
+def check_scaled_human_fixture(
+    source_dir: Path, catalog: dict[str, Any], revision: str
+) -> None:
+    """Run the complete human-page semantic grammar over a synthetic large catalogue."""
+    source = ensure_tree(source_dir)
+    check_staged_record_outputs(source, catalog)
+    parsed_markers: dict[str, PageParser] = {}
+    for path in sorted((source / "formalization").rglob("*.md")):
+        text = path.read_text(encoding="utf-8")
+        for match in re.finditer(
+            r"(?ms)^<!-- formalization-status-generated:start ([^\n]+) -->\n"
+            r"(.*?)^<!-- formalization-status-generated:end -->$",
+            text,
+        ):
+            specification, body = match.groups()
+            if specification in parsed_markers:
+                raise ValueError(f"scaled fixture duplicates marker {specification}")
+            parser = parse_record_html(body, f"scaled marker {specification}")
+            assert_metadata(parser, catalog, revision, f"scaled marker {specification}")
+            parsed_markers[specification] = parser
+    expected_specs = {"overview", "project-original", "source-index", "status", "topic-index"}
+    expected_specs.update(f"source {item['id']}" for item in catalog["sources"])
+    expected_specs.update(f"topic {item['id']}" for item in catalog["topics"])
+    expected_specs.update(f"record {item['id']}" for item in catalog["records"])
+    if set(parsed_markers) != expected_specs:
+        raise ValueError("scaled fixture marker set differs from the catalogue")
+    for specification, parser in parsed_markers.items():
+        if not specification.startswith("record ") and parser.record_fields:
+            raise ValueError(
+                f"scaled fixture duplicates full record truth in {specification}"
+            )
+
+    require_index_rows(
+        parsed_markers["overview"], expected_overview_index_rows(catalog), "scaled overview"
+    )
+    require_index_rows(
+        parsed_markers["source-index"],
+        expected_source_index_rows(catalog),
+        "scaled source index",
+    )
+    require_index_rows(
+        parsed_markers["topic-index"],
+        expected_topic_index_rows(catalog),
+        "scaled topic index",
+    )
+    require_index_rows(
+        parsed_markers["status"], expected_status_index_rows(catalog), "scaled status"
+    )
+    project_records = [
+        record for record in catalog["records"] if record["origin"] == "project_original"
+    ]
+    require_index_rows(
+        parsed_markers["project-original"],
+        expected_projection_rows(project_records, "source", "foundations"),
+        "scaled foundations",
+    )
+    for source_item in catalog["sources"]:
+        source_id = source_item["id"]
+        require_index_rows(
+            parsed_markers[f"source {source_id}"],
+            expected_projection_rows(records_for_source(catalog, source_id), "source", source_id),
+            f"scaled source {source_id}",
+        )
+    for topic in catalog["topics"]:
+        topic_id = topic["id"]
+        parser = parsed_markers[f"topic {topic_id}"]
+        require_index_rows(
+            parser,
+            expected_projection_rows(records_for_topic(catalog, topic_id), "topic", topic_id),
+            f"scaled topic {topic_id}",
+        )
+        if parser.dynamic_headings != [
+            (
+                "topic",
+                (("topic-id", topic_id), ("topic-label", topic["label"])),
+                f"Generated {topic['label']} records",
+            )
+        ]:
+            raise ValueError(f"scaled topic {topic_id} has the wrong dynamic heading")
+    occurrences = {record["id"]: 0 for record in catalog["records"]}
+    for record in catalog["records"]:
+        specification = f"record {record['id']}"
+        parser = parsed_markers[specification]
+        validate_record_blocks(parser, [record], catalog, f"scaled {specification}")
+        require_index_rows(
+            parser, [], f"scaled {specification}", allow_canonical_record=True
+        )
+    for parser in parsed_markers.values():
+        for record_id in parser.record_fields:
+            if record_id not in occurrences:
+                raise ValueError(f"scaled fixture contains unknown full record {record_id}")
+            occurrences[record_id] += 1
+    if any(count != 1 for count in occurrences.values()):
+        raise ValueError("scaled fixture does not render every full record exactly once")
 
 
 def check_workflow_invariants(repo_root: Path) -> None:
@@ -1543,6 +1713,28 @@ def run_staged_mutation_tests(
                 "<!-- formalization-status-generated:end -->",
                 re.search(r"(?ms)<article .*?</article>", detail_text).group(0)
                 + "\n<!-- formalization-status-generated:end -->",
+                1,
+            ),
+        ),
+        (
+            "source projection stripped-identity full truth",
+            source_relative,
+            source_text.replace(
+                "<!-- formalization-status-generated:end -->",
+                "<article><h3>Stripped identity</h3><dl>"
+                "<dt>Implementation state</dt><dd>implemented</dd>"
+                "</dl></article>\n<!-- formalization-status-generated:end -->",
+                1,
+            ),
+        ),
+        (
+            "source projection unrecognized record-like container",
+            source_relative,
+            source_text.replace(
+                "<!-- formalization-status-generated:end -->",
+                f'<section id="record-{record_id}"><dl><dt>Status</dt>'
+                "<dd>implemented</dd></dl></section>\n"
+                "<!-- formalization-status-generated:end -->",
                 1,
             ),
         ),
@@ -2063,6 +2255,35 @@ def run_self_tests() -> None:
             pass
         else:
             raise AssertionError("invalid catalogue mutation was accepted")
+
+        stripped_record_html = (
+            "<article><h3>Stripped identity</h3><dl><dt>Status</dt>"
+            "<dd>implemented</dd></dl></article>"
+        )
+        rendered_stripped_record_html = (
+            '<article class="page-layout"><!-- formalization-status-generated:start source fixture -->'
+            + stripped_record_html
+            + "<!-- formalization-status-generated:end --></article>"
+        )
+        require_index_rows(
+            parse_record_html(
+                '<article class="page-layout"><!-- formalization-status-generated:start source fixture -->'
+                "<!-- formalization-status-generated:end --></article>",
+                "clean rendered marker scope",
+            ),
+            [],
+            "clean rendered marker scope",
+        )
+        for label, value in (
+            ("raw stripped-identity projection", stripped_record_html),
+            ("rendered stripped-identity projection", rendered_stripped_record_html),
+        ):
+            try:
+                require_index_rows(parse_record_html(value, label), [], label)
+            except ValueError:
+                pass
+            else:
+                raise AssertionError(f"{label} was accepted")
 
         record_tree = temporary / "record-tree"
         rendered_record = record_tree / "formalization/records/fixture-record"

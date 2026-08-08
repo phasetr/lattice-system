@@ -41,7 +41,10 @@ occur exactly once across the human publication.
 
 Source, topic, project-original, and status pages contain only exact counts and
 compact links to those canonical details; they contain no record definition
-lists. Their projection rows retain `record-<record-id>` as an explicit element
+lists. The projection grammar also rejects record-like `article`, `dl`, `dt`,
+or `dd` structures, typed-field attributes, and unknown `record-*` containers,
+even when canonical article identity attributes have been stripped. Their
+projection rows retain `record-<record-id>` as an explicit element
 ID, preserving the four prototype records' already published source/topic
 fragments while changing the fragment target from a duplicated detail block to
 the corresponding compact row. Dynamic index and projection rows use the same
@@ -159,7 +162,9 @@ thousands of records. The standard-library checker requires HTTP 200 and the
 expected content type, exact generated metadata and catalog-derived ordered
 overview/source/topic/status projections, schema version 1,
 a supported matching catalogue state (`prototype` or `authoritative`),
-matching input digests, a published schema equal to
+the exact closed top-level key sets and generator identity/version pairs
+(`validate_formalization_status.py` version 2 and
+`generate_formalization_site.py` version 2), matching input digests, a published schema equal to
 the checked-out canonical schema, and a publication revision equal to the
 triggering `main` SHA. Redirects are rejected before following, every response
 has an eight-MiB hard limit, and one 240-second absolute deadline bounds complete

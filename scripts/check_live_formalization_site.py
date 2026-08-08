@@ -57,6 +57,25 @@ SHA256_RE = re.compile(r"[0-9a-f]{64}")
 REVISION_RE = re.compile(r"[0-9a-f]{40}")
 MAX_BODY_BYTES = 8 * 1024 * 1024
 MAX_DEADLINE_SECONDS = 240
+CATALOG_KEYS = {
+    "catalog_state",
+    "generated_by",
+    "generator_version",
+    "input_sha256",
+    "records",
+    "schema_version",
+    "source_items",
+    "sources",
+    "topics",
+}
+PUBLICATION_KEYS = {
+    "catalog_state",
+    "generated_by",
+    "generator_version",
+    "input_sha256",
+    "revision",
+    "schema_version",
+}
 
 
 @dataclass(frozen=True)
@@ -318,6 +337,20 @@ def verify_responses(
     schema_response = responses[JSON_ENDPOINTS[1]]
     schema = parse_json(schema_response, JSON_ENDPOINTS[1])
     publication = parse_json(responses[JSON_ENDPOINTS[2]], JSON_ENDPOINTS[2])
+    if set(catalog) != CATALOG_KEYS:
+        raise ValueError("published catalogue has missing or additional top-level keys")
+    if set(publication) != PUBLICATION_KEYS:
+        raise ValueError("publication sidecar has missing or additional top-level keys")
+    if (
+        catalog.get("generated_by") != "scripts/validate_formalization_status.py"
+        or catalog.get("generator_version") != 2
+    ):
+        raise ValueError("published catalogue has the wrong generator identity or version")
+    if (
+        publication.get("generated_by") != "scripts/generate_formalization_site.py"
+        or publication.get("generator_version") != 2
+    ):
+        raise ValueError("publication sidecar has the wrong generator identity or version")
     digest = catalog.get("input_sha256")
     if catalog.get("schema_version") != 1 or publication.get("schema_version") != 1:
         raise ValueError("catalog/publication schema_version must both equal 1")
@@ -433,122 +466,12 @@ def verify_with_retry(
     raise ValueError(f"live publication check failed after {attempts} attempt(s): {last_error}")
 
 
-def legacy_fixture_responses(
-    revision: str, catalog_state: str = "prototype"
-) -> dict[str, Response]:
-    """Build a coherent in-memory publication for dependency-free self-tests."""
-    digest = "a" * 64
-    catalog_href = "/lattice-system/formalization-status/v1/catalog.json"
-    schema_href = "/lattice-system/formalization-status/v1/schema.json"
-    publication_href = "/lattice-system/formalization-status/v1/publication.json"
-    authoritative = catalog_state == "authoritative"
-    authority_href = (
-        catalog_href if authoritative else "/lattice-system/formalization/legacy/"
-    )
-    authority_label = (
-        "Current authority: validated version 1 catalogue"
-        if authoritative
-        else "Current authority: complete interim legacy catalogue"
-    )
-    book_href = "/lattice-system/formalization/sources/book/"
-    foundations_href = "/lattice-system/formalization/sources/foundations/"
-    topic_href = "/lattice-system/formalization/topics/spin/"
-    metadata = (
-        '<p>Generated formalization-status view.</p><ul data-generated-metadata="true">'
-        f'<li data-meta="catalog-state">Catalogue state: {catalog_state}</li>'
-        '<li data-meta="schema-version">Schema version: 1</li>'
-        f'<li data-meta="input-sha256">Input SHA-256: {digest}</li>'
-        f'<li data-meta="revision">Deploy revision: {revision}</li>'
-        f'<li data-meta="catalog-link" data-href="{catalog_href}">'
-        f'<a href="{catalog_href}">Machine data: version 1 catalogue</a></li>'
-        f'<li data-meta="schema-link" data-href="{schema_href}">'
-        f'<a href="{schema_href}">Schema: version 1 schema</a></li>'
-        f'<li data-meta="publication-link" data-href="{publication_href}">'
-        f'<a href="{publication_href}">Build metadata: publication sidecar</a></li>'
-        f'<li data-meta="authority-link" data-href="{authority_href}">'
-        f'<a href="{authority_href}">{authority_label}</a></li></ul>'
-    )
-    human = {
-        "formalization/": metadata
-        + '<ul><li data-row-kind="overview-counts" data-record-count="1" '
-        + f'data-source-count="1" data-topic-count="1">This {catalog_state} snapshot '
-        + "contains 1 records, 1 sources, and 1 topics.</li></ul>"
-        + '<ul><li data-row-kind="overview-navigation" data-navigation-id="sources" '
-        + 'data-href="/lattice-system/formalization/sources/"><a '
-        + 'href="/lattice-system/formalization/sources/">Browse generated source '
-        + "projections</a></li>"
-        + '<li data-row-kind="overview-navigation" data-navigation-id="topics" '
-        + 'data-href="/lattice-system/formalization/topics/"><a '
-        + 'href="/lattice-system/formalization/topics/">Browse generated topic '
-        + "projections</a></li>"
-        + '<li data-row-kind="overview-navigation" data-navigation-id="status" '
-        + 'data-href="/lattice-system/formalization/status/"><a '
-        + 'href="/lattice-system/formalization/status/">Browse generated status '
-        + "summary</a></li></ul>",
-        "formalization/status/": metadata
-        + '<ul data-index="status"><li data-row-kind="status" '
-        + 'data-status-label="proved" data-record-count="1">proved: 1</li></ul>',
-        "formalization/sources/": metadata
-        + '<ul data-index="sources"><li data-row-kind="source" '
-        + 'data-source-id="book" data-source-title="Book" data-record-count="1" '
-        + f'data-href="{book_href}"><a href="{book_href}">'
-        + "Book: 1 related record(s)</a></li>"
-        + '<li data-row-kind="project-original" '
-        + 'data-source-id="foundations" data-record-count="0" '
-        + f'data-href="{foundations_href}"><a href="{foundations_href}">'
-        + "Project-original foundations: 0 record(s)</a></li></ul>",
-        "formalization/topics/": metadata
-        + '<ul data-index="topics"><li data-row-kind="topic" '
-        + 'data-topic-id="spin" data-topic-label="Spin" data-record-count="1" '
-        + f'data-href="{topic_href}"><a href="{topic_href}">'
-        + "Spin: 1 record(s)</a></li></ul>",
-    }
-    catalog = {
-        "schema_version": 1,
-        "catalog_state": catalog_state,
-        "input_sha256": digest,
-        "sources": [{"id": "book", "title": "Book"}],
-        "source_items": [{"id": "book-item", "source_id": "book"}],
-        "topics": [{"id": "spin", "label": "Spin"}],
-        "records": [
-            {
-                "id": "record",
-                "origin": "literature",
-                "implementation_state": "complete",
-                "declaration_kind": "theorem",
-                "trust_state": "proved",
-                "source_relations": [
-                    {"source_item_id": "book-item", "relation": "formalizes"}
-                ],
-                "topic_ids": ["spin"],
-            }
-        ],
-    }
-    publication = {
-        "schema_version": 1,
-        "catalog_state": catalog_state,
-        "input_sha256": digest,
-        "revision": revision,
-    }
-    payloads: dict[str, tuple[str, bytes]] = {
-        **{key: ("text/html", value.encode()) for key, value in human.items()},
-        JSON_ENDPOINTS[0]: ("application/json", json.dumps(catalog).encode()),
-        JSON_ENDPOINTS[1]: (
-            "application/json",
-            json.dumps({"$id": PAGES_BASE + JSON_ENDPOINTS[1]}).encode(),
-        ),
-        JSON_ENDPOINTS[2]: ("application/json", json.dumps(publication).encode()),
-    }
-    return {
-        endpoint: Response(200, content_type, body, urljoin(PAGES_BASE, endpoint))
-        for endpoint, (content_type, body) in payloads.items()
-    }
-
-
 def fixture_responses(
-    revision: str, catalog_state: str = "prototype"
+    revision: str, catalog_state: str = "prototype", record_count: int = 4
 ) -> dict[str, Response]:
     """Build a complete scalable-route fixture for dependency-free self-tests."""
+    if record_count < len(COMPATIBILITY_RECORD_IDS):
+        raise ValueError("live fixture must retain every pinned compatibility record")
     digest = "a" * 64
     catalog_href = "/lattice-system/formalization-status/v1/catalog.json"
     schema_href = "/lattice-system/formalization-status/v1/schema.json"
@@ -601,9 +524,20 @@ def fixture_responses(
                 "trust_state": "axiom_free",
             }
         )
+    for index in range(record_count - len(COMPATIBILITY_RECORD_IDS)):
+        records.append(
+            {
+                **records[0],
+                "id": f"zz-fixture-record-{index:04d}",
+                "lean_name": f"LatticeSystem.Fixture.scaledResult{index}",
+                "summary": f"Scaled fixture result {index}",
+            }
+        )
     catalog: dict[str, object] = {
         "schema_version": 1,
         "catalog_state": catalog_state,
+        "generated_by": "scripts/validate_formalization_status.py",
+        "generator_version": 2,
         "input_sha256": digest,
         "sources": [{"id": "book", "title": "Book"}],
         "source_items": [
@@ -678,10 +612,14 @@ def fixture_responses(
         + rows_html(expected_projection_rows(records, "topic", "spin")),
     }
     for record in records:
+        if record["id"] not in COMPATIBILITY_RECORD_IDS:
+            continue
         human[f'formalization/records/{record["id"]}/'] = metadata + record_html(record)
     publication = {
         "schema_version": 1,
         "catalog_state": catalog_state,
+        "generated_by": "scripts/generate_formalization_site.py",
+        "generator_version": 2,
         "input_sha256": digest,
         "revision": revision,
     }
@@ -706,6 +644,10 @@ def run_self_tests() -> None:
     fixture = fixture_responses(revision)
     canonical_schema = fixture[JSON_ENDPOINTS[1]].body
     verify_responses(fixture, PAGES_BASE, revision, canonical_schema)
+    scaled_fixture = fixture_responses(revision, record_count=1000)
+    verify_responses(scaled_fixture, PAGES_BASE, revision, canonical_schema)
+    if len(scaled_fixture) != 14:
+        raise AssertionError("1000-record live fixture exceeded the bounded endpoint policy")
     authoritative_fixture = fixture_responses(revision, "authoritative")
     verify_responses(
         authoritative_fixture,
@@ -775,6 +717,65 @@ def run_self_tests() -> None:
             ),
         ),
     ]
+    leaked_projection = dict(fixture)
+    leaked_response = leaked_projection["formalization/sources/book/"]
+    leaked_projection["formalization/sources/book/"] = Response(
+        leaked_response.status,
+        leaked_response.content_type,
+        leaked_response.body
+        + b"<article><h3>Stripped identity</h3><dl><dt>Implementation state</dt>"
+        + b"<dd>implemented</dd></dl></article>",
+        leaked_response.final_url,
+    )
+    negative_fixtures.append(("stripped-identity full record projection leak", leaked_projection))
+
+    def changed_json(
+        endpoint: str, key: str, value: object | None, remove: bool = False
+    ) -> dict[str, Response]:
+        """Mutate one machine-object key while retaining a coherent HTTP fixture."""
+        changed = dict(fixture)
+        response = changed[endpoint]
+        payload = json.loads(response.body)
+        if remove:
+            payload.pop(key)
+        else:
+            payload[key] = value
+        changed[endpoint] = Response(
+            response.status,
+            response.content_type,
+            json.dumps(payload).encode(),
+            response.final_url,
+        )
+        return changed
+
+    negative_fixtures.extend(
+        [
+            (
+                "missing catalogue generator identity",
+                changed_json(JSON_ENDPOINTS[0], "generated_by", None, remove=True),
+            ),
+            (
+                "wrong catalogue generator version",
+                changed_json(JSON_ENDPOINTS[0], "generator_version", 1),
+            ),
+            (
+                "additional catalogue key",
+                changed_json(JSON_ENDPOINTS[0], "unexpected", True),
+            ),
+            (
+                "missing publication generator identity",
+                changed_json(JSON_ENDPOINTS[2], "generated_by", None, remove=True),
+            ),
+            (
+                "wrong publication generator version",
+                changed_json(JSON_ENDPOINTS[2], "generator_version", 1),
+            ),
+            (
+                "additional publication key",
+                changed_json(JSON_ENDPOINTS[2], "unexpected", True),
+            ),
+        ]
+    )
     wrong_revision = dict(json.loads(fixture[JSON_ENDPOINTS[2]].body))
     wrong_revision["revision"] = "2" * 40
     revision_fixture = dict(fixture)

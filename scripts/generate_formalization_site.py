@@ -866,12 +866,43 @@ def run_self_tests(repo_root: Path) -> None:
                 ],
             }
         )
+        for relative, permalink, title, specification in (
+            ("formalization/index.md", "/formalization/", "Formalization", "overview"),
+            (
+                "formalization/status.md",
+                "/formalization/status/",
+                "Formalization status",
+                "status",
+            ),
+            (
+                "formalization/sources/index.md",
+                "/formalization/sources/",
+                "Formalization sources",
+                "source-index",
+            ),
+            (
+                "formalization/sources/foundations.md",
+                "/formalization/sources/foundations/",
+                "Project-original foundations",
+                "project-original",
+            ),
+            (
+                "formalization/topics/index.md",
+                "/formalization/topics/",
+                "Formalization topics",
+                "topic-index",
+            ),
+        ):
+            dynamic_projection_page(
+                dynamic_root / relative, permalink, title, specification
+            )
         created = create_dynamic_pages(dynamic_root, scaled_aggregate)
         if created != 1002:
             raise AssertionError("dynamic page generation did not scale without placeholders")
-        record_files = list((dynamic_root / "formalization/records").glob("*.md"))
-        if len(record_files) != 1000:
-            raise AssertionError("dynamic record generation lost or duplicated a record")
+        replace_markers(dynamic_root, scaled_aggregate, "r")
+        from check_generated_site import check_scaled_human_fixture
+
+        check_scaled_human_fixture(dynamic_root, scaled_aggregate, "r")
         for kind, reserved in (("source", "foundations"), ("source", "index"), ("topic", "index")):
             hostile_routes = dict(project_aggregate)
             hostile_routes["sources"] = (
