@@ -97,11 +97,20 @@ above is the local pre-Jekyll reproduction path.
 
 Before this work, GitHub Pages reported `build_type=workflow`, but the active
 workflow list contained no Pages owner; the doc-gen4 block in Lean CI was and
-remains commented out. PR A introduces a build-only workflow that runs on every
-pull request, pushes to `main`, and manual dispatches. It validates and uploads
-an artifact but has no publication job or publication capability. PR B alone
-may establish the sole deployment owner after build evidence is accepted. At
-all times there must be exactly one such owner; Lean CI must never own Pages.
+remains commented out. PR A introduced the build job on every pull request,
+push to `main`, and manual dispatch. PR B adds the workflow's sole deploy job.
+It requires that same run's successful build and uploaded `github-pages`
+artifact, and its strict event guard admits only a push to `refs/heads/main`.
+Pull-request and manual runs therefore build the complete artifact while the
+deploy job is visibly skipped.
+
+Only the deploy job has `pages: write` and `id-token: write`; the workflow top
+level and build job remain `contents: read`, and Lean CI remains read-only with
+doc-gen4 disabled. The deploy job owns the `github-pages` environment and uses
+`actions/deploy-pages@v4`, the version documented by GitHub for the
+`actions/upload-pages-artifact@v4` artifact service. Workflow concurrency uses
+the single `pages` group without cancelling an in-progress deployment. This is
+the repository's only Pages deployment owner.
 
 The build job has a five-minute timeout. The exact sum of rendered regular-file
 `st_size` values is reported as **rendered uncompressed bytes** after symlinks
@@ -109,10 +118,12 @@ and non-regular entries are rejected. A value at or below 10 MiB is within the
 normal budget; a larger value requires review, and a value above 25 MiB fails.
 The compressed artifact size reported by the Actions API is a separate metric
 and is recorded from the PR run rather than inferred from the rendered tree.
-The workflow writes the uncompressed value to its step summary. The first PR
-run supplies the currently pending Jekyll runtime and uploaded-artifact
-evidence; record those observed values in Issue #5229 before accepting PR A or
-enabling PR B.
+The workflow writes the uncompressed value to its step summary. The accepted
+PR-A run completed the Formalization Pages workflow in 34 seconds. Its uploaded
+artifact was 573,915 bytes compressed and 3,437,699 bytes uncompressed, within
+both thresholds. Lean Action CI completed in 1 minute 16 seconds. These values
+are the historical baseline for reviewing later cost changes; Issue #5229
+records the run evidence and permission audit.
 
 These thresholds apply only to the lightweight status site. They neither hide
 nor relax the separate decision that doc-gen4 is too expensive to re-enable.

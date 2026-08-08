@@ -1053,28 +1053,35 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
 
 
 def check_workflow_invariants(repo_root: Path) -> None:
-    """Enforce the build-only boundary and the Lean workflow permission cleanup."""
+    """Enforce the sole main-only deploy owner and read-only Lean workflow."""
     pages_path = repo_root / ".github/workflows/formalization_pages.yml"
     lean_path = repo_root / ".github/workflows/lean_action_ci.yml"
     pages = pages_path.read_text(encoding="utf-8")
     lean = lean_path.read_text(encoding="utf-8")
-    forbidden = (
+    lean_forbidden = (
         "actions/" + "deploy-pages",
         "pages" + ": write",
         "id-token" + ": write",
         "environment" + ":",
     )
-    for token in forbidden:
-        if token in pages or token in lean:
-            raise ValueError(f"build-only workflow boundary contains forbidden token: {token}")
+    for token in lean_forbidden:
+        if token in lean:
+            raise ValueError(f"Lean workflow contains forbidden Pages ownership: {token}")
     jobs = pages.split("\njobs:\n", 1)
     if len(jobs) != 2:
         raise ValueError("formalization workflow lacks one jobs block")
     job_names = re.findall(r"(?m)^  ([A-Za-z0-9_-]+):\n    ", jobs[1])
-    if job_names != ["build"]:
-        raise ValueError(f"formalization workflow must contain only the build job: {job_names}")
+    if job_names != ["build", "deploy"]:
+        raise ValueError(
+            f"formalization workflow must contain exactly build then deploy: {job_names}"
+        )
+    build_block, deploy_block = jobs[1].split("\n  deploy:\n", 1)
+    for token in lean_forbidden:
+        if token in build_block:
+            raise ValueError(f"Pages build job contains deploy capability: {token}")
     required = (
         "permissions:\n  contents: read",
+        "concurrency:\n  group: pages\n  cancel-in-progress: false",
         "pull_request:",
         "branches: [main]",
         "workflow_dispatch:",
@@ -1093,6 +1100,31 @@ def check_workflow_invariants(repo_root: Path) -> None:
             raise ValueError(f"formalization workflow lacks required invariant: {token}")
     if "paths:" in pages or "paths-ignore:" in pages:
         raise ValueError("formalization workflow must run on every pull request")
+    upload_binding = (
+        "uses: actions/upload-pages-artifact@v4\n"
+        "        with:\n"
+        "          name: github-pages"
+    )
+    if upload_binding not in build_block:
+        raise ValueError("Pages build job must upload the explicitly named github-pages artifact")
+    deploy_required = (
+        "if: github.event_name == 'push' && github.ref == 'refs/heads/main'",
+        "needs: build",
+        "permissions:\n      pages: write\n      id-token: write",
+        "environment:\n      name: github-pages",
+        "url: ${{ steps.deployment.outputs.page_url }}",
+        "id: deployment",
+        "uses: actions/deploy-pages@v4\n"
+        "        with:\n"
+        "          artifact_name: github-pages",
+    )
+    for token in deploy_required:
+        if token not in deploy_block:
+            raise ValueError(f"Pages deploy job lacks required invariant: {token}")
+    if pages.count("actions/deploy-pages@v4") != 1:
+        raise ValueError("formalization workflow must have exactly one Pages deploy action")
+    if pages.count("pages: write") != 1 or pages.count("id-token: write") != 1:
+        raise ValueError("Pages/OIDC write permissions must occur only in the deploy job")
     if "permissions:\n  contents: read" not in lean:
         raise ValueError("Lean CI does not have the expected read-only top permission")
     if "--emit-lean-check" not in lean or "lake env lean .self-local/tmp/formalization-axioms.lean" not in lean:
