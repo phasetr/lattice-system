@@ -378,15 +378,16 @@ def _sorted_unique_strings(value: Any) -> bool:
     )
 
 
-def validate_cutover_baseline(
+def _validate_cutover_baseline(
     baseline: Any,
     records: Iterable[dict[str, Any]],
     expected_rows: list[dict[str, Any]],
-    allowed_non_record_ordinals: set[int] | None = None,
-    exceptional_mappings: dict[int, dict[str, Any]] | None = None,
-    retired_declarations: dict[int, list[dict[str, Any]]] | None = None,
+    allowed_non_record_ordinals: set[int] | None,
+    exceptional_mappings: dict[int, dict[str, Any]] | None,
+    retired_declarations: dict[int, list[dict[str, Any]]] | None,
+    audited_exceptional_names: dict[int, tuple[str, ...]],
 ) -> list[str]:
-    """Validate exhaustive historical coverage and irreversible cutover IDs."""
+    """Validate cutover coverage against an explicit audited-name table."""
     errors: list[str] = []
     allowed_non_record_ordinals = allowed_non_record_ordinals or set()
     exceptional_mappings = exceptional_mappings or {}
@@ -507,6 +508,16 @@ def validate_cutover_baseline(
                     errors.append(
                         f"{location}: non-expandable grouped mapping lacks exact certificate evidence"
                     )
+                elif index not in audited_exceptional_names:
+                    errors.append(
+                        f"{location}: exceptional ordinal lacks independently pinned expected names"
+                    )
+                elif set(entry.get("expected_lean_names", [])) != set(
+                    audited_exceptional_names[index]
+                ):
+                    errors.append(
+                        f"{location}: exceptional certificate names differ from independently pinned expected names"
+                    )
                 elif (
                     entry.get("row_sha256") != row.get("row_sha256")
                     or set(entry.get("expected_lean_names", []))
@@ -530,9 +541,26 @@ def validate_cutover_baseline(
                     )
             else:
                 entry = exceptional_mappings.get(index)
-                if entry is None or set(entry.get("expected_lean_names", [])) != retired_names:
+                if entry is None:
                     errors.append(
                         f"{location}: pure-retired non-mechanical row lacks exact expected names"
+                    )
+                elif index not in audited_exceptional_names:
+                    errors.append(
+                        f"{location}: exceptional ordinal lacks independently pinned expected names"
+                    )
+                elif set(entry.get("expected_lean_names", [])) != set(
+                    audited_exceptional_names[index]
+                ):
+                    errors.append(
+                        f"{location}: exceptional certificate names differ from independently pinned expected names"
+                    )
+                elif (
+                    entry.get("row_sha256") != row.get("row_sha256")
+                    or set(entry.get("expected_lean_names", [])) != retired_names
+                ):
+                    errors.append(
+                        f"{location}: pure-retired certificate names/hash differ from retired declarations"
                     )
                 else:
                     needed_exceptional_ordinals.add(index)
@@ -582,6 +610,26 @@ def validate_cutover_baseline(
     if missing:
         errors.append(f"cutover baseline: cutover records were deleted or are missing: {missing}")
     return errors
+
+
+def validate_cutover_baseline(
+    baseline: Any,
+    records: Iterable[dict[str, Any]],
+    expected_rows: list[dict[str, Any]],
+    allowed_non_record_ordinals: set[int] | None = None,
+    exceptional_mappings: dict[int, dict[str, Any]] | None = None,
+    retired_declarations: dict[int, list[dict[str, Any]]] | None = None,
+) -> list[str]:
+    """Validate production cutover coverage against code-pinned audited names."""
+    return _validate_cutover_baseline(
+        baseline,
+        records,
+        expected_rows,
+        allowed_non_record_ordinals,
+        exceptional_mappings,
+        retired_declarations,
+        PINNED_EXCEPTIONAL_EXPECTED_NAMES,
+    )
 
 
 def _sorted_unique_ordinals(value: Any) -> bool:
@@ -840,17 +888,18 @@ def retired_declaration_map(
     return result, errors
 
 
-def validate_cutover_certificate(
+def _validate_cutover_certificate(
     certificate: Any,
     certificate_raw: bytes,
     baseline: Any,
     baseline_raw: bytes,
     catalog_state: Any,
     records: Iterable[dict[str, Any]],
-    repo_root: Path | None = None,
-    accepted_certificate_sha256: str | None = ACCEPTED_CUTOVER_CERTIFICATE_SHA256,
+    repo_root: Path | None,
+    accepted_certificate_sha256: str | None,
+    audited_exceptional_names: dict[int, tuple[str, ...]],
 ) -> list[str]:
-    """Bind one baseline and its immutable cutover projections to a certificate."""
+    """Bind one certificate using an explicit audited-name table and digest."""
     errors: list[str] = []
     if not isinstance(certificate, dict):
         return ["cutover certificate: expected object"]
@@ -876,6 +925,17 @@ def validate_cutover_certificate(
         certificate.get("exceptional_mappings")
     )
     errors.extend(exceptional_errors)
+    for ordinal, entry in exceptional_map.items():
+        if ordinal not in audited_exceptional_names:
+            errors.append(
+                f"cutover certificate exceptional mapping {ordinal}: ordinal lacks independently pinned expected names"
+            )
+        elif set(entry.get("expected_lean_names", [])) != set(
+            audited_exceptional_names[ordinal]
+        ):
+            errors.append(
+                f"cutover certificate exceptional mapping {ordinal}: names differ from independently pinned expected names"
+            )
     _retired_map, retired_errors = retired_declaration_map(
         certificate.get("retired_declarations"), repo_root
     )
@@ -905,6 +965,30 @@ def validate_cutover_certificate(
         elif certificate_digest != accepted_certificate_sha256:
             errors.append("authoritative cutover certificate differs from the accepted fingerprint")
     return errors
+
+
+def validate_cutover_certificate(
+    certificate: Any,
+    certificate_raw: bytes,
+    baseline: Any,
+    baseline_raw: bytes,
+    catalog_state: Any,
+    records: Iterable[dict[str, Any]],
+    repo_root: Path | None = None,
+    accepted_certificate_sha256: str | None = ACCEPTED_CUTOVER_CERTIFICATE_SHA256,
+) -> list[str]:
+    """Validate a production certificate against code-pinned audited evidence."""
+    return _validate_cutover_certificate(
+        certificate,
+        certificate_raw,
+        baseline,
+        baseline_raw,
+        catalog_state,
+        records,
+        repo_root,
+        accepted_certificate_sha256,
+        PINNED_EXCEPTIONAL_EXPECTED_NAMES,
+    )
 
 
 def validate_cutover_requirement(
@@ -1044,7 +1128,32 @@ def self_test(repo_root: Path) -> list[str]:
         "schema_version": 1,
     }
     certificate_raw = canonical_bytes(certificate)
-    baseline_errors = validate_cutover_baseline(
+    fixture_audited_exceptional_names = {
+        entry["ordinal"]: tuple(entry["expected_lean_names"])
+        for entry in exceptional_entries
+    }
+
+    def validate_fixture_baseline(*args: Any) -> list[str]:
+        """Validate the exhaustive synthetic fixture against separate test pins."""
+        return _validate_cutover_baseline(
+            *args,
+            fixture_audited_exceptional_names,
+        )
+
+    def validate_fixture_certificate(*args: Any, **kwargs: Any) -> list[str]:
+        """Validate the synthetic certificate against separate test pins."""
+        accepted_digest = kwargs.pop(
+            "accepted_certificate_sha256",
+            ACCEPTED_CUTOVER_CERTIFICATE_SHA256,
+        )
+        return _validate_cutover_certificate(
+            *args,
+            **kwargs,
+            accepted_certificate_sha256=accepted_digest,
+            audited_exceptional_names=fixture_audited_exceptional_names,
+        )
+
+    baseline_errors = validate_fixture_baseline(
         baseline,
         records,
         rows,
@@ -1052,7 +1161,7 @@ def self_test(repo_root: Path) -> list[str]:
         {entry["ordinal"]: entry for entry in exceptional_entries},
         retired_by_ordinal,
     )
-    certificate_errors = validate_cutover_certificate(
+    certificate_errors = validate_fixture_certificate(
         certificate,
         certificate_raw,
         baseline,
@@ -1124,7 +1233,7 @@ def self_test(repo_root: Path) -> list[str]:
     for label, row_index, mutation in runtime_row_mutations:
         mutated = copy.deepcopy(baseline)
         mutated["legacy_rows"][row_index].update(mutation)
-        if not validate_cutover_baseline(
+        if not validate_fixture_baseline(
             mutated,
             records,
             rows,
@@ -1150,7 +1259,7 @@ def self_test(repo_root: Path) -> list[str]:
         if row["legacy_first_cell"] == "`pauliX/Y/Z_isHermitian`"
     )
     hermitian_row["mapped_record_ids"] = hermitian_row["mapped_record_ids"][:1]
-    if not validate_cutover_baseline(
+    if not validate_fixture_baseline(
         missing_group_member,
         records,
         rows,
@@ -1223,7 +1332,7 @@ def self_test(repo_root: Path) -> list[str]:
         ):
             mutated_evidence = copy.deepcopy(exceptional_by_ordinal)
             mutated_evidence[ordinal]["expected_lean_names"] = names
-            if not validate_cutover_baseline(
+            if not validate_fixture_baseline(
                 baseline,
                 records,
                 rows,
@@ -1235,12 +1344,144 @@ def self_test(repo_root: Path) -> list[str]:
                     f"pinned exceptional row {ordinal} accepted {label} certificate names"
                 )
 
+    pinned_ordinal = min(PINNED_EXCEPTIONAL_EXPECTED_NAMES)
+    pinned_names = PINNED_EXCEPTIONAL_EXPECTED_NAMES[pinned_ordinal]
+    pinned_row_index = pinned_ordinal - 1
+    pinned_record_ids = [record_by_name[name] for name in pinned_names]
+
+    omitted_baseline = copy.deepcopy(baseline)
+    omitted_baseline["legacy_rows"][pinned_row_index]["mapped_record_ids"].remove(
+        pinned_record_ids[-1]
+    )
+    omitted_evidence = copy.deepcopy(exceptional_by_ordinal)
+    omitted_evidence[pinned_ordinal]["expected_lean_names"] = list(pinned_names[:-1])
+    omitted_errors = validate_fixture_baseline(
+        omitted_baseline,
+        records,
+        rows,
+        set(non_record_ordinals),
+        omitted_evidence,
+        retired_by_ordinal,
+    )
+    if not any("independently pinned" in error for error in omitted_errors):
+        failures.append("aligned omitted exceptional name bypassed independent pins")
+    omitted_certificate = copy.deepcopy(certificate)
+    omitted_certificate_entry = next(
+        entry
+        for entry in omitted_certificate["exceptional_mappings"]
+        if entry["ordinal"] == pinned_ordinal
+    )
+    omitted_certificate_entry["expected_lean_names"] = list(pinned_names[:-1])
+    omitted_certificate_errors = validate_fixture_certificate(
+        omitted_certificate,
+        canonical_bytes(omitted_certificate),
+        baseline,
+        baseline_raw,
+        "prototype",
+        records,
+        repo_root,
+    )
+    if not any(
+        "independently pinned" in error for error in omitted_certificate_errors
+    ):
+        failures.append("certificate validator accepted an omitted pinned name")
+
+    extra_name = "LatticeSystem.Fixture.independent_pin_extra"
+    extra_record = {"id": "fixture-independent-pin-extra", "lean_name": extra_name}
+    extra_records = [*records, extra_record]
+    extra_baseline = copy.deepcopy(baseline)
+    extra_baseline["cutover_record_ids"] = sorted(
+        [*extra_baseline["cutover_record_ids"], extra_record["id"]]
+    )
+    extra_baseline["legacy_rows"][pinned_row_index]["mapped_record_ids"] = sorted(
+        [
+            *extra_baseline["legacy_rows"][pinned_row_index]["mapped_record_ids"],
+            extra_record["id"],
+        ]
+    )
+    extra_evidence = copy.deepcopy(exceptional_by_ordinal)
+    extra_evidence[pinned_ordinal]["expected_lean_names"] = sorted(
+        [*pinned_names, extra_name]
+    )
+    extra_errors = validate_fixture_baseline(
+        extra_baseline,
+        extra_records,
+        rows,
+        set(non_record_ordinals),
+        extra_evidence,
+        retired_by_ordinal,
+    )
+    if not any("independently pinned" in error for error in extra_errors):
+        failures.append("aligned extra exceptional name bypassed independent pins")
+
+    unrelated_record = next(
+        record for record in records if record["lean_name"] not in pinned_names
+    )
+    unrelated_baseline = copy.deepcopy(baseline)
+    unrelated_baseline["legacy_rows"][pinned_row_index]["mapped_record_ids"] = sorted(
+        [*pinned_record_ids[:-1], unrelated_record["id"]]
+    )
+    unrelated_evidence = copy.deepcopy(exceptional_by_ordinal)
+    unrelated_evidence[pinned_ordinal]["expected_lean_names"] = sorted(
+        [*pinned_names[:-1], unrelated_record["lean_name"]]
+    )
+    unrelated_errors = validate_fixture_baseline(
+        unrelated_baseline,
+        records,
+        rows,
+        set(non_record_ordinals),
+        unrelated_evidence,
+        retired_by_ordinal,
+    )
+    if not any("independently pinned" in error for error in unrelated_errors):
+        failures.append("aligned unrelated exceptional name bypassed independent pins")
+
+    unpinned_ordinal = next(
+        ordinal
+        for ordinal in exceptional_by_ordinal
+        if ordinal not in PINNED_EXCEPTIONAL_EXPECTED_NAMES
+    )
+    pins_without_ordinal = dict(fixture_audited_exceptional_names)
+    pins_without_ordinal.pop(unpinned_ordinal)
+    unpinned_errors = _validate_cutover_baseline(
+        baseline,
+        records,
+        rows,
+        set(non_record_ordinals),
+        exceptional_by_ordinal,
+        retired_by_ordinal,
+        pins_without_ordinal,
+    )
+    if not any(
+        f"cutover baseline row {unpinned_ordinal}: exceptional ordinal lacks independently pinned"
+        in error
+        for error in unpinned_errors
+    ):
+        failures.append("exceptional certificate accepted an unpinned ordinal")
+    unpinned_certificate_errors = _validate_cutover_certificate(
+        certificate,
+        certificate_raw,
+        baseline,
+        baseline_raw,
+        "prototype",
+        records,
+        repo_root,
+        ACCEPTED_CUTOVER_CERTIFICATE_SHA256,
+        pins_without_ordinal,
+    )
+    if not any(
+        f"exceptional mapping {unpinned_ordinal}: ordinal lacks independently pinned"
+        in error
+        for error in unpinned_certificate_errors
+    ):
+        failures.append("certificate validator accepted an unpinned ordinal")
+
     uncertified_group = {
         entry["ordinal"]: entry
         for entry in exceptional_entries
         if entry["ordinal"] != etc_row["ordinal"]
     }
-    if not validate_cutover_baseline(
+    if not validate_fixture_baseline(
         baseline,
         records,
         rows,
@@ -1266,7 +1507,7 @@ def self_test(repo_root: Path) -> list[str]:
             "row_sha256": exact_row["row_sha256"],
         },
     }
-    if not validate_cutover_baseline(
+    if not validate_fixture_baseline(
         nongrouped,
         records,
         rows,
@@ -1284,7 +1525,7 @@ def self_test(repo_root: Path) -> list[str]:
                 mapped_record_ids=[],
                 outcome="not_a_declaration",
             )
-    if not validate_cutover_baseline(
+    if not validate_fixture_baseline(
         all_non_record,
         records,
         rows,
@@ -1305,7 +1546,7 @@ def self_test(repo_root: Path) -> list[str]:
         failures.append("mixed/pure retired row fixtures drifted")
     missing_survivor = copy.deepcopy(baseline)
     missing_survivor["legacy_rows"][655]["mapped_record_ids"] = []
-    if not validate_cutover_baseline(
+    if not validate_fixture_baseline(
         missing_survivor,
         records,
         rows,
@@ -1319,7 +1560,7 @@ def self_test(repo_root: Path) -> list[str]:
         for ordinal, entries in retired_by_ordinal.items()
         if ordinal != 656
     }
-    if not validate_cutover_baseline(
+    if not validate_fixture_baseline(
         baseline,
         records,
         rows,
@@ -1333,7 +1574,7 @@ def self_test(repo_root: Path) -> list[str]:
     wrong_row_entry["ordinal"] = 657
     wrong_row_entry["row_sha256"] = baseline["legacy_rows"][656]["row_sha256"]
     wrong_row_retirement[657] = [wrong_row_entry]
-    if not validate_cutover_baseline(
+    if not validate_fixture_baseline(
         baseline,
         records,
         rows,
@@ -1344,7 +1585,7 @@ def self_test(repo_root: Path) -> list[str]:
         failures.append("retirement evidence was accepted for the wrong legacy row")
     wrong_hash_retirement = copy.deepcopy(retired_by_ordinal)
     wrong_hash_retirement[656][0]["row_sha256"] = "0" * 64
-    if not validate_cutover_baseline(
+    if not validate_fixture_baseline(
         baseline,
         records,
         rows,
@@ -1400,7 +1641,7 @@ def self_test(repo_root: Path) -> list[str]:
             )
     missing_replacement = copy.deepcopy(retired_by_ordinal)
     missing_replacement[656][0]["replacement_record_ids"] = ["missing-replacement"]
-    if not validate_cutover_baseline(
+    if not validate_fixture_baseline(
         baseline,
         records,
         rows,
@@ -1416,7 +1657,7 @@ def self_test(repo_root: Path) -> list[str]:
             "lean_name": retired_entries[0]["former_lean_name"],
         },
     ]
-    if not validate_cutover_baseline(
+    if not validate_fixture_baseline(
         baseline,
         retired_current_record,
         rows,
@@ -1430,7 +1671,7 @@ def self_test(repo_root: Path) -> list[str]:
     remapped["legacy_rows"][0]["mapped_record_ids"] = remapped["legacy_rows"][1][
         "mapped_record_ids"
     ]
-    if not validate_cutover_certificate(
+    if not validate_fixture_certificate(
         certificate,
         certificate_raw,
         remapped,
@@ -1442,7 +1683,7 @@ def self_test(repo_root: Path) -> list[str]:
         failures.append("row remapping without a new certificate was accepted")
     shrunk = copy.deepcopy(baseline)
     shrunk["cutover_record_ids"].pop()
-    if not validate_cutover_certificate(
+    if not validate_fixture_certificate(
         certificate,
         certificate_raw,
         shrunk,
@@ -1453,7 +1694,7 @@ def self_test(repo_root: Path) -> list[str]:
     ):
         failures.append("cutover ID shrink without a new certificate was accepted")
     omitted_current = [*records, {"id": "unfrozen", "lean_name": "LatticeSystem.Fixture.unfrozen"}]
-    if not validate_cutover_certificate(
+    if not validate_fixture_certificate(
         certificate,
         certificate_raw,
         baseline,
@@ -1464,7 +1705,7 @@ def self_test(repo_root: Path) -> list[str]:
     ):
         failures.append("prototype freeze omitted a current record")
     accepted_digest = sha256_bytes(certificate_raw)
-    if validate_cutover_certificate(
+    if validate_fixture_certificate(
         certificate,
         certificate_raw,
         baseline,
@@ -1476,7 +1717,7 @@ def self_test(repo_root: Path) -> list[str]:
     ):
         failures.append("authoritative post-cutover record superset was rejected")
     deleted = records[1:]
-    if not validate_cutover_certificate(
+    if not validate_fixture_certificate(
         certificate,
         certificate_raw,
         baseline,

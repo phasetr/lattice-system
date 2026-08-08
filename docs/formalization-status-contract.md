@@ -360,9 +360,13 @@ prose/symbolic backtick tokens that cannot be expanded deterministically as
 Lean identifiers, the certificate stores the row
 ordinal, exact row hash, and the complete sorted fully qualified expected Lean
 names. Those names must equal the mapped and certified-retired declarations
-bidirectionally. Such an
-exception is rejected for a nongrouped row, and unused or missing exceptional
-entries are errors.
+bidirectionally and must also equal an independently audited, code-pinned set
+for that ordinal. The baseline and certificate therefore cannot self-certify a
+different interpretation by changing both mappings and expected names together.
+An exceptional ordinal absent from the code-pinned evidence is rejected. Future
+migration PRs must deliberately extend that reviewed table as they add audited
+non-mechanical mappings. Such an exception is rejected for a nongrouped row,
+and unused or missing exceptional entries are errors.
 
 Retirement is not a free-form escape from coverage. Each certificate entry
 binds one exact row hash, ordinal, legacy leaf, former fully qualified Lean
