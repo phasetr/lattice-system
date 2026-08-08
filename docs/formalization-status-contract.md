@@ -329,8 +329,13 @@ group is never assigned Cartesian, zipped, paired, or cyclic semantics by the
 checker. The exact
 first-cell text, text outside backticks (including literal `etc.`), and derived
 closed grouping-syntax tags are also pinned. Mechanically expandable groups
-require equality between the complete expanded leaf set and mapped record
-leaves; mapping only the first member is rejected. A `not_a_declaration` row
+require equality between the complete expanded leaf set and the coverage set;
+mapping only the first member is rejected. A row may bind exact retired
+declaration evidence: its complete expected legacy set must equal the
+disjoint union of current mapped leaves and certified retired leaves. Mixed
+rows remain `mapped` and must retain at least one current record. A pure-retired
+row uses the closed `retired` outcome, no current record IDs, and the
+`retired_declarations` disposition. A `not_a_declaration` row
 maps none and uses only the closed
 `non_declaration` disposition. Such a row is accepted only when its exact
 legacy cell has no declaration reference and its ordinal occurs in the paired
@@ -354,14 +359,28 @@ multiple groups in one reference, declaration signatures with arguments, or
 prose/symbolic backtick tokens that cannot be expanded deterministically as
 Lean identifiers, the certificate stores the row
 ordinal, exact row hash, and the complete sorted fully qualified expected Lean
-names. Those names must equal the mapped declarations bidirectionally. Such an
+names. Those names must equal the mapped and certified-retired declarations
+bidirectionally. Such an
 exception is rejected for a nongrouped row, and unused or missing exceptional
 entries are errors.
+
+Retirement is not a free-form escape from coverage. Each certificate entry
+binds one exact row hash, ordinal, legacy leaf, former fully qualified Lean name
+(or its exact former short name), former `LatticeSystem/**/*.lean` path, and a
+40-hex deletion commit plus a nonempty reason. The validator proves that the
+commit is in current history, changes that exact path, the parent version
+declares the leaf, the commit version removes it (or the file), and the current
+Lean tree and current catalogue no longer declare it. Optional sorted
+replacement record IDs must exist. Entries are sorted and unique by
+ordinal/leaf; wrong-row, survivor, fabricated-history, overlapping-current,
+missing, extra, and unused retirement evidence is rejected. This model applies
+uniformly to any number of absent historical leaves, including mixed rows whose
+other declarations survive.
 
 The paired certificate hashes the exact canonical baseline bytes, the sorted
 cutover-ID projection, and the complete ordinal/outcome/disposition/mapping/row
 hash projection. It also freezes the sorted non-record and exceptional-mapping
-ordinal/name evidence. While the catalogue remains a prototype, introducing
+ordinal/name evidence and the complete deletion-history evidence. While the catalogue remains a prototype, introducing
 this pair
 is a freeze gate: the current record-ID set must equal `cutover_record_ids`, so
 an omitted current record is rejected. The atomic cutover PR must pin the

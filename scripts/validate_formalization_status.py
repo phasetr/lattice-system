@@ -17,9 +17,12 @@ from formalization_cutover import (
     CUTOVER_BASELINE_KEYS,
     CUTOVER_CERTIFICATE_KEYS,
     CUTOVER_EXCEPTIONAL_MAPPING_KEYS,
+    CUTOVER_RETIRED_DECLARATION_KEYS,
+    CUTOVER_RETIRED_DECLARATION_REQUIRED_KEYS,
     LEGACY_ROW_KEYS,
     exceptional_mapping_map,
     reconstruct_legacy_rows,
+    retired_declaration_map,
     self_test as cutover_self_test,
     validate_cutover_baseline,
     validate_cutover_certificate,
@@ -221,6 +224,11 @@ class Contract:
                 "cutover_exceptional_mapping",
                 CUTOVER_EXCEPTIONAL_MAPPING_KEYS,
                 CUTOVER_EXCEPTIONAL_MAPPING_KEYS,
+            ),
+            (
+                "cutover_retired_declaration",
+                CUTOVER_RETIRED_DECLARATION_KEYS,
+                CUTOVER_RETIRED_DECLARATION_REQUIRED_KEYS,
             ),
             ("cutover_legacy_row", LEGACY_ROW_KEYS, LEGACY_ROW_KEYS),
             ("manifest", MANIFEST_KEYS, MANIFEST_REQUIRED_KEYS),
@@ -1989,6 +1997,11 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
     baseline_rows[0].update(
         mapped_record_ids=["fixture-record"], outcome="mapped", disposition=None
     )
+    baseline_rows[2].update(
+        mapped_record_ids=[],
+        outcome="retired",
+        disposition="retired_declarations",
+    )
     baseline_fixture = {
         "baseline_commit": "6519099024bf156b87ac0c807c6633c513792581",
         "baseline_path": "docs/index.md",
@@ -2021,6 +2034,12 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
             lambda value: value["legacy_rows"][0].update(disposition="non_declaration"),
         ),
         (
+            "mapped row with retired disposition",
+            lambda value: value["legacy_rows"][0].update(
+                disposition="retired_declarations"
+            ),
+        ),
+        (
             "non-record row with mapped IDs",
             lambda value: value["legacy_rows"][1].update(mapped_record_ids=["fixture-record"]),
         ),
@@ -2031,6 +2050,16 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
         (
             "unclosed waived disposition",
             lambda value: value["legacy_rows"][1].update(disposition="waived"),
+        ),
+        (
+            "retired row with mapped IDs",
+            lambda value: value["legacy_rows"][2].update(
+                mapped_record_ids=["fixture-record"]
+            ),
+        ),
+        (
+            "retired row without retired disposition",
+            lambda value: value["legacy_rows"][2].update(disposition=None),
         ),
         (
             "unknown grouping syntax",
@@ -2057,6 +2086,7 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
         "exceptional_mappings": [],
         "legacy_mapping_sha256": "2" * 64,
         "non_record_ordinals": [2],
+        "retired_declarations": [],
         "schema_version": 1,
     }
     certificate_schema_validation = Validation()
@@ -2083,6 +2113,22 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
                     {
                         "expected_lean_names": ["not-qualified"],
                         "ordinal": 1,
+                        "row_sha256": "0" * 64,
+                    }
+                ]
+            ),
+        ),
+        (
+            "malformed retired declaration",
+            lambda value: value.update(
+                retired_declarations=[
+                    {
+                        "deletion_commit": "0" * 40,
+                        "former_lean_name": "not a name",
+                        "former_path": "outside.lean",
+                        "legacy_leaf": "bad leaf",
+                        "ordinal": 1,
+                        "reason": "",
                         "row_sha256": "0" * 64,
                     }
                 ]
@@ -2268,11 +2314,15 @@ def main() -> int:
                     input_raw[baseline_declared],
                     manifest.get("catalog_state"),
                     records,
+                    repo_root,
                 )
             )
             non_record_ordinals = certificate.get("non_record_ordinals", [])
             exceptional_mappings, _exceptional_errors = exceptional_mapping_map(
                 certificate.get("exceptional_mappings")
+            )
+            retired_declarations, _retired_errors = retired_declaration_map(
+                certificate.get("retired_declarations"), repo_root
             )
             for error in validate_cutover_baseline(
                 baseline,
@@ -2280,6 +2330,7 @@ def main() -> int:
                 reconstruct_legacy_rows(repo_root),
                 set(non_record_ordinals) if isinstance(non_record_ordinals, list) else set(),
                 exceptional_mappings,
+                retired_declarations,
             ):
                 validation.errors.append(error)
     validate_prototype_coverage(

@@ -36,14 +36,15 @@ LEGACY_ROW_KEYS = {
     "outcome",
     "row_sha256",
 }
-OUTCOMES = {"mapped", "not_a_declaration"}
-DISPOSITIONS = {"non_declaration"}
+OUTCOMES = {"mapped", "not_a_declaration", "retired"}
+DISPOSITIONS = {"non_declaration", "retired_declarations"}
 CUTOVER_CERTIFICATE_KEYS = {
     "baseline_sha256",
     "cutover_record_ids_sha256",
     "exceptional_mappings",
     "legacy_mapping_sha256",
     "non_record_ordinals",
+    "retired_declarations",
     "schema_version",
 }
 CUTOVER_EXCEPTIONAL_MAPPING_KEYS = {
@@ -51,6 +52,18 @@ CUTOVER_EXCEPTIONAL_MAPPING_KEYS = {
     "ordinal",
     "row_sha256",
 }
+CUTOVER_RETIRED_DECLARATION_REQUIRED_KEYS = {
+    "deletion_commit",
+    "former_lean_name",
+    "former_path",
+    "legacy_leaf",
+    "ordinal",
+    "reason",
+    "row_sha256",
+}
+CUTOVER_RETIRED_DECLARATION_KEYS = (
+    CUTOVER_RETIRED_DECLARATION_REQUIRED_KEYS | {"replacement_record_ids"}
+)
 # PR E must replace this with the SHA-256 of the independently audited canonical
 # certificate in the same atomic change that flips the catalogue authority.
 ACCEPTED_CUTOVER_CERTIFICATE_SHA256: str | None = None
@@ -123,7 +136,45 @@ PINNED_EXCEPTIONAL_EXPECTED_NAMES = {
     ),
 }
 SHA256_RE = re.compile(r"[0-9a-f]{64}")
+GIT_COMMIT_RE = re.compile(r"[0-9a-f]{40}")
 STABLE_ID_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
+LEAN_NAME_RE = re.compile(
+    r"LatticeSystem(?:\.[A-Za-z_\u0080-\uFFFF][A-Za-z0-9_'\u0080-\uFFFF]*)+"
+)
+LEAN_DECLARATION_RE = re.compile(
+    r"(?m)^\s*(?:(?:private|protected|noncomputable|unsafe)\s+)*"
+    r"(?:abbrev|axiom|class|def|inductive|instance|lemma|opaque|structure|theorem)\s+"
+    r"([A-Za-z_\u0080-\uFFFF][A-Za-z0-9_'\u0080-\uFFFF]*)"
+)
+RETIRED_FIXTURES = {
+    656: {
+        "deletion_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
+        "former_lean_name": (
+            "LatticeSystem.Quantum."
+            "sublatticeSpinHalfOpComplementMinus_complement_plus_mulVec_neelStateOf"
+        ),
+        "former_path": (
+            "LatticeSystem/Quantum/MarshallLiebMattis/"
+            "SublatticeCasimirNeelExpectations.lean"
+        ),
+        "legacy_leaf": (
+            "sublatticeSpinHalfOpComplementMinus_complement_plus_mulVec_neelStateOf"
+        ),
+        "reason": "Deleted with the bulk orphan-module removal in PR #3919.",
+    },
+    676: {
+        "deletion_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
+        "former_lean_name": "LatticeSystem.Quantum.neelStateOf_allUp_orthogonal",
+        "former_path": (
+            "LatticeSystem/Quantum/MarshallLiebMattis/"
+            "SublatticeCasimirNeelBasisOrthogonality.lean"
+        ),
+        "legacy_leaf": "neelStateOf_allUp_orthogonal",
+        "reason": "Deleted with the bulk orphan-module removal in PR #3919.",
+    },
+}
+_CURRENT_DECLARATION_LEAVES_CACHE: dict[Path, set[str]] = {}
+_RETIREMENT_HISTORY_CACHE: dict[tuple[Path, str, str, str, str], str | None] = {}
 
 
 def _is_separator(line: str) -> bool:
@@ -339,15 +390,25 @@ def validate_cutover_baseline(
     expected_rows: list[dict[str, Any]],
     allowed_non_record_ordinals: set[int] | None = None,
     exceptional_mappings: dict[int, dict[str, Any]] | None = None,
+    retired_declarations: dict[int, list[dict[str, Any]]] | None = None,
 ) -> list[str]:
     """Validate exhaustive historical coverage and irreversible cutover IDs."""
     errors: list[str] = []
     allowed_non_record_ordinals = allowed_non_record_ordinals or set()
     exceptional_mappings = exceptional_mappings or {}
+    retired_declarations = retired_declarations or {}
     record_map = {
         record.get("id"): record
         for record in records
         if isinstance(record, dict) and isinstance(record.get("id"), str)
+    }
+    current_record_names = {
+        record.get("lean_name")
+        for record in record_map.values()
+        if isinstance(record.get("lean_name"), str)
+    }
+    current_record_leaves = {
+        name.rsplit(".", 1)[-1] for name in current_record_names
     }
     if not isinstance(baseline, dict):
         return ["cutover baseline: expected object"]
@@ -404,6 +465,21 @@ def validate_cutover_baseline(
         outcome = row.get("outcome")
         mapped = row.get("mapped_record_ids")
         disposition = row.get("disposition")
+        retired_entries = retired_declarations.get(index, [])
+        retired_leaves = {entry.get("legacy_leaf") for entry in retired_entries}
+        retired_names = {entry.get("former_lean_name") for entry in retired_entries}
+        if retired_names & current_record_names or retired_leaves & current_record_leaves:
+            errors.append(f"{location}: retired declaration still has a current record")
+        if any(entry.get("row_sha256") != row.get("row_sha256") for entry in retired_entries):
+            errors.append(f"{location}: retired declaration evidence has the wrong row hash")
+        if retired_entries and not row.get("legacy_declaration_refs"):
+            errors.append(f"{location}: retirement evidence lacks a legacy declaration reference")
+        if any(
+            record_id not in record_map
+            for entry in retired_entries
+            for record_id in entry.get("replacement_record_ids", [])
+        ):
+            errors.append(f"{location}: retired declaration replacement record is missing")
         if outcome not in OUTCOMES:
             errors.append(f"{location}: invalid outcome")
         if not _sorted_unique_strings(mapped):
@@ -423,11 +499,13 @@ def validate_cutover_baseline(
             mapped_leaves = {
                 name.rsplit(".", 1)[-1] for name in mapped_names if isinstance(name, str)
             }
+            if mapped_leaves & retired_leaves or mapped_names & retired_names:
+                errors.append(f"{location}: mapped and retired declarations overlap")
             mechanically_expected = expand_legacy_leaves(row)
             if mechanically_expected is not None:
-                if mapped_leaves != mechanically_expected:
+                if mapped_leaves | retired_leaves != mechanically_expected:
                     errors.append(
-                        f"{location}: mapped Lean leaves differ from the complete expanded legacy references"
+                        f"{location}: mapped/retired leaves differ from the complete expanded legacy references"
                     )
             else:
                 entry = exceptional_mappings.get(index)
@@ -437,10 +515,30 @@ def validate_cutover_baseline(
                     )
                 elif (
                     entry.get("row_sha256") != row.get("row_sha256")
-                    or set(entry.get("expected_lean_names", [])) != mapped_names
+                    or set(entry.get("expected_lean_names", []))
+                    != mapped_names | retired_names
                 ):
                     errors.append(
                         f"{location}: exceptional certificate names/hash differ from mapped records"
+                    )
+                else:
+                    needed_exceptional_ordinals.add(index)
+        elif outcome == "retired":
+            if mapped:
+                errors.append(f"{location}: retired outcome cannot map current records")
+            if disposition != "retired_declarations":
+                errors.append(f"{location}: retired outcome requires its closed disposition")
+            mechanically_expected = expand_legacy_leaves(row)
+            if mechanically_expected is not None:
+                if retired_leaves != mechanically_expected:
+                    errors.append(
+                        f"{location}: pure-retired leaves differ from expanded legacy references"
+                    )
+            else:
+                entry = exceptional_mappings.get(index)
+                if entry is None or set(entry.get("expected_lean_names", [])) != retired_names:
+                    errors.append(
+                        f"{location}: pure-retired non-mechanical row lacks exact expected names"
                     )
                 else:
                     needed_exceptional_ordinals.add(index)
@@ -454,6 +552,8 @@ def validate_cutover_baseline(
             if row.get("legacy_declaration_refs"):
                 errors.append(f"{location}: a declaration-bearing row cannot be a non-record")
             actual_non_record_ordinals.add(index)
+        if outcome == "not_a_declaration" and retired_entries:
+            errors.append(f"{location}: non-record row cannot retire declarations")
         mapped_ids.extend(mapped)
     if actual_non_record_ordinals != allowed_non_record_ordinals:
         errors.append(
@@ -463,6 +563,13 @@ def validate_cutover_baseline(
         errors.append(
             "cutover baseline: certificate exceptional-mapping ordinals differ from required bindings"
         )
+    used_retired_ordinals = {
+        row.get("ordinal")
+        for row in rows
+        if isinstance(row, dict) and row.get("outcome") in {"mapped", "retired"}
+    }
+    if set(retired_declarations) - used_retired_ordinals:
+        errors.append("cutover baseline: retired declaration evidence is unused")
     mapped_set = set(mapped_ids)
     non_legacy_set = set(non_legacy_ids)
     cutover_set = set(cutover_ids)
@@ -525,6 +632,160 @@ def exceptional_mapping_map(value: Any) -> tuple[dict[int, dict[str, Any]], list
     return result, errors
 
 
+def _git_text(repo_root: Path, revision_path: str) -> str | None:
+    """Return one historical Git blob as text, or none when it does not exist."""
+    process = subprocess.run(
+        ["git", "show", revision_path],
+        cwd=repo_root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    return process.stdout if process.returncode == 0 else None
+
+
+def _retirement_history_error(entry: dict[str, Any], repo_root: Path) -> str | None:
+    """Prove that one exact former declaration disappeared in the named commit."""
+    commit = entry["deletion_commit"]
+    path = entry["former_path"]
+    leaf = entry["legacy_leaf"]
+    former_name = entry["former_lean_name"]
+    cache_key = (repo_root.resolve(), commit, path, leaf, former_name)
+    if cache_key in _RETIREMENT_HISTORY_CACHE:
+        return _RETIREMENT_HISTORY_CACHE[cache_key]
+
+    def finish(error: str | None) -> str | None:
+        _RETIREMENT_HISTORY_CACHE[cache_key] = error
+        return error
+
+    ancestor = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", commit, "HEAD"],
+        cwd=repo_root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if ancestor.returncode != 0:
+        return finish("deletion commit is not an ancestor of HEAD")
+    changed = subprocess.run(
+        ["git", "diff-tree", "--no-commit-id", "--name-only", "-r", commit, "--", path],
+        cwd=repo_root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if changed.returncode != 0 or path not in changed.stdout.splitlines():
+        return finish("deletion commit does not change the former path")
+    before = _git_text(repo_root, f"{commit}^:{path}")
+    after = _git_text(repo_root, f"{commit}:{path}")
+    if before is None or leaf not in set(LEAN_DECLARATION_RE.findall(before)):
+        return finish("former path does not declare the legacy leaf before deletion")
+    if former_name != leaf:
+        namespaces = set(
+            re.findall(
+                r"(?m)^namespace\s+(LatticeSystem(?:\.[A-Za-z_][A-Za-z0-9_']*)*)\s*$",
+                before,
+            )
+        )
+        if not any(former_name == f"{namespace}.{leaf}" for namespace in namespaces):
+            return finish("former fully qualified name disagrees with the historical namespace")
+    if after is not None and leaf in set(LEAN_DECLARATION_RE.findall(after)):
+        return finish("legacy leaf remains declared at the deletion commit")
+    resolved_root = repo_root.resolve()
+    current_leaves = _CURRENT_DECLARATION_LEAVES_CACHE.get(resolved_root)
+    if current_leaves is None:
+        current_leaves = set()
+        for current_path in (repo_root / "LatticeSystem").rglob("*.lean"):
+            current_leaves.update(
+                LEAN_DECLARATION_RE.findall(current_path.read_text(encoding="utf-8"))
+            )
+        _CURRENT_DECLARATION_LEAVES_CACHE[resolved_root] = current_leaves
+    if leaf in current_leaves:
+        return finish("legacy leaf is still declared in the current Lean tree")
+    return finish(None)
+
+
+def retired_declaration_map(
+    value: Any,
+    repo_root: Path | None = None,
+) -> tuple[dict[int, list[dict[str, Any]]], list[str]]:
+    """Validate and index exact, history-proven retired declaration evidence."""
+    errors: list[str] = []
+    result: dict[int, list[dict[str, Any]]] = {}
+    if not isinstance(value, list):
+        return {}, ["cutover certificate: retired_declarations must be an array"]
+    ordering: list[tuple[int, str]] = []
+    for index, entry in enumerate(value, 1):
+        location = f"cutover certificate retired declaration {index}"
+        if (
+            not isinstance(entry, dict)
+            or not CUTOVER_RETIRED_DECLARATION_REQUIRED_KEYS <= set(entry)
+            or not set(entry) <= CUTOVER_RETIRED_DECLARATION_KEYS
+        ):
+            errors.append(f"{location}: field contract differs")
+            continue
+        ordinal = entry.get("ordinal")
+        leaf = entry.get("legacy_leaf")
+        former_name = entry.get("former_lean_name")
+        if not isinstance(ordinal, int) or not 1 <= ordinal <= BASELINE_ROW_COUNT:
+            errors.append(f"{location}: invalid ordinal")
+            continue
+        if not isinstance(leaf, str) or not _is_lean_identifier_leaf(leaf):
+            errors.append(f"{location}: invalid exact legacy leaf")
+            continue
+        ordering.append((ordinal, leaf))
+        if (
+            not isinstance(former_name, str)
+            or not (
+                former_name == leaf
+                or (
+                    LEAN_NAME_RE.fullmatch(former_name) is not None
+                    and former_name.rsplit(".", 1)[-1] == leaf
+                )
+            )
+        ):
+            errors.append(f"{location}: former Lean name does not bind the legacy leaf")
+        if not isinstance(entry.get("deletion_commit"), str) or GIT_COMMIT_RE.fullmatch(
+            entry["deletion_commit"]
+        ) is None:
+            errors.append(f"{location}: invalid deletion commit")
+        path = entry.get("former_path")
+        if (
+            not isinstance(path, str)
+            or re.fullmatch(r"LatticeSystem/[A-Za-z0-9_./-]+\.lean", path) is None
+            or ".." in Path(path).parts
+        ):
+            errors.append(f"{location}: invalid former Lean path")
+        reason = entry.get("reason")
+        if (
+            not isinstance(reason, str)
+            or not reason.strip()
+            or any(ord(character) < 32 or 127 <= ord(character) <= 159 for character in reason)
+        ):
+            errors.append(f"{location}: retirement reason must be nonempty inline text")
+        if not isinstance(entry.get("row_sha256"), str) or SHA256_RE.fullmatch(
+            entry["row_sha256"]
+        ) is None:
+            errors.append(f"{location}: invalid row SHA-256")
+        replacements = entry.get("replacement_record_ids", [])
+        if not _sorted_unique_strings(replacements) or any(
+            STABLE_ID_RE.fullmatch(record_id) is None for record_id in replacements
+        ):
+            errors.append(f"{location}: replacement record IDs must be sorted valid IDs")
+        if repo_root is not None and not any(
+            message.startswith(location) for message in errors
+        ):
+            history_error = _retirement_history_error(entry, repo_root)
+            if history_error is not None:
+                errors.append(f"{location}: {history_error}")
+        result.setdefault(ordinal, []).append(entry)
+    if ordering != sorted(set(ordering)):
+        errors.append(
+            "cutover certificate: retired declarations must be sorted unique ordinal/leaf pairs"
+        )
+    return result, errors
+
+
 def validate_cutover_certificate(
     certificate: Any,
     certificate_raw: bytes,
@@ -532,6 +793,7 @@ def validate_cutover_certificate(
     baseline_raw: bytes,
     catalog_state: Any,
     records: Iterable[dict[str, Any]],
+    repo_root: Path | None = None,
     accepted_certificate_sha256: str | None = ACCEPTED_CUTOVER_CERTIFICATE_SHA256,
 ) -> list[str]:
     """Bind one baseline and its immutable cutover projections to a certificate."""
@@ -560,10 +822,16 @@ def validate_cutover_certificate(
         certificate.get("exceptional_mappings")
     )
     errors.extend(exceptional_errors)
+    _retired_map, retired_errors = retired_declaration_map(
+        certificate.get("retired_declarations"), repo_root
+    )
+    errors.extend(retired_errors)
     if not _sorted_unique_ordinals(certificate.get("non_record_ordinals")):
         errors.append("cutover certificate: non_record_ordinals must be sorted unique ordinals")
     if set(exceptional_map) & set(certificate.get("non_record_ordinals", [])):
         errors.append("cutover certificate: exceptional mappings and non-record rows overlap")
+    if set(_retired_map) & set(certificate.get("non_record_ordinals", [])):
+        errors.append("cutover certificate: retired declarations and non-record rows overlap")
     current_ids = {
         record.get("id")
         for record in records
@@ -677,6 +945,30 @@ def self_test(repo_root: Path) -> list[str]:
         target["mapped_record_ids"].append(record_id)
         target["mapped_record_ids"].sort()
         records.append({"id": record_id, "lean_name": f"LatticeSystem.Fixture.{leaf}"})
+    retired_entries: list[dict[str, Any]] = []
+    retired_record_ids: set[str] = set()
+    for ordinal, fixture in RETIRED_FIXTURES.items():
+        row = fixture_rows[ordinal - 1]
+        fixture_name = f"LatticeSystem.Fixture.{fixture['legacy_leaf']}"
+        retired_record_id = record_by_name[fixture_name]
+        row["mapped_record_ids"].remove(retired_record_id)
+        retired_record_ids.add(retired_record_id)
+        if not row["mapped_record_ids"]:
+            row["outcome"] = "retired"
+            row["disposition"] = "retired_declarations"
+        retired_entries.append(
+            {
+                **fixture,
+                "ordinal": ordinal,
+                "replacement_record_ids": [],
+                "row_sha256": row["row_sha256"],
+            }
+        )
+    records = [record for record in records if record["id"] not in retired_record_ids]
+    retired_by_ordinal = {
+        ordinal: [entry for entry in retired_entries if entry["ordinal"] == ordinal]
+        for ordinal in sorted(RETIRED_FIXTURES)
+    }
     cutover_ids = sorted(record["id"] for record in records)
     baseline = {
         "schema_version": 1,
@@ -694,6 +986,7 @@ def self_test(repo_root: Path) -> list[str]:
         "exceptional_mappings": exceptional_entries,
         "legacy_mapping_sha256": sha256_bytes(canonical_bytes(mappings)),
         "non_record_ordinals": non_record_ordinals,
+        "retired_declarations": retired_entries,
         "schema_version": 1,
     }
     certificate_raw = canonical_bytes(certificate)
@@ -703,6 +996,7 @@ def self_test(repo_root: Path) -> list[str]:
         rows,
         set(non_record_ordinals),
         {entry["ordinal"]: entry for entry in exceptional_entries},
+        retired_by_ordinal,
     )
     certificate_errors = validate_cutover_certificate(
         certificate,
@@ -711,6 +1005,7 @@ def self_test(repo_root: Path) -> list[str]:
         baseline_raw,
         "prototype",
         records,
+        repo_root,
     )
     if baseline_errors or certificate_errors:
         failures.append(
@@ -725,6 +1020,10 @@ def self_test(repo_root: Path) -> list[str]:
     non_record_row_index = next(
         index for index, row in enumerate(baseline["legacy_rows"])
         if row["outcome"] == "not_a_declaration"
+    )
+    retired_row_index = next(
+        index for index, row in enumerate(baseline["legacy_rows"])
+        if row["outcome"] == "retired"
     )
     runtime_row_mutations = (
         (
@@ -752,6 +1051,16 @@ def self_test(repo_root: Path) -> list[str]:
             non_record_row_index,
             {"disposition": "waived"},
         ),
+        (
+            "retired row with a mapped ID",
+            retired_row_index,
+            {"mapped_record_ids": [records[0]["id"]]},
+        ),
+        (
+            "retired row without its closed disposition",
+            retired_row_index,
+            {"disposition": None},
+        ),
     )
     for label, row_index, mutation in runtime_row_mutations:
         mutated = copy.deepcopy(baseline)
@@ -762,6 +1071,7 @@ def self_test(repo_root: Path) -> list[str]:
             rows,
             set(non_record_ordinals),
             {entry["ordinal"]: entry for entry in exceptional_entries},
+            retired_by_ordinal,
         ):
             failures.append(f"runtime row conditional accepted {label}")
 
@@ -787,6 +1097,7 @@ def self_test(repo_root: Path) -> list[str]:
         rows,
         set(non_record_ordinals),
         {entry["ordinal"]: entry for entry in exceptional_entries},
+        retired_by_ordinal,
     ):
         failures.append("slash expansion accepted missing Y/Z group members")
 
@@ -859,6 +1170,7 @@ def self_test(repo_root: Path) -> list[str]:
                 rows,
                 set(non_record_ordinals),
                 mutated_evidence,
+                retired_by_ordinal,
             ):
                 failures.append(
                     f"pinned exceptional row {ordinal} accepted {label} certificate names"
@@ -875,6 +1187,7 @@ def self_test(repo_root: Path) -> list[str]:
         rows,
         set(non_record_ordinals),
         uncertified_group,
+        retired_by_ordinal,
     ):
         failures.append("non-expandable etc. group was accepted without certificate evidence")
 
@@ -900,6 +1213,7 @@ def self_test(repo_root: Path) -> list[str]:
         rows,
         set(non_record_ordinals),
         forged_exception,
+        retired_by_ordinal,
     ):
         failures.append("nongrouped mismatched row was accepted through certificate evidence")
 
@@ -917,8 +1231,122 @@ def self_test(repo_root: Path) -> list[str]:
         rows,
         set(range(1, BASELINE_ROW_COUNT + 1)),
         {entry["ordinal"]: entry for entry in exceptional_entries},
+        retired_by_ordinal,
     ):
         failures.append("all-rows-non-record-except-prototype fixture was accepted")
+
+    mixed_retired_row = baseline["legacy_rows"][655]
+    pure_retired_row = baseline["legacy_rows"][675]
+    if (
+        mixed_retired_row["outcome"] != "mapped"
+        or len(mixed_retired_row["mapped_record_ids"]) != 1
+        or pure_retired_row["outcome"] != "retired"
+        or pure_retired_row["mapped_record_ids"]
+    ):
+        failures.append("mixed/pure retired row fixtures drifted")
+    missing_survivor = copy.deepcopy(baseline)
+    missing_survivor["legacy_rows"][655]["mapped_record_ids"] = []
+    if not validate_cutover_baseline(
+        missing_survivor,
+        records,
+        rows,
+        set(non_record_ordinals),
+        exceptional_by_ordinal,
+        retired_by_ordinal,
+    ):
+        failures.append("mixed retired row accepted deletion of its surviving declaration")
+    uncertified_retirement = {
+        ordinal: entries
+        for ordinal, entries in retired_by_ordinal.items()
+        if ordinal != 656
+    }
+    if not validate_cutover_baseline(
+        baseline,
+        records,
+        rows,
+        set(non_record_ordinals),
+        exceptional_by_ordinal,
+        uncertified_retirement,
+    ):
+        failures.append("mixed retired row accepted an uncertified missing legacy leaf")
+    wrong_row_retirement = copy.deepcopy(retired_by_ordinal)
+    wrong_row_entry = wrong_row_retirement.pop(656)[0]
+    wrong_row_entry["ordinal"] = 657
+    wrong_row_entry["row_sha256"] = baseline["legacy_rows"][656]["row_sha256"]
+    wrong_row_retirement[657] = [wrong_row_entry]
+    if not validate_cutover_baseline(
+        baseline,
+        records,
+        rows,
+        set(non_record_ordinals),
+        exceptional_by_ordinal,
+        wrong_row_retirement,
+    ):
+        failures.append("retirement evidence was accepted for the wrong legacy row")
+    wrong_hash_retirement = copy.deepcopy(retired_by_ordinal)
+    wrong_hash_retirement[656][0]["row_sha256"] = "0" * 64
+    if not validate_cutover_baseline(
+        baseline,
+        records,
+        rows,
+        set(non_record_ordinals),
+        exceptional_by_ordinal,
+        wrong_hash_retirement,
+    ):
+        failures.append("retirement evidence was accepted with the wrong row hash")
+    misnamed_retirement_entries = copy.deepcopy(retired_entries)
+    misnamed_retirement_entries[0]["legacy_leaf"] = (
+        "sublatticeSpinHalfOpMinus_mul_sublatticeSpinHalfOpPlus_eq"
+    )
+    _misnamed_map, misnamed_errors = retired_declaration_map(
+        misnamed_retirement_entries, repo_root
+    )
+    if not misnamed_errors:
+        failures.append("retirement evidence accepted a misnamed deleted declaration")
+    nonexistent_retirement = copy.deepcopy(retired_entries)
+    nonexistent_retirement[0]["legacy_leaf"] = "neverExistedLegacyDeclaration"
+    nonexistent_retirement[0]["former_lean_name"] = (
+        "LatticeSystem.Quantum.neverExistedLegacyDeclaration"
+    )
+    _nonexistent_map, nonexistent_errors = retired_declaration_map(
+        nonexistent_retirement, repo_root
+    )
+    if not nonexistent_errors:
+        failures.append("retirement evidence accepted a name absent from deletion history")
+    fabricated_commit = copy.deepcopy(retired_entries)
+    fabricated_commit[0]["deletion_commit"] = "0" * 40
+    _fabricated_map, fabricated_errors = retired_declaration_map(
+        fabricated_commit, repo_root
+    )
+    if not fabricated_errors:
+        failures.append("retirement evidence accepted a fabricated deletion commit")
+    missing_replacement = copy.deepcopy(retired_by_ordinal)
+    missing_replacement[656][0]["replacement_record_ids"] = ["missing-replacement"]
+    if not validate_cutover_baseline(
+        baseline,
+        records,
+        rows,
+        set(non_record_ordinals),
+        exceptional_by_ordinal,
+        missing_replacement,
+    ):
+        failures.append("retirement evidence accepted a missing replacement record")
+    retired_current_record = [
+        *records,
+        {
+            "id": "fixture-retired-still-current",
+            "lean_name": retired_entries[0]["former_lean_name"],
+        },
+    ]
+    if not validate_cutover_baseline(
+        baseline,
+        retired_current_record,
+        rows,
+        set(non_record_ordinals),
+        exceptional_by_ordinal,
+        retired_by_ordinal,
+    ):
+        failures.append("retired declaration accepted a current catalogue record")
 
     remapped = copy.deepcopy(baseline)
     remapped["legacy_rows"][0]["mapped_record_ids"] = remapped["legacy_rows"][1][
@@ -931,6 +1359,7 @@ def self_test(repo_root: Path) -> list[str]:
         canonical_bytes(remapped),
         "prototype",
         records,
+        repo_root,
     ):
         failures.append("row remapping without a new certificate was accepted")
     shrunk = copy.deepcopy(baseline)
@@ -942,6 +1371,7 @@ def self_test(repo_root: Path) -> list[str]:
         canonical_bytes(shrunk),
         "prototype",
         records,
+        repo_root,
     ):
         failures.append("cutover ID shrink without a new certificate was accepted")
     omitted_current = [*records, {"id": "unfrozen", "lean_name": "LatticeSystem.Fixture.unfrozen"}]
@@ -952,6 +1382,7 @@ def self_test(repo_root: Path) -> list[str]:
         baseline_raw,
         "prototype",
         omitted_current,
+        repo_root,
     ):
         failures.append("prototype freeze omitted a current record")
     accepted_digest = sha256_bytes(certificate_raw)
@@ -962,7 +1393,8 @@ def self_test(repo_root: Path) -> list[str]:
         baseline_raw,
         "authoritative",
         omitted_current,
-        accepted_digest,
+        repo_root,
+        accepted_certificate_sha256=accepted_digest,
     ):
         failures.append("authoritative post-cutover record superset was rejected")
     deleted = records[1:]
@@ -973,7 +1405,8 @@ def self_test(repo_root: Path) -> list[str]:
         baseline_raw,
         "authoritative",
         deleted,
-        accepted_digest,
+        repo_root,
+        accepted_certificate_sha256=accepted_digest,
     ):
         failures.append("authoritative deletion of a certified record was accepted")
 

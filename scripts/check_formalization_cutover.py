@@ -12,6 +12,7 @@ from typing import Any
 from formalization_cutover import (
     exceptional_mapping_map,
     reconstruct_legacy_rows,
+    retired_declaration_map,
     self_test,
     validate_cutover_baseline,
     validate_cutover_certificate,
@@ -69,10 +70,14 @@ def main() -> int:
                     baseline_raw,
                     manifest.get("catalog_state"),
                     records,
+                    repo_root,
                 )
             )
             exceptional_mappings, _exceptional_errors = exceptional_mapping_map(
                 certificate.get("exceptional_mappings")
+            )
+            retired_declarations, _retired_errors = retired_declaration_map(
+                certificate.get("retired_declarations"), repo_root
             )
             failures.extend(
                 validate_cutover_baseline(
@@ -81,6 +86,7 @@ def main() -> int:
                     reconstruct_legacy_rows(repo_root),
                     set(certificate.get("non_record_ordinals", [])),
                     exceptional_mappings,
+                    retired_declarations,
                 )
             )
     if failures:
