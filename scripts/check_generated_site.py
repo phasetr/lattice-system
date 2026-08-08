@@ -1053,26 +1053,53 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
 
 
 def check_workflow_invariants(repo_root: Path) -> None:
-    """Enforce the build-only boundary and the Lean workflow permission cleanup."""
-    pages_path = repo_root / ".github/workflows/formalization_pages.yml"
-    lean_path = repo_root / ".github/workflows/lean_action_ci.yml"
+    """Enforce the sole main-only deploy owner and read-only Lean workflow."""
+    workflow_dir = repo_root / ".github/workflows"
+    pages_path = workflow_dir / "formalization_pages.yml"
+    lean_path = workflow_dir / "lean_action_ci.yml"
     pages = pages_path.read_text(encoding="utf-8")
     lean = lean_path.read_text(encoding="utf-8")
-    forbidden = (
+    workflow_paths = sorted(
+        {*workflow_dir.glob("*.yml"), *workflow_dir.glob("*.yaml")}
+    )
+    if not workflow_paths:
+        raise ValueError("repository has no workflows to audit")
+    competing_tokens = (
         "actions/" + "deploy-pages",
         "pages" + ": write",
         "id-token" + ": write",
+    )
+    for workflow_path in workflow_paths:
+        if workflow_path == pages_path:
+            continue
+        workflow = workflow_path.read_text(encoding="utf-8")
+        for token in competing_tokens:
+            if token in workflow:
+                raise ValueError(
+                    f"competing Pages owner in {workflow_path.name}: {token}"
+                )
+    lean_forbidden = (
+        *competing_tokens,
         "environment" + ":",
     )
-    for token in forbidden:
-        if token in pages or token in lean:
-            raise ValueError(f"build-only workflow boundary contains forbidden token: {token}")
+    for token in lean_forbidden:
+        if token in lean:
+            raise ValueError(f"Lean workflow contains forbidden Pages ownership: {token}")
     jobs = pages.split("\njobs:\n", 1)
     if len(jobs) != 2:
         raise ValueError("formalization workflow lacks one jobs block")
     job_names = re.findall(r"(?m)^  ([A-Za-z0-9_-]+):\n    ", jobs[1])
-    if job_names != ["build"]:
-        raise ValueError(f"formalization workflow must contain only the build job: {job_names}")
+    if job_names != ["build", "deploy"]:
+        raise ValueError(
+            f"formalization workflow must contain exactly build then deploy: {job_names}"
+        )
+    workflow_block = jobs[0]
+    build_block, deploy_block = jobs[1].split("\n  deploy:\n", 1)
+    if "concurrency:" in workflow_block or "concurrency:" in build_block:
+        raise ValueError("Pages concurrency must be scoped only to the deploy job")
+    for token in lean_forbidden:
+        if token in build_block:
+            raise ValueError(f"Pages build job contains deploy capability: {token}")
     required = (
         "permissions:\n  contents: read",
         "pull_request:",
@@ -1093,6 +1120,34 @@ def check_workflow_invariants(repo_root: Path) -> None:
             raise ValueError(f"formalization workflow lacks required invariant: {token}")
     if "paths:" in pages or "paths-ignore:" in pages:
         raise ValueError("formalization workflow must run on every pull request")
+    upload_binding = (
+        "uses: actions/upload-pages-artifact@v4\n"
+        "        with:\n"
+        "          name: github-pages"
+    )
+    if upload_binding not in build_block:
+        raise ValueError("Pages build job must upload the explicitly named github-pages artifact")
+    deploy_required = (
+        "if: github.event_name == 'push' && github.ref == 'refs/heads/main'",
+        "needs: build",
+        "concurrency:\n      group: pages\n      cancel-in-progress: false",
+        "permissions:\n      pages: write\n      id-token: write",
+        "environment:\n      name: github-pages",
+        "url: ${{ steps.deployment.outputs.page_url }}",
+        "id: deployment",
+        "uses: actions/deploy-pages@v4\n"
+        "        with:\n"
+        "          artifact_name: github-pages",
+    )
+    for token in deploy_required:
+        if token not in deploy_block:
+            raise ValueError(f"Pages deploy job lacks required invariant: {token}")
+    if pages.count("actions/deploy-pages@v4") != 1:
+        raise ValueError("formalization workflow must have exactly one Pages deploy action")
+    if pages.count("concurrency:") != 1 or pages.count("group: pages") != 1:
+        raise ValueError("Pages concurrency must have exactly one deploy-job owner")
+    if pages.count("pages: write") != 1 or pages.count("id-token: write") != 1:
+        raise ValueError("Pages/OIDC write permissions must occur only in the deploy job")
     if "permissions:\n  contents: read" not in lean:
         raise ValueError("Lean CI does not have the expected read-only top permission")
     if "--emit-lean-check" not in lean or "lake env lean .self-local/tmp/formalization-axioms.lean" not in lean:
@@ -1897,6 +1952,41 @@ def run_self_tests() -> None:
     finally:
         shutil.rmtree(temporary)
     check_workflow_invariants(REPO_ROOT)
+    with tempfile.TemporaryDirectory(
+        prefix="formalization-workflow-owner-",
+        dir=REPO_ROOT / ".self-local/tmp",
+    ) as workflow_temporary:
+        fixture_root = Path(workflow_temporary)
+        fixture_workflows = fixture_root / ".github/workflows"
+        fixture_workflows.mkdir(parents=True)
+        shutil.copy2(
+            REPO_ROOT / ".github/workflows/formalization_pages.yml",
+            fixture_workflows / "formalization_pages.yml",
+        )
+        shutil.copy2(
+            REPO_ROOT / ".github/workflows/lean_action_ci.yml",
+            fixture_workflows / "lean_action_ci.yml",
+        )
+        (fixture_workflows / "second_owner.yaml").write_text(
+            "name: Competing owner\n"
+            "jobs:\n"
+            "  deploy:\n"
+            "    permissions:\n"
+            "      pages: write\n"
+            "      id-token: write\n"
+            "    steps:\n"
+            "      - uses: actions/deploy-pages@v4\n",
+            encoding="utf-8",
+        )
+        try:
+            check_workflow_invariants(fixture_root)
+        except ValueError as error:
+            if "competing Pages owner" not in str(error):
+                raise AssertionError(
+                    "second-owner workflow failed for an unrelated reason"
+                ) from error
+        else:
+            raise AssertionError("second Pages deployment owner was accepted")
 
 
 def parse_args() -> argparse.Namespace:
