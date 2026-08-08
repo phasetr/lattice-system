@@ -24,6 +24,7 @@ jobs:
           date +%s > .self-local/tmp/formalization-pages-start
           python3 scripts/check_docs_hierarchy.py
           python3 scripts/validate_formalization_status.py --self-test --emit-aggregate .self-local/tmp/catalog.json
+          python3 scripts/check_live_formalization_site.py --self-test
 
       - name: Generate the staged site twice
         run: |
@@ -109,3 +110,24 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           artifact_name: github-pages
+
+  verify-publication:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Verify live formalization publication
+        run: |
+          python3 scripts/check_live_formalization_site.py \
+            --base-url https://phasetr.github.io/lattice-system/ \
+            --revision "$GITHUB_SHA" \
+            --canonical-schema formalization-status/v1/schema.json \
+            --attempts 7 \
+            --initial-delay 5 \
+            --timeout 10 \
+            --deadline 240

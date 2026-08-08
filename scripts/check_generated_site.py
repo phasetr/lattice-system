@@ -703,6 +703,40 @@ def expected_source_index_rows(
     return rows
 
 
+def expected_overview_index_rows(
+    catalog: dict[str, Any],
+) -> list[tuple[str, tuple[tuple[str, str], ...], str | None, str]]:
+    """Independently derive exact overview counts and navigation rows."""
+    rows = [
+        (
+            "overview-counts",
+            (
+                ("record-count", str(len(catalog["records"]))),
+                ("source-count", str(len(catalog["sources"]))),
+                ("topic-count", str(len(catalog["topics"]))),
+            ),
+            None,
+            f"This prototype snapshot contains {len(catalog['records'])} records, "
+            f"{len(catalog['sources'])} sources, and {len(catalog['topics'])} topics.",
+        )
+    ]
+    for navigation_id, visible in (
+        ("sources", "Browse generated source projections"),
+        ("topics", "Browse generated topic projections"),
+        ("status", "Browse generated status summary"),
+    ):
+        href = f"{BASEURL}/formalization/{navigation_id}/"
+        rows.append(
+            (
+                "overview-navigation",
+                (("href", href), ("navigation-id", navigation_id)),
+                href,
+                visible,
+            )
+        )
+    return rows
+
+
 def expected_topic_index_rows(
     catalog: dict[str, Any],
 ) -> list[tuple[str, tuple[tuple[str, str], ...], str | None, str]]:
@@ -814,19 +848,7 @@ def check_built_site(
         assert_metadata(parser, catalog, revision, label)
     require_index_rows(
         overview,
-        [
-            (
-                "overview-counts",
-                (
-                    ("record-count", str(len(catalog["records"]))),
-                    ("source-count", str(len(catalog["sources"]))),
-                    ("topic-count", str(len(catalog["topics"]))),
-                ),
-                None,
-                f"This prototype snapshot contains {len(catalog['records'])} records, "
-                f"{len(catalog['sources'])} sources, and {len(catalog['topics'])} topics.",
-            )
-        ],
+        expected_overview_index_rows(catalog),
         "built overview",
     )
     require_index_rows(source_index, expected_source_index_rows(catalog), "built source index")
@@ -1031,19 +1053,7 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
     )
     require_index_rows(
         overview_parser,
-        [
-            (
-                "overview-counts",
-                (
-                    ("record-count", str(len(catalog["records"]))),
-                    ("source-count", str(len(catalog["sources"]))),
-                    ("topic-count", str(len(catalog["topics"]))),
-                ),
-                None,
-                f"This prototype snapshot contains {len(catalog['records'])} records, "
-                f"{len(catalog['sources'])} sources, and {len(catalog['topics'])} topics.",
-            )
-        ],
+        expected_overview_index_rows(catalog),
         "staged overview",
     )
     status_parser = parse_record_html(
@@ -1089,12 +1099,16 @@ def check_workflow_invariants(repo_root: Path) -> None:
     if len(jobs) != 2:
         raise ValueError("formalization workflow lacks one jobs block")
     job_names = re.findall(r"(?m)^  ([A-Za-z0-9_-]+):\n    ", jobs[1])
-    if job_names != ["build", "deploy"]:
+    if job_names != ["build", "deploy", "verify-publication"]:
         raise ValueError(
-            f"formalization workflow must contain exactly build then deploy: {job_names}"
+            "formalization workflow must contain exactly build, deploy, then "
+            f"verify-publication: {job_names}"
         )
     workflow_block = jobs[0]
-    build_block, deploy_block = jobs[1].split("\n  deploy:\n", 1)
+    build_block, remaining_jobs = jobs[1].split("\n  deploy:\n", 1)
+    deploy_block, verify_block = remaining_jobs.split(
+        "\n  verify-publication:\n", 1
+    )
     if "concurrency:" in workflow_block or "concurrency:" in build_block:
         raise ValueError("Pages concurrency must be scoped only to the deploy job")
     for token in lean_forbidden:
@@ -1110,6 +1124,7 @@ def check_workflow_invariants(repo_root: Path) -> None:
         "actions/jekyll-build-pages@v1",
         "actions/upload-pages-artifact@v4",
         "timeout-minutes: 5",
+        "python3 scripts/check_live_formalization_site.py --self-test",
         "cmp .self-local/tmp/catalog.json "
         ".self-local/tmp/formalization-site-a/source/formalization-status/v1/catalog.json",
         "--expected-catalog .self-local/tmp/catalog.json",
@@ -1142,6 +1157,41 @@ def check_workflow_invariants(repo_root: Path) -> None:
     for token in deploy_required:
         if token not in deploy_block:
             raise ValueError(f"Pages deploy job lacks required invariant: {token}")
+    verify_required = (
+        "if: github.event_name == 'push' && github.ref == 'refs/heads/main'",
+        "needs: deploy",
+        "timeout-minutes: 5",
+        "permissions:\n      contents: read",
+        "uses: actions/checkout@v6",
+        "python3 scripts/check_live_formalization_site.py",
+        "--base-url https://phasetr.github.io/lattice-system/",
+        '--revision "$GITHUB_SHA"',
+        "--canonical-schema formalization-status/v1/schema.json",
+        "--attempts 7",
+        "--initial-delay 5",
+        "--timeout 10",
+        "--deadline 240",
+    )
+    for token in verify_required:
+        if token not in verify_block:
+            raise ValueError(
+                f"live publication verification lacks required invariant: {token}"
+            )
+    for token in (*competing_tokens, "environment:", "concurrency:"):
+        if token in verify_block:
+            raise ValueError(
+                f"live publication verification has forbidden capability: {token}"
+            )
+    verify_permissions = re.findall(
+        r"(?m)^    permissions:\n((?:      [^\n]+\n)+)", verify_block
+    )
+    if verify_permissions != ["      contents: read\n"]:
+        raise ValueError(
+            "live publication verification permissions must be exactly contents: read"
+        )
+    strict_guard = "if: github.event_name == 'push' && github.ref == 'refs/heads/main'"
+    if pages.count(strict_guard) != 2:
+        raise ValueError("deploy and live verification must share the exact main-push guard")
     if pages.count("actions/deploy-pages@v4") != 1:
         raise ValueError("formalization workflow must have exactly one Pages deploy action")
     if pages.count("concurrency:") != 1 or pages.count("group: pages") != 1:
