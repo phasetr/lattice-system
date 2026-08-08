@@ -12,7 +12,6 @@ import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
-from urllib.parse import urljoin
 
 from check_generated_site import (
     PageParser,
@@ -58,6 +57,9 @@ SHA256_RE = re.compile(r"[0-9a-f]{64}")
 REVISION_RE = re.compile(r"[0-9a-f]{40}")
 MAX_BODY_BYTES = 8 * 1024 * 1024
 MAX_DEADLINE_SECONDS = 240
+STABLE_ID_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
+RESERVED_SOURCE_IDS = {"foundations", "index"}
+RESERVED_TOPIC_IDS = {"index"}
 CATALOG_KEYS = {
     "catalog_state",
     "generated_by",
@@ -90,6 +92,21 @@ class Response:
 
 
 Fetcher = Callable[[str, float], Response]
+
+
+def exact_endpoint_url(base_url: str, endpoint: str) -> str:
+    """Construct one contained publication URL without URL-reference resolution."""
+    validate_base_url(base_url)
+    if (
+        not endpoint
+        or endpoint.startswith("/")
+        or any(token in endpoint for token in ("..", "?", "#", "%", "\\"))
+    ):
+        raise ValueError(f"unsafe publication endpoint: {endpoint!r}")
+    result = base_url + endpoint
+    if not result.startswith(PAGES_BASE) or result != f"{PAGES_BASE}{endpoint}":
+        raise ValueError(f"publication endpoint escaped the fixed base: {endpoint!r}")
+    return result
 
 
 class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
@@ -160,6 +177,47 @@ def parse_json(response: Response, endpoint: str) -> dict[str, object]:
     return value
 
 
+def validate_catalog_before_routes(
+    catalog: dict[str, object],
+    published_schema: dict[str, object],
+    canonical_schema_bytes: bytes,
+) -> None:
+    """Validate the fetched catalogue fully before any catalogue-derived URL exists."""
+    try:
+        canonical_schema = json.loads(canonical_schema_bytes.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError("checkout canonical schema is invalid UTF-8 JSON") from error
+    if not isinstance(canonical_schema, dict) or published_schema != canonical_schema:
+        raise ValueError("published schema differs from the checkout canonical schema")
+    aggregate_schema = canonical_schema.get("$defs", {}).get("aggregate")
+    if not isinstance(aggregate_schema, dict):
+        raise ValueError("checkout canonical schema lacks the aggregate contract")
+    schema_validation = Validation()
+    validate_schema_instance(
+        catalog,
+        aggregate_schema,
+        canonical_schema,
+        "published catalogue",
+        schema_validation,
+    )
+    if schema_validation.errors:
+        raise ValueError(
+            "published catalogue violates the canonical schema: "
+            + "; ".join(schema_validation.errors)
+        )
+
+
+def require_route_id(value: object, kind: str) -> str:
+    """Require one safe stable ID and reject collisions with fixed route owners."""
+    if not isinstance(value, str) or STABLE_ID_RE.fullmatch(value) is None:
+        raise ValueError(f"catalogue {kind} route ID is unsafe: {value!r}")
+    if kind == "source" and value in RESERVED_SOURCE_IDS:
+        raise ValueError(f"catalogue source route ID is reserved: {value}")
+    if kind == "topic" and value in RESERVED_TOPIC_IDS:
+        raise ValueError(f"catalogue topic route ID is reserved: {value}")
+    return value
+
+
 def parse_human(response: Response, endpoint: str) -> PageParser:
     """Require an exact successful HTML response and parse generated structures."""
     if response.status != 200:
@@ -217,15 +275,19 @@ def expected_human_endpoints(catalog: dict[str, object]) -> tuple[str, ...]:
     records = catalog.get("records")
     if not isinstance(sources, list) or not isinstance(topics, list) or not isinstance(records, list):
         raise ValueError("catalogue human-route registries must be arrays")
-    source_ids = [item.get("id") for item in sources if isinstance(item, dict)]
-    topic_ids = [item.get("id") for item in topics if isinstance(item, dict)]
-    record_ids = {item.get("id") for item in records if isinstance(item, dict)}
-    if (
-        len(source_ids) != len(sources)
-        or len(topic_ids) != len(topics)
-        or any(not isinstance(item, str) for item in [*source_ids, *topic_ids])
+    if not all(isinstance(item, dict) for item in [*sources, *topics, *records]):
+        raise ValueError("catalogue route registries contain a non-object")
+    source_ids = [require_route_id(item.get("id"), "source") for item in sources]
+    topic_ids = [require_route_id(item.get("id"), "topic") for item in topics]
+    ordered_record_ids = [require_route_id(item.get("id"), "record") for item in records]
+    for kind, identifiers in (
+        ("source", source_ids),
+        ("topic", topic_ids),
+        ("record", ordered_record_ids),
     ):
-        raise ValueError("catalogue source/topic route IDs are invalid")
+        if len(identifiers) != len(set(identifiers)):
+            raise ValueError(f"catalogue {kind} route IDs are duplicated")
+    record_ids = set(ordered_record_ids)
     missing_compatibility = set(COMPATIBILITY_RECORD_IDS) - record_ids
     if missing_compatibility:
         raise ValueError(
@@ -347,7 +409,7 @@ def verify_responses(
     for endpoint, response in responses.items():
         if len(response.body) > MAX_BODY_BYTES:
             raise ValueError(f"{endpoint}: response body exceeds the byte limit")
-        expected_url = urljoin(base_url, endpoint)
+        expected_url = exact_endpoint_url(base_url, endpoint)
         if response.final_url != expected_url:
             raise ValueError(f"{endpoint}: unexpected redirect to {response.final_url}")
 
@@ -388,28 +450,7 @@ def verify_responses(
         raise ValueError("catalog/publication input_sha256 values differ")
     if publication.get("revision") != revision:
         raise ValueError("publication revision does not equal the required main SHA")
-    try:
-        canonical_schema = json.loads(canonical_schema_bytes.decode("utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError) as error:
-        raise ValueError("checkout canonical schema is invalid UTF-8 JSON") from error
-    if schema != canonical_schema:
-        raise ValueError("published schema differs from the checkout canonical schema")
-    aggregate_schema = canonical_schema.get("$defs", {}).get("aggregate")
-    if not isinstance(aggregate_schema, dict):
-        raise ValueError("checkout canonical schema lacks the aggregate contract")
-    schema_validation = Validation()
-    validate_schema_instance(
-        catalog,
-        aggregate_schema,
-        canonical_schema,
-        "published catalogue",
-        schema_validation,
-    )
-    if schema_validation.errors:
-        raise ValueError(
-            "published catalogue violates the canonical schema: "
-            + "; ".join(schema_validation.errors)
-        )
+    validate_catalog_before_routes(catalog, schema, canonical_schema_bytes)
 
     pages = {
         endpoint: parse_human(responses[endpoint], endpoint)
@@ -441,6 +482,7 @@ def fetch_publication(
     fetcher: Fetcher,
     deadline_at: float,
     monotonic: Callable[[], float],
+    canonical_schema_bytes: bytes,
 ) -> dict[str, Response]:
     """Fetch one coherent catalogue-derived snapshot within the absolute deadline."""
     responses = {}
@@ -448,10 +490,16 @@ def fetch_publication(
         remaining = deadline_at - monotonic()
         if remaining <= 0:
             raise ValueError("live publication deadline expired during a snapshot")
-        responses[endpoint] = fetcher(
-            urljoin(base_url, endpoint), min(timeout, remaining)
-        )
+        requested_url = exact_endpoint_url(base_url, endpoint)
+        response = fetcher(requested_url, min(timeout, remaining))
+        if response.final_url != requested_url:
+            raise ValueError(f"{endpoint}: unexpected redirect to {response.final_url}")
+        responses[endpoint] = response
     catalog = parse_json(responses[JSON_ENDPOINTS[0]], JSON_ENDPOINTS[0])
+    published_schema = parse_json(responses[JSON_ENDPOINTS[1]], JSON_ENDPOINTS[1])
+    validate_catalog_before_routes(
+        catalog, published_schema, canonical_schema_bytes
+    )
     additional = [
         endpoint
         for endpoint in expected_human_endpoints(catalog)
@@ -461,9 +509,11 @@ def fetch_publication(
         remaining = deadline_at - monotonic()
         if remaining <= 0:
             raise ValueError("live publication deadline expired during a snapshot")
-        responses[endpoint] = fetcher(
-            urljoin(base_url, endpoint), min(timeout, remaining)
-        )
+        requested_url = exact_endpoint_url(base_url, endpoint)
+        response = fetcher(requested_url, min(timeout, remaining))
+        if response.final_url != requested_url:
+            raise ValueError(f"{endpoint}: unexpected redirect to {response.final_url}")
+        responses[endpoint] = response
     return responses
 
 
@@ -495,7 +545,12 @@ def verify_with_retry(
         try:
             verify_responses(
                 fetch_publication(
-                    base_url, timeout, fetcher, deadline_at, monotonic
+                    base_url,
+                    timeout,
+                    fetcher,
+                    deadline_at,
+                    monotonic,
+                    canonical_schema_bytes,
                 ),
                 base_url,
                 revision,
@@ -617,7 +672,7 @@ def fixture_responses(
         JSON_ENDPOINTS[2]: ("application/json", json.dumps(publication).encode()),
     }
     return {
-        endpoint: Response(200, content_type, body, urljoin(PAGES_BASE, endpoint))
+        endpoint: Response(200, content_type, body, exact_endpoint_url(PAGES_BASE, endpoint))
         for endpoint, (content_type, body) in payloads.items()
     }
 
@@ -632,6 +687,67 @@ def run_self_tests() -> None:
     verify_responses(scaled_fixture, PAGES_BASE, revision, canonical_schema)
     if len(scaled_fixture) != 14:
         raise AssertionError("1000-record live fixture exceeded the bounded endpoint policy")
+
+    malicious_route_cases = (
+        ("sources", "../escape"),
+        ("topics", "book?query"),
+        ("records", "book#fragment"),
+        ("sources", "book%2fescape"),
+        ("topics", "book\\escape"),
+        ("records", "/absolute"),
+        ("sources", "https://evil.example/path"),
+        ("sources", "index"),
+        ("sources", "foundations"),
+        ("topics", "index"),
+    )
+    for collection, malicious_id in malicious_route_cases:
+        poisoned = dict(fixture)
+        catalog_response = poisoned[JSON_ENDPOINTS[0]]
+        payload = json.loads(catalog_response.body)
+        payload[collection][0]["id"] = malicious_id
+        poisoned[JSON_ENDPOINTS[0]] = Response(
+            catalog_response.status,
+            catalog_response.content_type,
+            json.dumps(payload).encode(),
+            catalog_response.final_url,
+        )
+        requested: list[str] = []
+
+        def instrumented_fetcher(url: str, timeout: float) -> Response:
+            """Record every request so invalid IDs cannot trigger a dynamic fetch."""
+            requested.append(url)
+            return poisoned[url.removeprefix(PAGES_BASE)]
+
+        try:
+            verify_with_retry(
+                PAGES_BASE,
+                revision,
+                attempts=1,
+                initial_delay=0,
+                timeout=1,
+                deadline=30,
+                canonical_schema_bytes=canonical_schema,
+                fetcher=instrumented_fetcher,
+                sleep=lambda _delay: None,
+                monotonic=lambda: 0.0,
+            )
+        except ValueError as error:
+            if (
+                "violates the canonical schema" not in str(error)
+                and "route ID is reserved" not in str(error)
+            ):
+                raise AssertionError(
+                    f"malicious route ID failed for an unrelated reason: {malicious_id}: {error}"
+                ) from error
+        else:
+            raise AssertionError(f"malicious route ID was accepted: {malicious_id}")
+        expected_bootstrap_urls = [
+            exact_endpoint_url(PAGES_BASE, endpoint) for endpoint in BOOTSTRAP_ENDPOINTS
+        ]
+        if requested != expected_bootstrap_urls:
+            raise AssertionError(
+                f"malicious route ID caused an off-contract request: {malicious_id}: {requested}"
+            )
     authoritative_fixture = fixture_responses(revision, "authoritative")
     verify_responses(
         authoritative_fixture,

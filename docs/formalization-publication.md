@@ -157,7 +157,13 @@ the three versioned JSON resources (`catalog.json`, `schema.json`, and
 `publication.json`) below the fixed
 `https://phasetr.github.io/lattice-system/` base. It then derives and fetches
 every source/topic projection and the project-original projection from that
-catalogue. It also checks the four original prototype record routes as a
+catalogue only after the fetched schema equals the checkout schema and the
+catalogue passes its complete recursive aggregate contract. Route IDs must use
+the stable-ID grammar and avoid fixed-route reservations; endpoint URLs use
+exact fixed-base concatenation rather than URL-reference resolution. Invalid
+path, query, fragment, percent, backslash, absolute-like, or reserved IDs fail
+while the request set is still the seven bootstrap endpoints. It also checks
+the four original prototype record routes as a
 permanent public-compatibility smoke set. It does not issue one HTTP request per
 future record: the status page proves the exact complete record-link projection,
 while the same-run rendered-artifact gate has already checked every detail page
