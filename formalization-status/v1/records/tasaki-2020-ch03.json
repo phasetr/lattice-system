@@ -1,0 +1,32 @@
+{
+  "records": [
+    {
+      "axiom_dependencies": [],
+      "capstone": true,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-theorem-3-1-finite-dimensional-core",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.horsch_vonderLinden_lowLying",
+      "module": "LatticeSystem.Quantum.HorschVonderLinden",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "source_coverage": "conditional_reduction",
+      "source_path": "LatticeSystem/Quantum/HorschVonderLinden.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-theorem-3-1"
+        }
+      ],
+      "summary": "A normalized low-Rayleigh-energy trial state orthogonal to a ground eigenvector yields a low-lying energy eigenstate; the long-range-order estimate remains an application input.",
+      "topic_ids": [
+        "low-energy-spectrum",
+        "symmetry-breaking"
+      ],
+      "trust_state": "axiom_free"
+    }
+  ],
+  "schema_version": 1,
+  "source_id": "tasaki-2020",
+  "source_unit": "chapter-03"
+}

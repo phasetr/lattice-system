@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "topics": [
+    {
+      "description": "Low-energy spectral results and variational extraction of eigenstates.",
+      "id": "low-energy-spectrum",
+      "label": "Low-energy spectrum"
+    },
+    {
+      "description": "Pauli matrices and finite-dimensional spin operator identities.",
+      "id": "quantum-spin",
+      "label": "Quantum spin"
+    },
+    {
+      "description": "Symmetry breaking, its absence, and thermodynamic-limit order parameters.",
+      "id": "symmetry-breaking",
+      "label": "Symmetry breaking"
+    }
+  ]
+}

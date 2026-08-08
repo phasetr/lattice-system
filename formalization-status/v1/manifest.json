@@ -1,0 +1,18 @@
+{
+  "catalog_state": "prototype",
+  "human_publication_root": "/lattice-system/formalization/",
+  "machine_publication_root": "/lattice-system/formalization-status/v1/",
+  "record_shards": [
+    "records/shastry-1992.json",
+    "records/tasaki-2020-ch02.json",
+    "records/tasaki-2020-ch03.json",
+    "records/tasaki-2020-ch04.json"
+  ],
+  "registries": {
+    "source_items": "source-items.json",
+    "sources": "sources.json",
+    "topics": "topics.json"
+  },
+  "schema": "schema.json",
+  "schema_version": 1
+}

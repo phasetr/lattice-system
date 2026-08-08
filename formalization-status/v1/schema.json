@@ -1,0 +1,784 @@
+{
+  "$defs": {
+    "aggregate": {
+      "additionalProperties": false,
+      "properties": {
+        "catalog_state": {
+          "$ref": "#/$defs/catalog_state"
+        },
+        "generated_by": {
+          "const": "scripts/validate_formalization_status.py"
+        },
+        "generator_version": {
+          "const": 2
+        },
+        "input_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "records": {
+          "items": {
+            "$ref": "#/$defs/declaration_record"
+          },
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1
+        },
+        "source_items": {
+          "items": {
+            "$ref": "#/$defs/source_item"
+          },
+          "type": "array"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/source"
+          },
+          "type": "array"
+        },
+        "topics": {
+          "items": {
+            "$ref": "#/$defs/topic"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "catalog_state",
+        "generated_by",
+        "generator_version",
+        "input_sha256",
+        "records",
+        "schema_version",
+        "source_items",
+        "sources",
+        "topics"
+      ],
+      "type": "object"
+    },
+    "catalog_state": {
+      "enum": [
+        "authoritative",
+        "prototype"
+      ]
+    },
+    "declaration_kind": {
+      "enum": [
+        "abbrev",
+        "axiom",
+        "class",
+        "definition",
+        "inductive",
+        "instance",
+        "lemma",
+        "opaque",
+        "structure",
+        "theorem"
+      ]
+    },
+    "declaration_record": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "trust_state": {
+                "const": "axiom_free"
+              }
+            },
+            "required": [
+              "trust_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "axiom_dependencies": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "trust_state": {
+                "const": "depends_on_documented_axioms"
+              }
+            },
+            "required": [
+              "trust_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "axiom_dependencies": {
+                "minItems": 1
+              },
+              "declaration_kind": {
+                "not": {
+                  "const": "axiom"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "trust_state": {
+                "const": "documented_axiom"
+              }
+            },
+            "required": [
+              "trust_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "axiom_dependencies": {
+                "maxItems": 1,
+                "minItems": 1
+              },
+              "declaration_kind": {
+                "const": "axiom"
+              },
+              "implementation_state": {
+                "const": "implemented"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "declaration_kind": {
+                "const": "axiom"
+              }
+            },
+            "required": [
+              "declaration_kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "trust_state": {
+                "const": "documented_axiom"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "implementation_state": {
+                "const": "in_progress"
+              }
+            },
+            "required": [
+              "implementation_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "capstone": {
+                "const": false
+              },
+              "source_coverage": {
+                "const": "partial"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "capstone": {
+                "const": true
+              }
+            },
+            "required": [
+              "capstone"
+            ]
+          },
+          "then": {
+            "properties": {
+              "implementation_state": {
+                "const": "implemented"
+              },
+              "source_coverage": {
+                "enum": [
+                  "complete",
+                  "conditional_reduction"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "origin": {
+                "const": "literature"
+              }
+            },
+            "required": [
+              "origin"
+            ]
+          },
+          "then": {
+            "properties": {
+              "source_coverage": {
+                "not": {
+                  "const": "not_applicable"
+                }
+              },
+              "source_relations": {
+                "contains": {
+                  "properties": {
+                    "relation": {
+                      "enum": [
+                        "formalizes",
+                        "presents"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "relation"
+                  ]
+                },
+                "maxContains": 1,
+                "minContains": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "origin": {
+                "const": "project_original"
+              }
+            },
+            "required": [
+              "origin"
+            ]
+          },
+          "then": {
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "implementation_state": {
+                      "const": "implemented"
+                    }
+                  },
+                  "required": [
+                    "implementation_state"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "source_coverage": {
+                      "const": "not_applicable"
+                    }
+                  }
+                }
+              }
+            ],
+            "properties": {
+              "source_relations": {
+                "not": {
+                  "contains": {
+                    "properties": {
+                      "relation": {
+                        "enum": [
+                          "formalizes",
+                          "presents"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "relation"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "axiom_dependencies": {
+          "items": {
+            "$ref": "#/$defs/lean_name"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "capstone": {
+          "type": "boolean"
+        },
+        "declaration_kind": {
+          "$ref": "#/$defs/declaration_kind"
+        },
+        "id": {
+          "$ref": "#/$defs/stable_id"
+        },
+        "implementation_state": {
+          "$ref": "#/$defs/implementation_state"
+        },
+        "lean_name": {
+          "$ref": "#/$defs/lean_name"
+        },
+        "module": {
+          "$ref": "#/$defs/module_name"
+        },
+        "origin": {
+          "$ref": "#/$defs/origin"
+        },
+        "proof_guide_anchor": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/stable_id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_coverage": {
+          "$ref": "#/$defs/source_coverage"
+        },
+        "source_path": {
+          "$ref": "#/$defs/source_path"
+        },
+        "source_relations": {
+          "items": {
+            "$ref": "#/$defs/source_relation"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "summary": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "topic_ids": {
+          "items": {
+            "$ref": "#/$defs/stable_id"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "trust_state": {
+          "$ref": "#/$defs/trust_state"
+        }
+      },
+      "required": [
+        "axiom_dependencies",
+        "capstone",
+        "declaration_kind",
+        "id",
+        "implementation_state",
+        "lean_name",
+        "module",
+        "origin",
+        "proof_guide_anchor",
+        "source_coverage",
+        "source_path",
+        "source_relations",
+        "summary",
+        "topic_ids",
+        "trust_state"
+      ],
+      "type": "object"
+    },
+    "implementation_state": {
+      "enum": [
+        "implemented",
+        "in_progress"
+      ]
+    },
+    "lean_name": {
+      "pattern": "^LatticeSystem(?:\\.[A-Za-z_\\u0080-\\uFFFF][A-Za-z0-9_'\\u0080-\\uFFFF]*)+$",
+      "type": "string"
+    },
+    "manifest": {
+      "additionalProperties": false,
+      "properties": {
+        "catalog_state": {
+          "$ref": "#/$defs/catalog_state"
+        },
+        "human_publication_root": {
+          "pattern": "^/lattice-system/.+/$",
+          "type": "string"
+        },
+        "machine_publication_root": {
+          "pattern": "^/lattice-system/.+/$",
+          "type": "string"
+        },
+        "record_shards": {
+          "items": {
+            "pattern": "^records/[a-z0-9]+(?:-[a-z0-9]+)*\\.json$",
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "registries": {
+          "additionalProperties": false,
+          "properties": {
+            "source_items": {
+              "const": "source-items.json"
+            },
+            "sources": {
+              "const": "sources.json"
+            },
+            "topics": {
+              "const": "topics.json"
+            }
+          },
+          "required": [
+            "source_items",
+            "sources",
+            "topics"
+          ],
+          "type": "object"
+        },
+        "schema": {
+          "const": "schema.json"
+        },
+        "schema_version": {
+          "const": 1
+        }
+      },
+      "required": [
+        "catalog_state",
+        "human_publication_root",
+        "machine_publication_root",
+        "record_shards",
+        "registries",
+        "schema",
+        "schema_version"
+      ],
+      "type": "object"
+    },
+    "module_name": {
+      "pattern": "^LatticeSystem(?:\\.[A-Z][A-Za-z0-9_]*)+$",
+      "type": "string"
+    },
+    "origin": {
+      "enum": [
+        "literature",
+        "project_original"
+      ]
+    },
+    "record_shard": {
+      "additionalProperties": false,
+      "properties": {
+        "records": {
+          "items": {
+            "$ref": "#/$defs/declaration_record"
+          },
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1
+        },
+        "source_id": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/stable_id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_unit": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "records",
+        "schema_version",
+        "source_id",
+        "source_unit"
+      ],
+      "type": "object"
+    },
+    "source": {
+      "additionalProperties": false,
+      "properties": {
+        "authors": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "edition": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "$ref": "#/$defs/stable_id"
+        },
+        "publication": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "url": {
+          "pattern": "^https://",
+          "type": "string"
+        },
+        "year": {
+          "maximum": 9999,
+          "minimum": 1000,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "authors",
+        "id",
+        "year"
+      ],
+      "type": "object"
+    },
+    "source_coverage": {
+      "enum": [
+        "complete",
+        "conditional_reduction",
+        "not_applicable",
+        "partial"
+      ]
+    },
+    "source_item": {
+      "additionalProperties": false,
+      "properties": {
+        "equations": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "id": {
+          "$ref": "#/$defs/stable_id"
+        },
+        "item_kind": {
+          "enum": [
+            "article",
+            "definition",
+            "equation",
+            "exercise",
+            "lemma",
+            "proposition",
+            "section",
+            "theorem"
+          ]
+        },
+        "item_number": {
+          "oneOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pages": {
+          "oneOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "section": {
+          "oneOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_id": {
+          "$ref": "#/$defs/stable_id"
+        },
+        "title": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "equations",
+        "id",
+        "item_kind",
+        "item_number",
+        "pages",
+        "section",
+        "source_id",
+        "title"
+      ],
+      "type": "object"
+    },
+    "source_item_registry": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "source_items": {
+          "items": {
+            "$ref": "#/$defs/source_item"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "source_items"
+      ],
+      "type": "object"
+    },
+    "source_path": {
+      "pattern": "^LatticeSystem/(?:[A-Za-z][A-Za-z0-9_]*/)*[A-Za-z][A-Za-z0-9_]*\\.lean$",
+      "type": "string"
+    },
+    "source_registry": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/source"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "sources"
+      ],
+      "type": "object"
+    },
+    "source_relation": {
+      "additionalProperties": false,
+      "properties": {
+        "relation": {
+          "enum": [
+            "attributes",
+            "cross_checks",
+            "formalizes",
+            "presents",
+            "supports"
+          ]
+        },
+        "source_item_id": {
+          "$ref": "#/$defs/stable_id"
+        }
+      },
+      "required": [
+        "relation",
+        "source_item_id"
+      ],
+      "type": "object"
+    },
+    "stable_id": {
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "type": "string"
+    },
+    "topic": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "$ref": "#/$defs/stable_id"
+        },
+        "label": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "id",
+        "label"
+      ],
+      "type": "object"
+    },
+    "topic_registry": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "topics": {
+          "items": {
+            "$ref": "#/$defs/topic"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "topics"
+      ],
+      "type": "object"
+    },
+    "trust_state": {
+      "enum": [
+        "axiom_free",
+        "depends_on_documented_axioms",
+        "documented_axiom"
+      ]
+    }
+  },
+  "$id": "https://phasetr.github.io/lattice-system/formalization-status/v1/schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/aggregate"
+    },
+    {
+      "$ref": "#/$defs/manifest"
+    },
+    {
+      "$ref": "#/$defs/record_shard"
+    },
+    {
+      "$ref": "#/$defs/source_item_registry"
+    },
+    {
+      "$ref": "#/$defs/source_registry"
+    },
+    {
+      "$ref": "#/$defs/topic_registry"
+    }
+  ],
+  "title": "lattice-system formalization status schema version 1",
+  "type": "object"
+}

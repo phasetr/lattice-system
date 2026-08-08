@@ -1,0 +1,42 @@
+{
+  "records": [
+    {
+      "axiom_dependencies": [
+        "LatticeSystem.Quantum.shastry_no_symmetry_breaking_1d"
+      ],
+      "capstone": true,
+      "declaration_kind": "axiom",
+      "id": "tasaki-2020-theorem-4-2-shastry-no-ssb",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.shastry_no_symmetry_breaking_1d",
+      "module": "LatticeSystem.Quantum.SpinS.ShastryNoSSB",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "source_coverage": "complete",
+      "source_path": "LatticeSystem/Quantum/SpinS/ShastryNoSSB.lean",
+      "source_relations": [
+        {
+          "relation": "presents",
+          "source_item_id": "tasaki-2020-theorem-4-2"
+        },
+        {
+          "relation": "attributes",
+          "source_item_id": "shastry-1992-static-susceptibility-argument"
+        },
+        {
+          "relation": "supports",
+          "source_item_id": "tanaka-takeda-idogaki-2004-no-ssb"
+        }
+      ],
+      "summary": "The staggered order parameter of the one-dimensional antiferromagnetic Heisenberg ring vanishes in the thermodynamic-then-zero-field limit.",
+      "topic_ids": [
+        "quantum-spin",
+        "symmetry-breaking"
+      ],
+      "trust_state": "documented_axiom"
+    }
+  ],
+  "schema_version": 1,
+  "source_id": "tasaki-2020",
+  "source_unit": "chapter-04"
+}
