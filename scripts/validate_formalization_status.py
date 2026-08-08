@@ -1638,6 +1638,29 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
     record_fixture = json.loads(
         (root / "records/tasaki-2020-ch02.json").read_text(encoding="utf-8")
     )["records"][0]
+    collision_record = copy.deepcopy(record_fixture)
+    collision_record.update(
+        {
+            "declaration_kind": "theorem",
+            "lean_name": duplicate_name,
+            "module": "LatticeSystem.Quantum.SpinS.BoxLocalEnergyDensity",
+            "source_path": "LatticeSystem/Quantum/SpinS/BoxLocalEnergyDensity.lean",
+        }
+    )
+    collision_validation = Validation()
+    validate_record(
+        collision_record,
+        "duplicate-terminal-name-record",
+        contract,
+        repo_root,
+        item_map,
+        set(topic_map),
+        collision_validation,
+    )
+    check(
+        any("source does not declare" in error for error in collision_validation.errors),
+        "duplicate fully qualified name paired with the other file/module was accepted",
+    )
     for field in ("axiom_dependencies", "topic_ids", "source_relations"):
         for malformed in (
             None,
