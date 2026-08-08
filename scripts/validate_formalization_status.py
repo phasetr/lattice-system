@@ -33,6 +33,8 @@ from formalization_cutover import (
 
 SCHEMA_VERSION = 1
 GENERATOR_VERSION = 2
+RESERVED_SOURCE_ROUTE_IDS = {"foundations", "index"}
+RESERVED_TOPIC_ROUTE_IDS = {"index"}
 MANIFEST_KEYS = {
     "catalog_state",
     "cutover_baseline",
@@ -840,6 +842,10 @@ def validate_sources(
     properties, required = contract.object_keys("source")
     for identifier, source in sources.items():
         location = f"sources.json.sources[{identifier}]"
+        validation.require(
+            identifier not in RESERVED_SOURCE_ROUTE_IDS,
+            f"{location}.id: reserved human publication route",
+        )
         validation.keys(source, properties, required, location)
         authors = source.get("authors")
         validation.require(
@@ -928,6 +934,10 @@ def validate_topics(
     properties, required = contract.object_keys("topic")
     for identifier, topic in topics.items():
         location = f"topics.json.topics[{identifier}]"
+        validation.require(
+            identifier not in RESERVED_TOPIC_ROUTE_IDS,
+            f"{location}.id: reserved human publication route",
+        )
         validation.keys(topic, properties, required, location)
         require_inline_text(topic.get("description"), f"{location}.description", validation)
         require_inline_text(topic.get("label"), f"{location}.label", validation)
@@ -1572,6 +1582,45 @@ end LatticeSystem
         bad_source_validation,
     )
     check(bool(bad_source_validation.errors), "bad year and non-HTTPS URL were accepted")
+    for reserved in sorted(RESERVED_SOURCE_ROUTE_IDS):
+        reserved_validation = Validation()
+        validate_sources(
+            {
+                "schema_version": 1,
+                "sources": [
+                    {
+                        "authors": ["A. Author"],
+                        "id": reserved,
+                        "year": 2000,
+                    }
+                ],
+            },
+            contract,
+            reserved_validation,
+        )
+        check(
+            bool(reserved_validation.errors),
+            f"reserved source publication route was accepted: {reserved}",
+        )
+    reserved_topic_validation = Validation()
+    validate_topics(
+        {
+            "schema_version": 1,
+            "topics": [
+                {
+                    "description": "Reserved route fixture",
+                    "id": "index",
+                    "label": "Reserved",
+                }
+            ],
+        },
+        contract,
+        reserved_topic_validation,
+    )
+    check(
+        bool(reserved_topic_validation.errors),
+        "reserved topic publication route was accepted: index",
+    )
     dependency_validation = Validation()
     validate_dependencies(
         [

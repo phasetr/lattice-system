@@ -334,7 +334,7 @@ def check_staged_fragment_pins(source: Path) -> None:
         if permalink is None:
             continue
         route = permalink.group(1).strip('"')
-        explicit = re.findall(r'<a\s+id="([^"]+)"\s*></a>', text)
+        explicit = re.findall(r'<[A-Za-z][^>]*\sid="([^"]+)"[^>]*>', text)
         pinned = re.findall(r"(?m)^#{1,6} .*\n\{:\s+#([^ }]+)\s*\}$", text)
         stable = [*explicit, *pinned]
         duplicates = sorted({item for item in stable if stable.count(item) > 1})
@@ -342,6 +342,11 @@ def check_staged_fragment_pins(source: Path) -> None:
             raise ValueError(
                 f"staged page has duplicate explicit fragment pins: "
                 f"{path.relative_to(source)}: {duplicates}"
+            )
+        if route in pages:
+            raise ValueError(
+                f"staged pages have a duplicate permalink: {route}: "
+                f"{pages[route][0].relative_to(source)} and {path.relative_to(source)}"
             )
         pages[route] = (path, text, set(stable))
 
@@ -601,19 +606,22 @@ def normalized_rendered_text(parts: list[str]) -> str:
 def expected_record_structure(
     record: dict[str, Any],
     catalog: dict[str, Any],
-    relation_source: str | None,
 ) -> tuple[str, list[tuple[str, str, tuple[tuple[str, str], ...], str]]]:
     """Independently compute the exact heading and ordered typed field sequence."""
     fields: list[tuple[str, str, tuple[tuple[str, str], ...], str]] = [
         ("Record ID", "record-id", (), record["id"]),
         ("Lean declaration", "lean-name", (), record["lean_name"]),
+        ("Declaration kind", "declaration-kind", (), record["declaration_kind"]),
         ("Human status", "human-status", (), derived_human_label(record)),
         ("Implementation state", "implementation-state", (), record["implementation_state"]),
         ("Source coverage", "source-coverage", (), record["source_coverage"]),
         ("Trust state", "trust-state", (), record["trust_state"]),
         ("Capstone", "capstone", (), str(record["capstone"]).lower()),
         ("Module", "module", (), record["module"]),
+        ("Source path", "source-path", (), record["source_path"]),
+        ("Origin", "origin", (), record["origin"]),
     ]
+    fields.extend(("Topic", "topic-id", (), topic_id) for topic_id in record["topic_ids"])
     dependencies = record["axiom_dependencies"]
     if dependencies:
         fields.extend(
@@ -624,12 +632,18 @@ def expected_record_structure(
         fields.append(
             ("Axiom dependency", "axiom-dependency", (("empty", "true"),), "none")
         )
+    if record["proof_guide_anchor"] is None:
+        fields.append(
+            ("Proof-guide anchor", "proof-guide-anchor", (("empty", "true"),), "none")
+        )
+    else:
+        fields.append(
+            ("Proof-guide anchor", "proof-guide-anchor", (), record["proof_guide_anchor"])
+        )
     item_map = {item["id"]: item for item in catalog["source_items"]}
     source_map = {item["id"]: item for item in catalog["sources"]}
     for relation in record["source_relations"]:
         item = item_map[relation["source_item_id"]]
-        if relation_source is not None and item["source_id"] != relation_source:
-            continue
         source = source_map[item["source_id"]]
         fields.append(
             (
@@ -681,7 +695,6 @@ def validate_record_blocks(
     parser: PageParser,
     expected_records: list[dict[str, Any]],
     catalog: dict[str, Any],
-    relation_source: str | None,
     label: str,
 ) -> None:
     """Require exact membership, heading, attributes, order, and field values."""
@@ -692,7 +705,7 @@ def validate_record_blocks(
             f"{label}: record IDs differ; expected {sorted(expected_ids)}, found {sorted(actual_ids)}"
         )
     for record in expected_records:
-        expected_heading, expected_fields = expected_record_structure(record, catalog, relation_source)
+        expected_heading, expected_fields = expected_record_structure(record, catalog)
         identifier = record["id"]
         if parser.record_headings[identifier] != expected_heading:
             raise ValueError(
@@ -820,6 +833,46 @@ def expected_topic_index_rows(
     return rows
 
 
+def canonical_record_href(record_id: str) -> str:
+    """Return the independently derived stable human record route."""
+    return f"{BASEURL}/formalization/records/{record_id}/"
+
+
+def expected_projection_rows(
+    records: list[dict[str, Any]], projection_kind: str, projection_id: str
+) -> list[tuple[str, tuple[tuple[str, str], ...], str | None, str]]:
+    """Derive one exact count and the compact ordered links for a projection."""
+    result = [
+        (
+            "projection-count",
+            (
+                ("projection-id", projection_id),
+                ("projection-kind", projection_kind),
+                ("record-count", str(len(records))),
+            ),
+            None,
+            f"{len(records)} record(s)",
+        )
+    ]
+    for record in records:
+        href = canonical_record_href(record["id"])
+        result.append(
+            (
+                "record-projection",
+                (
+                    ("href", href),
+                    ("id", f"record-{record['id']}"),
+                    ("projection-id", projection_id),
+                    ("projection-kind", projection_kind),
+                    ("record-id", record["id"]),
+                ),
+                href,
+                record["summary"],
+            )
+        )
+    return result
+
+
 def expected_status_index_rows(
     catalog: dict[str, Any],
 ) -> list[tuple[str, tuple[tuple[str, str], ...], str | None, str]]:
@@ -828,15 +881,24 @@ def expected_status_index_rows(
     for record in catalog["records"]:
         label = derived_human_label(record)
         counts[label] = counts.get(label, 0) + 1
-    return [
-        (
-            "status",
-            (("record-count", str(counts[label])), ("status-label", label)),
-            None,
-            f"{label}: {counts[label]}",
+    result = []
+    for label in sorted(counts):
+        result.append(
+            (
+                "status-count",
+                (("record-count", str(counts[label])), ("status-label", label)),
+                None,
+                f"{label}: {counts[label]}",
+            )
         )
-        for label in sorted(counts)
-    ]
+        result.extend(
+            expected_projection_rows(
+                [record], "status", label
+            )[1]
+            for record in catalog["records"]
+            if derived_human_label(record) == label
+        )
+    return result
 
 
 def require_index_rows(
@@ -850,6 +912,51 @@ def require_index_rows(
             f"{label}: structured index rows differ; expected {expected!r}, "
             f"found {parser.index_rows!r}"
         )
+
+
+def check_staged_record_outputs(source: Path, catalog: dict[str, Any]) -> None:
+    """Require an exact one-file-per-record generated Markdown root."""
+    root = source / "formalization" / "records"
+    if not root.is_dir() or root.is_symlink():
+        raise ValueError("staged canonical record root is missing or unsafe")
+    expected = {f"{record['id']}.md" for record in catalog["records"]}
+    actual: set[str] = set()
+    for path in root.rglob("*"):
+        if path.is_symlink() or not path.is_file() or path.parent != root:
+            raise ValueError(f"unexpected staged canonical record output: {path}")
+        actual.add(path.name)
+    if actual != expected:
+        raise ValueError(
+            f"staged canonical record filenames differ: expected {sorted(expected)}, "
+            f"found {sorted(actual)}"
+        )
+    for record in catalog["records"]:
+        path = root / f"{record['id']}.md"
+        route = f"/formalization/records/{record['id']}/"
+        text = path.read_text(encoding="utf-8")
+        if re.findall(r"(?m)^permalink:\s*(\S+)\s*$", text) != [route]:
+            raise ValueError(f"staged canonical record has the wrong permalink: {record['id']}")
+
+
+def check_built_record_outputs(site: Path, catalog: dict[str, Any]) -> None:
+    """Require an exact one-directory-per-record rendered HTML root."""
+    root = site / "formalization" / "records"
+    if not root.is_dir() or root.is_symlink():
+        raise ValueError("rendered canonical record root is missing or unsafe")
+    expected = {record["id"] for record in catalog["records"]}
+    actual = {path.name for path in root.iterdir() if path.is_dir() and not path.is_symlink()}
+    if actual != expected:
+        raise ValueError(
+            f"rendered canonical record directories differ: expected {sorted(expected)}, "
+            f"found {sorted(actual)}"
+        )
+    for path in root.rglob("*"):
+        if path.is_symlink():
+            raise ValueError(f"rendered canonical record output contains a symlink: {path}")
+        if path.is_file() and (path.name != "index.html" or path.parent.parent != root):
+            raise ValueError(f"unexpected rendered canonical record output: {path}")
+        if path.is_dir() and path.parent != root:
+            raise ValueError(f"unexpected nested rendered canonical record directory: {path}")
 
 
 def check_built_site(
@@ -885,7 +992,7 @@ def check_built_site(
     if canonical_json(publication) != built_publication or publication != {
         "catalog_state": catalog["catalog_state"],
         "generated_by": "scripts/generate_formalization_site.py",
-        "generator_version": 1,
+        "generator_version": 2,
         "input_sha256": catalog["input_sha256"],
         "revision": revision,
         "schema_version": catalog["schema_version"],
@@ -893,6 +1000,7 @@ def check_built_site(
         raise ValueError("publication sidecar metadata does not match the build")
 
     pages = parse_site(site)
+    check_built_record_outputs(site, catalog)
     reject_authority_contradictions(
         catalog,
         [
@@ -921,7 +1029,6 @@ def check_built_site(
     require_index_rows(topic_index, expected_topic_index_rows(catalog), "built topic index")
     require_index_rows(status, expected_status_index_rows(catalog), "built status index")
 
-    source_items = {item["id"]: item for item in catalog["source_items"]}
     source_pages: dict[str, PageParser] = {}
     for source in catalog["sources"]:
         source_id = source["id"]
@@ -932,24 +1039,24 @@ def check_built_site(
         if expected_href not in source_index.links:
             raise ValueError(f"source index lacks {expected_href}")
         expected_records = records_for_source(catalog, source_id)
-        validate_record_blocks(
+        require_index_rows(
             parser,
-            expected_records,
-            catalog,
-            source_id,
+            expected_projection_rows(expected_records, "source", source_id),
             f"built source {source_id}",
         )
+        if parser.record_fields:
+            raise ValueError(f"built source {source_id}: projection duplicates full record truth")
 
     foundation_parser = required_page(site, "formalization/sources/foundations/index.html", pages)
     assert_metadata(foundation_parser, catalog, revision, "project-original foundations")
     project_records = [record for record in catalog["records"] if record["origin"] == "project_original"]
-    validate_record_blocks(
+    require_index_rows(
         foundation_parser,
-        project_records,
-        catalog,
-        None,
+        expected_projection_rows(project_records, "source", "foundations"),
         "built project-original foundations",
     )
+    if foundation_parser.record_fields:
+        raise ValueError("built project-original foundations duplicate full record truth")
 
     topic_pages: dict[str, PageParser] = {}
     for topic in catalog["topics"]:
@@ -960,13 +1067,13 @@ def check_built_site(
         expected_href = f"{BASEURL}/formalization/topics/{topic_id}/"
         if expected_href not in topic_index.links:
             raise ValueError(f"topic index lacks {expected_href}")
-        validate_record_blocks(
+        require_index_rows(
             parser,
-            records_for_topic(catalog, topic_id),
-            catalog,
-            None,
+            expected_projection_rows(records_for_topic(catalog, topic_id), "topic", topic_id),
             f"built topic {topic_id}",
         )
+        if parser.record_fields:
+            raise ValueError(f"built topic {topic_id}: projection duplicates full record truth")
         expected_heading = [
             (
                 "topic",
@@ -977,10 +1084,27 @@ def check_built_site(
         if parser.dynamic_headings != expected_heading:
             raise ValueError(f"built topic {topic_id}: dynamic heading differs")
 
+    if status.record_fields:
+        raise ValueError("built status projection duplicates full record truth")
+
+    detail_pages: dict[str, PageParser] = {}
     for record in catalog["records"]:
+        record_id = record["id"]
+        detail = required_page(
+            site, f"formalization/records/{record_id}/index.html", pages
+        )
+        assert_metadata(detail, catalog, revision, f"record {record_id}")
+        validate_record_blocks(detail, [record], catalog, f"built record {record_id}")
+        require_index_rows(detail, [], f"built record {record_id}")
+        detail_pages[record_id] = detail
         anchor = f"record-{record['id']}"
+        href = canonical_record_href(record_id)
         related_sources = {
-            source_items[relation["source_item_id"]]["source_id"]
+            next(
+                item["source_id"]
+                for item in catalog["source_items"]
+                if item["id"] == relation["source_item_id"]
+            )
             for relation in record["source_relations"]
         }
         if related_sources and not all(anchor in source_pages[source_id].ids for source_id in related_sources):
@@ -991,6 +1115,26 @@ def check_built_site(
             raise ValueError(f"project-original record lacks foundation anchor: {record['id']}")
         if not all(anchor in topic_pages[topic_id].ids for topic_id in record["topic_ids"]):
             raise ValueError(f"record lacks stable topic projection anchor: {record['id']}")
+        projection_pages = [
+            *(source_pages[source_id] for source_id in related_sources),
+            *(topic_pages[topic_id] for topic_id in record["topic_ids"]),
+            status,
+        ]
+        if record["origin"] == "project_original":
+            projection_pages.append(foundation_parser)
+        if not all(href in parser.links for parser in projection_pages):
+            raise ValueError(f"record projection lacks canonical detail link: {record_id}")
+
+    full_truth_occurrences: dict[str, int] = {record["id"]: 0 for record in catalog["records"]}
+    for parser in pages.values():
+        for record_id in parser.record_fields:
+            if record_id not in full_truth_occurrences:
+                raise ValueError(f"rendered site contains an unknown full record: {record_id}")
+            full_truth_occurrences[record_id] += 1
+    if any(count != 1 for count in full_truth_occurrences.values()):
+        raise ValueError(
+            f"full record truth must occur exactly once: {full_truth_occurrences}"
+        )
 
 
 
@@ -1016,6 +1160,7 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
     if publication.get("input_sha256") != catalog["input_sha256"]:
         raise ValueError("staged publication sidecar has the wrong catalogue digest")
     generated_files = sorted((source / "formalization").rglob("*.md"))
+    check_staged_record_outputs(source, catalog)
     reject_authority_contradictions(
         catalog,
         [
@@ -1023,10 +1168,11 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
             for path in sorted(source.rglob("*.md"))
         ],
     )
-    marker_specs: set[str] = set()
+    marker_specs: list[str] = []
+    marker_parsers: list[PageParser] = []
     for path in generated_files:
         text = path.read_text(encoding="utf-8")
-        marker_specs.update(
+        marker_specs.extend(
             re.findall(r"<!-- formalization-status-generated:start ([^\n]+) -->", text)
         )
         for match in re.finditer(
@@ -1036,6 +1182,7 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
         ):
             body = match.group(2)
             body_parser = parse_record_html(body, f"staged marker {match.group(1)}")
+            marker_parsers.append(body_parser)
             assert_metadata(
                 body_parser,
                 catalog,
@@ -1054,7 +1201,8 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
     expected_specs = {"overview", "project-original", "source-index", "status", "topic-index"}
     expected_specs.update(f"source {item['id']}" for item in catalog["sources"])
     expected_specs.update(f"topic {item['id']}" for item in catalog["topics"])
-    if marker_specs != expected_specs:
+    expected_specs.update(f"record {item['id']}" for item in catalog["records"])
+    if len(marker_specs) != len(set(marker_specs)) or set(marker_specs) != expected_specs:
         raise ValueError(
             f"generated marker set mismatch: expected {sorted(expected_specs)}, found {sorted(marker_specs)}"
         )
@@ -1065,24 +1213,28 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
             source / "formalization/sources" / f"{source_id}.md",
             f"source {source_id}",
         )
-        validate_record_blocks(
-            parse_record_html(body, f"staged source {source_id}"),
-            records_for_source(catalog, source_id),
-            catalog,
-            source_id,
+        source_parser = parse_record_html(body, f"staged source {source_id}")
+        require_index_rows(
+            source_parser,
+            expected_projection_rows(records_for_source(catalog, source_id), "source", source_id),
             f"staged source {source_id}",
         )
+        if source_parser.record_fields:
+            raise ValueError(f"staged source {source_id} duplicates full record truth")
     foundation_body = marker_body(
         source / "formalization/sources/foundations.md", "project-original"
     )
     project_records = [record for record in catalog["records"] if record["origin"] == "project_original"]
-    validate_record_blocks(
-        parse_record_html(foundation_body, "staged project-original foundations"),
-        project_records,
-        catalog,
-        None,
+    foundation_parser = parse_record_html(
+        foundation_body, "staged project-original foundations"
+    )
+    require_index_rows(
+        foundation_parser,
+        expected_projection_rows(project_records, "source", "foundations"),
         "staged project-original foundations",
     )
+    if foundation_parser.record_fields:
+        raise ValueError("staged project-original foundations duplicate full record truth")
     for topic in catalog["topics"]:
         topic_id = topic["id"]
         body = marker_body(
@@ -1090,13 +1242,13 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
             f"topic {topic_id}",
         )
         topic_parser = parse_record_html(body, f"staged topic {topic_id}")
-        validate_record_blocks(
+        require_index_rows(
             topic_parser,
-            records_for_topic(catalog, topic_id),
-            catalog,
-            None,
+            expected_projection_rows(records_for_topic(catalog, topic_id), "topic", topic_id),
             f"staged topic {topic_id}",
         )
+        if topic_parser.record_fields:
+            raise ValueError(f"staged topic {topic_id} duplicates full record truth")
         expected_heading = [
             (
                 "topic",
@@ -1133,6 +1285,26 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
         marker_body(source / "formalization/status.md", "status"), "staged status"
     )
     require_index_rows(status_parser, expected_status_index_rows(catalog), "staged status")
+    if status_parser.record_fields:
+        raise ValueError("staged status projection duplicates full record truth")
+
+    full_truth_occurrences: dict[str, int] = {record["id"]: 0 for record in catalog["records"]}
+    for record in catalog["records"]:
+        record_id = record["id"]
+        detail_path = source / "formalization" / "records" / f"{record_id}.md"
+        detail_body = marker_body(detail_path, f"record {record_id}")
+        detail_parser = parse_record_html(detail_body, f"staged record {record_id}")
+        validate_record_blocks(detail_parser, [record], catalog, f"staged record {record_id}")
+        require_index_rows(detail_parser, [], f"staged record {record_id}")
+    for parser in marker_parsers:
+        for record_id in parser.record_fields:
+            if record_id not in full_truth_occurrences:
+                raise ValueError(f"staged source contains an unknown full record: {record_id}")
+            full_truth_occurrences[record_id] += 1
+    if any(count != 1 for count in full_truth_occurrences.values()):
+        raise ValueError(
+            f"staged full record truth must occur exactly once: {full_truth_occurrences}"
+        )
 
 
 def check_workflow_invariants(repo_root: Path) -> None:
@@ -1304,41 +1476,164 @@ def run_staged_mutation_tests(
             raise AssertionError("independently recomputed aggregate accepted a status mutation")
     finally:
         shutil.rmtree(aggregate_mutation)
+    first_record = expected_catalog["records"][0]
+    record_id = first_record["id"]
+    detail_relative = f"formalization/records/{record_id}.md"
+    detail_text = (source / detail_relative).read_text(encoding="utf-8")
+    detail_href = canonical_record_href(record_id)
+    source_item_map = {item["id"]: item for item in expected_catalog["source_items"]}
+    related_source = source_item_map[first_record["source_relations"][0]["source_item_id"]][
+        "source_id"
+    ]
+    source_relative = f"formalization/sources/{related_source}.md"
+    source_text = (source / source_relative).read_text(encoding="utf-8")
+    projection_pattern = re.compile(
+        rf'<li id="record-{re.escape(record_id)}" .*?</li>'
+    )
+    projection_match = projection_pattern.search(source_text)
+    if projection_match is None:
+        raise AssertionError("canonical source projection mutation fixture is absent")
+    projection_row = projection_match.group(0)
+    status_text = (source / "formalization/status.md").read_text(encoding="utf-8")
+    status_count_match = re.search(
+        r'(data-row-kind="status-count"[^>]*data-record-count=")(\d+)(")',
+        status_text,
+    )
+    if status_count_match is None:
+        raise AssertionError("status count mutation fixture is absent")
+    wrong_status_count = (
+        status_text[: status_count_match.start(2)]
+        + str(int(status_count_match.group(2)) + 1)
+        + status_text[status_count_match.end(2) :]
+    )
+    mutation_cases = [
+        (
+            "detail implementation status",
+            detail_relative,
+            detail_text.replace(
+                f'<dd data-field="implementation-state">{first_record["implementation_state"]}</dd>',
+                '<dd data-field="implementation-state">in_progress</dd>',
+                1,
+            ),
+        ),
+        (
+            "detail source path omission",
+            detail_relative,
+            detail_text.replace(
+                '<dt data-label-for="source-path">Source path</dt>\n'
+                f'<dd data-field="source-path">{first_record["source_path"]}</dd>\n',
+                "",
+                1,
+            ),
+        ),
+        (
+            "source projection omission",
+            source_relative,
+            source_text.replace(projection_row + "\n", "", 1),
+        ),
+        (
+            "source projection wrong detail link",
+            source_relative,
+            source_text.replace(detail_href, f"{BASEURL}/formalization/records/wrong/", 1),
+        ),
+        (
+            "source projection duplicate full truth",
+            source_relative,
+            source_text.replace(
+                "<!-- formalization-status-generated:end -->",
+                re.search(r"(?ms)<article .*?</article>", detail_text).group(0)
+                + "\n<!-- formalization-status-generated:end -->",
+                1,
+            ),
+        ),
+        (
+            "status count",
+            "formalization/status.md",
+            wrong_status_count,
+        ),
+    ]
+    fragment_relative = (
+        "formalization/legacy/"
+        "04-3d-rotation-matrices-general-tasaki-2-1-eq-2-1-11.md"
+    )
+    fragment_text = (source / fragment_relative).read_text(encoding="utf-8")
+    fragment_pin = (
+        "{: #legacy-catalogue-3d-rotation-matrices-r-general--tasaki-21-eq-2111}\n"
+    )
+    if fragment_pin not in fragment_text:
+        raise AssertionError("staged fragment-pin mutation fixture is absent")
+    mutation_cases.append(
+        (
+            "missing render-stable legacy fragment pin",
+            fragment_relative,
+            fragment_text.replace(fragment_pin, "", 1),
+        )
+    )
+    for label, relative, mutated_text in mutation_cases:
+        temporary = Path(tempfile.mkdtemp(prefix="site-a2-semantic-mutation-", dir=scratch))
+        try:
+            mutated = temporary / "source"
+            shutil.copytree(source, mutated)
+            path = mutated / relative
+            if mutated_text == path.read_text(encoding="utf-8"):
+                raise AssertionError(f"A2 semantic mutation made no change: {label}")
+            path.write_text(mutated_text, encoding="utf-8")
+            try:
+                check_staged_source(mutated, expected_catalog_path, revision)
+            except ValueError:
+                pass
+            else:
+                raise AssertionError(f"staged A2 semantic mutation was accepted: {label}")
+        finally:
+            shutil.rmtree(temporary)
+    missing_temporary = Path(tempfile.mkdtemp(prefix="site-a2-missing-detail-", dir=scratch))
+    try:
+        missing_source = missing_temporary / "source"
+        shutil.copytree(source, missing_source)
+        (missing_source / detail_relative).unlink()
+        try:
+            check_staged_source(missing_source, expected_catalog_path, revision)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("staged source accepted a missing canonical detail page")
+    finally:
+        shutil.rmtree(missing_temporary)
     replacements = (
         (
             "implementation status",
-            "formalization/sources/tasaki-2020.md",
+            "formalization/records/tasaki-2020-theorem-3-1-finite-dimensional-core.md",
             '<dd data-field="implementation-state">implemented</dd>',
             '<dd data-field="implementation-state">in_progress</dd>',
         ),
         (
             "Lean name",
-            "formalization/sources/nielsen-chuang-2010.md",
+            "formalization/records/tasaki-2020-section-2-1-pauli-x-involutive.md",
             '<dd data-field="lean-name">LatticeSystem.Quantum.pauliX_mul_self</dd>',
             '<dd data-field="lean-name">LatticeSystem.Quantum.changed</dd>',
         ),
         (
             "module",
-            "formalization/sources/nielsen-chuang-2010.md",
+            "formalization/records/tasaki-2020-section-2-1-pauli-x-involutive.md",
             '<dd data-field="module">LatticeSystem.Quantum.Pauli</dd>',
             '<dd data-field="module">LatticeSystem.Quantum.Changed</dd>',
         ),
         (
             "axiom dependency",
-            "formalization/sources/shastry-1992.md",
+            "formalization/records/shastry-1992-staggered-susceptibility-bound.md",
             '<dd data-field="axiom-dependency">'
             "LatticeSystem.Quantum.shastry_staggered_susceptibility_bound</dd>",
             '<dd data-field="axiom-dependency">LatticeSystem.Quantum.changed</dd>',
         ),
         (
             "citation locator",
-            "formalization/sources/nielsen-chuang-2010.md",
+            "formalization/records/tasaki-2020-section-2-1-pauli-x-involutive.md",
             "exercise 2.41; section 2.1.3; pages 78",
             "exercise 2.41; section 2.1.3; pages 79",
         ),
         (
             "summary",
-            "formalization/sources/nielsen-chuang-2010.md",
+            "formalization/records/tasaki-2020-section-2-1-pauli-x-involutive.md",
             '<h3 data-field="summary">The Pauli X matrix squares to the identity.</h3>',
             '<h3 data-field="summary">The Pauli X matrix has changed.</h3>',
         ),
@@ -1364,7 +1659,9 @@ def run_staged_mutation_tests(
             raise AssertionError(f"mutation fixture text is absent: {label}")
         mutation_cases.append((label, relative, original.replace(before, after, 1)))
 
-    pauli_relative = "formalization/sources/nielsen-chuang-2010.md"
+    pauli_relative = (
+        "formalization/records/tasaki-2020-section-2-1-pauli-x-involutive.md"
+    )
     pauli_text = (source / pauli_relative).read_text(encoding="utf-8")
     human_row = (
         '<dt data-label-for="human-status">Human status</dt>\n'
@@ -1581,7 +1878,9 @@ def run_staged_mutation_tests(
             ),
         )
     )
-    shastry_relative = "formalization/topics/symmetry-breaking.md"
+    shastry_relative = (
+        "formalization/records/shastry-1992-staggered-susceptibility-bound.md"
+    )
     shastry_text = (source / shastry_relative).read_text(encoding="utf-8")
     citation_rows = re.findall(
         r'<dt data-label-for="citation">.*?</dt>\n<dd data-field="citation"[^>]*>.*?</dd>',
@@ -1765,6 +2064,20 @@ def run_self_tests() -> None:
         else:
             raise AssertionError("invalid catalogue mutation was accepted")
 
+        record_tree = temporary / "record-tree"
+        rendered_record = record_tree / "formalization/records/fixture-record"
+        rendered_record.mkdir(parents=True)
+        (rendered_record / "index.html").write_text("fixture", encoding="utf-8")
+        record_catalog = {"records": [{"id": "fixture-record"}]}
+        check_built_record_outputs(record_tree, record_catalog)
+        (rendered_record / "poison.txt").write_text("poison", encoding="utf-8")
+        try:
+            check_built_record_outputs(record_tree, record_catalog)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("rendered record output accepted an unexpected file")
+
         project_record = {
             "axiom_dependencies": [],
             "capstone": False,
@@ -1775,10 +2088,12 @@ def run_self_tests() -> None:
             "module": "LatticeSystem.Fixture",
             "origin": "project_original",
             "source_coverage": "not_applicable",
+            "source_path": "LatticeSystem/Fixture.lean",
             "source_relations": [],
             "summary": "Lieb's \"theorem\" in LatticeSystem.Fixture",
             "topic_ids": ["fixture-topic"],
             "trust_state": "axiom_free",
+            "proof_guide_anchor": None,
         }
         project_catalog = {
             "records": [project_record],
@@ -1797,6 +2112,7 @@ def run_self_tests() -> None:
             "module": "LatticeSystem.Fixture",
             "origin": "literature",
             "source_coverage": "complete",
+            "source_path": "LatticeSystem/Fixture.lean",
             "source_relations": [
                 {"relation": "formalizes", "source_item_id": "fixture-theorem"},
                 {"relation": "supports", "source_item_id": "fixture-equation"},
@@ -1804,6 +2120,7 @@ def run_self_tests() -> None:
             "summary": hostile_text,
             "topic_ids": ["fixture-topic", "second-topic"],
             "trust_state": "depends_on_documented_axioms",
+            "proof_guide_anchor": "fixture-anchor",
         }
         literature_catalog = {
             "records": [literature_record],
@@ -1845,7 +2162,7 @@ def run_self_tests() -> None:
 
         def fixture_html(record: dict[str, Any], catalog: dict[str, Any]) -> str:
             """Render an independent structured HTML fixture for checker tests."""
-            heading, fields = expected_record_structure(record, catalog, None)
+            heading, fields = expected_record_structure(record, catalog)
             result = [
                 f'<article id="record-{record["id"]}" data-record-id="{record["id"]}">',
                 f'<h3 data-field="summary">{fixture_escape(heading)}</h3>',
@@ -1876,7 +2193,6 @@ def run_self_tests() -> None:
                 parse_record_html(value, label),
                 [record],
                 catalog,
-                None,
                 label,
             )
 

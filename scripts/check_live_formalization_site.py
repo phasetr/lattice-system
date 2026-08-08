@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import re
 import time
@@ -17,18 +18,24 @@ from urllib.parse import urljoin
 from check_generated_site import (
     PageParser,
     assert_metadata,
+    canonical_record_href,
     expected_overview_index_rows,
+    expected_projection_rows,
+    expected_record_structure,
     expected_source_index_rows,
     expected_status_index_rows,
     expected_topic_index_rows,
     parse_record_html,
+    records_for_source,
+    records_for_topic,
     reject_authority_contradictions,
     require_index_rows,
+    validate_record_blocks,
 )
 
 
 PAGES_BASE = "https://phasetr.github.io/lattice-system/"
-HUMAN_ENDPOINTS = (
+CORE_HUMAN_ENDPOINTS = (
     "formalization/",
     "formalization/status/",
     "formalization/sources/",
@@ -39,10 +46,16 @@ JSON_ENDPOINTS = (
     "formalization-status/v1/schema.json",
     "formalization-status/v1/publication.json",
 )
-ENDPOINTS = (*HUMAN_ENDPOINTS, *JSON_ENDPOINTS)
+BOOTSTRAP_ENDPOINTS = (*CORE_HUMAN_ENDPOINTS, *JSON_ENDPOINTS)
+COMPATIBILITY_RECORD_IDS = (
+    "shastry-1992-staggered-susceptibility-bound",
+    "tasaki-2020-section-2-1-pauli-x-involutive",
+    "tasaki-2020-theorem-3-1-finite-dimensional-core",
+    "tasaki-2020-theorem-4-2-shastry-no-ssb",
+)
 SHA256_RE = re.compile(r"[0-9a-f]{64}")
 REVISION_RE = re.compile(r"[0-9a-f]{40}")
-MAX_BODY_BYTES = 2 * 1024 * 1024
+MAX_BODY_BYTES = 8 * 1024 * 1024
 MAX_DEADLINE_SECONDS = 240
 
 
@@ -177,16 +190,120 @@ def require_navigation(
     )
 
 
+def expected_human_endpoints(catalog: dict[str, object]) -> tuple[str, ...]:
+    """Derive the bounded live surface: all projections plus pinned compatibility details."""
+    sources = catalog.get("sources")
+    topics = catalog.get("topics")
+    records = catalog.get("records")
+    if not isinstance(sources, list) or not isinstance(topics, list) or not isinstance(records, list):
+        raise ValueError("catalogue human-route registries must be arrays")
+    source_ids = [item.get("id") for item in sources if isinstance(item, dict)]
+    topic_ids = [item.get("id") for item in topics if isinstance(item, dict)]
+    record_ids = {item.get("id") for item in records if isinstance(item, dict)}
+    if (
+        len(source_ids) != len(sources)
+        or len(topic_ids) != len(topics)
+        or any(not isinstance(item, str) for item in [*source_ids, *topic_ids])
+    ):
+        raise ValueError("catalogue source/topic route IDs are invalid")
+    missing_compatibility = set(COMPATIBILITY_RECORD_IDS) - record_ids
+    if missing_compatibility:
+        raise ValueError(
+            f"catalogue removed pinned public record routes: {sorted(missing_compatibility)}"
+        )
+    return (
+        *CORE_HUMAN_ENDPOINTS,
+        *(f"formalization/sources/{identifier}/" for identifier in source_ids),
+        "formalization/sources/foundations/",
+        *(f"formalization/topics/{identifier}/" for identifier in topic_ids),
+        *(f"formalization/records/{identifier}/" for identifier in COMPATIBILITY_RECORD_IDS),
+    )
+
+
+def require_projection_surface(
+    pages: dict[str, PageParser], catalog: dict[str, object]
+) -> None:
+    """Require exact live source/topic/status membership and pinned record details."""
+    typed_catalog = catalog  # Runtime checks below consume the JSON object structurally.
+    for source in typed_catalog["sources"]:  # type: ignore[index]
+        source_id = source["id"]
+        endpoint = f"formalization/sources/{source_id}/"
+        parser = pages[endpoint]
+        require_index_rows(
+            parser,
+            expected_projection_rows(
+                records_for_source(typed_catalog, source_id), "source", source_id  # type: ignore[arg-type]
+            ),
+            endpoint,
+        )
+        if parser.record_fields:
+            raise ValueError(f"{endpoint}: projection duplicates full record truth")
+    foundation_endpoint = "formalization/sources/foundations/"
+    project_records = [
+        record
+        for record in typed_catalog["records"]  # type: ignore[index]
+        if record["origin"] == "project_original"
+    ]
+    require_index_rows(
+        pages[foundation_endpoint],
+        expected_projection_rows(project_records, "source", "foundations"),
+        foundation_endpoint,
+    )
+    if pages[foundation_endpoint].record_fields:
+        raise ValueError(f"{foundation_endpoint}: projection duplicates full record truth")
+    for topic in typed_catalog["topics"]:  # type: ignore[index]
+        topic_id = topic["id"]
+        endpoint = f"formalization/topics/{topic_id}/"
+        parser = pages[endpoint]
+        require_index_rows(
+            parser,
+            expected_projection_rows(
+                records_for_topic(typed_catalog, topic_id), "topic", topic_id  # type: ignore[arg-type]
+            ),
+            endpoint,
+        )
+        if parser.record_fields:
+            raise ValueError(f"{endpoint}: projection duplicates full record truth")
+    if pages["formalization/status/"].record_fields:
+        raise ValueError("formalization/status/: projection duplicates full record truth")
+    record_map = {
+        record["id"]: record for record in typed_catalog["records"]  # type: ignore[index]
+    }
+    item_map = {
+        item["id"]: item for item in typed_catalog["source_items"]  # type: ignore[index]
+    }
+    for record_id in COMPATIBILITY_RECORD_IDS:
+        endpoint = f"formalization/records/{record_id}/"
+        record = record_map[record_id]
+        validate_record_blocks(pages[endpoint], [record], typed_catalog, endpoint)  # type: ignore[arg-type]
+        href = canonical_record_href(record_id)
+        anchor = f"record-{record_id}"
+        related_sources = {
+            item_map[relation["source_item_id"]]["source_id"]
+            for relation in record["source_relations"]
+        }
+        compatibility_pages = [
+            pages["formalization/status/"],
+            *(pages[f"formalization/sources/{source_id}/"] for source_id in related_sources),
+            *(pages[f"formalization/topics/{topic_id}/"] for topic_id in record["topic_ids"]),
+        ]
+        if record["origin"] == "project_original":
+            compatibility_pages.append(pages[foundation_endpoint])
+        if not all(anchor in parser.ids and href in parser.links for parser in compatibility_pages):
+            raise ValueError(f"{endpoint}: a pinned legacy projection anchor/link is missing")
+
+
 def verify_responses(
     responses: dict[str, Response],
     base_url: str,
     revision: str,
     canonical_schema_bytes: bytes,
 ) -> None:
-    """Validate all seven endpoint responses as one coherent publication."""
+    """Validate one coherent machine surface and scalable human projection snapshot."""
     validate_base_url(base_url)
-    if set(responses) != set(ENDPOINTS):
-        raise ValueError("live response set does not match the seven required endpoints")
+    missing_bootstrap = set(BOOTSTRAP_ENDPOINTS) - set(responses)
+    if missing_bootstrap:
+        raise ValueError(f"live response set lacks bootstrap endpoints: {sorted(missing_bootstrap)}")
     for endpoint, response in responses.items():
         if len(response.body) > MAX_BODY_BYTES:
             raise ValueError(f"{endpoint}: response body exceeds the byte limit")
@@ -195,6 +312,9 @@ def verify_responses(
             raise ValueError(f"{endpoint}: unexpected redirect to {response.final_url}")
 
     catalog = parse_json(responses[JSON_ENDPOINTS[0]], JSON_ENDPOINTS[0])
+    expected_endpoints = {*JSON_ENDPOINTS, *expected_human_endpoints(catalog)}
+    if set(responses) != expected_endpoints:
+        raise ValueError("live response set does not match the catalogue-derived route surface")
     schema_response = responses[JSON_ENDPOINTS[1]]
     schema = parse_json(schema_response, JSON_ENDPOINTS[1])
     publication = parse_json(responses[JSON_ENDPOINTS[2]], JSON_ENDPOINTS[2])
@@ -223,7 +343,7 @@ def verify_responses(
 
     pages = {
         endpoint: parse_human(responses[endpoint], endpoint)
-        for endpoint in HUMAN_ENDPOINTS
+        for endpoint in expected_human_endpoints(catalog)
     }
     reject_authority_contradictions(
         catalog,
@@ -232,6 +352,7 @@ def verify_responses(
     for endpoint, parser in pages.items():
         require_metadata(parser, endpoint, catalog, revision)
     require_navigation(pages, catalog)
+    require_projection_surface(pages, catalog)
 
 
 def fetch_publication(
@@ -241,9 +362,22 @@ def fetch_publication(
     deadline_at: float,
     monotonic: Callable[[], float],
 ) -> dict[str, Response]:
-    """Fetch one coherent seven-endpoint snapshot within the absolute deadline."""
+    """Fetch one coherent catalogue-derived snapshot within the absolute deadline."""
     responses = {}
-    for endpoint in ENDPOINTS:
+    for endpoint in BOOTSTRAP_ENDPOINTS:
+        remaining = deadline_at - monotonic()
+        if remaining <= 0:
+            raise ValueError("live publication deadline expired during a snapshot")
+        responses[endpoint] = fetcher(
+            urljoin(base_url, endpoint), min(timeout, remaining)
+        )
+    catalog = parse_json(responses[JSON_ENDPOINTS[0]], JSON_ENDPOINTS[0])
+    additional = [
+        endpoint
+        for endpoint in expected_human_endpoints(catalog)
+        if endpoint not in responses
+    ]
+    for endpoint in additional:
         remaining = deadline_at - monotonic()
         if remaining <= 0:
             raise ValueError("live publication deadline expired during a snapshot")
@@ -299,7 +433,7 @@ def verify_with_retry(
     raise ValueError(f"live publication check failed after {attempts} attempt(s): {last_error}")
 
 
-def fixture_responses(
+def legacy_fixture_responses(
     revision: str, catalog_state: str = "prototype"
 ) -> dict[str, Response]:
     """Build a coherent in-memory publication for dependency-free self-tests."""
@@ -411,6 +545,161 @@ def fixture_responses(
     }
 
 
+def fixture_responses(
+    revision: str, catalog_state: str = "prototype"
+) -> dict[str, Response]:
+    """Build a complete scalable-route fixture for dependency-free self-tests."""
+    digest = "a" * 64
+    catalog_href = "/lattice-system/formalization-status/v1/catalog.json"
+    schema_href = "/lattice-system/formalization-status/v1/schema.json"
+    publication_href = "/lattice-system/formalization-status/v1/publication.json"
+    authority_href = (
+        catalog_href
+        if catalog_state == "authoritative"
+        else "/lattice-system/formalization/legacy/"
+    )
+    authority_label = (
+        "Current authority: validated version 1 catalogue"
+        if catalog_state == "authoritative"
+        else "Current authority: complete interim legacy catalogue"
+    )
+    metadata = (
+        '<p>Generated formalization-status view.</p><ul data-generated-metadata="true">'
+        f'<li data-meta="catalog-state">Catalogue state: {catalog_state}</li>'
+        '<li data-meta="schema-version">Schema version: 1</li>'
+        f'<li data-meta="input-sha256">Input SHA-256: {digest}</li>'
+        f'<li data-meta="revision">Deploy revision: {revision}</li>'
+        f'<li data-meta="catalog-link" data-href="{catalog_href}">'
+        f'<a href="{catalog_href}">Machine data: version 1 catalogue</a></li>'
+        f'<li data-meta="schema-link" data-href="{schema_href}">'
+        f'<a href="{schema_href}">Schema: version 1 schema</a></li>'
+        f'<li data-meta="publication-link" data-href="{publication_href}">'
+        f'<a href="{publication_href}">Build metadata: publication sidecar</a></li>'
+        f'<li data-meta="authority-link" data-href="{authority_href}">'
+        f'<a href="{authority_href}">{authority_label}</a></li></ul>'
+    )
+    records = []
+    for index, record_id in enumerate(COMPATIBILITY_RECORD_IDS):
+        records.append(
+            {
+                "axiom_dependencies": [],
+                "capstone": bool(index % 2),
+                "declaration_kind": "theorem",
+                "id": record_id,
+                "implementation_state": "implemented",
+                "lean_name": f"LatticeSystem.Fixture.result{index}",
+                "module": "LatticeSystem.Fixture",
+                "origin": "literature",
+                "proof_guide_anchor": None,
+                "source_coverage": "complete",
+                "source_path": "LatticeSystem/Fixture.lean",
+                "source_relations": [
+                    {"source_item_id": "book-item", "relation": "formalizes"}
+                ],
+                "summary": f"Fixture result {index}",
+                "topic_ids": ["spin"],
+                "trust_state": "axiom_free",
+            }
+        )
+    catalog: dict[str, object] = {
+        "schema_version": 1,
+        "catalog_state": catalog_state,
+        "input_sha256": digest,
+        "sources": [{"id": "book", "title": "Book"}],
+        "source_items": [
+            {
+                "equations": [],
+                "id": "book-item",
+                "item_kind": "theorem",
+                "item_number": "1",
+                "pages": "1",
+                "section": "1",
+                "source_id": "book",
+                "title": "Book result",
+            }
+        ],
+        "topics": [{"id": "spin", "label": "Spin"}],
+        "records": records,
+    }
+
+    def rows_html(
+        rows: list[tuple[str, tuple[tuple[str, str], ...], str | None, str]]
+    ) -> str:
+        """Render independent exact structured rows for the live fixture."""
+        result = []
+        for kind, attributes, anchor_href, visible in rows:
+            rendered = []
+            for key, value in attributes:
+                name = "id" if key == "id" else f"data-{key}"
+                rendered.append(f' {name}="{html.escape(value, quote=True)}"')
+            content = html.escape(visible, quote=False)
+            if anchor_href is not None:
+                content = (
+                    f'<a href="{html.escape(anchor_href, quote=True)}">{content}</a>'
+                )
+            result.append(
+                f'<li data-row-kind="{kind}"{"".join(rendered)}>{content}</li>'
+            )
+        return "".join(result)
+
+    def record_html(record: dict[str, object]) -> str:
+        """Render an independent full record article from checker expectations."""
+        heading, fields = expected_record_structure(record, catalog)  # type: ignore[arg-type]
+        body = [
+            f'<article id="record-{record["id"]}" data-record-id="{record["id"]}">',
+            f'<h3 data-field="summary">{html.escape(heading)}</h3><dl>',
+        ]
+        for label, name, attributes, value in fields:
+            extra = "".join(
+                f' data-{key}="{html.escape(item, quote=True)}"'
+                for key, item in attributes
+            )
+            body.append(
+                f'<dt data-label-for="{name}">{html.escape(label)}</dt>'
+                f'<dd data-field="{name}"{extra}>{html.escape(value)}</dd>'
+            )
+        body.append("</dl></article>")
+        return "".join(body)
+
+    human: dict[str, str] = {
+        "formalization/": metadata
+        + rows_html(expected_overview_index_rows(catalog)),  # type: ignore[arg-type]
+        "formalization/status/": metadata
+        + rows_html(expected_status_index_rows(catalog)),  # type: ignore[arg-type]
+        "formalization/sources/": metadata
+        + rows_html(expected_source_index_rows(catalog)),  # type: ignore[arg-type]
+        "formalization/topics/": metadata
+        + rows_html(expected_topic_index_rows(catalog)),  # type: ignore[arg-type]
+        "formalization/sources/book/": metadata
+        + rows_html(expected_projection_rows(records, "source", "book")),
+        "formalization/sources/foundations/": metadata
+        + rows_html(expected_projection_rows([], "source", "foundations")),
+        "formalization/topics/spin/": metadata
+        + rows_html(expected_projection_rows(records, "topic", "spin")),
+    }
+    for record in records:
+        human[f'formalization/records/{record["id"]}/'] = metadata + record_html(record)
+    publication = {
+        "schema_version": 1,
+        "catalog_state": catalog_state,
+        "input_sha256": digest,
+        "revision": revision,
+    }
+    payloads: dict[str, tuple[str, bytes]] = {
+        **{key: ("text/html", value.encode()) for key, value in human.items()},
+        JSON_ENDPOINTS[0]: ("application/json", json.dumps(catalog).encode()),
+        JSON_ENDPOINTS[1]: (
+            "application/json",
+            json.dumps({"$id": PAGES_BASE + JSON_ENDPOINTS[1]}).encode(),
+        ),
+        JSON_ENDPOINTS[2]: ("application/json", json.dumps(publication).encode()),
+    }
+    return {
+        endpoint: Response(200, content_type, body, urljoin(PAGES_BASE, endpoint))
+        for endpoint, (content_type, body) in payloads.items()
+    }
+
+
 def run_self_tests() -> None:
     """Exercise positive, retry, and representative semantic failure paths."""
     revision = "1" * 40
@@ -443,6 +732,110 @@ def run_self_tests() -> None:
         pass
     else:
         raise AssertionError("authoritative live page accepted stale legacy-authority prose")
+
+    def changed_response(endpoint: str, old: bytes, new: bytes) -> dict[str, Response]:
+        """Replace one unique byte sequence in a coherent live fixture."""
+        changed = dict(fixture)
+        original = changed[endpoint]
+        if original.body.count(old) != 1:
+            raise AssertionError(f"A2 live mutation target is not unique: {old!r}")
+        changed[endpoint] = Response(
+            original.status,
+            original.content_type,
+            original.body.replace(old, new, 1),
+            original.final_url,
+        )
+        return changed
+
+    first_id = COMPATIBILITY_RECORD_IDS[0]
+    first_detail = f"formalization/records/{first_id}/"
+    negative_fixtures = [
+        (
+            "wrong canonical detail field",
+            changed_response(
+                first_detail,
+                b'<dd data-field="implementation-state">implemented</dd>',
+                b'<dd data-field="implementation-state">in_progress</dd>',
+            ),
+        ),
+        (
+            "wrong compact projection link",
+            changed_response(
+                "formalization/sources/book/",
+                f'data-href="{canonical_record_href(first_id)}"'.encode(),
+                b'data-href="/lattice-system/formalization/records/wrong/"',
+            ),
+        ),
+        (
+            "missing compatibility anchor",
+            changed_response(
+                "formalization/topics/spin/",
+                f'id="record-{first_id}"'.encode(),
+                b'id="record-wrong"',
+            ),
+        ),
+    ]
+    wrong_revision = dict(json.loads(fixture[JSON_ENDPOINTS[2]].body))
+    wrong_revision["revision"] = "2" * 40
+    revision_fixture = dict(fixture)
+    publication_response = revision_fixture[JSON_ENDPOINTS[2]]
+    revision_fixture[JSON_ENDPOINTS[2]] = Response(
+        publication_response.status,
+        publication_response.content_type,
+        json.dumps(wrong_revision).encode(),
+        publication_response.final_url,
+    )
+    negative_fixtures.append(("wrong revision", revision_fixture))
+    missing_detail = dict(fixture)
+    missing_detail.pop(first_detail)
+    negative_fixtures.append(("missing pinned record route", missing_detail))
+    removed_record = dict(fixture)
+    removed_catalog = dict(json.loads(removed_record[JSON_ENDPOINTS[0]].body))
+    removed_catalog["records"] = [
+        record for record in removed_catalog["records"] if record["id"] != first_id
+    ]
+    catalog_response = removed_record[JSON_ENDPOINTS[0]]
+    removed_record[JSON_ENDPOINTS[0]] = Response(
+        catalog_response.status,
+        catalog_response.content_type,
+        json.dumps(removed_catalog).encode(),
+        catalog_response.final_url,
+    )
+    negative_fixtures.append(("removed pinned record identity", removed_record))
+    for label, changed in negative_fixtures:
+        try:
+            verify_responses(changed, PAGES_BASE, revision, canonical_schema)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"live A2 semantic mutation was accepted: {label}")
+
+    calls = 0
+    clock = [0.0]
+    sleeps: list[float] = []
+
+    def flaky_fetcher(url: str, timeout: float) -> Response:
+        """Fail once, then serve the complete catalogue-derived fixture."""
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            raise urllib.error.URLError("not propagated")
+        return fixture[url.removeprefix(PAGES_BASE)]
+
+    verify_with_retry(
+        PAGES_BASE,
+        revision,
+        attempts=2,
+        initial_delay=1,
+        timeout=1,
+        deadline=30,
+        canonical_schema_bytes=canonical_schema,
+        fetcher=flaky_fetcher,
+        sleep=lambda delay: (sleeps.append(delay), clock.__setitem__(0, clock[0] + delay)),
+        monotonic=lambda: clock[0],
+    )
+    if sleeps != [1]:
+        raise AssertionError("bounded A2 retry self-test used an unexpected delay")
     mutations: list[tuple[str, dict[str, Response]]] = []
 
     def mutate(endpoint: str, old: bytes, new: bytes) -> dict[str, Response]:
@@ -466,7 +859,7 @@ def run_self_tests() -> None:
     source_row = source_row_start + source_body.split(source_row_start, 1)[1].split(
         b"</li>", 1
     )[0] + b"</li>"
-    status_row_start = b'<li data-row-kind="status"'
+    status_row_start = b'<li data-row-kind="status-count"'
     status_body = fixture["formalization/status/"].body
     status_row = status_row_start + status_body.split(status_row_start, 1)[1].split(
         b"</li>", 1
@@ -506,8 +899,8 @@ def run_self_tests() -> None:
             "wrong count",
             mutate(
                 "formalization/sources/",
-                b'data-record-count="1"',
-                b'data-record-count="2"',
+                b'data-record-count="4"',
+                b'data-record-count="5"',
             ),
         ),
         (
@@ -522,8 +915,8 @@ def run_self_tests() -> None:
             "wrong visible label",
             mutate(
                 "formalization/topics/",
-                b">Spin: 1 record(s)</a>",
-                b">Wrong: 1 record(s)</a>",
+                b">Spin: 4 record(s)</a>",
+                b">Wrong: 4 record(s)</a>",
             ),
         ),
         (
@@ -548,7 +941,7 @@ def run_self_tests() -> None:
                 "formalization/status/",
                 status_row,
                 status_row
-                + b'<li data-row-kind="status" data-status-label="extra" '
+                + b'<li data-row-kind="status-count" data-status-label="extra" '
                 + b'data-record-count="1">extra: 1</li>',
             ),
         ),

@@ -17,7 +17,7 @@ from typing import Any
 from urllib.parse import unquote, urlsplit
 
 
-GENERATOR_VERSION = 1
+GENERATOR_VERSION = 2
 MARKER_RE = re.compile(
     r"(?ms)^<!-- formalization-status-generated:start ([^\n]+) -->\n.*?"
     r"^<!-- formalization-status-generated:end -->$"
@@ -28,6 +28,9 @@ OWNERSHIP_MARKER_RE = re.compile(
 )
 REVISION_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._/-]{0,199}")
 BASEURL = "/lattice-system"
+ROUTE_ID_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
+RESERVED_SOURCE_ROUTE_IDS = {"foundations", "index"}
+RESERVED_TOPIC_ROUTE_IDS = {"index"}
 
 
 def html_text(value: Any) -> str:
@@ -77,7 +80,7 @@ def pin_referenced_fragments(source_root: Path) -> int:
     pinned = 0
     for path, fragments in sorted(targets.items()):
         text = texts[path]
-        explicit = set(re.findall(r'<a\s+id="([^"]+)"\s*></a>', text))
+        explicit = set(re.findall(r'<[A-Za-z][^>]*\sid="([^"]+)"[^>]*>', text))
         explicit.update(re.findall(r"(?m)^\{:\s+#([^ }]+)\s*\}$", text))
         pending = fragments - explicit
         if not pending:
@@ -171,9 +174,8 @@ def record_lines(
     record: dict[str, Any],
     source_items: dict[str, dict[str, Any]],
     sources: dict[str, dict[str, Any]],
-    relation_filter: str | None = None,
 ) -> list[str]:
-    """Render one record as escaped, structured raw HTML for Kramdown."""
+    """Render one canonical record detail as escaped structured HTML."""
     def field(label: str, name: str, value: Any, **attributes: Any) -> list[str]:
         """Render one visible label/value pair with escaped data attributes."""
         rendered_attributes = "".join(
@@ -193,24 +195,31 @@ def record_lines(
     for label, name, value in (
         ("Record ID", "record-id", record["id"]),
         ("Lean declaration", "lean-name", record["lean_name"]),
+        ("Declaration kind", "declaration-kind", record["declaration_kind"]),
         ("Human status", "human-status", human_status(record)),
         ("Implementation state", "implementation-state", record["implementation_state"]),
         ("Source coverage", "source-coverage", record["source_coverage"]),
         ("Trust state", "trust-state", record["trust_state"]),
         ("Capstone", "capstone", str(record["capstone"]).lower()),
         ("Module", "module", record["module"]),
+        ("Source path", "source-path", record["source_path"]),
+        ("Origin", "origin", record["origin"]),
     ):
         lines.extend(field(label, name, value))
+    for topic_id in record["topic_ids"]:
+        lines.extend(field("Topic", "topic-id", topic_id))
     dependencies = record["axiom_dependencies"]
     if dependencies:
         for item in dependencies:
             lines.extend(field("Axiom dependency", "axiom-dependency", item))
     else:
         lines.extend(field("Axiom dependency", "axiom-dependency", "none", empty="true"))
+    if record["proof_guide_anchor"] is None:
+        lines.extend(field("Proof-guide anchor", "proof-guide-anchor", "none", empty="true"))
+    else:
+        lines.extend(field("Proof-guide anchor", "proof-guide-anchor", record["proof_guide_anchor"]))
     for relation in record["source_relations"]:
         item = source_items[relation["source_item_id"]]
-        if relation_filter is not None and item["source_id"] != relation_filter:
-            continue
         source = sources[item["source_id"]]
         lines.extend(
             field(
@@ -246,6 +255,46 @@ def index_row(
         rendered += f' data-href="{html_text(href)}"'
         content = f'<a href="{html_text(href)}">{content}</a>'
     return f'<li data-row-kind="{html_text(kind)}"{rendered}>{content}</li>'
+
+
+def record_href(record_id: str) -> str:
+    """Return the sole canonical human route for one record's full detail."""
+    return f"{BASEURL}/formalization/records/{record_id}/"
+
+
+def projection_row(record: dict[str, Any], projection_kind: str, projection_id: str) -> str:
+    """Render one compact record link while preserving legacy record fragments."""
+    href = record_href(record["id"])
+    return (
+        f'<li id="record-{html_text(record["id"])}" '
+        f'data-row-kind="record-projection" '
+        f'data-projection-kind="{html_text(projection_kind)}" '
+        f'data-projection-id="{html_text(projection_id)}" '
+        f'data-record-id="{html_text(record["id"])}" '
+        f'data-href="{html_text(href)}"><a href="{html_text(href)}">'
+        f'{html_text(record["summary"])}</a></li>'
+    )
+
+
+def projection_lines(
+    records: list[dict[str, Any]], projection_kind: str, projection_id: str
+) -> list[str]:
+    """Render an exact count followed by compact canonical-record links."""
+    return [
+        '<ul data-index="record-projection">',
+        index_row(
+            "projection-count",
+            {
+                "projection-kind": projection_kind,
+                "projection-id": projection_id,
+                "record-count": len(records),
+            },
+            f"{len(records)} record(s)",
+        ),
+        *(projection_row(record, projection_kind, projection_id) for record in records),
+        "</ul>",
+        "",
+    ]
 
 
 def render_marker(
@@ -313,16 +362,21 @@ def render_marker(
         for record in records:
             label = human_status(record)
             counts[label] = counts.get(label, 0) + 1
-        lines.extend(("## Generated status summary", "", '<ul data-index="status">'))
+        lines.extend(("## Generated status projections", "", '<ul data-index="status">'))
         for label in sorted(counts):
             lines.append(
                 index_row(
-                    "status",
+                    "status-count",
                     {"status-label": label, "record-count": counts[label]},
                     f"{label}: {counts[label]}",
                 )
             )
-        lines.extend(("</ul>", "", "The three machine status dimensions remain visible on every record page.", ""))
+            lines.extend(
+                projection_row(record, "status", label)
+                for record in records
+                if human_status(record) == label
+            )
+        lines.extend(("</ul>", "", "The three machine status dimensions are visible only on each canonical record page.", ""))
     elif kind == "source-index" and argument is None:
         lines.extend(("## Generated source index", "", '<ul data-index="sources">'))
         for source_id, source in sorted(sources.items()):
@@ -351,30 +405,19 @@ def render_marker(
         lines.extend(("</ul>", ""))
     elif kind == "source" and argument in sources:
         selected = [record for record in records if source_for_record(record, source_items, argument)]
-        lines.extend(("## Generated records related to this source", ""))
-        if not selected:
-            lines.extend(
-                (
-                    f"No {aggregate['catalog_state']} record currently has a typed "
-                    "relation to this source.",
-                    "",
-                )
+        lines.extend(
+            (
+                f'<h2 data-heading-kind="source" data-source-id="{html_text(argument)}" '
+                f'data-source-title="{html_text(sources[argument].get("title", argument))}">'
+                "Generated record projection</h2>",
+                "",
             )
-        for record in selected:
-            lines.extend(record_lines(record, source_items, sources, argument))
+        )
+        lines.extend(projection_lines(selected, "source", argument))
     elif kind == "project-original" and argument is None:
         selected = [record for record in records if record["origin"] == "project_original"]
-        lines.extend(("## Generated project-original foundation records", ""))
-        if not selected:
-            lines.extend(
-                (
-                    "No project-original record is present in this "
-                    f"{aggregate['catalog_state']} catalogue.",
-                    "",
-                )
-            )
-        for record in selected:
-            lines.extend(record_lines(record, source_items, sources))
+        lines.extend(("## Generated project-original foundation projection", ""))
+        lines.extend(projection_lines(selected, "source", "foundations"))
     elif kind == "topic-index" and argument is None:
         lines.extend(("## Generated topic index", "", '<ul data-index="topics">'))
         for topic_id, topic in sorted(topics.items()):
@@ -402,8 +445,13 @@ def render_marker(
                 "",
             )
         )
-        for record in selected:
-            lines.extend(record_lines(record, source_items, sources))
+        lines.extend(projection_lines(selected, "topic", argument))
+    elif kind == "record" and argument is not None:
+        matching = [record for record in records if record["id"] == argument]
+        if len(matching) != 1:
+            raise ValueError(f"unknown generated record marker: {argument}")
+        lines.extend(("## Canonical record detail", ""))
+        lines.extend(record_lines(matching[0], source_items, sources))
     else:
         raise ValueError(f"unknown generated marker specification: {specification}")
 
@@ -452,11 +500,16 @@ def safe_output(repo_root: Path, requested: Path) -> Path:
     return resolved
 
 
-def validate_marker_ownership(docs_root: Path, expected_specs: set[str]) -> None:
-    """Require empty, unique, complete canonical markers and a free machine-output root."""
+def validate_marker_ownership(
+    docs_root: Path, required_specs: set[str], allowed_specs: set[str]
+) -> None:
+    """Require strict committed-marker ownership and free generated roots."""
     machine_root = docs_root / "formalization-status"
     if machine_root.exists() or machine_root.is_symlink():
         raise ValueError(f"committed documentation owns generated machine output: {machine_root}")
+    records_root = docs_root / "formalization" / "records"
+    if records_root.exists() or records_root.is_symlink():
+        raise ValueError(f"committed documentation owns generated record output: {records_root}")
     found: list[str] = []
     start_count = 0
     end_count = 0
@@ -475,21 +528,114 @@ def validate_marker_ownership(docs_root: Path, expected_specs: set[str]) -> None
         raise ValueError("canonical generated markers are malformed or unpaired")
     if len(found) != len(set(found)):
         raise ValueError("canonical generated marker specifications collide")
-    if set(found) != expected_specs:
+    found_specs = set(found)
+    if not required_specs <= found_specs or not found_specs <= allowed_specs:
         raise ValueError(
-            f"canonical generated marker set mismatch: expected {sorted(expected_specs)}, found {sorted(found)}"
+            "canonical generated marker set mismatch: "
+            f"required {sorted(required_specs)}, allowed {sorted(allowed_specs)}, "
+            f"found {sorted(found_specs)}"
         )
 
 
-def canonical_marker_specs(repo_root: Path) -> set[str]:
-    """Derive the required canonical marker ownership from checked-in registries."""
+def canonical_marker_specs(repo_root: Path) -> tuple[set[str], set[str]]:
+    """Derive required and optional committed markers from checked-in registries."""
     root = repo_root / "formalization-status/v1"
     sources = json.loads((root / "sources.json").read_text(encoding="utf-8"))["sources"]
     topics = json.loads((root / "topics.json").read_text(encoding="utf-8"))["topics"]
-    result = {"overview", "project-original", "source-index", "status", "topic-index"}
-    result.update(f"source {item['id']}" for item in sources)
-    result.update(f"topic {item['id']}" for item in topics)
-    return result
+    required = {"overview", "project-original", "source-index", "status", "topic-index"}
+    allowed = set(required)
+    allowed.update(f"source {item['id']}" for item in sources)
+    allowed.update(f"topic {item['id']}" for item in topics)
+    return required, allowed
+
+
+def require_route_id(identifier: str, label: str) -> None:
+    """Reject any registry identifier that is unsafe as one flat route segment."""
+    if ROUTE_ID_RE.fullmatch(identifier) is None:
+        raise ValueError(f"unsafe {label} route identifier: {identifier!r}")
+
+
+def dynamic_projection_page(
+    path: Path,
+    route: str,
+    title: str,
+    marker_specification: str,
+) -> None:
+    """Create one missing staged projection page without owning committed prose."""
+    if path.exists() or path.is_symlink():
+        if not path.is_file() or path.is_symlink():
+            raise ValueError(f"projection output collides with a non-file: {path}")
+        text = path.read_text(encoding="utf-8")
+        permalink = re.findall(r"(?m)^permalink:\s*(\S+)\s*$", text)
+        markers = re.findall(
+            r"<!-- formalization-status-generated:start ([^\n]+) -->", text
+        )
+        if permalink != [route] or markers != [marker_specification]:
+            raise ValueError(
+                f"committed projection page has wrong route or marker ownership: {path}"
+            )
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "---\n"
+        "layout: page\n"
+        f'title: "{title}"\n'
+        f"permalink: {route}\n"
+        "---\n\n"
+        f"# {title}\n\n"
+        f"<!-- formalization-status-generated:start {marker_specification} -->\n"
+        "<!-- formalization-status-generated:end -->\n",
+        encoding="utf-8",
+    )
+
+
+def create_dynamic_pages(source_root: Path, aggregate: dict[str, Any]) -> int:
+    """Create missing source/topic pages and every canonical record detail page."""
+    count = 0
+    for source in aggregate["sources"]:
+        identifier = source["id"]
+        require_route_id(identifier, "source")
+        if identifier in RESERVED_SOURCE_ROUTE_IDS:
+            raise ValueError(f"reserved source projection route identifier: {identifier}")
+        path = source_root / "formalization" / "sources" / f"{identifier}.md"
+        existed = path.exists()
+        dynamic_projection_page(
+            path,
+            f"/formalization/sources/{identifier}/",
+            f"Formalizations related to source {identifier}",
+            f"source {identifier}",
+        )
+        count += int(not existed)
+    for topic in aggregate["topics"]:
+        identifier = topic["id"]
+        require_route_id(identifier, "topic")
+        if identifier in RESERVED_TOPIC_ROUTE_IDS:
+            raise ValueError(f"reserved topic projection route identifier: {identifier}")
+        path = source_root / "formalization" / "topics" / f"{identifier}.md"
+        existed = path.exists()
+        dynamic_projection_page(
+            path,
+            f"/formalization/topics/{identifier}/",
+            f"Formalizations for topic {identifier}",
+            f"topic {identifier}",
+        )
+        count += int(not existed)
+    records_root = source_root / "formalization" / "records"
+    if records_root.exists() or records_root.is_symlink():
+        raise ValueError(f"generated record root collision: {records_root}")
+    records_root.mkdir(parents=True)
+    for record in aggregate["records"]:
+        identifier = record["id"]
+        require_route_id(identifier, "record")
+        path = records_root / f"{identifier}.md"
+        dynamic_projection_page(
+            path,
+            f"/formalization/records/{identifier}/",
+            f"Formalization record {identifier}",
+            f"record {identifier}",
+        )
+        count += 1
+    return count
 
 
 def run_self_tests(repo_root: Path) -> None:
@@ -531,10 +677,12 @@ def run_self_tests(repo_root: Path) -> None:
         "module": "LatticeSystem.Fixture",
         "origin": "project_original",
         "source_coverage": "not_applicable",
+        "source_path": "LatticeSystem/Fixture.lean",
         "source_relations": [],
         "summary": "Lieb's \"theorem\"",
         "topic_ids": ["fixture-topic"],
         "trust_state": "axiom_free",
+        "proof_guide_anchor": None,
     }
     project_aggregate = {
         "catalog_state": "prototype",
@@ -547,18 +695,25 @@ def run_self_tests(repo_root: Path) -> None:
     }
     project_view = render_marker("project-original", project_aggregate, "r")
     topic_view = render_marker("topic fixture-topic", project_aggregate, "r")
+    record_view = render_marker("record project-fixture", project_aggregate, "r")
+    expected_href = "/lattice-system/formalization/records/project-fixture/"
     assert 'id="record-project-fixture"' in project_view
     assert 'id="record-project-fixture"' in topic_view
-    assert '<h3 data-field="summary">Lieb&#x27;s &quot;theorem&quot;</h3>' in project_view
-    assert '<dt data-label-for="human-status">Human status</dt>' in project_view
-    assert '<dd data-field="human-status">definition only</dd>' in project_view
-    assert "LatticeSystem.Fixture.value" in project_view
+    assert f'data-href="{expected_href}"' in project_view
+    assert f'<a href="{expected_href}">Lieb&#x27;s &quot;theorem&quot;</a>' in project_view
+    assert '<h3 data-field="summary">Lieb&#x27;s &quot;theorem&quot;</h3>' in record_view
+    assert '<dt data-label-for="human-status">Human status</dt>' in record_view
+    assert '<dd data-field="human-status">definition only</dd>' in record_view
+    assert '<dd data-field="source-path">' in record_view
+    assert '<dd data-field="origin">project_original</dd>' in record_view
+    assert '<dd data-field="topic-id">fixture-topic</dd>' in record_view
+    assert "LatticeSystem.Fixture.value" in record_view
     assert 'data-field="citation"' not in project_view
     liquid_fixture = dict(project_record)
     liquid_fixture["summary"] = '{{ 7 | plus: 1 }} and {% include x %}'
     liquid_aggregate = dict(project_aggregate)
     liquid_aggregate["records"] = [liquid_fixture]
-    liquid_view = render_marker("project-original", liquid_aggregate, "r")
+    liquid_view = render_marker("record project-fixture", liquid_aggregate, "r")
     assert "{{" not in liquid_view and "{%" not in liquid_view
     assert "&#123;&#123; 7 | plus: 1 &#125;&#125;" in liquid_view
     hostile = 'Lieb\'s "theorem" {{ 7 | plus: 1 }} {% include x %}'
@@ -617,7 +772,7 @@ def run_self_tests(repo_root: Path) -> None:
             "<!-- formalization-status-generated:end -->\nafter\n",
             encoding="utf-8",
         )
-        validate_marker_ownership(temporary, {"overview"})
+        validate_marker_ownership(temporary, {"overview"}, {"overview"})
         replace_markers(temporary, project_aggregate, "r")
         replaced = page.read_text(encoding="utf-8")
         assert replaced.startswith("before\n") and replaced.endswith("\nafter\n")
@@ -635,14 +790,14 @@ def run_self_tests(repo_root: Path) -> None:
                 encoding="utf-8",
             )
             try:
-                validate_marker_ownership(temporary, {"overview"})
+                validate_marker_ownership(temporary, {"overview"}, {"overview"})
             except ValueError:
                 pass
             else:
                 raise AssertionError(f"marker ownership accepted {label}")
         page.write_text("no marker\n", encoding="utf-8")
         try:
-            validate_marker_ownership(temporary, {"overview"})
+            validate_marker_ownership(temporary, {"overview"}, {"overview"})
         except ValueError:
             pass
         else:
@@ -679,11 +834,62 @@ def run_self_tests(repo_root: Path) -> None:
             raise AssertionError("fragment pinning accepted an unresolved heading fragment")
         (temporary / "formalization-status/v1").mkdir(parents=True)
         try:
-            validate_marker_ownership(temporary, set())
+            validate_marker_ownership(temporary, set(), set())
         except ValueError:
             pass
         else:
             raise AssertionError("marker ownership accepted committed machine output")
+        shutil.rmtree(temporary / "formalization-status")
+        (temporary / "formalization/records").mkdir(parents=True)
+        try:
+            validate_marker_ownership(temporary, set(), set())
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("marker ownership accepted committed record output")
+
+        dynamic_root = temporary / "dynamic"
+        scaled_records = []
+        for index in range(1000):
+            scaled = dict(project_record)
+            scaled["id"] = f"fixture-record-{index:04d}"
+            scaled["lean_name"] = f"LatticeSystem.Fixture.value{index}"
+            scaled["summary"] = f"Fixture record {index}"
+            scaled_records.append(scaled)
+        scaled_aggregate = dict(project_aggregate)
+        scaled_aggregate.update(
+            {
+                "records": scaled_records,
+                "sources": [{"id": "future-source", "title": "Future source"}],
+                "topics": [
+                    {"description": "Fixture", "id": "fixture-topic", "label": "Fixture"}
+                ],
+            }
+        )
+        created = create_dynamic_pages(dynamic_root, scaled_aggregate)
+        if created != 1002:
+            raise AssertionError("dynamic page generation did not scale without placeholders")
+        record_files = list((dynamic_root / "formalization/records").glob("*.md"))
+        if len(record_files) != 1000:
+            raise AssertionError("dynamic record generation lost or duplicated a record")
+        for kind, reserved in (("source", "foundations"), ("source", "index"), ("topic", "index")):
+            hostile_routes = dict(project_aggregate)
+            hostile_routes["sources"] = (
+                [{"id": reserved, "title": "Reserved"}] if kind == "source" else []
+            )
+            hostile_routes["topics"] = (
+                [{"description": "Reserved", "id": reserved, "label": "Reserved"}]
+                if kind == "topic"
+                else []
+            )
+            hostile_routes["records"] = []
+            hostile_root = temporary / f"reserved-{kind}-{reserved}"
+            try:
+                create_dynamic_pages(hostile_root, hostile_routes)
+            except ValueError:
+                pass
+            else:
+                raise AssertionError(f"reserved {kind} route was accepted: {reserved}")
     finally:
         shutil.rmtree(temporary)
 
@@ -710,11 +916,11 @@ def main() -> int:
         symlinks = [path for path in (repo_root / "docs").rglob("*") if path.is_symlink()]
         if symlinks:
             raise ValueError(f"documentation source contains unsupported symlinks: {symlinks}")
-        validate_marker_ownership(repo_root / "docs", canonical_marker_specs(repo_root))
+        required_markers, allowed_markers = canonical_marker_specs(repo_root)
+        validate_marker_ownership(repo_root / "docs", required_markers, allowed_markers)
         output.mkdir(parents=True)
         source = output / "source"
         shutil.copytree(repo_root / "docs", source)
-        pinned_fragment_count = pin_referenced_fragments(source)
         machine = source / "formalization-status" / "v1"
         machine.mkdir(parents=True)
         aggregate_path = machine / "catalog.json"
@@ -741,7 +947,13 @@ def main() -> int:
         }
         with (machine / "publication.json").open("w", encoding="utf-8", newline="\n") as sidecar:
             sidecar.write(json.dumps(publication, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
+        dynamic_page_count = create_dynamic_pages(source, aggregate)
         marker_count = replace_markers(source, aggregate, args.revision)
+        pinned_fragment_count = pin_referenced_fragments(source)
+        record_route_digest = hashlib.sha256()
+        for record in aggregate["records"]:
+            record_route_digest.update(record["id"].encode("utf-8") + b"\0")
+            record_route_digest.update(record_href(record["id"]).encode("utf-8") + b"\0")
         tree_digest = hashlib.sha256()
         for path in sorted(item for item in source.rglob("*") if item.is_file()):
             relative = str(path.relative_to(source))
@@ -752,8 +964,11 @@ def main() -> int:
                 {
                     "generator_version": GENERATOR_VERSION,
                     "input_sha256": aggregate["input_sha256"],
+                    "dynamic_page_count": dynamic_page_count,
                     "marker_count": marker_count,
                     "pinned_fragment_count": pinned_fragment_count,
+                    "record_page_count": len(aggregate["records"]),
+                    "record_route_sha256": record_route_digest.hexdigest(),
                     "revision": args.revision,
                     "source_tree_sha256": tree_digest.hexdigest(),
                 },

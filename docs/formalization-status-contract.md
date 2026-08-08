@@ -137,6 +137,45 @@ Shards are normally one source chapter, paper, or coherent source unit. Split a
 large chapter by section only when reviewability requires it. Moving a record
 between shards is non-semantic because its stable record ID does not change.
 
+## Human publication topology
+
+The stable canonical human route for a record is
+`/lattice-system/formalization/records/<record-id>/`. The generator creates that
+page only in the staged Jekyll tree; `docs/formalization/records/` is a reserved
+generated-output root and must not contain committed placeholders. Each detail
+page renders the complete record exactly once, including every canonical field
+and every typed source relation in canonical order. The familiar human status
+label is derived from the three machine dimensions and is explicitly display
+data, not a fourth stored status field.
+
+Source, topic, project-original, and status pages are compact projections. They
+contain exact counts and ordered links to canonical record routes, but never a
+second full record definition list. Missing source and topic pages are created
+dynamically from the registries during staging, so adding future sources and
+topics does not require committed marker placeholders. Existing hand-written
+source/topic context remains outside its unique empty generated marker.
+The route segments `index` and `foundations` are reserved for source IDs, and
+`index` is reserved for topic IDs, because those names own the fixed index and
+project-original pages. The semantic validator rejects those registry IDs
+before generation; the generator independently rejects them at the output
+boundary.
+
+Every projection row has the exact record ID, canonical detail URL, and escaped
+summary. Source membership is existential over typed relations to that source;
+multiple relations still produce one row. Topic membership is the exact
+`topic_ids` projection. Status membership is derived from the same closed human
+label function used on detail pages. Rows are ordered by stable record ID. The
+explicit fragment `record-<record-id>` remains on source and topic rows so the
+four accepted prototype records retain their already published fragment
+targets, while the full detail moves to the canonical record route.
+
+The staged and rendered checkers require a bijection among catalogue record
+IDs, generated filenames, permalinks, rendered directories, and full record
+articles. They reject a full article outside its canonical detail page, an
+extra or missing output, a path or permalink collision, a wrong projection
+link, or any missing/extra/reordered projection member. These human-rendering
+rules do not alter the version 1 manifest, canonical records, or machine API.
+
 ## Registry model
 
 ### Sources
