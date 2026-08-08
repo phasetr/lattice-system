@@ -12,23 +12,30 @@ import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
-from urllib.parse import urljoin
 
 from check_generated_site import (
     PageParser,
     assert_metadata,
+    canonical_record_href,
+    expected_marker_body,
     expected_overview_index_rows,
+    expected_projection_rows,
     expected_source_index_rows,
     expected_status_index_rows,
     expected_topic_index_rows,
     parse_record_html,
+    records_for_source,
+    records_for_topic,
     reject_authority_contradictions,
     require_index_rows,
+    require_generated_ownership,
+    validate_record_blocks,
 )
+from validate_formalization_status import Validation, validate_schema_instance
 
 
 PAGES_BASE = "https://phasetr.github.io/lattice-system/"
-HUMAN_ENDPOINTS = (
+CORE_HUMAN_ENDPOINTS = (
     "formalization/",
     "formalization/status/",
     "formalization/sources/",
@@ -39,11 +46,39 @@ JSON_ENDPOINTS = (
     "formalization-status/v1/schema.json",
     "formalization-status/v1/publication.json",
 )
-ENDPOINTS = (*HUMAN_ENDPOINTS, *JSON_ENDPOINTS)
+BOOTSTRAP_ENDPOINTS = (*CORE_HUMAN_ENDPOINTS, *JSON_ENDPOINTS)
+COMPATIBILITY_RECORD_IDS = (
+    "shastry-1992-staggered-susceptibility-bound",
+    "tasaki-2020-section-2-1-pauli-x-involutive",
+    "tasaki-2020-theorem-3-1-finite-dimensional-core",
+    "tasaki-2020-theorem-4-2-shastry-no-ssb",
+)
 SHA256_RE = re.compile(r"[0-9a-f]{64}")
 REVISION_RE = re.compile(r"[0-9a-f]{40}")
-MAX_BODY_BYTES = 2 * 1024 * 1024
+MAX_BODY_BYTES = 8 * 1024 * 1024
 MAX_DEADLINE_SECONDS = 240
+STABLE_ID_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
+RESERVED_SOURCE_IDS = {"foundations", "index"}
+RESERVED_TOPIC_IDS = {"index"}
+CATALOG_KEYS = {
+    "catalog_state",
+    "generated_by",
+    "generator_version",
+    "input_sha256",
+    "records",
+    "schema_version",
+    "source_items",
+    "sources",
+    "topics",
+}
+PUBLICATION_KEYS = {
+    "catalog_state",
+    "generated_by",
+    "generator_version",
+    "input_sha256",
+    "revision",
+    "schema_version",
+}
 
 
 @dataclass(frozen=True)
@@ -57,6 +92,21 @@ class Response:
 
 
 Fetcher = Callable[[str, float], Response]
+
+
+def exact_endpoint_url(base_url: str, endpoint: str) -> str:
+    """Construct one contained publication URL without URL-reference resolution."""
+    validate_base_url(base_url)
+    if (
+        not endpoint
+        or endpoint.startswith("/")
+        or any(token in endpoint for token in ("..", "?", "#", "%", "\\"))
+    ):
+        raise ValueError(f"unsafe publication endpoint: {endpoint!r}")
+    result = base_url + endpoint
+    if not result.startswith(PAGES_BASE) or result != f"{PAGES_BASE}{endpoint}":
+        raise ValueError(f"publication endpoint escaped the fixed base: {endpoint!r}")
+    return result
 
 
 class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
@@ -127,6 +177,47 @@ def parse_json(response: Response, endpoint: str) -> dict[str, object]:
     return value
 
 
+def validate_catalog_before_routes(
+    catalog: dict[str, object],
+    published_schema: dict[str, object],
+    canonical_schema_bytes: bytes,
+) -> None:
+    """Validate the fetched catalogue fully before any catalogue-derived URL exists."""
+    try:
+        canonical_schema = json.loads(canonical_schema_bytes.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError("checkout canonical schema is invalid UTF-8 JSON") from error
+    if not isinstance(canonical_schema, dict) or published_schema != canonical_schema:
+        raise ValueError("published schema differs from the checkout canonical schema")
+    aggregate_schema = canonical_schema.get("$defs", {}).get("aggregate")
+    if not isinstance(aggregate_schema, dict):
+        raise ValueError("checkout canonical schema lacks the aggregate contract")
+    schema_validation = Validation()
+    validate_schema_instance(
+        catalog,
+        aggregate_schema,
+        canonical_schema,
+        "published catalogue",
+        schema_validation,
+    )
+    if schema_validation.errors:
+        raise ValueError(
+            "published catalogue violates the canonical schema: "
+            + "; ".join(schema_validation.errors)
+        )
+
+
+def require_route_id(value: object, kind: str) -> str:
+    """Require one safe stable ID and reject collisions with fixed route owners."""
+    if not isinstance(value, str) or STABLE_ID_RE.fullmatch(value) is None:
+        raise ValueError(f"catalogue {kind} route ID is unsafe: {value!r}")
+    if kind == "source" and value in RESERVED_SOURCE_IDS:
+        raise ValueError(f"catalogue source route ID is reserved: {value}")
+    if kind == "topic" and value in RESERVED_TOPIC_IDS:
+        raise ValueError(f"catalogue topic route ID is reserved: {value}")
+    return value
+
+
 def parse_human(response: Response, endpoint: str) -> PageParser:
     """Require an exact successful HTML response and parse generated structures."""
     if response.status != 200:
@@ -177,27 +268,172 @@ def require_navigation(
     )
 
 
+def expected_human_endpoints(catalog: dict[str, object]) -> tuple[str, ...]:
+    """Derive the bounded live surface: all projections plus pinned compatibility details."""
+    sources = catalog.get("sources")
+    topics = catalog.get("topics")
+    records = catalog.get("records")
+    if not isinstance(sources, list) or not isinstance(topics, list) or not isinstance(records, list):
+        raise ValueError("catalogue human-route registries must be arrays")
+    if not all(isinstance(item, dict) for item in [*sources, *topics, *records]):
+        raise ValueError("catalogue route registries contain a non-object")
+    source_ids = [require_route_id(item.get("id"), "source") for item in sources]
+    topic_ids = [require_route_id(item.get("id"), "topic") for item in topics]
+    ordered_record_ids = [require_route_id(item.get("id"), "record") for item in records]
+    for kind, identifiers in (
+        ("source", source_ids),
+        ("topic", topic_ids),
+        ("record", ordered_record_ids),
+    ):
+        if len(identifiers) != len(set(identifiers)):
+            raise ValueError(f"catalogue {kind} route IDs are duplicated")
+    record_ids = set(ordered_record_ids)
+    missing_compatibility = set(COMPATIBILITY_RECORD_IDS) - record_ids
+    if missing_compatibility:
+        raise ValueError(
+            f"catalogue removed pinned public record routes: {sorted(missing_compatibility)}"
+        )
+    return (
+        *CORE_HUMAN_ENDPOINTS,
+        *(f"formalization/sources/{identifier}/" for identifier in source_ids),
+        "formalization/sources/foundations/",
+        *(f"formalization/topics/{identifier}/" for identifier in topic_ids),
+        *(f"formalization/records/{identifier}/" for identifier in COMPATIBILITY_RECORD_IDS),
+    )
+
+
+def endpoint_marker_specification(endpoint: str) -> str:
+    """Map one fetched human endpoint to its exact generated marker owner."""
+    fixed = {
+        "formalization/": "overview",
+        "formalization/status/": "status",
+        "formalization/sources/": "source-index",
+        "formalization/sources/foundations/": "project-original",
+        "formalization/topics/": "topic-index",
+    }
+    if endpoint in fixed:
+        return fixed[endpoint]
+    match = re.fullmatch(r"formalization/(sources|topics|records)/([^/]+)/", endpoint)
+    if match is None:
+        raise ValueError(f"unknown human endpoint marker ownership: {endpoint}")
+    kind = {"sources": "source", "topics": "topic", "records": "record"}[
+        match.group(1)
+    ]
+    return f"{kind} {match.group(2)}"
+
+
+def require_projection_surface(
+    pages: dict[str, PageParser], catalog: dict[str, object]
+) -> None:
+    """Require exact live source/topic/status membership and pinned record details."""
+    typed_catalog = catalog  # Runtime checks below consume the JSON object structurally.
+    for source in typed_catalog["sources"]:  # type: ignore[index]
+        source_id = source["id"]
+        endpoint = f"formalization/sources/{source_id}/"
+        parser = pages[endpoint]
+        require_index_rows(
+            parser,
+            expected_projection_rows(
+                records_for_source(typed_catalog, source_id), "source", source_id  # type: ignore[arg-type]
+            ),
+            endpoint,
+        )
+        if parser.record_fields:
+            raise ValueError(f"{endpoint}: projection duplicates full record truth")
+    foundation_endpoint = "formalization/sources/foundations/"
+    project_records = [
+        record
+        for record in typed_catalog["records"]  # type: ignore[index]
+        if record["origin"] == "project_original"
+    ]
+    require_index_rows(
+        pages[foundation_endpoint],
+        expected_projection_rows(project_records, "source", "foundations"),
+        foundation_endpoint,
+    )
+    if pages[foundation_endpoint].record_fields:
+        raise ValueError(f"{foundation_endpoint}: projection duplicates full record truth")
+    for topic in typed_catalog["topics"]:  # type: ignore[index]
+        topic_id = topic["id"]
+        endpoint = f"formalization/topics/{topic_id}/"
+        parser = pages[endpoint]
+        require_index_rows(
+            parser,
+            expected_projection_rows(
+                records_for_topic(typed_catalog, topic_id), "topic", topic_id  # type: ignore[arg-type]
+            ),
+            endpoint,
+        )
+        if parser.record_fields:
+            raise ValueError(f"{endpoint}: projection duplicates full record truth")
+    if pages["formalization/status/"].record_fields:
+        raise ValueError("formalization/status/: projection duplicates full record truth")
+    record_map = {
+        record["id"]: record for record in typed_catalog["records"]  # type: ignore[index]
+    }
+    item_map = {
+        item["id"]: item for item in typed_catalog["source_items"]  # type: ignore[index]
+    }
+    for record_id in COMPATIBILITY_RECORD_IDS:
+        endpoint = f"formalization/records/{record_id}/"
+        record = record_map[record_id]
+        validate_record_blocks(pages[endpoint], [record], typed_catalog, endpoint)  # type: ignore[arg-type]
+        href = canonical_record_href(record_id)
+        anchor = f"record-{record_id}"
+        related_sources = {
+            item_map[relation["source_item_id"]]["source_id"]
+            for relation in record["source_relations"]
+        }
+        compatibility_pages = [
+            pages["formalization/status/"],
+            *(pages[f"formalization/sources/{source_id}/"] for source_id in related_sources),
+            *(pages[f"formalization/topics/{topic_id}/"] for topic_id in record["topic_ids"]),
+        ]
+        if record["origin"] == "project_original":
+            compatibility_pages.append(pages[foundation_endpoint])
+        if not all(anchor in parser.ids and href in parser.links for parser in compatibility_pages):
+            raise ValueError(f"{endpoint}: a pinned legacy projection anchor/link is missing")
+
+
 def verify_responses(
     responses: dict[str, Response],
     base_url: str,
     revision: str,
     canonical_schema_bytes: bytes,
 ) -> None:
-    """Validate all seven endpoint responses as one coherent publication."""
+    """Validate one coherent machine surface and scalable human projection snapshot."""
     validate_base_url(base_url)
-    if set(responses) != set(ENDPOINTS):
-        raise ValueError("live response set does not match the seven required endpoints")
+    missing_bootstrap = set(BOOTSTRAP_ENDPOINTS) - set(responses)
+    if missing_bootstrap:
+        raise ValueError(f"live response set lacks bootstrap endpoints: {sorted(missing_bootstrap)}")
     for endpoint, response in responses.items():
         if len(response.body) > MAX_BODY_BYTES:
             raise ValueError(f"{endpoint}: response body exceeds the byte limit")
-        expected_url = urljoin(base_url, endpoint)
+        expected_url = exact_endpoint_url(base_url, endpoint)
         if response.final_url != expected_url:
             raise ValueError(f"{endpoint}: unexpected redirect to {response.final_url}")
 
     catalog = parse_json(responses[JSON_ENDPOINTS[0]], JSON_ENDPOINTS[0])
+    expected_endpoints = {*JSON_ENDPOINTS, *expected_human_endpoints(catalog)}
+    if set(responses) != expected_endpoints:
+        raise ValueError("live response set does not match the catalogue-derived route surface")
     schema_response = responses[JSON_ENDPOINTS[1]]
     schema = parse_json(schema_response, JSON_ENDPOINTS[1])
     publication = parse_json(responses[JSON_ENDPOINTS[2]], JSON_ENDPOINTS[2])
+    if set(catalog) != CATALOG_KEYS:
+        raise ValueError("published catalogue has missing or additional top-level keys")
+    if set(publication) != PUBLICATION_KEYS:
+        raise ValueError("publication sidecar has missing or additional top-level keys")
+    if (
+        catalog.get("generated_by") != "scripts/validate_formalization_status.py"
+        or catalog.get("generator_version") != 2
+    ):
+        raise ValueError("published catalogue has the wrong generator identity or version")
+    if (
+        publication.get("generated_by") != "scripts/generate_formalization_site.py"
+        or publication.get("generator_version") != 2
+    ):
+        raise ValueError("publication sidecar has the wrong generator identity or version")
     digest = catalog.get("input_sha256")
     if catalog.get("schema_version") != 1 or publication.get("schema_version") != 1:
         raise ValueError("catalog/publication schema_version must both equal 1")
@@ -214,17 +450,22 @@ def verify_responses(
         raise ValueError("catalog/publication input_sha256 values differ")
     if publication.get("revision") != revision:
         raise ValueError("publication revision does not equal the required main SHA")
-    try:
-        canonical_schema = json.loads(canonical_schema_bytes.decode("utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError) as error:
-        raise ValueError("checkout canonical schema is invalid UTF-8 JSON") from error
-    if schema != canonical_schema:
-        raise ValueError("published schema differs from the checkout canonical schema")
+    validate_catalog_before_routes(catalog, schema, canonical_schema_bytes)
 
     pages = {
         endpoint: parse_human(responses[endpoint], endpoint)
-        for endpoint in HUMAN_ENDPOINTS
+        for endpoint in expected_human_endpoints(catalog)
     }
+    for endpoint, parser in pages.items():
+        specification = endpoint_marker_specification(endpoint)
+        require_generated_ownership(parser, endpoint, specification)
+        rendered_marker = (
+            f"<!-- formalization-status-generated:start {specification} -->\n"
+            + expected_marker_body(specification, catalog, revision)
+            + "<!-- formalization-status-generated:end -->"
+        ).encode()
+        if responses[endpoint].body.count(rendered_marker) != 1:
+            raise ValueError(f"{endpoint}: generated owned region is not exact")
     reject_authority_contradictions(
         catalog,
         [(endpoint, " ".join(parser.text)) for endpoint, parser in pages.items()],
@@ -232,6 +473,7 @@ def verify_responses(
     for endpoint, parser in pages.items():
         require_metadata(parser, endpoint, catalog, revision)
     require_navigation(pages, catalog)
+    require_projection_surface(pages, catalog)
 
 
 def fetch_publication(
@@ -240,16 +482,38 @@ def fetch_publication(
     fetcher: Fetcher,
     deadline_at: float,
     monotonic: Callable[[], float],
+    canonical_schema_bytes: bytes,
 ) -> dict[str, Response]:
-    """Fetch one coherent seven-endpoint snapshot within the absolute deadline."""
+    """Fetch one coherent catalogue-derived snapshot within the absolute deadline."""
     responses = {}
-    for endpoint in ENDPOINTS:
+    for endpoint in BOOTSTRAP_ENDPOINTS:
         remaining = deadline_at - monotonic()
         if remaining <= 0:
             raise ValueError("live publication deadline expired during a snapshot")
-        responses[endpoint] = fetcher(
-            urljoin(base_url, endpoint), min(timeout, remaining)
-        )
+        requested_url = exact_endpoint_url(base_url, endpoint)
+        response = fetcher(requested_url, min(timeout, remaining))
+        if response.final_url != requested_url:
+            raise ValueError(f"{endpoint}: unexpected redirect to {response.final_url}")
+        responses[endpoint] = response
+    catalog = parse_json(responses[JSON_ENDPOINTS[0]], JSON_ENDPOINTS[0])
+    published_schema = parse_json(responses[JSON_ENDPOINTS[1]], JSON_ENDPOINTS[1])
+    validate_catalog_before_routes(
+        catalog, published_schema, canonical_schema_bytes
+    )
+    additional = [
+        endpoint
+        for endpoint in expected_human_endpoints(catalog)
+        if endpoint not in responses
+    ]
+    for endpoint in additional:
+        remaining = deadline_at - monotonic()
+        if remaining <= 0:
+            raise ValueError("live publication deadline expired during a snapshot")
+        requested_url = exact_endpoint_url(base_url, endpoint)
+        response = fetcher(requested_url, min(timeout, remaining))
+        if response.final_url != requested_url:
+            raise ValueError(f"{endpoint}: unexpected redirect to {response.final_url}")
+        responses[endpoint] = response
     return responses
 
 
@@ -281,7 +545,12 @@ def verify_with_retry(
         try:
             verify_responses(
                 fetch_publication(
-                    base_url, timeout, fetcher, deadline_at, monotonic
+                    base_url,
+                    timeout,
+                    fetcher,
+                    deadline_at,
+                    monotonic,
+                    canonical_schema_bytes,
                 ),
                 base_url,
                 revision,
@@ -300,99 +569,93 @@ def verify_with_retry(
 
 
 def fixture_responses(
-    revision: str, catalog_state: str = "prototype"
+    revision: str, catalog_state: str = "prototype", record_count: int = 4
 ) -> dict[str, Response]:
-    """Build a coherent in-memory publication for dependency-free self-tests."""
+    """Build a complete scalable-route fixture for dependency-free self-tests."""
+    if record_count < len(COMPATIBILITY_RECORD_IDS):
+        raise ValueError("live fixture must retain every pinned compatibility record")
     digest = "a" * 64
-    catalog_href = "/lattice-system/formalization-status/v1/catalog.json"
-    schema_href = "/lattice-system/formalization-status/v1/schema.json"
-    publication_href = "/lattice-system/formalization-status/v1/publication.json"
-    authoritative = catalog_state == "authoritative"
-    authority_href = (
-        catalog_href if authoritative else "/lattice-system/formalization/legacy/"
-    )
-    authority_label = (
-        "Current authority: validated version 1 catalogue"
-        if authoritative
-        else "Current authority: complete interim legacy catalogue"
-    )
-    book_href = "/lattice-system/formalization/sources/book/"
-    foundations_href = "/lattice-system/formalization/sources/foundations/"
-    topic_href = "/lattice-system/formalization/topics/spin/"
-    metadata = (
-        '<p>Generated formalization-status view.</p><ul data-generated-metadata="true">'
-        f'<li data-meta="catalog-state">Catalogue state: {catalog_state}</li>'
-        '<li data-meta="schema-version">Schema version: 1</li>'
-        f'<li data-meta="input-sha256">Input SHA-256: {digest}</li>'
-        f'<li data-meta="revision">Deploy revision: {revision}</li>'
-        f'<li data-meta="catalog-link" data-href="{catalog_href}">'
-        f'<a href="{catalog_href}">Machine data: version 1 catalogue</a></li>'
-        f'<li data-meta="schema-link" data-href="{schema_href}">'
-        f'<a href="{schema_href}">Schema: version 1 schema</a></li>'
-        f'<li data-meta="publication-link" data-href="{publication_href}">'
-        f'<a href="{publication_href}">Build metadata: publication sidecar</a></li>'
-        f'<li data-meta="authority-link" data-href="{authority_href}">'
-        f'<a href="{authority_href}">{authority_label}</a></li></ul>'
-    )
-    human = {
-        "formalization/": metadata
-        + '<ul><li data-row-kind="overview-counts" data-record-count="1" '
-        + f'data-source-count="1" data-topic-count="1">This {catalog_state} snapshot '
-        + "contains 1 records, 1 sources, and 1 topics.</li></ul>"
-        + '<ul><li data-row-kind="overview-navigation" data-navigation-id="sources" '
-        + 'data-href="/lattice-system/formalization/sources/"><a '
-        + 'href="/lattice-system/formalization/sources/">Browse generated source '
-        + "projections</a></li>"
-        + '<li data-row-kind="overview-navigation" data-navigation-id="topics" '
-        + 'data-href="/lattice-system/formalization/topics/"><a '
-        + 'href="/lattice-system/formalization/topics/">Browse generated topic '
-        + "projections</a></li>"
-        + '<li data-row-kind="overview-navigation" data-navigation-id="status" '
-        + 'data-href="/lattice-system/formalization/status/"><a '
-        + 'href="/lattice-system/formalization/status/">Browse generated status '
-        + "summary</a></li></ul>",
-        "formalization/status/": metadata
-        + '<ul data-index="status"><li data-row-kind="status" '
-        + 'data-status-label="proved" data-record-count="1">proved: 1</li></ul>',
-        "formalization/sources/": metadata
-        + '<ul data-index="sources"><li data-row-kind="source" '
-        + 'data-source-id="book" data-source-title="Book" data-record-count="1" '
-        + f'data-href="{book_href}"><a href="{book_href}">'
-        + "Book: 1 related record(s)</a></li>"
-        + '<li data-row-kind="project-original" '
-        + 'data-source-id="foundations" data-record-count="0" '
-        + f'data-href="{foundations_href}"><a href="{foundations_href}">'
-        + "Project-original foundations: 0 record(s)</a></li></ul>",
-        "formalization/topics/": metadata
-        + '<ul data-index="topics"><li data-row-kind="topic" '
-        + 'data-topic-id="spin" data-topic-label="Spin" data-record-count="1" '
-        + f'data-href="{topic_href}"><a href="{topic_href}">'
-        + "Spin: 1 record(s)</a></li></ul>",
-    }
-    catalog = {
-        "schema_version": 1,
-        "catalog_state": catalog_state,
-        "input_sha256": digest,
-        "sources": [{"id": "book", "title": "Book"}],
-        "source_items": [{"id": "book-item", "source_id": "book"}],
-        "topics": [{"id": "spin", "label": "Spin"}],
-        "records": [
+    records = []
+    for index, record_id in enumerate(COMPATIBILITY_RECORD_IDS):
+        records.append(
             {
-                "id": "record",
-                "origin": "literature",
-                "implementation_state": "complete",
+                "axiom_dependencies": [],
+                "capstone": bool(index % 2),
                 "declaration_kind": "theorem",
-                "trust_state": "proved",
+                "id": record_id,
+                "implementation_state": "implemented",
+                "lean_name": f"LatticeSystem.Fixture.result{index}",
+                "module": "LatticeSystem.Fixture",
+                "origin": "literature",
+                "proof_guide_anchor": None,
+                "source_coverage": "complete",
+                "source_path": "LatticeSystem/Fixture.lean",
                 "source_relations": [
                     {"source_item_id": "book-item", "relation": "formalizes"}
                 ],
+                "summary": f"Fixture result {index}",
                 "topic_ids": ["spin"],
+                "trust_state": "axiom_free",
+            }
+        )
+    for index in range(record_count - len(COMPATIBILITY_RECORD_IDS)):
+        records.append(
+            {
+                **records[0],
+                "id": f"zz-fixture-record-{index:04d}",
+                "lean_name": f"LatticeSystem.Fixture.scaledResult{index}",
+                "summary": f"Scaled fixture result {index}",
+            }
+        )
+    catalog: dict[str, object] = {
+        "schema_version": 1,
+        "catalog_state": catalog_state,
+        "generated_by": "scripts/validate_formalization_status.py",
+        "generator_version": 2,
+        "input_sha256": digest,
+        "sources": [
+            {"authors": ["Fixture Author"], "id": "book", "title": "Book", "year": 2026}
+        ],
+        "source_items": [
+            {
+                "equations": [],
+                "id": "book-item",
+                "item_kind": "theorem",
+                "item_number": "1",
+                "pages": "1",
+                "section": "1",
+                "source_id": "book",
+                "title": "Book result",
             }
         ],
+        "topics": [{"description": "Spin fixture", "id": "spin", "label": "Spin"}],
+        "records": records,
+    }
+
+    from generate_formalization_site import render_marker
+
+    specifications = {
+        "formalization/": "overview",
+        "formalization/status/": "status",
+        "formalization/sources/": "source-index",
+        "formalization/topics/": "topic-index",
+        "formalization/sources/book/": "source book",
+        "formalization/sources/foundations/": "project-original",
+        "formalization/topics/spin/": "topic spin",
+        **{
+            f"formalization/records/{record_id}/": f"record {record_id}"
+            for record_id in COMPATIBILITY_RECORD_IDS
+        },
+    }
+    human = {
+        endpoint: render_marker(specification, catalog, revision)
+        for endpoint, specification in specifications.items()
     }
     publication = {
         "schema_version": 1,
         "catalog_state": catalog_state,
+        "generated_by": "scripts/generate_formalization_site.py",
+        "generator_version": 2,
         "input_sha256": digest,
         "revision": revision,
     }
@@ -401,12 +664,15 @@ def fixture_responses(
         JSON_ENDPOINTS[0]: ("application/json", json.dumps(catalog).encode()),
         JSON_ENDPOINTS[1]: (
             "application/json",
-            json.dumps({"$id": PAGES_BASE + JSON_ENDPOINTS[1]}).encode(),
+            (
+                Path(__file__).resolve().parents[1]
+                / "formalization-status/v1/schema.json"
+            ).read_bytes(),
         ),
         JSON_ENDPOINTS[2]: ("application/json", json.dumps(publication).encode()),
     }
     return {
-        endpoint: Response(200, content_type, body, urljoin(PAGES_BASE, endpoint))
+        endpoint: Response(200, content_type, body, exact_endpoint_url(PAGES_BASE, endpoint))
         for endpoint, (content_type, body) in payloads.items()
     }
 
@@ -417,6 +683,71 @@ def run_self_tests() -> None:
     fixture = fixture_responses(revision)
     canonical_schema = fixture[JSON_ENDPOINTS[1]].body
     verify_responses(fixture, PAGES_BASE, revision, canonical_schema)
+    scaled_fixture = fixture_responses(revision, record_count=1000)
+    verify_responses(scaled_fixture, PAGES_BASE, revision, canonical_schema)
+    if len(scaled_fixture) != 14:
+        raise AssertionError("1000-record live fixture exceeded the bounded endpoint policy")
+
+    malicious_route_cases = (
+        ("sources", "../escape"),
+        ("topics", "book?query"),
+        ("records", "book#fragment"),
+        ("sources", "book%2fescape"),
+        ("topics", "book\\escape"),
+        ("records", "/absolute"),
+        ("sources", "https://evil.example/path"),
+        ("sources", "index"),
+        ("sources", "foundations"),
+        ("topics", "index"),
+    )
+    for collection, malicious_id in malicious_route_cases:
+        poisoned = dict(fixture)
+        catalog_response = poisoned[JSON_ENDPOINTS[0]]
+        payload = json.loads(catalog_response.body)
+        payload[collection][0]["id"] = malicious_id
+        poisoned[JSON_ENDPOINTS[0]] = Response(
+            catalog_response.status,
+            catalog_response.content_type,
+            json.dumps(payload).encode(),
+            catalog_response.final_url,
+        )
+        requested: list[str] = []
+
+        def instrumented_fetcher(url: str, timeout: float) -> Response:
+            """Record every request so invalid IDs cannot trigger a dynamic fetch."""
+            requested.append(url)
+            return poisoned[url.removeprefix(PAGES_BASE)]
+
+        try:
+            verify_with_retry(
+                PAGES_BASE,
+                revision,
+                attempts=1,
+                initial_delay=0,
+                timeout=1,
+                deadline=30,
+                canonical_schema_bytes=canonical_schema,
+                fetcher=instrumented_fetcher,
+                sleep=lambda _delay: None,
+                monotonic=lambda: 0.0,
+            )
+        except ValueError as error:
+            if (
+                "violates the canonical schema" not in str(error)
+                and "route ID is reserved" not in str(error)
+            ):
+                raise AssertionError(
+                    f"malicious route ID failed for an unrelated reason: {malicious_id}: {error}"
+                ) from error
+        else:
+            raise AssertionError(f"malicious route ID was accepted: {malicious_id}")
+        expected_bootstrap_urls = [
+            exact_endpoint_url(PAGES_BASE, endpoint) for endpoint in BOOTSTRAP_ENDPOINTS
+        ]
+        if requested != expected_bootstrap_urls:
+            raise AssertionError(
+                f"malicious route ID caused an off-contract request: {malicious_id}: {requested}"
+            )
     authoritative_fixture = fixture_responses(revision, "authoritative")
     verify_responses(
         authoritative_fixture,
@@ -443,6 +774,236 @@ def run_self_tests() -> None:
         pass
     else:
         raise AssertionError("authoritative live page accepted stale legacy-authority prose")
+
+    def changed_response(endpoint: str, old: bytes, new: bytes) -> dict[str, Response]:
+        """Replace one unique byte sequence in a coherent live fixture."""
+        changed = dict(fixture)
+        original = changed[endpoint]
+        if original.body.count(old) != 1:
+            raise AssertionError(f"A2 live mutation target is not unique: {old!r}")
+        changed[endpoint] = Response(
+            original.status,
+            original.content_type,
+            original.body.replace(old, new, 1),
+            original.final_url,
+        )
+        return changed
+
+    first_id = COMPATIBILITY_RECORD_IDS[0]
+    first_detail = f"formalization/records/{first_id}/"
+    negative_fixtures = [
+        (
+            "wrong canonical detail field",
+            changed_response(
+                first_detail,
+                b'<dd data-field="implementation-state">implemented</dd>',
+                b'<dd data-field="implementation-state">in_progress</dd>',
+            ),
+        ),
+        (
+            "wrong compact projection link",
+            changed_response(
+                "formalization/sources/book/",
+                f'data-href="{canonical_record_href(first_id)}"'.encode(),
+                b'data-href="/lattice-system/formalization/records/wrong/"',
+            ),
+        ),
+        (
+            "missing compatibility anchor",
+            changed_response(
+                "formalization/topics/spin/",
+                f'id="record-{first_id}"'.encode(),
+                b'id="record-wrong"',
+            ),
+        ),
+    ]
+    projection_end = b'</div>\n<!-- formalization-status-generated:end -->'
+    negative_fixtures.extend(
+        [
+            (
+                "stripped-identity full record projection leak",
+                changed_response(
+                    "formalization/sources/book/",
+                    projection_end,
+                    b"<article><h3>Stripped identity</h3><dl><dt>Implementation state</dt>"
+                    b"<dd>implemented</dd></dl></article>\n" + projection_end,
+                ),
+            ),
+            (
+                "unowned paragraph in generated projection",
+                changed_response(
+                    "formalization/sources/book/",
+                    projection_end,
+                    b"<p>poison</p>\n" + projection_end,
+                ),
+            ),
+        ]
+    )
+
+    def changed_json(
+        endpoint: str, key: str, value: object | None, remove: bool = False
+    ) -> dict[str, Response]:
+        """Mutate one machine-object key while retaining a coherent HTTP fixture."""
+        changed = dict(fixture)
+        response = changed[endpoint]
+        payload = json.loads(response.body)
+        if remove:
+            payload.pop(key)
+        else:
+            payload[key] = value
+        changed[endpoint] = Response(
+            response.status,
+            response.content_type,
+            json.dumps(payload).encode(),
+            response.final_url,
+        )
+        return changed
+
+    negative_fixtures.extend(
+        [
+            (
+                "missing catalogue generator identity",
+                changed_json(JSON_ENDPOINTS[0], "generated_by", None, remove=True),
+            ),
+            (
+                "wrong catalogue generator version",
+                changed_json(JSON_ENDPOINTS[0], "generator_version", 1),
+            ),
+            (
+                "additional catalogue key",
+                changed_json(JSON_ENDPOINTS[0], "unexpected", True),
+            ),
+            (
+                "missing publication generator identity",
+                changed_json(JSON_ENDPOINTS[2], "generated_by", None, remove=True),
+            ),
+            (
+                "wrong publication generator version",
+                changed_json(JSON_ENDPOINTS[2], "generator_version", 1),
+            ),
+            (
+                "additional publication key",
+                changed_json(JSON_ENDPOINTS[2], "unexpected", True),
+            ),
+        ]
+    )
+
+    def changed_nested_catalog(
+        collection: str, field: str, value: object | None, remove: bool = False
+    ) -> dict[str, Response]:
+        """Mutate one nested catalogue object without changing route identities."""
+        changed = dict(fixture)
+        response = changed[JSON_ENDPOINTS[0]]
+        payload = json.loads(response.body)
+        target = payload[collection][0]
+        if remove:
+            target.pop(field)
+        else:
+            target[field] = value
+        changed[JSON_ENDPOINTS[0]] = Response(
+            response.status,
+            response.content_type,
+            json.dumps(payload).encode(),
+            response.final_url,
+        )
+        return changed
+
+    nested_schema_mutations = []
+    for collection, required_field, typed_field, wrong_value in (
+        ("records", "summary", "capstone", "false"),
+        ("sources", "authors", "title", []),
+        ("source_items", "pages", "equations", "none"),
+        ("topics", "label", "label", []),
+    ):
+        nested_schema_mutations.extend(
+            [
+                (
+                    f"additional nested {collection} field",
+                    changed_nested_catalog(collection, "unexpected", True),
+                ),
+                (
+                    f"missing nested {collection} field",
+                    changed_nested_catalog(
+                        collection, required_field, None, remove=True
+                    ),
+                ),
+                (
+                    f"wrong nested {collection} field type",
+                    changed_nested_catalog(collection, typed_field, wrong_value),
+                ),
+            ]
+        )
+    for label, changed in nested_schema_mutations:
+        try:
+            verify_responses(changed, PAGES_BASE, revision, canonical_schema)
+        except ValueError as error:
+            if "violates the canonical schema" not in str(error):
+                raise AssertionError(
+                    f"nested schema mutation failed for an unrelated reason: {label}: {error}"
+                ) from error
+        else:
+            raise AssertionError(f"nested schema mutation was accepted: {label}")
+    wrong_revision = dict(json.loads(fixture[JSON_ENDPOINTS[2]].body))
+    wrong_revision["revision"] = "2" * 40
+    revision_fixture = dict(fixture)
+    publication_response = revision_fixture[JSON_ENDPOINTS[2]]
+    revision_fixture[JSON_ENDPOINTS[2]] = Response(
+        publication_response.status,
+        publication_response.content_type,
+        json.dumps(wrong_revision).encode(),
+        publication_response.final_url,
+    )
+    negative_fixtures.append(("wrong revision", revision_fixture))
+    missing_detail = dict(fixture)
+    missing_detail.pop(first_detail)
+    negative_fixtures.append(("missing pinned record route", missing_detail))
+    removed_record = dict(fixture)
+    removed_catalog = dict(json.loads(removed_record[JSON_ENDPOINTS[0]].body))
+    removed_catalog["records"] = [
+        record for record in removed_catalog["records"] if record["id"] != first_id
+    ]
+    catalog_response = removed_record[JSON_ENDPOINTS[0]]
+    removed_record[JSON_ENDPOINTS[0]] = Response(
+        catalog_response.status,
+        catalog_response.content_type,
+        json.dumps(removed_catalog).encode(),
+        catalog_response.final_url,
+    )
+    negative_fixtures.append(("removed pinned record identity", removed_record))
+    for label, changed in negative_fixtures:
+        try:
+            verify_responses(changed, PAGES_BASE, revision, canonical_schema)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"live A2 semantic mutation was accepted: {label}")
+
+    calls = 0
+    clock = [0.0]
+    sleeps: list[float] = []
+
+    def flaky_fetcher(url: str, timeout: float) -> Response:
+        """Fail once, then serve the complete catalogue-derived fixture."""
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            raise urllib.error.URLError("not propagated")
+        return fixture[url.removeprefix(PAGES_BASE)]
+
+    verify_with_retry(
+        PAGES_BASE,
+        revision,
+        attempts=2,
+        initial_delay=1,
+        timeout=1,
+        deadline=30,
+        canonical_schema_bytes=canonical_schema,
+        fetcher=flaky_fetcher,
+        sleep=lambda delay: (sleeps.append(delay), clock.__setitem__(0, clock[0] + delay)),
+        monotonic=lambda: clock[0],
+    )
+    if sleeps != [1]:
+        raise AssertionError("bounded A2 retry self-test used an unexpected delay")
     mutations: list[tuple[str, dict[str, Response]]] = []
 
     def mutate(endpoint: str, old: bytes, new: bytes) -> dict[str, Response]:
@@ -466,7 +1027,7 @@ def run_self_tests() -> None:
     source_row = source_row_start + source_body.split(source_row_start, 1)[1].split(
         b"</li>", 1
     )[0] + b"</li>"
-    status_row_start = b'<li data-row-kind="status"'
+    status_row_start = b'<li data-row-kind="status-count"'
     status_body = fixture["formalization/status/"].body
     status_row = status_row_start + status_body.split(status_row_start, 1)[1].split(
         b"</li>", 1
@@ -506,8 +1067,8 @@ def run_self_tests() -> None:
             "wrong count",
             mutate(
                 "formalization/sources/",
-                b'data-record-count="1"',
-                b'data-record-count="2"',
+                b'data-record-count="4"',
+                b'data-record-count="5"',
             ),
         ),
         (
@@ -522,8 +1083,8 @@ def run_self_tests() -> None:
             "wrong visible label",
             mutate(
                 "formalization/topics/",
-                b">Spin: 1 record(s)</a>",
-                b">Wrong: 1 record(s)</a>",
+                b">Spin: 4 record(s)</a>",
+                b">Wrong: 4 record(s)</a>",
             ),
         ),
         (
@@ -548,7 +1109,7 @@ def run_self_tests() -> None:
                 "formalization/status/",
                 status_row,
                 status_row
-                + b'<li data-row-kind="status" data-status-label="extra" '
+                + b'<li data-row-kind="status-count" data-status-label="extra" '
                 + b'data-record-count="1">extra: 1</li>',
             ),
         ),
@@ -568,8 +1129,8 @@ def run_self_tests() -> None:
             "additive metadata",
             mutate(
                 "formalization/",
-                b"catalogue</a></li></ul>",
-                b'catalogue</a></li><li data-meta="poison">Poison: true</li></ul>',
+                b"legacy catalogue</a></li>\n</ul>",
+                b'legacy catalogue</a></li>\n<li data-meta="poison">Poison: true</li>\n</ul>',
             ),
         ),
     )

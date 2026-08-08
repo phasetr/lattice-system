@@ -14,23 +14,45 @@ formalization-status site. It is separate from doc-gen4, which remains disabled.
 The manifest-listed JSON under `formalization-status/v1/` is validated first.
 The generator creates one revision-independent canonical aggregate and injects
 human source, topic, overview, and status projections into a copied Jekyll
-source tree. Generated source and rendered output live only under
-`.self-local/tmp/`; neither is committed.
+source tree. It also creates exactly one canonical human detail page per record
+at `/formalization/records/<record-id>/`. Generated source and rendered output
+live only under `.self-local/tmp/`; neither is committed.
 
-Before copying documentation, the generator reserves the machine publication
-root and requires every committed generated marker to occur exactly once with
-an empty body. Explanatory prose remains outside those markers. The checker
+Before copying documentation, the generator reserves both the machine
+publication root and `docs/formalization/records/`; committed files may own
+neither generated output tree. It requires every committed generated marker to
+occur exactly once with an empty body. Explanatory prose remains outside those
+markers. Missing source and topic projection pages are created dynamically from
+the registries, so catalogue growth does not require committed placeholder
+pages. Existing source and topic pages may retain hand-written context around
+their uniquely owned marker. The checker
 accepts a separately emitted validator aggregate, recomputes its framed input
-digest, and requires byte equality plus exact record membership and visible
-field agreement in every source and topic projection. Each generated record is
+digest, and requires byte equality plus exact projection membership, counts,
+order, record identities, and canonical detail links. Each canonical detail is
 raw HTML with an escaped heading and an ordered definition list of visible
 `data-label-for` labels paired with typed `data-field` values. The checker
-compares the complete heading, labels, field names, field values, typed citation
-attributes, direct-child grammar, and order independently; missing, duplicate,
+compares every canonical record field, including ordered topics, complete typed
+provenance, source path, origin, and the proof-guide anchor. Missing, duplicate,
 unrecognized, reordered, or contradictory additive fields are rejected in both
-staged source and rendered HTML.
-Dynamic source, topic, and status index rows use the same escaped raw-HTML
-boundary with explicit identity, label, and count attributes. Braces are
+staged source and rendered HTML. The staged and rendered gates also require the
+record ID set, generated filenames, permalinks, rendered directories, and
+article identities to be one-to-one, and require every full record article to
+occur exactly once across the human publication.
+
+Source, topic, project-original, and status pages contain only exact counts and
+compact links to those canonical details; they contain no record definition
+lists. The projection grammar also rejects record-like `article`, `dl`, `dt`,
+or `dd` structures, typed-field attributes, and unknown `record-*` containers,
+even when canonical article identity attributes have been stripped. Every
+generated marker owns one typed container whose complete staged serialization
+and live serialization must match the catalogue-derived output exactly;
+arbitrary tags, text, or whitespace inside that region are rejected while
+hand-written prose outside the marker remains allowed. Their
+projection rows retain `record-<record-id>` as an explicit element
+ID, preserving the four prototype records' already published source/topic
+fragments while changing the fragment target from a duplicated detail block to
+the corresponding compact row. Dynamic index and projection rows use the same
+escaped raw-HTML boundary with explicit identity, label, and count attributes. Braces are
 numeric HTML entities in staged source, preventing catalogue text from opening
 a Liquid expression while preserving the canonical visible text after parsing.
 Before rendering, the generator also assigns an explicit Kramdown ID to every
@@ -44,7 +66,10 @@ ID and rejects duplicates.
 The generated views visibly report the catalogue state, schema version, input
 SHA-256, and build revision. The build revision is presentation metadata and is
 not included in `catalog.json`, so the stable machine artifact is deterministic
-for unchanged canonical inputs. While the catalogue state is `prototype`, the
+for unchanged canonical inputs. Human generator version 2 introduces the
+canonical record-route topology; `generation.json` records its exact record
+page count and a framed digest of every record ID/route pair. While the
+catalogue state is `prototype`, the
 [complete interim legacy catalogue](/lattice-system/formalization/legacy/)
 remains authoritative until Issue #5228 performs the audited cutover.
 When the state becomes `authoritative`, the same generated metadata instead
@@ -54,11 +79,13 @@ state flip with stale prototype authority prose is rejected. In authoritative
 state they scan every staged Markdown page and every rendered HTML page for the
 closed stale-authority phrases exercised by negative tests, rather than merely
 checking that the generated metadata itself is correct. The live checker
-applies the same rule to all four fetched human entry points.
+applies the same rule to every fetched human page.
 
 Stable publication paths are:
 
 - Human catalogue: `/lattice-system/formalization/`
+- Canonical human record detail:
+  `/lattice-system/formalization/records/<record-id>/`
 - Version 1 machine catalogue:
   `/lattice-system/formalization-status/v1/catalog.json`
 - Version 1 schema: `/lattice-system/formalization-status/v1/schema.json`
@@ -124,18 +151,35 @@ cannot replace a pending `main` deployment. This is the repository's only
 Pages deployment owner.
 
 After a successful guarded deployment, a separate read-only job verifies the
-live publication for that same `main` SHA. It fetches exactly the four human
-entry points (`formalization/`, `status/`, `sources/`, and `topics/`) and the
-three versioned JSON resources (`catalog.json`, `schema.json`, and
+live publication for that same `main` SHA. It first fetches the four stable
+human entry points (`formalization/`, `status/`, `sources/`, and `topics/`) and
+the three versioned JSON resources (`catalog.json`, `schema.json`, and
 `publication.json`) below the fixed
-`https://phasetr.github.io/lattice-system/` base. The standard-library checker
-requires HTTP 200 and the expected content type, exact generated metadata and
-catalog-derived ordered overview/source/topic/status rows, schema version 1,
+`https://phasetr.github.io/lattice-system/` base. It then derives and fetches
+every source/topic projection and the project-original projection from that
+catalogue only after the fetched schema equals the checkout schema and the
+catalogue passes its complete recursive aggregate contract. Route IDs must use
+the stable-ID grammar and avoid fixed-route reservations; endpoint URLs use
+exact fixed-base concatenation rather than URL-reference resolution. Invalid
+path, query, fragment, percent, backslash, absolute-like, or reserved IDs fail
+while the request set is still the seven bootstrap endpoints. It also checks
+the four original prototype record routes as a
+permanent public-compatibility smoke set. It does not issue one HTTP request per
+future record: the status page proves the exact complete record-link projection,
+while the same-run rendered-artifact gate has already checked every detail page
+and link. This keeps the post-deploy check bounded as the catalogue grows to
+thousands of records. The standard-library checker requires HTTP 200 and the
+expected content type, exact generated metadata and catalog-derived ordered
+overview/source/topic/status projections, schema version 1,
 a supported matching catalogue state (`prototype` or `authoritative`),
-matching input digests, a published schema equal to
+the exact closed top-level key sets and generator identity/version pairs
+(`validate_formalization_status.py` version 2 and
+`generate_formalization_site.py` version 2), recursive catalogue validation by
+the same dependency-free schema evaluator used during generation, matching
+input digests, a published schema equal to
 the checked-out canonical schema, and a publication revision equal to the
 triggering `main` SHA. Redirects are rejected before following, every response
-has a two-MiB hard limit, and one 240-second absolute deadline bounds complete
+has an eight-MiB hard limit, and one 240-second absolute deadline bounds complete
 snapshot retries within the five-minute job. These retries accommodate Pages
 propagation without any agent-side polling. Pull-request and manual runs
 exercise only its in-memory self-tests and skip the live job. Run those tests

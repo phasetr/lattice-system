@@ -450,6 +450,11 @@ def public_target(
 def main() -> None:
     long_record_negative_self_tests()
     moved_prose_negative_self_tests()
+    generated_records = DOCS / "formalization" / "records"
+    if generated_records.exists() or generated_records.is_symlink():
+        fail(
+            "docs/formalization/records is generator-owned and must not be committed"
+        )
     old_text = baseline_index()
     old_lines = old_text.splitlines(keepends=True)
     permalink_to_page: dict[str, Path] = {}
