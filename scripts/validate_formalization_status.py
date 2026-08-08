@@ -21,6 +21,7 @@ from formalization_cutover import (
     CUTOVER_RETIRED_DECLARATION_REQUIRED_KEYS,
     LEGACY_ROW_KEYS,
     exceptional_mapping_map,
+    lean_declaration_inventory,
     reconstruct_legacy_rows,
     retired_declaration_map,
     self_test as cutover_self_test,
@@ -945,53 +946,7 @@ def source_declares(path: Path, kind: str, lean_name: str) -> bool:
         source = path.read_text(encoding="utf-8")
     except OSError:
         return False
-    # Remove nested block comments while retaining newlines for command boundaries.
-    cleaned: list[str] = []
-    index = 0
-    comment_depth = 0
-    while index < len(source):
-        if source.startswith("/-", index):
-            comment_depth += 1
-            cleaned.extend("  ")
-            index += 2
-        elif comment_depth and source.startswith("-/", index):
-            comment_depth -= 1
-            cleaned.extend("  ")
-            index += 2
-        else:
-            character = source[index]
-            cleaned.append("\n" if comment_depth and character == "\n" else character if not comment_depth else " ")
-            index += 1
-    lines = [line.split("--", 1)[0] for line in "".join(cleaned).splitlines()]
-    attributes = r"(?:@\[[^\]\n]*\]\s*)*"
-    modifiers = r"(?:(?:private|protected|noncomputable|unsafe|public)\s+)*"
-    declaration = re.compile(
-        rf"^\s*{attributes}{modifiers}{re.escape(keyword)}\s+([^\s(:{{\[]+)"
-    )
-    command = re.compile(r"^\s*(namespace|section|end)(?:\s+([^\s]+))?")
-    frames: list[tuple[str, list[str]]] = []
-    for line in lines:
-        command_match = command.match(line)
-        if command_match:
-            command_kind, command_name = command_match.groups()
-            if command_kind == "namespace" and command_name:
-                frames.append(("namespace", command_name.split(".")))
-            elif command_kind == "section":
-                frames.append(("section", []))
-            elif command_kind == "end" and frames:
-                frames.pop()
-            continue
-        declaration_match = declaration.match(line)
-        if declaration_match:
-            declared = declaration_match.group(1)
-            namespace = [part for frame_kind, parts in frames if frame_kind == "namespace" for part in parts]
-            if declared.startswith("_root_."):
-                full_name = declared.removeprefix("_root_.")
-            else:
-                full_name = ".".join([*namespace, *declared.split(".")])
-            if full_name == lean_name:
-                return True
-    return False
+    return keyword in lean_declaration_inventory(source).get(lean_name, set())
 
 
 def validate_state_dimensions(record: dict[str, Any], location: str, validation: Validation) -> None:
@@ -1498,6 +1453,28 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
             "LatticeSystem.Lattice.spacingOf",
         ),
         "same-line @[simp] def spacingOf was not detected",
+    )
+    parser_fixture = """
+namespace LatticeSystem
+namespace Fixture
+section Inner
+@[simp] private noncomputable theorem attributedResult : True := by trivial
+end Inner
+namespace Nested
+protected def value : Nat := 0
+end Nested
+end Fixture
+end LatticeSystem
+"""
+    parser_inventory = lean_declaration_inventory(parser_fixture)
+    check(
+        "theorem"
+        in parser_inventory.get("LatticeSystem.Fixture.attributedResult", set()),
+        "shared inventory missed same-line attributes/modifiers in a nested namespace",
+    )
+    check(
+        "def" in parser_inventory.get("LatticeSystem.Fixture.Nested.value", set()),
+        "shared inventory missed a protected declaration in a nested namespace",
     )
     duplicate_name = (
         "LatticeSystem.Quantum.InfiniteSpinSystem.IsPhysicalGroundState."
@@ -2050,6 +2027,12 @@ def run_self_tests(contract: Contract, repo_root: Path) -> list[str]:
         (
             "unclosed waived disposition",
             lambda value: value["legacy_rows"][1].update(disposition="waived"),
+        ),
+        (
+            "non-record row with retired disposition",
+            lambda value: value["legacy_rows"][1].update(
+                disposition="retired_declarations"
+            ),
         ),
         (
             "retired row with mapped IDs",

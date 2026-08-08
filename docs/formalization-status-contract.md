@@ -365,14 +365,16 @@ exception is rejected for a nongrouped row, and unused or missing exceptional
 entries are errors.
 
 Retirement is not a free-form escape from coverage. Each certificate entry
-binds one exact row hash, ordinal, legacy leaf, former fully qualified Lean name
-(or its exact former short name), former `LatticeSystem/**/*.lean` path, and a
+binds one exact row hash, ordinal, legacy leaf, former fully qualified Lean
+name, former `LatticeSystem/**/*.lean` path, and a
 40-hex deletion commit plus a nonempty reason. The validator proves that the
 commit is in current history, changes that exact path, the parent version
-declares the leaf, the commit version removes it (or the file), and the current
-Lean tree and current catalogue no longer declare it. Optional sorted
-replacement record IDs must exist. Entries are sorted and unique by
-ordinal/leaf; wrong-row, survivor, fabricated-history, overlapping-current,
+declares the exact fully qualified name, the commit version removes it (or the
+file), and the current Lean tree and current catalogue no longer declare it.
+The shared source inventory tracks nested namespaces, leading attributes, and
+declaration modifiers rather than relying on terminal-name substring scans.
+Optional sorted replacement record IDs must exist. Entries are sorted and unique
+by ordinal/leaf; wrong-row, survivor, fabricated-history, overlapping-current,
 missing, extra, and unused retirement evidence is rejected. This model applies
 uniformly to any number of absent historical leaves, including mixed rows whose
 other declarations survive.

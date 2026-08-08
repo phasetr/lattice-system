@@ -37,7 +37,6 @@ LEGACY_ROW_KEYS = {
     "row_sha256",
 }
 OUTCOMES = {"mapped", "not_a_declaration", "retired"}
-DISPOSITIONS = {"non_declaration", "retired_declarations"}
 CUTOVER_CERTIFICATE_KEYS = {
     "baseline_sha256",
     "cutover_record_ids_sha256",
@@ -141,11 +140,6 @@ STABLE_ID_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 LEAN_NAME_RE = re.compile(
     r"LatticeSystem(?:\.[A-Za-z_\u0080-\uFFFF][A-Za-z0-9_'\u0080-\uFFFF]*)+"
 )
-LEAN_DECLARATION_RE = re.compile(
-    r"(?m)^\s*(?:(?:private|protected|noncomputable|unsafe)\s+)*"
-    r"(?:abbrev|axiom|class|def|inductive|instance|lemma|opaque|structure|theorem)\s+"
-    r"([A-Za-z_\u0080-\uFFFF][A-Za-z0-9_'\u0080-\uFFFF]*)"
-)
 RETIRED_FIXTURES = {
     656: {
         "deletion_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
@@ -173,7 +167,7 @@ RETIRED_FIXTURES = {
         "reason": "Deleted with the bulk orphan-module removal in PR #3919.",
     },
 }
-_CURRENT_DECLARATION_LEAVES_CACHE: dict[Path, set[str]] = {}
+_CURRENT_DECLARATION_NAMES_CACHE: dict[Path, set[str]] = {}
 _RETIREMENT_HISTORY_CACHE: dict[tuple[Path, str, str, str, str], str | None] = {}
 
 
@@ -545,7 +539,7 @@ def validate_cutover_baseline(
         elif outcome == "not_a_declaration":
             if mapped:
                 errors.append(f"{location}: not_a_declaration outcome cannot map records")
-            if disposition not in DISPOSITIONS:
+            if disposition != "non_declaration":
                 errors.append(f"{location}: invalid closed non-record disposition")
             if index not in allowed_non_record_ordinals:
                 errors.append(f"{location}: non-record outcome is absent from the certificate")
@@ -644,6 +638,86 @@ def _git_text(repo_root: Path, revision_path: str) -> str | None:
     return process.stdout if process.returncode == 0 else None
 
 
+def lean_declaration_inventory(source: str) -> dict[str, set[str]]:
+    """Parse exact fully qualified Lean declarations from one source blob."""
+    cleaned: list[str] = []
+    index = 0
+    comment_depth = 0
+    while index < len(source):
+        if source.startswith("/-", index):
+            comment_depth += 1
+            cleaned.extend("  ")
+            index += 2
+        elif comment_depth and source.startswith("-/", index):
+            comment_depth -= 1
+            cleaned.extend("  ")
+            index += 2
+        else:
+            character = source[index]
+            cleaned.append(
+                "\n"
+                if comment_depth and character == "\n"
+                else character
+                if not comment_depth
+                else " "
+            )
+            index += 1
+    lines = [line.split("--", 1)[0] for line in "".join(cleaned).splitlines()]
+    attributes = r"(?:@\[[^\]\n]*\]\s*)*"
+    modifiers = r"(?:(?:private|protected|noncomputable|unsafe|public)\s+)*"
+    declaration = re.compile(
+        rf"^\s*{attributes}{modifiers}"
+        r"(abbrev|axiom|class|def|inductive|instance|lemma|opaque|structure|theorem)"
+        r"\s+([^\s(:{\[]+)"
+    )
+    command = re.compile(r"^\s*(namespace|section|end)(?:\s+([^\s]+))?")
+    frames: list[tuple[str, list[str]]] = []
+    inventory: dict[str, set[str]] = {}
+    for line in lines:
+        command_match = command.match(line)
+        if command_match:
+            command_kind, command_name = command_match.groups()
+            if command_kind == "namespace" and command_name:
+                frames.append(("namespace", command_name.split(".")))
+            elif command_kind == "section":
+                frames.append(("section", []))
+            elif command_kind == "end" and frames:
+                frames.pop()
+            continue
+        declaration_match = declaration.match(line)
+        if declaration_match is None:
+            continue
+        kind, declared = declaration_match.groups()
+        namespace = [
+            part
+            for frame_kind, parts in frames
+            if frame_kind == "namespace"
+            for part in parts
+        ]
+        if declared.startswith("_root_."):
+            full_name = declared.removeprefix("_root_.")
+        else:
+            full_name = ".".join([*namespace, *declared.split(".")])
+        inventory.setdefault(full_name, set()).add(kind)
+    return inventory
+
+
+def current_lean_declaration_names(repo_root: Path) -> set[str]:
+    """Return the cached exact FQ declaration inventory for current project sources."""
+    resolved_root = repo_root.resolve()
+    current_names = _CURRENT_DECLARATION_NAMES_CACHE.get(resolved_root)
+    if current_names is None:
+        current_names = set()
+        for current_path in (repo_root / "LatticeSystem").rglob("*.lean"):
+            current_names.update(
+                lean_declaration_inventory(
+                    current_path.read_text(encoding="utf-8")
+                )
+            )
+        _CURRENT_DECLARATION_NAMES_CACHE[resolved_root] = current_names
+    return current_names
+
+
 def _retirement_history_error(entry: dict[str, Any], repo_root: Path) -> str | None:
     """Prove that one exact former declaration disappeared in the named commit."""
     commit = entry["deletion_commit"]
@@ -657,6 +731,9 @@ def _retirement_history_error(entry: dict[str, Any], repo_root: Path) -> str | N
     def finish(error: str | None) -> str | None:
         _RETIREMENT_HISTORY_CACHE[cache_key] = error
         return error
+
+    if former_name in current_lean_declaration_names(repo_root):
+        return finish("former Lean name is still declared in the current Lean tree")
 
     ancestor = subprocess.run(
         ["git", "merge-base", "--is-ancestor", commit, "HEAD"],
@@ -678,30 +755,10 @@ def _retirement_history_error(entry: dict[str, Any], repo_root: Path) -> str | N
         return finish("deletion commit does not change the former path")
     before = _git_text(repo_root, f"{commit}^:{path}")
     after = _git_text(repo_root, f"{commit}:{path}")
-    if before is None or leaf not in set(LEAN_DECLARATION_RE.findall(before)):
-        return finish("former path does not declare the legacy leaf before deletion")
-    if former_name != leaf:
-        namespaces = set(
-            re.findall(
-                r"(?m)^namespace\s+(LatticeSystem(?:\.[A-Za-z_][A-Za-z0-9_']*)*)\s*$",
-                before,
-            )
-        )
-        if not any(former_name == f"{namespace}.{leaf}" for namespace in namespaces):
-            return finish("former fully qualified name disagrees with the historical namespace")
-    if after is not None and leaf in set(LEAN_DECLARATION_RE.findall(after)):
-        return finish("legacy leaf remains declared at the deletion commit")
-    resolved_root = repo_root.resolve()
-    current_leaves = _CURRENT_DECLARATION_LEAVES_CACHE.get(resolved_root)
-    if current_leaves is None:
-        current_leaves = set()
-        for current_path in (repo_root / "LatticeSystem").rglob("*.lean"):
-            current_leaves.update(
-                LEAN_DECLARATION_RE.findall(current_path.read_text(encoding="utf-8"))
-            )
-        _CURRENT_DECLARATION_LEAVES_CACHE[resolved_root] = current_leaves
-    if leaf in current_leaves:
-        return finish("legacy leaf is still declared in the current Lean tree")
+    if before is None or former_name not in lean_declaration_inventory(before):
+        return finish("former path does not declare the exact former Lean name before deletion")
+    if after is not None and former_name in lean_declaration_inventory(after):
+        return finish("former Lean name remains declared at the deletion commit")
     return finish(None)
 
 
@@ -736,15 +793,12 @@ def retired_declaration_map(
         ordering.append((ordinal, leaf))
         if (
             not isinstance(former_name, str)
-            or not (
-                former_name == leaf
-                or (
-                    LEAN_NAME_RE.fullmatch(former_name) is not None
-                    and former_name.rsplit(".", 1)[-1] == leaf
-                )
-            )
+            or LEAN_NAME_RE.fullmatch(former_name) is None
+            or former_name.rsplit(".", 1)[-1] != leaf
         ):
-            errors.append(f"{location}: former Lean name does not bind the legacy leaf")
+            errors.append(
+                f"{location}: exact fully qualified former Lean name does not bind the legacy leaf"
+            )
         if not isinstance(entry.get("deletion_commit"), str) or GIT_COMMIT_RE.fullmatch(
             entry["deletion_commit"]
         ) is None:
@@ -1052,6 +1106,11 @@ def self_test(repo_root: Path) -> list[str]:
             {"disposition": "waived"},
         ),
         (
+            "non-record row with retired disposition",
+            non_record_row_index,
+            {"disposition": "retired_declarations"},
+        ),
+        (
             "retired row with a mapped ID",
             retired_row_index,
             {"mapped_record_ids": [records[0]["id"]]},
@@ -1320,6 +1379,25 @@ def self_test(repo_root: Path) -> list[str]:
     )
     if not fabricated_errors:
         failures.append("retirement evidence accepted a fabricated deletion commit")
+    for current_leaf in ("flipConfig_apply", "timeReversalSign_zero"):
+        current_declaration_retirement = [
+            {
+                **RETIRED_FIXTURES[656],
+                "former_lean_name": f"LatticeSystem.Quantum.{current_leaf}",
+                "former_path": "LatticeSystem/Quantum/TimeReversalMulti.lean",
+                "legacy_leaf": current_leaf,
+                "ordinal": 656,
+                "replacement_record_ids": [],
+                "row_sha256": baseline["legacy_rows"][655]["row_sha256"],
+            }
+        ]
+        _current_map, current_errors = retired_declaration_map(
+            current_declaration_retirement, repo_root
+        )
+        if not any("still declared in the current Lean tree" in error for error in current_errors):
+            failures.append(
+                f"retirement evidence did not reject current declaration {current_leaf}"
+            )
     missing_replacement = copy.deepcopy(retired_by_ordinal)
     missing_replacement[656][0]["replacement_record_ids"] = ["missing-replacement"]
     if not validate_cutover_baseline(

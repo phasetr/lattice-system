@@ -350,8 +350,7 @@
           "type": "string"
         },
         "former_lean_name": {
-          "pattern": "^(?:LatticeSystem(?:\\.[A-Za-z_\\u0080-\\uFFFF][A-Za-z0-9_'\\u0080-\\uFFFF]*)+|[A-Za-z_\\u0080-\\uFFFF][A-Za-z0-9_'\\u0080-\\uFFFF]*)$",
-          "type": "string"
+          "$ref": "#/$defs/lean_name"
         },
         "former_path": {
           "pattern": "^LatticeSystem/[A-Za-z0-9_./-]+\\.lean$",
