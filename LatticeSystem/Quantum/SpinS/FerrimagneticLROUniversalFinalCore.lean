@@ -8,7 +8,6 @@ import LatticeSystem.Quantum.SpinS.SectorRestrictionComplexEigval
 import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorEigenvalueUnique
 import LatticeSystem.Quantum.SpinS.Theorem23Local
 import LatticeSystem.Quantum.SpinS.Theorem23Sectors
-import LatticeSystem.Quantum.SpinS.FerrimagneticLROCapstone
 import LatticeSystem.Quantum.SpinS.EigenspaceFinrankLeOneTransfer
 import LatticeSystem.Quantum.SpinS.SubmatrixEigenvalueReal
 

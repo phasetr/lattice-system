@@ -1,3 +1,4 @@
+import LatticeSystem.Quantum.SpinS.Theorem23StructuralBipartiteToy
 import LatticeSystem.Quantum.SpinS.Theorem24SU2GlobalUniquenessFromMLMCoreSectors
 
 /-!

@@ -1,4 +1,6 @@
+import LatticeSystem.Quantum.SpinS.MagSectorEmbeddingCore
 import LatticeSystem.Quantum.SpinS.Problem25dBalancedSectorWitnessCore
+import LatticeSystem.Quantum.SpinS.Problem25dSectorSupportedWrapper
 import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeel
 
 /-!

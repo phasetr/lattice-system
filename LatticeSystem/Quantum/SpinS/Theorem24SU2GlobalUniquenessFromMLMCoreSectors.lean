@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23StructuralGeneralFinal
+import LatticeSystem.Quantum.SpinS.Theorem23GeneralHOutside
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralSectorLiftCasimir
 import LatticeSystem.Quantum.SpinS.EigenspaceFinrankLeOneTransfer
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
