@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.AndersonTowerSphereAverage
+import LatticeSystem.Quantum.SpinS.CartesianAxis
 import LatticeSystem.Math.SphereMoment
 import LatticeSystem.Math.NoncommPowerExpansion
 import Mathlib.Analysis.Matrix.Normed
@@ -8,8 +9,8 @@ import Mathlib.Analysis.Matrix.Normed
 
 For a unit vector `n ∈ S² ⊂ ℝ³` the direction order operator `Ô_L^n = Σ_x ε_x (Ŝ_x · n)`
 (`directionStaggeredOp`) decomposes along the three spin axes as `Ô_L^n = Σ_α n_α ô^{(α)}`, where
-`ô^{(α)}` is the axis-`α` staggered order operator (`stagOpVec`).  Raising to the `M`-th power and
-integrating over the sphere, the noncommutative multinomial theorem
+`ô^{(α)}` is the axis-`α` staggered order operator (`stagOpVec`, taken from `CartesianAxis`).
+Raising to the `M`-th power and integrating over the sphere, the noncommutative multinomial theorem
 (`pow_sum_smul_eq_sum_smul_prod`) together with the scalar monomial moments
 (`sphereMonomialMoment_eq`) yields
 
@@ -28,13 +29,6 @@ open Matrix MeasureTheory LatticeSystem.Math
 open scoped Matrix.Norms.Frobenius
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
-
-/-- The **axis-indexed staggered order operator vector** `α ↦ ô^{(α)}`: axis `0` is
-`staggeredOrderOp1S`, axis `1` is `staggeredOrderOp2S`, axis `2` is the `3`-axis operator
-`staggeredOrderOpS`.  It packages the three components so that `directionStaggeredOp` is the
-`n`-weighted sum `Σ_α n_α ô^{(α)}` (`directionStaggeredOp_eq_sum`). -/
-noncomputable def stagOpVec (A : Λ → Bool) (N : ℕ) : Fin 3 → ManyBodyOpS Λ N :=
-  ![staggeredOrderOp1S A N, staggeredOrderOp2S A N, staggeredOrderOpS A N]
 
 /-- **Axis decomposition of the direction order operator.**  For a unit vector
 `n ∈ EuclideanSpace ℝ (Fin 3)`, the direction order operator `Ô_L^n` is the coordinate-weighted sum

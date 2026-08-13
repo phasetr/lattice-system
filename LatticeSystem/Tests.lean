@@ -93,6 +93,7 @@ import LatticeSystem.Tests.MarshallLiebMattisToyHamiltonianCasimir
 import LatticeSystem.Tests.MarshallLiebMattisSublatticeCasimirNeel
 import LatticeSystem.Tests.TimeReversalSpinHalf
 import LatticeSystem.Tests.TimeReversalMulti
+import LatticeSystem.Tests.CartesianAxis
 
 /-!
 # Test aggregator for the `lattice-system` library
