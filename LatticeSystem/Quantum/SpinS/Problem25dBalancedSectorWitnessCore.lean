@@ -1,5 +1,8 @@
+import LatticeSystem.Quantum.SpinS.MagConfig
 import LatticeSystem.Quantum.SpinS.MagSumStepDown
-import LatticeSystem.Quantum.SpinS.Problem25dSectorSupportedWrapper
+import LatticeSystem.Quantum.SpinS.MarshallSignCore
+import LatticeSystem.Quantum.SpinS.Problem25dCorrelationSignBridge
+import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeelCore
 
 /-!
 # Problem 2.5.d balanced-sector witness: signed ladder entries (foundation)
