@@ -299,6 +299,14 @@ def approved_changes(text: str) -> str:
             "**Phase A (current, this PR)**",
             "**Phase A (historical scaffold; implementation recorded at the time)**",
         )
+        .replace(
+            "The operator order is preserved exactly. | `Quantum/SpinS/AndersonTowerSphereMoment.lean` |",
+            "The operator order is preserved exactly. `stagOpVec` is defined in `CartesianAxis.lean`; `directionStaggeredOp_eq_sum` and `sphereAverage_directionStaggeredOp_pow` remain in `AndersonTowerSphereMoment.lean`. | `Quantum/SpinS/CartesianAxis.lean` / `Quantum/SpinS/AndersonTowerSphereMoment.lean` |",
+        )
+        .replace(
+            "isolated to this proof. | `Quantum/SpinS/AndersonTowerLeviCivita.lean` |",
+            "isolated to this proof. `leviCivita3` and `totalSpinSOpVec` are defined in `CartesianAxis.lean`; the three diagonal commutators and `totalSpinSOpVec_commutator_stagOpVec` remain in `AndersonTowerLeviCivita.lean`. | `Quantum/SpinS/CartesianAxis.lean` / `Quantum/SpinS/AndersonTowerLeviCivita.lean` |",
+        )
     )
 
 
