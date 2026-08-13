@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.AndersonTowerEnergyBoundSU2
 import LatticeSystem.Quantum.SpinS.AndersonTowerSphereMoment
+import LatticeSystem.Quantum.SpinS.CartesianAxis
 
 /-!
 # Tasaki §4.2.2 Proposition 4.10: Levi-Civita bookkeeping for the total×order rotation commutators
@@ -9,12 +10,9 @@ total-spin generator `Ŝ^{(γ)}_tot` through the ordered product `∏_j ô^{(w_j
 letter `w_k = β` by the rotated axis `δ` weighted by `i ε_{γβδ}`.  To keep the axis case analysis in
 a single place, this module packages:
 
-* the **Levi-Civita scalar** `leviCivita3 : Fin 3 → Fin 3 → Fin 3 → ℂ` (the totally antisymmetric
-  symbol with `ε_{012} = 1`), so that the double axis index of the contraction lives in the `ℂ`
-  scalar and is folded by `Finset.sum` algebra rather than by hand;
-* the **total-spin generator vector** `totalSpinSOpVec γ = Ŝ^{(γ)}_tot` bundling the three Cartesian
-  total-spin operators `totalSpinSOp{1,2,3}` over the axis index `Fin 3`;
-* the **diagonal rotation commutators** `[Ŝ^{(γ)}_tot, ô^{(γ)}] = 0` (same-axis, hence commuting);
+* the **diagonal rotation commutators** `[Ŝ^{(γ)}_tot, ô^{(γ)}] = 0` (same-axis, hence commuting),
+  stated in the axis conventions `leviCivita3`, `stagOpVec`, `totalSpinSOpVec` imported from
+  `CartesianAxis`;
 * the **uniform single-letter rotation commutator**
   `[Ŝ^{(γ)}_tot, ô^{(β)}] = i Σ_δ ε_{γβδ} ô^{(δ)}`, which merges the six off-diagonal total×order
   commutators (`AndersonTowerEnergyBoundSU2`) and the three diagonal ones into a single statement.
@@ -29,30 +27,6 @@ namespace LatticeSystem.Quantum
 open Matrix
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
-
-/-! ### The Levi-Civita scalar and the total-spin generator vector -/
-
-/-- The **Levi-Civita symbol** `ε_{γβδ}` on `Fin 3`, valued in `ℂ`: the totally antisymmetric scalar
-normalised by `ε_{012} = 1`, taking the value `+1` on the even permutations `(0,1,2)`, `(1,2,0)`,
-`(2,0,1)`, the value `−1` on the odd permutations `(0,2,1)`, `(1,0,2)`, `(2,1,0)`, and `0` whenever
-two indices coincide.  Carrying the axis double index of the swap-band contraction as this `ℂ`
-scalar lets the `Finset.sum` over axes absorb the case analysis. -/
-def leviCivita3 : Fin 3 → Fin 3 → Fin 3 → ℂ
-  | 0, 1, 2 => 1
-  | 1, 2, 0 => 1
-  | 2, 0, 1 => 1
-  | 0, 2, 1 => -1
-  | 1, 0, 2 => -1
-  | 2, 1, 0 => -1
-  | _, _, _ => 0
-
-/-- The **total-spin generator vector** `γ ↦ Ŝ^{(γ)}_tot`: axis `0` is `totalSpinSOp1`, axis `1` is
-`totalSpinSOp2`, axis `2` is `totalSpinSOp3`.  It bundles the three Cartesian total-spin generators
-over the axis index `Fin 3`, mirroring the staggered order vector `stagOpVec`, so that the rotation
-commutator `[Ŝ^{(γ)}_tot, ô^{(β)}]` can be stated uniformly in the axis indices. -/
-noncomputable def totalSpinSOpVec (Λ : Type*) [Fintype Λ] [DecidableEq Λ] (N : ℕ) :
-    Fin 3 → ManyBodyOpS Λ N :=
-  ![totalSpinSOp1 Λ N, totalSpinSOp2 Λ N, totalSpinSOp3 Λ N]
 
 /-! ### Diagonal (same-axis) rotation commutators `[Ŝ^{(γ)}_tot, ô^{(γ)}] = 0` -/
 
