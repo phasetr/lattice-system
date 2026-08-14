@@ -1317,6 +1317,14 @@ formalization of Tasaki \S2.1 and \S2.2.
   \texttt{totalSpinHalfRot\{1,2,3\}Pi\_eq}: global rotation
   $\hat U^{(\alpha)}_{\rm tot,\theta}$ via \texttt{Finset.noncommProd}
   (Tasaki eq.~(2.2.11)).
+  Internal implementation record (private, not public API), all in
+  \texttt{Quantum/TotalSpin/Rotation.lean}: the six \texttt{Pi} and
+  \texttt{\_theta} constructors are instantiations of the private
+  \texttt{totalSpinHalfRotOf}~$U$; the private
+  \texttt{totalSpinHalfRotOf\_one}, \texttt{totalSpinHalfRotOf\_mul} and
+  \texttt{totalSpinHalfRotOf\_two\_site} prove, respectively, the
+  \texttt{\_zero} family, the cyclic family and the two-site family
+  below; the \texttt{Pi\_eq} theorems remain \texttt{rfl}.
 \item \texttt{totalSpinHalfRot\{1,2,3\}Pi\_mul\_totalSpinHalfRot\{2,3,1\}Pi}:
   $\hat U^{(\alpha)}_{\pi,{\rm tot}} \cdot
    \hat U^{(\beta)}_{\pi,{\rm tot}}

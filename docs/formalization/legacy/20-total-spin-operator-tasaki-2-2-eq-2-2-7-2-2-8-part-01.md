@@ -118,6 +118,40 @@ Systems*, §2.2 eqs. (2.2.7) and (2.2.8), p. 22.
 | `marshallSquareState` / `_neelSquareConfig` | 2D Marshall-rotated checkerboard state; coincides with `neelSquareState K L` at the Néel configuration | `Quantum/NeelState/MarshallSign.lean` |
 <!-- legacy-source:end:784:888 -->
 
+## Authoritative supplemental implementation record (private, not public API)
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+private implementation declarations introduced for the public rotation rows of that block. Every
+migrated row above is unchanged.
+
+Source file: `LatticeSystem/Quantum/TotalSpin/Rotation.lean`, section "Internal generic
+construction", immediately before `totalSpinHalfRot1Pi`. All four declarations are `private` and
+are not public API; no public name, signature, statement or doc comment changed when they were
+introduced (issue #5241, PR #5243).
+
+- `private noncomputable def totalSpinHalfRotOf (U : Matrix (Fin 2) (Fin 2) ℂ) : ManyBodyOp Λ`,
+  defined as `(Finset.univ : Finset Λ).noncommProd (fun x => onSite x U) …` with the commutation
+  side condition discharged by `onSite_mul_onSite_of_ne`. Role: the one generic site-wise product
+  of a single-site matrix over the lattice. It implements the public constructors
+  `totalSpinHalfRot{1,2,3}Pi` (at `U = spinHalfRot{1,2,3} Real.pi`) and `totalSpinHalfRot{1,2,3} θ`
+  (at `U = spinHalfRot{1,2,3} θ`), which are now one-line instantiations.
+- `private theorem totalSpinHalfRotOf_one : totalSpinHalfRotOf Λ 1 = 1`. Role: identity value of
+  the generic product. It implements the public family `totalSpinHalfRot{1,2,3}_zero`, each proved
+  from it together with `spinHalfRot{1,2,3}_zero`.
+- `private theorem totalSpinHalfRotOf_mul (U V : Matrix (Fin 2) (Fin 2) ℂ) :
+  totalSpinHalfRotOf Λ U * totalSpinHalfRotOf Λ V = totalSpinHalfRotOf Λ (U * V)`.
+  Role: site-wise multiplicativity. It implements the public cyclic family
+  `totalSpinHalfRot{1,2,3}Pi_mul_totalSpinHalfRot{2,3,1}Pi`, each proved from it together with
+  `spinHalfRot{1,2,3}_pi_mul_spinHalfRot{2,3,1}_pi`.
+- `private theorem totalSpinHalfRotOf_two_site (U : Matrix (Fin 2) (Fin 2) ℂ) :
+  totalSpinHalfRotOf (Fin 2) U = onSite (0 : Fin 2) U * onSite (1 : Fin 2) U`. Role: two-site
+  factorisation. It implements the public theorems `totalSpinHalfRot{1,2,3}Pi_two_site` and
+  `totalSpinHalfRot{1,2,3}_two_site`, each a one-line application.
+
+The public theorems `totalSpinHalfRot{1,2,3}Pi_eq` keep their `:= rfl` proofs and do not invoke any
+of the four private declarations. The other public results of the same file (`_eq_exp`,
+`_commute_of_commute`, `_conjTranspose_mul_self`, `_conj_eq_self_of_commute`) are unchanged and go
+through the public `_eq_exp` seam, not through the private core.
+
 ---
 
 [← The AKLT model (Tasaki §7.1)](/lattice-system/formalization/legacy/19-the-aklt-model-tasaki-7-1/) · [Catalogue](/lattice-system/formalization/legacy/) · [Total spin operator (Tasaki §2.2 eq. (2.2.7), (2.2.8)) →](/lattice-system/formalization/legacy/20-total-spin-operator-tasaki-2-2-eq-2-2-7-2-2-8-part-02/)
