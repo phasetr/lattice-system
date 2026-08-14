@@ -30,43 +30,79 @@ Distinct-site `onSite` embeddings commute (`onSite_mul_onSite_of_ne`),
 so we can form `Û^(α)_π_tot := ∏_{x ∈ Λ} Û^(α)_π_x` as a
 `Finset.noncommProd`. -/
 
+/-! ### Internal generic construction
+
+The six rotation constructors below differ only in the single-site matrix they multiply over the
+lattice, so they are factored through a private core parameterised by that matrix. The parameter
+is the matrix itself rather than a `Fin 3` axis index because the single-site rotations
+`spinHalfRot{1,2,3}` are three separate functions, not an axis-indexed family. -/
+
+/-- Generic global rotation: the site-wise product `∏_{x ∈ Λ} onSite x U` of a single-site
+matrix `U`, formed as a `Finset.noncommProd` because distinct-site embeddings commute
+(`onSite_mul_onSite_of_ne`). Each public `totalSpinHalfRotα(Pi)` instantiates this at the
+corresponding single-site rotation. -/
+private noncomputable def totalSpinHalfRotOf (U : Matrix (Fin 2) (Fin 2) ℂ) : ManyBodyOp Λ :=
+  (Finset.univ : Finset Λ).noncommProd
+    (fun x => onSite x U)
+    (fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+
+/-- The global rotation of the identity matrix is the identity operator. -/
+private theorem totalSpinHalfRotOf_one : totalSpinHalfRotOf Λ 1 = 1 := by
+  unfold totalSpinHalfRotOf
+  simp_rw [onSite_one]
+  exact (Finset.noncommProd_eq_pow_card _ _ _ 1 (fun _ _ => rfl)).trans (one_pow _)
+
+/-- Global rotations multiply site-wise: the product of the global rotations of `U` and `V` is
+the global rotation of `U * V` (`Finset.noncommProd_mul_distrib` plus `onSite_mul_onSite_same`). -/
+private theorem totalSpinHalfRotOf_mul (U V : Matrix (Fin 2) (Fin 2) ℂ) :
+    totalSpinHalfRotOf Λ U * totalSpinHalfRotOf Λ V = totalSpinHalfRotOf Λ (U * V) := by
+  unfold totalSpinHalfRotOf
+  rw [← Finset.noncommProd_mul_distrib
+    (s := (Finset.univ : Finset Λ))
+    (f := fun x : Λ => onSite x U)
+    (g := fun x : Λ => onSite x V)
+    (comm_ff := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+    (comm_gg := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+    (comm_gf := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)]
+  refine Finset.noncommProd_congr rfl ?_ _
+  intros x _
+  change onSite x U * onSite x V = onSite x (U * V)
+  exact onSite_mul_onSite_same x U V
+
+/-- On two sites the global rotation factors as the product over site `0` and site `1`. -/
+private theorem totalSpinHalfRotOf_two_site (U : Matrix (Fin 2) (Fin 2) ℂ) :
+    totalSpinHalfRotOf (Fin 2) U =
+      onSite (0 : Fin 2) U * onSite (1 : Fin 2) U := by
+  unfold totalSpinHalfRotOf
+  show ((Finset.univ : Finset (Fin 2)).noncommProd _ _ : ManyBodyOp (Fin 2)) = _
+  simp [show (Finset.univ : Finset (Fin 2)) = insert 0 {1} from by decide,
+    Finset.noncommProd_insert_of_notMem, Finset.noncommProd_singleton]
+
 /-- Total π-rotation about axis 1: `Û^(1)_π_tot`. -/
 noncomputable def totalSpinHalfRot1Pi : ManyBodyOp Λ :=
-  (Finset.univ : Finset Λ).noncommProd
-    (fun x => onSite x (spinHalfRot1 Real.pi))
-    (fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+  totalSpinHalfRotOf Λ (spinHalfRot1 Real.pi)
 
 /-- Total π-rotation about axis 2: `Û^(2)_π_tot`. -/
 noncomputable def totalSpinHalfRot2Pi : ManyBodyOp Λ :=
-  (Finset.univ : Finset Λ).noncommProd
-    (fun x => onSite x (spinHalfRot2 Real.pi))
-    (fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+  totalSpinHalfRotOf Λ (spinHalfRot2 Real.pi)
 
 /-- Total π-rotation about axis 3: `Û^(3)_π_tot`. -/
 noncomputable def totalSpinHalfRot3Pi : ManyBodyOp Λ :=
-  (Finset.univ : Finset Λ).noncommProd
-    (fun x => onSite x (spinHalfRot3 Real.pi))
-    (fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+  totalSpinHalfRotOf Λ (spinHalfRot3 Real.pi)
 
 /-! ## General-θ global rotation (Tasaki eq (2.2.11)) -/
 
 /-- Total rotation about axis 1 by angle `θ`: `Û^(1)_θ_tot := ∏_x Û^(1)_θ_x`. -/
 noncomputable def totalSpinHalfRot1 (θ : ℝ) : ManyBodyOp Λ :=
-  (Finset.univ : Finset Λ).noncommProd
-    (fun x => onSite x (spinHalfRot1 θ))
-    (fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+  totalSpinHalfRotOf Λ (spinHalfRot1 θ)
 
 /-- Total rotation about axis 2 by angle `θ`. -/
 noncomputable def totalSpinHalfRot2 (θ : ℝ) : ManyBodyOp Λ :=
-  (Finset.univ : Finset Λ).noncommProd
-    (fun x => onSite x (spinHalfRot2 θ))
-    (fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+  totalSpinHalfRotOf Λ (spinHalfRot2 θ)
 
 /-- Total rotation about axis 3 by angle `θ`. -/
 noncomputable def totalSpinHalfRot3 (θ : ℝ) : ManyBodyOp Λ :=
-  (Finset.univ : Finset Λ).noncommProd
-    (fun x => onSite x (spinHalfRot3 θ))
-    (fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+  totalSpinHalfRotOf Λ (spinHalfRot3 θ)
 
 /-- `Û^(α)_π_tot` is a special case of `Û^(α)_θ_tot` at `θ = π`. -/
 theorem totalSpinHalfRot1Pi_eq : totalSpinHalfRot1Pi Λ = totalSpinHalfRot1 Λ Real.pi := rfl
@@ -84,72 +120,36 @@ the single-site relation `Û^(1)_π · Û^(2)_π = Û^(3)_π` (Tasaki eq.
 theorem totalSpinHalfRot1Pi_mul_totalSpinHalfRot2Pi :
     totalSpinHalfRot1Pi Λ * totalSpinHalfRot2Pi Λ = totalSpinHalfRot3Pi Λ := by
   unfold totalSpinHalfRot1Pi totalSpinHalfRot2Pi totalSpinHalfRot3Pi
-  rw [← Finset.noncommProd_mul_distrib
-    (s := (Finset.univ : Finset Λ))
-    (f := fun x : Λ => onSite x (spinHalfRot1 Real.pi))
-    (g := fun x : Λ => onSite x (spinHalfRot2 Real.pi))
-    (comm_ff := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
-    (comm_gg := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
-    (comm_gf := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)]
-  refine Finset.noncommProd_congr rfl ?_ _
-  intros x _
-  change onSite x (spinHalfRot1 Real.pi) * onSite x (spinHalfRot2 Real.pi) =
-       onSite x (spinHalfRot3 Real.pi)
-  rw [onSite_mul_onSite_same, spinHalfRot1_pi_mul_spinHalfRot2_pi]
+  rw [totalSpinHalfRotOf_mul, spinHalfRot1_pi_mul_spinHalfRot2_pi]
 
 /-- Tasaki Problem 2.2.a, axes (2,3)→1:
 `Û^(2)_π_tot · Û^(3)_π_tot = Û^(1)_π_tot`. -/
 theorem totalSpinHalfRot2Pi_mul_totalSpinHalfRot3Pi :
     totalSpinHalfRot2Pi Λ * totalSpinHalfRot3Pi Λ = totalSpinHalfRot1Pi Λ := by
   unfold totalSpinHalfRot1Pi totalSpinHalfRot2Pi totalSpinHalfRot3Pi
-  rw [← Finset.noncommProd_mul_distrib
-    (s := (Finset.univ : Finset Λ))
-    (f := fun x : Λ => onSite x (spinHalfRot2 Real.pi))
-    (g := fun x : Λ => onSite x (spinHalfRot3 Real.pi))
-    (comm_ff := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
-    (comm_gg := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
-    (comm_gf := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)]
-  refine Finset.noncommProd_congr rfl ?_ _
-  intros x _
-  change onSite x (spinHalfRot2 Real.pi) * onSite x (spinHalfRot3 Real.pi) =
-       onSite x (spinHalfRot1 Real.pi)
-  rw [onSite_mul_onSite_same, spinHalfRot2_pi_mul_spinHalfRot3_pi]
+  rw [totalSpinHalfRotOf_mul, spinHalfRot2_pi_mul_spinHalfRot3_pi]
 
 /-- Tasaki Problem 2.2.a, axes (3,1)→2:
 `Û^(3)_π_tot · Û^(1)_π_tot = Û^(2)_π_tot`. -/
 theorem totalSpinHalfRot3Pi_mul_totalSpinHalfRot1Pi :
     totalSpinHalfRot3Pi Λ * totalSpinHalfRot1Pi Λ = totalSpinHalfRot2Pi Λ := by
   unfold totalSpinHalfRot1Pi totalSpinHalfRot2Pi totalSpinHalfRot3Pi
-  rw [← Finset.noncommProd_mul_distrib
-    (s := (Finset.univ : Finset Λ))
-    (f := fun x : Λ => onSite x (spinHalfRot3 Real.pi))
-    (g := fun x : Λ => onSite x (spinHalfRot1 Real.pi))
-    (comm_ff := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
-    (comm_gg := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
-    (comm_gf := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)]
-  refine Finset.noncommProd_congr rfl ?_ _
-  intros x _
-  change onSite x (spinHalfRot3 Real.pi) * onSite x (spinHalfRot1 Real.pi) =
-       onSite x (spinHalfRot2 Real.pi)
-  rw [onSite_mul_onSite_same, spinHalfRot3_pi_mul_spinHalfRot1_pi]
+  rw [totalSpinHalfRotOf_mul, spinHalfRot3_pi_mul_spinHalfRot1_pi]
 
 /-- `Û^(α)_0_tot = 1`: the identity rotation on the many-body space. -/
 theorem totalSpinHalfRot1_zero : totalSpinHalfRot1 Λ 0 = 1 := by
   unfold totalSpinHalfRot1
-  simp_rw [spinHalfRot1_zero, onSite_one]
-  exact (Finset.noncommProd_eq_pow_card _ _ _ 1 (fun _ _ => rfl)).trans (one_pow _)
+  rw [spinHalfRot1_zero, totalSpinHalfRotOf_one]
 
 /-- `Û^(2)_0_tot = 1`. -/
 theorem totalSpinHalfRot2_zero : totalSpinHalfRot2 Λ 0 = 1 := by
   unfold totalSpinHalfRot2
-  simp_rw [spinHalfRot2_zero, onSite_one]
-  exact (Finset.noncommProd_eq_pow_card _ _ _ 1 (fun _ _ => rfl)).trans (one_pow _)
+  rw [spinHalfRot2_zero, totalSpinHalfRotOf_one]
 
 /-- `Û^(3)_0_tot = 1`. -/
 theorem totalSpinHalfRot3_zero : totalSpinHalfRot3 Λ 0 = 1 := by
   unfold totalSpinHalfRot3
-  simp_rw [spinHalfRot3_zero, onSite_one]
-  exact (Finset.noncommProd_eq_pow_card _ _ _ 1 (fun _ _ => rfl)).trans (one_pow _)
+  rw [spinHalfRot3_zero, totalSpinHalfRotOf_one]
 
 /-! ## Site embedding as a ring homomorphism
 
@@ -193,33 +193,24 @@ product over site 0 and site 1. -/
 theorem totalSpinHalfRot1Pi_two_site :
     totalSpinHalfRot1Pi (Fin 2) =
       onSite (0 : Fin 2) (spinHalfRot1 Real.pi) *
-        onSite (1 : Fin 2) (spinHalfRot1 Real.pi) := by
-  unfold totalSpinHalfRot1Pi
-  show ((Finset.univ : Finset (Fin 2)).noncommProd _ _ : ManyBodyOp (Fin 2)) = _
-  simp [show (Finset.univ : Finset (Fin 2)) = insert 0 {1} from by decide,
-    Finset.noncommProd_insert_of_notMem, Finset.noncommProd_singleton]
+        onSite (1 : Fin 2) (spinHalfRot1 Real.pi) :=
+  totalSpinHalfRotOf_two_site (spinHalfRot1 Real.pi)
 
 /-- For two sites, the total π-rotation about axis 2 factors as the
 product over site 0 and site 1. -/
 theorem totalSpinHalfRot2Pi_two_site :
     totalSpinHalfRot2Pi (Fin 2) =
       onSite (0 : Fin 2) (spinHalfRot2 Real.pi) *
-        onSite (1 : Fin 2) (spinHalfRot2 Real.pi) := by
-  unfold totalSpinHalfRot2Pi
-  show ((Finset.univ : Finset (Fin 2)).noncommProd _ _ : ManyBodyOp (Fin 2)) = _
-  simp [show (Finset.univ : Finset (Fin 2)) = insert 0 {1} from by decide,
-    Finset.noncommProd_insert_of_notMem, Finset.noncommProd_singleton]
+        onSite (1 : Fin 2) (spinHalfRot2 Real.pi) :=
+  totalSpinHalfRotOf_two_site (spinHalfRot2 Real.pi)
 
 /-- For two sites, the total π-rotation about axis 3 factors as the
 product over site 0 and site 1. -/
 theorem totalSpinHalfRot3Pi_two_site :
     totalSpinHalfRot3Pi (Fin 2) =
       onSite (0 : Fin 2) (spinHalfRot3 Real.pi) *
-        onSite (1 : Fin 2) (spinHalfRot3 Real.pi) := by
-  unfold totalSpinHalfRot3Pi
-  show ((Finset.univ : Finset (Fin 2)).noncommProd _ _ : ManyBodyOp (Fin 2)) = _
-  simp [show (Finset.univ : Finset (Fin 2)) = insert 0 {1} from by decide,
-    Finset.noncommProd_insert_of_notMem, Finset.noncommProd_singleton]
+        onSite (1 : Fin 2) (spinHalfRot3 Real.pi) :=
+  totalSpinHalfRotOf_two_site (spinHalfRot3 Real.pi)
 
 /-! ## Two-spin explicit total general-θ rotation -/
 
@@ -228,33 +219,24 @@ product over site 0 and site 1. -/
 theorem totalSpinHalfRot1_two_site (θ : ℝ) :
     totalSpinHalfRot1 (Fin 2) θ =
       onSite (0 : Fin 2) (spinHalfRot1 θ) *
-        onSite (1 : Fin 2) (spinHalfRot1 θ) := by
-  unfold totalSpinHalfRot1
-  show ((Finset.univ : Finset (Fin 2)).noncommProd _ _ : ManyBodyOp (Fin 2)) = _
-  simp [show (Finset.univ : Finset (Fin 2)) = insert 0 {1} from by decide,
-    Finset.noncommProd_insert_of_notMem, Finset.noncommProd_singleton]
+        onSite (1 : Fin 2) (spinHalfRot1 θ) :=
+  totalSpinHalfRotOf_two_site (spinHalfRot1 θ)
 
 /-- For two sites, the total `θ`-rotation about axis 2 factors as the
 product over site 0 and site 1. -/
 theorem totalSpinHalfRot2_two_site (θ : ℝ) :
     totalSpinHalfRot2 (Fin 2) θ =
       onSite (0 : Fin 2) (spinHalfRot2 θ) *
-        onSite (1 : Fin 2) (spinHalfRot2 θ) := by
-  unfold totalSpinHalfRot2
-  show ((Finset.univ : Finset (Fin 2)).noncommProd _ _ : ManyBodyOp (Fin 2)) = _
-  simp [show (Finset.univ : Finset (Fin 2)) = insert 0 {1} from by decide,
-    Finset.noncommProd_insert_of_notMem, Finset.noncommProd_singleton]
+        onSite (1 : Fin 2) (spinHalfRot2 θ) :=
+  totalSpinHalfRotOf_two_site (spinHalfRot2 θ)
 
 /-- For two sites, the total `θ`-rotation about axis 3 factors as the
 product over site 0 and site 1. -/
 theorem totalSpinHalfRot3_two_site (θ : ℝ) :
     totalSpinHalfRot3 (Fin 2) θ =
       onSite (0 : Fin 2) (spinHalfRot3 θ) *
-        onSite (1 : Fin 2) (spinHalfRot3 θ) := by
-  unfold totalSpinHalfRot3
-  show ((Finset.univ : Finset (Fin 2)).noncommProd _ _ : ManyBodyOp (Fin 2)) = _
-  simp [show (Finset.univ : Finset (Fin 2)) = insert 0 {1} from by decide,
-    Finset.noncommProd_insert_of_notMem, Finset.noncommProd_singleton]
+        onSite (1 : Fin 2) (spinHalfRot3 θ) :=
+  totalSpinHalfRotOf_two_site (spinHalfRot3 θ)
 
 /-! ## Total rotation as matrix exponential (Tasaki §2.2 eq (2.2.11))
 
