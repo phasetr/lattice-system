@@ -109,4 +109,78 @@ example :
   unfold spinHalfDotVec
   simp [Matrix.cons_val_zero, Matrix.cons_val_one]
 
+/-! ## D. Characterization pins for the π layer
+
+Twelve pins, one per public theorem targeted by the R1b spin-half
+π-layer core refactor (issue #5241): `_pi_sq` ×3, `_pi_anticomm_`
+×3, `_pi_mul_` ×3, same-axis `_pi_conj_` ×3. Each `example` restates
+the public statement verbatim and is closed by the public name, so a
+future body-only change (e.g. the private-core migration itself)
+cannot silently alter these signatures. These are **surface** pins:
+they detect statement/name drift, not proof-content drift (the M1/M2
+limitation recorded for #5243 recurs verbatim here). -/
+
+/-- `(Û^(1)_π)² = -1`. -/
+example :
+    spinHalfRot1 Real.pi * spinHalfRot1 Real.pi = -1 :=
+  spinHalfRot1_pi_sq
+
+/-- `(Û^(2)_π)² = -1`. -/
+example :
+    spinHalfRot2 Real.pi * spinHalfRot2 Real.pi = -1 :=
+  spinHalfRot2_pi_sq
+
+/-- `(Û^(3)_π)² = -1`. -/
+example :
+    spinHalfRot3 Real.pi * spinHalfRot3 Real.pi = -1 :=
+  spinHalfRot3_pi_sq
+
+/-- `Û^(1)_π · Û^(2)_π + Û^(2)_π · Û^(1)_π = 0`. -/
+example :
+    spinHalfRot1 Real.pi * spinHalfRot2 Real.pi
+      + spinHalfRot2 Real.pi * spinHalfRot1 Real.pi = 0 :=
+  spinHalfRot1_pi_anticomm_spinHalfRot2_pi
+
+/-- `Û^(2)_π · Û^(3)_π + Û^(3)_π · Û^(2)_π = 0`. -/
+example :
+    spinHalfRot2 Real.pi * spinHalfRot3 Real.pi
+      + spinHalfRot3 Real.pi * spinHalfRot2 Real.pi = 0 :=
+  spinHalfRot2_pi_anticomm_spinHalfRot3_pi
+
+/-- `Û^(3)_π · Û^(1)_π + Û^(1)_π · Û^(3)_π = 0`. -/
+example :
+    spinHalfRot3 Real.pi * spinHalfRot1 Real.pi
+      + spinHalfRot1 Real.pi * spinHalfRot3 Real.pi = 0 :=
+  spinHalfRot3_pi_anticomm_spinHalfRot1_pi
+
+/-- `Û^(1)_π · Û^(2)_π = Û^(3)_π`. -/
+example :
+    spinHalfRot1 Real.pi * spinHalfRot2 Real.pi = spinHalfRot3 Real.pi :=
+  spinHalfRot1_pi_mul_spinHalfRot2_pi
+
+/-- `Û^(2)_π · Û^(3)_π = Û^(1)_π`. -/
+example :
+    spinHalfRot2 Real.pi * spinHalfRot3 Real.pi = spinHalfRot1 Real.pi :=
+  spinHalfRot2_pi_mul_spinHalfRot3_pi
+
+/-- `Û^(3)_π · Û^(1)_π = Û^(2)_π`. -/
+example :
+    spinHalfRot3 Real.pi * spinHalfRot1 Real.pi = spinHalfRot2 Real.pi :=
+  spinHalfRot3_pi_mul_spinHalfRot1_pi
+
+/-- `(Û^(1)_π)† · Ŝ^(1) · Û^(1)_π = Ŝ^(1)`. -/
+example :
+    (spinHalfRot1 Real.pi)ᴴ * spinHalfOp1 * spinHalfRot1 Real.pi = spinHalfOp1 :=
+  spinHalfRot1_pi_conj_spinHalfOp1
+
+/-- `(Û^(2)_π)† · Ŝ^(2) · Û^(2)_π = Ŝ^(2)`. -/
+example :
+    (spinHalfRot2 Real.pi)ᴴ * spinHalfOp2 * spinHalfRot2 Real.pi = spinHalfOp2 :=
+  spinHalfRot2_pi_conj_spinHalfOp2
+
+/-- `(Û^(3)_π)† · Ŝ^(3) · Û^(3)_π = Ŝ^(3)`. -/
+example :
+    (spinHalfRot3 Real.pi)ᴴ * spinHalfOp3 * spinHalfRot3 Real.pi = spinHalfOp3 :=
+  spinHalfRot3_pi_conj_spinHalfOp3
+
 end LatticeSystem.Tests.SpinHalfRotation
