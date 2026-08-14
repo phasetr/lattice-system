@@ -325,6 +325,21 @@ def approved_changes(text: str) -> str:
             "proved from the private theorems `axisRot3DPi_sq`, `axisRot3DPi_mul_succ`, and "
             "`axisRot3DPi_comm_succ` in the same file.",
         )
+        .replace(
+            "(Tasaki Problem 2.1.c, all 3 axes)",
+            "(Tasaki Problem 2.1.c, all 3 axes). Internal implementation record "
+            "(private, not public API): `spinOneRot1`, `spinOneRot2`, `spinOneRot3` are "
+            "`spinOneRotOf S θ` at `S = spinOneOp1, spinOneOp2, spinOneOp3` for the "
+            "private def `spinOneRotOf : Matrix (Fin 3) (Fin 3) ℂ → ℝ → "
+            "Matrix (Fin 3) (Fin 3) ℂ`.",
+        )
+        .replace(
+            "boundary checks `Û^(α)_0 = 1` and `Û^(α)_π = û_α`",
+            "boundary checks `Û^(α)_0 = 1` and `Û^(α)_π = û_α`. Internal implementation "
+            "record (private, not public API): both rows are proved from the private "
+            "theorems `spinOneRotOf_zero` and `spinOneRotOf_pi` in the same file, "
+            "combined with `spinOnePiRot{1,2,3}_eq`.",
+        )
     )
 
 

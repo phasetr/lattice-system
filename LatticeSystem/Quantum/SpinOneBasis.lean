@@ -282,45 +282,62 @@ For `S = 1`, the closed form analogue of Tasaki eq. (2.1.26) reads
 `Û^(α)_θ = 1̂ - i sin θ · Ŝ^(α) - (1 - cos θ) · (Ŝ^(α))²`.
 -/
 
+/-! ### Internal generic rotation
+
+The three closed-form rotations below share one formula, so they are factored through a
+private helper parameterised by the axis operator `S`. The three spin-1 operators
+`spinOneOp{1,2,3}` are not cyclically related literal matrices, so the parameter is the
+operator itself rather than a `Fin 3` axis index (contrast `Rotation3D.axisRot3D`). -/
+
+/-- Generic `S = 1` closed-form rotation builder:
+`1 - i sin θ · S - (1 - cos θ) · S²` (Tasaki Problem 2.1.c). Each public
+`spinOneRotα` instantiates this at `spinOneOpα`. -/
+private noncomputable def spinOneRotOf (S : Matrix (Fin 3) (Fin 3) ℂ) (θ : ℝ) :
+    Matrix (Fin 3) (Fin 3) ℂ :=
+  1 - (Complex.I * (Real.sin θ : ℂ)) • S -
+    ((1 : ℂ) - (Real.cos θ : ℂ)) • (S * S)
+
+/-- The generic `S = 1` rotation at angle `0` is the identity. -/
+private theorem spinOneRotOf_zero (S : Matrix (Fin 3) (Fin 3) ℂ) :
+    spinOneRotOf S 0 = 1 := by
+  simp [spinOneRotOf, Real.sin_zero, Real.cos_zero]
+
+/-- The generic `S = 1` rotation at angle `π` is `1 - 2 · S²`, the form in which the
+explicit π-rotation matrices `û_α` are characterised by `spinOnePiRotα_eq`. -/
+private theorem spinOneRotOf_pi (S : Matrix (Fin 3) (Fin 3) ℂ) :
+    spinOneRotOf S Real.pi = 1 - (2 : ℂ) • (S * S) := by
+  norm_num [spinOneRotOf, Real.sin_pi, Real.cos_pi]
+
 /-- S = 1 closed-form rotation about axis 3.
 `Û^(3)_θ = 1 - i sin θ · Ŝ^(3) - (1 - cos θ) · (Ŝ^(3))²`. -/
 noncomputable def spinOneRot3 (θ : ℝ) : Matrix (Fin 3) (Fin 3) ℂ :=
-  1 - (Complex.I * (Real.sin θ : ℂ)) • spinOneOp3 -
-    ((1 : ℂ) - (Real.cos θ : ℂ)) • (spinOneOp3 * spinOneOp3)
+  spinOneRotOf spinOneOp3 θ
 
 /-- `Û^(3)_0 = 1` for S = 1. -/
-theorem spinOneRot3_zero : spinOneRot3 0 = 1 := by
-  unfold spinOneRot3
-  simp [Real.sin_zero, Real.cos_zero]
+theorem spinOneRot3_zero : spinOneRot3 0 = 1 :=
+  spinOneRotOf_zero _
 
 /-- `Û^(3)_π = û_3` for S = 1. -/
-theorem spinOneRot3_pi : spinOneRot3 Real.pi = spinOnePiRot3 := by
-  unfold spinOneRot3
-  rw [spinOnePiRot3_eq]
-  simp [Real.sin_pi, Real.cos_pi]
-  ring
+theorem spinOneRot3_pi : spinOneRot3 Real.pi = spinOnePiRot3 :=
+  (spinOneRotOf_pi _).trans spinOnePiRot3_eq.symm
 
 /-- S = 1 closed-form rotation about axis 1.
 `Û^(1)_θ = 1 - i sin θ · Ŝ^(1) - (1 - cos θ) · (Ŝ^(1))²`. -/
 noncomputable def spinOneRot1 (θ : ℝ) : Matrix (Fin 3) (Fin 3) ℂ :=
-  1 - (Complex.I * (Real.sin θ : ℂ)) • spinOneOp1 -
-    ((1 : ℂ) - (Real.cos θ : ℂ)) • (spinOneOp1 * spinOneOp1)
+  spinOneRotOf spinOneOp1 θ
 
 /-- S = 1 closed-form rotation about axis 2.
 `Û^(2)_θ = 1 - i sin θ · Ŝ^(2) - (1 - cos θ) · (Ŝ^(2))²`. -/
 noncomputable def spinOneRot2 (θ : ℝ) : Matrix (Fin 3) (Fin 3) ℂ :=
-  1 - (Complex.I * (Real.sin θ : ℂ)) • spinOneOp2 -
-    ((1 : ℂ) - (Real.cos θ : ℂ)) • (spinOneOp2 * spinOneOp2)
+  spinOneRotOf spinOneOp2 θ
 
 /-- `Û^(1)_0 = 1` for S = 1. -/
-theorem spinOneRot1_zero : spinOneRot1 0 = 1 := by
-  unfold spinOneRot1
-  simp [Real.sin_zero, Real.cos_zero]
+theorem spinOneRot1_zero : spinOneRot1 0 = 1 :=
+  spinOneRotOf_zero _
 
 /-- `Û^(2)_0 = 1` for S = 1. -/
-theorem spinOneRot2_zero : spinOneRot2 0 = 1 := by
-  unfold spinOneRot2
-  simp [Real.sin_zero, Real.cos_zero]
+theorem spinOneRot2_zero : spinOneRot2 0 = 1 :=
+  spinOneRotOf_zero _
 
 /-- `û_1 = 1̂ - 2 · (Ŝ^(1))²` for α = 1 (Tasaki eq (2.1.30) for S = 1). -/
 theorem spinOnePiRot1_eq :
@@ -343,18 +360,12 @@ theorem spinOnePiRot2_eq :
     (simp; try ring)
 
 /-- `Û^(1)_π = û_1` for S = 1. -/
-theorem spinOneRot1_pi : spinOneRot1 Real.pi = spinOnePiRot1 := by
-  unfold spinOneRot1
-  rw [spinOnePiRot1_eq]
-  simp [Real.sin_pi, Real.cos_pi]
-  ring
+theorem spinOneRot1_pi : spinOneRot1 Real.pi = spinOnePiRot1 :=
+  (spinOneRotOf_pi _).trans spinOnePiRot1_eq.symm
 
 /-- `Û^(2)_π = û_2` for S = 1. -/
-theorem spinOneRot2_pi : spinOneRot2 Real.pi = spinOnePiRot2 := by
-  unfold spinOneRot2
-  rw [spinOnePiRot2_eq]
-  simp [Real.sin_pi, Real.cos_pi]
-  ring
+theorem spinOneRot2_pi : spinOneRot2 Real.pi = spinOnePiRot2 :=
+  (spinOneRotOf_pi _).trans spinOnePiRot2_eq.symm
 
 /-! ## Tasaki Problem 2.1.g / eq (2.1.34): action of `û_α` on the
 spin-1 basis states `|ψ^{+1,0,-1}⟩`. The matrix elements
