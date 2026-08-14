@@ -478,7 +478,7 @@ Both cases require $i^2 = -1$ (\texttt{Complex.I\_sq}).
 \end{proof}
 
 \paragraph{Proof technique.}
-All statements are parametrised through a private helper
+All statements are parametrised through a file-level generic helper
 \texttt{rotOf S theta := cos(theta/2) * 1 - (2*I*sin(theta/2)) * S} and then
 instantiated at \texttt{S = spinHalfOp\{1,2,3\}}. The
 \texttt{adjoint} lemma needs \texttt{Complex.conj\_I} (for
@@ -486,6 +486,19 @@ $\overline{i} = -i$), \texttt{Complex.conj\_ofReal} (for real sin),
 and \texttt{Real.cos\_neg} / \texttt{Real.sin\_neg}.
 The $2\pi$ lemma follows from \texttt{Real.cos\_pi} and
 \texttt{Real.sin\_pi}.
+
+\paragraph{Internal implementation record (private, not public API).}
+The $\pi$-layer results above (\texttt{spinHalfRot1/2/3\_pi\_sq},
+\texttt{spinHalfRot1/2/3\_pi\_anticomm\_spinHalfRot2/3/1\_pi},
+\texttt{spinHalfRot1/2/3\_pi\_mul\_spinHalfRot2/3/1\_pi}, and the
+same-axis case of \texttt{spinHalfRot1/2/3\_pi\_conj\_spinHalfOp1/2/3})
+are each one-line instantiations of a private generic core over the
+public \texttt{rotOf}: \texttt{rotOf\_pi\_sq}, \texttt{rotOf\_pi\_anticomm},
+\texttt{rotOf\_pi\_mul\_rotOf\_pi} and \texttt{rotOf\_pi\_conj\_self},
+respectively, all in \texttt{Quantum/SpinHalfRotation.lean}. These four
+are internal implementation detail, not public API;
+\texttt{spinHalfRot1/2/3\_det\_eq\_one} and
+\texttt{Quantum/SpinHalfRotation/Conjugation.lean} are unchanged.
 
 \paragraph{Proof technique for the group law and unitarity.}
 The key step is an algebraic expansion lemma
