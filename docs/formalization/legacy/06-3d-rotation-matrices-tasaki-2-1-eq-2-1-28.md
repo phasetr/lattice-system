@@ -18,7 +18,7 @@ Systems*, §2.1 eqs. (2.1.27)-(2.1.28), p. 18 and Problem 2.1.f.
 
 | Lean name | Statement | File |
 |---|---|---|
-| `rot3D{1,2,3}Pi` | 3×3 real orthogonal π-rotation matrices | `Quantum/Rotation3D.lean` |
+| `rot3D{1,2,3}Pi` | 3×3 real orthogonal π-rotation matrices. Internal implementation record (private, not public API): `rot3D1Pi`, `rot3D2Pi`, `rot3D3Pi` are `axisRot3DPi a` at `a = 0, 1, 2` for the private def `axisRot3DPi : Fin 3 → Matrix (Fin 3) (Fin 3) ℝ`, and the three rows below are proved from the private theorems `axisRot3DPi_sq`, `axisRot3DPi_mul_succ`, and `axisRot3DPi_comm_succ` in the same file. | `Quantum/Rotation3D.lean` |
 | `rot3D{1,2,3}Pi_sq` | `(R^(α)_π)² = 1` | `Quantum/Rotation3D.lean` |
 | `rot3D{1,2,3}Pi_mul_rot3D{2,3,1}Pi` | `R^(α)_π · R^(β)_π = R^(γ)_π` (cyclic, Problem 2.1.f) | `Quantum/Rotation3D.lean` |
 | `rot3D{1,2,3}Pi_comm_*` | distinct-axis `R^(α)_π` and `R^(β)_π` commute | `Quantum/Rotation3D.lean` |

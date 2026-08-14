@@ -15,7 +15,7 @@ permalink: /formalization/legacy/04-3d-rotation-matrices-general-tasaki-2-1-eq-2
 
 | Lean name | Statement | File |
 |---|---|---|
-| `rot3D{1,2,3} θ` | 3×3 real rotation matrices by angle θ about each axis | `Quantum/Rotation3D.lean` |
+| `rot3D{1,2,3} θ` | 3×3 real rotation matrices by angle θ about each axis. Internal implementation record (private, not public API): `rot3D1`, `rot3D2`, `rot3D3` are `axisRot3D a θ` at `a = 0, 1, 2` for the private def `axisRot3D : Fin 3 → ℝ → Matrix (Fin 3) (Fin 3) ℝ`, and the two rows below are proved from the private theorems `axisRot3D_zero` and `axisRot3D_pi` in the same file. | `Quantum/Rotation3D.lean` |
 | `rot3D{1,2,3}_zero` | `R^(α)_0 = 1` | `Quantum/Rotation3D.lean` |
 | `rot3D{1,2,3}_pi` | `R^(α)_π` from general formula matches explicit π-rotation | `Quantum/Rotation3D.lean` |
 

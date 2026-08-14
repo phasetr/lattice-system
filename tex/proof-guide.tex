@@ -1183,11 +1183,20 @@ formalization of Tasaki \S2.1 and \S2.2.
 \item \texttt{rot3D\{1,2,3\}}, \texttt{rot3D\{1,2,3\}\_zero},
   \texttt{rot3D\{1,2,3\}\_pi}: explicit 3D rotation matrices
   $R^{(\alpha)}_\theta$ (Tasaki eq.~(2.1.11)).
+  These are implemented as instantiations at \texttt{a = 0, 1, 2} of the
+  private axis-indexed core \texttt{axisRot3D}, with the private lemmas
+  \texttt{axisRot3D\_zero} and \texttt{axisRot3D\_pi}; the private names are
+  internal implementation detail, not public API.
 \item \texttt{rot3D\{1,2,3\}Pi}, \texttt{rot3D\{1,2,3\}Pi\_sq},
   \texttt{rot3D\{1,2,3\}Pi\_mul\_rot3D\{2,3,1\}Pi},
   \texttt{rot3D\{1,2,3\}Pi\_comm\_*}: $\pi$-rotation matrices
   $R^{(\alpha)}_\pi$ and their group structure (Tasaki eq.~(2.1.28),
   Problem 2.1.f).
+  These are implemented as instantiations at \texttt{a = 0, 1, 2} of the
+  private axis-indexed core \texttt{axisRot3DPi}, with the private lemmas
+  \texttt{axisRot3DPi\_sq}, \texttt{axisRot3DPi\_mul\_succ}, and
+  \texttt{axisRot3DPi\_comm\_succ}; the private names are internal
+  implementation detail, not public API.
 \item \texttt{spinOnePiRot\{1,2,3\}}, \texttt{spinOnePiRot3\_eq},
   \texttt{spinOnePiRot\{1,2,3\}\_sq}, \texttt{spinOnePiRot\{1,2,3\}\_comm\_*}:
   $S = 1$ $\pi$-rotation matrices and their integer-spin Z$_2 \times$ Z$_2$
