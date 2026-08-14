@@ -307,6 +307,24 @@ def approved_changes(text: str) -> str:
             "isolated to this proof. | `Quantum/SpinS/AndersonTowerLeviCivita.lean` |",
             "isolated to this proof. `leviCivita3` and `totalSpinSOpVec` are defined in `CartesianAxis.lean`; the three diagonal commutators and `totalSpinSOpVec_commutator_stagOpVec` remain in `AndersonTowerLeviCivita.lean`. | `Quantum/SpinS/CartesianAxis.lean` / `Quantum/SpinS/AndersonTowerLeviCivita.lean` |",
         )
+        .replace(
+            "3×3 real rotation matrices by angle θ about each axis",
+            "3×3 real rotation matrices by angle θ about each axis. Internal implementation "
+            "record (private, not public API): `rot3D1`, `rot3D2`, `rot3D3` are `axisRot3D a θ` "
+            "at `a = 0, 1, 2` for the private def "
+            "`axisRot3D : Fin 3 → ℝ → Matrix (Fin 3) (Fin 3) ℝ`, and the two rows below are "
+            "proved from the private theorems `axisRot3D_zero` and `axisRot3D_pi` in the same "
+            "file.",
+        )
+        .replace(
+            "3×3 real orthogonal π-rotation matrices",
+            "3×3 real orthogonal π-rotation matrices. Internal implementation record (private, "
+            "not public API): `rot3D1Pi`, `rot3D2Pi`, `rot3D3Pi` are `axisRot3DPi a` at "
+            "`a = 0, 1, 2` for the private def "
+            "`axisRot3DPi : Fin 3 → Matrix (Fin 3) (Fin 3) ℝ`, and the three rows below are "
+            "proved from the private theorems `axisRot3DPi_sq`, `axisRot3DPi_mul_succ`, and "
+            "`axisRot3DPi_comm_succ` in the same file.",
+        )
     )
 
 
