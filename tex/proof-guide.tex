@@ -1215,6 +1215,11 @@ formalization of Tasaki \S2.1 and \S2.2.
   for all 3 axes (Tasaki Problem 2.1.c, eq.~(2.1.30)) and the
   squared-operator helpers used in the boundary checks $\hat U^{(\alpha)}_\pi
   = \hat u_\alpha$.
+  These are implemented as instantiations at $S = \hat S^{(1)}, \hat S^{(2)},
+  \hat S^{(3)}$ of the private operator-parameterised core
+  \texttt{spinOneRotOf}, with the private lemmas \texttt{spinOneRotOf\_zero}
+  and \texttt{spinOneRotOf\_pi}; the private names are internal implementation
+  detail, not public API.
 \item \texttt{spinOnePiRot\{1,2,3\}\_mulVec\_spinOne\{Plus,Zero,Minus\}}:
   action of the $S = 1$ $\pi$-rotation matrices on the
   $|\psi^{+1,0,-1}\rangle$ basis (Tasaki eq.~(2.1.34) / Problem 2.1.g
