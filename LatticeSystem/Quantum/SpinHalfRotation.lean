@@ -310,52 +310,58 @@ theorem spinHalfRot3_pi : spinHalfRot3 Real.pi = (-(2 * I)) • spinHalfOp3 :=
 
 /-! ## `(Û^(α)_π)² = -1` -/
 
+/-- `rotOf S π * rotOf S π = -1` when `S * S = (1/4) · 1`: the generic
+squared π-rotation, obtained from the group law at `π + π = 2π`. -/
+private lemma rotOf_pi_sq {S : Matrix (Fin 2) (Fin 2) ℂ}
+    (hS_sq : S * S = (1 / 4 : ℂ) • 1) :
+    rotOf S Real.pi * rotOf S Real.pi = -1 := by
+  rw [rotOf_mul_rotOf hS_sq, show Real.pi + Real.pi = 2 * Real.pi from by ring,
+    rotOf_two_pi]
+
 /-- `(Û^(1)_π)² = -1` (from group law and `Û^(1)_{2π} = -1`). -/
 theorem spinHalfRot1_pi_sq :
-    spinHalfRot1 Real.pi * spinHalfRot1 Real.pi = -1 := by
-  rw [spinHalfRot1_mul, show Real.pi + Real.pi = 2 * Real.pi from by ring,
-    spinHalfRot1_two_pi]
+    spinHalfRot1 Real.pi * spinHalfRot1 Real.pi = -1 :=
+  rotOf_pi_sq spinHalfOp1_mul_self
 
 /-- `(Û^(2)_π)² = -1`. -/
 theorem spinHalfRot2_pi_sq :
-    spinHalfRot2 Real.pi * spinHalfRot2 Real.pi = -1 := by
-  rw [spinHalfRot2_mul, show Real.pi + Real.pi = 2 * Real.pi from by ring,
-    spinHalfRot2_two_pi]
+    spinHalfRot2 Real.pi * spinHalfRot2 Real.pi = -1 :=
+  rotOf_pi_sq spinHalfOp2_mul_self
 
 /-- `(Û^(3)_π)² = -1`. -/
 theorem spinHalfRot3_pi_sq :
-    spinHalfRot3 Real.pi * spinHalfRot3 Real.pi = -1 := by
-  rw [spinHalfRot3_mul, show Real.pi + Real.pi = 2 * Real.pi from by ring,
-    spinHalfRot3_two_pi]
+    spinHalfRot3 Real.pi * spinHalfRot3 Real.pi = -1 :=
+  rotOf_pi_sq spinHalfOp3_mul_self
 
 /-! ## π-rotation anticommutation at distinct axes (Tasaki eq 2.1.25, S = 1/2) -/
+
+/-- Generic π-rotation anticommutation: the π-rotations built from two
+anticommuting matrices `Sα`, `Sβ` again anticommute. -/
+private lemma rotOf_pi_anticomm {Sα Sβ : Matrix (Fin 2) (Fin 2) ℂ}
+    (hanti : Sα * Sβ + Sβ * Sα = 0) :
+    rotOf Sα Real.pi * rotOf Sβ Real.pi
+      + rotOf Sβ Real.pi * rotOf Sα Real.pi = 0 := by
+  rw [rotOf_pi, rotOf_pi,
+    Matrix.smul_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_smul,
+    smul_smul, smul_smul, ← smul_add, hanti, smul_zero]
 
 /-- `Û^(1)_π · Û^(2)_π + Û^(2)_π · Û^(1)_π = 0`. -/
 theorem spinHalfRot1_pi_anticomm_spinHalfRot2_pi :
     spinHalfRot1 Real.pi * spinHalfRot2 Real.pi
-      + spinHalfRot2 Real.pi * spinHalfRot1 Real.pi = 0 := by
-  rw [spinHalfRot1_pi, spinHalfRot2_pi,
-    Matrix.smul_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_smul,
-    smul_smul, smul_smul, ← smul_add,
-    spinHalfOp1_anticomm_spinHalfOp2, smul_zero]
+      + spinHalfRot2 Real.pi * spinHalfRot1 Real.pi = 0 :=
+  rotOf_pi_anticomm spinHalfOp1_anticomm_spinHalfOp2
 
 /-- `Û^(2)_π · Û^(3)_π + Û^(3)_π · Û^(2)_π = 0`. -/
 theorem spinHalfRot2_pi_anticomm_spinHalfRot3_pi :
     spinHalfRot2 Real.pi * spinHalfRot3 Real.pi
-      + spinHalfRot3 Real.pi * spinHalfRot2 Real.pi = 0 := by
-  rw [spinHalfRot2_pi, spinHalfRot3_pi,
-    Matrix.smul_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_smul,
-    smul_smul, smul_smul, ← smul_add,
-    spinHalfOp2_anticomm_spinHalfOp3, smul_zero]
+      + spinHalfRot3 Real.pi * spinHalfRot2 Real.pi = 0 :=
+  rotOf_pi_anticomm spinHalfOp2_anticomm_spinHalfOp3
 
 /-- `Û^(3)_π · Û^(1)_π + Û^(1)_π · Û^(3)_π = 0`. -/
 theorem spinHalfRot3_pi_anticomm_spinHalfRot1_pi :
     spinHalfRot3 Real.pi * spinHalfRot1 Real.pi
-      + spinHalfRot1 Real.pi * spinHalfRot3 Real.pi = 0 := by
-  rw [spinHalfRot3_pi, spinHalfRot1_pi,
-    Matrix.smul_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_smul,
-    smul_smul, smul_smul, ← smul_add,
-    spinHalfOp3_anticomm_spinHalfOp1, smul_zero]
+      + spinHalfRot1 Real.pi * spinHalfRot3 Real.pi = 0 :=
+  rotOf_pi_anticomm spinHalfOp3_anticomm_spinHalfOp1
 
 /-! ## `(Û^(α)_π)† = 2i · Ŝ^(α)` -/
 
@@ -390,32 +396,30 @@ theorem spinHalfRot3_pi_conjTranspose :
 
 /-! ## π-rotation products (Tasaki eq 2.1.29, S = 1/2) -/
 
-/-- `Û^(1)_π · Û^(2)_π = Û^(3)_π`. -/
-theorem spinHalfRot1_pi_mul_spinHalfRot2_pi :
-    spinHalfRot1 Real.pi * spinHalfRot2 Real.pi = spinHalfRot3 Real.pi := by
-  rw [spinHalfRot1_pi, spinHalfRot2_pi, spinHalfRot3_pi,
-    Matrix.smul_mul, Matrix.mul_smul, smul_smul,
-    spinHalfOp1_mul_spinHalfOp2, smul_smul]
+/-- Generic π-rotation product: `Sα * Sβ = (i/2) · Sγ` propagates to
+`rotOf Sα π * rotOf Sβ π = rotOf Sγ π`. -/
+private lemma rotOf_pi_mul_rotOf_pi {Sα Sβ Sγ : Matrix (Fin 2) (Fin 2) ℂ}
+    (h : Sα * Sβ = (I / 2) • Sγ) :
+    rotOf Sα Real.pi * rotOf Sβ Real.pi = rotOf Sγ Real.pi := by
+  rw [rotOf_pi, rotOf_pi, rotOf_pi,
+    Matrix.smul_mul, Matrix.mul_smul, smul_smul, h, smul_smul]
   congr 1
   linear_combination (2 * I) * Complex.I_sq
+
+/-- `Û^(1)_π · Û^(2)_π = Û^(3)_π`. -/
+theorem spinHalfRot1_pi_mul_spinHalfRot2_pi :
+    spinHalfRot1 Real.pi * spinHalfRot2 Real.pi = spinHalfRot3 Real.pi :=
+  rotOf_pi_mul_rotOf_pi spinHalfOp1_mul_spinHalfOp2
 
 /-- `Û^(2)_π · Û^(3)_π = Û^(1)_π`. -/
 theorem spinHalfRot2_pi_mul_spinHalfRot3_pi :
-    spinHalfRot2 Real.pi * spinHalfRot3 Real.pi = spinHalfRot1 Real.pi := by
-  rw [spinHalfRot2_pi, spinHalfRot3_pi, spinHalfRot1_pi,
-    Matrix.smul_mul, Matrix.mul_smul, smul_smul,
-    spinHalfOp2_mul_spinHalfOp3, smul_smul]
-  congr 1
-  linear_combination (2 * I) * Complex.I_sq
+    spinHalfRot2 Real.pi * spinHalfRot3 Real.pi = spinHalfRot1 Real.pi :=
+  rotOf_pi_mul_rotOf_pi spinHalfOp2_mul_spinHalfOp3
 
 /-- `Û^(3)_π · Û^(1)_π = Û^(2)_π`. -/
 theorem spinHalfRot3_pi_mul_spinHalfRot1_pi :
-    spinHalfRot3 Real.pi * spinHalfRot1 Real.pi = spinHalfRot2 Real.pi := by
-  rw [spinHalfRot3_pi, spinHalfRot1_pi, spinHalfRot2_pi,
-    Matrix.smul_mul, Matrix.mul_smul, smul_smul,
-    spinHalfOp3_mul_spinHalfOp1, smul_smul]
-  congr 1
-  linear_combination (2 * I) * Complex.I_sq
+    spinHalfRot3 Real.pi * spinHalfRot1 Real.pi = spinHalfRot2 Real.pi :=
+  rotOf_pi_mul_rotOf_pi spinHalfOp3_mul_spinHalfOp1
 
 /-! ## Same-axis coordinate transformation at `θ = π`
 
@@ -424,38 +428,32 @@ conjugation by `Û^(α)_θ` (the axis of rotation is fixed). At `θ = π`
 the statement is `(Û^(α)_π)† · Ŝ^(α) · Û^(α)_π = Ŝ^(α)`.
 -/
 
-/-- `(Û^(1)_π)† · Ŝ^(1) · Û^(1)_π = Ŝ^(1)`. -/
-theorem spinHalfRot1_pi_conj_spinHalfOp1 :
-    (spinHalfRot1 Real.pi)ᴴ * spinHalfOp1 * spinHalfRot1 Real.pi = spinHalfOp1 := by
-  rw [spinHalfRot1_pi_conjTranspose, spinHalfRot1_pi,
+/-- Generic same-axis invariance at `θ = π`: `(rotOf S π)ᴴ * S * rotOf S π = S`
+for Hermitian `S` with `S * S = (1/4) · 1`. -/
+private lemma rotOf_pi_conj_self {S : Matrix (Fin 2) (Fin 2) ℂ}
+    (hS : S.IsHermitian) (hS_sq : S * S = (1 / 4 : ℂ) • 1) :
+    (rotOf S Real.pi)ᴴ * S * rotOf S Real.pi = S := by
+  rw [rotOf_pi_conjTranspose hS, rotOf_pi,
     Matrix.smul_mul, Matrix.smul_mul, Matrix.mul_smul, smul_smul,
-    spinHalfOp1_mul_self, Matrix.smul_mul, Matrix.one_mul, smul_smul]
-  conv_rhs => rw [show (spinHalfOp1 : Matrix (Fin 2) (Fin 2) ℂ)
-      = (1 : ℂ) • spinHalfOp1 from (one_smul _ _).symm]
+    hS_sq, Matrix.smul_mul, Matrix.one_mul, smul_smul]
+  conv_rhs => rw [show S = (1 : ℂ) • S from (one_smul _ _).symm]
   congr 1
   linear_combination -Complex.I_sq
+
+/-- `(Û^(1)_π)† · Ŝ^(1) · Û^(1)_π = Ŝ^(1)`. -/
+theorem spinHalfRot1_pi_conj_spinHalfOp1 :
+    (spinHalfRot1 Real.pi)ᴴ * spinHalfOp1 * spinHalfRot1 Real.pi = spinHalfOp1 :=
+  rotOf_pi_conj_self spinHalfOp1_isHermitian spinHalfOp1_mul_self
 
 /-- `(Û^(2)_π)† · Ŝ^(2) · Û^(2)_π = Ŝ^(2)`. -/
 theorem spinHalfRot2_pi_conj_spinHalfOp2 :
-    (spinHalfRot2 Real.pi)ᴴ * spinHalfOp2 * spinHalfRot2 Real.pi = spinHalfOp2 := by
-  rw [spinHalfRot2_pi_conjTranspose, spinHalfRot2_pi,
-    Matrix.smul_mul, Matrix.smul_mul, Matrix.mul_smul, smul_smul,
-    spinHalfOp2_mul_self, Matrix.smul_mul, Matrix.one_mul, smul_smul]
-  conv_rhs => rw [show (spinHalfOp2 : Matrix (Fin 2) (Fin 2) ℂ)
-      = (1 : ℂ) • spinHalfOp2 from (one_smul _ _).symm]
-  congr 1
-  linear_combination -Complex.I_sq
+    (spinHalfRot2 Real.pi)ᴴ * spinHalfOp2 * spinHalfRot2 Real.pi = spinHalfOp2 :=
+  rotOf_pi_conj_self spinHalfOp2_isHermitian spinHalfOp2_mul_self
 
 /-- `(Û^(3)_π)† · Ŝ^(3) · Û^(3)_π = Ŝ^(3)`. -/
 theorem spinHalfRot3_pi_conj_spinHalfOp3 :
-    (spinHalfRot3 Real.pi)ᴴ * spinHalfOp3 * spinHalfRot3 Real.pi = spinHalfOp3 := by
-  rw [spinHalfRot3_pi_conjTranspose, spinHalfRot3_pi,
-    Matrix.smul_mul, Matrix.smul_mul, Matrix.mul_smul, smul_smul,
-    spinHalfOp3_mul_self, Matrix.smul_mul, Matrix.one_mul, smul_smul]
-  conv_rhs => rw [show (spinHalfOp3 : Matrix (Fin 2) (Fin 2) ℂ)
-      = (1 : ℂ) • spinHalfOp3 from (one_smul _ _).symm]
-  congr 1
-  linear_combination -Complex.I_sq
+    (spinHalfRot3 Real.pi)ᴴ * spinHalfOp3 * spinHalfRot3 Real.pi = spinHalfOp3 :=
+  rotOf_pi_conj_self spinHalfOp3_isHermitian spinHalfOp3_mul_self
 
 /-! ## Flip coordinate transformation at `θ = π` for distinct axes
 

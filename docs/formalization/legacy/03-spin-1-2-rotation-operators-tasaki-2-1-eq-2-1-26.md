@@ -51,6 +51,42 @@ p. 16 (`Û_{2π} = -1` for half-odd-integer spin).
 
 <!-- legacy-source:end:259:296 -->
 
+## Authoritative supplemental implementation record (private, not public API)
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+private implementation declarations introduced for the public π-rotation rows of that block. Every
+migrated row above is unchanged.
+
+Source file: `LatticeSystem/Quantum/SpinHalfRotation.lean`. All four declarations are `private`
+and are not public API; no public name, signature, statement or doc comment changed when they were
+introduced (issue #5241, PR #5244). All four generalize a proof script that was previously
+duplicated 3x (once per axis) into a single generic core over the public `rotOf` builder, which
+stays public and unchanged.
+
+- `private lemma rotOf_pi_sq {S : Matrix (Fin 2) (Fin 2) ℂ} (hS_sq : S * S = (1 / 4 : ℂ) • 1) :
+  rotOf S Real.pi * rotOf S Real.pi = -1`. Role: the generic squared π-rotation, from the group law
+  at `π + π = 2π`. It implements the public family `spinHalfRot{1,2,3}_pi_sq`, each proved from it
+  together with `spinHalfOp{1,2,3}_mul_self`.
+- `private lemma rotOf_pi_anticomm {Sα Sβ : Matrix (Fin 2) (Fin 2) ℂ}
+  (hanti : Sα * Sβ + Sβ * Sα = 0) : rotOf Sα Real.pi * rotOf Sβ Real.pi
+  + rotOf Sβ Real.pi * rotOf Sα Real.pi = 0`. Role: generic π-rotation anticommutation at distinct
+  axes. It implements the public cyclic family `spinHalfRot{1,2,3}_pi_anticomm_spinHalfRot{2,3,1}_pi`,
+  each proved from it together with the corresponding `spinHalfOp{α}_anticomm_spinHalfOp{β}`.
+- `private lemma rotOf_pi_mul_rotOf_pi {Sα Sβ Sγ : Matrix (Fin 2) (Fin 2) ℂ}
+  (h : Sα * Sβ = (I / 2) • Sγ) : rotOf Sα Real.pi * rotOf Sβ Real.pi = rotOf Sγ Real.pi`. Role:
+  generic π-rotation product. It implements the public cyclic family
+  `spinHalfRot{1,2,3}_pi_mul_spinHalfRot{2,3,1}_pi`, each proved from it together with the
+  corresponding `spinHalfOp{α}_mul_spinHalfOp{β}`.
+- `private lemma rotOf_pi_conj_self {S : Matrix (Fin 2) (Fin 2) ℂ} (hS : S.IsHermitian)
+  (hS_sq : S * S = (1 / 4 : ℂ) • 1) : (rotOf S Real.pi)ᴴ * S * rotOf S Real.pi = S`. Role: generic
+  same-axis invariance at `θ = π`. It implements the public family
+  `spinHalfRot{1,2,3}_pi_conj_spinHalfOp{1,2,3}` (same-axis case), each proved from it together with
+  the corresponding `spinHalfOp{α}_isHermitian` and `spinHalfOp{α}_mul_self`.
+
+The public `rotOf*` cores (`rotOf`, `rotOf_zero`, `rotOf_adjoint`, `rotOf_two_pi`,
+`rotOf_mul_rotOf`, `rotOf_mul_conjTranspose`, `rotOf_pi`, `rotOf_neg_pi`, `rotOf_pi_conjTranspose`,
+`rotOf_pi_conj_of_ne`), `spinHalfRot{1,2,3}_det_eq_one` and
+`LatticeSystem/Quantum/SpinHalfRotation/Conjugation.lean` are unchanged.
+
 ---
 
 [← Spin-1/2 operators (Tasaki §2.1)](/lattice-system/formalization/legacy/02-spin-1-2-operators-tasaki-2-1/) · [Catalogue](/lattice-system/formalization/legacy/) · [3D rotation matrices `R^(α)_θ` (general θ, Tasaki §2.1 eq. (2.1.11)) →](/lattice-system/formalization/legacy/04-3d-rotation-matrices-general-tasaki-2-1-eq-2-1-11/)
