@@ -51,11 +51,23 @@ restarting work:
    verbatim.** It is a copy: neither a place for detail nor a restart
    input.
 
-Never record, publicly or privately, conversation transcripts, quotations,
-approval dialogue or its chronology, personal, credential, or security
-data, or internal agent, tool, command, log, sandbox, permission, or
-process detail. Record authorization only as normalized current state
-(for example "Exact scope approved"), never its source dialogue.
+This minimal public allowlist takes precedence over any broader or older
+rule elsewhere — in this file, `CLAUDE.local.md`, or existing Issue/PR
+practice — that asks for fuller detail in public Issue, PR, or comment
+bodies.
+
+In every record of work state or work history, public or private —
+Issues, PR bodies and comments, mirrors, private active records, reports,
+and scratch or temporary files alike — never record conversation
+transcripts, quotations, approval dialogue or its chronology, personal,
+credential, or security data, or internal agent, tool, command, log,
+sandbox, permission, or process detail. Standing, reusable policy or
+instruction documents (this file, `CLAUDE.local.md`, the `.self-local/docs/`
+design set) may state operational rules, including tool and command
+conventions, but must never carry task-specific conversation, approval
+chronology, personal or security-sensitive material, or raw work logs.
+Record authorization only as normalized current state (for example
+"Exact scope approved"), never its source dialogue.
 
 Remove disallowed content instead of correcting it by appending.
 Sanitization overrides append-only, immutability, pre-backup, and
