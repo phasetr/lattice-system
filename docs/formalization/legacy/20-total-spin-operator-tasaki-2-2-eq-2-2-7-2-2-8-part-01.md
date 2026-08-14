@@ -148,9 +148,12 @@ introduced (issue #5241, PR #5243).
   `totalSpinHalfRot{1,2,3}_two_site`, each a one-line application.
 
 The public theorems `totalSpinHalfRot{1,2,3}Pi_eq` keep their `:= rfl` proofs and do not invoke any
-of the four private declarations. The other public results of the same file (`_eq_exp`,
-`_commute_of_commute`, `_conjTranspose_mul_self`, `_conj_eq_self_of_commute`) are unchanged and go
-through the public `_eq_exp` seam, not through the private core.
+of the four private declarations. Of the other public results of the same file, `_commute_of_commute`,
+`_conjTranspose_mul_self`, and `_conj_eq_self_of_commute` are unchanged and go through the public
+`_eq_exp` seam, not through the private core. `_eq_exp` itself is not exempt from the private core:
+it is proved by the (unrelated, pre-existing) private helper `totalRot_eq_exp_aux`, whose statement
+still spells the raw `Finset.noncommProd` and which typechecks only by delta-unfolding
+`totalSpinHalfRotOf`'s definition.
 
 ---
 
