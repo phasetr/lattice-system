@@ -30,9 +30,7 @@ the following on-disk sources and obey their instructions:
 
 3. The committed project documents:
    - `README.md` — project introduction
-   - `docs/index.md` — concise public-facing landing page
-   - `formalization-status/v1/` — prototype structured-status contract and samples
-   - `docs/formalization/legacy/` — authoritative theorem/status catalogue
+   - `docs/index.md` — public-facing roadmap and theorem index
    - `tex/proof-guide.tex` — public-facing mathematical exposition
 
 ## Active-work state
@@ -166,11 +164,8 @@ handover.
   the user remain in 日本語.
 - **Add a doc comment to every `def` / `theorem` / `lemma` / `structure`,
   including `private` ones. Maintain zero linter warnings.**
-- **Updating the authoritative record under `docs/formalization/legacy/` and
-  `tex/proof-guide.tex`** in the same PR is mandatory whenever a new `def` /
-  `theorem` / `lemma` is committed. `docs/index.md` is the landing page;
-  `formalization-status/v1/` remains a non-authoritative prototype until a
-  separately reviewed catalogue cutover.
+- **Updating `docs/index.md` and `tex/proof-guide.tex`** in the same PR
+  is mandatory whenever a new `def` / `theorem` / `lemma` is committed.
 - **Citations** must include edition, equation/theorem number, and page
   number when referring to a textbook.
 
@@ -202,8 +197,8 @@ Keep reviews terse:
 2. Confirm the proofs are reasonable (`unfold; push_cast; ring`,
    structural induction, etc.).
 3. Run `lake env lean <single file>` if the change is local to one file.
-4. Flag any missing or stale row in the authoritative legacy catalogue,
-   including its exact Lean name, statement, source path, and citation.
+4. Flag any missing `docs/index.md` row update or stale `(PR pending)`
+   tag (the author updates these in the next PR — that is expected).
 
 Do not run `lake build` of the whole project unless the change spans
 many files. The 20-PR refactor cadence keeps single-file build times
