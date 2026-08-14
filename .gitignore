@@ -13,5 +13,5 @@
 # sed/perl backup files
 *.bak
 
-# untracked per user decision 2026-08-07 (#5187); kept locally only
-/AGENTS.md
+# personal working notes; never committed
+/.self-local/
