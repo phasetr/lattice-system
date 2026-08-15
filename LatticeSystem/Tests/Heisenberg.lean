@@ -116,20 +116,27 @@ example (J : ℝ) :
 
 /-! ## Heisenberg-on-graph named wrapper (PR #189) -/
 
+/-- Hermiticity stated for the named wrapper `heisenbergHamiltonianOnGraph`
+is discharged by the `couplingOf` theorem through the definitional
+unfolding of the wrapper. -/
 example (J : ℝ) :
     (heisenbergHamiltonianOnGraph (pathGraph 3)
         (-(J : ℂ))).IsHermitian :=
-  heisenbergHamiltonianOnGraph_isHermitian _ (by simp)
+  heisenbergHamiltonian_couplingOf_isHermitian _ (by simp)
 
+/-- Commutation with `Ŝ_tot^{(1)}` stated for the named wrapper is
+discharged by the `couplingOf` theorem through the same unfolding. -/
 example (J : ℂ) :
     Commute (heisenbergHamiltonianOnGraph (cycleGraph 4) J)
       (totalSpinHalfOp1 (Fin 4)) :=
-  heisenbergHamiltonianOnGraph_commute_totalSpinHalfOp1 _ J
+  heisenbergHamiltonian_couplingOf_commute_totalSpinHalfOp1 _ J
 
+/-- Commutation with the Casimir `Ŝ_tot²` stated for the named wrapper is
+discharged by the `couplingOf` theorem through the same unfolding. -/
 example (J : ℂ) :
     Commute (heisenbergHamiltonianOnGraph (pathGraph 3) J)
       (totalSpinHalfSquared (Fin 3)) :=
-  heisenbergHamiltonianOnGraph_commute_totalSpinHalfSquared _ J
+  heisenbergHamiltonian_couplingOf_commute_totalSpinHalfSquared _ J
 
 /-! ## 2D / 3D Heisenberg Gibbs states -/
 
