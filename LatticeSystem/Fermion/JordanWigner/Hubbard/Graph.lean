@@ -1,4 +1,4 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.Charges
+import LatticeSystem.Fermion.JordanWigner.Hubbard.ChargesCore
 
 /-!
 # Hubbard model — graph-centric wrappers, chain and cycle instances
@@ -9,11 +9,11 @@ contains:
 1. **Graph-centric wrappers** — `hubbardKineticOnGraph`, `hubbardHamiltonianOnGraph`
    and their Hermiticity + `N̂` commutativity.
 2. **1D open chain instance** — `hubbardChainHamiltonian`, its Gibbs state,
-   and a full Gibbs expectation companion family.
+   and its Gibbs expectation companions.
 3. **Hubbard Gibbs state on a graph** — `hubbardGibbsStateOnGraph` and bridge
    theorem to the chain.
 4. **1D periodic chain instance** — `hubbardCycleHamiltonian`, its Gibbs state,
-   and a full Gibbs expectation companion family.
+   and its Gibbs expectation companions.
 5. **Two-particle eigenstate** — `fermionTotalNumber_mulVec_twoParticle`.
 -/
 
@@ -155,26 +155,6 @@ theorem hubbardChainGibbsExpectation_zero (N : ℕ) (J U : ℝ)
   LatticeSystem.Quantum.gibbsExpectation_zero
     (hubbardChainHamiltonian N J U) A
 
-/-- For Hermitian `O`, the Hubbard-chain expectation `⟨O⟩_β` is
-real. -/
-theorem hubbardChainGibbsExpectation_im_of_isHermitian
-    (N : ℕ) (β J U : ℝ) {O : ManyBodyOp (Fin (2 * N + 2))}
-    (hO : O.IsHermitian) :
-    (LatticeSystem.Quantum.gibbsExpectation β
-        (hubbardChainHamiltonian N J U) O).im = 0 :=
-  LatticeSystem.Quantum.gibbsExpectation_im_of_isHermitian
-    (hubbardChainHamiltonian_isHermitian N J U) hO β
-
-/-- Hubbard-chain conservation law: `⟨[H, A]⟩_β = 0`. -/
-theorem hubbardChainGibbsExpectation_commutator_hamiltonian
-    (N : ℕ) (β J U : ℝ) (A : ManyBodyOp (Fin (2 * N + 2))) :
-    LatticeSystem.Quantum.gibbsExpectation β
-        (hubbardChainHamiltonian N J U)
-        (hubbardChainHamiltonian N J U * A
-          - A * hubbardChainHamiltonian N J U) = 0 :=
-  LatticeSystem.Quantum.gibbsExpectation_commutator_hamiltonian β
-    (hubbardChainHamiltonian N J U) A
-
 /-- Hubbard-chain energy expectation is real:
 `(⟨H_chain⟩_β).im = 0`. -/
 theorem hubbardChainGibbsExpectation_hamiltonian_im
@@ -202,17 +182,6 @@ theorem hubbardChain_partitionFn_im (N : ℕ) (β J U : ℝ) :
         (hubbardChainHamiltonian N J U)).im = 0 :=
   LatticeSystem.Quantum.partitionFn_im_of_isHermitian
     (hubbardChainHamiltonian_isHermitian N J U) β
-
-/-- Hubbard-chain real-cast equality. -/
-theorem hubbardChainGibbsExpectation_ofReal_re_eq
-    (N : ℕ) (β J U : ℝ) {O : ManyBodyOp (Fin (2 * N + 2))}
-    (hO : O.IsHermitian) :
-    (((LatticeSystem.Quantum.gibbsExpectation β
-        (hubbardChainHamiltonian N J U) O).re : ℂ))
-      = LatticeSystem.Quantum.gibbsExpectation β
-          (hubbardChainHamiltonian N J U) O :=
-  LatticeSystem.Quantum.gibbsExpectation_ofReal_re_eq_of_isHermitian
-    (hubbardChainHamiltonian_isHermitian N J U) hO β
 
 /-- Hubbard-chain Rényi-n trace identity. -/
 theorem hubbardChainGibbsState_pow_trace
@@ -312,14 +281,6 @@ theorem hubbardGibbsStateOnGraph_isHermitian
   LatticeSystem.Quantum.gibbsState_isHermitian
     (hubbardHamiltonianOnGraph_isHermitian N G hJ hU) β
 
-/-- The graph-built Hubbard Gibbs state commutes with its Hamiltonian. -/
-theorem hubbardGibbsStateOnGraph_commute_hamiltonian
-    (N : ℕ) (β : ℝ) (G : SimpleGraph (Fin (N + 1))) [DecidableRel G.Adj]
-    (J U : ℂ) :
-    Commute (hubbardGibbsStateOnGraph N β G J U)
-      (hubbardHamiltonianOnGraph N G J U) :=
-  LatticeSystem.Quantum.gibbsState_commute_hamiltonian β _
-
 /-- Bridge: `hubbardChainGibbsState` = `hubbardGibbsStateOnGraph`
 on `pathGraph (N+1)` with weight `-J`. -/
 theorem hubbardChainGibbsState_eq_onGraph (N : ℕ) (β : ℝ) (J U : ℝ) :
@@ -377,62 +338,12 @@ theorem hubbardCycleGibbsExpectation_zero (N : ℕ) (J U : ℝ)
   LatticeSystem.Quantum.gibbsExpectation_zero
     (hubbardCycleHamiltonian N J U) A
 
-/-- For Hermitian `O`, the periodic-Hubbard expectation `⟨O⟩_β`
-is real. -/
-theorem hubbardCycleGibbsExpectation_im_of_isHermitian
-    (N : ℕ) (β J U : ℝ) {O : ManyBodyOp (Fin (2 * N + 2))}
-    (hO : O.IsHermitian) :
-    (LatticeSystem.Quantum.gibbsExpectation β
-        (hubbardCycleHamiltonian N J U) O).im = 0 :=
-  LatticeSystem.Quantum.gibbsExpectation_im_of_isHermitian
-    (hubbardCycleHamiltonian_isHermitian N J U) hO β
-
-/-- Periodic-Hubbard conservation law: `⟨[H, A]⟩_β = 0`. -/
-theorem hubbardCycleGibbsExpectation_commutator_hamiltonian
-    (N : ℕ) (β J U : ℝ) (A : ManyBodyOp (Fin (2 * N + 2))) :
-    LatticeSystem.Quantum.gibbsExpectation β
-        (hubbardCycleHamiltonian N J U)
-        (hubbardCycleHamiltonian N J U * A
-          - A * hubbardCycleHamiltonian N J U) = 0 :=
-  LatticeSystem.Quantum.gibbsExpectation_commutator_hamiltonian β
-    (hubbardCycleHamiltonian N J U) A
-
-/-- Periodic-Hubbard energy expectation is real. -/
-theorem hubbardCycleGibbsExpectation_hamiltonian_im
-    (N : ℕ) (β J U : ℝ) :
-    (LatticeSystem.Quantum.gibbsExpectation β
-        (hubbardCycleHamiltonian N J U)
-        (hubbardCycleHamiltonian N J U)).im = 0 :=
-  LatticeSystem.Quantum.gibbsExpectation_hamiltonian_im
-    (hubbardCycleHamiltonian_isHermitian N J U) β
-
-/-- Periodic-Hubbard energy n-th power expectation is real. -/
-theorem hubbardCycleGibbsExpectation_hamiltonian_pow_im
-    (N : ℕ) (β J U : ℝ) (n : ℕ) :
-    (LatticeSystem.Quantum.gibbsExpectation β
-        (hubbardCycleHamiltonian N J U)
-        ((hubbardCycleHamiltonian N J U)^n)).im = 0 :=
-  LatticeSystem.Quantum.gibbsExpectation_pow_im_of_isHermitian
-    (hubbardCycleHamiltonian_isHermitian N J U)
-    (hubbardCycleHamiltonian_isHermitian N J U) β n
-
 /-- Periodic-Hubbard partition function is real. -/
 theorem hubbardCycle_partitionFn_im (N : ℕ) (β J U : ℝ) :
     (LatticeSystem.Quantum.partitionFn β
         (hubbardCycleHamiltonian N J U)).im = 0 :=
   LatticeSystem.Quantum.partitionFn_im_of_isHermitian
     (hubbardCycleHamiltonian_isHermitian N J U) β
-
-/-- Periodic-Hubbard real-cast equality. -/
-theorem hubbardCycleGibbsExpectation_ofReal_re_eq
-    (N : ℕ) (β J U : ℝ) {O : ManyBodyOp (Fin (2 * N + 2))}
-    (hO : O.IsHermitian) :
-    (((LatticeSystem.Quantum.gibbsExpectation β
-        (hubbardCycleHamiltonian N J U) O).re : ℂ))
-      = LatticeSystem.Quantum.gibbsExpectation β
-          (hubbardCycleHamiltonian N J U) O :=
-  LatticeSystem.Quantum.gibbsExpectation_ofReal_re_eq_of_isHermitian
-    (hubbardCycleHamiltonian_isHermitian N J U) hO β
 
 /-- Periodic-Hubbard Rényi-n trace identity. -/
 theorem hubbardCycleGibbsState_pow_trace
