@@ -3831,22 +3831,24 @@ For any $G$-walk from $x$ to $y$ and any configuration
 $\sigma$ with $\sigma_x \neq \sigma_y$,
 $\texttt{SwapReachable}\,G\,\sigma\,(\texttt{basisSwap}\,\sigma\,x\,y)$.
 
-By induction on the walk. The cons case
-$x \to v \to \cdots \to y'$ (after the head edge $(x, v)$) splits
-on $\sigma_v$:
+This is the $N = 1$ reading of the spin-$S$ single-quantum walk
+transport \texttt{raiseLowerReachableS\_transportOne\_of\_walk}
+(\texttt{LatticeSystem/Quantum/SpinS/ConnectedRaiseLower.lean}):
 \begin{itemize}
-\item Case A ($\sigma_v \neq \sigma_x$, so $\sigma_v = \sigma_y$):
-  swap $(x, v)$ first via the head edge; the resulting
-  configuration $\sigma_1$ has $\sigma_1{}_v = \sigma_x \neq
-  \sigma_y = \sigma_1{}_y$, so the inductive hypothesis on the
-  remaining walk applies.
-\item Case B ($\sigma_v = \sigma_x$): apply the inductive
-  hypothesis on the remaining walk first, then swap $(x, v)$
-  via the head edge on the resulting configuration.
+\item $\sigma_x \neq \sigma_y$ in $\mathrm{Fin}\,2$ means the two
+endpoint values are $0$ and $1$ in one of the two orders; the bond swap
+lowers the endpoint carrying $1$ and raises the endpoint carrying $0$,
+that is, it is the transport of a single magnetisation quantum
+(\texttt{transportOne\_eq\_basisSwap});
+\item that transport runs along the walk when $\sigma_x = 1$ and along
+its reverse when $\sigma_x = 0$, and Tasaki's decomposition into three
+single-edge swaps at an intermediate vertex $v$ is the $N = 1$ case of
+the overflow-free routing performed there: push into $v$ when $v$ has
+room, otherwise recurse first to make room;
+\item each raise/lower step of the resulting chain is a bond swap
+(\texttt{swapStep\_of\_raiseLowerStepS}), and reachability transports
+along that implication (\texttt{Relation.ReflTransGen.mono}).
 \end{itemize}
-Both cases produce a configuration equal to
-$\texttt{basisSwap}\,\sigma\,x\,y$ off the support
-$\{x, v, y\}$ and at the three special sites by direct check.
 Lean: \texttt{swapReachable\_of\_walk\_of\_ne}.
 \end{theorem}
 
