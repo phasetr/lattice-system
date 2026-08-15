@@ -55,6 +55,7 @@ import LatticeSystem.Tests.SpinSRaiseLowerMatrixPow
 import LatticeSystem.Tests.SpinSBipartiteCompleteGraph
 import LatticeSystem.Tests.SpinSShiftedDressedMatrix
 import LatticeSystem.Tests.SpinSSublatticeCasimirNeel
+import LatticeSystem.Tests.SpinSToyHamiltonianCasimir
 import LatticeSystem.Tests.SU2Family
 import LatticeSystem.Tests.Pauli
 import LatticeSystem.Tests.Z2Z2
@@ -90,7 +91,6 @@ import LatticeSystem.Tests.MarshallLiebMattisToyHamiltonian
 import LatticeSystem.Tests.MarshallLiebMattisBipartiteGraph
 import LatticeSystem.Tests.MarshallLiebMattisSublatticeSpin
 import LatticeSystem.Tests.MarshallLiebMattisSublatticeSpinDot
-import LatticeSystem.Tests.MarshallLiebMattisToyHamiltonianCasimir
 import LatticeSystem.Tests.TimeReversalSpinHalf
 import LatticeSystem.Tests.TimeReversalMulti
 import LatticeSystem.Tests.CartesianAxis

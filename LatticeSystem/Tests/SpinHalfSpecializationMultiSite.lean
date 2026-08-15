@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.SpinHalfSpecializationSublattice
+import LatticeSystem.Quantum.SpinS.ToyHamiltonianCasimir
 
 /-!
 # Test coverage for the many-body spin-`1/2` specialisation bridges
@@ -15,8 +16,10 @@ Three viewpoints:
 2. **Behaviour** — a concrete matrix element and a concrete
    eigenvalue, which pin the Néel orientation convention
    (`A ↦ 0` up, `¬A ↦ Fin.last`) rather than merely the types.
-3. **Transfer** — a spin-`1/2` sublattice Casimir theorem is
-   reproduced from its spin-`S` source through the bridges alone.
+3. **Transfer** — spin-`1/2` theorems (a sublattice Casimir
+   eigenvalue, and the SU(2) invariance and symmetry of the MLM toy
+   Hamiltonian) are reproduced from their spin-`S` sources through the
+   bridges alone.
 -/
 
 namespace LatticeSystem.Tests.SpinHalfSpecializationMultiSite
@@ -161,5 +164,41 @@ example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (A : Λ → Bool) :
   congr 1
   push_cast
   ring
+
+/-- `Commute Ĥ_toy (Ŝ_tot)²`: the spin-`1/2` MLM toy Hamiltonian commutes
+with the total spin Casimir, obtained from the spin-`S` SU(2) invariance
+at `N = 1` through the bridges alone (Tasaki §2.5 (2.5.11)). -/
+example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonian A) (totalSpinHalfSquared Λ) := by
+  have h := heisenbergToyHamiltonianS_commute_totalSpinSSquared (Λ := Λ) 1 A
+  rwa [heisenbergToyHamiltonianS_one_eq_heisenbergToyHamiltonian,
+    totalSpinSSquared_one_eq_totalSpinHalfSquared] at h
+
+/-- `Commute Ĥ_toy Ŝ_tot^{(α)}` for all three axes: the spin-`1/2` toy
+Hamiltonian is SU(2) invariant at the axis level, transferred from the
+spin-`S` axis commutators at `N = 1`. The axis-`3` component is the
+magnetisation-sector conservation `[Ĥ_toy, Ŝ_tot^z] = 0`. -/
+example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonian A) (totalSpinHalfOp1 Λ) ∧
+      Commute (heisenbergToyHamiltonian A) (totalSpinHalfOp2 Λ) ∧
+        Commute (heisenbergToyHamiltonian A) (totalSpinHalfOp3 Λ) := by
+  have h1 := heisenbergToyHamiltonianS_commute_totalSpinSOp1 (Λ := Λ) 1 A
+  have h2 := heisenbergToyHamiltonianS_commute_totalSpinSOp2 (Λ := Λ) 1 A
+  have h3 := heisenbergToyHamiltonianS_commute_totalSpinSOp3 (Λ := Λ) 1 A
+  rw [heisenbergToyHamiltonianS_one_eq_heisenbergToyHamiltonian,
+    totalSpinSOp1_one_eq_totalSpinHalfOp1] at h1
+  rw [heisenbergToyHamiltonianS_one_eq_heisenbergToyHamiltonian,
+    totalSpinSOp2_one_eq_totalSpinHalfOp2] at h2
+  rw [heisenbergToyHamiltonianS_one_eq_heisenbergToyHamiltonian,
+    totalSpinSOp3_one_eq_totalSpinHalfOp3] at h3
+  exact ⟨h1, h2, h3⟩
+
+/-- The spin-`1/2` MLM toy Hamiltonian is matrix-symmetric, transferred
+from its spin-`S` source at `N = 1` (real symmetric coupling plus
+Hermiticity). -/
+example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (A : Λ → Bool) :
+    (heisenbergToyHamiltonian A).IsSymm := by
+  have h := heisenbergToyHamiltonianS_isSymm (Λ := Λ) 1 A
+  rwa [heisenbergToyHamiltonianS_one_eq_heisenbergToyHamiltonian] at h
 
 end LatticeSystem.Tests.SpinHalfSpecializationMultiSite
