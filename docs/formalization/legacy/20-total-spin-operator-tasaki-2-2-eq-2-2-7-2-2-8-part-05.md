@@ -83,6 +83,23 @@ permalink: /formalization/legacy/20-total-spin-operator-tasaki-2-2-eq-2-2-7-2-2-
 
 <!-- legacy-source:end:1188:1255 -->
 
+## Authoritative supplemental implementation record (many-body spin-`1/2` specialisation)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+the many-body continuation of the single-site spin-`S` ↔ spin-`1/2` bridge
+(`Quantum/SpinS/SpinHalfSpecialization.lean`, catalogued on the Tasaki §2.4 generalised page).
+Every migrated row above is unchanged.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `onSiteS_one_eq_onSite` / `spinSDot_one_eq_spinHalfDot` / `heisenbergHamiltonianS_one_eq_heisenbergHamiltonian` / `totalSpinSOp{1,2,3}_one_eq_totalSpinHalfOp{1,2,3}` / `totalSpinSSquared_one_eq_totalSpinHalfSquared` / `basisVecS_one_eq_basisVec` / `neelConfigOfS_one_eq_neelConfigOf` / `neelStateOfS_one_eq_neelStateOf` | **multi-site spin-`S` ↔ spin-`1/2` bridge at `N = 1`**: `ManyBodyOpS Λ 1` and `ManyBodyOp Λ` are definitionally equal, so every multi-site spin-`S` object at `N = 1` equals its spin-`1/2` counterpart without a cast: site embeddings, the two-site inner product `Ŝ_x · Ŝ_y` (Tasaki §2.2 eq. (2.2.13), p. 27), the Heisenberg Hamiltonian, the total spin operators and Casimir, and the computational-basis / Néel constructors (Tasaki §2.5 eq. (2.5.2), p. 37; the Néel bridge pins the orientation `A ↦ ↑`, `¬A ↦ ↓`) (PR #5250) | `Quantum/SpinS/SpinHalfSpecializationMultiSite.lean` |
+| `sublatticeSpinSOp{1,2,3}_one_eq_sublatticeSpinHalfOp{1,2,3}` / `sublatticeSpinSOp{Plus,Minus}_one_eq_sublatticeSpinHalfOp{Plus,Minus}` / `sublatticeSpinSquaredS_one_eq_sublatticeSpinHalfSquared` / `sublatticeSpinSDot_one_eq_sublatticeSpinDot` / `heisenbergToyHamiltonianS_one_eq_heisenbergToyHamiltonian` | **sublattice spin-`S` ↔ spin-`1/2` bridge at `N = 1`**: the sublattice spin components, sublattice ladder operators, sublattice Casimir `(Ŝ_A)²`, cross-sublattice inner product `Ŝ_A · Ŝ_B` and MLM toy Hamiltonian of the spin-`S` development coincide at `N = 1` with the spin-`1/2` definitions of `Quantum/MarshallLiebMattis/` (Tasaki §2.5 eqs. (2.5.10)–(2.5.11), pp. 40–42). Scaffolding layer: its scope is exactly the spin-`1/2` sublattice objects that still carry their own definitions (PR #5250) | `Quantum/SpinS/SpinHalfSpecializationSublattice.lean` |
+
+Regression coverage for both files (type-level elaboration without casts, a concrete matrix
+element and eigenvalue pinning the Néel orientation, and the transfer of
+`sublatticeSpinHalfSquared_mulVec_neelStateOf` from its spin-`S` source through the bridges) lives
+in `LatticeSystem/Tests/SpinHalfSpecializationMultiSite.lean`.
+
 ---
 
 [← Total spin operator (Tasaki §2.2 eq. (2.2.7), (2.2.8))](/lattice-system/formalization/legacy/20-total-spin-operator-tasaki-2-2-eq-2-2-7-2-2-8-part-04/) · [Catalogue](/lattice-system/formalization/legacy/) · [Two-site spin inner product (Tasaki §2.2 eq. (2.2.16)) →](/lattice-system/formalization/legacy/21-two-site-spin-inner-product-tasaki-2-2-eq-2-2-16/)
