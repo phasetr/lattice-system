@@ -378,21 +378,6 @@ theorem totalSpinHalfRot3_commute_of_commute (θ : ℝ) (A : ManyBodyOp Λ)
   rw [totalSpinHalfRot3_eq_exp]
   exact totalSpinHalfRot_commute_aux Λ _ θ A h
 
-/-- Tasaki §2.2 (2.2.12) → (2.2.13), ladder version: `A` commuting
-with `Ŝ^+_tot` also commutes with `exp(c • Ŝ^+_tot)` for any `c ∈ ℂ`
-(direct application of `Commute.exp_right`; useful for U(1) symmetry
-arguments together with the analogous `Ŝ^-_tot` statement). -/
-theorem totalSpinHalfOpPlus_exp_commute_of_commute (c : ℂ) (A : ManyBodyOp Λ)
-    (h : Commute A (totalSpinHalfOpPlus Λ)) :
-    Commute A (NormedSpace.exp (c • totalSpinHalfOpPlus Λ)) :=
-  (h.smul_right c).exp_right
-
-/-- Same for the lowering operator. -/
-theorem totalSpinHalfOpMinus_exp_commute_of_commute (c : ℂ) (A : ManyBodyOp Λ)
-    (h : Commute A (totalSpinHalfOpMinus Λ)) :
-    Commute A (NormedSpace.exp (c • totalSpinHalfOpMinus Λ)) :=
-  (h.smul_right c).exp_right
-
 /-! ## Unitarity and conjugation form of the global rotation
 
 `Û^(α)_θ_tot = exp(-iθ Ŝ_tot^(α))` is unitary because `-iθ Ŝ_tot^(α)`

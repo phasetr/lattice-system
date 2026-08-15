@@ -117,6 +117,32 @@ Done
 Done
 <!-- legacy-source:end:131:131 -->
 
+## Authoritative supplemental implementation record (P1f-same: same-site commutation)
+
+This section is maintained by hand, lies outside the migrated blocks on this page, and records the
+current implementation of the P1f-same milestone above. That block is a frozen historical record —
+it is pinned byte-for-byte by `scripts/check_docs_hierarchy.py` and is never edited for later
+relocations or deletions.
+
+The milestone itself is unchanged: Tasaki eq. (2.2.6) at `x = y` is realised by the generic
+`onSite_commutator_same` (`Quantum/ManyBody.lean`), which lifts any single-site commutator through
+the site embedding, applied to the single-site relations
+`spinHalfOp{1,2,3}_commutator_spinHalfOp{2,3,1}` (`Quantum/SpinHalf.lean`). The three named
+spin-`1/2` specialisations in `Quantum/TotalSpin.lean` —
+`spinHalfOp1_onSite_commutator_spinHalfOp2_onSite`,
+`spinHalfOp2_onSite_commutator_spinHalfOp3_onSite` and
+`spinHalfOp3_onSite_commutator_spinHalfOp1_onSite` — were retired: each was the single `rw` chain
+composing those two ingredients with `onSite_smul` (`Quantum/ManyBody.lean`) to restate the
+commutator in the `c • onSite x Sγ` form the statement quotes, and no Lean file referenced them.
+All three ingredients remain in the library with their own consumers.
+
+The neighbouring milestone P1f (eq. (2.2.6) at `x ≠ y`) is likewise unchanged, and is realised by
+`onSite_mul_onSite_of_ne` (`Quantum/ManyBody.lean`), which states the distinct-site commutation for
+arbitrary single-site matrices under an explicit `i ≠ j` hypothesis and is consumed across the
+library. Its spin-`1/2` wrapper `spinHalfOp_onSite_comm_of_ne` in `Quantum/TotalSpin.lean` was
+retired: it applied that theorem verbatim under renamed variables, adding no hypothesis and no
+proof step, and no Lean file referenced it.
+
 <!-- legacy-source:start:132:132 -->
 ## P1f' (Tasaki §2.2): Total spin operator `Ŝ_tot^(α)` (eq. (2.2.7)) and Hermiticity
 

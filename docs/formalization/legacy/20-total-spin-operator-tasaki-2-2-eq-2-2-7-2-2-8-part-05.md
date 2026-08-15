@@ -187,6 +187,32 @@ for arbitrary spin-`S`; the spin-`1/2` reading is the `N = 1` case. Regression c
 Marshall–Lieb–Mattis sublattice theory is fully retired: every statement above is now proved once,
 for general spin-`S`.
 
+## Authoritative supplemental implementation record (Tasaki §2.2 global-rotation ladder-exponential instances)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+the current state of one row of that block. The migrated catalogue block is a frozen historical
+record — its rows are pinned byte-for-byte by `scripts/check_docs_hierarchy.py` and are never
+edited for later deletions — so the row `totalSpinHalfOp{Plus,Minus}_exp_commute_of_commute`
+describes membership as it stood at migration time.
+
+Retired from `Quantum/TotalSpin/Rotation.lean`:
+`totalSpinHalfOpPlus_exp_commute_of_commute` and `totalSpinHalfOpMinus_exp_commute_of_commute`.
+That row therefore has no member left in the library.
+
+Nothing mathematical is lost. Neither statement renders a numbered Tasaki equation: each was the
+one-line application `(h.smul_right c).exp_right` of the Mathlib lemmas `Commute.smul_right` and
+`Commute.exp_right` to `Ŝ^±_tot`, recoverable in the same one line wherever a U(1) argument needs
+it. The `Ŝ_tot^(α)` statements of Tasaki eqs. (2.2.12)–(2.2.13), which use the same two Mathlib
+lemmas through the private helper `totalSpinHalfRot_commute_aux`, are unaffected.
+
+The neighbouring rows of the block are untouched: `totalSpinHalfRot{1,2,3}_commute_of_commute`
+keeps its statement and its consumers in `Quantum/SpinDot/Hamiltonian.lean`, and
+`totalSpinHalfRot{1,2,3}_conjTranspose_mul_self` and
+`totalSpinHalfRot{1,2,3}_conj_eq_self_of_commute` keep their statements and proofs in
+`Quantum/TotalSpin/Rotation.lean` — the latter family is the library's only rendering of the
+finite form of Tasaki eq. (2.2.13), so it is retained together with the unitarity layer it is
+proved from, independently of whether another Lean file references it.
+
 ---
 
 [← Total spin operator (Tasaki §2.2 eq. (2.2.7), (2.2.8))](/lattice-system/formalization/legacy/20-total-spin-operator-tasaki-2-2-eq-2-2-7-2-2-8-part-04/) · [Catalogue](/lattice-system/formalization/legacy/) · [Two-site spin inner product (Tasaki §2.2 eq. (2.2.16)) →](/lattice-system/formalization/legacy/21-two-site-spin-inner-product-tasaki-2-2-eq-2-2-16/)
