@@ -363,7 +363,7 @@ theorem spinHalfRot3_pi_anticomm_spinHalfRot1_pi :
       + spinHalfRot1 Real.pi * spinHalfRot3 Real.pi = 0 :=
   rotOf_pi_anticomm spinHalfOp3_anticomm_spinHalfOp1
 
-/-! ## `(Û^(α)_π)† = 2i · Ŝ^(α)` -/
+/-! ## Generic π-adjoint: `(rotOf S π)ᴴ = (2i) • S` -/
 
 /-- `rotOf S (-π) = (2i) • S`: the negative-π rotation is the conjugate of the π-rotation. -/
 lemma rotOf_neg_pi (S : Matrix (Fin 2) (Fin 2) ℂ) :
@@ -378,21 +378,6 @@ lemma rotOf_pi_conjTranspose {S : Matrix (Fin 2) (Fin 2) ℂ}
     (hS : S.IsHermitian) :
     (rotOf S Real.pi)ᴴ = (2 * I) • S := by
   rw [rotOf_adjoint hS, rotOf_neg_pi]
-
-/-- `(Û^(1)_π)† = 2i · Ŝ^(1)`. -/
-theorem spinHalfRot1_pi_conjTranspose :
-    (spinHalfRot1 Real.pi)ᴴ = (2 * I) • spinHalfOp1 :=
-  rotOf_pi_conjTranspose spinHalfOp1_isHermitian
-
-/-- `(Û^(2)_π)† = 2i · Ŝ^(2)`. -/
-theorem spinHalfRot2_pi_conjTranspose :
-    (spinHalfRot2 Real.pi)ᴴ = (2 * I) • spinHalfOp2 :=
-  rotOf_pi_conjTranspose spinHalfOp2_isHermitian
-
-/-- `(Û^(3)_π)† = 2i · Ŝ^(3)`. -/
-theorem spinHalfRot3_pi_conjTranspose :
-    (spinHalfRot3 Real.pi)ᴴ = (2 * I) • spinHalfOp3 :=
-  rotOf_pi_conjTranspose spinHalfOp3_isHermitian
 
 /-! ## π-rotation products (Tasaki eq 2.1.29, S = 1/2) -/
 
@@ -498,18 +483,6 @@ lemma rotOf_pi_conj_of_ne {Sα Sβ : Matrix (Fin 2) (Fin 2) ℂ}
   congr 1
   linear_combination Complex.I_sq
 
-/-- `(Û^(1)_π)† · Ŝ^(2) · Û^(1)_π = -Ŝ^(2)`. -/
-theorem spinHalfRot1_pi_conj_spinHalfOp2 :
-    (spinHalfRot1 Real.pi)ᴴ * spinHalfOp2 * spinHalfRot1 Real.pi = -spinHalfOp2 :=
-  rotOf_pi_conj_of_ne spinHalfOp1_isHermitian spinHalfOp1_mul_self
-    spinHalfOp1_anticomm_spinHalfOp2
-
-/-- `(Û^(1)_π)† · Ŝ^(3) · Û^(1)_π = -Ŝ^(3)`. -/
-theorem spinHalfRot1_pi_conj_spinHalfOp3 :
-    (spinHalfRot1 Real.pi)ᴴ * spinHalfOp3 * spinHalfRot1 Real.pi = -spinHalfOp3 :=
-  rotOf_pi_conj_of_ne spinHalfOp1_isHermitian spinHalfOp1_mul_self
-    (anticomm_swap spinHalfOp3_anticomm_spinHalfOp1)
-
 /-- `(Û^(2)_π)† · Ŝ^(1) · Û^(2)_π = -Ŝ^(1)`. -/
 theorem spinHalfRot2_pi_conj_spinHalfOp1 :
     (spinHalfRot2 Real.pi)ᴴ * spinHalfOp1 * spinHalfRot2 Real.pi = -spinHalfOp1 :=
@@ -521,17 +494,5 @@ theorem spinHalfRot2_pi_conj_spinHalfOp3 :
     (spinHalfRot2 Real.pi)ᴴ * spinHalfOp3 * spinHalfRot2 Real.pi = -spinHalfOp3 :=
   rotOf_pi_conj_of_ne spinHalfOp2_isHermitian spinHalfOp2_mul_self
     spinHalfOp2_anticomm_spinHalfOp3
-
-/-- `(Û^(3)_π)† · Ŝ^(1) · Û^(3)_π = -Ŝ^(1)`. -/
-theorem spinHalfRot3_pi_conj_spinHalfOp1 :
-    (spinHalfRot3 Real.pi)ᴴ * spinHalfOp1 * spinHalfRot3 Real.pi = -spinHalfOp1 :=
-  rotOf_pi_conj_of_ne spinHalfOp3_isHermitian spinHalfOp3_mul_self
-    spinHalfOp3_anticomm_spinHalfOp1
-
-/-- `(Û^(3)_π)† · Ŝ^(2) · Û^(3)_π = -Ŝ^(2)`. -/
-theorem spinHalfRot3_pi_conj_spinHalfOp2 :
-    (spinHalfRot3 Real.pi)ᴴ * spinHalfOp2 * spinHalfRot3 Real.pi = -spinHalfOp2 :=
-  rotOf_pi_conj_of_ne spinHalfOp3_isHermitian spinHalfOp3_mul_self
-    (anticomm_swap spinHalfOp2_anticomm_spinHalfOp3)
 
 end LatticeSystem.Quantum
