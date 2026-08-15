@@ -1,5 +1,7 @@
-import LatticeSystem.Quantum.SpinS.RaiseLower
+import LatticeSystem.Quantum.SpinS.ConfigCombinatorics
 import Mathlib.Data.Nat.Dist
+import Mathlib.Tactic.Abel
+import Mathlib.Tactic.Ring
 
 /-!
 # Spin-configuration distance: over/under sites and distance reduction (foundation)
