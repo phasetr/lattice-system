@@ -1,8 +1,8 @@
 /-
 Tasaki §4.2.2 Theorem 4.6 (Anderson tower), Tier 4 — the numerator estimate.
 
-The ★ variational bound (`tower_numerator_double_commutator_le`) reduces the trial-state energy gap
-to `⟨Φ, [(ô⁻)^M, [Ĥ, (ô⁺)^M]] Φ⟩`.  This file supplies the Heisenberg-specific inputs of that
+The ★ variational bound proved in `AndersonTowerAssembly` reduces the trial-state energy gap to
+`⟨Φ, [(ô⁻)^M, [Ĥ, (ô⁺)^M]] Φ⟩`.  This file supplies the Heisenberg-specific inputs of that
 estimate — the Lemma R2 word bounds for the double commutator `d̂ = [ô⁺, [Ĥ, ô⁻]]` (`O(1/V)` per
 term) and for the single commutator `[Ĥ, ô⁺]`, together with the Jacobi identity
 `[[Ĥ, ô⁺], ô⁻] = −d̂` that surfaces `d̂` — and obtains the numerator bound by instantiating the
@@ -11,7 +11,6 @@ estimates at the numerator word lengths `2M−2` and `2M−3` are collected here
 bound.
 -/
 import LatticeSystem.Quantum.SpinS.AndersonTowerLocalDecay
-import LatticeSystem.Quantum.SpinS.AndersonTowerAssembly
 import LatticeSystem.Quantum.SpinS.OrderDensityNumeratorEngine
 
 namespace LatticeSystem.Quantum

@@ -3,7 +3,7 @@ import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergU1
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensate
 
 /-!
-# Tasaki §5.3 Theorem 5.2 (BEC low-lying tower states): XY-planar numerator bound (PR-4b)
+# Tasaki §5.3 Theorem 5.2 (BEC low-lying tower states): XY-planar numerator bound
 
 This file discharges the **XY-planar variational-numerator bound** of the Bose–Einstein-condensation
 tower (`tasaki_5_2_bec_tower`, Tasaki §5.3, eq. (5.3.4)) at half filling.  The route is the
@@ -22,7 +22,7 @@ The `Ĥ_ZZ` locality is obtained directly from `iterOrderComm_norm_le_of_localSu
 of two-site-supported bond operators `Ŝ³_x Ŝ³_y`, so its iterated order-density commutators decay by
 `(4N/V)` per step, and the `Ĥ_ZZ` single/double commutators are just two such iterated commutators.
 The resulting aggregates are bounded by the *same* constants `24 d N³` and `96 d N⁴ / V` as the
-Heisenberg chain (the `Ŝ³ Ŝ³` leaf is smaller than the `Ŝ_x·Ŝ_y` leaf), so the final `Ĥ_ZZ`
+Heisenberg instantiation (the `Ŝ³ Ŝ³` leaf is smaller than the `Ŝ_x·Ŝ_y` leaf), so the final `Ĥ_ZZ`
 numerator bound has the identical moment-factor shape as `tower_numerator_bound`, which is exactly
 what lets `xy_tower_numerator_bound` combine the two bounds into a single right-hand side.
 
@@ -378,15 +378,16 @@ theorem zz_tower_numerator_bound (d L N M : ℕ) [NeZero L] (hN : 1 ≤ N) (hL :
       zzSingleComm_word_re_bound d L N hN hL Φ hsing hq₀ hm0 hratio wl wr hc hb)
     hcond2 hbudget2 hcond3 hbudget3
 
-/-! ### The XY-planar numerator bound (PR-4b deliverable) -/
+/-! ### The XY-planar numerator bound -/
 
-/-- **XY-planar variational numerator bound** (design-note math (2.1), the PR-4b deliverable).  For
-the half-filling XY tower (`N = 1`), the pure-XY variational numerator with `Ĥ' = 2 Ĥ_XY` splits by
+/-- **XY-planar variational numerator bound** (design-note math (2.1)).  For the half-filling XY
+tower (`N = 1`), the pure-XY variational numerator with `Ĥ' = 2 Ĥ_XY` splits by
 `Ĥ_XY = Ĥ_Heis − Ĥ_ZZ` and Hamiltonian-linearity into `2 · (Heisenberg numerator) − 2 · (ZZ
 numerator)`; the triangle inequality with `tower_numerator_bound` (Anderson-tower Theorem 4.6) and
-`zz_tower_numerator_bound` — which have the *identical* moment-factor right-hand side — bounds it by
-`4` copies of that common `O(M²/V)` right-hand side.  This is the `Term1` numerator consumed by the
-PR-5 half-filling tower assembly.
+`zz_tower_numerator_bound` — both instantiations of the same generic engine
+`tower_numerator_bound_of_word_bounds`, hence with the *identical* moment-factor right-hand side —
+bounds it by `4` copies of that common `O(M²/V)` right-hand side.  This numerator is consumed by
+the half-filling tower assembly in `BoseEinsteinCondensateTower`.
 
 Reference: Tasaki §5.3 Theorem 5.2, eq. (5.3.4), p. 141; math note
 `.self-local/docs/math-thm52-pr4b-zz-numerator.md` §2 eq. (2.1). -/

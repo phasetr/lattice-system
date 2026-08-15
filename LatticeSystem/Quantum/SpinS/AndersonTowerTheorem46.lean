@@ -11,6 +11,7 @@ This file is downstream of `AndersonTower.lean` (which only states the predicate
 theorem can refer to the numerator machinery without an import cycle.
 -/
 import LatticeSystem.Quantum.SpinS.AndersonTowerNumerator
+import LatticeSystem.Quantum.SpinS.AndersonTowerAssembly
 import LatticeSystem.Math.Analysis.RealRpowNatSqrt
 
 namespace LatticeSystem.Quantum

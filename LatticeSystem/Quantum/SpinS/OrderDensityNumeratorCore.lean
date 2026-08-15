@@ -3,10 +3,11 @@ Hamiltonian-agnostic order-density algebra shared by the tower numerator estimat
 
 The declarations here scalarize an inserted order commutator `[ô⁺, ô⁻]` on a total-`Ŝ³` singlet,
 telescope powers of the staggered order density into order words, and collect per-term expectation
-bounds through triangle inequalities.  No statement or proof mentions a Hamiltonian, so both the
-Anderson-tower numerator chain (Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
-1st ed., Springer 2020, §4.2.2 Theorem 4.6) and the Bose–Einstein-condensation XY numerator chain
-(§5.3 Theorem 5.2) reuse them unchanged.
+bounds through triangle inequalities.  No statement or proof mentions a Hamiltonian, so the single
+Hamiltonian-generic collection in `OrderDensityNumeratorEngine` is built on them — and through that
+one engine, both the Anderson-tower numerator (Hal Tasaki, *Physics and Mathematics of Quantum
+Many-Body Systems*, 1st ed., Springer 2020, §4.2.2 Theorem 4.6) and the Bose–Einstein-condensation
+XY numerator (§5.3 Theorem 5.2) share these facts.
 
 The order-word layer comes from `AndersonTowerLocality` and the generic power telescopes from
 `LatticeSystem.Math.CommutatorTelescope`.
