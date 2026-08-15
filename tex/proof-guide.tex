@@ -3953,22 +3953,28 @@ $\sigma, \sigma'$ with the same total magnetisation
 $\bar\sigma = \bar\sigma'$,
 $\texttt{SwapReachable}\,G\,\sigma\,\sigma'$.
 
-Strong induction on the **configuration distance**
-$\mathrm{configDist}(\sigma, \sigma') :=
- \#\{x \in \Lambda \mid \sigma_x \neq \sigma'_x\}$:
+This is the $N = 1$ reading of the spin-$S$ raise/lower reachability
+\texttt{raiseLowerReachableS\_of\_connected}
+(\texttt{LatticeSystem/Quantum/SpinS/ConnectedRaiseLower.lean}):
 \begin{itemize}
-\item Base $\mathrm{configDist} = 0$: $\sigma = \sigma'$, refl.
-\item Inductive step: pigeonhole on the magnetisation equality
-gives sites $x$ with $(\sigma_x, \sigma'_x) = (0, 1)$ and $y$ with
-$(\sigma_y, \sigma'_y) = (1, 0)$
-(\texttt{exists\_swap\_pair\_of\_eq\_magnetization}); apply
-Theorem~\ref{thm:swap-reachable} to get $\sigma \to
-\texttt{basisSwap}\,\sigma\,x\,y$; the new configuration has
-$\mathrm{configDist}$ strictly smaller (sites $x, y$ newly agree
-with $\sigma'$, see \texttt{configDist\_basisSwap\_lt}) and the
-same magnetisation as $\sigma'$
-(Theorem~\ref{thm:mag-swap}); apply IH.
+\item the two magnetisation quantum numbers are affinely related,
+$\bar\sigma = |\Lambda| - 2\,\texttt{magSumS}\,\sigma$
+(\texttt{magnetization\_eq\_card\_sub\_two\_mul}), so equal magnetisation
+is the same hypothesis as an equal magnetisation sum
+(\texttt{magnetization\_eq\_iff\_magSumS\_eq});
+\item a raise/lower step along a $G$-edge with spin values in
+$\mathrm{Fin}\,2$ forces the two endpoint values to be $0$ and $1$ in some
+order, hence is a bond swap
+(\texttt{swapStep\_of\_raiseLowerStepS}), the spin-$S$ counterpart of
+Theorem~\ref{thm:swap-reachable} being the walk transport of a single
+magnetisation quantum;
+\item reachability transports along that implication
+(\texttt{Relation.ReflTransGen.mono}), and the magnetisation is preserved
+step by step (Theorem~\ref{thm:mag-swap}).
 \end{itemize}
+The spin-$S$ statement assumes $G$ connected, that is, preconnected with
+$\Lambda$ non-empty; the empty lattice is treated separately, where
+$\sigma = \sigma'$ for want of sites.
 Lean: \texttt{swapReachable\_of\_eq\_magnetization}.
 \end{theorem}
 
@@ -3976,7 +3982,7 @@ This completes the combinatorial content needed for
 Perron--Frobenius irreducibility of the dressed Heisenberg matrix
 on the magnetisation-$M$ subspace. Subsequent PRs will:
 \begin{itemize}
-\item upgrade $\mathrm{configDist}$ reachability to a positive
+\item upgrade swap reachability to a positive
 matrix-power entry $(B^n)_{\sigma, \sigma'} > 0$ for the shifted
 non-negative matrix $B = cI - M$ defined below;
 \item apply Perron--Frobenius

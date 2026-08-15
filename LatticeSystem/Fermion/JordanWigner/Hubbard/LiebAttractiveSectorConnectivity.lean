@@ -43,35 +43,18 @@ exactly `k` up electrons (`Σ_x u_x = k`). -/
 abbrev hubbardSpinCountSector (N : ℕ) (k : ℕ) : Type :=
   {u : hubbardSpinConfig N // (∑ x : Fin (N + 1), (u x).val) = k}
 
-/-- The integer magnetization in terms of the up-count: `|u| = |Λ| − 2·Σ_x u_x`. -/
-theorem magnetization_eq_card_sub_two_mul (u : hubbardSpinConfig N) :
-    magnetization (Fin (N + 1)) u
-      = (N + 1 : ℤ) - 2 * ∑ x : Fin (N + 1), ((u x).val : ℤ) := by
-  have hsign : ∀ s : Fin 2, (spinSign s : ℤ) = 1 - 2 * (s.val : ℤ) := by
-    decide
-  unfold magnetization
-  simp_rw [hsign]
-  rw [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
-    ← Finset.mul_sum]
-  ring
-
-/-- Two equal-count configurations have equal magnetization. -/
+/-- Two equal-count configurations have equal magnetization. The up-count is the
+`magSumS` quantum number at `N = 1`, so this is the magnetisation dictionary
+`|u| = |Λ| − 2·Σ_x u_x` read backwards. -/
 theorem magnetization_eq_of_sumVal_eq {u v : hubbardSpinConfig N}
     (h : (∑ x : Fin (N + 1), (u x).val) = ∑ x : Fin (N + 1), (v x).val) :
-    magnetization (Fin (N + 1)) u = magnetization (Fin (N + 1)) v := by
-  rw [magnetization_eq_card_sub_two_mul, magnetization_eq_card_sub_two_mul]
-  have : (∑ x : Fin (N + 1), ((u x).val : ℤ)) = ∑ x : Fin (N + 1), ((v x).val : ℤ) := by
-    rw [← Nat.cast_sum, ← Nat.cast_sum, h]
-  rw [this]
+    magnetization (Fin (N + 1)) u = magnetization (Fin (N + 1)) v :=
+  (magnetization_eq_iff_magSumS_eq u v).mpr h
 
 /-- A `basisSwap` preserves the up-count (the swap permutes occupation values). -/
 theorem sumVal_basisSwap (σ : hubbardSpinConfig N) (x y : Fin (N + 1)) :
-    (∑ z : Fin (N + 1), (basisSwap σ x y z).val) = ∑ z : Fin (N + 1), (σ z).val := by
-  have h := magnetization_basisSwap σ x y
-  rw [magnetization_eq_card_sub_two_mul, magnetization_eq_card_sub_two_mul] at h
-  have h2 : (∑ z : Fin (N + 1), ((basisSwap σ x y z).val : ℤ))
-      = ∑ z : Fin (N + 1), ((σ z).val : ℤ) := by linarith
-  exact_mod_cast h2
+    (∑ z : Fin (N + 1), (basisSwap σ x y z).val) = ∑ z : Fin (N + 1), (σ z).val :=
+  (magnetization_eq_iff_magSumS_eq (basisSwap σ x y) σ).mp (magnetization_basisSwap σ x y)
 
 /-! ## The sector kinetic support graph -/
 
@@ -91,14 +74,6 @@ Lemma 10.10. -/
 theorem hubbardKineticSectorGraph_adj_entry_ne {T : Fin (N + 1) → Fin (N + 1) → ℂ} {k : ℕ}
     {p q : hubbardSpinCountSector N k} (h : (hubbardKineticSectorGraph N T k).Adj p q) :
     hubbardBlockKineticUpFixedMatrix N T p.val q.val ≠ 0 := h.1
-
-/-- `basisSwap` is symmetric in its two sites. -/
-private theorem basisSwap_comm (σ : hubbardSpinConfig N) (x y : Fin (N + 1)) :
-    basisSwap σ x y = basisSwap σ y x := by
-  by_cases hxy : x = y
-  · rw [hxy]
-  · unfold basisSwap
-    exact Function.update_comm hxy (σ y) (σ x) σ
 
 /-- A single hopping-edge swap with the source occupied (`σ x = 1`, `σ y = 0`) gives a sector-graph
 edge. Both kinetic entries are nonzero: the forward one by PR40c

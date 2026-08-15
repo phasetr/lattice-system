@@ -9,22 +9,22 @@ namespace LatticeSystem.Tests.MarshallLiebMattisEqMagnetizationReachable
 
 open LatticeSystem.Quantum
 
-/-- Configuration distance is zero iff configurations are equal. -/
+/-- Magnetisation in terms of the spin-`S` magnetisation sum at `N = 1`. -/
+example (σ : Fin 2 → Fin 2) :
+    magnetization (Fin 2) σ = (Fintype.card (Fin 2) : ℤ) - 2 * (magSumS (N := 1) σ : ℤ) :=
+  magnetization_eq_card_sub_two_mul σ
+
+/-- Equal magnetisation is the same hypothesis as an equal magnetisation sum. -/
 example (σ σ' : Fin 2 → Fin 2) :
-    configDist σ σ' = 0 ↔ σ = σ' :=
-  configDist_eq_zero_iff σ σ'
+    magnetization (Fin 2) σ = magnetization (Fin 2) σ' ↔
+      magSumS (N := 1) σ = magSumS (N := 1) σ' :=
+  magnetization_eq_iff_magSumS_eq σ σ'
 
-/-- For σ ≠ σ' with equal magnetisation, there exist swap pair sites. -/
-example (σ σ' : Fin 2 → Fin 2) (hne : σ ≠ σ')
-    (hmag : magnetization (Fin 2) σ = magnetization (Fin 2) σ') :
-    ∃ x y : Fin 2, σ x = 0 ∧ σ' x = 1 ∧ σ y = 1 ∧ σ' y = 0 :=
-  exists_swap_pair_of_eq_magnetization hne hmag
-
-/-- Swap at the canonical pair reduces configuration distance. -/
-example {σ σ' : Fin 2 → Fin 2} {x y : Fin 2}
-    (hx0 : σ x = 0) (hx1 : σ' x = 1) (hy1 : σ y = 1) (hy0 : σ' y = 0) :
-    configDist (basisSwap σ x y) σ' < configDist σ σ' :=
-  configDist_basisSwap_lt hx0 hx1 hy1 hy0
+/-- A spin-`S` raise/lower step at `N = 1` is a bond swap. -/
+example (G : SimpleGraph (Fin 2)) {σ σ' : Fin 2 → Fin 2}
+    (h : RaiseLowerStepS (N := 1) G σ σ') :
+    SwapStep G σ σ' :=
+  swapStep_of_raiseLowerStepS h
 
 /-- Tasaki §2.5 p. 42 Proposition: equal-magnetisation reachability. -/
 example (G : SimpleGraph (Fin 2)) (hG : G.Preconnected)

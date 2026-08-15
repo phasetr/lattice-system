@@ -189,6 +189,16 @@ theorem basisSwap_involutive {x y : Λ} (hxy : x ≠ y) (σ : Λ → Fin 2) :
           Function.update_of_ne hzx]
 
 omit [Fintype Λ] in
+/-- The swap is symmetric in its two sites:
+`basisSwap σ x y = basisSwap σ y x`. -/
+theorem basisSwap_comm (σ : Λ → Fin 2) (x y : Λ) :
+    basisSwap σ x y = basisSwap σ y x := by
+  by_cases hxy : x = y
+  · rw [hxy]
+  · unfold basisSwap
+    exact Function.update_comm hxy (σ y) (σ x) σ
+
+omit [Fintype Λ] in
 /-- The swap of an anti-parallel configuration is anti-parallel:
 `(swap σ) x ≠ (swap σ) y`. -/
 theorem basisSwap_antiparallel {x y : Λ} (hxy : x ≠ y) (σ : Λ → Fin 2)

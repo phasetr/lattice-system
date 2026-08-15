@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.MarshallLiebMattis.MarshallSignTrick
+import LatticeSystem.Quantum.SpinS.ConnectedRaiseLower
 import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
 
 /-!
@@ -24,6 +25,9 @@ This module formalises the combinatorial content of Property (iii):
 * `SwapStep G σ σ'` — `σ'` is obtained from `σ` by swapping
   antiparallel spins along a single `G`-edge.
 * `SwapReachable G` — the reflexive transitive closure of `SwapStep G`.
+* `swapStep_of_raiseLowerStepS` — a spin-`S` raise/lower step at `N = 1`
+  is a bond swap, the bridge through which the spin-`1/2` reachability
+  results are obtained from the spin-`S` development.
 * `swapReachable_of_walk_of_ne` — for any `G`-walk from `x` to `y`
   with `σ x ≠ σ y`, `SwapReachable G σ (basisSwap σ x y)`. The proof
   follows Tasaki p. 41 by induction on the walk, decomposing into
@@ -91,6 +95,43 @@ theorem SwapReachable.of_step {G : SimpleGraph Λ}
     {σ σ' : Λ → Fin 2} (h : SwapStep G σ σ') :
     SwapReachable G σ σ' :=
   SwapReachable.single G h
+
+/-! ## Bridge from the spin-`S` raise/lower step at `N = 1` -/
+
+omit [Fintype Λ] in
+/-- At `N = 1` a spin-`S` raise/lower step along a `G`-edge is a bond swap:
+raising one endpoint and lowering the other within `Fin 2` forces the two
+endpoint values to be `0` and `1` in some order, so the resulting
+configuration is `basisSwap σ x y`. This is the specialisation that lets the
+spin-`1/2` reachability statements be read off the spin-`S` development. -/
+theorem swapStep_of_raiseLowerStepS {G : SimpleGraph Λ} {σ σ' : Λ → Fin 2}
+    (h : RaiseLowerStepS (N := 1) G σ σ') : SwapStep G σ σ' := by
+  obtain ⟨x, y, hadj, hstep, hoff⟩ := h
+  have hxy : x ≠ y := fun heq => G.loopless.irrefl _ (heq ▸ hadj)
+  have hx := (σ x).isLt
+  have hy := (σ y).isLt
+  have hx' := (σ' x).isLt
+  have hy' := (σ' y).isLt
+  refine ⟨x, y, hadj, ?_, ?_⟩
+  · intro heq
+    have hval : (σ x).val = (σ y).val := by rw [heq]
+    rcases hstep with ⟨h1, h2⟩ | ⟨h1, h2⟩ <;> omega
+  · funext z
+    by_cases hzx : z = x
+    · subst hzx
+      unfold basisSwap
+      rw [Function.update_of_ne hxy, Function.update_self]
+      apply Fin.ext
+      rcases hstep with ⟨h1, h2⟩ | ⟨h1, h2⟩ <;> omega
+    · by_cases hzy : z = y
+      · subst hzy
+        unfold basisSwap
+        rw [Function.update_self]
+        apply Fin.ext
+        rcases hstep with ⟨h1, h2⟩ | ⟨h1, h2⟩ <;> omega
+      · rw [hoff z hzx hzy]
+        unfold basisSwap
+        rw [Function.update_of_ne hzy, Function.update_of_ne hzx]
 
 /-! ## Walk-based connectivity -/
 

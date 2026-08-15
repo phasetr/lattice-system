@@ -29,14 +29,6 @@ open Matrix
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
-omit [Fintype Λ] in
-/-- `basisSwap` is symmetric in the two site arguments:
-`basisSwap σ x y = basisSwap σ y x`. -/
-private theorem basisSwap_swap_args (σ : Λ → Fin 2) {x y : Λ} (hxy : x ≠ y) :
-    basisSwap σ x y = basisSwap σ y x := by
-  unfold basisSwap
-  rw [Function.update_comm hxy.symm]
-
 /-- For `(u, v) ≠ (a, b)` (as ordered pairs),
 `Σ_v ite (u = a ∧ v = b) c 0 = ite (u = a) c 0` after summing over `v`. -/
 private theorem sum_ite_pair_eq_single (a b : Λ) (c : ℂ) (u : Λ) :
@@ -88,7 +80,7 @@ theorem heisenbergHamiltonian_apply_basisSwap
     · by_cases hyx_pair : u = y ∧ v = x
       · obtain ⟨huy, hvx⟩ := hyx_pair
         subst huy; subst hvx
-        rw [basisSwap_swap_args σ hxy,
+        rw [basisSwap_comm σ,
             spinHalfDot_apply_basisSwap hxy.symm h.symm]
         rw [if_neg hxy_pair]
         rw [if_pos ⟨rfl, rfl⟩]

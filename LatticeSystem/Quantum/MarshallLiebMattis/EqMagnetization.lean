@@ -17,6 +17,12 @@ The proof uses the identification `basisSwap σ x y = σ ∘ Equiv.swap x y`:
 the swap is a permutation of the underlying lattice, and the
 magnetisation `∑_x spinSign(σ x)` is invariant under permutation.
 
+The module also records the affine identification of the two magnetisation
+quantum numbers in use, `|σ| = |Λ| − 2 · magSumS σ`, and the resulting
+equivalence of the equal-magnetisation and equal-`magSumS` hypotheses. It
+is through this translation that the spin-`1/2` configuration reachability
+is obtained from the spin-`S` raise/lower reachability at `N = 1`.
+
 References:
 - H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
   Springer 2020, §2.5, p. 42.
@@ -67,5 +73,33 @@ sector as `σ`. -/
 theorem magnetization_basisSwap_eq_zero_iff (σ : Λ → Fin 2) (x y : Λ) :
     magnetization Λ (basisSwap σ x y) = 0 ↔ magnetization Λ σ = 0 := by
   rw [magnetization_basisSwap]
+
+/-! ## Magnetisation versus the spin-`S` magnetisation sum at `N = 1` -/
+
+omit [DecidableEq Λ] in
+/-- The integer magnetisation in terms of the down-spin count:
+`|σ| = |Λ| − 2 · Σ_x σ_x`, where `Σ_x σ_x = magSumS (N := 1) σ` is the
+spin-`S` magnetisation-index sum read at `N = 1`. Each site contributes
+`spinSign (σ x) = 1 − 2 · σ_x`. -/
+theorem magnetization_eq_card_sub_two_mul (σ : Λ → Fin 2) :
+    magnetization Λ σ = (Fintype.card Λ : ℤ) - 2 * (magSumS (N := 1) σ : ℤ) := by
+  have hsign : ∀ s : Fin 2, (spinSign s : ℤ) = 1 - 2 * (s.val : ℤ) := by decide
+  unfold magnetization magSumS
+  simp_rw [hsign]
+  rw [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, ← Finset.mul_sum,
+    Nat.cast_sum]
+  simp
+
+omit [DecidableEq Λ] in
+/-- Equal magnetisation is equivalent to an equal spin-`S` magnetisation
+sum at `N = 1`: the two quantum numbers differ by the affine change
+`|σ| = |Λ| − 2 · magSumS σ`. This is the hypothesis translation used to
+read the spin-`1/2` equal-magnetisation reachability off the spin-`S`
+raise/lower reachability. -/
+theorem magnetization_eq_iff_magSumS_eq (σ σ' : Λ → Fin 2) :
+    magnetization Λ σ = magnetization Λ σ' ↔
+      magSumS (N := 1) σ = magSumS (N := 1) σ' := by
+  rw [magnetization_eq_card_sub_two_mul, magnetization_eq_card_sub_two_mul]
+  omega
 
 end LatticeSystem.Quantum
