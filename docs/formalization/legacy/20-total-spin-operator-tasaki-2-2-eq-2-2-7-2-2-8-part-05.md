@@ -102,19 +102,27 @@ It holds likewise for the frozen rows on part 3 of this catalogue naming
 `Quantum/MarshallLiebMattis/SublatticeSpinLadderPropertiesCore.lean`,
 `Quantum/MarshallLiebMattis/SublatticeSpinRealness.lean` and
 `Quantum/MarshallLiebMattis/SublatticeSpinRealnessCore.lean`: those files have been retired, and
-their current spin-`S` home is recorded below. It holds finally for the frozen rows naming
+their current spin-`S` home is recorded below. It holds likewise for the frozen rows naming
 `Quantum/MarshallLiebMattis/SublatticeSpinDot.lean` (on this page and on part 3 of this
 catalogue): that file has been retired as well, and its current spin-`S` home is recorded below.
+It holds finally for the frozen rows naming
+`Quantum/MarshallLiebMattis/SublatticeSpin.lean` and
+`Quantum/MarshallLiebMattis/SublatticeSpinCore.lean` (on this page and on parts 2 and 3 of this
+catalogue): those files have been retired too, and their current spin-`S` home is recorded below.
+The spin-`1/2` sublattice layer of `Quantum/MarshallLiebMattis/` no longer exists in any form;
+that directory now holds only the bipartite-graph, Marshall sign-trick and Perron–Frobenius
+machinery together with the toy Hamiltonian itself.
 
 | Lean name | Statement | File |
 |---|---|---|
-| `onSiteS_one_eq_onSite` / `spinSDot_one_eq_spinHalfDot` / `heisenbergHamiltonianS_one_eq_heisenbergHamiltonian` / `totalSpinSOp{1,2,3}_one_eq_totalSpinHalfOp{1,2,3}` / `totalSpinSSquared_one_eq_totalSpinHalfSquared` / `basisVecS_one_eq_basisVec` / `neelConfigOfS_one_eq_neelConfigOf` / `neelStateOfS_one_eq_neelStateOf` | **multi-site spin-`S` ↔ spin-`1/2` bridge at `N = 1`**: `ManyBodyOpS Λ 1` and `ManyBodyOp Λ` are definitionally equal, so every multi-site spin-`S` object at `N = 1` equals its spin-`1/2` counterpart without a cast: site embeddings, the two-site inner product `Ŝ_x · Ŝ_y` (Tasaki §2.2 eq. (2.2.13), p. 27), the Heisenberg Hamiltonian, the total spin operators and Casimir, and the computational-basis / Néel constructors (Tasaki §2.5 eq. (2.5.2), p. 37; the Néel bridge pins the orientation `A ↦ ↑`, `¬A ↦ ↓`) (PR #5250) | `Quantum/SpinS/SpinHalfSpecializationMultiSite.lean` |
-| `sublatticeSpinSOp{1,2,3}_one_eq_sublatticeSpinHalfOp{1,2,3}` / `sublatticeSpinSOp{Plus,Minus}_one_eq_sublatticeSpinHalfOp{Plus,Minus}` / `sublatticeSpinSquaredS_one_eq_sublatticeSpinHalfSquared` / `heisenbergToyHamiltonianS_one_eq_heisenbergToyHamiltonian` | **sublattice spin-`S` ↔ spin-`1/2` bridge at `N = 1`**: the sublattice spin components, sublattice ladder operators, sublattice Casimir `(Ŝ_A)²` and MLM toy Hamiltonian of the spin-`S` development coincide at `N = 1` with the spin-`1/2` definitions of `Quantum/MarshallLiebMattis/` (Tasaki §2.5 eqs. (2.5.10)–(2.5.11), pp. 40–42). Scaffolding layer: its scope is exactly the spin-`1/2` sublattice objects that still carry their own definitions (PR #5250) | `Quantum/SpinS/SpinHalfSpecializationSublattice.lean` |
+| `onSiteS_one_eq_onSite` / `spinSDot_one_eq_spinHalfDot` / `heisenbergHamiltonianS_one_eq_heisenbergHamiltonian` / `totalSpinSOp{1,2,3}_one_eq_totalSpinHalfOp{1,2,3}` / `totalSpinSSquared_one_eq_totalSpinHalfSquared` / `basisVecS_one_eq_basisVec` / `neelConfigOfS_one_eq_neelConfigOf` / `neelStateOfS_one_eq_neelStateOf` / `heisenbergToyHamiltonianS_one_eq_heisenbergToyHamiltonian` | **multi-site spin-`S` ↔ spin-`1/2` bridge at `N = 1`**: `ManyBodyOpS Λ 1` and `ManyBodyOp Λ` are definitionally equal, so every multi-site spin-`S` object at `N = 1` equals its spin-`1/2` counterpart without a cast: site embeddings, the two-site inner product `Ŝ_x · Ŝ_y` (Tasaki §2.2 eq. (2.2.13), p. 27), the Heisenberg Hamiltonian, the total spin operators and Casimir, the computational-basis / Néel constructors (Tasaki §2.5 eq. (2.5.2), p. 37; the Néel bridge pins the orientation `A ↦ ↑`, `¬A ↦ ↓`), and the MLM toy Hamiltonian (Tasaki §2.5 eq. (2.5.10), pp. 40–42) | `Quantum/SpinS/SpinHalfSpecializationMultiSite.lean` |
 
-Regression coverage for both files (type-level elaboration without casts, a concrete matrix
-element and eigenvalue pinning the Néel orientation, and the transfer of the spin-`1/2` sublattice
-Casimir eigenvalue on the Néel state from its spin-`S` source through the bridges) lives
-in `LatticeSystem/Tests/SpinHalfSpecializationMultiSite.lean`.
+This is the only remaining spin-`S` ↔ spin-`1/2` bridge file: its scope is exactly the spin-`1/2`
+objects that still carry their own definitions, and the sublattice layer no longer does. Regression
+coverage (type-level elaboration without casts, a concrete matrix element pinning the Néel
+orientation, and the transfer of the spin-`1/2` SU(2) invariance and symmetry of `Ĥ_toy` from their
+spin-`S` sources through the bridges) lives in
+`LatticeSystem/Tests/SpinHalfSpecializationMultiSite.lean`.
 
 The Néel-state statements of the sublattice theory — the two sublattice Casimir eigenvalues, the
 `Ŝ_tot^(3)` and sublattice `Ŝ^(3)` eigenvalues (including their squares and the cross term), the
@@ -163,6 +171,21 @@ single home in `Quantum/SpinS/SublatticeSpinDot.lean`, stated for arbitrary spin
 spin-`1/2` reading is the `N = 1` case, where the two extreme-weight statements collapse to the
 single spin-`1/2` all-aligned statement. Regression coverage lives in
 `LatticeSystem/Tests/SpinSSublatticeSpinDot.lean`.
+
+The sublattice spin operators themselves — the definitions
+`Ŝ_A^{(α)} := Σ_{x ∈ A} Ŝ_x^{(α)}` with the total-spin decomposition
+`Ŝ_tot^{(α)} = Ŝ_A^{(α)} + Ŝ_¬A^{(α)}`, their Hermiticity, the same-axis and mixed-axes
+cross-sublattice commutativity, the sublattice SU(2) algebra `[Ŝ_A^{(α)}, Ŝ_A^{(β)}] = i ε^{αβγ}
+Ŝ_A^{(γ)}`, the sublattice Casimir `(Ŝ_A)² := Σ_α (Ŝ_A^{(α)})²` with its Hermiticity,
+self-invariance and commutation with `Ŝ_¬A^{(α)}`, `(Ŝ_¬A)²`, `Ŝ_tot^{(α)}` and `(Ŝ_tot)²`, plus
+the sublattice ladder operators `Ŝ_A^±` with their `Ŝ_A^{(1)} ± i Ŝ_A^{(2)}` form, sublattice
+decomposition of `Ŝ_tot^±` and the sublattice / total Cartan relations
+`[Ŝ_A^{(3)}, Ŝ_A^±] = ± Ŝ_A^±`, `[Ŝ_tot^{(3)}, Ŝ_A^±] = ± Ŝ_A^±` — have a single home in
+`Quantum/SpinS/SublatticeSpin.lean` and `Quantum/SpinS/SublatticeSpinLadderDefCore.lean`, stated
+for arbitrary spin-`S`; the spin-`1/2` reading is the `N = 1` case. Regression coverage lives in
+`LatticeSystem/Tests/SpinSSublatticeSpin.lean`. With this the spin-`1/2` mirror of the
+Marshall–Lieb–Mattis sublattice theory is fully retired: every statement above is now proved once,
+for general spin-`S`.
 
 ---
 

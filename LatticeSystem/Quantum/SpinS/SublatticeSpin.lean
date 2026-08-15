@@ -13,9 +13,7 @@ To establish the Casimir identity used in Tasaki Theorem 2.3
 
   `Ĥ_toy = (1/(2|Λ|)) ((Ŝ_tot)² − (Ŝ_A)² − (Ŝ_B)²)`,
 
-we need spin-`S` analogues of the **sublattice spin operators**
-already defined for spin-`1/2`
-(`Quantum/MarshallLiebMattis/SublatticeSpin.lean`):
+we need the **sublattice spin operators**
 
   `Ŝ_A^(α) := Σ_{x : A x = true} onSiteS x (spinSOp_α N)`,
   `Ŝ_¬A^(α) := Σ_{x : A x = false} onSiteS x (spinSOp_α N)`.
@@ -23,9 +21,9 @@ already defined for spin-`1/2`
 The total spin-`S` then decomposes as
 `Ŝ_tot^(α) = Ŝ_A^(α) + Ŝ_¬A^(α)`.
 
-This module defines the spin-`S` sublattice operators and the
-decomposition. First step in the γ-4 multi-PR effort tracked
-under Issue #412.
+This module defines the sublattice operators, their Hermiticity,
+the cross-sublattice commutativity, the sublattice SU(2) algebra and
+the sublattice Casimir `(Ŝ_A)²` with its commutation properties.
 
 References:
 - H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
