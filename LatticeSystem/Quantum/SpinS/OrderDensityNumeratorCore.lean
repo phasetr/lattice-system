@@ -108,20 +108,6 @@ theorem orderMinusPow_commutator_eq (d L N M : ℕ) [NeZero L]
   rw [← neg_sub (X * staggeredOrderDensityOpS d L N false ^ M)
       (staggeredOrderDensityOpS d L N false ^ M * X), commutator_pow_eq_sum]
 
-/-- **Right power commutator telescope.**  `A^r·B − B·A^r = ∑_l A^l (A·B−B·A) A^{r-1-l}`. -/
-theorem pow_right_commutator_eq_sum {n : Type*} [Fintype n] [DecidableEq n]
-    (A B : Matrix n n ℂ) (r : ℕ) :
-    A ^ r * B - B * A ^ r
-      = ∑ l ∈ Finset.range r, A ^ l * (A * B - B * A) * A ^ (r - 1 - l) := by
-  have h : B * A ^ r - A ^ r * B
-      = ∑ l ∈ Finset.range r, A ^ l * (B * A - A * B) * A ^ (r - 1 - l) :=
-    commutator_pow_eq_sum B A r
-  have key : (∑ l ∈ Finset.range r, A ^ l * (A * B - B * A) * A ^ (r - 1 - l))
-      = -(∑ l ∈ Finset.range r, A ^ l * (B * A - A * B) * A ^ (r - 1 - l)) := by
-    rw [← Finset.sum_neg_distrib]
-    exact Finset.sum_congr rfl (fun l _ => by noncomm_ring)
-  rw [key, ← h]; abel
-
 /-- **Triple Leibniz decomposition.**  `[A·G·C, Z] = A·G·[C,Z] + A·[G,Z]·C + [A,Z]·G·C` (pure ring
 identity).  In the typical application `A = (ô⁺)^j`, `G` is a Hamiltonian–order commutator,
 `C = (ô⁺)^{M-1-j}` and `Z = ô⁻`: the middle term's `[G,Z]` gives the S1 contribution, the outer
