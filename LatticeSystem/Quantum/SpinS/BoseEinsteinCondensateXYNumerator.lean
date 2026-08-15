@@ -386,8 +386,8 @@ tower (`N = 1`), the pure-XY variational numerator with `Ĥ' = 2 Ĥ_XY` splits b
 numerator)`; the triangle inequality with `tower_numerator_bound` (Anderson-tower Theorem 4.6) and
 `zz_tower_numerator_bound` — both instantiations of the same generic engine
 `tower_numerator_bound_of_word_bounds`, hence with the *identical* moment-factor right-hand side —
-bounds it by `4` copies of that common `O(M²/V)` right-hand side.  This is the `Term1` numerator
-consumed by the half-filling tower assembly in `BoseEinsteinCondensateTower`.
+bounds it by `4` copies of that common `O(M²/V)` right-hand side.  This numerator is consumed by
+the half-filling tower assembly in `BoseEinsteinCondensateTower`.
 
 Reference: Tasaki §5.3 Theorem 5.2, eq. (5.3.4), p. 141; math note
 `.self-local/docs/math-thm52-pr4b-zz-numerator.md` §2 eq. (2.1). -/
