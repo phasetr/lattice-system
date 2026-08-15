@@ -28,11 +28,16 @@ This module formalises the combinatorial content of Property (iii):
 * `swapStep_of_raiseLowerStepS` — a spin-`S` raise/lower step at `N = 1`
   is a bond swap, the bridge through which the spin-`1/2` reachability
   results are obtained from the spin-`S` development.
+* `transportOne_eq_basisSwap` — the configuration-level half of that
+  bridge: at `N = 1` the single-quantum transport is the bond swap.
 * `swapReachable_of_walk_of_ne` — for any `G`-walk from `x` to `y`
-  with `σ x ≠ σ y`, `SwapReachable G σ (basisSwap σ x y)`. The proof
-  follows Tasaki p. 41 by induction on the walk, decomposing into
-  three single-edge swaps with case analysis on `σ z` at the
-  intermediate vertex.
+  with `σ x ≠ σ y`, `SwapReachable G σ (basisSwap σ x y)`. This is
+  Tasaki p. 41, read off the spin-`S` walk transport
+  `raiseLowerReachableS_transportOne_of_walk` at `N = 1`: the bond swap
+  moves the single quantum sitting at the endpoint with value `1` to the
+  endpoint with value `0`, and Tasaki's three-edge decomposition at an
+  intermediate vertex is the `N = 1` case of the overflow-free routing
+  performed there.
 
 Key applications (used in PR α-5 to invoke Perron–Frobenius):
 
@@ -96,7 +101,7 @@ theorem SwapReachable.of_step {G : SimpleGraph Λ}
     SwapReachable G σ σ' :=
   SwapReachable.single G h
 
-/-! ## Bridge from the spin-`S` raise/lower step at `N = 1` -/
+/-! ## Bridges from the spin-`S` development at `N = 1` -/
 
 omit [Fintype Λ] in
 /-- At `N = 1` a spin-`S` raise/lower step along a `G`-edge is a bond swap:
@@ -133,151 +138,77 @@ theorem swapStep_of_raiseLowerStepS {G : SimpleGraph Λ} {σ σ' : Λ → Fin 2}
         unfold basisSwap
         rw [Function.update_of_ne hzy, Function.update_of_ne hzx]
 
+omit [Fintype Λ] in
+/-- At `N = 1` the single-quantum transport `transportOne σ x y` (lower `x`,
+raise `y`) is the bond swap `basisSwap σ x y`, under the endpoint values
+`σ x = 1` and `σ y = 0` that make the transport possible. Together with
+`swapStep_of_raiseLowerStepS` this identifies the spin-`S` transport moves at
+`N = 1` with the spin-`1/2` bond swaps, configuration by configuration. -/
+theorem transportOne_eq_basisSwap {σ : Λ → Fin 2} {x y : Λ} (hxy : x ≠ y)
+    (hx : σ x = 1) (hy : σ y = 0) :
+    transportOne (N := 1) σ x y = basisSwap σ x y := by
+  have hyroom : (σ y).val < 1 := by rw [hy]; decide
+  funext z
+  apply Fin.ext
+  by_cases hzx : z = x
+  · subst hzx
+    rw [transportOne_apply_x hxy]
+    unfold basisSwap
+    rw [Function.update_of_ne hxy, Function.update_self, hx, hy]
+    decide
+  · by_cases hzy : z = y
+    · subst hzy
+      rw [transportOne_apply_y hyroom]
+      unfold basisSwap
+      rw [Function.update_self, hx, hy]
+      decide
+    · rw [transportOne_apply_off hzx hzy]
+      unfold basisSwap
+      rw [Function.update_of_ne hzy, Function.update_of_ne hzx]
+
 /-! ## Walk-based connectivity -/
-
-omit [Fintype Λ] in
-/-- Helper: `basisSwap` agrees with the underlying configuration off
-`{x, y}`. -/
-private theorem basisSwap_off_xy {x y : Λ} (σ : Λ → Fin 2)
-    {z : Λ} (hzx : z ≠ x) (hzy : z ≠ y) :
-    basisSwap σ x y z = σ z := by
-  unfold basisSwap
-  rw [Function.update_of_ne hzy, Function.update_of_ne hzx]
-
-omit [Fintype Λ] in
-/-- Helper: `basisSwap σ x y` at site `x` equals `σ y`. -/
-private theorem basisSwap_at_x {x y : Λ} (hxy : x ≠ y) (σ : Λ → Fin 2) :
-    basisSwap σ x y x = σ y := by
-  unfold basisSwap
-  rw [Function.update_of_ne hxy, Function.update_self]
-
-omit [Fintype Λ] in
-/-- Helper: `basisSwap σ x y` at site `y` equals `σ x`. -/
-private theorem basisSwap_at_y {x y : Λ} (σ : Λ → Fin 2) :
-    basisSwap σ x y y = σ x := by
-  unfold basisSwap
-  rw [Function.update_self]
-
-/-- For Fin 2, `s ≠ t` and `s ≠ u` implies `t = u`. -/
-private theorem fin2_eq_of_both_ne {s t u : Fin 2} (h₁ : s ≠ t) (h₂ : s ≠ u) :
-    t = u := by
-  fin_cases s <;> fin_cases t <;> fin_cases u <;>
-    first | rfl | (exact absurd rfl h₁) | (exact absurd rfl h₂)
 
 omit [Fintype Λ] in
 /-- **Key lemma (Tasaki p. 41).** If `G.Walk x y` exists and
 `σ x ≠ σ y`, then `σ` and `basisSwap σ x y` are `SwapReachable`.
 
-Proof: induction on the walk `x → ... → y`. The base case `nil` has
-`x = y` contradicting `σ x ≠ σ y`. For the cons case `x → v → y'`
-(walk of positive length):
-
-* If `v = y'` (walk has length 1): direct single-edge swap step.
-* Otherwise, two cases on `σ v`:
-  - **Case A** `σ v ≠ σ x` (so `σ v = σ y`): swap along the edge
-    `(x, v)` first, then apply the induction hypothesis on the
-    remaining walk `v → y'`.
-  - **Case B** `σ v = σ x`: apply the induction hypothesis on the
-    walk `v → y'` first, then swap along the edge `(x, v)`. -/
+Proof: the two endpoint values are `0` and `1` in one of the two orders, so
+the bond swap transports the single quantum sitting at the endpoint with
+value `1` to the endpoint with value `0` (`transportOne_eq_basisSwap`). The
+spin-`S` walk transport `raiseLowerReachableS_transportOne_of_walk` at
+`N = 1`, run along `w` or along its reverse according to that order, yields a
+chain of raise/lower steps, each of which is a bond swap
+(`swapStep_of_raiseLowerStepS`). Tasaki's decomposition into three
+single-edge swaps at an intermediate vertex is the `N = 1` case of the
+overflow-free routing performed inside that transport. -/
 theorem swapReachable_of_walk_of_ne
     {G : SimpleGraph Λ} {x y : Λ} (w : G.Walk x y)
     {σ : Λ → Fin 2} (h : σ x ≠ σ y) :
     SwapReachable G σ (basisSwap σ x y) := by
-  induction w generalizing σ with
-  | nil =>
-    -- x = y, contradicting h
-    exact absurd rfl h
-  | @cons u v y' hadj p ih =>
-    -- u → v → ... → y'.  hadj : G.Adj u v.  p : G.Walk v y'.
-    -- ih : ∀ σ', σ' v ≠ σ' y' → SwapReachable G σ' (basisSwap σ' v y')
-    -- Goal: SwapReachable G σ (basisSwap σ u y') given σ u ≠ σ y'.
-    have huv : u ≠ v := fun heq => G.loopless.irrefl _ (heq ▸ hadj)
-    by_cases hvy : v = y'
-    · -- Walk has length 1: direct swap along (u, v) = (u, y').
-      subst hvy
-      exact SwapReachable.of_step ⟨u, v, hadj, h, rfl⟩
-    · -- Walk has length ≥ 2: case analysis on σ v.
-      by_cases hsuv : σ v = σ u
-      · -- Case B: σ v = σ u. So σ v ≠ σ y'.
-        have hvy_ne : σ v ≠ σ y' := hsuv ▸ h
-        -- Step 1: IH on σ along walk p, swapping (v, y').
-        have hreach1 : SwapReachable G σ (basisSwap σ v y') := ih hvy_ne
-        -- Let σ₁ := basisSwap σ v y'.
-        have huy : u ≠ y' := fun heq => h (heq ▸ rfl)
-        have hσ₁_u : (basisSwap σ v y') u = σ u :=
-          basisSwap_off_xy σ huv huy
-        have hσ₁_v : (basisSwap σ v y') v = σ y' := basisSwap_at_x hvy σ
-        have hσ₁_y : (basisSwap σ v y') y' = σ v := basisSwap_at_y σ
-        have hσ₁_ne : (basisSwap σ v y') u ≠ (basisSwap σ v y') v := by
-          rw [hσ₁_u, hσ₁_v]; exact h
-        have hreach2 : SwapStep G (basisSwap σ v y')
-            (basisSwap (basisSwap σ v y') u v) :=
-          ⟨u, v, hadj, hσ₁_ne, rfl⟩
-        have hcomb : SwapReachable G σ (basisSwap (basisSwap σ v y') u v) :=
-          hreach1.tail hreach2
-        -- Show basisSwap σ₁ u v = basisSwap σ u y'.
-        have hgoal :
-            basisSwap (basisSwap σ v y') u v = basisSwap σ u y' := by
-          funext z
-          by_cases hzu : z = u
-          · rw [hzu]
-            rw [basisSwap_at_x huv (basisSwap σ v y'), hσ₁_v]
-            rw [basisSwap_at_x huy σ]
-          · by_cases hzv : z = v
-            · rw [hzv]
-              rw [basisSwap_at_y (basisSwap σ v y'), hσ₁_u]
-              rw [basisSwap_off_xy σ (Ne.symm huv) hvy]
-              exact hsuv.symm
-            · by_cases hzy' : z = y'
-              · rw [hzy']
-                rw [basisSwap_off_xy (basisSwap σ v y')
-                      (Ne.symm huy) (Ne.symm hvy)]
-                rw [hσ₁_y, basisSwap_at_y σ, hsuv]
-              · rw [basisSwap_off_xy (basisSwap σ v y') hzu hzv]
-                rw [basisSwap_off_xy σ hzu hzy']
-                rw [basisSwap_off_xy σ hzv hzy']
-        rw [← hgoal]; exact hcomb
-      · -- Case A: σ v ≠ σ u. So σ v = σ y' (Fin 2 has only 2 values).
-        have hvy_eq : σ v = σ y' := fin2_eq_of_both_ne (Ne.symm hsuv) h
-        -- Step 1: swap (u, v) on σ. σ u ≠ σ v (= σ y').
-        have huv_ne_σ : σ u ≠ σ v := by
-          intro heq; exact hsuv heq.symm
-        have hstep1 : SwapStep G σ (basisSwap σ u v) :=
-          ⟨u, v, hadj, huv_ne_σ, rfl⟩
-        -- Let σ₁ := basisSwap σ u v.
-        have huy : u ≠ y' := fun heq => h (heq ▸ rfl)
-        have hσ₁_v : (basisSwap σ u v) v = σ u := basisSwap_at_y σ
-        have hσ₁_y : (basisSwap σ u v) y' = σ y' :=
-          basisSwap_off_xy σ (Ne.symm huy) (Ne.symm hvy)
-        have hσ₁_u : (basisSwap σ u v) u = σ v := basisSwap_at_x huv σ
-        have hσ₁_ne : (basisSwap σ u v) v ≠ (basisSwap σ u v) y' := by
-          rw [hσ₁_v, hσ₁_y]; exact h
-        have hreach2 : SwapReachable G (basisSwap σ u v)
-            (basisSwap (basisSwap σ u v) v y') := ih hσ₁_ne
-        have hcomb : SwapReachable G σ
-            (basisSwap (basisSwap σ u v) v y') :=
-          (SwapReachable.of_step hstep1).trans hreach2
-        -- Show basisSwap σ₁ v y' = basisSwap σ u y'.
-        have hgoal :
-            basisSwap (basisSwap σ u v) v y' = basisSwap σ u y' := by
-          funext z
-          by_cases hzv : z = v
-          · rw [hzv]
-            rw [basisSwap_at_x hvy (basisSwap σ u v), hσ₁_y]
-            rw [basisSwap_off_xy σ (Ne.symm huv) hvy]
-            exact hvy_eq.symm
-          · by_cases hzy' : z = y'
-            · rw [hzy']
-              rw [basisSwap_at_y (basisSwap σ u v), hσ₁_v]
-              rw [basisSwap_at_y σ]
-            · by_cases hzu : z = u
-              · rw [hzu]
-                rw [basisSwap_off_xy (basisSwap σ u v) huv huy]
-                rw [hσ₁_u, basisSwap_at_x huy σ, hvy_eq]
-              · rw [basisSwap_off_xy (basisSwap σ u v) hzv hzy']
-                rw [basisSwap_off_xy σ hzu hzy']
-                rw [basisSwap_off_xy σ hzu hzv]
-        rw [← hgoal]; exact hcomb
+  have hxy : x ≠ y := fun heq => h (by rw [heq])
+  have hvals : ∀ s : Fin 2, s = 0 ∨ s = 1 := by decide
+  rcases hvals (σ x) with hx0 | hx1
+  · -- `σ x = 0`, `σ y = 1`: transport the quantum from `y` to `x`.
+    have hy1 : σ y = 1 := by
+      rcases hvals (σ y) with hy0 | hy1
+      · exact absurd (hx0.trans hy0.symm) h
+      · exact hy1
+    have hreach := raiseLowerReachableS_transportOne_of_walk (N := 1)
+      w.reverse (σ := σ) hxy.symm (by rw [hy1]; decide) (by rw [hx0]; decide)
+    rw [transportOne_eq_basisSwap hxy.symm hy1 hx0,
+      ← basisSwap_comm σ x y] at hreach
+    exact Relation.ReflTransGen.mono
+      (fun _ _ hstep => swapStep_of_raiseLowerStepS hstep) hreach
+  · -- `σ x = 1`, `σ y = 0`: transport the quantum from `x` to `y`.
+    have hy0 : σ y = 0 := by
+      rcases hvals (σ y) with hy0 | hy1
+      · exact hy0
+      · exact absurd (hx1.trans hy1.symm) h
+    have hreach := raiseLowerReachableS_transportOne_of_walk (N := 1)
+      w (σ := σ) hxy (by rw [hx1]; decide) (by rw [hy0]; decide)
+    rw [transportOne_eq_basisSwap hxy hx1 hy0] at hreach
+    exact Relation.ReflTransGen.mono
+      (fun _ _ hstep => swapStep_of_raiseLowerStepS hstep) hreach
 
 omit [Fintype Λ] in
 /-- **Property (iii) ingredient.** For a connected graph `G`, any

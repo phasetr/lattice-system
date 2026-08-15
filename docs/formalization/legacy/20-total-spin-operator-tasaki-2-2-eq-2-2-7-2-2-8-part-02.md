@@ -111,25 +111,32 @@ permalink: /formalization/legacy/20-total-spin-operator-tasaki-2-2-eq-2-2-7-2-2-
 | `neelConfigOfS` / `neelStateOfS` / `sublatticeSpinSquaredS_mulVec_neelStateOfS` / `_complement_mulVec_neelStateOfS` | **spin-`S` Néel state** on a bipartite graph: `σ x := 0` for `A x = true` (highest weight on A), `Fin.last N` otherwise (lowest weight on `¬A`); together with the sublattice Casimir eigenvalues `(Ŝ_A)² · \|Φ_Néel⟩ = (\|A\|·N/2)(\|A\|·N/2+1) · \|Φ_Néel⟩` and `(Ŝ_¬A)² · \|Φ_Néel⟩ = (\|¬A\|·N/2)(\|¬A\|·N/2+1) · \|Φ_Néel⟩`. Mirrors `Quantum/MarshallLiebMattis/SublatticeCasimirNeel.lean` (γ-4 step 26) | `Quantum/SpinS/SublatticeCasimirNeelCore.lean` (PR #1067) |
 <!-- legacy-source:end:889:984 -->
 
-## Authoritative supplemental implementation record (equal-magnetisation reachability)
+## Authoritative supplemental implementation record (swap connectivity and equal-magnetisation reachability)
 
 This section is maintained by hand, lies outside the migrated catalogue block above, and records
-the current implementation of the Tasaki §2.5 p. 42 Proposition. The migrated catalogue block
-above is a frozen historical record — its rows are pinned byte-for-byte by
-`scripts/check_docs_hierarchy.py` and are never edited for later renames or deletions. In
+the current implementation of the Tasaki §2.5 p. 41 walk lemma and p. 42 Proposition. The
+migrated catalogue block above is a frozen historical record — its rows are pinned byte-for-byte
+by `scripts/check_docs_hierarchy.py` and are never edited for later renames or deletions. In
 particular, the frozen rows for `disagreementSet` / `configDist`,
 `exists_swap_pair_of_eq_magnetization` and `configDist_basisSwap_lt` name a spin-`1/2`
 configuration distance and its pigeonhole induction that have since been retired: they were the
 `N = 1` case of the spin-`S` configuration distance `configDistS` and of the spin-`S` reachability
 induction, both of which are stated for arbitrary spin-`S` in `Quantum/SpinS/ConfigDistCore.lean`
-and `Quantum/SpinS/ConnectedRaiseLower.lean`. The frozen row for
-`swapReachable_of_eq_magnetization` names a declaration and file that are still live; only its
-proof has changed, and the bridge lemmas carrying that proof are recorded below.
+and `Quantum/SpinS/ConnectedRaiseLower.lean`. The frozen rows for
+`swapReachable_of_walk_of_ne` and `swapReachable_of_eq_magnetization` name declarations and files
+that are still live; only their proofs have changed, and the bridge lemmas carrying those proofs
+are recorded below. The walk induction with case analysis on the intermediate spin, described in
+the frozen row for `swapReachable_of_walk_of_ne`, is likewise retired: it is the `N = 1` case of
+the spin-`S` single-quantum walk transport `raiseLowerReachableS_transportOne_of_walk`, whose
+overflow-free routing at an intermediate vertex plays the role of Tasaki's three-edge
+decomposition, so the walk lemma is now obtained by transporting one quantum from the endpoint
+with value `1` to the endpoint with value `0`, along the walk or along its reverse.
 
 | Lean name | Statement | File |
 |---|---|---|
 | `magnetization_eq_card_sub_two_mul` / `magnetization_eq_iff_magSumS_eq` | the two magnetisation quantum numbers in use are affinely related, `\|σ\| = \|Λ\| − 2·magSumS σ` (each site contributes `spinSign (σ x) = 1 − 2·σ_x`), so equal magnetisation is the same hypothesis as an equal spin-`S` magnetisation sum at `N = 1` | `Quantum/MarshallLiebMattis/EqMagnetization.lean` |
 | `swapStep_of_raiseLowerStepS` | a spin-`S` raise/lower step along a `G`-edge at `N = 1` is a bond swap: raising one endpoint and lowering the other within `Fin 2` forces the endpoint values to be `0` and `1` in some order, so the step lands on `basisSwap σ x y` | `Quantum/MarshallLiebMattis/Connectivity.lean` |
+| `transportOne_eq_basisSwap` | the configuration-level half of the same `N = 1` bridge: for `σ x = 1` and `σ y = 0` the spin-`S` single-quantum transport `transportOne σ x y` is the bond swap `basisSwap σ x y` | `Quantum/MarshallLiebMattis/Connectivity.lean` |
 | `swapReachable_of_eq_magnetization` | **Tasaki §2.5 p. 42 Proposition** (statement unchanged): on a preconnected graph, two configurations of equal magnetisation are linked by single-edge bond swaps. Now the `N = 1` reading of `raiseLowerReachableS_of_connected`: the hypothesis is translated by `magnetization_eq_iff_magSumS_eq`, each raise/lower step is a bond swap by `swapStep_of_raiseLowerStepS`, and reachability transports along that implication. The empty lattice, excluded by the spin-`S` connectedness hypothesis, is handled separately | `Quantum/MarshallLiebMattis/EqMagnetizationReachable.lean` |
 
 The symmetry of the bond swap in its two sites, `basisSwap_comm`, has a single home next to the
