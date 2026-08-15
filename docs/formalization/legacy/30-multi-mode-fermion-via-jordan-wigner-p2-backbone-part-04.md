@@ -144,6 +144,32 @@ The finite-temperature version of Lieb's theorem (Kubo–Kishi): at half-filling
 
 <!-- legacy-source:end:2605:2731 -->
 
+## Authoritative supplemental implementation record (Hubbard chain / cycle Gibbs expectation companions)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records the
+current membership of the open-chain and periodic Hubbard Gibbs expectation companion families in
+`Fermion/JordanWigner/Hubbard/Graph.lean`. The migrated catalogue block above is a frozen historical
+record — its rows are pinned byte-for-byte by `scripts/check_docs_hierarchy.py` and are never edited
+for later deletions or relocations, so the two slash-separated stem-shorthand family rows and the
+phrase "same family as the open chain" describe membership as it stood at migration time.
+
+The open chain retains `hubbardChainGibbsExpectation_zero`,
+`hubbardChainGibbsExpectation_hamiltonian_im`, `hubbardChainGibbsExpectation_hamiltonian_pow_im`,
+`hubbardChain_partitionFn_im` and `hubbardChainGibbsState_pow_trace`. The periodic chain retains
+`hubbardCycleGibbsExpectation_zero`, `hubbardCycle_partitionFn_im` and
+`hubbardCycleGibbsState_pow_trace`; the two families are therefore no longer identical in membership.
+
+Retired as unreferenced one-line specializations of the generic `gibbsExpectation*` and
+`gibbsState_commute_hamiltonian` primitives (which are themselves unchanged in
+`Quantum/GibbsState.lean`): `hubbardChainGibbsExpectation_im_of_isHermitian`,
+`hubbardChainGibbsExpectation_commutator_hamiltonian`,
+`hubbardChainGibbsExpectation_ofReal_re_eq`, `hubbardGibbsStateOnGraph_commute_hamiltonian`,
+`hubbardCycleGibbsExpectation_im_of_isHermitian`,
+`hubbardCycleGibbsExpectation_commutator_hamiltonian`,
+`hubbardCycleGibbsExpectation_hamiltonian_im`,
+`hubbardCycleGibbsExpectation_hamiltonian_pow_im` and
+`hubbardCycleGibbsExpectation_ofReal_re_eq`.
+
 ---
 
 [← Multi-mode fermion via Jordan–Wigner (P2 backbone)](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-03/) · [Catalogue](/lattice-system/formalization/legacy/) · End →

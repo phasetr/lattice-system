@@ -4593,15 +4593,18 @@ operators of the previous section.  The Lean formalisation is
 \texttt{LatticeSystem/Fermion/JordanWigner/Hubbard.lean}.
 
 \textbf{Status}: Formalised on
-\(\mathrm{Fin}\,(N+1)\) (open BC) and \(\mathrm{Fin}\,(N+2)\)
-(periodic BC) with the corresponding Gibbs state +
-expectation companion family
+\(\mathrm{Fin}\,(N+1)\) (open BC) and \(\mathrm{Fin}\,(N+1)\)
+(periodic BC), each with its own Gibbs state and Gibbs expectation
+companions
 (\texttt{hubbardChain\{Hamiltonian, Gibbs\}\{State,Expectation\}\_*}
-and the periodic counterparts, Phase 2 work, issue \#241).
-The companion family covers Hermiticity, commute-with-H,
-$\beta = 0$ closed form, im-of-Hermitian, commutator,
-hamiltonian-im, hamiltonian-pow-im, partition function im,
-ofReal-re-eq, and pow-trace.
+and \texttt{hubbardCycle*}, Phase 2 work, issue \#241).
+The open-chain companions give Hermiticity, commutation with
+\(\hat H\), the \(\beta = 0\) closed form, reality of the energy and
+energy-power expectations, reality of the partition function, and the
+\(\mathrm{Tr}(\rho_\beta^{\,n})\) identity; the periodic companions
+give Hermiticity, commutation with \(\hat H\), the \(\beta = 0\)
+closed form, reality of the partition function, and the
+\(\mathrm{Tr}(\rho_\beta^{\,n})\) identity.
 
 \subsection{Fock space representation and Slater determinants (Tasaki §9.2.3)}
 \label{subsec:fock-slater}

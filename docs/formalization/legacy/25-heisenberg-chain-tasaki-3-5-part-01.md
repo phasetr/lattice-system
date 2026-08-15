@@ -149,9 +149,15 @@ generic index type by `LatticeSystem/Tests/GibbsState.lean`. The two further pri
 `gibbsVariance_im_of_isHermitian` (`Quantum/GibbsState/Covariance.lean`) and
 `gibbsExpectation_ofReal_re_eq_of_isHermitian` (`Quantum/GibbsState.lean`) are unchanged as well,
 but they have no direct test in `LatticeSystem/Tests/GibbsState.lean`; they are consumed by the
-surviving named-model companions in `Quantum/IsingChain.lean`, `Quantum/HeisenbergChain/Gibbs.lean`,
-`Quantum/HeisenbergLattice/CompanionsCore.lean` and
-`Fermion/JordanWigner/Hubbard/Graph.lean`.
+surviving named-model companions in `Quantum/IsingChain.lean`, `Quantum/HeisenbergChain/Gibbs.lean`
+and `Quantum/HeisenbergLattice/CompanionsCore.lean`.
+
+The graph-built Hubbard Gibbs state rows above are frozen in the same sense.
+`Fermion/JordanWigner/Hubbard/Graph.lean` currently carries `hubbardGibbsStateOnGraph`, its
+Hermiticity corollary `hubbardGibbsStateOnGraph_isHermitian` and the `rfl` bridge
+`hubbardChainGibbsState_eq_onGraph`; the commute corollary
+`hubbardGibbsStateOnGraph_commute_hamiltonian` has been retired as an unreferenced one-line
+specialization of the generic `gibbsState_commute_hamiltonian`.
 
 ---
 
