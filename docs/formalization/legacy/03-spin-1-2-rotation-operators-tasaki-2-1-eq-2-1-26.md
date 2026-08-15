@@ -84,8 +84,68 @@ stays public and unchanged.
 
 The public `rotOf*` cores (`rotOf`, `rotOf_zero`, `rotOf_adjoint`, `rotOf_two_pi`,
 `rotOf_mul_rotOf`, `rotOf_mul_conjTranspose`, `rotOf_pi`, `rotOf_neg_pi`, `rotOf_pi_conjTranspose`,
-`rotOf_pi_conj_of_ne`), `spinHalfRot{1,2,3}_det_eq_one` and
-`LatticeSystem/Quantum/SpinHalfRotation/Conjugation.lean` are unchanged.
+`rotOf_pi_conj_of_ne`) and `spinHalfRot{1,2,3}_det_eq_one` are unchanged.
+`LatticeSystem/Quantum/SpinHalfRotation/Conjugation.lean` was unchanged as of this record's
+introduction (PR #5244); PR-B3a subsequently retired six declarations from it, listed in the
+axis-instances record below.
+
+## Authoritative supplemental implementation record (spin-1/2 rotation conjugation axis instances)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+the current membership of the rotation-conjugation rows of that block. The migrated catalogue block
+above is a frozen historical record — its rows are pinned byte-for-byte by
+`scripts/check_docs_hierarchy.py` and are never edited for later deletions, so the rows
+`spinHalfRot{1,2,3}_pi_conjTranspose`, `spinHalfRot{1,2,3}_pi_conj_spinHalfOp{1,2,3}`,
+`spinHalfRot{1,2,3}_conj_spinHalfOp{1,2,3}` and `spinHalfRot1_half_pi_conj_spinHalfOp{2,3}` /
+`spinHalfRot2_half_pi_conj_spinHalfOp{3,1}` / `spinHalfRot3_half_pi_conj_spinHalfOp{1,2}`,
+together with the last row's "all 6 cases `α ≠ β`" prose and the file column of each, describe
+membership and location as they stood at migration time.
+
+Retired from `Quantum/SpinHalfRotation.lean`: `spinHalfRot1_pi_conjTranspose`,
+`spinHalfRot2_pi_conjTranspose`, `spinHalfRot3_pi_conjTranspose`,
+`spinHalfRot1_pi_conj_spinHalfOp2`, `spinHalfRot1_pi_conj_spinHalfOp3`,
+`spinHalfRot3_pi_conj_spinHalfOp1` and `spinHalfRot3_pi_conj_spinHalfOp2`.
+
+Retired from `Quantum/SpinHalfRotation/Conjugation.lean`: `spinHalfRot2_conj_spinHalfOp2`,
+`spinHalfRot3_conj_spinHalfOp3`, `spinHalfRot2_half_pi_conj_spinHalfOp3`,
+`spinHalfRot3_half_pi_conj_spinHalfOp1`, `spinHalfRot2_half_pi_conj_spinHalfOp1` and
+`spinHalfRot3_half_pi_conj_spinHalfOp2`. The general-θ and `π/2` rows of the frozen block carry
+`Quantum/SpinHalfRotation.lean` in their file column. These declarations moved to
+`Quantum/SpinHalfRotation/Conjugation.lean` in the Phase-2 split (`2724e968`, "Refactor Phase 2
+(PR 22)"); `docs/index.md`'s File column was not updated at that time and went stale, recorded
+here rather than corrected there.
+
+Surviving members, row by row. `spinHalfRot{1,2,3}_pi_conjTranspose`: none.
+`spinHalfRot{1,2,3}_pi_conj_spinHalfOp{1,2,3}`: `spinHalfRot1_pi_conj_spinHalfOp1`,
+`spinHalfRot2_pi_conj_spinHalfOp2`, `spinHalfRot3_pi_conj_spinHalfOp3`,
+`spinHalfRot2_pi_conj_spinHalfOp1` and `spinHalfRot2_pi_conj_spinHalfOp3`.
+`spinHalfRot{1,2,3}_conj_spinHalfOp{1,2,3}` (same-axis, general θ):
+`spinHalfRot1_conj_spinHalfOp1`. The `π/2` row: `spinHalfRot1_half_pi_conj_spinHalfOp2` and
+`spinHalfRot1_half_pi_conj_spinHalfOp3`. The two cross-axis general-θ rows
+`spinHalfRot{1,2,3}_conj_spinHalfOp{2,3,1}` and `spinHalfRot{1,2,3}_conj_spinHalfOp{3,1,2}` are
+complete and untouched; three of their six members (`spinHalfRot2_conj_spinHalfOp3`,
+`spinHalfRot2_conj_spinHalfOp1`, `spinHalfRot3_conj_spinHalfOp2`) are book-equation coverage of
+Tasaki eq. (2.1.16) that no other declaration in the library uses, and are kept on that ground
+alone: retaining them keeps eq. (2.1.16)'s six-case coverage complete. This coverage carve-out
+applies only to these three eq. (2.1.16) members; it does not apply to the other deletions
+recorded in this section (the eq. (2.1.15) same-axis general-θ family (3→1), the eq. (2.1.21)
+θ=π cross-axis family (6→2), the eq. (2.1.22) θ=π/2 family (6→2), and the
+`spinHalfRot{1,2,3}_pi_conjTranspose` row (3→0, now empty)), all of which were removed as
+ordinary zero-reference wrapper duplication with no carve-out.
+
+Nothing is lost, with one qualification.
+
+- `spinHalfRot{1,2,3}_pi_conjTranspose` survives in full as the public generic
+  `rotOf_pi_conjTranspose` (`(rotOf S π)ᴴ = (2i) • S` for Hermitian `S`), which each retired name
+  instantiated in a single term-mode line.
+- The cross-axis content of `spinHalfRot{1,2,3}_pi_conj_spinHalfOp{1,2,3}` survives as the public
+  generic `rotOf_pi_conj_of_ne`, still used by the two surviving cross-axis members.
+- The retired `π/2` statements are two-line specializations (`Real.cos_pi_div_two`,
+  `Real.sin_pi_div_two`) of general-θ identities that all survive.
+- The qualification: the two retired same-axis general-θ statements have no public generic core.
+  Their proofs went through the `private` lemma `rotOf_comm_self`, which stays private, so recovery
+  is by copying the surviving `spinHalfRot1_conj_spinHalfOp1` proof with the axis index changed,
+  not by a one-line application of a public lemma.
 
 ---
 

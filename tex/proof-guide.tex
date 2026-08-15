@@ -450,8 +450,16 @@ For any $\alpha, \beta \in \{1, 2, 3\}$,
         -\hat S^{(\beta)} & \text{if } \alpha \neq \beta.
       \end{cases}
 \]
-Lean names: \texttt{spinHalfRot1/2/3\_pi\_conj\_spinHalfOp1/2/3} for
-the nine distinct pairings. This is the Tasaki eq.~(2.1.15)
+Lean names: \texttt{spinHalfRot1\_pi\_conj\_spinHalfOp1},
+\texttt{spinHalfRot2\_pi\_conj\_spinHalfOp2},
+\texttt{spinHalfRot3\_pi\_conj\_spinHalfOp3} for the same-axis case, and
+\texttt{spinHalfRot2\_pi\_conj\_spinHalfOp1},
+\texttt{spinHalfRot2\_pi\_conj\_spinHalfOp3} for the two cross-axis
+pairings ($\alpha = 2$) the library consumes; the statement for every
+$(\alpha, \beta)$ is carried by two generic \texttt{rotOf}-level cores in
+\texttt{Quantum/SpinHalfRotation.lean}: the private \texttt{rotOf\_pi\_conj\_self}
+($\alpha = \beta$) and the public \texttt{rotOf\_pi\_conj\_of\_ne}
+($\alpha \neq \beta$). This is the Tasaki eq.~(2.1.15)
 ($\alpha = \beta$) and eq.~(2.1.21) ($\alpha \neq \beta$) both
 specialized at $\theta = \pi$.
 \end{theorem}
@@ -1172,10 +1180,12 @@ formalization of Tasaki \S2.1 and \S2.2.
 \item \texttt{spinHalfRot\{1,2,3\}\_conj\_spinHalfOp\{2,3,1\}}: general-$\theta$
   cyclic conjugation $(\hat U^{(\alpha)}_\theta)^\dagger \hat S^{(\beta)}
   \hat U^{(\alpha)}_\theta = \cos\theta\,\hat S^{(\beta)} - \sin\theta\,\hat S^{(\gamma)}$
-  (Tasaki eq.~(2.1.16)), 6 cyclic + 6 anti-cyclic + 3 same-axis (Tasaki
-  eq.~(2.1.13)-(2.1.15)).
-\item \texttt{spinHalfRot\{1,2,3\}\_half\_pi\_conj\_spinHalfOp\_*}:
-  $\pi/2$-rotation conjugation (Tasaki eq.~(2.1.22)), 6 cases.
+  (Tasaki eq.~(2.1.16)), together with its anti-cyclic companions and the
+  same-axis invariance (Tasaki eq.~(2.1.13)-(2.1.15)).
+\item \texttt{spinHalfRot1\_half\_pi\_conj\_spinHalfOp\{2,3\}}:
+  $\pi/2$-rotation conjugation (Tasaki eq.~(2.1.22)), for the cases the
+  library consumes; the remaining cases are two-line specializations of the
+  general-$\theta$ conjugation identities above.
 \item \texttt{spinHalfRot\{1,2,3\}\_eq\_exp}: $\hat U^{(\alpha)}_\theta =
   \exp(-i\theta\hat S^{(\alpha)})$ for all three axes (Tasaki
   Problem 2.1.b). Axis 3 uses \texttt{Matrix.exp\_diagonal} +
