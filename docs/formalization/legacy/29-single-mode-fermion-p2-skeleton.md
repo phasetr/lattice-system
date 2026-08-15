@@ -123,7 +123,8 @@ Both of the modules named by those two rows have since been retired in full as u
 corollaries of the per-site orthogonality results and of `fermionMultiNumber_commute`-style
 pairwise number commutation: `Fermion/JordanWigner/Hubbard/SiteProjectionsCommute.lean`
 (6 same-site pairwise `Commute` theorems) and
-`Fermion/JordanWigner/Hubbard/RemainingProjectionCommutes.lean` (5 cross-site `Commute` theorems).
+`Fermion/JordanWigner/Hubbard/RemainingProjectionCommutes.lean`
+(5 cross-projection `Commute` theorems).
 The "16/16 commute matrix" completeness claim of the migrated row therefore no longer describes
 the current library.
 
@@ -131,9 +132,12 @@ The cross-site commute relations that survive are unchanged:
 `fermionUpProjection_commute_fermionDownProjection_of_any` in
 `Fermion/JordanWigner/Hubbard/UpDownProjectionCommute.lean`,
 `fermionEmptyProjection_commute_of_any` in
-`Fermion/JordanWigner/Hubbard/EmptyProjectionCommute.lean`, and
+`Fermion/JordanWigner/Hubbard/EmptyProjectionCommute.lean`,
 `fermionUpProjection_commute_of_any` / `fermionDownProjection_commute_of_any` in
-`Fermion/JordanWigner/Hubbard/SingleProjectionsCommute.lean`.
+`Fermion/JordanWigner/Hubbard/SingleProjectionsCommute.lean`, and
+`fermionUpNumber_mul_fermionDownNumber_commute` (the `p_⇈` diagonal case,
+`Commute (p_⇈(i)) (p_⇈(j))`) in
+`Fermion/JordanWigner/Hubbard/DoubleOccupancyCommute.lean`.
 
 ---
 
