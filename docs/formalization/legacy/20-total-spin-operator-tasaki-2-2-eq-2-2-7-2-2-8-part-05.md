@@ -88,7 +88,13 @@ permalink: /formalization/legacy/20-total-spin-operator-tasaki-2-2-eq-2-2-7-2-2-
 This section is maintained by hand, lies outside the migrated catalogue block above, and records
 the many-body continuation of the single-site spin-`S` ↔ spin-`1/2` bridge
 (`Quantum/SpinS/SpinHalfSpecialization.lean`, catalogued on the Tasaki §2.4 generalised page).
-Every migrated row above is unchanged.
+The migrated catalogue block above is a frozen historical record — its rows are pinned
+byte-for-byte by `scripts/check_docs_hierarchy.py` and are never edited for later renames or
+deletions. In particular, the frozen row for `sublatticeSpinHalfSquared_mulVec_neelStateOf` /
+`_complement_mulVec_neelStateOf` names the declaration and file
+(`Quantum/MarshallLiebMattis/SublatticeCasimirNeelCore.lean`) as they existed at migration time;
+that file and declaration have since been retired, and the paragraph below records their current
+spin-`S` replacement.
 
 | Lean name | Statement | File |
 |---|---|---|
