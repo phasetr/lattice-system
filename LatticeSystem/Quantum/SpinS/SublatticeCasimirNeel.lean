@@ -14,7 +14,8 @@ import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeelCore
 /-!
 # Spin-`S` Néel state and sublattice Casimir eigenvalues
 
-Spin-`S` analog of `Quantum/MarshallLiebMattis/SublatticeCasimirNeel.lean`.
+Ladder-operator action, diagonal matrix elements of `Ĥ_toy_S` and the
+sublattice-exchange identities of the spin-`S` Néel state.
 
 The graph-centric spin-`S` Néel state on a bipartite graph `(Λ, A)` is
 

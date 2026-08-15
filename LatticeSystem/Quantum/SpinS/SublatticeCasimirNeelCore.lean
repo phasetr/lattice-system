@@ -9,7 +9,8 @@ set_option linter.unusedSimpArgs false
 /-!
 # Spin-`S` Néel state and sublattice Casimir eigenvalues
 
-Spin-`S` analog of `Quantum/MarshallLiebMattis/SublatticeCasimirNeel.lean`.
+Definition of the spin-`S` Néel state together with its sublattice
+Casimir and `Ŝ^(3)` eigenvalues.
 
 The graph-centric spin-`S` Néel state on a bipartite graph `(Λ, A)` is
 
