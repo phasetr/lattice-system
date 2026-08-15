@@ -116,6 +116,38 @@ Systems*, §3.5, p. 89.
 | `openChainHeisenbergHamiltonian_two_site_eq` | for `N = 1` (the 2-site open chain on `Fin 2`), `H_open = -2J · spinHalfDot 0 1` (explicit one-bond reduction; Tasaki §2.4 simplest concrete instance) | `Quantum/HeisenbergChain/EigenvaluesCore.lean` |
 <!-- legacy-source:end:1444:1546 -->
 
+## Authoritative supplemental implementation record (2D / 3D Heisenberg lattice Gibbs expectation companions)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+the current implementation of the 2D square-lattice, 2D square-torus and 3D cubic-lattice
+Heisenberg Gibbs expectation companions. The migrated catalogue block above is a frozen historical
+record — its rows are pinned byte-for-byte by `scripts/check_docs_hierarchy.py` and are never
+edited for later relocations or deletions. In particular, the three brace-expansion rows for
+`squareLatticeHeisenbergGibbsExpectation_{…}`, `squareTorusHeisenbergGibbsExpectation_{…}` and
+`cubicLatticeHeisenbergGibbsExpectation_{…}` name the family members and the file
+(`Quantum/HeisenbergLattice.lean`) as they were at migration time; the companions were later moved
+out of that file, and most of them have since been retired.
+
+Current locations: the 2D square-lattice and 2D square-torus companions live in
+`Quantum/HeisenbergLattice/CompanionsCore.lean`, the 3D cubic-lattice companions in
+`Quantum/HeisenbergLattice/Companions.lean`. Current membership is
+`squareLatticeHeisenbergGibbsExpectation_zero` / `_im_of_isHermitian` /
+`_commutator_hamiltonian` / `_hamiltonian_pow_im` and
+`squareLatticeHeisenbergGibbsHamiltonianVariance_im`;
+`squareTorusHeisenbergGibbsExpectation_zero` / `_hamiltonian_pow_im` / `_anticommutator_im`;
+`cubicLatticeHeisenbergGibbsExpectation_zero` / `_hamiltonian_pow_im` / `_commutator_re` and
+`cubicLatticeHeisenbergGibbsState_pow_trace`. The remaining members of each frozen row have been
+retired as unreferenced one-line specializations.
+
+The generic primitives those specializations apply — `gibbsExpectation_zero`,
+`gibbsExpectation_im_of_isHermitian`, `gibbsExpectation_commutator_hamiltonian`,
+`gibbsExpectation_mul_hamiltonian_im`, `gibbsExpectation_sq_im_of_isHermitian`,
+`gibbsExpectation_pow_im_of_isHermitian`, `gibbsExpectation_anticommutator_im`,
+`gibbsExpectation_commutator_re`, `gibbsVariance_im_of_isHermitian`,
+`gibbsExpectation_ofReal_re_eq_of_isHermitian` and `gibbsState_pow_trace` — are unchanged in
+`Quantum/GibbsState.lean` / `Quantum/GibbsState/Covariance.lean` and are exercised directly at the
+generic index type by `LatticeSystem/Tests/GibbsState.lean`.
+
 ---
 
 [← Gibbs state (Tasaki §3.3)](/lattice-system/formalization/legacy/24-gibbs-state-tasaki-3-3/) · [Catalogue](/lattice-system/formalization/legacy/) · [Heisenberg chain (Tasaki §3.5) →](/lattice-system/formalization/legacy/25-heisenberg-chain-tasaki-3-5-part-02/)
