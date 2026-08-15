@@ -166,13 +166,13 @@ example (β J : ℝ) (N : ℕ) :
       (heisenbergHamiltonian (cubicLatticeCoupling N J)) :=
   cubicLatticeHeisenbergGibbsState_commute_hamiltonian β J N
 
-/-! ## 2D / 3D Heisenberg full Gibbs companion family (PR #334 backfill)
+/-! ## 2D / 3D Heisenberg Gibbs expectation companions
 
-Spot-checks for the 33 companion theorems backfilled in PR #334:
-representative `_zero` (β=0 closed form), `_im_of_isHermitian`,
-`_commutator_hamiltonian`, `_hamiltonian_pow_im`,
-`_HamiltonianVariance_im`, and `_pow_trace` companions for each
-of the three 2D / 3D Heisenberg variants. -/
+Spot-checks pinning the lattice-specific companions at the
+concrete 2D / 3D index types: `_zero` (β=0 closed form),
+`_im_of_isHermitian`, `_commutator_hamiltonian`,
+`_hamiltonian_pow_im`, `_HamiltonianVariance_im`,
+`_anticommutator_im`, `_commutator_re` and `_pow_trace`. -/
 
 /-- 2D square-lattice: β = 0 closed form `⟨A⟩_0 = (1/dim) · Tr A`. -/
 example (J : ℝ) (N : ℕ) (A : ManyBodyOp (Fin (N + 1) × Fin (N + 1))) :

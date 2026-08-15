@@ -19,32 +19,23 @@ This file (parent / content) contains:
   `_partitionFn_im` for each variant,
 - Coupling reality (`*Coupling_conj`) lemmas.
 
-Sub-files extending this module (Phase 4 codex audit Item 9
-split):
+Sub-files extending this module:
 
 | sub-file | content |
 |---|---|
-| `HeisenbergLattice/Companions.lean` | full 11-companion Gibbs |
-|                                     | expectation family per variant |
-|                                     | (`_zero`, `_im_of_isHermitian`, |
-|                                     | `_commutator_hamiltonian`, |
-|                                     | `_mul_hamiltonian_im`, |
-|                                     | `_hamiltonian_sq_im`, |
-|                                     | `_hamiltonian_pow_im`, |
-|                                     | `_anticommutator_im`, |
-|                                     | `_commutator_re`, |
-|                                     | `_HamiltonianVariance_im`, |
-|                                     | `_ofReal_re_eq`, `_pow_trace`) |
-|                                     | × 3 variants = 33 companions. |
+| `HeisenbergLattice/CompanionsCore.lean` | 2D square-lattice |
+|                                         | and 2D square-torus |
+|                                         | Gibbs expectation |
+|                                         | companions |
+| `HeisenbergLattice/Companions.lean`     | 3D cubic-lattice |
+|                                         | Gibbs expectation |
+|                                         | companions |
 
-Downstream code that wants the full companion family should
-import `Quantum.HeisenbergLattice.Companions` directly (this
-file is content + extensions, not a façade).
-
-(Refactor Phase 2 PR 16 — first HeisenbergChain extraction,
-plan v4 §3.1. Phase 3 PR #334 backfilled the missing 33 2D / 3D
-companions; Phase 4 codex audit Item 9 split them out into
-`Companions.lean` to keep this file lean and content-focused.)
+Each companion is a specialization of a generic primitive in
+`Quantum.GibbsState` / `Quantum.GibbsState.Covariance` to a
+concrete lattice index type; downstream code that wants those
+specializations imports the sub-file directly (this file is
+content + extensions, not a façade).
 -/
 
 namespace LatticeSystem.Quantum

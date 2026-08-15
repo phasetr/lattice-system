@@ -20,6 +20,34 @@ Done
 Done
 <!-- legacy-source:end:145:145 -->
 
+## Authoritative supplemental implementation record (P1l: 2D / 3D Heisenberg Gibbs companions)
+
+This section is maintained by hand, lies outside the migrated blocks on this page, and records the current
+implementation of the 2D square-lattice, 2D square-torus and 3D cubic-lattice Heisenberg companions
+named in the P1l block. That block is a frozen historical record — it is pinned byte-for-byte by
+`scripts/check_docs_hierarchy.py` and is never edited for later relocations or deletions — so its
+"full 11-companion family per variant" wording describes the state at migration time, not the
+current implementation.
+
+Per-variant Hamiltonian Hermiticity, the Gibbs states with their Hermiticity and commute-with-`H`
+companions, the energy-expectation realness (`…GibbsExpectation_hamiltonian_im`) and the
+partition-function realness (`…Heisenberg_partitionFn_im`) are unchanged in
+`Quantum/HeisenbergLattice.lean`. The Gibbs expectation companions proper live in
+`Quantum/HeisenbergLattice/CompanionsCore.lean` (2D square-lattice, 2D square-torus) and
+`Quantum/HeisenbergLattice/Companions.lean` (3D cubic-lattice), where 12 declarations survive:
+`squareLatticeHeisenbergGibbsExpectation_zero` / `_im_of_isHermitian` /
+`_commutator_hamiltonian` / `_hamiltonian_pow_im` and
+`squareLatticeHeisenbergGibbsHamiltonianVariance_im`;
+`squareTorusHeisenbergGibbsExpectation_zero` / `_hamiltonian_pow_im` / `_anticommutator_im`;
+`cubicLatticeHeisenbergGibbsExpectation_zero` / `_hamiltonian_pow_im` / `_commutator_re` and
+`cubicLatticeHeisenbergGibbsState_pow_trace`.
+
+The other members of the frozen enumeration were retired as unreferenced one-line specializations
+of the generic primitives in `Quantum/GibbsState.lean` / `Quantum/GibbsState/Covariance.lean`. In
+particular `_mul_hamiltonian_im`, `_hamiltonian_sq_im` and `_ofReal_re_eq` no longer exist for any
+of the three variants, `_pow_trace` survives only for the 3D cubic lattice, and
+`_HamiltonianVariance_im` survives only for the 2D square lattice.
+
 <!-- legacy-source:start:146:146 -->
 ## P1m (Tasaki §2.5, generic-S sector form): **Spin-S Marshall–Lieb–Mattis Theorem 2.2 on the magnetization sector**: generalisation of P1k from spin-1/2 / `H_0` to general spin `S` (`N = 2S`) and arbitrary magnetization sector `M` via the subtype `magConfigS V N M`. Sector matrices: shifted dressed (`shiftedDressedSReMatrixOnMagSector`), dressed (`dressedHeisenbergSReMatrixOnMagSector`), un-dressed real-form (`heisenbergHamiltonianSReMatrixOnMagSector`), and un-dressed complex-form (`heisenbergHamiltonianSMatrixOnMagSector`). Bipartite raise/lower reachability (γ-3 connectivity for general spin) lifted to the sector subtype. PF application: `IsIrreducible` (#846), positive Perron eigenvector existence (#847) and uniqueness (#848) on the shifted sector matrix. Marshall sign conjugation forward (#853) + inverse (#854) gives a real-form sector eigenvector existence with Marshall sign structure. Eigenvector uniqueness (#854) at fixed `μ` and eigenvalue uniqueness (#856, via dressed-sector symmetry + Rayleigh identity). Bundled real-form ground-state theorems: same-`μ` form (#855) and forced-eigenvalue form (#859). Complex-form bridge: complex sector matrix Hermiticity + real-↔-complex eigenvector correspondence (#857, #858, #861). Complex-form existence (#860), Marshall-positive uniqueness (#862), and **strongest bundled COMPLEX ground-state theorem** `marshallLiebMattis_spinS_heisenbergSector_complexGroundState_full` (#865) — the COMPLEX-Hilbert-space form of Tasaki §2.5 Theorem 2.2 in the magnetization sector. Generic spin `S`, arbitrary bipartite-antiferromagnetic Heisenberg coupling supported on a connected bipartite graph, with the intermediate-existence hypothesis. The next step is the lift from the magnetization sector to the FULL Hilbert space — comparing ground-state energies across magnetization sectors.
 
