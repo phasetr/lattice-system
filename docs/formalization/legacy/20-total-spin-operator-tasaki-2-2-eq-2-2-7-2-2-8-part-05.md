@@ -94,7 +94,9 @@ deletions. In particular, the frozen row for `sublatticeSpinHalfSquared_mulVec_n
 `_complement_mulVec_neelStateOf` names the declaration and file
 (`Quantum/MarshallLiebMattis/SublatticeCasimirNeelCore.lean`) as they existed at migration time;
 that file and declaration have since been retired, and the paragraph below records their current
-spin-`S` replacement.
+spin-`S` replacement. The same holds for the frozen rows naming
+`Quantum/MarshallLiebMattis/ToyHamiltonianCasimir.lean` (on this page and on part 3 of this
+catalogue): that file has been retired as well, and its current spin-`S` home is recorded below.
 
 | Lean name | Statement | File |
 |---|---|---|
@@ -115,6 +117,19 @@ state — have a single home in `Quantum/SpinS/SublatticeCasimirNeel.lean`,
 `Quantum/SpinS/SublatticeCasimirNeelExpectations.lean`, stated for arbitrary spin-`S`; the
 spin-`1/2` reading is the `N = 1` case, reached through the bridges above. Their regression
 coverage lives in `LatticeSystem/Tests/SpinSSublatticeCasimirNeel.lean`.
+
+The toy-Hamiltonian Casimir statements — the oriented cross-sublattice decomposition
+`Ĥ_toy = Ŝ_A · Ŝ_¬A + Ŝ_¬A · Ŝ_A` and its closed form `2 • Ŝ_A · Ŝ_¬A`, the Casimir identity
+`(Ŝ_tot)² = (Ŝ_A)² + 2 • (Ŝ_A · Ŝ_¬A) + (Ŝ_¬A)²` with the difference form
+`Ĥ_toy = (Ŝ_tot)² − (Ŝ_A)² − (Ŝ_¬A)²` (Tasaki §2.5 (2.5.10)–(2.5.11)), the commutators with the
+total and the two sublattice Casimirs, the axis-level and ladder SU(2) invariance, the
+magnetisation-sector preservation, matrix-element realness and symmetry, and the eigenvalue on the
+all-aligned state (Casimir-difference form and the simplified product form) — have a single home in
+`Quantum/SpinS/ToyHamiltonianCasimir.lean`, stated for arbitrary spin-`S`; the spin-`1/2` reading is
+the `N = 1` case, reached through the bridges above. Regression coverage lives in
+`LatticeSystem/Tests/SpinSToyHamiltonianCasimir.lean`, and the spin-`1/2` readings of the total
+Casimir / axis commutators and of the symmetry of `Ĥ_toy` are exercised as bridge transfers in
+`LatticeSystem/Tests/SpinHalfSpecializationMultiSite.lean`.
 
 ---
 

@@ -6,8 +6,9 @@ import LatticeSystem.Quantum.SpinS.LadderBoundary
 /-!
 # Spin-`S` toy Hamiltonian as a cross-sublattice spin dot product
 
-Spin-`S` analog of the leading section of
-`Quantum/MarshallLiebMattis/ToyHamiltonianCasimir.lean`.
+Cross-sublattice decomposition, Casimir identity, SU(2) invariance,
+magnetisation-sector preservation and all-aligned eigenvalues of the
+spin-`S` MLM toy Hamiltonian.
 The spin-`S` MLM toy Hamiltonian (Tasaki §2.5 eq. (2.5.10), without
 the `1/|Λ|` factor)
 
