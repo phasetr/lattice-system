@@ -9,6 +9,7 @@ the `[ô⁺, ô⁻]` terms (second/third sums, `O(M⁴/V²)`).
 import LatticeSystem.Quantum.SpinS.AndersonTowerLocalDecay
 import LatticeSystem.Quantum.SpinS.AndersonTowerAssembly
 import LatticeSystem.Math.CommutatorTelescope
+import LatticeSystem.Quantum.SpinS.OrderDensityNumeratorCore
 
 namespace LatticeSystem.Quantum
 
@@ -57,23 +58,6 @@ theorem numerator_eq_sum_j (d L N M : ℕ) [NeZero L] :
               * staggeredOrderDensityOpS d L N false ^ M) := by
   rw [heisenberg_orderDensityPow_commutator_eq, Finset.mul_sum, Finset.sum_mul,
     ← Finset.sum_sub_distrib]
-
-/-- **Scalarization of an inserted `[ô⁺, ô⁻]` (S2/S3 core).**  On a total-`Ŝ³` singlet `Φ`, the
-order commutator inserted between two order words collapses to a scalar (the suffix charge), since
-`[ô⁺, ô⁻]` acts on any order-word state as `(V⁻² · 2 m(suf))`:
-`(ô^{wₗ} [ô⁺,ô⁻] ô^{wᵣ}) Φ = (V⁻² · 2 m(wᵣ)) · (ô^{wₗ} ô^{wᵣ}) Φ`. -/
-theorem orderWord_orderCommutator_insert_mulVec_eq (d L N : ℕ) [NeZero L]
-    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
-    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) (wl wr : List Bool) :
-    (orderWordProd d L N wl
-        * (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
-          - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
-        * orderWordProd d L N wr).mulVec Φ
-      = ((((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹) * (2 * mCharge wr))
-          • (orderWordProd d L N wl * orderWordProd d L N wr).mulVec Φ := by
-  rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
-    orderCommutator_mulVec_orderWordProd d L N Φ hsing wr, Matrix.mulVec_smul,
-    Matrix.mulVec_mulVec]
 
 /-- The identity operator lies in the local-decay class with `ζ = 0` (empty support). -/
 theorem isR2LocalUpTo_one (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (K : ℕ) :
@@ -217,26 +201,6 @@ theorem heisenberg_order_nested_eq_neg_orderDoubleComm (d L N : ℕ) [NeZero L] 
       = - orderDoubleComm d L N := by
   rw [heisenberg_order_jacobi, heisenberg_orderCommutator_commute, zero_sub]
 
-/-- **Anti-expansion of `(ô⁻)^M` against an operator.**  `(ô⁻)^M X − X (ô⁻)^M` telescopes into a
-signed sum of single `[X, ô⁻]` insertions between powers of `ô⁻`. -/
-theorem orderMinusPow_commutator_eq (d L N M : ℕ) [NeZero L]
-    (X : ManyBodyOpS (HypercubicTorus d L) N) :
-    staggeredOrderDensityOpS d L N false ^ M * X
-        - X * staggeredOrderDensityOpS d L N false ^ M
-      = - ∑ k ∈ Finset.range M, staggeredOrderDensityOpS d L N false ^ k
-          * (X * staggeredOrderDensityOpS d L N false
-            - staggeredOrderDensityOpS d L N false * X)
-          * staggeredOrderDensityOpS d L N false ^ (M - 1 - k) := by
-  rw [← neg_sub (X * staggeredOrderDensityOpS d L N false ^ M)
-      (staggeredOrderDensityOpS d L N false ^ M * X), commutator_pow_eq_sum]
-
-/-- A power of a single order density is the order-word product over a constant word:
-`(ô^b)^a = ô^{replicate a b}`.  Lets the numerator's order-density powers be fed to the R2-based
-single-term bounds, which are phrased over `orderWordProd`. -/
-theorem orderWordProd_replicate (d L N a : ℕ) [NeZero L] (b : Bool) :
-    orderWordProd d L N (List.replicate a b) = staggeredOrderDensityOpS d L N b ^ a := by
-  rw [orderWordProd, List.map_replicate, List.prod_replicate]
-
 /-- The moment factor at the numerator word length `2M−2` is bounded by `P_M / (2q₀)`: it equals the
 even-`K` moment `P_{M-1}` (`2M−2 = 2(M−1)`), pinched by one LRO ratio step. -/
 theorem momentFactor_twoM_sub_two_le (d L N M : ℕ) [NeZero L]
@@ -291,15 +255,6 @@ theorem momentFactor_twoM_sub_three_le (d L N M : ℕ) [NeZero L]
       _ ≤ phatMoment d L N Φ M / (2 * q₀) * (1 + 1 / Real.sqrt (2 * q₀)) := by
           gcongr; linarith [hfacnn]
 
-/-- **Triple Leibniz decomposition.**  `[A·G·C, Z] = A·G·[C,Z] + A·[G,Z]·C + [A,Z]·G·C` (pure ring
-identity).  Applied with `A = (ô⁺)^j`, `G = [Ĥ,ô⁺]`, `C = (ô⁺)^{M-1-j}`, `Z = ô⁻`: the middle term's
-`[G,Z] = [[Ĥ,ô⁺],ô⁻] = −d̂` gives the S1 contribution, the outer two give the S2/S3 crossings. -/
-theorem mul_mul_commutator_decomp {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
-    (A G C Z : ManyBodyOpS Λ N) :
-    A * G * C * Z - Z * (A * G * C)
-      = A * G * (C * Z - Z * C) + A * (G * Z - Z * G) * C + (A * Z - Z * A) * G * C := by
-  noncomm_ring
-
 /-- **S1 single-term bound (powers form).**  Each `(ô⁻)^k (ô⁺)^j d̂ (ô⁺)^{M-1-j} (ô⁻)^{M-1-k}`
 expectation is an order-word sandwich of `d̂` of total length `2M−2`, hence bounded by
 `3(96dN⁴/V)·mf(2M−2)` via `orderDoubleComm_word_re_bound`. -/
@@ -340,22 +295,6 @@ theorem s1_term_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ 
   rwa [hlen] at hbd
 
 /-! ### S2/S3 single-term bound via R2 on `G = [Ĥ, ô⁺]` -/
-
-/-- **Scalarization of an inserted `[ô⁺,ô⁻]` with a left factor.**  Generalizes
-`orderWord_orderCommutator_insert_mulVec_eq` to allow an arbitrary operator `X` to the left:
-`(X · ô^{wₗ} [ô⁺,ô⁻] ô^{wᵣ}) Φ = (V⁻²·2 m(wᵣ)) · (X · ô^{wₗ} ô^{wᵣ}) Φ`. -/
-theorem orderCommutator_insert_left_mulVec_eq (d L N : ℕ) [NeZero L]
-    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
-    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0)
-    (X : ManyBodyOpS (HypercubicTorus d L) N) (wl wr : List Bool) :
-    (X * (orderWordProd d L N wl
-        * (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
-          - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
-        * orderWordProd d L N wr)).mulVec Φ
-      = ((((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹) * (2 * mCharge wr))
-          • (X * (orderWordProd d L N wl * orderWordProd d L N wr)).mulVec Φ := by
-  rw [← Matrix.mulVec_mulVec, orderWord_orderCommutator_insert_mulVec_eq d L N Φ hsing wl wr,
-    Matrix.mulVec_smul, Matrix.mulVec_mulVec]
 
 /-- **S2/S3 single-term bound (R2 on `G = [Ĥ, ô⁺]`).**  Lemma R2 applied to the single
 Heisenberg–order commutator (in the local-decay class with `g₀ ≤ 24 d N³`):
@@ -434,27 +373,6 @@ theorem s23_term1_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
       (by rw [List.length_append]; exact hcond) (by rw [List.length_append]; exact hbudget)
     simpa only [List.length_append] using h
 
-/-- **Bra-side scalarization of a buried `Ŝ³`.**  Moving `Ŝ³` (`= [ô⁺,ô⁻]·V²/2`) onto the bra `Φ`
-via Hermiticity: `(ô^{wₗ})†Φ` is an `Ŝ³` eigenstate (charge `m((wₗ)ʳ⁻)`), so
-`⟨Φ, ô^{wₗ} Ŝ³ X Φ⟩ = conj(m((wₗ)ʳ⁻)) ⟨Φ, ô^{wₗ} X Φ⟩` for any right factor `X`. -/
-theorem dotProduct_orderWord_totalSpinSOp3_mid_eq (d L N : ℕ) [NeZero L]
-    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
-    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) (wl : List Bool)
-    (X : ManyBodyOpS (HypercubicTorus d L) N) :
-    star Φ ⬝ᵥ (orderWordProd d L N wl * totalSpinSOp3 (HypercubicTorus d L) N * X).mulVec Φ
-      = (starRingEnd ℂ) (mCharge (wl.reverse.map not))
-          * (star Φ ⬝ᵥ (orderWordProd d L N wl * X).mulVec Φ) := by
-  have key : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec
-        ((orderWordProd d L N (wl.reverse.map not)).mulVec Φ)
-      = mCharge (wl.reverse.map not) • (orderWordProd d L N (wl.reverse.map not)).mulVec Φ :=
-    totalSpinSOp3_mulVec_orderWordProd_eigenvec d L N _ hsing
-  rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
-    star_dotProduct_mulVec_conjTranspose (orderWordProd d L N wl), orderWordProd_conjTranspose,
-    star_dotProduct_mulVec_conjTranspose (totalSpinSOp3 (HypercubicTorus d L) N),
-    (totalSpinSOp3_isHermitian (HypercubicTorus d L) N).eq, key, star_smul, smul_dotProduct,
-    smul_eq_mul, ← orderWordProd_conjTranspose,
-    ← star_dotProduct_mulVec_conjTranspose, Matrix.mulVec_mulVec, starRingEnd_apply]
-
 /-- **S2/S3 term-3 leaf.**  `[ô⁺,ô⁻]` left of `G = [Ĥ,ô⁺]`: convert to `(2/V²)Ŝ³`, scalarize `Ŝ³`
 onto the bra (`dotProduct_orderWord_totalSpinSOp3_mid_eq`), then bound the residual `G`-sandwich by
 R2 — giving `‖(2/V²) conj(m((wₗ)ʳ⁻))‖ · 3(24dN³) · mf`. -/
@@ -504,38 +422,7 @@ theorem s23_term3_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
       hcond hbudget using 4
     rw [orderWordProd_mul_append]; noncomm_ring
 
-/-! ### Collection helpers (nested-sum triangle inequality) -/
-
-/-- **Right power commutator telescope.**  `A^r·B − B·A^r = ∑_l A^l (A·B−B·A) A^{r-1-l}`. -/
-theorem pow_right_commutator_eq_sum {n : Type*} [Fintype n] [DecidableEq n]
-    (A B : Matrix n n ℂ) (r : ℕ) :
-    A ^ r * B - B * A ^ r
-      = ∑ l ∈ Finset.range r, A ^ l * (A * B - B * A) * A ^ (r - 1 - l) := by
-  have h : B * A ^ r - A ^ r * B
-      = ∑ l ∈ Finset.range r, A ^ l * (B * A - A * B) * A ^ (r - 1 - l) :=
-    commutator_pow_eq_sum B A r
-  have key : (∑ l ∈ Finset.range r, A ^ l * (A * B - B * A) * A ^ (r - 1 - l))
-      = -(∑ l ∈ Finset.range r, A ^ l * (B * A - A * B) * A ^ (r - 1 - l)) := by
-    rw [← Finset.sum_neg_distrib]
-    exact Finset.sum_congr rfl (fun l _ => by noncomm_ring)
-  rw [key, ← h]; abel
-
-/-- **Triangle inequality for a sum of sandwiched expectations.**  The real part of a finite-sum
-operator's expectation is bounded by the sum of the per-term absolute real parts. -/
-theorem abs_re_dotProduct_sum_le (d L N : ℕ) [NeZero L]
-    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) {ι : Type*} (s : Finset ι)
-    (f : ι → ManyBodyOpS (HypercubicTorus d L) N) :
-    |(star Φ ⬝ᵥ (∑ i ∈ s, f i).mulVec Φ).re| ≤ ∑ i ∈ s, |(star Φ ⬝ᵥ (f i).mulVec Φ).re| := by
-  rw [Matrix.sum_mulVec, dotProduct_sum, Complex.re_sum]
-  exact Finset.abs_sum_le_sum_abs (fun i => (star Φ ⬝ᵥ (f i).mulVec Φ).re) s
-
-/-- The same triangle bound for a negated finite sum (`|Re| = |Re of the un-negated sum|`). -/
-theorem abs_re_dotProduct_neg_sum_le (d L N : ℕ) [NeZero L]
-    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) {ι : Type*} (s : Finset ι)
-    (f : ι → ManyBodyOpS (HypercubicTorus d L) N) :
-    |(star Φ ⬝ᵥ (- ∑ i ∈ s, f i).mulVec Φ).re| ≤ ∑ i ∈ s, |(star Φ ⬝ᵥ (f i).mulVec Φ).re| := by
-  rw [Matrix.neg_mulVec, dotProduct_neg, Complex.neg_re, abs_neg]
-  exact abs_re_dotProduct_sum_le d L N Φ s f
+/-! ### Per-`j` term decomposition and assembly of the numerator bound -/
 
 /-- **Per-`j` three-way split with `d̂` surfaced.**  `[Tⱼ, ô⁻]` splits as `(ô⁺)^j G [(ô⁺)^r,ô⁻]`
 (S2) `− (ô⁺)^j d̂ (ô⁺)^r` (S1) `+ [(ô⁺)^j,ô⁻] G (ô⁺)^r` (S3), where `Tⱼ = (ô⁺)^j G (ô⁺)^r`,
@@ -616,18 +503,6 @@ theorem s2_lterm_eq (d L N j k l r : ℕ) [NeZero L] :
     orderWordProd_replicate, orderWordProd_mul_append, orderWordProd_replicate,
     orderWordProd_replicate]
   noncomm_ring
-
-/-- The order-commutator scalar coefficient is bounded by the word length:
-`‖V⁻²·2·m(w)‖ ≤ V⁻²·2·|w|`. -/
-theorem orderScalar_norm_le (d L : ℕ) [NeZero L] (w : List Bool) :
-    ‖(((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹) * (2 * mCharge w)‖
-      ≤ ((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (w.length : ℝ)) := by
-  rw [norm_mul, show ‖((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹‖
-      = ((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ from by
-    simp only [norm_mul, norm_inv, norm_pow, Complex.norm_natCast]]
-  refine mul_le_mul_of_nonneg_left ?_ (by positivity)
-  rw [norm_mul, show ‖(2 : ℂ)‖ = 2 from by norm_num]
-  exact mul_le_mul_of_nonneg_left (mCharge_norm_le w) (by norm_num)
 
 /-- A per-`l` S3 term equals an `s23_term3_bound`-shaped operator (replicate words). -/
 theorem s3_lterm_eq (d L N j k l : ℕ) [NeZero L] :
