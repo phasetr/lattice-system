@@ -4,6 +4,8 @@ import LatticeSystem.Quantum.SpinS.TotalSpin
 import LatticeSystem.Quantum.SpinS.TotalSquaredCore
 import LatticeSystem.Quantum.SpinS.HeisenbergCore
 import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeelCore
+import LatticeSystem.Quantum.SpinS.ToyHamiltonian
+import LatticeSystem.Quantum.MarshallLiebMattis.ToyHamiltonian
 import LatticeSystem.Quantum.SpinDot.HamiltonianCore
 import LatticeSystem.Quantum.TotalSpin.Casimir
 import LatticeSystem.Quantum.NeelState.Definition
@@ -24,9 +26,10 @@ below are plain equalities requiring no cast.
 Covered objects: site embeddings (`onSiteS`), the two-site inner
 product (`spinSDot`), the Heisenberg-type Hamiltonian
 (`heisenbergHamiltonianS`), the total spin operators
-(`totalSpinSOp{1,2,3}`) and Casimir (`totalSpinSSquared`), and the
+(`totalSpinSOp{1,2,3}`) and Casimir (`totalSpinSSquared`), the
 computational-basis / Néel state constructors (`basisVecS`,
-`neelConfigOfS`, `neelStateOfS`).
+`neelConfigOfS`, `neelStateOfS`), and the Marshall–Lieb–Mattis toy
+Hamiltonian (`heisenbergToyHamiltonianS`).
 
 These transfer identities let a theorem proved once in the general
 spin-`S` development be read off as a statement about the genuinely
@@ -34,7 +37,8 @@ spin-`1/2` objects, so that spin-`1/2` results need not be reproved.
 
 References:
 - H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
-  Springer 2020, §2.2 (2.2.13) and §2.5 eq. (2.5.2), pp. 27, 37.
+  Springer 2020, §2.2 (2.2.13) and §2.5 eqs. (2.5.2), (2.5.10),
+  pp. 27, 37, 40–42.
 -/
 
 namespace LatticeSystem.Quantum
@@ -120,5 +124,15 @@ theorem neelConfigOfS_one_eq_neelConfigOf (A : Λ → Bool) :
 the spin-`1/2` Néel state (Tasaki §2.5 eq. (2.5.2)). -/
 theorem neelStateOfS_one_eq_neelStateOf (A : Λ → Bool) :
     (neelStateOfS A 1 : (Λ → Fin 2) → ℂ) = neelStateOf A := rfl
+
+/-! ## Marshall–Lieb–Mattis toy Hamiltonian -/
+
+/-- `Ĥ_toy` at `N = 1` is the spin-`1/2` MLM toy Hamiltonian, i.e. the
+Heisenberg Hamiltonian with bipartite coupling (Tasaki §2.5
+eq. (2.5.10)). -/
+theorem heisenbergToyHamiltonianS_one_eq_heisenbergToyHamiltonian (A : Λ → Bool) :
+    (heisenbergToyHamiltonianS A 1 : ManyBodyOpS Λ 1) = heisenbergToyHamiltonian A := by
+  unfold heisenbergToyHamiltonianS heisenbergToyHamiltonian
+  exact heisenbergHamiltonianS_one_eq_heisenbergHamiltonian _
 
 end LatticeSystem.Quantum

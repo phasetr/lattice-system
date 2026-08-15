@@ -1,25 +1,23 @@
-import LatticeSystem.Quantum.SpinS.SpinHalfSpecializationSublattice
+import LatticeSystem.Quantum.SpinS.SpinHalfSpecializationMultiSite
 import LatticeSystem.Quantum.SpinS.ToyHamiltonianCasimir
 
 /-!
 # Test coverage for the many-body spin-`1/2` specialisation bridges
 
-Pins the `N = 1` identification of the multi-site and sublattice
-spin-`S` objects with their spin-`1/2` counterparts
-(`SpinHalfSpecializationMultiSite.lean`,
-`SpinHalfSpecializationSublattice.lean`).
+Pins the `N = 1` identification of the multi-site spin-`S` objects with
+their spin-`1/2` counterparts
+(`SpinHalfSpecializationMultiSite.lean`).
 
 Three viewpoints:
 
 1. **Type level** — each bridge elaborates at `Λ = Fin 2` between
    `ManyBodyOpS (Fin 2) 1` and `ManyBodyOp (Fin 2)` without a cast.
-2. **Behaviour** — a concrete matrix element and a concrete
-   eigenvalue, which pin the Néel orientation convention
-   (`A ↦ 0` up, `¬A ↦ Fin.last`) rather than merely the types.
-3. **Transfer** — spin-`1/2` theorems (a sublattice Casimir
-   eigenvalue, and the SU(2) invariance and symmetry of the MLM toy
-   Hamiltonian) are reproduced from their spin-`S` sources through the
-   bridges alone.
+2. **Behaviour** — a concrete matrix element, which pins the Néel
+   orientation convention (`A ↦ 0` up, `¬A ↦ Fin.last`) rather than
+   merely the types.
+3. **Transfer** — spin-`1/2` theorems (the SU(2) invariance and the
+   symmetry of the MLM toy Hamiltonian) are reproduced from their
+   spin-`S` sources through the bridges alone.
 -/
 
 namespace LatticeSystem.Tests.SpinHalfSpecializationMultiSite
@@ -77,44 +75,12 @@ example (A : Fin 2 → Bool) :
     (neelStateOfS A 1 : (Fin 2 → Fin 2) → ℂ) = neelStateOf A :=
   neelStateOfS_one_eq_neelStateOf A
 
-/-! ## Type level: sublattice bridges -/
-
-/-- `Ŝ_A^{(1)}` at `N = 1` is `sublatticeSpinHalfOp1`. -/
-example (A : Fin 2 → Bool) :
-    (sublatticeSpinSOp1 1 A : ManyBodyOpS (Fin 2) 1) = sublatticeSpinHalfOp1 A :=
-  sublatticeSpinSOp1_one_eq_sublatticeSpinHalfOp1 A
-
-/-- `Ŝ_A^{(2)}` at `N = 1` is `sublatticeSpinHalfOp2`. -/
-example (A : Fin 2 → Bool) :
-    (sublatticeSpinSOp2 1 A : ManyBodyOpS (Fin 2) 1) = sublatticeSpinHalfOp2 A :=
-  sublatticeSpinSOp2_one_eq_sublatticeSpinHalfOp2 A
-
-/-- `Ŝ_A^{(3)}` at `N = 1` is `sublatticeSpinHalfOp3`. -/
-example (A : Fin 2 → Bool) :
-    (sublatticeSpinSOp3 1 A : ManyBodyOpS (Fin 2) 1) = sublatticeSpinHalfOp3 A :=
-  sublatticeSpinSOp3_one_eq_sublatticeSpinHalfOp3 A
-
-/-- `Ŝ_A^+` at `N = 1` is `sublatticeSpinHalfOpPlus`. -/
-example (A : Fin 2 → Bool) :
-    (sublatticeSpinSOpPlus 1 A : ManyBodyOpS (Fin 2) 1) = sublatticeSpinHalfOpPlus A :=
-  sublatticeSpinSOpPlus_one_eq_sublatticeSpinHalfOpPlus A
-
-/-- `Ŝ_A^-` at `N = 1` is `sublatticeSpinHalfOpMinus`. -/
-example (A : Fin 2 → Bool) :
-    (sublatticeSpinSOpMinus 1 A : ManyBodyOpS (Fin 2) 1) = sublatticeSpinHalfOpMinus A :=
-  sublatticeSpinSOpMinus_one_eq_sublatticeSpinHalfOpMinus A
-
-/-- `(Ŝ_A)²` at `N = 1` is `sublatticeSpinHalfSquared`. -/
-example (A : Fin 2 → Bool) :
-    (sublatticeSpinSquaredS 1 A : ManyBodyOpS (Fin 2) 1) = sublatticeSpinHalfSquared A :=
-  sublatticeSpinSquaredS_one_eq_sublatticeSpinHalfSquared A
-
 /-- `Ĥ_toy` at `N = 1` is `heisenbergToyHamiltonian`. -/
 example (A : Fin 2 → Bool) :
     (heisenbergToyHamiltonianS A 1 : ManyBodyOpS (Fin 2) 1) = heisenbergToyHamiltonian A :=
   heisenbergToyHamiltonianS_one_eq_heisenbergToyHamiltonian A
 
-/-! ## Behaviour: concrete matrix element and eigenvalue -/
+/-! ## Behaviour: concrete matrix element -/
 
 /-- The spin-`S` diagonal formula transported to `N = 1` gives the
 spin-`1/2` antiparallel value `(Ŝ_0 · Ŝ_1) σ σ = -1/4` on the Néel
@@ -126,39 +92,7 @@ example :
     spinSDot_apply_diag_of_ne (by decide)]
   norm_num [neelConfigOfS]
 
-/-- On the single-site sublattice `A = {0}` of `Fin 2`, the transported
-spin-`S` Casimir eigenvalue is `3/4 = (1/2)(1/2 + 1)`. -/
-example :
-    (sublatticeSpinHalfSquared (fun x : Fin 2 => x == 0)).mulVec
-        (neelStateOf (fun x : Fin 2 => x == 0)) =
-      (3 / 4 : ℂ) • neelStateOf (fun x : Fin 2 => x == 0) := by
-  have h := sublatticeSpinSquaredS_mulVec_neelStateOfS (Λ := Fin 2) (fun x => x == 0) 1
-  rw [sublatticeSpinSquaredS_one_eq_sublatticeSpinHalfSquared,
-    neelStateOfS_one_eq_neelStateOf] at h
-  rw [h]
-  congr 1
-  have hcard : (Finset.univ.filter (fun x : Fin 2 => (x == 0) = true)).card = 1 := by decide
-  rw [hcard]
-  norm_num
-
 /-! ## Transfer: a spin-`1/2` theorem from its spin-`S` source -/
-
-/-- `(Ŝ_A)² · |Φ_Néel(A)⟩ = (|A|(|A| + 2)/4) · |Φ_Néel(A)⟩`, obtained
-from the spin-`S` theorem at `N = 1` through the bridges alone. This is
-the regression check that the two developments agree on statements, not
-just on definitions. -/
-example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (A : Λ → Bool) :
-    (sublatticeSpinHalfSquared A).mulVec (neelStateOf A) =
-      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
-          ((Finset.univ.filter (fun x : Λ => A x = true)).card + 2) / 4) •
-        neelStateOf A := by
-  have h := sublatticeSpinSquaredS_mulVec_neelStateOfS (Λ := Λ) A 1
-  rw [sublatticeSpinSquaredS_one_eq_sublatticeSpinHalfSquared,
-    neelStateOfS_one_eq_neelStateOf] at h
-  rw [h]
-  congr 1
-  push_cast
-  ring
 
 /-- `Commute Ĥ_toy (Ŝ_tot)²`: the spin-`1/2` MLM toy Hamiltonian commutes
 with the total spin Casimir, obtained from the spin-`S` SU(2) invariance

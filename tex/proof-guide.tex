@@ -16918,15 +16918,15 @@ identities \texttt{onSiteS\_one\_eq\_onSite},
 \texttt{neelConfigOfS\_one\_eq\_neelConfigOf} and
 \texttt{neelStateOfS\_one\_eq\_neelStateOf} hold without any cast; the last
 two pin the N\'eel orientation ($A\mapsto\uparrow$,
-$\neg A\mapsto\downarrow$) common to the two developments.  The companion
-file \texttt{Quantum/SpinS/SpinHalfSpecializationSublattice.lean} does the
-same for the sublattice layer
-(\texttt{sublatticeSpinSOp\{1,2,3\}}, \texttt{sublatticeSpinSOp\{Plus,Minus\}},
-\texttt{sublatticeSpinSquaredS} and
-\texttt{heisenbergToyHamiltonianS}), whose spin-`1/2` counterparts live in
-\texttt{Quantum/MarshallLiebMattis/}; it is a scaffolding layer covering
-exactly those spin-`1/2` sublattice objects that still carry their own
-definitions.  Reference: Tasaki, Springer 2020, \S2.2 eq.~(2.2.13), p.~27,
+$\neg A\mapsto\downarrow$) common to the two developments.  The same file
+carries \texttt{heisenbergToyHamiltonianS\_one\_eq\_heisenbergToyHamiltonian}
+for the Marshall--Lieb--Mattis toy Hamiltonian.  The sublattice layer needs
+no bridge of its own: the sublattice components
+\texttt{sublatticeSpinSOp\{1,2,3\}}, the ladder operators
+\texttt{sublatticeSpinSOp\{Plus,Minus\}} and the sublattice Casimir
+\texttt{sublatticeSpinSquaredS} are stated once for arbitrary spin-`S` in
+\texttt{Quantum/SpinS/}, and the spin-`1/2` reading is the $N = 1$ case.
+Reference: Tasaki, Springer 2020, \S2.2 eq.~(2.2.13), p.~27,
 and \S2.5 eqs.~(2.5.2), (2.5.10)--(2.5.11), pp.~37, 40--42.
 
 \textbf{Single-site $\hat{S}^{(3)}_x$ expectations on $|c..c\rangle$
