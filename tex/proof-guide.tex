@@ -450,10 +450,16 @@ For any $\alpha, \beta \in \{1, 2, 3\}$,
         -\hat S^{(\beta)} & \text{if } \alpha \neq \beta.
       \end{cases}
 \]
-Lean names: \texttt{spinHalfRot1/2/3\_pi\_conj\_spinHalfOp1/2/3} for the
-pairings the library consumes; the statement for every $(\alpha, \beta)$ is
-carried by the generic \texttt{rotOf}-level cores in
-\texttt{Quantum/SpinHalfRotation.lean}. This is the Tasaki eq.~(2.1.15)
+Lean names: \texttt{spinHalfRot1\_pi\_conj\_spinHalfOp1},
+\texttt{spinHalfRot2\_pi\_conj\_spinHalfOp2},
+\texttt{spinHalfRot3\_pi\_conj\_spinHalfOp3} for the same-axis case, and
+\texttt{spinHalfRot2\_pi\_conj\_spinHalfOp1},
+\texttt{spinHalfRot2\_pi\_conj\_spinHalfOp3} for the two cross-axis
+pairings ($\alpha = 2$) the library consumes; the statement for every
+$(\alpha, \beta)$ is carried by two generic \texttt{rotOf}-level cores in
+\texttt{Quantum/SpinHalfRotation.lean}: the private \texttt{rotOf\_pi\_conj\_self}
+($\alpha = \beta$) and the public \texttt{rotOf\_pi\_conj\_of\_ne}
+($\alpha \neq \beta$). This is the Tasaki eq.~(2.1.15)
 ($\alpha = \beta$) and eq.~(2.1.21) ($\alpha \neq \beta$) both
 specialized at $\theta = \pi$.
 \end{theorem}

@@ -84,8 +84,10 @@ stays public and unchanged.
 
 The public `rotOf*` cores (`rotOf`, `rotOf_zero`, `rotOf_adjoint`, `rotOf_two_pi`,
 `rotOf_mul_rotOf`, `rotOf_mul_conjTranspose`, `rotOf_pi`, `rotOf_neg_pi`, `rotOf_pi_conjTranspose`,
-`rotOf_pi_conj_of_ne`), `spinHalfRot{1,2,3}_det_eq_one` and
-`LatticeSystem/Quantum/SpinHalfRotation/Conjugation.lean` are unchanged.
+`rotOf_pi_conj_of_ne`) and `spinHalfRot{1,2,3}_det_eq_one` are unchanged.
+`LatticeSystem/Quantum/SpinHalfRotation/Conjugation.lean` was unchanged as of this record's
+introduction (PR #5244); PR-B3a subsequently retired six declarations from it, listed in the
+axis-instances record below.
 
 ## Authoritative supplemental implementation record (spin-1/2 rotation conjugation axis instances)
 
