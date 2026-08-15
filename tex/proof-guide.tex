@@ -17661,19 +17661,6 @@ projections aggregate to the spin-resolved number operators
 (and their complements), complementing the partition-of-identity
 (PR~\#1011) $\sum_\alpha p_\alpha = 1$.
 
-\textbf{Hubbard same-site per-site projections pairwise commute
-(PR~\#1020)}: in the file
-\texttt{Fermion/JordanWigner/Hubbard/SiteProjectionsCommute.lean}.
-The four per-site occupation projections at the same site $i$
-pairwise commute: $\texttt{Commute}\,p_\alpha(i)\,p_\beta(i)$
-for any $\alpha, \beta \in \{\emptyset, \uparrow, \downarrow,
-\Uparrow\}$. For $\alpha \neq \beta$ trivial from
-PRs~\#1014, \#1016, \#1017, \#1018: both products vanish, so
-the commutator is $0$. Together with the partition / idempotency
-/ Hermiticity / orthogonality results, the per-site projection
-algebra is fully commutative on top of being a complete
-orthogonal partition.
-
 \textbf{Hubbard per-site projection power identities
 (PR~\#1034)}: in the file
 \texttt{Fermion/JordanWigner/Hubbard/SiteProjectionsPow.lean}.
@@ -17713,21 +17700,6 @@ relations. Same proof template as PRs~\#1006, \#1035, \#1036:
 the four underlying $n_\sigma$ (and complements) pairwise
 commute, so the products commute via \texttt{Commute.mul\_left}
 / \texttt{.mul\_right}.
-
-\textbf{Remaining 5 cross-projection commute relations (PR~\#1038,
-completes 16/16 commute matrix)}: in the file
-\texttt{Fermion/JordanWigner/Hubbard/RemainingProjectionCommutes.lean}.
-Five remaining pairs:
-$\texttt{Commute}\,(p_\emptyset(i))\,(p_\uparrow(j))$,
-$\texttt{Commute}\,(p_\emptyset(i))\,(p_\downarrow(j))$,
-$\texttt{Commute}\,(p_\emptyset(i))\,(p_\Uparrow(j))$,
-$\texttt{Commute}\,(p_\uparrow(i))\,(p_\Uparrow(j))$,
-$\texttt{Commute}\,(p_\downarrow(i))\,(p_\Uparrow(j))$.
-Same proof template throughout. Combined with PRs~\#1006,
-\#1020, \#1035, \#1036, \#1037, all 16 combinations of
-$\texttt{Commute}\,(p_\alpha(i))\,(p_\beta(j))$ are formalised,
-making the 4-state per-site occupation algebra fully commutative
-across arbitrary site pairs.
 
 \textbf{All-down spin state for the Hubbard model (PR~\#1039)}:
 in the file
