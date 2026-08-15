@@ -483,6 +483,8 @@ private theorem orderNumerator_s3_part_bound (d L N M j k : ℕ) [NeZero L]
   exact mul_le_mul_of_nonneg_right (by exact_mod_cast (by omega : j ≤ M))
     (mul_nonneg (by positivity) (mul_nonneg (by linarith [hc₂]) (momentFactor_nonneg d L N Φ _)))
 
+/-! ### Assembly of the per-`(j,k)` bound -/
+
 /-- **Per-`(j,k)` term bound.**  The sandwiched commutator `(ô⁻)^k [T_j, ô⁻] (ô⁻)^{M-1-k}` (with
 `T_j = (ô⁺)^j G (ô⁺)^{M-1-j}`) decomposes into the S1 middle `(−D)`, the S2 source and the S3
 source; the triangle inequality plus the three part bounds give the total. -/

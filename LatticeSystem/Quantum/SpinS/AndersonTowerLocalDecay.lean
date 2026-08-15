@@ -297,13 +297,6 @@ theorem iterOrderComm_norm_le_of_supported [NeZero L] {S : Finset (HypercubicTor
       _ = (2 * (S.card : ℝ) * (N : ℝ) / (L : ℝ) ^ d) ^ u.length
             * (2 * (S.card : ℝ) * (N : ℝ) / (L : ℝ) ^ d) * manyBodyOperatorNormS G := by ring
 
-/-- **An `S`-supported operator lies in the local-decay class** with `ζ = |S|`, `o₀ = N`,
-`g₀ = ‖G‖`.  This bridges operator support to the `IsR2LocalUpTo` hypothesis of Lemma R2. -/
-theorem isR2LocalUpTo_of_supported [NeZero L] {S : Finset (HypercubicTorus d L)}
-    {G : ManyBodyOpS (HypercubicTorus d L) N} (hG : SupportedOn S G) (hN : 1 ≤ N) (K : ℕ) :
-    IsR2LocalUpTo K (S.card : ℝ) (N : ℝ) (manyBodyOperatorNormS G) G :=
-  ⟨manyBodyOperatorNormS_nonneg G, fun u _ => iterOrderComm_norm_le_of_supported hN u G hG⟩
-
 /-! ### Linearity of `iterOrderComm` and the quasi-local-sum bound (R2 local-decay, commit 10) -/
 
 /-- `orderComm` is additive in its operator argument. -/

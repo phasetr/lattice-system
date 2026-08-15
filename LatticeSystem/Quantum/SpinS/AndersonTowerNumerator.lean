@@ -176,6 +176,8 @@ theorem heisenbergRaisingComm_word_re_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤
   · exact momentFactor_nonneg d L N Φ _
   · exact heisenbergRaisingCommAggregate_le hL hN
 
+/-! ### Assembly of the numerator bound -/
+
 /-- **Numerator double-commutator bound.**  The ★-variational numerator
 `⟨Φ, [(ô⁻)^M,[Ĥ,(ô⁺)^M]] Φ⟩` is bounded by `M²` copies of the per-insertion bound: the generic
 collection `tower_numerator_bound_of_word_bounds` applied to the Heisenberg Hamiltonian, with
