@@ -88,7 +88,13 @@ permalink: /formalization/legacy/20-total-spin-operator-tasaki-2-2-eq-2-2-7-2-2-
 This section is maintained by hand, lies outside the migrated catalogue block above, and records
 the many-body continuation of the single-site spin-`S` ↔ spin-`1/2` bridge
 (`Quantum/SpinS/SpinHalfSpecialization.lean`, catalogued on the Tasaki §2.4 generalised page).
-Every migrated row above is unchanged.
+The migrated catalogue block above is a frozen historical record — its rows are pinned
+byte-for-byte by `scripts/check_docs_hierarchy.py` and are never edited for later renames or
+deletions. In particular, the frozen row for `sublatticeSpinHalfSquared_mulVec_neelStateOf` /
+`_complement_mulVec_neelStateOf` names the declaration and file
+(`Quantum/MarshallLiebMattis/SublatticeCasimirNeelCore.lean`) as they existed at migration time;
+that file and declaration have since been retired, and the paragraph below records their current
+spin-`S` replacement.
 
 | Lean name | Statement | File |
 |---|---|---|
@@ -96,9 +102,19 @@ Every migrated row above is unchanged.
 | `sublatticeSpinSOp{1,2,3}_one_eq_sublatticeSpinHalfOp{1,2,3}` / `sublatticeSpinSOp{Plus,Minus}_one_eq_sublatticeSpinHalfOp{Plus,Minus}` / `sublatticeSpinSquaredS_one_eq_sublatticeSpinHalfSquared` / `sublatticeSpinSDot_one_eq_sublatticeSpinDot` / `heisenbergToyHamiltonianS_one_eq_heisenbergToyHamiltonian` | **sublattice spin-`S` ↔ spin-`1/2` bridge at `N = 1`**: the sublattice spin components, sublattice ladder operators, sublattice Casimir `(Ŝ_A)²`, cross-sublattice inner product `Ŝ_A · Ŝ_B` and MLM toy Hamiltonian of the spin-`S` development coincide at `N = 1` with the spin-`1/2` definitions of `Quantum/MarshallLiebMattis/` (Tasaki §2.5 eqs. (2.5.10)–(2.5.11), pp. 40–42). Scaffolding layer: its scope is exactly the spin-`1/2` sublattice objects that still carry their own definitions (PR #5250) | `Quantum/SpinS/SpinHalfSpecializationSublattice.lean` |
 
 Regression coverage for both files (type-level elaboration without casts, a concrete matrix
-element and eigenvalue pinning the Néel orientation, and the transfer of
-`sublatticeSpinHalfSquared_mulVec_neelStateOf` from its spin-`S` source through the bridges) lives
+element and eigenvalue pinning the Néel orientation, and the transfer of the spin-`1/2` sublattice
+Casimir eigenvalue on the Néel state from its spin-`S` source through the bridges) lives
 in `LatticeSystem/Tests/SpinHalfSpecializationMultiSite.lean`.
+
+The Néel-state statements of the sublattice theory — the two sublattice Casimir eigenvalues, the
+`Ŝ_tot^(3)` and sublattice `Ŝ^(3)` eigenvalues (including their squares and the cross term), the
+sublattice ladder actions, the per-pair `Ŝ_x · Ŝ_y` diagonal values, the diagonal expectation of the
+MLM toy Hamiltonian, and the non-vanishing / orthogonality / independence facts about the Néel
+state — have a single home in `Quantum/SpinS/SublatticeCasimirNeel.lean`,
+`Quantum/SpinS/SublatticeCasimirNeelCore.lean` and
+`Quantum/SpinS/SublatticeCasimirNeelExpectations.lean`, stated for arbitrary spin-`S`; the
+spin-`1/2` reading is the `N = 1` case, reached through the bridges above. Their regression
+coverage lives in `LatticeSystem/Tests/SpinSSublatticeCasimirNeel.lean`.
 
 ---
 

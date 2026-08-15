@@ -464,8 +464,6 @@ import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeSpinDot
 import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeSpinLadderPropertiesCore
 import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeSpinLadderProperties
 import LatticeSystem.Quantum.MarshallLiebMattis.ToyHamiltonianCasimir
-import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeCasimirNeelCore
-import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeCasimirNeel
 import LatticeSystem.Quantum.Z2Z2
 import LatticeSystem.Quantum.IsingChain
 import LatticeSystem.Fermion.Mode
