@@ -159,6 +159,29 @@ Hermiticity corollary `hubbardGibbsStateOnGraph_isHermitian` and the `rfl` bridg
 `hubbardGibbsStateOnGraph_commute_hamiltonian` has been retired as an unreferenced one-line
 specialization of the generic `gibbsState_commute_hamiltonian`.
 
+## Authoritative supplemental implementation record (Heisenberg-on-graph named-wrapper corollaries)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+the current state of the Heisenberg-on-graph named wrapper. The migrated catalogue block above is a
+frozen historical record — its rows are pinned byte-for-byte by `scripts/check_docs_hierarchy.py`
+and are never edited for later deletions, so the brace-shorthand row
+`heisenbergHamiltonianOnGraph_isHermitian` / `_commute_totalSpinHalfOp{1,2,3}` /
+`_commute_totalSpinHalfSquared` describes membership as it stood at migration time.
+
+That whole five-member family has since been retired as a duplicate re-exposure: each member was a
+one-line restatement of the corresponding `couplingOf` theorem under the wrapper name. What
+survives in `Quantum/HeisenbergChain.lean` is the definition
+`heisenbergHamiltonianOnGraph G J = heisenbergHamiltonian (couplingOf G J)` together with the
+canonical `couplingOf`-form theorems `heisenbergHamiltonian_couplingOf_isHermitian`,
+`heisenbergHamiltonian_couplingOf_commute_totalSpinHalfOp1` / `_commute_totalSpinHalfOp2` /
+`_commute_totalSpinHalfOp3` and `heisenbergHamiltonian_couplingOf_commute_totalSpinHalfSquared`.
+
+Because the wrapper is definitionally its `couplingOf` right-hand side, those five theorems
+discharge Hermiticity and SU(2) invariance for goals stated in wrapper form without any bridge
+lemma; `LatticeSystem/Tests/Heisenberg.lean` pins that interoperability by stating the goals for
+`heisenbergHamiltonianOnGraph` and proving them with the `couplingOf` theorems. The Gibbs rows for
+`heisenbergGibbsStateOnGraph` are unaffected.
+
 ---
 
 [← Gibbs state (Tasaki §3.3)](/lattice-system/formalization/legacy/24-gibbs-state-tasaki-3-3/) · [Catalogue](/lattice-system/formalization/legacy/) · [Heisenberg chain (Tasaki §3.5) →](/lattice-system/formalization/legacy/25-heisenberg-chain-tasaki-3-5-part-02/)

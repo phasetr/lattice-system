@@ -249,43 +249,6 @@ theorem heisenbergHamiltonian_couplingOf_commute_totalSpinHalfSquared
       (totalSpinHalfSquared Λ) :=
   heisenbergHamiltonian_commute_totalSpinHalfSquared _
 
-/-! ### Named-wrapper corollaries -/
-
-/-- Hermiticity of the graph-wrapper Hamiltonian for real `J`. -/
-theorem heisenbergHamiltonianOnGraph_isHermitian
-    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
-    (G : SimpleGraph Λ) [DecidableRel G.Adj] {J : ℂ} (hJ : star J = J) :
-    (heisenbergHamiltonianOnGraph G J).IsHermitian :=
-  heisenbergHamiltonian_couplingOf_isHermitian G hJ
-
-/-- Commute with total-spin components. -/
-theorem heisenbergHamiltonianOnGraph_commute_totalSpinHalfOp1
-    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
-    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
-    Commute (heisenbergHamiltonianOnGraph G J) (totalSpinHalfOp1 Λ) :=
-  heisenbergHamiltonian_couplingOf_commute_totalSpinHalfOp1 G J
-
-/-- The Heisenberg-on-graph Hamiltonian commutes with `Ŝ_tot^(2)`. -/
-theorem heisenbergHamiltonianOnGraph_commute_totalSpinHalfOp2
-    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
-    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
-    Commute (heisenbergHamiltonianOnGraph G J) (totalSpinHalfOp2 Λ) :=
-  heisenbergHamiltonian_couplingOf_commute_totalSpinHalfOp2 G J
-
-/-- The Heisenberg-on-graph Hamiltonian commutes with `Ŝ_tot^(3)`. -/
-theorem heisenbergHamiltonianOnGraph_commute_totalSpinHalfOp3
-    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
-    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
-    Commute (heisenbergHamiltonianOnGraph G J) (totalSpinHalfOp3 Λ) :=
-  heisenbergHamiltonian_couplingOf_commute_totalSpinHalfOp3 G J
-
-/-- The Heisenberg-on-graph Hamiltonian commutes with `(Ŝ_tot)²`. -/
-theorem heisenbergHamiltonianOnGraph_commute_totalSpinHalfSquared
-    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
-    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
-    Commute (heisenbergHamiltonianOnGraph G J) (totalSpinHalfSquared Λ) :=
-  heisenbergHamiltonian_couplingOf_commute_totalSpinHalfSquared G J
-
 /-! ## Heisenberg-on-graph Gibbs state
 
 For any finite graph `G` with real edge weight `J : ℂ`, the Gibbs
