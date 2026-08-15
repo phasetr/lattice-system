@@ -98,33 +98,6 @@ theorem spinHalfOp_onSite_comm_of_ne {x y : Λ} (hxy : x ≠ y)
     onSite x Sα * onSite y Sβ = onSite y Sβ * onSite x Sα :=
   onSite_mul_onSite_of_ne hxy Sα Sβ
 
-/-! ## Same-site commutation (Tasaki eq (2.2.6), `x = y` case, S = 1/2)
-
-These are the diagonal cases of Tasaki eq. (2.2.6): at the same site
-`x`, the spin operators obey the single-site commutation relations
-(2.1.1) lifted by `onSite`. -/
-
-/-- Same-site commutator: `[Ŝ_x^(1), Ŝ_x^(2)] = i · Ŝ_x^(3)`. -/
-theorem spinHalfOp1_onSite_commutator_spinHalfOp2_onSite (x : Λ) :
-    (onSite x spinHalfOp1 * onSite x spinHalfOp2
-        - onSite x spinHalfOp2 * onSite x spinHalfOp1 : ManyBodyOp Λ) =
-      Complex.I • onSite x spinHalfOp3 := by
-  rw [onSite_commutator_same, spinHalfOp1_commutator_spinHalfOp2, onSite_smul]
-
-/-- Same-site commutator: `[Ŝ_x^(2), Ŝ_x^(3)] = i · Ŝ_x^(1)`. -/
-theorem spinHalfOp2_onSite_commutator_spinHalfOp3_onSite (x : Λ) :
-    (onSite x spinHalfOp2 * onSite x spinHalfOp3
-        - onSite x spinHalfOp3 * onSite x spinHalfOp2 : ManyBodyOp Λ) =
-      Complex.I • onSite x spinHalfOp1 := by
-  rw [onSite_commutator_same, spinHalfOp2_commutator_spinHalfOp3, onSite_smul]
-
-/-- Same-site commutator: `[Ŝ_x^(3), Ŝ_x^(1)] = i · Ŝ_x^(2)`. -/
-theorem spinHalfOp3_onSite_commutator_spinHalfOp1_onSite (x : Λ) :
-    (onSite x spinHalfOp3 * onSite x spinHalfOp1
-        - onSite x spinHalfOp1 * onSite x spinHalfOp3 : ManyBodyOp Λ) =
-      Complex.I • onSite x spinHalfOp2 := by
-  rw [onSite_commutator_same, spinHalfOp3_commutator_spinHalfOp1, onSite_smul]
-
 /-! ## Total raising/lowering operators (Tasaki eq (2.2.8)) -/
 
 /-- Total raising operator: `Ŝ^+_tot := Σ_{x ∈ Λ} Ŝ_x^+`. -/
@@ -228,26 +201,6 @@ theorem totalSpinHalfOp3_mulVec_basisVec_const (s : Fin 2) :
   congr 1
   rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
 
-/-- All-up specialisation: `Ŝ_tot^(3) · |↑..↑⟩ = (|Λ|/2) · |↑..↑⟩`. -/
-theorem totalSpinHalfOp3_mulVec_basisVec_all_up :
-    (totalSpinHalfOp3 Λ).mulVec (basisVec (fun _ : Λ => (0 : Fin 2))) =
-      ((Fintype.card Λ : ℂ) / 2) • basisVec (fun _ : Λ => (0 : Fin 2)) := by
-  rw [totalSpinHalfOp3_mulVec_basisVec_const]
-  have hsign : spinHalfSign (0 : Fin 2) = (1 / 2 : ℂ) := by
-    simp [spinHalfSign]
-  rw [hsign]
-  congr 1; ring
-
-/-- All-down specialisation: `Ŝ_tot^(3) · |↓..↓⟩ = -(|Λ|/2) · |↓..↓⟩`. -/
-theorem totalSpinHalfOp3_mulVec_basisVec_all_down :
-    (totalSpinHalfOp3 Λ).mulVec (basisVec (fun _ : Λ => (1 : Fin 2))) =
-      (-((Fintype.card Λ : ℂ) / 2)) • basisVec (fun _ : Λ => (1 : Fin 2)) := by
-  rw [totalSpinHalfOp3_mulVec_basisVec_const]
-  have hsign : spinHalfSign (1 : Fin 2) = -(1 / 2 : ℂ) := by
-    simp [spinHalfSign]
-  rw [hsign]
-  congr 1; ring
-
 /-- `Ŝ_tot^(3) · |σ⟩ = (|σ| / 2) · |σ⟩`: the `Ŝ_tot^(3)` eigenvalue is
 half the total magnetization (Tasaki eq. (2.2.10)). -/
 theorem totalSpinHalfOp3_mulVec_basisVec_eq_magnetization (σ : Λ → Fin 2) :
@@ -306,44 +259,6 @@ theorem onSite_spinHalfOpMinus_mulVec_basisVec (x : Λ) (σ : Λ → Fin 2) :
       rw [← hsx]; exact Function.update_eq_self _ _
     rw [h1]
     simp
-
-/-- `Ŝ^+_tot · |σ⟩` is the sum of site-wise raising actions. -/
-theorem totalSpinHalfOpPlus_mulVec_basisVec (σ : Λ → Fin 2) :
-    (totalSpinHalfOpPlus Λ).mulVec (basisVec σ) =
-      ∑ x : Λ, (if σ x = 1 then basisVec (Function.update σ x 0)
-                           else (0 : (Λ → Fin 2) → ℂ)) := by
-  unfold totalSpinHalfOpPlus
-  funext τ
-  change ∑ ρ, (∑ x, onSite x spinHalfOpPlus) τ ρ * basisVec σ ρ =
-       (∑ x : Λ, (if σ x = 1 then basisVec (Function.update σ x 0)
-                              else (0 : (Λ → Fin 2) → ℂ))) τ
-  simp only [Matrix.sum_apply, Finset.sum_mul, Finset.sum_apply]
-  rw [Finset.sum_comm]
-  refine Finset.sum_congr rfl fun x _ => ?_
-  have h := onSite_spinHalfOpPlus_mulVec_basisVec Λ x σ
-  have hτ := congrFun h τ
-  change ∑ ρ, onSite x spinHalfOpPlus τ ρ * basisVec σ ρ = _
-  rw [← hτ]
-  rfl
-
-/-- `Ŝ^-_tot · |σ⟩` is the sum of site-wise lowering actions. -/
-theorem totalSpinHalfOpMinus_mulVec_basisVec (σ : Λ → Fin 2) :
-    (totalSpinHalfOpMinus Λ).mulVec (basisVec σ) =
-      ∑ x : Λ, (if σ x = 0 then basisVec (Function.update σ x 1)
-                           else (0 : (Λ → Fin 2) → ℂ)) := by
-  unfold totalSpinHalfOpMinus
-  funext τ
-  change ∑ ρ, (∑ x, onSite x spinHalfOpMinus) τ ρ * basisVec σ ρ =
-       (∑ x : Λ, (if σ x = 0 then basisVec (Function.update σ x 1)
-                              else (0 : (Λ → Fin 2) → ℂ))) τ
-  simp only [Matrix.sum_apply, Finset.sum_mul, Finset.sum_apply]
-  rw [Finset.sum_comm]
-  refine Finset.sum_congr rfl fun x _ => ?_
-  have h := onSite_spinHalfOpMinus_mulVec_basisVec Λ x σ
-  have hτ := congrFun h τ
-  change ∑ ρ, onSite x spinHalfOpMinus τ ρ * basisVec σ ρ = _
-  rw [← hτ]
-  rfl
 
 /-! ## Ladder termination on the fully-polarised states (Tasaki §2.4 boundary)
 
@@ -456,23 +371,7 @@ theorem onSite_commutator_totalOnSite
     simp
   · intro h; exact absurd (Finset.mem_univ x) h
 
-/-! ## Adjoint relations and ladder commutator for total raising/lowering -/
-
-/-- `(Ŝ^+_tot)† = Ŝ^-_tot`. -/
-theorem totalSpinHalfOpPlus_conjTranspose :
-    (totalSpinHalfOpPlus Λ).conjTranspose = totalSpinHalfOpMinus Λ := by
-  unfold totalSpinHalfOpPlus totalSpinHalfOpMinus
-  rw [Matrix.conjTranspose_sum]
-  refine Finset.sum_congr rfl fun x _ => ?_
-  rw [onSite_conjTranspose, spinHalfOpPlus_conjTranspose]
-
-/-- `(Ŝ^-_tot)† = Ŝ^+_tot`. -/
-theorem totalSpinHalfOpMinus_conjTranspose :
-    (totalSpinHalfOpMinus Λ).conjTranspose = totalSpinHalfOpPlus Λ := by
-  unfold totalSpinHalfOpPlus totalSpinHalfOpMinus
-  rw [Matrix.conjTranspose_sum]
-  refine Finset.sum_congr rfl fun x _ => ?_
-  rw [onSite_conjTranspose, spinHalfOpMinus_conjTranspose]
+/-! ## Ladder commutator for total raising/lowering -/
 
 /-- Cartan ladder relation: `[Ŝ_tot^(3), Ŝ^+_tot] = Ŝ^+_tot`.
 Derived from `[Ŝ_tot^(3), Ŝ_tot^(α)]` for `α = 1, 2` and
