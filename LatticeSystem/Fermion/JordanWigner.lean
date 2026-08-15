@@ -327,12 +327,10 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsUpDown
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsEmptySingle
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsSingleDoubly
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsSpinResolved
-import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsCommute
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsPow
 import LatticeSystem.Fermion.JordanWigner.Hubbard.EmptyProjectionCommute
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SingleProjectionsCommute
 import LatticeSystem.Fermion.JordanWigner.Hubbard.UpDownProjectionCommute
-import LatticeSystem.Fermion.JordanWigner.Hubbard.RemainingProjectionCommutes
 import LatticeSystem.Fermion.JordanWigner.CPlusCDaggerSq
 import LatticeSystem.Fermion.JordanWigner.CMinusCDaggerSq
 import LatticeSystem.Fermion.JordanWigner.CPlusMinusCDaggerPauli

@@ -110,6 +110,31 @@ fermion mode acting on `ℂ²` with computational basis
 
 <!-- legacy-source:end:2149:2245 -->
 
+## Authoritative supplemental implementation record (Hubbard per-site / cross-site projection commute relations)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+the current state of the Hubbard 4-state per-site projection commute relations. The migrated
+catalogue block above is a frozen historical record — its rows are pinned byte-for-byte by
+`scripts/check_docs_hierarchy.py` and are never edited for later deletions, so the two anonymous
+family rows "(6 pairwise `Commute` lemmas)" and "(5 remaining cross-projection commutes)" describe
+membership as it stood at migration time.
+
+Both of the modules named by those two rows have since been retired in full as unreferenced
+corollaries of the per-site orthogonality results and of `fermionMultiNumber_commute`-style
+pairwise number commutation: `Fermion/JordanWigner/Hubbard/SiteProjectionsCommute.lean`
+(6 same-site pairwise `Commute` theorems) and
+`Fermion/JordanWigner/Hubbard/RemainingProjectionCommutes.lean` (5 cross-site `Commute` theorems).
+The "16/16 commute matrix" completeness claim of the migrated row therefore no longer describes
+the current library.
+
+The cross-site commute relations that survive are unchanged:
+`fermionUpProjection_commute_fermionDownProjection_of_any` in
+`Fermion/JordanWigner/Hubbard/UpDownProjectionCommute.lean`,
+`fermionEmptyProjection_commute_of_any` in
+`Fermion/JordanWigner/Hubbard/EmptyProjectionCommute.lean`, and
+`fermionUpProjection_commute_of_any` / `fermionDownProjection_commute_of_any` in
+`Fermion/JordanWigner/Hubbard/SingleProjectionsCommute.lean`.
+
 ---
 
 [← Spin-`S` saturated ferromagnetic state (Tasaki §2.4 generalised)](/lattice-system/formalization/legacy/28-spin-saturated-ferromagnetic-state-tasaki-2-4-generalised-part-02/) · [Catalogue](/lattice-system/formalization/legacy/) · [Multi-mode fermion via Jordan–Wigner (P2 backbone) →](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-01/)
