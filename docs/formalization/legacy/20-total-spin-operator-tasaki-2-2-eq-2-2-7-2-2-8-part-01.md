@@ -169,8 +169,10 @@ brace-shorthand rows
 "for every … adjacent and wrap bond", "coverage parity" and "full Néel-state bond family" prose,
 describe membership as it stood at migration time.
 
-The per-direction and per-wrap instances of those four families are no longer present in the
-library. Retired from `Quantum/NeelState/InnerProductCore.lean`:
+Of those four families only the 2D `szsz` one has been retired in full; the other three each keep a
+single representative bond (`horizontal_adjacent` for the 2D `spinHalfDot` family, `x_adjacent` for
+the two cubic families, enumerated below), and every other per-direction and per-wrap instance is no
+longer present in the library. Retired from `Quantum/NeelState/InnerProductCore.lean`:
 `neelSquareState_inner_spinHalfDot_vertical_adjacent_eq_neg_one_quarter`,
 `neelSquareState_inner_spinHalfDot_horizontal_wrap_eq_neg_one_quarter`,
 `neelSquareState_inner_spinHalfDot_vertical_wrap_eq_neg_one_quarter`,
