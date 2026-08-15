@@ -15,10 +15,9 @@ linear in the Hamiltonian, so the pure-XY numerator splits as
 `⟨Φ, [Aᴴ, [2 Ĥ_XY, A]] Φ⟩ = 2 ⟨Φ, [Aᴴ, [Ĥ_Heis, A]] Φ⟩ − 2 ⟨Φ, [Aᴴ, [Ĥ_ZZ, A]] Φ⟩`.  The
 Heisenberg term is bounded verbatim by the Anderson-tower asset `tower_numerator_bound`; the
 residual `Ĥ_ZZ` term is bounded here by a reduced replica of the Anderson-tower numerator chain (the
-Hamiltonian-agnostic order-word bricks — `plain_orderWord_re_bound`,
-`orderCommutator_insert_left_mulVec_eq`, `dotProduct_orderWord_totalSpinSOp3_mid_eq`,
-`orderScalar_norm_le`, the split-independent R2 engine `r2_split_independent` — are imported and
-reused, not re-proved).
+Hamiltonian-agnostic order-word bricks — `orderCommutator_insert_left_mulVec_eq`,
+`dotProduct_orderWord_totalSpinSOp3_mid_eq`, `orderScalar_norm_le`, the split-independent R2 engine
+`r2_split_independent` — are imported and reused, not re-proved).
 
 The `Ĥ_ZZ` locality is obtained directly from `iterOrderComm_norm_le_of_localSum`: `Ĥ_ZZ` is a sum
 of two-site-supported bond operators `Ŝ³_x Ŝ³_y`, so its iterated order-density commutators decay by
@@ -339,8 +338,9 @@ theorem zzSingleComm_word_re_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (hL :
   · exact momentFactor_nonneg d L N Φ _
   · exact zzSingleCommAggregate_le d L N hN
 
-/-- **Commutator-power expansion of `[Ĥ_ZZ, (ô⁺)^M]`** (ZZ analogue of
-`heisenberg_orderDensityPow_commutator_eq`). -/
+/-- **Commutator-power expansion of `[Ĥ_ZZ, (ô⁺)^M]`.**  The inner commutator of the ZZ numerator
+splits into a telescoping sum of single `[Ĥ_ZZ, ô⁺]` insertions between powers of the order
+density. -/
 theorem zz_orderDensityPow_commutator_eq (d L N M : ℕ) [NeZero L] :
     zzHamiltonianS d L N * staggeredOrderDensityOpS d L N true ^ M
         - staggeredOrderDensityOpS d L N true ^ M * zzHamiltonianS d L N
@@ -350,8 +350,9 @@ theorem zz_orderDensityPow_commutator_eq (d L N M : ℕ) [NeZero L] :
           * staggeredOrderDensityOpS d L N true ^ (M - 1 - j) :=
   commutator_pow_eq_sum _ _ M
 
-/-- **The ZZ numerator double commutator as a single sum over insertion positions** (ZZ analogue of
-`numerator_eq_sum_j`). -/
+/-- **The ZZ numerator double commutator as a single sum over insertion positions.**  Substituting
+the commutator-power expansion of `[Ĥ_ZZ, (ô⁺)^M]` into the ★-variational numerator gives a sum
+over `j` of the `(ô⁻)^M`-commutators of the position-`j` `[Ĥ_ZZ, ô⁺]` insertions. -/
 theorem zz_numerator_eq_sum_j (d L N M : ℕ) [NeZero L] :
     staggeredOrderDensityOpS d L N false ^ M
         * (zzHamiltonianS d L N * staggeredOrderDensityOpS d L N true ^ M
@@ -372,7 +373,9 @@ theorem zz_numerator_eq_sum_j (d L N M : ℕ) [NeZero L] :
               * staggeredOrderDensityOpS d L N false ^ M) := by
   rw [zz_orderDensityPow_commutator_eq, Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib]
 
-/-- **ZZ S1 single-term bound (powers form)** (ZZ analogue of `s1_term_bound`). -/
+/-- **ZZ S1 single-term bound (powers form).**  Each
+`(ô⁻)^k (ô⁺)^j d̂_ZZ (ô⁺)^{M-1-j} (ô⁻)^{M-1-k}` expectation is an order-word sandwich of `d̂_ZZ`
+of total length `2M−2`, hence bounded by `zzDoubleComm_word_re_bound` at that length. -/
 theorem zz_s1_term_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
     (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
     (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
@@ -409,7 +412,8 @@ theorem zz_s1_term_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 �
     (by rw [hlen]; exact hcond) (by rw [hlen]; exact hbudget)
   rwa [hlen] at hbd
 
-/-- **ZZ S2/S3 term-1 leaf** (ZZ analogue of `s23_term1_bound`). -/
+/-- **ZZ S2/S3 term-1 leaf.**  With `G_ZZ = [Ĥ_ZZ, ô⁺]` left of a Φ-side `[ô⁺,ô⁻]`: scalarize the
+order commutator (left-factor form), then bound the residual `G_ZZ`-sandwich by R2. -/
 theorem zz_s23_term1_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
     (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
     (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
@@ -453,7 +457,9 @@ theorem zz_s23_term1_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L
       (by rw [List.length_append]; exact hcond) (by rw [List.length_append]; exact hbudget)
     simpa only [List.length_append] using h
 
-/-- **ZZ S2/S3 term-3 leaf** (ZZ analogue of `s23_term3_bound`). -/
+/-- **ZZ S2/S3 term-3 leaf.**  With `[ô⁺,ô⁻]` left of `G_ZZ = [Ĥ_ZZ, ô⁺]`: convert the order
+commutator to `(2/V²)Ŝ³`, scalarize `Ŝ³` onto the bra, then bound the residual `G_ZZ`-sandwich by
+R2. -/
 theorem zz_s23_term3_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
     (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
     (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
@@ -501,7 +507,9 @@ theorem zz_s23_term3_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L
 
 /-! ### The ZZ nested-sum collection (reduced replica) -/
 
-/-- **ZZ S1 middle-term bound (sandwiched)** (ZZ analogue of `s1_middle_bound`). -/
+/-- **ZZ S1 middle-term bound (sandwiched).**  The middle `(ô⁺)^j(−d̂_ZZ)(ô⁺)^{M-1-j}`, sandwiched
+by `(ô⁻)^k … (ô⁻)^{M-1-k}`, is the negative of the ZZ S1 single-term operator, hence obeys the same
+bound. -/
 theorem zz_s1_middle_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
     (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
     (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
@@ -528,8 +536,7 @@ theorem zz_s1_middle_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2
     Matrix.neg_mulVec, dotProduct_neg, Complex.neg_re, abs_neg]
   exact zz_s1_term_bound d L N M j k hN hL Φ hsing hq₀ hm0 hratio hj hk hcond hbudget
 
-/-- A per-`l` ZZ S2 term equals a `zz_s23_term1_bound`-shaped operator (ZZ analogue of
-`s2_lterm_eq`). -/
+/-- A per-`l` ZZ S2 term equals a `zz_s23_term1_bound`-shaped operator (replicate words). -/
 theorem zz_s2_lterm_eq (d L N j k l r : ℕ) [NeZero L] :
     staggeredOrderDensityOpS d L N false ^ k * staggeredOrderDensityOpS d L N true ^ j
         * (zzHamiltonianS d L N * staggeredOrderDensityOpS d L N true
@@ -552,8 +559,7 @@ theorem zz_s2_lterm_eq (d L N j k l r : ℕ) [NeZero L] :
     orderWordProd_replicate]
   noncomm_ring
 
-/-- A per-`l` ZZ S3 term equals a `zz_s23_term3_bound`-shaped operator (ZZ analogue of
-`s3_lterm_eq`). -/
+/-- A per-`l` ZZ S3 term equals a `zz_s23_term3_bound`-shaped operator (replicate words). -/
 theorem zz_s3_lterm_eq (d L N j k l : ℕ) [NeZero L] :
     staggeredOrderDensityOpS d L N false ^ k
         * (staggeredOrderDensityOpS d L N true ^ l
@@ -577,7 +583,8 @@ theorem zz_s3_lterm_eq (d L N j k l : ℕ) [NeZero L] :
     orderWordProd_replicate]
   noncomm_ring
 
-/-- **Per-`l` ZZ S2 bound (uniform in `l`)** (ZZ analogue of `s2_lterm_bound`). -/
+/-- **Per-`l` ZZ S2 bound (uniform in `l`).**  Each ZZ S2 term is bounded by
+`V⁻²·2·(2M)·3(24dN³)·mf(2M-3)`, independently of `l`. -/
 theorem zz_s2_lterm_bound (d L N M j k l : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
     (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
     (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
@@ -617,7 +624,8 @@ theorem zz_s2_lterm_bound (d L N M j k l : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 
   refine mul_le_mul_of_nonneg_left ?_ (by positivity)
   exact mul_le_mul_of_nonneg_left (by exact_mod_cast hwrlen) (by norm_num)
 
-/-- **Per-`l` ZZ S3 bound (uniform in `l`)** (ZZ analogue of `s3_lterm_bound`). -/
+/-- **Per-`l` ZZ S3 bound (uniform in `l`).**  Each ZZ S3 term is bounded by
+`V⁻²·2·(2M)·3(24dN³)·mf(2M-3)`, independently of `l`. -/
 theorem zz_s3_lterm_bound (d L N M j k l : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
     (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
     (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
@@ -666,8 +674,8 @@ theorem zz_s3_lterm_bound (d L N M j k l : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 
     ++ List.replicate l true).reverse.map not)),
     mul_le_mul_of_nonneg_left hm hV]
 
-/-- The sandwiched ZZ S2 part is the `l`-sum of the per-`l` operators (ZZ analogue of
-`s2_part_eq`). -/
+/-- The sandwiched ZZ S2 part is the `l`-sum of the per-`l` ZZ S2 operators (expand
+`[(ô⁺)^r, ô⁻]`). -/
 theorem zz_s2_part_eq (d L N j k r : ℕ) [NeZero L] :
     staggeredOrderDensityOpS d L N false ^ k * (staggeredOrderDensityOpS d L N true ^ j
         * (zzHamiltonianS d L N * staggeredOrderDensityOpS d L N true
@@ -687,7 +695,8 @@ theorem zz_s2_part_eq (d L N j k r : ℕ) [NeZero L] :
   rw [pow_right_commutator_eq_sum, Finset.mul_sum, Finset.mul_sum, Finset.sum_mul]
   exact Finset.sum_congr rfl (fun l _ => by noncomm_ring)
 
-/-- **ZZ S2 part bound** (ZZ analogue of `s2_part_bound`). -/
+/-- **ZZ S2 part bound.**  The sandwiched ZZ S2 part is bounded by `M` copies of the per-`l` ZZ S2
+bound. -/
 theorem zz_s2_part_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
     (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
     (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
@@ -714,7 +723,8 @@ theorem zz_s2_part_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 �
   exact mul_le_mul_of_nonneg_right (by exact_mod_cast (by omega : M - 1 - j ≤ M))
     (mul_nonneg (by positivity) (mul_nonneg (by positivity) (momentFactor_nonneg d L N Φ _)))
 
-/-- **ZZ S3 part operator identity** (ZZ analogue of `s3_part_eq`). -/
+/-- **ZZ S3 part operator identity.**  The sandwiched ZZ S3 part expands (left commutator telescope
+over `l < j`) into the per-`l` ZZ S3 operators. -/
 theorem zz_s3_part_eq (d L N j k : ℕ) [NeZero L] :
     staggeredOrderDensityOpS d L N false ^ k
         * ((staggeredOrderDensityOpS d L N true ^ j * staggeredOrderDensityOpS d L N false
@@ -736,7 +746,8 @@ theorem zz_s3_part_eq (d L N j k : ℕ) [NeZero L] :
   simp only [Finset.sum_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl (fun l _ => by noncomm_ring)
 
-/-- **ZZ S3 part bound** (ZZ analogue of `s3_part_bound`). -/
+/-- **ZZ S3 part bound.**  The sandwiched ZZ S3 part is bounded by `M` copies of the per-`l` ZZ S3
+bound. -/
 theorem zz_s3_part_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
     (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
     (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
@@ -763,7 +774,10 @@ theorem zz_s3_part_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 �
   exact mul_le_mul_of_nonneg_right (by exact_mod_cast (by omega : j ≤ M))
     (mul_nonneg (by positivity) (mul_nonneg (by positivity) (momentFactor_nonneg d L N Φ _)))
 
-/-- **Per-`j` three-way ZZ split with `d̂_ZZ` surfaced** (ZZ analogue of `Tj_orderMinus_decomp`). -/
+/-- **Per-`j` three-way ZZ split with `d̂_ZZ` surfaced.**  `[T_j, ô⁻]` with
+`T_j = (ô⁺)^j G_ZZ (ô⁺)^r` and `G_ZZ = [Ĥ_ZZ, ô⁺]` splits as `(ô⁺)^j G_ZZ [(ô⁺)^r, ô⁻]` (S2)
+`− (ô⁺)^j d̂_ZZ (ô⁺)^r` (S1) `+ [(ô⁺)^j, ô⁻] G_ZZ (ô⁺)^r` (S3), via the triple Leibniz rule plus
+`[G_ZZ, ô⁻] = −d̂_ZZ`. -/
 theorem zz_Tj_orderMinus_decomp (d L N j r : ℕ) [NeZero L] :
     (staggeredOrderDensityOpS d L N true ^ j
         * (zzHamiltonianS d L N * staggeredOrderDensityOpS d L N true
@@ -787,7 +801,9 @@ theorem zz_Tj_orderMinus_decomp (d L N j r : ℕ) [NeZero L] :
           * staggeredOrderDensityOpS d L N true ^ r := by
   rw [mul_mul_commutator_decomp, zz_order_nested_eq_neg_zzDoubleComm]
 
-/-- **Per-`(j,k)` ZZ term bound** (ZZ analogue of `tower_jk_term_bound`). -/
+/-- **Per-`(j,k)` ZZ term bound.**  The sandwiched commutator `(ô⁻)^k [T_j, ô⁻] (ô⁻)^{M-1-k}`
+decomposes into the ZZ S1 middle, S2 and S3 parts; the triangle inequality plus the three part
+bounds yields the total bound. -/
 theorem zz_tower_jk_term_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
     (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
     (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
@@ -856,8 +872,9 @@ theorem zz_tower_jk_term_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL
   · exact zz_s2_part_bound d L N M j k hN hL Φ hsing hq₀ hm0 hratio hj hk hcond3 hbudget3
   · exact zz_s3_part_bound d L N M j k hN hL Φ hsing hq₀ hm0 hratio hj hk hcond3 hbudget3
 
-/-- **ZZ numerator double-commutator bound** (ZZ analogue of `tower_numerator_bound`; identical RHS
-shape).  Bounds `⟨Φ, [(ô⁻)^M, [Ĥ_ZZ, (ô⁺)^M]] Φ⟩` by the `M²` per-`(j,k)` terms. -/
+/-- **ZZ numerator double-commutator bound.**  Bounds `⟨Φ, [(ô⁻)^M, [Ĥ_ZZ, (ô⁺)^M]] Φ⟩` by the
+`M²` per-`(j,k)` terms.  The right-hand side has the same shape, and the same constants
+`96 d N⁴/V` and `24 d N³`, as the Heisenberg numerator bound. -/
 theorem zz_tower_numerator_bound (d L N M : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
     (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
     (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
