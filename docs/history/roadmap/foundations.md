@@ -132,8 +132,9 @@ spin-`1/2` specialisations in `Quantum/TotalSpin.lean` —
 `spinHalfOp1_onSite_commutator_spinHalfOp2_onSite`,
 `spinHalfOp2_onSite_commutator_spinHalfOp3_onSite` and
 `spinHalfOp3_onSite_commutator_spinHalfOp1_onSite` — were retired: each was the single `rw` chain
-composing those two ingredients, and no Lean file referenced them. Both ingredients remain in the
-library with their own consumers.
+composing those two ingredients with `onSite_smul` (`Quantum/ManyBody.lean`) to restate the
+commutator in the `c • onSite x Sγ` form the statement quotes, and no Lean file referenced them.
+All three ingredients remain in the library with their own consumers.
 
 The neighbouring milestone P1f (eq. (2.2.6) at `x ≠ y`) is unaffected: its named wrapper
 `spinHalfOp_onSite_comm_of_ne` keeps its statement in `Quantum/TotalSpin.lean`.

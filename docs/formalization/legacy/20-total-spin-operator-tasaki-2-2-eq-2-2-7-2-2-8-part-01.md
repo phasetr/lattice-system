@@ -248,15 +248,15 @@ the site-wise `onSite_spinHalfOpPlus/Minus_mulVec_basisVec`, the definitions
 `totalSpinHalfOp3_mulVec_basisVec` / `_eq_magnetization` all keep their statements and consumers.
 
 Nothing mathematical is lost. Each retirement satisfies one criterion: the retired statement was a
-one-line specialisation of a declaration that is still present in the library and still consumed.
-Concretely:
+specialisation of a declaration that is still present in the library and still consumed, reachable
+without introducing new proof ideas. Concretely:
 
 - the `x = y` case of Tasaki eq. (2.2.6) is the generic `onSite_commutator_same`
   (`Quantum/ManyBody.lean`) composed with the single-site commutators
-  `spinHalfOp{1,2,3}_commutator_spinHalfOp{2,3,1}` (`Quantum/SpinHalf.lean`); each retired
-  spin specialisation was exactly that one `rw` chain, and both ingredients keep their consumers
-  (`onSite_commutator_same` is used in `Quantum/TotalSpin.lean` and
-  `Quantum/TotalSpin/Casimir.lean`);
+  `spinHalfOp{1,2,3}_commutator_spinHalfOp{2,3,1}` (`Quantum/SpinHalf.lean`) and `onSite_smul`
+  (`Quantum/ManyBody.lean`); each retired spin specialisation was exactly that three-lemma `rw`
+  chain, and all three ingredients keep their consumers (`onSite_commutator_same` and `onSite_smul`
+  are used in `Quantum/TotalSpin.lean` and `Quantum/TotalSpin/Casimir.lean`);
 - `_all_up` and `_all_down` were the `s := 0` and `s := 1` instantiations of the surviving
   `totalSpinHalfOp3_mulVec_basisVec_const`;
 - `(Ŝ^±_tot)† = Ŝ^∓_tot` is the site-wise sum of the surviving single-site
@@ -264,13 +264,38 @@ Concretely:
   Jordan–Wigner layer) transported through `onSite_conjTranspose` and `Matrix.conjTranspose_sum`;
 - `Ŝ^±_tot · |σ⟩` as a sum of site-wise actions is the `Finset.sum` of the surviving
   `onSite_spinHalfOpPlus/Minus_mulVec_basisVec`, which are the forms the library actually consumes
-  (`Quantum/SpinDot/Core.lean`, `Fermion/JordanWigner/AnnihilationCreationBasisVec.lean`).
+  (`Quantum/SpinDot/Core.lean`, `Fermion/JordanWigner/AnnihilationCreationBasisVec.lean`); the
+  retired total-operator forms did not add a new proof idea over the surviving site-wise lemmas —
+  the reduction is a `Finset.sum_comm` reindexing, not a one-line rewrite (they carry no numbered
+  book equation of their own, so the reachability criterion, not a self-standing citation, is what
+  justifies the retirement).
 
-The criterion is applied only to declarations that carry no numbered book equation of their own. A
-statement that is the sole Lean rendering of a numbered Tasaki equation is kept even when no Lean
-file references it: `spinHalfOp_onSite_comm_of_ne` (eq. (2.2.6) at `x ≠ y`) and
-`totalSpinHalfOp{Minus,Plus}_mulVec_basisVec_all_{down,up}` (the §2.4 eq. (2.4.9) ladder
-terminations) are therefore untouched.
+The criterion above is applied only to declarations that carry no numbered book equation of their
+own; declarations that are, individually, a Lean rendering of a numbered Tasaki equation are
+evaluated on that separate ground instead, and are kept when removing them would leave a book
+equation without any statement referencing it. That is what protects
+`spinHalfOp_onSite_comm_of_ne`: it is the only Lean statement of eq. (2.2.6) at `x ≠ y` that carries
+a `x ≠ y` hypothesis (the underlying fact is otherwise stated only as the unconditional
+`onSite_mul_onSite_of_ne`, and as prose in the `Quantum/TotalSpin.lean` module header and
+`Quantum/ManyBody.lean:261-266`); it is retained as the named `x ≠ y` witness rather than as an
+unreferenced specialisation. It does *not* apply to
+`totalSpinHalfOp{Minus,Plus}_mulVec_basisVec_all_{down,up}`: eq. (2.4.9) itself (the ferromagnetic
+ground-state ladder `|Φ_M⟩ ∝ (Ŝtot^∓)^{Smax∓M} |Φ↑/↓⟩`) is stated independently, and with more
+content, in `Quantum/TotalSpin/Casimir.lean:201-255`,
+`Quantum/MagnetizationSubspace.lean:44-59` and `Quantum/SpinDot/Hamiltonian.lean:183-236`. The two
+`_all_{down,up}` lemmas instead record the `k`-boundary annihilation
+(`Ŝtot^∓ · |Φ↑/↓⟩ = 0`) that the ladder's induction step needs; they are untouched not because they
+are a sole book-equation witness, but because they are not one-line specialisations of any
+surviving declaration (they are the base case the surviving `Finset.sum_eq_zero` argument over
+`onSite_spinHalfOp{Plus,Minus}_mulVec_basisVec` is built from, and no other declaration restates
+that base case).
+
+The three same-site commutator specialisations that *were* retired above are a different case from
+both of these: the fact they proved (the diagonal `x = y` case of eq. (2.2.6)) is independently and
+fully carried by the frozen-row / doc-comment prose at `Quantum/ManyBody.lean:261-266`
+(`## Same-site multiplication (Tasaki eq (2.2.6), x = y case)`), so the "sole Lean rendering of a
+numbered equation" ground did not apply to them either; they were removed purely under the
+reachability criterion above.
 
 The supplemental section on the private rotation core above needs no change: the three public
 families it names — `_commute_of_commute`, `_conjTranspose_mul_self` and

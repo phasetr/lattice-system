@@ -87,8 +87,9 @@ theorem totalSpinHalfOp3_isHermitian : (totalSpinHalfOp3 Λ).IsHermitian := by
 
 For `x ≠ y`, the site-embedded spin operators `onSite x Sα` and
 `onSite y Sβ` commute. This is exactly `onSite_mul_onSite_of_ne` from
-`ManyBody.lean`. We expose a Spin-1/2-specific named wrapper for use
-downstream.
+`ManyBody.lean`, specialised to a named `x ≠ y` wrapper: it is kept as the
+sole Lean statement of Tasaki eq. (2.2.6) at `x ≠ y` carrying an explicit
+`x ≠ y` hypothesis, even though it has no downstream consumer.
 -/
 
 /-- Distinct-site commutation for S = 1/2 spin operators: for `x ≠ y`,

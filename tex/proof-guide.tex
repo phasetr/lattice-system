@@ -746,9 +746,10 @@ Tasaki eq.~(2.2.6), namely
 $[\hat S_x^{(\alpha)}, \hat S_x^{(\beta)}]
   = i \sum_\gamma \varepsilon^{\alpha\beta\gamma} \hat S_x^{(\gamma)}$
 for $\alpha, \beta \in \{1, 2, 3\}$. In Lean each such specialization is
-the one-step rewrite of \texttt{onSite\_commutator\_same} by the
-corresponding single-site relation
-\texttt{spinHalfOp\{1,2,3\}\_commutator\_spinHalfOp\{2,3,1\}}.
+the rewrite of \texttt{onSite\_commutator\_same} by the corresponding
+single-site relation
+\texttt{spinHalfOp\{1,2,3\}\_commutator\_spinHalfOp\{2,3,1\}}, followed by
+\texttt{onSite\_smul} to put the scalar in front of the site embedding.
 \end{lemma}
 
 \begin{proof}
