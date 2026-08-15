@@ -136,8 +136,12 @@ composing those two ingredients with `onSite_smul` (`Quantum/ManyBody.lean`) to 
 commutator in the `c • onSite x Sγ` form the statement quotes, and no Lean file referenced them.
 All three ingredients remain in the library with their own consumers.
 
-The neighbouring milestone P1f (eq. (2.2.6) at `x ≠ y`) is unaffected: its named wrapper
-`spinHalfOp_onSite_comm_of_ne` keeps its statement in `Quantum/TotalSpin.lean`.
+The neighbouring milestone P1f (eq. (2.2.6) at `x ≠ y`) is likewise unchanged, and is realised by
+`onSite_mul_onSite_of_ne` (`Quantum/ManyBody.lean`), which states the distinct-site commutation for
+arbitrary single-site matrices under an explicit `i ≠ j` hypothesis and is consumed across the
+library. Its spin-`1/2` wrapper `spinHalfOp_onSite_comm_of_ne` in `Quantum/TotalSpin.lean` was
+retired: it applied that theorem verbatim under renamed variables, adding no hypothesis and no
+proof step, and no Lean file referenced it.
 
 <!-- legacy-source:start:132:132 -->
 ## P1f' (Tasaki §2.2): Total spin operator `Ŝ_tot^(α)` (eq. (2.2.7)) and Hermiticity

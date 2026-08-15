@@ -83,22 +83,6 @@ theorem totalSpinHalfOp3_isHermitian : (totalSpinHalfOp3 Λ).IsHermitian := by
   exact Matrix.isHermitian_sum Finset.univ
     (fun x _ => onSite_isHermitian x spinHalfOp3_isHermitian)
 
-/-! ## Distinct-site commutation (Tasaki eq 2.2.6, S = 1/2, `x ≠ y` case)
-
-For `x ≠ y`, the site-embedded spin operators `onSite x Sα` and
-`onSite y Sβ` commute. This is exactly `onSite_mul_onSite_of_ne` from
-`ManyBody.lean`, specialised to a named `x ≠ y` wrapper: it is kept as the
-sole Lean statement of Tasaki eq. (2.2.6) at `x ≠ y` carrying an explicit
-`x ≠ y` hypothesis, even though it has no downstream consumer.
--/
-
-/-- Distinct-site commutation for S = 1/2 spin operators: for `x ≠ y`,
-`Ŝ_x^(α) · Ŝ_y^(β) = Ŝ_y^(β) · Ŝ_x^(α)`. -/
-theorem spinHalfOp_onSite_comm_of_ne {x y : Λ} (hxy : x ≠ y)
-    (Sα Sβ : Matrix (Fin 2) (Fin 2) ℂ) :
-    onSite x Sα * onSite y Sβ = onSite y Sβ * onSite x Sα :=
-  onSite_mul_onSite_of_ne hxy Sα Sβ
-
 /-! ## Total raising/lowering operators (Tasaki eq (2.2.8)) -/
 
 /-- Total raising operator: `Ŝ^+_tot := Σ_{x ∈ Λ} Ŝ_x^+`. -/

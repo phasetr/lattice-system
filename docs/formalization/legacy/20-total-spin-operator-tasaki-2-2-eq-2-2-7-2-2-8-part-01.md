@@ -219,18 +219,19 @@ pattern, not the source of the coverage. Consequently the `szsz` correlator carr
 specialisation by design: the 2D case is obtained from the generic theorem exactly as the retired
 2D instances were.
 
-## Authoritative supplemental implementation record (Tasaki §2.2 same-site commutator, total ladder action and total adjoint instances)
+## Authoritative supplemental implementation record (Tasaki §2.2 distinct-site and same-site commutators, total ladder action and total adjoint instances)
 
 This section is maintained by hand, lies outside the migrated catalogue block above, and records
-the current state of four rows of that block. The migrated catalogue block is a frozen historical
+the current state of five rows of that block. The migrated catalogue block is a frozen historical
 record — its rows are pinned byte-for-byte by `scripts/check_docs_hierarchy.py` and are never
-edited for later deletions — so the rows
+edited for later deletions — so the rows `spinHalfOp_onSite_comm_of_ne`,
 `spinHalfOp{1,2,3}_onSite_commutator_spinHalfOp{2,3,1}_onSite`,
 `totalSpinHalfOpPlus/Minus_conjTranspose`, `totalSpinHalfOpPlus/Minus_mulVec_basisVec` and
 `totalSpinHalfOp3_mulVec_basisVec_const` / `_all_up` / `_all_down` describe membership as it stood
 at migration time.
 
 Retired from `Quantum/TotalSpin.lean`:
+`spinHalfOp_onSite_comm_of_ne`,
 `spinHalfOp1_onSite_commutator_spinHalfOp2_onSite`,
 `spinHalfOp2_onSite_commutator_spinHalfOp3_onSite`,
 `spinHalfOp3_onSite_commutator_spinHalfOp1_onSite`,
@@ -238,8 +239,9 @@ Retired from `Quantum/TotalSpin.lean`:
 `totalSpinHalfOpPlus_mulVec_basisVec`, `totalSpinHalfOpMinus_mulVec_basisVec`,
 `totalSpinHalfOpPlus_conjTranspose` and `totalSpinHalfOpMinus_conjTranspose`.
 
-Row by row: the same-site commutator row, the total adjoint row and the total ladder-action row
-have no member left in the library; the constant-configuration row keeps
+Row by row: the distinct-site commutation row, the same-site commutator row, the total adjoint row
+and the total ladder-action row have no member left in the library; the constant-configuration row
+keeps
 `totalSpinHalfOp3_mulVec_basisVec_const`, which is consumed by
 `Quantum/SpinDot/HamiltonianCore.lean`. Every other row of the block is untouched — in particular
 the site-wise `onSite_spinHalfOpPlus/Minus_mulVec_basisVec`, the definitions
@@ -251,6 +253,11 @@ Nothing mathematical is lost. Each retirement satisfies one criterion: the retir
 specialisation of a declaration that is still present in the library and still consumed, reachable
 without introducing new proof ideas. Concretely:
 
+- the `x ≠ y` case of Tasaki eq. (2.2.6) is `onSite_mul_onSite_of_ne` (`Quantum/ManyBody.lean`),
+  which is already stated for arbitrary single-site matrices under an explicit `i ≠ j` hypothesis
+  and is consumed across the library (for instance by the private rotation core recorded above);
+  the retired `spinHalfOp_onSite_comm_of_ne` applied it verbatim under renamed variables, adding no
+  hypothesis, no specialisation of the matrices and no proof step;
 - the `x = y` case of Tasaki eq. (2.2.6) is the generic `onSite_commutator_same`
   (`Quantum/ManyBody.lean`) composed with the single-site commutators
   `spinHalfOp{1,2,3}_commutator_spinHalfOp{2,3,1}` (`Quantum/SpinHalf.lean`) and `onSite_smul`
@@ -273,14 +280,12 @@ without introducing new proof ideas. Concretely:
 The criterion above is applied only to declarations that carry no numbered book equation of their
 own; declarations that are, individually, a Lean rendering of a numbered Tasaki equation are
 evaluated on that separate ground instead, and are kept when removing them would leave a book
-equation without any statement referencing it. That is what protects
-`spinHalfOp_onSite_comm_of_ne`: it is the only Lean statement of eq. (2.2.6) at `x ≠ y` that carries
-a `x ≠ y` hypothesis (the underlying fact is otherwise stated only as the unconditional
-`onSite_mul_onSite_of_ne`, and as prose in the `Quantum/TotalSpin.lean` module header and
-`Quantum/ManyBody.lean:261-266`); it is retained as the named `x ≠ y` witness rather than as an
-unreferenced specialisation. It does *not* apply to
-`totalSpinHalfOp{Minus,Plus}_mulVec_basisVec_all_{down,up}`: eq. (2.4.9) itself (the ferromagnetic
-ground-state ladder `|Φ_M⟩ ∝ (Ŝtot^∓)^{Smax∓M} |Φ↑/↓⟩`) is stated independently, and with more
+equation without any statement referencing it. `spinHalfOp_onSite_comm_of_ne` does not qualify on
+that ground: retiring it leaves eq. (2.2.6) at `x ≠ y` stated by `onSite_mul_onSite_of_ne`, which
+carries the `x ≠ y` hypothesis itself, and cited in prose by the `Quantum/TotalSpin.lean` module
+header and `Quantum/ManyBody.lean:261-266`. This ground does *not* apply to
+`totalSpinHalfOp{Minus,Plus}_mulVec_basisVec_all_{down,up}` either: eq. (2.4.9) itself
+(the ferromagnetic ground-state ladder `|Φ_M⟩ ∝ (Ŝtot^∓)^{Smax∓M} |Φ↑/↓⟩`) is stated independently, and with more
 content, in `Quantum/TotalSpin/Casimir.lean:201-255`,
 `Quantum/MagnetizationSubspace.lean:44-59` and `Quantum/SpinDot/Hamiltonian.lean:183-236`. The two
 `_all_{down,up}` lemmas instead record the `k`-boundary annihilation
@@ -291,8 +296,8 @@ surviving declaration (they are the base case the surviving `Finset.sum_eq_zero`
 that base case).
 
 The three same-site commutator specialisations that *were* retired above are a different case from
-both of these: the fact they proved (the diagonal `x = y` case of eq. (2.2.6)) is independently and
-fully carried by the frozen-row / doc-comment prose at `Quantum/ManyBody.lean:261-266`
+the `_all_{down,up}` pair: the fact they proved (the diagonal `x = y` case of eq. (2.2.6)) is
+independently and fully carried by the doc-comment prose at `Quantum/ManyBody.lean:261-266`
 (`## Same-site multiplication (Tasaki eq (2.2.6), x = y case)`), so the "sole Lean rendering of a
 numbered equation" ground did not apply to them either; they were removed purely under the
 reachability criterion above.
