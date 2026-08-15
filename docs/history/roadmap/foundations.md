@@ -117,6 +117,27 @@ Done
 Done
 <!-- legacy-source:end:131:131 -->
 
+## Authoritative supplemental implementation record (P1f-same: same-site commutation)
+
+This section is maintained by hand, lies outside the migrated blocks on this page, and records the
+current implementation of the P1f-same milestone above. That block is a frozen historical record —
+it is pinned byte-for-byte by `scripts/check_docs_hierarchy.py` and is never edited for later
+relocations or deletions.
+
+The milestone itself is unchanged: Tasaki eq. (2.2.6) at `x = y` is realised by the generic
+`onSite_commutator_same` (`Quantum/ManyBody.lean`), which lifts any single-site commutator through
+the site embedding, applied to the single-site relations
+`spinHalfOp{1,2,3}_commutator_spinHalfOp{2,3,1}` (`Quantum/SpinHalf.lean`). The three named
+spin-`1/2` specialisations in `Quantum/TotalSpin.lean` —
+`spinHalfOp1_onSite_commutator_spinHalfOp2_onSite`,
+`spinHalfOp2_onSite_commutator_spinHalfOp3_onSite` and
+`spinHalfOp3_onSite_commutator_spinHalfOp1_onSite` — were retired: each was the single `rw` chain
+composing those two ingredients, and no Lean file referenced them. Both ingredients remain in the
+library with their own consumers.
+
+The neighbouring milestone P1f (eq. (2.2.6) at `x ≠ y`) is unaffected: its named wrapper
+`spinHalfOp_onSite_comm_of_ne` keeps its statement in `Quantum/TotalSpin.lean`.
+
 <!-- legacy-source:start:132:132 -->
 ## P1f' (Tasaki §2.2): Total spin operator `Ŝ_tot^(α)` (eq. (2.2.7)) and Hermiticity
 

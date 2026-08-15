@@ -219,6 +219,63 @@ pattern, not the source of the coverage. Consequently the `szsz` correlator carr
 specialisation by design: the 2D case is obtained from the generic theorem exactly as the retired
 2D instances were.
 
+## Authoritative supplemental implementation record (Tasaki §2.2 same-site commutator, total ladder action and total adjoint instances)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+the current state of four rows of that block. The migrated catalogue block is a frozen historical
+record — its rows are pinned byte-for-byte by `scripts/check_docs_hierarchy.py` and are never
+edited for later deletions — so the rows
+`spinHalfOp{1,2,3}_onSite_commutator_spinHalfOp{2,3,1}_onSite`,
+`totalSpinHalfOpPlus/Minus_conjTranspose`, `totalSpinHalfOpPlus/Minus_mulVec_basisVec` and
+`totalSpinHalfOp3_mulVec_basisVec_const` / `_all_up` / `_all_down` describe membership as it stood
+at migration time.
+
+Retired from `Quantum/TotalSpin.lean`:
+`spinHalfOp1_onSite_commutator_spinHalfOp2_onSite`,
+`spinHalfOp2_onSite_commutator_spinHalfOp3_onSite`,
+`spinHalfOp3_onSite_commutator_spinHalfOp1_onSite`,
+`totalSpinHalfOp3_mulVec_basisVec_all_up`, `totalSpinHalfOp3_mulVec_basisVec_all_down`,
+`totalSpinHalfOpPlus_mulVec_basisVec`, `totalSpinHalfOpMinus_mulVec_basisVec`,
+`totalSpinHalfOpPlus_conjTranspose` and `totalSpinHalfOpMinus_conjTranspose`.
+
+Row by row: the same-site commutator row, the total adjoint row and the total ladder-action row
+have no member left in the library; the constant-configuration row keeps
+`totalSpinHalfOp3_mulVec_basisVec_const`, which is consumed by
+`Quantum/SpinDot/HamiltonianCore.lean`. Every other row of the block is untouched — in particular
+the site-wise `onSite_spinHalfOpPlus/Minus_mulVec_basisVec`, the definitions
+`totalSpinHalfOpPlus` / `totalSpinHalfOpMinus` with their eq. (2.2.8) forms
+`totalSpinHalfOpPlus_eq_add` / `totalSpinHalfOpMinus_eq_sub`, the Cartan ladder relations, and
+`totalSpinHalfOp3_mulVec_basisVec` / `_eq_magnetization` all keep their statements and consumers.
+
+Nothing mathematical is lost. Each retirement satisfies one criterion: the retired statement was a
+one-line specialisation of a declaration that is still present in the library and still consumed.
+Concretely:
+
+- the `x = y` case of Tasaki eq. (2.2.6) is the generic `onSite_commutator_same`
+  (`Quantum/ManyBody.lean`) composed with the single-site commutators
+  `spinHalfOp{1,2,3}_commutator_spinHalfOp{2,3,1}` (`Quantum/SpinHalf.lean`); each retired
+  spin specialisation was exactly that one `rw` chain, and both ingredients keep their consumers
+  (`onSite_commutator_same` is used in `Quantum/TotalSpin.lean` and
+  `Quantum/TotalSpin/Casimir.lean`);
+- `_all_up` and `_all_down` were the `s := 0` and `s := 1` instantiations of the surviving
+  `totalSpinHalfOp3_mulVec_basisVec_const`;
+- `(Ŝ^±_tot)† = Ŝ^∓_tot` is the site-wise sum of the surviving single-site
+  `spinHalfOp{Plus,Minus}_conjTranspose` (`Quantum/SpinHalfBasis.lean`, consumed by the
+  Jordan–Wigner layer) transported through `onSite_conjTranspose` and `Matrix.conjTranspose_sum`;
+- `Ŝ^±_tot · |σ⟩` as a sum of site-wise actions is the `Finset.sum` of the surviving
+  `onSite_spinHalfOpPlus/Minus_mulVec_basisVec`, which are the forms the library actually consumes
+  (`Quantum/SpinDot/Core.lean`, `Fermion/JordanWigner/AnnihilationCreationBasisVec.lean`).
+
+The criterion is applied only to declarations that carry no numbered book equation of their own. A
+statement that is the sole Lean rendering of a numbered Tasaki equation is kept even when no Lean
+file references it: `spinHalfOp_onSite_comm_of_ne` (eq. (2.2.6) at `x ≠ y`) and
+`totalSpinHalfOp{Minus,Plus}_mulVec_basisVec_all_{down,up}` (the §2.4 eq. (2.4.9) ladder
+terminations) are therefore untouched.
+
+The supplemental section on the private rotation core above needs no change: the three public
+families it names — `_commute_of_commute`, `_conjTranspose_mul_self` and
+`_conj_eq_self_of_commute` — all keep their statements and proofs.
+
 ---
 
 [← The AKLT model (Tasaki §7.1)](/lattice-system/formalization/legacy/19-the-aklt-model-tasaki-7-1/) · [Catalogue](/lattice-system/formalization/legacy/) · [Total spin operator (Tasaki §2.2 eq. (2.2.7), (2.2.8)) →](/lattice-system/formalization/legacy/20-total-spin-operator-tasaki-2-2-eq-2-2-7-2-2-8-part-02/)
