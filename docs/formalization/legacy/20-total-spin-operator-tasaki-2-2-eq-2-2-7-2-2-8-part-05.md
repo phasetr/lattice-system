@@ -97,6 +97,12 @@ that file and declaration have since been retired, and the paragraph below recor
 spin-`S` replacement. The same holds for the frozen rows naming
 `Quantum/MarshallLiebMattis/ToyHamiltonianCasimir.lean` (on this page and on part 3 of this
 catalogue): that file has been retired as well, and its current spin-`S` home is recorded below.
+It holds likewise for the frozen rows on part 3 of this catalogue naming
+`Quantum/MarshallLiebMattis/SublatticeSpinLadderProperties.lean`,
+`Quantum/MarshallLiebMattis/SublatticeSpinLadderPropertiesCore.lean`,
+`Quantum/MarshallLiebMattis/SublatticeSpinRealness.lean` and
+`Quantum/MarshallLiebMattis/SublatticeSpinRealnessCore.lean`: those files have been retired, and
+their current spin-`S` home is recorded below.
 
 | Lean name | Statement | File |
 |---|---|---|
@@ -130,6 +136,20 @@ the `N = 1` case, reached through the bridges above. Regression coverage lives i
 `LatticeSystem/Tests/SpinSToyHamiltonianCasimir.lean`, and the spin-`1/2` readings of the total
 Casimir / axis commutators and of the symmetry of `Ĥ_toy` are exercised as bridge transfers in
 `LatticeSystem/Tests/SpinHalfSpecializationMultiSite.lean`.
+
+The sublattice ladder and realness statements — the annihilation of configurations extremal on `A`
+and of the all-aligned states by `Ŝ_A^±`, the adjoint relations `(Ŝ_A^+)† = Ŝ_A^-` and
+`(Ŝ_A^-)† = Ŝ_A^+`, the shift of the magnetisation subspace by `Ŝ_A^±`, the sublattice Cartan
+identities `Ŝ_A^+ Ŝ_A^- = (Ŝ_A^{(1)})² + (Ŝ_A^{(2)})² + Ŝ_A^{(3)}` and
+`Ŝ_A^- Ŝ_A^+ = (Ŝ_A^{(1)})² + (Ŝ_A^{(2)})² − Ŝ_A^{(3)}` with the commutator
+`[Ŝ_A^+, Ŝ_A^-] = 2 · Ŝ_A^{(3)}`, the cross-axis identity
+`Ŝ_A^{(1)} Ŝ_B^{(1)} + Ŝ_A^{(2)} Ŝ_B^{(2)} = ½ (Ŝ_A^+ Ŝ_B^- + Ŝ_A^- Ŝ_B^+)`, the commutativity of
+ladder operators on complementary sublattices, the matrix-element realness of the sublattice axis-1
+/ axis-3 and ladder operators, and the `conjTranspose` form `(Ŝ_A^{(α)})² = (Ŝ_A^{(α)})ᴴ Ŝ_A^{(α)}`
+— have a single home in `Quantum/SpinS/SublatticeSpinLadder.lean`,
+`Quantum/SpinS/SublatticeSpinLadderDef.lean` and
+`Quantum/SpinS/SublatticeSpinLadderDefCore.lean`, stated for arbitrary spin-`S`; the spin-`1/2`
+reading is the `N = 1` case, reached through the bridges above.
 
 ---
 
