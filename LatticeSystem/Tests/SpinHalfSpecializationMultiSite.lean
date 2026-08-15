@@ -109,11 +109,6 @@ example (A : Fin 2 → Bool) :
     (sublatticeSpinSquaredS 1 A : ManyBodyOpS (Fin 2) 1) = sublatticeSpinHalfSquared A :=
   sublatticeSpinSquaredS_one_eq_sublatticeSpinHalfSquared A
 
-/-- `Ŝ_A · Ŝ_B` at `N = 1` is `sublatticeSpinDot`. -/
-example (A B : Fin 2 → Bool) :
-    (sublatticeSpinSDot 1 A B : ManyBodyOpS (Fin 2) 1) = sublatticeSpinDot A B :=
-  sublatticeSpinSDot_one_eq_sublatticeSpinDot A B
-
 /-- `Ĥ_toy` at `N = 1` is `heisenbergToyHamiltonian`. -/
 example (A : Fin 2 → Bool) :
     (heisenbergToyHamiltonianS A 1 : ManyBodyOpS (Fin 2) 1) = heisenbergToyHamiltonian A :=

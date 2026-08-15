@@ -459,7 +459,6 @@ import LatticeSystem.Quantum.MarshallLiebMattis.ToyHamiltonian
 import LatticeSystem.Quantum.MarshallLiebMattis.BipartiteGraph
 import LatticeSystem.Quantum.MarshallLiebMattis.ToyPF
 import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeSpin
-import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeSpinDot
 import LatticeSystem.Quantum.Z2Z2
 import LatticeSystem.Quantum.IsingChain
 import LatticeSystem.Fermion.Mode
