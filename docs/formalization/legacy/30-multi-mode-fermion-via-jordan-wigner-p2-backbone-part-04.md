@@ -150,8 +150,8 @@ This section is maintained by hand, lies outside the migrated catalogue block ab
 current membership of the open-chain and periodic Hubbard Gibbs expectation companion families in
 `Fermion/JordanWigner/Hubbard/Graph.lean`. The migrated catalogue block above is a frozen historical
 record — its rows are pinned byte-for-byte by `scripts/check_docs_hierarchy.py` and are never edited
-for later deletions or relocations, so the two brace-style family rows and the phrase "same family as
-the open chain" describe membership as it stood at migration time.
+for later deletions or relocations, so the two slash-separated stem-shorthand family rows and the
+phrase "same family as the open chain" describe membership as it stood at migration time.
 
 The open chain retains `hubbardChainGibbsExpectation_zero`,
 `hubbardChainGibbsExpectation_hamiltonian_im`, `hubbardChainGibbsExpectation_hamiltonian_pow_im`,
