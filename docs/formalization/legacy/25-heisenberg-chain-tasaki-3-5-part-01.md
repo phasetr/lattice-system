@@ -143,10 +143,15 @@ The generic primitives those specializations apply — `gibbsExpectation_zero`,
 `gibbsExpectation_im_of_isHermitian`, `gibbsExpectation_commutator_hamiltonian`,
 `gibbsExpectation_mul_hamiltonian_im`, `gibbsExpectation_sq_im_of_isHermitian`,
 `gibbsExpectation_pow_im_of_isHermitian`, `gibbsExpectation_anticommutator_im`,
-`gibbsExpectation_commutator_re`, `gibbsVariance_im_of_isHermitian`,
-`gibbsExpectation_ofReal_re_eq_of_isHermitian` and `gibbsState_pow_trace` — are unchanged in
+`gibbsExpectation_commutator_re` and `gibbsState_pow_trace` — are unchanged in
 `Quantum/GibbsState.lean` / `Quantum/GibbsState/Covariance.lean` and are exercised directly at the
-generic index type by `LatticeSystem/Tests/GibbsState.lean`.
+generic index type by `LatticeSystem/Tests/GibbsState.lean`. The two further primitives
+`gibbsVariance_im_of_isHermitian` (`Quantum/GibbsState/Covariance.lean`) and
+`gibbsExpectation_ofReal_re_eq_of_isHermitian` (`Quantum/GibbsState.lean`) are unchanged as well,
+but they have no direct test in `LatticeSystem/Tests/GibbsState.lean`; they are consumed by the
+surviving named-model companions in `Quantum/IsingChain.lean`, `Quantum/HeisenbergChain/Gibbs.lean`,
+`Quantum/HeisenbergLattice/CompanionsCore.lean` and
+`Fermion/JordanWigner/Hubbard/Graph.lean`.
 
 ---
 
