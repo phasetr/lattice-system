@@ -16903,6 +16903,32 @@ $N = 1$ ($S = 1/2$), each generic spin-`S` operator reduces to the
 corresponding half-Pauli matrix, providing a direct bridge between
 the generic and spin-`1/2` formalisms.
 
+\textbf{Many-body spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
+(PR~\#5250)}: the new file
+\texttt{Quantum/SpinS/SpinHalfSpecializationMultiSite.lean} lifts the
+single-site specialisation to the many-body layer.  Since
+\texttt{ManyBodyOpS $\Lambda$ 1} and \texttt{ManyBodyOp $\Lambda$} are
+definitionally equal ($\textsf{Fin}\,(1+1)$ versus $\textsf{Fin}\,2$), the
+identities \texttt{onSiteS\_one\_eq\_onSite},
+\texttt{spinSDot\_one\_eq\_spinHalfDot},
+\texttt{heisenbergHamiltonianS\_one\_eq\_heisenbergHamiltonian},
+\texttt{totalSpinSOp\{1,2,3\}\_one\_eq\_totalSpinHalfOp\{1,2,3\}},
+\texttt{totalSpinSSquared\_one\_eq\_totalSpinHalfSquared},
+\texttt{basisVecS\_one\_eq\_basisVec},
+\texttt{neelConfigOfS\_one\_eq\_neelConfigOf} and
+\texttt{neelStateOfS\_one\_eq\_neelStateOf} hold without any cast; the last
+two pin the N\'eel orientation ($A\mapsto\uparrow$,
+$\neg A\mapsto\downarrow$) common to the two developments.  The companion
+file \texttt{Quantum/SpinS/SpinHalfSpecializationSublattice.lean} does the
+same for the sublattice layer
+(\texttt{sublatticeSpinSOp\{1,2,3\}}, \texttt{sublatticeSpinSOp\{Plus,Minus\}},
+\texttt{sublatticeSpinSquaredS}, \texttt{sublatticeSpinSDot} and
+\texttt{heisenbergToyHamiltonianS}), whose spin-`1/2` counterparts live in
+\texttt{Quantum/MarshallLiebMattis/}; it is a scaffolding layer covering
+exactly those spin-`1/2` sublattice objects that still carry their own
+definitions.  Reference: Tasaki, Springer 2020, \S2.2 eq.~(2.2.13), p.~27,
+and \S2.5 eqs.~(2.5.2), (2.5.10)--(2.5.11), pp.~37, 40--42.
+
 \textbf{Single-site $\hat{S}^{(3)}_x$ expectations on $|c..c\rangle$
 (PR~\#925)}: the new file
 \texttt{Quantum/SpinS/SingleSiteZExpectation.lean} proves
