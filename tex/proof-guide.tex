@@ -745,10 +745,10 @@ $\hat S^{(\alpha)}, \hat S^{(\beta)}$ recovers the $x = y$ case of
 Tasaki eq.~(2.2.6), namely
 $[\hat S_x^{(\alpha)}, \hat S_x^{(\beta)}]
   = i \sum_\gamma \varepsilon^{\alpha\beta\gamma} \hat S_x^{(\gamma)}$
-for $\alpha, \beta \in \{1, 2, 3\}$. Lean names:
-\texttt{spinHalfOp1\_onSite\_commutator\_spinHalfOp2\_onSite},
-\texttt{spinHalfOp2\_onSite\_commutator\_spinHalfOp3\_onSite},
-\texttt{spinHalfOp3\_onSite\_commutator\_spinHalfOp1\_onSite}.
+for $\alpha, \beta \in \{1, 2, 3\}$. In Lean each such specialization is
+the one-step rewrite of \texttt{onSite\_commutator\_same} by the
+corresponding single-site relation
+\texttt{spinHalfOp\{1,2,3\}\_commutator\_spinHalfOp\{2,3,1\}}.
 \end{lemma}
 
 \begin{proof}
@@ -1273,8 +1273,6 @@ formalization of Tasaki \S2.1 and \S2.2.
 \item \texttt{onSite\_mul\_onSite\_same},
   \texttt{onSite\_commutator\_same}: same-site product / commutator
   (Tasaki eq.~(2.2.6) diagonal).
-\item \texttt{spinHalfOp\{1,2,3\}\_onSite\_commutator\_spinHalfOp\{2,3,1\}\_onSite}:
-  same-site spin commutators.
 \item \texttt{onSite\_commutator\_totalOnSite}: generic
   $[\texttt{onSite}\,x\,A, \sum_z \texttt{onSite}\,z\,B]
    = \texttt{onSite}\,x\,[A, B]$.
@@ -1283,9 +1281,8 @@ formalization of Tasaki \S2.1 and \S2.2.
   eq.~(2.2.1)/(2.2.4)).
 \item \texttt{totalSpinHalfOpPlus}, \texttt{totalSpinHalfOpMinus},
   \texttt{totalSpinHalfOpPlus\_eq\_add},
-  \texttt{totalSpinHalfOpMinus\_eq\_sub},
-  \texttt{totalSpinHalfOpPlus/Minus\_conjTranspose}:
-  $\hat S^{\pm}_{\rm tot}$ and adjoints (Tasaki eq.~(2.2.8)).
+  \texttt{totalSpinHalfOpMinus\_eq\_sub}:
+  $\hat S^{\pm}_{\rm tot}$ (Tasaki eq.~(2.2.8)).
 \item \texttt{totalSpinHalfOp\{1,2,3\}\_commutator\_totalSpinHalfOp\{2,3,1\}}:
   total-spin commutators.
 \item \texttt{totalSpinHalfOp3\_commutator\_totalSpinHalfOpPlus/Minus}:
@@ -1304,9 +1301,8 @@ formalization of Tasaki \S2.1 and \S2.2.
   \texttt{totalSpinHalfOp3\_mulVec\_basisVec\_eq\_magnetization}:
   $\hat S^{(3)}_{\rm tot}$ eigenvalues on basis states (Tasaki
   eq.~(2.2.10)).
-\item \texttt{onSite\_spinHalfOpPlus/Minus\_mulVec\_basisVec},
-  \texttt{totalSpinHalfOpPlus/Minus\_mulVec\_basisVec}: raising and
-  lowering action on basis states.
+\item \texttt{onSite\_spinHalfOpPlus/Minus\_mulVec\_basisVec}: site-wise
+  raising and lowering action on basis states.
 \item \texttt{spinHalfDot}, \texttt{spinHalfDot\_eq\_plus\_minus}:
   two-site inner product $\hat S_x \cdot \hat S_y$ and its
   raising/lowering decomposition (Tasaki eq.~(2.2.16)).
@@ -1402,20 +1398,19 @@ formalization of Tasaki \S2.1 and \S2.2.
   \texttt{LinearMap.continuous\_of\_finiteDimensional}), and
   \texttt{Matrix.exp\_sum\_of\_commute} for the commuting site
   embeddings.
-\item \texttt{totalSpinHalfRot\{1,2,3\}\_commute\_of\_commute},
-  \texttt{totalSpinHalfOp\{Plus,Minus\}\_exp\_commute\_of\_commute}:
+\item \texttt{totalSpinHalfRot\{1,2,3\}\_commute\_of\_commute}:
   Tasaki eq.~(2.2.12)$\to$ commutativity with $\hat U$.
   $\mathrm{Commute}\,A\,\hat S^{(\alpha)}_{\rm tot}
-    \Rightarrow \mathrm{Commute}\,A\,\hat U^{(\alpha)}_{\theta,{\rm tot}}$
-  (and its $\hat S^{\pm}_{\rm tot}$ ladder analogue). Proof: rewrite
-  $\hat U$ via \texttt{\_eq\_exp}, then invoke
+    \Rightarrow \mathrm{Commute}\,A\,\hat U^{(\alpha)}_{\theta,{\rm tot}}$.
+  Proof: rewrite $\hat U$ via \texttt{\_eq\_exp}, then invoke
   \texttt{Commute.smul\_right} and \texttt{Commute.exp\_right}.
 \item \texttt{totalSpinHalfRot\{1,2,3\}\_conjTranspose\_mul\_self}:
   unitarity $(\hat U^{(\alpha)}_{\theta,{\rm tot}})^\dagger
   \hat U^{(\alpha)}_{\theta,{\rm tot}} = \hat 1$. Derived from
   \texttt{NormedSpace.exp\_mem\_unitary\_of\_mem\_skewAdjoint} after
   recognising $-i\theta\,\hat S^{(\alpha)}_{\rm tot}$ as skew-adjoint
-  (the helper \texttt{neg\_I\_mul\_real\_skewAdjoint\_smul\_isHermitian}).
+  (the helper
+  \texttt{neg\_I\_mul\_real\_smul\_isHermitian\_mem\_skewAdjoint}).
   Same Frobenius topology bridge with explicit \texttt{@}-notation as
   \texttt{onSite\_exp\_eq\_exp\_onSite}.
 \item \texttt{totalSpinHalfRot\{1,2,3\}\_conj\_eq\_self\_of\_commute}:
