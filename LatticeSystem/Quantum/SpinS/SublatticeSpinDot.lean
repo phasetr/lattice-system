@@ -7,7 +7,6 @@ import LatticeSystem.Quantum.SpinS.SpinSDotAllAlignedLast
 /-!
 # Spin-`S` cross-sublattice spin dot product (Tasaki §2.5 Theorem 2.3 prep)
 
-Spin-`S` analog of `Quantum/MarshallLiebMattis/SublatticeSpinDot.lean`.
 The cross-sublattice spin dot product
 
   `Ŝ_A · Ŝ_B := Σ_α Ŝ_A^(α) Ŝ_B^(α)`

@@ -1,8 +1,7 @@
 import LatticeSystem.Quantum.SpinS.SpinHalfSpecializationMultiSite
-import LatticeSystem.Quantum.SpinS.SublatticeSpinDot
 import LatticeSystem.Quantum.SpinS.SublatticeSpinLadderDefCore
 import LatticeSystem.Quantum.SpinS.ToyHamiltonian
-import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeSpinDot
+import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeSpin
 import LatticeSystem.Quantum.MarshallLiebMattis.ToyHamiltonian
 
 /-!
@@ -17,8 +16,7 @@ equal the spin-`1/2` sublattice operators of
 Covered objects: the sublattice spin components
 (`sublatticeSpinSOp{1,2,3}`), the sublattice ladder operators
 (`sublatticeSpinSOp{Plus,Minus}`), the sublattice Casimir
-(`sublatticeSpinSquaredS`), the cross-sublattice inner product
-(`sublatticeSpinSDot`), and the MLM toy Hamiltonian
+(`sublatticeSpinSquaredS`), and the MLM toy Hamiltonian
 (`heisenbergToyHamiltonianS`).
 
 Unlike `SpinHalfSpecializationMultiSite.lean`, this module refers to
@@ -79,7 +77,7 @@ theorem sublatticeSpinSOpMinus_one_eq_sublatticeSpinHalfOpMinus (A : Λ → Bool
   rw [spinSOpMinus_one_eq_spinHalfOpMinus]
   simp only [onSiteS_one_eq_onSite]
 
-/-! ## Sublattice Casimir and cross-sublattice inner product -/
+/-! ## Sublattice Casimir -/
 
 /-- `(Ŝ_A)² = Σ_α (Ŝ_A^{(α)})²` at `N = 1` is the spin-`1/2`
 sublattice Casimir (Tasaki §2.5 eq. (2.5.11)). -/
@@ -88,18 +86,6 @@ theorem sublatticeSpinSquaredS_one_eq_sublatticeSpinHalfSquared (A : Λ → Bool
   unfold sublatticeSpinSquaredS sublatticeSpinHalfSquared
   rw [sublatticeSpinSOp1_one_eq_sublatticeSpinHalfOp1,
     sublatticeSpinSOp2_one_eq_sublatticeSpinHalfOp2,
-    sublatticeSpinSOp3_one_eq_sublatticeSpinHalfOp3]
-
-/-- `Ŝ_A · Ŝ_B = Σ_α Ŝ_A^{(α)} Ŝ_B^{(α)}` at `N = 1` is the spin-`1/2`
-cross-sublattice inner product (Tasaki §2.5 eq. (2.5.10)). -/
-theorem sublatticeSpinSDot_one_eq_sublatticeSpinDot (A B : Λ → Bool) :
-    (sublatticeSpinSDot 1 A B : ManyBodyOpS Λ 1) = sublatticeSpinDot A B := by
-  unfold sublatticeSpinSDot sublatticeSpinDot
-  rw [sublatticeSpinSOp1_one_eq_sublatticeSpinHalfOp1,
-    sublatticeSpinSOp1_one_eq_sublatticeSpinHalfOp1,
-    sublatticeSpinSOp2_one_eq_sublatticeSpinHalfOp2,
-    sublatticeSpinSOp2_one_eq_sublatticeSpinHalfOp2,
-    sublatticeSpinSOp3_one_eq_sublatticeSpinHalfOp3,
     sublatticeSpinSOp3_one_eq_sublatticeSpinHalfOp3]
 
 /-! ## Toy Hamiltonian -/

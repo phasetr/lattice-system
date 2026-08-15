@@ -102,12 +102,14 @@ It holds likewise for the frozen rows on part 3 of this catalogue naming
 `Quantum/MarshallLiebMattis/SublatticeSpinLadderPropertiesCore.lean`,
 `Quantum/MarshallLiebMattis/SublatticeSpinRealness.lean` and
 `Quantum/MarshallLiebMattis/SublatticeSpinRealnessCore.lean`: those files have been retired, and
-their current spin-`S` home is recorded below.
+their current spin-`S` home is recorded below. It holds finally for the frozen rows naming
+`Quantum/MarshallLiebMattis/SublatticeSpinDot.lean` (on this page and on part 3 of this
+catalogue): that file has been retired as well, and its current spin-`S` home is recorded below.
 
 | Lean name | Statement | File |
 |---|---|---|
 | `onSiteS_one_eq_onSite` / `spinSDot_one_eq_spinHalfDot` / `heisenbergHamiltonianS_one_eq_heisenbergHamiltonian` / `totalSpinSOp{1,2,3}_one_eq_totalSpinHalfOp{1,2,3}` / `totalSpinSSquared_one_eq_totalSpinHalfSquared` / `basisVecS_one_eq_basisVec` / `neelConfigOfS_one_eq_neelConfigOf` / `neelStateOfS_one_eq_neelStateOf` | **multi-site spin-`S` ↔ spin-`1/2` bridge at `N = 1`**: `ManyBodyOpS Λ 1` and `ManyBodyOp Λ` are definitionally equal, so every multi-site spin-`S` object at `N = 1` equals its spin-`1/2` counterpart without a cast: site embeddings, the two-site inner product `Ŝ_x · Ŝ_y` (Tasaki §2.2 eq. (2.2.13), p. 27), the Heisenberg Hamiltonian, the total spin operators and Casimir, and the computational-basis / Néel constructors (Tasaki §2.5 eq. (2.5.2), p. 37; the Néel bridge pins the orientation `A ↦ ↑`, `¬A ↦ ↓`) (PR #5250) | `Quantum/SpinS/SpinHalfSpecializationMultiSite.lean` |
-| `sublatticeSpinSOp{1,2,3}_one_eq_sublatticeSpinHalfOp{1,2,3}` / `sublatticeSpinSOp{Plus,Minus}_one_eq_sublatticeSpinHalfOp{Plus,Minus}` / `sublatticeSpinSquaredS_one_eq_sublatticeSpinHalfSquared` / `sublatticeSpinSDot_one_eq_sublatticeSpinDot` / `heisenbergToyHamiltonianS_one_eq_heisenbergToyHamiltonian` | **sublattice spin-`S` ↔ spin-`1/2` bridge at `N = 1`**: the sublattice spin components, sublattice ladder operators, sublattice Casimir `(Ŝ_A)²`, cross-sublattice inner product `Ŝ_A · Ŝ_B` and MLM toy Hamiltonian of the spin-`S` development coincide at `N = 1` with the spin-`1/2` definitions of `Quantum/MarshallLiebMattis/` (Tasaki §2.5 eqs. (2.5.10)–(2.5.11), pp. 40–42). Scaffolding layer: its scope is exactly the spin-`1/2` sublattice objects that still carry their own definitions (PR #5250) | `Quantum/SpinS/SpinHalfSpecializationSublattice.lean` |
+| `sublatticeSpinSOp{1,2,3}_one_eq_sublatticeSpinHalfOp{1,2,3}` / `sublatticeSpinSOp{Plus,Minus}_one_eq_sublatticeSpinHalfOp{Plus,Minus}` / `sublatticeSpinSquaredS_one_eq_sublatticeSpinHalfSquared` / `heisenbergToyHamiltonianS_one_eq_heisenbergToyHamiltonian` | **sublattice spin-`S` ↔ spin-`1/2` bridge at `N = 1`**: the sublattice spin components, sublattice ladder operators, sublattice Casimir `(Ŝ_A)²` and MLM toy Hamiltonian of the spin-`S` development coincide at `N = 1` with the spin-`1/2` definitions of `Quantum/MarshallLiebMattis/` (Tasaki §2.5 eqs. (2.5.10)–(2.5.11), pp. 40–42). Scaffolding layer: its scope is exactly the spin-`1/2` sublattice objects that still carry their own definitions (PR #5250) | `Quantum/SpinS/SpinHalfSpecializationSublattice.lean` |
 
 Regression coverage for both files (type-level elaboration without casts, a concrete matrix
 element and eigenvalue pinning the Néel orientation, and the transfer of the spin-`1/2` sublattice
@@ -150,6 +152,17 @@ ladder operators on complementary sublattices, the matrix-element realness of th
 `Quantum/SpinS/SublatticeSpinLadderDef.lean` and
 `Quantum/SpinS/SublatticeSpinLadderDefCore.lean`, stated for arbitrary spin-`S`; the spin-`1/2`
 reading is the `N = 1` case, reached through the bridges above.
+
+The cross-sublattice dot-product statements — the definition `Ŝ_A · Ŝ_B := Σ_α Ŝ_A^{(α)} Ŝ_B^{(α)}`
+with its definitional unfolding and ladder form, the bilinear expansion
+`Ŝ_A · Ŝ_B = Σ_{x ∈ A} Σ_{y ∈ B} Ŝ_x · Ŝ_y` (Tasaki §2.5 (2.5.10)), the Hermiticity of
+`Ŝ_A · Ŝ_¬A`, the identification `Ŝ_A · Ŝ_A = (Ŝ_A)²` with the resulting double-sum form of the
+sublattice Casimir, and the maximum-spin Casimir eigenvalue `(|A|·N/2)(|A|·N/2 + 1)` on the
+all-aligned states and on any configuration constant on `A` at either extreme weight — have a
+single home in `Quantum/SpinS/SublatticeSpinDot.lean`, stated for arbitrary spin-`S`; the
+spin-`1/2` reading is the `N = 1` case, where the two extreme-weight statements collapse to the
+single spin-`1/2` all-aligned statement. Regression coverage lives in
+`LatticeSystem/Tests/SpinSSublatticeSpinDot.lean`.
 
 ---
 
