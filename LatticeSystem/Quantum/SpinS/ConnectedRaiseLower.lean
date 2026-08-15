@@ -36,8 +36,6 @@ Tracked in #4609.
 
 namespace LatticeSystem.Quantum
 
-open Matrix
-
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-! ## The single-quantum transport configuration -/

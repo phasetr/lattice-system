@@ -1,25 +1,23 @@
+import LatticeSystem.Quantum.SpinS.ConfigCombinatorics
 import LatticeSystem.Quantum.SpinS.MultiSite
 import LatticeSystem.Quantum.SpinS.TotalSpin
 
 /-!
-# Spin-`S` magnetization function on configurations
+# Spin-`S` magnetization operator and its eigenspaces
 (Tasaki §2.5 Phase B-β β-4a)
 
-For a spin parameter `N : ℕ` (with `N = 2S`) and a finite lattice `Λ`,
-each configuration `σ : Λ → Fin (N + 1)` carries a **magnetization**
-quantum number. We use the natural-number index sum
+The matrix-level magnetization layer for a spin parameter `N : ℕ`
+(with `N = 2S`) on a finite lattice `Λ`.  The combinatorial index sum
+`magSumS σ = Σ_{x : Λ} (σ x).val` of a configuration `σ : Λ → Fin (N + 1)`
+is supplied by `LatticeSystem/Quantum/SpinS/ConfigCombinatorics.lean`;
+here it is turned into the `Ŝ_tot^{(3)}` eigenvalue
 
-  `magSumS σ := Σ_{x : Λ} (σ x).val`
+  `magEigenvalueS σ := (|Λ| · N / 2) − magSumS σ`
 
-as the basic combinatorial quantity. The physical magnetic quantum
-number is `(|Λ| · N / 2) − magSumS σ` (in units of `S`).
-
-The magnetic-quantum-number range of `magSumS` is
-`{0, 1, ..., |Λ| · N}`.
-
-For spin-1/2 (`N = 1`), `magSumS σ = |{x : σ x = 1}|` is the
-"down-spin count" and matches the existing spin-1/2 magnetization
-encoding (`Quantum/MagnetizationSubspace.lean`).
+(the physical magnetic quantum number, in units of `S`), and the
+eigenspaces `magSubspaceS Λ N M` are shown to be pairwise disjoint, to
+contain every basis state `|σ⟩`, and to span the whole multi-site
+Hilbert space.
 
 Tracked in #412.
 -/
@@ -27,52 +25,6 @@ Tracked in #412.
 namespace LatticeSystem.Quantum
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
-
-/-- The magnetization-index sum of a spin-`S` configuration. -/
-def magSumS (σ : Λ → Fin (N + 1)) : ℕ :=
-  ∑ x : Λ, (σ x).val
-
-omit [DecidableEq Λ] in
-/-- Definitional unfolding of `magSumS`. -/
-theorem magSumS_def (σ : Λ → Fin (N + 1)) :
-    magSumS σ = ∑ x : Λ, (σ x).val := rfl
-
-omit [DecidableEq Λ] in
-/-- `magSumS σ ≤ |Λ| · N`. -/
-theorem magSumS_le (σ : Λ → Fin (N + 1)) :
-    magSumS σ ≤ Fintype.card Λ * N := by
-  unfold magSumS
-  calc ∑ x : Λ, (σ x).val
-      ≤ ∑ _ : Λ, N := by
-        refine Finset.sum_le_sum ?_
-        intro x _
-        have := (σ x).isLt
-        omega
-    _ = Fintype.card Λ * N := by
-        rw [Finset.sum_const, Finset.card_univ, smul_eq_mul]
-
-omit [DecidableEq Λ] in
-/-- `magSumS σ = |Λ| · N` iff `σ x = Fin.last N` for every `x : Λ`
-(the lowest-weight all-`Fin.last N` config achieves the maximum). -/
-theorem magSumS_eq_max_iff (σ : Λ → Fin (N + 1)) :
-    magSumS σ = Fintype.card Λ * N ↔ ∀ x : Λ, σ x = Fin.last N := by
-  unfold magSumS
-  constructor
-  · intro h x
-    -- If `magSumS σ = |Λ| · N`, then each `(σ x).val = N` (max).
-    have hle : ∀ y ∈ (Finset.univ : Finset Λ), (σ y).val ≤ N :=
-      fun y _ => by have := (σ y).isLt; omega
-    have hsum_eq : ∀ y ∈ (Finset.univ : Finset Λ), (σ y).val = N := by
-      apply (Finset.sum_eq_sum_iff_of_le hle).mp
-      rw [Finset.sum_const, Finset.card_univ, smul_eq_mul]
-      exact h
-    apply Fin.ext
-    rw [hsum_eq x (Finset.mem_univ x)]
-    rfl
-  · intro h
-    have heq : ∀ x : Λ, (σ x).val = N := fun x => by rw [h x]; rfl
-    rw [Finset.sum_congr rfl (fun x _ => heq x)]
-    rw [Finset.sum_const, Finset.card_univ, smul_eq_mul]
 
 /-! ## Magnetization subspace -/
 
@@ -269,20 +221,6 @@ theorem iSup_magSubspaceS_eq_top :
   exact (⨆ M : ℂ, magSubspaceS Λ N M).smul_mem _ (basisVecS_mem_iSup_magSubspaceS σ)
 
 /-! ## Constant configurations -/
-
-omit [DecidableEq Λ] in
-/-- `magSumS` of a constant configuration `(fun _ => s)` is `|Λ| · s.val`. -/
-theorem magSumS_const (s : Fin (N + 1)) :
-    magSumS (fun _ : Λ => s) = Fintype.card Λ * s.val := by
-  unfold magSumS
-  rw [Finset.sum_const, Finset.card_univ, smul_eq_mul]
-
-omit [DecidableEq Λ] in
-/-- `magSumS (fun _ => 0) = 0`. -/
-theorem magSumS_const_zero :
-    magSumS (fun _ : Λ => (0 : Fin (N + 1))) = 0 := by
-  rw [magSumS_const]
-  simp
 
 omit [DecidableEq Λ] in
 /-- `magEigenvalueS σ ∈ ℝ`: the eigenvalue is real-valued (its
