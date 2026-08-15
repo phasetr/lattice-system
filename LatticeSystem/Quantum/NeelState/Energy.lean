@@ -66,31 +66,4 @@ theorem neelChainState_energy_expectation_K1 (J : ℝ) :
   rw [h]
   ring
 
-/-- 3D Néel: z-axis wrap bond expectation = -1/4. -/
-theorem neelCubicState_inner_spinHalfDot_z_wrap_eq_neg_one_quarter
-    (K L M : ℕ) {i j : ℕ}
-    (hi : i < 2 * K) (hj : j < 2 * L) :
-    ∑ τ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * (M + 1)) → Fin 2,
-        neelCubicState K L (M + 1) τ *
-          ((spinHalfDot
-              (((⟨i, hi⟩, ⟨j, hj⟩), ⟨2 * M + 1, by omega⟩) :
-                (Fin (2 * K) × Fin (2 * L)) × Fin (2 * (M + 1)))
-              (((⟨i, hi⟩, ⟨j, hj⟩), ⟨0, by omega⟩) :
-                (Fin (2 * K) × Fin (2 * L)) × Fin (2 * (M + 1)))).mulVec
-            (neelCubicState K L (M + 1))) τ = -(1 / 4 : ℂ) := by
-  unfold neelCubicState
-  apply inner_basisVec_spinHalfDot_basisVec_antiparallel
-  · intro h
-    have h1 := congrArg Prod.snd h
-    have hval := congrArg Fin.val h1
-    simp at hval
-  · unfold neelCubicConfig
-    simp only
-    rcases Nat.mod_two_eq_zero_or_one (i + j) with hij0 | hij1
-    · have h1 : (i + j + (2 * M + 1)) % 2 ≠ 0 := by omega
-      simp [h1, hij0]
-    · have h1 : (i + j + (2 * M + 1)) % 2 = 0 := by omega
-      simp [h1, hij1]
-
-
 end LatticeSystem.Quantum

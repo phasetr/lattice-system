@@ -155,6 +155,68 @@ it is proved by the (unrelated, pre-existing) private helper `totalRot_eq_exp_au
 still spells the raw `Finset.noncommProd` and which typechecks only by delta-unfolding
 `totalSpinHalfRotOf`'s definition.
 
+## Authoritative supplemental implementation record (Néel per-bond correlation direction/wrap variants)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+the current state of the Néel-state per-bond correlation family. The migrated catalogue block above
+is a frozen historical record — its rows are pinned byte-for-byte by
+`scripts/check_docs_hierarchy.py` and are never edited for later deletions, so the four
+brace-shorthand rows
+`neelSquareState_inner_szsz_{horizontal,vertical}_{adjacent,wrap}_eq_neg_one_quarter`,
+`neelCubicState_inner_szsz_{x,y,z}_{adjacent,wrap}_eq_neg_one_quarter`,
+`neelSquareState_inner_spinHalfDot_{horizontal,vertical}_{adjacent,wrap}_eq_neg_one_quarter` and
+`neelCubicState_inner_spinHalfDot_{x,y,z}_{adjacent,wrap}_eq_neg_one_quarter`, together with their
+"for every … adjacent and wrap bond", "coverage parity" and "full Néel-state bond family" prose,
+describe membership as it stood at migration time.
+
+The per-direction and per-wrap instances of those four families are no longer present in the
+library. Retired from `Quantum/NeelState/InnerProductCore.lean`:
+`neelSquareState_inner_spinHalfDot_vertical_adjacent_eq_neg_one_quarter`,
+`neelSquareState_inner_spinHalfDot_horizontal_wrap_eq_neg_one_quarter`,
+`neelSquareState_inner_spinHalfDot_vertical_wrap_eq_neg_one_quarter`,
+`neelCubicState_inner_spinHalfDot_y_adjacent_eq_neg_one_quarter`,
+`neelCubicState_inner_spinHalfDot_z_adjacent_eq_neg_one_quarter`,
+`neelCubicState_inner_spinHalfDot_x_wrap_eq_neg_one_quarter` and
+`neelCubicState_inner_spinHalfDot_y_wrap_eq_neg_one_quarter`.
+Retired from `Quantum/NeelState/InnerProduct.lean`:
+`neelSquareState_inner_szsz_horizontal_adjacent_eq_neg_one_quarter`,
+`neelSquareState_inner_szsz_vertical_adjacent_eq_neg_one_quarter`,
+`neelSquareState_inner_szsz_horizontal_wrap_eq_neg_one_quarter`,
+`neelSquareState_inner_szsz_vertical_wrap_eq_neg_one_quarter`,
+`neelCubicState_inner_szsz_y_adjacent_eq_neg_one_quarter`,
+`neelCubicState_inner_szsz_z_adjacent_eq_neg_one_quarter`,
+`neelCubicState_inner_szsz_x_wrap_eq_neg_one_quarter`,
+`neelCubicState_inner_szsz_y_wrap_eq_neg_one_quarter` and
+`neelCubicState_inner_szsz_z_wrap_eq_neg_one_quarter`.
+Retired from `Quantum/NeelState/Energy.lean`:
+`neelCubicState_inner_spinHalfDot_z_wrap_eq_neg_one_quarter`.
+
+The surviving members of the inner-product family are unchanged in statement and proof.
+In `Quantum/NeelState/InnerProductCore.lean`: `neelChainState_norm_squared`,
+`neelSquareState_norm_squared`, `neelCubicState_norm_squared`,
+`neelChainState_inner_basisVec_basisSwap_adjacent_eq_zero`,
+`neelChainState_inner_spinHalfDot_adjacent_eq_neg_one_quarter`,
+`neelChainState_inner_spinHalfDot_wrap_eq_neg_one_quarter`,
+`neelSquareState_inner_spinHalfDot_horizontal_adjacent_eq_neg_one_quarter` and
+`neelCubicState_inner_spinHalfDot_x_adjacent_eq_neg_one_quarter`.
+In `Quantum/NeelState/InnerProduct.lean`:
+`neelChainState_inner_szsz_adjacent_eq_neg_one_quarter`,
+`neelChainState_inner_szsz_wrap_eq_neg_one_quarter`,
+`neelCubicState_inner_szsz_x_adjacent_eq_neg_one_quarter`,
+`neelChainState_inner_off_diagonal_correlator_adjacent_eq_zero` and
+`neelChainState_inner_spinHalfDot_parallel_eq_one_quarter`.
+`neelChainState_energy_expectation_K1` in `Quantum/NeelState/Energy.lean` is likewise unchanged.
+
+Nothing mathematical is lost. Every antiparallel bond, in every dimension and for both the full
+`Ŝ_x · Ŝ_y` expectation and the diagonal `Ŝ^z_x · Ŝ^z_y` correlator, is covered in one line by the
+generic `inner_neelStateOf_spinHalfDot_neelStateOf_antiparallel` and
+`inner_neelStateOf_szsz_neelStateOf_antiparallel` (`Quantum/NeelState/Definition.lean`), applied
+through the `neelChainState_eq_neelStateOf` / `neelSquareState_eq_neelStateOf` /
+`neelCubicState_eq_neelStateOf` bridges; the surviving named instances are representatives of that
+pattern, not the source of the coverage. Consequently the `szsz` correlator carries no 2D
+specialisation by design: the 2D case is obtained from the generic theorem exactly as the retired
+2D instances were.
+
 ---
 
 [← The AKLT model (Tasaki §7.1)](/lattice-system/formalization/legacy/19-the-aklt-model-tasaki-7-1/) · [Catalogue](/lattice-system/formalization/legacy/) · [Total spin operator (Tasaki §2.2 eq. (2.2.7), (2.2.8)) →](/lattice-system/formalization/legacy/20-total-spin-operator-tasaki-2-2-eq-2-2-7-2-2-8-part-02/)
