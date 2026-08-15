@@ -110,8 +110,9 @@ Retired from `Quantum/SpinHalfRotation/Conjugation.lean`: `spinHalfRot2_conj_spi
 `spinHalfRot3_conj_spinHalfOp3`, `spinHalfRot2_half_pi_conj_spinHalfOp3`,
 `spinHalfRot3_half_pi_conj_spinHalfOp1`, `spinHalfRot2_half_pi_conj_spinHalfOp1` and
 `spinHalfRot3_half_pi_conj_spinHalfOp2`. The general-θ and `π/2` rows of the frozen block carry
-`Quantum/SpinHalfRotation.lean` in their file column, while those declarations have always lived
-in `Quantum/SpinHalfRotation/Conjugation.lean`; that is a property of the frozen record, recorded
+`Quantum/SpinHalfRotation.lean` in their file column. These declarations moved to
+`Quantum/SpinHalfRotation/Conjugation.lean` in the Phase-2 split (`2724e968`, "Refactor Phase 2
+(PR 22)"); `docs/index.md`'s File column was not updated at that time and went stale, recorded
 here rather than corrected there.
 
 Surviving members, row by row. `spinHalfRot{1,2,3}_pi_conjTranspose`: none.
@@ -124,8 +125,13 @@ Surviving members, row by row. `spinHalfRot{1,2,3}_pi_conjTranspose`: none.
 `spinHalfRot{1,2,3}_conj_spinHalfOp{2,3,1}` and `spinHalfRot{1,2,3}_conj_spinHalfOp{3,1,2}` are
 complete and untouched; three of their six members (`spinHalfRot2_conj_spinHalfOp3`,
 `spinHalfRot2_conj_spinHalfOp1`, `spinHalfRot3_conj_spinHalfOp2`) are book-equation coverage of
-Tasaki eq. (2.1.16) that no other declaration in the library uses, and are kept on that ground:
-they are the general-θ base layer from which the surviving `π` and `π/2` statements specialize.
+Tasaki eq. (2.1.16) that no other declaration in the library uses, and are kept on that ground
+alone: retaining them keeps eq. (2.1.16)'s six-case coverage complete. This coverage carve-out
+applies only to these three eq. (2.1.16) members; it does not apply to the other deletions
+recorded in this section (the eq. (2.1.15) same-axis general-θ family (3→1), the eq. (2.1.21)
+θ=π cross-axis family (6→2), the eq. (2.1.22) θ=π/2 family (6→2), and the
+`spinHalfRot{1,2,3}_pi_conjTranspose` row (3→0, now empty)), all of which were removed as
+ordinary zero-reference wrapper duplication with no carve-out.
 
 Nothing is lost, with one qualification.
 
