@@ -65,7 +65,9 @@ instance in the concrete `spinHalfOp` vocabulary in one line.
 
 The dedicated spin-1/2 module `Quantum/SpinHalfDecomp.lean` that originally discharged this
 milestone (`pauliCoeff{0,1,2,3}`, `pauli_decomposition`, `spinHalf_decomposition`,
-`pauli_linearIndep`) has therefore been removed in full; no Lean file referenced any of its names.
+`pauli_linearIndep`) has therefore been removed in full; no *other* Lean file referenced any of its
+names — within the module itself, `spinHalf_decomposition` referenced `pauli_decomposition` and the
+three bridges `pauli{X,Y,Z}_eq_two_smul_spinHalfOp{1,2,3}` (`Quantum/SpinHalf.lean`).
 Its explicit coefficient formulas and the linear independence of `{1, σ^x, σ^y, σ^z}` were content
 beyond Problem 2.1.a, which asks only for polynomial expressibility. Tasaki eq. (2.1.8)
 `σ^(α) = 2 Ŝ^(α)` — `pauli{X,Y,Z}_eq_two_smul_spinHalfOp{1,2,3}` in `Quantum/SpinHalf.lean`, whose
