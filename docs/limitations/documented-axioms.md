@@ -72,3 +72,73 @@ natural home is elsewhere. The `#print axioms` of every theorem in the repositor
 the precise dependency on these documented axioms auditable.
 
 <!-- legacy-source:end:155:216 -->
+
+## Theorem 7.7 (hexagonal AKLT correlation decay and infinite-volume uniqueness)
+
+**Tasaki §7.3.2, Theorem 7.7** (eqs. (7.3.6)–(7.3.9), pp. 210–212) is a **documented
+axiom**, `tasaki_theorem_7_7` (`LatticeSystem/Quantum/SpinS/GeneralAKLT.lean`, doc
+comment lines 130–174, declaration lines 175–183). This page's title and banner scope
+it to Appendix A; this section records a non-Appendix documented axiom here as well.
+
+- **Proved (axiom-free):** the finite honeycomb-torus VBS ground state exists and is
+  zero-energy and frustration-free — `honeycombVBSState_isGeneralGraphVBSGroundState`
+  (`LatticeSystem/Quantum/SpinS/HoneycombAKLTZeroEnergy.lean`, PR #5133, `#print axioms`
+  = std3), for the canonical graph `honeycombTorusGraph m` with `m ≥ 2`.
+- **What the axiom statement literally asserts:** two conjuncts, quantified as `∃ C ξ,
+  0 < C ∧ 0 < ξ ∧ ∀ (hexagonal G), (…) ∧ (…)`:
+  1. For every hexagonal lattice `G` (`IsHexagonalLatticeAKLT G`), *some* zero-energy VBS
+     ground state `Φ` exists (`∃ Φ, IsGeneralGraphVBSGroundState G 3 Φ ∧ …`) whose spin
+     correlation is sign-alternating and exponentially decaying with the single pair
+     `C, ξ` uniform over all hexagon sizes (eq. (7.3.9)). The axiom does **not** assert
+     that this ground state is the *only* one at finite volume — an existential `∃ Φ`,
+     not a universal `∀ Φ`, is what is axiomatized (see below).
+  2. `HasUniqueInfiniteVolumeVBSGroundState G 3` holds. This is itself a **separate
+     uninterpreted marker axiom** (`axiom HasUniqueInfiniteVolumeVBSGroundState (G :
+     SimpleGraph Λ) (N : ℕ) : Prop`, `GeneralAKLT.lean:128`) with no mathematical
+     content of its own — it is an opaque `Prop`-valued declaration, not a proved
+     predicate. There are currently zero consumers of `tasaki_theorem_7_7` in the
+     repository; `#print axioms` on a hypothetical consumer would show the standard
+     three (`std3` = `propext`, `Classical.choice`, `Quot.sound`) plus the two project
+     axioms `HasUniqueInfiniteVolumeVBSGroundState` and `tasaki_theorem_7_7` itself —
+     five names in total, one of which (`HasUniqueInfiniteVolumeVBSGroundState`)
+     carries no formalized statement at all.
+- **Not yet formalized (the *proof*, not the axiom's existential assertion):** per the
+  catalogue's own language (`docs/formalization/legacy/19-the-aklt-model-tasaki-7-1.md`,
+  rows for `honeycombVBSState` and `honeycombVBSState_isGeneralGraphVBSGroundState`),
+  finite-volume ground-state uniqueness, a spectral gap, and (for a general hexagon)
+  the finite-volume analytic/KLT ingredients that would *prove* the correlation-decay
+  bound all "remain unproved." The axiom statement itself does existentially assert the
+  decay bound (see the first bullet above) — what is absent from the formalization is
+  the underlying proof of that bound for a general hexagon, not the assertion, and the
+  axiom does not assert uniqueness or a gap at finite volume at all.
+- **Witness is not fixed to the transported canonical state:** the `∃ Φ` conjunct is
+  satisfied by *any* `Φ` meeting the predicates — the axiom does not type-fix or
+  require `Φ` to be the canonical VBS state `honeycombVBSState m` transported along the
+  isomorphism `G ≃g honeycombTorusGraph m` supplied by `IsHexagonalLatticeAKLT G`. The
+  *intended* mathematical witness is that transported canonical state (per the KLT
+  analysis), and the parallel axiom-free theorem above proves the ground-state property
+  only for the canonical state on the canonical torus itself — but this is not proved or
+  required by the axiom statement for a general hexagon; it is only the informal
+  motivation for why the existential is expected to be witnessable.
+- **Axiom reason (documented):** the rigorous 2D honeycomb correlation-decay proof
+  requires Kennedy–Lieb–Tasaki, *J. Stat. Phys.* **53**, 383–415 (1988),
+  DOI [10.1007/BF01011563](https://doi.org/10.1007/BF01011563) ("KLT [41]"), which is a
+  real implementation dependency with **no open-access or author-hosted copy found (as
+  of 2026-08-16, via OpenAlex/Unpaywall/author-homepage checks; institutional/
+  subscription access was not attempted, and general-search-engine lookup was not
+  attempted either since it is bot-blocked in this environment)**: OpenAlex work
+  `W2092140400` reports `oa_status = closed` with no repository fulltext; Unpaywall
+  confirms `is_oa = false`; none of Kennedy, Lieb, or Tasaki self-host a copy (Kennedy's
+  own publication page links only to a dead `springerlink.com` URL). Open-access status
+  is time-varying and this claim should be re-checked, not assumed permanent.
+- **Re-check condition:** the disposition would change if either (a) a legitimate copy
+  of KLT [41] is obtained (e.g. via institutional library/Springer subscription access,
+  since no confirmed open-access route exists) and a math-before-code transcription of
+  its finite-volume uniqueness proof and its proof of eq. (7.3.9) is completed, or (b)
+  an independent formalized proof of eq. (7.3.9) not relying on [41], should one become
+  available.
+- **Tracking:** Issue #5132 (Theorem 7.7 discharge status); master tracker #4718.
+  Catalogue rows: `docs/formalization/legacy/19-the-aklt-model-tasaki-7-1.md`, the
+  `tasaki_theorem_7_7` declaration row (grouped detail record #767) and the two inline
+  `honeycombVBSState` / `honeycombVBSState_isGeneralGraphVBSGroundState` rows (not
+  grouped detail records) that state the "remain unproved" items cited above.
