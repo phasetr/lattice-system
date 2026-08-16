@@ -145,7 +145,9 @@ non-Appendix documented axiom alongside the Appendix A entries above.
   `tasaki_theorem_7_7` declaration row (grouped detail record #767) and the two inline
   `honeycombVBSState` / `honeycombVBSState_isGeneralGraphVBSGroundState` rows (not
   grouped detail records) that state the "remain unproved" items cited above.
-  Note: detail record #767 is a frozen baseline archival copy (verified byte-for-byte
-  against `docs/index.md` as of the tracked baseline commit) and so still shows its
-  original, now-stale `(line 724, …)` citation by design; the actual declaration lives at
-  `LatticeSystem/Quantum/SpinS/HoneycombAKLTZeroEnergy.lean:60`.
+  Note: detail record #767 is a frozen baseline archival copy (whitespace-normalized
+  exact parity per `scripts/check_docs_hierarchy.py` against `docs/index.md` at the
+  tracked baseline commit `6519099`) and so still shows its original `(line 724, …)`
+  citation, which was already stale even at the time the record was frozen; the actual
+  declaration, `honeycombVBSState_isGeneralGraphVBSGroundState`, lives in
+  `LatticeSystem/Quantum/SpinS/HoneycombAKLTZeroEnergy.lean`.
