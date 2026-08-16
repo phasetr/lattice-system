@@ -151,3 +151,60 @@ non-Appendix documented axiom alongside the Appendix A entries above.
   citation, which was already stale even at the time the record was frozen; the actual
   declaration, `honeycombVBSState_isGeneralGraphVBSGroundState`, lives in
   `LatticeSystem/Quantum/SpinS/HoneycombAKLTZeroEnergy.lean`.
+
+## Theorem 7.2 (AKLT infinite chain: unique ground state with a nonzero gap)
+
+**Tasaki §7.1.3, Theorem 7.2** (p. 179) is a **documented axiom** carried by two
+declarations in `LatticeSystem/Quantum/SpinS/AKLTInfiniteChain.lean`:
+`IsAKLTChainDynamics` (doc comment lines 43–48, declaration line 49) and
+`aklt_theorem_7_2` (doc comment lines 51–61, declaration lines 62–65).
+
+- **Proved (axiom-free):** the finite-volume counterpart, Tasaki Theorem 7.1, is a
+  theorem — `aklt_theorem_7_1` (`LatticeSystem/Quantum/SpinS/AKLTTheorem71.lean`, line
+  49), recorded in the catalogue with the standard three axioms (`propext`,
+  `Classical.choice`, `Quot.sound`). Only the passage to the infinite chain is
+  axiomatized.
+- **What the axiom statement literally asserts:** for a one-dimensional
+  `InfiniteSpinSystem 1 A` over a C*-algebra `A` and a dynamics `δ : A → A` satisfying
+  the marker, there exists `ω : WeakDual ℂ A` with `IsState ω`, `IsGroundState ω δ`
+  (Definition A.25: `0 ≤ ω (star a * δ a)` for all `a`), uniqueness among states
+  (`∀ ω', IsState ω' → IsGroundState ω' δ → ω' = ω`), and `∃ γ, HasNonzeroGap ω δ γ`
+  (Definition A.27, whose first conjunct is `0 < γ`). This is faithful to the book,
+  which states the theorem in exactly the sense of Definitions A.25/A.27 and identifies
+  the state with the `L↑∞` limit of the VBS state (7.1.12).
+- **The dynamics marker has no mathematical content:** `IsAKLTChainDynamics S δ` is an
+  uninterpreted Prop-valued axiom, following the same idiom as `IsLocalHamiltonianData`
+  (`LatticeSystem/Math/CStarAlgebra/GroundState.lean`, line 52). It cannot be
+  established for any concrete data, so the theorem is only usable under an assumed
+  hypothesis; since the marker admits the interpretation "always false", the pair adds
+  no inconsistency. There are currently zero consumers of either declaration in the
+  repository, so no proved result depends on them.
+- **Axiom reason (documented):** the statement is an assertion about the state space of
+  the quasi-local C*-algebra of the spin-1 chain on ℤ — existence of a weak-* limit
+  state, uniqueness quantified over all states (not merely translation-invariant ones),
+  and a spectral-gap condition phrased through the derivation `δ = [Ĥ_AKLT, ·]`. Its
+  proof (Matsui, *Commun. Math. Phys.* **218**, 393 (2001), strengthening
+  Affleck–Kennedy–Lieb–Tasaki, *Commun. Math. Phys.* **115**, 477 (1988)) is carried
+  out entirely in that operator-algebraic setting and is not reproduced by Tasaki, who
+  states it without proof. Per the project's operator-algebra policy — the same one
+  under which Appendix A.21–A.28 (states, Banach–Alaoglu, ground states of infinite
+  systems, GNS) are recorded — such results are faithful documented axioms that wait
+  for a dedicated operator-algebra development, whose natural home is a separate
+  project or `mathlib`. This entry therefore creates no book-order discharge work item;
+  the "prove theorems Tasaki cites without proof" rule does not override it, because
+  its standing exception is exactly the genuine C*-algebra/GNS framework.
+- **Re-check condition:** the disposition would change only when all three of the
+  following exist in reviewed form in this repository (or are usable from `mathlib`):
+  (a) a concrete construction of the quasi-local C*-algebra of the spin-1 chain on ℤ
+  together with the AKLT interaction `Σ_x ĥ_x^{AKLT}`, so that `IsAKLTChainDynamics`
+  can be replaced by a real definition of the dynamics `δ = [Ĥ_AKLT, ·]` instead of an
+  opaque marker; (b) a state/weak-* layer able to construct the `L↑∞` limit of the
+  finite-volume VBS states as a state on that algebra and to use Definitions A.25/A.27
+  on it; and (c) a math-before-code transcription of Matsui's uniqueness-among-all-
+  states argument (or of an independent proof of the same statement). Partial progress
+  on (a) or (b) alone does not reopen this entry.
+- **Tracking:** master tracker #4718 (strict book-order axiom discharge). No dedicated
+  discharge issue exists or is to be opened for Theorem 7.2 while the re-check
+  condition above is unmet. Catalogue row:
+  `docs/formalization/legacy/19-the-aklt-model-tasaki-7-1.md`, the
+  `IsAKLTChainDynamics` / `aklt_theorem_7_2` row.
