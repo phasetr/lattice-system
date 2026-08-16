@@ -268,3 +268,26 @@ listed in the [Deprecation window](/lattice-system/deprecations/#remaining-linte
 page. Removal requires interactive `simp?` per sub-case.
 
 <!-- legacy-source:end:2780:3037 -->
+
+## Authoritative supplemental implementation record (Problem 2.1.a concrete-case modules)
+
+This section is maintained by hand, lies outside the migrated block above, and corrects one
+sentence of it. The migrated block is a frozen historical record — it is pinned byte-for-byte by
+`scripts/check_docs_hierarchy.py` and is never edited for later corrections or deletions.
+
+The closing sentence of the P1d''' entry reads "The earlier concrete-case modules `pauliBasis`
+(`S = 1/2`) and `spinOne_decomposition` (`S = 1`) remain as illustrative specialisations." Two
+things about it are no longer accurate:
+
+- `pauliBasis` is a name that never existed in the library. The `S = 1/2` module was
+  `Quantum/SpinHalfDecomp.lean`, whose theorems were `pauli_decomposition` and
+  `spinHalf_decomposition`. This is a pre-existing drift, independent of the removal recorded in
+  the next item.
+- That module has since been removed in full, so the `S = 1/2` half of the sentence no longer
+  holds. Problem 2.1.a for `S = 1/2` is the `N := 1` instance of `spinS_adjoin_eq_top`, restated in
+  the concrete `spinHalfOp` vocabulary in one line by the bridges
+  `spinSOp{1,2,3}_one_eq_spinHalfOp{1,2,3}` (`Quantum/SpinS/SpinHalfSpecialization.lean`).
+
+The `S = 1` half stands: `spinOne_decomposition` in `Quantum/SpinOneDecomp.lean` remains as an
+illustrative specialisation. No `spinSOp* 2 = spinOneOp*` bridge exists, so its content is not a
+one-line instance of the general theorem in the concrete spin-1 vocabulary.
