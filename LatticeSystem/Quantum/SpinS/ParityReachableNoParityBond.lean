@@ -38,12 +38,6 @@ theorem IonParityReachableS.refl (G : SimpleGraph V) (σ : V → Fin (N + 1)) :
     IonParityReachableS G σ σ := Relation.ReflTransGen.refl
 
 omit [Fintype V] [DecidableEq V] in
-/-- A single ion-only parity step is ion-only reachable. -/
-theorem IonParityReachableS.single {G : SimpleGraph V} {σ σ' : V → Fin (N + 1)}
-    (h : IonParityStepS G σ σ') : IonParityReachableS G σ σ' :=
-  Relation.ReflTransGen.single h
-
-omit [Fintype V] [DecidableEq V] in
 /-- Transitivity of ion-only parity reachability. -/
 theorem IonParityReachableS.trans {G : SimpleGraph V} {σ σ' σ'' : V → Fin (N + 1)}
     (h₁ : IonParityReachableS G σ σ') (h₂ : IonParityReachableS G σ' σ'') :

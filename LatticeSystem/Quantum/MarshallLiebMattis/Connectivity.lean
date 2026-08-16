@@ -73,33 +73,16 @@ def SwapReachable (G : SimpleGraph Λ) : (Λ → Fin 2) → (Λ → Fin 2) → P
   Relation.ReflTransGen (SwapStep G)
 
 omit [Fintype Λ] in
+/-- Reflexivity: every configuration is swap-reachable from itself. -/
 theorem SwapReachable.refl (G : SimpleGraph Λ) (σ : Λ → Fin 2) :
     SwapReachable G σ σ :=
   Relation.ReflTransGen.refl
 
 omit [Fintype Λ] in
+/-- Single-edge case: a direct `SwapStep` is a `SwapReachable`. -/
 theorem SwapReachable.single (G : SimpleGraph Λ) {σ σ' : Λ → Fin 2}
     (h : SwapStep G σ σ') : SwapReachable G σ σ' :=
   Relation.ReflTransGen.single h
-
-omit [Fintype Λ] in
-theorem SwapReachable.trans {G : SimpleGraph Λ} {σ τ σ' : Λ → Fin 2}
-    (h₁ : SwapReachable G σ τ) (h₂ : SwapReachable G τ σ') :
-    SwapReachable G σ σ' :=
-  Relation.ReflTransGen.trans h₁ h₂
-
-omit [Fintype Λ] in
-theorem SwapReachable.tail' {G : SimpleGraph Λ} {σ τ σ' : Λ → Fin 2}
-    (h₁ : SwapReachable G σ τ) (h₂ : SwapStep G τ σ') :
-    SwapReachable G σ σ' :=
-  Relation.ReflTransGen.tail h₁ h₂
-
-omit [Fintype Λ] in
-/-- Single-edge case: a direct `SwapStep` is a `SwapReachable`. -/
-theorem SwapReachable.of_step {G : SimpleGraph Λ}
-    {σ σ' : Λ → Fin 2} (h : SwapStep G σ σ') :
-    SwapReachable G σ σ' :=
-  SwapReachable.single G h
 
 /-! ## Bridges from the spin-`S` development at `N = 1` -/
 
