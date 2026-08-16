@@ -64,16 +64,6 @@ import LatticeSystem.Quantum.Z2Z2
 import LatticeSystem.Fermion.SingleMode
 import LatticeSystem.Fermion.JordanWigner.FockSpaceRepresentation
 import LatticeSystem.Fermion.JordanWigner.SmearedCAR
--- Tasaki §2.5 Theorem 2.3 (spin-S Marshall–Lieb–Mattis) tree.
--- These are the in-progress final-wrapper "tip" modules; importing them here
--- pulls the whole §2.5 module tree into the build root so the default
--- `lake build` (and CI) elaborates it, rather than leaving it reachable only
--- via per-module builds.
--- Tasaki §2.5 Theorem 2.3: the saturated-ladder-iterate route was found unsound
--- (the `hdominates` leaf is false; the ferromagnetic ladder iterate is not the
--- Marshall-positive AFM ground state — see .self-local/docs/tasaki-2-5-pf-route-design.md).
--- The sound per-sector Perron–Frobenius ground state is kept; the unsound conditional
--- wrapper tree (40 modules) is removed.  Issue #3542.
 import LatticeSystem.Quantum.SpinS.Theorem23PFConstancy
 import LatticeSystem.Quantum.SpinS.CasimirSpectralBound
 import LatticeSystem.Quantum.SpinS.Theorem23AntialignedJointEigenvector
@@ -110,10 +100,13 @@ library. Importing this file pulls in every public source module
 (but not the `Tests/` regression-test modules — those live in
 `LatticeSystem.Tests`, imported separately by the build).
 
-The list above enumerates only the tips of the library's import
-DAG — the modules that no other library module imports — because
-everything else is reached transitively; a module needs a line
-here exactly when nothing else in the library imports it.
+The list above enumerates only the tips of the library's
+non-Tests import DAG — the modules that no other module in the
+non-Tests library imports, because everything else is reached
+transitively; a module needs a line here exactly when nothing
+else in the (non-Tests) library imports it. (A tip still counts
+as such even when a `Tests` module also imports it, since
+`Tests` is not part of the root's own transitive closure.)
 
 The library's design philosophy is **graph-centric**: the
 underlying combinatorial datum of every many-body system is a
