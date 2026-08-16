@@ -1,11 +1,10 @@
 import LatticeSystem.Quantum.SpinHalf
 import LatticeSystem.Quantum.SpinHalfBasis
-import LatticeSystem.Quantum.SpinHalfDecomp
 
 /-!
 # Test coverage for the SpinHalf cluster
 
-A+C+G+D coverage for `Quantum/SpinHalf{,Basis,Decomp}.lean` (per
+A+C+G+D coverage for `Quantum/SpinHalf{,Basis}.lean` (per
 refactor plan v4 §9 mapping table; refactor Phase 1 PR 10, #281).
 -/
 

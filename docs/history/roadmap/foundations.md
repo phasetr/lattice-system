@@ -50,6 +50,31 @@ Done
 Done
 <!-- legacy-source:end:120:120 -->
 
+## Authoritative supplemental implementation record (P1d'': Problem 2.1.a for S = 1/2)
+
+This section is maintained by hand, lies outside the migrated blocks on this page, and records the
+current implementation of the P1d'' milestone above. That block is a frozen historical record — it
+is pinned byte-for-byte by `scripts/check_docs_hierarchy.py` and is never edited for later
+relocations or deletions.
+
+The milestone stays Done, and is now carried by P1d''' below: `spinS_adjoin_eq_top`
+(`Quantum/SpinS/SpanningTheorem.lean`) proves `Algebra.adjoin ℂ {Ŝ^(1)_N, Ŝ^(2)_N, Ŝ^(3)_N} = ⊤`
+for every `N`, so `N := 1` is the `S = 1/2` case, and the bridges
+`spinSOp{1,2,3}_one_eq_spinHalfOp{1,2,3}` (`Quantum/SpinS/SpinHalfSpecialization.lean`) restate that
+instance in the concrete `spinHalfOp` vocabulary in one line.
+
+The dedicated spin-1/2 module `Quantum/SpinHalfDecomp.lean` that originally discharged this
+milestone (`pauliCoeff{0,1,2,3}`, `pauli_decomposition`, `spinHalf_decomposition`,
+`pauli_linearIndep`) has therefore been removed in full; no *other* Lean file referenced any of its
+names — within the module itself, `spinHalf_decomposition` referenced `pauli_decomposition` and the
+three bridges `pauli{X,Y,Z}_eq_two_smul_spinHalfOp{1,2,3}` (`Quantum/SpinHalf.lean`).
+Its explicit coefficient formulas and the linear independence of `{1, σ^x, σ^y, σ^z}` were content
+beyond Problem 2.1.a, which asks only for polynomial expressibility. Tasaki eq. (2.1.8)
+`σ^(α) = 2 Ŝ^(α)` — `pauli{X,Y,Z}_eq_two_smul_spinHalfOp{1,2,3}` in `Quantum/SpinHalf.lean`, whose
+only consumer was the retired module — keeps its statements: it is a catalogued row of the
+[spin-1/2 operators page](/lattice-system/formalization/legacy/02-spin-1-2-operators-tasaki-2-1/)
+and no public generic states it.
+
 <!-- legacy-source:start:121:121 -->
 ## P1d''' (Tasaki §2.1): Problem 2.1.a for `S ≥ 1` (polynomial basis of `M_{2S+1}(ℂ)` via Lagrange interpolation in `Ŝ^(3)` and `Ŝ^±` ladder action)
 

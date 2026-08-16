@@ -42,8 +42,8 @@ References:
 - H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
   Springer 2020, §2.1 Problem 2.1.a (p. 15) and solution S.1
   (p. 493).
-- Concrete cases already in the library: `Quantum/SpinHalf.lean`,
-  `Quantum/SpinHalfDecomp.lean` (`S = 1/2`, `N = 1`); `Quantum/SpinOne.lean`,
+- Concrete cases already in the library: `Quantum/SpinHalf.lean`
+  (`S = 1/2`, `N = 1`); `Quantum/SpinOne.lean`,
   `Quantum/SpinOneDecomp.lean` (`S = 1`, `N = 2`).
 -/
 
