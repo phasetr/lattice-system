@@ -256,10 +256,11 @@ by two declarations in `LatticeSystem/Quantum/SpinS/AKLTStability.lean`:
   speak about arbitrary bounded range-r families that need not be translates of one
   local operator. Because the marker cannot be established for any concrete data, the
   axiom is usable only under an assumed hypothesis, and since the marker admits the
-  interpretation "always false" the pair adds no inconsistency. There are currently
-  zero consumers of either declaration in the repository (the only other mentions are
-  the module import in `AnisotropicLargeD.lean` and a doc comment in
-  `LiebSchultzMattisGeneral.lean`), so no proved result depends on them.
+  interpretation "always false" the pair adds no inconsistency. The declarations are
+  used only within this module (`IsTranslationCovariant` gates the
+  `translation_covariant` field of `IsAKLTPerturbation`, which `aklt_theorem_7_3`
+  consumes as a hypothesis); no proved result outside this axiom pair depends on
+  them.
 - **Axiom reason (documented):** Tasaki states Theorem 7.3 without proof and
   attributes it to D. A. Yarotsky, *Ground states in relatively bounded quantum
   perturbations of classical lattice systems*, Commun. Math. Phys. **261**, 799-819
@@ -274,8 +275,7 @@ by two declarations in `LatticeSystem/Quantum/SpinS/AKLTStability.lean`:
   polymer/cluster expansion, no uniform-in-L analyticity layer, and no chain
   translation operator (the only occurrences of "cluster expansion" under
   `LatticeSystem/` are the doc comments of this axiom and of the Theorem 8.1 large-D
-  axiom; the `*Cluster*` declarations in the source are the unrelated §7.3
-  cluster-state Hamiltonians). Per the policy above, perturbation-theoretic
+  axiom). Per the policy above, perturbation-theoretic
   results — the same class as Lemma 10.1 (degenerate perturbation theory) — are
   faithful documented axioms and are not active proof targets; this is a standing
   named exception, so the "prove theorems Tasaki cites without proof" rule does not
