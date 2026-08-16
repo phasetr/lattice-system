@@ -17,7 +17,7 @@ example (G : SimpleGraph (Fin 2)) (σ : Fin 2 → Fin 2) :
 example (G : SimpleGraph (Fin 2)) (hadj : G.Adj 0 1)
     (σ : Fin 2 → Fin 2) (h : σ 0 ≠ σ 1) :
     SwapReachable G σ (basisSwap σ 0 1) :=
-  SwapReachable.of_step ⟨0, 1, hadj, h, rfl⟩
+  SwapReachable.single G ⟨0, 1, hadj, h, rfl⟩
 
 /-- Walk-induction for any walk x → y. -/
 example (G : SimpleGraph (Fin 2)) {x y : Fin 2} (w : G.Walk x y)

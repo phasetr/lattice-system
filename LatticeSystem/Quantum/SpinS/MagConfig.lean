@@ -97,22 +97,6 @@ theorem RaiseLowerReachableSMagSector.refl
   Relation.ReflTransGen.refl
 
 omit [DecidableEq V] in
-/-- A single step is reachable. -/
-theorem RaiseLowerReachableSMagSector.single {G : SimpleGraph V} {M : ℕ}
-    {σ τ : magConfigS V N M} (h : RaiseLowerStepSMagSector G σ τ) :
-    RaiseLowerReachableSMagSector G σ τ :=
-  Relation.ReflTransGen.single h
-
-omit [DecidableEq V] in
-/-- Transitivity. -/
-theorem RaiseLowerReachableSMagSector.trans {G : SimpleGraph V} {M : ℕ}
-    {σ τ ρ : magConfigS V N M}
-    (h₁ : RaiseLowerReachableSMagSector G σ τ)
-    (h₂ : RaiseLowerReachableSMagSector G τ ρ) :
-    RaiseLowerReachableSMagSector G σ ρ :=
-  Relation.ReflTransGen.trans h₁ h₂
-
-omit [DecidableEq V] in
 /-- Tail extension on the subtype. -/
 theorem RaiseLowerReachableSMagSector.tail' {G : SimpleGraph V} {M : ℕ}
     {σ τ ρ : magConfigS V N M}

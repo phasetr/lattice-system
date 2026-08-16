@@ -37,12 +37,6 @@ theorem BondParityReachableS.refl (G : SimpleGraph V) (σ : V → Fin (N + 1)) :
     BondParityReachableS G σ σ := Relation.ReflTransGen.refl
 
 omit [Fintype V] [DecidableEq V] in
-/-- A single bond-only parity step is bond-only reachable. -/
-theorem BondParityReachableS.single {G : SimpleGraph V} {σ σ' : V → Fin (N + 1)}
-    (h : BondParityStepS G σ σ') : BondParityReachableS G σ σ' :=
-  Relation.ReflTransGen.single h
-
-omit [Fintype V] [DecidableEq V] in
 /-- Transitivity of bond-only parity reachability. -/
 theorem BondParityReachableS.trans {G : SimpleGraph V} {σ σ' σ'' : V → Fin (N + 1)}
     (h₁ : BondParityReachableS G σ σ') (h₂ : BondParityReachableS G σ' σ'') :
