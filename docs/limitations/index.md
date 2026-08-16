@@ -11,7 +11,7 @@ externally quoted results are represented by documented Lean axioms. This page
 states the policy and trust-boundary categories; it is not a generated or
 complete declaration register.
 
-- [Appendix status and axiomatization policy](/lattice-system/limitations/documented-axioms/)
+- [Documented-axiom status and axiomatization policy](/lattice-system/limitations/documented-axioms/)
 - [Complete interim declaration catalogue](/lattice-system/formalization/legacy/)
 - [Formalization-status contract](/lattice-system/formalization-status-contract/)
 

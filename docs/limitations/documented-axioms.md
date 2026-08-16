@@ -1,10 +1,10 @@
 ---
 layout: page
-title: "Appendix A and Chapter 7 documented-axiom status and policy"
+title: "Documented-axiom status and axiomatization policy"
 permalink: /limitations/documented-axioms/
 ---
 
-# Appendix A and Chapter 7 documented-axiom status and policy
+# Documented-axiom status and axiomatization policy
 
 > This current policy text was moved losslessly from the former monolithic index. Declaration-level status remains authoritative in the interim legacy catalogue until #5228.
 
