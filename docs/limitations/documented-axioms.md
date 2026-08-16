@@ -250,9 +250,15 @@ by two declarations in `LatticeSystem/Quantum/SpinS/AKLTStability.lean`:
   class below. Any future discharge must re-derive, not assume, the C/ξ uniformity.
 - **The translation-covariance marker has no mathematical content:**
   `IsTranslationCovariant L v` is an uninterpreted Prop-valued axiom, the same idiom
-  as `IsAKLTChainDynamics` (Theorem 7.2, above). It stands for v̂_x = T̂^x v̂_o (T̂†)^x,
-  which needs a chain translation operator that the repository does not define;
-  keeping it as a hypothesis is deliberate, since dropping it would let the axiom
+  as `IsAKLTChainDynamics` (Theorem 7.2, above). It stands for v̂_x = T̂^x v̂_o (T̂†)^x;
+  the repository does define a chain translation operator, `chainTranslationOp`
+  (`LiebSchultzMattisOrthogonality.lean:40`, instantiated at `N := 2` it has exactly
+  the type `ManyBodyOpS (Fin L) 2`), with supporting API
+  (`chainTranslationOp_unitary`/`'`, `chainTranslation_conj_onSiteS`/`_mul`/`_spinSDot`,
+  `chainTranslation_commute_hamiltonian`), but `AKLTStability.lean` does not import
+  `LiebSchultzMattisOrthogonality.lean`, so `IsTranslationCovariant` is not wired to
+  this existing operator. Keeping the marker as a hypothesis is deliberate, since
+  dropping it would let the axiom
   speak about arbitrary bounded range-r families that need not be translates of one
   local operator. Because the marker cannot be established for any concrete data, the
   axiom is usable only under an assumed hypothesis, and since the marker admits the
@@ -272,10 +278,9 @@ by two declarations in `LatticeSystem/Quantum/SpinS/AKLTStability.lean`:
   volume — and it is exactly this machinery, not any finite-dimensional
   linear-algebra argument, that yields both the L-uniform gap and the exponential
   clustering. The repository contains no such development: there is no
-  polymer/cluster expansion, no uniform-in-L analyticity layer, and no chain
-  translation operator (the only occurrences of "cluster expansion" under
-  `LatticeSystem/` are the doc comments of this axiom and of the Theorem 8.1 large-D
-  axiom). Per the policy above, perturbation-theoretic
+  polymer/cluster expansion and no uniform-in-L analyticity layer; the existing
+  `chainTranslationOp` (see above) is not wired into `AKLTStability.lean`. Per the
+  policy above, perturbation-theoretic
   results — the same class as Lemma 10.1 (degenerate perturbation theory) — are
   faithful documented axioms and are not active proof targets; this is a standing
   named exception, so the "prove theorems Tasaki cites without proof" rule does not
@@ -286,10 +291,10 @@ by two declarations in `LatticeSystem/Quantum/SpinS/AKLTStability.lean`:
   following exist in reviewed form in this repository (or are usable from mathlib):
   (a) a general, reviewed cluster/polymer-expansion (or equivalent
   quantum-perturbation) framework with volume-uniform convergence estimates, strong
-  enough to prove gap stability rather than assume it; (b) a real definition of the
-  chain translation operator T̂ on `ManyBodyOpS (Fin L) 2`, so that
-  `IsTranslationCovariant` is replaced by the actual condition
-  v̂_x = T̂^x v̂_o (T̂†)^x instead of an opaque marker; and (c) a math-before-code
+  enough to prove gap stability rather than assume it; (b) wiring
+  `IsTranslationCovariant` to the existing `chainTranslationOp`
+  (`LiebSchultzMattisOrthogonality.lean`), replacing the opaque marker with the actual
+  condition v̂_x = T̂^x v̂_o (T̂†)^x using that operator; and (c) a math-before-code
   transcription of Yarotsky's argument (from arXiv:math-ph/0412040) — or of the more
   general frustration-free stability theorem of S. Michalakis, J. P. Zwolak,
   *Stability of frustration-free Hamiltonians*, Commun. Math. Phys. **322**, 277-302
