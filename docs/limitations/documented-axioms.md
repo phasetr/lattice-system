@@ -1,10 +1,10 @@
 ---
 layout: page
-title: "Appendix status and axiomatization policy"
+title: "Documented-axiom status and axiomatization policy"
 permalink: /limitations/documented-axioms/
 ---
 
-# Appendix status and axiomatization policy
+# Documented-axiom status and axiomatization policy
 
 > This current policy text was moved losslessly from the former monolithic index. Declaration-level status remains authoritative in the interim legacy catalogue until #5228.
 
@@ -77,8 +77,8 @@ the precise dependency on these documented axioms auditable.
 
 **Tasaki §7.3.2, Theorem 7.7** (eqs. (7.3.6)–(7.3.9), pp. 210–212) is a **documented
 axiom**, `tasaki_theorem_7_7` (`LatticeSystem/Quantum/SpinS/GeneralAKLT.lean`, doc
-comment lines 130–174, declaration lines 175–183). This page's title and banner scope
-it to Appendix A; this section records a non-Appendix documented axiom here as well.
+comment lines 130–174, declaration lines 175–183). This section records this
+non-Appendix documented axiom alongside the Appendix A entries above.
 
 - **Proved (axiom-free):** the finite honeycomb-torus VBS ground state exists and is
   zero-energy and frustration-free — `honeycombVBSState_isGeneralGraphVBSGroundState`
@@ -137,8 +137,17 @@ it to Appendix A; this section records a non-Appendix documented axiom here as w
   its finite-volume uniqueness proof and its proof of eq. (7.3.9) is completed, or (b)
   an independent formalized proof of eq. (7.3.9) not relying on [41], should one become
   available.
-- **Tracking:** Issue #5132 (Theorem 7.7 discharge status); master tracker #4718.
+- **Tracking:** Issue #5132 (Theorem 7.7 discharge status) — **closed as not planned**
+  (2026-08-16); master tracker #4718 remains open. Reopen #5132 if either re-check
+  condition above is met (KLT [41] obtained and transcribed, or an independent
+  [41]-free proof of eq. (7.3.9) becomes available).
   Catalogue rows: `docs/formalization/legacy/19-the-aklt-model-tasaki-7-1.md`, the
   `tasaki_theorem_7_7` declaration row (grouped detail record #767) and the two inline
   `honeycombVBSState` / `honeycombVBSState_isGeneralGraphVBSGroundState` rows (not
   grouped detail records) that state the "remain unproved" items cited above.
+  Note: detail record #767 is a frozen baseline archival copy (whitespace-normalized
+  exact parity per `scripts/check_docs_hierarchy.py` against `docs/index.md` at the
+  tracked baseline commit `6519099`) and so still shows its original `(line 724, …)`
+  citation, which was already stale even at the time the record was frozen; the actual
+  declaration, `honeycombVBSState_isGeneralGraphVBSGroundState`, lives in
+  `LatticeSystem/Quantum/SpinS/HoneycombAKLTZeroEnergy.lean`.

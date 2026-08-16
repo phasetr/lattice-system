@@ -12,4 +12,4 @@ These links project explicitly Appendix-A-labelled matrix and spectral foundatio
 
 - [Generic matrix-analysis helpers (`Math/MatrixAnalysis/`)](/lattice-system/formalization/legacy/15-generic-matrix-analysis-helpers/#legacy-catalogue-generic-matrix-analysis-helpers-mathmatrixanalysis)
 - [Perron-Frobenius theorem (`Math/PerronFrobenius.lean`, `Math/PerronFrobeniusPrimitive.lean`, `Math/CollatzWielandt.lean`, `Math/PerronFrobeniusMain.lean`)](/lattice-system/formalization/legacy/26-perron-frobenius-theorem/#legacy-catalogue-perron-frobenius-theorem-mathperronfrobeniuslean-mathperronfrobeniusprimitivelean-mathcollatzwielandtlean-mathperronfrobeniusmainlean)
-- [Appendix status and axiomatization policy](/lattice-system/limitations/documented-axioms/)
+- [Documented-axiom status and axiomatization policy](/lattice-system/limitations/documented-axioms/)
