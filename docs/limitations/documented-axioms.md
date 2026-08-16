@@ -72,3 +72,35 @@ natural home is elsewhere. The `#print axioms` of every theorem in the repositor
 the precise dependency on these documented axioms auditable.
 
 <!-- legacy-source:end:155:216 -->
+
+## Theorem 7.7 (hexagonal AKLT correlation decay and infinite-volume uniqueness)
+
+**Tasaki §7.3.2, Theorem 7.7** (eqs. (7.3.6)–(7.3.9), pp. 210–212) is a **documented
+axiom**, `tasaki_theorem_7_7` (`LatticeSystem/Quantum/SpinS/GeneralAKLT.lean`).
+
+- **Proved (axiom-free):** the finite honeycomb-torus VBS ground state exists and is
+  zero-energy and frustration-free — `honeycombVBSState_isGeneralGraphVBSGroundState`
+  (`LatticeSystem/Quantum/SpinS/HoneycombAKLTZeroEnergy.lean`, PR #5133, `#print axioms`
+  = std3), for the canonical graph `honeycombTorusGraph m` with `m ≥ 2`.
+- **Axiomatized:** for a *general* hexagonal lattice (`IsHexagonalLatticeAKLT G`), (1)
+  finite-volume uniqueness of the ground state, (2) the size-uniform sign-alternating
+  exponential correlation-decay estimate eq. (7.3.9), (3) translation-invariant
+  infinite-volume uniqueness (`HasUniqueInfiniteVolumeVBSGroundState`), and (4) the
+  graph-isomorphism transport of the canonical torus's ground state to a general
+  `IsHexagonalLatticeAKLT` graph. The parallel axiom-free theorem above proves the
+  ground-state property only on the canonical torus; it does not discharge or reduce
+  any of these four items.
+- **Axiom reason (documented):** the rigorous 2D honeycomb correlation-decay proof
+  requires Kennedy–Lieb–Tasaki, *J. Stat. Phys.* **53**, 383–415 (1988),
+  DOI [10.1007/BF01011563](https://doi.org/10.1007/BF01011563) ("KLT [41]"), which is a
+  real implementation dependency confirmed unobtainable: OpenAlex work
+  `W2092140400` reports `oa_status = closed` with no repository fulltext; Unpaywall
+  confirms `is_oa = false`; none of Kennedy, Lieb, or Tasaki self-host a copy (Kennedy's
+  own publication page links only to a dead `springerlink.com` URL).
+- **Re-check condition:** obtaining a legitimate copy of KLT [41] (e.g. via
+  institutional library/Springer subscription access, since no open-access route
+  exists) and completing a math-before-code transcription of its finite-volume
+  uniqueness proof and its proof of eq. (7.3.9).
+- **Tracking:** Issue #5132 (Theorem 7.7 discharge status); master tracker #4718.
+  Catalogue record: `docs/formalization/legacy/19-the-aklt-model-tasaki-7-1.md`
+  (grouped detail records #767/#768).
