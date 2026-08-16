@@ -183,7 +183,7 @@ declarations in `LatticeSystem/Quantum/SpinS/AKLTInfiniteChain.lean`:
   the quasi-local C*-algebra of the spin-1 chain on ℤ — existence of a weak-* limit
   state, uniqueness quantified over all states (not merely translation-invariant ones),
   and a spectral-gap condition phrased through the derivation `δ = [Ĥ_AKLT, ·]`. Its
-  proof (Matsui, *Commun. Math. Phys.* **218**, 393 (2001), strengthening
+  proof (Matsui, *Commun. Math. Phys.* **189**, 127 (1997), strengthening
   Affleck–Kennedy–Lieb–Tasaki, *Commun. Math. Phys.* **115**, 477 (1988)) is carried
   out entirely in that operator-algebraic setting and is not reproduced by Tasaki, who
   states it without proof. Per the project's operator-algebra policy — the same one
