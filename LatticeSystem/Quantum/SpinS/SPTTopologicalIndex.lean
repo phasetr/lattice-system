@@ -7,8 +7,8 @@ Different SPT phases cannot be told apart by any local order parameter (there is
 breaking).  The Haldane phase is protected by any one of three symmetries:
 
 * **(S1) Z₂ × Z₂** — the π-rotations about the spin axes (`IsZ2Z2Invariant`);
-* **(S2) time-reversal** `Θ̂` (`IsTimeReversalSymmetricS` at `N = 2`,
-  `LiebSchultzMattisDiscrete.lean`);
+* **(S2) time-reversal** `Θ̂` — the marker of record is the general-`N` `IsTimeReversalSymmetricS`
+  (`LiebSchultzMattisDiscrete.lean`), named here in prose only (see below);
 * **(S3) bond-centered inversion** `Û_inv` (`IsBondInversionInvariant`).
 
 A clean characterization uses **"topological" indices** of the ground-state entanglement, invariant
@@ -30,10 +30,19 @@ definitions for matrix product states are in §8.3.4 and Ogata's rigorous infini
 
 The protecting symmetries and the entanglement entropy are uninterpreted markers (the antiunitary
 time reversal, the inversion geometry, and the half-infinite-chain Schmidt decomposition belong to
-the operator-algebra framework); time reversal is carried at `N = 2` by the general-`N` marker
-`IsTimeReversalSymmetricS`.  The inversion-parity formula `(−1)^{L·S}` is an axiom that is not yet
-implemented — a discharge target (its `S = 1` instance is reachable from `manyBodyReversalS` and
-`akltVBSState`), not a documented won't-do.
+the operator-algebra framework).  The marker of record for (S2) at `N = 2` is
+`IsTimeReversalSymmetricS`, but this module does not import `LiebSchultzMattisDiscrete.lean`, so
+every mention of it here is a cross-reference inside a doc comment, not a Lean consumer relation.
+
+The inversion-parity formula `(−1)^{L·S}` is not a documented won't-do but a discharge target, and
+discharging it is more than deleting an `axiom` line: the opaque marker `vbsInversionParityS` has to
+be replaced by a real definition of the `Û_inv` eigenvalue, and the formula then proved as a theorem
+about that definition.  The missing ingredient is the geometry of `Û_inv`, which permutes the
+*sites* of the ring (`x ↦ L − 1 − x`): that is `ringReflect` (`RingBondReflection.lean`) with its
+configuration action `ringConfigReflect` (`RingReflectionTheta.lean`).  It is a different map from
+the on-site spin reversal `Θ = manyBodyReversalS` (`ManyBodyReversalS.lean`), which reverses each
+site's spin index (`σ ↦ Fin.rev ∘ σ`) and leaves the sites in place.  At `S = 1` the reflection maps
+together with `akltVBSState` are the intended starting point; none of them is imported here either.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §8.3.2–§8.3.3, eqs. (8.3.6)–(8.3.10), pp. 256–263; F. Pollmann, A. M. Turner, E. Berg, M.

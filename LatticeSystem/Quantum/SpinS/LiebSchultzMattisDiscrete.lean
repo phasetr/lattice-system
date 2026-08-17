@@ -54,8 +54,9 @@ axiom IsZ2Z2SymmetricS {L N : ℕ} : ManyBodyOpS (Fin L) N → Prop
 
 /-- **Time-reversal symmetry marker** `IsTimeReversalSymmetricS H` for a general spin chain: `H` is
 invariant under the antiunitary time-reversal `Θ̂`.  An uninterpreted predicate, and the only
-time-reversal marker here: the §8.3.2–§8.3.3 SPT sections (`SPTTopologicalIndex.lean`) use it at
-`N = 2`. -/
+time-reversal marker in the repository: the §8.3.2–§8.3.3 SPT sections name it as symmetry (S2)
+at `N = 2`, but `SPTTopologicalIndex.lean` does not import this file, so that is a cross-reference
+mention inside a doc comment, not a Lean consumer. -/
 axiom IsTimeReversalSymmetricS {L N : ℕ} : ManyBodyOpS (Fin L) N → Prop
 
 /-- **Unique-gapped-ground-state marker** `HasUniqueGappedGroundStateS H`: the Hamiltonian `H` has a

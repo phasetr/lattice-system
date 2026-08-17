@@ -29,8 +29,11 @@ The Gu–Wen Hamiltonian is *defined concretely*.  The SPT-phase notions (`Conti
 not a theorem), built on a genuine continuous path of Hamiltonians together with uninterpreted
 markers
 for the deep predicates (short-range, gapped-unique, product-state, symmetry) whose faithful forms
-belong to the infinite-chain / operator-algebra framework.  The Oshikawa parity and the edge
-degeneracy are documented axioms.
+belong to the infinite-chain / operator-algebra framework.  The Oshikawa parity (eq. (8.3.3)) is a
+documented axiom; the edge degeneracy is a discharge target instead, and discharging it means
+replacing the opaque marker `vbsOpenChainGroundDegeneracyS` by a real definition of the open-chain
+ground-state degeneracy and then proving the `(S+1)²` formula about that definition — not merely
+deleting an `axiom` line.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §8.3.1–§8.3.2, eqs. (8.3.1)–(8.3.4), pp. 251–256; Z.-C. Gu, X.-G. Wen, Phys. Rev. B **80**,
