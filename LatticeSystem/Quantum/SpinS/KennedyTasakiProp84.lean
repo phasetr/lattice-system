@@ -116,7 +116,7 @@ For a word `w` supported in the interior window `[a, b]` (`hw`), with genuine ma
 (`hleft : 0 < a`, `hright : b + 1 < L`): the Kennedy–Tasaki-transformed monomial
 `Û_KT O_w Û_KT` is again local in `[a, b]` **iff** `O_w` is Z₂ × Z₂ invariant, and Z₂ × Z₂
 invariance of `O_w` is preserved by the transformation (the printed parenthetical
-"(In this case `Ĥ` is also `Z₂ × Z₂` invariant.)", which for the primed `Ĥ'` costs nothing since
+"(In this case `Ĥ'` is also `Z₂ × Z₂` invariant.)", which for the primed `Ĥ'` costs nothing since
 `Û_KT` commutes with every `Û_π^{(α)}`, p. 250).
 
 The interior-window hypothesis is **not** removable: `O = Ŝ_0^{(3)}` has odd left parity

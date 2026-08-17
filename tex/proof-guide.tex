@@ -12641,21 +12641,44 @@ backfill.
 
 \medskip
 \noindent\textbf{§8.2.2--§8.2.3 Kennedy--Tasaki transformation + Proposition 8.4} (Pollmann--Turner
---Berg--Oshikawa; Tasaki §8.2.2--§8.2.3, eqs.~(8.2.5)--(8.2.7), pp.~241--251;
-\texttt{Quantum/SpinS/KennedyTasakiTransformation.lean}, Issue \#4485).  The nonlocal unitary
-realizing hidden $\mathbb{Z}_2\times\mathbb{Z}_2$ symmetry breaking.  \texttt{ktUnitaryS}~$L$ (marker)
-is the Kennedy--Tasaki unitary $\hat U_{\mathrm{KT}}=\prod_{u<v}\exp(i\pi\hat S_u^{(3)}\hat S_v^{(1)})$
-(eq.~8.2.5), with \texttt{ktUnitaryS\_sq} ($\hat U_{\mathrm{KT}}^2=1$) and
-\texttt{ktUnitaryS\_selfAdjoint} ($\hat U_{\mathrm{KT}}=\hat U_{\mathrm{KT}}^\dagger$) --- a
-self-adjoint involution.  \texttt{piRotationS}~$L\,\alpha=\prod_x\exp(i\pi\hat S_x^{(\alpha)})$
-(concrete, on-site matrix exponentials) is the $\pi$-rotation about axis $\alpha$;
-\texttt{IsZ2Z2Invariant}~$H$ is $(\hat U_\pi^{(\alpha)})^\dagger H\hat U_\pi^{(\alpha)}=H$ for all
-$\alpha$.  The markers \texttt{HasShortRangeInteraction}/\texttt{HasSomeShortRangeInteraction} capture
-range-$r$ locality.  The axiom \texttt{tasaki\_prop\_8\_4} states that for a short-range open-chain
-$\hat H$, the transformed $\hat U_{\mathrm{KT}}\hat H\hat U_{\mathrm{KT}}$ is again short-range
-\emph{iff} $\hat H$ is $\mathbb{Z}_2\times\mathbb{Z}_2$ invariant --- the hidden-symmetry-breaking
-picture is effective exactly when $\hat H$ has $\mathbb{Z}_2\times\mathbb{Z}_2$ symmetry.  A documented
-axiom.  Chapters~3--10 backfill.
+--Berg--Oshikawa; Tasaki §8.2.2--§8.2.3, eqs.~(8.2.5)--(8.2.7), (8.2.12)--(8.2.15), (8.2.17),
+pp.~241--251; \emph{proved, single-local-monomial form, axiom-free/\texttt{std3}},
+\texttt{Quantum/SpinS/SpinOneHalfTurnRegion.lean},
+\texttt{Quantum/SpinS/KennedyTasakiTransformation.lean},
+\texttt{Quantum/SpinS/KennedyTasakiTransformRules.lean},
+\texttt{Quantum/SpinS/KennedyTasakiMonomial.lean},
+\texttt{Quantum/SpinS/KennedyTasakiProp84.lean}, PR \#5283).  The nonlocal unitary realizing hidden
+$\mathbb{Z}_2\times\mathbb{Z}_2$ symmetry breaking.  \texttt{ktUnitaryS}~$L=\prod_{u<v}\bigl(1-2(\hat
+S_u^{(3)}\hat S_v^{(1)})^2\bigr)$ is the concrete Kennedy--Tasaki unitary --- the $S=1$ closed form of
+$\hat U_{\mathrm{KT}}=\prod_{u<v}\exp(i\pi\hat S_u^{(3)}\hat S_v^{(1)})$ (eq.~8.2.5), valid because the
+two factors sit on different sites so $A^3=A$ --- a self-adjoint involution (\texttt{ktUnitaryS\_sq},
+\texttt{ktUnitaryS\_selfAdjoint}).  \texttt{piRotationS}~$L\,\alpha=\prod_x\bigl(1-2(\hat
+S_x^{(\alpha)})^2\bigr)$ is likewise concrete (the $S=1$ closed form of the $\pi$-rotation about axis
+$\alpha$, no matrix exponential); \texttt{IsZ2Z2Invariant}~$H$ is $(\hat U_\pi^{(\alpha)})^\dagger
+H\hat U_\pi^{(\alpha)}=H$ for all $\alpha$.  \texttt{tasaki\_prop\_8\_4\_local\_monomial} is the
+reformulated, proved statement: the printed Proposition quantifies over Hamiltonians with short-range
+interactions, but §8.2.2--§8.2.3 argue and prove only the level of a single local monomial
+$O_w=\prod_i\hat S_{x_i}^{(\alpha_i)}$ (a word \texttt{w~:~List~(Fin~L~\texttimes~Fin~3)}), so a
+fixed-window locality predicate \texttt{IsLocalWindowS}~$L\,N\,a\,b$ (commutant form, following
+\texttt{IsLocalRangeR}) replaces the range-$r$ markers \texttt{HasShortRangeInteraction} and
+\texttt{HasSomeShortRangeInteraction} (both deleted: at fixed finite $L$ a range-existence predicate
+is vacuously true once $r\ge L$, since ring/chain distance is bounded by $L$).  For $w$ supported in
+an interior window $[a,b]$ with genuine margin on both sides ($0<a$, $b+1<L$ --- not removable:
+$\hat S_0^{(3)}$ has odd left parity yet $\hat U_{\mathrm{KT}}\hat S_0^{(3)}\hat
+U_{\mathrm{KT}}=\hat S_0^{(3)}$ is exactly local, because the (8.2.13)/(8.2.14) strings are half-open
+and so are empty at an edge site), the theorem shows $\hat U_{\mathrm{KT}}O_w\hat U_{\mathrm{KT}}$ is
+again local in $[a,b]$ \emph{iff} $O_w$ is $\mathbb{Z}_2\times\mathbb{Z}_2$ invariant --- via the sign
+identity $\hat U_\pi^{(\alpha)}O_w\hat U_\pi^{(\alpha)}=(-1)^{c_\alpha}O_w$
+($c_\alpha=\#\{i\mid\alpha_i\ne\alpha\}$) rather than a bare parity biconditional, since the printed
+parity criterion is false as an iff at $O_w=0$ --- with invariance of $O_w$ preserved by the
+transformation: the printed parenthetical ``(In this case $\hat H'$ is also
+$\mathbb{Z}_2\times\mathbb{Z}_2$ invariant.)'' generalizes for free to every $H$, since $\hat
+U_{\mathrm{KT}}$ commutes with every $\hat U_\pi^{(\alpha)}$ (p.~250).  Proved by the half-turn
+control-polynomial algebra of §8.2.2 (no operator-algebra or path-integral dependency) plus a
+self-authored necessity argument, since the book states only ``it is easy to check'' for the
+single-monomial parity criterion and never addresses the Hamiltonian-level sum; the step from a
+non-invariant local term to a non-short-ranged \emph{sum} is not made in the book and is deliberately
+out of scope here.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§8.3.1--§8.3.2 Symmetry protected topological (SPT) phase} (Gu--Wen /
