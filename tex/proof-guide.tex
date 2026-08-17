@@ -12697,7 +12697,10 @@ Hamiltonians, each short-range gapped-unique (marker \texttt{IsShortRangeGappedU
 (\texttt{IsProductStateHamiltonian}); and \texttt{IsSPTPhase}~$sym\,H$ is short-range gapped-unique,
 $sym$-symmetric, and not trivial.  The Haldane phase is the prototypical SPT phase protected by
 $\mathbb{Z}_2\times\mathbb{Z}_2$ (\texttt{IsZ2Z2Invariant}).  Concrete Hamiltonian + \texttt{def} SPT.
-Of the two axioms only the Oshikawa string order (eq.~8.3.3) is a documented axiom;
+Of the section's two statement axioms only the Oshikawa string order (eq.~8.3.3) --- together with
+its opaque carrier \texttt{vbsStringOrderParameterS} --- is a documented axiom, as are the two
+classification markers \texttt{IsShortRangeGappedUniqueGS} and \texttt{IsProductStateHamiltonian}
+(all three entries in \path{docs/limitations/documented-axioms.md});
 \texttt{tasaki\_vbs\_edge\_degeneracy} is \emph{not} a documented axiom but a discharge target, and
 discharging it is more than deleting an axiom line: the opaque marker
 \texttt{vbsOpenChainGroundDegeneracyS} must be replaced by a real definition of the open-chain
@@ -12711,10 +12714,12 @@ open-chain spin-$S$ infrastructure.  Chapters~3--10 backfill.
 (Pollmann--Turner--Berg--Oshikawa; Tasaki §8.3.2--§8.3.3, eqs.~(8.3.6)--(8.3.10), pp.~256--263;
 \texttt{Quantum/SpinS/SPTTopologicalIndex.lean}, Issue \#4485).  The Haldane phase is protected by any
 of three symmetries: (S1) $\mathbb{Z}_2\times\mathbb{Z}_2$ (\texttt{IsZ2Z2Invariant}), (S2)
-time-reversal (the marker of record is the general-$N$ \texttt{IsTimeReversalSymmetricS} of
-\texttt{Quantum/SpinS/LiebSchultzMattisDiscrete.lean}, named here at $N=2$ in prose only:
-\texttt{SPTTopologicalIndex.lean} does not import that file, so this is a doc-comment
-cross-reference, not a Lean consumer), (S3) bond-centered
+time-reversal (\texttt{IsTimeReversalInvariant} marker, whose type and meaning coincide with the
+$N=2$ instance of the general-$N$ \texttt{IsTimeReversalSymmetricS} of
+\texttt{Quantum/SpinS/LiebSchultzMattisDiscrete.lean}: a genuine duplicate kept in parallel, since
+consolidating it is a deletion requiring its own approval; \texttt{SPTTopologicalIndex.lean} does
+not import that file, so the mention there is a doc-comment cross-reference, not a Lean consumer),
+(S3) bond-centered
 inversion (\texttt{IsBondInversionInvariant} marker).  The axiom
 \texttt{tasaki\_vbs\_inversion\_parity} gives
 the inversion-parity $\mathbb{Z}_2$ index $\hat U_{\mathrm{inv}}|\Phi_{\mathrm{VBS}}^S\rangle

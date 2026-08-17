@@ -7,8 +7,7 @@ Different SPT phases cannot be told apart by any local order parameter (there is
 breaking).  The Haldane phase is protected by any one of three symmetries:
 
 * **(S1) Z₂ × Z₂** — the π-rotations about the spin axes (`IsZ2Z2Invariant`);
-* **(S2) time-reversal** `Θ̂` — the marker of record is the general-`N` `IsTimeReversalSymmetricS`
-  (`LiebSchultzMattisDiscrete.lean`), named here in prose only (see below);
+* **(S2) time-reversal** `Θ̂` (`IsTimeReversalInvariant`);
 * **(S3) bond-centered inversion** `Û_inv` (`IsBondInversionInvariant`).
 
 A clean characterization uses **"topological" indices** of the ground-state entanglement, invariant
@@ -30,9 +29,10 @@ definitions for matrix product states are in §8.3.4 and Ogata's rigorous infini
 
 The protecting symmetries and the entanglement entropy are uninterpreted markers (the antiunitary
 time reversal, the inversion geometry, and the half-infinite-chain Schmidt decomposition belong to
-the operator-algebra framework).  The marker of record for (S2) at `N = 2` is
-`IsTimeReversalSymmetricS`, but this module does not import `LiebSchultzMattisDiscrete.lean`, so
-every mention of it here is a cross-reference inside a doc comment, not a Lean consumer relation.
+the operator-algebra framework).  The (S2) marker `IsTimeReversalInvariant` below has the same type
+and meaning as the `N = 2` instance of the general-`N` `IsTimeReversalSymmetricS`
+(`LiebSchultzMattisDiscrete.lean`); this module does not import that file, so the cross-reference is
+prose inside a doc comment, not a Lean consumer relation.
 
 The inversion-parity formula `(−1)^{L·S}` is not a documented won't-do but a discharge target, and
 discharging it is more than deleting an `axiom` line: the opaque marker `vbsInversionParityS` has to
@@ -60,6 +60,15 @@ namespace LatticeSystem.Quantum
 open Matrix
 
 variable {L : ℕ}
+
+/-- **(S2) Time-reversal symmetry marker** `IsTimeReversalInvariant H`: the Hamiltonian `H` is
+invariant under the antiunitary time-reversal `Θ̂`.  A faithful definition needs the antiunitary
+operator; kept as an uninterpreted predicate.  Its type and meaning coincide with the `N = 2`
+instance of the general-`N` `IsTimeReversalSymmetricS` (`LiebSchultzMattisDiscrete.lean`), so the
+pair is a genuine duplicate and not a deliberate scope split; consolidating it would delete a
+declaration, which is a separately approved decision that has not been taken, so the two are
+recorded here as knowingly parallel markers. -/
+axiom IsTimeReversalInvariant (H : ManyBodyOpS (Fin L) 2) : Prop
 
 /-- **(S3) Bond-centered inversion symmetry marker** `IsBondInversionInvariant H`: the Hamiltonian
 `H` is invariant under the bond-centered spatial inversion `Û_inv`.  A faithful definition needs the
