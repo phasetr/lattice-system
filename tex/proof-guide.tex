@@ -12588,23 +12588,37 @@ Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§8.1.2--§8.1.3 Hidden order forces edge states} (Theorem 8.2, Koma--Tasaki; Tasaki
-§8.1.2--§8.1.3, eqs.~(8.1.9)--(8.1.11), pp.~229--238;
-\texttt{Quantum/SpinS/AnisotropicEdgeStates.lean}, Issue \#4485).  Hidden antiferromagnetic order ---
-positivity of the den Nijs--Rommelse string order parameter $O_{\mathrm{string}}^{(\alpha)}(D)$ of
-the ground state of (8.1.1) --- distinguishes the Haldane phase ($0\le D<D_c$) from the large-$D$
-phase and forces low-lying edge states.  The marker \texttt{HasStringLRO} $L\,D\,\Phi\,q$ carries the
-hidden-order bound (8.1.10) $\langle\Phi|(\hat O_{\mathrm{string}}^{(\alpha)}/L)^2|\Phi\rangle\ge
-q_\alpha$ ($q_\alpha>0$, $L$-independent).  Since edge states are an open-boundary phenomenon, the
-theorem uses the open-chain Hamiltonian \texttt{openAnisotropicChainHamiltonianS} (coupling
-\texttt{openAnisotropicChainCoupling}, no wrap-around).  The axiom \texttt{tasaki\_theorem\_8\_2} states that for
-fixed $D,q$ there are $L$-independent $C_\nu>0$ such that for every $L>0$, whenever $\Phi$ is the
-\emph{unique} ground state (\texttt{IsUniqueChainGroundState}) at energy $E_0$ with
-\texttt{HasStringLRO}, there are three linearly independent excited states $\Psi_\nu$
-($\nu:\texttt{Fin}~3$, \texttt{LinearIndependent}) with $\hat H_D^{\mathrm{open}}\Psi_\nu=E_\nu\Psi_\nu$
-and $E_0<E_\nu\le E_0+C_\nu/L$ --- hidden order forces a near four-fold degeneracy (the free $S=1/2$
-edge spins); the constants are quantified outside $\forall L$, hence length-uniform.  Proved by the
-Horsch--von der Linden / Koma--Tasaki variational argument (as Theorem 3.1); a documented axiom.
-Chapters~3--10 backfill.
+§8.1.2--§8.1.3, eqs.~(8.1.8)--(8.1.12), pp.~236--238; \emph{proved}, axiom-free/\texttt{std3},
+\texttt{Quantum/SpinS/AnisotropicEdgeStates.lean},
+\texttt{Quantum/SpinS/AnisotropicEdgeStringOrder.lean},
+\texttt{Quantum/SpinS/AnisotropicEdgeSymmetry.lean},
+\texttt{Quantum/SpinS/AnisotropicEdgeEnergy.lean},
+\texttt{Quantum/SpinS/AnisotropicEdgeStatesDischarge.lean}, PR \#5279).  Hidden antiferromagnetic
+order --- positivity of the den Nijs--Rommelse string order parameter
+$O_{\mathrm{string}}^{(\alpha)}(D)$ of the ground state of (8.1.1) --- distinguishes the Haldane
+phase ($0\le D<D_c$) from the large-$D$ phase and forces low-lying edge states.  The concrete
+predicate \texttt{HasStringLRO} $L\,\Phi\,q$ (no $D$ argument) carries the hidden-order bound
+(8.1.10) $\langle\Phi|(\hat O_{\mathrm{string}}^{(\alpha)}/L)^2|\Phi\rangle\ge q_\alpha$
+($q_\alpha>0$, $L$-independent), for the prefix string operator $\hat
+O_{\mathrm{string}}^{(\alpha)}$ built from the spin-one half turn \texttt{spinOneHalfTurnS}
+$\alpha=1-2(\hat S^{(\alpha)})^2$ (the closed form of $\exp(i\pi\hat S^{(\alpha)})$, valid because
+$(\hat S^{(\alpha)})^3=\hat S^{(\alpha)}$ for $S=1$).  Since edge states are an open-boundary
+phenomenon, the theorem uses the open-chain Hamiltonian \texttt{openAnisotropicChainHamiltonianS}
+(coupling \texttt{openAnisotropicChainCoupling}, no wrap-around).  The theorem
+\texttt{tasaki\_theorem\_8\_2} (formerly a documented axiom) states that for fixed $D\ge0,q>0$
+there are an eventual threshold $L_0$ ($=1$, no numerical threshold is needed) and
+$L$-independent constants $C_\nu=64(3+D)/q_\nu>0$ such that for every $L\ge L_0$, whenever $\Phi$
+is the \emph{unique} ground state (\texttt{IsUniqueChainGroundState}) of
+$\hat H_D^{\mathrm{open}}$ at energy $E_0$ with \texttt{HasStringLRO}, there are three linearly
+independent excited states $\Psi_\nu$ ($\nu:\texttt{Fin}~3$, \texttt{LinearIndependent}) with
+$\hat H_D^{\mathrm{open}}\Psi_\nu=E_\nu\Psi_\nu$ and $E_0<E_\nu\le E_0+C_\nu/L$ --- hidden order
+forces a near four-fold degeneracy (the free $S=1/2$ edge spins); the constants are quantified
+outside $\forall L$, hence genuinely length-uniform.  Proved by the Horsch--von der Linden /
+Koma--Tasaki variational argument (as Theorem 3.1): the $Z_2\times Z_2$ half-turn symmetry
+(\texttt{manyBodyReversalS}, \texttt{magParityDiagS}) selects three mutually orthogonal,
+ground-orthogonal sector eigenvectors, and the double-commutator bound
+$\|[\hat O_\alpha,[\hat H,\hat O_\alpha]]\|\le64(3+D)L$ (a self-authored support-counting
+argument, since the book only sketches it) feeds the variational gap estimate.
 
 \medskip
 \noindent\textbf{§8.2.1 $\lambda$-D model: Néel $\le$ string order} (Theorem 8.3, Kennedy--Tasaki;

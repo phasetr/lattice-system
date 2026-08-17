@@ -160,6 +160,13 @@ to the identity endomorphism, whose operator norm is `1` on the nontrivial space
     manyBodyOperatorNormS (1 : ManyBodyOpS Λ N) = 1 := by
   rw [manyBodyOperatorNormS_eq_toEuclideanCLM, map_one, norm_one]
 
+/-- **A unitary has operator norm one**: from the `C*`-identity `‖UᴴU‖ = ‖U‖²` and `‖1‖ = 1`. -/
+theorem manyBodyOperatorNormS_eq_one_of_unitary {U : ManyBodyOpS Λ N}
+    (hU : Matrix.conjTranspose U * U = 1) : manyBodyOperatorNormS U = 1 := by
+  have h := manyBodyOperatorNormS_conjTranspose_mul_self U
+  rw [hU, manyBodyOperatorNormS_one] at h
+  rw [← Real.sqrt_sq (manyBodyOperatorNormS_nonneg U), ← h, Real.sqrt_one]
+
 /-- **Unitary conjugation preserves the many-body `L²` operator norm**: if `UᴴU = 1` then
 `‖U Y Uᴴ‖ = ‖Y‖`.  The forward bound is two submultiplicative steps with `‖U‖ = 1` (from the
 `C*`-identity `‖UᴴU‖ = ‖U‖²` and `‖1‖ = 1`) and `‖Uᴴ‖ = ‖U‖`; the reverse bound rewrites
@@ -168,10 +175,7 @@ generalized Lieb–Schultz–Mattis Lemma 6.4 (Tasaki §6.2). -/
 theorem manyBodyOperatorNormS_unitary_conj {U Y : ManyBodyOpS Λ N}
     (hU : Matrix.conjTranspose U * U = 1) :
     manyBodyOperatorNormS (U * Y * Matrix.conjTranspose U) = manyBodyOperatorNormS Y := by
-  have hUnorm : manyBodyOperatorNormS U = 1 := by
-    have h := manyBodyOperatorNormS_conjTranspose_mul_self U
-    rw [hU, manyBodyOperatorNormS_one] at h
-    rw [← Real.sqrt_sq (manyBodyOperatorNormS_nonneg U), ← h, Real.sqrt_one]
+  have hUnorm : manyBodyOperatorNormS U = 1 := manyBodyOperatorNormS_eq_one_of_unitary hU
   have hY : Matrix.conjTranspose U * (U * Y * Matrix.conjTranspose U) * U = Y := by
     calc Matrix.conjTranspose U * (U * Y * Matrix.conjTranspose U) * U
         = (Matrix.conjTranspose U * U) * (Y * (Matrix.conjTranspose U * U)) := by
