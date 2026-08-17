@@ -70,22 +70,55 @@ noncomputable def piRotationS (L : ℕ) (α : Fin 3) : ManyBodyOpS (Fin L) 2 :=
 def IsZ2Z2Invariant (H : ManyBodyOpS (Fin L) 2) : Prop :=
   ∀ α : Fin 3, (piRotationS L α).conjTranspose * H * piRotationS L α = H
 
-/-- **Short-range-interaction marker** `HasShortRangeInteraction H r`: the open-chain Hamiltonian
-`H`
-is a sum of local terms each acting within range `r`.  A faithful definition needs the local-term
-decomposition; it is kept as an uninterpreted predicate (cf. the commutant-form `IsLocalRangeR`). -/
-axiom HasShortRangeInteraction (H : ManyBodyOpS (Fin L) 2) (r : ℕ) : Prop
+/-- The **word-indexed spin monomial** `O_w = ∏_i Ŝ_{w_i.1}^{(w_i.2)}` for a word
+`w : List (Fin L × Fin 3)` of (site, axis) letters, read left to right in list order.  Same-site
+letters do not commute (`Ŝ^{(1)} Ŝ^{(2)} ≠ Ŝ^{(2)} Ŝ^{(1)}`) and the book's own example
+`Ŝ_x^{(1)} Ŝ_{x+1}^{(2)} (Ŝ_{x+2}^{(3)})²` repeats a letter, so a `List`, not a `Finset`/`Multiset`,
+is the right bookkeeping (idiom precedent: `cartWord`, `AndersonTowerCartWord.lean:33`). -/
+noncomputable def spinMonomialS {L : ℕ} (w : List (Fin L × Fin 3)) : ManyBodyOpS (Fin L) 2 :=
+  (w.map fun p => spinSSiteComponentS p.2 p.1).prod
 
-/-- `H` **has some short-range interaction**: it is range-`r` local for some `r`. -/
-def HasSomeShortRangeInteraction (H : ManyBodyOpS (Fin L) 2) : Prop :=
-  ∃ r : ℕ, HasShortRangeInteraction H r
+/-- **Commutant-form window locality** `IsLocalWindowS L N a b op`: the operator `op` acts only on
+sites inside the window `[a, b] ⊆ Fin L`, recorded as the commutant condition that `op` commutes
+with every single-site operator `onSiteS z A` placed at a site `z` outside the window.  This is the
+open-chain, explicit-window analogue of the ring-distance predicate `IsLocalRangeR`
+(`LiebSchultzMattisGeneral.lean:52`), and is the contentful replacement for the deleted opaque axiom
+`HasShortRangeInteraction`: unlike an `∃ r, …` range-existence form, which is vacuously true for
+every operator once `r ≥ L` (ring distance on `Fin L` is bounded by `L / 2`), a fixed window
+`[a, b]` is genuinely restrictive at fixed finite `L`. -/
+def IsLocalWindowS (L N a b : ℕ) (op : ManyBodyOpS (Fin L) N) : Prop :=
+  ∀ z : Fin L, (z.val < a ∨ b < z.val) →
+    ∀ A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ, Commute op (onSiteS z A)
 
-/-- **Tasaki Proposition 8.4 (Pollmann–Turner–Berg–Oshikawa), AXIOM.**  For an `S = 1` open-chain
-Hamiltonian `Ĥ` with short-range interactions, the Kennedy–Tasaki-transformed Hamiltonian
-`Û_KT Ĥ Û_KT` again has only short-range interactions **iff** `Ĥ` is Z₂ × Z₂ invariant.  Thus the
-hidden Z₂ × Z₂ symmetry-breaking picture is effective exactly when the original Hamiltonian has
-Z₂ × Z₂ symmetry.  Recorded as a documented axiom. -/
-axiom tasaki_prop_8_4 (H : ManyBodyOpS (Fin L) 2) (hH : HasSomeShortRangeInteraction H) :
-    HasSomeShortRangeInteraction (ktUnitaryS L * H * ktUnitaryS L) ↔ IsZ2Z2Invariant H
+/-- **Tasaki Proposition 8.4 (Pollmann–Turner–Berg–Oshikawa), single-local-monomial form.**  The
+printed Proposition quantifies over Hamiltonians with short-range interactions, but §8.2.2–§8.2.3
+(pp. 241–251) argue, and prove, only the single-local-monomial statement below; the step from a
+non-invariant local term to a non-short-ranged *sum* is made nowhere in the book (it would need to
+rule out cancellation between distinct non-invariant terms) and is deliberately out of scope here.
+
+For a word `w` supported in the interior window `[a, b]` (`hw`), with genuine margin on both sides
+(`hleft : 0 < a`, `hright : b + 1 < L`): the Kennedy–Tasaki-transformed monomial
+`Û_KT O_w Û_KT` is again local in `[a, b]` **iff** `O_w` is Z₂ × Z₂ invariant, and Z₂ × Z₂ invariance
+of `O_w` is preserved by the transformation (the printed parenthetical "(In this case `Ĥ` is also
+`Z₂ × Z₂` invariant.)", which for the primed `Ĥ'` costs nothing since `Û_KT` commutes with every
+`Û_π^{(α)}`, p. 250).
+
+The interior-window hypothesis is **not** removable: `O = Ŝ_0^{(3)}` has odd left parity
+(`n₂ + n₃ = 1`) yet `Û_KT Ŝ_0^{(3)} Û_KT = Ŝ_0^{(3)}` is exactly local, because the (8.2.13)/(8.2.14)
+strings are half-open (`u < x` on the left, `v > x` on the right) and so are empty at an edge site.
+No `O_w ≠ 0` hypothesis is needed: non-invariance itself forces `O_w ≠ 0`
+(`(-1)^c • O_w = O_w` failing implies `O_w ≠ 0`), and `O_w = 0` makes both sides of the
+biconditional and the implication true.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §8.2.2–§8.2.3, Proposition 8.4, eqs. (8.2.12)–(8.2.15), (8.2.17), p. 250. -/
+theorem tasaki_prop_8_4_local_monomial {L : ℕ} (w : List (Fin L × Fin 3)) (a b : ℕ)
+    (hw : ∀ p ∈ w, a ≤ (p.1 : Fin L).val ∧ (p.1 : Fin L).val ≤ b)
+    (hleft : 0 < a) (hright : b + 1 < L) :
+    (IsLocalWindowS L 2 a b (ktUnitaryS L * spinMonomialS w * ktUnitaryS L)
+        ↔ IsZ2Z2Invariant (spinMonomialS w))
+      ∧ (IsZ2Z2Invariant (spinMonomialS w) →
+          IsZ2Z2Invariant (ktUnitaryS L * spinMonomialS w * ktUnitaryS L)) := by
+  sorry
 
 end LatticeSystem.Quantum
