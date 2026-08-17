@@ -75,7 +75,10 @@ axiom tasaki_vbs_edge_degeneracy (S : ℕ) : vbsOpenChainGroundDegeneracyS S = (
 
 /-- **Gapped-unique marker** `IsShortRangeGappedUniqueGS H`: the Hamiltonian `H` is short-ranged and
 has a unique ground state with a nonvanishing energy gap.  Kept as an uninterpreted predicate (its
-faithful form is the infinite-chain gapped-uniqueness used to classify phases). -/
+faithful form is the infinite-chain gapped-uniqueness used to classify phases).  Bundling both
+conditions at `N = 2` is deliberate: it is the single hypothesis the phase classification below
+travels along paths with, and it is not to be merged with the separate general-`N` markers
+`HasShortRangeHamiltonianS` / `HasUniqueGappedGroundStateS` (`LiebSchultzMattisDiscrete.lean`). -/
 axiom IsShortRangeGappedUniqueGS (H : ManyBodyOpS (Fin L) 2) : Prop
 
 /-- **Product-state marker** `IsProductStateHamiltonian H`: `H` has a trivial tensor-product ground

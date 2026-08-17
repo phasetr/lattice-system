@@ -26,10 +26,9 @@ ground state `|Φ_GS⟩ = Σ_j √p_j |Φ_j⟩_L ⊗ |Ψ_j⟩_R` (eq. (8.3.7)), 
 definitions for matrix product states are in §8.3.4 and Ogata's rigorous infinite-chain indices in
 §8.3.6.
 
-The protecting symmetries, the SPT classification, and the entanglement entropy are uninterpreted
-markers (the antiunitary time reversal, the inversion geometry, and the half-infinite-chain Schmidt
-decomposition belong to the operator-algebra framework).  The inversion-parity formula `(−1)^{L·S}`
-and the odd/even-`S` classification are documented axioms.
+The protecting symmetries and the entanglement entropy are uninterpreted markers (the antiunitary
+time reversal, the inversion geometry, and the half-infinite-chain Schmidt decomposition belong to
+the operator-algebra framework).  The inversion-parity formula `(−1)^{L·S}` is a documented axiom.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §8.3.2–§8.3.3, eqs. (8.3.6)–(8.3.10), pp. 256–263; F. Pollmann, A. M. Turner, E. Berg, M.
@@ -44,7 +43,9 @@ variable {L : ℕ}
 
 /-- **(S2) Time-reversal symmetry marker** `IsTimeReversalInvariant H`: the Hamiltonian `H` is
 invariant under the antiunitary time-reversal `Θ̂`.  A faithful definition needs the antiunitary
-operator; kept as an uninterpreted predicate. -/
+operator; kept as an uninterpreted predicate.  Its scope is deliberately the `S = 1` (`N = 2`)
+SPT setting of this section, distinct from the general-`N` `IsTimeReversalSymmetricS`
+(`LiebSchultzMattisDiscrete.lean`) used by Theorem 8.6; the two are not to be merged. -/
 axiom IsTimeReversalInvariant (H : ManyBodyOpS (Fin L) 2) : Prop
 
 /-- **(S3) Bond-centered inversion symmetry marker** `IsBondInversionInvariant H`: the Hamiltonian
@@ -61,16 +62,6 @@ chain is an eigenstate of bond-centered inversion with eigenvalue `(−1)^{L·S}
 `Û_inv |Φ_VBS^S⟩ = (−1)^{L·S} |Φ_VBS^S⟩`.  For odd `L·S` the state has odd parity and so cannot be
 continuously connected to the even-parity trivial product state — a `Z₂` topological obstruction. -/
 axiom tasaki_vbs_inversion_parity (L S : ℕ) : vbsInversionParityS L S = (-1 : ℤ) ^ (L * S)
-
-/-- **SPT-nontriviality marker** `IsSpinSVBSNontrivialSPT S`: the spin-`S` VBS phase is a nontrivial
-SPT phase (protected by (S1), (S2), or (S3)). -/
-axiom IsSpinSVBSNontrivialSPT : ℕ → Prop
-
-/-- **Tasaki §8.3.3 (odd/even-`S` SPT classification), AXIOM.**  The spin-`S` VBS state exhibiting
-the Haldane gap is a **nontrivial** SPT phase (protected by Z₂ × Z₂, time-reversal, or bond-centered
-inversion) **iff `S` is odd**; for even `S` it belongs to the trivial phase and can be continuously
-connected to a product state under any of the symmetries. -/
-axiom tasaki_spt_classification (S : ℕ) : IsSpinSVBSNontrivialSPT S ↔ Odd S
 
 /-- The **bipartite entanglement entropy** `S_LR = −Σ_j p_j log p_j` of a chain state, from the
 Schmidt weights `p_j` of the left/right bipartition (eqs. (8.3.7)–(8.3.8)).  The half-infinite-chain
