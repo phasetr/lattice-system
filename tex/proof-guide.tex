@@ -12696,8 +12696,12 @@ Hamiltonians, each short-range gapped-unique (marker \texttt{IsShortRangeGappedU
 \texttt{IsTrivialPhase}~$sym\,H$ is symmetry-connection to a product-state Hamiltonian
 (\texttt{IsProductStateHamiltonian}); and \texttt{IsSPTPhase}~$sym\,H$ is short-range gapped-unique,
 $sym$-symmetric, and not trivial.  The Haldane phase is the prototypical SPT phase protected by
-$\mathbb{Z}_2\times\mathbb{Z}_2$ (\texttt{IsZ2Z2Invariant}).  Concrete Hamiltonian + \texttt{def} SPT;
-the Oshikawa parity and edge degeneracy are documented axioms.  Chapters~3--10 backfill.
+$\mathbb{Z}_2\times\mathbb{Z}_2$ (\texttt{IsZ2Z2Invariant}).  Concrete Hamiltonian + \texttt{def} SPT.
+Of the two axioms only the Oshikawa string order (eq.~8.3.3) is a documented axiom;
+\texttt{tasaki\_vbs\_edge\_degeneracy} is \emph{not} a documented axiom but an axiom still awaiting
+implementation (a discharge target: the book's own §7.1.3 completeness argument, together with
+Problem/Solution 7.2.3.b, extends to general $S$ by degree counting, so what is missing is the
+open-chain spin-$S$ infrastructure, not the mathematics).  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§8.3.2--§8.3.3 Protecting symmetries + topological indices for SPT}
