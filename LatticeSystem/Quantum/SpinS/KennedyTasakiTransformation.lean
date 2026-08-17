@@ -405,7 +405,10 @@ noncomputable def piRotationS (L : ℕ) (alpha : Fin 3) : ManyBodyOpS (Fin L) 2 
   halfTurnRegionS L alpha Finset.univ
 
 /-- **Z₂ × Z₂ invariance** of a Hamiltonian `H`: `(Û_π^{(α)})† H Û_π^{(α)} = H` for every spin axis
-`α = 1, 2, 3`, i.e. `H` commutes with each of the three `π` rotations. -/
+`α = 1, 2, 3`, i.e. `H` commutes with each of the three `π` rotations.  This is the *concrete*
+`S = 1` condition, spelled out through `piRotationS`; the general-`N` opaque marker
+`IsZ2Z2SymmetricS` (`LiebSchultzMattisDiscrete.lean`) is a deliberately different object and the
+two are not to be merged. -/
 def IsZ2Z2Invariant (H : ManyBodyOpS (Fin L) 2) : Prop :=
   ∀ α : Fin 3, (piRotationS L α).conjTranspose * H * piRotationS L α = H
 

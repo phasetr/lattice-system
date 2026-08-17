@@ -382,6 +382,46 @@ def approved_changes(text: str) -> str:
             "`Quantum/SpinS/KennedyTasakiProp84.lean` |",
         )
         .replace(
+            "| `IsTimeReversalInvariant` / `IsBondInversionInvariant` / `vbsInversionParityS` / "
+            "`tasaki_spt_classification` | **§8.3.2–§8.3.3 Protecting symmetries + topological indices "
+            "for SPT** (Pollmann–Turner–Berg–Oshikawa; eqs. (8.3.6)–(8.3.10)): the Haldane phase is "
+            "protected by any of three symmetries — (S1) Z₂×Z₂ (`IsZ2Z2Invariant`), (S2) time-reversal "
+            "(`IsTimeReversalInvariant` marker), (S3) bond-centered inversion (`IsBondInversionInvariant` "
+            "marker). `vbsInversionParityS L S` (marker, ℤ) + `tasaki_vbs_inversion_parity` (**AXIOM**): "
+            "`Û_inv|Φ_VBS^S⟩ = (−1)^{L·S}|Φ_VBS^S⟩` — odd `L·S` ⟹ odd parity ⟹ Z₂ obstruction to "
+            "connecting to the trivial state. `IsSpinSVBSNontrivialSPT S` (marker) + "
+            "`tasaki_spt_classification` (**AXIOM**): the spin-`S` VBS is a nontrivial SPT phase **iff "
+            "`S` is odd** (even `S` ⇒ trivial). `entanglementEntropyS` (marker, eqs. 8.3.7–8.3.8): the "
+            "bipartite entanglement entropy `−Σ p_j log p_j` from the Schmidt decomposition. §8.3.3 is "
+            "heuristic; precise indices come in §8.3.4 (MPS) / §8.3.6 (Ogata) | "
+            "`Quantum/SpinS/SPTTopologicalIndex.lean` |",
+            "| `IsTimeReversalInvariant` / `IsBondInversionInvariant` / `vbsInversionParityS` / "
+            "`entanglementEntropyS` | "
+            "**§8.3.2–§8.3.3 Protecting symmetries + topological indices for SPT** "
+            "(Pollmann–Turner–Berg–Oshikawa; eqs. (8.3.6)–(8.3.10), pp. 256–263): the Haldane phase is "
+            "protected by any of three symmetries — (S1) Z₂×Z₂ (`IsZ2Z2Invariant`), (S2) time-reversal "
+            "(`IsTimeReversalInvariant` marker — a duplicate of `IsTimeReversalSymmetricS` "
+            "(`LiebSchultzMattisDiscrete.lean`, prose cross-reference, not a Lean consumer) at "
+            "`N = 2`, kept in parallel since consolidating it is a deletion needing its own approval), "
+            "and (S3) bond-centered inversion (`IsBondInversionInvariant` marker). "
+            "`vbsInversionParityS L S` (marker, ℤ) + `tasaki_vbs_inversion_parity` (**AXIOM**, a "
+            "**discharge target**, not a documented won't-do): `Û_inv|Φ_VBS^S⟩ = (−1)^{L·S}|Φ_VBS^S⟩` — "
+            "odd `L·S` ⟹ odd parity ⟹ Z₂ obstruction to the trivial state; discharge means replacing the "
+            "opaque parity marker by a real definition of the `Û_inv` eigenvalue (site reflection "
+            "`ringReflect` / `ringConfigReflect`, not the on-site reversal `manyBodyReversalS`), with `S "
+            "= 1` (`akltVBSState`) the first case. Caveat: `ringReflect` is even-ring only "
+            "(`Fin (2 * n)`, bond-centered); the axiom covers every `L`, and odd `L` fixes the middle "
+            "site, so discharge needs a general `Fin L` inversion or an even-`L` restriction. "
+            "`entanglementEntropyS` (**AXIOM**, eqs. 8.3.7–8.3.8): "
+            "the bipartite entanglement entropy `−Σ p_j log p_j` from the half-infinite-chain Schmidt "
+            "decomposition — a contentless marker with zero consumers, recorded in "
+            "`docs/limitations/documented-axioms.md`. The odd/even-`S` SPT classification is **not "
+            "formalized here at all**: the book states it only as a belief (p. 258), so the contentless, "
+            "self-satisfiable pair `IsSpinSVBSNontrivialSPT` / `tasaki_spt_classification` was "
+            "**deleted** (same ledger). §8.3.3 is heuristic; precise indices come in §8.3.4 (MPS) / "
+            "§8.3.6 (Ogata) | `Quantum/SpinS/SPTTopologicalIndex.lean` |",
+        )
+        .replace(
             "All items below are formally proved with **zero `sorry`**.",
             "The catalogue below includes proved results, conditional results, and documented axioms as recorded, with **zero `sorry`**.",
         )

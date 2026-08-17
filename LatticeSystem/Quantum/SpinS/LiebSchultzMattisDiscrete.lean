@@ -39,21 +39,33 @@ axiom IsTranslationInvariantS {L N : ℕ} : ManyBodyOpS (Fin L) N → Prop
 
 /-- **Short-range marker** `HasShortRangeHamiltonianS H`: the Hamiltonian `H` is a sum of local
 terms of bounded range.  An uninterpreted predicate; the contentful spin-one counterpart is the
-fixed-window commutant predicate `IsLocalWindowS`. -/
+fixed-window commutant predicate `IsLocalWindowS`.  It is deliberately kept separate from (and not
+merged into) the `N = 2` bundled SPT marker `IsShortRangeGappedUniqueGS` (`SPTPhase.lean`), which
+packages short-rangedness together with gapped uniqueness for the phase classification. -/
 axiom HasShortRangeHamiltonianS {L N : ℕ} : ManyBodyOpS (Fin L) N → Prop
 
 /-- **Z₂ × Z₂ symmetry marker** `IsZ2Z2SymmetricS H` for a general spin chain: `H` is invariant
 under
-the π-rotations about two spin axes.  An uninterpreted predicate. -/
+the π-rotations about two spin axes.  An uninterpreted predicate.  Staying opaque at general `N` is
+deliberate — no general-`N` π-rotation operator exists here — so it is distinct from the concrete
+`S = 1` definition `IsZ2Z2Invariant` (`KennedyTasakiTransformation.lean`), and the two are not to be
+merged. -/
 axiom IsZ2Z2SymmetricS {L N : ℕ} : ManyBodyOpS (Fin L) N → Prop
 
 /-- **Time-reversal symmetry marker** `IsTimeReversalSymmetricS H` for a general spin chain: `H` is
-invariant under the antiunitary time-reversal `Θ̂`.  An uninterpreted predicate. -/
+invariant under the antiunitary time-reversal `Θ̂`.  An uninterpreted predicate.  Its `N = 2`
+instance has the same type and meaning as the SPT-section marker `IsTimeReversalInvariant`
+(`SPTTopologicalIndex.lean`), which is a genuine duplicate rather than a deliberate scope split;
+consolidating the two would delete a declaration, a separately approved decision that has not been
+taken, so both are kept as knowingly parallel markers.  `SPTTopologicalIndex.lean` does not import
+this file, so its mention of this name is a doc-comment cross-reference, not a Lean consumer. -/
 axiom IsTimeReversalSymmetricS {L N : ℕ} : ManyBodyOpS (Fin L) N → Prop
 
 /-- **Unique-gapped-ground-state marker** `HasUniqueGappedGroundStateS H`: the Hamiltonian `H` has a
 ground state that is both unique and accompanied by a nonvanishing energy gap.  An uninterpreted
-predicate; its negation is the conclusion of the no-go Theorem 8.6. -/
+predicate; its negation is the conclusion of the no-go Theorem 8.6.  Being a standalone general-`N`
+predicate is deliberate: it is negated on its own by Theorem 8.6, so it is not merged into the
+`N = 2` bundled SPT marker `IsShortRangeGappedUniqueGS` (`SPTPhase.lean`). -/
 axiom HasUniqueGappedGroundStateS {L N : ℕ} : ManyBodyOpS (Fin L) N → Prop
 
 /-- **Tasaki Theorem 8.6 (discrete-symmetry Lieb–Schultz–Mattis no-go, Ogata–Tasaki), AXIOM.**  For

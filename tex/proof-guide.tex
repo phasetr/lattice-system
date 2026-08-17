@@ -12696,24 +12696,55 @@ Hamiltonians, each short-range gapped-unique (marker \texttt{IsShortRangeGappedU
 \texttt{IsTrivialPhase}~$sym\,H$ is symmetry-connection to a product-state Hamiltonian
 (\texttt{IsProductStateHamiltonian}); and \texttt{IsSPTPhase}~$sym\,H$ is short-range gapped-unique,
 $sym$-symmetric, and not trivial.  The Haldane phase is the prototypical SPT phase protected by
-$\mathbb{Z}_2\times\mathbb{Z}_2$ (\texttt{IsZ2Z2Invariant}).  Concrete Hamiltonian + \texttt{def} SPT;
-the Oshikawa parity and edge degeneracy are documented axioms.  Chapters~3--10 backfill.
+$\mathbb{Z}_2\times\mathbb{Z}_2$ (\texttt{IsZ2Z2Invariant}).  Concrete Hamiltonian + \texttt{def} SPT.
+Of the section's two statement axioms only the Oshikawa string order (eq.~8.3.3) --- together with
+its opaque carrier \texttt{vbsStringOrderParameterS} --- is a documented axiom, as are the two
+classification markers \texttt{IsShortRangeGappedUniqueGS} and \texttt{IsProductStateHamiltonian}
+(all three entries in \path{docs/limitations/documented-axioms.md});
+\texttt{tasaki\_vbs\_edge\_degeneracy} is \emph{not} a documented axiom but a discharge target, and
+discharging it is more than deleting an axiom line: the opaque marker
+\texttt{vbsOpenChainGroundDegeneracyS} must be replaced by a real definition of the open-chain
+ground-state degeneracy and the $(S+1)^2$ formula then proved as a theorem about that definition.
+The mathematics is available --- the book's own §7.1.3 completeness argument, together with
+Problem/Solution 7.2.3.b, extends to general $S$ by degree counting --- so what is missing is the
+open-chain spin-$S$ infrastructure.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§8.3.2--§8.3.3 Protecting symmetries + topological indices for SPT}
 (Pollmann--Turner--Berg--Oshikawa; Tasaki §8.3.2--§8.3.3, eqs.~(8.3.6)--(8.3.10), pp.~256--263;
 \texttt{Quantum/SpinS/SPTTopologicalIndex.lean}, Issue \#4485).  The Haldane phase is protected by any
 of three symmetries: (S1) $\mathbb{Z}_2\times\mathbb{Z}_2$ (\texttt{IsZ2Z2Invariant}), (S2)
-time-reversal (\texttt{IsTimeReversalInvariant} marker), (S3) bond-centered inversion
-(\texttt{IsBondInversionInvariant} marker).  The axiom \texttt{tasaki\_vbs\_inversion\_parity} gives
+time-reversal (\texttt{IsTimeReversalInvariant} marker, whose type and meaning coincide with the
+$N=2$ instance of the general-$N$ \texttt{IsTimeReversalSymmetricS} of
+\texttt{Quantum/SpinS/LiebSchultzMattisDiscrete.lean}: a genuine duplicate kept in parallel, since
+consolidating it is a deletion requiring its own approval; \texttt{SPTTopologicalIndex.lean} does
+not import that file, so the mention there is a doc-comment cross-reference, not a Lean consumer),
+(S3) bond-centered
+inversion (\texttt{IsBondInversionInvariant} marker).  The axiom
+\texttt{tasaki\_vbs\_inversion\_parity} gives
 the inversion-parity $\mathbb{Z}_2$ index $\hat U_{\mathrm{inv}}|\Phi_{\mathrm{VBS}}^S\rangle
 =(-1)^{L\cdot S}|\Phi_{\mathrm{VBS}}^S\rangle$ (odd $L\cdot S\Rightarrow$ odd parity $\Rightarrow$
-obstruction to the trivial state), and \texttt{tasaki\_spt\_classification} states that the spin-$S$
-VBS is a nontrivial SPT phase iff $S$ is odd (even $S\Rightarrow$ trivial).  \texttt{entanglementEntropyS}
-(marker, eqs.~8.3.7--8.3.8) is the bipartite entanglement entropy $-\sum_j p_j\log p_j$ from the
-Schmidt decomposition.  This section is heuristic; the precise indices come in §8.3.4 (MPS) and §8.3.6
-(Ogata).  Markers for the antiunitary/inversion/Schmidt structure; the parity and classification are
-documented axioms.  Chapters~3--10 backfill.
+obstruction to the trivial state).  \texttt{entanglementEntropyS}
+(documented axiom, eqs.~8.3.7--8.3.8) is the bipartite entanglement entropy $-\sum_j p_j\log p_j$
+from the half-infinite-chain Schmidt decomposition: an uninterpreted marker with zero consumers.  This section is heuristic; the precise indices come in §8.3.4 (MPS) and §8.3.6
+(Ogata).  Markers for the antiunitary/inversion/Schmidt structure; the parity is \emph{not} a
+documented axiom but a discharge target, and discharging it is more than deleting an axiom line: the
+opaque marker \texttt{vbsInversionParityS} must be replaced by a real definition of the $\hat
+U_{\mathrm{inv}}$ eigenvalue and the formula $(-1)^{L\cdot S}$ then proved as a theorem about that
+definition.  The missing ingredient is the geometry of $\hat U_{\mathrm{inv}}$, which permutes the
+\emph{sites} ($x\mapsto L-1-x$): that is \texttt{ringReflect}
+(\texttt{Quantum/SpinS/RingBondReflection.lean}) with its configuration action
+\texttt{ringConfigReflect} (\texttt{Quantum/SpinS/RingReflectionTheta.lean}), a different map from
+the on-site spin reversal $\Theta=\texttt{manyBodyReversalS}$ ($\sigma\mapsto\mathrm{Fin.rev}\circ
+\sigma$, which leaves the sites in place).  \emph{Caveat on the ring parity:} \texttt{ringReflect}
+is defined only on $\mathrm{Fin}(2n)$, i.e.\ it is the bond-centered reflection of an \emph{even}
+ring $L=2n$, where it has no fixed site, whereas \texttt{tasaki\_vbs\_inversion\_parity} quantifies
+over \emph{every} $L$; for odd $L$ the map $x\mapsto L-1-x$ fixes $x=(L-1)/2$ and is therefore
+site-centered rather than bond-centered, so a discharge needs either an inversion defined on a
+general $\mathrm{Fin}\,L$ or a restriction of the parity statement to even $L$.  At $S=1$ those
+reflection maps together with \texttt{akltVBSState} are the intended starting point.  The book's
+odd/even-$S$ SPT classification, which it states only as a belief, is not
+formalized here.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§8.3.4 Matrix-product SPT index} (Theorem 8.7 Tachikawa + Corollary 8.5; Tasaki
