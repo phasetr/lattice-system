@@ -17,8 +17,9 @@ characterisation, involutivity, self-adjointness, the conjugation law `u_α Ŝ^{
 (`+` exactly when `α = β`), and stability of the family under conjugation by any of its members.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §2.1, eqs. (2.1.21), (2.1.23) and (2.1.29)–(2.1.30), pp. 17–19; §8.1.3, footnote 11, p. 237
-(the `S = 1` restriction is essential for the closed form).
+2020), §2.1, eqs. (2.1.21), (2.1.23) and (2.1.29)–(2.1.30), pp. 17–19, and the unnumbered display
+`e^{-iπŜ^{(α)}} = 1̂ - 2 (Ŝ^{(α)})²` introducing (2.1.33), p. 20 (the closed form above); §8.1.3,
+footnote 11, p. 237 (the `S = 1` restriction is essential for the closed form).
 -/
 
 namespace LatticeSystem.Quantum
@@ -87,9 +88,10 @@ operator identities proved from the polynomial form.
 **Declared overlap.**  This is a near-restatement of `spinOnePiRot1_eq`, `spinOnePiRot2_eq` and
 `spinOnePiRot3_eq` of `Quantum/SpinOneBasis.lean`, which prove the same three identities with the
 axis operator written as `spinOneOp1/2/3`, whereas the §8.1.3 argument needs the `spinSOp1/2/3 2`
-representation packaged by `spinOneAxisS`.  The near-twin is necessary rather than deliberate: the
-repository has no bridging lemma `spinOneOpα = spinSOpα 2`, so neither form is obtainable from the
-other by rewriting. -/
+representation packaged by `spinOneAxisS`.  The near-twin stands only because the repository has no
+bridging lemma `spinOneOpα = spinSOpα 2`: such a bridge is available from `spinSOpPlus_two_eq` and
+`spinSOpMinus_two_eq` above, but adding it and folding the two families together is a
+deduplication off the §8.1.3 critical path and is not done here. -/
 theorem spinOneHalfTurnS_eq_one_sub_two_smul_sq (alpha : Fin 3) :
     spinOneHalfTurnS alpha = 1 - (2 : ℂ) • (spinOneAxisS alpha) ^ 2 := by
   fin_cases alpha
