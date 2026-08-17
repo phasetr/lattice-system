@@ -38,9 +38,8 @@ under the chain translation.  An uninterpreted predicate. -/
 axiom IsTranslationInvariantS {L N : ℕ} : ManyBodyOpS (Fin L) N → Prop
 
 /-- **Short-range marker** `HasShortRangeHamiltonianS H`: the Hamiltonian `H` is a sum of local
-terms
-of bounded range.  An uninterpreted predicate (general-spin analogue of
-`HasShortRangeInteraction`). -/
+terms of bounded range.  An uninterpreted predicate; the contentful spin-one counterpart is the
+fixed-window commutant predicate `IsLocalWindowS`. -/
 axiom HasShortRangeHamiltonianS {L N : ℕ} : ManyBodyOpS (Fin L) N → Prop
 
 /-- **Z₂ × Z₂ symmetry marker** `IsZ2Z2SymmetricS H` for a general spin chain: `H` is invariant

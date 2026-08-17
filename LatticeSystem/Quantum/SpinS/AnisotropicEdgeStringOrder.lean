@@ -1,5 +1,5 @@
 import LatticeSystem.Quantum.SpinS.SiteComponent
-import LatticeSystem.Quantum.SpinS.SpinOneHalfTurn
+import LatticeSystem.Quantum.SpinS.SpinOneHalfTurnRegion
 import LatticeSystem.Quantum.SpinS.AndersonTowerLocality
 import LatticeSystem.Math.ComplexVectorKernel
 
@@ -12,9 +12,10 @@ operator**
   `Ô^{(α)}_string = Σ_{x} Ŝ_x^{(α)} exp(i π Σ_{y < x} Ŝ_y^{(α)})`   (Tasaki (8.1.8), p. 236),
 
 whose exponential factor is, at `S = 1`, the product of the per-site half turns `u_α` over the sites
-strictly to the left of `x` — a `π` rotation of the sub-chain `{0, …, x-1}`.  This module builds
-that operator, proves it self-adjoint, states the hidden-order hypothesis (8.1.10) as a concrete
-Rayleigh bound, and converts it into the norm lower bound used by the variational argument.
+strictly to the left of `x` — a `π` rotation of the sub-chain `{0, …, x-1}`, i.e. the prefix
+instance of the region half turn `halfTurnRegionS`.  This module builds that operator, proves it
+self-adjoint, states the hidden-order hypothesis (8.1.10) as a concrete Rayleigh bound, and converts
+it into the norm lower bound used by the variational argument.
 
 Note that this left **prefix** string is a different operator from the strict two-endpoint window
 string `stringOperatorS` / `stringOperatorAxisS` of `AKLTStringOrderDefs`; only the `onSiteS`
@@ -34,13 +35,13 @@ variable {L : ℕ}
 /-! ## Definitions -/
 
 /-- The **prefix rotation** `R^{(α)}_{<m} = ∏_{y < m} u_α^{(y)}`, the `π` rotation about axis `α` of
-the sub-chain `{0, …, m-1}`, written as an ordered product of commuting single-site half turns.
-It is indexed by `m : ℕ` rather than by a site, so that the same declaration serves both the string
-operator (at `m = x.val`) and the support-count argument (which compares `m ≤ z` and `z + 2 ≤ m`).
-The product uses `List.ofFn ... |>.prod` because matrices form no `CommMonoid`. -/
+the sub-chain `{0, …, m-1}`, i.e. the region half turn `halfTurnRegionS` on the prefix set
+`{y | y < m}`.  It is indexed by `m : ℕ` rather than by a site, so that the same declaration serves
+both the string operator (at `m = x.val`) and the support-count argument (which compares `m ≤ z`
+and `z + 2 ≤ m`). -/
 noncomputable def edgeStringPrefixRotationS (L : ℕ) (alpha : Fin 3) (m : ℕ) :
     ManyBodyOpS (Fin L) 2 :=
-  (List.ofFn fun y : Fin L => if y.val < m then onSiteS y (spinOneHalfTurnS alpha) else 1).prod
+  halfTurnRegionS L alpha (Finset.univ.filter fun y : Fin L => y.val < m)
 
 /-- The **global edge-string order operator** `Ô^{(α)}_string = Σ_x Ŝ_x^{(α)} R^{(α)}_{<x}`
 (Tasaki (8.1.8), p. 236). -/
@@ -55,222 +56,82 @@ def HasStringLRO (L : ℕ) (Phi : (Fin L → Fin 3) → ℂ) (q : Fin 3 → ℝ)
   ∀ alpha : Fin 3, q alpha ≤ expectationRatioRe
     (((((L : ℂ)⁻¹) • edgeStringOrderOpS L alpha) ^ 2)) Phi
 
-/-- The many-body site component is the site embedding of the single-site axis operator. -/
-theorem spinSSiteComponentS_eq_onSiteS (alpha : Fin 3) (x : Fin L) :
-    spinSSiteComponentS alpha x = onSiteS x (spinOneAxisS alpha) := by
-  fin_cases alpha <;> rfl
+/-! ## The prefix rotation as a region half turn -/
 
-/-! ## Structure of the prefix rotation -/
-
-/-- The site-`y` factor of the prefix rotation `R^{(α)}_{<m}`: the half turn `u_α` when `y` lies
-strictly left of `m`, and the identity otherwise. -/
-private noncomputable def edgePrefixFactorS (L : ℕ) (alpha : Fin 3) (m : ℕ) (y : Fin L) :
-    Matrix (Fin 3) (Fin 3) ℂ :=
-  if y.val < m then spinOneHalfTurnS alpha else 1
-
-/-- Each prefix factor is an involution. -/
-private theorem edgePrefixFactorS_mul_self (L : ℕ) (alpha : Fin 3) (m : ℕ) (y : Fin L) :
-    edgePrefixFactorS L alpha m y * edgePrefixFactorS L alpha m y = 1 := by
-  rw [edgePrefixFactorS]
-  split
-  · exact spinOneHalfTurnS_mul_self alpha
-  · exact one_mul 1
-
-/-- Each prefix factor is Hermitian. -/
-private theorem edgePrefixFactorS_isHermitian (L : ℕ) (alpha : Fin 3) (m : ℕ) (y : Fin L) :
-    (edgePrefixFactorS L alpha m y).IsHermitian := by
-  rw [edgePrefixFactorS]
-  split
-  · exact spinOneHalfTurnS_isHermitian alpha
-  · exact Matrix.isHermitian_one
-
-/-- The prefix rotation as a product over `List.finRange`, with the factor selector exposed. -/
-private theorem edgeStringPrefixRotationS_eq_map (L : ℕ) (alpha : Fin 3) (m : ℕ) :
-    edgeStringPrefixRotationS L alpha m
-      = ((List.finRange L).map fun y => onSiteS y (edgePrefixFactorS L alpha m y)).prod := by
-  have hfun : (fun y : Fin L => if y.val < m then onSiteS y (spinOneHalfTurnS alpha) else 1)
-      = fun y : Fin L => onSiteS y (edgePrefixFactorS L alpha m y) := by
-    funext y
-    rw [edgePrefixFactorS]
-    split
-    · rfl
-    · exact (onSiteS_one y).symm
-  rw [edgeStringPrefixRotationS, hfun, List.ofFn_eq_map]
-
-/-- Site embeddings at distinct sites commute, so the factor list is pairwise commuting. -/
-private theorem edgePrefixFactorS_pairwise (L : ℕ) (alpha : Fin 3) (m : ℕ)
-    {l : List (Fin L)} (hl : l.Nodup) :
-    (l.map fun y => onSiteS y (edgePrefixFactorS L alpha m y)).Pairwise Commute := by
-  rw [List.pairwise_map]
-  exact hl.imp fun {a b} hab => onSiteS_commute_of_ne hab _ _
-
-/-- Splitting the prefix rotation off its site-`w` factor. -/
-private theorem edgeStringPrefixRotationS_split (L : ℕ) (alpha : Fin 3) (m : ℕ) (w : Fin L) :
-    edgeStringPrefixRotationS L alpha m
-      = onSiteS w (edgePrefixFactorS L alpha m w) *
-        ((((List.finRange L).erase w).map fun y =>
-          onSiteS y (edgePrefixFactorS L alpha m y)).prod) := by
-  rw [edgeStringPrefixRotationS_eq_map]
-  have hperm := (List.perm_cons_erase (List.mem_finRange w)).map
-    (fun y : Fin L => onSiteS y (edgePrefixFactorS L alpha m y))
-  rw [hperm.prod_eq' (edgePrefixFactorS_pairwise L alpha m (List.nodup_finRange L))]
+/-- Membership in the prefix site set is the numerical prefix condition. -/
+theorem mem_edgeStringPrefixSites {L m : ℕ} (y : Fin L) :
+    y ∈ (Finset.univ.filter fun z : Fin L => z.val < m) ↔ y.val < m := by
   simp
-
-/-- The complement of the site-`w` factor commutes with every operator supported at `w`. -/
-private theorem edgePrefixErased_commute (L : ℕ) (alpha : Fin 3) (m : ℕ) (w : Fin L)
-    (A : Matrix (Fin 3) (Fin 3) ℂ) :
-    Commute ((((List.finRange L).erase w).map fun y =>
-      onSiteS y (edgePrefixFactorS L alpha m y)).prod) (onSiteS w A) := by
-  refine Commute.list_prod_left _ _ ?_
-  intro z hz
-  rw [List.mem_map] at hz
-  obtain ⟨y, hy, rfl⟩ := hz
-  refine onSiteS_commute_of_ne ?_ _ _
-  intro hyw
-  subst hyw
-  exact (List.nodup_finRange L).not_mem_erase hy
-
-/-- A product of involutive site embeddings at distinct sites is an involution. -/
-private theorem onSiteListProd_mul_self (f : Fin L → Matrix (Fin 3) (Fin 3) ℂ)
-    (hf : ∀ y, f y * f y = 1) :
-    ∀ l : List (Fin L), l.Nodup →
-      (l.map fun y => onSiteS y (f y)).prod * (l.map fun y => onSiteS y (f y)).prod = 1 := by
-  intro l
-  induction l with
-  | nil => intro _; simp
-  | cons a t ih =>
-    intro hl
-    rw [List.nodup_cons] at hl
-    have hcomm : Commute (onSiteS a (f a) : ManyBodyOpS (Fin L) 2)
-        ((t.map fun y => onSiteS y (f y)).prod) := by
-      refine Commute.list_prod_right _ _ ?_
-      intro z hz
-      rw [List.mem_map] at hz
-      obtain ⟨y, hy, rfl⟩ := hz
-      refine onSiteS_commute_of_ne ?_ _ _
-      rintro rfl
-      exact hl.1 hy
-    rw [List.map_cons, List.prod_cons, hcomm.symm.mul_mul_mul_comm,
-      onSiteS_mul_onSiteS_same, hf, onSiteS_one, ih hl.2, mul_one]
-
-/-- A product of Hermitian site embeddings at distinct sites is Hermitian. -/
-private theorem onSiteListProd_isHermitian (f : Fin L → Matrix (Fin 3) (Fin 3) ℂ)
-    (hf : ∀ y, (f y).IsHermitian) :
-    ∀ l : List (Fin L), l.Nodup →
-      ((l.map fun y => onSiteS y (f y)).prod).IsHermitian := by
-  intro l
-  induction l with
-  | nil => intro _; simp
-  | cons a t ih =>
-    intro hl
-    rw [List.nodup_cons] at hl
-    have hcomm : Commute (onSiteS a (f a) : ManyBodyOpS (Fin L) 2)
-        ((t.map fun y => onSiteS y (f y)).prod) := by
-      refine Commute.list_prod_right _ _ ?_
-      intro z hz
-      rw [List.mem_map] at hz
-      obtain ⟨y, hy, rfl⟩ := hz
-      refine onSiteS_commute_of_ne ?_ _ _
-      rintro rfl
-      exact hl.1 hy
-    rw [List.map_cons, List.prod_cons]
-    exact Matrix.IsHermitian.mul_of_commute (onSiteS_isHermitian a (hf a)) (ih hl.2) hcomm
 
 /-! ## Algebraic properties of the prefix rotation -/
 
 /-- **The prefix rotation is an involution**: `R² = 1`, since each `u_α` is. -/
 theorem edgeStringPrefixRotationS_mul_self (L : ℕ) (alpha : Fin 3) (m : ℕ) :
-    edgeStringPrefixRotationS L alpha m * edgeStringPrefixRotationS L alpha m = 1 := by
-  rw [edgeStringPrefixRotationS_eq_map]
-  exact onSiteListProd_mul_self _ (edgePrefixFactorS_mul_self L alpha m) _
-    (List.nodup_finRange L)
+    edgeStringPrefixRotationS L alpha m * edgeStringPrefixRotationS L alpha m = 1 :=
+  halfTurnRegionS_mul_self L alpha _
 
 /-- **The prefix rotation is self-adjoint**, hence unitary. -/
 theorem edgeStringPrefixRotationS_isHermitian (L : ℕ) (alpha : Fin 3) (m : ℕ) :
-    (edgeStringPrefixRotationS L alpha m).IsHermitian := by
-  rw [edgeStringPrefixRotationS_eq_map]
-  exact onSiteListProd_isHermitian _ (edgePrefixFactorS_isHermitian L alpha m) _
-    (List.nodup_finRange L)
+    (edgeStringPrefixRotationS L alpha m).IsHermitian :=
+  halfTurnRegionS_isHermitian L alpha _
 
 /-- The prefix rotation is unitary: `RᴴR = 1`. -/
 theorem edgeStringPrefixRotationS_conjTranspose_mul_self (L : ℕ) (alpha : Fin 3) (m : ℕ) :
     Matrix.conjTranspose (edgeStringPrefixRotationS L alpha m) *
-        edgeStringPrefixRotationS L alpha m = 1 := by
-  rw [(edgeStringPrefixRotationS_isHermitian L alpha m).eq]
-  exact edgeStringPrefixRotationS_mul_self L alpha m
+        edgeStringPrefixRotationS L alpha m = 1 :=
+  halfTurnRegionS_conjTranspose_mul_self L alpha _
 
 /-- **Sites at or beyond the prefix are untouched**: `R^{(α)}_{<m}` commutes with any operator
 supported at a site `w` with `m ≤ w`. -/
 theorem edgeStringPrefixRotationS_commute_onSiteS_of_le (L : ℕ) (alpha : Fin 3) (m : ℕ)
     {w : Fin L} (h : m ≤ w.val) (A : Matrix (Fin 3) (Fin 3) ℂ) :
-    Commute (edgeStringPrefixRotationS L alpha m) (onSiteS w A) := by
-  rw [edgeStringPrefixRotationS_split L alpha m w]
-  have hfac : edgePrefixFactorS L alpha m w = 1 := if_neg (by omega)
-  rw [hfac, onSiteS_one, one_mul]
-  exact edgePrefixErased_commute L alpha m w A
+    Commute (edgeStringPrefixRotationS L alpha m) (onSiteS w A) :=
+  halfTurnRegionS_commute_onSiteS_of_not_mem L alpha _
+    (fun hw => absurd ((mem_edgeStringPrefixSites w).mp hw) (by omega)) A
 
 /-- **Sites inside the prefix are conjugated by the half turn**: for `w < m`,
 `R^{(α)}_{<m} A_w R^{(α)}_{<m} = (u_α A u_α)_w`. -/
 theorem edgeStringPrefixRotationS_conj_onSiteS_of_lt (L : ℕ) (alpha : Fin 3) (m : ℕ)
     {w : Fin L} (h : w.val < m) (A : Matrix (Fin 3) (Fin 3) ℂ) :
     edgeStringPrefixRotationS L alpha m * onSiteS w A * edgeStringPrefixRotationS L alpha m
-      = onSiteS w (spinOneHalfTurnS alpha * A * spinOneHalfTurnS alpha) := by
-  set Q := ((((List.finRange L).erase w).map fun y =>
-    onSiteS y (edgePrefixFactorS L alpha m y)).prod) with hQdef
-  have hsplit : edgeStringPrefixRotationS L alpha m
-      = onSiteS w (spinOneHalfTurnS alpha) * Q := by
-    rw [hQdef, edgeStringPrefixRotationS_split L alpha m w, edgePrefixFactorS, if_pos h]
-  have hpast : edgeStringPrefixRotationS L alpha m * onSiteS w A
-      = onSiteS w (spinOneHalfTurnS alpha * A * spinOneHalfTurnS alpha) *
-        edgeStringPrefixRotationS L alpha m := by
-    rw [hsplit]
-    calc onSiteS w (spinOneHalfTurnS alpha) * Q * onSiteS w A
-        = onSiteS w (spinOneHalfTurnS alpha) * (Q * onSiteS w A) := by noncomm_ring
-      _ = onSiteS w (spinOneHalfTurnS alpha) * (onSiteS w A * Q) :=
-          by rw [(edgePrefixErased_commute L alpha m w A).eq]
-      _ = onSiteS w (spinOneHalfTurnS alpha * A) * Q := by
-          rw [← mul_assoc, onSiteS_mul_onSiteS_same]
-      _ = onSiteS w (spinOneHalfTurnS alpha * A * spinOneHalfTurnS alpha) *
-            (onSiteS w (spinOneHalfTurnS alpha) * Q) := by
-          rw [← mul_assoc, onSiteS_mul_onSiteS_same, mul_assoc, mul_assoc,
-            spinOneHalfTurnS_mul_self alpha, mul_one]
-  rw [hpast, mul_assoc, edgeStringPrefixRotationS_mul_self, mul_one]
+      = onSiteS w (spinOneHalfTurnS alpha * A * spinOneHalfTurnS alpha) :=
+  halfTurnRegionS_conj_onSiteS_of_mem L alpha _ ((mem_edgeStringPrefixSites w).mpr h) A
 
 /-- **The prefix rotation commutes with its own axis component at every site**: inside the prefix
 because `u_α` commutes with `Ŝ^{(α)}`, outside because the supports are disjoint. -/
 theorem edgeStringPrefixRotationS_commute_component (L : ℕ) (alpha : Fin 3) (m : ℕ) (x : Fin L) :
-    Commute (edgeStringPrefixRotationS L alpha m) (spinSSiteComponentS alpha x) := by
-  rw [spinSSiteComponentS_eq_onSiteS]
-  by_cases h : x.val < m
-  · have hconj := edgeStringPrefixRotationS_conj_onSiteS_of_lt L alpha m h (spinOneAxisS alpha)
-    rw [spinOneHalfTurnS_conj_spinOneAxisS, if_pos rfl, one_smul] at hconj
-    have hstep := congrArg (fun M => M * edgeStringPrefixRotationS L alpha m) hconj
-    simp only [mul_assoc, edgeStringPrefixRotationS_mul_self, mul_one] at hstep
-    exact hstep
-  · exact edgeStringPrefixRotationS_commute_onSiteS_of_le L alpha m (by omega) _
+    Commute (edgeStringPrefixRotationS L alpha m) (spinSSiteComponentS alpha x) :=
+  halfTurnRegionS_commute_component L alpha _ x
+
+/-- **The empty prefix carries the identity**: `R^{(α)}_{<0} = 1`.  This is why the left string of
+the Kennedy–Tasaki rule (8.2.14) disappears at the left edge of an open chain. -/
+theorem edgeStringPrefixRotationS_zero (L : ℕ) (alpha : Fin 3) :
+    edgeStringPrefixRotationS L alpha 0 = 1 := by
+  rw [edgeStringPrefixRotationS,
+    show (Finset.univ.filter fun y : Fin L => y.val < 0) = ∅ by ext y; simp,
+    halfTurnRegionS_empty]
+
+/-- **Extending the prefix past one more site**: `R^{(α)}_{<x+1} = u_α^{(x)} R^{(α)}_{<x}`. -/
+theorem edgeStringPrefixRotationS_succ (L : ℕ) (alpha : Fin 3) (x : Fin L) :
+    edgeStringPrefixRotationS L alpha (x.val + 1)
+      = onSiteS x (spinOneHalfTurnS alpha) * edgeStringPrefixRotationS L alpha x.val := by
+  have hset : (Finset.univ.filter fun y : Fin L => y.val < x.val + 1)
+      = insert x (Finset.univ.filter fun y : Fin L => y.val < x.val) := by
+    ext y
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert]
+    constructor
+    · intro hy
+      rcases Nat.lt_succ_iff_lt_or_eq.mp hy with h | h
+      · exact Or.inr h
+      · exact Or.inl (Fin.ext h)
+    · rintro (rfl | h) <;> omega
+  rw [edgeStringPrefixRotationS, edgeStringPrefixRotationS, hset,
+    halfTurnRegionS_insert L alpha _ (by simp)]
 
 /-- Two prefix rotations about the same axis commute. -/
 theorem edgeStringPrefixRotationS_commute_self (L : ℕ) (alpha : Fin 3) (m m' : ℕ) :
-    Commute (edgeStringPrefixRotationS L alpha m) (edgeStringPrefixRotationS L alpha m') := by
-  rw [edgeStringPrefixRotationS_eq_map, edgeStringPrefixRotationS_eq_map]
-  refine Commute.list_prod_left _ _ ?_
-  intro z hz
-  rw [List.mem_map] at hz
-  obtain ⟨y, _, rfl⟩ := hz
-  refine Commute.list_prod_right _ _ ?_
-  intro v hv
-  rw [List.mem_map] at hv
-  obtain ⟨w, _, rfl⟩ := hv
-  by_cases hyw : y = w
-  · subst hyw
-    have hfac : edgePrefixFactorS L alpha m y * edgePrefixFactorS L alpha m' y
-        = edgePrefixFactorS L alpha m' y * edgePrefixFactorS L alpha m y := by
-      unfold edgePrefixFactorS
-      split <;> split <;> simp
-    change onSiteS y (edgePrefixFactorS L alpha m y) * onSiteS y (edgePrefixFactorS L alpha m' y)
-      = onSiteS y (edgePrefixFactorS L alpha m' y) * onSiteS y (edgePrefixFactorS L alpha m y)
-    rw [onSiteS_mul_onSiteS_same, onSiteS_mul_onSiteS_same, hfac]
-  · exact onSiteS_commute_of_ne hyw _ _
+    Commute (edgeStringPrefixRotationS L alpha m) (edgeStringPrefixRotationS L alpha m') :=
+  halfTurnRegionS_commute L alpha alpha _ _
 
 /-! ## The string operator -/
 
@@ -311,23 +172,6 @@ theorem edgeStringTerm_commute (L : ℕ) (alpha : Fin 3) (x y : Fin L) :
 
 /-! ## Conjugation by a global on-site involution -/
 
-/-- **Conjugation by an involution is multiplicative**: `U (X Y) U = (U X U)(U Y U)` when
-`U² = 1`. -/
-theorem conj_mul_of_mul_self {U : ManyBodyOpS (Fin L) 2} (hU : U * U = 1)
-    (X Y : ManyBodyOpS (Fin L) 2) :
-    U * (X * Y) * U = (U * X * U) * (U * Y * U) := by
-  rw [show (U * X * U) * (U * Y * U) = U * X * (U * U) * (Y * U) by noncomm_ring, hU]
-  noncomm_ring
-
-/-- Conjugation by an involution distributes over an ordered product. -/
-private theorem conj_listProd {U : ManyBodyOpS (Fin L) 2} (hU : U * U = 1)
-    (l : List (ManyBodyOpS (Fin L) 2)) :
-    U * l.prod * U = (l.map fun X => U * X * U).prod := by
-  induction l with
-  | nil => simpa using hU
-  | cons a t ih =>
-    rw [List.prod_cons, List.map_cons, List.prod_cons, ← ih, ← conj_mul_of_mul_self hU]
-
 /-- **The prefix rotation is invariant under any global half turn**: if the involution `U` acts
 site-wise by conjugation with a single-site involution `V` that fixes `u_α`, then `U R U = R`.
 This is the many-body lift of `spinOneHalfTurnS_conj_spinOneHalfTurnS`. -/
@@ -337,18 +181,8 @@ theorem edgeStringPrefixRotationS_conj (L : ℕ) (alpha : Fin 3) (m : ℕ)
     (hVhalf : V * spinOneHalfTurnS alpha * V = spinOneHalfTurnS alpha)
     (hconj : ∀ (z : Fin L) (A : Matrix (Fin 3) (Fin 3) ℂ),
       U * onSiteS z A * U = onSiteS z (V * A * V)) :
-    U * edgeStringPrefixRotationS L alpha m * U = edgeStringPrefixRotationS L alpha m := by
-  rw [edgeStringPrefixRotationS_eq_map, conj_listProd hU, List.map_map]
-  congr 1
-  apply List.map_congr_left
-  intro y _
-  simp only [Function.comp_apply]
-  rw [hconj]
-  congr 1
-  rw [edgePrefixFactorS]
-  split
-  · exact hVhalf
-  · rw [mul_one]; exact hV
+    U * edgeStringPrefixRotationS L alpha m * U = edgeStringPrefixRotationS L alpha m :=
+  halfTurnRegionS_conj L alpha _ U V hU hV hVhalf hconj
 
 /-- **The conjugation law of the string operator** (Tasaki (8.1.12), p. 238): a global half turn
 `U` acting site-wise by a single-site involution `V` that fixes `u_α` and sends `Ŝ^{(α)}` to

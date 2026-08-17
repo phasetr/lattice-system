@@ -73,6 +73,7 @@ import LatticeSystem.Quantum.SpinS.JointCasimirEigenspaceMagInvariant
 import LatticeSystem.Quantum.SpinS.SublatticeMaxCasimirEigenspaceComplementNeBot
 import LatticeSystem.Quantum.SpinS.Theorem23PFBaseCasimir
 import LatticeSystem.Quantum.SpinS.KennedyTasakiTransformation
+import LatticeSystem.Quantum.SpinS.KennedyTasakiProp84
 import LatticeSystem.Quantum.SpinS.LambdaDModel
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisDiscrete
 import LatticeSystem.Quantum.SpinS.SPTMatrixProductIndex
