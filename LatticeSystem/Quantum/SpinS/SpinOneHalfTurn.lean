@@ -25,7 +25,12 @@ open Matrix
 
 /-- The single-site **spin-one axis operator** `Ŝ^{(α)}` selected by `α : Fin 3`
 (`0 ↦ Ŝ^{(1)}`, `1 ↦ Ŝ^{(2)}`, `2 ↦ Ŝ^{(3)}`).  This is the single-site companion of the
-many-body selector `spinSSiteComponentS`. -/
+many-body selector `spinSSiteComponentS`.
+
+**Declared overlap.**  This is definitionally `spinSOpFin3 2` of `RingReflectionRingInstance`.  The
+overlap is deliberate: `spinSOpFin3` lives in the Theorem 4.2 reflection-positivity layer, so
+reusing it would pull roughly 44 extra modules into the import closure of this low-level module in
+exchange for a purely definitional convenience. -/
 noncomputable def spinOneAxisS (alpha : Fin 3) : Matrix (Fin 3) (Fin 3) ℂ :=
   ![spinSOp1 2, spinSOp2 2, spinSOp3 2] alpha
 
