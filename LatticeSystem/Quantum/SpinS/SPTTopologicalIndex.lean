@@ -7,7 +7,8 @@ Different SPT phases cannot be told apart by any local order parameter (there is
 breaking).  The Haldane phase is protected by any one of three symmetries:
 
 * **(S1) Z₂ × Z₂** — the π-rotations about the spin axes (`IsZ2Z2Invariant`);
-* **(S2) time-reversal** `Θ̂` (`IsTimeReversalInvariant`);
+* **(S2) time-reversal** `Θ̂` (`IsTimeReversalSymmetricS` at `N = 2`,
+  `LiebSchultzMattisDiscrete.lean`);
 * **(S3) bond-centered inversion** `Û_inv` (`IsBondInversionInvariant`).
 
 A clean characterization uses **"topological" indices** of the ground-state entanglement, invariant
@@ -15,9 +16,10 @@ under continuous symmetric deformation.  The simplest is the **inversion parity*
 VBS state on an `L`-site ring, `Û_inv |Φ_VBS^S⟩ = (−1)^{L·S} |Φ_VBS^S⟩`.  When `L·S` is odd the VBS
 state has *odd* parity and cannot be continuously connected to the *even*-parity trivial state, so
 it
-is a nontrivial SPT.  More generally the spin-`S` VBS is a nontrivial SPT phase (protected by (S1),
-(S2), or (S3)) **iff `S` is odd**; for even `S` it is trivial — a further qualitative odd/even-`S`
-distinction beyond Haldane's.
+is a nontrivial SPT.  More generally the book states as a *belief* — not as a theorem — that the
+spin-`S` VBS is a nontrivial SPT phase (protected by (S1), (S2), or (S3)) exactly when `S` is odd,
+the even-`S` side being trivial; that belief is not formalized here (see
+`docs/limitations/documented-axioms.md`).
 
 The general "topological" indices arise from the **Schmidt decomposition** of the infinite-chain
 ground state `|Φ_GS⟩ = Σ_j √p_j |Φ_j⟩_L ⊗ |Ψ_j⟩_R` (eq. (8.3.7)), the reduced density matrix
@@ -28,7 +30,10 @@ definitions for matrix product states are in §8.3.4 and Ogata's rigorous infini
 
 The protecting symmetries and the entanglement entropy are uninterpreted markers (the antiunitary
 time reversal, the inversion geometry, and the half-infinite-chain Schmidt decomposition belong to
-the operator-algebra framework).  The inversion-parity formula `(−1)^{L·S}` is a documented axiom.
+the operator-algebra framework); time reversal is carried at `N = 2` by the general-`N` marker
+`IsTimeReversalSymmetricS`.  The inversion-parity formula `(−1)^{L·S}` is an axiom that is not yet
+implemented — a discharge target (its `S = 1` instance is reachable from `manyBodyReversalS` and
+`akltVBSState`), not a documented won't-do.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §8.3.2–§8.3.3, eqs. (8.3.6)–(8.3.10), pp. 256–263; F. Pollmann, A. M. Turner, E. Berg, M.
@@ -40,13 +45,6 @@ namespace LatticeSystem.Quantum
 open Matrix
 
 variable {L : ℕ}
-
-/-- **(S2) Time-reversal symmetry marker** `IsTimeReversalInvariant H`: the Hamiltonian `H` is
-invariant under the antiunitary time-reversal `Θ̂`.  A faithful definition needs the antiunitary
-operator; kept as an uninterpreted predicate.  Its scope is deliberately the `S = 1` (`N = 2`)
-SPT setting of this section, distinct from the general-`N` `IsTimeReversalSymmetricS`
-(`LiebSchultzMattisDiscrete.lean`) used by Theorem 8.6; the two are not to be merged. -/
-axiom IsTimeReversalInvariant (H : ManyBodyOpS (Fin L) 2) : Prop
 
 /-- **(S3) Bond-centered inversion symmetry marker** `IsBondInversionInvariant H`: the Hamiltonian
 `H` is invariant under the bond-centered spatial inversion `Û_inv`.  A faithful definition needs the

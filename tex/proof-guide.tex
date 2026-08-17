@@ -12704,15 +12704,19 @@ the Oshikawa parity and edge degeneracy are documented axioms.  Chapters~3--10 b
 (Pollmann--Turner--Berg--Oshikawa; Tasaki §8.3.2--§8.3.3, eqs.~(8.3.6)--(8.3.10), pp.~256--263;
 \texttt{Quantum/SpinS/SPTTopologicalIndex.lean}, Issue \#4485).  The Haldane phase is protected by any
 of three symmetries: (S1) $\mathbb{Z}_2\times\mathbb{Z}_2$ (\texttt{IsZ2Z2Invariant}), (S2)
-time-reversal (\texttt{IsTimeReversalInvariant} marker), (S3) bond-centered inversion
-(\texttt{IsBondInversionInvariant} marker).  The axiom \texttt{tasaki\_vbs\_inversion\_parity} gives
+time-reversal (the general-$N$ marker \texttt{IsTimeReversalSymmetricS} of
+\texttt{Quantum/SpinS/LiebSchultzMattisDiscrete.lean}, used here at $N=2$), (S3) bond-centered
+inversion (\texttt{IsBondInversionInvariant} marker).  The axiom
+\texttt{tasaki\_vbs\_inversion\_parity} gives
 the inversion-parity $\mathbb{Z}_2$ index $\hat U_{\mathrm{inv}}|\Phi_{\mathrm{VBS}}^S\rangle
 =(-1)^{L\cdot S}|\Phi_{\mathrm{VBS}}^S\rangle$ (odd $L\cdot S\Rightarrow$ odd parity $\Rightarrow$
 obstruction to the trivial state).  \texttt{entanglementEntropyS}
 (marker, eqs.~8.3.7--8.3.8) is the bipartite entanglement entropy $-\sum_j p_j\log p_j$ from the
 Schmidt decomposition.  This section is heuristic; the precise indices come in §8.3.4 (MPS) and §8.3.6
-(Ogata).  Markers for the antiunitary/inversion/Schmidt structure; the parity is a documented axiom.
-Chapters~3--10 backfill.
+(Ogata).  Markers for the antiunitary/inversion/Schmidt structure; the parity is \emph{not} a
+documented axiom but an axiom still awaiting implementation (its $S=1$ instance is a discharge
+target).  The book's odd/even-$S$ SPT classification, which it states only as a belief, is not
+formalized here.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§8.3.4 Matrix-product SPT index} (Theorem 8.7 Tachikawa + Corollary 8.5; Tasaki

@@ -53,9 +53,9 @@ merged. -/
 axiom IsZ2Z2SymmetricS {L N : ℕ} : ManyBodyOpS (Fin L) N → Prop
 
 /-- **Time-reversal symmetry marker** `IsTimeReversalSymmetricS H` for a general spin chain: `H` is
-invariant under the antiunitary time-reversal `Θ̂`.  An uninterpreted predicate.  Its general-`N`
-scope is deliberate and distinct from the `N = 2` SPT-section marker `IsTimeReversalInvariant`
-(`SPTTopologicalIndex.lean`); the two are not to be merged. -/
+invariant under the antiunitary time-reversal `Θ̂`.  An uninterpreted predicate, and the only
+time-reversal marker here: the §8.3.2–§8.3.3 SPT sections (`SPTTopologicalIndex.lean`) use it at
+`N = 2`. -/
 axiom IsTimeReversalSymmetricS {L N : ℕ} : ManyBodyOpS (Fin L) N → Prop
 
 /-- **Unique-gapped-ground-state marker** `HasUniqueGappedGroundStateS H`: the Hamiltonian `H` has a
