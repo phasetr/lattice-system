@@ -41,8 +41,14 @@ about that definition.  The missing ingredient is the geometry of `Û_inv`, whic
 *sites* of the ring (`x ↦ L − 1 − x`): that is `ringReflect` (`RingBondReflection.lean`) with its
 configuration action `ringConfigReflect` (`RingReflectionTheta.lean`).  It is a different map from
 the on-site spin reversal `Θ = manyBodyReversalS` (`ManyBodyReversalS.lean`), which reverses each
-site's spin index (`σ ↦ Fin.rev ∘ σ`) and leaves the sites in place.  At `S = 1` the reflection maps
-together with `akltVBSState` are the intended starting point; none of them is imported here either.
+site's spin index (`σ ↦ Fin.rev ∘ σ`) and leaves the sites in place.  Caveat on the ring parity:
+`ringReflect` is defined only on `Fin (2 * n)`, i.e. it is the bond-centered reflection of an
+**even** ring `L = 2n`, where it has no fixed site, whereas `tasaki_vbs_inversion_parity` below
+quantifies over *every* `L`; for odd `L` the map `x ↦ L − 1 − x` fixes `x = (L − 1) / 2` and is
+therefore site-centered rather than bond-centered, so a discharge needs either an inversion defined
+on a general `Fin L` or a restriction of the parity statement to even `L`.  At `S = 1` the
+reflection maps together with `akltVBSState` are the intended starting point; none of them is
+imported here either.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §8.3.2–§8.3.3, eqs. (8.3.6)–(8.3.10), pp. 256–263; F. Pollmann, A. M. Turner, E. Berg, M.

@@ -12731,9 +12731,14 @@ definition.  The missing ingredient is the geometry of $\hat U_{\mathrm{inv}}$, 
 (\texttt{Quantum/SpinS/RingBondReflection.lean}) with its configuration action
 \texttt{ringConfigReflect} (\texttt{Quantum/SpinS/RingReflectionTheta.lean}), a different map from
 the on-site spin reversal $\Theta=\texttt{manyBodyReversalS}$ ($\sigma\mapsto\mathrm{Fin.rev}\circ
-\sigma$, which leaves the sites in place); at $S=1$ those reflection maps together with
-\texttt{akltVBSState} are the intended starting point.  The book's odd/even-$S$ SPT classification,
-which it states only as a belief, is not
+\sigma$, which leaves the sites in place).  \emph{Caveat on the ring parity:} \texttt{ringReflect}
+is defined only on $\mathrm{Fin}(2n)$, i.e.\ it is the bond-centered reflection of an \emph{even}
+ring $L=2n$, where it has no fixed site, whereas \texttt{tasaki\_vbs\_inversion\_parity} quantifies
+over \emph{every} $L$; for odd $L$ the map $x\mapsto L-1-x$ fixes $x=(L-1)/2$ and is therefore
+site-centered rather than bond-centered, so a discharge needs either an inversion defined on a
+general $\mathrm{Fin}\,L$ or a restriction of the parity statement to even $L$.  At $S=1$ those
+reflection maps together with \texttt{akltVBSState} are the intended starting point.  The book's
+odd/even-$S$ SPT classification, which it states only as a belief, is not
 formalized here.  Chapters~3--10 backfill.
 
 \medskip
