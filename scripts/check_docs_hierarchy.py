@@ -339,6 +339,49 @@ def approved_changes(text: str) -> str:
             "`Quantum/SpinS/AnisotropicEdgeStatesDischarge.lean` |",
         )
         .replace(
+            "| `ktUnitaryS` / `piRotationS` / `IsZ2Z2Invariant` / `tasaki_prop_8_4` | "
+            "**§8.2.2–§8.2.3 Kennedy–Tasaki transformation + Proposition 8.4** (Pollmann–Turner–Berg–"
+            "Oshikawa; eqs. (8.2.5)–(8.2.7)): the nonlocal unitary realizing hidden Z₂×Z₂ symmetry "
+            "breaking. `ktUnitaryS L` (marker) is the Kennedy–Tasaki unitary "
+            "`Û_KT = ∏_{u<v} exp(iπ Ŝ_u^{(3)} Ŝ_v^{(1)})` (eq. 8.2.5), with `ktUnitaryS_sq` "
+            "(`Û_KT²=1`) and `ktUnitaryS_selfAdjoint` (`Û_KT=Û_KT†`) — a self-adjoint involution. "
+            "`piRotationS L α = ∏_x exp(iπ Ŝ_x^{(α)})` (**concrete**, on-site matrix exponentials) "
+            "is the π-rotation about axis `α`; `IsZ2Z2Invariant H` = "
+            "`(Û_π^{(α)})† H Û_π^{(α)} = H` for all `α` (commutes with all three π-rotations). "
+            "`HasShortRangeInteraction`/`HasSomeShortRangeInteraction` (markers) capture range-`r` "
+            "locality. `tasaki_prop_8_4` (**AXIOM**): for a short-range open-chain `Ĥ`, "
+            "`Û_KT Ĥ Û_KT` is again short-range **iff** `Ĥ` is Z₂×Z₂ invariant — the "
+            "hidden-symmetry-breaking picture is effective exactly when `Ĥ` has Z₂×Z₂ symmetry | "
+            "`Quantum/SpinS/KennedyTasakiTransformation.lean` |",
+            "| `ktUnitaryS` / `piRotationS` / `IsZ2Z2Invariant` / `tasaki_prop_8_4_local_monomial` | "
+            "**§8.2.2–§8.2.3 Kennedy–Tasaki transformation + Proposition 8.4** (Pollmann–Turner–Berg–"
+            "Oshikawa; **PROVED**, `#print axioms` = std3, merged in commit `2cb2cfc8`; "
+            "eqs. (8.2.5)–(8.2.7), (8.2.12)–(8.2.15), (8.2.17)): the nonlocal unitary realizing "
+            "hidden Z₂×Z₂ symmetry breaking. `ktUnitaryS L = ∏_{u<v} (1 − 2(Ŝ_u^{(3)} Ŝ_v^{(1)})²)` "
+            "is now **concrete** (not a marker): the `S=1` closed form of "
+            "`Û_KT = ∏_{u<v} exp(iπ Ŝ_u^{(3)} Ŝ_v^{(1)})` (eq. 8.2.5), a self-adjoint involution "
+            "(`ktUnitaryS_sq`, `ktUnitaryS_selfAdjoint`). `piRotationS L α = "
+            "∏_x (1 − 2(Ŝ_x^{(α)})²)` is likewise **concrete** (the `S=1` closed form of the "
+            "π-rotation about axis `α`); `IsZ2Z2Invariant H` = "
+            "`(Û_π^{(α)})† H Û_π^{(α)} = H` for all `α`. `tasaki_prop_8_4_local_monomial` (now a "
+            "**theorem**, formerly an axiom): the printed Proposition quantifies over short-range "
+            "Hamiltonians, but §8.2.2–§8.2.3 argue and prove only a **single local monomial** "
+            "`O_w = ∏_i Ŝ_{x_i}^{(α_i)}` (`w : List (Fin L × Fin 3)`); `IsLocalWindowS L N a b` "
+            "(commutant form) replaces the deleted markers "
+            "`HasShortRangeInteraction`/`HasSomeShortRangeInteraction`. For `w` supported in an "
+            "interior window `[a,b]` with margin on both sides (`0<a`, `b+1<L`), "
+            "`Û_KT O_w Û_KT` is again local in `[a,b]` **iff** `O_w` is Z₂×Z₂ invariant — via "
+            "the sign identity `Û_π^{(α)} O_w Û_π^{(α)} = (−1)^{c_α} O_w` "
+            "(`c_α = #{i∣α_i≠α}`) rather than a bare parity biconditional (false as an iff at "
+            "`O_w = 0`). Proof: half-turn control-polynomial algebra of §8.2.2; the "
+            "Hamiltonian-level (sum) statement is deliberately out of scope | "
+            "`Quantum/SpinS/SpinOneHalfTurnRegion.lean`; "
+            "`Quantum/SpinS/KennedyTasakiTransformation.lean`; "
+            "`Quantum/SpinS/KennedyTasakiTransformRules.lean`; "
+            "`Quantum/SpinS/KennedyTasakiMonomial.lean`; "
+            "`Quantum/SpinS/KennedyTasakiProp84.lean` |",
+        )
+        .replace(
             "All items below are formally proved with **zero `sorry`**.",
             "The catalogue below includes proved results, conditional results, and documented axioms as recorded, with **zero `sorry`**.",
         )
