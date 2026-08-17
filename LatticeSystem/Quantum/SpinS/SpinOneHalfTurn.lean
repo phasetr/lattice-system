@@ -1,3 +1,4 @@
+import LatticeSystem.Quantum.SpinOneBasis
 import LatticeSystem.Quantum.SpinS.Hermitian
 import LatticeSystem.Quantum.SpinS.SpinSReversal
 
@@ -9,10 +10,11 @@ For `S = 1` the operator `Ŝ^{(α)}` has eigenvalues `{1, 0, -1}`, so `(Ŝ^{(α)
 
   `exp(i π Ŝ^{(α)}) = 1 - 2 (Ŝ^{(α)})²`.
 
-This module introduces that uniform three-axis family together with the algebraic identities used
-by the §8.1.3 edge-state analysis: involutivity, self-adjointness, the conjugation law
-`u_α Ŝ^{(β)} u_α = ± Ŝ^{(β)}` (`+` exactly when `α = β`), and stability of the family under
-conjugation by any of its members.
+The three matrices themselves are the existing `spinOnePiRot1`, `spinOnePiRot2`, `spinOnePiRot3` of
+`Quantum/SpinOneBasis.lean`; this module packages them as one family indexed by `alpha : Fin 3` and
+supplies the algebraic identities used by the §8.1.3 edge-state analysis: the polynomial
+characterisation, involutivity, self-adjointness, the conjugation law `u_α Ŝ^{(β)} u_α = ± Ŝ^{(β)}`
+(`+` exactly when `α = β`), and stability of the family under conjugation by any of its members.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §2.1, eqs. (2.1.21), (2.1.23) and (2.1.29)–(2.1.30), pp. 17–19; §8.1.3, footnote 11, p. 237
@@ -43,17 +45,20 @@ theorem spinOneAxisS_isHermitian (alpha : Fin 3) : (spinOneAxisS alpha).IsHermit
 
 /-- The **per-site spin-one half turn** `u_α = exp(i π Ŝ^{(α)}) = 1 - 2 (Ŝ^{(α)})²`, the closed
 form valid because `(Ŝ^{(α)})³ = Ŝ^{(α)}` at `S = 1` (Tasaki (2.1.21)/(2.1.23), pp. 17–18;
-footnote 11, p. 237, records that the `S = 1` restriction is essential).  No Lean bridge to
+footnote 11, p. 237, records that the `S = 1` restriction is essential).
+
+The members are literally the existing π-rotation matrices `spinOnePiRot1`, `spinOnePiRot2`,
+`spinOnePiRot3` of `Quantum/SpinOneBasis.lean`: this definition only turns those three constants
+into the `Fin 3`-indexed family that the axis-symmetric §8.1.3 argument quantifies over.  The
+polynomial form is recovered by `spinOneHalfTurnS_eq_one_sub_two_smul_sq`.  No Lean bridge to
 `NormedSpace.exp` is attempted: it is off the critical path, and the repository already lets a
 concrete phase and an `exp` form coexist without a proved bridge (`AKLTStringOrderDefs`).
 
-**Declared overlap.**  At `alpha = 2` this is definitionally the existing single-constant
-`spinSStringPhaseS1 = diagonal (k ↦ (-1)^(k+1)) = diag(-1, 1, -1)` of `AKLTStringOrderDefs`.  The
-overlap is deliberate: `spinOneHalfTurnS` is the uniform three-member family required by the
-axis-symmetric §8.1.3 argument, and the §7.2 constant is left untouched so that already-discharged
-material is not disturbed. -/
-noncomputable def spinOneHalfTurnS (alpha : Fin 3) : Matrix (Fin 3) (Fin 3) ℂ :=
-  1 - (2 : ℂ) • (spinOneAxisS alpha) ^ 2
+**Declared overlap.**  At `alpha = 2` the value equals the single constant
+`spinSStringPhaseS1 = diagonal (k ↦ (-1)^(k+1)) = diag(-1, 1, -1)` of `AKLTStringOrderDefs`.  That
+§7.2 constant is left untouched so that already-discharged material is not disturbed. -/
+def spinOneHalfTurnS (alpha : Fin 3) : Matrix (Fin 3) (Fin 3) ℂ :=
+  ![spinOnePiRot1, spinOnePiRot2, spinOnePiRot3] alpha
 
 /-- `(√2)² = 2` as a complex scalar; the single irrational entry appearing in the explicit
 spin-one matrices. -/
@@ -73,36 +78,50 @@ private theorem spinSOpMinus_two_eq :
   ext i j
   fin_cases i <;> fin_cases j <;> norm_num [spinSOpMinus]
 
+/-- **The half turn is the `S = 1` polynomial in its axis operator**: `u_α = 1 - 2 (Ŝ^{(α)})²`
+(Tasaki (2.1.30)/(2.1.32), p. 19).  This is the bridge between the explicit matrices
+`spinOnePiRot1/2/3` that define the family and the operator identities proved from the polynomial
+form. -/
+theorem spinOneHalfTurnS_eq_one_sub_two_smul_sq (alpha : Fin 3) :
+    spinOneHalfTurnS alpha = 1 - (2 : ℂ) • (spinOneAxisS alpha) ^ 2 := by
+  fin_cases alpha
+  · change spinOnePiRot1 = 1 - (2 : ℂ) • (spinOneAxisS 0) ^ 2
+    have h1 : spinOneAxisS 0 = (1 / 2 : ℂ) • (spinSOpPlus 2 + spinSOpMinus 2) := rfl
+    rw [h1, spinSOpPlus_two_eq, spinSOpMinus_two_eq]
+    ext i j
+    fin_cases i <;> fin_cases j <;>
+      simp [pow_two, spinOnePiRot1] <;> ring_nf <;> simp [sqrtTwo_sq] <;> norm_num
+  · change spinOnePiRot2 = 1 - (2 : ℂ) • (spinOneAxisS 1) ^ 2
+    have h2 : spinOneAxisS 1 = (1 / (2 * Complex.I) : ℂ) • (spinSOpPlus 2 - spinSOpMinus 2) := rfl
+    rw [h2, spinSOpPlus_two_eq, spinSOpMinus_two_eq]
+    ext i j
+    fin_cases i <;> fin_cases j <;>
+      simp [pow_two, spinOnePiRot2] <;> ring_nf <;> simp [Complex.I_sq, sqrtTwo_sq] <;> norm_num
+  · change spinOnePiRot3 = 1 - (2 : ℂ) • (spinOneAxisS 2) ^ 2
+    have h3 : spinOneAxisS 2 = spinSOp3 2 := rfl
+    rw [h3]
+    ext i j
+    fin_cases i <;> fin_cases j <;> simp [pow_two, spinSOp3, spinOnePiRot3] <;> norm_num
+
 /-- The **axis-1 half turn is the negated single-site reversal**: `u_1 = -F`.  Hence conjugation by
 `u_1` agrees with conjugation by `F`, whose full action on `Ŝ^{(1)}, Ŝ^{(2)}, Ŝ^{(3)}` is already
 available. -/
 theorem spinOneHalfTurnS_zero_eq : spinOneHalfTurnS 0 = -spinReversalS 2 := by
-  have h1 : spinOneAxisS 0 = (1 / 2 : ℂ) • (spinSOpPlus 2 + spinSOpMinus 2) := rfl
+  change spinOnePiRot1 = -spinReversalS 2
   ext i j
-  rw [spinOneHalfTurnS, h1, spinSOpPlus_two_eq, spinSOpMinus_two_eq]
-  fin_cases i <;> fin_cases j <;>
-    simp [pow_two, spinReversalS, Fin.rev] <;> ring_nf <;> simp [sqrtTwo_sq] <;>
-    norm_num
+  fin_cases i <;> fin_cases j <;> simp [spinOnePiRot1, spinReversalS, Fin.rev]
 
-/-- The **axis-3 half turn is the diagonal phase** `diag(-1, 1, -1)` — definitionally the existing
-`spinSStringPhaseS1`, as disclosed on `spinOneHalfTurnS`. -/
-theorem spinOneHalfTurnS_two_eq : spinOneHalfTurnS 2 = !![-1, 0, 0; 0, 1, 0; 0, 0, -1] := by
-  have h3 : spinOneAxisS 2 = spinSOp3 2 := rfl
-  ext i j
-  rw [spinOneHalfTurnS, h3]
-  fin_cases i <;> fin_cases j <;> simp [pow_two, spinSOp3] <;> norm_num
+/-- The **axis-3 half turn is the diagonal π-rotation matrix** `spinOnePiRot3 = diag(-1, 1, -1)`. -/
+theorem spinOneHalfTurnS_two_eq : spinOneHalfTurnS 2 = spinOnePiRot3 := rfl
 
 /-- The **axis-2 half turn is the product of the other two**, `u_2 = u_1 u_3`, matching the
 spin-`S` relation `û_1 û_2 = û_3` with no extra phase (Tasaki (2.1.29)–(2.1.30), p. 19). -/
 theorem spinOneHalfTurnS_one_eq :
     spinOneHalfTurnS 1 = spinOneHalfTurnS 0 * spinOneHalfTurnS 2 := by
-  have h2 : spinOneAxisS 1 = (1 / (2 * Complex.I) : ℂ) • (spinSOpPlus 2 - spinSOpMinus 2) := rfl
-  rw [spinOneHalfTurnS_zero_eq, spinOneHalfTurnS_two_eq]
+  change spinOnePiRot2 = spinOnePiRot1 * spinOnePiRot3
   ext i j
-  rw [spinOneHalfTurnS, h2, spinSOpPlus_two_eq, spinSOpMinus_two_eq]
   fin_cases i <;> fin_cases j <;>
-    simp [pow_two, spinReversalS, Fin.rev, Matrix.mul_apply] <;>
-    ring_nf <;> simp [Complex.I_sq, sqrtTwo_sq] <;> norm_num
+    simp [spinOnePiRot1, spinOnePiRot2, spinOnePiRot3, Matrix.mul_apply, Fin.sum_univ_three]
 
 /-- **The half turn commutes with its own axis operator**: `u_α Ŝ^{(α)} = Ŝ^{(α)} u_α`, both being
 polynomials in `Ŝ^{(α)}`.  This is the crux of the mutual commutativity of the string terms
@@ -110,16 +129,14 @@ polynomials in `Ŝ^{(α)}`.  This is the crux of the mutual commutativity of the
 theorem spinOneHalfTurnS_commute_spinOneAxisS (alpha : Fin 3) :
     Commute (spinOneHalfTurnS alpha) (spinOneAxisS alpha) := by
   change spinOneHalfTurnS alpha * spinOneAxisS alpha = spinOneAxisS alpha * spinOneHalfTurnS alpha
-  rw [spinOneHalfTurnS, Matrix.sub_mul, Matrix.mul_sub, one_mul, mul_one, Matrix.smul_mul,
-    Matrix.mul_smul, pow_two, mul_assoc]
+  rw [spinOneHalfTurnS_eq_one_sub_two_smul_sq, Matrix.sub_mul, Matrix.mul_sub, one_mul, mul_one,
+    Matrix.smul_mul, Matrix.mul_smul, pow_two, mul_assoc]
 
-/-- The axis-1 and axis-3 half turns commute. -/
+/-- The axis-1 and axis-3 half turns commute (the integer-spin commutation
+`spinOnePiRot3_comm_spinOnePiRot1`). -/
 private theorem spinOneHalfTurnS_zero_mul_two_comm :
-    spinOneHalfTurnS 0 * spinOneHalfTurnS 2 = spinOneHalfTurnS 2 * spinOneHalfTurnS 0 := by
-  rw [spinOneHalfTurnS_zero_eq, spinOneHalfTurnS_two_eq]
-  ext i j
-  fin_cases i <;> fin_cases j <;>
-    simp [Matrix.mul_apply, Fin.sum_univ_three, spinReversalS, Fin.rev]
+    spinOneHalfTurnS 0 * spinOneHalfTurnS 2 = spinOneHalfTurnS 2 * spinOneHalfTurnS 0 :=
+  spinOnePiRot3_comm_spinOnePiRot1.symm
 
 /-- Conjugation by the axis-2 half turn factors as conjugation by the axis-3 half turn followed by
 conjugation by the axis-1 half turn, since `u_2 = u_1 u_3` and `u_1`, `u_3` commute. -/
@@ -130,32 +147,14 @@ private theorem spinOneHalfTurnS_one_conj (X : Matrix (Fin 3) (Fin 3) ℂ) :
   nth_rewrite 2 [spinOneHalfTurnS_zero_mul_two_comm]
   noncomm_ring
 
-/-- The axis-3 half turn is an involution. -/
-private theorem spinOneHalfTurnS_two_mul_self :
-    spinOneHalfTurnS 2 * spinOneHalfTurnS 2 = 1 := by
-  rw [spinOneHalfTurnS_two_eq]
-  ext i j
-  fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_three]
-
-/-- The axis-1 half turn is an involution. -/
-private theorem spinOneHalfTurnS_zero_mul_self :
-    spinOneHalfTurnS 0 * spinOneHalfTurnS 0 = 1 := by
-  rw [spinOneHalfTurnS_zero_eq, neg_mul_neg]
-  exact spinReversalS_mul_self 2
-
 /-- **Each half turn is an involution**: `u_α² = 1` (the `S = 1` form of `(û_α)² = Û_{2π} = 1`,
-Tasaki (2.1.23), p. 17). -/
+Tasaki (2.1.23), p. 17; the three instances are `spinOnePiRot{1,2,3}_sq`). -/
 theorem spinOneHalfTurnS_mul_self (alpha : Fin 3) :
     spinOneHalfTurnS alpha * spinOneHalfTurnS alpha = 1 := by
-  have h1 : spinOneHalfTurnS 1 * spinOneHalfTurnS 1 = 1 := by
-    have h := spinOneHalfTurnS_one_conj 1
-    rw [mul_one, mul_one, spinOneHalfTurnS_two_mul_self, mul_one,
-      spinOneHalfTurnS_zero_mul_self] at h
-    exact h
   fin_cases alpha
-  · exact spinOneHalfTurnS_zero_mul_self
-  · exact h1
-  · exact spinOneHalfTurnS_two_mul_self
+  · exact spinOnePiRot1_sq
+  · exact spinOnePiRot2_sq
+  · exact spinOnePiRot3_sq
 
 /-- **Each half turn is self-adjoint**: `u_αᴴ = u_α`, since `Ŝ^{(α)}` is Hermitian and `u_α` is a
 real polynomial in it.  This is what makes each string term `Ŝ_x^{(α)} R^{(α)}_{<x}` Hermitian
@@ -163,7 +162,7 @@ real polynomial in it.  This is what makes each string term `Ŝ_x^{(α)} R^{(α)
 theorem spinOneHalfTurnS_isHermitian (alpha : Fin 3) : (spinOneHalfTurnS alpha).IsHermitian := by
   have hS := (spinOneAxisS_isHermitian alpha).eq
   change (spinOneHalfTurnS alpha)ᴴ = spinOneHalfTurnS alpha
-  rw [spinOneHalfTurnS, Matrix.conjTranspose_sub, Matrix.conjTranspose_one,
+  rw [spinOneHalfTurnS_eq_one_sub_two_smul_sq, Matrix.conjTranspose_sub, Matrix.conjTranspose_one,
     Matrix.conjTranspose_smul, pow_two, Matrix.conjTranspose_mul, hS]
   norm_num [pow_two]
 
@@ -179,14 +178,14 @@ private theorem spinOneHalfTurnS_two_conj_spinSOpPlus :
     spinOneHalfTurnS 2 * spinSOpPlus 2 * spinOneHalfTurnS 2 = -spinSOpPlus 2 := by
   rw [spinOneHalfTurnS_two_eq, spinSOpPlus_two_eq]
   ext i j
-  fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_three]
+  fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_three, spinOnePiRot3]
 
 /-- Conjugating the lowering operator by the axis-3 half turn flips its sign. -/
 private theorem spinOneHalfTurnS_two_conj_spinSOpMinus :
     spinOneHalfTurnS 2 * spinSOpMinus 2 * spinOneHalfTurnS 2 = -spinSOpMinus 2 := by
   rw [spinOneHalfTurnS_two_eq, spinSOpMinus_two_eq]
   ext i j
-  fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_three]
+  fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_three, spinOnePiRot3]
 
 /-- Axis-3 half turn versus the axis-1 spin component: `u_3 Ŝ^{(1)} u_3 = -Ŝ^{(1)}`. -/
 private theorem spinOneHalfTurnS_two_conj_axis_zero :
@@ -272,7 +271,7 @@ theorem spinOneHalfTurnS_conj_spinOneHalfTurnS (alpha beta : Fin 3) :
   have hconj := spinOneHalfTurnS_conj_spinOneAxisS alpha beta
   have hbeta : spinOneHalfTurnS beta
       = 1 - (2 : ℂ) • (spinOneAxisS beta * spinOneAxisS beta) := by
-    rw [spinOneHalfTurnS, pow_two]
+    rw [spinOneHalfTurnS_eq_one_sub_two_smul_sq, pow_two]
   have hsq : spinOneHalfTurnS alpha * (spinOneAxisS beta * spinOneAxisS beta)
         * spinOneHalfTurnS alpha
       = (spinOneHalfTurnS alpha * spinOneAxisS beta * spinOneHalfTurnS alpha) *

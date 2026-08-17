@@ -50,7 +50,7 @@ private theorem spinOneHalfTurnS_two_conj_apply (A : Matrix (Fin 3) (Fin 3) ℂ)
   have hdiag : spinOneHalfTurnS 2 = Matrix.diagonal (fun k : Fin 3 => -((-1 : ℂ) ^ k.val)) := by
     rw [spinOneHalfTurnS_two_eq]
     ext a b
-    fin_cases a <;> fin_cases b <;> simp [Matrix.diagonal]
+    fin_cases a <;> fin_cases b <;> simp [Matrix.diagonal, spinOnePiRot3]
   rw [hdiag, Matrix.mul_diagonal, Matrix.diagonal_mul]
   ring
 

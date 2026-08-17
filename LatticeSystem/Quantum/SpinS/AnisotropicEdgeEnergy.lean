@@ -205,7 +205,8 @@ theorem manyBodyOperatorNormS_spinSSiteComponentS_le (alpha : Fin 3) (x : Fin L)
     exact onSiteS_isHermitian x (spinOneAxisS_isHermitian alpha)
   have hu : spinOneAxisS alpha * spinOneAxisS alpha
       = (2 : ℂ)⁻¹ • ((1 : Matrix (Fin 3) (Fin 3) ℂ) - spinOneHalfTurnS alpha) := by
-    rw [spinOneHalfTurnS, sub_sub_cancel, smul_smul, inv_mul_cancel₀ two_ne_zero, one_smul, pow_two]
+    rw [spinOneHalfTurnS_eq_one_sub_two_smul_sq, sub_sub_cancel, smul_smul,
+      inv_mul_cancel₀ two_ne_zero, one_smul, pow_two]
   have hsq : manyBodyOperatorNormS (spinSSiteComponentS alpha x) ^ 2
       = manyBodyOperatorNormS
           (onSiteS x (spinOneAxisS alpha * spinOneAxisS alpha) : ManyBodyOpS (Fin L) 2) := by
