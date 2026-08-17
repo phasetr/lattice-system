@@ -24,15 +24,17 @@ hidden antiferromagnetic order forces a near four-fold degeneracy of low-lying s
 `S = 1/2` edge spins of the open chain).  Edge states are an open-boundary phenomenon, so the
 theorem uses the open-chain Hamiltonian `openAnisotropicChainHamiltonianS`.
 
-The hidden-order assumption (8.1.10) is carried by the uninterpreted marker `HasStringLRO` (its
-faithful form needs the global normalized string operator, not yet defined).  Theorem 8.2, whose
-proof
-is the variational/trial-state (Horsch–von der Linden, Koma–Tasaki) argument, is recorded as a
-documented axiom; the three low-lying states are exhibited as a linearly independent triple of
-eigenvectors with energies within `C_ν / L` of the ground energy.
+The hidden-order assumption (8.1.10) is now carried by the **concrete** ratio-form marker
+`HasStringLRO`, built from the genuine global prefix-string operator `edgeStringOrderOpS`
+(§7.3.1-style per-site half-turn phase composed as a left prefix, not the two-endpoint window of
+`AKLTStringOrderDefs`).  Theorem 8.2 is stated (RED state: proof body is `sorry`, see the PR-1
+Red/TDD gate) with the source-faithful quantifier order confirmed by the design round recorded in
+`.self-local/active/issue-4718.md`: eventual threshold `L0 = 1`, `L`-independent constants `C_ν`,
+and three nonzero linearly independent excited eigenvectors with `O(1/L)` energy bounds above the
+**unique** ground energy.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §8.1.2–§8.1.3, Theorem 8.2, eqs. (8.1.9)–(8.1.11), pp. 229–238; T. Koma, H. Tasaki, J. Stat.
+2020), §8.1.2–§8.1.3, Theorem 8.2, eqs. (8.1.8)–(8.1.12), pp. 236–238; T. Koma, H. Tasaki, J. Stat.
 Phys. **76**, 745 (1994); M. den Nijs, K. Rommelse, Phys. Rev. B **40**, 4709 (1989).
 -/
 
@@ -55,34 +57,69 @@ noncomputable def openAnisotropicChainHamiltonianS (L : ℕ) (D : ℝ) : ManyBod
   heisenbergHamiltonianS (openAnisotropicChainCoupling L) 2 +
     (D : ℂ) • ∑ x : Fin L, spinSSiteOp3 x 2 * spinSSiteOp3 x 2
 
-/-- **Hidden-order (string long-range order) marker** `HasStringLRO L D Φ q`: the ground state `Φ`
-of the anisotropic chain `Ĥ_D` exhibits hidden antiferromagnetic order in all three directions,
-i.e. the den Nijs–Rommelse bound (8.1.10) `⟨Φ| (Ô_string^{(α)} / L)² |Φ⟩ ≥ q_α` holds for each `α`
-with the `L`-independent constants `q_α`.  A faithful definition needs the global normalized string
-operator; it is kept as an uninterpreted predicate so Theorem 8.2 assumes only the genuine hidden
-order. -/
-axiom HasStringLRO (L : ℕ) (D : ℝ) (Φ : (Fin L → Fin 3) → ℂ) (q : Fin 3 → ℝ) : Prop
+/-- **The per-site spin-one half turn** `u_α = exp(i π Ŝ^{(α)}) = 1 - 2 (Ŝ^{(α)})²`, the closed form
+valid because `(Ŝ^{(α)})³ = Ŝ^{(α)}` at `S = 1` (Tasaki (2.1.21)/(2.1.23), pp. 17–18; footnote 11,
+p. 237, records that the `S = 1` restriction is essential for this closed form).  This is a
+provisional Red-state placement in the model-definitions file; per the active record's file
+boundaries it belongs in a new shared module `LatticeSystem/Quantum/SpinS/SpinOneHalfTurn.lean`
+(M1a), to be moved there at the implementation gate.  Its axis-`3` value overlaps definitionally
+with the existing `spinSStringPhaseS1` (`AKLTStringOrderDefs.lean:41`); this overlap is disclosed
+here and will be disclosed again in the PR body per the design record. -/
+noncomputable def spinOneHalfTurnS (alpha : Fin 3) : Matrix (Fin 3) (Fin 3) ℂ :=
+  1 - (2 : ℂ) • (![spinSOp1 2, spinSOp2 2, spinSOp3 2] alpha) ^ 2
 
-/-- **Tasaki Theorem 8.2 (hidden order forces edge states), AXIOM.**  Fix the anisotropy `D` and
-hidden-order constants `q_α > 0`.  Then there are **`L`-independent** constants `C_ν > 0` such that:
-for every `L > 0`, whenever `Φ` is the **unique** ground state of the *open-chain* Hamiltonian
-`Ĥ_D^open` at ground energy `E₀` (`IsUniqueChainGroundState`) exhibiting hidden antiferromagnetic
-order (`HasStringLRO L D Φ q`, the bound (8.1.10)), there exist **three linearly independent excited
-states** `Ψ_ν` (`ν : Fin 3`) with energies `E_ν` satisfying `Ĥ_D^open Ψ_ν = E_ν Ψ_ν` and
-`E₀ < E_ν ≤ E₀ + C_ν / L`.  Hidden antiferromagnetic order thus forces a near four-fold degeneracy
-of low-lying states — the free `S = 1/2` spins at the two open ends.  The constants `C_ν` are
-quantified outside `∀ L`, so the `O(1/L)` splitting is genuinely length-uniform.  Proved by the
-Horsch–von der Linden / Koma–Tasaki variational (trial-state) argument, as in Theorem 3.1; recorded
-as a documented axiom. -/
-axiom tasaki_theorem_8_2 (D : ℝ) (q : Fin 3 → ℝ) (hq : ∀ α : Fin 3, 0 < q α) :
-    ∃ C : Fin 3 → ℝ, (∀ ν : Fin 3, 0 < C ν) ∧
-      ∀ (L : ℕ) (Φ : (Fin L → Fin 3) → ℂ) (E₀ : ℝ), 0 < L →
-        IsUniqueChainGroundState (openAnisotropicChainHamiltonianS L D) E₀ Φ →
-        HasStringLRO L D Φ q →
-        ∃ (Ψ : Fin 3 → ((Fin L → Fin 3) → ℂ)) (E : Fin 3 → ℝ),
-          LinearIndependent ℂ Ψ ∧
-            ∀ ν : Fin 3,
-              (openAnisotropicChainHamiltonianS L D).mulVec (Ψ ν) = (E ν : ℂ) • Ψ ν ∧
-                E₀ < E ν ∧ E ν ≤ E₀ + C ν / (L : ℝ)
+/-- **The prefix rotation** `R^{(α)}_{<m} = ∏_{y < m} u_α^{(y)}`, the product of half turns over the
+sites strictly left of `m`.  Indexed by `m : ℕ` (not `x : Fin L`) so the single declaration also
+serves the support-count argument, which compares `m ≤ z` and `z + 2 ≤ m`.  Provisional Red-state
+placement; belongs in `AnisotropicEdgeStringOrder.lean` per the file boundaries. -/
+noncomputable def edgeStringPrefixRotationS
+    (L : ℕ) (alpha : Fin 3) (m : ℕ) : ManyBodyOpS (Fin L) 2 :=
+  (List.ofFn fun y : Fin L =>
+    if y.val < m then onSiteS y (spinOneHalfTurnS alpha) else 1).prod
+
+/-- **The global edge-string order operator** `Ô^{(α)}_string = Σ_x Ŝ^{(α)}_x R^{(α)}_{<x}`
+(the (8.1.8)-faithful left-prefix string, distinct from `AKLTStringOrderDefs`'s two-endpoint window
+string).  Provisional Red-state placement; belongs in `AnisotropicEdgeStringOrder.lean`. -/
+noncomputable def edgeStringOrderOpS
+    (L : ℕ) (alpha : Fin 3) : ManyBodyOpS (Fin L) 2 :=
+  ∑ x : Fin L, spinSSiteComponentS alpha x * edgeStringPrefixRotationS L alpha x.val
+
+/-- **Hidden-order (string long-range order) marker** `HasStringLRO L Φ q`, the concrete
+ratio-form (8.1.10) bound: for every axis `α`, the normalized Rayleigh expectation of
+`(Ô^{(α)}_string / L)²` at the state `Φ` is at least `q_α`.  Replaces the former uninterpreted
+marker `HasStringLRO L D Φ q`; `D` is deliberately absent, since the ratio form is the (8.1.10)
+definition itself and not a `D`-dependent hypothesis. -/
+def HasStringLRO (L : ℕ) (Phi : (Fin L → Fin 3) → ℂ)
+    (q : Fin 3 → ℝ) : Prop :=
+  ∀ alpha : Fin 3, q alpha ≤ expectationRatioRe
+    (((((L : ℂ)⁻¹) • edgeStringOrderOpS L alpha) ^ 2)) Phi
+
+/-- **Tasaki Theorem 8.2 (hidden order forces edge states).**  Fix the anisotropy `D ≥ 0` and hidden
+-order constants `q_α > 0`.  Then there is an eventual threshold `L0` and **`L`-independent**
+constants `C_ν > 0` such that: for every `L ≥ L0`, whenever `Φ` is the **unique** ground state of the
+*open-chain* Hamiltonian `Ĥ_D^open` at ground energy `E₀` (`IsUniqueChainGroundState`) exhibiting
+hidden antiferromagnetic order (`HasStringLRO L Φ q`, the bound (8.1.10)), there exist **three
+nonzero, mutually linearly independent excited states** `Ψ_ν` (`ν : Fin 3`) with energies `E_ν`
+satisfying `Ĥ_D^open Ψ_ν = E_ν Ψ_ν` and `E₀ < E_ν ≤ E₀ + C_ν / L`.  Hidden antiferromagnetic order
+thus forces a near four-fold degeneracy of low-lying states — the free `S = 1/2` spins at the two
+open ends.  The constants `C_ν` are quantified outside `∀ L`, so the `O(1/L)` splitting is genuinely
+length-uniform.  Proved by the Horsch–von der Linden / Koma–Tasaki variational (trial-state)
+argument, as in Theorem 3.1.  **RED STATE (PR-1 Red/TDD gate): the proof body is `sorry` pending the
+implementation gate**; only the statement shape is authorized at this step. -/
+theorem tasaki_theorem_8_2
+    (D : ℝ) (hD : 0 ≤ D) (q : Fin 3 → ℝ) (hq : ∀ alpha : Fin 3, 0 < q alpha) :
+    ∃ L0 : ℕ, ∃ C : Fin 3 → ℝ,
+      (∀ nu : Fin 3, 0 < C nu) ∧
+      ∀ L : ℕ, L0 ≤ L →
+        ∀ (E0 : ℝ) (Phi : (Fin L → Fin 3) → ℂ),
+          IsUniqueChainGroundState (openAnisotropicChainHamiltonianS L D) E0 Phi →
+          HasStringLRO L Phi q →
+          ∃ (E : Fin 3 → ℝ) (Psi : Fin 3 → ((Fin L → Fin 3) → ℂ)),
+            LinearIndependent ℂ Psi ∧
+            ∀ nu : Fin 3,
+              Psi nu ≠ 0 ∧
+              (openAnisotropicChainHamiltonianS L D).mulVec (Psi nu) = (E nu : ℂ) • Psi nu ∧
+              E0 < E nu ∧ E nu ≤ E0 + C nu / (L : ℝ) := by
+  sorry
 
 end LatticeSystem.Quantum
