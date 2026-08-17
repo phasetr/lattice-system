@@ -292,6 +292,53 @@ def approved_changes(text: str) -> str:
             "mps_theorem_7_6` is **PROVED axiom-free; Standard 3; merged in commit `50b30949`**",
         )
         .replace(
+            "| `openAnisotropicChainHamiltonianS` / `HasStringLRO` / `tasaki_theorem_8_2` | "
+            "**§8.1.2–§8.1.3 Hidden order forces edge states** (Theorem 8.2, Koma–Tasaki; "
+            "eqs. (8.1.9)–(8.1.11)): in the anisotropic chain, hidden antiferromagnetic order "
+            "(positive den Nijs–Rommelse string order `O_string^{(α)}(D)`, §7.2.1) distinguishes "
+            "the Haldane phase (`0≤D<D_c`) from the large-`D` phase, and forces low-lying edge "
+            "states. `openAnisotropicChainHamiltonianS L D` is the **open-boundary** anisotropic "
+            "chain (`openAnisotropicChainCoupling`, no wrap-around — the free ends carry the "
+            "`S=1/2` edge spins). `HasStringLRO L D Φ q` (marker) is the hidden-order bound "
+            "(8.1.10) `⟨Φ\\|(Ô_string^{(α)}/L)²\\|Φ⟩ ≥ q_α` (`q_α>0`). `tasaki_theorem_8_2` "
+            "(**AXIOM**): for fixed `D, q` there are **L-independent** `C_ν>0` such that for "
+            "every `L>0`, whenever `Φ` is the **unique** ground state "
+            "(`IsUniqueChainGroundState`) of `Ĥ_D^open` at `E₀` with `HasStringLRO`, there are "
+            "**three linearly independent excited states** `Ψ_ν` (`ν:Fin 3`, "
+            "`LinearIndependent ℂ Ψ`) with `Ĥ_D^open Ψ_ν = E_ν Ψ_ν` and "
+            "`E₀ < E_ν ≤ E₀ + C_ν/L` — hidden order ⟹ near four-fold degeneracy (free `S=1/2` "
+            "edge spins). `C_ν` quantified outside `∀L` (genuinely length-uniform). Proof: "
+            "Horsch–von der Linden / Koma–Tasaki variational argument (as Theorem 3.1) | "
+            "`Quantum/SpinS/AnisotropicEdgeStates.lean` |",
+            "| `openAnisotropicChainHamiltonianS` / `HasStringLRO` / `tasaki_theorem_8_2` | "
+            "**§8.1.2–§8.1.3 Hidden order forces edge states** (Theorem 8.2, Koma–Tasaki; "
+            "**PROVED**, `#print axioms` = std3, merged in commit `244c3ea9`; "
+            "eqs. (8.1.8)–(8.1.12), pp. 236–238): hidden antiferromagnetic order (positive "
+            "den Nijs–Rommelse string order `O_string^{(α)}(D)`, §7.2.1) distinguishes the "
+            "Haldane phase (`0≤D<D_c`) from the large-`D` phase and forces low-lying edge "
+            "states. `openAnisotropicChainHamiltonianS L D` is the **open-boundary** anisotropic "
+            "chain (`openAnisotropicChainCoupling`, no wrap-around — the free ends carry the "
+            "`S=1/2` edge spins). `HasStringLRO L Φ q` (no `D` argument; now a **concrete** "
+            "predicate, not an uninterpreted marker) is the hidden-order bound (8.1.10) "
+            "`⟨Φ\\|(Ô_string^{(α)}/L)²\\|Φ⟩ ≥ q_α` (`q_α>0`), built via the spin-one half turn "
+            "`spinOneHalfTurnS α = 1 − 2(Ŝ^{(α)})²` (closed form of `exp(iπŜ^{(α)})`). "
+            "`tasaki_theorem_8_2` (now a **theorem**, formerly a documented axiom): for fixed "
+            "`D≥0, q>0` there are an eventual threshold `L₀` (`=1`) and **L-independent** "
+            "`C_ν = 64(3+D)/q_ν > 0` such that for every `L≥L₀`, whenever `Φ` is the **unique** "
+            "ground state (`IsUniqueChainGroundState`) of `Ĥ_D^open` at `E₀` with "
+            "`HasStringLRO`, there are **three linearly independent excited states** `Ψ_ν` "
+            "with `Ĥ_D^open Ψ_ν = E_ν Ψ_ν` and `E₀ < E_ν ≤ E₀ + C_ν/L` — hidden order ⟹ near "
+            "four-fold degeneracy (free `S=1/2` edge spins). Proof: `Z₂×Z₂` half-turn symmetry "
+            "(`manyBodyReversalS`, `magParityDiagS`) selects three sector eigenvectors; a "
+            "double-commutator support bound feeds the Horsch–von der Linden / Koma–Tasaki "
+            "variational gap estimate (as Theorem 3.1) | "
+            "`Quantum/SpinS/AnisotropicEdgeStates.lean`; "
+            "`Quantum/SpinS/AnisotropicEdgeStringOrder.lean`; "
+            "`Quantum/SpinS/AnisotropicEdgeSymmetry.lean`; "
+            "`Quantum/SpinS/AnisotropicEdgeEnergy.lean`; "
+            "`Quantum/SpinS/AnisotropicEdgeStatesDischarge.lean` |",
+        )
+        .replace(
             "All items below are formally proved with **zero `sorry`**.",
             "The catalogue below includes proved results, conditional results, and documented axioms as recorded, with **zero `sorry`**.",
         )
