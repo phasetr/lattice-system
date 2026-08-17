@@ -66,22 +66,29 @@ private theorem sqrtTwo_sq : ((Real.sqrt 2 : ℝ) : ℂ) ^ 2 = 2 := by
   rw [← Complex.ofReal_pow, Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 2)]
   norm_num
 
-/-- Explicit entries of the spin-one raising operator. -/
-private theorem spinSOpPlus_two_eq :
-    spinSOpPlus 2 = !![0, ((Real.sqrt 2 : ℝ) : ℂ), 0; 0, 0, ((Real.sqrt 2 : ℝ) : ℂ); 0, 0, 0] := by
+/-- At `S = 1` the generic raising operator is the explicit constant `spinOneOpPlus` of
+`Quantum/SpinOneBasis.lean`. -/
+private theorem spinSOpPlus_two_eq : spinSOpPlus 2 = spinOneOpPlus := by
   ext i j
-  fin_cases i <;> fin_cases j <;> simp [spinSOpPlus]
+  fin_cases i <;> fin_cases j <;> simp [spinSOpPlus, spinOneOpPlus]
 
-/-- Explicit entries of the spin-one lowering operator. -/
-private theorem spinSOpMinus_two_eq :
-    spinSOpMinus 2 = !![0, 0, 0; ((Real.sqrt 2 : ℝ) : ℂ), 0, 0; 0, ((Real.sqrt 2 : ℝ) : ℂ), 0] := by
+/-- At `S = 1` the generic lowering operator is the explicit constant `spinOneOpMinus` of
+`Quantum/SpinOneBasis.lean`. -/
+private theorem spinSOpMinus_two_eq : spinSOpMinus 2 = spinOneOpMinus := by
   ext i j
-  fin_cases i <;> fin_cases j <;> norm_num [spinSOpMinus]
+  fin_cases i <;> fin_cases j <;> norm_num [spinSOpMinus, spinOneOpMinus]
 
 /-- **The half turn is the `S = 1` polynomial in its axis operator**: `u_α = 1 - 2 (Ŝ^{(α)})²`
-(Tasaki (2.1.30)/(2.1.32), p. 19).  This is the bridge between the explicit matrices
-`spinOnePiRot1/2/3` that define the family and the operator identities proved from the polynomial
-form. -/
+(Tasaki, the unnumbered display `e^{-iπŜ^{(α)}} = 1̂ - 2 (Ŝ^{(α)})²` introducing (2.1.33), p. 20).
+This is the bridge between the explicit matrices `spinOnePiRot1/2/3` that define the family and the
+operator identities proved from the polynomial form.
+
+**Declared overlap.**  This is a near-restatement of `spinOnePiRot1_eq`, `spinOnePiRot2_eq` and
+`spinOnePiRot3_eq` of `Quantum/SpinOneBasis.lean`, which prove the same three identities with the
+axis operator written as `spinOneOp1/2/3`, whereas the §8.1.3 argument needs the `spinSOp1/2/3 2`
+representation packaged by `spinOneAxisS`.  The near-twin is necessary rather than deliberate: the
+repository has no bridging lemma `spinOneOpα = spinSOpα 2`, so neither form is obtainable from the
+other by rewriting. -/
 theorem spinOneHalfTurnS_eq_one_sub_two_smul_sq (alpha : Fin 3) :
     spinOneHalfTurnS alpha = 1 - (2 : ℂ) • (spinOneAxisS alpha) ^ 2 := by
   fin_cases alpha
@@ -90,13 +97,15 @@ theorem spinOneHalfTurnS_eq_one_sub_two_smul_sq (alpha : Fin 3) :
     rw [h1, spinSOpPlus_two_eq, spinSOpMinus_two_eq]
     ext i j
     fin_cases i <;> fin_cases j <;>
-      simp [pow_two, spinOnePiRot1] <;> ring_nf <;> simp [sqrtTwo_sq] <;> norm_num
+      simp [pow_two, spinOnePiRot1, spinOneOpPlus, spinOneOpMinus] <;> ring_nf <;>
+        simp [sqrtTwo_sq] <;> norm_num
   · change spinOnePiRot2 = 1 - (2 : ℂ) • (spinOneAxisS 1) ^ 2
     have h2 : spinOneAxisS 1 = (1 / (2 * Complex.I) : ℂ) • (spinSOpPlus 2 - spinSOpMinus 2) := rfl
     rw [h2, spinSOpPlus_two_eq, spinSOpMinus_two_eq]
     ext i j
     fin_cases i <;> fin_cases j <;>
-      simp [pow_two, spinOnePiRot2] <;> ring_nf <;> simp [Complex.I_sq, sqrtTwo_sq] <;> norm_num
+      simp [pow_two, spinOnePiRot2, spinOneOpPlus, spinOneOpMinus] <;> ring_nf <;>
+        simp [Complex.I_sq, sqrtTwo_sq] <;> norm_num
   · change spinOnePiRot3 = 1 - (2 : ℂ) • (spinOneAxisS 2) ^ 2
     have h3 : spinOneAxisS 2 = spinSOp3 2 := rfl
     rw [h3]
@@ -178,14 +187,16 @@ private theorem spinOneHalfTurnS_two_conj_spinSOpPlus :
     spinOneHalfTurnS 2 * spinSOpPlus 2 * spinOneHalfTurnS 2 = -spinSOpPlus 2 := by
   rw [spinOneHalfTurnS_two_eq, spinSOpPlus_two_eq]
   ext i j
-  fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_three, spinOnePiRot3]
+  fin_cases i <;> fin_cases j <;>
+    simp [Matrix.mul_apply, Fin.sum_univ_three, spinOnePiRot3, spinOneOpPlus]
 
 /-- Conjugating the lowering operator by the axis-3 half turn flips its sign. -/
 private theorem spinOneHalfTurnS_two_conj_spinSOpMinus :
     spinOneHalfTurnS 2 * spinSOpMinus 2 * spinOneHalfTurnS 2 = -spinSOpMinus 2 := by
   rw [spinOneHalfTurnS_two_eq, spinSOpMinus_two_eq]
   ext i j
-  fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_three, spinOnePiRot3]
+  fin_cases i <;> fin_cases j <;>
+    simp [Matrix.mul_apply, Fin.sum_univ_three, spinOnePiRot3, spinOneOpMinus]
 
 /-- Axis-3 half turn versus the axis-1 spin component: `u_3 Ŝ^{(1)} u_3 = -Ŝ^{(1)}`. -/
 private theorem spinOneHalfTurnS_two_conj_axis_zero :
