@@ -17,6 +17,7 @@ import LatticeSystem.Quantum.SpinS.AKLTTheorem71
 import LatticeSystem.Quantum.SpinS.ClusterState
 import LatticeSystem.Quantum.SpinS.HoneycombAKLTZeroEnergy
 import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrderUniqueness
+import LatticeSystem.Quantum.SpinS.AnisotropicEdgeStatesDischarge
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingGap
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisGeneralDischarge
 import LatticeSystem.Quantum.SpinS.RingReflection
