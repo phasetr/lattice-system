@@ -44,8 +44,9 @@ theorem spinOneAxisS_isHermitian (alpha : Fin 3) : (spinOneAxisS alpha).IsHermit
   · exact spinSOp3_isHermitian 2
 
 /-- The **per-site spin-one half turn** `u_α = exp(i π Ŝ^{(α)}) = 1 - 2 (Ŝ^{(α)})²`, the closed
-form valid because `(Ŝ^{(α)})³ = Ŝ^{(α)}` at `S = 1` (Tasaki (2.1.21)/(2.1.23), pp. 17–18;
-footnote 11, p. 237, records that the `S = 1` restriction is essential).
+form valid because `(Ŝ^{(α)})³ = Ŝ^{(α)}` at `S = 1` (Tasaki, the unnumbered display
+`e^{-iπŜ^{(α)}} = 1̂ - 2 (Ŝ^{(α)})²` introducing (2.1.33), p. 20; footnote 11, p. 237, records that
+the `S = 1` restriction is essential).
 
 The members are literally the existing π-rotation matrices `spinOnePiRot1`, `spinOnePiRot2`,
 `spinOnePiRot3` of `Quantum/SpinOneBasis.lean`: this definition only turns those three constants
