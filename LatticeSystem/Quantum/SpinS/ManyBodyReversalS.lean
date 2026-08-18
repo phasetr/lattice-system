@@ -1,3 +1,4 @@
+import LatticeSystem.Quantum.SpinS.ConfigPermMatrixS
 import LatticeSystem.Quantum.SpinS.SpinSReversal
 import LatticeSystem.Quantum.SpinS.TotalSpin
 
@@ -34,7 +35,7 @@ theorem revConfigS_involutive (σ : Λ → Fin (N + 1)) : revConfigS (revConfigS
 /-- **Many-body spin reversal** `Θ`: the permutation matrix of `revConfigS`. -/
 noncomputable def manyBodyReversalS (Λ : Type*) [Fintype Λ] [DecidableEq Λ] (N : ℕ) :
     ManyBodyOpS Λ N :=
-  Matrix.of fun σ' σ => if σ' = revConfigS σ then (1 : ℂ) else 0
+  configPermMatrixS revConfigS
 
 /-- Matrix entry of the many-body reversal: `Θ σ' σ = 1` iff `σ' = revConfigS σ`. -/
 theorem manyBodyReversalS_apply (σ' σ : Λ → Fin (N + 1)) :
@@ -43,34 +44,13 @@ theorem manyBodyReversalS_apply (σ' σ : Λ → Fin (N + 1)) :
 /-- Conjugation by `Θ` reindexes by the configuration reversal. -/
 theorem manyBodyReversalS_conj_apply (M : ManyBodyOpS Λ N) (σ' σ : Λ → Fin (N + 1)) :
     (manyBodyReversalS Λ N * M * manyBodyReversalS Λ N) σ' σ =
-      M (revConfigS σ') (revConfigS σ) := by
-  rw [Matrix.mul_apply]
-  have hΘM : ∀ τ, (manyBodyReversalS Λ N * M) σ' τ = M (revConfigS σ') τ := by
-    intro τ
-    rw [Matrix.mul_apply, Finset.sum_eq_single (revConfigS σ')]
-    · rw [manyBodyReversalS_apply, if_pos (revConfigS_involutive σ').symm, one_mul]
-    · intro ρ _ hρ
-      rw [manyBodyReversalS_apply, if_neg (fun h => hρ (by rw [h, revConfigS_involutive])),
-        zero_mul]
-    · intro h; exact absurd (Finset.mem_univ _) h
-  rw [Finset.sum_eq_single (revConfigS σ)]
-  · rw [hΘM, manyBodyReversalS_apply, if_pos rfl, mul_one]
-  · intro ρ _ hρ
-    rw [hΘM, manyBodyReversalS_apply, if_neg hρ, mul_zero]
-  · intro h; exact absurd (Finset.mem_univ _) h
+      M (revConfigS σ') (revConfigS σ) :=
+  configPermMatrixS_conj_apply revConfigS_involutive M σ' σ
 
 /-- `Θ` is an involution. -/
 theorem manyBodyReversalS_mul_self (Λ : Type*) [Fintype Λ] [DecidableEq Λ] (N : ℕ) :
-    manyBodyReversalS Λ N * manyBodyReversalS Λ N = 1 := by
-  ext σ' σ
-  rw [show manyBodyReversalS Λ N * manyBodyReversalS Λ N
-        = manyBodyReversalS Λ N * 1 * manyBodyReversalS Λ N by rw [mul_one],
-    manyBodyReversalS_conj_apply, Matrix.one_apply, Matrix.one_apply]
-  by_cases h : σ' = σ
-  · subst h; simp
-  · have hne : ¬ (revConfigS σ' = revConfigS σ) :=
-      fun hr => h (funext fun x => Fin.rev_injective (congrFun hr x))
-    simp only [if_neg h, if_neg hne]
+    manyBodyReversalS Λ N * manyBodyReversalS Λ N = 1 :=
+  configPermMatrixS_mul_self revConfigS_involutive
 
 /-- **Conjugation of a single-site operator by `Θ`**:
 `Θ (onSiteS z A) Θ = onSiteS z (F A F)`. -/

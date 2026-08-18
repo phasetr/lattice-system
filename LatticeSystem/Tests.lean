@@ -99,6 +99,7 @@ import LatticeSystem.Tests.GradedPolynomialLayerNegativeControl
 import LatticeSystem.Tests.GradedPolynomialLayer
 import LatticeSystem.Tests.AKLTOpenChainProblem723a
 import LatticeSystem.Tests.AKLTOpenChainProblem723b
+import LatticeSystem.Tests.ConfigPermMatrixS
 
 /-!
 # Test aggregator for the `lattice-system` library
