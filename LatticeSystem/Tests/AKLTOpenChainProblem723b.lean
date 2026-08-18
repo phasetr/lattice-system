@@ -21,8 +21,6 @@ Load-bearing controls: the wrap-bond leak control
 periodic one, cf. `card_openBonds 3 = 2` in `AKLTOpenChainProblem723a.lean`); the `L = 2` structural
 cross-check against `finrank_vbsBondSubspace`; and the ring-side regression pinning
 `fBond_isRelPrime`/`weylMap_ground_form_eq_const_smul_prod` after the `_of_witness` split.
-
-Design: `.self-local/reports/design-8-3-1-item1-pr3-round1-20260818.md`.
 -/
 
 namespace LatticeSystem.Tests.AKLTOpenChainProblem723b
