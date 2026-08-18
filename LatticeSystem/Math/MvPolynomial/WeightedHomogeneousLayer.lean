@@ -133,6 +133,30 @@ the same degree *at every site separately*, which is strictly finer than the tot
 used by `weylMap_isHomogeneous`. -/
 noncomputable def siteWeight : Fin L × Fin 2 → (Fin L →₀ ℕ) := fun e => Finsupp.single e.1 1
 
+/-- **Per-site weights are plain exponent sums.**  Evaluating the `siteWeight`-weight of a
+multidegree `d` at a single site `y` returns the total exponent `d (y,0) + d (y,1)` of that site's
+two Weyl variables.  This is the bridge that turns the `Finsupp`-valued weighted grading into
+ordinary arithmetic on exponents, and it is what lets the cofactor lemma be read site by site. -/
+theorem weight_siteWeight_apply (d : (Fin L × Fin 2) →₀ ℕ) (y : Fin L) :
+    (Finsupp.weight (siteWeight (L := L)) d) y = d (y, 0) + d (y, 1) := by
+  classical
+  rw [Finsupp.weight_apply,
+    Finsupp.sum_fintype d (fun i c => c • siteWeight i) (fun i => zero_smul ℕ (siteWeight i)),
+    Finsupp.finset_sum_apply, Fintype.sum_prod_type, Finset.sum_eq_single y]
+  · simp [siteWeight, Fin.sum_univ_two]
+  · intro x _ hxy
+    simp [siteWeight, hxy]
+  · intro h
+    exact absurd (Finset.mem_univ y) h
+
+/-- The per-site degree `∑_x single x 2` of a Weyl image evaluates to `2` at every site: each
+spin-`1` site contributes exactly one degree-`2` binary form (Tasaki eq. (7.1.22)). -/
+theorem weylMapWeight_apply (y : Fin L) :
+    (∑ x : Fin L, Finsupp.single x 2 : Fin L →₀ ℕ) y = 2 := by
+  classical
+  rw [Finsupp.finset_sum_apply]
+  simp
+
 /-- Each single-site multidegree has per-site weight `Finsupp.single x 2`: site `x` carries
 degree `2` (Tasaki eq. (7.1.22): one spin-`1` site is one degree-`2` binary form) and every other
 site carries degree `0`. -/
