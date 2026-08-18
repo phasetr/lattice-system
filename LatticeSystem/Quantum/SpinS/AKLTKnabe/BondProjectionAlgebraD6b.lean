@@ -17,10 +17,7 @@ consume:
   reason the offset sums `D_d` with `d ∉ {0, 1, −1}` may be discarded in eq. (7.1.36);
 * the **conjugate transpose** of a block embedding and, as its corollary, the transport of positive
   semidefiniteness along `onEmbS` (design item B5f), which is what turns the four-site window
-  certificate `ε₃ ≥ 2/5` into a certificate for every window of a long chain;
-* the transport of **negation** and of an **ordered finite product** along `onEmbS`, which is what
-  carries a Casimir polynomial `∏_j (Ĉ − j(j+1))` of a two-site bond from its local
-  `(N+1)² × (N+1)²` matrix to the many-body operator on an arbitrary site set.
+  certificate `ε₃ ≥ 2/5` into a certificate for every window of a long chain.
 
 ## Periodic ring versus open window (design risk R3 — read before consuming this file)
 
@@ -291,28 +288,6 @@ theorem onEmbS_posSemidef {ι : Fin m → Λ} (hι : Function.Injective ι)
     rw [← onEmbS_conjTranspose, onEmbS_mul hι, hCH]
   rw [key]
   exact Matrix.posSemidef_conjTranspose_mul_self _
-
-/-- **The block embedding transports matrix negation.**  Together with `onEmbS_add` and
-`onEmbS_smul` this lets an affine expression in a local operator be pushed through the
-embedding one summand at a time. -/
-theorem onEmbS_neg (ι : Fin m → Λ)
-    (A : Matrix (Fin m → Fin (N + 1)) (Fin m → Fin (N + 1)) ℂ) :
-    (onEmbS ι (-A) : ManyBodyOpS Λ N) = -onEmbS ι A := by
-  simpa only [neg_one_smul] using onEmbS_smul ι (-1 : ℂ) A
-
-/-- **The block embedding transports an ordered finite matrix product.**  Injectivity of the site
-list enters through `onEmbS_mul` at every cons step; the base case is `onEmbS_one`.  This is what
-reduces a bond operator defined as a `List.ofFn … |>.prod` of local factors — the only available
-shape, since the many-body matrix ring is noncommutative — to the block embedding of the
-corresponding local product. -/
-theorem onEmbS_list_prod (ι : Fin m → Λ) (hι : Function.Injective ι)
-    (l : List (Matrix (Fin m → Fin (N + 1)) (Fin m → Fin (N + 1)) ℂ)) :
-    (onEmbS ι l.prod : ManyBodyOpS Λ N) = (l.map fun A => onEmbS ι A).prod := by
-  induction l with
-  | nil =>
-      simpa only [List.prod_nil, List.map_nil] using (onEmbS_one (N := N) ι)
-  | cons A l ih =>
-      rw [List.prod_cons, ← onEmbS_mul hι, ih, List.map_cons, List.prod_cons]
 
 end Embedding
 

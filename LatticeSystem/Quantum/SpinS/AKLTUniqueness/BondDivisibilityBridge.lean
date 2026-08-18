@@ -48,13 +48,6 @@ theorem rename_bondEmb_f2 : rename (bondEmb x) f2 = fBond x := by
   simp only [f2, fBond, bondFactor, map_sub, map_mul, rename_X, bondEmb]
   norm_num
 
-/-- Easy half: if the local bond factor divides a local polynomial `q`, then the global bond
-factor divides its `rename`-image (`map_dvd` through the `rename` algebra hom). -/
-theorem fBond_dvd_rename (q : MvPolynomial (Fin 2 × Fin 2) ℂ) (h : f2 ∣ q) :
-    fBond x ∣ rename (bondEmb x) q := by
-  rw [← rename_bondEmb_f2 x]
-  exact map_dvd _ h
-
 /-- `rename bondEmb` pushes the local left-site multidegree to the global site `x`
 (`mapDomain_single` on each of the two `Finsupp.single` summands of `mdSite`). -/
 theorem mapDomain_bondEmb_mdSite_left {N : ℕ} (k : Fin (N + 1)) :

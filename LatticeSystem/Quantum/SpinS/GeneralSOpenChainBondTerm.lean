@@ -1,6 +1,6 @@
 import LatticeSystem.Quantum.SpinS.GeneralAKLT
 import LatticeSystem.Quantum.SpinS.TwoSiteSliceS
-import LatticeSystem.Quantum.SpinS.AKLTKnabe.BondProjectionAlgebraD6b
+import LatticeSystem.Quantum.SpinS.AKLTKnabe.SiteBlockEmbeddingD5b
 import LatticeSystem.Quantum.SpinS.AKLTOpenChainWeylFactorization
 import LatticeSystem.Math.MvPolynomial.PairwiseCoprimeProd
 
@@ -20,10 +20,13 @@ This module builds the canonical single-polynomial member of that family, the **
 `ĥ_x = q_S(Ĉ_x) = ∏_{j=0}^{S} (Ĉ_x − j(j+1))`,  `Ĉ_x = (Ŝ_x + Ŝ_{x+1})² = 2S(S+1) + 2 Ŝ_x·Ŝ_{x+1}`,
 
 which acts on the total-spin-`J` bond subspace by the scalar `∏_{j=0}^{S}(J(J+1) − j(j+1))`: zero
-for `J ≤ S` and strictly positive for `J > S`.  Family membership is recorded exactly by those two
-scalar facts (`casimirPenaltyWeight_eq_zero`, `casimirPenaltyWeight_pos`); the operator identity
-`q_S(Ĉ) = Σ_J a_J P̂_J` would need the full spectral decomposition of `Ĉ`, which nothing here
-consumes.  At `S = 1` the polynomial collapses to `24 · P̂₂[Ŝ_x + Ŝ_{x+1}]`, reproducing the
+for `J ≤ S` and strictly positive for `J > S`.  Of that description only the two *scalar* facts
+about the weight function are proved here (`casimirPenaltyWeight_eq_zero`,
+`casimirPenaltyWeight_pos`); they constrain `casimirPenaltyWeight` alone and are linked to the
+operator `bondCasimirPenaltyS` by no theorem in the tree.  Family membership itself is the operator
+identity `q_S(Ĉ) = Σ_J a_J P̂_J`, which would need the full spectral decomposition of `Ĉ`; it is not
+proved and nothing here consumes it.  At `S = 1` the polynomial collapses to
+`24 · P̂₂[Ŝ_x + Ŝ_{x+1}]`, reproducing the
 `S = 1` chain of §7.1.2, eq. (7.1.5), p. 180 up to the harmless positive factor.
 
 The spin is a **positive integer** `S`, forced by the book: p. 209 explains that short-ranged
