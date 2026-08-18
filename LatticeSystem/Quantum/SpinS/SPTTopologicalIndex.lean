@@ -16,8 +16,9 @@ VBS state on an `L`-site ring, `Û_inv |Φ_VBS^S⟩ = (−1)^{L·S} |Φ_VBS^S⟩
 state has *odd* parity and cannot be continuously connected to the *even*-parity trivial state, so
 it is a nontrivial SPT.  At `S = 1` the inversion operator, the parity identity and the
 odd-`L` contrast with the trivial product state are proved in `VBSInversionParity.lean`; general
-`S` is not covered there, since the library has no general-`S` VBS state to apply `Û_inv` to (see
-the "Eq. (8.3.5)" entry of `docs/limitations/documented-axioms.md`).  More generally the book
+`S` is not covered there, since the library has no general-`S` VBS state to apply `Û_inv` to
+(see the "General-`S` bond-inversion parity" entry of `docs/limitations/documented-axioms.md`).
+More generally the book
 states as a *belief* — not as a
 theorem — that the spin-`S` VBS is a nontrivial SPT phase (protected by (S1), (S2), or (S3))
 exactly when `S` is odd, the even-`S` side being trivial; that belief is not formalized here
