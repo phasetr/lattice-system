@@ -378,6 +378,56 @@ by two declarations in `LatticeSystem/Quantum/SpinS/AKLTStability.lean`:
 - **Re-check condition:** the disposition would change only when all three of the following exist in reviewed form in this repository (or are usable from `mathlib`): (a) a constructed quasi-local C\*-algebra of the spin chain on `ℤ` — i.e. the inductive limit currently taken as a `QuasiLocalRealization` hypothesis discharged into an actual construction; (b) an infinite-chain notion of "short-ranged Hamiltonian with a unique gapped ground state" definable on it (Definitions A.25/A.27 style), so that `IsShortRangeGappedUniqueGS` and `IsProductStateHamiltonian` can be replaced by real definitions rather than opaque markers; and (c) a decision, recorded at that point, on whether to carry the book's ground-state-continuity conjunct in `HamiltonianPath`. Partial progress on (a) alone does not reopen this entry, since the phase classification would remain unstatable.
 - **Tracking:** master tracker #4718 (strict book-order axiom discharge). No dedicated discharge issue exists for the §8.3.2 markers, and none is to be opened while the re-check condition above is unmet. Catalogue row: `docs/formalization/legacy/19-the-aklt-model-tasaki-7-1.md`, the `guWenHamiltonianS` / `IsSPTPhase` / `tasaki_oshikawa_8_3_3` row.
 
+## Eq. (8.3.5) (general-`S` bond-inversion parity of the VBS state)
+
+**Tasaki §8.3.2, eq. (8.3.5)** (p. 257) asserts, for the spin-`S` VBS state on an `L`-site ring,
+`Û_inv |Φ_VBS^S⟩ = (−1)^{L·S} |Φ_VBS^S⟩`, where `Û_inv` is the bond-centered inversion (site map
+`x ↦ L − 1 − x`, i.e. `Fin.rev`). This is a **documented axiom** in the sense that the *general-`S`*
+instance of the identity has no declaration anywhere in this repository — the pair of markers that
+used to name it, `vbsInversionParityS : ℕ → ℕ → ℂ` and `tasaki_vbs_inversion_parity`, were
+**deleted** (PR #5291, commit `d817b344`) rather than left as opaque axioms, since they were
+contentless (uninterpreted, unconstrained) and had zero consumers.
+
+- **What is proved, and what is not:** the `S = 1` instance of (8.3.5) is proved axiom-free, as a
+  real theorem rather than a marker: `tasaki_vbs_inversion_parity_spin_one`
+  (`LatticeSystem/Quantum/SpinS/VBSInversionParity.lean`, line 166) establishes
+  `Û_inv |Φ_VBS⟩ = (−1)^L |Φ_VBS⟩` for the concrete `S = 1` AKLT VBS state, for every `L` (`Fin.rev`
+  is a reflection of the cycle for odd `L` too, so no parity restriction on `L` is needed); its
+  ground-state form `tasaki_vbs_inversion_parity_ground_state_spin_one` transfers the parity to
+  every ground state via the AKLT uniqueness theorem (§7.1.3). `#print axioms` is `propext`,
+  `Classical.choice`, `Quot.sound` (no `sorry`, no bespoke axiom). What remains undischarged is the
+  **general-`S`** claim `Û_inv |Φ_VBS^S⟩ = (−1)^{L·S} |Φ_VBS^S⟩` for `S ≥ 2`.
+- **Why the general-`S` instance is not proved:** the repository has no general-`S` VBS
+  matrix-product state to apply `Û_inv` to. `tasaki_vbs_inversion_parity_spin_one`'s proof mechanism
+  is intrinsically tied to the `S = 1` matrix-product representation — the antisymmetric
+  valence-bond matrix `ε = !![0, 1; -1, 0]` and the identity `ε (A^s)ᵀ = −(A^s ε)` for the fixed
+  spin-one matrices `akltVBSMatrices` (`AKLTStringOrderDefs.lean`, line 27) — which produces one
+  sign per site under transposition of the ordered matrix product. Repository-wide there is no
+  general-`S` VBS matrix-product state (`akltVBSState` is hard-wired to spin-one), so there is
+  nothing of the right type to state, let alone prove, the general-`S` identity against. This is the
+  same missing-layer obstacle recorded for eq. (8.3.3) above: a general-`S` extension of the
+  existing, working `S = 1` machinery, not an absent framework category.
+- **Consumers:** freshly re-verified (`grep -rn` over `LatticeSystem/`): neither `vbsInversionParityS`
+  nor `tasaki_vbs_inversion_parity` occurs anywhere in `LatticeSystem/` (both were deleted, not
+  merely made axiom-free). `tex/proof-guide.tex:12799` mentions both names once in prose, recording
+  the deletion; not a Lean consumer. The general-`S` claim therefore has **no declaration at all**
+  in this repository, proved or axiomatized — it is absent rather than deferred as an opaque marker.
+- **Axiom reason (documented):** same policy class as eq. (8.3.3) above — "waiting for a general-`S`
+  extension of existing, working machinery" — not the "no such development exists here" class of
+  Theorem 8.1/7.3 or Theorem 8.3.
+- **Re-check condition:** the disposition would change when a general-`S` VBS matrix-product state
+  generalizing `akltVBSState` off the fixed `akltVBSMatrices` exists in reviewed form in this
+  repository, sufficient to state and prove `Û_inv |Φ_VBS^S⟩ = (−1)^{L·S} |Φ_VBS^S⟩` against a real
+  general-`S` object rather than an opaque marker. This is the same re-check condition item (a) as
+  eq. (8.3.3) above; discharging (8.3.5) at general `S` and (8.3.3) at general `S` share the same
+  missing infrastructure and are natural candidates for the same follow-up PR.
+- **Tracking:** master tracker #4718 (strict book-order axiom discharge). No dedicated discharge
+  issue exists for the general-`S` case of eq. (8.3.5), and none is to be opened while the re-check
+  condition above is unmet. Catalogue row: `docs/formalization/legacy/19-the-aklt-model-tasaki-7-1.md`,
+  the `IsTimeReversalInvariant` / `IsBondInversionInvariant` / `tasaki_vbs_inversion_parity_spin_one`
+  / `entanglementEntropyS` row, which records both the `S = 1` PROVED result and the deletion of the
+  general-`S` markers.
+
 ## §8.3.3 entanglement-entropy marker (`entanglementEntropyS`)
 
 **Tasaki §8.3.3** (`S_LR = −Σ_j p_j log p_j`, defined just after eqs. (8.3.7)-(8.3.8), p. 262) contributes one **documented axiom**, `entanglementEntropyS` (`LatticeSystem/Quantum/SpinS/SPTTopologicalIndex.lean`, doc comment lines 79-82, declaration line 83). This is a contentless marker, not a deferred theorem: no book theorem in this repository depends on it.
