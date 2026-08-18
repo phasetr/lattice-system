@@ -97,8 +97,10 @@ theorem casimirPenaltyWeight_pos {S J : ℕ} (h : S < J) : 0 < casimirPenaltyWei
 /-! ## The bond term and the open-chain Hamiltonian -/
 
 /-- The **general-`S` AKLT bond term** `ĥ_x = q_S(Ĉ_x) = ∏_{j=0}^{S} (Ĉ_x − j(j+1)·1)` on the bond
-`{x, y}` of two spin-`S` sites (`N = 2S`), the canonical single-polynomial member of Tasaki's
-family (7.3.2), p. 208 with the weights `casimirPenaltyWeight S J`.
+`{x, y}` of two spin-`S` sites (`N = 2S`), the intended canonical single-polynomial member of
+Tasaki's family (7.3.2), p. 208 with the weights `casimirPenaltyWeight S J`; as with
+`casimirPenaltyWeight` above, no theorem in the tree links this operator to the family membership
+identity `q_S(Ĉ) = Σ_J a_J P̂_J` (see the module doc comment).
 
 The factors are polynomials in the single operator `Ĉ = bondCasimirS x y (2S)` and hence commute,
 but `ManyBodyOpS` is a noncommutative matrix ring, so the product is taken as an ordered
