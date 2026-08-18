@@ -38,19 +38,12 @@ namespace LatticeSystem.Quantum
 
 open Matrix
 
-/-- The **open-chain nearest-neighbour coupling** on `Fin L`: `J x y = 1` iff `y = x + 1` (directed,
-no periodic wrap-around), so the bonds are `{0,1}, {1,2}, …, {L−2, L−1}` (each counted once) and the
-two end sites `0` and `L−1` each have a single neighbour — the open boundary that carries the
-`S = 1/2` edge spins. -/
-def openAnisotropicChainCoupling (L : ℕ) (x y : Fin L) : ℂ :=
-  if y.val = x.val + 1 then 1 else 0
-
 /-- The **open-chain anisotropic `S = 1` Hamiltonian** with crystal-field anisotropy `D`: the
 open-boundary analogue of `anisotropicChainHamiltonianS`,
 `Ĥ_D^open = Σ_{x=0}^{L-2} Ŝ_x·Ŝ_{x+1} + D Σ_x (Ŝ_x^{(3)})²` (eq. (8.1.1) with open boundary).  The
 free boundary spins make the edge states of Theorem 8.2 possible. -/
 noncomputable def openAnisotropicChainHamiltonianS (L : ℕ) (D : ℝ) : ManyBodyOpS (Fin L) 2 :=
-  heisenbergHamiltonianS (openAnisotropicChainCoupling L) 2 +
+  heisenbergHamiltonianS (openBondCoupling L) 2 +
     (D : ℂ) • ∑ x : Fin L, spinSSiteOp3 x 2 * spinSSiteOp3 x 2
 
 end LatticeSystem.Quantum

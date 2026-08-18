@@ -371,8 +371,9 @@ Problem 2.1.b to axes 1 and 2. -/
 noncomputable def hadamard : Matrix (Fin 2) (Fin 2) ℂ :=
   ((Real.sqrt 2 : ℂ)⁻¹) • !![1, 1; 1, -1]
 
-/-- `(1/√2) * (1/√2) = 1/2` in `ℂ`; used to simplify Hadamard products. -/
-private lemma sqrt2_inv_mul_sqrt2_inv :
+/-- `(√2)⁻¹ * (√2)⁻¹ = 1/2` in `ℂ`: the normalisation identity for the `(√2)⁻¹` prefactor,
+which is the only irrational input of the Hadamard and matrix-product evaluations. -/
+lemma sqrt2_inv_mul_sqrt2_inv :
     ((Real.sqrt 2 : ℂ)⁻¹) * ((Real.sqrt 2 : ℂ)⁻¹) = (1 / 2 : ℂ) := by
   rw [← mul_inv, ← Complex.ofReal_mul,
     Real.mul_self_sqrt (by norm_num : (0:ℝ) ≤ 2)]

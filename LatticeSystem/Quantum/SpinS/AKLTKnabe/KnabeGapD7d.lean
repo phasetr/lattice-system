@@ -63,9 +63,10 @@ variable {L : ℕ} [NeZero L]
 
 /-! ### G1 — a single bond projection is positive semidefinite -/
 
-/-- **G1.**  Each ring bond projection `P̂₂[Ŝ_y + Ŝ_{y+1}]` is positive semidefinite: it is a
-Hermitian idempotent, so `P = Pᴴ P ≥ 0`.  (`Matrix.conjTranspose` is spelled out because the `ᴴ`
-postfix does not parse inside this namespace.) -/
+/-- **G1.**  Each ring bond projection `P̂₂[Ŝ_y + Ŝ_{y+1}]` is positive semidefinite: it is the
+distinct-site instance `y ≠ y + 1` of the bond-local lemma `bondSpin2ProjectionS_posSemidef`
+(Gate D6b Stage A).  The ring input is exactly the distinctness of the two endpoints, which needs
+`2 ≤ L`. -/
 theorem posSemidef_ringBond (hL : 2 ≤ L) (y : Fin L) :
     (ringBond y : ManyBodyOpS (Fin L) 2).PosSemidef := by
   have hone : ((1 : Fin L)).val = 1 := by
@@ -78,13 +79,7 @@ theorem posSemidef_ringBond (hL : 2 ≤ L) (y : Fin L) :
     have h2 := congrArg Fin.val h1
     rw [hone, hzero] at h2
     omega
-  have hH := bondSpin2ProjectionS_isHermitian y (y + 1)
-  have key : Matrix.conjTranspose (bondSpin2ProjectionS y (y + 1) : ManyBodyOpS (Fin L) 2)
-      * bondSpin2ProjectionS y (y + 1) = bondSpin2ProjectionS y (y + 1) := by
-    rw [hH.eq, bondSpin2ProjectionS_mul_self hne]
-  change (bondSpin2ProjectionS y (y + 1) : ManyBodyOpS (Fin L) 2).PosSemidef
-  exact key ▸ Matrix.posSemidef_conjTranspose_mul_self
-    (bondSpin2ProjectionS y (y + 1) : ManyBodyOpS (Fin L) 2)
+  exact bondSpin2ProjectionS_posSemidef hne
 
 /-! ### G2 — positivity and the zero mode, in one call to Tasaki Lemma A.9 -/
 

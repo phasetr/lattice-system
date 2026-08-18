@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.AKLTBondProjection
 import LatticeSystem.Quantum.SpinS.AKLTStringOrderTransfer
+import LatticeSystem.Quantum.SpinS.AKLTTwoSiteTensor
 import LatticeSystem.Quantum.SpinS.MPSTheorem76Algebra
 
 /-!
@@ -25,13 +26,13 @@ The route is the one fixed by the Gate D7a design, block ④-II (F0–F8):
 * **F5** `exists_bondSlice_eq_trace` — the *key structural fact*: for a periodic MPS state, every
   two-site bond slice is the linear functional `a ↦ tr (A^{a₀} A^{a₁} R)` of the two-site tensor,
   with a remainder matrix `R` independent of the bond configuration `a`.
-* **F6** `akltTwoSiteTensor_eq` — the exact two-site tensor table
-  `A^{a₀}A^{a₁} = !![¼Ψ_{↓↑}(a), sΨ_{↓↓}(a); −sΨ_{↑↑}(a), −¼Ψ_{↑↓}(a)]` with `s = (√2)⁻¹`, i.e.
-  each of the four components of `A^{a₀}A^{a₁}` is a *multiple of a single VBS bond vector*
-  `Ψ_{σσ'}` (`vbsBondVec`, Tasaki eqs. (7.1.19)–(7.1.20)).  The only irrational input is
-  `(√2)⁻¹ · (√2)⁻¹ = ½`, used once.
+* **F6** `akltTwoSiteTensor_eq` and `mem_vbsBondSubspace_of_twoSiteTensor` — the exact two-site
+  tensor table `A^{a₀}A^{a₁} = !![¼Ψ_{↓↑}(a), sΨ_{↓↓}(a); −sΨ_{↑↑}(a), −¼Ψ_{↑↓}(a)]` with
+  `s = (√2)⁻¹`, and its consequence that every *linear functional* of the two-site tensor lies in
+  the span `W`.  Both live in `Quantum/SpinS/AKLTTwoSiteTensor.lean`, since the open chain
+  (§7.2.3) needs exactly the same table with a different coefficient list.
 * **F7** `akltVBSState_isVBSGroundForm` — every bond slice lies in the four-dimensional span `W`
-  (`vbsBondSubspace`), by `Submodule.smul_mem` / `add_mem`.
+  (`vbsBondSubspace`), by F5 + F6 with the coefficient table `c i j = R j i`.
 * **F8** `bondSpin2ProjectionS_mulVec_akltVBSState_eq_zero` — frustration-freeness, by the `⇐`
   direction of the production `tasaki_lemma_7_4` (`AKLTBondProjection.lean:696`).
 
@@ -198,59 +199,23 @@ theorem exists_bondSlice_eq_trace [NeZero L] (hL : 1 < L) (x : Fin L) (τ : Fin 
   simp only [orderedProd]
   rw [Matrix.mul_assoc]
 
-/-! ### F6 — the exact two-site tensor table -/
-
-/-- **F6.**  The two-site MPS tensor of the AKLT matrices, entry by entry: each of its four
-components is a multiple of one VBS bond vector `Ψ_{σσ'}` of Tasaki eqs. (7.1.19)–(7.1.20),
-with `s = (√2)⁻¹`,
-`A^{a₀}A^{a₁} = !![¼ Ψ_{↓↑}(a), s Ψ_{↓↓}(a); −s Ψ_{↑↑}(a), −¼ Ψ_{↑↓}(a)]`.
-The only irrational input is `(√2)⁻¹ (√2)⁻¹ = ½`, used once. -/
-private lemma akltTwoSiteTensor_eq (a : Fin 2 → Fin 3) :
-    akltVBSMatrices (a 0) * akltVBSMatrices (a 1) =
-      !![(1 / 4 : ℂ) * vbsBondVec 1 0 a, ((Real.sqrt 2 : ℂ))⁻¹ * vbsBondVec 1 1 a;
-        -((Real.sqrt 2 : ℂ))⁻¹ * vbsBondVec 0 0 a, (-1 / 4 : ℂ) * vbsBondVec 0 1 a] := by
-  have hs : ((Real.sqrt 2 : ℂ))⁻¹ * ((Real.sqrt 2 : ℂ))⁻¹ = (1 / 2 : ℂ) := by
-    rw [← mul_inv, ← Complex.ofReal_mul, Real.mul_self_sqrt (by norm_num : (0 : ℝ) ≤ 2)]
-    norm_num
-  simp only [vbsBondVec, akltVBSMatrices]
-  obtain ⟨u, hu⟩ : ∃ u, a 0 = u := ⟨_, rfl⟩
-  obtain ⟨v, hv⟩ : ∃ v, a 1 = v := ⟨_, rfl⟩
-  rw [hu, hv]
-  fin_cases u <;> fin_cases v <;> ext i j <;> fin_cases i <;> fin_cases j <;>
-    simp +decide [Matrix.mul_apply, Fin.sum_univ_two, hs] <;>
-    ring
-
 /-! ### F7/F8 — frustration-freeness of the ring VBS state -/
 
 /-- **F7.**  Every two-site bond slice of the periodic AKLT matrix-product state lies in the
 four-dimensional VBS bond subspace `W` of Tasaki eq. (7.1.21): the state has the valence-bond-solid
-singlet-tensor form at every bond of the ring, the wrap bond included. -/
+singlet-tensor form at every bond of the ring, the wrap bond included.  By F5 the slice is the
+linear functional of the two-site tensor with coefficient table `c i j = R j i` read off the
+remainder matrix, so the shared tensor lemma `mem_vbsBondSubspace_of_twoSiteTensor`
+(`AKLTTwoSiteTensor.lean`, which also carries the former F6 table) applies verbatim; the open
+chain uses the same lemma with a different coefficient table. -/
 theorem akltVBSState_isVBSGroundForm [NeZero L] (hL : 1 < L) (x : Fin L) :
     IsVBSGroundForm L x (akltVBSState L) := by
   intro τ
   obtain ⟨R, hR⟩ := exists_bondSlice_eq_trace hL x τ
-  have htr : ∀ M : Matrix (Fin 2) (Fin 2) ℂ,
-      Matrix.trace (M * R) = M 0 0 * R 0 0 + M 0 1 * R 1 0 + (M 1 0 * R 0 1 + M 1 1 * R 1 1) := by
-    intro M
-    rw [Matrix.trace_fin_two, Matrix.mul_apply, Matrix.mul_apply, Fin.sum_univ_two,
-      Fin.sum_univ_two]
-  have hmem : ∀ p q : Fin 2, vbsBondVec p q ∈ vbsBondSubspace := by
-    intro p q
-    simp only [vbsBondSubspace]
-    exact Submodule.subset_span ⟨(p, q), rfl⟩
-  have hslice : bondSlice x (akltVBSState L) τ
-      = (R 0 0 * (1 / 4 : ℂ)) • vbsBondVec 1 0
-        + (R 1 0 * ((Real.sqrt 2 : ℂ))⁻¹) • vbsBondVec 1 1
-        + (R 0 1 * -((Real.sqrt 2 : ℂ))⁻¹) • vbsBondVec 0 0
-        + (R 1 1 * (-1 / 4 : ℂ)) • vbsBondVec 0 1 := by
-    funext a
-    rw [hR a, akltTwoSiteTensor_eq a, htr]
-    simp
-    ring
-  rw [hslice]
-  exact Submodule.add_mem _ (Submodule.add_mem _ (Submodule.add_mem _
-    (Submodule.smul_mem _ _ (hmem 1 0)) (Submodule.smul_mem _ _ (hmem 1 1)))
-    (Submodule.smul_mem _ _ (hmem 0 0))) (Submodule.smul_mem _ _ (hmem 0 1))
+  refine mem_vbsBondSubspace_of_twoSiteTensor (fun i j => R j i) _ fun a => ?_
+  rw [hR a, Matrix.trace_fin_two, Matrix.mul_apply, Matrix.mul_apply]
+  simp only [Fin.sum_univ_two]
+  ring
 
 /-- **F8 — frustration-freeness of the ring VBS state.**  The bond spin-2 projection
 `P̂₂[Ŝ_x + Ŝ_{x+1}]` annihilates the periodic AKLT matrix-product state at **every** bond `x` of

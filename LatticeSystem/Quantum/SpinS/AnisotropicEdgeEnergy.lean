@@ -45,8 +45,8 @@ noncomputable def edgeLocalTermS (L : ℕ) (D : ℝ) (z : Fin L) : ManyBodyOpS (
 
 /-- The open-chain Heisenberg part collapses to one bond per site: the doubled sum
 `∑_{x,y} J x y Ŝ_x·Ŝ_y` has a single surviving `y` for each `x`. -/
-private theorem heisenbergHamiltonianS_openAnisotropicChainCoupling_eq (L : ℕ) :
-    heisenbergHamiltonianS (openAnisotropicChainCoupling L) 2
+private theorem heisenbergHamiltonianS_openBondCoupling_eq (L : ℕ) :
+    heisenbergHamiltonianS (openBondCoupling L) 2
       = ∑ z : Fin L, (if h : z.val + 1 < L then spinSDot z ⟨z.val + 1, h⟩ 2 else 0) := by
   rw [heisenbergHamiltonianS]
   refine Finset.sum_congr rfl fun x _ => ?_
@@ -54,15 +54,15 @@ private theorem heisenbergHamiltonianS_openAnisotropicChainCoupling_eq (L : ℕ)
   · rw [dif_pos h]
     refine (Finset.sum_eq_single (⟨x.val + 1, h⟩ : Fin L) ?_ ?_).trans ?_
     · intro y _ hy
-      rw [openAnisotropicChainCoupling, if_neg, zero_smul]
+      rw [openBondCoupling, if_neg, zero_smul]
       intro hcon
       exact hy (Fin.ext hcon)
     · intro hx
       exact absurd (Finset.mem_univ _) hx
-    · rw [openAnisotropicChainCoupling, if_pos rfl, one_smul]
+    · rw [openBondCoupling, if_pos rfl, one_smul]
   · rw [dif_neg h]
     refine Finset.sum_eq_zero fun y _ => ?_
-    rw [openAnisotropicChainCoupling, if_neg, zero_smul]
+    rw [openBondCoupling, if_neg, zero_smul]
     intro hcon
     have := y.isLt
     omega
@@ -72,7 +72,7 @@ theorem openAnisotropicChainHamiltonianS_eq_sum_local (L : ℕ) (D : ℝ) :
     openAnisotropicChainHamiltonianS L D = ∑ z : Fin L, edgeLocalTermS L D z := by
   simp only [edgeLocalTermS]
   rw [Finset.sum_add_distrib, ← Finset.smul_sum, openAnisotropicChainHamiltonianS,
-    heisenbergHamiltonianS_openAnisotropicChainCoupling_eq]
+    heisenbergHamiltonianS_openBondCoupling_eq]
 
 /-- **The open chain Hamiltonian is Hermitian**: the coupling is real and the anisotropy term is a
 real multiple of a sum of squares of Hermitian operators. -/
@@ -80,7 +80,7 @@ theorem openAnisotropicChainHamiltonianS_isHermitian (L : ℕ) (D : ℝ) :
     (openAnisotropicChainHamiltonianS L D).IsHermitian := by
   refine Matrix.IsHermitian.add ?_ ?_
   · refine heisenbergHamiltonianS_isHermitian_of_real (fun x y => ?_) 2
-    rw [openAnisotropicChainCoupling]
+    rw [openBondCoupling]
     split <;> simp
   · change Matrix.conjTranspose ((D : ℂ) • ∑ x : Fin L, spinSSiteOp3 x 2 * spinSSiteOp3 x 2)
       = (D : ℂ) • ∑ x : Fin L, spinSSiteOp3 x 2 * spinSSiteOp3 x 2
