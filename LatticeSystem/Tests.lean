@@ -100,6 +100,7 @@ import LatticeSystem.Tests.GradedPolynomialLayer
 import LatticeSystem.Tests.AKLTOpenChainProblem723a
 import LatticeSystem.Tests.AKLTOpenChainProblem723b
 import LatticeSystem.Tests.ConfigPermMatrixS
+import LatticeSystem.Tests.VBSInversionParitySpinOne
 
 /-!
 # Test aggregator for the `lattice-system` library
