@@ -64,23 +64,29 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
 /-! ## The Casimir penalty weights -/
 
-/-- The **Casimir penalty weight** `a_J = q_S(J(J+1)) = ∏_{j=0}^{S} (J(J+1) − j(j+1))`: the scalar
-by which the bond term `ĥ = q_S(Ĉ)` acts on the total-spin-`J` subspace of a bond of two spin-`S`
-sites, `Ĉ` having eigenvalue `J(J+1)` there.  These are the coefficients `a_J` of Tasaki's family
-(7.3.2), p. 208.  Stated over `ℝ` so that positivity is available directly. -/
+/-- The **Casimir penalty weight** `a_J = q_S(J(J+1)) = ∏_{j=0}^{S} (J(J+1) − j(j+1))`: the value
+the defining polynomial `q_S` takes at the total-spin-`J` eigenvalue `J(J+1)` of `Ĉ`.  These are the
+coefficients `a_J` of Tasaki's family (7.3.2), p. 208.  This scalar is *not* linked to the operator
+`bondCasimirPenaltyS` by any theorem in the tree (see the module doc comment); only the two facts
+about `casimirPenaltyWeight` itself below are proved.  Stated over `ℝ` so that positivity is
+available directly. -/
 noncomputable def casimirPenaltyWeight (S J : ℕ) : ℝ :=
   ∏ j ∈ Finset.range (S + 1), ((J : ℝ) * (J + 1) - (j : ℝ) * (j + 1))
 
 /-- **No penalty on the low total spins.**  For `J ≤ S` the factor with `j = J` vanishes, so
-`a_J = 0`: the bond term annihilates the total-spin-`J` subspace for every `J = 0, …, S`, which is
-the kernel `⊕_{J≤S}` of Tasaki's family (7.3.2), p. 208 (the `S` valence bonds per link). -/
+`a_J = 0` — the weight vanishes exactly on the intended kernel `⊕_{J≤S}` of Tasaki's family
+(7.3.2), p. 208 (the `S` valence bonds per link).  This is a fact about the scalar weight
+function alone; no theorem in the tree links it to the operator `bondCasimirPenaltyS` (see the
+module doc comment). -/
 theorem casimirPenaltyWeight_eq_zero {S J : ℕ} (h : J ≤ S) : casimirPenaltyWeight S J = 0 :=
   Finset.prod_eq_zero (Finset.mem_range.mpr (Nat.lt_succ_of_le h)) (by ring)
 
 /-- **Strictly positive penalty on the high total spins.**  For `J > S` every factor satisfies
-`J(J+1) > j(j+1)` (as `j ≤ S < J`), so `a_J > 0`: the bond term penalizes exactly the total spins
-`J = S+1, …, 2S`, the "two highest values" of Tasaki's `S = 2` instance (7.3.2), p. 208.  No upper
-bound on `J` is needed. -/
+`J(J+1) > j(j+1)` (as `j ≤ S < J`), so `a_J > 0` — the weight is positive exactly on the intended
+penalized total spins `J = S+1, …, 2S`, the "two highest values" of Tasaki's `S = 2` instance
+(7.3.2), p. 208.  This is a fact about the scalar weight function alone; no theorem in the tree
+links it to the operator `bondCasimirPenaltyS` (see the module doc comment).  No upper bound on
+`J` is needed. -/
 theorem casimirPenaltyWeight_pos {S J : ℕ} (h : S < J) : 0 < casimirPenaltyWeight S J := by
   refine Finset.prod_pos fun j hj => ?_
   rw [Finset.mem_range] at hj
