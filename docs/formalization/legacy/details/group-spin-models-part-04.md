@@ -289,7 +289,7 @@ specialization of the shared two-site gluing `glueTwoSitesS` / `twoSiteSliceS`
 
 **Lean name:** <!-- legacy-detail-lean:start:763 -->`bondFactor` / `weylMap` / `fBond` / `fBond_dvd_weylMap_of_isVBSGroundForm` / `weylMap_ground_form_eq_const_smul_prod` / `ground_eigen_isVBSGroundForm` / `aklt_ring_ground_state_unique`<!-- legacy-detail-lean:end:763 -->
 
-**File:** <!-- legacy-detail-file:start:763 -->`Quantum/SpinS/AKLTUniqueness/GroundStateUnique.lean`; `Quantum/SpinS/AKLTUniqueness/ProductBondDivisibility.lean`; `Quantum/SpinS/AKLTUniqueness/BondDivisibilityBridge.lean`; `Quantum/SpinS/AKLTUniqueness/LocalBondDivisibility.lean`; `Math/MvPolynomial/WeylSpinOneMap.lean`; `Math/MvPolynomial/BilinearFactorCoprime.lean`; `Math/MvPolynomial/PairwiseCoprimeProd.lean`<!-- legacy-detail-file:end:763 -->
+**File:** <!-- legacy-detail-file:start:763 -->`Quantum/SpinS/AKLTUniqueness/GroundStateUnique.lean`; `Quantum/SpinS/AKLTUniqueness/ProductBondDivisibility.lean`; `Quantum/SpinS/AKLTUniqueness/BondDivisibilityBridge.lean`; `Quantum/SpinS/AKLTUniqueness/LocalBondDivisibility.lean`; `Math/MvPolynomial/WeylSpinMap.lean`; `Math/MvPolynomial/BilinearFactorCoprime.lean`; `Math/MvPolynomial/PairwiseCoprimeProd.lean`<!-- legacy-detail-file:end:763 -->
 
 **Statement and implementation chronicle:**
 
@@ -310,8 +310,9 @@ now-`theorem` `aklt_theorem_7_1` (`AKLTTheorem71.lean`, PR #5131). The proof fol
 (frustration-freeness, Lemma A.10): the affine identity `Ĥ_AKLT = 2Ĥ′ − (2/3)L` turns the
 eigen-equation into `Ĥ′ Ψ = 0`, so `Ψ` is a zero mode of every bond projection
 (`frustration_free_local_eigen`), hence `IsVBSGroundForm L x Ψ` at every bond (Lemma 7.4). **Stage C
-polynomial machinery** (recovered infra): the Weyl map `weylMap : ((Fin L → Fin 3) → ℂ) →ₗ[ℂ]
-MvPolynomial (Fin L × Fin 2) ℂ` (`Math/MvPolynomial/WeylSpinOneMap.lean`, eq. (7.1.22)) sends each
+polynomial machinery** (recovered infra): the Weyl map `weylMap`, at `N = 2` of type
+`((Fin L → Fin 3) → ℂ) →ₗ[ℂ]
+MvPolynomial (Fin L × Fin 2) ℂ` (`Math/MvPolynomial/WeylSpinMap.lean`, eq. (7.1.22)) sends each
 site's spin-1 state to a degree-2 monomial in `u_x, v_x` with the essential `√2` Clebsch–Gordan
 weight;
 

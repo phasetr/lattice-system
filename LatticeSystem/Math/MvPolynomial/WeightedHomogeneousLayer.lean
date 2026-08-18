@@ -1,13 +1,14 @@
 /-
 Per-site (weighted homogeneous) grading of the Weyl polynomial representation.
 
-The total-degree grading of `LatticeSystem.Math.MvPolynomial.WeylSpinOneMap`
-(`weylMap_isHomogeneous`: every Weyl image is homogeneous of total degree `2L`) is too coarse to
-control the cofactor of the bond product `∏_x f_x`: a cofactor of total degree `2` in the `2L`
-Weyl variables still ranges over a large space.  The finer grading that does control it assigns to
-each variable its **own site**, so that a polynomial carries one degree per site of the chain;
-the Weyl image then has degree `2` at every site, and a cofactor of the bond product is pinned to
-the monomials of degree `1` at the two chain ends and `0` at every interior site.
+The total-degree grading of `LatticeSystem.Math.MvPolynomial.WeylSpinMap`
+(`weylMap_isHomogeneous`: every Weyl image is homogeneous of total degree `N·L`, `N = 2S`) is too
+coarse to control the cofactor of the bond product `∏_x f_x`: at `N = 2` a cofactor of total degree
+`2` in the `2L` Weyl variables still ranges over a large space.  The finer grading that does control
+it assigns to each variable its **own site**, so that a polynomial carries one degree per site of
+the chain; the Weyl image then has degree `N` at every site, and at `N = 2` a cofactor of the bond
+product is pinned to the monomials of degree `1` at the two chain ends and `0` at every interior
+site.
 
 This file provides that layer in two parts.
 
@@ -18,7 +19,7 @@ This file provides that layer in two parts.
   no quotient (cofactor) counterpart.  Left cancellation in `M` is what turns "the `b`-side
   selector `weight b = m`" into "the `d`-side selector `weight d = k + m`"; it holds for the two
   weight monoids used here (`ℕ` and `Fin L →₀ ℕ`).
-* The instances that specialise that pair to the Weyl representation of the spin-`1` chain: the
+* The instances that specialise that pair to the Weyl representation of the spin-`S` chain: the
   per-site weight `siteWeight` on the Weyl variables `Fin L × Fin 2`, valued in the per-site degree
   monoid `Fin L →₀ ℕ`; the per-site homogeneity `weylMap_isWeightedHomogeneous` of the Weyl image;
   and the weighted homogeneity `bondFactor_isWeightedHomogeneous` of the bilinear bond factor.
@@ -28,8 +29,8 @@ every degree, so both homogeneity hypotheses become vacuous while the conclusion
 The counterexample is kept as the regression test
 `LatticeSystem.Tests.GradedPolynomialLayerNegativeControl`.
 
-The two gradings are not independent: `weylMap_isWeightedHomogeneous` (degree `2` at each site)
-implies `weylMap_isHomogeneous` (total degree `2L`), by summing the per-site degrees, i.e. by
+The two gradings are not independent: `weylMap_isWeightedHomogeneous` (degree `N` at each site)
+implies `weylMap_isHomogeneous` (total degree `N·L`), by summing the per-site degrees, i.e. by
 applying `Finsupp.weight (fun _ => 1)` to the per-site degree identity.  The converse fails, since
 a fixed total degree does not pin the degree at each individual site.  The total-degree statement
 is nevertheless kept as it stands, because it is the form directly consumed by
@@ -41,7 +42,7 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (S
 representation due to Arovas–Auerbach–Haldane [10]; proof due to Kennedy–Lieb–Tasaki [41].
 -/
 import Mathlib.RingTheory.MvPolynomial.WeightedHomogeneous
-import LatticeSystem.Math.MvPolynomial.WeylSpinOneMap
+import LatticeSystem.Math.MvPolynomial.WeylSpinMap
 import LatticeSystem.Math.MvPolynomial.BilinearFactorCoprime
 
 open MvPolynomial
@@ -149,37 +150,38 @@ theorem weight_siteWeight_apply (d : (Fin L × Fin 2) →₀ ℕ) (y : Fin L) :
   · intro h
     exact absurd (Finset.mem_univ y) h
 
-/-- The per-site degree `∑_x single x 2` of a Weyl image evaluates to `2` at every site: each
-spin-`1` site contributes exactly one degree-`2` binary form (Tasaki eq. (7.1.22)). -/
-theorem weylMapWeight_apply (y : Fin L) :
-    (∑ x : Fin L, Finsupp.single x 2 : Fin L →₀ ℕ) y = 2 := by
+/-- The per-site degree `∑_x single x N` of a Weyl image evaluates to `N` at every site: each
+spin-`S` site contributes exactly one degree-`N` binary form, `N = 2S` (Tasaki eq. (7.1.22)).
+`N` is explicit because the statement carries no `Fin (N + 1)`-typed subterm to infer it from. -/
+theorem weylMapWeight_apply (N : ℕ) (y : Fin L) :
+    (∑ x : Fin L, Finsupp.single x N : Fin L →₀ ℕ) y = N := by
   classical
   rw [Finsupp.finset_sum_apply]
   simp
 
-/-- Each single-site multidegree has per-site weight `Finsupp.single x 2`: site `x` carries
-degree `2` (Tasaki eq. (7.1.22): one spin-`1` site is one degree-`2` binary form) and every other
+/-- Each single-site multidegree has per-site weight `Finsupp.single x N`: site `x` carries
+degree `N` (Tasaki eq. (7.1.22): one spin-`S` site is one degree-`N` binary form) and every other
 site carries degree `0`. -/
-theorem weight_siteWeight_mdSite (x : Fin L) (k : Fin 3) :
-    Finsupp.weight (siteWeight (L := L)) (mdSite x k) = Finsupp.single x 2 := by
-  fin_cases k <;>
-    simp [mdSite, siteWeight, map_add, Finsupp.weight_single, Finsupp.smul_single,
-      ← Finsupp.single_add]
+theorem weight_siteWeight_mdSite {N : ℕ} (x : Fin L) (k : Fin (N + 1)) :
+    Finsupp.weight (siteWeight (L := L)) (mdSite x k) = Finsupp.single x N := by
+  rw [mdSite, map_add, Finsupp.weight_single, Finsupp.weight_single, siteWeight, siteWeight,
+    Finsupp.smul_single, Finsupp.smul_single, ← Finsupp.single_add, smul_eq_mul, smul_eq_mul,
+    mul_one, mul_one, Nat.sub_add_cancel (Nat.lt_succ_iff.mp k.isLt)]
 
-/-- The multidegree of a chain state has per-site weight `∑_x single x 2`: every site carries
-degree exactly `2` (the per-site refinement of `md_degree`, which only records the total `2L`). -/
-theorem weight_siteWeight_md (σ : Fin L → Fin 3) :
-    Finsupp.weight (siteWeight (L := L)) (md σ) = ∑ x : Fin L, Finsupp.single x 2 := by
+/-- The multidegree of a chain state has per-site weight `∑_x single x N`: every site carries
+degree exactly `N` (the per-site refinement of `md_degree`, which only records the total `N·L`). -/
+theorem weight_siteWeight_md {N : ℕ} (σ : Fin L → Fin (N + 1)) :
+    Finsupp.weight (siteWeight (L := L)) (md σ) = ∑ x : Fin L, Finsupp.single x N := by
   rw [md, map_sum]
   exact Finset.sum_congr rfl fun x _ => weight_siteWeight_mdSite x (σ x)
 
 /-- **Per-site refinement of `weylMap_isHomogeneous`.**  The Weyl image `weylMap Φ` is
-`siteWeight`-homogeneous of degree `∑_x single x 2`, i.e. it has degree exactly `2` in each site's
+`siteWeight`-homogeneous of degree `∑_x single x N`, i.e. it has degree exactly `N` in each site's
 own pair of variables (Tasaki eqs. (7.1.22)–(7.1.25)).  The aggregate statement
-`weylMap_isHomogeneous` (total degree `2L`) follows from this one by summing the per-site degrees,
+`weylMap_isHomogeneous` (total degree `N·L`) follows from this one by summing the per-site degrees,
 but not conversely; it is kept as the form consumed by `ProductBondDivisibility`. -/
-theorem weylMap_isWeightedHomogeneous (Φ : (Fin L → Fin 3) → ℂ) :
-    (weylMap Φ).IsWeightedHomogeneous (siteWeight (L := L)) (∑ x : Fin L, Finsupp.single x 2) := by
+theorem weylMap_isWeightedHomogeneous {N : ℕ} (Φ : (Fin L → Fin (N + 1)) → ℂ) :
+    (weylMap Φ).IsWeightedHomogeneous (siteWeight (L := L)) (∑ x : Fin L, Finsupp.single x N) := by
   simp only [weylMap, Fintype.linearCombination_apply]
   refine IsWeightedHomogeneous.sum _ _ _ (fun σ _ => ?_)
   rw [weylMono, smul_monomial]

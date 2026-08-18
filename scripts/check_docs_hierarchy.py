@@ -535,6 +535,29 @@ def approved_changes(text: str) -> str:
             "Σ_{x,y} [openAnisotropicChainCoupling] · spinSDotXXZ",
             "Σ_{x,y} [openBondCoupling] · spinSDotXXZ",
         )
+        # PR-1 of the §8.3.1 item (1) general-S arc (#5292/#5293) generalizes `weylMap` in
+        # place from the fixed-`Fin 3` (spin-1) form to a `{N : ℕ}`-parametrized form and
+        # renames its home module `WeylSpinOneMap.lean` to `WeylSpinMap.lean`.  This is a pure
+        # rename/generalization with no change to the recorded `N = 2` statement, so both the
+        # long-form detail record (line 763) and its compact-row File column are updated.
+        .replace(
+            "the Weyl map `weylMap : ((Fin L → Fin 3) → ℂ) →ₗ[ℂ] "
+            "MvPolynomial (Fin L × Fin 2) ℂ` (`Math/MvPolynomial/WeylSpinOneMap.lean`, "
+            "eq. (7.1.22))",
+            "the Weyl map `weylMap`, at `N = 2` of type "
+            "`((Fin L → Fin 3) → ℂ) →ₗ[ℂ] MvPolynomial (Fin L × Fin 2) ℂ` "
+            "(`Math/MvPolynomial/WeylSpinMap.lean`, eq. (7.1.22))",
+        )
+        .replace(
+            "`Quantum/SpinS/AKLTUniqueness/LocalBondDivisibility.lean`; "
+            "`Math/MvPolynomial/WeylSpinOneMap.lean`; "
+            "`Math/MvPolynomial/BilinearFactorCoprime.lean`; "
+            "`Math/MvPolynomial/PairwiseCoprimeProd.lean`",
+            "`Quantum/SpinS/AKLTUniqueness/LocalBondDivisibility.lean`; "
+            "`Math/MvPolynomial/WeylSpinMap.lean`; "
+            "`Math/MvPolynomial/BilinearFactorCoprime.lean`; "
+            "`Math/MvPolynomial/PairwiseCoprimeProd.lean`",
+        )
     )
 
 

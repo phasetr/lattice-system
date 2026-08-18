@@ -1,5 +1,5 @@
 import LatticeSystem.Math.MvPolynomial.WeightedHomogeneousLayer
-import LatticeSystem.Math.MvPolynomial.WeylSpinOneMap
+import LatticeSystem.Math.MvPolynomial.WeylSpinMap
 import LatticeSystem.Math.MvPolynomial.BilinearFactorCoprime
 
 /-!

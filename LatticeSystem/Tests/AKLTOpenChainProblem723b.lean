@@ -40,7 +40,7 @@ example (L : ℕ) (d : (Fin L × Fin 2) →₀ ℕ) (y : Fin L) :
 evaluates to `2` at every site. -/
 example (L : ℕ) (y : Fin L) :
     (∑ x : Fin L, Finsupp.single x 2 : Fin L →₀ ℕ) y = 2 :=
-  weylMapWeight_apply y
+  weylMapWeight_apply 2 y
 
 /-! ## 2. `ProductBondDivisibility` refactor: `_of_witness` split (design §3(B)) -/
 
