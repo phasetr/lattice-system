@@ -16,6 +16,7 @@ import LatticeSystem.Quantum.SpinS.AKLTInfiniteChain
 import LatticeSystem.Quantum.SpinS.AKLTStringOrder
 import LatticeSystem.Quantum.SpinS.AKLTTheorem71
 import LatticeSystem.Quantum.SpinS.AKLTOpenChainCompleteness
+import LatticeSystem.Quantum.SpinS.GeneralSOpenChainBondTerm
 import LatticeSystem.Quantum.SpinS.ClusterState
 import LatticeSystem.Quantum.SpinS.HoneycombAKLTZeroEnergy
 import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrderUniqueness

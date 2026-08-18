@@ -18,26 +18,6 @@ open scoped ComplexOrder
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
-/-- The block embedding transports an ordered finite matrix product. -/
-private theorem onEmbS_list_prod {m N : ℕ}
-    (ι : Fin m → Λ) (hι : Function.Injective ι)
-    (l : List
-      (Matrix (Fin m → Fin (N + 1)) (Fin m → Fin (N + 1)) ℂ)) :
-    onEmbS ι l.prod = (l.map fun A => onEmbS ι A).prod := by
-  induction l with
-  | nil =>
-      simpa only [List.prod_nil, List.map_nil] using
-        (onEmbS_one (N := N) ι)
-  | cons A l ih =>
-      rw [List.prod_cons, ← onEmbS_mul hι, ih, List.map_cons,
-        List.prod_cons]
-
-/-- The block embedding transports matrix negation. -/
-private theorem onEmbS_neg {m N : ℕ} (ι : Fin m → Λ)
-    (A : Matrix (Fin m → Fin (N + 1)) (Fin m → Fin (N + 1)) ℂ) :
-    onEmbS ι (-A) = -onEmbS ι A := by
-  simpa only [neg_one_smul] using onEmbS_smul ι (-1 : ℂ) A
-
 /-- The arbitrary-bond spin-three projector is the block embedding of the
 certified local `P₃` matrix. -/
 theorem bondMaxSpinProjectionS_three_eq_onEmbS
