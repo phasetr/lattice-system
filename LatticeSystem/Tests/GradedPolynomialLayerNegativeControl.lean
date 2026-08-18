@@ -4,7 +4,7 @@ import Mathlib.RingTheory.MvPolynomial.WeightedHomogeneous
 /-!
 # Negative control: the cofactor (quotient) lemma genuinely needs `q ≠ 0`
 
-`LatticeSystem.Math.MvPolynomial.isWeightedHomogeneous_cofactor_weight` reads
+`LatticeSystem.Math.isWeightedHomogeneous_cofactor_weight` reads
 
   `hq : q.IsWeightedHomogeneous w k`, `hq0 : q ≠ 0`, `hqr : (q * r).IsWeightedHomogeneous w n` ⊢
   `∀ d ∈ r.support, k + Finsupp.weight w d = n`.

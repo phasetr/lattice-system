@@ -5,9 +5,9 @@ import LatticeSystem.Math.MvPolynomial.BilinearFactorCoprime
 /-!
 # Signature regression tests for the graded-polynomial layer
 
-Usage specifications for the five declarations of
-`LatticeSystem.Math.MvPolynomial.WeightedHomogeneousLayer`; each `example` breaks if a signature
-(argument order, implicit/explicit status, instance requirements) drifts.
+Usage specifications for the declarations of
+`LatticeSystem.Math.MvPolynomial.WeightedHomogeneousLayer` listed below; each `example` breaks if a
+signature (argument order, implicit/explicit status, instance requirements) drifts.
 
 * `weightedHomogeneousComponent_mul_of_isWeightedHomogeneous` — component-of-product.
 * `isWeightedHomogeneous_cofactor_weight` — the cofactor (quotient) lemma, `hq0 : q ≠ 0` required

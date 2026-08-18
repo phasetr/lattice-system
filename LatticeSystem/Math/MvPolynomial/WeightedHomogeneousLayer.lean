@@ -18,18 +18,23 @@ This file provides that layer in two parts.
   no quotient (cofactor) counterpart.  Left cancellation in `M` is what turns "the `b`-side
   selector `weight b = m`" into "the `d`-side selector `weight d = k + m`"; it holds for the two
   weight monoids used here (`ℕ` and `Fin L →₀ ℕ`).
-* The instances consumed by the AKLT uniqueness argument: the per-site weight `siteWeight` on the
-  Weyl variables `Fin L × Fin 2`, valued in the per-site degree monoid `Fin L →₀ ℕ`; the per-site
-  homogeneity `weylMap_isWeightedHomogeneous` of the Weyl image; and the weighted homogeneity
-  `bondFactor_isWeightedHomogeneous` of the bilinear bond factor.
+* The instances that specialise that pair to the Weyl representation of the spin-`1` chain: the
+  per-site weight `siteWeight` on the Weyl variables `Fin L × Fin 2`, valued in the per-site degree
+  monoid `Fin L →₀ ℕ`; the per-site homogeneity `weylMap_isWeightedHomogeneous` of the Weyl image;
+  and the weighted homogeneity `bondFactor_isWeightedHomogeneous` of the bilinear bond factor.
 
 The cofactor lemma is **false without `q ≠ 0`**: the zero polynomial is weighted homogeneous of
 every degree, so both homogeneity hypotheses become vacuous while the conclusion is arbitrary.
 The counterexample is kept as the regression test
 `LatticeSystem.Tests.GradedPolynomialLayerNegativeControl`.
 
-`weylMap_isHomogeneous` (total degree `2L`) is a sibling of `weylMap_isWeightedHomogeneous`
-(degree `2` at each site), not a duplicate: neither implies the other, and both have consumers.
+The two gradings are not independent: `weylMap_isWeightedHomogeneous` (degree `2` at each site)
+implies `weylMap_isHomogeneous` (total degree `2L`), by summing the per-site degrees, i.e. by
+applying `Finsupp.weight (fun _ => 1)` to the per-site degree identity.  The converse fails, since
+a fixed total degree does not pin the degree at each individual site.  The total-degree statement
+is nevertheless kept as it stands, because it is the form directly consumed by
+`LatticeSystem.Quantum.SpinS.AKLTUniqueness.ProductBondDivisibility`, which compares total degrees
+of the bond product and the Weyl image.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (Springer, 2020),
 §7.1.3 "The Uniqueness of the Ground State", pp. 186–188, eqs. (7.1.22)–(7.1.25); polynomial
@@ -147,8 +152,8 @@ theorem weight_siteWeight_md (σ : Fin L → Fin 3) :
 /-- **Per-site refinement of `weylMap_isHomogeneous`.**  The Weyl image `weylMap Φ` is
 `siteWeight`-homogeneous of degree `∑_x single x 2`, i.e. it has degree exactly `2` in each site's
 own pair of variables (Tasaki eqs. (7.1.22)–(7.1.25)).  The aggregate statement
-`weylMap_isHomogeneous` (total degree `2L`) is the image of this one under `Finsupp.degree` and is
-kept unchanged; neither implies the other. -/
+`weylMap_isHomogeneous` (total degree `2L`) follows from this one by summing the per-site degrees,
+but not conversely; it is kept as the form consumed by `ProductBondDivisibility`. -/
 theorem weylMap_isWeightedHomogeneous (Φ : (Fin L → Fin 3) → ℂ) :
     (weylMap Φ).IsWeightedHomogeneous (siteWeight (L := L)) (∑ x : Fin L, Finsupp.single x 2) := by
   simp only [weylMap, Fintype.linearCombination_apply]
