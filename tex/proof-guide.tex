@@ -12604,7 +12604,7 @@ O_{\mathrm{string}}^{(\alpha)}$ built from the spin-one half turn \texttt{spinOn
 $\alpha=1-2(\hat S^{(\alpha)})^2$ (the closed form of $\exp(i\pi\hat S^{(\alpha)})$, valid because
 $(\hat S^{(\alpha)})^3=\hat S^{(\alpha)}$ for $S=1$).  Since edge states are an open-boundary
 phenomenon, the theorem uses the open-chain Hamiltonian \texttt{openAnisotropicChainHamiltonianS}
-(coupling \texttt{openAnisotropicChainCoupling}, no wrap-around).  The theorem
+(coupling \texttt{openBondCoupling}, no wrap-around).  The theorem
 \texttt{tasaki\_theorem\_8\_2} (formerly a documented axiom) states that for fixed $D\ge0,q>0$
 there are an eventual threshold $L_0$ ($=1$, no numerical threshold is needed) and
 $L$-independent constants $C_\nu=64(3+D)/q_\nu>0$ such that for every $L\ge L_0$, whenever $\Phi$
@@ -12625,7 +12625,7 @@ argument, since the book only sketches it) feeds the variational gap estimate.
 Tasaki
 §8.2.1, eqs.~(8.2.1)--(8.2.4), pp.~239--241; \texttt{Quantum/SpinS/LambdaDModel.lean}, Issue \#4485).
 The two-parameter Haldane-phase model \texttt{lambdaDChainHamiltonianS} $L\,\lambda\,D=\sum_{x,y}
-[\texttt{openAnisotropicChainCoupling}]\cdot\texttt{spinSDotXXZ}\,x\,y\,\lambda\,2+D\sum_x(\hat
+[\texttt{openBondCoupling}]\cdot\texttt{spinSDotXXZ}\,x\,y\,\lambda\,2+D\sum_x(\hat
 S_x^{(3)})^2$ is the open XXZ chain with Ising anisotropy $\lambda$ and crystal field $D$ (eq.~8.2.1;
 $\lambda=1$ gives the open-boundary version of the anisotropic model 8.1.1, agreeing in the bulk).  The thermodynamic double-limit order parameters ---
 the Néel parameter \texttt{neelOrderParameterS} (8.2.2) and the den Nijs--Rommelse string parameter

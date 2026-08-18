@@ -139,6 +139,19 @@ theorem bondSpin2ProjectionS_isHermitian {L : ℕ} (x y : Fin L) :
     rw [isSelfAdjoint_iff, Complex.star_def]; simp [Complex.conj_ofNat]
   exact ((hD.smul h2).add (hsq.smul h6)).add (Matrix.isHermitian_one.smul h3)
 
+/-- **A bond projection is positive semidefinite.**  For any two *distinct* sites `x ≠ y` of a
+chain — adjacent or not, wrap bond or not — `P̂₂[Ŝ_x + Ŝ_y]` is a Hermitian idempotent, hence
+`P = Pᴴ P ≥ 0`.  Both the periodic ring bond and the open-chain bond consume this form.
+(`Matrix.conjTranspose` is spelled out because the `ᴴ` postfix does not parse inside the
+`LatticeSystem.Quantum` namespace.) -/
+theorem bondSpin2ProjectionS_posSemidef {L : ℕ} {x y : Fin L} (hxy : x ≠ y) :
+    (bondSpin2ProjectionS x y : ManyBodyOpS (Fin L) 2).PosSemidef := by
+  have key : Matrix.conjTranspose (bondSpin2ProjectionS x y : ManyBodyOpS (Fin L) 2)
+      * bondSpin2ProjectionS x y = bondSpin2ProjectionS x y := by
+    rw [(bondSpin2ProjectionS_isHermitian x y).eq, bondSpin2ProjectionS_mul_self hxy]
+  exact key ▸ Matrix.posSemidef_conjTranspose_mul_self
+    (bondSpin2ProjectionS x y : ManyBodyOpS (Fin L) 2)
+
 /-! ## A5–A6: commutation of bond operators on disjoint site pairs -/
 
 /-- **Two bond Heisenberg operators on disjoint site pairs commute** (design item A5). The four

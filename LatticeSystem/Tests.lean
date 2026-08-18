@@ -97,6 +97,7 @@ import LatticeSystem.Tests.CartesianAxis
 import LatticeSystem.Tests.SpinHalfSpecializationMultiSite
 import LatticeSystem.Tests.GradedPolynomialLayerNegativeControl
 import LatticeSystem.Tests.GradedPolynomialLayer
+import LatticeSystem.Tests.AKLTOpenChainProblem723a
 
 /-!
 # Test aggregator for the `lattice-system` library

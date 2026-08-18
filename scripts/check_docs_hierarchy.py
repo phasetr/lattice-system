@@ -470,6 +470,20 @@ def approved_changes(text: str) -> str:
             "theorems `spinOneRotOf_zero` and `spinOneRotOf_pi` in the same file, "
             "combined with `spinOnePiRot{1,2,3}_eq`.",
         )
+        # The directed open-chain coupling moved to `Quantum/SpinS/HeisenbergCore.lean` under the
+        # name `openBondCoupling`, shared by the §8.1/§8.2 open chains and the §7.2.3 open AKLT
+        # chain.  Both catalogue mentions follow the identifier.  (Applied last, so it also
+        # rewrites the Theorem 8.2 replacement text produced above.)
+        .replace(
+            "chain (`openAnisotropicChainCoupling`, no wrap-around — the free ends carry the "
+            "`S=1/2` edge spins)",
+            "chain (`openBondCoupling`, no wrap-around — the free ends carry the "
+            "`S=1/2` edge spins)",
+        )
+        .replace(
+            "Σ_{x,y} [openAnisotropicChainCoupling] · spinSDotXXZ",
+            "Σ_{x,y} [openBondCoupling] · spinSDotXXZ",
+        )
     )
 
 

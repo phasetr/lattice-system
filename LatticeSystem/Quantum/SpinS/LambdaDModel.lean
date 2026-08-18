@@ -46,7 +46,7 @@ At `λ = 1` it is the **open-boundary** version of the anisotropic model (8.1.1)
 with periodic boundary); the two agree in the bulk / thermodynamic limit. -/
 noncomputable def lambdaDChainHamiltonianS (L : ℕ) (lam D : ℝ) : ManyBodyOpS (Fin L) 2 :=
   (∑ x : Fin L, ∑ y : Fin L,
-      openAnisotropicChainCoupling L x y • spinSDotXXZ x y (lam : ℂ) 2) +
+      openBondCoupling L x y • spinSDotXXZ x y (lam : ℂ) 2) +
     (D : ℂ) • ∑ x : Fin L, spinSSiteOp3 x 2 * spinSSiteOp3 x 2
 
 /-- The **Néel order parameter** `O_Néel^{(α)}(λ, D)` of the λ-D model (eq. (8.2.2)): the

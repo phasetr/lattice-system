@@ -56,6 +56,21 @@ theorem heisenbergHamiltonianS_isHermitian_of_real
   rw [Matrix.conjTranspose_smul, (spinSDot_isHermitian x y N).eq]
   rw [hreal]
 
+/-! ## Open-chain nearest-neighbour coupling -/
+
+/-- The **directed open-chain nearest-neighbour coupling** on `Fin L`: `J x y = 1` iff
+`y.val = x.val + 1` (no periodic wrap-around), so the bonds are `{0,1}, {1,2}, …, {L−2, L−1}`,
+each counted **once** in a doubled sum `∑_{x,y} J x y • Ŝ_x·Ŝ_y`, and the two end sites `0` and
+`L−1` each have a single neighbour — the open boundary carrying the `S = 1/2` edge spins.  It is
+the open counterpart of the periodic `ringCoupling`.
+
+This is deliberately **not** the graph coupling `openChainCoupling`
+(`Quantum/HeisenbergChain.lean`): that one is `couplingOf (pathGraph (N+1)) (-(J:ℂ))`, hence
+*symmetric* (it carries each bond in both orientations, doubling the doubled sum) and weighted by
+the ferromagnetic `−J`.  Reusing it here would silently double the Hamiltonian and flip its sign
+convention, so the two must not be unified. -/
+def openBondCoupling (L : ℕ) (x y : Fin L) : ℂ :=
+  if y.val = x.val + 1 then 1 else 0
 
 /-! ## SU(2) invariance (Tasaki §2.2 (2.2.13) general S) -/
 
