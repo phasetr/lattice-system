@@ -449,6 +449,23 @@ theorem openVBSState_mem_openAKLTGroundSpace (hL : 2 ≤ L) (p q : Fin 2) :
   rw [openAKLTGroundSpace_eq_ker (by omega), LinearMap.mem_ker, Matrix.mulVecLin_apply]
   exact (openProjHamiltonianS_posSemidef_and_mulVec hL p q).2
 
+/-- The span of the four boundary components sits inside the ground space of `Ĥ^open`: each
+`Φ_{pq}` is a ground state, and the ground space is a submodule. -/
+theorem span_openVBSState_le_openAKLTGroundSpace (hL : 2 ≤ L) :
+    Submodule.span ℂ (Set.range fun r : Fin 2 × Fin 2 => openVBSState L r.1 r.2)
+      ≤ openAKLTGroundSpace L := by
+  rw [Submodule.span_le]
+  rintro v ⟨⟨p, q⟩, rfl⟩
+  exact openVBSState_mem_openAKLTGroundSpace hL p q
+
+/-- The span of the four open VBS states is exactly four-dimensional: they are linearly
+independent (`openVBSState_linearIndependent`) and indexed by `Fin 2 × Fin 2`. -/
+theorem finrank_span_openVBSState (hL : 2 ≤ L) :
+    Module.finrank ℂ
+        (Submodule.span ℂ (Set.range fun r : Fin 2 × Fin 2 => openVBSState L r.1 r.2)) = 4 := by
+  rw [finrank_span_eq_card (openVBSState_linearIndependent hL)]
+  simp
+
 /-- **Problem 7.2.3.a, the lower bound.**  The ground space of the open AKLT chain has complex
 dimension at least `4`: the four independent boundary components `Φ_{pq}` all sit in it.  At
 `L = 2` this matches the proved dimension `4` of the VBS bond subspace `W`
@@ -456,16 +473,7 @@ dimension at least `4`: the four independent boundary components `Φ_{pq}` all s
 7.2.3.b and is not proved here. -/
 theorem four_le_finrank_openAKLTGroundSpace (hL : 2 ≤ L) :
     4 ≤ Module.finrank ℂ (openAKLTGroundSpace L) := by
-  have hspan : Submodule.span ℂ (Set.range fun r : Fin 2 × Fin 2 => openVBSState L r.1 r.2)
-      ≤ openAKLTGroundSpace L := by
-    rw [Submodule.span_le]
-    rintro v ⟨⟨p, q⟩, rfl⟩
-    exact openVBSState_mem_openAKLTGroundSpace hL p q
-  have hfr : Module.finrank ℂ
-      (Submodule.span ℂ (Set.range fun r : Fin 2 × Fin 2 => openVBSState L r.1 r.2)) = 4 := by
-    rw [finrank_span_eq_card (openVBSState_linearIndependent hL)]
-    simp
-  rw [← hfr]
-  exact Submodule.finrank_mono hspan
+  rw [← finrank_span_openVBSState hL]
+  exact Submodule.finrank_mono (span_openVBSState_le_openAKLTGroundSpace hL)
 
 end LatticeSystem.Quantum
