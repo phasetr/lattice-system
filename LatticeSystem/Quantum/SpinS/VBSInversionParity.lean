@@ -158,7 +158,7 @@ theorem akltVBSState_comp_rev (L : ℕ) (σ : Fin L → Fin 3) :
   simp only [akltVBSState]
   rw [list_ofFn_comp_rev, trace_orderedProd_reverse, List.length_ofFn]
 
-/-- **Tasaki §8.3.2 (S3) at `S = 1`, eq. (8.3.5) and p. 257, PROVED.**  The periodic spin-one VBS
+/-- **Tasaki §8.3.2 (S3) at `S = 1`, p. 257 unnumbered display, PROVED.**  The periodic spin-one VBS
 state is an eigenstate of the bond-centered inversion `Û_inv` with eigenvalue `(−1)^L`:
 `Û_inv |Φ_VBS⟩ = (−1)^L |Φ_VBS⟩`, for every ring length `L` (no parity restriction).  At `L = 3`
 this reproduces the book's worked example (S.63), p. 505.  The general-`S` formula `(−1)^{L·S}` is

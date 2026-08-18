@@ -3,10 +3,11 @@ import LatticeSystem.Quantum.SpinS.AKLTUniqueness.GroundStateUnique
 import LatticeSystem.Quantum.SpinS.AKLT
 
 /-!
-# §8.3.2 item (3) — `S = 1` bond-inversion parity (eq. (8.3.5))
+# §8.3.2 item (3) — `S = 1` bond-inversion parity (p. 257, unnumbered display)
 
 Signature and capstone tests for the bond-inversion unitary `Û_inv` (Tasaki §8.3.2, eq. (8.3.5),
-p. 257) at `S = 1`, for the production module `LatticeSystem.Quantum.SpinS.VBSInversionParity`.
+p. 257, defines `Û_inv`; the parity identity itself is the unnumbered display on the same page)
+at `S = 1`, for the production module `LatticeSystem.Quantum.SpinS.VBSInversionParity`.
 No production code lives here: every `example`/`theorem` below only pins down the intended
 statement of that module (and its `ConfigPermMatrixS` dependency).
 
@@ -59,9 +60,9 @@ example (L N : ℕ) (Φ : (Fin L → Fin (N + 1)) → ℂ) :
 
 /-! ## 3. Capstone: `Û_inv |Φ_VBS⟩ = (-1)^L |Φ_VBS⟩`, no hypothesis on `L` -/
 
-/-- Tasaki §8.3.2, (8.3.5), p. 257 at `S = 1`: the periodic VBS state is an eigenstate of
-bond-centered inversion with eigenvalue `(-1)^L`, for every `L` (no parity restriction; the
-statement is vacuously true at `L = 1` since `akltVBSState 1 = 0`). -/
+/-- Tasaki §8.3.2, p. 257, unnumbered display, at `S = 1`: the periodic VBS state is an
+eigenstate of bond-centered inversion with eigenvalue `(-1)^L`, for every `L` (no parity
+restriction; the statement is vacuously true at `L = 1` since `akltVBSState 1 = 0`). -/
 example (L : ℕ) :
     (bondInversionUnitaryS L 2).mulVec (akltVBSState L) = ((-1 : ℂ) ^ L) • akltVBSState L :=
   tasaki_vbs_inversion_parity_spin_one L
