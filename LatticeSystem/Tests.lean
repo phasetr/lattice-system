@@ -97,6 +97,7 @@ import LatticeSystem.Tests.CartesianAxis
 import LatticeSystem.Tests.SpinHalfSpecializationMultiSite
 import LatticeSystem.Tests.GradedPolynomialLayerNegativeControl
 import LatticeSystem.Tests.GradedPolynomialLayer
+import LatticeSystem.Tests.WeylMapGeneralN
 import LatticeSystem.Tests.AKLTOpenChainProblem723a
 import LatticeSystem.Tests.AKLTOpenChainProblem723b
 import LatticeSystem.Tests.ConfigPermMatrixS
