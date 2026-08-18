@@ -15,7 +15,7 @@ import LatticeSystem.Quantum.SpinS.AKLTMatrixProduct
 import LatticeSystem.Quantum.SpinS.AKLTInfiniteChain
 import LatticeSystem.Quantum.SpinS.AKLTStringOrder
 import LatticeSystem.Quantum.SpinS.AKLTTheorem71
-import LatticeSystem.Quantum.SpinS.AKLTOpenChain
+import LatticeSystem.Quantum.SpinS.AKLTOpenChainWeylFactorization
 import LatticeSystem.Quantum.SpinS.ClusterState
 import LatticeSystem.Quantum.SpinS.HoneycombAKLTZeroEnergy
 import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrderUniqueness
