@@ -112,26 +112,36 @@ theorem fBond_vars (hL : 1 < L) (x : Fin L) :
   · intro h; simp at h
   · intro h; simp at h
 
-/-- **Distinct bonds are relatively prime** (Stage C step 2', Tasaki §7.1.3).  For `L ≥ 3` and
-`x ≠ y`, the prime factors `f_x` and `f_y` are relatively prime: they have equal total degree `2`,
-and the witness variable `(s, 0)` (`exists_bond_var_witness`) occurs in `f_x.vars` but not
-`f_y.vars`, so `bondFactor_isRelPrime` applies. -/
-theorem fBond_isRelPrime (hL : 3 ≤ L) {x y : Fin L} (hxy : x ≠ y) :
+/-- **Coprimality from a separating variable** (Stage C step 2', Tasaki §7.1.3).  Given a site `s`
+on the bond `{x, ringSucc x}` and off the bond `{y, ringSucc y}`, the prime factors `f_x` and `f_y`
+are relatively prime: they have equal total degree `2`, and the witness variable `(s, 0)` occurs in
+`f_x.vars` but not `f_y.vars`, so `bondFactor_isRelPrime` applies.  Only `1 < L` is needed here —
+the stronger `3 ≤ L` of the cyclic chain is what it costs to *produce* such a witness for all
+`x ≠ y`, and the open chain produces one for its own bonds already at `L = 2`. -/
+theorem fBond_isRelPrime_of_witness (hL : 1 < L) {x y : Fin L}
+    (h : ∃ s : Fin L, (s = x ∨ s = ringSucc x) ∧ s ≠ y ∧ s ≠ ringSucc y) :
     IsRelPrime (fBond x) (fBond y) := by
-  obtain ⟨s, hs, hsy, hsry⟩ := exists_bond_var_witness hL hxy
-  refine bondFactor_isRelPrime (fBond_prime (by omega) x)
-    (fBond_prime (by omega) y).ne_zero
-    ((fBond_totalDegree (by omega) x).trans (fBond_totalDegree (by omega) y).symm)
+  obtain ⟨s, hs, hsy, hsry⟩ := h
+  refine bondFactor_isRelPrime (fBond_prime hL x)
+    (fBond_prime hL y).ne_zero
+    ((fBond_totalDegree hL x).trans (fBond_totalDegree hL y).symm)
     (e := (s, 0)) ?_ ?_
-  · rw [fBond_vars (by omega) x]
+  · rw [fBond_vars hL x]
     rcases hs with rfl | rfl <;> simp
-  · rw [fBond_vars (by omega) y]
+  · rw [fBond_vars hL y]
     simp only [Finset.mem_insert, Finset.mem_singleton, not_or]
     refine ⟨?_, ?_, ?_, ?_⟩
     · intro h; exact hsy (congrArg Prod.fst h)
     · intro h; simp at h
     · intro h; simp at h
     · intro h; exact hsry (congrArg Prod.fst h)
+
+/-- **Distinct bonds are relatively prime** (Stage C step 2', Tasaki §7.1.3).  For `L ≥ 3` and
+`x ≠ y`, the prime factors `f_x` and `f_y` are relatively prime: the cyclic separation witness
+`exists_bond_var_witness` feeds `fBond_isRelPrime_of_witness`. -/
+theorem fBond_isRelPrime (hL : 3 ≤ L) {x y : Fin L} (hxy : x ≠ y) :
+    IsRelPrime (fBond x) (fBond y) :=
+  fBond_isRelPrime_of_witness (by omega) (exists_bond_var_witness hL hxy)
 
 /-! ### Product divisibility and the degree count (Tasaki eq. (7.1.25)) -/
 

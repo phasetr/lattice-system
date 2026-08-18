@@ -45,6 +45,16 @@ permalink: /formalization/legacy/19-the-aklt-model-tasaki-7-1/
 
 <!-- legacy-source:end:752:783 -->
 
+## Authoritative supplemental implementation record (§7.2.3 open AKLT chain)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+a new capstone added after the migration baseline; it is not subject to the frozen byte-for-byte
+parity of the block above.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `openBonds` / `openAKLTHamiltonianS` / `openProjHamiltonianS` / `openVBSState` / `openAKLTGroundSpace` / `four_le_finrank_openAKLTGroundSpace` / `weylMap_openGroundForm_eq_boundary_smul_prod` / `finrank_openAKLTGroundSpace_eq_four` / `openAKLTGroundSpace_eq_span_openVBSState` | **§7.2.3 Problem 7.2.3.a–b: the open `S=1` AKLT chain has exactly four ground states** (**PROVED**, `#print axioms` = std3, PRs #5287/#5288/#5289; Tasaki, 1st ed. (2020), §7.2.3, eq. (7.2.45) p. 204, eqs. (7.2.46)–(7.2.48) pp. 205–207, problems p. 207, solution (S.77) p. 508): `openAKLTHamiltonianS L` sums eq. (7.2.46) over the `L−1` `openBonds` (no wrap bond; ground energy `−(2/3)(L−1)`). The four `openVBSState L p q` are the boundary entries `(A^{σ₁}⋯A^{σ_L})_{pq}` of the AKLT tensor whose trace is the periodic VBS state; independent but not orthogonal, giving `4 ≤ dim` (Problem 7.2.3.a). Completeness (Problem 7.2.3.b, eq. (S.77)): the Weyl image of any ground state factors as a boundary quadratic times `∏_{x=1}^{L−1} f_x`; the per-site weighted grading (`siteWeight`) — not the total-degree grading used for the periodic ring — pins the cofactor's per-site degree to `1` at the two ends and `0` in the bulk, forcing `finrank_openAKLTGroundSpace_eq_four` (`dim = 4`) and `openAKLTGroundSpace_eq_span_openVBSState`. Proof: open-bond frustration-freeness (Lemma 7.4, Lemma A.9/A.10) + bond divisibility + UFD coprimality on `openBonds` + weighted-cofactor lemma; axiom-free, no operator algebra | `Quantum/SpinS/AKLTOpenChain.lean`; `Quantum/SpinS/AKLTOpenChainWeylFactorization.lean`; `Quantum/SpinS/AKLTOpenChainCompleteness.lean`; `Quantum/SpinS/AKLTTwoSiteTensor.lean`; `Quantum/SpinS/MPSOrderedProdSplit.lean`; `Math/MvPolynomial/WeightedHomogeneousLayer.lean` |
+
 ---
 
 [← Antiferromagnetic Heisenberg chains and the Haldane conjecture (Tasaki §6.1)](/lattice-system/formalization/legacy/18-antiferromagnetic-heisenberg-chains-and-the-haldane-conjec/) · [Catalogue](/lattice-system/formalization/legacy/) · [Total spin operator (Tasaki §2.2 eq. (2.2.7), (2.2.8)) →](/lattice-system/formalization/legacy/20-total-spin-operator-tasaki-2-2-eq-2-2-7-2-2-8-part-01/)
