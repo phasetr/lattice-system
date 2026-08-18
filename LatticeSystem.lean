@@ -82,6 +82,7 @@ import LatticeSystem.Quantum.SpinS.SPTMatrixProductIndex
 import LatticeSystem.Quantum.SpinS.SPTPhase
 import LatticeSystem.Quantum.SpinS.SPTPhaseTransition
 import LatticeSystem.Quantum.SpinS.SPTTopologicalIndex
+import LatticeSystem.Quantum.SpinS.VBSInversionParity
 import LatticeSystem.Quantum.SpinS.ToricCode
 import LatticeSystem.Quantum.SpinS.AxisSwapLadderMagShift
 import LatticeSystem.Quantum.SpinS.BareSubmatrixPFFinrank
