@@ -2,18 +2,17 @@ import LatticeSystem.Quantum.SpinS.ConfigPermMatrixS
 import LatticeSystem.Quantum.SpinS.ManyBodyReversalS
 
 /-!
-# §8.3.2 item (3) PR-0 (TDD Red) — generic configuration-permutation-matrix layer
+# §8.3.2 item (3) — generic configuration-permutation-matrix layer
 
 Signature and regression tests for the generic layer `configPermMatrixS`
 (`LatticeSystem.Quantum.SpinS.ConfigPermMatrixS`), which factors out the shared "permutation
 matrix of an involutive configuration map" pattern behind `manyBodyReversalS`
-(`ManyBodyReversalS.lean`) and, in a later PR, the bond-inversion unitary `bondInversionUnitaryS`
-(`VBSInversionParity.lean`, not yet written).
+(`ManyBodyReversalS.lean`) and the bond-inversion unitary `bondInversionUnitaryS`
+(`VBSInversionParity.lean`).
 
-No production code lives here: every `example` below only pins down the intended statement,
-so the whole file is expected to fail to elaborate until `ConfigPermMatrixS.lean` and the
-`manyBodyReversalS := configPermMatrixS revConfigS` refactor of `ManyBodyReversalS.lean` exist
-(TDD Red, design `.self-local/reports/design-8-3-1-item3-round1-20260818.md` §2.1).
+No production code lives here: every `example` below only pins down the intended statement of
+`ConfigPermMatrixS.lean` and the `manyBodyReversalS := configPermMatrixS revConfigS` refactor of
+`ManyBodyReversalS.lean`.
 -/
 
 namespace LatticeSystem.Tests.ConfigPermMatrixS

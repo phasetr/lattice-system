@@ -3,14 +3,12 @@ import LatticeSystem.Quantum.SpinS.AKLTUniqueness.GroundStateUnique
 import LatticeSystem.Quantum.SpinS.AKLT
 
 /-!
-# §8.3.2 item (3) PR-0 (TDD Red) — `S = 1` bond-inversion parity (eq. (8.3.5))
+# §8.3.2 item (3) — `S = 1` bond-inversion parity (eq. (8.3.5))
 
 Signature and capstone tests for the bond-inversion unitary `Û_inv` (Tasaki §8.3.2, eq. (8.3.5),
-p. 257) at `S = 1`, ahead of the production module `LatticeSystem.Quantum.SpinS.VBSInversionParity`
-(design `.self-local/reports/design-8-3-1-item3-round1-20260818.md` §2.2–2.4). No production code
-lives here: every `example`/`theorem` below only pins down the intended statement, so the whole
-file is expected to fail to elaborate until that module (and its `ConfigPermMatrixS` dependency)
-exist (TDD Red).
+p. 257) at `S = 1`, for the production module `LatticeSystem.Quantum.SpinS.VBSInversionParity`.
+No production code lives here: every `example`/`theorem` below only pins down the intended
+statement of that module (and its `ConfigPermMatrixS` dependency).
 
 Covers:
 1. the configuration map `bondInversionConfigS := σ ∘ Fin.rev` and its involutivity;
