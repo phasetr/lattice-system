@@ -12780,29 +12780,28 @@ $N=2$ instance of the general-$N$ \texttt{IsTimeReversalSymmetricS} of
 consolidating it is a deletion requiring its own approval; \texttt{SPTTopologicalIndex.lean} does
 not import that file, so the mention there is a doc-comment cross-reference, not a Lean consumer),
 (S3) bond-centered
-inversion (\texttt{IsBondInversionInvariant} marker).  The axiom
-\texttt{tasaki\_vbs\_inversion\_parity} gives
-the inversion-parity $\mathbb{Z}_2$ index $\hat U_{\mathrm{inv}}|\Phi_{\mathrm{VBS}}^S\rangle
-=(-1)^{L\cdot S}|\Phi_{\mathrm{VBS}}^S\rangle$ (odd $L\cdot S\Rightarrow$ odd parity $\Rightarrow$
-obstruction to the trivial state).  \texttt{entanglementEntropyS}
+inversion (\texttt{IsBondInversionInvariant} marker).  At $S=1$ the inversion-parity
+$\mathbb{Z}_2$ index is now \textbf{proved}, not an axiom: \texttt{bondInversionConfigS}/
+\texttt{bondInversionUnitaryS} (\texttt{Quantum/SpinS/VBSInversionParity.lean}) are the concrete
+site reflection $\sigma\mapsto\sigma\circ\mathrm{Fin.rev}$ and its permutation operator
+$\hat U_{\mathrm{inv}}$, defined for \emph{every} $L$ --- $\mathrm{Fin.rev}$ is a reflection of the
+cycle for odd $L$ too (it fixes the single site $(L-1)/2$, as any reflection of an odd cycle must),
+so no parity restriction on $L$ is needed anywhere.  The theorem
+\texttt{tasaki\_vbs\_inversion\_parity\_spin\_one} gives $\hat U_{\mathrm{inv}}
+|\Phi_{\mathrm{VBS}}\rangle=(-1)^{L}|\Phi_{\mathrm{VBS}}\rangle$ (eq.~8.3.5 at $S=1$), matching the
+book's worked example (S.63), p.~505, at $L=3$; \texttt{tasaki\_vbs\_inversion\_parity\_ground\_state\_spin\_one}
+transfers the same parity to every nonzero ground state of the spin-one AKLT ring via the
+uniqueness theorem of §7.1.3.  The proof mechanism is the book's ``the inversion flips the sign of
+each valence bond'': the antisymmetric matrix $\varepsilon=\left(\begin{smallmatrix}0&1\\-1&0
+\end{smallmatrix}\right)$ satisfies $\varepsilon (A^s)^{\mathsf T}=-(A^s\varepsilon)$ for every spin
+label $s$, so transposing the ordered matrix-product word --- which is what reversing the site
+order does under the trace --- produces one sign per site.  The general-$S$ formula
+$(-1)^{L\cdot S}$ and its markers \texttt{vbsInversionParityS}/\texttt{tasaki\_vbs\_inversion\_parity}
+were \textbf{deleted}: the library has no general-$S$ VBS construction, so the general-$S$ case is
+not covered.  \texttt{entanglementEntropyS}
 (documented axiom, eqs.~8.3.7--8.3.8) is the bipartite entanglement entropy $-\sum_j p_j\log p_j$
-from the half-infinite-chain Schmidt decomposition: an uninterpreted marker with zero consumers.  This section is heuristic; the precise indices come in §8.3.4 (MPS) and §8.3.6
-(Ogata).  Markers for the antiunitary/inversion/Schmidt structure; the parity is \emph{not} a
-documented axiom but a discharge target, and discharging it is more than deleting an axiom line: the
-opaque marker \texttt{vbsInversionParityS} must be replaced by a real definition of the $\hat
-U_{\mathrm{inv}}$ eigenvalue and the formula $(-1)^{L\cdot S}$ then proved as a theorem about that
-definition.  The missing ingredient is the geometry of $\hat U_{\mathrm{inv}}$, which permutes the
-\emph{sites} ($x\mapsto L-1-x$): that is \texttt{ringReflect}
-(\texttt{Quantum/SpinS/RingBondReflection.lean}) with its configuration action
-\texttt{ringConfigReflect} (\texttt{Quantum/SpinS/RingReflectionTheta.lean}), a different map from
-the on-site spin reversal $\Theta=\texttt{manyBodyReversalS}$ ($\sigma\mapsto\mathrm{Fin.rev}\circ
-\sigma$, which leaves the sites in place).  \emph{Caveat on the ring parity:} \texttt{ringReflect}
-is defined only on $\mathrm{Fin}(2n)$, i.e.\ it is the bond-centered reflection of an \emph{even}
-ring $L=2n$, where it has no fixed site, whereas \texttt{tasaki\_vbs\_inversion\_parity} quantifies
-over \emph{every} $L$; for odd $L$ the map $x\mapsto L-1-x$ fixes $x=(L-1)/2$ and is therefore
-site-centered rather than bond-centered, so a discharge needs either an inversion defined on a
-general $\mathrm{Fin}\,L$ or a restriction of the parity statement to even $L$.  At $S=1$ those
-reflection maps together with \texttt{akltVBSState} are the intended starting point.  The book's
+from the half-infinite-chain Schmidt decomposition: an uninterpreted marker with zero consumers.
+This section is heuristic; the precise indices come in §8.3.4 (MPS) and §8.3.6 (Ogata).  The book's
 odd/even-$S$ SPT classification, which it states only as a belief, is not
 formalized here.  Chapters~3--10 backfill.
 
