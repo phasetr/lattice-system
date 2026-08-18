@@ -5,7 +5,7 @@ import LatticeSystem.Math.MvPolynomial.WeightedHomogeneousLayer
 # `N = 2` convergence regression gate for the general-`N` Weyl map
 
 `LatticeSystem.Math.weylMap` and its supporting declarations (`mdSite`, `md`, `cgSite`, `cgNorm`,
-`weylMono`) are being generalized from the hard-wired spin-`1` case (site-state type `Fin 3`) to a
+`weylMono`) were generalized from the hard-wired spin-`1` case (site-state type `Fin 3`) to a
 general spin-`S` case with `N = 2S` (site-state type `Fin (N + 1)`), per Issue #5292 PR-1 (design:
 `.self-local/reports/design-5292-pr1-weylmap-generalization-round1-20260819.md`). This file is the
 regression gate that certifies the generalization does not silently change the pre-PR spin-`1`
@@ -28,9 +28,10 @@ Four groups:
    silently ignores `N` (e.g. one that always behaves as if `N = 2`) fails this file even though it
    would pass groups 1-3.
 
-No production code is written here. This file must FAIL TO COMPILE until `weylMap` and its
-supporting declarations gain the implicit `{N : ℕ}` parameter (`weylMap_isHomogeneous`,
-`weylMapWeight_apply`, and the rest of §2/§3 of the design note).
+No production code is written here. `weylMap` and its supporting declarations already carry the
+general-`N` parameter (`weylMap_isHomogeneous`, `weylMapWeight_apply`, and the rest of §2/§3 of the
+design note): most take `N` implicitly as `{N : ℕ}`, but `weylMapWeight_apply` takes it as an
+explicit first argument (see Group 1 below).
 -/
 
 open MvPolynomial LatticeSystem.Math
@@ -101,7 +102,7 @@ example : cgSite (N := 2) 2 = (1 : ℂ) := by
 
 /-- The general-`N` `mdSite` reproduces the pre-PR matrix-literal shape at `N = 2`: the three
 `Fin 3` site states map to `u_x^2`, `u_x v_x`, `v_x^2` respectively. -/
-theorem mdSite_eq_matrixLiteral (x : Fin L) (k : Fin 3) :
+example (x : Fin L) (k : Fin 3) :
     mdSite (N := 2) x k =
       ![Finsupp.single (x, 0) 2,
         Finsupp.single (x, 0) 1 + Finsupp.single (x, 1) 1,
