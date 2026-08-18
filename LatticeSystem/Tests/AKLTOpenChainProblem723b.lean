@@ -8,15 +8,15 @@ import LatticeSystem.Quantum.SpinS.AKLTUniqueness.ProductBondDivisibility
 (Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Problem 7.2.3.b, p. 207,
 solution (S.77), p. 508.)
 
-**TDD Red.**  Signature and negative-control tests only, no production code: `example`s that pin
-down the exact statements of `weight_siteWeight_apply`, `weylMapWeight_apply`,
-`fBond_isRelPrime_of_witness`, `exists_open_bond_var_witness`, `fBond_isRelPrime_openBonds`,
-`fBond_isWeightedHomogeneous`, `prod_openBonds_fBond_isWeightedHomogeneous`,
-`prod_openBonds_fBond_ne_zero`, `prodWeight_apply_first`, `prodWeight_apply_last`,
-`prodWeight_apply_of_interior`, `weylMap_openGroundForm_eq_boundary_smul_prod`,
-`openGroundSpace_isVBSGroundForm`, `finrank_openAKLTGroundSpace_le_four`,
-`finrank_openAKLTGroundSpace_eq_four`, `openAKLTGroundSpace_eq_span_openVBSState` — none of which
-exist yet, so this file does **not** build.  Load-bearing controls: the wrap-bond leak control
+Signature and negative-control tests only, no production code: `example`s that pin down the exact
+statements of `weight_siteWeight_apply`, `weylMapWeight_apply`, `fBond_isRelPrime_of_witness`,
+`exists_open_bond_var_witness`, `fBond_isRelPrime_openBonds`, `fBond_isWeightedHomogeneous`,
+`prod_openBonds_fBond_isWeightedHomogeneous`, `prod_openBonds_fBond_ne_zero`,
+`prodWeight_apply_first`, `prodWeight_apply_last`, `prodWeight_apply_of_interior`,
+`weylMap_openGroundForm_eq_boundary_smul_prod`, `openGroundSpace_isVBSGroundForm`,
+`finrank_openAKLTGroundSpace_le_four`, `finrank_openAKLTGroundSpace_eq_four`,
+`openAKLTGroundSpace_eq_span_openVBSState`, so that a later refactor cannot silently drift them.
+Load-bearing controls: the wrap-bond leak control
 (`prodWeight_apply_first (L := 3) = 1`, not `2`, distinguishing the open per-site weight from the
 periodic one, cf. `card_openBonds 3 = 2` in `AKLTOpenChainProblem723a.lean`); the `L = 2` structural
 cross-check against `finrank_vbsBondSubspace`; and the ring-side regression pinning
@@ -172,10 +172,10 @@ example (L : ℕ) (hL : 2 ≤ L) :
   finrank_openAKLTGroundSpace_eq_four hL
 
 /-- `L = 2` structural cross-check: at the smallest admissible `L` the capstone must literally match
-the proved dimension of the ring-bond subspace `W` (`finrank_vbsBondSubspace = 4`, since at `L = 2`
-the open ground space *is* the bond subspace). -/
-example : Module.finrank ℂ (openAKLTGroundSpace 2) = 4 :=
-  finrank_openAKLTGroundSpace_eq_four (le_refl 2)
+the proved dimension of the ring-bond subspace `W` (`finrank_vbsBondSubspace`, over the same ambient
+type `(Fin 2 → Fin 3) → ℂ`), since at `L = 2` the open ground space *is* the bond subspace. -/
+example : Module.finrank ℂ (openAKLTGroundSpace 2) = Module.finrank ℂ vbsBondSubspace := by
+  rw [finrank_openAKLTGroundSpace_eq_four (le_refl 2), finrank_vbsBondSubspace]
 
 /-- `openAKLTGroundSpace_eq_span_openVBSState`: the literal book claim — every ground state is a
 linear combination of the four `openVBSState` boundary components, not merely `4 ≤ dim ≤ 4`. -/
