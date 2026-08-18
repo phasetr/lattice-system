@@ -48,29 +48,26 @@ theorem rename_bondEmb_f2 : rename (bondEmb x) f2 = fBond x := by
   simp only [f2, fBond, bondFactor, map_sub, map_mul, rename_X, bondEmb]
   norm_num
 
-/-- Easy half: if the local bond factor divides a local polynomial `q`, then the global bond
-factor divides its `rename`-image (`map_dvd` through the `rename` algebra hom). -/
-theorem fBond_dvd_rename (q : MvPolynomial (Fin 2 × Fin 2) ℂ) (h : f2 ∣ q) :
-    fBond x ∣ rename (bondEmb x) q := by
-  rw [← rename_bondEmb_f2 x]
-  exact map_dvd _ h
-
 /-- `rename bondEmb` pushes the local left-site multidegree to the global site `x`
-(`mapDomain_single` on each `Finsupp.single`). -/
-theorem mapDomain_bondEmb_mdSite_left (k : Fin 3) :
+(`mapDomain_single` on each of the two `Finsupp.single` summands of `mdSite`). -/
+theorem mapDomain_bondEmb_mdSite_left {N : ℕ} (k : Fin (N + 1)) :
     Finsupp.mapDomain (bondEmb x) (mdSite (0 : Fin 2) k) = mdSite x k := by
-  fin_cases k <;>
-    simp [mdSite, bondEmb, Finsupp.mapDomain_single, Finsupp.mapDomain_add]
+  have h0 : bondEmb x ((0 : Fin 2), (0 : Fin 2)) = (x, 0) := by simp [bondEmb]
+  have h1 : bondEmb x ((0 : Fin 2), (1 : Fin 2)) = (x, 1) := by simp [bondEmb]
+  rw [mdSite, mdSite, Finsupp.mapDomain_add, Finsupp.mapDomain_single, Finsupp.mapDomain_single,
+    h0, h1]
 
 /-- `rename bondEmb` pushes the local right-site multidegree to the global site `ringSucc x`. -/
-theorem mapDomain_bondEmb_mdSite_right (k : Fin 3) :
+theorem mapDomain_bondEmb_mdSite_right {N : ℕ} (k : Fin (N + 1)) :
     Finsupp.mapDomain (bondEmb x) (mdSite (1 : Fin 2) k) = mdSite (ringSucc x) k := by
-  fin_cases k <;>
-    simp [mdSite, bondEmb, Finsupp.mapDomain_single, Finsupp.mapDomain_add]
+  have h0 : bondEmb x ((1 : Fin 2), (0 : Fin 2)) = (ringSucc x, 0) := by simp [bondEmb]
+  have h1 : bondEmb x ((1 : Fin 2), (1 : Fin 2)) = (ringSucc x, 1) := by simp [bondEmb]
+  rw [mdSite, mdSite, Finsupp.mapDomain_add, Finsupp.mapDomain_single, Finsupp.mapDomain_single,
+    h0, h1]
 
 /-- The Clebsch–Gordan norm splits as (rest) × (two bond sites), using `x ≠ ringSucc x`.
 The rest factor is the product of `cgSite` over all sites off the bond. -/
-theorem cgNorm_bond_rest_split (hL : 1 < L) (σ : Fin L → Fin 3) :
+theorem cgNorm_bond_rest_split {N : ℕ} (hL : 1 < L) (σ : Fin L → Fin (N + 1)) :
     cgNorm σ =
       (∏ y ∈ (Finset.univ.erase x).erase (ringSucc x), cgSite (σ y))
         * cgSite (σ x) * cgSite (σ (ringSucc x)) := by
@@ -81,7 +78,7 @@ theorem cgNorm_bond_rest_split (hL : 1 < L) (σ : Fin L → Fin 3) :
   ring
 
 /-- The total multidegree splits as (rest) + (two bond sites), using `x ≠ ringSucc x`. -/
-theorem md_bond_rest_split (hL : 1 < L) (σ : Fin L → Fin 3) :
+theorem md_bond_rest_split {N : ℕ} (hL : 1 < L) (σ : Fin L → Fin (N + 1)) :
     md σ = (∑ y ∈ (Finset.univ.erase x).erase (ringSucc x), mdSite y (σ y))
       + mdSite x (σ x) + mdSite (ringSucc x) (σ (ringSucc x)) := by
   have hxy : x ≠ ringSucc x := ne_ringSucc hL x
@@ -93,7 +90,7 @@ theorem md_bond_rest_split (hL : 1 < L) (σ : Fin L → Fin 3) :
 /-- The rest (off-bond) Weyl monomial of a chain state `σ` at the bond `{x, ringSucc x}`: the
 single monomial carrying the product of the off-bond site multidegrees and Clebsch–Gordan weights.
 It is the factor of `weylMono σ` that survives after stripping the two bond sites. -/
-noncomputable def restMono (σ : Fin L → Fin 3) : MvPolynomial (Fin L × Fin 2) ℂ :=
+noncomputable def restMono {N : ℕ} (σ : Fin L → Fin (N + 1)) : MvPolynomial (Fin L × Fin 2) ℂ :=
   monomial (∑ y ∈ (Finset.univ.erase x).erase (ringSucc x), mdSite y (σ y))
     (∏ y ∈ (Finset.univ.erase x).erase (ringSucc x), cgSite (σ y))
 
@@ -101,7 +98,7 @@ noncomputable def restMono (σ : Fin L → Fin 3) : MvPolynomial (Fin L × Fin 2
 (weylMono₂ (bond slice of σ))`, where `restMono σ` is the Weyl monomial of the sites off the bond.
 This composes `md_bond_rest_split`, `cgNorm_bond_rest_split`, `rename_monomial`, and the `mdSite`
 mapDomain pushes — the algebraic heart of the general-`L` split identity, per state. -/
-theorem weylMono_bond_rest_split (hL : 1 < L) (σ : Fin L → Fin 3) :
+theorem weylMono_bond_rest_split {N : ℕ} (hL : 1 < L) (σ : Fin L → Fin (N + 1)) :
     weylMono σ
       = restMono x σ * rename (bondEmb x) (weylMono (L := 2) ![σ x, σ (ringSucc x)]) := by
   rw [restMono, weylMono, weylMono, rename_monomial, monomial_mul,
@@ -117,7 +114,8 @@ theorem weylMono_bond_rest_split (hL : 1 < L) (σ : Fin L → Fin 3) :
 overwrites the bond sites with `a` and keeps the rest as `r`, the rest factor depends only on `r`
 and the bond factor only on `a`, giving `weylMono (glueBond x a r) = restMono r · rename bondEmb
 (weylMono₂ a)`. -/
-theorem weylMono_glueBond_split (hL : 1 < L) (a : Fin 2 → Fin 3) (r : Fin L → Fin 3) :
+theorem weylMono_glueBond_split {N : ℕ} (hL : 1 < L) (a : Fin 2 → Fin (N + 1))
+    (r : Fin L → Fin (N + 1)) :
     weylMono (glueBond x a r)
       = restMono x r * rename (bondEmb x) (weylMono (L := 2) a) := by
   have hxne : x ≠ ringSucc x := ne_ringSucc hL x
@@ -136,7 +134,7 @@ theorem weylMono_glueBond_split (hL : 1 < L) (a : Fin 2 → Fin 3) (r : Fin L �
         = ∏ y ∈ (Finset.univ.erase x).erase (ringSucc x), cgSite (r y) :=
       Finset.prod_congr rfl (fun y hy => by rw [hgr y hy])
     rw [restMono, restMono, he, hc]
-  have hbond : (![glueBond x a r x, glueBond x a r (ringSucc x)] : Fin 2 → Fin 3) = a := by
+  have hbond : (![glueBond x a r x, glueBond x a r (ringSucc x)] : Fin 2 → Fin (N + 1)) = a := by
     have h0 : glueBond x a r x = a 0 := by simp [glueBond, glueTwoSitesS]
     have h1 : glueBond x a r (ringSucc x) = a 1 := by
       simp [glueBond, glueTwoSitesS, Ne.symm hxne]
@@ -149,30 +147,32 @@ of the *local* Weyl image of the two-site bond slice `bondSlice x Φ r`.  Proof:
 `weylMap₂` as a sum over bond configurations, use the per-state factorization
 `weylMono_glueBond_split`, then reindex the resulting double sum over
 `(rest config, bond config) ↦ glueBond x a r` by an explicit bijection (`Finset.sum_bij'`). -/
-theorem weylMap_eq_bondSlice_sum (hL : 1 < L) (Φ : (Fin L → Fin 3) → ℂ) :
-    ∃ (restWeight : (Fin L → Fin 3) → MvPolynomial (Fin L × Fin 2) ℂ),
-      weylMap Φ = ∑ r : Fin L → Fin 3,
+theorem weylMap_eq_bondSlice_sum {N : ℕ} (hL : 1 < L) (Φ : (Fin L → Fin (N + 1)) → ℂ) :
+    ∃ (restWeight : (Fin L → Fin (N + 1)) → MvPolynomial (Fin L × Fin 2) ℂ),
+      weylMap Φ = ∑ r : Fin L → Fin (N + 1),
         restWeight r * rename (bondEmb x) (weylMap (L := 2) (bondSlice x Φ r)) := by
   classical
   refine ⟨fun r => if r x = 0 ∧ r (ringSucc x) = 0 then restMono x r else 0, ?_⟩
   have hxne : x ≠ ringSucc x := ne_ringSucc hL x
-  have gb_x : ∀ (a : Fin 2 → Fin 3) (r : Fin L → Fin 3), glueBond x a r x = a 0 :=
+  have gb_x : ∀ (a : Fin 2 → Fin (N + 1)) (r : Fin L → Fin (N + 1)),
+      glueBond x a r x = a 0 :=
     fun a r => by simp [glueBond, glueTwoSitesS]
-  have gb_rs : ∀ (a : Fin 2 → Fin 3) (r : Fin L → Fin 3), glueBond x a r (ringSucc x) = a 1 :=
+  have gb_rs : ∀ (a : Fin 2 → Fin (N + 1)) (r : Fin L → Fin (N + 1)),
+      glueBond x a r (ringSucc x) = a 1 :=
     fun a r => by simp [glueBond, glueTwoSitesS, Ne.symm hxne]
-  have gb_rest : ∀ (a : Fin 2 → Fin 3) (r : Fin L → Fin 3) (k : Fin L),
+  have gb_rest : ∀ (a : Fin 2 → Fin (N + 1)) (r : Fin L → Fin (N + 1)) (k : Fin L),
       k ≠ x → k ≠ ringSucc x → glueBond x a r k = r k :=
     fun a r k hkx hkr => by simp [glueBond, glueTwoSitesS, hkx, hkr]
   -- Rewrite each summand: expand the inner Weyl map and factor through `weylMono_glueBond_split`.
-  have step1 : ∀ r : Fin L → Fin 3,
+  have step1 : ∀ r : Fin L → Fin (N + 1),
       (if r x = 0 ∧ r (ringSucc x) = 0 then restMono x r else 0)
         * rename (bondEmb x) (weylMap (L := 2) (bondSlice x Φ r))
-      = ∑ a : Fin 2 → Fin 3,
+      = ∑ a : Fin 2 → Fin (N + 1),
           (if r x = 0 ∧ r (ringSucc x) = 0 then
             Φ (glueBond x a r) • weylMono (glueBond x a r) else 0) := by
     intro r
     rw [show weylMap (L := 2) (bondSlice x Φ r)
-          = ∑ a : Fin 2 → Fin 3, bondSlice x Φ r a • weylMono (L := 2) a from by
+          = ∑ a : Fin 2 → Fin (N + 1), bondSlice x Φ r a • weylMono (L := 2) a from by
         simp only [weylMap, Fintype.linearCombination_apply],
       map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl (fun a _ => ?_)
@@ -182,14 +182,14 @@ theorem weylMap_eq_bondSlice_sum (hL : 1 < L) (Φ : (Fin L → Fin 3) → ℂ) :
       rfl
     · rw [if_neg hr, if_neg hr, zero_mul]
   -- Pull the (bond-independent) `ite` out of the bond sum.
-  have hpull : (∑ r : Fin L → Fin 3, ∑ a : Fin 2 → Fin 3,
+  have hpull : (∑ r : Fin L → Fin (N + 1), ∑ a : Fin 2 → Fin (N + 1),
         (if r x = 0 ∧ r (ringSucc x) = 0 then
           Φ (glueBond x a r) • weylMono (glueBond x a r) else 0))
-      = ∑ r : Fin L → Fin 3, if r x = 0 ∧ r (ringSucc x) = 0 then
-          (∑ a : Fin 2 → Fin 3, Φ (glueBond x a r) • weylMono (glueBond x a r)) else 0 := by
+      = ∑ r : Fin L → Fin (N + 1), if r x = 0 ∧ r (ringSucc x) = 0 then
+          (∑ a : Fin 2 → Fin (N + 1), Φ (glueBond x a r) • weylMono (glueBond x a r)) else 0 := by
     refine Finset.sum_congr rfl (fun r _ => ?_)
     split_ifs <;> simp
-  rw [show weylMap Φ = ∑ σ : Fin L → Fin 3, Φ σ • weylMono σ from by
+  rw [show weylMap Φ = ∑ σ : Fin L → Fin (N + 1), Φ σ • weylMono σ from by
       simp only [weylMap, Fintype.linearCombination_apply]]
   rw [Finset.sum_congr rfl (fun r (_ : r ∈ Finset.univ) => step1 r), hpull,
     ← Finset.sum_filter, ← Finset.sum_product']
@@ -197,7 +197,7 @@ theorem weylMap_eq_bondSlice_sum (hL : 1 < L) (Φ : (Fin L → Fin 3) → ℂ) :
   symm
   refine Finset.sum_bij'
     (fun p _ => glueBond x p.2 p.1)
-    (fun σ _ => ((fun k => if k = x then (0 : Fin 3) else if k = ringSucc x then 0 else σ k),
+    (fun σ _ => ((fun k => if k = x then (0 : Fin (N + 1)) else if k = ringSucc x then 0 else σ k),
         ![σ x, σ (ringSucc x)]))
     (fun p _ => Finset.mem_univ _)
     (fun σ _ => ?_)
@@ -230,20 +230,38 @@ theorem weylMap_eq_bondSlice_sum (hL : 1 < L) (Φ : (Fin L → Fin 3) → ℂ) :
       · subst hkr; rw [gb_rs]; simp
       · rw [gb_rest _ _ k hkx hkr]; simp [hkx, hkr]
 
+/-- **Local-to-global prime-power bridge.**  If the local bond factor `f₂` divides the local Weyl
+image of *every* two-site bond slice of `Φ` to the power `S`, then the global bond factor `f_x`
+divides `weylMap Φ` to the same power `S`.  Stated for a general spin `S̄ = N/2` on the sites: the
+exponent `S` and the site-state index `N` are independent, the former coming from the order of
+vanishing of the local kernel, the latter from the site spin.
+
+Proof: `weylMap_eq_bondSlice_sum` writes `weylMap Φ` as a rest-fiber sum of `rename bondEmb`-images
+of local bond-slice Weyl images; `rename` is an algebra hom carrying `f₂ ^ S` to `f_x ^ S`
+(`rename_bondEmb_f2`, `map_pow`), so `f_x ^ S` divides each summand and hence the sum
+(`Finset.dvd_sum`). -/
+theorem fBond_pow_dvd_weylMap_of_local {N : ℕ} (hL : 1 < L) (S : ℕ)
+    (Φ : (Fin L → Fin (N + 1)) → ℂ)
+    (h : ∀ r : Fin L → Fin (N + 1), f2 ^ S ∣ weylMap (L := 2) (bondSlice x Φ r)) :
+    fBond x ^ S ∣ weylMap Φ := by
+  obtain ⟨restWeight, hsum⟩ := weylMap_eq_bondSlice_sum x hL Φ
+  rw [hsum]
+  refine Finset.dvd_sum (fun r _ => Dvd.dvd.mul_left ?_ _)
+  rw [← rename_bondEmb_f2 x, ← map_pow]
+  exact map_dvd _ (h r)
+
 /-- **U3b bridge (Tasaki §7.1.3, `⟹` direction).**  If the chain state `Φ` has the VBS
 singlet-tensor form on the bond `{x, ringSucc x}` (`IsVBSGroundForm`), then the global bond factor
 `f_x` divides its Weyl image `weylMap Φ`.
 
-Proof: `weylMap_eq_bondSlice_sum` writes `weylMap Φ` as a rest-fiber sum of `rename bondEmb`-images
-of local bond-slice Weyl images; each bond slice lies in `vbsBondSubspace` (`IsVBSGroundForm`), so
-`f₂` divides its local Weyl image (U3a `f2_dvd_weylMap_of_mem_vbsBondSubspace`), whence `f_x`
-divides each summand (`fBond_dvd_rename`) and the whole sum (`Finset.dvd_sum`). -/
+It is the `S = 1` case of `fBond_pow_dvd_weylMap_of_local`, whose local hypothesis is discharged by
+U3a (`f2_dvd_weylMap_of_mem_vbsBondSubspace`): each bond slice lies in `vbsBondSubspace`, so `f₂`
+divides its local Weyl image. -/
 theorem fBond_dvd_weylMap_of_isVBSGroundForm
     (hL : 1 < L) (Φ : (Fin L → Fin 3) → ℂ) (hΦ : IsVBSGroundForm L x Φ) :
     fBond x ∣ weylMap Φ := by
-  obtain ⟨restWeight, hsum⟩ := weylMap_eq_bondSlice_sum x hL Φ
-  rw [hsum]
-  refine Finset.dvd_sum (fun r _ => Dvd.dvd.mul_left ?_ _)
-  exact fBond_dvd_rename x _ (f2_dvd_weylMap_of_mem_vbsBondSubspace _ (hΦ r))
+  rw [← pow_one (fBond x)]
+  exact fBond_pow_dvd_weylMap_of_local x hL 1 Φ
+    (fun r => by rw [pow_one]; exact f2_dvd_weylMap_of_mem_vbsBondSubspace _ (hΦ r))
 
 end LatticeSystem.Quantum.AKLTUniqueness

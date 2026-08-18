@@ -14,6 +14,11 @@ together with its **multiplicativity** `onEmbS ι A * onEmbS ι B = onEmbS ι (A
 of a chain, because `bondSpin2ProjectionS` is a *polynomial* `½ D + ⅙ D² + ⅓` in the bond
 Heisenberg operator and the squaring has to be performed after the embedding.
 
+The other algebraic transports along `onEmbS` (`add`, `smul`, `neg`, and the ordered `List.prod`)
+live here as well, next to the multiplicativity they are proved from: a bond operator written as an
+ordered product of affine expressions in a local operator then reduces to the block embedding of a
+single local matrix, for any spin and any site set.
+
 The `τ`-sum in the product is over the whole configuration type `Λ → Fin (N + 1)`; it is collapsed
 onto the `m`-site fibre by `Finset.sum_subset` (the off-fibre terms vanish) followed by
 `Finset.sum_nbij'` with the mutually inverse maps `τ ↦ τ ∘ ι` and `a ↦ Function.extend ι a σ`.
@@ -156,6 +161,28 @@ theorem onEmbS_mul {ι : Fin m → Λ} (hι : Function.Injective ι)
       rw [if_neg h2, mul_zero]
     · simp only [onEmbS_apply]
       rw [if_neg h1, zero_mul]
+
+/-- The block embedding transports matrix negation.  Together with `onEmbS_add` and `onEmbS_smul`
+this lets an affine expression in a local operator be pushed through the embedding one summand at
+a time. -/
+theorem onEmbS_neg (ι : Fin m → Λ)
+    (A : Matrix (Fin m → Fin (N + 1)) (Fin m → Fin (N + 1)) ℂ) :
+    (onEmbS ι (-A) : ManyBodyOpS Λ N) = -onEmbS ι A := by
+  simpa only [neg_one_smul] using onEmbS_smul ι (-1 : ℂ) A
+
+/-- **The block embedding transports an ordered finite matrix product.**  Injectivity of the site
+list enters through `onEmbS_mul` at every cons step; the base case is `onEmbS_one`.  This is what
+reduces a bond operator defined as a `List.ofFn … |>.prod` of local factors — the only available
+shape, since the many-body matrix ring is noncommutative — to the block embedding of the
+corresponding local product. -/
+theorem onEmbS_list_prod (ι : Fin m → Λ) (hι : Function.Injective ι)
+    (l : List (Matrix (Fin m → Fin (N + 1)) (Fin m → Fin (N + 1)) ℂ)) :
+    (onEmbS ι l.prod : ManyBodyOpS Λ N) = (l.map fun A => onEmbS ι A).prod := by
+  induction l with
+  | nil =>
+      simpa only [List.prod_nil, List.map_nil] using (onEmbS_one (N := N) ι)
+  | cons A l ih =>
+      rw [List.prod_cons, ← onEmbS_mul hι, ih, List.map_cons, List.prod_cons]
 
 /-! ## The two-site block: bonds -/
 

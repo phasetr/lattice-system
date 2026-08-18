@@ -103,24 +103,25 @@ noncomputable def vbsBondSubspace : Submodule ℂ ((Fin 2 → Fin 3) → ℂ) :=
   Submodule.span ℂ (Set.range fun p : Fin 2 × Fin 2 => vbsBondVec p.1 p.2)
 
 /-- **Glue a bond configuration into a rest configuration.**  `glueBond x a τ` places the two-site
-bond values `a : Fin 2 → Fin 3` on the sites `{x, x+1}` (`a 0` on the left endpoint `x`, `a 1` on
-the right endpoint `ringSucc x`) and keeps the rest-of-chain configuration `τ` elsewhere.  This
+bond values `a : Fin 2 → Fin (N+1)` on the sites `{x, x+1}` (`a 0` on the left endpoint `x`, `a 1`
+on the right endpoint `ringSucc x`) and keeps the rest-of-chain configuration `τ` elsewhere.  This
 realizes the change of variables `≅ (bond 2 sites) × (rest)` used to reduce the global bond operator
-to the local `9 × 9` problem (Tasaki eqs. (7.1.20)–(7.1.21), p. 186).
+to the local `(N+1)² × (N+1)²` problem (Tasaki eqs. (7.1.20)–(7.1.21), p. 186, at `N = 2`).
 
 It is the specialization of the general two-site gluing `glueTwoSitesS` to the periodic ring bond
-`{x, ringSucc x}` of the `S = 1` chain. -/
-def glueBond (x : Fin L) (a : Fin 2 → Fin 3) (τ : Fin L → Fin 3) : Fin L → Fin 3 :=
+`{x, ringSucc x}` of a spin-`S` chain (`N = 2S`). -/
+def glueBond {N : ℕ} (x : Fin L) (a : Fin 2 → Fin (N + 1)) (τ : Fin L → Fin (N + 1)) :
+    Fin L → Fin (N + 1) :=
   glueTwoSitesS x (ringSucc x) a τ
 
 /-- The **two-site bond slice** of a chain state `Φ` at the bond `{x, x+1}` for a fixed
 rest-of-chain configuration `τ`: the vector `a ↦ Φ (glueBond x a τ)` obtained by freezing
-every site outside the bond to `τ` (Tasaki eqs. (7.1.20)–(7.1.21), p. 186).
+every site outside the bond to `τ` (Tasaki eqs. (7.1.20)–(7.1.21), p. 186, at `N = 2`).
 
 It is the specialization of the general two-site slice `twoSiteSliceS` to the periodic ring bond
-`{x, ringSucc x}` of the `S = 1` chain. -/
-def bondSlice (x : Fin L) (Φ : (Fin L → Fin 3) → ℂ) (τ : Fin L → Fin 3) :
-    (Fin 2 → Fin 3) → ℂ :=
+`{x, ringSucc x}` of a spin-`S` chain (`N = 2S`). -/
+def bondSlice {N : ℕ} (x : Fin L) (Φ : (Fin L → Fin (N + 1)) → ℂ) (τ : Fin L → Fin (N + 1)) :
+    (Fin 2 → Fin (N + 1)) → ℂ :=
   twoSiteSliceS x (ringSucc x) Φ τ
 
 /-- **The VBS singlet-form predicate** `IsVBSGroundForm L x Φ` (Tasaki eqs. (7.1.19)–(7.1.20),
