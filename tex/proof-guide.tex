@@ -12358,6 +12358,66 @@ length-$L_0$ trace coefficient.  This example shows that equality at
 a single fixed length cannot replace all-length equality.
 
 \medskip
+\noindent\textbf{§7.2.3 The open AKLT chain and its four ground states}
+(Problems 7.2.3.a--b; Tasaki, 1st ed. (2020), §7.2.3, eqs.~(7.2.45)--(7.2.48), pp.~205--207,
+problems p.~207, solution~(S.77) p.~508;
+\texttt{Quantum/SpinS/AKLTOpenChain.lean},
+\texttt{Quantum/SpinS/AKLTOpenChainWeylFactorization.lean},
+\texttt{Quantum/SpinS/AKLTOpenChainCompleteness.lean}; PRs \#5288, \#5289;
+\emph{proved}, axiom-free/\texttt{std3}).
+The open-boundary chain drops the wrap bond of the ring Hamiltonian: $\hat H_{\mathrm{AKLT}}^{\mathrm{open}}$
+(\texttt{openAKLTHamiltonianS}) sums eq.~(7.2.46) over the $L-1$ bonds $\{x,x+1\}$,
+$x=1,\dots,L-1$ (\texttt{openBonds}), never over all $L$ sites, with ground energy
+$-\frac23(L-1)$ rather than the periodic $-\frac23 L$.  The four candidate ground states
+$\Phi_{pq}=\texttt{openVBSState}\,L\,p\,q$, $p,q\in\{0,1\}$, are the boundary matrix entries
+$(A^{\sigma_1}\cdots A^{\sigma_L})_{pq}$ of the same AKLT tensor whose \emph{trace} is the periodic
+VBS state (\texttt{akltVBSState\_eq\_sum\_diag\_openVBSState}).  They are linearly independent but
+not orthogonal, giving the lower bound $4\leq\dim(\text{ground space})$ --- Problem~7.2.3.a.
+
+\smallskip
+\noindent\emph{Completeness (Problem 7.2.3.b, eq.~(S.77)).}
+The proof reuses the spectral bridge and Weyl-map machinery of §7.1.3 on \texttt{openBonds}: any
+ground state $\Psi$ is annihilated by every open bond projector (\texttt{frustration\_free\_local\_eigen},
+Lemma~7.4), hence \texttt{fBond\_dvd\_weylMap\_of\_isVBSGroundForm} gives $f_x\mid\texttt{weylMap}\,\Psi$
+at every $x\in\texttt{openBonds}\,L$; distinct open bonds are pairwise coprime for every $L\geq2$
+(\texttt{fBond\_isRelPrime\_openBonds}, via a bond-separating witness that, unlike the cyclic
+\texttt{fBond\_isRelPrime}, needs no lower bound on $L$), so
+$q:=\prod_{x\in\texttt{openBonds}\,L}f_x$ divides $\texttt{weylMap}\,\Psi$.  Here the ring proof's
+argument breaks: $\deg q = 2(L-1) < 2L = \deg(\texttt{weylMap}\,\Psi)$, so the cofactor $r$ with
+$\texttt{weylMap}\,\Psi = q\cdot r$ is \emph{not} a constant, and the total-degree grading alone
+only pins $\deg r = 2$ --- not enough to bound the dimension by $4$.  The \emph{per-site} weighted
+grading \texttt{siteWeight} (one weight variable per physical site) does the job:
+\texttt{weylMap\_isWeightedHomogeneous} and \texttt{bondFactor\_isWeightedHomogeneous} show that
+$\texttt{weylMap}\,\Psi$ has per-site degree exactly $2$ everywhere while $q$ has per-site degree
+$2$ at every interior site and $1$ at each of the two ends; the weighted-homogeneous cofactor lemma
+(\texttt{isWeightedHomogeneous\_cofactor\_weight}, using $q\neq0$ from primality of the bond
+factors) then forces $r$ to have per-site degree $1$ at site $1$, $1$ at site $L$, and $0$
+everywhere else --- exactly the four monomials $X_{1,a}X_{L,b}$.  This gives
+\texttt{weylMap\_openGroundForm\_eq\_boundary\_smul\_prod}:
+\[
+ \texttt{weylMap}\,\Psi
+ =\Bigl(\sum_{a,b\in\{0,1\}} c_{ab}\,X_{(1,a)}X_{(L,b)}\Bigr)\cdot
+ \prod_{x=1}^{L-1} f_x,
+\]
+the formal rendering of eq.~(S.77).  Injectivity of \texttt{weylMap} then bounds the image of the
+ground space by the span of the four polynomials $X_{(1,a)}X_{(L,b)}\cdot q$
+(\texttt{finrank\_openAKLTGroundSpace\_le\_four}); combined with the lower bound this gives the
+capstone $\dim(\text{ground space})=4$ (\texttt{finrank\_openAKLTGroundSpace\_eq\_four}) and the
+literal book claim that the ground space is exactly the span of the four boundary states
+(\texttt{openAKLTGroundSpace\_eq\_span\_openVBSState}) --- the free $S=1/2$ edge spins of the open
+chain.  The whole argument is finite-dimensional linear algebra plus multivariate-polynomial UFD
+factorization; axiom-free, no operator algebra.
+
+\smallskip
+\noindent\emph{Correction to the printed statement.}
+The printed upper limit of the product in (S.77) is $L$; the correct limit is $L-1$.  Three
+independent reasons confirm this (checked on the rendered page image, not on a text extraction):
+the solution's own preceding sentence states that (7.1.24) holds for $x=1,\dots,L-1$; the variables
+$u_{L+1},v_{L+1}$ do not exist on an open chain of $L$ sites; and the degree count above gives
+$2+2(L-1)=2L=\deg(\texttt{weylMap}\,\Psi)$, whereas $L$ bond factors would give $2L+2$.  The formal
+statement above uses the corrected limit $L-1$ throughout.
+
+\medskip
 \noindent\textbf{§7.3.2 AKLT model on a general graph} (Theorem 7.7; Tasaki §7.3.2,
 eqs.~(7.3.6)--(7.3.9), pp.~210--212; \texttt{Quantum/SpinS/GeneralAKLT.lean}, Issue \#4485).  The VBS
 construction extends to any graph $(\Lambda,B)$, giving the graph-centric generalized AKLT
