@@ -36,15 +36,12 @@ theorem akltTwoSiteTensor_eq (a : Fin 2 → Fin 3) :
     akltVBSMatrices (a 0) * akltVBSMatrices (a 1) =
       !![(1 / 4 : ℂ) * vbsBondVec 1 0 a, ((Real.sqrt 2 : ℂ))⁻¹ * vbsBondVec 1 1 a;
         -((Real.sqrt 2 : ℂ))⁻¹ * vbsBondVec 0 0 a, (-1 / 4 : ℂ) * vbsBondVec 0 1 a] := by
-  have hs : ((Real.sqrt 2 : ℂ))⁻¹ * ((Real.sqrt 2 : ℂ))⁻¹ = (1 / 2 : ℂ) := by
-    rw [← mul_inv, ← Complex.ofReal_mul, Real.mul_self_sqrt (by norm_num : (0 : ℝ) ≤ 2)]
-    norm_num
   simp only [vbsBondVec, akltVBSMatrices]
   obtain ⟨u, hu⟩ : ∃ u, a 0 = u := ⟨_, rfl⟩
   obtain ⟨v, hv⟩ : ∃ v, a 1 = v := ⟨_, rfl⟩
   rw [hu, hv]
   fin_cases u <;> fin_cases v <;> ext i j <;> fin_cases i <;> fin_cases j <;>
-    simp +decide [Matrix.mul_apply, Fin.sum_univ_two, hs] <;>
+    simp +decide [Matrix.mul_apply, Fin.sum_univ_two, sqrt2_inv_mul_sqrt2_inv] <;>
     ring
 
 /-- **Every linear functional of the two-site AKLT tensor lies in the VBS bond subspace `W`.**

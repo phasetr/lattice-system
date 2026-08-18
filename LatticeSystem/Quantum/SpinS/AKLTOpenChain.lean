@@ -323,19 +323,13 @@ private theorem openVBSState_openLIConfig {m : ℕ} (b₀ b₁ : Fin 3) (p q : F
   simp only [orderedProd, orderedProd_replicate_one]
   rw [Matrix.mul_assoc]
 
-/-- `(√2)⁻¹ (√2)⁻¹ = ½`, the only irrational input of the four evaluations. -/
-private theorem sqrtTwo_inv_mul_self :
-    ((Real.sqrt 2 : ℂ))⁻¹ * ((Real.sqrt 2 : ℂ))⁻¹ = (1 / 2 : ℂ) := by
-  rw [← mul_inv, ← Complex.ofReal_mul, Real.mul_self_sqrt (by norm_num : (0 : ℝ) ≤ 2)]
-  norm_num
-
 /-- Evaluation at `(|−⟩, |+⟩, |0⟩, …)`: only the `(0,0)` boundary component survives. -/
 private theorem openVBSState_config_two_zero {m : ℕ} (p q : Fin 2) :
     openVBSState (m + 2) p q (openLIConfig 2 0)
       = if p = 0 ∧ q = 0 then -((1 / 2 : ℂ) ^ (m + 1)) else 0 := by
   rw [openVBSState_openLIConfig]
   fin_cases p <;> fin_cases q <;>
-    simp [akltVBSMatrices, Matrix.mul_apply, Matrix.diagonal, sqrtTwo_inv_mul_self, pow_succ]
+    simp [akltVBSMatrices, Matrix.mul_apply, Matrix.diagonal, sqrt2_inv_mul_sqrt2_inv, pow_succ]
   ring
 
 /-- Evaluation at `(|−⟩, |0⟩, |0⟩, …)`: only the `(0,1)` boundary component survives. -/
