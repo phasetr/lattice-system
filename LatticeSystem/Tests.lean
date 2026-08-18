@@ -95,6 +95,8 @@ import LatticeSystem.Tests.TimeReversalSpinHalf
 import LatticeSystem.Tests.TimeReversalMulti
 import LatticeSystem.Tests.CartesianAxis
 import LatticeSystem.Tests.SpinHalfSpecializationMultiSite
+import LatticeSystem.Tests.GradedPolynomialLayerNegativeControl
+import LatticeSystem.Tests.GradedPolynomialLayer
 
 /-!
 # Test aggregator for the `lattice-system` library
