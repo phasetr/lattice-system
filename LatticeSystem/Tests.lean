@@ -104,6 +104,7 @@ import LatticeSystem.Tests.AKLTOpenChainProblem723b
 import LatticeSystem.Tests.ConfigPermMatrixS
 import LatticeSystem.Tests.VBSInversionParitySpinOne
 import LatticeSystem.Tests.GeneralSBondTermSpinOne
+import LatticeSystem.Tests.GeneralSBondSliceConverse
 import LatticeSystem.Tests.GeneralSWeylLadder
 import LatticeSystem.Tests.GeneralSWeylCasimir
 import LatticeSystem.Tests.GeneralSCasimirDescent
