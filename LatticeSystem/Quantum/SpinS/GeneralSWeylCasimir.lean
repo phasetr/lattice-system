@@ -13,9 +13,8 @@ differential operator
   `Ĉ ↦ N(N+1) − f₂ Ω`,  `f₂ = u₀v₁ − v₀u₁`,  `Ω = ∂_{u₀}∂_{v₁} − ∂_{v₀}∂_{u₁}`.
 
 This is the identity that turns the spectral condition "the bond carries total spin `J`", i.e. the
-eigenvalue `J(J+1)` of `Ĉ`, into an *algebraic* condition on the Weyl image, since the commutator
-layer (`bondOmega_bond_mul_of_isWeightedHomogeneous`) records how multiplication by `f₂` shifts
-`Ω`, and hence the Casimir value, with no spectral theory involved.
+eigenvalue `J(J+1)` of `Ĉ`, into an *algebraic* condition on the Weyl image, with no spectral theory
+involved.
 
 Two ingredients meet here, and nothing else is needed:
 
@@ -42,18 +41,6 @@ open MvPolynomial LatticeSystem.Math LatticeSystem.Quantum.AKLTUniqueness
 namespace LatticeSystem.Quantum
 
 variable {L N : ℕ}
-
-/-- Additivity of a per-variable Euler operator `X i ∂_i`: it fuses the two halves of an inner
-per-site Euler identity that sit under an outer Euler operator. -/
-private theorem mul_pderiv_add (i : Fin L × Fin 2) (p q : MvPolynomial (Fin L × Fin 2) ℂ) :
-    X i * pderiv i p + X i * pderiv i q = X i * pderiv i (p + q) := by
-  rw [map_add, mul_add]
-
-/-- Homogeneity of a per-variable Euler operator `X i ∂_i`: it pulls a scalar out, which is what
-lets the inner site's Euler eigenvalue pass through the outer site's operator. -/
-private theorem mul_pderiv_smul (i : Fin L × Fin 2) (r : ℂ) (p : MvPolynomial (Fin L × Fin 2) ℂ) :
-    X i * pderiv i (r • p) = r • (X i * pderiv i p) := by
-  rw [Derivation.map_smul, mul_smul_comm]
 
 /-- **Euler identity on a Weyl image.**  A Weyl image carries degree exactly `N = 2S` in the two
 variables of every site (`weylMap_isWeightedHomogeneous`), so the per-site Euler operator
@@ -116,8 +103,9 @@ theorem weylMap_mulVec_bondCasimirS (N : ℕ) (φ : (Fin 2 → Fin (N + 1)) → 
             + X ((0 : Fin 2), (1 : Fin 2)) * pderiv (0, 1)
               (X ((1 : Fin 2), (1 : Fin 2)) * pderiv (1, 1) (weylMap φ))
         = ((N : ℂ) * N) • weylMap φ := by
-    rw [add_assoc, mul_pderiv_add, mul_pderiv_add, weylMap_site_euler (1 : Fin 2) φ,
-      mul_pderiv_smul, mul_pderiv_smul, ← smul_add, weylMap_site_euler (0 : Fin 2) φ, smul_smul]
+    rw [add_assoc, ← mul_add, ← map_add, ← mul_add, ← map_add,
+      weylMap_site_euler (1 : Fin 2) φ, Derivation.map_smul, mul_smul_comm, Derivation.map_smul,
+      mul_smul_comm, ← smul_add, weylMap_site_euler (0 : Fin 2) φ, smul_smul]
   rw [bondCasimirS, spinSDot_eq_plus_minus]
   simp only [Matrix.add_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec, map_add, map_smul]
   rw [hPM, hMP, hTT, f2, bondFactor_mul_bondOmega_two_site h01]

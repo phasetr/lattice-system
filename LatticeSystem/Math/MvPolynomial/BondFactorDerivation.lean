@@ -15,7 +15,10 @@ commutator of `Ω` with multiplication by `f`: for pairwise distinct `a, b, c, d
   `Ω (f * p) = f * Ω p + 2 • p + ∑_{i ∈ {a, b, c, d}} X i * ∂_i p`.
 
 This is a pure Leibniz computation whose only inputs are `∂_a f = X b`, `∂_b f = X a`,
-`∂_c f = -X d` and `∂_d f = -X c`.  Two consequences are recorded:
+`∂_c f = -X d` and `∂_d f = -X c`.  Two consequences are recorded; together they are the eigenvalue
+shift law that the bond-divisibility step of the uniqueness argument runs on.  Neither enters the
+two-site Casimir intertwiner `LatticeSystem.Quantum.weylMap_mulVec_bondCasimirS`, which consumes
+only `bondFactor_mul_bondOmega_two_site` and `site_euler` below.
 
 * `bondOmega_isWeightedHomogeneous` — `Ω` lowers the `w`-weighted degree by `w a + w b`
   (`= w c + w d`, both branches sharing the same target degree), a double application of
@@ -251,8 +254,8 @@ in which each of the eight factors involves the two variables of a *single* site
 differentiated variable belongs to the other site.
 
 The four composite terms are exactly the Weyl transports of `Ŝ^{(3)}`- and `Ŝ^±`-type two-site
-products, which is how the identity converts the spin dot product into `f_{xy} Ω` plus the Euler
-part `¼(a_x + b_x)(a_y + b_y)`. -/
+products, which is how the identity converts the spin dot product `Ŝ_x·Ŝ_y` into the Euler part
+`¼(a_x + b_x)(a_y + b_y)` minus one half of `f_{xy} Ω`. -/
 theorem bondFactor_mul_bondOmega_two_site {x y : Fin L} (hxy : x ≠ y)
     (p : MvPolynomial (Fin L × Fin 2) ℂ) :
     bondFactor ((x, 0) : Fin L × Fin 2) (y, 1) (x, 1) (y, 0)
