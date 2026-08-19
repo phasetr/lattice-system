@@ -4,6 +4,7 @@ import LatticeSystem.Math.RealEigenvalueLePF
 import LatticeSystem.Math.EffectiveLimit
 import LatticeSystem.Math.MatrixAnalysis.Decomposition
 import LatticeSystem.Math.WignerTheorem
+import LatticeSystem.Math.ProjectiveRepresentation
 import LatticeSystem.Math.CStarAlgebra.GNS
 import LatticeSystem.Math.MvPolynomial.WeightedHomogeneousLayer
 import LatticeSystem.Math.MvPolynomial.BondFactorDerivation
