@@ -33,8 +33,9 @@ Required production API (all in `LatticeSystem.Math`, generic `σ` unless noted)
   d`, forced by the two branches sharing the same target degree `n'`), for any left-cancellative
   weight monoid `M` (`IsWeightedHomogeneous.pderiv`, applied twice).
 * `bondOmega_bond_mul_of_isWeightedHomogeneous` — the combined "`f2` instance" headline deliverable
-  of PR-3a: for `p` `siteWeight`-homogeneous of bidegree `(m, n)` at the two bond sites `x y`,
-  `Ω(f·p) = f·Ω p + (m+n+2)•p`.
+  of PR-3a: for `p` `siteWeight`-homogeneous of an arbitrary per-site multidegree `D`,
+  `Ω(f·p) = f·Ω p + (D x + D y + 2)•p` at the two bond sites `x y` (the bidegree form
+  `D = single x m + single y n` is the two-line specialisation pinned below).
 
 No production code is written here; every proof term is either the library declaration itself or a
 short derivation from the declarations above using only pre-existing `mathlib` simp lemmas.
@@ -96,15 +97,25 @@ example {σ M : Type*} [AddCancelCommMonoid M] {w : σ → M} {a b c d : σ} {n 
 factor for the pair of distinct sites `x y : Fin L` (`= f2` at `L = 2`, `x = 0`, `y = 1`). -/
 
 /-- **Headline deliverable.**  Combining (K1) with the per-site Euler identity (through
-`siteWeight`-homogeneity of `p` at bidegree `(m, n)` on sites `x, y`): `Ω(f·p) = f·Ω p +
-(m+n+2)•p`. -/
+`siteWeight`-homogeneity of `p` at an arbitrary per-site multidegree `D`): `Ω(f·p) = f·Ω p +
+(D x + D y + 2)•p`; the degrees away from the bond `{x, y}` are unconstrained. -/
+example {L : ℕ} {x y : Fin L} (hxy : x ≠ y) {D : Fin L →₀ ℕ}
+    {p : MvPolynomial (Fin L × Fin 2) ℂ}
+    (hp : p.IsWeightedHomogeneous (siteWeight (L := L)) D) :
+    bondOmega (x, 0) (y, 1) (x, 1) (y, 0) (bondFactor (x, 0) (y, 1) (x, 1) (y, 0) * p)
+      = bondFactor (x, 0) (y, 1) (x, 1) (y, 0) * bondOmega (x, 0) (y, 1) (x, 1) (y, 0) p
+        + ((D x + D y + 2 : ℕ) : ℂ) • p :=
+  bondOmega_bond_mul_of_isWeightedHomogeneous hxy hp
+
+/-- The per-site bidegree `(m, n)` form is the two-line specialisation `D = single x m + single y n`
+of the headline instance, `Ω(f·p) = f·Ω p + (m+n+2)•p`; it needs no separate library declaration. -/
 example {L : ℕ} {x y : Fin L} (hxy : x ≠ y) {m n : ℕ} {p : MvPolynomial (Fin L × Fin 2) ℂ}
     (hp : p.IsWeightedHomogeneous (siteWeight (L := L))
       (Finsupp.single x m + Finsupp.single y n)) :
     bondOmega (x, 0) (y, 1) (x, 1) (y, 0) (bondFactor (x, 0) (y, 1) (x, 1) (y, 0) * p)
       = bondFactor (x, 0) (y, 1) (x, 1) (y, 0) * bondOmega (x, 0) (y, 1) (x, 1) (y, 0) p
-        + ((m + n + 2 : ℕ) : ℂ) • p :=
-  bondOmega_bond_mul_of_isWeightedHomogeneous hxy hp
+        + ((m + n + 2 : ℕ) : ℂ) • p := by
+  simpa [hxy, hxy.symm] using bondOmega_bond_mul_of_isWeightedHomogeneous hxy hp
 
 /-! ## `N = 2` numeric checks (design report §2.1: `Ω(u₀²u₁²) = 0`, `Ω(f₂²) = 6f₂`) -/
 
@@ -137,7 +148,11 @@ example :
       (bondFactor ((0 : Fin 2), (0 : Fin 2)) (1, 1) (0, 1) (1, 0))
       = (2 : MvPolynomial (Fin 2 × Fin 2) ℂ) := by
     apply bondOmega_bondFactor_self <;> decide
-  rw [bondOmega_bond_mul_of_isWeightedHomogeneous hxy hp, hΩf2, mul_two]
+  have hD : ((Finsupp.single (0 : Fin 2) 1 + Finsupp.single (1 : Fin 2) 1 : Fin 2 →₀ ℕ) 0
+      + (Finsupp.single (0 : Fin 2) 1 + Finsupp.single (1 : Fin 2) 1 : Fin 2 →₀ ℕ) 1 + 2 : ℕ)
+      = 4 := by
+    simp
+  rw [bondOmega_bond_mul_of_isWeightedHomogeneous hxy hp, hΩf2, mul_two, hD]
   push_cast
   module
 

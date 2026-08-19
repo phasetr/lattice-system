@@ -24,12 +24,15 @@ This is a pure Leibniz computation whose only inputs are `∂_a f = X b`, `∂_b
   `x ≠ y` of the Weyl variables `Fin L × Fin 2` the bond factor is
   `f_{xy} = u_x v_y - v_x u_y = bondFactor (x,0) (y,1) (x,1) (y,0)`, and the four-term boundary sum
   above splits into the two per-site Euler operators `X (x,0) * ∂_(x,0) + X (x,1) * ∂_(x,1)`.  On a
-  `siteWeight`-homogeneous `p` of per-site bidegree `(m, n)` at `x` and `y` those evaluate to
-  `m • p` and `n • p` (Euler's identity
+  `siteWeight`-homogeneous `p` of arbitrary per-site multidegree `D : Fin L →₀ ℕ` those evaluate to
+  `(D x) • p` and `(D y) • p` (Euler's identity
   `MvPolynomial.IsWeightedHomogeneous.sum_weight_X_mul_pderiv`, applied one site at a time through
   the `ℕ`-valued weight that selects that site's two variables), so that
 
-  `Ω (f_{xy} * p) = f_{xy} * Ω p + (m + n + 2) • p`.
+  `Ω (f_{xy} * p) = f_{xy} * Ω p + (D x + D y + 2) • p`,
+
+  with the degrees off the bond playing no role (so the uniform degree `D = ∑_z single z N` of the
+  Weyl image of a spin-`S` chain state is covered on the same footing as a two-site bidegree).
 
 The `p = 1` instance `Ω f = 2` (`bondOmega_bondFactor_self`) is the normalisation that fixes the
 constant `2`.
@@ -188,20 +191,22 @@ private theorem site_euler {x : Fin L} {D : Fin L →₀ ℕ} {p : MvPolynomial 
 /-- **The two-site bond instance (the headline of the derivation layer).**  For two distinct sites
 `x ≠ y` of the Weyl variables `Fin L × Fin 2`, with bond factor
 `f_{xy} = bondFactor (x,0) (y,1) (x,1) (y,0) = u_x v_y - v_x u_y`, and a `siteWeight`-homogeneous
-`p` of per-site bidegree `(m, n)` at `x` and `y`, the boundary sum of the bond commutator collapses
-site by site through Euler's identity:
+`p` of arbitrary per-site multidegree `D : Fin L →₀ ℕ`, the boundary sum of the bond commutator
+collapses site by site through Euler's identity, leaving only the two bond sites:
 
-  `Ω (f_{xy} * p) = f_{xy} * Ω p + (m + n + 2) • p`.
+  `Ω (f_{xy} * p) = f_{xy} * Ω p + (D x + D y + 2) • p`.
+
+The degrees at the sites other than `x, y` are irrelevant, so no constraint on `D` off the bond is
+imposed; the per-site bidegree `(m, n)` instance is `D = single x m + single y n`.
 
 Under the Weyl representation of the spin-`S` chain this is the statement that multiplying by the
-bond factor shifts the two-site Casimir eigenvalue by exactly `m + n + 2`. -/
-theorem bondOmega_bond_mul_of_isWeightedHomogeneous {x y : Fin L} (hxy : x ≠ y) {m n : ℕ}
+bond factor shifts the two-site Casimir eigenvalue by exactly `D x + D y + 2`. -/
+theorem bondOmega_bond_mul_of_isWeightedHomogeneous {x y : Fin L} (hxy : x ≠ y) {D : Fin L →₀ ℕ}
     {p : MvPolynomial (Fin L × Fin 2) ℂ}
-    (hp : p.IsWeightedHomogeneous (siteWeight (L := L))
-      (Finsupp.single x m + Finsupp.single y n)) :
+    (hp : p.IsWeightedHomogeneous (siteWeight (L := L)) D) :
     bondOmega (x, 0) (y, 1) (x, 1) (y, 0) (bondFactor (x, 0) (y, 1) (x, 1) (y, 0) * p)
       = bondFactor (x, 0) (y, 1) (x, 1) (y, 0) * bondOmega (x, 0) (y, 1) (x, 1) (y, 0) p
-        + ((m + n + 2 : ℕ) : ℂ) • p := by
+        + ((D x + D y + 2 : ℕ) : ℂ) • p := by
   have h01 : (0 : Fin 2) ≠ 1 := by decide
   have hab : ((x, 0) : Fin L × Fin 2) ≠ (y, 1) := fun h => hxy (congrArg Prod.fst h)
   have hac : ((x, 0) : Fin L × Fin 2) ≠ (x, 1) := fun h => h01 (congrArg Prod.snd h)
@@ -209,20 +214,14 @@ theorem bondOmega_bond_mul_of_isWeightedHomogeneous {x y : Fin L} (hxy : x ≠ y
   have hbc : ((y, 1) : Fin L × Fin 2) ≠ (x, 1) := fun h => hxy.symm (congrArg Prod.fst h)
   have hbd : ((y, 1) : Fin L × Fin 2) ≠ (y, 0) := fun h => h01.symm (congrArg Prod.snd h)
   have hcd : ((x, 1) : Fin L × Fin 2) ≠ (y, 0) := fun h => hxy (congrArg Prod.fst h)
-  have hx : (Finsupp.single x m + Finsupp.single y n : Fin L →₀ ℕ) x = m := by
-    simp [hxy.symm]
-  have hy : (Finsupp.single x m + Finsupp.single y n : Fin L →₀ ℕ) y = n := by
-    simp [hxy]
   have hEx := site_euler (x := x) hp
   have hEy := site_euler (x := y) hp
-  rw [hx] at hEx
-  rw [hy] at hEy
   rw [bondOmega_bondFactor_mul hab hac had hbc hbd hcd p]
   have hbdry : X ((x, 0) : Fin L × Fin 2) * pderiv (x, 0) p + X (y, 1) * pderiv (y, 1) p
-      + X (x, 1) * pderiv (x, 1) p + X (y, 0) * pderiv (y, 0) p = m • p + n • p := by
+      + X (x, 1) * pderiv (x, 1) p + X (y, 0) * pderiv (y, 0) p = (D x) • p + (D y) • p := by
     rw [← hEx, ← hEy]
     ring
-  rw [hbdry, ← Nat.cast_smul_eq_nsmul ℂ m p, ← Nat.cast_smul_eq_nsmul ℂ n p]
+  rw [hbdry, ← Nat.cast_smul_eq_nsmul ℂ (D x) p, ← Nat.cast_smul_eq_nsmul ℂ (D y) p]
   push_cast
   module
 
