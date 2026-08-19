@@ -20,8 +20,11 @@ explicit polynomials `X^{boundaryDeg m S ab} · ∏_x f_x^S` are Weyl images
 (`openVBSStateGeneralS`), each is annihilated by every bond term, and they are linearly
 independent, which gives the lower half `(S+1)² ≤ dim` of Tasaki's edge degeneracy
 (`succ_sq_le_finrank_openAKLTGroundSpaceGeneralS`) and, as a by-product, the attainment of the
-ground energy `0` (`isGroundEnergy_openAKLTHamiltonianGeneralS`).  The matching upper bound is not
-proved here.
+ground energy `0` (`isGroundEnergy_openAKLTHamiltonianGeneralS`).  The boundary shape read forwards
+confines the injective Weyl image of the whole ground space to the span of those same `(S+1)²`
+polynomials, giving the matching upper bound and hence the exact degeneracy
+(`finrank_openAKLTGroundSpaceGeneralS_eq_succ_sq`), which at `S = 1` is the four-fold degeneracy of
+Problem 7.2.3.b (`openAKLTGroundSpaceGeneralS_one`).
 
 The Hamiltonian is already normalised to ground energy `0` (unlike the `S = 1` open chain
 `openProjHamiltonianS`, which needs an affine shift), so the frustration-free argument here carries
@@ -214,8 +217,7 @@ theorem openVBSStateGeneralS_linearIndependent (m S : ℕ) :
 /-- **Tasaki §8.3.1, p. 252, the lower half of the `(S+1)²` edge degeneracy.**  The ground space of
 the general-`S` open AKLT chain has complex dimension at least `(S+1)²`: the `(S+1)²` independent
 boundary states `Φ_{ab}` all sit in it, one for each pair of effective spin-`S/2` edge spins.  At
-`S = 1` this is the `4 ≤ dim` bound of Problem 7.2.3.a; the matching upper bound is not proved
-here. -/
+`S = 1` this is the `4 ≤ dim` bound of Problem 7.2.3.a. -/
 theorem succ_sq_le_finrank_openAKLTGroundSpaceGeneralS {m S : ℕ} (hS : S ≠ 0) :
     (S + 1) ^ 2 ≤ Module.finrank ℂ (openAKLTGroundSpaceGeneralS (m + 2) S) := by
   have hle : Submodule.span ℂ
@@ -247,5 +249,69 @@ theorem isGroundEnergy_openAKLTHamiltonianGeneralS {L S : ℕ} (hL : 2 ≤ L) (h
     simp
   · exact realSpectrum_nonneg_of_posSemidef
       (openAKLTHamiltonianGeneralS_posSemidef (by omega) hS) hE
+
+/-! ## The matching upper bound and the exact `(S+1)²` edge degeneracy -/
+
+/-- **Tasaki §8.3.1, p. 252, the upper half of the `(S+1)²` edge degeneracy.**  The ground space of
+the general-`S` open AKLT chain has complex dimension at most `(S+1)²`.
+
+The Weyl map is injective, so the ground space has the same dimension as its image; the boundary
+shape (`weylMap_groundSpaceGeneralS_eq_boundary_mul_prod`) puts that image inside the span of the
+`(S+1)²` polynomials `X^{boundaryDeg m S ab} · ∏_x f_x^S`, and a span of `(S+1)²` vectors has
+dimension at most `(S+1)²`.  The per-site grading is what pins the boundary cofactor to those
+finitely many monomials; the total-degree grading would bound nothing. -/
+theorem finrank_openAKLTGroundSpaceGeneralS_le_succ_sq {m S : ℕ} (hS : S ≠ 0) :
+    Module.finrank ℂ (openAKLTGroundSpaceGeneralS (m + 2) S) ≤ (S + 1) ^ 2 := by
+  classical
+  set F : Fin (S + 1) × Fin (S + 1) → MvPolynomial (Fin (m + 2) × Fin 2) ℂ :=
+    fun ab => monomial (boundaryDeg m S ab) 1 * ∏ x ∈ openBonds (m + 2), fBond x ^ S with hF
+  haveI : FiniteDimensional ℂ (Submodule.span ℂ (Set.range F)) :=
+    FiniteDimensional.span_of_finite ℂ (Set.finite_range _)
+  have hmap : Submodule.map weylMap (openAKLTGroundSpaceGeneralS (m + 2) S)
+      ≤ Submodule.span ℂ (Set.range F) := by
+    rw [Submodule.map_le_iff_le_comap]
+    intro Φ hΦ
+    obtain ⟨c, hc⟩ := weylMap_groundSpaceGeneralS_eq_boundary_mul_prod hS hΦ
+    rw [Submodule.mem_comap, hc, Finset.sum_mul]
+    refine Submodule.sum_mem _ fun ab _ => ?_
+    have hsm : (monomial (boundaryDeg m S ab) (c ab) : MvPolynomial (Fin (m + 2) × Fin 2) ℂ)
+        * ∏ x ∈ openBonds (m + 2), fBond x ^ S = c ab • F ab := by
+      simp only [hF, ← smul_mul_assoc, smul_monomial, smul_eq_mul, mul_one]
+    rw [hsm]
+    exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨ab, rfl⟩)
+  have hcard : Module.finrank ℂ (Submodule.span ℂ (Set.range F)) ≤ (S + 1) ^ 2 := by
+    have h := finrank_range_le_card (R := ℂ) F
+    rw [Set.finrank] at h
+    simpa [Fintype.card_prod, sq] using h
+  rw [LinearEquiv.finrank_eq (Submodule.equivMapOfInjective (weylMap (L := m + 2) (N := 2 * S))
+    weylMap_injective (openAKLTGroundSpaceGeneralS (m + 2) S))]
+  exact le_trans (Submodule.finrank_mono hmap) hcard
+
+/-- **Tasaki §8.3.1 (1st ed., 2020, p. 252), PROVED: the `(S+1)²`-fold edge degeneracy.**  The
+ground space of the spin-`S` open AKLT chain of `m + 2 ≥ 2` sites has complex dimension exactly
+`(S+1)²`: the `(S+1)²` generalized VBS boundary states `Φ_{ab}` are independent ground states and
+there are no others.  Physically the degeneracy is carried by the two free effective spin-`S/2`
+spins dangling at the ends of the open chain.  For even `S` the count `(S+1)²` is odd, so in
+particular not a multiple of four, which is Tasaki's remark that the even-`S` edge degeneracy does
+not fit the Z₂ × Z₂ picture of the Haldane phase. -/
+theorem finrank_openAKLTGroundSpaceGeneralS_eq_succ_sq {m S : ℕ} (hS : S ≠ 0) :
+    Module.finrank ℂ (openAKLTGroundSpaceGeneralS (m + 2) S) = (S + 1) ^ 2 :=
+  le_antisymm (finrank_openAKLTGroundSpaceGeneralS_le_succ_sq hS)
+    (succ_sq_le_finrank_openAKLTGroundSpaceGeneralS hS)
+
+/-- **`S = 1` back-compatibility of the ground space.**  At `S = 1` the general-`S` zero-energy
+space is the ground space of the `S = 1` open AKLT chain of §7.2.3: the two Hamiltonians differ by
+the positive scalar `24` (`openAKLTHamiltonianGeneralS_one`) and the `S = 1` ground space is the
+kernel of the projector Hamiltonian (`openAKLTGroundSpace_eq_ker`), so the two kernels coincide.
+Consequently `finrank_openAKLTGroundSpaceGeneralS_eq_succ_sq` at `S = 1` recovers
+`finrank_openAKLTGroundSpace_eq_four`. -/
+theorem openAKLTGroundSpaceGeneralS_one {L : ℕ} (hL : 1 ≤ L) :
+    openAKLTGroundSpaceGeneralS L 1 = openAKLTGroundSpace L := by
+  rw [openAKLTGroundSpaceGeneralS_eq_ker, openAKLTGroundSpace_eq_ker hL,
+    openAKLTHamiltonianGeneralS_one]
+  ext Φ
+  rw [LinearMap.mem_ker, LinearMap.mem_ker, Matrix.mulVecLin_apply, Matrix.mulVecLin_apply,
+    Matrix.smul_mulVec, smul_eq_zero]
+  simp
 
 end LatticeSystem.Quantum

@@ -12748,8 +12748,7 @@ SPT phase.  \texttt{guWenHamiltonianS} $L\,D\,B=\texttt{anisotropicChainHamilton
 S_x^{(1)}$ (eq.~8.3.4, the $S=1$ chain with a magnetic field $B$ in the 1-direction, breaking
 $\mathbb{Z}_2\times\mathbb{Z}_2$ to a single $\mathbb{Z}_2$; $B=0$ recovers the anisotropic model).
 The axiom \texttt{tasaki\_oshikawa\_8\_3\_3} (eq.~8.3.3) records that the spin-$S$ VBS string order is
-positive for odd $S$ and zero for even $S$, and \texttt{tasaki\_vbs\_edge\_degeneracy} that the
-spin-$S$ AKLT open chain has $(S{+}1)^2$-fold edge degeneracy.  The SPT notions are honest
+positive for odd $S$ and zero for even $S$.  The SPT notions are honest
 \texttt{def}s (never axioms): \texttt{HamiltonianPath} is a genuinely \texttt{Continuous} path of
 Hamiltonians, each short-range gapped-unique (marker \texttt{IsShortRangeGappedUniqueGS});
 \texttt{SymmetryConnected}~$sym$ requires every $\hat H_s$ to satisfy the symmetry predicate $sym$;
@@ -12757,17 +12756,56 @@ Hamiltonians, each short-range gapped-unique (marker \texttt{IsShortRangeGappedU
 (\texttt{IsProductStateHamiltonian}); and \texttt{IsSPTPhase}~$sym\,H$ is short-range gapped-unique,
 $sym$-symmetric, and not trivial.  The Haldane phase is the prototypical SPT phase protected by
 $\mathbb{Z}_2\times\mathbb{Z}_2$ (\texttt{IsZ2Z2Invariant}).  Concrete Hamiltonian + \texttt{def} SPT.
-Of the section's two statement axioms only the Oshikawa string order (eq.~8.3.3) --- together with
-its opaque carrier \texttt{vbsStringOrderParameterS} --- is a documented axiom, as are the two
-classification markers \texttt{IsShortRangeGappedUniqueGS} and \texttt{IsProductStateHamiltonian}
-(all three entries in \path{docs/limitations/documented-axioms.md});
-\texttt{tasaki\_vbs\_edge\_degeneracy} is \emph{not} a documented axiom but a discharge target, and
-discharging it is more than deleting an axiom line: the opaque marker
-\texttt{vbsOpenChainGroundDegeneracyS} must be replaced by a real definition of the open-chain
-ground-state degeneracy and the $(S+1)^2$ formula then proved as a theorem about that definition.
-The mathematics is available --- the book's own §7.1.3 completeness argument, together with
-Problem/Solution 7.2.3.b, extends to general $S$ by degree counting --- so what is missing is the
-open-chain spin-$S$ infrastructure.  Chapters~3--10 backfill.
+The Oshikawa string order (eq.~8.3.3) --- together with its opaque carrier
+\texttt{vbsStringOrderParameterS} --- is a documented axiom, as are the two classification markers
+\texttt{IsShortRangeGappedUniqueGS} and \texttt{IsProductStateHamiltonian} (all three entries in
+\path{docs/limitations/documented-axioms.md}).  The edge degeneracy is no longer an axiom: the
+markers \texttt{vbsOpenChainGroundDegeneracyS} and \texttt{tasaki\_vbs\_edge\_degeneracy} have been
+deleted and the $(S{+}1)^2$ formula is now a theorem, recorded in the next paragraph.
+Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§8.3.1 The general-$S$ open AKLT chain has exactly $(S{+}1)^2$ ground states}
+(Tasaki, 1st ed. (2020), §8.3.1, p.~252;
+\path{Quantum/SpinS/GeneralSOpenChainBondTerm.lean},
+\path{Quantum/SpinS/GeneralSCasimirSpectrum.lean},
+\path{Quantum/SpinS/GeneralSCasimirDescent.lean},
+\path{Quantum/SpinS/GeneralSWeylLadder.lean},
+\path{Quantum/SpinS/GeneralSWeylCasimir.lean},
+\path{Quantum/SpinS/AKLTOpenChainWeylFactorization.lean},
+\path{Quantum/SpinS/GeneralSOpenChainGroundSpace.lean};
+Issue \#5292, PRs \#5293--\#5303; \emph{proved}, axiom-free/\texttt{std3}).
+Tasaki reports the $(S{+}1)^2$-fold edge degeneracy of the spin-$S$ AKLT open chain as the
+even/odd-$S$ counterpart of the four-fold $S=1$ degeneracy; for even $S$ the count is odd, so it
+does not fit the $\mathbb{Z}_2\times\mathbb{Z}_2$ picture.  The bond term is the concrete Casimir
+penalty $\hat h_{xy}=\prod_{j=0}^{S}\bigl(\hat C_{xy}-j(j+1)\bigr)$
+(\texttt{bondCasimirPenaltyS}), positive semidefinite and vanishing exactly on the two-site
+total-spin-$\leq S$ sector (\texttt{casimirPenaltyWeight\_eq\_zero} /
+\texttt{casimirPenaltyWeight\_pos}); \texttt{openAKLTHamiltonianGeneralS} sums it over the $L-1$
+\texttt{openBonds}
+and is already normalized to ground energy $0$, so no affine shift is needed (unlike the $S=1$
+chain).  Frustration-freeness (Lemma~A.9/A.10) makes the zero-energy space
+\texttt{openAKLTGroundSpaceGeneralS} the joint bond kernel, and the general-$N$ Weyl map turns
+annihilation at a bond into divisibility by $f_x^{S}$
+(\texttt{bondCasimirPenaltyS\_mulVec\_eq\_zero\_iff\_fBond\_pow\_dvd}).  Exactly as at $S=1$ the
+per-site weighted grading --- not the total degree --- pins the cofactor: the Weyl image has
+per-site degree $2S$ everywhere, while $\prod_x f_x^{S}$ has per-site degree $2S$ in the bulk and
+$S$ at each end, so the cofactor is a combination of the $(S{+}1)^2$ boundary monomials
+$u_1^{S-a}v_1^{a}u_L^{S-b}v_L^{b}$ (\texttt{boundaryDeg}), one per pair $a,b\in\{0,\dots,S\}$ of
+effective spin-$S/2$ edge spins
+(\texttt{weylMap\_groundSpaceGeneralS\_eq\_boundary\_mul\_prod}).  Read backwards, that shape
+\emph{constructs} $(S{+}1)^2$ independent ground states (\texttt{openVBSStateGeneralS}), giving
+$(S{+}1)^2\leq\dim$; read forwards it confines the injective Weyl image of the whole ground space to
+the span of those same $(S{+}1)^2$ polynomials, giving the matching upper bound.  Hence
+\texttt{finrank\_openAKLTGroundSpaceGeneralS\_eq\_succ\_sq}: $\dim(\text{ground space})=(S+1)^2$.
+At $S=1$ the Hamiltonian is $24$ times the projector Hamiltonian of eq.~(7.2.46), so
+\texttt{openAKLTGroundSpaceGeneralS\_one} identifies the two ground spaces and the capstone
+reproduces Problem~7.2.3.b's $\dim=4$.  This discharges the deleted §8.3.1 markers
+\texttt{vbsOpenChainGroundDegeneracyS} / \texttt{tasaki\_vbs\_edge\_degeneracy}: the degeneracy is
+now the \texttt{Module.finrank} of a concretely defined ground space, parameterized by the chain
+length as well as by $S$, so the marker's opaque $\mathbb{N}\to\mathbb{N}$ name was deliberately
+not preserved.  The whole argument is finite-dimensional linear algebra plus
+multivariate-polynomial UFD factorization; axiom-free, no operator algebra.
 
 \medskip
 \noindent\textbf{§8.3.2--§8.3.3 Protecting symmetries + topological indices for SPT}

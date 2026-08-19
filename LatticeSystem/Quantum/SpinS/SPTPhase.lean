@@ -30,10 +30,10 @@ not a theorem), built on a genuine continuous path of Hamiltonians together with
 markers
 for the deep predicates (short-range, gapped-unique, product-state, symmetry) whose faithful forms
 belong to the infinite-chain / operator-algebra framework.  The Oshikawa parity (eq. (8.3.3)) is a
-documented axiom; the edge degeneracy is a discharge target instead, and discharging it means
-replacing the opaque marker `vbsOpenChainGroundDegeneracyS` by a real definition of the open-chain
-ground-state degeneracy and then proving the `(S+1)²` formula about that definition — not merely
-deleting an `axiom` line.
+documented axiom.  The `(S+1)²` edge degeneracy is **not** an axiom here: it is proved in
+`Quantum/SpinS/GeneralSOpenChainGroundSpace.lean` as
+`finrank_openAKLTGroundSpaceGeneralS_eq_succ_sq`, about the concretely defined ground space of the
+general-`S` open AKLT chain; that module is not imported here, the reference is documentary only.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §8.3.1–§8.3.2, eqs. (8.3.1)–(8.3.4), pp. 251–256; Z.-C. Gu, X.-G. Wen, Phys. Rev. B **80**,
@@ -66,15 +66,6 @@ unbroken for even-`S` ones — a qualitative even/odd-`S` distinction beyond Hal
 half-odd-integer one. -/
 axiom tasaki_oshikawa_8_3_3 (S : ℕ) (α : Fin 3) :
     (Odd S → 0 < vbsStringOrderParameterS S α) ∧ (Even S → vbsStringOrderParameterS S α = 0)
-
-/-- The **ground-state degeneracy of the spin-`S` AKLT model on an open chain**, from the effective
-`S/2` edge spins.  An uninterpreted marker. -/
-axiom vbsOpenChainGroundDegeneracyS : ℕ → ℕ
-
-/-- **Tasaki §8.3.1 (edge-state degeneracy), AXIOM.**  The spin-`S` AKLT model on an open chain has
-`(S+1)²`-fold degenerate ground states (the generalized VBS states), from the two effective `S/2`
-edge spins.  For even `S` this is not a multiple of four, so it does not fit the Z₂ × Z₂ picture. -/
-axiom tasaki_vbs_edge_degeneracy (S : ℕ) : vbsOpenChainGroundDegeneracyS S = (S + 1) ^ 2
 
 /-- **Gapped-unique marker** `IsShortRangeGappedUniqueGS H`: the Hamiltonian `H` is short-ranged and
 has a unique ground state with a nonvanishing energy gap.  Kept as an uninterpreted predicate (its

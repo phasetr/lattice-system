@@ -1,5 +1,4 @@
 import LatticeSystem.Quantum.SpinS.GeneralSOpenChainGroundSpace
-import LatticeSystem.Quantum.SpinS.AKLTOpenChainCompleteness
 
 /-!
 # Tasaki §8.3.1: the exact `(S+1)²` edge degeneracy of the general-`S` open AKLT chain
@@ -9,11 +8,8 @@ the matching upper bound `finrank_openAKLTGroundSpaceGeneralS_le_succ_sq`, the t
 `finrank_openAKLTGroundSpaceGeneralS_eq_succ_sq`, and the `S = 1` identification
 `openAKLTGroundSpaceGeneralS_one` with the `S = 1` open-chain ground space `openAKLTGroundSpace`.
 
-Every declaration these pins reference is production code that does **not exist yet** in this PR
-(TDD Red); each pin is therefore stated as the target type with a `sorry` body rather than a call
-to a not-yet-existing name, so the pin itself already fixes the signature to be implemented while
-`warningAsError`/`mathlibStandardSet` turns the `sorry` into a build error until the real proof
-lands.
+Each signature pin is discharged by the production declaration itself, so a change to any of the
+three statements breaks this file.
 -/
 
 open Matrix MvPolynomial
@@ -25,23 +21,23 @@ namespace LatticeSystem.Tests.GeneralSEdgeDegeneracy
 
 /-- **Signature pin: `(S+1)²` upper-bounds the general-`S` open-chain ground-space dimension.** -/
 example {m S : ℕ} (hS : S ≠ 0) :
-    Module.finrank ℂ (openAKLTGroundSpaceGeneralS (m + 2) S) ≤ (S + 1) ^ 2 := by
-  sorry
+    Module.finrank ℂ (openAKLTGroundSpaceGeneralS (m + 2) S) ≤ (S + 1) ^ 2 :=
+  finrank_openAKLTGroundSpaceGeneralS_le_succ_sq hS
 
 /-! ### 2. Signature pin: the capstone (exact `(S+1)²` edge degeneracy) -/
 
 /-- **Signature pin: the exact `(S+1)²` edge degeneracy** (Tasaki §8.3.1, p. 252). -/
 example {m S : ℕ} (hS : S ≠ 0) :
-    Module.finrank ℂ (openAKLTGroundSpaceGeneralS (m + 2) S) = (S + 1) ^ 2 := by
-  sorry
+    Module.finrank ℂ (openAKLTGroundSpaceGeneralS (m + 2) S) = (S + 1) ^ 2 :=
+  finrank_openAKLTGroundSpaceGeneralS_eq_succ_sq hS
 
 /-! ### 3. Signature pin: the `S = 1` identification -/
 
 /-- **Signature pin: at `S = 1` the general-`S` ground space is the `S = 1` open-chain ground
 space.** -/
 example {L : ℕ} (hL : 1 ≤ L) :
-    openAKLTGroundSpaceGeneralS L 1 = openAKLTGroundSpace L := by
-  sorry
+    openAKLTGroundSpaceGeneralS L 1 = openAKLTGroundSpace L :=
+  openAKLTGroundSpaceGeneralS_one hL
 
 /-! ### 4. `S = 1` cross-check: the capstone reproduces `finrank_openAKLTGroundSpace_eq_four` -/
 
@@ -50,7 +46,10 @@ issue's own cross-check that the general-`S` capstone, specialised at `S = 1` an
 `S = 1` identification, recovers the previously-proved `4`-fold degeneracy of the `S = 1` open
 chain. -/
 example {L : ℕ} (hL : 2 ≤ L) : Module.finrank ℂ (openAKLTGroundSpace L) = 4 := by
-  sorry
+  obtain ⟨m, rfl⟩ : ∃ m, L = m + 2 := ⟨L - 2, by omega⟩
+  rw [← openAKLTGroundSpaceGeneralS_one (by omega),
+    finrank_openAKLTGroundSpaceGeneralS_eq_succ_sq (S := 1) (by norm_num)]
+  norm_num
 
 /-! ### 5. Value pin: `S = 2`, `m = 0` — the nine-fold case Tasaki names on p. 252 -/
 
@@ -58,6 +57,8 @@ example {L : ℕ} (hL : 2 ≤ L) : Module.finrank ℂ (openAKLTGroundSpace L) = 
 ground-space dimension *exactly* `9`, upgrading the `9 ≤` lower-bound pin of
 `Tests/GeneralSEdgeDegeneracyLowerBound.lean`. -/
 example : Module.finrank ℂ (openAKLTGroundSpaceGeneralS 2 2) = 9 := by
-  sorry
+  have h := finrank_openAKLTGroundSpaceGeneralS_eq_succ_sq (m := 0) (S := 2) (by norm_num)
+  norm_num at h
+  exact h
 
 end LatticeSystem.Tests.GeneralSEdgeDegeneracy
