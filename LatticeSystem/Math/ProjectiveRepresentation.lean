@@ -12,9 +12,10 @@ triviality is equivalent to the phase function being a coboundary in the sense o
 
 The unitary/antiunitary dichotomy is carried by a sign character `s : G →* ℤˣ` and encoded on
 matrices by entrywise complex conjugation (eq. (8.3.40)), so no antilinear-operator theory is
-needed: with `v̂(g) = û(g) K̂^{ε(g)}` and `K̂ X = X* K̂`, `K̂² = 1`, eq. (8.3.42) is equivalent
-to the matrix identity `û(g) · C_g[û(h)] = e^{iφ̃(g,h)} û(gh)`.  The same encoding is used for the
-antiunitary case of Wigner's theorem in `LatticeSystem.Math.WignerTheorem`.
+needed: with the book's case distinction `v̂(g) = û(g)` for `ε(g) = 1` and `v̂(g) = û(g) K̂` for
+`ε(g) = -1`, where `K̂ X = X* K̂` and `K̂² = 1`, eq. (8.3.42) is equivalent to the matrix identity
+`û(g) · C_g[û(h)] = e^{iφ̃(g,h)} û(gh)`.  The same encoding is used for the antiunitary case of
+Wigner's theorem in `LatticeSystem.Math.WignerTheorem`.
 
 Phases live in mathlib's `Circle` rather than in `ℝ`: `Circle.exp : ℝ → Circle` is surjective, so
 `∃ ψ : G → Circle` is equivalent to the book's `∃ ψ̃ : G → ℝ`, while the book's "mod 2π" becomes
@@ -56,7 +57,7 @@ lemma signConj_circle (ε : ℤˣ) (z : Circle) :
 
 /-- `signConjMatrix` is homogeneous for the twisted scalar action: pulling a scalar out of an
 entrywise conjugation conjugates the scalar. -/
-private lemma signConjMatrix_smul (ε : ℤˣ) (z : ℂ) (X : Matrix D D ℂ) :
+lemma signConjMatrix_smul (ε : ℤˣ) (z : ℂ) (X : Matrix D D ℂ) :
     signConjMatrix ε (z • X) = signConj ε z • signConjMatrix ε X := by
   ext i j
   simp [signConjMatrix, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.smul_apply, map_mul]
@@ -94,7 +95,7 @@ private lemma smul_left_cancel_of_unitary [Nonempty D] {A : Matrix D D ℂ}
   simpa using congrFun (congrFun h' i) i
 
 /-- Scaling a unitary by a phase keeps it unitary. -/
-private lemma circle_smul_mem_unitaryGroup (z : Circle) {A : Matrix D D ℂ}
+lemma circle_smul_mem_unitaryGroup (z : Circle) {A : Matrix D D ℂ}
     (hA : A ∈ Matrix.unitaryGroup D ℂ) : (z : ℂ) • A ∈ Matrix.unitaryGroup D ℂ := by
   have hz : (z : ℂ) * star (z : ℂ) = 1 := by
     rw [← starRingEnd_apply, ← Circle.coe_inv_eq_conj, ← Circle.coe_mul, mul_inv_cancel,
