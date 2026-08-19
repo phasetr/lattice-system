@@ -29,9 +29,9 @@ Five groups, mirroring the general-`N` Weyl-map gate `WeylMapGeneralN.lean`:
 4. **Non-degeneracy control** — the same `J = 2` weight differs between `S = 1` (nonzero, `24`) and
    `S = 2` (zero), so a weight definition that silently ignores `S` fails here.
 5. **Divisibility capstone: shape and `S = 1` oracle** — `prod_fBond_pow_dvd_weylMap_of_annihilated`
-   applied at its stated general signature (PR-3c: `hloc` is discharged in-line by
-   `f2_pow_dvd_weylMap_of_localCasimirPenalty` and no longer appears as a hypothesis of the
-   capstone), then cross-checked at `S = 1` two independent ways — the new general-`S` theorem and
+   applied at its stated general signature (the local kernel is discharged in-line by
+   `f2_pow_dvd_weylMap_of_localCasimirPenalty`, so it is not a hypothesis of the capstone), then
+   cross-checked at `S = 1` two independent ways — the new general-`S` theorem and
    the pre-existing spin-one bespoke route (`bondCasimirPenaltyS_one`,
    `bondLocal_ker_eq_vbsBondSubspace`, `f2_dvd_weylMap_of_mem_vbsBondSubspace`) — so a sign slip in
    the Casimir-descent scalars (design pitfall 5: the scalars are `N(N+1) − j(j+1)`, not `j(j+1)`)
@@ -107,21 +107,19 @@ example : casimirPenaltyWeight 2 2 = 0 :=
 
 /-! ## Group 5: divisibility capstone, shape and `S = 1` oracle -/
 
-/-- **Capstone shape (PR-3c).** `prod_fBond_pow_dvd_weylMap_of_annihilated`, applied at its
-post-PR-3c general signature: `hloc` is discharged in-line by
-`f2_pow_dvd_weylMap_of_localCasimirPenalty` and no longer appears as a hypothesis here, so a state
-`Φ` annihilated by every open-bond Casimir penalty alone forces the prime-power product
-`∏ f_x ^ S` to divide `weylMap Φ`.  Placeholder Red until `dev-implement` removes the `hloc`
-parameter from `prod_fBond_pow_dvd_weylMap_of_annihilated`. -/
+/-- **Capstone shape.** `prod_fBond_pow_dvd_weylMap_of_annihilated` at its general signature: the
+local kernel statement is discharged in-line by `f2_pow_dvd_weylMap_of_localCasimirPenalty` and is
+not a hypothesis here, so a state `Φ` annihilated by every open-bond Casimir penalty alone forces
+the prime-power product `∏ f_x ^ S` to divide `weylMap Φ`. -/
 example (hL : 2 ≤ L) (S : ℕ) (Φ : (Fin L → Fin (2 * S + 1)) → ℂ)
     (hΦ : ∀ x ∈ openBonds L, (bondCasimirPenaltyS x (ringSucc x) S).mulVec Φ = 0) :
     (∏ x ∈ openBonds L, fBond x ^ S) ∣ weylMap Φ :=
   prod_fBond_pow_dvd_weylMap_of_annihilated hL S Φ hΦ
 
 /-- **`S = 1` oracle, general-`S` route.** The same capstone shape as above, instantiated at
-`S = 1`; the local hypothesis is now discharged for every `S`, not just `S = 1`, by
+`S = 1`; the local kernel is discharged for every `S`, not just `S = 1`, by
 `f2_pow_dvd_weylMap_of_localCasimirPenalty` inside `prod_fBond_pow_dvd_weylMap_of_annihilated`
-itself.  Placeholder Red for the same reason as the shape example above. -/
+itself. -/
 example {L : ℕ} (hL : 2 ≤ L) (Φ : (Fin L → Fin 3) → ℂ)
     (hΦ : ∀ x ∈ openBonds L, (bondCasimirPenaltyS x (ringSucc x) 1).mulVec Φ = 0) :
     (∏ x ∈ openBonds L, fBond x ^ 1) ∣ weylMap Φ :=
@@ -145,11 +143,11 @@ example (φ : (Fin 2 → Fin 3) → ℂ) (hφ : (localCasimirPenalty 1).mulVec �
     exact (smul_eq_zero.mp hφ).resolve_left (by norm_num)
   simpa [LinearMap.mem_ker] using hz
 
-/-- **Cross-check pin.** The two `S = 1` oracle routes above must agree: the general-`S` local-kernel
-discharge `f2_pow_dvd_weylMap_of_localCasimirPenalty` at `S = 1` proves the identical statement as
+/-- **Cross-check pin.** The two `S = 1` oracle routes above must agree: the general-`S`
+local-kernel discharge `f2_pow_dvd_weylMap_of_localCasimirPenalty` at `S = 1` proves the same as
 the bespoke spin-one computation. This is the concrete oracle that would catch a sign slip in
 `f2_pow_dvd_weylMap_of_localCasimirPenalty` (the Casimir-descent scalars are `N(N+1) − j(j+1)`, not
-`j(j+1)`). Placeholder Red until `dev-implement` lands `f2_pow_dvd_weylMap_of_localCasimirPenalty`. -/
+`j(j+1)`). -/
 example (φ : (Fin 2 → Fin 3) → ℂ) (hφ : (localCasimirPenalty 1).mulVec φ = 0) :
     f2 ^ 1 ∣ weylMap (L := 2) φ :=
   f2_pow_dvd_weylMap_of_localCasimirPenalty 1 φ hφ
