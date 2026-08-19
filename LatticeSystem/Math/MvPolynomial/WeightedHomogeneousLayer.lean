@@ -187,4 +187,35 @@ theorem weylMap_isWeightedHomogeneous {N : ℕ} (Φ : (Fin L → Fin (N + 1)) �
   rw [weylMono, smul_monomial]
   exact isWeightedHomogeneous_monomial _ _ _ (weight_siteWeight_md σ)
 
+/-- **The Weyl map is onto its per-site graded piece.**  A polynomial carrying degree exactly `N`
+in every site's own pair of variables — the degree of a Weyl image
+(`weylMap_isWeightedHomogeneous`) — is the Weyl image of `weylPreimage p`.  Together with
+`weylMap_injective` this identifies the range of `weylMap` with that graded piece, so an explicitly
+written polynomial of the right per-site degrees defines a state of the chain.
+
+The homogeneity hypothesis is load-bearing rather than technical: off that graded piece a
+polynomial has monomials that are not Weyl monomials at all, `weylPreimage` cannot see them, and the
+round trip loses them (regression test `GeneralSBondSliceConverse`).  Proof: on a Weyl multidegree
+`md τ` the coefficient is recovered by `weylMap_coeff` and `cgNorm τ ≠ 0`; on any other multidegree
+both sides vanish, the left one because `weylMap` is supported on Weyl monomials and the right one
+because `hp` plus `exists_md_eq` would exhibit the missing configuration. -/
+theorem weylMap_weylPreimage {N : ℕ} {p : MvPolynomial (Fin L × Fin 2) ℂ}
+    (hp : p.IsWeightedHomogeneous (siteWeight (L := L)) (∑ x : Fin L, Finsupp.single x N)) :
+    weylMap (weylPreimage (N := N) p) = p := by
+  ext d
+  by_cases hd : ∃ τ : Fin L → Fin (N + 1), md τ = d
+  · obtain ⟨τ, rfl⟩ := hd
+    rw [weylMap_coeff]
+    simp only [weylPreimage]
+    exact div_mul_cancel₀ _ (cgNorm_ne_zero τ)
+  · have hp0 : p.coeff d = 0 := by
+      by_contra hne
+      refine hd (exists_md_eq fun y => ?_)
+      have hy := DFunLike.congr_fun (hp hne) y
+      rwa [weight_siteWeight_apply, weylMapWeight_apply] at hy
+    rw [hp0]
+    simp only [weylMap, Fintype.linearCombination_apply, coeff_sum, weylMono, smul_monomial,
+      smul_eq_mul, coeff_monomial]
+    exact Finset.sum_eq_zero fun σ _ => if_neg fun h => hd ⟨σ, h⟩
+
 end LatticeSystem.Math
