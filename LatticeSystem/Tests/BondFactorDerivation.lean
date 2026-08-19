@@ -5,9 +5,8 @@ import LatticeSystem.Math.MvPolynomial.BilinearFactorCoprime
 /-!
 # Red tests for the bond-factor derivation layer (PR-3a, #5292)
 
-Signature/behaviour specification for the *not-yet-implemented*
-`LatticeSystem.Math.MvPolynomial.BondFactorDerivation` (design report
-`.self-local/reports/design-5292-pr3-su2-harmonic-round1-20260819.md`, §2.1 fact (K1) and the
+Signature/behaviour specification for
+`LatticeSystem.Math.MvPolynomial.BondFactorDerivation` (PR-3 design round §2.1 fact (K1) and the
 bidegree-lowering half of §2 "genuinely laborious" remark on `IsWeightedHomogeneous.pderiv`).
 
 `Ω := ∂_a∂_b − ∂_c∂_d` (`bondOmega a b c d`) is the two-site derivative operator whose instance at
@@ -16,10 +15,10 @@ to `hloc`.  This file is deliberately Math-layer only (no `AKLTUniqueness`/`weyl
 `bondFactor (x,0) (y,1) (x,1) (y,0)` plays the role of the `L = 2` bond factor `f2` for an arbitrary
 pair of distinct sites `x y : Fin L`.
 
-Every `example` below breaks with "unknown identifier" until `BondFactorDerivation.lean` supplies
-the corresponding declaration — this **is** the Red state for a Lean library (there is no test
-runner separate from `lake build`).  The two numeric `example`s at the bottom pin the `N = 2`
-sanity checks recorded in the design report (§2.1: `Ω(u₀²u₁²) = 0`, `Ω(f₂²) = 6·f₂`).
+Every `example` below is a signature/behaviour pin against the production declarations in
+`BondFactorDerivation.lean` (there is no test runner separate from `lake build`).  The two numeric
+`example`s at the bottom pin the `N = 2` sanity checks from the design round (§2.1:
+`Ω(u₀²u₁²) = 0`, `Ω(f₂²) = 6·f₂`).
 
 Required production API (all in `LatticeSystem.Math`, generic `σ` unless noted):
 
