@@ -41,17 +41,17 @@ noncomputable def openAKLTGroundSpaceGeneralS (L S : ℕ) :
 theorem openAKLTGroundSpaceGeneralS_eq_ker (L S : ℕ) :
     openAKLTGroundSpaceGeneralS L S
       = LinearMap.ker (Matrix.mulVecLin (openAKLTHamiltonianGeneralS L S)) := by
-  sorry -- dev-implement: `Module.End.eigenspace` at eigenvalue `0` unfolds to `ker`
-        -- (`Module.End.mem_eigenspace_iff` + `zero_smul`).
+  ext Φ
+  rw [openAKLTGroundSpaceGeneralS, Module.End.mem_eigenspace_iff, zero_smul, LinearMap.mem_ker]
 
 /-- **`Ĥ ≥ 0`**, so `0` lower-bounds the energy: each bond term is positive semidefinite
 (`bondCasimirPenaltyS_posSemidef`), and a sum of positive-semidefinite matrices is
 positive semidefinite. -/
 theorem openAKLTHamiltonianGeneralS_posSemidef {L S : ℕ} (hL : 2 ≤ L) (hS : S ≠ 0) :
     (openAKLTHamiltonianGeneralS L S).PosSemidef := by
-  sorry -- dev-implement: `openAKLTHamiltonianGeneralS` unfolded as `Finset.sum` +
-        -- `bondCasimirPenaltyS_posSemidef (ne_ringSucc hL x) hS` for each `x ∈ openBonds L` +
-        -- `Matrix.PosSemidef.add`/`.zero` (`Finset.sum_induction`).
+  rw [openAKLTHamiltonianGeneralS]
+  exact Finset.sum_induction _ _ (fun _ _ => Matrix.PosSemidef.add) Matrix.PosSemidef.zero
+    fun x _ => bondCasimirPenaltyS_posSemidef (ne_ringSucc (by omega) x) hS
 
 /-- **Headline: the zero-energy space is the joint bond kernel** (frustration-freeness).  A state
 has zero energy iff it is annihilated by every open-bond Casimir penalty term separately. -/
@@ -59,9 +59,18 @@ theorem mem_openAKLTGroundSpaceGeneralS_iff {L S : ℕ} (hL : 2 ≤ L) (hS : S �
     (Φ : (Fin L → Fin (2 * S + 1)) → ℂ) :
     Φ ∈ openAKLTGroundSpaceGeneralS L S
       ↔ ∀ x ∈ openBonds L, (bondCasimirPenaltyS x (ringSucc x) S).mulVec Φ = 0 := by
-  sorry -- dev-implement: `openAKLTGroundSpaceGeneralS_eq_ker` + `LinearMap.mem_ker` +
-        -- `Matrix.mulVecLin_apply`; `→` via `frustration_free_local_eigen` with
-        -- `bondCasimirPenaltyS_posSemidef` as the local lower bound (all local energies `0`);
-        -- `←` via `Finset.sum_mulVec` + `Finset.sum_eq_zero`.
+  have hlb : ∀ x ∈ openBonds L,
+      (bondCasimirPenaltyS x (ringSucc x) S
+        - ((0 : ℝ) : ℂ) • (1 : ManyBodyOpS (Fin L) (2 * S))).PosSemidef := fun x _ => by
+    simpa using bondCasimirPenaltyS_posSemidef (ne_ringSucc (by omega) x) hS
+  rw [openAKLTGroundSpaceGeneralS_eq_ker, LinearMap.mem_ker, Matrix.mulVecLin_apply,
+    openAKLTHamiltonianGeneralS]
+  refine ⟨fun h x hx => ?_, fun h => ?_⟩
+  · have hgs : (∑ x ∈ openBonds L, bondCasimirPenaltyS x (ringSucc x) S).mulVec Φ
+        = ((∑ _x ∈ openBonds L, (0 : ℝ) : ℝ) : ℂ) • Φ := by simpa using h
+    simpa using frustration_free_local_eigen (openBonds L)
+      (fun x : Fin L => bondCasimirPenaltyS x (ringSucc x) S) (fun _ => (0 : ℝ)) Φ hlb hgs x hx
+  · rw [Matrix.sum_mulVec]
+    exact Finset.sum_eq_zero h
 
 end LatticeSystem.Quantum

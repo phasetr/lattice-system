@@ -22,12 +22,13 @@ This module builds the canonical single-polynomial member of that family, the **
 `ĥ_x = q_S(Ĉ_x) = ∏_{j=0}^{S} (Ĉ_x − j(j+1))`,  `Ĉ_x = (Ŝ_x + Ŝ_{x+1})² = 2S(S+1) + 2 Ŝ_x·Ŝ_{x+1}`,
 
 which acts on the total-spin-`J` bond subspace by the scalar `∏_{j=0}^{S}(J(J+1) − j(j+1))`: zero
-for `J ≤ S` and strictly positive for `J > S`.  Of that description only the two *scalar* facts
-about the weight function are proved here (`casimirPenaltyWeight_eq_zero`,
-`casimirPenaltyWeight_pos`); they constrain `casimirPenaltyWeight` alone and are linked to the
-operator `bondCasimirPenaltyS` by no theorem in the tree.  Family membership itself is the operator
-identity `q_S(Ĉ) = Σ_J a_J P̂_J`, which would need the full spectral decomposition of `Ĉ`; it is not
-proved and nothing here consumes it.  At `S = 1` the polynomial collapses to
+for `J ≤ S` and strictly positive for `J > S`.  The two *scalar* facts about the weight function
+proved here (`casimirPenaltyWeight_eq_zero`, `casimirPenaltyWeight_pos`) say exactly that `q_S` is
+nonnegative at every Casimir eigenvalue; `GeneralSCasimirSpectrum` turns that into the consequence
+the ground-state analysis actually uses, positive semidefiniteness of the bond term
+(`bondCasimirPenaltyS_posSemidef`).  Family membership itself — the operator identity
+`q_S(Ĉ) = Σ_J a_J P̂_J`, which would need the full spectral decomposition of `Ĉ` — is not proved,
+and nothing in the tree consumes it.  At `S = 1` the polynomial collapses to
 `24 · P̂₂[Ŝ_x + Ŝ_{x+1}]`, reproducing the
 `S = 1` chain of §7.1.2, eq. (7.1.5), p. 180 up to the harmless positive factor.
 
@@ -72,27 +73,22 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
 /-- The **Casimir penalty weight** `a_J = q_S(J(J+1)) = ∏_{j=0}^{S} (J(J+1) − j(j+1))`: the value
 the defining polynomial `q_S` takes at the total-spin-`J` eigenvalue `J(J+1)` of `Ĉ`.  These are the
-coefficients `a_J` of Tasaki's family (7.3.2), p. 208.  This scalar is *not* linked to the operator
-`bondCasimirPenaltyS` by any theorem in the tree (see the module doc comment); only the two facts
-about `casimirPenaltyWeight` itself below are proved.  Stated over `ℝ` so that positivity is
-available directly. -/
+coefficients `a_J` of Tasaki's family (7.3.2), p. 208.  Stated over `ℝ` so that positivity is
+available directly; the two sign facts below are what
+`GeneralSCasimirSpectrum.localCasimirPenalty_posSemidef` consumes. -/
 noncomputable def casimirPenaltyWeight (S J : ℕ) : ℝ :=
   ∏ j ∈ Finset.range (S + 1), ((J : ℝ) * (J + 1) - (j : ℝ) * (j + 1))
 
 /-- **No penalty on the low total spins.**  For `J ≤ S` the factor with `j = J` vanishes, so
 `a_J = 0` — the weight vanishes exactly on the intended kernel `⊕_{J≤S}` of Tasaki's family
-(7.3.2), p. 208 (the `S` valence bonds per link).  This is a fact about the scalar weight
-function alone; no theorem in the tree links it to the operator `bondCasimirPenaltyS` (see the
-module doc comment). -/
+(7.3.2), p. 208 (the `S` valence bonds per link). -/
 theorem casimirPenaltyWeight_eq_zero {S J : ℕ} (h : J ≤ S) : casimirPenaltyWeight S J = 0 :=
   Finset.prod_eq_zero (Finset.mem_range.mpr (Nat.lt_succ_of_le h)) (by ring)
 
 /-- **Strictly positive penalty on the high total spins.**  For `J > S` every factor satisfies
 `J(J+1) > j(j+1)` (as `j ≤ S < J`), so `a_J > 0` — the weight is positive exactly on the intended
 penalized total spins `J = S+1, …, 2S`, the "two highest values" of Tasaki's `S = 2` instance
-(7.3.2), p. 208.  This is a fact about the scalar weight function alone; no theorem in the tree
-links it to the operator `bondCasimirPenaltyS` (see the module doc comment).  No upper bound on
-`J` is needed. -/
+(7.3.2), p. 208.  No upper bound on `J` is needed. -/
 theorem casimirPenaltyWeight_pos {S J : ℕ} (h : S < J) : 0 < casimirPenaltyWeight S J := by
   refine Finset.prod_pos fun j hj => ?_
   rw [Finset.mem_range] at hj
@@ -104,9 +100,9 @@ theorem casimirPenaltyWeight_pos {S J : ℕ} (h : S < J) : 0 < casimirPenaltyWei
 
 /-- The **general-`S` AKLT bond term** `ĥ_x = q_S(Ĉ_x) = ∏_{j=0}^{S} (Ĉ_x − j(j+1)·1)` on the bond
 `{x, y}` of two spin-`S` sites (`N = 2S`), the intended canonical single-polynomial member of
-Tasaki's family (7.3.2), p. 208 with the weights `casimirPenaltyWeight S J`; as with
-`casimirPenaltyWeight` above, no theorem in the tree links this operator to the family membership
-identity `q_S(Ĉ) = Σ_J a_J P̂_J` (see the module doc comment).
+Tasaki's family (7.3.2), p. 208 with the weights `casimirPenaltyWeight S J`; the family membership
+identity `q_S(Ĉ) = Σ_J a_J P̂_J` itself is not proved (see the module doc comment), only the
+consequence used downstream, `bondCasimirPenaltyS_posSemidef`.
 
 The factors are polynomials in the single operator `Ĉ = bondCasimirS x y (2S)` and hence commute,
 but `ManyBodyOpS` is a noncommutative matrix ring, so the product is taken as an ordered

@@ -6,8 +6,7 @@ import LatticeSystem.Quantum.SpinS.GeneralSOpenChainGroundSpace
 Regression gate for `Quantum.GeneralSOpenChainGroundSpace`: the zero-energy space
 `openAKLTGroundSpaceGeneralS`, its identification with the kernel of the Hamiltonian's linear map,
 positive semidefiniteness of the Hamiltonian, and the frustration-free characterization
-`mem_openAKLTGroundSpaceGeneralS_iff`.  Every production declaration exercised below is currently
-a `sorry` stub (dev-implement fills the proofs); this file pins the exact signatures.
+`mem_openAKLTGroundSpaceGeneralS_iff`.  This file pins the exact signatures of those declarations.
 -/
 
 open Matrix LatticeSystem.Quantum LatticeSystem.Math

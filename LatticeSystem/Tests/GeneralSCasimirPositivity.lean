@@ -10,16 +10,15 @@ AKLT instantiation in `Quantum.GeneralSCasimirSpectrum` (`bondCasimirS_isHermiti
 `aeval_nodal_bondCasimirS`, `casimirPenaltyPoly`, `localCasimirPenalty_posSemidef`,
 `bondCasimirPenaltyS_posSemidef`).  No production code is written here.
 
-Every production declaration exercised below is currently a `sorry` stub (dev-implement fills the
-proofs); this file pins the exact signatures the implementation must satisfy and the numeric
-identities the argument depends on.
+This file pins the exact signatures of those declarations together with the numeric identities the
+argument depends on.
 
 Four groups:
 
 1. **Generic-lemma oracle** — a fully worked `n = ι = Fin 1` instance of
    `posSemidef_aeval_of_aeval_nodal_eq_zero`, independent of the AKLT context.
 2. **`N = 1` node-polynomial pin** — `casimirNode`'s nodal factorization at the smallest
-   nontrivial case, `X (X − 2)` (no dependency on any `sorry` stub: pure `Polynomial` computation).
+   nontrivial case, `X (X − 2)` (a pure `Polynomial` computation).
 3. **`S = 1` positivity oracle** — `localCasimirPenalty 1` is PSD both via the new
    `localCasimirPenalty_posSemidef` and, independently, via `bondCasimirPenaltyS_one` +
    `bondSpin2ProjectionS_posSemidef` (`24 • P̂₂ ≥ 0`); the two routes must prove the *same*
@@ -57,8 +56,8 @@ example :
 
 /-- **`N = 1` node-polynomial pin.**  At `N = 1` (two spin-`1/2` sites) the nodal polynomial of
 `casimirNode` is exactly `X (X − 2)`, the smallest nontrivial instance of the Casimir eigenvalue
-family of Tasaki §7.3.1, eq. (7.3.1), p. 208.  Pure `Polynomial` computation, no dependency on any
-`sorry` stub. -/
+family of Tasaki §7.3.1, eq. (7.3.1), p. 208.  A pure `Polynomial` computation, independent of the
+bond-Casimir matrix layer. -/
 example :
     Lagrange.nodal (Finset.univ : Finset (Fin 2)) (casimirNode 1)
       = Polynomial.X * (Polynomial.X - Polynomial.C (2 : ℝ)) := by
