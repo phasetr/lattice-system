@@ -105,6 +105,7 @@ import LatticeSystem.Tests.ConfigPermMatrixS
 import LatticeSystem.Tests.VBSInversionParitySpinOne
 import LatticeSystem.Tests.GeneralSBondTermSpinOne
 import LatticeSystem.Tests.GeneralSWeylLadder
+import LatticeSystem.Tests.GeneralSWeylCasimir
 
 /-!
 # Test aggregator for the `lattice-system` library
