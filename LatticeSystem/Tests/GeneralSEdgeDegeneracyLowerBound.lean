@@ -1,26 +1,20 @@
 import LatticeSystem.Quantum.SpinS.GeneralSOpenChainGroundSpace
 
 /-!
-# Tasaki §8.3.1: the `(S+1)²` lower bound for the general-`S` open AKLT ground space (PR-6b, Red)
+# Tasaki §8.3.1: the `(S+1)²` lower bound for the general-`S` open AKLT ground space
 
-Acceptance gate for the not-yet-implemented PR-6b layer of the `#5292` arc (design report
-`.self-local/reports/design-5292-pr6-finrank-lower-bound-round1-20260820.md` §4/§7): the general-`S`
-open VBS boundary states `openVBSStateGeneralS`, their Weyl image (`weylMap_openVBSStateGeneralS`),
-the headline lower bound `succ_sq_le_finrank_openAKLTGroundSpaceGeneralS`, and the attainment fact
+Regression pins for the general-`S` VBS boundary layer of
+`Quantum.SpinS.GeneralSOpenChainGroundSpace`: the boundary states `openVBSStateGeneralS`, their
+Weyl image (`weylMap_openVBSStateGeneralS`), their membership and independence, the headline lower
+bound `succ_sq_le_finrank_openAKLTGroundSpaceGeneralS`, and the attainment fact
 `isGroundEnergy_openAKLTHamiltonianGeneralS`.
 
-**TDD status: RED.**  None of `openVBSStateGeneralS`, `weylMap_openVBSStateGeneralS`,
-`boundaryMonomial_mul_prod_isWeightedHomogeneous`,
-`openVBSStateGeneralS_mem_openAKLTGroundSpaceGeneralS`,
-`openVBSStateGeneralS_linearIndependent`, `succ_sq_le_finrank_openAKLTGroundSpaceGeneralS`, or
-`isGroundEnergy_openAKLTHamiltonianGeneralS` exist on `main` yet, so this file does **not** build:
-every example naming one of them fails with an unknown-identifier error until PR-6b's
-`dev-implement` step lands those declarations in `Quantum/SpinS/GeneralSOpenChainGroundSpace.lean`.
-Every proof left in place (rather than immediately failing on the missing name) is marked `sorry` so
-that, once the declarations exist, only the `sorry`s — not the statements — need to be discharged.
-
-The one exception is test point 4 (the cardinality pin), which needs no new production code and is
-a genuine green regression check today.
+Beyond the signature pins the file fixes the numerical values (`S = 1` gives `4 ≤ dim`, the
+nine-fold `S = 2`, `m = 0` case Tasaki names on p. 252), the cardinality `(S+1)²` of the index type
+consumed by `finrank_span_eq_card`, the nonzero witness attainment needs, and two shape controls:
+the degenerate `S = 0` collapse of both the boundary monomial and the bond product, and the `S = 1`,
+`m = 0` Weyl image `X_{(1,a)} X_{(2,b)} f_1` predicted by the merged
+`weylMap_openGroundForm_eq_boundary_smul_prod`.
 -/
 
 open Matrix MvPolynomial
@@ -32,7 +26,7 @@ namespace LatticeSystem.Tests.GeneralSEdgeDegeneracyLowerBound
 /-! ### 1. Signature pins -/
 
 /-- **Signature pin: the general-`S` open VBS boundary states.** -/
-example (m S : ℕ) (ab : Fin (S + 1) × Fin (S + 1)) :
+noncomputable example (m S : ℕ) (ab : Fin (S + 1) × Fin (S + 1)) :
     (Fin (m + 2) → Fin (2 * S + 1)) → ℂ :=
   openVBSStateGeneralS m S ab
 
@@ -58,17 +52,18 @@ example {m S : ℕ} (hS : S ≠ 0) :
     (S + 1) ^ 2 ≤ Module.finrank ℂ (openAKLTGroundSpaceGeneralS (m + 2) S) :=
   succ_sq_le_finrank_openAKLTGroundSpaceGeneralS hS
 
-/-- **Signature pin: attainment.**  `0` is really the ground energy of the general-`S` open chain. -/
+/-- **Signature pin: attainment.**  `0` is really the ground energy of the general-`S` open
+chain. -/
 example {L S : ℕ} (hL : 2 ≤ L) (hS : S ≠ 0) :
     IsGroundEnergy (openAKLTHamiltonianGeneralS L S) 0 :=
   isGroundEnergy_openAKLTHamiltonianGeneralS hL hS
 
-/-! ### 2. `S = 1` value: matches the merged `four_le_finrank_openAKLTGroundSpace` -/
+/-! ### 2. `S = 1` value: the `4 ≤ finrank` bound of Problem 7.2.3.a -/
 
-/-- At `S = 1` the lower bound reproduces the merged `4 ≤ finrank` fact for the `S = 1` open chain,
-now stated through the general-`S` ground space (`openAKLTGroundSpaceGeneralS L 1 =
-openAKLTGroundSpace L` is out of scope for PR-6b per the design report §5 item 9, so this test does
-**not** compare against `openAKLTGroundSpace`). -/
+/-- At `S = 1` the lower bound reproduces the `4 ≤ finrank` bound of the `S = 1` open chain
+(`four_le_finrank_openAKLTGroundSpace`), stated through the general-`S` ground space: the
+identification `openAKLTGroundSpaceGeneralS L 1 = openAKLTGroundSpace L` is a separate fact, so this
+test does **not** compare against `openAKLTGroundSpace`. -/
 example (m : ℕ) : 4 ≤ Module.finrank ℂ (openAKLTGroundSpaceGeneralS (m + 2) 1) := by
   have h := succ_sq_le_finrank_openAKLTGroundSpaceGeneralS (m := m) (S := 1) (by norm_num)
   norm_num at h
@@ -82,10 +77,10 @@ example : 9 ≤ Module.finrank ℂ (openAKLTGroundSpaceGeneralS 2 2) := by
   norm_num at h
   exact h
 
-/-! ### 4. Cardinality pin — a genuine (green) regression guard, no new production code needed -/
+/-! ### 4. Cardinality pin -/
 
-/-- **Cardinality pin.** `finrank_span_eq_card` will consume this: the boundary-edge-spin index type
-`Fin (S+1) × Fin (S+1)` really has `(S+1)²` elements, guarding against an off-by-one in
+/-- **Cardinality pin.**  The count `finrank_span_eq_card` consumes: the boundary-edge-spin index
+type `Fin (S+1) × Fin (S+1)` really has `(S+1)²` elements, guarding against an off-by-one in
 `boundaryDeg`'s domain. -/
 example (S : ℕ) : Fintype.card (Fin (S + 1) × Fin (S + 1)) = (S + 1) ^ 2 := by
   rw [Fintype.card_prod, Fintype.card_fin]
@@ -105,16 +100,20 @@ every boundary state is the constant `1`.  Catches a wrong `S − a` truncation 
 slip in `openVBSStateGeneralS`'s definition. -/
 example (m : ℕ) (ab : Fin 1 × Fin 1) : weylMap (openVBSStateGeneralS m 0 ab) = 1 := by
   rw [weylMap_openVBSStateGeneralS]
-  sorry
+  simp [boundaryDeg, mdSite]
 
-/-! ### 7. Bond-membership control: `m = 0`, `S = 1` matches the merged `S = 1` shape -/
+/-! ### 7. Bond-membership control: `m = 0`, `S = 1` matches the `S = 1` boundary shape -/
 
 /-- At `m = 0`, `S = 1` the boundary state's Weyl image is `X (0,a) * X (1,b) * fBond 0` — the
-`L = 2` instance the merged `weylMap_openGroundForm_eq_boundary_smul_prod` shape predicts. -/
+`L = 2` instance of the shape `weylMap_openGroundForm_eq_boundary_smul_prod` predicts. -/
 example (a b : Fin 2) :
     weylMap (openVBSStateGeneralS 0 1 (a, b))
       = X ((0 : Fin 2), a) * X ((1 : Fin 2), b) * fBond (0 : Fin 2) := by
-  rw [weylMap_openVBSStateGeneralS]
-  sorry
+  have hbonds : openBonds 2 = {(0 : Fin 2)} := by decide
+  have hlast : (Fin.last 1 : Fin 2) = 1 := rfl
+  rw [weylMap_openVBSStateGeneralS, hbonds, Finset.prod_singleton, pow_one, boundaryDeg_one,
+    hlast]
+  congr 1
+  rw [X, X, monomial_mul, mul_one]
 
 end LatticeSystem.Tests.GeneralSEdgeDegeneracyLowerBound
