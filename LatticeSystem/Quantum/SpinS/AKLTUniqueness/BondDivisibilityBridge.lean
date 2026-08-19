@@ -91,22 +91,22 @@ theorem cgNorm_bond_rest_split {N : ℕ} (hL : 1 < L) (σ : Fin L → Fin (N + 1
       (Finset.mem_erase.mpr ⟨Ne.symm hxy, Finset.mem_univ _⟩)]
   ring
 
-/-- The total multidegree splits as (rest) + (two bond sites), using `x ≠ ringSucc x`. -/
-theorem md_bond_rest_split {N : ℕ} (hL : 1 < L) (σ : Fin L → Fin (N + 1)) :
-    md σ = (∑ y ∈ (Finset.univ.erase x).erase (ringSucc x), mdSite y (σ y))
-      + mdSite x (σ x) + mdSite (ringSucc x) (σ (ringSucc x)) := by
-  have hxy : x ≠ ringSucc x := ne_ringSucc hL x
-  rw [md, ← Finset.add_sum_erase Finset.univ (fun y => mdSite y (σ y)) (Finset.mem_univ x),
-    ← Finset.add_sum_erase (Finset.univ.erase x) (fun y => mdSite y (σ y))
-      (Finset.mem_erase.mpr ⟨Ne.symm hxy, Finset.mem_univ _⟩)]
-  abel
-
 /-- The **off-bond multidegree** of a chain state `σ` at the bond `{x, ringSucc x}`: the sum of the
 per-site multidegrees of the sites off the bond.  It is the exponent of the off-bond monomial
 `restMono`, and read as a weighted degree (`offBondWeight`) it is the grading that separates the
 rest-of-chain fibers of the Weyl image. -/
 noncomputable def restDeg {N : ℕ} (σ : Fin L → Fin (N + 1)) : (Fin L × Fin 2) →₀ ℕ :=
   ∑ y ∈ (Finset.univ.erase x).erase (ringSucc x), mdSite y (σ y)
+
+/-- The total multidegree splits as (off-bond) + (two bond sites), using `x ≠ ringSucc x`. -/
+theorem md_bond_rest_split {N : ℕ} (hL : 1 < L) (σ : Fin L → Fin (N + 1)) :
+    md σ = restDeg x σ + mdSite x (σ x) + mdSite (ringSucc x) (σ (ringSucc x)) := by
+  have hxy : x ≠ ringSucc x := ne_ringSucc hL x
+  rw [md, restDeg,
+    ← Finset.add_sum_erase Finset.univ (fun y => mdSite y (σ y)) (Finset.mem_univ x),
+    ← Finset.add_sum_erase (Finset.univ.erase x) (fun y => mdSite y (σ y))
+      (Finset.mem_erase.mpr ⟨Ne.symm hxy, Finset.mem_univ _⟩)]
+  abel
 
 /-- The rest (off-bond) Weyl monomial of a chain state `σ` at the bond `{x, ringSucc x}`: the
 single monomial carrying the off-bond multidegree `restDeg` and the product of the off-bond
@@ -122,7 +122,7 @@ mapDomain pushes — the algebraic heart of the general-`L` split identity, per 
 theorem weylMono_bond_rest_split {N : ℕ} (hL : 1 < L) (σ : Fin L → Fin (N + 1)) :
     weylMono σ
       = restMono x σ * rename (bondEmb x) (weylMono (L := 2) ![σ x, σ (ringSucc x)]) := by
-  rw [restMono, restDeg, weylMono, weylMono, rename_monomial, monomial_mul,
+  rw [restMono, weylMono, weylMono, rename_monomial, monomial_mul,
     md_bond_rest_split x hL σ, cgNorm_bond_rest_split x hL σ]
   simp only [md, Fin.sum_univ_two, Finsupp.mapDomain_add, cgNorm, Fin.prod_univ_two,
     Matrix.cons_val_zero, Matrix.cons_val_one,

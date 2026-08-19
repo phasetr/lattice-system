@@ -16,9 +16,9 @@ divisibility statement into a *slicewise* one:
   `f_x ^ S`-divisible Weyl images.
 
 Pinned here: the round trip on a genuine graded input, the negative control showing that the
-homogeneity hypothesis is load-bearing, agreement of the two directions of the bridge on the same
-`f₂` / `f_x` / `bondEmb` convention, and the `S = 1` specialization against the bespoke spin-one
-bond projection.
+homogeneity hypothesis is load-bearing, composability of the two directions of the bridge (the
+converse's conclusion is the forward bridge's premise), and the `S = 1` specialization against the
+bespoke spin-one bond projection.
 -/
 
 open MvPolynomial LatticeSystem.Math LatticeSystem.Quantum LatticeSystem.Quantum.AKLTUniqueness
@@ -78,11 +78,13 @@ theorem f2_pow_dvd_weylMap_bondSlice_of_fBond_pow_dvd_sig {N : ℕ} (hL : 1 < L)
     f2 ^ S ∣ weylMap (L := 2) (bondSlice x Φ r) :=
   f2_pow_dvd_weylMap_bondSlice_of_fBond_pow_dvd hL x S Φ h r
 
-/-- **Direction consistency.** Composing the converse with the forward bridge
-`fBond_pow_dvd_weylMap_of_local` must return the original hypothesis: for `Φ` with
+/-- **API consistency.** Composing the converse with the forward bridge
+`fBond_pow_dvd_weylMap_of_local` returns the original hypothesis: for `Φ` with
 `fBond x ^ S ∣ weylMap Φ`, going local (the converse) and then back global (the forward bridge)
-reproduces `fBond x ^ S ∣ weylMap Φ`. Pins that both directions agree on the same `f2` / `fBond` /
-`bondEmb` convention — a `u ↔ v` drift in either would still typecheck but break this. -/
+reproduces `fBond x ^ S ∣ weylMap Φ`. Pins that the two statements stay composable — the converse's
+conclusion is exactly the premise the forward bridge consumes, so a statement-level drift of either
+(a different slice, exponent or bond-factor argument) breaks this. It does *not* probe the shared
+`f2` / `fBond` / `bondEmb` definitions, which both directions inherit from the same source. -/
 theorem fBond_pow_dvd_weylMap_round_trip {N : ℕ} (hL : 1 < L) (x : Fin L) (S : ℕ)
     (Φ : (Fin L → Fin (N + 1)) → ℂ) (h : fBond x ^ S ∣ weylMap Φ) :
     fBond x ^ S ∣ weylMap Φ :=

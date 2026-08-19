@@ -49,8 +49,11 @@ exact characterisation: the two-site kernel of `ĥ^loc` is *precisely* the Weyl 
 (`GeneralSCasimirDescent`) from the Weyl bidegree `(2S, 2S)` down to level `S`, where the descent
 family annihilates its own layer — and a single bond term of the chain annihilates a state
 precisely when `f_x^S` divides its Weyl image
-(`bondCasimirPenaltyS_mulVec_eq_zero_iff_fBond_pow_dvd`).  Only the assembly over the `L − 1` bonds
-is one-directional, since it consumes the pairwise coprimality of the bond factors.
+(`bondCasimirPenaltyS_mulVec_eq_zero_iff_fBond_pow_dvd`).  Of the assembly over the `L − 1` bonds
+only the direction that consumes the pairwise coprimality of the bond factors is stated
+(`prod_fBond_pow_dvd_weylMap_of_annihilated`, annihilation by every bond `⟹ ∏_x f_x^S` divides the
+Weyl image); the converse is immediate from `Finset.dvd_prod_of_mem` and the per-bond iff, and
+nothing consumes it.
 
 The bond sum runs over `openBonds L`, never over `Finset.univ`: the open chain of eq. (7.2.46),
 p. 205 has exactly `L − 1` bonds, and summing over `Finset.univ` silently reinstates the wrap bond
