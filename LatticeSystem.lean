@@ -100,6 +100,7 @@ import LatticeSystem.Quantum.SpinS.Problem25dBalancedPFCrossSign
 import LatticeSystem.Quantum.SpinS.SpinHalfSpecializationMultiSite
 import LatticeSystem.Quantum.SpinS.GeneralSWeylLadder
 import LatticeSystem.Quantum.SpinS.GeneralSWeylCasimir
+import LatticeSystem.Quantum.SpinS.GeneralSCasimirDescent
 
 /-!
 # `lattice-system` library root
