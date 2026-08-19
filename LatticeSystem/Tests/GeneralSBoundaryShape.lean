@@ -13,8 +13,8 @@ homogeneity and nonvanishing of the divisor `∏_x f_x^S`, and the headline shap
 Load-bearing controls: the `S = 0` degenerate case, which a wrong `S − a` truncation would get
 wrong first; the `S = 1` oracle, pinning the general shape against the pre-existing
 `weylMap_openGroundForm_eq_boundary_smul_prod` of eq. (S.77) so that the `u ↔ v` convention cannot
-drift; and a negative control showing that the per-site homogeneity hypothesis of
-`exists_boundary_factorization` is load-bearing.
+drift; and a shape-membership control pinning the image of `boundaryDeg` at `S = 1` against a
+multidegree that divisibility alone would admit.
 -/
 
 open MvPolynomial
@@ -147,12 +147,14 @@ example {m : ℕ} (Ψ : (Fin (m + 2) → Fin 3) → ℂ)
             * ∏ x ∈ openBonds (m + 2), fBond x :=
   weylMap_openGroundForm_eq_boundary_smul_prod Ψ hΨ
 
-/-- **Negative control**: the `hp` weighted-homogeneity hypothesis of
-`exists_boundary_factorization` is load-bearing.  Without it, `hdvd` alone is too weak:
-`p := (∏ f_x^S) * X (0,0) ^ (S + 1)` is divisible by `∏ f_x^S` but (already at `S = 1`, `m = 0`) its
-cofactor `X (0,0) ^ 2` has degree `2` at the first site, not `1`, so it is not a sum of the
-boundary monomials at `S = 1` (the two first-site exponents of a boundary multidegree sum to `S`,
-but here they sum to `2 ≠ 1`). -/
+/-- **Shape-membership control**: the multidegree of `X (0,0) ^ 2` lies outside the `S = 1`
+boundary shape, even though `(∏ f_x^1) * X (0,0) ^ 2` is divisible by `∏ f_x^1`.  The two halves
+are established separately, so this pins the image of `boundaryDeg` — the two first-site exponents
+of a boundary multidegree sum to `S`, here to `1`, whereas `X (0,0) ^ 2` sums to `2` — against a
+multidegree that the divisibility hypothesis of `exists_boundary_factorization` would admit on its
+own.  A wrong generalization of `boundaryDeg` allowing an end degree above `S` fails here.  This is
+a statement about `boundaryDeg`, not a refutation of a factorization: ruling out a boundary
+factorization of that `p` would additionally need the cancellation step in the integral domain. -/
 example :
     (∏ x ∈ openBonds 2, fBond x ^ 1) ∣ (∏ x ∈ openBonds 2, fBond x ^ 1) * X ((0 : Fin 2), 0) ^ 2 ∧
       ¬ ∃ d ∈ Finset.image (boundaryDeg 0 1) Finset.univ,
