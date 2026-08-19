@@ -112,6 +112,7 @@ import LatticeSystem.Tests.GeneralSCasimirPositivity
 import LatticeSystem.Tests.GeneralSOpenChainGroundSpace
 import LatticeSystem.Tests.GeneralSBoundaryShape
 import LatticeSystem.Tests.GeneralSEdgeDegeneracyLowerBound
+import LatticeSystem.Tests.GeneralSEdgeDegeneracy
 
 /-!
 # Test aggregator for the `lattice-system` library

@@ -473,6 +473,14 @@ def approved_changes(text: str) -> str:
             "| `Quantum/SpinS/VBSInversionParity.lean`; `Quantum/SpinS/SPTTopologicalIndex.lean` |",
         )
         .replace(
+            "`tasaki_vbs_edge_degeneracy` (**AXIOM**): the spin-`S` AKLT open chain has "
+            "`(S+1)²`-fold edge degeneracy.",
+            "`tasaki_vbs_edge_degeneracy` was an **AXIOM** here and has been **discharged and "
+            "deleted** (Issue #5292): the `(S+1)²`-fold edge degeneracy of the spin-`S` AKLT open "
+            "chain is proved as `finrank_openAKLTGroundSpaceGeneralS_eq_succ_sq`, see the "
+            "supplemental §8.3.1 record below.",
+        )
+        .replace(
             "All items below are formally proved with **zero `sorry`**.",
             "The catalogue below includes proved results, conditional results, and documented axioms as recorded, with **zero `sorry`**.",
         )

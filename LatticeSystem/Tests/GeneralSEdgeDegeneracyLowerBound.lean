@@ -61,9 +61,9 @@ example {L S : ℕ} (hL : 2 ≤ L) (hS : S ≠ 0) :
 /-! ### 2. `S = 1` value: the `4 ≤ finrank` bound of Problem 7.2.3.a -/
 
 /-- At `S = 1` the lower bound reproduces the `4 ≤ finrank` bound of the `S = 1` open chain
-(`four_le_finrank_openAKLTGroundSpace`), stated through the general-`S` ground space: the
-identification `openAKLTGroundSpaceGeneralS L 1 = openAKLTGroundSpace L` is a separate fact, so this
-test does **not** compare against `openAKLTGroundSpace`. -/
+(`four_le_finrank_openAKLTGroundSpace`), stated through the general-`S` ground space: this pin is
+about the lower-bound theorem alone, so it does not travel along the separate identification
+`openAKLTGroundSpaceGeneralS_one` (pinned in `Tests/GeneralSEdgeDegeneracy.lean`). -/
 example (m : ℕ) : 4 ≤ Module.finrank ℂ (openAKLTGroundSpaceGeneralS (m + 2) 1) := by
   have h := succ_sq_le_finrank_openAKLTGroundSpaceGeneralS (m := m) (S := 1) (by norm_num)
   norm_num at h
