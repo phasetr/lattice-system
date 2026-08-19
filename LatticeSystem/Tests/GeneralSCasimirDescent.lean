@@ -34,12 +34,14 @@ noncomputable example (c : ℂ) (p : MvPolynomial (Fin 2 × Fin 2) ℂ) :
 noncomputable example (m S : ℕ) : List ℂ :=
   casimirPenaltyScalars m S
 
-/-- `casimirDescentStep` preserves `siteWeight`-homogeneity of bidegree `(m + 1, m + 1)`. -/
+/-- `casimirDescentStep` preserves `siteWeight`-homogeneity of bidegree `(m, m)`, with no
+nonzero-level side condition: at the bottom level `(0, 0)` the bond derivation annihilates its
+argument, so the step stays in that bidegree there too. -/
 example {m : ℕ} (c : ℂ) {p : MvPolynomial (Fin 2 × Fin 2) ℂ}
     (hp : p.IsWeightedHomogeneous (siteWeight (L := 2))
-      (Finsupp.single 0 (m + 1) + Finsupp.single 1 (m + 1))) :
+      (Finsupp.single 0 m + Finsupp.single 1 m)) :
     (casimirDescentStep c p).IsWeightedHomogeneous (siteWeight (L := 2))
-      (Finsupp.single 0 (m + 1) + Finsupp.single 1 (m + 1)) :=
+      (Finsupp.single 0 m + Finsupp.single 1 m) :=
   casimirDescentStep_isWeightedHomogeneous c hp
 
 /-- The level shift: `A_{c + (2m+2)}(f₂ q) = f₂ · A_c(q)` for `q` of bidegree `(m, m)`. -/
