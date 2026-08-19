@@ -9,12 +9,12 @@ Weyl image (`weylMap_openVBSStateGeneralS`), their membership and independence, 
 bound `succ_sq_le_finrank_openAKLTGroundSpaceGeneralS`, and the attainment fact
 `isGroundEnergy_openAKLTHamiltonianGeneralS`.
 
-Beyond the signature pins the file fixes the numerical values (`S = 1` gives `4 ≤ dim`, the
-nine-fold `S = 2`, `m = 0` case Tasaki names on p. 252), the cardinality `(S+1)²` of the index type
-consumed by `finrank_span_eq_card`, the nonzero witness attainment needs, and two shape controls:
-the degenerate `S = 0` collapse of both the boundary monomial and the bond product, and the `S = 1`,
-`m = 0` Weyl image `X_{(1,a)} X_{(2,b)} f_1` predicted by the merged
-`weylMap_openGroundForm_eq_boundary_smul_prod`.
+Beyond the signature pins the file fixes the numerical values (`S = 1` gives `4 ≤ dim`, an `m = 0`
+instance of the nine-fold `S = 2` degeneracy Tasaki states for the open `S = 2` chain on p. 252),
+the cardinality `(S+1)²` of the index type consumed by `finrank_span_eq_card`, the nonzero witness
+attainment needs, and two shape controls: the degenerate `S = 0` collapse of both the boundary
+monomial and the bond product, and the `S = 1`, `m = 0` Weyl image `X_{(1,a)} X_{(2,b)} f_1`
+predicted by `weylMap_openGroundForm_eq_boundary_smul_prod`.
 -/
 
 open Matrix MvPolynomial
