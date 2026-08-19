@@ -54,7 +54,7 @@ and is exported for the same consumer.
 This is the derivation layer of the Casimir descent for the uniqueness of the spin-`S` valence-bond
 ground state: under the Weyl (Schwinger-boson) representation the two-site Casimir operator acts as
 `N (N + 1) - f_{xy} Ω`, so multiplication by `f_{xy}` shifts the Casimir eigenvalue exactly by the
-`(m + n + 2)` recorded above.
+`(D x + D y + 2)` recorded above.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (Springer, 2020),
 §7.1.3 "The Uniqueness of the Ground State", pp. 186–188, eqs. (7.1.22)–(7.1.25); polynomial

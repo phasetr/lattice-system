@@ -11,7 +11,8 @@ bidegree-lowering half of §2 "genuinely laborious" remark on `IsWeightedHomogen
 
 `Ω := ∂_a∂_b − ∂_c∂_d` (`bondOmega a b c d`) is the two-site derivative operator whose instance at
 the bond factor `f = X a * X b - X c * X d` (`bondFactor a b c d`) drives the Casimir-descent route
-to `hloc`.  This file is deliberately Math-layer only (no `AKLTUniqueness`/`weylMap` dependency);
+to the local kernel statement `f2_pow_dvd_weylMap_of_localCasimirPenalty`.  This file is
+deliberately Math-layer only (no `AKLTUniqueness`/`weylMap` dependency);
 `bondFactor (x,0) (y,1) (x,1) (y,0)` plays the role of the `L = 2` bond factor `f2` for an arbitrary
 pair of distinct sites `x y : Fin L`.
 
