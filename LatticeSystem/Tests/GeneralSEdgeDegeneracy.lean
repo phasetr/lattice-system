@@ -12,7 +12,6 @@ Each signature pin is discharged by the production declaration itself, so a chan
 three statements breaks this file.
 -/
 
-open Matrix MvPolynomial
 open LatticeSystem.Quantum
 
 namespace LatticeSystem.Tests.GeneralSEdgeDegeneracy
