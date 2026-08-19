@@ -113,6 +113,7 @@ import LatticeSystem.Tests.GeneralSOpenChainGroundSpace
 import LatticeSystem.Tests.GeneralSBoundaryShape
 import LatticeSystem.Tests.GeneralSEdgeDegeneracyLowerBound
 import LatticeSystem.Tests.GeneralSEdgeDegeneracy
+import LatticeSystem.Tests.ProjectiveRepresentation
 
 /-!
 # Test aggregator for the `lattice-system` library
