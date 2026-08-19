@@ -3,7 +3,7 @@ import LatticeSystem.Math.MvPolynomial.WeightedHomogeneousLayer
 import LatticeSystem.Math.MvPolynomial.BilinearFactorCoprime
 
 /-!
-# Red tests for the bond-factor derivation layer (PR-3a, #5292)
+# Specification tests for the bond-factor derivation layer (PR-3a, #5292)
 
 Signature/behaviour specification for
 `LatticeSystem.Math.MvPolynomial.BondFactorDerivation` (PR-3 design round §2.1 fact (K1) and the
@@ -116,7 +116,7 @@ example {L : ℕ} {x y : Fin L} (hxy : x ≠ y) {m n : ℕ} {p : MvPolynomial (F
         + ((m + n + 2 : ℕ) : ℂ) • p := by
   simpa [hxy, hxy.symm] using bondOmega_bond_mul_of_isWeightedHomogeneous hxy hp
 
-/-! ## `N = 2` numeric checks (design report §2.1: `Ω(u₀²u₁²) = 0`, `Ω(f₂²) = 6f₂`) -/
+/-! ## `N = 2` numeric checks (design round §2.1: `Ω(u₀²u₁²) = 0`, `Ω(f₂²) = 6f₂`) -/
 
 /-- `Ω(u₀²u₁²) = 0` at `N = 2`: `u₀²u₁²` has site-`0` degree `2` from `u₀` alone and site-`1`
 degree `2` from `u₁` alone, so neither derivative branch of `Ω` sees both of its variables. -/
@@ -129,7 +129,7 @@ example :
     simpa using (pderiv (R := ℂ) ((0 : Fin 2), (1 : Fin 2))).map_natCast 2
   simp [h2, Prod.mk.injEq]
 
-/-- `Ω(f₂²) = 6·f₂` at `N = 2` (design report §2.1, the `Ĉ p = 0` check on `p = f₂²`, `J = 0`):
+/-- `Ω(f₂²) = 6·f₂` at `N = 2` (design round §2.1, the `Ĉ p = 0` check on `p = f₂²`, `J = 0`):
 derived from the headline instance applied at `p = f₂` itself (`m = n = 1`) together with `Ω f₂ =
 2`. -/
 example :
