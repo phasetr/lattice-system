@@ -1,22 +1,31 @@
 /-
-# Tasaki §7.2.3 (Problem 7.2.3.b): the boundary-quadratic factorization (S.77)
+# Tasaki §8.3.1 / §7.2.3 (Problem 7.2.3.b): the boundary shape of the open-chain cofactor
 
-The polynomial half of the completeness statement for the **open** `S = 1` AKLT chain: the Weyl
-image of any open-chain ground form is a **boundary quadratic** in the two end sites times the
-product of the `L − 1` open bond factors,
+The polynomial half of the completeness statement for the **open** spin-`S` AKLT chain: a
+polynomial of per-site degree `2S` that is divisible by the product of the `S`-th powers of the
+`L − 1` open bond factors equals that product times a **boundary form** — a linear combination of
+the `(S+1)²` monomials
+
+`u_1^{S−a} v_1^a · u_L^{S−b} v_L^b`,  `a, b ∈ {0, …, S}`,
+
+carried by the two end sites alone (`exists_boundary_factorization`).  At `S = 1` the boundary form
+is the quadratic of eq. (S.77) and the statement specializes to the Weyl image of an open-chain
+`S = 1` ground form (`weylMap_openGroundForm_eq_boundary_smul_prod`),
 
 `weylMap Ψ = (Σ_{a,b} c_{ab} u/v_1^a u/v_L^b) · ∏_{x=1}^{L-1} (u_x v_{x+1} − v_x u_{x+1})`.
 
 Structurally this repeats the ring argument of `AKLTUniqueness/ProductBondDivisibility.lean` with
 `Finset.univ` replaced by `openBonds L`, with one genuine difference.  On the ring the `L` bond
-factors already account for the whole degree `2L` of the Weyl image, so the cofactor is a
-*constant* and the ground space is one-dimensional.  On the open chain there are only `L − 1`
-bonds, total degree `2L − 2`, so the cofactor has degree `2` — and the total-degree grading is far
-too coarse to pin a degree-`2` form in `2L` variables.  What does pin it is the **per-site**
-grading of `Math/MvPolynomial/WeightedHomogeneousLayer.lean`: every site of the Weyl image carries
-degree exactly `2`, the open bond product carries `1` at each end site and `2` in the bulk, so the
-cofactor carries `1` at each end and `0` everywhere else.  Those are exactly the four monomials
-`u_1 u_L, u_1 v_L, v_1 u_L, v_1 v_L` of eq. (S.77).
+factors already account for the whole degree of the Weyl image, so the cofactor is a *constant* and
+the ground space is one-dimensional.  On the open chain there are only `L − 1` bonds, so the
+cofactor is a nonconstant form — and the total-degree grading is far too coarse to pin it in `2L`
+variables.  What does pin it is the **per-site** grading of
+`Math/MvPolynomial/WeightedHomogeneousLayer.lean`: the hypothesis carries degree `2S` at every
+site, the open bond product `∏ f_x^S` carries `S` at each end site and `2S` in the bulk, so the
+cofactor carries `S` at each end and `0` everywhere else.  A degree-`S` multidegree in a single
+site's two variables is exactly a split `(S−a, a)`, which gives the `(S+1)²` boundary multidegrees
+`boundaryDeg` — Tasaki's two free effective spin-`S/2` edge spins.  At `S = 1` they are the four
+monomials `u_1 u_L, u_1 v_L, v_1 u_L, v_1 v_L` of eq. (S.77).
 
 The bond factors are handled with the same UFD machinery as on the ring, but the separation
 witness is produced by `exists_open_bond_var_witness`, which needs no hypothesis on `L` at all
@@ -30,7 +39,7 @@ is `2 + 2(L − 1) = 2L`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §7.2.3, Problem 7.2.3.b, p. 207, solution (S.77), p. 508; §7.1.3, eqs. (7.1.22)–(7.1.25),
-pp. 186–188; proof due to Kennedy–Lieb–Tasaki [41].
+pp. 186–188; §8.3.1, p. 252; proof due to Kennedy–Lieb–Tasaki [41].
 -/
 import LatticeSystem.Quantum.SpinS.AKLTOpenChain
 import LatticeSystem.Quantum.SpinS.AKLTUniqueness.ProductBondDivisibility
@@ -97,6 +106,21 @@ load-bearing `q ≠ 0` hypothesis of `isWeightedHomogeneous_cofactor_weight`, wi
 homogeneity hypotheses of that lemma are vacuous. -/
 theorem prod_openBonds_fBond_ne_zero (hL : 1 < L) : (∏ x ∈ openBonds L, fBond x) ≠ 0 :=
   Finset.prod_ne_zero_iff.mpr fun x _ => (fBond_prime hL x).ne_zero
+
+/-- The product of the `S`-th powers of the open bond factors — the divisor produced by the
+general-`S` bond kernel — is `siteWeight`-homogeneous of the `S`-scaled per-bond degree: `S` copies
+of a homogeneous factor scale its per-site degree by `S`. -/
+theorem prod_openBonds_fBond_pow_isWeightedHomogeneous (S : ℕ) :
+    (∏ x ∈ openBonds L, fBond x ^ S).IsWeightedHomogeneous (siteWeight (L := L))
+      (S • ∑ x ∈ openBonds L, (Finsupp.single x 1 + Finsupp.single (ringSucc x) 1)) := by
+  rw [Finset.prod_pow]
+  exact prod_openBonds_fBond_isWeightedHomogeneous.pow S
+
+/-- The product of the `S`-th powers of the open bond factors is nonzero — the load-bearing `q ≠ 0`
+hypothesis of `isWeightedHomogeneous_cofactor_weight` in the general-`S` setting. -/
+theorem prod_openBonds_fBond_pow_ne_zero (hL : 1 < L) (S : ℕ) :
+    (∏ x ∈ openBonds L, fBond x ^ S) ≠ 0 :=
+  Finset.prod_ne_zero_iff.mpr fun x _ => pow_ne_zero S (fBond_prime hL x).ne_zero
 
 /-! ### Per-site bookkeeping: degree `1` at the two ends, `2` in the bulk -/
 
@@ -169,12 +193,28 @@ theorem prodWeight_apply_last (hL : 2 ≤ L) :
       ⟨L - 1, by omega⟩ = 1 := by
   rw [prodWeight_apply, if_neg (by rw [mem_openBonds]; simp; omega), if_pos (by simp; omega)]
 
+/-- Scaling the per-bond degree sum by `S` scales every site's degree by `S`.  Isolated as its own
+lemma because `IsWeightedHomogeneous.pow` produces the `AddMonoid.nsmul` action, whereas `Finsupp`
+also carries its own `ℕ`-action; the induction below never has to name either instance. -/
+private theorem smul_prodWeight_apply (S : ℕ) (y : Fin L) :
+    (S • ∑ x ∈ openBonds L, (Finsupp.single x 1 + Finsupp.single (ringSucc x) 1) :
+        Fin L →₀ ℕ) y
+      = S * (∑ x ∈ openBonds L, (Finsupp.single x 1 + Finsupp.single (ringSucc x) 1) :
+        Fin L →₀ ℕ) y := by
+  induction S with
+  | zero => simp
+  | succ n ih => rw [succ_nsmul, Finsupp.add_apply, ih, Nat.succ_mul]
+
 /-! ### The shape of the cofactor -/
 
-/-- The four boundary multidegrees of eq. (S.77): one variable of the first site and one variable
-of the last site, indexed by the two free `S = 1/2` edge spins. -/
-private noncomputable def boundaryDeg (m : ℕ) (ab : Fin 2 × Fin 2) : (Fin (m + 2) × Fin 2) →₀ ℕ :=
-  Finsupp.single ((0 : Fin (m + 2)), ab.1) 1 + Finsupp.single (Fin.last (m + 1), ab.2) 1
+/-- The `(S+1)²` **boundary multidegrees**: the degree-`S` binary form `u^{S−a} v^a` at the first
+site times the degree-`S` binary form `u^{S−b} v^b` at the last site, indexed by Tasaki's two free
+effective spin-`S/2` edge spins (§8.3.1, p. 252).  At `S = 1` these are the four multidegrees of
+eq. (S.77).  The single-site factors are the Weyl multidegrees `mdSite`, so the indexing convention
+(`0 ↦ u`, `1 ↦ v`) is the one of the Weyl map itself. -/
+noncomputable def boundaryDeg (m S : ℕ) (ab : Fin (S + 1) × Fin (S + 1)) :
+    (Fin (m + 2) × Fin 2) →₀ ℕ :=
+  mdSite (N := S) (0 : Fin (m + 2)) ab.1 + mdSite (N := S) (Fin.last (m + 1)) ab.2
 
 /-- The first and last sites of a chain of length `≥ 2` are distinct. -/
 private theorem first_ne_last (m : ℕ) : (0 : Fin (m + 2)) ≠ Fin.last (m + 1) := by
@@ -183,66 +223,72 @@ private theorem first_ne_last (m : ℕ) : (0 : Fin (m + 2)) ≠ Fin.last (m + 1)
   simp only [Fin.val_zero, Fin.val_last] at hv
   omega
 
-/-- Coefficientwise description of a boundary multidegree. -/
-private theorem boundaryDeg_apply {m : ℕ} (ab : Fin 2 × Fin 2) (y : Fin (m + 2)) (j : Fin 2) :
-    boundaryDeg m ab (y, j)
-      = (if (0 : Fin (m + 2)) = y ∧ ab.1 = j then 1 else 0)
-        + (if Fin.last (m + 1) = y ∧ ab.2 = j then 1 else 0) := by
-  simp only [boundaryDeg, Finsupp.add_apply, Finsupp.single_apply, Prod.mk.injEq]
+/-- The exponent of `u` at the first site is `S − a`. -/
+theorem boundaryDeg_apply_first_u {m S : ℕ} (ab : Fin (S + 1) × Fin (S + 1)) :
+    boundaryDeg m S ab ((0 : Fin (m + 2)), 0) = S - (ab.1 : ℕ) := by
+  simp [boundaryDeg, Finsupp.add_apply, mdSite_apply_self,
+    mdSite_apply_ne (first_ne_last m).symm]
 
-/-- A boundary multidegree at the first site reads off its first index. -/
-private theorem boundaryDeg_apply_first {m : ℕ} (ab : Fin 2 × Fin 2) (j : Fin 2) :
-    boundaryDeg m ab ((0 : Fin (m + 2)), j) = if ab.1 = j then 1 else 0 := by
-  rw [boundaryDeg_apply]
-  simp [Ne.symm (first_ne_last m)]
+/-- The exponent of `v` at the first site is `a`; reading this coordinate recovers the first edge
+spin. -/
+theorem boundaryDeg_apply_first_v {m S : ℕ} (ab : Fin (S + 1) × Fin (S + 1)) :
+    boundaryDeg m S ab ((0 : Fin (m + 2)), 1) = (ab.1 : ℕ) := by
+  simp [boundaryDeg, Finsupp.add_apply, mdSite_apply_snd,
+    mdSite_apply_ne (first_ne_last m).symm]
 
-/-- A boundary multidegree at the last site reads off its second index. -/
-private theorem boundaryDeg_apply_last {m : ℕ} (ab : Fin 2 × Fin 2) (j : Fin 2) :
-    boundaryDeg m ab (Fin.last (m + 1), j) = if ab.2 = j then 1 else 0 := by
-  rw [boundaryDeg_apply]
-  simp [first_ne_last m]
+/-- The exponent of `u` at the last site is `S − b`. -/
+theorem boundaryDeg_apply_last_u {m S : ℕ} (ab : Fin (S + 1) × Fin (S + 1)) :
+    boundaryDeg m S ab (Fin.last (m + 1), 0) = S - (ab.2 : ℕ) := by
+  simp [boundaryDeg, Finsupp.add_apply, mdSite_apply_self, mdSite_apply_ne (first_ne_last m)]
 
-/-- The four boundary multidegrees are pairwise distinct, so the four monomials of eq. (S.77) are
-genuinely four independent monomials. -/
-private theorem boundaryDeg_injective {m : ℕ} : Function.Injective (boundaryDeg m) := by
+/-- The exponent of `v` at the last site is `b`; reading this coordinate recovers the second edge
+spin. -/
+theorem boundaryDeg_apply_last_v {m S : ℕ} (ab : Fin (S + 1) × Fin (S + 1)) :
+    boundaryDeg m S ab (Fin.last (m + 1), 1) = (ab.2 : ℕ) := by
+  simp [boundaryDeg, Finsupp.add_apply, mdSite_apply_snd, mdSite_apply_ne (first_ne_last m)]
+
+/-- A boundary multidegree vanishes at both variables of every interior site: the whole degree sits
+at the two ends. -/
+theorem boundaryDeg_apply_interior {m S : ℕ} (ab : Fin (S + 1) × Fin (S + 1)) {y : Fin (m + 2)}
+    (h0 : y ≠ 0) (hl : y ≠ Fin.last (m + 1)) (j : Fin 2) : boundaryDeg m S ab (y, j) = 0 := by
+  simp [boundaryDeg, Finsupp.add_apply, mdSite_apply_ne (Ne.symm h0), mdSite_apply_ne (Ne.symm hl)]
+
+/-- The `(S+1)²` boundary multidegrees are pairwise distinct — the two `v`-exponents read off `ab`
+— so the boundary form of `exists_boundary_factorization` has `(S+1)²` independent monomials. -/
+theorem boundaryDeg_injective {m S : ℕ} : Function.Injective (boundaryDeg m S) := by
   rintro ⟨a₁, b₁⟩ ⟨a₂, b₂⟩ h
-  have ha := congrArg (fun f : (Fin (m + 2) × Fin 2) →₀ ℕ => f ((0 : Fin (m + 2)), a₁)) h
-  have hb := congrArg (fun f : (Fin (m + 2) × Fin 2) →₀ ℕ => f (Fin.last (m + 1), b₁)) h
-  simp only [boundaryDeg_apply_first, boundaryDeg_apply_last] at ha hb
-  have ha' : a₂ = a₁ := by
-    by_contra hc
-    simp only [if_neg hc] at ha
-    simp at ha
-  have hb' : b₂ = b₁ := by
-    by_contra hc
-    simp only [if_neg hc] at hb
-    simp at hb
-  rw [ha', hb']
+  have ha := congrArg (fun f : (Fin (m + 2) × Fin 2) →₀ ℕ => f ((0 : Fin (m + 2)), 1)) h
+  have hb := congrArg (fun f : (Fin (m + 2) × Fin 2) →₀ ℕ => f (Fin.last (m + 1), 1)) h
+  simp only [boundaryDeg_apply_first_v, boundaryDeg_apply_last_v] at ha hb
+  rw [Fin.ext ha, Fin.ext hb]
 
-/-- **The cofactor has per-site degree `1` at each end and `0` in the bulk.**  Writing
-`weylMap Ψ = (∏_{openBonds} f_x) · r`, the weighted cofactor lemma applied at each site turns the
-per-site identity `(bond product degree) + (cofactor degree) = 2` into exponent arithmetic: `2 + ?`
-in the bulk forces `? = 0`, and `1 + ?` at the two ends forces `? = 1`. -/
-private theorem cofactor_support_shape {m : ℕ} (Ψ : (Fin (m + 2) → Fin 3) → ℂ)
-    {r : MvPolynomial (Fin (m + 2) × Fin 2) ℂ}
-    (hqr : weylMap Ψ = (∏ x ∈ openBonds (m + 2), fBond x) * r)
+/-- **The cofactor has per-site degree `S` at each end and `0` in the bulk.**  Writing
+`p = (∏_{openBonds} f_x^S) · r` with `p` of per-site degree `2S`, the weighted cofactor lemma
+applied at each site turns the per-site identity `(bond product degree) + (cofactor degree) = 2S`
+into exponent arithmetic: `2S + ?` in the bulk forces `? = 0`, and `S + ?` at the two ends forces
+`? = S`. -/
+private theorem cofactor_support_shape {m S : ℕ} {p r : MvPolynomial (Fin (m + 2) × Fin 2) ℂ}
+    (hp : p.IsWeightedHomogeneous (siteWeight (L := m + 2))
+      (∑ x : Fin (m + 2), Finsupp.single x (2 * S)))
+    (hpr : p = (∏ x ∈ openBonds (m + 2), fBond x ^ S) * r)
     {d : (Fin (m + 2) × Fin 2) →₀ ℕ} (hd : d ∈ r.support) :
     (∀ y : Fin (m + 2), y ≠ 0 → y ≠ Fin.last (m + 1) → d (y, 0) = 0 ∧ d (y, 1) = 0)
-      ∧ d ((0 : Fin (m + 2)), 0) + d ((0 : Fin (m + 2)), 1) = 1
-      ∧ d (Fin.last (m + 1), 0) + d (Fin.last (m + 1), 1) = 1 := by
-  have hn : ((∏ x ∈ openBonds (m + 2), fBond x) * r).IsWeightedHomogeneous
-      (siteWeight (L := m + 2)) (∑ x : Fin (m + 2), Finsupp.single x 2) := by
-    rw [← hqr]
-    exact weylMap_isWeightedHomogeneous Ψ
+      ∧ d ((0 : Fin (m + 2)), 0) + d ((0 : Fin (m + 2)), 1) = S
+      ∧ d (Fin.last (m + 1), 0) + d (Fin.last (m + 1), 1) = S := by
+  have hn : ((∏ x ∈ openBonds (m + 2), fBond x ^ S) * r).IsWeightedHomogeneous
+      (siteWeight (L := m + 2)) (∑ x : Fin (m + 2), Finsupp.single x (2 * S)) := by
+    rw [← hpr]
+    exact hp
   have hkey := isWeightedHomogeneous_cofactor_weight
-    (prod_openBonds_fBond_isWeightedHomogeneous (L := m + 2))
-    (prod_openBonds_fBond_ne_zero (by omega)) hn hd
+    (prod_openBonds_fBond_pow_isWeightedHomogeneous (L := m + 2) S)
+    (prod_openBonds_fBond_pow_ne_zero (by omega) S) hn hd
   have happ : ∀ y : Fin (m + 2),
-      (∑ x ∈ openBonds (m + 2), (Finsupp.single x 1 + Finsupp.single (ringSucc x) 1) :
-          Fin (m + 2) →₀ ℕ) y + (d (y, 0) + d (y, 1)) = 2 := by
+      S * (∑ x ∈ openBonds (m + 2), (Finsupp.single x 1 + Finsupp.single (ringSucc x) 1) :
+          Fin (m + 2) →₀ ℕ) y + (d (y, 0) + d (y, 1)) = 2 * S := by
     intro y
     have h := congrArg (fun f : Fin (m + 2) →₀ ℕ => f y) hkey
-    simpa only [Finsupp.add_apply, weight_siteWeight_apply, weylMapWeight_apply] using h
+    simpa only [Finsupp.add_apply, smul_prodWeight_apply, weight_siteWeight_apply,
+      weylMapWeight_apply] using h
   have hz : (⟨0, by omega⟩ : Fin (m + 2)) = (0 : Fin (m + 2)) := Fin.ext (by simp)
   have hl : (⟨m + 2 - 1, by omega⟩ : Fin (m + 2)) = Fin.last (m + 1) := Fin.ext (by simp)
   refine ⟨fun y hy0 hyl => ?_, ?_, ?_⟩
@@ -264,43 +310,78 @@ private theorem cofactor_support_shape {m : ℕ} (Ψ : (Fin (m + 2) → Fin 3) �
     rw [hlst] at h
     omega
 
-/-- Every multidegree of the shape produced by `cofactor_support_shape` is one of the four
-boundary multidegrees: degree `1` split over a site's two variables selects exactly one of
-them. -/
-private theorem exists_boundary_shape {m : ℕ} {d : (Fin (m + 2) × Fin 2) →₀ ℕ}
+/-- Every multidegree of the shape produced by `cofactor_support_shape` is one of the `(S+1)²`
+boundary multidegrees: a degree-`S` split over a site's two variables is exactly the choice of the
+`v`-exponent `a ≤ S`, which is what `Fin (S+1)` records.  This is the boundary multidegree
+bijection behind the `(S+1)²` count of §8.3.1, p. 252. -/
+private theorem exists_boundary_shape {m S : ℕ} {d : (Fin (m + 2) × Fin 2) →₀ ℕ}
     (hint : ∀ y : Fin (m + 2), y ≠ 0 → y ≠ Fin.last (m + 1) → d (y, 0) = 0 ∧ d (y, 1) = 0)
-    (hfst : d ((0 : Fin (m + 2)), 0) + d ((0 : Fin (m + 2)), 1) = 1)
-    (hlst : d (Fin.last (m + 1), 0) + d (Fin.last (m + 1), 1) = 1) :
-    ∃ ab : Fin 2 × Fin 2, d = boundaryDeg m ab := by
-  classical
-  have hA : ∃ a : Fin 2, ∀ j : Fin 2, d ((0 : Fin (m + 2)), j) = if a = j then 1 else 0 := by
-    rcases (by omega : d ((0 : Fin (m + 2)), 0) = 1 ∧ d ((0 : Fin (m + 2)), 1) = 0
-        ∨ d ((0 : Fin (m + 2)), 0) = 0 ∧ d ((0 : Fin (m + 2)), 1) = 1) with ⟨h1, h2⟩ | ⟨h1, h2⟩
-    · exact ⟨0, fun j => by fin_cases j <;> simp [h1, h2]⟩
-    · exact ⟨1, fun j => by fin_cases j <;> simp [h1, h2]⟩
-  have hB : ∃ b : Fin 2, ∀ j : Fin 2, d (Fin.last (m + 1), j) = if b = j then 1 else 0 := by
-    rcases (by omega : d (Fin.last (m + 1), 0) = 1 ∧ d (Fin.last (m + 1), 1) = 0
-        ∨ d (Fin.last (m + 1), 0) = 0 ∧ d (Fin.last (m + 1), 1) = 1) with ⟨h1, h2⟩ | ⟨h1, h2⟩
-    · exact ⟨0, fun j => by fin_cases j <;> simp [h1, h2]⟩
-    · exact ⟨1, fun j => by fin_cases j <;> simp [h1, h2]⟩
-  obtain ⟨a, ha⟩ := hA
-  obtain ⟨b, hb⟩ := hB
-  refine ⟨(a, b), ?_⟩
+    (hfst : d ((0 : Fin (m + 2)), 0) + d ((0 : Fin (m + 2)), 1) = S)
+    (hlst : d (Fin.last (m + 1), 0) + d (Fin.last (m + 1), 1) = S) :
+    ∃ ab : Fin (S + 1) × Fin (S + 1), d = boundaryDeg m S ab := by
+  refine ⟨(⟨d ((0 : Fin (m + 2)), 1), by omega⟩, ⟨d (Fin.last (m + 1), 1), by omega⟩), ?_⟩
   ext e
   obtain ⟨y, j⟩ := e
-  by_cases hy0 : (0 : Fin (m + 2)) = y
+  by_cases hy0 : y = 0
   · subst hy0
-    rw [ha j, boundaryDeg_apply_first]
-  · by_cases hyl : Fin.last (m + 1) = y
+    revert j
+    rw [Fin.forall_fin_two]
+    refine ⟨?_, ?_⟩
+    · simp only [boundaryDeg_apply_first_u]
+      omega
+    · simp only [boundaryDeg_apply_first_v]
+  · by_cases hyl : y = Fin.last (m + 1)
     · subst hyl
-      rw [hb j, boundaryDeg_apply_last]
-    · rw [boundaryDeg_apply, if_neg (fun h => hy0 h.1), if_neg (fun h => hyl h.1), add_zero]
-      have hzero := hint y (fun h => hy0 h.symm) (fun h => hyl h.symm)
-      fin_cases j
-      · exact hzero.1
-      · exact hzero.2
+      revert j
+      rw [Fin.forall_fin_two]
+      refine ⟨?_, ?_⟩
+      · simp only [boundaryDeg_apply_last_u]
+        omega
+      · simp only [boundaryDeg_apply_last_v]
+    · revert j
+      rw [Fin.forall_fin_two]
+      refine ⟨?_, ?_⟩
+      · rw [boundaryDeg_apply_interior _ hy0 hyl]
+        exact (hint y hy0 hyl).1
+      · rw [boundaryDeg_apply_interior _ hy0 hyl]
+        exact (hint y hy0 hyl).2
 
-/-! ### Eq. (S.77) -/
+/-! ### The general-`S` boundary shape, and eq. (S.77) -/
+
+/-- **General-`S` boundary shape of the cofactor** (Tasaki §8.3.1, p. 252; the `S = 1` case is
+Problem 7.2.3.b, solution (S.77), p. 508).  A polynomial of per-site degree `2S` divisible by
+`∏_{openBonds} f_x^S` is that product times a **boundary form**: a linear combination of the
+`(S+1)²` monomials `X^{boundaryDeg m S ab}`, which involve only the two end sites.
+
+Stated for a bare polynomial rather than for a Weyl image `weylMap Φ`: this is the weakest
+hypothesis, it keeps the spin-state type `Fin (2S+1)` out of the statement, and it is what the
+ground-space corollary and the dimension count both consume. -/
+theorem exists_boundary_factorization {m S : ℕ} {p : MvPolynomial (Fin (m + 2) × Fin 2) ℂ}
+    (hp : p.IsWeightedHomogeneous (siteWeight (L := m + 2))
+      (∑ x : Fin (m + 2), Finsupp.single x (2 * S)))
+    (hdvd : (∏ x ∈ openBonds (m + 2), fBond x ^ S) ∣ p) :
+    ∃ c : Fin (S + 1) × Fin (S + 1) → ℂ,
+      p = (∑ ab : Fin (S + 1) × Fin (S + 1), monomial (boundaryDeg m S ab) (c ab))
+            * ∏ x ∈ openBonds (m + 2), fBond x ^ S := by
+  classical
+  obtain ⟨r, hr⟩ := hdvd
+  have hsupp : r.support ⊆ Finset.image (boundaryDeg m S) Finset.univ := by
+    intro d hd
+    obtain ⟨hint, hfst, hlst⟩ := cofactor_support_shape hp hr hd
+    obtain ⟨ab, hab⟩ := exists_boundary_shape hint hfst hlst
+    exact Finset.mem_image.mpr ⟨ab, Finset.mem_univ ab, hab.symm⟩
+  refine ⟨fun ab => coeff (boundaryDeg m S ab) r, ?_⟩
+  have hexp : r = ∑ ab : Fin (S + 1) × Fin (S + 1),
+      monomial (boundaryDeg m S ab) (coeff (boundaryDeg m S ab) r) := by
+    calc r = ∑ d ∈ r.support, monomial d (coeff d r) := as_sum r
+      _ = ∑ d ∈ Finset.image (boundaryDeg m S) Finset.univ, monomial d (coeff d r) := by
+          refine Finset.sum_subset hsupp fun d _ hd => ?_
+          rw [notMem_support_iff.mp hd, monomial_zero]
+      _ = ∑ ab : Fin (S + 1) × Fin (S + 1),
+            monomial (boundaryDeg m S ab) (coeff (boundaryDeg m S ab) r) :=
+          Finset.sum_image fun _ _ _ _ h => boundaryDeg_injective h
+  rw [hr, mul_comm (∏ x ∈ openBonds (m + 2), fBond x ^ S) r]
+  exact congrArg (fun q => q * ∏ x ∈ openBonds (m + 2), fBond x ^ S) hexp
 
 /-- A degree-`(1,1)` monomial in two variables is the corresponding scaled product. -/
 private theorem monomial_pair_eq {σ : Type*} (i j : σ) (c : ℂ) :
@@ -308,14 +389,27 @@ private theorem monomial_pair_eq {σ : Type*} (i j : σ) (c : ℂ) :
       = C c * (X i * X j) := by
   rw [X, X, monomial_mul, C_mul_monomial, mul_one, mul_one]
 
+/-- At `S = 1` a boundary multidegree is one variable of the first site and one variable of the
+last site: the degree-`1` binary forms are just `u` and `v`, so `mdSite` collapses to a single
+`Finsupp.single`.  This is the bridge from the general shape to the four quadratic monomials of
+eq. (S.77). -/
+theorem boundaryDeg_one {m : ℕ} (ab : Fin 2 × Fin 2) :
+    boundaryDeg m 1 ab
+      = Finsupp.single ((0 : Fin (m + 2)), ab.1) 1 + Finsupp.single (Fin.last (m + 1), ab.2) 1 := by
+  have hmd : ∀ (x : Fin (m + 2)) (k : Fin 2), mdSite (N := 1) x k = Finsupp.single (x, k) 1 := by
+    intro x k
+    fin_cases k <;> simp [mdSite]
+  rw [boundaryDeg, hmd, hmd]
+
 /-- **Tasaki Problem 7.2.3.b, eq. (S.77), p. 508** (printed upper product index `L` corrected to
 `L − 1`).  The Weyl image of any open-chain ground form factors as a **boundary quadratic** —
 a linear combination of the four products `X_{(1,a)} X_{(L,b)}`, involving only the two end sites —
 times the product of the `L − 1` open bond factors.
 
 Proof: each open bond factor divides `weylMap Ψ` (the U3b bridge), distinct open bonds are
-relatively prime, so the whole product divides (`prod_dvd_of_pairwise_isRelPrime`); the per-site
-weighted cofactor lemma then confines the cofactor's support to the four boundary multidegrees.
+relatively prime, so the whole product divides (`prod_dvd_of_pairwise_isRelPrime`); the general
+boundary shape `exists_boundary_factorization` at `S = 1` then confines the cofactor's support to
+the four boundary multidegrees, which `boundaryDeg_one` turns into the printed products.
 
 Unlike the ring statement `weylMap_ground_form_eq_const_smul_prod` there is **no** `Ψ ≠ 0`
 hypothesis: the four coefficients may all vanish, and the cofactor lemma needs the bond product,
@@ -329,28 +423,23 @@ theorem weylMap_openGroundForm_eq_boundary_smul_prod {m : ℕ}
             C (c ab) * (X ((0 : Fin (m + 2)), ab.1) * X (Fin.last (m + 1), ab.2)))
             * ∏ x ∈ openBonds (m + 2), fBond x := by
   classical
-  obtain ⟨r, hr⟩ : (∏ x ∈ openBonds (m + 2), fBond x) ∣ weylMap Ψ :=
-    prod_dvd_of_pairwise_isRelPrime (openBonds (m + 2)) fBond (weylMap Ψ)
+  have hdvd : (∏ x ∈ openBonds (m + 2), fBond x ^ 1) ∣ weylMap Ψ := by
+    simp only [pow_one]
+    exact prod_dvd_of_pairwise_isRelPrime (openBonds (m + 2)) fBond (weylMap Ψ)
       (fun x hx => fBond_dvd_weylMap_of_isVBSGroundForm x (by omega) Ψ (hΨ x hx))
       (fun x hx y hy hxy => fBond_isRelPrime_openBonds (by omega)
         (Finset.mem_coe.mp hx) (Finset.mem_coe.mp hy) hxy)
-  have hsupp : r.support ⊆ Finset.image (boundaryDeg m) Finset.univ := by
-    intro d hd
-    obtain ⟨p, hp⟩ := cofactor_support_shape Ψ hr hd
-    obtain ⟨ab, hab⟩ := exists_boundary_shape p hp.1 hp.2
-    exact Finset.mem_image.mpr ⟨ab, Finset.mem_univ ab, hab.symm⟩
-  refine ⟨fun ab => coeff (boundaryDeg m ab) r, ?_⟩
-  have hexp : r = ∑ ab : Fin 2 × Fin 2,
-      C (coeff (boundaryDeg m ab) r)
-        * (X ((0 : Fin (m + 2)), ab.1) * X (Fin.last (m + 1), ab.2)) := by
-    calc r = ∑ d ∈ r.support, monomial d (coeff d r) := as_sum r
-      _ = ∑ d ∈ Finset.image (boundaryDeg m) Finset.univ, monomial d (coeff d r) := by
-          refine Finset.sum_subset hsupp fun d _ hd => ?_
-          rw [notMem_support_iff.mp hd, monomial_zero]
-      _ = ∑ ab : Fin 2 × Fin 2, monomial (boundaryDeg m ab) (coeff (boundaryDeg m ab) r) :=
-          Finset.sum_image fun _ _ _ _ h => boundaryDeg_injective h
-      _ = _ := Finset.sum_congr rfl fun ab _ => monomial_pair_eq _ _ _
-  rw [hr, mul_comm (∏ x ∈ openBonds (m + 2), fBond x) r]
-  exact congrArg (fun p => p * ∏ x ∈ openBonds (m + 2), fBond x) hexp
+  obtain ⟨c, hc⟩ := exists_boundary_factorization (m := m) (S := 1)
+    (weylMap_isWeightedHomogeneous Ψ) hdvd
+  have hc' : weylMap Ψ
+      = (∑ ab : Fin 2 × Fin 2, monomial (boundaryDeg m 1 ab) (c ab))
+          * ∏ x ∈ openBonds (m + 2), fBond x ^ 1 := hc
+  refine ⟨c, ?_⟩
+  have hsum : (∑ ab : Fin 2 × Fin 2, monomial (boundaryDeg m 1 ab) (c ab))
+      = ∑ ab : Fin 2 × Fin 2,
+          C (c ab) * (X ((0 : Fin (m + 2)), ab.1) * X (Fin.last (m + 1), ab.2)) :=
+    Finset.sum_congr rfl fun ab _ => by rw [boundaryDeg_one, monomial_pair_eq]
+  rw [hc', hsum]
+  simp only [pow_one]
 
 end LatticeSystem.Quantum.AKLTUniqueness
