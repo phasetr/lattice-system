@@ -15,7 +15,10 @@ commutator of `Ω` with multiplication by `f`: for pairwise distinct `a, b, c, d
   `Ω (f * p) = f * Ω p + 2 • p + ∑_{i ∈ {a, b, c, d}} X i * ∂_i p`.
 
 This is a pure Leibniz computation whose only inputs are `∂_a f = X b`, `∂_b f = X a`,
-`∂_c f = -X d` and `∂_d f = -X c`.  Two consequences are recorded:
+`∂_c f = -X d` and `∂_d f = -X c`.  Two consequences are recorded; together they are the eigenvalue
+shift law that the bond-divisibility step of the uniqueness argument runs on.  Neither enters the
+two-site Casimir intertwiner `LatticeSystem.Quantum.weylMap_mulVec_bondCasimirS`, which consumes
+only `bondFactor_mul_bondOmega_two_site` and `site_euler` below.
 
 * `bondOmega_isWeightedHomogeneous` — `Ω` lowers the `w`-weighted degree by `w a + w b`
   (`= w c + w d`, both branches sharing the same target degree), a double application of
@@ -36,6 +39,17 @@ This is a pure Leibniz computation whose only inputs are `∂_a f = X b`, `∂_b
 
 The `p = 1` instance `Ω f = 2` (`bondOmega_bondFactor_self`) is the normalisation that fixes the
 constant `2`.
+
+Independently of the commutator, the two-site operator `f_{xy} Ω` itself is *distributed* into four
+site-separated second-order terms (`bondFactor_mul_bondOmega_two_site`),
+
+  `f_{xy} Ω = a_x b_y + b_x a_y − (u_x∂_{v_x})(v_y∂_{u_y}) − (v_x∂_{u_x})(u_y∂_{v_y})`,
+  `a_x = u_x∂_{u_x}`, `b_x = v_x∂_{v_x}`,
+
+again for every `p` and with `x ≠ y` the only input.  Each factor is the Weyl transport of a
+single-site spin operator, so this identity is what turns the two-site Casimir into `N(N+1) − f Ω`;
+the per-site Euler identity `site_euler` supplies the `a_x + b_x = (deg_x) ·` half of that reduction
+and is exported for the same consumer.
 
 This is the derivation layer of the Casimir descent for the uniqueness of the spin-`S` valence-bond
 ground state: under the Weyl (Schwinger-boson) representation the two-site Casimir operator acts as
@@ -174,8 +188,12 @@ private theorem isWeightedHomogeneous_siteDegWeight {x : Fin L} {D : Fin L →�
 
 /-- **Per-site Euler identity.**  On a `siteWeight`-homogeneous polynomial of per-site degree `D`
 the Euler operator of a single site `x` — the two-term sum over that site's own Weyl variables —
-multiplies by the degree `D x` of that site. -/
-private theorem site_euler {x : Fin L} {D : Fin L →₀ ℕ} {p : MvPolynomial (Fin L × Fin 2) ℂ}
+multiplies by the degree `D x` of that site.
+
+It is the diagonal half of the Weyl dictionary: together with
+`bondFactor_mul_bondOmega_two_site` it is what collapses the `(a_x + b_x)(a_y + b_y)` part of the
+two-site Casimir to the scalar `N²` on a Weyl image. -/
+theorem site_euler {x : Fin L} {D : Fin L →₀ ℕ} {p : MvPolynomial (Fin L × Fin 2) ℂ}
     (hp : p.IsWeightedHomogeneous (siteWeight (L := L)) D) :
     X (x, 0) * pderiv (x, 0) p + X (x, 1) * pderiv (x, 1) p = (D x) • p := by
   have hsum : ∑ i : Fin L × Fin 2, siteDegWeight x i • (X i * pderiv i p)
@@ -224,5 +242,33 @@ theorem bondOmega_bond_mul_of_isWeightedHomogeneous {x y : Fin L} (hxy : x ≠ y
   rw [hbdry, ← Nat.cast_smul_eq_nsmul ℂ (D x) p, ← Nat.cast_smul_eq_nsmul ℂ (D y) p]
   push_cast
   module
+
+/-- **The universal two-site distribution.**  Multiplication by the bond factor
+`f_{xy} = u_x v_y − v_x u_y` composed with the bond derivation `Ω = ∂_{u_x}∂_{v_y} − ∂_{v_x}∂_{u_y}`
+is, on *every* polynomial and with no grading hypothesis, the four-term operator
+
+  `f_{xy} Ω = a_x b_y + b_x a_y − (u_x∂_{v_x})(v_y∂_{u_y}) − (v_x∂_{u_x})(u_y∂_{v_y})`
+
+in which each of the eight factors involves the two variables of a *single* site.  The only input is
+`x ≠ y`: it makes the inner `∂(X)` contribution of each Leibniz expansion vanish, because the
+differentiated variable belongs to the other site.
+
+The four composite terms are exactly the Weyl transports of `Ŝ^{(3)}`- and `Ŝ^±`-type two-site
+products, which is how the identity converts the spin dot product `Ŝ_x·Ŝ_y` into the Euler part
+`¼(a_x + b_x)(a_y + b_y)` minus one half of `f_{xy} Ω`. -/
+theorem bondFactor_mul_bondOmega_two_site {x y : Fin L} (hxy : x ≠ y)
+    (p : MvPolynomial (Fin L × Fin 2) ℂ) :
+    bondFactor ((x, 0) : Fin L × Fin 2) (y, 1) (x, 1) (y, 0)
+        * bondOmega ((x, 0) : Fin L × Fin 2) (y, 1) (x, 1) (y, 0) p
+      = X (x, 0) * pderiv (x, 0) (X (y, 1) * pderiv (y, 1) p)
+        + X (x, 1) * pderiv (x, 1) (X (y, 0) * pderiv (y, 0) p)
+        - X (x, 0) * pderiv (x, 1) (X (y, 1) * pderiv (y, 0) p)
+        - X (x, 1) * pderiv (x, 0) (X (y, 0) * pderiv (y, 1) p) := by
+  have hzero : ∀ i j : Fin 2, pderiv ((x, j) : Fin L × Fin 2)
+      (X ((y, i) : Fin L × Fin 2) : MvPolynomial (Fin L × Fin 2) ℂ) = 0 :=
+    fun _ _ => pderiv_X_of_ne fun h => hxy.symm (congrArg Prod.fst h)
+  rw [bondFactor, bondOmega_apply]
+  simp only [pderiv_mul, hzero, zero_mul, zero_add]
+  ring
 
 end LatticeSystem.Math

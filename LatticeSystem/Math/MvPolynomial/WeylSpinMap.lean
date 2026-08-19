@@ -36,6 +36,7 @@ representation due to Arovas–Auerbach–Haldane [10]; proof due to Kennedy–L
 import Mathlib.Data.Complex.Basic
 import Mathlib.Analysis.SpecialFunctions.Sqrt
 import Mathlib.Data.Nat.Choose.Basic
+import Mathlib.Algebra.MvPolynomial.PDeriv
 import Mathlib.RingTheory.MvPolynomial.Homogeneous
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
 import Mathlib.Algebra.BigOperators.Finsupp.Basic
@@ -66,8 +67,14 @@ coordinate recovers `k` via `k ↦ N - k`, which underlies injectivity of `md`. 
 theorem mdSite_apply_self (x : Fin L) (k : Fin (N + 1)) : (mdSite x k) (x, 0) = N - (k : ℕ) := by
   simp [mdSite, Finsupp.add_apply, Prod.ext_iff]
 
-/-- A single-site multidegree vanishes at any variable belonging to a different site `y ≠ x`. -/
-theorem mdSite_apply_ne {x y : Fin L} (h : y ≠ x) (k : Fin (N + 1)) : (mdSite y k) (x, 0) = 0 := by
+/-- Value of a single-site multidegree at the second (`v`) variable of its own site: this
+coordinate is the site state `k` itself, the exponent of `v_x` in `u_x^{N−k} v_x^k`. -/
+theorem mdSite_apply_snd (x : Fin L) (k : Fin (N + 1)) : (mdSite x k) (x, 1) = (k : ℕ) := by
+  simp [mdSite, Finsupp.add_apply, Prod.ext_iff]
+
+/-- A single-site multidegree vanishes at *either* variable of a different site `y ≠ x`. -/
+theorem mdSite_apply_ne {x y : Fin L} (h : y ≠ x) (k : Fin (N + 1)) (i : Fin 2) :
+    (mdSite y k) (x, i) = 0 := by
   simp [mdSite, Finsupp.add_apply, Prod.ext_iff, h]
 
 /-- The total multidegree of a chain state `σ`, i.e. the sum of the per-site degree-`N`
@@ -79,7 +86,7 @@ noncomputable def md (σ : Fin L → Fin (N + 1)) : (Fin L × Fin 2) →₀ ℕ 
 this is the key computation for injectivity of `md`. -/
 theorem md_apply_fst (σ : Fin L → Fin (N + 1)) (i : Fin L) : (md σ) (i, 0) = N - (σ i : ℕ) := by
   rw [md, Finsupp.finset_sum_apply,
-    Finset.sum_eq_single i (fun y _ hy => mdSite_apply_ne hy (σ y))
+    Finset.sum_eq_single i (fun y _ hy => mdSite_apply_ne hy (σ y) 0)
       (fun h => absurd (Finset.mem_univ i) h)]
   exact mdSite_apply_self i (σ i)
 
@@ -133,6 +140,50 @@ theorem cgNorm_ne_zero (σ : Fin L → Fin (N + 1)) : cgNorm σ ≠ 0 :=
 (7.1.22)–(7.1.23)).  A single monomial is used (not the product form `∏ X`). -/
 noncomputable def weylMono (σ : Fin L → Fin (N + 1)) : MvPolynomial (Fin L × Fin 2) ℂ :=
   MvPolynomial.monomial (md σ) (cgNorm σ)
+
+/-- The single-site Weyl monomial `w_x k = c(k) · u_x^{N−k} v_x^k` (site `x`, site-state `k`):
+the image, under the per-site transport layer, of the standard basis vector `k` at site
+`x` alone, isolated from the other `L − 1` sites.  This is the fixture the per-site ladder
+transport lemmas are stated against; it is the site-`x` factor of `weylMono σ` at `k = σ x`
+(`exists_weylMono_site_factor` below). -/
+noncomputable def weylSiteMono (x : Fin L) (k : Fin (N + 1)) : MvPolynomial (Fin L × Fin 2) ℂ :=
+  MvPolynomial.monomial (mdSite x k) (cgSite k)
+
+/-- **One-site factorization of the Weyl monomials.**  At a fixed site `x` the whole
+`Function.update`-family `k ↦ weylMono (Function.update σ x k)` factors as one `k`-independent
+polynomial `M` — the monomial of the other `L − 1` sites — times the single-site monomial
+`weylSiteMono x k`, and `M` involves no variable of site `x` (recorded as
+`∂_{u_x} M = ∂_{v_x} M = 0`).  Taking `k = σ x` and `Function.update_eq_self` gives the plain
+factorization `weylMono σ = M * weylSiteMono x (σ x)`.
+
+The off-site factor is packaged existentially on purpose: the two-site analogue `restMono`
+(`Quantum.SpinS.AKLTUniqueness.BondDivisibilityBridge`) already names the off-*bond* monomial, and
+a second named "off-monomial" definition would be a near-duplicate of it. -/
+theorem exists_weylMono_site_factor (x : Fin L) (σ : Fin L → Fin (N + 1)) :
+    ∃ M : MvPolynomial (Fin L × Fin 2) ℂ,
+      (∀ i : Fin 2, MvPolynomial.pderiv (x, i) M = 0) ∧
+        ∀ k, weylMono (Function.update σ x k) = M * weylSiteMono x k := by
+  classical
+  refine ⟨MvPolynomial.monomial (∑ y ∈ Finset.univ.erase x, mdSite y (σ y))
+      (∏ y ∈ Finset.univ.erase x, cgSite (σ y)), fun i => ?_, fun k => ?_⟩
+  · have hzero : (∑ y ∈ Finset.univ.erase x, mdSite y (σ y)) (x, i) = 0 := by
+      rw [Finsupp.finset_sum_apply]
+      exact Finset.sum_eq_zero fun y hy => mdSite_apply_ne (Finset.ne_of_mem_erase hy) (σ y) i
+    rw [MvPolynomial.pderiv_monomial, hzero]
+    simp
+  · have hmd : md (Function.update σ x k)
+        = (∑ y ∈ Finset.univ.erase x, mdSite y (σ y)) + mdSite x k := by
+      rw [md, ← Finset.sum_erase_add _ _ (Finset.mem_univ x), Function.update_self]
+      congr 1
+      exact Finset.sum_congr rfl fun y hy => by
+        rw [Function.update_of_ne (Finset.ne_of_mem_erase hy)]
+    have hcg : cgNorm (Function.update σ x k)
+        = (∏ y ∈ Finset.univ.erase x, cgSite (σ y)) * cgSite k := by
+      rw [cgNorm, ← Finset.prod_erase_mul _ _ (Finset.mem_univ x), Function.update_self]
+      congr 1
+      exact Finset.prod_congr rfl fun y hy => by
+        rw [Function.update_of_ne (Finset.ne_of_mem_erase hy)]
+    rw [weylMono, weylSiteMono, MvPolynomial.monomial_mul, hmd, hcg]
 
 /-- The Weyl (Schwinger-boson) linear map `Φ ↦ ∑_σ Φ σ • X^{md σ}` from many-body spin-`S` states
 to polynomials in the `2L` Weyl variables (Tasaki §7.1.3, eq. (7.1.22)).  It is injective with
