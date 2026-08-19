@@ -63,6 +63,12 @@ noncomputable def bondCasimirS (x y : Λ) (N : ℕ) : ManyBodyOpS Λ N :=
   (2 * (((N : ℂ) / 2) * ((N : ℂ) / 2 + 1))) • (1 : ManyBodyOpS Λ N) +
     (2 : ℂ) • spinSDot x y N
 
+/-- **The bond Casimir is Hermitian.**  `bondCasimirS` is a real scalar multiple of the identity
+plus a real scalar multiple of the Hermitian operator `Ŝ_x·Ŝ_y` (`spinSDot_isHermitian`), hence
+Hermitian itself. -/
+theorem bondCasimirS_isHermitian (x y : Λ) (N : ℕ) : (bondCasimirS x y N).IsHermitian := by
+  sorry -- dev-implement: `spinSDot_isHermitian` + `Matrix.IsHermitian.add`/`.smul`/`isHermitian_one`.
+
 /-- The **bond projection onto the maximal total spin** `P̂_N[Ŝ_x + Ŝ_y]` for two spin-`S = N/2`
 sites: the Lagrange/Casimir projector `∏_{j=0}^{N-1} (Ĉ − j(j+1)) / (N(N+1) − j(j+1))` onto the
 top spin-`N` subspace (`1` there, `0` on every lower spin-`J` subspace).  The factors are
