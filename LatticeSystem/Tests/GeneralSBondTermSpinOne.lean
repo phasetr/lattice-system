@@ -146,15 +146,43 @@ example (φ : (Fin 2 → Fin 3) → ℂ) (hφ : (localCasimirPenalty 1).mulVec �
     exact (smul_eq_zero.mp hφ).resolve_left (by norm_num)
   simpa [LinearMap.mem_ker] using hz
 
-/-- **Signature pin at `S = 1`.** The general-`S` local-kernel discharge
-`f2_pow_dvd_weylMap_of_localCasimirPenalty`, instantiated at `S = 1`, states verbatim what the
-bespoke spin-one derivation above proves; being the same proposition, the two cannot disagree.  What
-this pins is the signature — a general-`S` statement that no longer instantiates to the spin-one one
-fails to elaborate here.  The sign of the Casimir-descent scalars (`N(N+1) − j(j+1)`, not `j(j+1)`)
-is pinned numerically in `Tests/GeneralSCasimirDescent.lean`, Groups 3–4. -/
+/-! ## Group 6 (PR-4a, `#5292`): the local kernel becomes an iff
+
+`localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd` does not exist yet on this branch (it *replaces*
+`f2_pow_dvd_weylMap_of_localCasimirPenalty`, design report §2.2); every example below is expected to
+fail to elaborate until PR-4a lands. -/
+
+/-- **Signature pin at `S = 1`, `⊆` direction (`.mp`).** The general-`S` local-kernel iff
+`localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd`, instantiated at `S = 1` and read via `.mp`,
+states verbatim what the bespoke spin-one derivation above proves; being the same proposition, the
+two cannot disagree.  What this pins is the signature — a general-`S` statement that no longer
+instantiates to the spin-one one fails to elaborate here.  The sign of the Casimir-descent scalars
+(`N(N+1) − j(j+1)`, not `j(j+1)`) is pinned numerically in `Tests/GeneralSCasimirDescent.lean`,
+Groups 3–4. -/
 example (φ : (Fin 2 → Fin 3) → ℂ) (hφ : (localCasimirPenalty 1).mulVec φ = 0) :
     f2 ^ 1 ∣ weylMap (L := 2) φ :=
-  f2_pow_dvd_weylMap_of_localCasimirPenalty 1 φ hφ
+  (localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd 1 φ).mp hφ
+
+/-- **New-direction oracle (`⊇`, `.mpr`), independent cross-check.** Each of the four VBS bond
+generators `vbsBondVec σ σ'` independently satisfies both sides of the `S = 1` iff by pre-existing
+routes with *no* dependency on the new lemma: `f₂ ∣ weylMap (vbsBondVec σ σ')`
+(`f2_dvd_weylMap_vbsBondVec`) and `(localCasimirPenalty 1).mulVec (vbsBondVec σ σ') = 0`
+(`bondCasimirPenaltyS_one` + `bondLocal_mulVec_vbsBondVec`).  This is the trip-wire for the newly
+proved `⊇` direction: the `S = 3/2` tables are a different model and must not be used. -/
+example (σ σ' : Fin 2) :
+    (localCasimirPenalty 1).mulVec (vbsBondVec σ σ') = 0 := by
+  have h24 : localCasimirPenalty 1 = (24 : ℂ) • bondSpin2ProjectionS (0 : Fin 2) 1 :=
+    bondCasimirPenaltyS_one 0 1
+  rw [h24, Matrix.smul_mulVec, bondLocal_mulVec_vbsBondVec, smul_zero]
+
+/-- **The same target, derived from the new `.mpr` direction.** Consistency check: applying
+`localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd` at `S = 1` to the independently-known
+`f2_dvd_weylMap_vbsBondVec` must produce the *same* conclusion as the independent derivation
+directly above. -/
+example (σ σ' : Fin 2) :
+    (localCasimirPenalty 1).mulVec (vbsBondVec σ σ') = 0 :=
+  (localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd 1 (vbsBondVec σ σ')).mpr
+    (by rw [pow_one]; exact f2_dvd_weylMap_vbsBondVec σ σ')
 
 /-- **`onEmbS_list_prod` module-boundary regression.** The block-embedding-of-a-list-product lemma
 lives in the shared embedding module `SiteBlockEmbeddingD5b` alongside the `onEmbS` ring-transport
