@@ -107,6 +107,8 @@ import LatticeSystem.Tests.GeneralSBondTermSpinOne
 import LatticeSystem.Tests.GeneralSWeylLadder
 import LatticeSystem.Tests.GeneralSWeylCasimir
 import LatticeSystem.Tests.GeneralSCasimirDescent
+import LatticeSystem.Tests.GeneralSCasimirPositivity
+import LatticeSystem.Tests.GeneralSOpenChainGroundSpace
 
 /-!
 # Test aggregator for the `lattice-system` library
