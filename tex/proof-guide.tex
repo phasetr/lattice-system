@@ -12862,6 +12862,19 @@ construction; Theorem 8.7 and the nontriviality are documented axioms, Corollary
 Chapters~3--10 backfill.
 
 \medskip
+\noindent\textbf{§8.3.5 Projective-representation definition layer} (Tasaki §8.3.5, eqs.~(8.3.40)--(8.3.43),
+pp.~277--278; \texttt{Math/ProjectiveRepresentation.lean}, Issue \#5306, PR \#5307).  \texttt{IsProjectiveRep}
+$u\,s\,\varphi$ formalizes (8.3.41)--(8.3.42) for $u:G\to\mathrm{Matrix}\,D\,D\,\mathbb{C}$, a sign
+representation $s:G\to\{1,-1\}$, and a $\mathrm{Circle}$-valued phase $\varphi:G\to G\to\mathrm{Circle}$; the
+entrywise-conjugation twist \texttt{signConjMatrix} encodes the antiunitary case of (8.3.40).
+\texttt{IsTrivialProjectiveRep}~$u\,s$ (p.~278: $\exists$ a genuine representation $v$ and phase $\psi$ with
+$u=\psi\cdot v$) is proved \emph{equivalent} to \texttt{IsPhaseCoboundary}~$s\,\varphi$ (eq.~8.3.43:
+$\varphi(g,h)=\psi(g)\,\psi(h)^{s(g)}\,\psi(gh)^{-1}$), given \texttt{IsProjectiveRep}~$u\,s\,\varphi$ and a
+nonempty bond space --- \texttt{isTrivialProjectiveRep\_iff\_isPhaseCoboundary}, axiom-free.  This is the
+definition layer only: \texttt{tasaki\_theorem\_8\_7} above remains a documented axiom until the MPS-transport
+and cocycle-chase arguments (later PRs of Issue \#5306) discharge it.
+
+\medskip
 \noindent\textbf{§8.3.5 Discrete-symmetry Lieb--Schultz--Mattis theorem} (Theorem 8.6, Ogata--Tasaki;
 Tasaki §8.3.5, pp.~276--280; \texttt{Quantum/SpinS/LiebSchultzMattisDiscrete.lean}, Issue \#4485).
 The general no-go theorem without continuous symmetry.  The axiom \texttt{tasaki\_theorem\_8\_6}

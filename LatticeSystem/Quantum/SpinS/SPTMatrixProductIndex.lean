@@ -29,6 +29,18 @@ construction belong to the operator-algebra framework).  Theorem 8.7 and the hal
 nontriviality are documented axioms; **Corollary 8.5 is then *proved*** as the contrapositive of
 Theorem 8.7.
 
+A concrete, non-marker definition layer for `IsProjectiveRep` / `IsTrivialProjectiveRep` and their
+book-faithful equivalence with a phase coboundary (eq. (8.3.43)) lives in
+`LatticeSystem.Math.ProjectiveRepresentation` (Issue #5306). The four markers above (this module's
+`IsProjectiveRep`, `IsTrivialProjectiveRep`, `SymmetricInjectiveMPSExists`, `tasaki_theorem_8_7`)
+form one coupled cluster and are retired together only once the MPS-transport and cocycle-chase
+arguments needed to discharge `tasaki_theorem_8_7` land (Issue #5306, later PR); they are
+intentionally left untouched until then.  Note that `LatticeSystem.Quantum.IsProjectiveRep` /
+`IsTrivialProjectiveRep` (the markers here, indexed by an `ℝ`-valued phase) and
+`LatticeSystem.Math.IsProjectiveRep` / `IsTrivialProjectiveRep` (the definitions there, carrying an
+explicit matrix family and a `Circle`-valued phase) are distinct declarations that share a short
+name: always refer to them fully qualified, never through an unqualified `open`.
+
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §8.3.4, Theorem 8.7, Corollary 8.5, eqs. (8.3.42)–(8.3.47), pp. 269–279; F. Pollmann, A. M.
 Turner, E. Berg, M. Oshikawa, Phys. Rev. B **85**, 075125 (2012); X. Chen, Z.-C. Gu, X.-G. Wen,
