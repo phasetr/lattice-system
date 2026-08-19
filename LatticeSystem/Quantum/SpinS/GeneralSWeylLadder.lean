@@ -7,9 +7,10 @@ import Mathlib.Algebra.MvPolynomial.PDeriv
 
 `weylMap` (`LatticeSystem.Math.WeylSpinMap`) intertwines the single-site spin-`S` operators
 `Ŝ^+`, `Ŝ^-`, `Ŝ^{(3)}` (`spinSOpPlus`, `spinSOpMinus`, `spinSOp3`) with the Weyl-variable
-differential operators `X_x∂_{v_x}`, `X_x∂_{u_x}`, `½(X_x∂_{u_x} − X_x∂_{v_x})` (`u_x = (x,0)`,
-`v_x = (x,1)`) at a single site `x : Fin L`, for any `L` and any `S`.  Transporting one site at a
-time — rather than assembling a two-site matrix element directly, multi-site operators being
+differential operators `u_x∂_{v_x}`, `v_x∂_{u_x}`, `½(u_x∂_{u_x} − v_x∂_{v_x})` (`u_x = (x,0)`,
+`v_x = (x,1)`, matching Tasaki eq. (7.1.23)) at a single site `x : Fin L`, for any `L` and any `S`.
+Transporting one site at a time — rather than assembling a two-site matrix element directly,
+multi-site operators being
 recovered afterwards from products of one-site ones — means the per-site statement is proved once
 and reused unchanged at every bond, instead of once per bond.
 
@@ -125,8 +126,10 @@ private theorem mdSite_lower_multidegree {x : Fin L} {j k : Fin (N + 1)}
 
 /-- The per-site raising-ladder column sum: transporting `Ŝ^+` at site `x` through the single-site
 Weyl monomials is the differential operator `X_x ∂_{v_x}` (`u_x = (x,0)`, `v_x = (x,1)`).  The
-`spinSOpPlus`/`cgSite` weights must match *exactly* (not merely up to a constant) for this to hold;
-`Tests.GeneralSWeylLadder` pins that Clebsch–Gordan normalization.  At the top state `j = 0` both
+*relative* `spinSOpPlus`/`cgSite` weights are forced for this to hold: the Clebsch–Gordan step
+ratio `cgSite(k+1)/cgSite(k)` is pinned, whereas an overall rescaling `cgSite → λ·cgSite` would
+leave the identity unaffected (both sides scale by `λ`).  `Tests.GeneralSWeylLadder` pins that
+Clebsch–Gordan normalization.  At the top state `j = 0` both
 sides vanish, but for different reasons: the matrix column is empty, while the derivative side has
 no `v_x` to differentiate. -/
 theorem weylSiteMono_spinSOpPlus_sum (x : Fin L) (j : Fin (N + 1)) :

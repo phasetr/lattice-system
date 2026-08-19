@@ -142,10 +142,10 @@ noncomputable def weylMono (σ : Fin L → Fin (N + 1)) : MvPolynomial (Fin L ×
   MvPolynomial.monomial (md σ) (cgNorm σ)
 
 /-- The single-site Weyl monomial `w_x k = c(k) · u_x^{N−k} v_x^k` (site `x`, site-state `k`):
-the image, under the eventual per-site transport layer, of the standard basis vector `k` at site
+the image, under the per-site transport layer, of the standard basis vector `k` at site
 `x` alone, isolated from the other `L − 1` sites.  This is the fixture the per-site ladder
-transport lemmas (`Quantum.SpinS.GeneralSWeylLadder`) are stated against; it is the site-`x` factor
-of `weylMono σ` at `k = σ x` (`exists_weylMono_site_factor` below). -/
+transport lemmas are stated against; it is the site-`x` factor of `weylMono σ` at `k = σ x`
+(`exists_weylMono_site_factor` below). -/
 noncomputable def weylSiteMono (x : Fin L) (k : Fin (N + 1)) : MvPolynomial (Fin L × Fin 2) ℂ :=
   MvPolynomial.monomial (mdSite x k) (cgSite k)
 
