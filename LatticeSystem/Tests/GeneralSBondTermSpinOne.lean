@@ -30,8 +30,8 @@ Five groups, mirroring the general-`N` Weyl-map gate `WeylMapGeneralN.lean`:
    `S = 2` (zero), so a weight definition that silently ignores `S` fails here.
 5. **Divisibility capstone: shape and `S = 1` signature pin** —
    `prod_fBond_pow_dvd_weylMap_of_annihilated` applied at its stated general signature (the local
-   kernel is discharged in-line by `f2_pow_dvd_weylMap_of_localCasimirPenalty`, so it is not a
-   hypothesis of the capstone), then the `S = 1` local-kernel statement derived a second time
+   kernel is discharged in-line by `localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd`, so it is not
+   a hypothesis of the capstone), then the `S = 1` local-kernel statement derived a second time
    through the pre-existing spin-one bespoke route (`bondCasimirPenaltyS_one`,
    `bondLocal_ker_eq_vbsBondSubspace`, `f2_dvd_weylMap_of_mem_vbsBondSubspace`).  Both routes prove
    the *same* proposition, so what is pinned is the signature — that the general-`S` theorem still
@@ -111,9 +111,10 @@ example : casimirPenaltyWeight 2 2 = 0 :=
 /-! ## Group 5: divisibility capstone, shape and `S = 1` oracle -/
 
 /-- **Capstone shape.** `prod_fBond_pow_dvd_weylMap_of_annihilated` at its general signature: the
-local kernel statement is discharged in-line by `f2_pow_dvd_weylMap_of_localCasimirPenalty` and is
-not a hypothesis here, so a state `Φ` annihilated by every open-bond Casimir penalty alone forces
-the prime-power product `∏ f_x ^ S` to divide `weylMap Φ`. -/
+local kernel statement is discharged in-line by
+`localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd` and is not a hypothesis here, so a state `Φ`
+annihilated by every open-bond Casimir penalty alone forces the prime-power product `∏ f_x ^ S` to
+divide `weylMap Φ`. -/
 example (hL : 2 ≤ L) (S : ℕ) (Φ : (Fin L → Fin (2 * S + 1)) → ℂ)
     (hΦ : ∀ x ∈ openBonds L, (bondCasimirPenaltyS x (ringSucc x) S).mulVec Φ = 0) :
     (∏ x ∈ openBonds L, fBond x ^ S) ∣ weylMap Φ :=
@@ -121,8 +122,8 @@ example (hL : 2 ≤ L) (S : ℕ) (Φ : (Fin L → Fin (2 * S + 1)) → ℂ)
 
 /-- **`S = 1` oracle, general-`S` route.** The same capstone shape as above, instantiated at
 `S = 1`; the local kernel is discharged for every `S`, not just `S = 1`, by
-`f2_pow_dvd_weylMap_of_localCasimirPenalty` inside `prod_fBond_pow_dvd_weylMap_of_annihilated`
-itself. -/
+`localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd` inside
+`prod_fBond_pow_dvd_weylMap_of_annihilated` itself. -/
 example {L : ℕ} (hL : 2 ≤ L) (Φ : (Fin L → Fin 3) → ℂ)
     (hΦ : ∀ x ∈ openBonds L, (bondCasimirPenaltyS x (ringSucc x) 1).mulVec Φ = 0) :
     (∏ x ∈ openBonds L, fBond x ^ 1) ∣ weylMap Φ :=
@@ -132,8 +133,8 @@ example {L : ℕ} (hL : 2 ≤ L) (Φ : (Fin L → Fin 3) → ℂ)
 `S = 1`, derived independently from the pre-existing spin-one tree
 (`bondCasimirPenaltyS_one`, `bondLocal_ker_eq_vbsBondSubspace`,
 `f2_dvd_weylMap_of_mem_vbsBondSubspace`) rather than from
-`f2_pow_dvd_weylMap_of_localCasimirPenalty`.  Kept beside the general route as the only independent
-check available (the `S = 3/2` tables are a different model and must not be used). -/
+`localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd`.  Kept beside the general route as the only
+independent check available (the `S = 3/2` tables are a different model and must not be used). -/
 example (φ : (Fin 2 → Fin 3) → ℂ) (hφ : (localCasimirPenalty 1).mulVec φ = 0) :
     f2 ^ 1 ∣ weylMap (L := 2) φ := by
   rw [pow_one]
@@ -146,11 +147,11 @@ example (φ : (Fin 2 → Fin 3) → ℂ) (hφ : (localCasimirPenalty 1).mulVec �
     exact (smul_eq_zero.mp hφ).resolve_left (by norm_num)
   simpa [LinearMap.mem_ker] using hz
 
-/-! ## Group 6 (PR-4a, `#5292`): the local kernel becomes an iff
+/-! ## Group 6: the local kernel as an equivalence
 
-`localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd` does not exist yet on this branch (it *replaces*
-`f2_pow_dvd_weylMap_of_localCasimirPenalty`, design report §2.2); every example below is expected to
-fail to elaborate until PR-4a lands. -/
+`localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd` characterises the two-site kernel of the bond
+term exactly, so both readings are pinned: `.mp` against the bespoke spin-one divisibility route,
+and `.mpr` against the four VBS bond generators. -/
 
 /-- **Signature pin at `S = 1`, `⊆` direction (`.mp`).** The general-`S` local-kernel iff
 `localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd`, instantiated at `S = 1` and read via `.mp`,

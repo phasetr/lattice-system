@@ -4,15 +4,16 @@ import LatticeSystem.Math.MvPolynomial.BondFactorDerivation
 import LatticeSystem.Math.MvPolynomial.WeightedHomogeneousLayer
 
 /-!
-# Signature and numeric regression pins for the Casimir-descent layer (PR-3c)
+# Signature and numeric regression pins for the Casimir-descent layer
 
 `GeneralSCasimirDescent` is the polynomial-algebra engine behind the local kernel statement
-`f2_pow_dvd_weylMap_of_localCasimirPenalty` of `GeneralSOpenChainBondTerm`: a composite of
-`c·(−) − f₂·Ω(−)` steps is `∏ c_i · (−) mod f₂`, and the Casimir-penalty scalar family is invariant
-under the level shift that division by `f₂` induces.  This file pins the exact signatures of its
-eight public declarations (both `def`s and all six `theorem`s) by bare term application — no tactic
-hides an argument-order or coercion mismatch — together with fully concrete numeric instances at
-small `m`/`S` that a later refactor of the definitions cannot silently change.
+`localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd` of `GeneralSOpenChainBondTerm`: a composite of
+`c·(−) − f₂·Ω(−)` steps is `∏ c_i · (−) mod f₂`, the Casimir-penalty scalar family is invariant
+under the level shift that division by `f₂` induces, and the family truncated at its own level
+annihilates that level outright.  This file pins the exact signatures of its public declarations by
+bare term application — no tactic hides an argument-order or coercion mismatch — together with fully
+concrete numeric instances at small `m`/`S` that a later refactor of the definitions cannot silently
+change.
 
 No production code is written here.
 -/
@@ -22,7 +23,7 @@ open LatticeSystem.Quantum.AKLTUniqueness
 
 namespace LatticeSystem.Tests.GeneralSCasimirDescent
 
-/-! ## Group 1: signature pins for the eight public declarations -/
+/-! ## Group 1: signature pins for the public declarations -/
 
 /-- `casimirDescentStep : ℂ → MvPolynomial (Fin 2 × Fin 2) ℂ → MvPolynomial (Fin 2 × Fin 2) ℂ`. -/
 noncomputable example (c : ℂ) (p : MvPolynomial (Fin 2 × Fin 2) ℂ) :
@@ -48,9 +49,9 @@ example {m : ℕ} (c : ℂ) {q : MvPolynomial (Fin 2 × Fin 2) ℂ}
     casimirDescentStep (c + (2 * m + 2 : ℕ)) (f2 * q) = f2 * casimirDescentStep c q :=
   casimirDescentStep_bondFactor_mul c hq
 
-/-- The level shift, folded over a whole scalar list.  **PR-4a: `hm : m ≠ 0` is deleted** — the
-annihilating-polynomial route (`casimirDescentFold_self_eq_zero`) makes the level shift uniform
-without needing a nonzero-level side condition. -/
+/-- The level shift, folded over a whole scalar list, with no nonzero-level side condition: the
+annihilating-polynomial route (`casimirDescentFold_self_eq_zero`) makes the level shift uniform down
+to bidegree `(0, 0)`. -/
 example {m : ℕ} (cs : List ℂ) {q : MvPolynomial (Fin 2 × Fin 2) ℂ}
     (hq : q.IsWeightedHomogeneous (siteWeight (L := 2))
       (Finsupp.single 0 m + Finsupp.single 1 m)) :
@@ -68,9 +69,9 @@ example {cs : List ℂ} (hcs : cs.prod ≠ 0) {p : MvPolynomial (Fin 2 × Fin 2)
 example {m S : ℕ} (h : S < m) : (casimirPenaltyScalars m S).prod ≠ 0 :=
   casimirPenaltyScalars_prod_ne_zero h
 
-/-- **Headline.** A `k`-step Casimir-penalty descent vanishing on `p` (homogeneous of bidegree
-`(S + k, S + k)`) forces `f₂^k ∣ p`.  **PR-4a: `hS : S ≠ 0` is deleted** (`S` becomes fully
-explicit) for the same reason as `casimirDescentFold_bondFactor_mul` above. -/
+/-- A `k`-step Casimir-penalty descent vanishing on `p` (homogeneous of bidegree `(S + k, S + k)`)
+forces `f₂^k ∣ p`, with `S` fully explicit and no nonzero-level side condition, for the same reason
+as `casimirDescentFold_bondFactor_mul` above. -/
 example (S k : ℕ) {p : MvPolynomial (Fin 2 × Fin 2) ℂ}
     (hp : p.IsWeightedHomogeneous (siteWeight (L := 2))
       (Finsupp.single 0 (S + k) + Finsupp.single 1 (S + k)))
@@ -142,17 +143,16 @@ example : casimirDescentStep (6 : ℂ) (f2 * f2) = f2 * casimirDescentStep (2 : 
   norm_num at h
   exact h
 
-/-! ## Group 5 (PR-4a, `#5292`): signature pins for the three new public declarations
+/-! ## Group 5: the annihilating polynomial and the resulting equivalence
 
-`casimirDescentFold_self_eq_zero`, `casimirDescentFold_bondFactor_pow_mul`, and
-`casimirDescentFold_eq_zero_iff_bondFactor_pow_dvd` do not exist yet on this branch; every example
-in this group is expected to fail to elaborate (`unknown identifier`) until PR-4a lands the engine
-in `GeneralSCasimirDescent.lean` (design report §2.1). -/
+`casimirDescentFold_self_eq_zero`, `casimirDescentFold_bondFactor_pow_mul` and
+`casimirDescentFold_eq_zero_iff_bondFactor_pow_dvd` are the layer-annihilation half of the engine:
+the Casimir-penalty family of a level kills that level, which upgrades the one-sided divisibility
+statement into an equivalence. -/
 
-/-- **Headline (new): the Casimir polynomial of a layer annihilates that layer.** A `p` homogeneous
-of bidegree `(m, m)` is killed by the fold of its own Casimir-penalty scalars, with no side
-hypothesis on `m` at all (unlike the pre-PR-4a `bondFactor_pow_dvd_of_casimirDescentFold`, which
-needed `S ≠ 0`). -/
+/-- **The Casimir polynomial of a layer annihilates that layer.** A `p` homogeneous of bidegree
+`(m, m)` is killed by the fold of its own Casimir-penalty scalars, with no side hypothesis on `m`
+at all. -/
 example {m : ℕ} {p : MvPolynomial (Fin 2 × Fin 2) ℂ}
     (hp : p.IsWeightedHomogeneous (siteWeight (L := 2))
       (Finsupp.single 0 m + Finsupp.single 1 m)) :
@@ -185,8 +185,8 @@ example :
   exact casimirDescentFold_self_eq_zero (m := 1) hf2
 
 /-- **The level shift, iterated `k` times.** Dividing off `f₂^k` and pushing it back out of the
-fold agree, for a `q` of bidegree `(m, m)` and any target level `S` — the direction that gives
-`⊇` for free (design report §0(b)). -/
+fold agree, for a `q` of bidegree `(m, m)` and any target level `S` — the direction that gives the
+`f₂^S ∣ p ⟹ fold = 0` half of the equivalence. -/
 example {m : ℕ} (k S : ℕ) {q : MvPolynomial (Fin 2 × Fin 2) ℂ}
     (hq : q.IsWeightedHomogeneous (siteWeight (L := 2))
       (Finsupp.single 0 m + Finsupp.single 1 m)) :
@@ -194,10 +194,10 @@ example {m : ℕ} (k S : ℕ) {q : MvPolynomial (Fin 2 × Fin 2) ℂ}
       = f2 ^ k * List.foldr casimirDescentStep q (casimirPenaltyScalars m S) :=
   casimirDescentFold_bondFactor_pow_mul k S hq
 
-/-- **Headline of the module (new): the equivalence with no side hypothesis at all.** Combining
-`casimirDescentFold_self_eq_zero` (for `⊆`) with `casimirDescentFold_bondFactor_pow_mul` applied to
-`p = f₂^S · r` (for `⊇`) upgrades the pre-PR-4a one-sided
-`bondFactor_pow_dvd_of_casimirDescentFold` into an iff, valid even at `S = 0`. -/
+/-- **Headline of the module: the equivalence with no side hypothesis at all.**
+`bondFactor_pow_dvd_of_casimirDescentFold` gives `⊆`; `casimirDescentFold_bondFactor_pow_mul`
+applied to `p = f₂^S · r`, followed by `casimirDescentFold_self_eq_zero`, gives `⊇`.  Valid even at
+`S = 0`. -/
 example (S : ℕ) {p : MvPolynomial (Fin 2 × Fin 2) ℂ}
     (hp : p.IsWeightedHomogeneous (siteWeight (L := 2))
       (Finsupp.single 0 (S + S) + Finsupp.single 1 (S + S))) :
