@@ -90,6 +90,15 @@ theorem md_apply_fst (σ : Fin L → Fin (N + 1)) (i : Fin L) : (md σ) (i, 0) =
       (fun h => absurd (Finset.mem_univ i) h)]
   exact mdSite_apply_self i (σ i)
 
+/-- Reading the second (`v`) variable of site `i` returns the site state `σ i` itself.  Together
+with `md_apply_fst` this recovers a configuration from its multidegree coordinate by coordinate,
+which is what identifies the image of `md` (`exists_md_eq`). -/
+theorem md_apply_snd (σ : Fin L → Fin (N + 1)) (i : Fin L) : (md σ) (i, 1) = (σ i : ℕ) := by
+  rw [md, Finsupp.finset_sum_apply,
+    Finset.sum_eq_single i (fun y _ hy => mdSite_apply_ne hy (σ y) 1)
+      (fun h => absurd (Finset.mem_univ i) h)]
+  exact mdSite_apply_snd i (σ i)
+
 /-- The total multidegree of every chain state is `N·L` (each of the `L` sites contributes `N`);
 hence every Weyl monomial is homogeneous of total degree `N·L` (Tasaki eq. (7.1.25)). -/
 theorem md_degree (σ : Fin L → Fin (N + 1)) : (md σ).degree = N * L := by
@@ -108,6 +117,25 @@ theorem md_injective : Function.Injective (md : (Fin L → Fin (N + 1)) → _) :
   have hσ : (σ i : ℕ) ≤ N := Nat.lt_succ_iff.mp (σ i).isLt
   have hτ : (τ i : ℕ) ≤ N := Nat.lt_succ_iff.mp (τ i).isLt
   exact Fin.ext (by omega)
+
+/-- **The multidegrees of chain states are exactly the per-site degree-`N` multidegrees.**  A
+multidegree `d` on the Weyl variables whose two exponents at each site sum to `N` is the multidegree
+of the configuration `τ y = d (y, 1)`, i.e. `d` really is the exponent of a Weyl monomial.  With
+`md_injective` this pins the image of `md`, which is what makes the Weyl map surjective onto its
+per-site graded piece (`weylMap_weylPreimage`). -/
+theorem exists_md_eq {d : (Fin L × Fin 2) →₀ ℕ} (hd : ∀ y : Fin L, d (y, 0) + d (y, 1) = N) :
+    ∃ τ : Fin L → Fin (N + 1), md τ = d := by
+  refine ⟨fun y => ⟨d (y, 1), by have := hd y; omega⟩, ?_⟩
+  ext v
+  obtain ⟨y, i⟩ := v
+  fin_cases i
+  · change (md _) (y, 0) = d (y, 0)
+    rw [md_apply_fst]
+    have := hd y
+    change N - d (y, 1) = d (y, 0)
+    omega
+  · change (md _) (y, 1) = d (y, 1)
+    rw [md_apply_snd]
 
 /-- The single-site Clebsch–Gordan normalization constant `c(k) = √(binom(N,k))` from the
 isomorphism `Symᴺ(ℂ²) ≅ (spin S)`, `N = 2S`.  At `N = 2` it is `c(0) = 1` (`m = +1`, `u_x²`),
@@ -219,5 +247,15 @@ theorem weylMap_isHomogeneous (Φ : (Fin L → Fin (N + 1)) → ℂ) :
   refine IsHomogeneous.sum _ _ _ (fun σ _ => ?_)
   rw [weylMono, smul_monomial]
   exact isHomogeneous_monomial _ (md_degree σ)
+
+/-- The **Weyl preimage** of a polynomial: the chain state reading off, at each configuration `τ`,
+the coefficient of the Weyl monomial `X^{md τ}` normalized by the Clebsch–Gordan weight `cgNorm τ`
+(the inverse of `weylMap_coeff`).  It inverts `weylMap` on the polynomials with the per-site degrees
+of a Weyl image (`weylMap_weylPreimage`, one layer up where the per-site grading lives), and is what
+turns an explicitly written polynomial — a boundary monomial times a product of bond factors — into
+a state of the chain.  The site index `N` is not determined by `p` and must be supplied. -/
+noncomputable def weylPreimage (p : MvPolynomial (Fin L × Fin 2) ℂ) :
+    (Fin L → Fin (N + 1)) → ℂ :=
+  fun τ => p.coeff (md τ) / cgNorm τ
 
 end LatticeSystem.Math
