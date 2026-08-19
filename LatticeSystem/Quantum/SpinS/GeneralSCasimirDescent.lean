@@ -25,11 +25,13 @@ spectral theory and no harmonic (Clebsch–Gordan) decomposition:
   (`(m+1)(m+2) − j(j+1) − (2m+2) = m(m+1) − j(j+1)`).
 
 Iterating the two gives the headline `bondFactor_pow_dvd_of_casimirDescentFold`: a polynomial of
-bidegree `(S+k, S+k)` annihilated by the `S`-fold descent of level `S+k` is divisible by `f₂^k`.
-Its consumer is the local kernel statement of the general-`S` open chain
+bidegree `(S+k, S+k)` annihilated by the `(S+1)`-fold descent of level `S+k` is divisible by `f₂^k`
+(the scalar family `casimirPenaltyScalars (S+k) S` carries one step per `j = 0, …, S`, hence `S+1`
+steps).  Its consumer is the local kernel statement of the general-`S` open chain
 (`LatticeSystem.Quantum.f2_pow_dvd_weylMap_of_localCasimirPenalty`), where the descent starts at the
-Weyl bidegree `(2S, 2S)` of a two-site state and stops at level `S`, the last level at which the
-scalar family is still nonvanishing.
+Weyl bidegree `(2S, 2S)` of a two-site state and stops on arrival at level `S`, the first level at
+which the scalar family acquires a zero factor (at `j = S` it is `S(S+1) − S(S+1) = 0`); `S+1` is
+the last level at which the family is still nonvanishing.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §7.1.3 "The Uniqueness of the Ground State", pp. 186–188, eqs. (7.1.22)–(7.1.25); §7.3.1,

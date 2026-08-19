@@ -28,17 +28,20 @@ Five groups, mirroring the general-`N` Weyl-map gate `WeylMapGeneralN.lean`:
    the operator `bondCasimirPenaltyS` is a separate piece of data and is not seen here.
 4. **Non-degeneracy control** — the same `J = 2` weight differs between `S = 1` (nonzero, `24`) and
    `S = 2` (zero), so a weight definition that silently ignores `S` fails here.
-5. **Divisibility capstone: shape and `S = 1` oracle** — `prod_fBond_pow_dvd_weylMap_of_annihilated`
-   applied at its stated general signature (the local kernel is discharged in-line by
-   `f2_pow_dvd_weylMap_of_localCasimirPenalty`, so it is not a hypothesis of the capstone), then
-   cross-checked at `S = 1` two independent ways — the new general-`S` theorem and
-   the pre-existing spin-one bespoke route (`bondCasimirPenaltyS_one`,
-   `bondLocal_ker_eq_vbsBondSubspace`, `f2_dvd_weylMap_of_mem_vbsBondSubspace`) — so a sign slip in
+5. **Divisibility capstone: shape and `S = 1` signature pin** —
+   `prod_fBond_pow_dvd_weylMap_of_annihilated` applied at its stated general signature (the local
+   kernel is discharged in-line by `f2_pow_dvd_weylMap_of_localCasimirPenalty`, so it is not a
+   hypothesis of the capstone), then the `S = 1` local-kernel statement derived a second time
+   through the pre-existing spin-one bespoke route (`bondCasimirPenaltyS_one`,
+   `bondLocal_ker_eq_vbsBondSubspace`, `f2_dvd_weylMap_of_mem_vbsBondSubspace`).  Both routes prove
+   the *same* proposition, so what is pinned is the signature — that the general-`S` theorem still
+   instantiates verbatim to the bespoke spin-one statement — and not a numeric value: the sign of
    the Casimir-descent scalars (design pitfall 5: the scalars are `N(N+1) − j(j+1)`, not `j(j+1)`)
-   is caught by disagreement between the two routes; plus `onEmbS_list_prod` referenced from the
-   shared embedding module `SiteBlockEmbeddingD5b` rather than from any `N`-specific consumer, which
-   is what lets the general-`S` module reduce a bond term to `onEmbS` without importing the `N = 3`
-   certificate tables.
+   is pinned in `Tests/GeneralSCasimirDescent.lean`, Groups 3–4
+   (`casimirPenaltyScalars 2 1 = [6, 4]`, `casimirDescentStep 2 f₂ = 0`).  Plus `onEmbS_list_prod`
+   referenced from the shared embedding module `SiteBlockEmbeddingD5b` rather than from any
+   `N`-specific consumer, which is what lets the general-`S` module reduce a bond term to `onEmbS`
+   without importing the `N = 3` certificate tables.
 -/
 
 open MvPolynomial LatticeSystem.Math LatticeSystem.Quantum LatticeSystem.Quantum.AKLTUniqueness
@@ -143,11 +146,12 @@ example (φ : (Fin 2 → Fin 3) → ℂ) (hφ : (localCasimirPenalty 1).mulVec �
     exact (smul_eq_zero.mp hφ).resolve_left (by norm_num)
   simpa [LinearMap.mem_ker] using hz
 
-/-- **Cross-check pin.** The two `S = 1` oracle routes above must agree: the general-`S`
-local-kernel discharge `f2_pow_dvd_weylMap_of_localCasimirPenalty` at `S = 1` proves the same as
-the bespoke spin-one computation. This is the concrete oracle that would catch a sign slip in
-`f2_pow_dvd_weylMap_of_localCasimirPenalty` (the Casimir-descent scalars are `N(N+1) − j(j+1)`, not
-`j(j+1)`). -/
+/-- **Signature pin at `S = 1`.** The general-`S` local-kernel discharge
+`f2_pow_dvd_weylMap_of_localCasimirPenalty`, instantiated at `S = 1`, states verbatim what the
+bespoke spin-one derivation above proves; being the same proposition, the two cannot disagree.  What
+this pins is the signature — a general-`S` statement that no longer instantiates to the spin-one one
+fails to elaborate here.  The sign of the Casimir-descent scalars (`N(N+1) − j(j+1)`, not `j(j+1)`)
+is pinned numerically in `Tests/GeneralSCasimirDescent.lean`, Groups 3–4. -/
 example (φ : (Fin 2 → Fin 3) → ℂ) (hφ : (localCasimirPenalty 1).mulVec φ = 0) :
     f2 ^ 1 ∣ weylMap (L := 2) φ :=
   f2_pow_dvd_weylMap_of_localCasimirPenalty 1 φ hφ
