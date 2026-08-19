@@ -42,12 +42,15 @@ Two reductions are proved on top of the definition.  Locally, `ĥ_x` is the bloc
 two-site slice separately — this is what confines the remaining su(2) work to a fixed
 `(2S+1)² × (2S+1)²` problem.  Globally, if every open bond annihilates a state then the
 prime-power product `∏_x f_x^S` of bond factors divides its Weyl image, the polynomial input of
-the `(S+1)²` ground-state count asserted at §8.3.1, p. 252.  The local half of that statement is an
-exact characterisation — the two-site kernel of `ĥ^loc` is *precisely* the Weyl images divisible by
+the `(S+1)²` ground-state count asserted at §8.3.1, p. 252.  Everything below that product is an
+exact characterisation: the two-site kernel of `ĥ^loc` is *precisely* the Weyl images divisible by
 `f₂^S` — obtained here by transporting the ordered product of Casimir factors through the Weyl map
 (`weylMap_mulVec_bondCasimirS`) and running the polynomial Casimir descent
 (`GeneralSCasimirDescent`) from the Weyl bidegree `(2S, 2S)` down to level `S`, where the descent
-family annihilates its own layer.
+family annihilates its own layer — and a single bond term of the chain annihilates a state
+precisely when `f_x^S` divides its Weyl image
+(`bondCasimirPenaltyS_mulVec_eq_zero_iff_fBond_pow_dvd`).  Only the assembly over the `L − 1` bonds
+is one-directional, since it consumes the pairwise coprimality of the bond factors.
 
 The bond sum runs over `openBonds L`, never over `Finset.univ`: the open chain of eq. (7.2.46),
 p. 205 has exactly `L − 1` bonds, and summing over `Finset.univ` silently reinstates the wrap bond
@@ -257,6 +260,28 @@ theorem localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd (S : ℕ)
 
 /-! ## Prime-power bond divisibility of the Weyl image -/
 
+/-- **The bond kernel is exactly the `f_x^S`-divisible Weyl images.**  A chain state is annihilated
+by the bond term `ĥ_x` of the bond `{x, ringSucc x}` **iff** the `S`-th power of the global bond
+factor `f_x = u_x v_{x+1} − v_x u_{x+1}` divides its Weyl image — the polynomial form of "the link
+carries `S` valence bonds" (Tasaki §8.3.1, p. 252).
+
+Both directions compose the same two steps, the slicewise reduction of the bond term
+(`bondCasimirPenaltyS_mulVec_eq_zero_iff_slices`) and the two-site kernel description
+(`localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd`), with the local-to-global bridge
+`fBond_pow_dvd_weylMap_of_local` in one direction and its converse
+`f2_pow_dvd_weylMap_bondSlice_of_fBond_pow_dvd` in the other. -/
+theorem bondCasimirPenaltyS_mulVec_eq_zero_iff_fBond_pow_dvd {L : ℕ} (hL : 1 < L) (x : Fin L)
+    (S : ℕ) (Φ : (Fin L → Fin (2 * S + 1)) → ℂ) :
+    (bondCasimirPenaltyS x (ringSucc x) S).mulVec Φ = 0 ↔ fBond x ^ S ∣ weylMap Φ := by
+  rw [bondCasimirPenaltyS_mulVec_eq_zero_iff_slices (ne_ringSucc hL x) S Φ]
+  constructor
+  · intro h
+    exact fBond_pow_dvd_weylMap_of_local x hL S Φ fun r =>
+      (localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd S _).mp (h r)
+  · intro h τ
+    exact (localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd S _).mpr
+      (f2_pow_dvd_weylMap_bondSlice_of_fBond_pow_dvd hL x S Φ h τ)
+
 /-- **General-`S` open-chain bond kernel implies prime-power divisibility.**  If the state `Φ` is
 annihilated by the bond term of every open bond, then the product `∏_{x} f_x^S` of the `S`-th
 powers of the bond factors `f_x = u_x v_{x+1} − v_x u_{x+1}` divides its Weyl image
@@ -264,21 +289,18 @@ powers of the bond factors `f_x = u_x v_{x+1} − v_x u_{x+1}` divides its Weyl 
 p. 207, solution (S.77), p. 508, where the `S = 1` product carries the exponent `1`).  This is the
 polynomial input of the `(S+1)²` ground-state count asserted at §8.3.1, p. 252.
 
-The local input is `localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd`: the two-site kernel of the
-bond term is exactly the polynomials divisible by `f₂^S`.  Everything global is proved here: the
-local-to-global bridge for one bond (`fBond_pow_dvd_weylMap_of_local`) and the assembly over bonds,
-which needs the
-bond factors to be pairwise relatively prime.  Coprimality of the *powers* follows from coprimality
-of the factors (`IsRelPrime.pow`), so no primality argument is repeated. -/
+The per-bond input is `bondCasimirPenaltyS_mulVec_eq_zero_iff_fBond_pow_dvd`, which identifies the
+kernel of a single bond term with the `f_x^S`-divisible Weyl images.  What is proved here is the
+assembly over bonds, which needs the bond factors to be pairwise relatively prime.  Coprimality of
+the *powers* follows from coprimality of the factors (`IsRelPrime.pow`), so no primality argument is
+repeated. -/
 theorem prod_fBond_pow_dvd_weylMap_of_annihilated {L : ℕ} (hL : 2 ≤ L) (S : ℕ)
     (Φ : (Fin L → Fin (2 * S + 1)) → ℂ)
     (hΦ : ∀ x ∈ openBonds L, (bondCasimirPenaltyS x (ringSucc x) S).mulVec Φ = 0) :
     (∏ x ∈ openBonds L, fBond x ^ S) ∣ weylMap Φ := by
   have hL1 : 1 < L := hL
   refine prod_dvd_of_pairwise_isRelPrime _ _ _ (fun x hx => ?_) (fun x hx y hy hxy => ?_)
-  · refine fBond_pow_dvd_weylMap_of_local x hL1 S Φ fun r =>
-      (localCasimirPenalty_mulVec_eq_zero_iff_f2_pow_dvd S _).mp ?_
-    exact (bondCasimirPenaltyS_mulVec_eq_zero_iff_slices (ne_ringSucc hL1 x) S Φ).mp (hΦ x hx) r
+  · exact (bondCasimirPenaltyS_mulVec_eq_zero_iff_fBond_pow_dvd hL1 x S Φ).mp (hΦ x hx)
   · exact (fBond_isRelPrime_openBonds hL (Finset.mem_coe.mp hx) (Finset.mem_coe.mp hy) hxy).pow
 
 end LatticeSystem.Quantum

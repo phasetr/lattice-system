@@ -3,36 +3,22 @@ import LatticeSystem.Quantum.SpinS.GeneralSOpenChainBondTerm
 import LatticeSystem.Math.MvPolynomial.WeightedHomogeneousLayer
 
 /-!
-# TDD Red — the Weyl preimage and the global-to-local bond-divisibility bridge (PR-6a, #5292)
+# The Weyl preimage and the global-to-local bond-divisibility bridge
 
-**Red-phase specification tests**, per the design report
-`.self-local/reports/design-5292-pr6-finrank-lower-bound-round1-20260820.md` §3 and §7 (PR-6a test
-points). These tests pin the acceptance criteria of the four PR-6a declarations *before* they exist
-on `main`; the file is expected to fail to build (`sorry`s are build errors under this repo's
-`warningAsError` policy) until PR-6a lands the production declarations. No production logic is
-written here.
+Regression tests for the two facts that turn a *polynomial* into a *state* and a *global*
+divisibility statement into a *slicewise* one:
 
-## Declarations under test (not yet on `main`)
+* `weylPreimage` / `weylMap_weylPreimage` — the Weyl map inverts on its per-site graded piece, so a
+  polynomial with the per-site degrees of a Weyl image is the image of an explicit state.
+* `f2_pow_dvd_weylMap_bondSlice_of_fBond_pow_dvd` and the packaged bond-kernel iff
+  `bondCasimirPenaltyS_mulVec_eq_zero_iff_fBond_pow_dvd` — divisibility of the chain Weyl image by
+  `f_x ^ S` restricts to every two-site bond slice, so the bond term's kernel *is* the
+  `f_x ^ S`-divisible Weyl images.
 
-* `LatticeSystem.Math.weylPreimage {L N} (p : MvPolynomial (Fin L × Fin 2) ℂ) :
-    (Fin L → Fin (N + 1)) → ℂ`
-* `LatticeSystem.Math.weylMap_weylPreimage {L N} {p}
-    (hp : p.IsWeightedHomogeneous siteWeight (∑ x, single x N)) : weylMap (weylPreimage p) = p`
-* `LatticeSystem.Quantum.AKLTUniqueness.f2_pow_dvd_weylMap_bondSlice_of_fBond_pow_dvd
-    {N} (hL : 1 < L) (x : Fin L) (S) (Φ) (h : fBond x ^ S ∣ weylMap Φ) (r) :
-      f2 ^ S ∣ weylMap (L := 2) (bondSlice x Φ r)`
-* `LatticeSystem.Quantum.bondCasimirPenaltyS_mulVec_eq_zero_iff_fBond_pow_dvd
-    {L} (hL : 1 < L) (x) (S) (Φ) :
-      (bondCasimirPenaltyS x (ringSucc x) S).mulVec Φ = 0 ↔ fBond x ^ S ∣ weylMap Φ`
-
-## `weylPreimage` placeholder
-
-`weylPreimage` does not exist on `main` yet, but its type is needed to state the round-trip and
-negative-control tests (test points 2–3 of the design report §7). `weylPreimagePlaceholder` below is
-a **type-only stand-in**: its body is `sorry`, never the design report's formula
-(`p.coeff (md τ) / cgNorm τ`), so this file never duplicates the production definition it is
-specifying. It must be deleted (together with the tests that use it) once PR-6a lands the real
-`LatticeSystem.Math.weylPreimage` and this file is updated to reference it directly.
+Pinned here: the round trip on a genuine graded input, the negative control showing that the
+homogeneity hypothesis is load-bearing, agreement of the two directions of the bridge on the same
+`f₂` / `f_x` / `bondEmb` convention, and the `S = 1` specialization against the bespoke spin-one
+bond projection.
 -/
 
 open MvPolynomial LatticeSystem.Math LatticeSystem.Quantum LatticeSystem.Quantum.AKLTUniqueness
@@ -41,54 +27,62 @@ namespace LatticeSystem.Tests.GeneralSBondSliceConverse
 
 variable {L : ℕ}
 
-/-! ## `weylPreimage` placeholder (type-only, `sorry` body; see module doc) -/
+/-! ## The Weyl preimage round trip -/
 
-/-- Type-only stand-in for the not-yet-existing `LatticeSystem.Math.weylPreimage`. Its body is
-`sorry`, not the production formula, so this is a signature fixture and not production logic. -/
-private noncomputable def weylPreimagePlaceholder {L N : ℕ}
-    (p : MvPolynomial (Fin L × Fin 2) ℂ) : (Fin L → Fin (N + 1)) → ℂ :=
-  sorry
-
-/-! ## Test point 2: round-trip oracle at `L = 2`, `N = 2` -/
-
-/-- **Round-trip oracle.** `weylMap (weylPreimage (f2 ^ 2)) = f2 ^ 2`: `f2 ^ 2` has per-site
-degree `(2, 2)` at `N = 2`, so `weylMap_weylPreimage`'s homogeneity hypothesis is met and the
-preimage really is a two-sided inverse on this input. Pins that `weylPreimage` recovers exactly the
+/-- **Round-trip oracle.** `weylMap (weylPreimage (f₂ ^ 2)) = f₂ ^ 2`: `f₂ ^ 2` has per-site degree
+`(2, 2)` at `N = 2`, so `weylMap_weylPreimage`'s homogeneity hypothesis is met and the preimage
+really is a two-sided inverse on this input. Pins that `weylPreimage` recovers exactly the
 polynomial it was built from, not merely something in its fiber. -/
 theorem weylMap_weylPreimage_f2_sq :
-    weylMap (weylPreimagePlaceholder (N := 2) (f2 ^ 2)) = f2 ^ 2 := by
-  sorry
-
-/-! ## Test point 3: negative control — the homogeneity hypothesis is load-bearing -/
+    weylMap (weylPreimage (N := 2) (f2 ^ 2)) = f2 ^ 2 := by
+  refine weylMap_weylPreimage ?_
+  have hf2 := bondFactor_isWeightedHomogeneous (siteWeight (L := 2))
+    ((0 : Fin 2), (0 : Fin 2)) (1, 1) (0, 1) (1, 0) rfl
+  have hdeg : (∑ x : Fin 2, Finsupp.single x 2 : Fin 2 →₀ ℕ)
+      = 2 • (siteWeight ((0 : Fin 2), (0 : Fin 2)) + siteWeight ((1 : Fin 2), (1 : Fin 2))) := by
+    rw [Fin.sum_univ_two, smul_add, siteWeight, siteWeight, Finsupp.smul_single,
+      Finsupp.smul_single, smul_eq_mul]
+  rw [hdeg]
+  exact hf2.pow 2
 
 /-- **Negative control.** At `N = 2`, `p = X ((0 : Fin 2), 0) ^ 2` has per-site degree `(2, 0)`,
-*not* `(2, 2)`, so `weylMap_weylPreimage`'s hypothesis fails and the round-trip must break: `p` is
-not weight-homogeneous of the degree `weylPreimage` is built to recover. Mirrors
-`GradedPolynomialLayerNegativeControl`; catches an unconditional (hypothesis-free) `weylPreimage`
-round-trip theorem, which would be false. -/
+*not* `(2, 2)`, so `weylMap_weylPreimage`'s hypothesis fails and the round trip must break: no Weyl
+monomial has the multidegree of `p` (they all have total degree `4`), the preimage is the zero state
+and its Weyl image is `0 ≠ p`. Catches an unconditional (hypothesis-free) round-trip theorem, which
+would be false; mirrors `GradedPolynomialLayerNegativeControl`. -/
 theorem weylMap_weylPreimage_ne_of_not_homogeneous :
-    weylMap (weylPreimagePlaceholder (N := 2)
+    weylMap (weylPreimage (N := 2)
         ((X ((0 : Fin 2), (0 : Fin 2)) : MvPolynomial (Fin 2 × Fin 2) ℂ) ^ 2))
       ≠ (X ((0 : Fin 2), (0 : Fin 2)) : MvPolynomial (Fin 2 × Fin 2) ℂ) ^ 2 := by
-  sorry
+  have hzero : weylPreimage (N := 2)
+      ((X ((0 : Fin 2), (0 : Fin 2)) : MvPolynomial (Fin 2 × Fin 2) ℂ) ^ 2) = 0 := by
+    funext τ
+    have hne : Finsupp.single ((0 : Fin 2), (0 : Fin 2)) 2 ≠ md τ := by
+      intro h
+      have hdeg := md_degree τ
+      rw [← h, Finsupp.degree_single] at hdeg
+      norm_num at hdeg
+    simp [weylPreimage, X_pow_eq_monomial, coeff_monomial, hne]
+  rw [hzero, map_zero]
+  exact fun h => pow_ne_zero 2 (X_ne_zero ((0 : Fin 2), (0 : Fin 2))) h.symm
 
-/-! ## Test points 1 / 4 / 5: the global-to-local bridge and the packaged bond-kernel iff -/
+/-! ## The global-to-local bridge and the packaged bond-kernel iff -/
 
 /-- **Signature pin — the crux.** `f2_pow_dvd_weylMap_bondSlice_of_fBond_pow_dvd`: if the global
 bond factor `fBond x` to the power `S` divides the Weyl image of `Φ`, then the local bond factor
 `f2` to the same power `S` divides the Weyl image of *every* bond slice of `Φ` at `x`. The converse
-of the already-merged `fBond_pow_dvd_weylMap_of_local`. -/
+of `fBond_pow_dvd_weylMap_of_local`. -/
 theorem f2_pow_dvd_weylMap_bondSlice_of_fBond_pow_dvd_sig {N : ℕ} (hL : 1 < L) (x : Fin L)
     (S : ℕ) (Φ : (Fin L → Fin (N + 1)) → ℂ) (h : fBond x ^ S ∣ weylMap Φ)
     (r : Fin L → Fin (N + 1)) :
-    f2 ^ S ∣ weylMap (L := 2) (bondSlice x Φ r) := by
-  sorry
+    f2 ^ S ∣ weylMap (L := 2) (bondSlice x Φ r) :=
+  f2_pow_dvd_weylMap_bondSlice_of_fBond_pow_dvd hL x S Φ h r
 
-/-- **Direction consistency.** Composing the new converse with the already-merged forward bridge
+/-- **Direction consistency.** Composing the converse with the forward bridge
 `fBond_pow_dvd_weylMap_of_local` must return the original hypothesis: for `Φ` with
-`fBond x ^ S ∣ weylMap Φ`, going local (the new lemma) and then back global (the merged one)
+`fBond x ^ S ∣ weylMap Φ`, going local (the converse) and then back global (the forward bridge)
 reproduces `fBond x ^ S ∣ weylMap Φ`. Pins that both directions agree on the same `f2` / `fBond` /
-`bondEmb` convention — a `u ↔ v` drift in the new lemma would still typecheck but break this. -/
+`bondEmb` convention — a `u ↔ v` drift in either would still typecheck but break this. -/
 theorem fBond_pow_dvd_weylMap_round_trip {N : ℕ} (hL : 1 < L) (x : Fin L) (S : ℕ)
     (Φ : (Fin L → Fin (N + 1)) → ℂ) (h : fBond x ^ S ∣ weylMap Φ) :
     fBond x ^ S ∣ weylMap Φ :=
@@ -100,15 +94,14 @@ theorem fBond_pow_dvd_weylMap_round_trip {N : ℕ} (hL : 1 < L) (x : Fin L) (S :
 `fBond x ^ S`-divisible Weyl images, both directions. -/
 theorem bondCasimirPenaltyS_mulVec_eq_zero_iff_fBond_pow_dvd_sig {L : ℕ} (hL : 1 < L) (x : Fin L)
     (S : ℕ) (Φ : (Fin L → Fin (2 * S + 1)) → ℂ) :
-    (bondCasimirPenaltyS x (ringSucc x) S).mulVec Φ = 0 ↔ fBond x ^ S ∣ weylMap Φ := by
-  sorry
+    (bondCasimirPenaltyS x (ringSucc x) S).mulVec Φ = 0 ↔ fBond x ^ S ∣ weylMap Φ :=
+  bondCasimirPenaltyS_mulVec_eq_zero_iff_fBond_pow_dvd hL x S Φ
 
-/-- **`S = 1` control.** Instantiating the packaged iff at `S = 1` and rewriting through the
-pre-existing `bondCasimirPenaltyS_one` reproduces annihilation by `bondSpin2ProjectionS`: a state's
-Weyl image is divisible by `fBond x` exactly when the spin-two bond projection annihilates it (up to
-the harmless positive factor `24`). Cross-checks the new `⟸` half against the merged spin-one
-bespoke route, the same role Group 6 of `Tests/GeneralSBondTermSpinOne.lean` plays for the local
-(two-site) iff. -/
+/-- **`S = 1` control.** Instantiating the packaged iff at `S = 1` and rewriting through
+`bondCasimirPenaltyS_one` reproduces annihilation by `bondSpin2ProjectionS`: a state's Weyl image is
+divisible by `fBond x` exactly when the spin-two bond projection annihilates it (up to the harmless
+positive factor `24`). Cross-checks the `⟸` half against the spin-one bespoke route, the same role
+Group 6 of `Tests/GeneralSBondTermSpinOne.lean` plays for the local (two-site) iff. -/
 theorem bondCasimirPenaltyS_mulVec_eq_zero_iff_fBond_pow_dvd_S_one {L : ℕ} (hL : 1 < L) (x : Fin L)
     (Φ : (Fin L → Fin 3) → ℂ) :
     (bondSpin2ProjectionS x (ringSucc x)).mulVec Φ = 0 ↔ fBond x ^ 1 ∣ weylMap Φ := by
