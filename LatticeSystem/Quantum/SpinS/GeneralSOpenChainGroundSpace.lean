@@ -39,10 +39,10 @@ namespace LatticeSystem.Quantum
 open LatticeSystem.Math LatticeSystem.Quantum.AKLTUniqueness MvPolynomial
 
 /-- The **zero-energy space of the general-`S` open chain**: the eigenspace of the Hamiltonian's
-linear map at eigenvalue `0`.  This is the zero-energy eigenspace of a positive-semidefinite
-Hamiltonian (`openAKLTHamiltonianGeneralS_posSemidef`), and `0` really is the ground energy: the
-boundary states `openVBSStateGeneralS` are explicit nonzero zero modes
-(`isGroundEnergy_openAKLTHamiltonianGeneralS`). -/
+linear map at eigenvalue `0`.  For `2 ≤ L` and `S ≠ 0` the Hamiltonian is positive semidefinite
+(`openAKLTHamiltonianGeneralS_posSemidef`) and `0` really is its ground energy, the boundary states
+`openVBSStateGeneralS` being explicit nonzero zero modes
+(`isGroundEnergy_openAKLTHamiltonianGeneralS`); the definition itself assumes neither. -/
 noncomputable def openAKLTGroundSpaceGeneralS (L S : ℕ) :
     Submodule ℂ ((Fin L → Fin (2 * S + 1)) → ℂ) :=
   Module.End.eigenspace (Matrix.mulVecLin (openAKLTHamiltonianGeneralS L S)) 0
@@ -190,10 +190,11 @@ theorem openVBSStateGeneralS_mem_openAKLTGroundSpaceGeneralS {m S : ℕ} (hS : S
   exact (Finset.dvd_prod_of_mem (fun z => fBond z ^ S) hx).mul_left _
 
 /-- **The `(S+1)²` boundary states are linearly independent** (Tasaki §8.3.1, p. 252).  The Weyl map
-is injective, so it suffices to separate the images: they are the pairwise distinct monomials
-`X^{boundaryDeg m S ab}` (`boundaryDeg_injective`) — a subfamily of the monomial basis — multiplied
-by the single nonzero polynomial `∏_x f_x^S`, and multiplication by a nonzero polynomial is
-injective in the polynomial domain. -/
+is linear, so independence of the images already forces independence of the states themselves
+(`LinearIndependent.of_comp`; injectivity of the Weyl map is not needed).  Those images are the
+pairwise distinct monomials `X^{boundaryDeg m S ab}` (`boundaryDeg_injective`) — a subfamily of the
+monomial basis — multiplied by the single nonzero polynomial `∏_x f_x^S`, and multiplication by a
+nonzero polynomial is injective in the polynomial domain. -/
 theorem openVBSStateGeneralS_linearIndependent (m S : ℕ) :
     LinearIndependent ℂ fun ab : Fin (S + 1) × Fin (S + 1) => openVBSStateGeneralS m S ab := by
   refine LinearIndependent.of_comp (weylMap (L := m + 2) (N := 2 * S)) ?_
