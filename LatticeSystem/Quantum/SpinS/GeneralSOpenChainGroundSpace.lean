@@ -15,7 +15,7 @@ future work.
 
 The Hamiltonian is already normalised to ground energy `0` (unlike the `S = 1` open chain
 `openProjHamiltonianS`, which needs an affine shift), so the frustration-free argument here carries
-every local energy `0` with no shift, mirroring `AKLTOpenChainCompleteness.lean:44–56`.
+every local energy `0` with no shift, mirroring `openGroundSpace_isVBSGroundForm`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §7.2.3, eq. (7.2.46), p. 205; §8.3.1, p. 252; Appendix A.2.3, Lemmas A.9–A.10, pp. 469–470.

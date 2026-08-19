@@ -2,7 +2,7 @@ import LatticeSystem.Math.PosSemidef.AnnihilatingPolynomial
 import LatticeSystem.Quantum.SpinS.GeneralSCasimirSpectrum
 
 /-!
-# Positivity of the general-`S` AKLT bond term (PR-4b of #5292)
+# Positivity of the general-`S` AKLT bond term
 
 Regression gate for the annihilating-polynomial positivity route: the generic Lagrange-based
 lemma `Math/PosSemidef/AnnihilatingPolynomial.posSemidef_aeval_of_aeval_nodal_eq_zero`, and its

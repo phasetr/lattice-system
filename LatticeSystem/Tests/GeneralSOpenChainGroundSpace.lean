@@ -1,7 +1,7 @@
 import LatticeSystem.Quantum.SpinS.GeneralSOpenChainGroundSpace
 
 /-!
-# Ground space of the general-`S` open AKLT chain is the joint bond kernel (PR-4b of #5292)
+# Ground space of the general-`S` open AKLT chain is the joint bond kernel
 
 Regression gate for `Quantum.GeneralSOpenChainGroundSpace`: the zero-energy space
 `openAKLTGroundSpaceGeneralS`, its identification with the kernel of the Hamiltonian's linear map,
