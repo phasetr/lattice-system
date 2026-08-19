@@ -4,13 +4,12 @@ import Mathlib.Analysis.Matrix.Order
 /-!
 # Positive semidefiniteness from an annihilating polynomial with distinct real nodes
 
-If a Hermitian matrix `A` satisfies a real-coefficient polynomial identity
-`∏_i (X − r i) ` (`aeval A = 0`) at pairwise distinct real nodes `r i`, and a polynomial `q` of
-degree `< card ι` is nonnegative at every node, then `aeval A q` is positive semidefinite.  The
-route is Lagrange interpolation: `q = Σ_i q(r i) • basis i`, each Lagrange basis polynomial
-`basis i` becomes a Hermitian idempotent under `aeval A` (so `aeval A (basis i) = Pᴴ P` for
-`P = aeval A (basis i)` itself), and a nonnegative combination of positive-semidefinite matrices is
-positive semidefinite.
+If a Hermitian matrix `A` is annihilated by the nodal polynomial of pairwise distinct real nodes
+`r i`, that is `aeval A (∏_i (X − r i)) = 0`, and a real polynomial `q` of degree `< card ι` is
+nonnegative at every node, then `aeval A q` is positive semidefinite.  The route is Lagrange
+interpolation: `q = Σ_i q(r i) • basis i`, each Lagrange basis polynomial `basis i` becomes a
+Hermitian idempotent under `aeval A` (so `aeval A (basis i) = Pᴴ P` for `P = aeval A (basis i)`
+itself), and a nonnegative combination of positive-semidefinite matrices is positive semidefinite.
 
 This is the generic layer behind the AKLT bond-term positivity of Tasaki §7.3.1 (eq. (7.3.3),
 p. 208): the bond Casimir `Ĉ` satisfies the annihilating polynomial

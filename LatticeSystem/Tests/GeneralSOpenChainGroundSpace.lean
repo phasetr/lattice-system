@@ -26,8 +26,7 @@ example {L S : ℕ} (hL : 2 ≤ L) (hS : S ≠ 0) :
   openAKLTHamiltonianGeneralS_posSemidef hL hS
 
 /-- **Signature pin, headline: the zero-energy space is the joint bond kernel.**  Instantiated at
-`L = 2` (the shortest open chain, a single bond) and `S = 1` so the site-state type matches the
-pre-existing spin-one model (`Fin 3`). -/
+`L = 2`, the shortest open chain (a single bond), with `S` left general. -/
 example {S : ℕ} (hS : S ≠ 0) (Φ : (Fin 2 → Fin (2 * S + 1)) → ℂ) :
     Φ ∈ openAKLTGroundSpaceGeneralS 2 S
       ↔ ∀ x ∈ openBonds 2, (bondCasimirPenaltyS x (ringSucc x) S).mulVec Φ = 0 :=

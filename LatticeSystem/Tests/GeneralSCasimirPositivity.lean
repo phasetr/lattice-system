@@ -17,8 +17,10 @@ Four groups:
 
 1. **Generic-lemma oracle** — a fully worked `n = ι = Fin 1` instance of
    `posSemidef_aeval_of_aeval_nodal_eq_zero`, independent of the AKLT context.
-2. **`N = 1` node-polynomial pin** — `casimirNode`'s nodal factorization at the smallest
-   nontrivial case, `X (X − 2)` (a pure `Polynomial` computation).
+2. **`N = 1` annihilating-polynomial oracle** — `casimirNode`'s nodal factorization at the
+   smallest nontrivial case, `X (X − 2)`, together with the matrix-layer statement it certifies:
+   `Ĉ (Ĉ − 2) = 0` for the two-site bond Casimir, which exercises `bondCasimirS`, `weylMap` and
+   the descent fold rather than `Polynomial` alone.
 3. **`S = 1` positivity oracle** — `localCasimirPenalty 1` is PSD both via the new
    `localCasimirPenalty_posSemidef` and, independently, via `bondCasimirPenaltyS_one` +
    `bondSpin2ProjectionS_posSemidef` (`24 • P̂₂ ≥ 0`); the two routes must prove the *same*
@@ -52,17 +54,28 @@ example :
       exact_mod_cast (by norm_num : (0 : ℕ) < 1))
     (fun _ => by norm_num)
 
-/-! ## Group 2: `N = 1` node-polynomial pin -/
+/-! ## Group 2: `N = 1` annihilating-polynomial oracle -/
 
 /-- **`N = 1` node-polynomial pin.**  At `N = 1` (two spin-`1/2` sites) the nodal polynomial of
 `casimirNode` is exactly `X (X − 2)`, the smallest nontrivial instance of the Casimir eigenvalue
 family of Tasaki §7.3.1, eq. (7.3.1), p. 208.  A pure `Polynomial` computation, independent of the
 bond-Casimir matrix layer. -/
-example :
+private theorem nodal_casimirNode_one :
     Lagrange.nodal (Finset.univ : Finset (Fin 2)) (casimirNode 1)
       = Polynomial.X * (Polynomial.X - Polynomial.C (2 : ℝ)) := by
   rw [Lagrange.nodal_eq, Fin.prod_univ_two]
   norm_num [casimirNode]
+
+/-- **`N = 1` matrix-layer oracle.**  The concrete content of the annihilating polynomial at the
+smallest nontrivial case: the two-site bond Casimir satisfies `Ĉ (Ĉ − 2) = 0` (eigenvalue `0` on
+the singlet, `2` on the triplet; Tasaki §7.3.1, eq. (7.3.1), p. 208).  Unlike the node-polynomial
+pin above, this evaluates the annihilating polynomial on the matrix layer, so it exercises
+`bondCasimirS`, `weylMap` and the descent fold. -/
+example :
+    Polynomial.aeval (bondCasimirS (0 : Fin 2) 1 1)
+        (Polynomial.X * (Polynomial.X - Polynomial.C (2 : ℝ))) = 0 := by
+  rw [← nodal_casimirNode_one]
+  exact aeval_nodal_bondCasimirS 1
 
 /-! ## Group 3: `S = 1` positivity oracle -/
 
