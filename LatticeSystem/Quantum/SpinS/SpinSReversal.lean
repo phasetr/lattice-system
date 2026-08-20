@@ -11,6 +11,9 @@ linear unitary it is the π-rotation about axis 1: it conjugates `Ŝ³ ↦ −Ŝ
 `M ↔ −M` reflection symmetry `Θ Ŝ³_tot Θ⁻¹ = −Ŝ³_tot` and `Θ Ĥ Θ⁻¹ = Ĥ` used in the
 Mattis–Nishimori uniqueness argument (Theorem 2.4).
 
+Being the axis-1 π rotation up to a phase, `F` is also the real involution underlying the closed
+form of `û₁ = exp(iπ Ŝ^{(1)})` in `Quantum/SpinS/SpinSPiRotation.lean`.
+
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.4, p. 43–44.
 -/
@@ -25,8 +28,27 @@ variable {N : ℕ}
 noncomputable def spinReversalS (N : ℕ) : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ :=
   Matrix.of fun i j => if j = Fin.rev i then (1 : ℂ) else 0
 
+/-- Entries of `F`: the row `i` carries its single `1` in the column `rev i`. -/
 theorem spinReversalS_apply (i j : Fin (N + 1)) :
     spinReversalS N i j = if j = Fin.rev i then (1 : ℂ) else 0 := rfl
+
+/-- `F` is symmetric with real entries, hence self-adjoint. -/
+theorem spinReversalS_conjTranspose (N : ℕ) :
+    (spinReversalS N).conjTranspose = spinReversalS N := by
+  ext i j
+  rw [Matrix.conjTranspose_apply, spinReversalS_apply, spinReversalS_apply]
+  rcases eq_or_ne j (Fin.rev i) with h | h
+  · rw [if_pos h, if_pos (Fin.rev_eq_iff.mp h.symm), star_one]
+  · rw [if_neg h, if_neg fun h' => h (Fin.rev_eq_iff.mp h'.symm), star_zero]
+
+/-- Entrywise complex conjugation fixes `F`: all its entries are `0` or `1`. -/
+theorem spinReversalS_map_conj (N : ℕ) :
+    (spinReversalS N).map (starRingEnd ℂ) = spinReversalS N := by
+  ext i j
+  rw [Matrix.map_apply, spinReversalS_apply]
+  rcases eq_or_ne j (Fin.rev i) with h | h
+  · rw [if_pos h, map_one]
+  · rw [if_neg h, map_zero]
 
 /-- `F` is an involution: `F * F = 1`. -/
 theorem spinReversalS_mul_self (N : ℕ) :

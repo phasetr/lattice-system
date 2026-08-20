@@ -246,11 +246,11 @@ private lemma t4_mpsMix_composition_agrees :
   rw [t4_mpsMix_pauliX_mpsMix_pauliZ_fixtureA, t4_mpsMix_mul_pauliXZ_fixtureA]
 
 /-- T4: the inverse-transport device `symmetryTransportMPS_symmetryTransportMPS`, specialized to
-`ε = 1`, `u = σ^x`, `v = σ^z`. -/
+the outer transport `ε = 1`, `u = σ^z` and the inner transport `δ = 1`, `v = σ^x`. -/
 private lemma t4_symmetryTransportMPS_symmetryTransportMPS (A : MPSMatrices 1 1) :
     symmetryTransportMPS (1 : ℤˣ) pauliZ (symmetryTransportMPS (1 : ℤˣ) pauliX A) =
-      mpsMix (pauliZ * signConjMatrix (1 : ℤˣ) pauliX) A :=
-  symmetryTransportMPS_symmetryTransportMPS (ε := 1) (u := pauliX) (v := pauliZ) A
+      symmetryTransportMPS ((1 : ℤˣ) * (1 : ℤˣ)) (pauliZ * signConjMatrix (1 : ℤˣ) pauliX) A :=
+  symmetryTransportMPS_symmetryTransportMPS (ε := 1) (δ := 1) (u := pauliZ) (v := pauliX) A
 
 /-! ## T5: the book's `S = 1` time-reversal instance (8.3.33) -/
 

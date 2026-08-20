@@ -27,7 +27,8 @@ namespace LatticeSystem.Quantum
 
 open Matrix Module
 open LatticeSystem.Math (signConj signConjMatrix signConj_one_apply signConj_neg_one_apply
-  signConj_signConj signConjMatrix_smul signConjMatrix_signConjMatrix
+  signConj_circle signConj_signConj signConjMatrix_smul signConjMatrix_one_apply
+  signConjMatrix_signConjMatrix signConjMatrix_signConjMatrix_mul
   signConjMatrix_conjTranspose signConjMatrix_mem_unitaryGroup mem_spectrum_signConjMatrix_iff
   norm_signConj finrank_ker_mulVecLin_signConjMatrix)
 
@@ -66,6 +67,13 @@ lemma mpsMix_one (A : MPSMatrices D N) : mpsMix 1 A = A := by
   funext σ
   simp [mpsMix, Matrix.one_apply, ite_smul]
 
+/-- Mixing is homogeneous in the mixing matrix: rescaling `u` rescales the mixed family.  This is
+what turns the phase of eq. (8.3.42) into a phase of the transported family. -/
+lemma mpsMix_smul (z : ℂ) (u : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) (A : MPSMatrices D N) :
+    mpsMix (z • u) A = fun σ => z • mpsMix u A σ := by
+  funext σ
+  simp only [mpsMix, Matrix.smul_apply, smul_eq_mul, Finset.smul_sum, smul_smul]
+
 /-- The conjugation moves past a mixing at the cost of conjugating the mixing matrix. -/
 lemma mpsConjugate_mpsMix (ε : ℤˣ) (u : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
     (A : MPSMatrices D N) :
@@ -78,22 +86,55 @@ lemma mpsConjugate_mpsMix (ε : ℤˣ) (u : Matrix (Fin (N + 1)) (Fin (N + 1)) �
   rw [signConjMatrix_smul]
   congr 1
 
+/-- Iterating the conjugation multiplies the signs, `C_ε ∘ C_δ = C_{εδ}`, on MPS families. -/
+lemma mpsConjugate_mpsConjugate_mul (ε δ : ℤˣ) (A : MPSMatrices D N) :
+    mpsConjugate ε (mpsConjugate δ A) = mpsConjugate (ε * δ) A :=
+  funext fun σ => signConjMatrix_signConjMatrix_mul ε δ (A σ)
+
 /-- The conjugation is an involution on MPS families. -/
 lemma mpsConjugate_mpsConjugate (ε : ℤˣ) (A : MPSMatrices D N) :
     mpsConjugate ε (mpsConjugate ε A) = A := by
-  funext σ
-  exact signConjMatrix_signConjMatrix ε (A σ)
+  rw [mpsConjugate_mpsConjugate_mul, Int.units_mul_self]
+  exact funext fun σ => signConjMatrix_one_apply (A σ)
 
-/-- Transporting twice with the same sign is a pure mixing.  Taking `v` to be the adjoint of
-`C_g[u]` recovers the original family; this inverse transport is what
-`mpsProductsSpanAt_symmetryTransportMPS` runs backwards along to pull the spanning conditions from
-`A` to `Ã_g`. -/
-lemma symmetryTransportMPS_symmetryTransportMPS (ε : ℤˣ)
+/-- Transporting twice multiplies the signs and composes the mixing matrices, the second one
+twisted by the outer sign.  Taking `δ = ε` and `u` to be the adjoint of `C_g[v]` recovers the
+original family; this inverse transport is what `mpsProductsSpanAt_symmetryTransportMPS` runs
+backwards along to pull the spanning conditions from `A` to `Ã_g`.  For a projective
+representation the composed mixing matrix is again a member of the family, up to the phase of
+eq. (8.3.42). -/
+lemma symmetryTransportMPS_symmetryTransportMPS (ε δ : ℤˣ)
     (u v : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) (A : MPSMatrices D N) :
-    symmetryTransportMPS ε v (symmetryTransportMPS ε u A) =
-      mpsMix (v * signConjMatrix ε u) A := by
-  rw [symmetryTransportMPS, symmetryTransportMPS, mpsConjugate_mpsMix,
-    mpsConjugate_mpsConjugate, mpsMix_mpsMix]
+    symmetryTransportMPS ε u (symmetryTransportMPS δ v A) =
+      symmetryTransportMPS (ε * δ) (u * signConjMatrix ε v) A := by
+  simp only [symmetryTransportMPS]
+  rw [mpsConjugate_mpsMix, mpsConjugate_mpsConjugate_mul, mpsMix_mpsMix]
+
+/-- **Transport of a phased conjugate family** (the computation behind eqs. (8.3.49)–(8.3.50)).
+The transport passes through an overall phase `z` and a gauge conjugation by `V`: the phase picks
+up the sign twist `z ↦ z^{s(g)}` and the gauge matrix is conjugated to `C_g[V]`.  Applied to the
+gauge relation (8.3.48) this is what lets two transports be compared without ever inverting
+it. -/
+lemma symmetryTransportMPS_conj (ε : ℤˣ) (u : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) (z : Circle)
+    (V : Matrix (Fin D) (Fin D) ℂ) (A : MPSMatrices D N) :
+    symmetryTransportMPS ε u (fun σ => (z : ℂ) • (V.conjTranspose * A σ * V)) =
+      fun σ => ((z ^ (ε : ℤ) : Circle) : ℂ) •
+        ((signConjMatrix ε V).conjTranspose * symmetryTransportMPS ε u A σ *
+          signConjMatrix ε V) := by
+  funext σ
+  have hterm : ∀ σ' : Fin (N + 1),
+      u σ σ' • signConjMatrix ε ((z : ℂ) • (V.conjTranspose * A σ' * V)) =
+        ((z ^ (ε : ℤ) : Circle) : ℂ) • ((signConjMatrix ε V).conjTranspose *
+          (u σ σ' • signConjMatrix ε (A σ')) * signConjMatrix ε V) := by
+    intro σ'
+    rw [signConjMatrix_smul, signConj_circle, map_mul, map_mul, ← signConjMatrix_conjTranspose,
+      Matrix.mul_smul, Matrix.smul_mul, smul_smul, smul_smul, mul_comm]
+  have hmix : symmetryTransportMPS ε u A σ =
+      ∑ σ' : Fin (N + 1), u σ σ' • signConjMatrix ε (A σ') := rfl
+  change (∑ σ' : Fin (N + 1),
+      u σ σ' • signConjMatrix ε ((z : ℂ) • (V.conjTranspose * A σ' * V))) = _
+  rw [hmix, Finset.mul_sum, Finset.sum_mul, Finset.smul_sum]
+  exact Finset.sum_congr rfl fun σ' _ => hterm σ'
 
 /-! ## Transport of the spanning conditions -/
 
@@ -160,9 +201,13 @@ theorem mpsProductsSpanAt_symmetryTransportMPS {ε : ℤˣ}
     mpsProductsSpanAt (symmetryTransportMPS ε u A) ℓ := by
   have hback : mpsMix (star (signConjMatrix ε u))
       (mpsConjugate ε (symmetryTransportMPS ε u A)) = A := by
-    have hinv := symmetryTransportMPS_symmetryTransportMPS ε u (star (signConjMatrix ε u)) A
-    rwa [Matrix.mem_unitaryGroup_iff'.mp (signConjMatrix_mem_unitaryGroup ε hu),
-      mpsMix_one] at hinv
+    have hone : symmetryTransportMPS (1 : ℤˣ) (1 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) A = A := by
+      rw [symmetryTransportMPS, mpsMix_one]
+      exact funext fun σ => signConjMatrix_one_apply (A σ)
+    have hinv := symmetryTransportMPS_symmetryTransportMPS ε ε (star (signConjMatrix ε u)) u A
+    rw [Matrix.mem_unitaryGroup_iff'.mp (signConjMatrix_mem_unitaryGroup ε hu),
+      Int.units_mul_self, hone] at hinv
+    exact hinv
   have hconj : mpsProductsSpanAt (mpsConjugate ε (symmetryTransportMPS ε u A)) ℓ := by
     unfold mpsProductsSpanAt at hspan ⊢
     refine eq_top_iff.mpr ?_
