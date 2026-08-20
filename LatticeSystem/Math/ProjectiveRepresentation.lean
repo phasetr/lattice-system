@@ -95,11 +95,23 @@ lemma signConj_signConj (ε : ℤˣ) (z : ℂ) : signConj ε (signConj ε z) = z
   · simp [signConj_one_apply]
   · simp [signConj_neg_one_apply]
 
+/-- Iterating the matrix twist multiplies the signs: `C_ε ∘ C_δ = C_{εδ}`.  Two antiunitary
+twists cancel, one of each kind conjugates once. -/
+lemma signConjMatrix_signConjMatrix_mul (ε δ : ℤˣ) (X : Matrix D D ℂ) :
+    signConjMatrix ε (signConjMatrix δ X) = signConjMatrix (ε * δ) X := by
+  rcases Int.units_eq_one_or ε with hε | hε <;> rcases Int.units_eq_one_or δ with hδ | hδ <;>
+    subst hε <;> subst hδ
+  · rw [one_mul, signConjMatrix_one_apply]
+  · rw [one_mul, signConjMatrix_one_apply]
+  · rw [mul_one, signConjMatrix_one_apply]
+  · rw [show ((-1 : ℤˣ) * (-1 : ℤˣ)) = 1 from by decide, signConjMatrix_one_apply]
+    ext i j
+    simp [signConjMatrix_neg_one_apply]
+
 /-- The matrix twist is an involution. -/
 lemma signConjMatrix_signConjMatrix (ε : ℤˣ) (X : Matrix D D ℂ) :
     signConjMatrix ε (signConjMatrix ε X) = X := by
-  ext i j
-  simp [signConjMatrix, signConj_signConj]
+  rw [signConjMatrix_signConjMatrix_mul, Int.units_mul_self, signConjMatrix_one_apply]
 
 /-- The scalar twist is an isometry: `|C_g[z]| = |z|`. -/
 lemma norm_signConj (ε : ℤˣ) (z : ℂ) : ‖signConj ε z‖ = ‖z‖ := by

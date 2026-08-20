@@ -73,6 +73,20 @@ def IsInjectiveMPS (A : MPSMatrices D N) (lam : ℝ) : Prop :=
   IsMPSNormalized A lam ∧ MPSSpansEventually A ∧ MPSSpansForAllLarge A ∧
     HasPrimitiveTransferSpectrum A lam
 
+/-- An injective family has positive bond dimension.  At `D = 0` the transfer-matrix algebra is a
+subsingleton, so its spectrum is empty and Theorem 7.5(iii) cannot hold; hypotheses built on
+`IsInjectiveMPS` therefore need no separate `0 < D` conjunct. -/
+theorem pos_of_isInjectiveMPS {A : MPSMatrices D N} {lam : ℝ} (hA : IsInjectiveMPS A lam) :
+    0 < D := by
+  rcases Nat.eq_zero_or_pos D with hD | hD
+  · subst hD
+    haveI : Subsingleton (Matrix (Fin 0 × Fin 0) (Fin 0 × Fin 0) ℂ) :=
+      ⟨fun a b => funext fun i => i.1.elim0⟩
+    have hmem := hA.2.2.2.1
+    rw [spectrum.of_subsingleton] at hmem
+    exact absurd hmem (Set.notMem_empty _)
+  · exact hD
+
 /-- The dual completely positive transfer map `ρ ↦ Σ_σ (A^σ)† ρ A^σ`. -/
 noncomputable def mpsDualTransferMap (A : MPSMatrices D N)
     (ρ : Matrix (Fin D) (Fin D) ℂ) : Matrix (Fin D) (Fin D) ℂ :=
