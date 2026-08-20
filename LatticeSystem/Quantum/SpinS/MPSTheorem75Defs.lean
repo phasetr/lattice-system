@@ -83,6 +83,17 @@ def HasFaithfulDualEigenmatrix (A : MPSMatrices D N) (lam : ℝ) : Prop :=
   ∃ ρ : Matrix (Fin D) (Fin D) ℂ,
     ρ.PosDef ∧ mpsDualTransferMap A ρ = (lam : ℂ) • ρ
 
+/-- Ordered products of a globally rescaled family pick up the rescaling to the power of the word
+length. -/
+theorem orderedProd_smul (z : ℂ) (A : MPSMatrices D N) (w : List (Fin (N + 1))) :
+    orderedProd (fun σ => z • A σ) w = z ^ w.length • orderedProd A w := by
+  induction w with
+  | nil => simp [orderedProd]
+  | cons σ ss ih =>
+      change (z • A σ) * orderedProd (fun τ => z • A τ) ss = _
+      rw [ih, Matrix.smul_mul, Matrix.mul_smul, smul_smul, List.length_cons, pow_succ, mul_comm]
+      rfl
+
 /-- Left multiplication by a single MPS matrix sends the span of the ordered products of length
 `ℓ` into the span of the ordered products of length `ℓ + 1`. -/
 theorem orderedProd_mul_mem_span_succ (A : MPSMatrices D N) (ℓ : ℕ) (σ : Fin (N + 1))

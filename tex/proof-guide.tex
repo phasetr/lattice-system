@@ -12894,6 +12894,37 @@ p.~279 for general $g$ --- and never proves.  The seven §8.3.4 axioms above are
 later PRs of Issue \#5306.
 
 \medskip
+\noindent\textbf{§8.3.4--§8.3.5 Invariance implies the gauge relation (8.3.48)} (Tasaki §8.3.4,
+eqs.~(8.3.15)--(8.3.16) and footnote~37, p.~265; §8.3.5, eqs.~(8.3.45)--(8.3.48), pp.~278--279;
+\texttt{Quantum/SpinS/MPSInvarianceGauge.lean}, Issue \#5306, PR \#5309).  Tasaki assumes
+$\hat V(g)|\Phi_L\rangle=e^{i\eta_L(g)}|\Phi_L\rangle$ for every length $L$ (8.3.45) and concludes,
+``as in (8.3.16)'', that $\tilde A_g^\sigma=e^{i\zeta(g)}\,\hat U^\dagger(g)A^\sigma\hat U(g)$
+(8.3.48).  The justification he gives (footnote~37) is to set $B^\sigma=e^{-i\eta_L/L}\tilde
+A^\sigma$ and ``apply the theorem'', but that $B$ depends on $L$, whereas Theorem~7.6 compares two
+\emph{fixed} families; the argument as printed does not apply.  This repository closes the gap
+instead of assuming it.  In coefficient form the invariance reads
+$\operatorname{tr}\tilde A^{\sigma_1}\cdots\tilde
+A^{\sigma_L}=e^{i\eta_L}\operatorname{tr}A^{\sigma_1}\cdots A^{\sigma_L}$
+(\texttt{GeneratesPhasedMPS}).  Expanding $1=\sum_i c_i A^{w_i}$ over words $w_i$ of a spanning
+length, transporting the combination to $\tilde A$ and testing it against the words of the second
+family pins $\sum_i c_i\tilde A^{w_i}$ to a scalar; taking the trace of that identity cancels the
+bond dimension and yields the multiplicativity $\eta_{a+b}=\eta_a\eta_b$ (\texttt{phase\_mul}),
+whence $\eta_L=c^L$ for all lengths beyond twice the spanning length
+(\texttt{exists\_phase\_eq\_pow}).  The rescaled family $c^{-1}\tilde A$ is then \emph{independent of
+$L$} and has the same coefficients as $A$ on all long chains, so Theorem~7.6 applies to it once its
+hypothesis is relaxed from exact equality at every length to equality at all sufficiently large
+lengths (\texttt{GeneratesSameMPSEventually},
+\texttt{mps\_theorem\_7\_6\_of\_eventual\_agreement}; the printed \texttt{mps\_theorem\_7\_6} is
+unchanged and follows from the relaxed form).  That relaxation is not cosmetic: ``$\eta_L=L\zeta$
+for any $L$'' is false as printed, because at a length whose coefficients all vanish --- length one
+for a family of traceless matrices, e.g.\ the spin-$1$ Pauli family --- the hypothesis reads
+$0=e^{i\eta_L}\cdot 0$ and constrains $\eta_L$ not at all.  Only the long lengths are needed:
+(8.3.49)--(8.3.54) use (8.3.48) alone.  The result, \texttt{exists\_unitary\_gauge\_of\_invariance},
+is stated for a single symmetry element (its sign $\varepsilon=s(g)$ and unitary $u=\hat u(g)$); the
+seven §8.3.4 axioms above remain untouched, since \texttt{tasaki\_theorem\_8\_7} still needs the
+cocycle chase of (8.3.49)--(8.3.54).
+
+\medskip
 \noindent\textbf{§8.3.5 Discrete-symmetry Lieb--Schultz--Mattis theorem} (Theorem 8.6, Ogata--Tasaki;
 Tasaki §8.3.5, pp.~276--280; \texttt{Quantum/SpinS/LiebSchultzMattisDiscrete.lean}, Issue \#4485).
 The general no-go theorem without continuous symmetry.  The axiom \texttt{tasaki\_theorem\_8\_6}

@@ -20,7 +20,7 @@ The route is the one fixed by the Gate D7a design, block ④-II (F0–F8):
   norm formula `AKLTStringOrder.state_norm_pos` (`AKLTStringOrderTransfer.lean:718`).
 * **F3** `akltVBSState_rotate` / `akltVBSState_shift` — the trace-product state is invariant under
   a one-step ring rotation, hence under any rotation.  Proved from `List.ofFn_succ'` (the `snoc`
-  form of `List.ofFn`), the production `orderedProd_append` (`MPSTheorem76Algebra.lean:36`) and
+  form of `List.ofFn`), the production `orderedProd_append` (`MPSTheorem76Algebra.lean:39`) and
   cyclicity of the matrix trace.
 * **F4** `glueBond_shift` — rotating a glued bond configuration moves the bond to `x = 0`.
 * **F5** `exists_bondSlice_eq_trace` — the *key structural fact*: for a periodic MPS state, every

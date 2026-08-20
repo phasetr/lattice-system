@@ -566,6 +566,21 @@ def approved_changes(text: str) -> str:
             "`Math/MvPolynomial/BilinearFactorCoprime.lean`; "
             "`Math/MvPolynomial/PairwiseCoprimeProd.lean`",
         )
+        # PR-3 of the §8.3.4 invariance/gauge arc (#5306) inserts
+        # `exists_unitary_gauge_data_of_eventually` between the word-transport equivalence and the
+        # gauge data, and weakens `exists_word_transport_algEquiv` to the threshold (eventual
+        # agreement) hypothesis.  The recorded Theorem 7.6 DAG is corrected to the actual chain;
+        # the statement it proves is unchanged.
+        .replace(
+            "The verified DAG is `GeneratesSameMPS` → `exists_word_transport_algEquiv` → "
+            "`exists_unitary_gauge_data` → `mps_theorem_7_6`: fixed-length word transport gives",
+            "The verified DAG is `GeneratesSameMPS` → (`.eventually`) → "
+            "`GeneratesSameMPSEventually` → `exists_word_transport_algEquiv` → "
+            "`exists_unitary_gauge_data_of_eventually` → `exists_unitary_gauge_data` / "
+            "`mps_theorem_7_6_of_eventual_agreement` → `mps_theorem_7_6`: "
+            "`exists_word_transport_algEquiv` now takes only the threshold hypothesis "
+            "(agreement for all sufficiently large lengths), fixed-length word transport gives",
+        )
     )
 
 
