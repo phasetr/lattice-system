@@ -72,7 +72,7 @@ theorem mpsEvalWords_surjective {A : MPSMatrices D N} {ℓ : ℕ}
 
 /-- Trace equality above the spanning length preserves every linear relation among fixed-length
 words. -/
-private theorem evalWords_ker_le {A B : MPSMatrices D N} {ℓ : ℕ}
+private theorem mpsEvalWords_ker_le {A B : MPSMatrices D N} {ℓ : ℕ}
     (hsame : ∀ L : ℕ, ℓ ≤ L → ∀ ss : Fin L → Fin (N + 1),
       Matrix.trace (orderedProd A (List.ofFn ss)) = Matrix.trace (orderedProd B (List.ofFn ss)))
     (hspanB : mpsProductsSpanAt B ℓ) :
@@ -123,14 +123,14 @@ private theorem evalWords_ker_le {A B : MPSMatrices D N} {ℓ : ℕ}
     LinearMap.zero_apply, Matrix.zero_mul, Matrix.trace_zero] using h
 
 /-- The two fixed-length word evaluation maps have the same kernel. -/
-private theorem evalWords_ker_eq {A B : MPSMatrices D N} {ℓ : ℕ}
+private theorem mpsEvalWords_ker_eq {A B : MPSMatrices D N} {ℓ : ℕ}
     (hsame : ∀ L : ℕ, ℓ ≤ L → ∀ ss : Fin L → Fin (N + 1),
       Matrix.trace (orderedProd A (List.ofFn ss)) = Matrix.trace (orderedProd B (List.ofFn ss)))
     (hspanA : mpsProductsSpanAt A ℓ) (hspanB : mpsProductsSpanAt B ℓ) :
     LinearMap.ker (mpsEvalWords A ℓ) = LinearMap.ker (mpsEvalWords B ℓ) := by
   apply le_antisymm
-  · exact evalWords_ker_le hsame hspanB
-  · exact evalWords_ker_le (fun L hL ss => (hsame L hL ss).symm) hspanA
+  · exact mpsEvalWords_ker_le hsame hspanB
+  · exact mpsEvalWords_ker_le (fun L hL ss => (hsame L hL ss).symm) hspanA
 
 /-- Equality against every fixed-length word in a spanning family determines a matrix. -/
 theorem eq_of_trace_mul_words {A : MPSMatrices D N} {ℓ : ℕ}
@@ -185,7 +185,7 @@ theorem exists_word_transport_algEquiv
   let f : Matrix (Fin D) (Fin D) ℂ →ₗ[ℂ] Matrix (Fin D) (Fin D) ℂ :=
     evalB.comp sectionA
   have hker : LinearMap.ker evalA = LinearMap.ker evalB := by
-    exact evalWords_ker_eq hsame hspanA hspanB
+    exact mpsEvalWords_ker_eq hsame hspanA hspanB
   have hsectionA_apply (X : Matrix (Fin D) (Fin D) ℂ) :
       evalA (sectionA X) = X := by
     have h := LinearMap.congr_fun hsectionA X

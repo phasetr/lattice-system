@@ -528,7 +528,8 @@ element is both `0` and `1`), so the transfer-matrix algebra collapses to the tr
 lam`) is **uninhabited** at `D = 0` for every `A` and `lam`. Consequently T9 cannot literally
 instantiate `exists_unitary_gauge_of_phased`/`exists_unitary_gauge_of_invariance` at `D = 0` with a
 genuine `IsInjectiveMPS` witness: the production `by_cases hD : D = 0` branch (mirroring
-`exists_unitary_gauge_data`'s existing `D = 0` branch in `MPSTheorem76Unitary.lean`) must discharge
+`exists_unitary_gauge_data_of_eventually`'s `D = 0` branch in `MPSTheorem76Unitary.lean`) must
+discharge
 its conclusion by `Subsingleton.elim` alone, without ever inspecting the (unsatisfiable) hypotheses.
 This lemma records only the `Subsingleton` fact the guard relies on. -/
 private lemma t9_matrix_subsingleton_of_D_zero :

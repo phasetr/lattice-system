@@ -85,17 +85,6 @@ private theorem unitNormalizedMPS_hasFaithfulDualEigenmatrix
       rw [hdual, smul_smul]
       simp [ne_of_gt hlam]
 
-/-- Ordered products of the rescaled family differ by the corresponding scalar power. -/
-private theorem orderedProd_unitNormalizedMPS
-    (A : MPSMatrices D N) (lam : ℝ) (σs : List (Fin (N + 1))) :
-    orderedProd (unitNormalizedMPS A lam) σs =
-      ((((Real.sqrt lam : ℝ) : ℂ)⁻¹) ^ σs.length) • orderedProd A σs := by
-  induction σs with
-  | nil => simp [orderedProd]
-  | cons σ σs ih =>
-      simp only [orderedProd, unitNormalizedMPS, ih, List.length_cons, pow_succ']
-      rw [Matrix.smul_mul, Matrix.mul_smul, smul_smul]
-
 /-- Fixed-length word spanning is unchanged by positive normalization rescaling. -/
 private theorem mpsProductsSpanAt_unitNormalizedMPS_iff
     (A : MPSMatrices D N) (lam : ℝ) (hlam : 0 < lam) (n : ℕ) :
@@ -103,6 +92,10 @@ private theorem mpsProductsSpanAt_unitNormalizedMPS_iff
       mpsProductsSpanAt A n := by
   have hc : (((Real.sqrt lam : ℝ) : ℂ)⁻¹) ≠ 0 := by
     exact inv_ne_zero (by exact_mod_cast (Real.sqrt_pos.2 hlam).ne')
+  have hscale (σs : List (Fin (N + 1))) :
+      orderedProd (unitNormalizedMPS A lam) σs =
+        ((((Real.sqrt lam : ℝ) : ℂ)⁻¹) ^ σs.length) • orderedProd A σs :=
+    orderedProd_smul _ A σs
   unfold mpsProductsSpanAt
   have hspan :
       Submodule.span ℂ {M : Matrix (Fin D) (Fin D) ℂ |
@@ -114,7 +107,7 @@ private theorem mpsProductsSpanAt_unitNormalizedMPS_iff
     apply le_antisymm
     · apply Submodule.span_le.mpr
       rintro M ⟨σs, hlen, rfl⟩
-      rw [orderedProd_unitNormalizedMPS, hlen]
+      rw [hscale, hlen]
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨σs, hlen, rfl⟩)
     · apply Submodule.span_le.mpr
       rintro M ⟨σs, hlen, rfl⟩
@@ -124,7 +117,7 @@ private theorem mpsProductsSpanAt_unitNormalizedMPS_iff
             M = orderedProd (unitNormalizedMPS A lam) τs})
         ((((Real.sqrt lam : ℝ) : ℂ)⁻¹) ^ n)⁻¹
         (Submodule.subset_span ⟨σs, hlen, rfl⟩)
-      rw [orderedProd_unitNormalizedMPS, hlen, inv_smul_smul₀ (pow_ne_zero n hc)] at hscaled
+      rw [hscale, hlen, inv_smul_smul₀ (pow_ne_zero n hc)] at hscaled
       exact hscaled
   rw [hspan]
 

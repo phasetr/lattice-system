@@ -13,7 +13,7 @@ The book's own justification (footnote 37, p. 265) is `B^σ = e^{−iη_L/L} Ã^
 theorem", but that `B` depends on `L`, whereas Theorem 7.6 compares two *fixed* families.  The gap
 is closed here in two steps:
 
-* the phase is **exponential**, `η_L = c^L` for all `L` beyond the spanning length
+* the phase is **exponential**, `η_L = c^L` for all `L` beyond twice the spanning length
   (`exists_phase_eq_pow`), proved from the multiplicativity `η_{a+b} = η_a η_b` (`phase_mul`); the
   latter comes from expanding `1` as a linear combination of ordered products of `A`, transporting
   that combination to `B`, and taking the trace, which removes the leftover constant;
@@ -25,8 +25,9 @@ is closed here in two steps:
 trace coefficients all vanish — length one for a family of traceless matrices, as for the spin-`1`
 Pauli family — the invariance hypothesis reads `0 = e^{iη_L} · 0` and constrains `η_L` not at all
 (and `|Φ_L⟩ = 0` there, so the phase is not even defined).  The exponential law is therefore stated
-for lengths at least the spanning length, which is all that §8.3.5 uses: eqs. (8.3.49)–(8.3.54)
-consume only the gauge relation (8.3.48) and never mention `η_L` again.
+for lengths at least twice the spanning length (the multiplicativity `η_{a+b} = η_a η_b` needs both
+factors above that length), which is all that §8.3.5 uses: eqs. (8.3.49)–(8.3.54) consume only the
+gauge relation (8.3.48) and never mention `η_L` again.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §8.3.4, eqs. (8.3.15)–(8.3.16) and footnote 37, p. 265; §8.3.5, eqs. (8.3.45)–(8.3.48),
@@ -150,10 +151,12 @@ theorem phase_mul [NeZero D] {a b : ℕ} (hspanA : mpsProductsSpanAt A a)
   rw [hcirc]
   group
 
-/-- **The phase is exponential beyond the spanning length.**  For injective families the phase
+/-- **The phase is exponential beyond twice the spanning length.**  For injective families the phase
 function of `GeneratesPhasedMPS` is `η_L = c^L` for all sufficiently long chains, with a single
-`c : Circle`.  This is Tasaki's `η_L = Lζ` (eq. (8.3.16)) with its correct range of validity: below
-the spanning length the trace coefficients can vanish identically and leave `η_L` unconstrained. -/
+`c : Circle`; the threshold returned here is twice the spanning length, since the multiplicativity
+step splits a length into two summands that must both exceed it.  This is Tasaki's `η_L = Lζ`
+(eq. (8.3.16)) with its correct range of validity: below the spanning length the trace coefficients
+can vanish identically and leave `η_L` unconstrained. -/
 theorem exists_phase_eq_pow [NeZero D] (hspanA : MPSSpansForAllLarge A)
     (hspanB : MPSSpansForAllLarge B) (hphase : GeneratesPhasedMPS A B η) :
     ∃ (c : Circle) (ℓ₀ : ℕ), ∀ L : ℕ, ℓ₀ ≤ L → η L = c ^ L := by
@@ -194,17 +197,6 @@ theorem exists_phase_eq_pow [NeZero D] (hspanA : MPSSpansForAllLarge A)
   rw [hpow k, hbase, ← pow_add, Nat.add_comm]
 
 /-! ## The gauge relation -/
-
-/-- Ordered products of a globally rescaled family pick up the rescaling to the power of the word
-length. -/
-theorem orderedProd_smul (z : ℂ) (A : MPSMatrices D N) (w : List (Fin (N + 1))) :
-    orderedProd (fun σ => z • A σ) w = z ^ w.length • orderedProd A w := by
-  induction w with
-  | nil => simp [orderedProd]
-  | cons σ ss ih =>
-      change (z • A σ) * orderedProd (fun τ => z • A τ) ss = _
-      rw [ih, Matrix.smul_mul, Matrix.mul_smul, smul_smul, List.length_cons, pow_succ, mul_comm]
-      rfl
 
 /-- Rescaling an MPS family by a phase preserves injectivity: the rescaling is the symmetry
 transport with trivial sign and the (unitary) mixing matrix `z · 1`. -/
