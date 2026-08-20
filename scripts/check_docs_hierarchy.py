@@ -17,6 +17,7 @@ from urllib.parse import unquote, urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 BASELINE_COMMIT = "6519099024bf156b87ac0c807c6633c513792581"
+LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -112,6 +113,27 @@ FORMER_ROOT_IDS = (
     (3038, 'links'),
 )
 
+# Published Kramdown basic_generate_id values from the single-page documented-axiom
+# ledger, in the same fixed-fixture spirit as FORMER_ROOT_IDS.  Each id must stay
+# reachable on the ledger page: either the heading still lives there, or the page
+# carries an explicit compatibility anchor for it.
+FORMER_LEDGER_IDS = (
+    (7, 'documented-axiom-status-and-axiomatization-policy'),
+    (12, 'appendix-a-status-and-axiomatization-policy'),
+    (76, 'theorem-77-hexagonal-aklt-correlation-decay-and-infinite-volume-uniqueness'),
+    (155, 'theorem-72-aklt-infinite-chain-unique-ground-state-with-a-nonzero-gap'),
+    (212, 'theorem-73-stability-of-the-aklt-gap-under-small-local-perturbations'),
+    (317, 'theorem-81-large-d-phase-of-the-anisotropic-s--1-chain-l-uniform-gap-and-clustering'),
+    (339, 'theorem-83--d-model-nel-order-bounded-by-string-order'),
+    (356, 'eq-833-oshikawa-parity-dependence-of-the-spin-s-vbs-string-order'),
+    (369, 'spt-phase-markers-isshortrangegappeduniquegs-isproductstatehamiltonian'),
+    (381, 'general-s-bond-inversion-parity-of-the-vbs-state-p-259-unnumbered-display'),
+    (437, 'entanglement-entropy-marker-entanglemententropys'),
+    (451, 'theorem-86-lieb-schultz-mattis-type-theorem-without-continuous-symmetry'),
+    (464, 'theorem-88-rigorous-index-theorem-and-the-spt-phase-transition'),
+    (480, 'theorem-89-stability-of-the-toric-codes-topological-order-under-arbitrary-local-perturbations'),
+)
+
 # Exact public targets for every Tasaki chapter projection.  These are a fixed
 # review fixture: fragments are intentionally retained and validated.
 CHAPTER_EXPECTED_TARGETS = {
@@ -203,6 +225,16 @@ def fail(message: str) -> None:
 def baseline_index() -> str:
     return subprocess.run(
         ["git", "show", f"{BASELINE_COMMIT}:docs/index.md"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+
+
+def baseline_ledger() -> str:
+    return subprocess.run(
+        ["git", "show", f"{LEDGER_BASELINE_COMMIT}:docs/limitations/documented-axioms.md"],
         cwd=ROOT,
         check=True,
         capture_output=True,
@@ -871,6 +903,24 @@ def main() -> None:
     explicit_root = set(re.findall(r'<a\s+id="([^"]+)"\s*></a>', bodies[root]))
     if explicit_root != expected_ids:
         fail(f"root compatibility IDs differ: missing={sorted(expected_ids-explicit_root)}, extra={sorted(explicit_root-expected_ids)}")
+
+    ledger = DOCS / "limitations" / "documented-axioms.md"
+    ledger_headings = [
+        (line_number, match.group(1))
+        for line_number, line in enumerate(baseline_ledger().splitlines(), 1)
+        if (match := re.match(r"^#{1,6} (.+)$", line))
+    ]
+    if FORMER_LEDGER_IDS != tuple(
+        (line_number, heading_anchor(heading)) for line_number, heading in ledger_headings
+    ):
+        fail("fixed former-ledger anchor fixture no longer matches the pre-split ledger headings")
+    ledger_ids = {anchor for _line, anchor in FORMER_LEDGER_IDS}
+    unreachable = ledger_ids - all_anchors[ledger]
+    if unreachable:
+        fail(f"pre-split ledger IDs no longer resolve on the ledger page: {sorted(unreachable)}")
+    invented = set(re.findall(r'<a\s+id="([^"]+)"\s*></a>', bodies[ledger])) - ledger_ids
+    if invented:
+        fail(f"ledger compatibility anchors are not pre-split Kramdown IDs: {sorted(invented)}")
 
     # Resolve Markdown links in every docs page plus repository-facing prose.
     markdown_sources = ALL_DOC_PAGES + [ROOT / "README.md", ROOT / "AGENTS.md"]
