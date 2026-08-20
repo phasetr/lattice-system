@@ -13,16 +13,23 @@ Behavioural tests for `LatticeSystem.Math.ProjectiveRepresentation`:
 * **T3** the sign twist is not a no-op: `signConj`/`signConjMatrix` at `ε = -1` genuinely
   conjugate, and a concrete `(u, s, φ)` with `s ≠ 1` satisfies `IsProjectiveRep` only because
   of the twist.
-* **T4** round trip of the capstone `isTrivialProjectiveRep_iff_isPhaseCoboundary` on a
-  two-dimensional bond space (`D = Fin 2`) with the *nontrivial* sign character: `.mp` extracts
-  a coboundary presentation from triviality, `.mpr` feeds it back to recover triviality.
-* **T5** capstone negative control: the `Z₂ × Z₂` Pauli projective representation on `ℂ²`
-  (Tasaki §2.1, eq. (2.1.31)) has an asymmetric phase, so `.mp` shows it is *not* trivial.
-  Together with T4 this pins the capstone down on a space where both sides can fail — on a
-  one-dimensional space every projective representation is trivial.
+* **T4** both directions of the capstone `isTrivialProjectiveRep_iff_isPhaseCoboundary` on a
+  two-dimensional bond space (`D = Fin 2`), applied to the *same* family `û(e) = 1̂`,
+  `û(a) = û₂ = -iσ^y` with the *same* phase `φ(a,a) = -1` (the spin-1/2 time-reversal example of
+  p. 278, `Θ̂² = -1̂`).  For the trivial sign character `.mpr` yields triviality, for the
+  antiunitary one `.mp` yields *non*triviality: with `s(a) = -1` formula (8.3.43) degenerates to
+  `ψ(a) ψ(a)⁻¹ ψ(e)⁻¹` at `(a,a)` and can no longer produce `-1`.  The two conclusions differ in
+  nothing but the sign character `s` and contradict each other as soon as `s` is ignored, so the
+  twist is load-bearing.
+* **T5** a second capstone negative control, untwisted and on a larger group: the `Z₂ × Z₂` Pauli
+  representation on `ℂ²` (`σ^x`, `σ^z`, which realise the anticommutation half of Tasaki
+  eq. (2.1.31) in the gauge where the generators square to `+1̂` rather than `-1̂`) has an
+  asymmetric phase, so `.mp` shows it is *not* trivial.  Together with T4 this pins the capstone
+  down on a space where both sides can fail — on a one-dimensional space every projective
+  representation is trivial.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §8.3.5,
-eqs. (8.3.40)-(8.3.43), pp. 277-278; §2.1, eq. (2.1.31), p. 26.  Refs #5306, #4718.
+eqs. (8.3.40)-(8.3.43), pp. 277-278; §2.1, eq. (2.1.31), p. 20.  Refs #5306, #4718.
 -/
 
 namespace LatticeSystem.Tests
@@ -133,12 +140,14 @@ private lemma t2_not_isPhaseCoboundary :
 /-- A concrete nonconstant phase in `Circle`, used as the "twist" scalar throughout T3/T4. -/
 private noncomputable def iCircle : Circle := Circle.exp (Real.pi / 2)
 
-/-- `iCircle` squares to `-1`, so it is not a square root of `1`. -/
+/-- `iCircle` squares to `-1`. -/
+private lemma iCircle_mul_self : iCircle * iCircle = negCircle := by
+  rw [iCircle, negCircle, ← Circle.exp_add]
+  norm_num
+
+/-- `iCircle` is not a square root of `1`. -/
 private lemma iCircle_mul_self_ne_one : iCircle * iCircle ≠ 1 := by
-  have hsq : iCircle * iCircle = negCircle := by
-    rw [iCircle, negCircle, ← Circle.exp_add]
-    norm_num
-  rw [hsq]
+  rw [iCircle_mul_self]
   exact negCircle_ne_one
 
 /-- `iCircle` has unit modulus (stated as `z * conj z = 1`). -/
@@ -205,7 +214,7 @@ private lemma t3_isProjectiveRep :
     · simp [g0_mul_self, g0_ne_one, sT3_g0, uT3, signConjMatrix_smul, t3_signConj_neg_one,
         Circle.smul_def, smul_smul, iCircle_conj_mul]
 
-/-! ## T4: capstone round trip on a two-dimensional space with a nontrivial sign -/
+/-! ## T4: capstone on a two-dimensional space, with and without the sign twist -/
 
 /-- `σ^x` is unitary. -/
 private lemma pauliX_mem_unitaryGroup : pauliX ∈ Matrix.unitaryGroup (Fin 2) ℂ := by
@@ -217,35 +226,66 @@ private lemma pauliZ_mem_unitaryGroup : pauliZ ∈ Matrix.unitaryGroup (Fin 2) �
   rw [Matrix.mem_unitaryGroup_iff, Matrix.star_eq_conjTranspose, pauliZ_isHermitian.eq,
     pauliZ_mul_self]
 
-/-- `σ^x` has real entries, so the antiunitary twist fixes it. -/
-private lemma signConjMatrix_neg_one_pauliX : signConjMatrix (-1 : ℤˣ) pauliX = pauliX := by
+/-- The unitary part of spin-1/2 time reversal, `Θ̂ = û₂ K̂` with `û₂ = -i σ^y = ((0, -1), (1, 0))`
+(p. 278).  Its entries are real, so the antiunitary twist `C_{-1}` fixes it; its square is `-1̂`,
+which is the relation `Θ̂² = -1̂` for half-odd-integer spin. -/
+private def thetaMat : Matrix (Fin 2) (Fin 2) ℂ :=
+  !![0, -1; 1, 0]
+
+/-- `û₂ û₂ = -1̂`. -/
+private lemma thetaMat_mul_self : thetaMat * thetaMat = -(1 : Matrix (Fin 2) (Fin 2) ℂ) := by
   ext i j
   fin_cases i <;> fin_cases j <;>
-    simp [signConjMatrix, signConj, pauliX, RingHom.mapMatrix_apply]
+    simp [thetaMat, Matrix.mul_apply, Fin.sum_univ_two]
 
-/-- The genuine `sT3`-twisted two-dimensional representation `v 1 = 1`, `v g0 = σ^x`. -/
-private def vT4 (g : Multiplicative (ZMod 2)) : Matrix (Fin 2) (Fin 2) ℂ :=
-  if g = 1 then 1 else pauliX
+/-- `û₂` is unitary. -/
+private lemma thetaMat_mem_unitaryGroup : thetaMat ∈ Matrix.unitaryGroup (Fin 2) ℂ := by
+  rw [Matrix.mem_unitaryGroup_iff]
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [thetaMat, Matrix.mul_apply, Fin.sum_univ_two, Matrix.star_eq_conjTranspose,
+      Matrix.conjTranspose_apply]
 
-/-- Each `vT4 g` is unitary. -/
-private lemma vT4_mem_unitaryGroup (g : Multiplicative (ZMod 2)) :
-    vT4 g ∈ Matrix.unitaryGroup (Fin 2) ℂ := by
-  rcases multiplicativeZMod2_eq_one_or_eq_g0 g with hg | hg <;> subst hg
-  · simp [vT4]
-  · simpa [vT4, if_neg g0_ne_one] using pauliX_mem_unitaryGroup
+/-- `û₂` has real entries, so it is fixed by the twist `C_ε` for *both* signs. -/
+private lemma signConjMatrix_thetaMat (ε : ℤˣ) : signConjMatrix ε thetaMat = thetaMat := by
+  rcases Int.units_eq_one_or ε with h | h <;> subst h
+  · exact signConjMatrix_one_apply thetaMat
+  · ext i j
+    fin_cases i <;> fin_cases j <;>
+      simp [signConjMatrix, signConj, thetaMat, RingHom.mapMatrix_apply]
 
-/-- `vT4` is a genuine representation for the sign character `sT3` (identically trivial phase):
-`σ^x * C_{-1}[σ^x] = σ^x σ^x = 1`. -/
-private lemma vT4_isProjectiveRep :
-    IsProjectiveRep vT4 sT3
-      (1 : Multiplicative (ZMod 2) → Multiplicative (ZMod 2) → Circle) := by
-  refine ⟨vT4_mem_unitaryGroup, by simp [vT4], fun g h => ?_⟩
-  rcases multiplicativeZMod2_eq_one_or_eq_g0 g with hg | hg <;>
-    rcases multiplicativeZMod2_eq_one_or_eq_g0 h with hh | hh <;> subst hg <;> subst hh
-  · simp [vT4, sT3_one, signConjMatrix_one_apply]
-  · simp [vT4, sT3_one, signConjMatrix_one_apply, g0_ne_one]
-  · simp [vT4, sT3_g0, g0_ne_one]
-  · simp [vT4, sT3_g0, g0_ne_one, g0_mul_self, signConjMatrix_neg_one_pauliX, pauliX_mul_self]
+/-- The two-dimensional family `û(e) = 1̂`, `û(a) = û₂` of the time-reversal example of p. 278. -/
+private def uT4 (g : Multiplicative (ZMod 2)) : Matrix (Fin 2) (Fin 2) ℂ :=
+  if g = 1 then 1 else thetaMat
+
+/-- The phase function of `uT4`: `-1` exactly at `(g0, g0)`, read off from
+`û₂ û₂ = -1̂ = e^{iπ} û(e)` (eq. (8.3.42)). -/
+private noncomputable def phiT4 (g h : Multiplicative (ZMod 2)) : Circle :=
+  if g = g0 ∧ h = g0 then negCircle else 1
+
+/-- `phiT4` is trivial at the identity pair, as `IsProjectiveRep` forces. -/
+private lemma phiT4_one_one : phiT4 1 1 = 1 := if_neg fun h => g0_ne_one h.1.symm
+
+/-- `phiT4` is `-1` at `(g0, g0)`: the obstruction that the twisted coboundary formula cannot
+absorb. -/
+private lemma phiT4_g0_g0 : phiT4 g0 g0 = negCircle := if_pos ⟨rfl, rfl⟩
+
+/-- T4a: `(uT4, s, phiT4)` is a projective representation for *every* sign character `s`, because
+`û₂` is real and hence fixed by `C_{s(g)}`.  The two capstone tests below instantiate this at
+`s = 1` and at the nontrivial `s = sT3`, so they differ in nothing but the sign character. -/
+private lemma uT4_isProjectiveRep (s : Multiplicative (ZMod 2) →* ℤˣ) :
+    IsProjectiveRep uT4 s phiT4 := by
+  refine ⟨fun g => ?_, by simp [uT4], fun g h => ?_⟩
+  · rcases multiplicativeZMod2_eq_one_or_eq_g0 g with hg | hg <;> subst hg
+    · simp [uT4]
+    · simpa [uT4, if_neg g0_ne_one] using thetaMat_mem_unitaryGroup
+  · rcases multiplicativeZMod2_eq_one_or_eq_g0 g with hg | hg <;>
+      rcases multiplicativeZMod2_eq_one_or_eq_g0 h with hh | hh <;> subst hg <;> subst hh
+    · simp [uT4, phiT4, g0_ne_one.symm]
+    · simp [uT4, phiT4, g0_ne_one, g0_ne_one.symm, signConjMatrix_thetaMat]
+    · simp [uT4, phiT4, g0_ne_one, g0_ne_one.symm]
+    · simp [uT4, phiT4_g0_g0, g0_ne_one, g0_mul_self, signConjMatrix_thetaMat, thetaMat_mul_self,
+        coe_negCircle]
 
 /-- A nonconstant `Circle`-valued gauge `ψ : G → Circle` with `ψ 1 = 1`, `ψ g0 = iCircle`. -/
 private noncomputable def psiT4 (g : Multiplicative (ZMod 2)) : Circle :=
@@ -257,43 +297,48 @@ private lemma psiT4_one : psiT4 (1 : Multiplicative (ZMod 2)) = 1 := if_pos rfl
 /-- The gauge is `iCircle` at `g0`, so it is not constant. -/
 private lemma psiT4_g0 : psiT4 g0 = iCircle := if_neg g0_ne_one
 
-/-- The gauge transform `u(g) = e^{iψ̃(g)} v̂₀(g)` of the genuine representation `vT4`: a
-two-dimensional projective representation whose composition law closes with the *identically
-trivial* phase only because of the sign twist (`ψ(g0) conj(ψ(g0)) = 1`, whereas the untwisted
-product would be `ψ(g0)² = -1`). -/
-private noncomputable def uT4 (g : Multiplicative (ZMod 2)) : Matrix (Fin 2) (Fin 2) ℂ :=
-  (psiT4 g : ℂ) • vT4 g
+/-- T4b: for the *untwisted* sign character `s = 1` the phase `phiT4` is a coboundary, witnessed by
+the gauge `psiT4`: the untwisted formula (8.3.43) contributes `ψ(g0) ψ(g0) = i² = -1` at `(g0, g0)`,
+matching `û₂ û₂ = -1̂`. -/
+private lemma t4_isPhaseCoboundary_one :
+    IsPhaseCoboundary (1 : Multiplicative (ZMod 2) →* ℤˣ) phiT4 := by
+  refine ⟨psiT4, fun g h => ?_⟩
+  rcases multiplicativeZMod2_eq_one_or_eq_g0 g with hg | hg <;>
+    rcases multiplicativeZMod2_eq_one_or_eq_g0 h with hh | hh <;> subst hg <;> subst hh
+  · simp [phiT4, psiT4_one, g0_ne_one.symm]
+  · simp [phiT4, psiT4_one, psiT4_g0, g0_ne_one.symm]
+  · simp [phiT4, psiT4_one, psiT4_g0, g0_ne_one.symm]
+  · simp [phiT4_g0_g0, psiT4_one, psiT4_g0, g0_mul_self, iCircle_mul_self]
 
-/-- `uT4` is a projective representation for `sT3` with identically trivial phase. -/
-private lemma uT4_isProjectiveRep :
-    IsProjectiveRep uT4 sT3
-      (1 : Multiplicative (ZMod 2) → Multiplicative (ZMod 2) → Circle) := by
-  refine ⟨fun g => circle_smul_mem_unitaryGroup (psiT4 g) (vT4_mem_unitaryGroup g), ?_,
-    fun g h => ?_⟩
-  · simp [uT4, vT4, psiT4_one]
-  · rcases multiplicativeZMod2_eq_one_or_eq_g0 g with hg | hg <;>
-      rcases multiplicativeZMod2_eq_one_or_eq_g0 h with hh | hh <;> subst hg <;> subst hh
-    · simp [uT4, vT4, psiT4_one, sT3_one, signConjMatrix_one_apply]
-    · simp [uT4, vT4, psiT4_one, psiT4_g0, sT3_one, signConjMatrix_one_apply, g0_ne_one]
-    · simp [uT4, vT4, psiT4_one, psiT4_g0, sT3_g0, g0_ne_one]
-    · simp [uT4, vT4, psiT4_one, psiT4_g0, sT3_g0, g0_ne_one, g0_mul_self, signConjMatrix_smul,
-        t3_signConj_neg_one, signConjMatrix_neg_one_pauliX, smul_smul, iCircle_conj_mul,
-        pauliX_mul_self]
+/-- T4c (`.mpr`, untwisted): the capstone turns the coboundary of T4b into triviality of `uT4` for
+`s = 1`.  The genuine representation behind it is `i⁻¹ û₂ = -σ^y` (which squares to `1̂`); it is
+produced by the capstone, not handed to it. -/
+private lemma t4_isTrivialProjectiveRep_one :
+    IsTrivialProjectiveRep uT4 (1 : Multiplicative (ZMod 2) →* ℤˣ) :=
+  (isTrivialProjectiveRep_iff_isPhaseCoboundary (uT4_isProjectiveRep 1)).mpr
+    t4_isPhaseCoboundary_one
 
-/-- T4 (⟹, `.mp`): `uT4` is trivial by construction (the genuine representation `vT4` times the
-nonconstant gauge `psiT4`), so the capstone returns a coboundary presentation of its phase — on a
-two-dimensional space and with the nontrivial sign character `sT3`, i.e. the twisted coboundary
-formula `φ = ψ(g) ψ(h)^{s(g)} ψ(gh)⁻¹` of eq. (8.3.43) is what comes out. -/
-private lemma t4_mp :
-    IsPhaseCoboundary sT3
-      (1 : Multiplicative (ZMod 2) → Multiplicative (ZMod 2) → Circle) :=
-  (isTrivialProjectiveRep_iff_isPhaseCoboundary uT4_isProjectiveRep).mp
-    ⟨vT4, psiT4, vT4_isProjectiveRep, fun _ => rfl⟩
+/-- T4d: for the *twisted* sign character `sT3` the very same phase is **not** a coboundary.  The
+twist is what kills it: at `(g0, g0)` the exponent `s(g0) = -1` turns eq. (8.3.43) into
+`ψ(g0) ψ(g0)⁻¹ ψ(1)⁻¹ = 1`, which can never equal `-1`, whereas the untwisted formula of T4b gives
+`ψ(g0)²` and is free to be `-1`. -/
+private lemma t4_not_isPhaseCoboundary_sT3 : ¬ IsPhaseCoboundary sT3 phiT4 := by
+  rintro ⟨ψ, hψ⟩
+  have h11 := hψ 1 1
+  simp only [phiT4_one_one, map_one, Units.val_one, zpow_one, mul_one,
+    mul_inv_cancel_right] at h11
+  have hgg := hψ g0 g0
+  simp only [phiT4_g0_g0, sT3_g0, Units.val_neg, Units.val_one, zpow_neg, zpow_one, g0_mul_self,
+    mul_inv_cancel, one_mul, ← h11, inv_one] at hgg
+  exact negCircle_ne_one hgg
 
-/-- T4 (⟸, `.mpr`): feeding the coboundary produced by `.mp` back through the capstone recovers
-triviality of `uT4`, closing the round trip. -/
-private lemma t4_mpr : IsTrivialProjectiveRep uT4 sT3 :=
-  (isTrivialProjectiveRep_iff_isPhaseCoboundary uT4_isProjectiveRep).mpr t4_mp
+/-- T4e (`.mp`, twisted): the capstone converts the failure of T4d into nontriviality of `uT4` for
+the antiunitary sign character `sT3` — the formal counterpart of `Θ̂² = -1̂` obstructing a
+time-reversal-symmetric injective MPS (p. 278).  Together with T4c this pins the twist down: the
+statements of T4c and T4e differ only in `s`, and are contradictory the moment `s` is ignored. -/
+private lemma t4_not_isTrivialProjectiveRep_sT3 : ¬ IsTrivialProjectiveRep uT4 sT3 := fun h =>
+  t4_not_isPhaseCoboundary_sT3
+    ((isTrivialProjectiveRep_iff_isPhaseCoboundary (uT4_isProjectiveRep sT3)).mp h)
 
 /-! ## T5: capstone negative control (the Pauli representation of `Z₂ × Z₂` is nontrivial) -/
 

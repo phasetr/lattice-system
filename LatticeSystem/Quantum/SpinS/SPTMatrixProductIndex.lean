@@ -31,11 +31,14 @@ Theorem 8.7.
 
 A concrete, non-marker definition layer for `IsProjectiveRep` / `IsTrivialProjectiveRep` and their
 book-faithful equivalence with a phase coboundary (eq. (8.3.43)) lives in
-`LatticeSystem.Math.ProjectiveRepresentation` (Issue #5306). The four markers above (this module's
-`IsProjectiveRep`, `IsTrivialProjectiveRep`, `SymmetricInjectiveMPSExists`, `tasaki_theorem_8_7`)
-form one coupled cluster and are retired together only once the MPS-transport and cocycle-chase
-arguments needed to discharge `tasaki_theorem_8_7` land (Issue #5306, later PR); they are
-intentionally left untouched until then.  Note that `LatticeSystem.Quantum.IsProjectiveRep` /
+`LatticeSystem.Math.ProjectiveRepresentation` (Issue #5306).  The seven axioms of this module —
+`IsProjectiveRep`, `IsTrivialProjectiveRep`, `SymmetricInjectiveMPSExists`, `tasaki_theorem_8_7`,
+`z2z2SpinCocycle`, `z2z2Spin_isProjectiveRep`, `z2z2Spin_nontrivial_of_odd` — form one coupled
+cluster: each of them feeds `tasaki_corollary_8_5`, and none can be replaced by a concrete
+definition on its own, since a concrete `IsProjectiveRep` forces concrete `Z₂ × Z₂` operators and a
+concrete cocycle.  They are therefore retired together, only once the MPS-transport and
+cocycle-chase arguments needed to discharge `tasaki_theorem_8_7` land (Issue #5306, later PR); they
+are intentionally left untouched until then.  Note that `LatticeSystem.Quantum.IsProjectiveRep` /
 `IsTrivialProjectiveRep` (the markers here, indexed by an `ℝ`-valued phase) and
 `LatticeSystem.Math.IsProjectiveRep` / `IsTrivialProjectiveRep` (the definitions there, carrying an
 explicit matrix family and a `Circle`-valued phase) are distinct declarations that share a short
