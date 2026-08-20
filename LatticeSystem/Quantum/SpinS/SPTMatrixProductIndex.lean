@@ -38,7 +38,10 @@ cluster: each of them feeds `tasaki_corollary_8_5`, and none can be replaced by 
 definition on its own, since a concrete `IsProjectiveRep` forces concrete `Z₂ × Z₂` operators and a
 concrete cocycle.  They are therefore retired together, only once the MPS-transport and
 cocycle-chase arguments needed to discharge `tasaki_theorem_8_7` land (Issue #5306, later PR); they
-are intentionally left untouched until then.  Note that `LatticeSystem.Quantum.IsProjectiveRep` /
+are intentionally left untouched until then.  The §8.3.4–§8.3.5 MPS-transport layer itself (the
+injectivity-transport lemma `isInjectiveMPS_symmetryTransportMPS`) lives in
+`LatticeSystem.Quantum.SPTSymmetryTransportedMPS` (Issue #5306 PR-2); it does not yet discharge
+`tasaki_theorem_8_7`.  Note that `LatticeSystem.Quantum.IsProjectiveRep` /
 `IsTrivialProjectiveRep` (the markers here, indexed by an `ℝ`-valued phase) and
 `LatticeSystem.Math.IsProjectiveRep` / `IsTrivialProjectiveRep` (the definitions there, carrying an
 explicit matrix family and a `Circle`-valued phase) are distinct declarations that share a short
