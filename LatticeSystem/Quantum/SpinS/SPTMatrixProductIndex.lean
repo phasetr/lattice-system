@@ -41,7 +41,11 @@ cocycle-chase arguments needed to discharge `tasaki_theorem_8_7` land (Issue #53
 are intentionally left untouched until then.  The §8.3.4–§8.3.5 MPS-transport layer itself (the
 injectivity-transport lemma `isInjectiveMPS_symmetryTransportMPS`) lives in
 `LatticeSystem.Quantum.SPTSymmetryTransportedMPS` (Issue #5306 PR-2); it does not yet discharge
-`tasaki_theorem_8_7`.  Note that `LatticeSystem.Quantum.IsProjectiveRep` /
+`tasaki_theorem_8_7`.  The passage from the invariance hypothesis of Theorem 8.7 to the gauge
+relation (8.3.48), `Ã_g^σ = e^{iζ(g)} U†(g) A^σ U(g)`, has landed in
+`LatticeSystem.Quantum.MPSInvarianceGauge` (Issue #5306 PR-3); discharging `tasaki_theorem_8_7`
+still needs the cocycle chase of eqs. (8.3.49)–(8.3.54) on top of it, so the seven axioms here are
+again unchanged.  Note that `LatticeSystem.Quantum.IsProjectiveRep` /
 `IsTrivialProjectiveRep` (the markers here, indexed by an `ℝ`-valued phase) and
 `LatticeSystem.Math.IsProjectiveRep` / `IsTrivialProjectiveRep` (the definitions there, carrying an
 explicit matrix family and a `Circle`-valued phase) are distinct declarations that share a short
