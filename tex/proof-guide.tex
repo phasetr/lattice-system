@@ -12875,6 +12875,25 @@ definition layer only: \texttt{tasaki\_theorem\_8\_7} above remains a documented
 and cocycle-chase arguments (later PRs of Issue \#5306) discharge it.
 
 \medskip
+\noindent\textbf{§8.3.4--§8.3.5 Injectivity of the symmetry-transported MPS} (Tasaki §8.3.4,
+eqs.~(8.3.13)--(8.3.14), pp.~264--265; §8.3.5, eq.~(8.3.33), p.~273, and eq.~(8.3.47), p.~279;
+\texttt{Quantum/SpinS/SPTSymmetryTransportedMPS.lean}, Issue \#5306, PR \#5308).  A symmetry
+operation $\hat v(g)$ sends an MPS family $(A^\sigma)_\sigma$ to
+$\tilde A_g^\sigma=\sum_{\sigma'}\langle\psi^\sigma|\hat u(g)|\psi^{\sigma'}\rangle\,C_g[A^{\sigma'}]$
+(eq.~(8.3.47)), formalized as \texttt{symmetryTransportMPS}~$\varepsilon\,u\,A$ and staged as the
+entrywise conjugation \texttt{mpsConjugate} (the twist $C_g$ of (8.3.40), $\varepsilon=s(g)$) followed
+by the single-site mixing \texttt{mpsMix}.  For a unitary mixing matrix the transfer matrix is merely
+conjugated (\texttt{mpsTransferMatrix\_symmetryTransportMPS}; the book's ``identical'' for
+$\varepsilon=1$), the normalization (8.3.14) holds with the \emph{same} $\lambda$, and both spanning
+conditions of Theorem~7.5 transport because a second transport, by the adjoint of the conjugated
+mixing matrix $C_g[u]$ (again unitary), inverts the first one.  Hence
+\texttt{isInjectiveMPS\_symmetryTransportMPS}: injectivity passes to $\tilde A_g$, axiom-free.  This is
+the assertion Tasaki makes three times --- p.~265, p.~273 for the $S=1$ time reversal (8.3.33), and
+p.~279 for general $g$ --- and never proves.  The seven §8.3.4 axioms above are untouched;
+\texttt{tasaki\_theorem\_8\_7} additionally needs the invariance and cocycle-chase arguments of the
+later PRs of Issue \#5306.
+
+\medskip
 \noindent\textbf{§8.3.5 Discrete-symmetry Lieb--Schultz--Mattis theorem} (Theorem 8.6, Ogata--Tasaki;
 Tasaki §8.3.5, pp.~276--280; \texttt{Quantum/SpinS/LiebSchultzMattisDiscrete.lean}, Issue \#4485).
 The general no-go theorem without continuous symmetry.  The axiom \texttt{tasaki\_theorem\_8\_6}

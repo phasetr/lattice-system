@@ -87,6 +87,7 @@ import LatticeSystem.Quantum.SpinS.LiebSchultzMattisDiscrete
 import LatticeSystem.Quantum.SpinS.SPTMatrixProductIndex
 import LatticeSystem.Quantum.SpinS.SPTPhase
 import LatticeSystem.Quantum.SpinS.SPTPhaseTransition
+import LatticeSystem.Quantum.SpinS.SPTSymmetryTransportedMPS
 import LatticeSystem.Quantum.SpinS.SPTTopologicalIndex
 import LatticeSystem.Quantum.SpinS.VBSInversionParity
 import LatticeSystem.Quantum.SpinS.ToricCode

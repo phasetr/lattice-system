@@ -114,6 +114,7 @@ import LatticeSystem.Tests.GeneralSBoundaryShape
 import LatticeSystem.Tests.GeneralSEdgeDegeneracyLowerBound
 import LatticeSystem.Tests.GeneralSEdgeDegeneracy
 import LatticeSystem.Tests.ProjectiveRepresentation
+import LatticeSystem.Tests.SPTSymmetryTransportedMPS
 
 /-!
 # Test aggregator for the `lattice-system` library
