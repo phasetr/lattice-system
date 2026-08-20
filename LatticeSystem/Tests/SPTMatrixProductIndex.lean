@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.SPTMatrixProductIndex
+import LatticeSystem.Quantum.SpinS.SpinOneHalfTurn
 import LatticeSystem.Quantum.SpinS.SPTSymmetryTransportedMPS
 import LatticeSystem.Quantum.SpinS.MPSInvarianceGauge
 import LatticeSystem.Quantum.SpinS.MPSTheorem75Defs
@@ -31,8 +32,14 @@ concrete instance so that no statement can be satisfied vacuously.
 * **T9** Theorem 8.7: `SymmetricInjectiveMPSExists` is non-vacuously satisfiable, and
   `tasaki_theorem_8_7` discharges it to `Math.IsTrivialProjectiveRep`, on the trivial
   one-dimensional witness (`N = 0`, `D = 1`, `u ≡ 1`, `s ≡ 1`, `φ ≡ 1`).
-* **T10** Corollary 8.5: at `S = 1/2` the closed forms of `û₁`, `û₃` are the textbook `iσ^x`,
-  `iσ^z`, they anticommute, and `tasaki_corollary_8_5` applies.
+* **T10** Corollary 8.5, `Z₂ × Z₂` half: at `S = 1/2` the closed forms of `û₁`, `û₃` are the
+  textbook `iσ^x`, `iσ^z`, they anticommute, and `tasaki_corollary_8_5_z2z2` applies.
+* **T11** the closed forms at `S = 1`: `û₁`, `û₃` and the product `û₁û₃` are the spin-one half
+  turns `spinOneHalfTurnS 0`, `spinOneHalfTurnS 2`, `spinOneHalfTurnS 1` of
+  `Quantum/SpinS/SpinOneHalfTurn.lean`, the identifications claimed by the module docstring of
+  `Quantum/SpinS/SpinSPiRotation.lean`.
+* **T12** Corollary 8.5, time-reversal half: at `S = 1/2` the antiunitary square `Θ̂²` is genuinely
+  `-1̂`, and `tasaki_corollary_8_5_time_reversal` applies.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §2.1, eqs. (2.1.29)-(2.1.31), pp. 18-19; §8.3.5, Theorem 8.7 and Corollary 8.5,
@@ -300,7 +307,7 @@ private lemma t9b_tasaki_theorem_8_7_nonvacuous :
       (1 : Multiplicative (ZMod 2) →* ℤˣ) :=
   tasaki_theorem_8_7 uTrivial_isProjectiveRep t9a_symmetricInjectiveMPSExists_nonvacuous
 
-/-! ## T10: the closed-form `π` rotations and Corollary 8.5 -/
+/-! ## T10: the closed-form `π` rotations and Corollary 8.5, `Z₂ × Z₂` half -/
 
 /-- T10a: at `S = 1/2` (`N = 1`) the closed form of `û₁ = exp(iπŜ^{(1)}) = exp(iπσ^x/2)` is
 `iσ^x`, the textbook value — a concrete check that the `i^{2S}` normalisation of
@@ -324,11 +331,51 @@ private lemma t10c_spin_half_anticommute :
     spinSPiRotation3 1 * spinSPiRotation1 1 = -(spinSPiRotation1 1 * spinSPiRotation3 1) :=
   spinSPiRotation3_mul_spinSPiRotation1_of_odd odd_one
 
-/-- T10d: the capstone `tasaki_corollary_8_5`, now an unconditional theorem, applies at `S = 1/2`:
-no `Z₂ × Z₂`-invariant injective matrix product state of spin-`1/2` chains exists. -/
-private lemma t10d_tasaki_corollary_8_5_spin_half :
+/-- T10d: the capstone `tasaki_corollary_8_5_z2z2`, now an unconditional theorem, applies at
+`S = 1/2`: no `Z₂ × Z₂`-invariant injective matrix product state of spin-`1/2` chains exists. -/
+private lemma t10d_tasaki_corollary_8_5_z2z2_spin_half :
     ¬ SymmetricInjectiveMPSExists (z2z2SpinRep 1)
       (1 : Multiplicative (ZMod 2 × ZMod 2) →* ℤˣ) :=
-  tasaki_corollary_8_5 1 odd_one
+  tasaki_corollary_8_5_z2z2 1 odd_one
+
+/-! ## T11: the `S = 1` closed forms agree with the spin-one half turns -/
+
+/-- T11a: at `S = 1` (`N = 2`) the closed form of `û₁` is the spin-one half turn
+`spinOneHalfTurnS 0 = 1̂ - 2(Ŝ^{(1)})²`, the identification claimed by the module docstring of
+`Quantum/SpinS/SpinSPiRotation.lean` (`i^{2S} = -1` times the basis reversal). -/
+private lemma t11a_spinSPiRotation1_spin_one :
+    spinSPiRotation1 2 = spinOneHalfTurnS 0 := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [spinSPiRotation1, spinSFlip, spinOneHalfTurnS, spinOnePiRot1, Fin.rev, Complex.I_sq]
+
+/-- T11b: at `S = 1` the closed form of `û₃` is `spinOneHalfTurnS 2 = diag(-1, 1, -1)`. -/
+private lemma t11b_spinSPiRotation3_spin_one :
+    spinSPiRotation3 2 = spinOneHalfTurnS 2 := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [spinSPiRotation3, spinSAlternating, spinOneHalfTurnS, spinOnePiRot3, Matrix.diagonal,
+      Complex.I_sq]
+
+/-- T11c: at `S = 1` the product `û₁û₃` — the matrix part of the time reversal used by
+`timeReversalSpinRep` — is the remaining half turn `spinOneHalfTurnS 1`, i.e. the book's `û₂`. -/
+private lemma t11c_spinSPiRotation_product_spin_one :
+    spinSPiRotation1 2 * spinSPiRotation3 2 = spinOneHalfTurnS 1 := by
+  rw [t11a_spinSPiRotation1_spin_one, t11b_spinSPiRotation3_spin_one, spinOneHalfTurnS_one_eq]
+
+/-! ## T12: Corollary 8.5, time-reversal half -/
+
+/-- T12a: the antiunitary square of the time reversal is genuinely `-1̂` at `S = 1/2`, so the
+hypothesis feeding `tasaki_corollary_8_5_time_reversal` is not vacuous. -/
+private lemma t12a_time_reversal_square_spin_half :
+    (spinSPiRotation1 1 * spinSPiRotation3 1) * (spinSPiRotation1 1 * spinSPiRotation3 1) =
+      -1 :=
+  spinSPiRotation1_mul_spinSPiRotation3_mul_self_of_odd odd_one
+
+/-- T12b: the capstone `tasaki_corollary_8_5_time_reversal` applies at `S = 1/2`: no
+time-reversally invariant injective matrix product state of spin-`1/2` chains exists. -/
+private lemma t12b_tasaki_corollary_8_5_time_reversal_spin_half :
+    ¬ SymmetricInjectiveMPSExists (timeReversalSpinRep 1) (MonoidHom.id ℤˣ) :=
+  tasaki_corollary_8_5_time_reversal 1 odd_one
 
 end LatticeSystem.Tests

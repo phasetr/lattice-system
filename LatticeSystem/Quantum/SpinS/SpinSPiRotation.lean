@@ -6,7 +6,8 @@ import Mathlib.LinearAlgebra.UnitaryGroup
 
 Tasaki's `{1̂, û₁, û₂, û₃}` of eq. (2.1.29): the `π` rotations about the three axes, which for
 half-odd-integer spin square to `−1̂` and anticommute (eq. (2.1.31)).  Only the two rotations about
-axes `1` and `3` are built here; the third is their product up to a phase.
+axes `1` and `3` are built here, together with their product `û₁û₃`, which supplies the matrix part
+of the time reversal `Θ̂` of p. 278.
 
 In the `Ŝ^{(3)}` eigenbasis `|S, m_k⟩` with `m_k = S − k` and `N = 2S`, the two rotations are
 diagonal resp. antidiagonal:
@@ -14,12 +15,17 @@ diagonal resp. antidiagonal:
 * `exp(iπ Ŝ^{(3)})|S, m⟩ = e^{iπm}|S, m⟩`, and `e^{iπ(N/2 − k)} = i^N (−1)^k`;
 * `exp(iπ Ŝ^{(1)})|S, m⟩ = i^{2S}|S, −m⟩ = i^N |S, −m⟩`, the standard `π` rotation about the
   `1` axis (at `S = 1/2` this is `exp(iπσ^x/2) = iσ^x`, at `S = 1` it is the `−1` times the
-  reversal that `spinOneHalfTurnS` writes as `1̂ − 2(Ŝ^{(1)})²`).
+  reversal that `spinOneHalfTurnS` writes as `1̂ − 2(Ŝ^{(1)})²`; both `S = 1` identifications are
+  pinned in `LatticeSystem/Tests/SPTMatrixProductIndex.lean`).
 
 Both are therefore a fixed phase `i^N` times a real involution, and that is how they are defined:
 as in `Quantum/SpinS/SpinOneHalfTurn.lean` (`S = 1`) no Lean bridge to `NormedSpace.exp` is
 attempted — it is off the critical path, and the repository already lets a concrete matrix and its
 `exp` form coexist without a proved bridge.
+
+Since the two phases `i^{2S}` multiply to the real sign `(−1)^{2S}`, the product `û₁û₃` is a real
+matrix: entrywise conjugation — the operation `C_g` of eq. (8.3.40) at the antiunitary sign —
+fixes it, which is what makes it a legitimate matrix part for an antiunitary symmetry.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §2.1, eqs. (2.1.29)–(2.1.31), pp. 18–19.
@@ -60,6 +66,11 @@ theorem spinSFlip_mul_self (N : ℕ) : spinSFlip N * spinSFlip N = 1 := by
   · intro hmem
     exact absurd (Finset.mem_univ _) hmem
 
+/-- Entrywise complex conjugation fixes the flip: all its entries are `0` or `1`. -/
+theorem spinSFlip_map_conj (N : ℕ) : (spinSFlip N).map (starRingEnd ℂ) = spinSFlip N := by
+  ext i j
+  by_cases h : i = j.rev <;> simp [spinSFlip, Matrix.map_apply, h]
+
 /-- The alternating diagonal is real, hence self-adjoint. -/
 theorem spinSAlternating_conjTranspose (N : ℕ) :
     (spinSAlternating N).conjTranspose = spinSAlternating N := by
@@ -79,6 +90,13 @@ theorem spinSAlternating_mul_self (N : ℕ) : spinSAlternating N * spinSAlternat
   change (-1 : ℂ) ^ (k : ℕ) * (-1 : ℂ) ^ (k : ℕ) = 1
   rw [← pow_add, ← two_mul, pow_mul]
   simp
+
+/-- Entrywise complex conjugation fixes the alternating diagonal: all its entries are `0` or
+`±1`. -/
+theorem spinSAlternating_map_conj (N : ℕ) :
+    (spinSAlternating N).map (starRingEnd ℂ) = spinSAlternating N := by
+  ext i j
+  by_cases h : i = j <;> simp [spinSAlternating, Matrix.map_apply, h]
 
 /-- **Tasaki eq. (2.1.31) for half-odd-integer spin.**  The two involutions anticommute exactly
 when `N = 2S` is odd: the flip sends the basis index `k` to `N − k`, and `(−1)^{N−k} = −(−1)^k`
@@ -172,5 +190,32 @@ theorem spinSPiRotation3_mul_spinSPiRotation1_of_odd {N : ℕ} (hN : Odd N) :
   rw [spinSPiRotation1, spinSPiRotation3, Matrix.smul_mul, Matrix.mul_smul, smul_smul,
     Matrix.smul_mul, Matrix.mul_smul, smul_smul, spinSAlternating_mul_spinSFlip_of_odd hN,
     smul_neg]
+
+/-! ## The product `û₁û₃`: the matrix part of the time reversal (p. 278) -/
+
+/-- **The product of the two `π` rotations is real**: the two phases `i^{2S}` multiply to the sign
+`(−1)^{2S}`, leaving the real matrix `F·D`. -/
+theorem spinSPiRotation1_mul_spinSPiRotation3 (N : ℕ) :
+    spinSPiRotation1 N * spinSPiRotation3 N =
+      ((-1 : ℂ) ^ N) • (spinSFlip N * spinSAlternating N) := by
+  rw [spinSPiRotation1, spinSPiRotation3, Matrix.smul_mul, Matrix.mul_smul, smul_smul, I_pow_sq]
+
+/-- **`(û₁û₃)² = −1̂` for half-odd-integer spin**, the identity `Θ̂² = −1̂` of Tasaki p. 278 for
+the time reversal `Θ̂ = û₁û₃ K̂`: the two rotations anticommute (eq. (2.1.31)) and each squares to
+`−1̂` (eq. (2.1.30)), so the three signs combine to one. -/
+theorem spinSPiRotation1_mul_spinSPiRotation3_mul_self_of_odd {N : ℕ} (hN : Odd N) :
+    (spinSPiRotation1 N * spinSPiRotation3 N) * (spinSPiRotation1 N * spinSPiRotation3 N) =
+      -1 := by
+  calc (spinSPiRotation1 N * spinSPiRotation3 N) * (spinSPiRotation1 N * spinSPiRotation3 N)
+      = spinSPiRotation1 N * (spinSPiRotation3 N * spinSPiRotation1 N) * spinSPiRotation3 N := by
+        simp only [Matrix.mul_assoc]
+    _ = spinSPiRotation1 N * -(spinSPiRotation1 N * spinSPiRotation3 N) * spinSPiRotation3 N := by
+        rw [spinSPiRotation3_mul_spinSPiRotation1_of_odd hN]
+    _ = -((spinSPiRotation1 N * spinSPiRotation1 N) *
+          (spinSPiRotation3 N * spinSPiRotation3 N)) := by
+        simp only [Matrix.mul_neg, Matrix.neg_mul, Matrix.mul_assoc]
+    _ = -1 := by
+        rw [spinSPiRotation1_mul_self_of_odd hN, spinSPiRotation3_mul_self_of_odd hN,
+          neg_mul_neg, mul_one]
 
 end LatticeSystem.Quantum

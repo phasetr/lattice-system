@@ -12880,21 +12880,41 @@ book's finite $G$ (finiteness is never used), and the invariance hypothesis is r
 periodic trace coefficients rather than as an operator identity on $\bigotimes_x h_x$ --- the
 convention of the entire MPS layer.
 
-\texttt{tasaki\_corollary\_8\_5} is likewise \textbf{proved} axiom-free, and unconditionally: for
-half-odd-integer spin ($S=N/2$ with $N$ odd) there is no
-$\mathbb{Z}_2\times\mathbb{Z}_2$-invariant injective matrix product state --- the matrix-product
-Lieb--Schultz--Mattis no-go.  Its concrete input is the pair of $\pi$ rotations of eq.~(2.1.29),
+Corollary~8.5 is \emph{disjunctive} --- no injective matrix product state that is
+$\mathbb{Z}_2\times\mathbb{Z}_2$ invariant \emph{or} time-reversally invariant --- and
+\textbf{both} halves are proved axiom-free and unconditionally, following the two instances the
+book runs through on p.~278.  The common input is the pair of $\pi$ rotations of eq.~(2.1.29),
 $\hat u_1=\exp(i\pi\hat S^{(1)})=i^{2S}F$ with $F$ the basis reversal
 $|S,m\rangle\mapsto|S,-m\rangle$, and $\hat u_3=\exp(i\pi\hat S^{(3)})=i^{2S}\,\mathrm{diag}
 ((-1)^k)$, both written in closed form as for $S=1$ in
-\texttt{Quantum/SpinS/SpinOneHalfTurn.lean} and with no Lean bridge to \texttt{NormedSpace.exp};
-both are unitary, both square to $(-1)^{2S}$, and they anticommute exactly when $N$ is odd
-(eq.~(2.1.31)).  Nontriviality is then generic: a genuine representation of a commutative group has
-commuting images, and rescaling each image by a phase cannot repair that.  The six former markers
-(\texttt{IsProjectiveRep}, \texttt{IsTrivialProjectiveRep}, \texttt{z2z2SpinCocycle},
-\texttt{z2z2Spin\_isProjectiveRep}, \texttt{z2z2Spin\_nontrivial\_of\_odd} and
-\texttt{Z2xZ2Spin}) are \textbf{deleted}: none of them asserted anything checkable.
-Chapters~3--10 backfill.
+\texttt{Quantum/SpinS/SpinOneHalfTurn.lean} and with no Lean bridge to \texttt{NormedSpace.exp}
+(at $S=1$ they are literally \texttt{spinOneHalfTurnS 0} and \texttt{spinOneHalfTurnS 2}, and
+their product is \texttt{spinOneHalfTurnS 1}; all three identifications are pinned in
+\texttt{Tests/SPTMatrixProductIndex.lean}).  Both rotations are unitary, both square to
+$(-1)^{2S}$, and they anticommute exactly when $N$ is odd (eq.~(2.1.31)).
+
+\texttt{tasaki\_corollary\_8\_5\_z2z2} takes $G=\mathbb{Z}_2\times\mathbb{Z}_2$ acting by
+$\{\hat 1,\hat u_1,\hat u_3,\hat u_1\hat u_3\}$; nontriviality is then generic: a genuine
+representation of a commutative group has commuting images, and rescaling each image by a phase
+cannot repair that.  \texttt{tasaki\_corollary\_8\_5\_time\_reversal} takes the book's second
+instance, $G=\mathbb{Z}_2=\{e,a\}$ with $s(a)=-1$ and $\hat v(a)=\hat\Theta=X\hat K$; the group
+is realised as the units $\mathbb{Z}^\times=\{1,-1\}$, which makes $s$ the identity homomorphism,
+and the matrix part is $X=\hat u_1\hat u_3$ in place of the book's $\hat u_2$.  Only
+$\hat\Theta^2=-\hat 1$ enters, which in the encoding of (8.3.40) is the matrix identity
+$X\,C[X]=-\hat 1$: entrywise conjugation fixes $X$, because the two phases $i^{2S}$ multiply to the
+real sign $(-1)^{2S}$, so $X\,C[X]=(\hat u_1\hat u_3)^2=-\hat 1$ for odd $N$.  Nontriviality is
+again one line: a trivial representation would give $\hat\Theta^2=\hat v_0(a)C[\hat v_0(a)]=\hat
+1$, the phase cancelling against its own conjugate.
+
+The \textbf{seven} axioms this module used to carry are all retired.
+\texttt{SymmetricInjectiveMPSExists} and \texttt{tasaki\_theorem\_8\_7} became the real
+definition and the proved theorem above; the axioms \texttt{IsProjectiveRep} and
+\texttt{IsTrivialProjectiveRep} were superseded by the real definitions of
+\texttt{Math/ProjectiveRepresentation.lean}; and \texttt{z2z2SpinCocycle},
+\texttt{z2z2Spin\_isProjectiveRep} and \texttt{z2z2Spin\_nontrivial\_of\_odd} were
+\textbf{deleted} as asserting nothing checkable, together with the carrier they were stated over,
+\texttt{Z2xZ2Spin} $:=$ \texttt{Fin 4} --- an \texttt{abbrev}, never an axiom, and carrying no
+group structure.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§8.3.5 Projective-representation definition layer} (Tasaki §8.3.5, eqs.~(8.3.40)--(8.3.43),
@@ -12910,7 +12930,11 @@ definition layer of the paragraph above: \texttt{IsPhaseCoboundary} is the exact
 cocycle chase, and this equivalence is the last step of \texttt{tasaki\_theorem\_8\_7}.  The same file
 carries the generic $\mathbb{Z}_2\times\mathbb{Z}_2$ package (\texttt{anticommPairRep}): two
 anticommuting unitaries squaring to $-\hat 1$ generate a projective representation, and that
-representation is not trivial --- the input to \texttt{tasaki\_corollary\_8\_5}.
+representation is not trivial --- the input to \texttt{tasaki\_corollary\_8\_5\_z2z2}.  The
+companion antiunitary package \texttt{timeReversalRep} (PR \#5310) does the same for
+$G=\mathbb{Z}_2$ realised as $\mathbb{Z}^\times$ with $s=\mathrm{id}$: a unitary $X$ with
+$X\,C[X]=-\hat 1$ generates a projective representation that is not trivial --- the input to
+\texttt{tasaki\_corollary\_8\_5\_time\_reversal}.
 
 \medskip
 \noindent\textbf{§8.3.4--§8.3.5 Injectivity of the symmetry-transported MPS} (Tasaki §8.3.4,

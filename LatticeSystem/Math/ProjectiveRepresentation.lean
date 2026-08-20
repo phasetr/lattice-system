@@ -419,4 +419,75 @@ theorem not_isTrivialProjectiveRep_anticommPairRep [Nonempty D] {X Y : Matrix D 
   refine hXYne ?_
   rw [hab, hba, mul_comm (G := Multiplicative (ZMod 2 × ZMod 2)), mul_comm (G := Circle)]
 
+/-! ## The time-reversal `Z₂` projective representation
+
+Tasaki p. 278 treats time reversal by taking `G = Z₂ = {e, a}` with `s(e) = 1`, `s(a) = −1` and
+`v̂(a) = Θ̂ = û₂K̂`, and reads the index off `Θ̂² = −1̂`, which holds for half-odd-integer spin.  In
+the encoding of eq. (8.3.40) the antiunitary square `Θ̂²` of `v̂(a) = X K̂` is the matrix `X·C[X]`,
+so the whole input is a single unitary `X` with `X·C[X] = −1̂`.
+
+The group is realised as the units `ℤˣ = {1, −1}`, which makes the book's sign representation `s`
+the identity homomorphism and `a = −1`.
+-/
+
+/-- The family `v̂(e) = 1̂`, `v̂(a) = X K̂` of an antiunitary time reversal (p. 278), the group `Z₂`
+being realised as `ℤˣ` with nontrivial element `a = −1`. -/
+def timeReversalRep (X : Matrix D D ℂ) (g : ℤˣ) : Matrix D D ℂ :=
+  if g = -1 then X else 1
+
+omit [Fintype D] in
+/-- At the identity the time-reversal family is `1̂`, the normalisation `v̂(e) = 1̂` of p. 277. -/
+private lemma timeReversalRep_one (X : Matrix D D ℂ) : timeReversalRep X 1 = 1 :=
+  if_neg (by decide)
+
+omit [Fintype D] in
+/-- At the nontrivial element the time-reversal family is the matrix part of `Θ̂`. -/
+private lemma timeReversalRep_neg_one (X : Matrix D D ℂ) : timeReversalRep X (-1) = X :=
+  if_pos rfl
+
+/-- **Tasaki p. 278 (time reversal) as a projective representation.**  A unitary `X` whose
+antiunitary square is `−1̂`, i.e. `X·C[X] = −1̂` (the book's `Θ̂² = −1̂`), generates a projective
+representation of `Z₂` with the antiunitary sign character `s(a) = −1`.  The phase function is
+`−1` on the single pair `(a, a)` and `1` on the three pairs involving the identity. -/
+theorem exists_isProjectiveRep_timeReversalRep {X : Matrix D D ℂ}
+    (hX : X ∈ Matrix.unitaryGroup D ℂ) (hX2 : X * signConjMatrix (-1) X = -1) :
+    ∃ φ, IsProjectiveRep (timeReversalRep X) (MonoidHom.id ℤˣ) φ := by
+  refine ⟨fun g h => if g = -1 ∧ h = -1 then circleNegOne else 1, fun g => ?_,
+    timeReversalRep_one X, fun g h => ?_⟩
+  · rcases Int.units_eq_one_or g with rfl | rfl
+    · rw [timeReversalRep_one]
+      exact Submonoid.one_mem _
+    · rw [timeReversalRep_neg_one]
+      exact hX
+  · rcases Int.units_eq_one_or g with rfl | rfl <;> rcases Int.units_eq_one_or h with rfl | rfl
+    · simp [timeReversalRep, signConjMatrix_one_apply]
+    · simp [timeReversalRep, signConjMatrix_one_apply]
+    · simp [timeReversalRep]
+    · simpa [timeReversalRep] using hX2
+
+/-- **Tasaki p. 278: `Θ̂² = −1̂` makes the time-reversal index nontrivial.**  Were the family
+trivial, its nontrivial element would be `X = ψ(a) v̂₀(a)` for a genuine representation `v̂₀`,
+whose antiunitary square is `v̂₀(a) C[v̂₀(a)] = v̂₀(e) = 1̂`.  The phase cancels against its own
+conjugate — this is where the antiunitary sign enters — so `X·C[X]` would be `1̂`, not `−1̂`. -/
+theorem not_isTrivialProjectiveRep_timeReversalRep [Nonempty D] {X : Matrix D D ℂ}
+    (hX2 : X * signConjMatrix (-1) X = -1) :
+    ¬ IsTrivialProjectiveRep (timeReversalRep X) (MonoidHom.id ℤˣ) := by
+  rintro ⟨v, ψ, ⟨-, hv1, hvMul⟩, huv⟩
+  have hvsq : v (-1) * signConjMatrix (-1 : ℤˣ) (v (-1)) = 1 := by
+    have h := hvMul (-1) (-1)
+    rwa [MonoidHom.id_apply, Pi.one_apply, Pi.one_apply, Circle.coe_one, one_smul,
+      show ((-1 : ℤˣ) * (-1 : ℤˣ)) = 1 from by decide, hv1] at h
+  have hXv : X = ((ψ (-1) : Circle) : ℂ) • v (-1) := by
+    have h := huv (-1)
+    rwa [timeReversalRep_neg_one] at h
+  have hone : X * signConjMatrix (-1 : ℤˣ) X = 1 := by
+    rw [hXv, signConjMatrix_smul, signConj_circle, Matrix.smul_mul, Matrix.mul_smul, smul_smul,
+      ← Circle.coe_mul, hvsq, show ((-1 : ℤˣ) : ℤ) = -1 from rfl, zpow_neg_one,
+      mul_inv_cancel, Circle.coe_one, one_smul]
+  rw [hX2] at hone
+  obtain ⟨i⟩ := ‹Nonempty D›
+  have hii := congrFun (congrFun hone i) i
+  rw [Matrix.neg_apply, Matrix.one_apply_eq] at hii
+  exact absurd hii (by norm_num)
+
 end LatticeSystem.Math

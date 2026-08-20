@@ -17,11 +17,19 @@ that equivalence live in `LatticeSystem.Math.ProjectiveRepresentation`.
 under the symmetry, `V̂(g)|Φ_L⟩ = e^{iη_L(g)}|Φ_L⟩` for all `g` and all `L`, then the on-site
 projective representation is trivial.
 
-**Corollary 8.5** (p. 276): for half-odd-integer spin the `Z₂ × Z₂` representation by the `π`
-rotations `{1̂, û₁, û₂, û₃}` is nontrivial (eq. (2.1.31)), so no `Z₂ × Z₂`-invariant injective
-matrix product state exists — the matrix-product form of the Lieb–Schultz–Mattis no-go.  The
-closed-form rotations live in `LatticeSystem.Quantum.SpinSPiRotation` and the generic `Z₂ × Z₂`
-package in `LatticeSystem.Math.ProjectiveRepresentation`.
+**Corollary 8.5** (p. 276): for half-odd-integer spin there is no injective matrix product state
+that is `Z₂ × Z₂` invariant *or* time-reversally invariant — the matrix-product form of the
+Lieb–Schultz–Mattis no-go.  Both halves of that disjunction are proved here, following the two
+instances the book runs through on p. 278:
+
+* `tasaki_corollary_8_5_z2z2` — `G = Z₂ × Z₂` acting by the `π` rotations `{1̂, û₁, û₂, û₃}`, which
+  anticommute for half-odd-integer spin (eq. (2.1.31));
+* `tasaki_corollary_8_5_time_reversal` — `G = Z₂ = {e, a}` with the antiunitary sign `s(a) = -1`,
+  acting by `Θ̂ = X K̂` whose square is `-1̂` for half-odd-integer spin.  The book takes `X = û₂`;
+  here `X = û₁û₃`, and only `Θ̂² = -1̂` — i.e. `X·C[X] = -1̂` — enters the argument.
+
+The closed-form rotations live in `LatticeSystem.Quantum.SpinSPiRotation` and the generic `Z₂ × Z₂`
+and time-reversal packages in `LatticeSystem.Math.ProjectiveRepresentation`.
 
 ## The route taken here
 
@@ -58,8 +66,11 @@ namespace LatticeSystem.Quantum
 
 open Matrix
 open LatticeSystem.Math (IsProjectiveRep IsTrivialProjectiveRep IsPhaseCoboundary signConjMatrix
-  signConjMatrix_mem_unitaryGroup isTrivialProjectiveRep_iff_isPhaseCoboundary anticommPairRep
-  exists_isProjectiveRep_anticommPairRep not_isTrivialProjectiveRep_anticommPairRep)
+  signConjMatrix_mem_unitaryGroup signConjMatrix_smul signConjMatrix_neg_one_apply
+  signConj_neg_one_apply isTrivialProjectiveRep_iff_isPhaseCoboundary anticommPairRep
+  exists_isProjectiveRep_anticommPairRep not_isTrivialProjectiveRep_anticommPairRep
+  timeReversalRep exists_isProjectiveRep_timeReversalRep
+  not_isTrivialProjectiveRep_timeReversalRep)
 
 variable {D N : ℕ}
 
@@ -263,7 +274,12 @@ theorem tasaki_theorem_8_7 {G : Type*} [Group G] {N : ℕ}
   exact (isTrivialProjectiveRep_iff_isPhaseCoboundary hrep).mpr
     (isPhaseCoboundary_of_invariantInjectiveMPS hrep hA hinv)
 
-/-! ## Corollary 8.5: no `Z₂ × Z₂`-symmetric injective MPS at half-odd-integer spin -/
+/-! ## Corollary 8.5: no symmetric injective MPS at half-odd-integer spin
+
+The book (p. 278) settles the two halves of the corollary's disjunction by exhibiting two
+nontrivial on-site projective representations: the `Z₂ × Z₂` one built from the `π` rotations, and
+the time-reversal `Z₂` one built from `Θ̂`.  Each is fed to Theorem 8.7 in contrapositive form.
+-/
 
 /-- **The on-site `Z₂ × Z₂` projective representation of eq. (2.1.29)** for spin `S = N/2`: the
 group acts by the `π` rotations `û₁` and `û₃` and by their product, a multiple of `û₂`. -/
@@ -271,14 +287,14 @@ noncomputable def z2z2SpinRep (N : ℕ) :
     Multiplicative (ZMod 2 × ZMod 2) → Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ :=
   anticommPairRep (spinSPiRotation1 N) (spinSPiRotation3 N)
 
-/-- **Tasaki Corollary 8.5 (the matrix-product Lieb–Schultz–Mattis no-go), p. 276.**  For
-half-odd-integer spin (`S = N/2` with `N` odd) there is **no** `Z₂ × Z₂`-invariant injective matrix
-product state.
+/-- **Tasaki Corollary 8.5, `Z₂ × Z₂` half (the matrix-product Lieb–Schultz–Mattis no-go), p. 276.**
+For half-odd-integer spin (`S = N/2` with `N` odd) there is **no** `Z₂ × Z₂`-invariant injective
+matrix product state.
 
 This is the contrapositive of Theorem 8.7: a symmetric injective MPS would force the on-site
 `Z₂ × Z₂` projective representation to be trivial, whereas at odd `N` the `π` rotations anticommute
 (eq. (2.1.31)) while a trivial representation of a commutative group has commuting images. -/
-theorem tasaki_corollary_8_5 (N : ℕ) (hN : Odd N) :
+theorem tasaki_corollary_8_5_z2z2 (N : ℕ) (hN : Odd N) :
     ¬ SymmetricInjectiveMPSExists (z2z2SpinRep N)
       (1 : Multiplicative (ZMod 2 × ZMod 2) →* ℤˣ) := by
   obtain ⟨φ, hrep⟩ := exists_isProjectiveRep_anticommPairRep
@@ -288,5 +304,39 @@ theorem tasaki_corollary_8_5 (N : ℕ) (hN : Odd N) :
   exact fun hMPS => not_isTrivialProjectiveRep_anticommPairRep
     (spinSPiRotation1_mem_unitaryGroup N) (spinSPiRotation3_mem_unitaryGroup N)
     (spinSPiRotation3_mul_spinSPiRotation1_of_odd hN) (tasaki_theorem_8_7 hrep hMPS)
+
+/-- **The on-site time-reversal representation of p. 278** for spin `S = N/2`: the group
+`Z₂ = {e, a}`, realised as `ℤˣ`, acts antiunitarily by `v̂(a) = Θ̂ = X K̂` with `X = û₁û₃`. -/
+noncomputable def timeReversalSpinRep (N : ℕ) : ℤˣ → Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ :=
+  timeReversalRep (spinSPiRotation1 N * spinSPiRotation3 N)
+
+/-- **`Θ̂² = -1̂` for half-odd-integer spin** (p. 278), in the matrix encoding of eq. (8.3.40):
+entrywise conjugation fixes `û₁û₃`, whose entries are real, so the antiunitary square `X·C[X]` is
+the plain square `(û₁û₃)²`, and that is `-1̂` at odd `N`. -/
+private theorem spinSTimeReversal_antiunitary_square {N : ℕ} (hN : Odd N) :
+    (spinSPiRotation1 N * spinSPiRotation3 N) *
+        signConjMatrix (-1) (spinSPiRotation1 N * spinSPiRotation3 N) = -1 := by
+  have hreal : signConjMatrix (-1 : ℤˣ) (spinSPiRotation1 N * spinSPiRotation3 N) =
+      spinSPiRotation1 N * spinSPiRotation3 N := by
+    rw [spinSPiRotation1_mul_spinSPiRotation3, signConjMatrix_smul, map_mul,
+      signConjMatrix_neg_one_apply, signConjMatrix_neg_one_apply, spinSFlip_map_conj,
+      spinSAlternating_map_conj, signConj_neg_one_apply]
+    simp
+  rw [hreal, spinSPiRotation1_mul_spinSPiRotation3_mul_self_of_odd hN]
+
+/-- **Tasaki Corollary 8.5, time-reversal half, p. 276.**  For half-odd-integer spin
+(`S = N/2` with `N` odd) there is **no** time-reversally invariant injective matrix product state.
+
+Again the contrapositive of Theorem 8.7, with the book's second instance (p. 278): a symmetric
+injective MPS would force the on-site time-reversal representation to be trivial, whereas a trivial
+one has `Θ̂² = v̂₀(a) C[v̂₀(a)] = 1̂` — the phase drops out against its conjugate — and here
+`Θ̂² = -1̂`. -/
+theorem tasaki_corollary_8_5_time_reversal (N : ℕ) (hN : Odd N) :
+    ¬ SymmetricInjectiveMPSExists (timeReversalSpinRep N) (MonoidHom.id ℤˣ) := by
+  obtain ⟨φ, hrep⟩ := exists_isProjectiveRep_timeReversalRep
+    (mul_mem (spinSPiRotation1_mem_unitaryGroup N) (spinSPiRotation3_mem_unitaryGroup N))
+    (spinSTimeReversal_antiunitary_square hN)
+  exact fun hMPS => not_isTrivialProjectiveRep_timeReversalRep
+    (spinSTimeReversal_antiunitary_square hN) (tasaki_theorem_8_7 hrep hMPS)
 
 end LatticeSystem.Quantum
