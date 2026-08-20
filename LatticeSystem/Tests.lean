@@ -115,6 +115,7 @@ import LatticeSystem.Tests.GeneralSEdgeDegeneracyLowerBound
 import LatticeSystem.Tests.GeneralSEdgeDegeneracy
 import LatticeSystem.Tests.ProjectiveRepresentation
 import LatticeSystem.Tests.SPTSymmetryTransportedMPS
+import LatticeSystem.Tests.SPTMatrixProductIndex
 
 /-!
 # Test aggregator for the `lattice-system` library
