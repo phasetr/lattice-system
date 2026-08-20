@@ -37,7 +37,7 @@ eqs. (8.3.45)-(8.3.48)) and the relaxed Theorem 7.6 hypothesis (`GeneratesSameMP
   trace coefficients all vanish (`tr σ^α = 0`), so `GeneratesPhasedMPS` imposes **no constraint** on
   `η 1`: two different phase functions differing only at `L = 1` both satisfy the hypothesis for the
   same pair `(fixtureP, fixtureP)`. This is the machine-checked witness that "`η_L = c^L` for any
-  `L`" is false as stated and only holds for `L` at least the spanning length.
+  `L`" is false as stated and only holds for `L` at least twice the spanning length.
 * **T11** (PR-3, regression) the relaxed Theorem 7.6 hypothesis `GeneratesSameMPSEventually`
   recovers the exact-equality version via `GeneratesSameMPS.eventually`, so `mps_theorem_7_6`'s
   statement (unchanged by PR-3) is still reachable from the relaxed entry point.
@@ -563,7 +563,7 @@ private lemma t10_generatesPhasedMPS_fixtureP_fixtureP_phaseVariant (z : Circle)
 /-- T10: two different values of `η 1` are both compatible with the same underlying pair
 `(fixtureP, fixtureP)`, so `η 1` is genuinely unconstrained: this is the negative-control witness
 for the design report's discovery that "`η_L = c^L` for any `L`" is false as stated (it only holds
-for `L` at least the spanning length `2`). -/
+for `L` at least twice the spanning length). -/
 private lemma t10_phase_at_length_one_unconstrained :
     GeneratesPhasedMPS fixtureP fixtureP (phaseVariant (1 : Circle)) ∧
       GeneratesPhasedMPS fixtureP fixtureP (phaseVariant (Circle.exp Real.pi)) ∧

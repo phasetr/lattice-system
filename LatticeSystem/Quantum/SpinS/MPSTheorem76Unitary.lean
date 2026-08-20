@@ -570,8 +570,8 @@ namespace MPSTheorem76.Internal
 have a unitary gauge, unique up to phase.  Only the coefficients at lengths beyond the common
 spanning length are used, so the exact-equality hypothesis of the book is not needed.
 
-This theorem-specific endpoint is consumed exactly by `mps_theorem_7_6_of_eventual_agreement` in
-`AKLTMatrixProduct`. -/
+This theorem-specific endpoint is consumed by `mps_theorem_7_6_of_eventual_agreement` in
+`AKLTMatrixProduct` and by `exists_unitary_gauge_data` below (via `hsame.eventually`). -/
 theorem exists_unitary_gauge_data_of_eventually
     (A B : MPSMatrices D N) (lamA lamB : ℝ)
     (hA : IsInjectiveMPS A lamA) (hB : IsInjectiveMPS B lamB)

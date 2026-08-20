@@ -426,8 +426,11 @@ Standard 3;
 
 merged in commit `50b30949`**: there is a unitary `U` such that `B^σ = U† A^σ U`, and every unitary
 `V` with the same gauge relation satisfies `V = z • U` for some `z` with `‖z‖=1`. The verified DAG
-is `GeneratesSameMPS` → `exists_word_transport_algEquiv` → `exists_unitary_gauge_data` →
-`mps_theorem_7_6`: fixed-length word transport gives a matrix-algebra equivalence, normalization
-makes its inner implementer unitary, and the full matrix-algebra center gives uniqueness up to
-phase.
+is `GeneratesSameMPS` → (`.eventually`) → `GeneratesSameMPSEventually` →
+`exists_word_transport_algEquiv` → `exists_unitary_gauge_data_of_eventually` →
+`exists_unitary_gauge_data` / `mps_theorem_7_6_of_eventual_agreement` → `mps_theorem_7_6`:
+`exists_word_transport_algEquiv` now takes only the threshold hypothesis (agreement for all
+sufficiently large lengths), fixed-length word transport gives a matrix-algebra equivalence,
+normalization makes its inner implementer unitary, and the full matrix-algebra center gives
+uniqueness up to phase.
 <!-- legacy-detail:end:766 -->
