@@ -618,6 +618,33 @@ def approved_changes(text: str) -> str:
             "(never an axiom) | `Quantum/SpinS/SPTMatrixProductIndex.lean`; "
             "`Quantum/SpinS/SpinSPiRotation.lean`; `Math/ProjectiveRepresentation.lean` |",
         )
+        # `spinSFlip` was a duplicate of `spinReversalS`, so the §8.3.5 `π` rotation `û₁` is built
+        # from `spinReversalS` instead; its self-adjointness and real-entry lemmas are public API
+        # now and belong in the recorded Lean-name cell.
+        .replace(
+            "| `spinReversalS`, `spinReversalS_conj_spinSOp3`, `spinReversalS_conj_spinSOpPlus`, "
+            "`spinReversalS_conj_spinSOpMinus`, `spinReversalS_conj_spinSOp1`, `spinReversalS_conj_spinSOp2` "
+            "| **Single-site spin reversal (π-rotation about axis 1)** (Tasaki §2.5 Theorem 2.4, Issue #3739, "
+            "PR #3743): the permutation matrix `F` of `Fin.rev` (`k ↦ N−k`); conjugation reindexes by "
+            "`Fin.rev` (`(F·M·F) i j = M (rev i) (rev j)`), giving `F Ŝ³ F = −Ŝ³`, `F Ŝ⁺ F = Ŝ⁻`, `F Ŝ⁻ F = "
+            "Ŝ⁺` (hence `Ŝ¹↦Ŝ¹`, `Ŝ²↦−Ŝ²`), and `F` is an involution. The many-site product `Θ = ⊗_x F` will "
+            "give the `M ↔ −M` reflection symmetry `Θ Ŝ³_tot Θ⁻¹ = −Ŝ³_tot`, `Θ Ĥ Θ⁻¹ = Ĥ` used in the "
+            "Mattis–Nishimori uniqueness argument. Tasaki, Springer 2020, §2.5 Theorem 2.4, p. 43–44 (file "
+            "`Quantum/SpinS/SpinSReversal.lean`) |",
+            "| `spinReversalS`, `spinReversalS_conjTranspose`, `spinReversalS_map_conj`, "
+            "`spinReversalS_conj_spinSOp3`, `spinReversalS_conj_spinSOpPlus`, "
+            "`spinReversalS_conj_spinSOpMinus`, `spinReversalS_conj_spinSOp1`, `spinReversalS_conj_spinSOp2` "
+            "| **Single-site spin reversal (π-rotation about axis 1)** (Tasaki §2.5 Theorem 2.4, Issue #3739, "
+            "PR #3743): the permutation matrix `F` of `Fin.rev` (`k ↦ N−k`); conjugation reindexes by "
+            "`Fin.rev` (`(F·M·F) i j = M (rev i) (rev j)`), giving `F Ŝ³ F = −Ŝ³`, `F Ŝ⁺ F = Ŝ⁻`, `F Ŝ⁻ F = "
+            "Ŝ⁺` (hence `Ŝ¹↦Ŝ¹`, `Ŝ²↦−Ŝ²`), and `F` is an involution.  `F` is also self-adjoint with real "
+            "entries (`spinReversalS_conjTranspose`, `spinReversalS_map_conj`), which is what makes it the "
+            "real involution behind the closed-form `π` rotation `û₁ = i^{2S}F` of "
+            "`Quantum/SpinS/SpinSPiRotation.lean`. The many-site product `Θ = ⊗_x F` will give the `M ↔ −M` "
+            "reflection symmetry `Θ Ŝ³_tot Θ⁻¹ = −Ŝ³_tot`, `Θ Ĥ Θ⁻¹ = Ĥ` used in the Mattis–Nishimori "
+            "uniqueness argument. Tasaki, Springer 2020, §2.5 Theorem 2.4, p. 43–44 (file "
+            "`Quantum/SpinS/SpinSReversal.lean`) |",
+        )
     )
 
 
