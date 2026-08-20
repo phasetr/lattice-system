@@ -142,10 +142,9 @@ private lemma t4_symmetryTransportMPS_conj_trivial {D N : ℕ} (z : Circle)
         (fun σ => (z : ℂ) • (V.conjTranspose * A σ * V)) =
       fun σ => (z : ℂ) • (V.conjTranspose * A σ * V) := by
   have h := symmetryTransportMPS_conj (1 : ℤˣ) (1 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) z V A
-  rw [symmetryTransportMPS_one_one] at h
   funext σ
-  have hσ := congrFun h σ
-  rw [hσ, signConjMatrix_one_apply, Units.val_one, zpow_one]
+  rw [congrFun h σ, symmetryTransportMPS_one_one, signConjMatrix_one_apply, Units.val_one,
+    zpow_one]
 
 /-! ## T5: `pos_of_isInjectiveMPS` -/
 
@@ -283,11 +282,11 @@ private lemma uTrivial_isProjectiveRep :
   ⟨fun _ => Submonoid.one_mem _, rfl,
     fun _ _ => by simp [uTrivial, signConjMatrix, LatticeSystem.Math.signConj]⟩
 
-/-- `symmetryTransportMPS (1 : ℤˣ) (uTrivial g) unitA = unitA` for every `g`, since
-`uTrivial g = 1` and the trivial sign/mixing transport is the identity
+/-- `symmetryTransportMPS (1 g) (uTrivial g) unitA = unitA` for every `g`, since the trivial sign
+character has `1 g = 1`, `uTrivial g = 1`, and the trivial sign/mixing transport is the identity
 (`symmetryTransportMPS_one_one`, defined for T4 above). -/
 private lemma symmetryTransportMPS_uTrivial_unitA (g : Multiplicative (ZMod 2)) :
-    symmetryTransportMPS (1 : ℤˣ) (uTrivial g) unitA = unitA := by
+    symmetryTransportMPS ((1 : Multiplicative (ZMod 2) →* ℤˣ) g) (uTrivial g) unitA = unitA := by
   change symmetryTransportMPS (1 : ℤˣ) (1 : Matrix (Fin 1) (Fin 1) ℂ) unitA = unitA
   exact symmetryTransportMPS_one_one unitA
 
