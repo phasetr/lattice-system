@@ -35,7 +35,7 @@ eqs. (8.3.40)-(8.3.43), pp. 277-278; §2.1, eq. (2.1.31), p. 20.  Refs #5306, #4
 namespace LatticeSystem.Tests
 
 open LatticeSystem.Math
-open LatticeSystem.Quantum (pauliX pauliZ pauliX_isHermitian pauliZ_isHermitian pauliX_mul_self
+open LatticeSystem.Quantum (pauliX pauliZ pauliX_mem_unitaryGroup pauliZ_isHermitian
   pauliZ_mul_self)
 
 /-! ## Shared fixtures -/
@@ -206,11 +206,6 @@ private lemma t3_isProjectiveRep :
         Circle.smul_def, smul_smul, iCircle_conj_mul]
 
 /-! ## T4: capstone on a two-dimensional space, with and without the sign twist -/
-
-/-- `σ^x` is unitary. -/
-private lemma pauliX_mem_unitaryGroup : pauliX ∈ Matrix.unitaryGroup (Fin 2) ℂ := by
-  rw [Matrix.mem_unitaryGroup_iff, Matrix.star_eq_conjTranspose, pauliX_isHermitian.eq,
-    pauliX_mul_self]
 
 /-- `σ^z` is unitary. -/
 private lemma pauliZ_mem_unitaryGroup : pauliZ ∈ Matrix.unitaryGroup (Fin 2) ℂ := by

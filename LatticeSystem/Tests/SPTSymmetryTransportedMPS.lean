@@ -141,16 +141,11 @@ private lemma t2_isInjectiveMPS_fixtureA : IsInjectiveMPS fixtureA (1 : ℝ) :=
   ⟨t2_isMPSNormalized, t2_mpsSpansEventually, t2_mpsSpansForAllLarge,
     t2_hasPrimitiveTransferSpectrum⟩
 
-/-- `σ^x` is unitary. -/
-private lemma t2_pauliX_mem_unitaryGroup : pauliX ∈ Matrix.unitaryGroup (Fin 2) ℂ := by
-  rw [Matrix.mem_unitaryGroup_iff, Matrix.star_eq_conjTranspose, pauliX_isHermitian.eq,
-    pauliX_mul_self]
-
 /-- T2: the `σ^x`-transported family `symmetryTransportMPS 1 σ^x fixtureA` is again injective, by
 the PR-2 capstone. This is the non-vacuity test required by #5306's acceptance criteria. -/
 private lemma t2_isInjectiveMPS_symmetryTransportMPS :
     IsInjectiveMPS (symmetryTransportMPS (1 : ℤˣ) pauliX fixtureA) (1 : ℝ) :=
-  isInjectiveMPS_symmetryTransportMPS t2_pauliX_mem_unitaryGroup t2_isInjectiveMPS_fixtureA
+  isInjectiveMPS_symmetryTransportMPS pauliX_mem_unitaryGroup t2_isInjectiveMPS_fixtureA
 
 /-- T2: the transported family is visibly the swap of `fixtureA` (`![0, 1]`), confirming the
 capstone is not applied to a degenerate/identity-equal instance. -/
@@ -237,15 +232,17 @@ private lemma t4_symmetryTransportMPS_symmetryTransportMPS (A : MPSMatrices 1 1)
 
 /-! ## T5: the book's `S = 1` time-reversal instance (8.3.33) -/
 
-/-- `û₂` of eq. (8.3.33): a `3 × 3` antidiagonal unitary with signs `(−1)^{1+σ}`, `σ ∈ {−1,0,1}`
-in book order (`Fin 3` index `0 ↦ −1`, `1 ↦ 0`, `2 ↦ +1`). -/
+/-- `û₂` of eq. (8.3.33): a `3 × 3` antidiagonal unitary with signs `(−1)^{1+σ}`, `σ ∈ {−1,0,1}`,
+indexed by the repo's spin-one convention `0 ↦ +1`, `1 ↦ 0`, `2 ↦ −1` (as in `akltVBSMatrices`).
+The sign pattern `(+1, −1, +1)` is a palindrome, so the matrix is the same under either reading of
+the index. -/
 private def uT5 : Matrix (Fin 3) (Fin 3) ℂ := !![0, 0, 1; 0, -1, 0; 1, 0, 0]
 
 /-- T5: the printed eq. (8.3.33) `(Ã⁺, Ã⁰, Ã⁻) = ((A⁻)^*, −(A⁰)^*, (A⁺)^*)`, for a symbolic
-`S = 1` MPS family `A`.  The book lists the triple in the order `(+, 0, −)` whereas the `Fin 3`
-index of an `MPSMatrices D 2` runs in the order `(σ = −1, 0, +1)`, so the `![…]` below is the
-book's triple read backwards: its entry `0` is `Ã⁻ = (A⁺)^* = (A 2)^*`, its entry `1` is
-`Ã⁰ = −(A⁰)^* = −(A 1)^*`, and its entry `2` is `Ã⁺ = (A⁻)^* = (A 0)^*`. -/
+`S = 1` MPS family `A`.  The `Fin 3` physical index of an `MPSMatrices D 2` runs in the order
+`(σ = +1, 0, −1)`, which is the book's own order for the triple, so the `![…]` below reads: entry
+`0` is `Ã⁺ = (A⁻)^* = (A 2)^*`, entry `1` is `Ã⁰ = −(A⁰)^* = −(A 1)^*`, and entry `2` is
+`Ã⁻ = (A⁺)^* = (A 0)^*`. -/
 private lemma t5_symmetryTransportMPS_uT5 {D : ℕ} (A : MPSMatrices D 2) :
     symmetryTransportMPS (-1 : ℤˣ) uT5 A =
       ![(A 2).map (starRingEnd ℂ), -(A 1).map (starRingEnd ℂ), (A 0).map (starRingEnd ℂ)] := by

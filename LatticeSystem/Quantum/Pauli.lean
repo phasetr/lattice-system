@@ -1,6 +1,7 @@
 import Mathlib.Data.Complex.Basic
 import Mathlib.LinearAlgebra.Matrix.Hermitian
 import Mathlib.LinearAlgebra.Matrix.Notation
+import Mathlib.LinearAlgebra.UnitaryGroup
 
 /-!
 # Single-site Pauli operators
@@ -10,6 +11,7 @@ spin-1/2 Hilbert space `ℂ^2`, and proves the basic algebraic relations:
 
 * Hermiticity `σ^α = (σ^α)†`,
 * involutivity `σ^α * σ^α = 1`,
+* unitarity, membership in `Matrix.unitaryGroup (Fin 2) ℂ`,
 * anticommutation `σ^α σ^β + σ^β σ^α = 0` for `α ≠ β`,
 * the cyclic products `σ^x σ^y = i σ^z`, `σ^y σ^z = i σ^x`, `σ^z σ^x = i σ^y`.
 
@@ -72,6 +74,13 @@ theorem pauliZ_mul_self : pauliZ * pauliZ = 1 := by
   ext i j
   fin_cases i <;> fin_cases j <;>
     simp [pauliZ, Matrix.mul_apply, Fin.sum_univ_two]
+
+/-! ## Unitarity -/
+
+/-- `σ^x` is unitary, being Hermitian and an involution: `σ^x (σ^x)† = σ^x σ^x = 1`. -/
+theorem pauliX_mem_unitaryGroup : pauliX ∈ Matrix.unitaryGroup (Fin 2) ℂ := by
+  rw [Matrix.mem_unitaryGroup_iff, Matrix.star_eq_conjTranspose, pauliX_isHermitian.eq,
+    pauliX_mul_self]
 
 /-! ## Cyclic products (`σ^α σ^β = i σ^γ` for `(α,β,γ)` a cyclic permutation) -/
 
