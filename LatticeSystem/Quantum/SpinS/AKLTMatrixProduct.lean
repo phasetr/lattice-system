@@ -28,7 +28,10 @@ symmetry-protected topological phases (§8.3.4).
 
 The transfer matrix, ordered products, normalization, spanning conditions, spectral primitivity
 condition, and corrected Theorem 7.5 are imported from `MPSTheorem75`. Theorem 7.6 is proved from
-the finite-dimensional algebra and unitary-gauge substrate in `MPSTheorem76Unitary`.
+the finite-dimensional algebra and unitary-gauge substrate in `MPSTheorem76Unitary`, which only ever
+uses the coefficients of chains at least as long as a common spanning length; that stronger form is
+`mps_theorem_7_6_of_eventual_agreement`, and §8.3.5 needs it because the gauge there is produced by
+a rescaling whose defining phase relation is only available on long chains.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §7.2.2, Theorem 7.6, eqs. (7.2.43)–(7.2.44), p. 203; M. Fannes, B. Nachtergaele, and
@@ -63,6 +66,30 @@ theorem mps_theorem_7_6
         ∃ z : ℂ, ‖z‖ = 1 ∧ V = z • U := by
   obtain ⟨U, hgauge, hunique⟩ :=
     MPSTheorem76.Internal.exists_unitary_gauge_data A B lamA lamB hA hB hsame
+  exact ⟨U, U.property, hgauge, hunique⟩
+
+/-- **Tasaki Theorem 7.6, relaxed hypothesis.**
+Two injective MPS collections whose periodic trace coefficients agree at every sufficiently large
+length are related by a unitary gauge, unique up to phase.  The coefficients of the short chains are
+never used: they can vanish identically, as they do for a family of traceless matrices at length
+one, and then they say nothing about either collection.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §7.2.2, Theorem 7.6, eqs. (7.2.43)–(7.2.44), p. 203. -/
+theorem mps_theorem_7_6_of_eventual_agreement
+    (A B : MPSMatrices D N) (lamA lamB : ℝ)
+    (hA : IsInjectiveMPS A lamA)
+    (hB : IsInjectiveMPS B lamB)
+    (hsame : GeneratesSameMPSEventually A B) :
+    ∃ U : Matrix (Fin D) (Fin D) ℂ,
+      U ∈ Matrix.unitaryGroup (Fin D) ℂ ∧
+      (∀ σ, B σ = U.conjTranspose * A σ * U) ∧
+      ∀ V : Matrix (Fin D) (Fin D) ℂ,
+        V ∈ Matrix.unitaryGroup (Fin D) ℂ →
+        (∀ σ, B σ = V.conjTranspose * A σ * V) →
+        ∃ z : ℂ, ‖z‖ = 1 ∧ V = z • U := by
+  obtain ⟨U, hgauge, hunique⟩ :=
+    MPSTheorem76.Internal.exists_unitary_gauge_data_of_eventually A B lamA lamB hA hB hsame
   exact ⟨U, U.property, hgauge, hunique⟩
 
 end LatticeSystem.Quantum

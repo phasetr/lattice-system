@@ -566,14 +566,16 @@ private theorem unitary_gauge_unique_up_to_phase
 
 namespace MPSTheorem76.Internal
 
-/-- Equal injective MPS representations have a unitary gauge, unique up to phase.
+/-- Injective MPS representations whose trace coefficients agree on all sufficiently long chains
+have a unitary gauge, unique up to phase.  Only the coefficients at lengths beyond the common
+spanning length are used, so the exact-equality hypothesis of the book is not needed.
 
-This theorem-specific endpoint is consumed exactly by `mps_theorem_7_6` in
+This theorem-specific endpoint is consumed exactly by `mps_theorem_7_6_of_eventual_agreement` in
 `AKLTMatrixProduct`. -/
-theorem exists_unitary_gauge_data
+theorem exists_unitary_gauge_data_of_eventually
     (A B : MPSMatrices D N) (lamA lamB : ℝ)
     (hA : IsInjectiveMPS A lamA) (hB : IsInjectiveMPS B lamB)
-    (hsame : GeneratesSameMPS A B) :
+    (hsame : GeneratesSameMPSEventually A B) :
     ∃ U : Matrix.unitaryGroup (Fin D) ℂ,
       (∀ σ, B σ = (U : Matrix (Fin D) (Fin D) ℂ).conjTranspose *
         A σ * (U : Matrix (Fin D) (Fin D) ℂ)) ∧
@@ -593,12 +595,19 @@ theorem exists_unitary_gauge_data
   letI : NeZero D := ⟨hD⟩
   obtain ⟨ℓA, hspanA_large⟩ := hA.2.2.1
   obtain ⟨ℓB, hspanB_large⟩ := hB.2.2.1
-  let ℓ := max (max ℓA ℓB) 1
+  obtain ⟨ℓ₀, hcoeff⟩ := hsame
+  let ℓ := max (max (max ℓA ℓB) ℓ₀) 1
   have hℓ : 1 ≤ ℓ := le_max_right _ _
-  have hspanA := hspanA_large ℓ (le_trans (le_max_left _ _) (le_max_left _ _))
-  have hspanB := hspanB_large ℓ (le_trans (le_max_right _ _) (le_max_left _ _))
+  have hspanA := hspanA_large ℓ
+    (le_trans (le_trans (le_max_left _ _) (le_max_left _ _)) (le_max_left _ _))
+  have hspanB := hspanB_large ℓ
+    (le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) (le_max_left _ _))
+  have hsame' : ∀ L : ℕ, ℓ ≤ L → ∀ ss : Fin L → Fin (N + 1),
+      Matrix.trace (orderedProd A (List.ofFn ss)) =
+        Matrix.trace (orderedProd B (List.ofFn ss)) := fun L hL =>
+    hcoeff L (le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hL)
   obtain ⟨e, _, _, he⟩ :=
-    exists_word_transport_algEquiv A B ℓ hℓ hsame hspanA hspanB
+    exists_word_transport_algEquiv A B ℓ hℓ hsame' hspanA hspanB
   obtain ⟨P, R, hPR, hRP, hinner⟩ := exists_inner_matrix e
   have hgauge (σ : Fin (N + 1)) : B σ = P * A σ * R := by
     rw [← he]
@@ -689,6 +698,23 @@ theorem exists_unitary_gauge_data
   intro V hVunit hV
   exact unitary_gauge_unique_up_to_phase
     A B ℓ hspanA U V U.property hVunit hU hV
+
+/-- Equal injective MPS representations have a unitary gauge, unique up to phase.
+
+This theorem-specific endpoint is consumed exactly by `mps_theorem_7_6` in
+`AKLTMatrixProduct`. -/
+theorem exists_unitary_gauge_data
+    (A B : MPSMatrices D N) (lamA lamB : ℝ)
+    (hA : IsInjectiveMPS A lamA) (hB : IsInjectiveMPS B lamB)
+    (hsame : GeneratesSameMPS A B) :
+    ∃ U : Matrix.unitaryGroup (Fin D) ℂ,
+      (∀ σ, B σ = (U : Matrix (Fin D) (Fin D) ℂ).conjTranspose *
+        A σ * (U : Matrix (Fin D) (Fin D) ℂ)) ∧
+      ∀ V : Matrix (Fin D) (Fin D) ℂ,
+        V ∈ Matrix.unitaryGroup (Fin D) ℂ →
+        (∀ σ, B σ = V.conjTranspose * A σ * V) →
+        ∃ z : ℂ, ‖z‖ = 1 ∧ V = z • (U : Matrix (Fin D) (Fin D) ℂ) :=
+  exists_unitary_gauge_data_of_eventually A B lamA lamB hA hB hsame.eventually
 
 end MPSTheorem76.Internal
 

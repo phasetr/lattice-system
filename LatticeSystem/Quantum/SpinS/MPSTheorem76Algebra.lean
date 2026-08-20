@@ -5,8 +5,11 @@ import Mathlib.LinearAlgebra.GeneralLinearGroup.AlgEquiv
 /-!
 # Algebra transport for Tasaki Theorem 7.6
 
-This file constructs the algebra equivalence induced by equality of every periodic MPS trace
-coefficient at a common spanning length. The fixed-length word substrate remains private.
+This file constructs the algebra equivalence induced by equality of the periodic MPS trace
+coefficients of all words at least as long as a common spanning length. The fixed-length word
+substrate (`MPSWord`, `mpsWordEval`, `mpsEvalWords` and their surjectivity and separation lemmas) is
+public, since §8.3.5's passage from symmetry invariance to a gauge relation runs the same linear
+extension over formal words.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §7.2.2, Theorem 7.6, eq. (7.2.43), p. 203.
@@ -19,18 +22,18 @@ open Matrix Module
 variable {D N : ℕ}
 
 /-- A fixed-length physical word. -/
-private abbrev Word (N ℓ : ℕ) :=
+abbrev MPSWord (N ℓ : ℕ) :=
   Fin ℓ → Fin (N + 1)
 
 /-- The matrix obtained by evaluating a fixed-length word. -/
-private noncomputable def wordEval (A : MPSMatrices D N) {ℓ : ℕ}
-    (w : Word N ℓ) : Matrix (Fin D) (Fin D) ℂ :=
+noncomputable def mpsWordEval (A : MPSMatrices D N) {ℓ : ℕ}
+    (w : MPSWord N ℓ) : Matrix (Fin D) (Fin D) ℂ :=
   orderedProd A (List.ofFn w)
 
 /-- The linear combination map which evaluates formal fixed-length words. -/
-private noncomputable def evalWords (A : MPSMatrices D N) (ℓ : ℕ) :
-    (Word N ℓ →₀ ℂ) →ₗ[ℂ] Matrix (Fin D) (Fin D) ℂ :=
-  Finsupp.linearCombination ℂ (wordEval A)
+noncomputable def mpsEvalWords (A : MPSMatrices D N) (ℓ : ℕ) :
+    (MPSWord N ℓ →₀ ℂ) →ₗ[ℂ] Matrix (Fin D) (Fin D) ℂ :=
+  Finsupp.linearCombination ℂ (mpsWordEval A)
 
 /-- Ordered MPS products turn list concatenation into matrix multiplication. -/
 theorem orderedProd_append (A : MPSMatrices D N)
@@ -42,18 +45,21 @@ theorem orderedProd_append (A : MPSMatrices D N)
       simp only [List.cons_append, orderedProd]
       rw [ih, Matrix.mul_assoc]
 
-/-- Function-indexed trace equality implies trace equality for every list word. -/
-private theorem trace_eq_list {A B : MPSMatrices D N}
-    (h : GeneratesSameMPS A B) (u : List (Fin (N + 1))) :
+/-- Function-indexed trace equality above a length threshold implies trace equality for every list
+word at least that long. -/
+private theorem trace_eq_list_of_le {A B : MPSMatrices D N} {ℓ : ℕ}
+    (h : ∀ L : ℕ, ℓ ≤ L → ∀ ss : Fin L → Fin (N + 1),
+      Matrix.trace (orderedProd A (List.ofFn ss)) = Matrix.trace (orderedProd B (List.ofFn ss)))
+    {u : List (Fin (N + 1))} (hu : ℓ ≤ u.length) :
     Matrix.trace (orderedProd A u) = Matrix.trace (orderedProd B u) := by
-  simpa only [List.ofFn_get] using h u.length u.get
+  simpa only [List.ofFn_get] using h u.length hu u.get
 
 /-- Fixed-length spanning is equivalent to surjectivity of the word evaluation map. -/
-private theorem evalWords_surjective {A : MPSMatrices D N} {ℓ : ℕ}
+theorem mpsEvalWords_surjective {A : MPSMatrices D N} {ℓ : ℕ}
     (hspan : mpsProductsSpanAt A ℓ) :
-    Function.Surjective (evalWords A ℓ) := by
+    Function.Surjective (mpsEvalWords A ℓ) := by
   rw [← LinearMap.range_eq_top]
-  rw [evalWords, Finsupp.range_linearCombination]
+  rw [mpsEvalWords, Finsupp.range_linearCombination]
   rw [← hspan]
   apply le_antisymm
   · apply Submodule.span_mono
@@ -62,52 +68,55 @@ private theorem evalWords_surjective {A : MPSMatrices D N} {ℓ : ℕ}
   · apply Submodule.span_mono
     rintro M ⟨u, hu, rfl⟩
     subst ℓ
-    exact ⟨u.get, by simp [wordEval]⟩
+    exact ⟨u.get, by simp [mpsWordEval]⟩
 
-/-- Trace equality preserves every linear relation among fixed-length words. -/
+/-- Trace equality above the spanning length preserves every linear relation among fixed-length
+words. -/
 private theorem evalWords_ker_le {A B : MPSMatrices D N} {ℓ : ℕ}
-    (hsame : GeneratesSameMPS A B)
+    (hsame : ∀ L : ℕ, ℓ ≤ L → ∀ ss : Fin L → Fin (N + 1),
+      Matrix.trace (orderedProd A (List.ofFn ss)) = Matrix.trace (orderedProd B (List.ofFn ss)))
     (hspanB : mpsProductsSpanAt B ℓ) :
-    LinearMap.ker (evalWords A ℓ) ≤ LinearMap.ker (evalWords B ℓ) := by
+    LinearMap.ker (mpsEvalWords A ℓ) ≤ LinearMap.ker (mpsEvalWords B ℓ) := by
   classical
   intro c hc
   rw [LinearMap.mem_ker] at hc ⊢
-  have hpair (t : Word N ℓ) :
+  have hpair (t : MPSWord N ℓ) :
       (Matrix.traceLinearMap (Fin D) ℂ ℂ).comp
-          ((LinearMap.mulRight ℂ (wordEval A t)).comp (evalWords A ℓ)) =
+          ((LinearMap.mulRight ℂ (mpsWordEval A t)).comp (mpsEvalWords A ℓ)) =
         (Matrix.traceLinearMap (Fin D) ℂ ℂ).comp
-          ((LinearMap.mulRight ℂ (wordEval B t)).comp (evalWords B ℓ)) := by
+          ((LinearMap.mulRight ℂ (mpsWordEval B t)).comp (mpsEvalWords B ℓ)) := by
     apply Finsupp.lhom_ext'
     intro w
     apply LinearMap.ext
     intro z
-    simp only [LinearMap.comp_apply, Finsupp.lsingle_apply, evalWords,
+    simp only [LinearMap.comp_apply, Finsupp.lsingle_apply, mpsEvalWords,
       Finsupp.linearCombination_single, Matrix.traceLinearMap_apply,
-      LinearMap.mulRight_apply, Matrix.smul_mul, Matrix.trace_smul, wordEval]
+      LinearMap.mulRight_apply, Matrix.smul_mul, Matrix.trace_smul, mpsWordEval]
     congr 1
     rw [← orderedProd_append A (List.ofFn w) (List.ofFn t)]
     rw [← orderedProd_append B (List.ofFn w) (List.ofFn t)]
-    exact trace_eq_list hsame _
-  have hzero (t : Word N ℓ) :
-      Matrix.trace (evalWords B ℓ c * wordEval B t) = 0 := by
+    exact trace_eq_list_of_le hsame (by simp)
+  have hzero (t : MPSWord N ℓ) :
+      Matrix.trace (mpsEvalWords B ℓ c * mpsWordEval B t) = 0 := by
     have h := LinearMap.congr_fun (hpair t) c
     simpa only [LinearMap.comp_apply, Matrix.traceLinearMap_apply,
       LinearMap.mulRight_apply, hc, Matrix.zero_mul, Matrix.trace_zero] using h.symm
-  have hsurjB := evalWords_surjective hspanB
+  have hsurjB := mpsEvalWords_surjective hspanB
   rw [Matrix.ext_iff_trace_mul_right]
   intro X
   obtain ⟨d, rfl⟩ := hsurjB X
   have hfunctional :
       (Matrix.traceLinearMap (Fin D) ℂ ℂ).comp
-          ((LinearMap.mulLeft ℂ (evalWords B ℓ c)).comp (evalWords B ℓ)) = 0 := by
+          ((LinearMap.mulLeft ℂ (mpsEvalWords B ℓ c)).comp (mpsEvalWords B ℓ)) = 0 := by
     apply Finsupp.lhom_ext'
     intro t
     apply LinearMap.ext
     intro z
-    simp only [LinearMap.comp_apply, Finsupp.lsingle_apply, evalWords,
+    simp only [LinearMap.comp_apply, Finsupp.lsingle_apply, mpsEvalWords,
       Finsupp.linearCombination_single, Matrix.traceLinearMap_apply,
-      LinearMap.mulLeft_apply, LinearMap.zero_apply, Matrix.mul_smul, Matrix.trace_smul, wordEval]
-    change z • Matrix.trace (evalWords B ℓ c * wordEval B t) = 0
+      LinearMap.mulLeft_apply, LinearMap.zero_apply, Matrix.mul_smul, Matrix.trace_smul,
+      mpsWordEval]
+    change z • Matrix.trace (mpsEvalWords B ℓ c * mpsWordEval B t) = 0
     rw [hzero t, smul_zero]
   have h := LinearMap.congr_fun hfunctional d
   simpa only [LinearMap.comp_apply, Matrix.traceLinearMap_apply, LinearMap.mulLeft_apply,
@@ -115,59 +124,62 @@ private theorem evalWords_ker_le {A B : MPSMatrices D N} {ℓ : ℕ}
 
 /-- The two fixed-length word evaluation maps have the same kernel. -/
 private theorem evalWords_ker_eq {A B : MPSMatrices D N} {ℓ : ℕ}
-    (hsame : GeneratesSameMPS A B)
+    (hsame : ∀ L : ℕ, ℓ ≤ L → ∀ ss : Fin L → Fin (N + 1),
+      Matrix.trace (orderedProd A (List.ofFn ss)) = Matrix.trace (orderedProd B (List.ofFn ss)))
     (hspanA : mpsProductsSpanAt A ℓ) (hspanB : mpsProductsSpanAt B ℓ) :
-    LinearMap.ker (evalWords A ℓ) = LinearMap.ker (evalWords B ℓ) := by
+    LinearMap.ker (mpsEvalWords A ℓ) = LinearMap.ker (mpsEvalWords B ℓ) := by
   apply le_antisymm
   · exact evalWords_ker_le hsame hspanB
-  · exact evalWords_ker_le (fun L ss => (hsame L ss).symm) hspanA
+  · exact evalWords_ker_le (fun L hL ss => (hsame L hL ss).symm) hspanA
 
 /-- Equality against every fixed-length word in a spanning family determines a matrix. -/
-private theorem eq_of_trace_mul_words {A : MPSMatrices D N} {ℓ : ℕ}
+theorem eq_of_trace_mul_words {A : MPSMatrices D N} {ℓ : ℕ}
     (hspan : mpsProductsSpanAt A ℓ)
     {X Y : Matrix (Fin D) (Fin D) ℂ}
-    (htrace : ∀ w : Word N ℓ,
-      Matrix.trace (X * wordEval A w) = Matrix.trace (Y * wordEval A w)) :
+    (htrace : ∀ w : MPSWord N ℓ,
+      Matrix.trace (X * mpsWordEval A w) = Matrix.trace (Y * mpsWordEval A w)) :
     X = Y := by
   classical
   rw [Matrix.ext_iff_trace_mul_right]
   intro Z
-  obtain ⟨c, rfl⟩ := evalWords_surjective hspan Z
+  obtain ⟨c, rfl⟩ := mpsEvalWords_surjective hspan Z
   have hfunctional :
       (Matrix.traceLinearMap (Fin D) ℂ ℂ).comp
-          ((LinearMap.mulLeft ℂ X).comp (evalWords A ℓ)) =
+          ((LinearMap.mulLeft ℂ X).comp (mpsEvalWords A ℓ)) =
         (Matrix.traceLinearMap (Fin D) ℂ ℂ).comp
-          ((LinearMap.mulLeft ℂ Y).comp (evalWords A ℓ)) := by
+          ((LinearMap.mulLeft ℂ Y).comp (mpsEvalWords A ℓ)) := by
     apply Finsupp.lhom_ext'
     intro w
     apply LinearMap.ext
     intro z
-    simp only [LinearMap.comp_apply, Finsupp.lsingle_apply, evalWords,
+    simp only [LinearMap.comp_apply, Finsupp.lsingle_apply, mpsEvalWords,
       Finsupp.linearCombination_single, Matrix.traceLinearMap_apply,
-      LinearMap.mulLeft_apply, Matrix.mul_smul, Matrix.trace_smul, wordEval]
-    change z • Matrix.trace (X * wordEval A w) =
-      z • Matrix.trace (Y * wordEval A w)
+      LinearMap.mulLeft_apply, Matrix.mul_smul, Matrix.trace_smul, mpsWordEval]
+    change z • Matrix.trace (X * mpsWordEval A w) =
+      z • Matrix.trace (Y * mpsWordEval A w)
     rw [htrace w]
   exact LinearMap.congr_fun hfunctional c
 
 namespace MPSTheorem76.Internal
 
-/-- A common spanning length and all-word trace equality induce the algebra equivalence transporting
-every word in `A` to the corresponding word in `B`. The exact consumer is
-`MPSTheorem76.Internal.exists_unitary_gauge_data`. -/
+/-- A common spanning length `ℓ` and trace equality for all words of length at least `ℓ` induce the
+algebra equivalence transporting every word in `A` to the corresponding word in `B` — including the
+words shorter than `ℓ`, since each of them is tested against a trailing word of length `ℓ`. The
+exact consumer is `MPSTheorem76.Internal.exists_unitary_gauge_data_of_eventually`. -/
 theorem exists_word_transport_algEquiv
     (A B : MPSMatrices D N) (ℓ : ℕ) (_hℓ : 1 ≤ ℓ)
-    (hsame : GeneratesSameMPS A B)
+    (hsame : ∀ L : ℕ, ℓ ≤ L → ∀ ss : Fin L → Fin (N + 1),
+      Matrix.trace (orderedProd A (List.ofFn ss)) = Matrix.trace (orderedProd B (List.ofFn ss)))
     (hspanA : mpsProductsSpanAt A ℓ) (hspanB : mpsProductsSpanAt B ℓ) :
     ∃ e : Matrix (Fin D) (Fin D) ℂ ≃ₐ[ℂ] Matrix (Fin D) (Fin D) ℂ,
       (∀ u : List (Fin (N + 1)), e (orderedProd A u) = orderedProd B u) ∧
       (∀ u : List (Fin (N + 1)), e.symm (orderedProd B u) = orderedProd A u) ∧
       (∀ σ : Fin (N + 1), e (A σ) = B σ) := by
   classical
-  let evalA := evalWords A ℓ
-  let evalB := evalWords B ℓ
-  have hsurjA : Function.Surjective evalA := evalWords_surjective hspanA
-  have hsurjB : Function.Surjective evalB := evalWords_surjective hspanB
+  let evalA := mpsEvalWords A ℓ
+  let evalB := mpsEvalWords B ℓ
+  have hsurjA : Function.Surjective evalA := mpsEvalWords_surjective hspanA
+  have hsurjB : Function.Surjective evalB := mpsEvalWords_surjective hspanB
   obtain ⟨sectionA, hsectionA⟩ :=
     evalA.exists_rightInverse_of_surjective (LinearMap.range_eq_top.mpr hsurjA)
   let f : Matrix (Fin D) (Fin D) ℂ →ₗ[ℂ] Matrix (Fin D) (Fin D) ℂ :=
@@ -178,7 +190,7 @@ theorem exists_word_transport_algEquiv
       evalA (sectionA X) = X := by
     have h := LinearMap.congr_fun hsectionA X
     simpa only [LinearMap.comp_apply, LinearMap.id_apply] using h
-  have hf_eval (c : Word N ℓ →₀ ℂ) : f (evalA c) = evalB c := by
+  have hf_eval (c : MPSWord N ℓ →₀ ℂ) : f (evalA c) = evalB c := by
     have hdiffA : sectionA (evalA c) - c ∈ LinearMap.ker evalA := by
       rw [LinearMap.mem_ker, map_sub, hsectionA_apply, sub_self]
     have hdiffB : sectionA (evalA c) - c ∈ LinearMap.ker evalB := by
@@ -205,24 +217,24 @@ theorem exists_word_transport_algEquiv
   let eLin : Matrix (Fin D) (Fin D) ℂ ≃ₗ[ℂ] Matrix (Fin D) (Fin D) ℂ :=
     LinearEquiv.ofBijective f ⟨hfinj, hfsurj⟩
   have eLin_apply (X : Matrix (Fin D) (Fin D) ℂ) : eLin X = f X := rfl
-  have eLin_eval (c : Word N ℓ →₀ ℂ) : eLin (evalA c) = evalB c := by
+  have eLin_eval (c : MPSWord N ℓ →₀ ℂ) : eLin (evalA c) = evalB c := by
     rw [eLin_apply, hf_eval]
-  have hpair (t : Word N ℓ) :
+  have hpair (t : MPSWord N ℓ) :
       (Matrix.traceLinearMap (Fin D) ℂ ℂ).comp
-          ((LinearMap.mulRight ℂ (wordEval A t)).comp evalA) =
+          ((LinearMap.mulRight ℂ (mpsWordEval A t)).comp evalA) =
         (Matrix.traceLinearMap (Fin D) ℂ ℂ).comp
-          ((LinearMap.mulRight ℂ (wordEval B t)).comp evalB) := by
+          ((LinearMap.mulRight ℂ (mpsWordEval B t)).comp evalB) := by
     apply Finsupp.lhom_ext'
     intro w
     apply LinearMap.ext
     intro z
-    simp only [LinearMap.comp_apply, Finsupp.lsingle_apply, evalA, evalB, evalWords,
+    simp only [LinearMap.comp_apply, Finsupp.lsingle_apply, evalA, evalB, mpsEvalWords,
       Finsupp.linearCombination_single, Matrix.traceLinearMap_apply,
-      LinearMap.mulRight_apply, Matrix.smul_mul, Matrix.trace_smul, wordEval]
+      LinearMap.mulRight_apply, Matrix.smul_mul, Matrix.trace_smul, mpsWordEval]
     congr 1
     rw [← orderedProd_append A (List.ofFn w) (List.ofFn t)]
     rw [← orderedProd_append B (List.ofFn w) (List.ofFn t)]
-    exact trace_eq_list hsame _
+    exact trace_eq_list_of_le hsame (by simp)
   have eLin_word (u : List (Fin (N + 1))) :
       eLin (orderedProd A u) = orderedProd B u := by
     obtain ⟨c, hc⟩ := hsurjA (orderedProd A u)
@@ -235,14 +247,15 @@ theorem exists_word_transport_algEquiv
     simp only [LinearMap.comp_apply, Matrix.traceLinearMap_apply,
       LinearMap.mulRight_apply] at hp
     calc
-      Matrix.trace (evalB c * wordEval B t) =
-          Matrix.trace (evalA c * wordEval A t) := hp.symm
-      _ = Matrix.trace (orderedProd A u * wordEval A t) := by rw [hc]
+      Matrix.trace (evalB c * mpsWordEval B t) =
+          Matrix.trace (evalA c * mpsWordEval A t) := hp.symm
+      _ = Matrix.trace (orderedProd A u * mpsWordEval A t) := by rw [hc]
       _ = Matrix.trace (orderedProd A (u ++ List.ofFn t)) := by
           rw [orderedProd_append]
           rfl
-      _ = Matrix.trace (orderedProd B (u ++ List.ofFn t)) := trace_eq_list hsame _
-      _ = Matrix.trace (orderedProd B u * wordEval B t) := by
+      _ = Matrix.trace (orderedProd B (u ++ List.ofFn t)) :=
+          trace_eq_list_of_le hsame (by simp)
+      _ = Matrix.trace (orderedProd B u * mpsWordEval B t) := by
           rw [orderedProd_append]
           rfl
   have eLin_one : eLin (1 : Matrix (Fin D) (Fin D) ℂ) = 1 := by
@@ -261,8 +274,8 @@ theorem exists_word_transport_algEquiv
         | add d₁ d₂ hd₁ hd₂ =>
             simp only [map_add, Matrix.mul_add, hd₁, hd₂, Matrix.mul_add]
         | single v q =>
-            simp only [evalA, evalWords, Finsupp.linearCombination_single,
-              Matrix.smul_mul, Matrix.mul_smul, map_smul, smul_smul, wordEval]
+            simp only [evalA, mpsEvalWords, Finsupp.linearCombination_single,
+              Matrix.smul_mul, Matrix.mul_smul, map_smul, smul_smul, mpsWordEval]
             rw [← orderedProd_append A (List.ofFn w) (List.ofFn v)]
             rw [eLin_word]
             rw [orderedProd_append]
