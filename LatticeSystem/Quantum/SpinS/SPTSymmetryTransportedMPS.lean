@@ -13,10 +13,10 @@ eq. (8.3.33).
 
 The transformation is staged as a conjugation `mpsConjugate` followed by a mixing `mpsMix` of the
 single-site index, because each of the four conditions defining `IsInjectiveMPS` is transported one
-stage at a time: the mixing is undone by the adjoint mixing matrix (which is what makes the
-spanning conditions transport), while the conjugation acts on the transfer matrix and hence on its
-spectrum and eigenspaces.  The result is the book's repeated but unproved assertion that the
-transported family is again injective.
+stage at a time: the transport is inverted by a second transport, with the adjoint of the
+conjugated mixing matrix (which is what makes the spanning conditions transport), while the
+conjugation acts on the transfer matrix and hence on its spectrum and eigenspaces.  The result is
+the book's repeated but unproved assertion that the transported family is again injective.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §8.3.4, eqs. (8.3.13)–(8.3.14), pp. 264–265; §8.3.5, eq. (8.3.33), p. 273, and eq. (8.3.47),
@@ -28,8 +28,8 @@ namespace LatticeSystem.Quantum
 open Matrix Module
 open LatticeSystem.Math (signConj signConjMatrix signConj_one_apply signConj_neg_one_apply
   signConj_signConj signConjMatrix_smul signConjMatrix_signConjMatrix
-  signConjMatrix_conjTranspose mem_spectrum_signConjMatrix_iff norm_signConj
-  finrank_ker_mulVecLin_signConjMatrix)
+  signConjMatrix_conjTranspose signConjMatrix_mem_unitaryGroup mem_spectrum_signConjMatrix_iff
+  norm_signConj finrank_ker_mulVecLin_signConjMatrix)
 
 variable {D N : ℕ}
 
@@ -53,7 +53,8 @@ noncomputable def symmetryTransportMPS (ε : ℤˣ) (u : Matrix (Fin (N + 1)) (F
     (A : MPSMatrices D N) : MPSMatrices D N :=
   mpsMix u (mpsConjugate ε A)
 
-/-- Mixing composes contravariantly in the mixing matrices. -/
+/-- Mixing is a left action of the matrix ring on MPS families: mixing by `v` and then by `u` is
+mixing by `u * v` (covariant composition). -/
 lemma mpsMix_mpsMix (u v : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) (A : MPSMatrices D N) :
     mpsMix u (mpsMix v A) = mpsMix (u * v) A := by
   funext σ
@@ -84,8 +85,9 @@ lemma mpsConjugate_mpsConjugate (ε : ℤˣ) (A : MPSMatrices D N) :
   exact signConjMatrix_signConjMatrix ε (A σ)
 
 /-- Transporting twice with the same sign is a pure mixing.  Taking `v` to be the adjoint of
-`C_g[u]` recovers the original family, which is how the spanning conditions are transported in
-both directions. -/
+`C_g[u]` recovers the original family; this inverse transport is what
+`mpsProductsSpanAt_symmetryTransportMPS` runs backwards along to pull the spanning conditions from
+`A` to `Ã_g`. -/
 lemma symmetryTransportMPS_symmetryTransportMPS (ε : ℤˣ)
     (u v : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) (A : MPSMatrices D N) :
     symmetryTransportMPS ε v (symmetryTransportMPS ε u A) =
@@ -123,46 +125,56 @@ private lemma orderedProd_mpsMix_mem_span (u : Matrix (Fin (N + 1)) (Fin (N + 1)
       exact Submodule.sum_mem _ fun σ' _ =>
         Submodule.smul_mem _ _ (orderedProd_mul_mem_span_succ A ss.length σ' ih)
 
+/-- Spanning at a given length is inherited by a conjugated family, since entrywise conjugation is
+a conjugate-linear involution of the matrix space. -/
+private lemma mpsProductsSpanAt_mpsConjugate (ε : ℤˣ) {A : MPSMatrices D N} {ℓ : ℕ}
+    (hspan : mpsProductsSpanAt A ℓ) : mpsProductsSpanAt (mpsConjugate ε A) ℓ := by
+  unfold mpsProductsSpanAt at hspan ⊢
+  rw [Submodule.eq_top_iff'] at hspan ⊢
+  intro M
+  set W : Submodule ℂ (Matrix (Fin D) (Fin D) ℂ) :=
+    Submodule.span ℂ {P : Matrix (Fin D) (Fin D) ℂ |
+      ∃ σs : List (Fin (N + 1)), σs.length = ℓ ∧ P = orderedProd (mpsConjugate ε A) σs}
+  have key : ∀ Y ∈ Submodule.span ℂ {P : Matrix (Fin D) (Fin D) ℂ |
+      ∃ σs : List (Fin (N + 1)), σs.length = ℓ ∧ P = orderedProd A σs},
+      signConjMatrix ε Y ∈ W := by
+    intro Y hY
+    induction hY using Submodule.span_induction with
+    | mem P hP =>
+        obtain ⟨σs, hlen, rfl⟩ := hP
+        exact Submodule.subset_span ⟨σs, hlen, (orderedProd_mpsConjugate ε A σs).symm⟩
+    | zero => simpa only [map_zero] using W.zero_mem
+    | add X Y _ _ hX hY => simpa only [map_add] using W.add_mem hX hY
+    | smul c X _ hX => simpa only [signConjMatrix_smul] using W.smul_mem (signConj ε c) hX
+  have hM := key (signConjMatrix ε M) (hspan _)
+  rwa [signConjMatrix_signConjMatrix] at hM
+
 /-- Spanning at a given length is inherited by the symmetry-transported family, for every unitary
-mixing matrix.  The conjugation stage uses that entrywise conjugation is a conjugate-linear
-involution; the mixing stage uses that a unitary mixing is undone by its adjoint. -/
+mixing matrix.  The proof runs backwards along the inverse transport: transporting `Ã_g` once more,
+with the adjoint of the (again unitary) conjugated mixing matrix `C_g[u]`, returns `A`, so every
+ordered product of `A` already lies in the span of the ordered products of `C_g[Ã_g]` of the same
+length; the leftover conjugation is then removed by its own involutivity. -/
 theorem mpsProductsSpanAt_symmetryTransportMPS {ε : ℤˣ}
     {u : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ} (hu : u ∈ Matrix.unitaryGroup (Fin (N + 1)) ℂ)
     {A : MPSMatrices D N} {ℓ : ℕ} (hspan : mpsProductsSpanAt A ℓ) :
     mpsProductsSpanAt (symmetryTransportMPS ε u A) ℓ := by
-  have hconj : mpsProductsSpanAt (mpsConjugate ε A) ℓ := by
+  have hback : mpsMix (star (signConjMatrix ε u))
+      (mpsConjugate ε (symmetryTransportMPS ε u A)) = A := by
+    have hinv := symmetryTransportMPS_symmetryTransportMPS ε u (star (signConjMatrix ε u)) A
+    rwa [Matrix.mem_unitaryGroup_iff'.mp (signConjMatrix_mem_unitaryGroup ε hu),
+      mpsMix_one] at hinv
+  have hconj : mpsProductsSpanAt (mpsConjugate ε (symmetryTransportMPS ε u A)) ℓ := by
     unfold mpsProductsSpanAt at hspan ⊢
-    rw [Submodule.eq_top_iff'] at hspan ⊢
-    intro M
-    set W : Submodule ℂ (Matrix (Fin D) (Fin D) ℂ) :=
-      Submodule.span ℂ {P : Matrix (Fin D) (Fin D) ℂ |
-        ∃ σs : List (Fin (N + 1)), σs.length = ℓ ∧ P = orderedProd (mpsConjugate ε A) σs}
-    have key : ∀ Y ∈ Submodule.span ℂ {P : Matrix (Fin D) (Fin D) ℂ |
-        ∃ σs : List (Fin (N + 1)), σs.length = ℓ ∧ P = orderedProd A σs},
-        signConjMatrix ε Y ∈ W := by
-      intro Y hY
-      induction hY using Submodule.span_induction with
-      | mem P hP =>
-          obtain ⟨σs, hlen, rfl⟩ := hP
-          exact Submodule.subset_span ⟨σs, hlen, (orderedProd_mpsConjugate ε A σs).symm⟩
-      | zero => simpa only [map_zero] using W.zero_mem
-      | add X Y _ _ hX hY => simpa only [map_add] using W.add_mem hX hY
-      | smul c X _ hX => simpa only [signConjMatrix_smul] using W.smul_mem (signConj ε c) hX
-    have hM := key (signConjMatrix ε M) (hspan _)
-    rwa [signConjMatrix_signConjMatrix] at hM
-  have hmix : ∀ B : MPSMatrices D N, mpsProductsSpanAt B ℓ → mpsProductsSpanAt (mpsMix u B) ℓ := by
-    intro B hB
-    have hinv : mpsMix (star u) (mpsMix u B) = B := by
-      rw [mpsMix_mpsMix, Matrix.mem_unitaryGroup_iff'.mp hu, mpsMix_one]
-    unfold mpsProductsSpanAt at hB ⊢
     refine eq_top_iff.mpr ?_
-    rw [← hB, Submodule.span_le]
+    rw [← hspan, Submodule.span_le]
     rintro P ⟨σs, hlen, rfl⟩
     subst hlen
-    have hmem := orderedProd_mpsMix_mem_span (star u) (mpsMix u B) σs
-    rw [hinv] at hmem
+    have hmem := orderedProd_mpsMix_mem_span (star (signConjMatrix ε u))
+      (mpsConjugate ε (symmetryTransportMPS ε u A)) σs
+    rw [hback] at hmem
     exact hmem
-  exact hmix _ hconj
+  have hfinal := mpsProductsSpanAt_mpsConjugate ε hconj
+  rwa [mpsConjugate_mpsConjugate] at hfinal
 
 /-! ## Transport of the normalization and of the transfer spectrum -/
 

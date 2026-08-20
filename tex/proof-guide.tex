@@ -12885,7 +12885,8 @@ entrywise conjugation \texttt{mpsConjugate} (the twist $C_g$ of (8.3.40), $\vare
 by the single-site mixing \texttt{mpsMix}.  For a unitary mixing matrix the transfer matrix is merely
 conjugated (\texttt{mpsTransferMatrix\_symmetryTransportMPS}; the book's ``identical'' for
 $\varepsilon=1$), the normalization (8.3.14) holds with the \emph{same} $\lambda$, and both spanning
-conditions of Theorem~7.5 transport because a unitary mixing is undone by its adjoint.  Hence
+conditions of Theorem~7.5 transport because a second transport, by the adjoint of the conjugated
+mixing matrix $C_g[u]$ (again unitary), inverts the first one.  Hence
 \texttt{isInjectiveMPS\_symmetryTransportMPS}: injectivity passes to $\tilde A_g$, axiom-free.  This is
 the assertion Tasaki makes three times --- p.~265, p.~273 for the $S=1$ time reversal (8.3.33), and
 p.~279 for general $g$ --- and never proves.  The seven §8.3.4 axioms above are untouched;

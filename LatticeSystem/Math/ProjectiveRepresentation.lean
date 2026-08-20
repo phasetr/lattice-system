@@ -116,7 +116,8 @@ lemma signConjMatrix_conjTranspose (ε : ℤˣ) (X : Matrix D D ℂ) :
     simp [signConjMatrix_neg_one_apply, Matrix.conjTranspose_apply]
 
 /-- The matrix twist preserves unitarity, since it is a ring homomorphism commuting with the
-adjoint.  This is why the book's transported family is again normalised (eq. (8.3.14)). -/
+adjoint.  The twisted mixing matrix `C_g[u]` of the *inverse* symmetry transport is therefore again
+unitary, which is what lets the spanning conditions be pulled back along it (§8.3.4, p. 265). -/
 lemma signConjMatrix_mem_unitaryGroup (ε : ℤˣ) {X : Matrix D D ℂ}
     (hX : X ∈ Matrix.unitaryGroup D ℂ) : signConjMatrix ε X ∈ Matrix.unitaryGroup D ℂ := by
   rw [Matrix.mem_unitaryGroup_iff] at hX ⊢

@@ -16,6 +16,10 @@ Behavioural tests for `LatticeSystem.Quantum.SPTSymmetryTransportedMPS` (§8.3.4
 * **T5** the book's `S = 1` time-reversal instance (8.3.33),
   `Ã⁺ = (A⁻)^*, Ã⁰ = −(A⁰)^*, Ã⁻ = (A⁺)^*`, as the `ε = -1` instance of the general transport at a
   concrete unitary `û₂`.
+* **T6** the antiunitary branch of the capstone at bond dimension `D = 2`: the spin-`1` Pauli
+  family is injective with `λ = 3` and a gapped transfer spectrum `{3, -1}`, and `û₂` is unitary,
+  so the capstone transports a nondegenerate `λ`-eigenspace and a nonempty gap condition through
+  the entrywise conjugation.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed.), §8.3.4,
 pp. 264-265, eqs. (8.3.13)-(8.3.14); §8.3.5, p. 273, eq. (8.3.33); p. 279, eq. (8.3.47).
@@ -192,7 +196,7 @@ private lemma t3_symmetryTransportMPS_neg_one_ne_one :
 
 /-! ## T4: composition pins the row/column convention -/
 
-/-- T4 (abstract): `mpsMix` composes contravariantly, `mpsMix u (mpsMix v A) = mpsMix (u * v) A`,
+/-- T4 (abstract): `mpsMix` composes covariantly, `mpsMix u (mpsMix v A) = mpsMix (u * v) A`,
 specialized to the concrete non-commuting pair `σ^x, σ^z` (this is what PR-4's cocycle chase
 needs; a transposed convention would instead give `mpsMix (v * u) A`, see T4's concrete check
 below). -/
@@ -237,8 +241,11 @@ private lemma t4_symmetryTransportMPS_symmetryTransportMPS (A : MPSMatrices 1 1)
 in book order (`Fin 3` index `0 ↦ −1`, `1 ↦ 0`, `2 ↦ +1`). -/
 private def uT5 : Matrix (Fin 3) (Fin 3) ℂ := !![0, 0, 1; 0, -1, 0; 1, 0, 0]
 
-/-- T5: `symmetryTransportMPS (-1) û₂ A = (Ã⁺, Ã⁰, Ã⁻) = ((A⁻)^*, −(A⁰)^*, (A⁺)^*)`, the printed
-eq. (8.3.33), for a symbolic `S = 1` MPS family `A`. -/
+/-- T5: the printed eq. (8.3.33) `(Ã⁺, Ã⁰, Ã⁻) = ((A⁻)^*, −(A⁰)^*, (A⁺)^*)`, for a symbolic
+`S = 1` MPS family `A`.  The book lists the triple in the order `(+, 0, −)` whereas the `Fin 3`
+index of an `MPSMatrices D 2` runs in the order `(σ = −1, 0, +1)`, so the `![…]` below is the
+book's triple read backwards: its entry `0` is `Ã⁻ = (A⁺)^* = (A 2)^*`, its entry `1` is
+`Ã⁰ = −(A⁰)^* = −(A 1)^*`, and its entry `2` is `Ã⁺ = (A⁻)^* = (A 0)^*`. -/
 private lemma t5_symmetryTransportMPS_uT5 {D : ℕ} (A : MPSMatrices D 2) :
     symmetryTransportMPS (-1 : ℤˣ) uT5 A =
       ![(A 2).map (starRingEnd ℂ), -(A 1).map (starRingEnd ℂ), (A 0).map (starRingEnd ℂ)] := by
@@ -247,5 +254,201 @@ private lemma t5_symmetryTransportMPS_uT5 {D : ℕ} (A : MPSMatrices D 2) :
   fin_cases σ <;>
     · ext i j
       simp [uT5, signConjMatrix, signConj, Fin.sum_univ_three, RingHom.mapMatrix_apply]
+
+/-! ## T6: the antiunitary branch of the capstone at bond dimension `D = 2` -/
+
+/-- T6: `û₂` of eq. (8.3.33) is unitary, hence a legal mixing matrix for the capstone. -/
+private lemma t6_uT5_mem_unitaryGroup : uT5 ∈ Matrix.unitaryGroup (Fin 3) ℂ := by
+  rw [Matrix.mem_unitaryGroup_iff]
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [uT5, Matrix.star_eq_conjTranspose, Matrix.conjTranspose_apply, Matrix.mul_apply,
+      Fin.sum_univ_three]
+
+/-- A spin-`S = 1` MPS family of bond dimension `D = 2`: the three Pauli matrices.  It is
+normalized with `λ = 3`, its length-2 ordered products already span all `2 × 2` matrices, and its
+transfer matrix is `2|v⟩⟨v| − 1` with the nondegenerate top eigenvalue `3` and the gapped
+eigenvalue `−1`, so every clause of `IsInjectiveMPS` is checked here with genuine content (unlike
+the `D = 1` fixture of T2, whose transfer matrix is `1 × 1`). -/
+private def fixtureP : MPSMatrices 2 2 := ![pauliX, pauliY, pauliZ]
+
+/-- `fixtureP` is normalized with `λ = 3`, since each Pauli matrix is Hermitian and squares
+to `1`. -/
+private lemma t6_isMPSNormalized : IsMPSNormalized fixtureP (3 : ℝ) := by
+  refine ⟨by norm_num, ?_⟩
+  rw [Fin.sum_univ_three]
+  change pauliX * pauliX.conjTranspose + pauliY * pauliY.conjTranspose
+      + pauliZ * pauliZ.conjTranspose = ((3 : ℝ) : ℂ) • (1 : Matrix (Fin 2) (Fin 2) ℂ)
+  rw [pauliX_isHermitian.eq, pauliY_isHermitian.eq, pauliZ_isHermitian.eq, pauliX_mul_self,
+    pauliY_mul_self, pauliZ_mul_self]
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp <;> norm_num
+
+/-- Any submodule of `2 × 2` matrices containing every product of two matrices of `fixtureP` is
+everything, since those products exhaust the Pauli basis `1, σ^x, σ^y, σ^z` up to phases. -/
+private lemma t6_eq_top_of_products_mem (W : Submodule ℂ (Matrix (Fin 2) (Fin 2) ℂ))
+    (hW : ∀ σ τ : Fin 3, fixtureP σ * fixtureP τ ∈ W) : W = ⊤ := by
+  have hone : (1 : Matrix (Fin 2) (Fin 2) ℂ) ∈ W := by
+    have h : pauliX * pauliX ∈ W := hW 0 0
+    rwa [pauliX_mul_self] at h
+  have hZ : pauliZ ∈ W := by
+    have h : pauliX * pauliY ∈ W := hW 0 1
+    rw [pauliX_mul_pauliY] at h
+    have h2 := W.smul_mem (-Complex.I) h
+    rwa [smul_smul, neg_mul, Complex.I_mul_I, neg_neg, one_smul] at h2
+  have hY : pauliY ∈ W := by
+    have h : pauliZ * pauliX ∈ W := hW 2 0
+    rw [pauliZ_mul_pauliX] at h
+    have h2 := W.smul_mem (-Complex.I) h
+    rwa [smul_smul, neg_mul, Complex.I_mul_I, neg_neg, one_smul] at h2
+  have hX : pauliX ∈ W := by
+    have h : pauliY * pauliZ ∈ W := hW 1 2
+    rw [pauliY_mul_pauliZ] at h
+    have h2 := W.smul_mem (-Complex.I) h
+    rwa [smul_smul, neg_mul, Complex.I_mul_I, neg_neg, one_smul] at h2
+  refine Submodule.eq_top_iff'.mpr fun M => ?_
+  have hM : M = ((M 0 0 + M 1 1) / 2) • (1 : Matrix (Fin 2) (Fin 2) ℂ)
+      + ((M 0 1 + M 1 0) / 2) • pauliX + (Complex.I * (M 0 1 - M 1 0) / 2) • pauliY
+      + ((M 0 0 - M 1 1) / 2) • pauliZ := by
+    ext i j
+    fin_cases i <;> fin_cases j <;>
+      simp [pauliX, pauliY, pauliZ] <;> ring_nf <;> rw [Complex.I_sq] <;> ring
+  rw [hM]
+  exact W.add_mem (W.add_mem (W.add_mem (W.smul_mem _ hone) (W.smul_mem _ hX))
+    (W.smul_mem _ hY)) (W.smul_mem _ hZ)
+
+/-- Theorem 7.5(i) for `fixtureP` at `ℓ = 2`: the products `σ^α σ^β` span all `2 × 2` matrices
+(length `1` cannot span, since three matrices cannot span a four-dimensional space). -/
+private lemma t6_mpsProductsSpanAt_two : mpsProductsSpanAt fixtureP 2 :=
+  t6_eq_top_of_products_mem _ fun σ τ => Submodule.subset_span
+    ⟨[σ, τ], rfl, by rw [show orderedProd fixtureP [σ, τ] = fixtureP σ * (fixtureP τ * 1) from rfl,
+      mul_one]⟩
+
+/-- The diagonal indicator vector `v_{(a,b)} = δ_{ab}` of the doubled index, the top transfer
+eigenvector of `fixtureP`. -/
+private def t6v : Fin 2 × Fin 2 → ℂ := fun p => if p.1 = p.2 then 1 else 0
+
+/-- `v` is nonzero. -/
+private lemma t6v_ne_zero : t6v ≠ 0 := by
+  intro h
+  have h00 := congrFun h (0, 0)
+  simp [t6v] at h00
+
+/-- The transfer matrix of `fixtureP` is `T = 2|v⟩⟨v| − 1`, the Pauli completeness relation
+`Σ_α (σ^α)^*_{ab} (σ^α)_{cd} = 2 δ_{bd} δ_{ac} − δ_{ab} δ_{cd}`. -/
+private lemma t6_mpsTransferMatrix_apply (p q : Fin 2 × Fin 2) :
+    mpsTransferMatrix fixtureP p q =
+      2 * t6v p * t6v q - (1 : Matrix (Fin 2 × Fin 2) (Fin 2 × Fin 2) ℂ) p q := by
+  obtain ⟨p1, p2⟩ := p
+  obtain ⟨q1, q2⟩ := q
+  fin_cases p1 <;> fin_cases p2 <;> fin_cases q1 <;> fin_cases q2 <;>
+    simp [mpsTransferMatrix, fixtureP, t6v, pauliX, pauliY, pauliZ, Fin.sum_univ_three] <;>
+    norm_num
+
+/-- The transfer matrix of `fixtureP` acts by `(T x)_p = 2 v_p (x_{00} + x_{11}) − x_p`. -/
+private lemma t6_mulVec_apply (x : Fin 2 × Fin 2 → ℂ) (p : Fin 2 × Fin 2) :
+    (mpsTransferMatrix fixtureP).mulVec x p = 2 * t6v p * (x (0, 0) + x (1, 1)) - x p := by
+  obtain ⟨p1, p2⟩ := p
+  fin_cases p1 <;> fin_cases p2 <;>
+    simp [Matrix.mulVec, dotProduct, Fintype.sum_prod_type, Fin.sum_univ_two,
+      t6_mpsTransferMatrix_apply, t6v, Matrix.one_apply] <;> ring
+
+/-- `v` is an eigenvector of the transfer matrix for the normalization eigenvalue `λ = 3`. -/
+private lemma t6_mulVec_t6v :
+    (mpsTransferMatrix fixtureP).mulVec t6v = ((3 : ℝ) : ℂ) • t6v := by
+  funext p
+  rw [t6_mulVec_apply]
+  obtain ⟨p1, p2⟩ := p
+  fin_cases p1 <;> fin_cases p2 <;> simp [t6v] <;> norm_num
+
+/-- For a complex matrix, membership in the spectrum is exactly the existence of an
+eigenvector. -/
+private lemma t6_mem_spectrum_iff {n : Type} [Fintype n] [DecidableEq n]
+    (M : Matrix n n ℂ) (μ : ℂ) :
+    μ ∈ spectrum ℂ M ↔ ∃ x : n → ℂ, x ≠ 0 ∧ M.mulVec x = μ • x := by
+  rw [spectrum.mem_iff, Matrix.isUnit_iff_isUnit_det, isUnit_iff_ne_zero, not_ne_iff,
+    ← Matrix.exists_mulVec_eq_zero_iff]
+  refine exists_congr fun x => and_congr_right fun _ => ?_
+  rw [Algebra.algebraMap_eq_smul_one, Matrix.sub_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec,
+    sub_eq_zero, eq_comm]
+
+/-- The transfer spectrum of `fixtureP` is `{3, −1}`: an eigenvector either has a nonzero diagonal
+sum, forcing `μ = 3`, or has a vanishing one, forcing `μ = −1`. -/
+private lemma t6_spectrum_mem (μ : ℂ) (hμ : μ ∈ spectrum ℂ (mpsTransferMatrix fixtureP)) :
+    μ = 3 ∨ μ = -1 := by
+  obtain ⟨x, hx0, hx⟩ := (t6_mem_spectrum_iff _ _).mp hμ
+  by_cases hS : x (0, 0) + x (1, 1) = 0
+  · right
+    obtain ⟨p, hp⟩ : ∃ p, x p ≠ 0 := by
+      by_contra hcon
+      push Not at hcon
+      exact hx0 (funext hcon)
+    have hpe := congrFun hx p
+    rw [t6_mulVec_apply, hS] at hpe
+    simp only [Pi.smul_apply, smul_eq_mul, mul_zero, zero_sub] at hpe
+    have hfac : (μ + 1) * x p = 0 := by linear_combination -hpe
+    rcases mul_eq_zero.mp hfac with h | h
+    · linear_combination h
+    · exact absurd h hp
+  · left
+    have h00 := congrFun hx (0, 0)
+    have h11 := congrFun hx (1, 1)
+    rw [t6_mulVec_apply] at h00 h11
+    simp only [t6v, Pi.smul_apply, smul_eq_mul, reduceIte] at h00 h11
+    have hkey : (μ - 3) * (x (0, 0) + x (1, 1)) = 0 := by linear_combination -h00 - h11
+    rcases mul_eq_zero.mp hkey with h | h
+    · linear_combination h
+    · exact absurd h hS
+
+/-- Theorem 7.5(iii) for `fixtureP`: `λ = 3` is a simple transfer eigenvalue and the rest of the
+spectrum sits at `−1`, strictly inside the disc of radius `3`. -/
+private lemma t6_hasPrimitiveTransferSpectrum :
+    HasPrimitiveTransferSpectrum fixtureP (3 : ℝ) := by
+  refine ⟨(t6_mem_spectrum_iff _ _).mpr ⟨t6v, t6v_ne_zero, t6_mulVec_t6v⟩, ?_, ?_⟩
+  · have hker : LinearMap.ker ((mpsTransferMatrix fixtureP).mulVecLin
+        - ((3 : ℝ) : ℂ) • LinearMap.id) = Submodule.span ℂ {t6v} := by
+      refine le_antisymm (fun x hx => ?_) ?_
+      · rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_coe, id_eq,
+          Matrix.mulVecLin_apply, sub_eq_zero] at hx
+        rw [Submodule.mem_span_singleton]
+        refine ⟨(x (0, 0) + x (1, 1)) / 2, funext fun p => ?_⟩
+        have hp := congrFun hx p
+        rw [t6_mulVec_apply] at hp
+        simp only [Pi.smul_apply, smul_eq_mul, Complex.ofReal_ofNat] at hp ⊢
+        linear_combination hp / 4
+      · rw [Submodule.span_le, Set.singleton_subset_iff, SetLike.mem_coe, LinearMap.mem_ker,
+          LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_coe, id_eq,
+          Matrix.mulVecLin_apply, sub_eq_zero]
+        exact t6_mulVec_t6v
+    rw [hker, finrank_span_singleton t6v_ne_zero]
+  · intro μ hμ hne
+    rcases t6_spectrum_mem μ hμ with h | h
+    · exact absurd (by rw [h]; norm_num) hne
+    · rw [h]
+      norm_num
+
+/-- `fixtureP` is injective in the sense of Tasaki Theorem 7.5, with `λ = 3`. -/
+private lemma t6_isInjectiveMPS : IsInjectiveMPS fixtureP (3 : ℝ) :=
+  ⟨t6_isMPSNormalized, ⟨2, t6_mpsProductsSpanAt_two⟩,
+    (mps_spans_eventually_iff_spans_for_all_large fixtureP 3 t6_isMPSNormalized).mp
+      ⟨2, t6_mpsProductsSpanAt_two⟩,
+    t6_hasPrimitiveTransferSpectrum⟩
+
+/-- T6: the capstone on the antiunitary branch `ε = -1` at bond dimension `D = 2`, at the book's
+time-reversal mixing matrix `û₂` of eq. (8.3.33).  Unlike T2 this exercises the entrywise
+conjugation on the transfer matrix, its spectrum and its `λ`-eigenspace with a nondegenerate,
+genuinely gapped spectrum. -/
+private lemma t6_isInjectiveMPS_symmetryTransportMPS :
+    IsInjectiveMPS (symmetryTransportMPS (-1 : ℤˣ) uT5 fixtureP) (3 : ℝ) :=
+  isInjectiveMPS_symmetryTransportMPS t6_uT5_mem_unitaryGroup t6_isInjectiveMPS
+
+/-- T6: the transported family is the visible `σ^x ↔ σ^z` swap `![σ^z, σ^y, σ^x]`, so the capstone
+above is not applied to a fixed point of the transport. -/
+private lemma t6_symmetryTransportMPS_fixtureP :
+    symmetryTransportMPS (-1 : ℤˣ) uT5 fixtureP = ![pauliZ, pauliY, pauliX] := by
+  rw [t5_symmetryTransportMPS_uT5]
+  funext σ
+  fin_cases σ <;> ext i j <;> fin_cases i <;> fin_cases j <;>
+    simp [fixtureP, pauliX, pauliY, pauliZ]
 
 end LatticeSystem.Tests
