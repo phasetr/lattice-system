@@ -6,42 +6,37 @@ import LatticeSystem.Math.ProjectiveRepresentation
 import LatticeSystem.Quantum.Pauli
 
 /-!
-# Tests (RED): §8.3.5 Theorem 8.7 cocycle chase and seven-axiom retirement (#5306 PR-4)
+# Tests: §8.3.5 Theorem 8.7 cocycle chase and Corollary 8.5
 
-Behavioural tests for the PR-4 declarations of the design report
-`.self-local/reports/design-5306-pr4-cocycle-chase.md` §2, none of which exist yet in the
-production tree at the time this file is written: `SPTMatrixProductIndex.lean` still carries its
-seven axioms (`IsProjectiveRep`, `IsTrivialProjectiveRep`, `SymmetricInjectiveMPSExists`,
-`tasaki_theorem_8_7`, `z2z2SpinCocycle`, `z2z2Spin_isProjectiveRep`,
-`z2z2Spin_nontrivial_of_odd`), so every lemma below fails to elaborate (unknown identifier /
-wrong arity) until PR-4 lands. This is the intended Red state.
+Behavioural tests for the layer that proves Tasaki Theorem 8.7 and Corollary 8.5: the signatures
+of the transport algebra and of the chase are pinned here, and each capstone is exercised on a
+concrete instance so that no statement can be satisfied vacuously.
 
-* **T1** `LatticeSystem.Math.signConjMatrix_signConjMatrix_mul` (§2.1): the two-sign
-  generalisation of `signConjMatrix_signConjMatrix`, locked at its exact signature and checked
-  concretely on a genuinely complex `1×1` matrix (double antiunitary twist cancels).
-* **T2** `mpsMix_smul` (§2.2): mixing by a rescaled matrix rescales the mixed family, locked at
-  its exact signature and checked concretely on the Pauli matrix `σ^x`.
-* **T3** the *generalised* `symmetryTransportMPS_symmetryTransportMPS` (§2.2, two independent
-  signs `ε`, `δ`): the current production lemma only accepts a single shared sign, so calling it
-  with two signs is a genuine arity/signature change, not just a missing name.
-* **T4** `symmetryTransportMPS_conj` (§2.2): transport of a phased conjugate family, locked at its
-  exact signature and checked concretely at the trivial sign/mixing (`ε = 1`, `u = 1`).
-* **T5** `pos_of_isInjectiveMPS` (§2.3, `MPSTheorem75Defs.lean`): an injective MPS family forces a
-  positive bond dimension; locked generically and instantiated non-vacuously on a genuine bond-`1`
-  witness (`unitA` below).
-* **T6** `eq_one_of_unitary_conj_smul` (§2.4, footnote 52's `c = 1`): locked at its exact
-  signature (the crux of PR-4's shorter route via Theorem 7.5(ii)).
-* **T7** `symmetryTransportMPS_mul_of_isProjectiveRep` (§2.4, the composition law, §0 step 1 of
-  the design report): locked at its exact signature.
-* **T8** `isPhaseCoboundary_of_invariantInjectiveMPS` (§2.4, the cocycle chase itself): locked at
-  its exact signature.
-* **T9** the capstone: `SymmetricInjectiveMPSExists` (as a *definition*, §1) is non-vacuously
-  satisfiable, and `tasaki_theorem_8_7` (as a *proved theorem*, no longer an axiom) discharges it
-  to `Math.IsTrivialProjectiveRep`, on the trivial one-dimensional witness (`N = 0`, `D = 1`,
-  `u ≡ 1`, `s ≡ 1`, `φ ≡ 1`) — the design report's non-vacuity requirement (§5, item 3).
+* **T1** `LatticeSystem.Math.signConjMatrix_signConjMatrix_mul`: the two-sign generalisation of
+  `signConjMatrix_signConjMatrix`, checked concretely on a genuinely complex `1×1` matrix (a
+  double antiunitary twist cancels).
+* **T2** `mpsMix_smul`: mixing by a rescaled matrix rescales the mixed family, checked concretely
+  on the Pauli matrix `σ^x`.
+* **T3** `symmetryTransportMPS_symmetryTransportMPS` with two independent signs `ε`, `δ`, plus the
+  degenerate single-sign instance.
+* **T4** `symmetryTransportMPS_conj`: transport of a phased conjugate family, checked concretely
+  at the trivial sign/mixing (`ε = 1`, `u = 1`).
+* **T5** `pos_of_isInjectiveMPS`: an injective MPS family forces a positive bond dimension,
+  instantiated on a genuine bond-`1` witness (`unitA` below).
+* **T6** `eq_one_of_unitary_conj_smul`: footnote 52's `c = 1`, the crux of the shorter route via
+  Theorem 7.5(ii).
+* **T7** `symmetryTransportMPS_mul_of_isProjectiveRep`: the composition law replacing
+  (8.3.51)–(8.3.52).
+* **T8** `isPhaseCoboundary_of_invariantInjectiveMPS`: the cocycle chase itself.
+* **T9** Theorem 8.7: `SymmetricInjectiveMPSExists` is non-vacuously satisfiable, and
+  `tasaki_theorem_8_7` discharges it to `Math.IsTrivialProjectiveRep`, on the trivial
+  one-dimensional witness (`N = 0`, `D = 1`, `u ≡ 1`, `s ≡ 1`, `φ ≡ 1`).
+* **T10** Corollary 8.5: at `S = 1/2` the closed forms of `û₁`, `û₃` are the textbook `iσ^x`,
+  `iσ^z`, they anticommute, and `tasaki_corollary_8_5` applies.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §8.3.5, Theorem 8.7, eqs. (8.3.40)-(8.3.54), footnote 52, pp. 276-280.
+2020), §2.1, eqs. (2.1.29)-(2.1.31), pp. 18-19; §8.3.5, Theorem 8.7 and Corollary 8.5,
+eqs. (8.3.40)-(8.3.54), footnote 52, pp. 276-280.
 Refs #5306, #4718.
 -/
 
@@ -304,5 +299,36 @@ private lemma t9b_tasaki_theorem_8_7_nonvacuous :
     LatticeSystem.Math.IsTrivialProjectiveRep uTrivial
       (1 : Multiplicative (ZMod 2) →* ℤˣ) :=
   tasaki_theorem_8_7 uTrivial_isProjectiveRep t9a_symmetricInjectiveMPSExists_nonvacuous
+
+/-! ## T10: the closed-form `π` rotations and Corollary 8.5 -/
+
+/-- T10a: at `S = 1/2` (`N = 1`) the closed form of `û₁ = exp(iπŜ^{(1)}) = exp(iπσ^x/2)` is
+`iσ^x`, the textbook value — a concrete check that the `i^{2S}` normalisation of
+`spinSPiRotation1` is the right one. -/
+private lemma t10a_spinSPiRotation1_spin_half :
+    spinSPiRotation1 1 = Complex.I • pauliX := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [spinSPiRotation1, spinSFlip, pauliX, Fin.rev]
+
+/-- T10b: at `S = 1/2` the closed form of `û₃ = exp(iπŜ^{(3)}) = exp(iπσ^z/2)` is `iσ^z`. -/
+private lemma t10b_spinSPiRotation3_spin_half :
+    spinSPiRotation3 1 = Complex.I • pauliZ := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [spinSPiRotation3, spinSAlternating, pauliZ, Matrix.diagonal]
+
+/-- T10c: the `π` rotations genuinely anticommute at `S = 1/2`, so the `Z₂ × Z₂` hypothesis of
+Corollary 8.5 is not vacuous. -/
+private lemma t10c_spin_half_anticommute :
+    spinSPiRotation3 1 * spinSPiRotation1 1 = -(spinSPiRotation1 1 * spinSPiRotation3 1) :=
+  spinSPiRotation3_mul_spinSPiRotation1_of_odd odd_one
+
+/-- T10d: the capstone `tasaki_corollary_8_5`, now an unconditional theorem, applies at `S = 1/2`:
+no `Z₂ × Z₂`-invariant injective matrix product state of spin-`1/2` chains exists. -/
+private lemma t10d_tasaki_corollary_8_5_spin_half :
+    ¬ SymmetricInjectiveMPSExists (z2z2SpinRep 1)
+      (1 : Multiplicative (ZMod 2 × ZMod 2) →* ℤˣ) :=
+  tasaki_corollary_8_5 1 odd_one
 
 end LatticeSystem.Tests

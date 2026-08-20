@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.MPSInvarianceGauge
+import LatticeSystem.Quantum.SpinS.SpinSPiRotation
 
 /-!
 # Tasaki §8.3.4–§8.3.5: the matrix-product SPT index (Theorem 8.7)
@@ -15,6 +16,12 @@ that equivalence live in `LatticeSystem.Math.ProjectiveRepresentation`.
 **Theorem 8.7** (Tachikawa, p. 278): if an injective matrix product state is invariant up to a phase
 under the symmetry, `V̂(g)|Φ_L⟩ = e^{iη_L(g)}|Φ_L⟩` for all `g` and all `L`, then the on-site
 projective representation is trivial.
+
+**Corollary 8.5** (p. 276): for half-odd-integer spin the `Z₂ × Z₂` representation by the `π`
+rotations `{1̂, û₁, û₂, û₃}` is nontrivial (eq. (2.1.31)), so no `Z₂ × Z₂`-invariant injective
+matrix product state exists — the matrix-product form of the Lieb–Schultz–Mattis no-go.  The
+closed-form rotations live in `LatticeSystem.Quantum.SpinSPiRotation` and the generic `Z₂ × Z₂`
+package in `LatticeSystem.Math.ProjectiveRepresentation`.
 
 ## The route taken here
 
@@ -51,7 +58,8 @@ namespace LatticeSystem.Quantum
 
 open Matrix
 open LatticeSystem.Math (IsProjectiveRep IsTrivialProjectiveRep IsPhaseCoboundary signConjMatrix
-  signConjMatrix_mem_unitaryGroup isTrivialProjectiveRep_iff_isPhaseCoboundary)
+  signConjMatrix_mem_unitaryGroup isTrivialProjectiveRep_iff_isPhaseCoboundary anticommPairRep
+  exists_isProjectiveRep_anticommPairRep not_isTrivialProjectiveRep_anticommPairRep)
 
 variable {D N : ℕ}
 
@@ -254,5 +262,31 @@ theorem tasaki_theorem_8_7 {G : Type*} [Group G] {N : ℕ}
   rintro ⟨D, A, lam, hA, hinv⟩
   exact (isTrivialProjectiveRep_iff_isPhaseCoboundary hrep).mpr
     (isPhaseCoboundary_of_invariantInjectiveMPS hrep hA hinv)
+
+/-! ## Corollary 8.5: no `Z₂ × Z₂`-symmetric injective MPS at half-odd-integer spin -/
+
+/-- **The on-site `Z₂ × Z₂` projective representation of eq. (2.1.29)** for spin `S = N/2`: the
+group acts by the `π` rotations `û₁` and `û₃` and by their product, a multiple of `û₂`. -/
+noncomputable def z2z2SpinRep (N : ℕ) :
+    Multiplicative (ZMod 2 × ZMod 2) → Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ :=
+  anticommPairRep (spinSPiRotation1 N) (spinSPiRotation3 N)
+
+/-- **Tasaki Corollary 8.5 (the matrix-product Lieb–Schultz–Mattis no-go), p. 276.**  For
+half-odd-integer spin (`S = N/2` with `N` odd) there is **no** `Z₂ × Z₂`-invariant injective matrix
+product state.
+
+This is the contrapositive of Theorem 8.7: a symmetric injective MPS would force the on-site
+`Z₂ × Z₂` projective representation to be trivial, whereas at odd `N` the `π` rotations anticommute
+(eq. (2.1.31)) while a trivial representation of a commutative group has commuting images. -/
+theorem tasaki_corollary_8_5 (N : ℕ) (hN : Odd N) :
+    ¬ SymmetricInjectiveMPSExists (z2z2SpinRep N)
+      (1 : Multiplicative (ZMod 2 × ZMod 2) →* ℤˣ) := by
+  obtain ⟨φ, hrep⟩ := exists_isProjectiveRep_anticommPairRep
+    (spinSPiRotation1_mem_unitaryGroup N) (spinSPiRotation3_mem_unitaryGroup N)
+    (spinSPiRotation1_mul_self_of_odd hN) (spinSPiRotation3_mul_self_of_odd hN)
+    (spinSPiRotation3_mul_spinSPiRotation1_of_odd hN)
+  exact fun hMPS => not_isTrivialProjectiveRep_anticommPairRep
+    (spinSPiRotation1_mem_unitaryGroup N) (spinSPiRotation3_mem_unitaryGroup N)
+    (spinSPiRotation3_mul_spinSPiRotation1_of_odd hN) (tasaki_theorem_8_7 hrep hMPS)
 
 end LatticeSystem.Quantum
