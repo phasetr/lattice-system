@@ -12845,20 +12845,55 @@ odd/even-$S$ SPT classification, which it states only as a belief, is not
 formalized here.  Chapters~3--10 backfill.
 
 \medskip
-\noindent\textbf{§8.3.4 Matrix-product SPT index} (Theorem 8.7 Tachikawa + Corollary 8.5; Tasaki
-§8.3.4, eqs.~(8.3.42)--(8.3.47), pp.~269--279; \texttt{Quantum/SpinS/SPTMatrixProductIndex.lean},
-Issue \#4485).  For matrix product states the entanglement index becomes a precise invariant: a
-projective representation of the symmetry $G$ on the bond space with phase function (2-cocycle)
-$\varphi:G\to G\to\mathbb{R}$ (\texttt{IsProjectiveRep}), \emph{trivial} (\texttt{IsTrivialProjectiveRep})
-iff $\varphi$ is a coboundary (eq.~8.3.43); the cohomology class is the SPT index.  The axiom
-\texttt{tasaki\_theorem\_8\_7} states that a symmetric injective MPS
-(\texttt{SymmetricInjectiveMPSExists}, $\hat V(g)|\Phi\rangle=e^{i\eta_L(g)}|\Phi\rangle$) forces the
-projective representation to be trivial.  For half-odd-integer spin ($N$ odd) the axiom
-\texttt{z2z2Spin\_nontrivial\_of\_odd} (eq.~2.1.31) records that the $\mathbb{Z}_2\times\mathbb{Z}_2$
-representation is nontrivial, and \texttt{tasaki\_corollary\_8\_5} is then \emph{proved} as the
-contrapositive: for odd $N$ there is no $\mathbb{Z}_2\times\mathbb{Z}_2$-invariant injective MPS --- the
-matrix-product Lieb--Schultz--Mattis no-go.  Markers for the cocycle/coboundary cohomology and the MPS
-construction; Theorem 8.7 and the nontriviality are documented axioms, Corollary 8.5 a proved theorem.
+\noindent\textbf{§8.3.4--§8.3.5 Matrix-product SPT index} (Theorem 8.7 Tachikawa + Corollary 8.5;
+Tasaki §8.3.4--§8.3.5, eqs.~(8.3.40)--(8.3.54), footnotes~50--52, pp.~276--280;
+\texttt{Quantum/SpinS/SPTMatrixProductIndex.lean}, \texttt{Quantum/SpinS/SpinSPiRotation.lean},
+Issue \#5306, PR \#5310).  For matrix product states the entanglement index becomes a precise
+invariant.  A protecting symmetry $G$ acts on the \emph{single-spin} space
+$h_0\cong\mathbb{C}^{2S+1}$ (p.~277 --- \emph{not} on the bond space) by a projective
+representation $\hat u(g)\,C_g[\hat u(h)]=e^{i\tilde\varphi(g,h)}\hat u(gh)$
+(\texttt{Math.IsProjectiveRep}), \emph{trivial} iff $\tilde\varphi$ is a coboundary
+(eq.~(8.3.43)); the cohomology class is the SPT index.  \texttt{SymmetricInjectiveMPSExists}
+$u\,s$ is a real definition of the hypothesis (8.3.45): an injective matrix product state whose
+symmetry-transported family agrees with it up to a length-dependent phase, for every $g$.
+
+\texttt{tasaki\_theorem\_8\_7} is \textbf{proved} axiom-free.  The book inverts the gauge relation
+(8.3.48) into (8.3.50) and substitutes that relation into itself, which forces the antilinear
+operators $\hat V(g)=\hat u(g)\hat K$ and the convention of Appendix A.4.3.  This repository runs
+the same chase \emph{forwards} instead, entirely inside the matrix algebra: the transport composes,
+$R_g\circ R_h=e^{i\tilde\varphi(g,h)}R_{gh}$
+(\texttt{symmetryTransportMPS\_mul\_of\_isProjectiveRep}, replacing (8.3.51)--(8.3.52)), and it
+moves through a phased gauge conjugation (\texttt{symmetryTransportMPS\_conj}), so applying it to
+(8.3.48) twice and comparing with (8.3.48) at $gh$ yields footnote~52's $W^\dagger A^\sigma
+W=c\,A^\sigma$ with $W=\hat U(g)\,C_g[\hat U(h)]\,\hat U^\dagger(gh)$ --- and yields it
+\emph{for each $\sigma$}, whereas the book compares two sums over $\sigma'$ and reads off equality
+of the summands, a step that would additionally need the mixing matrix
+$\langle\psi^\sigma|\hat v^\dagger(gh)|\psi^{\sigma'}\rangle$ to be invertible.  Footnote~52 then
+gets $c=1$ from Theorem~7.5(i) together with the centrality of $W$;
+\texttt{eq\_one\_of\_unitary\_conj\_smul} uses Theorem~7.5(\emph{ii}) instead, so that
+$\hat 1=c^{\ell}\hat 1$ holds at two consecutive lengths and $c=1$ follows with no centrality
+argument at all.  The resulting relation
+$\tilde\varphi(g,h)=\zeta(g)+s(g)\zeta(h)-\zeta(gh)$ is eq.~(8.3.54), i.e.\ literally
+\texttt{IsPhaseCoboundary}, so the definition-layer equivalence below closes the theorem.  Two
+further deviations are deliberate and harmless: the group is an arbitrary group rather than the
+book's finite $G$ (finiteness is never used), and the invariance hypothesis is recorded on the
+periodic trace coefficients rather than as an operator identity on $\bigotimes_x h_x$ --- the
+convention of the entire MPS layer.
+
+\texttt{tasaki\_corollary\_8\_5} is likewise \textbf{proved} axiom-free, and unconditionally: for
+half-odd-integer spin ($S=N/2$ with $N$ odd) there is no
+$\mathbb{Z}_2\times\mathbb{Z}_2$-invariant injective matrix product state --- the matrix-product
+Lieb--Schultz--Mattis no-go.  Its concrete input is the pair of $\pi$ rotations of eq.~(2.1.29),
+$\hat u_1=\exp(i\pi\hat S^{(1)})=i^{2S}F$ with $F$ the basis reversal
+$|S,m\rangle\mapsto|S,-m\rangle$, and $\hat u_3=\exp(i\pi\hat S^{(3)})=i^{2S}\,\mathrm{diag}
+((-1)^k)$, both written in closed form as for $S=1$ in
+\texttt{Quantum/SpinS/SpinOneHalfTurn.lean} and with no Lean bridge to \texttt{NormedSpace.exp};
+both are unitary, both square to $(-1)^{2S}$, and they anticommute exactly when $N$ is odd
+(eq.~(2.1.31)).  Nontriviality is then generic: a genuine representation of a commutative group has
+commuting images, and rescaling each image by a phase cannot repair that.  The six former markers
+(\texttt{IsProjectiveRep}, \texttt{IsTrivialProjectiveRep}, \texttt{z2z2SpinCocycle},
+\texttt{z2z2Spin\_isProjectiveRep}, \texttt{z2z2Spin\_nontrivial\_of\_odd} and
+\texttt{Z2xZ2Spin}) are \textbf{deleted}: none of them asserted anything checkable.
 Chapters~3--10 backfill.
 
 \medskip
@@ -12871,8 +12906,11 @@ entrywise-conjugation twist \texttt{signConjMatrix} encodes the antiunitary case
 $u=\psi\cdot v$) is proved \emph{equivalent} to \texttt{IsPhaseCoboundary}~$s\,\varphi$ (eq.~8.3.43:
 $\varphi(g,h)=\psi(g)\,\psi(h)^{s(g)}\,\psi(gh)^{-1}$), given \texttt{IsProjectiveRep}~$u\,s\,\varphi$ and a
 nonempty bond space --- \texttt{isTrivialProjectiveRep\_iff\_isPhaseCoboundary}, axiom-free.  This is the
-definition layer only: \texttt{tasaki\_theorem\_8\_7} above remains a documented axiom until the MPS-transport
-and cocycle-chase arguments (later PRs of Issue \#5306) discharge it.
+definition layer of the paragraph above: \texttt{IsPhaseCoboundary} is the exact target of the forward
+cocycle chase, and this equivalence is the last step of \texttt{tasaki\_theorem\_8\_7}.  The same file
+carries the generic $\mathbb{Z}_2\times\mathbb{Z}_2$ package (\texttt{anticommPairRep}): two
+anticommuting unitaries squaring to $-\hat 1$ generate a projective representation, and that
+representation is not trivial --- the input to \texttt{tasaki\_corollary\_8\_5}.
 
 \medskip
 \noindent\textbf{§8.3.4--§8.3.5 Injectivity of the symmetry-transported MPS} (Tasaki §8.3.4,
@@ -12889,9 +12927,10 @@ conditions of Theorem~7.5 transport because a second transport, by the adjoint o
 mixing matrix $C_g[u]$ (again unitary), inverts the first one.  Hence
 \texttt{isInjectiveMPS\_symmetryTransportMPS}: injectivity passes to $\tilde A_g$, axiom-free.  This is
 the assertion Tasaki makes three times --- p.~265, p.~273 for the $S=1$ time reversal (8.3.33), and
-p.~279 for general $g$ --- and never proves.  The seven §8.3.4 axioms above are untouched;
-\texttt{tasaki\_theorem\_8\_7} additionally needs the invariance and cocycle-chase arguments of the
-later PRs of Issue \#5306.
+p.~279 for general $g$ --- and never proves.  The transport also composes for two independent signs
+(\texttt{symmetryTransportMPS\_symmetryTransportMPS}) and moves through a phased gauge conjugation
+(\texttt{symmetryTransportMPS\_conj}); those two identities are the algebra on which the forward
+cocycle chase of \texttt{tasaki\_theorem\_8\_7} runs.
 
 \medskip
 \noindent\textbf{§8.3.4--§8.3.5 Invariance implies the gauge relation (8.3.48)} (Tasaki §8.3.4,
@@ -12920,9 +12959,9 @@ for any $L$'' is false as printed, because at a length whose coefficients all va
 for a family of traceless matrices, e.g.\ the spin-$1$ Pauli family --- the hypothesis reads
 $0=e^{i\eta_L}\cdot 0$ and constrains $\eta_L$ not at all.  Only the long lengths are needed:
 (8.3.49)--(8.3.54) use (8.3.48) alone.  The result, \texttt{exists\_unitary\_gauge\_of\_invariance},
-is stated for a single symmetry element (its sign $\varepsilon=s(g)$ and unitary $u=\hat u(g)$); the
-seven §8.3.4 axioms above remain untouched, since \texttt{tasaki\_theorem\_8\_7} still needs the
-cocycle chase of (8.3.49)--(8.3.54).
+is stated for a single symmetry element (its sign $\varepsilon=s(g)$ and unitary $u=\hat u(g)$), and
+is the sole entry point of the forward cocycle chase of (8.3.49)--(8.3.54) that proves
+\texttt{tasaki\_theorem\_8\_7}.
 
 \medskip
 \noindent\textbf{§8.3.5 Discrete-symmetry Lieb--Schultz--Mattis theorem} (Theorem 8.6, Ogata--Tasaki;

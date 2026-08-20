@@ -581,6 +581,42 @@ def approved_changes(text: str) -> str:
             "`exists_word_transport_algEquiv` now takes only the threshold hypothesis "
             "(agreement for all sufficiently large lengths), fixed-length word transport gives",
         )
+        .replace(
+            "| `IsTrivialProjectiveRep` / `tasaki_theorem_8_7` / `tasaki_corollary_8_5` | **§8.3.4 "
+            "Matrix-product SPT index** (Theorem 8.7 Tachikawa + Corollary 8.5; eqs. "
+            "(8.3.42)–(8.3.47)): the precise MPS invariant. A protecting symmetry `G` acts on the "
+            "bond space by a projective representation with phase function (2-cocycle) `φ : G→G→ℝ` "
+            "(`IsProjectiveRep` marker); it is **trivial** (`IsTrivialProjectiveRep` marker) iff `φ` "
+            "is a coboundary (eq. 8.3.43) — the cohomology class is the SPT index. "
+            "`SymmetricInjectiveMPSExists G φ` (marker): an injective MPS invariant up to phase under "
+            "`V̂(g)`. `tasaki_theorem_8_7` (**AXIOM**): symmetric injective MPS ⟹ trivial projective "
+            "rep. For half-odd-integer spin (`N` odd), `z2z2Spin_nontrivial_of_odd` (**AXIOM**, eq. "
+            "2.1.31): the Z₂×Z₂ rep is nontrivial. `tasaki_corollary_8_5` (**PROVED**, contrapositive "
+            "of Thm 8.7): for `N` odd there is **no** Z₂×Z₂-invariant injective MPS — the "
+            "matrix-product Lieb–Schultz–Mattis no-go | `Quantum/SpinS/SPTMatrixProductIndex.lean` |",
+            "| `IsTrivialProjectiveRep` / `tasaki_theorem_8_7` / `tasaki_corollary_8_5` | "
+            "**§8.3.4–§8.3.5 Matrix-product SPT index** (Theorem 8.7 Tachikawa + Corollary 8.5; "
+            "**both PROVED**, `#print axioms` = std3, Issue #5306 PR-4, PR #5310; eqs. "
+            "(8.3.40)–(8.3.54), footnotes 50–52, pp. 276–280): the precise MPS invariant. A "
+            "protecting symmetry `G` acts on the **single-spin** space (p. 277, not the bond space) "
+            "by a projective representation `u` with sign character `s : G →* ℤˣ` and `Circle`-valued "
+            "phase `φ` (`Math.IsProjectiveRep`, PR-1); it is **trivial** "
+            "(`Math.IsTrivialProjectiveRep`) iff `φ` is a coboundary (eq. (8.3.43)) — the cohomology "
+            "class is the SPT index. `SymmetricInjectiveMPSExists u s` is now a real **`def`** (eq. "
+            "(8.3.45)): an injective MPS whose symmetry-transported family agrees with it up to a "
+            "phase, for every `g`. `tasaki_theorem_8_7`: symmetric injective MPS ⟹ trivial projective "
+            "rep, proved by running the cocycle chase (8.3.49)–(8.3.54) **forwards** — transport "
+            "composition law, `symmetryTransportMPS_conj` through the gauge relation (8.3.48), then "
+            "footnote 52's `W†A^σW = cA^σ` with `c = 1` from Theorem 7.5(ii) at two consecutive "
+            "lengths (no centrality argument, no antilinear operators). `tasaki_corollary_8_5 N (Odd "
+            "N)`: **no** Z₂×Z₂-invariant injective MPS at half-odd-integer spin, from the closed-form "
+            "`π` rotations `û₁`, `û₃` (`i^{2S}` times the basis reversal resp. the alternating "
+            "diagonal, eq. (2.1.29)), which anticommute for odd `N` (eq. (2.1.31)). The former "
+            "markers `IsProjectiveRep`, `IsTrivialProjectiveRep`, `z2z2SpinCocycle`, "
+            "`z2z2Spin_isProjectiveRep`, `z2z2Spin_nontrivial_of_odd` and `Z2xZ2Spin` are **deleted** "
+            "| `Quantum/SpinS/SPTMatrixProductIndex.lean`; `Quantum/SpinS/SpinSPiRotation.lean`; "
+            "`Math/ProjectiveRepresentation.lean` |",
+        )
     )
 
 
