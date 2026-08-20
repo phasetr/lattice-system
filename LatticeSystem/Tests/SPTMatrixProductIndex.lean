@@ -316,7 +316,7 @@ private lemma t10a_spinSPiRotation1_spin_half :
     spinSPiRotation1 1 = Complex.I • pauliX := by
   ext i j
   fin_cases i <;> fin_cases j <;>
-    simp [spinSPiRotation1, spinSFlip, pauliX, Fin.rev]
+    simp [spinSPiRotation1, spinReversalS, pauliX, Fin.rev]
 
 /-- T10b: at `S = 1/2` the closed form of `û₃ = exp(iπŜ^{(3)}) = exp(iπσ^z/2)` is `iσ^z`. -/
 private lemma t10b_spinSPiRotation3_spin_half :
@@ -347,7 +347,7 @@ private lemma t11a_spinSPiRotation1_spin_one :
     spinSPiRotation1 2 = spinOneHalfTurnS 0 := by
   ext i j
   fin_cases i <;> fin_cases j <;>
-    simp [spinSPiRotation1, spinSFlip, spinOneHalfTurnS, spinOnePiRot1, Fin.rev, Complex.I_sq]
+    simp [spinSPiRotation1, spinReversalS, spinOneHalfTurnS, spinOnePiRot1, Fin.rev, Complex.I_sq]
 
 /-- T11b: at `S = 1` the closed form of `û₃` is `spinOneHalfTurnS 2 = diag(-1, 1, -1)`. -/
 private lemma t11b_spinSPiRotation3_spin_one :

@@ -1,5 +1,6 @@
 import Mathlib.Data.Complex.Basic
 import Mathlib.LinearAlgebra.UnitaryGroup
+import LatticeSystem.Quantum.SpinS.SpinSReversal
 
 /-!
 # The spin-`S` `π` rotations `û_α = exp(iπ Ŝ^{(α)})` in closed form
@@ -35,41 +36,15 @@ namespace LatticeSystem.Quantum
 
 open Matrix
 
-/-! ## The two real involutions -/
+/-! ## The two real involutions
 
-/-- The **spin-`S` flip** `|S, m⟩ ↦ |S, −m⟩`, the permutation matrix of the basis reversal
-`k ↦ N − k`. -/
-def spinSFlip (N : ℕ) : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ :=
-  Matrix.of fun i j => if i = j.rev then 1 else 0
+The basis reversal `|S, m⟩ ↦ |S, −m⟩` is the spin reversal `F` of
+`Quantum/SpinS/SpinSReversal.lean`; only the alternating diagonal is new here. -/
 
 /-- The **spin-`S` alternating diagonal** `k ↦ (−1)^k`, the phase pattern of `e^{iπ m_k}` up to the
 overall factor `i^N`. -/
 def spinSAlternating (N : ℕ) : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ :=
   Matrix.diagonal fun k => (-1 : ℂ) ^ (k : ℕ)
-
-/-- The flip is symmetric with real entries, hence self-adjoint. -/
-theorem spinSFlip_conjTranspose (N : ℕ) : (spinSFlip N).conjTranspose = spinSFlip N := by
-  ext i j
-  rcases eq_or_ne i j.rev with h | h
-  · subst h
-    simp [spinSFlip, Matrix.conjTranspose_apply, Fin.rev_rev]
-  · have h' : j ≠ i.rev := fun hji => h (by rw [hji, Fin.rev_rev])
-    simp [spinSFlip, Matrix.conjTranspose_apply, h, h']
-
-/-- The flip is an involution: reversing the basis twice is the identity. -/
-theorem spinSFlip_mul_self (N : ℕ) : spinSFlip N * spinSFlip N = 1 := by
-  ext i j
-  rw [Matrix.mul_apply, Finset.sum_eq_single (Fin.rev j)]
-  · simp [spinSFlip, Fin.rev_rev, Matrix.one_apply]
-  · intro b _ hb
-    simp [spinSFlip, hb]
-  · intro hmem
-    exact absurd (Finset.mem_univ _) hmem
-
-/-- Entrywise complex conjugation fixes the flip: all its entries are `0` or `1`. -/
-theorem spinSFlip_map_conj (N : ℕ) : (spinSFlip N).map (starRingEnd ℂ) = spinSFlip N := by
-  ext i j
-  by_cases h : i = j.rev <;> simp [spinSFlip, Matrix.map_apply, h]
 
 /-- The alternating diagonal is real, hence self-adjoint. -/
 theorem spinSAlternating_conjTranspose (N : ℕ) :
@@ -99,10 +74,10 @@ theorem spinSAlternating_map_conj (N : ℕ) :
   by_cases h : i = j <;> simp [spinSAlternating, Matrix.map_apply, h]
 
 /-- **Tasaki eq. (2.1.31) for half-odd-integer spin.**  The two involutions anticommute exactly
-when `N = 2S` is odd: the flip sends the basis index `k` to `N − k`, and `(−1)^{N−k} = −(−1)^k`
+when `N = 2S` is odd: the reversal sends the basis index `k` to `N − k`, and `(−1)^{N−k} = −(−1)^k`
 precisely for odd `N`. -/
-theorem spinSAlternating_mul_spinSFlip_of_odd {N : ℕ} (hN : Odd N) :
-    spinSAlternating N * spinSFlip N = -(spinSFlip N * spinSAlternating N) := by
+theorem spinSAlternating_mul_spinReversalS_of_odd {N : ℕ} (hN : Odd N) :
+    spinSAlternating N * spinReversalS N = -(spinReversalS N * spinSAlternating N) := by
   ext i j
   rw [spinSAlternating, Matrix.diagonal_mul, Matrix.neg_apply, Matrix.mul_diagonal]
   rcases eq_or_ne i j.rev with h | h
@@ -122,16 +97,20 @@ theorem spinSAlternating_mul_spinSFlip_of_odd {N : ℕ} (hN : Odd N) :
             rw [hsq, mul_one]
         _ = (-1 : ℂ) ^ (N - (j : ℕ)) * (-1 : ℂ) ^ (j : ℕ) * (-1 : ℂ) ^ (j : ℕ) := by ring
         _ = -((-1 : ℂ) ^ (j : ℕ)) := by rw [hsum]; ring
-    simp only [spinSFlip, Matrix.of_apply, hrev, hsign]
+    have hentry : spinReversalS N (Fin.rev j) j = 1 := by
+      simp [spinReversalS_apply, Fin.rev_rev]
+    rw [hentry, hrev, hsign]
     ring
-  · simp [spinSFlip, h]
+  · have hentry : spinReversalS N i j = 0 := by
+      rw [spinReversalS_apply, if_neg fun h' => h (Fin.rev_eq_iff.mp h'.symm)]
+    rw [hentry, mul_zero, zero_mul, neg_zero]
 
 /-! ## The `π` rotations -/
 
 /-- **The spin-`S` `π` rotation about the `1` axis**, `û₁ = exp(iπ Ŝ^{(1)})`, in the closed form
 `i^{2S}` times the basis reversal (eq. (2.1.29)). -/
 noncomputable def spinSPiRotation1 (N : ℕ) : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ :=
-  (Complex.I ^ N) • spinSFlip N
+  (Complex.I ^ N) • spinReversalS N
 
 /-- **The spin-`S` `π` rotation about the `3` axis**, `û₃ = exp(iπ Ŝ^{(3)})`, in the closed form
 `i^{2S}` times the alternating diagonal: `e^{iπ(N/2 − k)} = i^N (−1)^k` (eq. (2.1.29)). -/
@@ -161,8 +140,8 @@ private theorem smul_involution_mem_unitaryGroup {N : ℕ} (z : ℂ)
 /-- `û₁` is unitary. -/
 theorem spinSPiRotation1_mem_unitaryGroup (N : ℕ) :
     spinSPiRotation1 N ∈ Matrix.unitaryGroup (Fin (N + 1)) ℂ :=
-  smul_involution_mem_unitaryGroup _ (I_pow_mul_conj N) (spinSFlip_conjTranspose N)
-    (spinSFlip_mul_self N)
+  smul_involution_mem_unitaryGroup _ (I_pow_mul_conj N) (spinReversalS_conjTranspose N)
+    (spinReversalS_mul_self N)
 
 /-- `û₃` is unitary. -/
 theorem spinSPiRotation3_mem_unitaryGroup (N : ℕ) :
@@ -175,7 +154,7 @@ theorem spinSPiRotation3_mem_unitaryGroup (N : ℕ) :
 theorem spinSPiRotation1_mul_self_of_odd {N : ℕ} (hN : Odd N) :
     spinSPiRotation1 N * spinSPiRotation1 N = -1 := by
   rw [spinSPiRotation1, Matrix.smul_mul, Matrix.mul_smul, smul_smul, I_pow_sq,
-    spinSFlip_mul_self, hN.neg_one_pow, neg_one_smul]
+    spinReversalS_mul_self, hN.neg_one_pow, neg_one_smul]
 
 /-- **`û₃² = (−1)^{2S}`** (eq. (2.1.30)). -/
 theorem spinSPiRotation3_mul_self_of_odd {N : ℕ} (hN : Odd N) :
@@ -188,7 +167,7 @@ theorem spinSPiRotation3_mul_spinSPiRotation1_of_odd {N : ℕ} (hN : Odd N) :
     spinSPiRotation3 N * spinSPiRotation1 N =
       -(spinSPiRotation1 N * spinSPiRotation3 N) := by
   rw [spinSPiRotation1, spinSPiRotation3, Matrix.smul_mul, Matrix.mul_smul, smul_smul,
-    Matrix.smul_mul, Matrix.mul_smul, smul_smul, spinSAlternating_mul_spinSFlip_of_odd hN,
+    Matrix.smul_mul, Matrix.mul_smul, smul_smul, spinSAlternating_mul_spinReversalS_of_odd hN,
     smul_neg]
 
 /-! ## The product `û₁û₃`: the matrix part of the time reversal (p. 278) -/
@@ -197,7 +176,7 @@ theorem spinSPiRotation3_mul_spinSPiRotation1_of_odd {N : ℕ} (hN : Odd N) :
 `(−1)^{2S}`, leaving the real matrix `F·D`. -/
 theorem spinSPiRotation1_mul_spinSPiRotation3 (N : ℕ) :
     spinSPiRotation1 N * spinSPiRotation3 N =
-      ((-1 : ℂ) ^ N) • (spinSFlip N * spinSAlternating N) := by
+      ((-1 : ℂ) ^ N) • (spinReversalS N * spinSAlternating N) := by
   rw [spinSPiRotation1, spinSPiRotation3, Matrix.smul_mul, Matrix.mul_smul, smul_smul, I_pow_sq]
 
 /-- **`(û₁û₃)² = −1̂` for half-odd-integer spin**, the identity `Θ̂² = −1̂` of Tasaki p. 278 for

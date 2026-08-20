@@ -12848,6 +12848,7 @@ formalized here.  Chapters~3--10 backfill.
 \noindent\textbf{§8.3.4--§8.3.5 Matrix-product SPT index} (Theorem 8.7 Tachikawa + Corollary 8.5;
 Tasaki §8.3.4--§8.3.5, eqs.~(8.3.40)--(8.3.54), footnotes~50--52, pp.~276--280;
 \texttt{Quantum/SpinS/SPTMatrixProductIndex.lean}, \texttt{Quantum/SpinS/SpinSPiRotation.lean},
+\texttt{Quantum/SpinS/SpinSReversal.lean},
 Issue \#5306, PR \#5310).  For matrix product states the entanglement index becomes a precise
 invariant.  A protecting symmetry $G$ acts on the \emph{single-spin} space
 $h_0\cong\mathbb{C}^{2S+1}$ (p.~277 --- \emph{not} on the bond space) by a projective
@@ -12885,7 +12886,7 @@ $\mathbb{Z}_2\times\mathbb{Z}_2$ invariant \emph{or} time-reversally invariant -
 \textbf{both} halves are proved axiom-free and unconditionally, following the two instances the
 book runs through on p.~278.  The common input is the pair of $\pi$ rotations of eq.~(2.1.29),
 $\hat u_1=\exp(i\pi\hat S^{(1)})=i^{2S}F$ with $F$ the basis reversal
-$|S,m\rangle\mapsto|S,-m\rangle$, and $\hat u_3=\exp(i\pi\hat S^{(3)})=i^{2S}\,\mathrm{diag}
+$|S,m\rangle\mapsto|S,-m\rangle$ --- the \texttt{spinReversalS} of §2.5 ---, and $\hat u_3=\exp(i\pi\hat S^{(3)})=i^{2S}\,\mathrm{diag}
 ((-1)^k)$, both written in closed form as for $S=1$ in
 \texttt{Quantum/SpinS/SpinOneHalfTurn.lean} and with no Lean bridge to \texttt{NormedSpace.exp}
 (at $S=1$ they are literally \texttt{spinOneHalfTurnS 0} and \texttt{spinOneHalfTurnS 2}, and

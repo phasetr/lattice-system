@@ -319,7 +319,7 @@ private theorem spinSTimeReversal_antiunitary_square {N : ℕ} (hN : Odd N) :
   have hreal : signConjMatrix (-1 : ℤˣ) (spinSPiRotation1 N * spinSPiRotation3 N) =
       spinSPiRotation1 N * spinSPiRotation3 N := by
     rw [spinSPiRotation1_mul_spinSPiRotation3, signConjMatrix_smul, map_mul,
-      signConjMatrix_neg_one_apply, signConjMatrix_neg_one_apply, spinSFlip_map_conj,
+      signConjMatrix_neg_one_apply, signConjMatrix_neg_one_apply, spinReversalS_map_conj,
       spinSAlternating_map_conj, signConj_neg_one_apply]
     simp
   rw [hreal, spinSPiRotation1_mul_spinSPiRotation3_mul_self_of_odd hN]
