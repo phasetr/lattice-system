@@ -405,4 +405,67 @@ private lemma t5_not_isTrivialProjectiveRep :
   t5_not_isPhaseCoboundary
     ((isTrivialProjectiveRep_iff_isPhaseCoboundary uPauli_isProjectiveRep).mp h)
 
+/-! ## T6: entrywise-conjugation API (M1-M9 of #5306 PR-2, design §5a)
+
+Behavioural tests for the extension of `LatticeSystem.Math.ProjectiveRepresentation` with
+involutivity, adjoint, unitary-preservation, spectrum, and rank/kernel-finrank lemmas for
+`signConj`/`signConjMatrix` (Tasaki §8.3.5 eq. (8.3.40)'s `C_g`). Each test both locks the exact
+public name/signature `dev-implement` must produce and exercises the mathematical content, so it
+cannot pass by an accidentally vacuous statement. Refs #5306, #4718. -/
+
+/-- M1 (unitary case): `signConj` at `ε = 1` is the identity. -/
+private lemma t6_signConj_one_id (z : ℂ) : signConj (1 : ℤˣ) z = z :=
+  signConj_one_apply z
+
+/-- M1 (antiunitary case): `signConj` at `ε = -1` is complex conjugation. -/
+private lemma t6_signConj_neg_one_conj (z : ℂ) :
+    signConj (-1 : ℤˣ) z = starRingEnd ℂ z :=
+  signConj_neg_one_apply z
+
+/-- M2 (unitary case): `signConjMatrix` at `ε = 1` is the identity. -/
+private lemma t6_signConjMatrix_one_id (M : Matrix (Fin 2) (Fin 2) ℂ) :
+    signConjMatrix (1 : ℤˣ) M = M :=
+  signConjMatrix_one_apply M
+
+/-- M2 (antiunitary case): `signConjMatrix` at `ε = -1` is entrywise complex conjugation. -/
+private lemma t6_signConjMatrix_neg_one_map (M : Matrix (Fin 2) (Fin 2) ℂ) :
+    signConjMatrix (-1 : ℤˣ) M = M.map (starRingEnd ℂ) :=
+  signConjMatrix_neg_one_apply M
+
+/-- M3: `signConj` is an involution. -/
+private lemma t6_signConj_involutive (ε : ℤˣ) (z : ℂ) :
+    signConj ε (signConj ε z) = z :=
+  signConj_signConj ε z
+
+/-- M3: `signConjMatrix` is an involution. -/
+private lemma t6_signConjMatrix_involutive (ε : ℤˣ) (M : Matrix (Fin 2) (Fin 2) ℂ) :
+    signConjMatrix ε (signConjMatrix ε M) = M :=
+  signConjMatrix_signConjMatrix ε M
+
+/-- M4: `signConj` preserves the complex norm. -/
+private lemma t6_norm_signConj (ε : ℤˣ) (z : ℂ) : ‖signConj ε z‖ = ‖z‖ :=
+  norm_signConj ε z
+
+/-- M5: `signConjMatrix` commutes with the conjugate-transpose. -/
+private lemma t6_signConjMatrix_conjTranspose (ε : ℤˣ) (M : Matrix (Fin 2) (Fin 2) ℂ) :
+    (signConjMatrix ε M).conjTranspose = signConjMatrix ε M.conjTranspose :=
+  signConjMatrix_conjTranspose ε M
+
+/-- M6: `signConjMatrix` preserves membership in the unitary group; witnessed on the concrete
+unitary `σ^x`. -/
+private lemma t6_signConjMatrix_pauliX_mem_unitaryGroup (ε : ℤˣ) :
+    signConjMatrix ε pauliX ∈ Matrix.unitaryGroup (Fin 2) ℂ :=
+  signConjMatrix_mem_unitaryGroup ε pauliX_mem_unitaryGroup
+
+/-- M7: `signConjMatrix`'s effect on the spectrum is `signConj` applied to eigenvalues. -/
+private lemma t6_mem_spectrum_signConjMatrix_iff (ε : ℤˣ) (M : Matrix (Fin 2) (Fin 2) ℂ) (μ : ℂ) :
+    μ ∈ spectrum ℂ (signConjMatrix ε M) ↔ signConj ε μ ∈ spectrum ℂ M :=
+  mem_spectrum_signConjMatrix_iff ε M μ
+
+/-- M9: `signConjMatrix` preserves the kernel finrank of `Matrix.mulVecLin`. -/
+private lemma t6_finrank_ker_mulVecLin_signConjMatrix (ε : ℤˣ) (M : Matrix (Fin 2) (Fin 2) ℂ) :
+    Module.finrank ℂ (LinearMap.ker (signConjMatrix ε M).mulVecLin) =
+      Module.finrank ℂ (LinearMap.ker M.mulVecLin) :=
+  finrank_ker_mulVecLin_signConjMatrix ε M
+
 end LatticeSystem.Tests
