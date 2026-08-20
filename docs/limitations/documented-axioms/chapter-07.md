@@ -15,7 +15,8 @@ permalink: /limitations/documented-axioms/chapter-07/
 **Tasaki §7.3.2, Theorem 7.7** (eqs. (7.3.6)–(7.3.9), pp. 210–212) is a **documented
 axiom**, `tasaki_theorem_7_7` (`LatticeSystem/Quantum/SpinS/GeneralAKLT.lean`, doc
 comment lines 130–174, declaration lines 175–183). This section records this
-non-Appendix documented axiom alongside the Appendix A entries above.
+non-Appendix documented axiom alongside the Appendix A entries of the
+[documented-axiom policy](/lattice-system/limitations/documented-axioms/).
 
 - **Proved (axiom-free):** the finite honeycomb-torus VBS ground state exists and is
   zero-energy and frustration-free — `honeycombVBSState_isGeneralGraphVBSGroundState`
@@ -221,7 +222,7 @@ by two declarations in `LatticeSystem/Quantum/SpinS/AKLTStability.lean`:
   clustering. The repository contains no such development: there is no
   polymer/cluster expansion and no uniform-in-L analyticity layer; the existing
   `chainTranslationOp` (see above) is not wired into `AKLTStability.lean`. Per the
-  policy above, perturbation-theoretic
+  [documented-axiom policy](/lattice-system/limitations/documented-axioms/), perturbation-theoretic
   results — the same class as Lemma 10.1 (degenerate perturbation theory) — are
   faithful documented axioms and are not active proof targets; this is a standing
   named exception, so the "prove theorems Tasaki cites without proof" rule does not
