@@ -64,11 +64,6 @@ private lemma coe_negCircle : (negCircle : ℂ) = -1 := by
 /-- `negCircle ≠ 1`: the asymmetric phase functions below really take two values. -/
 private lemma negCircle_ne_one : negCircle ≠ 1 := Circle.exp_pi_ne_one
 
-/-- The twist at `ε = 1` (the unitary case of eq. (8.3.40)) is the identity. -/
-private lemma signConjMatrix_one_apply {D : Type*} [Fintype D] [DecidableEq D]
-    (M : Matrix D D ℂ) : signConjMatrix (1 : ℤˣ) M = M := by
-  simp [signConjMatrix, signConj]
-
 /-- With the trivial sign character on an abelian group, the coboundary formula (8.3.43) is
 symmetric in `g` and `h`; hence an asymmetric phase function is not a coboundary. -/
 private lemma not_isPhaseCoboundary_of_ne {G : Type*} [CommGroup G] {φ : G → G → Circle}
@@ -158,16 +153,12 @@ private lemma iCircle_mul_conj : (iCircle : ℂ) * starRingEnd ℂ (iCircle : �
 private lemma iCircle_conj_mul : starRingEnd ℂ (iCircle : ℂ) * (iCircle : ℂ) = 1 := by
   rw [mul_comm]; exact iCircle_mul_conj
 
-/-- T3a: `signConj` at `ε = -1` is entrywise complex conjugation (eq. (8.3.40)). -/
-private lemma t3_signConj_neg_one (z : ℂ) : signConj (-1 : ℤˣ) z = starRingEnd ℂ z := by
-  simp [signConj]
-
 /-- T3b: `signConjMatrix` at `ε = -1` is entrywise complex conjugation, and this is *not* the
 identity on a genuinely complex matrix (the twist is not a no-op). -/
 private lemma t3_signConjMatrix_neg_one_ne_self :
     signConjMatrix (-1 : ℤˣ) (iCircle • (1 : Matrix (Fin 1) (Fin 1) ℂ)) ≠
       iCircle • (1 : Matrix (Fin 1) (Fin 1) ℂ) := by
-  rw [Circle.smul_def, signConjMatrix_smul, map_one, t3_signConj_neg_one]
+  rw [Circle.smul_def, signConjMatrix_smul, map_one, signConj_neg_one_apply]
   intro h
   have h00 := congrFun (congrFun h 0) 0
   simp only [Matrix.smul_apply, Matrix.one_apply_eq, smul_eq_mul, mul_one] at h00
@@ -211,7 +202,7 @@ private lemma t3_isProjectiveRep :
     · simp [uT3, signConjMatrix, signConj, sT3_one]
     · simp [uT3, signConjMatrix, signConj, sT3_one]
     · simp [uT3, signConjMatrix, signConj, sT3_g0]
-    · simp [g0_mul_self, g0_ne_one, sT3_g0, uT3, signConjMatrix_smul, t3_signConj_neg_one,
+    · simp [g0_mul_self, g0_ne_one, sT3_g0, uT3, signConjMatrix_smul, signConj_neg_one_apply,
         Circle.smul_def, smul_smul, iCircle_conj_mul]
 
 /-! ## T4: capstone on a two-dimensional space, with and without the sign twist -/

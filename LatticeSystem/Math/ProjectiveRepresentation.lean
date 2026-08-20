@@ -1,4 +1,5 @@
 import Mathlib.Analysis.Complex.Circle
+import Mathlib.LinearAlgebra.Matrix.Rank
 import Mathlib.LinearAlgebra.UnitaryGroup
 
 /-!
@@ -61,6 +62,106 @@ lemma signConjMatrix_smul (ε : ℤˣ) (z : ℂ) (X : Matrix D D ℂ) :
     signConjMatrix ε (z • X) = signConj ε z • signConjMatrix ε X := by
   ext i j
   simp [signConjMatrix, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.smul_apply, map_mul]
+
+/-! ## Entrywise conjugation: involutivity, adjoint, unitaries, spectrum, rank
+
+The operation `C_g` of eq. (8.3.40) is a ring homomorphism that is only *conjugate* linear, so the
+usual linear-algebra transport lemmas have to be recorded by hand.  They are what carries the
+injectivity of a matrix product state to its symmetry-transformed partner (§8.3.4, p. 265).
+-/
+
+/-- At the unitary sign `ε = 1` the scalar twist of eq. (8.3.40) is the identity. -/
+lemma signConj_one_apply (z : ℂ) : signConj 1 z = z := by
+  simp [signConj]
+
+/-- At the antiunitary sign `ε = -1` the scalar twist of eq. (8.3.40) is complex conjugation. -/
+lemma signConj_neg_one_apply (z : ℂ) : signConj (-1) z = starRingEnd ℂ z := by
+  simp [signConj]
+
+/-- At the unitary sign `ε = 1` the matrix twist of eq. (8.3.40) is the identity. -/
+lemma signConjMatrix_one_apply (X : Matrix D D ℂ) : signConjMatrix 1 X = X := by
+  simp [signConjMatrix, signConj]
+
+/-- At the antiunitary sign `ε = -1` the matrix twist of eq. (8.3.40) is entrywise complex
+conjugation. -/
+lemma signConjMatrix_neg_one_apply (X : Matrix D D ℂ) :
+    signConjMatrix (-1) X = X.map (starRingEnd ℂ) := by
+  ext i j
+  simp [signConjMatrix, signConj]
+
+/-- The scalar twist is an involution, since complex conjugation is. -/
+lemma signConj_signConj (ε : ℤˣ) (z : ℂ) : signConj ε (signConj ε z) = z := by
+  rcases Int.units_eq_one_or ε with h | h <;> subst h
+  · simp [signConj_one_apply]
+  · simp [signConj_neg_one_apply]
+
+/-- The matrix twist is an involution. -/
+lemma signConjMatrix_signConjMatrix (ε : ℤˣ) (X : Matrix D D ℂ) :
+    signConjMatrix ε (signConjMatrix ε X) = X := by
+  ext i j
+  simp [signConjMatrix, signConj_signConj]
+
+/-- The scalar twist is an isometry: `|C_g[z]| = |z|`. -/
+lemma norm_signConj (ε : ℤˣ) (z : ℂ) : ‖signConj ε z‖ = ‖z‖ := by
+  rcases Int.units_eq_one_or ε with h | h <;> subst h
+  · rw [signConj_one_apply]
+  · rw [signConj_neg_one_apply, RCLike.norm_conj]
+
+/-- The matrix twist commutes with the adjoint: `C_g[X]† = C_g[X†]`. -/
+lemma signConjMatrix_conjTranspose (ε : ℤˣ) (X : Matrix D D ℂ) :
+    (signConjMatrix ε X).conjTranspose = signConjMatrix ε X.conjTranspose := by
+  rcases Int.units_eq_one_or ε with h | h <;> subst h
+  · rw [signConjMatrix_one_apply, signConjMatrix_one_apply]
+  · ext i j
+    simp [signConjMatrix_neg_one_apply, Matrix.conjTranspose_apply]
+
+/-- The matrix twist preserves unitarity, since it is a ring homomorphism commuting with the
+adjoint.  This is why the book's transported family is again normalised (eq. (8.3.14)). -/
+lemma signConjMatrix_mem_unitaryGroup (ε : ℤˣ) {X : Matrix D D ℂ}
+    (hX : X ∈ Matrix.unitaryGroup D ℂ) : signConjMatrix ε X ∈ Matrix.unitaryGroup D ℂ := by
+  rw [Matrix.mem_unitaryGroup_iff] at hX ⊢
+  rw [Matrix.star_eq_conjTranspose, signConjMatrix_conjTranspose, ← map_mul,
+    ← Matrix.star_eq_conjTranspose, hX, map_one]
+
+/-- The matrix twist moves the spectrum by the scalar twist: `μ` is an eigenvalue of `C_g[X]`
+exactly when `C_g[μ]` is an eigenvalue of `X`. -/
+lemma mem_spectrum_signConjMatrix_iff (ε : ℤˣ) (X : Matrix D D ℂ) (μ : ℂ) :
+    μ ∈ spectrum ℂ (signConjMatrix ε X) ↔ signConj ε μ ∈ spectrum ℂ X := by
+  have hkey : algebraMap ℂ (Matrix D D ℂ) μ - signConjMatrix ε X =
+      signConjMatrix ε (algebraMap ℂ (Matrix D D ℂ) (signConj ε μ) - X) := by
+    rw [map_sub, Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one,
+      signConjMatrix_smul, map_one, signConj_signConj]
+  rw [spectrum.mem_iff, spectrum.mem_iff, hkey]
+  refine not_congr ⟨fun h => ?_, fun h => h.map (signConjMatrix ε)⟩
+  simpa [signConjMatrix_signConjMatrix] using h.map (signConjMatrix ε)
+
+section Rank
+
+open scoped ComplexOrder
+
+/-- The matrix twist preserves the rank: entrywise conjugation is the composition of the adjoint
+with the transpose, and both preserve the rank. -/
+private lemma rank_signConjMatrix (ε : ℤˣ) (X : Matrix D D ℂ) :
+    (signConjMatrix ε X).rank = X.rank := by
+  rcases Int.units_eq_one_or ε with h | h <;> subst h
+  · rw [signConjMatrix_one_apply]
+  · have hmap : signConjMatrix (-1 : ℤˣ) X = X.conjTranspose.transpose := by
+      ext i j
+      simp [signConjMatrix_neg_one_apply, Matrix.conjTranspose_apply]
+    rw [hmap, Matrix.rank_transpose, Matrix.rank_conjTranspose]
+
+/-- The matrix twist preserves the dimension of the kernel of the associated linear map.  Applied
+to `Ã - λ` this is what transports the simplicity of the transfer eigenvalue `λ`. -/
+lemma finrank_ker_mulVecLin_signConjMatrix (ε : ℤˣ) (X : Matrix D D ℂ) :
+    Module.finrank ℂ (LinearMap.ker (signConjMatrix ε X).mulVecLin) =
+      Module.finrank ℂ (LinearMap.ker X.mulVecLin) := by
+  have h1 := LinearMap.finrank_range_add_finrank_ker (signConjMatrix ε X).mulVecLin
+  have h2 := LinearMap.finrank_range_add_finrank_ker X.mulVecLin
+  have hrank : Module.finrank ℂ (LinearMap.range (signConjMatrix ε X).mulVecLin) =
+      Module.finrank ℂ (LinearMap.range X.mulVecLin) := rank_signConjMatrix ε X
+  omega
+
+end Rank
 
 /-- **Projective representation** (eqs. (8.3.41)–(8.3.42)).  A family of unitaries `u : G → Matrix`
 with `u 1 = 1`, together with a sign character `s` recording for each `g` whether `v̂(g)` is unitary
