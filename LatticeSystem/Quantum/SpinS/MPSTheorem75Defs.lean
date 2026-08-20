@@ -83,6 +83,31 @@ def HasFaithfulDualEigenmatrix (A : MPSMatrices D N) (lam : ℝ) : Prop :=
   ∃ ρ : Matrix (Fin D) (Fin D) ℂ,
     ρ.PosDef ∧ mpsDualTransferMap A ρ = (lam : ℂ) • ρ
 
+/-- Left multiplication by a single MPS matrix sends the span of the ordered products of length
+`ℓ` into the span of the ordered products of length `ℓ + 1`. -/
+theorem orderedProd_mul_mem_span_succ (A : MPSMatrices D N) (ℓ : ℕ) (σ : Fin (N + 1))
+    {X : Matrix (Fin D) (Fin D) ℂ}
+    (hX : X ∈ Submodule.span ℂ {P : Matrix (Fin D) (Fin D) ℂ |
+      ∃ σs : List (Fin (N + 1)), σs.length = ℓ ∧ P = orderedProd A σs}) :
+    A σ * X ∈ Submodule.span ℂ {P : Matrix (Fin D) (Fin D) ℂ |
+      ∃ σs : List (Fin (N + 1)), σs.length = ℓ + 1 ∧ P = orderedProd A σs} := by
+  set W : Submodule ℂ (Matrix (Fin D) (Fin D) ℂ) :=
+    Submodule.span ℂ {P : Matrix (Fin D) (Fin D) ℂ |
+      ∃ σs : List (Fin (N + 1)), σs.length = ℓ + 1 ∧ P = orderedProd A σs} with hW
+  induction hX using Submodule.span_induction with
+  | mem P hP =>
+      obtain ⟨σs, hlen, rfl⟩ := hP
+      apply Submodule.subset_span
+      refine ⟨σ :: σs, ?_, ?_⟩
+      · simp [hlen]
+      · rfl
+  | zero =>
+      simpa only [Matrix.mul_zero] using W.zero_mem
+  | add X Y _ _ hX hY =>
+      simpa [Matrix.mul_add] using W.add_mem hX hY
+  | smul c X _ hX =>
+      simpa [Matrix.mul_smul] using W.smul_mem c hX
+
 /-- Spanning at one length propagates to the next length under MPS normalization. -/
 private theorem mpsProductsSpanAt_succ
     (A : MPSMatrices D N) (lam : ℝ) (ℓ : ℕ)
@@ -95,23 +120,8 @@ private theorem mpsProductsSpanAt_succ
     Submodule.span ℂ {X : Matrix (Fin D) (Fin D) ℂ |
       ∃ σs : List (Fin (N + 1)), σs.length = ℓ + 1 ∧ X = orderedProd A σs}
   have hleft (σ : Fin (N + 1)) (X : Matrix (Fin D) (Fin D) ℂ) :
-      A σ * X ∈ W := by
-    have hX : X ∈ Submodule.span ℂ {P : Matrix (Fin D) (Fin D) ℂ |
-        ∃ σs : List (Fin (N + 1)), σs.length = ℓ ∧ P = orderedProd A σs} :=
-      hspan X
-    induction hX using Submodule.span_induction with
-    | mem P hP =>
-        obtain ⟨σs, hlen, rfl⟩ := hP
-        apply Submodule.subset_span
-        refine ⟨σ :: σs, ?_, ?_⟩
-        · simp [hlen]
-        · rfl
-    | zero =>
-        simpa only [Matrix.mul_zero] using W.zero_mem
-    | add X Y _ _ hX hY =>
-        simpa [Matrix.mul_add] using W.add_mem hX hY
-    | smul c X _ hX =>
-        simpa [Matrix.mul_smul] using W.smul_mem c hX
+      A σ * X ∈ W :=
+    orderedProd_mul_mem_span_succ A ℓ σ (hspan X)
   have hlam : (lam : ℂ) ≠ 0 := by
     exact_mod_cast ne_of_gt hnorm.1
   have hM :
