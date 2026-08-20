@@ -1,11 +1,15 @@
 import LatticeSystem.Quantum.SpinS.SPTSymmetryTransportedMPS
+import LatticeSystem.Quantum.SpinS.MPSInvarianceGauge
+import LatticeSystem.Quantum.SpinS.AKLTMatrixProduct
 import LatticeSystem.Quantum.Pauli
 
 /-!
-# Tests: symmetry-transported MPS injectivity transport (#5306 PR-2)
+# Tests: symmetry-transported MPS injectivity transport (#5306 PR-2/PR-3)
 
 Behavioural tests for `LatticeSystem.Quantum.SPTSymmetryTransportedMPS` (§8.3.4/§8.3.5's
-`Ã_g^σ = Σ_{σ'} ⟨ψ^σ|û(g)|ψ^{σ'}⟩ C_g[A^{σ'}]`, eqs. (8.3.13)-(8.3.14), (8.3.33), (8.3.47)):
+`Ã_g^σ = Σ_{σ'} ⟨ψ^σ|û(g)|ψ^{σ'}⟩ C_g[A^{σ'}]`, eqs. (8.3.13)-(8.3.14), (8.3.33), (8.3.47)) and, as
+of PR-3, for `LatticeSystem.Quantum.MPSInvarianceGauge` (§8.3.5's "invariance implies gauge",
+eqs. (8.3.45)-(8.3.48)) and the relaxed Theorem 7.6 hypothesis (`GeneratesSameMPSEventually`):
 
 * **T1** identity transport: `symmetryTransportMPS 1 1 A = A`.
 * **T2** non-vacuity: a concrete `IsInjectiveMPS` instance (bond dimension `D = 1`), transported
@@ -20,9 +24,27 @@ Behavioural tests for `LatticeSystem.Quantum.SPTSymmetryTransportedMPS` (§8.3.4
   family is injective with `λ = 3` and a gapped transfer spectrum `{3, -1}`, and `û₂` is unitary,
   so the capstone transports a nondegenerate `λ`-eigenspace and a nonempty gap condition through
   the entrywise conjugation.
+* **T7** (PR-3) non-vacuity of `exists_unitary_gauge_of_invariance`: the trivial instance
+  `ε = 1, u = 1, η ≡ 1` at `A := fixtureP` is genuinely instantiable.
+* **T8** (PR-3) the phase extracted by `exists_phase_eq_pow` from a scalar-rescaled copy of
+  `fixtureP` is exactly the rescaling phase, catching an off-by-one or sign error in the
+  exponent/index convention.
+* **T9** (PR-3, documented limitation, not a full instantiation) the `D = 0` degenerate branch:
+  `IsInjectiveMPS` is uninhabited at `D = 0` (the transfer-matrix algebra collapses to the trivial
+  ring, whose `spectrum` is empty), so this case can only be guarded by `Subsingleton`, never
+  exercised by a concrete injective fixture; see the caveat in `t9_matrix_subsingleton_of_D_zero`.
+* **T10** (PR-3) negative control for the design report's discovery: at `L = 1`, `fixtureP`'s
+  trace coefficients all vanish (`tr σ^α = 0`), so `GeneratesPhasedMPS` imposes **no constraint** on
+  `η 1`: two different phase functions differing only at `L = 1` both satisfy the hypothesis for the
+  same pair `(fixtureP, fixtureP)`. This is the machine-checked witness that "`η_L = c^L` for any
+  `L`" is false as stated and only holds for `L` at least the spanning length.
+* **T11** (PR-3, regression) the relaxed Theorem 7.6 hypothesis `GeneratesSameMPSEventually`
+  recovers the exact-equality version via `GeneratesSameMPS.eventually`, so `mps_theorem_7_6`'s
+  statement (unchanged by PR-3) is still reachable from the relaxed entry point.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed.), §8.3.4,
-pp. 264-265, eqs. (8.3.13)-(8.3.14); §8.3.5, p. 273, eq. (8.3.33); p. 279, eq. (8.3.47).
+pp. 264-265, eqs. (8.3.13)-(8.3.14); §8.3.5, p. 273, eq. (8.3.33); pp. 278-279,
+eqs. (8.3.45)-(8.3.48).
 Refs #5306, #4718.
 -/
 
@@ -447,5 +469,169 @@ private lemma t6_symmetryTransportMPS_fixtureP :
   funext σ
   fin_cases σ <;> ext i j <;> fin_cases i <;> fin_cases j <;>
     simp [fixtureP, pauliX, pauliY, pauliZ]
+
+/-! ## T7: non-vacuity of `exists_unitary_gauge_of_invariance` -/
+
+/-- T7: the trivial instance `ε = 1, u = 1, η ≡ 1` at `A := fixtureP` genuinely instantiates
+`exists_unitary_gauge_of_invariance` (design report §4.2, PR-3's non-vacuity requirement, the T7
+analogue of PR-2's T2). Without this, the whole PR-3 gauge capstone could be vacuous. -/
+private lemma t7_exists_unitary_gauge_of_invariance_nonvacuous :
+    ∃ (ζ : Circle) (U : Matrix (Fin 2) (Fin 2) ℂ), U ∈ Matrix.unitaryGroup (Fin 2) ℂ ∧
+      ∀ σ, symmetryTransportMPS (1 : ℤˣ) (1 : Matrix (Fin 3) (Fin 3) ℂ) fixtureP σ =
+        (ζ : ℂ) • (U.conjTranspose * fixtureP σ * U) := by
+  have hu : (1 : Matrix (Fin 3) (Fin 3) ℂ) ∈ Matrix.unitaryGroup (Fin 3) ℂ := Submonoid.one_mem _
+  have hinv : GeneratesPhasedMPS fixtureP
+      (symmetryTransportMPS (1 : ℤˣ) (1 : Matrix (Fin 3) (Fin 3) ℂ) fixtureP)
+      (fun _ => (1 : Circle)) := by
+    intro L ss
+    rw [t1_symmetryTransportMPS_one_one]
+    simp
+  obtain ⟨ζ, U, hgauge⟩ :=
+    exists_unitary_gauge_of_invariance fixtureP (3 : ℝ) t6_isInjectiveMPS (1 : ℤˣ)
+      (1 : Matrix (Fin 3) (Fin 3) ℂ) hu (fun _ => (1 : Circle)) hinv
+  exact ⟨ζ, (U : Matrix (Fin 2) (Fin 2) ℂ), U.property, hgauge⟩
+
+/-! ## T8: the extracted phase pins the exponent convention -/
+
+/-- Ordered products of a globally rescaled MPS family pick up the rescaling to the power of the
+word length: `orderedProd (z • A) w = z^{|w|} • orderedProd A w`. Proved directly (not reusing any
+PR-3 production lemma) so that T8 is an independent check on the phase-extraction convention. -/
+private lemma t8_orderedProd_smul {D N : ℕ} (z : ℂ) (A : MPSMatrices D N)
+    (w : List (Fin (N + 1))) :
+    orderedProd (fun σ => z • A σ) w = z ^ w.length • orderedProd A w := by
+  induction w with
+  | nil => simp [orderedProd]
+  | cons σ ss ih =>
+      change (z • A σ) * orderedProd (fun τ => z • A τ) ss = _
+      rw [ih, Matrix.smul_mul, Matrix.mul_smul, smul_smul, List.length_cons, pow_succ, mul_comm]
+      rfl
+
+/-- T8: for `z : Circle` and `B := z • fixtureP`, the coefficient family `GeneratesPhasedMPS
+fixtureP B (fun L => z ^ L)` holds, by the general rescaling fact above. -/
+private lemma t8_generatesPhasedMPS_smul (z : Circle) :
+    GeneratesPhasedMPS fixtureP (fun σ => (z : ℂ) • fixtureP σ) (fun L => z ^ L) := by
+  intro L ss
+  have hlen : (List.ofFn ss).length = L := by simp
+  rw [congrArg Matrix.trace (t8_orderedProd_smul (z : ℂ) fixtureP (List.ofFn ss)),
+    Matrix.trace_smul, hlen, Circle.coe_pow, smul_eq_mul]
+
+/-- Scalar multiplication by a nonzero-modulus phase preserves fixed-length spanning (the fixed
+length forces the *same* power `z^ℓ` at every generator, which is what makes the argument work
+without any conjugate-linearity bookkeeping, unlike `mpsProductsSpanAt_mpsConjugate`). -/
+private lemma t8_mpsProductsSpanAt_smul (z : Circle) {D N : ℕ} {A : MPSMatrices D N} {ℓ : ℕ}
+    (hspan : mpsProductsSpanAt A ℓ) :
+    mpsProductsSpanAt (fun σ => (z : ℂ) • A σ) ℓ := by
+  have hzne : (z : ℂ) ≠ 0 := Circle.coe_ne_zero z
+  unfold mpsProductsSpanAt at hspan ⊢
+  rw [Submodule.eq_top_iff'] at hspan ⊢
+  intro M
+  set W : Submodule ℂ (Matrix (Fin D) (Fin D) ℂ) :=
+    Submodule.span ℂ {P : Matrix (Fin D) (Fin D) ℂ |
+      ∃ σs : List (Fin (N + 1)), σs.length = ℓ ∧ P = orderedProd (fun σ => (z : ℂ) • A σ) σs}
+    with hW
+  have key : ∀ Y ∈ Submodule.span ℂ {P : Matrix (Fin D) (Fin D) ℂ |
+      ∃ σs : List (Fin (N + 1)), σs.length = ℓ ∧ P = orderedProd A σs}, (z : ℂ) ^ ℓ • Y ∈ W := by
+    intro Y hY
+    induction hY using Submodule.span_induction with
+    | mem P hP =>
+        obtain ⟨σs, hlen, rfl⟩ := hP
+        apply Submodule.subset_span
+        exact ⟨σs, hlen, by rw [t8_orderedProd_smul, hlen]⟩
+    | zero => simp only [smul_zero]; exact W.zero_mem
+    | add X Y _ _ hX hY => simpa only [smul_add] using W.add_mem hX hY
+    | smul c X _ hX =>
+        have hcomm : (z : ℂ) ^ ℓ • (c • X) = c • ((z : ℂ) ^ ℓ • X) := by
+          rw [smul_smul, smul_smul, mul_comm]
+        rw [hcomm]
+        exact W.smul_mem c hX
+  have hMinv := key (((z : ℂ) ^ ℓ)⁻¹ • M) (hspan _)
+  rwa [smul_smul, mul_inv_cancel₀ (pow_ne_zero ℓ hzne), one_smul] at hMinv
+
+/-- T8: the phase `c` extracted by `exists_phase_eq_pow` from `t8_generatesPhasedMPS_smul` is
+exactly `z`, catching an off-by-one or reciprocal error in the extraction convention (design
+report §4.2, `exists_phase_eq_pow`). -/
+private lemma t8_exists_phase_eq_pow_recovers_z (z : Circle) :
+    ∃ c : Circle, c = z ∧ ∀ L, 2 * 2 ≤ L → z ^ L = c ^ L := by
+  obtain ⟨c, hc⟩ := exists_phase_eq_pow (A := fixtureP)
+    (B := fun σ => (z : ℂ) • fixtureP σ) (ℓ := 2) t6_mpsProductsSpanAt_two
+    (t8_mpsProductsSpanAt_smul z t6_mpsProductsSpanAt_two) (t8_generatesPhasedMPS_smul z)
+  have hc4 : c ^ (4 : ℕ) = z ^ (4 : ℕ) := (hc 4 (by norm_num)).symm
+  have hc5 : c ^ (5 : ℕ) = z ^ (5 : ℕ) := (hc 5 (by norm_num)).symm
+  have hcz : z ^ (4 : ℕ) * c = z ^ (4 : ℕ) * z :=
+    calc z ^ (4 : ℕ) * c = c ^ (4 : ℕ) * c := by rw [hc4]
+      _ = c ^ (5 : ℕ) := (pow_succ c 4).symm
+      _ = z ^ (5 : ℕ) := hc5
+      _ = z ^ (4 : ℕ) * z := pow_succ z 4
+  exact ⟨c, mul_left_cancel hcz, fun L hL => hc L hL⟩
+
+/-! ## T9: the `D = 0` degenerate branch (documented limitation) -/
+
+/-- **Documented limitation**: at `D = 0`, `Matrix (Fin 0) (Fin 0) ℂ` is a subsingleton (its unique
+element is both `0` and `1`), so the transfer-matrix algebra collapses to the trivial ring, whose
+`spectrum` is always empty — hence `HasPrimitiveTransferSpectrum A lam` (and so `IsInjectiveMPS A
+lam`) is **uninhabited** at `D = 0` for every `A` and `lam`. Consequently T9 cannot literally
+instantiate `exists_unitary_gauge_of_phased`/`exists_unitary_gauge_of_invariance` at `D = 0` with a
+genuine `IsInjectiveMPS` witness: the production `by_cases hD : D = 0` branch (mirroring
+`exists_unitary_gauge_data`'s existing `D = 0` branch in `MPSTheorem76Unitary.lean`) must discharge
+its conclusion by `Subsingleton.elim` alone, without ever inspecting the (unsatisfiable) hypotheses.
+This lemma records only the `Subsingleton` fact the guard relies on. -/
+private lemma t9_matrix_subsingleton_of_D_zero :
+    Subsingleton (Matrix (Fin 0) (Fin 0) ℂ) := by
+  infer_instance
+
+/-! ## T10: negative control (η is unconstrained below the spanning length) -/
+
+/-- A phase function that is `z` at `L = 1` and trivial everywhere else. -/
+private noncomputable def phaseVariant (z : Circle) : ℕ → Circle :=
+  fun L => if L = 1 then z else 1
+
+/-- Each Pauli matrix is traceless. -/
+private lemma t10_trace_fixtureP_eq_zero (σ : Fin 3) : Matrix.trace (fixtureP σ) = 0 := by
+  fin_cases σ <;> simp [fixtureP, pauliX, pauliY, pauliZ, Matrix.trace, Fin.sum_univ_two]
+
+/-- T10: for **any** phase `z`, `GeneratesPhasedMPS fixtureP fixtureP (phaseVariant z)` holds: at
+`L = 1` both sides of the coefficient equation vanish (Pauli matrices are traceless), so the
+hypothesis places no constraint whatsoever on `η 1`, while at every other length the trivial phase
+`1` matches the trivial equality `A = B`. -/
+private lemma t10_generatesPhasedMPS_fixtureP_fixtureP_phaseVariant (z : Circle) :
+    GeneratesPhasedMPS fixtureP fixtureP (phaseVariant z) := by
+  intro L ss
+  rcases eq_or_ne L 1 with hL | hL
+  · subst hL
+    have hword : List.ofFn ss = [ss 0] := by simp [List.ofFn_succ, List.ofFn_zero]
+    rw [hword]
+    simp [phaseVariant, orderedProd, t10_trace_fixtureP_eq_zero]
+  · simp [phaseVariant, hL]
+
+/-- T10: two different values of `η 1` are both compatible with the same underlying pair
+`(fixtureP, fixtureP)`, so `η 1` is genuinely unconstrained: this is the negative-control witness
+for the design report's discovery that "`η_L = c^L` for any `L`" is false as stated (it only holds
+for `L` at least the spanning length `2`). -/
+private lemma t10_phase_at_length_one_unconstrained :
+    GeneratesPhasedMPS fixtureP fixtureP (phaseVariant (1 : Circle)) ∧
+      GeneratesPhasedMPS fixtureP fixtureP (phaseVariant (Circle.exp Real.pi)) ∧
+      phaseVariant (1 : Circle) 1 ≠ phaseVariant (Circle.exp Real.pi) 1 := by
+  refine ⟨t10_generatesPhasedMPS_fixtureP_fixtureP_phaseVariant 1,
+    t10_generatesPhasedMPS_fixtureP_fixtureP_phaseVariant (Circle.exp Real.pi), ?_⟩
+  simpa [phaseVariant] using Circle.exp_pi_ne_one.symm
+
+/-! ## T11: regression, the relaxed Theorem 7.6 hypothesis recovers the exact version -/
+
+/-- T11: `GeneratesSameMPS.eventually` turns exact trace-coefficient equality into the relaxed
+`GeneratesSameMPSEventually` hypothesis, and `mps_theorem_7_6_of_eventual_agreement` recovers the
+exact statement of `mps_theorem_7_6` from it, confirming PR-3's Theorem 7.6 relaxation does not
+disturb the unchanged public `mps_theorem_7_6`. -/
+private lemma t11_mps_theorem_7_6_of_eventual_agreement_matches_exact
+    {D N : ℕ} (A B : MPSMatrices D N) (lamA lamB : ℝ)
+    (hA : IsInjectiveMPS A lamA) (hB : IsInjectiveMPS B lamB)
+    (hsame : GeneratesSameMPS A B) :
+    ∃ U : Matrix (Fin D) (Fin D) ℂ,
+      U ∈ Matrix.unitaryGroup (Fin D) ℂ ∧
+      (∀ σ, B σ = U.conjTranspose * A σ * U) ∧
+      ∀ V : Matrix (Fin D) (Fin D) ℂ,
+        V ∈ Matrix.unitaryGroup (Fin D) ℂ →
+        (∀ σ, B σ = V.conjTranspose * A σ * V) →
+        ∃ z : ℂ, ‖z‖ = 1 ∧ V = z • U := by
+  exact mps_theorem_7_6_of_eventual_agreement A B lamA lamB hA hB hsame.eventually
 
 end LatticeSystem.Tests
