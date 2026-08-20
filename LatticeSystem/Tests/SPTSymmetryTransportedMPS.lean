@@ -67,7 +67,7 @@ private lemma t2_orderedProd_replicate_zero (ℓ : ℕ) :
   induction ℓ with
   | zero => rfl
   | succ n ih =>
-      show fixtureA 0 * orderedProd fixtureA (List.replicate n 0) = 1
+      change fixtureA 0 * orderedProd fixtureA (List.replicate n 0) = 1
       rw [fixtureA_zero, ih, one_mul]
 
 /-- `fixtureA`'s ordered products span the (one-dimensional) `1 × 1` matrix space at every
@@ -77,12 +77,14 @@ private lemma t2_mpsProductsSpanAt (ℓ : ℕ) : mpsProductsSpanAt fixtureA ℓ 
   have hone : (1 : Matrix (Fin 1) (Fin 1) ℂ) ∈
       Submodule.span ℂ {M : Matrix (Fin 1) (Fin 1) ℂ |
         ∃ σs : List (Fin 2), σs.length = ℓ ∧ M = orderedProd fixtureA σs} :=
-    Submodule.subset_span ⟨List.replicate ℓ 0, List.length_replicate ℓ 0,
+    Submodule.subset_span ⟨List.replicate ℓ 0, List.length_replicate,
       (t2_orderedProd_replicate_zero ℓ).symm⟩
   refine Submodule.eq_top_iff'.mpr fun M => ?_
   have hM : M = (M 0 0) • (1 : Matrix (Fin 1) (Fin 1) ℂ) := by
     ext i j
-    fin_cases i <;> fin_cases j <;> simp
+    fin_cases i
+    fin_cases j
+    simp
   rw [hM]
   exact Submodule.smul_mem _ _ hone
 
@@ -100,13 +102,17 @@ private lemma t2_mpsTransferMatrix_eq_one :
   ext p q
   obtain ⟨p1, p2⟩ := p
   obtain ⟨q1, q2⟩ := q
-  fin_cases p1 <;> fin_cases p2 <;> fin_cases q1 <;> fin_cases q2 <;>
-    simp [mpsTransferMatrix, fixtureA_zero, fixtureA_one, Fin.sum_univ_two]
+  fin_cases p1
+  fin_cases p2
+  fin_cases q1
+  fin_cases q2
+  simp [mpsTransferMatrix, fixtureA_zero, fixtureA_one, Fin.sum_univ_two]
 
 /-- `fixtureA` satisfies Theorem 7.5(iii): `λ = 1` is the unique, simple transfer eigenvalue
 (vacuously: the transfer matrix is a `1 × 1` identity, so it has a single eigenvalue). -/
 private lemma t2_hasPrimitiveTransferSpectrum :
     HasPrimitiveTransferSpectrum fixtureA (1 : ℝ) := by
+  unfold HasPrimitiveTransferSpectrum
   rw [t2_mpsTransferMatrix_eq_one]
   haveI : Nontrivial (Matrix (Fin 1 × Fin 1) (Fin 1 × Fin 1) ℂ) :=
     ⟨0, 1, by
@@ -118,11 +124,11 @@ private lemma t2_hasPrimitiveTransferSpectrum :
   refine ⟨by rw [hspec]; rfl, ?_, fun μ hμ hne => absurd (by
     rwa [hspec, Set.mem_singleton_iff] at hμ) hne⟩
   have hzero : (1 : Matrix (Fin 1 × Fin 1) (Fin 1 × Fin 1) ℂ).mulVecLin -
-      (1 : ℂ) • LinearMap.id = 0 := by
+      ((1 : ℝ) : ℂ) • LinearMap.id = 0 := by
     ext v i
     simp [Matrix.mulVecLin_one]
-  rw [hzero, LinearMap.ker_zero, Module.finrank_top]
-  simpa using Module.finrank_pi (R := ℂ) (ι := Fin 1 × Fin 1)
+  rw [hzero, LinearMap.ker_zero, finrank_top]
+  simp
 
 /-- `fixtureA` is a genuinely injective MPS family (Tasaki Theorem 7.5). This is the acceptance
 condition's non-vacuity witness: without it, the capstone `isInjectiveMPS_symmetryTransportMPS`
