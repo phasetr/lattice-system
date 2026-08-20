@@ -493,76 +493,32 @@ private lemma t7_exists_unitary_gauge_of_invariance_nonvacuous :
 
 /-! ## T8: the extracted phase pins the exponent convention -/
 
-/-- Ordered products of a globally rescaled MPS family pick up the rescaling to the power of the
-word length: `orderedProd (z • A) w = z^{|w|} • orderedProd A w`. Proved directly (not reusing any
-PR-3 production lemma) so that T8 is an independent check on the phase-extraction convention. -/
-private lemma t8_orderedProd_smul {D N : ℕ} (z : ℂ) (A : MPSMatrices D N)
-    (w : List (Fin (N + 1))) :
-    orderedProd (fun σ => z • A σ) w = z ^ w.length • orderedProd A w := by
-  induction w with
-  | nil => simp [orderedProd]
-  | cons σ ss ih =>
-      change (z • A σ) * orderedProd (fun τ => z • A τ) ss = _
-      rw [ih, Matrix.smul_mul, Matrix.mul_smul, smul_smul, List.length_cons, pow_succ, mul_comm]
-      rfl
-
 /-- T8: for `z : Circle` and `B := z • fixtureP`, the coefficient family `GeneratesPhasedMPS
-fixtureP B (fun L => z ^ L)` holds, by the general rescaling fact above. -/
+fixtureP B (fun L => z ^ L)` holds, by the production rescaling lemma `orderedProd_smul`. -/
 private lemma t8_generatesPhasedMPS_smul (z : Circle) :
     GeneratesPhasedMPS fixtureP (fun σ => (z : ℂ) • fixtureP σ) (fun L => z ^ L) := by
   intro L ss
   have hlen : (List.ofFn ss).length = L := by simp
-  rw [congrArg Matrix.trace (t8_orderedProd_smul (z : ℂ) fixtureP (List.ofFn ss)),
+  rw [congrArg Matrix.trace (orderedProd_smul (z : ℂ) fixtureP (List.ofFn ss)),
     Matrix.trace_smul, hlen, Circle.coe_pow, smul_eq_mul]
 
-/-- Scalar multiplication by a nonzero-modulus phase preserves fixed-length spanning (the fixed
-length forces the *same* power `z^ℓ` at every generator, which is what makes the argument work
-without any conjugate-linearity bookkeeping, unlike `mpsProductsSpanAt_mpsConjugate`). -/
-private lemma t8_mpsProductsSpanAt_smul (z : Circle) {D N : ℕ} {A : MPSMatrices D N} {ℓ : ℕ}
-    (hspan : mpsProductsSpanAt A ℓ) :
-    mpsProductsSpanAt (fun σ => (z : ℂ) • A σ) ℓ := by
-  have hzne : (z : ℂ) ≠ 0 := Circle.coe_ne_zero z
-  unfold mpsProductsSpanAt at hspan ⊢
-  rw [Submodule.eq_top_iff'] at hspan ⊢
-  intro M
-  set W : Submodule ℂ (Matrix (Fin D) (Fin D) ℂ) :=
-    Submodule.span ℂ {P : Matrix (Fin D) (Fin D) ℂ |
-      ∃ σs : List (Fin (N + 1)), σs.length = ℓ ∧ P = orderedProd (fun σ => (z : ℂ) • A σ) σs}
-    with hW
-  have key : ∀ Y ∈ Submodule.span ℂ {P : Matrix (Fin D) (Fin D) ℂ |
-      ∃ σs : List (Fin (N + 1)), σs.length = ℓ ∧ P = orderedProd A σs}, (z : ℂ) ^ ℓ • Y ∈ W := by
-    intro Y hY
-    induction hY using Submodule.span_induction with
-    | mem P hP =>
-        obtain ⟨σs, hlen, rfl⟩ := hP
-        apply Submodule.subset_span
-        exact ⟨σs, hlen, by rw [t8_orderedProd_smul, hlen]⟩
-    | zero => simp only [smul_zero]; exact W.zero_mem
-    | add X Y _ _ hX hY => simpa only [smul_add] using W.add_mem hX hY
-    | smul c X _ hX =>
-        have hcomm : (z : ℂ) ^ ℓ • (c • X) = c • ((z : ℂ) ^ ℓ • X) := by
-          rw [smul_smul, smul_smul, mul_comm]
-        rw [hcomm]
-        exact W.smul_mem c hX
-  have hMinv := key (((z : ℂ) ^ ℓ)⁻¹ • M) (hspan _)
-  rwa [smul_smul, mul_inv_cancel₀ (pow_ne_zero ℓ hzne), one_smul] at hMinv
-
 /-- T8: the phase `c` extracted by `exists_phase_eq_pow` from `t8_generatesPhasedMPS_smul` is
-exactly `z`, catching an off-by-one or reciprocal error in the extraction convention (design
-report §4.2, `exists_phase_eq_pow`). -/
+exactly `z`, catching an off-by-one or reciprocal error in the extraction convention.  The two
+instantiations at the returned threshold `ℓ₀` and at `ℓ₀ + 1` are what pin `c`; a convention that
+returned `z⁻¹`, `z ^ 2` or the phase shifted by one length would fail here. -/
 private lemma t8_exists_phase_eq_pow_recovers_z (z : Circle) :
-    ∃ c : Circle, c = z ∧ ∀ L, 2 * 2 ≤ L → z ^ L = c ^ L := by
-  obtain ⟨c, hc⟩ := exists_phase_eq_pow (A := fixtureP)
-    (B := fun σ => (z : ℂ) • fixtureP σ) (ℓ := 2) t6_mpsProductsSpanAt_two
-    (t8_mpsProductsSpanAt_smul z t6_mpsProductsSpanAt_two) (t8_generatesPhasedMPS_smul z)
-  have hc4 : c ^ (4 : ℕ) = z ^ (4 : ℕ) := (hc 4 (by norm_num)).symm
-  have hc5 : c ^ (5 : ℕ) = z ^ (5 : ℕ) := (hc 5 (by norm_num)).symm
-  have hcz : z ^ (4 : ℕ) * c = z ^ (4 : ℕ) * z :=
-    calc z ^ (4 : ℕ) * c = c ^ (4 : ℕ) * c := by rw [hc4]
-      _ = c ^ (5 : ℕ) := (pow_succ c 4).symm
-      _ = z ^ (5 : ℕ) := hc5
-      _ = z ^ (4 : ℕ) * z := pow_succ z 4
-  exact ⟨c, mul_left_cancel hcz, fun L hL => hc L hL⟩
+    ∃ (c : Circle) (ℓ₀ : ℕ), c = z ∧ ∀ L, ℓ₀ ≤ L → z ^ L = c ^ L := by
+  obtain ⟨c, ℓ₀, hc⟩ := exists_phase_eq_pow (A := fixtureP)
+    (B := fun σ => (z : ℂ) • fixtureP σ) t6_isInjectiveMPS.2.2.1
+    (isInjectiveMPS_smul z t6_isInjectiveMPS).2.2.1 (t8_generatesPhasedMPS_smul z)
+  have hc0 : c ^ ℓ₀ = z ^ ℓ₀ := (hc ℓ₀ le_rfl).symm
+  have hc1 : c ^ (ℓ₀ + 1) = z ^ (ℓ₀ + 1) := (hc (ℓ₀ + 1) (Nat.le_succ ℓ₀)).symm
+  have hcz : z ^ ℓ₀ * c = z ^ ℓ₀ * z :=
+    calc z ^ ℓ₀ * c = c ^ ℓ₀ * c := by rw [hc0]
+      _ = c ^ (ℓ₀ + 1) := (pow_succ c ℓ₀).symm
+      _ = z ^ (ℓ₀ + 1) := hc1
+      _ = z ^ ℓ₀ * z := pow_succ z ℓ₀
+  exact ⟨c, ℓ₀, mul_left_cancel hcz, fun L hL => hc L hL⟩
 
 /-! ## T9: the `D = 0` degenerate branch (documented limitation) -/
 
