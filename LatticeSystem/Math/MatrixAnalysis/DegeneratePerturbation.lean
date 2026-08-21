@@ -152,7 +152,8 @@ energy quadratic form `w ↦ re ⟪w, H w⟫` admits a sharp lower bound `m ‖w
 constant `m` being attained at a unit eigenvector of `H` lying in `q`. The minimum of the
 continuous energy on the compact unit sphere of `q` is a local extremum of the Rayleigh quotient,
 hence an eigenvector, and homogeneity of the quadratic form propagates the sphere minimum to all
-of `q`. This variational extraction is the only analytic input of the spectral-gap forms below. -/
+of `q`. The two spectral-gap statements below obtain their minimising eigenvector from this
+extraction. -/
 theorem exists_unit_eigenvector_min_energy_on_invariant {H : Matrix n n ℂ} (hH : H.IsHermitian)
     {q : Submodule ℂ (EuclideanSpace ℂ n)}
     (hInv : ∀ v ∈ q, Matrix.toEuclideanLin H v ∈ q) (hq : q ≠ ⊥) :
