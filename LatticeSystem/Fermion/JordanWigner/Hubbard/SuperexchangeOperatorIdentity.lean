@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJModel
+import LatticeSystem.Math.AnticommuteCommute
 
 /-!
 # Tasaki §10.1: the superexchange operator identity (eq. (10.1.9)/(10.1.10))
@@ -67,7 +68,27 @@ theorem fermionHopReturn_same_spin_eq (N : ℕ) (x y : Fin (N + 1)) (hxy : x ≠
       fermionMultiNumber (2 * N + 1) (spinfulIndex N y σ) -
         fermionMultiNumber (2 * N + 1) (spinfulIndex N x σ) *
           fermionMultiNumber (2 * N + 1) (spinfulIndex N y σ) := by
-  sorry
+  have hne : spinfulIndex N y σ ≠ spinfulIndex N x σ := fun h =>
+    hxy ((spinfulIndex_eq_iff N y x σ σ).mp h).1.symm
+  have algebra : ∀ ca cb aa ab : ManyBodyOp (Fin (2 * N + 2)),
+      aa * ca = 1 - ca * aa → cb * ca = -(ca * cb) → cb * aa = -(aa * cb) →
+      cb * aa * ca * ab = cb * ab - ca * aa * (cb * ab) := by
+    intro ca cb aa ab h1 h2 h3
+    calc cb * aa * ca * ab = cb * (aa * ca) * ab := by noncomm_ring
+      _ = cb * (1 - ca * aa) * ab := by rw [h1]
+      _ = cb * ab - cb * ca * (aa * ab) := by noncomm_ring
+      _ = cb * ab - -(ca * cb) * (aa * ab) := by rw [h2]
+      _ = cb * ab + ca * (cb * aa) * ab := by noncomm_ring
+      _ = cb * ab + ca * -(aa * cb) * ab := by rw [h3]
+      _ = cb * ab - ca * aa * (cb * ab) := by noncomm_ring
+  simp only [fermionMultiNumber]
+  refine algebra _ _ _ _ ?_ ?_ ?_
+  · rw [eq_sub_iff_add_eq]
+    exact fermionMultiAnticomm_self (2 * N + 1) (spinfulIndex N x σ)
+  · rw [eq_neg_iff_add_eq_zero]
+    exact fermionMultiCreation_anticomm_of_ne hne
+  · rw [eq_neg_iff_add_eq_zero]
+    exact fermionMultiCreation_annihilation_anticomm_of_ne hne
 
 /-- **Opposite-spin summand** (`σ ≠ τ`, hence `{σ, τ} = {0, 1}` in `Fin 2`). For `x ≠ y`,
 `ĉ†_{y,τ} ĉ_{x,τ} ĉ†_{x,σ} ĉ_{y,σ} = − (ĉ†_{y,τ} ĉ_{y,σ}) (ĉ†_{x,σ} ĉ_{x,τ})`: three CAR
@@ -86,13 +107,36 @@ theorem fermionHopReturn_opposite_spin_eq (N : ℕ) (x y : Fin (N + 1)) (hxy : x
             fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N y σ)) *
           (fermionMultiCreation (2 * N + 1) (spinfulIndex N x σ) *
             fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N x τ))) := by
-  sorry
+  have hxx : spinfulIndex N x τ ≠ spinfulIndex N x σ := fun h =>
+    hστ ((spinfulIndex_eq_iff N x x τ σ).mp h).2.symm
+  have hτσ : spinfulIndex N x τ ≠ spinfulIndex N y σ := fun h =>
+    hxy ((spinfulIndex_eq_iff N x y τ σ).mp h).1
+  have hσσ : spinfulIndex N x σ ≠ spinfulIndex N y σ := fun h =>
+    hxy ((spinfulIndex_eq_iff N x y σ σ).mp h).1
+  have algebra : ∀ cb' aa' ca ab : ManyBodyOp (Fin (2 * N + 2)),
+      aa' * ca = -(ca * aa') → aa' * ab = -(ab * aa') → ca * ab = -(ab * ca) →
+      cb' * aa' * ca * ab = -(cb' * ab * (ca * aa')) := by
+    intro cb' aa' ca ab h1 h2 h3
+    calc cb' * aa' * ca * ab = cb' * (aa' * ca) * ab := by noncomm_ring
+      _ = cb' * -(ca * aa') * ab := by rw [h1]
+      _ = -(cb' * ca * (aa' * ab)) := by noncomm_ring
+      _ = -(cb' * ca * -(ab * aa')) := by rw [h2]
+      _ = cb' * (ca * ab) * aa' := by noncomm_ring
+      _ = cb' * -(ab * ca) * aa' := by rw [h3]
+      _ = -(cb' * ab * (ca * aa')) := by noncomm_ring
+  refine algebra _ _ _ _ ?_ ?_ ?_
+  · rw [eq_neg_iff_add_eq_zero]
+    exact fermionMultiAnnihilation_creation_anticomm_of_ne hxx
+  · rw [eq_neg_iff_add_eq_zero]
+    exact fermionMultiAnnihilation_anticomm_of_ne hτσ
+  · rw [eq_neg_iff_add_eq_zero]
+    exact fermionMultiCreation_annihilation_anticomm_of_ne hσσ
 
 /-- **Charge decomposition of the same-spin density-density sum.**
-`Σ_σ n̂_{x,σ} n̂_{y,σ} = 2 (Ŝ^z_x Ŝ^z_y + ¼ n̂_x n̂_y)`: expand both sides into the four spin-label
-products `n̂_{x,↑} n̂_{y,↑}`, `n̂_{x,↑} n̂_{y,↓}`, `n̂_{x,↓} n̂_{y,↑}`, `n̂_{x,↓} n̂_{y,↓}` and match
-coefficients (no hypothesis on `x, y` is needed — this is a purely local algebraic rearrangement
-of commuting number operators). -/
+`Σ_σ n̂_{x,σ} n̂_{y,σ} = 2 (Ŝ^z_x Ŝ^z_y + ¼ n̂_x n̂_y)`: expand both sides into the four
+spin-label products `n̂_{x,↑} n̂_{y,↑}`, `n̂_{x,↑} n̂_{y,↓}`, `n̂_{x,↓} n̂_{y,↑}`,
+`n̂_{x,↓} n̂_{y,↓}` and match coefficients (no hypothesis on `x, y` is needed — this is a
+purely local algebraic rearrangement of commuting number operators). -/
 theorem sum_fermionMultiNumber_spinfulIndex_mul_eq (N : ℕ) (x y : Fin (N + 1)) :
     ∑ σ : Fin 2,
         fermionMultiNumber (2 * N + 1) (spinfulIndex N x σ) *
@@ -100,7 +144,11 @@ theorem sum_fermionMultiNumber_spinfulIndex_mul_eq (N : ℕ) (x y : Fin (N + 1))
       (2 : ℂ) •
         (fermionSiteSpinZ N x * fermionSiteSpinZ N y +
           (1 / 4 : ℂ) • (fermionSiteNumber N x * fermionSiteNumber N y)) := by
-  sorry
+  simp only [Fin.sum_univ_two, fermionMultiNumber, fermionSiteSpinZ, fermionSiteNumber,
+    fermionUpNumber, fermionDownNumber, fermionUpCreation, fermionUpAnnihilation,
+    fermionDownCreation, fermionDownAnnihilation, smul_sub, smul_add, sub_mul, mul_sub,
+    add_mul, mul_add, smul_mul_assoc, mul_smul_comm, smul_smul]
+  module
 
 /-- **Ladder decomposition of the two-site spin dot.** For `x ≠ y`,
 `Ŝ⁺_y Ŝ⁻_x + Ŝ⁻_y Ŝ⁺_x = 2 (Ŝ_x·Ŝ_y − Ŝ^z_x Ŝ^z_y)`: the two-site ladder bilinears at `x` and
@@ -112,7 +160,25 @@ theorem fermionSiteSpinPlus_mul_Minus_add_fermionSiteSpinMinus_mul_Plus_eq
     fermionSiteSpinPlus N y * fermionSiteSpinMinus N x +
         fermionSiteSpinMinus N y * fermionSiteSpinPlus N x =
       (2 : ℂ) • (fermionSpinDot N x y - fermionSiteSpinZ N x * fermionSiteSpinZ N y) := by
-  sorry
+  have hx : fermionSiteSpinMinus N x * fermionSiteSpinPlus N y
+      = fermionSiteSpinPlus N y * fermionSiteSpinMinus N x := by
+    unfold fermionSiteSpinMinus fermionSiteSpinPlus
+    exact anticomm_commute_mul_mul
+      (fermionDownCreation_upCreation_anticomm N x y)
+      (fermionDownCreation_downAnnihilation_anticomm_ne N hxy)
+      (fermionUpAnnihilation_upCreation_anticomm_ne N hxy)
+      (fermionUpAnnihilation_downAnnihilation_anticomm N x y)
+  have hy : fermionSiteSpinMinus N y * fermionSiteSpinPlus N x
+      = fermionSiteSpinPlus N x * fermionSiteSpinMinus N y := by
+    unfold fermionSiteSpinMinus fermionSiteSpinPlus
+    exact anticomm_commute_mul_mul
+      (fermionDownCreation_upCreation_anticomm N y x)
+      (fermionDownCreation_downAnnihilation_anticomm_ne N (Ne.symm hxy))
+      (fermionUpAnnihilation_upCreation_anticomm_ne N (Ne.symm hxy))
+      (fermionUpAnnihilation_downAnnihilation_anticomm N y x)
+  rw [← hx, hy]
+  unfold fermionSpinDot
+  module
 
 /-- **The superexchange operator identity** (Tasaki eq. (10.1.9)/(10.1.10), p. 344), the PR-7
 capstone. For `x ≠ y`:
@@ -132,6 +198,24 @@ theorem fermionHopReturn_eq (N : ℕ) (x y : Fin (N + 1)) (hxy : x ≠ y) :
     fermionHopReturn N x y =
       fermionSiteNumber N y - (2 : ℂ) • fermionSpinDot N x y -
         (1 / 2 : ℂ) • (fermionSiteNumber N x * fermionSiteNumber N y) := by
-  sorry
+  have hny : ∑ σ : Fin 2, fermionMultiNumber (2 * N + 1) (spinfulIndex N y σ)
+      = fermionSiteNumber N y := by
+    rw [Fin.sum_univ_two]
+    rfl
+  have key : fermionHopReturn N x y
+      = (∑ σ : Fin 2, (fermionMultiNumber (2 * N + 1) (spinfulIndex N y σ) -
+            fermionMultiNumber (2 * N + 1) (spinfulIndex N x σ) *
+              fermionMultiNumber (2 * N + 1) (spinfulIndex N y σ))) -
+          (fermionSiteSpinPlus N y * fermionSiteSpinMinus N x +
+            fermionSiteSpinMinus N y * fermionSiteSpinPlus N x) := by
+    simp only [fermionHopReturn, Fin.sum_univ_two, fermionSiteSpinPlus, fermionSiteSpinMinus,
+      fermionUpCreation, fermionUpAnnihilation, fermionDownCreation, fermionDownAnnihilation]
+    rw [fermionHopReturn_same_spin_eq N x y hxy 0, fermionHopReturn_same_spin_eq N x y hxy 1,
+      fermionHopReturn_opposite_spin_eq N x y hxy 0 1 (by decide),
+      fermionHopReturn_opposite_spin_eq N x y hxy 1 0 (by decide)]
+    abel
+  rw [key, Finset.sum_sub_distrib, hny, sum_fermionMultiNumber_spinfulIndex_mul_eq N x y,
+    fermionSiteSpinPlus_mul_Minus_add_fermionSiteSpinMinus_mul_Plus_eq N x y hxy]
+  module
 
 end LatticeSystem.Fermion
