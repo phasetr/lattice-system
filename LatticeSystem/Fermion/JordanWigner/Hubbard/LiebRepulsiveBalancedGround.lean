@@ -48,7 +48,7 @@ Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1s
 namespace LatticeSystem.Fermion
 
 open Matrix Module Module.End LatticeSystem.Quantum LatticeSystem.Math
-open scoped BigOperators ComplexOrder
+open scoped BigOperators
 
 variable {N : ℕ}
 
