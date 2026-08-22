@@ -6850,11 +6850,24 @@ configuration sector $K$ and the compressions of $\hat H_0$, $\hat V$ to $K$
 \emph{only inside $K$}, under the hypothesis that the hopping matrix respects
 the bipartition --- this is \emph{false} on the whole Fock space (a hard-core
 configuration with an empty site can absorb a hopping electron and stay
-hard-core); both the half-filling restriction and bipartiteness are
-essential, the latter removing the on-site part of $\hat V$.
-\emph{Left open for later PRs of the arc}: the bridge to PR-3's $K$
-definition, that $\hat V$ preserves $K$, and the compressed reduced-inverse
-construction itself.
+hard-core), so the half-filling restriction is essential. What the proof uses
+of the hopping matrix is only the vanishing of the endpoint diagonal
+(\texttt{liebEndpointHopping\_diag\_eq\_zero}), which removes the on-site
+(number-operator) part of $\hat V$; bipartiteness is a sufficient condition
+for that, not a necessary one --- a non-bipartite hopping matrix with
+vanishing diagonal gives the same first-order vanishing on the half-filled
+sector.
+\emph{Left open for later PRs of the arc}, all on the compressed sector $K$:
+(a) the compressed \texttt{IsReducedInverse} (the explicit reduced inverse
+restricted to $K$); (b) the compressed bridge
+$\hat H_{s=1}(\lambda)|_K=\hat H_0|_K+\lambda\hat V|_K$ to
+\texttt{perturbedHamiltonian}, together with the sector preservation of
+$\hat V$ it presupposes; and (c) nonemptiness of the compressed sector
+(\texttt{Nonempty (configSector \ldots)}), an instance hypothesis of
+\texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation}. Until those exist
+the whole-Fock-space $\hat H_0$/$\hat V$ statements have no consumer
+downstream; if the arc's capstone ends up going through the compressed layer
+alone, the whole-Fock-space versions are to be deleted, not kept.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,

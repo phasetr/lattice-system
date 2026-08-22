@@ -43,7 +43,16 @@ The constant-energy-shift lemma this setup also needs (normalising the hard-core
 
 The remaining `Ĥ₀`/`V̂` items above are stated on the whole Fock space, where `Ĥ₀` is diagonal;
 the sector-compressed statements are read off from them through `configSectorCompress_apply`, so
-both layers are needed.
+both layers are needed here.
+
+Left for later PRs of the arc, all on the compressed sector `K`: (a) the compressed
+`IsReducedInverse`, i.e. the explicit reduced inverse restricted to `K`; (b) the compressed
+bridge `Ĥ_{s=1}(λ)|_K = Ĥ₀|_K + λ V̂|_K` to `LatticeSystem.Math.perturbedHamiltonian`, together
+with the sector preservation of `V̂` that it presupposes; and (c) nonemptiness of the compressed
+sector, `Nonempty (configSector N (liebHalfFillingPred N nUp))`, which is an instance hypothesis
+of `tasaki_lemma_10_1_degenerate_perturbation`. Until those exist, the whole-Fock-space `Ĥ₀`/`V̂`
+statements have no consumer downstream of this file; if the arc's capstone ends up going through
+the compressed layer alone, the whole-Fock-space versions are to be deleted, not kept.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §10.1 (Lemma 10.1, eq. (10.1.20)) and §10.2.2 (p. 353).
@@ -206,8 +215,8 @@ theorem mem_matrixKernel_liebPerturbationH0_iff (N : ℕ)
 /-- Uniqueness of the kernel projection of `Ĥ₀`: a Hermitian matrix `P` that maps into `ker Ĥ₀`
 (`Ĥ₀ P = 0`) and fixes every hard-core vector *is* the orthogonal projection onto `ker Ĥ₀`, since
 `ker Ĥ₀` is the hard-core subspace (`mem_matrixKernel_liebPerturbationH0_iff`) and the two
-conditions are exactly the defining properties `P w ∈ ker Ĥ₀` and `w - P w ⊥ ker Ĥ₀`. Used both for
-the operator-product projection `∏ᵢ (1 - n̂↑n̂↓)` and for the explicit diagonal indicator matrix. -/
+conditions are exactly the defining properties `P w ∈ ker Ĥ₀` and `w - P w ⊥ ker Ĥ₀`. Used to
+identify `P̂₀` with the operator-product projection `∏ᵢ (1 - n̂↑n̂↓)`. -/
 private theorem kernelProjectionMatrix_liebPerturbationH0_eq_of_fixes_hardcore (N : ℕ)
     {P : ManyBodyOp (Fin (2 * N + 2))} (hHerm : P.IsHermitian)
     (hmul : liebPerturbationH0 N * P = 0)
@@ -505,9 +514,11 @@ hypothesis that makes the second-order effective Hamiltonian `Ĥeff = −P̂₀ 
 
 The half-filling restriction is essential, not cosmetic: on the whole Fock space `P̂₀ V̂ P̂₀` does
 not vanish (any hard-core configuration with an empty site can receive a hopping electron and stay
-hard-core), which is why the statement lives on the compressed sector. Bipartiteness of the
-hopping matrix is likewise essential, since it is what removes the on-site (number-operator) part
-of `V̂`. -/
+hard-core), which is why the statement lives on the compressed sector. Of the hopping matrix the
+proof uses only the vanishing of the endpoint diagonal (`liebEndpointHopping_diag_eq_zero`), which
+is what removes the on-site (number-operator) part of `V̂`; bipartiteness is a sufficient condition
+for that, not a necessary one — a non-bipartite hopping matrix with vanishing diagonal has the same
+first-order vanishing on the half-filled sector. -/
 theorem kernelProjection_mul_liebPerturbationVCompressed_mul_kernelProjection (N nUp : ℕ)
     {A : Finset (Fin (N + 1))} {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ}
     (hbip : HoppingRespectsBipartition A T) :
