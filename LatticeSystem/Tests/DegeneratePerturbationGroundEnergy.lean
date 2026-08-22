@@ -31,8 +31,8 @@ sentence "there are exactly `D₀` … eigenstates … depend[ing] continuously 
 seven declarations pinned below is a transcription of that argument. They are this arc's
 **elementary replacement** for it — built from the trial vector of eq. (10.1.18) and the plain
 Rayleigh–Ritz variational principle (B1/B2) — and every test below must be read as testing *that
-replacement*, not as testing "Tasaki's proof, formalized". `tasaki_lemma_10_1_degenerate_perturbation`
-itself stays a documented axiom until PR-6.
+replacement*, not as testing "Tasaki's proof, formalized". The capstone
+`tasaki_lemma_10_1_degenerate_perturbation` itself stays a documented axiom until PR-6.
 
 Also machine-checks the **`V = 0` corner** (design report §8, item 2): at `H0 = V = H0inv = 0`
 (`n = Fin 1`), `matrixKernel 0 = ⊤`, `hFirstOrder` holds trivially, and L1's residual identity
