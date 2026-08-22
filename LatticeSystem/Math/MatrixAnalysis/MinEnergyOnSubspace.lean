@@ -32,7 +32,7 @@ eigenvector witness.
 
 namespace LatticeSystem.Math
 
-open Matrix
+open Matrix LatticeSystem.Quantum
 
 variable {n : Type*} [Fintype n] [DecidableEq n]
 
@@ -40,6 +40,57 @@ variable {n : Type*} [Fintype n] [DecidableEq n]
 the real part of the Rayleigh quotient `⟪v, H v⟫` (Tasaki §10.2.3, p. 351). -/
 noncomputable def minEnergyOn (W : Submodule ℂ (EuclideanSpace ℂ n)) (H : Matrix n n ℂ) : ℝ :=
   sInf {r : ℝ | ∃ v ∈ W, ‖v‖ = 1 ∧ r = RCLike.re (inner ℂ v (Matrix.toEuclideanLin H v))}
+
+/-- The energy at a unit vector is bounded by the sum of entrywise norms.  This is the
+`EuclideanSpace`-side form of `abs_rayleighOnVec_le_sum_entryNorms_of_unit`, obtained by
+transporting the inner product to the matrix-side dot product. -/
+private theorem abs_re_inner_toEuclideanLin_le_sum_entryNorms (A : Matrix n n ℂ)
+    {v : EuclideanSpace ℂ n} (hv : ‖v‖ = 1) :
+    |RCLike.re (inner ℂ v (Matrix.toEuclideanLin A v))| ≤ ∑ i, ∑ j, ‖A i j‖ := by
+  have hunit : star (WithLp.ofLp v) ⬝ᵥ WithLp.ofLp v = 1 := by
+    rw [dotProduct_comm, ← EuclideanSpace.inner_eq_star_dotProduct, inner_self_eq_norm_sq_to_K, hv]
+    norm_num
+  have hbridge : RCLike.re (inner ℂ v (Matrix.toEuclideanLin A v))
+      = rayleighOnVec A (WithLp.ofLp v) := by
+    rw [EuclideanSpace.inner_eq_star_dotProduct, rayleighOnVec]
+    change (A *ᵥ WithLp.ofLp v ⬝ᵥ star (WithLp.ofLp v)).re = _
+    rw [dotProduct_comm]
+  rw [hbridge]
+  exact abs_rayleighOnVec_le_sum_entryNorms_of_unit A hunit
+
+/-- The energies of `H` at unit vectors of a nonzero subspace form a nonempty set: any nonzero
+vector of `W` normalises to a unit vector of `W`. -/
+private theorem energySet_nonempty {W : Submodule ℂ (EuclideanSpace ℂ n)} (hW : W ≠ ⊥)
+    (H : Matrix n n ℂ) :
+    {r : ℝ | ∃ v ∈ W, ‖v‖ = 1
+      ∧ r = RCLike.re (inner ℂ v (Matrix.toEuclideanLin H v))}.Nonempty := by
+  obtain ⟨w, hwW, hwne⟩ := (Submodule.ne_bot_iff W).mp hW
+  exact ⟨_, (‖w‖⁻¹ : ℂ) • w, W.smul_mem _ hwW, norm_smul_inv_norm hwne, rfl⟩
+
+/-- The energies of `H` at unit vectors are bounded below by `-∑ ‖H i j‖`, so the infimum defining
+`minEnergyOn` is a genuine greatest lower bound. -/
+private theorem energySet_bddBelow (W : Submodule ℂ (EuclideanSpace ℂ n)) (H : Matrix n n ℂ) :
+    BddBelow {r : ℝ | ∃ v ∈ W, ‖v‖ = 1
+      ∧ r = RCLike.re (inner ℂ v (Matrix.toEuclideanLin H v))} := by
+  refine ⟨-∑ i, ∑ j, ‖H i j‖, ?_⟩
+  rintro r ⟨v, -, hv, rfl⟩
+  exact neg_le_of_abs_le (abs_re_inner_toEuclideanLin_le_sum_entryNorms H hv)
+
+/-- Variational upper bound: every unit vector of `W` is a trial state for `minEnergyOn W H`. -/
+private theorem minEnergyOn_le {W : Submodule ℂ (EuclideanSpace ℂ n)} {H : Matrix n n ℂ}
+    {v : EuclideanSpace ℂ n} (hvW : v ∈ W) (hv : ‖v‖ = 1) :
+    minEnergyOn W H ≤ RCLike.re (inner ℂ v (Matrix.toEuclideanLin H v)) :=
+  csInf_le (energySet_bddBelow W H) ⟨v, hvW, hv, rfl⟩
+
+/-- Variational lower bound: a constant dominated by the energy of every unit vector of a nonzero
+`W` is dominated by `minEnergyOn W H`. -/
+private theorem le_minEnergyOn {W : Submodule ℂ (EuclideanSpace ℂ n)} (hW : W ≠ ⊥)
+    {H : Matrix n n ℂ} {c : ℝ}
+    (h : ∀ v ∈ W, ‖v‖ = 1 → c ≤ RCLike.re (inner ℂ v (Matrix.toEuclideanLin H v))) :
+    c ≤ minEnergyOn W H := by
+  refine le_csInf (energySet_nonempty hW H) ?_
+  rintro r ⟨v, hvW, hv, rfl⟩
+  exact h v hvW hv
 
 /-- **Reachability**: if `H` is Hermitian and preserves the nonzero subspace `W`, then
 `minEnergyOn W H` is the ground eigenvalue of `H` on `W`, attained by a unit eigenvector of `H`
@@ -49,7 +100,37 @@ theorem minEnergyOn_isGroundEigenvalueOn {H : Matrix n n ℂ} (hH : H.IsHermitia
     {W : Submodule ℂ (EuclideanSpace ℂ n)}
     (hInv : ∀ v ∈ W, Matrix.toEuclideanLin H v ∈ W) (hW : W ≠ ⊥) :
     IsGroundEigenvalueOn W H (minEnergyOn W H) := by
-  sorry
+  obtain ⟨m, x, hxW, hxnorm, hxeig, hmin⟩ :=
+    exists_unit_eigenvector_min_energy_on_invariant hH hInv hW
+  have hxne : x ≠ 0 := by
+    intro h
+    rw [h, norm_zero] at hxnorm
+    exact zero_ne_one hxnorm
+  have heig_energy : ∀ (μ : ℝ) (w : EuclideanSpace ℂ n),
+      Matrix.toEuclideanLin H w = (μ : ℂ) • w →
+      RCLike.re (inner ℂ w (Matrix.toEuclideanLin H w)) = μ * ‖w‖ ^ 2 := by
+    intro μ w hw
+    rw [hw, inner_smul_right, inner_self_eq_norm_sq_to_K, RCLike.ofReal_eq_complex_ofReal,
+      ← Complex.ofReal_pow, ← Complex.ofReal_mul]
+    exact Complex.ofReal_re _
+  have heq : minEnergyOn W H = m := by
+    refine le_antisymm ?_ (le_minEnergyOn hW ?_)
+    · have hx := heig_energy m x hxeig
+      rw [hxnorm, one_pow, mul_one] at hx
+      rw [← hx]
+      exact minEnergyOn_le hxW hxnorm
+    · intro v hvW hv
+      have hb := hmin v hvW
+      rw [hv] at hb
+      simpa using hb
+  rw [heq]
+  refine ⟨⟨x, hxW, hxne, hxeig⟩, ?_⟩
+  rintro μ ⟨ψ, hψW, hψne, hψeig⟩
+  have hb := hmin ψ hψW
+  rw [heig_energy μ ψ hψeig] at hb
+  have hnz : ‖ψ‖ ≠ 0 := norm_ne_zero_iff.mpr hψne
+  have hpos : 0 < ‖ψ‖ ^ 2 := by positivity
+  exact le_of_mul_le_mul_right hb hpos
 
 /-- **Entry-norm Lipschitz continuity** of `minEnergyOn W` in the matrix argument: bounded by the
 sum of entrywise norm differences, uniformly over the choice of nonzero subspace `W`. Mirrors
@@ -58,7 +139,27 @@ the whole space. -/
 theorem abs_minEnergyOn_sub_le_sum_entryNorms {W : Submodule ℂ (EuclideanSpace ℂ n)}
     (hW : W ≠ ⊥) (H₁ H₂ : Matrix n n ℂ) :
     |minEnergyOn W H₁ - minEnergyOn W H₂| ≤ ∑ i, ∑ j, ‖(H₁ - H₂) i j‖ := by
-  sorry
+  have key : ∀ A B : Matrix n n ℂ, minEnergyOn W A ≤ minEnergyOn W B + ∑ i, ∑ j, ‖(A - B) i j‖ := by
+    intro A B
+    refine sub_le_iff_le_add.mp (le_minEnergyOn hW ?_)
+    intro v hvW hv
+    have h1 : minEnergyOn W A ≤ RCLike.re (inner ℂ v (Matrix.toEuclideanLin A v)) :=
+      minEnergyOn_le hvW hv
+    have hdiff : RCLike.re (inner ℂ v (Matrix.toEuclideanLin (A - B) v))
+        = RCLike.re (inner ℂ v (Matrix.toEuclideanLin A v))
+          - RCLike.re (inner ℂ v (Matrix.toEuclideanLin B v)) := by
+      rw [map_sub, LinearMap.sub_apply, inner_sub_right, map_sub]
+    have h2 : RCLike.re (inner ℂ v (Matrix.toEuclideanLin (A - B) v)) ≤ ∑ i, ∑ j, ‖(A - B) i j‖ :=
+      le_of_abs_le (abs_re_inner_toEuclideanLin_le_sum_entryNorms (A - B) hv)
+    linarith
+  have hsym : (∑ i, ∑ j, ‖(H₂ - H₁) i j‖) = ∑ i, ∑ j, ‖(H₁ - H₂) i j‖ := by
+    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
+    rw [show (H₂ - H₁) i j = -((H₁ - H₂) i j) from by rw [Matrix.sub_apply, Matrix.sub_apply]; ring,
+      norm_neg]
+  have h12 := key H₁ H₂
+  have h21 := key H₂ H₁
+  rw [hsym] at h21
+  exact abs_sub_le_iff.mpr ⟨by linarith, by linarith⟩
 
 /-- **Continuity of `minEnergyOn W` under a continuous matrix-valued parameter**: if
 `F : X → Matrix n n ℂ` is continuous, so is `x ↦ minEnergyOn W (F x)`. Mirrors
@@ -67,6 +168,21 @@ theorem abs_minEnergyOn_sub_le_sum_entryNorms {W : Submodule ℂ (EuclideanSpace
 theorem Continuous.minEnergyOn_comp {W : Submodule ℂ (EuclideanSpace ℂ n)} (hW : W ≠ ⊥)
     {X : Type*} [PseudoMetricSpace X] {F : X → Matrix n n ℂ} (hF : Continuous F) :
     Continuous (fun x => minEnergyOn W (F x)) := by
-  sorry
+  refine Metric.continuous_iff.mpr (fun x₀ ε hε => ?_)
+  have hcont : ContinuousAt (fun x => ∑ i, ∑ j, ‖(F x - F x₀) i j‖) x₀ :=
+    continuous_sum_entryNorms.continuousAt.comp
+      (hF.sub (continuous_const : Continuous (fun _ : X => F x₀))).continuousAt
+  have hzero : (∑ i, ∑ j, ‖(F x₀ - F x₀) i j‖) = 0 := by simp
+  rw [Metric.continuousAt_iff] at hcont
+  obtain ⟨δ, hδpos, hδ⟩ := hcont ε hε
+  refine ⟨δ, hδpos, fun x hx => ?_⟩
+  have hsumlt : ∑ i, ∑ j, ‖(F x - F x₀) i j‖ < ε := by
+    have h := hδ hx
+    rw [hzero, Real.dist_eq, sub_zero] at h
+    have hnn : (0 : ℝ) ≤ ∑ i, ∑ j, ‖(F x - F x₀) i j‖ :=
+      Finset.sum_nonneg (fun i _ => Finset.sum_nonneg (fun j _ => norm_nonneg _))
+    rwa [abs_of_nonneg hnn] at h
+  rw [Real.dist_eq]
+  exact lt_of_le_of_lt (abs_minEnergyOn_sub_le_sum_entryNorms hW (F x) (F x₀)) hsumlt
 
 end LatticeSystem.Math
