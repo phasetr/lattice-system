@@ -5,14 +5,13 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.SuperexchangeOperatorIdentity
 # Hop-pair collapse for Theorem 10.4 (Tasaki §10.1, PR-8a)
 
 Eighth installment of the Theorem 10.4 discharge arc (issue #5320); first of the two-PR
-final-assembly split of the original PR-8 (PR-8a / PR-8b, per the fresh design round scoped to
-PR-8, recorded in `.self-local/active/issue-5320.md`). PR-6 supplied the reduced-inverse layer and
-its capstone `secondOrderEffectiveHamiltonian_liebPerturbation_eq`, which reduces the second-order
-effective Hamiltonian to `−(P̂₀ · V̂|_K · V̂|_K · P̂₀)`; PR-7 supplied the model-independent
-hop-return identity `fermionHopReturn_eq`. This file computes the entrywise expansion of
-`V̂ · V̂` on the singly-occupied (half-filled hard-core) sector and collapses it to a sum of
-`fermionHopReturn` terms — Tasaki's collapse argument (eq. (10.1.8), p. 344): "one electron must
-hop from `x` to `y` to resolve the double occupancy so that the excited state returns to the
+final-assembly split of the original PR-8 (PR-8a / PR-8b). PR-6 supplied the reduced-inverse layer
+and its capstone `secondOrderEffectiveHamiltonian_liebPerturbation_eq`, which reduces the
+second-order effective Hamiltonian to `−(P̂₀ · V̂|_K · V̂|_K · P̂₀)`; PR-7 supplied the
+model-independent hop-return identity `fermionHopReturn_eq`. This file computes the entrywise
+expansion of `V̂ · V̂` on the singly-occupied (half-filled hard-core) sector and collapses it to a
+sum of `fermionHopReturn` terms — Tasaki's collapse argument (eq. (10.1.8), p. 344): "one electron
+must hop from `x` to `y` to resolve the double occupancy so that the excited state returns to the
 subspace `H₀`".
 
 ## Collapse argument
@@ -31,11 +30,17 @@ here, both sides carry the same operator and `jwSign` cancels by construction. T
 therefore needs no `hT` (symmetry of the hopping matrix `T`) at this stage: the surviving
 coefficient is the *asymmetric* product `t_{yx} · t_{xy}`, and only PR-8b's reduction of that
 product to the endpoint-graph indicator `t_{xy}²` (`liebEndpointHopping_sq_eq_indicator`'s `hT`
-variant) needs the symmetry hypothesis. This file nevertheless records the provenance of that later
-correction (`.self-local/active/issue-5320.md`, "Correction: `hT` ... is a *necessary* hypothesis"):
+variant) needs the symmetry hypothesis. There `hT` is genuinely necessary rather than a convenience:
 an asymmetric `T` with `T x y > 0 > T y x` would make `t_{yx} t_{xy}` and the endpoint indicator
 `(liebEndpointHopping A T 1 x y)²` disagree in sign, which is why PR-8b — not this file — must
 carry `hT` alongside `hbip`.
+
+Index-orientation caveat: the display above attaches `t_{ij}` to the *left* operator factor, while
+the proof below (`hzero`/`hcollapse`) works in the `simp` normal form of the matrix product, where
+`t_{ij}` sits with the *right* factor `ĉ†_{i,σ}ĉ_{j,σ}` (the one acting first) and `t_{kl}` with the
+left factor. The two index pairs are thus interchanged relative to this paragraph — the surviving
+diagonal is written `k = j ∧ l = i` there — but the condition and the resulting statement are the
+same.
 
 Both the `i = j` and `k = l` (same-site) sub-cases are number-operator terms; they are killed
 upstream by `liebEndpointHopping_diag_eq_zero` (`LiebRepulsivePerturbationSetup.lean`), acting on
