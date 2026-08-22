@@ -173,14 +173,15 @@ example :
   refine ⟨0, 1, 0, 1, 1, e0, 0, Matrix.isHermitian_zero, ?_, ?_,
     by simp [fin1_matrixKernel_zero_eq_top], by simp, ?_, ?_, ?_⟩
   · rw [hA]
-    exact ⟨by simp, by simp, by simp, by simp, Matrix.isHermitian_zero⟩
+    exact ⟨by simp [fin1_kernelProjectionMatrix_zero_eq_one],
+      by simp [fin1_kernelProjectionMatrix_zero_eq_one], by simp, by simp,
+      Matrix.isHermitian_zero⟩
   · rw [hA, fin1_kernelProjectionMatrix_zero_eq_one]
   · rw [fin1_kernelProjectionMatrix_zero_eq_one]
     intro h
     have := congrArg (fun M : Matrix (Fin 1) (Fin 1) ℂ => M 0 0) h
     simp at this
-  · have hone : Matrix.toEuclideanLin (1 : Matrix (Fin 1) (Fin 1) ℂ) e0 = e0 := by simp
-    simp [perturbedHamiltonian, hone]
+  · simp [perturbedHamiltonian]
   · have hK0 : Matrix.toEuclideanLin
         (secondOrderEffectiveHamiltonian (0 : Matrix (Fin 1) (Fin 1) ℂ) 1
           (0 : Matrix (Fin 1) (Fin 1) ℂ)) e0 = 0 := by
@@ -215,11 +216,14 @@ example :
   refine ⟨0, 0, 0, 0, 0, 0, e0, Matrix.isHermitian_zero, ?_, ?_,
     by simp [fin1_matrixKernel_zero_eq_top], ?_, ?_, ?_, ?_⟩
   · rw [hA]
-    exact ⟨by simp, by simp, by simp, by simp, Matrix.isHermitian_zero⟩
+    exact ⟨by simp [fin1_kernelProjectionMatrix_zero_eq_one],
+      by simp [fin1_kernelProjectionMatrix_zero_eq_one], by simp, by simp,
+      Matrix.isHermitian_zero⟩
   · rw [hA, fin1_kernelProjectionMatrix_zero_eq_one]
   · rw [fin1_matrixKernel_zero_eq_top]
     simp [he0ne]
   · rw [fin1_kernelProjectionMatrix_zero_eq_one]
+    simp
   · simp [perturbedHamiltonian]
   · simpa using he0ne
 
