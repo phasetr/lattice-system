@@ -19,14 +19,8 @@ Pins the API contract of the six declarations that
    `‖(R − Ĥ₀⁻¹) u‖ ≤ (|λ|v + |E|) ‖u‖ / (g (g − |λ|v − |E|))`.
 
 Also machine-checks a concrete `Fin 2` inhabitation of `IsReducedInverse` via N1
-(design report §6.3, fallback form).
-
-Design report §6.4 (`hsmall` load-bearing counterexample) is **not** pinned here: exhibiting it
-needs the `H2`/`H3` hoists (`toEuclideanLin_one_sub_apply`,
-`toEuclideanLin_kernelProjectionMatrix`) that this same PR adds to `DegeneratePerturbation.lean`,
-so it is deferred to the Green phase once those hoists exist (design report §5 pitfall P-a flags
-`H3` as the one step with real API-shape risk; do not attempt it test-first without the hoists in
-hand).
+(design report §6.3, fallback form), and a `Fin 1` counterexample showing that the smallness
+hypothesis `|λ|v + |E| < g` of N4 cannot be dropped.
 -/
 
 namespace LatticeSystem.Tests.DegeneratePerturbationReducedResolvent
@@ -63,18 +57,18 @@ example {H0 V : Matrix n n ℂ} (hH0 : H0.IsHermitian) :
 /-- Pins **N4**: under the smallness hypothesis `|λ|v + |E| < g`, the kernel of the compressed
 operator `A(λ,E)` coincides with `ker Ĥ₀`. -/
 example {H0 V : Matrix n n ℂ} (lam E : ℝ) {g v : ℝ}
-    (hH0 : H0.IsHermitian) (hH0pos : H0.PosSemidef) (hV : V.IsHermitian)
+    (hH0 : H0.IsHermitian)
     (hgap : ∀ u : EuclideanSpace ℂ n, u ∈ (matrixKernel H0)ᗮ →
       g * ‖u‖ ^ 2 ≤ RCLike.re (inner ℂ u (Matrix.toEuclideanLin H0 u)))
     (hv : ∀ u : EuclideanSpace ℂ n, ‖Matrix.toEuclideanLin V u‖ ≤ v * ‖u‖)
     (hsmall : |lam| * v + |E| < g) :
     matrixKernel (reducedPerturbedHamiltonian H0 V lam E) = matrixKernel H0 :=
-  matrixKernel_reducedPerturbedHamiltonian hH0 hH0pos hV hgap hv hsmall
+  matrixKernel_reducedPerturbedHamiltonian hH0 hgap hv hsmall
 
 /-- Pins **N5**: existence of the reduced resolvent `R(λ,E)` together with its operator-norm
 bound `‖R u‖ ≤ ‖u‖ / (g − |λ|v − |E|)`. -/
 example {H0 V : Matrix n n ℂ} (lam E : ℝ) {g v : ℝ}
-    (hH0 : H0.IsHermitian) (hH0pos : H0.PosSemidef) (hV : V.IsHermitian)
+    (hH0 : H0.IsHermitian) (hV : V.IsHermitian)
     (hgap : ∀ u : EuclideanSpace ℂ n, u ∈ (matrixKernel H0)ᗮ →
       g * ‖u‖ ^ 2 ≤ RCLike.re (inner ℂ u (Matrix.toEuclideanLin H0 u)))
     (hv : ∀ u : EuclideanSpace ℂ n, ‖Matrix.toEuclideanLin V u‖ ≤ v * ‖u‖)
@@ -82,13 +76,12 @@ example {H0 V : Matrix n n ℂ} (lam E : ℝ) {g v : ℝ}
     ∃ R, IsReducedInverse (reducedPerturbedHamiltonian H0 V lam E) R ∧
       ∀ u : EuclideanSpace ℂ n,
         ‖Matrix.toEuclideanLin R u‖ ≤ ‖u‖ / (g - |lam| * v - |E|) :=
-  exists_isReducedInverse_reducedPerturbedHamiltonian hH0 hH0pos hV hgap hv hsmall
+  exists_isReducedInverse_reducedPerturbedHamiltonian hH0 hV hgap hv hsmall
 
 /-- Pins **N6**: the resolvent-difference bound
 `‖(R(λ,E) − Ĥ₀⁻¹) u‖ ≤ (|λ|v + |E|) ‖u‖ / (g (g − |λ|v − |E|))`. -/
 example {H0 V H0inv R : Matrix n n ℂ} (lam E : ℝ) {g v : ℝ}
-    (hH0 : H0.IsHermitian) (hH0pos : H0.PosSemidef) (hV : V.IsHermitian)
-    (hInv0 : IsReducedInverse H0 H0inv)
+    (hH0 : H0.IsHermitian) (hInv0 : IsReducedInverse H0 H0inv)
     (hgap : ∀ u : EuclideanSpace ℂ n, u ∈ (matrixKernel H0)ᗮ →
       g * ‖u‖ ^ 2 ≤ RCLike.re (inner ℂ u (Matrix.toEuclideanLin H0 u)))
     (hv : ∀ u : EuclideanSpace ℂ n, ‖Matrix.toEuclideanLin V u‖ ≤ v * ‖u‖)
@@ -97,7 +90,7 @@ example {H0 V H0inv R : Matrix n n ℂ} (lam E : ℝ) {g v : ℝ}
     ∀ u : EuclideanSpace ℂ n,
       ‖Matrix.toEuclideanLin R u - Matrix.toEuclideanLin H0inv u‖
         ≤ (|lam| * v + |E|) * ‖u‖ / (g * (g - |lam| * v - |E|)) :=
-  norm_sub_reducedInverse_le hH0 hH0pos hV hInv0 hgap hv hsmall hR
+  norm_sub_reducedInverse_le hH0 hInv0 hgap hv hsmall hR
 
 /-- **Concrete inhabitation of `IsReducedInverse` at `n = Fin 2`** (design report §6.3, fallback
 form — answers the PR-1 review follow-up with a genuinely non-vacuous witness): the diagonal
@@ -107,5 +100,40 @@ example : ∃ R, IsReducedInverse (Matrix.diagonal ![(0 : ℂ), 1]) R := by
     refine Matrix.isHermitian_diagonal_iff.mpr fun i => ?_
     fin_cases i <;> simp [isSelfAdjoint_iff]
   exact exists_isReducedInverse_of_isHermitian hH0
+
+/-- **The smallness hypothesis of N4 is load-bearing** (design report §6.4). At the boundary
+`|λ|v + |E| = g` the conclusion already fails: for the `1 × 1` identity `Ĥ₀ = 1` (gap `g = 1`,
+`ker Ĥ₀ = ⊥`) with `V̂ = 0` (`v = 0`), `λ = 0` and `E = 1`, the compression `A(0,1) = Ĥ₀ − 1` is
+zero, so its kernel is all of the space while `ker Ĥ₀ = ⊥`. Every hypothesis of
+`matrixKernel_reducedPerturbedHamiltonian` except `hsmall` holds here. -/
+example : ∃ (H0 V : Matrix (Fin 1) (Fin 1) ℂ) (lam E g v : ℝ),
+    H0.IsHermitian ∧
+    (∀ u : EuclideanSpace ℂ (Fin 1), u ∈ (matrixKernel H0)ᗮ →
+      g * ‖u‖ ^ 2 ≤ RCLike.re (inner ℂ u (Matrix.toEuclideanLin H0 u))) ∧
+    (∀ u : EuclideanSpace ℂ (Fin 1), ‖Matrix.toEuclideanLin V u‖ ≤ v * ‖u‖) ∧
+    matrixKernel (reducedPerturbedHamiltonian H0 V lam E) ≠ matrixKernel H0 := by
+  have hone : ∀ u : EuclideanSpace ℂ (Fin 1),
+      Matrix.toEuclideanLin (1 : Matrix (Fin 1) (Fin 1) ℂ) u = u := by
+    intro u
+    simp
+  have hker : matrixKernel (1 : Matrix (Fin 1) (Fin 1) ℂ) = ⊥ := by
+    rw [Submodule.eq_bot_iff]
+    intro x hx
+    rw [← hone x]
+    exact LinearMap.mem_ker.mp hx
+  have hP : kernelProjectionMatrix (1 : Matrix (Fin 1) (Fin 1) ℂ) = 0 := by
+    refine Matrix.toEuclideanLin.injective ?_
+    rw [toEuclideanLin_kernelProjectionMatrix, hker, map_zero]
+    ext x
+    simp
+  have hA : reducedPerturbedHamiltonian (1 : Matrix (Fin 1) (Fin 1) ℂ) 0 0 1 = 0 := by
+    rw [reducedPerturbedHamiltonian, perturbedHamiltonian, hP]
+    simp
+  refine ⟨1, 0, 0, 1, 1, 0, Matrix.isHermitian_one, fun u _ => ?_, fun u => by simp, ?_⟩
+  · rw [hone u, inner_self_eq_norm_sq_to_K]
+    have hre : ((‖u‖ : ℂ) ^ 2).re = ‖u‖ ^ 2 := by rw [← Complex.ofReal_pow, Complex.ofReal_re]
+    simp [hre]
+  · rw [hA, hker, matrixKernel, LinearMap.ker_eq_top.mpr (map_zero Matrix.toEuclideanLin)]
+    exact top_ne_bot
 
 end LatticeSystem.Tests.DegeneratePerturbationReducedResolvent

@@ -59,6 +59,20 @@ open scoped ComplexOrder
 
 variable {n : Type*} [Fintype n] [DecidableEq n]
 
+/-- `Matrix.toEuclideanLin` sends matrix multiplication to composition of the associated linear
+maps, read off pointwise. -/
+theorem toEuclideanLin_mul_apply (A B : Matrix n n ℂ) (v : EuclideanSpace ℂ n) :
+    Matrix.toEuclideanLin (A * B) v
+      = Matrix.toEuclideanLin A (Matrix.toEuclideanLin B v) := by
+  apply WithLp.ofLp_injective 2
+  simp [Matrix.ofLp_toLpLin, Matrix.toLin'_apply, Matrix.mulVec_mulVec]
+
+/-- The linear map of the complementary matrix `1 - A` is `v ↦ v - A v`. -/
+theorem toEuclideanLin_one_sub_apply (A : Matrix n n ℂ) (v : EuclideanSpace ℂ n) :
+    Matrix.toEuclideanLin (1 - A) v = v - Matrix.toEuclideanLin A v := by
+  apply WithLp.ofLp_injective 2
+  simp [Matrix.ofLp_toLpLin, Matrix.toLin'_apply]
+
 /-- The kernel of a finite matrix, as a subspace of `EuclideanSpace ℂ n`
 via `Matrix.toEuclideanLin`. -/
 noncomputable def matrixKernel (H : Matrix n n ℂ) :
@@ -97,6 +111,45 @@ theorem kernelProjectionMatrix_isIdempotent (H : Matrix n n ℂ) :
   rw [← map_mul (LinearMap.toMatrixOrthonormal (EuclideanSpace.basisFun n ℂ))]
   congr 1
   rw [← ContinuousLinearMap.coe_mul, h]
+
+/-- **The projection matrix represents the orthogonal projection.** The linear map attached to
+`kernelProjectionMatrix H` is the star projection onto `ker H`; this is the bridge that turns
+matrix identities involving `P̂₀` into Hilbert-space projection facts. -/
+theorem toEuclideanLin_kernelProjectionMatrix (H : Matrix n n ℂ) :
+    Matrix.toEuclideanLin (kernelProjectionMatrix H)
+      = (matrixKernel H).starProjection.toLinearMap := by
+  have hrepr : kernelProjectionMatrix H
+      = LinearMap.toMatrix (EuclideanSpace.basisFun n ℂ).toBasis
+          (EuclideanSpace.basisFun n ℂ).toBasis
+          (matrixKernel H).starProjection.toLinearMap := rfl
+  rw [hrepr, Matrix.toEuclideanLin_eq_toLin_orthonormal, Matrix.toLin_toMatrix]
+
+/-- **The range of a Hermitian matrix is orthogonal to its kernel.** In particular `(ker H)ᗮ` is
+invariant under `H`, which is what the spectral-gap extractions below need. -/
+theorem toEuclideanLin_mem_matrixKernel_orthogonal {H : Matrix n n ℂ} (hH : H.IsHermitian)
+    (v : EuclideanSpace ℂ n) : Matrix.toEuclideanLin H v ∈ (matrixKernel H)ᗮ := by
+  have hsym : (Matrix.toEuclideanLin H).IsSymmetric := Matrix.isHermitian_iff_isSymmetric.mp hH
+  rw [Submodule.mem_orthogonal]
+  intro u hu
+  rw [← hsym u v, LinearMap.mem_ker.mp hu, inner_zero_left]
+
+/-- **A matrix annihilates the projection onto its own kernel**: `H · P̂₀ = 0`. -/
+theorem mul_kernelProjectionMatrix_eq_zero (H : Matrix n n ℂ) :
+    H * kernelProjectionMatrix H = 0 := by
+  refine Matrix.toEuclideanLin.injective (LinearMap.ext fun x => ?_)
+  have hmem : (matrixKernel H).starProjection x ∈ matrixKernel H :=
+    Submodule.starProjection_apply_mem _ x
+  rw [toEuclideanLin_mul_apply, toEuclideanLin_kernelProjectionMatrix, map_zero,
+    LinearMap.zero_apply]
+  exact LinearMap.mem_ker.mp hmem
+
+/-- **A Hermitian matrix is annihilated by the projection onto its kernel**: `P̂₀ · H = 0`. The
+adjoint of `H · P̂₀ = 0`, using that both factors are Hermitian. -/
+theorem kernelProjectionMatrix_mul_eq_zero {H : Matrix n n ℂ} (hH : H.IsHermitian) :
+    kernelProjectionMatrix H * H = 0 := by
+  have h := congrArg Matrix.conjTranspose (mul_kernelProjectionMatrix_eq_zero H)
+  rwa [Matrix.conjTranspose_mul, (kernelProjectionMatrix_isHermitian H).eq, hH.eq,
+    Matrix.conjTranspose_zero] at h
 
 /-- `H0inv` is the **reduced (Moore–Penrose) inverse** of `H0`: it inverts
 `H0` on `(ker H0)ᗮ` and vanishes on `ker H0`. We axiomatize this property
@@ -241,13 +294,8 @@ theorem matrixKernel_orthogonal_gap {H0 : Matrix n n ℂ} (hH0pos : H0.PosSemide
   · refine ⟨1, one_pos, fun u hu => ?_⟩
     rw [hbot, Submodule.mem_bot] at hu
     simp [hu]
-  · have hsym : (Matrix.toEuclideanLin H0).IsSymmetric :=
-      Matrix.isHermitian_iff_isSymmetric.mp hH0pos.1
-    have hInv : ∀ v ∈ (matrixKernel H0)ᗮ, Matrix.toEuclideanLin H0 v ∈ (matrixKernel H0)ᗮ := by
-      intro v _
-      rw [Submodule.mem_orthogonal]
-      intro u hu
-      rw [← hsym u v, LinearMap.mem_ker.mp hu, inner_zero_left]
+  · have hInv : ∀ v ∈ (matrixKernel H0)ᗮ, Matrix.toEuclideanLin H0 v ∈ (matrixKernel H0)ᗮ :=
+      fun v _ => toEuclideanLin_mem_matrixKernel_orthogonal hH0pos.1 v
     obtain ⟨m, x, hxq, hxnorm, hxeig, hbound⟩ :=
       exists_unit_eigenvector_min_energy_on_invariant hH0pos.1 hInv hbot
     refine ⟨m, ?_, hbound⟩
@@ -334,33 +382,23 @@ theorem IsReducedInverse.norm_toEuclideanLin_le {H0 H0inv : Matrix n n ℂ}
   classical
   have hPsym : (Matrix.toEuclideanLin (kernelProjectionMatrix H0)).IsSymmetric :=
     Matrix.isHermitian_iff_isSymmetric.mp (kernelProjectionMatrix_isHermitian H0)
-  have hmul : ∀ (A B : Matrix n n ℂ) (v : EuclideanSpace ℂ n),
-      Matrix.toEuclideanLin (A * B) v
-        = Matrix.toEuclideanLin A (Matrix.toEuclideanLin B v) := by
-    intro A B v
-    apply WithLp.ofLp_injective 2
-    simp [Matrix.ofLp_toLpLin, Matrix.toLin'_apply, Matrix.mulVec_mulVec]
-  have hsub : ∀ (A : Matrix n n ℂ) (v : EuclideanSpace ℂ n),
-      Matrix.toEuclideanLin (1 - A) v = v - Matrix.toEuclideanLin A v := by
-    intro A v
-    apply WithLp.ofLp_injective 2
-    simp [Matrix.ofLp_toLpLin, Matrix.toLin'_apply]
   set y : EuclideanSpace ℂ n := Matrix.toEuclideanLin H0inv u with hydef
   have hPy : Matrix.toEuclideanLin (kernelProjectionMatrix H0) y = 0 := by
-    rw [hydef, ← hmul, hInv.kills_kernel_left]
+    rw [hydef, ← toEuclideanLin_mul_apply, hInv.kills_kernel_left]
     simp
   have hyperp : y ∈ (matrixKernel H0)ᗮ := by
     rw [Submodule.mem_orthogonal]
     intro v hv
     have hPv : Matrix.toEuclideanLin (kernelProjectionMatrix H0) v = v := by
-      have hv' := hmul H0inv H0 v
-      rw [hInv.right_inv_on_compl, LinearMap.mem_ker.mp hv, map_zero, hsub,
-        sub_eq_zero] at hv'
+      have hv' := toEuclideanLin_mul_apply H0inv H0 v
+      rw [hInv.right_inv_on_compl, LinearMap.mem_ker.mp hv, map_zero,
+        toEuclideanLin_one_sub_apply, sub_eq_zero] at hv'
       exact hv'.symm
     rw [← hPv, hPsym v y, hPy, inner_zero_right]
   have hH0y : Matrix.toEuclideanLin H0 y
       = u - Matrix.toEuclideanLin (kernelProjectionMatrix H0) u := by
-    rw [hydef, ← hmul, hInv.left_inv_on_compl, hsub]
+    rw [hydef, ← toEuclideanLin_mul_apply, hInv.left_inv_on_compl,
+      toEuclideanLin_one_sub_apply]
   have hpair : RCLike.re (inner ℂ y (Matrix.toEuclideanLin H0 y)) = RCLike.re (inner ℂ y u) := by
     rw [hH0y, inner_sub_right, ← hPsym y u, hPy, inner_zero_left, sub_zero]
   have hkey : g * ‖y‖ ^ 2 ≤ ‖y‖ * ‖u‖ := by
