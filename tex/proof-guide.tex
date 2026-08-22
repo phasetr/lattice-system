@@ -6823,6 +6823,65 @@ bipartite for the same $A\sqcup B$ and connected, hence carry the same
 Lieb--Mattis total spin $S_0 = ||A|-|B||/2$.
 Not itself a numbered Tasaki statement; axiom-free.
 
+\emph{Perturbation setup at the homotopy endpoint (Issue~\#5320, PR~\#5326
+PR-5).} Not itself a numbered Tasaki statement; generic
+degenerate-perturbation-theory infrastructure setting up the $\lambda\to0$
+deformation of p.~353 as an instance of Tasaki Lemma~10.1's
+$\hat H(\lambda)=\hat H_0+\lambda\hat V$ contract
+(\texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation}, Issue~\#5313).
+Generic layer
+(\texttt{Math/MatrixAnalysis/DegeneratePerturbation.lean},
+\texttt{MinEnergyOnSubspace.lean}):
+\texttt{kernelProjectionMatrix\_eq\_of\_fixes\_kernel} (a Hermitian matrix
+mapping into $\ker H$ and fixing every kernel vector is the orthogonal
+projection onto $\ker H$), its diagonal specialization
+\texttt{kernelProjectionMatrix\_diagonal}, and the constant-shift lemma
+\texttt{minEnergyOn\_add\_const\_smul\_one}. Model-specific layer
+(\texttt{Fermion/JordanWigner/Hubbard/LiebRepulsivePerturbationSetup.lean},
+new file, plus \texttt{configSectorCompress\_apply} in
+\texttt{HubbardImpossibilityLowUVariationalCore.lean}):
+$\hat H_0=\sum_x\hat n_{x\uparrow}\hat n_{x\downarrow}$ ($U=1$) and the
+unit-coupling endpoint hopping $\hat V$ at $s=1$
+(\texttt{homotopyHamiltonian\_one\_eq\_perturbedHamiltonian}); $\hat H_0\ge0$;
+$\ker\hat H_0$ identified with the hard-core subspace, with an explicit
+reduced (Moore--Penrose) inverse; the half-filled fixed-$\hat S^3$
+configuration sector $K$ and the compressions of $\hat H_0$, $\hat V$ to $K$
+(PSD/Hermiticity preserved). \textbf{Capstone:} $\hat P_0\hat V\hat P_0=0$
+\emph{only inside $K$}, under the hypothesis that the hopping matrix respects
+the bipartition --- this is \emph{false} on the whole Fock space (a hard-core
+configuration with an empty site can absorb a hopping electron and stay
+hard-core), so the half-filling restriction is essential. What the proof uses
+of the hopping matrix is only the vanishing of the endpoint diagonal
+(\texttt{liebEndpointHopping\_diag\_eq\_zero}), which removes the on-site
+(number-operator) part of $\hat V$; bipartiteness is a sufficient condition
+for that, not a necessary one --- a non-bipartite hopping matrix with
+vanishing diagonal gives the same first-order vanishing on the half-filled
+sector.
+\emph{Left open for later PRs of the arc}, all on the compressed sector $K$:
+(a) the compressed \texttt{IsReducedInverse} (the explicit reduced inverse
+restricted to $K$); (b) the compressed bridge
+$\hat H_{s=1}(\lambda)|_K=\hat H_0|_K+\lambda\hat V|_K$ to
+\texttt{perturbedHamiltonian}, together with the sector preservation of
+$\hat V$ it presupposes; and (c) nonemptiness of the compressed sector
+(\texttt{Nonempty (configSector \ldots)}), an instance hypothesis of
+\texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation}.
+\emph{Debt.} What the compressed layer consumes from the whole-Fock-space
+layer is only the diagonality of $\hat H_0$
+(\texttt{liebPerturbationH0\_mulVec\_basisVec}, read off in the sector basis
+through \texttt{configSectorCompress\_apply}), $\hat H_0\ge0$, and the entries
+of $\hat V$ between singly-occupied configurations; until (a)--(c) exist,
+every declaration introduced with this setup that no proof consumes is carried
+as debt, not as settled API: on the whole Fock space the
+\texttt{perturbedHamiltonian} bridge, the kernel criterion
+\texttt{mem\_matrixKernel\_liebPerturbationH0\_iff} with the hard-core
+projection identity that consumes it, and the explicit reduced inverse; on the
+compressed sector $\hat H_0|_K\ge0$ (the sole consumer of $\hat H_0\ge0$), the
+Hermiticity of $\hat V|_K$, and the $\hat P_0\hat V\hat P_0=0$ capstone
+itself; and, in the generic layer,
+\texttt{minEnergyOn\_add\_const\_smul\_one}. All of these are staged for the
+application of Lemma~10.1 and the arc assembly (PR-11 to PR-13); whatever that
+assembly does not consume is to be deleted, not kept.
+
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
 eqs.~(10.2.7)/(10.2.8)/(10.2.13); \emph{proved axiom-free on the general spin-$z$

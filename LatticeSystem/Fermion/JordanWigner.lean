@@ -198,6 +198,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveBalancedGround
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveShibaSpinOp
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCasimirSector
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveHomotopyContinuity
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsivePerturbationSetup
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetism
 import LatticeSystem.Fermion.JordanWigner.Hubbard.BipartiteSpectrum
