@@ -6881,8 +6881,16 @@ itself; and, in the generic layer,
 \texttt{minEnergyOn\_add\_const\_smul\_one}. All of these are staged for the
 application of Lemma~10.1 and the arc assembly (PR-11 to PR-13); whatever that
 assembly does not consume is to be deleted, not kept. (Debt items (a)--(c)
-above are discharged by PR-6 below; the whole-Fock-space explicit reduced
-inverse remains unreferenced debt.)
+above are discharged by PR-6 below, which also consumes the whole-Fock-space
+\texttt{perturbedHamiltonian} bridge and the \emph{definition} of the explicit
+reduced inverse $\hat H_0^{-1}$, the compressed reduced inverse being its
+compression. What remains unreferenced is the \emph{statement}
+\texttt{liebPerturbationH0\_isReducedInverse} alone --- PR-6 re-derives the
+compressed contract from the diagonal form instead of transporting it ---
+together with the hard-core projection identity, $\hat H_0|_K\ge0$, the
+Hermiticity of $\hat V|_K$, the $\hat P_0\hat V\hat P_0=0$ capstone and
+\texttt{minEnergyOn\_add\_const\_smul\_one}, all of which PR-6 leaves
+untouched.)
 
 \emph{Superexchange reduced-inverse layer (Issue~\#5320, PR~\#5327 PR-6).}
 Not itself a numbered Tasaki statement; discharges PR-5's debt items (a)--(c)
@@ -6903,7 +6911,15 @@ compression homomorphism (\texttt{configSectorCompress\_mul\_of\_preserves},
 number-sector instance
 (\texttt{configSectorNumberCompress\_mul\_of\_right\_preserves},
 \texttt{LiebAttractiveFullSectorSU2Algebra.lean}, Theorem~10.2 full-sector-lift
-arc) was refactored in this PR to derive from it. Axiom-free.
+arc) was refactored in this PR to derive from it. \emph{Debt.} Nothing yet
+consumes \texttt{liebPerturbationV\_preserves\_liebHalfFillingPred} (staged for
+PR-8's compressed product step) nor the three discharged debt items
+\texttt{liebPerturbationH0Compressed\_isReducedInverse},
+\texttt{configSector\_liebHalfFillingPred\_nonempty} and
+\texttt{homotopyHamiltonian\_one\_compressed\_eq\_perturbedHamiltonian} (staged
+for the Lemma~10.1 application at the arc assembly, PR-11 to PR-13); each is
+carried as debt, not as settled API, the capstone being the one exception.
+Axiom-free.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,

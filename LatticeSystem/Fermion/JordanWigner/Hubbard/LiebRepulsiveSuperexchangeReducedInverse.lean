@@ -42,6 +42,18 @@ Lemma 10.1 application (PR-11 to PR-13) and neither depends on the superexchange
   `configSectorCompress` and does **not** presuppose the sector preservation of `V̂` proved above;
   only its later *interpretation* at assembly does.
 
+Of PR-5's whole-Fock-space reduced-inverse pair this file consumes the *definition* `Ĥ₀Inv`
+(`liebPerturbationH0InvCompressed` is literally its compression) but not the *statement*
+`liebPerturbationH0_isReducedInverse`, since the compressed contract is re-derived from the
+diagonal form; that statement therefore stays at reference 0 and its deletion debt is unresolved.
+
+Nothing yet consumes `liebPerturbationV_preserves_liebHalfFillingPred` (staged for PR-8, where the
+compressed product `V̂|_K · V̂|_K` is identified with the compression of `V̂ · V̂`),
+`liebPerturbationH0Compressed_isReducedInverse`, `configSector_liebHalfFillingPred_nonempty` or
+`homotopyHamiltonian_one_compressed_eq_perturbedHamiltonian` (all staged for the Lemma 10.1
+application at the arc assembly, PR-11 to PR-13). Each is carried as debt, not as settled API;
+whatever that assembly does not consume is to be deleted, not kept.
+
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §10.1 (Lemma 10.1, eq. (10.1.20)) and §10.2.2 (eq. (10.1.7), p. 344; p. 353).
 -/

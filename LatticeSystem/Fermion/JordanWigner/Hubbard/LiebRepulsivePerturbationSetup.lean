@@ -42,23 +42,26 @@ The constant-energy-shift lemma this setup will need (normalising the hard-core 
 (`Math/MatrixAnalysis/MinEnergyOnSubspace.lean`), added alongside PR-2's `minEnergyOn` API and so
 far unconsumed.
 
-Of the whole-Fock-space layer the compressed statements consume only the
+Of the whole-Fock-space layer the compressed statements *in this file* consume only the
 diagonality of `Ĥ₀` (`liebPerturbationH0_mulVec_basisVec`, transported to the sector basis by
 `configSectorCompress_apply`, which is what turns `P̂₀|_K` into an explicit indicator), the
 positive semidefiniteness of `Ĥ₀`, and the entries of `V̂` between singly-occupied configurations.
-The bridge `Ĥ_{s=1}(λ) = Ĥ₀ + λ V̂`, the kernel description `ker Ĥ₀ = hard-core subspace` with the
-hard-core projection identity, and the explicit reduced inverse feed no statement of the
-compressed layer — nor anything else, here or downstream.
+Downstream, the superexchange layer additionally consumes the bridge `Ĥ_{s=1}(λ) = Ĥ₀ + λ V̂` and
+the *definition* `Ĥ₀Inv`, whose compression is the compressed reduced inverse; it does not consume
+the *statement* `liebPerturbationH0_isReducedInverse`, re-deriving the compressed contract from the
+diagonal form instead. The kernel description `ker Ĥ₀ = hard-core subspace` and the hard-core
+projection identity built from it feed nothing, here or downstream.
 
 The compressed counterparts of this setup live in `LiebRepulsiveSuperexchangeReducedInverse.lean`:
-the compressed `IsReducedInverse`, the compressed bridge `Ĥ_{s=1}(λ)|_K = Ĥ₀|_K + λ V̂|_K` to
-`LatticeSystem.Math.perturbedHamiltonian` (which consumes the whole-space bridge and `Ĥ₀Inv` from
-here), and the nonemptiness of the compressed sector.
+the compressed `IsReducedInverse` (whose matrix is the compression of `Ĥ₀Inv` from here), the
+compressed bridge `Ĥ_{s=1}(λ)|_K = Ĥ₀|_K + λ V̂|_K` to `LatticeSystem.Math.perturbedHamiltonian`
+(which consumes the whole-space bridge from here), and the nonemptiness of the compressed sector.
 
 Every declaration introduced with this setup that no proof consumes is carried as debt, not as
 settled API: on the whole Fock space the kernel criterion `mem_matrixKernel_liebPerturbationH0_iff`
-with the hard-core projection identity that consumes it, and the whole-space `IsReducedInverse` of
-`Ĥ₀Inv`; on the sector `Ĥ₀|_K ≥ 0` (which is the sole consumer of the whole-space `Ĥ₀ ≥ 0`), the
+with the hard-core projection identity that consumes it, and the whole-space `IsReducedInverse`
+statement for `Ĥ₀Inv` (the definition itself is consumed downstream, the statement is not); on the
+sector `Ĥ₀|_K ≥ 0` (which is the sole consumer of the whole-space `Ĥ₀ ≥ 0`), the
 Hermiticity of `V̂|_K`, and the `P̂₀ V̂ P̂₀ = 0` capstone itself; and, outside this file,
 `LatticeSystem.Math.minEnergyOn_add_const_smul_one`. All of them are staged for the application
 of Lemma 10.1 and the assembly of the arc (PR-11 to PR-13); whatever that assembly does not
