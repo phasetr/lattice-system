@@ -7,7 +7,6 @@ import Mathlib.Analysis.InnerProductSpace.Rayleigh
 import Mathlib.Analysis.Matrix.Hermitian
 import Mathlib.LinearAlgebra.Matrix.PosDef
 import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
-import Mathlib.Topology.Algebra.Order.Field
 
 /-!
 # Degenerate perturbation theory: the second-order effective Hamiltonian (Tasaki Lemma 10.1)
@@ -38,23 +37,22 @@ Alongside the definitions the file carries the spectral-gap layer of the setup
 unique ground state on an invariant subspace, and the resulting operator-norm bound
 `‖Ĥ₀⁻¹ u‖ ≤ ‖u‖ / E_gap` on the reduced inverse.
 
-## Status
+## Role
 
-The content of Lemma 10.1 is the analytic theory of degenerate
-perturbations: continuity of the low-lying eigenstates and the `λ → 0⁺`
-limit. Per the project policy (perturbation-theory proofs are not
-undertaken; deep analytic results are faithful documented axioms), the
-lemma is recorded as a documented `axiom`
-(`tasaki_lemma_10_1_degenerate_perturbation`), in the same spirit as the
-strong-coupling companion `effectiveHamiltonian_strongCoupling_limit`
-(Theorem A.12, `Math/EffectiveLimit.lean`). The supporting projection
-matrix is constructed concretely, and its Hermitian/idempotent properties
-are proved as consistency guards.
+This is the definitional base of the Lemma 10.1 layer cake: the kernel projection `P̂₀`, the
+reduced-inverse contract `IsReducedInverse`, the effective and perturbed Hamiltonians, and the
+ground-state predicates `IsGroundEigenvalueOn` / `IsUniqueGroundStateOn`, together with the
+spectral-gap facts (10.1.13)–(10.1.14) that all later layers consume. The quantitative layers
+built on it are `DegeneratePerturbationReducedResolvent.lean` (the resolvent `R(λ,E)`),
+`DegeneratePerturbationFeshbach.lean` (the exact elimination of `|Γ⟩`),
+`DegeneratePerturbationGroundEnergy.lean` (the bounds on the ground energy `E(λ)`),
+`DegeneratePerturbationUniqueness.lean` (one-dimensionality of the ground state), and
+`DegeneratePerturbationConvergence.lean`, which carries Lemma 10.1 itself.
 -/
 
 namespace LatticeSystem.Math
 
-open Matrix Filter Topology
+open Matrix
 open scoped ComplexOrder
 
 variable {n : Type*} [Fintype n] [DecidableEq n]
@@ -197,6 +195,23 @@ def IsUniqueGroundStateOn (K : Submodule ℂ (EuclideanSpace ℂ n))
     IsGroundEigenvalueOn K H E ∧
     ∀ ψ : EuclideanSpace ℂ n, ψ ∈ K →
       Matrix.toEuclideanLin H ψ = (E : ℂ) • ψ → ∃ c : ℂ, ψ = c • φ
+
+/-- **The unique ground state is only determined up to a phase.** Rescaling by a unit-modulus
+`c : ℂ` preserves `IsUniqueGroundStateOn`, so any statement that pins down a normalized ground
+state may choose the phase freely. -/
+theorem IsUniqueGroundStateOn.smul_of_norm_one {K : Submodule ℂ (EuclideanSpace ℂ n)}
+    {H : Matrix n n ℂ} {E : ℝ} {φ : EuclideanSpace ℂ n} {c : ℂ} (hc : ‖c‖ = 1)
+    (hGS : IsUniqueGroundStateOn K H E φ) : IsUniqueGroundStateOn K H E (c • φ) := by
+  obtain ⟨hmem, hnorm, heig, hground, huniq⟩ := hGS
+  have hcne : c ≠ 0 := by
+    intro h
+    rw [h, norm_zero] at hc
+    exact zero_ne_one hc
+  refine ⟨K.smul_mem c hmem, by rw [norm_smul, hc, hnorm, mul_one], ?_, hground, ?_⟩
+  · rw [map_smul, heig, smul_comm]
+  · intro ψ hψ hψeig
+    obtain ⟨d, hd⟩ := huniq ψ hψ hψeig
+    exact ⟨d * c⁻¹, by rw [hd, smul_smul, mul_assoc, inv_mul_cancel₀ hcne, mul_one]⟩
 
 open Metric in
 /-- **Lowest energy on an invariant subspace, attained at a unit eigenvector.**
@@ -410,38 +425,5 @@ theorem IsReducedInverse.norm_toEuclideanLin_le {H0 H0inv : Matrix n n ℂ}
     positivity
   · rw [le_div_iff₀ hg]
     nlinarith [hkey, h0]
-
-/-- **Tasaki Lemma 10.1 (degenerate perturbation theory), AXIOM.**
-(1st ed., Springer 2020, §10.1, Lemma 10.1 / eq. (10.1.20), p. 346.)
-
-For `Ĥ(λ) = Ĥ₀ + λ V̂` with `Ĥ₀ ≥ 0` Hermitian, `V̂` Hermitian, `H0inv`
-a reduced inverse of `Ĥ₀`, and the **first-order term vanishing on the
-degenerate subspace** (`P̂₀ V̂ P̂₀ = 0`, the condition under which the
-effective theory is governed by the second-order term — Tasaki eq.
-(10.1.6), `Ĥspin = λ² Ĥeff`, has no `λ¹` term): if the second-order
-effective Hamiltonian `Ĥeff = − P̂₀ V̂ Ĥ₀⁻¹ V̂ P̂₀` has a unique ground
-state `Φeff` on the kernel `H₀ = ker Ĥ₀`, then there is `λ₀ > 0` such that
-for every `λ ∈ (0, λ₀)` the
-perturbed Hamiltonian `Ĥ(λ)` has a unique ground state on the whole space,
-and (a phase choice of) these normalized ground states converges to `Φeff`
-as `λ → 0⁺`.
-
-This is the analytic theory of degenerate perturbations (continuity of the
-low-lying eigenstates and the `λ → 0⁺` limit); recorded as a faithful
-documented axiom per the project policy. -/
-axiom tasaki_lemma_10_1_degenerate_perturbation [Nonempty n]
-    (H0 V H0inv : Matrix n n ℂ)
-    (hH0 : H0.IsHermitian) (hH0pos : H0.PosSemidef) (hV : V.IsHermitian)
-    (hInv : IsReducedInverse H0 H0inv)
-    (hFirstOrder : kernelProjectionMatrix H0 * V * kernelProjectionMatrix H0 = 0)
-    (Eeff : ℝ) (Φeff : EuclideanSpace ℂ n)
-    (hEffGS : IsUniqueGroundStateOn (matrixKernel H0)
-      (secondOrderEffectiveHamiltonian H0 V H0inv) Eeff Φeff) :
-    ∃ lam0 : ℝ, 0 < lam0 ∧
-      ∃ Elam : ℝ → ℝ, ∃ Philam : ℝ → EuclideanSpace ℂ n,
-        (∀ lam : ℝ, 0 < lam → lam < lam0 →
-          IsUniqueGroundStateOn (⊤ : Submodule ℂ (EuclideanSpace ℂ n))
-            (perturbedHamiltonian H0 V lam) (Elam lam) (Philam lam)) ∧
-        Tendsto Philam (nhdsWithin (0 : ℝ) (Set.Ioi 0)) (𝓝 Φeff)
 
 end LatticeSystem.Math

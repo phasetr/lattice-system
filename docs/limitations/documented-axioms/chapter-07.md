@@ -223,7 +223,7 @@ by two declarations in `LatticeSystem/Quantum/SpinS/AKLTStability.lean`:
   polymer/cluster expansion and no uniform-in-L analyticity layer; the existing
   `chainTranslationOp` (see above) is not wired into `AKLTStability.lean`. Per the
   [documented-axiom policy](/lattice-system/limitations/documented-axioms/), perturbation-theoretic
-  results — the same class as Lemma 10.1 (degenerate perturbation theory) — are
+  results — the same class as the Chapter 10 singular-perturbation arguments — are
   faithful documented axioms and are not active proof targets; this is a standing
   named exception, so the "prove theorems Tasaki cites without proof" rule does not
   override it, and this entry creates no book-order discharge work item. Source

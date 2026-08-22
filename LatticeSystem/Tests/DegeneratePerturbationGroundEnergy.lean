@@ -33,7 +33,8 @@ seven declarations pinned below is a transcription of that argument. They are th
 **elementary replacement** for it — built from the trial vector of eq. (10.1.18) and the plain
 Rayleigh–Ritz variational principle (B1/B2) — and every test below must be read as testing *that
 replacement*, not as testing "Tasaki's proof, formalized". The capstone
-`tasaki_lemma_10_1_degenerate_perturbation` itself stays a documented axiom until PR-6.
+`tasaki_lemma_10_1_degenerate_perturbation` is assembled from this layer in
+`Math/MatrixAnalysis/DegeneratePerturbationConvergence.lean`.
 
 Also machine-checks two instances built from explicit matrices:
 
