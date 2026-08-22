@@ -100,7 +100,44 @@ private theorem sum_val_update_hop_site {N : ℕ} (c : Fin (2 * N + 2) → Fin 2
             ((Function.update (Function.update c (spinfulIndex N j σ) 0)
               (spinfulIndex N i σ) 1) (spinfulIndex N z 1)).val
           = (c (spinfulIndex N z 0)).val + (c (spinfulIndex N z 1)).val) := by
-  sorry
+  have hsiteNe : ∀ (a b : Fin (N + 1)) (r s : Fin 2), a ≠ b →
+      spinfulIndex N a r ≠ spinfulIndex N b s :=
+    fun a b r s hab h => hab ((spinfulIndex_eq_iff N a b r s).mp h).1
+  have hspinNe : ∀ (a b : Fin (N + 1)) (r s : Fin 2), r ≠ s →
+      spinfulIndex N a r ≠ spinfulIndex N b s :=
+    fun a b r s hrs h => hrs ((spinfulIndex_eq_iff N a b r s).mp h).2
+  have hpq : spinfulIndex N i σ ≠ spinfulIndex N j σ := hsiteNe i j σ σ hij
+  have hci : (c (spinfulIndex N i σ)).val = 0 := by
+    rw [Function.update_of_ne hpq] at hp
+    simp [hp]
+  have hcj : (c (spinfulIndex N j σ)).val = 1 := by simp [hq]
+  have hdi : ((Function.update (Function.update c (spinfulIndex N j σ) 0)
+      (spinfulIndex N i σ) 1) (spinfulIndex N i σ)).val = 1 := by simp
+  have hdj : ((Function.update (Function.update c (spinfulIndex N j σ) 0)
+      (spinfulIndex N i σ) 1) (spinfulIndex N j σ)).val = 0 := by
+    rw [Function.update_of_ne hpq.symm]
+    simp
+  have hdother : ∀ (z : Fin (N + 1)) (r : Fin 2),
+      spinfulIndex N z r ≠ spinfulIndex N i σ → spinfulIndex N z r ≠ spinfulIndex N j σ →
+      ((Function.update (Function.update c (spinfulIndex N j σ) 0)
+            (spinfulIndex N i σ) 1) (spinfulIndex N z r)).val
+        = (c (spinfulIndex N z r)).val := by
+    intro z r h1 h2
+    rw [Function.update_of_ne h1, Function.update_of_ne h2]
+  refine ⟨?_, ?_, ?_⟩
+  · rcases (show σ = 0 ∨ σ = 1 by omega) with rfl | rfl
+    · have h1 := hdother i 1 (hspinNe i i 1 0 (by decide)) (hsiteNe i j 1 0 hij)
+      omega
+    · have h1 := hdother i 0 (hspinNe i i 0 1 (by decide)) (hsiteNe i j 0 1 hij)
+      omega
+  · rcases (show σ = 0 ∨ σ = 1 by omega) with rfl | rfl
+    · have h1 := hdother j 1 (hsiteNe j i 1 0 (Ne.symm hij)) (hspinNe j j 1 0 (by decide))
+      omega
+    · have h1 := hdother j 0 (hsiteNe j i 0 1 (Ne.symm hij)) (hspinNe j j 0 1 (by decide))
+      omega
+  · intro z hzi hzj
+    rw [hdother z 0 (hsiteNe z i 0 σ hzi) (hsiteNe z j 0 σ hzj),
+      hdother z 1 (hsiteNe z i 1 σ hzi) (hsiteNe z j 1 σ hzj)]
 
 /-! ## The hop-pair collapse -/
 
@@ -123,7 +160,50 @@ private theorem hop_pair_apply_eq_zero_of_ne {N : ℕ} {c e : Fin (2 * N + 2) �
           fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j σ)) *
         (fermionMultiCreation (2 * N + 1) (spinfulIndex N k τ) *
           fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N l τ))) e c = 0 := by
-  sorry
+  have hentry : ∀ M : ManyBodyOp (Fin (2 * N + 2)), M e c = M.mulVec (basisVec c) e :=
+    fun M => (mulVec_basisVec_apply M e c).symm
+  rw [hentry (fermionMultiCreation (2 * N + 1) (spinfulIndex N i σ) *
+        fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j σ) *
+      (fermionMultiCreation (2 * N + 1) (spinfulIndex N k τ) *
+        fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N l τ))),
+    ← Matrix.mulVec_mulVec, fermionMultiCreation_mul_Annihilation_mulVec_basisVec]
+  by_cases hcond : c (spinfulIndex N l τ) = 1 ∧
+      (Function.update c (spinfulIndex N l τ) 0) (spinfulIndex N k τ) = 0
+  · rw [if_pos hcond, Matrix.mulVec_smul,
+      fermionMultiCreation_mul_Annihilation_mulVec_basisVec]
+    obtain ⟨hdk, hdl, hdz⟩ := sum_val_update_hop_site c hkl hcond.1 hcond.2
+    set d := Function.update (Function.update c (spinfulIndex N l τ) 0)
+      (spinfulIndex N k τ) 1
+    by_cases hcond2 : d (spinfulIndex N j σ) = 1 ∧
+        (Function.update d (spinfulIndex N j σ) 0) (spinfulIndex N i σ) = 0
+    · have hene : e ≠ Function.update (Function.update d (spinfulIndex N j σ) 0)
+          (spinfulIndex N i σ) 1 := by
+        intro heq
+        obtain ⟨hdi, hdj, -⟩ := sum_val_update_hop_site d hij hcond2.1 hcond2.2
+        rw [← heq] at hdi hdj
+        have hei := he i
+        have hej := he j
+        have hck := hc k
+        have hcl := hc l
+        have hjk : j = k := by
+          by_contra hjk
+          rcases eq_or_ne j l with rfl | hjl
+          · omega
+          · have hdzj := hdz j hjk hjl
+            have hcj := hc j
+            omega
+        have hil : i = l := by
+          by_contra hil
+          rcases eq_or_ne i k with rfl | hik
+          · omega
+          · have hdzi := hdz i hik hil
+            have hci := hc i
+            omega
+        exact hne ⟨hil, hjk⟩
+      rw [if_pos hcond2]
+      simp only [Pi.smul_apply, smul_eq_mul, basisVec_of_ne hene, mul_zero]
+    · rw [if_neg hcond2, smul_zero, Pi.zero_apply]
+  · rw [if_neg hcond, Matrix.mulVec_zero, Pi.zero_apply]
 
 /-! ## The PR-8a capstone -/
 
@@ -146,6 +226,68 @@ theorem liebPerturbationV_sq_apply_eq_of_singly_occupied {N : ℕ} {A : Finset (
       = ∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
           ((liebEndpointHopping A T 1 y x * liebEndpointHopping A T 1 x y : ℝ) : ℂ) *
             (fermionHopReturn N x y) e c := by
-  sorry
+  have hzero : ∀ (σ τ : Fin 2) (i j k l : Fin (N + 1)), ¬ (k = j ∧ l = i) →
+      (liebEndpointHopping A T 1 i j : ℂ) * (liebEndpointHopping A T 1 k l : ℂ) *
+          ((fermionMultiCreation (2 * N + 1) (spinfulIndex N k τ) *
+                fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N l τ) *
+              (fermionMultiCreation (2 * N + 1) (spinfulIndex N i σ) *
+                fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j σ))) e c) = 0 := by
+    intro σ τ i j k l hne
+    by_cases hij : i = j
+    · subst hij
+      rw [liebEndpointHopping_diag_eq_zero hbip i, Complex.ofReal_zero, zero_mul, zero_mul]
+    · by_cases hkl : k = l
+      · subst hkl
+        rw [liebEndpointHopping_diag_eq_zero hbip k, Complex.ofReal_zero, mul_zero, zero_mul]
+      · rw [hop_pair_apply_eq_zero_of_ne hc he hkl hij hne, mul_zero]
+  have hcollapse : ∀ (σ τ : Fin 2) (i j : Fin (N + 1)),
+      ∑ k : Fin (N + 1), ∑ l : Fin (N + 1),
+          (liebEndpointHopping A T 1 i j : ℂ) * (liebEndpointHopping A T 1 k l : ℂ) *
+            ((fermionMultiCreation (2 * N + 1) (spinfulIndex N k τ) *
+                  fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N l τ) *
+                (fermionMultiCreation (2 * N + 1) (spinfulIndex N i σ) *
+                  fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j σ))) e c)
+        = (liebEndpointHopping A T 1 i j : ℂ) * (liebEndpointHopping A T 1 j i : ℂ) *
+            ((fermionMultiCreation (2 * N + 1) (spinfulIndex N j τ) *
+                  fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N i τ) *
+                (fermionMultiCreation (2 * N + 1) (spinfulIndex N i σ) *
+                  fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j σ))) e c) := by
+    intro σ τ i j
+    rw [Fintype.sum_eq_single j (fun k hkj =>
+      Finset.sum_eq_zero fun l _ => hzero σ τ i j k l (fun h => hkj h.1))]
+    exact Fintype.sum_eq_single i (fun l hli => hzero σ τ i j j l (fun h => hli h.2))
+  have hreindex : ∀ G : Fin 2 → Fin (N + 1) → Fin (N + 1) → Fin 2 → ℂ,
+      ∑ i : Fin (N + 1), ∑ j : Fin (N + 1), ∑ σ : Fin 2, ∑ τ : Fin 2, G σ i j τ
+        = ∑ σ : Fin 2, ∑ i : Fin (N + 1), ∑ j : Fin (N + 1), ∑ τ : Fin 2, G σ i j τ := by
+    intro G
+    exact (Finset.sum_congr rfl fun i _ => Finset.sum_comm).trans Finset.sum_comm
+  have hrhs : ∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
+        ((liebEndpointHopping A T 1 y x * liebEndpointHopping A T 1 x y : ℝ) : ℂ) *
+          (fermionHopReturn N x y) e c
+      = ∑ σ : Fin 2, ∑ i : Fin (N + 1), ∑ j : Fin (N + 1), ∑ τ : Fin 2,
+          (liebEndpointHopping A T 1 i j : ℂ) * (liebEndpointHopping A T 1 j i : ℂ) *
+            ((fermionMultiCreation (2 * N + 1) (spinfulIndex N j τ) *
+                  fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N i τ) *
+                (fermionMultiCreation (2 * N + 1) (spinfulIndex N i σ) *
+                  fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j σ))) e c) := by
+    rw [← hreindex (fun σ i j τ =>
+      (liebEndpointHopping A T 1 i j : ℂ) * (liebEndpointHopping A T 1 j i : ℂ) *
+        ((fermionMultiCreation (2 * N + 1) (spinfulIndex N j τ) *
+              fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N i τ) *
+            (fermionMultiCreation (2 * N + 1) (spinfulIndex N i σ) *
+              fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j σ))) e c))]
+    refine Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => ?_
+    rw [fermionHopReturn, Matrix.sum_apply, Complex.ofReal_mul, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun ρ _ => ?_
+    rw [Matrix.sum_apply, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun υ _ => ?_
+    rw [mul_assoc (fermionMultiCreation (2 * N + 1) (spinfulIndex N y υ) *
+        fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N x υ)),
+      mul_comm ((liebEndpointHopping A T 1 y x : ℝ) : ℂ)]
+  rw [hrhs, liebPerturbationV, hubbardKinetic]
+  simp only [Finset.sum_mul, Finset.mul_sum, Matrix.smul_mul, Matrix.mul_smul, smul_smul,
+    Matrix.sum_apply, Matrix.smul_apply, smul_eq_mul]
+  exact Finset.sum_congr rfl fun σ _ => Finset.sum_congr rfl fun i _ =>
+    Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun τ _ => hcollapse σ τ i j
 
 end LatticeSystem.Fermion
