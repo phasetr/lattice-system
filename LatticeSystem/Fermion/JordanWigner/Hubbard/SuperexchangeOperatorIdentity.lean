@@ -22,7 +22,7 @@ below it on the same page, `Σ_σ n̂_{x,σ} n̂_{y,σ} = 2 (Ŝ^{(3)}_x Ŝ^{(3)}
 CAR output into the spin-dot form. This is the algebraic core from which the strong-coupling
 perturbative reduction to the Heisenberg exchange term is built.
 
-The *following* eq. (10.1.10) (p. 345), `Ĥ_spin = Σ_{x,y} (|t_{x,y}|²/U_x) (2 Ŝ_x·Ŝ_y − ¼) P̂₀`,
+The *following* eq. (10.1.10) (p. 345), `Ĥ_spin = Σ_{x,y} (|t_{x,y}|²/U_x) 2 (Ŝ_x·Ŝ_y − ¼) P̂₀`,
 is a distinct statement and is **not** proved here: it additionally needs the hopping weights
 `t_{x,y}`, the kernel projection `P̂₀`, and `n̂_x P̂₀ = P̂₀`. It is PR-8's target. Accordingly,
 nothing here depends on the half-filling sector, the hard-core projection, or the bipartite
