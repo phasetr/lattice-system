@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinSymmetry
+import LatticeSystem.Math.AnticommuteCommute
 
 /-!
 # Per-site fermionic spin operators and the two-site spin dot `Ŝ_x · Ŝ_y`
@@ -10,6 +11,11 @@ Jordan–Wigner fermions:
 `Ŝ^z_x = (n̂_{x↑} − n̂_{x↓}) / 2`,
 `Ŝ_x · Ŝ_y = ½(Ŝ^+_x Ŝ^-_y + Ŝ^-_x Ŝ^+_y) + Ŝ^z_x Ŝ^z_y`.
 These are the per-site summands of the total spin operators (`fermionTotalSpinPlus`, …).
+
+The different-site commutation `Ŝ^-_x Ŝ^+_y = Ŝ^+_y Ŝ^-_x` (`x ≠ y`) belongs to this layer too:
+it is a property of the per-site ladders alone, the `(-1)^4 = 1` cancellation of four cross-site
+anticommutations, obtained from the model-agnostic ring helpers of
+`LatticeSystem.Math.AnticommuteCommute`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed.), §9.3.3 (spin operators) and §11.5.2, eq. (11.5.4).
@@ -37,6 +43,19 @@ noncomputable def fermionSpinDot (N : ℕ) (i j : Fin (N + 1)) : ManyBodyOp (Fin
   (1 / 2 : ℂ) • (fermionSiteSpinPlus N i * fermionSiteSpinMinus N j +
       fermionSiteSpinMinus N i * fermionSiteSpinPlus N j) +
     fermionSiteSpinZ N i * fermionSiteSpinZ N j
+
+/-- **Different-site spin ladders commute.**  For `x ≠ y` the bilinear (even) operators
+`Ŝ⁻_x = ĉ†_{x↓}ĉ_{x↑}` and `Ŝ⁺_y = ĉ†_{y↑}ĉ_{y↓}` act on disjoint mode sets, so they commute:
+`Ŝ⁻_x Ŝ⁺_y = Ŝ⁺_y Ŝ⁻_x` (four cross-site anticommutations combine to `(-1)^4 = +1`). -/
+theorem fermionSiteSpinMinus_mul_Plus_comm (N : ℕ) (x y : Fin (N + 1)) (hxy : x ≠ y) :
+    fermionSiteSpinMinus N x * fermionSiteSpinPlus N y
+      = fermionSiteSpinPlus N y * fermionSiteSpinMinus N x := by
+  unfold fermionSiteSpinMinus fermionSiteSpinPlus
+  exact anticomm_commute_mul_mul
+    (fermionDownCreation_upCreation_anticomm N x y)
+    (fermionDownCreation_downAnnihilation_anticomm_ne N hxy)
+    (fermionUpAnnihilation_upCreation_anticomm_ne N hxy)
+    (fermionUpAnnihilation_downAnnihilation_anticomm N x y)
 
 /-- The total spin raising operator is the sum of the per-site ones (consistency with
 `fermionTotalSpinPlus`). -/

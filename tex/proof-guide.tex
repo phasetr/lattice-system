@@ -6922,6 +6922,46 @@ for the Lemma~10.1 application at the arc assembly, PR-11 to PR-13); each is
 carried as debt, not as settled API, the capstone being the one exception.
 Axiom-free.
 
+\emph{Superexchange operator identity (Issue~\#5320, PR~\#5328 PR-7).} A
+direct formalization of Tasaki's eq.~(10.1.9) together with the two auxiliary
+identities stated just below it,
+$\sum_\sigma\hat n_{x,\sigma}\hat n_{y,\sigma}
+=2(\hat S^{(3)}_x\hat S^{(3)}_y+\tfrac14\hat n_x\hat n_y)$ and
+$\hat S^+_y\hat S^-_x+\hat S^-_y\hat S^+_x
+=2(\hat S^{(1)}_x\hat S^{(1)}_y+\hat S^{(2)}_x\hat S^{(2)}_y)$
+(§10.1, p.~344), and
+--- unlike PR-1 through PR-6 --- \textbf{model-independent}: no dependence on
+the arc's half-filling sector, hard-core projection, or bipartite endpoint
+graph. It is \emph{not} eq.~(10.1.10),
+$\hat H_{\mathrm{spin}}=\sum_{x,y}(|t_{x,y}|^2/U_x)2(\hat S_x\!\cdot\!\hat S_y-\tfrac14)\hat P_0$
+(p.~345), a distinct statement requiring the hopping weights, the kernel
+projection $\hat P_0$ and $\hat n_x\hat P_0=\hat P_0$: that is PR-8's target.
+The capstone
+\texttt{fermionHopReturn\_eq} proves, for distinct sites $x\ne y$,
+$\sum_{\sigma,\tau}\hat c^\dagger_{y,\tau}\hat c_{x,\tau}\hat c^\dagger_{x,\sigma}\hat c_{y,\sigma}
+= \hat n_y - 2\hat S_x\!\cdot\!\hat S_y - \tfrac12\hat n_x\hat n_y$
+(\texttt{fermionHopReturn}, the round-trip hopping sum), proved via CAR
+(canonical anticommutation relations) rather than Jordan--Wigner sign
+combinatorics: the $\sigma=\tau$ diagonal collapses to
+$\hat n_{y,\sigma}-\hat n_{x,\sigma}\hat n_{y,\sigma}$
+(\texttt{fermionHopReturn\_same\_spin\_eq}), the $\sigma\ne\tau$ off-diagonal
+turns into $-\hat S^{\pm}_y\hat S^{\mp}_x$
+(\texttt{fermionHopReturn\_opposite\_spin\_eq}), and the two halves are
+assembled via the charge decomposition
+\texttt{sum\_fermionMultiNumber\_spinfulIndex\_mul\_eq} and the ladder
+decomposition
+\texttt{fermionSiteSpinPlus\_mul\_Minus\_add\_fermionSiteSpinMinus\_mul\_Plus\_eq}
+(which reuses the different-site ladder commutation
+\texttt{fermionSiteSpinMinus\_mul\_Plus\_comm}, moved by this PR to the shared
+\texttt{FermionSiteSpin.lean} so that the §11.5 t-J bond-sum and this identity
+import one proof instead of two copies).
+Prepares the sandwiching with the kernel projection $\hat P_0$ that PR-8
+(\texttt{LiebRepulsiveSuperexchange.lean}) performs on the half-filled
+hard-core sector. \emph{Debt.} Nothing consumes the capstone
+\texttt{fermionHopReturn\_eq} yet (nor, outside its own file, the four lemmas
+feeding it); the whole layer is staged for PR-8 and is carried as debt, not as
+settled API. Axiom-free.
+
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
 eqs.~(10.2.7)/(10.2.8)/(10.2.13); \emph{proved axiom-free on the general spin-$z$
@@ -8918,7 +8958,8 @@ indicator $[\,s'=\texttt{tJSpinSwap}\,s\,i\,j\,]$), so the exchange off-diagonal
 $-(J/2)\cdot(\geq0)\leq0$.  \emph{(vii) The full off-diagonal $M_{s',s}\leq0$ is now assembled}
 (\texttt{TJExchangeBondSum.lean}).  Different-site ladders commute,
 $\hat S^-_x\hat S^+_y=\hat S^+_y\hat S^-_x$ for $x\neq y$
-(\texttt{fermionSiteSpinMinus\_mul\_Plus\_comm}; the two even bilinears act on disjoint mode sets,
+(\texttt{fermionSiteSpinMinus\_mul\_Plus\_comm}, \texttt{FermionSiteSpin.lean}; the two even
+bilinears act on disjoint mode sets,
 so four cross-site anticommutations combine to $(-1)^4=+1$, through the generic ring helpers
 \texttt{anticomm\_commute\_mul} / \texttt{anticomm\_commute\_mul\_mul} of
 \texttt{Math/AnticommuteCommute.lean}: an element anticommuting with both factors of a product

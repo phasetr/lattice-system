@@ -25,7 +25,6 @@ into a down creation (and vice versa), the flipped-down Jordan–Wigner crossing
 
 * `shibaSignedUnitary_conj_siteSpinPlus` — `Ûᴴ Ŝ⁺_x Û = ε_x · ĉ†_{x↑} ĉ†_{x↓}`.
 * `shibaSignedUnitary_conj_siteSpinMinus` — `Ûᴴ Ŝ⁻_x Û = ε_x · ĉ_{x↓} ĉ_{x↑}`.
-* `fermionSiteSpinMinus_mul_Plus_comm` — `Ŝ⁻_x Ŝ⁺_y = Ŝ⁺_y Ŝ⁻_x` for `x ≠ y`.
 * `shibaSignedUnitary_conj_spinPlusMinus` —
   `Ûᴴ (Ŝ⁺_x Ŝ⁻_y) Û = (ε_x ε_y) · hubbardPairCorrelationOp N x y`.
 
