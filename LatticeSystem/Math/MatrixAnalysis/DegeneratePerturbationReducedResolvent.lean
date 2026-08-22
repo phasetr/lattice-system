@@ -15,13 +15,15 @@ symmetric compression
   `A(λ,E) := (1̂ − P̂₀)(Ĥ(λ) − E)(1̂ − P̂₀)`,
 
 so that `A(0,0) = Ĥ₀` and the effective operator of (10.1.21) is `K(λ,E) = −P̂₀V̂ R(λ,E) V̂P̂₀`,
-matching (10.1.20) `Ĥeff = −P̂₀V̂Ĥ₀⁻¹V̂P̂₀` at `λ = E = 0`. Tasaki compresses on the left only;
+matching (10.1.20) `Ĥeff = −P̂₀V̂Ĥ₀⁻¹V̂P̂₀` at `λ = E = 0` — the match uses that a reduced inverse
+is unique, so that `R(0,0)` *is* `Ĥ₀⁻¹`. Tasaki compresses on the left only;
 the two operators agree on `H⊥`, and the symmetric compression is used because it is Hermitian
 as a matrix and annihilates `ker Ĥ₀` on both sides, which is exactly what the five-field contract
 `IsReducedInverse` requires.
 
 The results are:
 
+* a reduced inverse is unique, so `Ĥ₀⁻¹` and `R(λ,E)` denote well-defined matrices;
 * every Hermitian matrix has a reduced inverse (the existence engine, applied both to `Ĥ₀` and to
   `A(λ,E)`);
 * under the smallness hypothesis `|λ| v + |E| < g` — with `g` a spectral gap of `Ĥ₀` on `(ker Ĥ₀)ᗮ`
@@ -40,6 +42,18 @@ open Matrix
 open scoped ComplexOrder
 
 variable {n : Type*} [Fintype n] [DecidableEq n]
+
+/-- **The reduced inverse is unique.** If `R` and `R'` both invert `A` on `(ker A)ᗮ` and annihilate
+`ker A`, then `R' = R' (A R) = (R' A) R = (1̂ − P̂₀) R = R`. This well-definedness is what licenses
+the notation `Ĥ₀⁻¹` for *the* reduced inverse, and hence the reading of `K(λ,E)` at `λ = E = 0` as
+Tasaki's `Ĥeff` of eq. (10.1.20): `A(0,0) = Ĥ₀` pins `R(0,0)` to `Ĥ₀⁻¹` only because no other
+reduced inverse of `Ĥ₀` exists. -/
+theorem IsReducedInverse.unique {A R R' : Matrix n n ℂ}
+    (hR : IsReducedInverse A R) (hR' : IsReducedInverse A R') : R = R' :=
+  calc R = R' * A * R := by
+        rw [hR'.right_inv_on_compl, sub_mul, one_mul, hR.kills_kernel_left, sub_zero]
+    _ = R' * (A * R) := mul_assoc _ _ _
+    _ = R' := by rw [hR.left_inv_on_compl, mul_sub, mul_one, hR'.kills_kernel_right, sub_zero]
 
 /-- **Every Hermitian matrix has a reduced inverse.** On `(ker A)ᗮ` the operator `A` is injective,
 hence (finite dimension) bijective, so inverting it there and extending by `0` on `ker A` produces

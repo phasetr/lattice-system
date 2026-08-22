@@ -3,7 +3,7 @@ import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationReducedResolvent
 /-!
 # Test coverage for the reduced resolvent `R(λ,E)` (Tasaki Lemma 10.1, PR-2)
 
-Pins the API contract of the six declarations that
+Pins the API contract of the declarations that
 `Math/MatrixAnalysis/DegeneratePerturbationReducedResolvent.lean` adds on top of
 `DegeneratePerturbation.lean`'s `IsReducedInverse` (see
 `.self-local/reports/design-lemma101-pr2-reduced-resolvent.md` §3b):
@@ -17,10 +17,13 @@ Pins the API contract of the six declarations that
    of `A(λ,E)` exists and obeys the operator-norm bound `‖R u‖ ≤ ‖u‖ / (g − |λ|v − |E|)`.
 5. `norm_sub_reducedInverse_le` (N6) — the resolvent-difference bound
    `‖(R − Ĥ₀⁻¹) u‖ ≤ (|λ|v + |E|) ‖u‖ / (g (g − |λ|v − |E|))`.
+6. `IsReducedInverse.unique` — a reduced inverse is unique, so `Ĥ₀⁻¹` and `R(λ,E)` name
+   well-defined matrices.
 
 Also machine-checks a concrete `Fin 2` inhabitation of `IsReducedInverse` via N1
 (design report §6.3, fallback form), and a `Fin 1` counterexample showing that the smallness
-hypothesis `|λ|v + |E| < g` of N4 cannot be dropped.
+hypothesis `|λ|v + |E| < g` of N4 is sharp: the conclusion already fails at the boundary
+`|λ|v + |E| = g`, and the boundary equation is itself part of the machine-checked statement.
 -/
 
 namespace LatticeSystem.Tests.DegeneratePerturbationReducedResolvent
@@ -47,12 +50,19 @@ example {H0 V : Matrix n n ℂ} (lam E : ℝ) (hH0 : H0.IsHermitian) :
         - (E : ℂ) • (1 - kernelProjectionMatrix H0) :=
   reducedPerturbedHamiltonian_eq hH0 lam E
 
-/-- **`λ = E = 0` sanity check**: the compression degenerates to `Ĥ₀` itself, i.e. `R(0,0)` is
-Tasaki's `Ĥ₀⁻¹` (design report §6.2). Follows from the N2 expansion by `lam = 0`, `E = 0`. -/
-example {H0 V : Matrix n n ℂ} (hH0 : H0.IsHermitian) :
-    reducedPerturbedHamiltonian H0 V 0 0 = H0 := by
-  rw [reducedPerturbedHamiltonian_eq hH0]
-  simp
+/-- **`λ = E = 0` sanity check**: the compression degenerates to `Ĥ₀` itself (by the N2 expansion
+at `lam = 0`, `E = 0`), so uniqueness of the reduced inverse forces *every* `R(0,0)` to be Tasaki's
+`Ĥ₀⁻¹` (design report §6.2). This is the implicit step behind reading
+`K(λ,E) = −P̂₀V̂R(λ,E)V̂P̂₀` as eq. (10.1.20) at `λ = E = 0`. -/
+example {H0 V H0inv R : Matrix n n ℂ} (hH0 : H0.IsHermitian)
+    (hInv0 : IsReducedInverse H0 H0inv)
+    (hR : IsReducedInverse (reducedPerturbedHamiltonian H0 V 0 0) R) :
+    R = H0inv := by
+  have h00 : reducedPerturbedHamiltonian H0 V 0 0 = H0 := by
+    rw [reducedPerturbedHamiltonian_eq hH0]
+    simp
+  rw [h00] at hR
+  exact hR.unique hInv0
 
 /-- Pins **N4**: under the smallness hypothesis `|λ|v + |E| < g`, the kernel of the compressed
 operator `A(λ,E)` coincides with `ker Ĥ₀`. -/
@@ -101,16 +111,18 @@ example : ∃ R, IsReducedInverse (Matrix.diagonal ![(0 : ℂ), 1]) R := by
     fin_cases i <;> simp [isSelfAdjoint_iff]
   exact exists_isReducedInverse_of_isHermitian hH0
 
-/-- **The smallness hypothesis of N4 is load-bearing** (design report §6.4). At the boundary
-`|λ|v + |E| = g` the conclusion already fails: for the `1 × 1` identity `Ĥ₀ = 1` (gap `g = 1`,
-`ker Ĥ₀ = ⊥`) with `V̂ = 0` (`v = 0`), `λ = 0` and `E = 1`, the compression `A(0,1) = Ĥ₀ − 1` is
-zero, so its kernel is all of the space while `ker Ĥ₀ = ⊥`. Every hypothesis of
-`matrixKernel_reducedPerturbedHamiltonian` except `hsmall` holds here. -/
+/-- **The smallness hypothesis of N4 is load-bearing, and sharp** (design report §6.4). For the
+`1 × 1` identity `Ĥ₀ = 1` (gap `g = 1`, `ker Ĥ₀ = ⊥`) with `V̂ = 0` (`v = 0`), `λ = 0` and `E = 1`,
+the compression `A(0,1) = Ĥ₀ − 1` is zero, so its kernel is all of the space while `ker Ĥ₀ = ⊥`.
+Every hypothesis of `matrixKernel_reducedPerturbedHamiltonian` except `hsmall` holds here, and the
+conjuncts `0 < g` and `|λ|v + |E| = g` machine-check that the failure occurs already at the
+boundary — so weakening `hsmall` from `<` to `≤` would make N4 false. -/
 example : ∃ (H0 V : Matrix (Fin 1) (Fin 1) ℂ) (lam E g v : ℝ),
     H0.IsHermitian ∧
     (∀ u : EuclideanSpace ℂ (Fin 1), u ∈ (matrixKernel H0)ᗮ →
       g * ‖u‖ ^ 2 ≤ RCLike.re (inner ℂ u (Matrix.toEuclideanLin H0 u))) ∧
     (∀ u : EuclideanSpace ℂ (Fin 1), ‖Matrix.toEuclideanLin V u‖ ≤ v * ‖u‖) ∧
+    0 < g ∧ |lam| * v + |E| = g ∧
     matrixKernel (reducedPerturbedHamiltonian H0 V lam E) ≠ matrixKernel H0 := by
   have hone : ∀ u : EuclideanSpace ℂ (Fin 1),
       Matrix.toEuclideanLin (1 : Matrix (Fin 1) (Fin 1) ℂ) u = u := by
@@ -129,7 +141,8 @@ example : ∃ (H0 V : Matrix (Fin 1) (Fin 1) ℂ) (lam E g v : ℝ),
   have hA : reducedPerturbedHamiltonian (1 : Matrix (Fin 1) (Fin 1) ℂ) 0 0 1 = 0 := by
     rw [reducedPerturbedHamiltonian, perturbedHamiltonian, hP]
     simp
-  refine ⟨1, 0, 0, 1, 1, 0, Matrix.isHermitian_one, fun u _ => ?_, fun u => by simp, ?_⟩
+  refine ⟨1, 0, 0, 1, 1, 0, Matrix.isHermitian_one, fun u _ => ?_, fun u => by simp,
+    by norm_num, by norm_num, ?_⟩
   · rw [hone u, inner_self_eq_norm_sq_to_K]
     have hre : ((‖u‖ : ℂ) ^ 2).re = ‖u‖ ^ 2 := by rw [← Complex.ofReal_pow, Complex.ofReal_re]
     simp [hre]

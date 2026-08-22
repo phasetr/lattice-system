@@ -5377,7 +5377,10 @@ file \texttt{Math/MatrixAnalysis/DegeneratePerturbationReducedResolvent.lean}
 makes both statements quantitative, using the sign-symmetric compression
 $A(\lambda,E) := (1-\hat P_0)(\hat H(\lambda) - E)(1-\hat P_0)$ so that
 $A(0,0) = \hat H_0$ and $-\hat P_0 \hat V R(\lambda,E) \hat V \hat P_0$ matches
-$\hat H_{\rm eff}$ at $\lambda=E=0$. Every Hermitian matrix has a reduced
+$\hat H_{\rm eff}$ at $\lambda=E=0$. That match presupposes that $\hat H_0^{-1}$
+names a single matrix, which is \texttt{IsReducedInverse.unique}: two reduced
+inverses $R$, $R'$ of the same $A$ satisfy
+$R' = R'(AR) = (R'A)R = (1-\hat P_0)R = R$. Every Hermitian matrix has a reduced
 inverse (\texttt{exists\_isReducedInverse\_of\_isHermitian}, the general
 existence engine behind \texttt{IsReducedInverse}); under the smallness
 hypothesis $|\lambda|v + |E| < g$, with $g$ the spectral gap of $\hat H_0$ on
