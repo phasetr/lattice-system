@@ -67,6 +67,12 @@ the sole consumer of the whole-space `Ĥ₀ ≥ 0`), the Hermiticity of `V̂|_K`
 of Lemma 10.1 and the assembly of the arc (PR-11 to PR-13); whatever that assembly does not
 consume is to be deleted, not kept.
 
+PR-6 de-privatizes six helpers of this file that its superexchange reduced-inverse layer needs
+directly (`spinfulSite_other_val_eq_zero`, `liebHalfFilling_site_occupation`,
+`hubbardConfigInteractionWeight_one_eq_zero_iff`, `liebEndpointHopping_diag_eq_zero`,
+`liebPerturbationH0_eq_diagonal`, `liebPerturbationH0Compressed_eq_diagonal`), rather than
+duplicating them in the new file.
+
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §10.1 (Lemma 10.1, eq. (10.1.20)) and §10.2.2 (p. 353).
 -/
@@ -159,7 +165,7 @@ private theorem hubbardConfigInteractionWeight_one_eq_natCast (N : ℕ)
 
 /-- The interaction weight of `Ĥ₀` vanishes exactly on hard-core configurations: a sum of
 `0`/`1`-valued double-occupancy terms is zero exactly when every term is. -/
-private theorem hubbardConfigInteractionWeight_one_eq_zero_iff (N : ℕ)
+theorem hubbardConfigInteractionWeight_one_eq_zero_iff (N : ℕ)
     (c : Fin (2 * N + 2) → Fin 2) :
     hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0
       ↔ ∀ x : Fin (N + 1),
@@ -172,7 +178,7 @@ private theorem hubbardConfigInteractionWeight_one_eq_zero_iff (N : ℕ)
     exact_mod_cast h x
 
 /-- Matrix form of the diagonality of `Ĥ₀`: it is the diagonal matrix of interaction weights. -/
-private theorem liebPerturbationH0_eq_diagonal (N : ℕ) :
+theorem liebPerturbationH0_eq_diagonal (N : ℕ) :
     liebPerturbationH0 N
       = Matrix.diagonal (hubbardConfigInteractionWeight N (fun _ => (1 : ℂ))) := by
   ext c' c
@@ -383,7 +389,7 @@ theorem liebPerturbationVCompressed_isHermitian (N nUp : ℕ) (A : Finset (Fin (
 /-- The compressed `Ĥ₀` stays diagonal, with the interaction weight of the sector configuration as
 its eigenvalue: the sector basis is a subfamily of the computational basis, which already
 diagonalizes `Ĥ₀`. -/
-private theorem liebPerturbationH0Compressed_eq_diagonal (N nUp : ℕ) :
+theorem liebPerturbationH0Compressed_eq_diagonal (N nUp : ℕ) :
     liebPerturbationH0Compressed N nUp
       = Matrix.diagonal (fun s : configSector N (liebHalfFillingPred N nUp) =>
           hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) s.val) := by
@@ -408,7 +414,7 @@ theorem kernelProjectionMatrix_liebPerturbationH0Compressed_eq_diagonal (N nUp :
 
 /-- On a site carrying exactly one electron, the spin orbital other than the occupied one is
 empty. -/
-private theorem spinfulSite_other_val_eq_zero {N : ℕ} {c : Fin (2 * N + 2) → Fin 2}
+theorem spinfulSite_other_val_eq_zero {N : ℕ} {c : Fin (2 * N + 2) → Fin 2}
     {x : Fin (N + 1)} (hx : (c (spinfulIndex N x 0)).val + (c (spinfulIndex N x 1)).val = 1)
     {σ τ : Fin 2} (hστ : τ ≠ σ) (hσ : c (spinfulIndex N x σ) = 1) :
     (c (spinfulIndex N x τ)).val = 0 := by
@@ -427,7 +433,7 @@ private theorem spinfulSite_other_val_eq_zero {N : ℕ} {c : Fin (2 * N + 2) →
 /-- **Half filling plus the hard-core condition means one electron per site.** A configuration of
 the sector carries `N + 1` electrons on `N + 1` sites; if no site is doubly occupied, then no site
 can be empty either, so every site carries exactly one electron. -/
-private theorem liebHalfFilling_site_occupation (N nUp : ℕ) {c : Fin (2 * N + 2) → Fin 2}
+theorem liebHalfFilling_site_occupation (N nUp : ℕ) {c : Fin (2 * N + 2) → Fin 2}
     (hc : liebHalfFillingPred N nUp c)
     (hhard : hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0) (x : Fin (N + 1)) :
     (c (spinfulIndex N x 0)).val + (c (spinfulIndex N x 1)).val = 1 := by
@@ -456,7 +462,7 @@ private theorem liebHalfFilling_site_occupation (N nUp : ℕ) {c : Fin (2 * N + 
 /-- The endpoint hopping matrix has no diagonal entry: a bipartite hopping matrix vanishes on
 `(x, x)` (a site is not in the sublattice opposite to its own), and the endpoint construction adds
 an edge only between sites of *different* sublattices. -/
-private theorem liebEndpointHopping_diag_eq_zero {N : ℕ} {A : Finset (Fin (N + 1))}
+theorem liebEndpointHopping_diag_eq_zero {N : ℕ} {A : Finset (Fin (N + 1))}
     {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ} (hbip : HoppingRespectsBipartition A T)
     (x : Fin (N + 1)) : liebEndpointHopping A T 1 x x = 0 := by
   have hT0 : T x x = 0 := by
