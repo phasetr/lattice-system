@@ -5365,6 +5365,36 @@ e_1 + e_2\}$, $\varphi = e_0$), and the resulting operator bound
 $\|\hat H_0^{-1} u\| \le \|u\|/g$
 (\texttt{IsReducedInverse.norm\_toEuclideanLin\_le}). All four are axiom-free.
 
+\medskip
+\noindent\textbf{Reduced resolvent layer} (Tasaki §10.1, pp.~346--347, between
+eq.~(10.1.17) $\lambda\hat V|\Phi\rangle =
+\{-\hat H_0 + E + \lambda(\hat P_0 - 1)\hat V\}|\Gamma\rangle$ and its
+inversion (10.1.21)). Tasaki asserts without proof that the braced operator is
+invertible on $H_0^\perp$ for sufficiently small $\lambda$, with the
+approximation $|\Gamma\rangle \simeq -\lambda \hat H_0^{-1}\hat V|\Phi\rangle$
+(eq.~(10.1.18)) recovered as the $\lambda, E \to 0$ limit of the inverse; the
+file \texttt{Math/MatrixAnalysis/DegeneratePerturbationReducedResolvent.lean}
+makes both statements quantitative, using the sign-symmetric compression
+$A(\lambda,E) := (1-\hat P_0)(\hat H(\lambda) - E)(1-\hat P_0)$ so that
+$A(0,0) = \hat H_0$ and $-\hat P_0 \hat V R(\lambda,E) \hat V \hat P_0$ matches
+$\hat H_{\rm eff}$ at $\lambda=E=0$. Every Hermitian matrix has a reduced
+inverse (\texttt{exists\_isReducedInverse\_of\_isHermitian}, the general
+existence engine behind \texttt{IsReducedInverse}); under the smallness
+hypothesis $|\lambda|v + |E| < g$, with $g$ the spectral gap of $\hat H_0$ on
+$H_0^\perp$ and $v$ an operator bound for $\hat V$, the compression
+$A(\lambda,E)$ inherits the gap $g - |\lambda|v - |E|$
+(\texttt{reducedPerturbedHamiltonian\_gap}) and has \emph{the same kernel} as
+$\hat H_0$ (\texttt{matrixKernel\_reducedPerturbedHamiltonian}). Consequently
+the reduced resolvent $R(\lambda,E)$ exists
+(\texttt{exists\_isReducedInverse\_reducedPerturbedHamiltonian}) with
+$\|R(\lambda,E)u\| \le \|u\|/(g-|\lambda|v-|E|)$, and it converges to
+$\hat H_0^{-1}$ at the rate
+$\|(R(\lambda,E) - \hat H_0^{-1})u\| \le (|\lambda|v+|E|)\|u\|/(g(g-|\lambda|v-|E|))$
+(\texttt{norm\_sub\_reducedInverse\_le}), the quantitative form of
+eq.~(10.1.18). Every result of this layer is axiom-free; the
+perturbation-theory axiom
+\texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation} itself is unaffected.
+
 %======================================================================
 \subsection{Lieb's theorem for the attractive Hubbard model (Tasaki §10.2.1, Theorems 10.2 \& 10.3)}
 \label{subsec:lieb-attractive}
