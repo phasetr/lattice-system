@@ -6962,6 +6962,28 @@ hard-core sector. \emph{Debt.} Nothing consumes the capstone
 feeding it); the whole layer is staged for PR-8 and is carried as debt, not as
 settled API. Axiom-free.
 
+\emph{Hop-pair collapse, all Fock space, asymmetric coefficient
+(Issue~\#5320, PR~\#5329 PR-8a).} A direct formalization of Tasaki's collapse
+argument at eq.~(10.1.8), p.~344 (an electron must hop from $x$ to $y$ to
+resolve the double occupancy so the excited state returns to $H_0$), not
+generic infrastructure. On the singly-occupied (half-filled hard-core)
+sector, expanding $\hat V\hat V=\sum_{\sigma,i,j,\tau,k,l}t_{ij}t_{kl}
+(\hat c^\dagger_{i,\sigma}\hat c_{j,\sigma})(\hat c^\dagger_{k,\tau}\hat c_{l,\tau})$
+collapses the double sum to the diagonal $i=l\wedge j=k$
+(\texttt{hop\_pair\_apply\_eq\_zero\_of\_ne}, via the per-site occupancy
+transport lemma \texttt{sum\_val\_update\_hop\_site}). The capstone
+\texttt{liebPerturbationV\_sq\_apply\_eq\_of\_singly\_occupied} proves
+$(\hat V\hat V)_{ec}=\sum_{x,y}(t_{yx}t_{xy})\cdot\mathrm{fermionHopReturn}\,N\,x\,y\,{}_{ec}$
+on the whole Fock space, reusing PR-7's \texttt{fermionHopReturn} verbatim
+(no Jordan--Wigner sign computation needed). The coefficient is left as the
+\textbf{asymmetric} product $t_{yx}t_{xy}$; reducing it to the endpoint-graph
+indicator $t_{xy}^2$ needs the additional hopping-symmetry hypothesis $hT$,
+\emph{not} required here and deferred to PR-8b. \emph{Debt.} Nothing
+consumes the capstone yet: it is staged for PR-8b, which reduces the
+right-hand side further via the half-filling diagonal collapse and lifts it
+to the compressed sector $K$ for the arc assembly (PR-11 to PR-13).
+Axiom-free.
+
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
 eqs.~(10.2.7)/(10.2.8)/(10.2.13); \emph{proved axiom-free on the general spin-$z$
