@@ -291,9 +291,9 @@ theorem continuous_minEnergyOn_homotopyHamiltonian (A : Finset (Fin (N + 1)))
 
 /-! ## Local constancy ⇒ constancy: the topological core of the deformation argument -/
 
-/-- **Local-constancy-to-constancy along the homotopy** (item 7 of the PR-4 design; the
-homotopy-independent topological core of Tasaki's deformation argument, p. 353): suppose every
-`s ∈ [0, 1]` has a *unique occupied Casimir sector attaining the ground energy* of `H s`
+/-- **Local-constancy-to-constancy along the homotopy** (the homotopy-independent topological core
+of Tasaki's deformation argument, p. 353): suppose every `s ∈ [0, 1]` has a *unique occupied
+Casimir sector attaining the ground energy* of `H s`
 (the conclusion of PR-3's `exists_unique_casimir_sector_strict_min`, packaged here as the selector
 `c : ℝ → ℂ` together with its defining strict-minimality property `hStrict`), and the
 sector-restricted minimum energy is continuous in `s` for every *occupied* comparison sector `c'`
