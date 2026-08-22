@@ -50,28 +50,24 @@ The bridge `Ĥ_{s=1}(λ) = Ĥ₀ + λ V̂`, the kernel description `ker Ĥ₀ = 
 hard-core projection identity, and the explicit reduced inverse feed no statement of the
 compressed layer — nor anything else, here or downstream.
 
-Left for later PRs of the arc, all on the compressed sector `K`: (a) the compressed
-`IsReducedInverse`, i.e. the explicit reduced inverse restricted to `K`; (b) the compressed
-bridge `Ĥ_{s=1}(λ)|_K = Ĥ₀|_K + λ V̂|_K` to `LatticeSystem.Math.perturbedHamiltonian`, together
-with the sector preservation of `V̂` that it presupposes; and (c) nonemptiness of the compressed
-sector, `Nonempty (configSector N (liebHalfFillingPred N nUp))`, which is an instance hypothesis
-of `tasaki_lemma_10_1_degenerate_perturbation`.
+The compressed counterparts of this setup live in `LiebRepulsiveSuperexchangeReducedInverse.lean`:
+the compressed `IsReducedInverse`, the compressed bridge `Ĥ_{s=1}(λ)|_K = Ĥ₀|_K + λ V̂|_K` to
+`LatticeSystem.Math.perturbedHamiltonian` (which consumes the whole-space bridge and `Ĥ₀Inv` from
+here), and the nonemptiness of the compressed sector.
 
-Until those exist, every declaration introduced with this setup that no proof consumes is carried
-as debt, not as settled API: on the whole Fock space the `perturbedHamiltonian` bridge, the
-kernel criterion `mem_matrixKernel_liebPerturbationH0_iff` with the hard-core projection identity
-that consumes it, and `Ĥ₀Inv` with its `IsReducedInverse`; on the sector `Ĥ₀|_K ≥ 0` (which is
-the sole consumer of the whole-space `Ĥ₀ ≥ 0`), the Hermiticity of `V̂|_K`, and the
-`P̂₀ V̂ P̂₀ = 0` capstone itself; and, outside this file,
+Every declaration introduced with this setup that no proof consumes is carried as debt, not as
+settled API: on the whole Fock space the kernel criterion `mem_matrixKernel_liebPerturbationH0_iff`
+with the hard-core projection identity that consumes it, and the whole-space `IsReducedInverse` of
+`Ĥ₀Inv`; on the sector `Ĥ₀|_K ≥ 0` (which is the sole consumer of the whole-space `Ĥ₀ ≥ 0`), the
+Hermiticity of `V̂|_K`, and the `P̂₀ V̂ P̂₀ = 0` capstone itself; and, outside this file,
 `LatticeSystem.Math.minEnergyOn_add_const_smul_one`. All of them are staged for the application
 of Lemma 10.1 and the assembly of the arc (PR-11 to PR-13); whatever that assembly does not
 consume is to be deleted, not kept.
 
-PR-6 de-privatizes six helpers of this file that its superexchange reduced-inverse layer needs
-directly (`spinfulSite_other_val_eq_zero`, `liebHalfFilling_site_occupation`,
-`hubbardConfigInteractionWeight_one_eq_zero_iff`, `liebEndpointHopping_diag_eq_zero`,
-`liebPerturbationH0_eq_diagonal`, `liebPerturbationH0Compressed_eq_diagonal`), rather than
-duplicating them in the new file.
+Four helpers are public rather than `private` because the superexchange reduced-inverse layer
+(`LiebRepulsiveSuperexchangeReducedInverse.lean`) consumes them directly instead of duplicating
+them: `liebHalfFilling_site_occupation`, `liebEndpointHopping_diag_eq_zero`,
+`liebPerturbationH0Compressed_eq_diagonal` and `hubbardConfigInteractionWeight_one_star`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §10.1 (Lemma 10.1, eq. (10.1.20)) and §10.2.2 (p. 353).
@@ -163,9 +159,17 @@ private theorem hubbardConfigInteractionWeight_one_eq_natCast (N : ℕ)
   push_cast
   ring
 
+/-- The interaction weight of `Ĥ₀` is real (it is a natural number), so the diagonal `Ĥ₀` and its
+reciprocal-weight inverse are Hermitian. -/
+theorem hubbardConfigInteractionWeight_one_star (N : ℕ) (c : Fin (2 * N + 2) → Fin 2) :
+    star (hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c)
+      = hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c := by
+  rw [hubbardConfigInteractionWeight_one_eq_natCast]
+  simp
+
 /-- The interaction weight of `Ĥ₀` vanishes exactly on hard-core configurations: a sum of
 `0`/`1`-valued double-occupancy terms is zero exactly when every term is. -/
-theorem hubbardConfigInteractionWeight_one_eq_zero_iff (N : ℕ)
+private theorem hubbardConfigInteractionWeight_one_eq_zero_iff (N : ℕ)
     (c : Fin (2 * N + 2) → Fin 2) :
     hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0
       ↔ ∀ x : Fin (N + 1),
@@ -178,7 +182,7 @@ theorem hubbardConfigInteractionWeight_one_eq_zero_iff (N : ℕ)
     exact_mod_cast h x
 
 /-- Matrix form of the diagonality of `Ĥ₀`: it is the diagonal matrix of interaction weights. -/
-theorem liebPerturbationH0_eq_diagonal (N : ℕ) :
+private theorem liebPerturbationH0_eq_diagonal (N : ℕ) :
     liebPerturbationH0 N
       = Matrix.diagonal (hubbardConfigInteractionWeight N (fun _ => (1 : ℂ))) := by
   ext c' c
@@ -260,17 +264,6 @@ theorem kernelProjectionMatrix_liebPerturbationH0_eq_hardcoreProjection (N : ℕ
 
 /-! ## The explicit reduced inverse of `Ĥ₀` -/
 
-/-- The kernel projection of `Ĥ₀` in explicit diagonal form: the indicator matrix of the
-hard-core configurations. Together with
-`kernelProjectionMatrix_liebPerturbationH0_eq_hardcoreProjection` this identifies the operator
-product `∏ᵢ (1 - n̂↑n̂↓)` with that indicator, which is what makes the reduced-inverse identities
-below a diagonal computation. -/
-private theorem kernelProjectionMatrix_liebPerturbationH0_eq_diagonal (N : ℕ) :
-    LatticeSystem.Math.kernelProjectionMatrix (liebPerturbationH0 N)
-      = Matrix.diagonal (fun c : Fin (2 * N + 2) → Fin 2 =>
-          if hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0 then 1 else 0) := by
-  rw [liebPerturbationH0_eq_diagonal, LatticeSystem.Math.kernelProjectionMatrix_diagonal]
-
 /-- **The explicit reduced (Moore–Penrose) inverse of `Ĥ₀`**: diagonal in the computational
 basis, `0` on hard-core configurations (`ker Ĥ₀`) and the reciprocal interaction weight on every
 other configuration. At the single-double-occupancy configurations of Tasaki's leading-order
@@ -291,52 +284,8 @@ theorem liebPerturbationH0_isReducedInverse (N : ℕ) :
       = Matrix.diagonal (fun c : Fin (2 * N + 2) → Fin 2 =>
           if hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0 then 0
           else (hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c)⁻¹) := rfl
-  have hsub : (1 : ManyBodyOp (Fin (2 * N + 2)))
-        - Matrix.diagonal (fun c : Fin (2 * N + 2) → Fin 2 =>
-            if hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0 then 1 else 0)
-      = Matrix.diagonal (fun c : Fin (2 * N + 2) → Fin 2 =>
-          if hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0 then 0 else 1) := by
-    rw [show (1 : ManyBodyOp (Fin (2 * N + 2))) = Matrix.diagonal (fun _ => (1 : ℂ)) from
-      Matrix.diagonal_one.symm, Matrix.diagonal_sub]
-    congr 1
-    funext c
-    by_cases h : hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0 <;> simp [h]
-  refine ⟨?_, ?_, ?_, ?_, ?_⟩
-  · rw [kernelProjectionMatrix_liebPerturbationH0_eq_diagonal, liebPerturbationH0_eq_diagonal,
-      hInv, hsub, Matrix.diagonal_mul_diagonal]
-    congr 1
-    funext c
-    by_cases h : hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0
-    · simp [h]
-    · simp [h]
-  · rw [kernelProjectionMatrix_liebPerturbationH0_eq_diagonal, liebPerturbationH0_eq_diagonal,
-      hInv, hsub, Matrix.diagonal_mul_diagonal]
-    congr 1
-    funext c
-    by_cases h : hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0
-    · simp [h]
-    · simp [h]
-  · rw [hInv, kernelProjectionMatrix_liebPerturbationH0_eq_diagonal, Matrix.diagonal_mul_diagonal]
-    refine Eq.trans (congrArg Matrix.diagonal ?_) Matrix.diagonal_zero'
-    funext c
-    by_cases h : hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0 <;> simp [h]
-  · rw [hInv, kernelProjectionMatrix_liebPerturbationH0_eq_diagonal, Matrix.diagonal_mul_diagonal]
-    refine Eq.trans (congrArg Matrix.diagonal ?_) Matrix.diagonal_zero'
-    funext c
-    by_cases h : hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0 <;> simp [h]
-  · rw [hInv]
-    refine Matrix.isHermitian_diagonal_of_self_adjoint _ ?_
-    change star (fun c : Fin (2 * N + 2) → Fin 2 =>
-      if hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0 then (0 : ℂ)
-      else (hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c)⁻¹) = _
-    funext c
-    have hreal : star (hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c)
-        = hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c := by
-      rw [hubbardConfigInteractionWeight_one_eq_natCast]
-      simp
-    by_cases h : hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0
-    · simp [Pi.star_apply, h]
-    · rw [Pi.star_apply, if_neg h, star_inv₀, hreal]
+  rw [liebPerturbationH0_eq_diagonal, hInv]
+  exact LatticeSystem.Math.isReducedInverse_diagonal (hubbardConfigInteractionWeight_one_star N)
 
 /-! ## The half-filled fixed-`Ŝ³` sector and the compressed `Ĥ₀`, `V̂` -/
 
@@ -414,7 +363,7 @@ theorem kernelProjectionMatrix_liebPerturbationH0Compressed_eq_diagonal (N nUp :
 
 /-- On a site carrying exactly one electron, the spin orbital other than the occupied one is
 empty. -/
-theorem spinfulSite_other_val_eq_zero {N : ℕ} {c : Fin (2 * N + 2) → Fin 2}
+private theorem spinfulSite_other_val_eq_zero {N : ℕ} {c : Fin (2 * N + 2) → Fin 2}
     {x : Fin (N + 1)} (hx : (c (spinfulIndex N x 0)).val + (c (spinfulIndex N x 1)).val = 1)
     {σ τ : Fin 2} (hστ : τ ≠ σ) (hσ : c (spinfulIndex N x σ) = 1) :
     (c (spinfulIndex N x τ)).val = 0 := by

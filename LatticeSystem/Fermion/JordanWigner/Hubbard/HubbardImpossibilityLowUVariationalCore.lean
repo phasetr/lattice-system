@@ -241,7 +241,23 @@ theorem configSectorCompress_mul_of_preserves (P : (Fin (2 * N + 2) → Fin 2) �
     (hB : ∀ c c' : Fin (2 * N + 2) → Fin 2, P c → ¬ P c' → B c' c = 0) :
     configSectorCompress N P A * configSectorCompress N P B
       = configSectorCompress N P (A * B) := by
-  sorry
+  classical
+  ext s s'
+  have hL : ∀ t : configSector N P,
+      configSectorCompress N P A s t * configSectorCompress N P B t s'
+        = A s.val t.val * B t.val s'.val := by
+    intro t
+    rw [configSectorCompress_apply, configSectorCompress_apply]
+  have hsub : ∑ w ∈ Finset.univ.filter P, A s.val w * B w s'.val
+      = ∑ t : configSector N P, A s.val t.val * B t.val s'.val :=
+    Finset.sum_subtype _ (fun w => by simp) _
+  have hfil : ∑ w ∈ Finset.univ.filter P, A s.val w * B w s'.val
+      = ∑ w, A s.val w * B w s'.val := by
+    refine Finset.sum_filter_of_ne fun w _ hne => ?_
+    by_contra hw
+    exact hne (by rw [hB s'.val w s'.property hw, mul_zero])
+  rw [Matrix.mul_apply, Finset.sum_congr rfl (fun t _ => hL t), ← hsub, hfil,
+    configSectorCompress_apply, Matrix.mul_apply]
 
 /-- **Eigenvector lift (support form).** If `A` keeps the lift `T c` supported on `P` and `c` is an
 eigenvector of the compression `compress(A)` at `E`, then the lift `configSectorExpansion c` is an

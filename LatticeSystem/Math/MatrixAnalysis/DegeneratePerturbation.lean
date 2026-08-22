@@ -217,6 +217,45 @@ structure IsReducedInverse (H0 H0inv : Matrix n n ℂ) : Prop where
   /-- `H0inv` is Hermitian. -/
   hermitian : H0inv.IsHermitian
 
+/-- **The reduced inverse of a real diagonal matrix** is the entrywise inverse off the zero
+entries. Diagonal matrices are the case in which `Ĥ₀⁻¹` is completely explicit; a concrete model
+reaches it by first diagonalising `Ĥ₀` in a basis of eigenconfigurations, on the whole space and on
+an invariant sector alike. -/
+theorem isReducedInverse_diagonal {d : n → ℂ} (hd : ∀ i, star (d i) = d i) :
+    IsReducedInverse (Matrix.diagonal d)
+      (Matrix.diagonal (fun i => if d i = 0 then 0 else (d i)⁻¹)) := by
+  have hsub : (1 : Matrix n n ℂ)
+        - Matrix.diagonal (fun i => if d i = 0 then (1 : ℂ) else 0)
+      = Matrix.diagonal (fun i => if d i = 0 then (0 : ℂ) else 1) := by
+    rw [show (1 : Matrix n n ℂ) = Matrix.diagonal (fun _ => (1 : ℂ)) from Matrix.diagonal_one.symm,
+      Matrix.diagonal_sub]
+    congr 1
+    funext i
+    by_cases h : d i = 0 <;> simp [h]
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  · rw [kernelProjectionMatrix_diagonal, hsub, Matrix.diagonal_mul_diagonal]
+    congr 1
+    funext i
+    by_cases h : d i = 0 <;> simp [h]
+  · rw [kernelProjectionMatrix_diagonal, hsub, Matrix.diagonal_mul_diagonal]
+    congr 1
+    funext i
+    by_cases h : d i = 0 <;> simp [h]
+  · rw [kernelProjectionMatrix_diagonal, Matrix.diagonal_mul_diagonal]
+    refine Eq.trans (congrArg Matrix.diagonal ?_) Matrix.diagonal_zero'
+    funext i
+    by_cases h : d i = 0 <;> simp [h]
+  · rw [kernelProjectionMatrix_diagonal, Matrix.diagonal_mul_diagonal]
+    refine Eq.trans (congrArg Matrix.diagonal ?_) Matrix.diagonal_zero'
+    funext i
+    by_cases h : d i = 0 <;> simp [h]
+  · refine Matrix.isHermitian_diagonal_of_self_adjoint _ ?_
+    change star (fun i => if d i = 0 then (0 : ℂ) else (d i)⁻¹) = _
+    funext i
+    by_cases h : d i = 0
+    · simp [Pi.star_apply, h]
+    · rw [Pi.star_apply, if_neg h, star_inv₀, hd i]
+
 /-- The **second-order effective Hamiltonian** `Ĥeff = − P̂₀ V̂ Ĥ₀⁻¹ V̂ P̂₀`
 (Tasaki eq. (10.1.20)). -/
 noncomputable def secondOrderEffectiveHamiltonian (H0 V H0inv : Matrix n n ℂ) :
