@@ -25,9 +25,10 @@ Pins the API contract of `Math/MatrixAnalysis/DegeneratePerturbationUniqueness.l
 *not* Tasaki's proof (which uses continuity + linear-independence counting over `D₀` branches);
 it is this arc's replacement, reaching the same conclusion by a different, mathlib-only route.
 
-Also machine-checks, reusing the two-site / `Fin 1` witnesses de-privatized in
-`Tests/DegeneratePerturbationGroundEnergy.lean` (design report §7 pitfall P-g, so as not to
-duplicate declarations):
+Also machine-checks, reusing the two-site witness exposed by
+`Tests/DegeneratePerturbationGroundEnergy.lean` and the coordinate readout of
+`Tests/DegeneratePerturbationWitness.lean` (design report §7 pitfall P-g, so as not to duplicate
+declarations):
 
 * the **two-site non-vacuity witness** (design report §9 item 2) — `hEffGS` is fully discharged on
   the two-site data (`ker Ĥ₀ = ℂe₀` is one-dimensional, so uniqueness is free once membership is
@@ -68,6 +69,7 @@ namespace LatticeSystem.Tests.DegeneratePerturbationUniqueness
 
 open LatticeSystem.Math Matrix
 open LatticeSystem.Tests.DegeneratePerturbationGroundEnergy
+open LatticeSystem.Tests.DegeneratePerturbationWitness
 open scoped ComplexOrder
 
 variable {n : Type*} [Fintype n] [DecidableEq n]
@@ -159,7 +161,7 @@ example {H0 V H0inv : Matrix n n ℂ} {Eeff : ℝ} {Φeff : EuclideanSpace ℂ n
 
 /-! ### Two-site non-vacuity witness (design report §9 item 2)
 
-Reuses `twoSiteH0`, `twoSiteV`, `twoSiteGround` etc. de-privatized in
+Reuses `twoSiteH0`, `twoSiteV`, `twoSiteGround` etc. exposed by
 `Tests/DegeneratePerturbationGroundEnergy.lean`. `ker twoSiteH0 = ℂ ∙ twoSiteGround` is
 one-dimensional, so the uniqueness clause of `IsUniqueGroundStateOn` on it is automatic once
 membership is known (`Submodule.mem_span_singleton`), and only the ground-eigenvalue clause needs
@@ -244,11 +246,6 @@ theorem gapWitness_v_isHermitian : gapWitnessV.IsHermitian := by
   ext i j
   fin_cases i <;> fin_cases j <;> simp [gapWitnessV, Matrix.conjTranspose_apply]
 
-/-- Coordinates of a matrix action on `EuclideanSpace ℂ (Fin 4)`. -/
-theorem gapWitness_toEuclideanLin_apply (M : Matrix (Fin 4) (Fin 4) ℂ)
-    (x : EuclideanSpace ℂ (Fin 4)) (i : Fin 4) :
-    (Matrix.toEuclideanLin M x) i = ∑ j, M i j * x j := rfl
-
 /-- `Ĥ₀` is idempotent: `Ĥ₀ = diag(0,0,1,1)` already *is* the orthogonal projection onto
 `span{e₂,e₃}`. This is the only fact `gapWitness_kernelProjectionMatrix` needs — no coordinate
 description of `ker Ĥ₀` is required. -/
@@ -314,7 +311,7 @@ theorem gapWitness_effective_eigenvector_e0 :
       = ((-1 : ℝ) : ℂ) • EuclideanSpace.single (0 : Fin 4) (1 : ℂ) := by
   rw [gapWitness_secondOrderEffectiveHamiltonian]
   refine PiLp.ext fun i => ?_
-  rw [gapWitness_toEuclideanLin_apply]
+  rw [toEuclideanLin_apply_coord]
   fin_cases i <;> simp [PiLp.single_apply]
 
 /-- `Ĥeff = −I₂` on `ker Ĥ₀`: `e₁` is *also* a `(−1)`-eigenvector, not a scalar multiple of `e₀` —
@@ -325,7 +322,7 @@ theorem gapWitness_effective_eigenvector_e1 :
       = ((-1 : ℝ) : ℂ) • EuclideanSpace.single (1 : Fin 4) (1 : ℂ) := by
   rw [gapWitness_secondOrderEffectiveHamiltonian]
   refine PiLp.ext fun i => ?_
-  rw [gapWitness_toEuclideanLin_apply]
+  rw [toEuclideanLin_apply_coord]
   fin_cases i <;> simp [PiLp.single_apply]
 
 /-- `e₀ ∈ ker Ĥ₀`: the last two coordinates of `Ĥ₀e₀` are `(e₀) 2 = 0` and `(e₀) 3 = 0`. -/
@@ -334,7 +331,7 @@ theorem gapWitness_e0_mem_ker :
       ∈ matrixKernel gapWitnessH0 := by
   rw [matrixKernel, LinearMap.mem_ker]
   refine PiLp.ext fun i => ?_
-  rw [gapWitness_toEuclideanLin_apply]
+  rw [toEuclideanLin_apply_coord]
   fin_cases i <;> simp [gapWitnessH0, PiLp.single_apply]
 
 /-- `e₁ ∈ ker Ĥ₀`: the last two coordinates of `Ĥ₀e₁` are `(e₁) 2 = 0` and `(e₁) 3 = 0`. -/
@@ -343,7 +340,7 @@ theorem gapWitness_e1_mem_ker :
       ∈ matrixKernel gapWitnessH0 := by
   rw [matrixKernel, LinearMap.mem_ker]
   refine PiLp.ext fun i => ?_
-  rw [gapWitness_toEuclideanLin_apply]
+  rw [toEuclideanLin_apply_coord]
   fin_cases i <;> simp [gapWitnessH0, PiLp.single_apply]
 
 /-- **`ker Ĥ₀ = span{e₀, e₁}`.** `Ĥ₀ = diag(0,0,1,1)` annihilates exactly the vectors whose last
@@ -358,10 +355,10 @@ theorem gapWitness_matrixKernel :
   · rw [matrixKernel, LinearMap.mem_ker] at hψ
     have h2 : ψ 2 = 0 := by
       have h := congrArg (fun x : EuclideanSpace ℂ (Fin 4) => x 2) hψ
-      simpa [gapWitness_toEuclideanLin_apply, gapWitnessH0, Fin.sum_univ_four] using h
+      simpa [toEuclideanLin_apply_coord, gapWitnessH0, Fin.sum_univ_four] using h
     have h3 : ψ 3 = 0 := by
       have h := congrArg (fun x : EuclideanSpace ℂ (Fin 4) => x 3) hψ
-      simpa [gapWitness_toEuclideanLin_apply, gapWitnessH0, Fin.sum_univ_four] using h
+      simpa [toEuclideanLin_apply_coord, gapWitnessH0, Fin.sum_univ_four] using h
     refine Submodule.mem_span_pair.mpr ⟨ψ 0, ψ 1, PiLp.ext fun i => ?_⟩
     fin_cases i <;> simp [h2, h3]
   · rintro x hx

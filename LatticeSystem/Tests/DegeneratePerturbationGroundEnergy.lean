@@ -1,4 +1,5 @@
 import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationGroundEnergy
+import LatticeSystem.Tests.DegeneratePerturbationWitness
 
 /-!
 # Test coverage for the trial-state variational bound (Tasaki Lemma 10.1, PR-4)
@@ -58,14 +59,21 @@ Also machine-checks two instances built from explicit matrices:
   witness, where it evaluates to `1` and the resulting bound `E ≤ −λ² + λ³` is machine-checked
   from B1 and L2 directly.
 
-**Witness helpers are not `private`.** The `fin1_*`/`twoSite_*` scaffolding below is reused by
-`Tests/DegeneratePerturbationUniqueness.lean` (PR-5, design report §7 pitfall P-g): rebuilding the
-same witness matrices there would be a duplicate declaration, so this file exposes them instead.
+**Which witness helpers are not `private`.** `Tests/DegeneratePerturbationUniqueness.lean` (PR-5,
+design report §7 pitfall P-g) instantiates its own pins on the same two-site model, and rebuilding
+those matrices there would be a duplicate declaration. The eleven declarations it consumes —
+`twoSiteH0`, `twoSiteV`, `twoSiteGround`, `twoSite_matrixKernel`, `twoSite_ground_mem`,
+`twoSite_norm_ground`, `twoSite_h0_posSemidef`, `twoSite_v_isHermitian`,
+`twoSite_isReducedInverse`, `twoSite_firstOrder`, `twoSite_effective_eigenvector` — are therefore
+exposed; everything else below is `private`, being internal to this file's own computations. The
+`Fin 1` scaffolding shared with `Tests/DegeneratePerturbationFeshbach.lean` lives in
+`Tests/DegeneratePerturbationWitness.lean`.
 -/
 
 namespace LatticeSystem.Tests.DegeneratePerturbationGroundEnergy
 
 open LatticeSystem.Math Matrix
+open LatticeSystem.Tests.DegeneratePerturbationWitness
 open scoped ComplexOrder
 
 variable {n : Type*} [Fintype n] [DecidableEq n]
@@ -169,25 +177,12 @@ example {H0 V : Matrix n n ℂ} {v lam E : ℝ} {Φeff : EuclideanSpace ℂ n}
     |E| ≤ lam * v :=
   abs_isGroundEigenvalue_perturbedHamiltonian_le hH0pos hV hv hFirstOrder hΦeff hnorm hlam hE
 
-/-- The kernel of the zero matrix is the whole space (shared scaffolding for the `V = 0` corner
-below, mirroring `DegeneratePerturbationFeshbach`'s `fin1_matrixKernel_zero_eq_top`). -/
-theorem fin1_matrixKernel_zero_eq_top :
-    matrixKernel (0 : Matrix (Fin 1) (Fin 1) ℂ) = ⊤ := by
-  rw [Submodule.eq_top_iff']
-  intro x
-  simp [matrixKernel]
-
 /-- The zero matrix is trivially a reduced inverse of itself: `ker 0 = ⊤`, so the kernel
 projection is the identity and every field of `IsReducedInverse` collapses to `0 = 0`. -/
-theorem fin1_isReducedInverse_zero_zero :
+private theorem fin1_isReducedInverse_zero_zero :
     IsReducedInverse (0 : Matrix (Fin 1) (Fin 1) ℂ) 0 := by
-  have hP : kernelProjectionMatrix (0 : Matrix (Fin 1) (Fin 1) ℂ) = 1 := by
-    refine Matrix.toEuclideanLin.injective ?_
-    rw [toEuclideanLin_kernelProjectionMatrix, fin1_matrixKernel_zero_eq_top,
-      Submodule.starProjection_top]
-    ext x
-    simp
-  refine ⟨?_, ?_, ?_, ?_, Matrix.isHermitian_zero⟩ <;> simp [hP]
+  refine ⟨?_, ?_, ?_, ?_, Matrix.isHermitian_zero⟩ <;>
+    simp [fin1_kernelProjectionMatrix_zero_eq_one]
 
 /-- **`V = 0` corner** (design report §8 item 2): at `H0 = V = H0inv = 0` on `n = Fin 1`,
 `matrixKernel 0 = ⊤`, `hFirstOrder` holds trivially, and L1's exact residual identity
@@ -224,20 +219,14 @@ noncomputable def twoSiteV : Matrix (Fin 2) (Fin 2) ℂ := !![0, 1; 1, 0]
 
 /-- The kernel projection `P̂₀ = diag(1,0)` of the witness, identified with
 `kernelProjectionMatrix twoSiteH0` in `twoSite_kernelProjectionMatrix`. -/
-noncomputable def twoSiteProj : Matrix (Fin 2) (Fin 2) ℂ := !![1, 0; 0, 0]
+private noncomputable def twoSiteProj : Matrix (Fin 2) (Fin 2) ℂ := !![1, 0; 0, 0]
 
 /-- The witness effective ground state `Φeff = e₀`, a unit vector spanning `ker Ĥ₀`. -/
 noncomputable def twoSiteGround : EuclideanSpace ℂ (Fin 2) := EuclideanSpace.single 0 1
 
 /-- The witness first-order correction `u = Ĥ₀⁻¹V̂Φeff = e₁` (see
 `twoSite_reducedInverse_v_ground`). -/
-noncomputable def twoSiteExcited : EuclideanSpace ℂ (Fin 2) := EuclideanSpace.single 1 1
-
-/-- Coordinates of a matrix acting on `EuclideanSpace ℂ (Fin 2)`: the action is `mulVec`, so the
-`i`-th coordinate pairs the `i`-th row with the vector. -/
-theorem twoSite_toEuclideanLin_apply (M : Matrix (Fin 2) (Fin 2) ℂ)
-    (x : EuclideanSpace ℂ (Fin 2)) (i : Fin 2) :
-    (Matrix.toEuclideanLin M x) i = ∑ j, M i j * x j := rfl
+private noncomputable def twoSiteExcited : EuclideanSpace ℂ (Fin 2) := EuclideanSpace.single 1 1
 
 /-- `Φeff = e₀` is a unit vector, as L4 and L5 require. -/
 theorem twoSite_norm_ground : ‖twoSiteGround‖ = 1 := by
@@ -246,7 +235,7 @@ theorem twoSite_norm_ground : ‖twoSiteGround‖ = 1 := by
 
 /-- `u = e₁` is a unit vector, so the closed form `c₃ = |re⟪u, V̂u⟫| + |Eeff|‖u‖²` reduces to
 `|re⟪u, V̂u⟫| + |Eeff|` at the witness. -/
-theorem twoSite_norm_excited : ‖twoSiteExcited‖ = 1 := by
+private theorem twoSite_norm_excited : ‖twoSiteExcited‖ = 1 := by
   rw [twoSiteExcited, EuclideanSpace.single, PiLp.norm_single]
   simp
 
@@ -258,7 +247,7 @@ theorem twoSite_matrixKernel : matrixKernel twoSiteH0 = ℂ ∙ twoSiteGround :=
   constructor
   · intro hx
     have h1 : (Matrix.toEuclideanLin twoSiteH0 x) 1 = 0 := by rw [hx]; rfl
-    rw [twoSite_toEuclideanLin_apply] at h1
+    rw [toEuclideanLin_apply_coord] at h1
     simp [twoSiteH0, Fin.sum_univ_two] at h1
     refine ⟨x 0, ?_⟩
     refine PiLp.ext ?_
@@ -267,12 +256,12 @@ theorem twoSite_matrixKernel : matrixKernel twoSiteH0 = ℂ ∙ twoSiteGround :=
   · rintro ⟨c, rfl⟩
     refine PiLp.ext ?_
     intro i
-    rw [twoSite_toEuclideanLin_apply]
+    rw [toEuclideanLin_apply_coord]
     fin_cases i <;> simp [twoSiteH0, twoSiteGround]
 
 /-- `P̂₀ = diag(1,0)`: the star projection onto the line `ℂe₀` is `w ↦ ⟪e₀, w⟫ • e₀`, whose matrix
 in the standard orthonormal basis has the single entry `1` at `(0,0)`. -/
-theorem twoSite_kernelProjectionMatrix :
+private theorem twoSite_kernelProjectionMatrix :
     kernelProjectionMatrix twoSiteH0 = twoSiteProj := by
   ext x y
   rw [kernelProjectionMatrix_apply, twoSite_matrixKernel,
@@ -287,7 +276,7 @@ theorem twoSite_ground_mem : twoSiteGround ∈ matrixKernel twoSiteH0 := by
   exact Submodule.mem_span_singleton_self _
 
 /-- `Ĥ₀ = diag(0,1)` is Hermitian. -/
-theorem twoSite_h0_isHermitian : twoSiteH0.IsHermitian := by
+private theorem twoSite_h0_isHermitian : twoSiteH0.IsHermitian := by
   ext i j
   fin_cases i <;> fin_cases j <;> simp [twoSiteH0, Matrix.conjTranspose_apply]
 
@@ -316,7 +305,7 @@ theorem twoSite_isReducedInverse : IsReducedInverse twoSiteH0 twoSiteH0 := by
 
 /-- The second-order effective Hamiltonian of the witness is `Ĥeff = diag(−1,0)`
 (eq. (10.1.20) evaluated on the two-site model). -/
-theorem twoSite_secondOrderEffectiveHamiltonian :
+private theorem twoSite_secondOrderEffectiveHamiltonian :
     secondOrderEffectiveHamiltonian twoSiteH0 twoSiteV twoSiteH0 = !![-1, 0; 0, 0] := by
   rw [secondOrderEffectiveHamiltonian, twoSite_kernelProjectionMatrix]
   ext i j
@@ -332,7 +321,7 @@ theorem twoSite_effective_eigenvector :
   rw [twoSite_secondOrderEffectiveHamiltonian]
   refine PiLp.ext ?_
   intro i
-  rw [twoSite_toEuclideanLin_apply]
+  rw [toEuclideanLin_apply_coord]
   fin_cases i <;> simp [twoSiteGround]
 
 /-- `Ĥ₀ = diag(0,1)` is positive semidefinite, the extra hypothesis L5 imposes on `Ĥ₀`. -/
@@ -346,44 +335,44 @@ theorem twoSite_h0_posSemidef : twoSiteH0.PosSemidef := by
 
 /-- `v = 1` is an operator bound for `V̂`, which merely swaps the two coordinates: L5's `hv` at the
 witness. -/
-theorem twoSite_v_opBound (u : EuclideanSpace ℂ (Fin 2)) :
+private theorem twoSite_v_opBound (u : EuclideanSpace ℂ (Fin 2)) :
     ‖Matrix.toEuclideanLin twoSiteV u‖ ≤ 1 * ‖u‖ := by
   have h0 : (Matrix.toEuclideanLin twoSiteV u) 0 = u 1 := by
-    rw [twoSite_toEuclideanLin_apply]; simp [twoSiteV]
+    rw [toEuclideanLin_apply_coord]; simp [twoSiteV]
   have h1 : (Matrix.toEuclideanLin twoSiteV u) 1 = u 0 := by
-    rw [twoSite_toEuclideanLin_apply]; simp [twoSiteV]
+    rw [toEuclideanLin_apply_coord]; simp [twoSiteV]
   rw [one_mul, EuclideanSpace.norm_eq, EuclideanSpace.norm_eq]
   simp only [Fin.sum_univ_two, h0, h1]
   rw [add_comm]
 
 /-- The witness first-order correction is `u = Ĥ₀⁻¹V̂Φeff = e₁`. -/
-theorem twoSite_reducedInverse_v_ground :
+private theorem twoSite_reducedInverse_v_ground :
     Matrix.toEuclideanLin twoSiteH0 (Matrix.toEuclideanLin twoSiteV twoSiteGround)
       = twoSiteExcited := by
   refine PiLp.ext fun i => ?_
-  rw [twoSite_toEuclideanLin_apply]
+  rw [toEuclideanLin_apply_coord]
   fin_cases i <;>
-    simp [twoSiteH0, twoSiteV, twoSiteGround, twoSiteExcited, twoSite_toEuclideanLin_apply,
+    simp [twoSiteH0, twoSiteV, twoSiteGround, twoSiteExcited, toEuclideanLin_apply_coord,
       Fin.sum_univ_two]
 
 /-- `⟪Φeff, u⟫ = ⟪e₀, e₁⟫ = 0`: the orthogonality that makes `‖Ψ‖² = 1 + λ²`. -/
-theorem twoSite_inner_ground_excited : (inner ℂ twoSiteGround twoSiteExcited : ℂ) = 0 := by
+private theorem twoSite_inner_ground_excited : (inner ℂ twoSiteGround twoSiteExcited : ℂ) = 0 := by
   simp [twoSiteGround, twoSiteExcited, EuclideanSpace.inner_single_right]
 
 /-- `⟪u, V̂u⟫ = ⟪e₁, e₀⟫ = 0`: the `λ³` coefficient of the exact trial energy vanishes at the
 witness, so the closed form leaves `c₃ = |Eeff| ‖u‖² = 1`. -/
-theorem twoSite_inner_excited_v_excited :
+private theorem twoSite_inner_excited_v_excited :
     (inner ℂ twoSiteExcited (Matrix.toEuclideanLin twoSiteV twoSiteExcited) : ℂ) = 0 := by
   have h : Matrix.toEuclideanLin twoSiteV twoSiteExcited = twoSiteGround := by
     refine PiLp.ext fun i => ?_
-    rw [twoSite_toEuclideanLin_apply]
+    rw [toEuclideanLin_apply_coord]
     fin_cases i <;> simp [twoSiteV, twoSiteGround, twoSiteExcited]
   rw [h, twoSiteGround, twoSiteExcited, EuclideanSpace.inner_single_right]
   simp
 
 /-- **L2 at the witness**: the trial vector `Ψ = e₀ − λe₁` has exact energy
 `⟪Ψ, Ĥ(λ)Ψ⟫ = −λ²`, matching `λ²Eeff` with `Eeff = −1` because the `λ³` term vanishes. -/
-theorem twoSite_trial_energy (lam : ℝ) :
+private theorem twoSite_trial_energy (lam : ℝ) :
     (inner ℂ (twoSiteGround - (lam : ℂ) • twoSiteExcited)
         (Matrix.toEuclideanLin (perturbedHamiltonian twoSiteH0 twoSiteV lam)
           (twoSiteGround - (lam : ℂ) • twoSiteExcited)) : ℂ)
@@ -397,7 +386,7 @@ theorem twoSite_trial_energy (lam : ℝ) :
   simp
 
 /-- The trial vector of the witness has squared norm `‖e₀ − λe₁‖² = 1 + λ²`. -/
-theorem twoSite_trial_norm_sq (lam : ℝ) :
+private theorem twoSite_trial_norm_sq (lam : ℝ) :
     ‖twoSiteGround - (lam : ℂ) • twoSiteExcited‖ ^ 2 = 1 + lam ^ 2 := by
   have hns : ‖((lam : ℂ)) • twoSiteExcited‖ ^ 2 = lam ^ 2 * ‖twoSiteExcited‖ ^ 2 := by
     rw [norm_smul, mul_pow]
