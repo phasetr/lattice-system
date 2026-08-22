@@ -19,7 +19,7 @@ locate the one Casimir eigenvalue the transported ground state actually occupies
   `spinZSectorEuclidean` (`LiebRepulsiveBalancedGround.lean`) by also fixing the total number `N̂`.
 * `numberSpinZCasimirSectorEuclidean N L m₀ c` — the Casimir-refined sector `K_c = K ⊓ ker(Ŝ² − c)`.
   `K_c` is defined purely from the fixed charges `N̂`, `Ŝ³`, `Ŝ²`; it carries no dependence on any
-  particular Hamiltonian of the homotopy family `H_s` (spin-orbit-coupling parameter `s`,
+  particular Hamiltonian of the homotopy family `H_s` (homotopy interpolation parameter `s`,
   PR-4/PR-5) used later in the arc.
 * **Proposition 1** (invariance): any Hamiltonian `H` commuting with `N̂`, `Ŝ³` (and, for `K_c`,
   also `Ŝ²`) preserves `K` and `K_c`
