@@ -10,8 +10,9 @@ two *distinct* sites `x ≠ y` on the spinful Jordan–Wigner backbone, the roun
 
 `Σ_{σ,τ} ĉ†_{y,τ} ĉ_{x,τ} ĉ†_{x,σ} ĉ_{y,σ}`
 
-(a fermion hops `x → y` with spin `σ`, then a — possibly different-spin — fermion hops `y → x`
-with spin `τ`, landing back on the original pair of sites) equals
+(read right to left: a fermion hops `y → x` with spin `σ`, leaving `x` doubly occupied and `y`
+empty, then a — possibly different-spin — fermion hops `x → y` with spin `τ`, landing back on the
+original pair of sites) equals
 
 `n̂_y − 2 Ŝ_x·Ŝ_y − ½ n̂_x n̂_y`.
 
@@ -31,12 +32,12 @@ endpoint graph of the Lieb-repulsive arc (PR-6,
 kernel-projection `P₀` on the half-filled hard-core sector.
 
 The proof route is via CAR (canonical anticommutation relations), not Jordan–Wigner sign
-combinatorics: three anticommutation swaps move `ĉ†_{x,σ}` past `ĉ_{x,τ}` and `ĉ†_{y,τ}`, turning
-the opposite-spin summand into `−Ŝ^{±}_y Ŝ^{∓}_x`, while the same-spin summand collapses via the
-ordinary `n̂ = c†c` algebra to `n̂_{y,σ} − n̂_{x,σ} n̂_{y,σ}`. This route was chosen over
-`HopSignBetween`'s Jordan–Wigner string-sign lemmas to avoid the four-way `x ≶ y`, `σ, τ`
-case split on two different configurations, which is exactly where a silent overall-sign error
-would hide.
+combinatorics: three anticommutation swaps carry `ĉ_{x,τ}` past `ĉ†_{x,σ}` and past `ĉ_{y,σ}`,
+then `ĉ†_{x,σ}` past `ĉ_{y,σ}`, turning the opposite-spin summand into `−Ŝ^{±}_y Ŝ^{∓}_x`, while
+the same-spin summand collapses via the ordinary `n̂ = c†c` algebra to
+`n̂_{y,σ} − n̂_{x,σ} n̂_{y,σ}`. This route was chosen over `HopSignBetween`'s Jordan–Wigner
+string-sign lemmas to avoid the four-way `x ≶ y`, `σ, τ` case split on two different
+configurations, which is exactly where a silent overall-sign error would hide.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed.), §10.1, eq. (10.1.9) and the two auxiliary identities below it, p. 344.
@@ -48,10 +49,12 @@ open Matrix LatticeSystem.Quantum
 open scoped BigOperators
 
 /-- **The hop-return operator** `Σ_{σ,τ} ĉ†_{y,τ} ĉ_{x,τ} ĉ†_{x,σ} ĉ_{y,σ}` (Tasaki eq. (10.1.9)):
-a fermion hops `x → y` carrying spin `σ`, then a (possibly different-spin) fermion hops back
-`y → x` carrying spin `τ`. Summed over both spin labels of the outgoing and returning hop, this
-is the round-trip operator whose value between the two intermediate (singly-occupied-`x`,
-doubly-occupied-`y`)  hard-core Fock states supplies the second-order strong-coupling
+read right to left, a fermion hops `y → x` carrying spin `σ`, then a (possibly different-spin)
+fermion hops back `x → y` carrying spin `τ`. The intermediate state in between has `x` doubly
+occupied and `y` empty; that double occupancy is what the second-order energy denominator `U_x`
+weighs. Summed over both spin labels of the outgoing and returning hop, this is the round-trip
+operator whose matrix elements between hard-core Fock states — hard-core at both ends, the
+intermediate state being the doubly-occupied excursion — supply the second-order strong-coupling
 superexchange coefficient (PR-8). No hypothesis on `x, y` is built into the definition; the
 identity below requires `x ≠ y`. -/
 noncomputable def fermionHopReturn (N : ℕ) (x y : Fin (N + 1)) : ManyBodyOp (Fin (2 * N + 2)) :=
@@ -102,10 +105,10 @@ theorem fermionHopReturn_same_spin_eq (N : ℕ) (x y : Fin (N + 1)) (hxy : x ≠
 /-- **Opposite-spin summand** (`σ ≠ τ`, hence `{σ, τ} = {0, 1}` in `Fin 2`). For `x ≠ y`,
 `ĉ†_{y,τ} ĉ_{x,τ} ĉ†_{x,σ} ĉ_{y,σ} = − (ĉ†_{y,τ} ĉ_{y,σ}) (ĉ†_{x,σ} ĉ_{x,τ})`: three CAR
 anticommutation swaps (`{ĉ_{x,τ}, ĉ†_{x,σ}} = 0` since `τ ≠ σ` are distinct modes at the same
-site, `{ĉ_{x,τ}, ĉ_{y,σ}} = 0` and `{ĉ†_{x,σ}, ĉ_{y,σ}} = 0` since `x ≠ y`) move `ĉ†_{x,σ}` past
-`ĉ_{x,τ}` and past `ĉ†_{y,τ}`, regrouping the four operators around the two sites `y` and `x`.
-The right-hand-side factors are (up to sign) the spin ladder operators
-`Ŝ^{(τσ)}_y := ĉ†_{y,τ} ĉ_{y,σ}` and `Ŝ^{(στ)}_x := ĉ†_{x,σ} ĉ_{x,τ}`. -/
+site, `{ĉ_{x,τ}, ĉ_{y,σ}} = 0` and `{ĉ†_{x,σ}, ĉ_{y,σ}} = 0` since `x ≠ y`) carry `ĉ_{x,τ}` past
+`ĉ†_{x,σ}` and past `ĉ_{y,σ}`, then `ĉ†_{x,σ}` past `ĉ_{y,σ}`, regrouping the four operators
+around the two sites `y` and `x`. The right-hand-side factors are (up to sign) the spin ladder
+operators `Ŝ^{(τσ)}_y := ĉ†_{y,τ} ĉ_{y,σ}` and `Ŝ^{(στ)}_x := ĉ†_{x,σ} ĉ_{x,τ}`. -/
 theorem fermionHopReturn_opposite_spin_eq (N : ℕ) (x y : Fin (N + 1)) (hxy : x ≠ y)
     (σ τ : Fin 2) (hστ : σ ≠ τ) :
     fermionMultiCreation (2 * N + 1) (spinfulIndex N y τ) *
