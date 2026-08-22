@@ -29,11 +29,10 @@ term at `(i, j, k, l) = (l, k, k, l)` is literally the `(τ', σ') = (σ, τ)` s
 here, both sides carry the same operator and `jwSign` cancels by construction. The capstone
 therefore needs no `hT` (symmetry of the hopping matrix `T`) at this stage: the surviving
 coefficient is the *asymmetric* product `t_{yx} · t_{xy}`, and only PR-8b's reduction of that
-product to the endpoint-graph indicator `t_{xy}²` (`liebEndpointHopping_sq_eq_indicator`'s `hT`
-variant) needs the symmetry hypothesis. There `hT` is genuinely necessary rather than a convenience:
-an asymmetric `T` with `T x y > 0 > T y x` would make `t_{yx} t_{xy}` and the endpoint indicator
-`(liebEndpointHopping A T 1 x y)²` disagree in sign, which is why PR-8b — not this file — must
-carry `hT` alongside `hbip`.
+product to the endpoint-graph indicator `t_{xy}²` needs the symmetry hypothesis. There `hT` is
+genuinely necessary rather than a convenience: an asymmetric `T` with `T x y > 0 > T y x` would
+make `t_{yx} t_{xy}` and the endpoint indicator `(liebEndpointHopping A T 1 x y)²` disagree in
+sign, which is why PR-8b — not this file — must carry `hT` alongside `hbip`.
 
 Index-orientation caveat: the display above attaches `t_{ij}` to the *left* operator factor, while
 the proof below (`hzero`/`hcollapse`) works in the `simp` normal form of the matrix product, where
