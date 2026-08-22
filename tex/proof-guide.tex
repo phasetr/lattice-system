@@ -5555,16 +5555,24 @@ $\lambda_0 = \min\{1,\ g/(4v+1),\ \delta/(c_3+C+1)\}$ with $C = 4v^3/g^2$ --- th
 $+1$'s keeping the quotients well-formed at $v = 0$ and at $c_3 = C = 0$ --- so
 that $\hat H(\lambda)$ has a unique ground state on the whole space for every
 $\lambda \in (0,\lambda_0)$. That statement is the first conjunct of the axiom's
-conclusion. Non-vacuity and necessity are machine-checked in
+conclusion. Non-vacuity is machine-checked in
 \texttt{Tests/DegeneratePerturbationUniqueness.lean}: the two-site witness
 ($\hat H_0 = {\rm diag}(0,1)$, $\hat V = {\rm offdiag}(1,1)$,
 $\hat H_{\rm eff} = {\rm diag}(-1,0)$, $\Phi_{\rm eff} = e_0$) discharges the
 unique-ground-state hypothesis on $\ker \hat H_0$ in full and instantiates the
-packaged statement, while a four-dimensional witness
+packaged statement. A four-dimensional witness
 ($\hat H_0 = {\rm diag}(0,0,1,1)$, $\hat V$ coupling $e_0 \leftrightarrow e_2$
 and $e_1 \leftrightarrow e_3$ with unit weight, $\hat H_{\rm eff} = -\mathbb 1_2$
-on $\ker \hat H_0$) exhibits a genuinely degenerate $\hat H_{\rm eff}$ at which
-that hypothesis fails, showing it is not droppable. Every result of this layer
+on $\ker \hat H_0$) shows that the hypothesis is not automatic. What is
+machine-checked there is (i) that this witness satisfies all the \emph{other}
+hypotheses of the packaged statement, and (ii) the full negation
+$\neg\,\exists\,E_{\rm eff}\,\Phi_{\rm eff}$ of the unique-ground-state
+hypothesis on $\ker \hat H_0$ --- the failure of \emph{every} candidate pair,
+not just of the candidate $\Phi_{\rm eff} = e_0$. That $\hat H(\lambda)$ itself
+has a degenerate ground state at this witness, which is what would show the
+\emph{conclusion} fails once the hypothesis is dropped, is a hand computation
+recorded in the test file's module documentation and is \emph{not}
+machine-checked. Every result of this layer
 is axiom-free;
 \texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation} itself is unaffected.
 

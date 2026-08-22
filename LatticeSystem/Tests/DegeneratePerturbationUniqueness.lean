@@ -32,19 +32,23 @@ duplicate declarations):
 * the **two-site non-vacuity witness** (design report §9 item 2) — `hEffGS` is fully discharged on
   the two-site data (`ker Ĥ₀ = ℂe₀` is one-dimensional, so uniqueness is free once membership is
   known), instantiating U3's hypothesis bundle non-vacuously;
-* the **`hδgap`-is-load-bearing soundness guard** (design report §9 item 4, §11 item 5) — a
+* the **`hEffGS`-is-load-bearing soundness guard** (design report §9 item 4, §11 item 5) — a
   4-dimensional witness (`Ĥ₀ = diag(0,0,1,1)`, `V̂` coupling `e₀↔e₂` and `e₁↔e₃` with equal
   weight) where `Ĥeff` restricted to `ker Ĥ₀` is the scalar matrix `−1·I₂`: genuinely degenerate,
-  so `Ĥeff` has **no** unique ground state on `ker Ĥ₀` and `hEffGS` cannot be discharged here. This
-  is machine-checked below (`counterexample_hEffGS_fails`); it is the necessity witness for U3's
-  `hEffGS` hypothesis. **Deviation from the design report**: §9 item 4 proposed a 3-dimensional
+  so `Ĥeff` has **no** unique ground state on `ker Ĥ₀`. What is machine-checked below is the full
+  negation over *all* candidates, `counterexample_hEffGS_fails :
+  ¬ ∃ Eeff Φeff, IsUniqueGroundStateOn (ker Ĥ₀) Ĥeff Eeff Φeff`, together with the fact that the
+  witness satisfies every *other* hypothesis of U3 (`Ĥ₀ ≥ 0`, `V̂` Hermitian, reduced inverse,
+  vanishing first-order term), so `hEffGS` is the single hypothesis that fails on it.
+  **Deviation from the design report**: §9 item 4 proposed a 3-dimensional
   witness (`Ĥ₀ = diag(0,0,1)`, both kernel vectors coupled symmetrically to a single excited mode
   `e₂`). Hand computation shows that witness is a rank-one correction
   `Ĥeff|_{ker} = −(a,b)ᵀ(a,b)` with `a = b`, which has eigenvalues `{−2a², 0}` — **not** degenerate,
   so it does *not* in fact violate `hEffGS`. The 4-dimensional two-excited-mode witness used here
   is the smallest one the author could verify by hand to genuinely produce a degenerate `Ĥeff`.
   The harder direction — that `Ĥ(λ)`'s ground state is *also* non-unique at this witness, which is
-  what shows `hEffGS` cannot be dropped from U3 itself — is *not* machine-checked here (design
+  what would show U3's *conclusion* fails once `hEffGS` is dropped — is **not** machine-checked
+  here; it is a hand computation only (design
   report §11 item 5 permits deferring the harder half to PR-6 if it exceeds ~40 lines): by the
   `0↔1, 2↔3` block-permutation symmetry of both `Ĥ₀` and `V̂`, `Ĥ(λ)` splits into two identical
   `2×2` blocks `!![0, λ; λ, 1]` on `{e₀,e₂}` and `{e₁,e₃}`, so every eigenvalue of `Ĥ(λ)` — in
@@ -200,15 +204,15 @@ example : ∃ lam0 : ℝ, 0 < lam0 ∧ ∀ lam : ℝ, 0 < lam → lam < lam0 →
   exists_lam0_isUniqueGroundStateOn_perturbedHamiltonian twoSite_h0_posSemidef
     twoSite_v_isHermitian twoSite_isReducedInverse twoSite_firstOrder twoSite_hEffGS
 
-/-! ### The `hδgap`-necessity witness (design report §9 item 4, §11 item 5)
+/-! ### The `hEffGS`-necessity witness (design report §9 item 4, §11 item 5)
 
 `n = Fin 4`, `Ĥ₀ = diag(0,0,1,1)`, `V̂` couples `e₀ ↔ e₂` and `e₁ ↔ e₃` each with unit weight, all
 other entries zero. `ker Ĥ₀ = span{e₀, e₁}` (two-dimensional), and
 `Ĥeff = −P̂₀V̂Ĥ₀⁻¹V̂P̂₀ = −I₂` on it (`Ĥ₀⁻¹ = Ĥ₀`, its own reduced inverse, since `Ĥ₀` acts as the
 identity on `(ker Ĥ₀)ᗮ = span{e₂,e₃}`). This is genuinely degenerate: `e₀` and `e₁` are both
 `(−1)`-eigenvectors of `Ĥeff` in `ker Ĥ₀` that are not scalar multiples of one another, so `Ĥeff`
-has **no** unique ground state on `ker Ĥ₀` — `hEffGS` fails at this witness, which is exactly what
-shows the hypothesis is not vacuous/droppable. -/
+has **no** unique ground state on `ker Ĥ₀` for *any* candidate energy and candidate state —
+`hEffGS` fails at this witness, which is exactly what shows the hypothesis is not vacuous. -/
 
 /-- The witness unperturbed Hamiltonian `Ĥ₀ = diag(0,0,1,1)`. -/
 noncomputable def gapWitnessH0 : Matrix (Fin 4) (Fin 4) ℂ := !![0,0,0,0; 0,0,0,0; 0,0,1,0; 0,0,0,1]
@@ -324,6 +328,15 @@ theorem gapWitness_effective_eigenvector_e1 :
   rw [gapWitness_toEuclideanLin_apply]
   fin_cases i <;> simp [PiLp.single_apply]
 
+/-- `e₀ ∈ ker Ĥ₀`: the last two coordinates of `Ĥ₀e₀` are `(e₀) 2 = 0` and `(e₀) 3 = 0`. -/
+theorem gapWitness_e0_mem_ker :
+    (EuclideanSpace.single (0 : Fin 4) (1 : ℂ) : EuclideanSpace ℂ (Fin 4))
+      ∈ matrixKernel gapWitnessH0 := by
+  rw [matrixKernel, LinearMap.mem_ker]
+  refine PiLp.ext fun i => ?_
+  rw [gapWitness_toEuclideanLin_apply]
+  fin_cases i <;> simp [gapWitnessH0, PiLp.single_apply]
+
 /-- `e₁ ∈ ker Ĥ₀`: the last two coordinates of `Ĥ₀e₁` are `(e₁) 2 = 0` and `(e₁) 3 = 0`. -/
 theorem gapWitness_e1_mem_ker :
     (EuclideanSpace.single (1 : Fin 4) (1 : ℂ) : EuclideanSpace ℂ (Fin 4))
@@ -333,25 +346,86 @@ theorem gapWitness_e1_mem_ker :
   rw [gapWitness_toEuclideanLin_apply]
   fin_cases i <;> simp [gapWitnessH0, PiLp.single_apply]
 
-/-- **The soundness guard**: `Ĥeff` restricted to `ker Ĥ₀` is genuinely degenerate at this
-witness — `e₀` and `e₁` are both `(−1)`-eigenvectors and are not scalar multiples of one another —
-so no candidate `Φeff = e₀` makes the uniqueness clause of `IsUniqueGroundStateOn` hold: `e₁`
-witnesses its failure directly (if every `E`-eigenvector in `ker Ĥ₀` were a multiple of `e₀`, `e₁`
-would have to be, contradicting its zero `0`-th coordinate against `e₀`'s nonzero one). This is
-the necessity witness for `hEffGS` that design report §9 item 4 / §11 item 5 asks for; the harder
-direction (that `Ĥ(λ)`'s ground state is *also* non-unique here, for every `λ`, by the
-`0↔1, 2↔3` block-permutation symmetry noted in the module doc) is deferred to PR-6. -/
+/-- **`ker Ĥ₀ = span{e₀, e₁}`.** `Ĥ₀ = diag(0,0,1,1)` annihilates exactly the vectors whose last
+two coordinates vanish, and such a vector is `ψ₀ • e₀ + ψ₁ • e₁`. This is what makes the failure of
+`hEffGS` below a statement about *every* candidate ground state, not just about `e₀`: `Ĥeff` acts as
+`−1` on the whole plane. -/
+theorem gapWitness_matrixKernel :
+    matrixKernel gapWitnessH0
+      = Submodule.span ℂ {(EuclideanSpace.single (0 : Fin 4) (1 : ℂ) : EuclideanSpace ℂ (Fin 4)),
+          (EuclideanSpace.single (1 : Fin 4) (1 : ℂ) : EuclideanSpace ℂ (Fin 4))} := by
+  refine le_antisymm (fun ψ hψ => ?_) (Submodule.span_le.mpr ?_)
+  · rw [matrixKernel, LinearMap.mem_ker] at hψ
+    have h2 : ψ 2 = 0 := by
+      have h := congrArg (fun x : EuclideanSpace ℂ (Fin 4) => x 2) hψ
+      simpa [gapWitness_toEuclideanLin_apply, gapWitnessH0, Fin.sum_univ_four] using h
+    have h3 : ψ 3 = 0 := by
+      have h := congrArg (fun x : EuclideanSpace ℂ (Fin 4) => x 3) hψ
+      simpa [gapWitness_toEuclideanLin_apply, gapWitnessH0, Fin.sum_univ_four] using h
+    refine Submodule.mem_span_pair.mpr ⟨ψ 0, ψ 1, PiLp.ext fun i => ?_⟩
+    fin_cases i <;> simp [h2, h3]
+  · rintro x hx
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
+    rcases hx with rfl | rfl
+    · exact gapWitness_e0_mem_ker
+    · exact gapWitness_e1_mem_ker
+
+/-- The witness satisfies **every hypothesis of U3 except `hEffGS`**: `Ĥ₀` is positive semidefinite,
+`V̂` is Hermitian, `Ĥ₀` is its own reduced inverse, and the first-order term `P̂₀V̂P̂₀` vanishes. So
+what `counterexample_hEffGS_fails` isolates really is the unique-ground-state hypothesis, and not
+some other hypothesis silently failing on the same data. -/
+example : gapWitnessH0.PosSemidef ∧ gapWitnessV.IsHermitian ∧
+    IsReducedInverse gapWitnessH0 gapWitnessH0 ∧
+    kernelProjectionMatrix gapWitnessH0 * gapWitnessV * kernelProjectionMatrix gapWitnessH0 = 0 :=
+  ⟨gapWitness_h0_posSemidef, gapWitness_v_isHermitian, gapWitness_isReducedInverse,
+    gapWitness_firstOrder⟩
+
+/-- **The soundness guard**: `hEffGS` fails at this witness for **every** candidate pair
+`(Eeff, Φeff)`, not merely for the candidate `Φeff = e₀`. Indeed `Ĥeff` acts as `−1` on all of
+`ker Ĥ₀ = span{e₀,e₁}`, so a candidate normalized ground state forces `Eeff = −1`, and then both
+`e₀` and `e₁` are `Eeff`-eigenvectors inside `ker Ĥ₀`; the uniqueness clause would make each of
+them a multiple of `Φeff`, which is impossible since `e₁`'s `0`-th coordinate vanishes while
+`e₀`'s does not. This is the necessity witness for `hEffGS` that design report §9 item 4 / §11
+item 5 asks for; the harder direction (that `Ĥ(λ)`'s ground state is *also* non-unique here, for
+every `λ`, by the `0↔1, 2↔3` block-permutation symmetry noted in the module doc) is a hand
+computation, deferred to PR-6. -/
 theorem counterexample_hEffGS_fails :
-    ¬ ∀ ψ ∈ matrixKernel gapWitnessH0,
-        Matrix.toEuclideanLin (secondOrderEffectiveHamiltonian gapWitnessH0 gapWitnessV
-            gapWitnessH0) ψ = ((-1 : ℝ) : ℂ) • ψ →
-        ∃ c : ℂ, ψ = c • EuclideanSpace.single (0 : Fin 4) (1 : ℂ) := by
-  intro huniq
-  obtain ⟨c, hc⟩ := huniq (EuclideanSpace.single (1 : Fin 4) (1 : ℂ)) gapWitness_e1_mem_ker
-    gapWitness_effective_eigenvector_e1
-  have h1 : (EuclideanSpace.single (1 : Fin 4) (1 : ℂ) : EuclideanSpace ℂ (Fin 4)) 1 = 1 := by
-    simp
-  rw [hc] at h1
-  simp at h1
+    ¬ ∃ (Eeff : ℝ) (Φeff : EuclideanSpace ℂ (Fin 4)),
+        IsUniqueGroundStateOn (matrixKernel gapWitnessH0)
+          (secondOrderEffectiveHamiltonian gapWitnessH0 gapWitnessV gapWitnessH0) Eeff Φeff := by
+  rintro ⟨Eeff, Φeff, hmem, hnorm, heig, -, huniq⟩
+  have hne : Φeff ≠ 0 := by
+    intro h
+    rw [h, norm_zero] at hnorm
+    exact zero_ne_one hnorm
+  have hminus : Matrix.toEuclideanLin
+        (secondOrderEffectiveHamiltonian gapWitnessH0 gapWitnessV gapWitnessH0) Φeff
+      = ((-1 : ℝ) : ℂ) • Φeff := by
+    rw [gapWitness_matrixKernel, Submodule.mem_span_pair] at hmem
+    obtain ⟨a, b, rfl⟩ := hmem
+    rw [map_add, map_smul, map_smul, gapWitness_effective_eigenvector_e0,
+      gapWitness_effective_eigenvector_e1, smul_add, smul_comm a, smul_comm b]
+  have hEeff : Eeff = -1 := by
+    have hcast : ((-1 : ℝ) : ℂ) = (Eeff : ℂ) := (smul_left_inj hne).mp (hminus.symm.trans heig)
+    exact_mod_cast hcast.symm
+  subst hEeff
+  obtain ⟨c₀, hc₀⟩ := huniq _ gapWitness_e0_mem_ker gapWitness_effective_eigenvector_e0
+  obtain ⟨c₁, hc₁⟩ := huniq _ gapWitness_e1_mem_ker gapWitness_effective_eigenvector_e1
+  have h₀ : (1 : ℂ) = c₀ * Φeff 0 := by
+    have h := congrArg (fun x : EuclideanSpace ℂ (Fin 4) => x 0) hc₀
+    simpa [PiLp.single_apply] using h
+  have h₁ : (0 : ℂ) = c₁ * Φeff 0 := by
+    have h := congrArg (fun x : EuclideanSpace ℂ (Fin 4) => x 0) hc₁
+    simpa [PiLp.single_apply] using h
+  have h₂ : (1 : ℂ) = c₁ * Φeff 1 := by
+    have h := congrArg (fun x : EuclideanSpace ℂ (Fin 4) => x 1) hc₁
+    simpa [PiLp.single_apply] using h
+  have hΦ0 : Φeff 0 ≠ 0 := by
+    intro h
+    rw [h, mul_zero] at h₀
+    exact one_ne_zero h₀
+  have hc₁0 : c₁ = 0 := (mul_eq_zero.mp h₁.symm).resolve_right hΦ0
+  rw [hc₁0, zero_mul] at h₂
+  exact one_ne_zero h₂
 
 end LatticeSystem.Tests.DegeneratePerturbationUniqueness
