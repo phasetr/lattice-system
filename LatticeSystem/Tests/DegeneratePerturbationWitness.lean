@@ -4,16 +4,19 @@ import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbation
 # Shared scaffolding for the explicit witnesses of the Lemma 10.1 test files
 
 The test files of the Tasaki Lemma 10.1 arc (`Tests/DegeneratePerturbationFeshbach.lean`,
-`Tests/DegeneratePerturbationGroundEnergy.lean`, `Tests/DegeneratePerturbationUniqueness.lean`)
-instantiate their API pins on explicit matrices over `Fin 1`, `Fin 2` and `Fin 4`. This module
-holds the facts more than one of them needs, so that no declaration is duplicated across them:
+`Tests/DegeneratePerturbationGroundEnergy.lean`, `Tests/DegeneratePerturbationUniqueness.lean`,
+`Tests/DegeneratePerturbationConvergence.lean`) instantiate their API pins on explicit matrices
+over `Fin 1`, `Fin 2` and `Fin 4`. This module holds the facts more than one of them needs, so
+that no declaration is duplicated across them:
 
 * `toEuclideanLin_apply_coord` — the coordinate readout of a matrix action, the entry point of
   every explicit finite-dimensional computation in those files;
 * `fin1_matrixKernel_zero_eq_top` / `fin1_kernelProjectionMatrix_zero_eq_one` — the `Ĥ₀ = 0`
   degeneration on `Fin 1`, where `ker Ĥ₀` is the whole space and the kernel projection is the
   identity matrix. It carries the `V = 0` corner of the trial-state bound and the two
-  load-bearing counterexamples of the Feshbach equivalence.
+  load-bearing counterexamples of the Feshbach equivalence;
+* `fin1_isReducedInverse_zero_zero` — the reduced-inverse hypothesis at that same `Ĥ₀ = 0`
+  corner, which both the trial-state bound and the capstone instantiate.
 -/
 
 namespace LatticeSystem.Tests.DegeneratePerturbationWitness
@@ -42,5 +45,12 @@ theorem fin1_kernelProjectionMatrix_zero_eq_one :
     Submodule.starProjection_top]
   ext x
   simp
+
+/-- The zero matrix is trivially a reduced inverse of itself: `ker 0 = ⊤`, so the kernel
+projection is the identity and every field of `IsReducedInverse` collapses to `0 = 0`. -/
+theorem fin1_isReducedInverse_zero_zero :
+    IsReducedInverse (0 : Matrix (Fin 1) (Fin 1) ℂ) 0 := by
+  refine ⟨?_, ?_, ?_, ?_, Matrix.isHermitian_zero⟩ <;>
+    simp [fin1_kernelProjectionMatrix_zero_eq_one]
 
 end LatticeSystem.Tests.DegeneratePerturbationWitness

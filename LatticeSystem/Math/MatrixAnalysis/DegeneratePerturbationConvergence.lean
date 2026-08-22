@@ -1,6 +1,4 @@
 import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationUniqueness
-import Mathlib.Data.Real.Sqrt
-import Mathlib.Topology.Algebra.Order.Field
 
 /-!
 # Convergence of the perturbed ground state (Tasaki Lemma 10.1)

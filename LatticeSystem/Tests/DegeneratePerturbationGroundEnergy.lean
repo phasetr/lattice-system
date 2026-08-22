@@ -178,13 +178,6 @@ example {H0 V : Matrix n n ℂ} {v lam E : ℝ} {Φeff : EuclideanSpace ℂ n}
     |E| ≤ lam * v :=
   abs_isGroundEigenvalue_perturbedHamiltonian_le hH0pos hV hv hFirstOrder hΦeff hnorm hlam hE
 
-/-- The zero matrix is trivially a reduced inverse of itself: `ker 0 = ⊤`, so the kernel
-projection is the identity and every field of `IsReducedInverse` collapses to `0 = 0`. -/
-private theorem fin1_isReducedInverse_zero_zero :
-    IsReducedInverse (0 : Matrix (Fin 1) (Fin 1) ℂ) 0 := by
-  refine ⟨?_, ?_, ?_, ?_, Matrix.isHermitian_zero⟩ <;>
-    simp [fin1_kernelProjectionMatrix_zero_eq_one]
-
 /-- **`V = 0` corner** (design report §8 item 2): at `H0 = V = H0inv = 0` on `n = Fin 1`,
 `matrixKernel 0 = ⊤`, `hFirstOrder` holds trivially, and L1's exact residual identity
 degenerates to `Ĥ(λ)Φ = 0 = −λ²•0`. Exercises the degenerate `ker Ĥ₀ = ⊤` branch that the

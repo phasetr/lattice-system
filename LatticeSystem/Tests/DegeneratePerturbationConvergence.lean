@@ -169,6 +169,7 @@ constant `K = 0`: `v = c₃ = 0` forces `w = Γ = 0` and `|a| = 1`. -/
 /-- The unique (up to phase) unit vector of the one-dimensional `EuclideanSpace ℂ (Fin 1)`. -/
 private noncomputable def fin1Ground : EuclideanSpace ℂ (Fin 1) := EuclideanSpace.single 0 1
 
+/-- `fin1Ground = e₀` is a unit vector, the normalization the ground-state predicate demands. -/
 private theorem fin1_norm_ground : ‖fin1Ground‖ = 1 := by
   rw [fin1Ground, EuclideanSpace.single, PiLp.norm_single]
   simp
@@ -181,11 +182,6 @@ private theorem fin1_eq_smul_ground (ψ : EuclideanSpace ℂ (Fin 1)) :
   have hi : i = 0 := Subsingleton.elim i 0
   subst hi
   simp [fin1Ground, EuclideanSpace.single, PiLp.smul_apply]
-
-private theorem fin1_isReducedInverse_zero_zero :
-    IsReducedInverse (0 : Matrix (Fin 1) (Fin 1) ℂ) 0 := by
-  refine ⟨?_, ?_, ?_, ?_, Matrix.isHermitian_zero⟩ <;>
-    simp [fin1_kernelProjectionMatrix_zero_eq_one]
 
 /-- `hEffGS` at the `Fin 1`, `H0 = V = H0inv = 0` corner: `Ĥeff = 0` restricted to
 `ker (0 : Matrix (Fin 1) (Fin 1) ℂ) = ⊤` has `fin1Ground` as its (trivially) unique normalized
