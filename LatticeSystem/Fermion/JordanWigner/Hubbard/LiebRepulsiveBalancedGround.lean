@@ -354,8 +354,7 @@ repulsive interaction `Ĥint^{unif} = U Σ_x n̂_{x,↑} n̂_{x,↓}` by the sca
 `E`-ground submodule of the symmetric-interaction Hamiltonian on the `Ne`-electron sector
 coincides with the `(E − c)`-ground submodule of the uniform-interaction Hamiltonian on the same
 sector: the two variants have the **same** ground submodule (up to the constant energy shift
-`c`), justifying the reduction of the uniform case (10.2.5) to the symmetric case (10.2.6) used in
-Tasaki's proof of Theorem 10.4.
+`c`), supplying the form conversion (10.2.6) → (10.2.5) **at a constant `U`**.
 
 Scope: `hubbardGroundSubmoduleAtElectronNumber` is the `E`-eigenspace intersected with the
 `Ne`-electron sector and carries **no** minimality of `E`, so what this transports between the two
