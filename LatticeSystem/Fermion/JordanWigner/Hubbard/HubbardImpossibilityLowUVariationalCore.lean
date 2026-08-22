@@ -140,6 +140,27 @@ noncomputable def configSectorCompress (N : ℕ) (P : (Fin (2 * N + 2) → Fin 2
     Matrix (configSector N P) (configSector N P) ℂ :=
   (configSectorEmbedding N P)ᴴ * A * configSectorEmbedding N P
 
+/-- **Entrywise form of the compression:** the `(s, s')` entry of `Tᴴ A T` is the Fock-space matrix
+element `⟨s| A |s'⟩ = A_{s, s'}` of `A` between the two sector configurations, because the columns
+of `T` are computational basis vectors. -/
+theorem configSectorCompress_apply (P : (Fin (2 * N + 2) → Fin 2) → Prop) [DecidablePred P]
+    (A : ManyBodyOp (Fin (2 * N + 2))) (s s' : configSector N P) :
+    configSectorCompress N P A s s' = A s.val s'.val := by
+  have hcol : ∀ w : Fin (2 * N + 2) → Fin 2,
+      (A * configSectorEmbedding N P) w s' = A.mulVec (basisVec s'.val) w := by
+    intro w
+    rw [Matrix.mul_apply, Matrix.mulVec, dotProduct]
+    exact Finset.sum_congr rfl fun _ _ => rfl
+  have hrow : ∀ w : Fin (2 * N + 2) → Fin 2,
+      (configSectorEmbedding N P)ᴴ s w = basisVec s.val w := by
+    intro w
+    rw [Matrix.conjTranspose_apply, configSectorEmbedding, Matrix.of_apply,
+      show star (basisVec s.val w) = basisVec s.val w from by
+        rw [basisVec_apply]; split <;> simp]
+  rw [configSectorCompress, Matrix.mul_assoc, Matrix.mul_apply]
+  simp only [hrow, hcol]
+  rw [basisVec_sum_mul, mulVec_basisVec_apply]
+
 /-- **The sector embedding has orthonormal columns:** `Tᴴ T = 1`. -/
 theorem configSectorEmbedding_conjTranspose_mul_self (P : (Fin (2 * N + 2) → Fin 2) → Prop)
     [DecidablePred P] :
