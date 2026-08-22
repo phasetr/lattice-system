@@ -677,6 +677,31 @@ def approved_changes(text: str) -> str:
             "uniqueness argument. Tasaki, Springer 2020, §2.5 Theorem 2.4, p. 43–44 (file "
             "`Quantum/SpinS/SpinSReversal.lean`) |",
         )
+        # The §10.1 arc (#5313) discharges Lemma 10.1: the documented axiom becomes a theorem
+        # assembled from the five layers, so the recorded verdict and the File column (the
+        # capstone now lives in `DegeneratePerturbationConvergence.lean`) follow the declaration.
+        .replace(
+            "| `tasaki_lemma_10_1_degenerate_perturbation` | **Lemma 10.1** (Tasaki §10.1, p. 346, "
+            "**AXIOM**): assuming the first-order term vanishes on the degenerate subspace (`P̂₀ "
+            "V̂ P̂₀ = 0`, so the effective theory is second-order, eq. (10.1.6)), if `Ĥeff` has a "
+            "unique ground state on `ker Ĥ₀`, then `Ĥ(λ)` has a unique ground state for all "
+            "sufficiently small `λ > 0`, converging (phase choice) to the effective ground state "
+            "as `λ → 0⁺`. Analytic degenerate-perturbation theory → faithful documented axiom "
+            "(companion to the strong-coupling `effectiveHamiltonian_strongCoupling_limit`, "
+            "Theorem A.12). | `Math/MatrixAnalysis/DegeneratePerturbation.lean` |",
+            "| `tasaki_lemma_10_1_degenerate_perturbation` | **Lemma 10.1** (Tasaki §10.1, p. 346, "
+            "**PROVED**, axiom-free, `#print axioms` = std3): assuming the first-order term "
+            "vanishes on the degenerate subspace (`P̂₀ V̂ P̂₀ = 0`, so the effective theory is "
+            "second-order, eq. (10.1.6)), if `Ĥeff` has a unique ground state on `ker Ĥ₀`, then "
+            "`Ĥ(λ)` has a unique ground state for all sufficiently small `λ > 0`, converging "
+            "(phase choice) to the effective ground state as `λ → 0⁺`. At fixed finite volume this "
+            "is ordinary linear algebra: the whole statement is assembled from the five layers "
+            "listed below, with the convergence conjunct discharged by the quantitative rate "
+            "`‖Philam λ − Φeff‖² ≤ Kλ` rather than by an eigenvalue-branch continuation argument "
+            "(companion to the strong-coupling `effectiveHamiltonian_strongCoupling_limit`, "
+            "Theorem A.12, likewise axiom-free). | "
+            "`Math/MatrixAnalysis/DegeneratePerturbationConvergence.lean` |",
+        )
     )
 
 
@@ -725,7 +750,7 @@ def reconstruct_roadmap_prose(current: str, baseline_line: str) -> str:
 
 
 def normalize_current_moved_prose(start: int, end: int, current: str, old_lines: list[str]) -> str:
-    """Invert only documented presentation wrappers and two governance corrections."""
+    """Invert only documented presentation wrappers and three governance corrections."""
     if start == end and 114 <= start <= 153:
         current = reconstruct_roadmap_prose(current, old_lines[start - 1])
     current = current.replace(
@@ -736,7 +761,28 @@ def normalize_current_moved_prose(start: int, end: int, current: str, old_lines:
         "**Phase A (historical scaffold; implementation recorded at the time)**",
         "**Phase A (current, this PR)**",
     )
-    return whitespace_normalized(current)
+    # The §10.1 arc (#5313) discharges Lemma 10.1, so the documented-axiom policy preamble stops
+    # naming it as a perturbation-theoretic axiom and delimits that class by the analytic
+    # machinery it needs instead.  The ledger paragraph is hard-wrapped, so unlike the two
+    # corrections above this one is inverted after whitespace normalization.
+    return whitespace_normalized(current).replace(
+        "- **Perturbation-theoretic results** (e.g., the singular-perturbation and "
+        "adiabatic-continuation arguments in Chapter 10, the cluster expansions behind **Theorem "
+        "7.3** and **Theorem 8.1**, and the quasi-adiabatic continuation behind **Theorem 8.9**): "
+        "the analytic proofs of weak-coupling continuation and adiabatic following for eigenstate "
+        "families are **not undertaken** as an active project goal; such techniques naturally "
+        "belong to a separate analytic-perturbation development. The class is delimited by the "
+        "*machinery* it needs — analytic eigenvalue-branch (Rellich–Kato) continuation, "
+        "cluster/polymer expansions, volume-uniform estimates — and does **not** cover "
+        "finite-dimensional degenerate perturbation theory at fixed finite volume, which is "
+        "ordinary linear algebra and is proved (**Lemma 10.1** and the strong-coupling **Theorem "
+        "A.12** are both axiom-free)",
+        "- **Perturbation-theoretic results** (e.g., **Lemma 10.1** (Tasaki §10.1, degenerate "
+        "perturbation theory) and singular-perturbation arguments in Chapter 10): the analytic "
+        "proofs of weak-coupling continuation and adiabatic following for eigenstate families are "
+        "**not undertaken** as an active project goal; such techniques naturally belong to a "
+        "separate analytic-perturbation development",
+    )
 
 
 def moved_prose_negative_self_tests() -> None:
