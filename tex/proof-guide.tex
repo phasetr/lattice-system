@@ -5398,6 +5398,48 @@ eq.~(10.1.18). Every result of this layer is axiom-free; the
 perturbation-theory axiom
 \texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation} itself is unaffected.
 
+\medskip
+\noindent\textbf{Feshbach equivalence layer} (Tasaki §10.1, pp.~346--347,
+eqs.~(10.1.15), (10.1.17), (10.1.20), (10.1.21)). Tasaki splits an eigenvector
+$|\Xi\rangle = |\Phi\rangle + |\Gamma\rangle$ along $H_0 = \ker \hat H_0$ and
+$H_0^\perp$, obtaining the component equations (10.1.15)
+$\lambda \hat P_0 \hat V|\Gamma\rangle = E|\Phi\rangle$ and
+(10.1.16)/(10.1.17) $\lambda\hat V|\Phi\rangle =
+\{-\hat H_0 + E + \lambda(\hat P_0 - 1)\hat V\}|\Gamma\rangle$, then asserts
+without proof that eliminating $|\Gamma\rangle$ via the reduced resolvent
+$R(\lambda,E)$ produces the approximate effective eigenvalue equation
+(10.1.21), converging to $\hat H_{\rm eff}$ (10.1.20) as $\lambda \to 0$. The
+file \texttt{Math/MatrixAnalysis/DegeneratePerturbationFeshbach.lean} makes
+this elimination exact. Writing
+$K(\lambda,E) := -\hat P_0 \hat V R(\lambda,E) \hat V \hat P_0$
+(\texttt{secondOrderEffectiveHamiltonian} with middle factor $R(\lambda,E)$,
+matching $\hat H_{\rm eff}$ at middle factor $\hat H_0^{-1}$), the main theorem
+\texttt{perturbedHamiltonian\_eigenvector\_iff} states: for Hermitian
+$\hat H_0$ with vanishing first-order term $\hat P_0 \hat V \hat P_0 = 0$ and a
+reduced inverse $R$ of the compression $A(\lambda,E)$ sharing $\hat H_0$'s
+kernel projection, $|\Phi\rangle + |\Gamma\rangle$
+($\Phi \in \ker \hat H_0$, $\Gamma \in H_0^\perp$) is an $E$-eigenvector of
+$\hat H(\lambda)$ iff
+$|\Gamma\rangle = -\lambda R(\lambda,E)\hat V|\Phi\rangle$ (the exact form of
+the book's approximation (10.1.18)) and
+$\lambda^2 K(\lambda,E)|\Phi\rangle = E|\Phi\rangle$ — eq.~(10.1.21) with
+$\simeq$ replaced by $=$ and the quotient $E/\lambda^2$ cleared, needing no
+$\lambda \ne 0$ hypothesis. Both $\hat H_{\rm eff}$ and $K(\lambda,E)$ are
+Hermitian and map into $\ker \hat H_0$
+(\texttt{secondOrderEffectiveHamiltonian\_isHermitian},
+\texttt{toEuclideanLin\_secondOrderEffectiveHamiltonian\_mem\_matrixKernel}), and
+an eigenvector with vanishing $\hat P_0$-component is zero
+(\texttt{perturbedHamiltonian\_eigenvector\_eq\_zero\_of\_starProjection\_eq\_zero}).
+Finally, quantifying the book's claim (p.~347) that the left-hand side of
+(10.1.21) converges to $\hat H_{\rm eff}|\Xi\rangle$ as $\lambda \to 0$, once
+$g > 0$, $|E| \le |\lambda|v$ and $4|\lambda|v \le g$,
+$\|K(\lambda,E)u - \hat H_{\rm eff}u\| \le (4v^3/g^2)|\lambda|\,\|u\|$
+(\texttt{norm\_sub\_secondOrderEffectiveHamiltonian\_le\_abs\_mul}, sharpened
+from the general-smallness bound
+\texttt{norm\_sub\_secondOrderEffectiveHamiltonian\_le}). Every result of this
+layer is axiom-free; \texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation}
+itself is unaffected.
+
 %======================================================================
 \subsection{Lieb's theorem for the attractive Hubbard model (Tasaki §10.2.1, Theorems 10.2 \& 10.3)}
 \label{subsec:lieb-attractive}

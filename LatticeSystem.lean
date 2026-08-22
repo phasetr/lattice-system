@@ -4,6 +4,7 @@ import LatticeSystem.Math.RealEigenvalueLePF
 import LatticeSystem.Math.EffectiveLimit
 import LatticeSystem.Math.MatrixAnalysis.Decomposition
 import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationReducedResolvent
+import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationFeshbach
 import LatticeSystem.Math.WignerTheorem
 import LatticeSystem.Math.ProjectiveRepresentation
 import LatticeSystem.Math.CStarAlgebra.GNS
