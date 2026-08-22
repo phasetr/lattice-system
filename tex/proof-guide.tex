@@ -6905,7 +6905,8 @@ this gives the \textbf{PR-6 capstone}
 \texttt{secondOrderEffectiveHamiltonian\_liebPerturbation\_eq}: the
 second-order effective Hamiltonian collapses to
 $-\hat P_0\hat V|_K\hat V|_K\hat P_0$, the object PR-8 computes explicitly as
-the superexchange sum. The sector-preservation step reuses a new generic
+the superexchange sum. \texttt{liebPerturbationV\_preserves\_liebHalfFillingPred}
+supplies the entrywise sector-preservation hypothesis needed by a new generic
 compression homomorphism (\texttt{configSectorCompress\_mul\_of\_preserves},
 \texttt{HubbardImpossibilityLowUVariationalCore.lean}); the pre-existing
 number-sector instance
