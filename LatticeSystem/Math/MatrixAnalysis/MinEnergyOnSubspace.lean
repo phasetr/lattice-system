@@ -201,6 +201,32 @@ before comparing it with the second-order effective Hamiltonian of Tasaki Lemma 
 theorem minEnergyOn_add_const_smul_one {W : Submodule ℂ (EuclideanSpace ℂ n)} (hW : W ≠ ⊥)
     (H : Matrix n n ℂ) (c : ℝ) :
     minEnergyOn W (H + (c : ℂ) • (1 : Matrix n n ℂ)) = minEnergyOn W H + c := by
-  sorry
+  have hshift : ∀ (A : Matrix n n ℂ) (d : ℝ) (v : EuclideanSpace ℂ n), ‖v‖ = 1 →
+      RCLike.re (inner ℂ v (Matrix.toEuclideanLin (A + (d : ℂ) • (1 : Matrix n n ℂ)) v))
+        = RCLike.re (inner ℂ v (Matrix.toEuclideanLin A v)) + d := by
+    intro A d v hv
+    have hone : Matrix.toEuclideanLin (1 : Matrix n n ℂ) v = v := by
+      apply WithLp.ofLp_injective 2
+      simp
+    have happ : Matrix.toEuclideanLin (A + (d : ℂ) • (1 : Matrix n n ℂ)) v
+        = Matrix.toEuclideanLin A v + (d : ℂ) • v := by
+      rw [map_add, LinearMap.add_apply, map_smul, LinearMap.smul_apply, hone]
+    rw [happ, inner_add_right, inner_smul_right, inner_self_eq_norm_sq_to_K, hv]
+    simp
+  have key : ∀ (A : Matrix n n ℂ) (d : ℝ),
+      minEnergyOn W A + d ≤ minEnergyOn W (A + (d : ℂ) • (1 : Matrix n n ℂ)) := by
+    intro A d
+    refine le_minEnergyOn hW fun v hvW hv => ?_
+    rw [hshift A d v hv]
+    have hle : minEnergyOn W A ≤ RCLike.re (inner ℂ v (Matrix.toEuclideanLin A v)) :=
+      minEnergyOn_le hvW hv
+    linarith
+  refine le_antisymm ?_ (key H c)
+  have hback := key (H + (c : ℂ) • (1 : Matrix n n ℂ)) (-c)
+  have hcancel : H + (c : ℂ) • (1 : Matrix n n ℂ) + ((-c : ℝ) : ℂ) • (1 : Matrix n n ℂ) = H := by
+    push_cast
+    module
+  rw [hcancel] at hback
+  linarith
 
 end LatticeSystem.Math
