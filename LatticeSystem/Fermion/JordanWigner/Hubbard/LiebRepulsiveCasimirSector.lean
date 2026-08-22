@@ -25,9 +25,9 @@ locate the one Casimir eigenvalue the transported ground state actually occupies
   (`numberSpinZSectorEuclidean_mem_of_commute`,
   `numberSpinZCasimirSectorEuclidean_mem_of_commute`).
 * **Proposition 2** (unique strict minimality): if `H` is Hermitian, commutes with `N̂`, `Ŝ³`, `Ŝ²`,
-  and has a *unique* normalized ground state on `K`, then exactly one Casimir eigenvalue `c`
-  attains the ground energy on `K_c`, every other sector being strictly higher
-  (`exists_unique_casimir_sector_strict_min`).
+  and has a *unique* normalized ground state on `K`, then some occupied Casimir sector `K_c`
+  (`K_c ≠ ⊥`) attains the ground energy, and it is the only occupied one that does — every other
+  occupied sector is strictly higher (`exists_unique_casimir_sector_strict_min`).
 
 This is a **thin wrapper**: no new mathematical framework is introduced. `K`/`K_c` are plain
 `Module.End.eigenspace` intersections (as `spinZSectorEuclidean` already is), invariance is the
@@ -111,9 +111,9 @@ theorem numberSpinZCasimirSectorEuclidean_mem_of_commute {N : ℕ} {H : ManyBody
 
 /-- **Proposition 2** (unique strict Casimir-sector minimality): if `H` is Hermitian, commutes with
 `N̂`, `Ŝ³`, `Ŝ²`, and has a *unique* normalized ground state `φ` on the joint sector `K`, then there
-is exactly one Casimir eigenvalue `c` for which the sector-restricted minimum energy
-`minEnergyOn K_c H` attains the ground energy `E`; every other *occupied* Casimir sector `K_{c'}`
-(`c' ≠ c`, `K_{c'} ≠ ⊥`) has strictly higher minimum energy.
+is an *occupied* Casimir eigenvalue `c` (`K_c ≠ ⊥`) whose sector-restricted minimum energy
+`minEnergyOn K_c H` attains the ground energy `E`, and it is unique among occupied sectors: every
+other occupied Casimir sector `K_{c'}` (`c' ≠ c`, `K_{c'} ≠ ⊥`) has strictly higher minimum energy.
 
 The side condition `K_{c'} ≠ ⊥` is the standing convention of `minEnergyOn`
 (`MinEnergyOnSubspace.lean`): the zero subspace has no unit vector, so `minEnergyOn ⊥ H = sInf ∅`
@@ -131,7 +131,8 @@ theorem exists_unique_casimir_sector_strict_min {N : ℕ} {H : ManyBodyOp (Fin (
     (hHS2 : Commute H (fermionTotalSpinSquared N))
     {L m₀ : ℂ} {E : ℝ} {φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)}
     (hGS : IsUniqueGroundStateOn (numberSpinZSectorEuclidean N L m₀) H E φ) :
-    ∃ c : ℂ, minEnergyOn (numberSpinZCasimirSectorEuclidean N L m₀ c) H = E ∧
+    ∃ c : ℂ, numberSpinZCasimirSectorEuclidean N L m₀ c ≠ ⊥ ∧
+      minEnergyOn (numberSpinZCasimirSectorEuclidean N L m₀ c) H = E ∧
       ∀ c' : ℂ, c' ≠ c → numberSpinZCasimirSectorEuclidean N L m₀ c' ≠ ⊥ →
         E < minEnergyOn (numberSpinZCasimirSectorEuclidean N L m₀ c') H := by
   obtain ⟨hφK, hφnorm, hφeig, hground, huniq⟩ := hGS
@@ -169,7 +170,7 @@ theorem exists_unique_casimir_sector_strict_min {N : ℕ} {H : ManyBodyOp (Fin (
     intro h
     rw [h, Submodule.mem_bot] at hφKc
     exact hφne hφKc
-  refine ⟨c, le_antisymm ?_ (hEle c hKcne), ?_⟩
+  refine ⟨c, hKcne, le_antisymm ?_ (hEle c hKcne), ?_⟩
   · exact (minEnergyOn_isGroundEigenvalueOn hH (hInv c) hKcne).2 E ⟨φ, hφKc, hφne, hφeig⟩
   intro c' hcc' hc'ne
   refine lt_of_le_of_ne (hEle c' hc'ne) fun heq => ?_
