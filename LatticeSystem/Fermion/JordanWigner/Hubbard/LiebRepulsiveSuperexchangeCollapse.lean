@@ -61,9 +61,9 @@ loses one at `j`, and is unchanged elsewhere.
 
 ## Debt
 
-Nothing yet consumes the capstone `liebPerturbationV_sq_apply_eq_of_singly_occupied` (staged for
-PR-8b, which reduces its right-hand side further via the half-filling diagonal collapse and lifts
-it to the compressed sector).
+None: the capstone `liebPerturbationV_sq_apply_eq_of_singly_occupied` is consumed by
+`LiebRepulsiveSuperexchange.lean` (PR-8b), which reduces its right-hand side further via the
+half-filling diagonal collapse and lifts it to the compressed sector.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §10.1, eq. (10.1.8), p. 344.

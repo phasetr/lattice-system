@@ -47,8 +47,9 @@ Of PR-5's whole-Fock-space reduced-inverse pair this file consumes the *definiti
 `liebPerturbationH0_isReducedInverse`, since the compressed contract is re-derived from the
 diagonal form; that statement therefore stays at reference 0 and its deletion debt is unresolved.
 
-Nothing yet consumes `liebPerturbationV_preserves_liebHalfFillingPred` (staged for PR-8, where the
-compressed product `V̂|_K · V̂|_K` is identified with the compression of `V̂ · V̂`),
+`liebPerturbationV_preserves_liebHalfFillingPred` is consumed by
+`LiebRepulsiveSuperexchange.lean` (PR-8b), where the compressed product `V̂|_K · V̂|_K` is
+identified with the compression of `V̂ · V̂`. Nothing yet consumes
 `liebPerturbationH0Compressed_isReducedInverse`, `configSector_liebHalfFillingPred_nonempty` or
 `homotopyHamiltonian_one_compressed_eq_perturbedHamiltonian` (all staged for the Lemma 10.1
 application at the arc assembly, PR-11 to PR-13). Each is carried as debt, not as settled API;
