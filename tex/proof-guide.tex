@@ -5346,6 +5346,25 @@ Theorem A.12 (\texttt{effectiveHamiltonian\_strongCoupling\_limit}). The
 projection $\hat P_0$ is constructed concretely and its
 Hermitian/idempotent properties are proved as consistency guards.
 
+\medskip
+\noindent\textbf{Spectral-gap layer} (Tasaki §10.1, p.~345, the standing
+assumption $E_{\rm gap} > 0$ preceding eq.~(10.1.13)). What Tasaki assumes is,
+in finite dimensions, a theorem, and the same file proves it in the
+quadratic-form shape the perturbative estimates consume: the variational
+extraction of a minimising unit eigenvector on an $\hat H$-invariant subspace
+(\texttt{exists\_unit\_eigenvector\_min\_energy\_on\_invariant}), the coercivity
+$g\|u\|^2 \le \operatorname{Re}\langle u, \hat H_0 u\rangle$ with $g > 0$ on
+$H_0^\perp = (\ker \hat H_0)^\perp$ (\texttt{matrixKernel\_orthogonal\_gap}),
+the gap $(E + \delta)\|w\|^2 \le \operatorname{Re}\langle w, \hat H w\rangle$
+with $\delta > 0$ above a unique ground state $\varphi$ of energy $E$ on an
+invariant subspace $K$, for $w \in K \cap (\mathbb{C}\varphi)^\perp$
+(\texttt{IsUniqueGroundStateOn.orthogonal\_gap}; $\hat H$-invariance of $K$ is
+load-bearing, its removal being refuted by the machine-checked counterexample
+$\hat H = \operatorname{diag}(0, 10, -10)$, $K = \operatorname{span}\{e_0,
+e_1 + e_2\}$, $\varphi = e_0$), and the resulting operator bound
+$\|\hat H_0^{-1} u\| \le \|u\|/g$
+(\texttt{IsReducedInverse.norm\_toEuclideanLin\_le}). All four are axiom-free.
+
 %======================================================================
 \subsection{Lieb's theorem for the attractive Hubbard model (Tasaki §10.2.1, Theorems 10.2 \& 10.3)}
 \label{subsec:lieb-attractive}
