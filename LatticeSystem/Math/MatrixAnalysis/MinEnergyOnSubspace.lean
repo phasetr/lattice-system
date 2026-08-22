@@ -1,5 +1,4 @@
-import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbation
-import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueLipschitz
+import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationGroundEnergy
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueContinuous
 
 /-!
@@ -17,8 +16,9 @@ pin down the ground-state sector of the attractive Hubbard model.
 
 This is a **thin wrapper** around existing infrastructure:
 
-* reachability is `exists_unit_eigenvector_min_energy_on_invariant`
-  (`DegeneratePerturbation.lean`), repackaged as an `IsGroundEigenvalueOn` witness;
+* reachability identifies `minEnergyOn` with the ground eigenvalue supplied by
+  `exists_isGroundEigenvalueOn`, its variational sharpness coming from
+  `IsGroundEigenvalueOn.mul_norm_sq_le` (`DegeneratePerturbationGroundEnergy.lean`);
 * the entry-norm Lipschitz bound and the parameter-continuity corollary mirror
   `abs_hermitianMinEigenvalue_sub_le_sum_entryNorms` and `Continuous.hermitianMinEigenvalue_comp`
   (`HermitianMinEigenvalueLipschitz.lean` / `HermitianMinEigenvalueContinuous.lean`), specialized
@@ -37,7 +37,9 @@ open Matrix LatticeSystem.Quantum
 variable {n : Type*} [Fintype n] [DecidableEq n]
 
 /-- The **minimum energy** of `H` on the subspace `W`: the infimum, over unit vectors `v ∈ W`, of
-the real part of the Rayleigh quotient `⟪v, H v⟫` (Tasaki §10.2.3, p. 351). -/
+the real part of the Rayleigh quotient `⟪v, H v⟫` (Tasaki §10.2.3, p. 351).  (For `W = ⊥` there is
+no unit vector and the infimum degenerates to the junk value `minEnergyOn ⊥ H = sInf ∅ = 0`, which
+is why the lower bounds below assume `W ≠ ⊥`.) -/
 noncomputable def minEnergyOn (W : Submodule ℂ (EuclideanSpace ℂ n)) (H : Matrix n n ℂ) : ℝ :=
   sInf {r : ℝ | ∃ v ∈ W, ‖v‖ = 1 ∧ r = RCLike.re (inner ℂ v (Matrix.toEuclideanLin H v))}
 
@@ -76,14 +78,18 @@ private theorem energySet_bddBelow (W : Submodule ℂ (EuclideanSpace ℂ n)) (H
   rintro r ⟨v, -, hv, rfl⟩
   exact neg_le_of_abs_le (abs_re_inner_toEuclideanLin_le_sum_entryNorms H hv)
 
-/-- Variational upper bound: every unit vector of `W` is a trial state for `minEnergyOn W H`. -/
+/-- Variational upper bound: every unit vector of `W` is a trial state for `minEnergyOn W H`.
+Kept `private` because the public `minEnergyOn_isGroundEigenvalueOn` recovers it for Hermitian `H`
+preserving `W`; a consumer needing the bound for a non-Hermitian `H` or a non-invariant `W` cannot
+derive it from the public API and should promote this lemma instead of restating it. -/
 private theorem minEnergyOn_le {W : Submodule ℂ (EuclideanSpace ℂ n)} {H : Matrix n n ℂ}
     {v : EuclideanSpace ℂ n} (hvW : v ∈ W) (hv : ‖v‖ = 1) :
     minEnergyOn W H ≤ RCLike.re (inner ℂ v (Matrix.toEuclideanLin H v)) :=
   csInf_le (energySet_bddBelow W H) ⟨v, hvW, hv, rfl⟩
 
 /-- Variational lower bound: a constant dominated by the energy of every unit vector of a nonzero
-`W` is dominated by `minEnergyOn W H`. -/
+`W` is dominated by `minEnergyOn W H`.  `private` for the same reason as `minEnergyOn_le`: it is
+recoverable from `minEnergyOn_isGroundEigenvalueOn` only in the Hermitian invariant case. -/
 private theorem le_minEnergyOn {W : Submodule ℂ (EuclideanSpace ℂ n)} (hW : W ≠ ⊥)
     {H : Matrix n n ℂ} {c : ℝ}
     (h : ∀ v ∈ W, ‖v‖ = 1 → c ≤ RCLike.re (inner ℂ v (Matrix.toEuclideanLin H v))) :
@@ -94,43 +100,30 @@ private theorem le_minEnergyOn {W : Submodule ℂ (EuclideanSpace ℂ n)} (hW : 
 
 /-- **Reachability**: if `H` is Hermitian and preserves the nonzero subspace `W`, then
 `minEnergyOn W H` is the ground eigenvalue of `H` on `W`, attained by a unit eigenvector of `H`
-lying in `W`. This repackages `exists_unit_eigenvector_min_energy_on_invariant` as an
-`IsGroundEigenvalueOn` witness. -/
+lying in `W`. The ground eigenvalue `E` itself comes from `exists_isGroundEigenvalueOn`; the two
+inequalities identifying it with `minEnergyOn W H` are the variational bounds, the `≥` direction
+being the sharpness statement `IsGroundEigenvalueOn.mul_norm_sq_le` and the `≤` direction the
+trial state obtained by normalising a ground eigenvector. -/
 theorem minEnergyOn_isGroundEigenvalueOn {H : Matrix n n ℂ} (hH : H.IsHermitian)
     {W : Submodule ℂ (EuclideanSpace ℂ n)}
     (hInv : ∀ v ∈ W, Matrix.toEuclideanLin H v ∈ W) (hW : W ≠ ⊥) :
     IsGroundEigenvalueOn W H (minEnergyOn W H) := by
-  obtain ⟨m, x, hxW, hxnorm, hxeig, hmin⟩ :=
-    exists_unit_eigenvector_min_energy_on_invariant hH hInv hW
-  have hxne : x ≠ 0 := by
-    intro h
-    rw [h, norm_zero] at hxnorm
-    exact zero_ne_one hxnorm
-  have heig_energy : ∀ (μ : ℝ) (w : EuclideanSpace ℂ n),
-      Matrix.toEuclideanLin H w = (μ : ℂ) • w →
-      RCLike.re (inner ℂ w (Matrix.toEuclideanLin H w)) = μ * ‖w‖ ^ 2 := by
-    intro μ w hw
-    rw [hw, inner_smul_right, inner_self_eq_norm_sq_to_K, RCLike.ofReal_eq_complex_ofReal,
-      ← Complex.ofReal_pow, ← Complex.ofReal_mul]
-    exact Complex.ofReal_re _
-  have heq : minEnergyOn W H = m := by
+  obtain ⟨E, hE⟩ := exists_isGroundEigenvalueOn hH hInv hW
+  obtain ⟨φ, hφW, hφne, hφeig⟩ := hE.1
+  have heq : minEnergyOn W H = E := by
     refine le_antisymm ?_ (le_minEnergyOn hW ?_)
-    · have hx := heig_energy m x hxeig
-      rw [hxnorm, one_pow, mul_one] at hx
-      rw [← hx]
-      exact minEnergyOn_le hxW hxnorm
+    · have hvnorm : ‖(‖φ‖⁻¹ : ℂ) • φ‖ = 1 := norm_smul_inv_norm hφne
+      have hvenergy : RCLike.re (inner ℂ ((‖φ‖⁻¹ : ℂ) • φ)
+          (Matrix.toEuclideanLin H ((‖φ‖⁻¹ : ℂ) • φ))) = E := by
+        rw [map_smul, hφeig, smul_comm, inner_smul_right, inner_self_eq_norm_sq_to_K, hvnorm]
+        simp
+      rw [← hvenergy]
+      exact minEnergyOn_le (W.smul_mem _ hφW) hvnorm
     · intro v hvW hv
-      have hb := hmin v hvW
-      rw [hv] at hb
-      simpa using hb
+      have hb := IsGroundEigenvalueOn.mul_norm_sq_le hH hInv hE v hvW
+      rwa [hv, one_pow, mul_one] at hb
   rw [heq]
-  refine ⟨⟨x, hxW, hxne, hxeig⟩, ?_⟩
-  rintro μ ⟨ψ, hψW, hψne, hψeig⟩
-  have hb := hmin ψ hψW
-  rw [heig_energy μ ψ hψeig] at hb
-  have hnz : ‖ψ‖ ≠ 0 := norm_ne_zero_iff.mpr hψne
-  have hpos : 0 < ‖ψ‖ ^ 2 := by positivity
-  exact le_of_mul_le_mul_right hb hpos
+  exact hE
 
 /-- **Entry-norm Lipschitz continuity** of `minEnergyOn W` in the matrix argument: bounded by the
 sum of entrywise norm differences, uniformly over the choice of nonzero subspace `W`. Mirrors

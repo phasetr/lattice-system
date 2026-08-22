@@ -6711,15 +6711,16 @@ this transports between the two variants is the eigenspace equality alone;
 transporting ground-state minimality (that the shifted $E-c$ is the least sector
 eigenvalue) is a separate step. Axiom-free; finite-dimensional linear algebra.
 
-\emph{Minimum energy on a subspace (Issue~\#5320, PR~\#5321 PR-2).} Generic
+\emph{Minimum energy on a subspace (Issue~\#5320, PR~\#5322 PR-2).} Generic
 infrastructure feeding the arc's continuity arguments:
 \texttt{minEnergyOn}~$W$~$H$ = $\inf\{\operatorname{re}\langle v,Hv\rangle \mid
 v\in W,\ \|v\|=1\}$ (\texttt{Math/MatrixAnalysis/MinEnergyOnSubspace.lean})
 restricts the whole-space \texttt{hermitianMinEigenvalue} variational
 functional to unit vectors of a fixed nonzero subspace~$W$, with a reachability
-lemma (repackaging \texttt{exists\_unit\_eigenvector\_min\_energy\_on\_invariant}
-as an \texttt{IsGroundEigenvalueOn} witness), an entry-norm Lipschitz bound, and
-a parameter-continuity corollary, mirroring the whole-space
+lemma (identifying it with the ground eigenvalue of
+\texttt{exists\_isGroundEigenvalueOn} via the variational bounds of
+\texttt{DegeneratePerturbationGroundEnergy.lean}), an entry-norm Lipschitz
+bound, and a parameter-continuity corollary, mirroring the whole-space
 \texttt{hermitianMinEigenvalue} lemmas. Not itself a numbered Tasaki statement;
 axiom-free.
 
