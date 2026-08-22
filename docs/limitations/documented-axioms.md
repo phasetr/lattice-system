@@ -59,7 +59,7 @@ finite volume, which is ordinary linear algebra and is proved (**Lemma 10.1** an
 strong-coupling **Theorem A.12** are both axiom-free). **Theorem 10.4** (Lieb's repulsive-Hubbard
 half-filling ground state) currently has its entire content axiomatized: the global minimum
 energy, ground-state degeneracy, and total-spin values are all undischarged. (The fixed-Ŝ³-sector
-ground-state uniqueness has been proved; full theorem discharge is tracked in Issue #5004.)
+ground-state uniqueness has been proved; full theorem discharge is tracked in Issue #5320.)
 
 - **Book theorems that Tasaki states without proof** (results he quotes from the
 external literature rather than proving in the text): **Theorem 10.11** (Kubo–Kishi
