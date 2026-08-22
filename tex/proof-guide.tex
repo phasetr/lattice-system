@@ -6703,8 +6703,8 @@ $c = -\tfrac U2 N_e + \tfrac U4(N{+}1)$. Consequently the $E$-ground submodule o
 the symmetric-interaction Hamiltonian on the $N_e$-electron sector coincides with
 the $(E-c)$-ground submodule of the uniform-interaction Hamiltonian on the same
 sector (\texttt{symmetricRepulsiveHubbardHamiltonian\_groundSubmodule\_eq\_uniform}),
-justifying the reduction of the uniform case (eq.~(10.2.5)) to the symmetric case
-(eq.~(10.2.6)) used throughout Tasaki's proof of Theorem~10.4. Scope:
+supplying the form conversion (10.2.6)~$\to$~(10.2.5) \emph{at a constant} $U$.
+Scope:
 \texttt{hubbardGroundSubmoduleAtElectronNumber} is the $E$-eigenspace intersected
 with the $N_e$-electron sector and carries \emph{no} minimality of $E$, so what
 this transports between the two variants is the eigenspace equality alone;
@@ -6755,6 +6755,73 @@ the inner-product carrier \texttt{EuclideanSpace}~$\mathbb{C}$~$n$
 \texttt{Matrix.toEuclideanLin}); it is shared with the full-$N_e$-sector weight
 decomposition of
 \texttt{Fermion/JordanWigner/Hubbard/LiebAttractiveFullSectorUnique.lean}.
+
+\emph{Homotopy continuity and local-constancy (Issue~\#5320, PR~\#5325 PR-4).}
+Sets up, in
+\texttt{Fermion/JordanWigner/Hubbard/LiebRepulsiveHomotopyContinuity.lean},
+Tasaki's coupling deformation $H_s$ (p.~353) toward an explicit
+uniform $\pm\lambda$ endpoint: the hopping homotopy $T_s = (1-s)T + sT_1$
+(\texttt{homotopyHopping}, with the endpoint \texttt{liebEndpointHopping})
+and the on-site homotopy $U_s = (1-s)U + s$ (\texttt{homotopyOnSite}), assembled
+into $H_s$ (\texttt{homotopyHamiltonian}) via the uniform repulsive Hubbard
+Hamiltonian. The lemmas establish: the base point $H_0 =
+\hat H^{\mathrm{rep,unif}}(T,U)$ (\texttt{homotopyHamiltonian\_zero}), sign
+preservation on the original support and the value $s\lambda$ on added $A$-$B$
+edges, vanishing of same-sublattice entries,
+and preservation of symmetry, bipartition, and connectivity along the homotopy
+(connectivity needs the strict endpoint hypothesis $0<\lambda$, not merely
+$\lambda\neq0$, since a negative $\lambda$ can cancel the original entry at an
+interior $s$), positivity of $U_s$, and continuity of $s\mapsto H_s$
+(transported to continuity of the sector-restricted minimum energy via PR-2's
+\texttt{Continuous.minEnergyOn\_comp}). The topological core,
+\texttt{casimirSelector\_eq\_const\_of\_locally\_unique\_strict\_min}, upgrades
+PR-3's local (pointwise-in-$s$) unique-occupied-Casimir-sector conclusion to a
+single sector occupied for \emph{every} $s\in[0,1]$ --- the original model at
+$s=0$ included --- via
+\texttt{IsLocallyConstant.apply\_eq\_of\_preconnectedSpace} on the preconnected
+set $[0,1]$; continuity of the sector minimum energy is assumed only at
+\emph{occupied} sectors, and no continuity of the ground energy $E$ is assumed
+(it is recovered from the fixed-sector continuity via strict minimality).
+Since \texttt{homotopyOnSite} is a scalar, $H_s$ deforms the \emph{uniform}
+Hamiltonian~(10.2.5) rather than the site-dependent symmetric form~(10.2.6).
+What PR-1's
+\texttt{symmetricRepulsiveHubbardHamiltonian\_groundSubmodule\_eq\_uniform}
+(eq.~(10.2.9)) supplies is the form conversion (10.2.6)~$\to$~(10.2.5)
+\emph{at a constant} $U$: its coupling argument is a scalar $U\in\mathbb{R}$
+and it compares $\hat H^{\rm rep,sym}(T, x\mapsto U)$ with
+$\hat H^{\rm rep,unif}(T,U)$, so a non-constant $U_x$ never occurs in it; and
+what it transports is the eigenspace equality alone, minimality included in
+neither direction.
+\emph{Open obligation (Issue~\#5320).} The site-dependent reduction $U_x\to U$
+--- Tasaki's own first deformation step, ``For each $x\in\Lambda$, we change
+$U_x$ to a common constant $U>0$'' (p.~353) --- is therefore discharged nowhere
+yet. Expanding the symmetric form with a genuine $U:\Lambda\to\mathbb{R}$ gives
+$\sum_x U_x\hat n_{x,\uparrow}\hat n_{x,\downarrow} - \tfrac12\sum_x
+U_x(\hat n_{x,\uparrow}+\hat n_{x,\downarrow}) + \tfrac14\sum_x U_x$, whose
+middle term is a site-dependent one-body potential rather than a multiple of the
+total number $\hat N$, so PR-1's constant-energy-shift argument is inapplicable
+in principle; this file cannot supply the step either, \texttt{homotopyOnSite}
+being a scalar by definition. The second disjunct of
+\texttt{IsLiebRepulsiveHamiltonian} (the site-dependent symmetric form) thus
+remains unreduced, and the arc's final assembly of Theorem~10.4 (PR-12/PR-13)
+must either discharge it or restrict the theorem's hypothesis accordingly.
+This file starts from a uniform model, and what is deformed here is $U\to1$.
+\emph{Provenance.} Tasaki's endpoint keeps the original bond set --- ``We do not
+modify $t_{x,y}$ which is zero to begin with'' (p.~353) --- whereas
+\texttt{liebEndpointHopping} carries $\operatorname{sign}(t_{x,y})\,\lambda$ on
+the original support and $\lambda$ on every \emph{previously vanishing} $A$-$B$
+pair, completing the support to the full bipartite graph on $A\sqcup B$. This is a
+deliberate strengthening of the arc's design, of the same
+``independent-route replacement'' kind as the Lemma~10.1 discharge
+(Issue~\#5313), and not a formalization of the book's stated deformation.
+It is harmless for what the arc consumes (the endpoint stays symmetric,
+bipartite and connected); its one visible consequence is that the
+$\lambda\to0$ effective Heisenberg model~(10.2.12) sits on the complete
+bipartite graph rather than on the original bond set
+$\{\{x,y\}\mid t_{x,y}\neq0\}$, and both are
+bipartite for the same $A\sqcup B$ and connected, hence carry the same
+Lieb--Mattis total spin $S_0 = ||A|-|B||/2$.
+Not itself a numbered Tasaki statement; axiom-free.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
