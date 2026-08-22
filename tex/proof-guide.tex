@@ -6783,14 +6783,34 @@ set $[0,1]$; continuity of the sector minimum energy is assumed only at
 \emph{occupied} sectors, and no continuity of the ground energy $E$ is assumed
 (it is recovered from the fixed-sector continuity via strict minimality).
 Since \texttt{homotopyOnSite} is a scalar, $H_s$ deforms the \emph{uniform}
-Hamiltonian~(10.2.5) rather than the site-dependent symmetric
-form~(10.2.6): Tasaki's own $U_x\to U$ step is discharged upstream by PR-1's
+Hamiltonian~(10.2.5) rather than the site-dependent symmetric form~(10.2.6).
+What PR-1's
 \texttt{symmetricRepulsiveHubbardHamiltonian\_groundSubmodule\_eq\_uniform}
-(eq.~(10.2.9)), and what is deformed here is $U\to1$.
+(eq.~(10.2.9)) supplies is the form conversion (10.2.6)~$\to$~(10.2.5)
+\emph{at a constant} $U$: its coupling argument is a scalar $U\in\mathbb{R}$
+and it compares $\hat H^{\rm rep,sym}(T, x\mapsto U)$ with
+$\hat H^{\rm rep,unif}(T,U)$, so a non-constant $U_x$ never occurs in it; and
+what it transports is the eigenspace equality alone, minimality included in
+neither direction.
+\emph{Open obligation (Issue~\#5320).} The site-dependent reduction $U_x\to U$
+--- Tasaki's own first deformation step, ``For each $x\in\Lambda$, we change
+$U_x$ to a common constant $U>0$'' (p.~353) --- is therefore discharged nowhere
+yet. Expanding the symmetric form with a genuine $U:\Lambda\to\mathbb{R}$ gives
+$\sum_x U_x\hat n_{x,\uparrow}\hat n_{x,\downarrow} - \tfrac12\sum_x
+U_x(\hat n_{x,\uparrow}+\hat n_{x,\downarrow}) + \tfrac14\sum_x U_x$, whose
+middle term is a site-dependent one-body potential rather than a multiple of the
+total number $\hat N$, so PR-1's constant-energy-shift argument is inapplicable
+in principle; this file cannot supply the step either, \texttt{homotopyOnSite}
+being a scalar by definition. The second disjunct of
+\texttt{IsLiebRepulsiveHamiltonian} (the site-dependent symmetric form) thus
+remains unreduced, and the arc's final assembly of Theorem~10.4 (PR-12/PR-13)
+must either discharge it or restrict the theorem's hypothesis accordingly.
+This file starts from a uniform model, and what is deformed here is $U\to1$.
 \emph{Provenance.} Tasaki's endpoint keeps the original bond set --- ``We do not
 modify $t_{x,y}$ which is zero to begin with'' (p.~353) --- whereas
-\texttt{liebEndpointHopping} puts $\lambda$ on \emph{every} $A$-$B$ pair,
-completing the support to the full bipartite graph on $A\sqcup B$. This is a
+\texttt{liebEndpointHopping} carries $\operatorname{sign}(t_{x,y})\,\lambda$ on
+the original support and $\lambda$ on every \emph{previously vanishing} $A$-$B$
+pair, completing the support to the full bipartite graph on $A\sqcup B$. This is a
 deliberate strengthening of the arc's design, of the same
 ``independent-route replacement'' kind as the Lemma~10.1 discharge
 (Issue~\#5313), and not a formalization of the book's stated deformation.

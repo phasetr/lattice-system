@@ -27,24 +27,40 @@ load-bearing analytic facts:
 `homotopyOnSite` is a scalar homotopy `U_s = (1 - s) U + s`, so `H_s` deforms the **uniform**
 repulsive Hubbard Hamiltonian (`repulsiveHubbardHamiltonian`, eq. (10.2.5), a single `U > 0`) —
 not the symmetric form with site-dependent `U_x > 0` (eq. (10.2.6)) that
-`IsLiebRepulsiveHamiltonian` also admits. That is not a loss of generality for the arc: Tasaki's
-own first deformation step ("For each `x ∈ Λ`, we change `U_x` to a common constant `U > 0`",
-p. 353) is discharged upstream by PR-1's
-`symmetricRepulsiveHubbardHamiltonian_groundSubmodule_eq_uniform` (eq. (10.2.9)), which identifies
-the ground submodule of the symmetric form with that of a uniform one up to a constant energy
-shift. The arc therefore enters this file holding a uniform model, and what is deformed here is
-`U → 1`.
+`IsLiebRepulsiveHamiltonian` also admits.
+
+What PR-1's `symmetricRepulsiveHubbardHamiltonian_groundSubmodule_eq_uniform` (eq. (10.2.9))
+supplies is the form conversion (10.2.6) → (10.2.5) **at a constant `U`**: its coupling argument
+is a scalar `U : ℝ` and it compares `symmetricRepulsiveHubbardHamiltonian N T (fun _ => U)` with
+`repulsiveHubbardHamiltonian N T U`, so a non-constant `U_x` never occurs in it. What it
+transports is moreover the eigenspace equality alone — `hubbardGroundSubmoduleAtElectronNumber` is
+the `E`-eigenspace intersected with the `Ne`-electron sector and carries no minimality of `E` — so
+ground-state minimality is not moved between the two forms.
+
+**Open obligation of issue #5320: the site-dependent `U_x → U` reduction is discharged nowhere
+yet.** Tasaki's own first deformation step ("For each `x ∈ Λ`, we change `U_x` to a common
+constant `U > 0`", p. 353) is therefore *not* the content of PR-1. Expanding the symmetric form
+with a genuine `U : Λ → ℝ` gives
+`Σ_x U_x n̂_{x,↑} n̂_{x,↓} − (1/2) Σ_x U_x (n̂_{x,↑} + n̂_{x,↓}) + (1/4) Σ_x U_x`,
+whose middle term is a site-dependent one-body potential rather than a multiple of the total
+number `N̂`, so PR-1's constant-energy-shift argument is inapplicable in principle; this file
+cannot supply the step either, `homotopyOnSite : ℝ → ℝ → ℝ` being a scalar by definition. The
+second disjunct of `IsLiebRepulsiveHamiltonian` (the site-dependent symmetric form) consequently
+remains unreduced, and the arc's final assembly of Theorem 10.4 (PR-12/PR-13) must either
+discharge it or restrict the theorem's hypothesis accordingly. This file starts from a uniform
+model, and what is deformed here is `U → 1`.
 
 ## Provenance: the endpoint hopping is *stronger* than the book's
 
 Tasaki's endpoint keeps the original bond set: "For each pair `x, y ∈ Λ` such that `x ≠ y`, we
 change `t_{x,y}` to a constant `λ > 0` if `t_{x,y}` is positive, and to `−λ` if `t_{x,y}` is
 negative. **We do not modify `t_{x,y}` which is zero to begin with**" (p. 353), so his endpoint
-model keeps the original bond set `{{x, y} | t_{x,y} ≠ 0}`. `liebEndpointHopping` instead puts `λ`
-on *every* `A`-`B` pair, completing the support to the full bipartite graph on `A ⊔ B`. This is a
-deliberate deviation from the book's stated deformation — the same "independent-route replacement"
-pattern used to discharge Lemma 10.1 (#5313) — and reading this file as a formalization of the
-book's deformation would be a false attribution. It is harmless for everything the arc consumes:
+model keeps the original bond set `{{x, y} | t_{x,y} ≠ 0}`. `liebEndpointHopping` instead carries
+`sign(T x y) · λ` on the original support and `λ` on every *previously vanishing* `A`-`B` pair,
+completing the support to the full bipartite graph on `A ⊔ B`. This is a deliberate deviation from
+the book's stated deformation — the same "independent-route replacement" pattern used to discharge
+Lemma 10.1 (#5313) — and reading this file as a formalization of the book's deformation would be a
+false attribution. It is harmless for everything the arc consumes:
 the endpoint stays symmetric (`homotopyHopping_symm`), stays bipartite for `A`
 (`homotopyHopping_bipartite`), and stays connected whenever the original is
 (`homotopyHopping_connected`, added edges only help). Its one visible consequence is that the
