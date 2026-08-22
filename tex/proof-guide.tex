@@ -6880,7 +6880,30 @@ Hermiticity of $\hat V|_K$, and the $\hat P_0\hat V\hat P_0=0$ capstone
 itself; and, in the generic layer,
 \texttt{minEnergyOn\_add\_const\_smul\_one}. All of these are staged for the
 application of Lemma~10.1 and the arc assembly (PR-11 to PR-13); whatever that
-assembly does not consume is to be deleted, not kept.
+assembly does not consume is to be deleted, not kept. (Debt items (a)--(c)
+above are discharged by PR-6 below; the whole-Fock-space explicit reduced
+inverse remains unreferenced debt.)
+
+\emph{Superexchange reduced-inverse layer (Issue~\#5320, PR~\#5327 PR-6).}
+Not itself a numbered Tasaki statement; discharges PR-5's debt items (a)--(c)
+on the compressed sector $K$ and prepares the superexchange identity for
+PR-7/PR-8. \textbf{Crux:} \texttt{liebPerturbationV\_intermediate\_weight\_eq\_one}
+--- Tasaki's ``the site $x$ is doubly occupied in
+$\hat c^\dagger_{x,\sigma}\hat c_{y,\sigma}\vert\Phi\rangle$'' (eq.~(10.1.7),
+p.~344), read at this arc's $U=1$ normalisation as ``the intermediate
+interaction weight is exactly $1$''. Combined with the diagonal compressed
+reduced inverse (\texttt{liebPerturbationH0Compressed\_isReducedInverse}),
+this gives the \textbf{PR-6 capstone}
+\texttt{secondOrderEffectiveHamiltonian\_liebPerturbation\_eq}: the
+second-order effective Hamiltonian collapses to
+$-\hat P_0\hat V|_K\hat V|_K\hat P_0$, the object PR-8 computes explicitly as
+the superexchange sum. The sector-preservation step reuses a new generic
+compression homomorphism (\texttt{configSectorCompress\_mul\_of\_preserves},
+\texttt{HubbardImpossibilityLowUVariationalCore.lean}); the pre-existing
+number-sector instance
+(\texttt{configSectorNumberCompress\_mul\_of\_right\_preserves},
+\texttt{LiebAttractiveFullSectorSU2Algebra.lean}, Theorem~10.2 full-sector-lift
+arc) was refactored in this PR to derive from it. Axiom-free.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
