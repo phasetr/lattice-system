@@ -89,7 +89,19 @@ theorem liebEndpointHopping_sq_eq_indicator {N : ℕ} {A : Finset (Fin (N + 1))}
     {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ} (hbip : HoppingRespectsBipartition A T)
     (x y : Fin (N + 1)) :
     (liebEndpointHopping A T 1 x y) ^ 2 = if (liebEndpointGraph A).Adj x y then 1 else 0 := by
-  sorry
+  by_cases hAB : x ∈ A ↔ y ∉ A
+  · rw [if_pos (show (liebEndpointGraph A).Adj x y from hAB)]
+    by_cases hT0 : T x y = 0
+    · rw [show liebEndpointHopping A T 1 x y = 1 by simp [liebEndpointHopping, hT0, hAB], one_pow]
+    · rw [show liebEndpointHopping A T 1 x y = if 0 < T x y then 1 else -1 by
+        simp [liebEndpointHopping, hT0]]
+      split_ifs <;> norm_num
+  · rw [if_neg (show ¬ (liebEndpointGraph A).Adj x y from hAB)]
+    have hT0 : T x y = 0 := by
+      by_contra h
+      exact hAB (hbip h)
+    rw [show liebEndpointHopping A T 1 x y = 0 by simp [liebEndpointHopping, hT0, hAB]]
+    norm_num
 
 /-- **The `hT` reduction of the asymmetric product to the endpoint-graph indicator.** Under
 `hbip` *and* the symmetry `hT : ∀ x y, T x y = T y x`, the asymmetric coefficient surviving PR-8a's
@@ -102,7 +114,11 @@ theorem liebEndpointHopping_mul_symm_eq_indicator {N : ℕ} {A : Finset (Fin (N 
     (hT : ∀ x y, T x y = T y x) (x y : Fin (N + 1)) :
     liebEndpointHopping A T 1 y x * liebEndpointHopping A T 1 x y
       = if (liebEndpointGraph A).Adj x y then 1 else 0 := by
-  sorry
+  have hend : liebEndpointHopping A T 1 y x = liebEndpointHopping A T 1 x y := by
+    have hiff : (y ∈ A ↔ x ∉ A) ↔ (x ∈ A ↔ y ∉ A) := by tauto
+    simp only [liebEndpointHopping, hT y x, hiff]
+  rw [hend, ← pow_two]
+  exact liebEndpointHopping_sq_eq_indicator hbip x y
 
 /-! ## Half-filling diagonal collapse of `fermionHopReturn` -/
 
@@ -120,7 +136,18 @@ theorem fermionHopReturn_apply_eq_of_singly_occupied {N : ℕ} {x y : Fin (N + 1
     (fermionHopReturn N x y) e c
       = (2 : ℂ) * (((1 / 4 : ℂ) • (fermionSiteNumber N x * fermionSiteNumber N y)
           - fermionSpinDot N x y) e c) := by
-  sorry
+  have hx : ((c (spinfulIndex N x 0)).val : ℂ) + ((c (spinfulIndex N x 1)).val : ℂ) = 1 := by
+    exact_mod_cast congrArg (fun n : ℕ => (n : ℂ)) (hc x)
+  have hnum : (fermionSiteNumber N x * fermionSiteNumber N y) e c
+      = (fermionSiteNumber N y) e c := by
+    rw [← mulVec_basisVec_apply (fermionSiteNumber N x * fermionSiteNumber N y) e c,
+      ← mulVec_basisVec_apply (fermionSiteNumber N y) e c, ← Matrix.mulVec_mulVec,
+      fermionSiteNumber_mulVec_basisVec, Matrix.mulVec_smul,
+      fermionSiteNumber_mulVec_basisVec, smul_smul, hx, mul_one]
+  rw [fermionHopReturn_eq N x y hxy]
+  simp only [Matrix.sub_apply, Matrix.smul_apply, smul_eq_mul]
+  rw [← hnum]
+  ring
 
 /-! ## Sector lift of `V̂ · V̂` -/
 
@@ -134,7 +161,10 @@ theorem liebPerturbationVCompressed_sq_eq_configSectorCompress (N nUp : ℕ)
     liebPerturbationVCompressed N nUp A T * liebPerturbationVCompressed N nUp A T
       = configSectorCompress N (liebHalfFillingPred N nUp)
           (liebPerturbationV N A T * liebPerturbationV N A T) := by
-  sorry
+  rw [liebPerturbationVCompressed]
+  exact configSectorCompress_mul_of_preserves (liebHalfFillingPred N nUp)
+    (liebPerturbationV N A T)
+    fun c c' hc hc' => liebPerturbationV_preserves_liebHalfFillingPred N nUp A T hc hc'
 
 /-! ## The PR-8b capstone -/
 
@@ -158,7 +188,38 @@ theorem kernelProjection_mul_liebPerturbationVCompressed_sq_mul_kernelProjection
               (tJExchange N (liebEndpointGraph A))
           * LatticeSystem.Math.kernelProjectionMatrix
               (liebPerturbationH0Compressed N nUp)) := by
-  sorry
+  have hentry : ∀ c e : Fin (2 * N + 2) → Fin 2,
+      (∀ z : Fin (N + 1), (c (spinfulIndex N z 0)).val + (c (spinfulIndex N z 1)).val = 1) →
+      (∀ z : Fin (N + 1), (e (spinfulIndex N z 0)).val + (e (spinfulIndex N z 1)).val = 1) →
+      (liebPerturbationV N A T * liebPerturbationV N A T) e c
+        = (2 : ℂ) * (tJExchange N (liebEndpointGraph A)) e c := by
+    intro c e hc he
+    rw [liebPerturbationV_sq_apply_eq_of_singly_occupied hbip hc he]
+    simp only [tJExchange, Matrix.sum_apply, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun u _ => Finset.sum_congr rfl fun v _ => ?_
+    rw [liebEndpointHopping_mul_symm_eq_indicator hbip hT u v]
+    by_cases hadj : (liebEndpointGraph A).Adj u v
+    · rw [if_pos hadj, if_pos hadj,
+        fermionHopReturn_apply_eq_of_singly_occupied hadj.ne hc e, Complex.ofReal_one, one_mul]
+    · rw [if_neg hadj, if_neg hadj, Complex.ofReal_zero, zero_mul, Matrix.zero_apply, mul_zero]
+  rw [Matrix.mul_assoc (LatticeSystem.Math.kernelProjectionMatrix
+        (liebPerturbationH0Compressed N nUp)) (liebPerturbationVCompressed N nUp A T)
+      (liebPerturbationVCompressed N nUp A T),
+    liebPerturbationVCompressed_sq_eq_configSectorCompress,
+    kernelProjectionMatrix_liebPerturbationH0Compressed_eq_diagonal]
+  ext s s'
+  simp only [Matrix.smul_apply, Matrix.mul_diagonal, Matrix.diagonal_mul, smul_eq_mul]
+  by_cases hs : hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) s.val = 0
+  · by_cases hs' : hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) s'.val = 0
+    · rw [if_pos hs, if_pos hs']
+      simp only [one_mul, mul_one]
+      rw [configSectorCompress_apply, configSectorCompress_apply]
+      exact hentry s'.val s.val (liebHalfFilling_site_occupation N nUp s'.property hs')
+        (liebHalfFilling_site_occupation N nUp s.property hs)
+    · rw [if_neg hs']
+      ring
+  · rw [if_neg hs]
+    ring
 
 /-- **Corollary for PR-9/PR-10**: composing the PR-8b capstone with PR-6's
 `secondOrderEffectiveHamiltonian_liebPerturbation_eq`
@@ -177,6 +238,7 @@ theorem secondOrderEffectiveHamiltonian_liebPerturbation_eq_tJExchange (N nUp : 
                 (tJExchange N (liebEndpointGraph A))
             * LatticeSystem.Math.kernelProjectionMatrix
                 (liebPerturbationH0Compressed N nUp))) := by
-  sorry
+  rw [secondOrderEffectiveHamiltonian_liebPerturbation_eq N nUp hbip,
+    kernelProjection_mul_liebPerturbationVCompressed_sq_mul_kernelProjection N nUp hbip hT]
 
 end LatticeSystem.Fermion
