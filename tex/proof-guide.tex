@@ -6756,6 +6756,26 @@ the inner-product carrier \texttt{EuclideanSpace}~$\mathbb{C}$~$n$
 decomposition of
 \texttt{Fermion/JordanWigner/Hubbard/LiebAttractiveFullSectorUnique.lean}.
 
+\emph{Homotopy continuity and local-constancy (Issue~\#5320, PR~\#5325 PR-4).}
+Sets up Tasaki's coupling deformation $H_s$ (p.~353) toward an explicit
+uniform $\pm\lambda$ endpoint: the hopping homotopy $T_s = (1-s)T + sT_1$
+(\texttt{homotopyHopping}, with the endpoint \texttt{liebEndpointHopping})
+and the on-site homotopy $U_s = (1-s)U + s$ (\texttt{homotopyOnSite}), assembled
+into $H_s$ (\texttt{homotopyHamiltonian}) via the uniform repulsive Hubbard
+Hamiltonian. Eight lemmas establish: sign preservation on the original support
+and non-vanishing of added $A$-$B$ edges, vanishing of same-sublattice entries,
+and preservation of symmetry, bipartition, and connectivity along the homotopy
+(connectivity needs the strict endpoint hypothesis $0<\lambda$, not merely
+$\lambda\neq0$, since a negative $\lambda$ can cancel the original entry at an
+interior $s$), positivity of $U_s$, and continuity of $s\mapsto H_s$
+(transported to continuity of the sector-restricted minimum energy via PR-2's
+\texttt{Continuous.minEnergyOn\_comp}). The topological core,
+\texttt{casimirSelector\_eq\_const\_of\_locally\_unique\_strict\_min}, upgrades
+PR-3's local (pointwise-in-$s$) unique-occupied-Casimir-sector conclusion to a
+single sector occupied for \emph{every} $s\in(0,1]$, via
+\texttt{IsLocallyConstant.apply\_eq\_of\_preconnectedSpace} on the preconnected
+set $(0,1]$. Not itself a numbered Tasaki statement; axiom-free.
+
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
 eqs.~(10.2.7)/(10.2.8)/(10.2.13); \emph{proved axiom-free on the general spin-$z$
