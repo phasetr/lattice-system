@@ -7024,9 +7024,14 @@ $\hat H_{\mathrm{spin}}=\sum_{x,y}(|t_{x,y}|^2/U_x)2(\hat S_x\!\cdot\!\hat S_y-\
 at this arc's $U=1$ normalisation and on the complete-bipartite endpoint
 graph. \emph{This closes the superexchange sub-arc} (PR-6 reduced-inverse
 layer, PR-7 model-independent identity, PR-8a whole-Fock-space collapse,
-PR-8b endpoint-graph capstone); both new declarations of this file are staged
-for PR-9 (Fermion--Spin bridge) and PR-10 (endpoint Heisenberg Casimir) per
-the fixed PR order.
+PR-8b endpoint-graph capstone). \emph{Debt.} Of this file's eight new
+declarations (the endpoint graph \texttt{liebEndpointGraph} with its
+\texttt{DecidableRel} instance, four feeder lemmas, the capstone and the
+corollary), seven are consumed inside the file: the capstone is consumed by
+the corollary, and the rest feed the capstone. The corollary
+\texttt{secondOrderEffectiveHamiltonian\_liebPerturbation\_eq\_tJExchange} is
+the only one still at reference~0, staged for PR-9 (Fermion--Spin bridge) and
+PR-10 (endpoint Heisenberg Casimir) per the fixed PR order.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
