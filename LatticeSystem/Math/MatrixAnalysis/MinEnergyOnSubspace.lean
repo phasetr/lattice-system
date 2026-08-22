@@ -6,13 +6,25 @@ import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueContinuous
 
 This file formalizes the **minimum energy on a subspace** ingredient of Tasaki Theorem 10.4
 (Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer 2020,
-§10.2.3, p. 351): for a Hamiltonian `H` and a candidate low-energy subspace `W`, the quantity
+§10.2.2, p. 350; proof pp. 351–353): for a Hamiltonian `H` and a candidate low-energy subspace
+`W`, the quantity
 
   `minEnergyOn W H = inf { re ⟪v, H v⟫ | v ∈ W, ‖v‖ = 1 }`
 
-is the lowest value the energy functional attains on the unit sphere of `W`. Theorem 10.4 compares
-`minEnergyOn` on two competing subspaces (the trial ferromagnetic sector and its complement) to
-pin down the ground-state sector of the attractive Hubbard model.
+is the lowest value the energy functional attains on the unit sphere of `W`.
+
+Theorem 10.4 is a statement about the **repulsive** Hubbard model at half filling `N = |Λ|`:
+every ground state has total spin `Stot = ||A| − |B||/2`, and the ground states are exactly
+`2 Stot + 1 = |A| − |B| + 1` fold degenerate. Tasaki's proof works inside the balanced spin-`z`
+sector `H_{N/2,N/2}` (for odd `N`, `H_{(N+1)/2,(N−1)/2}`) and carries that sector by the **Shiba
+transformation** to the **attractive** model (eqs. (10.2.10)/(10.2.11)), where Theorem 10.2
+supplies a unique ground state; the total-spin value is then pinned by continuously deforming the
+couplings (`U_x → U`, `t_{x,y} → ±λ`) and letting `λ → 0` (p. 353). `minEnergyOn` is the
+sector-restricted energy functional such a deformation argument varies, which is why reachability
+and parameter continuity are proved for it here.
+
+Provenance: the contents are generic matrix analysis, not a formalization of a numbered Tasaki
+statement; the citation records which argument they are built for.
 
 This is a **thin wrapper** around existing infrastructure:
 
@@ -37,7 +49,8 @@ open Matrix LatticeSystem.Quantum
 variable {n : Type*} [Fintype n] [DecidableEq n]
 
 /-- The **minimum energy** of `H` on the subspace `W`: the infimum, over unit vectors `v ∈ W`, of
-the real part of the Rayleigh quotient `⟪v, H v⟫` (Tasaki §10.2.3, p. 351).  (For `W = ⊥` there is
+the real part of the Rayleigh quotient `⟪v, H v⟫` — the sector-restricted energy functional varied
+in the proof of Tasaki Theorem 10.4 (§10.2.2, pp. 351–353).  (For `W = ⊥` there is
 no unit vector and the infimum degenerates to the junk value `minEnergyOn ⊥ H = sInf ∅ = 0`, which
 is why the lower bounds below assume `W ≠ ⊥`.) -/
 noncomputable def minEnergyOn (W : Submodule ℂ (EuclideanSpace ℂ n)) (H : Matrix n n ℂ) : ℝ :=
