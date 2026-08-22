@@ -46,7 +46,7 @@ Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1s
 namespace LatticeSystem.Fermion
 
 open Matrix Module Module.End LatticeSystem.Quantum LatticeSystem.Math
-open scoped BigOperators
+open scoped BigOperators ComplexOrder
 
 variable {N : ℕ}
 
@@ -178,7 +178,7 @@ theorem repulsiveSpinZSector_ground_unique (N Ne : ℕ)
     · rw [if_neg hxy, if_neg (fun h => hxy h.symm)]
   have hT'_conn : (hoppingSupportGraph T').Preconnected := by
     rw [hT', hoppingSupportGraph_add_diagonal]; exact hT_conn
-  obtain ⟨Eattr, φattr, huniqueAttr, _⟩ :=
+  obtain ⟨Eattr, φattr, huniqueAttr, hsinglet⟩ :=
     theorem_10_2_lieb_attractive_unique_singlet N Ne hNe_even hNe_pos (by omega)
       T' hT'_symm hT'_conn U hU_pos
   obtain ⟨hmemφ, hnormφ, hHφ, hgroundφ, huniqφ⟩ := huniqueAttr
@@ -190,6 +190,35 @@ theorem repulsiveSpinZSector_ground_unique (N Ne : ℕ)
   have hHf : Hattr.mulVec f = (Eattr : ℂ) • f := bwd Hattr (Eattr : ℂ) φattr hHφ
   have hNf : (fermionTotalNumber (2 * N + 1)).mulVec f = ((Ne : ℕ) : ℂ) • f :=
     bwd _ _ φattr ((Module.End.mem_eigenspace_iff).mp hmemφ)
+  -- `φ_attr` is a spin singlet, hence unpolarised: `Ŝ³ φ_attr = 0`.
+  have hCasf : (fermionTotalSpinSquared N).mulVec f = 0 := by
+    have h0 : Matrix.toEuclideanLin (fermionTotalSpinSquared N) φattr = (0 : ℂ) • φattr := by
+      rw [hsinglet, zero_smul]
+    have h1 := bwd (fermionTotalSpinSquared N) (0 : ℂ) φattr h0
+    rwa [zero_smul] at h1
+  have hS3f : (fermionTotalSpinZ N).mulVec f = 0 := by
+    -- `Ŝ² = (Ŝ⁽¹⁾ᴴŜ⁽¹⁾ + Ŝ⁽²⁾ᴴŜ⁽²⁾) + (Ŝ³)ᴴŜ³` is a sum of positive semidefinite blocks, so a
+    -- null vector of the Casimir is a null vector of the `Ŝ³` block.
+    set P12 : ManyBodyOp (Fin (2 * N + 2)) :=
+      Matrix.conjTranspose (tJTotalSpinOne N) * tJTotalSpinOne N
+        + Matrix.conjTranspose (tJTotalSpinTwo N) * tJTotalSpinTwo N with hP12
+    set P3 : ManyBodyOp (Fin (2 * N + 2)) :=
+      Matrix.conjTranspose (fermionTotalSpinZ N) * fermionTotalSpinZ N with hP3
+    have hsplit : fermionTotalSpinSquared N = P12 + P3 := by
+      rw [hP12, hP3, (tJTotalSpinOne_isHermitian N).eq, (tJTotalSpinTwo_isHermitian N).eq,
+        (fermionTotalSpinZ_isHermitian N).eq, fermionTotalSpinSquared_eq_cartesianSqSum]
+    have h12 : (0 : ℂ) ≤ star f ⬝ᵥ P12.mulVec f :=
+      Matrix.PosSemidef.dotProduct_mulVec_nonneg
+        ((Matrix.posSemidef_conjTranspose_mul_self _).add
+          (Matrix.posSemidef_conjTranspose_mul_self _)) f
+    have h3 : (0 : ℂ) ≤ star f ⬝ᵥ P3.mulVec f :=
+      Matrix.PosSemidef.dotProduct_mulVec_nonneg (Matrix.posSemidef_conjTranspose_mul_self _) f
+    have hsum : star f ⬝ᵥ P12.mulVec f + star f ⬝ᵥ P3.mulVec f = 0 := by
+      rw [← dotProduct_add, ← Matrix.add_mulVec, ← hsplit, hCasf, dotProduct_zero]
+    have h3zero : star f ⬝ᵥ P3.mulVec f = 0 :=
+      le_antisymm (by rw [← hsum]; exact le_add_of_nonneg_left h12) h3
+    rw [hP3, ← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, ← Matrix.star_mulVec] at h3zero
+    exact dotProduct_star_self_eq_zero.mp h3zero
   -- The transported state `ψ = Û φ_attr`.
   set ψ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2) := WithLp.toLp 2 (Ush.mulVec f) with hψdef
   have hψofLp : ψ.ofLp = Ush.mulVec f := rfl
@@ -299,9 +328,23 @@ theorem repulsiveSpinZSector_ground_unique (N Ne : ℕ)
       _ = Ush.mulVec (c • f) := by rw [hcofLp]
       _ = c • Ush.mulVec f := by rw [Matrix.mulVec_smul]
   refine ⟨Eattr - cR, ψ, φattr, ⟨hψmem, hψnorm, hEeig, hground, huniq⟩, hψofLp, hpair, ?_⟩
-  -- RED (PR-1, TDD): number-operator eigenvalue of the transported ground state `ψ = Û φ_attr`,
-  -- via `Ŝ³ φattr = 0` (singlet) and the Shiba charge exchange `Ûᴴ N̂ Û = 2 Ŝ³ + (N+1)·1`.
-  sorry
+  -- `N̂` is diagonal in the occupation basis, so both conjugation orders reindex it by the same
+  -- Shiba flip: `Ûᴴ N̂ Û = Û N̂ Ûᴴ = 2 Ŝ³ + (N+1)·1`.
+  have hNsym : Matrix.conjTranspose Ush * fermionTotalNumber (2 * N + 1) * Ush
+      = (2 : ℂ) • fermionTotalSpinZ N + ((N : ℂ) + 1) • 1 := by
+    rw [← shibaSignedUnitary_conj_totalNumber (shibaSignFn A) hs, fermionTotalNumber_eq_diagonal,
+      shibaSignedUnitary_conj_diagonal (shibaSignFn A) hs,
+      shibaSignedUnitary_self_conj_diagonal (shibaSignFn A) hs]
+  -- `N̂ Û = Û (2 Ŝ³ + (N+1)·1)`.
+  have hNUfwd : fermionTotalNumber (2 * N + 1) * Ush
+      = Ush * ((2 : ℂ) • fermionTotalSpinZ N + ((N : ℂ) + 1) • 1) := by
+    rw [← hNsym, ← Matrix.mul_assoc, ← Matrix.mul_assoc, hUUc, Matrix.one_mul]
+  have hchargef : ((2 : ℂ) • fermionTotalSpinZ N
+      + ((N : ℂ) + 1) • (1 : ManyBodyOp (Fin (2 * N + 2)))).mulVec f = ((N : ℂ) + 1) • f := by
+    rw [Matrix.add_mulVec, Matrix.smul_mulVec, hS3f, smul_zero, zero_add, Matrix.smul_mulVec,
+      Matrix.one_mulVec]
+  refine fwd (fermionTotalNumber (2 * N + 1)) ((N : ℂ) + 1) ψ ?_
+  rw [hψofLp, Matrix.mulVec_mulVec, hNUfwd, ← Matrix.mulVec_mulVec, hchargef, Matrix.mulVec_smul]
 
 /-- **Eq. (10.2.9)** (Tasaki §10.2.2, p. 351): on the fixed `Ne`-electron sector, the symmetric
 repulsive interaction with **uniform** on-site repulsion `U_x = U` differs from the uniform
@@ -321,8 +364,58 @@ theorem symmetricRepulsiveHubbardHamiltonian_groundSubmodule_eq_uniform
       = hubbardGroundSubmoduleAtElectronNumber
           (repulsiveHubbardHamiltonian N T U)
           (E - (-(U : ℂ) / 2 * (Ne : ℂ) + (U : ℂ) / 4 * ((N : ℂ) + 1))) Ne := by
-  -- RED (PR-1, TDD): eq. (10.2.9) constant-shift identity between the uniform and symmetric
-  -- repulsive interactions on the fixed-`Ne` sector, hence ground-submodule agreement.
-  sorry
+  classical
+  -- Per site: `U (n̂↑ − ½)(n̂↓ − ½) = U n̂↑n̂↓ − (U/2)(n̂↑ + n̂↓) + U/4`.
+  have hterm : ∀ x : Fin (N + 1),
+      (U : ℂ) • ((fermionUpNumber N x - (1 / 2 : ℂ) • (1 : ManyBodyOp (Fin (2 * N + 2))))
+          * (fermionDownNumber N x - (1 / 2 : ℂ) • (1 : ManyBodyOp (Fin (2 * N + 2)))))
+        = (U : ℂ) • (fermionUpNumber N x * fermionDownNumber N x)
+          - (((U : ℂ) / 2) • fermionUpNumber N x + ((U : ℂ) / 2) • fermionDownNumber N x)
+          + ((U : ℂ) / 4) • (1 : ManyBodyOp (Fin (2 * N + 2))) := by
+    intro x
+    simp only [Matrix.sub_mul, Matrix.mul_sub, Matrix.smul_mul, Matrix.mul_smul, Matrix.one_mul,
+      Matrix.mul_one]
+    module
+  -- Eq. (10.2.9): summing over the `N+1` sites, `Ĥint^{sym} = Ĥint^{unif} − (U/2) N̂ + (U/4)|Λ|`.
+  have hint : symmetricRepulsiveHubbardInteraction N (fun _ => U)
+      = hubbardOnSiteInteractionSite N (fun _ => (U : ℂ))
+        - ((U : ℂ) / 2) • fermionTotalNumber (2 * N + 1)
+        + ((U : ℂ) / 4 * ((N : ℂ) + 1)) • (1 : ManyBodyOp (Fin (2 * N + 2))) := by
+    have hup : ∑ x : Fin (N + 1), ((U : ℂ) / 2) • fermionUpNumber N x
+        = ((U : ℂ) / 2) • ∑ x : Fin (N + 1), fermionUpNumber N x := Finset.smul_sum.symm
+    have hdn : ∑ x : Fin (N + 1), ((U : ℂ) / 2) • fermionDownNumber N x
+        = ((U : ℂ) / 2) • ∑ x : Fin (N + 1), fermionDownNumber N x := Finset.smul_sum.symm
+    have hconst : ∑ _x : Fin (N + 1), ((U : ℂ) / 4) • (1 : ManyBodyOp (Fin (2 * N + 2)))
+        = ((U : ℂ) / 4 * ((N : ℂ) + 1)) • (1 : ManyBodyOp (Fin (2 * N + 2))) := by
+      rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, ← Nat.cast_smul_eq_nsmul ℂ,
+        smul_smul]
+      congr 1
+      push_cast
+      ring
+    simp only [symmetricRepulsiveHubbardInteraction, hubbardOnSiteInteractionSite,
+      fermionTotalNumber_eq_up_add_down, fermionTotalUpNumber, fermionTotalDownNumber]
+    rw [Finset.sum_congr rfl (fun x _ => hterm x), Finset.sum_add_distrib,
+      Finset.sum_sub_distrib, Finset.sum_add_distrib, hup, hdn, hconst]
+    module
+  have hop : symmetricRepulsiveHubbardHamiltonian N T (fun _ => U)
+      = repulsiveHubbardHamiltonian N T U
+        - ((U : ℂ) / 2) • fermionTotalNumber (2 * N + 1)
+        + ((U : ℂ) / 4 * ((N : ℂ) + 1)) • (1 : ManyBodyOp (Fin (2 * N + 2))) := by
+    rw [symmetricRepulsiveHubbardHamiltonian, repulsiveHubbardHamiltonian, hint]
+    abel
+  ext v
+  simp only [hubbardGroundSubmoduleAtElectronNumber, Submodule.mem_inf,
+    Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
+  constructor
+  · rintro ⟨hH, hN⟩
+    refine ⟨?_, hN⟩
+    rw [hop, Matrix.add_mulVec, Matrix.sub_mulVec, Matrix.smul_mulVec, hN, Matrix.smul_mulVec,
+      Matrix.one_mulVec, smul_smul] at hH
+    linear_combination (norm := module) hH
+  · rintro ⟨hH, hN⟩
+    refine ⟨?_, hN⟩
+    rw [hop, Matrix.add_mulVec, Matrix.sub_mulVec, Matrix.smul_mulVec, hN, Matrix.smul_mulVec,
+      Matrix.one_mulVec, smul_smul, hH]
+    module
 
 end LatticeSystem.Fermion

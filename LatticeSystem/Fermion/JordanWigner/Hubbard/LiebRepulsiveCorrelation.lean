@@ -171,7 +171,7 @@ theorem theorem_10_5_shen_qiu_tian_transverse_sign (N Ne : ℕ)
   classical
   set Ush : Matrix (Fin (2 * N + 2) → Fin 2) (Fin (2 * N + 2) → Fin 2) ℂ :=
     shibaSignedUnitary N (shibaSignFn A) with hUsh
-  obtain ⟨Elem, ψ, φattr, huniqψ, hψeq, hpair⟩ :=
+  obtain ⟨Elem, ψ, φattr, huniqψ, hψeq, hpair, _⟩ :=
     repulsiveSpinZSector_ground_unique N Ne hNe_even hNe_pos hNe_lt T hT_symm hbip hT_conn U hU_pos
   obtain ⟨hφmem, hφnorm, hφeig, hφground, _⟩ := hGS
   obtain ⟨hψmem, hψnorm, hψeig, hψground, hψuniq⟩ := huniqψ
