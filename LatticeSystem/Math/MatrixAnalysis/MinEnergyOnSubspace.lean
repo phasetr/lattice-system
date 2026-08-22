@@ -15,7 +15,7 @@ is the lowest value the energy functional attains on the unit sphere of `W`.
 
 Theorem 10.4 is a statement about the **repulsive** Hubbard model at half filling `N = |Λ|`:
 every ground state has total spin `Stot = ||A| − |B||/2`, and the ground states are exactly
-`2 Stot + 1 = |A| − |B| + 1` fold degenerate. Tasaki's proof works inside the balanced spin-`z`
+`2 Stot + 1 = ||A| − |B|| + 1` fold degenerate. Tasaki's proof works inside the balanced spin-`z`
 sector `H_{N/2,N/2}` (for odd `N`, `H_{(N+1)/2,(N−1)/2}`) and carries that sector by the **Shiba
 transformation** to the **attractive** model (eqs. (10.2.10)/(10.2.11)), where Theorem 10.2
 supplies a unique ground state; the total-spin value is then pinned by continuously deforming the
