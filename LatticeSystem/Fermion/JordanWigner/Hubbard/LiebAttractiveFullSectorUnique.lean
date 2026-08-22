@@ -4,6 +4,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveBalancedUniquene
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveSingletGround
 import LatticeSystem.Fermion.JordanWigner.Hubbard.FermionTotalSpinCasimirCharges
 import LatticeSystem.Math.InvariantSubmoduleEigenvector
+import LatticeSystem.Math.MatrixAnalysis.CommutingEigenspaceInvariance
 import LatticeSystem.Math.AngularMomentum.SpinHalfSector
 import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
 
@@ -138,17 +139,6 @@ theorem fermionTotalNumber_mul_tJTotalSpinTwo (N : ℕ) :
   have hP := (fermionTotalSpinPlus_commute_fermionTotalNumber N).symm.eq
   have hM := (fermionTotalSpinMinus_commute_fermionTotalNumber N).symm.eq
   rw [tJTotalSpinTwo, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_sub, Matrix.sub_mul, hP, hM]
-
-/-! ## A commuting operator preserves an eigenspace -/
-
-/-- If `A` commutes with `B` then `A` maps each `B`-eigenspace into itself: from `B x = e x` and
-`A B = B A` one gets `B (A x) = e (A x)`. -/
-private theorem mulVec_mem_eigenspace_of_commute {n : Type*} [Fintype n]
-    {A B : Matrix n n ℂ} (hAB : Commute A B) {e : ℂ} {x : n → ℂ}
-    (hx : x ∈ Module.End.eigenspace B.mulVecLin e) :
-    A.mulVec x ∈ Module.End.eigenspace B.mulVecLin e := by
-  rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hx ⊢
-  rw [Matrix.mulVec_mulVec, ← hAB.eq, ← Matrix.mulVec_mulVec, hx, Matrix.mulVec_smul]
 
 /-! ## The full `Ne`-sector ground eigenspace -/
 

@@ -1,6 +1,7 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveBalancedGround
 import LatticeSystem.Fermion.JordanWigner.Hubbard.FermionTotalSpinCasimirCharges
 import LatticeSystem.Math.MatrixAnalysis.MinEnergyOnSubspace
+import LatticeSystem.Math.MatrixAnalysis.CommutingEigenspaceInvariance
 
 /-!
 # Casimir sector machinery for Theorem 10.4 (Tasaki §10.2.2, PR-3)
@@ -64,21 +65,6 @@ noncomputable def numberSpinZCasimirSectorEuclidean (N : ℕ) (L m₀ c : ℂ) :
     Module.End.eigenspace (Matrix.toEuclideanLin (fermionTotalSpinSquared N)) c
 
 /-! ## Proposition 1: invariance of `K` and `K_c` -/
-
-/-- If `A` commutes with `B` then `A` maps every `B`-eigenspace of `EuclideanSpace ℂ n` into
-itself. `EuclideanSpace` counterpart of `mulVec_mem_eigenspace_of_commute`
-(`LiebAttractiveFullSectorUnique.lean`). -/
-private theorem toEuclideanLin_mem_eigenspace_of_commute {n : Type*} [Fintype n] [DecidableEq n]
-    {A B : Matrix n n ℂ} (hAB : Commute A B) {e : ℂ} {v : EuclideanSpace ℂ n}
-    (hv : v ∈ Module.End.eigenspace (Matrix.toEuclideanLin B) e) :
-    Matrix.toEuclideanLin A v ∈ Module.End.eigenspace (Matrix.toEuclideanLin B) e := by
-  rw [Module.End.mem_eigenspace_iff] at hv ⊢
-  have hv' : B.mulVec (WithLp.ofLp v) = e • WithLp.ofLp v := by
-    have h := congrArg WithLp.ofLp hv
-    simpa using h
-  apply WithLp.ofLp_injective (p := 2) (V := n → ℂ)
-  change B.mulVec (A.mulVec (WithLp.ofLp v)) = e • A.mulVec (WithLp.ofLp v)
-  rw [Matrix.mulVec_mulVec, ← hAB.eq, ← Matrix.mulVec_mulVec, hv', Matrix.mulVec_smul]
 
 /-- **Proposition 1a** (invariance of `K`): any Hamiltonian `H` commuting with the total number
 `N̂` and the spin-`z` charge `Ŝ³` preserves the joint sector `K`. -/

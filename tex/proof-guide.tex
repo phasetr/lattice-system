@@ -6744,6 +6744,18 @@ $K_{c'}\neq\{0\}$) is strictly higher. Unoccupied sectors are excluded on both
 sides because \texttt{minEnergyOn} on the zero subspace is a junk value. Not
 itself a numbered Tasaki statement; axiom-free.
 
+The eigenspace-invariance step behind Proposition~1 — a matrix $A$ commuting
+with $B$ maps every $B$-eigenspace into itself — has a single home in
+\texttt{Math/MatrixAnalysis/CommutingEigenspaceInvariance.lean}, stated for the
+function carrier $n\to\mathbb{C}$
+(\texttt{mulVec\_mem\_eigenspace\_of\_commute}, acting by
+\texttt{Matrix.mulVecLin}) and, as a transport along \texttt{WithLp.ofLp}, for
+the inner-product carrier \texttt{EuclideanSpace}~$\mathbb{C}$~$n$
+(\texttt{toEuclideanLin\_mem\_eigenspace\_of\_commute}, acting by
+\texttt{Matrix.toEuclideanLin}); it is shared with the full-$N_e$-sector weight
+decomposition of
+\texttt{Fermion/JordanWigner/Hubbard/LiebAttractiveFullSectorUnique.lean}.
+
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
 eqs.~(10.2.7)/(10.2.8)/(10.2.13); \emph{proved axiom-free on the general spin-$z$
