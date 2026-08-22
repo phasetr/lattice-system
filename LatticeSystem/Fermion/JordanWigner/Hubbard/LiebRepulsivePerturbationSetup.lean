@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveHomotopyContinuity
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowUVariationalCore
 
 /-!
 # Perturbation setup for Theorem 10.4 (Tasaki §10.2.2, PR-5)
@@ -26,13 +27,23 @@ endpoint `s = 1` and the pieces of the Lemma 10.1 contract that are concrete for
 * `liebPerturbationH0Inv` / `liebPerturbationH0_isReducedInverse`: the explicit diagonal reduced
   (Moore–Penrose) inverse of `Ĥ₀` — `0` on hard-core configurations, the reciprocal interaction
   weight elsewhere — discharging `IsReducedInverse Ĥ₀ Ĥ₀Inv`.
-* `hubbardHardcoreProjection_mul_liebPerturbationV_mul_hubbardHardcoreProjection`: the
-  first-order vanishing condition `P̂₀ V̂ P̂₀ = 0` at half filling, needed for the second-order
-  effective Hamiltonian `Ĥeff = −P̂₀ V̂ Ĥ₀⁻¹ V̂ P̂₀` (eq. (10.1.20)) to be the whole `λ²` term.
+* `liebHalfFillingPred` / `liebPerturbationH0Compressed` / `liebPerturbationVCompressed`: the
+  half-filled fixed-`Ŝ³` configuration sector and the compressions of `Ĥ₀`, `V̂` to it
+  (`configSectorCompress`, `HubbardImpossibilityLowUVariationalCore.lean`), together with the
+  preservation of positive semidefiniteness and Hermiticity under the compression.
+* `kernelProjection_mul_liebPerturbationVCompressed_mul_kernelProjection`: the first-order
+  vanishing condition `P̂₀ V̂ P̂₀ = 0` **inside that sector**, needed for the second-order effective
+  Hamiltonian `Ĥeff = −P̂₀ V̂ Ĥ₀⁻¹ V̂ P̂₀` (eq. (10.1.20)) to be the whole `λ²` term. The condition
+  is genuinely a sector statement: on the whole Fock space it is false, because a hard-core
+  configuration with an empty site can absorb a hopping electron and stay hard-core.
 
 The constant-energy-shift lemma this setup also needs (normalising the hard-core ground energy to
 `0` before comparing with `Ĥeff`) is `LatticeSystem.Math.minEnergyOn_add_const_smul_one`
 (`Math/MatrixAnalysis/MinEnergyOnSubspace.lean`), added alongside PR-2's `minEnergyOn` API.
+
+The remaining `Ĥ₀`/`V̂` items above are stated on the whole Fock space, where `Ĥ₀` is diagonal;
+the sector-compressed statements are read off from them through `configSectorCompress_apply`, so
+both layers are needed.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §10.1 (Lemma 10.1, eq. (10.1.20)) and §10.2.2 (p. 353).
@@ -201,20 +212,10 @@ private theorem kernelProjectionMatrix_liebPerturbationH0_eq_of_fixes_hardcore (
     {P : ManyBodyOp (Fin (2 * N + 2))} (hHerm : P.IsHermitian)
     (hmul : liebPerturbationH0 N * P = 0)
     (hfix : ∀ ψ ∈ hubbardHardcoreSubspace N, P.mulVec ψ = ψ) :
-    LatticeSystem.Math.kernelProjectionMatrix (liebPerturbationH0 N) = P := by
-  refine Matrix.toEuclideanLin.injective (LinearMap.ext fun w => ?_)
-  rw [LatticeSystem.Math.toEuclideanLin_kernelProjectionMatrix]
-  refine Submodule.eq_starProjection_of_mem_of_inner_eq_zero ?_ ?_
-  · rw [LatticeSystem.Math.matrixKernel, LinearMap.mem_ker,
-      ← LatticeSystem.Math.toEuclideanLin_mul_apply, hmul]
-    simp
-  · intro u hu
-    have hPu : Matrix.toEuclideanLin P u = u := by
-      apply WithLp.ofLp_injective 2
-      exact hfix _ ((mem_matrixKernel_liebPerturbationH0_iff N u).mp hu)
-    have hsym : (Matrix.toEuclideanLin P).IsSymmetric :=
-      Matrix.isHermitian_iff_isSymmetric.mp hHerm
-    rw [inner_sub_left, hsym w u, hPu, sub_self]
+    LatticeSystem.Math.kernelProjectionMatrix (liebPerturbationH0 N) = P :=
+  LatticeSystem.Math.kernelProjectionMatrix_eq_of_fixes_kernel hHerm hmul fun u hu => by
+    apply WithLp.ofLp_injective 2
+    exact hfix _ ((mem_matrixKernel_liebPerturbationH0_iff N u).mp hu)
 
 /-- **`Ĥ₀`'s kernel projection is the hard-core projection**: the orthogonal projection onto
 `ker Ĥ₀`, expressed as a matrix (`kernelProjectionMatrix`, `DegeneratePerturbation.lean`),
@@ -240,36 +241,7 @@ private theorem kernelProjectionMatrix_liebPerturbationH0_eq_diagonal (N : ℕ) 
     LatticeSystem.Math.kernelProjectionMatrix (liebPerturbationH0 N)
       = Matrix.diagonal (fun c : Fin (2 * N + 2) → Fin 2 =>
           if hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0 then 1 else 0) := by
-  refine kernelProjectionMatrix_liebPerturbationH0_eq_of_fixes_hardcore N ?_ ?_ ?_
-  · refine Matrix.isHermitian_diagonal_of_self_adjoint _ ?_
-    change star (fun c : Fin (2 * N + 2) → Fin 2 =>
-      if hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0 then (1 : ℂ) else 0) = _
-    funext c
-    by_cases h : hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0 <;>
-      simp [Pi.star_apply, h]
-  · rw [liebPerturbationH0_eq_diagonal, Matrix.diagonal_mul_diagonal]
-    refine Eq.trans (congrArg Matrix.diagonal ?_) Matrix.diagonal_zero'
-    funext c
-    by_cases h : hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0 <;> simp [h]
-  · intro ψ hψ
-    funext c
-    rw [Matrix.mulVec_diagonal]
-    by_cases h : hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0
-    · rw [if_pos h, one_mul]
-    · rw [if_neg h, zero_mul]
-      obtain ⟨x, hx⟩ : ∃ x : Fin (N + 1),
-          ((c (spinfulIndex N x 0)).val : ℂ) * ((c (spinfulIndex N x 1)).val : ℂ) ≠ 0 := by
-        by_contra hall
-        push Not at hall
-        exact h ((hubbardConfigInteractionWeight_one_eq_zero_iff N c).mpr hall)
-      have hval : ∀ k : Fin (2 * N + 2), ((c k).val : ℂ) ≠ 0 → c k = 1 := by
-        intro k hk
-        rcases (show c k = 0 ∨ c k = 1 from by
-          rcases (c k) with ⟨u, hu⟩; interval_cases u; exacts [Or.inl rfl, Or.inr rfl]) with h0 | h1
-        · exact absurd (by rw [h0]; simp) hk
-        · exact h1
-      exact (hardcore_mulVec_apply_eq_zero_of_double N ψ hψ c x
-        (hval _ (left_ne_zero_of_mul hx)) (hval _ (right_ne_zero_of_mul hx))).symm
+  rw [liebPerturbationH0_eq_diagonal, LatticeSystem.Math.kernelProjectionMatrix_diagonal]
 
 /-- **The explicit reduced (Moore–Penrose) inverse of `Ĥ₀`**: diagonal in the computational
 basis, `0` on hard-core configurations (`ker Ĥ₀`) and the reciprocal interaction weight on every
@@ -338,17 +310,221 @@ theorem liebPerturbationH0_isReducedInverse (N : ℕ) :
     · simp [Pi.star_apply, h]
     · rw [Pi.star_apply, if_neg h, star_inv₀, hreal]
 
-/-! ## `P̂₀ V̂ P̂₀ = 0` at half filling -/
+/-! ## The half-filled fixed-`Ŝ³` sector and the compressed `Ĥ₀`, `V̂` -/
 
-/-- **The hopping term vanishes to first order on the hard-core, half-filled sector**:
-`P̂₀ V̂ P̂₀ = 0`, where `P̂₀ = hubbardHardcoreProjection N` and `V̂ = liebPerturbationV N A T` is
-the unit-coupling hopping operator on the sites `Fin (N + 1)` (half filling: `N + 1` electrons on
-`N + 1` sites, so every hard-core configuration has exactly one electron per site). Every hopping
-term `c†_{x,σ} c_{y,σ}` (`x ≠ y`) then either empties a singly-occupied site or doubly occupies
-one, landing outside the hard-core subspace; `P̂₀` on the right annihilates it. -/
-theorem hubbardHardcoreProjection_mul_liebPerturbationV_mul_hubbardHardcoreProjection
-    (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) :
-    hubbardHardcoreProjection N * liebPerturbationV N A T * hubbardHardcoreProjection N = 0 := by
-  sorry
+/-- **The half-filled fixed-`Ŝ³` configuration predicate**: a Fock configuration carries `N + 1`
+electrons on the `N + 1` sites (half filling, `N̂ = N + 1`), exactly `nUp` of them spin-up
+(equivalently `Ŝ³ = (2 nUp − (N + 1)) / 2`). This is the configuration-basis description of the
+joint sector `K = {N̂ = N + 1} ⊓ {Ŝ³ = m₀}` of `LiebRepulsiveCasimirSector.lean`; the perturbative
+step of §10.2.2 takes place inside `K`, not on the whole Fock space. -/
+abbrev liebHalfFillingPred (N nUp : ℕ) : (Fin (2 * N + 2) → Fin 2) → Prop :=
+  fun c => (∑ j : Fin (2 * N + 2), (c j).val) = N + 1 ∧
+    (∑ x : Fin (N + 1), (c (spinfulIndex N x 0)).val) = nUp
+
+/-- **The compressed unperturbed Hamiltonian** `Ĥ₀|_K`: the matrix of `Ĥ₀` in the orthonormal
+configuration basis of the half-filled fixed-`Ŝ³` sector (`configSectorCompress`,
+`HubbardImpossibilityLowUVariationalCore.lean`). -/
+noncomputable def liebPerturbationH0Compressed (N nUp : ℕ) :
+    Matrix (configSector N (liebHalfFillingPred N nUp))
+      (configSector N (liebHalfFillingPred N nUp)) ℂ :=
+  configSectorCompress N (liebHalfFillingPred N nUp) (liebPerturbationH0 N)
+
+/-- **The compressed perturbation** `V̂|_K`: the matrix of the unit-coupling endpoint hopping
+operator in the configuration basis of the half-filled fixed-`Ŝ³` sector. -/
+noncomputable def liebPerturbationVCompressed (N nUp : ℕ) (A : Finset (Fin (N + 1)))
+    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) :
+    Matrix (configSector N (liebHalfFillingPred N nUp))
+      (configSector N (liebHalfFillingPred N nUp)) ℂ :=
+  configSectorCompress N (liebHalfFillingPred N nUp) (liebPerturbationV N A T)
+
+/-- **`Ĥ₀|_K ≥ 0`**: positive semidefiniteness survives the sector compression, since the latter is
+the congruence `A ↦ Tᴴ A T` by the isometric sector embedding. -/
+theorem liebPerturbationH0Compressed_posSemidef (N nUp : ℕ) :
+    (liebPerturbationH0Compressed N nUp).PosSemidef := by
+  rw [liebPerturbationH0Compressed, configSectorCompress]
+  exact (liebPerturbationH0_posSemidef N).conjTranspose_mul_mul_same _
+
+/-- **`V̂|_K` is Hermitian** whenever the original hopping matrix is symmetric: the endpoint
+hopping matrix is then symmetric too (`homotopyHopping_symm` at `s = 1`), so `V̂` is Hermitian, and
+Hermiticity survives the compression (`configSectorCompress_isHermitian`). -/
+theorem liebPerturbationVCompressed_isHermitian (N nUp : ℕ) (A : Finset (Fin (N + 1)))
+    {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ} (hT : ∀ x y, T x y = T y x) :
+    (liebPerturbationVCompressed N nUp A T).IsHermitian := by
+  refine configSectorCompress_isHermitian _ (hubbardKinetic_isHermitian N fun i j => ?_)
+  have hend : homotopyHopping T (liebEndpointHopping A T 1) 1 = liebEndpointHopping A T 1 := by
+    simp [homotopyHopping]
+  have hsymm := homotopyHopping_symm A T hT 1 1 j i
+  rw [hend] at hsymm
+  rw [hsymm]
+  simp
+
+/-- The compressed `Ĥ₀` stays diagonal, with the interaction weight of the sector configuration as
+its eigenvalue: the sector basis is a subfamily of the computational basis, which already
+diagonalizes `Ĥ₀`. -/
+private theorem liebPerturbationH0Compressed_eq_diagonal (N nUp : ℕ) :
+    liebPerturbationH0Compressed N nUp
+      = Matrix.diagonal (fun s : configSector N (liebHalfFillingPred N nUp) =>
+          hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) s.val) := by
+  ext s s'
+  rw [liebPerturbationH0Compressed, configSectorCompress_apply, liebPerturbationH0_eq_diagonal,
+    Matrix.diagonal_apply, Matrix.diagonal_apply]
+  by_cases h : s = s'
+  · rw [if_pos h, if_pos (congrArg Subtype.val h)]
+  · rw [if_neg h, if_neg (fun hv => h (Subtype.ext hv))]
+
+/-- **`P̂₀` inside the sector is the hard-core indicator.** The orthogonal projection onto
+`ker (Ĥ₀|_K)` is the diagonal indicator of the sector configurations without a doubly occupied
+site. -/
+theorem kernelProjectionMatrix_liebPerturbationH0Compressed_eq_diagonal (N nUp : ℕ) :
+    LatticeSystem.Math.kernelProjectionMatrix (liebPerturbationH0Compressed N nUp)
+      = Matrix.diagonal (fun s : configSector N (liebHalfFillingPred N nUp) =>
+          if hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) s.val = 0 then 1 else 0) := by
+  rw [liebPerturbationH0Compressed_eq_diagonal,
+    LatticeSystem.Math.kernelProjectionMatrix_diagonal]
+
+/-! ## `P̂₀ V̂ P̂₀ = 0` on the half-filled sector -/
+
+/-- On a site carrying exactly one electron, the spin orbital other than the occupied one is
+empty. -/
+private theorem spinfulSite_other_val_eq_zero {N : ℕ} {c : Fin (2 * N + 2) → Fin 2}
+    {x : Fin (N + 1)} (hx : (c (spinfulIndex N x 0)).val + (c (spinfulIndex N x 1)).val = 1)
+    {σ τ : Fin 2} (hστ : τ ≠ σ) (hσ : c (spinfulIndex N x σ) = 1) :
+    (c (spinfulIndex N x τ)).val = 0 := by
+  have hsum : ∑ r : Fin 2, (c (spinfulIndex N x r)).val = 1 := by
+    rw [Fin.sum_univ_two]
+    exact hx
+  have hσv : (c (spinfulIndex N x σ)).val = 1 := by rw [hσ]; rfl
+  have hsplit : (c (spinfulIndex N x σ)).val
+      + ∑ r ∈ Finset.univ.erase σ, (c (spinfulIndex N x r)).val
+      = ∑ r : Fin 2, (c (spinfulIndex N x r)).val :=
+    Finset.add_sum_erase Finset.univ (fun r : Fin 2 => (c (spinfulIndex N x r)).val)
+      (Finset.mem_univ σ)
+  have hrest : ∑ r ∈ Finset.univ.erase σ, (c (spinfulIndex N x r)).val = 0 := by omega
+  exact Finset.sum_eq_zero_iff.mp hrest τ (Finset.mem_erase.mpr ⟨hστ, Finset.mem_univ τ⟩)
+
+/-- **Half filling plus the hard-core condition means one electron per site.** A configuration of
+the sector carries `N + 1` electrons on `N + 1` sites; if no site is doubly occupied, then no site
+can be empty either, so every site carries exactly one electron. -/
+private theorem liebHalfFilling_site_occupation (N nUp : ℕ) {c : Fin (2 * N + 2) → Fin 2}
+    (hc : liebHalfFillingPred N nUp c)
+    (hhard : hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0) (x : Fin (N + 1)) :
+    (c (spinfulIndex N x 0)).val + (c (spinfulIndex N x 1)).val = 1 := by
+  have hle : ∀ y : Fin (N + 1),
+      (c (spinfulIndex N y 0)).val + (c (spinfulIndex N y 1)).val ≤ 1 := by
+    intro y
+    have hz := (hubbardConfigInteractionWeight_one_eq_zero_iff N c).mp hhard y
+    have h0 := (c (spinfulIndex N y 0)).isLt
+    have h1 := (c (spinfulIndex N y 1)).isLt
+    rcases mul_eq_zero.mp hz with h | h
+    · have hv : (c (spinfulIndex N y 0)).val = 0 := by exact_mod_cast h
+      omega
+    · have hv : (c (spinfulIndex N y 1)).val = 0 := by exact_mod_cast h
+      omega
+  have hsum : ∑ y : Fin (N + 1),
+      ((c (spinfulIndex N y 0)).val + (c (spinfulIndex N y 1)).val) = N + 1 := by
+    rw [← sum_spinful_split N (fun j => (c j).val)]
+    exact hc.1
+  have heq : ∑ y : Fin (N + 1),
+      ((c (spinfulIndex N y 0)).val + (c (spinfulIndex N y 1)).val)
+        = ∑ _y : Fin (N + 1), 1 := by
+    rw [hsum]
+    simp
+  exact (Finset.sum_eq_sum_iff_of_le fun y _ => hle y).mp heq x (Finset.mem_univ x)
+
+/-- The endpoint hopping matrix has no diagonal entry: a bipartite hopping matrix vanishes on
+`(x, x)` (a site is not in the sublattice opposite to its own), and the endpoint construction adds
+an edge only between sites of *different* sublattices. -/
+private theorem liebEndpointHopping_diag_eq_zero {N : ℕ} {A : Finset (Fin (N + 1))}
+    {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ} (hbip : HoppingRespectsBipartition A T)
+    (x : Fin (N + 1)) : liebEndpointHopping A T 1 x x = 0 := by
+  have hT0 : T x x = 0 := by
+    by_contra h
+    have hiff := hbip h
+    tauto
+  simp [liebEndpointHopping, hT0]
+
+/-- **`V̂` has no matrix element between two singly-occupied configurations.** With one electron
+per site, a hopping term `c†_{x,σ} c_{y,σ}` with `x ≠ y` empties site `y`, so the resulting
+configuration differs from every singly-occupied one; the terms with `x = y` are number operators,
+whose coefficient is the vanishing diagonal entry of the bipartite endpoint hopping matrix. -/
+private theorem liebPerturbationV_apply_eq_zero_of_singly_occupied {N : ℕ}
+    {A : Finset (Fin (N + 1))} {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ}
+    (hbip : HoppingRespectsBipartition A T) {c c' : Fin (2 * N + 2) → Fin 2}
+    (hc : ∀ x, (c (spinfulIndex N x 0)).val + (c (spinfulIndex N x 1)).val = 1)
+    (hc' : ∀ x, (c' (spinfulIndex N x 0)).val + (c' (spinfulIndex N x 1)).val = 1) :
+    liebPerturbationV N A T c' c = 0 := by
+  have hterm : ∀ (σ : Fin 2) (i j : Fin (N + 1)),
+      (((liebEndpointHopping A T 1 i j : ℝ) : ℂ) •
+        (fermionMultiCreation (2 * N + 1) (spinfulIndex N i σ) *
+          fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j σ))) c' c = 0 := by
+    intro σ i j
+    rw [Matrix.smul_apply, smul_eq_mul]
+    by_cases hij : i = j
+    · subst hij
+      rw [liebEndpointHopping_diag_eq_zero hbip i, Complex.ofReal_zero, zero_mul]
+    · refine mul_eq_zero_of_right _ ?_
+      rw [← mulVec_basisVec_apply (fermionMultiCreation (2 * N + 1) (spinfulIndex N i σ) *
+          fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j σ)) c' c,
+        fermionMultiCreation_mul_Annihilation_mulVec_basisVec]
+      by_cases hcond : c (spinfulIndex N j σ) = 1 ∧
+          (Function.update c (spinfulIndex N j σ) 0) (spinfulIndex N i σ) = 0
+      · rw [if_pos hcond, Pi.smul_apply, smul_eq_mul]
+        have hpq : spinfulIndex N i σ ≠ spinfulIndex N j σ :=
+          fun h => hij ((spinfulIndex_eq_iff N i j σ σ).mp h).1
+        have hall : ∀ r : Fin 2,
+            ((Function.update (Function.update c (spinfulIndex N j σ) 0)
+              (spinfulIndex N i σ) 1) (spinfulIndex N j r)).val = 0 := by
+          intro r
+          by_cases hr : r = σ
+          · subst hr
+            rw [Function.update_of_ne hpq.symm, Function.update_self]
+            rfl
+          · have h1 : spinfulIndex N j r ≠ spinfulIndex N j σ :=
+              fun h => hr ((spinfulIndex_eq_iff N j j r σ).mp h).2
+            have h2 : spinfulIndex N j r ≠ spinfulIndex N i σ :=
+              fun h => hij ((spinfulIndex_eq_iff N j i r σ).mp h).1.symm
+            rw [Function.update_of_ne h2, Function.update_of_ne h1]
+            exact spinfulSite_other_val_eq_zero (hc j) hr hcond.1
+        have hne : c' ≠ Function.update (Function.update c (spinfulIndex N j σ) 0)
+            (spinfulIndex N i σ) 1 := by
+          intro heq
+          have hj := hc' j
+          rw [heq, hall 0, hall 1] at hj
+          omega
+        rw [basisVec_apply, if_neg hne, mul_zero]
+      · rw [if_neg hcond, Pi.zero_apply]
+  rw [liebPerturbationV, hubbardKinetic]
+  simp only [Matrix.sum_apply]
+  exact Finset.sum_eq_zero fun σ _ => Finset.sum_eq_zero fun i _ =>
+    Finset.sum_eq_zero fun j _ => hterm σ i j
+
+/-- **First-order vanishing on the half-filled sector**: `P̂₀ V̂ P̂₀ = 0` for the compressed
+family `Ĥ(λ)|_K = Ĥ₀|_K + λ V̂|_K`, with `P̂₀` the projection onto `ker (Ĥ₀|_K)`. This is the
+hypothesis that makes the second-order effective Hamiltonian `Ĥeff = −P̂₀ V̂ Ĥ₀⁻¹ V̂ P̂₀`
+(eq. (10.1.20)) carry the whole `λ²` term of Tasaki's `λ → 0` deformation (§10.2.2, p. 353).
+
+The half-filling restriction is essential, not cosmetic: on the whole Fock space `P̂₀ V̂ P̂₀` does
+not vanish (any hard-core configuration with an empty site can receive a hopping electron and stay
+hard-core), which is why the statement lives on the compressed sector. Bipartiteness of the
+hopping matrix is likewise essential, since it is what removes the on-site (number-operator) part
+of `V̂`. -/
+theorem kernelProjection_mul_liebPerturbationVCompressed_mul_kernelProjection (N nUp : ℕ)
+    {A : Finset (Fin (N + 1))} {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ}
+    (hbip : HoppingRespectsBipartition A T) :
+    LatticeSystem.Math.kernelProjectionMatrix (liebPerturbationH0Compressed N nUp)
+        * liebPerturbationVCompressed N nUp A T
+        * LatticeSystem.Math.kernelProjectionMatrix (liebPerturbationH0Compressed N nUp) = 0 := by
+  rw [kernelProjectionMatrix_liebPerturbationH0Compressed_eq_diagonal]
+  ext s s'
+  rw [Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.zero_apply]
+  by_cases hs : hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) s.val = 0
+  · by_cases hs' : hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) s'.val = 0
+    · rw [liebPerturbationVCompressed, configSectorCompress_apply,
+        liebPerturbationV_apply_eq_zero_of_singly_occupied hbip
+          (liebHalfFilling_site_occupation N nUp s'.property hs')
+          (liebHalfFilling_site_occupation N nUp s.property hs)]
+      rw [mul_zero, zero_mul]
+    · rw [if_neg hs', mul_zero]
+  · rw [if_neg hs, zero_mul, zero_mul]
 
 end LatticeSystem.Fermion

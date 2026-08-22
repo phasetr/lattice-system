@@ -149,6 +149,58 @@ theorem kernelProjectionMatrix_mul_eq_zero {H : Matrix n n ℂ} (hH : H.IsHermit
   rwa [Matrix.conjTranspose_mul, (kernelProjectionMatrix_isHermitian H).eq, hH.eq,
     Matrix.conjTranspose_zero] at h
 
+/-- **Uniqueness of the kernel projection.** A Hermitian matrix `P` that maps everything into
+`ker H` (`H * P = 0`) and fixes every kernel vector *is* the orthogonal projection onto `ker H`:
+those two conditions are exactly the defining properties `P w ∈ ker H` and `w - P w ⊥ ker H` of
+the orthogonal projection, so any explicit candidate can be identified with `P̂₀` by checking
+them. -/
+theorem kernelProjectionMatrix_eq_of_fixes_kernel {H P : Matrix n n ℂ} (hHerm : P.IsHermitian)
+    (hmul : H * P = 0) (hfix : ∀ u ∈ matrixKernel H, Matrix.toEuclideanLin P u = u) :
+    kernelProjectionMatrix H = P := by
+  refine Matrix.toEuclideanLin.injective (LinearMap.ext fun w => ?_)
+  rw [toEuclideanLin_kernelProjectionMatrix]
+  refine Submodule.eq_starProjection_of_mem_of_inner_eq_zero ?_ ?_
+  · rw [matrixKernel, LinearMap.mem_ker, ← toEuclideanLin_mul_apply, hmul]
+    simp
+  · intro u hu
+    have hsym : (Matrix.toEuclideanLin P).IsSymmetric :=
+      Matrix.isHermitian_iff_isSymmetric.mp hHerm
+    rw [inner_sub_left, hsym w u, hfix u hu, sub_self]
+
+/-- **The kernel projection of a diagonal matrix is the diagonal indicator of its zero entries.**
+Diagonal matrices are the case in which `P̂₀` is completely explicit; the concrete models feeding
+the Lemma 10.1 contract reach it by first diagonalising `Ĥ₀` in a basis of eigenconfigurations. -/
+theorem kernelProjectionMatrix_diagonal (d : n → ℂ) :
+    kernelProjectionMatrix (Matrix.diagonal d)
+      = Matrix.diagonal (fun i => if d i = 0 then 1 else 0) := by
+  refine kernelProjectionMatrix_eq_of_fixes_kernel ?_ ?_ ?_
+  · refine Matrix.isHermitian_diagonal_of_self_adjoint _ ?_
+    change star (fun i => if d i = 0 then (1 : ℂ) else 0) = _
+    funext i
+    by_cases h : d i = 0 <;> simp [Pi.star_apply, h]
+  · rw [Matrix.diagonal_mul_diagonal]
+    refine Eq.trans (congrArg Matrix.diagonal ?_) Matrix.diagonal_zero'
+    funext i
+    by_cases h : d i = 0 <;> simp [h]
+  · intro u hu
+    have hker : (Matrix.diagonal d).mulVec (WithLp.ofLp u) = 0 := by
+      have hu' : Matrix.toEuclideanLin (Matrix.diagonal d) u = 0 := LinearMap.mem_ker.mp hu
+      have hofLp : WithLp.ofLp (Matrix.toEuclideanLin (Matrix.diagonal d) u)
+          = (Matrix.diagonal d).mulVec (WithLp.ofLp u) := rfl
+      rw [← hofLp, hu']
+      rfl
+    apply WithLp.ofLp_injective 2
+    change (Matrix.diagonal (fun i => if d i = 0 then (1 : ℂ) else 0)).mulVec (WithLp.ofLp u)
+      = WithLp.ofLp u
+    funext i
+    rw [Matrix.mulVec_diagonal]
+    by_cases h : d i = 0
+    · rw [if_pos h, one_mul]
+    · have hi := congrFun hker i
+      rw [Matrix.mulVec_diagonal, Pi.zero_apply] at hi
+      rw [if_neg h, zero_mul]
+      exact ((mul_eq_zero.mp hi).resolve_left h).symm
+
 /-- `H0inv` is the **reduced (Moore–Penrose) inverse** of `H0`: it inverts
 `H0` on `(ker H0)ᗮ` and vanishes on `ker H0`. We axiomatize this property
 (mathlib has no general pseudo-inverse construction) and pass `H0inv` as
