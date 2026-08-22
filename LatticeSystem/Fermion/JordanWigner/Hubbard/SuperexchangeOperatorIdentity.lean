@@ -1,8 +1,7 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJModel
-import LatticeSystem.Math.AnticommuteCommute
 
 /-!
-# Tasaki §10.1: the superexchange operator identity (eq. (10.1.9)/(10.1.10))
+# Tasaki §10.1: the superexchange operator identity (eq. (10.1.9))
 
 Towards Theorem 10.4 (Lieb's repulsive-Hubbard half-filling theorem, Issue #5320, PR-7 of the
 `theorem_10_4_lieb_repulsive_half_filling` discharge arc): the **model-independent** algebraic
@@ -16,11 +15,19 @@ with spin `τ`, landing back on the original pair of sites) equals
 
 `n̂_y − 2 Ŝ_x·Ŝ_y − ½ n̂_x n̂_y`.
 
-This is Tasaki's eq. (10.1.9)/(10.1.10) (p. 344), the algebraic core from which the
-strong-coupling perturbative reduction to the Heisenberg exchange term is built. Nothing here
-depends on the half-filling sector, the hard-core projection, or the bipartite endpoint graph of
-the Lieb-repulsive arc (PR-6, `LiebRepulsiveSuperexchangeReducedInverse.lean`); those enter only
-at PR-8 (`LiebRepulsiveSuperexchange.lean`), which sandwiches this identity between the
+This is Tasaki's eq. (10.1.9) (p. 344) together with the two auxiliary identities stated just
+below it on the same page, `Σ_σ n̂_{x,σ} n̂_{y,σ} = 2 (Ŝ^{(3)}_x Ŝ^{(3)}_y + ¼ n̂_x n̂_y)` and
+`Ŝ⁺_y Ŝ⁻_x + Ŝ⁻_y Ŝ⁺_x = 2 (Ŝ^{(1)}_x Ŝ^{(1)}_y + Ŝ^{(2)}_x Ŝ^{(2)}_y)`, which convert the raw
+CAR output into the spin-dot form. This is the algebraic core from which the strong-coupling
+perturbative reduction to the Heisenberg exchange term is built.
+
+The *following* eq. (10.1.10) (p. 345), `Ĥ_spin = Σ_{x,y} (|t_{x,y}|²/U_x) (2 Ŝ_x·Ŝ_y − ¼) P̂₀`,
+is a distinct statement and is **not** proved here: it additionally needs the hopping weights
+`t_{x,y}`, the kernel projection `P̂₀`, and `n̂_x P̂₀ = P̂₀`. It is PR-8's target. Accordingly,
+nothing here depends on the half-filling sector, the hard-core projection, or the bipartite
+endpoint graph of the Lieb-repulsive arc (PR-6,
+`LiebRepulsiveSuperexchangeReducedInverse.lean`); those enter only at PR-8
+(`LiebRepulsiveSuperexchange.lean`), which sandwiches this identity between the
 kernel-projection `P₀` on the half-filled hard-core sector.
 
 The proof route is via CAR (canonical anticommutation relations), not Jordan–Wigner sign
@@ -32,15 +39,13 @@ case split on two different configurations, which is exactly where a silent over
 would hide.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
-(1st ed.), §10.1, eq. (10.1.9)/(10.1.10), p. 344.
+(1st ed.), §10.1, eq. (10.1.9) and the two auxiliary identities below it, p. 344.
 -/
 
 namespace LatticeSystem.Fermion
 
 open Matrix LatticeSystem.Quantum
 open scoped BigOperators
-
-variable {N : ℕ}
 
 /-- **The hop-return operator** `Σ_{σ,τ} ĉ†_{y,τ} ĉ_{x,τ} ĉ†_{x,σ} ĉ_{y,σ}` (Tasaki eq. (10.1.9)):
 a fermion hops `x → y` carrying spin `σ`, then a (possibly different-spin) fermion hops back
@@ -59,7 +64,11 @@ noncomputable def fermionHopReturn (N : ℕ) (x y : Fin (N + 1)) : ManyBodyOp (F
 /-- **Same-spin summand** (`σ = τ`). For a fixed spin label `σ` and `x ≠ y`,
 `ĉ†_{y,σ} ĉ_{x,σ} ĉ†_{x,σ} ĉ_{y,σ} = n̂_{y,σ} − n̂_{x,σ} n̂_{y,σ}`: inserting
 `ĉ_{x,σ} ĉ†_{x,σ} = 1 − n̂_{x,σ}` at the middle pair (both operators live at the same mode
-`spinfulIndex N x σ`) and using `ĉ†_{y,σ} ĉ_{y,σ} = n̂_{y,σ}` at the outer pair. -/
+`spinfulIndex N x σ`) splits the product into the outer pair `ĉ†_{y,σ} ĉ_{y,σ} = n̂_{y,σ}` and a
+remainder `ĉ†_{y,σ} ĉ†_{x,σ} ĉ_{x,σ} ĉ_{y,σ}`. Regrouping that remainder into
+`n̂_{x,σ} n̂_{y,σ}` carries `ĉ†_{y,σ}` first past `ĉ†_{x,σ}` and then past `ĉ_{x,σ}`; this is
+where `x ≠ y` is used (the modes `spinfulIndex N y σ` and `spinfulIndex N x σ` are then distinct,
+so both cross-mode CAR anticommutators vanish), and the two resulting sign flips cancel. -/
 theorem fermionHopReturn_same_spin_eq (N : ℕ) (x y : Fin (N + 1)) (hxy : x ≠ y) (σ : Fin 2) :
     fermionMultiCreation (2 * N + 1) (spinfulIndex N y σ) *
           fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N x σ) *
@@ -160,27 +169,13 @@ theorem fermionSiteSpinPlus_mul_Minus_add_fermionSiteSpinMinus_mul_Plus_eq
     fermionSiteSpinPlus N y * fermionSiteSpinMinus N x +
         fermionSiteSpinMinus N y * fermionSiteSpinPlus N x =
       (2 : ℂ) • (fermionSpinDot N x y - fermionSiteSpinZ N x * fermionSiteSpinZ N y) := by
-  have hx : fermionSiteSpinMinus N x * fermionSiteSpinPlus N y
-      = fermionSiteSpinPlus N y * fermionSiteSpinMinus N x := by
-    unfold fermionSiteSpinMinus fermionSiteSpinPlus
-    exact anticomm_commute_mul_mul
-      (fermionDownCreation_upCreation_anticomm N x y)
-      (fermionDownCreation_downAnnihilation_anticomm_ne N hxy)
-      (fermionUpAnnihilation_upCreation_anticomm_ne N hxy)
-      (fermionUpAnnihilation_downAnnihilation_anticomm N x y)
-  have hy : fermionSiteSpinMinus N y * fermionSiteSpinPlus N x
-      = fermionSiteSpinPlus N x * fermionSiteSpinMinus N y := by
-    unfold fermionSiteSpinMinus fermionSiteSpinPlus
-    exact anticomm_commute_mul_mul
-      (fermionDownCreation_upCreation_anticomm N y x)
-      (fermionDownCreation_downAnnihilation_anticomm_ne N (Ne.symm hxy))
-      (fermionUpAnnihilation_upCreation_anticomm_ne N (Ne.symm hxy))
-      (fermionUpAnnihilation_downAnnihilation_anticomm N y x)
-  rw [← hx, hy]
+  rw [← fermionSiteSpinMinus_mul_Plus_comm N x y hxy,
+    fermionSiteSpinMinus_mul_Plus_comm N y x (Ne.symm hxy)]
   unfold fermionSpinDot
   module
 
-/-- **The superexchange operator identity** (Tasaki eq. (10.1.9)/(10.1.10), p. 344), the PR-7
+/-- **The superexchange operator identity** (Tasaki eq. (10.1.9) and the two auxiliary identities
+below it, p. 344; the subsequent eq. (10.1.10) is PR-8's target, not this one), the PR-7
 capstone. For `x ≠ y`:
 
 `Σ_{σ,τ} ĉ†_{y,τ} ĉ_{x,τ} ĉ†_{x,σ} ĉ_{y,σ} = n̂_y − 2 Ŝ_x·Ŝ_y − ½ n̂_x n̂_y`.

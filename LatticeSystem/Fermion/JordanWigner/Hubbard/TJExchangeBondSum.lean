@@ -1,7 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJExchangeNonneg
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJDiagonalMatrixElement
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJKineticSummand
-import LatticeSystem.Math.AnticommuteCommute
 
 /-!
 # Tasaki 11.5: the t-J interaction off-diagonal is `≤ 0`, hence `M_{s',s} ≤ 0` (Prop 11.24 PR-B7-3h)
@@ -32,19 +31,6 @@ open Matrix LatticeSystem.Quantum LatticeSystem.Lattice SimpleGraph
 open scoped BigOperators
 
 variable {N : ℕ}
-
-/-- **Different-site spin ladders commute.**  For `x ≠ y` the bilinear (even) operators
-`Ŝ⁻_x = ĉ†_{x↓}ĉ_{x↑}` and `Ŝ⁺_y = ĉ†_{y↑}ĉ_{y↓}` act on disjoint mode sets, so they commute:
-`Ŝ⁻_x Ŝ⁺_y = Ŝ⁺_y Ŝ⁻_x` (four cross-site anticommutations combine to `(-1)^4 = +1`). -/
-theorem fermionSiteSpinMinus_mul_Plus_comm (N : ℕ) (x y : Fin (N + 1)) (hxy : x ≠ y) :
-    fermionSiteSpinMinus N x * fermionSiteSpinPlus N y
-      = fermionSiteSpinPlus N y * fermionSiteSpinMinus N x := by
-  unfold fermionSiteSpinMinus fermionSiteSpinPlus
-  exact anticomm_commute_mul_mul
-    (fermionDownCreation_upCreation_anticomm N x y)
-    (fermionDownCreation_downAnnihilation_anticomm_ne N hxy)
-    (fermionUpAnnihilation_upCreation_anticomm_ne N hxy)
-    (fermionUpAnnihilation_downAnnihilation_anticomm N x y)
 
 /-- **Each cyclic swapped-exchange summand is `0` or `1`.**  The graph-weighted reversed ladder
 `couplingOf(cycleGraph) x y · ⟨Φ_{s'}|Ŝ⁻_x Ŝ⁺_y|Φ_s⟩` is `0` or `1`: non-adjacent pairs are killed
