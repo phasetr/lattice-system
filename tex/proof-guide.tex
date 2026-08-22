@@ -6681,6 +6681,32 @@ The total-spin value is not claimed (the Shiba map sends $\hat{\mathbf S}^2$ to 
 $\eta$-pseudospin Casimir), so the full Theorem~10.4 capstone still awaits
 perturbation-theory spin-value determination.
 
+\emph{Number-operator eigenvalue (Issue~\#5320, PR~\#5320 PR-1).} Because the
+transported attractive ground state $\varphi_{\mathrm{attr}}$ is a spin singlet
+($\hat{\mathbf S}^2\varphi_{\mathrm{attr}}=0$, forcing $\hat S^3\varphi_{\mathrm{attr}}=0$),
+transporting through the same charge exchange gives
+$\hat N\varphi = (N{+}1)\cdot\varphi$: every transported ground state, on
+\emph{every} spin-$z$ sector $\hat S^3=m$, sits in the fixed $(N{+}1)$-electron
+(half-filling) sector, independently of the electron number $N_e$ used to select
+the attractive-model sector it is transported from. This is a new conjunct of
+\texttt{repulsiveSpinZSector\_ground\_unique}, not a new lemma.
+
+\emph{Eq.~(10.2.9): symmetric/uniform ground-submodule reduction (PR~\#5320
+PR-1).} On a fixed electron-number sector $\hat N=N_e$ with uniform repulsion
+$U_x=U$, expanding $U(\hat n_\uparrow-\tfrac12)(\hat n_\downarrow-\tfrac12) = U
+\hat n_\uparrow\hat n_\downarrow - \tfrac U2(\hat n_\uparrow+\hat n_\downarrow) +
+\tfrac U4$ per site and summing gives $\hat H_{\rm int}^{\rm sym}(U) = \hat
+H_{\rm int}^{\rm unif}(U) - \tfrac U2\hat N + \tfrac U4|\Lambda|$ (eq.~(10.2.9),
+p.~351), so on the $\hat N = N_e$ sector
+$\hat H^{\rm rep,sym}(U) = \hat H^{\rm rep,unif}(U) + c\cdot\mathbf 1$ with
+$c = -\tfrac U2 N_e + \tfrac U4(N{+}1)$. Consequently the $E$-ground submodule of
+the symmetric-interaction Hamiltonian on the $N_e$-electron sector coincides with
+the $(E-c)$-ground submodule of the uniform-interaction Hamiltonian on the same
+sector (\texttt{symmetricRepulsiveHubbardHamiltonian\_groundSubmodule\_eq\_uniform}),
+justifying the reduction of the uniform case (eq.~(10.2.5)) to the symmetric case
+(eq.~(10.2.6)) used throughout Tasaki's proof of Theorem~10.4. Axiom-free;
+finite-dimensional linear algebra.
+
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
 eqs.~(10.2.7)/(10.2.8)/(10.2.13); \emph{proved axiom-free on the general spin-$z$
