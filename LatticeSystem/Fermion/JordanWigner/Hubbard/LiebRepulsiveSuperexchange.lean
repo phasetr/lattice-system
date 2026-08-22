@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveSuperexchangeCollapse
+import LatticeSystem.Quantum.MarshallLiebMattis.BipartiteGraph
 
 /-!
 # The superexchange capstone for Theorem 10.4 (Tasaki §10.1, eq. (10.1.10), PR-8b)
@@ -10,7 +11,9 @@ the singly-occupied sector to a sum of `fermionHopReturn` terms with coefficient
 (the asymmetric product, not yet the endpoint-graph indicator). This file completes the
 superexchange identity — Tasaki's eq. (10.1.10), p. 345 — by
 
-1. defining the endpoint bipartite graph `liebEndpointGraph`;
+1. defining the endpoint bipartite graph `liebEndpointGraph` as the `Finset` specialisation of the
+   sublattice-indicator graph `bipartiteGraphFromA`
+   (`Quantum/MarshallLiebMattis/BipartiteGraph.lean`);
 2. reducing the coefficient `t_{yx} · t_{xy}` to the endpoint-graph indicator via the symmetry
    hypothesis `hT` (necessary, not decoration — see the design-round note reproduced below);
 3. collapsing the diagonal (number-operator) part of `fermionHopReturn_eq`'s right-hand side on the
@@ -37,20 +40,20 @@ t_{xy}² =` the endpoint-graph indicator.
 
 ## Endpoint-graph provenance (arc-wide documented deviation, restated)
 
-`liebEndpointGraph A` is the *complete bipartite* graph on `(A, Aᶜ)` (`Adj x y := x ∈ A ↔ y ∉ A`),
-**not** the book's bond set `B = {{x, y} | t_{x,y} ≠ 0}` (p. 345). This is the same intentional
-complete-bipartite endpoint substitution documented for the whole arc since PR-4
-(`LiebRepulsiveHomotopyContinuity.lean`); the Heisenberg model this capstone produces is therefore
-on the complete bipartite graph, not on the original hopping graph's bond set.
+`liebEndpointGraph A` is the *complete bipartite* graph on `(A, Aᶜ)` (adjacency `x ∈ A ↔ y ∉ A`,
+`liebEndpointGraph_adj`), **not** the book's bond set `B = { {x, y} | t_{x,y} ≠ 0 }` (p. 345). This
+is the same intentional complete-bipartite endpoint substitution documented for the whole arc since
+PR-4 (`LiebRepulsiveHomotopyContinuity.lean`); the Heisenberg model this capstone produces is
+therefore on the complete bipartite graph, not on the original hopping graph's bond set.
 
 ## Debt
 
 The capstone `kernelProjection_mul_liebPerturbationVCompressed_sq_mul_kernelProjection` is consumed
 here by the corollary `secondOrderEffectiveHamiltonian_liebPerturbation_eq_tJExchange`; the four
-feeder lemmas, `liebEndpointGraph` and its `DecidableRel` instance all feed that same chain inside
-this file. The corollary is therefore the only declaration of this file still at reference 0; it is
-staged for PR-9 (Fermion-Spin bridge) and PR-10 (endpoint Heisenberg Casimir) per the fixed PR
-order (issue #5320).
+feeder lemmas, `liebEndpointGraph`, its adjacency lemma and its `DecidableRel` instance all feed
+that same chain inside this file. The corollary is therefore the only declaration of this file
+still at reference 0; it is staged for PR-9 (Fermion-Spin bridge) and PR-10 (endpoint Heisenberg
+Casimir) per the fixed PR order (issue #5320).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §10.1, eq. (10.1.10), p. 345.
@@ -66,24 +69,31 @@ variable {N : ℕ}
 /-! ## The endpoint bipartite graph -/
 
 /-- **The endpoint bipartite graph** on the bipartition `(A, Aᶜ)`: `x` and `y` are adjacent iff
-they lie in different parts. This is the complete bipartite graph on `(A, Aᶜ)`, an intentional
-strengthening of the book's literal bond set `{{x, y} | t_{x,y} ≠ 0}` (p. 345), matching the
-arc-wide endpoint-graph deviation documented since PR-4. Symmetric (`x ∈ A ↔ y ∉ A` swaps to
-`y ∈ A ↔ x ∉ A` by elementary propositional reasoning on the two membership propositions) and
-irreflexive (`x ∈ A ↔ x ∉ A` is `False`). -/
-noncomputable def liebEndpointGraph {N : ℕ} (A : Finset (Fin (N + 1))) :
-    SimpleGraph (Fin (N + 1)) where
-  Adj x y := x ∈ A ↔ y ∉ A
-  symm x y h := by tauto
-  loopless := ⟨fun x h => by tauto⟩
+they lie in different parts. Rather than a fresh `SimpleGraph` structure, this is the
+sublattice-indicator complete bipartite graph `bipartiteGraphFromA`
+(`Quantum/MarshallLiebMattis/BipartiteGraph.lean`) specialised at `Λ := Fin (N + 1)` and the
+indicator `fun x => decide (x ∈ A)`, so symmetry and irreflexivity are inherited rather than
+reproved; the `Finset` form of the adjacency used throughout this file is `liebEndpointGraph_adj`.
+It is an intentional strengthening of the book's literal bond set `{ {x, y} | t_{x,y} ≠ 0 }`
+(p. 345), matching the arc-wide endpoint-graph deviation documented since PR-4. -/
+def liebEndpointGraph {N : ℕ} (A : Finset (Fin (N + 1))) : SimpleGraph (Fin (N + 1)) :=
+  bipartiteGraphFromA fun x => decide (x ∈ A)
+
+/-- **The endpoint graph's adjacency in `Finset` form**: `x` and `y` are adjacent iff exactly one
+of them lies in `A`, which is what the `Bool`-indicator adjacency `decide (x ∈ A) ≠ decide (y ∈ A)`
+of `bipartiteGraphFromA` says. -/
+@[simp] theorem liebEndpointGraph_adj {N : ℕ} (A : Finset (Fin (N + 1))) (x y : Fin (N + 1)) :
+    (liebEndpointGraph A).Adj x y ↔ (x ∈ A ↔ y ∉ A) := by
+  simp only [liebEndpointGraph, bipartiteGraphFromA_adj, ne_eq, decide_eq_decide]
+  tauto
 
 /-- A genuine (non-`Classical.dec`) `DecidableRel` instance for `liebEndpointGraph`'s adjacency,
-inherited directly from the decidability of `Finset` membership and of `Iff` between decidable
-propositions — needed so `tJExchange (liebEndpointGraph A)` does not hit an instance mismatch
-against a classical instance elsewhere in the sum. -/
+inherited directly from the decidability of `Finset` membership and of `Bool` disequality — needed
+so `tJExchange (liebEndpointGraph A)` does not hit an instance mismatch against a classical
+instance elsewhere in the sum. -/
 instance liebEndpointGraph_decidableRel {N : ℕ} (A : Finset (Fin (N + 1))) :
     DecidableRel (liebEndpointGraph A).Adj :=
-  fun x y => inferInstanceAs (Decidable (x ∈ A ↔ y ∉ A))
+  fun x y => inferInstanceAs (Decidable (decide (x ∈ A) ≠ decide (y ∈ A)))
 
 /-! ## The coefficient reduction: `t_{yx} · t_{xy}` to the endpoint-graph indicator -/
 
@@ -94,13 +104,13 @@ theorem liebEndpointHopping_sq_eq_indicator {N : ℕ} {A : Finset (Fin (N + 1))}
     (x y : Fin (N + 1)) :
     (liebEndpointHopping A T 1 x y) ^ 2 = if (liebEndpointGraph A).Adj x y then 1 else 0 := by
   by_cases hAB : x ∈ A ↔ y ∉ A
-  · rw [if_pos (show (liebEndpointGraph A).Adj x y from hAB)]
+  · rw [if_pos ((liebEndpointGraph_adj A x y).mpr hAB)]
     by_cases hT0 : T x y = 0
     · rw [show liebEndpointHopping A T 1 x y = 1 by simp [liebEndpointHopping, hT0, hAB], one_pow]
     · rw [show liebEndpointHopping A T 1 x y = if 0 < T x y then 1 else -1 by
         simp [liebEndpointHopping, hT0]]
       split_ifs <;> norm_num
-  · rw [if_neg (show ¬ (liebEndpointGraph A).Adj x y from hAB)]
+  · rw [if_neg (mt (liebEndpointGraph_adj A x y).mp hAB)]
     have hT0 : T x y = 0 := by
       by_contra h
       exact hAB (hbip h)

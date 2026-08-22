@@ -6963,8 +6963,9 @@ hard-core sector. \emph{Debt.} \texttt{fermionHopReturn\_eq} is
 \textbf{discharged}: PR-8b consumes it directly (the half-filling diagonal
 collapse rewrites through it), sandwiching the identity between $\hat P_0$ on
 the half-filled hard-core sector to reach eq.~(10.1.10). The four feeder
-lemmas remain unconsumed outside this file, staying at reference~0 for the
-arc assembly to judge. Axiom-free.
+lemmas are each consumed inside this file, by \texttt{fermionHopReturn\_eq}
+alone, and have no consumer outside it --- a single-consumer chain for the arc
+assembly to judge, not decoration. Axiom-free.
 
 \emph{Hop-pair collapse, all Fock space, asymmetric coefficient
 (Issue~\#5320, PR~\#5329 PR-8a).} A direct formalization of Tasaki's collapse
@@ -6996,7 +6997,13 @@ completing Tasaki's eq.~(10.1.10), p.~345, from PR-7's model-independent
 \texttt{liebPerturbationV\_sq\_apply\_eq\_of\_singly\_occupied}. The endpoint
 bipartite graph \texttt{liebEndpointGraph}~$A$ (complete bipartite on
 $(A,A^c)$, the arc's intentional endpoint-graph substitution for the book's
-literal bond set, documented since PR-4) lets
+literal bond set, documented since PR-4; defined not as a fresh
+\texttt{SimpleGraph} but as the \texttt{Finset} specialisation of the
+sublattice-indicator graph \texttt{bipartiteGraphFromA}
+(\texttt{Quantum/MarshallLiebMattis/BipartiteGraph.lean}) at the indicator
+$x\mapsto\mathrm{decide}(x\in A)$, with \texttt{liebEndpointGraph\_adj}
+recovering the \texttt{Finset} adjacency $x\in A\leftrightarrow y\notin A$
+that this file's proofs use) lets
 \texttt{liebEndpointHopping\_mul\_symm\_eq\_indicator} reduce PR-8a's
 surviving \textbf{asymmetric} product $t_{yx}t_{xy}$ to the endpoint-graph
 indicator $t_{xy}^2$, under the additional symmetry hypothesis
@@ -7024,11 +7031,12 @@ $\hat H_{\mathrm{spin}}=\sum_{x,y}(|t_{x,y}|^2/U_x)2(\hat S_x\!\cdot\!\hat S_y-\
 at this arc's $U=1$ normalisation and on the complete-bipartite endpoint
 graph. \emph{This closes the superexchange sub-arc} (PR-6 reduced-inverse
 layer, PR-7 model-independent identity, PR-8a whole-Fock-space collapse,
-PR-8b endpoint-graph capstone). \emph{Debt.} Of this file's eight new
-declarations (the endpoint graph \texttt{liebEndpointGraph} with its
-\texttt{DecidableRel} instance, four feeder lemmas, the capstone and the
-corollary), seven are consumed inside the file: the capstone is consumed by
-the corollary, and the rest feed the capstone. The corollary
+PR-8b endpoint-graph capstone). \emph{Debt.} Of this file's nine new
+declarations (the endpoint graph \texttt{liebEndpointGraph} with its adjacency
+lemma \texttt{liebEndpointGraph\_adj} and its \texttt{DecidableRel} instance,
+four feeder lemmas, the capstone and the corollary), eight are consumed inside
+the file: the capstone is consumed by the corollary, and the rest feed the
+capstone. The corollary
 \texttt{secondOrderEffectiveHamiltonian\_liebPerturbation\_eq\_tJExchange} is
 the only one still at reference~0, staged for PR-9 (Fermion--Spin bridge) and
 PR-10 (endpoint Heisenberg Casimir) per the fixed PR order.
