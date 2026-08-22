@@ -74,7 +74,13 @@ private theorem toEuclideanLin_mem_eigenspace_of_commute {n : Type*} [Fintype n]
     {A B : Matrix n n ℂ} (hAB : Commute A B) {e : ℂ} {v : EuclideanSpace ℂ n}
     (hv : v ∈ Module.End.eigenspace (Matrix.toEuclideanLin B) e) :
     Matrix.toEuclideanLin A v ∈ Module.End.eigenspace (Matrix.toEuclideanLin B) e := by
-  sorry
+  rw [Module.End.mem_eigenspace_iff] at hv ⊢
+  have hv' : B.mulVec (WithLp.ofLp v) = e • WithLp.ofLp v := by
+    have h := congrArg WithLp.ofLp hv
+    simpa using h
+  apply WithLp.ofLp_injective (p := 2) (V := n → ℂ)
+  change B.mulVec (A.mulVec (WithLp.ofLp v)) = e • A.mulVec (WithLp.ofLp v)
+  rw [Matrix.mulVec_mulVec, ← hAB.eq, ← Matrix.mulVec_mulVec, hv', Matrix.mulVec_smul]
 
 /-- **Proposition 1a** (invariance of `K`): any Hamiltonian `H` commuting with the total number
 `N̂` and the spin-`z` charge `Ŝ³` preserves the joint sector `K`. -/
@@ -83,7 +89,11 @@ theorem numberSpinZSectorEuclidean_mem_of_commute {N : ℕ} {H : ManyBodyOp (Fin
     {L m₀ : ℂ} {v : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)}
     (hv : v ∈ numberSpinZSectorEuclidean N L m₀) :
     Matrix.toEuclideanLin H v ∈ numberSpinZSectorEuclidean N L m₀ := by
-  sorry
+  rw [numberSpinZSectorEuclidean, Submodule.mem_inf] at hv ⊢
+  obtain ⟨hN, hS3⟩ := hv
+  rw [spinZSectorEuclidean] at hS3 ⊢
+  exact ⟨toEuclideanLin_mem_eigenspace_of_commute hHN hN,
+    toEuclideanLin_mem_eigenspace_of_commute hHS3 hS3⟩
 
 /-- **Proposition 1b** (invariance of `K_c`): any Hamiltonian `H` commuting with `N̂`, `Ŝ³`, and
 the total-spin Casimir `Ŝ²` preserves the sector `K_c`, for every eigenvalue `c` of `Ŝ²`. This is
@@ -95,15 +105,21 @@ theorem numberSpinZCasimirSectorEuclidean_mem_of_commute {N : ℕ} {H : ManyBody
     {L m₀ c : ℂ} {v : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)}
     (hv : v ∈ numberSpinZCasimirSectorEuclidean N L m₀ c) :
     Matrix.toEuclideanLin H v ∈ numberSpinZCasimirSectorEuclidean N L m₀ c := by
-  sorry
+  rw [numberSpinZCasimirSectorEuclidean, Submodule.mem_inf] at hv ⊢
+  exact ⟨numberSpinZSectorEuclidean_mem_of_commute hHN hHS3 hv.1,
+    toEuclideanLin_mem_eigenspace_of_commute hHS2 hv.2⟩
 
 /-! ## Proposition 2: unique strict Casimir-sector minimality -/
 
 /-- **Proposition 2** (unique strict Casimir-sector minimality): if `H` is Hermitian, commutes with
 `N̂`, `Ŝ³`, `Ŝ²`, and has a *unique* normalized ground state `φ` on the joint sector `K`, then there
 is exactly one Casimir eigenvalue `c` for which the sector-restricted minimum energy
-`minEnergyOn K_c H` attains the ground energy `E`; every other Casimir sector `K_{c'}` (`c' ≠ c`)
-has strictly higher minimum energy.
+`minEnergyOn K_c H` attains the ground energy `E`; every other *occupied* Casimir sector `K_{c'}`
+(`c' ≠ c`, `K_{c'} ≠ ⊥`) has strictly higher minimum energy.
+
+The side condition `K_{c'} ≠ ⊥` is the standing convention of `minEnergyOn`
+(`MinEnergyOnSubspace.lean`): the zero subspace has no unit vector, so `minEnergyOn ⊥ H = sInf ∅`
+is a junk value unrelated to `H`, and all but finitely many `c' : ℂ` index such an empty sector.
 
 Proof idea: `Ŝ²` commutes with `H` and preserves the (one-dimensional, by uniqueness) `E`-eigenspace
 of `H` on `K`, hence acts there by a scalar `c`; `φ` is therefore already an `Ŝ²`-eigenvector with
@@ -116,10 +132,63 @@ theorem exists_unique_casimir_sector_strict_min {N : ℕ} {H : ManyBodyOp (Fin (
     (hHN : Commute H (fermionTotalNumber (2 * N + 1))) (hHS3 : Commute H (fermionTotalSpinZ N))
     (hHS2 : Commute H (fermionTotalSpinSquared N))
     {L m₀ : ℂ} {E : ℝ} {φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)}
-    (hK : numberSpinZSectorEuclidean N L m₀ ≠ ⊥)
     (hGS : IsUniqueGroundStateOn (numberSpinZSectorEuclidean N L m₀) H E φ) :
     ∃ c : ℂ, minEnergyOn (numberSpinZCasimirSectorEuclidean N L m₀ c) H = E ∧
-      ∀ c' : ℂ, c' ≠ c → E < minEnergyOn (numberSpinZCasimirSectorEuclidean N L m₀ c') H := by
-  sorry
+      ∀ c' : ℂ, c' ≠ c → numberSpinZCasimirSectorEuclidean N L m₀ c' ≠ ⊥ →
+        E < minEnergyOn (numberSpinZCasimirSectorEuclidean N L m₀ c') H := by
+  obtain ⟨hφK, hφnorm, hφeig, hground, huniq⟩ := hGS
+  have hφne : φ ≠ 0 := by
+    intro h
+    rw [h, norm_zero] at hφnorm
+    exact zero_ne_one hφnorm
+  have hInv : ∀ d : ℂ, ∀ v ∈ numberSpinZCasimirSectorEuclidean N L m₀ d,
+      Matrix.toEuclideanLin H v ∈ numberSpinZCasimirSectorEuclidean N L m₀ d :=
+    fun _ _ hv => numberSpinZCasimirSectorEuclidean_mem_of_commute hHN hHS3 hHS2 hv
+  have hsub : ∀ d : ℂ, numberSpinZCasimirSectorEuclidean N L m₀ d
+      ≤ numberSpinZSectorEuclidean N L m₀ := by
+    intro d
+    rw [numberSpinZCasimirSectorEuclidean]
+    exact inf_le_left
+  have hEle : ∀ d : ℂ, numberSpinZCasimirSectorEuclidean N L m₀ d ≠ ⊥ →
+      E ≤ minEnergyOn (numberSpinZCasimirSectorEuclidean N L m₀ d) H := by
+    intro d hd
+    obtain ⟨⟨ψ, hψmem, hψne, hψeig⟩, -⟩ := minEnergyOn_isGroundEigenvalueOn hH (hInv d) hd
+    exact hground.2 _ ⟨ψ, hsub d hψmem, hψne, hψeig⟩
+  have hS2mem : Matrix.toEuclideanLin (fermionTotalSpinSquared N) φ
+      ∈ numberSpinZSectorEuclidean N L m₀ :=
+    numberSpinZSectorEuclidean_mem_of_commute
+      (fermionTotalSpinSquared_commute_fermionTotalNumber N)
+      (fermionTotalSpinSquared_commute_fermionTotalSpinZ N) hφK
+  have hS2eig : Matrix.toEuclideanLin H (Matrix.toEuclideanLin (fermionTotalSpinSquared N) φ)
+      = (E : ℂ) • Matrix.toEuclideanLin (fermionTotalSpinSquared N) φ :=
+    Module.End.mem_eigenspace_iff.mp (toEuclideanLin_mem_eigenspace_of_commute hHS2.symm
+      (Module.End.mem_eigenspace_iff.mpr hφeig))
+  obtain ⟨c, hc⟩ := huniq _ hS2mem hS2eig
+  have hφKc : φ ∈ numberSpinZCasimirSectorEuclidean N L m₀ c := by
+    rw [numberSpinZCasimirSectorEuclidean, Submodule.mem_inf]
+    exact ⟨hφK, Module.End.mem_eigenspace_iff.mpr hc⟩
+  have hKcne : numberSpinZCasimirSectorEuclidean N L m₀ c ≠ ⊥ := by
+    intro h
+    rw [h, Submodule.mem_bot] at hφKc
+    exact hφne hφKc
+  refine ⟨c, le_antisymm ?_ (hEle c hKcne), ?_⟩
+  · exact (minEnergyOn_isGroundEigenvalueOn hH (hInv c) hKcne).2 E ⟨φ, hφKc, hφne, hφeig⟩
+  intro c' hcc' hc'ne
+  refine lt_of_le_of_ne (hEle c' hc'ne) fun heq => ?_
+  obtain ⟨⟨ψ, hψmem, hψne, hψeig⟩, -⟩ := minEnergyOn_isGroundEigenvalueOn hH (hInv c') hc'ne
+  rw [← heq] at hψeig
+  have hψS2 : Matrix.toEuclideanLin (fermionTotalSpinSquared N) ψ = c' • ψ := by
+    rw [numberSpinZCasimirSectorEuclidean, Submodule.mem_inf] at hψmem
+    exact Module.End.mem_eigenspace_iff.mp hψmem.2
+  obtain ⟨a, ha⟩ := huniq ψ (hsub c' hψmem) hψeig
+  have hane : a ≠ 0 := by
+    intro h
+    rw [h, zero_smul] at ha
+    exact hψne ha
+  rw [ha, map_smul, hc, smul_smul, smul_smul] at hψS2
+  have hzero : (a * c - c' * a) • φ = 0 := by rw [sub_smul, hψS2, sub_self]
+  rcases smul_eq_zero.mp hzero with h | h
+  · exact hcc' (mul_left_cancel₀ hane (by linear_combination -h))
+  · exact hφne h
 
 end LatticeSystem.Fermion
