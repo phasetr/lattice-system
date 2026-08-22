@@ -26,8 +26,8 @@ factors; uniqueness of the reduced inverse identifies `K(0,0)` with `Ĥeff`.
 
 The book's next step — "the left-hand side of (10.1.21) clearly converges to `Ĥeff|Ξ⟩` as
 `λ → 0`" — is made quantitative here as `‖K(λ,E)u − Ĥeff u‖ ≤ (4v³/g²)|λ| ‖u‖`, valid once
-`|E| ≤ |λ|v` and `4|λ|v ≤ g`, with `g` a spectral gap of `Ĥ₀` on `H⊥` and `v` an operator bound
-for `V̂`.
+`0 < g`, `|E| ≤ |λ|v` and `4|λ|v ≤ g`, with `g` a spectral gap of `Ĥ₀` on `H⊥` and `v` an
+operator bound for `V̂`.
 
 The equivalence itself is purely algebraic: besides Hermiticity of `Ĥ₀` it uses only the
 vanishing first-order term `P̂₀V̂P̂₀ = 0`, the reduced-inverse contract for `R`, and the equality
@@ -312,10 +312,12 @@ theorem norm_sub_secondOrderEffectiveHamiltonian_le {H0 V H0inv R : Matrix n n �
   have e3 := mul_le_mul_of_nonneg_left hznorm (mul_nonneg hvnn hcnn)
   linarith
 
-/-- **The explicit `O(λ)` bound on `K(λ,E) − Ĥeff`** (Tasaki §10.1, p. 347). Once the energy is
-of the order of the perturbation (`|E| ≤ |λ|v`) and the perturbation is small compared with the
-gap (`4|λ|v ≤ g`), the compression keeps at least half of the gap, and the sharp bound collapses
-to `‖K(λ,E)u − Ĥeff u‖ ≤ (4v³/g²)|λ| ‖u‖`. -/
+/-- **The explicit `O(λ)` bound on `K(λ,E) − Ĥeff`** (Tasaki §10.1, p. 347). For a strictly
+positive gap (`0 < g`; `4|λ|v ≤ g` alone still admits the degenerate `g = 0`, where the constant
+`4v³/g²` is meaningless), once the energy is of the order of the perturbation (`|E| ≤ |λ|v`) and
+the perturbation is small compared with the gap (`4|λ|v ≤ g`), the compression keeps at least
+half of the gap, and the sharp bound collapses to
+`‖K(λ,E)u − Ĥeff u‖ ≤ (4v³/g²)|λ| ‖u‖`. -/
 theorem norm_sub_secondOrderEffectiveHamiltonian_le_abs_mul {H0 V H0inv R : Matrix n n ℂ}
     {lam E g v : ℝ} (hH0 : H0.IsHermitian) (hInv0 : IsReducedInverse H0 H0inv)
     (hgap : ∀ u : EuclideanSpace ℂ n, u ∈ (matrixKernel H0)ᗮ →

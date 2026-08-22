@@ -22,7 +22,7 @@ Pins the API contract of the declarations that
 5. `norm_sub_secondOrderEffectiveHamiltonian_le` (C5) — the sharp operator-norm bound
    `‖K u − Ĥeff u‖ ≤ v² (|λ|v + |E|) ‖u‖ / (g (g − |λ|v − |E|))`.
 6. `norm_sub_secondOrderEffectiveHamiltonian_le_abs_mul` (C6) — the explicit-constant bound
-   `‖K u − Ĥeff u‖ ≤ (4v³/g²) |λ| ‖u‖` under `|E| ≤ |λ|v` and `4|λ|v ≤ g`.
+   `‖K u − Ĥeff u‖ ≤ (4v³/g²) |λ| ‖u‖` under `0 < g`, `|E| ≤ |λ|v` and `4|λ|v ≤ g`.
 
 Also machine-checks the `λ = E = 0` degeneration of C3's `K` to eq. (10.1.20)'s `Ĥeff` (reusing
 PR-2's `IsReducedInverse.unique`), and two `Fin 1` counterexamples showing that `hFirstOrder`
@@ -98,7 +98,7 @@ example {H0 V H0inv R : Matrix n n ℂ} {lam E g v : ℝ}
   norm_sub_secondOrderEffectiveHamiltonian_le hH0 hInv0 hgap hv hsmall hR u
 
 /-- Pins **C6**: the explicit-constant bound `‖K u − Ĥeff u‖ ≤ (4v³/g²) |λ| ‖u‖`, under
-`|E| ≤ |λ|v` and `4|λ|v ≤ g` (`hsmall` of C5 is derived, not assumed). -/
+`0 < g`, `|E| ≤ |λ|v` and `4|λ|v ≤ g` (`hsmall` of C5 is derived, not assumed). -/
 example {H0 V H0inv R : Matrix n n ℂ} {lam E g v : ℝ}
     (hH0 : H0.IsHermitian) (hInv0 : IsReducedInverse H0 H0inv)
     (hgap : ∀ u : EuclideanSpace ℂ n, u ∈ (matrixKernel H0)ᗮ →
@@ -136,6 +136,8 @@ private theorem fin1_matrixKernel_zero_eq_top :
   intro x
   simp [matrixKernel]
 
+/-- Second half of the `Fin 1` scaffolding: with `ker Ĥ₀ = ⊤` the kernel projection `P̂₀` is the
+identity matrix, because the star projection onto `⊤` is the identity map. -/
 private theorem fin1_kernelProjectionMatrix_zero_eq_one :
     kernelProjectionMatrix (0 : Matrix (Fin 1) (Fin 1) ℂ) = 1 := by
   refine Matrix.toEuclideanLin.injective ?_
