@@ -1,4 +1,5 @@
 import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationFeshbach
+import LatticeSystem.Tests.DegeneratePerturbationWitness
 
 /-!
 # Test coverage for the exact Feshbach equivalence (Tasaki Lemma 10.1, PR-3)
@@ -28,12 +29,15 @@ Also machine-checks the `λ = E = 0` degeneration of C3's `K` to eq. (10.1.20)'s
 PR-2's `IsReducedInverse.unique`), and two `Fin 1` counterexamples showing that `hFirstOrder`
 and `Γ ∈ (matrixKernel H0)ᗮ` are each independently load-bearing in C3 (design report §7.3/§7.4,
 risk R3): dropping either hypothesis produces a genuine (not merely unproved) failure of the
-forward direction, witnessed concretely via `Submodule.starProjection_top`.
+forward direction, witnessed concretely via `Submodule.starProjection_top`. The `Fin 1`
+scaffolding those two counterexamples run on lives in `Tests/DegeneratePerturbationWitness.lean`,
+shared with the trial-state test file's `V = 0` corner.
 -/
 
 namespace LatticeSystem.Tests.DegeneratePerturbationFeshbach
 
 open LatticeSystem.Math Matrix
+open LatticeSystem.Tests.DegeneratePerturbationWitness
 open scoped ComplexOrder
 
 variable {n : Type*} [Fintype n] [DecidableEq n]
@@ -126,25 +130,6 @@ example {H0 V H0inv R : Matrix n n ℂ} (hH0 : H0.IsHermitian)
     simp
   rw [h00] at hR
   rw [hR.unique hInv0]
-
-/-- Shared `Fin 1` scaffolding for the two load-bearing counterexamples below: `H0 = 0`, so
-`ker Ĥ₀ = ⊤`, `P̂₀ = 1` (via `Submodule.starProjection_top`), and every reduced-inverse /
-projection hypothesis of C3 degenerates to trivial statements about the zero matrix. -/
-private theorem fin1_matrixKernel_zero_eq_top :
-    matrixKernel (0 : Matrix (Fin 1) (Fin 1) ℂ) = ⊤ := by
-  rw [Submodule.eq_top_iff']
-  intro x
-  simp [matrixKernel]
-
-/-- Second half of the `Fin 1` scaffolding: with `ker Ĥ₀ = ⊤` the kernel projection `P̂₀` is the
-identity matrix, because the star projection onto `⊤` is the identity map. -/
-private theorem fin1_kernelProjectionMatrix_zero_eq_one :
-    kernelProjectionMatrix (0 : Matrix (Fin 1) (Fin 1) ℂ) = 1 := by
-  refine Matrix.toEuclideanLin.injective ?_
-  rw [toEuclideanLin_kernelProjectionMatrix, fin1_matrixKernel_zero_eq_top,
-    Submodule.starProjection_top]
-  ext x
-  simp
 
 /-- **`hFirstOrder` is load-bearing in C3** (design report §7.3, risk R3): at `n = Fin 1`, take
 `H0 = 0`, `V = 1`, `lam = E = 1`, `R = 0` (a reduced inverse of `A(1,1) = 0`, since `P̂₀ = 1`

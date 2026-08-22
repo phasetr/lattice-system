@@ -118,8 +118,10 @@ import LatticeSystem.Tests.SPTSymmetryTransportedMPS
 import LatticeSystem.Tests.SPTMatrixProductIndex
 import LatticeSystem.Tests.DegeneratePerturbationSpectralGapForm
 import LatticeSystem.Tests.DegeneratePerturbationReducedResolvent
+import LatticeSystem.Tests.DegeneratePerturbationWitness
 import LatticeSystem.Tests.DegeneratePerturbationFeshbach
 import LatticeSystem.Tests.DegeneratePerturbationGroundEnergy
+import LatticeSystem.Tests.DegeneratePerturbationUniqueness
 
 /-!
 # Test aggregator for the `lattice-system` library
