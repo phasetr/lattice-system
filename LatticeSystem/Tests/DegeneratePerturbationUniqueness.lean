@@ -1,23 +1,10 @@
-import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationFeshbach
-import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationGroundEnergy
+import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationUniqueness
 import LatticeSystem.Tests.DegeneratePerturbationGroundEnergy
 
 /-!
 # Test coverage for ground-state one-dimensionality (Tasaki Lemma 10.1, PR-5)
 
-**RED (this PR only writes tests).** `Math/MatrixAnalysis/DegeneratePerturbationUniqueness.lean`
-does not exist yet; the five pins below cite declarations
-(`exists_norm_toEuclideanLin_le`, `abs_inner_secondOrderEffectiveHamiltonian_sub_mul_norm_sq_le`,
-`perturbedHamiltonian_eigenvector_eq_zero_of_inner_starProjection_eq_zero`,
-`exists_isUniqueGroundStateOn_perturbedHamiltonian`,
-`exists_lam0_isUniqueGroundStateOn_perturbedHamiltonian`) that PR-5's implementation has not yet
-introduced, so `lake build` fails on "unknown identifier" at each of them. This file therefore
-does **not** import the (nonexistent) `DegeneratePerturbationUniqueness` module; it imports only
-the already-merged PR-3/PR-4 tips, so every failure below is caused by a genuinely missing
-declaration and nothing else.
-
-Pins the API contract that
-`.self-local/reports/design-lemma101-pr5-ground-state-uniqueness.md` §3 commits to:
+Pins the API contract of `Math/MatrixAnalysis/DegeneratePerturbationUniqueness.lean`:
 
 1. **N1** `exists_norm_toEuclideanLin_le` — every matrix has an operator-norm bound on
    `EuclideanSpace ℂ n`.
@@ -106,18 +93,17 @@ example {H0 V H0inv : Matrix n n ℂ} {g v lam E : ℝ} {Φ Γ : EuclideanSpace 
   abs_inner_secondOrderEffectiveHamiltonian_sub_mul_norm_sq_le hH0 hV hInv hFirstOrder hgap hv
     hgpos hlam hEabs hsmall4 hΦ hΓ heig
 
-/-- Pins **U1**, kernel-triviality (design report §2 Step 2, §3 row U1): under the `δ`-gap of
-`Ĥeff` above its ground state `Φeff` inside `ker Ĥ₀`, the energy-order bound
-`E ≤ λ²Eeff + c₃λ³`, and smallness `(c₃ + C)λ < δ`, any `E`-eigenvector `Ξ` of `Ĥ(λ)` with
-`⟪Φeff, P₀Ξ⟫ = 0` is zero. -/
+/-- Pins **U1**, kernel-triviality (design report §2 Step 2, §3 row U1): under the smallness
+hypotheses of U0 (which U1 invokes), the `δ`-gap of `Ĥeff` above its ground state `Φeff` inside
+`ker Ĥ₀`, the energy-order bound `E ≤ λ²Eeff + c₃λ³`, and smallness `(c₃ + C)λ < δ`, any
+`E`-eigenvector `Ξ` of `Ĥ(λ)` with `⟪Φeff, P₀Ξ⟫ = 0` is zero. -/
 example {H0 V H0inv : Matrix n n ℂ} {g v lam E Eeff δ c₃ : ℝ} {Φeff Ξ : EuclideanSpace ℂ n}
     (hH0 : H0.IsHermitian) (hV : V.IsHermitian) (hInv : IsReducedInverse H0 H0inv)
     (hFirstOrder : kernelProjectionMatrix H0 * V * kernelProjectionMatrix H0 = 0)
     (hgap : ∀ u : EuclideanSpace ℂ n, u ∈ (matrixKernel H0)ᗮ →
       g * ‖u‖ ^ 2 ≤ RCLike.re (inner ℂ u (Matrix.toEuclideanLin H0 u)))
     (hv : ∀ u : EuclideanSpace ℂ n, ‖Matrix.toEuclideanLin V u‖ ≤ v * ‖u‖)
-    (hgpos : 0 < g) (hlam : 0 < lam)
-    (hδpos : 0 < δ)
+    (hgpos : 0 < g) (hlam : 0 < lam) (hEabs : |E| ≤ lam * v) (hsmall4 : 4 * (lam * v) ≤ g)
     (hδgap : ∀ w ∈ matrixKernel H0 ⊓ (Submodule.span ℂ {Φeff})ᗮ,
       (Eeff + δ) * ‖w‖ ^ 2
         ≤ RCLike.re (inner ℂ w (Matrix.toEuclideanLin
@@ -128,33 +114,31 @@ example {H0 V H0inv : Matrix n n ℂ} {g v lam E Eeff δ c₃ : ℝ} {Φeff Ξ :
     (hperp : (inner ℂ Φeff ((matrixKernel H0).starProjection Ξ) : ℂ) = 0) :
     Ξ = 0 :=
   perturbedHamiltonian_eigenvector_eq_zero_of_inner_starProjection_eq_zero hH0 hV hInv
-    hFirstOrder hgap hv hgpos hlam hδpos hδgap hEup hsmallδ hΞ hperp
+    hFirstOrder hgap hv hgpos hlam hEabs hsmall4 hδgap hEup hsmallδ hΞ hperp
 
 /-- Pins **U2** (design report §2 Step 3, §3 row U2): at a fixed `λ` satisfying the smallness
-hypotheses (`0 < λ ≤ 1`, `4λv ≤ g`, `(c₃+C)λ < δ`) and given the energy-order bound `hc₃` for
+hypotheses (`0 < λ`, `4λv ≤ g`, `(c₃+C)λ < δ`) and given the energy-order bound `hc₃` for
 every ground eigenvalue on the whole space, `Ĥ(λ)` has a unique ground state on `⊤`. -/
 example {H0 V H0inv : Matrix n n ℂ} {g v lam Eeff δ c₃ : ℝ} {Φeff : EuclideanSpace ℂ n}
-    (hH0 : H0.IsHermitian) (hV : V.IsHermitian) (hInv : IsReducedInverse H0 H0inv)
+    (hH0pos : H0.PosSemidef) (hV : V.IsHermitian) (hInv : IsReducedInverse H0 H0inv)
     (hFirstOrder : kernelProjectionMatrix H0 * V * kernelProjectionMatrix H0 = 0)
     (hgap : ∀ u : EuclideanSpace ℂ n, u ∈ (matrixKernel H0)ᗮ →
       g * ‖u‖ ^ 2 ≤ RCLike.re (inner ℂ u (Matrix.toEuclideanLin H0 u)))
     (hv : ∀ u : EuclideanSpace ℂ n, ‖Matrix.toEuclideanLin V u‖ ≤ v * ‖u‖)
-    (hgpos : 0 < g) (hδpos : 0 < δ)
+    (hgpos : 0 < g)
     (hδgap : ∀ w ∈ matrixKernel H0 ⊓ (Submodule.span ℂ {Φeff})ᗮ,
       (Eeff + δ) * ‖w‖ ^ 2
         ≤ RCLike.re (inner ℂ w (Matrix.toEuclideanLin
             (secondOrderEffectiveHamiltonian H0 V H0inv) w)))
     (hΦeff : Φeff ∈ matrixKernel H0) (hnorm : ‖Φeff‖ = 1)
-    (hEeff : Matrix.toEuclideanLin (secondOrderEffectiveHamiltonian H0 V H0inv) Φeff
-      = (Eeff : ℂ) • Φeff)
-    (hlam : 0 < lam) (hlam1 : lam ≤ 1) (hsmall4 : 4 * (lam * v) ≤ g)
+    (hlam : 0 < lam) (hsmall4 : 4 * (lam * v) ≤ g)
     (hsmallδ : (c₃ + 4 * v ^ 3 / g ^ 2) * lam < δ)
     (hc₃ : ∀ E : ℝ, IsGroundEigenvalueOn (⊤ : Submodule ℂ (EuclideanSpace ℂ n))
       (perturbedHamiltonian H0 V lam) E → E ≤ lam ^ 2 * Eeff + c₃ * lam ^ 3) :
     ∃ E φ, IsUniqueGroundStateOn (⊤ : Submodule ℂ (EuclideanSpace ℂ n))
       (perturbedHamiltonian H0 V lam) E φ :=
-  exists_isUniqueGroundStateOn_perturbedHamiltonian hH0 hV hInv hFirstOrder hgap hv hgpos hδpos
-    hδgap hΦeff hnorm hEeff hlam hlam1 hsmall4 hsmallδ hc₃
+  exists_isUniqueGroundStateOn_perturbedHamiltonian hH0pos hV hInv hFirstOrder hgap hv hgpos
+    hδgap hΦeff hnorm hlam hsmall4 hsmallδ hc₃
 
 /-- Pins **U3** (design report §2 Step 4, §3 row U3), **the PR's headline result**: exactly the
 first conjunct of `tasaki_lemma_10_1_degenerate_perturbation`'s conclusion, under exactly the
@@ -208,10 +192,8 @@ theorem twoSite_hEffGS : IsUniqueGroundStateOn (matrixKernel twoSiteH0)
     obtain ⟨c, rfl⟩ := hψK
     exact ⟨c, rfl⟩
 
-/-- **Uses U3** at the two-site witness: `twoSite_hEffGS` instantiates U3's hypothesis
-non-vacuously, so once U3 exists it produces a genuine `λ₀ > 0` for the two-site model. This
-`example` fails today only because `exists_lam0_isUniqueGroundStateOn_perturbedHamiltonian` is not
-yet defined (the Red condition for U3), not because of the witness computation above. -/
+/-- **Uses U3** at the two-site witness: `twoSite_hEffGS` instantiates U3's hypothesis bundle
+non-vacuously, so U3 produces a genuine `λ₀ > 0` for the two-site model. -/
 example : ∃ lam0 : ℝ, 0 < lam0 ∧ ∀ lam : ℝ, 0 < lam → lam < lam0 →
     ∃ E φ, IsUniqueGroundStateOn (⊤ : Submodule ℂ (EuclideanSpace ℂ (Fin 2)))
       (perturbedHamiltonian twoSiteH0 twoSiteV lam) E φ :=

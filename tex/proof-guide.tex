@@ -5487,6 +5487,87 @@ first-order condition, and the lower half is read off a ground eigenvector.
 Every result of this layer is axiom-free;
 \texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation} itself is unaffected.
 
+\medskip
+\noindent\textbf{Ground-state one-dimensionality for small $\lambda$} (Tasaki
+§10.1, p.~347, eqs.~(10.1.21)--(10.1.22), the closing paragraph of the proof of
+Lemma 10.1), in the file
+\texttt{Math/MatrixAnalysis/DegeneratePerturbationUniqueness.lean}.
+\emph{Provenance.} Tasaki closes his proof by \emph{counting}: ``Because the
+states $|\Xi_j(0)\rangle$ with $j = 1, \dots, D_0$ are linearly independent, one
+of them must coincide with $|\Phi_{\rm eff\text{-}GS}\rangle$ \dots\ Recalling
+that $\varepsilon_j > \varepsilon_1$ for any $j = 2, \dots, D_0$ by assumption,
+and $\varepsilon_j = \lim_{\lambda \to 0} E_j(\lambda)/\lambda^2$, we find that
+$|\Xi_1(\lambda)\rangle$ is the unique ground state of $\hat H(\lambda)$ for
+sufficiently small $\lambda$.'' That paragraph rests on the proof's opening
+Rellich--Kato input (``By continuity there are exactly $D_0$ independent
+eigenstates \dots\ each \dots\ depends continuously on $\lambda$'', asserted
+without proof), on a count over the $D_0$ continuous branches, and on the limit
+$\varepsilon_j = \lim E_j(\lambda)/\lambda^2$. \emph{None of these is used
+here}: no continuity, no branch counting, no $\lambda \to 0$ limit, no $D_0$.
+The present layer is an \emph{independent elementary route} to the same
+conclusion, and reading it as a formalization of the book's argument would be a
+false attribution. First,
+\texttt{exists\_norm\_toEuclideanLin\_le} retires the arc's standing
+operator-bound hypothesis: every $V \in \mathrm{Mat}_n(\mathbb C)$ satisfies
+$\|\hat V u\| \le v\|u\|$ with $v = \|\texttt{Matrix.toEuclideanCLM}\,V\|$, so
+no norm instance on matrices is ever committed to. Next,
+\texttt{abs\_inner\_secondOrderEffectiveHamiltonian\_sub\_mul\_norm\_sq\_le} is
+the quadratic-form engine and the layer's only analytic step: pairing the
+\emph{exact} effective eigenvalue equation
+$\lambda^2 K(\lambda,E)|\Phi\rangle = E|\Phi\rangle$ with $|\Phi\rangle$ gives
+$\lambda^2\,{\rm re}\langle \Phi, K(\lambda,E)\Phi\rangle = E\|\Phi\|^2$ with no
+division by $\lambda^2$, and the bound
+$\|K(\lambda,E)u - \hat H_{\rm eff}u\| \le (4v^3/g^2)|\lambda|\,\|u\|$ transfers
+it to $\hat H_{\rm eff}$ at one extra power of $\lambda$:
+$|\lambda^2\,{\rm re}\langle \Phi, \hat H_{\rm eff}\Phi\rangle - E\|\Phi\|^2|
+ \le (4v^3/g^2)\lambda^3\|\Phi\|^2$
+for an exact $(\Phi,\Gamma)$-split $E$-eigenvector of $\hat H(\lambda)$, at each
+fixed $\lambda$ rather than in a limit. Combining it with the $\delta$-gap of
+$\hat H_{\rm eff}$ above $\Phi_{\rm eff}$ inside $\ker \hat H_0$ and with the
+variational bound $E \le \lambda^2 E_{\rm eff} + c_3\lambda^3$,
+\texttt{perturbedHamiltonian\_eigenvector\_eq\_zero\_of\_inner\_starProjection\_eq\_zero}
+shows that an $E$-eigenvector $\Xi$ with
+$\langle \Phi_{\rm eff}, \hat P_0\Xi\rangle = 0$ vanishes: a nonzero
+$\Phi = \hat P_0\Xi$ would give both
+$\lambda^2(E_{\rm eff}+\delta)\|\Phi\|^2 \le
+ \lambda^2\,{\rm re}\langle \Phi, \hat H_{\rm eff}\Phi\rangle$
+and
+$\lambda^2\,{\rm re}\langle \Phi, \hat H_{\rm eff}\Phi\rangle \le
+ (\lambda^2 E_{\rm eff} + (c_3 + 4v^3/g^2)\lambda^3)\|\Phi\|^2$,
+hence $\delta \le (c_3 + 4v^3/g^2)\lambda$, contradicting smallness; so
+$\hat P_0\Xi = 0$, and the Feshbach reconstruction kills $\Xi$ itself. That
+turns into uniqueness at a fixed small $\lambda$
+(\texttt{exists\_isUniqueGroundStateOn\_perturbedHamiltonian}) by an
+\emph{antisymmetric linear combination}: with
+$a(\psi) = \langle \Phi_{\rm eff}, \hat P_0\psi\rangle$, which is
+$\mathbb C$-linear because $\hat P_0$ is a continuous linear map and the inner
+product is linear in its second slot, the vector
+$a(\varphi)\psi - a(\psi)\varphi$ is again an $E$-eigenvector and has $a = 0$,
+hence vanishes, so every $E$-eigenvector is a multiple of the normalized ground
+eigenvector $\varphi$. This combination is \emph{not} in the book; it is what
+replaces the count over the $D_0$ branches. Finally
+\texttt{exists\_lam0\_isUniqueGroundStateOn\_perturbedHamiltonian} packages the
+threshold: under exactly the hypotheses of
+\texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation} (minus the redundant
+Hermiticity of $\hat H_0$ and the \texttt{Nonempty} instance) it produces
+$g > 0$, $v$, $\delta > 0$ and $c_3 \ge 0$ internally and sets
+$\lambda_0 = \min\{1,\ g/(4v+1),\ \delta/(c_3+C+1)\}$ with $C = 4v^3/g^2$ --- the
+$+1$'s keeping the quotients well-formed at $v = 0$ and at $c_3 = C = 0$ --- so
+that $\hat H(\lambda)$ has a unique ground state on the whole space for every
+$\lambda \in (0,\lambda_0)$. That statement is the first conjunct of the axiom's
+conclusion. Non-vacuity and necessity are machine-checked in
+\texttt{Tests/DegeneratePerturbationUniqueness.lean}: the two-site witness
+($\hat H_0 = {\rm diag}(0,1)$, $\hat V = {\rm offdiag}(1,1)$,
+$\hat H_{\rm eff} = {\rm diag}(-1,0)$, $\Phi_{\rm eff} = e_0$) discharges the
+unique-ground-state hypothesis on $\ker \hat H_0$ in full and instantiates the
+packaged statement, while a four-dimensional witness
+($\hat H_0 = {\rm diag}(0,0,1,1)$, $\hat V$ coupling $e_0 \leftrightarrow e_2$
+and $e_1 \leftrightarrow e_3$ with unit weight, $\hat H_{\rm eff} = -\mathbb 1_2$
+on $\ker \hat H_0$) exhibits a genuinely degenerate $\hat H_{\rm eff}$ at which
+that hypothesis fails, showing it is not droppable. Every result of this layer
+is axiom-free;
+\texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation} itself is unaffected.
+
 %======================================================================
 \subsection{Lieb's theorem for the attractive Hubbard model (Tasaki §10.2.1, Theorems 10.2 \& 10.3)}
 \label{subsec:lieb-attractive}
