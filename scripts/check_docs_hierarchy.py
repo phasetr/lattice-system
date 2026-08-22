@@ -710,7 +710,7 @@ def approved_changes(text: str) -> str:
             "**PR #4955 (general-sector PR-1)**. | "
             "`Fermion/JordanWigner/Hubbard/LiebRepulsiveBalancedGround.lean` |",
             "Half-integer `m` (odd `Ne`) is out of scope (Theorem 10.2 requires `Even Ne`). "
-            "**Number-operator eigenvalue** (Issue #5320, PR #5320 PR-1): because Theorem 10.2's "
+            "**Number-operator eigenvalue** (Issue #5320, PR #5321 PR-1): because Theorem 10.2's "
             "attractive ground state is a spin singlet, its transport lands in the fixed "
             "`(N+1)`-electron (half-filling) sector on every spin-`z` sector — `N̂ φ = (N+1)·φ` — "
             "independently of `Ne`. **PR #4955 (general-sector PR-1)**. | "

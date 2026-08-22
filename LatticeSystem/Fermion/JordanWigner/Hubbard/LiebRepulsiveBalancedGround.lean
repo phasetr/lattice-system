@@ -93,8 +93,10 @@ this is what Theorem 10.5 (Shen–Qiu–Tian) consumes on the general spin-`z` s
 **Number-operator eigenvalue (PR-1 extension).** Because Theorem 10.2's attractive ground state
 `φ_attr` is a spin singlet (`Ŝ² φ_attr = 0`), its spin-`z` eigenvalue is forced to `0`
 (`Ŝ³ φ_attr = 0`); transporting this through the Shiba charge exchange
-(`Û N̂ Ûᴴ = Ûᴴ N̂ Û = 2 Ŝ³ + (N+1)·1`, both directions agree because `N̂` is diagonal in the
-occupation basis and the modulus-one sign dressing cancels under either conjugation order) gives
+(`Û N̂ Ûᴴ = Ûᴴ N̂ Û = 2 Ŝ³ + (N+1)·1`; the two conjugation orders agree because the Shiba flip is
+an **involution** — `shibaPermMatrix` is Hermitian with `P · P = 1`, so the diagonal `N̂` is
+reindexed by the *same* map `shibaConfig` either way, the modulus-one sign dressing cancelling in
+both orders) gives
 `N̂ φ = (N+1) · φ`: **every** transported ground state, on **every** spin-`z` sector `Ŝ³ = m`,
 sits in the fixed `(N+1)`-electron (half-filling) sector, independently of the electron number
 `Ne` used to select the attractive-model sector it is transported from.  (Note: this is `N+1`,
@@ -328,8 +330,8 @@ theorem repulsiveSpinZSector_ground_unique (N Ne : ℕ)
       _ = Ush.mulVec (c • f) := by rw [hcofLp]
       _ = c • Ush.mulVec f := by rw [Matrix.mulVec_smul]
   refine ⟨Eattr - cR, ψ, φattr, ⟨hψmem, hψnorm, hEeig, hground, huniq⟩, hψofLp, hpair, ?_⟩
-  -- `N̂` is diagonal in the occupation basis, so both conjugation orders reindex it by the same
-  -- Shiba flip: `Ûᴴ N̂ Û = Û N̂ Ûᴴ = 2 Ŝ³ + (N+1)·1`.
+  -- The Shiba flip is an involution (`shibaPermMatrix` Hermitian, `P · P = 1`), so the diagonal
+  -- `N̂` is reindexed by the same map in both orders: `Ûᴴ N̂ Û = Û N̂ Ûᴴ = 2 Ŝ³ + (N+1)·1`.
   have hNsym : Matrix.conjTranspose Ush * fermionTotalNumber (2 * N + 1) * Ush
       = (2 : ℂ) • fermionTotalSpinZ N + ((N : ℂ) + 1) • 1 := by
     rw [← shibaSignedUnitary_conj_totalNumber (shibaSignFn A) hs, fermionTotalNumber_eq_diagonal,
@@ -356,7 +358,12 @@ repulsive interaction `Ĥint^{unif} = U Σ_x n̂_{x,↑} n̂_{x,↓}` by the sca
 coincides with the `(E − c)`-ground submodule of the uniform-interaction Hamiltonian on the same
 sector: the two variants have the **same** ground submodule (up to the constant energy shift
 `c`), justifying the reduction of the uniform case (10.2.5) to the symmetric case (10.2.6) used in
-Tasaki's proof of Theorem 10.4. -/
+Tasaki's proof of Theorem 10.4.
+
+Scope: `hubbardGroundSubmoduleAtElectronNumber` is the `E`-eigenspace intersected with the
+`Ne`-electron sector and carries **no** minimality of `E`, so what this transports between the two
+variants is the eigenspace equality alone; transporting ground-state minimality (that the shifted
+`E − c` is the least sector eigenvalue) is a separate step. -/
 theorem symmetricRepulsiveHubbardHamiltonian_groundSubmodule_eq_uniform
     (N : ℕ) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (U : ℝ) (Ne : ℕ) (E : ℂ) :
     hubbardGroundSubmoduleAtElectronNumber
@@ -373,8 +380,7 @@ theorem symmetricRepulsiveHubbardHamiltonian_groundSubmodule_eq_uniform
           - (((U : ℂ) / 2) • fermionUpNumber N x + ((U : ℂ) / 2) • fermionDownNumber N x)
           + ((U : ℂ) / 4) • (1 : ManyBodyOp (Fin (2 * N + 2))) := by
     intro x
-    simp only [Matrix.sub_mul, Matrix.mul_sub, Matrix.smul_mul, Matrix.mul_smul, Matrix.one_mul,
-      Matrix.mul_one]
+    rw [symmetricHubbardOnSite_expand]
     module
   -- Eq. (10.2.9): summing over the `N+1` sites, `Ĥint^{sym} = Ĥint^{unif} − (U/2) N̂ + (U/4)|Λ|`.
   have hint : symmetricRepulsiveHubbardInteraction N (fun _ => U)
