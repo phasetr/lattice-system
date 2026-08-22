@@ -39,12 +39,15 @@ Also machine-checks two instances built from explicit matrices:
 * the **`V = 0` corner** (design report §8, item 2): at `H0 = V = H0inv = 0` (`n = Fin 1`),
   `matrixKernel 0 = ⊤`, `hFirstOrder` holds trivially, and L1's residual identity degenerates to
   `0 = 0`, exercising the degenerate `ker Ĥ₀ = ⊤` branch;
-* the **two-site witness** (`n = Fin 2`, Tasaki p. 346): `Ĥ₀ = diag(0,1)`, `V̂ = offdiag(1,1)`,
+* the **two-site witness** (`n = Fin 2`): `Ĥ₀ = diag(0,1)`, `V̂ = offdiag(1,1)`,
   `Ĥ₀⁻¹ = diag(0,1)`, `Φeff = e₀`, for which `ker Ĥ₀ = ℂe₀`, `P̂₀ = diag(1,0)`,
-  `Ĥeff = diag(−1,0)`, `Eeff = −1` and `u = e₁`. It discharges the *entire* hypothesis bundle of
-  L4 and L5 on explicit data, so neither statement is vacuous; fused with B2 (which supplies the
-  ground eigenvalue) both become unconditional. The design report placed this witness in PR-6 and
-  recorded either placement as defensible (§10, item 4); it is built here.
+  `Ĥeff = diag(−1,0)`, `Eeff = −1` and `u = e₁`. It is the `β = γ` symmetric subspace of the
+  singlet sector of Tasaki's two-electron two-site Hubbard model (pp. 341–342, eq. (10.1.1)) at
+  `U = 1`, `t = λ/2`, with `Ĥ₀` the on-site interaction and `V̂` the hopping. It discharges the
+  *entire* hypothesis bundle of L4 and L5 on explicit data, so neither statement is vacuous; fused
+  with B2 (which supplies the ground eigenvalue) both become unconditional. The design report
+  placed this witness in PR-6 and recorded either placement as defensible (§10, item 4); it is
+  built here.
 
 **Not covered here (deliberately, per the design report):**
 * Any counterexample family showing `lam ≤ 1` is load-bearing in L4 — the design report classifies
@@ -185,7 +188,8 @@ private theorem fin1_isReducedInverse_zero_zero :
 /-- **`V = 0` corner** (design report §8 item 2): at `H0 = V = H0inv = 0` on `n = Fin 1`,
 `matrixKernel 0 = ⊤`, `hFirstOrder` holds trivially, and L1's exact residual identity
 degenerates to `Ĥ(λ)Φ = 0 = −λ²•0`. Exercises the degenerate `ker Ĥ₀ = ⊤` branch that the
-two-site non-vacuity witness (deferred to PR-6) does not cover. -/
+two-site non-vacuity witness built below does not cover, its kernel being the proper line
+`ℂe₀`. -/
 example {lam : ℝ} {Φ : EuclideanSpace ℂ (Fin 1)}
     (hΦ : Φ ∈ matrixKernel (0 : Matrix (Fin 1) (Fin 1) ℂ)) :
     Matrix.toEuclideanLin (perturbedHamiltonian (0 : Matrix (Fin 1) (Fin 1) ℂ) 0 lam)
@@ -196,11 +200,15 @@ example {lam : ℝ} {Φ : EuclideanSpace ℂ (Fin 1)}
             (Matrix.toEuclideanLin (0 : Matrix (Fin 1) (Fin 1) ℂ) Φ)) :=
   toEuclideanLin_perturbedHamiltonian_trialVector hΦ (by simp) fin1_isReducedInverse_zero_zero
 
-/-! ### The two-site witness (`n = Fin 2`, Tasaki p. 346)
+/-! ### The two-site witness (`n = Fin 2`; Tasaki pp. 341–342, eq. (10.1.1))
 
 `Ĥ₀ = diag(0,1)`, `V̂ = offdiag(1,1)`, `Ĥ₀⁻¹ = diag(0,1)`, `Φeff = e₀`: the smallest model with a
-nonzero perturbation obeying `P̂₀V̂P̂₀ = 0`. Every hypothesis of L4 and L5 is discharged on this
-data below, which is what makes those two statements non-vacuous. -/
+nonzero perturbation obeying `P̂₀V̂P̂₀ = 0`. It is the `β = γ` symmetric subspace of the singlet
+sector (eq. (10.1.3)) of the book's two-electron two-site Hubbard model at `U = 1`, `t = λ/2`,
+where `e₀` is the singly occupied singlet, `e₁` the symmetric doubly occupied state at interaction
+energy `U`, and `V̂` the hopping; correspondingly `λ²Eeff = −λ²` reproduces the book's
+`E_GS ≃ −4t²/U`. Every hypothesis of L4 and L5 is discharged on this data below, which is what
+makes those two statements non-vacuous. -/
 
 /-- The witness unperturbed Hamiltonian `Ĥ₀ = diag(0,1)`: kernel `ℂe₀`, unit gap above it. Since
 `Ĥ₀` acts as the identity on `(ker Ĥ₀)ᗮ = ℂe₁`, it is also its own reduced inverse
@@ -418,8 +426,10 @@ so the documented closed form `c₃ = |re⟪u, V̂u⟫| + |Eeff| ‖u‖²` is p
 two-site data it is `0 + 1·1 = 1`, and the bound `E ≤ −λ² + λ³` with *that* explicit constant
 holds. The proof reruns L4's argument concretely — B1 applied to the trial vector, whose exact
 energy is `−λ²` (L2) and whose squared norm is `1 + λ²` — so it also checks the two identities the
-constant comes from. Tasaki's exact ground energy `(1 − √(1+4λ²))/2` for this model sits just
-below the bound, which is therefore sharp rather than slack. -/
+constant comes from. The exact ground energy of `Ĥ(λ) = !![0, λ; λ, 1]` is `(1 − √(1+4λ²))/2`,
+which is the book's `E_GS = {U − √(U²+16t²)}/2` (pp. 341–342) at `U = 1`, `t = λ/2`; its expansion
+`−λ² + λ⁴ + O(λ⁶)` shows the bound's leading `λ²` coefficient is sharp, while the whole `λ³` term
+is slack (at `λ = 1` the bound reads `0` against the exact `(1 − √5)/2 ≈ −0.618`). -/
 example (lam E : ℝ) (hlam : 0 < lam) (hlam1 : lam ≤ 1)
     (hE : IsGroundEigenvalueOn (⊤ : Submodule ℂ (EuclideanSpace ℂ (Fin 2)))
       (perturbedHamiltonian twoSiteH0 twoSiteV lam) E) :
