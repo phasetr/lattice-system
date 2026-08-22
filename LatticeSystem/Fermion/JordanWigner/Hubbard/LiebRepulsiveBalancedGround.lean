@@ -33,10 +33,12 @@ state `φ_attr`, energy `E_attr`) transports to the repulsive-model **spin-`z`**
 sector; only the scalars `Ne`/`m` change.)
 
 Because `Û` maps the spin SU(2) algebra to the η-pseudospin algebra (`Û Ŝ² Ûᴴ ≠ Ŝ²`), the
-attractive singlet is **not** transported to a spin singlet; the repulsive total-spin value
-requires the degenerate perturbation theory (a deferred axiom).  Accordingly this capstone claims
-**only** the spin-`z`-sector ground-state uniqueness, not any total-spin value.  Half-integer `m`
-(odd `Ne`) is out of scope: Theorem 10.2 requires `Even Ne`.
+attractive singlet is **not** transported to a spin singlet; identifying the repulsive total-spin
+value needs the (finite-dimensional) degenerate perturbation theory of Lemma 10.1
+(`tasaki_lemma_10_1_degenerate_perturbation`, itself proved axiom-free).  Accordingly this capstone
+claims the spin-`z`-sector ground-state uniqueness together with the half-filling number eigenvalue
+`N̂ φ = (N+1)·φ`, but no total-spin value.  Half-integer `m` (odd `Ne`) is out of scope:
+Theorem 10.2 requires `Even Ne`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §10.2.2 (Theorem 10.4), eqs. (10.2.10)/(10.2.11), pp. 350–352; E. H. Lieb,
@@ -77,7 +79,8 @@ repulsive Hubbard Hamiltonian `Ĥ^{rep,sym}` has a **unique** ground state on th
 `Ŝ³ = m` with `m = (Ne − (N+1))/2`.
 
 The total-spin value is **not** claimed: the Shiba unitary sends `Ŝ²` to the η-pseudospin Casimir,
-so identifying the repulsive total spin needs the deferred degenerate perturbation theory.
+so identifying the repulsive total spin needs the (finite-dimensional) degenerate perturbation
+theory of Lemma 10.1 (`tasaki_lemma_10_1_degenerate_perturbation`, proved axiom-free).
 
 Proof: transport the attractive-model number-sector unique ground state (Theorem 10.2,
 `theorem_10_2_lieb_attractive_unique_singlet`, applied to `T + diag(U/2)` with electron number
@@ -199,28 +202,22 @@ theorem repulsiveSpinZSector_ground_unique (N Ne : ℕ)
     have h1 := bwd (fermionTotalSpinSquared N) (0 : ℂ) φattr h0
     rwa [zero_smul] at h1
   have hS3f : (fermionTotalSpinZ N).mulVec f = 0 := by
-    -- `Ŝ² = (Ŝ⁽¹⁾ᴴŜ⁽¹⁾ + Ŝ⁽²⁾ᴴŜ⁽²⁾) + (Ŝ³)ᴴŜ³` is a sum of positive semidefinite blocks, so a
-    -- null vector of the Casimir is a null vector of the `Ŝ³` block.
-    set P12 : ManyBodyOp (Fin (2 * N + 2)) :=
-      Matrix.conjTranspose (tJTotalSpinOne N) * tJTotalSpinOne N
-        + Matrix.conjTranspose (tJTotalSpinTwo N) * tJTotalSpinTwo N with hP12
-    set P3 : ManyBodyOp (Fin (2 * N + 2)) :=
-      Matrix.conjTranspose (fermionTotalSpinZ N) * fermionTotalSpinZ N with hP3
-    have hsplit : fermionTotalSpinSquared N = P12 + P3 := by
-      rw [hP12, hP3, (tJTotalSpinOne_isHermitian N).eq, (tJTotalSpinTwo_isHermitian N).eq,
-        (fermionTotalSpinZ_isHermitian N).eq, fermionTotalSpinSquared_eq_cartesianSqSum]
-    have h12 : (0 : ℂ) ≤ star f ⬝ᵥ P12.mulVec f :=
-      Matrix.PosSemidef.dotProduct_mulVec_nonneg
-        ((Matrix.posSemidef_conjTranspose_mul_self _).add
-          (Matrix.posSemidef_conjTranspose_mul_self _)) f
-    have h3 : (0 : ℂ) ≤ star f ⬝ᵥ P3.mulVec f :=
-      Matrix.PosSemidef.dotProduct_mulVec_nonneg (Matrix.posSemidef_conjTranspose_mul_self _) f
-    have hsum : star f ⬝ᵥ P12.mulVec f + star f ⬝ᵥ P3.mulVec f = 0 := by
-      rw [← dotProduct_add, ← Matrix.add_mulVec, ← hsplit, hCasf, dotProduct_zero]
-    have h3zero : star f ⬝ᵥ P3.mulVec f = 0 :=
-      le_antisymm (by rw [← hsum]; exact le_add_of_nonneg_left h12) h3
-    rw [hP3, ← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, ← Matrix.star_mulVec] at h3zero
-    exact dotProduct_star_self_eq_zero.mp h3zero
+    -- `Ŝ² = (Ŝ⁽¹⁾)² + (Ŝ⁽²⁾)² + (Ŝ³)²` is a Cartesian square sum of Hermitian generators, so a
+    -- null vector of the Casimir is a null vector of each component (Tasaki Lemma A.11).
+    set J : Fin 3 → ManyBodyOp (Fin (2 * N + 2)) :=
+      ![tJTotalSpinOne N, tJTotalSpinTwo N, fermionTotalSpinZ N] with hJ
+    have hherm : ∀ α ∈ (Finset.univ : Finset (Fin 3)), (J α).IsHermitian := by
+      intro α _
+      fin_cases α
+      · simpa [hJ] using tJTotalSpinOne_isHermitian N
+      · simpa [hJ] using tJTotalSpinTwo_isHermitian N
+      · simpa [hJ] using fermionTotalSpinZ_isHermitian N
+    have hcas : ∑ α ∈ (Finset.univ : Finset (Fin 3)), J α * J α = fermionTotalSpinSquared N := by
+      rw [fermionTotalSpinSquared_eq_cartesianSqSum, hJ, Fin.sum_univ_three]
+      simp
+    have hz := mulVec_eq_zero_of_sq_sum_inner_zero (Φ := f) (Finset.univ : Finset (Fin 3)) J hherm
+      (by rw [hcas, hCasf, dotProduct_zero]) 2 (Finset.mem_univ 2)
+    simpa [hJ] using hz
   -- The transported state `ψ = Û φ_attr`.
   set ψ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2) := WithLp.toLp 2 (Ush.mulVec f) with hψdef
   have hψofLp : ψ.ofLp = Ush.mulVec f := rfl

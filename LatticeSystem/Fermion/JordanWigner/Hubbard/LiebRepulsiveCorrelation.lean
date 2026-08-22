@@ -32,7 +32,8 @@ positive; the diagonal (`x = y`) contribution is `‖ĉ†_{x↑} ĉ†_{x↓} �
 The unique ground state on the **general spin-`z` sector `Ŝ³ = m`** (`m = (Ne − (N+1))/2`, even
 `Ne`) is handled via Theorem 10.4's general-sector uniqueness
 `repulsiveSpinZSector_ground_unique`.  Only the correlation sign is claimed; the total-spin value
-is **not** asserted (that needs the deferred degenerate perturbation theory).  The balanced
+is **not** asserted (that needs the (finite-dimensional) degenerate perturbation theory of
+Lemma 10.1, `tasaki_lemma_10_1_degenerate_perturbation`, proved axiom-free).  The balanced
 `Ŝ³ = 0` sector is the `Ne = N + 1` special case.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer

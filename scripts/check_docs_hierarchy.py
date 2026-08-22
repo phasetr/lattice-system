@@ -716,6 +716,14 @@ def approved_changes(text: str) -> str:
             "independently of `Ne`. **PR #4955 (general-sector PR-1)**. | "
             "`Fermion/JordanWigner/Hubbard/LiebRepulsiveBalancedGround.lean` |",
         )
+        # The §10.1 arc (#5313) proved Lemma 10.1, so the total-spin caveat of the Theorem 10.4
+        # spin-`z`-sector row no longer points at a deferred axiom: what is still missing is the
+        # application of the (now proved) finite-dimensional degenerate perturbation theory.
+        .replace(
+            "identifying it needs the deferred degenerate perturbation axiom.",
+            "identifying it needs the (finite-dimensional) degenerate perturbation theory of "
+            "Lemma 10.1 (`tasaki_lemma_10_1_degenerate_perturbation`, proved axiom-free).",
+        )
     )
 
 
@@ -796,6 +804,12 @@ def normalize_current_moved_prose(start: int, end: int, current: str, old_lines:
         "proofs of weak-coupling continuation and adiabatic following for eigenstate families are "
         "**not undertaken** as an active project goal; such techniques naturally belong to a "
         "separate analytic-perturbation development",
+    ).replace(
+        # Issue #5004 was closed; the Theorem 10.4 discharge is now tracked in Issue #5320, so the
+        # ledger's pointer follows the open tracker.  Hard-wrapped, hence inverted after
+        # whitespace normalization like the correction above.
+        "full theorem discharge is tracked in Issue #5320.",
+        "full theorem discharge is tracked in Issue #5004.",
     )
 
 
