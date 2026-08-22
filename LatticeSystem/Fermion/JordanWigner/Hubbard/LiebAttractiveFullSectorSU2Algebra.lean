@@ -29,9 +29,11 @@ operators reused verbatim for the attractive Hubbard case.
   submodule closure.
 * `preservesHubbardSectorW_fermionTotalSpin{Plus,Minus,Z}`,
   `preservesHubbardSectorW_tJTotalSpin{One,Two}` — total-spin operators preserve the `Ne`-sector.
-* `configSectorCompress_smul`, `configSectorCompress_sub` — the compression is `ℂ`-linear.
+* `configSectorCompress_smul`, `configSectorCompress_sub`, `configSectorCompress_add` — the
+  compression is `ℂ`-linear.
 * `configSectorNumberCompress_mul_of_right_preserves` — the compression homomorphism
-  `compress(A) compress(B) = compress(A B)` when `B` preserves the `Ne`-sector.
+  `compress(A) compress(B) = compress(A B)` when `B` preserves the `Ne`-sector, the number-sector
+  instance of the generic `configSectorCompress_mul_of_preserves`.
 * `configSectorNumberCompress_su2_12/23/31` — the compressed generators satisfy the `su(2)`
   relations.
 * `configSectorNumberCompress_attractive_commute_one/two/three` — `Ĥ_W` commutes with each
@@ -127,57 +129,29 @@ theorem configSectorCompress_sub (P : (Fin (2 * N + 2) → Fin 2) → Prop) [Dec
   unfold configSectorCompress
   rw [Matrix.mul_sub, Matrix.sub_mul]
 
+/-- `compress` is additive: `compress(A + B) = compress(A) + compress(B)`. -/
+theorem configSectorCompress_add (P : (Fin (2 * N + 2) → Fin 2) → Prop) [DecidablePred P]
+    (A B : ManyBodyOp (Fin (2 * N + 2))) :
+    configSectorCompress N P (A + B) = configSectorCompress N P A + configSectorCompress N P B := by
+  unfold configSectorCompress
+  rw [Matrix.mul_add, Matrix.add_mul]
+
 /-! ## The compression homomorphism on the number sector -/
 
-/-- The projection `T Tᴴ` fixes `B T` when `B` preserves the `Ne`-sector `W` (each column
-`B |s⟩ ∈ W`). -/
-theorem configSectorNumberProjection_mul_of_preserves (Ne : ℕ)
-    {B : ManyBodyOp (Fin (2 * N + 2))} (hB : PreservesHubbardSectorW N Ne B) :
-    (configSectorEmbedding N (hubbardNumberSectorPred N Ne)
-          * (configSectorEmbedding N (hubbardNumberSectorPred N Ne))ᴴ)
-        * (B * configSectorEmbedding N (hubbardNumberSectorPred N Ne))
-      = B * configSectorEmbedding N (hubbardNumberSectorPred N Ne) := by
-  ext w s
-  have hcol : (fun x => (B * configSectorEmbedding N (hubbardNumberSectorPred N Ne)) x s)
-      = B.mulVec (basisVec s.val) := by
-    funext x; rw [Matrix.mul_apply]; rfl
-  have hmemW : B.mulVec (basisVec s.val) ∈ hubbardSectorWSubmodule N Ne :=
-    hB _ (basisVec_sector_mem Ne s)
-  have hsupp : ∀ ww, ¬ hubbardNumberSectorPred N Ne ww → B.mulVec (basisVec s.val) ww = 0 :=
-    hubbardNumberSector_supported_of_mem Ne hmemW
-  rw [Matrix.mul_apply,
-    show (∑ x, (configSectorEmbedding N (hubbardNumberSectorPred N Ne)
-            * (configSectorEmbedding N (hubbardNumberSectorPred N Ne))ᴴ) w x *
-          (B * configSectorEmbedding N (hubbardNumberSectorPred N Ne)) x s)
-        = ((configSectorEmbedding N (hubbardNumberSectorPred N Ne)
-            * (configSectorEmbedding N (hubbardNumberSectorPred N Ne))ᴴ).mulVec
-            (B.mulVec (basisVec s.val))) w from by
-      rw [Matrix.mulVec, dotProduct]
-      exact Finset.sum_congr rfl (fun x _ => by rw [congrFun hcol x]),
-    configSectorProjection_mulVec_eq_of_supported (hubbardNumberSectorPred N Ne) hsupp,
-    ← congrFun hcol w]
-
 /-- **Compression homomorphism (number sector).** `compress(A) compress(B) = compress(A B)` when
-`B` preserves the `Ne`-sector `W` (so the intermediate projection `T Tᴴ` between `A` and `B` is
-invisible). -/
+`B` preserves the `Ne`-sector `W`: a `W`-preserving operator sends each sector basis vector to a
+sector-supported vector, which is the entrywise hypothesis of the generic
+`configSectorCompress_mul_of_preserves`. -/
 theorem configSectorNumberCompress_mul_of_right_preserves (Ne : ℕ)
     (A : ManyBodyOp (Fin (2 * N + 2))) {B : ManyBodyOp (Fin (2 * N + 2))}
     (hB : PreservesHubbardSectorW N Ne B) :
     configSectorCompress N (hubbardNumberSectorPred N Ne) A
         * configSectorCompress N (hubbardNumberSectorPred N Ne) B
-      = configSectorCompress N (hubbardNumberSectorPred N Ne) (A * B) := by
-  unfold configSectorCompress
-  rw [show (configSectorEmbedding N (hubbardNumberSectorPred N Ne))ᴴ * A
-          * configSectorEmbedding N (hubbardNumberSectorPred N Ne)
-          * ((configSectorEmbedding N (hubbardNumberSectorPred N Ne))ᴴ * B
-            * configSectorEmbedding N (hubbardNumberSectorPred N Ne))
-        = (configSectorEmbedding N (hubbardNumberSectorPred N Ne))ᴴ * A
-          * ((configSectorEmbedding N (hubbardNumberSectorPred N Ne)
-              * (configSectorEmbedding N (hubbardNumberSectorPred N Ne))ᴴ)
-            * (B * configSectorEmbedding N (hubbardNumberSectorPred N Ne))) by
-      simp only [Matrix.mul_assoc],
-    configSectorNumberProjection_mul_of_preserves Ne hB]
-  simp only [Matrix.mul_assoc]
+      = configSectorCompress N (hubbardNumberSectorPred N Ne) (A * B) :=
+  configSectorCompress_mul_of_preserves _ A fun c c' hc hc' => by
+    have hzero := hubbardNumberSector_supported_of_mem Ne
+      (hB _ (basisVec_sector_mem Ne ⟨c, hc⟩)) c' hc'
+    rwa [mulVec_basisVec_apply] at hzero
 
 /-! ## The compressed `su(2)` relations -/
 
