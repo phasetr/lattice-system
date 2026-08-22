@@ -49,20 +49,21 @@ declarations):
   is the smallest one the author could verify by hand to genuinely produce a degenerate `Ĥeff`.
   The harder direction — that `Ĥ(λ)`'s ground state is *also* non-unique at this witness, which is
   what would show U3's *conclusion* fails once `hEffGS` is dropped — is **not** machine-checked
-  here; it is a hand computation only (design
-  report §11 item 5 permits deferring the harder half to PR-6 if it exceeds ~40 lines): by the
-  `0↔1, 2↔3` block-permutation symmetry of both `Ĥ₀` and `V̂`, `Ĥ(λ)` splits into two identical
-  `2×2` blocks `!![0, λ; λ, 1]` on `{e₀,e₂}` and `{e₁,e₃}`, so every eigenvalue of `Ĥ(λ)` — in
-  particular the ground eigenvalue `(1 − √(1+4λ²))/2` — occurs with multiplicity (at least) `2`,
-  with eigenvectors supported on disjoint coordinate pairs and hence not scalar multiples of one
-  another, for **every** `λ`, not just small `λ`. This hand computation is recorded here as the
-  necessity argument for `hEffGS`; formalizing it is left to PR-6 or a follow-up.
+  here; it is a hand computation only: by the `0↔1, 2↔3` block-permutation symmetry of both
+  `Ĥ₀` and `V̂`, `Ĥ(λ)` splits into two identical `2×2` blocks `!![0, λ; λ, 1]` on `{e₀,e₂}` and
+  `{e₁,e₃}`, so every eigenvalue of `Ĥ(λ)` — in particular the ground eigenvalue `(1 − √(1+4λ²))/2`
+  — occurs with multiplicity (at least) `2`, with eigenvectors supported on disjoint coordinate
+  pairs and hence not scalar multiples of one another, for **every** `λ`, not just small `λ`. This
+  hand computation is recorded here as the necessity argument for `hEffGS`; it is deliberately not
+  formalized, being off the critical path of Lemma 10.1 (it would cost an explicit `4×4` spectral
+  computation and pins nothing the capstone consumes).
 
 **Not covered here (deliberately):**
 * Any test of the explicit `λ₀` value `min 1 (min (g/(4v+1)) (δ/(c₃+C+1)))` — U3 packages `λ₀`
   existentially (design report §11 item 1), so no closed form is pinned.
-* `IsReducedInverse.unique`'s disposition (design report §6, §11 item 4) — left to PR-6's
-  tier-1 audit per the design report; not a PR-5 test concern.
+* `IsReducedInverse.unique` is exercised in `Tests/DegeneratePerturbationReducedResolvent.lean`,
+  where it plays its own role: it is the statement that Tasaki's notation `Ĥ₀⁻¹`, and hence
+  `Ĥeff` (10.1.20), is well defined even though the capstone takes `H0inv` as data.
 -/
 
 namespace LatticeSystem.Tests.DegeneratePerturbationUniqueness
@@ -146,9 +147,9 @@ example {H0 V H0inv : Matrix n n ℂ} {g v lam Eeff δ c₃ : ℝ} {Φeff : Eucl
   exists_isUniqueGroundStateOn_perturbedHamiltonian hH0pos hV hInv hFirstOrder hgap hv hgpos
     hδgap hΦeff hnorm hlam hsmall4 hsmallδ hc₃
 
-/-- Pins **U3** (design report §2 Step 4, §3 row U3), **the PR's headline result**: exactly the
-first conjunct of `tasaki_lemma_10_1_degenerate_perturbation`'s conclusion, under exactly the
-axiom's hypotheses (minus the redundant `hH0`/`[Nonempty n]`, design report §7 pitfall P-i). -/
+/-- Pins **U3**: exactly the first conjunct of `tasaki_lemma_10_1_degenerate_perturbation`'s
+conclusion, under exactly the capstone's hypotheses (minus the redundant
+`hH0`/`[Nonempty n]`). -/
 example {H0 V H0inv : Matrix n n ℂ} {Eeff : ℝ} {Φeff : EuclideanSpace ℂ n}
     (hH0pos : H0.PosSemidef) (hV : V.IsHermitian) (hInv : IsReducedInverse H0 H0inv)
     (hFirstOrder : kernelProjectionMatrix H0 * V * kernelProjectionMatrix H0 = 0)
@@ -382,10 +383,10 @@ example : gapWitnessH0.PosSemidef ∧ gapWitnessV.IsHermitian ∧
 `ker Ĥ₀ = span{e₀,e₁}`, so a candidate normalized ground state forces `Eeff = −1`, and then both
 `e₀` and `e₁` are `Eeff`-eigenvectors inside `ker Ĥ₀`; the uniqueness clause would make each of
 them a multiple of `Φeff`, which is impossible since `e₁`'s `0`-th coordinate vanishes while
-`e₀`'s does not. This is the necessity witness for `hEffGS` that design report §9 item 4 / §11
-item 5 asks for; the harder direction (that `Ĥ(λ)`'s ground state is *also* non-unique here, for
-every `λ`, by the `0↔1, 2↔3` block-permutation symmetry noted in the module doc) is a hand
-computation, deferred to PR-6. -/
+`e₀`'s does not. This is the necessity witness for `hEffGS` that design report §9 item 4 asks for;
+the harder direction (that `Ĥ(λ)`'s ground state is *also* non-unique here, for every `λ`, by the
+`0↔1, 2↔3` block-permutation symmetry noted in the module doc) is a hand computation that is
+deliberately not formalized, being off the critical path of Lemma 10.1. -/
 theorem counterexample_hEffGS_fails :
     ¬ ∃ (Eeff : ℝ) (Φeff : EuclideanSpace ℂ (Fin 4)),
         IsUniqueGroundStateOn (matrixKernel gapWitnessH0)

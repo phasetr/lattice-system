@@ -46,11 +46,17 @@ functional-analysis development; such a development may well be carried out
 **separately** (for instance contributed to `mathlib`), and these axioms simply
 **wait for that implementation**.
 
-- **Perturbation-theoretic results** (e.g., **Lemma 10.1** (Tasaki §10.1, degenerate
-perturbation theory) and singular-perturbation arguments in Chapter 10): the analytic
-proofs of weak-coupling continuation and adiabatic following for eigenstate families
-are **not undertaken** as an active project goal; such techniques naturally belong to
-a separate analytic-perturbation development. **Theorem 10.4** (Lieb's repulsive-Hubbard
+- **Perturbation-theoretic results** (e.g., the singular-perturbation and
+adiabatic-continuation arguments in Chapter 10, the cluster expansions behind
+**Theorem 7.3** and **Theorem 8.1**, and the quasi-adiabatic continuation behind
+**Theorem 8.9**): the analytic proofs of weak-coupling continuation and adiabatic
+following for eigenstate families are **not undertaken** as an active project goal;
+such techniques naturally belong to a separate analytic-perturbation development.
+The class is delimited by the *machinery* it needs — analytic eigenvalue-branch
+(Rellich–Kato) continuation, cluster/polymer expansions, volume-uniform estimates —
+and does **not** cover finite-dimensional degenerate perturbation theory at fixed
+finite volume, which is ordinary linear algebra and is proved (**Lemma 10.1** and the
+strong-coupling **Theorem A.12** are both axiom-free). **Theorem 10.4** (Lieb's repulsive-Hubbard
 half-filling ground state) currently has its entire content axiomatized: the global minimum
 energy, ground-state degeneracy, and total-spin values are all undischarged. (The fixed-Ŝ³-sector
 ground-state uniqueness has been proved; full theorem discharge is tracked in Issue #5004.)

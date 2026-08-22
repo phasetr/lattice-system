@@ -33,7 +33,8 @@ seven declarations pinned below is a transcription of that argument. They are th
 **elementary replacement** for it — built from the trial vector of eq. (10.1.18) and the plain
 Rayleigh–Ritz variational principle (B1/B2) — and every test below must be read as testing *that
 replacement*, not as testing "Tasaki's proof, formalized". The capstone
-`tasaki_lemma_10_1_degenerate_perturbation` itself stays a documented axiom until PR-6.
+`tasaki_lemma_10_1_degenerate_perturbation` is assembled from this layer in
+`Math/MatrixAnalysis/DegeneratePerturbationConvergence.lean`.
 
 Also machine-checks two instances built from explicit matrices:
 
@@ -176,13 +177,6 @@ example {H0 V : Matrix n n ℂ} {v lam E : ℝ} {Φeff : EuclideanSpace ℂ n}
       (perturbedHamiltonian H0 V lam) E) :
     |E| ≤ lam * v :=
   abs_isGroundEigenvalue_perturbedHamiltonian_le hH0pos hV hv hFirstOrder hΦeff hnorm hlam hE
-
-/-- The zero matrix is trivially a reduced inverse of itself: `ker 0 = ⊤`, so the kernel
-projection is the identity and every field of `IsReducedInverse` collapses to `0 = 0`. -/
-private theorem fin1_isReducedInverse_zero_zero :
-    IsReducedInverse (0 : Matrix (Fin 1) (Fin 1) ℂ) 0 := by
-  refine ⟨?_, ?_, ?_, ?_, Matrix.isHermitian_zero⟩ <;>
-    simp [fin1_kernelProjectionMatrix_zero_eq_one]
 
 /-- **`V = 0` corner** (design report §8 item 2): at `H0 = V = H0inv = 0` on `n = Fin 1`,
 `matrixKernel 0 = ⊤`, `hFirstOrder` holds trivially, and L1's exact residual identity

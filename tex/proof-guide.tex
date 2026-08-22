@@ -5337,14 +5337,32 @@ choice of normalized ground states converges to
 $|\Phi_{\rm eff\text{-}GS}\rangle$ as $\lambda \to 0^+$
 (\texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation}).
 
-\emph{Status.} The content is the analytic theory of degenerate
-perturbations (continuity of the low-lying eigenstates and the
-$\lambda \to 0^+$ limit); per the project policy (perturbation-theory
-proofs are not undertaken) it is recorded as a faithful documented
-\texttt{axiom}, the weak-coupling companion of the strong-coupling
-Theorem A.12 (\texttt{effectiveHamiltonian\_strongCoupling\_limit}). The
-projection $\hat P_0$ is constructed concretely and its
-Hermitian/idempotent properties are proved as consistency guards.
+\emph{Status.} Proved, axiom-free: \texttt{\#print axioms} returns exactly
+\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}. At fixed
+finite volume the lemma is ordinary linear algebra, and the proof runs through
+the layers described below --- spectral-gap quadratic forms, the reduced
+resolvent $R(\lambda,E)$, the exact Feshbach elimination of $|\Gamma\rangle$,
+the trial-state bound $E \le \lambda^2 E_{\rm eff} + c_3\lambda^3$, the
+antisymmetric combination giving one-dimensionality, and finally the
+quantitative rate $\|c\varphi - \Phi_{\rm eff}\|^2 \le K\lambda$. It is the
+weak-coupling companion of the strong-coupling Theorem A.12
+(\texttt{effectiveHamiltonian\_strongCoupling\_limit}), likewise axiom-free.
+
+\emph{Provenance.} Tasaki's printed proof (pp.~346--347) ends at uniqueness;
+the convergence conjunct is never argued, only inherited from the proof's
+opening analytic assumption ``We can also assume that each of these $D_0$
+eigenstates depends continuously on $\lambda$'' (Rellich--Kato, asserted
+without proof) together with the identification
+$|\Xi_1(0)\rangle = (\text{const.})|\Phi_{\rm eff\text{-}GS}\rangle$ read off
+eqs.~(10.1.21)--(10.1.22); no rate is claimed. What is formalized here is an
+independent, fully quantitative substitute, not ``Tasaki's proof, formalized''.
+Two points of fidelity: the book writes ``converges to
+$|\Phi_{\rm eff\text{-}GS}\rangle$'' with no phase caveat, while an
+eigenvector is determined only up to a phase, so the existential
+$\Phi_\lambda$ supplies the phase choice
+(\texttt{IsUniqueGroundStateOn.smul\_of\_norm\_one}); and the book's two-sided
+$\lambda \to 0$ becomes the weaker one-sided limit along $\lambda \downarrow 0$
+(\texttt{nhdsWithin 0 (Set.Ioi 0)}).
 
 \medskip
 \noindent\textbf{Spectral-gap layer} (Tasaki §10.1, p.~345, the standing
@@ -5394,9 +5412,7 @@ $\|R(\lambda,E)u\| \le \|u\|/(g-|\lambda|v-|E|)$, and it converges to
 $\hat H_0^{-1}$ at the rate
 $\|(R(\lambda,E) - \hat H_0^{-1})u\| \le (|\lambda|v+|E|)\|u\|/(g(g-|\lambda|v-|E|))$
 (\texttt{norm\_sub\_reducedInverse\_le}), the quantitative form of
-eq.~(10.1.18). Every result of this layer is axiom-free; the
-perturbation-theory axiom
-\texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation} itself is unaffected.
+eq.~(10.1.18). Every result of this layer is axiom-free.
 
 \medskip
 \noindent\textbf{Feshbach equivalence layer} (Tasaki §10.1, pp.~346--347,
@@ -5437,8 +5453,7 @@ $\|K(\lambda,E)u - \hat H_{\rm eff}u\| \le (4v^3/g^2)|\lambda|\,\|u\|$
 (\texttt{norm\_sub\_secondOrderEffectiveHamiltonian\_le\_abs\_mul}, sharpened
 from the general-smallness bound
 \texttt{norm\_sub\_secondOrderEffectiveHamiltonian\_le}). Every result of this
-layer is axiom-free; \texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation}
-itself is unaffected.
+layer is axiom-free.
 
 \medskip
 \noindent\textbf{Trial-state variational bound} (Tasaki §10.1, pp.~346--347,
@@ -5484,8 +5499,7 @@ two-sided estimate $|E| \le \lambda v$
 variational at $\Phi_{\rm eff}$, whose energy
 $\lambda\langle\Phi_{\rm eff}, \hat V\Phi_{\rm eff}\rangle$ vanishes by the
 first-order condition, and the lower half is read off a ground eigenvector.
-Every result of this layer is axiom-free;
-\texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation} itself is unaffected.
+Every result of this layer is axiom-free.
 
 \medskip
 \noindent\textbf{Ground-state one-dimensionality for small $\lambda$} (Tasaki
@@ -5554,7 +5568,7 @@ $g > 0$, $v$, $\delta > 0$ and $c_3 \ge 0$ internally and sets
 $\lambda_0 = \min\{1,\ g/(4v+1),\ \delta/(c_3+C+1)\}$ with $C = 4v^3/g^2$ --- the
 $+1$'s keeping the quotients well-formed at $v = 0$ and at $c_3 = C = 0$ --- so
 that $\hat H(\lambda)$ has a unique ground state on the whole space for every
-$\lambda \in (0,\lambda_0)$. That statement is the first conjunct of the axiom's
+$\lambda \in (0,\lambda_0)$. That statement is the first conjunct of Lemma 10.1's
 conclusion. Non-vacuity is machine-checked in
 \texttt{Tests/DegeneratePerturbationUniqueness.lean}: the two-site witness
 ($\hat H_0 = {\rm diag}(0,1)$, $\hat V = {\rm offdiag}(1,1)$,
@@ -5573,8 +5587,67 @@ has a degenerate ground state at this witness, which is what would show the
 \emph{conclusion} fails once the hypothesis is dropped, is a hand computation
 recorded in the test file's module documentation and is \emph{not}
 machine-checked. Every result of this layer
-is axiom-free;
-\texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation} itself is unaffected.
+is axiom-free.
+
+\medskip
+\noindent\textbf{Convergence and the capstone} (Tasaki §10.1, Lemma 10.1 and
+eqs.~(10.1.20)--(10.1.22), pp.~346--347;
+\texttt{Math/MatrixAnalysis/DegeneratePerturbationConvergence.lean}). The
+remaining conjunct of Lemma 10.1 --- convergence of the ground state as
+$\lambda \to 0^+$ --- is the one the book never argues (see the Status
+paragraph above), and it is discharged here with an explicit rate. Fix
+$\lambda \in (0,\lambda_0)$ and split a normalized ground state $\varphi$ of
+$\hat H(\lambda)$ as $\Phi = \hat P_0\varphi$, $\Gamma = \varphi - \Phi$, with
+$a = \langle \Phi_{\rm eff}, \Phi\rangle$ and
+$w = \Phi - a\,\Phi_{\rm eff}$.
+\texttt{norm\_sub\_starProjection\_perturbedHamiltonian\_le} bounds the
+orthogonal half: the Feshbach reconstruction $\Gamma = -\lambda R(\lambda,E)\hat V\Phi$
+and the resolvent bound, with $g - \lambda v - |E| \ge g/2$ from $|E| \le \lambda v$
+and $4\lambda v \le g$, give $\|\Gamma\| \le (2v/g)\lambda\|\Phi\|$.
+\texttt{mul\_norm\_sub\_smul\_sq\_le} bounds the transverse half by an exact
+cancellation: symmetry of $\hat H_{\rm eff}$ and
+$\hat H_{\rm eff}\Phi_{\rm eff} = E_{\rm eff}\Phi_{\rm eff}$ give
+$\operatorname{Re}\langle \Phi, \hat H_{\rm eff}\Phi\rangle
+ = |a|^2 E_{\rm eff} + \operatorname{Re}\langle w, \hat H_{\rm eff}w\rangle$;
+the $\delta$-gap bounds the last term below by $(E_{\rm eff}+\delta)\|w\|^2$,
+the quadratic-form engine together with $E \le \lambda^2 E_{\rm eff} + c_3\lambda^3$
+bounds $\lambda^2\operatorname{Re}\langle \Phi, \hat H_{\rm eff}\Phi\rangle$ above by
+$(\lambda^2 E_{\rm eff} + (c_3+C)\lambda^3)\|\Phi\|^2$ with $C = 4v^3/g^2$, and
+Pythagoras $\|\Phi\|^2 = |a|^2 + \|w\|^2$ makes the entire $E_{\rm eff}$
+contribution cancel --- no sign hypothesis on $E_{\rm eff}$ is needed --- leaving
+$\delta\|w\|^2 \le (c_3+C)\lambda\|\Phi\|^2$. Then
+\texttt{exists\_norm\_smul\_sub\_sq\_le\_of\_isUniqueGroundStateOn} assembles the
+rate: $1 = \|\Phi\|^2 + \|\Gamma\|^2$ and $\|\Phi\|^2 = |a|^2 + \|w\|^2$ give
+$1 - |a|^2 = \|w\|^2 + \|\Gamma\|^2$; kernel triviality makes $a \ne 0$, so the
+phase $c = |a|/a$ has $\|c\| = 1$,
+$\langle \Phi_{\rm eff}, c\varphi\rangle = |a|$ and
+$\|c\varphi - \Phi_{\rm eff}\|^2 = 2 - 2|a| \le 2(1-|a|^2)$, whence
+\[
+  \|c\varphi - \Phi_{\rm eff}\|^2 \le K\lambda,
+  \qquad K = 2\!\left(\frac{c_3 + 4v^3/g^2}{\delta} + \frac{4v^2}{g^2}\right).
+\]
+The rate is $O(\sqrt\lambda)$; it is not optimal (the true rate is $O(\lambda)$)
+and is not claimed to be --- convergence only needs it to vanish.
+\texttt{exists\_lam0\_isUniqueGroundStateOn\_norm\_sub\_sq\_le} packages
+uniqueness and the rate over a single threshold (the two $\lambda_0$'s come from
+independently chosen constants and are combined with $\min$), re-phasing the
+ground state by \texttt{IsUniqueGroundStateOn.smul\_of\_norm\_one} (stated in
+\texttt{Math/MatrixAnalysis/DegeneratePerturbation.lean}, where the predicate
+\texttt{IsUniqueGroundStateOn} itself is defined). Finally
+\texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation} is Lemma 10.1 itself:
+the per-$\lambda$ data is turned into the total functions $E_\lambda$,
+$\Phi_\lambda$ demanded by the statement by choice, with the junk value
+$(0,\Phi_{\rm eff})$ outside $(0,\lambda_0)$, and convergence is a squeeze of
+$\|\Phi_\lambda - \Phi_{\rm eff}\| \le \sqrt{K\lambda}$ against
+$\sqrt{K\,\cdot} \to 0$. Non-vacuity is machine-checked in
+\texttt{Tests/DegeneratePerturbationConvergence.lean} at the two-site witness ---
+Tasaki's own suggested check, p.~346, ``It may be useful to check that the ground
+state of the two-site Hubbard model $\ldots$ indeed converges to that of the
+two-site antiferromagnetic Heisenberg model'' --- and at the one-dimensional
+$\hat H_0 = \hat V = 0$ corner where $\ker \hat H_0$ is everything; the ground
+state produced is chosen, hence opaque, so those tests pin the \emph{statement}
+at the witnesses, not a concrete converging family. Every result of this layer,
+and the capstone, is axiom-free.
 
 %======================================================================
 \subsection{Lieb's theorem for the attractive Hubbard model (Tasaki §10.2.1, Theorems 10.2 \& 10.3)}
@@ -13770,10 +13843,15 @@ A.21--A.28 (Wigner, states, Banach--Alaoglu, ground states, GNS)---are recorded 
 documented axioms.
 
 These axioms are \emph{not} active proof targets here, and the project similarly records
-perturbation-theoretic results as documented axioms (e.g., degenerate perturbation theory,
-Lemma 10.1 (Tasaki \S10.1), and singular-perturbation arguments in Chapter 10): the analytic
-proofs of weak-coupling continuation and adiabatic following for eigenstate families belong to
-a separate analytic-perturbation development.  The heavy functional-analytic, operator-algebraic,
+perturbation-theoretic results as documented axioms (e.g., the singular-perturbation and
+adiabatic-continuation arguments in Chapter 10, and the cluster expansions behind Theorems 7.3
+and 8.1): the analytic proofs of weak-coupling continuation and adiabatic following for
+eigenstate families belong to a separate analytic-perturbation development.  That class is
+delimited by the machinery it needs---analytic eigenvalue-branch (Rellich--Kato) continuation,
+cluster/polymer expansions, volume-uniform estimates---and does \emph{not} cover
+finite-dimensional degenerate perturbation theory at fixed finite volume, which is ordinary
+linear algebra and is proved (Lemma 10.1, Tasaki \S10.1, and the strong-coupling Theorem A.12
+are both axiom-free).  The heavy functional-analytic, operator-algebraic,
 and perturbation-theoretic theory has its natural home in dedicated developments (possibly
 contributed to \texttt{mathlib}), and the axioms wait for that implementation.  The project's
 policy is to axiomatize only the appendix and perturbation-theory results that Tasaki's formalized
