@@ -88,7 +88,17 @@ eigenvalue `Ne` becomes the spin-`z` eigenvalue `m = (Ne − (N+1))/2` (eq. (10.
 
 The transported ground state `φ = Û φ_attr` is exposed via `φ.ofLp = Û φ_attr.ofLp` together
 with Theorem 10.3's pair-transfer positivity of the underlying attractive ground state `φ_attr`;
-this is what Theorem 10.5 (Shen–Qiu–Tian) consumes on the general spin-`z` sector `Ŝ³ = m`. -/
+this is what Theorem 10.5 (Shen–Qiu–Tian) consumes on the general spin-`z` sector `Ŝ³ = m`.
+
+**Number-operator eigenvalue (PR-1 extension).** Because Theorem 10.2's attractive ground state
+`φ_attr` is a spin singlet (`Ŝ² φ_attr = 0`), its spin-`z` eigenvalue is forced to `0`
+(`Ŝ³ φ_attr = 0`); transporting this through the Shiba charge exchange
+(`Û N̂ Ûᴴ = Ûᴴ N̂ Û = 2 Ŝ³ + (N+1)·1`, both directions agree because `N̂` is diagonal in the
+occupation basis and the modulus-one sign dressing cancels under either conjugation order) gives
+`N̂ φ = (N+1) · φ`: **every** transported ground state, on **every** spin-`z` sector `Ŝ³ = m`,
+sits in the fixed `(N+1)`-electron (half-filling) sector, independently of the electron number
+`Ne` used to select the attractive-model sector it is transported from.  (Note: this is `N+1`,
+**not** `Ne` — the two coincide only in the special case `Ne = N+1`.) -/
 theorem repulsiveSpinZSector_ground_unique (N Ne : ℕ)
     (hNe_even : Even Ne) (hNe_pos : 0 < Ne) (hNe_lt : Ne < 2 * (N + 1))
     {A : Finset (Fin (N + 1))} (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
@@ -100,9 +110,10 @@ theorem repulsiveSpinZSector_ground_unique (N Ne : ℕ)
           (spinZSectorEuclidean N (((Ne : ℂ) - ((N : ℂ) + 1)) / 2))
           (symmetricRepulsiveHubbardHamiltonian N T U) E φ ∧
         φ.ofLp = (shibaSignedUnitary N (shibaSignFn A)).mulVec φattr.ofLp ∧
-        ∀ x y : Fin (N + 1),
+        (∀ x y : Fin (N + 1),
           0 < (euclideanExpectation (hubbardPairCorrelationOp N x y) φattr).re ∧
-            (euclideanExpectation (hubbardPairCorrelationOp N x y) φattr).im = 0 := by
+            (euclideanExpectation (hubbardPairCorrelationOp N x y) φattr).im = 0) ∧
+        Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1)) φ = ((N : ℂ) + 1) • φ := by
   classical
   -- Abbreviations for the Shiba unitary, the two Hamiltonians and the scalar shift.
   set Ush : Matrix (Fin (2 * N + 2) → Fin 2) (Fin (2 * N + 2) → Fin 2) ℂ :=
@@ -287,6 +298,31 @@ theorem repulsiveSpinZSector_ground_unique (N Ne : ℕ)
       _ = Ush.mulVec ((Matrix.conjTranspose Ush).mulVec ψ'.ofLp) := by rw [Matrix.mulVec_mulVec]
       _ = Ush.mulVec (c • f) := by rw [hcofLp]
       _ = c • Ush.mulVec f := by rw [Matrix.mulVec_smul]
-  exact ⟨Eattr - cR, ψ, φattr, ⟨hψmem, hψnorm, hEeig, hground, huniq⟩, hψofLp, hpair⟩
+  refine ⟨Eattr - cR, ψ, φattr, ⟨hψmem, hψnorm, hEeig, hground, huniq⟩, hψofLp, hpair, ?_⟩
+  -- RED (PR-1, TDD): number-operator eigenvalue of the transported ground state `ψ = Û φ_attr`,
+  -- via `Ŝ³ φattr = 0` (singlet) and the Shiba charge exchange `Ûᴴ N̂ Û = 2 Ŝ³ + (N+1)·1`.
+  sorry
+
+/-- **Eq. (10.2.9)** (Tasaki §10.2.2, p. 351): on the fixed `Ne`-electron sector, the symmetric
+repulsive interaction with **uniform** on-site repulsion `U_x = U` differs from the uniform
+repulsive interaction `Ĥint^{unif} = U Σ_x n̂_{x,↑} n̂_{x,↓}` by the scalar
+`c = −(U/2)·Ne + (U/4)·(N+1)`:
+`Ĥint^{sym}(U) = Ĥint^{unif}(U) − (U/2) N̂ + (U/4)|Λ|`, so on the `N̂ = Ne` sector
+`Ĥ^{rep,sym}(U) = Ĥ^{rep,unif}(U) + c · 1`.  Consequently, for any target energy `E`, the
+`E`-ground submodule of the symmetric-interaction Hamiltonian on the `Ne`-electron sector
+coincides with the `(E − c)`-ground submodule of the uniform-interaction Hamiltonian on the same
+sector: the two variants have the **same** ground submodule (up to the constant energy shift
+`c`), justifying the reduction of the uniform case (10.2.5) to the symmetric case (10.2.6) used in
+Tasaki's proof of Theorem 10.4. -/
+theorem symmetricRepulsiveHubbardHamiltonian_groundSubmodule_eq_uniform
+    (N : ℕ) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (U : ℝ) (Ne : ℕ) (E : ℂ) :
+    hubbardGroundSubmoduleAtElectronNumber
+        (symmetricRepulsiveHubbardHamiltonian N T (fun _ => U)) E Ne
+      = hubbardGroundSubmoduleAtElectronNumber
+          (repulsiveHubbardHamiltonian N T U)
+          (E - (-(U : ℂ) / 2 * (Ne : ℂ) + (U : ℂ) / 4 * ((N : ℂ) + 1))) Ne := by
+  -- RED (PR-1, TDD): eq. (10.2.9) constant-shift identity between the uniform and symmetric
+  -- repulsive interactions on the fixed-`Ne` sector, hence ground-submodule agreement.
+  sorry
 
 end LatticeSystem.Fermion
