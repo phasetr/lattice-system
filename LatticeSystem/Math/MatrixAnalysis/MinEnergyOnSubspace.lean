@@ -194,10 +194,11 @@ theorem Continuous.minEnergyOn_comp {W : Submodule ℂ (EuclideanSpace ℂ n)} (
 /-- **Constant-shift lemma**: shifting a Hamiltonian by a real multiple of the identity shifts
 `minEnergyOn` by the same constant, `minEnergyOn W (H + c • 1) = minEnergyOn W H + c`, for any
 nonzero subspace `W`. Every unit vector picks up the same additive `c` in its energy, since
-`⟪v, (H + c • 1) v⟫ = ⟪v, H v⟫ + c ⟪v, v⟫ = ⟪v, H v⟫ + c` at `‖v‖ = 1`; used (Theorem 10.4 arc,
-issue #5320, PR-5) to normalise the energy origin of a degenerate unperturbed Hamiltonian `Ĥ₀`
-before comparing it with the second-order effective Hamiltonian of Tasaki Lemma 10.1
-(`DegeneratePerturbation.lean`). -/
+`⟪v, (H + c • 1) v⟫ = ⟪v, H v⟫ + c ⟪v, v⟫ = ⟪v, H v⟫ + c` at `‖v‖ = 1`. Added in the Theorem 10.4
+arc (issue #5320, PR-5) for later PRs of that arc, which normalise the energy origin of a
+degenerate unperturbed Hamiltonian `Ĥ₀` before comparing it with the second-order effective
+Hamiltonian of Tasaki Lemma 10.1 (`DegeneratePerturbation.lean`); it has no consumer yet, and is
+to be deleted if the arc's assembly does not take it up. -/
 theorem minEnergyOn_add_const_smul_one {W : Submodule ℂ (EuclideanSpace ℂ n)} (hW : W ≠ ⊥)
     (H : Matrix n n ℂ) (c : ℝ) :
     minEnergyOn W (H + (c : ℂ) • (1 : Matrix n n ℂ)) = minEnergyOn W H + c := by

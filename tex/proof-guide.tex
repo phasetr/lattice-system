@@ -6864,10 +6864,23 @@ $\hat H_{s=1}(\lambda)|_K=\hat H_0|_K+\lambda\hat V|_K$ to
 \texttt{perturbedHamiltonian}, together with the sector preservation of
 $\hat V$ it presupposes; and (c) nonemptiness of the compressed sector
 (\texttt{Nonempty (configSector \ldots)}), an instance hypothesis of
-\texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation}. Until those exist
-the whole-Fock-space $\hat H_0$/$\hat V$ statements have no consumer
-downstream; if the arc's capstone ends up going through the compressed layer
-alone, the whole-Fock-space versions are to be deleted, not kept.
+\texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation}.
+\emph{Debt.} What the compressed layer consumes from the whole-Fock-space
+layer is only the diagonality of $\hat H_0$
+(\texttt{liebPerturbationH0\_mulVec\_basisVec}, read off in the sector basis
+through \texttt{configSectorCompress\_apply}), $\hat H_0\ge0$, and the entries
+of $\hat V$ between singly-occupied configurations; until (a)--(c) exist,
+every declaration introduced with this setup that no proof consumes is carried
+as debt, not as settled API: on the whole Fock space the
+\texttt{perturbedHamiltonian} bridge, the kernel criterion
+\texttt{mem\_matrixKernel\_liebPerturbationH0\_iff} with the hard-core
+projection identity that consumes it, and the explicit reduced inverse; on the
+compressed sector $\hat H_0|_K\ge0$ (the sole consumer of $\hat H_0\ge0$), the
+Hermiticity of $\hat V|_K$, and the $\hat P_0\hat V\hat P_0=0$ capstone
+itself; and, in the generic layer,
+\texttt{minEnergyOn\_add\_const\_smul\_one}. All of these are staged for the
+application of Lemma~10.1 and the arc assembly (PR-11 to PR-13); whatever that
+assembly does not consume is to be deleted, not kept.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,

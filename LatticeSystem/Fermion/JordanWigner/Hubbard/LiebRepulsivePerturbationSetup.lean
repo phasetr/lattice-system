@@ -37,22 +37,35 @@ endpoint `s = 1` and the pieces of the Lemma 10.1 contract that are concrete for
   is genuinely a sector statement: on the whole Fock space it is false, because a hard-core
   configuration with an empty site can absorb a hopping electron and stay hard-core.
 
-The constant-energy-shift lemma this setup also needs (normalising the hard-core ground energy to
+The constant-energy-shift lemma this setup will need (normalising the hard-core ground energy to
 `0` before comparing with `Ĥeff`) is `LatticeSystem.Math.minEnergyOn_add_const_smul_one`
-(`Math/MatrixAnalysis/MinEnergyOnSubspace.lean`), added alongside PR-2's `minEnergyOn` API.
+(`Math/MatrixAnalysis/MinEnergyOnSubspace.lean`), added alongside PR-2's `minEnergyOn` API and so
+far unconsumed.
 
-The remaining `Ĥ₀`/`V̂` items above are stated on the whole Fock space, where `Ĥ₀` is diagonal;
-the sector-compressed statements are read off from them through `configSectorCompress_apply`, so
-both layers are needed here.
+Of the whole-Fock-space layer the compressed statements consume only the
+diagonality of `Ĥ₀` (`liebPerturbationH0_mulVec_basisVec`, transported to the sector basis by
+`configSectorCompress_apply`, which is what turns `P̂₀|_K` into an explicit indicator), the
+positive semidefiniteness of `Ĥ₀`, and the entries of `V̂` between singly-occupied configurations.
+The bridge `Ĥ_{s=1}(λ) = Ĥ₀ + λ V̂`, the kernel description `ker Ĥ₀ = hard-core subspace` with the
+hard-core projection identity, and the explicit reduced inverse feed no statement of the
+compressed layer — nor anything else, here or downstream.
 
 Left for later PRs of the arc, all on the compressed sector `K`: (a) the compressed
 `IsReducedInverse`, i.e. the explicit reduced inverse restricted to `K`; (b) the compressed
 bridge `Ĥ_{s=1}(λ)|_K = Ĥ₀|_K + λ V̂|_K` to `LatticeSystem.Math.perturbedHamiltonian`, together
 with the sector preservation of `V̂` that it presupposes; and (c) nonemptiness of the compressed
 sector, `Nonempty (configSector N (liebHalfFillingPred N nUp))`, which is an instance hypothesis
-of `tasaki_lemma_10_1_degenerate_perturbation`. Until those exist, the whole-Fock-space `Ĥ₀`/`V̂`
-statements have no consumer downstream of this file; if the arc's capstone ends up going through
-the compressed layer alone, the whole-Fock-space versions are to be deleted, not kept.
+of `tasaki_lemma_10_1_degenerate_perturbation`.
+
+Until those exist, every declaration introduced with this setup that no proof consumes is carried
+as debt, not as settled API: on the whole Fock space the `perturbedHamiltonian` bridge, the
+kernel criterion `mem_matrixKernel_liebPerturbationH0_iff` with the hard-core projection identity
+that consumes it, and `Ĥ₀Inv` with its `IsReducedInverse`; on the sector `Ĥ₀|_K ≥ 0` (which is
+the sole consumer of the whole-space `Ĥ₀ ≥ 0`), the Hermiticity of `V̂|_K`, and the
+`P̂₀ V̂ P̂₀ = 0` capstone itself; and, outside this file,
+`LatticeSystem.Math.minEnergyOn_add_const_smul_one`. All of them are staged for the application
+of Lemma 10.1 and the assembly of the arc (PR-11 to PR-13); whatever that assembly does not
+consume is to be deleted, not kept.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §10.1 (Lemma 10.1, eq. (10.1.20)) and §10.2.2 (p. 353).
