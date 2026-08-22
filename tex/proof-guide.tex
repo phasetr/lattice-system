@@ -5440,6 +5440,53 @@ from the general-smallness bound
 layer is axiom-free; \texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation}
 itself is unaffected.
 
+\medskip
+\noindent\textbf{Trial-state variational bound} (Tasaki §10.1, pp.~346--347,
+eqs.~(10.1.18)--(10.1.20)), in the file
+\texttt{Math/MatrixAnalysis/DegeneratePerturbationGroundEnergy.lean}.
+\emph{Provenance.} Tasaki's proof of Lemma 10.1 contains \emph{no} variational
+estimate: its analytic input is the unproved sentence ``By continuity there are
+exactly $D_0$ independent eigenstates of $\hat H(\lambda)$ whose eigenvalues
+converge to zero \dots\ We can also assume that each of these $D_0$ eigenstates
+depends continuously on $\lambda$'' (Rellich--Kato perturbation theory). The
+present layer is an \emph{elementary replacement} for that input and is
+\emph{not} a formalization of the book's argument; the claim ``Tasaki's proof,
+formalized'' would be a false attribution. The book anchor is nonetheless
+precise: the trial vector is eq.~(10.1.18), and the bound obtained is the
+rigorous upper half of eq.~(10.1.19). Concretely, for
+$\Phi \in \ker \hat H_0$ with $\hat P_0 \hat V \hat P_0 = 0$, put
+$u = \hat H_0^{-1}\hat V \Phi$ and $\Psi = \Phi - \lambda u$. Then the residual
+is exact,
+$\hat H(\lambda)\Psi = -\lambda^2 \hat V u$
+(\texttt{toEuclideanLin\_perturbedHamiltonian\_trialVector}), and so is the
+energy,
+$\langle \Psi, \hat H(\lambda)\Psi\rangle
+ = \lambda^2 \langle \Phi, \hat H_{\rm eff}\Phi\rangle
+ + \lambda^3 \langle u, \hat V u\rangle$
+(\texttt{inner\_trialVector\_perturbedHamiltonian}), with
+$\hat H_{\rm eff}$ as in eq.~(10.1.20). Combined with the Rayleigh--Ritz
+variational principle on an invariant subspace
+(\texttt{IsGroundEigenvalueOn.mul\_norm\_sq\_le}, together with the existence
+statement \texttt{exists\_isGroundEigenvalueOn} and Hermiticity
+\texttt{perturbedHamiltonian\_isHermitian}) and with the orthogonality
+$\langle \Phi, u\rangle = 0$, which makes $\|\Psi\|^2 = 1 + \lambda^2\|u\|^2$,
+this yields \texttt{exists\_const\_isGroundEigenvalue\_perturbedHamiltonian\_le}:
+for a normalized eigenvector $\Phi_{\rm eff} \in \ker \hat H_0$ of
+$\hat H_{\rm eff}$ with eigenvalue $E_{\rm eff}$ there is
+$c_3 = |{\rm re}\langle u, \hat V u\rangle| + |E_{\rm eff}|\,\|u\|^2 \ge 0$,
+independent of $\lambda$, with
+$E \le \lambda^2 E_{\rm eff} + c_3 \lambda^3$ for every ground eigenvalue $E$
+of $\hat H(\lambda)$ and every $0 < \lambda \le 1$ (the hypothesis
+$\lambda \le 1$ absorbs the $\lambda^4$ remainder into $\lambda^3$). Separately,
+positivity of $\hat H_0$ and an operator bound $v$ for $\hat V$ give the
+two-sided estimate $|E| \le \lambda v$
+(\texttt{abs\_isGroundEigenvalue\_perturbedHamiltonian\_le}): the upper half is
+variational at $\Phi_{\rm eff}$, whose energy
+$\lambda\langle\Phi_{\rm eff}, \hat V\Phi_{\rm eff}\rangle$ vanishes by the
+first-order condition, and the lower half is read off a ground eigenvector.
+Every result of this layer is axiom-free;
+\texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation} itself is unaffected.
+
 %======================================================================
 \subsection{Lieb's theorem for the attractive Hubbard model (Tasaki §10.2.1, Theorems 10.2 \& 10.3)}
 \label{subsec:lieb-attractive}
