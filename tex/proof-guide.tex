@@ -6724,6 +6724,23 @@ bound, and a parameter-continuity corollary, mirroring the whole-space
 \texttt{hermitianMinEigenvalue} lemmas. Not itself a numbered Tasaki statement;
 axiom-free.
 
+\emph{Casimir sector machinery (Issue~\#5320, PR~\#5324 PR-3).} Generic
+infrastructure feeding the arc's later homotopy/perturbation steps
+(\texttt{Fermion/JordanWigner/Hubbard/LiebRepulsiveCasimirSector.lean}):
+\texttt{numberSpinZSectorEuclidean}~$N$~$L$~$m_0$ is the joint sector
+$K=\{\hat N=L\}\sqcap\{\hat S^3=m_0\}$, refining the spin-$z$ sector by also
+fixing the total number, and \texttt{numberSpinZCasimirSectorEuclidean}~$N$~$L$~$m_0$~$c$
+further refines it by the total-spin Casimir eigenvalue, $K_c = K\sqcap\ker(\hat{\mathbf
+S}^2-c)$. Proposition~1 (\texttt{numberSpinZSectorEuclidean\_mem\_of\_commute},
+\texttt{numberSpinZCasimirSectorEuclidean\_mem\_of\_commute}) shows any Hamiltonian
+commuting with $\hat N$, $\hat S^3$ (and, for $K_c$, also $\hat{\mathbf S}^2$)
+preserves $K$ and $K_c$. Proposition~2
+(\texttt{exists\_unique\_casimir\_sector\_strict\_min}) shows that if $H$ is
+Hermitian, commutes with $\hat N$, $\hat S^3$, $\hat{\mathbf S}^2$, and has a
+unique normalized ground state on $K$, exactly one Casimir eigenvalue $c$
+attains the ground energy on $K_c$, every other occupied sector $K_{c'}$ being
+strictly higher. Not itself a numbered Tasaki statement; axiom-free.
+
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
 eqs.~(10.2.7)/(10.2.8)/(10.2.13); \emph{proved axiom-free on the general spin-$z$

@@ -45,8 +45,6 @@ namespace LatticeSystem.Fermion
 open Matrix Module Module.End LatticeSystem.Quantum LatticeSystem.Math
 open scoped BigOperators
 
-variable {N : ℕ}
-
 /-! ## The joint number/spin-`z` sector `K` and its Casimir refinement `K_c` -/
 
 /-- The **joint number/spin-`z` sector** `K = {N̂ = L} ⊓ {Ŝ³ = m₀}`: the subspace of
