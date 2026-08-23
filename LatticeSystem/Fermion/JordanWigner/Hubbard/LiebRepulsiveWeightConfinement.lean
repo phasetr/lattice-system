@@ -25,11 +25,7 @@ to an admissible sector, and comparing the transported Casimir eigenvalue agains
 sum over the (confined) admissible blocks: the upper bound via `finrank_span_finset_le_card` +
 `Submodule.finrank_mono` (each block spanned by its unique ground state), the lower bound via
 `Module.End.eigenvectors_linearIndependent'` + `LinearIndependent.fintype_card_le_finrank`
-(distinct-weight eigenvectors of `Ŝ³` are linearly independent). The eigenvector-independence step
-is isolated in `linearIndependent_of_fermionTotalSpinZ_eigenvectors` with an *abstract* weight
-function: instantiating `Module.End.eigenvectors_linearIndependent'` directly at the concrete
-`liebHalfFillingSpinZVal` weights sends the unifier into the numeral tower of `ℂ` and blows the
-heartbeat budget.
+(distinct-weight eigenvectors of `Ŝ³` are linearly independent).
 
 ## Contents
 
@@ -367,21 +363,10 @@ theorem liebRepulsive_finrank_groundSubmodule_le (N cA cB : ℕ)
     _ ≤ (Finset.Icc cB cA).card := by rw [hSdef]; exact Finset.card_image_le
     _ = cA - cB + 1 := by rw [Nat.card_Icc]; omega
 
-/-- **Distinct-weight `Ŝ³` eigenvectors are linearly independent.** The `Module.End`-level step of
-the lower `finrank` bound, stated with an abstract weight function `μ` and an abstract family `v`
-so that the eigenvalue arithmetic of `liebHalfFillingSpinZVal` never enters the unifier. -/
-private theorem linearIndependent_of_fermionTotalSpinZ_eigenvectors {n : ℕ} (N : ℕ)
-    (μ : Fin n → ℂ) (hμ : Function.Injective μ)
-    (v : Fin n → ((Fin (2 * N + 2) → Fin 2) → ℂ))
-    (hne : ∀ i, v i ≠ 0)
-    (heig : ∀ i, v i ∈ Module.End.eigenspace (fermionTotalSpinZ N).mulVecLin (μ i)) :
-    LinearIndependent ℂ v :=
-  Module.End.eigenvectors_linearIndependent' _ μ hμ v fun i => ⟨heig i, hne i⟩
-
 /-- **Lower `finrank` bound.** `cA − cB + 1 ≤ finrank G`: the family of admissible-sector ground
 states, indexed by `i : Fin (cA − cB + 1)` through the up-count `cB + i`, lies in `G` and consists
 of `Ŝ³`-eigenvectors at pairwise distinct eigenvalues (`liebHalfFillingSpinZVal` is injective), so
-`linearIndependent_of_fermionTotalSpinZ_eigenvectors` + `LinearIndependent.fintype_card_le_finrank`
+`Module.End.eigenvectors_linearIndependent'` + `LinearIndependent.fintype_card_le_finrank`
 (applied inside `↥G`) give the bound. -/
 theorem liebRepulsive_finrank_groundSubmodule_ge (N cA cB : ℕ)
     (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (U : Fin (N + 1) → ℝ)
@@ -425,7 +410,7 @@ theorem liebRepulsive_finrank_groundSubmodule_ge (N cA cB : ℕ)
     exact Fin.ext (by omega)
   -- distinct weights give a linearly independent family inside `G`
   have hli : LinearIndependent ℂ (fun i : Fin (cA - cB + 1) => WithLp.ofLp (f i)) :=
-    linearIndependent_of_fermionTotalSpinZ_eigenvectors N _ hinj _ hfne hfeig
+    Module.End.eigenvectors_linearIndependent' _ _ hinj _ fun i => ⟨hfeig i, hfne i⟩
   have hliG : LinearIndependent ℂ (fun i : Fin (cA - cB + 1) =>
       (⟨WithLp.ofLp (f i), hfG i⟩ : ↥(hubbardGroundSubmoduleAtElectronNumber
         (symmetricRepulsiveHubbardHamiltonian N T U) (E₀ : ℂ) (N + 1)))) :=
