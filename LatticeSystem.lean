@@ -11,6 +11,7 @@ import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationConvergence
 import LatticeSystem.Math.MatrixAnalysis.MinEnergyOnSubspace
 import LatticeSystem.Math.MatrixAnalysis.BlockTransport
 import LatticeSystem.Math.MatrixAnalysis.SubmatrixGroundState
+import LatticeSystem.Math.MatrixAnalysis.PiEuclideanEigenBridge
 import LatticeSystem.Math.WignerTheorem
 import LatticeSystem.Math.ProjectiveRepresentation
 import LatticeSystem.Math.CStarAlgebra.GNS

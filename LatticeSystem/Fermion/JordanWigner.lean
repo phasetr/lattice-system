@@ -211,6 +211,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveUniquenessAssembl
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveSU2Invariance
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveEndpointIdentification
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCasimirPinning
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveMultipletCompanion
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetism
 import LatticeSystem.Fermion.JordanWigner.Hubbard.BipartiteSpectrum

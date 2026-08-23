@@ -1,6 +1,7 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveSectorBridgeFinal
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveSU2Invariance
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSpinSymmetryRaising
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorReduction
 
 /-!
 # `SU(2)` invariance of the symmetric repulsive Hubbard Hamiltonian (Tasaki §10.2.2, PR-12a)
@@ -261,5 +262,33 @@ theorem liebRepulsive_exists_unique_casimir_sector_unconditional (N Ne : ℕ)
     (fermionTotalNumber_commute_symmetricRepulsiveHubbardHamiltonian N T U).symm
     (fermionTotalSpinZ_commute_symmetricRepulsiveHubbardHamiltonian N T U).symm
     (fermionTotalSpinSquared_commute_symmetricRepulsiveHubbardHamiltonian N T hT_symm U).symm
+
+/-! ## `Ĥ` commutes with the Cartesian generators `tJTotalSpinOne`/`tJTotalSpinTwo` (PR-14a) -/
+
+/-- **The symmetric repulsive Hubbard Hamiltonian commutes with `Ŝ⁽¹⁾_tot = ½(Ŝ⁺+Ŝ⁻)`.** Repulsive
+analogue of `attractiveHubbardHamiltonian_mul_tJTotalSpinOne`
+(`LiebAttractiveFullSectorSU2Algebra.lean:201`), assembled from the `Ŝ⁺`/`Ŝ⁻` commutators above. -/
+theorem symmetricRepulsiveHubbardHamiltonian_mul_tJTotalSpinOne
+    (N : ℕ) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (U : Fin (N + 1) → ℝ)
+    (hT_symm : ∀ i j, T i j = T j i) :
+    symmetricRepulsiveHubbardHamiltonian N T U * tJTotalSpinOne N
+      = tJTotalSpinOne N * symmetricRepulsiveHubbardHamiltonian N T U := by
+  have hcP := (fermionTotalSpinPlus_commute_symmetricRepulsiveHubbardHamiltonian N T U).eq.symm
+  have hcM :=
+    (fermionTotalSpinMinus_commute_symmetricRepulsiveHubbardHamiltonian N T hT_symm U).eq.symm
+  rw [tJTotalSpinOne, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_add, Matrix.add_mul, hcP, hcM]
+
+/-- **The symmetric repulsive Hubbard Hamiltonian commutes with `Ŝ⁽²⁾_tot = −(i/2)(Ŝ⁺−Ŝ⁻)`.**
+Repulsive analogue of `attractiveHubbardHamiltonian_mul_tJTotalSpinTwo`
+(`LiebAttractiveFullSectorSU2Algebra.lean:211`), assembled from the `Ŝ⁺`/`Ŝ⁻` commutators above. -/
+theorem symmetricRepulsiveHubbardHamiltonian_mul_tJTotalSpinTwo
+    (N : ℕ) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (U : Fin (N + 1) → ℝ)
+    (hT_symm : ∀ i j, T i j = T j i) :
+    symmetricRepulsiveHubbardHamiltonian N T U * tJTotalSpinTwo N
+      = tJTotalSpinTwo N * symmetricRepulsiveHubbardHamiltonian N T U := by
+  have hcP := (fermionTotalSpinPlus_commute_symmetricRepulsiveHubbardHamiltonian N T U).eq.symm
+  have hcM :=
+    (fermionTotalSpinMinus_commute_symmetricRepulsiveHubbardHamiltonian N T hT_symm U).eq.symm
+  rw [tJTotalSpinTwo, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_sub, Matrix.sub_mul, hcP, hcM]
 
 end LatticeSystem.Fermion

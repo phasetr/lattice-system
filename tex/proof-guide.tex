@@ -6742,7 +6742,15 @@ sector $K_c\neq\{0\}$ attaining the ground energy, and it is unique among
 occupied sectors: every other occupied sector $K_{c'}$ ($c'\neq c$,
 $K_{c'}\neq\{0\}$) is strictly higher. Unoccupied sectors are excluded on both
 sides because \texttt{minEnergyOn} on the zero subspace is a junk value. Not
-itself a numbered Tasaki statement; axiom-free.
+itself a numbered Tasaki statement; axiom-free. \textbf{PR-13b extends} the
+conclusion of \texttt{exists\_unique\_casimir\_sector\_strict\_min} with the
+membership witness $\varphi\in K_c$ (needed by the selector-uniqueness
+argument across several couplings, \texttt{LiebRepulsiveCasimirPinning.lean});
+of the three consumers,
+\texttt{liebRepulsive\_exists\_unique\_casimir\_sector}
+(\texttt{LiebRepulsiveSectorBridgeFinal.lean}) discards the new component via
+\texttt{-}, while \texttt{LiebRepulsiveCasimirPinning.lean} and
+\texttt{LiebRepulsiveMultipletCompanion.lean} both use the membership witness.
 
 The eigenspace-invariance step behind Proposition~1 — a matrix $A$ commuting
 with $B$ maps every $B$-eigenspace into itself — has a single home in
@@ -7363,7 +7371,16 @@ assets (\texttt{liebPerturbationH0Compressed\_posSemidef},
 \texttt{kernelProjection\_mul\_liebPerturbationVCompressed\_mul\_kernelProjection})
 --- giving the perturbed Hamiltonian $\hat H_0^c + \lambda \hat V^c$ a unique
 ground state for every sufficiently small $\lambda>0$, converging to an
-effective ground state $\Phi_{\mathrm{eff}}$ as $\lambda\to 0^+$.
+effective ground state $\Phi_{\mathrm{eff}}$ as $\lambda\to 0^+$. The full
+export accordingly packages, alongside the $\lambda$-family uniqueness and the
+convergence $\Phi_\lambda\to\Phi_{\mathrm{eff}}$,
+\texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation}'s own conclusion
+transported through \texttt{hEffGS}: a genuine
+$\mathrm{IsUniqueGroundStateOn}$ of the second-order effective Hamiltonian
+\texttt{secondOrderEffectiveHamiltonian} on $\ker\hat H_0^c$
+(\texttt{matrixKernel}) at some energy $E_{\mathrm{eff}}$ and witness
+$\Phi_{\mathrm{eff}}$, not merely the existence of $\Phi_{\mathrm{eff}}$ as a
+limit point.
 \textbf{Debt.} This PR consumes and closes PR-11a's
 \texttt{isUniqueGroundStateOn\_liebPerturbationH0Compressed\_kernel\_iff\_heisenberg},
 \texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff}, and
@@ -7646,15 +7663,91 @@ $\Phi_{\mathrm{eff}}$ is then identified, via a reindexing onto the
 hard-core sector and mutual energy minimality, with the Marshall-positive
 Theorem~2.3 eigenvector of
 \texttt{liebRepulsive\_groundState\_casimir\_eq\_predicted}, which carries
-\texttt{liebRepulsiveSpinCasimir}~$A$. \textbf{Debt (new).} This PR's own
-capstone \texttt{symmetricHomotopyHamiltonian\_one\_isUniqueGroundStateOn}
-is at reference~0, staged for PR-14's finrank/degeneracy-count assembly.
-Also extends \texttt{exists\_unique\_casimir\_sector\_strict\_min}'s
+\texttt{liebRepulsiveSpinCasimir}~$A$. \textbf{Debt (new).} Both of this
+PR's own capstones are at reference~0, staged for PR-14's
+finrank/degeneracy-count assembly:
+\texttt{symmetricHomotopyHamiltonian\_one\_isUniqueGroundStateOn}
+(Capstone~1) and
+\texttt{symmetricHomotopy\_casimirSelector\_zero\_eq\_liebRepulsiveSpinCasimir}
+(Capstone~2). Also extends
+\texttt{exists\_unique\_casimir\_sector\_strict\_min}'s
 conclusion with the membership witness $\varphi\in K_c$, and factors
 \texttt{apply\_eq\_zero\_of\_mapsTo\_coordinateSpan} /
 \texttt{toEuclideanLin\_submatrix\_equiv\_apply} out of
 \texttt{Math/MatrixAnalysis/BlockTransport.lean} /
-\texttt{SubmatrixGroundState.lean} respectively. Axiom-free.
+\texttt{SubmatrixGroundState.lean} respectively. \textbf{PR-14a has since
+consumed} Capstone~2
+(\texttt{symmetricHomotopy\_casimirSelector\_zero\_eq\_liebRepulsiveSpinCasimir},
+in
+\texttt{liebRepulsive\_admissibleSector\_groundState\_casimir\_eigenvector},
+\texttt{LiebRepulsiveMultipletCompanion.lean}), closing that debt.
+Capstone~1
+(\texttt{symmetricHomotopyHamiltonian\_one\_isUniqueGroundStateOn}) remains
+at reference~0, still staged for a later assembly step. Axiom-free.
+
+\emph{SU(2) weight transport and the sector energy ladder (Issue~\#5320,
+PR~\#5342 PR-14a).} The first half of the arc's final assembly step (the
+complementary weight confinement + \texttt{finrank} count is PR-14b, and
+the axiom discharge itself is PR-15). One generic layer item opens the
+file: \texttt{mulVec\_eq\_smul\_iff\_toEuclideanLin\_toLp\_eq\_smul}
+(\texttt{Math/MatrixAnalysis/PiEuclideanEigenBridge.lean}) crosses, once
+and for all, the boundary between the plain function carrier
+(\texttt{Matrix.mulVec}, used by
+\texttt{hubbardGroundSubmoduleAtElectronNumber}) and the
+$\mathrm{EuclideanSpace}\,\mathbb C\,n$ carrier (\texttt{Matrix.toEuclideanLin},
+used by the arc's sector machinery).
+\texttt{symmetricRepulsiveHubbardHamiltonian\_mul\_tJTotalSpinOne}/\texttt{Two}
+extend \texttt{LiebRepulsiveSU2Invariance.lean} (PR-12a) with the
+Cartesian-generator commutators ($\hat H$ commutes with
+$\hat S^{(1)}_{\mathrm{tot}}=\tfrac12(\hat S^++\hat S^-)$ and
+$\hat S^{(2)}_{\mathrm{tot}}=-\tfrac i2(\hat S^+-\hat S^-)$), the repulsive
+analogues of
+\texttt{attractiveHubbardHamiltonian\_mul\_tJTotalSpinOne}/\texttt{Two}
+(\texttt{LiebAttractiveFullSectorSU2Algebra.lean}). \textbf{Step~1}
+\texttt{liebRepulsive\_admissibleSector\_groundState\_casimir\_eigenvector}:
+for an admissible $\hat S^3$ value, the unique ground state on
+\texttt{numberSpinZSectorEuclidean} is an $\hat{\mathbf S}^2$-eigenvector at
+\texttt{liebRepulsiveSpinCasimir}~$A$, combining
+\texttt{repulsiveSpinZSector\_ground\_unique\_on\_numberSpinZSector}
+(\texttt{LiebRepulsiveSectorBridgeFinal.lean}) with
+\texttt{exists\_unique\_casimir\_sector\_strict\_min}
+(\texttt{LiebRepulsiveCasimirSector.lean}) and PR-13b's
+\texttt{casimirSelector\_strict\_min\_unique} +
+\texttt{symmetricHomotopy\_casimirSelector\_zero\_eq\_liebRepulsiveSpinCasimir}
+(\texttt{LiebRepulsiveCasimirPinning.lean}), instantiated at $\lambda=1$ (the
+homotopy coupling is irrelevant here). \textbf{Steps~2/3}
+\texttt{liebRepulsive\_su2\_weight\_transport}: specializes
+\texttt{ham\_su2\_multiplet\_companion} (\texttt{Math/AngularMomentum/Multiplet.lean})
+to the physical Hamiltonian, producing at every weight $J-k$ ($k\le 2J$) a
+nonzero companion sharing the seed's $\hat H$/$\hat N$ eigenvalues; a
+private wrapper \texttt{liebRepulsive\_transport\_to\_sector} packages the
+companion into a named \texttt{numberSpinZSectorEuclidean} sector. Two
+further private lemmas assemble the energy ladder and its converse:
+\texttt{liebRepulsive\_sector\_energy\_le} (one-directional ground-energy
+inequality between two admissible sectors, via the weight-transport
+companion) and \texttt{liebRepulsive\_groundEnergy\_le\_of\_electronNumber}
+(global minimality: every $(N{+}1)$-electron eigenvalue of the physical
+Hamiltonian is at least the common admissible-sector ground energy, via
+\texttt{exists\_joint\_eigenvector\_in\_invariant\_submodule} and the
+angular-momentum quantization \texttt{angMom\_sub\_mem\_nat}).
+\textbf{Capstone} \texttt{liebRepulsive\_multipletCompanion\_capstone}:
+assembles all of the above into a single ground energy $E_0$ such that
+every admissible $\hat S^3$ sector has a unique ground state at $E_0$
+carrying \texttt{liebRepulsiveSpinCasimir}~$A$, and $E_0$ is minimal over
+the whole $(N{+}1)$-electron sector --- conjunct~(ii) of
+\texttt{theorem\_10\_4\_lieb\_repulsive\_half\_filling}
+(\texttt{LiebRepulsive.lean:134}), restricted to the symmetric disjunct;
+PR-14b's weight confinement and \texttt{finrank} count are \emph{not} part
+of this capstone. \textbf{Debt discharged.} This PR consumes and closes
+PR-13b's Capstone~2
+\texttt{symmetricHomotopy\_casimirSelector\_zero\_eq\_liebRepulsiveSpinCasimir}
+(see the updated PR-13b paragraph above); PR-13b's Capstone~1
+\texttt{symmetricHomotopyHamiltonian\_one\_isUniqueGroundStateOn} is
+\emph{not} consumed by this PR
+(\texttt{liebRepulsive\_admissibleSector\_groundState\_casimir\_eigenvector}
+reaches its unique-ground-state premise via
+\texttt{repulsiveSpinZSector\_ground\_unique\_on\_numberSpinZSector} instead)
+and remains at reference~0, staged for a later assembly step. Axiom-free.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
