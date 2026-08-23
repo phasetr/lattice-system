@@ -27,6 +27,10 @@ diagonal matrix's entries, and these two lemmas transport it. A matrix that is b
   coordinate outside `P`.
 * `blockSupport_apply_eq_zero` — a matrix conjugated by the diagonal indicator of `P` has no
   entries outside the `P`-block, hence in particular leaves the coordinate span invariant.
+* `apply_eq_zero_of_mapsTo_coordinateSpan` — conversely, a matrix leaving the coordinate span of `P`
+  invariant has no entries at a `P`-column and a `¬P`-row.
+* `coordinateRestrict_toEuclideanLin` — on vectors supported on `P`, coordinate restriction
+  intertwines a matrix with its `P`-block submatrix.
 * `isUniqueGroundStateOn_coordinateSpan_iff_submatrix` — for `H` leaving the coordinate block of `P`
   invariant (`H i j = 0` whenever `P j` and `¬ P i`) and a candidate `φ` in the coordinate span,
   `H`'s unique ground state on the coordinate span of `P` at `φ` is equivalent to the submatrix
@@ -200,11 +204,36 @@ private theorem toEuclideanLin_mem_coordinateSpan (hInv : ∀ i j, P j → ¬ P 
   · rw [hInv i k hk hi, zero_mul]
   · rw [(mem_coordinateSpan_iff v).mp hv k hk, mul_zero]
 
+/-- **Block invariance is entrywise vanishing off the block.** If `H` maps the coordinate span of
+`P` into itself, then its entries at a `P`-column and a `¬P`-row vanish: testing invariance on the
+standard basis vector at that column reads off exactly that entry. This is the converse of
+`toEuclideanLin_mem_coordinateSpan`, and the route by which a model that knows only that `H`
+commutes with the charges cutting out the block supplies the `hInv` hypothesis of
+`isUniqueGroundStateOn_coordinateSpan_iff_submatrix`. -/
+theorem apply_eq_zero_of_mapsTo_coordinateSpan
+    (hmaps : ∀ v ∈ coordinateSpan P, Matrix.toEuclideanLin H v ∈ coordinateSpan P)
+    {i j : n} (hj : P j) (hi : ¬ P i) : H i j = 0 := by
+  classical
+  set v : EuclideanSpace ℂ n := EuclideanSpace.single j (1 : ℂ) with hv
+  have hvmem : v ∈ coordinateSpan P := by
+    refine (mem_coordinateSpan_iff _).mpr fun k hk => ?_
+    have hkj : k ≠ j := fun h => hk (h ▸ hj)
+    simp [hv, hkj]
+  have hval : (Matrix.toEuclideanLin H v) i = ∑ k, H i k * v k := rfl
+  have hsum : (∑ k, H i k * v k) = H i j := by
+    refine Eq.trans (Finset.sum_eq_single j (fun k _ hkj => ?_) (fun h => absurd
+      (Finset.mem_univ j) h)) ?_
+    · simp [hv, hkj]
+    · simp [hv]
+  have := (mem_coordinateSpan_iff _).mp (hmaps v hvmem) i hi
+  rw [hval, hsum] at this
+  exact this
+
 /-- **Restriction intertwines a matrix with its submatrix on span vectors.** For a vector supported
 on `P`, restricting the matrix action to the `P`-coordinates is the action of the `P`-block
 submatrix on the restricted vector; no hypothesis on `H` is needed, since the discarded columns are
 multiplied by vanishing coordinates. -/
-private theorem coordinateRestrict_toEuclideanLin {v : EuclideanSpace ℂ n}
+theorem coordinateRestrict_toEuclideanLin {v : EuclideanSpace ℂ n}
     (hv : v ∈ coordinateSpan P) :
     coordinateRestrict P (Matrix.toEuclideanLin H v)
       = Matrix.toEuclideanLin (H.submatrix Subtype.val Subtype.val) (coordinateRestrict P v) := by

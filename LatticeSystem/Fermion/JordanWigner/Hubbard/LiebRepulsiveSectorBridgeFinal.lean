@@ -219,7 +219,7 @@ theorem liebRepulsive_exists_unique_casimir_sector (N Ne : ℕ)
                 (symmetricRepulsiveHubbardHamiltonian N T U) := by
   obtain ⟨E, φ, hGS⟩ := repulsiveSpinZSector_ground_unique_on_numberSpinZSector N Ne hNe_even
     hNe_pos hNe_lt T hT_symm hbip hT_conn U hU_pos
-  obtain ⟨c, hKcne, hKcmin, hstrict⟩ :=
+  obtain ⟨c, hKcne, -, hKcmin, hstrict⟩ :=
     exists_unique_casimir_sector_strict_min hH hHN hHS3 hHS2 hGS
   refine ⟨c, hKcne, fun c' hcc' hc'ne => ?_⟩
   rw [hKcmin]
