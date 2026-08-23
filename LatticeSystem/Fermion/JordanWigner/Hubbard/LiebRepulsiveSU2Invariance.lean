@@ -273,7 +273,10 @@ theorem symmetricRepulsiveHubbardHamiltonian_mul_tJTotalSpinOne
     (hT_symm : ∀ i j, T i j = T j i) :
     symmetricRepulsiveHubbardHamiltonian N T U * tJTotalSpinOne N
       = tJTotalSpinOne N * symmetricRepulsiveHubbardHamiltonian N T U := by
-  sorry
+  have hcP := (fermionTotalSpinPlus_commute_symmetricRepulsiveHubbardHamiltonian N T U).eq.symm
+  have hcM :=
+    (fermionTotalSpinMinus_commute_symmetricRepulsiveHubbardHamiltonian N T hT_symm U).eq.symm
+  rw [tJTotalSpinOne, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_add, Matrix.add_mul, hcP, hcM]
 
 /-- **The symmetric repulsive Hubbard Hamiltonian commutes with `Ŝ⁽²⁾_tot = −(i/2)(Ŝ⁺−Ŝ⁻)`.**
 Repulsive analogue of `attractiveHubbardHamiltonian_mul_tJTotalSpinTwo`
@@ -283,6 +286,9 @@ theorem symmetricRepulsiveHubbardHamiltonian_mul_tJTotalSpinTwo
     (hT_symm : ∀ i j, T i j = T j i) :
     symmetricRepulsiveHubbardHamiltonian N T U * tJTotalSpinTwo N
       = tJTotalSpinTwo N * symmetricRepulsiveHubbardHamiltonian N T U := by
-  sorry
+  have hcP := (fermionTotalSpinPlus_commute_symmetricRepulsiveHubbardHamiltonian N T U).eq.symm
+  have hcM :=
+    (fermionTotalSpinMinus_commute_symmetricRepulsiveHubbardHamiltonian N T hT_symm U).eq.symm
+  rw [tJTotalSpinTwo, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_sub, Matrix.sub_mul, hcP, hcM]
 
 end LatticeSystem.Fermion

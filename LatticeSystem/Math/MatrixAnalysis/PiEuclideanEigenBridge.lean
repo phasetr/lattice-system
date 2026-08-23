@@ -35,6 +35,10 @@ theorem mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul {n : Type*} [Fintype n] [
     (M : Matrix n n ℂ) (v : n → ℂ) (a : ℂ) :
     M.mulVec v = a • v ↔
       Matrix.toEuclideanLin M (WithLp.toLp 2 v) = a • (WithLp.toLp 2 v) := by
-  sorry
+  have happ : Matrix.toEuclideanLin M (WithLp.toLp 2 v) = WithLp.toLp 2 (M.mulVec v) := by
+    rw [show Matrix.toEuclideanLin M = Matrix.toLpLin 2 2 M from rfl, Matrix.toLpLin_toLp,
+      Matrix.toLin'_apply]
+  rw [happ, ← WithLp.toLp_smul]
+  exact ((WithLp.toLp_injective 2).eq_iff).symm
 
 end LatticeSystem.Math
