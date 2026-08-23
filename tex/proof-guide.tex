@@ -7070,11 +7070,15 @@ correct shift is $2\kappa=|A|(N+1-|A|)$ with no $/2$, since the
 $(2:\mathbb C)\bullet\mathrm{bipartiteCoupling}$ both pick up the same factor
 $2$. This PR \textbf{discharges} PR-8b's sole reference-0 debt
 \texttt{secondOrderEffectiveHamiltonian\_liebPerturbation\_eq\_tJExchange}.
-\emph{Debt (new, staged for PR-9b/PR-10).} The two capstones and the
-convention-guard lemma
+\emph{Debt (new, staged for PR-9b/PR-10).} The $\hat H_{\mathrm{eff}}$
+corollary
+\texttt{secondOrderEffectiveHamiltonian\_liebPerturbation\_reindex\_eq\_heisenbergOnMagSector}
+and the convention-guard lemma
 \texttt{liebHardCoreToMagConfigS\_apply\_eq\_zero\_iff\_up\_occupied} (kept
 deliberately at reference~0 as a single visible up/down-convention pin, not
-decoration) are the file's three reference-0 declarations.
+decoration) are the file's two reference-0 declarations; the raw capstone
+\texttt{kernelProjection\_mul\_liebPerturbationVCompressed\_sq\_mul\_kernelProjection\_reindex\_eq}
+is consumed inside the file by that corollary.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,

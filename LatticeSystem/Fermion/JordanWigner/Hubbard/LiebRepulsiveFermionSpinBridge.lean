@@ -56,9 +56,11 @@ same-site entry `fermionSpinDot N x x` never reaches the capstone and is deliber
 
 ## Debt
 
-Three declarations are at reference 0. The two capstones are staged for PR-9b (total-spin Casimir
-bridge) and PR-10 (endpoint Heisenberg Casimir) per the fixed PR order (issue #5320). The
-convention guard `liebHardCoreToMagConfigS_apply_eq_zero_iff_up_occupied` is deliberate: it pins
+Two declarations are at reference 0. The `Ĥeff` corollary
+`secondOrderEffectiveHamiltonian_liebPerturbation_reindex_eq_heisenbergOnMagSector` is staged for
+PR-9b (total-spin Casimir bridge) and PR-10 (endpoint Heisenberg Casimir) per the fixed PR order
+(issue #5320); the raw capstone it is derived from is consumed inside this file by that corollary.
+The convention guard `liebHardCoreToMagConfigS_apply_eq_zero_iff_up_occupied` is deliberate: it pins
 the up/down reading of the sector `Equiv` in a single visible statement so that a silent flip of
 the convention (which selects the mirror sector `M = nUp` and would break PR-10) fails loudly here
 rather than downstream.
@@ -97,22 +99,6 @@ private theorem fin2_snd_eq_one_sub (a b : Fin 2) (h : a.val + b.val = 1) : b = 
 /-- An occupation value that is not `1` is `0`. -/
 private theorem fin2_eq_zero_of_ne_one {a : Fin 2} (h : a ≠ 1) : a = 0 := by
   revert a; decide
-
-/-- Reindex a sum over the `2 N + 2` spin orbitals as the double sum over the `N + 1` sites and the
-two spin labels; the `spinfulIndex` pairing `(x, r) ↦ 2 x + r` is a bijection. -/
-private theorem sum_spinfulIndex_eq {β : Type*} [AddCommMonoid β] (N : ℕ)
-    (g : Fin (2 * N + 2) → β) :
-    ∑ j : Fin (2 * N + 2), g j
-      = ∑ x : Fin (N + 1), (g (spinfulIndex N x 0) + g (spinfulIndex N x 1)) := by
-  have hbij : Function.Bijective fun p : Fin (N + 1) × Fin 2 => spinfulIndex N p.1 p.2 := by
-    refine ⟨fun p q h => ?_, fun k => ?_⟩
-    · obtain ⟨h1, h2⟩ := (spinfulIndex_eq_iff N p.1 q.1 p.2 q.2).mp h
-      exact Prod.ext h1 h2
-    · obtain ⟨a, r, rfl⟩ := exists_spinfulIndex N k
-      exact ⟨(a, r), rfl⟩
-  rw [← Fintype.sum_bijective _ hbij (fun p => g (spinfulIndex N p.1 p.2)) g fun _ => rfl,
-    Fintype.sum_prod_type]
-  exact Finset.sum_congr rfl fun x _ => Fin.sum_univ_two _
 
 /-! ## The hard-core half-filling predicate -/
 
@@ -173,31 +159,25 @@ def liebHardCoreToMagConfigS (N nUp : ℕ) :
 /-! ## The sector `Equiv`: backward direction -/
 
 /-- The Fock configuration recovered from a spin-`1/2` configuration `σ`: site `x`'s up orbital is
-occupied iff `σ x = 0`, and its down orbital iff `σ x = 1` — matching `tJConfigOf`'s indexing
-pattern (`k.val % 2 = 0` = up orbital). -/
+occupied iff `σ x = 0`, and its down orbital iff `σ x = 1`. It is the `tJConfigOf` basis
+configuration (`TJSectorBasis.lean`) of the t-J site-state reading `σ x = 0` as `↑` and `σ x = 1`
+as `↓`, so the orbital-indexing arithmetic is reused rather than redone. -/
 def liebHardCoreOfMagConfigSFock {N : ℕ} (σ : Fin (N + 1) → Fin 2) : Fin (2 * N + 2) → Fin 2 :=
-  fun k =>
-    let i : Fin (N + 1) :=
-      ⟨k.val / 2, (Nat.div_lt_iff_lt_mul (by norm_num)).mpr (by have := k.isLt; omega)⟩
-    if k.val % 2 = 0 then 1 - σ i else σ i
+  tJConfigOf N fun x => if σ x = 0 then 1 else 2
 
 /-- `liebHardCoreOfMagConfigSFock σ` at the up-orbital `spinfulIndex x 0` is `1 − σ x`. -/
 theorem liebHardCoreOfMagConfigSFock_apply_up (N : ℕ) (σ : Fin (N + 1) → Fin 2)
     (x : Fin (N + 1)) :
     liebHardCoreOfMagConfigSFock σ (spinfulIndex N x 0) = 1 - σ x := by
-  have hsite : (spinfulIndex N x 0).val / 2 = x.val := by simp [spinfulIndex]
-  have hmod : (spinfulIndex N x 0).val % 2 = 0 := by simp [spinfulIndex]
-  simp only [liebHardCoreOfMagConfigSFock, hsite, hmod, if_true]
+  simp only [liebHardCoreOfMagConfigSFock, tJConfigOf_apply_up]
+  rcases fin2_eq_zero_or_one (σ x) with h | h <;> rw [h] <;> decide
 
 /-- `liebHardCoreOfMagConfigSFock σ` at the down-orbital `spinfulIndex x 1` is `σ x`. -/
 theorem liebHardCoreOfMagConfigSFock_apply_down (N : ℕ) (σ : Fin (N + 1) → Fin 2)
     (x : Fin (N + 1)) :
     liebHardCoreOfMagConfigSFock σ (spinfulIndex N x 1) = σ x := by
-  have hval : (spinfulIndex N x 1).val = 2 * x.val + 1 := by simp [spinfulIndex]
-  have hsite : (spinfulIndex N x 1).val / 2 = x.val := by
-    rw [hval, Nat.mul_add_div (by norm_num)]; norm_num
-  have hmod : (spinfulIndex N x 1).val % 2 = 1 := by rw [hval, Nat.mul_add_mod]
-  simp only [liebHardCoreOfMagConfigSFock, hsite, hmod, if_neg (by norm_num : ¬ (1 = 0))]
+  simp only [liebHardCoreOfMagConfigSFock, tJConfigOf_apply_down]
+  rcases fin2_eq_zero_or_one (σ x) with h | h <;> rw [h] <;> decide
 
 /-- `liebHardCoreOfMagConfigSFock σ` lies in `liebHardCoreHalfFillingPred N nUp`, provided
 `σ`'s magnetization sum is `N + 1 − nUp` and `nUp ≤ N + 1` (needed to recover `nUp` from the
@@ -226,7 +206,7 @@ theorem liebHardCoreOfMagConfigSFock_mem_pred (N nUp : ℕ) (hnUp : nUp ≤ N + 
     rw [Finset.sum_add_distrib] at hsum
     omega
   refine ⟨⟨?_, hup⟩, hsingle⟩
-  rw [sum_spinfulIndex_eq N fun j => ((liebHardCoreOfMagConfigSFock σ) j).val,
+  rw [sum_spinful_split N fun j => ((liebHardCoreOfMagConfigSFock σ) j).val,
     Finset.sum_congr rfl fun z (_ : z ∈ Finset.univ) => hsingle z]
   simp
 
@@ -324,10 +304,9 @@ private theorem liebHardCoreHalfFillingSectorEquivS_eq_iff (N nUp : ℕ) (hnUp :
 def liebHardCoreSiteState {N : ℕ} (c : Fin (2 * N + 2) → Fin 2) : Fin (N + 1) → Fin 3 :=
   fun x => if c (spinfulIndex N x 0) = 1 then 1 else 2
 
-/-- `liebHardCoreSiteState c` never takes the "empty" value `0`, since every site is singly
-occupied. -/
-theorem liebHardCoreSiteState_ne_zero (N nUp : ℕ) {c : Fin (2 * N + 2) → Fin 2}
-    (_hc : liebHardCoreHalfFillingPred N nUp c) (x : Fin (N + 1)) :
+/-- `liebHardCoreSiteState c` never takes the "empty" value `0`: it reads every site as `↑` or `↓`
+by construction, so no half-filling hypothesis is needed. -/
+theorem liebHardCoreSiteState_ne_zero (N : ℕ) {c : Fin (2 * N + 2) → Fin 2} (x : Fin (N + 1)) :
     liebHardCoreSiteState c x ≠ 0 := by
   simp only [liebHardCoreSiteState]
   split_ifs <;> decide
@@ -456,14 +435,13 @@ private theorem spinSDot_one_apply_eq_of_ne {N : ℕ} {x y : Fin (N + 1)} (hxy :
 
 /-! ## Entrywise operator correspondence -/
 
-/-- **The diagonal number-operator constant**: on a pair of hard-core half-filled bra/ket
-configurations, `n̂_x n̂_y` collapses to the Kronecker delta `[e = c]` (every site is singly
-occupied, so `n̂_x = n̂_y = 1` identically on both `c` and `e`). Summed over the endpoint graph's
+/-- **The diagonal number-operator constant**: on a hard-core half-filled ket configuration `c`,
+`n̂_x n̂_y` collapses to the Kronecker delta `[e = c]` (every site of `c` is singly occupied, so
+`n̂_x = n̂_y = 1` there; the bra `e` is arbitrary). Summed over the endpoint graph's
 `2 |A| (N + 1 − |A|)` ordered adjacent pairs, this is what produces the exact
 `|A| (N + 1 − |A|)` constant shift in the PR-9a capstones below. -/
 theorem fermionSiteNumber_mul_apply_eq_ite_of_singlyOccupied (N nUp : ℕ) (x y : Fin (N + 1))
-    {c e : Fin (2 * N + 2) → Fin 2}
-    (hc : liebHardCoreHalfFillingPred N nUp c) (_he : liebHardCoreHalfFillingPred N nUp e) :
+    {c e : Fin (2 * N + 2) → Fin 2} (hc : liebHardCoreHalfFillingPred N nUp c) :
     (fermionSiteNumber N x * fermionSiteNumber N y) e c = if e = c then 1 else 0 := by
   have hx : ((c (spinfulIndex N x 0)).val : ℂ) + ((c (spinfulIndex N x 1)).val : ℂ) = 1 := by
     exact_mod_cast congrArg (fun n : ℕ => (n : ℂ)) (hc.2 x)
@@ -502,7 +480,7 @@ theorem fermionSpinDot_apply_eq_spinSDot_of_singlyOccupied (N nUp : ℕ) {x y : 
     intro z
     rw [tJConfigOf_apply_up, tJConfigOf_apply_down, hswapVal]
     rcases fin3_eq_zero_or_one_or_two (liebHardCoreSiteState c (Equiv.swap x y z)) with h | h | h
-    · exact absurd h (liebHardCoreSiteState_ne_zero N nUp hc _)
+    · exact absurd h (liebHardCoreSiteState_ne_zero N _)
     · rw [h]; decide
     · rw [h]; decide
   -- and its down-orbital occupation is the site-swapped spin configuration
@@ -523,11 +501,11 @@ theorem fermionSpinDot_apply_eq_spinSDot_of_singlyOccupied (N nUp : ℕ) {x y : 
       exact (liebHardCoreSiteState_eq_two_iff N nUp hc _).mpr hcontra
   -- the fermionic bond action, read entrywise against the bra `e`
   have hbond := congrFun (tJExchangeBond_mulVec_tJConfigOf_full N (liebHardCoreSiteState c) x y hxy
-    (liebHardCoreSiteState_ne_zero N nUp hc x) (liebHardCoreSiteState_ne_zero N nUp hc y)) e
+    (liebHardCoreSiteState_ne_zero N x) (liebHardCoreSiteState_ne_zero N y)) e
   rw [hcfg] at hbond
   simp only [Pi.smul_apply, Pi.sub_apply, smul_eq_mul, mulVec_basisVec_apply, Matrix.sub_apply,
     Matrix.smul_apply, basisVec_apply] at hbond
-  rw [fermionSiteNumber_mul_apply_eq_ite_of_singlyOccupied N nUp x y hc he] at hbond
+  rw [fermionSiteNumber_mul_apply_eq_ite_of_singlyOccupied N nUp x y hc] at hbond
   -- the spin side, in the same swap form
   rw [spinSDot_one_apply_eq_of_ne hxy]
   have hdelta : (if e = c then (1 : ℂ) else 0)
@@ -542,42 +520,6 @@ theorem fermionSpinDot_apply_eq_spinSDot_of_singlyOccupied (N nUp : ℕ) {x y : 
   linear_combination -hbond
 
 /-! ## The PR-9a capstone: reindexing onto the Heisenberg magnetization sector -/
-
-/-- The number of ordered adjacent pairs of the complete bipartite endpoint graph is
-`2 |A| (N + 1 − |A|)`: for `x ∈ A` the neighbours are `Aᶜ` and for `x ∉ A` they are `A`. -/
-private theorem sum_liebEndpointGraph_adj_eq (N : ℕ) (A : Finset (Fin (N + 1))) :
-    ∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
-        (if (liebEndpointGraph A).Adj x y then (1 : ℂ) else 0)
-      = 2 * (A.card : ℂ) * ((N + 1 - A.card : ℕ) : ℂ) := by
-  have hfilter : ∀ x : Fin (N + 1),
-      (Finset.univ.filter fun y => (liebEndpointGraph A).Adj x y).card
-        = if x ∈ A then N + 1 - A.card else A.card := by
-    intro x
-    by_cases hx : x ∈ A
-    · rw [if_pos hx,
-        show (Finset.univ.filter fun y => (liebEndpointGraph A).Adj x y) = Aᶜ from by
-          ext y
-          simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_compl,
-            liebEndpointGraph_adj]
-          tauto,
-        Finset.card_compl, Fintype.card_fin]
-    · rw [if_neg hx,
-        show (Finset.univ.filter fun y => (liebEndpointGraph A).Adj x y) = A from by
-          ext y
-          simp only [Finset.mem_filter, Finset.mem_univ, true_and, liebEndpointGraph_adj]
-          tauto]
-  have hinner : ∀ x : Fin (N + 1),
-      ∑ y : Fin (N + 1), (if (liebEndpointGraph A).Adj x y then (1 : ℂ) else 0)
-        = if x ∈ A then ((N + 1 - A.card : ℕ) : ℂ) else (A.card : ℂ) := by
-    intro x
-    rw [Finset.sum_boole, hfilter x]
-    split_ifs <;> rfl
-  rw [Finset.sum_congr rfl fun x (_ : x ∈ Finset.univ) => hinner x, Finset.sum_ite,
-    show (Finset.univ.filter fun x : Fin (N + 1) => x ∈ A) = A from by ext z; simp,
-    show (Finset.univ.filter fun x : Fin (N + 1) => x ∉ A) = Aᶜ from by ext z; simp,
-    Finset.sum_const, Finset.sum_const, Finset.card_compl, Fintype.card_fin, nsmul_eq_mul,
-    nsmul_eq_mul]
-  ring
 
 /-- The inclusion of the hard-core sub-sector into the ambient half-filled sector: the
 `.1`-projection of the conjunction defining `liebHardCoreHalfFillingPred`. -/
@@ -600,6 +542,23 @@ private theorem bipartiteCoupling_eq_liebEndpointGraph_indicator (N : ℕ)
       = if (liebEndpointGraph A).Adj x y then (1 : ℂ) else 0 := by
   simp only [bipartiteCoupling, liebEndpointGraph_adj, ne_eq, decide_eq_decide]
   by_cases hx : x ∈ A <;> by_cases hy : y ∈ A <;> simp [hx, hy]
+
+/-- The number of ordered adjacent pairs of the complete bipartite endpoint graph is
+`2 |A| (N + 1 − |A|)`: the adjacency indicator *is* the bipartite coupling at `A`'s sublattice
+indicator, so this is `bipartiteCoupling_sum` (`Quantum/MarshallLiebMattis/ToyHamiltonian.lean`)
+with the two sublattice filters read back as `A` and `Aᶜ`. -/
+private theorem sum_liebEndpointGraph_adj_eq (N : ℕ) (A : Finset (Fin (N + 1))) :
+    ∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
+        (if (liebEndpointGraph A).Adj x y then (1 : ℂ) else 0)
+      = 2 * (A.card : ℂ) * ((N + 1 - A.card : ℕ) : ℂ) := by
+  have hA : (Finset.univ.filter fun x : Fin (N + 1) => decide (x ∈ A) = true) = A := by
+    ext z; simp
+  have hAc : (Finset.univ.filter fun x : Fin (N + 1) => (!decide (x ∈ A)) = true) = Aᶜ := by
+    ext z; simp
+  rw [Finset.sum_congr rfl fun x (_ : x ∈ Finset.univ) =>
+      Finset.sum_congr rfl fun y (_ : y ∈ Finset.univ) =>
+        (bipartiteCoupling_eq_liebEndpointGraph_indicator N A x y).symm,
+    bipartiteCoupling_sum, hA, hAc, Finset.card_compl, Fintype.card_fin]
 
 /-- **PR-9a capstone (raw form)**: the PR-8b superexchange identity
 (`kernelProjection_mul_liebPerturbationVCompressed_sq_mul_kernelProjection`,
@@ -660,7 +619,7 @@ theorem kernelProjection_mul_liebPerturbationVCompressed_sq_mul_kernelProjection
     by_cases hadj : (liebEndpointGraph A).Adj x y
     · rw [if_pos hadj, if_pos hadj, if_pos hadj, mul_one, Matrix.sub_apply, Matrix.smul_apply,
         smul_eq_mul,
-        fermionSiteNumber_mul_apply_eq_ite_of_singlyOccupied N nUp x y s'.property s.property,
+        fermionSiteNumber_mul_apply_eq_ite_of_singlyOccupied N nUp x y s'.property,
         fermionSpinDot_apply_eq_spinSDot_of_singlyOccupied N nUp hadj.ne s'.property s.property]
     · rw [if_neg hadj, if_neg hadj, if_neg hadj, Matrix.zero_apply]
       ring
