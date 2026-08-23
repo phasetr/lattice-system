@@ -187,6 +187,7 @@ CHAPTER_EXPECTED_TARGETS = {
     10: (
         "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-03/#tasaki-chapter-10-part-01",
         "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-04/#tasaki-chapter-10-part-02",
+        "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-05/#tasaki-chapter-10-part-03",
     ),
     11: (
         "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-02/#tasaki-chapter-11-part-01",

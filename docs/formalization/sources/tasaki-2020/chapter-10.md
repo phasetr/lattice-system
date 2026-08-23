@@ -12,3 +12,4 @@ These links project explicit Tasaki chapter headings or citations from the inter
 
 - [Tasaki Chapter 10, first catalogue chunk](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-03/#tasaki-chapter-10-part-01)
 - [Tasaki Chapter 10, continued catalogue chunk](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-04/#tasaki-chapter-10-part-02)
+- [Tasaki Chapter 10, continued catalogue chunk](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-05/#tasaki-chapter-10-part-03)
