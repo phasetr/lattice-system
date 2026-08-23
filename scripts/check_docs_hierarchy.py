@@ -824,6 +824,12 @@ def normalize_current_moved_prose(start: int, end: int, current: str, old_lines:
     # naming it as a perturbation-theoretic axiom and delimits that class by the analytic
     # machinery it needs instead.  The ledger paragraph is hard-wrapped, so unlike the two
     # corrections above this one is inverted after whitespace normalization.
+    #
+    # PR-15c (#5320) then discharges Theorem 10.4 itself: the closing parenthetical grows from
+    # "Lemma 10.1 and ... Theorem A.12 are both axiom-free" to "..., and Theorem 10.4 are all
+    # axiom-free", and the sentence recording Theorem 10.4 as fully axiomatized is deleted outright
+    # (rather than edited), so it must be reinstated here — with the still-open tracker issue,
+    # which the next .replace folds back to the closed #5004 to match the historical baseline.
     return whitespace_normalized(current).replace(
         "- **Perturbation-theoretic results** (e.g., the singular-perturbation and "
         "adiabatic-continuation arguments in Chapter 10, the cluster expansions behind **Theorem "
@@ -834,13 +840,17 @@ def normalize_current_moved_prose(start: int, end: int, current: str, old_lines:
         "*machinery* it needs — analytic eigenvalue-branch (Rellich–Kato) continuation, "
         "cluster/polymer expansions, volume-uniform estimates — and does **not** cover "
         "finite-dimensional degenerate perturbation theory at fixed finite volume, which is "
-        "ordinary linear algebra and is proved (**Lemma 10.1** and the strong-coupling **Theorem "
-        "A.12** are both axiom-free)",
+        "ordinary linear algebra and is proved (**Lemma 10.1**, the strong-coupling **Theorem "
+        "A.12**, and **Theorem 10.4** are all axiom-free).",
         "- **Perturbation-theoretic results** (e.g., **Lemma 10.1** (Tasaki §10.1, degenerate "
         "perturbation theory) and singular-perturbation arguments in Chapter 10): the analytic "
         "proofs of weak-coupling continuation and adiabatic following for eigenstate families are "
         "**not undertaken** as an active project goal; such techniques naturally belong to a "
-        "separate analytic-perturbation development",
+        "separate analytic-perturbation development. **Theorem 10.4** (Lieb's repulsive-Hubbard "
+        "half-filling ground state) currently has its entire content axiomatized: the global "
+        "minimum energy, ground-state degeneracy, and total-spin values are all undischarged. "
+        "(The fixed-Ŝ³-sector ground-state uniqueness has been proved; full theorem discharge is "
+        "tracked in Issue #5320.)",
     ).replace(
         # Issue #5004 was closed; the Theorem 10.4 discharge is now tracked in Issue #5320, so the
         # ledger's pointer follows the open tracker.  Hard-wrapped, hence inverted after
