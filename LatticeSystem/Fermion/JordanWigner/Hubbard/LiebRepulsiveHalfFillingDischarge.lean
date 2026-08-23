@@ -59,7 +59,7 @@ variable {N : ℕ}
 
 /-- If the bipartition sublattice `A` is empty, `HoppingRespectsBipartition` forces `T = 0`
 (every entry is forced zero, since `x ∈ A` is vacuously false for every `x`). -/
-theorem liebRepulsive_hopping_eq_zero_of_A_card_eq_zero {A : Finset (Fin (N + 1))}
+private theorem liebRepulsive_hopping_eq_zero_of_A_card_eq_zero {A : Finset (Fin (N + 1))}
     {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ} (hbip : HoppingRespectsBipartition A T)
     (hA : A.card = 0) : T = 0 := by
   ext x y
@@ -71,7 +71,7 @@ theorem liebRepulsive_hopping_eq_zero_of_A_card_eq_zero {A : Finset (Fin (N + 1)
 
 /-- If the complement sublattice `B = Aᶜ` is empty, `HoppingRespectsBipartition` forces `T = 0`
 (every entry is forced zero, since `x ∈ A` is vacuously true for every `x`). -/
-theorem liebRepulsive_hopping_eq_zero_of_B_card_eq_zero {A : Finset (Fin (N + 1))}
+private theorem liebRepulsive_hopping_eq_zero_of_B_card_eq_zero {A : Finset (Fin (N + 1))}
     {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ} (hbip : HoppingRespectsBipartition A T)
     (hB : (bipartitionComplement A).card = 0) : T = 0 := by
   have hall : ∀ z : Fin (N + 1), z ∈ A := by
