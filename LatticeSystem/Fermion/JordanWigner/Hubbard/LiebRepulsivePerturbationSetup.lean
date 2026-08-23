@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveHomotopyContinuity
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowUVariationalCore
+import LatticeSystem.Math.MatrixAnalysis.BlockTransport
 
 /-!
 # Perturbation setup for Theorem 10.4 (Tasaki §10.2.2, PR-5)
@@ -351,6 +352,23 @@ theorem liebPerturbationH0Compressed_eq_diagonal (N nUp : ℕ) :
   by_cases h : s = s'
   · rw [if_pos h, if_pos (congrArg Subtype.val h)]
   · rw [if_neg h, if_neg (fun hv => h (Subtype.ext hv))]
+
+/-- **The hard-core predicate on the half-filled fixed-`Ŝ³` sector.** A sector configuration `s`
+is hard-core (no doubly occupied site) exactly when its Fock-space interaction weight vanishes. -/
+abbrev liebHalfFillingHardcorePred (N nUp : ℕ) :
+    configSector N (liebHalfFillingPred N nUp) → Prop :=
+  fun s => hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) s.val = 0
+
+/-- **`ker (Ĥ₀|_K)` is the coordinate span of the hard-core sector configurations.** Bridges the
+diagonal form of the compressed unperturbed Hamiltonian (`liebPerturbationH0Compressed_eq_diagonal`)
+to the generic coordinate-span kernel identification
+(`LatticeSystem.Math.matrixKernel_diagonal_eq_coordinateSpan`,
+`Math/MatrixAnalysis/BlockTransport.lean`); this is the sector-level analogue of
+`mem_matrixKernel_liebPerturbationH0_iff` needed to apply Lemma 10.1's block transport to `Ĥ₀|_K`. -/
+theorem matrixKernel_liebPerturbationH0Compressed_eq_coordinateSpan (N nUp : ℕ) :
+    LatticeSystem.Math.matrixKernel (liebPerturbationH0Compressed N nUp)
+      = LatticeSystem.Math.coordinateSpan (liebHalfFillingHardcorePred N nUp) := by
+  sorry
 
 /-- **`P̂₀` inside the sector is the hard-core indicator.** The orthogonal projection onto
 `ker (Ĥ₀|_K)` is the diagonal indicator of the sector configurations without a doubly occupied
