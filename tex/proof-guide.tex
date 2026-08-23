@@ -7467,14 +7467,16 @@ all four discharged adapters into PR-11c's
 \texttt{liebRepulsive\_exists\_unique\_casimir\_sector}, yielding the same
 unique-strictly-minimal-occupied-Casimir-sector conclusion
 \textbf{unconditionally} (no SU(2)/Hermiticity hypotheses left), closing
-PR-11c's reference-0 debt on that capstone. \textbf{Debt (new).} Two
-declarations introduced by this PR are at reference~0: the sector-arithmetic
-bridge \texttt{liebHalfFillingSpinZVal\_eq\_of\_two\_mul}, staged for PR-12b
-consumption (its per-$s$ instantiation matches PR-11c's
+PR-11c's reference-0 debt on that capstone. \textbf{Debt.} The
+sector-arithmetic bridge \texttt{liebHalfFillingSpinZVal\_eq\_of\_two\_mul}
+remains at reference~0 --- PR-12b did \emph{not} consume it as originally
+staged, so it is still staged for a later PR (matching PR-11c's
 \texttt{liebHalfFillingSpinZVal N nUp} against the $N_e$-indexed statement of
-Theorem~10.4); and this PR's own final capstone
-\texttt{liebRepulsive\_exists\_unique\_casimir\_sector\_unconditional}, which
-stays at reference~0, staged for the arc's remaining assembly (PR-13/PR-14).
+Theorem~10.4). This PR's own final capstone
+\texttt{liebRepulsive\_exists\_unique\_casimir\_sector\_unconditional} was
+staged at reference~0, but \textbf{PR-12b has since consumed it} (as
+\texttt{symmetricHomotopy\_exists\_unique\_casimir\_sector} in
+\texttt{LiebRepulsiveSymmetricHomotopy.lean}), closing that debt.
 \textbf{Also deletes}
 \texttt{configSectorCompress\_eq\_submatrix}
 (\texttt{HubbardImpossibilityLowUVariationalCore.lean}), a decorative
@@ -7486,10 +7488,17 @@ capstone is decorative'' discipline, deleted rather than staged a fourth time
 emerges). Axiom-free.
 
 \emph{The site-dependent-$U$ homotopy discharge (Issue~\#5320, PR~\#5339
-PR-12b).} Closes obligation (3) of PR-11c's capstone docstring: the
-$U_x\to U$ reduction is discharged by rerunning PR-4's uniform-$U$ homotopy
-argument directly at fixed site-dependent $U : \mathrm{Fin}(N{+}1)\to\mathbb R$,
-never reducing to the uniform model.
+PR-12b).} Discharges the homotopy leg of obligation (3) of PR-11c's
+capstone docstring: the $U_x\to U$ reduction is discharged by rerunning
+PR-4's uniform-$U$ homotopy argument directly at fixed site-dependent
+$U : \mathrm{Fin}(N{+}1)\to\mathbb R$, never reducing to the uniform model.
+This PR only establishes the homotopy leg ($c(0)=c(1)$, the site-dependent
+model's occupied Casimir sector agrees with the sector at the homotopy's
+$s=1$ endpoint); identifying that endpoint's Hamiltonian with the uniform
+$\lambda$-endpoint model of PR-4/PR-11c (no Lean lemma of the form
+\texttt{symmetricHomotopyHamiltonian \_ \_ \_ \_ \_ 1 =
+symmetricRepulsiveHubbardHamiltonian \_ (liebEndpointHopping \_ \_ \_)
+(fun \_ => 1)} exists yet in this arc) is deferred to PR-13.
 \texttt{homotopyOnSiteFn}~$U\,s\,x := $~\texttt{homotopyOnSite}~$(U\,x)\,s$
 lifts PR-4's scalar on-site homotopy pointwise;
 \texttt{symmetricHomotopyHamiltonian} reuses PR-4's hopping homotopy
@@ -7517,11 +7526,16 @@ with the continuity fact through PR-4's
 \texttt{casimirSelector\_eq\_const\_of\_locally\_unique\_strict\_min},
 yielding a selector $c:\mathbb R\to\mathbb C$ constant along the whole
 homotopy, in particular $c(0)=c(1)$ --- the occupied Casimir sector of the
-site-dependent symmetric model ($s=0$) agrees with that of the
-$\lambda$-endpoint model ($s=1$). Both new declarations at reference~0
-(\texttt{symmetricHomotopy\_exists\_unique\_casimir\_sector},
-\texttt{symmetricHomotopy\_casimirSelector\_eq\_const}) are staged for the
-arc's remaining assembly (PR-13/PR-14). Axiom-free.
+site-dependent symmetric model ($s=0$) agrees with the occupied Casimir
+sector at the homotopy's $s=1$ endpoint; that $s=1$ Hamiltonian's
+identification with the $\lambda$-endpoint model of PR-4/PR-11c is deferred
+to PR-13 (see above). \texttt{symmetricHomotopyHamiltonian\_zero} is at
+reference~0 (docstring mention only, not consumed by any proof); the
+capstone \texttt{symmetricHomotopy\_casimirSelector\_eq\_const} is also at
+reference~0, staged for the arc's remaining assembly (PR-13/PR-14);
+\texttt{symmetricHomotopy\_exists\_unique\_casimir\_sector} is \emph{not} at
+reference~0 --- it is consumed by the capstone's proof in this same file.
+Axiom-free.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,

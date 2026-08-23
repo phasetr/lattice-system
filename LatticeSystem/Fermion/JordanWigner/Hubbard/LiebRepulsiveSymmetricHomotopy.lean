@@ -152,8 +152,11 @@ theorem symmetricHomotopy_exists_unique_casimir_sector (N Ne : ℕ)
 
 /-- **The assembled capstone**: the occupied Casimir sector of the symmetric-form homotopy is
 constant along the whole homotopy — in particular the occupied Casimir sector of the original
-symmetric repulsive model (`s = 0`, via `symmetricHomotopyHamiltonian_zero`) agrees with that of
-the `λ`-endpoint model (`s = 1`). Assembled from
+symmetric repulsive model (`s = 0`, via `symmetricHomotopyHamiltonian_zero`) agrees with the
+occupied Casimir sector at the homotopy's `s = 1` endpoint. Identifying that `s = 1` Hamiltonian
+with the `λ`-endpoint model of PR-4/PR-11c (`symmetricHomotopyHamiltonian _ _ _ _ _ 1 =
+symmetricRepulsiveHubbardHamiltonian _ (liebEndpointHopping _ _ _) (fun _ => 1)` holds, but not
+`rfl`) is left to PR-13. Assembled from
 `symmetricHomotopy_exists_unique_casimir_sector` (supplying `hStrict` pointwise via `choose`, with
 the `minEnergyOn K_{c s} (H s) = E s` conjunct closed by `rfl` on `E s := minEnergyOn K_{c s} (H
 s)`) and `continuous_minEnergyOn_symmetricHomotopyHamiltonian` (supplying `hCont`), through PR-4's
