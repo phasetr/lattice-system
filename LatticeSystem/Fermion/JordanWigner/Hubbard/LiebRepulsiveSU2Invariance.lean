@@ -8,7 +8,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorReduction
 
 Fifteenth installment of the Theorem 10.4 discharge arc (issue #5320). PR-11c's capstone
 `liebRepulsive_exists_unique_casimir_sector`
-(`LiebRepulsiveSectorBridgeFinal.lean:192`) takes the `SU(2)` commute/Hermiticity adapters for
+(`LiebRepulsiveSectorBridgeFinal.lean`) takes the `SU(2)` commute/Hermiticity adapters for
 `symmetricRepulsiveHubbardHamiltonian` as explicit hypotheses, since they were **not yet
 formalized** for this Hamiltonian family (unlike `hubbardHamiltonian`,
 `SaturatedFerromagnetism.lean`, and `attractiveHubbardHamiltonian`,
@@ -233,7 +233,7 @@ theorem liebHalfFillingSpinZVal_eq_of_two_mul (N nUp Ne : ℕ) (hNe : Ne = 2 * n
 /-! ## The unconditional capstone -/
 
 /-- **The unconditional corollary of PR-11c's capstone.**
-`liebRepulsive_exists_unique_casimir_sector` (`LiebRepulsiveSectorBridgeFinal.lean:192`) took
+`liebRepulsive_exists_unique_casimir_sector` (`LiebRepulsiveSectorBridgeFinal.lean`) took
 the four `SU(2)` commute/Hermiticity adapters as explicit hypotheses; this file has now supplied
 all four for `symmetricRepulsiveHubbardHamiltonian`, so this corollary discharges them and
 consumes PR-11c's previously reference-0 capstone, closing that debt. -/
