@@ -8,8 +8,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveFermionSpinCasimi
 §10.2.3, p. 356, eqs. (10.2.16)/(10.2.17).)
 
 Specification suite for
-`LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismStaggeredAlgebra.lean`
-(design: `.self-local/docs/theorem-10-6-design.md`).  `example`s pin down the exact signatures of
+`LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismStaggeredAlgebra.lean`.
+`example`s pin down the exact signatures of
 `fermionStaggeredSpinZ`, `fermionStaggeredTransverse`,
 `fermionSpinDot_eq_transverse_add_spinZ_mul`,
 `fermionStaggeredCasimirOp_eq_transverse_add_staggeredSpinZ_sq`,

@@ -54,8 +54,8 @@ repulsive Hubbard model satisfies the ferrimagnetic order-parameter bound
   `⟨v| (Ô_L)² |v⟩ ≥ ((|A| − |B|)/2)²`.
 
 (The book also notes the left-hand side is independent of the ground state.)
-Proved via Theorem 10.4, exactly as Theorem 4.4 (not reflection positivity); recorded
-as an axiom pending discharge (Issue #5347). -/
+Proved via Theorem 10.4 and Theorem 10.5 (inequality (10.2.7)), exactly as Theorem 4.4
+(not reflection positivity); recorded as an axiom pending discharge (Issue #5347). -/
 axiom theorem_10_6_lieb_ferrimagnetism
     (A : Finset (Fin (N + 1)))
     (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
