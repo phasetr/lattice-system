@@ -7167,6 +7167,11 @@ Hamiltonian merely block-\emph{diagonal} across $P$/$\neg P$; the new
 \texttt{blockSupport\_apply\_eq\_zero} lets a block-supported model supply
 $h_{\mathrm{Inv}}$ in one line, so the sole existing call site
 (\texttt{LiebRepulsiveSectorAssembly.lean}) needs no shape change.
+\textbf{Debt (new).} The generalization's actual payoff --- covering a
+Hamiltonian that is block-diagonal across $P$/$\neg P$ but \emph{not}
+block-supported (i.e.\ $h_{\mathrm{Inv}}$ holds while $H=\hat P H\hat P$
+fails) --- has no consumer yet; every current call site still happens to be
+block-supported, so this coverage is staged for a later PR.
 
 \emph{Theorem 2.3 instance and fermionic Casimir transport (Issue~\#5320,
 PR~\#5334 PR-10b).} \texttt{liebOrientedSublattice}~$A$ is the canonically
@@ -7507,7 +7512,9 @@ $s=1$ endpoint); identifying that endpoint's Hamiltonian with the uniform
 $\lambda$-endpoint model of PR-4/PR-11c (no Lean lemma of the form
 \texttt{symmetricHomotopyHamiltonian \_ \_ \_ \_ \_ 1 =
 symmetricRepulsiveHubbardHamiltonian \_ (liebEndpointHopping \_ \_ \_)
-(fun \_ => 1)} exists yet in this arc) is deferred to PR-13.
+(fun \_ => 1)} exists yet in this arc) is deferred to PR-13. \textbf{PR-13a
+has since supplied} this identification as
+\texttt{symmetricHomotopyHamiltonian\_one\_eq\_uniform}.
 \texttt{homotopyOnSiteFn}~$U\,s\,x := $~\texttt{homotopyOnSite}~$(U\,x)\,s$
 lifts PR-4's scalar on-site homotopy pointwise;
 \texttt{symmetricHomotopyHamiltonian} reuses PR-4's hopping homotopy
@@ -7538,7 +7545,8 @@ homotopy, in particular $c(0)=c(1)$ --- the occupied Casimir sector of the
 site-dependent symmetric model ($s=0$) agrees with the occupied Casimir
 sector at the homotopy's $s=1$ endpoint; that $s=1$ Hamiltonian's
 identification with the $\lambda$-endpoint model of PR-4/PR-11c is deferred
-to PR-13 (see above). \texttt{symmetricHomotopyHamiltonian\_zero} is at
+to PR-13 (see above; \textbf{PR-13a has since supplied} it as
+\texttt{symmetricHomotopyHamiltonian\_one\_eq\_uniform}). \texttt{symmetricHomotopyHamiltonian\_zero} is at
 reference~0 (docstring mention only, not consumed by any proof); the
 capstone \texttt{symmetricHomotopy\_casimirSelector\_eq\_const} is also at
 reference~0, staged for the arc's remaining assembly (PR-13/PR-14);
@@ -7575,7 +7583,10 @@ generalization}: see the updated PR-10a paragraph above.
 \texttt{minEnergyOn\_add\_const\_smul\_one} (staged unconsumed since PR-5) as
 a decorative reference-0 declaration, since the arc's assembly normalises the
 energy origin at the \texttt{IsUniqueGroundStateOn} level instead (PR-11a's
-\texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff}). Axiom-free.
+\texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff}). \textbf{Debt (new).}
+This PR's own capstone
+\texttt{configSectorCompress\_symmetricHomotopyHamiltonian\_one\_eq\_perturbedHamiltonian\_sub\_smul}
+is at reference~0, staged for PR-13b's consumption. Axiom-free.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
