@@ -3,7 +3,7 @@ import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbation
 /-!
 # Coordinate-block ground-state transport
 
-Two model-independent facts about a Hermitian matrix that is *supported on a coordinate block*:
+Two model-independent facts about a matrix that is *supported on a coordinate block*:
 one relating its unique-ground-state predicate on that block to the same predicate for the block's
 submatrix on the whole restricted space, and one identifying the kernel of a diagonal matrix with
 the coordinate span of the indices where it vanishes.
@@ -288,7 +288,7 @@ theorem isUniqueGroundStateOn_coordinateSpan_iff_submatrix {H : Matrix n n ℂ}
       rw [← coordinateExtend_coordinateRestrict hψmem, hc, coordinateExtend_smul,
         coordinateExtend_coordinateRestrict hφ]
 
-/-- **The kernel of a block-diagonal matrix is the coordinate span of its zero-block predicate.**
+/-- **The kernel of a diagonal matrix is the coordinate span of its zero-entry predicate.**
 If a diagonal matrix's entries vanish exactly on a decidable predicate `P`, its kernel (as a
 subspace of `EuclideanSpace ℂ n`) is the coordinate span of `P`. -/
 theorem matrixKernel_diagonal_eq_coordinateSpan (d : n → ℂ) (P : n → Prop) [DecidablePred P]
