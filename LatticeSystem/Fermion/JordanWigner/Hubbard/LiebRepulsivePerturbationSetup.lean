@@ -364,11 +364,13 @@ diagonal form of the compressed unperturbed Hamiltonian (`liebPerturbationH0Comp
 to the generic coordinate-span kernel identification
 (`LatticeSystem.Math.matrixKernel_diagonal_eq_coordinateSpan`,
 `Math/MatrixAnalysis/BlockTransport.lean`); this is the sector-level analogue of
-`mem_matrixKernel_liebPerturbationH0_iff` needed to apply Lemma 10.1's block transport to `Ĥ₀|_K`. -/
+`mem_matrixKernel_liebPerturbationH0_iff` needed to apply Lemma 10.1's block transport to
+`Ĥ₀|_K`. -/
 theorem matrixKernel_liebPerturbationH0Compressed_eq_coordinateSpan (N nUp : ℕ) :
     LatticeSystem.Math.matrixKernel (liebPerturbationH0Compressed N nUp)
       = LatticeSystem.Math.coordinateSpan (liebHalfFillingHardcorePred N nUp) := by
-  sorry
+  rw [liebPerturbationH0Compressed_eq_diagonal]
+  exact LatticeSystem.Math.matrixKernel_diagonal_eq_coordinateSpan _ _ fun _ => Iff.rfl
 
 /-- **`P̂₀` inside the sector is the hard-core indicator.** The orthogonal projection onto
 `ker (Ĥ₀|_K)` is the diagonal indicator of the sector configurations without a doubly occupied
