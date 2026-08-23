@@ -160,6 +160,7 @@ theorem tasaki_lemma_10_1_liebRepulsive_apply
     ∃ lam0 : ℝ, 0 < lam0 ∧
       ∃ Elam : ℝ → ℝ,
       ∃ Philam : ℝ → EuclideanSpace ℂ (configSector N (liebHalfFillingPred N nUp)),
+      ∃ Eeff : ℝ,
       ∃ Φeff : EuclideanSpace ℂ (configSector N (liebHalfFillingPred N nUp)),
         (∀ lam : ℝ, 0 < lam → lam < lam0 →
           IsUniqueGroundStateOn
@@ -167,6 +168,10 @@ theorem tasaki_lemma_10_1_liebRepulsive_apply
             (perturbedHamiltonian (liebPerturbationH0Compressed N nUp)
               (liebPerturbationVCompressed N nUp A T) lam)
             (Elam lam) (Philam lam)) ∧
+        IsUniqueGroundStateOn (matrixKernel (liebPerturbationH0Compressed N nUp))
+          (secondOrderEffectiveHamiltonian (liebPerturbationH0Compressed N nUp)
+            (liebPerturbationVCompressed N nUp A T) (liebPerturbationH0InvCompressed N nUp))
+          Eeff Φeff ∧
         Filter.Tendsto Philam (nhdsWithin (0 : ℝ) (Set.Ioi 0)) (nhds Φeff) := by
   classical
   haveI hne : Nonempty (configSector N (liebHalfFillingPred N nUp)) :=
@@ -205,6 +210,6 @@ theorem tasaki_lemma_10_1_liebRepulsive_apply
       (liebPerturbationH0Compressed_isReducedInverse N nUp)
       (kernelProjection_mul_liebPerturbationVCompressed_mul_kernelProjection N nUp hbip)
       E Φ hEffGS
-  exact ⟨lam0, hlam0, Elam, Philam, Φ, hUnique, hTend⟩
+  exact ⟨lam0, hlam0, Elam, Philam, E, Φ, hUnique, hEffGS, hTend⟩
 
 end LatticeSystem.Fermion
