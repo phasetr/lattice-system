@@ -7921,15 +7921,50 @@ correlation sign is claimed (the total-spin value is not asserted); the balanced
 $\hat S^3=0$ sector is the $N_e=N+1$ special case.
 
 \medskip
+\emph{Staggered spin-component algebra (Issue~\#5347, PR~\#5348 PR-1;
+proved, axiom-free).} Operator-algebra layer for Theorem~10.6
+(\texttt{Fermion/JordanWigner/Hubbard/LiebFerrimagnetismStaggeredAlgebra.lean}):
+splits the squared staggered order parameter $(\hat O_L)^2=\sum_{x,y}
+\varepsilon_x\varepsilon_y\,\hat S_x\!\cdot\!\hat S_y$
+(\texttt{fermionStaggeredCasimirOp}) into its transverse part
+$(\hat O_L)^2_\perp$ (\texttt{fermionStaggeredTransverse}) and the square of
+the longitudinal staggered operator $\hat O^{(3)}_L=\sum_x\varepsilon_x\hat
+S^z_x$ (\texttt{fermionStaggeredSpinZ}), via the per-pair split $\hat
+S_x\!\cdot\!\hat S_y=\tfrac12(\hat S^+_x\hat S^-_y+\hat S^-_x\hat S^+_y)+\hat
+S^z_x\hat S^z_y$ (\texttt{fermionSpinDot\_eq\_transverse\_add\_spinZ\_mul})
+and factoring the diagonal double sum
+(\texttt{fermionStaggeredCasimirOp\_eq\_transverse\_add\_staggeredSpinZ\_sq}).
+Shows $\hat O^{(3)}_L$ is self-adjoint
+(\texttt{fermionStaggeredSpinZ\_isHermitian}), giving Hermitian-square
+positivity $\operatorname{Re}\langle v|(\hat O^{(3)}_L)^2|v\rangle\ge0$
+(\texttt{vectorExpectation\_staggeredSpinZ\_sq\_nonneg}) and hence the
+transverse expectation lower bound $\operatorname{Re}\langle v|(\hat
+O_L)^2_\perp|v\rangle\le\operatorname{Re}\langle v|(\hat O_L)^2|v\rangle$
+(\texttt{fermionStaggeredTransverse\_expectation\_le\_staggeredCasimir\_expectation}),
+the positivity step feeding the ferrimagnetic bound (10.2.17); also shows
+$(\hat O_L)^2$ itself is self-adjoint
+(\texttt{fermionStaggeredCasimirOp\_isHermitian}). Mirrors the spin-$S$
+template of §4.1 Theorem~4.4 (eq.~(4.1.12)). Not yet consumed by
+\texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below); later
+arc PRs carry the Theorem-10.5 sign step and the SU(2) ground-multiplet
+tower argument (the fermion-native Theorem-4.4 template, not reflection
+positivity) to the axiom discharge.
+
+\medskip
 \noindent\textbf{Theorem 10.6} (Shen–Qiu–Tian ferrimagnetism; Tasaki §10.2.3,
-p.~354, eqs.~(10.2.16)/(10.2.17)). Under the hypotheses of Theorem 10.4, every
+p.~356, eqs.~(10.2.16)/(10.2.17)). Under the hypotheses of Theorem 10.4, every
 normalized ground state $v$ satisfies the staggered-order-parameter bound
 $\langle v|(\hat O_L)^2|v\rangle \ge \bigl((|A|-|B|)/2\bigr)^2$, where
 $(\hat O_L)^2 = \sum_{x,y} \varepsilon_x \varepsilon_y\, \hat S_x \cdot \hat S_y$
 with staggered sign $\varepsilon_x = \pm 1$ on the two sublattices
 (\texttt{fermionStaggeredCasimirOp}, \texttt{theorem\_10\_6\_lieb\_ferrimagnetism}),
-exhibiting ferrimagnetic long-range order. Recorded as a faithful documented
-\texttt{axiom} (Lieb's reflection positivity).
+exhibiting ferrimagnetic long-range order. Tasaki proves this exactly as Theorem~4.4,
+via \emph{both} Theorem~10.4 (\texttt{theorem\_10\_4\_lieb\_repulsive\_half\_filling})
+and inequality~(10.2.7) — Theorem~10.5's transverse-correlation sign
+(\texttt{theorem\_10\_5\_shen\_qiu\_tian\_transverse\_sign}), used in place of the
+spin-$S$ argument's~(4.1.15) — \emph{not} reflection positivity (RP is Theorem~10.4's
+own proof method, already discharged); recorded as an axiom pending discharge
+(Issue~\#5347).
 
 \medskip
 \noindent\textbf{Proposition 10.7} (Tasaki §10.2.3, p.~356), \emph{proved

@@ -216,6 +216,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveWeightConfinement
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveHalfFillingDischarge
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetism
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismStaggeredAlgebra
 import LatticeSystem.Fermion.JordanWigner.Hubbard.BipartiteSpectrum
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebShenQiu
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebKuboKishi

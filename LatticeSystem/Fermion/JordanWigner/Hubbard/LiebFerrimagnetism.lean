@@ -5,7 +5,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
 
 This file formalizes the statement of **Tasaki Theorem 10.6** (Shen, Qiu,
 and Tian's ferrimagnetism bound; Hal Tasaki, *Physics and Mathematics of
-Quantum Many-Body Systems*, 1st ed., Springer 2020, §10.2.3, p. 354,
+Quantum Many-Body Systems*, 1st ed., Springer 2020, §10.2.3, p. 356,
 eqs. (10.2.16)/(10.2.17)): for the repulsive Hubbard model at half-filling
 (Theorem 10.4), the squared staggered magnetization order parameter has a
 ground-state expectation bounded below by `((|A| − |B|)/2)²`:
@@ -17,10 +17,17 @@ of the choice of ground state. This exhibits ferrimagnetic long-range order.
 
 ## Status
 
-Like Theorems 10.4 and 10.5, this is a consequence of Lieb's spin-space
-reflection-positivity method; per the project policy it is recorded as a
-faithful documented `axiom`, reusing the packaged model hypotheses
-`IsLiebRepulsiveModel` and the ground subspace from `LiebRepulsive.lean`.
+Tasaki proves this exactly as Theorem 4.4 (Tasaki, 1st ed., Springer 2020,
+§10.2.3, p. 356, the paragraph immediately preceding Theorem 10.6), building on
+**both** Theorem 10.4 (`theorem_10_4_lieb_repulsive_half_filling`) and inequality
+(10.2.7) — Theorem 10.5's transverse-correlation sign
+(`theorem_10_5_shen_qiu_tian_transverse_sign`), used in place of the spin-`S`
+argument's (4.1.15) — **not** on reflection positivity: reflection positivity is
+Theorem 10.4's own proof method, and Theorem 10.6 reuses Theorem 10.4's
+already-discharged ground subspace together with Theorem 10.5's correlation-sign
+step. This is currently an `axiom` pending discharge (Issue #5347), reusing the
+packaged model hypotheses `IsLiebRepulsiveModel` and the ground subspace from
+`LiebRepulsive.lean`.
 -/
 
 namespace LatticeSystem.Fermion
@@ -40,14 +47,15 @@ noncomputable def fermionStaggeredCasimirOp (N : ℕ) (A : Finset (Fin (N + 1)))
       fermionSpinDot N x y
 
 /-- **Tasaki Theorem 10.6** (Shen–Qiu–Tian ferrimagnetism; 1st ed., Springer
-2020, §10.2.3, p. 354, eqs. (10.2.16)/(10.2.17), **AXIOM**). Under the
+2020, §10.2.3, p. 356, eqs. (10.2.16)/(10.2.17), **AXIOM**). Under the
 hypotheses of Theorem 10.4, every normalized ground state `v` of the
 repulsive Hubbard model satisfies the ferrimagnetic order-parameter bound
 
   `⟨v| (Ô_L)² |v⟩ ≥ ((|A| − |B|)/2)²`.
 
 (The book also notes the left-hand side is independent of the ground state.)
-Recorded as a faithful documented axiom (Lieb's reflection positivity). -/
+Proved via Theorem 10.4 and Theorem 10.5 (inequality (10.2.7)), exactly as Theorem 4.4
+(not reflection positivity); recorded as an axiom pending discharge (Issue #5347). -/
 axiom theorem_10_6_lieb_ferrimagnetism
     (A : Finset (Fin (N + 1)))
     (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
