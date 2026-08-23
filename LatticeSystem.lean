@@ -9,6 +9,7 @@ import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationGroundEnergy
 import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationUniqueness
 import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationConvergence
 import LatticeSystem.Math.MatrixAnalysis.MinEnergyOnSubspace
+import LatticeSystem.Math.MatrixAnalysis.BlockTransport
 import LatticeSystem.Math.WignerTheorem
 import LatticeSystem.Math.ProjectiveRepresentation
 import LatticeSystem.Math.CStarAlgebra.GNS
