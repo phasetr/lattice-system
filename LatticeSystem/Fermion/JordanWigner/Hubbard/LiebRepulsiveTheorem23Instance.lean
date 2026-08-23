@@ -64,14 +64,14 @@ private theorem bipartitionComplement_bipartitionComplement (A : Finset (Fin (N 
   simp [bipartitionComplement]
 
 /-- The sites carrying the indicator value `true` of a `Finset` sublattice `S` are exactly `S`. -/
-private theorem liebSublattice_filter_true (S : Finset (Fin (N + 1))) :
+theorem liebSublattice_filter_true (S : Finset (Fin (N + 1))) :
     Finset.univ.filter (fun x : Fin (N + 1) => (decide (x ∈ S)) = true) = S := by
   ext x
   simp
 
 /-- The sites carrying the indicator value `false` of a `Finset` sublattice `S` are exactly the
 bipartition complement of `S`. -/
-private theorem liebSublattice_filter_false (S : Finset (Fin (N + 1))) :
+theorem liebSublattice_filter_false (S : Finset (Fin (N + 1))) :
     Finset.univ.filter (fun x : Fin (N + 1) => (! decide (x ∈ S)) = true)
       = bipartitionComplement S := by
   ext x
@@ -153,6 +153,29 @@ private theorem liebOrientedSublattice_hsB (A : Finset (Fin (N + 1)))
     exact_mod_cast (liebOrientedSublattice_card_pos A hA hB).2
   rw [liebSublattice_filter_false, Nat.cast_one]
   linarith
+
+/-- **The nondegeneracy side conditions at the oriented sublattice**, in the four shapes the
+Marshall–Lieb–Mattis layer consumes: the filtered cardinalities `1 ≤ |A'|`, `1 ≤ |A'ᶜ|` demanded by
+`tasaki_2_5_theorem_2_3`, and the bare existence of a `true` and of a `false` site demanded by the
+Perron–Frobenius sector lemmas. All four follow from `liebOrientedSublattice_card_pos`. -/
+theorem liebOrientedSublattice_theorem23_side_conditions (A : Finset (Fin (N + 1)))
+    (hA : 1 ≤ A.card) (hB : 1 ≤ (bipartitionComplement A).card) :
+    1 ≤ (Finset.univ.filter (fun x : Fin (N + 1) =>
+        (decide (x ∈ liebOrientedSublattice A)) = true)).card ∧
+      1 ≤ (Finset.univ.filter (fun x : Fin (N + 1) =>
+        (! decide (x ∈ liebOrientedSublattice A)) = true)).card ∧
+      (∃ a, (decide (a ∈ liebOrientedSublattice A)) = true) ∧
+      (∃ b, (decide (b ∈ liebOrientedSublattice A)) = false) := by
+  classical
+  obtain ⟨hposA, hposB⟩ := liebOrientedSublattice_card_pos A hA hB
+  refine ⟨by rw [liebSublattice_filter_true]; exact hposA,
+    by rw [liebSublattice_filter_false]; exact hposB, ?_, ?_⟩
+  · obtain ⟨a, ha⟩ := Finset.card_pos.mp hposA
+    exact ⟨a, by simpa using ha⟩
+  · obtain ⟨b, hb⟩ := Finset.card_pos.mp hposB
+    have hb' : b ∉ liebOrientedSublattice A := by
+      simpa [bipartitionComplement] using hb
+    exact ⟨b, by simpa using hb'⟩
 
 /-! ## The coupling hypotheses at `J = (2 : ℂ) • bipartiteCoupling A'` -/
 
@@ -311,21 +334,8 @@ theorem liebRepulsive_groundState_casimir_eq_predicted (A : Finset (Fin (N + 1))
   classical
   haveI hne : Nonempty (magConfigS (Fin (N + 1)) 1 (N + 1 - nUp)) :=
     magConfigS_nonempty_of_le_card_mul (by simp)
-  obtain ⟨hposA, hposB⟩ := liebOrientedSublattice_card_pos A hA hB
-  have hcardA : 1 ≤ (Finset.univ.filter (fun x : Fin (N + 1) =>
-      (decide (x ∈ liebOrientedSublattice A)) = true)).card := by
-    rw [liebSublattice_filter_true]; exact hposA
-  have hcardB : 1 ≤ (Finset.univ.filter (fun x : Fin (N + 1) =>
-      (! decide (x ∈ liebOrientedSublattice A)) = true)).card := by
-    rw [liebSublattice_filter_false]; exact hposB
-  have hA_ne : ∃ a, (decide (a ∈ liebOrientedSublattice A)) = true := by
-    obtain ⟨a, ha⟩ := Finset.card_pos.mp hposA
-    exact ⟨a, by simpa using ha⟩
-  have hB_ne : ∃ b, (decide (b ∈ liebOrientedSublattice A)) = false := by
-    obtain ⟨b, hb⟩ := Finset.card_pos.mp hposB
-    have hb' : b ∉ liebOrientedSublattice A := by
-      simpa [bipartitionComplement] using hb
-    exact ⟨b, by simpa using hb'⟩
+  obtain ⟨hcardA, hcardB, hA_ne, hB_ne⟩ :=
+    liebOrientedSublattice_theorem23_side_conditions A hA hB
   obtain ⟨cdiag, hcdiag⟩ := exists_strict_diag_bound_dressedHeisenbergSReMatrix
     (fun x : Fin (N + 1) => decide (x ∈ liebOrientedSublattice A))
     ((2 : ℂ) • bipartiteCoupling

@@ -7287,7 +7287,74 @@ kernel bridge), likewise staged for PR-11b/PR-11c consumption. Also
 non-private'd
 \texttt{hubbardConfigInteractionWeight\_one\_eq\_zero\_of\_singlyOccupied}
 (\texttt{LiebRepulsiveFermionSpinBridge.lean}, PR-9a) to reuse it across the
-module boundary instead of duplicating it. Axiom-free.
+module boundary instead of duplicating it. Axiom-free. PR-11b has since
+consumed the capstone
+\texttt{isUniqueGroundStateOn\_liebPerturbationH0Compressed\_kernel\_iff\_heisenberg},
+\texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff}, and
+\texttt{isUniqueGroundStateOn\_of\_finrank\_eigenspace\_le\_one}, closing that
+debt; \texttt{eigenspace\_diagonal\_eq\_coordinateSpan},
+\texttt{IsUniqueGroundStateOn.mono}, and
+\texttt{configSectorCompress\_eq\_submatrix} remain unconsumed (staged for
+PR-11c/PR-12 onward).
+
+\emph{The uniqueness supply and the Lemma~10.1 application (Issue~\#5320,
+PR~\#5336 PR-11b).} Supplies the two pieces PR-11b owns, closing
+PR-11a's staged existence-witness builders; PR-10b's own capstone
+\texttt{liebRepulsive\_groundState\_casimir\_eq\_predicted} remains at
+reference~0 (staged for PR-12/PR-13's assembly), since this PR only shares
+its four inline side conditions, not the capstone itself.
+\texttt{liebOrientedSublattice\_theorem23\_side\_conditions} factors the four
+nondegeneracy side conditions ($1\le|A'|$, $1\le|A'^c|$, and the bare
+true/false witnesses) that PR-10b's
+\texttt{liebRepulsive\_groundState\_casimir\_eq\_predicted} derived inline from
+\texttt{liebOrientedSublattice\_card\_pos}, now shared with this file's own
+capstone (\texttt{liebSublattice\_filter\_true}/\texttt{liebSublattice\_filter\_false},
+PR-10b; non-\texttt{private} because both are used at several call sites
+within \texttt{LiebRepulsiveTheorem23Instance.lean} itself, not because of any
+consumer outside the module). \textbf{Capstone 1}
+\texttt{liebRepulsive\_isUniqueGroundStateOn\_heisenbergOnMagSector}: combines
+PR-10b's \texttt{liebRepulsive\_theorem23\_instance} (a Marshall-positive
+sector eigenvector plus energy minimality, not by itself a genuine
+\texttt{IsUniqueGroundStateOn}) with the Perron--Frobenius
+$\mathrm{finrank}\le 1$ route
+(\texttt{heisenbergHamiltonianSMatrixOnMagSector\_finrank\_le\_one\_of\_marshall\_positive},
+\texttt{Quantum/SpinS/Theorem24SectorPFFromTheorem23.lean}) and PR-11a's
+generic builders \texttt{isUniqueGroundStateOn\_of\_finrank\_eigenspace\_le\_one}
+/ \texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff}
+(\texttt{Math/MatrixAnalysis/SubmatrixGroundState.lean}) to promote it to a
+genuine $\mathrm{IsUniqueGroundStateOn}$ on the whole space of
+$\hat H_{\mathrm{Heis}} - \mathrm{shift}\cdot 1$ at energy $E$ and witness
+$\Phi$ --- the exact right-hand side of PR-11a's assembly capstone
+\texttt{isUniqueGroundStateOn\_liebPerturbationH0Compressed\_kernel\_iff\_heisenberg}.
+\textbf{Capstone 2} \texttt{tasaki\_lemma\_10\_1\_liebRepulsive\_apply}:
+transports Capstone~1's witness back along PR-11a's iff onto $\ker(\hat
+H_0|_K)$ to supply \texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation}'s
+(\texttt{Math/MatrixAnalysis/DegeneratePerturbationConvergence.lean},
+discharged independently in issue~\#5313) \texttt{hEffGS} hypothesis ---
+every other hypothesis of that lemma was already discharged by PR-5/PR-6
+assets (\texttt{liebPerturbationH0Compressed\_posSemidef},
+\texttt{liebPerturbationVCompressed\_isHermitian},
+\texttt{liebPerturbationH0Compressed\_isReducedInverse},
+\texttt{kernelProjection\_mul\_liebPerturbationVCompressed\_mul\_kernelProjection})
+--- giving the perturbed Hamiltonian $\hat H_0^c + \lambda \hat V^c$ a unique
+ground state for every sufficiently small $\lambda>0$, converging to an
+effective ground state $\Phi_{\mathrm{eff}}$ as $\lambda\to 0^+$.
+\textbf{Debt.} This PR consumes and closes PR-11a's
+\texttt{isUniqueGroundStateOn\_liebPerturbationH0Compressed\_kernel\_iff\_heisenberg},
+\texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff}, and
+\texttt{isUniqueGroundStateOn\_of\_finrank\_eigenspace\_le\_one}. PR-10b's
+sole reference-0 declaration
+\texttt{liebRepulsive\_groundState\_casimir\_eq\_predicted} is \emph{not}
+closed by this PR: Capstone~1 calls
+\texttt{liebRepulsive\_theorem23\_instance} directly, and only shares the
+side-conditions lemma feeding that capstone's proof; it remains staged for
+PR-12/PR-13's assembly. \texttt{eigenspace\_diagonal\_eq\_coordinateSpan},
+\texttt{IsUniqueGroundStateOn.mono}, and
+\texttt{configSectorCompress\_eq\_submatrix} (all PR-11a) remain staged,
+unconsumed until PR-11c/PR-12 onward. This PR's own final capstone
+\texttt{tasaki\_lemma\_10\_1\_liebRepulsive\_apply} stays at reference~0,
+staged for the arc's remaining assembly (PR-12/PR-13); axiom removal itself
+is PR-14's responsibility. Axiom-free.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
