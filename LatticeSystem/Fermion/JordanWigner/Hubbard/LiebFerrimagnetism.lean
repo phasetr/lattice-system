@@ -17,12 +17,17 @@ of the choice of ground state. This exhibits ferrimagnetic long-range order.
 
 ## Status
 
-Tasaki proves this exactly as Theorem 4.4 (`.self-local/refs/Hal.Tasaki.txt:18755-18758`),
-building on Theorem 10.4 (`theorem_10_4_lieb_repulsive_half_filling`), **not** on
-reflection positivity — reflection positivity is Theorem 10.4's own proof method, and
-Theorem 10.6 only reuses Theorem 10.4's already-discharged ground subspace. This is
-currently an `axiom` pending discharge (Issue #5347), reusing the packaged model
-hypotheses `IsLiebRepulsiveModel` and the ground subspace from `LiebRepulsive.lean`.
+Tasaki proves this exactly as Theorem 4.4 (Tasaki, 1st ed., Springer 2020,
+§10.2.3, p. 356, the paragraph immediately preceding Theorem 10.6), building on
+**both** Theorem 10.4 (`theorem_10_4_lieb_repulsive_half_filling`) and inequality
+(10.2.7) — Theorem 10.5's transverse-correlation sign
+(`theorem_10_5_shen_qiu_tian_transverse_sign`), used in place of the spin-`S`
+argument's (4.1.15) — **not** on reflection positivity: reflection positivity is
+Theorem 10.4's own proof method, and Theorem 10.6 reuses Theorem 10.4's
+already-discharged ground subspace together with Theorem 10.5's correlation-sign
+step. This is currently an `axiom` pending discharge (Issue #5347), reusing the
+packaged model hypotheses `IsLiebRepulsiveModel` and the ground subspace from
+`LiebRepulsive.lean`.
 -/
 
 namespace LatticeSystem.Fermion
