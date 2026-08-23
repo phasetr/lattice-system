@@ -6639,10 +6639,16 @@ energy $E_0$ whose $(N+1)$-electron ground subspace is nonzero, energy-minimal,
 lies in the Casimir eigenspace $S_0(S_0+1)$ with $S_0 = ||A|-|B||/2$, and has
 $\dim = |A|-|B|+1$.
 
-\emph{Status.} Proved by Lieb's spin-space reflection-positivity method (via the
-Shiba transformation from the attractive case, Theorem 10.2); per the project
-policy recorded as a faithful documented \texttt{axiom}, built on concrete
-repulsive Hubbard Hamiltonians.
+\emph{Status.} \textbf{PROVED} (axiom discharged; Issue~\#5320, PR~\#5346
+PR-15c; \texttt{\#print axioms} = \texttt{propext}, \texttt{Classical.choice},
+\texttt{Quot.sound}), in
+\texttt{LiebRepulsiveHalfFillingDischarge.lean}. Lieb's spin-space
+reflection-positivity argument (via the Shiba transformation from the attractive
+case, Theorem 10.2) is carried out over the \#5320 arc, whose final assembly is
+described at the end of this subsection; \texttt{LiebRepulsive.lean} retains only
+the model data (\texttt{IsLiebRepulsiveModel}, the two Hamiltonians, the ground
+submodule, $S_0$ and the multiplicity), since it sits strictly upstream of the
+discharge chain.
 
 \medskip
 \noindent \emph{Shiba transformation infrastructure (PR~\#4950).} The axiom-free
@@ -7858,10 +7864,31 @@ capstone):} \texttt{liebRepulsive\_symmetric\_halfFilling} and
 \texttt{liebRepulsive\_uniform\_of\_symmetric} are not yet consumed; PR-15c
 must assemble the uniform-Hamiltonian conclusion into
 \texttt{theorem\_10\_4\_lieb\_repulsive\_half\_filling}'s exact statement and
-move it out of \texttt{LiebRepulsive.lean}. \textbf{Incidental:}
+move it out of \texttt{LiebRepulsive.lean}. \textbf{PR-15c has since consumed}
+both (see the PR-15c paragraph below), closing this debt.
+\textbf{Incidental:}
 \texttt{LiebRepulsiveShibaKinetic.lean}'s \texttt{diagonal\_mulVec\_basisVec}
 is made non-\texttt{private} in this PR to avoid duplicating it in the new
 file. Axiom-free.
+
+\medskip
+\emph{The Theorem 10.4 capstone: axiom discharged (Issue~\#5320, PR~\#5346
+PR-15c).} The arc terminates by turning
+\texttt{theorem\_10\_4\_lieb\_repulsive\_half\_filling} from an \texttt{axiom}
+in \texttt{LiebRepulsive.lean} into a \texttt{theorem} of identical statement at
+the end of \texttt{LiebRepulsiveHalfFillingDischarge.lean}. The proof destructs
+\texttt{IsLiebRepulsiveModel} and splits its
+\texttt{IsLiebRepulsiveHamiltonian} disjunction: the symmetric disjunct
+$\hat H = \texttt{symmetricRepulsiveHubbardHamiltonian}\,N\,T\,U$ is PR-15b's
+all-$A$ \texttt{liebRepulsive\_symmetric\_halfFilling} applied verbatim, and the
+uniform disjunct $\hat H = \texttt{repulsiveHubbardHamiltonian}\,N\,T\,U$ is that
+same statement at the constant family $x\mapsto U$ pushed through
+\texttt{liebRepulsive\_uniform\_of\_symmetric}. The Hamiltonian definitions and
+the packaged model hypotheses stay in \texttt{LiebRepulsive.lean}, which is
+strictly upstream of the discharge chain and therefore cannot host the capstone.
+Axiom-free: \texttt{\#print axioms
+theorem\_10\_4\_lieb\_repulsive\_half\_filling} reports only
+\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,

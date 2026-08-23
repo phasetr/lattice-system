@@ -572,8 +572,8 @@ theorem theorem_10_4_lieb_repulsive_half_filling
         = liebRepulsiveGroundMultiplicity A := by
   obtain ⟨hsymm, hbip, hconn, hham⟩ := hModel
   rcases hham with ⟨U, hU, rfl⟩ | ⟨U, hU, rfl⟩
-  · sorry -- exact liebRepulsive_uniform_of_symmetric (A := A) N T U
-    -- (liebRepulsive_symmetric_halfFilling N T hsymm hbip hconn (fun _ => U) (fun _ => hU))
-  · sorry -- exact liebRepulsive_symmetric_halfFilling N T hsymm hbip hconn U hU
+  · exact liebRepulsive_uniform_of_symmetric (A := A) N T U
+      (liebRepulsive_symmetric_halfFilling N T hsymm hbip hconn (fun _ => U) (fun _ => hU))
+  · exact liebRepulsive_symmetric_halfFilling N T hsymm hbip hconn U hU
 
 end LatticeSystem.Fermion
