@@ -203,6 +203,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveSuperexchangeRedu
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SuperexchangeOperatorIdentity
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveSuperexchangeCollapse
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveSuperexchange
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveFermionSpinBridge
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetism
 import LatticeSystem.Fermion.JordanWigner.Hubbard.BipartiteSpectrum
