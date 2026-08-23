@@ -7485,6 +7485,44 @@ capstone is decorative'' discipline, deleted rather than staged a fourth time
 (PR-13 can re-derive the two-line corollary at its actual point of use if one
 emerges). Axiom-free.
 
+\emph{The site-dependent-$U$ homotopy discharge (Issue~\#5320, PR~\#5339
+PR-12b).} Closes obligation (3) of PR-11c's capstone docstring: the
+$U_x\to U$ reduction is discharged by rerunning PR-4's uniform-$U$ homotopy
+argument directly at fixed site-dependent $U : \mathrm{Fin}(N{+}1)\to\mathbb R$,
+never reducing to the uniform model.
+\texttt{homotopyOnSiteFn}~$U\,s\,x := $~\texttt{homotopyOnSite}~$(U\,x)\,s$
+lifts PR-4's scalar on-site homotopy pointwise;
+\texttt{symmetricHomotopyHamiltonian} reuses PR-4's hopping homotopy
+(\texttt{homotopyHopping}/\texttt{liebEndpointHopping}) verbatim and pairs it
+with \texttt{homotopyOnSiteFn} through
+\texttt{symmetricRepulsiveHubbardHamiltonian}, so PR-1's constant-$U$ shift
+argument (documented as inapplicable to a site-dependent potential in PR-4's
+module docstring) is never invoked, and
+\texttt{repulsiveSpinZSector\_ground\_unique}
+(\texttt{LiebRepulsiveBalancedGround.lean}, already $U$-generic) applies at
+every $s$ with no adapter. \texttt{symmetricHomotopyHamiltonian\_zero}
+identifies $H_0$ with the original symmetric repulsive model;
+\texttt{continuous\_symmetricHomotopyHamiltonian}/
+\texttt{continuous\_minEnergyOn\_symmetricHomotopyHamiltonian} mirror PR-4's
+continuity pair for the pointwise-affine on-site term;
+\texttt{symmetricHomotopy\_exists\_unique\_casimir\_sector} is PR-12a's
+unconditional capstone
+\texttt{liebRepulsive\_exists\_unique\_casimir\_sector\_unconditional} applied
+at $T_s$, $U_s(\cdot)$ for every $s\in[0,1]$ (hopping side-conditions
+transport via PR-4's \texttt{homotopyHopping\_symm}/\texttt{\_bipartite}/
+\texttt{\_connected}, on-site positivity via \texttt{homotopyOnSiteFn\_pos}).
+\textbf{Capstone} \texttt{symmetricHomotopy\_casimirSelector\_eq\_const}:
+assembles the per-$s$ existence-uniqueness instance (via \texttt{choose})
+with the continuity fact through PR-4's
+\texttt{casimirSelector\_eq\_const\_of\_locally\_unique\_strict\_min},
+yielding a selector $c:\mathbb R\to\mathbb C$ constant along the whole
+homotopy, in particular $c(0)=c(1)$ --- the occupied Casimir sector of the
+site-dependent symmetric model ($s=0$) agrees with that of the
+$\lambda$-endpoint model ($s=1$). Both new declarations at reference~0
+(\texttt{symmetricHomotopy\_exists\_unique\_casimir\_sector},
+\texttt{symmetricHomotopy\_casimirSelector\_eq\_const}) are staged for the
+arc's remaining assembly (PR-13/PR-14). Axiom-free.
+
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
 eqs.~(10.2.7)/(10.2.8)/(10.2.13); \emph{proved axiom-free on the general spin-$z$
