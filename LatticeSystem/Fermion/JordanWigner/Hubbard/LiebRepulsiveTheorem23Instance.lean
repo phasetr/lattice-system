@@ -42,7 +42,7 @@ another is likewise not treated here: every statement below stays on the
 One declaration is at reference 0: this file's capstone
 `liebRepulsive_groundState_casimir_eq_predicted`, staged for the arc's remaining assembly. The
 orientation adapter `liebOrientedSublattice_bipartiteCoupling_eq` is consumed by it, the capstone
-stating the coupling at the indicator of `A` — the form PR-10a's effective-Hamiltonian bridge
+stating the coupling at the indicator of `A` — the form PR-9a's effective-Hamiltonian bridge
 produces — rather than at the oriented indicator Theorem 2.3 requires.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020,
@@ -269,7 +269,7 @@ sector such that, along the sector bijection `liebHardCoreHalfFillingSectorEquiv
   sublattice;
 * `c` is an eigenvector at `μ` of the superexchange Heisenberg matrix
   `heisenbergHamiltonianSMatrixOnMagSector ((2 : ℂ) • bipartiteCoupling A) 1 (N + 1 − nUp)`
-  compressed onto that sector — the very matrix PR-10a's
+  compressed onto that sector — the very matrix PR-9a's
   `secondOrderEffectiveHamiltonian_liebPerturbation_reindex_eq_heisenbergOnMagSector`
   (`LiebRepulsiveFermionSpinBridge.lean`) identifies with the second-order effective Hamiltonian
   up to the constant `|A| (N + 1 − |A|)`;
@@ -278,7 +278,7 @@ sector such that, along the sector bijection `liebHardCoreHalfFillingSectorEquiv
   `liebRepulsiveSpinCasimir A = S₀ (S₀ + 1)`, `S₀ = ||A| − |Aᶜ||/2` (Tasaki Theorem 10.4's target
   total spin).
 
-The coupling is stated at the unoriented `A`, the form PR-10a's bridge produces
+The coupling is stated at the unoriented `A`, the form PR-9a's bridge produces
 (`liebOrientedSublattice_bipartiteCoupling_eq`); the Marshall sign is necessarily at the oriented
 sublattice. The eigenvector, its positivity and the energy minimality come from Theorem 2.3 at the
 superexchange coupling (`liebRepulsive_theorem23_instance`), the Casimir eigenvalue from
