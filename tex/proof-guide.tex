@@ -7037,9 +7037,9 @@ lemma \texttt{liebEndpointGraph\_adj} and its \texttt{DecidableRel} instance,
 four feeder lemmas, the capstone and the corollary), eight are consumed inside
 the file: the capstone is consumed by the corollary, and the rest feed the
 capstone. The corollary
-\texttt{secondOrderEffectiveHamiltonian\_liebPerturbation\_eq\_tJExchange} is
-the only one still at reference~0, staged for PR-9 (Fermion--Spin bridge) and
-PR-10 (endpoint Heisenberg Casimir) per the fixed PR order.
+\texttt{secondOrderEffectiveHamiltonian\_liebPerturbation\_eq\_tJExchange} was
+the only one still at reference~0; PR-9a (Issue~\#5320, PR~\#5331) consumed
+it and resolved this debt (see below).
 
 \emph{Fermion--Spin bridge, first half (Issue~\#5320, PR~\#5331 PR-9a).} The
 first of the two-PR 9a/9b split of PR-9, bridging the half-filled
@@ -7062,13 +7062,12 @@ land PR-8b's superexchange identity on
 $\mathrm{heisenbergHamiltonianSMatrixOnMagSector}((2:\mathbb C)\bullet
 \mathrm{bipartiteCoupling}(x\mapsto\mathrm{decide}(x\in A)))$ minus the
 constant $|A|(N+1-|A|)$ --- exactly Tasaki's Theorem~2.3 shape (\S2.5, p.~42)
-for PR-10. Two constant corrections were made during the Red$\to$Green cycle
-(same root cause, one per capstone): the Red-stage stub carried the shift as
-$\kappa\bullet 1$ with $\kappa=|A|(N+1-|A|)/2$; the Green proof shows the
-correct shift is $2\kappa=|A|(N+1-|A|)$ with no $/2$, since the
-\texttt{tJExchange}-level constant and the doubled bond coupling
-$(2:\mathbb C)\bullet\mathrm{bipartiteCoupling}$ both pick up the same factor
-$2$. This PR \textbf{discharges} PR-8b's sole reference-0 debt
+for PR-10. The shift $|A|(N+1-|A|)$ carries no $/2$: the
+\texttt{tJExchange}-level constant $\kappa=|A|(N+1-|A|)/2$ and the doubled
+bond coupling $(2:\mathbb C)\bullet\mathrm{bipartiteCoupling}$ both pick up
+the same factor $2$, so the two cancel and the surviving shift is
+$2\kappa=|A|(N+1-|A|)$. This PR \textbf{discharges} PR-8b's sole reference-0
+debt
 \texttt{secondOrderEffectiveHamiltonian\_liebPerturbation\_eq\_tJExchange}.
 \emph{Debt (new, staged for PR-9b/PR-10).} The $\hat H_{\mathrm{eff}}$
 corollary
