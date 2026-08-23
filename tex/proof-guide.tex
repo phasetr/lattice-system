@@ -6878,7 +6878,9 @@ projection identity that consumes it, and the explicit reduced inverse; on the
 compressed sector $\hat H_0|_K\ge0$ (the sole consumer of $\hat H_0\ge0$), the
 Hermiticity of $\hat V|_K$, and the $\hat P_0\hat V\hat P_0=0$ capstone
 itself; and, in the generic layer,
-\texttt{minEnergyOn\_add\_const\_smul\_one}. All of these are staged for the
+\texttt{minEnergyOn\_add\_const\_smul\_one} (\textbf{deleted in PR-13a} as a
+decorative reference-0 declaration, per its own doc comment's stipulation,
+rather than staged a further round). The rest are staged for the
 application of Lemma~10.1 and the arc assembly (PR-11 to PR-13); whatever that
 assembly does not consume is to be deleted, not kept. (Debt items (a)--(c)
 above are discharged by PR-6 below, which also consumes the whole-Fock-space
@@ -6889,8 +6891,8 @@ compression. What remains unreferenced is the \emph{statement}
 compressed contract from the diagonal form instead of transporting it ---
 together with the hard-core projection identity, $\hat H_0|_K\ge0$, the
 Hermiticity of $\hat V|_K$, the $\hat P_0\hat V\hat P_0=0$ capstone and
-\texttt{minEnergyOn\_add\_const\_smul\_one}, all of which PR-6 leaves
-untouched.)
+\texttt{minEnergyOn\_add\_const\_smul\_one} (later deleted in PR-13a), all of
+which PR-6 leaves untouched.)
 
 \emph{Superexchange reduced-inverse layer (Issue~\#5320, PR~\#5327 PR-6).}
 Not itself a numbered Tasaki statement; discharges PR-5's debt items (a)--(c)
@@ -6917,12 +6919,13 @@ arc) was refactored in this PR to derive from it. \emph{Debt.}
 \textbf{discharged}: PR-8b consumes it via
 \texttt{configSectorCompress\_mul\_of\_preserves} to identify the compressed
 product $\hat V|_K\hat V|_K$ with the compression of $\hat V\hat V$. Still
-staged and unconsumed: \texttt{liebPerturbationH0Compressed\_isReducedInverse},
-\texttt{configSector\_liebHalfFillingPred\_nonempty} and
-\texttt{homotopyHamiltonian\_one\_compressed\_eq\_perturbedHamiltonian} (for
-the Lemma~10.1 application at the arc assembly, PR-11 to PR-13); each is
-carried as debt, not as settled API, the capstone being the one exception.
-Axiom-free.
+staged and unconsumed: \texttt{liebPerturbationH0Compressed\_isReducedInverse}
+and \texttt{configSector\_liebHalfFillingPred\_nonempty} (for the Lemma~10.1
+application at the arc assembly, PR-11 to PR-13); PR-13a has since consumed
+\texttt{homotopyHamiltonian\_one\_compressed\_eq\_perturbedHamiltonian}
+(\texttt{LiebRepulsiveEndpointIdentification.lean}), closing that debt. Each
+remaining item is carried as debt, not as settled API, the capstone being the
+one exception. Axiom-free.
 
 \emph{Superexchange operator identity (Issue~\#5320, PR~\#5328 PR-7).} A
 direct formalization of Tasaki's eq.~(10.1.9) together with the two auxiliary
@@ -7157,7 +7160,19 @@ an arbitrary coordinate block. PR-11a has since consumed both capstones ---
 \texttt{LiebRepulsiveSectorAssembly.lean}, and \texttt{matrixKernel\_diagonal\_eq\_coordinateSpan}
 via \texttt{LiebRepulsivePerturbationSetup.lean}'s
 \texttt{matrixKernel\_liebPerturbationH0Compressed\_eq\_coordinateSpan} --- closing that debt.
-Axiom-free.
+Axiom-free. \textbf{Generalized in PR-13a}: the block-support hypothesis
+$H=\hat P H\hat P$ of Capstone~1 was weakened in place to the invariance
+hypothesis $h_{\mathrm{Inv}} : \forall i\,j,\ P\,j\to\neg P\,i\to H\,i\,j=0$
+(rows outside $P$ vanish at columns inside $P$), which also covers a
+Hamiltonian merely block-\emph{diagonal} across $P$/$\neg P$; the new
+\texttt{blockSupport\_apply\_eq\_zero} lets a block-supported model supply
+$h_{\mathrm{Inv}}$ in one line, so the sole existing call site
+(\texttt{LiebRepulsiveSectorAssembly.lean}) needs no shape change.
+\textbf{Debt (new).} The generalization's actual payoff --- covering a
+Hamiltonian that is block-diagonal across $P$/$\neg P$ but \emph{not}
+block-supported (i.e.\ $h_{\mathrm{Inv}}$ holds while $H=\hat P H\hat P$
+fails) --- has no consumer yet; every current call site still happens to be
+block-supported, so this coverage is staged for a later PR.
 
 \emph{Theorem 2.3 instance and fermionic Casimir transport (Issue~\#5320,
 PR~\#5334 PR-10b).} \texttt{liebOrientedSublattice}~$A$ is the canonically
@@ -7498,7 +7513,9 @@ $s=1$ endpoint); identifying that endpoint's Hamiltonian with the uniform
 $\lambda$-endpoint model of PR-4/PR-11c (no Lean lemma of the form
 \texttt{symmetricHomotopyHamiltonian \_ \_ \_ \_ \_ 1 =
 symmetricRepulsiveHubbardHamiltonian \_ (liebEndpointHopping \_ \_ \_)
-(fun \_ => 1)} exists yet in this arc) is deferred to PR-13.
+(fun \_ => 1)} exists yet in this arc) is deferred to PR-13. \textbf{PR-13a
+has since supplied} this identification as
+\texttt{symmetricHomotopyHamiltonian\_one\_eq\_uniform}.
 \texttt{homotopyOnSiteFn}~$U\,s\,x := $~\texttt{homotopyOnSite}~$(U\,x)\,s$
 lifts PR-4's scalar on-site homotopy pointwise;
 \texttt{symmetricHomotopyHamiltonian} reuses PR-4's hopping homotopy
@@ -7529,13 +7546,48 @@ homotopy, in particular $c(0)=c(1)$ --- the occupied Casimir sector of the
 site-dependent symmetric model ($s=0$) agrees with the occupied Casimir
 sector at the homotopy's $s=1$ endpoint; that $s=1$ Hamiltonian's
 identification with the $\lambda$-endpoint model of PR-4/PR-11c is deferred
-to PR-13 (see above). \texttt{symmetricHomotopyHamiltonian\_zero} is at
+to PR-13 (see above; \textbf{PR-13a has since supplied} it as
+\texttt{symmetricHomotopyHamiltonian\_one\_eq\_uniform}). \texttt{symmetricHomotopyHamiltonian\_zero} is at
 reference~0 (docstring mention only, not consumed by any proof); the
 capstone \texttt{symmetricHomotopy\_casimirSelector\_eq\_const} is also at
 reference~0, staged for the arc's remaining assembly (PR-13/PR-14);
 \texttt{symmetricHomotopy\_exists\_unique\_casimir\_sector} is \emph{not} at
 reference~0 --- it is consumed by the capstone's proof in this same file.
 Axiom-free.
+
+\emph{Symmetric endpoint identification and block-invariance transport
+(Issue~\#5320, PR~\#5340 PR-13a).} Identifies PR-12b's homotopy $s=1$ endpoint
+with PR-5/PR-6's $\lambda$-family perturbation setup, and generalizes the
+arc's block-transport lemma from block support to block invariance.
+\texttt{sum\_fermionSiteNumber\_eq\_fermionTotalNumber}: the site occupation
+numbers sum to the total particle number, $\sum_x\hat n_x=\hat N$.
+\texttt{configSectorCompress\_fermionTotalNumber\_eq\_smul\_one}: $\hat N$
+compresses to the scalar $(N+1)\bullet 1$ on the half-filled fixed-$\hat S^3$
+sector, since every configuration of that sector carries exactly $N+1$
+electrons. \texttt{symmetricHomotopyHamiltonian\_one\_eq\_uniform}: PR-12b's
+site-dependent-$U$ homotopy's $s=1$ endpoint is exactly the uniform-$U=1$
+symmetric repulsive Hubbard Hamiltonian on the endpoint hopping matrix
+\texttt{liebEndpointHopping A T lam}. \textbf{Capstone}
+\texttt{configSectorCompress\_symmetricHomotopyHamiltonian\_one\_eq\_perturbedHamiltonian\_sub\_smul}:
+combining that endpoint identity with PR-12a's
+\texttt{symmetricRepulsiveHubbardInteraction\_eq\_uniform\_sub\_siteNumber}
+(at $U\equiv1$) and PR-6's
+\texttt{homotopyHamiltonian\_one\_compressed\_eq\_perturbedHamiltonian}, the
+compressed number operator collapses to $(N+1)\bullet 1$ on the sector, so
+the compressed endpoint equals PR-5's compressed perturbed Hamiltonian
+shifted by the real constant $((N+1)/4:\mathbb R)$ --- the shape
+\texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff} consumes directly, so no
+sector-restricted shift lemma is needed. \textbf{\texttt{BlockTransport.lean}
+generalization}: see the updated PR-10a paragraph above.
+\textbf{Debt discharged.} Deletes
+\texttt{Math/MatrixAnalysis/MinEnergyOnSubspace.lean}'s
+\texttt{minEnergyOn\_add\_const\_smul\_one} (staged unconsumed since PR-5) as
+a decorative reference-0 declaration, since the arc's assembly normalises the
+energy origin at the \texttt{IsUniqueGroundStateOn} level instead (PR-11a's
+\texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff}). \textbf{Debt (new).}
+This PR's own capstone
+\texttt{configSectorCompress\_symmetricHomotopyHamiltonian\_one\_eq\_perturbedHamiltonian\_sub\_smul}
+is at reference~0, staged for PR-13b's consumption. Axiom-free.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,

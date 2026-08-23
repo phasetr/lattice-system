@@ -3,16 +3,17 @@ import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbation
 /-!
 # Coordinate-block ground-state transport
 
-Two model-independent facts about a matrix that is *supported on a coordinate block*:
-one relating its unique-ground-state predicate on that block to the same predicate for the block's
-submatrix on the whole restricted space, and one identifying the kernel of a diagonal matrix with
-the coordinate span of the indices where it vanishes.
+Two model-independent facts about a matrix that *leaves a coordinate block invariant*: one relating
+its unique-ground-state predicate on that block to the same predicate for the block's submatrix on
+the whole restricted space, and one identifying the kernel of a diagonal matrix with the coordinate
+span of the indices where it vanishes.
 
-Both facts are the generic transport layer needed whenever a Hamiltonian is known to vanish outside
-a coordinate subspace (e.g. a projection built from a diagonal indicator): rather than reproving
-ground-state uniqueness or a kernel computation for each concrete model, a model only has to supply
-the block-support hypothesis (`H = P̂ H P̂`) or the vanishing-locus characterization of a diagonal
-matrix's entries, and these two lemmas transport it.
+Both facts are the generic transport layer needed whenever a Hamiltonian preserves a coordinate
+subspace (e.g. one cut out by a diagonal indicator): rather than reproving ground-state uniqueness
+or a kernel computation for each concrete model, a model only has to supply the block-invariance
+hypothesis (`H i j = 0` whenever `P j` and `¬ P i`) or the vanishing-locus characterization of a
+diagonal matrix's entries, and these two lemmas transport it. A matrix that is block-*supported*
+(`H = P̂ H P̂`) is invariant in this sense via `blockSupport_apply_eq_zero`.
 
 ## Main results
 
@@ -24,11 +25,13 @@ matrix's entries, and these two lemmas transport it.
   inverse of `coordinateRestrict` on the coordinate span.
 * `mem_coordinateSpan_iff` — membership in the coordinate span is exactly vanishing of every
   coordinate outside `P`.
-* `isUniqueGroundStateOn_coordinateSpan_iff_submatrix` — for `H` supported on the coordinate block
-  of `P` (`H = P̂ · H · P̂`, `P̂` the diagonal indicator of `P`) and a candidate `φ` in the
-  coordinate span, `H`'s unique ground state on the coordinate span of `P` at `φ` is equivalent to
-  the submatrix restriction of `H` to that block having the restricted candidate as its unique
-  ground state on the whole restricted space.
+* `blockSupport_apply_eq_zero` — a matrix conjugated by the diagonal indicator of `P` has no
+  entries outside the `P`-block, hence in particular leaves the coordinate span invariant.
+* `isUniqueGroundStateOn_coordinateSpan_iff_submatrix` — for `H` leaving the coordinate block of `P`
+  invariant (`H i j = 0` whenever `P j` and `¬ P i`) and a candidate `φ` in the coordinate span,
+  `H`'s unique ground state on the coordinate span of `P` at `φ` is equivalent to the submatrix
+  restriction of `H` to that block having the restricted candidate as its unique ground state on the
+  whole restricted space.
 * `matrixKernel_diagonal_eq_coordinateSpan` — the kernel of a diagonal matrix equals the coordinate
   span of the predicate characterizing its zero entries.
 -/
@@ -165,8 +168,12 @@ section BlockSupport
 
 variable {H : Matrix n n ℂ} {P : n → Prop} [DecidablePred P]
 
-/-- A matrix conjugated by the diagonal indicator of `P` has no entries outside the `P`-block. -/
-private theorem blockSupport_apply_eq_zero
+/-- **A matrix conjugated by the diagonal indicator of `P` has no entries outside the `P`-block.**
+This is the standard way a model supplies the invariance hypothesis
+`hInv : ∀ i j, P j → ¬ P i → H i j = 0` of
+`isUniqueGroundStateOn_coordinateSpan_iff_submatrix`: block support is strictly stronger than block
+invariance, so a conjugated matrix qualifies via `Or.inl`. -/
+theorem blockSupport_apply_eq_zero
     (hblock : H = Matrix.diagonal (fun i => if P i then (1 : ℂ) else 0) * H
         * Matrix.diagonal (fun i => if P i then (1 : ℂ) else 0))
     {i j : n} (hij : ¬ P i ∨ ¬ P j) : H i j = 0 := by
@@ -180,19 +187,25 @@ private theorem blockSupport_apply_eq_zero
   · rw [if_neg hj, mul_zero] at h
     exact h
 
-/-- The image of a matrix without entries outside the `P`-rows lies in the coordinate span. -/
-private theorem toEuclideanLin_mem_coordinateSpan (hrow : ∀ i j, ¬ P i → H i j = 0)
-    (v : EuclideanSpace ℂ n) : Matrix.toEuclideanLin H v ∈ coordinateSpan P := by
+/-- **The coordinate span is invariant under a block-invariant matrix.** For a vector supported on
+`P`, only the `P`-columns contribute, and those vanish on the `¬P`-rows by `hInv`. -/
+private theorem toEuclideanLin_mem_coordinateSpan (hInv : ∀ i j, P j → ¬ P i → H i j = 0)
+    {v : EuclideanSpace ℂ n} (hv : v ∈ coordinateSpan P) :
+    Matrix.toEuclideanLin H v ∈ coordinateSpan P := by
   refine (mem_coordinateSpan_iff _).mpr fun i hi => ?_
   have hval : (Matrix.toEuclideanLin H v) i = ∑ k, H i k * v k := rfl
   rw [hval]
-  exact Finset.sum_eq_zero fun k _ => by rw [hrow i k hi, zero_mul]
+  refine Finset.sum_eq_zero fun k _ => ?_
+  by_cases hk : P k
+  · rw [hInv i k hk hi, zero_mul]
+  · rw [(mem_coordinateSpan_iff v).mp hv k hk, mul_zero]
 
-/-- **Restriction intertwines a block-supported matrix with its submatrix.** If a matrix has no
-entries outside the `P`-columns, restricting its action to the `P`-coordinates is the action of the
-`P`-block submatrix on the restricted vector. -/
-private theorem coordinateRestrict_toEuclideanLin (hcol : ∀ i j, ¬ P j → H i j = 0)
-    (v : EuclideanSpace ℂ n) :
+/-- **Restriction intertwines a matrix with its submatrix on span vectors.** For a vector supported
+on `P`, restricting the matrix action to the `P`-coordinates is the action of the `P`-block
+submatrix on the restricted vector; no hypothesis on `H` is needed, since the discarded columns are
+multiplied by vanishing coordinates. -/
+private theorem coordinateRestrict_toEuclideanLin {v : EuclideanSpace ℂ n}
+    (hv : v ∈ coordinateSpan P) :
     coordinateRestrict P (Matrix.toEuclideanLin H v)
       = Matrix.toEuclideanLin (H.submatrix Subtype.val Subtype.val) (coordinateRestrict P v) := by
   refine PiLp.ext fun j => ?_
@@ -200,36 +213,41 @@ private theorem coordinateRestrict_toEuclideanLin (hcol : ∀ i j, ¬ P j → H 
   have hrhs : Matrix.toEuclideanLin (H.submatrix Subtype.val Subtype.val)
       (coordinateRestrict P v) j = ∑ k : {i // P i}, H j.val k.val * v k.val := rfl
   rw [hlhs, hrhs]
-  exact sum_eq_sum_subtype (fun k => H j.val k * v k) fun k hk => by simp [hcol j k hk]
+  exact sum_eq_sum_subtype (fun k => H j.val k * v k)
+    fun k hk => by simp [(mem_coordinateSpan_iff v).mp hv k hk]
 
 end BlockSupport
 
-/-- **Generic block-transport of the unique-ground-state predicate.** If `H` is supported on the
-coordinate block of a decidable predicate `P` (`H = P̂ · H · P̂`, with `P̂` the diagonal indicator
-of `P`), then for a candidate `φ` in the coordinate span of `P`, `H` having `φ` as its unique ground
-state on the coordinate span is equivalent to the submatrix restriction of `H` to that block
-having the restricted candidate `coordinateRestrict P φ` as its unique ground state on the whole
-restricted space `⊤`. -/
+/-- **Generic block-transport of the unique-ground-state predicate.** The hypothesis
+`hInv : ∀ i j, P j → ¬ P i → H i j = 0` says that rows outside `P` vanish at columns inside `P`,
+i.e. `H` leaves the coordinate span of `P` invariant; it is weaker than block support
+`H = P̂ · H · P̂`, and in particular holds for a Hamiltonian that is merely block-*diagonal* across
+`P`/`¬P`. For a candidate `φ` in the coordinate span of `P`, `H` having `φ` as its unique ground
+state on the coordinate span is equivalent to the submatrix restriction of `H` to that block having
+the restricted candidate `coordinateRestrict P φ` as its unique ground state on the whole restricted
+space `⊤`. -/
 theorem isUniqueGroundStateOn_coordinateSpan_iff_submatrix {H : Matrix n n ℂ}
     {P : n → Prop} [DecidablePred P]
-    (hblock : H = Matrix.diagonal (fun i => if P i then (1 : ℂ) else 0) * H
-        * Matrix.diagonal (fun i => if P i then (1 : ℂ) else 0))
+    (hInv : ∀ i j, P j → ¬ P i → H i j = 0)
     {E : ℝ} {φ : EuclideanSpace ℂ n} (hφ : φ ∈ coordinateSpan P) :
     IsUniqueGroundStateOn (coordinateSpan P) H E φ ↔
       IsUniqueGroundStateOn (⊤ : Submodule ℂ (EuclideanSpace ℂ {i // P i}))
         (H.submatrix Subtype.val Subtype.val) E (coordinateRestrict P φ) := by
-  have hrow : ∀ i j, ¬ P i → H i j = 0 :=
-    fun _ _ hi => blockSupport_apply_eq_zero hblock (Or.inl hi)
-  have hcol : ∀ i j, ¬ P j → H i j = 0 :=
-    fun _ _ hj => blockSupport_apply_eq_zero hblock (Or.inr hj)
-  have hmemH := toEuclideanLin_mem_coordinateSpan hrow
-  have hres := coordinateRestrict_toEuclideanLin hcol
+  have hmemH : ∀ v : EuclideanSpace ℂ n, v ∈ coordinateSpan P →
+      Matrix.toEuclideanLin H v ∈ coordinateSpan P :=
+    fun _ hv => toEuclideanLin_mem_coordinateSpan hInv hv
+  have hres : ∀ v : EuclideanSpace ℂ n, v ∈ coordinateSpan P →
+      coordinateRestrict P (Matrix.toEuclideanLin H v)
+        = Matrix.toEuclideanLin (H.submatrix Subtype.val Subtype.val) (coordinateRestrict P v) :=
+    fun _ hv => coordinateRestrict_toEuclideanLin hv
   have hext : ∀ ψ : EuclideanSpace ℂ {i // P i}, Matrix.toEuclideanLin H (coordinateExtend P ψ)
       = coordinateExtend P
         (Matrix.toEuclideanLin (H.submatrix Subtype.val Subtype.val) ψ) := by
     intro ψ
-    rw [← coordinateRestrict_coordinateExtend ψ, ← hres,
-      coordinateExtend_coordinateRestrict (hmemH _), coordinateRestrict_coordinateExtend]
+    have hmemψ := coordinateExtend_mem_coordinateSpan (P := P) ψ
+    have h := hres _ hmemψ
+    rw [coordinateRestrict_coordinateExtend] at h
+    rw [← h, coordinateExtend_coordinateRestrict (hmemH _ hmemψ)]
   have hzero : ∀ ψ : EuclideanSpace ℂ {i // P i}, coordinateExtend P ψ = 0 → ψ = 0 := by
     intro ψ h
     exact norm_eq_zero.mp (by rw [← norm_coordinateExtend ψ, h, norm_zero])
@@ -246,7 +264,7 @@ theorem isUniqueGroundStateOn_coordinateSpan_iff_submatrix {H : Matrix n n ℂ}
       exact hnorm
     have heig' : Matrix.toEuclideanLin (H.submatrix Subtype.val Subtype.val)
         (coordinateRestrict P φ) = (E : ℂ) • coordinateRestrict P φ := by
-      rw [← hres φ, heig, coordinateRestrict_smul]
+      rw [← hres _ hmem, heig, coordinateRestrict_smul]
     have hne : coordinateRestrict P φ ≠ 0 := by
       intro h
       rw [h, norm_zero] at hnorm'
@@ -268,9 +286,9 @@ theorem isUniqueGroundStateOn_coordinateSpan_iff_submatrix {H : Matrix n n ℂ}
     have heigφ : Matrix.toEuclideanLin H φ = (E : ℂ) • φ := by
       calc Matrix.toEuclideanLin H φ
           = coordinateExtend P (coordinateRestrict P (Matrix.toEuclideanLin H φ)) :=
-            (coordinateExtend_coordinateRestrict (hmemH φ)).symm
+            (coordinateExtend_coordinateRestrict (hmemH _ hφ)).symm
         _ = coordinateExtend P (coordinateRestrict P ((E : ℂ) • φ)) := by
-            rw [hres φ, heig, coordinateRestrict_smul]
+            rw [hres _ hφ, heig, coordinateRestrict_smul]
         _ = (E : ℂ) • φ := coordinateExtend_coordinateRestrict ((coordinateSpan P).smul_mem _ hφ)
     have hne : φ ≠ 0 := by
       intro h
@@ -280,10 +298,10 @@ theorem isUniqueGroundStateOn_coordinateSpan_iff_submatrix {H : Matrix n n ℂ}
     · rintro μ ⟨ψ, hψmem, hψ0, hψeig⟩
       refine hground.2 μ ⟨coordinateRestrict P ψ, Submodule.mem_top,
         fun h => hψ0 (hzero' ψ hψmem h), ?_⟩
-      rw [← hres ψ, hψeig, coordinateRestrict_smul]
+      rw [← hres _ hψmem, hψeig, coordinateRestrict_smul]
     · intro ψ hψmem hψeig
       obtain ⟨c, hc⟩ := huniq (coordinateRestrict P ψ) Submodule.mem_top
-        (by rw [← hres ψ, hψeig, coordinateRestrict_smul])
+        (by rw [← hres _ hψmem, hψeig, coordinateRestrict_smul])
       refine ⟨c, ?_⟩
       rw [← coordinateExtend_coordinateRestrict hψmem, hc, coordinateExtend_smul,
         coordinateExtend_coordinateRestrict hφ]
