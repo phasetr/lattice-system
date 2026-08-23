@@ -7298,8 +7298,11 @@ debt; \texttt{eigenspace\_diagonal\_eq\_coordinateSpan},
 PR-11c/PR-12 onward). PR-11c has since consumed
 \texttt{eigenspace\_diagonal\_eq\_coordinateSpan} and
 \texttt{IsUniqueGroundStateOn.mono}, closing those debts (see the PR-11c
-paragraph below); \texttt{configSectorCompress\_eq\_submatrix} remains
-unconsumed, staged for PR-12 onward.
+paragraph below); \texttt{configSectorCompress\_eq\_submatrix} was
+\textbf{deleted in PR-12a} (a fourth staging round with no consumer is not an
+option --- decorative declaration per \texttt{lean-coding-conventions}'s
+``a reference-0 declaration that is not a capstone is decorative'' discipline;
+see the PR-12a paragraph below).
 
 \emph{The uniqueness supply and the Lemma~10.1 application (Issue~\#5320,
 PR~\#5336 PR-11b).} Supplies the two pieces PR-11b owns, closing
@@ -7356,8 +7359,10 @@ PR-12/PR-13's assembly. \texttt{eigenspace\_diagonal\_eq\_coordinateSpan},
 \texttt{IsUniqueGroundStateOn.mono}, and
 \texttt{configSectorCompress\_eq\_submatrix} (all PR-11a) remain staged,
 unconsumed until PR-11c/PR-12 onward --- PR-11c has since consumed the first
-two, closing those debts; \texttt{configSectorCompress\_eq\_submatrix}
-remains unconsumed, staged for PR-12 onward. This PR's own final capstone
+two, closing those debts; \texttt{configSectorCompress\_eq\_submatrix} was
+\textbf{deleted in PR-12a} as a decorative (reference-0) declaration rather
+than staged a fourth time (see the PR-12a paragraph below). This PR's own
+final capstone
 \texttt{tasaki\_lemma\_10\_1\_liebRepulsive\_apply} stays at reference~0,
 staged for the arc's remaining assembly (PR-12/PR-13); axiom removal itself
 is PR-14's responsibility. Axiom-free.
@@ -7412,14 +7417,62 @@ occupied Casimir eigenvalue with \texttt{liebRepulsiveSpinCasimir A}
 finrank/degeneracy count assembly (PR-13/PR-14). \textbf{Debt discharged}:
 this PR consumes PR-11a's \texttt{eigenspace\_diagonal\_eq\_coordinateSpan}
 and \texttt{IsUniqueGroundStateOn.mono}, closing both debts;
-\texttt{configSectorCompress\_eq\_submatrix} remains unconsumed, staged for
-PR-12 onward. \textbf{Debt (new)}: two declarations introduced by this PR are
-at reference~0 --- the diagonal-charge bridge
+\texttt{configSectorCompress\_eq\_submatrix} was later \textbf{deleted in
+PR-12a} as a decorative (reference-0) declaration rather than staged a fourth
+time (see the PR-12a paragraph below). \textbf{Debt (new)}: two declarations
+introduced by this PR are at reference~0 --- the diagonal-charge bridge
 \texttt{numberSpinZSectorEuclidean\_eq\_coordinateSpan\_liebHalfFillingPred}
 (not itself chained into this file's own capstone, staged as a standalone
 fact for PR-12's sector-level transports) and the file's own final capstone
 \texttt{liebRepulsive\_exists\_unique\_casimir\_sector} (staged for PR-12's
 SU(2) adapters and the arc's remaining assembly). Axiom-free.
+\textbf{PR-12a has since consumed}
+\texttt{liebRepulsive\_exists\_unique\_casimir\_sector} by discharging all
+four SU(2)-adapter hypotheses and wrapping it as the unconditional corollary
+\texttt{liebRepulsive\_exists\_unique\_casimir\_sector\_unconditional},
+closing that debt (see the PR-12a paragraph below); the diagonal-charge
+bridge remains unconsumed, staged for PR-12b/PR-13.
+
+\emph{The \texttt{SU(2)} commute/Hermiticity adapters, and the unconditional
+capstone (Issue~\#5320, PR~\#5338 PR-12a).} Supplies the four adapter
+hypotheses PR-11c's capstone took as explicit hypotheses, discharging them.
+The site-dependent symmetric interaction $\hat H_{\mathrm{int}}' =
+\sum_x U_x(\hat n_{x\uparrow}-\tfrac12)(\hat n_{x\downarrow}-\tfrac12)$ is not
+itself a multiple of \texttt{hubbardOnSiteInteractionSite}, so the attractive
+family's SU(2) proofs do not clone verbatim;
+\texttt{symmetricRepulsiveHubbardInteraction\_eq\_uniform\_sub\_siteNumber}
+expands it into three separately SU(2)-invariant summands
+(\texttt{hubbardOnSiteInteractionSite}, a per-site-number term, and a scalar
+multiple of $1$). The one genuinely new commutator,
+\texttt{fermionTotalSpinPlus\_commute\_fermionSiteNumber}
+($[\hat S^+_{\mathrm{tot}}, \hat n_x] = 0$), covers the middle summand; the
+$\hat S^3$/$\hat N$ analogues already existed (\texttt{TJSpinSymmetry.lean} /
+\texttt{TJNumberCommute.lean}).
+\texttt{symmetricRepulsiveHubbardHamiltonian\_isHermitian} establishes
+Hermiticity (kinetic part via \texttt{hubbardKinetic\_isHermitian},
+interaction part via the manifestly real diagonal
+\texttt{symmetricRepulsiveHubbardInteraction\_eq\_diagonal}). The six
+generator/Casimir commutators ($\hat S^+$, $\hat S^-$, $\hat N_\uparrow$,
+$\hat N_\downarrow$, $\hat S^3$, $\hat N$, $(\hat S_{\mathrm{tot}})^2$)
+assemble from these, mirroring \texttt{LiebAttractiveSU2Invariance.lean} line
+for line. \texttt{liebHalfFillingSpinZVal\_eq\_of\_two\_mul} is the $N_e =
+2\,nUp$ sector-arithmetic bridge PR-12b's per-$s$ instantiation needs to
+match PR-11c's \texttt{liebHalfFillingSpinZVal} against the $N_e$-indexed
+statement of Theorem~10.4. \textbf{Capstone}
+\texttt{liebRepulsive\_exists\_unique\_casimir\_sector\_unconditional}: feeds
+all four discharged adapters into PR-11c's
+\texttt{liebRepulsive\_exists\_unique\_casimir\_sector}, yielding the same
+unique-strictly-minimal-occupied-Casimir-sector conclusion
+\textbf{unconditionally} (no SU(2)/Hermiticity hypotheses left), closing
+PR-11c's reference-0 debt on that capstone. \textbf{Also deletes}
+\texttt{configSectorCompress\_eq\_submatrix}
+(\texttt{HubbardImpossibilityLowUVariationalCore.lean}), a decorative
+reference-0 declaration staged unconsumed through PR-11a $\to$ PR-11b $\to$
+PR-11c with no genuine consumer after three rounds --- per
+\texttt{lean-coding-conventions}'s ``a reference-0 declaration that is not a
+capstone is decorative'' discipline, deleted rather than staged a fourth time
+(PR-13 can re-derive the two-line corollary at its actual point of use if one
+emerges). Axiom-free.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
