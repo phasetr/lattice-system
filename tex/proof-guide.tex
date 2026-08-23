@@ -7226,7 +7226,10 @@ reference~0: the file's own final capstone
 arc's remaining assembly (PR-11/PR-12). PR-9a's $\hat H_{\mathrm{eff}}$
 corollary and PR-10a's \texttt{coordinateSpan} capstones have since been
 consumed by PR-11a (see the PR-11a entry below); this file's own capstone
-remains unconsumed. Axiom-free.
+remains unconsumed. \textbf{PR-13b has since consumed}
+\texttt{liebRepulsive\_groundState\_casimir\_eq\_predicted} (via
+\texttt{casimirValue\_eq\_liebRepulsiveSpinCasimir\_of\_effectiveGroundState}),
+closing that debt. Axiom-free.
 
 \emph{Generic ground-state transport layer and the sector-assembly capstone
 (Issue~\#5320, PR~\#5335 PR-11a).} Assembles PR-9a's Fermion--Spin bridge and
@@ -7380,7 +7383,11 @@ than staged a fourth time (see the PR-12a paragraph below). This PR's own
 final capstone
 \texttt{tasaki\_lemma\_10\_1\_liebRepulsive\_apply} stays at reference~0,
 staged for the arc's remaining assembly (PR-12/PR-13); axiom removal itself
-is PR-14's responsibility. Axiom-free.
+is PR-14's responsibility. \textbf{PR-13b has since consumed}
+\texttt{tasaki\_lemma\_10\_1\_liebRepulsive\_apply} (in both the
+$\lambda$-family transport capstone
+\texttt{symmetricHomotopyHamiltonian\_one\_isUniqueGroundStateOn} and the
+Casimir-pinning capstone), closing that debt. Axiom-free.
 
 \emph{The three-way sector bridge, and the PR-3 debt discharge (Issue~\#5320,
 PR~\#5337 PR-11c).} Connects the three distinct descriptions of the
@@ -7446,7 +7453,11 @@ SU(2) adapters and the arc's remaining assembly). Axiom-free.
 four SU(2)-adapter hypotheses and wrapping it as the unconditional corollary
 \texttt{liebRepulsive\_exists\_unique\_casimir\_sector\_unconditional},
 closing that debt (see the PR-12a paragraph below); the diagonal-charge
-bridge remains unconsumed, staged for PR-12b/PR-13.
+bridge remains unconsumed, staged for PR-12b/PR-13. \textbf{PR-13b has since
+consumed}
+\texttt{numberSpinZSectorEuclidean\_eq\_coordinateSpan\_liebHalfFillingPred}
+(in the compressed-to-full transport of the $\lambda$-family ground state),
+closing that debt.
 
 \emph{The \texttt{SU(2)} commute/Hermiticity adapters, and the unconditional
 capstone (Issue~\#5320, PR~\#5338 PR-12a).} Supplies the four adapter
@@ -7487,7 +7498,10 @@ sector-arithmetic bridge \texttt{liebHalfFillingSpinZVal\_eq\_of\_two\_mul}
 remains at reference~0 --- PR-12b did \emph{not} consume it as originally
 staged, so it is still staged for a later PR (matching PR-11c's
 \texttt{liebHalfFillingSpinZVal N nUp} against the $N_e$-indexed statement of
-Theorem~10.4). This PR's own final capstone
+Theorem~10.4). \textbf{PR-13b has since consumed}
+\texttt{liebHalfFillingSpinZVal\_eq\_of\_two\_mul} (matching that
+$N_e$-indexed statement inside the Casimir-pinning capstone), closing that
+debt. This PR's own final capstone
 \texttt{liebRepulsive\_exists\_unique\_casimir\_sector\_unconditional} was
 staged at reference~0, but \textbf{PR-12b has since consumed it} (as
 \texttt{symmetricHomotopy\_exists\_unique\_casimir\_sector} in
@@ -7547,13 +7561,18 @@ site-dependent symmetric model ($s=0$) agrees with the occupied Casimir
 sector at the homotopy's $s=1$ endpoint; that $s=1$ Hamiltonian's
 identification with the $\lambda$-endpoint model of PR-4/PR-11c is deferred
 to PR-13 (see above; \textbf{PR-13a has since supplied} it as
-\texttt{symmetricHomotopyHamiltonian\_one\_eq\_uniform}). \texttt{symmetricHomotopyHamiltonian\_zero} is at
+\texttt{symmetricHomotopyHamiltonian\_one\_eq\_uniform}). \texttt{symmetricHomotopyHamiltonian\_zero} was at
 reference~0 (docstring mention only, not consumed by any proof); the
-capstone \texttt{symmetricHomotopy\_casimirSelector\_eq\_const} is also at
+capstone \texttt{symmetricHomotopy\_casimirSelector\_eq\_const} was also at
 reference~0, staged for the arc's remaining assembly (PR-13/PR-14);
 \texttt{symmetricHomotopy\_exists\_unique\_casimir\_sector} is \emph{not} at
 reference~0 --- it is consumed by the capstone's proof in this same file.
-Axiom-free.
+\textbf{PR-13b has since consumed} both
+\texttt{symmetricHomotopyHamiltonian\_zero} (as a genuine proof step
+identifying the coupling-independent $s=0$ endpoint at two distinct
+couplings) and \texttt{symmetricHomotopy\_casimirSelector\_eq\_const}
+(evaluating the selector at $s=0$ along the $\lambda\to0^+$ family), closing
+both debts. Axiom-free.
 
 \emph{Symmetric endpoint identification and block-invariance transport
 (Issue~\#5320, PR~\#5340 PR-13a).} Identifies PR-12b's homotopy $s=1$ endpoint
@@ -7587,7 +7606,55 @@ energy origin at the \texttt{IsUniqueGroundStateOn} level instead (PR-11a's
 \texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff}). \textbf{Debt (new).}
 This PR's own capstone
 \texttt{configSectorCompress\_symmetricHomotopyHamiltonian\_one\_eq\_perturbedHamiltonian\_sub\_smul}
-is at reference~0, staged for PR-13b's consumption. Axiom-free.
+was at reference~0, staged for PR-13b's consumption. \textbf{PR-13b has since
+consumed} it (in the compressed-to-full transport
+\texttt{isUniqueGroundStateOn\_symmetricHomotopyHamiltonian\_one\_of\_compressed}),
+closing that debt. Axiom-free.
+
+\emph{Casimir pinning $c(0)=$ \texttt{liebRepulsiveSpinCasimir}~$A$
+(Issue~\#5320, PR~\#5341 PR-13b).} Identifies the arc's occupied Casimir
+sector with \texttt{liebRepulsiveSpinCasimir}~$A$, discharging obligation
+(2) of PR-11c's capstone docstring. \texttt{casimirSelector\_strict\_min\_unique}:
+two occupied Casimir eigenvalues of the \emph{same} Hamiltonian, each
+satisfying the strict-minimality property of
+\texttt{exists\_unique\_casimir\_sector\_strict\_min}, coincide (each would
+otherwise be strictly below the other). \textbf{Capstone 1}
+\texttt{symmetricHomotopyHamiltonian\_one\_isUniqueGroundStateOn}: the
+PR-13a-scoped $\lambda$-family transport capstone --- for every sufficiently
+small $\lambda>0$, PR-11b's compressed unique ground state
+(\texttt{tasaki\_lemma\_10\_1\_liebRepulsive\_apply}) transports, via
+\texttt{configSectorCompress\_apply}, PR-13a's compressed endpoint identity,
+and the generalized
+\texttt{isUniqueGroundStateOn\_coordinateSpan\_iff\_submatrix}, to a unique
+ground state of the homotopy's $s=1$ endpoint on the joint number/spin-$z$
+sector $K=$ \texttt{numberSpinZSectorEuclidean}~$N\,(N+1)\,m_0$.
+\textbf{Capstone 2}
+\texttt{symmetricHomotopy\_casimirSelector\_zero\_eq\_liebRepulsiveSpinCasimir}:
+extends PR-12b's \texttt{symmetricHomotopy\_casimirSelector\_eq\_const}
+($c(0)=c(1)$) with $c(0)=$ \texttt{liebRepulsiveSpinCasimir}~$A$. For every
+$\lambda$ the transported $s=1$ ground state occupies, by
+\texttt{exists\_unique\_casimir\_sector\_strict\_min}, an occupied Casimir
+sector; selector uniqueness identifies it with the PR-12b selector value at
+$s=1$ for that coupling, hence --- through $c(0)=c(1)$ and the
+$\lambda$-independence of the $s=0$ endpoint
+(\texttt{symmetricHomotopyHamiltonian\_zero}) --- with $c(0)$ for the
+\emph{given} coupling. Restricting the resulting Casimir eigen-equation to
+the half-filled coordinate block and passing $\lambda\to0^+$ (Lemma~10.1's
+convergence $\Phi_\lambda\to\Phi_{\mathrm{eff}}$) transports it to the
+effective ground state $\Phi_{\mathrm{eff}}$ by uniqueness of limits;
+$\Phi_{\mathrm{eff}}$ is then identified, via a reindexing onto the
+hard-core sector and mutual energy minimality, with the Marshall-positive
+Theorem~2.3 eigenvector of
+\texttt{liebRepulsive\_groundState\_casimir\_eq\_predicted}, which carries
+\texttt{liebRepulsiveSpinCasimir}~$A$. \textbf{Debt (new).} This PR's own
+capstone \texttt{symmetricHomotopyHamiltonian\_one\_isUniqueGroundStateOn}
+is at reference~0, staged for PR-14's finrank/degeneracy-count assembly.
+Also extends \texttt{exists\_unique\_casimir\_sector\_strict\_min}'s
+conclusion with the membership witness $\varphi\in K_c$, and factors
+\texttt{apply\_eq\_zero\_of\_mapsTo\_coordinateSpan} /
+\texttt{toEuclideanLin\_submatrix\_equiv\_apply} out of
+\texttt{Math/MatrixAnalysis/BlockTransport.lean} /
+\texttt{SubmatrixGroundState.lean} respectively. Axiom-free.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
