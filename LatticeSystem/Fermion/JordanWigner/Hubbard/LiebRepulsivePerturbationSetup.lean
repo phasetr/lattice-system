@@ -46,9 +46,10 @@ of `Ĥeff` only up to an additive constant) is carried out by the arc's assembly
 `−|A| (N + 1 − |A|) • 1` already folded into the matrix, and the generic transport of a real
 constant shift across that predicate is `LatticeSystem.Math.isUniqueGroundStateOn_sub_smul_one_iff`
 (`Math/MatrixAnalysis/SubmatrixGroundState.lean`), itself unconsumed and staged for PR-11b. The
-`minEnergyOn` form of the same normalisation, `LatticeSystem.Math.minEnergyOn_add_const_smul_one`
-(`Math/MatrixAnalysis/MinEnergyOnSubspace.lean`), was added alongside PR-2's `minEnergyOn` API,
-was not taken up by that route, and remains unconsumed.
+`minEnergyOn` form of the same normalisation, `minEnergyOn_add_const_smul_one`
+(`Math/MatrixAnalysis/MinEnergyOnSubspace.lean`), was added alongside PR-2's `minEnergyOn` API and
+was not taken up by that route; it was **deleted in PR-13a** as a decorative reference-0
+declaration, per its own doc comment's stipulation, rather than staged a further round.
 
 Of the whole-Fock-space layer the compressed statements *in this file* consume only the
 diagonality of `Ĥ₀` (`liebPerturbationH0_mulVec_basisVec`, transported to the sector basis by
@@ -73,9 +74,9 @@ sector `Ĥ₀|_K ≥ 0` (which is the sole consumer of the whole-space `Ĥ₀ �
 Hermiticity of `V̂|_K`, and the `P̂₀ V̂ P̂₀ = 0` capstone itself. All of them are staged for the
 application of Lemma 10.1 and the assembly of the arc (PR-11 to PR-13); whatever that assembly
 does not consume is to be deleted, not kept. Outside this file,
-`LatticeSystem.Math.minEnergyOn_add_const_smul_one` was staged the same way, but the assembly's
-first installment (PR-11a) took the `IsUniqueGroundStateOn` route above instead of consuming it,
-so it is to be deleted unless a later PR of the arc takes it up.
+`minEnergyOn_add_const_smul_one` was staged the same way; the assembly's first installment
+(PR-11a) took the `IsUniqueGroundStateOn` route above instead of consuming it, and it was
+**deleted in PR-13a** rather than staged a further round.
 
 The helpers `liebHalfFilling_site_occupation`, `liebEndpointHopping_diag_eq_zero`,
 `liebPerturbationH0Compressed_eq_diagonal` and `hubbardConfigInteractionWeight_one_star` are public
