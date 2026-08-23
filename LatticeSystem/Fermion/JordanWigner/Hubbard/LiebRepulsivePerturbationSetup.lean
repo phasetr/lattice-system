@@ -68,10 +68,11 @@ Hermiticity of `V̂|_K`, and the `P̂₀ V̂ P̂₀ = 0` capstone itself; and, o
 of Lemma 10.1 and the assembly of the arc (PR-11 to PR-13); whatever that assembly does not
 consume is to be deleted, not kept.
 
-Four helpers are public rather than `private` because the superexchange reduced-inverse layer
-(`LiebRepulsiveSuperexchangeReducedInverse.lean`) consumes them directly instead of duplicating
-them: `liebHalfFilling_site_occupation`, `liebEndpointHopping_diag_eq_zero`,
-`liebPerturbationH0Compressed_eq_diagonal` and `hubbardConfigInteractionWeight_one_star`.
+The helpers `liebHalfFilling_site_occupation`, `liebEndpointHopping_diag_eq_zero`,
+`liebPerturbationH0Compressed_eq_diagonal` and `hubbardConfigInteractionWeight_one_star` are public
+rather than `private` because the downstream superexchange layers (from
+`LiebRepulsiveSuperexchangeReducedInverse.lean` on) consume them directly instead of duplicating
+them.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §10.1 (Lemma 10.1, eq. (10.1.20)) and §10.2.2 (p. 353).
@@ -172,10 +173,8 @@ theorem hubbardConfigInteractionWeight_one_star (N : ℕ) (c : Fin (2 * N + 2) �
   simp
 
 /-- The interaction weight of `Ĥ₀` vanishes exactly on hard-core configurations: a sum of
-`0`/`1`-valued double-occupancy terms is zero exactly when every term is. Public (de-privatized
-PR-11a): consumed outside this file by the PR-11a hard-core/ambient sector `Equiv`
-(`LiebRepulsiveSectorAssembly.lean`). -/
-theorem hubbardConfigInteractionWeight_one_eq_zero_iff (N : ℕ)
+`0`/`1`-valued double-occupancy terms is zero exactly when every term is. -/
+private theorem hubbardConfigInteractionWeight_one_eq_zero_iff (N : ℕ)
     (c : Fin (2 * N + 2) → Fin 2) :
     hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0
       ↔ ∀ x : Fin (N + 1),
