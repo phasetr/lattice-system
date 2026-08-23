@@ -130,17 +130,15 @@ theorem isUniqueGroundStateOn_liebPerturbationH0Compressed_kernel_iff_heisenberg
   have hker := matrixKernel_liebPerturbationH0Compressed_eq_coordinateSpan N nUp
   have hmem : Φ ∈ coordinateSpan (liebHalfFillingHardcorePred N nUp) := by
     rw [← hker]; exact hΦ
-  have hblock : secondOrderEffectiveHamiltonian (liebPerturbationH0Compressed N nUp)
-        (liebPerturbationVCompressed N nUp A T) (liebPerturbationH0InvCompressed N nUp)
-      = Matrix.diagonal (fun s => if liebHalfFillingHardcorePred N nUp s then (1 : ℂ) else 0)
-          * secondOrderEffectiveHamiltonian (liebPerturbationH0Compressed N nUp)
-              (liebPerturbationVCompressed N nUp A T) (liebPerturbationH0InvCompressed N nUp)
-          * Matrix.diagonal
-              (fun s => if liebHalfFillingHardcorePred N nUp s then (1 : ℂ) else 0) := by
-    have h := secondOrderEffectiveHamiltonian_eq_kernelProjectionMatrix_conj
-      (liebPerturbationH0Compressed N nUp) (liebPerturbationVCompressed N nUp A T)
-      (liebPerturbationH0InvCompressed N nUp)
-    rwa [kernelProjectionMatrix_liebPerturbationH0Compressed_eq_diagonal] at h
+  -- PR-13a: generalized from the block-diagonal `hblock` to the weaker `hInv` invariance
+  -- hypothesis consumed by the generalized `isUniqueGroundStateOn_coordinateSpan_iff_submatrix`
+  -- (`Math/MatrixAnalysis/BlockTransport.lean`); Red scaffold, proof deferred to dev-implement.
+  have hInv : ∀ i j, liebHalfFillingHardcorePred N nUp j →
+      ¬ liebHalfFillingHardcorePred N nUp i →
+      secondOrderEffectiveHamiltonian (liebPerturbationH0Compressed N nUp)
+          (liebPerturbationVCompressed N nUp A T) (liebPerturbationH0InvCompressed N nUp) i j
+        = 0 := by
+    sorry
   have h1 : IsUniqueGroundStateOn (matrixKernel (liebPerturbationH0Compressed N nUp))
         (secondOrderEffectiveHamiltonian (liebPerturbationH0Compressed N nUp)
           (liebPerturbationVCompressed N nUp A T) (liebPerturbationH0InvCompressed N nUp)) E Φ
@@ -151,7 +149,7 @@ theorem isUniqueGroundStateOn_liebPerturbationH0Compressed_kernel_iff_heisenberg
               (liebPerturbationH0InvCompressed N nUp)).submatrix Subtype.val Subtype.val) E
           (coordinateRestrict (liebHalfFillingHardcorePred N nUp) Φ) := by
     rw [hker]
-    exact isUniqueGroundStateOn_coordinateSpan_iff_submatrix hblock hmem
+    exact isUniqueGroundStateOn_coordinateSpan_iff_submatrix hInv hmem
   have hcomp : (Subtype.val ∘
         ⇑((liebHardCoreHalfFillingSectorEquivS N nUp hnUp).symm.trans
           (liebHardCoreAmbientSubtypeEquiv N nUp)))

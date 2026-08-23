@@ -204,89 +204,23 @@ private theorem coordinateRestrict_toEuclideanLin (hcol : ∀ i j, ¬ P j → H 
 
 end BlockSupport
 
-/-- **Generic block-transport of the unique-ground-state predicate.** If `H` is supported on the
-coordinate block of a decidable predicate `P` (`H = P̂ · H · P̂`, with `P̂` the diagonal indicator
-of `P`), then for a candidate `φ` in the coordinate span of `P`, `H` having `φ` as its unique ground
-state on the coordinate span is equivalent to the submatrix restriction of `H` to that block
-having the restricted candidate `coordinateRestrict P φ` as its unique ground state on the whole
-restricted space `⊤`. -/
+/-- **Generic block-transport of the unique-ground-state predicate (PR-13a, generalized in
+place).** The block-diagonal hypothesis `H = P̂ · H · P̂` (which fails for a Hamiltonian that is
+merely block-diagonal across `P`/`¬P`, not supported on the `P`-block alone) is replaced by the
+weaker invariance hypothesis `hInv : ∀ i j, P j → ¬ P i → H i j = 0`: rows outside `P` vanish at
+columns inside `P`, which is exactly what a candidate `φ` confined to the coordinate span of `P`
+needs from `H` under the action of `Matrix.toEuclideanLin`. For a candidate `φ` in the coordinate
+span of `P`, `H` having `φ` as its unique ground state on the coordinate span is equivalent to the
+submatrix restriction of `H` to that block having the restricted candidate `coordinateRestrict P φ`
+as its unique ground state on the whole restricted space `⊤`. -/
 theorem isUniqueGroundStateOn_coordinateSpan_iff_submatrix {H : Matrix n n ℂ}
     {P : n → Prop} [DecidablePred P]
-    (hblock : H = Matrix.diagonal (fun i => if P i then (1 : ℂ) else 0) * H
-        * Matrix.diagonal (fun i => if P i then (1 : ℂ) else 0))
+    (hInv : ∀ i j, P j → ¬ P i → H i j = 0)
     {E : ℝ} {φ : EuclideanSpace ℂ n} (hφ : φ ∈ coordinateSpan P) :
     IsUniqueGroundStateOn (coordinateSpan P) H E φ ↔
       IsUniqueGroundStateOn (⊤ : Submodule ℂ (EuclideanSpace ℂ {i // P i}))
         (H.submatrix Subtype.val Subtype.val) E (coordinateRestrict P φ) := by
-  have hrow : ∀ i j, ¬ P i → H i j = 0 :=
-    fun _ _ hi => blockSupport_apply_eq_zero hblock (Or.inl hi)
-  have hcol : ∀ i j, ¬ P j → H i j = 0 :=
-    fun _ _ hj => blockSupport_apply_eq_zero hblock (Or.inr hj)
-  have hmemH := toEuclideanLin_mem_coordinateSpan hrow
-  have hres := coordinateRestrict_toEuclideanLin hcol
-  have hext : ∀ ψ : EuclideanSpace ℂ {i // P i}, Matrix.toEuclideanLin H (coordinateExtend P ψ)
-      = coordinateExtend P
-        (Matrix.toEuclideanLin (H.submatrix Subtype.val Subtype.val) ψ) := by
-    intro ψ
-    rw [← coordinateRestrict_coordinateExtend ψ, ← hres,
-      coordinateExtend_coordinateRestrict (hmemH _), coordinateRestrict_coordinateExtend]
-  have hzero : ∀ ψ : EuclideanSpace ℂ {i // P i}, coordinateExtend P ψ = 0 → ψ = 0 := by
-    intro ψ h
-    exact norm_eq_zero.mp (by rw [← norm_coordinateExtend ψ, h, norm_zero])
-  have hzero' : ∀ v : EuclideanSpace ℂ n, v ∈ coordinateSpan P →
-      coordinateRestrict P v = 0 → v = 0 := by
-    intro v hv h
-    refine norm_eq_zero.mp ?_
-    rw [← coordinateExtend_coordinateRestrict hv, norm_coordinateExtend, h, norm_zero]
-  constructor
-  · rintro ⟨hmem, hnorm, heig, hground, huniq⟩
-    have hnorm' : ‖coordinateRestrict P φ‖ = 1 := by
-      rw [← norm_coordinateExtend (coordinateRestrict P φ),
-        coordinateExtend_coordinateRestrict hmem]
-      exact hnorm
-    have heig' : Matrix.toEuclideanLin (H.submatrix Subtype.val Subtype.val)
-        (coordinateRestrict P φ) = (E : ℂ) • coordinateRestrict P φ := by
-      rw [← hres φ, heig, coordinateRestrict_smul]
-    have hne : coordinateRestrict P φ ≠ 0 := by
-      intro h
-      rw [h, norm_zero] at hnorm'
-      exact zero_ne_one hnorm'
-    refine ⟨Submodule.mem_top, hnorm', heig',
-      ⟨⟨coordinateRestrict P φ, Submodule.mem_top, hne, heig'⟩, ?_⟩, ?_⟩
-    · rintro μ ⟨ψ, -, hψ0, hψeig⟩
-      refine hground.2 μ ⟨coordinateExtend P ψ, coordinateExtend_mem_coordinateSpan ψ,
-        fun h => hψ0 (hzero ψ h), ?_⟩
-      rw [hext ψ, hψeig, coordinateExtend_smul]
-    · rintro ψ - hψeig
-      obtain ⟨c, hc⟩ := huniq (coordinateExtend P ψ) (coordinateExtend_mem_coordinateSpan ψ)
-        (by rw [hext ψ, hψeig, coordinateExtend_smul])
-      exact ⟨c, by rw [← coordinateRestrict_coordinateExtend ψ, hc, coordinateRestrict_smul]⟩
-  · rintro ⟨-, hnorm, heig, hground, huniq⟩
-    have hnormφ : ‖φ‖ = 1 := by
-      rw [← coordinateExtend_coordinateRestrict hφ, norm_coordinateExtend]
-      exact hnorm
-    have heigφ : Matrix.toEuclideanLin H φ = (E : ℂ) • φ := by
-      calc Matrix.toEuclideanLin H φ
-          = coordinateExtend P (coordinateRestrict P (Matrix.toEuclideanLin H φ)) :=
-            (coordinateExtend_coordinateRestrict (hmemH φ)).symm
-        _ = coordinateExtend P (coordinateRestrict P ((E : ℂ) • φ)) := by
-            rw [hres φ, heig, coordinateRestrict_smul]
-        _ = (E : ℂ) • φ := coordinateExtend_coordinateRestrict ((coordinateSpan P).smul_mem _ hφ)
-    have hne : φ ≠ 0 := by
-      intro h
-      rw [h, norm_zero] at hnormφ
-      exact zero_ne_one hnormφ
-    refine ⟨hφ, hnormφ, heigφ, ⟨⟨φ, hφ, hne, heigφ⟩, ?_⟩, ?_⟩
-    · rintro μ ⟨ψ, hψmem, hψ0, hψeig⟩
-      refine hground.2 μ ⟨coordinateRestrict P ψ, Submodule.mem_top,
-        fun h => hψ0 (hzero' ψ hψmem h), ?_⟩
-      rw [← hres ψ, hψeig, coordinateRestrict_smul]
-    · intro ψ hψmem hψeig
-      obtain ⟨c, hc⟩ := huniq (coordinateRestrict P ψ) Submodule.mem_top
-        (by rw [← hres ψ, hψeig, coordinateRestrict_smul])
-      refine ⟨c, ?_⟩
-      rw [← coordinateExtend_coordinateRestrict hψmem, hc, coordinateExtend_smul,
-        coordinateExtend_coordinateRestrict hφ]
+  sorry
 
 /-- **The kernel of a diagonal matrix is the coordinate span of its zero-entry predicate.**
 If a diagonal matrix's entries vanish exactly on a decidable predicate `P`, its kernel (as a
