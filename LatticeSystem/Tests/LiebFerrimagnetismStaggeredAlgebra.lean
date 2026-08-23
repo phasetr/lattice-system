@@ -93,8 +93,8 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (v : (Fin (2 * N + 2) → Fin 2) �
       (vectorExpectation (fermionStaggeredCasimirOp N A) v).re :=
   fermionStaggeredTransverse_expectation_le_staggeredCasimir_expectation N A v
 
-/-- `fermionStaggeredCasimirOp` is self-adjoint (used everywhere downstream to discharge `.im = 0`
-on its expectations). -/
+/-- `fermionStaggeredCasimirOp` is self-adjoint (staged for later PR consumption to discharge
+`.im = 0` on its expectations; see the PR-7/PR-8 design route in the module docstring). -/
 example (N : ℕ) (A : Finset (Fin (N + 1))) :
     (fermionStaggeredCasimirOp N A).IsHermitian :=
   fermionStaggeredCasimirOp_isHermitian N A
