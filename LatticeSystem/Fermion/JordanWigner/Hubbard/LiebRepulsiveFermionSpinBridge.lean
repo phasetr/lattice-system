@@ -96,10 +96,6 @@ private theorem fin2_fst_eq_one_sub (a b : Fin 2) (h : a.val + b.val = 1) : a = 
 private theorem fin2_snd_eq_one_sub (a b : Fin 2) (h : a.val + b.val = 1) : b = 1 - a := by
   revert a b; decide
 
-/-- An occupation value that is not `1` is `0`. -/
-private theorem fin2_eq_zero_of_ne_one {a : Fin 2} (h : a ≠ 1) : a = 0 := by
-  revert a; decide
-
 /-! ## The hard-core half-filling predicate -/
 
 /-- **The hard-core half-filled fixed-`Ŝ³` configuration predicate**: `liebHalfFillingPred` (half
@@ -135,7 +131,7 @@ def liebHardCoreDownOccupation {N : ℕ} (c : Fin (2 * N + 2) → Fin 2) : Fin (
 
 /-- `liebHardCoreDownOccupation` lands in the magnetization sector `M = N + 1 − nUp`: the number of
 down-occupied sites is the complement of the up-count `nUp` inside the `N + 1` singly-occupied
-sites (design-round convention check: `M` is the **down**-count, not `nUp`). -/
+sites (`M` is the **down**-count, not `nUp`). -/
 theorem liebHardCoreDownOccupation_magSumS_eq (N nUp : ℕ)
     {c : Fin (2 * N + 2) → Fin 2} (hc : liebHardCoreHalfFillingPred N nUp c) :
     magSumS (liebHardCoreDownOccupation c) = N + 1 - nUp := by
