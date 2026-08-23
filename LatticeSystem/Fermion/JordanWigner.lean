@@ -209,6 +209,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveTheorem23Instance
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveSectorAssembly
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveUniquenessAssembly
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveSU2Invariance
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveSymmetricHomotopy
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetism
 import LatticeSystem.Fermion.JordanWigner.Hubbard.BipartiteSpectrum
