@@ -14,13 +14,6 @@ Eighteenth installment of the Theorem 10.4 discharge arc (issue #5320).
   each satisfying the strict-minimality property of
   `exists_unique_casimir_sector_strict_min` (`LiebRepulsiveCasimirSector.lean`) for the *same*
   Hamiltonian must coincide.
-* `symmetricHomotopyHamiltonian_one_isUniqueGroundStateOn` — the PR-13a-scoped λ-family transport
-  capstone: for every `λ ∈ (0, λ₀)`,
-  `IsUniqueGroundStateOn K (symmetricHomotopyHamiltonian N A T U lam 1) E_λ φ_λ` on the joint
-  number/spin-`z` sector `K = numberSpinZSectorEuclidean N (N+1) m₀`, obtained by transporting
-  `tasaki_lemma_10_1_liebRepulsive_apply`'s compressed uniqueness up along `coordinateExtend` and
-  the generalized `isUniqueGroundStateOn_coordinateSpan_iff_submatrix`
-  (`Math/MatrixAnalysis/BlockTransport.lean`).
 * `symmetricHomotopy_casimirSelector_zero_eq_liebRepulsiveSpinCasimir` — the arc's Casimir-pinning
   capstone: extends PR-12b's `symmetricHomotopy_casimirSelector_eq_const`
   (`LiebRepulsiveSymmetricHomotopy.lean`, `c 0 = c 1`) with `c 0 = liebRepulsiveSpinCasimir A`.
@@ -166,35 +159,6 @@ private theorem isUniqueGroundStateOn_symmetricHomotopyHamiltonian_one_of_compre
   rw [coordinateRestrict_coordinateExtend, hsub,
     configSectorCompress_symmetricHomotopyHamiltonian_one_eq_perturbedHamiltonian_sub_smul]
   exact (isUniqueGroundStateOn_sub_smul_one_iff _ _ (((N : ℝ) + 1) / 4) E Φ).mp hGS
-
-/-- **The λ-family transport capstone.** For a nondegenerate bipartition and an admissible
-magnetization sector, the `s = 1` endpoint of the symmetric-form homotopy has, for every
-sufficiently small `λ > 0`, a unique ground state on the joint number/spin-`z` sector
-`K = numberSpinZSectorEuclidean N (N+1) (liebHalfFillingSpinZVal N nUp)`: PR-11b's compressed
-`λ`-family uniqueness (`tasaki_lemma_10_1_liebRepulsive_apply`,
-`LiebRepulsiveUniquenessAssembly.lean`) transported by
-`isUniqueGroundStateOn_symmetricHomotopyHamiltonian_one_of_compressed`. -/
-theorem symmetricHomotopyHamiltonian_one_isUniqueGroundStateOn
-    (N nUp : ℕ) (hnUp : nUp ≤ N + 1)
-    (A : Finset (Fin (N + 1))) (hA : 1 ≤ A.card) (hB : 1 ≤ (bipartitionComplement A).card)
-    (hM : (N + 1 - nUp) ∈ tasaki23GroundStateSectors
-      (fun x => decide (x ∈ liebOrientedSublattice A)) 1)
-    {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ}
-    (hbip : HoppingRespectsBipartition A T) (hT : ∀ x y, T x y = T y x)
-    (U : Fin (N + 1) → ℝ) :
-    ∃ lam0 : ℝ, 0 < lam0 ∧
-      ∃ Elam : ℝ → ℝ,
-      ∃ philam : ℝ → EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2),
-        ∀ lam : ℝ, 0 < lam → lam < lam0 →
-          IsUniqueGroundStateOn
-            (numberSpinZSectorEuclidean N ((N : ℂ) + 1) (liebHalfFillingSpinZVal N nUp))
-            (symmetricHomotopyHamiltonian N A T U lam 1) (Elam lam) (philam lam) := by
-  obtain ⟨lam0, hlam0, Elam, Philam, -, -, hUnique, -, -⟩ :=
-    tasaki_lemma_10_1_liebRepulsive_apply A hA hB nUp hnUp hM hbip hT
-  exact ⟨lam0, hlam0, fun lam => Elam lam - ((N : ℝ) + 1) / 4,
-    fun lam => coordinateExtend (liebHalfFillingPred N nUp) (Philam lam),
-    fun lam hlam hlt => isUniqueGroundStateOn_symmetricHomotopyHamiltonian_one_of_compressed
-      N nUp A T U lam (Elam lam) (Philam lam) (hUnique lam hlam hlt)⟩
 
 /-! ## The Casimir eigenvalue of the effective ground state -/
 
