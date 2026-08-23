@@ -725,6 +725,42 @@ def approved_changes(text: str) -> str:
             "identifying it needs the (finite-dimensional) degenerate perturbation theory of "
             "Lemma 10.1 (`tasaki_lemma_10_1_degenerate_perturbation`, proved axiom-free).",
         )
+        # PR-15c of the Theorem 10.4 discharge arc (#5320) discharges the axiom itself; the
+        # row's status/proof-sketch prose is rewritten to reflect the completed theorem.
+        .replace(
+            "| `theorem_10_4_lieb_repulsive_half_filling` | **Theorem 10.4** (Tasaki §10.2.2, "
+            "p. 350, **AXIOM**): at half-filling `N = \\|Λ\\|`, the ground subspace is nonzero, "
+            "energy-minimal, consists entirely of total-spin `S₀ = \\|\\|A\\|−\\|B\\|\\|/2` "
+            "states (Casimir `S₀(S₀+1)`), and has dimension exactly `\\|A\\|−\\|B\\|+1` (the "
+            "unavoidable SU(2) multiplet degeneracy). Lieb's reflection positivity via the Shiba "
+            "transformation → faithful documented axiom. | "
+            "`Fermion/JordanWigner/Hubbard/LiebRepulsive.lean` |",
+            "| `theorem_10_4_lieb_repulsive_half_filling` | **Theorem 10.4** (Tasaki §10.2.2, "
+            "p. 350, **now PROVED — axiom discharged**, Issue #5320, PR #5346 PR-15c; "
+            "`#print axioms` = std3): for a bipartite real symmetric connected hopping matrix "
+            "`T` and a repulsive Hubbard Hamiltonian `H` in either form (uniform eq. (10.2.5) or "
+            "symmetric eq. (10.2.6)), at half-filling `N = \\|Λ\\|` the ground subspace is "
+            "nonzero, energy-minimal, consists entirely of total-spin "
+            "`S₀ = \\|\\|A\\|−\\|B\\|\\|/2` states (Casimir `S₀(S₀+1)`), and has dimension "
+            "exactly `\\|A\\|−\\|B\\|+1` (the unavoidable SU(2) multiplet degeneracy). "
+            "**Proof**: the capstone splits `IsLiebRepulsiveModel`'s "
+            "`IsLiebRepulsiveHamiltonian` disjunction. The **symmetric disjunct** is "
+            "`liebRepulsive_symmetric_halfFilling`, which combines the conditional capstone "
+            "`liebRepulsive_symmetric_halfFilling_conditional` "
+            "(`LiebRepulsiveWeightConfinement.lean`, the `1 ≤ \\|A\\|`/`1 ≤ \\|B\\|` case "
+            "reached through the Shiba-transformed reflection-positivity ground state, Casimir "
+            "sector pinning, SU(2) weight transport and weight confinement) with the degenerate "
+            "case `\\|A\\| = 0 ∨ \\|B\\| = 0`, which forces `T = 0` and hence — by connectedness "
+            "of the now edgeless hopping support graph — `N = 0`, a single-site model whose "
+            "ground submodule is one diagonal eigenspace (Casimir `3/4`, `finrank 2`, matching "
+            "`liebRepulsiveSpinCasimir`/`liebRepulsiveGroundMultiplicity` at the one-point "
+            "bipartition). The **uniform disjunct** is `liebRepulsive_uniform_of_symmetric`, "
+            "transporting the constant-`U` symmetric-form conjuncts across the energy shift of "
+            "`symmetricRepulsiveHubbardHamiltonian_groundSubmodule_eq_uniform`. The model "
+            "hypotheses `IsLiebRepulsiveModel` / `IsLiebRepulsiveHamiltonian` and the Hamiltonian "
+            "definitions stay in `LiebRepulsive.lean`, strictly upstream of the discharge chain. "
+            "| `Fermion/JordanWigner/Hubbard/LiebRepulsiveHalfFillingDischarge.lean` |",
+        )
     )
 
 

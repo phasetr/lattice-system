@@ -18,8 +18,8 @@ energy `E₀`, and `E₀` is minimal over the whole `(N+1)`-electron sector. It 
 PR-14b infrastructure lemmas that stay in this module because they generalize PR-14a's own
 minimality proof (`liebRepulsive_groundSubmodule_le_comap_of_commute`,
 `liebRepulsive_exists_jointEigenvector_of_ne_bot`), consumed by the weight confinement built in
-`LiebRepulsiveWeightConfinement.lean`. The `finrank` count and the axiom discharge itself (PR-15)
-are **not** in this file's scope.
+`LiebRepulsiveWeightConfinement.lean`. The `finrank` count and the axiom discharge itself
+(PR-15, since completed by PR-15c) are **not** in this file's scope.
 
 ## Route
 

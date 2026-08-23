@@ -6827,7 +6827,7 @@ conclusion directly for a general site-dependent $U:\mathrm{Fin}(N{+}1)\to
 \mathbb{R}$ symmetric Hamiltonian (only $\forall x,\,0<U_x$ is assumed), so the
 $U_x\to U$ reduction sketched above is never needed by the arc; it remains an
 observation about the book's own stated deformation argument, not a blocking
-gap for the arc's discharge (PR-15).
+gap for the arc's discharge (\textbf{completed by PR-15c}).
 \emph{Provenance.} Tasaki's endpoint keeps the original bond set --- ``We do not
 modify $t_{x,y}$ which is zero to begin with'' (p.~353) --- whereas
 \texttt{liebEndpointHopping} carries $\operatorname{sign}(t_{x,y})\,\lambda$ on
@@ -7306,10 +7306,12 @@ left-hand side while leaving the right-hand side, which only sees
 infrastructure} (PR-11b/PR-11c remain): the Theorem~2.3 instance (PR-10b) and
 the ground-state existence witness remain to be supplied by PR-11b; PR-11b is
 limited to producing the existence witness and applying Lemma~10.1, and axiom
-removal itself is PR-15's responsibility (the arc's final assembly step later
+removal itself was, at this PR, staged for the arc's final assembly step (later
 split into PR-14a/PR-14b) --- the site-dependent-$U$ homotopy
 (PR-12b) and full assembly (PR-13, expected to split into
-PR-13a/PR-13b) also remain before Theorem~10.4 is discharged (Issue~\#5320);
+PR-13a/PR-13b) also remained before Theorem~10.4 was discharged (Issue~\#5320);
+\textbf{PR-15c has since discharged} the axiom (see the Theorem~10.4 status
+note above);
 the three-way sector bridge between \texttt{configSector},
 \texttt{numberSpinZSectorEuclidean}, and \texttt{spinZSectorEuclidean} is
 separate out-of-scope work left for PR-11c.
@@ -7417,8 +7419,9 @@ than staged a fourth time (see the PR-12a paragraph below). This PR's own
 final capstone
 \texttt{tasaki\_lemma\_10\_1\_liebRepulsive\_apply} stays at reference~0,
 staged for the arc's remaining assembly (PR-12/PR-13); axiom removal itself
-is PR-15's responsibility (the arc's final assembly step later split into
-PR-14a/PR-14b). \textbf{PR-13b has since consumed}
+was, at this PR, staged for the arc's final assembly step (later split into
+PR-14a/PR-14b), \textbf{since discharged by PR-15c} (see the Theorem~10.4
+status note above). \textbf{PR-13b has since consumed}
 \texttt{tasaki\_lemma\_10\_1\_liebRepulsive\_apply} (in both the
 $\lambda$-family transport capstone
 \texttt{symmetricHomotopyHamiltonian\_one\_isUniqueGroundStateOn} and the
@@ -7475,12 +7478,14 @@ four remaining obligations before
 occupied Casimir eigenvalue with \texttt{liebRepulsiveSpinCasimir A}
 (PR-12/PR-13), (3) the site-dependent $U_x\to U$ reduction (PR-12b), (4) the
 finrank/degeneracy count assembly (PR-14a/PR-14b, since completed; axiom
-removal itself is PR-15's responsibility). \textbf{Debt discharged}:
+removal itself was, at this PR, staged as PR-15's responsibility, \textbf{since
+completed by PR-15c}). \textbf{Debt discharged}:
 this PR consumes PR-11a's \texttt{eigenspace\_diagonal\_eq\_coordinateSpan}
 and \texttt{IsUniqueGroundStateOn.mono}, closing both debts;
 \texttt{configSectorCompress\_eq\_submatrix} was later \textbf{deleted in
 PR-12a} as a decorative (reference-0) declaration rather than staged a fourth
-time (see the PR-12a paragraph below). \textbf{Debt (new)}: two declarations
+time (see the PR-12a paragraph below); \textbf{PR-15c has since discharged}
+the axiom itself. \textbf{Debt (new)}: two declarations
 introduced by this PR are at reference~0 --- the diagonal-charge bridge
 \texttt{numberSpinZSectorEuclidean\_eq\_coordinateSpan\_liebHalfFillingPred}
 (not itself chained into this file's own capstone, staged as a standalone
@@ -7714,7 +7719,8 @@ Axiom-free.
 \emph{SU(2) weight transport and the sector energy ladder (Issue~\#5320,
 PR~\#5342 PR-14a).} The first half of the arc's final assembly step (the
 complementary weight confinement + \texttt{finrank} count is PR-14b, and
-the axiom discharge itself is PR-15). One generic layer item opens the
+the axiom discharge itself was, at this PR, staged as PR-15, \textbf{since
+completed by PR-15c}). One generic layer item opens the
 file: \texttt{mulVec\_eq\_smul\_iff\_toEuclideanLin\_toLp\_eq\_smul}
 (\texttt{Math/MatrixAnalysis/PiEuclideanEigenBridge.lean}) crosses, once
 and for all, the boundary between the plain function carrier
@@ -7780,7 +7786,8 @@ time. Axiom-free.
 \emph{Weight confinement, the \texttt{finrank} count, and the arc's
 symmetric-disjunct conditional capstone (Issue~\#5320, PR~\#5343 PR-14b).}
 The second half of the arc's final assembly step (axiom discharge itself
-remains PR-15's responsibility).
+was, at this PR, staged as PR-15's responsibility, \textbf{since completed
+by PR-15c}).
 \texttt{liebRepulsive\_groundSubmodule\_le\_comap\_of\_commute} factors the
 invariance-under-a-commuting-charge step out of PR-14a's
 \texttt{liebRepulsive\_groundEnergy\_le\_of\_electronNumber} for reuse on
@@ -7820,7 +7827,7 @@ reference~0 through PR-14a, and this PR's route to weight confinement does
 not need it, so it is removed as a decorative reference-0 declaration
 rather than staged a third time. \textbf{Debt (new).} This PR's own capstone
 \texttt{liebRepulsive\_symmetric\_halfFilling\_conditional} is at reference~0,
-staged for PR-15's axiom discharge. Axiom-free.
+staged for PR-15's axiom discharge, \textbf{since completed by PR-15c}. Axiom-free.
 
 \emph{Degenerate-sublattice reduction, the $N=0$ block, and the all-$A$
 symmetric/uniform assembly (Issue~\#5320, PR~\#5345 PR-15b).} Two generic
