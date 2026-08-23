@@ -163,17 +163,6 @@ theorem configSectorCompress_apply (P : (Fin (2 * N + 2) → Fin 2) → Prop) [D
   simp only [hrow, hcol]
   rw [basisVec_sum_mul, mulVec_basisVec_apply]
 
-/-- **The sector compression is the coordinate submatrix.** `Tᴴ A T = A.submatrix Subtype.val
-Subtype.val`: restating `configSectorCompress_apply` in `Matrix.submatrix` form, which is the
-shape the generic coordinate-block ground-state transport
-(`Math/MatrixAnalysis/BlockTransport.lean`, `Math/MatrixAnalysis/SubmatrixGroundState.lean`)
-consumes. -/
-theorem configSectorCompress_eq_submatrix (P : (Fin (2 * N + 2) → Fin 2) → Prop) [DecidablePred P]
-    (A : ManyBodyOp (Fin (2 * N + 2))) :
-    configSectorCompress N P A = A.submatrix Subtype.val Subtype.val := by
-  ext s s'
-  rw [configSectorCompress_apply, Matrix.submatrix_apply]
-
 /-- **The sector embedding has orthonormal columns:** `Tᴴ T = 1`. -/
 theorem configSectorEmbedding_conjTranspose_mul_self (P : (Fin (2 * N + 2) → Fin 2) → Prop)
     [DecidablePred P] :
