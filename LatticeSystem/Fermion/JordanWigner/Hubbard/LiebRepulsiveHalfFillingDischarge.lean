@@ -11,7 +11,7 @@ import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
 
 Assembly layer for the Theorem 10.4 (Lieb repulsive Hubbard half-filling) discharge arc
 (issue #5320). Covers the two pieces `liebRepulsive_symmetric_halfFilling_conditional`
-(`LiebRepulsiveWeightConfinement.lean:497`, requiring `1 ≤ |A|` and `1 ≤ |B|`) does not:
+(`LiebRepulsiveWeightConfinement.lean`, requiring `1 ≤ |A|` and `1 ≤ |B|`) does not:
 
 * the **degenerate case** `|A| = 0 ∨ |B| = 0`, which forces the hopping matrix `T` to vanish and,
   via connectedness of the (now edgeless) hopping support graph, forces `N = 0` — a single-site
@@ -460,7 +460,7 @@ theorem liebRepulsive_symmetric_halfFilling_degenerate {A : Finset (Fin (N + 1))
 /-! ## The all-`A` symmetric-form theorem -/
 
 /-- **The symmetric-form Theorem 10.4, for every bipartition `A`.** Combines
-`liebRepulsive_symmetric_halfFilling_conditional` (`LiebRepulsiveWeightConfinement.lean:497`, the
+`liebRepulsive_symmetric_halfFilling_conditional` (`LiebRepulsiveWeightConfinement.lean`, the
 `1 ≤ |A|` and `1 ≤ |B|` case) with the degenerate case above (`|A| = 0 ∨ |B| = 0`), by cases on
 whether both sublattices are nonempty. Reference-0 within this PR; consumed by PR-15c's capstone. -/
 theorem liebRepulsive_symmetric_halfFilling (N : ℕ) {A : Finset (Fin (N + 1))}
