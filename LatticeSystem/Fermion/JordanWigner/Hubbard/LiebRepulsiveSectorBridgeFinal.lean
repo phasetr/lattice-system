@@ -181,7 +181,7 @@ This capstone pins down **exactly** what remains before `theorem_10_4_lieb_repul
    homotopy continuity of PR-4 (`casimirSelector_eq_const_of_locally_unique_strict_min`) and
    PR-11b's Lemma 10.1 application (`tasaki_lemma_10_1_liebRepulsive_apply`) transported along
    this file's sector bridge (PR-12/PR-13).
-3. The site-dependent `U_x → U` reduction for the general symmetric form (PR-12a). Expanding the
+3. The site-dependent `U_x → U` reduction for the general symmetric form (PR-12b). Expanding the
    symmetric form at a genuine `U : Λ → ℝ` produces the term `−(1/2) ∑_x U_x (n̂_{x,↑} + n̂_{x,↓})`,
    a site-dependent one-body potential rather than a multiple of `N̂`, so no constant energy shift
    reduces it to the uniform form. The alternative is to run the homotopy along the site-dependent

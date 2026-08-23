@@ -1,7 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveSectorBridgeFinal
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveSU2Invariance
-import LatticeSystem.Fermion.JordanWigner.Hubbard.TJModel
-import LatticeSystem.Fermion.JordanWigner.CreationNumberIdentities
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSpinSymmetryRaising
 
 /-!
 # `SU(2)` invariance of the symmetric repulsive Hubbard Hamiltonian (Tasaki §10.2.2, PR-12a)
@@ -22,10 +21,11 @@ Expanded
 against a site-dependent `U`, it decomposes into three separately `SU(2)`-invariant summands:
 `hubbardOnSiteInteractionSite N U − Σ_x (U_x/2) • n̂_x + ((Σ_x U_x)/4) • 1`
 (`symmetricRepulsiveHubbardInteraction_eq_uniform_sub_siteNumber`). The middle summand's
-invariance needs one genuinely new commutator, `fermionTotalSpinPlus_commute_fermionSiteNumber`
-(the `Ŝ³` and `N̂` analogues, `totalSpinZ_commute_fermionSiteNumber` and
-`fermionTotalNumber_commute_fermionSiteNumber`, already exist in `TJSpinSymmetry.lean` /
-`TJNumberCommute.lean`).
+invariance reuses the per-site-number commutators of the t-J layer, which already cover all three
+generators: `totalSpinPlus_commute_fermionSiteNumber` (`TJSpinSymmetryRaising.lean`),
+`totalSpinZ_commute_fermionSiteNumber` (`TJSpinSymmetry.lean`) and
+`fermionTotalNumber_commute_fermionSiteNumber` (`TJNumberCommute.lean`); no new commutator is
+needed here.
 
 This file also supplies the `Ne = 2·nUp` sector-arithmetic bridge that PR-12b's per-`s`
 instantiation needs to match PR-11c's `liebHalfFillingSpinZVal`, and resolves the
@@ -38,8 +38,6 @@ actual point of use if one emerges.
 
 ## Main definitions and results
 
-* `fermionTotalSpinPlus_commute_fermionSiteNumber` — the one new commutator,
-  `Commute Ŝ⁺_tot n̂_x`, proved via the four public CAR same-site number identities.
 * `symmetricRepulsiveHubbardInteraction_eq_uniform_sub_siteNumber` — the site-dependent expansion
   of `Ĥint'` into a `hubbardOnSiteInteractionSite` term, a per-site-number term, and a scalar.
 * `symmetricRepulsiveHubbardHamiltonian_isHermitian` — Hermiticity of the symmetric repulsive
@@ -68,66 +66,6 @@ open Matrix LatticeSystem.Quantum LatticeSystem.Math
 open scoped BigOperators
 
 variable {N : ℕ}
-
-/-! ## The one new commutator -/
-
-/-- **The one genuinely new commutator of this PR.** `[Ŝ⁺_tot, n̂_x] = 0`: the total spin-raising
-operator commutes with the per-site total number `n̂_x = n̂_{x,↑} + n̂_{x,↓}`. Proved per term
-of `Ŝ⁺_tot = Σ_k c†_{k,↑}c_{k,↓}`: for `k ≠ x` all four operators sit at distinct Jordan–Wigner
-modes (cloning the `hkx` branch of `fermionSpinPlusTerm_commute_interactionTerm`); for `k = x`
-both sides reduce to `c†_{x,↑}c_{x,↓}` via the four public CAR same-site number identities
-(`fermionMultiCreation_mul_fermionMultiNumber_eq_zero`,
-`fermionMultiNumber_mul_fermionMultiCreation_eq_fermionMultiCreation`,
-`fermionMultiNumber_mul_fermionMultiAnnihilation_eq_zero`,
-`fermionMultiAnnihilation_mul_fermionMultiNumber_eq_fermionMultiAnnihilation`). -/
-theorem fermionTotalSpinPlus_commute_fermionSiteNumber (N : ℕ) (x : Fin (N + 1)) :
-    Commute (fermionTotalSpinPlus N) (fermionSiteNumber N x) := by
-  unfold fermionTotalSpinPlus fermionSiteNumber
-  refine Commute.sum_left _ _ _ fun k _ => ?_
-  by_cases hkx : k = x
-  · subst hkx
-    unfold fermionUpCreation fermionDownAnnihilation fermionUpNumber fermionDownNumber
-    set j₀ := spinfulIndex N k 0
-    set j₁ := spinfulIndex N k 1
-    have hne : j₀ ≠ j₁ := spinfulIndex_up_ne_down N k k
-    have h_an_nu : fermionMultiAnnihilation (2 * N + 1) j₁ * fermionMultiNumber (2 * N + 1) j₀
-        = fermionMultiNumber (2 * N + 1) j₀ * fermionMultiAnnihilation (2 * N + 1) j₁ :=
-      (fermionMultiNumber_commute_fermionMultiAnnihilation_of_ne hne).symm.eq
-    have h_nd_cr : fermionMultiNumber (2 * N + 1) j₁ * fermionMultiCreation (2 * N + 1) j₀
-        = fermionMultiCreation (2 * N + 1) j₀ * fermionMultiNumber (2 * N + 1) j₁ :=
-      (fermionMultiNumber_commute_fermionMultiCreation_of_ne hne.symm).eq
-    have hlhs : (fermionMultiCreation (2 * N + 1) j₀ * fermionMultiAnnihilation (2 * N + 1) j₁)
-          * (fermionMultiNumber (2 * N + 1) j₀ + fermionMultiNumber (2 * N + 1) j₁)
-        = fermionMultiCreation (2 * N + 1) j₀ * fermionMultiAnnihilation (2 * N + 1) j₁ := by
-      rw [Matrix.mul_add, Matrix.mul_assoc, h_an_nu, ← Matrix.mul_assoc,
-        fermionMultiCreation_mul_fermionMultiNumber_eq_zero, Matrix.zero_mul, zero_add,
-        Matrix.mul_assoc,
-        fermionMultiAnnihilation_mul_fermionMultiNumber_eq_fermionMultiAnnihilation]
-    have hrhs : (fermionMultiNumber (2 * N + 1) j₀ + fermionMultiNumber (2 * N + 1) j₁)
-          * (fermionMultiCreation (2 * N + 1) j₀ * fermionMultiAnnihilation (2 * N + 1) j₁)
-        = fermionMultiCreation (2 * N + 1) j₀ * fermionMultiAnnihilation (2 * N + 1) j₁ := by
-      rw [Matrix.add_mul, ← Matrix.mul_assoc,
-        fermionMultiNumber_mul_fermionMultiCreation_eq_fermionMultiCreation, ← Matrix.mul_assoc,
-        h_nd_cr, Matrix.mul_assoc, fermionMultiNumber_mul_fermionMultiAnnihilation_eq_zero,
-        Matrix.mul_zero, add_zero]
-    exact hlhs.trans hrhs.symm
-  · have h_cr_nu : Commute (fermionUpCreation N k) (fermionUpNumber N x) := by
-      unfold fermionUpCreation fermionUpNumber
-      exact (fermionMultiNumber_commute_fermionMultiCreation_of_ne
-        (fun g => hkx (spinfulIndex_up_injective N g.symm))).symm
-    have h_cr_nd : Commute (fermionUpCreation N k) (fermionDownNumber N x) := by
-      unfold fermionUpCreation fermionDownNumber
-      exact (fermionMultiNumber_commute_fermionMultiCreation_of_ne
-        (spinfulIndex_up_ne_down N k x).symm).symm
-    have h_an_nu : Commute (fermionDownAnnihilation N k) (fermionUpNumber N x) := by
-      unfold fermionDownAnnihilation fermionUpNumber
-      exact (fermionMultiNumber_commute_fermionMultiAnnihilation_of_ne
-        (spinfulIndex_up_ne_down N x k)).symm
-    have h_an_nd : Commute (fermionDownAnnihilation N k) (fermionDownNumber N x) := by
-      unfold fermionDownAnnihilation fermionDownNumber
-      exact (fermionMultiNumber_commute_fermionMultiAnnihilation_of_ne
-        (fun g => hkx (spinfulIndex_down_injective N g.symm))).symm
-    exact (h_cr_nu.mul_left h_an_nu).add_right (h_cr_nd.mul_left h_an_nd)
 
 /-! ## The site-dependent expansion of the symmetric interaction -/
 
@@ -175,8 +113,8 @@ theorem symmetricRepulsiveHubbardHamiltonian_isHermitian
 by `fermionTotalSpinPlus_commute_hubbardKinetic`; the interaction commutes term-by-term via
 `symmetricRepulsiveHubbardInteraction_eq_uniform_sub_siteNumber`'s three summands
 (`hubbardOnSiteInteractionSite` covered by `LiebAttractiveSU2Invariance.lean`, the site-number
-term by `fermionTotalSpinPlus_commute_fermionSiteNumber` above, the scalar multiple of `1` by
-`Commute.one_right`). -/
+term by `totalSpinPlus_commute_fermionSiteNumber` (`TJSpinSymmetryRaising.lean`), the scalar
+multiple of `1` by `Commute.one_right`). -/
 theorem fermionTotalSpinPlus_commute_symmetricRepulsiveHubbardHamiltonian
     (N : ℕ) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (U : Fin (N + 1) → ℝ) :
     Commute (fermionTotalSpinPlus N) (symmetricRepulsiveHubbardHamiltonian N T U) := by
@@ -186,7 +124,7 @@ theorem fermionTotalSpinPlus_commute_symmetricRepulsiveHubbardHamiltonian
     (Commute.sub_right (fermionTotalSpinPlus_commute_hubbardOnSiteInteractionSite N _) ?_)
     ((Commute.one_right _).smul_right _))
   exact Commute.sum_right _ _ _ fun x _ =>
-    (fermionTotalSpinPlus_commute_fermionSiteNumber N x).smul_right _
+    (totalSpinPlus_commute_fermionSiteNumber N x).smul_right _
 
 /-- `[Ŝ⁻_tot, Ĥ] = 0` for the symmetric repulsive Hubbard Hamiltonian: derived from
 `[Ŝ⁺_tot, Ĥ] = 0` by conjugate transposes, using `(Ŝ⁺_tot)ᴴ = Ŝ⁻_tot` and Hermiticity of `Ĥ`.

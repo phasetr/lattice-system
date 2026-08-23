@@ -7267,7 +7267,7 @@ infrastructure} (PR-11b/PR-11c remain): the Theorem~2.3 instance (PR-10b) and
 the ground-state existence witness remain to be supplied by PR-11b; PR-11b is
 limited to producing the existence witness and applying Lemma~10.1, and axiom
 removal itself is PR-14's responsibility --- the site-dependent-$U$ homotopy
-(PR-12/PR-12a) and full assembly (PR-13, expected to split into
+(PR-12b) and full assembly (PR-13, expected to split into
 PR-13a/PR-13b) also remain before Theorem~10.4 is discharged (Issue~\#5320);
 the three-way sector bridge between \texttt{configSector},
 \texttt{numberSpinZSectorEuclidean}, and \texttt{spinZSectorEuclidean} is
@@ -7413,7 +7413,7 @@ four remaining obligations before
 \texttt{theorem\_10\_4\_lieb\_repulsive\_half\_filling} can be discharged:
 (1) the SU(2) commute/Hermiticity adapters (PR-12), (2) identifying the
 occupied Casimir eigenvalue with \texttt{liebRepulsiveSpinCasimir A}
-(PR-12/PR-13), (3) the site-dependent $U_x\to U$ reduction (PR-12a), (4) the
+(PR-12/PR-13), (3) the site-dependent $U_x\to U$ reduction (PR-12b), (4) the
 finrank/degeneracy count assembly (PR-13/PR-14). \textbf{Debt discharged}:
 this PR consumes PR-11a's \texttt{eigenspace\_diagonal\_eq\_coordinateSpan}
 and \texttt{IsUniqueGroundStateOn.mono}, closing both debts;
@@ -7443,15 +7443,17 @@ family's SU(2) proofs do not clone verbatim;
 \texttt{symmetricRepulsiveHubbardInteraction\_eq\_uniform\_sub\_siteNumber}
 expands it into three separately SU(2)-invariant summands
 (\texttt{hubbardOnSiteInteractionSite}, a per-site-number term, and a scalar
-multiple of $1$). The one genuinely new commutator,
-\texttt{fermionTotalSpinPlus\_commute\_fermionSiteNumber}
-($[\hat S^+_{\mathrm{tot}}, \hat n_x] = 0$), covers the middle summand; the
-$\hat S^3$/$\hat N$ analogues already existed (\texttt{TJSpinSymmetry.lean} /
-\texttt{TJNumberCommute.lean}).
+multiple of $1$). The middle summand needs no new commutator: the t-J layer's
+per-site-number commutators already cover all three generators
+(\texttt{totalSpinPlus\_commute\_fermionSiteNumber},
+\texttt{TJSpinSymmetryRaising.lean};
+\texttt{totalSpinZ\_commute\_fermionSiteNumber}, \texttt{TJSpinSymmetry.lean};
+\texttt{fermionTotalNumber\_commute\_fermionSiteNumber},
+\texttt{TJNumberCommute.lean}), so this file imports and reuses them.
 \texttt{symmetricRepulsiveHubbardHamiltonian\_isHermitian} establishes
 Hermiticity (kinetic part via \texttt{hubbardKinetic\_isHermitian},
 interaction part via the manifestly real diagonal
-\texttt{symmetricRepulsiveHubbardInteraction\_eq\_diagonal}). The six
+\texttt{symmetricRepulsiveHubbardInteraction\_eq\_diagonal}). The seven
 generator/Casimir commutators ($\hat S^+$, $\hat S^-$, $\hat N_\uparrow$,
 $\hat N_\downarrow$, $\hat S^3$, $\hat N$, $(\hat S_{\mathrm{tot}})^2$)
 assemble from these, mirroring \texttt{LiebAttractiveSU2Invariance.lean} line
@@ -7464,7 +7466,12 @@ all four discharged adapters into PR-11c's
 \texttt{liebRepulsive\_exists\_unique\_casimir\_sector}, yielding the same
 unique-strictly-minimal-occupied-Casimir-sector conclusion
 \textbf{unconditionally} (no SU(2)/Hermiticity hypotheses left), closing
-PR-11c's reference-0 debt on that capstone. \textbf{Also deletes}
+PR-11c's reference-0 debt on that capstone. \textbf{Debt (new).} One
+declaration introduced by this PR is at reference~0 --- the sector-arithmetic
+bridge \texttt{liebHalfFillingSpinZVal\_eq\_of\_two\_mul}, staged for PR-12b
+consumption (its per-$s$ instantiation matches PR-11c's
+\texttt{liebHalfFillingSpinZVal N nUp} against the $N_e$-indexed statement of
+Theorem~10.4). \textbf{Also deletes}
 \texttt{configSectorCompress\_eq\_submatrix}
 (\texttt{HubbardImpossibilityLowUVariationalCore.lean}), a decorative
 reference-0 declaration staged unconsumed through PR-11a $\to$ PR-11b $\to$
