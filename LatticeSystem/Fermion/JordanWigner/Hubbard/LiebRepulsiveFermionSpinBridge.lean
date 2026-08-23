@@ -246,7 +246,7 @@ private theorem liebHardCoreOfMagConfigSFock_downOccupation {N : ℕ}
 
 /-- Two singly occupied configurations are equal iff their down-orbital occupations agree: the up
 orbital is the complement, so the down occupation already determines the whole configuration. -/
-private theorem singlyOccupied_eq_iff_downOccupation {N : ℕ} {c e : Fin (2 * N + 2) → Fin 2}
+theorem singlyOccupied_eq_iff_downOccupation {N : ℕ} {c e : Fin (2 * N + 2) → Fin 2}
     (hc : ∀ z : Fin (N + 1), (c (spinfulIndex N z 0)).val + (c (spinfulIndex N z 1)).val = 1)
     (he : ∀ z : Fin (N + 1), (e (spinfulIndex N z 0)).val + (e (spinfulIndex N z 1)).val = 1) :
     e = c ↔ liebHardCoreDownOccupation e = liebHardCoreDownOccupation c := by
