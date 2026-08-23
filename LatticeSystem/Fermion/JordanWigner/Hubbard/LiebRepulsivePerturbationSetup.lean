@@ -172,8 +172,10 @@ theorem hubbardConfigInteractionWeight_one_star (N : ℕ) (c : Fin (2 * N + 2) �
   simp
 
 /-- The interaction weight of `Ĥ₀` vanishes exactly on hard-core configurations: a sum of
-`0`/`1`-valued double-occupancy terms is zero exactly when every term is. -/
-private theorem hubbardConfigInteractionWeight_one_eq_zero_iff (N : ℕ)
+`0`/`1`-valued double-occupancy terms is zero exactly when every term is. Public (de-privatized
+PR-11a): consumed outside this file by the PR-11a hard-core/ambient sector `Equiv`
+(`LiebRepulsiveSectorAssembly.lean`). -/
+theorem hubbardConfigInteractionWeight_one_eq_zero_iff (N : ℕ)
     (c : Fin (2 * N + 2) → Fin 2) :
     hubbardConfigInteractionWeight N (fun _ => (1 : ℂ)) c = 0
       ↔ ∀ x : Fin (N + 1),
