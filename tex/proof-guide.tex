@@ -7128,6 +7128,34 @@ expansion \texttt{fermionTotalSpinSquared\_eq\_sum\_fermionSpinDot} by the crux
 --- no feeder lemma is left unconsumed. PR-9a's debt is unchanged by this PR:
 its $\hat H_{\mathrm{eff}}$ corollary remains staged for PR-10.
 
+\emph{Coordinate-block ground-state transport (Issue~\#5320, PR~\#5333
+PR-10a).} Generic infrastructure, not itself a formalization of a numbered
+Tasaki statement, preparing the arc's assembly (PR-11 onward):
+\texttt{coordinateSpan}~$P$ (\texttt{Math/MatrixAnalysis/BlockTransport.lean})
+is the subspace of \texttt{EuclideanSpace}~$\mathbb C\,n$ spanned by the
+standard basis vectors at indices satisfying a decidable predicate~$P$, exactly
+the vectors vanishing outside~$P$; \texttt{coordinateRestrict}/%
+\texttt{coordinateExtend} restrict to, and zero-extend from, the subtype
+$\{i \mid P\,i\}$, mutually inverse on the coordinate span, homogeneous and
+norm-preserving. \textbf{Capstone 1}
+\texttt{isUniqueGroundStateOn\_coordinateSpan\_iff\_submatrix}: for a matrix
+$H$ supported on the coordinate block of~$P$ ($H=\hat P H\hat P$, $\hat P$ the
+diagonal indicator of~$P$) and a candidate $\varphi\in\texttt{coordinateSpan}\,P$,
+$H$ having $\varphi$ as its unique ground state on \texttt{coordinateSpan}~$P$
+is equivalent to the submatrix restriction of $H$ to that block having the
+restricted candidate as its unique ground state on the whole restricted space
+--- the $\varphi\in\texttt{coordinateSpan}\,P$ hypothesis is essential (without
+it the $\leftarrow$ direction is false: a candidate with nonzero coordinates
+outside the block restricts to a normalized submatrix ground state while
+failing both membership and normalization on the big space). \textbf{Capstone
+2} \texttt{matrixKernel\_diagonal\_eq\_coordinateSpan}: the kernel of a
+diagonal matrix is the coordinate span of its vanishing locus. This
+generalizes the block-support/kernel-identification pattern already used in
+the arc's degenerate-perturbation layer (e.g.\
+\texttt{kernelProjectionMatrix\_diagonal}) from an ambient-space projection to
+an arbitrary coordinate block. Neither capstone is consumed yet; both are
+staged for the arc's assembly. Axiom-free.
+
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
 eqs.~(10.2.7)/(10.2.8)/(10.2.13); \emph{proved axiom-free on the general spin-$z$
