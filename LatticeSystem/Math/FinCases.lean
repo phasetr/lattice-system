@@ -17,6 +17,10 @@ namespace LatticeSystem
 theorem fin2_eq_zero_or_one (r : Fin 2) : r = 0 ∨ r = 1 := by
   fin_cases r <;> simp
 
+/-- An element of `Fin 2` that is not `1` is `0`. -/
+theorem fin2_eq_zero_of_ne_one {r : Fin 2} (h : r ≠ 1) : r = 0 :=
+  (fin2_eq_zero_or_one r).resolve_right h
+
 /-- Every element of `Fin 3` is `0`, `1`, or `2`. -/
 theorem fin3_eq_zero_or_one_or_two (v : Fin 3) : v = 0 ∨ v = 1 ∨ v = 2 := by
   fin_cases v <;> simp
