@@ -208,6 +208,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveFermionSpinCasimi
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveTheorem23Instance
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveSectorAssembly
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveUniquenessAssembly
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveSectorBridgeFinal
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetism
 import LatticeSystem.Fermion.JordanWigner.Hubbard.BipartiteSpectrum

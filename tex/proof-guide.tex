@@ -7295,7 +7295,11 @@ consumed the capstone
 debt; \texttt{eigenspace\_diagonal\_eq\_coordinateSpan},
 \texttt{IsUniqueGroundStateOn.mono}, and
 \texttt{configSectorCompress\_eq\_submatrix} remain unconsumed (staged for
-PR-11c/PR-12 onward).
+PR-11c/PR-12 onward). PR-11c has since consumed
+\texttt{eigenspace\_diagonal\_eq\_coordinateSpan} and
+\texttt{IsUniqueGroundStateOn.mono}, closing those debts (see the PR-11c
+paragraph below); \texttt{configSectorCompress\_eq\_submatrix} remains
+unconsumed, staged for PR-12 onward.
 
 \emph{The uniqueness supply and the Lemma~10.1 application (Issue~\#5320,
 PR~\#5336 PR-11b).} Supplies the two pieces PR-11b owns, closing
@@ -7351,10 +7355,71 @@ side-conditions lemma feeding that capstone's proof; it remains staged for
 PR-12/PR-13's assembly. \texttt{eigenspace\_diagonal\_eq\_coordinateSpan},
 \texttt{IsUniqueGroundStateOn.mono}, and
 \texttt{configSectorCompress\_eq\_submatrix} (all PR-11a) remain staged,
-unconsumed until PR-11c/PR-12 onward. This PR's own final capstone
+unconsumed until PR-11c/PR-12 onward --- PR-11c has since consumed the first
+two, closing those debts; \texttt{configSectorCompress\_eq\_submatrix}
+remains unconsumed, staged for PR-12 onward. This PR's own final capstone
 \texttt{tasaki\_lemma\_10\_1\_liebRepulsive\_apply} stays at reference~0,
 staged for the arc's remaining assembly (PR-12/PR-13); axiom removal itself
 is PR-14's responsibility. Axiom-free.
+
+\emph{The three-way sector bridge, and the PR-3 debt discharge (Issue~\#5320,
+PR~\#5337 PR-11c).} Connects the three distinct descriptions of the
+half-filled fixed-$\hat S^3$ sector in play across the arc ---
+\texttt{numberSpinZSectorEuclidean} (PR-3), \texttt{spinZSectorEuclidean}
+(PR-1), and \texttt{coordinateSpan (liebHalfFillingPred N nUp)} (PR-5) ---
+and discharges a debt open since PR-3.
+\texttt{liebHalfFillingSpinZVal}~$N\;nUp = (2\,nUp-(N+1))/2$ pins the
+$nUp$-parameterized spin-$z$ eigenvalue as its own named quantity, avoiding
+the cast-inversion trap of recovering $nUp$ from a complex $m_0$.
+\textbf{The diagonal-charge bridge}
+\texttt{numberSpinZSectorEuclidean\_eq\_coordinateSpan\_liebHalfFillingPred}:
+since both $\hat N$ and $\hat S^3$ are diagonal in the configuration basis
+(\texttt{fermionTotalNumber\_eq\_diagonal},
+\texttt{fermionTotalSpinZ\_eq\_diagonal}), the joint sector
+\texttt{numberSpinZSectorEuclidean}~$N\,(N{+}1)\,m_0$ equals
+\texttt{coordinateSpan (liebHalfFillingPred N nUp)} at the matching
+parameter --- PR-11a's \texttt{eigenspace\_diagonal\_eq\_coordinateSpan}
+applied to each factor, composed via the new generic lemma
+\texttt{coordinateSpan\_inf\_coordinateSpan}
+(\texttt{Math/MatrixAnalysis/SubmatrixGroundState.lean}: an intersection of
+coordinate spans is the coordinate span of the conjoined predicate).
+\textbf{The definitional inclusion}
+\texttt{numberSpinZSectorEuclidean\_le\_spinZSectorEuclidean}: the joint
+sector is contained in the spin-$z$-only sector, by \texttt{inf\_le\_right}.
+\textbf{Debt discharge (PR-3)}:
+\texttt{repulsiveSpinZSector\_ground\_unique\_on\_numberSpinZSector} restricts
+PR-1's \texttt{repulsiveSpinZSector\_ground\_unique} (stated on
+\texttt{spinZSectorEuclidean}) down to the joint sector
+\texttt{numberSpinZSectorEuclidean} via PR-11a's
+\texttt{IsUniqueGroundStateOn.mono}, using the number-operator eigenvalue
+conjunct $\hat N\varphi=(N{+}1)\varphi$ already exported by that ground state
+to place PR-1's witness $\varphi$ inside the smaller sector --- the
+\texttt{IsUniqueGroundStateOn}-on-$K$ hypothesis PR-3's
+\texttt{exists\_unique\_casimir\_sector\_strict\_min} could previously only
+take abstractly. \textbf{Capstone}
+\texttt{liebRepulsive\_exists\_unique\_casimir\_sector}: feeds this
+restriction into PR-3's \texttt{exists\_unique\_casimir\_sector\_strict\_min}
+(given the SU(2) commute/Hermiticity adapters for
+\texttt{symmetricRepulsiveHubbardHamiltonian} as explicit hypotheses --- not
+yet formalized for this Hamiltonian family, scheduled PR-12 work), yielding a
+unique, strictly-minimal occupied Casimir sector for the repulsive model's
+ground state on the joint sector. The capstone's own docstring pins down the
+four remaining obligations before
+\texttt{theorem\_10\_4\_lieb\_repulsive\_half\_filling} can be discharged:
+(1) the SU(2) commute/Hermiticity adapters (PR-12), (2) identifying the
+occupied Casimir eigenvalue with \texttt{liebRepulsiveSpinCasimir A}
+(PR-12/PR-13), (3) the site-dependent $U_x\to U$ reduction (PR-12a), (4) the
+finrank/degeneracy count assembly (PR-13/PR-14). \textbf{Debt discharged}:
+this PR consumes PR-11a's \texttt{eigenspace\_diagonal\_eq\_coordinateSpan}
+and \texttt{IsUniqueGroundStateOn.mono}, closing both debts;
+\texttt{configSectorCompress\_eq\_submatrix} remains unconsumed, staged for
+PR-12 onward. \textbf{Debt (new)}: two declarations introduced by this PR are
+at reference~0 --- the diagonal-charge bridge
+\texttt{numberSpinZSectorEuclidean\_eq\_coordinateSpan\_liebHalfFillingPred}
+(not itself chained into this file's own capstone, staged as a standalone
+fact for PR-12's sector-level transports) and the file's own final capstone
+\texttt{liebRepulsive\_exists\_unique\_casimir\_sector} (staged for PR-12's
+SU(2) adapters and the arc's remaining assembly). Axiom-free.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
