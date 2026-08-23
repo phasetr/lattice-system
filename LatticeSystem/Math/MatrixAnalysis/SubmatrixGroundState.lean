@@ -33,6 +33,8 @@ downward-restriction (`mono`) lemma for `IsUniqueGroundStateOn` along a submodul
 * `eigenspace_diagonal_eq_coordinateSpan` — the eigenspace analogue of
   `matrixKernel_diagonal_eq_coordinateSpan` (`BlockTransport.lean`): the `L`-eigenspace of a
   diagonal matrix equals the coordinate span of the predicate characterizing entries equal to `L`.
+* `coordinateSpan_inf_coordinateSpan` — an intersection of coordinate spans is the coordinate span
+  of the conjunction of the two predicates.
 * `IsUniqueGroundStateOn.mono` — `IsUniqueGroundStateOn` restricts downward along a submodule
   inclusion `K ≤ K'`, given the candidate lies in the smaller submodule.
 -/
@@ -269,6 +271,26 @@ theorem eigenspace_diagonal_eq_coordinateSpan (d : n → ℂ) (L : ℂ) (P : n �
     by_cases h : P i
     · rw [(hP i).mpr h]
     · rw [hv i h, mul_zero, mul_zero]
+
+omit [DecidableEq n] in
+/-- **An intersection of coordinate spans is a coordinate span.** If a predicate `R` is the
+conjunction of `P` and `Q` pointwise, then `coordinateSpan P ⊓ coordinateSpan Q = coordinateSpan R`.
+The conjunction is passed as a separate predicate `R` with a defining `Iff`, rather than as the
+literal `fun i => P i ∧ Q i`, so that callers may compose the two supports into any equivalent
+(and independently decidable) form. -/
+theorem coordinateSpan_inf_coordinateSpan (P Q R : n → Prop) [DecidablePred P] [DecidablePred Q]
+    [DecidablePred R] (hR : ∀ i, R i ↔ P i ∧ Q i) :
+    coordinateSpan P ⊓ coordinateSpan Q = coordinateSpan R := by
+  refine Submodule.ext fun v => ?_
+  rw [Submodule.mem_inf, mem_coordinateSpan_iff, mem_coordinateSpan_iff, mem_coordinateSpan_iff]
+  constructor
+  · rintro ⟨hP, hQ⟩ i hi
+    by_cases h : P i
+    · exact hQ i fun hq => hi ((hR i).mpr ⟨h, hq⟩)
+    · exact hP i h
+  · intro h
+    exact ⟨fun i hi => h i fun hr => hi ((hR i).mp hr).1,
+      fun i hi => h i fun hr => hi ((hR i).mp hr).2⟩
 
 /-- **`IsUniqueGroundStateOn` restricts downward along a submodule inclusion.** If `H` has a
 unique ground state `φ` on a submodule `K'`, and `φ` lies in a smaller submodule `K ≤ K'`, then

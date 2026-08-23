@@ -29,9 +29,6 @@ to `numberSpinZSectorEuclidean` (the PR-3 debt carried since PR-3, see the "Resi
 `.self-local/active/issue-5320.md`), and a capstone that pins down exactly what remains before
 `theorem_10_4_lieb_repulsive_half_filling` (`LiebRepulsive.lean:134`) can be discharged.
 
-**Status: Red skeleton (type signatures only, `sorry`).** Every declaration below is a stub for
-`dev-implement`; none is proved yet.
-
 ## Contents
 
 * `liebHalfFillingSpinZVal` — the `nUp`-parameterized spin-`z` eigenvalue `m₀ = (2 nUp − (N+1))/2`,
@@ -81,11 +78,51 @@ predicate `liebHalfFillingPred N nUp` (PR-5), at the matching parameter `m₀ =
 liebHalfFillingSpinZVal N nUp`. Both `N̂` and `Ŝ³` are diagonal in the computational configuration
 basis (`fermionTotalNumber_eq_diagonal`, `fermionTotalSpinZ_eq_diagonal`), so this is the
 generic eigenspace-intersection identity `eigenspace_diagonal_eq_coordinateSpan` applied twice,
-composed via `coordinateSpan P ⊓ coordinateSpan Q = coordinateSpan (fun i => P i ∧ Q i)`. -/
+composed via `coordinateSpan_inf_coordinateSpan`. The `Ŝ³` factor alone constrains only the
+*difference* `n_↑ − n_↓`; it is the number condition `n_↑ + n_↓ = N + 1` that turns the pair into
+the up-count condition `n_↑ = nUp` of `liebHalfFillingPred`. -/
 theorem numberSpinZSectorEuclidean_eq_coordinateSpan_liebHalfFillingPred (N nUp : ℕ) :
     numberSpinZSectorEuclidean N ((N : ℂ) + 1) (liebHalfFillingSpinZVal N nUp)
       = coordinateSpan (liebHalfFillingPred N nUp) := by
-  sorry
+  -- The `N̂` condition, in the configuration basis: `∑_j c j = N + 1`.
+  have hN : Module.End.eigenspace
+        (Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1))) ((N : ℂ) + 1)
+      = coordinateSpan (fun c : Fin (2 * N + 2) → Fin 2 =>
+          (∑ j : Fin (2 * N + 2), (c j).val) = N + 1) := by
+    rw [fermionTotalNumber_eq_diagonal]
+    refine eigenspace_diagonal_eq_coordinateSpan _ _ _ fun c => ?_
+    rw [← Nat.cast_sum, show ((N : ℂ) + 1) = ((N + 1 : ℕ) : ℂ) by push_cast; ring, Nat.cast_inj]
+  -- The `Ŝ³` condition, cleared of the ambient subtraction: `n_↑ + (N+1) = 2 nUp + n_↓`.
+  have hS3 : Module.End.eigenspace
+        (Matrix.toEuclideanLin (fermionTotalSpinZ N)) (liebHalfFillingSpinZVal N nUp)
+      = coordinateSpan (fun c : Fin (2 * N + 2) → Fin 2 =>
+          (∑ x : Fin (N + 1), (c (spinfulIndex N x 0)).val) + (N + 1)
+            = 2 * nUp + ∑ x : Fin (N + 1), (c (spinfulIndex N x 1)).val) := by
+    rw [fermionTotalSpinZ_eq_diagonal]
+    refine eigenspace_diagonal_eq_coordinateSpan _ _ _ fun c => ?_
+    rw [← Nat.cast_sum, ← Nat.cast_sum, liebHalfFillingSpinZVal]
+    constructor
+    · intro h
+      have h' : ((∑ x : Fin (N + 1), (c (spinfulIndex N x 0)).val : ℕ) : ℂ) + ((N : ℂ) + 1)
+          = 2 * (nUp : ℂ) + ((∑ x : Fin (N + 1), (c (spinfulIndex N x 1)).val : ℕ) : ℂ) := by
+        linear_combination 2 * h
+      exact_mod_cast h'
+    · intro h
+      have h' : ((∑ x : Fin (N + 1), (c (spinfulIndex N x 0)).val : ℕ) : ℂ) + ((N : ℂ) + 1)
+          = 2 * (nUp : ℂ) + ((∑ x : Fin (N + 1), (c (spinfulIndex N x 1)).val : ℕ) : ℂ) := by
+        exact_mod_cast h
+      linear_combination h' / 2
+  rw [numberSpinZSectorEuclidean, spinZSectorEuclidean, hN, hS3]
+  refine coordinateSpan_inf_coordinateSpan _ _ _ fun c => ?_
+  have hsplit : (∑ j : Fin (2 * N + 2), (c j).val)
+      = (∑ x : Fin (N + 1), (c (spinfulIndex N x 0)).val)
+        + ∑ x : Fin (N + 1), (c (spinfulIndex N x 1)).val := by
+    rw [sum_spinful_split N fun j => (c j).val, Finset.sum_add_distrib]
+  constructor
+  · rintro ⟨h1, h2⟩
+    exact ⟨h1, by omega⟩
+  · rintro ⟨h1, h2⟩
+    exact ⟨h1, by omega⟩
 
 /-- **The definitional inclusion** `numberSpinZSectorEuclidean N (N+1) m₀ ≤ spinZSectorEuclidean N
 m₀`: the joint sector `K` (fixing both `N̂` and `Ŝ³`) is contained in the spin-`z`-only sector
@@ -93,15 +130,15 @@ m₀`: the joint sector `K` (fixing both `N̂` and `Ŝ³`) is contained in the s
 factor (`numberSpinZSectorEuclidean`, `LiebRepulsiveCasimirSector.lean:55-58`). -/
 theorem numberSpinZSectorEuclidean_le_spinZSectorEuclidean (N : ℕ) (m₀ : ℂ) :
     numberSpinZSectorEuclidean N ((N : ℂ) + 1) m₀ ≤ spinZSectorEuclidean N m₀ := by
-  sorry
+  rw [numberSpinZSectorEuclidean]
+  exact inf_le_right
 
 /-! ## Downward restriction of PR-1's uniqueness (discharges the PR-3 debt) -/
 
-/-- **PR-1's uniqueness, restricted to the joint number/spin-`z` sector** (discharges the PR-3
-debt recorded since `LiebRepulsiveCasimirSector.lean`: "PR-3's bridge from
-`repulsiveSpinZSector_ground_unique`'s uniqueness-on-`spinZSectorEuclidean` down to the joint
-sector `K = numberSpinZSectorEuclidean` is not yet formalized"). Restricts
-`repulsiveSpinZSector_ground_unique`'s conclusion from `spinZSectorEuclidean N m` down to
+/-- **PR-1's uniqueness, restricted to the joint number/spin-`z` sector.** This supplies the
+`IsUniqueGroundStateOn`-on-`K` hypothesis that PR-3's `exists_unique_casimir_sector_strict_min`
+(`LiebRepulsiveCasimirSector.lean`) consumes, which PR-3 itself could only state abstractly.
+Restricts `repulsiveSpinZSector_ground_unique`'s conclusion from `spinZSectorEuclidean N m` down to
 `numberSpinZSectorEuclidean N (N+1) m` via `IsUniqueGroundStateOn.mono`, using the same PR-1
 witness `φ`, whose membership in the smaller sector follows from the number-operator eigenvalue
 conjunct `N̂ φ = (N+1) • φ` already exported by `repulsiveSpinZSector_ground_unique`. -/
@@ -115,7 +152,12 @@ theorem repulsiveSpinZSector_ground_unique_on_numberSpinZSector (N Ne : ℕ)
       IsUniqueGroundStateOn
           (numberSpinZSectorEuclidean N ((N : ℂ) + 1) (((Ne : ℂ) - ((N : ℂ) + 1)) / 2))
           (symmetricRepulsiveHubbardHamiltonian N T U) E φ := by
-  sorry
+  obtain ⟨E, φ, -, hGS, -, -, hnum⟩ :=
+    repulsiveSpinZSector_ground_unique N Ne hNe_even hNe_pos hNe_lt T hT_symm hbip hT_conn U hU_pos
+  refine ⟨E, φ, IsUniqueGroundStateOn.mono
+    (numberSpinZSectorEuclidean_le_spinZSectorEuclidean N _) ?_ hGS⟩
+  rw [numberSpinZSectorEuclidean, Submodule.mem_inf]
+  exact ⟨Module.End.mem_eigenspace_iff.mpr hnum, hGS.1⟩
 
 /-! ## Capstone: remaining obligations before Theorem 10.4's discharge -/
 
@@ -165,6 +207,12 @@ theorem liebRepulsive_exists_unique_casimir_sector (N Ne : ℕ)
                 (numberSpinZCasimirSectorEuclidean N ((N : ℂ) + 1)
                   (((Ne : ℂ) - ((N : ℂ) + 1)) / 2) c')
                 (symmetricRepulsiveHubbardHamiltonian N T U) := by
-  sorry
+  obtain ⟨E, φ, hGS⟩ := repulsiveSpinZSector_ground_unique_on_numberSpinZSector N Ne hNe_even
+    hNe_pos hNe_lt T hT_symm hbip hT_conn U hU_pos
+  obtain ⟨c, hKcne, hKcmin, hstrict⟩ :=
+    exists_unique_casimir_sector_strict_min hH hHN hHS3 hHS2 hGS
+  refine ⟨c, hKcne, fun c' hcc' hc'ne => ?_⟩
+  rw [hKcmin]
+  exact hstrict c' hcc' hc'ne
 
 end LatticeSystem.Fermion
