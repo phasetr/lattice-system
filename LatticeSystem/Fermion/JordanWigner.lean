@@ -205,6 +205,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveSuperexchangeColl
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveSuperexchange
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveFermionSpinBridge
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveFermionSpinCasimirBridge
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveTheorem23Instance
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetism
 import LatticeSystem.Fermion.JordanWigner.Hubbard.BipartiteSpectrum
