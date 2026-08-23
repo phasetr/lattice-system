@@ -55,11 +55,8 @@ such techniques naturally belong to a separate analytic-perturbation development
 The class is delimited by the *machinery* it needs — analytic eigenvalue-branch
 (Rellich–Kato) continuation, cluster/polymer expansions, volume-uniform estimates —
 and does **not** cover finite-dimensional degenerate perturbation theory at fixed
-finite volume, which is ordinary linear algebra and is proved (**Lemma 10.1** and the
-strong-coupling **Theorem A.12** are both axiom-free). **Theorem 10.4** (Lieb's repulsive-Hubbard
-half-filling ground state) currently has its entire content axiomatized: the global minimum
-energy, ground-state degeneracy, and total-spin values are all undischarged. (The fixed-Ŝ³-sector
-ground-state uniqueness has been proved; full theorem discharge is tracked in Issue #5320.)
+finite volume, which is ordinary linear algebra and is proved (**Lemma 10.1**, the
+strong-coupling **Theorem A.12**, and **Theorem 10.4** are all axiom-free).
 
 - **Book theorems that Tasaki states without proof** (results he quotes from the
 external literature rather than proving in the text): **Theorem 10.11** (Kubo–Kishi

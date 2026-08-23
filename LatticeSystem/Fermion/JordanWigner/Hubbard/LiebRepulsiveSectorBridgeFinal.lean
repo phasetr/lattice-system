@@ -28,7 +28,7 @@ the downward restriction of PR-1's `repulsiveSpinZSector_ground_unique` from `sp
 to `numberSpinZSectorEuclidean` — a debt open since PR-3, whose Casimir machinery consumes ground
 state uniqueness on the joint sector but could only take it as an abstract hypothesis — and a
 capstone that pins down exactly what remains before `theorem_10_4_lieb_repulsive_half_filling`
-(`LiebRepulsive.lean:134`) can be discharged.
+(`LiebRepulsiveHalfFillingDischarge.lean`) can be discharged.
 
 ## Contents
 
@@ -175,7 +175,8 @@ keeps them as explicit hypotheses so the adapter-discharge step stays separable 
 bridge.
 
 This capstone pins down **exactly** what remains before `theorem_10_4_lieb_repulsive_half_filling`
-(`LiebRepulsive.lean:134`) can be discharged, beyond what this arc has already proved:
+(`LiebRepulsiveHalfFillingDischarge.lean`) can be discharged, beyond what this arc has already
+proved:
 
 1. The SU(2) commute/Hermiticity adapters taken as hypotheses here — supplied by PR-12a
    (`LiebRepulsiveSU2Invariance.lean`).
@@ -190,7 +191,8 @@ This capstone pins down **exactly** what remains before `theorem_10_4_lieb_repul
    path `U_x(s) = (1 − s) U_x + s`, whose endpoint `U_x = 1` differs from the uniform form by
    `−(1/2) N̂ + ((N+1)/4) • 1`, which *is* constant on the fixed `N̂ = N + 1` sector.
 4. The finrank/degeneracy count assembly, `dim G = |A| − |B| + 1` (PR-14a/PR-14b, since
-   completed), and the direct `A = ∅` / `A = univ` endpoint cases (PR-15). -/
+   completed), and the direct `A = ∅` / `A = univ` endpoint cases (PR-15, since completed
+   by PR-15c). -/
 theorem liebRepulsive_exists_unique_casimir_sector (N Ne : ℕ)
     (hNe_even : Even Ne) (hNe_pos : 0 < Ne) (hNe_lt : Ne < 2 * (N + 1))
     {A : Finset (Fin (N + 1))} (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)

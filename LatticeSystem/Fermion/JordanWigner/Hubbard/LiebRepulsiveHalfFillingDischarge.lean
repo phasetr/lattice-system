@@ -7,11 +7,11 @@ import LatticeSystem.Math.MatrixAnalysis.PiDiagonalEigenspace
 import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
 
 /-!
-# Theorem 10.4 discharge: degenerate sublattice + uniform-disjunct assembly (PR-15b)
+# Theorem 10.4 discharge: degenerate sublattice, uniform-disjunct assembly, capstone (PR-15b/15c)
 
 Assembly layer for the Theorem 10.4 (Lieb repulsive Hubbard half-filling) discharge arc
-(issue #5320, PR-15b). Covers the two pieces `liebRepulsive_symmetric_halfFilling_conditional`
-(`LiebRepulsiveWeightConfinement.lean:497`, requiring `1 ≤ |A|` and `1 ≤ |B|`) does not:
+(issue #5320). Covers the two pieces `liebRepulsive_symmetric_halfFilling_conditional`
+(`LiebRepulsiveWeightConfinement.lean`, requiring `1 ≤ |A|` and `1 ≤ |B|`) does not:
 
 * the **degenerate case** `|A| = 0 ∨ |B| = 0`, which forces the hopping matrix `T` to vanish and,
   via connectedness of the (now edgeless) hopping support graph, forces `N = 0` — a single-site
@@ -19,11 +19,12 @@ Assembly layer for the Theorem 10.4 (Lieb repulsive Hubbard half-filling) discha
 * the **uniform-disjunct transport**, converting the symmetric-form conjuncts at a constant `U` to
   the uniform-interaction Hamiltonian `repulsiveHubbardHamiltonian`, via
   `symmetricRepulsiveHubbardHamiltonian_groundSubmodule_eq_uniform`
-  (`LiebRepulsiveBalancedGround.lean:363`).
+  (`LiebRepulsiveBalancedGround.lean:363`);
 
-This file does **not** touch `axiom theorem_10_4_lieb_repulsive_half_filling`
-(`LiebRepulsive.lean:134`); assembling the two disjuncts into the axiom's exact statement and moving
-it out of `LiebRepulsive.lean` is PR-15c's responsibility.
+and, at the end of this file (PR-15c), assembles both disjuncts into
+`theorem_10_4_lieb_repulsive_half_filling`, the capstone of the discharge arc (formerly
+`axiom theorem_10_4_lieb_repulsive_half_filling` in `LiebRepulsive.lean`, moved here since
+`LiebRepulsive.lean` sits strictly upstream of this discharge chain).
 
 ## Main results
 
@@ -43,6 +44,8 @@ it out of `LiebRepulsive.lean` is PR-15c's responsibility.
   hypothesis), combining the conditional capstone with the degenerate case above.
 * `liebRepulsive_uniform_of_symmetric` — transports the symmetric-form conjuncts at a constant `U`
   to the uniform-interaction Hamiltonian `repulsiveHubbardHamiltonian`.
+* `theorem_10_4_lieb_repulsive_half_filling` — **Tasaki Theorem 10.4** itself, assembled from the
+  two lemmas above by splitting `IsLiebRepulsiveModel`'s `IsLiebRepulsiveHamiltonian` disjunction.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §10.2.2 (Theorem 10.4), pp. 350–353.
@@ -457,7 +460,7 @@ theorem liebRepulsive_symmetric_halfFilling_degenerate {A : Finset (Fin (N + 1))
 /-! ## The all-`A` symmetric-form theorem -/
 
 /-- **The symmetric-form Theorem 10.4, for every bipartition `A`.** Combines
-`liebRepulsive_symmetric_halfFilling_conditional` (`LiebRepulsiveWeightConfinement.lean:497`, the
+`liebRepulsive_symmetric_halfFilling_conditional` (`LiebRepulsiveWeightConfinement.lean`, the
 `1 ≤ |A|` and `1 ≤ |B|` case) with the degenerate case above (`|A| = 0 ∨ |B| = 0`), by cases on
 whether both sublattices are nonempty. Reference-0 within this PR; consumed by PR-15c's capstone. -/
 theorem liebRepulsive_symmetric_halfFilling (N : ℕ) {A : Finset (Fin (N + 1))}
@@ -541,5 +544,36 @@ theorem liebRepulsive_uniform_of_symmetric (N : ℕ) {A : Finset (Fin (N + 1))}
     exact hcas
   · rw [← key]
     exact hrank
+
+/-! ## Theorem 10.4 capstone assembly -/
+
+/-- **Tasaki Theorem 10.4** (Lieb's theorem for the repulsive Hubbard model at half-filling, 1st
+ed., Springer 2020, §10.2.2, p. 350). For a bipartite real symmetric connected hopping matrix `T`
+and a repulsive Hubbard Hamiltonian `H` (uniform or symmetric form), at half-filling `N = |Λ|`
+(electron number `N + 1` on `Fin (N + 1)` sites), there is a ground energy `E₀` whose
+`(N+1)`-electron ground subspace `G` is nonzero, minimal in energy, consists entirely of
+total-spin `S₀ = ||A| − |B||/2` states (Casimir eigenvalue `S₀(S₀+1)`), and has dimension exactly
+`|A| − |B| + 1` (the unavoidable SU(2) multiplet degeneracy). Assembled from
+`liebRepulsive_symmetric_halfFilling` (the symmetric disjunct) and
+`liebRepulsive_uniform_of_symmetric` (transporting the symmetric-form conjuncts at a constant `U`
+to the uniform disjunct). -/
+theorem theorem_10_4_lieb_repulsive_half_filling
+    (A : Finset (Fin (N + 1)))
+    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
+    (H : ManyBodyOp (Fin (2 * N + 2)))
+    (hModel : IsLiebRepulsiveModel A T H) :
+    ∃ E₀ : ℂ,
+      hubbardGroundSubmoduleAtElectronNumber H E₀ (N + 1) ≠ ⊥ ∧
+      (∀ E : ℂ, hubbardGroundSubmoduleAtElectronNumber H E (N + 1) ≠ ⊥ →
+        E₀.re ≤ E.re) ∧
+      (∀ v ∈ hubbardGroundSubmoduleAtElectronNumber H E₀ (N + 1),
+        (fermionTotalSpinSquared N).mulVec v = liebRepulsiveSpinCasimir A • v) ∧
+      Module.finrank ℂ (hubbardGroundSubmoduleAtElectronNumber H E₀ (N + 1))
+        = liebRepulsiveGroundMultiplicity A := by
+  obtain ⟨hsymm, hbip, hconn, hham⟩ := hModel
+  rcases hham with ⟨U, hU, rfl⟩ | ⟨U, hU, rfl⟩
+  · exact liebRepulsive_uniform_of_symmetric (A := A) N T U
+      (liebRepulsive_symmetric_halfFilling N T hsymm hbip hconn (fun _ => U) (fun _ => hU))
+  · exact liebRepulsive_symmetric_halfFilling N T hsymm hbip hconn U hU
 
 end LatticeSystem.Fermion

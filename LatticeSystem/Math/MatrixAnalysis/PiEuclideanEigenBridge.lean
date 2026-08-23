@@ -5,7 +5,7 @@ import Mathlib.Analysis.InnerProductSpace.PiL2
 
 Generic layer item for the Theorem 10.4 (Lieb repulsive Hubbard half-filling) discharge arc
 (issue #5320, PR-14a). `hubbardGroundSubmoduleAtElectronNumber`
-(`LatticeSystem/Fermion/JordanWigner/Hubbard/LiebRepulsive.lean:90`) lives on the plain function
+(`LatticeSystem/Fermion/JordanWigner/Hubbard/LiebRepulsive.lean`) lives on the plain function
 carrier (Pi type, `Matrix.mulVecLin`), while every sector-machinery asset built for the arc so far
 (`numberSpinZCasimirSectorEuclidean`, `exists_unique_casimir_sector_strict_min`,
 `ham_su2_multiplet_companion`) is stated on `EuclideanSpace ℂ n` via `Matrix.toEuclideanLin`. This

@@ -1,5 +1,4 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractive
-import Mathlib.LinearAlgebra.Dimension.Finrank
 
 /-!
 # Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)
@@ -22,11 +21,11 @@ multiplet degeneracy).
 ## Status
 
 Theorem 10.4 is proved by Lieb's spin-space reflection-positivity method
-(via the Shiba transformation from the attractive case, Theorem 10.2); per
-the project policy this deep result is recorded as a faithful documented
-`axiom`, built on concrete repulsive Hubbard Hamiltonians. The model
-hypotheses are packaged in `IsLiebRepulsiveModel`, reused by the
-correlation theorems (10.5, 10.6) in follow-up files.
+(via the Shiba transformation from the attractive case, Theorem 10.2); the
+statement is `theorem_10_4_lieb_repulsive_half_filling`, in
+`LiebRepulsiveHalfFillingDischarge` (issue #5320). The model hypotheses are
+packaged in `IsLiebRepulsiveModel` here, reused by the correlation theorems
+(10.5, 10.6) in follow-up files.
 -/
 
 namespace LatticeSystem.Fermion
@@ -117,32 +116,5 @@ structure IsLiebRepulsiveModel (A : Finset (Fin (N + 1)))
   connected : (hoppingSupportGraph T).Preconnected
   /-- `H` is a repulsive Hubbard Hamiltonian (uniform or symmetric form). -/
   hamiltonian : IsLiebRepulsiveHamiltonian T H
-
-/-- **Tasaki Theorem 10.4** (Lieb's theorem for the repulsive Hubbard model
-at half-filling, 1st ed., Springer 2020, §10.2.2, p. 350, **AXIOM**). For a
-bipartite real symmetric connected hopping matrix `T` and a repulsive
-Hubbard Hamiltonian `H` (uniform or symmetric form), at half-filling
-`N = |Λ|` (electron number `N + 1` on `Fin (N + 1)` sites), there is a
-ground energy `E₀` whose `(N+1)`-electron ground subspace `G` is nonzero,
-minimal in energy, consists entirely of total-spin `S₀ = ||A| − |B||/2`
-states (Casimir eigenvalue `S₀(S₀+1)`), and has dimension exactly
-`|A| − |B| + 1` (the unavoidable SU(2) multiplet degeneracy).
-
-Proved by Lieb's spin-space reflection-positivity method (via the Shiba
-transformation from the attractive case); recorded as a faithful documented
-axiom. -/
-axiom theorem_10_4_lieb_repulsive_half_filling
-    (A : Finset (Fin (N + 1)))
-    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
-    (H : ManyBodyOp (Fin (2 * N + 2)))
-    (hModel : IsLiebRepulsiveModel A T H) :
-    ∃ E₀ : ℂ,
-      hubbardGroundSubmoduleAtElectronNumber H E₀ (N + 1) ≠ ⊥ ∧
-      (∀ E : ℂ, hubbardGroundSubmoduleAtElectronNumber H E (N + 1) ≠ ⊥ →
-        E₀.re ≤ E.re) ∧
-      (∀ v ∈ hubbardGroundSubmoduleAtElectronNumber H E₀ (N + 1),
-        (fermionTotalSpinSquared N).mulVec v = liebRepulsiveSpinCasimir A • v) ∧
-      Module.finrank ℂ (hubbardGroundSubmoduleAtElectronNumber H E₀ (N + 1))
-        = liebRepulsiveGroundMultiplicity A
 
 end LatticeSystem.Fermion

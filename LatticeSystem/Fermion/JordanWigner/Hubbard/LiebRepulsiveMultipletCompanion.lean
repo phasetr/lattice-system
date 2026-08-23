@@ -18,8 +18,8 @@ energy `E₀`, and `E₀` is minimal over the whole `(N+1)`-electron sector. It 
 PR-14b infrastructure lemmas that stay in this module because they generalize PR-14a's own
 minimality proof (`liebRepulsive_groundSubmodule_le_comap_of_commute`,
 `liebRepulsive_exists_jointEigenvector_of_ne_bot`), consumed by the weight confinement built in
-`LiebRepulsiveWeightConfinement.lean`. The `finrank` count and the axiom discharge itself (PR-15)
-are **not** in this file's scope.
+`LiebRepulsiveWeightConfinement.lean`. The `finrank` count and the axiom discharge itself
+(PR-15, since completed by PR-15c) are **not** in this file's scope.
 
 ## Route
 
@@ -43,7 +43,7 @@ for the full argument against the tower route.
   such that every admissible `Ŝ³` sector has a unique ground state at `E₀` carrying the Casimir
   eigenvalue `liebRepulsiveSpinCasimir A`, and `E₀` is minimal over the whole `(N+1)`-electron
   sector (conjunct (ii) of `theorem_10_4_lieb_repulsive_half_filling`,
-  `LiebRepulsive.lean:134`, restricted to the symmetric disjunct).
+  `LiebRepulsiveHalfFillingDischarge.lean`, restricted to the symmetric disjunct).
 * `liebRepulsive_groundSubmodule_le_comap_of_commute` (PR-14b) — invariance of the `(N+1)`-electron
   ground submodule under a conserved charge commuting with the Hamiltonian and `N̂`; reused on `Ŝ³`
   weight blocks by `LiebRepulsiveWeightConfinement.lean`.
@@ -503,7 +503,8 @@ private theorem liebRepulsive_groundEnergy_le_of_electronNumber (N cA cB : ℕ)
 sector (indexed by `nUp` with `(N+1-nUp) ∈ tasaki23GroundStateSectors …`) has a unique ground state
 at that energy, carrying the Casimir eigenvalue `liebRepulsiveSpinCasimir A`; moreover `E₀` is
 minimal over the whole `(N+1)`-electron sector (conjunct (ii) of
-`theorem_10_4_lieb_repulsive_half_filling`, `LiebRepulsive.lean:134`, symmetric disjunct only).
+`theorem_10_4_lieb_repulsive_half_filling`, `LiebRepulsiveHalfFillingDischarge.lean`, symmetric
+disjunct only).
 The energy-ladder equality across admissible sectors (step 3) is
 `liebRepulsive_sector_energy_le` applied in both directions against the top sector `nUp = |A'|`;
 global minimality (step 4) is `liebRepulsive_groundEnergy_le_of_electronNumber`.
