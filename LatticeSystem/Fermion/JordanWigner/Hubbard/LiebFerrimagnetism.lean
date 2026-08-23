@@ -17,10 +17,12 @@ of the choice of ground state. This exhibits ferrimagnetic long-range order.
 
 ## Status
 
-Like Theorems 10.4 and 10.5, this is a consequence of Lieb's spin-space
-reflection-positivity method; per the project policy it is recorded as a
-faithful documented `axiom`, reusing the packaged model hypotheses
-`IsLiebRepulsiveModel` and the ground subspace from `LiebRepulsive.lean`.
+Tasaki proves this exactly as Theorem 4.4 (`.self-local/refs/Hal.Tasaki.txt:18755-18758`),
+building on Theorem 10.4 (`theorem_10_4_lieb_repulsive_half_filling`), **not** on
+reflection positivity — reflection positivity is Theorem 10.4's own proof method, and
+Theorem 10.6 only reuses Theorem 10.4's already-discharged ground subspace. This is
+currently an `axiom` pending discharge (Issue #5347), reusing the packaged model
+hypotheses `IsLiebRepulsiveModel` and the ground subspace from `LiebRepulsive.lean`.
 -/
 
 namespace LatticeSystem.Fermion
@@ -47,7 +49,8 @@ repulsive Hubbard model satisfies the ferrimagnetic order-parameter bound
   `⟨v| (Ô_L)² |v⟩ ≥ ((|A| − |B|)/2)²`.
 
 (The book also notes the left-hand side is independent of the ground state.)
-Recorded as a faithful documented axiom (Lieb's reflection positivity). -/
+Proved via Theorem 10.4, exactly as Theorem 4.4 (not reflection positivity); recorded
+as an axiom pending discharge (Issue #5347). -/
 axiom theorem_10_6_lieb_ferrimagnetism
     (A : Finset (Fin (N + 1)))
     (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)

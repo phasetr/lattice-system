@@ -215,6 +215,8 @@ subject to the frozen byte-for-byte parity of the block above.
 
 **Correction (Theorem 10.6 citation page).** The Theorem 10.6 row above (frozen catalogue block, `fermionStaggeredCasimirOp` / `theorem_10_6_lieb_ferrimagnetism`) cites "Tasaki §10.2.3, p. 354"; the theorem statement is on **p. 356** (Tasaki, 1st ed., Springer 2020), matching Proposition 10.7's citation on the same page. Not corrected in place because that row is inside the frozen `legacy-source` block pinned byte-for-byte by `scripts/check_docs_hierarchy.py`.
 
+**Correction (Theorem 10.6 proof method).** The Theorem 10.6 row above (frozen catalogue block) closes with "Reflection positivity → faithful documented axiom." This is not accurate: Tasaki proves Theorem 10.6 exactly as Theorem 4.4 (`.self-local/refs/Hal.Tasaki.txt:18755-18758`), building on Theorem 10.4 (`theorem_10_4_lieb_repulsive_half_filling`) — reflection positivity is Theorem 10.4's own (already-discharged) proof method, not a proof method of Theorem 10.6 itself. Also, `docs/limitations/documented-axioms.md` has no entry for Theorem 10.6, since it is not a won't-do axiom but an active discharge target (Issue #5347); "faithful documented axiom" should be read here as "axiom pending discharge (Issue #5347)". Not corrected in place because that row is inside the frozen `legacy-source` block.
+
 ---
 
 [← Multi-mode fermion via Jordan–Wigner (P2 backbone)](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-03/) · [Catalogue](/lattice-system/formalization/legacy/) · [Multi-mode fermion via Jordan–Wigner (P2 backbone) →](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-05/)
