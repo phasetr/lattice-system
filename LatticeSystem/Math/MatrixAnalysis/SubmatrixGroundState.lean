@@ -16,6 +16,8 @@ downward-restriction (`mono`) lemma for `IsUniqueGroundStateOn` along a submodul
 
 ## Main results
 
+* `toEuclideanLin_submatrix_equiv_apply` — reindexing along an index `Equiv` intertwines a matrix
+  with its `Equiv`-submatrix, so an eigen-equation transports coordinatewise.
 * `isUniqueGroundStateOn_reindex_iff` — `IsUniqueGroundStateOn ⊤ H E φ` transports along an index
   `Equiv e : m ≃ n` to `IsUniqueGroundStateOn ⊤ (H.submatrix e e) E (φ ∘ e)` (up to the coordinate
   reindexing of the candidate vector).
@@ -45,6 +47,21 @@ open Matrix
 
 variable {n m : Type*} [Fintype n] [DecidableEq n] [Fintype m] [DecidableEq m]
 
+/-- **Reindexing intertwines a matrix with its `Equiv`-submatrix.** Along an index equivalence
+`e : m ≃ n`, the `e`-submatrix acting on the `e`-reindexed vector is the `e`-reindexing of the
+original action; the sum defining the matrix action is reindexed by `Equiv.sum_comp`. -/
+theorem toEuclideanLin_submatrix_equiv_apply (H : Matrix n n ℂ) (e : m ≃ n)
+    (v : EuclideanSpace ℂ n) :
+    Matrix.toEuclideanLin (H.submatrix e e) (WithLp.toLp 2 fun j => (WithLp.ofLp v) (e j))
+      = WithLp.toLp 2 fun j => (WithLp.ofLp (Matrix.toEuclideanLin H v)) (e j) := by
+  refine PiLp.ext fun j => ?_
+  have hlhs : Matrix.toEuclideanLin (H.submatrix e e)
+      (WithLp.toLp 2 fun j => (WithLp.ofLp v) (e j)) j = ∑ k : m, H (e j) (e k) * v (e k) := rfl
+  have hrhs : (WithLp.toLp 2 fun j => (WithLp.ofLp (Matrix.toEuclideanLin H v)) (e j)) j
+      = ∑ i : n, H (e j) i * v i := rfl
+  rw [hlhs, hrhs]
+  exact Equiv.sum_comp e fun i => H (e j) i * v i
+
 /-- **Reindexing transport of `IsUniqueGroundStateOn`, one implication.** For an index equivalence
 `e : m ≃ n`, a unique ground state of `H` on `⊤` induces one of the `e`-submatrix of `H` at the
 `e`-reindexed candidate vector, with the same ground energy. -/
@@ -58,14 +75,8 @@ private theorem isUniqueGroundStateOn_submatrix_of_equiv {H : Matrix n n ℂ} (e
     LinearIsometryEquiv.piLpCongrLeft 2 ℂ ℂ e.symm
   have hLφ : L φ = (WithLp.toLp 2 fun j => (WithLp.ofLp φ) (e j)) := rfl
   have hinter : ∀ v : EuclideanSpace ℂ n,
-      Matrix.toEuclideanLin (H.submatrix e e) (L v) = L (Matrix.toEuclideanLin H v) := by
-    intro v
-    refine PiLp.ext fun j => ?_
-    have hlhs : Matrix.toEuclideanLin (H.submatrix e e) (L v) j
-        = ∑ k : m, H (e j) (e k) * v (e k) := rfl
-    have hrhs : L (Matrix.toEuclideanLin H v) j = ∑ i : n, H (e j) i * v i := rfl
-    rw [hlhs, hrhs]
-    exact Equiv.sum_comp e fun i => H (e j) i * v i
+      Matrix.toEuclideanLin (H.submatrix e e) (L v) = L (Matrix.toEuclideanLin H v) :=
+    fun v => toEuclideanLin_submatrix_equiv_apply H e v
   have hback : ∀ (μ : ℝ) (ψ : EuclideanSpace ℂ m),
       Matrix.toEuclideanLin (H.submatrix e e) ψ = (μ : ℂ) • ψ →
         Matrix.toEuclideanLin H (L.symm ψ) = (μ : ℂ) • L.symm ψ := by
