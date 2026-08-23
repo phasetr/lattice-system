@@ -11,8 +11,7 @@ import LatticeSystem.Math.MatrixAnalysis.PiEuclideanEigenBridge
 # SU(2) weight transport and the sector energy ladder (Tasaki §10.2.2, PR-14a)
 
 Nineteenth installment of the Theorem 10.4 discharge arc (issue #5320). This file assembles the
-first half (PR-14a) of the arc's final assembly step, per the "PR-10 through PR-14 design round"
-(`.self-local/active/issue-5320.md`, PR-14 design round): for every admissible `Ŝ³` sector of the
+first half (PR-14a) of the arc's final assembly step: for every admissible `Ŝ³` sector of the
 physical symmetric repulsive Hamiltonian, the sector's unique ground state is a
 `liebRepulsiveSpinCasimir A`-eigenvector of `Ŝ²`, all admissible sectors share the same ground
 energy `E₀`, and `E₀` is minimal over the whole `(N+1)`-electron sector. The complementary weight
