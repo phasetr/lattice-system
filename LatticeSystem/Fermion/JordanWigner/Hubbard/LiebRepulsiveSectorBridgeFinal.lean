@@ -25,14 +25,15 @@ Since `N̂` and `Ŝ³` are both diagonal in the computational configuration basi
 `EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)` at the matching
 parameters `L = N + 1`, `m₀ = (2 nUp − (N + 1))/2`. This file supplies that missing bridge, plus
 the downward restriction of PR-1's `repulsiveSpinZSector_ground_unique` from `spinZSectorEuclidean`
-to `numberSpinZSectorEuclidean` (the PR-3 debt carried since PR-3, see the "Residual items" note in
-`.self-local/active/issue-5320.md`), and a capstone that pins down exactly what remains before
-`theorem_10_4_lieb_repulsive_half_filling` (`LiebRepulsive.lean:134`) can be discharged.
+to `numberSpinZSectorEuclidean` — a debt open since PR-3, whose Casimir machinery consumes ground
+state uniqueness on the joint sector but could only take it as an abstract hypothesis — and a
+capstone that pins down exactly what remains before `theorem_10_4_lieb_repulsive_half_filling`
+(`LiebRepulsive.lean:134`) can be discharged.
 
 ## Contents
 
 * `liebHalfFillingSpinZVal` — the `nUp`-parameterized spin-`z` eigenvalue `m₀ = (2 nUp − (N+1))/2`,
-  pinned as its own named quantity per the "state the bridge with `nUp` as the primitive" guidance.
+  pinned as its own named quantity so that the bridge is stated with `nUp` as the primitive.
 * `numberSpinZSectorEuclidean_eq_coordinateSpan_liebHalfFillingPred` — the diagonal-charge bridge
   `numberSpinZSectorEuclidean N (N+1) m₀ = coordinateSpan (liebHalfFillingPred N nUp)`.
 * `numberSpinZSectorEuclidean_le_spinZSectorEuclidean` — the definitional inclusion
@@ -42,14 +43,16 @@ to `numberSpinZSectorEuclidean` (the PR-3 debt carried since PR-3, see the "Resi
 * `liebRepulsive_exists_unique_casimir_sector` — capstone: combines the restriction above with
   PR-3's `exists_unique_casimir_sector_strict_min`, explicitly exposing the SU(2) commute
   adapters (`Commute` with `N̂`, `Ŝ³`, `Ŝ²`) and Hermiticity of the symmetric repulsive Hamiltonian
-  as hypotheses, since neither is formalized yet for this Hamiltonian family (scheduled PR-12 work,
-  see "Missing SU(2) adapters" in `.self-local/active/issue-5320.md`). This pins down the exact
-  remaining obligations of the arc before Theorem 10.4 itself can be discharged: (1) the SU(2)
-  commute/Hermiticity adapters below, (2) identifying the occupied Casimir eigenvalue with
+  as hypotheses. Those adapters are available for `hubbardHamiltonian`
+  (`SaturatedFerromagnetism.lean`) and for `attractiveHubbardHamiltonian`
+  (`LiebAttractiveSU2Invariance.lean`), but not yet for `repulsiveHubbardHamiltonian` /
+  `symmetricRepulsiveHubbardHamiltonian`; supplying them is scheduled PR-12 work. This pins down
+  the exact remaining obligations of the arc before Theorem 10.4 itself can be discharged: (1) the
+  SU(2) commute/Hermiticity adapters below, (2) identifying the occupied Casimir eigenvalue with
   `liebRepulsiveSpinCasimir A` via the homotopy continuity of PR-4 and PR-11b's Lemma 10.1
-  application, (3) the site-dependent `U_x → U` reduction (or the symmetric-path homotopy
-  alternative recorded in the "Open obligation" section of the issue record), and (4) the
-  finrank/degeneracy count assembly (PR-13/PR-14).
+  application, (3) the site-dependent `U_x → U` reduction (or, in its place, a homotopy run along
+  the site-dependent path `U_x(s) = (1 − s) U_x + s`), and (4) the finrank/degeneracy count
+  assembly (PR-13/PR-14).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §10.2.2 (Theorem 10.4), pp. 350–353.
@@ -65,8 +68,8 @@ open scoped BigOperators
 /-- **The spin-`z` eigenvalue of the half-filled sector, parameterized by `nUp`.**
 `m₀ = (2 nUp − (N+1))/2`, matching `liebHalfFillingPred N nUp`'s convention (`∑ c(x,↑) = nUp`) and
 `repulsiveSpinZSector_ground_unique`'s convention (`m = (Ne − (N+1))/2` at `Ne = 2 nUp`). Stated as
-its own named quantity, per the "state the bridge with `nUp` as the primitive" guidance in the
-PR-11 design round, to avoid the cast-inversion trap of deriving `nUp` back from a complex `m₀`. -/
+its own named quantity so that `nUp` stays the primitive of the bridge, avoiding the cast-inversion
+trap of recovering the natural number `nUp` from a complex `m₀`. -/
 noncomputable def liebHalfFillingSpinZVal (N nUp : ℕ) : ℂ :=
   ((2 * nUp : ℂ) - ((N : ℂ) + 1)) / 2
 
@@ -163,9 +166,10 @@ theorem repulsiveSpinZSector_ground_unique_on_numberSpinZSector (N Ne : ℕ)
 
 /-- **Capstone (PR-11c).** Assuming the SU(2) commute/Hermiticity adapters for the symmetric
 repulsive Hubbard Hamiltonian — `Commute` with `N̂`, `Ŝ³`, `Ŝ²`, and `IsHermitian` — which are
-**not yet formalized** for this Hamiltonian family (the "Missing SU(2) adapters" gap of the PR-11
-design round; scheduled as PR-12 work), the repulsive model's unique ground state on the joint
-number/spin-`z` sector occupies a unique, strictly-minimal occupied Casimir sector (PR-3's
+**not yet formalized** for this Hamiltonian family (they exist only for `hubbardHamiltonian` and
+`attractiveHubbardHamiltonian`; scheduled as PR-12 work), the repulsive model's unique ground state
+on the joint number/spin-`z` sector occupies a unique, strictly-minimal occupied Casimir sector
+(PR-3's
 `exists_unique_casimir_sector_strict_min`, fed by this file's restriction bridge
 `repulsiveSpinZSector_ground_unique_on_numberSpinZSector`).
 
@@ -177,8 +181,12 @@ This capstone pins down **exactly** what remains before `theorem_10_4_lieb_repul
    homotopy continuity of PR-4 (`casimirSelector_eq_const_of_locally_unique_strict_min`) and
    PR-11b's Lemma 10.1 application (`tasaki_lemma_10_1_liebRepulsive_apply`) transported along
    this file's sector bridge (PR-12/PR-13).
-3. The site-dependent `U_x → U` reduction for the general symmetric form, or the symmetric-path
-   homotopy alternative recorded in the "Open obligation" section of the issue record (PR-12a).
+3. The site-dependent `U_x → U` reduction for the general symmetric form (PR-12a). Expanding the
+   symmetric form at a genuine `U : Λ → ℝ` produces the term `−(1/2) ∑_x U_x (n̂_{x,↑} + n̂_{x,↓})`,
+   a site-dependent one-body potential rather than a multiple of `N̂`, so no constant energy shift
+   reduces it to the uniform form. The alternative is to run the homotopy along the site-dependent
+   path `U_x(s) = (1 − s) U_x + s`, whose endpoint `U_x = 1` differs from the uniform form by
+   `−(1/2) N̂ + ((N+1)/4) • 1`, which *is* constant on the fixed `N̂ = N + 1` sector.
 4. The finrank/degeneracy count assembly, `dim G = |A| − |B| + 1` (PR-13/PR-14), and the direct
    `A = ∅` / `A = univ` endpoint cases (PR-14). -/
 theorem liebRepulsive_exists_unique_casimir_sector (N Ne : ℕ)
