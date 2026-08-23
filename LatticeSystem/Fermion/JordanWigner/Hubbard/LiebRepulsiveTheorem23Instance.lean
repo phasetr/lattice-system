@@ -14,9 +14,9 @@ bipartite coupling `J = (2 : ℂ) • bipartiteCoupling A'` up to a constant
 the Marshall–Lieb–Mattis theorem
 `tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive`
 (`Quantum/SpinS/Theorem23StructuralGeneralFinal.lean`, Tasaki §2.5 Theorem 2.3) and transports the
-predicted total-spin Casimir value of the resulting Marshall-positive ground state onto the
-fermionic hard-core half-filled sector along
-`fermionTotalSpinSquared_reindex_eq_totalSpinSSquaredOnMagSector`
+resulting Marshall-positive ground state — its eigenvalue equation, its Marshall positivity, its
+energy minimality and its predicted total-spin Casimir value — onto the fermionic hard-core
+half-filled sector along `fermionTotalSpinSquared_reindex_eq_totalSpinSSquaredOnMagSector`
 (`LiebRepulsiveFermionSpinCasimirBridge.lean`).
 
 ## Orientation
@@ -39,10 +39,11 @@ another is likewise not treated here: every statement below stays on the
 
 ## Debt
 
-Two declarations are at reference 0. `liebOrientedSublattice_bipartiteCoupling_eq` is the adapter
-rewriting the effective Hamiltonian's coupling (stated at the indicator of `A`) into the oriented
-indicator Theorem 2.3 requires, and is consumed only once the two sides are assembled;
-`liebRepulsive_groundState_casimir_eq_predicted` is this file's capstone.
+One declaration is at reference 0: this file's capstone
+`liebRepulsive_groundState_casimir_eq_predicted`, staged for the arc's remaining assembly. The
+orientation adapter `liebOrientedSublattice_bipartiteCoupling_eq` is consumed by it, the capstone
+stating the coupling at the indicator of `A` — the form PR-10a's effective-Hamiltonian bridge
+produces — rather than at the oriented indicator Theorem 2.3 requires.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020,
 §2.5 Theorem 2.3, p. 42; §10.1 eq. (10.1.10), p. 345; §10.2.2 Theorem 10.4, p. 350.
@@ -258,23 +259,51 @@ theorem liebRepulsiveSpinCasimir_eq_tasaki23PredictedCasimirValue (A : Finset (F
   push_cast
   ring
 
-/-- **The predicted Casimir value on the fermionic hard-core half-filled sector.** For a
-nondegenerate bipartition and an admissible magnetization sector (`N + 1 − nUp` admissible for the
-oriented sublattice at spin `1/2`), the hard-core half-filled fermionic sector carries a nonzero
-vector on which the fermionic total-spin Casimir `fermionTotalSpinSquared N` acts as the scalar
-`liebRepulsiveSpinCasimir A = S₀ (S₀ + 1)`, `S₀ = ||A| − |Aᶜ||/2` (Tasaki Theorem 10.4's target
-total spin).
+/-- **The Marshall-positive ground state of the superexchange Hamiltonian on the fermionic
+hard-core half-filled sector, and its predicted Casimir.** For a nondegenerate bipartition and an
+admissible magnetization sector (`N + 1 − nUp` admissible for the oriented sublattice at spin
+`1/2`), there are an energy `μ` and a nonzero vector `c` on the hard-core half-filled fermionic
+sector such that, along the sector bijection `liebHardCoreHalfFillingSectorEquivS`:
 
-The vector is the Marshall-positive ground state supplied by Theorem 2.3 at the superexchange
-coupling (`liebRepulsive_theorem23_instance`), whose Casimir eigenvalue is the predicted one
-(`tasaki23_pf_groundState_casimir_eq_predicted_sector`), read on the fermionic side along the
+* `c` is entrywise strictly Marshall-positive against the Marshall sign of the oriented
+  sublattice;
+* `c` is an eigenvector at `μ` of the superexchange Heisenberg matrix
+  `heisenbergHamiltonianSMatrixOnMagSector ((2 : ℂ) • bipartiteCoupling A) 1 (N + 1 − nUp)`
+  compressed onto that sector — the very matrix PR-10a's
+  `secondOrderEffectiveHamiltonian_liebPerturbation_reindex_eq_heisenbergOnMagSector`
+  (`LiebRepulsiveFermionSpinBridge.lean`) identifies with the second-order effective Hamiltonian
+  up to the constant `|A| (N + 1 − |A|)`;
+* `μ` is minimal among that compressed matrix's eigenvalues, so `c` is one of its ground states;
+* the fermionic total-spin Casimir `fermionTotalSpinSquared N` acts on `c` as the scalar
+  `liebRepulsiveSpinCasimir A = S₀ (S₀ + 1)`, `S₀ = ||A| − |Aᶜ||/2` (Tasaki Theorem 10.4's target
+  total spin).
+
+The coupling is stated at the unoriented `A`, the form PR-10a's bridge produces
+(`liebOrientedSublattice_bipartiteCoupling_eq`); the Marshall sign is necessarily at the oriented
+sublattice. The eigenvector, its positivity and the energy minimality come from Theorem 2.3 at the
+superexchange coupling (`liebRepulsive_theorem23_instance`), the Casimir eigenvalue from
+`tasaki23_pf_groundState_casimir_eq_predicted_sector`, all read on the fermionic side along the
 sector bijection of `fermionTotalSpinSquared_reindex_eq_totalSpinSSquaredOnMagSector`. -/
 theorem liebRepulsive_groundState_casimir_eq_predicted (A : Finset (Fin (N + 1)))
     (hA : 1 ≤ A.card) (hB : 1 ≤ (bipartitionComplement A).card)
     (nUp : ℕ) (hnUp : nUp ≤ N + 1)
     (hM : (N + 1 - nUp) ∈ tasaki23GroundStateSectors
       (fun x => decide (x ∈ liebOrientedSublattice A)) 1) :
-    ∃ c : configSector N (liebHardCoreHalfFillingPred N nUp) → ℂ, c ≠ 0 ∧
+    ∃ μ : ℝ, ∃ c : configSector N (liebHardCoreHalfFillingPred N nUp) → ℂ, c ≠ 0 ∧
+      (∀ s, 0 < (marshallSignS (fun x => decide (x ∈ liebOrientedSublattice A))
+          (liebHardCoreHalfFillingSectorEquivS N nUp hnUp s).val).re * (c s).re) ∧
+      ((heisenbergHamiltonianSMatrixOnMagSector
+            ((2 : ℂ) • bipartiteCoupling (fun x : Fin (N + 1) => decide (x ∈ A))) 1
+            (N + 1 - nUp)).submatrix
+          (liebHardCoreHalfFillingSectorEquivS N nUp hnUp)
+          (liebHardCoreHalfFillingSectorEquivS N nUp hnUp)).mulVec c = (μ : ℂ) • c ∧
+      (∀ (μ' : ℝ) (c' : configSector N (liebHardCoreHalfFillingPred N nUp) → ℂ), c' ≠ 0 →
+        ((heisenbergHamiltonianSMatrixOnMagSector
+              ((2 : ℂ) • bipartiteCoupling (fun x : Fin (N + 1) => decide (x ∈ A))) 1
+              (N + 1 - nUp)).submatrix
+            (liebHardCoreHalfFillingSectorEquivS N nUp hnUp)
+            (liebHardCoreHalfFillingSectorEquivS N nUp hnUp)).mulVec c' = (μ' : ℂ) • c' →
+          μ ≤ μ') ∧
       ((fermionTotalSpinSquared N).submatrix
           (fun s : configSector N (liebHardCoreHalfFillingPred N nUp) => s.val)
           (fun s : configSector N (liebHardCoreHalfFillingPred N nUp) => s.val)).mulVec c
@@ -304,7 +333,7 @@ theorem liebRepulsive_groundState_casimir_eq_predicted (A : Finset (Fin (N + 1))
   obtain ⟨ctoy, hctoy⟩ := exists_strict_diag_bound_dressedHeisenbergSReMatrix
     (fun x : Fin (N + 1) => decide (x ∈ liebOrientedSublattice A))
     (bipartiteCoupling (fun x : Fin (N + 1) => decide (x ∈ liebOrientedSublattice A))) 1
-  obtain ⟨μ, hsector, -⟩ := liebRepulsive_theorem23_instance A hA hB cdiag
+  obtain ⟨μ, hsector, hmin⟩ := liebRepulsive_theorem23_instance A hA hB cdiag
     (liebRepulsiveJ_hJ_real _) (liebRepulsiveJ_hJ_real' _) (liebRepulsiveJ_hJ_sym _)
     (liebRepulsiveJ_hJ_nn _) (liebRepulsiveJ_hJ_bipartite _) (liebRepulsiveJ_hJ_pos _)
     hcdiag le_rfl hcardA hcardB
@@ -319,27 +348,84 @@ theorem liebRepulsive_groundState_casimir_eq_predicted (A : Finset (Fin (N + 1))
     magSectorEmbedding (fun σ : magConfigS (Fin (N + 1)) 1 (N + 1 - nUp) =>
       (((marshallSignS (fun x => decide (x ∈ liebOrientedSublattice A)) σ.1).re * v σ : ℝ) : ℂ))
     with hΦ
-  refine ⟨fun s => Φ ((liebHardCoreHalfFillingSectorEquivS N nUp hnUp s).val), ?_, ?_⟩
-  · intro hzero
-    have h0 := congrFun hzero ((liebHardCoreHalfFillingSectorEquivS N nUp hnUp).symm
-      (Classical.arbitrary (magConfigS (Fin (N + 1)) 1 (N + 1 - nUp))))
-    rw [Equiv.apply_symm_apply, hΦ, magSectorEmbedding_apply_subtype, Pi.zero_apply] at h0
-    have hre : (marshallSignS (fun x => decide (x ∈ liebOrientedSublattice A))
-        (Classical.arbitrary (magConfigS (Fin (N + 1)) 1 (N + 1 - nUp))).1).re
-        * v (Classical.arbitrary (magConfigS (Fin (N + 1)) 1 (N + 1 - nUp))) = 0 :=
-      Complex.ofReal_eq_zero.mp h0
-    have hvpos := hv_pos (Classical.arbitrary (magConfigS (Fin (N + 1)) 1 (N + 1 - nUp)))
+  have hsupp : ∀ σ : Fin (N + 1) → Fin (1 + 1), magSumS σ ≠ N + 1 - nUp → Φ σ = 0 := by
+    intro σ hσ
+    rw [hΦ]
+    exact magSectorEmbedding_apply_of_not_mem _ hσ
+  -- the orientation adapter: Theorem 2.3 runs at the oriented sublattice, the bridge at `A`
+  have hJ : ((2 : ℂ) • bipartiteCoupling (fun x => decide (x ∈ liebOrientedSublattice A)))
+      = ((2 : ℂ) • bipartiteCoupling (fun x : Fin (N + 1) => decide (x ∈ A))) := by
+    rw [liebOrientedSublattice_bipartiteCoupling_eq]
+  -- the Marshall-positive eigenvector, restricted to the magnetization sector
+  have hW : (heisenbergHamiltonianSMatrixOnMagSector
+        ((2 : ℂ) • bipartiteCoupling (fun x : Fin (N + 1) => decide (x ∈ A))) 1
+        (N + 1 - nUp)).mulVec (magSectorRestriction (M := N + 1 - nUp) Φ)
+      = (μ : ℂ) • magSectorRestriction (M := N + 1 - nUp) Φ := by
+    rw [← hJ]
+    exact heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction _ hH hsupp
+  have hcomp : (fun s => Φ ((liebHardCoreHalfFillingSectorEquivS N nUp hnUp s).val))
+        ∘ (liebHardCoreHalfFillingSectorEquivS N nUp hnUp).symm
+      = magSectorRestriction (M := N + 1 - nUp) Φ := by
+    funext τ
+    simp [Function.comp, magSectorRestriction]
+  have hpos : ∀ s : configSector N (liebHardCoreHalfFillingPred N nUp),
+      0 < (marshallSignS (fun x => decide (x ∈ liebOrientedSublattice A))
+          (liebHardCoreHalfFillingSectorEquivS N nUp hnUp s).val).re
+        * (Φ ((liebHardCoreHalfFillingSectorEquivS N nUp hnUp s).val)).re := by
+    intro s
+    have hval : Φ ((liebHardCoreHalfFillingSectorEquivS N nUp hnUp s).val)
+        = (((marshallSignS (fun x => decide (x ∈ liebOrientedSublattice A))
+              (liebHardCoreHalfFillingSectorEquivS N nUp hnUp s).val).re
+            * v (liebHardCoreHalfFillingSectorEquivS N nUp hnUp s) : ℝ) : ℂ) := by
+      rw [hΦ]
+      exact magSectorEmbedding_apply_subtype _ _
+    rw [hval, Complex.ofReal_re]
     rcases marshallSignS_re_eq_one_or_neg_one
         (fun x => decide (x ∈ liebOrientedSublattice A))
-        (Classical.arbitrary (magConfigS (Fin (N + 1)) 1 (N + 1 - nUp))).1 with h | h <;>
-      rw [h] at hre <;> linarith
+        (liebHardCoreHalfFillingSectorEquivS N nUp hnUp s).val with h | h <;>
+      rw [h] <;> nlinarith [hv_pos (liebHardCoreHalfFillingSectorEquivS N nUp hnUp s)]
+  refine ⟨μ, fun s => Φ ((liebHardCoreHalfFillingSectorEquivS N nUp hnUp s).val), ?_, hpos, ?_,
+    ?_, ?_⟩
+  · intro hzero
+    have h0 : Φ ((liebHardCoreHalfFillingSectorEquivS N nUp hnUp
+        ((liebHardCoreHalfFillingSectorEquivS N nUp hnUp).symm
+          (Classical.arbitrary (magConfigS (Fin (N + 1)) 1 (N + 1 - nUp))))).val) = 0 :=
+      congrFun hzero _
+    have hp := hpos ((liebHardCoreHalfFillingSectorEquivS N nUp hnUp).symm
+      (Classical.arbitrary (magConfigS (Fin (N + 1)) 1 (N + 1 - nUp))))
+    rw [h0] at hp
+    simp at hp
+  · rw [Matrix.submatrix_mulVec_equiv, hcomp, hW]
+    funext s
+    rfl
+  · intro μ' c' hc'_ne hc'_eig
+    have hW' : (heisenbergHamiltonianSMatrixOnMagSector
+          ((2 : ℂ) • bipartiteCoupling (fun x : Fin (N + 1) => decide (x ∈ A))) 1
+          (N + 1 - nUp)).mulVec
+          (fun τ => c' ((liebHardCoreHalfFillingSectorEquivS N nUp hnUp).symm τ))
+        = (μ' : ℂ) • fun τ => c' ((liebHardCoreHalfFillingSectorEquivS N nUp hnUp).symm τ) := by
+      funext τ
+      have h := congrFun hc'_eig ((liebHardCoreHalfFillingSectorEquivS N nUp hnUp).symm τ)
+      rw [Matrix.submatrix_mulVec_equiv] at h
+      simpa [Function.comp] using h
+    have hlift := heisenbergHamiltonianS_mulVec_magSectorEmbedding
+      ((2 : ℂ) • bipartiteCoupling (fun x : Fin (N + 1) => decide (x ∈ A)))
+      (fun τ => c' ((liebHardCoreHalfFillingSectorEquivS N nUp hnUp).symm τ)) hW'
+    have hemb_ne : magSectorEmbedding
+        (fun τ => c' ((liebHardCoreHalfFillingSectorEquivS N nUp hnUp).symm τ)) ≠ 0 := by
+      intro hemb
+      refine hc'_ne ?_
+      funext s
+      have h0 : magSectorEmbedding
+          (fun τ => c' ((liebHardCoreHalfFillingSectorEquivS N nUp hnUp).symm τ))
+          ((liebHardCoreHalfFillingSectorEquivS N nUp hnUp s).val) = 0 := congrFun hemb _
+      rw [magSectorEmbedding_apply_subtype] at h0
+      simpa using h0
+    rw [← hJ] at hlift
+    exact hmin hemb_ne hlift
   · rw [fermionTotalSpinSquared_reindex_eq_totalSpinSSquaredOnMagSector N nUp hnUp,
       liebRepulsiveSpinCasimir_eq_tasaki23PredictedCasimirValue A]
     funext s
-    have hsupp : ∀ σ : Fin (N + 1) → Fin (1 + 1), magSumS σ ≠ N + 1 - nUp → Φ σ = 0 := by
-      intro σ hσ
-      rw [hΦ]
-      exact magSectorEmbedding_apply_of_not_mem _ hσ
     have hequiv : ∑ s' : configSector N (liebHardCoreHalfFillingPred N nUp),
           totalSpinSSquared (Fin (N + 1)) 1
               ((liebHardCoreHalfFillingSectorEquivS N nUp hnUp s).val)

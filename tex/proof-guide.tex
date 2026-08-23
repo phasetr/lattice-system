@@ -7178,18 +7178,32 @@ predicted total-spin Casimir value of Theorem~2.3 at spin $1/2$ on the
 oriented sublattice is $\mathrm{liebRepulsiveSpinCasimir}\,A=S_0(S_0+1)$ at
 $S_0=\bigl||A|-|A^c|\bigr|/2$, Tasaki Theorem~10.4's target total spin.
 \textbf{Capstone 3}
-\texttt{liebRepulsive\_groundState\_casimir\_eq\_predicted}: transports that
-predicted Casimir value onto the fermionic hard-core half-filled sector ---
-for an admissible magnetization sector, a nonzero vector on which the
-fermionic total-spin Casimir \texttt{fermionTotalSpinSquared}~$N$ acts as the
-scalar \texttt{liebRepulsiveSpinCasimir}~$A$, the vector being the
-Marshall-positive ground state of Capstone~1 read on the fermionic side along
+\texttt{liebRepulsive\_groundState\_casimir\_eq\_predicted}: transports the
+whole Marshall-positive ground state of Capstone~1, not just its Casimir
+eigenvalue, onto the fermionic hard-core half-filled sector --- for an
+admissible magnetization sector, an energy $\mu$ and a nonzero vector $c$
+there such that, along PR-9a's sector bijection, (i)~$c$ is entrywise strictly
+Marshall-positive against the oriented sublattice's Marshall sign, (ii)~$c$ is
+a $\mu$-eigenvector of the superexchange Heisenberg matrix
+\texttt{heisenbergHamiltonianSMatrixOnMagSector}
+$((2:\mathbb C)\bullet\mathrm{bipartiteCoupling}\,A)\,1\,(N+1-n_\uparrow)$
+compressed onto that sector --- the very matrix PR-9a's
+$\hat H_{\mathrm{eff}}$ corollary identifies with the second-order effective
+Hamiltonian up to the constant $|A|(N+1-|A|)$, whence the coupling is stated
+at the \emph{unoriented} $A$, consuming the orientation adapter ---
+(iii)~$\mu$ is minimal among that compressed matrix's eigenvalues, so $c$ is
+one of its ground states, and (iv)~the fermionic total-spin Casimir
+\texttt{fermionTotalSpinSquared}~$N$ acts on $c$ as the scalar
+\texttt{liebRepulsiveSpinCasimir}~$A$, read on the fermionic side along
 PR-9b's sector bijection
 \texttt{fermionTotalSpinSquared\_reindex\_eq\_totalSpinSSquaredOnMagSector},
-discharging that PR-9b debt. \textbf{Debt.} Two declarations are at
-reference~0: \texttt{liebOrientedSublattice\_bipartiteCoupling\_eq} (the
-one-time orientation adapter, consumed only once the two sides are assembled)
-and the file's own final capstone
+discharging that PR-9b debt. Conjuncts (ii)/(iii) transport through
+\texttt{heisenbergHamiltonianSMatrixOnMagSector\_mulVec\_magSectorRestriction}
+(down to the magnetization sector) and
+\texttt{heisenbergHamiltonianS\_mulVec\_magSectorEmbedding} (back up, for the
+minimality's competitor eigenvectors), so PR-11/PR-12 need not re-derive the
+ground-state property from Theorem~2.3. \textbf{Debt.} One declaration is at
+reference~0: the file's own final capstone
 \texttt{liebRepulsive\_groundState\_casimir\_eq\_predicted}, staged for the
 arc's remaining assembly (PR-11/PR-12). PR-9a's $\hat H_{\mathrm{eff}}$
 corollary and PR-10a's \texttt{coordinateSpan} capstones remain unconsumed,
