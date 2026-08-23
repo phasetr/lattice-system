@@ -63,7 +63,8 @@ example (N : ℕ) (x y : Fin (N + 1)) :
       fermionSpinTransverse N x y + fermionSiteSpinZ N x * fermionSiteSpinZ N y :=
   fermionSpinDot_eq_transverse_add_spinZ_mul N x y
 
-/-! ## 3. Staggered-Casimir split: `fermionStaggeredCasimirOp_eq_transverse_add_staggeredSpinZ_sq` -/
+/-! ## 3. Staggered-Casimir split:
+`fermionStaggeredCasimirOp_eq_transverse_add_staggeredSpinZ_sq` -/
 
 /-- **Transverse / longitudinal split of `(Ô_L)²`** (mirrors Tasaki eq. (4.1.12) / Theorem 10.6's
 staggered analogue of (10.2.16)): the squared staggered Casimir operator splits as the staggered
