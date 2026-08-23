@@ -58,8 +58,8 @@ same-site entry `fermionSpinDot N x x` never reaches the capstone and is deliber
 
 Two declarations are at reference 0. The `Ĥeff` corollary
 `secondOrderEffectiveHamiltonian_liebPerturbation_reindex_eq_heisenbergOnMagSector` is staged for
-PR-9b (total-spin Casimir bridge) and PR-10 (endpoint Heisenberg Casimir) per the fixed PR order
-(issue #5320); the raw capstone it is derived from is consumed inside this file by that corollary.
+PR-10 (endpoint Heisenberg Casimir) per the fixed PR order (issue #5320); the raw capstone it is
+derived from is consumed inside this file by that corollary.
 The convention guard `liebHardCoreToMagConfigS_apply_eq_zero_iff_up_occupied` is deliberate: it pins
 the up/down reading of the sector `Equiv` in a single visible statement so that a silent flip of
 the convention (which selects the mirror sector `M = nUp` and would break PR-10) fails loudly here
@@ -246,7 +246,7 @@ private theorem liebHardCoreOfMagConfigSFock_downOccupation {N : ℕ}
 
 /-- Two singly occupied configurations are equal iff their down-orbital occupations agree: the up
 orbital is the complement, so the down occupation already determines the whole configuration. -/
-private theorem singlyOccupied_eq_iff_downOccupation {N : ℕ} {c e : Fin (2 * N + 2) → Fin 2}
+theorem singlyOccupied_eq_iff_downOccupation {N : ℕ} {c e : Fin (2 * N + 2) → Fin 2}
     (hc : ∀ z : Fin (N + 1), (c (spinfulIndex N z 0)).val + (c (spinfulIndex N z 1)).val = 1)
     (he : ∀ z : Fin (N + 1), (e (spinfulIndex N z 0)).val + (e (spinfulIndex N z 1)).val = 1) :
     e = c ↔ liebHardCoreDownOccupation e = liebHardCoreDownOccupation c := by

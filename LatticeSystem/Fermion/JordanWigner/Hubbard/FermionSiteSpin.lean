@@ -66,4 +66,13 @@ theorem fermionTotalSpinPlus_eq_sum_siteSpinPlus (N : ℕ) :
 theorem fermionTotalSpinMinus_eq_sum_siteSpinMinus (N : ℕ) :
     fermionTotalSpinMinus N = ∑ i : Fin (N + 1), fermionSiteSpinMinus N i := rfl
 
+/-- The total spin-z operator is the sum of the per-site ones, `Ŝ^z_tot = Σ_i Ŝ^z_i`, by
+linearity of `N̂_↑ − N̂_↓` over sites. Unlike the two ladder identities above this is not `rfl`:
+the total is a scalar multiple of a difference of sums, not a sum of scalar multiples. -/
+theorem fermionTotalSpinZ_eq_sum_fermionSiteSpinZ (N : ℕ) :
+    fermionTotalSpinZ N = ∑ i : Fin (N + 1), fermionSiteSpinZ N i := by
+  rw [fermionTotalSpinZ, fermionTotalUpNumber, fermionTotalDownNumber,
+    ← Finset.sum_sub_distrib, Finset.smul_sum]
+  rfl
+
 end LatticeSystem.Fermion
