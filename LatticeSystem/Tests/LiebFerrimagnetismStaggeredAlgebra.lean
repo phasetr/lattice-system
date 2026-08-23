@@ -1,34 +1,31 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismStaggeredAlgebra
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveFermionSpinCasimirBridge
 
 /-!
-# §10.2.3 Theorem 10.6 PR-1 — staggered spin component algebra (Red specification)
+# §10.2.3 Theorem 10.6 — staggered spin component algebra (specification)
 
 (Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer 2020,
-§10.2.3, p. 354, eqs. (10.2.16)/(10.2.17).)
+§10.2.3, p. 356, eqs. (10.2.16)/(10.2.17).)
 
-TDD **Red** specification for
+Specification suite for
 `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismStaggeredAlgebra.lean`
-(design: `.self-local/docs/theorem-10-6-design.md`, PR-1 bullet list), which does not exist yet.
-No `sorry`, no production code — `example`s that pin down the exact signatures of
+(design: `.self-local/docs/theorem-10-6-design.md`).  `example`s pin down the exact signatures of
 `fermionStaggeredSpinZ`, `fermionStaggeredTransverse`,
 `fermionSpinDot_eq_transverse_add_spinZ_mul`,
 `fermionStaggeredCasimirOp_eq_transverse_add_staggeredSpinZ_sq`,
 `fermionStaggeredSpinZ_isHermitian`, `vectorExpectation_staggeredSpinZ_sq_nonneg`,
 `fermionStaggeredTransverse_expectation_le_staggeredCasimir_expectation` and
 `fermionStaggeredCasimirOp_isHermitian`, mirroring the discharged SpinS template
-`Quantum/SpinS/FerrimagneticLROComponentAlgebra.lean`, so that PR-1's implementation cannot
-silently drift from the design's exact statements.
-
-This file's import alone is expected to fail until PR-1 lands the production module: that failure
-*is* the Red state this test suite records.
+`Quantum/SpinS/FerrimagneticLROComponentAlgebra.lean`, so that the implementation cannot silently
+drift from the design's exact statements.  The closing `N = 0` sanity check is the cheapest
+falsifier of a staggered-sign or normalization slip: on a single site the staggered gauge squares
+to `+1`, so the staggered order parameter collapses to the plain total-spin Casimir.
 -/
 
 namespace LatticeSystem.Tests.LiebFerrimagnetismStaggeredAlgebra
 
-open LatticeSystem.Fermion LatticeSystem.Quantum Matrix
-open scoped BigOperators ComplexOrder
-
-variable {N : ℕ}
+open LatticeSystem.Fermion LatticeSystem.Quantum
+open scoped BigOperators
 
 /-! ## 1. Signature specification: `fermionStaggeredSpinZ`, `fermionStaggeredTransverse` -/
 
@@ -101,5 +98,27 @@ on its expectations). -/
 example (N : ℕ) (A : Finset (Fin (N + 1))) :
     (fermionStaggeredCasimirOp N A).IsHermitian :=
   fermionStaggeredCasimirOp_isHermitian N A
+
+/-! ## 5. `N = 0` sanity check -/
+
+/-- **Single-site collapse.**  For `N = 0` the only pair is `x = y = 0`, whose staggered weight is
+`ε₀ ε₀ = +1` for either sublattice choice, so the staggered order parameter `(Ô_L)²` is the plain
+total-spin Casimir `(Ŝ_tot)²`. -/
+theorem fermionStaggeredCasimirOp_zero_eq_totalSpinSquared (A : Finset (Fin 1)) :
+    fermionStaggeredCasimirOp 0 A = fermionTotalSpinSquared 0 := by
+  rw [fermionTotalSpinSquared_eq_sum_fermionSpinDot]
+  unfold fermionStaggeredCasimirOp
+  refine Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => ?_
+  obtain rfl : x = y := Subsingleton.elim (α := Fin 1) x y
+  by_cases hx : x ∈ A <;> simp [hx]
+
+/-- **Single-site split.**  The transverse / longitudinal decomposition reproduces `(Ŝ_tot)²` at
+`N = 0` for either sublattice choice — a sign or normalization slip in the split would break this
+even before any ground-state input. -/
+example (A : Finset (Fin 1)) :
+    fermionTotalSpinSquared 0 =
+      fermionStaggeredTransverse 0 A + fermionStaggeredSpinZ 0 A * fermionStaggeredSpinZ 0 A := by
+  rw [← fermionStaggeredCasimirOp_eq_transverse_add_staggeredSpinZ_sq,
+    fermionStaggeredCasimirOp_zero_eq_totalSpinSquared]
 
 end LatticeSystem.Tests.LiebFerrimagnetismStaggeredAlgebra

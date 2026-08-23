@@ -19,7 +19,8 @@ multiply to `+1`, and the real symmetry `t_{x,y} = t_{y,x}` restores the term.
 
 This file supplies:
 
-* the sublattice gauge `gaugeSign` and its bond-cancellation `gaugeSign_mul_of_bipartite`;
+* the sublattice gauge `gaugeSign`, its reality `gaugeSign_isSelfAdjoint` and its
+  bond-cancellation `gaugeSign_mul_of_bipartite`;
 * the down-flip gauge factor `shibaGauge` and the crossing parity `shibaJwFlipParity`;
 * the column (basis-vector) action of the Shiba unitary and the per-hop conjugation
   identities `shibaSignedUnitary_conj_upHop` / `shibaSignedUnitary_conj_downHop`.
@@ -31,6 +32,7 @@ This file supplies:
 
 ## Main results
 
+* `gaugeSign_isSelfAdjoint` — the gauge is real, `star ε_x = ε_x`.
 * `gaugeSign_mul_of_bipartite` — `ε_x ε_y = −1` on a bipartite bond.
 * `diagonal_mulVec_basisVec` — a diagonal matrix scales a basis vector by its diagonal entry.
 * `shibaSignedUnitary_conj_symmetricKinetic` — `Ûᴴ Ĥhop Û = Ĥhop` (eq. (9.3.52)).
@@ -53,6 +55,14 @@ variable {N : ℕ}
 (Tasaki eq. (9.3.49)/(9.3.51), the `(−1)^x` gauge, p. 336). -/
 def gaugeSign (A : Finset (Fin (N + 1))) (x : Fin (N + 1)) : ℂ :=
   if x ∈ A then 1 else -1
+
+/-- **The sublattice gauge is real**, `star ε_x = ε_x`: it takes only the values `±1`. -/
+theorem gaugeSign_isSelfAdjoint (A : Finset (Fin (N + 1))) (x : Fin (N + 1)) :
+    IsSelfAdjoint (gaugeSign A x) := by
+  rw [isSelfAdjoint_iff, gaugeSign]
+  by_cases hx : x ∈ A
+  · rw [if_pos hx, star_one]
+  · rw [if_neg hx, star_neg, star_one]
 
 /-- **Bond cancellation of the gauge on a bipartite bond** (Tasaki p. 336): if
 `T x y ≠ 0` then `x` and `y` lie in different sublattices, so

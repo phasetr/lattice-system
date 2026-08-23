@@ -81,8 +81,8 @@ private theorem gaugeSign_mul_sameSublattice (A : Finset (Fin (N + 1))) (x y : F
 /-- The sublattice-gauge product is real (imaginary part zero). -/
 private theorem gaugeSign_mul_im (A : Finset (Fin (N + 1))) (x y : Fin (N + 1)) :
     (gaugeSign A x * gaugeSign A y).im = 0 := by
-  unfold gaugeSign
-  by_cases hx : x ∈ A <;> by_cases hy : y ∈ A <;> simp [hx, hy]
+  rw [← Complex.conj_eq_iff_im]
+  exact (gaugeSign_isSelfAdjoint A x).mul (gaugeSign_isSelfAdjoint A y)
 
 /-- The sublattice-gauge product is `−1` across the two sublattices. -/
 private theorem gaugeSign_mul_not_sameSublattice (A : Finset (Fin (N + 1))) (x y : Fin (N + 1))

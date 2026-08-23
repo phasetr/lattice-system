@@ -5,7 +5,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
 
 This file formalizes the statement of **Tasaki Theorem 10.6** (Shen, Qiu,
 and Tian's ferrimagnetism bound; Hal Tasaki, *Physics and Mathematics of
-Quantum Many-Body Systems*, 1st ed., Springer 2020, §10.2.3, p. 354,
+Quantum Many-Body Systems*, 1st ed., Springer 2020, §10.2.3, p. 356,
 eqs. (10.2.16)/(10.2.17)): for the repulsive Hubbard model at half-filling
 (Theorem 10.4), the squared staggered magnetization order parameter has a
 ground-state expectation bounded below by `((|A| − |B|)/2)²`:
@@ -40,7 +40,7 @@ noncomputable def fermionStaggeredCasimirOp (N : ℕ) (A : Finset (Fin (N + 1)))
       fermionSpinDot N x y
 
 /-- **Tasaki Theorem 10.6** (Shen–Qiu–Tian ferrimagnetism; 1st ed., Springer
-2020, §10.2.3, p. 354, eqs. (10.2.16)/(10.2.17), **AXIOM**). Under the
+2020, §10.2.3, p. 356, eqs. (10.2.16)/(10.2.17), **AXIOM**). Under the
 hypotheses of Theorem 10.4, every normalized ground state `v` of the
 repulsive Hubbard model satisfies the ferrimagnetic order-parameter bound
 

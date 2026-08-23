@@ -37,7 +37,7 @@ This mirrors the spin-`S` template of §4.1 (Theorem 4.4, eq. (4.1.12),
 `(Fin (2N+2) → Fin 2) → ℂ`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed.,
-Springer 2020, §10.2.3, p. 354, eqs. (10.2.16)/(10.2.17) (and the §4.1 template, eq. (4.1.12),
+Springer 2020, §10.2.3, p. 356, eqs. (10.2.16)/(10.2.17) (and the §4.1 template, eq. (4.1.12),
 pp. 77–78); S.-Q. Shen, Z.-M. Qiu, G.-S. Tian, *Phys. Rev. Lett.* **72** (1994) 1280.
 -/
 
@@ -69,14 +69,6 @@ private theorem fermionStaggeredCasimirOp_eq_gaugeSign_sum (N : ℕ) (A : Finset
     fermionStaggeredCasimirOp N A =
       ∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
         (gaugeSign A x * gaugeSign A y) • fermionSpinDot N x y := rfl
-
-/-- The sublattice gauge factor `ε_x = ±1` is real, hence self-adjoint. -/
-private theorem gaugeSign_isSelfAdjoint {N : ℕ} (A : Finset (Fin (N + 1))) (x : Fin (N + 1)) :
-    IsSelfAdjoint (gaugeSign A x) := by
-  rw [isSelfAdjoint_iff, gaugeSign]
-  by_cases hx : x ∈ A
-  · rw [if_pos hx, star_one]
-  · rw [if_neg hx, star_neg, star_one]
 
 /-! ## The transverse / longitudinal split -/
 
