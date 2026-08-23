@@ -58,7 +58,7 @@ same-site entry `fermionSpinDot N x x` never reaches the capstone and is deliber
 
 Two declarations are at reference 0. The `Ĥeff` corollary
 `secondOrderEffectiveHamiltonian_liebPerturbation_reindex_eq_heisenbergOnMagSector` is staged for
-PR-10 (endpoint Heisenberg Casimir) per the fixed PR order (issue #5320); the raw capstone it is
+the arc's assembly (PR-11 onward, issue #5320); the raw capstone it is
 derived from is consumed inside this file by that corollary.
 The convention guard `liebHardCoreToMagConfigS_apply_eq_zero_iff_up_occupied` is deliberate: it pins
 the up/down reading of the sector `Equiv` in a single visible statement so that a silent flip of
