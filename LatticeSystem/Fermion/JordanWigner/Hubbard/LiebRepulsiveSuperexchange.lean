@@ -48,12 +48,11 @@ therefore on the complete bipartite graph, not on the original hopping graph's b
 
 ## Debt
 
-The capstone `kernelProjection_mul_liebPerturbationVCompressed_sq_mul_kernelProjection` is consumed
-here by the corollary `secondOrderEffectiveHamiltonian_liebPerturbation_eq_tJExchange`; the four
-feeder lemmas, `liebEndpointGraph`, its adjacency lemma and its `DecidableRel` instance all feed
-that same chain inside this file. The corollary is therefore the only declaration of this file
-still at reference 0; it is staged for PR-9 (Fermion-Spin bridge) and PR-10 (endpoint Heisenberg
-Casimir) per the fixed PR order (issue #5320).
+None. The capstone `kernelProjection_mul_liebPerturbationVCompressed_sq_mul_kernelProjection` is
+consumed here by the corollary `secondOrderEffectiveHamiltonian_liebPerturbation_eq_tJExchange`;
+the four feeder lemmas, `liebEndpointGraph`, its adjacency lemma and its `DecidableRel` instance
+all feed that same chain inside this file. Both the capstone and the corollary are consumed by
+PR-9a's reindexing capstones (`LiebRepulsiveFermionSpinBridge.lean`).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §10.1, eq. (10.1.10), p. 345.
