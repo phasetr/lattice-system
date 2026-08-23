@@ -28,8 +28,13 @@ remaining pieces PR-11b owns:
    (`liebPerturbationH0Compressed_posSemidef`, `liebPerturbationVCompressed_isHermitian`,
    `liebPerturbationH0Compressed_isReducedInverse`,
    `kernelProjection_mul_liebPerturbationVCompressed_mul_kernelProjection`) — gives the perturbed
-   Hamiltonian a unique ground state for every sufficiently small `λ > 0`, converging to the
-   `hEffGS` witness as `λ → 0⁺`.
+   Hamiltonian a unique ground state for every sufficiently small `λ > 0`, converging to an
+   effective ground state `Φeff` as `λ → 0⁺`. The full export accordingly packages, alongside the
+   `λ`-family uniqueness and the convergence `Philam λ → Φeff`,
+   `tasaki_lemma_10_1_degenerate_perturbation`'s own conclusion transported through `hEffGS`:
+   a genuine `IsUniqueGroundStateOn` of `secondOrderEffectiveHamiltonian` on `matrixKernel
+   (liebPerturbationH0Compressed N nUp)` at some energy `Eeff` and witness `Φeff`, not merely the
+   existence of `Φeff` as a limit point.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §10.1 Lemma 10.1, pp. 346–347; §2.5 Theorem 2.3, p. 42; §10.2.2 Theorem 10.4, p. 350.
@@ -149,7 +154,12 @@ effective ground state `Φeff` as `λ → 0⁺`. Combines capstone 1 above with 
 (`isUniqueGroundStateOn_liebPerturbationH0Compressed_kernel_iff_heisenberg`,
 `LiebRepulsiveSectorAssembly.lean`) to supply `tasaki_lemma_10_1_degenerate_perturbation`'s
 `hEffGS` hypothesis; every other hypothesis of that lemma is already discharged by PR-5/PR-6
-assets. -/
+assets. The export therefore also carries `tasaki_lemma_10_1_degenerate_perturbation`'s own
+conclusion: `∃ Eeff Φeff, IsUniqueGroundStateOn (matrixKernel (liebPerturbationH0Compressed N nUp))
+(secondOrderEffectiveHamiltonian (liebPerturbationH0Compressed N nUp)
+(liebPerturbationVCompressed N nUp A T) (liebPerturbationH0InvCompressed N nUp)) Eeff Φeff`, a
+genuine unique-ground-state statement for the second-order effective Hamiltonian on `ker Ĥ₀c`, not
+merely the existence of `Φeff` as a limit point. -/
 theorem tasaki_lemma_10_1_liebRepulsive_apply
     (A : Finset (Fin (N + 1))) (hA : 1 ≤ A.card) (hB : 1 ≤ (bipartitionComplement A).card)
     (nUp : ℕ) (hnUp : nUp ≤ N + 1)
