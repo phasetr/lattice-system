@@ -6811,7 +6811,7 @@ total number $\hat N$, so PR-1's constant-energy-shift argument is inapplicable
 in principle; this file cannot supply the step either, \texttt{homotopyOnSite}
 being a scalar by definition. The second disjunct of
 \texttt{IsLiebRepulsiveHamiltonian} (the site-dependent symmetric form) thus
-remains unreduced, and the arc's final assembly of Theorem~10.4 (PR-12/PR-13)
+remains unreduced, and the arc's final assembly of Theorem~10.4 (PR-14a/PR-14b)
 must either discharge it or restrict the theorem's hypothesis accordingly.
 This file starts from a uniform model, and what is deformed here is $U\to1$.
 \textbf{Update (PR-14b).} The arc's actual capstone route bypasses this
@@ -7343,8 +7343,9 @@ see the PR-12a paragraph below).
 PR~\#5336 PR-11b).} Supplies the two pieces PR-11b owns, closing
 PR-11a's staged existence-witness builders; PR-10b's own capstone
 \texttt{liebRepulsive\_groundState\_casimir\_eq\_predicted} remains at
-reference~0 (staged for PR-12/PR-13's assembly), since this PR only shares
-its four inline side conditions, not the capstone itself.
+reference~0 at this PR (staged for PR-12/PR-13's assembly), since this PR
+only shares its four inline side conditions, not the capstone itself;
+\textbf{PR-13b has since consumed} it in \texttt{LiebRepulsiveCasimirPinning.lean}.
 \texttt{liebOrientedSublattice\_theorem23\_side\_conditions} factors the four
 nondegeneracy side conditions ($1\le|A'|$, $1\le|A'^c|$, and the bare
 true/false witnesses) that PR-10b's
@@ -7398,8 +7399,9 @@ sole reference-0 declaration
 \texttt{liebRepulsive\_groundState\_casimir\_eq\_predicted} is \emph{not}
 closed by this PR: Capstone~1 calls
 \texttt{liebRepulsive\_theorem23\_instance} directly, and only shares the
-side-conditions lemma feeding that capstone's proof; it remains staged for
-PR-12/PR-13's assembly. \texttt{eigenspace\_diagonal\_eq\_coordinateSpan},
+side-conditions lemma feeding that capstone's proof; it remained staged
+until \textbf{PR-13b consumed it} in \texttt{LiebRepulsiveCasimirPinning.lean}.
+\texttt{eigenspace\_diagonal\_eq\_coordinateSpan},
 \texttt{IsUniqueGroundStateOn.mono}, and
 \texttt{configSectorCompress\_eq\_submatrix} (all PR-11a) remain staged,
 unconsumed until PR-11c/PR-12 onward --- PR-11c has since consumed the first
@@ -7466,7 +7468,8 @@ four remaining obligations before
 (1) the SU(2) commute/Hermiticity adapters (PR-12), (2) identifying the
 occupied Casimir eigenvalue with \texttt{liebRepulsiveSpinCasimir A}
 (PR-12/PR-13), (3) the site-dependent $U_x\to U$ reduction (PR-12b), (4) the
-finrank/degeneracy count assembly (PR-13/PR-14). \textbf{Debt discharged}:
+finrank/degeneracy count assembly (PR-14a/PR-14b, since completed; axiom
+removal itself is PR-15's responsibility). \textbf{Debt discharged}:
 this PR consumes PR-11a's \texttt{eigenspace\_diagonal\_eq\_coordinateSpan}
 and \texttt{IsUniqueGroundStateOn.mono}, closing both debts;
 \texttt{configSectorCompress\_eq\_submatrix} was later \textbf{deleted in
@@ -7736,8 +7739,8 @@ homotopy coupling is irrelevant here). \textbf{Steps~2/3}
 \texttt{liebRepulsive\_su2\_weight\_transport}: specializes
 \texttt{ham\_su2\_multiplet\_companion} (\texttt{Math/AngularMomentum/Multiplet.lean})
 to the physical Hamiltonian, producing at every weight $J-k$ ($k\le 2J$) a
-nonzero companion sharing the seed's $\hat H$/$\hat N$ eigenvalues; a
-private wrapper \texttt{liebRepulsive\_transport\_to\_sector} packages the
+nonzero companion sharing the seed's $\hat H$/$\hat N$ eigenvalues;
+\texttt{liebRepulsive\_transport\_to\_sector} packages the
 companion into a named \texttt{numberSpinZSectorEuclidean} sector. Two
 further private lemmas assemble the energy ladder and its converse:
 \texttt{liebRepulsive\_sector\_energy\_le} (one-directional ground-energy
@@ -7794,7 +7797,7 @@ each admissible block is one-dimensional (spanned by its sector's unique
 ground state); \texttt{liebRepulsive\_finrank\_groundSubmodule\_le}/\texttt{\_ge}
 combine confinement with this one-dimensionality (upper bound) and with the
 linear independence of distinct-$\hat S^3$-weight eigenvectors (lower bound,
-via a new private \texttt{linearIndependent\_of\_fermionTotalSpinZ\_eigenvectors}),
+via \texttt{Module.End.eigenvectors\_linearIndependent'}),
 to pin $\mathrm{finrank}\,G=c_A-c_B+1$.
 \texttt{liebRepulsive\_groundSubmodule\_le\_spinSquared\_eigenspace} and
 \texttt{liebRepulsive\_groundSubmodule\_ne\_bot} supply conjuncts~(iii)

@@ -8,15 +8,18 @@ import LatticeSystem.Math.CommutingHermitianEigenvector
 import LatticeSystem.Math.MatrixAnalysis.PiEuclideanEigenBridge
 
 /-!
-# SU(2) weight transport and the sector energy ladder (Tasaki §10.2.2, PR-14a)
+# SU(2) weight transport and the sector energy ladder (Tasaki §10.2.2, PR-14a + PR-14b)
 
 Nineteenth installment of the Theorem 10.4 discharge arc (issue #5320). This file assembles the
 first half (PR-14a) of the arc's final assembly step: for every admissible `Ŝ³` sector of the
 physical symmetric repulsive Hamiltonian, the sector's unique ground state is a
 `liebRepulsiveSpinCasimir A`-eigenvector of `Ŝ²`, all admissible sectors share the same ground
-energy `E₀`, and `E₀` is minimal over the whole `(N+1)`-electron sector. The complementary weight
-confinement + `finrank` count (PR-14b) and the axiom discharge itself (PR-15) are **not** in this
-file's scope.
+energy `E₀`, and `E₀` is minimal over the whole `(N+1)`-electron sector. It also supplies two
+PR-14b infrastructure lemmas that stay in this module because they generalize PR-14a's own
+minimality proof (`liebRepulsive_groundSubmodule_le_comap_of_commute`,
+`liebRepulsive_exists_jointEigenvector_of_ne_bot`), consumed by the weight confinement built in
+`LiebRepulsiveWeightConfinement.lean`. The `finrank` count and the axiom discharge itself (PR-15)
+are **not** in this file's scope.
 
 ## Route
 
@@ -26,7 +29,7 @@ highest-weight tower `highestWeight_spinMultiplet_general`, per the arc's main-a
 along, so no separate highest-weight certificate is needed). See the design round's "Route note"
 for the full argument against the tower route.
 
-## Contents (this file, PR-14a scope)
+## Contents (this file)
 
 * `liebRepulsive_su2_weight_transport` — specializes `ham_su2_multiplet_companion` to the physical
   symmetric repulsive Hamiltonian: from a joint `(Ĥ, N̂, Ŝ³, Ŝ²)`-eigenvector of spin `J`, produces
@@ -41,6 +44,12 @@ for the full argument against the tower route.
   eigenvalue `liebRepulsiveSpinCasimir A`, and `E₀` is minimal over the whole `(N+1)`-electron
   sector (conjunct (ii) of `theorem_10_4_lieb_repulsive_half_filling`,
   `LiebRepulsive.lean:134`, restricted to the symmetric disjunct).
+* `liebRepulsive_groundSubmodule_le_comap_of_commute` (PR-14b) — invariance of the `(N+1)`-electron
+  ground submodule under a conserved charge commuting with the Hamiltonian and `N̂`; reused on `Ŝ³`
+  weight blocks by `LiebRepulsiveWeightConfinement.lean`.
+* `liebRepulsive_exists_jointEigenvector_of_ne_bot` (PR-14b) — general joint-eigenvector seed
+  extraction, generalizing `liebRepulsive_groundEnergy_le_of_electronNumber`'s extraction step from
+  the whole ground submodule to any `Ŝ²`/`Ŝ³`-invariant submodule contained in it.
 
 The weight of the sector indexed by `nUp` is `m = (2 nUp − (N+1))/2` (`liebHalfFillingSpinZVal`),
 and admissibility of `nUp` is, in up-count form, `|A'ᶜ| ≤ nUp ≤ |A'|` for the oriented sublattice
