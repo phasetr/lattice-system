@@ -28,7 +28,7 @@ the downward restriction of PR-1's `repulsiveSpinZSector_ground_unique` from `sp
 to `numberSpinZSectorEuclidean` — a debt open since PR-3, whose Casimir machinery consumes ground
 state uniqueness on the joint sector but could only take it as an abstract hypothesis — and a
 capstone that pins down exactly what remains before `theorem_10_4_lieb_repulsive_half_filling`
-(`LiebRepulsive.lean:134`) can be discharged.
+(`LiebRepulsive.lean`) can be discharged.
 
 ## Contents
 
@@ -175,7 +175,7 @@ keeps them as explicit hypotheses so the adapter-discharge step stays separable 
 bridge.
 
 This capstone pins down **exactly** what remains before `theorem_10_4_lieb_repulsive_half_filling`
-(`LiebRepulsive.lean:134`) can be discharged, beyond what this arc has already proved:
+(`LiebRepulsive.lean`) can be discharged, beyond what this arc has already proved:
 
 1. The SU(2) commute/Hermiticity adapters taken as hypotheses here — supplied by PR-12a
    (`LiebRepulsiveSU2Invariance.lean`).

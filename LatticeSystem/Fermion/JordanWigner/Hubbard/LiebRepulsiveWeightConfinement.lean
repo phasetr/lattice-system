@@ -7,8 +7,8 @@ Twentieth installment of the Theorem 10.4 discharge arc (issue #5320). This file
 weight confinement of the `(N+1)`-electron ground submodule to admissible `Ŝ³` sectors and the
 matching `finrank` count, completing (together with PR-14a's
 `liebRepulsive_multipletCompanion_capstone`) the symmetric disjunct of
-`theorem_10_4_lieb_repulsive_half_filling` (`LiebRepulsive.lean:134`) as a conditional theorem
-(the axiom itself is untouched; discharge is PR-15).
+`theorem_10_4_lieb_repulsive_half_filling` (`LiebRepulsiveHalfFillingDischarge.lean`) as a
+conditional theorem (the full unconditional discharge is PR-15).
 
 ## Route
 
@@ -45,8 +45,9 @@ sum over the (confined) admissible blocks: the upper bound via `finrank_span_fin
 * `liebRepulsive_groundSubmodule_ne_bot` — conjunct (i): `G ≠ ⊥`.
 * `liebRepulsive_symmetric_halfFilling_conditional` — the capstone:
   `theorem_10_4_lieb_repulsive_half_filling`'s conclusion verbatim, for
-  `symmetricRepulsiveHubbardHamiltonian N T U`, as a conditional theorem (the axiom itself is not
-  discharged by this file).
+  `symmetricRepulsiveHubbardHamiltonian N T U`, as a conditional theorem (the `1 ≤ |A|`/`1 ≤ |B|`
+  restriction is lifted, and the uniform disjunct is added, in
+  `LiebRepulsiveHalfFillingDischarge.lean`).
 
 The per-sector Casimir value `c₀` is carried as a parameter pinned by
 `hc₀ : c₀ = S₀ (S₀ + 1)`, `S₀ = (cA − cB)/2`. That hypothesis is not bookkeeping: confinement
@@ -491,9 +492,10 @@ half-filling (`1 ≤ |A|`, `1 ≤ |B|`), `theorem_10_4_lieb_repulsive_half_filli
 verbatim for `H = symmetricRepulsiveHubbardHamiltonian N T U`, as a **conditional theorem** built
 from PR-14a's `liebRepulsive_multipletCompanion_capstone` (ground energy `E₀`, conjunct (ii), and
 the per-sector Casimir family) together with this file's weight confinement and `finrank` count
-(conjuncts (i), (iii), (iv)). The axiom `theorem_10_4_lieb_repulsive_half_filling` is not touched by
-this capstone; discharging it (replacing the axiom with this theorem, plus the uniform disjunct and
-the degenerate `A = ∅`/`A = univ` cases) is PR-15's responsibility. -/
+(conjuncts (i), (iii), (iv)). Completing the unconditional
+`theorem_10_4_lieb_repulsive_half_filling` from this capstone (lifting the `1 ≤ |A|`/`1 ≤ |B|`
+restriction via the degenerate `A = ∅`/`A = univ` cases, and adding the uniform disjunct) is
+PR-15's responsibility. -/
 theorem liebRepulsive_symmetric_halfFilling_conditional (N : ℕ) {A : Finset (Fin (N + 1))}
     (hA : 1 ≤ A.card) (hB : 1 ≤ (bipartitionComplement A).card)
     (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (hT_symm : ∀ x y, T x y = T y x)

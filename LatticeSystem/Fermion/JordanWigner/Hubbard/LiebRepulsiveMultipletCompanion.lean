@@ -43,7 +43,7 @@ for the full argument against the tower route.
   such that every admissible `Ŝ³` sector has a unique ground state at `E₀` carrying the Casimir
   eigenvalue `liebRepulsiveSpinCasimir A`, and `E₀` is minimal over the whole `(N+1)`-electron
   sector (conjunct (ii) of `theorem_10_4_lieb_repulsive_half_filling`,
-  `LiebRepulsive.lean:134`, restricted to the symmetric disjunct).
+  `LiebRepulsive.lean`, restricted to the symmetric disjunct).
 * `liebRepulsive_groundSubmodule_le_comap_of_commute` (PR-14b) — invariance of the `(N+1)`-electron
   ground submodule under a conserved charge commuting with the Hamiltonian and `N̂`; reused on `Ŝ³`
   weight blocks by `LiebRepulsiveWeightConfinement.lean`.
@@ -503,7 +503,7 @@ private theorem liebRepulsive_groundEnergy_le_of_electronNumber (N cA cB : ℕ)
 sector (indexed by `nUp` with `(N+1-nUp) ∈ tasaki23GroundStateSectors …`) has a unique ground state
 at that energy, carrying the Casimir eigenvalue `liebRepulsiveSpinCasimir A`; moreover `E₀` is
 minimal over the whole `(N+1)`-electron sector (conjunct (ii) of
-`theorem_10_4_lieb_repulsive_half_filling`, `LiebRepulsive.lean:134`, symmetric disjunct only).
+`theorem_10_4_lieb_repulsive_half_filling`, `LiebRepulsive.lean`, symmetric disjunct only).
 The energy-ladder equality across admissible sectors (step 3) is
 `liebRepulsive_sector_energy_le` applied in both directions against the top sector `nUp = |A'|`;
 global minimality (step 4) is `liebRepulsive_groundEnergy_le_of_electronNumber`.

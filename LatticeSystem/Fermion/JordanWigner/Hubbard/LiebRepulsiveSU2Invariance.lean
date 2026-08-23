@@ -222,7 +222,7 @@ theorem fermionTotalSpinSquared_commute_symmetricRepulsiveHubbardHamiltonian
 hypothesis (rather than `nUp = Ne / 2` as a conclusion) to avoid natural-number division in
 downstream statements. Needed so that PR-12b's per-`s` instantiation can match PR-11c's
 `liebHalfFillingSpinZVal N nUp` sector parameter against the `Ne`-indexed statement of Theorem
-10.4 (`LiebRepulsive.lean:134`). -/
+10.4 (`LiebRepulsive.lean`). -/
 theorem liebHalfFillingSpinZVal_eq_of_two_mul (N nUp Ne : ℕ) (hNe : Ne = 2 * nUp) :
     liebHalfFillingSpinZVal N nUp = ((Ne : ℂ) - ((N : ℂ) + 1)) / 2 := by
   subst hNe
