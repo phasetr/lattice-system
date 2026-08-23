@@ -8,15 +8,18 @@ import LatticeSystem.Math.CommutingHermitianEigenvector
 import LatticeSystem.Math.MatrixAnalysis.PiEuclideanEigenBridge
 
 /-!
-# SU(2) weight transport and the sector energy ladder (Tasaki §10.2.2, PR-14a)
+# SU(2) weight transport and the sector energy ladder (Tasaki §10.2.2, PR-14a + PR-14b)
 
 Nineteenth installment of the Theorem 10.4 discharge arc (issue #5320). This file assembles the
 first half (PR-14a) of the arc's final assembly step: for every admissible `Ŝ³` sector of the
 physical symmetric repulsive Hamiltonian, the sector's unique ground state is a
 `liebRepulsiveSpinCasimir A`-eigenvector of `Ŝ²`, all admissible sectors share the same ground
-energy `E₀`, and `E₀` is minimal over the whole `(N+1)`-electron sector. The complementary weight
-confinement + `finrank` count (PR-14b) and the axiom discharge itself (PR-15) are **not** in this
-file's scope.
+energy `E₀`, and `E₀` is minimal over the whole `(N+1)`-electron sector. It also supplies two
+PR-14b infrastructure lemmas that stay in this module because they generalize PR-14a's own
+minimality proof (`liebRepulsive_groundSubmodule_le_comap_of_commute`,
+`liebRepulsive_exists_jointEigenvector_of_ne_bot`), consumed by the weight confinement built in
+`LiebRepulsiveWeightConfinement.lean`. The `finrank` count and the axiom discharge itself (PR-15)
+are **not** in this file's scope.
 
 ## Route
 
@@ -26,7 +29,7 @@ highest-weight tower `highestWeight_spinMultiplet_general`, per the arc's main-a
 along, so no separate highest-weight certificate is needed). See the design round's "Route note"
 for the full argument against the tower route.
 
-## Contents (this file, PR-14a scope)
+## Contents (this file)
 
 * `liebRepulsive_su2_weight_transport` — specializes `ham_su2_multiplet_companion` to the physical
   symmetric repulsive Hamiltonian: from a joint `(Ĥ, N̂, Ŝ³, Ŝ²)`-eigenvector of spin `J`, produces
@@ -41,6 +44,12 @@ for the full argument against the tower route.
   eigenvalue `liebRepulsiveSpinCasimir A`, and `E₀` is minimal over the whole `(N+1)`-electron
   sector (conjunct (ii) of `theorem_10_4_lieb_repulsive_half_filling`,
   `LiebRepulsive.lean:134`, restricted to the symmetric disjunct).
+* `liebRepulsive_groundSubmodule_le_comap_of_commute` (PR-14b) — invariance of the `(N+1)`-electron
+  ground submodule under a conserved charge commuting with the Hamiltonian and `N̂`; reused on `Ŝ³`
+  weight blocks by `LiebRepulsiveWeightConfinement.lean`.
+* `liebRepulsive_exists_jointEigenvector_of_ne_bot` (PR-14b) — general joint-eigenvector seed
+  extraction, generalizing `liebRepulsive_groundEnergy_le_of_electronNumber`'s extraction step from
+  the whole ground submodule to any `Ŝ²`/`Ŝ³`-invariant submodule contained in it.
 
 The weight of the sector indexed by `nUp` is `m = (2 nUp − (N+1))/2` (`liebHalfFillingSpinZVal`),
 and admissibility of `nUp` is, in up-count form, `|A'ᶜ| ≤ nUp ≤ |A'|` for the oriented sublattice
@@ -122,11 +131,13 @@ theorem liebRepulsive_su2_weight_transport
         (fermionTotalNumber_mul_tJTotalSpinTwo N) hNe')
 
 /-- **Weight transport into a named `Ŝ³` sector.** Packaging of
-`liebRepulsive_su2_weight_transport` for the two call sites of the closing argument: given the
+`liebRepulsive_su2_weight_transport` for the closing argument's call sites: given the
 index `k` reaching the sector `q` from the top of the multiplet (`J − k = (2q − (N+1))/2`), the
-companion lands in `numberSpinZSectorEuclidean N (N+1) (liebHalfFillingSpinZVal N q)` and keeps the
-energy eigenvalue `E`. -/
-private theorem liebRepulsive_transport_to_sector (N q k : ℕ)
+companion lands in `numberSpinZSectorEuclidean N (N+1) (liebHalfFillingSpinZVal N q)`, keeps the
+energy eigenvalue `E`, and remains a `Ŝ²`-eigenvector at the same Casimir `Jr(Jr+1)` as the seed
+`Φ` (PR-14b's weight confinement reads the spin label `Jr` off exactly this clause; PR-14a
+discarded it). -/
+theorem liebRepulsive_transport_to_sector (N q k : ℕ)
     (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (hT_symm : ∀ x y, T x y = T y x)
     (U : Fin (N + 1) → ℝ)
     {Φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)} {Jr m₀ : ℝ} {E : ℂ}
@@ -139,14 +150,15 @@ private theorem liebRepulsive_transport_to_sector (N q k : ℕ)
     (hk : (k : ℝ) ≤ 2 * Jr) (hq : Jr - (k : ℝ) = (2 * (q : ℝ) - ((N : ℝ) + 1)) / 2) :
     ∃ Ψ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2), Ψ ≠ 0 ∧
       Ψ ∈ numberSpinZSectorEuclidean N ((N : ℂ) + 1) (liebHalfFillingSpinZVal N q) ∧
-      Matrix.toEuclideanLin (symmetricRepulsiveHubbardHamiltonian N T U) Ψ = E • Ψ := by
-  obtain ⟨Ψ, hΨne, -, hΨ3, hΨH, hΨN⟩ :=
+      Matrix.toEuclideanLin (symmetricRepulsiveHubbardHamiltonian N T U) Ψ = E • Ψ ∧
+      Matrix.toEuclideanLin (fermionTotalSpinSquared N) Ψ = ((Jr * (Jr + 1) : ℝ) : ℂ) • Ψ := by
+  obtain ⟨Ψ, hΨne, hΨsq, hΨ3, hΨH, hΨN⟩ :=
     liebRepulsive_su2_weight_transport T hT_symm U hΦ hJ hsq h3 hH hNum k hk
   have hval : ((Jr - (k : ℝ) : ℝ) : ℂ) = liebHalfFillingSpinZVal N q := by
     rw [hq, liebHalfFillingSpinZVal]
     push_cast
     ring
-  refine ⟨Ψ, hΨne, ?_, hΨH⟩
+  refine ⟨Ψ, hΨne, ?_, hΨH, hΨsq⟩
   rw [numberSpinZSectorEuclidean, Submodule.mem_inf, spinZSectorEuclidean]
   exact ⟨Module.End.mem_eigenspace_iff.mpr hΨN,
     Module.End.mem_eigenspace_iff.mpr (by rw [hΨ3, hval])⟩
@@ -203,7 +215,7 @@ theorem liebRepulsive_admissibleSector_groundState_casimir_eigenvector
 /-! ## Admissible-sector arithmetic -/
 
 /-- A sublattice and its bipartition complement partition the site set: `|S| + |Sᶜ| = N + 1`. -/
-private theorem bipartitionComplement_card_add (N : ℕ) (S : Finset (Fin (N + 1))) :
+theorem bipartitionComplement_card_add (N : ℕ) (S : Finset (Fin (N + 1))) :
     S.card + (bipartitionComplement S).card = N + 1 := by
   rw [bipartitionComplement_eq_compl, Finset.card_add_card_compl, Fintype.card_fin]
 
@@ -212,7 +224,7 @@ down-count `N + 1 − nUp` (`tasaki23GroundStateSectors … 1 = Finset.Icc (min 
 (max |A'| |A'ᶜ|)` at the oriented sublattice `A'`) is, in terms of the up-count `nUp`, the two-sided
 bound `|A'ᶜ| ≤ nUp ≤ |A'|`; the orientation `|A'ᶜ| ≤ |A'|` resolves the `min`/`max` and
 `|A'| + |A'ᶜ| = N + 1` flips the interval. -/
-private theorem liebRepulsive_mem_tasaki23GroundStateSectors_iff (N : ℕ)
+theorem liebRepulsive_mem_tasaki23GroundStateSectors_iff (N : ℕ)
     (A : Finset (Fin (N + 1))) {nUp : ℕ} (hnUp : nUp ≤ N + 1) :
     (N + 1 - nUp) ∈ tasaki23GroundStateSectors
         (fun x => decide (x ∈ liebOrientedSublattice A)) 1 ↔
@@ -273,53 +285,59 @@ private theorem liebRepulsive_sector_energy_le (N cA cB nUp₁ nUp₂ : ℕ)
   have hkcast : ((cA - nUp₂ : ℕ) : ℝ) = (cA : ℝ) - (nUp₂ : ℝ) := Nat.cast_sub hhigh
   have hlow' : (cB : ℝ) ≤ (nUp₂ : ℝ) := by exact_mod_cast hlow
   have hcard' : (cA : ℝ) + (cB : ℝ) = (N : ℝ) + 1 := by exact_mod_cast hcard
-  obtain ⟨Ψ, hΨne, hΨmem, hΨH⟩ :=
+  obtain ⟨Ψ, hΨne, hΨmem, hΨH, -⟩ :=
     liebRepulsive_transport_to_sector N nUp₂ (cA - nUp₂) T hT_symm U hφ₁ne hS₀ hsq₁ h3₁ heig₁
       hnum₁ (by rw [hkcast, hLcast]; linarith) (by rw [hkcast, hLcast]; linarith)
   exact hGS₂.2.2.2.1.2 E₁ ⟨Ψ, hΨmem, hΨne, hΨH⟩
 
 /-! ## Step 4: minimality over the whole `(N+1)`-electron sector -/
 
-/-- **Global minimality of the admissible-sector ground energy.** If every admissible `Ŝ³` sector
-has ground energy `E₀`, then no `(N+1)`-electron eigenvalue of the physical Hamiltonian lies below
-`E₀`: the ground submodule at such an eigenvalue `E` is invariant under `Ŝ²` and `Ŝ³`, hence
-contains a joint eigenvector (`exists_joint_eigenvector_in_invariant_submodule`); its spin `J` and
-weight `m` are real (`isHermitian_mulVec_eigenvalue_eq_ofReal`,
-`Matrix.posSemidef_mulVec_eigenvalue_nonneg`) and satisfy the quantization
-`J − m ∈ ℤ≥0` (`angMom_sub_mem_nat`) together with the up-count bookkeeping
-`m = (2 nUp − (N+1))/2` (`attractiveHubbard_up_down_mulVec_of_number_spinZ` +
-`mulVec_apply_eq_zero_of_upNumber_ne`), so `J = (2p − (N+1))/2` for a natural `p`; transporting to
-the sector `q = min p cA` — admissible because `cB ≤ p` follows from `J ≥ 0` — produces an
-energy-`E` eigenvector there, and `E₀` is the ground eigenvalue of that sector. Only the numerical
-data `cA + cB = N + 1`, `cB ≤ cA` of the sublattice cardinalities is used. -/
-private theorem liebRepulsive_groundEnergy_le_of_electronNumber (N cA cB : ℕ)
+/-- **Invariance of the `(N+1)`-electron ground submodule under a conserved charge.** Any
+many-body operator `C` commuting with both the symmetric repulsive Hamiltonian and `N̂` preserves
+`G_E = hubbardGroundSubmoduleAtElectronNumber H E (N+1)`, since `G_E` is the intersection of the
+two eigenspaces. Used at `C = Ŝ²` and `C = Ŝ³`, both for `G_E` itself and — via PR-14b's weight
+confinement — for its `Ŝ³` weight blocks. -/
+theorem liebRepulsive_groundSubmodule_le_comap_of_commute (N : ℕ)
+    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (U : Fin (N + 1) → ℝ) (E : ℂ)
+    (C : ManyBodyOp (Fin (2 * N + 2)))
+    (hCH : Commute C (symmetricRepulsiveHubbardHamiltonian N T U))
+    (hCN : Commute C (fermionTotalNumber (2 * N + 1))) :
+    hubbardGroundSubmoduleAtElectronNumber (symmetricRepulsiveHubbardHamiltonian N T U) E (N + 1) ≤
+      (hubbardGroundSubmoduleAtElectronNumber (symmetricRepulsiveHubbardHamiltonian N T U)
+        E (N + 1)).comap C.mulVecLin := by
+  intro x hx
+  rw [hubbardGroundSubmoduleAtElectronNumber, Submodule.mem_inf] at hx
+  rw [Submodule.mem_comap, Matrix.mulVecLin_apply, hubbardGroundSubmoduleAtElectronNumber,
+    Submodule.mem_inf]
+  exact ⟨mulVec_mem_eigenspace_of_commute hCH hx.1, mulVec_mem_eigenspace_of_commute hCN hx.2⟩
+
+/-- **General joint-eigenvector seed extraction, invariant-submodule form (PR-14b).** Generalizes
+the seed-extraction step of `liebRepulsive_groundEnergy_le_of_electronNumber` from the whole
+`(N+1)`-electron ground submodule to any `Ŝ²`/`Ŝ³`-invariant submodule `B` contained in it
+(PR-14b's weight confinement applies it at `B = G ⊓ eigenspace Ŝ³ μ`): `B` contains a nonzero joint
+`(Ĥ, N̂, Ŝ³, Ŝ²)`-eigenvector `v`, with real eigenvalues `Er`, `N+1`, `mur`, `Jr(Jr+1)`
+respectively, satisfying the angular-momentum quantization `Jr = (2p−(N+1))/2` for a natural `p`
+and the up-count bookkeeping `mur = (2 nUp−(N+1))/2`, `nUp ≤ N+1`, together with the weight bound
+`|mur| ≤ Jr` (`angMom_abs_le_J`). Factored out of `liebRepulsive_groundEnergy_le_of_electronNumber`
+so PR-14b's weight confinement does not duplicate the extraction body. -/
+theorem liebRepulsive_exists_jointEigenvector_of_ne_bot (N : ℕ)
     (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (hT_symm : ∀ x y, T x y = T y x)
     (U : Fin (N + 1) → ℝ)
-    (hcard : cA + cB = N + 1) (horient : cB ≤ cA)
-    {E₀ : ℝ}
-    (hfam : ∀ q : ℕ, cB ≤ q → q ≤ cA →
-      ∃ φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2),
-        IsUniqueGroundStateOn
-          (numberSpinZSectorEuclidean N ((N : ℂ) + 1) (liebHalfFillingSpinZVal N q))
-          (symmetricRepulsiveHubbardHamiltonian N T U) E₀ φ) :
-    ∀ E : ℂ,
-      hubbardGroundSubmoduleAtElectronNumber
-          (symmetricRepulsiveHubbardHamiltonian N T U) E (N + 1) ≠ ⊥ →
-      E₀ ≤ E.re := by
-  intro E hG
-  -- the ground submodule is invariant under the two commuting charges `Ŝ²` and `Ŝ³`
-  have hinv : ∀ B : ManyBodyOp (Fin (2 * N + 2)),
-      Commute B (symmetricRepulsiveHubbardHamiltonian N T U) →
-      Commute B (fermionTotalNumber (2 * N + 1)) →
-      hubbardGroundSubmoduleAtElectronNumber (symmetricRepulsiveHubbardHamiltonian N T U)
-          E (N + 1) ≤
-        (hubbardGroundSubmoduleAtElectronNumber (symmetricRepulsiveHubbardHamiltonian N T U)
-          E (N + 1)).comap B.mulVecLin := by
-    intro B hBH hBN x hx
-    rw [hubbardGroundSubmoduleAtElectronNumber, Submodule.mem_inf] at hx
-    rw [Submodule.mem_comap, Matrix.mulVecLin_apply, hubbardGroundSubmoduleAtElectronNumber,
-      Submodule.mem_inf]
-    exact ⟨mulVec_mem_eigenspace_of_commute hBH hx.1, mulVec_mem_eigenspace_of_commute hBN hx.2⟩
+    {E : ℂ} {B : Submodule ℂ ((Fin (2 * N + 2) → Fin 2) → ℂ)}
+    (hBG : B ≤ hubbardGroundSubmoduleAtElectronNumber
+      (symmetricRepulsiveHubbardHamiltonian N T U) E (N + 1))
+    (hB3 : B ≤ B.comap (fermionTotalSpinZ N).mulVecLin)
+    (hB2 : B ≤ B.comap (fermionTotalSpinSquared N).mulVecLin)
+    (hBne : B ≠ ⊥) :
+    ∃ (Jr mur Er : ℝ) (p nUp : ℕ) (v : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)),
+      v ≠ 0 ∧ WithLp.ofLp v ∈ B ∧ E = (Er : ℂ) ∧ 0 ≤ Jr ∧
+      Jr = (2 * (p : ℝ) - ((N : ℝ) + 1)) / 2 ∧
+      mur = (2 * (nUp : ℝ) - ((N : ℝ) + 1)) / 2 ∧ nUp ≤ N + 1 ∧ |mur| ≤ Jr ∧
+      Matrix.toEuclideanLin (fermionTotalSpinSquared N) v = ((Jr * (Jr + 1) : ℝ) : ℂ) • v ∧
+      Matrix.toEuclideanLin (fermionTotalSpinZ N) v = ((mur : ℝ) : ℂ) • v ∧
+      Matrix.toEuclideanLin (symmetricRepulsiveHubbardHamiltonian N T U) v = E • v ∧
+      Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1)) v = ((N : ℂ) + 1) • v := by
+  classical
   have hcomm : Commute (fermionTotalSpinSquared N).mulVecLin (fermionTotalSpinZ N).mulVecLin := by
     have h := (fermionTotalSpinSquared_commute_fermionTotalSpinZ N).eq
     have h1 : (fermionTotalSpinSquared N).mulVecLin * (fermionTotalSpinZ N).mulVecLin
@@ -331,16 +349,10 @@ private theorem liebRepulsive_groundEnergy_le_of_electronNumber (N cA cB : ℕ)
       rw [Matrix.mulVecLin_mul]
       rfl
     exact h1.trans ((congrArg Matrix.mulVecLin h).trans h2.symm)
-  obtain ⟨lam, mu, v, hvmem, hvne, hvsq, hv3⟩ :=
+  obtain ⟨lam, mu, v, hvB, hvne, hvsq, hv3⟩ :=
     exists_joint_eigenvector_in_invariant_submodule
-      (fermionTotalSpinSquared N).mulVecLin (fermionTotalSpinZ N).mulVecLin
-      (hubbardGroundSubmoduleAtElectronNumber (symmetricRepulsiveHubbardHamiltonian N T U)
-        E (N + 1))
-      (hinv _ (fermionTotalSpinSquared_commute_symmetricRepulsiveHubbardHamiltonian N T hT_symm U)
-        (fermionTotalSpinSquared_commute_fermionTotalNumber N))
-      (hinv _ (fermionTotalSpinZ_commute_symmetricRepulsiveHubbardHamiltonian N T U)
-        (fermionTotalSpinZ_commute_fermionTotalNumber N))
-      hcomm hG
+      (fermionTotalSpinSquared N).mulVecLin (fermionTotalSpinZ N).mulVecLin B hB2 hB3 hcomm hBne
+  have hvmem := hBG hvB
   rw [hubbardGroundSubmoduleAtElectronNumber, Submodule.mem_inf] at hvmem
   have hHv : (symmetricRepulsiveHubbardHamiltonian N T U).mulVec v = E • v := by
     have h := Module.End.mem_eigenspace_iff.mp hvmem.1
@@ -379,6 +391,10 @@ private theorem liebRepulsive_groundEnergy_le_of_electronNumber (N cA cB : ℕ)
       = ((Jr * (Jr + 1) : ℝ) : ℂ) • v := by
     rw [← fermionTotalSpinSquared_eq_cartesianSqSum, hJrsq]
     exact hvsqr
+  -- the weight bound `|m| ≤ J` (Tasaki Lemma A.15)
+  obtain ⟨hmlow, hmhigh⟩ := angMom_abs_le_J (tJTotalSpinOne N) (tJTotalSpinTwo N)
+    (fermionTotalSpinZ N) (tJTotalSpinOne_isHermitian N) (tJTotalSpinTwo_isHermitian N)
+    (tJTotalSpin_su2_12 N) hvne hJr0 hcart hv3r
   -- the weight is a half-integer of the right parity: `mur = (2 nUp − (N+1))/2`
   obtain ⟨hup, -⟩ :=
     attractiveHubbard_up_down_mulVec_of_number_spinZ (N + 1) ((mur : ℝ) : ℂ) hNv hv3r
@@ -403,15 +419,56 @@ private theorem liebRepulsive_groundEnergy_le_of_electronNumber (N cA cB : ℕ)
     have h : nUp ≤ ∑ _i : Fin (N + 1), 1 :=
       Finset.sum_le_sum fun i _ => Fin.is_le (w (spinfulIndex N i 0))
     simpa using h
-  -- quantization: `Jr − mur` is a natural number, so `Jr = (2 p − (N+1))/2`
+  -- quantization: `Jr − mur` is a natural number, so `Jr = (2p − (N+1))/2`
   obtain ⟨n, hn⟩ := angMom_sub_mem_nat (tJTotalSpinOne N) (tJTotalSpinTwo N) (fermionTotalSpinZ N)
     (tJTotalSpinOne_isHermitian N) (tJTotalSpinTwo_isHermitian N) (tJTotalSpin_su2_12 N)
     (tJTotalSpin_su2_23 N) (tJTotalSpin_su2_31 N) hvne hJr0 hcart hv3r
-  set p : ℕ := nUp + n with hpdef
-  have hJrp : Jr = (2 * (p : ℝ) - ((N : ℝ) + 1)) / 2 := by
-    rw [hpdef]
-    push_cast
+  refine ⟨Jr, mur, Er, nUp + n, nUp, WithLp.toLp 2 v, ?_, hvB, hEr.symm, hJr0, ?_, by linarith,
+    hnUpN,
+    abs_le.mpr ⟨hmlow, hmhigh⟩, ?_, ?_, ?_, ?_⟩
+  · rw [ne_eq, WithLp.toLp_eq_zero]
+    exact hvne
+  · push_cast
     linarith
+  · exact (mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul _ _ _).mp (by rw [hJrsq]; exact hvsqr)
+  · exact (mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul _ _ _).mp hv3r
+  · exact (mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul _ _ _).mp hHv
+  · exact (mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul _ _ _).mp
+      (by rw [hNv, Nat.cast_add, Nat.cast_one])
+
+/-- **Global minimality of the admissible-sector ground energy.** If every admissible `Ŝ³` sector
+has ground energy `E₀`, then no `(N+1)`-electron eigenvalue of the physical Hamiltonian lies below
+`E₀`: the ground submodule at such an eigenvalue `E` is `Ŝ²`/`Ŝ³`-invariant, so
+`liebRepulsive_exists_jointEigenvector_of_ne_bot` (applied at `B = G_E` itself) supplies a joint
+eigenvector; transporting it to the admissible sector `q = min p cA` (admissible because
+`cB ≤ p` follows from `Jr ≥ 0`) produces an energy-`E` eigenvector there, and `E₀` is the ground
+eigenvalue of that sector. Only the numerical data `cA + cB = N + 1`, `cB ≤ cA` of the sublattice
+cardinalities is used. -/
+private theorem liebRepulsive_groundEnergy_le_of_electronNumber (N cA cB : ℕ)
+    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (hT_symm : ∀ x y, T x y = T y x)
+    (U : Fin (N + 1) → ℝ)
+    (hcard : cA + cB = N + 1) (horient : cB ≤ cA)
+    {E₀ : ℝ}
+    (hfam : ∀ q : ℕ, cB ≤ q → q ≤ cA →
+      ∃ φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2),
+        IsUniqueGroundStateOn
+          (numberSpinZSectorEuclidean N ((N : ℂ) + 1) (liebHalfFillingSpinZVal N q))
+          (symmetricRepulsiveHubbardHamiltonian N T U) E₀ φ) :
+    ∀ E : ℂ,
+      hubbardGroundSubmoduleAtElectronNumber
+          (symmetricRepulsiveHubbardHamiltonian N T U) E (N + 1) ≠ ⊥ →
+      E₀ ≤ E.re := by
+  intro E hG
+  obtain ⟨Jr, mur, Er, p, nUp, v, hvne, -, hEr, hJr0, hJrp, -, -, -, hsqE, h3E, hHE, hNE⟩ :=
+    liebRepulsive_exists_jointEigenvector_of_ne_bot N T hT_symm U le_rfl
+      (liebRepulsive_groundSubmodule_le_comap_of_commute N T U E (fermionTotalSpinZ N)
+        (fermionTotalSpinZ_commute_symmetricRepulsiveHubbardHamiltonian N T U)
+        (fermionTotalSpinZ_commute_fermionTotalNumber N))
+      (liebRepulsive_groundSubmodule_le_comap_of_commute N T U E (fermionTotalSpinSquared N)
+        (fermionTotalSpinSquared_commute_symmetricRepulsiveHubbardHamiltonian N T hT_symm U)
+        (fermionTotalSpinSquared_commute_fermionTotalNumber N))
+      hG
+  -- `Jr ≥ 0` forces `N + 1 ≤ 2 p`, hence `cB ≤ p`
   have hNp : N + 1 ≤ 2 * p := by
     have h0 := hJr0
     rw [hJrp] at h0
@@ -430,28 +487,11 @@ private theorem liebRepulsive_groundEnergy_le_of_electronNumber (N cA cB : ℕ)
     have h : ((N + 1 : ℕ) : ℝ) ≤ ((p + q : ℕ) : ℝ) := by exact_mod_cast hpq
     push_cast at h
     linarith
-  -- the Euclidean-carrier form of the four eigen-equations
-  have hvne' : (WithLp.toLp 2 v : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)) ≠ 0 := by
-    rw [ne_eq, WithLp.toLp_eq_zero]
-    exact hvne
-  have hsqE : Matrix.toEuclideanLin (fermionTotalSpinSquared N) (WithLp.toLp 2 v)
-      = ((Jr * (Jr + 1) : ℝ) : ℂ) • (WithLp.toLp 2 v) :=
-    (mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul _ _ _).mp (by rw [hJrsq]; exact hvsqr)
-  have h3E : Matrix.toEuclideanLin (fermionTotalSpinZ N) (WithLp.toLp 2 v)
-      = ((mur : ℝ) : ℂ) • (WithLp.toLp 2 v) :=
-    (mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul _ _ _).mp hv3r
-  have hHE : Matrix.toEuclideanLin (symmetricRepulsiveHubbardHamiltonian N T U)
-      (WithLp.toLp 2 v) = E • (WithLp.toLp 2 v) :=
-    (mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul _ _ _).mp hHv
-  have hNE : Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1)) (WithLp.toLp 2 v)
-      = ((N : ℂ) + 1) • (WithLp.toLp 2 v) :=
-    (mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul _ _ _).mp
-      (by rw [hNv, Nat.cast_add, Nat.cast_one])
-  obtain ⟨Ψ, hΨne, hΨmem, hΨH⟩ :=
-    liebRepulsive_transport_to_sector N q (p - q) T hT_symm U hvne' hJr0 hsqE h3E hHE hNE
+  obtain ⟨Ψ, hΨne, hΨmem, hΨH, -⟩ :=
+    liebRepulsive_transport_to_sector N q (p - q) T hT_symm U hvne hJr0 hsqE h3E hHE hNE
       (by rw [hqcast, hJrp]; linarith) (by rw [hqcast, hJrp]; ring)
   obtain ⟨φ, hGS⟩ := hfam q hq1 hq2
-  have hEre : E.re = Er := by rw [← hEr]; simp
+  have hEre : E.re = Er := by rw [hEr]; simp
   rw [hEre]
   refine hGS.2.2.2.1.2 Er ⟨Ψ, hΨmem, hΨne, ?_⟩
   rw [hΨH, hEr]
