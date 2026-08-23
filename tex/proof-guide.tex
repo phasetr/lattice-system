@@ -7816,6 +7816,53 @@ rather than staged a third time. \textbf{Debt (new).} This PR's own capstone
 \texttt{liebRepulsive\_symmetric\_halfFilling\_conditional} is at reference~0,
 staged for PR-15's axiom discharge. Axiom-free.
 
+\emph{Degenerate-sublattice reduction, the $N=0$ block, and the all-$A$
+symmetric/uniform assembly (Issue~\#5320, PR~\#5345 PR-15b).} Two generic
+layer items open a new file
+\texttt{Math/MatrixAnalysis/PiDiagonalEigenspace.lean}:
+\texttt{mem\_eigenspace\_diagonal\_mulVecLin\_iff} (a vector lies in the
+$L$-eigenspace of $(\mathrm{diagonal}\,d).\mathrm{mulVecLin}$ iff it vanishes
+at every coordinate $i$ with $d_i\ne L$) and
+\texttt{finrank\_eigenspace\_diagonal\_mulVecLin} (that eigenspace's
+$\mathrm{finrank}$ is the count of coordinates with $d_i=L$).
+\textbf{Degeneracy reduction:}
+\texttt{liebRepulsive\_hopping\_eq\_zero\_of\_degenerate} shows
+$|A|=0\lor|B|=0$ forces $T=0$;
+\texttt{liebRepulsive\_degenerate\_N\_eq\_zero} then forces $N=0$ via the
+vanishing hopping's edgeless support graph and
+\texttt{SimpleGraph.preconnected\_bot\_iff\_subsingleton};
+\texttt{liebRepulsive\_degenerate\_sublatticeImbalance\_eq\_one} records
+$\mathrm{sublatticeImbalance}\,A=1$ at $N=0$. \textbf{The $N=0$ block:} with
+$T=0$ the symmetric Hamiltonian reduces to a diagonal matrix, so
+\texttt{liebRepulsive\_groundSubmodule\_N0\_eq\_numberEigenspace} identifies
+the $E_0=-U_0/4$ ground submodule with the singly-occupied ($=1$) eigenspace
+of the total number operator;
+\texttt{liebRepulsive\_singlyOccupied\_card\_eq\_two} counts its two spanning
+configurations; \texttt{liebRepulsive\_symmetric\_halfFilling\_degenerate}
+assembles the four Theorem~10.4 conjuncts at $N=0$ (Casimir $3/4$,
+$\mathrm{finrank}=2$), the Casimir witness on the spin-down basis vector
+routed through PR-14a's \texttt{liebRepulsive\_su2\_weight\_transport} at a
+trivial ($T=0$, $U=0$) companion Hamiltonian. \textbf{All-$A$ assembly:}
+\texttt{liebRepulsive\_symmetric\_halfFilling} combines PR-14b's
+\texttt{liebRepulsive\_symmetric\_halfFilling\_conditional} ($1\le|A|$,
+$1\le|B|$) with the degenerate block above into the four Theorem~10.4
+conjuncts for \texttt{symmetricRepulsiveHubbardHamiltonian}, for
+\emph{every} bipartition $A$;
+\texttt{liebRepulsive\_uniform\_of\_symmetric} transports that all-$A$
+symmetric-form statement at a constant $U$ to the uniform-interaction
+Hamiltonian \texttt{repulsiveHubbardHamiltonian}, via
+\texttt{symmetricRepulsiveHubbardHamiltonian\_groundSubmodule\_eq\_uniform}
+(\texttt{LiebRepulsiveBalancedGround.lean:363}, an energy shift).
+\textbf{Debt (new, both reference~0 within this PR, staged for PR-15c's
+capstone):} \texttt{liebRepulsive\_symmetric\_halfFilling} and
+\texttt{liebRepulsive\_uniform\_of\_symmetric} are not yet consumed; PR-15c
+must assemble the uniform-Hamiltonian conclusion into
+\texttt{theorem\_10\_4\_lieb\_repulsive\_half\_filling}'s exact statement and
+move it out of \texttt{LiebRepulsive.lean}. \textbf{Incidental:}
+\texttt{LiebRepulsiveShibaKinetic.lean}'s \texttt{diagonal\_mulVec\_basisVec}
+is made non-\texttt{private} in this PR to avoid duplicating it in the new
+file. Axiom-free.
+
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
 eqs.~(10.2.7)/(10.2.8)/(10.2.13); \emph{proved axiom-free on the general spin-$z$
