@@ -20,12 +20,12 @@ of a `hubbardOnSiteInteractionSite`, so the attractive family's proofs do not cl
 Expanded
 against a site-dependent `U`, it decomposes into three separately `SU(2)`-invariant summands:
 `hubbardOnSiteInteractionSite N U − Σ_x (U_x/2) • n̂_x + ((Σ_x U_x)/4) • 1`
-(`symmetricRepulsiveHubbardInteraction_eq_uniform_sub_siteNumber`). The middle summand's
-invariance reuses the per-site-number commutators of the t-J layer, which already cover all three
-generators: `totalSpinPlus_commute_fermionSiteNumber` (`TJSpinSymmetryRaising.lean`),
-`totalSpinZ_commute_fermionSiteNumber` (`TJSpinSymmetry.lean`) and
-`fermionTotalNumber_commute_fermionSiteNumber` (`TJNumberCommute.lean`); no new commutator is
-needed here.
+(`symmetricRepulsiveHubbardInteraction_eq_uniform_sub_siteNumber`). For `Ŝ⁺`, the middle
+summand's invariance reuses the existing per-site-number commutator
+`totalSpinPlus_commute_fermionSiteNumber` (`TJSpinSymmetryRaising.lean`); no new commutator is
+needed there. For `N̂↑`/`N̂↓`, the per-site-number commutators (`hsite` at lines 152 and 170
+below) are new, proved inline from `fermionMultiNumber_commute`; `Ŝ³` and `N̂` are then free
+corollaries of the `N̂↑`/`N̂↓` results.
 
 This file also supplies the `Ne = 2·nUp` sector-arithmetic bridge that PR-12b's per-`s`
 instantiation needs to match PR-11c's `liebHalfFillingSpinZVal`, and resolves the
@@ -131,8 +131,8 @@ theorem fermionTotalSpinPlus_commute_symmetricRepulsiveHubbardHamiltonian
 Clone of
 `fermionTotalSpinMinus_commute_attractiveHubbardHamiltonian`
 (`LiebAttractiveSU2Invariance.lean:81`); the conjugate-transpose step must spell
-`Matrix.conjTranspose` explicitly (the postfix `ᴴ` fails to parse inside
-`namespace LatticeSystem.Quantum`). -/
+`Matrix.conjTranspose` explicitly since `congrArg` needs an explicit function argument
+(the postfix `ᴴ` notation is not itself a function it can take). -/
 theorem fermionTotalSpinMinus_commute_symmetricRepulsiveHubbardHamiltonian
     (N : ℕ) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (hT : ∀ i j, T i j = T j i)
     (U : Fin (N + 1) → ℝ) :

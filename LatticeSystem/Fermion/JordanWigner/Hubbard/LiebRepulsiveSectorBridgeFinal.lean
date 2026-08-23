@@ -165,18 +165,20 @@ theorem repulsiveSpinZSector_ground_unique_on_numberSpinZSector (N Ne : ℕ)
 /-! ## Capstone: remaining obligations before Theorem 10.4's discharge -/
 
 /-- **Capstone (PR-11c).** Assuming the SU(2) commute/Hermiticity adapters for the symmetric
-repulsive Hubbard Hamiltonian — `Commute` with `N̂`, `Ŝ³`, `Ŝ²`, and `IsHermitian` — which are
-**not yet formalized** for this Hamiltonian family (they exist only for `hubbardHamiltonian` and
-`attractiveHubbardHamiltonian`; scheduled as PR-12 work), the repulsive model's unique ground state
-on the joint number/spin-`z` sector occupies a unique, strictly-minimal occupied Casimir sector
-(PR-3's
-`exists_unique_casimir_sector_strict_min`, fed by this file's restriction bridge
-`repulsiveSpinZSector_ground_unique_on_numberSpinZSector`).
+repulsive Hubbard Hamiltonian — `Commute` with `N̂`, `Ŝ³`, `Ŝ²`, and `IsHermitian` — the
+repulsive model's unique ground state on the joint number/spin-`z` sector occupies a unique,
+strictly-minimal occupied Casimir sector (PR-3's `exists_unique_casimir_sector_strict_min`, fed by
+this file's restriction bridge `repulsiveSpinZSector_ground_unique_on_numberSpinZSector`). PR-12a
+(`LiebRepulsiveSU2Invariance.lean`) has since supplied these adapters and packages the
+unconditional corollary `liebRepulsive_exists_unique_casimir_sector_unconditional`; this theorem
+keeps them as explicit hypotheses so the adapter-discharge step stays separable from the sector
+bridge.
 
 This capstone pins down **exactly** what remains before `theorem_10_4_lieb_repulsive_half_filling`
 (`LiebRepulsive.lean:134`) can be discharged, beyond what this arc has already proved:
 
-1. The SU(2) commute/Hermiticity adapters taken as hypotheses here (PR-12).
+1. The SU(2) commute/Hermiticity adapters taken as hypotheses here — supplied by PR-12a
+   (`LiebRepulsiveSU2Invariance.lean`).
 2. Identifying the occupied Casimir eigenvalue `c` with `liebRepulsiveSpinCasimir A` — via the
    homotopy continuity of PR-4 (`casimirSelector_eq_const_of_locally_unique_strict_min`) and
    PR-11b's Lemma 10.1 application (`tasaki_lemma_10_1_liebRepulsive_apply`) transported along

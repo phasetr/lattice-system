@@ -7443,13 +7443,14 @@ family's SU(2) proofs do not clone verbatim;
 \texttt{symmetricRepulsiveHubbardInteraction\_eq\_uniform\_sub\_siteNumber}
 expands it into three separately SU(2)-invariant summands
 (\texttt{hubbardOnSiteInteractionSite}, a per-site-number term, and a scalar
-multiple of $1$). The middle summand needs no new commutator: the t-J layer's
-per-site-number commutators already cover all three generators
-(\texttt{totalSpinPlus\_commute\_fermionSiteNumber},
-\texttt{TJSpinSymmetryRaising.lean};
-\texttt{totalSpinZ\_commute\_fermionSiteNumber}, \texttt{TJSpinSymmetry.lean};
-\texttt{fermionTotalNumber\_commute\_fermionSiteNumber},
-\texttt{TJNumberCommute.lean}), so this file imports and reuses them.
+multiple of $1$). For $\hat S^+$, the middle summand's invariance reuses the
+existing per-site-number commutator
+\texttt{totalSpinPlus\_commute\_fermionSiteNumber}
+(\texttt{TJSpinSymmetryRaising.lean}); no new commutator is needed there. For
+$\hat N_\uparrow$/$\hat N_\downarrow$, the per-site-number commutators are new,
+proved inline from \texttt{fermionMultiNumber\_commute}; $\hat S^3$ and
+$\hat N$ are then free corollaries of the $\hat N_\uparrow$/$\hat N_\downarrow$
+results.
 \texttt{symmetricRepulsiveHubbardHamiltonian\_isHermitian} establishes
 Hermiticity (kinetic part via \texttt{hubbardKinetic\_isHermitian},
 interaction part via the manifestly real diagonal
@@ -7466,12 +7467,15 @@ all four discharged adapters into PR-11c's
 \texttt{liebRepulsive\_exists\_unique\_casimir\_sector}, yielding the same
 unique-strictly-minimal-occupied-Casimir-sector conclusion
 \textbf{unconditionally} (no SU(2)/Hermiticity hypotheses left), closing
-PR-11c's reference-0 debt on that capstone. \textbf{Debt (new).} One
-declaration introduced by this PR is at reference~0 --- the sector-arithmetic
+PR-11c's reference-0 debt on that capstone. \textbf{Debt (new).} Two
+declarations introduced by this PR are at reference~0: the sector-arithmetic
 bridge \texttt{liebHalfFillingSpinZVal\_eq\_of\_two\_mul}, staged for PR-12b
 consumption (its per-$s$ instantiation matches PR-11c's
 \texttt{liebHalfFillingSpinZVal N nUp} against the $N_e$-indexed statement of
-Theorem~10.4). \textbf{Also deletes}
+Theorem~10.4); and this PR's own final capstone
+\texttt{liebRepulsive\_exists\_unique\_casimir\_sector\_unconditional}, which
+stays at reference~0, staged for the arc's remaining assembly (PR-13/PR-14).
+\textbf{Also deletes}
 \texttt{configSectorCompress\_eq\_submatrix}
 (\texttt{HubbardImpossibilityLowUVariationalCore.lean}), a decorative
 reference-0 declaration staged unconsumed through PR-11a $\to$ PR-11b $\to$
