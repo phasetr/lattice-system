@@ -7209,6 +7209,60 @@ arc's remaining assembly (PR-11/PR-12). PR-9a's $\hat H_{\mathrm{eff}}$
 corollary and PR-10a's \texttt{coordinateSpan} capstones remain unconsumed,
 still staged for later assembly PRs. Axiom-free.
 
+\emph{Generic ground-state transport layer and the sector-assembly capstone
+(Issue~\#5320, PR~\#5335 PR-11a).} Assembles PR-9a's Fermion--Spin bridge,
+PR-9b's Casimir bridge, PR-10a's coordinate-block transport, and PR-10b's
+Theorem~2.3 instance into a single pure iff between the fermionic effective
+Hamiltonian and the superexchange Heisenberg matrix. Generic layer
+(\texttt{Math/MatrixAnalysis/SubmatrixGroundState.lean}) supplies further
+model-independent facts about \texttt{IsUniqueGroundStateOn} beyond PR-10a's
+\texttt{BlockTransport.lean}: \texttt{isUniqueGroundStateOn\_reindex\_iff}
+transports it along an index \texttt{Equiv};
+\texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff} transports it along a real
+constant shift of the Hamiltonian;
+\texttt{isUniqueGroundStateOn\_of\_finrank\_eigenspace\_le\_one} promotes an
+eigenspace $\mathrm{finrank}\le 1$ bound plus eigenvalue-minimality to a
+genuine unique-ground-state witness (staged for the not-yet-written existence
+step, PR-11b onward); plus the eigenspace analogue of
+\texttt{matrixKernel\_diagonal\_eq\_coordinateSpan}
+(\texttt{eigenspace\_diagonal\_eq\_coordinateSpan}), the block-diagonality of
+the second-order effective Hamiltonian under the kernel projection
+(\texttt{secondOrderEffectiveHamiltonian\_eq\_kernelProjectionMatrix\_conj}),
+and the downward-restriction lemma \texttt{IsUniqueGroundStateOn.mono} along a
+submodule inclusion. Model-specific layer:
+\texttt{matrixKernel\_liebPerturbationH0Compressed\_eq\_coordinateSpan}
+(\texttt{LiebRepulsivePerturbationSetup.lean}) identifies $\ker(\hat
+H_0|_K)$ with the coordinate span of the hard-core sector predicate
+\texttt{liebHalfFillingHardcorePred}, the sector-level analogue PR-9a's block
+transport needs; the new file \texttt{LiebRepulsiveSectorAssembly.lean}
+supplies the hard-core/ambient sector \texttt{Equiv}
+\texttt{liebHardCoreAmbientSubtypeEquiv} (bijecting the hard-core half-filled
+configuration sector with the hard-core-predicate subtype of the ambient
+half-filled sector, both round trips \texttt{rfl}) and its Fock-level
+compatibility lemma \texttt{liebHardCoreAmbientSubtypeEquiv\_val} with PR-9a's
+\texttt{liebHardCoreToAmbientSector}. \textbf{Capstone}
+\texttt{isUniqueGroundStateOn\_liebPerturbationH0Compressed\_kernel\_iff\_heisenberg}:
+a pure iff, with no Theorem~2.3 input --- for a candidate $\Phi\in\ker(\hat
+H_0|_K)$, $\hat H_{\mathrm{eff}}$ has a unique ground state on $\ker(\hat
+H_0|_K)$ at energy $E$ and candidate $\Phi$ iff the (constant-shifted, shift
+$|A|(N+1-|A|)$) antiferromagnetic Heisenberg matrix on the
+magnetization-$(N+1-n_\uparrow)$ sector has a unique ground state on the whole
+space at the same energy and the correspondingly reindexed candidate. Chains
+\texttt{BlockTransport.lean}'s
+\texttt{isUniqueGroundStateOn\_coordinateSpan\_iff\_submatrix} with
+\texttt{SubmatrixGroundState.lean}'s \texttt{isUniqueGroundStateOn\_reindex\_iff}
+along the composite \texttt{Equiv} between \texttt{magConfigS} and the
+hard-core-predicate subtype; the composite cancels PR-9a's own
+\texttt{liebHardCoreHalfFillingSectorEquivS}/\texttt{.symm} round trip via
+\texttt{liebHardCoreAmbientSubtypeEquiv\_val}, so the target Heisenberg matrix
+carries no residual submatrix. The candidate's kernel-membership hypothesis is
+essential (without it a nonzero out-of-block component destroys the
+left-hand side while leaving the right-hand side, which only sees
+\texttt{coordinateRestrict}, intact). \textbf{This closes the arc's assembly
+infrastructure}: the Theorem~2.3 instance (PR-10b) and the ground-state
+existence witness remain to be supplied by PR-11b, which alone will produce
+the fully discharged Theorem~10.4 statement. Axiom-free.
+
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
 eqs.~(10.2.7)/(10.2.8)/(10.2.13); \emph{proved axiom-free on the general spin-$z$
