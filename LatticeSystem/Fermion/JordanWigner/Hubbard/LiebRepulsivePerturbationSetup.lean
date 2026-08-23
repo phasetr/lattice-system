@@ -38,10 +38,17 @@ endpoint `s = 1` and the pieces of the Lemma 10.1 contract that are concrete for
   is genuinely a sector statement: on the whole Fock space it is false, because a hard-core
   configuration with an empty site can absorb a hopping electron and stay hard-core.
 
-The constant-energy-shift lemma this setup will need (normalising the hard-core ground energy to
-`0` before comparing with `Ĥeff`) is `LatticeSystem.Math.minEnergyOn_add_const_smul_one`
-(`Math/MatrixAnalysis/MinEnergyOnSubspace.lean`), added alongside PR-2's `minEnergyOn` API and so
-far unconsumed.
+The energy-origin normalisation this setup needs (comparing the hard-core ground energy with that
+of `Ĥeff` only up to an additive constant) is carried out by the arc's assembly at the level of
+`IsUniqueGroundStateOn`, not of `minEnergyOn`: PR-11a's capstone
+`isUniqueGroundStateOn_liebPerturbationH0Compressed_kernel_iff_heisenberg`
+(`LiebRepulsiveSectorAssembly.lean`) states the Heisenberg side with the shift
+`−|A| (N + 1 − |A|) • 1` already folded into the matrix, and the generic transport of a real
+constant shift across that predicate is `LatticeSystem.Math.isUniqueGroundStateOn_sub_smul_one_iff`
+(`Math/MatrixAnalysis/SubmatrixGroundState.lean`), itself unconsumed and staged for PR-11b. The
+`minEnergyOn` form of the same normalisation, `LatticeSystem.Math.minEnergyOn_add_const_smul_one`
+(`Math/MatrixAnalysis/MinEnergyOnSubspace.lean`), was added alongside PR-2's `minEnergyOn` API,
+was not taken up by that route, and remains unconsumed.
 
 Of the whole-Fock-space layer the compressed statements *in this file* consume only the
 diagonality of `Ĥ₀` (`liebPerturbationH0_mulVec_basisVec`, transported to the sector basis by
@@ -63,10 +70,12 @@ settled API: on the whole Fock space the kernel criterion `mem_matrixKernel_lieb
 with the hard-core projection identity that consumes it, and the whole-space `IsReducedInverse`
 statement for `Ĥ₀Inv` (the definition itself is consumed downstream, the statement is not); on the
 sector `Ĥ₀|_K ≥ 0` (which is the sole consumer of the whole-space `Ĥ₀ ≥ 0`), the
-Hermiticity of `V̂|_K`, and the `P̂₀ V̂ P̂₀ = 0` capstone itself; and, outside this file,
-`LatticeSystem.Math.minEnergyOn_add_const_smul_one`. All of them are staged for the application
-of Lemma 10.1 and the assembly of the arc (PR-11 to PR-13); whatever that assembly does not
-consume is to be deleted, not kept.
+Hermiticity of `V̂|_K`, and the `P̂₀ V̂ P̂₀ = 0` capstone itself. All of them are staged for the
+application of Lemma 10.1 and the assembly of the arc (PR-11 to PR-13); whatever that assembly
+does not consume is to be deleted, not kept. Outside this file,
+`LatticeSystem.Math.minEnergyOn_add_const_smul_one` was staged the same way, but the assembly's
+first installment (PR-11a) took the `IsUniqueGroundStateOn` route above instead of consuming it,
+so it is to be deleted unless a later PR of the arc takes it up.
 
 The helpers `liebHalfFilling_site_occupation`, `liebEndpointHopping_diag_eq_zero`,
 `liebPerturbationH0Compressed_eq_diagonal` and `hubbardConfigInteractionWeight_one_star` are public
