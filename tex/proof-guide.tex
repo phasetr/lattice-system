@@ -6746,10 +6746,11 @@ itself a numbered Tasaki statement; axiom-free. \textbf{PR-13b extends} the
 conclusion of \texttt{exists\_unique\_casimir\_sector\_strict\_min} with the
 membership witness $\varphi\in K_c$ (needed by the selector-uniqueness
 argument across several couplings, \texttt{LiebRepulsiveCasimirPinning.lean});
-the single existing consumer
-(\texttt{liebRepulsive\_exists\_unique\_casimir\_sector},
-\texttt{LiebRepulsiveSectorBridgeFinal.lean}) discards the new component via
-\texttt{-}.
+of the three consumers,
+\texttt{liebRepulsive\_exists\_unique\_casimir\_sector}
+(\texttt{LiebRepulsiveSectorBridgeFinal.lean}) discards the new component via
+\texttt{-}, while \texttt{LiebRepulsiveCasimirPinning.lean} and
+\texttt{LiebRepulsiveMultipletCompanion.lean} both use the membership witness.
 
 The eigenspace-invariance step behind Proposition~1 — a matrix $A$ commuting
 with $B$ maps every $B$-eigenspace into itself — has a single home in
