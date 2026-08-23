@@ -7264,12 +7264,18 @@ essential (without it a nonzero out-of-block component destroys the
 left-hand side while leaving the right-hand side, which only sees
 \texttt{coordinateRestrict}, intact). \textbf{This advances the arc's assembly
 infrastructure} (PR-11b/PR-11c remain): the Theorem~2.3 instance (PR-10b) and
-the ground-state existence witness remain to be supplied by PR-11b, which alone
-will produce the fully discharged Theorem~10.4 statement; the three-way sector
-bridge between \texttt{configSector}, \texttt{numberSpinZSectorEuclidean}, and
-\texttt{spinZSectorEuclidean} is separate out-of-scope work left for PR-11c.
-\textbf{Debt (new).} Five declarations introduced by this PR are at
-reference~0: \texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff} and
+the ground-state existence witness remain to be supplied by PR-11b; PR-11b is
+limited to producing the existence witness and applying Lemma~10.1, and axiom
+removal itself is PR-14's responsibility --- the site-dependent-$U$ homotopy
+(PR-12/PR-12a) and full assembly (PR-13, expected to split into
+PR-13a/PR-13b) also remain before Theorem~10.4 is discharged (Issue~\#5320);
+the three-way sector bridge between \texttt{configSector},
+\texttt{numberSpinZSectorEuclidean}, and \texttt{spinZSectorEuclidean} is
+separate out-of-scope work left for PR-11c.
+\textbf{Debt (new).} Six declarations introduced by this PR are at
+reference~0: the capstone itself,
+\texttt{isUniqueGroundStateOn\_liebPerturbationH0Compressed\_kernel\_iff\_heisenberg}
+(staged for PR-11b's consumption), \texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff} and
 \texttt{eigenspace\_diagonal\_eq\_coordinateSpan} (staged for PR-11b's
 existence-witness step), \texttt{IsUniqueGroundStateOn.mono} (staged for
 PR-11b/PR-11c's submodule transport),
@@ -7277,7 +7283,11 @@ PR-11b/PR-11c's submodule transport),
 not-yet-written existence step, PR-11b onward, as noted above), and
 \texttt{HubbardImpossibilityLowUVariationalCore.lean}'s
 \texttt{configSectorCompress\_eq\_submatrix} (this PR's Hubbard-side sector
-kernel bridge), likewise staged for PR-11b/PR-11c consumption. Axiom-free.
+kernel bridge), likewise staged for PR-11b/PR-11c consumption. Also
+non-private'd
+\texttt{hubbardConfigInteractionWeight\_one\_eq\_zero\_of\_singlyOccupied}
+(\texttt{LiebRepulsiveFermionSpinBridge.lean}, PR-9a) to reuse it across the
+module boundary instead of duplicating it. Axiom-free.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
