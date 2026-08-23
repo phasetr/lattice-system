@@ -1,5 +1,4 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveFermionSpinBridge
-import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveFullSectorUnique
 import LatticeSystem.Quantum.SpinS.TotalSquared
 
 /-!
@@ -7,13 +6,21 @@ import LatticeSystem.Quantum.SpinS.TotalSquared
 
 Eleventh installment of the Theorem 10.4 discharge arc (issue #5320); second of the two-PR 9a/9b
 split of "PR-9: Fermion-Spin bridge". This file supplies the ladder-vs-Cartesian Casimir bridge
-that PR-9a's module docstring flagged as separate work: `fermionTotalSpinSquared`
-(`SaturatedFerromagnetism.lean`, the ladder form `Ŝ⁻Ŝ⁺ + Ŝ_z(Ŝ_z + 1)`) and
-`totalSpinSSquared` (`Quantum/SpinS/TotalSquaredCore.lean`, the Cartesian form
-`(Ŝ¹)² + (Ŝ²)² + (Ŝ³)²`) are equal as operators but not definitionally, and the fermionic
-side lives on the whole Fock space while the spin-`1/2` side lives on the magnetization
-sector reached via PR-9a's sector `Equiv`
-(`liebHardCoreHalfFillingSectorEquivS`, `LiebRepulsiveFermionSpinBridge.lean`).
+that PR-9a's module docstring flagged as separate work. The fermionic Casimir
+`fermionTotalSpinSquared` (the ladder form `Ŝ⁻Ŝ⁺ + Ŝ_z(Ŝ_z + 1)`) predates this arc: it comes from
+the §11.1.1 saturated-ferromagnetism layer (`SaturatedFerromagnetism.lean`), and acts on the whole
+Hubbard Fock space `Fin (2 * N + 2) → Fin 2`. The spin-`1/2` Cartesian Casimir `totalSpinSSquared`
+(`Quantum/SpinS/TotalSquaredCore.lean`, `(Ŝ¹)² + (Ŝ²)² + (Ŝ³)²`) acts on spin configurations
+`Fin (N + 1) → Fin 2`. The two are therefore **not** operators on a common space, and no identity
+between them as operators is even well-typed.
+
+What is proved here is an **entrywise** correspondence on the hard-core half-filled sector: every
+matrix entry of the fermionic Casimir between two hard-core configurations equals the matrix entry
+of the Cartesian Casimir between their images under PR-9a's sector `Equiv`
+(`liebHardCoreHalfFillingSectorEquivS`, `LiebRepulsiveFermionSpinBridge.lean`). The restriction to
+that sector is essential and not a convenience: off it the fermionic Casimir also sees empty and
+doubly occupied sites, whose same-site dot vanishes instead of contributing the spin-`1/2` value
+`3/4`.
 
 ## Route
 
@@ -59,14 +66,6 @@ open Matrix LatticeSystem.Quantum
 variable {N : ℕ}
 
 /-! ## The fermionic Casimir as a double sum of two-site dots -/
-
-/-- `Ŝ³_tot = Σ_x Ŝ³_x`: the diagonal total spin is the sum of the per-site spin-z operators,
-by linearity of `N̂_↑ − N̂_↓` over sites. -/
-theorem fermionTotalSpinZ_eq_sum_fermionSiteSpinZ (N : ℕ) :
-    fermionTotalSpinZ N = ∑ x : Fin (N + 1), fermionSiteSpinZ N x := by
-  rw [fermionTotalSpinZ, fermionTotalUpNumber, fermionTotalDownNumber,
-    ← Finset.sum_sub_distrib, Finset.smul_sum]
-  rfl
 
 /-- **The fermionic Casimir expansion** `(Ŝ_tot)² = Σ_{x,y} Ŝ_x · Ŝ_y`, the fermionic mirror of
 `totalSpinSSquared_eq_sum_spinSDot`. The ladder definition
