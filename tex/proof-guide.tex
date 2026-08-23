@@ -6919,12 +6919,13 @@ arc) was refactored in this PR to derive from it. \emph{Debt.}
 \textbf{discharged}: PR-8b consumes it via
 \texttt{configSectorCompress\_mul\_of\_preserves} to identify the compressed
 product $\hat V|_K\hat V|_K$ with the compression of $\hat V\hat V$. Still
-staged and unconsumed: \texttt{liebPerturbationH0Compressed\_isReducedInverse},
-\texttt{configSector\_liebHalfFillingPred\_nonempty} and
-\texttt{homotopyHamiltonian\_one\_compressed\_eq\_perturbedHamiltonian} (for
-the Lemma~10.1 application at the arc assembly, PR-11 to PR-13); each is
-carried as debt, not as settled API, the capstone being the one exception.
-Axiom-free.
+staged and unconsumed: \texttt{liebPerturbationH0Compressed\_isReducedInverse}
+and \texttt{configSector\_liebHalfFillingPred\_nonempty} (for the Lemma~10.1
+application at the arc assembly, PR-11 to PR-13); PR-13a has since consumed
+\texttt{homotopyHamiltonian\_one\_compressed\_eq\_perturbedHamiltonian}
+(\texttt{LiebRepulsiveEndpointIdentification.lean}), closing that debt. Each
+remaining item is carried as debt, not as settled API, the capstone being the
+one exception. Axiom-free.
 
 \emph{Superexchange operator identity (Issue~\#5320, PR~\#5328 PR-7).} A
 direct formalization of Tasaki's eq.~(10.1.9) together with the two auxiliary

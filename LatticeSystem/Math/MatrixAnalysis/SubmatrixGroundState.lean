@@ -229,9 +229,10 @@ theorem isUniqueGroundStateOn_of_finrank_eigenspace_le_one (H : Matrix n n ℂ) 
 /-- **The second-order effective Hamiltonian is block-diagonal on the kernel of `H0`.**
 Writing `Ĥeff = secondOrderEffectiveHamiltonian H0 V H0inv` and `P̂₀ = kernelProjectionMatrix H0`,
 one has `Ĥeff = P̂₀ · Ĥeff · P̂₀`; a direct consequence of idempotence of
-`kernelProjectionMatrix`, supplying the `hblock` hypothesis of
-`isUniqueGroundStateOn_coordinateSpan_iff_submatrix` for `Ĥeff` generically (once `P̂₀` is
-identified with a coordinate-block indicator via `matrixKernel_diagonal_eq_coordinateSpan`). -/
+`kernelProjectionMatrix`, supplying the `hInv` hypothesis of
+`isUniqueGroundStateOn_coordinateSpan_iff_submatrix` for `Ĥeff` generically via
+`blockSupport_apply_eq_zero` (once `P̂₀` is identified with a coordinate-block indicator via
+`matrixKernel_diagonal_eq_coordinateSpan`). -/
 theorem secondOrderEffectiveHamiltonian_eq_kernelProjectionMatrix_conj
     (H0 V H0inv : Matrix n n ℂ) :
     secondOrderEffectiveHamiltonian H0 V H0inv

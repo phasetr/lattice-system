@@ -50,10 +50,11 @@ diagonal form; that statement therefore stays at reference 0 and its deletion de
 `liebPerturbationV_preserves_liebHalfFillingPred` is consumed by
 `LiebRepulsiveSuperexchange.lean` (PR-8b), where the compressed product `V̂|_K · V̂|_K` is
 identified with the compression of `V̂ · V̂`. Nothing yet consumes
-`liebPerturbationH0Compressed_isReducedInverse`, `configSector_liebHalfFillingPred_nonempty` or
-`homotopyHamiltonian_one_compressed_eq_perturbedHamiltonian` (all staged for the Lemma 10.1
-application at the arc assembly, PR-11 to PR-13). Each is carried as debt, not as settled API;
-whatever that assembly does not consume is to be deleted, not kept.
+`liebPerturbationH0Compressed_isReducedInverse` or `configSector_liebHalfFillingPred_nonempty`
+(staged for the Lemma 10.1 application at the arc assembly, PR-11 to PR-13); PR-13a has since
+consumed `homotopyHamiltonian_one_compressed_eq_perturbedHamiltonian`
+(`LiebRepulsiveEndpointIdentification.lean`), closing that debt. Each remaining item is carried
+as debt, not as settled API; whatever that assembly does not consume is to be deleted, not kept.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §10.1 (Lemma 10.1, eq. (10.1.20)) and §10.2.2 (eq. (10.1.7), p. 344; p. 353).
