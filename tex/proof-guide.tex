@@ -7083,6 +7083,36 @@ decoration) are the file's two reference-0 declarations; the raw capstone
 \texttt{kernelProjection\_mul\_liebPerturbationVCompressed\_sq\_mul\_kernelProjection\_reindex\_eq}
 is consumed inside the file by that corollary.
 
+\emph{Fermion--Spin bridge, second half (Issue~\#5320, PR~\#5332 PR-9b).} The
+second of the two-PR 9a/9b split of PR-9, completing the \textbf{Fermion--Spin
+bridge arc}. PR-9a's fermionic Casimir \texttt{fermionTotalSpinSquared} (ladder
+form $\hat S^-_{\mathrm{tot}}\hat S^+_{\mathrm{tot}}+\hat S^3_{\mathrm{tot}}(\hat
+S^3_{\mathrm{tot}}+1)$) and the spin-$1/2$ Cartesian Casimir
+\texttt{totalSpinSSquared} ($(\hat S^1)^2+(\hat S^2)^2+(\hat S^3)^2$) are equal
+as operators but not definitionally, and this PR bridges the two by expanding
+both as the \emph{same} double sum of two-site dots $\sum_{x,y}\hat S_x\cdot\hat
+S_y$ (\texttt{fermionTotalSpinSquared\_eq\_sum\_fermionSpinDot} via the SU(2)
+ladder commutator, matching the pre-existing spin-side expansion
+\texttt{totalSpinSSquared\_eq\_sum\_spinSDot}). The off-diagonal terms reuse
+PR-9a's crux \texttt{fermionSpinDot\_apply\_eq\_spinSDot\_of\_singlyOccupied}
+verbatim; the new same-site diagonal term is computed in closed form,
+$\hat S_x\cdot\hat S_x=\tfrac34(\hat n_{x\uparrow}+\hat n_{x\downarrow}-2\hat
+n_{x\uparrow}\hat n_{x\downarrow})$ (\texttt{fermionSpinDot\_self\_eq}, from the
+CAR $\hat c\hat c^\dagger=1-\hat n$ and idempotence $\hat n^2=\hat n$), which
+collapses to the scalar $3/4$ on a hard-core configuration, matching the
+spin-$1/2$ value $S(S+1)=3/4$. The \textbf{crux}
+\texttt{fermionTotalSpinSquared\_apply\_eq\_totalSpinSSquared\_of\_singlyOccupied}
+is the entrywise identity on hard-core half-filled bra/ket Fock
+configurations; the \textbf{capstone}
+\texttt{fermionTotalSpinSquared\_reindex\_eq\_totalSpinSSquaredOnMagSector}
+packages it into the \texttt{submatrix}-along-the-sector-\texttt{Equiv} form
+matching PR-9a's capstone shape, reindexing onto \texttt{totalSpinSSquared} on
+the magnetization sector --- the shape needed to transport the Theorem-2.3
+Casimir eigenvalue back to the fermionic ground states in the PR-11/PR-12
+assembly. \textbf{This closes the Fermion--Spin bridge arc} (PR-9a sector
+\texttt{Equiv} + Hamiltonian reindexing, PR-9b ladder$\leftrightarrow$Cartesian
+Casimir bridge).
+
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
 eqs.~(10.2.7)/(10.2.8)/(10.2.13); \emph{proved axiom-free on the general spin-$z$
