@@ -36,7 +36,19 @@ the `L`-eigenspace of `(Matrix.diagonal d).mulVecLin` iff it vanishes at every c
 theorem mem_eigenspace_diagonal_mulVecLin_iff (d : n → ℂ) (L : ℂ) (v : n → ℂ) :
     v ∈ Module.End.eigenspace (Matrix.diagonal d).mulVecLin L ↔
       ∀ i, d i ≠ L → v i = 0 := by
-  sorry
+  rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply, funext_iff]
+  constructor
+  · intro h i hi
+    have hcoord : (d i - L) * v i = 0 := by
+      have := h i
+      rw [Matrix.mulVec_diagonal, Pi.smul_apply, smul_eq_mul] at this
+      linear_combination this
+    exact (mul_eq_zero.mp hcoord).resolve_left (sub_ne_zero.mpr hi)
+  · intro h i
+    rw [Matrix.mulVec_diagonal, Pi.smul_apply, smul_eq_mul]
+    by_cases hi : d i = L
+    · rw [hi]
+    · rw [h i hi, mul_zero, mul_zero]
 
 /-- **`finrank` of a diagonal matrix's eigenspace.** The `L`-eigenspace of
 `(Matrix.diagonal d).mulVecLin` has dimension equal to the number of coordinates `i` with
@@ -44,6 +56,32 @@ theorem mem_eigenspace_diagonal_mulVecLin_iff (d : n → ℂ) (L : ℂ) (v : n �
 theorem finrank_eigenspace_diagonal_mulVecLin (d : n → ℂ) (L : ℂ) :
     Module.finrank ℂ (Module.End.eigenspace (Matrix.diagonal d).mulVecLin L)
       = Nat.card {i // d i = L} := by
-  sorry
+  have hker : Module.End.eigenspace (Matrix.diagonal d).mulVecLin L
+      = LinearMap.ker (Matrix.diagonal (fun i => d i - L)).mulVecLin := by
+    ext v
+    rw [mem_eigenspace_diagonal_mulVecLin_iff, LinearMap.mem_ker, Matrix.mulVecLin_apply,
+      funext_iff]
+    constructor
+    · intro h i
+      rw [Matrix.mulVec_diagonal, Pi.zero_apply]
+      by_cases hi : d i = L
+      · rw [hi, sub_self, zero_mul]
+      · rw [h i hi, mul_zero]
+    · intro h i hi
+      have := h i
+      rw [Matrix.mulVec_diagonal, Pi.zero_apply] at this
+      exact (mul_eq_zero.mp this).resolve_left (sub_ne_zero.mpr hi)
+  have hrange : Module.finrank ℂ
+      (LinearMap.range (Matrix.diagonal (fun i => d i - L)).mulVecLin)
+      = Fintype.card {i // d i - L ≠ 0} := Matrix.rank_diagonal _
+  have hcompl : Fintype.card {i // d i - L ≠ 0} = Fintype.card {i // ¬ d i = L} :=
+    Fintype.card_congr (Equiv.subtypeEquivRight fun _ => sub_ne_zero)
+  have hrn := LinearMap.finrank_range_add_finrank_ker
+    (Matrix.diagonal (fun i => d i - L)).mulVecLin
+  rw [Module.finrank_fintype_fun_eq_card, hrange, hcompl,
+    Fintype.card_subtype_compl (fun i => d i = L)] at hrn
+  have hle : Fintype.card {i // d i = L} ≤ Fintype.card n := Fintype.card_subtype_le _
+  rw [hker, Nat.card_eq_fintype_card]
+  omega
 
 end LatticeSystem.Math
