@@ -6814,6 +6814,14 @@ being a scalar by definition. The second disjunct of
 remains unreduced, and the arc's final assembly of Theorem~10.4 (PR-12/PR-13)
 must either discharge it or restrict the theorem's hypothesis accordingly.
 This file starts from a uniform model, and what is deformed here is $U\to1$.
+\textbf{Update (PR-14b).} The arc's actual capstone route bypasses this
+reduction entirely: \texttt{liebRepulsive\_symmetric\_halfFilling\_conditional}
+(\texttt{LiebRepulsiveWeightConfinement.lean}) proves the Theorem~10.4
+conclusion directly for a general site-dependent $U:\mathrm{Fin}(N{+}1)\to
+\mathbb{R}$ symmetric Hamiltonian (only $\forall x,\,0<U_x$ is assumed), so the
+$U_x\to U$ reduction sketched above is never needed by the arc; it remains an
+observation about the book's own stated deformation argument, not a blocking
+gap for the arc's discharge (PR-15).
 \emph{Provenance.} Tasaki's endpoint keeps the original bond set --- ``We do not
 modify $t_{x,y}$ which is zero to begin with'' (p.~353) --- whereas
 \texttt{liebEndpointHopping} carries $\operatorname{sign}(t_{x,y})\,\lambda$ on
@@ -7292,7 +7300,8 @@ left-hand side while leaving the right-hand side, which only sees
 infrastructure} (PR-11b/PR-11c remain): the Theorem~2.3 instance (PR-10b) and
 the ground-state existence witness remain to be supplied by PR-11b; PR-11b is
 limited to producing the existence witness and applying Lemma~10.1, and axiom
-removal itself is PR-14's responsibility --- the site-dependent-$U$ homotopy
+removal itself is PR-15's responsibility (the arc's final assembly step later
+split into PR-14a/PR-14b) --- the site-dependent-$U$ homotopy
 (PR-12b) and full assembly (PR-13, expected to split into
 PR-13a/PR-13b) also remain before Theorem~10.4 is discharged (Issue~\#5320);
 the three-way sector bridge between \texttt{configSector},
@@ -7400,11 +7409,15 @@ than staged a fourth time (see the PR-12a paragraph below). This PR's own
 final capstone
 \texttt{tasaki\_lemma\_10\_1\_liebRepulsive\_apply} stays at reference~0,
 staged for the arc's remaining assembly (PR-12/PR-13); axiom removal itself
-is PR-14's responsibility. \textbf{PR-13b has since consumed}
+is PR-15's responsibility (the arc's final assembly step later split into
+PR-14a/PR-14b). \textbf{PR-13b has since consumed}
 \texttt{tasaki\_lemma\_10\_1\_liebRepulsive\_apply} (in both the
 $\lambda$-family transport capstone
 \texttt{symmetricHomotopyHamiltonian\_one\_isUniqueGroundStateOn} and the
-Casimir-pinning capstone), closing that debt. Axiom-free.
+Casimir-pinning capstone), closing that debt
+(\texttt{symmetricHomotopyHamiltonian\_one\_isUniqueGroundStateOn} was itself
+later \textbf{deleted in PR-14b} as an unconsumed reference-0 declaration ---
+see the updated PR-13b/PR-14a paragraphs below). Axiom-free.
 
 \emph{The three-way sector bridge, and the PR-3 debt discharge (Issue~\#5320,
 PR~\#5337 PR-11c).} Connects the three distinct descriptions of the
@@ -7682,8 +7695,12 @@ in
 \texttt{liebRepulsive\_admissibleSector\_groundState\_casimir\_eigenvector},
 \texttt{LiebRepulsiveMultipletCompanion.lean}), closing that debt.
 Capstone~1
-(\texttt{symmetricHomotopyHamiltonian\_one\_isUniqueGroundStateOn}) remains
-at reference~0, still staged for a later assembly step. Axiom-free.
+(\texttt{symmetricHomotopyHamiltonian\_one\_isUniqueGroundStateOn}) remained
+at reference~0 through PR-14a; \textbf{PR-14b deleted it} (third staging
+round with no consumer; the weight-confinement route to
+\texttt{liebRepulsive\_symmetric\_halfFilling\_conditional} does not need
+it --- see the updated PR-14a paragraph and the new PR-14b paragraph below).
+Axiom-free.
 
 \emph{SU(2) weight transport and the sector energy ladder (Issue~\#5320,
 PR~\#5342 PR-14a).} The first half of the arc's final assembly step (the
@@ -7747,7 +7764,52 @@ PR-13b's Capstone~2
 (\texttt{liebRepulsive\_admissibleSector\_groundState\_casimir\_eigenvector}
 reaches its unique-ground-state premise via
 \texttt{repulsiveSpinZSector\_ground\_unique\_on\_numberSpinZSector} instead)
-and remains at reference~0, staged for a later assembly step. Axiom-free.
+and remained at reference~0 through this PR; it was \textbf{deleted in
+PR-14b} (see the new PR-14b paragraph below) rather than staged a third
+time. Axiom-free.
+
+\emph{Weight confinement, the \texttt{finrank} count, and the arc's
+symmetric-disjunct conditional capstone (Issue~\#5320, PR~\#5343 PR-14b).}
+The second half of the arc's final assembly step (axiom discharge itself
+remains PR-15's responsibility).
+\texttt{liebRepulsive\_groundSubmodule\_le\_comap\_of\_commute} factors the
+invariance-under-a-commuting-charge step out of PR-14a's
+\texttt{liebRepulsive\_groundEnergy\_le\_of\_electronNumber} for reuse on
+$\hat S^3$ weight blocks.
+\texttt{liebRepulsive\_exists\_jointEigenvector\_of\_ne\_bot} generalizes
+that PR's seed-extraction step from the whole $(N{+}1)$-electron ground
+submodule $G$ to any $\hat S^2$/$\hat S^3$-invariant submodule $B\le G$, so
+\textbf{weight confinement}
+(\texttt{liebRepulsive\_groundSubmodule\_spinZ\_weight\_admissible}) can run
+it at $B=G\sqcap\mathrm{eigenspace}\,\hat S^3\,\mu$: an occupied weight
+block sits at an admissible weight \texttt{liebHalfFillingSpinZVal}~$N\,q$,
+$c_B\le q\le c_A$, by comparing the block's joint-eigenvector spin label
+against $S_0=(c_A-c_B)/2$ via $c_0=S_0(S_0+1)$.
+\texttt{liebRepulsive\_mem\_groundSubmodule\_inf\_spinZ\_iff} and
+\texttt{liebRepulsive\_groundSubmodule\_eq\_iSup\_inf\_eigenspace} supply the
+Pi/Euclidean packaging and the $\hat S^3$-weight decomposition
+$G=\bigsqcup_\mu G\sqcap\mathrm{eigenspace}\,\hat S^3\,\mu$ that confinement
+runs on. \texttt{liebRepulsive\_groundSubmodule\_inf\_spinZ\_le\_span} shows
+each admissible block is one-dimensional (spanned by its sector's unique
+ground state); \texttt{liebRepulsive\_finrank\_groundSubmodule\_le}/\texttt{\_ge}
+combine confinement with this one-dimensionality (upper bound) and with the
+linear independence of distinct-$\hat S^3$-weight eigenvectors (lower bound,
+via a new private \texttt{linearIndependent\_of\_fermionTotalSpinZ\_eigenvectors}),
+to pin $\mathrm{finrank}\,G=c_A-c_B+1$.
+\texttt{liebRepulsive\_groundSubmodule\_le\_spinSquared\_eigenspace} and
+\texttt{liebRepulsive\_groundSubmodule\_ne\_bot} supply conjuncts~(iii)
+and~(i). \textbf{Capstone}
+\texttt{liebRepulsive\_symmetric\_halfFilling\_conditional}: assembles all
+of the above with PR-14a's \texttt{liebRepulsive\_multipletCompanion\_capstone}
+into \texttt{theorem\_10\_4\_lieb\_repulsive\_half\_filling}'s conclusion
+verbatim for $H=$ \texttt{symmetricRepulsiveHubbardHamiltonian}~$N\,T\,U$
+under $1\le|A|$, $1\le|B|$ --- a genuine conditional theorem, not itself a
+replacement of the axiom. \textbf{Debt discharged.} Also deletes PR-13b's
+Capstone~1 \texttt{symmetricHomotopyHamiltonian\_one\_isUniqueGroundStateOn}
+(see the updated PR-13b/PR-14a paragraphs above): it remained at
+reference~0 through PR-14a, and this PR's route to weight confinement does
+not need it, so it is removed as a decorative reference-0 declaration
+rather than staged a third time. Axiom-free.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
