@@ -109,8 +109,8 @@ abbrev liebHardCoreHalfFillingPred (N nUp : ℕ) : (Fin (2 * N + 2) → Fin 2) �
 /-- A hard-core configuration carries no doubly occupied site, so it lies in `ker Ĥ₀`: the
 interaction weight of `Ĥ₀` vanishes on it. This is the converse of
 `liebHalfFilling_site_occupation` and is what lets the hard-core projection `P̂₀` act as the
-identity on the sub-sector. Public (de-privatized PR-11a): consumed outside this file by the
-PR-11a hard-core/ambient sector `Equiv` (`LiebRepulsiveSectorAssembly.lean`). -/
+identity on the sub-sector. Consumed outside this file by the hard-core/ambient sector `Equiv`
+(`LiebRepulsiveSectorAssembly.lean`). -/
 theorem hubbardConfigInteractionWeight_one_eq_zero_of_singlyOccupied {N : ℕ}
     {c : Fin (2 * N + 2) → Fin 2}
     (hc : ∀ z : Fin (N + 1), (c (spinfulIndex N z 0)).val + (c (spinfulIndex N z 1)).val = 1) :

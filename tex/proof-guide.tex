@@ -7214,10 +7214,10 @@ consumed by PR-11a (see the PR-11a entry below); this file's own capstone
 remains unconsumed. Axiom-free.
 
 \emph{Generic ground-state transport layer and the sector-assembly capstone
-(Issue~\#5320, PR~\#5335 PR-11a).} Assembles PR-9a's Fermion--Spin bridge,
-PR-9b's Casimir bridge, PR-10a's coordinate-block transport, and PR-10b's
-Theorem~2.3 instance into a single pure iff between the fermionic effective
-Hamiltonian and the superexchange Heisenberg matrix. Generic layer
+(Issue~\#5320, PR~\#5335 PR-11a).} Assembles PR-9a's Fermion--Spin bridge and
+PR-10a's coordinate-block transport into a single pure iff between the
+fermionic effective Hamiltonian and the superexchange Heisenberg matrix.
+Generic layer
 (\texttt{Math/MatrixAnalysis/SubmatrixGroundState.lean}) supplies further
 model-independent facts about \texttt{IsUniqueGroundStateOn} beyond PR-10a's
 \texttt{BlockTransport.lean}: \texttt{isUniqueGroundStateOn\_reindex\_iff}
@@ -7268,17 +7268,16 @@ the ground-state existence witness remain to be supplied by PR-11b, which alone
 will produce the fully discharged Theorem~10.4 statement; the three-way sector
 bridge between \texttt{configSector}, \texttt{numberSpinZSectorEuclidean}, and
 \texttt{spinZSectorEuclidean} is separate out-of-scope work left for PR-11c.
-\textbf{Debt (new).} Four generic-layer declarations are at reference~0:
-\texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff} and
+\textbf{Debt (new).} Five declarations introduced by this PR are at
+reference~0: \texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff} and
 \texttt{eigenspace\_diagonal\_eq\_coordinateSpan} (staged for PR-11b's
 existence-witness step), \texttt{IsUniqueGroundStateOn.mono} (staged for
-PR-11b/PR-11c's submodule transport), and
+PR-11b/PR-11c's submodule transport),
 \texttt{isUniqueGroundStateOn\_of\_finrank\_eigenspace\_le\_one} (staged for the
-not-yet-written existence step, PR-11b onward, as noted above). A fifth,
-pre-existing reference-0 declaration in a file this arc touches,
+not-yet-written existence step, PR-11b onward, as noted above), and
 \texttt{HubbardImpossibilityLowUVariationalCore.lean}'s
-\texttt{configSectorCompress\_eq\_submatrix}, is likewise staged for PR-11b/PR-11c
-consumption. Axiom-free.
+\texttt{configSectorCompress\_eq\_submatrix} (this PR's Hubbard-side sector
+kernel bridge), likewise staged for PR-11b/PR-11c consumption. Axiom-free.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
