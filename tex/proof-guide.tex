@@ -7073,15 +7073,13 @@ coupling to $(2:\mathbb C)\bullet\mathrm{bipartiteCoupling}$, giving the
 surviving shift $2\kappa=|A|(N+1-|A|)$. This PR \textbf{discharges} PR-8b's
 sole reference-0 debt
 \texttt{secondOrderEffectiveHamiltonian\_liebPerturbation\_eq\_tJExchange}.
-\emph{Debt (new, staged for the arc's assembly, PR-11 onward).} The $\hat H_{\mathrm{eff}}$
-corollary
-\texttt{secondOrderEffectiveHamiltonian\_liebPerturbation\_reindex\_eq\_heisenbergOnMagSector}
-and the convention-guard lemma
-\texttt{liebHardCoreToMagConfigS\_apply\_eq\_zero\_iff\_up\_occupied} (kept
-deliberately at reference~0 as a single visible up/down-convention pin, not
-decoration) are the file's two reference-0 declarations; the raw capstone
+\emph{Debt.} PR-11a has since consumed the $\hat H_{\mathrm{eff}}$ corollary
+\texttt{secondOrderEffectiveHamiltonian\_liebPerturbation\_reindex\_eq\_heisenbergOnMagSector},
+closing that debt; the raw capstone
 \texttt{kernelProjection\_mul\_liebPerturbationVCompressed\_sq\_mul\_kernelProjection\_reindex\_eq}
-is consumed inside the file by that corollary.
+is consumed inside the file by that corollary. The convention-guard lemma
+\texttt{liebHardCoreToMagConfigS\_apply\_eq\_zero\_iff\_up\_occupied} remains at reference~0
+deliberately, as a single visible up/down-convention pin, not decoration.
 
 \emph{Fermion--Spin bridge, second half (Issue~\#5320, PR~\#5332 PR-9b).} The
 second of the two-PR 9a/9b split of PR-9, completing the \textbf{Fermion--Spin
@@ -7126,7 +7124,8 @@ the file's \emph{only} reference-0 declaration; the crux is consumed by the
 capstone, \texttt{fermionSpinDot\_self\_eq} by the crux's diagonal step, and the
 expansion \texttt{fermionTotalSpinSquared\_eq\_sum\_fermionSpinDot} by the crux
 --- no feeder lemma is left unconsumed. PR-9a's debt is unchanged by this PR:
-its $\hat H_{\mathrm{eff}}$ corollary remains staged for the arc's assembly (PR-11 onward).
+its $\hat H_{\mathrm{eff}}$ corollary remained staged until PR-11a consumed it (see the PR-11a
+entry below).
 
 \emph{Coordinate-block ground-state transport (Issue~\#5320, PR~\#5333
 PR-10a).} Generic infrastructure, not itself a formalization of a numbered
@@ -7153,8 +7152,12 @@ diagonal matrix is the coordinate span of its vanishing locus. This
 generalizes the block-support/kernel-identification pattern already used in
 the arc's degenerate-perturbation layer (e.g.\
 \texttt{kernelProjectionMatrix\_diagonal}) from an ambient-space projection to
-an arbitrary coordinate block. Neither capstone is consumed yet; both are
-staged for the arc's assembly. Axiom-free.
+an arbitrary coordinate block. PR-11a has since consumed both capstones ---
+\texttt{isUniqueGroundStateOn\_coordinateSpan\_iff\_submatrix} directly in
+\texttt{LiebRepulsiveSectorAssembly.lean}, and \texttt{matrixKernel\_diagonal\_eq\_coordinateSpan}
+via \texttt{LiebRepulsivePerturbationSetup.lean}'s
+\texttt{matrixKernel\_liebPerturbationH0Compressed\_eq\_coordinateSpan} --- closing that debt.
+Axiom-free.
 
 \emph{Theorem 2.3 instance and fermionic Casimir transport (Issue~\#5320,
 PR~\#5334 PR-10b).} \texttt{liebOrientedSublattice}~$A$ is the canonically
@@ -7206,8 +7209,85 @@ ground-state property from Theorem~2.3. \textbf{Debt.} One declaration is at
 reference~0: the file's own final capstone
 \texttt{liebRepulsive\_groundState\_casimir\_eq\_predicted}, staged for the
 arc's remaining assembly (PR-11/PR-12). PR-9a's $\hat H_{\mathrm{eff}}$
-corollary and PR-10a's \texttt{coordinateSpan} capstones remain unconsumed,
-still staged for later assembly PRs. Axiom-free.
+corollary and PR-10a's \texttt{coordinateSpan} capstones have since been
+consumed by PR-11a (see the PR-11a entry below); this file's own capstone
+remains unconsumed. Axiom-free.
+
+\emph{Generic ground-state transport layer and the sector-assembly capstone
+(Issue~\#5320, PR~\#5335 PR-11a).} Assembles PR-9a's Fermion--Spin bridge and
+PR-10a's coordinate-block transport into a single pure iff between the
+fermionic effective Hamiltonian and the superexchange Heisenberg matrix.
+Generic layer
+(\texttt{Math/MatrixAnalysis/SubmatrixGroundState.lean}) supplies further
+model-independent facts about \texttt{IsUniqueGroundStateOn} beyond PR-10a's
+\texttt{BlockTransport.lean}: \texttt{isUniqueGroundStateOn\_reindex\_iff}
+transports it along an index \texttt{Equiv};
+\texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff} transports it along a real
+constant shift of the Hamiltonian;
+\texttt{isUniqueGroundStateOn\_of\_finrank\_eigenspace\_le\_one} promotes an
+eigenspace $\mathrm{finrank}\le 1$ bound plus eigenvalue-minimality to a
+genuine unique-ground-state witness (staged for the not-yet-written existence
+step, PR-11b onward); plus the eigenspace analogue of
+\texttt{matrixKernel\_diagonal\_eq\_coordinateSpan}
+(\texttt{eigenspace\_diagonal\_eq\_coordinateSpan}), the block-diagonality of
+the second-order effective Hamiltonian under the kernel projection
+(\texttt{secondOrderEffectiveHamiltonian\_eq\_kernelProjectionMatrix\_conj}),
+and the downward-restriction lemma \texttt{IsUniqueGroundStateOn.mono} along a
+submodule inclusion. Model-specific layer:
+\texttt{matrixKernel\_liebPerturbationH0Compressed\_eq\_coordinateSpan}
+(\texttt{LiebRepulsivePerturbationSetup.lean}) identifies $\ker(\hat
+H_0|_K)$ with the coordinate span of the hard-core sector predicate
+\texttt{liebHalfFillingHardcorePred}, the sector-level analogue PR-9a's block
+transport needs; the new file \texttt{LiebRepulsiveSectorAssembly.lean}
+supplies the hard-core/ambient sector \texttt{Equiv}
+\texttt{liebHardCoreAmbientSubtypeEquiv} (bijecting the hard-core half-filled
+configuration sector with the hard-core-predicate subtype of the ambient
+half-filled sector, both round trips \texttt{rfl}) and its Fock-level
+compatibility lemma \texttt{liebHardCoreAmbientSubtypeEquiv\_val} with PR-9a's
+\texttt{liebHardCoreToAmbientSector}. \textbf{Capstone}
+\texttt{isUniqueGroundStateOn\_liebPerturbationH0Compressed\_kernel\_iff\_heisenberg}:
+a pure iff, with no Theorem~2.3 input --- for a candidate $\Phi\in\ker(\hat
+H_0|_K)$, $\hat H_{\mathrm{eff}}$ has a unique ground state on $\ker(\hat
+H_0|_K)$ at energy $E$ and candidate $\Phi$ iff the (constant-shifted, shift
+$|A|(N+1-|A|)$) antiferromagnetic Heisenberg matrix on the
+magnetization-$(N+1-n_\uparrow)$ sector has a unique ground state on the whole
+space at the same energy and the correspondingly reindexed candidate. Chains
+\texttt{BlockTransport.lean}'s
+\texttt{isUniqueGroundStateOn\_coordinateSpan\_iff\_submatrix} with
+\texttt{SubmatrixGroundState.lean}'s \texttt{isUniqueGroundStateOn\_reindex\_iff}
+along the composite \texttt{Equiv} between \texttt{magConfigS} and the
+hard-core-predicate subtype; the composite cancels PR-9a's own
+\texttt{liebHardCoreHalfFillingSectorEquivS}/\texttt{.symm} round trip via
+\texttt{liebHardCoreAmbientSubtypeEquiv\_val}, so the target Heisenberg matrix
+carries no residual submatrix. The candidate's kernel-membership hypothesis is
+essential (without it a nonzero out-of-block component destroys the
+left-hand side while leaving the right-hand side, which only sees
+\texttt{coordinateRestrict}, intact). \textbf{This advances the arc's assembly
+infrastructure} (PR-11b/PR-11c remain): the Theorem~2.3 instance (PR-10b) and
+the ground-state existence witness remain to be supplied by PR-11b; PR-11b is
+limited to producing the existence witness and applying Lemma~10.1, and axiom
+removal itself is PR-14's responsibility --- the site-dependent-$U$ homotopy
+(PR-12/PR-12a) and full assembly (PR-13, expected to split into
+PR-13a/PR-13b) also remain before Theorem~10.4 is discharged (Issue~\#5320);
+the three-way sector bridge between \texttt{configSector},
+\texttt{numberSpinZSectorEuclidean}, and \texttt{spinZSectorEuclidean} is
+separate out-of-scope work left for PR-11c.
+\textbf{Debt (new).} Six declarations introduced by this PR are at
+reference~0: the capstone itself,
+\texttt{isUniqueGroundStateOn\_liebPerturbationH0Compressed\_kernel\_iff\_heisenberg}
+(staged for PR-11b's consumption), \texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff} and
+\texttt{eigenspace\_diagonal\_eq\_coordinateSpan} (staged for PR-11b's
+existence-witness step), \texttt{IsUniqueGroundStateOn.mono} (staged for
+PR-11b/PR-11c's submodule transport),
+\texttt{isUniqueGroundStateOn\_of\_finrank\_eigenspace\_le\_one} (staged for the
+not-yet-written existence step, PR-11b onward, as noted above), and
+\texttt{HubbardImpossibilityLowUVariationalCore.lean}'s
+\texttt{configSectorCompress\_eq\_submatrix} (this PR's Hubbard-side sector
+kernel bridge), likewise staged for PR-11b/PR-11c consumption. Also
+non-private'd
+\texttt{hubbardConfigInteractionWeight\_one\_eq\_zero\_of\_singlyOccupied}
+(\texttt{LiebRepulsiveFermionSpinBridge.lean}, PR-9a) to reuse it across the
+module boundary instead of duplicating it. Axiom-free.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
