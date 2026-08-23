@@ -32,6 +32,7 @@ This file supplies:
 ## Main results
 
 * `gaugeSign_mul_of_bipartite` — `ε_x ε_y = −1` on a bipartite bond.
+* `diagonal_mulVec_basisVec` — a diagonal matrix scales a basis vector by its diagonal entry.
 * `shibaSignedUnitary_conj_symmetricKinetic` — `Ûᴴ Ĥhop Û = Ĥhop` (eq. (9.3.52)).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
@@ -562,7 +563,7 @@ private theorem shibaPermMatrix_mulVec_basisVec (c : Fin (2 * N + 2) → Fin 2) 
   · rw [if_neg h, if_neg (fun h' => h (by rw [h', shibaConfig_shibaConfig]))]
 
 /-- A diagonal matrix scales a basis vector: `diagonal s ·ᵥ |c⟩ = s c • |c⟩`. -/
-private theorem diagonal_mulVec_basisVec (s : (Fin (2 * N + 2) → Fin 2) → ℂ)
+theorem diagonal_mulVec_basisVec (s : (Fin (2 * N + 2) → Fin 2) → ℂ)
     (c : Fin (2 * N + 2) → Fin 2) :
     (Matrix.diagonal s).mulVec (basisVec c) = s c • basisVec c := by
   funext d
