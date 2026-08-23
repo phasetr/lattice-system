@@ -7156,6 +7156,45 @@ the arc's degenerate-perturbation layer (e.g.\
 an arbitrary coordinate block. Neither capstone is consumed yet; both are
 staged for the arc's assembly. Axiom-free.
 
+\emph{Theorem 2.3 instance and fermionic Casimir transport (Issue~\#5320,
+PR~\#5334 PR-10b).} \texttt{liebOrientedSublattice}~$A$ is the canonically
+oriented sublattice ($A$ itself if $|A^c|\le|A|$ already, else $A^c$), needed
+because Theorem~2.3
+(\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_bipartiteCompletePositive}) is stated
+under the canonical orientation $|\neg A|\le|A|$; the swap leaves both the
+sublattice imbalance and the bipartite coupling unchanged (the latter
+entrywise, since \texttt{bipartiteCoupling} only detects whether two sites lie
+on \emph{different} sublattices). \textbf{Capstone 1}
+\texttt{liebRepulsive\_theorem23\_instance}: for a nondegenerate bipartition
+($1\le|A|$, $1\le|A^c|$; the fully polarised endpoints $A=\emptyset$/full are
+excluded, needing instead the direct fully polarised ground state
+$S_0=(N+1)/2$), the full Marshall--Lieb--Mattis statement
+\texttt{tasaki\_2\_5\_theorem\_2\_3} holds at spin $S=1/2$ ($N_{\mathrm{spin}}=1$)
+for the superexchange coupling $J=(2:\mathbb C)\bullet\mathrm{bipartiteCoupling}\,A'$
+of the oriented sublattice $A'$, at every diagonal shift the caller supplies.
+\textbf{Capstone 2}
+\texttt{liebRepulsiveSpinCasimir\_eq\_tasaki23PredictedCasimirValue}: the
+predicted total-spin Casimir value of Theorem~2.3 at spin $1/2$ on the
+oriented sublattice is $\mathrm{liebRepulsiveSpinCasimir}\,A=S_0(S_0+1)$ at
+$S_0=\bigl||A|-|A^c|\bigr|/2$, Tasaki Theorem~10.4's target total spin.
+\textbf{Capstone 3}
+\texttt{liebRepulsive\_groundState\_casimir\_eq\_predicted}: transports that
+predicted Casimir value onto the fermionic hard-core half-filled sector ---
+for an admissible magnetization sector, a nonzero vector on which the
+fermionic total-spin Casimir \texttt{fermionTotalSpinSquared}~$N$ acts as the
+scalar \texttt{liebRepulsiveSpinCasimir}~$A$, the vector being the
+Marshall-positive ground state of Capstone~1 read on the fermionic side along
+PR-9b's sector bijection
+\texttt{fermionTotalSpinSquared\_reindex\_eq\_totalSpinSSquaredOnMagSector},
+discharging that PR-9b debt. \textbf{Debt.} Two declarations are at
+reference~0: \texttt{liebOrientedSublattice\_bipartiteCoupling\_eq} (the
+one-time orientation adapter, consumed only once inside Capstone~3's assembly)
+and the file's own final capstone
+\texttt{liebRepulsive\_groundState\_casimir\_eq\_predicted}, staged for the
+arc's remaining assembly (PR-11/PR-12). PR-9a's $\hat H_{\mathrm{eff}}$
+corollary and PR-10a's \texttt{coordinateSpan} capstones remain unconsumed,
+still staged for later assembly PRs. Axiom-free.
+
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
 eqs.~(10.2.7)/(10.2.8)/(10.2.13); \emph{proved axiom-free on the general spin-$z$
