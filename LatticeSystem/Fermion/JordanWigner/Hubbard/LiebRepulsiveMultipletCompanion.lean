@@ -1,6 +1,7 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCasimirPinning
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveSU2Invariance
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveFullSectorUnique
+import LatticeSystem.Fermion.JordanWigner.Hubbard.BipartiteSpectrum
 import LatticeSystem.Math.AngularMomentum.Multiplet
 import LatticeSystem.Math.InvariantSubmoduleEigenvector
 import LatticeSystem.Math.CommutingHermitianEigenvector
@@ -205,11 +206,7 @@ theorem liebRepulsive_admissibleSector_groundState_casimir_eigenvector
 /-- A sublattice and its bipartition complement partition the site set: `|S| + |Sᶜ| = N + 1`. -/
 private theorem bipartitionComplement_card_add (N : ℕ) (S : Finset (Fin (N + 1))) :
     S.card + (bipartitionComplement S).card = N + 1 := by
-  classical
-  have hc : bipartitionComplement S = Sᶜ := by
-    ext x
-    simp [bipartitionComplement]
-  rw [hc, Finset.card_add_card_compl, Fintype.card_fin]
+  rw [bipartitionComplement_eq_compl, Finset.card_add_card_compl, Fintype.card_fin]
 
 /-- **Admissibility in up-count form.** Tasaki's Theorem 2.3 admissible-sector condition on the
 down-count `N + 1 − nUp` (`tasaki23GroundStateSectors … 1 = Finset.Icc (min |A'| |A'ᶜ|)
@@ -264,7 +261,7 @@ private theorem liebRepulsive_sector_energy_le (N cA cB nUp₁ nUp₂ : ℕ)
       = (((2 * (nUp₁ : ℝ) - ((N : ℝ) + 1)) / 2 : ℝ) : ℂ) • φ₁ := by
     rw [Module.End.mem_eigenspace_iff.mp hmem₁.2, liebHalfFillingSpinZVal]
     push_cast
-    ring
+    ring_nf
   have hLcast : ((sublatticeImbalance A : ℕ) : ℝ) = (cA : ℝ) - (cB : ℝ) := by
     rw [himb, Nat.cast_sub horient]
   have hS₀ : (0 : ℝ) ≤ (sublatticeImbalance A : ℝ) / 2 := by positivity
@@ -273,7 +270,7 @@ private theorem liebRepulsive_sector_energy_le (N cA cB nUp₁ nUp₂ : ℕ)
         • φ₁ := by
     rw [hcas₁, liebRepulsiveSpinCasimir]
     push_cast
-    ring
+    ring_nf
   have hkcast : ((cA - nUp₂ : ℕ) : ℝ) = (cA : ℝ) - (nUp₂ : ℝ) := Nat.cast_sub hhigh
   have hlow' : (cB : ℝ) ≤ (nUp₂ : ℝ) := by exact_mod_cast hlow
   have hcard' : (cA : ℝ) + (cB : ℝ) = (N : ℝ) + 1 := by exact_mod_cast hcard

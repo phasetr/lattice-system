@@ -7688,19 +7688,14 @@ at reference~0, still staged for a later assembly step. Axiom-free.
 \emph{SU(2) weight transport and the sector energy ladder (Issue~\#5320,
 PR~\#5342 PR-14a).} The first half of the arc's final assembly step (the
 complementary weight confinement + \texttt{finrank} count is PR-14b, and
-the axiom discharge itself is PR-15). Two generic layer items open the
+the axiom discharge itself is PR-15). One generic layer item opens the
 file: \texttt{mulVec\_eq\_smul\_iff\_toEuclideanLin\_toLp\_eq\_smul}
 (\texttt{Math/MatrixAnalysis/PiEuclideanEigenBridge.lean}) crosses, once
 and for all, the boundary between the plain function carrier
 (\texttt{Matrix.mulVec}, used by
 \texttt{hubbardGroundSubmoduleAtElectronNumber}) and the
 $\mathrm{EuclideanSpace}\,\mathbb C\,n$ carrier (\texttt{Matrix.toEuclideanLin},
-used by the arc's sector machinery); \texttt{finrank\_iSup\_le\_sum}
-(\texttt{Math/MatrixAnalysis/FinrankIndexedSup.lean}) generalizes mathlib's
-two-submodule $\mathrm{finrank}(p\sqcup q)\le\mathrm{finrank}\,p+\mathrm{finrank}\,q$
-to a finite indexed supremum by induction, supplying the upper bound
-PR-14b's $\hat S^3$-decomposition step needs; \textbf{at reference~0 in
-this PR, staged for PR-14b's consumption.}
+used by the arc's sector machinery).
 \texttt{symmetricRepulsiveHubbardHamiltonian\_mul\_tJTotalSpinOne}/\texttt{Two}
 extend \texttt{LiebRepulsiveSU2Invariance.lean} (PR-12a) with the
 Cartesian-generator commutators ($\hat H$ commutes with
