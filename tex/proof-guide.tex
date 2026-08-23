@@ -7041,6 +7041,41 @@ capstone. The corollary
 the only one still at reference~0, staged for PR-9 (Fermion--Spin bridge) and
 PR-10 (endpoint Heisenberg Casimir) per the fixed PR order.
 
+\emph{Fermion--Spin bridge, first half (Issue~\#5320, PR~\#5331 PR-9a).} The
+first of the two-PR 9a/9b split of PR-9, bridging the half-filled
+\textbf{hard-core} Fock sector (\texttt{liebHardCoreHalfFillingPred}: single
+occupancy at every site conjoined onto \texttt{liebHalfFillingPred}, since the
+ambient sector alone is not in bijection with a spin-$1/2$ magnetization
+sector) to the magnetization-$(N+1-n_{\uparrow})$ sector \texttt{magConfigS}
+via the sector \texttt{Equiv} \texttt{liebHardCoreHalfFillingSectorEquivS}
+(forward = down-orbital occupation, backward needs $n_{\uparrow}\le N+1$ for
+the truncated-subtraction round-trip). The \texttt{t-J} reuse route
+(\texttt{liebHardCoreSiteState}, \texttt{tJConfigOf\_liebHardCoreSiteState\_eq})
+lets the crux entrywise identity
+\texttt{fermionSpinDot\_apply\_eq\_spinSDot\_of\_singlyOccupied} reuse the
+already-proved sign-free \texttt{t-J} bond action instead of re-deriving
+Jordan--Wigner sign combinatorics. \textbf{Capstones}
+\texttt{kernelProjection\_mul\_liebPerturbationVCompressed\_sq\_mul\_kernelProjection\_reindex\_eq}
+and its \textbf{PR-8b} $\hat H_{\mathrm{eff}}$-corollary reindex
+\texttt{secondOrderEffectiveHamiltonian\_liebPerturbation\_reindex\_eq\_heisenbergOnMagSector}
+land PR-8b's superexchange identity on
+$\mathrm{heisenbergHamiltonianSMatrixOnMagSector}((2:\mathbb C)\bullet
+\mathrm{bipartiteCoupling}(x\mapsto\mathrm{decide}(x\in A)))$ minus the
+constant $|A|(N+1-|A|)$ --- exactly Tasaki's Theorem~2.3 shape (\S2.5, p.~42)
+for PR-10. Two constant corrections were made during the Red$\to$Green cycle
+(same root cause, one per capstone): the Red-stage stub carried the shift as
+$\kappa\bullet 1$ with $\kappa=|A|(N+1-|A|)/2$; the Green proof shows the
+correct shift is $2\kappa=|A|(N+1-|A|)$ with no $/2$, since the
+\texttt{tJExchange}-level constant and the doubled bond coupling
+$(2:\mathbb C)\bullet\mathrm{bipartiteCoupling}$ both pick up the same factor
+$2$. This PR \textbf{discharges} PR-8b's sole reference-0 debt
+\texttt{secondOrderEffectiveHamiltonian\_liebPerturbation\_eq\_tJExchange}.
+\emph{Debt (new, staged for PR-9b/PR-10).} The two capstones and the
+convention-guard lemma
+\texttt{liebHardCoreToMagConfigS\_apply\_eq\_zero\_iff\_up\_occupied} (kept
+deliberately at reference~0 as a single visible up/down-convention pin, not
+decoration) are the file's three reference-0 declarations.
+
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
 eqs.~(10.2.7)/(10.2.8)/(10.2.13); \emph{proved axiom-free on the general spin-$z$
