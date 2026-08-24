@@ -7999,13 +7999,20 @@ the staggered sign product $\varepsilon_x\varepsilon_y$ and summing over the
 double sum preserves commutation.
 Mirrors the spin-$S$ template of §4.1 Theorem~4.4 (eq.~(4.1.12),
 \texttt{Quantum/SpinS/StaggeredCasimirSU2Invariance.lean}). The
-$\hat S^-_{\mathrm{tot}}$ conjunct originally proved here was removed in PR-5:
-no step of the arc consumes it (PR-4's ladder-ratio lemma takes only the
-$\hat S^+_{\mathrm{tot}}$ commutation, PR-5's tower cross terms only the
-$\hat S^3_{\mathrm{tot}}$ one). The $\hat S^3_{\mathrm{tot}}$ conjunct is
-consumed by PR-5's \texttt{liebRepulsive\_tower\_crossTerm\_eq\_zero}; the
-$\hat S^+_{\mathrm{tot}}$ one is consumed at the final assembly into
-the ferrimagnetic bound~(10.2.17), staged for PR-8, so
+$\hat S^-_{\mathrm{tot}}$ conjunct originally proved here was
+\textbf{deleted in PR-5}: no step of the arc consumes it (PR-4's ladder-ratio
+lemma takes only the $\hat S^+_{\mathrm{tot}}$ commutation, PR-5's tower cross
+terms only the $\hat S^3_{\mathrm{tot}}$ one); that deletion also left PR-1's
+\texttt{fermionStaggeredCasimirOp\_isHermitian}, whose only library consumer it
+was, at reference 0 (kept for PR-8, where the realness of
+$\langle v|(\hat O_L)^2|v\rangle$ is the expected consumer). Both surviving
+conjuncts are themselves still at reference 0: PR-5's
+\texttt{liebRepulsive\_tower\_crossTerm\_eq\_zero} takes
+$[O,\hat S^3_{\mathrm{tot}}]=0$ and PR-4's
+\texttt{fermionSpinMinus\_expectationRatioRe\_invariant} takes
+$[O,\hat S^+_{\mathrm{tot}}]=0$ as \emph{hypotheses} on a general observable
+$O$, so the instantiation at $O=(\hat O_L)^2$ is staged for PR-8's final
+assembly into the ferrimagnetic bound~(10.2.17), and
 \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} is still an axiom below.
 
 \medskip
@@ -8046,9 +8053,12 @@ added to the spin-$S$ file: the generic lemma's scalar-action input is the
 pre-existing
 \texttt{totalSpinSOpPlus\_mul\_totalSpinSOpMinus\_mulVec\_eq}. Not yet consumed by
 \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below): the
-fermionic instance supplies the arc's ground-multiplet lowering-tower step,
-staged for PR-5 (weight/Casimir identification) and the final assembly into
-the ferrimagnetic bound~(10.2.17), staged for PR-8.
+fermionic instance supplies the arc's ground-multiplet lowering-tower step.
+PR-5 (the tower basis, below) does \emph{not} consume it --- that PR builds the
+multiplet basis from the weight and Casimir data alone and never forms an
+expectation ratio --- so it remains staged for the arc's remaining transport
+steps (PR-6/PR-7) and the final assembly into the ferrimagnetic
+bound~(10.2.17) at PR-8.
 
 \medskip
 \emph{The ground multiplet is a single $SU(2)$ lowering tower (Issue~\#5347,

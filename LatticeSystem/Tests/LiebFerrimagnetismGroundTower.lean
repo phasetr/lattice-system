@@ -16,15 +16,24 @@ nonvanishing `L4`, tower linear independence `L5`, the ground-submodule span ide
 weight-orthogonal cross-term vanishing `L7`. Mirrors the specification style of
 `Tests/LiebFerrimagnetismLadderRatio.lean` / `Tests/LiebFerrimagnetismSU2Invariance.lean`.
 
-Each pin carries the *weakest* hypothesis set the proof actually consumes: `L3`/`L6` need the
-hopping symmetry `hT` (it is what makes `Ŝ⁻_tot` commute with the Hamiltonian), while `L4`, `L5`
-and `L7` do not need the highest-weight equation `Ŝ⁺_tot w = 0`, and `L7` needs neither the
-ground-submodule data nor a range restriction on the tower indices.
+Each pin records the hypothesis set the corresponding declaration actually takes, so that a later
+edit cannot silently widen it. What the pins fix in particular: `L3`/`L6` need the hopping symmetry
+`hT` (it is what makes `Ŝ⁻_tot` commute with the Hamiltonian), while `L4`, `L5` and `L7` do not
+need the highest-weight equation `Ŝ⁺_tot w = 0`, and `L7` needs neither the ground-submodule data
+nor a range restriction on the tower indices. `L1`, `L4` and `L5` still take Theorem 10.4's Casimir
+conclusion in the submodule-wide form `hcas : ∀ v ∈ G, …` even though each proof uses it at the
+single vector `w` alone; that is the shape Theorem 10.4 exports, not the pointwise-weakest
+hypothesis.
+
+The closing section instantiates the design's degenerate cases: the balanced bipartition
+`L = sublatticeImbalance A = 0` (single-member tower) and the one-site model `N = 0`, `A = univ`
+(`L = 1`, a spin-`1/2` doublet), which fix the `Fin (L + 1)` indexing and the `finrank` arithmetic
+against `liebRepulsiveGroundMultiplicity`.
 -/
 
 namespace LatticeSystem.Tests.LiebFerrimagnetismGroundTower
 
-open Matrix LatticeSystem.Fermion LatticeSystem.Quantum
+open Matrix Module LatticeSystem.Fermion LatticeSystem.Quantum
 
 /-! ## `L0` — general `Ŝ³`-weight band from an arbitrary Casimir eigenvalue -/
 
@@ -184,5 +193,127 @@ example (N : ℕ) (A : Finset (Fin (N + 1)))
     star (((fermionTotalSpinMinus N) ^ j).mulVec w) ⬝ᵥ
         (O.mulVec (((fermionTotalSpinMinus N) ^ k).mulVec w)) = 0 :=
   liebRepulsive_tower_crossTerm_eq_zero N A (hz := hz) (O := O) (hO := hO) (hjk := hjk)
+
+/-! ## Degenerate instantiations: the `L = 0` tower and the one-site `N = 0` doublet -/
+
+/-- **`L = 0` arithmetic.** The balanced bipartition `A = {0}` of `Fin 2` (`|A| = |B| = 1`) has
+`sublatticeImbalance A = 0` and `liebRepulsiveGroundMultiplicity A = 1`, so the tower index type
+`Fin (L + 1)` is `Fin 1` and the top weight `L/2` is `0`. -/
+example : sublatticeImbalance ({0} : Finset (Fin (1 + 1))) = 0 ∧
+    liebRepulsiveGroundMultiplicity ({0} : Finset (Fin (1 + 1))) = 1 := by
+  have hcard := bipartitionComplement_card_add 1 ({0} : Finset (Fin (1 + 1)))
+  have hA : ({0} : Finset (Fin (1 + 1))).card = 1 := by simp
+  refine ⟨?_, ?_⟩
+  · rw [sublatticeImbalance]
+    omega
+  · rw [liebRepulsiveGroundMultiplicity, sublatticeImbalance]
+    omega
+
+/-- **`L4`/`L6` at `L = 0`.** On the balanced bipartition the top-weight equation reads
+`Ŝ³_tot w = 0`, the nonvanishing range `k ≤ L` collapses to `k = 0` (so `(Ŝ⁻_tot)^0 = 1` must be
+the tower's first member), and the span identity collapses to `G = ℂ ∙ w`: the ground multiplet is
+the single vector `w`. -/
+example (T : Matrix (Fin (1 + 1)) (Fin (1 + 1)) ℝ) (hT : ∀ i j, T i j = T j i)
+    (U : Fin (1 + 1) → ℝ) (E₀ : ℂ)
+    (hcas : ∀ v ∈ hubbardGroundSubmoduleAtElectronNumber
+        (symmetricRepulsiveHubbardHamiltonian 1 T U) E₀ (1 + 1),
+      (fermionTotalSpinSquared 1).mulVec v =
+        liebRepulsiveSpinCasimir ({0} : Finset (Fin (1 + 1))) • v)
+    (hrank : Module.finrank ℂ (hubbardGroundSubmoduleAtElectronNumber
+        (symmetricRepulsiveHubbardHamiltonian 1 T U) E₀ (1 + 1))
+      = liebRepulsiveGroundMultiplicity ({0} : Finset (Fin (1 + 1))))
+    {w : (Fin (2 * 1 + 2) → Fin 2) → ℂ} (hw0 : w ≠ 0)
+    (hwG : w ∈ hubbardGroundSubmoduleAtElectronNumber
+      (symmetricRepulsiveHubbardHamiltonian 1 T U) E₀ (1 + 1))
+    (hz : (fermionTotalSpinZ 1).mulVec w = 0) :
+    (∀ k : ℕ, k ≤ 0 → ((fermionTotalSpinMinus 1) ^ k).mulVec w ≠ 0) ∧
+      hubbardGroundSubmoduleAtElectronNumber
+          (symmetricRepulsiveHubbardHamiltonian 1 T U) E₀ (1 + 1)
+        = Submodule.span ℂ {w} := by
+  have hcard := bipartitionComplement_card_add 1 ({0} : Finset (Fin (1 + 1)))
+  have hA : ({0} : Finset (Fin (1 + 1))).card = 1 := by simp
+  have himb : sublatticeImbalance ({0} : Finset (Fin (1 + 1))) = 0 := by
+    rw [sublatticeImbalance]
+    omega
+  have hz' : (fermionTotalSpinZ 1).mulVec w
+      = ((sublatticeImbalance ({0} : Finset (Fin (1 + 1))) : ℂ) / 2) • w := by
+    rw [himb]
+    simpa using hz
+  refine ⟨fun k hk => liebRepulsive_ground_tower_ne_zero 1 _ T U E₀ hcas hw0 hwG hz' k (by omega),
+    ?_⟩
+  rw [liebRepulsive_ground_eq_span_tower 1 _ T hT U E₀ hcas hrank hw0 hwG hz']
+  congr 1
+  rw [himb]
+  ext x
+  constructor
+  · rintro ⟨k, rfl⟩
+    simp
+  · rintro rfl
+    exact ⟨0, by simp⟩
+
+/-- **`L7` at `L = 0`.** With the top weight `0` the two lowest tower slots `j = 0`, `k = 1` carry
+the distinct weights `0` and `−1`, so the cross term `⟨w, O (Ŝ⁻_tot w)⟩` of any `Ŝ³_tot`-commuting
+observable vanishes — the `(Ŝ⁻_tot)^0 = 1` slot of `L7` in concrete form. -/
+example (O : ManyBodyOp (Fin (2 * 1 + 2))) (hO : Commute O (fermionTotalSpinZ 1))
+    {w : (Fin (2 * 1 + 2) → Fin 2) → ℂ}
+    (hz : (fermionTotalSpinZ 1).mulVec w = 0) :
+    star w ⬝ᵥ O.mulVec ((fermionTotalSpinMinus 1).mulVec w) = 0 := by
+  have hcard := bipartitionComplement_card_add 1 ({0} : Finset (Fin (1 + 1)))
+  have hA : ({0} : Finset (Fin (1 + 1))).card = 1 := by simp
+  have himb : sublatticeImbalance ({0} : Finset (Fin (1 + 1))) = 0 := by
+    rw [sublatticeImbalance]
+    omega
+  have hz' : (fermionTotalSpinZ 1).mulVec w
+      = ((sublatticeImbalance ({0} : Finset (Fin (1 + 1))) : ℂ) / 2) • w := by
+    rw [himb]
+    simpa using hz
+  simpa using
+    liebRepulsive_tower_crossTerm_eq_zero 1 ({0} : Finset (Fin (1 + 1))) (hz := hz') (O := O)
+      (hO := hO) (j := 0) (k := 1) (hjk := by omega)
+
+/-- **`N = 0`, `A = univ` arithmetic.** The one-site model (`|A| = 1`, `|B| = 0`) has
+`sublatticeImbalance A = 1` and `liebRepulsiveGroundMultiplicity A = 2`: the spin-`1/2` doublet. -/
+example : sublatticeImbalance (Finset.univ : Finset (Fin (0 + 1))) = 1 ∧
+    liebRepulsiveGroundMultiplicity (Finset.univ : Finset (Fin (0 + 1))) = 2 := by
+  have hcard := bipartitionComplement_card_add 0 (Finset.univ : Finset (Fin (0 + 1)))
+  have hA : (Finset.univ : Finset (Fin (0 + 1))).card = 1 := by simp
+  refine ⟨?_, ?_⟩
+  · rw [sublatticeImbalance]
+    omega
+  · rw [liebRepulsiveGroundMultiplicity, sublatticeImbalance]
+    omega
+
+/-- **`L5`/`L6` `finrank` arithmetic at `N = 0`, `A = univ`.** The two-member tower of the
+top-weight vector `w` (weight `1/2`) spans the ground submodule, so Theorem 10.4's count
+`finrank G = liebRepulsiveGroundMultiplicity A` evaluates to the concrete `finrank G = 2` — the
+`Fin (L + 1)` cardinality and `liebRepulsiveGroundMultiplicity` agree at `L = 1`. -/
+example (T : Matrix (Fin (0 + 1)) (Fin (0 + 1)) ℝ) (hT : ∀ i j, T i j = T j i)
+    (U : Fin (0 + 1) → ℝ) (E₀ : ℂ)
+    (hcas : ∀ v ∈ hubbardGroundSubmoduleAtElectronNumber
+        (symmetricRepulsiveHubbardHamiltonian 0 T U) E₀ (0 + 1),
+      (fermionTotalSpinSquared 0).mulVec v =
+        liebRepulsiveSpinCasimir (Finset.univ : Finset (Fin (0 + 1))) • v)
+    (hrank : Module.finrank ℂ (hubbardGroundSubmoduleAtElectronNumber
+        (symmetricRepulsiveHubbardHamiltonian 0 T U) E₀ (0 + 1))
+      = liebRepulsiveGroundMultiplicity (Finset.univ : Finset (Fin (0 + 1))))
+    {w : (Fin (2 * 0 + 2) → Fin 2) → ℂ} (hw0 : w ≠ 0)
+    (hwG : w ∈ hubbardGroundSubmoduleAtElectronNumber
+      (symmetricRepulsiveHubbardHamiltonian 0 T U) E₀ (0 + 1))
+    (hz : (fermionTotalSpinZ 0).mulVec w = ((1 : ℂ) / 2) • w) :
+    Module.finrank ℂ (hubbardGroundSubmoduleAtElectronNumber
+      (symmetricRepulsiveHubbardHamiltonian 0 T U) E₀ (0 + 1)) = 2 := by
+  have hcard := bipartitionComplement_card_add 0 (Finset.univ : Finset (Fin (0 + 1)))
+  have hA : (Finset.univ : Finset (Fin (0 + 1))).card = 1 := by simp
+  have himb : sublatticeImbalance (Finset.univ : Finset (Fin (0 + 1))) = 1 := by
+    rw [sublatticeImbalance]
+    omega
+  have hz' : (fermionTotalSpinZ 0).mulVec w
+      = ((sublatticeImbalance (Finset.univ : Finset (Fin (0 + 1))) : ℂ) / 2) • w := by
+    rw [himb]
+    simpa using hz
+  rw [liebRepulsive_ground_eq_span_tower 0 _ T hT U E₀ hcas hrank hw0 hwG hz',
+    finrank_span_eq_card
+      (liebRepulsive_ground_tower_linearIndependent 0 _ T U E₀ hcas hw0 hwG hz'),
+    Fintype.card_fin, himb]
 
 end LatticeSystem.Tests.LiebFerrimagnetismGroundTower
