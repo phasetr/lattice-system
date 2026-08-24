@@ -1,7 +1,11 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebShenQiuShibaBridge
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveFullSectorUnique
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveBalancedGround
+import LatticeSystem.Math.MatrixAnalysis.UnitaryGroundTransport
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebShenQiuShibaTransport
 
 /-!
-# Test coverage for the Theorem 10.8 Shiba Hamiltonian bridge (PR-1)
+# Test coverage for the Theorem 10.8 Shiba Hamiltonian bridge (PR-1) and spin-transport (PR-2)
 
 Pins the API contract of the constant-shift identity and the Shiba conjugation bridge of
 `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebShenQiuShibaBridge.lean` (PR-1 of the
@@ -18,17 +22,38 @@ four public `euclideanExpectation` helpers of `LiebAttractive.lean`:
    `_conjTranspose_mul_self`), public and sitting next to `euclideanExpectation` itself, so that
    the later Theorem 10.8 layers reuse them instead of re-deriving them.
 
+Also pins the API contract of PR-2 (`Ŝ³φ = 0` extraction + Shiba transport,
+`.self-local/docs/theorem-10-8-pr2-design.md` §2), TDD Red:
+
+4. **G1** `LatticeSystem.Math.IsUniqueGroundStateOn.conj_unitary` — the generic unitary-conjugation
+   ground-state transport (new file `Math/MatrixAnalysis/UnitaryGroundTransport.lean`), pinning
+   the full two-sided hypothesis list (`hUUc`/`hconj`/`hfwd`/`hbwd`), the fragile part per
+   design §4 R1/R2.
+5. **S1** `fermionTotalSpinZ_mulVec_eq_zero_of_fermionTotalSpinSquared_mulVec_eq_zero` — the
+   spin-algebra extraction (`LiebAttractiveFullSectorUnique.lean`, design §2.2), plus a sanity
+   instance at `N = 0`, `f = 0`.
+6. **T1** `shibaTransport_uniqueGroundStateOn_spinZSector` — the plain-attractive face of the
+   Hubbard transport (`LiebRepulsiveBalancedGround.lean`, design §2.3), energy slot `E − (∑ U)/4`.
+7. **T2** `shibaTransport_uniqueGroundStateOn_spinZSector_symmetricAttractive` — the
+   symmetric-attractive face (new file `LiebShenQiuShibaTransport.lean`, design §2.4), energy slot
+   exactly `E`, obtained by instantiating the shared transport
+   `shibaTransport_uniqueGroundStateOn_spinZSector_of_conj` at the residual-free bridge **B2**.
+8. **INV** a statement-invariance pin for `repulsiveSpinZSector_ground_unique` (design §1.1): the
+   full existential type, discharged by the theorem name, so that a future refactor (PR-2's
+   corollary form) cannot silently reorder/add conjuncts without breaking the three positional
+   call sites at `LiebRepulsiveCorrelation.lean:144`, `LiebFerrimagnetismCenteredSector.lean:266`,
+   `LiebRepulsiveSectorBridgeFinal.lean:159`.
+
 Each `example` fails to elaborate unless the corresponding declaration exists, is public, and has
 exactly this signature.
 
-**Not covered here**: the electron-number/spin-`z` sector transport (`shibaTransport_...`, PR-2)
-and the `Ŝ³ φ = 0` extraction (PR-2); the `k₀ → k` tower generalization (PR-3); the pair/ladder
-algebra and signed-sum inequality (PR-4); and the capstone assembly (PR-5).
+**Not covered here**: the `k₀ → k` tower generalization (PR-3); the pair/ladder algebra and
+signed-sum inequality (PR-4); and the capstone assembly (PR-5).
 -/
 
 namespace LatticeSystem.Tests.LiebShenQiuShibaBridge
 
-open LatticeSystem.Fermion LatticeSystem.Quantum Matrix
+open LatticeSystem.Fermion LatticeSystem.Quantum LatticeSystem.Math Matrix
 open scoped BigOperators
 
 variable {N : ℕ}
@@ -80,5 +105,90 @@ example (M : ManyBodyOp (Fin (2 * N + 2))) (φ : EuclideanSpace ℂ (Fin (2 * N 
     euclideanExpectation (Matrix.conjTranspose M * M) φ
       = ((∑ j, Complex.normSq ((M.mulVec φ.ofLp) j) : ℝ) : ℂ) :=
   euclideanExpectation_conjTranspose_mul_self M φ
+
+/-- Pins **G1**, the generic unitary-conjugation ground-state transport (design §2.1), at
+abstract carrier `n`. Fails to elaborate unless `IsUniqueGroundStateOn.conj_unitary` exists with
+exactly this two-sided-membership hypothesis list, and with the single unitarity hypothesis
+`U Uᴴ = 1` (its companion `Uᴴ U = 1` being derivable on a square matrix). -/
+example {n : Type*} [Fintype n] [DecidableEq n]
+    {K K' : Submodule ℂ (EuclideanSpace ℂ n)}
+    {Ugen H H' : Matrix n n ℂ} {E : ℝ} {φ : EuclideanSpace ℂ n}
+    (hUUc : Ugen * Matrix.conjTranspose Ugen = 1)
+    (hconj : Matrix.conjTranspose Ugen * H' * Ugen = H)
+    (hfwd : ∀ v ∈ K, Matrix.toEuclideanLin Ugen v ∈ K')
+    (hbwd : ∀ v ∈ K', Matrix.toEuclideanLin (Matrix.conjTranspose Ugen) v ∈ K)
+    (hGS : LatticeSystem.Math.IsUniqueGroundStateOn K H E φ) :
+    LatticeSystem.Math.IsUniqueGroundStateOn K' H' E (Matrix.toEuclideanLin Ugen φ) :=
+  LatticeSystem.Math.IsUniqueGroundStateOn.conj_unitary hUUc hconj hfwd hbwd hGS
+
+/-- Pins **S1**, the spin-algebra extraction: a null vector of the fermionic Casimir `Ŝ²` is a
+null vector of `Ŝ³` (design §2.2, Tasaki Lemma A.11 route). -/
+example {f : (Fin (2 * N + 2) → Fin 2) → ℂ}
+    (h : (fermionTotalSpinSquared N).mulVec f = 0) :
+    (fermionTotalSpinZ N).mulVec f = 0 :=
+  fermionTotalSpinZ_mulVec_eq_zero_of_fermionTotalSpinSquared_mulVec_eq_zero N h
+
+/-- Sanity instance of **S1** at `N = 0`, `f = 0`: forces the `Fin (2 * 0 + 2)` instance path to
+elaborate (design §5 item 3). -/
+example : (fermionTotalSpinZ 0).mulVec (0 : (Fin (2 * 0 + 2) → Fin 2) → ℂ) = 0 :=
+  fermionTotalSpinZ_mulVec_eq_zero_of_fermionTotalSpinSquared_mulVec_eq_zero 0
+    (by rw [Matrix.mulVec_zero])
+
+/-- Pins **T1**, the plain-attractive Shiba transport of `IsUniqueGroundStateOn` from the
+`N̂ = Ne` electron-number sector to the `Ŝ³ = m` spin-`z` sector (design §2.3), energy slot
+`E − (∑ x, U x) / 4`. -/
+example (N Ne : ℕ) {A : Finset (Fin (N + 1))} {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ}
+    (hT_symm : ∀ x y, T x y = T y x) (hbip : HoppingRespectsBipartition A T)
+    (U : Fin (N + 1) → ℝ) {E : ℝ} {φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)}
+    (hGS : IsUniqueGroundStateOn (electronNumberSectorEuclidean N Ne)
+      (attractiveHubbardHamiltonian N (T + Matrix.diagonal (fun x => U x / 2)) U) E φ)
+    (hsinglet : Matrix.toEuclideanLin (fermionTotalSpinSquared N) φ = 0) :
+    ∃ ψ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2),
+      ψ.ofLp = (shibaSignedUnitary N (shibaSignFn A)).mulVec φ.ofLp ∧
+      IsUniqueGroundStateOn (spinZSectorEuclidean N (((Ne : ℂ) - ((N : ℂ) + 1)) / 2))
+        (symmetricRepulsiveHubbardHamiltonian N T U)
+        (E - (∑ x : Fin (N + 1), U x) / 4) ψ ∧
+      Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1)) ψ = ((N : ℂ) + 1) • ψ :=
+  shibaTransport_uniqueGroundStateOn_spinZSector N Ne hT_symm hbip U hGS hsinglet
+
+/-- Pins **T2**, the symmetric-attractive-facing corollary (design §2.4): the same transport
+starting from `symmetricAttractiveHubbardHamiltonian`, with energy slot **exactly** `E` (the
+`¼ΣU` shifts on both sides cancel). -/
+example (N Ne : ℕ) {A : Finset (Fin (N + 1))} {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ}
+    (hT_symm : ∀ x y, T x y = T y x) (hbip : HoppingRespectsBipartition A T)
+    (U : Fin (N + 1) → ℝ) {E : ℝ} {φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)}
+    (hGS : IsUniqueGroundStateOn (electronNumberSectorEuclidean N Ne)
+      (symmetricAttractiveHubbardHamiltonian N T U) E φ)
+    (hsinglet : Matrix.toEuclideanLin (fermionTotalSpinSquared N) φ = 0) :
+    ∃ ψ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2),
+      ψ.ofLp = (shibaSignedUnitary N (shibaSignFn A)).mulVec φ.ofLp ∧
+      IsUniqueGroundStateOn (spinZSectorEuclidean N (((Ne : ℂ) - ((N : ℂ) + 1)) / 2))
+        (symmetricRepulsiveHubbardHamiltonian N T U) E ψ ∧
+      Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1)) ψ = ((N : ℂ) + 1) • ψ :=
+  shibaTransport_uniqueGroundStateOn_spinZSector_symmetricAttractive N Ne hT_symm hbip U hGS
+    hsinglet
+
+/-- **INV**: statement-invariance regression pin for `repulsiveSpinZSector_ground_unique`
+(design §1.1). Restates its full existential type and discharges it by the theorem name, so a
+future refactor (PR-2's corollary form) that reorders/adds a conjunct breaks this pin before it
+can silently break the three positional call sites
+(`LiebRepulsiveCorrelation.lean:144`, `LiebFerrimagnetismCenteredSector.lean:266`,
+`LiebRepulsiveSectorBridgeFinal.lean:159`). -/
+example (N Ne : ℕ)
+    (hNe_even : Even Ne) (hNe_pos : 0 < Ne) (hNe_lt : Ne < 2 * (N + 1))
+    {A : Finset (Fin (N + 1))} (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
+    (hT_symm : ∀ x y, T x y = T y x) (hbip : HoppingRespectsBipartition A T)
+    (hT_conn : (hoppingSupportGraph T).Preconnected)
+    (U : Fin (N + 1) → ℝ) (hU_pos : ∀ x, 0 < U x) :
+    ∃ (E : ℝ) (φ φattr : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)),
+      IsUniqueGroundStateOn
+          (spinZSectorEuclidean N (((Ne : ℂ) - ((N : ℂ) + 1)) / 2))
+          (symmetricRepulsiveHubbardHamiltonian N T U) E φ ∧
+        φ.ofLp = (shibaSignedUnitary N (shibaSignFn A)).mulVec φattr.ofLp ∧
+        (∀ x y : Fin (N + 1),
+          0 < (euclideanExpectation (hubbardPairCorrelationOp N x y) φattr).re ∧
+            (euclideanExpectation (hubbardPairCorrelationOp N x y) φattr).im = 0) ∧
+        Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1)) φ = ((N : ℂ) + 1) • φ :=
+  repulsiveSpinZSector_ground_unique N Ne hNe_even hNe_pos hNe_lt T hT_symm hbip hT_conn U hU_pos
 
 end LatticeSystem.Tests.LiebShenQiuShibaBridge
