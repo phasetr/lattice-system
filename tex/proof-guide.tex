@@ -8109,6 +8109,54 @@ what PR-6/PR-7 transport the ferrimagnetic bound~(10.2.17) along, with the final
 staged for PR-8.
 
 \medskip
+\emph{The centered tower member carries Theorem~10.5's correlation signs (Issue~\#5347,
+PR~\#5354 PR-6; proved, axiom-free).}
+(\texttt{Fermion/JordanWigner/Hubbard/LiebFerrimagnetismCenteredSector.lean}.) PR-5's ground
+multiplet is the lowering tower $(\hat S^-_{\mathrm{tot}})^kw$ ($k=0,\dots,L$,
+$L=\texttt{sublatticeImbalance}\,A$) of a highest-weight ground vector $w$; this file
+evaluates it at the \textbf{centered} exponent $k_0=L/2$ ($\mathbb N$ division) and
+identifies that member with Theorem~10.5's sector ground state. First,
+\texttt{liebRepulsive\_groundEnergy\_eq\_ofReal}: the $(N{+}1)$-electron ground energy
+$E_0$ of a nonzero ground submodule is real (Hermitian eigenvalue), needed to feed
+$\operatorname{Re}E_0$ into the $\mathbb R$-valued sector predicate
+\texttt{IsUniqueGroundStateOn}. Second,
+\texttt{liebRepulsive\_sectorGroundEnergy\_eq\_groundEnergy}: the ground energy $E$ of the
+centered spin-$z$ sector $\hat S^3=(N_{e_0}-(N{+}1))/2$ (electron number
+$N_{e_0}=N+1+L\bmod2$, even since $L$ and $N+1$ share parity) equals $\operatorname{Re}E_0$,
+by a two-sided pinch --- the sector ground state carries the half-filling number eigenvalue
+so $\operatorname{Re}E_0\le E$, while the centered tower member is a nonzero
+$\operatorname{Re}E_0$-eigenvector inside the sector so $E\le\operatorname{Re}E_0$. Third,
+\texttt{liebRepulsive\_centered\_eq\_smul\_sectorGround}: the energy match plus
+\texttt{IsUniqueGroundStateOn}'s uniqueness clause gives
+$(\hat S^-_{\mathrm{tot}})^{k_0}w=c\varphi$ for a nonzero $c$, where $\varphi$ is
+Theorem~10.5's unique sector ground state. Fourth,
+\texttt{liebRepulsive\_centered\_transverse\_sign}: transports Theorem~10.5's
+transverse-correlation sign pattern
+(\texttt{theorem\_10\_5\_shen\_qiu\_tian\_transverse\_sign}) onto the centered tower member
+--- real, strictly positive on a shared sublattice, strictly negative across sublattices ---
+the rescaling by $c$ contributing only the harmless positive factor $|c|^2$. Fifth,
+\texttt{liebRepulsive\_exists\_centered\_transverse\_sign}: the existential capstone,
+pairing a single highest-weight ground vector $w$
+(\texttt{liebRepulsive\_ground\_exists\_topWeight}) with both its weight equation and its
+centered-member sign pattern, which is what the ferrimagnetic bound~(10.2.17) needs to
+consume. A private supporting layer handles the arithmetic and carrier bookkeeping:
+\texttt{liebRepulsive\_sublatticeImbalance\_mod\_two} ($L\bmod2=(N{+}1)\bmod2$),
+\texttt{liebRepulsive\_centeredWeight\_eq} (the centered tower weight $L/2-k_0$ equals the
+sector's spin-$z$ value), \texttt{vectorExpectation\_smul\_vector}
+($\langle cv|O|cv\rangle=(\bar cc)\langle v|O|v\rangle$, the state-rescaling identity behind
+the $|c|^2$ factor), and \texttt{liebRepulsive\_centered\_mem\_spinZSector} (crossing the
+Pi carrier of \texttt{hubbardGroundSubmoduleAtElectronNumber} to the
+\texttt{EuclideanSpace} carrier of \texttt{spinZSectorEuclidean} via
+\texttt{mulVec\_eq\_smul\_iff\_toEuclideanLin\_toLp\_eq\_smul}). \textbf{Debt discharged.}
+Consumes PR-5's \texttt{liebRepulsive\_ground\_exists\_topWeight} and
+\texttt{liebRepulsive\_ground\_tower\_ne\_zero}, both previously at reference 0 (PR-5's
+\texttt{liebRepulsive\_ground\_eq\_span\_tower} and
+\texttt{liebRepulsive\_tower\_crossTerm\_eq\_zero} remain at reference 0, staged for PR-7).
+Not yet consumed by \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below):
+this PR transports the correlation signs to a single centered tower member; PR-7 must
+extend the argument to the whole tower, and PR-8 assembles the final capstone.
+
+\medskip
 \noindent\textbf{Theorem 10.6} (Shen–Qiu–Tian ferrimagnetism; Tasaki §10.2.3,
 p.~356, eqs.~(10.2.16)/(10.2.17)). Under the hypotheses of Theorem 10.4, every
 normalized ground state $v$ satisfies the staggered-order-parameter bound
