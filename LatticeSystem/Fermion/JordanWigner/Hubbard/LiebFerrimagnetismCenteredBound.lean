@@ -117,4 +117,40 @@ theorem liebRepulsive_centered_sum_transverse_eq (N : ℕ) (A : Finset (Fin (N +
     ← sub_smul, dotProduct_smul, smul_eq_mul]
   ring
 
+/-! ## The centered Casimir gap -/
+
+/-- **Realification of the centered Casimir gap.**  Both the Casimir value `γ₀ = S₀(S₀ + 1)` and
+the squared centered weight `m₀²` are casts of reals, so their difference is the cast of the real
+gap.  This is the shape in which the gap crosses from the complex identity of the Casimir step to
+the real inequalities of the capstone. -/
+private theorem liebRepulsive_centeredCasimirGap_eq_ofReal {N : ℕ} (A : Finset (Fin (N + 1))) :
+    liebRepulsiveSpinCasimir A
+        - ((sublatticeImbalance A : ℂ) / 2 - ((sublatticeImbalance A / 2 : ℕ) : ℂ)) ^ 2
+      = ((((sublatticeImbalance A : ℝ) / 2) * ((sublatticeImbalance A : ℝ) / 2 + 1)
+          - ((sublatticeImbalance A : ℝ) / 2
+            - ((sublatticeImbalance A / 2 : ℕ) : ℝ)) ^ 2 : ℝ) : ℂ) := by
+  rw [liebRepulsiveSpinCasimir]
+  push_cast
+  ring
+
+/-- **The centered Casimir gap dominates `S₀²`.**  With `d := L / 2` and `r := L % 2` (so
+`L = 2d + r` and `r ≤ 1`), the centered weight is `m₀ = S₀ − d = r/2`, and the gap minus the target
+is `S₀ − r²/4 = d + r/2 − r²/4 ≥ 0` because `r² ≤ r`.  The imbalance `L = 0` makes this an equality
+at `0`, so no strictness is available (nor needed). -/
+private theorem liebRepulsive_sq_le_centeredCasimirGap {N : ℕ} (A : Finset (Fin (N + 1))) :
+    ((sublatticeImbalance A : ℝ) / 2) ^ 2
+      ≤ ((sublatticeImbalance A : ℝ) / 2) * ((sublatticeImbalance A : ℝ) / 2 + 1)
+        - ((sublatticeImbalance A : ℝ) / 2 - ((sublatticeImbalance A / 2 : ℕ) : ℝ)) ^ 2 := by
+  have hdm : 2 * (sublatticeImbalance A / 2) + sublatticeImbalance A % 2 = sublatticeImbalance A :=
+    Nat.div_add_mod _ 2
+  have hr : sublatticeImbalance A % 2 ≤ 1 := by omega
+  have hdmR : 2 * ((sublatticeImbalance A / 2 : ℕ) : ℝ) + ((sublatticeImbalance A % 2 : ℕ) : ℝ)
+      = ((sublatticeImbalance A : ℕ) : ℝ) := by exact_mod_cast congrArg (fun n : ℕ => (n : ℝ)) hdm
+  have hrR : ((sublatticeImbalance A % 2 : ℕ) : ℝ) ≤ 1 := by exact_mod_cast hr
+  have hr0 : (0 : ℝ) ≤ ((sublatticeImbalance A % 2 : ℕ) : ℝ) := Nat.cast_nonneg _
+  have hd0 : (0 : ℝ) ≤ ((sublatticeImbalance A / 2 : ℕ) : ℝ) := Nat.cast_nonneg _
+  have hkey : ((sublatticeImbalance A % 2 : ℕ) : ℝ) * ((sublatticeImbalance A % 2 : ℕ) : ℝ)
+      ≤ ((sublatticeImbalance A % 2 : ℕ) : ℝ) := by nlinarith [hr0, hrR]
+  nlinarith [hdmR, hr0, hd0, hkey]
+
 end LatticeSystem.Fermion
