@@ -64,9 +64,12 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N +
 /-! ## `C2` — the tower `S₀² ≤ …` bound -/
 
 /-- **`C2`: every tower member `w_k` satisfies `S₀² ≤ ⟨Ô²⟩.re / ‖w_k‖²`**, `k` ranging over
-`0, …, L`. `C1` chained at `k₀ = L/2` (legal since `k₀ ≤ L`) with the PR-7 centered-sector bound
-`liebRepulsive_centered_ratioRe_ge_sq` (weakest-hypothesis form `D7`), whose sign pattern `hsign` on
-the centered member `w_{k₀}` is the sole extra hypothesis over `C1`. -/
+`0, …, L`. `C1` chained at `k₀ = L/2` (legal since `k₀ ≤ L`) with the PR-7 centered-sector bound,
+which enters as the hypothesis `hcentered` on the centered member `w_{k₀}` — the sole extra
+hypothesis over `C1`. Taking the bound itself rather than Theorem 10.5's sign pattern keeps `C2`
+free of the hopping symmetry `hT` (which the PR-7 bound needs, but which is irrelevant to the
+transport) and lets `E2` feed it the existential form
+`liebRepulsive_exists_centered_ratioRe_ge_sq`, whose ground vector already carries the bound. -/
 example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
     (U : Fin (N + 1) → ℝ) (E₀ : ℂ)
     (hcas : ∀ v ∈ hubbardGroundSubmoduleAtElectronNumber
@@ -76,15 +79,11 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N +
     (hwG : w ∈ hubbardGroundSubmoduleAtElectronNumber
       (symmetricRepulsiveHubbardHamiltonian N T U) E₀ (N + 1))
     (hz : (fermionTotalSpinZ N).mulVec w = ((sublatticeImbalance A : ℂ) / 2) • w)
-    (hsign : ∀ x y : Fin (N + 1),
-      (vectorExpectation (fermionSpinTransverse N x y)
-          (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w)).im = 0 ∧
-        (SameSublattice A x y →
-            0 < (vectorExpectation (fermionSpinTransverse N x y)
-              (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w)).re) ∧
-          (¬ SameSublattice A x y →
-            (vectorExpectation (fermionSpinTransverse N x y)
-              (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w)).re < 0)) :
+    (hcentered : ((sublatticeImbalance A : ℝ) / 2) ^ 2 ≤
+      (vectorExpectation (fermionStaggeredCasimirOp N A)
+          (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w)).re /
+        (star (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w) ⬝ᵥ
+            ((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w).re) :
     ∀ k : ℕ, k ≤ sublatticeImbalance A →
       ((sublatticeImbalance A : ℝ) / 2) ^ 2 ≤
         (vectorExpectation (fermionStaggeredCasimirOp N A)
@@ -92,7 +91,7 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N +
           (star (((fermionTotalSpinMinus N) ^ k).mulVec w) ⬝ᵥ
               ((fermionTotalSpinMinus N) ^ k).mulVec w).re :=
   liebFerrimagnetism_tower_ratioRe_ge_sq N A T U E₀ (hcas := hcas) (hw0 := hw0) (hwG := hwG)
-    (hz := hz) (hsign := hsign)
+    (hz := hz) (hcentered := hcentered)
 
 /-! ## `D2` — the universal ground-vector bound -/
 

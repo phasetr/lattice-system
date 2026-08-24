@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetism
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveFermionSpinCasimirBridge
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJHermitian
 import LatticeSystem.Math.MatrixAnalysis.HermitianSum
 
@@ -27,10 +28,9 @@ The split comes from the per-pair decomposition `Ŝ_x · Ŝ_y = ½(Ŝ⁺_x Ŝ⁻
 
   `⟨v| (Ô_L)²_⊥ |v⟩.re ≤ ⟨v| (Ô_L)² |v⟩.re`,
 
-which is the positivity step feeding the ferrimagnetic bound (10.2.17).  Finally `(Ô_L)²` itself
-is self-adjoint — `(Ŝ_x · Ŝ_y)ᴴ = Ŝ_y · Ŝ_x` and the staggered scalar `ε_x ε_y` is symmetric and
-real, so the ordered double sum is invariant under transposing the summation order — which makes
-all its expectations real.
+which is the positivity step feeding the ferrimagnetic bound (10.2.17).  On a single site
+(`N = 0`) the staggered gauge squares to `+1`, so `(Ô_L)²` collapses to the plain total-spin
+Casimir `(Ŝ_tot)²`, the shape in which the ferrimagnetic bound is evaluated there.
 
 This mirrors the spin-`S` template of §4.1 (Theorem 4.4, eq. (4.1.12),
 `Quantum/SpinS/FerrimagneticLROComponentAlgebra.lean`), transplanted to the fermionic carrier
@@ -141,27 +141,18 @@ theorem fermionStaggeredTransverse_expectation_le_staggeredCasimir_expectation (
     Matrix.add_mulVec, dotProduct_add, Complex.add_re]
   linarith
 
-/-- **`(Ô_L)² = Σ_{x,y} ε_x ε_y Ŝ_x · Ŝ_y` is self-adjoint.**  Each summand obeys
-`(ε_x ε_y Ŝ_x · Ŝ_y)ᴴ = ε_y ε_x Ŝ_y · Ŝ_x` (the gauge is real, the dot product's adjoint swaps
-the two sites), so the ordered double sum is invariant under transposing the summation order.
-Consequently every expectation of `(Ô_L)²` is real. -/
-theorem fermionStaggeredCasimirOp_isHermitian (N : ℕ) (A : Finset (Fin (N + 1))) :
-    (fermionStaggeredCasimirOp N A).IsHermitian := by
-  have hterm : ∀ x y : Fin (N + 1),
-      ((gaugeSign A x * gaugeSign A y) • fermionSpinDot N x y)ᴴ
-        = (gaugeSign A y * gaugeSign A x) • fermionSpinDot N y x := by
-    intro x y
-    rw [Matrix.conjTranspose_smul, fermionSpinDot_conjTranspose, StarMul.star_mul,
-      (gaugeSign_isSelfAdjoint A x).star_eq, (gaugeSign_isSelfAdjoint A y).star_eq]
-  unfold Matrix.IsHermitian
-  rw [fermionStaggeredCasimirOp_eq_gaugeSign_sum]
-  calc (∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
-          (gaugeSign A x * gaugeSign A y) • fermionSpinDot N x y)ᴴ
-      = ∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
-          (gaugeSign A y * gaugeSign A x) • fermionSpinDot N y x := by
-        simp only [Matrix.conjTranspose_sum]
-        exact Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => hterm x y
-    _ = ∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
-          (gaugeSign A x * gaugeSign A y) • fermionSpinDot N x y := Finset.sum_comm
+/-! ## The single-site collapse -/
+
+/-- **Single-site collapse.**  For `N = 0` the only pair is `x = y = 0`, whose staggered weight is
+`ε₀ ε₀ = +1` for either sublattice choice, so the staggered order parameter `(Ô_L)²` is the plain
+total-spin Casimir `(Ŝ_tot)²`.  This is the shape in which the ferrimagnetic bound (10.2.17) is
+evaluated on a single site, where the lowering-tower argument is unavailable. -/
+theorem fermionStaggeredCasimirOp_zero_eq_totalSpinSquared (A : Finset (Fin 1)) :
+    fermionStaggeredCasimirOp 0 A = fermionTotalSpinSquared 0 := by
+  rw [fermionTotalSpinSquared_eq_sum_fermionSpinDot]
+  unfold fermionStaggeredCasimirOp
+  refine Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => ?_
+  obtain rfl : x = y := Subsingleton.elim (α := Fin 1) x y
+  by_cases hx : x ∈ A <;> simp [hx]
 
 end LatticeSystem.Fermion

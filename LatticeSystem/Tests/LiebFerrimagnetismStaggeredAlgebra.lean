@@ -15,7 +15,7 @@ Specification suite for
 `fermionStaggeredCasimirOp_eq_transverse_add_staggeredSpinZ_sq`,
 `fermionStaggeredSpinZ_isHermitian`, `vectorExpectation_staggeredSpinZ_sq_nonneg`,
 `fermionStaggeredTransverse_expectation_le_staggeredCasimir_expectation` and
-`fermionStaggeredCasimirOp_isHermitian`, mirroring the discharged SpinS template
+`fermionStaggeredCasimirOp_zero_eq_totalSpinSquared`, mirroring the discharged SpinS template
 `Quantum/SpinS/FerrimagneticLROComponentAlgebra.lean`, so that the implementation cannot silently
 drift from the design's exact statements.  The closing `N = 0` sanity check is the cheapest
 falsifier of a staggered-sign or normalization slip: on a single site the staggered gauge squares
@@ -92,12 +92,6 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (v : (Fin (2 * N + 2) → Fin 2) �
     (vectorExpectation (fermionStaggeredTransverse N A) v).re ≤
       (vectorExpectation (fermionStaggeredCasimirOp N A) v).re :=
   fermionStaggeredTransverse_expectation_le_staggeredCasimir_expectation N A v
-
-/-- `fermionStaggeredCasimirOp` is self-adjoint (staged for later PR consumption to discharge
-`.im = 0` on its expectations; see the PR-7/PR-8 design route in the module docstring). -/
-example (N : ℕ) (A : Finset (Fin (N + 1))) :
-    (fermionStaggeredCasimirOp N A).IsHermitian :=
-  fermionStaggeredCasimirOp_isHermitian N A
 
 /-! ## 5. `N = 0` sanity check -/
 
