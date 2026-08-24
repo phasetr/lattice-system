@@ -71,7 +71,7 @@ def SameSublattice (A : Finset (Fin (N + 1))) (x y : Fin (N + 1)) : Prop :=
 /-! ## Sign of the sublattice-gauge product -/
 
 /-- The sublattice-gauge product is `+1` on the same sublattice. -/
-private theorem gaugeSign_mul_sameSublattice (A : Finset (Fin (N + 1))) (x y : Fin (N + 1))
+theorem gaugeSign_mul_sameSublattice (A : Finset (Fin (N + 1))) (x y : Fin (N + 1))
     (h : SameSublattice A x y) : gaugeSign A x * gaugeSign A y = 1 := by
   unfold gaugeSign SameSublattice at *
   by_cases hx : x ∈ A
@@ -85,7 +85,7 @@ private theorem gaugeSign_mul_im (A : Finset (Fin (N + 1))) (x y : Fin (N + 1)) 
   exact (gaugeSign_isSelfAdjoint A x).mul (gaugeSign_isSelfAdjoint A y)
 
 /-- The sublattice-gauge product is `−1` across the two sublattices. -/
-private theorem gaugeSign_mul_not_sameSublattice (A : Finset (Fin (N + 1))) (x y : Fin (N + 1))
+theorem gaugeSign_mul_not_sameSublattice (A : Finset (Fin (N + 1))) (x y : Fin (N + 1))
     (h : ¬ SameSublattice A x y) : gaugeSign A x * gaugeSign A y = -1 := by
   unfold gaugeSign SameSublattice at *
   by_cases hx : x ∈ A
