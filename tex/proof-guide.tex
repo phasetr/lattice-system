@@ -7865,7 +7865,7 @@ conjuncts for \texttt{symmetricRepulsiveHubbardHamiltonian}, for
 symmetric-form statement at a constant $U$ to the uniform-interaction
 Hamiltonian \texttt{repulsiveHubbardHamiltonian}, via
 \texttt{symmetricRepulsiveHubbardHamiltonian\_groundSubmodule\_eq\_uniform}
-(\texttt{LiebRepulsiveBalancedGround.lean:363}, an energy shift).
+(\texttt{LiebRepulsiveBalancedGround.lean:302}, an energy shift).
 \textbf{Debt (new, both reference~0 within this PR, staged for PR-15c's
 capstone):} \texttt{liebRepulsive\_symmetric\_halfFilling} and
 \texttt{liebRepulsive\_uniform\_of\_symmetric} are not yet consumed; PR-15c
@@ -8316,7 +8316,61 @@ as the named lemma \texttt{hubbardKinetic\_add\_diagonal\_half} in
 \texttt{LiebRepulsiveShibaConjugation.lean} and reused from both. Not yet consumed by
 \texttt{theorem\_10\_8\_lieb\_shen\_qiu\_superconductivity} (still an axiom
 below); staged for the later PRs of this arc ($\hat S^3\varphi=0$ extraction,
-PR-2 onward).
+PR-2 onward). \textbf{PR~\#5359 PR-2 has since consumed}
+\texttt{symmetricAttractiveHubbardHamiltonian\_eq\_attractive\_sub\_smul}
+(see the PR-2 paragraph below); the bridge capstone itself remains staged.
+
+\medskip
+\emph{The $\hat S^3\varphi=0$ extraction and the reusable Shiba transport
+(Issue~\#5357, PR~\#5359 PR-2; proved, axiom-free).}
+\textbf{Generic layer:} \texttt{IsUniqueGroundStateOn.conj\_unitary} (new file
+\texttt{Math/MatrixAnalysis/UnitaryGroundTransport.lean}) states unitary sector
+transport once and for all --- for $U$ with $U^\dagger U = U U^\dagger = 1$
+intertwining two Hamiltonians, $U^\dagger H' U = H$, and mapping a subspace $K$
+into $K'$ while $U^\dagger$ maps $K'$ back into $K$, the unique normalized
+ground state of $H$ on $K$ is carried by $U$ to the unique normalized ground
+state of $H'$ on $K'$ at the \emph{same} energy. Both membership directions are
+hypotheses and both are used: the forward one places the transported vector in
+$K'$, the backward one pulls a competing $K'$-eigenvector into $K$, where the
+minimality and uniqueness clauses of \texttt{IsUniqueGroundStateOn} live. A
+constant energy offset is deliberately not absorbed here; it is removed first
+with PR-1's \texttt{IsUniqueGroundStateOn.sub\_smul\_one}.
+\textbf{Spin-algebra layer:}
+\texttt{fermionTotalSpinZ\_mulVec\_eq\_zero\_of\_fermionTotalSpinSquared\_mulVec\_eq\_zero}
+(\texttt{LiebAttractiveFullSectorUnique.lean}, beside
+\texttt{fermionTotalSpinSquared\_eq\_cartesianSqSum}): a null vector of the
+fermionic Casimir $\hat S^2$ is a null vector of $\hat S^3$, because the
+Cartesian square-sum form $\hat S^2 = (\hat S^{(1)})^2+(\hat S^{(2)})^2+(\hat
+S^3)^2$ makes a vanishing Casimir expectation force each Hermitian component to
+annihilate the vector (Tasaki Lemma~A.11,
+\texttt{mulVec\_eq\_zero\_of\_sq\_sum\_inner\_zero}). This was an inline block
+inside Theorem~10.4's capstone proof; it is extracted, not copied.
+\textbf{Hubbard transport:}
+\texttt{shibaTransport\_uniqueGroundStateOn\_spinZSector}
+(\texttt{LiebRepulsiveBalancedGround.lean}) takes an attractive-model
+number-sector unique ground state $\varphi$ of $\hat H^{\rm attr}(T+\mathrm{diag}(U/2),U)$
+at energy $E$ together with $\hat S^2\varphi=0$, and returns $\psi = \hat U\varphi$
+as the unique ground state of $\hat H^{\rm rep,sym}(T,U)$ on the spin-$z$ sector
+$\hat S^3 = (N_e-(N{+}1))/2$ at energy $E - \tfrac14\sum_x U_x$, with the
+half-filling number eigenvalue $\hat N\psi = (N{+}1)\psi$ --- that is $N+1$, not
+$N_e$, and dropping $\hat S^3\varphi=0$ would make it false. It is stated in the
+plain-attractive form, so the §10.2.2 module acquires no dependence on the
+Theorem~10.8 statement layer.
+\textbf{Theorem 10.8 face:}
+\texttt{shibaTransport\_uniqueGroundStateOn\_spinZSector\_symmetricAttractive}
+(new file \texttt{LiebShenQiuShibaTransport.lean}) restates the same transport
+starting from $\hat H^{\rm attr,sym}(T,U)$ at \emph{unchanged} energy $E$, the
+$\tfrac14\sum_x U_x$ of PR-1's constant-shift identity cancelling the one the
+conjugation drops.
+\textbf{Refactor (no statement change):} Theorem~10.4's capstone
+\texttt{repulsiveSpinZSector\_ground\_unique} keeps its statement
+byte-identical --- same binders, same conjunct order, so its three positional
+call sites compile untouched --- and becomes the composition of Theorems
+10.2/10.3 with the new transport lemma.
+\textbf{Debt (new):}
+\texttt{shibaTransport\_uniqueGroundStateOn\_spinZSector\_symmetricAttractive}
+has no proof-level consumer yet; it is the sole deliverable the later PRs of this
+arc consume, and is covered by a signature pin in \texttt{Tests}.
 
 \medskip
 \noindent\textbf{Theorem 10.8} (Lieb–Shen–Qiu superconductivity; Tasaki §10.2.3,
