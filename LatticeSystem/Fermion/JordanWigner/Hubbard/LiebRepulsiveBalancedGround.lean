@@ -33,12 +33,16 @@ state `φ_attr`, energy `E_attr`) transports to the repulsive-model **spin-`z`**
 `E := E_attr − ¼(∑ U)`.  (These charge exchanges are pure operator identities, independent of the
 sector; only the scalars `Ne`/`m` change.)
 
-The transport itself is isolated as `shibaTransport_uniqueGroundStateOn_spinZSector`, which takes an
-attractive-model number-sector unique ground state together with its singlet property and returns
-the repulsive-model spin-`z`-sector one; it is the reusable interface for the later Theorem 10.8
-layers, and the capstone below is its composition with Theorems 10.2/10.3.  The subspace-free part
-of the argument — that a unitary intertwiner carries a unique ground state between two subspaces at
-unchanged energy — lives in `Math/MatrixAnalysis/UnitaryGroundTransport.lean`.
+The transport itself is isolated as `shibaTransport_uniqueGroundStateOn_spinZSector_of_conj`, which
+takes a number-sector unique ground state together with its singlet property and the conjugation
+identity for the model at hand, and returns the spin-`z`-sector one at unchanged energy.  All that
+varies between the §10.2.2 and §10.2.3 uses is that conjugation identity, so both are instances of
+it: `shibaTransport_uniqueGroundStateOn_spinZSector` below (plain attractive source, eq. (10.2.10),
+energy `E − ¼(∑ U)`), consumed by the capstone as the composition with Theorems 10.2/10.3, and the
+symmetric-attractive one of `LiebShenQiuShibaTransport.lean` (eq. (10.2.21), energy unchanged).
+The subspace-free part of the argument — that a unitary intertwiner carries a unique ground state
+between two subspaces at unchanged energy — lives in
+`Math/MatrixAnalysis/UnitaryGroundTransport.lean`.
 
 Because `Û` maps the spin SU(2) algebra to the η-pseudospin algebra (`Û Ŝ² Ûᴴ ≠ Ŝ²`), the
 attractive singlet is **not** transported to a spin singlet; identifying the repulsive total-spin
@@ -80,44 +84,40 @@ theorem hoppingSupportGraph_add_diagonal (T : Matrix (Fin (N + 1)) (Fin (N + 1))
   · rw [if_neg hxy, if_neg (Ne.symm hxy), add_zero, add_zero]
 
 /-- **Shiba transport of a unique ground state from the electron-number sector to the spin-`z`
-sector** (Tasaki §10.2.2, eqs. (10.2.10)/(10.2.11), pp. 350–352).  Given the unique normalized
-ground state `φ` of the plain attractive Hamiltonian `Ĥ^{attr}(T + diag(U/2), U)` on the
-`N̂ = Ne` sector, at energy `E`, together with the singlet property `Ŝ² φ = 0`, the Shiba unitary
-`Û` carries `φ` to the unique normalized ground state `ψ = Û φ` of the symmetric repulsive
-Hamiltonian `Ĥ^{rep,sym}(T,U)` on the spin-`z` sector `Ŝ³ = (Ne − (N+1))/2`, at energy
-`E − ¼(∑ U)`; moreover `ψ` sits in the half-filled sector, `N̂ ψ = (N+1) ψ`.
+sector, at unchanged energy** (Tasaki §10.2.2, eq. (10.2.11), pp. 350–352).  Let the Shiba unitary
+`Û` conjugate a Hamiltonian `Ĥ^{rep}` into `Ĥ` (`Ûᴴ Ĥ^{rep} Û = Ĥ`), and let `φ` be the unique
+normalized ground state of `Ĥ` on the `N̂ = Ne` sector at energy `E`, with the singlet property
+`Ŝ² φ = 0`.  Then `ψ = Û φ` is the unique normalized ground state of `Ĥ^{rep}` on the spin-`z`
+sector `Ŝ³ = (Ne − (N+1))/2`, at the **same** energy `E`, and sits in the half-filled sector,
+`N̂ ψ = (N+1) ψ`.
 
-Three ingredients: the conjugation `Ûᴴ Ĥ^{rep,sym} Û = Ĥ^{attr} − ¼(∑ U)·1` (eq. (10.2.10)),
-which is peeled off the energy by `IsUniqueGroundStateOn.sub_smul_one` so that the transport runs
-at a single energy; the charge exchange `Ûᴴ Ŝ³ Û = ½(N̂ − (N+1)·1)` and
-`Û N̂ Ûᴴ = 2 Ŝ³ + (N+1)·1` (eq. (10.2.11)), which supply the two sector-mapping hypotheses of
-`IsUniqueGroundStateOn.conj_unitary` in both directions; and, for the number eigenvalue,
-`Ŝ³ φ = 0` (forced by the singlet property) together with the involutivity of the Shiba flip,
-which makes the two conjugation orders `Ûᴴ N̂ Û` and `Û N̂ Ûᴴ` agree.
+Everything model-specific is confined to `hconj`; the transport itself uses only the charge
+exchange `Ûᴴ Ŝ³ Û = ½(N̂ − (N+1)·1)` and `Û N̂ Ûᴴ = 2 Ŝ³ + (N+1)·1` (eq. (10.2.11)), which supplies
+the two sector-mapping hypotheses of `IsUniqueGroundStateOn.conj_unitary` in both directions, and,
+for the number eigenvalue, `Ŝ³ φ = 0` (forced by the singlet property) together with the
+involutivity of the Shiba flip, which makes the two conjugation orders `Ûᴴ N̂ Û` and `Û N̂ Ûᴴ`
+agree.  Whatever constant the conjugation of the model at hand leaves behind is therefore not this
+lemma's business: it is peeled off the source Hamiltonian with
+`IsUniqueGroundStateOn.sub_smul_one` before this lemma is applied
+(`shibaTransport_uniqueGroundStateOn_spinZSector` below), or absent to begin with
+(`shibaTransport_uniqueGroundStateOn_spinZSector_symmetricAttractive`,
+`LiebShenQiuShibaTransport.lean`).
 
 Note the number eigenvalue is `N+1`, **not** `Ne`: every transported state sits at half filling
-regardless of the electron number of the attractive sector it comes from. -/
-theorem shibaTransport_uniqueGroundStateOn_spinZSector (N Ne : ℕ)
-    {A : Finset (Fin (N + 1))} {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ}
-    (hT_symm : ∀ x y, T x y = T y x) (hbip : HoppingRespectsBipartition A T)
-    (U : Fin (N + 1) → ℝ) {E : ℝ} {φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)}
-    (hGS : IsUniqueGroundStateOn (electronNumberSectorEuclidean N Ne)
-      (attractiveHubbardHamiltonian N (T + Matrix.diagonal (fun x => U x / 2)) U) E φ)
+regardless of the electron number of the sector it comes from. -/
+theorem shibaTransport_uniqueGroundStateOn_spinZSector_of_conj (N Ne : ℕ)
+    {A : Finset (Fin (N + 1))} {H Hrep : ManyBodyOp (Fin (2 * N + 2))}
+    (hconj : Matrix.conjTranspose (shibaSignedUnitary N (shibaSignFn A)) * Hrep
+      * shibaSignedUnitary N (shibaSignFn A) = H)
+    {E : ℝ} {φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)}
+    (hGS : IsUniqueGroundStateOn (electronNumberSectorEuclidean N Ne) H E φ)
     (hsinglet : Matrix.toEuclideanLin (fermionTotalSpinSquared N) φ = 0) :
     ∃ ψ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2),
       ψ.ofLp = (shibaSignedUnitary N (shibaSignFn A)).mulVec φ.ofLp ∧
-      IsUniqueGroundStateOn (spinZSectorEuclidean N (((Ne : ℂ) - ((N : ℂ) + 1)) / 2))
-        (symmetricRepulsiveHubbardHamiltonian N T U)
-        (E - (∑ x : Fin (N + 1), U x) / 4) ψ ∧
+      IsUniqueGroundStateOn (spinZSectorEuclidean N (((Ne : ℂ) - ((N : ℂ) + 1)) / 2)) Hrep E ψ ∧
       Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1)) ψ = ((N : ℂ) + 1) • ψ := by
-  classical
-  -- Abbreviations for the Shiba unitary, the two Hamiltonians and the scalar shift.
   set Ush : Matrix (Fin (2 * N + 2) → Fin 2) (Fin (2 * N + 2) → Fin 2) ℂ :=
     shibaSignedUnitary N (shibaSignFn A) with hUsh
-  set Hrep : ManyBodyOp (Fin (2 * N + 2)) := symmetricRepulsiveHubbardHamiltonian N T U with hHrep
-  set T' : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ := T + Matrix.diagonal (fun x => U x / 2) with hT'
-  set Hattr : ManyBodyOp (Fin (2 * N + 2)) := attractiveHubbardHamiltonian N T' U with hHattrDef
-  set cR : ℝ := (∑ x : Fin (N + 1), U x) / 4 with hcR
   -- The spin-`z` eigenvalue `m = (Ne − (N+1))/2` fixed by the electron number `Ne` (eq. (10.2.11)).
   set mVal : ℂ := ((Ne : ℂ) - ((N : ℂ) + 1)) / 2 with hmVal
   -- The number/spin-`z` conversion `2·m + (N+1) = Ne`.
@@ -129,11 +129,6 @@ theorem shibaTransport_uniqueGroundStateOn_spinZSector (N Ne : ℕ)
     shibaSignedUnitary_conjTranspose_mul_self (shibaSignFn A) hs
   have hUUc : Ush * Matrix.conjTranspose Ush = 1 :=
     shibaSignedUnitary_self_mul_conjTranspose (shibaSignFn A) hs
-  -- The Shiba conjugation `Ûᴴ Ĥ^{rep} Û = Ĥ^{attr} − cR·1` (c6, eq. (10.2.10)).
-  have hκ : ((∑ x : Fin (N + 1), (U x : ℂ)) / 4) = (cR : ℂ) := by rw [hcR]; push_cast; ring
-  have hconj : Matrix.conjTranspose Ush * Hrep * Ush = Hattr - (cR : ℂ) • 1 := by
-    rw [hUsh, hHrep, hHattrDef, hT',
-      shibaSignedUnitary_conj_symmetricRepulsive_eq_attractive hT_symm hbip U, hκ]
   -- Forward/reverse bridges between `mulVec` and `toEuclideanLin`.
   have fwd : ∀ (M : Matrix (Fin (2 * N + 2) → Fin 2) (Fin (2 * N + 2) → Fin 2) ℂ) (e : ℂ)
       (x : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)),
@@ -184,11 +179,10 @@ theorem shibaTransport_uniqueGroundStateOn_spinZSector (N Ne : ℕ)
     rw [hUcv, Matrix.mulVec_mulVec, hNU, ← Matrix.mulVec_mulVec, Matrix.add_mulVec,
       Matrix.smul_mulVec, hS3, Matrix.smul_mulVec, Matrix.one_mulVec, smul_smul, ← add_smul,
       hNeval, Matrix.mulVec_smul]
-  -- Peel the constant `−cR` off the attractive side, then transport along `Û`.
-  have hGStrans : IsUniqueGroundStateOn (spinZSectorEuclidean N mVal) Hrep (E - cR)
+  -- Transport along `Û`, at unchanged energy.
+  have hGStrans : IsUniqueGroundStateOn (spinZSectorEuclidean N mVal) Hrep E
       (Matrix.toEuclideanLin Ush φ) :=
-    IsUniqueGroundStateOn.conj_unitary hUU hUUc hconj hfwdmem hbwdmem
-      (hGS.sub_smul_one (c := cR))
+    IsUniqueGroundStateOn.conj_unitary hUUc hconj hfwdmem hbwdmem hGS
   refine ⟨Matrix.toEuclideanLin Ush φ, rfl, hGStrans, ?_⟩
   -- `φ` is a spin singlet, hence unpolarised: `Ŝ³ φ = 0`.
   have hS3f : (fermionTotalSpinZ N).mulVec φ.ofLp = 0 := by
@@ -216,6 +210,38 @@ theorem shibaTransport_uniqueGroundStateOn_spinZSector (N Ne : ℕ)
   have hUφ : (Matrix.toEuclideanLin Ush φ).ofLp = Ush.mulVec φ.ofLp := rfl
   refine fwd (fermionTotalNumber (2 * N + 1)) ((N : ℂ) + 1) _ ?_
   rw [hUφ, Matrix.mulVec_mulVec, hNUfwd, ← Matrix.mulVec_mulVec, hchargef, Matrix.mulVec_smul]
+
+/-- **Shiba transport from the plain attractive model** (Tasaki §10.2.2, eqs. (10.2.10)/(10.2.11),
+pp. 350–352).  Given the unique normalized ground state `φ` of the plain attractive Hamiltonian
+`Ĥ^{attr}(T + diag(U/2), U)` on the `N̂ = Ne` sector, at energy `E`, together with the singlet
+property `Ŝ² φ = 0`, the Shiba unitary `Û` carries `φ` to the unique normalized ground state
+`ψ = Û φ` of the symmetric repulsive Hamiltonian `Ĥ^{rep,sym}(T,U)` on the spin-`z` sector
+`Ŝ³ = (Ne − (N+1))/2`, at energy `E − ¼(∑ U)`; moreover `ψ` sits in the half-filled sector,
+`N̂ ψ = (N+1) ψ`.
+
+This is `shibaTransport_uniqueGroundStateOn_spinZSector_of_conj` at the conjugation
+`Ûᴴ Ĥ^{rep,sym} Û = Ĥ^{attr} − ¼(∑ U)·1` (eq. (10.2.10)), whose leftover constant is moved onto
+the source Hamiltonian by `IsUniqueGroundStateOn.sub_smul_one` — which is where the `−¼(∑ U)` of
+the output energy comes from.  Stating the source in plain-attractive form keeps this §10.2.2
+module free of any dependence on the Theorem-10.8 statement layer. -/
+theorem shibaTransport_uniqueGroundStateOn_spinZSector (N Ne : ℕ)
+    {A : Finset (Fin (N + 1))} {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ}
+    (hT_symm : ∀ x y, T x y = T y x) (hbip : HoppingRespectsBipartition A T)
+    (U : Fin (N + 1) → ℝ) {E : ℝ} {φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)}
+    (hGS : IsUniqueGroundStateOn (electronNumberSectorEuclidean N Ne)
+      (attractiveHubbardHamiltonian N (T + Matrix.diagonal (fun x => U x / 2)) U) E φ)
+    (hsinglet : Matrix.toEuclideanLin (fermionTotalSpinSquared N) φ = 0) :
+    ∃ ψ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2),
+      ψ.ofLp = (shibaSignedUnitary N (shibaSignFn A)).mulVec φ.ofLp ∧
+      IsUniqueGroundStateOn (spinZSectorEuclidean N (((Ne : ℂ) - ((N : ℂ) + 1)) / 2))
+        (symmetricRepulsiveHubbardHamiltonian N T U)
+        (E - (∑ x : Fin (N + 1), U x) / 4) ψ ∧
+      Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1)) ψ = ((N : ℂ) + 1) • ψ := by
+  have hκ : ((∑ x : Fin (N + 1), (U x : ℂ)) / 4)
+      = (((∑ x : Fin (N + 1), U x) / 4 : ℝ) : ℂ) := by push_cast; ring
+  refine shibaTransport_uniqueGroundStateOn_spinZSector_of_conj N Ne ?_
+    (hGS.sub_smul_one (c := (∑ x : Fin (N + 1), U x) / 4)) hsinglet
+  rw [shibaSignedUnitary_conj_symmetricRepulsive_eq_attractive hT_symm hbip U, hκ]
 
 /-- **Tasaki Theorem 10.4** (Lieb's theorem for the symmetric repulsive Hubbard model, general
 spin-`z` sector; 1st ed., Springer 2020, §10.2.2, pp. 350–352; **PROVED**, no axiom).  For any

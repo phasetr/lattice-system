@@ -10,9 +10,10 @@ to the unique normalized ground state of `H'` on a subspace `K'`, at the **same*
 
 Both sector-mapping directions are hypotheses and both are genuinely used: the forward one places
 the transported vector in `K'`, the backward one pulls a competing `K'`-eigenvector back into `K`,
-where the minimality and uniqueness clauses of `IsUniqueGroundStateOn` live.  Likewise both
-unitarity identities are used: `UᴴU = 1` for norm preservation, `UUᴴ = 1` for the round trip that
-recovers a competitor from its pullback.
+where the minimality and uniqueness clauses of `IsUniqueGroundStateOn` live.  Of the two unitarity
+identities only `UUᴴ = 1` is a hypothesis — it gives the round trip that recovers a competitor from
+its pullback — because on a square matrix the isometry identity `UᴴU = 1` used for norm
+preservation follows from it (`mul_eq_one_comm`).
 
 A constant energy offset between the two Hamiltonians is deliberately **not** absorbed here; apply
 `IsUniqueGroundStateOn.sub_smul_one` (`Math/MatrixAnalysis/DegeneratePerturbation.lean`) on the
@@ -49,11 +50,11 @@ private theorem norm_toEuclideanLin_of_conjTranspose_mul_self {U : Matrix n n �
   rw [← Real.sqrt_sq (norm_nonneg (Matrix.toEuclideanLin U v)), hsq,
     Real.sqrt_sq (norm_nonneg v)]
 
-/-- **Unitary conjugation transports a unique ground state at unchanged energy.**  Let `U` be
-unitary (`UᴴU = UUᴴ = 1`) and intertwine two Hamiltonians, `Uᴴ H' U = H`.  If `U` maps a subspace
-`K` into `K'` and `Uᴴ` maps `K'` back into `K`, then the unique normalized ground state `φ` of `H`
-on `K` is carried by `U` to the unique normalized ground state of `H'` on `K'`, with the same
-energy `E`.
+/-- **Unitary conjugation transports a unique ground state at unchanged energy.**  Let `U` satisfy
+`U Uᴴ = 1` (hence also `Uᴴ U = 1`, the carrier being square) and intertwine two Hamiltonians,
+`Uᴴ H' U = H`.  If `U` maps a subspace `K` into `K'` and `Uᴴ` maps `K'` back into `K`, then the
+unique normalized ground state `φ` of `H` on `K` is carried by `U` to the unique normalized ground
+state of `H'` on `K'`, with the same energy `E`.
 
 The intertwiner rearranges (using `UUᴴ = 1`) into `H' U = U H` and `H Uᴴ = Uᴴ H'`, which transport
 eigenvectors in either direction at unchanged eigenvalue; the two sector-mapping hypotheses then
@@ -62,7 +63,6 @@ keep both transports inside the relevant subspaces, so minimality of `E` on `K` 
 removed beforehand with `IsUniqueGroundStateOn.sub_smul_one`. -/
 theorem IsUniqueGroundStateOn.conj_unitary {K K' : Submodule ℂ (EuclideanSpace ℂ n)}
     {U H H' : Matrix n n ℂ} {E : ℝ} {φ : EuclideanSpace ℂ n}
-    (hUU : Matrix.conjTranspose U * U = 1)
     (hUUc : U * Matrix.conjTranspose U = 1)
     (hconj : Matrix.conjTranspose U * H' * U = H)
     (hfwd : ∀ v ∈ K, Matrix.toEuclideanLin U v ∈ K')
@@ -70,6 +70,7 @@ theorem IsUniqueGroundStateOn.conj_unitary {K K' : Submodule ℂ (EuclideanSpace
     (hGS : IsUniqueGroundStateOn K H E φ) :
     IsUniqueGroundStateOn K' H' E (Matrix.toEuclideanLin U φ) := by
   obtain ⟨hmem, hnorm, heig, hground, huniq⟩ := hGS
+  have hUU : Matrix.conjTranspose U * U = 1 := mul_eq_one_comm.mp hUUc
   have hH'U : H' * U = U * H := by
     rw [← hconj, ← Matrix.mul_assoc, ← Matrix.mul_assoc, hUUc, Matrix.one_mul]
   have hHUc : H * Matrix.conjTranspose U = Matrix.conjTranspose U * H' := by

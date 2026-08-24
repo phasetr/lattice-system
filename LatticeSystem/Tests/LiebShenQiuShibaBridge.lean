@@ -27,16 +27,17 @@ Also pins the API contract of PR-2 (`Ŝ³φ = 0` extraction + Shiba transport,
 
 4. **G1** `LatticeSystem.Math.IsUniqueGroundStateOn.conj_unitary` — the generic unitary-conjugation
    ground-state transport (new file `Math/MatrixAnalysis/UnitaryGroundTransport.lean`), pinning
-   the full two-sided hypothesis list (`hUU`/`hUUc`/`hconj`/`hfwd`/`hbwd`), the fragile part per
+   the full two-sided hypothesis list (`hUUc`/`hconj`/`hfwd`/`hbwd`), the fragile part per
    design §4 R1/R2.
 5. **S1** `fermionTotalSpinZ_mulVec_eq_zero_of_fermionTotalSpinSquared_mulVec_eq_zero` — the
    spin-algebra extraction (`LiebAttractiveFullSectorUnique.lean`, design §2.2), plus a sanity
    instance at `N = 0`, `f = 0`.
-6. **T1** `shibaTransport_uniqueGroundStateOn_spinZSector` — the plain-attractive Hubbard
-   transport (`LiebRepulsiveBalancedGround.lean`, design §2.3), energy slot `E − (∑ U)/4`.
+6. **T1** `shibaTransport_uniqueGroundStateOn_spinZSector` — the plain-attractive face of the
+   Hubbard transport (`LiebRepulsiveBalancedGround.lean`, design §2.3), energy slot `E − (∑ U)/4`.
 7. **T2** `shibaTransport_uniqueGroundStateOn_spinZSector_symmetricAttractive` — the
-   symmetric-attractive-facing corollary (new file `LiebShenQiuShibaTransport.lean`, design §2.4),
-   energy slot exactly `E` (the `¼ΣU` cancellation claim).
+   symmetric-attractive face (new file `LiebShenQiuShibaTransport.lean`, design §2.4), energy slot
+   exactly `E`, obtained by instantiating the shared transport
+   `shibaTransport_uniqueGroundStateOn_spinZSector_of_conj` at the residual-free bridge **B2**.
 8. **INV** a statement-invariance pin for `repulsiveSpinZSector_ground_unique` (design §1.1): the
    full existential type, discharged by the theorem name, so that a future refactor (PR-2's
    corollary form) cannot silently reorder/add conjuncts without breaking the three positional
@@ -107,18 +108,18 @@ example (M : ManyBodyOp (Fin (2 * N + 2))) (φ : EuclideanSpace ℂ (Fin (2 * N 
 
 /-- Pins **G1**, the generic unitary-conjugation ground-state transport (design §2.1), at
 abstract carrier `n`. Fails to elaborate unless `IsUniqueGroundStateOn.conj_unitary` exists with
-exactly this two-sided-membership hypothesis list. -/
+exactly this two-sided-membership hypothesis list, and with the single unitarity hypothesis
+`U Uᴴ = 1` (its companion `Uᴴ U = 1` being derivable on a square matrix). -/
 example {n : Type*} [Fintype n] [DecidableEq n]
     {K K' : Submodule ℂ (EuclideanSpace ℂ n)}
     {Ugen H H' : Matrix n n ℂ} {E : ℝ} {φ : EuclideanSpace ℂ n}
-    (hUU : Matrix.conjTranspose Ugen * Ugen = 1)
     (hUUc : Ugen * Matrix.conjTranspose Ugen = 1)
     (hconj : Matrix.conjTranspose Ugen * H' * Ugen = H)
     (hfwd : ∀ v ∈ K, Matrix.toEuclideanLin Ugen v ∈ K')
     (hbwd : ∀ v ∈ K', Matrix.toEuclideanLin (Matrix.conjTranspose Ugen) v ∈ K)
     (hGS : LatticeSystem.Math.IsUniqueGroundStateOn K H E φ) :
     LatticeSystem.Math.IsUniqueGroundStateOn K' H' E (Matrix.toEuclideanLin Ugen φ) :=
-  LatticeSystem.Math.IsUniqueGroundStateOn.conj_unitary hUU hUUc hconj hfwd hbwd hGS
+  LatticeSystem.Math.IsUniqueGroundStateOn.conj_unitary hUUc hconj hfwd hbwd hGS
 
 /-- Pins **S1**, the spin-algebra extraction: a null vector of the fermionic Casimir `Ŝ²` is a
 null vector of `Ŝ³` (design §2.2, Tasaki Lemma A.11 route). -/
