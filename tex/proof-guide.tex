@@ -7985,30 +7985,35 @@ bound~(10.2.17).
 \emph{$SU(2)$ invariance of $(\hat O_L)^2$ (Issue~\#5347, PR~\#5350
 PR-3; proved, axiom-free).}
 (\texttt{Fermion/JordanWigner/Hubbard/LiebFerrimagnetismSU2Invariance.lean}):
-the squared staggered order parameter commutes with every total-spin
-generator, $[(\hat O_L)^2,\hat S^3_{\mathrm{tot}}]=[(\hat
-O_L)^2,\hat S^+_{\mathrm{tot}}]=[(\hat O_L)^2,\hat S^-_{\mathrm{tot}}]=0$
+the squared staggered order parameter commutes with the total-spin
+generators used downstream, $[(\hat O_L)^2,\hat S^3_{\mathrm{tot}}]=[(\hat
+O_L)^2,\hat S^+_{\mathrm{tot}}]=0$
 (\texttt{fermionStaggeredCasimirOp\_commute\_fermionTotalSpinZ},
-\texttt{\_fermionTotalSpinPlus}, \texttt{\_fermionTotalSpinMinus}). Each
+\texttt{\_fermionTotalSpinPlus}). Each
 per-pair dot product $\hat S_x\!\cdot\!\hat S_y$ is itself an $SU(2)$ scalar,
 commuting with $\hat S^3_{\mathrm{tot}}$
 (\texttt{totalSpinZ\_commute\_fermionSpinDot}) and $\hat S^+_{\mathrm{tot}}$
 (\texttt{totalSpinPlus\_commute\_fermionSpinDot},
 \texttt{Fermion/JordanWigner/Hubbard/TJSpinSymmetryRaising.lean}); scaling by
 the staggered sign product $\varepsilon_x\varepsilon_y$ and summing over the
-double sum preserves commutation, giving the $\hat S^3_{\mathrm{tot}}$/$\hat
-S^+_{\mathrm{tot}}$ conjuncts directly. The $\hat S^-_{\mathrm{tot}}$ conjunct
-follows by conjugate-transposing $(\hat O_L)^2\hat S^+_{\mathrm{tot}}=\hat
-S^+_{\mathrm{tot}}(\hat O_L)^2$, using $(\hat S^+_{\mathrm{tot}})^\dagger=\hat
-S^-_{\mathrm{tot}}$ (\texttt{fermionTotalSpinPlus\_conjTranspose}) together
-with PR-1's self-adjointness (\texttt{fermionStaggeredCasimirOp\_isHermitian}).
+double sum preserves commutation.
 Mirrors the spin-$S$ template of §4.1 Theorem~4.4 (eq.~(4.1.12),
-\texttt{Quantum/SpinS/StaggeredCasimirSU2Invariance.lean}). Not yet consumed
-by \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below):
-these invariance facts feed the ground-multiplet weight-transport step,
-staged for PR-5 (identifying the repulsive-Hubbard ground multiplet's
-occupied Casimir/weight values, per PR-2 above) and the final assembly into
-the ferrimagnetic bound~(10.2.17), staged for PR-8.
+\texttt{Quantum/SpinS/StaggeredCasimirSU2Invariance.lean}). The
+$\hat S^-_{\mathrm{tot}}$ conjunct originally proved here was
+\textbf{deleted in PR-5}: no step of the arc consumes it (PR-4's ladder-ratio
+lemma takes only the $\hat S^+_{\mathrm{tot}}$ commutation, PR-5's tower cross
+terms only the $\hat S^3_{\mathrm{tot}}$ one); that deletion also left PR-1's
+\texttt{fermionStaggeredCasimirOp\_isHermitian}, whose only library consumer it
+was, at reference 0 (kept for PR-8, where the realness of
+$\langle v|(\hat O_L)^2|v\rangle$ is the expected consumer). Both surviving
+conjuncts are themselves still at reference 0: PR-5's
+\texttt{liebRepulsive\_tower\_crossTerm\_eq\_zero} takes
+$[O,\hat S^3_{\mathrm{tot}}]=0$ and PR-4's
+\texttt{fermionSpinMinus\_expectationRatioRe\_invariant} takes
+$[O,\hat S^+_{\mathrm{tot}}]=0$ as \emph{hypotheses} on a general observable
+$O$, so the instantiation at $O=(\hat O_L)^2$ is staged for PR-8's final
+assembly into the ferrimagnetic bound~(10.2.17), and
+\texttt{theorem\_10\_6\_lieb\_ferrimagnetism} is still an axiom below.
 
 \medskip
 \emph{Generic ladder-expectation-ratio invariance, and the fermionic instance
@@ -8048,9 +8053,60 @@ added to the spin-$S$ file: the generic lemma's scalar-action input is the
 pre-existing
 \texttt{totalSpinSOpPlus\_mul\_totalSpinSOpMinus\_mulVec\_eq}. Not yet consumed by
 \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below): the
-fermionic instance supplies the arc's ground-multiplet lowering-tower step,
-staged for PR-5 (weight/Casimir identification) and the final assembly into
-the ferrimagnetic bound~(10.2.17), staged for PR-8.
+fermionic instance supplies the arc's ground-multiplet lowering-tower step.
+PR-5 (the tower basis, below) does \emph{not} consume it --- that PR builds the
+multiplet basis from the weight and Casimir data alone and never forms an
+expectation ratio --- so it remains staged for the arc's remaining transport
+steps (PR-6/PR-7) and the final assembly into the ferrimagnetic
+bound~(10.2.17) at PR-8.
+
+\medskip
+\emph{The ground multiplet is a single $SU(2)$ lowering tower (Issue~\#5347,
+PR~\#5353 PR-5; proved, axiom-free).}
+(\texttt{Fermion/JordanWigner/Hubbard/LiebFerrimagnetismGroundTower.lean}.)
+Write $G$ for the $(N+1)$-electron ground submodule
+\texttt{hubbardGroundSubmoduleAtElectronNumber} of
+$\hat H=\texttt{symmetricRepulsiveHubbardHamiltonian}\,N\,T\,U$ at energy $E_0$, and
+$L=\bigl||A|-|B|\bigr|$ (\texttt{sublatticeImbalance}). Theorem~10.4's conclusions
+enter as \emph{hypotheses} --- the Casimir value $\hat S_{\mathrm{tot}}^2=\frac L2(\frac
+L2+1)$ on $G$, the count $\dim G=L+1$, and $G\ne0$ --- so nothing here re-derives the
+half-filling apparatus. First, the generic band
+\texttt{fermionTotalSpin\_abs\_weight\_le} (Tasaki Lemma~A.15 \texttt{angMom\_abs\_le\_J}
+fed with the Cartesian generators through
+\texttt{fermionTotalSpinSquared\_eq\_cartesianSqSum}; it names a preamble previously
+inlined twice) gives
+\texttt{liebRepulsive\_ground\_spinZ\_abs\_le}: every $\hat S^3_{\mathrm{tot}}$-eigenvector
+of $G$ has weight $m$ with $|m|\le L/2$. Second,
+\texttt{liebRepulsive\_ground\_exists\_topWeight}: $G$ is $\hat S^3_{\mathrm{tot}}$-invariant
+(\texttt{liebRepulsive\_groundSubmodule\_le\_comap\_of\_commute}), so
+\texttt{exists\_eigenvector\_in\_invariant\_submodule} yields a seed $v\in G$ at a real
+weight $m$; $\hat S^+_{\mathrm{tot}}$ also preserves $G$ and raises the weight by one
+(\texttt{fermionTotalSpinZ\_mulVec\_spinPlusPow}), so the band forces
+$(\hat S^+_{\mathrm{tot}})^{L+1}v=0$ and the last non-vanishing iterate
+$w=(\hat S^+_{\mathrm{tot}})^{k_0-1}v$ ($k_0=\texttt{Nat.find}$) is a highest-weight
+vector. Its weight $\mu$ satisfies $\mu(\mu+1)=\frac L2(\frac L2+1)$
+(\texttt{fermionTotalSpinSquared\_mulVec\_of\_isTop\_general} against the hypothesis
+Casimir value), whose roots are $L/2$ and $-(L/2+1)$; the band excludes the second, so
+$\hat S^3_{\mathrm{tot}}w=\frac L2 w$. Third, lowering stays in $G$
+(\texttt{liebRepulsive\_ground\_spinMinusPow\_mem}, the same comap step at
+$(\hat S^-_{\mathrm{tot}})^k$, which is where the hopping symmetry $T_{ij}=T_{ji}$ is
+needed), the $L+1$ iterates are non-zero and independent
+(\texttt{liebRepulsive\_ground\_tower\_ne\_zero},
+\texttt{\_tower\_linearIndependent}, from
+\texttt{spinMinusPow\_ne\_zero\_general} / \texttt{spinMinusPow\_linearIndependent\_general}),
+and \texttt{finrank\_span\_eq\_card} with $\dim G=L+1$ upgrades
+$\operatorname{span}\le G$ to the equality
+\texttt{liebRepulsive\_ground\_eq\_span\_tower}. Fourth,
+\texttt{liebRepulsive\_tower\_crossTerm\_eq\_zero}: distinct tower members carry the
+distinct real weights $L/2-j\ne L/2-k$, so for any $O$ commuting with
+$\hat S^3_{\mathrm{tot}}$ the cross term
+$\langle(\hat S^-_{\mathrm{tot}})^jw|O|(\hat S^-_{\mathrm{tot}})^kw\rangle$ vanishes by
+\texttt{Matrix.IsHermitian.dotProduct\_eq\_zero\_of\_eigenvalues\_ne}
+(\texttt{Quantum/SpinS/SaturatedFullLadderOrthogonality.lean}, already in scope through the
+module's existing import chain). Not yet consumed by
+\texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below): the tower basis is
+what PR-6/PR-7 transport the ferrimagnetic bound~(10.2.17) along, with the final assembly
+staged for PR-8.
 
 \medskip
 \noindent\textbf{Theorem 10.6} (Shen–Qiu–Tian ferrimagnetism; Tasaki §10.2.3,

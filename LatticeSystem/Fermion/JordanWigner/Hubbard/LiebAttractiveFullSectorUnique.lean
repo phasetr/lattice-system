@@ -122,6 +122,23 @@ theorem fermionTotalSpinSquared_posSemidef (N : ℕ) :
     ((Matrix.posSemidef_conjTranspose_mul_self _).add
       (Matrix.posSemidef_conjTranspose_mul_self _))
 
+/-- **The `Ŝ³_tot` weight band `|m| ≤ J`** (Tasaki Lemma A.15 on the fermionic carrier).  A nonzero
+joint eigenvector of the total-spin Casimir at `J(J+1)` (`J ≥ 0`) and of `Ŝ³_tot` at `m` has
+`|m| ≤ J`.  This is the generic angular-momentum bound `angMom_abs_le_J` fed with the three
+fermionic Cartesian generators `Ŝ⁽¹⁾_tot`, `Ŝ⁽²⁾_tot`, `Ŝ³_tot` through
+`fermionTotalSpinSquared_eq_cartesianSqSum`. -/
+theorem fermionTotalSpin_abs_weight_le (N : ℕ) {w : (Fin (2 * N + 2) → Fin 2) → ℂ} (hw : w ≠ 0)
+    {Jr m : ℝ} (hJ : 0 ≤ Jr)
+    (hcas : (fermionTotalSpinSquared N).mulVec w = ((Jr * (Jr + 1) : ℝ) : ℂ) • w)
+    (h3 : (fermionTotalSpinZ N).mulVec w = (m : ℂ) • w) :
+    |m| ≤ Jr := by
+  have hcart : (tJTotalSpinOne N * tJTotalSpinOne N + tJTotalSpinTwo N * tJTotalSpinTwo N
+      + fermionTotalSpinZ N * fermionTotalSpinZ N).mulVec w = ((Jr * (Jr + 1) : ℝ) : ℂ) • w := by
+    rw [← fermionTotalSpinSquared_eq_cartesianSqSum]; exact hcas
+  exact abs_le.mpr (angMom_abs_le_J (tJTotalSpinOne N) (tJTotalSpinTwo N) (fermionTotalSpinZ N)
+    (tJTotalSpinOne_isHermitian N) (tJTotalSpinTwo_isHermitian N) (tJTotalSpin_su2_12 N)
+    hw hJ hcart h3)
+
 /-! ## The total electron number commutes with the Cartesian generators -/
 
 /-- `N̂` commutes with `Ŝ⁽¹⁾_tot = ½(Ŝ⁺+Ŝ⁻)` (both `Ŝ⁺` and `Ŝ⁻` conserve the electron number). -/
@@ -273,14 +290,14 @@ theorem attractiveHubbardFullSectorGround_inf_spinZ_eigenspace_eq_bot (k Ne : �
     have hs : Real.sqrt (1 + 4 * lr) ^ 2 = 1 + 4 * lr := Real.sq_sqrt (by linarith)
     rw [hJr_def]; nlinarith [hs]
   -- SU(2) engine inputs for the plain Cartesian generators.
+  have hcas_Jr : (fermionTotalSpinSquared N).mulVec χ = ((Jr * (Jr + 1) : ℝ) : ℂ) • χ := by
+    rw [hχlr, show ((Jr * (Jr + 1) : ℝ) : ℂ) = (lr : ℂ) by rw [hJr_eq]]
   have hsq_engine : (tJTotalSpinOne N * tJTotalSpinOne N + tJTotalSpinTwo N * tJTotalSpinTwo N
       + fermionTotalSpinZ N * fermionTotalSpinZ N).mulVec χ = ((Jr * (Jr + 1) : ℝ) : ℂ) • χ := by
-    rw [← fermionTotalSpinSquared_eq_cartesianSqSum, hχlr,
-      show ((Jr * (Jr + 1) : ℝ) : ℂ) = (lr : ℂ) by rw [hJr_eq]]
+    rw [← fermionTotalSpinSquared_eq_cartesianSqSum]; exact hcas_Jr
   -- The seed weight `m` is a nonzero integer (even-`Ne` sector): `Jr` is a nonneg integer too.
-  obtain ⟨hmlb, hmub⟩ := angMom_abs_le_J (tJTotalSpinOne N) (tJTotalSpinTwo N)
-    (fermionTotalSpinZ N) (tJTotalSpinOne_isHermitian N) (tJTotalSpinTwo_isHermitian N)
-    (tJTotalSpin_su2_12 N) hχ0 hJr_nonneg hsq_engine hχ3
+  obtain ⟨hmlb, hmub⟩ :=
+    abs_le.mp (fermionTotalSpin_abs_weight_le N hχ0 hJr_nonneg hcas_Jr hχ3)
   have hJr_pos : 0 < Jr := by rcases lt_or_gt_of_ne hm0 with h | h <;> linarith
   obtain ⟨hχup, _⟩ := attractiveHubbard_up_down_mulVec_of_number_spinZ Ne (m : ℂ) hχN hχ3
   obtain ⟨w, hw⟩ := Function.ne_iff.mp hχ0

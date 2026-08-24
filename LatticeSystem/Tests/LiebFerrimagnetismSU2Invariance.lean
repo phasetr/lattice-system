@@ -9,9 +9,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismSU2Invarianc
 Specification suite for
 `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismSU2Invariance.lean`.
 The `example`s pin down the exact signatures of
-`fermionStaggeredCasimirOp_commute_fermionTotalSpinZ`,
-`fermionStaggeredCasimirOp_commute_fermionTotalSpinPlus` and
-`fermionStaggeredCasimirOp_commute_fermionTotalSpinMinus`, mirroring PR-1/PR-2's specification
+`fermionStaggeredCasimirOp_commute_fermionTotalSpinZ` and
+`fermionStaggeredCasimirOp_commute_fermionTotalSpinPlus`, mirroring PR-1/PR-2's specification
 style (`Tests/LiebFerrimagnetismStaggeredAlgebra.lean`,
 `Tests/LiebFerrimagnetismTransverseCasimir.lean`) and the discharged SpinS template
 `Quantum/SpinS/StaggeredCasimirSU2Invariance.lean`, so that the implementation cannot silently
@@ -39,14 +38,5 @@ sum `Ô²` does too. -/
 example (N : ℕ) (A : Finset (Fin (N + 1))) :
     Commute (fermionStaggeredCasimirOp N A) (fermionTotalSpinPlus N) :=
   fermionStaggeredCasimirOp_commute_fermionTotalSpinPlus N A
-
-/-- **`[Ô², Ŝ⁻_tot] = 0`.** Derived from `[Ô², Ŝ⁺_tot] = 0` by conjugate transposes, using
-`(Ŝ⁺_tot)ᴴ = Ŝ⁻_tot` (`fermionTotalSpinPlus_conjTranspose`) and the Hermiticity of `Ô²`
-(`fermionStaggeredCasimirOp_isHermitian`, `LiebFerrimagnetismStaggeredAlgebra.lean:148`) —
-mirroring `fermionTotalSpinMinus_commute_symmetricRepulsiveHubbardHamiltonian`
-(`LiebRepulsiveSU2Invariance.lean:137`). -/
-example (N : ℕ) (A : Finset (Fin (N + 1))) :
-    Commute (fermionStaggeredCasimirOp N A) (fermionTotalSpinMinus N) :=
-  fermionStaggeredCasimirOp_commute_fermionTotalSpinMinus N A
 
 end LatticeSystem.Tests.LiebFerrimagnetismSU2Invariance
