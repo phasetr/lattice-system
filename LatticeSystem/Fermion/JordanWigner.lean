@@ -219,6 +219,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetism
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismStaggeredAlgebra
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismTransverseCasimir
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismSU2Invariance
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismLadderRatio
 import LatticeSystem.Fermion.JordanWigner.Hubbard.BipartiteSpectrum
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebShenQiu
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebKuboKishi
