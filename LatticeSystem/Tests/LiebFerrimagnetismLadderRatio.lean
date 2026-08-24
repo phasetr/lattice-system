@@ -12,7 +12,7 @@ The `example` applies `fermionSpinMinus_expectationRatioRe_invariant` through *n
 so it pins the binder names as well as the argument types and order of
 the fermion-level instantiation of the generic
 `Math.MatrixAnalysis.LadderExpectationRatio.ladder_expectationRatioRe_invariant`
-(`Tests/LadderExpectationRatio.lean`) at `Sp := fermionTotalSpinPlus N`,
+(`Math/MatrixAnalysis/LadderExpectationRatio.lean`) at `Sp := fermionTotalSpinPlus N`,
 `Sm := fermionTotalSpinMinus N`, using `fermionTotalSpinMinus_conjTranspose`
 (`(Ŝ⁻_tot)ᴴ = Ŝ⁺_tot`, `SpinTotHermitian.lean:35`) for the adjoint hypothesis and
 `fermionTotalSpinPlus_mul_fermionTotalSpinMinus` (`Ŝ⁺_tot Ŝ⁻_tot = (Ŝ_tot)² − Ŝ³_tot(Ŝ³_tot − 1)`,

@@ -10,8 +10,9 @@ This arc's PR-4 retrofits `su2_expectation_ladder_cross`
 (`Quantum/SpinS/SU2ExpectationLadderInvariant.lean:71`) and
 `su2_expectationRatioRe_ladder_invariant` (`Quantum/SpinS/SU2ExpectationLadderInvariant.lean:93`)
 onto the new generic `Math.MatrixAnalysis.LadderExpectationRatio` lemmas
-(`Tests/LadderExpectationRatio.lean`), keeping both **types** unchanged and turning only their
-proofs into instantiations of the generic lemma. The one binder-level change is a rename: since
+(`Math/MatrixAnalysis/LadderExpectationRatio.lean`), keeping both **types** unchanged and turning
+only their proofs into instantiations of the generic lemma. The one binder-level change is a
+rename: since
 the generic lemma needs only
 `Commute O Ŝ⁺_tot`, the lowering-commutation binder of
 `su2_expectationRatioRe_ladder_invariant` became unused and is now spelled `_hOminus` (as
