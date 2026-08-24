@@ -7941,18 +7941,18 @@ positivity $\operatorname{Re}\langle v|(\hat O^{(3)}_L)^2|v\rangle\ge0$
 transverse expectation lower bound $\operatorname{Re}\langle v|(\hat
 O_L)^2_\perp|v\rangle\le\operatorname{Re}\langle v|(\hat O_L)^2|v\rangle$
 (\texttt{fermionStaggeredTransverse\_expectation\_le\_staggeredCasimir\_expectation}),
-the positivity step feeding the ferrimagnetic bound (10.2.17); also shows
-$(\hat O_L)^2$ itself is self-adjoint
-(\texttt{fermionStaggeredCasimirOp\_isHermitian}). Mirrors the spin-$S$
-template of §4.1 Theorem~4.4 (eq.~(4.1.12)). \textbf{Debt discharged
-(partial).} \texttt{fermionStaggeredTransverse\_expectation\_le\_staggeredCasimir\_expectation}
-has since been consumed by PR-7's capstone
+the positivity step feeding the ferrimagnetic bound (10.2.17). Mirrors the
+spin-$S$ template of §4.1 Theorem~4.4 (eq.~(4.1.12)). \textbf{Debt
+discharged.} \texttt{fermionStaggeredTransverse\_expectation\_le\_staggeredCasimir\_expectation}
+was consumed by PR-7's capstone
 \texttt{liebRepulsive\_centered\_ratioRe\_ge\_sq} (below), which restores the
 longitudinal square to raise the staggered transverse expectation to
-$\operatorname{Re}\langle v|(\hat O_L)^2|v\rangle$;
-\texttt{fermionStaggeredCasimirOp\_isHermitian} remains at reference~0. Not
-yet consumed by \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom
-below); PR-8 assembles the final capstone.
+$\operatorname{Re}\langle v|(\hat O_L)^2|v\rangle$; the whole layer now
+feeds \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (\textbf{proved}, PR-8,
+below). \textbf{Deleted (PR-8).} The reference-0 declaration
+\texttt{fermionStaggeredCasimirOp\_isHermitian} --- the self-adjointness of
+the un-split $(\hat O_L)^2$ --- was never consumed by the assembly and was
+removed rather than kept as decoration.
 
 \medskip
 \emph{Transverse/Casimir identity (Issue~\#5347, PR~\#5349
@@ -7982,9 +7982,8 @@ the route already taken by the repulsive multiplet and attractive
 full-sector arguments. \textbf{Debt discharged.} Consumed by PR-7's Casimir
 step \texttt{liebRepulsive\_centered\_sum\_transverse\_eq} (below), which
 rewrites the un-staggered transverse sum through this identity to evaluate
-it on the centered tower member. Not yet consumed by
-\texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below); PR-8
-assembles the full ferrimagnetic bound~(10.2.17).
+it on the centered tower member, feeding PR-8's assembly of
+\texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (\textbf{proved}, below).
 
 \medskip
 \emph{$SU(2)$ invariance of $(\hat O_L)^2$ (Issue~\#5347, PR~\#5350
@@ -8003,22 +8002,19 @@ commuting with $\hat S^3_{\mathrm{tot}}$
 the staggered sign product $\varepsilon_x\varepsilon_y$ and summing over the
 double sum preserves commutation.
 Mirrors the spin-$S$ template of §4.1 Theorem~4.4 (eq.~(4.1.12),
-\texttt{Quantum/SpinS/StaggeredCasimirSU2Invariance.lean}). The
-$\hat S^-_{\mathrm{tot}}$ conjunct originally proved here was
+\texttt{Quantum/SpinS/StaggeredCasimirSU2Invariance.lean}). \textbf{Debt
+discharged.} Both conjuncts are instantiated at $O=(\hat O_L)^2$ by PR-8's
+final assembly into the ferrimagnetic bound~(10.2.17) ---
+\texttt{fermionStaggeredCasimirOp\_commute\_fermionTotalSpinPlus} feeds the
+tower-ratio transport, \texttt{fermionStaggeredCasimirOp\_commute\_fermionTotalSpinZ}
+feeds the cross-term vanishing --- completing
+\texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (\textbf{proved}, below). The
+$\hat S^-_{\mathrm{tot}}$ conjunct recorded here through PR-4 was
 \textbf{deleted in PR-5}: no step of the arc consumes it (PR-4's ladder-ratio
 lemma takes only the $\hat S^+_{\mathrm{tot}}$ commutation, PR-5's tower cross
 terms only the $\hat S^3_{\mathrm{tot}}$ one); that deletion also left PR-1's
-\texttt{fermionStaggeredCasimirOp\_isHermitian}, whose only library consumer it
-was, at reference 0 (kept for PR-8, where the realness of
-$\langle v|(\hat O_L)^2|v\rangle$ is the expected consumer). Both surviving
-conjuncts are themselves still at reference 0: PR-5's
-\texttt{liebRepulsive\_tower\_crossTerm\_eq\_zero} takes
-$[O,\hat S^3_{\mathrm{tot}}]=0$ and PR-4's
-\texttt{fermionSpinMinus\_expectationRatioRe\_invariant} takes
-$[O,\hat S^+_{\mathrm{tot}}]=0$ as \emph{hypotheses} on a general observable
-$O$, so the instantiation at $O=(\hat O_L)^2$ is staged for PR-8's final
-assembly into the ferrimagnetic bound~(10.2.17), and
-\texttt{theorem\_10\_6\_lieb\_ferrimagnetism} is still an axiom below.
+\texttt{fermionStaggeredCasimirOp\_isHermitian} at reference 0, and it was
+\textbf{deleted in PR-8} (see the updated PR-1 remark above).
 
 \medskip
 \emph{Generic ladder-expectation-ratio invariance, and the fermionic instance
@@ -8056,15 +8052,16 @@ the positional call site in
 \texttt{Quantum/SpinS/SU2ExpectationLadderIterated.lean}. No declaration is
 added to the spin-$S$ file: the generic lemma's scalar-action input is the
 pre-existing
-\texttt{totalSpinSOpPlus\_mul\_totalSpinSOpMinus\_mulVec\_eq}. Not yet consumed by
-\texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below): the
-fermionic instance supplies the arc's ground-multiplet lowering-tower step.
-PR-5 (the tower basis, below) does \emph{not} consume it --- that PR builds the
+\texttt{totalSpinSOpPlus\_mul\_totalSpinSOpMinus\_mulVec\_eq}. \textbf{Debt
+discharged.} The fermionic instance
+\texttt{fermionSpinMinus\_expectationRatioRe\_invariant} supplies the arc's
+ground-multiplet lowering-tower step and is consumed by PR-8's final
+assembly \texttt{liebFerrimagnetism\_tower\_ratioRe\_eq} into
+\texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (\textbf{proved}, below). PR-5
+(the tower basis, below) does \emph{not} consume it --- that PR builds the
 multiplet basis from the weight and Casimir data alone and never forms an
 expectation ratio --- and neither PR-6 (the centered-sector bridge) nor PR-7
-(the centered-sector bound) forms one either, so it remains staged for
-PR-8's final assembly into the ferrimagnetic bound~(10.2.17) (or a later PR,
-if PR-8 does not need it).
+(the centered-sector bound) forms one either.
 
 \medskip
 \emph{The ground multiplet is a single $SU(2)$ lowering tower (Issue~\#5347,
@@ -8109,11 +8106,18 @@ $\hat S^3_{\mathrm{tot}}$ the cross term
 $\langle(\hat S^-_{\mathrm{tot}})^jw|O|(\hat S^-_{\mathrm{tot}})^kw\rangle$ vanishes by
 \texttt{Matrix.IsHermitian.dotProduct\_eq\_zero\_of\_eigenvalues\_ne}
 (\texttt{Quantum/SpinS/SaturatedFullLadderOrthogonality.lean}, already in scope through the
-module's existing import chain). Not yet consumed by
-\texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below): the tower basis is
-what PR-8's final assembly transports the ferrimagnetic bound~(10.2.17) along (PR-6 and
-PR-7 instead identify and bound a single centered tower member, without consuming the
-tower-basis lemmas themselves).
+module's existing import chain). \textbf{Debt discharged.} The tower basis
+(\texttt{liebRepulsive\_ground\_eq\_span\_tower} and
+\texttt{liebRepulsive\_tower\_crossTerm\_eq\_zero}) is what PR-8's final
+assembly \texttt{liebFerrimagnetism\_bound\_of\_mem\_ground} transports the
+ferrimagnetic bound~(10.2.17) along into
+\texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (\textbf{proved}, below) (PR-6
+and PR-7 instead identify and bound a single centered tower member, without
+consuming the tower-basis lemmas themselves). \textbf{Also deletes} PR-3's
+\texttt{fermionStaggeredCasimirOp\_commute\_fermionTotalSpinMinus} (see the
+updated PR-3 remark above), which left PR-1's
+\texttt{fermionStaggeredCasimirOp\_isHermitian} at reference 0; that one was
+\textbf{deleted in PR-8} as well.
 
 \medskip
 \emph{The centered tower member carries Theorem~10.5's correlation signs (Issue~\#5347,
@@ -8208,18 +8212,19 @@ obtained. \textbf{Debt discharged.} Consumes PR-1's
 \texttt{fermionStaggeredTransverse\_expectation\_le\_staggeredCasimir\_expectation}, PR-2's
 \texttt{sum\_fermionSpinTransverse\_eq\_totalSpinSquared\_sub\_spinZ\_sq}, and PR-6's
 \texttt{liebRepulsive\_exists\_centered\_transverse\_sign}, all three previously staged at
-reference 0. \textbf{Debt (new).} Only
-\texttt{liebRepulsive\_exists\_centered\_ratioRe\_ge\_sq} is at reference 0, staged for PR-8's
-final assembly into \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below); the
-other three public declarations are consumed within this module in a straight-line chain (the
-Casimir step and the sign step feed the capstone, which feeds the existential form). This PR
-bounds a single centered tower member, and PR-8's remaining task is to discharge the axiom for
-an arbitrary normalized ground state.
+reference 0. \textbf{Also discharged (by PR-8).}
+\texttt{liebRepulsive\_exists\_centered\_ratioRe\_ge\_sq} is consumed by PR-8's
+\texttt{liebFerrimagnetism\_symmetric} into \texttt{theorem\_10\_6\_lieb\_ferrimagnetism}
+(\textbf{proved} below); the other three public declarations are consumed within this module
+in a straight-line chain (the Casimir step and the sign step feed the capstone, which feeds
+the existential form). This PR bounds a single centered tower member; PR-8 universalizes the
+bound to an arbitrary normalized ground state via a ground-multiplet tower-transport argument.
 
 \medskip
 \noindent\textbf{Theorem 10.6} (Shen–Qiu–Tian ferrimagnetism; Tasaki §10.2.3,
-p.~356, eqs.~(10.2.16)/(10.2.17)). Under the hypotheses of Theorem 10.4, every
-normalized ground state $v$ satisfies the staggered-order-parameter bound
+p.~356, eqs.~(10.2.16)/(10.2.17)), \emph{proved, axiom discharged}
+(Issue~\#5347, PR~\#5356 PR-8; \texttt{\#print axioms} = std3). Under the hypotheses of
+Theorem 10.4, every normalized ground state $v$ satisfies the staggered-order-parameter bound
 $\langle v|(\hat O_L)^2|v\rangle \ge \bigl((|A|-|B|)/2\bigr)^2$, where
 $(\hat O_L)^2 = \sum_{x,y} \varepsilon_x \varepsilon_y\, \hat S_x \cdot \hat S_y$
 with staggered sign $\varepsilon_x = \pm 1$ on the two sublattices
@@ -8229,8 +8234,23 @@ via \emph{both} Theorem~10.4 (\texttt{theorem\_10\_4\_lieb\_repulsive\_half\_fil
 and inequality~(10.2.7) — Theorem~10.5's transverse-correlation sign
 (\texttt{theorem\_10\_5\_shen\_qiu\_tian\_transverse\_sign}), used in place of the
 spin-$S$ argument's~(4.1.15) — \emph{not} reflection positivity (RP is Theorem~10.4's
-own proof method, already discharged); recorded as an axiom pending discharge
-(Issue~\#5347).
+own proof method, already discharged). \textbf{PR-8's assembly}
+(\texttt{liebFerrimagnetism\_symmetric}, \texttt{theorem\_10\_6\_lieb\_ferrimagnetism},
+\texttt{LiebFerrimagnetismDischarge.lean}): PR-4's ladder-ratio invariance, applied at
+$(\hat O_L)^2$ (which commutes with $\hat S^+_{\mathrm{tot}}$, PR-3's
+\texttt{fermionStaggeredCasimirOp\_commute\_fermionTotalSpinPlus}), spreads PR-7's
+centered-member bound to every tower member (\texttt{liebFerrimagnetism\_tower\_ratioRe\_eq},
+\texttt{liebFerrimagnetism\_tower\_ratioRe\_ge\_sq}); since $(\hat O_L)^2$ also commutes with
+$\hat S^3_{\mathrm{tot}}$ (PR-3's
+\texttt{fermionStaggeredCasimirOp\_commute\_fermionTotalSpinZ}), PR-5's cross-term vanishing
+diagonalizes the quadratic form over the tower basis, averaging the per-member bound to an
+arbitrary normalized ground vector (\texttt{liebFerrimagnetism\_bound\_of\_mem\_ground}). A
+separate elementary branch handles the single site $N=0$, where $(\hat O_L)^2$ is the plain
+Casimir. Splitting \texttt{IsLiebRepulsiveModel}'s Hamiltonian disjunction (uniform vs.\
+symmetric, an energy shift) gives the capstone. The reference-0
+\texttt{fermionStaggeredCasimirOp\_isHermitian} was deleted in this PR as decorative, since the
+capstone reads $\langle v|(\hat O_L)^2|v\rangle$ through \texttt{vectorExpectation}'s own real
+part.
 
 \medskip
 \noindent\textbf{Proposition 10.7} (Tasaki §10.2.3, p.~356), \emph{proved

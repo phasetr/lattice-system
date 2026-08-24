@@ -44,8 +44,9 @@ namespace LatticeSystem.Fermion
 open Matrix Module LatticeSystem.Quantum LatticeSystem.Math
 
 /-- Theorem 10.4's Casimir eigenvalue rewritten as the real cast `J (J + 1)` at `J = L/2`, the
-shape consumed by the generic weight band `fermionTotalSpin_abs_weight_le`. -/
-private theorem liebRepulsiveSpinCasimir_eq_ofReal {N : ℕ} (A : Finset (Fin (N + 1))) :
+shape consumed by the generic weight band `fermionTotalSpin_abs_weight_le` and by the `N = 0`
+branch of the ferrimagnetic bound. -/
+theorem liebRepulsiveSpinCasimir_eq_ofReal {N : ℕ} (A : Finset (Fin (N + 1))) :
     liebRepulsiveSpinCasimir A =
       ((((sublatticeImbalance A : ℝ) / 2) * ((sublatticeImbalance A : ℝ) / 2 + 1) : ℝ) : ℂ) := by
   rw [liebRepulsiveSpinCasimir]

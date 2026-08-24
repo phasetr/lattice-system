@@ -15,7 +15,7 @@ Specification suite for
 `fermionStaggeredCasimirOp_eq_transverse_add_staggeredSpinZ_sq`,
 `fermionStaggeredSpinZ_isHermitian`, `vectorExpectation_staggeredSpinZ_sq_nonneg`,
 `fermionStaggeredTransverse_expectation_le_staggeredCasimir_expectation` and
-`fermionStaggeredCasimirOp_isHermitian`, mirroring the discharged SpinS template
+`fermionStaggeredCasimirOp_zero_eq_totalSpinSquared`, mirroring the discharged SpinS template
 `Quantum/SpinS/FerrimagneticLROComponentAlgebra.lean`, so that the implementation cannot silently
 drift from the design's exact statements.  The closing `N = 0` sanity check is the cheapest
 falsifier of a staggered-sign or normalization slip: on a single site the staggered gauge squares
@@ -93,24 +93,18 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (v : (Fin (2 * N + 2) → Fin 2) �
       (vectorExpectation (fermionStaggeredCasimirOp N A) v).re :=
   fermionStaggeredTransverse_expectation_le_staggeredCasimir_expectation N A v
 
-/-- `fermionStaggeredCasimirOp` is self-adjoint (staged for later PR consumption to discharge
-`.im = 0` on its expectations; see the PR-7/PR-8 design route in the module docstring). -/
-example (N : ℕ) (A : Finset (Fin (N + 1))) :
-    (fermionStaggeredCasimirOp N A).IsHermitian :=
-  fermionStaggeredCasimirOp_isHermitian N A
-
 /-! ## 5. `N = 0` sanity check -/
 
-/-- **Single-site collapse.**  For `N = 0` the only pair is `x = y = 0`, whose staggered weight is
-`ε₀ ε₀ = +1` for either sublattice choice, so the staggered order parameter `(Ô_L)²` is the plain
-total-spin Casimir `(Ŝ_tot)²`. -/
-theorem fermionStaggeredCasimirOp_zero_eq_totalSpinSquared (A : Finset (Fin 1)) :
-    fermionStaggeredCasimirOp 0 A = fermionTotalSpinSquared 0 := by
-  rw [fermionTotalSpinSquared_eq_sum_fermionSpinDot]
-  unfold fermionStaggeredCasimirOp
-  refine Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => ?_
-  obtain rfl : x = y := Subsingleton.elim (α := Fin 1) x y
-  by_cases hx : x ∈ A <;> simp [hx]
+/-- **`A0b` (PR-8 design §2 layer A): single-site collapse, moved to the library.**  For `N = 0`
+the only pair is `x = y = 0`, whose staggered weight is `ε₀ ε₀ = +1` for either sublattice choice,
+so the staggered order parameter `(Ô_L)²` is the plain total-spin Casimir `(Ŝ_tot)²`. PR-8's
+`N = 0` branch (`E1`, `liebFerrimagnetism_N_zero`) needs this from the library, not the `Tests`
+root, so the statement moves to `LiebFerrimagnetismStaggeredAlgebra.lean` (this pin only calls it).
+This pin fails to compile until the library declaration lands: re-proving it here while the
+library copy also exists would be a banned duplicate statement. -/
+example (A : Finset (Fin 1)) :
+    fermionStaggeredCasimirOp 0 A = fermionTotalSpinSquared 0 :=
+  fermionStaggeredCasimirOp_zero_eq_totalSpinSquared A
 
 /-- **Single-site split.**  The transverse / longitudinal decomposition reproduces `(Ŝ_tot)²` at
 `N = 0` for either sublattice choice — a sign or normalization slip in the split would break this

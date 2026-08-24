@@ -24,18 +24,20 @@ Tasaki proves this exactly as Theorem 4.4 (Tasaki, 1st ed., Springer 2020,
 (`theorem_10_5_shen_qiu_tian_transverse_sign`), used in place of the spin-`S`
 argument's (4.1.15) — **not** on reflection positivity: reflection positivity is
 Theorem 10.4's own proof method, and Theorem 10.6 reuses Theorem 10.4's
-already-discharged ground subspace together with Theorem 10.5's correlation-sign
-step. This is currently an `axiom` pending discharge (Issue #5347), reusing the
-packaged model hypotheses `IsLiebRepulsiveModel` and the ground subspace from
-`LiebRepulsive.lean`.
+ground subspace together with Theorem 10.5's correlation-sign step.
+
+This file keeps the order parameter `fermionStaggeredCasimirOp` itself, which the
+whole proof chain is stated in terms of and therefore imports. The theorem
+`theorem_10_6_lieb_ferrimagnetism` lives at the far end of that chain, in
+`LiebFerrimagnetismDischarge.lean`, together with the assembly of Theorems 10.4
+and 10.5 that proves it; it reuses the packaged model hypotheses
+`IsLiebRepulsiveModel` and the ground subspace from `LiebRepulsive.lean`.
 -/
 
 namespace LatticeSystem.Fermion
 
 open Matrix LatticeSystem.Quantum
 open scoped BigOperators ComplexOrder
-
-variable {N : ℕ}
 
 /-- The squared staggered magnetization order parameter
 `(Ô_L)² = Σ_{x,y} ε_x ε_y Ŝ_x · Ŝ_y` (Tasaki eq. (10.2.16)), where the
@@ -45,30 +47,5 @@ noncomputable def fermionStaggeredCasimirOp (N : ℕ) (A : Finset (Fin (N + 1)))
   ∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
     ((if x ∈ A then (1 : ℂ) else -1) * (if y ∈ A then (1 : ℂ) else -1)) •
       fermionSpinDot N x y
-
-/-- **Tasaki Theorem 10.6** (Shen–Qiu–Tian ferrimagnetism; 1st ed., Springer
-2020, §10.2.3, p. 356, eqs. (10.2.16)/(10.2.17), **AXIOM**). Under the
-hypotheses of Theorem 10.4, every normalized ground state `v` of the
-repulsive Hubbard model satisfies the ferrimagnetic order-parameter bound
-
-  `⟨v| (Ô_L)² |v⟩ ≥ ((|A| − |B|)/2)²`.
-
-(The book also notes the left-hand side is independent of the ground state.)
-Proved via Theorem 10.4 and Theorem 10.5 (inequality (10.2.7)), exactly as Theorem 4.4
-(not reflection positivity); recorded as an axiom pending discharge (Issue #5347). -/
-axiom theorem_10_6_lieb_ferrimagnetism
-    (A : Finset (Fin (N + 1)))
-    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
-    (H : ManyBodyOp (Fin (2 * N + 2)))
-    (hModel : IsLiebRepulsiveModel A T H)
-    (E₀ : ℂ)
-    (hGS_ne : hubbardGroundSubmoduleAtElectronNumber H E₀ (N + 1) ≠ ⊥)
-    (hMin : ∀ E : ℂ, hubbardGroundSubmoduleAtElectronNumber H E (N + 1) ≠ ⊥ →
-      E₀.re ≤ E.re)
-    (v : (Fin (2 * N + 2) → Fin 2) → ℂ)
-    (hv : v ∈ hubbardGroundSubmoduleAtElectronNumber H E₀ (N + 1))
-    (hnorm : dotProduct (star v) v = 1) :
-    ((sublatticeImbalance A : ℝ) / 2) ^ 2 ≤
-      (vectorExpectation (fermionStaggeredCasimirOp N A) v).re
 
 end LatticeSystem.Fermion
