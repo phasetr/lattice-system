@@ -117,6 +117,7 @@ import LatticeSystem.Tests.ProjectiveRepresentation
 import LatticeSystem.Tests.SPTSymmetryTransportedMPS
 import LatticeSystem.Tests.SPTMatrixProductIndex
 import LatticeSystem.Tests.LiebFerrimagnetismStaggeredAlgebra
+import LatticeSystem.Tests.LiebFerrimagnetismTransverseCasimir
 import LatticeSystem.Tests.DegeneratePerturbationSpectralGapForm
 import LatticeSystem.Tests.DegeneratePerturbationReducedResolvent
 import LatticeSystem.Tests.DegeneratePerturbationWitness
