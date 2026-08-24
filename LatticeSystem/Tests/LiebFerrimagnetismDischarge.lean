@@ -8,12 +8,12 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismDischarge
 
 Specification suite for
 `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismDischarge.lean` (PR-8, the final PR
-of the Theorem 10.6 discharge arc, issue #5347), per the confirmed design
-(`.self-local/docs/theorem-10-6-pr8-design.md`, 2026-08-24, layers C/D/E). The `example`s pin down
-the exact signatures of the five **public** declarations: the tower ratio-transport equality (`C1`)
-and its `S₀² ≤ …` corollary (`C2`), the universal ground-vector bound (`D2`), the assembled
-symmetric-form bound (`E2`), and the capstone (`E3`, `theorem_10_6_lieb_ferrimagnetism`, now a
-`theorem`, byte-identical signature to the axiom it replaces in `LiebFerrimagnetism.lean`). The
+of the Theorem 10.6 discharge arc, issue #5347), per the confirmed design (layers C/D/E). The
+`example`s pin down the exact signatures of the five **public** declarations: the tower
+ratio-transport equality (`C1`) and its `S₀² ≤ …` corollary (`C2`), the universal
+ground-vector bound (`D2`), the assembled symmetric-form bound (`E2`), and the capstone (`E3`,
+`theorem_10_6_lieb_ferrimagnetism`, now a `theorem`, byte-identical signature to the axiom it
+replaces in `LiebFerrimagnetism.lean`). The
 `private` declarations `B1` (`liebRepulsive_groundEnergy_eq_of_min`), `D1`
 (`vectorExpectation_diagonal_of_crossTerm_zero`) and `E1` (`liebFerrimagnetism_N_zero`) are not
 pinned here (repo convention: only public declarations get a `Tests/` pin, mirrored from
