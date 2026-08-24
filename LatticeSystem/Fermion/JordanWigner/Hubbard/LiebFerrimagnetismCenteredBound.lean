@@ -85,4 +85,36 @@ theorem liebRepulsive_centered_staggeredTransverse_ge_sum {N : ℕ} (A : Finset 
   obtain ⟨-, -, hneg⟩ := hsign x y
   exact liebRepulsive_staggeredPair_re_le A v x y hneg
 
+/-! ## The Casimir step -/
+
+/-- **The un-staggered transverse expectation on the centered tower member.**  Writing the
+transverse double sum as `(Ŝ_tot)² − (Ŝ³_tot)²`, the centered tower member `u = (Ŝ⁻_tot)^{k₀} w`
+(`k₀ = L/2`) is an eigenvector of `(Ŝ_tot)²` at Theorem 10.4's Casimir value `γ₀` — lowering stays
+inside the ground submodule (`liebRepulsive_ground_spinMinusPow_mem`) — and of `Ŝ³_tot` at the
+centered weight `m₀ = L/2 − k₀` (`fermionTotalSpinZ_mulVec_spinMinusPow_general`).  Hence the
+expectation is the Casimir gap `γ₀ − m₀²` times the squared norm of `u`. -/
+theorem liebRepulsive_centered_sum_transverse_eq (N : ℕ) (A : Finset (Fin (N + 1)))
+    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (hT : ∀ i j, T i j = T j i)
+    (U : Fin (N + 1) → ℝ) (E₀ : ℂ)
+    (hcas : ∀ v ∈ hubbardGroundSubmoduleAtElectronNumber
+        (symmetricRepulsiveHubbardHamiltonian N T U) E₀ (N + 1),
+      (fermionTotalSpinSquared N).mulVec v = liebRepulsiveSpinCasimir A • v)
+    {w : (Fin (2 * N + 2) → Fin 2) → ℂ}
+    (hwG : w ∈ hubbardGroundSubmoduleAtElectronNumber
+      (symmetricRepulsiveHubbardHamiltonian N T U) E₀ (N + 1))
+    (hz : (fermionTotalSpinZ N).mulVec w = ((sublatticeImbalance A : ℂ) / 2) • w) :
+    vectorExpectation (∑ x : Fin (N + 1), ∑ y : Fin (N + 1), fermionSpinTransverse N x y)
+        (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w)
+      = (liebRepulsiveSpinCasimir A
+          - ((sublatticeImbalance A : ℂ) / 2 - ((sublatticeImbalance A / 2 : ℕ) : ℂ)) ^ 2)
+        * (star (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w) ⬝ᵥ
+            ((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w) := by
+  have hmem := liebRepulsive_ground_spinMinusPow_mem N T hT U E₀ hwG (sublatticeImbalance A / 2)
+  have hm := fermionTotalSpinZ_mulVec_spinMinusPow_general N w ((sublatticeImbalance A : ℂ) / 2)
+    (sublatticeImbalance A / 2) hz
+  rw [vectorExpectation, sum_fermionSpinTransverse_eq_totalSpinSquared_sub_spinZ_sq,
+    Matrix.sub_mulVec, hcas _ hmem, ← Matrix.mulVec_mulVec, hm, Matrix.mulVec_smul, hm, smul_smul,
+    ← sub_smul, dotProduct_smul, smul_eq_mul]
+  ring
+
 end LatticeSystem.Fermion
