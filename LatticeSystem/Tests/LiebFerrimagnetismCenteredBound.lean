@@ -1,14 +1,13 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismCenteredBound
 
 /-!
-# §10.2.3 Theorem 10.6 — centered sector `⟨Ô²⟩ ≥ S₀²` lower bound (specification, Red)
+# §10.2.3 Theorem 10.6 — centered sector `⟨Ô²⟩ ≥ S₀²` lower bound (specification)
 
 Specification suite for
 `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismCenteredBound.lean` (PR-7 of the
-Theorem 10.6 discharge arc, issue #5347), written **before** the implementation module exists
-(TDD Red phase). The `example`s pin the exact type signature (and, crucially, the exact
-*hypothesis set*) of the four public declarations of the PR-7 design
-(`.self-local/docs/theorem-10-6-pr7-design.md` §1): the generic sum-linearity of
+Theorem 10.6 discharge arc, issue #5347). The `example`s pin the exact type signature (and,
+crucially, the exact *hypothesis set*) of the five public declarations per this arc's PR-7
+design: the generic sum-linearity of
 `vectorExpectation` (`D1`), the sign-transport bound onto the double-sum transverse operator
 (`D3`), the Casimir identity on the centered tower member (`D4`), the capstone ratio bound with
 **weakest hypotheses** (`D7`, no `hbip`/`hT_conn`/`hU`/`1 ≤ N`), and the existential capstone

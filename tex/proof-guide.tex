@@ -8061,9 +8061,10 @@ pre-existing
 fermionic instance supplies the arc's ground-multiplet lowering-tower step.
 PR-5 (the tower basis, below) does \emph{not} consume it --- that PR builds the
 multiplet basis from the weight and Casimir data alone and never forms an
-expectation ratio --- so it remains staged for the arc's remaining transport
-steps (PR-6/PR-7) and the final assembly into the ferrimagnetic
-bound~(10.2.17) at PR-8.
+expectation ratio --- and neither PR-6 (the centered-sector bridge) nor PR-7
+(the centered-sector bound) forms one either, so it remains staged for
+PR-8's final assembly into the ferrimagnetic bound~(10.2.17) (or a later PR,
+if PR-8 does not need it).
 
 \medskip
 \emph{The ground multiplet is a single $SU(2)$ lowering tower (Issue~\#5347,
@@ -8110,8 +8111,9 @@ $\langle(\hat S^-_{\mathrm{tot}})^jw|O|(\hat S^-_{\mathrm{tot}})^kw\rangle$ vani
 (\texttt{Quantum/SpinS/SaturatedFullLadderOrthogonality.lean}, already in scope through the
 module's existing import chain). Not yet consumed by
 \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below): the tower basis is
-what PR-6/PR-7 transport the ferrimagnetic bound~(10.2.17) along, with the final assembly
-staged for PR-8.
+what PR-8's final assembly transports the ferrimagnetic bound~(10.2.17) along (PR-6 and
+PR-7 instead identify and bound a single centered tower member, without consuming the
+tower-basis lemmas themselves).
 
 \medskip
 \emph{The centered tower member carries Theorem~10.5's correlation signs (Issue~\#5347,
