@@ -28,7 +28,7 @@ satisfies `m² ≤ γ₀`, which is exactly the content
 namespace LatticeSystem.Tests.LiebFerrimagnetismTransverseCasimir
 
 open LatticeSystem.Fermion LatticeSystem.Quantum
-open scoped BigOperators
+open scoped BigOperators ComplexOrder
 
 /-! ## 1. The transverse/Casimir double-sum identity:
 `sum_fermionSpinTransverse_eq_totalSpinSquared_sub_spinZ_sq` -/
