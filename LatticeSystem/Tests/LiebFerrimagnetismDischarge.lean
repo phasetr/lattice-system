@@ -6,7 +6,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismDischarge
 (Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer 2020,
 §10.2.3, p. 356, eqs. (10.2.16)/(10.2.17).)
 
-Specification suite for the not-yet-existing
+Specification suite for
 `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismDischarge.lean` (PR-8, the final PR
 of the Theorem 10.6 discharge arc, issue #5347), per the confirmed design
 (`.self-local/docs/theorem-10-6-pr8-design.md`, 2026-08-24, layers C/D/E). The `example`s pin down
@@ -14,14 +14,12 @@ the exact signatures of the five **public** declarations: the tower ratio-transp
 and its `S₀² ≤ …` corollary (`C2`), the universal ground-vector bound (`D2`), the assembled
 symmetric-form bound (`E2`), and the capstone (`E3`, `theorem_10_6_lieb_ferrimagnetism`, now a
 `theorem`, byte-identical signature to the axiom it replaces in `LiebFerrimagnetism.lean`). The
-`private` declarations `B1` (`liebRepulsive_groundEnergy_eq_of_min`), `B2`
-(`liebFerrimagnetism_symmetric_data`), `D1`
+`private` declarations `B1` (`liebRepulsive_groundEnergy_eq_of_min`), `D1`
 (`vectorExpectation_diagonal_of_crossTerm_zero`) and `E1` (`liebFerrimagnetism_N_zero`) are not
 pinned here (repo convention: only public declarations get a `Tests/` pin, mirrored from
 `Tests/LiebFerrimagnetismCenteredBound.lean`'s treatment of `D0`/`D2`/`D5`/`D6`).
 
-This whole file is Red until `LiebFerrimagnetismDischarge.lean` is created: the import itself does
-not resolve, and the theorem's *own compilability* is exactly the arc's acceptance condition
+`theorem_10_6_lieb_ferrimagnetism`'s own compilability is exactly the arc's acceptance condition
 (`#print axioms LatticeSystem.Fermion.theorem_10_6_lieb_ferrimagnetism` = `[propext,
 Classical.choice, Quot.sound]`, no `theorem_10_6_lieb_ferrimagnetism` axiom).
 
