@@ -3,6 +3,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveFullSectorUnique
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveBalancedGround
 import LatticeSystem.Math.MatrixAnalysis.UnitaryGroundTransport
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebShenQiuShibaTransport
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismCenteredSector
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebShenQiuSectorCasimir
 
 /-!
 # Test coverage for the Theorem 10.8 Shiba Hamiltonian bridge (PR-1) and spin-transport (PR-2)
@@ -44,11 +46,24 @@ Also pins the API contract of PR-2 (`Ŝ³φ = 0` extraction + Shiba transport,
    call sites at `LiebRepulsiveCorrelation.lean:144`, `LiebFerrimagnetismCenteredSector.lean:266`,
    `LiebRepulsiveSectorBridgeFinal.lean:159`.
 
+Also pins the API contract of PR-3 (`k₀ → k` sector generalization + Casimir value, design report
+`.self-local/docs/theorem-10-8-pr3-design.md`), TDD Red:
+
+9. **C1** `liebShenQiu_towerExponent_weight_eq` — the tower-exponent weight arithmetic
+   `L/2 − (a − Ne/2) = (Ne − (N+1))/2` (design §3 item 1), the generalized weight the
+   symmetric-attractive Shiba transport's sector lands at.
+10. **C2** `liebShenQiu_sectorGround_mem_halfFillingGround` — the generalized pinch
+    (`liebRepulsive_sectorGroundEnergy_eq_groundEnergy`, PR-3's `k`-general form) applied to the
+    transport's sector ground state, landing it in the `(N+1)`-electron ground submodule
+    (design §3 item 2).
+11. **C3** `liebShenQiu_casimir_eq` — Theorem 10.4's Casimir eigenvalue equation
+    `Ŝ² ψ = S₀(S₀+1) ψ` transported onto that same sector ground state (design §3 item 3).
+
 Each `example` fails to elaborate unless the corresponding declaration exists, is public, and has
 exactly this signature.
 
-**Not covered here**: the `k₀ → k` tower generalization (PR-3); the pair/ladder algebra and
-signed-sum inequality (PR-4); and the capstone assembly (PR-5).
+**Not covered here**: the pair/ladder algebra and signed-sum inequality (PR-4); and the capstone
+assembly (PR-5).
 -/
 
 namespace LatticeSystem.Tests.LiebShenQiuShibaBridge
@@ -190,5 +205,64 @@ example (N Ne : ℕ)
             (euclideanExpectation (hubbardPairCorrelationOp N x y) φattr).im = 0) ∧
         Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1)) φ = ((N : ℂ) + 1) • φ :=
   repulsiveSpinZSector_ground_unique N Ne hNe_even hNe_pos hNe_lt T hT_symm hbip hT_conn U hU_pos
+
+/-! ## PR-3 (#5357): `k₀ → k` sector generalization + Casimir value (`LiebShenQiuSectorCasimir.lean`,
+new module) -/
+
+/-- Pins **C1**, the tower-exponent weight arithmetic (design §3 item 1): at tower exponent
+`k := A.card - Ne / 2` (`hb`/`ha`/`hNe` are the side conditions `b ≤ Ne/2 ≤ a`, `Even Ne` that make
+`k` land in `[0, L]`), the generalized-pinch weight `L/2 - k` equals the symmetric-attractive
+Shiba transport's sector parameter `(Ne - (N+1))/2`. -/
+example (N : ℕ) (A : Finset (Fin (N + 1))) (Ne : ℕ)
+    (hb : 2 * (bipartitionComplement A).card ≤ Ne) (ha : Ne ≤ 2 * A.card) (hNe : Even Ne) :
+    (sublatticeImbalance A : ℂ) / 2 - ((A.card - Ne / 2 : ℕ) : ℂ)
+      = ((Ne : ℂ) - ((N : ℂ) + 1)) / 2 :=
+  liebShenQiu_towerExponent_weight_eq N A Ne hb ha hNe
+
+/-- Pins **C2**, the generalized pinch applied to the symmetric-attractive Shiba transport's
+sector ground state `ψ` (design §3 item 2): under the Theorem 10.4 hypotheses (`hmin`/`hE₀`/`hcas`)
+and PR-3's `(k, hk, hkm)` matching the transport's sector, `ψ` (unique ground state `hGS` at
+half filling `hψN`) lies in the `(N+1)`-electron `E₀`-ground submodule. -/
+example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
+    (hT : ∀ i j, T i j = T j i) (U : Fin (N + 1) → ℝ) (E₀ : ℂ)
+    (hmin : ∀ E : ℂ, hubbardGroundSubmoduleAtElectronNumber
+        (symmetricRepulsiveHubbardHamiltonian N T U) E (N + 1) ≠ ⊥ → E₀.re ≤ E.re)
+    (hE₀ : ((E₀.re : ℝ) : ℂ) = E₀)
+    (hcas : ∀ v ∈ hubbardGroundSubmoduleAtElectronNumber
+        (symmetricRepulsiveHubbardHamiltonian N T U) E₀ (N + 1),
+      (fermionTotalSpinSquared N).mulVec v = liebRepulsiveSpinCasimir A • v)
+    {w : (Fin (2 * N + 2) → Fin 2) → ℂ} (hw0 : w ≠ 0)
+    (hwG : w ∈ hubbardGroundSubmoduleAtElectronNumber
+      (symmetricRepulsiveHubbardHamiltonian N T U) E₀ (N + 1))
+    (hz : (fermionTotalSpinZ N).mulVec w = ((sublatticeImbalance A : ℂ) / 2) • w)
+    (k : ℕ) (hk : k ≤ sublatticeImbalance A)
+    {m : ℂ} (hkm : (sublatticeImbalance A : ℂ) / 2 - (k : ℂ) = m)
+    {E : ℝ} {ψ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)}
+    (hGS : IsUniqueGroundStateOn (spinZSectorEuclidean N m)
+      (symmetricRepulsiveHubbardHamiltonian N T U) E ψ)
+    (hψN : Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1)) ψ = ((N : ℂ) + 1) • ψ) :
+    ψ.ofLp ∈ hubbardGroundSubmoduleAtElectronNumber
+      (symmetricRepulsiveHubbardHamiltonian N T U) E₀ (N + 1) :=
+  liebShenQiu_sectorGround_mem_halfFillingGround N A T hT U E₀ (hmin := hmin) (hE₀ := hE₀)
+    (hcas := hcas) (hw0 := hw0) (hwG := hwG) (hz := hz) (k := k) (hk := hk) (hkm := hkm)
+    (hGS := hGS) (hψN := hψN)
+
+/-- Pins **C3**, the Casimir value on that same sector ground state (design §3 item 3): under the
+full Theorem 10.5 model hypotheses (`hbip`, `hT_conn`, `hU`) and PR-3's `(k, hk, hkm)`, `ψ` is an
+eigenvector of the total-spin Casimir `Ŝ²` with eigenvalue `liebRepulsiveSpinCasimir A =
+S₀(S₀+1)`, `S₀ := L/2`. -/
+example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
+    (hT : ∀ i j, T i j = T j i) (hbip : HoppingRespectsBipartition A T)
+    (hT_conn : (hoppingSupportGraph T).Preconnected)
+    (U : Fin (N + 1) → ℝ) (hU : ∀ x, 0 < U x)
+    (k : ℕ) (hk : k ≤ sublatticeImbalance A)
+    {m : ℂ} (hkm : (sublatticeImbalance A : ℂ) / 2 - (k : ℂ) = m)
+    {E : ℝ} {ψ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)}
+    (hGS : IsUniqueGroundStateOn (spinZSectorEuclidean N m)
+      (symmetricRepulsiveHubbardHamiltonian N T U) E ψ)
+    (hψN : Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1)) ψ = ((N : ℂ) + 1) • ψ) :
+    (fermionTotalSpinSquared N).mulVec ψ.ofLp = liebRepulsiveSpinCasimir A • ψ.ofLp :=
+  liebShenQiu_casimir_eq N A T hT hbip hT_conn U hU (k := k) (hk := hk) (hkm := hkm)
+    (hGS := hGS) (hψN := hψN)
 
 end LatticeSystem.Tests.LiebShenQiuShibaBridge
