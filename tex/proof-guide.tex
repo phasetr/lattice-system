@@ -8011,6 +8011,43 @@ occupied Casimir/weight values, per PR-2 above) and the final assembly into
 the ferrimagnetic bound~(10.2.17), staged for PR-8.
 
 \medskip
+\emph{Generic ladder-expectation-ratio invariance, and the fermionic instance
+(Issue~\#5347, PR~\#5351 PR-4; proved, axiom-free).} Reusable model-agnostic
+matrix-algebra infrastructure, \textbf{not specific to this arc}
+(\texttt{Math/MatrixAnalysis/LadderExpectationRatio.lean}). For
+$O,S^+,S^-:\iota\to\iota\to\mathbb C$ with $(S^-)^\dagger=S^+$,
+$[O,S^+]=0$, and $v$ an eigenvector of $S^+S^-$ at scalar $c$,
+\texttt{ladder\_expectation\_cross} gives the cross identity
+$\langle S^-v|O|S^-v\rangle=c\langle v|O|v\rangle$
+(with $\langle a|b\rangle:=\overline a\cdot b$); \texttt{ladder\_expectationRatioRe\_invariant}
+adds $S^-v\ne0$, takes the $O=1$ instance for the squared-norm scaling
+$\|S^-v\|^2=c\|v\|^2$, deduces $\operatorname{Im}c=0$ from the two real
+squared norms, and divides to get the invariant real Rayleigh quotient
+$\operatorname{Re}\langle S^-v|O|S^-v\rangle/\|S^-v\|^2=\operatorname{Re}\langle
+v|O|v\rangle/\|v\|^2$. \texttt{fermionSpinMinus\_expectationRatioRe\_invariant}
+(\texttt{Fermion/JordanWigner/Hubbard/LiebFerrimagnetismLadderRatio.lean})
+instantiates both at $S^+:=\hat S^+_{\mathrm{tot}}$,
+$S^-:=\hat S^-_{\mathrm{tot}}$, supplying
+\texttt{fermionTotalSpinMinus\_conjTranspose} for the adjoint hypothesis and
+the Casimir rearrangement \texttt{fermionTotalSpinPlus\_mul\_fermionTotalSpinMinus}
+($\hat S^+_{\mathrm{tot}}\hat S^-_{\mathrm{tot}}=(\hat
+S_{\mathrm{tot}})^2-\hat S^3_{\mathrm{tot}}(\hat S^3_{\mathrm{tot}}-1)$) for the
+scalar $c=\gamma-m^2+m$ on a joint $\hat S^3_{\mathrm{tot}}$/Casimir
+eigenvector. \textbf{Retrofit.} The two pre-existing spin-$S$ theorems in
+\texttt{Quantum/SpinS/SU2ExpectationLadderInvariant.lean}
+(\texttt{su2\_expectation\_ladder\_cross},
+\texttt{su2\_expectationRatioRe\_ladder\_invariant}) are retargeted onto this
+generic pair in the same PR, deleting roughly 90 lines of duplicated proof
+logic from that file while leaving both theorems' statements unchanged (only
+the Math-layer specialization
+\texttt{totalSpinSOpPlus\_mul\_totalSpinSOpMinus\_mulVec\_eq} is new there,
+supplying the spin-$S$ scalar action). Not yet consumed by
+\texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below): the
+fermionic instance supplies the arc's ground-multiplet lowering-tower step,
+staged for PR-5 (weight/Casimir identification) and the final assembly into
+the ferrimagnetic bound~(10.2.17), staged for PR-8.
+
+\medskip
 \noindent\textbf{Theorem 10.6} (Shen–Qiu–Tian ferrimagnetism; Tasaki §10.2.3,
 p.~356, eqs.~(10.2.16)/(10.2.17)). Under the hypotheses of Theorem 10.4, every
 normalized ground state $v$ satisfies the staggered-order-parameter bound
