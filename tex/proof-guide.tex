@@ -7982,6 +7982,35 @@ Casimir and weight values and assemble the full ferrimagnetic
 bound~(10.2.17).
 
 \medskip
+\emph{$SU(2)$ invariance of $(\hat O_L)^2$ (Issue~\#5347, PR~\#5350
+PR-3; proved, axiom-free).}
+(\texttt{Fermion/JordanWigner/Hubbard/LiebFerrimagnetismSU2Invariance.lean}):
+the squared staggered order parameter commutes with every total-spin
+generator, $[(\hat O_L)^2,\hat S^3_{\mathrm{tot}}]=[(\hat
+O_L)^2,\hat S^+_{\mathrm{tot}}]=[(\hat O_L)^2,\hat S^-_{\mathrm{tot}}]=0$
+(\texttt{fermionStaggeredCasimirOp\_commute\_fermionTotalSpinZ},
+\texttt{\_fermionTotalSpinPlus}, \texttt{\_fermionTotalSpinMinus}). Each
+per-pair dot product $\hat S_x\!\cdot\!\hat S_y$ is itself an $SU(2)$ scalar,
+commuting with $\hat S^3_{\mathrm{tot}}$
+(\texttt{totalSpinZ\_commute\_fermionSpinDot}) and $\hat S^+_{\mathrm{tot}}$
+(\texttt{totalSpinPlus\_commute\_fermionSpinDot},
+\texttt{Fermion/JordanWigner/Hubbard/TJSpinSymmetryRaising.lean}); scaling by
+the staggered sign product $\varepsilon_x\varepsilon_y$ and summing over the
+double sum preserves commutation, giving the $\hat S^3_{\mathrm{tot}}$/$\hat
+S^+_{\mathrm{tot}}$ conjuncts directly. The $\hat S^-_{\mathrm{tot}}$ conjunct
+follows by conjugate-transposing $(\hat O_L)^2\hat S^+_{\mathrm{tot}}=\hat
+S^+_{\mathrm{tot}}(\hat O_L)^2$, using $(\hat S^+_{\mathrm{tot}})^\dagger=\hat
+S^-_{\mathrm{tot}}$ (\texttt{fermionTotalSpinPlus\_conjTranspose}) together
+with PR-1's self-adjointness (\texttt{fermionStaggeredCasimirOp\_isHermitian}).
+Mirrors the spin-$S$ template of §4.1 Theorem~4.4 (eq.~(4.1.12),
+\texttt{Quantum/SpinS/StaggeredCasimirSU2Invariance.lean}). Not yet consumed
+by \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below):
+these invariance facts feed the ground-multiplet weight-transport step,
+staged for PR-5 (identifying the repulsive-Hubbard ground multiplet's
+occupied Casimir/weight values, per PR-2 above) and the final assembly into
+the ferrimagnetic bound~(10.2.17), staged for PR-8.
+
+\medskip
 \noindent\textbf{Theorem 10.6} (Shen–Qiu–Tian ferrimagnetism; Tasaki §10.2.3,
 p.~356, eqs.~(10.2.16)/(10.2.17)). Under the hypotheses of Theorem 10.4, every
 normalized ground state $v$ satisfies the staggered-order-parameter bound
