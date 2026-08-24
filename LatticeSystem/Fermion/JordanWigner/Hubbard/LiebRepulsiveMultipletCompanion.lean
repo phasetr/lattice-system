@@ -386,15 +386,14 @@ theorem liebRepulsive_exists_jointEigenvector_of_ne_bot (N : ℕ)
     have hs : Real.sqrt (1 + 4 * lamr) ^ 2 = 1 + 4 * lamr := Real.sq_sqrt (by linarith)
     rw [hJrdef]
     nlinarith [hs]
+  have hcasJr : (fermionTotalSpinSquared N).mulVec v = ((Jr * (Jr + 1) : ℝ) : ℂ) • v := by
+    rw [hJrsq]; exact hvsqr
   have hcart : (tJTotalSpinOne N * tJTotalSpinOne N + tJTotalSpinTwo N * tJTotalSpinTwo N
         + fermionTotalSpinZ N * fermionTotalSpinZ N).mulVec v
       = ((Jr * (Jr + 1) : ℝ) : ℂ) • v := by
-    rw [← fermionTotalSpinSquared_eq_cartesianSqSum, hJrsq]
-    exact hvsqr
+    rw [← fermionTotalSpinSquared_eq_cartesianSqSum]; exact hcasJr
   -- the weight bound `|m| ≤ J` (Tasaki Lemma A.15)
-  obtain ⟨hmlow, hmhigh⟩ := angMom_abs_le_J (tJTotalSpinOne N) (tJTotalSpinTwo N)
-    (fermionTotalSpinZ N) (tJTotalSpinOne_isHermitian N) (tJTotalSpinTwo_isHermitian N)
-    (tJTotalSpin_su2_12 N) hvne hJr0 hcart hv3r
+  have hmabs : |mur| ≤ Jr := fermionTotalSpin_abs_weight_le N hvne hJr0 hcasJr hv3r
   -- the weight is a half-integer of the right parity: `mur = (2 nUp − (N+1))/2`
   obtain ⟨hup, -⟩ :=
     attractiveHubbard_up_down_mulVec_of_number_spinZ (N + 1) ((mur : ℝ) : ℂ) hNv hv3r
@@ -425,7 +424,7 @@ theorem liebRepulsive_exists_jointEigenvector_of_ne_bot (N : ℕ)
     (tJTotalSpin_su2_23 N) (tJTotalSpin_su2_31 N) hvne hJr0 hcart hv3r
   refine ⟨Jr, mur, Er, nUp + n, nUp, WithLp.toLp 2 v, ?_, hvB, hEr.symm, hJr0, ?_, by linarith,
     hnUpN,
-    abs_le.mpr ⟨hmlow, hmhigh⟩, ?_, ?_, ?_, ?_⟩
+    hmabs, ?_, ?_, ?_, ?_⟩
   · rw [ne_eq, WithLp.toLp_eq_zero]
     exact hvne
   · push_cast
