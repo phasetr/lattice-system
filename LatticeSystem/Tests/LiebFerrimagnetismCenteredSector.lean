@@ -6,8 +6,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismCenteredSect
 Specification suite for
 `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismCenteredSector.lean` (PR-6 of the
 Theorem 10.6 discharge arc, issue #5347). The `example`s pin down the exact signatures of the
-five public declarations `T1`–`T6` (`T2` is `private`, so it is not pinned here) of the confirmed
-design (`.self-local/docs/theorem-10-6-pr6-design.md`, 2026-08-24): the ground-energy realification
+five public declarations `T1`–`T6` (`T2` is `private`, so it is not pinned here) of
+this arc's PR-6 design: the ground-energy realification
 `T1`, the sector/ground energy match `T3`, the centered tower member's collinearity with the
 sector's unique ground state `T4`, the transverse-sign transport `T5`, and the existential capstone
 `T6` (consuming PR-5's `liebRepulsive_ground_exists_topWeight`). Mirrors the specification style of

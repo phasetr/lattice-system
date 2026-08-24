@@ -7,8 +7,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
 The ground multiplet of Lieb's half-filled repulsive Hubbard model is the lowering tower
 `(Ŝ⁻_tot)^k w` (`k = 0, …, L`, `L := sublatticeImbalance A`) of a highest-weight ground vector `w`
 (`LiebFerrimagnetismGroundTower.lean`).  Tasaki's ferrimagnetic bound (10.2.17) is evaluated on the
-**centered** member of that tower, `k₀ := L / 2` (ℕ division), because that is where Tasaki states
-eq. (10.2.17) itself: at the tower weight closest to `Ŝ³ = 0`, `L/2 − k₀ = (L % 2)/2`. Admissibility
+**centered** member of that tower, `k₀ := L / 2` (ℕ division), because that is where Tasaki proves
+eq. (10.2.17): at the tower weight closest to `Ŝ³ = 0`, `L/2 − k₀ = (L % 2)/2`. Admissibility
 for Theorem 10.5 (`theorem_10_5_shen_qiu_tian_transverse_sign`) is not what singles out `k₀`: the
 `k`-th tower member's electron number `Ne_k := N + 1 + L − 2k` is even for *every* `k`
 (`L` and `N + 1` have equal parity), and its sector `Ŝ³ = (Ne_k − (N+1))/2` is admissible whenever
