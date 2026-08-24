@@ -1,9 +1,8 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismStaggeredAlgebra
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveFermionSpinCasimirBridge
-import LatticeSystem.Math.CommutingHermitianEigenvector
 
 /-!
-# §10.2.3 (Theorem 10.6): the transverse/Casimir identity and the weight band
+# §10.2.3 (Theorem 10.6): the transverse/Casimir identity
 
 The transverse double sum `Σ_{x,y} Ŝ⊥_{xy}` (Tasaki eq. (10.2.7)) of the previous layer is not a
 new operator: it is the *un-staggered* companion of `(Ô_L)²`, obtained from the staggered gauge by
@@ -18,33 +17,20 @@ identity**
 
   `Σ_{x,y} Ŝ⊥_{xy} = (Ŝ_tot)² − (Ŝ³_tot)²`.
 
-The right-hand side is positive semidefinite. Indeed the ladder definition
-`(Ŝ_tot)² = Ŝ⁻Ŝ⁺ + Ŝ³(Ŝ³ + 1)` and the SU(2) commutator `Ŝ⁺Ŝ⁻ − Ŝ⁻Ŝ⁺ = 2Ŝ³` give the
-anticommutator form
-
-  `(Ŝ_tot)² − (Ŝ³_tot)² = Ŝ⁻Ŝ⁺ + Ŝ³ = ½(Ŝ⁺Ŝ⁻ + Ŝ⁻Ŝ⁺)`,
-
-whose two summands are the Hermitian squares `Ŝ⁺Ŝ⁻ = (Ŝ⁻)ᴴŜ⁻` and `Ŝ⁻Ŝ⁺ = (Ŝ⁺)ᴴŜ⁺`.
-
-Evaluating that positive-semidefinite operator on a joint eigenvector of `Ŝ³_tot` (weight `m`) and
-`(Ŝ_tot)²` (Casimir value `γ`) yields `(γ − m²)‖v‖² ≥ 0`, hence the **weight band**
-
-  `m² ≤ γ`.
-
-The band is what selects the physical root of the Casimir equation `γ₀ = m(m + 1)`: its two real
-roots are `m = S₀` and the spurious top-weight companion `m = −(S₀ + 1)`, and only the former
-satisfies `m² ≤ γ₀`. The multiplet-grading step of the ferrimagnetism argument therefore cannot
-mistake the ground multiplet's top weight.
+The weight band `m² ≤ γ` that selects the physical root `m = S₀` of the Casimir equation
+`γ₀ = m(m + 1)` over its spurious companion `m = −(S₀ + 1)` is *not* restated here: it is the
+existing `angMom_abs_le_J` (`Math/AngularMomentum/Ladder.lean`) applied through
+`fermionTotalSpinSquared_posSemidef` and `fermionTotalSpinSquared_eq_cartesianSqSum`, the route
+already used by `LiebRepulsiveMultipletCompanion.lean` and `LiebAttractiveFullSectorUnique.lean`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed.,
-Springer 2020, §10.2.3, p. 356, eqs. (10.2.16)/(10.2.17); §10.2.2, eq. (10.2.7), p. 351;
-§11.1.1 (Casimir ladder form), p. 372.
+Springer 2020, §10.2.3, p. 356, eqs. (10.2.16)/(10.2.17); §10.2.2, eq. (10.2.7), p. 351.
 -/
 
 namespace LatticeSystem.Fermion
 
-open Matrix LatticeSystem.Quantum LatticeSystem.Math
-open scoped BigOperators ComplexOrder
+open Matrix LatticeSystem.Quantum
+open scoped BigOperators
 
 /-! ## The trivial gauge `A = Λ` -/
 
@@ -91,59 +77,5 @@ theorem sum_fermionSpinTransverse_eq_totalSpinSquared_sub_spinZ_sq (N : ℕ) :
   rw [fermionStaggeredCasimirOp_univ, fermionStaggeredTransverse_univ,
     fermionStaggeredSpinZ_univ] at hsplit
   rw [hsplit, add_sub_cancel_right]
-
-/-! ## Positive semidefiniteness and the weight band -/
-
-/-- **Anticommutator form of the transverse block.**  Substituting `Ŝ³ = ½(Ŝ⁺Ŝ⁻ − Ŝ⁻Ŝ⁺)` (the
-SU(2) commutator) into `(Ŝ_tot)² − (Ŝ³_tot)² = Ŝ⁻Ŝ⁺ + Ŝ³` symmetrizes the ladder product. -/
-private theorem fermionTotalSpinSquared_sub_spinZSq_eq_ladderAnticomm (N : ℕ) :
-    fermionTotalSpinSquared N - fermionTotalSpinZ N * fermionTotalSpinZ N =
-      (1 / 2 : ℂ) • (fermionTotalSpinPlus N * fermionTotalSpinMinus N +
-        fermionTotalSpinMinus N * fermionTotalSpinPlus N) := by
-  have hz : fermionTotalSpinZ N = (1 / 2 : ℂ) •
-      (fermionTotalSpinPlus N * fermionTotalSpinMinus N -
-        fermionTotalSpinMinus N * fermionTotalSpinPlus N) := by
-    rw [fermionTotalSpinPlus_commutator_fermionTotalSpinMinus, smul_smul]
-    norm_num
-  rw [fermionTotalSpinSquared, mul_add, mul_one,
-    show fermionTotalSpinMinus N * fermionTotalSpinPlus N +
-          (fermionTotalSpinZ N * fermionTotalSpinZ N + fermionTotalSpinZ N) -
-          fermionTotalSpinZ N * fermionTotalSpinZ N
-        = fermionTotalSpinMinus N * fermionTotalSpinPlus N + fermionTotalSpinZ N from by abel,
-    hz]
-  module
-
-/-- **The transverse block is positive semidefinite.**  `(Ŝ_tot)² − (Ŝ³_tot)²` equals
-`½(Ŝ⁺Ŝ⁻ + Ŝ⁻Ŝ⁺)`, a nonnegative multiple of the sum of the Hermitian squares
-`Ŝ⁺Ŝ⁻ = (Ŝ⁻)ᴴŜ⁻` and `Ŝ⁻Ŝ⁺ = (Ŝ⁺)ᴴŜ⁺`. -/
-theorem fermionTotalSpinSquared_sub_spinZSq_posSemidef (N : ℕ) :
-    (fermionTotalSpinSquared N - fermionTotalSpinZ N * fermionTotalSpinZ N).PosSemidef := by
-  rw [fermionTotalSpinSquared_sub_spinZSq_eq_ladderAnticomm]
-  have hhalf : (0 : ℂ) ≤ (1 / 2 : ℂ) := by
-    rw [show (1 / 2 : ℂ) = ((1 / 2 : ℝ) : ℂ) by norm_num]
-    exact RCLike.ofReal_nonneg.mpr (by norm_num : (0 : ℝ) ≤ 1 / 2)
-  refine Matrix.PosSemidef.smul (Matrix.PosSemidef.add ?_ ?_) hhalf
-  · have h := Matrix.posSemidef_conjTranspose_mul_self (fermionTotalSpinMinus N)
-    rwa [fermionTotalSpinMinus_conjTranspose] at h
-  · have h := Matrix.posSemidef_conjTranspose_mul_self (fermionTotalSpinPlus N)
-    rwa [fermionTotalSpinPlus_conjTranspose] at h
-
-/-- **The weight band `m² ≤ γ`.**  On a nonzero joint eigenvector of `Ŝ³_tot` (weight `m`) and
-`(Ŝ_tot)²` (Casimir value `γ`) the positive-semidefinite transverse block acts by the scalar
-`γ − m²`, which is therefore nonnegative.  This excludes the spurious root `m = −(S₀ + 1)` of the
-Casimir equation `γ₀ = m(m + 1)`. -/
-theorem spinZ_sq_le_casimir_of_jointEigenvector (N : ℕ) (m γ : ℝ)
-    (v : (Fin (2 * N + 2) → Fin 2) → ℂ) (hv : v ≠ 0)
-    (hz : (fermionTotalSpinZ N).mulVec v = (m : ℂ) • v)
-    (hs : (fermionTotalSpinSquared N).mulVec v = (γ : ℂ) • v) :
-    m ^ 2 ≤ γ := by
-  have hdiff : (fermionTotalSpinSquared N - fermionTotalSpinZ N * fermionTotalSpinZ N).mulVec v
-      = ((γ - m ^ 2 : ℝ) : ℂ) • v := by
-    rw [Matrix.sub_mulVec, hs, ← Matrix.mulVec_mulVec, hz, Matrix.mulVec_smul, hz]
-    push_cast
-    module
-  have hnonneg := Matrix.posSemidef_mulVec_eigenvalue_nonneg
-    (fermionTotalSpinSquared_sub_spinZSq_posSemidef N) hv hdiff
-  linarith
 
 end LatticeSystem.Fermion

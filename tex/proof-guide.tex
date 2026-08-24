@@ -7951,9 +7951,12 @@ tower argument (the fermion-native Theorem-4.4 template, not reflection
 positivity) to the axiom discharge.
 
 \medskip
-\emph{Transverse/Casimir identity and weight band (Issue~\#5347, PR~\#5349
-PR-2; proved, axiom-free).} Specializes PR-1's staggered split
-(\texttt{Fermion/JordanWigner/Hubbard/LiebFerrimagnetismTransverseCasimir.lean})
+\emph{Transverse/Casimir identity (Issue~\#5347, PR~\#5349
+PR-2; proved, axiom-free).} Trivial-gauge layer for Theorem~10.6
+(\texttt{Fermion/JordanWigner/Hubbard/LiebFerrimagnetismTransverseCasimir.lean}):
+specializes PR-1's staggered split
+(\texttt{fermionStaggeredCasimirOp\_eq\_transverse\_add\_staggeredSpinZ\_sq},
+\texttt{Fermion/JordanWigner/Hubbard/LiebFerrimagnetismStaggeredAlgebra.lean})
 to the trivial gauge $A=\Lambda$ ($\varepsilon_x\equiv+1$), where the
 staggered operators collapse to the plain totals
 $\hat O^{(3)}_\Lambda=\hat S^3_{\mathrm{tot}}$,
@@ -7963,22 +7966,20 @@ $\sum_{x,y}\hat S^\perp_{xy}=(\hat S_{\mathrm{tot}})^2-(\hat
 S^3_{\mathrm{tot}})^2$
 (\texttt{sum\_fermionSpinTransverse\_eq\_totalSpinSquared\_sub\_spinZ\_sq};
 Tasaki §10.2.2, eq.~(10.2.7), p.~351; §10.2.3, eqs.~(10.2.16)/(10.2.17),
-p.~356). Rewrites the right-hand side via the SU(2) ladder identity as
-$\tfrac12(\hat S^+\hat S^-+\hat S^-\hat S^+)$, a sum of the two Hermitian
-squares $(\hat S^-)^\dagger\hat S^-$ and $(\hat S^+)^\dagger\hat S^+$, giving
-\textbf{positive semidefiniteness}
-(\texttt{fermionTotalSpinSquared\_sub\_spinZSq\_posSemidef}; Tasaki §11.1.1
-Casimir ladder form, p.~372). Evaluating that positive-semidefinite operator
-on a nonzero joint eigenvector of $\hat S^3_{\mathrm{tot}}$ (weight $m$) and
-$(\hat S_{\mathrm{tot}})^2$ (Casimir value $\gamma$) yields the
-\textbf{weight band} $m^2\le\gamma$
-(\texttt{spinZ\_sq\_le\_casimir\_of\_jointEigenvector}), excluding the
-spurious root $m=-(S_0+1)$ of the Casimir equation $\gamma_0=m(m+1)$ and
-leaving only the physical root $m=S_0$. Not yet consumed by
+p.~356). The weight band $m^2\le\gamma$ that selects the physical root
+$m=S_0$ of the Casimir equation $\gamma_0=m(m+1)$ over its spurious companion
+$m=-(S_0+1)$ is not restated in this layer: PR-5 uses the existing
+$|m|\le J$ bound (\texttt{angMom\_abs\_le\_J},
+\texttt{Math/AngularMomentum/Ladder.lean}) through
+\texttt{fermionTotalSpinSquared\_posSemidef} and
+\texttt{fermionTotalSpinSquared\_eq\_cartesianSqSum}
+(\texttt{Fermion/JordanWigner/Hubbard/LiebAttractiveFullSectorUnique.lean}),
+the route already taken by the repulsive multiplet and attractive
+full-sector arguments. Not yet consumed by
 \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below); the
-remaining arc PRs must identify the joint eigenvector this file's
-weight-band lemma takes as a hypothesis with an actual repulsive-Hubbard
-ground state and assemble the full ferrimagnetic bound~(10.2.17).
+remaining arc PRs must identify the repulsive-Hubbard ground multiplet's
+Casimir and weight values and assemble the full ferrimagnetic
+bound~(10.2.17).
 
 \medskip
 \noindent\textbf{Theorem 10.6} (Shen–Qiu–Tian ferrimagnetism; Tasaki §10.2.3,
