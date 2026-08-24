@@ -20,9 +20,10 @@ symmetric attractive Hamiltonian carries exactly the same scalar, so the two con
 * `symmetricAttractiveHubbardHamiltonian_eq_attractive_sub_smul` — the constant-shift identity
   `Ĥ^{attr,sym}(T,U) = Ĥ^{attr}(T + diag(U/2), U) − (¼ Σ_x U_x)·1`.
 * `shibaSignedUnitary_conj_symmetricRepulsive_eq_symmetricAttractive` — the bridge
-  `Ûᴴ Ĥ^{rep,sym}(T,U) Û = Ĥ^{attr,sym}(T,U)`, with **no** residual scalar: the two Hamiltonians
-  are unitarily equivalent, so their spectra coincide and `Û` transports eigenvectors at
-  unchanged energy.
+  `Ûᴴ Ĥ^{rep,sym}(T,U) Û = Ĥ^{attr,sym}(T,U)`, with **no** residual scalar.  Turning it into
+  spectral equality and eigenvector transport takes the unitarity `Û Ûᴴ = 1`
+  (`shibaSignedUnitary_self_mul_conjTranspose`, `LiebRepulsiveShibaInteraction.lean`) on top of
+  this identity; that step is not performed in this file.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §§10.2.2/10.2.3, eqs. (10.2.10)/(10.2.11)/(10.2.21), pp. 352, 359;
@@ -47,29 +48,19 @@ theorem symmetricAttractiveHubbardHamiltonian_eq_attractive_sub_smul (N : ℕ)
     symmetricAttractiveHubbardHamiltonian N T U
       = attractiveHubbardHamiltonian N (T + Matrix.diagonal (fun x => U x / 2)) U
         - ((∑ x : Fin (N + 1), (U x : ℂ)) / 4) • (1 : ManyBodyOp (Fin (2 * N + 2))) := by
-  have hfun : (fun x y => ((T + Matrix.diagonal (fun z => U z / 2)) x y : ℂ))
-      = (fun x y => (T x y : ℂ) + (Matrix.diagonal (fun z => (U z : ℂ) / 2)) x y) := by
-    funext x y
-    rw [Matrix.add_apply, Complex.ofReal_add, Matrix.diagonal_apply, Matrix.diagonal_apply]
-    by_cases hxy : x = y
-    · rw [if_pos hxy, if_pos hxy]; push_cast; ring
-    · rw [if_neg hxy, if_neg hxy]; push_cast; ring
-  have hsplit : hubbardKinetic N (fun x y => ((T + Matrix.diagonal (fun z => U z / 2)) x y : ℂ))
-      = hubbardKinetic N (fun x y => (T x y : ℂ))
-        + ∑ x : Fin (N + 1),
-            ((U x : ℂ) / 2) • (fermionUpNumber N x + fermionDownNumber N x) := by
-    rw [hfun, hubbardKinetic_add, hubbardKinetic_diagonal]
-  rw [symmetricAttractiveHubbardHamiltonian, attractiveHubbardHamiltonian, hsplit,
-    sub_eq_add_neg, neg_symmetricRepulsiveInteraction_eq]
+  rw [symmetricAttractiveHubbardHamiltonian, attractiveHubbardHamiltonian,
+    hubbardKinetic_add_diagonal_half, sub_eq_add_neg, neg_symmetricRepulsiveInteraction_eq]
   abel
 
 /-- **The Shiba conjugation of the symmetric repulsive Hamiltonian is the symmetric attractive
 Hamiltonian** (Tasaki §10.2.3, eq. (10.2.21) combined with eq. (10.2.10)):
 `Ûᴴ Ĥ^{rep,sym}(T,U) Û = Ĥ^{attr,sym}(T,U)`.  The `−¼ Σ_x U_x` left over by the conjugation
 (`shibaSignedUnitary_conj_symmetricRepulsive_eq_attractive`) is exactly the constant carried by
-the symmetric attractive Hamiltonian, so no scalar survives: the two Hamiltonians are unitarily
-equivalent and `Û` maps `E`-eigenvectors of one to `E`-eigenvectors of the other at the same
-energy `E`. -/
+the symmetric attractive Hamiltonian, so no scalar survives.  This is the conjugation identity
+alone: reading it as unitary equivalence — `Û` carrying `E`-eigenvectors of one Hamiltonian to
+`E`-eigenvectors of the other at unchanged energy — additionally needs `Û Ûᴴ = 1`
+(`shibaSignedUnitary_self_mul_conjTranspose`, `LiebRepulsiveShibaInteraction.lean`), which is
+supplied at the site where the eigenvector transport is carried out, not here. -/
 theorem shibaSignedUnitary_conj_symmetricRepulsive_eq_symmetricAttractive
     {A : Finset (Fin (N + 1))} {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ}
     (hsymm : ∀ x y, T x y = T y x) (hbip : HoppingRespectsBipartition A T)

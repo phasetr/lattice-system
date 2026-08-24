@@ -23,7 +23,8 @@ downward-restriction (`mono`) lemma for `IsUniqueGroundStateOn` along a submodul
   reindexing of the candidate vector).
 * `isUniqueGroundStateOn_sub_smul_one_iff` — shifting `H` by a real constant multiple of the
   identity shifts the ground energy by the same constant and preserves the ground state and
-  ground-space predicate.
+  ground-space predicate; the `iff` packaging of `DegeneratePerturbation.lean`'s one-sided
+  `IsUniqueGroundStateOn.sub_smul_one`, applied at `-a` for the reverse direction.
 * `isUniqueGroundStateOn_of_finrank_eigenspace_le_one` — from `finrank ≤ 1` of the `E`-eigenspace
   of `H` (as a `Module.End` on the ambient Pi type via `Matrix.toLin'`), a nonzero `E`-eigenvector,
   and eigenvalue-minimality among all real eigenvalues of `H`, constructs a normalized
@@ -121,62 +122,19 @@ theorem isUniqueGroundStateOn_reindex_iff (H : Matrix n n ℂ) (e : m ≃ n) (E 
 
 /-- **Real constant shift preserves unique-ground-state transport.** Shifting `H` by `(a : ℂ) • 1`
 shifts the ground energy by `a` and leaves the ground submodule, candidate, and uniqueness clause
-unchanged: `IsUniqueGroundStateOn K H E φ ↔ IsUniqueGroundStateOn K (H - (a : ℂ) • 1) (E - a) φ`. -/
+unchanged: `IsUniqueGroundStateOn K H E φ ↔ IsUniqueGroundStateOn K (H - (a : ℂ) • 1) (E - a) φ`.
+This is the `iff` packaging of `IsUniqueGroundStateOn.sub_smul_one`
+(`Math/MatrixAnalysis/DegeneratePerturbation.lean`): the reverse direction is the same one-sided
+shift run at `-a`, which undoes the first one. -/
 theorem isUniqueGroundStateOn_sub_smul_one_iff (K : Submodule ℂ (EuclideanSpace ℂ n))
     (H : Matrix n n ℂ) (a : ℝ) (E : ℝ) (φ : EuclideanSpace ℂ n) :
     IsUniqueGroundStateOn K H E φ ↔
       IsUniqueGroundStateOn K (H - (a : ℂ) • (1 : Matrix n n ℂ)) (E - a) φ := by
-  have hone : ∀ ψ : EuclideanSpace ℂ n, Matrix.toEuclideanLin (1 : Matrix n n ℂ) ψ = ψ := by
-    intro ψ
-    apply WithLp.ofLp_injective 2
-    exact Matrix.one_mulVec (WithLp.ofLp ψ)
-  have hsub : ∀ ψ : EuclideanSpace ℂ n,
-      Matrix.toEuclideanLin (H - (a : ℂ) • (1 : Matrix n n ℂ)) ψ
-        = Matrix.toEuclideanLin H ψ - (a : ℂ) • ψ := by
-    intro ψ
-    have hmap : Matrix.toEuclideanLin (H - (a : ℂ) • (1 : Matrix n n ℂ))
-        = Matrix.toEuclideanLin H - (a : ℂ) • Matrix.toEuclideanLin (1 : Matrix n n ℂ) := by
-      rw [map_sub, map_smul]
-    rw [hmap, LinearMap.sub_apply, LinearMap.smul_apply, hone]
-  have hkey : ∀ (μ : ℝ) (ψ : EuclideanSpace ℂ n),
-      Matrix.toEuclideanLin (H - (a : ℂ) • (1 : Matrix n n ℂ)) ψ = ((μ : ℝ) : ℂ) • ψ
-        ↔ Matrix.toEuclideanLin H ψ = ((μ + a : ℝ) : ℂ) • ψ := by
-    intro μ ψ
-    rw [hsub, sub_eq_iff_eq_add, Complex.ofReal_add, add_smul]
-  have hEa : (E - a + a : ℝ) = E := by ring
-  constructor
-  · rintro ⟨hmem, hnorm, heig, hground, huniq⟩
-    have hshift : ∀ ψ : EuclideanSpace ℂ n, Matrix.toEuclideanLin H ψ = (E : ℂ) • ψ →
-        Matrix.toEuclideanLin (H - (a : ℂ) • (1 : Matrix n n ℂ)) ψ = ((E - a : ℝ) : ℂ) • ψ := by
-      intro ψ h
-      exact (hkey (E - a) ψ).mpr (by rw [hEa]; exact h)
-    obtain ⟨ψ₀, hψ₀mem, hψ₀0, hψ₀eig⟩ := hground.1
-    refine ⟨hmem, hnorm, hshift φ heig,
-      ⟨⟨ψ₀, hψ₀mem, hψ₀0, hshift ψ₀ hψ₀eig⟩, ?_⟩, ?_⟩
-    · rintro μ ⟨ψ, hψmem, hψ0, hψeig⟩
-      have hle := hground.2 (μ + a) ⟨ψ, hψmem, hψ0, (hkey μ ψ).mp hψeig⟩
-      linarith
-    · intro ψ hψmem hψeig
-      have h := (hkey (E - a) ψ).mp hψeig
-      rw [hEa] at h
-      exact huniq ψ hψmem h
-  · rintro ⟨hmem, hnorm, heig, hground, huniq⟩
-    have hunshift : ∀ ψ : EuclideanSpace ℂ n,
-        Matrix.toEuclideanLin (H - (a : ℂ) • (1 : Matrix n n ℂ)) ψ = ((E - a : ℝ) : ℂ) • ψ →
-          Matrix.toEuclideanLin H ψ = (E : ℂ) • ψ := by
-      intro ψ h
-      have h' := (hkey (E - a) ψ).mp h
-      rwa [hEa] at h'
-    obtain ⟨ψ₀, hψ₀mem, hψ₀0, hψ₀eig⟩ := hground.1
-    refine ⟨hmem, hnorm, hunshift φ heig,
-      ⟨⟨ψ₀, hψ₀mem, hψ₀0, hunshift ψ₀ hψ₀eig⟩, ?_⟩, ?_⟩
-    · rintro μ ⟨ψ, hψmem, hψ0, hψeig⟩
-      have hμa : (μ - a + a : ℝ) = μ := by ring
-      have hle := hground.2 (μ - a)
-        ⟨ψ, hψmem, hψ0, (hkey (μ - a) ψ).mpr (by rw [hμa]; exact hψeig)⟩
-      linarith
-    · intro ψ hψmem hψeig
-      exact huniq ψ hψmem ((hkey (E - a) ψ).mpr (by rw [hEa]; exact hψeig))
+  refine ⟨fun h => h.sub_smul_one, fun h => ?_⟩
+  have h' := h.sub_smul_one (c := -a)
+  have hmat : H - (a : ℂ) • (1 : Matrix n n ℂ) - ((-a : ℝ) : ℂ) • (1 : Matrix n n ℂ) = H := by
+    rw [Complex.ofReal_neg, neg_smul, sub_neg_eq_add, sub_add_cancel]
+  rwa [hmat, show E - a - -a = E by ring] at h'
 
 /-- **From `finrank ≤ 1` and minimality to a unique ground state.** If the `E`-eigenspace of `H`
 (as a `Module.End` on the Pi type `n → ℂ` via `Matrix.toLin'`) has `finrank ≤ 1`, `x : n → ℂ` is a

@@ -8276,7 +8276,13 @@ shifts a unique ground state's energy from $E$ to $E-c$ with the same
 eigenvector); \texttt{IsUniqueGroundStateOn.energy\_eq} (two unique ground
 states on the same $(K,H)$ share the same ground energy); and
 \texttt{IsUniqueGroundStateOn.exists\_smul\_eq} (consequently they are
-collinear, $\varphi_2=c\bullet\varphi_1$ with $\|c\|=1$). Theorem 10.5's
+collinear, $\varphi_2=c\bullet\varphi_1$ with $\|c\|=1$). The earlier
+\texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff}
+(\texttt{Math/MatrixAnalysis/SubmatrixGroundState.lean}) states the same shift as
+an \texttt{iff}; it keeps its statement and its call sites, but its proof body is
+replaced by a short derivation from \texttt{IsUniqueGroundStateOn.sub\_smul\_one}
+(the reverse direction is the same one-sided shift run at $-a$), leaving a single
+proof of the shift. Theorem 10.5's
 proof is retargeted in the same PR to call
 \texttt{IsUniqueGroundStateOn.exists\_smul\_eq} directly instead of deriving
 the energy-match/collinearity step by hand (no statement or citation change
@@ -8298,9 +8304,16 @@ $\hat H^{\rm attr,sym}(T,U)=\hat H^{\rm attr}(T+\mathrm{diag}(U/2),U)-(\tfrac14\
 — the same constant, so the two shifts cancel. Combining the two gives the
 capstone \texttt{shibaSignedUnitary\_conj\_symmetricRepulsive\_eq\_symmetricAttractive}:
 $\hat U^\dagger \hat H^{\rm rep,sym}(T,U) \hat U = \hat H^{\rm attr,sym}(T,U)$
-with \emph{no} residual scalar — the symmetric repulsive and symmetric
-attractive Hamiltonians are unitarily equivalent, so $\hat U$ transports
-eigenvectors at unchanged energy. Not yet consumed by
+with \emph{no} residual scalar. This is the conjugation identity alone: reading
+it as unitary equivalence (coinciding spectra, $\hat U$ transporting
+eigenvectors at unchanged energy) additionally takes $\hat U\hat U^\dagger=1$
+(\texttt{shibaSignedUnitary\_self\_mul\_conjTranspose},
+\texttt{LiebRepulsiveShibaInteraction.lean}), a step left to the consuming PR.
+The chemical-shift split
+$\hat H_{\rm hop}(T+\mathrm{diag}(U/2))=\hat H_{\rm hop}(T)+\sum_x (U_x/2)(\hat n_{x\uparrow}+\hat n_{x\downarrow})$,
+needed identically by the plain conjugation and by this bridge, is factored out
+as the named lemma \texttt{hubbardKinetic\_add\_diagonal\_half} in
+\texttt{LiebRepulsiveShibaConjugation.lean} and rewritten with from both. Not yet consumed by
 \texttt{theorem\_10\_8\_lieb\_shen\_qiu\_superconductivity} (still an axiom
 below); staged for the later PRs of this arc ($\hat S^3\varphi=0$ extraction,
 PR-2 onward).

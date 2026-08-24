@@ -24,15 +24,16 @@ energies allowed) and on-site attraction `Ĥatt-int = −Σ_x U_x n̂_{x,↑} n�
 
 ## Status
 
-**Theorem 10.2 is now PROVED axiom-free** (in `LiebAttractiveTheorem102.lean`,
-`theorem_10_2_lieb_attractive_unique_singlet`): Lieb's spin-space
-reflection-positivity is carried out on the balanced (`Ŝ³ = 0`) block and
-lifted to the full `Ne`-electron sector through the generic SU(2) multiplet
-engine (Tasaki Appendix A). Theorem 10.3 (Tian's pair-correlation
-positivity) is still recorded as a faithful documented `axiom`, built on a
-concrete attractive Hubbard Hamiltonian. The general hopping kinetic term
-reuses the existing `hubbardKinetic`; the unique-ground-state predicate
-reuses `IsUniqueGroundStateOn` from the degenerate-perturbation development.
+Both theorems are **PROVED axiom-free**, each in its own downstream file:
+`theorem_10_2_lieb_attractive_unique_singlet` (`LiebAttractiveTheorem102.lean`),
+where Lieb's spin-space reflection-positivity is carried out on the balanced
+(`Ŝ³ = 0`) block and lifted to the full `Ne`-electron sector through the
+generic SU(2) multiplet engine (Tasaki Appendix A), and
+`theorem_10_3_tian_pair_correlation_positive`
+(`LiebAttractiveTheorem103.lean`). This file carries the shared definitional
+layer both of them consume: the general hopping kinetic term reuses the
+existing `hubbardKinetic`; the unique-ground-state predicate reuses
+`IsUniqueGroundStateOn` from the degenerate-perturbation development.
 -/
 
 namespace LatticeSystem.Fermion
@@ -132,9 +133,5 @@ theorem euclideanExpectation_conjTranspose_mul_self
     dotProduct, Complex.ofReal_sum]
   refine Finset.sum_congr rfl (fun j _ => ?_)
   rw [Pi.star_apply, Complex.star_def, mul_comm, Complex.mul_conj]
-
--- **Tasaki Theorem 10.3** (Tian's pair-correlation positivity, 1st ed., Springer 2020, §10.2,
--- p. 349, eq. (10.2.4)) is now a **proved theorem** `theorem_10_3_tian_pair_correlation_positive`
--- in `LiebAttractiveTheorem103.lean` (no longer an axiom).
 
 end LatticeSystem.Fermion

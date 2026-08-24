@@ -28,6 +28,8 @@ scalar `¼ Σ_x U_x`.  (The constant is **negative**: expanding
 * `hubbardKinetic_add` — additivity of the kinetic operator in the hopping matrix.
 * `hubbardKinetic_diagonal` — the kinetic operator of a diagonal hopping is the
   weighted sum of on-site number operators.
+* `hubbardKinetic_add_diagonal_half` — the chemical shift `diag(U/2)` added to the
+  hopping matrix splits off as the chemical potential `Σ_x (U_x/2)(n̂_{x↑}+n̂_{x↓})`.
 * `neg_symmetricRepulsiveInteraction_eq` — `−Ĥint'` re-expressed as attractive
   interaction plus chemical potential minus a constant (Tasaki eq. (10.2.11)).
 * `shibaSignedUnitary_conj_symmetricRepulsive_eq_attractive` — the full conjugation
@@ -100,6 +102,26 @@ theorem hubbardKinetic_diagonal (μ : Fin (N + 1) → ℂ) :
   rw [Fin.sum_univ_two, ← smul_add, fermionUpNumber, fermionDownNumber, fermionMultiNumber,
     fermionMultiNumber]
 
+/-- **The chemical shift is absorbed into the hopping diagonal** (Tasaki eq. (10.2.11), p. 352):
+`Ĥhop(T + diag(U/2)) = Ĥhop(T) + Σ_x (U_x/2)(n̂_{x↑}+n̂_{x↓})`.  The real hopping matrix is cast
+entrywise, so the sum splits by `hubbardKinetic_add` and the diagonal part becomes the chemical
+potential by `hubbardKinetic_diagonal`.  Both the repulsive→attractive conjugation and its
+symmetric-attractive bridge (`LiebShenQiuShibaBridge.lean`) rewrite with this identity. -/
+theorem hubbardKinetic_add_diagonal_half (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
+    (U : Fin (N + 1) → ℝ) :
+    hubbardKinetic N (fun x y => ((T + Matrix.diagonal (fun z => U z / 2)) x y : ℂ))
+      = hubbardKinetic N (fun x y => (T x y : ℂ))
+        + ∑ x : Fin (N + 1),
+            ((U x : ℂ) / 2) • (fermionUpNumber N x + fermionDownNumber N x) := by
+  have hfun : (fun x y => ((T + Matrix.diagonal (fun z => U z / 2)) x y : ℂ))
+      = (fun x y => (T x y : ℂ) + (Matrix.diagonal (fun z => (U z : ℂ) / 2)) x y) := by
+    funext x y
+    rw [Matrix.add_apply, Complex.ofReal_add, Matrix.diagonal_apply, Matrix.diagonal_apply]
+    by_cases hxy : x = y
+    · rw [if_pos hxy, if_pos hxy]; push_cast; ring
+    · rw [if_neg hxy, if_neg hxy]; push_cast; ring
+  rw [hfun, hubbardKinetic_add, hubbardKinetic_diagonal]
+
 /-! ## The interaction bridge (Tasaki eq. (10.2.11)) -/
 
 /-- **The negated symmetric interaction as attractive interaction plus chemical
@@ -142,23 +164,12 @@ theorem shibaSignedUnitary_conj_symmetricRepulsive_eq_attractive
       = attractiveHubbardHamiltonian N (T + Matrix.diagonal (fun x => U x / 2)) U
         - ((∑ x : Fin (N + 1), (U x : ℂ)) / 4)
             • (1 : ManyBodyOp (Fin (2 * N + 2))) := by
-  have hfun : (fun x y => ((T + Matrix.diagonal (fun z => U z / 2)) x y : ℂ))
-      = (fun x y => (T x y : ℂ) + (Matrix.diagonal (fun z => (U z : ℂ) / 2)) x y) := by
-    funext x y
-    rw [Matrix.add_apply, Complex.ofReal_add, Matrix.diagonal_apply, Matrix.diagonal_apply]
-    by_cases hxy : x = y
-    · rw [if_pos hxy, if_pos hxy]; push_cast; ring
-    · rw [if_neg hxy, if_neg hxy]; push_cast; ring
-  have hsplit : hubbardKinetic N (fun x y => ((T + Matrix.diagonal (fun z => U z / 2)) x y : ℂ))
-      = hubbardKinetic N (fun x y => (T x y : ℂ))
-        + ∑ x : Fin (N + 1),
-            ((U x : ℂ) / 2) • (fermionUpNumber N x + fermionDownNumber N x) := by
-    rw [hfun, hubbardKinetic_add, hubbardKinetic_diagonal]
   rw [symmetricRepulsiveHubbardHamiltonian, Matrix.mul_add, Matrix.add_mul,
     shibaSignedUnitary_conj_symmetricKinetic hsymm hbip,
     shibaSignedUnitary_conj_symmetricInteraction (shibaSignFn A)
       (shibaSignFn_star_mul_self A) U,
-    neg_symmetricRepulsiveInteraction_eq, attractiveHubbardHamiltonian, hsplit]
+    neg_symmetricRepulsiveInteraction_eq, attractiveHubbardHamiltonian,
+    hubbardKinetic_add_diagonal_half]
   abel
 
 end LatticeSystem.Fermion
