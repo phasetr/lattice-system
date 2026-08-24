@@ -8,7 +8,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismLadderRatio
 
 Specification suite for
 `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismLadderRatio.lean`.
-The `example` pins down the exact signature of `fermionSpinMinus_expectationRatioRe_invariant`,
+The `example` applies `fermionSpinMinus_expectationRatioRe_invariant` through *named* arguments,
+so it pins the binder names as well as the argument types and order of
 the fermion-level instantiation of the generic
 `Math.MatrixAnalysis.LadderExpectationRatio.ladder_expectationRatioRe_invariant`
 (`Tests/LadderExpectationRatio.lean`) at `Sp := fermionTotalSpinPlus N`,
@@ -28,14 +29,15 @@ open Matrix LatticeSystem.Fermion LatticeSystem.Quantum
 /-! ## The fermion-level real-expectation-ratio ladder invariance -/
 
 /-- **Fermion `SU(2)`-invariant real-expectation-ratio ladder invariance.** Let
-`O : ManyBodyOp (Fin (2N+2))` commute with both total ladder operators
-(`hOplus : Commute O Ŝ⁺_tot`, `hOminus : Commute O Ŝ⁻_tot`), and let `v` be a joint `Ŝ³_tot` /
+`O : ManyBodyOp (Fin (2N+2))` commute with the total raising operator
+(`hOplus : Commute O Ŝ⁺_tot`), and let `v` be a joint `Ŝ³_tot` /
 Casimir eigenvector (`Ŝ³_tot v = m • v`, `(Ŝ_tot)² v = γ • v`).  When the lowering is
 non-vanishing (`Ŝ⁻_tot v ≠ 0`), the real Rayleigh quotient of `O` is preserved by the lowering:
-`⟨Ŝ⁻v, O Ŝ⁻v⟩.re / ⟨Ŝ⁻v, Ŝ⁻v⟩.re = ⟨v, O v⟩.re / ⟨v, v⟩.re`, where `⟨a, b⟩ := star a ⬝ᵥ b`. -/
+`⟨Ŝ⁻v, O Ŝ⁻v⟩.re / ⟨Ŝ⁻v, Ŝ⁻v⟩.re = ⟨v, O v⟩.re / ⟨v, v⟩.re`, where `⟨a, b⟩ := star a ⬝ᵥ b`.
+The `Ŝ⁻_tot` commutation is deliberately *not* a hypothesis: this pin fails if a future edit
+re-adds it. -/
 example (N : ℕ) (O : ManyBodyOp (Fin (2 * N + 2)))
     (hOplus : Commute O (fermionTotalSpinPlus N))
-    (hOminus : Commute O (fermionTotalSpinMinus N))
     {m γ : ℂ} {v : (Fin (2 * N + 2) → Fin 2) → ℂ}
     (hz : (fermionTotalSpinZ N).mulVec v = m • v)
     (hcas : (fermionTotalSpinSquared N).mulVec v = γ • v)
@@ -45,6 +47,7 @@ example (N : ℕ) (O : ManyBodyOp (Fin (2 * N + 2)))
         (star ((fermionTotalSpinMinus N).mulVec v) ⬝ᵥ
           ((fermionTotalSpinMinus N).mulVec v)).re =
       (star v ⬝ᵥ O.mulVec v).re / (star v ⬝ᵥ v).re :=
-  fermionSpinMinus_expectationRatioRe_invariant N O hOplus hOminus hz hcas hne
+  fermionSpinMinus_expectationRatioRe_invariant (N := N) (O := O) (hOplus := hOplus) (m := m)
+    (γ := γ) (v := v) (hz := hz) (hcas := hcas) (hne := hne)
 
 end LatticeSystem.Tests.LiebFerrimagnetismLadderRatio

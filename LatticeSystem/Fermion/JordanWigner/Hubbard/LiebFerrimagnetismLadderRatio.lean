@@ -33,11 +33,10 @@ open Matrix LatticeSystem.Quantum
 /-- **Fermionic ladder invariance of the real expectation ratio.** For `O` commuting with
 `Ŝ⁺_tot` and a joint `Ŝ³_tot` / Casimir eigenvector `v` with `Ŝ⁻_tot v ≠ 0`,
 `⟨Ŝ⁻v, O Ŝ⁻v⟩.re / ⟨Ŝ⁻v, Ŝ⁻v⟩.re = ⟨v, O v⟩.re / ⟨v, v⟩.re` (with `⟨a, b⟩ := star a ⬝ᵥ b`).
-The `Ŝ⁻_tot`-commutation hypothesis is part of the SU(2)-invariance package carried by the
-callers, but the ratio identity needs only the `Ŝ⁺_tot` one. -/
+Callers usually carry the full SU(2)-invariance package, but the ratio identity needs only the
+`Ŝ⁺_tot` commutation, so that is the sole commutation hypothesis. -/
 theorem fermionSpinMinus_expectationRatioRe_invariant (N : ℕ) (O : ManyBodyOp (Fin (2 * N + 2)))
     (hOplus : Commute O (fermionTotalSpinPlus N))
-    (_hOminus : Commute O (fermionTotalSpinMinus N))
     {m γ : ℂ} {v : (Fin (2 * N + 2) → Fin 2) → ℂ}
     (hz : (fermionTotalSpinZ N).mulVec v = m • v)
     (hcas : (fermionTotalSpinSquared N).mulVec v = γ • v)

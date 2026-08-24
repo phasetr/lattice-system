@@ -8038,10 +8038,15 @@ eigenvector. \textbf{Retrofit.} The two pre-existing spin-$S$ theorems in
 (\texttt{su2\_expectation\_ladder\_cross},
 \texttt{su2\_expectationRatioRe\_ladder\_invariant}) are retargeted onto this
 generic pair in the same PR, deleting roughly 90 lines of duplicated proof
-logic from that file while leaving both theorems' statements unchanged (only
-the Math-layer specialization
-\texttt{totalSpinSOpPlus\_mul\_totalSpinSOpMinus\_mulVec\_eq} is new there,
-supplying the spin-$S$ scalar action). Not yet consumed by
+logic from that file while leaving both theorems' types unchanged; the only
+binder-level change is a rename, the now-unused lowering-commutation
+hypothesis of \texttt{su2\_expectationRatioRe\_ladder\_invariant} becoming
+\texttt{\_hOminus} (required by \texttt{warningAsError = true}), invisible to
+the positional call site in
+\texttt{Quantum/SpinS/SU2ExpectationLadderIterated.lean}. No declaration is
+added to the spin-$S$ file: the generic lemma's scalar-action input is the
+pre-existing
+\texttt{totalSpinSOpPlus\_mul\_totalSpinSOpMinus\_mulVec\_eq}. Not yet consumed by
 \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below): the
 fermionic instance supplies the arc's ground-multiplet lowering-tower step,
 staged for PR-5 (weight/Casimir identification) and the final assembly into
