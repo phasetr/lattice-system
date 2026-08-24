@@ -13,7 +13,8 @@ Theorem 10.6 discharge arc, issue #5347), written **before** the implementation 
 (`D3`), the Casimir identity on the centered tower member (`D4`), the capstone ratio bound with
 **weakest hypotheses** (`D7`, no `hbip`/`hT_conn`/`hU`/`1 ≤ N`), and the existential capstone
 consuming PR-6's `liebRepulsive_exists_centered_transverse_sign` (`D8`). Mirrors the specification
-style of `Tests/LiebFerrimagnetismCenteredSector.lean` and `Tests/LiebFerrimagnetismGroundTower.lean`.
+style of `Tests/LiebFerrimagnetismCenteredSector.lean` and
+`Tests/LiebFerrimagnetismGroundTower.lean`.
 `D0`'s de-privatization, and the `private` `D2`/`D5`/`D6` arithmetic/pair-sign lemmas, are not
 pinned here (repo convention: only public declarations get a `Tests/` pin).
 
