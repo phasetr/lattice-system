@@ -105,47 +105,6 @@ theorem gaugeSign_mul_not_sameSublattice (A : Finset (Fin (N + 1))) (x y : Fin (
       exact h ⟨fun hx' => absurd hx' hx, fun hy' => absurd hy' hy⟩
     rw [if_neg hx, if_pos hy]; ring
 
-/-! ## Linearity and transport of the Euclidean expectation -/
-
-/-- The Euclidean expectation is homogeneous in the observable. -/
-private theorem euclideanExpectation_smul (a : ℂ) (O : ManyBodyOp (Fin (2 * N + 2)))
-    (φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)) :
-    euclideanExpectation (a • O) φ = a * euclideanExpectation O φ := by
-  unfold euclideanExpectation
-  rw [Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul]
-
-/-- The Euclidean expectation is additive in the observable. -/
-private theorem euclideanExpectation_add (O₁ O₂ : ManyBodyOp (Fin (2 * N + 2)))
-    (φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)) :
-    euclideanExpectation (O₁ + O₂) φ
-      = euclideanExpectation O₁ φ + euclideanExpectation O₂ φ := by
-  unfold euclideanExpectation
-  rw [Matrix.add_mulVec, dotProduct_add]
-
-/-- **Shiba transport of the Euclidean expectation**: if `ψ = Û φ_attr` then
-`⟨ψ| O |ψ⟩ = ⟨φ_attr| Ûᴴ O Û |φ_attr⟩`. -/
-private theorem euclideanExpectation_shiba_conj (O : ManyBodyOp (Fin (2 * N + 2)))
-    (Ush : Matrix (Fin (2 * N + 2) → Fin 2) (Fin (2 * N + 2) → Fin 2) ℂ)
-    (ψ φattr : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2))
-    (hψ : ψ.ofLp = Ush.mulVec φattr.ofLp) :
-    euclideanExpectation O ψ
-      = euclideanExpectation (Matrix.conjTranspose Ush * O * Ush) φattr := by
-  unfold euclideanExpectation
-  rw [hψ, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, ← Matrix.mulVec_mulVec,
-    ← Matrix.mulVec_mulVec]
-
-/-- The Euclidean `⟨v| Aᴴ A |v⟩` is the (nonnegative real) squared norm of `A v`. -/
-private theorem euclideanExpectation_conjTranspose_mul_self
-    (M : ManyBodyOp (Fin (2 * N + 2)))
-    (φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)) :
-    euclideanExpectation (Matrix.conjTranspose M * M) φ
-      = ((∑ j, Complex.normSq ((M.mulVec φ.ofLp) j) : ℝ) : ℂ) := by
-  unfold euclideanExpectation
-  rw [← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, ← Matrix.star_mulVec,
-    dotProduct, Complex.ofReal_sum]
-  refine Finset.sum_congr rfl (fun j _ => ?_)
-  rw [Pi.star_apply, Complex.star_def, mul_comm, Complex.mul_conj]
-
 /-! ## Tasaki Theorem 10.5 (general spin-`z` sector) -/
 
 /-- **Tasaki Theorem 10.5** (Shen–Qiu–Tian; 1st ed., Springer 2020, §10.2.2, p. 351/353,
@@ -183,21 +142,11 @@ theorem theorem_10_5_shen_qiu_tian_transverse_sign (N Ne : ℕ)
     shibaSignedUnitary N (shibaSignFn A) with hUsh
   obtain ⟨Elem, ψ, φattr, huniqψ, hψeq, hpair, _⟩ :=
     repulsiveSpinZSector_ground_unique N Ne hNe_even hNe_pos hNe_lt T hT_symm hbip hT_conn U hU_pos
-  obtain ⟨hφmem, hφnorm, hφeig, hφground, _⟩ := hGS
-  obtain ⟨hψmem, hψnorm, hψeig, hψground, hψuniq⟩ := huniqψ
-  have hφne : φ ≠ 0 := fun h => by rw [h, norm_zero] at hφnorm; exact one_ne_zero hφnorm.symm
-  have hψne : ψ ≠ 0 := fun h => by rw [h, norm_zero] at hψnorm; exact one_ne_zero hψnorm.symm
-  -- The two unique ground states share the ground eigenvalue `E = Elem`.
-  have hEle : E ≤ Elem := hφground.2 Elem ⟨ψ, hψmem, hψne, hψeig⟩
-  have hlemE : Elem ≤ E := hψground.2 E ⟨φ, hφmem, hφne, hφeig⟩
-  have hEeq : E = Elem := le_antisymm hEle hlemE
-  -- Collinearity `φ = c • ψ` with `|c| = 1`.
-  obtain ⟨c, hc⟩ := hψuniq φ hφmem (by rw [← hEeq]; exact hφeig)
+  -- The two unique ground states on the sector share the ground energy and are collinear
+  -- `φ = c • ψ` with `|c| = 1`.
+  obtain ⟨c, hcnorm, hc⟩ := huniqψ.exists_smul_eq hGS
   have hcc : star c * c = 1 := by
-    have hn : ‖c‖ = 1 := by
-      have h := hc ▸ hφnorm
-      rwa [norm_smul, hψnorm, mul_one] at h
-    have hnc : Complex.normSq c = 1 := by rw [Complex.normSq_eq_norm_sq, hn, one_pow]
+    have hnc : Complex.normSq c = 1 := by rw [Complex.normSq_eq_norm_sq, hcnorm, one_pow]
     rw [Complex.star_def, mul_comm, Complex.mul_conj, hnc, Complex.ofReal_one]
   -- Phase invariance of the expectation.
   have hphase : ∀ O : ManyBodyOp (Fin (2 * N + 2)),

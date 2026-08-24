@@ -20,8 +20,8 @@ superconductivity (condensation of fermion pairs).
 
 Theorem 10.8 rests on Lieb's spin-space reflection-positivity method
 (Shen–Qiu–Tian extension) and the uniqueness of the attractive-Hubbard ground
-state (Theorem 10.2); per the project policy it is recorded as a faithful
-documented `axiom`, built on the concrete **symmetric** attractive Hubbard
+state (Theorem 10.2); it is recorded as an `axiom` pending discharge
+(Issue #5357), built on the concrete **symmetric** attractive Hubbard
 Hamiltonian `Ĥhop − Σ_x U_x (n̂_↑ − ½)(n̂_↓ − ½)` (eq. (10.2.21), the form
 Theorem 10.8 uses) and the total pair operator, reusing the bipartition
 vocabulary and the `EuclideanSpace` ground-state representation of Theorem 10.2.
@@ -75,8 +75,8 @@ pair off-diagonal-long-range-order bound
   `⟨φ| b̂† b̂ |φ⟩ ≥ (|A| − N/2)(N/2 − |B|)`,
 
 with `b̂ = Σ_x ĉ_{x,↓} ĉ_{x,↑}`. The strictly positive regime exhibits
-condensation of fermion pairs (superconductivity). Recorded as a faithful
-documented axiom (Lieb's reflection positivity, Shen–Qiu–Tian). -/
+condensation of fermion pairs (superconductivity). Recorded as an axiom
+pending discharge (Issue #5357): Lieb's reflection positivity, Shen–Qiu–Tian. -/
 axiom theorem_10_8_lieb_shen_qiu_superconductivity (N Ne : ℕ)
     (A : Finset (Fin (N + 1)))
     (hNe_even : Even Ne) (hNe_pos : 0 < Ne)

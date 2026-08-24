@@ -8268,6 +8268,57 @@ domain. This is the one Chapter-10 item that is finite-dimensional linear
 algebra rather than reflection positivity, and it is fully discharged.
 
 \medskip
+\emph{Generic shift/uniqueness lemmas and the Shiba Hamiltonian bridge
+(Issue~\#5357, PR~\#5358 PR-1; proved, axiom-free).} Three model-independent
+additions to \texttt{Math/MatrixAnalysis/DegeneratePerturbation.lean}:
+\texttt{IsUniqueGroundStateOn.sub\_smul\_one} (shifting $H$ by $(c{:}\mathbb R)\bullet 1$
+shifts a unique ground state's energy from $E$ to $E-c$ with the same
+eigenvector); \texttt{IsUniqueGroundStateOn.energy\_eq} (two unique ground
+states on the same $(K,H)$ share the same ground energy); and
+\texttt{IsUniqueGroundStateOn.exists\_smul\_eq} (consequently they are
+collinear, $\varphi_2=c\bullet\varphi_1$ with $\|c\|=1$). The earlier
+\texttt{isUniqueGroundStateOn\_sub\_smul\_one\_iff}
+(\texttt{Math/MatrixAnalysis/SubmatrixGroundState.lean}) states the same shift as
+an \texttt{iff}; it keeps its statement and its call sites, but its proof body is
+replaced by a short derivation from \texttt{IsUniqueGroundStateOn.sub\_smul\_one}
+(the reverse direction is the same one-sided shift run at $-a$), leaving a single
+proof of the shift. Theorem 10.5's
+proof is retargeted in the same PR to call
+\texttt{IsUniqueGroundStateOn.exists\_smul\_eq} directly instead of deriving
+the energy-match/collinearity step by hand (no statement or citation change
+to Theorem 10.5 itself). The four \texttt{euclideanExpectation} helpers
+(homogeneity, additivity, Shiba-conjugation transport, and the
+$\langle v|A^\dagger A|v\rangle$ = squared-norm identity), previously
+\texttt{private} in \texttt{LiebRepulsiveCorrelation.lean}, move unchanged to
+\texttt{LiebAttractive.lean} next to \texttt{euclideanExpectation} itself and
+become public, for reuse by the later arc PRs. On the Hamiltonian side,
+Theorem 10.8 is stated for the \emph{symmetric} attractive Hamiltonian
+$\hat H^{\rm attr,sym}(T,U)=\hat H_{\rm hop}(T)-\sum_x U_x(\hat n_{x\uparrow}-\tfrac12)(\hat n_{x\downarrow}-\tfrac12)$
+(eq.~(10.2.21)), while the existing Shiba conjugation
+\texttt{shibaSignedUnitary\_conj\_symmetricRepulsive\_eq\_attractive}
+(eq.~(10.2.10)) delivers the \emph{plain} attractive Hamiltonian with on-site
+energies shifted by $U/2$, minus the scalar $\tfrac14\sum_x U_x$.
+\texttt{symmetricAttractiveHubbardHamiltonian\_eq\_attractive\_sub\_smul}
+reads eq.~(10.2.11) in the attractive direction:
+$\hat H^{\rm attr,sym}(T,U)=\hat H^{\rm attr}(T+\mathrm{diag}(U/2),U)-(\tfrac14\sum_x U_x)\bullet 1$
+— the same constant, so the two shifts cancel. Combining the two gives the
+capstone \texttt{shibaSignedUnitary\_conj\_symmetricRepulsive\_eq\_symmetricAttractive}:
+$\hat U^\dagger \hat H^{\rm rep,sym}(T,U) \hat U = \hat H^{\rm attr,sym}(T,U)$
+with \emph{no} residual scalar. This is the conjugation identity alone: reading
+it as unitary equivalence (coinciding spectra, $\hat U$ transporting
+eigenvectors at unchanged energy) additionally takes $\hat U\hat U^\dagger=1$
+(\texttt{shibaSignedUnitary\_self\_mul\_conjTranspose},
+\texttt{LiebRepulsiveShibaInteraction.lean}), a step left to the consuming PR.
+The chemical-shift split
+$\hat H_{\rm hop}(T+\mathrm{diag}(U/2))=\hat H_{\rm hop}(T)+\sum_x (U_x/2)(\hat n_{x\uparrow}+\hat n_{x\downarrow})$,
+needed identically by the plain conjugation and by this bridge, is factored out
+as the named lemma \texttt{hubbardKinetic\_add\_diagonal\_half} in
+\texttt{LiebRepulsiveShibaConjugation.lean} and reused from both. Not yet consumed by
+\texttt{theorem\_10\_8\_lieb\_shen\_qiu\_superconductivity} (still an axiom
+below); staged for the later PRs of this arc ($\hat S^3\varphi=0$ extraction,
+PR-2 onward).
+
+\medskip
 \noindent\textbf{Theorem 10.8} (Lieb–Shen–Qiu superconductivity; Tasaki §10.2.3,
 p.~359, eq.~(10.2.22)). For the symmetric attractive Hubbard model
 $\hat H_{\rm hop} - \sum_x U_x(\hat n_{x\uparrow}-\tfrac12)(\hat n_{x\downarrow}-\tfrac12)$
@@ -8279,8 +8330,9 @@ with $\hat b = \sum_x \hat c_{x\downarrow}\hat c_{x\uparrow}$
 (\texttt{totalPairCorrelationOperator},
 \texttt{theorem\_10\_8\_lieb\_shen\_qiu\_superconductivity}); the positive regime
 is the standard criterion for superconductivity (fermion-pair condensation).
-Recorded as a faithful documented \texttt{axiom} (Lieb's reflection positivity,
-Shen–Qiu–Tian, plus Theorem 10.2 uniqueness).
+Recorded as an axiom pending discharge (Issue~\#5357): Lieb's reflection
+positivity, Shen–Qiu–Tian, plus Theorem 10.2 uniqueness, generalizing the
+Theorem 10.4/10.5/10.6 Shiba-transformation machinery.
 
 %======================================================================
 \subsection{Kubo–Kishi finite-temperature susceptibility bound (Tasaki §10.2.5, Theorem 10.11)}

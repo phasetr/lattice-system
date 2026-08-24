@@ -24,15 +24,16 @@ energies allowed) and on-site attraction `Ĥatt-int = −Σ_x U_x n̂_{x,↑} n�
 
 ## Status
 
-**Theorem 10.2 is now PROVED axiom-free** (in `LiebAttractiveTheorem102.lean`,
-`theorem_10_2_lieb_attractive_unique_singlet`): Lieb's spin-space
-reflection-positivity is carried out on the balanced (`Ŝ³ = 0`) block and
-lifted to the full `Ne`-electron sector through the generic SU(2) multiplet
-engine (Tasaki Appendix A). Theorem 10.3 (Tian's pair-correlation
-positivity) is still recorded as a faithful documented `axiom`, built on a
-concrete attractive Hubbard Hamiltonian. The general hopping kinetic term
-reuses the existing `hubbardKinetic`; the unique-ground-state predicate
-reuses `IsUniqueGroundStateOn` from the degenerate-perturbation development.
+Both theorems are **PROVED axiom-free**, each in its own downstream file:
+`theorem_10_2_lieb_attractive_unique_singlet` (`LiebAttractiveTheorem102.lean`),
+where Lieb's spin-space reflection-positivity is carried out on the balanced
+(`Ŝ³ = 0`) block and lifted to the full `Ne`-electron sector through the
+generic SU(2) multiplet engine (Tasaki Appendix A), and
+`theorem_10_3_tian_pair_correlation_positive`
+(`LiebAttractiveTheorem103.lean`). This file carries the shared definitional
+layer both of them consume: the general hopping kinetic term reuses the
+existing `hubbardKinetic`; the unique-ground-state predicate reuses
+`IsUniqueGroundStateOn` from the degenerate-perturbation development.
 -/
 
 namespace LatticeSystem.Fermion
@@ -92,8 +93,45 @@ noncomputable def euclideanExpectation {ι : Type*} [Fintype ι]
     (O : Matrix ι ι ℂ) (φ : EuclideanSpace ℂ ι) : ℂ :=
   dotProduct (star φ.ofLp) (O.mulVec φ.ofLp)
 
--- **Tasaki Theorem 10.3** (Tian's pair-correlation positivity, 1st ed., Springer 2020, §10.2,
--- p. 349, eq. (10.2.4)) is now a **proved theorem** `theorem_10_3_tian_pair_correlation_positive`
--- in `LiebAttractiveTheorem103.lean` (no longer an axiom).
+/-! ## Linearity and transport of the Euclidean expectation -/
+
+/-- The Euclidean expectation is homogeneous in the observable. -/
+theorem euclideanExpectation_smul (a : ℂ) (O : ManyBodyOp (Fin (2 * N + 2)))
+    (φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)) :
+    euclideanExpectation (a • O) φ = a * euclideanExpectation O φ := by
+  unfold euclideanExpectation
+  rw [Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul]
+
+/-- The Euclidean expectation is additive in the observable. -/
+theorem euclideanExpectation_add (O₁ O₂ : ManyBodyOp (Fin (2 * N + 2)))
+    (φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)) :
+    euclideanExpectation (O₁ + O₂) φ
+      = euclideanExpectation O₁ φ + euclideanExpectation O₂ φ := by
+  unfold euclideanExpectation
+  rw [Matrix.add_mulVec, dotProduct_add]
+
+/-- **Shiba transport of the Euclidean expectation**: if `ψ = Û φ_attr` then
+`⟨ψ| O |ψ⟩ = ⟨φ_attr| Ûᴴ O Û |φ_attr⟩`. -/
+theorem euclideanExpectation_shiba_conj (O : ManyBodyOp (Fin (2 * N + 2)))
+    (Ush : Matrix (Fin (2 * N + 2) → Fin 2) (Fin (2 * N + 2) → Fin 2) ℂ)
+    (ψ φattr : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2))
+    (hψ : ψ.ofLp = Ush.mulVec φattr.ofLp) :
+    euclideanExpectation O ψ
+      = euclideanExpectation (Matrix.conjTranspose Ush * O * Ush) φattr := by
+  unfold euclideanExpectation
+  rw [hψ, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, ← Matrix.mulVec_mulVec,
+    ← Matrix.mulVec_mulVec]
+
+/-- The Euclidean `⟨v| Aᴴ A |v⟩` is the (nonnegative real) squared norm of `A v`. -/
+theorem euclideanExpectation_conjTranspose_mul_self
+    (M : ManyBodyOp (Fin (2 * N + 2)))
+    (φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)) :
+    euclideanExpectation (Matrix.conjTranspose M * M) φ
+      = ((∑ j, Complex.normSq ((M.mulVec φ.ofLp) j) : ℝ) : ℂ) := by
+  unfold euclideanExpectation
+  rw [← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, ← Matrix.star_mulVec,
+    dotProduct, Complex.ofReal_sum]
+  refine Finset.sum_congr rfl (fun j _ => ?_)
+  rw [Pi.star_apply, Complex.star_def, mul_comm, Complex.mul_conj]
 
 end LatticeSystem.Fermion

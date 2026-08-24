@@ -226,6 +226,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismCenteredBoun
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismDischarge
 import LatticeSystem.Fermion.JordanWigner.Hubbard.BipartiteSpectrum
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebShenQiu
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebShenQiuShibaBridge
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebKuboKishi
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SectorMinEnergy
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NonsingularHubbardModel
