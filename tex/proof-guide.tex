@@ -8206,10 +8206,13 @@ obtained. \textbf{Debt discharged.} Consumes PR-1's
 \texttt{fermionStaggeredTransverse\_expectation\_le\_staggeredCasimir\_expectation}, PR-2's
 \texttt{sum\_fermionSpinTransverse\_eq\_totalSpinSquared\_sub\_spinZ\_sq}, and PR-6's
 \texttt{liebRepulsive\_exists\_centered\_transverse\_sign}, all three previously staged at
-reference 0. \textbf{Debt (new).} All four public declarations of this PR are at reference 0,
-staged for PR-8's final assembly into \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an
-axiom below); this PR bounds a single centered tower member, and PR-8's remaining task is to
-discharge the axiom for an arbitrary normalized ground state.
+reference 0. \textbf{Debt (new).} Only
+\texttt{liebRepulsive\_exists\_centered\_ratioRe\_ge\_sq} is at reference 0, staged for PR-8's
+final assembly into \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below); the
+other three public declarations are consumed within this module in a straight-line chain (the
+Casimir step and the sign step feed the capstone, which feeds the existential form). This PR
+bounds a single centered tower member, and PR-8's remaining task is to discharge the axiom for
+an arbitrary normalized ground state.
 
 \medskip
 \noindent\textbf{Theorem 10.6} (Shen–Qiu–Tian ferrimagnetism; Tasaki §10.2.3,
