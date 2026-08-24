@@ -206,8 +206,8 @@ example (N Ne : ℕ)
         Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1)) φ = ((N : ℂ) + 1) • φ :=
   repulsiveSpinZSector_ground_unique N Ne hNe_even hNe_pos hNe_lt T hT_symm hbip hT_conn U hU_pos
 
-/-! ## PR-3 (#5357): `k₀ → k` sector generalization + Casimir value (`LiebShenQiuSectorCasimir.lean`,
-new module) -/
+/-! ## PR-3 (#5357): `k₀ → k` sector generalization + Casimir value
+(`LiebShenQiuSectorCasimir.lean`, new module) -/
 
 /-- Pins **C1**, the tower-exponent weight arithmetic (design §3 item 1): at tower exponent
 `k := A.card - Ne / 2` (`hb`/`ha`/`hNe` are the side conditions `b ≤ Ne/2 ≤ a`, `Even Ne` that make
