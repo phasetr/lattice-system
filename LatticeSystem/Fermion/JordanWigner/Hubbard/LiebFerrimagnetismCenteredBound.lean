@@ -153,4 +153,94 @@ private theorem liebRepulsive_sq_le_centeredCasimirGap {N : ℕ} (A : Finset (Fi
       ≤ ((sublatticeImbalance A % 2 : ℕ) : ℝ) := by nlinarith [hr0, hrR]
   nlinarith [hdmR, hr0, hd0, hkey]
 
+/-! ## The centered-sector bound -/
+
+/-- **Tasaki's ferrimagnetic bound (10.2.17) on the centered tower member.**  For the centered
+member `u = (Ŝ⁻_tot)^{k₀} w` (`k₀ = L/2`) of the ground multiplet's lowering tower,
+`S₀² ≤ ⟨(Ô_L)²⟩.re / ‖u‖²` with `S₀ = L/2`.
+
+Chain: the Casimir step evaluates the un-staggered transverse expectation as `(γ₀ − m₀²) ‖u‖²`,
+the sign step raises it to the staggered transverse expectation, restoring the
+positive-semidefinite longitudinal square raises it again to `⟨(Ô_L)²⟩.re`, and
+`S₀² ≤ γ₀ − m₀²` closes the arithmetic; `‖u‖² > 0` because the tower survives `k₀ ≤ L` steps.
+The sign pattern is a hypothesis, so Theorem 10.5's model hypotheses (`hbip`, `hT_conn`, `hU`,
+`1 ≤ N`) are not needed. -/
+theorem liebRepulsive_centered_ratioRe_ge_sq (N : ℕ) (A : Finset (Fin (N + 1)))
+    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (hT : ∀ i j, T i j = T j i)
+    (U : Fin (N + 1) → ℝ) (E₀ : ℂ)
+    (hcas : ∀ v ∈ hubbardGroundSubmoduleAtElectronNumber
+        (symmetricRepulsiveHubbardHamiltonian N T U) E₀ (N + 1),
+      (fermionTotalSpinSquared N).mulVec v = liebRepulsiveSpinCasimir A • v)
+    {w : (Fin (2 * N + 2) → Fin 2) → ℂ} (hw0 : w ≠ 0)
+    (hwG : w ∈ hubbardGroundSubmoduleAtElectronNumber
+      (symmetricRepulsiveHubbardHamiltonian N T U) E₀ (N + 1))
+    (hz : (fermionTotalSpinZ N).mulVec w = ((sublatticeImbalance A : ℂ) / 2) • w)
+    (hsign : ∀ x y : Fin (N + 1),
+      (vectorExpectation (fermionSpinTransverse N x y)
+          (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w)).im = 0 ∧
+        (SameSublattice A x y →
+            0 < (vectorExpectation (fermionSpinTransverse N x y)
+              (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w)).re) ∧
+          (¬ SameSublattice A x y →
+            (vectorExpectation (fermionSpinTransverse N x y)
+              (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w)).re < 0)) :
+    ((sublatticeImbalance A : ℝ) / 2) ^ 2 ≤
+      (vectorExpectation (fermionStaggeredCasimirOp N A)
+          (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w)).re /
+        (star (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w) ⬝ᵥ
+            ((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w).re := by
+  have hu0 : ((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w ≠ 0 :=
+    liebRepulsive_ground_tower_ne_zero N A T U E₀ hcas hw0 hwG hz _ (Nat.div_le_self _ _)
+  have hnorm : 0 < (star (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w) ⬝ᵥ
+      ((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w).re :=
+    dotProduct_star_self_re_pos hu0
+  have hsum : (vectorExpectation (∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
+        fermionSpinTransverse N x y)
+      (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w)).re
+      = (((sublatticeImbalance A : ℝ) / 2) * ((sublatticeImbalance A : ℝ) / 2 + 1)
+          - ((sublatticeImbalance A : ℝ) / 2 - ((sublatticeImbalance A / 2 : ℕ) : ℝ)) ^ 2)
+        * (star (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w) ⬝ᵥ
+            ((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w).re := by
+    rw [liebRepulsive_centered_sum_transverse_eq N A T hT U E₀ hcas hwG hz,
+      liebRepulsive_centeredCasimirGap_eq_ofReal, Complex.re_ofReal_mul]
+  have hstagger := liebRepulsive_centered_staggeredTransverse_ge_sum A
+    (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w) hsign
+  have hlong := fermionStaggeredTransverse_expectation_le_staggeredCasimir_expectation N A
+    (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w)
+  rw [le_div_iff₀ hnorm]
+  linarith [hsum, hstagger, hlong,
+    mul_le_mul_of_nonneg_right (liebRepulsive_sq_le_centeredCasimirGap A) hnorm.le]
+
+/-- **A ground vector realizing the centered-sector bound.**  The existential form of
+`liebRepulsive_centered_ratioRe_ge_sq`: Theorem 10.5's sign pattern on the centered tower member
+of a highest-weight ground vector is supplied by
+`liebRepulsive_exists_centered_transverse_sign`, so the full model hypotheses of Theorems 10.4 and
+10.5 are carried here.  Exposing the weight equation `Ŝ³_tot w = (L/2) w` alongside the bound is
+what lets the bound be transported along the tower. -/
+theorem liebRepulsive_exists_centered_ratioRe_ge_sq (N : ℕ) (A : Finset (Fin (N + 1)))
+    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (hT : ∀ i j, T i j = T j i)
+    (hbip : HoppingRespectsBipartition A T)
+    (hT_conn : (hoppingSupportGraph T).Preconnected)
+    (U : Fin (N + 1) → ℝ) (hU : ∀ x, 0 < U x) (hN : 1 ≤ N) (E₀ : ℂ)
+    (hne : hubbardGroundSubmoduleAtElectronNumber
+      (symmetricRepulsiveHubbardHamiltonian N T U) E₀ (N + 1) ≠ ⊥)
+    (hmin : ∀ E : ℂ, hubbardGroundSubmoduleAtElectronNumber
+        (symmetricRepulsiveHubbardHamiltonian N T U) E (N + 1) ≠ ⊥ → E₀.re ≤ E.re)
+    (hcas : ∀ v ∈ hubbardGroundSubmoduleAtElectronNumber
+        (symmetricRepulsiveHubbardHamiltonian N T U) E₀ (N + 1),
+      (fermionTotalSpinSquared N).mulVec v = liebRepulsiveSpinCasimir A • v) :
+    ∃ w : (Fin (2 * N + 2) → Fin 2) → ℂ, w ≠ 0 ∧
+      w ∈ hubbardGroundSubmoduleAtElectronNumber
+        (symmetricRepulsiveHubbardHamiltonian N T U) E₀ (N + 1) ∧
+      (fermionTotalSpinZ N).mulVec w = ((sublatticeImbalance A : ℂ) / 2) • w ∧
+      ((sublatticeImbalance A : ℝ) / 2) ^ 2 ≤
+        (vectorExpectation (fermionStaggeredCasimirOp N A)
+            (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w)).re /
+          (star (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w) ⬝ᵥ
+              ((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w).re := by
+  obtain ⟨w, hw0, hwG, hz, hsign⟩ := liebRepulsive_exists_centered_transverse_sign N A T hT hbip
+    hT_conn U hU hN E₀ hne hmin hcas
+  exact ⟨w, hw0, hwG, hz,
+    liebRepulsive_centered_ratioRe_ge_sq N A T hT U E₀ hcas hw0 hwG hz hsign⟩
+
 end LatticeSystem.Fermion
