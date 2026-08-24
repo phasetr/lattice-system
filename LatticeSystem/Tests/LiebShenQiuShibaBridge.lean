@@ -1,14 +1,12 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebShenQiu
-import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveShibaConjugation
-import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebShenQiuShibaBridge
 
 /-!
 # Test coverage for the Theorem 10.8 Shiba Hamiltonian bridge (PR-1)
 
-Pins the API contract of the constant-shift identity and the Shiba conjugation bridge that PR-1
-of the Theorem 10.8 discharge (design report `.self-local/docs/theorem-10-8-design.md` §1)
-introduces, plus the de-privatization of four `euclideanExpectation` helpers currently `private`
-in `LiebRepulsiveCorrelation.lean:111-148`:
+Pins the API contract of the constant-shift identity and the Shiba conjugation bridge of
+`LatticeSystem/Fermion/JordanWigner/Hubbard/LiebShenQiuShibaBridge.lean` (PR-1 of the
+Theorem 10.8 discharge, design report `.self-local/docs/theorem-10-8-design.md` §1), plus the
+four public `euclideanExpectation` helpers of `LiebAttractive.lean`:
 
 1. **B1** `symmetricAttractiveHubbardHamiltonian_eq_attractive_sub_smul` — the constant-shift
    identity `Ĥ^{attr,sym}(T,U) = Ĥ^{attr}(T + diag(U/2), U) − ((ΣU)/4)•1`.
@@ -17,12 +15,11 @@ in `LiebRepulsiveCorrelation.lean:111-148`:
    `shibaSignedUnitary_conj_symmetricRepulsive_eq_attractive` with B1, the `¼ΣU` shift cancelling
    exactly).
 3. **P1–P4** the four `euclideanExpectation` helpers (`_smul`, `_add`, `_shiba_conj`,
-   `_conjTranspose_mul_self`), moved out of `private` scope (design report §1, "Reuse ... they are
-   `private` in `LiebRepulsiveCorrelation.lean:111-148`; move them ... and un-private them").
+   `_conjTranspose_mul_self`), public and sitting next to `euclideanExpectation` itself, so that
+   the later Theorem 10.8 layers reuse them instead of re-deriving them.
 
-**RED (this PR)**: B1/B2 do not yet exist, and P1–P4 are still `private`, so none of the `example`s
-below elaborate. Implementation (including the actual move/un-private of P1–P4, and choosing their
-final home module) is out of scope for this PR (TDD Red only).
+Each `example` fails to elaborate unless the corresponding declaration exists, is public, and has
+exactly this signature.
 
 **Not covered here**: the electron-number/spin-`z` sector transport (`shibaTransport_...`, PR-2)
 and the `Ŝ³ φ = 0` extraction (PR-2); the `k₀ → k` tower generalization (PR-3); the pair/ladder

@@ -304,6 +304,79 @@ theorem IsUniqueGroundStateOn.smul_of_norm_one {K : Submodule ℂ (EuclideanSpac
     obtain ⟨d, hd⟩ := huniq ψ hψ hψeig
     exact ⟨d * c⁻¹, by rw [hd, smul_smul, mul_assoc, inv_mul_cancel₀ hcne, mul_one]⟩
 
+/-- **Shifting `H` by a real multiple of the identity shifts the ground energy.** Replacing `H`
+by `H − c·1` lowers every eigenvalue on `K` by `c` and changes no eigenvector, so the unique
+normalized ground state `φ` survives with energy `E − c`. This is how a Hamiltonian written with
+a centred interaction is matched against the plain one, the two differing by a constant. -/
+theorem IsUniqueGroundStateOn.sub_smul_one {K : Submodule ℂ (EuclideanSpace ℂ n)}
+    {H : Matrix n n ℂ} {E c : ℝ} {φ : EuclideanSpace ℂ n}
+    (hGS : IsUniqueGroundStateOn K H E φ) :
+    IsUniqueGroundStateOn K (H - (c : ℂ) • 1) (E - c) φ := by
+  obtain ⟨hmem, hnorm, heig, hground, huniq⟩ := hGS
+  have hshift : ∀ ψ : EuclideanSpace ℂ n,
+      Matrix.toEuclideanLin (H - (c : ℂ) • 1) ψ = Matrix.toEuclideanLin H ψ - (c : ℂ) • ψ := by
+    intro ψ
+    apply WithLp.ofLp_injective 2
+    simp [Matrix.ofLp_toLpLin, Matrix.toLin'_apply, Matrix.smul_mulVec]
+    -- `simp` leaves `c • ψ.ofLp = (c • ψ).ofLp`, true by definition of the `WithLp` synonym.
+    rfl
+  have hiff : ∀ (μ : ℝ) (ψ : EuclideanSpace ℂ n),
+      Matrix.toEuclideanLin (H - (c : ℂ) • 1) ψ = (μ : ℂ) • ψ ↔
+        Matrix.toEuclideanLin H ψ = ((μ + c : ℝ) : ℂ) • ψ := by
+    intro μ ψ
+    rw [hshift, sub_eq_iff_eq_add, Complex.ofReal_add, add_smul]
+  have hcancel : ∀ ψ : EuclideanSpace ℂ n,
+      Matrix.toEuclideanLin (H - (c : ℂ) • 1) ψ = ((E - c : ℝ) : ℂ) • ψ ↔
+        Matrix.toEuclideanLin H ψ = (E : ℂ) • ψ := by
+    intro ψ
+    rw [hiff (E - c) ψ, show E - c + c = E from sub_add_cancel E c]
+  have hφne : φ ≠ 0 := by
+    intro h
+    rw [h, norm_zero] at hnorm
+    exact zero_ne_one hnorm
+  have heig' : Matrix.toEuclideanLin (H - (c : ℂ) • 1) φ = ((E - c : ℝ) : ℂ) • φ :=
+    (hcancel φ).mpr heig
+  refine ⟨hmem, hnorm, heig', ⟨⟨φ, hmem, hφne, heig'⟩, ?_⟩, fun ψ hψK hψeig =>
+    huniq ψ hψK ((hcancel ψ).mp hψeig)⟩
+  rintro μ ⟨ψ, hψK, hψne, hψeig⟩
+  have hle := hground.2 (μ + c) ⟨ψ, hψK, hψne, (hiff μ ψ).mp hψeig⟩
+  linarith
+
+/-- **The ground energy on `(K, H)` is unique.** Two unique normalized ground states of the same
+Hamiltonian on the same subspace have the same energy: each one's minimality applies to the
+other's eigenvalue. -/
+theorem IsUniqueGroundStateOn.energy_eq {K : Submodule ℂ (EuclideanSpace ℂ n)}
+    {H : Matrix n n ℂ} {E₁ E₂ : ℝ} {φ₁ φ₂ : EuclideanSpace ℂ n}
+    (h₁ : IsUniqueGroundStateOn K H E₁ φ₁) (h₂ : IsUniqueGroundStateOn K H E₂ φ₂) : E₁ = E₂ := by
+  obtain ⟨hmem₁, hnorm₁, heig₁, hground₁, -⟩ := h₁
+  obtain ⟨hmem₂, hnorm₂, heig₂, hground₂, -⟩ := h₂
+  have hne₁ : φ₁ ≠ 0 := by
+    intro h
+    rw [h, norm_zero] at hnorm₁
+    exact zero_ne_one hnorm₁
+  have hne₂ : φ₂ ≠ 0 := by
+    intro h
+    rw [h, norm_zero] at hnorm₂
+    exact zero_ne_one hnorm₂
+  exact le_antisymm (hground₁.2 E₂ ⟨φ₂, hmem₂, hne₂, heig₂⟩)
+    (hground₂.2 E₁ ⟨φ₁, hmem₁, hne₁, heig₁⟩)
+
+/-- **Two unique ground states on the same `(K, H)` differ by a phase.** Their energies agree, so
+uniqueness applies to the second vector, and normalization forces the scalar to have modulus one.
+Together with `IsUniqueGroundStateOn.smul_of_norm_one` this says that the unique ground state is
+well defined exactly up to a phase. -/
+theorem IsUniqueGroundStateOn.exists_smul_eq {K : Submodule ℂ (EuclideanSpace ℂ n)}
+    {H : Matrix n n ℂ} {E₁ E₂ : ℝ} {φ₁ φ₂ : EuclideanSpace ℂ n}
+    (h₁ : IsUniqueGroundStateOn K H E₁ φ₁) (h₂ : IsUniqueGroundStateOn K H E₂ φ₂) :
+    ∃ c : ℂ, ‖c‖ = 1 ∧ φ₂ = c • φ₁ := by
+  have hE : E₁ = E₂ := h₁.energy_eq h₂
+  obtain ⟨-, hnorm₁, -, -, huniq₁⟩ := h₁
+  obtain ⟨hmem₂, hnorm₂, heig₂, -, -⟩ := h₂
+  obtain ⟨c, hc⟩ := huniq₁ φ₂ hmem₂ (by rw [hE]; exact heig₂)
+  refine ⟨c, ?_, hc⟩
+  rw [hc, norm_smul, hnorm₁, mul_one] at hnorm₂
+  exact hnorm₂
+
 open Metric in
 /-- **Lowest energy on an invariant subspace, attained at a unit eigenvector.**
 If a Hermitian matrix `H` preserves a nonzero subspace `q` of `EuclideanSpace ℂ n`, then the

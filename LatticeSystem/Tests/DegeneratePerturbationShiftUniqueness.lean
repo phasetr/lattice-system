@@ -15,8 +15,8 @@ in `Math/MatrixAnalysis/DegeneratePerturbation.lean` next to
 3. **S3** `IsUniqueGroundStateOn.exists_smul_eq` — two unique ground states on the same `(K, H)`
    are collinear via a unit-modulus scalar.
 
-**RED (this PR)**: these declarations do not yet exist; the `example`s below fail to elaborate.
-Implementation is out of scope for this PR (TDD Red only).
+Each `example` fails to elaborate unless the corresponding declaration exists with exactly this
+signature, so this file is the executable acceptance condition of the three lemmas.
 
 **Not covered here**: any instantiation on a concrete Hubbard Hamiltonian — that is exercised by
 `Tests/LiebShenQiuShibaBridge.lean`, which consumes the Hamiltonian-bridge identity built from
