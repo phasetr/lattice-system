@@ -217,6 +217,16 @@ subject to the frozen byte-for-byte parity of the block above.
 
 **Correction (Theorem 10.6 proof method).** The Theorem 10.6 row above (frozen catalogue block) closes with "Reflection positivity → faithful documented axiom." This is not accurate: Tasaki proves Theorem 10.6 exactly as Theorem 4.4 (Tasaki, 1st ed., Springer 2020, §10.2.3, p. 356, the paragraph immediately preceding Theorem 10.6), building on **both** Theorem 10.4 (`theorem_10_4_lieb_repulsive_half_filling`) and inequality (10.2.7) — Theorem 10.5's transverse-correlation sign (`theorem_10_5_shen_qiu_tian_transverse_sign`), used in place of the spin-`S` argument's (4.1.15) — reflection positivity is Theorem 10.4's own (already-discharged) proof method, not a proof method of Theorem 10.6 itself. Also, `docs/limitations/documented-axioms.md` has no entry for Theorem 10.6, since it is not a won't-do axiom but an active discharge target (Issue #5347); "faithful documented axiom" should be read here as "axiom pending discharge (Issue #5347)". Not corrected in place because that row is inside the frozen `legacy-source` block.
 
+## Authoritative supplemental implementation record (Theorem 10.6 discharge arc, PR-2: transverse-Casimir identity)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+new supporting declarations added after the migration baseline (Issue #5347, PR #5349); it is not
+subject to the frozen byte-for-byte parity of the block above.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `sum_fermionSpinTransverse_eq_totalSpinSquared_sub_spinZ_sq` | **The transverse/Casimir identity** (Theorem 10.6 discharge arc, Issue #5347, PR #5349 PR-2; **PROVED**, axiom-free): specializes PR-1's staggered split to the trivial gauge `A = Λ` (`ε_x ≡ +1`), where the staggered operators collapse to the plain totals (`Ô^{(3)}_Λ = Ŝ³_tot`, `(Ô_Λ)² = (Ŝ_tot)²`), turning the split into `Σ_{x,y} Ŝ⊥_{xy} = (Ŝ_tot)² − (Ŝ³_tot)²` (Tasaki §10.2.2, eq. (10.2.7), p. 351; §10.2.3, eqs. (10.2.16)/(10.2.17), p. 356). The weight band `m² ≤ γ` that selects the physical root `m = S₀` of the Casimir equation `γ₀ = m(m + 1)` over the spurious companion `m = −(S₀ + 1)` is not restated in this layer: PR-5 uses the existing `angMom_abs_le_J` (`Math/AngularMomentum/Ladder.lean`) through `fermionTotalSpinSquared_posSemidef` and `fermionTotalSpinSquared_eq_cartesianSqSum` (`LiebAttractiveFullSectorUnique.lean`), the route already taken by `LiebRepulsiveMultipletCompanion.lean` and `LiebAttractiveFullSectorUnique.lean`. **Not yet consumed** by `theorem_10_6_lieb_ferrimagnetism` (Theorem 10.6 row above, still an axiom); the remaining arc PRs must identify the repulsive-Hubbard ground multiplet's Casimir/weight values and assemble the full ferrimagnetic bound (10.2.17). | `Fermion/JordanWigner/Hubbard/LiebFerrimagnetismTransverseCasimir.lean` |
+
 ---
 
 [← Multi-mode fermion via Jordan–Wigner (P2 backbone)](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-03/) · [Catalogue](/lattice-system/formalization/legacy/) · [Multi-mode fermion via Jordan–Wigner (P2 backbone) →](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-05/)
