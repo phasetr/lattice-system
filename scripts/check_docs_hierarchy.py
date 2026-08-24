@@ -761,6 +761,32 @@ def approved_changes(text: str) -> str:
             "definitions stay in `LiebRepulsive.lean`, strictly upstream of the discharge chain. "
             "| `Fermion/JordanWigner/Hubbard/LiebRepulsiveHalfFillingDischarge.lean` |",
         )
+        # PR-8 of the Theorem 10.6 discharge arc (#5347) discharges the axiom itself; the row's
+        # status/proof-sketch prose is rewritten to reflect the completed theorem, the page-number
+        # correction (p. 354 → p. 356) is folded in, and the "reflection positivity" proof-method
+        # claim is replaced by the actual Theorem 10.4 + Theorem 10.5 route.
+        .replace(
+            "| `fermionStaggeredCasimirOp` / `theorem_10_6_lieb_ferrimagnetism` | **Theorem "
+            "10.6** (Shen–Qiu–Tian ferrimagnetism; Tasaki §10.2.3, p. 354, "
+            "eqs. (10.2.16)/(10.2.17), **AXIOM**): every normalized repulsive-Hubbard ground "
+            "state satisfies `⟨v\\| (Ô_L)² \\|v⟩ ≥ ((\\|A\\|−\\|B\\|)/2)²`, where "
+            "`(Ô_L)² = Σ_{x,y} ε_xε_y Ŝ_x·Ŝ_y` (staggered sign `ε_x=±1` per sublattice) — "
+            "ferrimagnetic long-range order. Reuses `IsLiebRepulsiveModel`. Reflection positivity "
+            "→ faithful documented axiom. | "
+            "`Fermion/JordanWigner/Hubbard/LiebFerrimagnetism.lean` |",
+            "| `fermionStaggeredCasimirOp` / `theorem_10_6_lieb_ferrimagnetism` | **Theorem "
+            "10.6** (Shen–Qiu–Tian ferrimagnetism; Tasaki §10.2.3, p. 356, "
+            "eqs. (10.2.16)/(10.2.17), **now PROVED — axiom discharged**, Issue #5347, "
+            "PR #5356 PR-8; `#print axioms` = std3): every normalized repulsive-Hubbard ground "
+            "state satisfies `⟨v\\| (Ô_L)² \\|v⟩ ≥ ((\\|A\\|−\\|B\\|)/2)²`, where "
+            "`(Ô_L)² = Σ_{x,y} ε_xε_y Ŝ_x·Ŝ_y` (staggered sign `ε_x=±1` per sublattice) — "
+            "ferrimagnetic long-range order. Reuses `IsLiebRepulsiveModel`. **Proof**: via "
+            "Theorem 10.4 and Theorem 10.5 (inequality (10.2.7)), exactly as Theorem 4.4, and "
+            "not by reflection positivity — a ground-multiplet lowering-tower argument "
+            "transports the centered-sector bound (Theorem 10.5's correlation-sign step) to "
+            "every tower member and every normalized ground vector. | "
+            "`Fermion/JordanWigner/Hubbard/LiebFerrimagnetismDischarge.lean` |",
+        )
     )
 
 

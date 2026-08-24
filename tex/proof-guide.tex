@@ -8208,18 +8208,19 @@ obtained. \textbf{Debt discharged.} Consumes PR-1's
 \texttt{fermionStaggeredTransverse\_expectation\_le\_staggeredCasimir\_expectation}, PR-2's
 \texttt{sum\_fermionSpinTransverse\_eq\_totalSpinSquared\_sub\_spinZ\_sq}, and PR-6's
 \texttt{liebRepulsive\_exists\_centered\_transverse\_sign}, all three previously staged at
-reference 0. \textbf{Debt (new).} Only
-\texttt{liebRepulsive\_exists\_centered\_ratioRe\_ge\_sq} is at reference 0, staged for PR-8's
-final assembly into \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below); the
-other three public declarations are consumed within this module in a straight-line chain (the
-Casimir step and the sign step feed the capstone, which feeds the existential form). This PR
-bounds a single centered tower member, and PR-8's remaining task is to discharge the axiom for
-an arbitrary normalized ground state.
+reference 0. \textbf{Also discharged (by PR-8).}
+\texttt{liebRepulsive\_exists\_centered\_ratioRe\_ge\_sq} is consumed by PR-8's
+\texttt{liebFerrimagnetism\_symmetric} into \texttt{theorem\_10\_6\_lieb\_ferrimagnetism}
+(\textbf{proved} below); the other three public declarations are consumed within this module
+in a straight-line chain (the Casimir step and the sign step feed the capstone, which feeds
+the existential form). This PR bounds a single centered tower member; PR-8 universalizes the
+bound to an arbitrary normalized ground state via a ground-multiplet tower-transport argument.
 
 \medskip
 \noindent\textbf{Theorem 10.6} (Shen–Qiu–Tian ferrimagnetism; Tasaki §10.2.3,
-p.~356, eqs.~(10.2.16)/(10.2.17)). Under the hypotheses of Theorem 10.4, every
-normalized ground state $v$ satisfies the staggered-order-parameter bound
+p.~356, eqs.~(10.2.16)/(10.2.17)), \emph{proved, axiom discharged}
+(Issue~\#5347, PR~\#5356 PR-8; \texttt{\#print axioms} = std3). Under the hypotheses of
+Theorem 10.4, every normalized ground state $v$ satisfies the staggered-order-parameter bound
 $\langle v|(\hat O_L)^2|v\rangle \ge \bigl((|A|-|B|)/2\bigr)^2$, where
 $(\hat O_L)^2 = \sum_{x,y} \varepsilon_x \varepsilon_y\, \hat S_x \cdot \hat S_y$
 with staggered sign $\varepsilon_x = \pm 1$ on the two sublattices
@@ -8229,8 +8230,23 @@ via \emph{both} Theorem~10.4 (\texttt{theorem\_10\_4\_lieb\_repulsive\_half\_fil
 and inequality~(10.2.7) — Theorem~10.5's transverse-correlation sign
 (\texttt{theorem\_10\_5\_shen\_qiu\_tian\_transverse\_sign}), used in place of the
 spin-$S$ argument's~(4.1.15) — \emph{not} reflection positivity (RP is Theorem~10.4's
-own proof method, already discharged); recorded as an axiom pending discharge
-(Issue~\#5347).
+own proof method, already discharged). \textbf{PR-8's assembly}
+(\texttt{liebFerrimagnetism\_symmetric}, \texttt{theorem\_10\_6\_lieb\_ferrimagnetism},
+\texttt{LiebFerrimagnetismDischarge.lean}): PR-4's ladder-ratio invariance, applied at
+$(\hat O_L)^2$ (which commutes with $\hat S^+_{\mathrm{tot}}$, PR-3's
+\texttt{fermionStaggeredCasimirOp\_commute\_fermionTotalSpinPlus}), spreads PR-7's
+centered-member bound to every tower member (\texttt{liebFerrimagnetism\_tower\_ratioRe\_eq},
+\texttt{liebFerrimagnetism\_tower\_ratioRe\_ge\_sq}); since $(\hat O_L)^2$ also commutes with
+$\hat S^3_{\mathrm{tot}}$ (PR-3's
+\texttt{fermionStaggeredCasimirOp\_commute\_fermionTotalSpinZ}), PR-5's cross-term vanishing
+diagonalizes the quadratic form over the tower basis, averaging the per-member bound to an
+arbitrary normalized ground vector (\texttt{liebFerrimagnetism\_bound\_of\_mem\_ground}). A
+separate elementary branch handles the single site $N=0$, where $(\hat O_L)^2$ is the plain
+Casimir. Splitting \texttt{IsLiebRepulsiveModel}'s Hamiltonian disjunction (uniform vs.\
+symmetric, an energy shift) gives the capstone. The reference-0
+\texttt{fermionStaggeredCasimirOp\_isHermitian} was deleted in this PR as decorative, since the
+capstone reads $\langle v|(\hat O_L)^2|v\rangle$ through \texttt{vectorExpectation}'s own real
+part.
 
 \medskip
 \noindent\textbf{Proposition 10.7} (Tasaki §10.2.3, p.~356), \emph{proved
