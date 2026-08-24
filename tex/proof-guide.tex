@@ -7944,11 +7944,15 @@ O_L)^2_\perp|v\rangle\le\operatorname{Re}\langle v|(\hat O_L)^2|v\rangle$
 the positivity step feeding the ferrimagnetic bound (10.2.17); also shows
 $(\hat O_L)^2$ itself is self-adjoint
 (\texttt{fermionStaggeredCasimirOp\_isHermitian}). Mirrors the spin-$S$
-template of §4.1 Theorem~4.4 (eq.~(4.1.12)). Not yet consumed by
-\texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below); later
-arc PRs carry the Theorem-10.5 sign step and the SU(2) ground-multiplet
-tower argument (the fermion-native Theorem-4.4 template, not reflection
-positivity) to the axiom discharge.
+template of §4.1 Theorem~4.4 (eq.~(4.1.12)). \textbf{Debt discharged
+(partial).} \texttt{fermionStaggeredTransverse\_expectation\_le\_staggeredCasimir\_expectation}
+has since been consumed by PR-7's capstone
+\texttt{liebRepulsive\_centered\_ratioRe\_ge\_sq} (below), which restores the
+longitudinal square to raise the staggered transverse expectation to
+$\operatorname{Re}\langle v|(\hat O_L)^2|v\rangle$;
+\texttt{fermionStaggeredCasimirOp\_isHermitian} remains at reference~0. Not
+yet consumed by \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom
+below); PR-8 assembles the final capstone.
 
 \medskip
 \emph{Transverse/Casimir identity (Issue~\#5347, PR~\#5349
@@ -7975,11 +7979,12 @@ $|m|\le J$ bound (\texttt{angMom\_abs\_le\_J},
 \texttt{fermionTotalSpinSquared\_eq\_cartesianSqSum}
 (\texttt{Fermion/JordanWigner/Hubbard/LiebAttractiveFullSectorUnique.lean}),
 the route already taken by the repulsive multiplet and attractive
-full-sector arguments. Not yet consumed by
-\texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below); the
-remaining arc PRs must identify the repulsive-Hubbard ground multiplet's
-Casimir and weight values and assemble the full ferrimagnetic
-bound~(10.2.17).
+full-sector arguments. \textbf{Debt discharged.} Consumed by PR-7's Casimir
+step \texttt{liebRepulsive\_centered\_sum\_transverse\_eq} (below), which
+rewrites the un-staggered transverse sum through this identity to evaluate
+it on the centered tower member. Not yet consumed by
+\texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below); PR-8
+assembles the full ferrimagnetic bound~(10.2.17).
 
 \medskip
 \emph{$SU(2)$ invariance of $(\hat O_L)^2$ (Issue~\#5347, PR~\#5350
@@ -8151,11 +8156,60 @@ Pi carrier of \texttt{hubbardGroundSubmoduleAtElectronNumber} to the
 Consumes PR-5's \texttt{liebRepulsive\_ground\_exists\_topWeight} and
 \texttt{liebRepulsive\_ground\_tower\_ne\_zero}, both previously at reference 0 (PR-5's
 \texttt{liebRepulsive\_ground\_eq\_span\_tower} and
-\texttt{liebRepulsive\_tower\_crossTerm\_eq\_zero} remain at reference 0, staged for PR-7's
-extension to the whole tower and PR-8's final assembly).
-Not yet consumed by \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an axiom below):
-this PR transports the correlation signs to a single centered tower member; PR-7 must
-extend the argument to the whole tower, and PR-8 assembles the final capstone.
+\texttt{liebRepulsive\_tower\_crossTerm\_eq\_zero} remain at reference 0, unrelated to this
+row). \texttt{liebRepulsive\_exists\_centered\_transverse\_sign} has since been consumed by
+PR-7 (below), whose capstone \texttt{liebRepulsive\_exists\_centered\_ratioRe\_ge\_sq}
+supplies its sign-pattern hypothesis directly from this existential.
+
+\medskip
+\emph{The centered-sector $(\hat O_L)^2$ lower bound (Issue~\#5347, PR~\#5355 PR-7;
+proved, axiom-free).}
+(\texttt{Fermion/JordanWigner/Hubbard/LiebFerrimagnetismCenteredBound.lean}.) Establishes
+Tasaki's ferrimagnetic bound~(10.2.17) on the single centered tower member
+$u=(\hat S^-_{\mathrm{tot}})^{k_0}w$ that PR-6 identified with Theorem~10.5's sector ground
+state: $S_0^2\le\operatorname{Re}\langle u|(\hat O_L)^2|u\rangle/\|u\|^2$
+($S_0=L/2$), working entirely inside $u$ (no sum over the tower).
+Two small additions land first in
+\texttt{Fermion/JordanWigner/Hubbard/LiebRepulsiveCorrelation.lean}:
+\texttt{gaugeSign\_mul\_sameSublattice}/\texttt{\_not\_sameSublattice} (Theorem~10.5's
+per-pair sign facts $\varepsilon_x\varepsilon_y=\pm1$) are made non-\texttt{private} so this
+PR's sign step can call them directly, and \texttt{vectorExpectation\_sum} (additivity of the
+raw expectation over a \texttt{Finset} sum of observables) is added to distribute
+$\langle\cdot|\cdot|\cdot\rangle$ across the $x,y$ double sum. \textbf{The sign step}
+\texttt{liebRepulsive\_centered\_staggeredTransverse\_ge\_sum}: staggering the un-staggered
+transverse double sum by $\varepsilon_x\varepsilon_y$ can only raise its expectation, since
+the gauge product is $+1$ exactly where Theorem~10.5's sign pattern is positive (same
+sublattice) and $-1$ exactly where it is negative (different sublattices) ---
+$\operatorname{Re}\langle u|\sum_{x,y}\hat S^\perp_{xy}|u\rangle\le\operatorname{Re}\langle
+u|(\hat O_L)^2_\perp|u\rangle$ (private per-pair step
+\texttt{liebRepulsive\_staggeredPair\_re\_le}). \textbf{The Casimir step}
+\texttt{liebRepulsive\_centered\_sum\_transverse\_eq}: rewriting the un-staggered double sum
+as $(\hat S_{\mathrm{tot}})^2-(\hat S^3_{\mathrm{tot}})^2$ (PR-2's identity), $u$ is a joint
+eigenvector of the two operators --- at PR-6's Casimir value $\gamma_0=S_0(S_0+1)$ (lowering
+stays in the ground submodule, PR-5's \texttt{liebRepulsive\_ground\_spinMinusPow\_mem}) and
+at the centered weight $m_0=S_0-k_0$ (\texttt{fermionTotalSpinZ\_mulVec\_spinMinusPow\_general})
+--- so the expectation is $(\gamma_0-m_0^2)\|u\|^2$. \textbf{The capstone}
+\texttt{liebRepulsive\_centered\_ratioRe\_ge\_sq}: restores the positive-semidefinite
+longitudinal square via PR-1's
+\texttt{fermionStaggeredTransverse\_expectation\_le\_staggeredCasimir\_expectation} and closes
+the arithmetic with $S_0^2\le\gamma_0-m_0^2$ (true because $m_0=(L\bmod2)/2\le1/2$, private
+lemmas \texttt{liebRepulsive\_centeredCasimirGap\_eq\_ofReal} realifying the gap and
+\texttt{liebRepulsive\_sq\_le\_centeredCasimirGap} for the arithmetic); $\|u\|^2>0$ because
+the tower survives $k_0\le L$ steps (PR-5's \texttt{liebRepulsive\_ground\_tower\_ne\_zero}).
+\textbf{The existential form} \texttt{liebRepulsive\_exists\_centered\_ratioRe\_ge\_sq}:
+supplies one highest-weight ground vector $w$ (via PR-6's
+\texttt{liebRepulsive\_exists\_centered\_transverse\_sign}) carrying both the weight equation
+$\hat S^3_{\mathrm{tot}}w=S_0w$ and the bound at its centered tower member, so Theorem~10.4's
+conclusions and Theorem~10.5's model hypotheses enter only here --- the sign step and the
+capstone take the correlation-sign pattern as a hypothesis and are independent of how it was
+obtained. \textbf{Debt discharged.} Consumes PR-1's
+\texttt{fermionStaggeredTransverse\_expectation\_le\_staggeredCasimir\_expectation}, PR-2's
+\texttt{sum\_fermionSpinTransverse\_eq\_totalSpinSquared\_sub\_spinZ\_sq}, and PR-6's
+\texttt{liebRepulsive\_exists\_centered\_transverse\_sign}, all three previously staged at
+reference 0. \textbf{Debt (new).} All four public declarations of this PR are at reference 0,
+staged for PR-8's final assembly into \texttt{theorem\_10\_6\_lieb\_ferrimagnetism} (still an
+axiom below); this PR bounds a single centered tower member, and PR-8's remaining task is to
+discharge the axiom for an arbitrary normalized ground state.
 
 \medskip
 \noindent\textbf{Theorem 10.6} (Shen–Qiu–Tian ferrimagnetism; Tasaki §10.2.3,
