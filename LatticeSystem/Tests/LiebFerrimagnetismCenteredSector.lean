@@ -25,7 +25,7 @@ plus the design's single extra side condition `1 ≤ N` (no `B.Nonempty` hypothe
 The closing section pins the centered-weight arithmetic that the design identifies as the only new
 mathematics of the PR (design §2): `L % 2 = (N+1) % 2` (`N = 1`, two instantiations) and `Ne₀`'s
 side conditions (`Even`, `0 < Ne₀ < 2(N+1)`) at `N = 1`, proved directly from
-`bipartitionComplement_card_add` + `omega` without depending on the (not yet implemented) `P1`.
+`bipartitionComplement_card_add` + `omega` without depending on the (private) `P1`.
 -/
 
 namespace LatticeSystem.Tests.LiebFerrimagnetismCenteredSector

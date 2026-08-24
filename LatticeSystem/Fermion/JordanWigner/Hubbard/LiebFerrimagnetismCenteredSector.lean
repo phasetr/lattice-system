@@ -233,9 +233,10 @@ on-site repulsion) together with `1 ≤ N`, the transverse spin correlation
 otherwise.
 
 The electron number `Ne₀ = N + 1 + L % 2` is even by `liebRepulsive_sublatticeImbalance_mod_two`
-and satisfies `0 < Ne₀ < 2(N+1)`, so Theorem 10.4's general-sector uniqueness supplies the sector
-ground state `φ`; `liebRepulsive_centered_eq_smul_sectorGround` identifies the centered tower
-member with `c • φ`, and the rescaling only multiplies the expectation by `|c|² > 0`. -/
+and satisfies `0 < Ne₀ < 2(N+1)`, so the same general-sector uniqueness Theorem 10.5 consumes
+(`repulsiveSpinZSector_ground_unique`) supplies the sector ground state `φ`;
+`liebRepulsive_centered_eq_smul_sectorGround` identifies the centered tower member with `c • φ`,
+and the rescaling only multiplies the expectation by `|c|² > 0`. -/
 theorem liebRepulsive_centered_transverse_sign (N : ℕ) (A : Finset (Fin (N + 1)))
     (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (hT : ∀ i j, T i j = T j i)
     (hbip : HoppingRespectsBipartition A T)
