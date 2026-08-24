@@ -45,7 +45,7 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) :
 `(Ŝ⁺_tot)ᴴ = Ŝ⁻_tot` (`fermionTotalSpinPlus_conjTranspose`) and the Hermiticity of `Ô²`
 (`fermionStaggeredCasimirOp_isHermitian`, `LiebFerrimagnetismStaggeredAlgebra.lean:148`) —
 mirroring `fermionTotalSpinMinus_commute_symmetricRepulsiveHubbardHamiltonian`
-(`LiebRepulsiveSU2Invariance.lean:145`). -/
+(`LiebRepulsiveSU2Invariance.lean:137`). -/
 example (N : ℕ) (A : Finset (Fin (N + 1))) :
     Commute (fermionStaggeredCasimirOp N A) (fermionTotalSpinMinus N) :=
   fermionStaggeredCasimirOp_commute_fermionTotalSpinMinus N A
