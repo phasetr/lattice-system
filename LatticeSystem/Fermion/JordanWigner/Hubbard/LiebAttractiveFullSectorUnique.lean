@@ -122,6 +122,29 @@ theorem fermionTotalSpinSquared_posSemidef (N : ℕ) :
     ((Matrix.posSemidef_conjTranspose_mul_self _).add
       (Matrix.posSemidef_conjTranspose_mul_self _))
 
+/-- **A spin singlet is unpolarised:** a null vector of the fermionic Casimir `Ŝ²` is a null vector
+of `Ŝ³` (Tasaki Lemma A.11 route).  Writing `Ŝ² = (Ŝ⁽¹⁾)² + (Ŝ⁽²⁾)² + (Ŝ³)²` as a Cartesian square
+sum of Hermitian generators (`fermionTotalSpinSquared_eq_cartesianSqSum`), the vanishing of the
+Casimir energy expectation forces each Cartesian component to annihilate the vector. -/
+theorem fermionTotalSpinZ_mulVec_eq_zero_of_fermionTotalSpinSquared_mulVec_eq_zero (N : ℕ)
+    {f : (Fin (2 * N + 2) → Fin 2) → ℂ} (h : (fermionTotalSpinSquared N).mulVec f = 0) :
+    (fermionTotalSpinZ N).mulVec f = 0 := by
+  classical
+  set J : Fin 3 → ManyBodyOp (Fin (2 * N + 2)) :=
+    ![tJTotalSpinOne N, tJTotalSpinTwo N, fermionTotalSpinZ N] with hJ
+  have hherm : ∀ α ∈ (Finset.univ : Finset (Fin 3)), (J α).IsHermitian := by
+    intro α _
+    fin_cases α
+    · simpa [hJ] using tJTotalSpinOne_isHermitian N
+    · simpa [hJ] using tJTotalSpinTwo_isHermitian N
+    · simpa [hJ] using fermionTotalSpinZ_isHermitian N
+  have hcas : ∑ α ∈ (Finset.univ : Finset (Fin 3)), J α * J α = fermionTotalSpinSquared N := by
+    rw [fermionTotalSpinSquared_eq_cartesianSqSum, hJ, Fin.sum_univ_three]
+    simp
+  have hz := mulVec_eq_zero_of_sq_sum_inner_zero (Φ := f) (Finset.univ : Finset (Fin 3)) J hherm
+    (by rw [hcas, h, dotProduct_zero]) 2 (Finset.mem_univ 2)
+  simpa [hJ] using hz
+
 /-- **The `Ŝ³_tot` weight band `|m| ≤ J`** (Tasaki Lemma A.15 on the fermionic carrier).  A nonzero
 joint eigenvector of the total-spin Casimir at `J(J+1)` (`J ≥ 0`) and of `Ŝ³_tot` at `m` has
 `|m| ≤ J`.  This is the generic angular-momentum bound `angMom_abs_le_J` fed with the three
