@@ -64,6 +64,15 @@ noncomputable def vectorExpectation {ι : Type*} [Fintype ι]
     (O : Matrix ι ι ℂ) (v : ι → ℂ) : ℂ :=
   dotProduct (star v) (O.mulVec v)
 
+/-- **Additivity of the raw expectation over a `Finset` sum of observables**,
+`⟨v| Σ_k O_k |v⟩ = Σ_k ⟨v| O_k |v⟩`: the matrix–vector product and the dot product are both
+additive in the observable. -/
+theorem vectorExpectation_sum {ι κ : Type*} [Fintype ι] (s : Finset κ)
+    (O : κ → Matrix ι ι ℂ) (v : ι → ℂ) :
+    vectorExpectation (∑ k ∈ s, O k) v = ∑ k ∈ s, vectorExpectation (O k) v := by
+  unfold vectorExpectation
+  rw [Matrix.sum_mulVec, dotProduct_sum]
+
 /-- Two sites lie in the same sublattice of the bipartition `A ⊔ Aᶜ`. -/
 def SameSublattice (A : Finset (Fin (N + 1))) (x y : Fin (N + 1)) : Prop :=
   x ∈ A ↔ y ∈ A
@@ -71,7 +80,7 @@ def SameSublattice (A : Finset (Fin (N + 1))) (x y : Fin (N + 1)) : Prop :=
 /-! ## Sign of the sublattice-gauge product -/
 
 /-- The sublattice-gauge product is `+1` on the same sublattice. -/
-private theorem gaugeSign_mul_sameSublattice (A : Finset (Fin (N + 1))) (x y : Fin (N + 1))
+theorem gaugeSign_mul_sameSublattice (A : Finset (Fin (N + 1))) (x y : Fin (N + 1))
     (h : SameSublattice A x y) : gaugeSign A x * gaugeSign A y = 1 := by
   unfold gaugeSign SameSublattice at *
   by_cases hx : x ∈ A
@@ -85,7 +94,7 @@ private theorem gaugeSign_mul_im (A : Finset (Fin (N + 1))) (x y : Fin (N + 1)) 
   exact (gaugeSign_isSelfAdjoint A x).mul (gaugeSign_isSelfAdjoint A y)
 
 /-- The sublattice-gauge product is `−1` across the two sublattices. -/
-private theorem gaugeSign_mul_not_sameSublattice (A : Finset (Fin (N + 1))) (x y : Fin (N + 1))
+theorem gaugeSign_mul_not_sameSublattice (A : Finset (Fin (N + 1))) (x y : Fin (N + 1))
     (h : ¬ SameSublattice A x y) : gaugeSign A x * gaugeSign A y = -1 := by
   unfold gaugeSign SameSublattice at *
   by_cases hx : x ∈ A
