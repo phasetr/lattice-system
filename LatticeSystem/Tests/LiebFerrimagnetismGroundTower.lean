@@ -316,4 +316,16 @@ example (T : Matrix (Fin (0 + 1)) (Fin (0 + 1)) ℝ) (hT : ∀ i j, T i j = T j 
       (liebRepulsive_ground_tower_linearIndependent 0 _ T U E₀ hcas hw0 hwG hz'),
     Fintype.card_fin, himb]
 
+/-! ## `A0a` (PR-8) — de-privatized Casimir realification -/
+
+/-- **`A0a` (PR-8 design §2 layer A): `liebRepulsiveSpinCasimir_eq_ofReal` must be public.**
+Theorem 10.4's Casimir eigenvalue rewritten as the real cast `J (J + 1)` at `J = L/2`; PR-8's
+`N = 0` branch (`E1`, `liebFerrimagnetism_N_zero`) needs it from outside this module, so it must be
+de-privatized in place (no restatement). This pin fails to compile while the declaration stays
+`private` in `LiebFerrimagnetismGroundTower.lean`. -/
+example {N : ℕ} (A : Finset (Fin (N + 1))) :
+    liebRepulsiveSpinCasimir A =
+      ((((sublatticeImbalance A : ℝ) / 2) * ((sublatticeImbalance A : ℝ) / 2 + 1) : ℝ) : ℂ) :=
+  liebRepulsiveSpinCasimir_eq_ofReal A
+
 end LatticeSystem.Tests.LiebFerrimagnetismGroundTower

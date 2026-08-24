@@ -101,16 +101,16 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) :
 
 /-! ## 5. `N = 0` sanity check -/
 
-/-- **Single-site collapse.**  For `N = 0` the only pair is `x = y = 0`, whose staggered weight is
-`ε₀ ε₀ = +1` for either sublattice choice, so the staggered order parameter `(Ô_L)²` is the plain
-total-spin Casimir `(Ŝ_tot)²`. -/
-theorem fermionStaggeredCasimirOp_zero_eq_totalSpinSquared (A : Finset (Fin 1)) :
-    fermionStaggeredCasimirOp 0 A = fermionTotalSpinSquared 0 := by
-  rw [fermionTotalSpinSquared_eq_sum_fermionSpinDot]
-  unfold fermionStaggeredCasimirOp
-  refine Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => ?_
-  obtain rfl : x = y := Subsingleton.elim (α := Fin 1) x y
-  by_cases hx : x ∈ A <;> simp [hx]
+/-- **`A0b` (PR-8 design §2 layer A): single-site collapse, moved to the library.**  For `N = 0`
+the only pair is `x = y = 0`, whose staggered weight is `ε₀ ε₀ = +1` for either sublattice choice,
+so the staggered order parameter `(Ô_L)²` is the plain total-spin Casimir `(Ŝ_tot)²`. PR-8's
+`N = 0` branch (`E1`, `liebFerrimagnetism_N_zero`) needs this from the library, not the `Tests`
+root, so the statement moves to `LiebFerrimagnetismStaggeredAlgebra.lean` (this pin only calls it).
+This pin fails to compile until the library declaration lands: re-proving it here while the
+library copy also exists would be a banned duplicate statement. -/
+example (A : Finset (Fin 1)) :
+    fermionStaggeredCasimirOp 0 A = fermionTotalSpinSquared 0 :=
+  fermionStaggeredCasimirOp_zero_eq_totalSpinSquared A
 
 /-- **Single-site split.**  The transverse / longitudinal decomposition reproduces `(Ŝ_tot)²` at
 `N = 0` for either sublattice choice — a sign or normalization slip in the split would break this
