@@ -7,10 +7,13 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
 The ground multiplet of Lieb's half-filled repulsive Hubbard model is the lowering tower
 `(Ŝ⁻_tot)^k w` (`k = 0, …, L`, `L := sublatticeImbalance A`) of a highest-weight ground vector `w`
 (`LiebFerrimagnetismGroundTower.lean`).  Tasaki's ferrimagnetic bound (10.2.17) is evaluated on the
-**centered** member of that tower, `k₀ := L / 2` (ℕ division), because only there does the tower
-weight `L/2 − k₀ = (L % 2)/2` land on the spin-`z` sector that Theorem 10.5
-(`theorem_10_5_shen_qiu_tian_transverse_sign`) controls: the sector `Ŝ³ = (Ne₀ − (N+1))/2` of the
-electron number `Ne₀ := N + 1 + L % 2`, which is even because `L` and `N + 1` have equal parity.
+**centered** member of that tower, `k₀ := L / 2` (ℕ division), because that is where Tasaki states
+eq. (10.2.17) itself: at the tower weight closest to `Ŝ³ = 0`, `L/2 − k₀ = (L % 2)/2`. Admissibility
+for Theorem 10.5 (`theorem_10_5_shen_qiu_tian_transverse_sign`) is not what singles out `k₀`: the
+`k`-th tower member's electron number `Ne_k := N + 1 + L − 2k` is even for *every* `k`
+(`L` and `N + 1` have equal parity), and its sector `Ŝ³ = (Ne_k − (N+1))/2` is admissible whenever
+`|L − 2k| < N + 1`, which holds for all `k` except the two extremes `k ∈ {0, L}` in the degenerate
+case `L = N + 1`.
 
 This module performs that identification and transports Theorem 10.5's sign pattern onto the
 centered tower member:
