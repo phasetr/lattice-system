@@ -9,7 +9,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismGroundTower
 Specification suite for
 `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismGroundTower.lean` (PR-5 of the
 Theorem 10.6 discharge arc, issue #5347). The `example`s pin down the exact signatures of the
-seven declarations `L0`–`L7` of the confirmed design
+eight declarations `L0`–`L7` of the confirmed design
 (`.self-local/docs/theorem-10-6-pr5-design.md`, 2026-08-24): the general weight-band bound `L0`,
 the `Ŝ³`-weight band `L1`, the top-weight existence `L2`, tower-membership `L3`, tower
 nonvanishing `L4`, tower linear independence `L5`, the ground-submodule span identity `L6`, and the
@@ -39,8 +39,8 @@ open Matrix Module LatticeSystem.Fermion LatticeSystem.Quantum
 
 /-- **`L0`: general weight-band bound.** A nonzero joint eigenvector of `(Ŝ_tot)²` (eigenvalue
 `Jr(Jr+1)`, `Jr ≥ 0`) and `Ŝ³_tot` (eigenvalue `m`) has `|m| ≤ Jr`. Factored out of the two inline
-copies at `LiebAttractiveFullSectorUnique.lean:275-283` and
-`LiebRepulsiveMultipletCompanion.lean:388-397` (design §2 `L0`). -/
+copies in `LiebAttractiveFullSectorUnique.lean` and `LiebRepulsiveMultipletCompanion.lean`
+(design §2 `L0`). -/
 example (N : ℕ) {w : (Fin (2 * N + 2) → Fin 2) → ℂ} (hw : w ≠ 0)
     {Jr m : ℝ} (hJ : 0 ≤ Jr)
     (hcas : (fermionTotalSpinSquared N).mulVec w = ((Jr * (Jr + 1) : ℝ) : ℂ) • w)
