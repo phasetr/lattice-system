@@ -87,7 +87,8 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N +
     E = E₀.re :=
   liebRepulsive_sectorGroundEnergy_eq_groundEnergy N A T hT U E₀ (hmin := hmin) (hE₀ := hE₀)
     (hcas := hcas) (hw0 := hw0) (hwG := hwG) (hz := hz)
-    (k := sublatticeImbalance A / 2) (hkm := liebRepulsive_centeredWeight_eq A)
+    (k := sublatticeImbalance A / 2) (hk := Nat.div_le_self _ _)
+    (hkm := liebRepulsive_centeredWeight_eq A)
     (hGS := hGS) (hφN := hφN)
 
 /-! ## `T4` — the centered tower member is a scalar multiple of the sector's unique ground state -/
