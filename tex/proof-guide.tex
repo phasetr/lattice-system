@@ -8392,10 +8392,11 @@ constant is cancelled twice, and the bridge is consumed directly.
 byte-identical --- same binders, same conjunct order, so its three positional
 call sites compile untouched --- and becomes the composition of Theorems
 10.2/10.3 with the new transport lemma.
-\textbf{Debt (new):}
+\textbf{Debt discharged (by PR-5).}
 \texttt{shibaTransport\_uniqueGroundStateOn\_spinZSector\_symmetricAttractive}
-has no proof-level consumer yet; it is the sole deliverable the later PRs of this
-arc consume, and is covered by a signature pin in \texttt{Tests}.
+is consumed by PR-5's capstone assembly into
+\texttt{theorem\_10\_8\_lieb\_shen\_qiu\_superconductivity} (Theorem~10.8 above,
+\emph{proved}).
 
 \medskip
 \emph{Sector generalization and the Casimir value on the transported ground state
@@ -8423,13 +8424,12 @@ on $\psi$, giving $\hat S^2_{\mathrm{tot}}\psi=S_0(S_0+1)\psi$ ($S_0=L/2$). Theo
 not used here --- only Theorem~10.4's ground-multiplet data and a highest-weight tower
 vector enter directly at this layer (Theorem~10.4's own proof pulls in
 \texttt{repulsiveSpinZSector\_ground\_unique}, Theorem~10.2, and Theorem~10.3).
-\textbf{Debt (new).} \texttt{liebShenQiu\_towerExponent\_weight\_eq} and
-\texttt{liebShenQiu\_casimir\_eq} are at reference 0 outside the Tests signature pin;
+\textbf{Debt discharged (by PR-5).}
 \texttt{liebShenQiu\_sectorGround\_mem\_halfFillingGround} is consumed by
-\texttt{liebShenQiu\_casimir\_eq}. None is yet consumed by
-\texttt{theorem\_10\_8\_lieb\_shen\_qiu\_superconductivity} (still
-an axiom below); staged for a later PR assembling this Casimir value with the Shiba
-transport into the superconducting bound itself.
+\texttt{liebShenQiu\_casimir\_eq} within this module; \texttt{liebShenQiu\_casimir\_eq}
+itself and \texttt{liebShenQiu\_towerExponent\_weight\_eq} are consumed by PR-5's
+capstone assembly into \texttt{theorem\_10\_8\_lieb\_shen\_qiu\_superconductivity}
+(Theorem~10.8 above, \emph{proved}).
 
 \medskip
 \emph{Pair operator and ladder algebra (Issue~\#5357, PR~\#5361 PR-4; proved,
@@ -8466,27 +8466,58 @@ inline adjoint block and supply this file's own expectation-distribution step;
 \texttt{sublatticeImbalance\_add\_bipartitionComplement\_card}, added to
 \texttt{LiebRepulsive.lean}, supplies the cardinality identity used by the
 tower-exponent bound; all three consumed immediately, so none is new debt.
-\textbf{Debt (new).} Six of the seven listed declarations are at reference~0
-outside a \texttt{Tests} signature pin (\texttt{fermionTotalSpinPlusMinus\_eq\_sum}
-is consumed in-file by \texttt{shiba\_spinPlusMinus\_expectation\_eq\_signed\_sum},
-\texttt{LiebShenQiuPairAlgebra.lean}:106); staged for PR-5's assembly of the
-superconducting bound itself.
+\textbf{Debt discharged (by PR-5).} \texttt{fermionTotalSpinPlusMinus\_eq\_sum} is
+consumed in-file by \texttt{shiba\_spinPlusMinus\_expectation\_eq\_signed\_sum}
+(\texttt{LiebShenQiuPairAlgebra.lean}:106); the remaining six declarations
+(\texttt{totalPairCreationOperator\_eq\_conjTranspose},
+\texttt{totalPairCorrelationOperator\_eq\_sum},
+\texttt{shiba\_spinPlusMinus\_expectation\_eq\_signed\_sum},
+\texttt{gaugeSign\_mul\_re\_mul\_le\_of\_pos},
+\texttt{liebShenQiuPairLowerBound\_le\_casimir\_gap}, and
+\texttt{liebShenQiu\_towerExponent\_le\_sublatticeImbalance}) are consumed by
+PR-5's capstone assembly into
+\texttt{theorem\_10\_8\_lieb\_shen\_qiu\_superconductivity} (Theorem~10.8 above,
+\emph{proved}).
 
 \medskip
 \noindent\textbf{Theorem 10.8} (Lieb–Shen–Qiu superconductivity; Tasaki §10.2.3,
-p.~359, eq.~(10.2.22)). For the symmetric attractive Hubbard model
+p.~359, eq.~(10.2.22)), \emph{proved, axiom discharged}
+(Issue~\#5357, PR~\#5362 PR-5; \texttt{\#print axioms} = std3). For the symmetric attractive Hubbard model
 $\hat H_{\rm hop} - \sum_x U_x(\hat n_{x\uparrow}-\tfrac12)(\hat n_{x\downarrow}-\tfrac12)$
-(eq.~(10.2.21)) on a bipartite lattice with even electron number $N$,
-$2|B| \le N \le 2|A|$, the unique ground state
+(eq.~(10.2.21)) on a bipartite lattice with even electron number $N_e$,
+$2|B| \le N_e \le 2|A|$, the unique ground state
 $\varphi$ (Theorem 10.2) satisfies the pair off-diagonal-long-range-order bound
-$\langle\varphi|\,\hat b^\dagger \hat b\,|\varphi\rangle \ge (|A|-N/2)(N/2-|B|)$
+$\langle\varphi|\,\hat b^\dagger \hat b\,|\varphi\rangle \ge (|A|-N_e/2)(N_e/2-|B|)$
 with $\hat b = \sum_x \hat c_{x\downarrow}\hat c_{x\uparrow}$
 (\texttt{totalPairCorrelationOperator},
 \texttt{theorem\_10\_8\_lieb\_shen\_qiu\_superconductivity}); the positive regime
 is the standard criterion for superconductivity (fermion-pair condensation).
-Recorded as an axiom pending discharge (Issue~\#5357): Lieb's reflection
-positivity, Shen–Qiu–Tian, plus Theorem 10.2 uniqueness, generalizing the
-Theorem 10.4/10.5/10.6 Shiba-transformation machinery.
+\textbf{PR-5's assembly} (\texttt{LiebShenQiuDischarge.lean}): the imaginary
+part vanishes for free since $\hat b^\dagger \hat b$ is a square
+(\texttt{liebShenQiu\_pairExpectation\_eq\_normSq}). Below the top of the band
+($N_e<2(N+1)$), centring away the interaction
+(\texttt{liebShenQiu\_attractiveGround\_of\_symmetric}) turns $\varphi$ into a
+plain attractive ground state; Theorem~10.2 makes it a spin singlet
+(\texttt{liebShenQiu\_ground\_singlet}) and Theorem~10.3 makes its pair-transfer
+correlations strictly positive. PR-2's Shiba transport carries $\varphi$ to a
+unique ground state $\psi=\hat U\varphi$ of the symmetric \emph{repulsive} model
+on the spin-$z$ sector $\hat S^3=(N_e-(N+1))/2$ at half filling, where PR-3's
+Casimir identification fixes $\hat S^2\psi=S_0(S_0+1)\psi$
+($S_0=||A|-|B||/2$); the ladder identity
+$\hat S^+_{\rm tot}\hat S^-_{\rm tot}=\hat S^2-\hat S^3(\hat S^3-1)$ evaluates
+$\langle\psi|\hat S^+_{\rm tot}\hat S^-_{\rm tot}|\psi\rangle=S_0(S_0+1)-m(m-1)$
+(\texttt{liebShenQiu\_spinPlusMinus\_expectation\_eq}); PR-4's Shiba identity
+(eq.~(10.2.13)) rewrites that as the sublattice-signed pair sum on $\varphi$,
+whose signs can only decrease the strictly positive terms
+(\texttt{liebShenQiu\_signedSum\_re\_le\_pairExpectation\_re}), and PR-4's real
+arithmetic (\texttt{liebShenQiuPairLowerBound\_le\_casimir\_gap}) closes the
+chain. At the top of the band ($N_e=2(N+1)$) the bound degenerates to $0$ and
+follows from the nonnegativity of $\langle\varphi|\hat b^\dagger\hat
+b|\varphi\rangle$ alone (\texttt{liebShenQiu\_bound\_of\_full}), no
+ground-state hypothesis needed. Theorem~10.5 is \emph{not} used: the sign step
+of eq.~(10.2.25) is re-derived directly from the Shiba identity plus
+Theorem~10.3's strict positivity rather than through Theorem~10.5's
+transverse-correlation sign.
 
 %======================================================================
 \subsection{Kubo–Kishi finite-temperature susceptibility bound (Tasaki §10.2.5, Theorem 10.11)}
