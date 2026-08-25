@@ -14,10 +14,9 @@ ground state `φ` satisfies the off-diagonal-long-range-order bound
 
   `⟨φ| b̂† b̂ |φ⟩ ≥ (|A| − Ne/2)(Ne/2 − |B|)`,   `b̂ = Σ_x ĉ_{x,↓} ĉ_{x,↑}`,
 
-the expectation being real.  The declaration `theorem_10_8_lieb_shen_qiu_superconductivity` was
-previously recorded as a faithful documented `axiom` (in `LiebShenQiu.lean`, which retains only the
-definitions the statement is written with); it is now a fully proved theorem, discharged axiom-free
-(modulo `propext`/`Classical.choice`/`Quot.sound`).
+the expectation being real.  The declaration `theorem_10_8_lieb_shen_qiu_superconductivity` is a
+fully proved theorem, discharged axiom-free (modulo `propext`/`Classical.choice`/`Quot.sound`);
+`LiebShenQiu.lean` retains only the definitions the statement is written with.
 
 ## The assembly
 

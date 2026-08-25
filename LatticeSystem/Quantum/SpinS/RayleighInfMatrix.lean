@@ -16,8 +16,8 @@ the min-eigenvalue continuity needed by the obligation (2) deformation argument)
 The normalisation identity `star φ ⬝ᵥ φ = 1` for a unit `EuclideanSpace` vector
 (`star_dotProduct_self_of_norm_one`) lives here as well: it is the elementary
 bridge between the `EuclideanSpace` norm and the `dotProduct` pairing in which
-every Rayleigh-style quantity of this repository is written, and is consumed by
-chapters that share no other common ancestor.
+every Rayleigh-style quantity of this repository is written, and is consumed
+by ground-state normalisation arguments across multiple chapters.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, §2.5 Theorem 2.4, p. 43–44.

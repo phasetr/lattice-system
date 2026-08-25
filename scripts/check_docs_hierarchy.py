@@ -819,7 +819,8 @@ def approved_changes(text: str) -> str:
             "can only decrease the strictly positive terms. At the top of the band (`Ne = 2(N+1)`) "
             "the bound degenerates to `0` and follows from `⟨φ\\|b̂ᴴb̂\\|φ⟩ ≥ 0` alone. Theorem 10.5 is "
             "**not** used — the sign step is re-derived directly from the Shiba identity plus Theorem "
-            "10.3's strict positivity. | `Fermion/JordanWigner/Hubbard/LiebShenQiuDischarge.lean` |",
+            "10.3's strict positivity. | `Fermion/JordanWigner/Hubbard/LiebShenQiu.lean`; "
+            "`Fermion/JordanWigner/Hubbard/LiebShenQiuDischarge.lean` |",
         )
     )
 

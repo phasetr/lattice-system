@@ -10,9 +10,9 @@ attractive Hubbard model on a bipartite lattice, the unique ground state
 (Theorem 10.2) exhibits off-diagonal long-range order of the fermion-pair
 operator,
 
-  `⟨ΦGS| b̂† b̂ |ΦGS⟩ ≥ (|A| − N/2)(N/2 − |B|)`,   `b̂ = Σ_x ĉ_{x,↓} ĉ_{x,↑}`,
+  `⟨ΦGS| b̂† b̂ |ΦGS⟩ ≥ (|A| − Ne/2)(Ne/2 − |B|)`,   `b̂ = Σ_x ĉ_{x,↓} ĉ_{x,↑}`,
 
-whenever the (even) electron number `N` satisfies `2|B| ≤ N ≤ 2|A|`. The
+whenever the (even) electron number `Ne` satisfies `2|B| ≤ Ne ≤ 2|A|`. The
 positivity of this pair correlation is the standard criterion for
 superconductivity (condensation of fermion pairs).
 
@@ -21,7 +21,7 @@ superconductivity (condensation of fermion pairs).
 This file carries the **vocabulary** of Theorem 10.8 only: the total pair
 operators `b̂`, `b̂†`, `b̂† b̂`, the concrete **symmetric** attractive Hubbard
 Hamiltonian `Ĥhop − Σ_x U_x (n̂_↑ − ½)(n̂_↓ − ½)` (eq. (10.2.21), the form
-Theorem 10.8 uses), and the numerical lower bound `(|A| − N/2)(N/2 − |B|)`.
+Theorem 10.8 uses), and the numerical lower bound `(|A| − Ne/2)(Ne/2 − |B|)`.
 They reuse the bipartition vocabulary and the `EuclideanSpace` ground-state
 representation of Theorem 10.2.
 
@@ -63,7 +63,7 @@ noncomputable def symmetricAttractiveHubbardHamiltonian (N : ℕ)
     ManyBodyOp (Fin (2 * N + 2)) :=
   hubbardKinetic N (fun x y => (T x y : ℂ)) - symmetricRepulsiveHubbardInteraction N U
 
-/-- The lower bound `(|A| − N/2)(N/2 − |B|)` of Theorem 10.8 (eq. (10.2.22)). -/
+/-- The lower bound `(|A| − Ne/2)(Ne/2 − |B|)` of Theorem 10.8 (eq. (10.2.22)). -/
 noncomputable def liebShenQiuPairLowerBound (A : Finset (Fin (N + 1))) (Ne : ℕ) : ℝ :=
   ((A.card : ℝ) - (Ne : ℝ) / 2) * ((Ne : ℝ) / 2 - ((bipartitionComplement A).card : ℝ))
 
