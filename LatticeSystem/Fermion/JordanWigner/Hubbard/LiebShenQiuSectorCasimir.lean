@@ -8,8 +8,9 @@ The Shiba transport of §10.2.3 (`LiebShenQiuShibaTransport.lean`) delivers, fro
 ground state of the symmetric **attractive** Hubbard model on the `N̂ = Ne` electron-number sector,
 a unique ground state `ψ` of the symmetric **repulsive** model on the spin-`z` sector
 `Ŝ³ = (Ne − (N+1))/2`, sitting at half filling.  Theorem 10.8's superconducting bound is evaluated
-on that `ψ`, so it needs `ψ`'s total spin, which is what Theorem 10.4 fixes for the half-filling
-ground multiplet: `Ŝ² = S₀(S₀+1)` at `S₀ = L/2`, `L := sublatticeImbalance A`.
+on the attractive ground state `φ = Ûᴴψ`; the Shiba transport turns it into a spin correlation on
+`ψ`, so it needs `ψ`'s total spin, which is what Theorem 10.4 fixes for the half-filling ground
+multiplet: `Ŝ² = S₀(S₀+1)` at `S₀ = L/2`, `L := sublatticeImbalance A`.
 
 The bridge is the tower exponent `k = |A| − Ne/2`: the lowering tower of a highest-weight
 half-filling ground vector reaches the weight `L/2 − k`, which is exactly the transported sector's
@@ -26,7 +27,9 @@ Theorem 10.4's Casimir clause applies.
 
 Theorem 10.5 (`theorem_10_5_shen_qiu_tian_transverse_sign`) is **not** used here: only Theorem
 10.4's ground-multiplet data (via `liebRepulsive_symmetric_halfFilling`) and the highest-weight
-tower enter, so the transverse-correlation layer of §10.2.2 stays out of the Theorem 10.8 route.
+tower enter directly at this layer (Theorem 10.4's own proof pulls in
+`repulsiveSpinZSector_ground_unique`, Theorem 10.2, and Theorem 10.3), so the transverse-correlation
+layer of §10.2.2 stays out of the Theorem 10.8 route.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed.,
 Springer 2020, §10.2.2 (Theorem 10.4, p. 350) and §10.2.3 (Theorem 10.8, p. 359,
