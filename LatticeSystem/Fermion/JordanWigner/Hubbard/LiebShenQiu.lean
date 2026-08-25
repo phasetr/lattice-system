@@ -32,8 +32,8 @@ layers that consume these definitions.
 
 namespace LatticeSystem.Fermion
 
-open Matrix LatticeSystem.Quantum LatticeSystem.Math
-open scoped BigOperators ComplexOrder
+open Matrix LatticeSystem.Quantum
+open scoped BigOperators
 
 variable {N : ℕ}
 
