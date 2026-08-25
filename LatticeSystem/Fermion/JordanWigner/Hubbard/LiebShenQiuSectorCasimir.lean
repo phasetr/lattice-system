@@ -53,8 +53,7 @@ theorem liebShenQiu_towerExponent_weight_eq (N : ℕ) (A : Finset (Fin (N + 1)))
       = ((Ne : ℂ) - ((N : ℂ) + 1)) / 2 := by
   have hcard := bipartitionComplement_card_add N A
   have hpar : Ne % 2 = 0 := Nat.even_iff.mp hNe
-  have hLnat : sublatticeImbalance A + (bipartitionComplement A).card = A.card := by
-    rw [sublatticeImbalance]; omega
+  have hLnat := sublatticeImbalance_add_bipartitionComplement_card A (by omega)
   have hknat : (A.card - Ne / 2) + Ne / 2 = A.card := by omega
   have hNenat : 2 * (Ne / 2) = Ne := by omega
   have hL : (sublatticeImbalance A : ℂ) + ((bipartitionComplement A).card : ℂ) = (A.card : ℂ) := by

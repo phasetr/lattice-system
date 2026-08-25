@@ -8464,9 +8464,11 @@ under the same two-sided bound.
 the pre-existing \texttt{euclideanExpectation} helpers, replace Theorem~10.5's
 inline adjoint block and supply this file's own expectation-distribution step;
 both consumed immediately, so neither is new debt.
-\textbf{Debt (new).} All seven listed declarations are at reference~0 outside a
-\texttt{Tests} signature pin; staged for PR-5's assembly of the superconducting
-bound itself.
+\textbf{Debt (new).} Six of the seven listed declarations are at reference~0
+outside a \texttt{Tests} signature pin (\texttt{fermionTotalSpinPlusMinus\_eq\_sum}
+is consumed in-file by \texttt{shiba\_spinPlusMinus\_expectation\_eq\_signed\_sum},
+\texttt{LiebShenQiuPairAlgebra.lean}:106); staged for PR-5's assembly of the
+superconducting bound itself.
 
 \medskip
 \noindent\textbf{Theorem 10.8} (Lieb–Shen–Qiu superconductivity; Tasaki §10.2.3,

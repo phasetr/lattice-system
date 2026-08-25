@@ -23,10 +23,10 @@ identities and the two inequalities that make the comparison term-wise.
 * `shiba_spinPlusMinus_expectation_eq_signed_sum` — Shiba transport (eq. (10.2.13)) turns the
   expectation of the ladder product in `ψ` into the **sublattice-signed** sum
   `Σ_{x,y} ε_x ε_y ⟨φ| ĉ†_{x↑} ĉ†_{x↓} ĉ_{y↓} ĉ_{y↑} |φ⟩`, `ε_x = ±1`.
-* `signed_sum_le_sum_of_pos` — the term-wise sign comparison `ε_x ε_y p ≤ p` for `p > 0`, which
-  bounds the signed sum by the unsigned one.  Tasaki argues the same step through Theorem 10.5's
-  correlation sign (eq. (10.2.25)); in this development that sign is itself *derived* from the
-  Shiba identity plus Theorem 10.3's strict positivity
+* `gaugeSign_mul_re_mul_le_of_pos` — the term-wise sign comparison `ε_x ε_y p ≤ p` for `p > 0`,
+  which bounds the signed sum by the unsigned one.  Tasaki argues the same step through
+  Theorem 10.5's correlation sign (eq. (10.2.25)); in this development that sign is itself
+  *derived* from the Shiba identity plus Theorem 10.3's strict positivity
   (`theorem_10_5_shen_qiu_tian_transverse_sign`), so the comparison is made directly from the two
   ingredients and Theorem 10.5 is not invoked as a lemma.
 * `liebShenQiuPairLowerBound_le_casimir_gap` — the real arithmetic
@@ -116,7 +116,7 @@ theorem shiba_spinPlusMinus_expectation_eq_signed_sum (N : ℕ) (A : Finset (Fin
 `(ε_x ε_y).re · p ≤ p` for `p > 0`, since `ε_x ε_y = ±1` (`+1` on a common sublattice, `−1`
 across the bipartition).  Summed over `x, y` this bounds the signed sum of Tasaki
 eq. (10.2.13) by the unsigned pair-correlation sum `⟨φ| b̂† b̂ |φ⟩`. -/
-theorem signed_sum_le_sum_of_pos (A : Finset (Fin (N + 1))) (x y : Fin (N + 1)) {p : ℝ}
+theorem gaugeSign_mul_re_mul_le_of_pos (A : Finset (Fin (N + 1))) (x y : Fin (N + 1)) {p : ℝ}
     (hp : 0 < p) : (gaugeSign A x * gaugeSign A y).re * p ≤ p := by
   by_cases h : SameSublattice A x y
   · rw [gaugeSign_mul_sameSublattice A x y h, Complex.one_re, one_mul]
@@ -134,8 +134,7 @@ theorem liebShenQiuPairLowerBound_le_casimir_gap (N : ℕ) (A : Finset (Fin (N +
     liebShenQiuPairLowerBound A Ne
       ≤ (liebRepulsiveSpinCasimir A).re
         - (((Ne : ℝ) - ((N : ℝ) + 1)) / 2) * ((((Ne : ℝ) - ((N : ℝ) + 1)) / 2) - 1) := by
-  have hLnat : sublatticeImbalance A + (bipartitionComplement A).card = A.card := by
-    rw [sublatticeImbalance]; omega
+  have hLnat := sublatticeImbalance_add_bipartitionComplement_card A (by omega)
   have hcard := bipartitionComplement_card_add N A
   have hL : (sublatticeImbalance A : ℝ) + ((bipartitionComplement A).card : ℝ)
       = (A.card : ℝ) := by exact_mod_cast hLnat
@@ -156,8 +155,7 @@ imbalance is `|A| − |B|`, and `2|B| ≤ Ne` gives `|B| ≤ Ne/2`.  This discha
 theorem liebShenQiu_towerExponent_le_sublatticeImbalance (N : ℕ) (A : Finset (Fin (N + 1)))
     (Ne : ℕ) (hb : 2 * (bipartitionComplement A).card ≤ Ne) (ha : Ne ≤ 2 * A.card) :
     A.card - Ne / 2 ≤ sublatticeImbalance A := by
-  have hLnat : sublatticeImbalance A + (bipartitionComplement A).card = A.card := by
-    rw [sublatticeImbalance]; omega
+  have hLnat := sublatticeImbalance_add_bipartitionComplement_card A (by omega)
   omega
 
 end LatticeSystem.Fermion

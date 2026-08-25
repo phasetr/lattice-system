@@ -49,6 +49,13 @@ def HoppingRespectsBipartition (A : Finset (Fin (N + 1)))
 noncomputable def sublatticeImbalance (A : Finset (Fin (N + 1))) : ℕ :=
   Int.natAbs ((A.card : ℤ) - ((bipartitionComplement A).card : ℤ))
 
+/-- **The imbalance recovers `|A|` from `|B|` when `|B| ≤ |A|`**: `||A| − |B|| + |B| = |A|`.
+(Without the side hypothesis the identity fails: `Int.natAbs` picks up `|B| − |A|` instead.) -/
+theorem sublatticeImbalance_add_bipartitionComplement_card (A : Finset (Fin (N + 1)))
+    (h : (bipartitionComplement A).card ≤ A.card) :
+    sublatticeImbalance A + (bipartitionComplement A).card = A.card := by
+  rw [sublatticeImbalance]; omega
+
 /-- The Casimir eigenvalue `S₀ (S₀ + 1)` of the total-spin operator at
 `S₀ = ||A| − |B||/2` (Tasaki's ground-state total spin in Theorem 10.4). -/
 noncomputable def liebRepulsiveSpinCasimir (A : Finset (Fin (N + 1))) : ℂ :=

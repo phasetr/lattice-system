@@ -8,9 +8,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaTheorem
 # Test coverage for the Theorem 10.8 pair/ladder algebra (PR-4)
 
 Pins the API contract of PR-4 of the Theorem 10.8 discharge (design report
-`.self-local/docs/theorem-10-8-design.md` §1 "New file `LiebShenQiuPairAlgebra.lean`"), TDD Red:
-new module `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebShenQiuPairAlgebra.lean`, not yet
-created.
+`.self-local/docs/theorem-10-8-design.md` §1 "New file `LiebShenQiuPairAlgebra.lean`"),
+against `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebShenQiuPairAlgebra.lean`.
 
 1. **PA1** `totalPairCreationOperator_eq_conjTranspose` — `b̂† = b̂ᴴ` (generalizing the inline
    `hPadj` block, `LiebRepulsiveCorrelation.lean:197`).
@@ -22,7 +21,7 @@ created.
    `⟨ψ|Ŝ⁺Ŝ⁻|ψ⟩ = Σ_{x,y} ε_x ε_y ⟨φ|pair x y|φ⟩`, reusing the already-public
    `euclideanExpectation_shiba_conj`/`_smul`/`_add` helpers (PR-1) and
    `shibaSignedUnitary_conj_spinPlusMinus` (`LiebRepulsiveShibaSpinOp.lean:339`).
-5. **PA5** `signed_sum_le_sum_of_pos` — the term-wise sign bound `ε_x ε_y · p ≤ p` for `p > 0`
+5. **PA5** `gaugeSign_mul_re_mul_le_of_pos` — the term-wise sign bound `ε_x ε_y · p ≤ p` for `p > 0`
    (uses `gaugeSign_mul_sameSublattice`/`_not_sameSublattice`,
    `LiebRepulsiveCorrelation.lean:83/97`).
 6. **PA6** `liebShenQiuPairLowerBound_le_casimir_gap` — the real arithmetic
@@ -80,7 +79,7 @@ example (N : ℕ) (A : Finset (Fin (N + 1)))
 `(ε_x ε_y).re · p ≤ p` for `p > 0` (used term-wise in the signed-sum-vs-plain-sum comparison). -/
 example (N : ℕ) (A : Finset (Fin (N + 1))) (x y : Fin (N + 1)) {p : ℝ} (hp : 0 < p) :
     (gaugeSign A x * gaugeSign A y).re * p ≤ p :=
-  signed_sum_le_sum_of_pos A x y hp
+  gaugeSign_mul_re_mul_le_of_pos A x y hp
 
 /-- Pins **PA6**: the real-arithmetic inequality `(a−n)(n−b) ≤ S₀(S₀+1) − m(m−1)` between
 `liebShenQiuPairLowerBound` and the Casimir/spin-`z` gap, under `b ≤ n ≤ a`. -/
