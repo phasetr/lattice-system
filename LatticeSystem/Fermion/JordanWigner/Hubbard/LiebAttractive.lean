@@ -87,6 +87,15 @@ noncomputable def hubbardPairCorrelationOp (N : ℕ) (x y : Fin (N + 1)) :
   fermionUpCreation N x * fermionDownCreation N x *
     fermionDownAnnihilation N y * fermionUpAnnihilation N y
 
+/-- **The on-site pair creation and annihilation factors are mutually adjoint**,
+`(ĉ†_{x,↑} ĉ†_{x,↓})ᴴ = ĉ_{x,↓} ĉ_{x,↑}`: the two halves of `hubbardPairCorrelationOp` at `x = y`,
+and the per-site summands of the total pair operators of Theorem 10.8. -/
+theorem fermionSitePairCreation_conjTranspose (N : ℕ) (x : Fin (N + 1)) :
+    Matrix.conjTranspose (fermionUpCreation N x * fermionDownCreation N x)
+      = fermionDownAnnihilation N x * fermionUpAnnihilation N x := by
+  rw [Matrix.conjTranspose_mul, fermionDownCreation_conjTranspose,
+    fermionUpCreation_conjTranspose]
+
 /-- The expectation `⟨φ| O |φ⟩` of an observable `O` in a (Euclidean)
 state vector `φ`. -/
 noncomputable def euclideanExpectation {ι : Type*} [Fintype ι]
@@ -109,6 +118,15 @@ theorem euclideanExpectation_add (O₁ O₂ : ManyBodyOp (Fin (2 * N + 2)))
       = euclideanExpectation O₁ φ + euclideanExpectation O₂ φ := by
   unfold euclideanExpectation
   rw [Matrix.add_mulVec, dotProduct_add]
+
+/-- The Euclidean expectation is additive over a `Finset` sum of observables,
+`⟨φ| Σ_k O_k |φ⟩ = Σ_k ⟨φ| O_k |φ⟩`. -/
+theorem euclideanExpectation_sum {κ : Type*} (s : Finset κ)
+    (O : κ → ManyBodyOp (Fin (2 * N + 2)))
+    (φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)) :
+    euclideanExpectation (∑ k ∈ s, O k) φ = ∑ k ∈ s, euclideanExpectation (O k) φ := by
+  unfold euclideanExpectation
+  rw [Matrix.sum_mulVec, dotProduct_sum]
 
 /-- **Shiba transport of the Euclidean expectation**: if `ψ = Û φ_attr` then
 `⟨ψ| O |ψ⟩ = ⟨φ_attr| Ûᴴ O Û |φ_attr⟩`. -/

@@ -135,6 +135,7 @@ import LatticeSystem.Tests.DegeneratePerturbationUniqueness
 import LatticeSystem.Tests.DegeneratePerturbationConvergence
 import LatticeSystem.Tests.DegeneratePerturbationShiftUniqueness
 import LatticeSystem.Tests.LiebShenQiuShibaBridge
+import LatticeSystem.Tests.LiebShenQiuPairAlgebra
 
 /-!
 # Test aggregator for the `lattice-system` library

@@ -8432,6 +8432,47 @@ an axiom below); staged for a later PR assembling this Casimir value with the Sh
 transport into the superconducting bound itself.
 
 \medskip
+\emph{Pair operator and ladder algebra (Issue~\#5357, PR~\#5361 PR-4; proved,
+axiom-free).}
+New file \texttt{LiebShenQiuPairAlgebra.lean} supplies the identities and
+inequalities that make eq.~(10.2.22)'s comparison term-wise.
+\texttt{totalPairCreationOperator\_eq\_conjTranspose} gives
+$\hat b^\dagger=\hat b^{\mathsf H}$; \texttt{totalPairCorrelationOperator\_eq\_sum}
+and \texttt{fermionTotalSpinPlusMinus\_eq\_sum} expand $\hat b^\dagger\hat b$ and
+$\hat S^+_{\mathrm{tot}}\hat S^-_{\mathrm{tot}}$ into the matching double sums
+$\sum_{x,y}\hat c^\dagger_{x\uparrow}\hat c^\dagger_{x\downarrow}\hat c_{y\downarrow}\hat c_{y\uparrow}$
+and $\sum_{x,y}\hat S^+_x\hat S^-_y$.
+\texttt{shiba\_spinPlusMinus\_expectation\_eq\_signed\_sum} transports the ladder
+expectation through the Shiba unitary (eq.~(10.2.13)) into the sublattice-signed
+pair-correlation sum $\sum_{x,y}\varepsilon_x\varepsilon_y\langle\varphi|\hat
+c^\dagger_{x\uparrow}\hat c^\dagger_{x\downarrow}\hat c_{y\downarrow}\hat
+c_{y\uparrow}|\varphi\rangle$.
+\texttt{gaugeSign\_mul\_re\_mul\_le\_of\_pos} is the term-wise sign bound
+$\varepsilon_x\varepsilon_y\,p\le p$ ($p>0$) that bounds the signed sum by the
+plain one; unlike Tasaki's route through Theorem~10.5's correlation sign
+(eq.~(10.2.25)), this development derives the sign directly from the Shiba
+identity plus Theorem~10.3's strict positivity, so Theorem~10.5 is not invoked.
+\texttt{liebShenQiuPairLowerBound\_le\_casimir\_gap} is the real-arithmetic
+inequality $(|A|-N_e/2)(N_e/2-|B|)\le S_0(S_0+1)-m(m-1)$
+($S_0=||A|-|B||/2$, $m=(N_e-(N{+}1))/2$) under $2|B|\le N_e\le 2|A|$.
+\texttt{liebShenQiu\_towerExponent\_le\_sublatticeImbalance} discharges PR-3's
+tower-exponent hypothesis of
+\texttt{liebShenQiu\_sectorGround\_mem\_halfFillingGround} at $k=|A|-N_e/2$,
+under the same two-sided bound.
+\textbf{Shared extraction.} \texttt{fermionSitePairCreation\_conjTranspose} and
+\texttt{euclideanExpectation\_sum}, added to \texttt{LiebAttractive.lean} next to
+the pre-existing \texttt{euclideanExpectation} helpers, replace Theorem~10.5's
+inline adjoint block and supply this file's own expectation-distribution step;
+\texttt{sublatticeImbalance\_add\_bipartitionComplement\_card}, added to
+\texttt{LiebRepulsive.lean}, supplies the cardinality identity used by the
+tower-exponent bound; all three consumed immediately, so none is new debt.
+\textbf{Debt (new).} Six of the seven listed declarations are at reference~0
+outside a \texttt{Tests} signature pin (\texttt{fermionTotalSpinPlusMinus\_eq\_sum}
+is consumed in-file by \texttt{shiba\_spinPlusMinus\_expectation\_eq\_signed\_sum},
+\texttt{LiebShenQiuPairAlgebra.lean}:106); staged for PR-5's assembly of the
+superconducting bound itself.
+
+\medskip
 \noindent\textbf{Theorem 10.8} (Lieb–Shen–Qiu superconductivity; Tasaki §10.2.3,
 p.~359, eq.~(10.2.22)). For the symmetric attractive Hubbard model
 $\hat H_{\rm hop} - \sum_x U_x(\hat n_{x\uparrow}-\tfrac12)(\hat n_{x\downarrow}-\tfrac12)$
