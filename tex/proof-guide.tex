@@ -8423,8 +8423,11 @@ on $\psi$, giving $\hat S^2_{\mathrm{tot}}\psi=S_0(S_0+1)\psi$ ($S_0=L/2$). Theo
 not used here --- only Theorem~10.4's ground-multiplet data and a highest-weight tower
 vector enter directly at this layer (Theorem~10.4's own proof pulls in
 \texttt{repulsiveSpinZSector\_ground\_unique}, Theorem~10.2, and Theorem~10.3).
-\textbf{Debt (new).} All three declarations of the new file are at reference
-0, not yet consumed by \texttt{theorem\_10\_8\_lieb\_shen\_qiu\_superconductivity} (still
+\textbf{Debt (new).} \texttt{liebShenQiu\_towerExponent\_weight\_eq} and
+\texttt{liebShenQiu\_casimir\_eq} are at reference 0 outside the Tests signature pin;
+\texttt{liebShenQiu\_sectorGround\_mem\_halfFillingGround} is consumed by
+\texttt{liebShenQiu\_casimir\_eq}. None is yet consumed by
+\texttt{theorem\_10\_8\_lieb\_shen\_qiu\_superconductivity} (still
 an axiom below); staged for a later PR assembling this Casimir value with the Shiba
 transport into the superconducting bound itself.
 
