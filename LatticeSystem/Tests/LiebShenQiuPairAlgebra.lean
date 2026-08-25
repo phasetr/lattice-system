@@ -2,7 +2,6 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebShenQiuPairAlgebra
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebShenQiu
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveShibaSpinOp
-import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaTheorem
 
 /-!
 # Test coverage for the Theorem 10.8 pair/ladder algebra (PR-4)
