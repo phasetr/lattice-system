@@ -13,6 +13,16 @@ sector's unique ground state `T4`, the transverse-sign transport `T5`, and the e
 `T6` (consuming PR-5's `liebRepulsive_ground_exists_topWeight`). Mirrors the specification style of
 `Tests/LiebFerrimagnetismGroundTower.lean`.
 
+**PR-3 of the Theorem 10.8 discharge arc (issue #5357) generalizes `T3`'s underlying
+declaration** `liebRepulsive_sectorGroundEnergy_eq_groundEnergy` from the hard-wired centered
+exponent `k₀ = sublatticeImbalance A / 2` to an arbitrary `(k : ℕ) (hk : k ≤ sublatticeImbalance A)`
+with the sector weight supplied via a matching hypothesis `{m : ℂ}
+(hkm : (sublatticeImbalance A : ℂ) / 2 - (k : ℂ) = m)`, and de-privatizes
+`liebRepulsive_centeredWeight_eq` (design `.self-local/docs/theorem-10-8-pr3-design.md` §2). The
+`T3` pin below is updated to the generalized signature, instantiated at `k := L/2,
+hkm := liebRepulsive_centeredWeight_eq A` so that it remains a byte-for-byte regression check of
+the original centered statement (design §2.1/§8 "Regression").
+
 Carrier throughout: `H := symmetricRepulsiveHubbardHamiltonian N T U`,
 `G := hubbardGroundSubmoduleAtElectronNumber H E₀ (N+1)`, `k₀ := sublatticeImbalance A / 2`
 (ℕ division), `mCentered := ((N + 1 + sublatticeImbalance A % 2 : ℕ : ℂ) - ((N : ℂ) + 1)) / 2` the
@@ -47,13 +57,15 @@ example (N : ℕ) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (hT : ∀ i j, T 
 
 /-! ## `T3` — the centered-sector ground energy equals the sector-agnostic ground energy -/
 
-/-- **`T3`: sector ground energy = ground energy.** The unique ground energy `E` of `H` on the
-centered spin-`z` sector `Ŝ³ = mCentered` (`mCentered := (Ne₀ − (N+1))/2`,
-`Ne₀ := N + 1 + L % 2`, `L := sublatticeImbalance A`) equals `E₀.re`, the real part of the
-sector-agnostic `(N+1)`-electron ground energy — a two-sided pinch (design §3 `T3`): `E₀.re ≤ E`
-from `φ`'s half-filling number eigenvalue `hφN` transported through
-`mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul` and `hmin`; `E ≤ E₀.re` from the centered tower
-member `(Ŝ⁻_tot)^{k₀} w` witnessing `IsGroundEigenvalueOn`'s minimality clause. -/
+/-- **`T3`: sector ground energy = ground energy (generalized, PR-3 of #5357).** The unique ground
+energy `E` of `H` on the spin-`z` sector `Ŝ³ = m` at an arbitrary tower exponent
+`k ≤ L := sublatticeImbalance A` (matched to `m` via `hkm`) equals `E₀.re`, the real part of the
+sector-agnostic `(N+1)`-electron ground energy — a two-sided pinch (design
+`.self-local/docs/theorem-10-8-pr3-design.md` §2.1): `E₀.re ≤ E` from `φ`'s half-filling number
+eigenvalue `hφN` transported through `mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul` and `hmin`;
+`E ≤ E₀.re` from the `k`-th tower member `(Ŝ⁻_tot)^k w` witnessing `IsGroundEigenvalueOn`'s
+minimality clause. Instantiated here at `k := L/2`, `hkm := liebRepulsive_centeredWeight_eq A` as a
+byte-for-byte regression check of the original centered `T3` statement. -/
 example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
     (hT : ∀ i j, T i j = T j i) (U : Fin (N + 1) → ℝ) (E₀ : ℂ)
     (hmin : ∀ E : ℂ, hubbardGroundSubmoduleAtElectronNumber
@@ -74,7 +86,10 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N +
     (hφN : Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1)) φ = ((N : ℂ) + 1) • φ) :
     E = E₀.re :=
   liebRepulsive_sectorGroundEnergy_eq_groundEnergy N A T hT U E₀ (hmin := hmin) (hE₀ := hE₀)
-    (hcas := hcas) (hw0 := hw0) (hwG := hwG) (hz := hz) (hGS := hGS) (hφN := hφN)
+    (hcas := hcas) (hw0 := hw0) (hwG := hwG) (hz := hz)
+    (k := sublatticeImbalance A / 2) (hk := Nat.div_le_self _ _)
+    (hkm := liebRepulsive_centeredWeight_eq A)
+    (hGS := hGS) (hφN := hφN)
 
 /-! ## `T4` — the centered tower member is a scalar multiple of the sector's unique ground state -/
 

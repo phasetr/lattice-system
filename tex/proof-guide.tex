@@ -8153,12 +8153,16 @@ centered-member sign pattern, which is what the ferrimagnetic bound~(10.2.17) ne
 consume. A private supporting layer handles the arithmetic and carrier bookkeeping:
 \texttt{liebRepulsive\_sublatticeImbalance\_mod\_two} ($L\bmod2=(N{+}1)\bmod2$),
 \texttt{liebRepulsive\_centeredWeight\_eq} (the centered tower weight $L/2-k_0$ equals the
-sector's spin-$z$ value), \texttt{vectorExpectation\_smul\_vector}
+sector's spin-$z$ value, made public in the Theorem~10.8 discharge arc's PR-3, below),
+\texttt{vectorExpectation\_smul\_vector}
 ($\langle cv|O|cv\rangle=(\bar cc)\langle v|O|v\rangle$, the state-rescaling identity behind
-the $|c|^2$ factor), and \texttt{liebRepulsive\_centered\_mem\_spinZSector} (crossing the
+the $|c|^2$ factor), and \texttt{liebRepulsive\_tower\_mem\_spinZSector} (crossing the
 Pi carrier of \texttt{hubbardGroundSubmoduleAtElectronNumber} to the
 \texttt{EuclideanSpace} carrier of \texttt{spinZSectorEuclidean} via
-\texttt{mulVec\_eq\_smul\_iff\_toEuclideanLin\_toLp\_eq\_smul}). \textbf{Debt discharged.}
+\texttt{mulVec\_eq\_smul\_iff\_toEuclideanLin\_toLp\_eq\_smul}; renamed from
+\texttt{liebRepulsive\_centered\_mem\_spinZSector} in the Theorem~10.8 arc's PR-3, which
+generalizes it from the centered exponent $k_0$ alone to an arbitrary tower exponent $k$).
+\textbf{Debt discharged.}
 Consumes PR-5's \texttt{liebRepulsive\_ground\_exists\_topWeight} and
 \texttt{liebRepulsive\_ground\_tower\_ne\_zero}, both previously at reference 0 (PR-5's
 \texttt{liebRepulsive\_ground\_eq\_span\_tower} and
@@ -8166,6 +8170,12 @@ Consumes PR-5's \texttt{liebRepulsive\_ground\_exists\_topWeight} and
 PR-7 consumes them). \texttt{liebRepulsive\_exists\_centered\_transverse\_sign} has since been consumed by
 PR-7 (below), whose capstone \texttt{liebRepulsive\_exists\_centered\_ratioRe\_ge\_sq}
 supplies its sign-pattern hypothesis directly from this existential.
+\textbf{Signature generalized (Theorem~10.8 discharge arc, PR-3, below).}
+\texttt{liebRepulsive\_sectorGroundEnergy\_eq\_groundEnergy} now takes an explicit tower
+exponent $k\le L$ and an implicit sector weight $m$ matched by a hypothesis
+$L/2-k=m$, in place of the hard-coded centered exponent, so callers outside this arc can
+present the sector at their own weight; the centered use above instantiates the generalized
+lemma at $k=k_0=L/2$ via \texttt{liebRepulsive\_centeredWeight\_eq}, unchanged in effect.
 
 \medskip
 \emph{The centered-sector $(\hat O_L)^2$ lower bound (Issue~\#5347, PR~\#5355 PR-7;
@@ -8386,6 +8396,40 @@ call sites compile untouched --- and becomes the composition of Theorems
 \texttt{shibaTransport\_uniqueGroundStateOn\_spinZSector\_symmetricAttractive}
 has no proof-level consumer yet; it is the sole deliverable the later PRs of this
 arc consume, and is covered by a signature pin in \texttt{Tests}.
+
+\medskip
+\emph{Sector generalization and the Casimir value on the transported ground state
+(Issue~\#5357, PR~\#5360 PR-3; proved, axiom-free).}
+\texttt{liebRepulsive\_centeredWeight\_eq} (Theorem~10.6 arc's PR-6,
+\texttt{LiebFerrimagnetismCenteredSector.lean}) is made non-\texttt{private} in the same
+file, and \texttt{liebRepulsive\_sectorGroundEnergy\_eq\_groundEnergy} (same PR-6 file) is
+generalized from the hard-coded centered exponent $k_0=L/2$ to an explicit tower exponent
+$k$ ($k\le L$) with an implicit sector weight $m$ matched by a hypothesis $L/2-k=m$
+(the renamed private helper \texttt{liebRepulsive\_tower\_mem\_spinZSector} takes the same
+generalization), so a caller outside the Theorem~10.6 arc can present the sector at
+whichever weight its own electron-number bookkeeping produces; PR-6's own centered use
+still instantiates it at $k=k_0=L/2$ via \texttt{liebRepulsive\_centeredWeight\_eq}, with
+no change to its conclusion. New file \texttt{LiebShenQiuSectorCasimir.lean} then
+identifies the total spin of the Shiba-transported sector ground state $\psi$ (PR-1/PR-2
+above): \texttt{liebShenQiu\_towerExponent\_weight\_eq} shows the tower exponent
+$k=|A|-N_e/2$ reaches exactly the transported sector's weight,
+$L/2-k=(N_e-(N{+}1))/2$, from $|A|+|B|=N+1$, \texttt{Even}~$N_e$, and the side condition
+$2|B|\le N_e\le 2|A|$ (the same $\texttt{hLower}/\texttt{hUpper}$ hypotheses as
+Theorem~10.8 itself, load-bearing for $L=|A|-|B|$ and $k\le L$);
+\texttt{liebShenQiu\_sectorGround\_mem\_halfFillingGround} feeds that weight match to the
+generalized pinch above to place $\psi$ in the $(N{+}1)$-electron half-filling ground
+submodule; \texttt{liebShenQiu\_casimir\_eq} then reads off Theorem~10.4's Casimir clause
+on $\psi$, giving $\hat S^2_{\mathrm{tot}}\psi=S_0(S_0+1)\psi$ ($S_0=L/2$). Theorem~10.5 is
+not used here --- only Theorem~10.4's ground-multiplet data and a highest-weight tower
+vector enter directly at this layer (Theorem~10.4's own proof pulls in
+\texttt{repulsiveSpinZSector\_ground\_unique}, Theorem~10.2, and Theorem~10.3).
+\textbf{Debt (new).} \texttt{liebShenQiu\_towerExponent\_weight\_eq} and
+\texttt{liebShenQiu\_casimir\_eq} are at reference 0 outside the Tests signature pin;
+\texttt{liebShenQiu\_sectorGround\_mem\_halfFillingGround} is consumed by
+\texttt{liebShenQiu\_casimir\_eq}. None is yet consumed by
+\texttt{theorem\_10\_8\_lieb\_shen\_qiu\_superconductivity} (still
+an axiom below); staged for a later PR assembling this Casimir value with the Shiba
+transport into the superconducting bound itself.
 
 \medskip
 \noindent\textbf{Theorem 10.8} (Lieb–Shen–Qiu superconductivity; Tasaki §10.2.3,

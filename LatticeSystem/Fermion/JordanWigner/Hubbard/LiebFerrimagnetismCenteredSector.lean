@@ -20,9 +20,11 @@ centered tower member:
 
 * `liebRepulsive_groundEnergy_eq_ofReal` — the ground energy `E₀` of a nonzero `(N+1)`-electron
   ground submodule is real (Hermiticity of the symmetric repulsive Hamiltonian);
-* `liebRepulsive_sectorGroundEnergy_eq_groundEnergy` — the sector ground energy `E` equals `E₀.re`,
-  by a two-sided pinch: the sector ground state sits at half filling (so `E₀.re ≤ E`), while the
-  centered tower member is an `E₀.re`-eigenvector inside the sector (so `E ≤ E₀.re`);
+* `liebRepulsive_sectorGroundEnergy_eq_groundEnergy` — the ground energy `E` of the spin-`z` sector
+  `Ŝ³ = m` reached by the tower exponent `k ≤ L` (the weight match `L/2 − k = m` being a
+  hypothesis) equals `E₀.re`, by a two-sided pinch: the sector ground state sits at half filling
+  (so `E₀.re ≤ E`), while the `k`-th tower member is an `E₀.re`-eigenvector inside the sector
+  (so `E ≤ E₀.re`);
 * `liebRepulsive_centered_eq_smul_sectorGround` — hence the centered tower member is a nonzero
   multiple of Theorem 10.5's unique sector ground state;
 * `liebRepulsive_centered_transverse_sign` — the transverse correlation on the centered tower
@@ -58,8 +60,10 @@ private theorem liebRepulsive_sublatticeImbalance_mod_two {N : ℕ} (A : Finset 
 /-- **The centered tower weight is Theorem 10.5's sector parameter.**  At the centered exponent
 `k₀ = L / 2` (ℕ division) the tower weight `L/2 − k₀` equals the spin-`z` value
 `(Ne₀ − (N+1))/2` of the electron number `Ne₀ = N + 1 + L % 2`: both sides are
-`(L % 2)/2 ∈ {0, 1/2}`. -/
-private theorem liebRepulsive_centeredWeight_eq {N : ℕ} (A : Finset (Fin (N + 1))) :
+`(L % 2)/2 ∈ {0, 1/2}`.  This is the centered instance of the weight match that
+`liebRepulsive_sectorGroundEnergy_eq_groundEnergy` takes as a hypothesis, not a general weight
+identity. -/
+theorem liebRepulsive_centeredWeight_eq {N : ℕ} (A : Finset (Fin (N + 1))) :
     (sublatticeImbalance A : ℂ) / 2 - ((sublatticeImbalance A / 2 : ℕ) : ℂ)
       = (((N + 1 + sublatticeImbalance A % 2 : ℕ) : ℂ) - ((N : ℂ) + 1)) / 2 := by
   have hdm : ((2 * (sublatticeImbalance A / 2) + sublatticeImbalance A % 2 : ℕ) : ℂ)
@@ -98,37 +102,43 @@ theorem liebRepulsive_groundEnergy_eq_ofReal (N : ℕ)
     (symmetricRepulsiveHubbardHamiltonian_isHermitian N T hT U) hv0 hv.1
   rw [← hμ, Complex.ofReal_re]
 
-/-! ## The centered tower member inside the spin-`z` sector -/
+/-! ## Tower members inside a spin-`z` sector -/
 
-/-- **The centered tower member lies in Theorem 10.5's sector.**  Lowering a highest-weight vector
-`k₀ = L/2` times produces a `Ŝ³_tot`-eigenvector of weight `L/2 − k₀`
-(`fermionTotalSpinZ_mulVec_spinMinusPow_general`), which `liebRepulsive_centeredWeight_eq`
-identifies with the sector parameter of the electron number `Ne₀ = N + 1 + L % 2`; the Pi carrier
-is crossed to `EuclideanSpace` by `mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul`. -/
-private theorem liebRepulsive_centered_mem_spinZSector {N : ℕ} (A : Finset (Fin (N + 1)))
+/-- **A tower member lies in the spin-`z` sector its weight names.**  Lowering a highest-weight
+vector `k` times produces a `Ŝ³_tot`-eigenvector of weight `L/2 − k`
+(`fermionTotalSpinZ_mulVec_spinMinusPow_general`), so it lies in the sector `Ŝ³ = m` of any `m`
+matching that weight (`hkm`); the Pi carrier is crossed to `EuclideanSpace` by
+`mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul`. -/
+private theorem liebRepulsive_tower_mem_spinZSector {N : ℕ} (A : Finset (Fin (N + 1)))
     {w : (Fin (2 * N + 2) → Fin 2) → ℂ}
-    (hz : (fermionTotalSpinZ N).mulVec w = ((sublatticeImbalance A : ℂ) / 2) • w) :
-    (WithLp.toLp 2 (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w)
+    (hz : (fermionTotalSpinZ N).mulVec w = ((sublatticeImbalance A : ℂ) / 2) • w)
+    (k : ℕ) {m : ℂ} (hkm : (sublatticeImbalance A : ℂ) / 2 - (k : ℂ) = m) :
+    (WithLp.toLp 2 (((fermionTotalSpinMinus N) ^ k).mulVec w)
         : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2))
-      ∈ spinZSectorEuclidean N
-        ((((N + 1 + sublatticeImbalance A % 2 : ℕ) : ℂ) - ((N : ℂ) + 1)) / 2) := by
+      ∈ spinZSectorEuclidean N m := by
   have hw := fermionTotalSpinZ_mulVec_spinMinusPow_general N w
-    ((sublatticeImbalance A : ℂ) / 2) (sublatticeImbalance A / 2) hz
-  rw [liebRepulsive_centeredWeight_eq A] at hw
+    ((sublatticeImbalance A : ℂ) / 2) k hz
+  rw [hkm] at hw
   rw [spinZSectorEuclidean, Module.End.mem_eigenspace_iff,
     ← mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul]
   exact hw
 
 /-! ## The sector ground energy is the half-filling ground energy -/
 
-/-- **The centered sector's ground energy is the half-filling ground energy.**  Let `E` be the
-ground energy on the centered spin-`z` sector `Ŝ³ = (Ne₀ − (N+1))/2` (`Ne₀ = N + 1 + L % 2`) and
-`E₀` the `(N+1)`-electron ground energy.  Then `E = E₀.re`, by a two-sided pinch: the sector ground
-state `φ` carries the half-filling number eigenvalue `hφN`, so it lies in the `(N+1)`-electron
-`E`-ground submodule and `hmin` gives `E₀.re ≤ E`; conversely the centered tower member is a
-nonzero `E₀.re`-eigenvector inside the sector (`liebRepulsive_ground_tower_ne_zero`,
-`liebRepulsive_ground_spinMinusPow_mem`, `liebRepulsive_centered_mem_spinZSector`), so the
-minimality clause of `IsGroundEigenvalueOn` gives `E ≤ E₀.re`. -/
+/-- **A tower sector's ground energy is the half-filling ground energy.**  Let `E` be the ground
+energy on the spin-`z` sector `Ŝ³ = m` whose weight is reached by the tower exponent `k ≤ L`
+(`hkm : L/2 − k = m`) and `E₀` the `(N+1)`-electron ground energy.  Then `E = E₀.re`, by a
+two-sided pinch: the sector ground state `φ` carries the half-filling number eigenvalue `hφN`, so
+it lies in the `(N+1)`-electron `E`-ground submodule and `hmin` gives `E₀.re ≤ E`; conversely the
+`k`-th tower member is a nonzero `E₀.re`-eigenvector inside the sector
+(`liebRepulsive_ground_tower_ne_zero`, `liebRepulsive_ground_spinMinusPow_mem`,
+`liebRepulsive_tower_mem_spinZSector`), so the minimality clause of `IsGroundEigenvalueOn` gives
+`E ≤ E₀.re`.
+
+Taking `m` as an implicit matched by `hkm` lets each caller present the sector in its own form: the
+centered exponent `k = L/2` of Tasaki's eq. (10.2.17) matches it through
+`liebRepulsive_centeredWeight_eq`, while §10.2.3's electron-number sectors match it through their
+own weight arithmetic. -/
 theorem liebRepulsive_sectorGroundEnergy_eq_groundEnergy (N : ℕ) (A : Finset (Fin (N + 1)))
     (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (hT : ∀ i j, T i j = T j i)
     (U : Fin (N + 1) → ℝ) (E₀ : ℂ)
@@ -142,10 +152,10 @@ theorem liebRepulsive_sectorGroundEnergy_eq_groundEnergy (N : ℕ) (A : Finset (
     (hwG : w ∈ hubbardGroundSubmoduleAtElectronNumber
       (symmetricRepulsiveHubbardHamiltonian N T U) E₀ (N + 1))
     (hz : (fermionTotalSpinZ N).mulVec w = ((sublatticeImbalance A : ℂ) / 2) • w)
+    (k : ℕ) (hk : k ≤ sublatticeImbalance A)
+    {m : ℂ} (hkm : (sublatticeImbalance A : ℂ) / 2 - (k : ℂ) = m)
     {E : ℝ} {φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)}
-    (hGS : IsUniqueGroundStateOn
-      (spinZSectorEuclidean N
-        ((((N + 1 + sublatticeImbalance A % 2 : ℕ) : ℂ) - ((N : ℂ) + 1)) / 2))
+    (hGS : IsUniqueGroundStateOn (spinZSectorEuclidean N m)
       (symmetricRepulsiveHubbardHamiltonian N T U) E φ)
     (hφN : Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1)) φ = ((N : ℂ) + 1) • φ) :
     E = E₀.re := by
@@ -155,13 +165,13 @@ theorem liebRepulsive_sectorGroundEnergy_eq_groundEnergy (N : ℕ) (A : Finset (
     ⟨WithLp.ofLp φ, rfl⟩
   rw [← mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul] at hφeig hφN
   rw [ne_eq, WithLp.toLp_eq_zero] at hφne
-  have htower := liebRepulsive_ground_spinMinusPow_mem N T hT U E₀ hwG (sublatticeImbalance A / 2)
+  have htower := liebRepulsive_ground_spinMinusPow_mem N T hT U E₀ hwG k
   rw [hubbardGroundSubmoduleAtElectronNumber, Submodule.mem_inf,
     Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at htower
-  refine le_antisymm (hφground.2 E₀.re ⟨WithLp.toLp 2 (((fermionTotalSpinMinus N) ^
-    (sublatticeImbalance A / 2)).mulVec w), liebRepulsive_centered_mem_spinZSector A hz, ?_, ?_⟩) ?_
+  refine le_antisymm (hφground.2 E₀.re ⟨WithLp.toLp 2 (((fermionTotalSpinMinus N) ^ k).mulVec w),
+    liebRepulsive_tower_mem_spinZSector A hz k hkm, ?_, ?_⟩) ?_
   · rw [ne_eq, WithLp.toLp_eq_zero]
-    exact liebRepulsive_ground_tower_ne_zero N A T U E₀ hcas hw0 hwG hz _ (Nat.div_le_self _ _)
+    exact liebRepulsive_ground_tower_ne_zero N A T U E₀ hcas hw0 hwG hz k hk
   · rw [← mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul, hE₀]
     exact htower.1
   · have humem : u ∈ hubbardGroundSubmoduleAtElectronNumber
@@ -178,10 +188,10 @@ theorem liebRepulsive_sectorGroundEnergy_eq_groundEnergy (N : ℕ) (A : Finset (
 /-! ## Collinearity with the sector ground state -/
 
 /-- **The centered tower member is a multiple of the sector ground state.**  Under the hypotheses
-of `liebRepulsive_sectorGroundEnergy_eq_groundEnergy`, the centered tower member
-`(Ŝ⁻_tot)^{k₀} w` (`k₀ = L/2`) is `c • φ` for a nonzero `c`: the energy match turns it into an
-`E`-eigenvector inside the sector, so the uniqueness clause of `IsUniqueGroundStateOn` applies, and
-`c ≠ 0` because the tower member itself is nonzero. -/
+of `liebRepulsive_sectorGroundEnergy_eq_groundEnergy` at the centered exponent `k₀ = L/2`, the
+centered tower member `(Ŝ⁻_tot)^{k₀} w` is `c • φ` for a nonzero `c`: the energy match turns it
+into an `E`-eigenvector inside the sector, so the uniqueness clause of `IsUniqueGroundStateOn`
+applies, and `c ≠ 0` because the tower member itself is nonzero. -/
 theorem liebRepulsive_centered_eq_smul_sectorGround (N : ℕ) (A : Finset (Fin (N + 1)))
     (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (hT : ∀ i j, T i j = T j i)
     (U : Fin (N + 1) → ℝ) (E₀ : ℂ)
@@ -205,7 +215,8 @@ theorem liebRepulsive_centered_eq_smul_sectorGround (N : ℕ) (A : Finset (Fin (
       (WithLp.toLp 2 (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w)
           : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)) = c • φ := by
   have hE := liebRepulsive_sectorGroundEnergy_eq_groundEnergy N A T hT U E₀ hmin hE₀ hcas hw0 hwG
-    hz hGS hφN
+    hz (sublatticeImbalance A / 2) (Nat.div_le_self _ _) (liebRepulsive_centeredWeight_eq A) hGS
+    hφN
   have hne0 : ((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w ≠ 0 :=
     liebRepulsive_ground_tower_ne_zero N A T U E₀ hcas hw0 hwG hz _ (Nat.div_le_self _ _)
   have htower := liebRepulsive_ground_spinMinusPow_mem N T hT U E₀ hwG (sublatticeImbalance A / 2)
@@ -217,7 +228,8 @@ theorem liebRepulsive_centered_eq_smul_sectorGround (N : ℕ) (A : Finset (Fin (
         (((fermionTotalSpinMinus N) ^ (sublatticeImbalance A / 2)).mulVec w)) := by
     rw [← mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul, hE, hE₀]
     exact htower.1
-  obtain ⟨c, hc⟩ := hGS.2.2.2.2 _ (liebRepulsive_centered_mem_spinZSector A hz) heig
+  obtain ⟨c, hc⟩ := hGS.2.2.2.2 _ (liebRepulsive_tower_mem_spinZSector A hz
+    (sublatticeImbalance A / 2) (liebRepulsive_centeredWeight_eq A)) heig
   refine ⟨c, ?_, hc⟩
   intro hc0
   rw [hc0, zero_smul, WithLp.toLp_eq_zero] at hc
