@@ -3,8 +3,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebShenQiuDischarge
 /-!
 # Test coverage for the Theorem 10.8 capstone assembly and axiom discharge (PR-5)
 
-Pins the API contract of PR-5 of the Theorem 10.8 discharge, design report
-`.self-local/docs/theorem-10-8-pr5-design.md` §2 "New file `LiebShenQiuDischarge.lean`", against
+Pins the API contract of PR-5 of the Theorem 10.8 discharge, PR-5 design §2 "New file
+`LiebShenQiuDischarge.lean`", against
 `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebShenQiuDischarge.lean`.
 
 The design's 6 helper lemmas (items 1–6, design §2) are `private` to that file by construction

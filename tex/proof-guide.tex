@@ -8323,17 +8323,19 @@ The chemical-shift split
 $\hat H_{\rm hop}(T+\mathrm{diag}(U/2))=\hat H_{\rm hop}(T)+\sum_x (U_x/2)(\hat n_{x\uparrow}+\hat n_{x\downarrow})$,
 needed identically by the plain conjugation and by this bridge, is factored out
 as the named lemma \texttt{hubbardKinetic\_add\_diagonal\_half} in
-\texttt{LiebRepulsiveShibaConjugation.lean} and reused from both. Not yet consumed by
-\texttt{theorem\_10\_8\_lieb\_shen\_qiu\_superconductivity} (still an axiom
-below); staged for the later PRs of this arc ($\hat S^3\varphi=0$ extraction,
-PR-2 onward). \textbf{PR~\#5359 PR-2 has since consumed the bridge capstone}
+\texttt{LiebRepulsiveShibaConjugation.lean} and reused from both.
+\textbf{PR~\#5359 PR-2 consumed the bridge capstone}
 \texttt{shibaSignedUnitary\_conj\_symmetricRepulsive\_eq\_symmetricAttractive}
 as the conjugation hypothesis of the symmetric-attractive Shiba transport (see
 the PR-2 paragraph below), and with it
 \texttt{symmetricAttractiveHubbardHamiltonian\_eq\_attractive\_sub\_smul}, on
 which its proof rests; the eigenvector-transport step deferred above is
 performed there by \texttt{IsUniqueGroundStateOn.conj\_unitary}, which supplies
-the $\hat U\hat U^\dagger = 1$ it needs.
+the $\hat U\hat U^\dagger = 1$ it needs. \textbf{Debt discharged (by PR-5).}
+\texttt{symmetricAttractiveHubbardHamiltonian\_eq\_attractive\_sub\_smul} is
+additionally consumed directly by PR-5's capstone assembly into
+\texttt{theorem\_10\_8\_lieb\_shen\_qiu\_superconductivity} (Theorem~10.8 below,
+\emph{proved}).
 
 \medskip
 \emph{The $\hat S^3\varphi=0$ extraction and the reusable Shiba transport
