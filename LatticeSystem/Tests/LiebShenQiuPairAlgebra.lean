@@ -11,15 +11,16 @@ Pins the API contract of PR-4 of the Theorem 10.8 discharge (design report
 `.self-local/docs/theorem-10-8-design.md` §1 "New file `LiebShenQiuPairAlgebra.lean`"),
 against `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebShenQiuPairAlgebra.lean`.
 
-1. **PA1** `totalPairCreationOperator_eq_conjTranspose` — `b̂† = b̂ᴴ` (generalizing the inline
-   `hPadj` block, `LiebRepulsiveCorrelation.lean:197`).
+1. **PA1** `totalPairCreationOperator_eq_conjTranspose` — `b̂† = b̂ᴴ` (generalizing the former
+   inline `hPadj` block, now removed).
 2. **PA2** `totalPairCorrelationOperator_eq_sum` — `b̂†b̂ = Σ_{x,y} hubbardPairCorrelationOp N x y`
    (definitional after `Finset.sum_mul_sum` + `mul_assoc`).
 3. **PA3** `fermionTotalSpinPlusMinus_eq_sum` — `Ŝ⁺Ŝ⁻ = Σ_{x,y} Ŝ⁺_x Ŝ⁻_y` (same
    double-sum expansion for the per-site ladder operators).
 4. **PA4** `shiba_spinPlusMinus_expectation_eq_signed_sum` — the Shiba-transported expectation
    `⟨ψ|Ŝ⁺Ŝ⁻|ψ⟩ = Σ_{x,y} ε_x ε_y ⟨φ|pair x y|φ⟩`, reusing the already-public
-   `euclideanExpectation_shiba_conj`/`_smul`/`_add` helpers (PR-1) and
+   `euclideanExpectation_shiba_conj`/`_smul` helpers (PR-1) and this PR's own
+   `euclideanExpectation_sum` helper (used twice), plus
    `shibaSignedUnitary_conj_spinPlusMinus` (`LiebRepulsiveShibaSpinOp.lean:339`).
 5. **PA5** `gaugeSign_mul_re_mul_le_of_pos` — the term-wise sign bound `ε_x ε_y · p ≤ p` for `p > 0`
    (uses `gaugeSign_mul_sameSublattice`/`_not_sameSublattice`,

@@ -8447,7 +8447,7 @@ expectation through the Shiba unitary (eq.~(10.2.13)) into the sublattice-signed
 pair-correlation sum $\sum_{x,y}\varepsilon_x\varepsilon_y\langle\varphi|\hat
 c^\dagger_{x\uparrow}\hat c^\dagger_{x\downarrow}\hat c_{y\downarrow}\hat
 c_{y\uparrow}|\varphi\rangle$.
-\texttt{signed\_sum\_le\_sum\_of\_pos} is the term-wise sign bound
+\texttt{gaugeSign\_mul\_re\_mul\_le\_of\_pos} is the term-wise sign bound
 $\varepsilon_x\varepsilon_y\,p\le p$ ($p>0$) that bounds the signed sum by the
 plain one; unlike Tasaki's route through Theorem~10.5's correlation sign
 (eq.~(10.2.25)), this development derives the sign directly from the Shiba
@@ -8463,7 +8463,9 @@ under the same two-sided bound.
 \texttt{euclideanExpectation\_sum}, added to \texttt{LiebAttractive.lean} next to
 the pre-existing \texttt{euclideanExpectation} helpers, replace Theorem~10.5's
 inline adjoint block and supply this file's own expectation-distribution step;
-both consumed immediately, so neither is new debt.
+\texttt{sublatticeImbalance\_add\_bipartitionComplement\_card}, added to
+\texttt{LiebRepulsive.lean}, supplies the cardinality identity used by the
+tower-exponent bound; all three consumed immediately, so none is new debt.
 \textbf{Debt (new).} Six of the seven listed declarations are at reference~0
 outside a \texttt{Tests} signature pin (\texttt{fermionTotalSpinPlusMinus\_eq\_sum}
 is consumed in-file by \texttt{shiba\_spinPlusMinus\_expectation\_eq\_signed\_sum},
