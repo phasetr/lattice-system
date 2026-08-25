@@ -194,11 +194,6 @@ theorem theorem_10_5_shen_qiu_tian_transverse_sign (N Ne : ℕ)
       Finset.sum_nonneg (fun j _ => Complex.normSq_nonneg _)
     have hgg : gaugeSign A x * gaugeSign A x = 1 :=
       gaugeSign_mul_sameSublattice A x x Iff.rfl
-    have hPadj : Matrix.conjTranspose (fermionUpCreation N x * fermionDownCreation N x)
-        = fermionDownAnnihilation N x * fermionUpAnnihilation N x := by
-      rw [Matrix.conjTranspose_mul, fermionUpCreation, fermionDownCreation,
-        fermionMultiCreation_conjTranspose, fermionMultiCreation_conjTranspose,
-        fermionDownAnnihilation, fermionUpAnnihilation]
     have hterm2 : euclideanExpectation (Matrix.conjTranspose Ush
           * (fermionSiteSpinMinus N x * fermionSiteSpinPlus N x) * Ush) φattr
         = (q : ℂ) := by
@@ -218,7 +213,8 @@ theorem theorem_10_5_shen_qiu_tian_transverse_sign (N Ne : ℕ)
         noncomm_ring
       rw [hsplit, hUsh, shibaSignedUnitary_conj_siteSpinMinus,
         shibaSignedUnitary_conj_siteSpinPlus, Matrix.smul_mul, Matrix.mul_smul, smul_smul, hgg,
-        one_smul, ← hPadj, euclideanExpectation_conjTranspose_mul_self]
+        one_smul, ← fermionSitePairCreation_conjTranspose N x,
+        euclideanExpectation_conjTranspose_mul_self]
     -- Value `= ↑((r1.re + q)/2)`, real and strictly positive.
     obtain ⟨hr1pos, hr1im⟩ := hpair x x
     have hr1real : r1 = (r1.re : ℂ) :=
