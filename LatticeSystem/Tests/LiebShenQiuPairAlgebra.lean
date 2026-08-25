@@ -1,3 +1,4 @@
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebShenQiuPairAlgebra
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebShenQiu
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveShibaSpinOp
