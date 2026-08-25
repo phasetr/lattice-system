@@ -62,14 +62,6 @@ theorem rayleighOnVec_one_eq_normSq {ι : Type*} [Fintype ι] [DecidableEq ι]
   rw [EuclideanSpace.inner_eq_star_dotProduct] at h
   simpa using h
 
-/-- The squared `dotProduct` self-pairing of a unit `EuclideanSpace` vector is `1`. -/
-theorem star_dotProduct_self_of_norm_one {ι : Type*} [Fintype ι]
-    (φ : EuclideanSpace ℂ ι) (hu : ‖φ‖ = 1) : star φ.ofLp ⬝ᵥ φ.ofLp = (1 : ℂ) := by
-  have h := inner_self_eq_norm_sq_to_K (𝕜 := ℂ) φ
-  rw [EuclideanSpace.inner_eq_star_dotProduct, hu] at h
-  rw [dotProduct_comm]
-  simpa using h
-
 /-- **Rayleigh value of a unit eigenvector.**  If `φ` is a unit `EuclideanSpace` vector and an
 eigenvector of `H` with real eigenvalue `lam` (`H φ.ofLp = lam • φ.ofLp`), then
 `rayleighOnVec H φ.ofLp = lam`. -/

@@ -83,6 +83,20 @@ theorem hoppingSupportGraph_add_diagonal (T : Matrix (Fin (N + 1)) (Fin (N + 1))
   · simp [hxy]
   · rw [if_neg hxy, if_neg (Ne.symm hxy), add_zero, add_zero]
 
+/-- **A diagonal shift preserves the symmetry of the hopping matrix**:
+`T + diagonal d` is symmetric whenever `T` is.  Together with
+`hoppingSupportGraph_add_diagonal` this is what lets Theorems 10.2/10.3, stated for a plain
+hopping matrix, be applied to the chemical-potential-shifted hopping `T + diag(U/2)` produced by
+centring the Hubbard interaction. -/
+theorem hoppingSymm_add_diagonal (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
+    (hT : ∀ x y, T x y = T y x) (d : Fin (N + 1) → ℝ) :
+    ∀ x y, (T + Matrix.diagonal d) x y = (T + Matrix.diagonal d) y x := by
+  intro x y
+  rw [Matrix.add_apply, Matrix.add_apply, Matrix.diagonal_apply, Matrix.diagonal_apply, hT x y]
+  by_cases hxy : x = y
+  · rw [hxy]
+  · rw [if_neg hxy, if_neg (fun h => hxy h.symm)]
+
 /-- **Shiba transport of a unique ground state from the electron-number sector to the spin-`z`
 sector, at unchanged energy** (Tasaki §10.2.2, eq. (10.2.11), pp. 350–352).  Let the Shiba unitary
 `Û` conjugate a Hamiltonian `Ĥ^{rep}` into `Ĥ` (`Ûᴴ Ĥ^{rep} Û = Ĥ`), and let `φ` be the unique
@@ -290,14 +304,7 @@ theorem repulsiveSpinZSector_ground_unique (N Ne : ℕ)
         Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1)) φ = ((N : ℂ) + 1) • φ := by
   classical
   -- Theorems 10.2/10.3 are applied to the shifted hopping `T' = T + diag(U/2)`.
-  have hT'_symm : ∀ x y, (T + Matrix.diagonal (fun x => U x / 2)) x y
-      = (T + Matrix.diagonal (fun x => U x / 2)) y x := by
-    intro x y
-    rw [Matrix.add_apply, Matrix.add_apply, Matrix.diagonal_apply, Matrix.diagonal_apply,
-      hT_symm x y]
-    by_cases hxy : x = y
-    · rw [hxy]
-    · rw [if_neg hxy, if_neg (fun h => hxy h.symm)]
+  have hT'_symm := hoppingSymm_add_diagonal T hT_symm (fun x => U x / 2)
   have hT'_conn :
       (hoppingSupportGraph (T + Matrix.diagonal (fun x => U x / 2))).Preconnected := by
     rw [hoppingSupportGraph_add_diagonal]; exact hT_conn

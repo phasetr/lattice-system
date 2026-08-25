@@ -787,6 +787,41 @@ def approved_changes(text: str) -> str:
             "every tower member and every normalized ground vector. | "
             "`Fermion/JordanWigner/Hubbard/LiebFerrimagnetismDischarge.lean` |",
         )
+        # PR-5 of the Theorem 10.8 discharge arc (#5357) discharges the axiom itself; the
+        # row's status/proof-sketch prose is rewritten to reflect the completed theorem.
+        .replace(
+            "| `totalPairAnnihilationOperator` / `totalPairCreationOperator` / "
+            "`totalPairCorrelationOperator` / `symmetricAttractiveHubbardHamiltonian` / "
+            "`liebShenQiuPairLowerBound` / `theorem_10_8_lieb_shen_qiu_superconductivity` | **Theorem "
+            "10.8** (Lieb–Shen–Qiu superconductivity; Tasaki §10.2.3, p. 359, eq. (10.2.22), "
+            "**AXIOM**): for the **symmetric** attractive Hubbard model `Ĥhop − Σ_x "
+            "U_x(n̂_↑−½)(n̂_↓−½)` (eq. (10.2.21)) on a bipartite lattice with even `N`, `2\\|B\\| ≤ N ≤ "
+            "2\\|A\\|`, the unique ground state satisfies `⟨φ\\| b̂† b̂ \\|φ⟩ ≥ (\\|A\\|−N/2)(N/2−\\|B\\|)` "
+            "with `b̂ = Σ_x ĉ_{x↓}ĉ_{x↑}` — off-diagonal long-range order (fermion-pair condensation "
+            "/ superconductivity). Reflection positivity + Theorem 10.2 uniqueness → faithful "
+            "documented axiom. | `Fermion/JordanWigner/Hubbard/LiebShenQiu.lean` |",
+            "| `totalPairAnnihilationOperator` / `totalPairCreationOperator` / "
+            "`totalPairCorrelationOperator` / `symmetricAttractiveHubbardHamiltonian` / "
+            "`liebShenQiuPairLowerBound` / `theorem_10_8_lieb_shen_qiu_superconductivity` | **Theorem "
+            "10.8** (Lieb–Shen–Qiu superconductivity; Tasaki §10.2.3, p. 359, eq. (10.2.22), **now "
+            "PROVED — axiom discharged**, Issue #5357, PR #5362 PR-5; `#print axioms` = std3): for "
+            "the **symmetric** attractive Hubbard model `Ĥhop − Σ_x U_x(n̂_↑−½)(n̂_↓−½)` (eq. "
+            "(10.2.21)) on a bipartite lattice with even `Ne`, `2\\|B\\| ≤ Ne ≤ 2\\|A\\|`, the unique "
+            "ground state satisfies `⟨φ\\| b̂† b̂ \\|φ⟩ ≥ (\\|A\\|−Ne/2)(Ne/2−\\|B\\|)` with `b̂ = Σ_x "
+            "ĉ_{x↓}ĉ_{x↑}` — off-diagonal long-range order (fermion-pair condensation / "
+            "superconductivity). **Proof**: below the top of the band (`Ne < 2(N+1)`), centring away "
+            "the interaction (`liebShenQiu_attractiveGround_of_symmetric`) turns the ground state "
+            "into a plain-attractive one, whose singlet property (Theorem 10.2) and Theorem 10.3's "
+            "pair-transfer positivity drive the Shiba transport of §10.2.3 onto the spin-`z` sector "
+            "`Ŝ³ = (Ne−(N+1))/2` of the symmetric repulsive model at half filling, where Theorem 10.4 "
+            "fixes the Casimir value; the ladder identity `Ŝ⁺Ŝ⁻ = Ŝ² − Ŝ³(Ŝ³−1)` and the Shiba "
+            "identity (eq. (10.2.13)) convert that into the sublattice-signed pair sum, whose signs "
+            "can only decrease the strictly positive terms. At the top of the band (`Ne = 2(N+1)`) "
+            "the bound degenerates to `0` and follows from `⟨φ\\|b̂ᴴb̂\\|φ⟩ ≥ 0` alone. Theorem 10.5 is "
+            "**not** used — the sign step is re-derived directly from the Shiba identity plus Theorem "
+            "10.3's strict positivity. | `Fermion/JordanWigner/Hubbard/LiebShenQiu.lean`; "
+            "`Fermion/JordanWigner/Hubbard/LiebShenQiuDischarge.lean` |",
+        )
     )
 
 
