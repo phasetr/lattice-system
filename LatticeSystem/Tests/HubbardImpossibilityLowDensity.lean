@@ -433,15 +433,16 @@ example {M : ℕ} (t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) (w : Fin (M + 1) 
 /-!
 ## Theorem 11.4 PR-5 — translation invariance and the delocalised lowest eigenmode
 
-The next six tests are Reds against the four PR-5 declarations
+The eight Reds below pin the four PR-5 declarations of
+`LatticeSystem/Math/MatrixAnalysis/PermInvariantUniformEigenvector.lean`
 (`commute_toPEquiv_toMatrix_of_perm_invariant`,
 `norm_apply_eq_norm_apply_of_comp_perm_smul`, `eigenspace_mulVecLin_ne_bot_of_map_eq`,
 `exists_uniformModulus_eigenvector_of_transitive_perm_invariance`), per
-`.self-local/docs/theorem-11-4-pr5-design.md` §5.  PR-5's production module
-(`LatticeSystem/Math/MatrixAnalysis/PermInvariantUniformEigenvector.lean`) does not exist yet, so
-Reds 20/21/23/24/25 fail to elaborate on the identifiers above (`unknown identifier`); Red 22 is
-the sharpness guard and needs none of them — it is provable today, purely from existing mathlib
-API, as the counterexample showing `_htransitive` cannot be dropped from A4.
+`.self-local/docs/theorem-11-4-pr5-design.md` §5.  Reds 20/21/21b consume the capstone A4 — its
+normalisation at two sizes, then its eigen-equation on a non-diagonal matrix at a nonzero
+eigenvalue; Reds 23/23b pin A1 and the failure of A1's hypothesis; Red 24 pins A3 and Red 25 pins
+A2 in isolation.  Red 22 alone references none of the four: it is the standalone sharpness
+counterexample, built from existing mathlib API, showing `_htransitive` cannot be dropped from A4.
 -/
 
 /-- **Red 20.** Application-shape / non-vacuity guard for A4 at `M = 1`. With `σ = Equiv.swap 0 1`
@@ -498,6 +499,38 @@ example :
       htrans htransitive hlam
   exact ⟨v, hv, fun x => by simpa using hmod x⟩
 
+/-- **Red 21b (A4's eigen-equation exercised).** Reds 20/21 run A4 at `t = 0`, `lam = 0`, where the
+eigen-equation `0 = 0 • v` holds for every `v`; here `t = ![![0, 1], ![1, 0]]` is swap-invariant
+but not diagonal and `lam = 1` is a genuine eigenvalue (eigenspace spanned by `![1, 1]`), so the
+returned `v` has to satisfy `t.mulVec v = 1 • v` — whence `v 1 = v 0` — on top of the uniform
+modulus. -/
+example :
+    ∃ v : Fin 2 → ℂ, (Matrix.of ![![(0 : ℂ), 1], ![1, 0]]).mulVec v = (1 : ℂ) • v
+      ∧ v 1 = v 0 ∧ ∀ x, ‖v x‖ ^ 2 = 1 / 2 := by
+  have htrans : ∀ i j : Fin 2,
+      (Matrix.of ![![(0 : ℂ), 1], ![1, 0]]) (Equiv.swap (0 : Fin 2) 1 i)
+          (Equiv.swap (0 : Fin 2) 1 j)
+        = (Matrix.of ![![(0 : ℂ), 1], ![1, 0]]) i j := by
+    intro i j; fin_cases i <;> fin_cases j <;> simp
+  have htransitive : ∀ i j : Fin 2, ∃ k : ℕ, ((Equiv.swap (0 : Fin 2) 1) ^ k) i = j := by
+    intro i j; fin_cases i <;> fin_cases j <;> first | exact ⟨0, rfl⟩ | exact ⟨1, by decide⟩
+  have hlam : Module.End.eigenspace
+      (Matrix.of ![![(0 : ℂ), 1], ![1, 0]]).mulVecLin (1 : ℂ) ≠ ⊥ := by
+    rw [Submodule.ne_bot_iff]
+    refine ⟨![1, 1], ?_, ?_⟩
+    · rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
+      funext x
+      fin_cases x <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_succ]
+    · intro h
+      have := congrFun h 0
+      simp at this
+  obtain ⟨v, hv, hmod⟩ :=
+    LatticeSystem.Math.exists_uniformModulus_eigenvector_of_transitive_perm_invariance
+      htrans htransitive hlam
+  refine ⟨v, hv, ?_, fun x => by simpa using hmod x⟩
+  have hv0 := congrFun hv 0
+  simpa [Matrix.mulVec, dotProduct, Fin.sum_univ_succ] using hv0
+
 /-- **Red 22 (sharpness of `_htransitive`).** With `σ = 1` (the identity), `htrans` holds for
 *every* matrix `t` — in particular for `t = Matrix.diagonal ![0, 1]` at `lam = 0` — so if the
 transitivity hypothesis were droppable from A4, every `0`-eigenvector of this `t` would have
@@ -539,9 +572,7 @@ example :
 
 /-- **Red 24 (A3 pinned).** On the `1 × 1` zero matrix (trivially Hermitian), taking
 `ε := hT.eigenvalues` makes `hspec` the reflexive multiset equality, and
-`eigenspace_mulVecLin_ne_bot_of_map_eq` must still deliver a non-trivial eigenspace at `ε 0`.
-Guards the `Multiset.map` direction (an inverted `hspec` would still typecheck but state a
-different fact). -/
+`eigenspace_mulVecLin_ne_bot_of_map_eq` must still deliver a non-trivial eigenspace at `ε 0`. -/
 example :
     Module.End.eigenspace (0 : Matrix (Fin 1) (Fin 1) ℂ).mulVecLin
         (((Matrix.isHermitian_zero (n := Fin 1) (α := ℂ)).eigenvalues 0 : ℝ) : ℂ)

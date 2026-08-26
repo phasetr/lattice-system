@@ -11455,8 +11455,14 @@ eqs.~(F.8)--(F.11), pp.~545--546.
 eigenmode (Tasaki §11.1.1, \texttt{Math/MatrixAnalysis/PermInvariantUniformEigenvector.lean}).}
 The variational estimate evaluates the double-occupancy weight of
 $\Psi=\hat C^\dagger_\downarrow(v)\Phi_\uparrow$ using $|v_x|^2=1/|\Lambda|$ for the single-particle
-mode $v$, which the paper reads off from translation invariance of the hopping matrix (Appendix~F,
-p.~545).  This stage \emph{derives} that delocalization rather than assuming it, and the derivation
+mode $v$.  The paper does not derive that value: it \emph{assumes} the delocalization bound
+$|\psi^{(p)}_x|\le\alpha/\sqrt{N_{\mathrm{s}}}$ for a constant $\alpha$ (eq.~(F.14), p.~547, with
+$N_{\mathrm{s}}=|\Lambda|$), and remarks that translation invariance in the sense of Appendix~E
+gives $\alpha=\sqrt m$ with $m$ the number of sites in the unit cell; on a site-transitive lattice
+$m=1$, so the bound reads $|\psi_x|\le1/\sqrt{|\Lambda|}$ and normalization turns it into the
+equality used here.  The Bloch form $\psi_x=e^{ik\cdot x}v_{u(x)}$ that translation invariance
+forces on a single-electron eigenstate is Appendix~E, eqs.~(E.3)/(E.5), p.~543.  This stage
+\emph{derives} that delocalization rather than assuming it, and the derivation
 mentions neither the Hubbard model nor fermions --- it is generic finite-dimensional linear algebra
 about a matrix invariant under a transitive permutation symmetry, hence placed in
 \texttt{Math/MatrixAnalysis/} by topic.
@@ -11491,8 +11497,10 @@ eigenvalue and its eigenspace is nontrivial
 (\texttt{eigenspace\_mulVecLin\_ne\_bot\_of\_map\_eq}), a vector of mathlib's spectral
 eigenvector basis serving as the witness.  This stage is again infrastructure only: no statement of
 \texttt{hubbard\_theorem\_11\_4} changes.  Sources: Hal Tasaki, \emph{Physics and Mathematics of
-Quantum Many-Body Systems} (1st ed., Springer 2020), §11.1.1, Theorem 11.4, p.~375; Tasaki,
-Prog.\ Theor.\ Phys.\ \textbf{99} (1998) 489, Theorem 3.3, Appendix~F, p.~545.
+Quantum Many-Body Systems} (1st ed., Springer 2020), §11.1.1, Theorem 11.4, p.~376; Tasaki,
+Prog.\ Theor.\ Phys.\ \textbf{99} (1998) 489, Theorem 3.3, Appendix~F, eq.~(F.14), p.~547 (the
+assumed delocalization bound and its translation-invariant constant), and Appendix~E,
+eqs.~(E.3)/(E.5), p.~543 (the Bloch form of a translation-invariant single-electron eigenstate).
 
 \noindent\textbf{Lemma 11.10} (Tasaki §11.3.1, eqs.~(11.3.1)--(11.3.2), pp.~405--406;
 \textbf{discharged axiom-free}, \texttt{TasakiFlatBandBasisLemma.lean}, Issue \#4477).  On the
