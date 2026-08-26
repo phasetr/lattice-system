@@ -138,6 +138,7 @@ import LatticeSystem.Tests.LiebShenQiuShibaBridge
 import LatticeSystem.Tests.LiebShenQiuPairAlgebra
 import LatticeSystem.Tests.LiebShenQiuDischarge
 import LatticeSystem.Tests.HubbardImpossibilityLowDensity
+import LatticeSystem.Tests.HubbardImpossibilityLowDensityRoth
 
 /-!
 # Test aggregator for the `lattice-system` library
