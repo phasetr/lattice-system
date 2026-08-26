@@ -21,6 +21,7 @@ import LatticeSystem.Fermion.JordanWigner.PartialIsometry
 import LatticeSystem.Fermion.JordanWigner.HoleProjectionsCommute
 import LatticeSystem.Fermion.JordanWigner.HoleProjectionCommuteLadder
 import LatticeSystem.Fermion.JordanWigner.HoleProjectionCommuteNumber
+import LatticeSystem.Fermion.JordanWigner.HoppingCommuteLadder
 import LatticeSystem.Fermion.JordanWigner.CDaggerCLadderZero
 import LatticeSystem.Fermion.JordanWigner.Hubbard
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Charges
@@ -251,6 +252,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowU
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowDensity
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardKineticSpinBounds
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardOnSiteInteractionSingleDown
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowDensityTrialCore
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowDensityTrial
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandBasisLemma
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJModel
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSpinSymmetry
