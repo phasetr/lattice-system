@@ -11548,6 +11548,89 @@ $E_{\mathrm{ferro}}=\sum_{j=1}^{N}\varepsilon_j$ described as one of the lowest 
 §11.1.1, Theorem 11.4, eq.~(11.1.8), p.~376 (the band condition whose level index the enumeration
 supplies).
 
+\medskip\noindent\textbf{Theorem 11.4 PR6, Roth's variational estimate (Tasaki §11.1.1,
+\texttt{Math/MatrixAnalysis/RowSumEigenvalueBound.lean},
+\texttt{HubbardImpossibilityLowDensityRothCore.lean},
+\texttt{HubbardImpossibilityLowDensityRoth.lean}).}  The spin-flip trial state
+$\Psi=\hat C^{\dagger}_{\downarrow}(v)\Phi^{\uparrow}$ of the previous stage still contains doubly
+occupied sites, which cost an energy proportional to $U$.  Roth's device removes them: the
+projected state of (11.1.9) is $\tilde\Psi=\Psi-\hat\nu\Psi$ with
+$\hat\nu=\sum_x\hat n_{x\uparrow}\hat n_{x\downarrow}$, written here as that explicit difference
+rather than through a projection operator $\hat P_0$
+(\texttt{hubbardLowDensityRothState}).  This stage proves the variational bound the state was built
+for: for \emph{every} coupling $U$,
+\[
+  \langle\tilde\Psi,\hat H\tilde\Psi\rangle\ \le\
+  \Bigl(E^{\uparrow}+\varepsilon+8K\frac{|S_{\uparrow}|}{N_{\mathrm s}}\Bigr)\,
+  \|\tilde\Psi\|^{2},
+\]
+where $E^{\uparrow}$ is the Slater energy of $\Phi^{\uparrow}$, $\varepsilon$ the eigenvalue of the
+$\downarrow$ orbital $v$, $N_{\mathrm s}=M+1$ the number of sites, and $K$ a uniform bound on the
+hopping row sums $\sum_y|t_{x,y}|$
+(\texttt{rayleighOnVec\_hubbardHamiltonian\_hubbardLowDensityRothState\_le}).  The coupling does not
+appear on the right because the Coulomb interaction annihilates $\tilde\Psi$ identically, which is
+the previous stage's (F.1)/(F.2) layer; the constant $8$ is explicit, and the side condition
+$2|S_{\uparrow}|\le N_{\mathrm s}$ is a genuine hypothesis, needed to convert
+$\|\Phi^{\uparrow}\|^{2}$ into $\|\tilde\Psi\|^{2}$ and to keep the Roth norm positive
+(\texttt{dotProduct\_star\_self\_hubbardLowDensityRothState\_re},
+\texttt{dotProduct\_star\_self\_hubbardLowDensityRothState\_pos}).
+
+Appendix~F reaches this bound through a Fourier mode representation; three of its steps are
+\emph{replaced} rather than reproduced, and one is sharpened.  The doubly occupied component is
+computed exactly, $\hat\nu\Psi=\sum_x v_x\hat c^{\dagger}_{x\downarrow}(\hat n_{x\uparrow}
+\Phi^{\uparrow})$, and the parity factorization of the previous stage turns any quadratic form in
+it into a diagonal sum over sites
+(\texttt{hubbardOnSiteInteraction\_one\_mulVec\_hubbardLowDensityTrialState},
+\texttt{dotProduct\_star\_hubbardOnSiteInteraction\_trial\_sandwich}).  At the identity this gives
+the double-occupancy weight $\langle\Psi,\hat\nu\Psi\rangle=(|S_{\uparrow}|/N_{\mathrm s})
+\|\Phi^{\uparrow}\|^{2}$ exactly, replacing (F.8) --- and, because only the uniformity of the
+$\downarrow$ orbital is used, requiring \emph{no} delocalization of the occupied
+$\uparrow$ modes
+(\texttt{dotProduct\_star\_hubbardOnSiteInteraction\_hubbardLowDensityTrialState}).  The
+majority-spin correction, which (F.9) evaluates through the mode expansion (F.4)--(F.7), is instead
+obtained from an exact canonical-anticommutation identity, the \emph{number sandwich}
+\[
+  \hat n_{x\sigma}\hat H^{\sigma}\hat n_{x\sigma}
+  =\hat n_{x\sigma}\hat H^{\sigma}
+   -\sum_z t_{x,z}\,\hat c^{\dagger}_{x\sigma}\hat c_{z\sigma}
+   +t_{x,x}\,\hat n_{x\sigma},
+\]
+proved for both spin labels from four elementary relations
+($\hat n\hat c^{\dagger}=\hat c^{\dagger}$, $\hat c^{\dagger}\hat n=0$, $\hat n\hat c=0$,
+$\hat n^{2}=\hat n$) together with the commutations at distinct modes
+(\texttt{fermionMultiNumber\_mul\_hubbardKineticSpin\_mul\_self}); summing it against the site
+weights leaves $E^{\uparrow}\langle\Psi,\hat\nu\Psi\rangle$ plus a remainder bounded by
+$2K|S_{\uparrow}|/N_{\mathrm s}$ times $\|\Phi^{\uparrow}\|^{2}$, so the mode expansion
+(F.4)--(F.7) is never formalized
+(\texttt{rayleighOnVec\_hubbardKineticSpin\_zero\_doubleOccupancy\_le}).  The minority-spin
+correction of (F.10)/(F.11) is not evaluated at all: the operator bound
+$\hat H^{\downarrow}\le K\hat N_{\downarrow}$ of the PR2 layer applies because $\hat\nu\Psi$ still
+carries a single $\downarrow$ electron, so the two-point remainder $R$ of (F.11) is never
+constructed (\texttt{rayleighOnVec\_hubbardKineticSpin\_one\_doubleOccupancy\_le}).  Collecting the
+three contributions reproduces the shape of (F.12)/(F.13), with the $\bar t$-type terms bounded by
+$K$ rather than averaged.
+
+The constant $K$ is not an extra assumption.  Appendix~F, p.~547, already assumes that
+$\max_{x}t_{x,x}$, $\max_{x}\sum_{y}|t_{x,y}|$ and $\varepsilon_1$ converge to finite quantities,
+which is exactly the row-sum hypothesis used here; and the two eigenvalue bounds it is applied
+through, $|\varepsilon_j|\le K$ and $|\varepsilon|\le K$, are a corollary of Gershgorin's circle
+theorem rather than a hand-rolled argument: Gershgorin puts $\lambda$ within
+$\sum_{y\neq k}|t_{k,y}|$ of $t_{k,k}$ for \emph{some} row $k$, and adding the centre back to the
+radius turns that into the $\ell^{\infty}$ estimate
+$|\lambda|\le\sum_y|t_{k,y}|\le\max_x\sum_y|t_{x,y}|$
+(\texttt{norm\_le\_of\_mulVec\_eq\_smul\_of\_rowSum\_le},
+\texttt{abs\_eigenvalues\_le\_of\_rowSum\_le}).  That corollary mentions no fermion, no Hubbard
+model and no textbook, so it is placed in \texttt{Math/MatrixAnalysis/} by topic.  Finally,
+(F.14)'s \emph{assumed} bound $|\psi^{(p)}_x|\le\alpha/\sqrt{N_{\mathrm s}}$ is not assumed anywhere
+in this development: the previous stage derives the uniform modulus of the $\downarrow$ orbital from
+translation invariance, and the majority-spin channel needs no such bound at all.  This stage is
+still infrastructure: no statement of \texttt{hubbard\_theorem\_11\_4} changes.  Sources: Hal
+Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems} (1st ed., Springer 2020),
+§11.1.1, Theorem 11.4, eqs.~(11.1.9)/(11.1.10), p.~376; Tasaki, Prog.\ Theor.\ Phys.\ \textbf{99}
+(1998) 489, Theorem 3.3, Appendix~F, eqs.~(F.1)--(F.3) and (F.8)--(F.13), pp.~545--546, together
+with the boundedness assumption on $\max_x t_{x,x}$, $\max_x\sum_y|t_{x,y}|$ and $\varepsilon_1$
+stated on p.~547.
+
 \noindent\textbf{Lemma 11.10} (Tasaki §11.3.1, eqs.~(11.3.1)--(11.3.2), pp.~405--406;
 \textbf{discharged axiom-free}, \texttt{TasakiFlatBandBasisLemma.lean}, Issue \#4477).  On the
 decorated lattice $\Lambda=E\cup I$ the localized states $\{\alpha_p\}_{p\in E}$ (metallic) and
