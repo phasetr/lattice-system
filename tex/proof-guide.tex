@@ -11502,6 +11502,52 @@ Prog.\ Theor.\ Phys.\ \textbf{99} (1998) 489, Theorem 3.3, Appendix~F, eq.~(F.14
 assumed delocalization bound and its translation-invariant constant), and Appendix~E,
 eqs.~(E.3)/(E.5), p.~543 (the Bloch form of a translation-invariant single-electron eigenstate).
 
+\medskip\noindent\textbf{Theorem 11.4 PR5b, the monotone re-enumeration of the single-particle
+spectrum and its lowest levels (Tasaki §11.1,
+\texttt{Math/MonotoneEnumeration.lean}).}  The book writes ``we also assume that the energy
+eigenvalues are ordered as $\varepsilon_j\le\varepsilon_{j+1}$'' (p.~375) and thereafter reads the
+ferromagnetic energy off that ordering: $|\Phi^\uparrow_{\mathrm{GS}}\rangle$ of (11.1.5) is
+``one of the \emph{lowest} energy states'' with $S_{\mathrm{tot}}=S_{\max}$, ``whose energy is
+$E_{\mathrm{ferro}}=\sum_{j=1}^{N}\varepsilon_j$''.  Formally the ordering is not an assumption but
+a \emph{re-enumeration}: mathlib's spectral theorem hands out the eigenvalues of the hopping matrix
+in an arbitrary order, as a family $g$ indexed by the site type, and what the book calls
+$\varepsilon$ is a monotone family carrying the same values.  The content of this stage is that
+these two descriptions determine each other, and that the book's three uses of the ordering follow.
+
+The bridge is that a monotone $\varepsilon$ with the same multiset of values as $g$ is exactly $g$
+read along the sorting permutation of $g$, $\varepsilon=g\circ\mathrm{sort}(g)$
+(\texttt{eq\_comp\_sort\_of\_monotone\_of\_map\_eq}).  The multiset hypothesis becomes a permutation
+of the underlying lists, and two lists that are permutations of each other and both sorted are
+equal.  This is close to, but is not, mathlib's \texttt{Tuple.unique\_monotone}, which compares two
+permutations of one and the same tuple, whereas here $\varepsilon$ and $g$ are unrelated families
+tied only by the multiset equality.
+
+Sums of ``the $k$ lowest levels'' are then spelled $\sum_{i<k}\varepsilon_i$, with the book's
+$j=1,\dots,N$ read as $i=0,\dots,N-1$.  Three facts follow, one for each use the book makes of the
+ordering.  First, minimality: for \emph{any} $k$-element set $S$ of single-electron levels,
+$\sum_{i<k}\varepsilon_i\le\sum_{p\in S}g_p$
+(\texttt{sum\_lowestLevels\_le\_sum\_of\_map\_eq}).  This is the formal content of ``one of the
+lowest energy states'', and it is the one genuinely new ingredient, mathlib having no counterpart:
+enumerating $S$ in increasing order, its $i$-th smallest element has index at least $i$ (a strictly
+monotone map of index types does not decrease the index), so monotonicity of $\varepsilon$ compares
+the two sums term by term.  Second, attainment: some $k$-element set realizes that value
+(\texttt{exists\_lowestLevels\_finset\_of\_map\_eq}), the image of the first $k$ indices under the
+sorting permutation; this is the occupied set of (11.1.5), produced existentially so that no new
+definition of it is introduced.  Third, the split
+$\sum_{i<k+1}\varepsilon_i=\sum_{i<k}\varepsilon_i+\varepsilon_k$
+(\texttt{sum\_lowestLevels\_succ}), which separates the highest occupied level --- the one that
+(11.1.6) removes --- and is the hook by which the band condition (11.1.8) enters at level $n=N$.
+
+Like the ordering itself, none of this mentions the Hubbard model, fermions, or even a matrix: it is
+order theory about families indexed by a finite ordinal, stated for an abstract linearly ordered
+value type, so it is placed in \texttt{Math/} by topic.  This stage is again infrastructure only: no
+statement of \texttt{hubbard\_theorem\_11\_4} changes.  Sources: Hal Tasaki, \emph{Physics and
+Mathematics of Quantum Many-Body Systems} (1st ed., Springer 2020), §11.1, p.~375 (the ordering
+assumption $\varepsilon_j\le\varepsilon_{j+1}$, and eqs.~(11.1.5)/(11.1.6) with
+$E_{\mathrm{ferro}}=\sum_{j=1}^{N}\varepsilon_j$ described as one of the lowest energy states), and
+§11.1.1, Theorem 11.4, eq.~(11.1.8), p.~376 (the band condition whose level index the enumeration
+supplies).
+
 \noindent\textbf{Lemma 11.10} (Tasaki §11.3.1, eqs.~(11.3.1)--(11.3.2), pp.~405--406;
 \textbf{discharged axiom-free}, \texttt{TasakiFlatBandBasisLemma.lean}, Issue \#4477).  On the
 decorated lattice $\Lambda=E\cup I$ the localized states $\{\alpha_p\}_{p\in E}$ (metallic) and
