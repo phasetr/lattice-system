@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowDensity
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardKineticSpinBounds
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardOnSiteInteractionSingleDown
 import LatticeSystem.Fermion.JordanWigner.Hubbard.ChargesCore
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveCoeffAction
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveBalancedSectorGround
