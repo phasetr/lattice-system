@@ -182,7 +182,7 @@ theorem hubbard_groundEnergy_eq_trace {E₀ : ℂ}
   · exact (sub_eq_zero.mp h).symm
   · exact absurd h hne
 
-/-- **Tasaki Theorem 11.3 (impossibility of ferromagnetism for small `U`), AXIOM.**  Let `E₀` be the
+/-- **Tasaki Theorem 11.3 (impossibility of ferromagnetism for small `U`).**  Let `E₀` be the
 genuine half-filling (`N + 1`-electron) ground energy of the Hubbard model with Hermitian hopping
 `t`: its eigenspace is nonzero (`hne`) and `E₀` is minimal among energies with a nonzero
 `(N + 1)`-electron eigenspace (`hmin`).  If `0 ≤ U` is strictly below the single-particle Fermi gap
