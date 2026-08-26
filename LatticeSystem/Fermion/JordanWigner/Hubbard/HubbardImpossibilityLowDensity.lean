@@ -49,14 +49,18 @@ impossibility statement is sound.  Translation invariance is required genuinely 
 acts transitively, ruling out the trivial `σ = id`), and the filling is nontrivial (`2 ≤ Ne`, the
 zero- and one-electron sectors are trivially maximal-spin).
 
-Two hypotheses strengthen Tasaki's bare statement, in the idiom already used for Theorem 11.3.
-`_hK` bounds the row sums of `t` uniformly by the outer parameter `K`: since `ρ₁` is fixed before
-`t` while the variational energy gain scales with the hopping, no size-uniform `ρ₁` can exist
-without a scale fixed in advance; every concrete `t` admits such a `K`, so only the order of the
-quantifiers is restricted.  `_hNen₀` demands `2 * n₀ ≤ Ne`: below `2 n₀` the band condition
-(11.1.8) degenerates (for `Ne ≤ n₀` it constrains nothing), and that degenerate regime is precisely
-the flat band where ferromagnetism does occur, so the unrestricted statement is not merely
-unprovable but false.
+Two hypotheses strengthen Tasaki's bare statement, in the idiom already used for the Hermiticity
+hypotheses of Proposition 11.2.  `_hK` bounds the row sums of `t` uniformly by the outer parameter
+`K`, which is what the variational estimate available here needs given the order of the
+quantifiers: `ρ₁` is fixed before `t`, and that estimate weighs the kinetic cost of the trial state
+against the band constant `c`, so the threshold it yields is governed by the ratio `c/K` and an
+upper bound on the bandwidth has to be fixed in advance; every concrete `t` admits such a `K`, so
+only the order of the quantifiers is restricted.  `_hNen₀` demands `2 * n₀ ≤ Ne`: the band
+condition (11.1.8) leaves the lowest `n₀` levels unconstrained, and by spin degeneracy `Ne`
+electrons occupy the lowest `⌈Ne/2⌉` levels, so `2 * n₀ ≤ Ne` is what puts the top occupied level
+inside the constrained range `n ≥ n₀`.  Below it the band condition says nothing about the occupied
+levels — the flat-band regime where ferromagnetism does occur — so this variational approach gives
+no bound there.
 
 Tasaki's proof uses the Roth/Gutzwiller projected trial state and the analytic estimate furnished
 by (11.1.8); it is recorded here as an axiom pending discharge. -/
