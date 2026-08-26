@@ -51,6 +51,17 @@ theorem fermionTotalDownNumber_mulVec_spinfulGeneralBasisState_empty
   rw [fermionTotalDownNumber_mulVec_spinfulGeneralBasisState e SUp ∅, Finset.card_empty,
     Nat.cast_zero, zero_smul]
 
+/-- **The fully polarized Slater determinant carries `|SUp|` electrons**: `N̂Φ↑ = |SUp|Φ↑`.  The
+mode monomial has one factor per element of `SUp`, and the total number operator counts the
+factors. -/
+theorem fermionTotalNumber_mulVec_spinfulGeneralBasisState_empty
+    (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (SUp : Finset (Fin (M + 1))) :
+    (fermionTotalNumber (2 * M + 1)).mulVec (spinfulGeneralBasisState e SUp ∅)
+      = ((SUp.card : ℕ) : ℂ) • spinfulGeneralBasisState e SUp ∅ := by
+  rw [spinfulGeneralBasisState, fermionTotalNumber_mulVec_generalModeMonomial,
+    spinfulSubsetPairList_length, Finset.card_empty]
+  norm_num
+
 /-! ## Particle content of the trial state -/
 
 /-- **The trial state carries exactly one ↓ electron**: `N̂_↓Ψ = Ψ`.  Adding a ↓ creation to a
@@ -73,11 +84,7 @@ theorem fermionTotalNumber_mulVec_hubbardLowDensityTrialState
     (v : Fin (M + 1) → ℂ) :
     (fermionTotalNumber (2 * M + 1)).mulVec (hubbardLowDensityTrialState e SUp v)
       = ((SUp.card + 1 : ℕ) : ℂ) • hubbardLowDensityTrialState e SUp v := by
-  have hN : (fermionTotalNumber (2 * M + 1)).mulVec (spinfulGeneralBasisState e SUp ∅)
-      = ((SUp.card : ℕ) : ℂ) • spinfulGeneralBasisState e SUp ∅ := by
-    rw [spinfulGeneralBasisState, fermionTotalNumber_mulVec_generalModeMonomial,
-      spinfulSubsetPairList_length, Finset.card_empty]
-    norm_num
+  have hN := fermionTotalNumber_mulVec_spinfulGeneralBasisState_empty e SUp
   rw [hubbardLowDensityTrialState, Matrix.mulVec_mulVec,
     fermionTotalNumber_mul_spinfulCreationFromVector, Matrix.add_mulVec,
     ← Matrix.mulVec_mulVec, hN, Matrix.mulVec_smul, Nat.cast_add, Nat.cast_one, add_smul,
@@ -254,6 +261,22 @@ theorem hubbardKineticSpin_commute_spinfulCreationFromVector_of_ne (M : ℕ)
 
 /-! ## The kinetic energy of the trial state -/
 
+/-- **The ↑ kinetic fiber carries the whole Slater energy of the fully polarized state**:
+`Ĥ^↑Φ↑ = (Σ_{j ∈ SUp} ε_j)Φ↑`.  The ↓ fiber annihilates `Φ↑`, so the aggregate kinetic action
+`hubbardKinetic_mulVec_spinfulGeneralBasisState` reduces to the ↑ fiber alone. -/
+theorem hubbardKineticSpin_zero_mulVec_spinfulGeneralBasisState_empty
+    {t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : t.IsHermitian)
+    (SUp : Finset (Fin (M + 1))) :
+    (hubbardKineticSpin M t 0).mulVec (spinfulGeneralBasisState (eigenbasisAsBasis hT) SUp ∅)
+      = occupiedEigenEnergy hT SUp ∅ • spinfulGeneralBasisState (eigenbasisAsBasis hT) SUp ∅ := by
+  have hdown : (hubbardKineticSpin M t 1).mulVec
+      (spinfulGeneralBasisState (eigenbasisAsBasis hT) SUp ∅) = 0 :=
+    hubbardKineticSpin_one_mulVec_eq_zero_of_downNumber_zero M t
+      (fermionTotalDownNumber_mulVec_spinfulGeneralBasisState_empty _ SUp)
+  have hsum := hubbardKinetic_mulVec_spinfulGeneralBasisState hT SUp ∅
+  rw [hubbardKinetic_eq_hubbardKineticSpin_add, Matrix.add_mulVec, hdown, add_zero] at hsum
+  exact hsum
+
 /-- **The trial state is a kinetic eigenvector**: if `t·v = ε v` then
 `Ĥ_kin Ψ = (Σ_{j ∈ SUp} ε_j + ε)Ψ`, the kinetic energy of the spin-flipped state, which the book
 records as unnumbered running text on p. 375.  The up fiber passes through the ↓ creation and
@@ -272,12 +295,7 @@ theorem hubbardKinetic_mulVec_hubbardLowDensityTrialState
   have hdown : (hubbardKineticSpin M t 1).mulVec
       (spinfulGeneralBasisState (eigenbasisAsBasis hT) SUp ∅) = 0 :=
     hubbardKineticSpin_one_mulVec_eq_zero_of_downNumber_zero M t h0
-  have hup : (hubbardKineticSpin M t 0).mulVec
-      (spinfulGeneralBasisState (eigenbasisAsBasis hT) SUp ∅)
-      = occupiedEigenEnergy hT SUp ∅ • spinfulGeneralBasisState (eigenbasisAsBasis hT) SUp ∅ := by
-    have hsum := hubbardKinetic_mulVec_spinfulGeneralBasisState hT SUp ∅
-    rw [hubbardKinetic_eq_hubbardKineticSpin_add, Matrix.add_mulVec, hdown, add_zero] at hsum
-    exact hsum
+  have hup := hubbardKineticSpin_zero_mulVec_spinfulGeneralBasisState_empty hT SUp
   rw [hubbardLowDensityTrialState, hubbardKinetic_eq_hubbardKineticSpin_add, Matrix.add_mulVec,
     Matrix.mulVec_mulVec, Matrix.mulVec_mulVec,
     (hubbardKineticSpin_commute_spinfulCreationFromVector_of_ne M t v
