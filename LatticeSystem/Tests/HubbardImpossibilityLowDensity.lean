@@ -8,6 +8,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveBalancedSectorGr
 import LatticeSystem.Quantum.SpinS.RayleighInfMatrix
 import LatticeSystem.Math.MatrixAnalysis.CourantFischer
 import LatticeSystem.Math.MatrixAnalysis.PermInvariantUniformEigenvector
+import LatticeSystem.Math.MonotoneEnumeration
 import Mathlib.Data.Matrix.PEquiv
 
 /-!
@@ -632,7 +633,8 @@ example : (1 : ℕ) ≤ 3 := by
   have hk : (2 : ℕ) ≤ 3 := by decide
   have hS : ({0, 2} : Finset (Fin 3)).card = 2 := by decide
   have h := LatticeSystem.Math.sum_lowestLevels_le_sum_of_map_eq hk hmono hspec hS
-  have hlhs : (∑ i : Fin 2, (![0, 1, 2] : Fin 3 → ℕ) (Fin.castLE hk i)) = 1 := by decide
+  have hlhs : (∑ i : Fin 2, (![0, 1, 2] : Fin 3 → ℕ) (Fin.castLE hk i)) = 1 := by
+    simp [Fin.sum_univ_succ]
   have hrhs : (∑ p ∈ ({0, 2} : Finset (Fin 3)), (![2, 0, 1] : Fin 3 → ℕ) p) = 3 := by decide
   rw [hlhs, hrhs] at h
   exact h
@@ -649,7 +651,8 @@ example :
   obtain ⟨S, hScard, hSsum⟩ :=
     LatticeSystem.Math.exists_lowestLevels_finset_of_map_eq hk hmono hspec
   refine ⟨S, hScard, ?_⟩
-  have hrhs : (∑ i : Fin 2, (![0, 1, 2] : Fin 3 → ℕ) (Fin.castLE hk i)) = 1 := by decide
+  have hrhs : (∑ i : Fin 2, (![0, 1, 2] : Fin 3 → ℕ) (Fin.castLE hk i)) = 1 := by
+    simp [Fin.sum_univ_succ]
   rw [hSsum, hrhs]
 
 /-- **Red 29 (C5 pinned, off-by-one).** `∑ i : Fin 3, ε (castLE _ i)
@@ -658,11 +661,15 @@ example :
 example : (3 : ℕ) = 1 + 2 := by
   have hk : (2 : ℕ) + 1 ≤ 3 := le_refl 3
   have h := LatticeSystem.Math.sum_lowestLevels_succ (ε := (![0, 1, 2] : Fin 3 → ℕ)) hk
-  have hlhs : (∑ i : Fin 3, (![0, 1, 2] : Fin 3 → ℕ) (Fin.castLE hk i)) = 3 := by decide
+  have hlhs : (∑ i : Fin 3, (![0, 1, 2] : Fin 3 → ℕ) (Fin.castLE hk i)) = 3 := by
+    simp [Fin.sum_univ_succ]
   have hrhs1 : (∑ i : Fin 2, (![0, 1, 2] : Fin 3 → ℕ)
-      (Fin.castLE (Nat.le_of_succ_le hk) i)) = 1 := by decide
-  have hrhs2 : (![0, 1, 2] : Fin 3 → ℕ) ⟨2, hk⟩ = 2 := by decide
-  rw [hlhs, hrhs1, hrhs2] at h
+      (Fin.castLE (Nat.le_of_succ_le hk) i)) = 1 := by
+    simp [Fin.sum_univ_succ]
+  have hrhs2 : (![0, 1, 2] : Fin 3 → ℕ) ⟨2, hk⟩ = 2 := by simp
+  -- `rewrite`, not `rw`: the latter's trailing `rfl` would close the goal on its own and the
+  -- rewritten `h` would no longer be what discharges it.
+  rewrite [hlhs, hrhs1, hrhs2] at h
   exact h
 
 /-- **Red 30 (sharpness of `hmono` — the load-bearing hypothesis).** Standalone, using none of

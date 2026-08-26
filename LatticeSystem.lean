@@ -2,6 +2,7 @@ import LatticeSystem.Math.GramEigenspaceCorrespondence
 import LatticeSystem.Math.RayleighAtEigenvector
 import LatticeSystem.Math.RealEigenvalueLePF
 import LatticeSystem.Math.EffectiveLimit
+import LatticeSystem.Math.MonotoneEnumeration
 import LatticeSystem.Math.MatrixAnalysis.Decomposition
 import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationReducedResolvent
 import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationFeshbach
