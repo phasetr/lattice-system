@@ -57,6 +57,18 @@ noncomputable def eigenNumberOp {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT
   spinfulCreationFromVector M (eigenbasisAsBasis hT j) σ
     * spinfulAnnihilationFromVector M (star (eigenbasisAsBasis hT j : Fin (M + 1) → ℂ)) σ
 
+/-- **The eigenmode number operator is positive-semidefinite**: writing
+`A = Ĉ_σ(ē_j)`, the adjoint relation `Aᴴ = Ĉ†_σ(e_j)` turns `n̂_{j,σ}` into the Gram matrix
+`Aᴴ·A`. -/
+theorem eigenNumberOp_posSemidef {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : T.IsHermitian)
+    (j : Fin (M + 1)) (σ : Fin 2) : (eigenNumberOp hT j σ).PosSemidef := by
+  set A := spinfulAnnihilationFromVector M
+    (star (eigenbasisAsBasis hT j : Fin (M + 1) → ℂ)) σ with hA
+  have hgram : eigenNumberOp hT j σ = Aᴴ * A := by
+    rw [eigenNumberOp, hA, spinfulAnnihilationFromVector_conjTranspose, star_star]
+  rw [hgram]
+  exact Matrix.posSemidef_conjTranspose_mul_self A
+
 /-- **The number-operator/creation commutation** `n̂_{j,σ}·Ĉ†_τ(e_k) = δ_{jk}δ_{στ}·Ĉ†_τ(e_k) +
 Ĉ†_τ(e_k)·n̂_{j,σ}`: creating mode `(k,τ)` raises the `(j,σ)`-count by `δ`.  From the dual CAR and
 the creation–creation anticommutation. -/
