@@ -13,6 +13,7 @@ import LatticeSystem.Math.MatrixAnalysis.BlockTransport
 import LatticeSystem.Math.MatrixAnalysis.SubmatrixGroundState
 import LatticeSystem.Math.MatrixAnalysis.PiEuclideanEigenBridge
 import LatticeSystem.Math.MatrixAnalysis.PiDiagonalEigenspace
+import LatticeSystem.Math.MatrixAnalysis.PermInvariantUniformEigenvector
 import LatticeSystem.Math.WignerTheorem
 import LatticeSystem.Math.ProjectiveRepresentation
 import LatticeSystem.Math.CStarAlgebra.GNS
