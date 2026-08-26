@@ -7,6 +7,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveCoeffAction
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveBalancedSectorGround
 import LatticeSystem.Quantum.SpinS.RayleighInfMatrix
 import LatticeSystem.Math.MatrixAnalysis.CourantFischer
+import LatticeSystem.Math.MatrixAnalysis.PermInvariantUniformEigenvector
 import Mathlib.Data.Matrix.PEquiv
 
 /-!
@@ -522,7 +523,7 @@ example :
     Commute ((Equiv.swap (0 : Fin 2) 1).toPEquiv.toMatrix : Matrix (Fin 2) (Fin 2) ℂ)
       (Matrix.of ![![(1 : ℂ), 2], ![2, 1]]) :=
   LatticeSystem.Math.commute_toPEquiv_toMatrix_of_perm_invariant
-    (fun i j => by fin_cases i <;> fin_cases j <;> simp [Equiv.swap_apply_def])
+    (fun i j => by fin_cases i <;> fin_cases j <;> simp)
 
 /-- **Red 23b (A1's hypothesis pinned).** `htrans` itself *fails* for
 `t = Matrix.diagonal ![0, 1]` under `σ = Equiv.swap 0 1` — pinning that A1's hypothesis is the
