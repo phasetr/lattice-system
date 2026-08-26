@@ -11269,18 +11269,29 @@ built like the §11.5 t-J \texttt{TJFilling} pattern) then produces a genuine $(
 $\hat H$-eigenvalue $E$ with $E<E_0$ and nonempty eigenspace, contradicting the minimality of $E_0$
 (\texttt{hmin}).  Another book-order Chapter 11 backfill.
 
-\noindent\textbf{Theorem 11.4} (Tasaki §11.1.1, eqs.~(11.1.8)--(11.1.10), pp.~379--380; documented
-axiom, \texttt{HubbardImpossibilityLowDensity.lean}, Issue \#4477).  Impossibility of ferromagnetism
-at low densities (Pieri--Daul--Baeriswyl--Dzierzawa--Fazekas).  The dimension enters only through the
-exponent $2/d$ of the band condition (11.1.8), so no explicit $d$-dimensional lattice is needed: we
-state \texttt{hubbardBandCondition} on the ascending single-particle spectrum $\varepsilon$
-($\varepsilon_n-\varepsilon_1\ge c\,((n-n_0)/|\Lambda|)^{2/d}$) and record
-\texttt{hubbard\_theorem\_11\_4}: fixing $d>2$ and positive band constants, there is a
-\emph{size-uniform} density threshold $\rho_1>0$ such that for any Hermitian translation-invariant
-$t$ obeying the band condition, any filling $N_e/|\Lambda|\le\rho_1$ and any $U\ge0$, the ground
-states (over the pinned \texttt{hubbardEigenspaceAt}\,$E_0\,N_e$, $E_0$ nonempty and minimal) are not
-all maximal-spin (with $2\le N_e$, since the zero- and one-electron sectors are trivially maximal-spin, and a genuinely transitive translation $\sigma$).  Keeping $d>2$ explicit is essential for soundness (the statement is false in
-$d=1$); the Roth/Gutzwiller variational proof is deferred.  Another book-order Chapter 11 backfill.
+\noindent\textbf{Theorem 11.4} (Tasaki §11.1.1, eqs.~(11.1.8)--(11.1.10), pp.~379--380; axiom
+pending discharge, \texttt{HubbardImpossibilityLowDensity.lean}, Issue \#4477).  Impossibility of
+ferromagnetism at low densities (Pieri--Daul--Baeriswyl--Dzierzawa--Fazekas).  The dimension enters
+only through the exponent $2/d$ of the band condition (11.1.8), so no explicit $d$-dimensional
+lattice is needed: we state \texttt{hubbardBandCondition} on the ascending single-particle spectrum
+$\varepsilon$ ($\varepsilon_n-\varepsilon_1\ge c\,((n-n_0)/|\Lambda|)^{2/d}$) and record
+\texttt{hubbard\_theorem\_11\_4}: fixing $d>2$, positive band constants $c,\rho_0,n_0$ and a hopping
+scale $K$, there is a \emph{size-uniform} density threshold $\rho_1>0$ such that for any Hermitian
+translation-invariant $t$ obeying the band condition, any filling $N_e/|\Lambda|\le\rho_1$ and any
+$U\ge0$, the ground states (over the pinned \texttt{hubbardEigenspaceAt}\,$E_0\,N_e$, $E_0$ nonempty
+and minimal) are not all maximal-spin (with $2\le N_e$, since the zero- and one-electron sectors are
+trivially maximal-spin, and a genuinely transitive translation $\sigma$).  Two further hypotheses
+are added relative to Tasaki's bare statement, in the idiom already used for the Hermiticity
+hypotheses of Proposition 11.2.  The uniform row-sum bound $\sum_y|t_{xy}|\le K$ is forced by the
+order of the quantifiers: $\rho_1$ is chosen before $t$, while the variational energy gain scales
+with the hopping, so no size-uniform $\rho_1$ can exist unless the hopping scale is fixed in
+advance; every concrete $t$ admits such a $K$, so only the quantifier order is restricted and the
+strengthening is sound.  The filling floor $2n_0\le N_e$ excludes the regime where (11.1.8)
+degenerates --- for $N_e\le n_0$ it constrains nothing, and that is precisely the flat band where
+ferromagnetism \emph{does} occur, so without it the statement would be false rather than merely
+unproven.  Keeping $d>2$ explicit is essential for soundness for the same reason (the statement is
+false in $d=1$); the Roth/Gutzwiller variational proof is not yet formalized.  Another book-order
+Chapter 11 backfill.
 
 \noindent\textbf{Lemma 11.10} (Tasaki §11.3.1, eqs.~(11.3.1)--(11.3.2), pp.~405--406;
 \textbf{discharged axiom-free}, \texttt{TasakiFlatBandBasisLemma.lean}, Issue \#4477).  On the
