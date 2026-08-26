@@ -11391,7 +11391,7 @@ variational vector of the argument is built from the fully polarized Slater dete
 $\Phi_\uparrow$ filling the up-modes $S_\uparrow$ by adding one $\downarrow$ electron in the
 single-particle state $v$,
 $\Psi=\hat C^\dagger_\downarrow(v)\Phi_\uparrow$ with
-$\hat C^\dagger_\sigma(v)=\sum_x v_x\,\hat c^\dagger_{x\sigma}$ (book eq.~(11.1.6), p.~376; paper
+$\hat C^\dagger_\sigma(v)=\sum_x v_x\,\hat c^\dagger_{x\sigma}$ (book eq.~(11.1.6), p.~375; paper
 eq.~(F.1), p.~545), formalized as \texttt{hubbardLowDensityTrialState}.  The projected
 $\tilde\Psi=(1-\hat\nu)\Psi$ of the previous stage is left in its explicit form, so this stage adds
 no second definition of the trial state.
@@ -11419,8 +11419,10 @@ $\langle\hat c^\dagger_{y\downarrow}\Phi,\,X\,\hat c^\dagger_{x\downarrow}\Phi'\
 (\texttt{dotProduct\_fermionDownCreation\_sandwich}): moving $\hat c^\dagger_{y\downarrow}$ across
 the inner product turns it into $\hat c_{y\downarrow}$, which passes through $X$ and meets
 $\hat c^\dagger_{x\downarrow}$ in the canonical anticommutator, and both remainder terms end in
-$\hat c_{y\downarrow}\Phi'=0$.  This is the formal content of the paper's Appendix F computation
-(F.3), and at $X=1$ it also gives the norm
+$\hat c_{y\downarrow}\Phi'=0$.  This is the formal content of the paper's unnumbered
+anticommutation bookkeeping in Appendix F --- the substitution of (F.5)/(F.7) followed by the
+canonical anticommutation relations (p.~545), which produces (F.8)--(F.11) (p.~546) --- and at
+$X=1$ it also gives the norm
 $\langle\Psi,\Psi\rangle=\bigl(\sum_x|v_x|^2\bigr)\langle\Phi,\Phi\rangle$
 (\texttt{dotProduct\_star\_self\_spinfulCreationFromVector\_of\_downNumber\_zero}).
 
@@ -11438,7 +11440,9 @@ contraction $\delta_{jx}\hat c^\dagger_{i\sigma}$ summed against $t_{ij}w_x$ reb
 creator of the transported vector, whereas for $\sigma\ne\tau$ the operators simply commute
 (\texttt{hubbardKineticSpin\_commute\_spinfulCreationFromVector\_of\_ne}).  With
 $\hat H^\downarrow\Phi_\uparrow=0$ from the previous stage and $t\,v=\varepsilon v$ this gives the
-energy (11.1.7) of the spin-flipped state,
+kinetic energy of the spin-flipped state, which the book records as unnumbered running text on
+p.~375 (the numbered (11.1.7) is the total-energy inequality
+$\langle\Psi|\hat H|\Psi\rangle-E_{\mathrm{ferro}}\le\varepsilon_1-\varepsilon_N+U<0$),
 $\hat H_{\mathrm{kin}}\Psi=\bigl(\sum_{j\in S_\uparrow}\varepsilon_j+\varepsilon\bigr)\Psi$
 (\texttt{hubbardKinetic\_mulVec\_hubbardLowDensityTrialState}).  This stage is again infrastructure
 only: no statement of \texttt{hubbard\_theorem\_11\_4} changes.  Sources: Hal Tasaki, \emph{Physics

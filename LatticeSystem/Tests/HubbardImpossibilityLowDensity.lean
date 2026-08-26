@@ -61,13 +61,12 @@ tests:
   it; that re-application is how the energy split feeds `ν̂v` back into the sector lemmas.
 
 The Roth trial state `Ψ = Ĉ†_↓(v)Φ↑` (Tasaki eq. (11.1.6)) and its Jordan–Wigner parity
-factorisation are covered by six further tests (PR-4 is not yet implemented, so every test below
-that names `hubbardLowDensityTrialState`,
+factorisation are covered by six further tests, which pin `hubbardLowDensityTrialState`,
 `fermionTotalDownNumber_mulVec_hubbardLowDensityTrialState`,
 `hubbardLowDensityTrialState_ne_zero`, `dotProduct_fermionDownCreation_sandwich`,
-`hubbardKinetic_mulVec_hubbardLowDensityTrialState`, or
-`hubbardKineticSpin_commute_spinfulCreationFromVector_of_ne` fails to elaborate on `main`; that
-failure is the Red evidence):
+`hubbardKinetic_mulVec_hubbardLowDensityTrialState` and
+`hubbardKineticSpin_commute_spinfulCreationFromVector_of_ne` at the shapes their consumers
+require:
 
 - **Red 14**: the primary PR-3→PR-4 junction — for the actual trial state `Ψ`, PR-3's interaction
   vanishing (`hubbardOnSiteInteraction_mulVec_sub_self_eq_zero_of_downNumber_one`) is fed by PR-4's
@@ -75,11 +74,11 @@ failure is the Red evidence):
 - **Red 15**: the parity/δ meaning test — the parity-factorisation sandwich at `X = 1` and `x ≠ y`
   collapses to `0`, pinning the Kronecker-δ shape of the sandwich.
 - **Red 16**: the sharpness guard for the sandwich's own hypothesis — on an explicit `M := 1`
-  configuration where `Φ'` already carries a ↓ electron at the creation site (violating what would
-  be the sandwich's `N̂_↓Φ' = 0` hypothesis), applying the ↓-creation again vanishes by Pauli
-  exclusion while the corresponding `x = y` value the sandwich formula would predict does not:
-  `0 ≠ 1`. Unlike the other five tests here this one is a **self-contained fixture using only
-  already-proved lemmas**, so (unlike Red 14/15/17/19) it is expected to typecheck today.
+  configuration where `Φ'` already carries a ↓ electron at the creation site (violating the
+  sandwich's `N̂_↓Φ' = 0` hypothesis), applying the ↓-creation again vanishes by Pauli exclusion
+  while the value the sandwich formula predicts at `x = y` does not: `0 ≠ 1`. Unlike the other
+  five tests here it is a **self-contained fixture** built from the ladder operators alone, so it
+  exhibits the counterexample without consuming the sandwich itself.
 - **Red 17**: non-vacuity guard (mirrors Red 3/7/10) — `S1`'s sector hypothesis is satisfied by a
   *nonzero* trial state (`v = Pi.single x 1`), so the one-↓ sector statements it feeds are not
   vacuous.
@@ -321,8 +320,8 @@ example (M : ℕ) (U : ℂ) {v : (Fin (2 * M + 2) → Fin 2) → ℂ}
 
 /-- **Red 14.** The primary PR-3→PR-4 junction: for the actual trial state
 `Ψ = hubbardLowDensityTrialState e SUp v`, PR-3's interaction vanishing is fed by PR-4's `S1`
-(`fermionTotalDownNumber_mulVec_hubbardLowDensityTrialState`), for every `U`. Fails to elaborate
-until `hubbardLowDensityTrialState` and `S1` are implemented (PR-4). -/
+(`fermionTotalDownNumber_mulVec_hubbardLowDensityTrialState`), for every `U`. Pins that `S1`
+delivers the sector hypothesis in exactly the shape the interaction vanishing consumes. -/
 example {M : ℕ} (U : ℂ) (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ))
     (SUp : Finset (Fin (M + 1))) (v : Fin (M + 1) → ℂ) :
     (hubbardOnSiteInteraction M U).mulVec
@@ -332,8 +331,9 @@ example {M : ℕ} (U : ℂ) (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) →
   hubbardOnSiteInteraction_mulVec_sub_self_eq_zero_of_downNumber_one M U
     (fermionTotalDownNumber_mulVec_hubbardLowDensityTrialState e SUp v)
 
-/-- **Red 15.** Parity/δ meaning test: the sandwich `B` at `X = 1` and `x ≠ y` collapses to `0`.
-Fails to elaborate until `dotProduct_fermionDownCreation_sandwich` is implemented (PR-4). -/
+/-- **Red 15.** Parity/δ meaning test: the sandwich `B`
+(`dotProduct_fermionDownCreation_sandwich`) at `X = 1` and `x ≠ y` collapses to `0`, pinning the
+Kronecker-δ shape of its conclusion. -/
 example (M : ℕ) {Φ Φ' : (Fin (2 * M + 2) → Fin 2) → ℂ}
     (hΦ' : (fermionTotalDownNumber M).mulVec Φ' = 0) {x y : Fin (M + 1)} (hxy : x ≠ y) :
     dotProduct (star ((fermionDownCreation M y).mulVec Φ))
@@ -343,15 +343,15 @@ example (M : ℕ) {Φ Φ' : (Fin (2 * M + 2) → Fin 2) → ℂ}
       (fun z => Commute.one_left _) hΦ' x y, if_neg hxy, zero_mul]
 
 /-- Fixture for Red 16: the `M := 1` configuration with a single ↓ electron already at site `0` —
-this violates what would be the sandwich `B`'s hypothesis `N̂_↓Φ' = 0`. -/
+this violates the sandwich `B`'s hypothesis `N̂_↓Φ' = 0`. -/
 private def hubbardImpossibilityLowDensitySharpnessConfig : Fin (2 * 1 + 2) → Fin 2 :=
   fun k => if k = spinfulIndex 1 0 1 then 1 else 0
 
 /-- **Red 16.** Sharpness guard for the sandwich's own hypothesis. On the fixture above, applying
 the ↓-creation operator again at the already-occupied site vanishes by Pauli exclusion, so the
-sandwich value is `0`; but the value the sandwich formula would predict at `x = y` (`⟨Φ',Φ'⟩`) is
-`1`. `0 ≠ 1`: the `N̂_↓Φ' = 0` hypothesis cannot be dropped. Unlike Red 14/15/17/19 this uses only
-already-proved lemmas, so it typechecks today. -/
+sandwich value is `0`; but the value the sandwich formula predicts at `x = y` (`⟨Φ',Φ'⟩`) is `1`.
+`0 ≠ 1`: the `N̂_↓Φ' = 0` hypothesis cannot be dropped. The fixture is self-contained — it uses
+the ladder operators alone, not the sandwich. -/
 example :
     (fermionTotalDownNumber 1).mulVec (basisVec hubbardImpossibilityLowDensitySharpnessConfig)
         = basisVec hubbardImpossibilityLowDensitySharpnessConfig
@@ -388,8 +388,8 @@ example :
     norm_num
 
 /-- **Red 17.** Non-vacuity guard (mirrors Red 3/7/10): `S1`'s sector hypothesis is satisfied by a
-*nonzero* trial state, `v = Pi.single x 1`. Fails to elaborate until `hubbardLowDensityTrialState`,
-`S1`, and `hubbardLowDensityTrialState_ne_zero` are implemented (PR-4). -/
+*nonzero* trial state, `v = Pi.single x 1`. Pins `S1` and `hubbardLowDensityTrialState_ne_zero`
+side by side, so the one-↓ sector statements they feed are not vacuous. -/
 example {M : ℕ} (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ))
     (SUp : Finset (Fin (M + 1))) (x : Fin (M + 1)) :
     (fermionTotalDownNumber M).mulVec (hubbardLowDensityTrialState e SUp (Pi.single x (1 : ℂ)))
@@ -401,9 +401,9 @@ example {M : ℕ} (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ))
   simp at this
 
 /-- **Red 18.** Kinetic consumption test: at `SUp = ∅` (so `Φ↑` is the vacuum and
-`occupiedEigenEnergy hT ∅ ∅ = 0`), `E`'s assembly collapses `Ĥ_kin Ψ` to `lam • Ψ` for an
-eigenvector `v` of `t`. Fails to elaborate until `hubbardLowDensityTrialState` and `E`
-(`hubbardKinetic_mulVec_hubbardLowDensityTrialState`) are implemented (PR-4). -/
+`occupiedEigenEnergy hT ∅ ∅ = 0`), the assembly `E`
+(`hubbardKinetic_mulVec_hubbardLowDensityTrialState`) collapses `Ĥ_kin Ψ` to `lam • Ψ` for an
+eigenvector `v` of `t`, pinning the eigenvalue slot against the occupied-energy offset. -/
 example {M : ℕ} {t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : t.IsHermitian)
     {v : Fin (M + 1) → ℂ} {lam : ℂ} (hv : t.mulVec v = lam • v) :
     (hubbardKinetic M t).mulVec (hubbardLowDensityTrialState (eigenbasisAsBasis hT) ∅ v)
@@ -411,11 +411,11 @@ example {M : ℕ} {t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : t.IsHermiti
   have hE := hubbardKinetic_mulVec_hubbardLowDensityTrialState hT ∅ hv
   simpa [occupiedEigenEnergy, Finset.sum_empty, zero_add] using hE
 
-/-- **Red 19.** Spin-tag guard: `K1` at `σ = 1` (same spin as the trial state's ↓ creator, carrying
-the extra `Ĉ†(t·w)` term) pinned side by side with `K2` at `σ = 0, τ = 1` (cross spin, a plain
-commutator with no extra term). Fails to elaborate until `K1`
-(`hubbardKineticSpin_mul_spinfulCreationFromVector`) and `K2`
-(`hubbardKineticSpin_commute_spinfulCreationFromVector_of_ne`) are implemented (PR-4). -/
+/-- **Red 19.** Spin-tag guard: `K1` (`hubbardKineticSpin_mul_spinfulCreationFromVector`) at
+`σ = 1` (same spin as the trial state's ↓ creator, carrying the extra `Ĉ†(t·w)` term) pinned side
+by side with `K2` (`hubbardKineticSpin_commute_spinfulCreationFromVector_of_ne`) at `σ = 0, τ = 1`
+(cross spin, a plain commutator with no extra term); guards the `Fin 2` tag swap that no type
+catches. -/
 example {M : ℕ} (t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) (w : Fin (M + 1) → ℂ) :
     hubbardKineticSpin M t 1 * spinfulCreationFromVector M w 1
         = spinfulCreationFromVector M w 1 * hubbardKineticSpin M t 1

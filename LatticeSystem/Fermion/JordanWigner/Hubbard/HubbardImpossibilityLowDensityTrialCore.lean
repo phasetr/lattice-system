@@ -19,7 +19,7 @@ particular Slater determinant:
 * the norm `⟨Ĉ†_↓(v)Φ, Ĉ†_↓(v)Φ⟩ = (Σ_x |v_x|²)⟨Φ,Φ⟩`, the δ factorisation at `X = 1`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §11.1.1, Theorem 11.4, eqs. (11.1.6)/(11.1.9), p. 376; the computation is Tasaki,
+2020), §11.1.1, Theorem 11.4, eqs. (11.1.6)/(11.1.9), pp. 375–376; the computation is Tasaki,
 Prog. Theor. Phys. **99** (1998) 489, Theorem 3.3, Appendix F, pp. 545–546, eqs. (F.1)/(F.3).
 -/
 

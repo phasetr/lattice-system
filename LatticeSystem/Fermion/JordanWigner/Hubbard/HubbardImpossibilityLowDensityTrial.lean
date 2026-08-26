@@ -252,9 +252,10 @@ theorem hubbardKineticSpin_commute_spinfulCreationFromVector_of_ne (M : ℕ)
 /-! ## The kinetic energy of the trial state -/
 
 /-- **The trial state is a kinetic eigenvector**: if `t·v = ε v` then
-`Ĥ_kin Ψ = (Σ_{j ∈ SUp} ε_j + ε)Ψ`, the energy (11.1.7) of the spin-flipped state.  The up fiber
-passes through the ↓ creation and reproduces the Slater energy of `Φ↑`; the down fiber annihilates
-`Φ↑` and contributes only the transported creation `Ĉ†_↓(t·v) = ε Ĉ†_↓(v)`. -/
+`Ĥ_kin Ψ = (Σ_{j ∈ SUp} ε_j + ε)Ψ`, the kinetic energy of the spin-flipped state, which the book
+records as unnumbered running text on p. 375.  The up fiber passes through the ↓ creation and
+reproduces the Slater energy of `Φ↑`; the down fiber annihilates `Φ↑` and contributes only the
+transported creation `Ĉ†_↓(t·v) = ε Ĉ†_↓(v)`. -/
 theorem hubbardKinetic_mulVec_hubbardLowDensityTrialState
     {t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : t.IsHermitian)
     (SUp : Finset (Fin (M + 1))) {v : Fin (M + 1) → ℂ} {lam : ℂ}
