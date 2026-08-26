@@ -11631,6 +11631,50 @@ Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems} (1st ed., Sp
 with the boundedness assumption on $\max_x t_{x,x}$, $\max_x\sum_y|t_{x,y}|$ and $\varepsilon_1$
 stated on p.~547.
 
+\medskip\noindent\textbf{Theorem 11.4 PR7a, the spin-weight machinery at a general filling
+(Tasaki §11.1.1, \texttt{HubbardFerromagnetismStructureCore.lean},
+\texttt{HubbardFerromagnetismStructure.lean}).}  Proposition 11.2 is a statement about the
+half-filled ground eigenspace, and the $\hat S^{3}$-weight machinery supporting it had been written
+only at $N_{\mathrm e}=N_{\mathrm s}$.  Theorem 11.4 argues at a \emph{low} filling
+$N_{\mathrm e}=\rho N_{\mathrm s}$, so that machinery is needed at an arbitrary electron number.
+This stage carries it there, in place: membership in
+$G=\ker(\hat H-E_0)\cap\ker(\hat N-N_{\mathrm e})$, the invariance of $G$ under
+$\hat S^{3},\hat S^{+},\hat S^{-}$, the vanishing of every $\hat S^{3}$-block whose weight is not
+one of $a-N_{\mathrm e}/2$ with $0\le a\le N_{\mathrm e}$, and the resulting finite decomposition
+$G=\bigvee_{a=0}^{N_{\mathrm e}}B_a$ (\texttt{mem\_hubbardEigenspaceAt},
+\texttt{fermionTotalSpinZ\_mulVec\_mem\_hubbardEigenspaceAt},
+\texttt{hubbardEigenspaceAt\_inf\_eigenspace\_eq\_bot},
+\texttt{hubbardEigenspaceAt\_eq\_iSup\_weight}).  Nothing in those arguments knew about half
+filling: they are the electron bookkeeping $a_{\uparrow}+a_{\downarrow}=N_{\mathrm e}$,
+$\hat S^{3}=(a_{\uparrow}-a_{\downarrow})/2=a_{\uparrow}-N_{\mathrm e}/2$, together with the
+$SU(2)$ commutation relations, so the filling enters only as the number the counting is done
+against.  In the same spirit the raising injectivity --- a maximal-spin vector of weight $s_z$ with
+$-S\le s_z<S$ is not annihilated by $\hat S^{+}$ --- is stated for an arbitrary real $S$ instead of
+the hard-coded $S_{\max}=N_{\mathrm s}/2$
+(\texttt{fermionTotalSpinPlus\_mulVec\_ne\_zero\_of\_maxSpin}); the highest-weight Casimir identity
+$S(S+1)=s_z(s_z+1)$ that it contradicts never mentioned the model either.
+
+What does \emph{not} move is the dimension count.  Proposition 11.2 concludes
+$\dim G=2S_{\max}+1$ because its top block is one-dimensional, and that is genuinely a half-filling
+fact: the fully $\uparrow$-polarized $N_{\mathrm e}$-electron space has dimension
+$\binom{N_{\mathrm s}}{N_{\mathrm e}}$, which equals $1$ only at
+$N_{\mathrm e}=N_{\mathrm s}$.  The \texttt{finrank} layer therefore stays at half filling.
+
+From this layer Theorem 11.4 needs exactly one thing, and needs it at a general filling: a
+\emph{nonzero} top-weight state.  It is produced by raising rather than by counting
+(\texttt{exists\_topWeight\_of\_maxSpin}).  Some block $B_a$ is nonzero, because the blocks exhaust
+$G\neq0$; and if $B_b\neq0$ with $b<N_{\mathrm e}$, then $\hat S^{+}$ sends a nonzero vector of
+$B_b$ to a nonzero vector of $B_{b+1}$ --- it preserves $G$, it raises the weight by one, and it
+cannot annihilate its argument, since that vector is maximal-spin of weight
+$b-N_{\mathrm e}/2<S$.  Iterating $N_{\mathrm e}-a$ times reaches $B_{N_{\mathrm e}}$, whose weight
+is $N_{\mathrm e}/2=S$.  No dimension, no basis and no spanning statement about the polarized
+sector occurs, which is what makes the argument available at every filling.  This stage is
+infrastructure only: no statement of \texttt{hubbard\_theorem\_11\_4} changes.  Sources: Hal
+Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems} (1st ed., Springer 2020),
+§11.1.1, Proposition 11.2 and eq.~(11.1.4), pp.~377--378 (the half-filling multiplet whose
+machinery is generalized), and §11.1.1, Theorem 11.4, eqs.~(11.1.8)--(11.1.10), p.~376 (the
+low-filling statement that requires it).
+
 \noindent\textbf{Lemma 11.10} (Tasaki §11.3.1, eqs.~(11.3.1)--(11.3.2), pp.~405--406;
 \textbf{discharged axiom-free}, \texttt{TasakiFlatBandBasisLemma.lean}, Issue \#4477).  On the
 decorated lattice $\Lambda=E\cup I$ the localized states $\{\alpha_p\}_{p\in E}$ (metallic) and
