@@ -307,7 +307,6 @@ theorem rayleighOnVec_hubbardKineticSpin_zero_doubleOccupancy_le
         + 2 * K * ((SUp.card : ℝ) / ((M : ℝ) + 1)) *
           (star (spinfulGeneralBasisState (eigenbasisAsBasis hT) SUp ∅) ⬝ᵥ
             spinfulGeneralBasisState (eigenbasisAsBasis hT) SUp ∅).re := by
-  have hMpos : (0 : ℝ) < (M : ℝ) + 1 := by positivity
   set Φ := spinfulGeneralBasisState (eigenbasisAsBasis hT) SUp ∅ with hΦ
   have hsand := dotProduct_star_doubleOccupancy_sandwich hT SUp hmod (hubbardKineticSpin M t 0)
     (hubbardKineticSpin_zero_commute_fermionDownAnnihilation t)

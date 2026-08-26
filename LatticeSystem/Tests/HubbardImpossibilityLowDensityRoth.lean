@@ -50,6 +50,12 @@ These tests pin the three PR-6 modules:
   degeneracy in Red 32.
 - **Red 39 (`hhalf` sharpness)**: without `2 * SUp.card ≤ M + 1` the constant `8` is not enough;
   exhibited as a standalone real-inequality failure at `ρ := SUp.card / (M + 1) → 1`.
+- **Red 40 (capstone consumption at a nonempty `SUp`)**: Red 32's fixture with `SUp := {0}`, where
+  `ρ = 1/2`, `hhalf` is saturated rather than vacuous and `Ψ̃ ≠ Ψ` — the corrections act on a
+  nonzero doubly occupied component. Red 32/33/38 all run at `SUp := ∅`, where the Roth
+  construction degenerates.
+- **Red 41 (the Roth norm ratio at a nonempty `SUp`)**: `‖Ψ̃‖² = (1 − ρ)‖Φ↑‖²` read off at
+  `SUp := {0}`, pinning the factor `1 − ρ` that is invisible at `SUp := ∅`.
 
 The site parameter `M` is a numeral at every fixture, so the modulus hypothesis is written with
 the natural-number coercion `((1 : ℕ) : ℝ)` that the statement's `(M : ℝ)` elaborates to.
@@ -263,5 +269,49 @@ example :
   intro h
   have h1 := h 1 (by norm_num) (le_refl 1)
   norm_num at h1
+
+/-- Fixture: the singleton occupied set saturates the half-filling side condition, `2 · 1 ≤ 1 + 1`,
+so the density is `ρ = 1/2` rather than `0`. -/
+private theorem singleton_half :
+    2 * ((({0} : Finset (Fin 2)).card : ℕ) : ℝ) ≤ ((1 : ℕ) : ℝ) + 1 := by
+  norm_num
+
+/-- Fixture: the Slater energy of the singleton occupied set vanishes, since the zero hopping
+matrix has vanishing row sums and hence vanishing eigenvalues. -/
+private theorem occ_singleton_re :
+    (occupiedEigenEnergy hT0 ({0} : Finset (Fin 2)) ∅).re = 0 := by
+  have h0 : hT0.eigenvalues 0 = 0 :=
+    abs_nonpos_iff.mp (abs_eigenvalues_le_of_rowSum_le hT0 zero_rowSum 0)
+  rw [occupiedEigenEnergy, Finset.sum_empty, add_zero, Finset.sum_singleton, h0,
+    Complex.ofReal_zero, Complex.zero_re]
+
+/-- **Red 40 (capstone consumption at a nonempty `SUp`).** The same `M := 1`, `t := 0`, `K := 0`,
+`e₁ := 0` fixture as Red 32, but with `SUp := {0}`: now `ρ = |SUp|/(M+1) = 1/2`, `hhalf` is
+saturated rather than vacuous, `ν̂Ψ ≠ 0`, and `Ψ̃ = Ψ − ν̂Ψ` is a genuine projection rather than `Ψ`
+itself.  Both corrections `V4`/`V5` are therefore applied to a nonzero doubly occupied component,
+and the residual `8K|SUp|/(M+1)` is forced to vanish exactly, so the bound is the tightest one the
+fixture admits: `rayleighOnVec Ĥ Ψ̃ ≤ 0`.  Red 32/33/38 all run at `SUp := ∅`, where the whole Roth
+construction degenerates; this instance shows the capstone's hypotheses are jointly satisfiable in
+the regime it was built for. -/
+example (U : ℝ) :
+    rayleighOnVec (hubbardHamiltonian 1 (0 : Matrix (Fin 2) (Fin 2) ℂ) (U : ℂ))
+        (hubbardLowDensityRothState (eigenbasisAsBasis hT0) ({0} : Finset (Fin 2)) vUniform)
+      ≤ 0 := by
+  have hbound := rayleighOnVec_hubbardHamiltonian_hubbardLowDensityRothState_le
+    hT0 ({0} : Finset (Fin 2)) vUniform_eig vUniform_mod zero_rowSum singleton_half U
+  rw [occ_singleton_re] at hbound
+  simpa using hbound
+
+/-- **Red 41 (the Roth norm ratio `1 − ρ` at a nonempty `SUp`).** At `SUp := {0}` the projection
+removes exactly half of the trial norm: `‖Ψ̃‖² = (1/2)‖Φ↑‖²`.  A dropped or inverted `1 − ρ` factor,
+invisible at `SUp := ∅` (where `Ψ̃ = Ψ`), fails here. -/
+example :
+    (star (hubbardLowDensityRothState (eigenbasisAsBasis hT0) ({0} : Finset (Fin 2)) vUniform) ⬝ᵥ
+        hubbardLowDensityRothState (eigenbasisAsBasis hT0) ({0} : Finset (Fin 2)) vUniform).re
+      = (1 / 2 : ℝ) *
+        (star (spinfulGeneralBasisState (eigenbasisAsBasis hT0) ({0} : Finset (Fin 2)) ∅) ⬝ᵥ
+          spinfulGeneralBasisState (eigenbasisAsBasis hT0) ({0} : Finset (Fin 2)) ∅).re := by
+  rw [dotProduct_star_self_hubbardLowDensityRothState_re hT0 ({0} : Finset (Fin 2)) vUniform_mod]
+  norm_num
 
 end LatticeSystem.Tests.HubbardImpossibilityLowDensityRoth

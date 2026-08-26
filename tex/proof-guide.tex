@@ -11614,8 +11614,10 @@ The constant $K$ is not an extra assumption.  Appendix~F, p.~547, already assume
 $\max_{x}t_{x,x}$, $\max_{x}\sum_{y}|t_{x,y}|$ and $\varepsilon_1$ converge to finite quantities,
 which is exactly the row-sum hypothesis used here; and the two eigenvalue bounds it is applied
 through, $|\varepsilon_j|\le K$ and $|\varepsilon|\le K$, are a corollary of Gershgorin's circle
-theorem rather than a hand-rolled argument: adding the centre back to the radius turns the circle
-theorem into the $\ell^{\infty}$ estimate $\|\lambda\|\le\sum_y|t_{x,y}|$
+theorem rather than a hand-rolled argument: Gershgorin puts $\lambda$ within
+$\sum_{y\neq k}|t_{k,y}|$ of $t_{k,k}$ for \emph{some} row $k$, and adding the centre back to the
+radius turns that into the $\ell^{\infty}$ estimate
+$|\lambda|\le\sum_y|t_{k,y}|\le\max_x\sum_y|t_{x,y}|$
 (\texttt{norm\_le\_of\_mulVec\_eq\_smul\_of\_rowSum\_le},
 \texttt{abs\_eigenvalues\_le\_of\_rowSum\_le}).  That corollary mentions no fermion, no Hubbard
 model and no textbook, so it is placed in \texttt{Math/MatrixAnalysis/} by topic.  Finally,
