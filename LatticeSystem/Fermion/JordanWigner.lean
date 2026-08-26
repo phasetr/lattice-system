@@ -255,6 +255,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardOnSiteInteractionSingle
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowDensityTrialCore
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowDensityTrial
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowDensityRothCore
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowDensityRoth
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandBasisLemma
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJModel
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSpinSymmetry
