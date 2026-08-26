@@ -11392,7 +11392,7 @@ $\Phi_\uparrow$ filling the up-modes $S_\uparrow$ by adding one $\downarrow$ ele
 single-particle state $v$,
 $\Psi=\hat C^\dagger_\downarrow(v)\Phi_\uparrow$ with
 $\hat C^\dagger_\sigma(v)=\sum_x v_x\,\hat c^\dagger_{x\sigma}$ (book eq.~(11.1.6), p.~375; paper
-eq.~(F.1), p.~545), formalized as \texttt{hubbardLowDensityTrialState}.  The projected
+eq.~(3.6), p.~506), formalized as \texttt{hubbardLowDensityTrialState}.  The projected
 $\tilde\Psi=(1-\hat\nu)\Psi$ of the previous stage is left in its explicit form, so this stage adds
 no second definition of the trial state.
 
@@ -11421,8 +11421,8 @@ the inner product turns it into $\hat c_{y\downarrow}$, which passes through $X$
 $\hat c^\dagger_{x\downarrow}$ in the canonical anticommutator, and both remainder terms end in
 $\hat c_{y\downarrow}\Phi'=0$.  This is the formal content of the paper's unnumbered
 anticommutation bookkeeping in Appendix F --- the substitution of (F.5)/(F.7) followed by the
-canonical anticommutation relations (p.~545), which produces (F.8)--(F.11) (p.~546) --- and at
-$X=1$ it also gives the norm
+canonical anticommutation relations (p.~545), which produces (F.8)--(F.11) (pp.~545--546) ---
+and at $X=1$ it also gives the norm
 $\langle\Psi,\Psi\rangle=\bigl(\sum_x|v_x|^2\bigr)\langle\Phi,\Phi\rangle$
 (\texttt{dotProduct\_star\_self\_spinfulCreationFromVector\_of\_downNumber\_zero}).
 
@@ -11448,7 +11448,8 @@ $\hat H_{\mathrm{kin}}\Psi=\bigl(\sum_{j\in S_\uparrow}\varepsilon_j+\varepsilon
 only: no statement of \texttt{hubbard\_theorem\_11\_4} changes.  Sources: Hal Tasaki, \emph{Physics
 and Mathematics of Quantum Many-Body Systems} (1st ed., Springer 2020), §11.1.1, Theorem 11.4,
 eqs.~(11.1.6)--(11.1.9), pp.~375--376; Tasaki, Prog.\ Theor.\ Phys.\ \textbf{99} (1998) 489,
-Theorem 3.3, Appendix F, pp.~545--546, eqs.~(F.1)/(F.3).
+Theorem 3.3, eq.~(3.6), p.~506, and the anticommutation bookkeeping of Appendix F yielding
+eqs.~(F.8)--(F.11), pp.~545--546.
 
 \noindent\textbf{Lemma 11.10} (Tasaki §11.3.1, eqs.~(11.3.1)--(11.3.2), pp.~405--406;
 \textbf{discharged axiom-free}, \texttt{TasakiFlatBandBasisLemma.lean}, Issue \#4477).  On the

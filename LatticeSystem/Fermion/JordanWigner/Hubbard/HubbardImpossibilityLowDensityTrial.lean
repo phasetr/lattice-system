@@ -18,8 +18,10 @@ determinant `Φ↑` filling the up-modes `SUp` by adding one ↓ electron in the
   kinetic energy of `Ψ` is `Σ_{j ∈ SUp} ε_j + ε` when `v` is an eigenvector of `t` for `ε`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §11.1.1, Theorem 11.4, eqs. (11.1.6)–(11.1.9), pp. 375–376; the computation is Tasaki,
-Prog. Theor. Phys. **99** (1998) 489, Theorem 3.3, Appendix F, pp. 545–546, eqs. (F.1)/(F.3).
+2020), §11.1.1, Theorem 11.4, eqs. (11.1.6)–(11.1.9), pp. 375–376; the trial state is Tasaki,
+Prog. Theor. Phys. **99** (1998) 489, Theorem 3.3, eq. (3.6), p. 506, and the parity bookkeeping
+is the unnumbered substitution of eqs. (F.5)/(F.7) yielding eqs. (F.8)–(F.11), Appendix F,
+pp. 545–546.
 -/
 
 namespace LatticeSystem.Fermion
@@ -232,7 +234,7 @@ theorem hubbardKineticSpin_mul_spinfulCreationFromVector (M : ℕ)
   exact add_comm _ _
 
 /-- **Cross-spin commutation of the hopping operator with a smeared creation**: for `σ ≠ τ`,
-`Ĥ^σ` commutes with `Ĉ†_τ(w)`.  Each hopping bilinear is even and lives at up-modes disjoint from
+`Ĥ^σ` commutes with `Ĉ†_τ(w)`.  Each hopping bilinear is even and lives at `σ` modes disjoint from
 the `τ` modes, so no contraction term survives — in contrast with the same-spin relation. -/
 theorem hubbardKineticSpin_commute_spinfulCreationFromVector_of_ne (M : ℕ)
     (t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) (w : Fin (M + 1) → ℂ) {σ τ : Fin 2}

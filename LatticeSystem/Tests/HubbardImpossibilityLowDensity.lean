@@ -404,7 +404,8 @@ example {M : ℕ} (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ))
 /-- **Red 18.** Kinetic consumption test: at `SUp = ∅` (so `Φ↑` is the vacuum and
 `occupiedEigenEnergy hT ∅ ∅ = 0`), the assembly `E`
 (`hubbardKinetic_mulVec_hubbardLowDensityTrialState`) collapses `Ĥ_kin Ψ` to `lam • Ψ` for an
-eigenvector `v` of `t`, pinning the eigenvalue slot against the occupied-energy offset. -/
+eigenvector `v` of `t`.  This pins the eigenvalue slot in the `SUp = ∅` base case only: the
+occupied-energy offset vanishes there, so its behaviour for nonempty `SUp` is untested. -/
 example {M : ℕ} {t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : t.IsHermitian)
     {v : Fin (M + 1) → ℂ} {lam : ℂ} (hv : t.mulVec v = lam • v) :
     (hubbardKinetic M t).mulVec (hubbardLowDensityTrialState (eigenbasisAsBasis hT) ∅ v)
