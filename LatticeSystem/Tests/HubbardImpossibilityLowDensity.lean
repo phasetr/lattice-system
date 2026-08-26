@@ -597,4 +597,108 @@ example :
     intro i j; fin_cases i <;> fin_cases j <;> first | exact ⟨0, rfl⟩ | exact ⟨1, by decide⟩
   exact LatticeSystem.Math.norm_apply_eq_norm_apply_of_comp_perm_smul hw hne htransitive 0 1
 
+/-!
+## Theorem 11.4 PR-5b — the single-particle spectrum enumeration bridge
+
+The six Reds below pin the six declarations of `LatticeSystem/Math/MonotoneEnumeration.lean`
+(`eq_comp_sort_of_monotone_of_map_eq` = C1, `val_le_val_of_strictMono` = C2 (private, not
+referenced here), `sum_lowestLevels_le_sum_of_monotone` = C4a, `sum_lowestLevels_le_sum_of_map_eq`
+= C4, `exists_lowestLevels_finset_of_map_eq` = C3, `sum_lowestLevels_succ` = C5), per
+`.self-local/docs/theorem-11-4-pr5b-design.md` §5. The primary fixture is `m = 3`, `α = ℕ`,
+`ε := ![0, 1, 2]`, `g := ![2, 0, 1]`, chosen so `hspec`/`hmono`/every concrete sum is `decide`-able.
+Red 30 is the standalone sharpness counterexample and references none of C1–C5. Red 31 is the
+junction guard at the real consumer's types (`Matrix.IsHermitian.eigenvalues` /
+`occupiedEigenEnergy`).
+-/
+
+/-- **Red 26 (C1 pinned).** On the fixture, `ε = g ∘ Tuple.sort g`. Guards the direction of the
+`Multiset.map` hypothesis: an inverted `hspec` still typechecks (the same trap Red 24 guards for
+A3). -/
+example :
+    (![0, 1, 2] : Fin 3 → ℕ)
+      = (![2, 0, 1] : Fin 3 → ℕ) ∘ Tuple.sort (![2, 0, 1] : Fin 3 → ℕ) := by
+  have hmono : Monotone (![0, 1, 2] : Fin 3 → ℕ) := by decide
+  have hspec : (Finset.univ : Finset (Fin 3)).val.map (![0, 1, 2] : Fin 3 → ℕ)
+      = (Finset.univ : Finset (Fin 3)).val.map (![2, 0, 1] : Fin 3 → ℕ) := by decide
+  exact LatticeSystem.Math.eq_comp_sort_of_monotone_of_map_eq hmono hspec
+
+/-- **Red 27 (C4 pinned, with the inequality direction).** `k = 2`, `S = ({0, 2} : Finset (Fin 3))`
+(so `∑ p ∈ S, g p = 3`), while `∑ i : Fin 2, ε (castLE _ i) = 1`. Asserts the *consequence* `1 ≤ 3`
+obtained through C4, so a flipped inequality fails to compile. -/
+example : (1 : ℕ) ≤ 3 := by
+  have hmono : Monotone (![0, 1, 2] : Fin 3 → ℕ) := by decide
+  have hspec : (Finset.univ : Finset (Fin 3)).val.map (![0, 1, 2] : Fin 3 → ℕ)
+      = (Finset.univ : Finset (Fin 3)).val.map (![2, 0, 1] : Fin 3 → ℕ) := by decide
+  have hk : (2 : ℕ) ≤ 3 := by decide
+  have hS : ({0, 2} : Finset (Fin 3)).card = 2 := by decide
+  have h := LatticeSystem.Math.sum_lowestLevels_le_sum_of_map_eq hk hmono hspec hS
+  have hlhs : (∑ i : Fin 2, (![0, 1, 2] : Fin 3 → ℕ) (Fin.castLE hk i)) = 1 := by decide
+  have hrhs : (∑ p ∈ ({0, 2} : Finset (Fin 3)), (![2, 0, 1] : Fin 3 → ℕ) p) = 3 := by decide
+  rw [hlhs, hrhs] at h
+  exact h
+
+/-- **Red 28 (C3 pinned, non-vacuity of "lowest").** Obtains `S` from C3 at `k = 2` and asserts
+`S.card = 2 ∧ ∑ p ∈ S, g p = 1`. The value `1` (not `3`) is the guard that C3 really returns the
+*lowest* levels rather than an arbitrary 2-subset — the single most likely silent bug. -/
+example :
+    ∃ S : Finset (Fin 3), S.card = 2 ∧ ∑ p ∈ S, (![2, 0, 1] : Fin 3 → ℕ) p = 1 := by
+  have hmono : Monotone (![0, 1, 2] : Fin 3 → ℕ) := by decide
+  have hspec : (Finset.univ : Finset (Fin 3)).val.map (![0, 1, 2] : Fin 3 → ℕ)
+      = (Finset.univ : Finset (Fin 3)).val.map (![2, 0, 1] : Fin 3 → ℕ) := by decide
+  have hk : (2 : ℕ) ≤ 3 := by decide
+  obtain ⟨S, hScard, hSsum⟩ :=
+    LatticeSystem.Math.exists_lowestLevels_finset_of_map_eq hk hmono hspec
+  refine ⟨S, hScard, ?_⟩
+  have hrhs : (∑ i : Fin 2, (![0, 1, 2] : Fin 3 → ℕ) (Fin.castLE hk i)) = 1 := by decide
+  rw [hSsum, hrhs]
+
+/-- **Red 29 (C5 pinned, off-by-one).** `∑ i : Fin 3, ε (castLE _ i)
+= (∑ i : Fin 2, ε (castLE _ i)) + ε 2`, i.e. `3 = 1 + 2`. A `Fin.last`/`castSucc` slip would give
+`1 + 1` or `3 + 2`. -/
+example : (3 : ℕ) = 1 + 2 := by
+  have hk : (2 : ℕ) + 1 ≤ 3 := le_refl 3
+  have h := LatticeSystem.Math.sum_lowestLevels_succ (ε := (![0, 1, 2] : Fin 3 → ℕ)) hk
+  have hlhs : (∑ i : Fin 3, (![0, 1, 2] : Fin 3 → ℕ) (Fin.castLE hk i)) = 3 := by decide
+  have hrhs1 : (∑ i : Fin 2, (![0, 1, 2] : Fin 3 → ℕ)
+      (Fin.castLE (Nat.le_of_succ_le hk) i)) = 1 := by decide
+  have hrhs2 : (![0, 1, 2] : Fin 3 → ℕ) ⟨2, hk⟩ = 2 := by decide
+  rw [hlhs, hrhs1, hrhs2] at h
+  exact h
+
+/-- **Red 30 (sharpness of `hmono` — the load-bearing hypothesis).** Standalone, using none of
+C1–C5. With `ε := ![2, 0, 1]` and `g := ε` (so `hspec` is `rfl` and monotonicity fails), `k = 1`,
+`S = {1}`: `∑ i : Fin 1, ε (castLE _ i) = 2` but `∑ p ∈ S, g p = 0`, so C4's conclusion is *false*
+without `Monotone ε`. Mirrors Red 22's discipline and is the test a reviewer will ask for. -/
+example :
+    ¬ (∑ i : Fin 1, (![2, 0, 1] : Fin 3 → ℕ) (Fin.castLE (by decide : (1 : ℕ) ≤ 3) i)
+        ≤ ∑ p ∈ ({1} : Finset (Fin 3)), (![2, 0, 1] : Fin 3 → ℕ) p) := by
+  have hlhs : (∑ i : Fin 1, (![2, 0, 1] : Fin 3 → ℕ) (Fin.castLE (by decide : (1 : ℕ) ≤ 3) i))
+      = 2 := by decide
+  have hrhs : (∑ p ∈ ({1} : Finset (Fin 3)), (![2, 0, 1] : Fin 3 → ℕ) p) = 0 := by decide
+  rw [hlhs, hrhs]
+  decide
+
+/-- **Red 31 (application shape at the real consumer's types).** Instantiates C3 with
+`g := hT.eigenvalues` for `hT : (0 : Matrix (Fin 2) (Fin 2) ℂ).IsHermitian` and `ε := 0` (`hspec`
+by rewriting `hT.eigenvalues = 0`, itself obtained from `Matrix.IsHermitian.eigenvalues_eq` and
+`Matrix.zero_mulVec`), then feeds the returned `S : Finset (Fin 2)` to `occupiedEigenEnergy hT S ∅`
+and asserts it is `0`. This is the junction guard: it pins that the `Finset (Fin (M+1))` produced
+by the generic `Math/` layer is literally the argument type the Fermion layer wants, which is the
+only thing that can break silently between PR-5b and PR-7. -/
+example {hT : (0 : Matrix (Fin 2) (Fin 2) ℂ).IsHermitian} :
+    ∃ S : Finset (Fin 2), S.card = 1 ∧ occupiedEigenEnergy hT S ∅ = 0 := by
+  have heig : ∀ i, hT.eigenvalues i = 0 := fun i => by
+    rw [hT.eigenvalues_eq]; simp [Matrix.zero_mulVec]
+  have hε : hT.eigenvalues = (0 : Fin 2 → ℝ) := funext heig
+  have hmono : Monotone (0 : Fin 2 → ℝ) := monotone_const
+  have hspec : (Finset.univ : Finset (Fin 2)).val.map (0 : Fin 2 → ℝ)
+      = (Finset.univ : Finset (Fin 2)).val.map hT.eigenvalues := by rw [hε]
+  have hk : (1 : ℕ) ≤ 2 := by decide
+  obtain ⟨S, hScard, hSsum⟩ :=
+    LatticeSystem.Math.exists_lowestLevels_finset_of_map_eq hk hmono hspec
+  refine ⟨S, hScard, ?_⟩
+  have hSsumR : (∑ p ∈ S, hT.eigenvalues p) = 0 := by rw [hSsum]; simp
+  unfold occupiedEigenEnergy
+  rw [← Complex.ofReal_sum, hSsumR, Finset.sum_empty, Complex.ofReal_zero, add_zero]
+
 end LatticeSystem.Tests.HubbardImpossibilityLowDensity
