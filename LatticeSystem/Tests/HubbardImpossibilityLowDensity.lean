@@ -60,7 +60,7 @@ tests:
   sector hypothesis for the doubly occupied part `ν̂v`, so the interaction vanishing re-applies to
   it; that re-application is how the energy split feeds `ν̂v` back into the sector lemmas.
 
-The Roth trial state `Ψ = Ĉ†_↓(v)Φ↑` (Tasaki eq. (11.1.6)) and its Jordan–Wigner parity
+The spin-flip trial state `Ψ = Ĉ†_↓(v)Φ↑` (Tasaki eq. (11.1.6)) and its Jordan–Wigner parity
 factorisation are covered by six further tests, which pin `hubbardLowDensityTrialState`,
 `fermionTotalDownNumber_mulVec_hubbardLowDensityTrialState`,
 `hubbardLowDensityTrialState_ne_zero`, `dotProduct_fermionDownCreation_sandwich`,
@@ -317,7 +317,7 @@ example (M : ℕ) (U : ℂ) {v : (Fin (2 * M + 2) → Fin 2) → ℂ}
       (fermionTotalDownNumber_mulVec_hubbardOnSiteInteraction_mulVec_of_downNumber_one M hv),
     dotProduct_zero, Complex.zero_re]
 
-/-! ## The Roth trial state and its Jordan–Wigner parity factorisation (PR-4) -/
+/-! ## The spin-flip trial state and its Jordan–Wigner parity factorisation (PR-4) -/
 
 /-- **Red 14.** The primary PR-3→PR-4 junction: for the actual trial state
 `Ψ = hubbardLowDensityTrialState e SUp v`, PR-3's interaction vanishing is fed by PR-4's `S1`

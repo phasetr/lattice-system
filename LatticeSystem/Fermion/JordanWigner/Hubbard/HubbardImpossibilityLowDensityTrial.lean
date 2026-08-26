@@ -4,9 +4,10 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowUVariat
 /-!
 # The spin-flip trial state of the low-density impossibility argument (Tasaki §11.1.1)
 
-Tasaki's variational state for Theorem 11.4 is obtained from the fully polarized Slater
+The variational vector of Tasaki's Theorem 11.4 argument is built from the fully polarized Slater
 determinant `Φ↑` filling the up-modes `SUp` by adding one ↓ electron in the single-particle state
-`v`: `Ψ = Ĉ†_↓(v)Φ↑` (eq. (11.1.6)).  This module defines that state
+`v`: `Ψ = Ĉ†_↓(v)Φ↑` (eq. (11.1.6)); the estimate is then run on its Gutzwiller projection
+`Ψ̃ = P̂₀Ψ`, the Roth state of eq. (11.1.9).  This module defines `Ψ`
 (`hubbardLowDensityTrialState`) and establishes the properties the variational estimate consumes:
 
 * `Ψ` carries exactly one ↓ electron (`N̂_↓Ψ = Ψ`), which is the sector hypothesis of the on-site
