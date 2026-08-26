@@ -17,7 +17,7 @@ proof (Tasaki's Roth/Gutzwiller variational state and the analytic estimate from
 yet formalized.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §11.1.1, Theorem 11.4, eqs. (11.1.8)–(11.1.10), pp. 379–380.
+2020), §11.1.1, Theorem 11.4, eqs. (11.1.8)–(11.1.10), p. 376.
 -/
 
 namespace LatticeSystem.Fermion

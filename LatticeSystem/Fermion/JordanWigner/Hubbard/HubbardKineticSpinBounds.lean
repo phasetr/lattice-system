@@ -17,7 +17,7 @@ impossibility argument uses in place of an exact evaluation of the minority-spin
   matrices, so a kernel vector of the total is a kernel vector of every down annihilator.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §11.1.1, Theorem 11.4, eqs. (11.1.8)–(11.1.10), pp. 379–380; the underlying argument is
+2020), §11.1.1, Theorem 11.4, eqs. (11.1.8)–(11.1.10), p. 376; the underlying argument is
 Tasaki, Prog. Theor. Phys. **99** (1998) 489, Theorem 3.3, Appendix F, pp. 545–547.
 -/
 

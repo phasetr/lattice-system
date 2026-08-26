@@ -14,7 +14,7 @@ exact canonical-anticommutation identity for the majority spin, an operator boun
 for the minority spin), which the aggregate operator cannot express.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §11.1.1, Theorem 11.4, eqs. (11.1.8)–(11.1.10), pp. 379–380; the underlying argument is
+2020), §11.1.1, Theorem 11.4, eqs. (11.1.8)–(11.1.10), p. 376; the underlying argument is
 Tasaki, Prog. Theor. Phys. **99** (1998) 489, Theorem 3.3, Appendix F, pp. 545–547.
 -/
 
