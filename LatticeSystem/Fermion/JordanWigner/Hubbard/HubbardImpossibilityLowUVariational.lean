@@ -22,7 +22,7 @@ variational discharge of Tasaki Theorem 11.3 (the spin-flip trial state lowers t
 all-up trace).
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §11.1.1, Theorem 11.3, eqs. (11.1.5)–(11.1.6), pp. 378–379.
+2020), §11.1.1, Theorem 11.3, eqs. (11.1.5)–(11.1.6), p. 375.
 -/
 
 namespace LatticeSystem.Fermion

@@ -11,13 +11,17 @@ in terms of the eigenmode number operators `n̂_{j,σ} = Ĉ†_σ(e_j) Ĉ_σ(ē_
 
 `Ĥ_kin = Σ_σ Σ_j ε_j n̂_{j,σ}`   (`hubbardKinetic_eq_sum_eigenNumberOp`).
 
+This aggregate form is the spin sum of the per-spin fiber identity `Ĥ^σ = Σ_j ε_j n̂_{j,σ}`
+(`hubbardKineticSpin_eq_sum_eigenNumberOp`), which is the form consumed by the spin-resolved
+kinetic bounds.
+
 Since `n̂_{j,σ}` is diagonal in the eigenmode Fock monomials
 (`eigenNumberOp_mulVec_generalModeMonomial`), this gives the kinetic energy of any eigenmode Slater
 determinant as the sum of the occupied single-particle energies — the variational input for
 Tasaki's spin-flip trial state (eq. (11.1.6)).
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
-(1st ed., Springer 2020), §11.1.1, Theorem 11.3, eqs. (11.1.5)–(11.1.6), pp. 378–379.
+(1st ed., Springer 2020), §11.1.1, Theorem 11.3, eqs. (11.1.5)–(11.1.6), p. 375.
 -/
 
 namespace LatticeSystem.Fermion

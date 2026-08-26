@@ -54,8 +54,8 @@ theorem hubbardKineticSpin_le_smul_sum_spinSiteNumber
 
 /-- **No spin-down electrons ⇒ every down annihilation kills the state**: `N̂_↓Φ = 0` forces
 `ĉ_{x↓}Φ = 0` at every site `x`.  The down-number operator is the sum of the positive-semidefinite
-Gram matrices `ĉ†_{x↓}ĉ_{x↓}`, so a vanishing total energy expectation forces each term's
-expectation, hence each `ĉ_{x↓}Φ`, to vanish. -/
+Gram matrices `ĉ†_{x↓}ĉ_{x↓}`, so a vanishing total down-spin particle number expectation forces
+each term's expectation, hence each `ĉ_{x↓}Φ`, to vanish. -/
 theorem fermionDownAnnihilation_mulVec_eq_zero_of_downNumber_zero (M : ℕ) (x : Fin (M + 1))
     {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : (fermionTotalDownNumber M).mulVec Φ = 0) :
     (fermionDownAnnihilation M x).mulVec Φ = 0 := by
