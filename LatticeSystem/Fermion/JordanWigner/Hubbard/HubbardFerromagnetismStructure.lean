@@ -10,6 +10,11 @@ one-dimensional, lower blocks embed into it) and packages **Proposition 11.2**: 
 eigenspace of the saturated-ferromagnetic Hubbard model at filling `N + 1` is the `(N + 2)`-fold
 maximal-spin multiplet of total spin `S_max = (N + 1)/2`.
 
+It also carries the `Ŝ⁺` raising chain at a *general* electron filling `Ne`
+(`exists_topWeight_of_maxSpin`): a nonzero maximal-spin eigenspace contains a nonzero vector of top
+`Ŝ³`-weight `Ne/2`.  That statement needs no dimension count and so is not restricted to half
+filling, unlike the `finrank` layer below it.
+
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §11.1.1, Proposition 11.2, eq. (11.1.4), pp. 377–378.
 -/
@@ -20,6 +25,96 @@ open Matrix LatticeSystem.Quantum Module
 open scoped BigOperators
 
 variable {N : ℕ} (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
+
+/-! ## The `Ŝ⁺` raising chain at a general filling -/
+
+/-- **A maximal-spin eigenspace contains a nonzero top-weight vector.**  If the `Ne`-electron
+energy-`E₀` eigenspace `G` is nonzero (`hne`) and every one of its vectors is an `(Ŝ_tot)²`
+eigenvector at the maximal value `S(S + 1)`, `S = Ne/2` (`hferro`), then `G` contains a nonzero
+vector of top `Ŝ³`-weight `S`.
+
+The argument is a raising induction, not a dimension count: `G` is the supremum of its `Ne + 1`
+`Ŝ³`-weight blocks (`hubbardEigenspaceAt_eq_iSup_weight`), so some block `B a` is nonzero; and
+`Ŝ⁺` maps a nonzero block strictly below the top to a nonzero block one step higher (it preserves
+`G`, it raises the weight by one, and it cannot annihilate a maximal-spin vector of weight `< S`,
+by `fermionTotalSpinPlus_mulVec_ne_zero_of_maxSpin`).  Iterating `Ne − a` times reaches the top
+block. -/
+theorem exists_topWeight_of_maxSpin {E₀ : ℂ} (Ne : ℕ)
+    (hferro : ∀ v ∈ hubbardEigenspaceAt t U E₀ Ne,
+      (fermionTotalSpinSquared N).mulVec v
+        = ((Ne : ℂ) / 2 * ((Ne : ℂ) / 2 + 1)) • v)
+    (hne : hubbardEigenspaceAt t U E₀ Ne ≠ ⊥) :
+    ∃ u, u ∈ hubbardEigenspaceAt t U E₀ Ne ∧ u ≠ 0 ∧
+      (fermionTotalSpinZ N).mulVec u = (((Ne : ℝ) / 2 : ℝ) : ℂ) • u := by
+  classical
+  -- one raising step: a nonzero weight-`(b − Ne/2)` block gives a nonzero weight-`(b + 1 − Ne/2)`
+  -- block, provided `b < Ne` (i.e. the source weight is strictly below the top)
+  have hstep : ∀ b : ℕ, b < Ne →
+      hubbardEigenspaceAt t U E₀ Ne ⊓ Module.End.eigenspace (fermionTotalSpinZ N).mulVecLin
+          (((b : ℝ) - (Ne : ℝ) / 2 : ℝ) : ℂ) ≠ ⊥ →
+      hubbardEigenspaceAt t U E₀ Ne ⊓ Module.End.eigenspace (fermionTotalSpinZ N).mulVecLin
+          ((((b + 1 : ℕ) : ℝ) - (Ne : ℝ) / 2 : ℝ) : ℂ) ≠ ⊥ := by
+    intro b hb hbne
+    obtain ⟨w, hwmem, hw0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hbne
+    obtain ⟨hwG, hwZ⟩ := Submodule.mem_inf.mp hwmem
+    rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hwZ
+    have hcas : (fermionTotalSpinSquared N).mulVec w
+        = ((((Ne : ℝ) / 2 : ℝ) : ℂ) * ((((Ne : ℝ) / 2 : ℝ) : ℂ) + 1)) • w := by
+      rw [hferro w hwG]
+      congr 1
+      push_cast
+      ring
+    have hplus : (fermionTotalSpinPlus N).mulVec w ≠ 0 :=
+      fermionTotalSpinPlus_mulVec_ne_zero_of_maxSpin w hw0 ((Ne : ℝ) / 2) ((b : ℝ) - (Ne : ℝ) / 2)
+        hwZ hcas (by have : (0 : ℝ) ≤ (b : ℝ) := Nat.cast_nonneg b; linarith)
+        (by have hbr : (b : ℝ) < (Ne : ℝ) := by exact_mod_cast hb
+            linarith)
+    refine fun hbot => hplus ?_
+    have hmem : (fermionTotalSpinPlus N).mulVec w ∈
+        hubbardEigenspaceAt t U E₀ Ne ⊓ Module.End.eigenspace (fermionTotalSpinZ N).mulVecLin
+          ((((b + 1 : ℕ) : ℝ) - (Ne : ℝ) / 2 : ℝ) : ℂ) := by
+      refine Submodule.mem_inf.mpr
+        ⟨fermionTotalSpinPlus_mulVec_mem_hubbardEigenspaceAt t U hwG, ?_⟩
+      rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply,
+        show ((((b + 1 : ℕ) : ℝ) - (Ne : ℝ) / 2 : ℝ) : ℂ)
+          = ((((b : ℝ) - (Ne : ℝ) / 2) + 1 : ℝ) : ℂ) from by push_cast; ring]
+      exact fermionTotalSpinZ_mulVec_fermionTotalSpinPlus_mulVec N ((b : ℝ) - (Ne : ℝ) / 2) hwZ
+    rw [hbot, Submodule.mem_bot] at hmem
+    exact hmem
+  -- iterate the raising step `j` times
+  have hup : ∀ j b : ℕ, b + j ≤ Ne →
+      hubbardEigenspaceAt t U E₀ Ne ⊓ Module.End.eigenspace (fermionTotalSpinZ N).mulVecLin
+          (((b : ℝ) - (Ne : ℝ) / 2 : ℝ) : ℂ) ≠ ⊥ →
+      hubbardEigenspaceAt t U E₀ Ne ⊓ Module.End.eigenspace (fermionTotalSpinZ N).mulVecLin
+          ((((b + j : ℕ) : ℝ) - (Ne : ℝ) / 2 : ℝ) : ℂ) ≠ ⊥ := by
+    intro j
+    induction j with
+    | zero => intro b _ hb; simpa using hb
+    | succ j ih =>
+      intro b hbj hb
+      have hstepj := hstep (b + j) (by omega) (ih b (by omega) hb)
+      rwa [show (((b + j + 1 : ℕ) : ℝ)) = (((b + (j + 1) : ℕ) : ℝ)) from by push_cast; ring]
+        at hstepj
+  -- some weight block is nonzero, else the whole eigenspace would vanish
+  obtain ⟨a, ha⟩ : ∃ a : Fin (Ne + 1),
+      hubbardEigenspaceAt t U E₀ Ne ⊓ Module.End.eigenspace (fermionTotalSpinZ N).mulVecLin
+        (((a : ℝ) - (Ne : ℝ) / 2 : ℝ) : ℂ) ≠ ⊥ := by
+    by_contra hcon
+    push Not at hcon
+    refine hne ?_
+    rw [hubbardEigenspaceAt_eq_iSup_weight t U Ne]
+    exact le_antisymm (iSup_le (fun a => (hcon a).le)) bot_le
+  have hja : (a : ℕ) ≤ Ne := Nat.lt_succ_iff.mp a.isLt
+  have htop := hup (Ne - (a : ℕ)) (a : ℕ) (by omega) ha
+  rw [show (((a : ℕ) + (Ne - (a : ℕ)) : ℕ) : ℝ) = ((Ne : ℕ) : ℝ) from by
+    rw [Nat.add_sub_cancel' hja]] at htop
+  obtain ⟨u, humem, hu0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot htop
+  obtain ⟨huG, huZ⟩ := Submodule.mem_inf.mp humem
+  rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at huZ
+  refine ⟨u, huG, hu0, ?_⟩
+  rw [huZ]
+  congr 2
+  ring
 
 /-! ## Upper bound: the top block is one-dimensional and lower blocks embed into it -/
 
@@ -98,7 +193,7 @@ theorem hubbardEigenspaceAtFilling_top_block_finrank_le_one {E₀ : ℂ} :
       simpa [proj] using hv0
     have hvN : (fermionTotalNumber (2 * N + 1)).mulVec (v : (Fin (2 * N + 2) → Fin 2) → ℂ)
         = ((N + 1 : ℕ) : ℂ) • (v : (Fin (2 * N + 2) → Fin 2) → ℂ) :=
-      (mem_hubbardEigenspaceAtFilling t U).mp (Submodule.mem_inf.mp v.2).1 |>.2
+      (mem_hubbardEigenspaceAt (Ne := N + 1) t U).mp (Submodule.mem_inf.mp v.2).1 |>.2
     have hvZ : (fermionTotalSpinZ N).mulVec (v : (Fin (2 * N + 2) → Fin 2) → ℂ)
         = ((((N + 1 : ℕ) : ℝ) / 2 : ℝ) : ℂ) • (v : (Fin (2 * N + 2) → Fin 2) → ℂ) := by
       have := (Submodule.mem_inf.mp v.2).2
@@ -178,7 +273,7 @@ theorem hubbardEigenspaceAtFilling_block_finrank_le_succ {E₀ : ℂ}
     have hwG := (Submodule.mem_inf.mp w.property).1
     change (fermionTotalSpinPlus N).mulVec w.val ∈ Ghi
     rw [hGhi, Submodule.mem_inf, Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
-    refine ⟨fermionTotalSpinPlus_mulVec_mem_hubbardEigenspaceAtFilling t U hwG, ?_⟩
+    refine ⟨fermionTotalSpinPlus_mulVec_mem_hubbardEigenspaceAt t U hwG, ?_⟩
     rw [show ((((a + 1 : ℝ) - ((N + 1 : ℕ) : ℝ) / 2 : ℝ)) : ℂ)
         = (((sz + 1 : ℝ)) : ℂ) from by rw [hsz]; push_cast; ring]
     exact fermionTotalSpinZ_mulVec_fermionTotalSpinPlus_mulVec N sz (hweight w)
@@ -199,8 +294,11 @@ theorem hubbardEigenspaceAtFilling_block_finrank_le_succ {E₀ : ℂ}
   have hdG : w.val - w'.val ∈ hubbardEigenspaceAtFilling t U E₀ :=
     Submodule.sub_mem _ (Submodule.mem_inf.mp w.property).1 (Submodule.mem_inf.mp w'.property).1
   have hcas := hferro _ hdG
-  refine fermionTotalSpinPlus_mulVec_ne_zero_of_maxSpin (w.val - w'.val) hd0 sz hdsz hcas
-    ?_ ?_ hdiff
+  rw [show ((N + 1 : ℕ) : ℂ) / 2 * (((N + 1 : ℕ) : ℂ) / 2 + 1)
+      = ((((N + 1 : ℕ) : ℝ) / 2 : ℝ) : ℂ) * (((((N + 1 : ℕ) : ℝ) / 2 : ℝ) : ℂ) + 1) from by
+    push_cast; ring] at hcas
+  refine fermionTotalSpinPlus_mulVec_ne_zero_of_maxSpin (w.val - w'.val) hd0
+    (((N + 1 : ℕ) : ℝ) / 2) sz hdsz hcas ?_ ?_ hdiff
   · rw [hsz]; have : (0 : ℝ) ≤ (a : ℝ) := Nat.cast_nonneg a; linarith
   · rw [hsz]; have : (a : ℝ) < ((N + 1 : ℕ) : ℝ) := by exact_mod_cast ha
     have hpos : (0 : ℝ) < ((N + 1 : ℕ) : ℝ) := by exact_mod_cast Nat.succ_pos N
@@ -249,7 +347,7 @@ theorem hubbardEigenspaceAtFilling_block_finrank_le_one {E₀ : ℂ}
 /-! ## Upper and lower bounds on the dimension -/
 
 /-- **Upper bound `finrank G ≤ N + 2`.**  `G` is the internal direct sum of its `N + 2` `Ŝ³`-weight
-blocks (`hubbardEigenspaceAtFilling_eq_iSup_weight` + independence of the `Ŝ³` eigenspaces), each of
+blocks (`hubbardEigenspaceAt_eq_iSup_weight` + independence of the `Ŝ³` eigenspaces), each of
 dimension `≤ 1` (`hubbardEigenspaceAtFilling_block_finrank_le_one`), so
 `finrank G = ∑ finrank (block) ≤ (N + 2)·1`. -/
 theorem hubbardEigenspaceAtFilling_finrank_le {E₀ : ℂ}
@@ -263,7 +361,7 @@ theorem hubbardEigenspaceAtFilling_finrank_le {E₀ : ℂ}
   set B : Fin (N + 1 + 1) → Submodule ℂ ((Fin (2 * N + 2) → Fin 2) → ℂ) :=
     fun a => hubbardEigenspaceAtFilling t U E₀ ⊓ Module.End.eigenspace T (wt a) with hB
   have hsup : ⨆ a, B a = hubbardEigenspaceAtFilling t U E₀ :=
-    (hubbardEigenspaceAtFilling_eq_iSup_weight t U).symm
+    (hubbardEigenspaceAt_eq_iSup_weight t U (N + 1)).symm
   have hwt_inj : Function.Injective wt := by
     intro a a' h
     simp only [hwt] at h
@@ -340,9 +438,8 @@ theorem hubbardEigenspaceAtFilling_finrank_ge
         rw [Nat.sub_sub_self hja], htop0, Nat.le_zero] at this
       exact this
     refine hne ?_
-    rw [hG, hubbardEigenspaceAtFilling_eq_iSup_weight t U]
+    rw [hG, hubbardEigenspaceAtFilling, hubbardEigenspaceAt_eq_iSup_weight t U (N + 1)]
     refine le_antisymm (iSup_le (fun a => ?_)) bot_le
-    rw [← hG]
     exact (hallbot a).le
   -- extract a nonzero top-weight vector `u ∈ G`
   obtain ⟨u, hutop, hune⟩ := Submodule.exists_mem_ne_zero_of_ne_bot htopBlockNe
@@ -355,14 +452,14 @@ theorem hubbardEigenspaceAtFilling_finrank_ge
     have hmem : (fermionTotalSpinPlus N).mulVec u ∈ G ⊓
         Module.End.eigenspace (fermionTotalSpinZ N).mulVecLin
           (((((N + 1 : ℕ) : ℝ) / 2 + 1 : ℝ)) : ℂ) := by
-      refine Submodule.mem_inf.mpr ⟨fermionTotalSpinPlus_mulVec_mem_hubbardEigenspaceAtFilling
+      refine Submodule.mem_inf.mpr ⟨fermionTotalSpinPlus_mulVec_mem_hubbardEigenspaceAt
         t U huG, ?_⟩
       rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
       exact fermionTotalSpinZ_mulVec_fermionTotalSpinPlus_mulVec N (((N + 1 : ℕ) : ℝ) / 2) huZ
     have hbot : G ⊓ Module.End.eigenspace (fermionTotalSpinZ N).mulVecLin
         (((((N + 1 : ℕ) : ℝ) / 2 + 1 : ℝ)) : ℂ) = ⊥ := by
       rw [hG]
-      refine hubbardEigenspaceAtFilling_inf_eigenspace_eq_bot t U _ (fun a hcon => ?_)
+      refine hubbardEigenspaceAt_inf_eigenspace_eq_bot t U (N + 1) _ (fun a hcon => ?_)
       have hreal : (((N + 1 : ℕ) : ℝ) / 2 + 1) = ((a : ℝ) - ((N + 1 : ℕ) : ℝ) / 2) := by
         exact_mod_cast hcon
       have hale : (a : ℝ) ≤ ((N + 1 : ℕ) : ℝ) := by
@@ -384,7 +481,7 @@ theorem hubbardEigenspaceAtFilling_finrank_ge
     | zero => rw [pow_zero, Matrix.one_mulVec]; exact huG
     | succ n ih =>
       rw [pow_succ', ← Matrix.mulVec_mulVec]
-      exact fermionTotalSpinMinus_mulVec_mem_hubbardEigenspaceAtFilling t U hJ hU ih
+      exact fermionTotalSpinMinus_mulVec_mem_hubbardEigenspaceAt t U hJ hU ih
   have hGLI : LinearIndependent ℂ (fun k : Fin (N + 1 + 1) =>
       (⟨((fermionTotalSpinMinus N) ^ (k : ℕ)).mulVec u, hmem k⟩ : G)) :=
     LinearIndependent.of_comp G.subtype hLI

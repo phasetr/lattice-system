@@ -141,14 +141,13 @@ theorem hubbardAllUpState_mem_of_maxSpin {E₀ : ℂ}
         rw [Nat.sub_sub_self hja], htop0, Nat.le_zero] at this
       exact this
     refine hne ?_
-    rw [hG, hubbardEigenspaceAtFilling_eq_iSup_weight t (U : ℂ)]
+    rw [hG, hubbardEigenspaceAtFilling, hubbardEigenspaceAt_eq_iSup_weight t (U : ℂ) (N + 1)]
     refine le_antisymm (iSup_le (fun a => ?_)) bot_le
-    rw [← hG]
     exact (hallbot a).le
   obtain ⟨u, hutop, hune⟩ := Submodule.exists_mem_ne_zero_of_ne_bot htopBlockNe
   have huG : u ∈ G := (Submodule.mem_inf.mp hutop).1
   have huN : (fermionTotalNumber (2 * N + 1)).mulVec u = ((N + 1 : ℕ) : ℂ) • u :=
-    ((mem_hubbardEigenspaceAtFilling t (U : ℂ)).mp huG).2
+    ((mem_hubbardEigenspaceAt (Ne := N + 1) t (U : ℂ)).mp huG).2
   have huZ : (fermionTotalSpinZ N).mulVec u = ((((N + 1 : ℕ) : ℝ) / 2 : ℝ) : ℂ) • u := by
     have := (Submodule.mem_inf.mp hutop).2
     rwa [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at this
@@ -173,7 +172,7 @@ theorem hubbard_groundEnergy_eq_trace {E₀ : ℂ}
     E₀ = ∑ i : Fin (N + 1), t i i := by
   have hH : (hubbardHamiltonian N t (U : ℂ)).mulVec (hubbardAllUpState N)
       = E₀ • hubbardAllUpState N :=
-    ((mem_hubbardEigenspaceAtFilling t (U : ℂ)).mp hmem).1
+    ((mem_hubbardEigenspaceAt (Ne := N + 1) t (U : ℂ)).mp hmem).1
   rw [hubbardHamiltonian_mulVec_allUpState_eigenstate] at hH
   have hne : hubbardAllUpState N ≠ 0 := hubbardAllUpState_ne_zero N
   have hsub : ((∑ i : Fin (N + 1), t i i) - E₀) • hubbardAllUpState N = 0 := by
