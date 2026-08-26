@@ -176,4 +176,39 @@ theorem eigenNumberOp_eq_site_sum {t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (
   simp only [spinfulCreationFromVector, spinfulAnnihilationFromVector, Finset.sum_mul,
     Finset.mul_sum, Finset.smul_sum, smul_mul_assoc, mul_smul_comm, smul_smul, Pi.star_apply]
 
+/-- **The eigenmode occupation numbers of one spin sum to its site occupation numbers**:
+`Σ_j n̂_{j,σ} = Σ_x n̂_{x,σ}`.  This is the operator form of the eigenbasis completeness relation
+`Σ_j e_j(y)·conj(e_j(x)) = δ_{yx}`, which collapses the double site sum of the eigenmode expansion
+onto its diagonal. -/
+theorem sum_eigenNumberOp_eq_sum_spinSiteNumber
+    {t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : t.IsHermitian) (σ : Fin 2) :
+    (∑ j : Fin (M + 1), eigenNumberOp hT j σ)
+      = ∑ i : Fin (M + 1), fermionMultiNumber (2 * M + 1) (spinfulIndex M i σ) := by
+  calc (∑ j : Fin (M + 1), eigenNumberOp hT j σ)
+      = ∑ j : Fin (M + 1), ∑ x : Fin (M + 1), ∑ y : Fin (M + 1),
+          (star ((eigenbasisAsBasis hT j : Fin (M + 1) → ℂ) x)
+              * (eigenbasisAsBasis hT j : Fin (M + 1) → ℂ) y) •
+            (fermionMultiCreation (2 * M + 1) (spinfulIndex M y σ) *
+              fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ)) :=
+        Finset.sum_congr rfl fun j _ => eigenNumberOp_eq_site_sum hT j σ
+    _ = ∑ x : Fin (M + 1), ∑ y : Fin (M + 1), ∑ j : Fin (M + 1),
+          (star ((eigenbasisAsBasis hT j : Fin (M + 1) → ℂ) x)
+              * (eigenbasisAsBasis hT j : Fin (M + 1) → ℂ) y) •
+            (fermionMultiCreation (2 * M + 1) (spinfulIndex M y σ) *
+              fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ)) := by
+        rw [Finset.sum_comm]
+        exact Finset.sum_congr rfl fun x _ => Finset.sum_comm
+    _ = ∑ x : Fin (M + 1), ∑ y : Fin (M + 1),
+          (if y = x then (1 : ℂ) else 0) •
+            (fermionMultiCreation (2 * M + 1) (spinfulIndex M y σ) *
+              fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ)) := by
+        refine Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => ?_
+        rw [← Finset.sum_smul, ← eigenbasisAsBasis_completeness_sum hT y x]
+        exact congrArg₂ _ (Finset.sum_congr rfl fun j _ => mul_comm _ _) rfl
+    _ = ∑ i : Fin (M + 1), fermionMultiNumber (2 * M + 1) (spinfulIndex M i σ) := by
+        refine Finset.sum_congr rfl fun x _ => ?_
+        rw [Finset.sum_eq_single x (fun y _ hy => by rw [if_neg hy, zero_smul])
+            (fun hx => absurd (Finset.mem_univ x) hx),
+          if_pos rfl, one_smul, fermionMultiNumber]
+
 end LatticeSystem.Fermion

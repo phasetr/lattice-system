@@ -11241,7 +11241,7 @@ Hermiticity hypotheses $\overline{t_{ij}}=t_{ji}$, $\overline U=U$ are added rel
 statement (needed for the $\hat S^-$-invariance of the eigenspace) and hold for the physical Hubbard
 model, so the strengthening is sound.
 
-\noindent\textbf{Theorem 11.3} (Tasaki §11.1.1, eqs.~(11.1.5)--(11.1.6), pp.~378--379; proved
+\noindent\textbf{Theorem 11.3} (Tasaki §11.1.1, eqs.~(11.1.5)--(11.1.6), p.~375; proved
 axiom-free, \texttt{HubbardImpossibilityLowU.lean} + \texttt{HubbardImpossibilityLowUVariational.lean}
 + \texttt{HubbardImpossibilityLowUVariationalCore.lean},
 Issue \#4599).  Ferromagnetism is impossible when the
@@ -11269,7 +11269,7 @@ built like the §11.5 t-J \texttt{TJFilling} pattern) then produces a genuine $(
 $\hat H$-eigenvalue $E$ with $E<E_0$ and nonempty eigenspace, contradicting the minimality of $E_0$
 (\texttt{hmin}).  Another book-order Chapter 11 backfill.
 
-\noindent\textbf{Theorem 11.4} (Tasaki §11.1.1, eqs.~(11.1.8)--(11.1.10), pp.~379--380; axiom
+\noindent\textbf{Theorem 11.4} (Tasaki §11.1.1, eqs.~(11.1.8)--(11.1.10), p.~376; axiom
 pending discharge, \texttt{HubbardImpossibilityLowDensity.lean}, Issue \#4477).  Impossibility of
 ferromagnetism at low densities (Pieri--Daul--Baeriswyl--Dzierzawa--Fazekas).  The dimension enters
 only through the exponent $2/d$ of the band condition (11.1.8), so no explicit $d$-dimensional
@@ -11296,6 +11296,50 @@ occupied levels --- the flat-band regime where ferromagnetism \emph{does} occur 
 variational approach gives no bound there.  Keeping $d>2$ explicit is likewise essential for
 soundness (the conclusion is false in $d=1$); the Roth/Gutzwiller variational proof is not yet
 formalized.  Another book-order Chapter 11 backfill.
+
+\medskip\noindent\textbf{Theorem 11.4 PR2, the spin-resolved kinetic layer (Tasaki §11.1.1,
+\texttt{HubbardKineticSpin.lean} + \texttt{HubbardKineticSpinBounds.lean}).}  The variational
+argument treats the two spin species differently, so the discharge starts by giving the kinetic
+operator a spin-resolved form.  We name the fiber
+$\hat H^\sigma=\sum_{i,j}t_{ij}\,\hat c^\dagger_{i\sigma}\hat c_{j\sigma}$
+(\texttt{hubbardKineticSpin}); the spin sum is the outermost layer of $\hat H_{\mathrm{kin}}$, so
+both $\hat H_{\mathrm{kin}}=\sum_\sigma\hat H^\sigma$ and
+$\hat H_{\mathrm{kin}}=\hat H^\uparrow+\hat H^\downarrow$ hold definitionally and the body of
+$\hat H_{\mathrm{kin}}$ is left as it is.  The eigenbasis diagonalization (11.1.5) is refactored per
+spin, $\hat H^\sigma=\sum_j\varepsilon_j\,\hat n_{j,\sigma}$
+(\texttt{hubbardKineticSpin\_eq\_sum\_eigenNumberOp},
+\texttt{HubbardImpossibilityLowUTrial.lean}), with the aggregate identity re-derived as its spin
+sum.
+
+Two operator facts are added on top.  First, the eigenmode occupation numbers of one spin sum to
+the site occupation numbers, $\sum_j\hat n_{j,\sigma}=\sum_x\hat n_{x,\sigma}$
+(\texttt{sum\_eigenNumberOp\_eq\_sum\_spinSiteNumber},
+\texttt{HubbardImpossibilityLowUTrialCore.lean}): this is the operator form of the eigenbasis
+\emph{completeness} relation $\sum_j e_j(y)\,\overline{e_j(x)}=\delta_{yx}$
+(\texttt{eigenbasisAsBasis\_completeness\_sum}, \texttt{GeneralFlatBandEigenbasis.lean}), read off
+the $(y,x)$ entry of $UU^\dagger=1$ for the unitary whose columns are the eigenvectors, and dual to
+the orthonormality relation already recorded there.  Each $\hat n_{j,\sigma}$ is the Gram matrix
+$\hat C_\sigma(\bar e_j)^\dagger\hat C_\sigma(\bar e_j)$ and hence positive semidefinite
+(\texttt{eigenNumberOp\_posSemidef}, \texttt{GeneralFlatBandSpanning.lean}), so
+$\varepsilon_{\max}\hat N_\sigma-\hat H^\sigma
+=\sum_j(\varepsilon_{\max}-\varepsilon_j)\,\hat n_{j,\sigma}$ is a nonnegative combination of
+positive-semidefinite operators: whenever $\varepsilon_j\le\varepsilon_{\max}$ for every $j$ we get
+the Loewner bound $\hat H^\sigma\le\varepsilon_{\max}\hat N_\sigma$
+(\texttt{hubbardKineticSpin\_le\_smul\_sum\_spinSiteNumber}).  Second, in the fully polarized sector
+$\hat N_\downarrow\Phi=0$ every down annihilator kills $\Phi$: $\hat N_\downarrow$ is a sum of Gram
+matrices $\hat c^\dagger_{x\downarrow}\hat c_{x\downarrow}$, so a vanishing total expectation forces
+each term, hence each $\hat c_{x\downarrow}\Phi$, to vanish
+(\texttt{fermionDownAnnihilation\_mulVec\_eq\_zero\_of\_downNumber\_zero}); every hopping term of
+$\hat H^\downarrow$ ends in such an annihilator, so $\hat H^\downarrow\Phi=0$
+(\texttt{hubbardKineticSpin\_one\_mulVec\_eq\_zero\_of\_downNumber\_zero}).
+
+This stage is infrastructure only: no statement of \texttt{hubbard\_theorem\_11\_4} changes.  The
+Loewner bound is what replaces the sharp evaluation of the minority-spin kinetic energy in the
+source argument: Hal Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems} (1st ed.,
+Springer 2020), §11.1.1, Theorem 11.4, eqs.~(11.1.8)--(11.1.10), p.~376; the underlying
+computation is Tasaki, Prog.\ Theor.\ Phys.\ \textbf{99} (1998) 489, Theorem 3.3, Appendix F,
+pp.~545--547, eqs.~(F.1)--(F.14), where $\hat H^\downarrow\le\varepsilon_{\max}\hat N_\downarrow$
+takes the place of (F.10)/(F.11).
 
 \noindent\textbf{Lemma 11.10} (Tasaki §11.3.1, eqs.~(11.3.1)--(11.3.2), pp.~405--406;
 \textbf{discharged axiom-free}, \texttt{TasakiFlatBandBasisLemma.lean}, Issue \#4477).  On the

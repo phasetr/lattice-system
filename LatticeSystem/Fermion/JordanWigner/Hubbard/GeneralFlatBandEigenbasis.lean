@@ -58,6 +58,25 @@ theorem eigenbasisAsBasis_orthonormal_sum
   simp only [starRingEnd_apply, eigenbasisAsBasis_apply]
   ring
 
+/-- **Completeness of the eigenbasis, in coordinate form**:
+`∑_j e_j(y)·conj(e_j(x)) = δ_{yx}` — the `(y, x)` entry of `U·Uᴴ = 1` for the unitary `U` whose
+columns are the eigenvectors.  Dual to `eigenbasisAsBasis_orthonormal_sum`. -/
+theorem eigenbasisAsBasis_completeness_sum
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : T.IsHermitian) (y x : Fin (M + 1)) :
+    (∑ j : Fin (M + 1), (eigenbasisAsBasis hT j : Fin (M + 1) → ℂ) y
+        * star ((eigenbasisAsBasis hT j : Fin (M + 1) → ℂ) x))
+      = if y = x then (1 : ℂ) else 0 := by
+  have hU : (hT.eigenvectorUnitary : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ)
+      * star (hT.eigenvectorUnitary : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) = 1 :=
+    Unitary.coe_mul_star_self _
+  have hentry := congrFun (congrFun hU y) x
+  rw [Matrix.mul_apply, Matrix.one_apply] at hentry
+  rw [← hentry]
+  refine Finset.sum_congr rfl fun j _ => ?_
+  rw [Matrix.star_eq_conjTranspose, Matrix.conjTranspose_apply,
+    Matrix.IsHermitian.eigenvectorUnitary_apply, Matrix.IsHermitian.eigenvectorUnitary_apply,
+    eigenbasisAsBasis_apply]
+
 /-- **The dual canonical anticommutation relation in the eigenbasis**:
 `{Ĉ_σ(ē_j), Ĉ†_τ(e_k)} = δ_{jk}·δ_{στ}·1`.  The smeared CAR
 (`spinfulFromVector_annihilation_creation_anticomm`) gives the coefficient
