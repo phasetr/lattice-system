@@ -64,7 +64,8 @@ The Roth trial state `Ψ = Ĉ†_↓(v)Φ↑` (Tasaki eq. (11.1.6)) and its Jord
 factorisation are covered by six further tests, which pin `hubbardLowDensityTrialState`,
 `fermionTotalDownNumber_mulVec_hubbardLowDensityTrialState`,
 `hubbardLowDensityTrialState_ne_zero`, `dotProduct_fermionDownCreation_sandwich`,
-`hubbardKinetic_mulVec_hubbardLowDensityTrialState` and
+`hubbardKinetic_mulVec_hubbardLowDensityTrialState`,
+`hubbardKineticSpin_mul_spinfulCreationFromVector` and
 `hubbardKineticSpin_commute_spinfulCreationFromVector_of_ne` at the shapes their consumers
 require:
 
@@ -83,7 +84,7 @@ require:
   *nonzero* trial state (`v = Pi.single x 1`), so the one-↓ sector statements it feeds are not
   vacuous.
 - **Red 18**: the kinetic consumption test — at `SUp = ∅` (so `Φ↑` is the vacuum and
-  `occupiedEigenEnergy hT ∅ ∅ = 0`), `K1`'s assembly collapses `Ĥ_kin Ψ` to `lam • Ψ` for an
+  `occupiedEigenEnergy hT ∅ ∅ = 0`), `E`'s assembly collapses `Ĥ_kin Ψ` to `lam • Ψ` for an
   eigenvector `v` of `t`.
 - **Red 19**: the spin-tag guard — `K1` at `σ = 1` (same spin as the trial state's ↓ creator,
   carrying the extra `Ĉ†(t·w)` term) pinned side by side with `K2` at `σ = 0, τ = 1` (cross spin,
