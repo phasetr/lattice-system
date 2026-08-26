@@ -11451,6 +11451,49 @@ eqs.~(11.1.6)--(11.1.9), pp.~375--376; Tasaki, Prog.\ Theor.\ Phys.\ \textbf{99}
 Theorem 3.3, eq.~(3.6), p.~506, and the anticommutation bookkeeping of Appendix F yielding
 eqs.~(F.8)--(F.11), pp.~545--546.
 
+\medskip\noindent\textbf{Theorem 11.4 PR5, translation invariance and the delocalized lowest
+eigenmode (Tasaki §11.1.1, \texttt{Math/MatrixAnalysis/PermInvariantUniformEigenvector.lean}).}
+The variational estimate evaluates the double-occupancy weight of
+$\Psi=\hat C^\dagger_\downarrow(v)\Phi_\uparrow$ using $|v_x|^2=1/|\Lambda|$ for the single-particle
+mode $v$, which the paper reads off from translation invariance of the hopping matrix (Appendix~F,
+p.~545).  This stage \emph{derives} that delocalization rather than assuming it, and the derivation
+mentions neither the Hubbard model nor fermions --- it is generic finite-dimensional linear algebra
+about a matrix invariant under a transitive permutation symmetry, hence placed in
+\texttt{Math/MatrixAnalysis/} by topic.
+
+Let $\sigma$ be a permutation of the site index set leaving the hopping matrix invariant,
+$t_{\sigma i,\sigma j}=t_{ij}$.  Through the permutation matrix $P_\sigma$ (mathlib's
+\texttt{toPEquiv.toMatrix}) this hypothesis is exactly a commutation, $P_\sigma t=tP_\sigma$
+(\texttt{commute\_toPEquiv\_toMatrix\_of\_perm\_invariant}): both products are submatrices of $t$
+reindexed by $\sigma$, so the claim reduces to $t_{\sigma i,j}=t_{i,\sigma^{-1}j}$, which is the
+hypothesis evaluated at $(i,\sigma^{-1}j)$.  Consequently $P_\sigma$ preserves every eigenspace of
+$t$, and a nonzero invariant subspace over $\mathbb{C}$ contains an eigenvector of the operator
+preserving it: the $\lambda$-eigenspace contains some $w\ne0$ with $w\circ\sigma=\mu\,w$.
+
+The factor $\mu$ is a phase, and seeing this needs no argument about the order of $\sigma$: summing
+$|w_{\sigma x}|=|\mu|\,|w_x|$ over $x$ gives $\sum_x|w_x|=|\mu|\sum_x|w_x|$, because $\sigma$ merely
+permutes the summands, while $\sum_x|w_x|>0$ since $w\ne0$; hence $|\mu|=1$ and
+$|w_{\sigma x}|=|w_x|$ pointwise.  Induction propagates the equality along the powers of $\sigma$,
+so if those powers act transitively then $x\mapsto|w_x|$ is constant
+(\texttt{norm\_apply\_eq\_norm\_apply\_of\_comp\_perm\_smul}).  This is the one place in the whole
+discharge where transitivity of the translations is consumed, and it is load-bearing rather than
+decorative: for $\sigma=1$ the invariance hypothesis holds for every $t$, yet
+$t=\mathrm{diag}(0,1)$ has only localized $0$-eigenvectors.
+
+Rescaling $w$ by $\sqrt{|\Lambda|}\,|w_{x_0}|$ turns constancy into the paper's normalization: every
+nontrivial eigenspace of a transitively symmetric $t$ contains a $v$ with $t\,v=\lambda v$ and
+$|v_x|^2=1/|\Lambda|$ at every site
+(\texttt{exists\_uniformModulus\_eigenvector\_of\_transitive\_perm\_invariance}).  The eigenvalue is
+left abstract, so the later assembly consumes this without touching any level enumeration.  The
+hypothesis of nontriviality is supplied separately: if the values of a level function $\varepsilon$
+enumerate the spectrum of a Hermitian $t$ as multisets, then every $\varepsilon_i$ genuinely is an
+eigenvalue and its eigenspace is nontrivial
+(\texttt{eigenspace\_mulVecLin\_ne\_bot\_of\_map\_eq}), a vector of mathlib's spectral
+eigenvector basis serving as the witness.  This stage is again infrastructure only: no statement of
+\texttt{hubbard\_theorem\_11\_4} changes.  Sources: Hal Tasaki, \emph{Physics and Mathematics of
+Quantum Many-Body Systems} (1st ed., Springer 2020), §11.1.1, Theorem 11.4, p.~375; Tasaki,
+Prog.\ Theor.\ Phys.\ \textbf{99} (1998) 489, Theorem 3.3, Appendix~F, p.~545.
+
 \noindent\textbf{Lemma 11.10} (Tasaki §11.3.1, eqs.~(11.3.1)--(11.3.2), pp.~405--406;
 \textbf{discharged axiom-free}, \texttt{TasakiFlatBandBasisLemma.lean}, Issue \#4477).  On the
 decorated lattice $\Lambda=E\cup I$ the localized states $\{\alpha_p\}_{p\in E}$ (metallic) and
