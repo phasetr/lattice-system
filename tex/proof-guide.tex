@@ -11341,6 +11341,46 @@ computation is Tasaki, Prog.\ Theor.\ Phys.\ \textbf{99} (1998) 489, Theorem 3.3
 pp.~545--547, eqs.~(F.1)--(F.14), where $\hat H^\downarrow\le\varepsilon_{\max}\hat N_\downarrow$
 takes the place of (F.10)/(F.11).
 
+\medskip\noindent\textbf{Theorem 11.4 PR3, the on-site interaction on the
+one-$\downarrow$-electron sector (Tasaki §11.1.1,
+\texttt{HubbardOnSiteInteractionSingleDown.lean}).}  The trial state of the argument is Roth's
+$\tilde\Psi=\hat P_0\Psi=(1-\hat\nu)\Psi$, with $\hat P_0=\prod_x(1-\hat n_{x\uparrow}\hat
+n_{x\downarrow})$ and $\hat\nu=\sum_{x\in\Lambda}\hat n_{x\uparrow}\hat n_{x\downarrow}$ (book
+eqs.~(11.1.9)/(11.1.10), p.~376; paper eq.~(F.1)), built on a $\Psi$ carrying a single $\downarrow$
+electron.  This stage formalizes the operator content of that projection on the whole sector
+$\hat N_\downarrow v=v$ rather than for the trial state alone, so that the later stages can feed it
+whichever vector they construct.
+
+The operator $\hat\nu$ is diagonal in the occupation basis with eigenvalue the number of doubly
+occupied sites (\texttt{hubbardOnSiteInteractionSite\_mulVec\_apply}, reused through the
+definitional identification of the constant coupling with the site-dependent one, so that no
+diagonality statement is restated).  On a configuration in the support of a vector with
+$\hat N_\downarrow v=v$ the $\downarrow$-count is $1$
+(\texttt{mulVec\_apply\_eq\_zero\_of\_downNumber\_ne}), hence $\sum_x n_{x\uparrow}n_{x\downarrow}
+\le\sum_x n_{x\downarrow}=1$; this is the counting form of the opening line of Appendix F,
+``$\hat n_{x\downarrow}\hat n_{y\downarrow}\Psi=0$ for any $x\ne y$ since there is only one
+$\downarrow$ electron'' (p.~545).  Three consequences follow.  The eigenvalue being $0$ or $1$,
+$\hat\nu$ is idempotent on the sector, $\hat\nu(\hat\nu v)=\hat\nu v$
+(\texttt{hubbardOnSiteInteraction\_mulVec\_mulVec\_of\_downNumber\_one}).  The doubly occupied part
+stays inside the sector, $\hat N_\downarrow(\hat\nu v)=\hat\nu v$
+(\texttt{fermionTotalDownNumber\_mulVec\_hubbardOnSiteInteraction\_mulVec\_of\_downNumber\_one}),
+which is what lets the minority-spin Loewner bound of the previous stage be applied to it.  And
+since $\hat H_{\mathrm{int}}(U)=U\hat\nu$, the projected vector minimizes the Coulomb interaction
+exactly, $\hat H_{\mathrm{int}}(U)(v-\hat\nu v)=0$ for \emph{every} $U$
+(\texttt{hubbardOnSiteInteraction\_mulVec\_sub\_self\_eq\_zero\_of\_downNumber\_one}) --- the book's
+``the state (11.1.9) minimizes the Coulomb interaction as $\hat H_{\mathrm{int}}\tilde\Psi=0$'', and
+the reason the eventual bound is uniform in $U\ge0$.
+
+The normalization is (F.2), $\langle\tilde\Psi,\tilde\Psi\rangle=\langle\Psi,\hat P_0\Psi\rangle
+=1-\langle\Psi,\hat\nu\Psi\rangle$ for normalized $\Psi$: with $\hat\nu$ Hermitian and idempotent on
+the sector the cross terms collapse and $\|v-\hat\nu v\|^2=\|v\|^2-\langle v,\hat\nu v\rangle$
+(\texttt{dotProduct\_star\_self\_sub\_hubbardOnSiteInteraction\_re\_of\_downNumber\_one}), stated on
+real parts because that is the shape the Rayleigh quotient consumes.  This stage is again
+infrastructure only: no statement of \texttt{hubbard\_theorem\_11\_4} changes.  Sources: Hal Tasaki,
+\emph{Physics and Mathematics of Quantum Many-Body Systems} (1st ed., Springer 2020), §11.1.1,
+Theorem 11.4, eqs.~(11.1.9)/(11.1.10), p.~376; Tasaki, Prog.\ Theor.\ Phys.\ \textbf{99} (1998) 489,
+Theorem 3.3, Appendix F, p.~545, eqs.~(F.1)/(F.2).
+
 \noindent\textbf{Lemma 11.10} (Tasaki §11.3.1, eqs.~(11.3.1)--(11.3.2), pp.~405--406;
 \textbf{discharged axiom-free}, \texttt{TasakiFlatBandBasisLemma.lean}, Issue \#4477).  On the
 decorated lattice $\Lambda=E\cup I$ the localized states $\{\alpha_p\}_{p\in E}$ (metallic) and
