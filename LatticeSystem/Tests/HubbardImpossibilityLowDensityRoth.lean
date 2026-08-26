@@ -43,7 +43,7 @@ These tests pin the three PR-6 modules:
 - **Red 36 (spin-tag guard)**: the sandwich at `σ := 0` versus `σ := 1` on the same `t` — both
   hold, and the statement's `spinfulIndex M x σ` must track `σ` (mirrors PR-4's Red 19).
 - **Red 37 (G1 sharpness)**: without the row-sum hypothesis `hK`, the conclusion `‖lam‖ ≤ K` is
-  false: on `Fin 1`, `t := ![![2]]`, `lam := 2`, `K := 1` — the row sum is `2 > 1`. Standalone,
+  false: on `Fin 1`, `t := fun _ _ => 2`, `lam := 2`, `K := 1` — the row sum is `2 > 1`. Standalone,
   mirrors PR-5 Red 22 / PR-5b Red 30.
 - **Red 38 (non-vacuity)**: `0 < ‖Ψ̃‖²` at a concrete configuration — the Roth projection does not
   annihilate the trial state, guarding against a "bound proved because both sides are 0"
@@ -62,7 +62,7 @@ the natural-number coercion `((1 : ℕ) : ℝ)` that the statement's `(M : ℝ)`
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §11.1.1, Theorem 11.4, eqs. (11.1.9)/(11.1.10), p. 376; Tasaki, Prog. Theor. Phys. **99**
-(1998) 489, Theorem 3.3, Appendix F, eqs. (F.1)–(F.13), pp. 545–546.
+(1998) 489, Theorem 3.3, Appendix F, eqs. (F.1)–(F.3) and (F.8)–(F.13), pp. 545–546.
 -/
 
 namespace LatticeSystem.Tests.HubbardImpossibilityLowDensityRoth
