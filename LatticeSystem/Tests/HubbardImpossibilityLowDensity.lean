@@ -601,14 +601,16 @@ example :
 /-!
 ## Theorem 11.4 PR-5b — the single-particle spectrum enumeration bridge
 
-The six Reds below pin the six declarations of `LatticeSystem/Math/MonotoneEnumeration.lean`
-(`eq_comp_sort_of_monotone_of_map_eq` = C1, `val_le_val_of_strictMono` = C2 (private, not
-referenced here), `sum_lowestLevels_le_sum_of_monotone` = C4a, `sum_lowestLevels_le_sum_of_map_eq`
-= C4, `exists_lowestLevels_finset_of_map_eq` = C3, `sum_lowestLevels_succ` = C5), per
+The six Reds below cover `LatticeSystem/Math/MonotoneEnumeration.lean`. Four of its six
+declarations are referenced directly: `eq_comp_sort_of_monotone_of_map_eq` = C1 (Red 26),
+`sum_lowestLevels_le_sum_of_map_eq` = C4 (Red 27), `exists_lowestLevels_finset_of_map_eq` = C3
+(Reds 28 and 31), `sum_lowestLevels_succ` = C5 (Red 29). The other two —
+`sum_lowestLevels_le_sum_of_monotone` = C4a and the private `val_le_val_of_strictMono` = C2 — are
+covered only indirectly, through C4's proof, which is the sole chain that reaches them. Red 30 is
+the standalone sharpness counterexample and references none of C1–C5. The numbering follows
 `.self-local/docs/theorem-11-4-pr5b-design.md` §5. The primary fixture is `m = 3`, `α = ℕ`,
 `ε := ![0, 1, 2]`, `g := ![2, 0, 1]`, chosen so `hspec`/`hmono`/every concrete sum is `decide`-able.
-Red 30 is the standalone sharpness counterexample and references none of C1–C5. Red 31 is the
-junction guard at the real consumer's types (`Matrix.IsHermitian.eigenvalues` /
+Red 31 is the junction guard at the real consumer's types (`Matrix.IsHermitian.eigenvalues` /
 `occupiedEigenEnergy`).
 -/
 
@@ -689,9 +691,10 @@ example :
 `g := hT.eigenvalues` for `hT : (0 : Matrix (Fin 2) (Fin 2) ℂ).IsHermitian` and `ε := 0` (`hspec`
 by rewriting `hT.eigenvalues = 0`, itself obtained from `Matrix.IsHermitian.eigenvalues_eq` and
 `Matrix.zero_mulVec`), then feeds the returned `S : Finset (Fin 2)` to `occupiedEigenEnergy hT S ∅`
-and asserts it is `0`. This is the junction guard: it pins that the `Finset (Fin (M+1))` produced
-by the generic `Math/` layer is literally the argument type the Fermion layer wants, which is the
-only thing that can break silently between PR-5b and PR-7. -/
+and asserts it is `0`. This is the junction guard for the argument *type*: it pins that the
+`Finset (Fin (M+1))` produced by the generic `Math/` layer is literally what the Fermion layer
+takes. The arc's remaining junction obligations — securing `Ne ≤ N + 1` and obtaining
+`hspec`/`hmono` at the genuine eigenvalues — are not exercised here and first arise in PR-7. -/
 example {hT : (0 : Matrix (Fin 2) (Fin 2) ℂ).IsHermitian} :
     ∃ S : Finset (Fin 2), S.card = 1 ∧ occupiedEigenEnergy hT S ∅ = 0 := by
   have heig : ∀ i, hT.eigenvalues i = 0 := fun i => by
