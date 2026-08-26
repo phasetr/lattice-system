@@ -7,6 +7,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveCoeffAction
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveBalancedSectorGround
 import LatticeSystem.Quantum.SpinS.RayleighInfMatrix
 import LatticeSystem.Math.MatrixAnalysis.CourantFischer
+import Mathlib.Data.Matrix.PEquiv
 
 /-!
 # Test coverage for Theorem 11.4 (impossibility of ferromagnetism at low densities)
@@ -427,5 +428,141 @@ example {M : ℕ} (t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) (w : Fin (M + 1) 
   ⟨hubbardKineticSpin_mul_spinfulCreationFromVector M t w 1,
     (hubbardKineticSpin_commute_spinfulCreationFromVector_of_ne M t w
       (by decide : (0 : Fin 2) ≠ 1)).eq⟩
+
+/-!
+## Theorem 11.4 PR-5 — translation invariance and the delocalised lowest eigenmode
+
+The next six tests are Reds against the four PR-5 declarations
+(`commute_toPEquiv_toMatrix_of_perm_invariant`,
+`norm_apply_eq_norm_apply_of_comp_perm_smul`, `eigenspace_mulVecLin_ne_bot_of_map_eq`,
+`exists_uniformModulus_eigenvector_of_transitive_perm_invariance`), per
+`.self-local/docs/theorem-11-4-pr5-design.md` §5.  PR-5's production module
+(`LatticeSystem/Math/MatrixAnalysis/PermInvariantUniformEigenvector.lean`) does not exist yet, so
+Reds 20/21/23/24/25 fail to elaborate on the identifiers above (`unknown identifier`); Red 22 is
+the sharpness guard and needs none of them — it is provable today, purely from existing mathlib
+API, as the counterexample showing `_htransitive` cannot be dropped from A4.
+-/
+
+/-- **Red 20.** Application-shape / non-vacuity guard for A4 at `M = 1`. With `σ = Equiv.swap 0 1`
+and `t = 0`, `htrans` and `htransitive` hold trivially and the eigenspace at `lam = 0` is `⊤ ≠ ⊥`
+(witnessed by `Pi.single 0 1`); A4 then returns some `v` whose normalisation
+`∑ x, ‖v x‖ ^ 2 = 1` is the consequence pinned here (an off-by-one in the `1 / card n` constant
+would give `2` instead). -/
+example :
+    ∃ v : Fin 2 → ℂ, (0 : Matrix (Fin 2) (Fin 2) ℂ).mulVec v = (0 : ℂ) • v
+      ∧ ∑ x, ‖v x‖ ^ 2 = 1 := by
+  have htrans : ∀ i j : Fin 2,
+      (0 : Matrix (Fin 2) (Fin 2) ℂ) (Equiv.swap (0 : Fin 2) 1 i) (Equiv.swap (0 : Fin 2) 1 j)
+        = (0 : Matrix (Fin 2) (Fin 2) ℂ) i j := by
+    intro i j; simp
+  have htransitive : ∀ i j : Fin 2, ∃ k : ℕ, ((Equiv.swap (0 : Fin 2) 1) ^ k) i = j := by
+    intro i j; fin_cases i <;> fin_cases j <;> first | exact ⟨0, rfl⟩ | exact ⟨1, by decide⟩
+  have hlam : Module.End.eigenspace (0 : Matrix (Fin 2) (Fin 2) ℂ).mulVecLin (0 : ℂ) ≠ ⊥ := by
+    rw [Submodule.ne_bot_iff]
+    refine ⟨Pi.single 0 1, ?_, ?_⟩
+    · rw [Module.End.mem_eigenspace_iff]; simp
+    · intro h
+      have := congrFun h 0
+      simp at this
+  obtain ⟨v, hv, hmod⟩ :=
+    LatticeSystem.Math.exists_uniformModulus_eigenvector_of_transitive_perm_invariance
+      htrans htransitive hlam
+  refine ⟨v, hv, ?_⟩
+  simp only [hmod]
+  simp
+
+/-- **Red 21.** Size dependence of A4's constant: at `M = 2` (`σ = finRotate 3`), the returned
+eigenvector satisfies `∀ x, ‖v x‖ ^ 2 = 1 / 3`, pinning `1 / (M + 1)` against a coincidence at
+`M = 1` (Red 20). -/
+example :
+    ∃ v : Fin 3 → ℂ, (0 : Matrix (Fin 3) (Fin 3) ℂ).mulVec v = (0 : ℂ) • v
+      ∧ ∀ x, ‖v x‖ ^ 2 = 1 / 3 := by
+  have htrans : ∀ i j : Fin 3,
+      (0 : Matrix (Fin 3) (Fin 3) ℂ) (finRotate 3 i) (finRotate 3 j)
+        = (0 : Matrix (Fin 3) (Fin 3) ℂ) i j := by
+    intro i j; simp
+  have htransitive : ∀ i j : Fin 3, ∃ k : ℕ, ((finRotate 3) ^ k) i = j := by
+    intro i j
+    fin_cases i <;> fin_cases j <;>
+      first | exact ⟨0, rfl⟩ | exact ⟨1, by decide⟩ | exact ⟨2, by decide⟩
+  have hlam : Module.End.eigenspace (0 : Matrix (Fin 3) (Fin 3) ℂ).mulVecLin (0 : ℂ) ≠ ⊥ := by
+    rw [Submodule.ne_bot_iff]
+    refine ⟨Pi.single 0 1, ?_, ?_⟩
+    · rw [Module.End.mem_eigenspace_iff]; simp
+    · intro h
+      have := congrFun h 0
+      simp at this
+  obtain ⟨v, hv, hmod⟩ :=
+    LatticeSystem.Math.exists_uniformModulus_eigenvector_of_transitive_perm_invariance
+      htrans htransitive hlam
+  exact ⟨v, hv, fun x => by simpa using hmod x⟩
+
+/-- **Red 22 (sharpness of `_htransitive`).** With `σ = 1` (the identity), `htrans` holds for
+*every* matrix `t` — in particular for `t = Matrix.diagonal ![0, 1]` at `lam = 0` — so if the
+transitivity hypothesis were droppable from A4, every `0`-eigenvector of this `t` would have
+constant modulus `1/2`. It does not: the eigen-equation forces `v 1 = 0`, and `‖v 1‖ ^ 2 = 0 ≠ 1/2`.
+This is a standalone counterexample using only existing mathlib API (no reference to A4),
+witnessing that `_htransitive` is load-bearing and not decoration. -/
+example :
+    ∀ v : Fin 2 → ℂ, (Matrix.diagonal ![(0 : ℂ), 1]).mulVec v = (0 : ℂ) • v →
+      ¬ (∀ x, ‖v x‖ ^ 2 = 1 / 2) := by
+  intro v hv hcontra
+  have h1 : v 1 = 0 := by
+    have hcongr := congrFun hv 1
+    rw [Matrix.mulVec_diagonal] at hcongr
+    simpa using hcongr
+  have := hcontra 1
+  rw [h1] at this
+  norm_num at this
+
+/-- **Red 23 (A1 pinned).** `commute_toPEquiv_toMatrix_of_perm_invariant` applied to a genuinely
+swap-invariant `t = ![![a, b], ![b, a]]` (with `a = 1`, `b = 2`) gives the commutation
+`P_σ · t = t · P_σ`. -/
+example :
+    Commute ((Equiv.swap (0 : Fin 2) 1).toPEquiv.toMatrix : Matrix (Fin 2) (Fin 2) ℂ)
+      (Matrix.of ![![(1 : ℂ), 2], ![2, 1]]) :=
+  LatticeSystem.Math.commute_toPEquiv_toMatrix_of_perm_invariant
+    (fun i j => by fin_cases i <;> fin_cases j <;> simp [Equiv.swap_apply_def])
+
+/-- **Red 23b (A1's hypothesis pinned).** `htrans` itself *fails* for
+`t = Matrix.diagonal ![0, 1]` under `σ = Equiv.swap 0 1` — pinning that A1's hypothesis is the
+invariance condition and not something weaker (a reviewer's first question about A1). -/
+example :
+    ¬ (∀ i j : Fin 2,
+        (Matrix.diagonal ![(0 : ℂ), 1]) (Equiv.swap (0 : Fin 2) 1 i)
+            (Equiv.swap (0 : Fin 2) 1 j)
+          = (Matrix.diagonal ![(0 : ℂ), 1]) i j) := by
+  intro h
+  have := h 0 0
+  simp [Equiv.swap_apply_left, Matrix.diagonal_apply_eq] at this
+
+/-- **Red 24 (A3 pinned).** On the `1 × 1` zero matrix (trivially Hermitian), taking
+`ε := hT.eigenvalues` makes `hspec` the reflexive multiset equality, and
+`eigenspace_mulVecLin_ne_bot_of_map_eq` must still deliver a non-trivial eigenspace at `ε 0`.
+Guards the `Multiset.map` direction (an inverted `hspec` would still typecheck but state a
+different fact). -/
+example :
+    Module.End.eigenspace (0 : Matrix (Fin 1) (Fin 1) ℂ).mulVecLin
+        (((Matrix.isHermitian_zero (n := Fin 1) (α := ℂ)).eigenvalues 0 : ℝ) : ℂ)
+      ≠ ⊥ :=
+  LatticeSystem.Math.eigenspace_mulVecLin_ne_bot_of_map_eq
+    (t := (0 : Matrix (Fin 1) (Fin 1) ℂ)) (Matrix.isHermitian_zero (n := Fin 1) (α := ℂ))
+    (ε := (Matrix.isHermitian_zero (n := Fin 1) (α := ℂ)).eigenvalues) rfl 0
+
+/-- **Red 25 (A2 pinned in isolation).** Concrete `w = ![1, -1]`, `σ = Equiv.swap 0 1`, `μ = -1`
+(deliberately not `1`, so the proof cannot silently assume the phase is trivial) satisfy
+`w ∘ σ = μ • w`; A2 must conclude `‖w 0‖ = ‖w 1‖`. -/
+example :
+    ‖(![(1 : ℂ), -1] : Fin 2 → ℂ) 0‖ = ‖(![(1 : ℂ), -1] : Fin 2 → ℂ) 1‖ := by
+  set w : Fin 2 → ℂ := ![1, -1] with hw_def
+  have hw : w ∘ (Equiv.swap (0 : Fin 2) 1) = (-1 : ℂ) • w := by
+    funext x; fin_cases x <;> simp [hw_def]
+  have hne : w ≠ 0 := by
+    intro h
+    have := congrFun h 0
+    simp [hw_def] at this
+  have htransitive : ∀ i j : Fin 2, ∃ k : ℕ, ((Equiv.swap (0 : Fin 2) 1) ^ k) i = j := by
+    intro i j; fin_cases i <;> fin_cases j <;> first | exact ⟨0, rfl⟩ | exact ⟨1, by decide⟩
+  exact LatticeSystem.Math.norm_apply_eq_norm_apply_of_comp_perm_smul hw hne htransitive 0 1
 
 end LatticeSystem.Tests.HubbardImpossibilityLowDensity
