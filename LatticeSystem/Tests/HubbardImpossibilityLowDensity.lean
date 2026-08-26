@@ -5,6 +5,9 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowDensity
 import LatticeSystem.Fermion.JordanWigner.Hubbard.ChargesCore
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveCoeffAction
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveBalancedSectorGround
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardFerromagnetismStructure
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SaturatedFerromagnetism
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TJAllUpProperties
 import LatticeSystem.Quantum.SpinS.RayleighInfMatrix
 import LatticeSystem.Math.MatrixAnalysis.CourantFischer
 import LatticeSystem.Math.MatrixAnalysis.PermInvariantUniformEigenvector
@@ -710,5 +713,69 @@ example {hT : (0 : Matrix (Fin 2) (Fin 2) ℂ).IsHermitian} :
   have hSsumR : (∑ p ∈ S, hT.eigenvalues p) = 0 := by rw [hSsum]; simp
   unfold occupiedEigenEnergy
   rw [← Complex.ofReal_sum, hSsumR, Finset.sum_empty, Complex.ofReal_zero, add_zero]
+
+/-!
+## Theorem 11.4 PR-7a — general-filling weight machinery
+
+The three Reds below (continuing the numbering at Red 42, per
+`.self-local/docs/theorem-11-4-pr7-design.md` §4/§7) cover the in-place generalisation of the
+`hubbardEigenspaceAtFilling` weight machinery from the fixed filling `N + 1` to a general `Ne`, and
+the new SU(2) raising-chain existence lemma `exists_topWeight_of_maxSpin`. Red 42 and Red 43
+reference names that do not exist yet at general `Ne` (only the `…AtFilling` specialisations at
+`Ne = N + 1` exist today), so they are expected to fail with an *unknown identifier* error until
+the generalisation lands. Red 44 is the standalone sharpness counterexample (PR-5 Red 22 / PR-5b
+Red 30 discipline): it references none of the generalised names and is expected to already
+typecheck against the existing `SaturatedFerromagnetism`/`TJAllUpProperties` API.
+-/
+
+/-- **Red 42 (generalisation guard: the weight machinery at a filling `Ne ≠ N + 1`).** At
+`N := 1`, `Ne := 1` (so `Ne ≠ N + 1 = 2`), the generalised membership lemma
+`mem_hubbardEigenspaceAt` and the generalised `Ŝ³`-invariance lemma
+`fermionTotalSpinZ_mulVec_mem_hubbardEigenspaceAt` must hold at the *stated* filling `Ne`, not at a
+silently retained `N + 1`. A generalisation that dropped `Ne` and kept `N + 1` hard-coded would
+fail to typecheck against this statement (the ambient type `Fin 4 → Fin 2 → ℂ` fixes `N = 1`, and
+`Ne := 1 ≠ 2`). -/
+example {v : (Fin 4 → Fin 2) → ℂ} {E₀ : ℂ}
+    (hv : v ∈ hubbardEigenspaceAt (0 : Matrix (Fin 2) (Fin 2) ℂ) (0 : ℂ) E₀ 1) :
+    (hubbardHamiltonian 1 0 0).mulVec v = E₀ • v ∧
+      (fermionTotalNumber 3).mulVec v = ((1 : ℕ) : ℂ) • v ∧
+      (fermionTotalSpinZ 1).mulVec v ∈
+        hubbardEigenspaceAt (0 : Matrix (Fin 2) (Fin 2) ℂ) (0 : ℂ) E₀ 1 := by
+  obtain ⟨hH, hN⟩ := mem_hubbardEigenspaceAt.mp hv
+  exact ⟨hH, hN, fermionTotalSpinZ_mulVec_mem_hubbardEigenspaceAt hv⟩
+
+/-- **Red 43 (`exists_topWeight_of_maxSpin`, starting the raising chain below the top).** At
+`t := 0`, `U := 0`, `N := 1`, `Ne := 2` (so `S := (Ne : ℝ) / 2 = 1`): given the max-spin hypothesis
+`hferro` on the whole eigenspace and non-vacuity `hne`, the returned top-weight vector `u` really
+has `Ŝ³ u = 1 • u`, i.e. weight `S`, not merely *some* weight in the tower. A statement-only /
+wrong-weight proof would fail the final conjunct. -/
+example {E₀ : ℂ}
+    (hferro : ∀ v ∈ hubbardEigenspaceAt (0 : Matrix (Fin 2) (Fin 2) ℂ) (0 : ℂ) E₀ 2,
+      (fermionTotalSpinSquared 1).mulVec v =
+        (((2 : ℂ) / 2) * ((2 : ℂ) / 2 + 1)) • v)
+    (hne : hubbardEigenspaceAt (0 : Matrix (Fin 2) (Fin 2) ℂ) (0 : ℂ) E₀ 2 ≠ ⊥) :
+    ∃ u, u ∈ hubbardEigenspaceAt (0 : Matrix (Fin 2) (Fin 2) ℂ) (0 : ℂ) E₀ 2 ∧ u ≠ 0 ∧
+      (fermionTotalSpinZ 1).mulVec u = ((1 : ℝ) : ℂ) • u := by
+  obtain ⟨u, hu1, hu2, hu3⟩ := exists_topWeight_of_maxSpin 2 hferro hne
+  refine ⟨u, hu1, hu2, ?_⟩
+  rw [hu3]
+  norm_num
+
+/-- **Red 44 (sharpness of `sz < S`: a top-weight vector is annihilated by `Ŝ⁺`).** Standalone,
+referencing none of the generalised lemma's names, mirroring the PR-5 Red 22 / PR-5b Red 30
+discipline. At `N := 0` (`S := (N + 1)/2 = 1/2`), the all-up state `|↑⟩` satisfies both the `Ŝ³`
+weight and the `(Ŝ_tot)²` max-spin hypotheses that
+`fermionTotalSpinPlus_mulVec_ne_zero_of_maxSpin` needs, at exactly `sz = S` (the boundary the
+hypothesis `hhigh : sz < S` excludes), and yet `Ŝ⁺ |↑⟩ = 0`. So the conclusion `Ŝ⁺ v ≠ 0` genuinely
+fails once `sz < S` is weakened to `sz ≤ S`: `hhigh` is load-bearing, not decoration. -/
+example :
+    hubbardAllUpState 0 ≠ 0 ∧
+      (fermionTotalSpinZ 0).mulVec (hubbardAllUpState 0) =
+        (((0 + 1 : ℕ) : ℂ) / 2) • hubbardAllUpState 0 ∧
+      (fermionTotalSpinSquared 0).mulVec (hubbardAllUpState 0) =
+        (((0 + 1 : ℕ) : ℂ) / 2 * (((0 + 1 : ℕ) : ℂ) / 2 + 1)) • hubbardAllUpState 0 ∧
+      (fermionTotalSpinPlus 0).mulVec (hubbardAllUpState 0) = 0 :=
+  ⟨hubbardAllUpState_ne_zero 0, fermionTotalSpinZ_mulVec_allUpState 0,
+    fermionTotalSpinSquared_mulVec_allUpState 0, fermionTotalSpinPlus_mulVec_allUpState 0⟩
 
 end LatticeSystem.Tests.HubbardImpossibilityLowDensity
