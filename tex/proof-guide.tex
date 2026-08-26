@@ -11384,6 +11384,68 @@ infrastructure only: no statement of \texttt{hubbard\_theorem\_11\_4} changes.  
 Theorem 11.4, eqs.~(11.1.9)/(11.1.10), p.~376; Tasaki, Prog.\ Theor.\ Phys.\ \textbf{99} (1998) 489,
 Theorem 3.3, Appendix F, p.~545, eqs.~(F.1)/(F.2).
 
+\medskip\noindent\textbf{Theorem 11.4 PR4, the spin-flip trial state and its Jordan--Wigner parity
+factorization (Tasaki §11.1.1, \texttt{HubbardImpossibilityLowDensityTrial.lean},
+\texttt{HubbardImpossibilityLowDensityTrialCore.lean}, \texttt{HoppingCommuteLadder.lean}).}  The
+variational vector of the argument is built from the fully polarized Slater determinant
+$\Phi_\uparrow$ filling the up-modes $S_\uparrow$ by adding one $\downarrow$ electron in the
+single-particle state $v$,
+$\Psi=\hat C^\dagger_\downarrow(v)\Phi_\uparrow$ with
+$\hat C^\dagger_\sigma(v)=\sum_x v_x\,\hat c^\dagger_{x\sigma}$ (book eq.~(11.1.6), p.~376; paper
+eq.~(F.1), p.~545), formalized as \texttt{hubbardLowDensityTrialState}.  The projected
+$\tilde\Psi=(1-\hat\nu)\Psi$ of the previous stage is left in its explicit form, so this stage adds
+no second definition of the trial state.
+
+The parity bookkeeping that the $\downarrow$ creator forces on the $\uparrow$ factors needs no
+Jordan--Wigner string reasoning, and the reason is structural: a hopping bilinear $\hat c^\dagger_i
+\hat c_j$ is an \emph{even} element, so a ladder operator at a mode distinct from both $i$ and $j$
+passes through it by two anticommutations whose signs cancel
+(\texttt{fermionMultiHopping\_commute\_fermionMultiCreation\_of\_ne},
+\texttt{fermionMultiHopping\_commute\_fermionMultiAnnihilation\_of\_ne}, single-species and
+spin-free, hence in \texttt{HoppingCommuteLadder.lean} beside the hole-projection analogue).  Their
+spinful readings (\texttt{upHopping\_commute\_fermionDownCreation},
+\texttt{upHopping\_commute\_fermionDownAnnihilation}) hold because the two spin species occupy
+disjoint Jordan--Wigner modes.
+
+Two identities carry the computation on a fully polarized $\Phi$ ($\hat N_\downarrow\Phi=0$).  The
+$\downarrow$ occupation at a site contracts the smeared creator to its own term,
+$\hat n_{x\downarrow}\hat C^\dagger_\downarrow(v)\Phi=v_x\,\hat c^\dagger_{x\downarrow}\Phi$
+(\texttt{fermionDownNumber\_mulVec\_spinfulCreationFromVector\_of\_downNumber\_zero}): the diagonal
+term is $\hat n_{x\downarrow}\hat c^\dagger_{x\downarrow}=\hat c^\dagger_{x\downarrow}$ and every
+other term commutes past $\hat n_{x\downarrow}$, which then annihilates $\Phi$.  And matrix elements
+between one-$\downarrow$ states factorize with a Kronecker $\delta$,
+$\langle\hat c^\dagger_{y\downarrow}\Phi,\,X\,\hat c^\dagger_{x\downarrow}\Phi'\rangle
+=\delta_{xy}\langle\Phi,X\Phi'\rangle$ for any $X$ commuting with the $\downarrow$ annihilators
+(\texttt{dotProduct\_fermionDownCreation\_sandwich}): moving $\hat c^\dagger_{y\downarrow}$ across
+the inner product turns it into $\hat c_{y\downarrow}$, which passes through $X$ and meets
+$\hat c^\dagger_{x\downarrow}$ in the canonical anticommutator, and both remainder terms end in
+$\hat c_{y\downarrow}\Phi'=0$.  This is the formal content of the paper's Appendix F computation
+(F.3), and at $X=1$ it also gives the norm
+$\langle\Psi,\Psi\rangle=\bigl(\sum_x|v_x|^2\bigr)\langle\Phi,\Phi\rangle$
+(\texttt{dotProduct\_star\_self\_spinfulCreationFromVector\_of\_downNumber\_zero}).
+
+The trial state then has the particle content the later stages require:
+$\hat N_\downarrow\Psi=\Psi$ (\texttt{fermionTotalDownNumber\_mulVec\_hubbardLowDensityTrialState}),
+which is precisely the sector hypothesis $\hat N_\downarrow v=v$ of the on-site interaction layer,
+and $\hat N\Psi=(|S_\uparrow|+1)\Psi$
+(\texttt{fermionTotalNumber\_mulVec\_hubbardLowDensityTrialState}), the electron-number label of the
+variational estimate; $\Psi\ne0$ for $v\ne0$
+(\texttt{hubbardLowDensityTrialState\_ne\_zero}), because its squared norm is a product of two
+nonzero factors.  For the kinetic energy the same-spin and cross-spin relations differ exactly by
+one term: $\hat H^\sigma\hat C^\dagger_\sigma(w)=\hat C^\dagger_\sigma(w)\hat H^\sigma+\hat
+C^\dagger_\sigma(t\,w)$ (\texttt{hubbardKineticSpin\_mul\_spinfulCreationFromVector}), the
+contraction $\delta_{jx}\hat c^\dagger_{i\sigma}$ summed against $t_{ij}w_x$ rebuilding the smeared
+creator of the transported vector, whereas for $\sigma\ne\tau$ the operators simply commute
+(\texttt{hubbardKineticSpin\_commute\_spinfulCreationFromVector\_of\_ne}).  With
+$\hat H^\downarrow\Phi_\uparrow=0$ from the previous stage and $t\,v=\varepsilon v$ this gives the
+energy (11.1.7) of the spin-flipped state,
+$\hat H_{\mathrm{kin}}\Psi=\bigl(\sum_{j\in S_\uparrow}\varepsilon_j+\varepsilon\bigr)\Psi$
+(\texttt{hubbardKinetic\_mulVec\_hubbardLowDensityTrialState}).  This stage is again infrastructure
+only: no statement of \texttt{hubbard\_theorem\_11\_4} changes.  Sources: Hal Tasaki, \emph{Physics
+and Mathematics of Quantum Many-Body Systems} (1st ed., Springer 2020), §11.1.1, Theorem 11.4,
+eqs.~(11.1.6)--(11.1.9), pp.~375--376; Tasaki, Prog.\ Theor.\ Phys.\ \textbf{99} (1998) 489,
+Theorem 3.3, Appendix F, pp.~545--546, eqs.~(F.1)/(F.3).
+
 \noindent\textbf{Lemma 11.10} (Tasaki §11.3.1, eqs.~(11.3.1)--(11.3.2), pp.~405--406;
 \textbf{discharged axiom-free}, \texttt{TasakiFlatBandBasisLemma.lean}, Issue \#4477).  On the
 decorated lattice $\Lambda=E\cup I$ the localized states $\{\alpha_p\}_{p\in E}$ (metallic) and
