@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowUTrialCore
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardKineticSpin
 
 /-!
 # Eigenmode kinetic diagonalization (Tasaki §11.1.1, toward Theorem 11.3)
@@ -29,22 +30,20 @@ variable {M : ℕ}
 /-! ## Kinetic operator as a sum of eigenmode number operators -/
 
 set_option maxHeartbeats 1000000 in
--- The nested triple `Finset.sum` reindexings over `(σ, j, y, x)` in the eigenbasis expansion
+-- The nested triple `Finset.sum` reindexings over `(j, y, x)` in the eigenbasis expansion
 -- push elaboration past the default heartbeat budget.
-/-- **Eigenmode diagonalization of the kinetic operator** (Tasaki eq. (11.1.5) in the
-single-particle eigenbasis):
-`Ĥ_kin = Σ_σ Σ_j ε_j n̂_{j,σ}`.
+/-- **Eigenmode diagonalization of one spin fiber of the kinetic operator** (Tasaki eq. (11.1.5),
+per spin): `Ĥ^σ = Σ_j ε_j n̂_{j,σ}`.
 
-Both sides expand to `Σ_σ Σ_{y,x} t_{yx} ĉ†_{yσ}ĉ_{xσ}`: the left by definition (renaming `(i,j)`
+Both sides expand to `Σ_{y,x} t_{yx} ĉ†_{yσ}ĉ_{xσ}`: the left by definition (renaming `(i,j)`
 to `(y,x)`), the right by the site expansion of `n̂_{j,σ}` and the spectral coordinate form
 `Σ_j ε_j e_j(y) conj(e_j(x)) = t_{yx}` (`hubbardSpectral_entry`). -/
-theorem hubbardKinetic_eq_sum_eigenNumberOp
-    {t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : t.IsHermitian) :
-    hubbardKinetic M t
-      = ∑ σ : Fin 2, ∑ j : Fin (M + 1), (hT.eigenvalues j : ℂ) • eigenNumberOp hT j σ := by
-  rw [hubbardKinetic]
-  refine Finset.sum_congr rfl fun σ _ => ?_
-  -- RHS for this `σ`: `Σ_j ε_j n̂_{j,σ} = Σ_{y,x} t_{yx} (c†_{yσ} c_{xσ})`.
+theorem hubbardKineticSpin_eq_sum_eigenNumberOp
+    {t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : t.IsHermitian) (σ : Fin 2) :
+    hubbardKineticSpin M t σ
+      = ∑ j : Fin (M + 1), (hT.eigenvalues j : ℂ) • eigenNumberOp hT j σ := by
+  rw [hubbardKineticSpin]
+  -- RHS: `Σ_j ε_j n̂_{j,σ} = Σ_{y,x} t_{yx} (c†_{yσ} c_{xσ})`.
   calc (∑ i : Fin (M + 1), ∑ j : Fin (M + 1),
           t i j • (fermionMultiCreation (2 * M + 1) (spinfulIndex M i σ) *
             fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M j σ)))
@@ -97,6 +96,18 @@ theorem hubbardKinetic_eq_sum_eigenNumberOp
         rw [smul_smul]
         congr 1
         ring
+
+/-- **Eigenmode diagonalization of the kinetic operator** (Tasaki eq. (11.1.5) in the
+single-particle eigenbasis):
+`Ĥ_kin = Σ_σ Σ_j ε_j n̂_{j,σ}`.
+
+The spin sum of the per-spin diagonalization `hubbardKineticSpin_eq_sum_eigenNumberOp`. -/
+theorem hubbardKinetic_eq_sum_eigenNumberOp
+    {t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : t.IsHermitian) :
+    hubbardKinetic M t
+      = ∑ σ : Fin 2, ∑ j : Fin (M + 1), (hT.eigenvalues j : ℂ) • eigenNumberOp hT j σ := by
+  rw [hubbardKinetic_eq_sum_hubbardKineticSpin]
+  exact Finset.sum_congr rfl fun σ _ => hubbardKineticSpin_eq_sum_eigenNumberOp hT σ
 
 /-! ## Kinetic energy of an eigenmode Slater determinant -/
 
