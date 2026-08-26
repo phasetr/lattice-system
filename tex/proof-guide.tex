@@ -11358,8 +11358,8 @@ diagonality statement is restated).  On a configuration in the support of a vect
 $\hat N_\downarrow v=v$ the $\downarrow$-count is $1$
 (\texttt{mulVec\_apply\_eq\_zero\_of\_downNumber\_ne}), hence $\sum_x n_{x\uparrow}n_{x\downarrow}
 \le\sum_x n_{x\downarrow}=1$; this is the counting form of the opening line of Appendix F,
-``$\hat n_{x\downarrow}\hat n_{y\downarrow}\Psi=0$ for any $x\ne y$ since there is only one
-$\downarrow$ electron'' (p.~545).  Three consequences follow.  The eigenvalue being $0$ or $1$,
+``$n_{x,\downarrow}n_{y,\downarrow}\Psi=0$ for any $x\ne y$ since there is only one $\downarrow$
+electron'' (p.~545).  Three consequences follow.  The eigenvalue being $0$ or $1$,
 $\hat\nu$ is idempotent on the sector, $\hat\nu(\hat\nu v)=\hat\nu v$
 (\texttt{hubbardOnSiteInteraction\_mulVec\_mulVec\_of\_downNumber\_one}).  The doubly occupied part
 stays inside the sector, $\hat N_\downarrow(\hat\nu v)=\hat\nu v$
@@ -11368,8 +11368,11 @@ which is what lets the minority-spin Loewner bound of the previous stage be appl
 since $\hat H_{\mathrm{int}}(U)=U\hat\nu$, the projected vector minimizes the Coulomb interaction
 exactly, $\hat H_{\mathrm{int}}(U)(v-\hat\nu v)=0$ for \emph{every} $U$
 (\texttt{hubbardOnSiteInteraction\_mulVec\_sub\_self\_eq\_zero\_of\_downNumber\_one}) --- the book's
-``the state (11.1.9) minimizes the Coulomb interaction as $\hat H_{\mathrm{int}}\tilde\Psi=0$'', and
-the reason the eventual bound is uniform in $U\ge0$.
+``Because of the projection, the state (11.1.9) minimizes the Coulomb interaction as
+$\hat H_{\mathrm{int}}|\Psi\rangle=0$'' (p.~376).  We quote that sentence verbatim: the book writes
+$|\Psi\rangle$ there, while the state it describes is the projected $|\tilde\Psi\rangle$ of
+(11.1.9), which is what the paper's (F.1)/(F.3) and our statement use.  This vanishing at every
+coupling is the reason the eventual bound is uniform in $U\ge0$.
 
 The normalization is (F.2), $\langle\tilde\Psi,\tilde\Psi\rangle=\langle\Psi,\hat P_0\Psi\rangle
 =1-\langle\Psi,\hat\nu\Psi\rangle$ for normalized $\Psi$: with $\hat\nu$ Hermitian and idempotent on

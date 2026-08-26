@@ -35,27 +35,29 @@ The spin-resolved kinetic layer is covered by four further tests:
   eigenvalue ceiling `e`, so the `∀ j, ε_j ≤ e` hypothesis restricts only the order of
   quantifiers, never a single model.
 
-PR-3 (the `ν̂ = hubbardOnSiteInteraction _ 1` layer on the `N̂_↓ = 1` sector, design
-`.self-local/docs/theorem-11-4-pr3-design.md` §5) adds five further tests:
+The `ν̂ = hubbardOnSiteInteraction _ 1` layer on the `N̂_↓ = 1` sector is covered by six further
+tests:
 
-- **Red 8**: the primary consumption test (PR-6 (A) shape) — for every `U`, L3
-  (`hubbardOnSiteInteraction_mulVec_sub_self_eq_zero_of_downNumber_one`) collapses the Rayleigh
-  quotient of the interaction on the Roth-projected vector to `0`. Fails to elaborate until L3
-  exists (Red evidence for PR-3).
+- **Red 8**: the primary consumption test — for every `U`,
+  `hubbardOnSiteInteraction_mulVec_sub_self_eq_zero_of_downNumber_one` collapses the Rayleigh
+  quotient of the interaction on the Roth-projected vector to `0`.
 - **Red 9**: meaning test / spin-tag guard — on the `M := 1` single-↓-electron fixture, `ν̂` sees
   zero doubly-occupied sites while `N̂_↓` sees exactly the one ↓ electron: pins that `ν̂` counts
-  double occupancy, not ↓ occupancy (a swap that no type checks). Provable now, from existing API
-  only.
+  double occupancy, not ↓ occupancy (a swap that no type checks).
 - **Red 10**: non-vacuity guard (mirrors Red 3/7) — the sector hypothesis `N̂_↓ v = v` is
   satisfiable by a *nonzero* vector (the same `M := 1` fixture), guarding against a vacuously-true
-  sector hypothesis. Provable now.
+  sector hypothesis.
 - **Red 11**: sharpness guard — on the `M := 1` fixture with **both** sites doubly occupied, `ν̂`
-  is *not* idempotent (`4` vs `2`): the project's recorded failure mode (an over-quantified
-  statement false off the intended sector) written as a test rather than discovered in review.
-  Provable now, from existing API only.
-- **Red 12**: the normalisation-shape consumption test (PR-6 (F) shape) — L4
-  (`dotProduct_star_self_sub_hubbardOnSiteInteraction_re_of_downNumber_one`) consumed in the mixed
-  `rayleighOnVec` form of (F.2). Fails to elaborate until L4 exists (Red evidence for PR-3).
+  is *not* idempotent (`ν̂(ν̂v) ≠ ν̂v`, the two coordinates being `4` and `2`): the project's
+  recorded failure mode (an over-quantified statement false off the intended sector) written as a
+  test rather than discovered in review.
+- **Red 12**: the normalisation-shape consumption test —
+  `dotProduct_star_self_sub_hubbardOnSiteInteraction_re_of_downNumber_one` consumed in the mixed
+  `rayleighOnVec` form of (F.2).
+- **Red 13**: the consumption test for sector closure —
+  `fermionTotalDownNumber_mulVec_hubbardOnSiteInteraction_mulVec_of_downNumber_one` discharges the
+  sector hypothesis for the doubly occupied part `ν̂v`, so the interaction vanishing re-applies to
+  it; that re-application is how the energy split feeds `ν̂v` back into the sector lemmas.
 -/
 
 namespace LatticeSystem.Tests.HubbardImpossibilityLowDensity
@@ -144,7 +146,7 @@ example {M : ℕ} {t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : t.IsHermiti
   ⟨Finset.univ.sup' Finset.univ_nonempty hT.eigenvalues,
     fun j => Finset.le_sup' hT.eigenvalues (Finset.mem_univ j)⟩
 
-/-! ## PR-3: the on-site interaction on the single-↓-electron sector -/
+/-! ## The on-site interaction on the single-↓-electron sector -/
 
 /-- Fixture for Red 9/Red 10: the `M := 1` configuration with one ↑ electron at site `0` and one
 ↓ electron at site `1` (built through `spinfulIndex`, never raw numerals). -/
@@ -155,10 +157,9 @@ private def hubbardOnSiteInteractionSingleDownConfig : Fin (2 * 1 + 2) → Fin 2
 private def hubbardOnSiteInteractionDoublyOccupiedConfig : Fin (2 * 1 + 2) → Fin 2 :=
   fun _ => 1
 
-/-- **Red 8.** Primary consumption test (PR-6 (A) shape): for arbitrary `U`, L3 collapses the
-Rayleigh quotient of the interaction on the Roth-projected vector to `0`. Expected to fail to
-elaborate until `hubbardOnSiteInteraction_mulVec_sub_self_eq_zero_of_downNumber_one` (L3)
-exists. -/
+/-- **Red 8.** Primary consumption test: for arbitrary `U`,
+`hubbardOnSiteInteraction_mulVec_sub_self_eq_zero_of_downNumber_one` collapses the Rayleigh
+quotient of the interaction on the Roth-projected vector to `0`. -/
 example (M : ℕ) (U : ℂ) {v : (Fin (2 * M + 2) → Fin 2) → ℂ}
     (hv : (fermionTotalDownNumber M).mulVec v = v) :
     rayleighOnVec (hubbardOnSiteInteraction M U)
@@ -210,7 +211,8 @@ example :
     exact one_ne_zero
 
 /-- **Red 11.** Sharpness guard: the sector hypothesis is load-bearing. On the `M := 1`
-configuration with **both** sites doubly occupied, `ν̂` is *not* idempotent — the project's
+configuration with **both** sites doubly occupied the two coordinates are `4` and `2`, and the
+guard asserts their *inequality* outright, so `ν̂` is *not* idempotent there — the project's
 recorded failure mode (an over-quantified statement false off the intended sector) written as a
 test rather than discovered in review. -/
 example :
@@ -220,7 +222,14 @@ example :
         hubbardOnSiteInteractionDoublyOccupiedConfig = 4
       ∧ (hubbardOnSiteInteraction 1 1).mulVec
             (basisVec hubbardOnSiteInteractionDoublyOccupiedConfig)
-            hubbardOnSiteInteractionDoublyOccupiedConfig = 2 := by
+            hubbardOnSiteInteractionDoublyOccupiedConfig = 2
+      ∧ (hubbardOnSiteInteraction 1 1).mulVec
+            ((hubbardOnSiteInteraction 1 1).mulVec
+              (basisVec hubbardOnSiteInteractionDoublyOccupiedConfig))
+            hubbardOnSiteInteractionDoublyOccupiedConfig
+          ≠ (hubbardOnSiteInteraction 1 1).mulVec
+              (basisVec hubbardOnSiteInteractionDoublyOccupiedConfig)
+              hubbardOnSiteInteractionDoublyOccupiedConfig := by
   have hbridge : hubbardOnSiteInteraction 1 1
       = hubbardOnSiteInteractionSite 1 (fun _ => 1) := rfl
   have hweight : hubbardConfigInteractionWeight 1 (fun _ => (1 : ℂ))
@@ -234,18 +243,25 @@ example :
           hubbardOnSiteInteractionDoublyOccupiedConfig = 2 := by
     rw [hbridge, hubbardOnSiteInteractionSite_mulVec_basisVec, hweight, Pi.smul_apply,
       basisVec_self, smul_eq_mul, mul_one]
-  refine ⟨?_, hbasis⟩
   have hnu : (hubbardOnSiteInteraction 1 1).mulVec
       (basisVec hubbardOnSiteInteractionDoublyOccupiedConfig)
       = (2 : ℂ) • basisVec hubbardOnSiteInteractionDoublyOccupiedConfig := by
     rw [hbridge, hubbardOnSiteInteractionSite_mulVec_basisVec, hweight]
-  rw [hnu, hbridge, Matrix.mulVec_smul, hubbardOnSiteInteractionSite_mulVec_basisVec, hweight,
-    Pi.smul_apply, Pi.smul_apply, basisVec_self, smul_eq_mul, smul_eq_mul, mul_one]
+  have hsquare :
+      (hubbardOnSiteInteraction 1 1).mulVec
+          ((hubbardOnSiteInteraction 1 1).mulVec
+            (basisVec hubbardOnSiteInteractionDoublyOccupiedConfig))
+          hubbardOnSiteInteractionDoublyOccupiedConfig = 4 := by
+    rw [hnu, hbridge, Matrix.mulVec_smul, hubbardOnSiteInteractionSite_mulVec_basisVec, hweight,
+      Pi.smul_apply, Pi.smul_apply, basisVec_self, smul_eq_mul, smul_eq_mul, mul_one]
+    norm_num
+  refine ⟨hsquare, hbasis, ?_⟩
+  rw [hsquare, hbasis]
   norm_num
 
-/-- **Red 12.** Normalisation-shape consumption test (PR-6 (F) shape): L4 consumed in the mixed
-`rayleighOnVec` form of (F.2). Expected to fail to elaborate until
-`dotProduct_star_self_sub_hubbardOnSiteInteraction_re_of_downNumber_one` (L4) exists. -/
+/-- **Red 12.** Normalisation-shape consumption test:
+`dotProduct_star_self_sub_hubbardOnSiteInteraction_re_of_downNumber_one` consumed in the mixed
+`rayleighOnVec` form of (F.2). -/
 example (M : ℕ) {v : (Fin (2 * M + 2) → Fin 2) → ℂ}
     (hv : (fermionTotalDownNumber M).mulVec v = v) :
     (dotProduct (star (v - (hubbardOnSiteInteraction M 1).mulVec v))
@@ -253,5 +269,21 @@ example (M : ℕ) {v : (Fin (2 * M + 2) → Fin 2) → ℂ}
       = (dotProduct (star v) v).re - rayleighOnVec (hubbardOnSiteInteraction M 1) v := by
   unfold rayleighOnVec
   exact dotProduct_star_self_sub_hubbardOnSiteInteraction_re_of_downNumber_one M hv
+
+/-- **Red 13.** Consumption test for sector closure: `N̂_↓(ν̂v) = ν̂v` is what lets the doubly
+occupied part `ν̂v` be fed back into the sector lemmas, so here it discharges the sector hypothesis
+of the interaction vanishing applied to `ν̂v` itself. It fails the moment
+`fermionTotalDownNumber_mulVec_hubbardOnSiteInteraction_mulVec_of_downNumber_one` stops producing
+the sector hypothesis in the shape the other lemmas consume. -/
+example (M : ℕ) (U : ℂ) {v : (Fin (2 * M + 2) → Fin 2) → ℂ}
+    (hv : (fermionTotalDownNumber M).mulVec v = v) :
+    rayleighOnVec (hubbardOnSiteInteraction M U)
+        ((hubbardOnSiteInteraction M 1).mulVec v
+          - (hubbardOnSiteInteraction M 1).mulVec ((hubbardOnSiteInteraction M 1).mulVec v))
+      = 0 := by
+  unfold rayleighOnVec
+  rw [hubbardOnSiteInteraction_mulVec_sub_self_eq_zero_of_downNumber_one M U
+      (fermionTotalDownNumber_mulVec_hubbardOnSiteInteraction_mulVec_of_downNumber_one M hv),
+    dotProduct_zero, Complex.zero_re]
 
 end LatticeSystem.Tests.HubbardImpossibilityLowDensity

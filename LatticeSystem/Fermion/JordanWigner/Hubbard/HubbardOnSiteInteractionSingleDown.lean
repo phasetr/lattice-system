@@ -88,10 +88,12 @@ theorem fermionTotalDownNumber_mulVec_hubbardOnSiteInteraction_mulVec_of_downNum
       hubbardOnSiteInteractionSite_mulVec_apply, hvc, mul_zero, mul_zero]
 
 /-- **The Roth-projected vector minimizes the Coulomb interaction, at every coupling**: if
-`N̂_↓v = v` then `Ĥ_int(U)(v − ν̂v) = 0` for every `U`.  This is eq. (F.1) of Tasaki,
-Prog. Theor. Phys. **99** (1998) 489, Appendix F, p. 545, in the form used by the book
-(eq. (11.1.9), p. 376): `Ĥ_int(U) = U ν̂`, so the statement is the idempotency of `ν̂` scaled by
-`U`, and the interaction energy of `(1 − ν̂)v` vanishes independently of `U`. -/
+`N̂_↓v = v` then `Ĥ_int(U)(v − ν̂v) = 0` for every `U`.  The `(1 − ν̂)` form of the projected vector
+is eq. (F.1), `Ψ̃ = P̂₀Ψ = (1 − ν̂)Ψ`, of Tasaki, Prog. Theor. Phys. **99** (1998) 489, Appendix F,
+p. 545; the vanishing itself is the book's statement that the state (11.1.9) minimizes the Coulomb
+interaction, Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §11.1.1, p. 376.
+Since `Ĥ_int(U) = U ν̂`, the statement is the idempotency of `ν̂` scaled by `U`, so the interaction
+energy of `(1 − ν̂)v` vanishes independently of `U`. -/
 theorem hubbardOnSiteInteraction_mulVec_sub_self_eq_zero_of_downNumber_one (M : ℕ) (U : ℂ)
     {v : (Fin (2 * M + 2) → Fin 2) → ℂ}
     (hv : (fermionTotalDownNumber M).mulVec v = v) :
