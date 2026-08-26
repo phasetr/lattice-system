@@ -12,8 +12,9 @@ which the model is not ferromagnetic, for *any* `U ≥ 0` (Pieri–Daul–Baeris
 The dimension enters only through the exponent `2/d` of the band condition (11.1.8) — no explicit
 `d`-dimensional lattice geometry is needed — so the statement is rendered on the project's
 `Fin (N+1)`-site Hubbard model with `d > 2` kept as an explicit hypothesis (the conclusion is false
-in `d = 1`, so dropping `d > 2` would be unsound).  Recorded as a documented axiom: the proof
-(Tasaki's Roth/Gutzwiller variational state and the analytic estimate from (11.1.8)) is deferred.
+in `d = 1`, so dropping `d > 2` would be unsound).  Recorded as an axiom pending discharge: the
+proof (Tasaki's Roth/Gutzwiller variational state and the analytic estimate from (11.1.8)) is not
+yet formalized.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §11.1.1, Theorem 11.4, eqs. (11.1.8)–(11.1.10), pp. 379–380.
@@ -34,9 +35,10 @@ def hubbardBandCondition (ε : Fin (N + 1) → ℝ) (c ρ₀ : ℝ) (n₀ d : �
   ∀ n : Fin (N + 1), n₀ ≤ n.val + 1 → ((n.val + 1 : ℝ)) / (N + 1) ≤ ρ₀ →
     c * (((n.val + 1 - n₀ : ℝ)) / (N + 1)) ^ ((2 : ℝ) / (d : ℝ)) ≤ ε n - ε 0
 
-/-- **Tasaki Theorem 11.4 (impossibility of ferromagnetism at low densities), AXIOM.**  Fix `d > 2`
-and positive band constants `c, ρ₀, n₀`.  Then there is a density threshold `ρ₁ > 0`, *uniform in
-the system size*, such that for any Hermitian, translation-invariant hopping `t` whose ascending
+/-- **Tasaki Theorem 11.4 (impossibility of ferromagnetism at low densities), AXIOM.**  Fix
+`d > 2`, positive band constants `c, ρ₀`, a level cutoff `n₀` and a hopping scale `K`.  Then there
+is a density threshold `ρ₁ > 0`, *uniform in the system size*, such that for any Hermitian,
+translation-invariant hopping `t` whose row sums of `‖t x y‖` are at most `K` and whose ascending
 single-particle spectrum `ε` satisfies the band condition (11.1.8), and any electron number `Ne`
 with density `Ne/|Λ| ≤ ρ₁` and any `U ≥ 0`, the ground states at filling `Ne` are **not** all
 maximal-spin: some ground state has `S_tot < S_max`.
@@ -45,19 +47,34 @@ As in Theorem 11.3 the conclusion negates the *pinned* ground-state max-spin pro
 ground eigenspace `hubbardEigenspaceAt … E₀ Ne` (`E₀` nonempty `hne` and minimal `hmin`), so the
 impossibility statement is sound.  Translation invariance is required genuinely (the symmetry `σ`
 acts transitively, ruling out the trivial `σ = id`), and the filling is nontrivial (`2 ≤ Ne`, the
-zero- and one-electron sectors are trivially maximal-spin).  Tasaki's proof uses the Roth/Gutzwiller
-projected trial state and
-the analytic estimate furnished by (11.1.8); it is recorded here as a documented axiom (to be
-discharged), matching the policy for the other deferred Chapter 11 results. -/
-axiom hubbard_theorem_11_4 (c ρ₀ : ℝ) (hc : 0 < c) (hρ₀ : 0 < ρ₀) (n₀ d : ℕ) (hd : 2 < d) :
+zero- and one-electron sectors are trivially maximal-spin).
+
+Two hypotheses strengthen Tasaki's bare statement, in the idiom already used for the Hermiticity
+hypotheses of Proposition 11.2.  `_hK` bounds the row sums of `t` uniformly by the outer parameter
+`K`, which is what the variational estimate available here needs given the order of the
+quantifiers: `ρ₁` is fixed before `t`, and that estimate weighs the kinetic cost of the trial state
+against the band constant `c`, so the threshold it yields is governed by the ratio `c/K` and an
+upper bound on the bandwidth has to be fixed in advance; every concrete `t` admits such a `K`, so
+only the order of the quantifiers is restricted.  `_hNen₀` demands `2 * n₀ ≤ Ne`: the band
+condition (11.1.8) leaves the lowest `n₀` levels unconstrained, and by spin degeneracy `Ne`
+electrons occupy the lowest `⌈Ne/2⌉` levels, so `2 * n₀ ≤ Ne` is what puts the top occupied level
+inside the constrained range `n ≥ n₀`.  Below it the band condition says nothing about the occupied
+levels — the flat-band regime where ferromagnetism does occur — so this variational approach gives
+no bound there.
+
+Tasaki's proof uses the Roth/Gutzwiller projected trial state and the analytic estimate furnished
+by (11.1.8); it is recorded here as an axiom pending discharge. -/
+axiom hubbard_theorem_11_4 (c ρ₀ K : ℝ) (hc : 0 < c) (hρ₀ : 0 < ρ₀) (n₀ d : ℕ) (hd : 2 < d) :
     ∃ ρ₁ : ℝ, 0 < ρ₁ ∧
       ∀ (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (ht : Matrix.IsHermitian t)
+        (_hK : ∀ x : Fin (N + 1), ∑ y : Fin (N + 1), ‖t x y‖ ≤ K)
         (σ : Equiv.Perm (Fin (N + 1))) (_htrans : ∀ i j, t (σ i) (σ j) = t i j)
         (_htransitive : ∀ i j : Fin (N + 1), ∃ k : ℕ, (σ ^ k) i = j)
         (ε : Fin (N + 1) → ℝ) (_hmono : Monotone ε)
         (_hspec : Finset.univ.val.map ε = Finset.univ.val.map ht.eigenvalues)
         (_hband : hubbardBandCondition ε c ρ₀ n₀ d)
-        (Ne : ℕ) (_hNe2 : 2 ≤ Ne) (_hNe : (Ne : ℝ) / (N + 1) ≤ ρ₁)
+        (Ne : ℕ) (_hNe2 : 2 ≤ Ne) (_hNen₀ : 2 * n₀ ≤ Ne)
+        (_hNe : (Ne : ℝ) / (N + 1) ≤ ρ₁)
         (U : ℝ) (_hU : 0 ≤ U) (E₀ : ℂ)
         (_hne : hubbardEigenspaceAt t (U : ℂ) E₀ Ne ≠ ⊥)
         (_hmin : ∀ E : ℂ, hubbardEigenspaceAt t (U : ℂ) E Ne ≠ ⊥ → E₀.re ≤ E.re),
