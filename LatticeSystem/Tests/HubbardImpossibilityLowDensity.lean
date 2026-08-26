@@ -1,4 +1,4 @@
-import LatticeSystem.Fermion.JordanWigner
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowDensity
 
 /-!
 # Test coverage for Theorem 11.4 (impossibility of ferromagnetism at low densities)
@@ -11,7 +11,7 @@ pin that signature and guard the two failure modes of such added hypotheses:
   `_hNen₀`, so the arity and the position of `K` are pinned.
 - **Red 2**: the filling hypotheses (`2 ≤ Ne`, `2 * n₀ ≤ Ne`, `Ne/(N+1) ≤ ρ₁`) are jointly
   satisfiable for every `ρ₁ > 0` and `n₀` — guards against under-quantification (vacuity).
-- **Red 3**: every Hermitian hopping matrix admits *some* uniform row-sum bound `K` — guards that
+- **Red 3**: every hopping matrix admits *some* uniform row-sum bound `K` — guards that
   `_hK` restricts only the order of quantifiers, never a single model.
 -/
 
@@ -45,7 +45,7 @@ satisfiable for every `ρ₁ > 0` and `n₀`: guards against the *opposite* fail
 hypotheses (under-quantification / vacuity). -/
 example (ρ₁ : ℝ) (hρ₁ : 0 < ρ₁) (n₀ : ℕ) :
     ∃ N Ne : ℕ, 2 ≤ Ne ∧ 2 * n₀ ≤ Ne ∧ (Ne : ℝ) / (N + 1) ≤ ρ₁ := by
-  set Ne := max 2 (2 * n₀) with hNe_def
+  set Ne := max 2 (2 * n₀)
   obtain ⟨M, hM⟩ := exists_nat_gt ((Ne : ℝ) / ρ₁)
   refine ⟨M, Ne, le_max_left _ _, le_max_right _ _, ?_⟩
   have hM0 : (0 : ℝ) < (M : ℝ) + 1 := by positivity
@@ -54,7 +54,7 @@ example (ρ₁ : ℝ) (hρ₁ : 0 < ρ₁) (n₀ : ℕ) :
   rw [div_lt_iff₀ hρ₁] at hMNe
   nlinarith [hMNe]
 
-/-- **Red 3.** Every Hermitian hopping matrix admits a uniform row-sum bound `K`: `_hK` restricts
+/-- **Red 3.** Every hopping matrix admits a uniform row-sum bound `K`: `_hK` restricts
 only the order of quantifiers (`ρ₁` before `∀ t`), never a single model. -/
 example (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) :
     ∃ K : ℝ, ∀ x : Fin (N + 1), ∑ y : Fin (N + 1), ‖t x y‖ ≤ K := by

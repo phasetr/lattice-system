@@ -36,8 +36,8 @@ def hubbardBandCondition (ε : Fin (N + 1) → ℝ) (c ρ₀ : ℝ) (n₀ d : �
     c * (((n.val + 1 - n₀ : ℝ)) / (N + 1)) ^ ((2 : ℝ) / (d : ℝ)) ≤ ε n - ε 0
 
 /-- **Tasaki Theorem 11.4 (impossibility of ferromagnetism at low densities), AXIOM.**  Fix
-`d > 2`, positive band constants `c, ρ₀, n₀` and a hopping scale `K`.  Then there is a density
-threshold `ρ₁ > 0`, *uniform in the system size*, such that for any Hermitian,
+`d > 2`, positive band constants `c, ρ₀`, a level cutoff `n₀` and a hopping scale `K`.  Then there
+is a density threshold `ρ₁ > 0`, *uniform in the system size*, such that for any Hermitian,
 translation-invariant hopping `t` whose row sums of `‖t x y‖` are at most `K` and whose ascending
 single-particle spectrum `ε` satisfies the band condition (11.1.8), and any electron number `Ne`
 with density `Ne/|Λ| ≤ ρ₁` and any `U ≥ 0`, the ground states at filling `Ne` are **not** all

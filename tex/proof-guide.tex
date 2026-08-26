@@ -11275,26 +11275,27 @@ ferromagnetism at low densities (Pieri--Daul--Baeriswyl--Dzierzawa--Fazekas).  T
 only through the exponent $2/d$ of the band condition (11.1.8), so no explicit $d$-dimensional
 lattice is needed: we state \texttt{hubbardBandCondition} on the ascending single-particle spectrum
 $\varepsilon$ ($\varepsilon_n-\varepsilon_1\ge c\,((n-n_0)/|\Lambda|)^{2/d}$) and record
-\texttt{hubbard\_theorem\_11\_4}: fixing $d>2$, positive band constants $c,\rho_0,n_0$ and a hopping
-scale $K$, there is a \emph{size-uniform} density threshold $\rho_1>0$ such that for any Hermitian
-translation-invariant $t$ obeying the band condition, any filling $N_e/|\Lambda|\le\rho_1$ and any
-$U\ge0$, the ground states (over the pinned \texttt{hubbardEigenspaceAt}\,$E_0\,N_e$, $E_0$ nonempty
-and minimal) are not all maximal-spin (with $2\le N_e$, since the zero- and one-electron sectors are
-trivially maximal-spin, and a genuinely transitive translation $\sigma$).  Two further hypotheses
-are added relative to Tasaki's bare statement, in the idiom already used for the Hermiticity
-hypotheses of Proposition 11.2.  The uniform row-sum bound $\sum_y|t_{xy}|\le K$ is what the
-variational estimate available here needs given the order of the quantifiers: $\rho_1$ is chosen
-before $t$, and that estimate weighs the kinetic cost of the trial state against the band constant
-$c$, so the threshold it yields is governed by the ratio $c/K$ and an upper bound on the bandwidth
-has to be fixed in advance; every concrete $t$ admits such a $K$, so only the quantifier order is
-restricted and the strengthening is sound.  The filling floor $2n_0\le N_e$ keeps the filling inside
-the range that (11.1.8) speaks about: the band condition leaves the lowest $n_0$ levels
-unconstrained, and by spin degeneracy $N_e$ electrons occupy the lowest $\lceil N_e/2\rceil$ levels,
-so $2n_0\le N_e$ is what puts the top occupied level inside the constrained range $n\ge n_0$.  Below
-it the band condition says nothing about the occupied levels --- the flat-band regime where
-ferromagnetism \emph{does} occur --- so this variational approach gives no bound there.  Keeping
-$d>2$ explicit is likewise essential for soundness (the conclusion is false in $d=1$); the
-Roth/Gutzwiller variational proof is not yet formalized.  Another book-order Chapter 11 backfill.
+\texttt{hubbard\_theorem\_11\_4}: fixing $d>2$, positive band constants $c,\rho_0$, a level cutoff
+$n_0$ and a hopping scale $K$, there is a \emph{size-uniform} density threshold $\rho_1>0$ such that
+for any Hermitian translation-invariant $t$ obeying the band condition, any filling
+$N_e/|\Lambda|\le\rho_1$ and any $U\ge0$, the ground states (over the pinned
+\texttt{hubbardEigenspaceAt}\,$E_0\,N_e$, $E_0$ nonempty and minimal) are not all maximal-spin (with
+$2\le N_e$, since the zero- and one-electron sectors are trivially maximal-spin, and a genuinely
+transitive translation $\sigma$).  Two further hypotheses are added relative to Tasaki's bare
+statement, in the idiom already used for the Hermiticity hypotheses of Proposition 11.2.  The
+uniform row-sum bound $\sum_y|t_{xy}|\le K$ is what the variational estimate available here needs
+given the order of the quantifiers: $\rho_1$ is chosen before $t$, and that estimate weighs the
+kinetic cost of the trial state against the band constant $c$, so the threshold it yields is
+governed by the ratio $c/K$ and an upper bound on the bandwidth has to be fixed in advance; every
+concrete $t$ admits such a $K$, so only the order of the quantifiers is restricted.  The filling
+floor $2n_0\le N_e$ keeps the filling inside the range that (11.1.8) speaks about: the band
+condition leaves the lowest $n_0$ levels unconstrained, and by spin degeneracy $N_e$ electrons
+occupy the lowest $\lceil N_e/2\rceil$ levels, so $2n_0\le N_e$ is what puts the top occupied level
+inside the constrained range $n\ge n_0$.  Below it the band condition says nothing about the
+occupied levels --- the flat-band regime where ferromagnetism \emph{does} occur --- so this
+variational approach gives no bound there.  Keeping $d>2$ explicit is likewise essential for
+soundness (the conclusion is false in $d=1$); the Roth/Gutzwiller variational proof is not yet
+formalized.  Another book-order Chapter 11 backfill.
 
 \noindent\textbf{Lemma 11.10} (Tasaki §11.3.1, eqs.~(11.3.1)--(11.3.2), pp.~405--406;
 \textbf{discharged axiom-free}, \texttt{TasakiFlatBandBasisLemma.lean}, Issue \#4477).  On the
