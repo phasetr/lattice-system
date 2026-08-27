@@ -34,11 +34,14 @@ permalink: /limitations/documented-axioms/chapter-04/
   reflection positivity. Per the 2026-07-05 policy override
   (externally-cited theorems the book merely quotes must still be proved,
   not deferred as external-cite-only), this is **not** classified as a
-  won't-do citation: it is the same "RP proof technique intractable at
-  project scale" class as Theorem 5.1 below, restricted here to the 1D ring
-  case the project's reflection-positivity infrastructure project (#4777)
-  is actively building; it returns to a discharged theorem once that
-  1D-ring RP/Gibbs-decomposition infrastructure is complete.
+  won't-do citation. It belongs to its own **"infrastructure-in-progress
+  (#4777)"** class, distinct from Theorem 5.1's "`d`-dimensional RP/IR-bound
+  intractable at project scale" class below: Theorem 5.1 needs a
+  `d`-dimensional reflection-positivity infrastructure the project does not
+  have and is not building, whereas this axiom needs exactly the 1D-ring
+  reflection-positivity / Gibbs-decomposition infrastructure that issue
+  #4777 is *actively under construction*; it returns to a discharged theorem
+  once that 1D-ring infrastructure is complete.
 - **Re-check condition:** would change once the #4777 reflection-positivity
   infrastructure (1D-ring Gibbs decomposition) is complete and a
   math-before-code transcription of the Shastry / Tanaka–Takeda–Idogaki
@@ -56,10 +59,11 @@ and 9 (p. 83)) rests on one **documented axiom**,
 (`LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean`, declaration line 64).
 
 - **Proved (axiom-free):** Corollary 4.3 itself, `no_long_range_order_1d`
-  (`NoLongRangeOrderConditional.lean`), is a genuine **theorem**, obtained by
+  (`NoLongRangeOrder1D.lean:109`), is a genuine **theorem**, obtained by
   feeding this axiom as the single quantitative input into the conditional
-  reduction `no_long_range_order_1d_of_susceptibility`; only the
-  susceptibility estimate below remains axiomatized.
+  reduction `no_long_range_order_1d_of_susceptibility`
+  (`NoLongRangeOrderConditional.lean:37`); only the susceptibility estimate
+  below remains axiomatized.
 - **What the axiom statement literally asserts:** for the zero-field
   one-dimensional spin-`S` antiferromagnetic Heisenberg ring on an **even**
   number `L ≥ 2` of sites, there is a size-uniform constant `C ≥ 0` such that
@@ -79,10 +83,12 @@ and 9 (p. 83)) rests on one **documented axiom**,
   **272-276**, 908, 2004) [63], cited by Tasaki's footnote 3 (p. 76), via a
   massive-Green-function / inverse-Fourier reflection-positivity analysis
   with `O(L)` control of the `k* = π` singularity. As with Theorem 4.2 above,
-  per the 2026-07-05 policy override this is classified as the same
-  "RP proof technique intractable at project scale" class as Theorem 5.1
-  below (1D-ring case), not an external-cite-only deferral; it returns to a
-  discharged theorem once the #4777 1D-ring RP infrastructure is complete.
+  per the 2026-07-05 policy override this is classified in the same
+  "infrastructure-in-progress (#4777)" class (not Theorem 5.1's
+  "`d`-dimensional RP/IR-bound intractable" class, and not an
+  external-cite-only deferral): it needs the 1D-ring RP/Gibbs-decomposition
+  infrastructure issue #4777 is actively building, and returns to a
+  discharged theorem once that infrastructure is complete.
 - **Re-check condition:** would change once the #4777 reflection-positivity
   infrastructure (1D-ring Gibbs decomposition) is complete and a
   math-before-code transcription of the Shastry / Tanaka–Takeda–Idogaki
@@ -164,8 +170,9 @@ by two **documented axioms** in
   definitions; only the existence of the limit states is axiomatized.
 - **What the axiom statements literally assert:** `theorem_4_20_omega0`
   states — conditional on `εGS` being the genuine ground-state energy
-  density of the model (`IsGroundStateEnergyDensity`, itself an
-  uninterpreted documented predicate) — that there exists a state `ω₀`
+  density of the model (`IsGroundStateEnergyDensity`,
+  `InfiniteVolumeGroundState.lean:188`, itself an uninterpreted documented
+  predicate) — that there exists a state `ω₀`
   (`WeakDual ℂ A`) that is an infinite-volume ground state at energy density
   `εGS` (`IsInfiniteVolumeGroundState`) with vanishing single-site
   magnetization `ω₀(Ŝ_x^{(α)}) = 0` (eq. (4.3.9)). The axiom itself is a bare
@@ -174,8 +181,9 @@ by two **documented axioms** in
   construction informally, but only the existence and the two stated
   properties are part of the formal statement. `theorem_4_20_omegaN` states
   that, additionally assuming staggered long-range order with parameter
-  `mStar > 0` (`HasStaggeredLRO`, also an uninterpreted documented
-  predicate), for every unit direction `n` there exists a state `ω_n`,
+  `mStar > 0` (`HasStaggeredLRO`, `InfiniteVolumeGroundState.lean:198`, also
+  an uninterpreted documented predicate), for every unit direction `n` there
+  exists a state `ω_n`,
   likewise an infinite-volume ground state at energy density `εGS`, with
   Néel magnetization `ω_n(Ŝ_x^{(α)}) = (−1)^x mStar n_α` (eq. (4.3.10)); the
   `L↑∞` limit motivation (eq. (4.3.8)) is again informal, not part of the
@@ -431,14 +439,20 @@ line 319).
   field-dependent thermal-average observables it quantifies over are real
   definitions.
 - **What the axiom statement literally asserts:** under the same conditions
-  as Theorem 4.26 (antiferromagnetic Heisenberg model, `d ≥ 3`, `N ≥ 1`),
-  the staggered moment survives the iterated limit
+  as Theorem 4.26 (antiferromagnetic Heisenberg model, `d ≥ 3`, `N ≥ 1`), a
+  single `∃ β₀, ∃ q` bundles **two** conjuncts sharing that `β₀, q`: (i) the
+  Theorem 4.26 long-range-order bound itself,
+  `⟨(Ô_L^{(α)}/L^d)²⟩_{β,0}^L ≥ q(β)` for every axis `α` and every `β > β₀`
+  (eq. (4.4.52)), and (ii) the staggered moment surviving the iterated limit,
   `lim_{h↓0} lim_{L↑∞} ⟨Ô_L^{(3)}⟩_{β,h}^L / L^d ≥ √(3 q(β))`, for every
   `β > β₀` (eq. (4.4.53)) — genuine symmetry breaking accompanying the
-  long-range order. `theorem_4_26_staggered_lro` and
-  `theorem_4_27_griffiths_koma_tasaki_ssb` each existentially quantify their
-  own threshold `β₀` and function `q` **independently** — the two axiom
-  statements do not assert that the same `β₀, q` witnesses work for both,
+  long-range order. The relationship is two-level: **within** Theorem 4.27
+  itself the LRO conjunct (i) and the SSB conjunct (ii) share the *same*
+  `β₀, q` witnesses (the Lean doc comment states this explicitly); **across**
+  Theorem 4.26 and Theorem 4.27 the two axioms are logically independent —
+  `theorem_4_26_staggered_lro` and `theorem_4_27_griffiths_koma_tasaki_ssb`
+  each existentially quantify their own `β₀, q`, and nothing forces the
+  witness used by 4.26 to coincide with the one inside 4.27's shared pair,
   even though both are read together as one long-range-order-plus-SSB
   package at sufficiently low temperature in `d ≥ 3`.
 - **Axiom reason (documented):** proved by Koma–Tasaki [34], extending

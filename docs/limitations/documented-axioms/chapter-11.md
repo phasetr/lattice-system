@@ -72,52 +72,6 @@ declaration line 104).
 - **Tracking:** master tracker #4718. No dedicated discharge issue exists or
   is to be opened while the re-check condition above is unmet.
 
-<a id="entry-lemma-11-22-11-23"></a>
-
-## Lemma 11.22 and Lemma 11.23 (positivity of the frustration-free local Hamiltonian)
-
-**Tasaki §11.4.3, Lemma 11.22 and Lemma 11.23** (eqs. (11.4.46)-(11.4.50),
-pp. 429-435) are two **documented axioms** in
-`LatticeSystem/Fermion/JordanWigner/Hubbard/NonsingularLocalHamiltonian.lean`:
-`nonsingular_lemma_11_22` (declaration line 129) and
-`nonsingular_lemma_11_23` (declaration line 141).
-
-- **Proved (axiom-free):** the local Hamiltonian `nonsingularLocalHamiltonian`
-  (eq. (11.4.48)) is a real definition, and the fact that it annihilates the
-  all-up flat-band state
-  (`nonsingularLocalHamiltonian_mulVec_alphaAllUpState`) is proved
-  axiom-free in the same file. Underlying **Lemma 11.21** (`ĥ_p ≥ 0 ⇒`
-  ferromagnetism, via Theorem 11.11) is proved as
-  `nonsingular_exhibitsFerromagnetism`, and **Theorem 11.20** is assembled
-  as `tasaki_theorem_11_20`, both in `NonsingularFerromagnetism.lean`,
-  consuming Lemma 11.22 as a hypothesis.
-- **What the axiom statements literally assert:** `nonsingular_lemma_11_22`
-  states that for `ν > 0` there are thresholds `T, V, clam > 0` and `cκ ≥ 0`
-  (`clam` strictly positive, `cκ` merely nonnegative) such that once
-  `t/s ≥ T` and `U/s ≥ V` (with `lam = clam·s`, `κ = cκ`), the local
-  Hamiltonian `ĥ_p` is positive semidefinite for every external site `p`.
-  `nonsingular_lemma_11_23` states, underlying Lemma 11.22, the analogous
-  fact for the sector-minimum energy: for `ν > 0` there are its **own**
-  thresholds `T, V, clam > 0, cκ ≥ 0` such that once `t/s ≥ T` and
-  `U/s ≥ V`, any state with total spin `twoS < K+1` (below `S_max`) has
-  strictly positive sector-minimum energy of `ĥ_p`. The two axioms
-  existentially quantify their threshold constants **independently** — the
-  statements do not assert that the same `T, V, clam, cκ` witnesses work for
-  both, even though both are read together as one "Lemma 11.22" bound
-  underlying Theorem 11.20's positivity argument.
-- **Axiom reason (documented):** both genuinely need eigenvalue-continuity
-  degenerate-perturbation-theory machinery in the `t, U ↑ ∞` limit that
-  mathlib lacks and this repository has not built for this model; this is
-  the volume-uniform perturbative-estimate documented-axiom class (`∃ T, V`
-  independent of the system size `K`, `∀ K, …`), not finite-fixed-`K` linear
-  algebra.
-- **Re-check condition:** would change only if a math-before-code
-  transcription of the `t, U ↑ ∞` degenerate-perturbation-theory argument
-  for `ĥ_p`'s positivity (Lemma 11.22) and its zero-mode characterization
-  (Lemma 11.23) is completed in this repository.
-- **Tracking:** master tracker #4718. No dedicated discharge issue exists or
-  is to be opened while the re-check condition above is unmet.
-
 <a id="entry-theorem-11-18"></a>
 
 ## Theorem 11.18 (local stability of ferromagnetic ground states)
@@ -177,6 +131,52 @@ declaration line 64).
 - **Re-check condition:** would change only if a math-before-code
   transcription of Tasaki's spin-wave dispersion perturbation-theory
   argument (§11.4.2) is completed in this repository.
+- **Tracking:** master tracker #4718. No dedicated discharge issue exists or
+  is to be opened while the re-check condition above is unmet.
+
+<a id="entry-lemma-11-22-11-23"></a>
+
+## Lemma 11.22 and Lemma 11.23 (positivity of the frustration-free local Hamiltonian)
+
+**Tasaki §11.4.3, Lemma 11.22 and Lemma 11.23** (eqs. (11.4.46)-(11.4.50),
+pp. 429-435) are two **documented axioms** in
+`LatticeSystem/Fermion/JordanWigner/Hubbard/NonsingularLocalHamiltonian.lean`:
+`nonsingular_lemma_11_22` (declaration line 129) and
+`nonsingular_lemma_11_23` (declaration line 141).
+
+- **Proved (axiom-free):** the local Hamiltonian `nonsingularLocalHamiltonian`
+  (eq. (11.4.48)) is a real definition, and the fact that it annihilates the
+  all-up flat-band state
+  (`nonsingularLocalHamiltonian_mulVec_alphaAllUpState`) is proved
+  axiom-free in the same file. Underlying **Lemma 11.21** (`ĥ_p ≥ 0 ⇒`
+  ferromagnetism, via Theorem 11.11) is proved as
+  `nonsingular_exhibitsFerromagnetism`, and **Theorem 11.20** is assembled
+  as `tasaki_theorem_11_20`, both in `NonsingularFerromagnetism.lean`,
+  consuming Lemma 11.22 as a hypothesis.
+- **What the axiom statements literally assert:** `nonsingular_lemma_11_22`
+  states that for `ν > 0` there are thresholds `T, V, clam > 0` and `cκ ≥ 0`
+  (`clam` strictly positive, `cκ` merely nonnegative) such that once
+  `t/s ≥ T` and `U/s ≥ V` (with `lam = clam·s`, `κ = cκ`), the local
+  Hamiltonian `ĥ_p` is positive semidefinite for every external site `p`.
+  `nonsingular_lemma_11_23` states, underlying Lemma 11.22, the analogous
+  fact for the sector-minimum energy: for `ν > 0` there are its **own**
+  thresholds `T, V, clam > 0, cκ ≥ 0` such that once `t/s ≥ T` and
+  `U/s ≥ V`, any state with total spin `twoS < K+1` (below `S_max`) has
+  strictly positive sector-minimum energy of `ĥ_p`. The two axioms
+  existentially quantify their threshold constants **independently** — the
+  statements do not assert that the same `T, V, clam, cκ` witnesses work for
+  both, even though both are read together as one "Lemma 11.22" bound
+  underlying Theorem 11.20's positivity argument.
+- **Axiom reason (documented):** both genuinely need eigenvalue-continuity
+  degenerate-perturbation-theory machinery in the `t, U ↑ ∞` limit that
+  mathlib lacks and this repository has not built for this model; this is
+  the volume-uniform perturbative-estimate documented-axiom class (`∃ T, V`
+  independent of the system size `K`, `∀ K, …`), not finite-fixed-`K` linear
+  algebra.
+- **Re-check condition:** would change only if a math-before-code
+  transcription of the `t, U ↑ ∞` degenerate-perturbation-theory argument
+  for `ĥ_p`'s positivity (Lemma 11.22) and its zero-mode characterization
+  (Lemma 11.23) is completed in this repository.
 - **Tracking:** master tracker #4718. No dedicated discharge issue exists or
   is to be opened while the re-check condition above is unmet.
 
