@@ -60,7 +60,7 @@ parity of the block above.
 
 | Lean name | Statement | File |
 |---|---|---|
-| `inner_timeReversal_eq_zero_of_sq_neg` | **Problem 2.3.a: Kramers-degeneracy orthogonality for an antiunitary square-root-of-`-1̂`** (**PROVED**, `#print axioms` = std3; Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Problem 2.3.a, p. 31, solution p. 496; Appendix A.4.3 eq. (A.4.17)): for an antiunitary map `V` on a complex inner product space (`⟪V u, V v⟫ = ⟪v, u⟫` for all `u, v`) satisfying `V (V v) = -v`, every vector `v` is orthogonal to its image, `⟪v, V v⟫ = 0` — the general half-odd-integer-spin Kramers-degeneracy orthogonality argument, stated for an abstract antiunitary `V` rather than the concrete `Θ̂` of `timeReversalSpinHalf` | `Quantum/TimeReversalSpinHalf.lean` |
+| `inner_timeReversal_eq_zero_of_sq_neg` | **Problem 2.3.a: Kramers-degeneracy orthogonality for an inner-product-reversing square-root-of-`-1̂`** (**PROVED**, `#print axioms` = std3; Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Problem 2.3.a, p. 31, solution p. 496; Appendix A.4.3 eq. (A.4.17)): for a map `V` on a complex inner product space with `⟪V u, V v⟫ = ⟪v, u⟫` for all `u, v` and `V (V v) = -v`, every vector `v` is orthogonal to its image, `⟪v, V v⟫ = 0`; neither linearity nor antilinearity of `V` is assumed, whereas Tasaki's antiunitary operators of eq. (A.4.17) are antilinear by definition — the general half-odd-integer-spin Kramers-degeneracy orthogonality argument, stated for such an abstract `V` rather than the concrete `Θ̂` of `timeReversalSpinHalf` | `Quantum/TimeReversalSpinHalf.lean` |
 
 ---
 
