@@ -20738,11 +20738,21 @@ forced by the ODE rather than inserted by hand. \texttt{lake build} is
 warning-free and \texttt{\#print axioms saturatedCoherentState\_zero\_apply}
 yields only \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
 (axiom-free). This is the first PR of the Problem 2.4.b arc: it establishes
-only the product form of eq.~(S.18); the Fourier-inversion capstone expressing
-\(\Phi_M\) in terms of \(\Xi_{\theta,\varphi}\) of eq.~(S.17) is deferred to a
-follow-up PR. Reference: H.~Tasaki, \emph{Physics and Mathematics of Quantum
-Many-Body Systems}, Springer 2020, Problem~2.4.b, p.~34, solution p.~497,
-eq.~(S.18) (there stated for \(S = 1/2\)).
+only the product form of eq.~(S.18), which belongs to the solution of
+Problem~2.4.c and is what the solution of Problem~2.4.b starts from (that
+solution expands \(\hat U^{(2)}_{\theta}\Phi^\uparrow = \sum_M c_M \Phi_M\) and
+needs every \(c_M\) to be nonzero); the Fourier-inversion capstone eq.~(S.17),
+which is the solution of Problem~2.4.b itself and expresses \(\Phi_M\) in terms
+of \(\Xi_{\theta,\varphi}\), is deferred to a follow-up PR. References:
+H.~Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems},
+Springer 2020: the coherent state
+\(\Xi_{\theta,\varphi} := \hat U^{(3)}_{\varphi}\hat U^{(2)}_{\theta}\Phi^\uparrow\)
+is eq.~(2.4.6), p.~33, and the global rotation
+\(\hat U^{(\alpha)}_{\theta} = \exp[-i\theta\,\hat S^{(\alpha)}_{\mathrm{tot}}]\)
+is eq.~(2.2.11), p.~22; the site-product form is eq.~(S.18) of the solution to
+Problem~2.4.c (statement p.~34, solution p.~497, stated there for
+\(S = 1/2\)); Problem~2.4.b is stated on p.~34 with solution on
+pp.~496--497, eq.~(S.17).
 
 \subsection*{DONE: Tasaki Problem 2.2.c}
 

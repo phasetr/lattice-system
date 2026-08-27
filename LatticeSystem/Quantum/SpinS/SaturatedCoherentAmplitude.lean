@@ -21,8 +21,13 @@ and proves that at `φ = 0` the coherent state is the site-product of these ampl
 The product form is obtained from uniqueness for the linear ODE `ẋ = -i Ŝ_tot^{(2)} x`: both the
 matrix-exponential state and the amplitude product solve it with the same value at `θ = 0`.
 
-Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020,
-Problem 2.4.b, p. 34, with solution on p. 497, eq. (S.18) (there stated for `S = 1/2`).
+References: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020.
+The coherent state `Ξ_{θ,φ} := Û_φ^{(3)} Û_θ^{(2)} Φ↑` is eq. (2.4.6), p. 33, and the global
+rotation `Û_θ^{(α)} = exp(-iθ Ŝ_tot^{(α)})` is eq. (2.2.11), p. 22.  The site-product form of
+`Ξ_{θ,φ}` is eq. (S.18) of the solution to Problem 2.4.c (statement p. 34, solution p. 497,
+stated there for `S = 1/2`).  It is established here as the foundation for Problem 2.4.b
+(statement p. 34, solution pp. 496-497, eq. (S.17)), whose solution expands
+`Û_θ^{(2)} Φ↑ = Σ_M c_M Φ_M` and needs every `c_M` to be nonzero.
 -/
 
 namespace LatticeSystem.Quantum
@@ -33,8 +38,8 @@ open Matrix NormedSpace
 
 /-- Raising-step normalisation: `√((j+1)(N-j)) · √(binom N (j+1)) = (N-j) · √(binom N j)`.
 This is the identity that makes `Ŝ^+` act on the one-site amplitudes of Tasaki's coherent state
-(*Physics and Mathematics of Quantum Many-Body Systems*, Problem 2.4.b, p. 34, solution p. 497,
-eq. (S.18)) by a shift of the exponents alone. -/
+(*Physics and Mathematics of Quantum Many-Body Systems*, eq. (2.4.6), p. 33; site-product form
+eq. (S.18) of the solution to Problem 2.4.c, p. 497) by a shift of the exponents alone. -/
 private lemma sqrt_choose_raise (N : ℕ) {i : ℕ} (hi : i < N) :
     Real.sqrt (((i : ℝ) + 1) * ((N : ℝ) - ((i : ℝ) + 1) + 1)) *
         Real.sqrt ((N.choose (i + 1) : ℕ) : ℝ)
@@ -57,8 +62,8 @@ private lemma sqrt_choose_raise (N : ℕ) {i : ℕ} (hi : i < N) :
 
 /-- Lowering-step normalisation: `√((N-k)(k+1)) · √(binom N k) = (k+1) · √(binom N (k+1))`.
 Companion of `sqrt_choose_raise` for the action of `Ŝ^-` on the one-site amplitudes of Tasaki's
-coherent state (*Physics and Mathematics of Quantum Many-Body Systems*, Problem 2.4.b, p. 34,
-solution p. 497, eq. (S.18)). -/
+coherent state (*Physics and Mathematics of Quantum Many-Body Systems*, eq. (2.4.6), p. 33;
+site-product form eq. (S.18) of the solution to Problem 2.4.c, p. 497). -/
 private lemma sqrt_choose_lower (N : ℕ) {k : ℕ} (hk : k + 1 ≤ N) :
     Real.sqrt (((N : ℝ) - (k : ℝ)) * ((k : ℝ) + 1)) * Real.sqrt ((N.choose k : ℕ) : ℝ)
       = ((k : ℝ) + 1) * Real.sqrt ((N.choose (k + 1) : ℕ) : ℝ) := by
@@ -80,9 +85,9 @@ private lemma sqrt_choose_lower (N : ℕ) {k : ℕ} (hk : k + 1 ≤ N) :
 
 /-- **One-site coherent amplitude** `√(binom N j) · cos(θ/2)^{N-j} · sin(θ/2)^j` of the spin-`S`
 saturated-ferromagnet coherent state, with `N = 2S` and basis index `j : Fin (N + 1)` (magnetic
-quantum number `m = N/2 - j`).  For `N = 1` this is the pair `(cos(θ/2), sin(θ/2))` of Tasaki,
-*Physics and Mathematics of Quantum Many-Body Systems*, Problem 2.4.b, p. 34, solution p. 497,
-eq. (S.18) at `φ = 0`. -/
+quantum number `m = N/2 - j`).  For `N = 1` this is the pair `(cos(θ/2), sin(θ/2))` of the
+one-site factor of Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, eq. (S.18)
+(solution to Problem 2.4.c, p. 497, stated there for `S = 1/2`), taken at `φ = 0`. -/
 noncomputable def saturatedCoherentAmp (N : ℕ) (θ : ℝ) (j : Fin (N + 1)) : ℂ :=
   (Real.sqrt (N.choose (j : ℕ)) : ℂ) * (Real.cos (θ / 2) : ℂ) ^ (N - (j : ℕ)) *
     (Real.sin (θ / 2) : ℂ) ^ (j : ℕ)
@@ -157,9 +162,9 @@ private lemma spinSOpMinus_mulVec_saturatedCoherentAmp (N : ℕ) (θ : ℝ) (i :
 
 /-- **One-site generator equation.** The one-site coherent amplitude solves
 `d/dθ amp = -i Ŝ^{(2)} amp`, the single-site form of the rotation generator of Tasaki's coherent
-state (*Physics and Mathematics of Quantum Many-Body Systems*, Problem 2.4.b, p. 34, solution
-p. 497, eq. (S.18)).  The half-angle `θ/2` of the amplitude is exactly what this equation
-forces. -/
+state (*Physics and Mathematics of Quantum Many-Body Systems*, eq. (2.4.6), p. 33, with the
+rotation `Û_θ^{(α)} = exp(-iθ Ŝ_tot^{(α)})` of eq. (2.2.11), p. 22).  The half-angle `θ/2` of
+the amplitude is exactly what this equation forces. -/
 private lemma saturatedCoherentAmp_hasDerivAt (N : ℕ) (θ : ℝ) (j : Fin (N + 1)) :
     HasDerivAt (fun t : ℝ => saturatedCoherentAmp N t j)
       ((((-Complex.I) • spinSOp2 N) *ᵥ saturatedCoherentAmp N θ) j) θ := by
@@ -249,20 +254,20 @@ theorem onSiteS_mulVec_prod (x : V) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
 /-! ## Coherent state -/
 
 /-- **Global rotation about axis 2**, `Û_θ^{(2)} = exp(-iθ Ŝ_tot^{(2)})`, of Tasaki,
-*Physics and Mathematics of Quantum Many-Body Systems*, Problem 2.4.b, p. 34. -/
+*Physics and Mathematics of Quantum Many-Body Systems*, eq. (2.2.11), p. 22. -/
 noncomputable def saturatedGlobalRot2 (V : Type*) [Fintype V] [DecidableEq V] (N : ℕ) (θ : ℝ) :
     ManyBodyOpS V N :=
   exp (θ • ((-Complex.I) • totalSpinSOp2 V N))
 
 /-- **Global rotation about axis 3**, `Û_φ^{(3)} = exp(-iφ Ŝ_tot^{(3)})`, of Tasaki,
-*Physics and Mathematics of Quantum Many-Body Systems*, Problem 2.4.b, p. 34. -/
+*Physics and Mathematics of Quantum Many-Body Systems*, eq. (2.2.11), p. 22. -/
 noncomputable def saturatedGlobalRot3 (V : Type*) [Fintype V] [DecidableEq V] (N : ℕ) (φ : ℝ) :
     ManyBodyOpS V N :=
   exp (φ • ((-Complex.I) • totalSpinSOp3 V N))
 
 /-- **Saturated-ferromagnet coherent state** `Ξ_{θ,φ} = Û_φ^{(3)} Û_θ^{(2)} Φ↑`, obtained by
 rotating the all-aligned highest-weight state.  Tasaki, *Physics and Mathematics of Quantum
-Many-Body Systems*, Problem 2.4.b, p. 34. -/
+Many-Body Systems*, eq. (2.4.6), p. 33. -/
 noncomputable def saturatedCoherentState (V : Type*) [Fintype V] [DecidableEq V] (N : ℕ)
     (θ φ : ℝ) : (V → Fin (N + 1)) → ℂ :=
   (saturatedGlobalRot3 V N φ * saturatedGlobalRot2 V N θ) *ᵥ allAlignedStateS V N 0
@@ -299,7 +304,7 @@ set_option backward.isDefEq.respectTransparency false in
 /-- **Generator equation for the coherent state.** The path `θ ↦ Ξ_{θ,0}` solves the linear ODE
 `ẋ = -i Ŝ_tot^{(2)} x` generated by the axis-2 total spin, which is the defining property of the
 rotation `Û_θ^{(2)}` in Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
-Problem 2.4.b, p. 34. -/
+eq. (2.2.11), p. 22. -/
 private lemma saturatedCoherentState_zero_hasDerivAt (θ : ℝ) :
     HasDerivAt (fun u : ℝ => saturatedCoherentState V N u 0)
       (((-Complex.I) • totalSpinSOp2 V N : ManyBodyOpS V N) *ᵥ saturatedCoherentState V N θ 0)
@@ -312,10 +317,12 @@ private lemma saturatedCoherentState_zero_hasDerivAt (θ : ℝ) :
 
 /-- **Product form of the coherent state at `φ = 0`.** At every spin configuration `σ` the
 coherent state `Ξ_{θ,0}` equals the product over sites of the one-site amplitudes
-`√(binom N (σ x)) cos(θ/2)^{N - σ x} sin(θ/2)^{σ x}`.  This is the general-`S` form of Tasaki,
-*Physics and Mathematics of Quantum Many-Body Systems*, Problem 2.4.b, p. 34, solution p. 497,
-eq. (S.18) at `φ = 0`.  Both sides solve the linear ODE generated by `-i Ŝ_tot^{(2)}` and agree
-at `θ = 0`, so they agree identically. -/
+`√(binom N (σ x)) cos(θ/2)^{N - σ x} sin(θ/2)^{σ x}`.  This is the general-`S` form, at `φ = 0`,
+of the site-product expression for `Ξ_{θ,φ}` in Tasaki, *Physics and Mathematics of Quantum
+Many-Body Systems*, eq. (S.18) of the solution to Problem 2.4.c (p. 497, stated there for
+`S = 1/2`); it is the input to Problem 2.4.b (p. 34, solution pp. 496-497, eq. (S.17)).  Both
+sides solve the linear ODE generated by `-i Ŝ_tot^{(2)}` and agree at `θ = 0`, so they agree
+identically. -/
 theorem saturatedCoherentState_zero_apply (θ : ℝ) (σ : V → Fin (N + 1)) :
     saturatedCoherentState V N θ 0 σ = ∏ x : V, saturatedCoherentAmp N θ (σ x) := by
   classical
