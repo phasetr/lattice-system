@@ -112,9 +112,9 @@ if `V` is antiunitary in the sense `⟨V u, V v⟩ = ⟨v, u⟩` and squares to 
 identity, `V (V v) = -v`, then every vector is orthogonal to its own image,
 `⟨v, V v⟩ = 0`. Indeed antiunitarity applied to the pair `(V v, v)` evaluates
 `⟨V (V v), V v⟩` as `⟨v, V v⟩`, while `V (V v) = -v` evaluates it as `-⟨v, V v⟩`;
-in characteristic zero `x = -x` forces `x = 0`. For a half-odd-integer spin the
-time-reversal map satisfies both hypotheses (see `timeReversalSpinHalf_sq`), so this
-is the mechanism behind Kramers degeneracy. -/
+in characteristic zero `x = -x` forces `x = 0`. This is the mechanism behind Kramers
+degeneracy at half-odd-integer spin, where the second hypothesis takes the form proved
+in `timeReversalSpinHalf_sq` for the concrete map `timeReversalSpinHalf`. -/
 theorem inner_timeReversal_eq_zero_of_sq_neg
     {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
     (V : E → E)

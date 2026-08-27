@@ -3,15 +3,14 @@ import LatticeSystem.Quantum.TimeReversalSpinHalf
 /-!
 # Test coverage for Tasaki Problem 2.3.a (`inner_timeReversal_eq_zero_of_sq_neg`)
 
-Red-first signature pin for `TSK-001` (Tasaki, *Physics and Mathematics of Quantum
-Many-Body Systems*, Problem 2.3.a, p. 31, solution p. 496, Appendix A.4.3
+Signature pin for the capstone `inner_timeReversal_eq_zero_of_sq_neg` in
+`LatticeSystem/Quantum/TimeReversalSpinHalf.lean` (Tasaki, *Physics and Mathematics of
+Quantum Many-Body Systems*, Problem 2.3.a, p. 31, solution p. 496, Appendix A.4.3
 eq. (A.4.17)): for any antiunitary-antilinear involution-up-to-sign `V` on an inner
 product space (`⟨V u, V v⟩ = ⟨v, u⟩` and `V (V v) = -v`), every vector is orthogonal
-to its image, `⟨v, V v⟩ = 0`. This file consumes the not-yet-implemented capstone
-`inner_timeReversal_eq_zero_of_sq_neg` (to be added in
-`LatticeSystem/Quantum/TimeReversalSpinHalf.lean` immediately after
-`timeReversalSpinHalf_sq`) by its exact name and signature, applying it to abstract
-witness data `(E, V, hanti, hsq)` via `exact`.
+to its image, `⟨v, V v⟩ = 0`. The fixture fixes the capstone's exact name, binder order
+and hypothesis shapes by discharging abstract witness data `(E, V, hanti, hsq)` with it
+via `exact`.
 -/
 
 namespace LatticeSystem.Tests.Problem23a
