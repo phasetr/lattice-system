@@ -325,7 +325,7 @@ example :
 /-!
 ## Theorem 11.4 PR-7b — the fractional-knapsack lemmas and the ferromagnetic floor
 
-Continues the numbering from PR-7a (Red 44), starting at Red 48.  Reds 45–47 and Red 51 were
+Continues the numbering from PR-7a (Red 44), starting at Red 48.  Reds 46, 47 and 51 were
 reserved for PR-7c; they are filled in below (§ PR-7c), together with Reds 54/54b.  These Reds pin
 the PR-7b consumption of:
 
@@ -489,7 +489,7 @@ example : (fermionTotalDownNumber 1).mulVec (hubbardAllUpState 1) = 0 :=
 /-!
 ## Theorem 11.4 PR-7c — the `rpow` threshold (T1) and the ferromagnetic-floor capstone (F4)
 
-Fills the reserved Reds 45–47 and 51 (the PR-7b placeholder above), adds Reds 54/54b for F4 and
+Fills the reserved Reds 46, 47 and 51 (the PR-7b placeholder above), adds Reds 54/54b for F4 and
 Red 55 for the discharged capstone. The two names pinned here are
 `T1 = LatticeSystem.Math.exists_pos_forall_mul_lt_rpow` (the `rpow` threshold) and
 `F4 = LatticeSystem.Fermion.sum_lowestLevels_mul_le_rayleighOnVec_hubbardKinetic` (the
