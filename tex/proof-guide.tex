@@ -11290,9 +11290,12 @@ kinetic cost of the trial state against the band constant $c$, so the threshold 
 governed by the ratio $c/K$ and an upper bound on the bandwidth has to be fixed in advance; every
 concrete $t$ admits such a $K$, so only the order of the quantifiers is restricted.  The filling
 floor $2n_0\le N_e$ keeps the filling inside the range that (11.1.8) speaks about: the band
-condition leaves the lowest $n_0$ levels unconstrained, and by spin degeneracy $N_e$ electrons
-occupy the lowest $\lceil N_e/2\rceil$ levels, so $2n_0\le N_e$ is what puts the top occupied level
-inside the constrained range $n\ge n_0$.  Below it the band condition says nothing about the
+condition constrains only the levels $n\ge n_0$ and measures its gap from the cutoff $n_0$, while
+the floor is evaluated on a fully polarized state, whose $N_e$ electrons occupy $N_e$ distinct
+levels; so $n_0\le N_e$ is what puts the level the squeeze is applied at, the $N_e$-th, inside the
+constrained range, and the spare factor of two leaves the margin $\rho/2\le(N_e-n_0)/|\Lambda|$
+that makes the band gap there at least $c(\rho/2)^{2/d}$ and hence comparable with the trial
+state's kinetic cost $8\max(K,1)\rho$.  Below the cutoff the band condition says nothing about the
 occupied levels --- the flat-band regime where ferromagnetism \emph{does} occur --- so this
 variational approach gives no bound there.  Keeping $d>2$ explicit is likewise essential for
 soundness (the conclusion is false in $d=1$).  The Roth/Gutzwiller variational proof is developed
@@ -11780,10 +11783,10 @@ $\rho_1=\min\{\rho_0,\tfrac12,r\}$.  Taking $\max(K,1)$ rather than $K$ keeps $b
 $K=0$, where the row-sum hypothesis alone forces only $K\ge0$, and costs nothing because
 $8K\rho\le8\max(K,1)\rho$; the $\tfrac12$ supplies both $2|S_\uparrow|\le|\Lambda|$, needed for the
 Roth state to have positive norm, and $N_{\mathrm e}\le|\Lambda|$, needed for the floor.  Above,
-Roth's estimate on the trial state built from the $\lceil N_{\mathrm e}/2\rceil$ lowest eigenmodes
+Roth's estimate on the trial state built from the $N_{\mathrm e}-1$ lowest eigenmodes
 and the delocalized lowest mode gives
-$E_0\le\sum_{i<\lceil N_{\mathrm e}/2\rceil}\varepsilon_i+\varepsilon_1
-+8K\lceil N_{\mathrm e}/2\rceil/|\Lambda|$; below, the floor applied to a top-weight ground state
+$E_0\le\sum_{i<N_{\mathrm e}-1}\varepsilon_i+\varepsilon_1
++8K(N_{\mathrm e}-1)/|\Lambda|$; below, the floor applied to a top-weight ground state
 gives $\sum_{i<N_{\mathrm e}}\varepsilon_i\le E_0$, with no $U$-dependent correction.  Splitting the
 floor at the top occupied level leaves
 $\varepsilon_{\mathrm{top}}-\varepsilon_1\le8\max(K,1)\rho$, while the band condition (11.1.8) at

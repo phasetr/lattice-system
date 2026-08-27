@@ -65,9 +65,12 @@ quantifiers: `ρ₁` is fixed before `t`, and that estimate weighs the kinetic c
 against the band constant `c`, so the threshold it yields is governed by the ratio `c/K` and an
 upper bound on the bandwidth has to be fixed in advance; every concrete `t` admits such a `K`, so
 only the order of the quantifiers is restricted.  `_hNen₀` demands `2 * n₀ ≤ Ne`: the band
-condition (11.1.8) leaves the lowest `n₀` levels unconstrained, and by spin degeneracy `Ne`
-electrons occupy the lowest `⌈Ne/2⌉` levels, so `2 * n₀ ≤ Ne` is what puts the top occupied level
-inside the constrained range `n ≥ n₀`.  Below it the band condition says nothing about the occupied
+condition (11.1.8) constrains only the levels `n ≥ n₀` and measures its gap from the cutoff `n₀`.
+The floor below is evaluated on a fully polarized state, whose `Ne` electrons occupy `Ne` distinct
+levels, so the squeeze is applied at the `Ne`-th level; `n₀ ≤ Ne` is what puts that level inside
+the constrained range, and the spare factor of two leaves the margin `ρ/2 ≤ (Ne − n₀)/|Λ|`, which
+makes the band gap there at least `c·(ρ/2)^{2/d}` and hence comparable with the trial state's
+kinetic cost `8·max(K,1)·ρ`.  Below the cutoff the band condition says nothing about the occupied
 levels — the flat-band regime where ferromagnetism does occur — so this variational approach gives
 no bound there.
 
@@ -78,7 +81,7 @@ costs nothing since `8Kρ ≤ 8·max(K,1)·ρ`.  The `1/2` supplies both `2|S_�
 Roth state to be normalizable, and `Ne ≤ |Λ|`, needed for the floor.
 
 The upper bound is `rayleighOnVec_hubbardHamiltonian_hubbardLowDensityRothState_le` evaluated on
-the Roth state built from the `⌈Ne/2⌉` lowest eigenmodes and the delocalized lowest mode furnished
+the Roth state built from the `Ne − 1` lowest eigenmodes and the delocalized lowest mode furnished
 by translation invariance; the lower bound is
 `sum_lowestLevels_mul_le_rayleighOnVec_hubbardKinetic` evaluated on a top-weight ground state,
 which exists precisely when the ground states are all maximal-spin. -/

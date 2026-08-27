@@ -595,6 +595,8 @@ example :
 /-- Fixture: the diagonal Hermitian matrix `diag(0, 1)` on `Fin 2` (Red 54b). -/
 private noncomputable def dfn : Fin 2 → ℂ := fun i => ((![0, 1] : Fin 2 → ℝ) i : ℂ)
 
+/-- Fixture: `diag(0, 1)` is Hermitian, the hypothesis the floor lemma takes at Red 54b's nonzero
+hopping. -/
 private theorem hTdiag : (Matrix.diagonal dfn).IsHermitian :=
   Matrix.isHermitian_diagonal_iff.mpr fun i => by
     change star (dfn i) = dfn i
