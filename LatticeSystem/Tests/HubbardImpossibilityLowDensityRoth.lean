@@ -495,20 +495,26 @@ Red 55 for the discharged capstone. The two names pinned here are
 `F4 = LatticeSystem.Fermion.sum_lowestLevels_mul_le_rayleighOnVec_hubbardKinetic` (the
 ferromagnetic floor), the two ingredients out of which `hubbard_theorem_11_4` is assembled.
 
-* **Red 45 / 46 / 47 (T1 consumption at three fixture triples).** Three independent instantiations
-  of T1 at different `(a, b, p)`, each obtaining the witness `r` and applying it at a concrete
-  density inside `(0, r]`. Red 46 additionally applies the *same* obtained `r` at two different
-  densities (`r/2` and `r/4`) — this is the load-bearing content: `r` is chosen once, before any
-  density is picked, exactly as `ρ₁` in `hubbard_theorem_11_4` is chosen before `N`.
-  **Note the point being guarded**: Red 46 is not exercising a nontrivial band condition (there is
-  none here — T1 has no such hypothesis); the fact it pins is purely that *one* witness `r` serves
-  *both* densities simultaneously, mirroring the PR-6 Red 38 lesson that a "both sides vacuous"
-  instance must not be mistaken for genuine content. Red 47 instead varies `(a, b)` while holding
-  `p` fixed, obtaining two independent witnesses, guarding that T1's conclusion is not accidentally
-  tied to one specific numeral pair.
-* **Red 51 (T1 pinned + `p < 1` sharpness).** The primary pinned instance at `a = b = 1`,
-  `p = 1/2`, plus a **standalone** counterexample at `p = 1` referencing neither T1 nor any fixture:
-  `1 * 1 < 1 * 1 ^ (1 : ℝ)` is false, so `hp1 : p < 1` cannot be dropped from T1's hypotheses.
+* **Red 46 / 47 (T1 consumption at two fixture triples).** Two independent instantiations of T1 at
+  different `(a, b, p)`, each obtaining the witness `r` and applying it at a concrete density
+  inside `(0, r]`. Red 46 (at `(a, b, p) = (2, 3, 1/3)`) additionally applies the *same* obtained
+  `r` at two different densities (`r/2` and `r/4`) — this is the load-bearing content: `r` is
+  chosen once, before any density is picked, exactly as `ρ₁` in `hubbard_theorem_11_4` is chosen
+  before `N`. **Note the point being guarded**: Red 46 is not exercising a nontrivial band
+  condition (there is none here — T1 has no such hypothesis); the fact it pins is purely that
+  *one* witness `r` serves *both* densities simultaneously, mirroring the PR-6 Red 38 lesson that
+  a "both sides vacuous" instance must not be mistaken for genuine content. Red 47 instead varies
+  `(a, b)` (at `(a, b, p) = (1, 1, 1/2)` and `(7, 5, 1/2)`) while holding `p` fixed, obtaining two
+  independent witnesses, guarding that T1's conclusion is not accidentally tied to one specific
+  numeral pair. (An earlier Red 45 at `(2, 3, 1/3)` applying `r` at a single density was a strict
+  first conjunct of Red 46 and has been removed as fully subsumed by it.)
+* **Red 51 (T1 pinned + a `p = 1` data point).** The primary pinned instance at `a = b = 1`,
+  `p = 1/2`, plus a **standalone** fact at `p = 1` referencing neither T1 nor any fixture:
+  `1 * 1 < 1 * 1 ^ (1 : ℝ)` is false. This shows only that T1's `(a, b) * r < (a, b) * r ^ p`
+  conclusion fails at the single point `r = 1`; since T1's own conclusion is an `∃ r > 0, ∀ ρ ∈
+  (0, r]` statement rather than a claim at every `ρ`, this single-point failure does not by itself
+  establish that `hp1 : p < 1` cannot be dropped from T1's hypotheses (T1's conclusion could in
+  principle still hold with a smaller witness `r < 1` even at `p = 1`).
 * **Red 54 (F4 at `t = 0`, the degenerate floor).** `M := 1`, `t := 0` (fixture `hT0`), `ε := 0`
   (`hspec` via `hT0.eigenvalues = 0`), the `Ne := 2` all-up Slater state `hubbardAllUpState 1`
   (`hdown`/`hnum` from the `Red 53` machinery, `hu0` from `hubbardAllUpState_ne_zero`): the
@@ -527,14 +533,6 @@ ferromagnetic floor), the two ingredients out of which `hubbard_theorem_11_4` is
   forces `N` to be chosen after it (this is what `Tests.HubbardImpossibilityLowDensity`'s Red 2
   pins). Red 55 therefore pins the next best thing, and the one thing Red 1 misses.
 -/
-
-/-- **Red 45 (T1 pinned at `a = 2`, `b = 3`, `p = 1/3`).** -/
-example :
-    ∃ r : ℝ, 0 < r ∧ (3 : ℝ) * (r / 2) < 2 * (r / 2) ^ ((1 : ℝ) / 3) := by
-  obtain ⟨r, hrpos, hr⟩ :=
-    LatticeSystem.Math.exists_pos_forall_mul_lt_rpow (a := 2) (b := 3) (p := 1 / 3)
-      (by norm_num) (by norm_num) (by norm_num)
-  exact ⟨r, hrpos, hr (r / 2) (by linarith) (by linarith)⟩
 
 /-- **Red 46 (the shared witness `r` applies at two distinct densities).** See the module-header
 note above: the content guarded is the *sharing* of `r`, not a nonvacuous side condition. -/
@@ -570,7 +568,9 @@ example :
   exact ⟨r, hrpos, hr (min r (1 / 4)) (lt_min hrpos (by norm_num)) (min_le_left r (1 / 4))⟩
 
 /-- **Red 51 sharpness (`p = 1`, standalone).** References neither T1 nor any fixture: witnesses
-that `hp1 : p < 1` is load-bearing, not decoration. -/
+that the inequality `a * r < b * r ^ p` fails at the single point `r = 1`, `p = 1` (a data point
+about `p = 1`, not a proof that `hp1 : p < 1` cannot be dropped from T1's `∃ r > 0, ∀ ρ ∈ (0, r]`
+conclusion). -/
 example : ¬ ((1 : ℝ) * 1 < 1 * (1 : ℝ) ^ (1 : ℝ)) := by
   rw [Real.rpow_one]; norm_num
 
