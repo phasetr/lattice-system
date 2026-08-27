@@ -14,11 +14,11 @@ import Mathlib.Data.Matrix.PEquiv
 /-!
 # Test coverage for Theorem 11.4 (impossibility of ferromagnetism at low densities)
 
-`hubbard_theorem_11_4` is an axiom pending discharge whose statement strengthens Tasaki's bare
-one by a hopping scale `K` with its row-sum bound `_hK` and a filling floor `_hNen₀`. These tests
-pin that signature and guard the two failure modes of such added hypotheses:
+`hubbard_theorem_11_4` strengthens Tasaki's bare statement by a hopping scale `K` with its row-sum
+bound `_hK` and a filling floor `_hNen₀`. These tests pin that signature and guard the two failure
+modes of such added hypotheses:
 
-- **Red 1**: an application test that consumes the axiom with every binder, including `_hK` and
+- **Red 1**: an application test that consumes the theorem with every binder, including `_hK` and
   `_hNen₀`, so the arity and the position of `K` are pinned.
 - **Red 2**: the filling hypotheses (`2 ≤ Ne`, `2 * n₀ ≤ Ne`, `Ne/(N+1) ≤ ρ₁`) are jointly
   satisfiable for every `ρ₁ > 0` and `n₀` — guards against under-quantification (vacuity).

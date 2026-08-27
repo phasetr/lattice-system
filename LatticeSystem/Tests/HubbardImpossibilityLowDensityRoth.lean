@@ -10,6 +10,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.AllUpState
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJAllUpProperties
 import LatticeSystem.Math.MatrixAnalysis.RowSumEigenvalueBound
 import LatticeSystem.Math.MonotoneEnumeration
+import LatticeSystem.Math.Analysis.RpowSublinearThreshold
 import LatticeSystem.Quantum.SpinS.RayleighInfMatrix
 import Mathlib.Analysis.Matrix.Spectrum
 import Mathlib.LinearAlgebra.Matrix.Charpoly.Basic
@@ -488,14 +489,11 @@ example : (fermionTotalDownNumber 1).mulVec (hubbardAllUpState 1) = 0 :=
 /-!
 ## Theorem 11.4 PR-7c — the `rpow` threshold (T1) and the ferromagnetic-floor capstone (F4)
 
-Fills the reserved Reds 45–47 and 51 (the PR-7b placeholder above), and adds Reds 54/54b for F4.
-`T1 = LatticeSystem.Math.exists_pos_forall_mul_lt_rpow` and
-`F4 = LatticeSystem.Fermion.sum_lowestLevels_mul_le_rayleighOnVec_hubbardKinetic` do not exist yet
-(this is the Red phase of PR-7c): every `example` below that references either name fails to
-elaborate with an *unknown identifier* error, and nothing else in this section does. The
-`Math.Analysis.RpowSublinearThreshold` import that will house T1 is deliberately **not** added yet
-(the module does not exist; adding an import for a nonexistent module would turn every example in
-this file into an import error rather than the intended per-declaration Red).
+Fills the reserved Reds 45–47 and 51 (the PR-7b placeholder above), adds Reds 54/54b for F4 and
+Red 55 for the discharged capstone. The two names pinned here are
+`T1 = LatticeSystem.Math.exists_pos_forall_mul_lt_rpow` (the `rpow` threshold) and
+`F4 = LatticeSystem.Fermion.sum_lowestLevels_mul_le_rayleighOnVec_hubbardKinetic` (the
+ferromagnetic floor), the two ingredients out of which `hubbard_theorem_11_4` is assembled.
 
 * **Red 45 / 46 / 47 (T1 consumption at three fixture triples).** Three independent instantiations
   of T1 at different `(a, b, p)`, each obtaining the witness `r` and applying it at a concrete
@@ -523,6 +521,11 @@ this file into an import error rather than the intended per-declaration Red).
   `Matrix.IsHermitian.roots_charpoly_eq_eigenvalues` applied to the diagonal matrix's own
   characteristic-polynomial factorization (`Matrix.charpoly_diagonal`), so this is the Red that
   fails if the weights or the `hspec` multiset transport inside F4 are wrong.
+* **Red 55 (the threshold is uniform in the system size and in `U`).** The capstone's own
+  quantifier order, which no fixture-based test can reach: the model here cannot be a numeral
+  fixture, because the density hypothesis `Ne/(N+1) ≤ ρ₁` refers to the *obtained* `ρ₁` and so
+  forces `N` to be chosen after it (this is what `Tests.HubbardImpossibilityLowDensity`'s Red 2
+  pins). Red 55 therefore pins the next best thing, and the one thing Red 1 misses.
 -/
 
 /-- **Red 45 (T1 pinned at `a = 2`, `b = 3`, `p = 1/3`).** -/
@@ -637,5 +640,27 @@ example :
     hTdiag hk hmono hTdiag_eigenvalues (hubbardAllUpState_ne_zero 1) allUpState_one_down_zero
     allUpState_one_number_two
   simpa using h
+
+/-- **Red 55 (the density threshold is uniform in the system size and in `U`).** The witness `ρ₁`
+is obtained *once* and then serves every system size, every hopping matrix and every interaction
+strength: the goal keeps `∃ ρ₁` outside the `∀ N` and `∀ U`, so a hypothetical `∀ N, ∃ ρ₁, …`
+reading could not discharge it. `Tests.HubbardImpossibilityLowDensity`'s Red 1 fixes `N` and `U`
+before obtaining `ρ₁` and therefore cannot see this; yet it is the physical content of the
+theorem, namely that the low-density regime does not shrink away as the volume grows. -/
+example (c ρ₀ K : ℝ) (hc : 0 < c) (hρ₀ : 0 < ρ₀) (n₀ d : ℕ) (hd : 2 < d) :
+    ∃ ρ₁ : ℝ, 0 < ρ₁ ∧ ∀ (N Ne : ℕ) (U : ℝ) (t : Fin (N + 1) → Fin (N + 1) → ℂ)
+      (ht : Matrix.IsHermitian t) (σ : Equiv.Perm (Fin (N + 1))) (ε : Fin (N + 1) → ℝ) (E₀ : ℂ),
+      (∀ x : Fin (N + 1), ∑ y : Fin (N + 1), ‖t x y‖ ≤ K) → (∀ i j, t (σ i) (σ j) = t i j) →
+      (∀ i j : Fin (N + 1), ∃ k : ℕ, (σ ^ k) i = j) → Monotone ε →
+      Finset.univ.val.map ε = Finset.univ.val.map ht.eigenvalues →
+      hubbardBandCondition ε c ρ₀ n₀ d → 2 ≤ Ne → 2 * n₀ ≤ Ne → (Ne : ℝ) / (N + 1) ≤ ρ₁ →
+      0 ≤ U → hubbardEigenspaceAt t (U : ℂ) E₀ Ne ≠ ⊥ →
+      (∀ E : ℂ, hubbardEigenspaceAt t (U : ℂ) E Ne ≠ ⊥ → E₀.re ≤ E.re) →
+      ¬ ∀ v ∈ hubbardEigenspaceAt t (U : ℂ) E₀ Ne,
+        (fermionTotalSpinSquared N).mulVec v = (((Ne : ℂ) / 2) * ((Ne : ℂ) / 2 + 1)) • v := by
+  obtain ⟨ρ₁, hρ₁, h⟩ := hubbard_theorem_11_4 c ρ₀ K hc hρ₀ n₀ d hd
+  exact ⟨ρ₁, hρ₁, fun N Ne U t ht σ ε E₀ hK htrans htransitive hmono hspec hband hNe2 hNen₀ hden
+    hU hne hmin => h N t ht hK σ htrans htransitive ε hmono hspec hband Ne hNe2 hNen₀ hden U hU E₀
+      hne hmin⟩
 
 end LatticeSystem.Tests.HubbardImpossibilityLowDensityRoth
