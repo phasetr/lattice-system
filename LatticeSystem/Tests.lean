@@ -93,6 +93,7 @@ import LatticeSystem.Tests.MarshallLiebMattisToyHamiltonian
 import LatticeSystem.Tests.MarshallLiebMattisBipartiteGraph
 import LatticeSystem.Tests.TimeReversalSpinHalf
 import LatticeSystem.Tests.TimeReversalMulti
+import LatticeSystem.Tests.Problem23a
 import LatticeSystem.Tests.CartesianAxis
 import LatticeSystem.Tests.SpinHalfSpecializationMultiSite
 import LatticeSystem.Tests.GradedPolynomialLayerNegativeControl

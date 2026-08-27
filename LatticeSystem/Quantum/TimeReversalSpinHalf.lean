@@ -105,6 +105,27 @@ theorem timeReversalSpinHalf_sq (v : Fin 2 → ℂ) :
   fin_cases i <;>
     simp [timeReversalSpinHalf, Pi.neg_apply]
 
+/-- **Kramers orthogonality** (Tasaki, *Physics and Mathematics of Quantum Many-Body
+Systems*, Problem 2.3.a, p. 31; solution p. 496; Appendix A.4.3 eq. (A.4.17)):
+
+if `V` is antiunitary in the sense `⟨V u, V v⟩ = ⟨v, u⟩` and squares to minus the
+identity, `V (V v) = -v`, then every vector is orthogonal to its own image,
+`⟨v, V v⟩ = 0`. Indeed antiunitarity applied to the pair `(V v, v)` evaluates
+`⟨V (V v), V v⟩` as `⟨v, V v⟩`, while `V (V v) = -v` evaluates it as `-⟨v, V v⟩`;
+in characteristic zero `x = -x` forces `x = 0`. For a half-odd-integer spin the
+time-reversal map satisfies both hypotheses (see `timeReversalSpinHalf_sq`), so this
+is the mechanism behind Kramers degeneracy. -/
+theorem inner_timeReversal_eq_zero_of_sq_neg
+    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+    (V : E → E)
+    (hanti : ∀ u v, inner ℂ (V u) (V v) = inner ℂ v u)
+    (hsq : ∀ v, V (V v) = -v)
+    (v : E) :
+    inner ℂ v (V v) = 0 := by
+  have h := hanti (V v) v
+  rw [hsq v, inner_neg_left] at h
+  exact add_self_eq_zero.mp (neg_eq_iff_add_eq_zero.mp h)
+
 /-! ## Time-reversal flips the spin: `Θ̂ Ŝ Θ̂⁻¹ = -Ŝ`
 
 Tasaki §2.3 eq. (2.3.14) (single spin): the antilinear time
