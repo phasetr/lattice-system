@@ -9,8 +9,8 @@ Quantum Many-Body Systems*, Problem 2.3.a, p. 31, solution p. 496, Appendix A.4.
 eq. (A.4.17)): for any map `V` on an inner product space that reverses the inner product
 (`⟨V u, V v⟩ = ⟨v, u⟩`) and is an involution up to sign (`V (V v) = -v`), every vector is
 orthogonal to its image, `⟨v, V v⟩ = 0`; no linearity assumption on `V` is needed. The
-fixture fixes the capstone's exact name, binder order and hypothesis shapes by discharging
-abstract witness data `(E, V, hanti, hsq)` with it via `exact`.
+fixture fixes the capstone's exact name, binder order and hypothesis shapes by applying it
+to discharge abstract witness data `(E, V, hanti, hsq)`.
 -/
 
 namespace LatticeSystem.Tests.Problem23a
