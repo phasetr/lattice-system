@@ -12,7 +12,7 @@ permalink: /limitations/documented-axioms/chapter-10/
 
 ## Theorem 10.11 (Kubo–Kishi finite-temperature charge/pairing susceptibility bound)
 
-**Tasaki §10.2.5, Theorem 10.11** (eqs. (10.2.52)-(10.2.56), pp. 368-369) is a
+**Tasaki §10.2.5, Theorem 10.11** (eqs. (10.2.52)-(10.2.56), p. 368) is a
 **documented axiom**, `theorem_10_11_kubo_kishi_susceptibility_bound`
 (`LatticeSystem/Fermion/JordanWigner/Hubbard/LiebKuboKishi.lean`, declaration
 line 139).

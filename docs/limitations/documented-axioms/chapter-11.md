@@ -108,7 +108,7 @@ declaration line 49).
 
 ## Theorem 11.19 (spin-wave excitation energy bounds)
 
-**Tasaki §11.4.2, Theorem 11.19** (eqs. (11.4.31)-(11.4.35), pp. 423-424) is
+**Tasaki §11.4.2, Theorem 11.19** (eqs. (11.4.31)-(11.4.35), p. 424) is
 a **documented axiom**, `nonsingular_theorem_11_19`
 (`LatticeSystem/Fermion/JordanWigner/Hubbard/SpinWaveExcitation.lean`,
 declaration line 64).
