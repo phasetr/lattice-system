@@ -136,7 +136,7 @@ and `becMStar_ge_sqrt_twoQ`
 
 ## Theorem 5.4 (symmetry breaking in coupled Bose–Einstein condensates)
 
-**Tasaki §5.5, Theorem 5.4** (eqs. (5.5.5)-(5.5.6), around p. 148) is a
+**Tasaki §5.5, Theorem 5.4** (eqs. (5.5.5)-(5.5.6), around p. 147) is a
 **documented axiom**, `tasaki_5_4_coupled_bec_ssb`
 (`LatticeSystem/Quantum/SpinS/BoseEinsteinCondensate.lean`, declaration
 line 496).

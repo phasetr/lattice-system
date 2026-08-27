@@ -219,7 +219,8 @@ declaration line 151).
 
 ## Theorem 11.27 (Tanaka–Tasaki metallic ferromagnetism)
 
-**Tasaki §11.5.2 ("Rigorous Results"), Theorem 11.27** (eqs. (11.5.19)-(11.5.24), p. 451) is a
+**Tasaki §11.5.2 ("Rigorous Results"), Theorem 11.27** (statement p. 451; eqs.
+(11.5.19)-(11.5.24) span pp. 450-451) is a
 **documented axiom**, `theorem_11_27`
 (`LatticeSystem/Fermion/JordanWigner/Hubbard/TanakaTasakiModel.lean`,
 declaration line 194).
