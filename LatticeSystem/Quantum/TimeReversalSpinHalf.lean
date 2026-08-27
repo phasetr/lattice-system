@@ -108,13 +108,16 @@ theorem timeReversalSpinHalf_sq (v : Fin 2 → ℂ) :
 /-- **Kramers orthogonality** (Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Problem 2.3.a, p. 31; solution p. 496; Appendix A.4.3 eq. (A.4.17)):
 
-if `V` is antiunitary in the sense `⟨V u, V v⟩ = ⟨v, u⟩` and squares to minus the
+if `V` reverses the inner product, `⟨V u, V v⟩ = ⟨v, u⟩`, and squares to minus the
 identity, `V (V v) = -v`, then every vector is orthogonal to its own image,
-`⟨v, V v⟩ = 0`. Indeed antiunitarity applied to the pair `(V v, v)` evaluates
+`⟨v, V v⟩ = 0`. Indeed the first hypothesis applied to the pair `(V v, v)` evaluates
 `⟨V (V v), V v⟩` as `⟨v, V v⟩`, while `V (V v) = -v` evaluates it as `-⟨v, V v⟩`;
-in characteristic zero `x = -x` forces `x = 0`. This is the mechanism behind Kramers
-degeneracy at half-odd-integer spin, where the second hypothesis takes the form proved
-in `timeReversalSpinHalf_sq` for the concrete map `timeReversalSpinHalf`. -/
+in characteristic zero `x = -x` forces `x = 0`. Neither linearity nor antilinearity of
+`V` is assumed: Tasaki's antiunitary operators of eq. (A.4.17) are antilinear by
+definition, whereas the conclusion needs only this inner-product identity and
+`V (V v) = -v`. This is the mechanism behind Kramers degeneracy at half-odd-integer
+spin, where the second hypothesis takes the form proved in `timeReversalSpinHalf_sq`
+for the concrete map `timeReversalSpinHalf`. -/
 theorem inner_timeReversal_eq_zero_of_sq_neg
     {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
     (V : E → E)

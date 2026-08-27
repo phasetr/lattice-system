@@ -15828,10 +15828,12 @@ is even (the minus signs cancel pairwise).
 \noindent\textbf{Theorem (Problem 2.3.a, Kramers-degeneracy
 orthogonality).} Tasaki, \emph{Physics and Mathematics of Quantum
 Many-Body Systems}, Problem 2.3.a, p.~31 (solution p.~496); see also
-Appendix A.4.3 eq.~(A.4.17). Let \(V\) be an antiunitary map on a
-complex inner product space, \(\langle Vu, Vv\rangle =
-\langle v, u\rangle\) for all \(u, v\), satisfying
-\(V(Vv) = -v\). Then every vector \(v\) is orthogonal to its image,
+Appendix A.4.3 eq.~(A.4.17). Let \(V\) be a map on a complex inner
+product space with \(\langle Vu, Vv\rangle = \langle v, u\rangle\)
+for all \(u, v\), satisfying \(V(Vv) = -v\); neither linearity nor
+antilinearity of \(V\) is assumed, whereas Tasaki's antiunitary
+operators of eq.~(A.4.17) are antilinear by definition. Then every
+vector \(v\) is orthogonal to its image,
 \[
   \langle v, Vv\rangle \;=\; 0.
 \]
@@ -15843,11 +15845,13 @@ complex inner product space, \(\langle Vu, Vv\rangle =
 In Lean this is the general (abstract-\(V\)) theorem
 \texttt{inner\_timeReversal\_eq\_zero\_of\_sq\_neg}
 (\texttt{LatticeSystem/Quantum/TimeReversalSpinHalf.lean}), stated
-for any antiunitary \(V\) with \(V^2 = -\mathrm{id}\) rather than only
-the concrete \(\hat{\Theta}\) above. This matches Problem 2.3.a, whose
-statement is purely abstract (an antiunitary \(V\) with \(V^2 = -I\));
-Tasaki notes that the spin identities (2.3.8) and (2.3.29), i.e. the
-half-odd-integer-spin time reversal, are special cases of it.
+for any \(V\) obeying the inner-product identity above with
+\(V^2 = -\mathrm{id}\), rather than only the concrete \(\hat{\Theta}\).
+This matches Problem 2.3.a, whose statement is purely abstract (an
+antiunitary \(V\) with \(V^2 = -I\)); Tasaki notes that the spin
+identities (2.3.8) and (2.3.29), i.e. the orthogonality of a
+half-odd-integer-spin state and its time-reversed image, are special
+cases of it.
 
 \noindent\textbf{Status / scope.} The \(S = 1/2\) single-spin and
 multi-spin cases are closed
