@@ -7,9 +7,13 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandEigenbasis
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowUTrial
 import LatticeSystem.Fermion.JordanWigner.Hubbard.ChargesCore
 import LatticeSystem.Fermion.JordanWigner.Hubbard.AllUpState
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TJAllUpProperties
 import LatticeSystem.Math.MatrixAnalysis.RowSumEigenvalueBound
 import LatticeSystem.Math.MonotoneEnumeration
+import LatticeSystem.Math.Analysis.RpowSublinearThreshold
 import LatticeSystem.Quantum.SpinS.RayleighInfMatrix
+import Mathlib.Analysis.Matrix.Spectrum
+import Mathlib.LinearAlgebra.Matrix.Charpoly.Basic
 
 /-!
 # Test coverage for Theorem 11.4 PR-6 (Roth's variational bound)
@@ -321,10 +325,9 @@ example :
 /-!
 ## Theorem 11.4 PR-7b — the fractional-knapsack lemmas and the ferromagnetic floor
 
-Continues the numbering from PR-7a (Red 44), starting at Red 48.  Reds 45–47 and Red 51 are
-reserved for PR-7c: 45–47 for the discharge of `hubbard_theorem_11_4` itself and the uniformity of
-its density threshold in `N` and in `U`, and 51 for the `rpow` threshold step `T1`, none of which
-exist yet.  These Reds pin the PR-7b consumption of:
+Continues the numbering from PR-7a (Red 44), starting at Red 48.  Reds 46, 47 and 51 were
+reserved for PR-7c; they are filled in below (§ PR-7c), together with Reds 54/54b.  These Reds pin
+the PR-7b consumption of:
 
 * `LatticeSystem.Math.sum_lowestLevels_le_sum_weighted` (W1, the fractional-knapsack lemma) and
   `LatticeSystem.Math.sum_lowestLevels_le_sum_weighted_of_map_eq` (W2, its reading against the
@@ -482,5 +485,184 @@ of a fully polarised two-electron sector) really has `N̂_↓ = 0` via F3. A dro
 with F3's `hZ` hypothesis. -/
 example : (fermionTotalDownNumber 1).mulVec (hubbardAllUpState 1) = 0 :=
   fermionTotalDownNumber_mulVec_eq_zero_of_topWeight allUpState_one_number_two allUpState_one_spinZ
+
+/-!
+## Theorem 11.4 PR-7c — the `rpow` threshold (T1) and the ferromagnetic-floor capstone (F4)
+
+Fills the reserved Reds 46, 47 and 51 (the PR-7b placeholder above), adds Reds 54/54b for F4 and
+Red 55 for the discharged capstone. The two names pinned here are
+`T1 = LatticeSystem.Math.exists_pos_forall_mul_lt_rpow` (the `rpow` threshold) and
+`F4 = LatticeSystem.Fermion.sum_lowestLevels_mul_le_rayleighOnVec_hubbardKinetic` (the
+ferromagnetic floor), the two ingredients out of which `hubbard_theorem_11_4` is assembled.
+
+* **Red 46 / 47 (T1 consumption at two fixture triples).** Two independent instantiations of T1 at
+  different `(a, b, p)`, each obtaining the witness `r` and applying it at a concrete density
+  inside `(0, r]`. Red 46 (at `(a, b, p) = (2, 3, 1/3)`) additionally applies the *same* obtained
+  `r` at two different densities (`r/2` and `r/4`) — this is the load-bearing content: `r` is
+  chosen once, before any density is picked, exactly as `ρ₁` in `hubbard_theorem_11_4` is chosen
+  before `N`. **Note the point being guarded**: Red 46 is not exercising a nontrivial band
+  condition (there is none here — T1 has no such hypothesis); the fact it pins is purely that
+  *one* witness `r` serves *both* densities simultaneously, mirroring the PR-6 Red 38 lesson that
+  a "both sides vacuous" instance must not be mistaken for genuine content. Red 47 instead varies
+  `(a, b)` (at `(a, b, p) = (1, 1, 1/2)` and `(7, 5, 1/2)`) while holding `p` fixed, obtaining two
+  independent witnesses, guarding that T1's conclusion is not accidentally tied to one specific
+  numeral pair. (An earlier Red 45 at `(2, 3, 1/3)` applying `r` at a single density was a strict
+  first conjunct of Red 46 and has been removed as fully subsumed by it.)
+* **Red 51 (T1 pinned + a `p = 1` data point).** The primary pinned instance at `a = b = 1`,
+  `p = 1/2`, plus a **standalone** fact at `p = 1` referencing neither T1 nor any fixture:
+  `1 * 1 < 1 * 1 ^ (1 : ℝ)` is false. This shows only that T1's `(a, b) * r < (a, b) * r ^ p`
+  conclusion fails at the single point `r = 1`; since T1's own conclusion is an `∃ r > 0, ∀ ρ ∈
+  (0, r]` statement rather than a claim at every `ρ`, this single-point failure does not by itself
+  establish that `hp1 : p < 1` cannot be dropped from T1's hypotheses (T1's conclusion could in
+  principle still hold with a smaller witness `r < 1` even at `p = 1`).
+* **Red 54 (F4 at `t = 0`, the degenerate floor).** `M := 1`, `t := 0` (fixture `hT0`), `ε := 0`
+  (`hspec` via `hT0.eigenvalues = 0`), the `Ne := 2` all-up Slater state `hubbardAllUpState 1`
+  (`hdown`/`hnum` from the `Red 53` machinery, `hu0` from `hubbardAllUpState_ne_zero`): the
+  floor collapses to `0 ≤ rayleighOnVec (hubbardKinetic 1 0) …`. **Red 54 alone is not enough**
+  — see Red 54b.
+* **Red 54b (F4 at a nonzero diagonal `t`, distinct eigenvalues).** Same `M := 1`, `Ne := 2`,
+  `hdown`/`hnum`/`hu0` as Red 54, but `t := Matrix.diagonal ![0, 1]` and `ε := ![0, 1]`: the
+  floor is the strict nontrivial number `0 + 1 = 1` times `‖u‖²`. `hspec` here is genuinely
+  earned (not the `ε := hT.eigenvalues` reflexivity shortcut of Red 24/54): it is derived from
+  `Matrix.IsHermitian.roots_charpoly_eq_eigenvalues` applied to the diagonal matrix's own
+  characteristic-polynomial factorization (`Matrix.charpoly_diagonal`), so this is the Red that
+  fails if the weights or the `hspec` multiset transport inside F4 are wrong.
+* **Red 55 (the threshold is uniform in the system size and in `U`).** The capstone's own
+  quantifier order, which no fixture-based test can reach: the model here cannot be a numeral
+  fixture, because the density hypothesis `Ne/(N+1) ≤ ρ₁` refers to the *obtained* `ρ₁` and so
+  forces `N` to be chosen after it (this is what `Tests.HubbardImpossibilityLowDensity`'s Red 2
+  pins). Red 55 therefore pins the next best thing, and the one thing Red 1 misses.
+-/
+
+/-- **Red 46 (the shared witness `r` applies at two distinct densities).** See the module-header
+note above: the content guarded is the *sharing* of `r`, not a nonvacuous side condition. -/
+example :
+    ∃ r : ℝ, 0 < r ∧
+      (3 : ℝ) * (r / 2) < 2 * (r / 2) ^ ((1 : ℝ) / 3) ∧
+      (3 : ℝ) * (r / 4) < 2 * (r / 4) ^ ((1 : ℝ) / 3) := by
+  obtain ⟨r, hrpos, hr⟩ :=
+    LatticeSystem.Math.exists_pos_forall_mul_lt_rpow (a := 2) (b := 3) (p := 1 / 3)
+      (by norm_num) (by norm_num) (by norm_num)
+  exact ⟨r, hrpos, hr (r / 2) (by linarith) (by linarith),
+    hr (r / 4) (by linarith) (by linarith)⟩
+
+/-- **Red 47 (T1 at two different `(a, b)` pairs, the same `p`).** -/
+example :
+    (∃ r : ℝ, 0 < r ∧ (1 : ℝ) * (r / 2) < 1 * (r / 2) ^ ((1 : ℝ) / 2)) ∧
+    (∃ r : ℝ, 0 < r ∧ (5 : ℝ) * (r / 2) < 7 * (r / 2) ^ ((1 : ℝ) / 2)) := by
+  refine ⟨?_, ?_⟩
+  · obtain ⟨r, hrpos, hr⟩ :=
+      LatticeSystem.Math.exists_pos_forall_mul_lt_rpow (a := 1) (b := 1) (p := 1 / 2)
+        (by norm_num) (by norm_num) (by norm_num)
+    exact ⟨r, hrpos, hr (r / 2) (by linarith) (by linarith)⟩
+  · obtain ⟨r, hrpos, hr⟩ :=
+      LatticeSystem.Math.exists_pos_forall_mul_lt_rpow (a := 7) (b := 5) (p := 1 / 2)
+        (by norm_num) (by norm_num) (by norm_num)
+    exact ⟨r, hrpos, hr (r / 2) (by linarith) (by linarith)⟩
+
+/-- **Red 51 (T1 pinned at `a = b = 1`, `p = 1/2`).** -/
+example :
+    ∃ r : ℝ, 0 < r ∧ (1 : ℝ) * (min r (1 / 4)) < 1 * (min r (1 / 4)) ^ ((1 : ℝ) / 2) := by
+  obtain ⟨r, hrpos, hr⟩ := LatticeSystem.Math.exists_pos_forall_mul_lt_rpow
+    (a := 1) (b := 1) (p := 1 / 2) (by norm_num) (by norm_num) (by norm_num)
+  exact ⟨r, hrpos, hr (min r (1 / 4)) (lt_min hrpos (by norm_num)) (min_le_left r (1 / 4))⟩
+
+/-- **Red 51 sharpness (`p = 1`, standalone).** References neither T1 nor any fixture: witnesses
+that the inequality `a * r < b * r ^ p` fails at the single point `r = 1`, `p = 1` (a data point
+about `p = 1`, not a proof that `hp1 : p < 1` cannot be dropped from T1's `∃ r > 0, ∀ ρ ∈ (0, r]`
+conclusion). -/
+example : ¬ ((1 : ℝ) * 1 < 1 * (1 : ℝ) ^ (1 : ℝ)) := by
+  rw [Real.rpow_one]; norm_num
+
+/-- **Red 54 (F4 at `t = 0`, the degenerate floor).** -/
+example :
+    (0 : ℝ) * (star (hubbardAllUpState 1) ⬝ᵥ hubbardAllUpState 1).re
+      ≤ rayleighOnVec (hubbardKinetic 1 (0 : Matrix (Fin 2) (Fin 2) ℂ))
+        (hubbardAllUpState 1) := by
+  have hk : (2 : ℕ) ≤ 1 + 1 := le_refl 2
+  have hmono : Monotone (fun _ : Fin 2 => (0 : ℝ)) := fun _ _ _ => le_refl 0
+  have heig : ∀ i : Fin 2, hT0.eigenvalues i = 0 := fun i => by
+    rw [hT0.eigenvalues_eq]; simp [Matrix.zero_mulVec]
+  have hspec : (Finset.univ : Finset (Fin 2)).val.map (fun _ : Fin 2 => (0 : ℝ))
+      = (Finset.univ : Finset (Fin 2)).val.map hT0.eigenvalues := by
+    have heq : hT0.eigenvalues = (fun _ : Fin 2 => (0 : ℝ)) := funext heig
+    rw [heq]
+  have h := LatticeSystem.Fermion.sum_lowestLevels_mul_le_rayleighOnVec_hubbardKinetic
+    hT0 hk hmono hspec (hubbardAllUpState_ne_zero 1) allUpState_one_down_zero
+    allUpState_one_number_two
+  simpa using h
+
+/-- Fixture: the diagonal Hermitian matrix `diag(0, 1)` on `Fin 2` (Red 54b). -/
+private noncomputable def dfn : Fin 2 → ℂ := fun i => ((![0, 1] : Fin 2 → ℝ) i : ℂ)
+
+/-- Fixture: `diag(0, 1)` is Hermitian, the hypothesis the floor lemma takes at Red 54b's nonzero
+hopping. -/
+private theorem hTdiag : (Matrix.diagonal dfn).IsHermitian :=
+  Matrix.isHermitian_diagonal_iff.mpr fun i => by
+    change star (dfn i) = dfn i
+    rw [dfn]
+    rw [Complex.star_def, Complex.conj_ofReal]
+
+/-- Fixture: `hspec` for `diag(0, 1)`, earned via the characteristic-polynomial route rather than
+the `ε := hT.eigenvalues` reflexivity shortcut, since Red 54b needs the ascending numeral function
+`![0, 1]`, not `hTdiag.eigenvalues` itself. -/
+private theorem hTdiag_eigenvalues :
+    (Finset.univ : Finset (Fin 2)).val.map (![0, 1] : Fin 2 → ℝ)
+      = (Finset.univ : Finset (Fin 2)).val.map hTdiag.eigenvalues := by
+  have hroots : (Matrix.diagonal dfn).charpoly.roots = Multiset.map dfn Finset.univ.val := by
+    rw [Matrix.charpoly_diagonal]
+    rw [Polynomial.roots_prod]
+    · simp
+    · simp [Polynomial.X_sub_C_ne_zero]
+  have heig := hTdiag.roots_charpoly_eq_eigenvalues
+  rw [hroots] at heig
+  have hcomp : Multiset.map dfn Finset.univ.val
+      = Multiset.map Complex.ofReal (Multiset.map (![0, 1] : Fin 2 → ℝ) Finset.univ.val) := by
+    rw [show dfn = Complex.ofReal ∘ (![0, 1] : Fin 2 → ℝ) from rfl, Multiset.map_map]
+  have hcomp2 : Multiset.map (RCLike.ofReal ∘ hTdiag.eigenvalues) Finset.univ.val
+      = Multiset.map Complex.ofReal (Multiset.map hTdiag.eigenvalues Finset.univ.val) := by
+    rw [Multiset.map_map]
+    rfl
+  rw [hcomp, hcomp2] at heig
+  exact (Multiset.map_injective Complex.ofReal_injective) heig
+
+/-- **Red 54b (F4 at a nonzero diagonal `t`, distinct eigenvalues).** -/
+example :
+    (∑ i : Fin 2, (![0, 1] : Fin 2 → ℝ) i) * (star (hubbardAllUpState 1) ⬝ᵥ
+        hubbardAllUpState 1).re
+      ≤ rayleighOnVec (hubbardKinetic 1 (Matrix.diagonal dfn)) (hubbardAllUpState 1) := by
+  have hk : (2 : ℕ) ≤ 1 + 1 := le_refl 2
+  have hmono : Monotone (![0, 1] : Fin 2 → ℝ) := by
+    intro a b hab
+    fin_cases a <;> fin_cases b <;>
+      first
+      | exact absurd hab (by decide)
+      | norm_num
+  have h := LatticeSystem.Fermion.sum_lowestLevels_mul_le_rayleighOnVec_hubbardKinetic
+    hTdiag hk hmono hTdiag_eigenvalues (hubbardAllUpState_ne_zero 1) allUpState_one_down_zero
+    allUpState_one_number_two
+  simpa using h
+
+/-- **Red 55 (the density threshold is uniform in the system size and in `U`).** The witness `ρ₁`
+is obtained *once* and then serves every system size, every hopping matrix and every interaction
+strength: the goal keeps `∃ ρ₁` outside the `∀ N` and `∀ U`, so a hypothetical `∀ N, ∃ ρ₁, …`
+reading could not discharge it. `Tests.HubbardImpossibilityLowDensity`'s Red 1 fixes `N` and `U`
+before obtaining `ρ₁` and therefore cannot see this; yet it is the physical content of the
+theorem, namely that the low-density regime does not shrink away as the volume grows. -/
+example (c ρ₀ K : ℝ) (hc : 0 < c) (hρ₀ : 0 < ρ₀) (n₀ d : ℕ) (hd : 2 < d) :
+    ∃ ρ₁ : ℝ, 0 < ρ₁ ∧ ∀ (N Ne : ℕ) (U : ℝ) (t : Fin (N + 1) → Fin (N + 1) → ℂ)
+      (ht : Matrix.IsHermitian t) (σ : Equiv.Perm (Fin (N + 1))) (ε : Fin (N + 1) → ℝ) (E₀ : ℂ),
+      (∀ x : Fin (N + 1), ∑ y : Fin (N + 1), ‖t x y‖ ≤ K) → (∀ i j, t (σ i) (σ j) = t i j) →
+      (∀ i j : Fin (N + 1), ∃ k : ℕ, (σ ^ k) i = j) → Monotone ε →
+      Finset.univ.val.map ε = Finset.univ.val.map ht.eigenvalues →
+      hubbardBandCondition ε c ρ₀ n₀ d → 2 ≤ Ne → 2 * n₀ ≤ Ne → (Ne : ℝ) / (N + 1) ≤ ρ₁ →
+      0 ≤ U → hubbardEigenspaceAt t (U : ℂ) E₀ Ne ≠ ⊥ →
+      (∀ E : ℂ, hubbardEigenspaceAt t (U : ℂ) E Ne ≠ ⊥ → E₀.re ≤ E.re) →
+      ¬ ∀ v ∈ hubbardEigenspaceAt t (U : ℂ) E₀ Ne,
+        (fermionTotalSpinSquared N).mulVec v = (((Ne : ℂ) / 2) * ((Ne : ℂ) / 2 + 1)) • v := by
+  obtain ⟨ρ₁, hρ₁, h⟩ := hubbard_theorem_11_4 c ρ₀ K hc hρ₀ n₀ d hd
+  exact ⟨ρ₁, hρ₁, fun N Ne U t ht σ ε E₀ hK htrans htransitive hmono hspec hband hNe2 hNen₀ hden
+    hU hne hmin => h N t ht hK σ htrans htransitive ε hmono hspec hband Ne hNe2 hNen₀ hden U hU E₀
+      hne hmin⟩
 
 end LatticeSystem.Tests.HubbardImpossibilityLowDensityRoth
