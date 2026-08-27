@@ -23,18 +23,23 @@ by two **documented axioms** in
   `IsInfiniteVolumeGroundState` / `InfiniteSpinSystem` layer, are real
   definitions; only the existence of the limit states is axiomatized.
 - **What the axiom statements literally assert:** `theorem_4_20_omega0`
-  states that the infinite-volume state `ω₀` built as the `L↑∞` limit of the
-  unique finite-volume ground-state expectation (eq. (4.3.7)) exists, is a
-  translation-invariant ground state, and has vanishing single-site
-  magnetization `ω₀(Ŝ_x^{(α)}) = 0` (eq. (4.3.9)) — conditional on `εGS`
-  being the genuine ground-state energy density of the model
-  (`IsGroundStateEnergyDensity`, itself an uninterpreted documented
-  predicate). `theorem_4_20_omegaN` states that, additionally assuming
-  staggered long-range order with parameter `mStar > 0`
-  (`HasStaggeredLRO`, also an uninterpreted documented predicate), for every
-  unit direction `n` the symmetry-breaking limit state `ω_n` (eq. (4.3.8))
-  exists, is a translation-invariant ground state, and has Néel
-  magnetization `ω_n(Ŝ_x^{(α)}) = (−1)^x mStar n_α` (eq. (4.3.10)).
+  states — conditional on `εGS` being the genuine ground-state energy
+  density of the model (`IsGroundStateEnergyDensity`, itself an
+  uninterpreted documented predicate) — that there exists a state `ω₀`
+  (`WeakDual ℂ A`) that is an infinite-volume ground state at energy density
+  `εGS` (`IsInfiniteVolumeGroundState`) with vanishing single-site
+  magnetization `ω₀(Ŝ_x^{(α)}) = 0` (eq. (4.3.9)). The axiom itself is a bare
+  existential; it does **not** encode the `L↑∞` limit construction
+  (eq. (4.3.7)) that motivates it — the module doc comment describes that
+  construction informally, but only the existence and the two stated
+  properties are part of the formal statement. `theorem_4_20_omegaN` states
+  that, additionally assuming staggered long-range order with parameter
+  `mStar > 0` (`HasStaggeredLRO`, also an uninterpreted documented
+  predicate), for every unit direction `n` there exists a state `ω_n`,
+  likewise an infinite-volume ground state at energy density `εGS`, with
+  Néel magnetization `ω_n(Ŝ_x^{(α)}) = (−1)^x mStar n_α` (eq. (4.3.10)); the
+  `L↑∞` limit motivation (eq. (4.3.8)) is again informal, not part of the
+  formal existential.
 - **Axiom reason (documented):** both statements assert existence of a
   weak-* limit state on the quasi-local C*-algebra of the infinite spin
   system (via Banach–Alaoglu, Theorem A.24) — genuine operator-algebraic /

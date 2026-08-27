@@ -92,13 +92,19 @@ pp. 429-435) are two **documented axioms** in
   as `tasaki_theorem_11_20`, both in `NonsingularFerromagnetism.lean`,
   consuming Lemma 11.22 as a hypothesis.
 - **What the axiom statements literally assert:** `nonsingular_lemma_11_22`
-  states that for `ν > 0` there are thresholds `T, V, clam, cκ > 0` such that
-  once `t/s ≥ T` and `U/s ≥ V` (with `lam = clam·s`, `κ = cκ`), the local
+  states that for `ν > 0` there are thresholds `T, V, clam > 0` and `cκ ≥ 0`
+  (`clam` strictly positive, `cκ` merely nonnegative) such that once
+  `t/s ≥ T` and `U/s ≥ V` (with `lam = clam·s`, `κ = cκ`), the local
   Hamiltonian `ĥ_p` is positive semidefinite for every external site `p`.
-  `nonsingular_lemma_11_23` states, underlying Lemma 11.22, that for the same
-  `ν` and thresholds, any state with total spin `twoS < K+1` (below
-  `S_max`) has strictly positive sector-minimum energy of `ĥ_p` in the
-  `t, U ↑ ∞` regime.
+  `nonsingular_lemma_11_23` states, underlying Lemma 11.22, the analogous
+  fact for the sector-minimum energy: for `ν > 0` there are its **own**
+  thresholds `T, V, clam > 0, cκ ≥ 0` such that once `t/s ≥ T` and
+  `U/s ≥ V`, any state with total spin `twoS < K+1` (below `S_max`) has
+  strictly positive sector-minimum energy of `ĥ_p`. The two axioms
+  existentially quantify their threshold constants **independently** — the
+  statements do not assert that the same `T, V, clam, cκ` witnesses work for
+  both, even though both are read together as one "Lemma 11.22" bound
+  underlying Theorem 11.20's positivity argument.
 - **Axiom reason (documented):** both genuinely need eigenvalue-continuity
   degenerate-perturbation-theory machinery in the `t, U ↑ ∞` limit that
   mathlib lacks and this repository has not built for this model; this is

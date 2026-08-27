@@ -146,11 +146,16 @@ line 496).
   condensates on copies of the torus, weakly coupled by a tunneling
   Hamiltonian of strength `ε`, at fixed doubled half filling and assuming the
   single uncoupled system has ODLRO with parameter `q₀ > 0` (Theorem 5.1),
-  the unique ground state `Φ^ε` develops a definite relative `U(1)` phase:
-  there is an order parameter `m̃ ≥ mStar ≥ √(2 q₀)` such that
+  and given a *supplied* family `Φ` of nonzero minimal-real-eigenvalue
+  eigenvectors of the coupled Hamiltonian at half filling for every `ε > 0`
+  and sufficiently large even `L` (`hΦ` — a hypothesis on the given family,
+  not a proved uniqueness/existence conclusion), there exists an order
+  parameter `m̃` with `√(2 q₀) ≤ m̃` such that
   `lim_{ε↓0} lim_{L↑∞} ⟨Φ^ε,â†_{(x,a)}â_{(x,b)}Φ^ε⟩/⟨Φ^ε,Φ^ε⟩ = m̃²e^{−iφ}`
   (eq. (5.5.5)) and the conjugate limit is `m̃²e^{+iφ}` (eq. (5.5.6)), stated
-  soundly in eventual-`ε` form (outer `ε↓0`, inner `L↑∞`).
+  soundly in eventual-`ε` form (outer `ε↓0`, inner `L↑∞`). The axiom does
+  **not** name or bound an intermediate `mStar`; `m̃` is the only order
+  parameter the statement introduces.
 - **Axiom reason (documented):** proved in Koma–Tasaki [22]. Unlike
   Theorem 5.1, this is a **genuine iterated thermodynamic limit**
   `lim_{ε↓0} lim_{L↑∞}`: Tasaki states in a footnote that the existence of
