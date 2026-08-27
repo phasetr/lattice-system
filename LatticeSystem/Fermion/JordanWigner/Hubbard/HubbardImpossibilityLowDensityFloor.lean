@@ -23,7 +23,7 @@ eigenmode occupations; the three facts collected here are what makes that readin
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §11.1, eqs. (11.1.5)/(11.1.6), p. 375, and §11.1.1, Theorem 11.4, eqs. (11.1.8)–(11.1.10),
 p. 376; the underlying argument is Tasaki, Prog. Theor. Phys. **99** (1998) 489, Theorem 3.3,
-Appendix F, eqs. (F.12)/(F.13), pp. 546–547.
+Appendix F, eqs. (F.12)/(F.13), p. 546.
 -/
 
 namespace LatticeSystem.Fermion
