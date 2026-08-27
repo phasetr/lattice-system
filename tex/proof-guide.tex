@@ -11703,10 +11703,12 @@ of an occupied set.  The proof is an exchange argument rather than an index enum
 the first $k$ indices, $\chi$ its indicator and $\theta=\varepsilon_{k-1}$ the top level of $T$,
 every term of $\sum_j(\varepsilon_j-\theta)(w_j-\chi_j)$ is nonnegative --- inside $T$ both factors
 are nonpositive, outside $T$ both are nonnegative --- while $\sum_j w_j=k=\sum_j\chi_j$ makes the
-$\theta$-terms cancel, leaving exactly $\sum_j\varepsilon_j w_j-\sum_{i<k}\varepsilon_i$.  The
-indicator case is the special case $w=\chi$, so the earlier stage's two minimality lemmas, and the
-private index-arithmetic step they rested on, are deleted as subsumed; with them goes the module's
-dependence on \texttt{Finset.orderEmbOfFin}.
+$\theta$-terms cancel, leaving exactly $\sum_j\varepsilon_j w_j-\sum_{i<k}\varepsilon_i$.  Taking
+$w$ to be the indicator of an \emph{arbitrary} $k$-element set of levels --- not the $\chi$ of the
+proof, which is the indicator of the first $k$ of them and turns the bound into an identity ---
+recovers the earlier stage's two minimality lemmas, so they and the private index-arithmetic step
+they rested on are deleted as subsumed; with them goes the module's dependence on
+\texttt{Finset.orderEmbOfFin}.
 
 The operator half supplies the weights.  Writing $A=\hat C_\sigma(\bar e_j)$ for the annihilator of
 the single-particle eigenmode $(j,\sigma)$, the dual canonical anticommutation relation

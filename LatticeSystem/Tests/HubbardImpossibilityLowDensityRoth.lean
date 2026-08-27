@@ -321,7 +321,10 @@ example :
 /-!
 ## Theorem 11.4 PR-7b — the fractional-knapsack lemmas and the ferromagnetic floor
 
-Continues the numbering from PR-7a (Red 44).  These Reds pin the PR-7b consumption of:
+Continues the numbering from PR-7a (Red 44), starting at Red 48.  Reds 45–47 and Red 51 are
+reserved for PR-7c: 45–47 for the discharge of `hubbard_theorem_11_4` itself and the uniformity of
+its density threshold in `N` and in `U`, and 51 for the `rpow` threshold step `T1`, none of which
+exist yet.  These Reds pin the PR-7b consumption of:
 
 * `LatticeSystem.Math.sum_lowestLevels_le_sum_weighted` (W1, the fractional-knapsack lemma) and
   `LatticeSystem.Math.sum_lowestLevels_le_sum_weighted_of_map_eq` (W2, its reading against the
@@ -420,8 +423,10 @@ example : (1 : ℝ) ≤ 2 := by
 
 /-- **Red 52 (F1 pinned).** `1 − n̂_{j,σ}` is positive-semidefinite for the eigenmode number
 operator on the `Red 32` fixture (`M := 1`, `hT0` the zero hopping matrix on `Fin 2`), at `j := 0`,
-`σ := 0`. Guards the `A·Aᴴ` versus `Aᴴ·A` orientation in F1's proof — the one thing that can
-silently flip and still typecheck. -/
+`σ := 0`. What is guarded is the orientation of F1's *statement*: it is `1 − n̂_{j,σ}`, not
+`n̂_{j,σ} − 1`, that is asserted positive-semidefinite, which is the direction the occupation weight
+`w_j ≤ 1` is read off from. The `A·Aᴴ` versus `Aᴴ·A` step inside F1's proof needs no guarding: the
+goal fixes `n̂_{j,σ} = Aᴴ·A`, so a flip there fails to typecheck. -/
 example :
     ((1 : ManyBodyOp (Fin 4)) - eigenNumberOp hT0 (0 : Fin 2) (0 : Fin 2)).PosSemidef :=
   one_sub_eigenNumberOp_posSemidef hT0 (0 : Fin 2) (0 : Fin 2)
