@@ -643,7 +643,7 @@ obtained through W2 (`sum_lowestLevels_le_sum_weighted_of_map_eq`, the successor
 coverage C4 provided does not decrease after its deletion. -/
 example : (1 : ℝ) ≤ 3 := by
   have hmono : Monotone (fun i : Fin 3 => (i : ℝ)) := fun a b hab => by
-    show (a : ℝ) ≤ (b : ℝ)
+    change (a : ℝ) ≤ (b : ℝ)
     have h : (a : ℕ) ≤ (b : ℕ) := hab
     exact_mod_cast h
   have hspec : (Finset.univ : Finset (Fin 3)).val.map (fun i : Fin 3 => (i : ℝ))
@@ -662,7 +662,7 @@ example : (1 : ℝ) ≤ 3 := by
   have hw0 : ∀ j, 0 ≤ w j := fun j => by fin_cases j <;> norm_num [hw_def]
   have hw1 : ∀ j, w j ≤ 1 := fun j => by fin_cases j <;> norm_num [hw_def]
   have hsum : ∑ j, w j = (2 : ℕ) := by
-    show (∑ j, w j : ℝ) = 2
+    change (∑ j, w j : ℝ) = 2
     simp [hw_def, Fin.sum_univ_three]
     norm_num
   have h := LatticeSystem.Math.sum_lowestLevels_le_sum_weighted_of_map_eq hk hmono hspec hw0 hw1
