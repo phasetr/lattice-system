@@ -2,6 +2,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowDensity
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowDensityTrial
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowDensityRothCore
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowDensityRoth
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowDensityFloor
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandEigenbasis
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowUTrial
 import LatticeSystem.Fermion.JordanWigner.Hubbard.ChargesCore
@@ -322,24 +323,17 @@ example :
 
 Continues the numbering from PR-7a (Red 44).  These Reds pin the PR-7b consumption of:
 
-* `LatticeSystem.Math.sum_lowestLevels_le_sum_weighted` (W1, the fractional-knapsack lemma
-  replacing PR-5b's `sum_lowestLevels_le_sum_of_monotone` = C4a);
-* `LatticeSystem.Math.sum_lowestLevels_le_sum_weighted_of_map_eq` (W2, replacing PR-5b's
-  `sum_lowestLevels_le_sum_of_map_eq` = C4, which `Tests.HubbardImpossibilityLowDensity`'s Red 27
-  is retargeted onto separately);
+* `LatticeSystem.Math.sum_lowestLevels_le_sum_weighted` (W1, the fractional-knapsack lemma) and
+  `LatticeSystem.Math.sum_lowestLevels_le_sum_weighted_of_map_eq` (W2, its reading against the
+  unsorted spectrum; `Tests.HubbardImpossibilityLowDensity`'s Red 27 pins W2 on the
+  `{0, 1}`-valued fixture, so the fixtures here are the genuinely fractional ones);
 * `one_sub_eigenNumberOp_posSemidef` (F1),
   `hubbardOnSiteInteraction_mulVec_eq_zero_of_downNumber_zero` (F2) and
   `fermionTotalDownNumber_mulVec_eq_zero_of_topWeight` (F3), the three algebraic ingredients of the
-  ferromagnetic floor (`.self-local/docs/theorem-11-4-pr7b-design.md` §4.3).
+  ferromagnetic floor.
 
-None of W1, W2, F1, F2, F3 exists yet (`Math/MonotoneEnumeration.lean` is unchanged and
-`HubbardImpossibilityLowDensityFloor.lean` has not been created); every reference to them below is
-an *unknown identifier*, which is the Red evidence for this arc.  Deliberately no `import` is added
-for the not-yet-existing `HubbardImpossibilityLowDensityFloor` module: an unresolved `import` would
-abort elaboration of the whole file, whereas an unresolved bare identifier fails only the
-declaration that uses it and lets every other declaration in this file — including the W1/W2 Reds
-and the fixture `have`s feeding the F1/F2/F3 Reds — be checked independently.  Once the Floor module
-is implemented, the missing `import` must be added alongside wiring these Reds to it.
+Each Red is a *consumption* test: it instantiates the named declaration and asserts the numeric or
+operator-level consequence, so a statement-only or direction-flipped version fails to compile.
 -/
 
 /-- **Red 48 (W1 pinned, the fractional regime).** `m = 3`, `ε := fun i => (i : ℝ)` (so
@@ -350,14 +344,14 @@ deleted `sum_lowestLevels_le_sum_of_monotone`'s `{0, 1}`-valued indicator weight
 instantiate here. -/
 example : (1 : ℝ) ≤ 3 / 2 := by
   have hmono : Monotone (fun i : Fin 3 => (i : ℝ)) := fun a b hab => by
-    show (a : ℝ) ≤ (b : ℝ)
+    change (a : ℝ) ≤ (b : ℝ)
     have h : (a : ℕ) ≤ (b : ℕ) := hab
     exact_mod_cast h
   set w : Fin 3 → ℝ := ![1, 1 / 2, 1 / 2] with hw_def
   have hw0 : ∀ j, 0 ≤ w j := fun j => by fin_cases j <;> norm_num [hw_def]
   have hw1 : ∀ j, w j ≤ 1 := fun j => by fin_cases j <;> norm_num [hw_def]
   have hsum : ∑ j, w j = (2 : ℕ) := by
-    show (∑ j, w j : ℝ) = 2
+    change (∑ j, w j : ℝ) = 2
     simp [hw_def, Fin.sum_univ_three]
     norm_num
   have hk : (2 : ℕ) ≤ 3 := by decide
@@ -392,7 +386,7 @@ than PR-5b's `decide`, which does not reduce on `ℝ`), `k = 2`, `w := ![1, 1/2,
 sorting-transport step of W2 at a genuinely unsorted `g` and a fractional weight. -/
 example : (1 : ℝ) ≤ 2 := by
   have hmono : Monotone (fun i : Fin 3 => (i : ℝ)) := fun a b hab => by
-    show (a : ℝ) ≤ (b : ℝ)
+    change (a : ℝ) ≤ (b : ℝ)
     have h : (a : ℕ) ≤ (b : ℕ) := hab
     exact_mod_cast h
   have hspec : (Finset.univ : Finset (Fin 3)).val.map (fun i : Fin 3 => (i : ℝ))
@@ -410,7 +404,7 @@ example : (1 : ℝ) ≤ 2 := by
   have hw0 : ∀ j, 0 ≤ w j := fun j => by fin_cases j <;> norm_num [hw_def]
   have hw1 : ∀ j, w j ≤ 1 := fun j => by fin_cases j <;> norm_num [hw_def]
   have hsum : ∑ j, w j = (2 : ℕ) := by
-    show (∑ j, w j : ℝ) = 2
+    change (∑ j, w j : ℝ) = 2
     simp [hw_def, Fin.sum_univ_three]
     norm_num
   have hk : (2 : ℕ) ≤ 3 := by decide
