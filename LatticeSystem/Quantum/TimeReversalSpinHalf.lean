@@ -112,12 +112,13 @@ if `V` reverses the inner product, `⟨V u, V v⟩ = ⟨v, u⟩`, and squares to
 identity, `V (V v) = -v`, then every vector is orthogonal to its own image,
 `⟨v, V v⟩ = 0`. Indeed the first hypothesis applied to the pair `(V v, v)` evaluates
 `⟨V (V v), V v⟩` as `⟨v, V v⟩`, while `V (V v) = -v` evaluates it as `-⟨v, V v⟩`;
-in characteristic zero `x = -x` forces `x = 0`. Neither linearity nor antilinearity of
-`V` is assumed: Tasaki's antiunitary operators of eq. (A.4.17) are antilinear by
-definition, whereas the conclusion needs only this inner-product identity and
-`V (V v) = -v`. This is the mechanism behind Kramers degeneracy at half-odd-integer
-spin, where the second hypothesis takes the form proved in `timeReversalSpinHalf_sq`
-for the concrete map `timeReversalSpinHalf`. -/
+in characteristic zero `x = -x` forces `x = 0`. Linearity and antilinearity of `V` are
+not imposed as explicit hypotheses: the proof uses only the inner-product identity and
+`V (V v) = -v`. Over a complex inner product space that inner-product identity already
+forces `V` to be antilinear, so the hypotheses describe the same class of maps as
+Tasaki's antiunitary operators of eq. (A.4.17). This is the mechanism behind Kramers
+degeneracy at half-odd-integer spin, where the second hypothesis takes the form proved
+in `timeReversalSpinHalf_sq` for the concrete map `timeReversalSpinHalf`. -/
 theorem inner_timeReversal_eq_zero_of_sq_neg
     {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
     (V : E → E)
