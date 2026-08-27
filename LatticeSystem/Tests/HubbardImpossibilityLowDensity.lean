@@ -601,17 +601,26 @@ example :
 /-!
 ## Theorem 11.4 PR-5b — the single-particle spectrum enumeration bridge
 
-The six Reds below cover `LatticeSystem/Math/MonotoneEnumeration.lean`. Four of its six
-declarations are referenced directly: `eq_comp_sort_of_monotone_of_map_eq` = C1 (Red 26),
-`sum_lowestLevels_le_sum_of_map_eq` = C4 (Red 27), `exists_lowestLevels_finset_of_map_eq` = C3
-(Reds 28 and 31), `sum_lowestLevels_succ` = C5 (Red 29). The other two —
-`sum_lowestLevels_le_sum_of_monotone` = C4a and the private `val_le_val_of_strictMono` = C2 — are
-covered only indirectly, through C4's proof, which is the sole chain that reaches them. Red 30 is
-the standalone sharpness counterexample and references none of C1–C5. The numbering follows
-`.self-local/docs/theorem-11-4-pr5b-design.md` §5. The primary fixture is `m = 3`, `α = ℕ`,
-`ε := ![0, 1, 2]`, `g := ![2, 0, 1]`, chosen so `hspec`/`hmono`/every concrete sum is `decide`-able.
-Red 31 is the junction guard at the real consumer's types (`Matrix.IsHermitian.eigenvalues` /
-`occupiedEigenEnergy`).
+The six Reds below cover `LatticeSystem/Math/MonotoneEnumeration.lean`. Three of its declarations
+are referenced directly: `eq_comp_sort_of_monotone_of_map_eq` = C1 (Red 26),
+`exists_lowestLevels_finset_of_map_eq` = C3 (Reds 28 and 31), `sum_lowestLevels_succ` = C5
+(Red 29). Red 27 was originally C4's pinning test (`sum_lowestLevels_le_sum_of_map_eq`); per
+`.self-local/docs/theorem-11-4-pr7b-design.md` §5, C4 — together with
+`sum_lowestLevels_le_sum_of_monotone` = C4a and the private `val_le_val_of_strictMono` = C2 — is
+**deleted** and subsumed by the weighted lemmas W1 (`sum_lowestLevels_le_sum_weighted`) and W2
+(`sum_lowestLevels_le_sum_weighted_of_map_eq`, pinned separately in the PR-7b section of
+`LatticeSystem.Tests.HubbardImpossibilityLowDensityRoth`), so Red 27 below is retargeted onto W2 on
+the same fixture. Red 30 is the standalone sharpness counterexample for `hmono` (now read against
+W2 rather than the deleted C4) and
+references neither C1/C3/C5 nor W1/W2. The numbering follows
+`.self-local/docs/theorem-11-4-pr5b-design.md` §5 (Reds 26–31) and
+`.self-local/docs/theorem-11-4-pr7b-design.md` §5 (the Red 27 retarget). The primary fixture for
+Reds 26/28/29/31 is `m = 3`, `α = ℕ`, `ε := ![0, 1, 2]`, `g := ![2, 0, 1]`, chosen so
+`hspec`/`hmono`/every concrete sum is `decide`-able; Red 27 restates the same values over `ℝ`
+(`decide` does not reduce on `ℝ`, so `ε := fun i => (i : ℝ)` for a computable `Monotone` proof and
+`g := ![2, 0, 1] : Fin 3 → ℝ`, with `hspec` via `List.rotate_perm` rather than `decide`), since
+W1/W2 are stated over `ℝ` rather than the deleted generic-`α` C4/C4a. Red 31 is the junction guard
+at the real consumer's types (`Matrix.IsHermitian.eigenvalues` / `occupiedEigenEnergy`).
 -/
 
 /-- **Red 26 (C1 pinned).** On the fixture, `ε = g ∘ Tuple.sort g`. Guards the direction of the
@@ -625,19 +634,44 @@ example :
       = (Finset.univ : Finset (Fin 3)).val.map (![2, 0, 1] : Fin 3 → ℕ) := by decide
   exact LatticeSystem.Math.eq_comp_sort_of_monotone_of_map_eq hmono hspec
 
-/-- **Red 27 (C4 pinned, with the inequality direction).** `k = 2`, `S = ({0, 2} : Finset (Fin 3))`
-(so `∑ p ∈ S, g p = 3`), while `∑ i : Fin 2, ε (castLE _ i) = 1`. Asserts the *consequence* `1 ≤ 3`
-obtained through C4, so a flipped inequality fails to compile. -/
-example : (1 : ℕ) ≤ 3 := by
-  have hmono : Monotone (![0, 1, 2] : Fin 3 → ℕ) := by decide
-  have hspec : (Finset.univ : Finset (Fin 3)).val.map (![0, 1, 2] : Fin 3 → ℕ)
-      = (Finset.univ : Finset (Fin 3)).val.map (![2, 0, 1] : Fin 3 → ℕ) := by decide
+/-- **Red 27 (W2 pinned, with the inequality direction — retargeted from the deleted C4).**
+`k = 2`, `w := ![1, 0, 1] : Fin 3 → ℝ` (the indicator of `S = {0, 2}`, so `∑ j, g j * w j
+= g 0 + g 2 = 3`), while `∑ i : Fin 2, ε (castLE _ i) = 1`. Asserts the *consequence* `1 ≤ 3`
+obtained through W2 (`sum_lowestLevels_le_sum_weighted_of_map_eq`, the successor of the deleted
+`sum_lowestLevels_le_sum_of_map_eq` = C4), so a flipped inequality fails to compile. The `{0,
+1}`-valued `w` reproduces C4's original `S`-indicator consumption exactly, so the sharpness
+coverage C4 provided does not decrease after its deletion. -/
+example : (1 : ℝ) ≤ 3 := by
+  have hmono : Monotone (fun i : Fin 3 => (i : ℝ)) := fun a b hab => by
+    show (a : ℝ) ≤ (b : ℝ)
+    have h : (a : ℕ) ≤ (b : ℕ) := hab
+    exact_mod_cast h
+  have hspec : (Finset.univ : Finset (Fin 3)).val.map (fun i : Fin 3 => (i : ℝ))
+      = (Finset.univ : Finset (Fin 3)).val.map (![2, 0, 1] : Fin 3 → ℝ) := by
+    rw [Fin.univ_val_map, Fin.univ_val_map]
+    have hofFnε : List.ofFn (fun i : Fin 3 => (i : ℝ)) = [0, 1, 2] := by
+      simp [List.ofFn_succ, List.ofFn_zero]
+      norm_num
+    have hofFng : List.ofFn (![2, 0, 1] : Fin 3 → ℝ) = [2, 0, 1] := by
+      simp [List.ofFn_succ, List.ofFn_zero]
+    rw [hofFnε, hofFng]
+    have hrot : ([0, 1, 2] : List ℝ).rotate 2 = [2, 0, 1] := by rfl
+    exact Multiset.coe_eq_coe.mpr (hrot ▸ (List.rotate_perm ([0, 1, 2] : List ℝ) 2).symm)
   have hk : (2 : ℕ) ≤ 3 := by decide
-  have hS : ({0, 2} : Finset (Fin 3)).card = 2 := by decide
-  have h := LatticeSystem.Math.sum_lowestLevels_le_sum_of_map_eq hk hmono hspec hS
-  have hlhs : (∑ i : Fin 2, (![0, 1, 2] : Fin 3 → ℕ) (Fin.castLE hk i)) = 1 := by
-    simp [Fin.sum_univ_succ]
-  have hrhs : (∑ p ∈ ({0, 2} : Finset (Fin 3)), (![2, 0, 1] : Fin 3 → ℕ) p) = 3 := by decide
+  set w : Fin 3 → ℝ := ![1, 0, 1] with hw_def
+  have hw0 : ∀ j, 0 ≤ w j := fun j => by fin_cases j <;> norm_num [hw_def]
+  have hw1 : ∀ j, w j ≤ 1 := fun j => by fin_cases j <;> norm_num [hw_def]
+  have hsum : ∑ j, w j = (2 : ℕ) := by
+    show (∑ j, w j : ℝ) = 2
+    simp [hw_def, Fin.sum_univ_three]
+    norm_num
+  have h := LatticeSystem.Math.sum_lowestLevels_le_sum_weighted_of_map_eq hk hmono hspec hw0 hw1
+    hsum
+  have hlhs : (∑ i : Fin 2, (fun i : Fin 3 => (i : ℝ)) (Fin.castLE hk i)) = 1 := by
+    simp [Fin.sum_univ_two]
+  have hrhs : (∑ j : Fin 3, (![2, 0, 1] : Fin 3 → ℝ) j * w j) = 3 := by
+    simp [hw_def, Fin.sum_univ_three]
+    norm_num
   rw [hlhs, hrhs] at h
   exact h
 
@@ -674,10 +708,11 @@ example : (3 : ℕ) = 1 + 2 := by
   rewrite [hlhs, hrhs1, hrhs2] at h
   exact h
 
-/-- **Red 30 (sharpness of `hmono` — the load-bearing hypothesis).** Standalone, using none of
-C1–C5. With `ε := ![2, 0, 1]` and `g := ε` (so `hspec` is `rfl` and monotonicity fails), `k = 1`,
-`S = {1}`: `∑ i : Fin 1, ε (castLE _ i) = 2` but `∑ p ∈ S, g p = 0`, so C4's conclusion is *false*
-without `Monotone ε`. Mirrors Red 22's discipline and is the test a reviewer will ask for. -/
+/-- **Red 30 (sharpness of `hmono` — the load-bearing hypothesis, read against W2).** Standalone,
+using none of C1/C3/C5 or W1/W2. With `ε := ![2, 0, 1]` and `g := ε` (so `hspec` is `rfl` and
+monotonicity fails), `k = 1`, `S = {1}`: `∑ i : Fin 1, ε (castLE _ i) = 2` but `∑ p ∈ S, g p = 0`,
+so the unweighted specialisation of W2's conclusion (the deleted C4's statement) is *false* without
+`Monotone ε`. Mirrors Red 22's discipline and is the test a reviewer will ask for. -/
 example :
     ¬ (∑ i : Fin 1, (![2, 0, 1] : Fin 3 → ℕ) (Fin.castLE (by decide : (1 : ℕ) ≤ 3) i)
         ≤ ∑ p ∈ ({1} : Finset (Fin 3)), (![2, 0, 1] : Fin 3 → ℕ) p) := by

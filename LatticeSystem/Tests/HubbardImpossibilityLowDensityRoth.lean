@@ -4,7 +4,10 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowDensity
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowDensityRoth
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandEigenbasis
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowUTrial
+import LatticeSystem.Fermion.JordanWigner.Hubbard.ChargesCore
+import LatticeSystem.Fermion.JordanWigner.Hubbard.AllUpState
 import LatticeSystem.Math.MatrixAnalysis.RowSumEigenvalueBound
+import LatticeSystem.Math.MonotoneEnumeration
 import LatticeSystem.Quantum.SpinS.RayleighInfMatrix
 
 /-!
@@ -71,7 +74,7 @@ open LatticeSystem.Fermion
 open LatticeSystem.Math
 open LatticeSystem.Quantum
 
-open scoped BigOperators
+open scoped BigOperators ComplexOrder
 
 /-- Fixture: the zero hopping matrix on `Fin 2` is Hermitian, its eigenvalues are all `0`. -/
 private noncomputable def hT0 : (0 : Matrix (Fin 2) (Fin 2) ℂ).IsHermitian := by
@@ -313,5 +316,172 @@ example :
           spinfulGeneralBasisState (eigenbasisAsBasis hT0) ({0} : Finset (Fin 2)) ∅).re := by
   rw [dotProduct_star_self_hubbardLowDensityRothState_re hT0 ({0} : Finset (Fin 2)) vUniform_mod]
   norm_num
+
+/-!
+## Theorem 11.4 PR-7b — the fractional-knapsack lemmas and the ferromagnetic floor
+
+Continues the numbering from PR-7a (Red 44).  These Reds pin the PR-7b consumption of:
+
+* `LatticeSystem.Math.sum_lowestLevels_le_sum_weighted` (W1, the fractional-knapsack lemma
+  replacing PR-5b's `sum_lowestLevels_le_sum_of_monotone` = C4a);
+* `LatticeSystem.Math.sum_lowestLevels_le_sum_weighted_of_map_eq` (W2, replacing PR-5b's
+  `sum_lowestLevels_le_sum_of_map_eq` = C4, which `Tests.HubbardImpossibilityLowDensity`'s Red 27
+  is retargeted onto separately);
+* `one_sub_eigenNumberOp_posSemidef` (F1),
+  `hubbardOnSiteInteraction_mulVec_eq_zero_of_downNumber_zero` (F2) and
+  `fermionTotalDownNumber_mulVec_eq_zero_of_topWeight` (F3), the three algebraic ingredients of the
+  ferromagnetic floor (`.self-local/docs/theorem-11-4-pr7b-design.md` §4.3).
+
+None of W1, W2, F1, F2, F3 exists yet (`Math/MonotoneEnumeration.lean` is unchanged and
+`HubbardImpossibilityLowDensityFloor.lean` has not been created); every reference to them below is
+an *unknown identifier*, which is the Red evidence for this arc.  Deliberately no `import` is added
+for the not-yet-existing `HubbardImpossibilityLowDensityFloor` module: an unresolved `import` would
+abort elaboration of the whole file, whereas an unresolved bare identifier fails only the
+declaration that uses it and lets every other declaration in this file — including the W1/W2 Reds
+and the fixture `have`s feeding the F1/F2/F3 Reds — be checked independently.  Once the Floor module
+is implemented, the missing `import` must be added alongside wiring these Reds to it.
+-/
+
+/-- **Red 48 (W1 pinned, the fractional regime).** `m = 3`, `ε := fun i => (i : ℝ)` (so
+`ε = ![0, 1, 2]` at the three fixture indices), `k = 2`, `w := ![1, 1/2, 1/2]`: `∑ w = 2` and the
+half-integral weights give `∑ i : Fin 2, ε (castLE i) = 0 + 1 = 1 ≤ 0·1 + 1·(1/2) + 2·(1/2) = 3/2`.
+The half-integral (not `{0, 1}`-valued) weight is the point: a proof that only handles the
+deleted `sum_lowestLevels_le_sum_of_monotone`'s `{0, 1}`-valued indicator weights fails to
+instantiate here. -/
+example : (1 : ℝ) ≤ 3 / 2 := by
+  have hmono : Monotone (fun i : Fin 3 => (i : ℝ)) := fun a b hab => by
+    show (a : ℝ) ≤ (b : ℝ)
+    have h : (a : ℕ) ≤ (b : ℕ) := hab
+    exact_mod_cast h
+  set w : Fin 3 → ℝ := ![1, 1 / 2, 1 / 2] with hw_def
+  have hw0 : ∀ j, 0 ≤ w j := fun j => by fin_cases j <;> norm_num [hw_def]
+  have hw1 : ∀ j, w j ≤ 1 := fun j => by fin_cases j <;> norm_num [hw_def]
+  have hsum : ∑ j, w j = (2 : ℕ) := by
+    show (∑ j, w j : ℝ) = 2
+    simp [hw_def, Fin.sum_univ_three]
+    norm_num
+  have hk : (2 : ℕ) ≤ 3 := by decide
+  have h := LatticeSystem.Math.sum_lowestLevels_le_sum_weighted hk hmono hw0 hw1 hsum
+  have hlhs : (∑ i : Fin 2, (fun i : Fin 3 => (i : ℝ)) (Fin.castLE hk i)) = 1 := by
+    simp [Fin.sum_univ_two]
+  have hrhs : (∑ j : Fin 3, (fun i : Fin 3 => (i : ℝ)) j * w j) = 3 / 2 := by
+    simp [hw_def, Fin.sum_univ_three]
+    norm_num
+  rw [hlhs, hrhs] at h
+  exact h
+
+/-- **Red 49 (W1 sharpness: `w ≤ 1` is load-bearing).** Standalone, references neither W1 nor W2.
+With `ε := fun i => (i : ℝ)`, `k = 2`, `w := ![2, 0, 0]`: `∑ w = 2` and `0 ≤ w`, but
+`∑ j, ε j * w j = 0 < 1 = ∑ i : Fin 2, ε (castLE i)`. Documents why `hw1` cannot be dropped from
+W1's hypotheses. -/
+example :
+    ¬ (∑ i : Fin 2, (fun i : Fin 3 => (i : ℝ)) (Fin.castLE (by decide : (2 : ℕ) ≤ 3) i)
+        ≤ ∑ j : Fin 3, (fun i : Fin 3 => (i : ℝ)) j * (![2, 0, 0] : Fin 3 → ℝ) j) := by
+  have hlhs : (∑ i : Fin 2, (fun i : Fin 3 => (i : ℝ))
+      (Fin.castLE (by decide : (2 : ℕ) ≤ 3) i)) = 1 := by
+    simp [Fin.sum_univ_two]
+  have hrhs : (∑ j : Fin 3, (fun i : Fin 3 => (i : ℝ)) j * (![2, 0, 0] : Fin 3 → ℝ) j) = 0 := by
+    simp [Fin.sum_univ_three]
+  rw [hlhs, hrhs]
+  norm_num
+
+/-- **Red 50 (W2 pinned on an unsorted `g`).** `ε := fun i => (i : ℝ)`, `g := ![1, 2, 0] : Fin 3 →
+ℝ` (a genuine cyclic rotation of `ε`'s values, so `hspec` is proved via `List.rotate_perm` rather
+than PR-5b's `decide`, which does not reduce on `ℝ`), `k = 2`, `w := ![1, 1/2, 1/2]`: `∑ w = 2` and
+`∑ j, g j * w j = 1·1 + 2·(1/2) + 0·(1/2) = 2 ≥ 1 = ∑ i : Fin 2, ε (castLE i)`. Guards the
+sorting-transport step of W2 at a genuinely unsorted `g` and a fractional weight. -/
+example : (1 : ℝ) ≤ 2 := by
+  have hmono : Monotone (fun i : Fin 3 => (i : ℝ)) := fun a b hab => by
+    show (a : ℝ) ≤ (b : ℝ)
+    have h : (a : ℕ) ≤ (b : ℕ) := hab
+    exact_mod_cast h
+  have hspec : (Finset.univ : Finset (Fin 3)).val.map (fun i : Fin 3 => (i : ℝ))
+      = (Finset.univ : Finset (Fin 3)).val.map (![1, 2, 0] : Fin 3 → ℝ) := by
+    rw [Fin.univ_val_map, Fin.univ_val_map]
+    have hofFnε : List.ofFn (fun i : Fin 3 => (i : ℝ)) = [0, 1, 2] := by
+      simp [List.ofFn_succ, List.ofFn_zero]
+      norm_num
+    have hofFng : List.ofFn (![1, 2, 0] : Fin 3 → ℝ) = [1, 2, 0] := by
+      simp [List.ofFn_succ, List.ofFn_zero]
+    rw [hofFnε, hofFng]
+    have hrot : ([0, 1, 2] : List ℝ).rotate 1 = [1, 2, 0] := by rfl
+    exact Multiset.coe_eq_coe.mpr (hrot ▸ (List.rotate_perm ([0, 1, 2] : List ℝ) 1).symm)
+  set w : Fin 3 → ℝ := ![1, 1 / 2, 1 / 2] with hw_def
+  have hw0 : ∀ j, 0 ≤ w j := fun j => by fin_cases j <;> norm_num [hw_def]
+  have hw1 : ∀ j, w j ≤ 1 := fun j => by fin_cases j <;> norm_num [hw_def]
+  have hsum : ∑ j, w j = (2 : ℕ) := by
+    show (∑ j, w j : ℝ) = 2
+    simp [hw_def, Fin.sum_univ_three]
+    norm_num
+  have hk : (2 : ℕ) ≤ 3 := by decide
+  have h := LatticeSystem.Math.sum_lowestLevels_le_sum_weighted_of_map_eq hk hmono hspec hw0 hw1
+    hsum
+  have hlhs : (∑ i : Fin 2, (fun i : Fin 3 => (i : ℝ)) (Fin.castLE hk i)) = 1 := by
+    simp [Fin.sum_univ_two]
+  have hrhs : (∑ j : Fin 3, (![1, 2, 0] : Fin 3 → ℝ) j * w j) = 2 := by
+    simp [hw_def, Fin.sum_univ_three]
+    norm_num
+  rw [hlhs, hrhs] at h
+  exact h
+
+/-- **Red 52 (F1 pinned).** `1 − n̂_{j,σ}` is positive-semidefinite for the eigenmode number
+operator on the `Red 32` fixture (`M := 1`, `hT0` the zero hopping matrix on `Fin 2`), at `j := 0`,
+`σ := 0`. Guards the `A·Aᴴ` versus `Aᴴ·A` orientation in F1's proof — the one thing that can
+silently flip and still typecheck. -/
+example :
+    ((1 : ManyBodyOp (Fin 4)) - eigenNumberOp hT0 (0 : Fin 2) (0 : Fin 2)).PosSemidef :=
+  one_sub_eigenNumberOp_posSemidef hT0 (0 : Fin 2) (0 : Fin 2)
+
+/-- **Red 52b (F2 pinned).** The on-site interaction annihilates the Fock vacuum at `M := 1`,
+`U := 5`, via the vacuum's own `N̂_↓ = 0` fact (`fermionTotalDownNumber_mulVec_vacuum`). A minimal
+non-trivial consumption of F2's hypothesis-to-conclusion shape. -/
+example : (hubbardOnSiteInteraction 1 (5 : ℂ)).mulVec (fermionMultiVacuum 3) = 0 :=
+  hubbardOnSiteInteraction_mulVec_eq_zero_of_downNumber_zero 1 (5 : ℂ)
+    (fermionTotalDownNumber_mulVec_vacuum 1)
+
+/-- Fixture: the all-up Slater state on `N := 1` (`Ne = N + 1 = 2` electrons) is annihilated by
+`N̂_↓`, built from `AllUpState.lean`'s per-site fact
+(`fermionDownNumber_mulVec_allUpState`) summed over the two sites. -/
+private theorem allUpState_one_down_zero :
+    (fermionTotalDownNumber 1).mulVec (hubbardAllUpState 1) = 0 := by
+  unfold fermionTotalDownNumber
+  rw [Matrix.sum_mulVec]
+  exact Finset.sum_eq_zero fun i _ => fermionDownNumber_mulVec_allUpState 1 i
+
+/-- Fixture: the all-up Slater state on `N := 1` has `N̂_↑ = 2`, built from
+`fermionUpNumber_mulVec_allUpState` summed over the two sites. -/
+private theorem allUpState_one_up_two :
+    (fermionTotalUpNumber 1).mulVec (hubbardAllUpState 1)
+      = ((2 : ℕ) : ℂ) • hubbardAllUpState 1 := by
+  unfold fermionTotalUpNumber
+  rw [Matrix.sum_mulVec]
+  simp [fermionUpNumber_mulVec_allUpState, two_smul]
+
+/-- Fixture: the all-up Slater state on `N := 1` is a `N̂_tot = 2` eigenvector, from
+`allUpState_one_up_two`, `allUpState_one_down_zero` and `fermionTotalNumber_eq_up_add_down`. -/
+private theorem allUpState_one_number_two :
+    (fermionTotalNumber (2 * 1 + 1)).mulVec (hubbardAllUpState 1)
+      = ((2 : ℕ) : ℂ) • hubbardAllUpState 1 := by
+  rw [fermionTotalNumber_eq_up_add_down, Matrix.add_mulVec, allUpState_one_up_two,
+    allUpState_one_down_zero, add_zero]
+
+/-- Fixture: the all-up Slater state on `N := 1` is a `Ŝᶻ_tot = 1` eigenvector — `(2/2 : ℝ)` cast to
+`ℂ`, matching F3's `hZ` shape — from `fermionTotalSpinZ`'s definition, `allUpState_one_up_two` and
+`allUpState_one_down_zero`. -/
+private theorem allUpState_one_spinZ :
+    (fermionTotalSpinZ 1).mulVec (hubbardAllUpState 1)
+      = ((((2 : ℕ) : ℝ) / 2 : ℝ) : ℂ) • hubbardAllUpState 1 := by
+  rw [fermionTotalSpinZ, Matrix.smul_mulVec, Matrix.sub_mulVec, allUpState_one_up_two,
+    allUpState_one_down_zero, sub_zero, smul_smul]
+  congr 1
+  push_cast
+  ring
+
+/-- **Red 53 (F3 pinned).** The all-up Slater state on `N := 1` (`Ne := 2`, the top-weight state
+of a fully polarised two-electron sector) really has `N̂_↓ = 0` via F3. A dropped factor `2` in the
+`Ŝᶻ_tot` definition, or an off-by-one in `Ne`, fails to unify `allUpState_one_spinZ`'s conclusion
+with F3's `hZ` hypothesis. -/
+example : (fermionTotalDownNumber 1).mulVec (hubbardAllUpState 1) = 0 :=
+  fermionTotalDownNumber_mulVec_eq_zero_of_topWeight allUpState_one_number_two allUpState_one_spinZ
 
 end LatticeSystem.Tests.HubbardImpossibilityLowDensityRoth
