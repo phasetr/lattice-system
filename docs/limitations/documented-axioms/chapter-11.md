@@ -12,7 +12,7 @@ permalink: /limitations/documented-axioms/chapter-11/
 
 ## Theorem 11.8 (Nagaoka connectivity classification)
 
-**Tasaki §11.2.2, Theorem 11.8** (pp. 386-388) is a **documented axiom**,
+**Tasaki §11.2.2, Theorem 11.8** (p. 387) is a **documented axiom**,
 `nagaoka_theorem_11_8`
 (`LatticeSystem/Fermion/JordanWigner/Hubbard/NagaokaConnectivityClassification.lean`,
 declaration line 60).
@@ -76,7 +76,7 @@ declaration line 104).
 
 ## Theorem 11.18 (local stability of ferromagnetic ground states)
 
-**Tasaki §11.4, Theorem 11.18** (eqs. (11.4.24)-(11.4.29), pp. 422-423) is a
+**Tasaki §11.4.2, Theorem 11.18** (eqs. (11.4.27)-(11.4.29), pp. 422-423) is a
 **documented axiom**, `nonsingular_theorem_11_18`
 (`LatticeSystem/Fermion/JordanWigner/Hubbard/NonsingularLocalStability.lean`,
 declaration line 49).
@@ -108,7 +108,7 @@ declaration line 49).
 
 ## Theorem 11.19 (spin-wave excitation energy bounds)
 
-**Tasaki §11.4.2, Theorem 11.19** (eqs. (11.4.30)-(11.4.35), pp. 423-424) is
+**Tasaki §11.4.2, Theorem 11.19** (eqs. (11.4.31)-(11.4.35), pp. 423-424) is
 a **documented axiom**, `nonsingular_theorem_11_19`
 (`LatticeSystem/Fermion/JordanWigner/Hubbard/SpinWaveExcitation.lean`,
 declaration line 64).
@@ -184,7 +184,7 @@ pp. 429-435) are two **documented axioms** in
 
 ## Lemma 11.25 (Hubbard–t-J equivalence in the strong-coupling limit)
 
-**Tasaki §11.5.3, Lemma 11.25** is a **documented axiom**, `lemma_11_25`
+**Tasaki §11.5.2 ("Rigorous Results"), Lemma 11.25** (p. 448) is a **documented axiom**, `lemma_11_25`
 (`LatticeSystem/Fermion/JordanWigner/Hubbard/MetallicFerroModel.lean`,
 declaration line 151).
 
@@ -219,7 +219,7 @@ declaration line 151).
 
 ## Theorem 11.27 (Tanaka–Tasaki metallic ferromagnetism)
 
-**Tasaki §11.5.4, Theorem 11.27** (eqs. (11.5.19)-(11.5.24)) is a
+**Tasaki §11.5.2 ("Rigorous Results"), Theorem 11.27** (eqs. (11.5.19)-(11.5.24), p. 451) is a
 **documented axiom**, `theorem_11_27`
 (`LatticeSystem/Fermion/JordanWigner/Hubbard/TanakaTasakiModel.lean`,
 declaration line 194).

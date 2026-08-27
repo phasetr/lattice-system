@@ -34,20 +34,25 @@ permalink: /limitations/documented-axioms/chapter-04/
   reflection positivity. Per the 2026-07-05 policy override
   (externally-cited theorems the book merely quotes must still be proved,
   not deferred as external-cite-only), this is **not** classified as a
-  won't-do citation. It belongs to its own **"infrastructure-in-progress
-  (#4777)"** class, distinct from Theorem 5.1's "`d`-dimensional RP/IR-bound
+  won't-do citation. It belongs to its own **"1D-ring RP infrastructure
+  incomplete"** class, distinct from Theorem 5.1's "`d`-dimensional RP/IR-bound
   intractable at project scale" class below: Theorem 5.1 needs a
   `d`-dimensional reflection-positivity infrastructure the project does not
   have and is not building, whereas this axiom needs exactly the 1D-ring
   reflection-positivity / Gibbs-decomposition infrastructure that issue
-  #4777 is *actively under construction*; it returns to a discharged theorem
-  once that 1D-ring infrastructure is complete.
-- **Re-check condition:** would change once the #4777 reflection-positivity
-  infrastructure (1D-ring Gibbs decomposition) is complete and a
-  math-before-code transcription of the Shastry / Tanaka–Takeda–Idogaki
-  argument on top of it is finished.
-- **Tracking:** master tracker #4718; active supporting infrastructure issue
-  #4777 (reflection-positivity).
+  #4777 scoped; #4777 closed (2026-07-11) without completing that
+  infrastructure or discharging the axiom, and no successor tracking issue is
+  currently open. It returns to a discharged theorem once that 1D-ring
+  infrastructure is built and a fresh discharge issue completes the
+  transcription.
+- **Re-check condition:** would change once 1D-ring reflection-positivity
+  infrastructure (1D-ring Gibbs decomposition) is built and a math-before-code
+  transcription of the Shastry / Tanaka–Takeda–Idogaki argument on top of it
+  is finished.
+- **Tracking:** master tracker #4718; Issue #4777 recorded and then closed
+  (2026-07-11) this axiom's 1D-ring RP-infrastructure scoping without
+  discharging it. No successor discharge issue exists or is to be opened
+  while the re-check condition above is unmet.
 
 <a id="entry-corollary-4-3-support"></a>
 
@@ -84,17 +89,21 @@ and 9 (p. 83)) rests on one **documented axiom**,
   massive-Green-function / inverse-Fourier reflection-positivity analysis
   with `O(L)` control of the `k* = π` singularity. As with Theorem 4.2 above,
   per the 2026-07-05 policy override this is classified in the same
-  "infrastructure-in-progress (#4777)" class (not Theorem 5.1's
+  "1D-ring RP infrastructure incomplete" class (not Theorem 5.1's
   "`d`-dimensional RP/IR-bound intractable" class, and not an
   external-cite-only deferral): it needs the 1D-ring RP/Gibbs-decomposition
-  infrastructure issue #4777 is actively building, and returns to a
-  discharged theorem once that infrastructure is complete.
-- **Re-check condition:** would change once the #4777 reflection-positivity
-  infrastructure (1D-ring Gibbs decomposition) is complete and a
-  math-before-code transcription of the Shastry / Tanaka–Takeda–Idogaki
-  susceptibility estimate on top of it is finished.
-- **Tracking:** master tracker #4718; active supporting infrastructure issue
-  #4777 (reflection-positivity).
+  infrastructure issue #4777 scoped; #4777 closed (2026-07-11) without
+  completing that infrastructure or discharging this axiom, and no successor
+  tracking issue is currently open. It returns to a discharged theorem once
+  that infrastructure is built.
+- **Re-check condition:** would change once 1D-ring reflection-positivity
+  infrastructure (1D-ring Gibbs decomposition) is built and a math-before-code
+  transcription of the Shastry / Tanaka–Takeda–Idogaki susceptibility
+  estimate on top of it is finished.
+- **Tracking:** master tracker #4718; Issue #4777 recorded and then closed
+  (2026-07-11) this axiom's 1D-ring RP-infrastructure scoping without
+  discharging it. No successor discharge issue exists or is to be opened
+  while the re-check condition above is unmet.
 
 <a id="entry-lemma-4-15-theorem-4-11-support"></a>
 
@@ -149,16 +158,19 @@ an unconditional equality:
   moment-ratio limits); Conjecture 4.12 itself would additionally require an
   independent proof of the matching equality, which is a strictly stronger,
   still-open statement.
-- **Tracking:** master tracker #4718; the three axioms share the
-  "2026-07-12 no-overreach boundary" decision recorded in their doc comments.
-  No dedicated discharge issue exists or is to be opened while the re-check
-  condition above is unmet.
+- **Tracking:** master tracker #4718; two of the three axioms
+  (`orderSqMoment_ratio_le_mStarSq` and `orderSqMoment_ratio_le_mStarSq_family`,
+  both in `AndersonTowerOrderSqConcentration.lean`) share the "2026-07-12
+  no-overreach boundary" decision recorded in their doc comments;
+  `mStar_eq_phat_ratio_limit`'s doc comment (`OrderOperatorAlgebra.lean`)
+  does not carry that marker. No dedicated discharge issue exists or is to be
+  opened while the re-check condition above is unmet.
 
 <a id="entry-theorem-4-20"></a>
 
 ## Theorem 4.20 (infinite-volume ground states `ω₀`, `ω_n`)
 
-**Tasaki §4.3, Theorem 4.20** (eqs. (4.3.7)-(4.3.10), around p. 91) is carried
+**Tasaki §4.3, Theorem 4.20** (eqs. (4.3.7)-(4.3.10), around p. 115) is carried
 by two **documented axioms** in
 `LatticeSystem/Quantum/SpinS/InfiniteVolumeGroundState.lean`:
 `theorem_4_20_omega0` (declaration line 210) and `theorem_4_20_omegaN`
@@ -255,7 +267,8 @@ boxes `Λ_n ⊂ ℤᵈ` to the abstract §4.3 infinite-volume system:
   repository, strong enough to both prove the box energy-density limit and
   identify a concrete `InfiniteSpinSystem` instance satisfying
   `IsAFMThermodynamicLimit` for the box model.
-- **Tracking:** master tracker #4718; infinite-volume foundation issue #4564.
+- **Tracking:** master tracker #4718; Issue #4564 recorded the infinite-volume
+  foundation this bridge builds on.
   No dedicated discharge issue exists or is to be opened while the re-check
   condition above is unmet.
 
@@ -263,7 +276,7 @@ boxes `Λ_n ⊂ ℤᵈ` to the abstract §4.3 infinite-volume system:
 
 ## Theorem 4.22 (no SSB and exponential clustering in one dimension)
 
-**Tasaki §4.4, Theorem 4.22** (eqs. (4.4.5)-(4.4.6), around p. 95, with
+**Tasaki §4.4, Theorem 4.22** (eqs. (4.4.5)-(4.4.6), around p. 119, with
 footnote 41) is carried by two **documented axioms** in
 `LatticeSystem/Quantum/SpinS/HeisenbergEquilibrium.lean`:
 `tasaki_4_22_magnetization_vanishes` (declaration line 152) and
@@ -305,7 +318,7 @@ footnote 41) is carried by two **documented axioms** in
 
 ## Theorem 4.23 (high-temperature disorder in two or higher dimensions)
 
-**Tasaki §4.4, Theorem 4.23** (eqs. (4.4.7)-(4.4.8), around p. 96) is a
+**Tasaki §4.4, Theorem 4.23** (eqs. (4.4.7)-(4.4.8), around pp. 119-120) is a
 **documented axiom**, `tasaki_4_23_high_temperature_disorder`
 (`LatticeSystem/Quantum/SpinS/HeisenbergEquilibrium.lean`, declaration
 line 192).
@@ -338,7 +351,7 @@ line 192).
 
 ## Theorem 4.24 (improved Hohenberg–Mermin–Wagner theorem)
 
-**Tasaki §4.4, Theorem 4.24** (eq. (4.4.22), around p. 97, with footnote 48)
+**Tasaki §4.4, Theorem 4.24** (eq. (4.4.22), around p. 124, with footnote 48)
 is a **documented axiom**, `improved_hohenberg_mermin_wagner`
 (`LatticeSystem/Quantum/SpinS/HeisenbergEquilibrium.lean`, declaration
 line 238).
@@ -370,7 +383,7 @@ line 238).
 
 ## Theorem 4.25 (McBryan–Spencer, Koma–Tasaki power-law bound)
 
-**Tasaki §4.4, Theorem 4.25** (eqs. (4.4.23)-(4.4.24), around p. 98) is a
+**Tasaki §4.4, Theorem 4.25** (eqs. (4.4.23)-(4.4.24), around p. 125) is a
 **documented axiom**, `mcbryan_spencer_koma_tasaki`
 (`LatticeSystem/Quantum/SpinS/HeisenbergEquilibrium.lean`, declaration
 line 262).
@@ -398,7 +411,7 @@ line 262).
 
 ## Theorem 4.26 (Dyson–Lieb–Simon long-range order in three or higher dimensions)
 
-**Tasaki §4.4, Theorem 4.26** (eq. (4.4.52), around p. 108) is a
+**Tasaki §4.4, Theorem 4.26** (eq. (4.4.52), around p. 130) is a
 **documented axiom**, `theorem_4_26_staggered_lro`
 (`LatticeSystem/Quantum/SpinS/HeisenbergEquilibrium.lean`, declaration
 line 296).
@@ -430,7 +443,7 @@ line 296).
 
 ## Theorem 4.27 (Griffiths, Koma–Tasaki finite-temperature symmetry breaking)
 
-**Tasaki §4.4, Theorem 4.27** (eq. (4.4.53), around p. 109) is a
+**Tasaki §4.4, Theorem 4.27** (eq. (4.4.53), around p. 131) is a
 **documented axiom**, `theorem_4_27_griffiths_koma_tasaki_ssb`
 (`LatticeSystem/Quantum/SpinS/HeisenbergEquilibrium.lean`, declaration
 line 319).
