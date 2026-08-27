@@ -506,8 +506,8 @@ ferromagnetic floor), the two ingredients out of which `hubbard_theorem_11_4` is
   a "both sides vacuous" instance must not be mistaken for genuine content. Red 47 instead varies
   `(a, b)` (at `(a, b, p) = (1, 1, 1/2)` and `(7, 5, 1/2)`) while holding `p` fixed, obtaining two
   independent witnesses, guarding that T1's conclusion is not accidentally tied to one specific
-  numeral pair. (An earlier Red 45 at `(2, 3, 1/3)` applying `r` at a single density was a strict
-  first conjunct of Red 46 and has been removed as fully subsumed by it.)
+  numeral pair. (The Red numbering skips 45: a single-density instantiation at `(2, 3, 1/3)` is a
+  strict first conjunct of Red 46, so it is not stated separately.)
 * **Red 51 (T1 pinned + a `p = 1` data point).** The primary pinned instance at `a = b = 1`,
   `p = 1/2`, plus a **standalone** fact at `p = 1` referencing neither T1 nor any fixture:
   `1 * 1 < 1 * 1 ^ (1 : ℝ)` is false. This shows only that T1's `(a, b) * r < (a, b) * r ^ p`
