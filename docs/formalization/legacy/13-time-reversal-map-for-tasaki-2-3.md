@@ -52,6 +52,16 @@ Systems*, §2.3 eqs. (2.3.4)–(2.3.8), pp. 26–27.
 
 <!-- legacy-source:end:467:505 -->
 
+## Authoritative supplemental implementation record (Problem 2.3.a Kramers orthogonality)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+a new capstone added after the migration baseline; it is not subject to the frozen byte-for-byte
+parity of the block above.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `inner_timeReversal_eq_zero_of_sq_neg` | **Problem 2.3.a: Kramers-degeneracy orthogonality for an inner-product-reversing square-root-of-`-1̂`** (**PROVED**, `#print axioms` = std3; Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Problem 2.3.a, p. 31, solution p. 496; Appendix A.4.3 eq. (A.4.17)): for a map `V` on a complex inner product space with `⟪V u, V v⟫ = ⟪v, u⟫` for all `u, v` and `V (V v) = -v`, every vector `v` is orthogonal to its image, `⟪v, V v⟫ = 0`; linearity and antilinearity of `V` are not imposed as explicit hypotheses (over a complex inner product space that inner-product identity already forces `V` to be antilinear, so this is the same class of maps as Tasaki's antiunitary operators of eq. (A.4.17)) — the general half-odd-integer-spin Kramers-degeneracy orthogonality argument, stated for such an abstract `V` rather than the concrete `Θ̂` of `timeReversalSpinHalf` | `Quantum/TimeReversalSpinHalf.lean` |
+
 ---
 
 [← Basis states and raising/lowering for S = 1 (Tasaki §2.1)](/lattice-system/formalization/legacy/12-basis-states-and-raising-lowering-for-s-1-tasaki-2-1/) · [Catalogue](/lattice-system/formalization/legacy/) · [Multi-body operator space (abstract lattice) →](/lattice-system/formalization/legacy/14-multi-body-operator-space-abstract-lattice/)
