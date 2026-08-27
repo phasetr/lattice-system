@@ -66,15 +66,17 @@ line 193).
   the bosonic tower states `Γ_M` (`|M| ≤ C₁ L^{d/2}`) are nonvanishing and
   low-lying with cubic energy increment,
   `⟨Γ_M,Ĥ_μΓ_M⟩/⟨Γ_M,Γ_M⟩ ≤ E₀ + C₂|M|³/L^d` (eq. (5.3.4)).
-- **Axiom reason (documented):** proved in Koma–Tasaki [21]. The
+- **Axiom reason (documented):** proved in Tasaki [21] (H. Tasaki,
+  *Long-range order, "tower" of states, and symmetry breaking in lattice
+  quantum systems*, J. Stat. Phys. **174**, 735-761, 2019). The
   general-`μ` statement stays a documented axiom because at `μ ≠ 0` a ground
   state has `Ŝ_tot^{(3)}Φ = s₀ ≠ 0`, so the reused half-filling variational
-  bricks no longer close, and the general-`μ` bound rests on Koma–Tasaki
+  bricks no longer close, and the general-`μ` bound rests on Tasaki
   [21]'s `d`-dimensional reflection-positivity/infrared machinery — the same
   RP-intractability-at-project-scale class as Theorem 5.1.
 - **Re-check condition:** would change under the same condition as
   Theorem 5.1 (a `d`-dimensional RP/IR-bound infrastructure plus a
-  transcription of the Koma–Tasaki [21] general-`μ` argument).
+  transcription of the Tasaki [21] general-`μ` argument).
 - **Tracking:** master tracker #4718. No dedicated discharge issue exists or
   is to be opened while the re-check condition above is unmet.
 
@@ -94,7 +96,7 @@ and `becMStar_ge_sqrt_twoQ`
   discharged *conditionally* as the theorem `tasaki_5_3_bec_u1_ssb_half_filling`
   (`BoseEinsteinCondensateCoherentAssembly.lean`), whose `#print axioms` is
   `std3 + becMStar_ge_sqrt_twoQ` and which additionally requires an explicit
-  `hRealizing` hypothesis (the Koma–Tasaki [66] uniform window-ratio
+  `hRealizing` hypothesis (the Tasaki [66] uniform window-ratio
   concentration input); the U(1) coherent state constructor
   `becCoherentState` and the coherent-SSB constants predicate
   `IsBECCoherentSSBConstants` are real definitions.
@@ -110,11 +112,11 @@ and `becMStar_ge_sqrt_twoQ`
   in the slow window, ruling out the unsound free-parameter reading
   (`mStar := 0` would otherwise satisfy a `hFamily`-free statement while
   `q₀ > 0`).
-- **Axiom reason (documented):** proved in Koma–Tasaki [21]/[66];
+- **Axiom reason (documented):** proved in Tasaki [21]/[66];
   `becMStar_ge_sqrt_twoQ` is the BEC half-filling counterpart of the `SU(2)`
   concentration axioms `orderSqMoment_ratio_le_mStarSq_family` and the
   `p̂`-mirror `mStar_eq_phat_ratio_limit` (Chapter 4 Lemma 4.15 entry): per
-  the 2026-07-12 no-overreach boundary, the Koma–Tasaki [66] concentration
+  the 2026-07-12 no-overreach boundary, the Tasaki [66] concentration
   mechanism is deferred with parity to those axioms rather than rebuilt. The
   general-`μ` statement `tasaki_5_3_bec_u1_ssb` stays a documented axiom for
   the same reason as Theorem 5.2 general-`μ`: at `μ ≠ 0` the reused
@@ -123,7 +125,7 @@ and `becMStar_ge_sqrt_twoQ`
 - **Re-check condition:** would change (for `tasaki_5_3_bec_u1_ssb`) under
   the same condition as Theorem 5.1/5.2 general-`μ`; and (for
   `becMStar_ge_sqrt_twoQ`) when a math-before-code transcription of the
-  Koma–Tasaki [66] concentration argument is completed with parity to the
+  Tasaki [66] concentration argument is completed with parity to the
   Chapter 4 Lemma 4.15 / Theorem 4.11 concentration axioms.
 - **Tracking:** master tracker #4718; shares the "2026-07-12 no-overreach
   boundary" decision with the Chapter 4 Lemma 4.15 / Theorem 4.11 entry. No
@@ -156,7 +158,9 @@ line 496).
   soundly in eventual-`ε` form (outer `ε↓0`, inner `L↑∞`). The axiom does
   **not** name or bound an intermediate `mStar`; `m̃` is the only order
   parameter the statement introduces.
-- **Axiom reason (documented):** proved in Koma–Tasaki [22]. Unlike
+- **Axiom reason (documented):** proved in Tasaki [22] (H. Tasaki,
+  *Spontaneous symmetry breaking in coupled Bose-Einstein condensates*,
+  J. Stat. Phys. **178**, 379-391, 2019). Unlike
   Theorem 5.1, this is a **genuine iterated thermodynamic limit**
   `lim_{ε↓0} lim_{L↑∞}`: Tasaki states in a footnote that the existence of
   the limit itself is unproven (open in the source literature), so this
@@ -166,6 +170,6 @@ line 496).
 - **Re-check condition:** would change only if the existence of the
   `lim_{ε↓0} lim_{L↑∞}` iterated limit is established in the source
   literature (or independently) and a math-before-code transcription of the
-  Koma–Tasaki [22] argument is completed.
+  Tasaki [22] argument is completed.
 - **Tracking:** master tracker #4718. No dedicated discharge issue exists or
   is to be opened while the re-check condition above is unmet.
