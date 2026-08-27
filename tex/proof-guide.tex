@@ -11525,12 +11525,14 @@ tied only by the multiset equality.
 Sums of ``the $k$ lowest levels'' are then spelled $\sum_{i<k}\varepsilon_i$, with the book's
 $j=1,\dots,N$ read as $i=0,\dots,N-1$.  Three facts follow, one for each use the book makes of the
 ordering.  First, minimality: for \emph{any} $k$-element set $S$ of single-electron levels,
-$\sum_{i<k}\varepsilon_i\le\sum_{p\in S}g_p$
-(\texttt{sum\_lowestLevels\_le\_sum\_of\_map\_eq}).  This is the formal content of ``one of the
+$\sum_{i<k}\varepsilon_i\le\sum_{p\in S}g_p$.  This is the formal content of ``one of the
 lowest energy states'', and it is the one genuinely new ingredient, mathlib having no counterpart:
 enumerating $S$ in increasing order, its $i$-th smallest element has index at least $i$ (a strictly
 monotone map of index types does not decrease the index), so monotonicity of $\varepsilon$ compares
-the two sums term by term.  Second, attainment: some $k$-element set realizes that value
+the two sums term by term.  A later stage below replaces this statement, and this proof of it, by a
+strictly stronger fractional bound
+(\texttt{sum\_lowestLevels\_le\_sum\_weighted\_of\_map\_eq}), which is what the module carries.
+Second, attainment: some $k$-element set realizes that value
 (\texttt{exists\_lowestLevels\_finset\_of\_map\_eq}), the image of the first $k$ indices under the
 sorting permutation; this is the occupied set of (11.1.5), produced existentially so that no new
 definition of it is introduced.  Third, the split
@@ -11675,6 +11677,65 @@ Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems} (1st ed., Sp
 §11.1.1, Proposition 11.2 and eq.~(11.1.4), pp.~377--378 (the half-filling multiplet whose
 machinery is generalized), and §11.1.1, Theorem 11.4, eqs.~(11.1.8)--(11.1.10), p.~376 (the
 low-filling statement that requires it).
+
+\medskip\noindent\textbf{Theorem 11.4 PR7b, the fractional-occupation bound and the algebraic
+ingredients of the ferromagnetic floor (Tasaki §11.1.1,
+\texttt{Math/MonotoneEnumeration.lean},
+\texttt{HubbardImpossibilityLowDensityFloor.lean}).}  Appendix~F reads the energy of a fully
+polarized state as $\sum_j\varepsilon_j$ over its occupied levels, which presupposes that the state
+is a Slater determinant, i.e.\ that it carries a definite \emph{set} of occupied modes.  Theorem
+11.4 hands over no such thing: its hypothesis produces a nonzero top-weight vector $u$ of the
+eigenspace (previous stage), an arbitrary element of a possibly high-dimensional space, and
+enumerating the Slater determinants that span the polarized sector would need both a spanning
+statement and a linear-independence statement for that sector at a general electron number, neither
+of which this development has.  This stage removes the need for either, by proving the energy floor
+for \emph{fractional} occupations.
+
+The order-theoretic half is a knapsack bound.  For a monotone $\varepsilon$ on $m$ levels and any
+weights $0\le w_j\le1$ with $\sum_j w_j=k$,
+\[
+  \sum_{i<k}\varepsilon_i\;\le\;\sum_j\varepsilon_j w_j,
+\]
+and likewise against the unsorted spectrum $g$ (\texttt{sum\_lowestLevels\_le\_sum\_weighted},
+\texttt{sum\_lowestLevels\_le\_sum\_weighted\_of\_map\_eq}).  The weights are not assumed to take
+only the values $0$ and $1$, so the bound covers a genuine fractional filling as well as the choice
+of an occupied set.  The proof is an exchange argument rather than an index enumeration: with $T$
+the first $k$ indices, $\chi$ its indicator and $\theta=\varepsilon_{k-1}$ the top level of $T$,
+every term of $\sum_j(\varepsilon_j-\theta)(w_j-\chi_j)$ is nonnegative --- inside $T$ both factors
+are nonpositive, outside $T$ both are nonnegative --- while $\sum_j w_j=k=\sum_j\chi_j$ makes the
+$\theta$-terms cancel, leaving exactly $\sum_j\varepsilon_j w_j-\sum_{i<k}\varepsilon_i$.  The
+indicator case is the special case $w=\chi$, so the earlier stage's two minimality lemmas, and the
+private index-arithmetic step they rested on, are deleted as subsumed; with them goes the module's
+dependence on \texttt{Finset.orderEmbOfFin}.
+
+The operator half supplies the weights.  Writing $A=\hat C_\sigma(\bar e_j)$ for the annihilator of
+the single-particle eigenmode $(j,\sigma)$, the dual canonical anticommutation relation
+$AA^{\dagger}+A^{\dagger}A=1$ turns $1-\hat n_{j\sigma}=AA^{\dagger}$ into a Gram matrix, so
+$\hat n_{j\sigma}\le1$ (\texttt{one\_sub\_eigenNumberOp\_posSemidef}); together with the already
+available $\hat n_{j\sigma}\ge0$ this confines
+$w_j=\langle u,\hat n_{j\uparrow}u\rangle/\|u\|^{2}$ to $[0,1]$, which is Pauli exclusion in
+exactly the form the knapsack bound consumes.  Next, a top-weight state is fully polarized:
+$\hat N=\hat N_{\uparrow}+\hat N_{\downarrow}$ and
+$\hat S^{3}=(\hat N_{\uparrow}-\hat N_{\downarrow})/2$ are operator identities in this development,
+so $\hat Nu=N_{\mathrm e}u$ and $\hat S^{3}u=(N_{\mathrm e}/2)u$ give $\hat N_{\downarrow}u=0$ by
+subtraction (\texttt{fermionTotalDownNumber\_mulVec\_eq\_zero\_of\_topWeight}).  This is where the
+configuration counting that Theorem 11.3 needed at half filling
+(\texttt{topWeight\_eq\_smul\_hubbardAllUpState}) disappears: it is replaced by two eigenvalue
+equations, which is what makes the step available at every $N_{\mathrm e}$.  Finally every summand
+of $\hat H_{\mathrm{int}}=U\sum_x\hat n_{x\uparrow}\hat n_{x\downarrow}$ ends in a down
+annihilation, so $\hat H_{\mathrm{int}}u=0$
+(\texttt{hubbardOnSiteInteraction\_mulVec\_eq\_zero\_of\_downNumber\_zero}) and the floor carries no
+$U$-dependent correction --- the reason Theorem 11.4 can hold for every $U\ge0$.
+
+Two departures from Appendix~F are already visible here and are deliberate: the floor is obtained
+from a fractional-occupation bound rather than from an enumeration of Slater determinants, and the
+delocalization estimate (F.14), which the appendix \emph{assumes}, was derived earlier in this arc
+from translation invariance.  This stage is still infrastructure: no statement of
+\texttt{hubbard\_theorem\_11\_4} changes.  Sources: Hal Tasaki, \emph{Physics and Mathematics of
+Quantum Many-Body Systems} (1st ed., Springer 2020), §11.1, eqs.~(11.1.5)/(11.1.6), p.~375, and
+§11.1.1, Theorem 11.4, eqs.~(11.1.8)--(11.1.10), p.~376; Tasaki, Prog.\ Theor.\ Phys.\ \textbf{99}
+(1998) 489, Theorem 3.3, Appendix~F, eqs.~(F.12)/(F.13), pp.~546--547, together with the
+boundedness assumption stated on p.~547.
 
 \noindent\textbf{Lemma 11.10} (Tasaki §11.3.1, eqs.~(11.3.1)--(11.3.2), pp.~405--406;
 \textbf{discharged axiom-free}, \texttt{TasakiFlatBandBasisLemma.lean}, Issue \#4477).  On the
