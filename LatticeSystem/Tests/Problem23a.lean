@@ -6,20 +6,21 @@ import LatticeSystem.Quantum.TimeReversalSpinHalf
 Signature pin for the capstone `inner_timeReversal_eq_zero_of_sq_neg` in
 `LatticeSystem/Quantum/TimeReversalSpinHalf.lean` (Tasaki, *Physics and Mathematics of
 Quantum Many-Body Systems*, Problem 2.3.a, p. 31, solution p. 496, Appendix A.4.3
-eq. (A.4.17)): for any antiunitary-antilinear involution-up-to-sign `V` on an inner
-product space (`⟨V u, V v⟩ = ⟨v, u⟩` and `V (V v) = -v`), every vector is orthogonal
-to its image, `⟨v, V v⟩ = 0`. The fixture fixes the capstone's exact name, binder order
-and hypothesis shapes by discharging abstract witness data `(E, V, hanti, hsq)` with it
-via `exact`.
+eq. (A.4.17)): for any map `V` on an inner product space that reverses the inner product
+(`⟨V u, V v⟩ = ⟨v, u⟩`) and is an involution up to sign (`V (V v) = -v`), every vector is
+orthogonal to its image, `⟨v, V v⟩ = 0`; no linearity assumption on `V` is needed. The
+fixture fixes the capstone's exact name, binder order and hypothesis shapes by discharging
+abstract witness data `(E, V, hanti, hsq)` with it via `exact`.
 -/
 
 namespace LatticeSystem.Tests.Problem23a
 
 open LatticeSystem.Quantum
 
-/-- Any antiunitary-antilinear involution-up-to-sign `V` on an inner product space `E`
-sends every vector to something orthogonal to it: `⟨v, V v⟩ = 0`. This pins the exact
-name, binder order, and hypothesis shapes of `inner_timeReversal_eq_zero_of_sq_neg`. -/
+/-- Any map `V` on an inner product space `E` that reverses the inner product
+(`⟨V u, V v⟩ = ⟨v, u⟩`) and is an involution up to sign (`V (V v) = -v`) sends every
+vector to something orthogonal to it: `⟨v, V v⟩ = 0`. This pins the exact name, binder
+order, and hypothesis shapes of `inner_timeReversal_eq_zero_of_sq_neg`. -/
 example {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
     (V : E → E)
     (hanti : ∀ u v, inner ℂ (V u) (V v) = inner ℂ v u)
