@@ -16,8 +16,10 @@ coherent state at `φ = 0` is the sum `Σ_M c_M(θ) Φ_M` with every coefficient
 
 The expansion comes from the identification of the joint `(Ĥ, (Ŝ_tot)²)`-eigenspace with the span
 of the ladder iterates, with the coefficients extracted by their pairwise orthogonality.
-Nonvanishing comes from the site-product form of `Ξ_{θ,0}` together with the one-dimensionality of
-each weight sector, so no closed-form coefficient is needed.
+Nonvanishing comes from the disjointness of the magnetisation-sector supports together with the
+site-product form of `Ξ_{θ,0}`: at a configuration where a given sector's ladder iterate is
+nonzero, every other sector contributes zero to the expansion, so the coefficient is forced to be a
+nonzero multiple of the (nonzero) product value; no closed-form coefficient is needed.
 
 The ambient vector space stays the raw function type `(V → Fin (N + 1)) → ℂ` carrying all the
 ladder and magnetisation-sector machinery; the `ℓ²` structure of `EuclideanSpace` is used only for

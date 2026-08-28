@@ -20723,7 +20723,10 @@ one-site amplitude
   \texttt{saturatedCoherentAmp}\,N\,\theta\,j
   \;=\; \sqrt{\binom{N}{j}}\,\cos(\theta/2)^{N-j}\sin(\theta/2)^{j}.
 \]
-The capstone theorem \texttt{saturatedCoherentState\_zero\_apply} proves that at
+The theorem \texttt{saturatedCoherentAmp\_ne\_zero} proves that this amplitude
+is nonzero for \(0 < \theta < \pi\), from positivity of the binomial
+coefficient and of \(\cos(\theta/2)\), \(\sin(\theta/2)\) on that range. The
+capstone theorem \texttt{saturatedCoherentState\_zero\_apply} proves that at
 \(\varphi = 0\) the coefficient of \(\Xi_{\theta,0}\) at basis configuration
 \(\sigma\) is the product of one-site amplitudes,
 \[
