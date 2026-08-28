@@ -46,6 +46,22 @@ noncomputable def saturatedCoherentAmp (N : ℕ) (θ : ℝ) (j : Fin (N + 1)) : 
   (Real.sqrt (N.choose (j : ℕ)) : ℂ) * (Real.cos (θ / 2) : ℂ) ^ (N - (j : ℕ)) *
     (Real.sin (θ / 2) : ℂ) ^ (j : ℕ)
 
+/-- **Nonvanishing of the one-site coherent amplitude.**  For `0 < θ < π` every amplitude
+`saturatedCoherentAmp N θ j` is nonzero: the binomial coefficient `binom N j` is positive because
+`j ≤ N`, and both `cos (θ / 2)` and `sin (θ / 2)` are strictly positive on `0 < θ < π`. -/
+theorem saturatedCoherentAmp_ne_zero (N : ℕ) {θ : ℝ} (h₀ : 0 < θ) (hπ : θ < Real.pi)
+    (j : Fin (N + 1)) : saturatedCoherentAmp N θ j ≠ 0 := by
+  have hcos : 0 < Real.cos (θ / 2) :=
+    Real.cos_pos_of_mem_Ioo ⟨by linarith [Real.pi_pos], by linarith⟩
+  have hsin : 0 < Real.sin (θ / 2) :=
+    Real.sin_pos_of_pos_of_lt_pi (by linarith) (by linarith [Real.pi_pos])
+  have hchoose : 0 < Real.sqrt (N.choose (j : ℕ)) :=
+    Real.sqrt_pos.mpr (by exact_mod_cast Nat.choose_pos (Nat.lt_succ_iff.mp j.isLt))
+  refine mul_ne_zero (mul_ne_zero ?_ (pow_ne_zero _ ?_)) (pow_ne_zero _ ?_)
+  · exact_mod_cast hchoose.ne'
+  · exact_mod_cast hcos.ne'
+  · exact_mod_cast hsin.ne'
+
 /-- Action of `Ŝ^+` on the one-site coherent amplitudes: the raising operator shifts the
 `cos`/`sin` exponents and replaces the binomial factor by `(N - j) √(binom N j)`. -/
 private lemma spinSOpPlus_mulVec_saturatedCoherentAmp (N : ℕ) (θ : ℝ) (i : Fin (N + 1)) :
@@ -256,8 +272,10 @@ private lemma hasDerivAt_mulVec_const {Φ : (V → Fin (N + 1)) → ℂ} {A : �
     ‖Φ‖ fun M => by rw [mul_comm]; exact Matrix.linfty_opNorm_mulVec M Φ).hasFDerivAt
       |>.comp_hasDerivAt t h
 
-/-- At `φ = 0` only the axis-2 rotation acts, since `Û_0^{(3)} = 1`. -/
-private lemma saturatedCoherentState_zero_eq_globalRot2 (θ : ℝ) :
+/-- At `φ = 0` only the axis-2 rotation acts, since `Û_0^{(3)} = 1`: the coherent state
+`Ξ_{θ,0}` of Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, eq. (2.4.6), p. 33,
+reduces to `Û_θ^{(2)} Φ↑`. -/
+lemma saturatedCoherentState_zero_eq_globalRot2 (θ : ℝ) :
     saturatedCoherentState V N θ 0 = saturatedGlobalRot2 V N θ *ᵥ allAlignedStateS V N 0 := by
   rw [saturatedCoherentState, saturatedGlobalRot3,
     show (0 : ℝ) • ((-Complex.I) • totalSpinSOp3 V N : ManyBodyOpS V N) = 0 from zero_smul _ _,
