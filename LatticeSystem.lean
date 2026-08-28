@@ -122,9 +122,7 @@ import LatticeSystem.Quantum.SpinS.SpinHalfSpecializationMultiSite
 import LatticeSystem.Quantum.SpinS.GeneralSWeylLadder
 import LatticeSystem.Quantum.SpinS.GeneralSWeylCasimir
 import LatticeSystem.Quantum.SpinS.GeneralSCasimirDescent
-import LatticeSystem.Quantum.SpinS.SaturatedCoherentAmplitude
-import LatticeSystem.Quantum.SpinS.SaturatedCoherentProjection
-import LatticeSystem.Quantum.SpinS.SaturatedCoherentWeight
+import LatticeSystem.Quantum.SpinS.SaturatedCoherentExpansion
 
 /-!
 # `lattice-system` library root

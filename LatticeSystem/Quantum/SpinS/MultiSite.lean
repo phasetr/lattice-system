@@ -119,6 +119,38 @@ theorem onSiteS_mulVec_basisVecS_apply
   rw [Finset.sum_ite_eq' Finset.univ σ (fun σ' => (onSiteS i A) τ σ')]
   simp
 
+/-- **Leibniz action of a one-site operator on an arbitrary vector.**  Applying `onSiteS i A` to
+any `v : (Λ → Fin (N + 1)) → ℂ` and reading the result at `σ` sums the site-`i` matrix elements
+`A (σ i) c` against the values of `v` on the configurations obtained from `σ` by resetting site
+`i` to `c`: off that one-site image the matrix elements of `onSiteS i A` vanish. -/
+theorem onSiteS_mulVec_apply (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
+    (v : (Λ → Fin (N + 1)) → ℂ) (σ : Λ → Fin (N + 1)) :
+    ((onSiteS i A : ManyBodyOpS Λ N) *ᵥ v) σ
+      = ∑ c : Fin (N + 1), A (σ i) c * v (Function.update σ i c) := by
+  classical
+  simp only [Matrix.mulVec, dotProduct]
+  have hsupp : ∀ τ ∈ (Finset.univ : Finset (Λ → Fin (N + 1))),
+      τ ∉ (Finset.univ : Finset (Fin (N + 1))).image (fun c => Function.update σ i c) →
+      (onSiteS i A : ManyBodyOpS Λ N) σ τ * v τ = 0 := by
+    intro τ _ hτ
+    have hne : ¬ (∀ k, k ≠ i → σ k = τ k) := by
+      intro hall
+      refine hτ (Finset.mem_image.2 ⟨τ i, Finset.mem_univ _, ?_⟩)
+      funext k
+      by_cases hk : k = i
+      · subst hk; simp
+      · rw [Function.update_of_ne hk]; exact hall k hk
+    rw [onSiteS_apply_eq_zero_of_off_site_diff i A hne, zero_mul]
+  rw [← Finset.sum_subset (Finset.subset_univ
+      ((Finset.univ : Finset (Fin (N + 1))).image (fun c => Function.update σ i c))) hsupp,
+    Finset.sum_image (by
+      intro a _ b _ hab
+      have := congrFun hab i
+      simpa using this)]
+  refine Finset.sum_congr rfl fun c _ => ?_
+  rw [onSiteS_apply_of_off_site_agree i A (fun k hk => (Function.update_of_ne hk _ _).symm)]
+  simp
+
 /-- For distinct sites `x ≠ y`, the product
 `onSiteS x (Ŝ^+) * onSiteS y (Ŝ^-)` has non-negative real-part
 matrix element on every `(σ', σ)` pair. -/
