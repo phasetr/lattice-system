@@ -144,6 +144,7 @@ import LatticeSystem.Tests.HubbardImpossibilityLowDensityWeights
 import LatticeSystem.Tests.Problem24b
 import LatticeSystem.Tests.Problem24bWeightExpansion
 import LatticeSystem.Tests.Problem24bPhaseProjection
+import LatticeSystem.Tests.Problem24cCoherentExpansion
 
 /-!
 # Test aggregator for the `lattice-system` library
