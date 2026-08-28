@@ -196,25 +196,7 @@ theorem onSiteS_mulVec_prod (x : V) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
     ((onSiteS x A : ManyBodyOpS V N) *ᵥ fun τ => ∏ y, f y (τ y)) σ
       = (A *ᵥ f x) (σ x) * ∏ y ∈ Finset.univ.erase x, f y (σ y) := by
   classical
-  simp only [Matrix.mulVec, dotProduct]
-  have hsupp : ∀ τ ∈ (Finset.univ : Finset (V → Fin (N + 1))),
-      τ ∉ (Finset.univ : Finset (Fin (N + 1))).image (fun c => Function.update σ x c) →
-      (onSiteS x A : ManyBodyOpS V N) σ τ * (∏ y, f y (τ y)) = 0 := by
-    intro τ _ hτ
-    have hne : ¬ (∀ k, k ≠ x → σ k = τ k) := by
-      intro hall
-      refine hτ (Finset.mem_image.2 ⟨τ x, Finset.mem_univ _, ?_⟩)
-      funext k
-      by_cases hk : k = x
-      · subst hk; simp
-      · rw [Function.update_of_ne hk]; exact hall k hk
-    rw [onSiteS_apply_eq_zero_of_off_site_diff x A hne, zero_mul]
-  rw [← Finset.sum_subset (Finset.subset_univ
-      ((Finset.univ : Finset (Fin (N + 1))).image (fun c => Function.update σ x c))) hsupp,
-    Finset.sum_image (by
-      intro a _ b _ hab
-      have := congrFun hab x
-      simpa using this)]
+  rw [onSiteS_mulVec_apply]
   have hprod : ∀ c : Fin (N + 1), (∏ y, f y (Function.update σ x c y))
       = f x c * ∏ y ∈ Finset.univ.erase x, f y (σ y) := by
     intro c
@@ -222,16 +204,10 @@ theorem onSiteS_mulVec_prod (x : V) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
       (Finset.mem_univ x)]
     simp only [Function.update_self]
     congr 1
-    refine Finset.prod_congr rfl ?_
-    intro y hy
+    refine Finset.prod_congr rfl fun y hy => ?_
     rw [Function.update_of_ne (Finset.ne_of_mem_erase hy)]
-  have hentry : ∀ c : Fin (N + 1),
-      (onSiteS x A : ManyBodyOpS V N) σ (Function.update σ x c) = A (σ x) c := by
-    intro c
-    rw [onSiteS_apply_of_off_site_agree x A (fun k hk => (Function.update_of_ne hk _ _).symm)]
-    simp
-  simp only [hentry, hprod]
-  simp only [Finset.sum_mul, mul_assoc]
+  simp only [hprod]
+  simp only [Matrix.mulVec, dotProduct, Finset.sum_mul, mul_assoc]
 
 /-! ## Coherent state -/
 
