@@ -124,6 +124,7 @@ import LatticeSystem.Quantum.SpinS.GeneralSWeylLadder
 import LatticeSystem.Quantum.SpinS.GeneralSWeylCasimir
 import LatticeSystem.Quantum.SpinS.GeneralSCasimirDescent
 import LatticeSystem.Quantum.SpinS.SaturatedCoherentExpansion
+import LatticeSystem.Quantum.IsingChainMatrixElements
 
 /-!
 # `lattice-system` library root
