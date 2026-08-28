@@ -33,7 +33,7 @@ deferred and require a `siteFlipAt` swap analysis. -/
 /-- Pointwise unfolding of `(onSite x pauliZ).mulVec v`: since
 `σ^z` is diagonal, the action is multiplication by
 `if τ x = 0 then 1 else -1` at every configuration `τ`. -/
-private theorem onSite_pauliZ_mulVec_apply
+theorem onSite_pauliZ_mulVec_apply
     (x : Λ) (v : (Λ → Fin 2) → ℂ) (τ : Λ → Fin 2) :
     ((onSite x pauliZ).mulVec v) τ =
       (if τ x = 0 then (1 : ℂ) else -1) * v τ := by
