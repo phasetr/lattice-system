@@ -35,6 +35,16 @@ Systems*, Springer 2020, §2.4 (pp. 30–37, spin-1/2 case).
 
 <!-- legacy-source:end:2129:2148 -->
 
+## Authoritative supplemental implementation record (Problem 2.4.b saturated coherent amplitude)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+a new capstone added after the migration baseline; it is not subject to the frozen byte-for-byte
+parity of the block above.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `saturatedCoherentAmp` / `saturatedCoherentState` / `saturatedGlobalRot2` / `saturatedGlobalRot3` / `onSiteS_mulVec_prod` / `saturatedCoherentState_zero_apply` | **Problem 2.4.b saturated coherent state, product form** (**PROVED**, `#print axioms saturatedCoherentState_zero_apply` = std3; Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*: the coherent state is eq. (2.4.6), p. 33, and the global rotation `Û_θ^{(α)} = exp(-iθ Ŝ_tot^{(α)})` is eq. (2.2.11), p. 22; the site-product form proved here is eq. (S.18) of the solution to Problem 2.4.c, p. 497, stated there for `S = 1/2`; Problem 2.4.b is stated on p. 34 with solution on pp. 496–497, eq. (S.17)): for the generic-spin (`N = 2S`) saturated coherent state `Ξ_{θ,φ} := Û_φ^{(3)} Û_θ^{(2)} Φ↑` (`saturatedCoherentState`, built from the total-spin rotation matrix exponentials `saturatedGlobalRot2`/`saturatedGlobalRot3`), at `φ = 0` its coefficient at basis configuration `σ` is the product of one-site amplitudes, `Ξ_{θ,0}(σ) = ∏_x saturatedCoherentAmp N θ (σ x)`, with the one-site amplitude `saturatedCoherentAmp N θ j = √(binom N j) · cos(θ/2)^{N−j} · sin(θ/2)^j`. Proved from uniqueness of solutions of the linear ODE `ẋ = -i Ŝ_tot^{(2)} x` (via `onSiteS_mulVec_prod`, the Leibniz action of a one-site operator on a product state): both the matrix-exponential coherent state and the amplitude product solve this ODE and agree at `θ = 0`, so the half-angle `θ/2` in the amplitude is forced by the ODE rather than inserted by hand. First PR of the Problem 2.4.b arc: establishes only the product form, eq. (S.18) of the solution to Problem 2.4.c, which is what the solution to Problem 2.4.b starts from (it expands `Û_θ^{(2)} Φ↑ = Σ_M c_M Φ_M` and needs every `c_M` to be nonzero); the Fourier-inversion capstone eq. (S.17), the solution to Problem 2.4.b itself, expressing `Φ_M` in terms of `Ξ_{θ,φ}`, is deferred to a follow-up PR | `Quantum/SpinS/SaturatedCoherentAmplitude.lean`; `Math/Combinatorics/SqrtChooseLadder.lean` |
+
 ---
 
 [← Spin-`S` saturated ferromagnetic state (Tasaki §2.4 generalised)](/lattice-system/formalization/legacy/28-spin-saturated-ferromagnetic-state-tasaki-2-4-generalised-part-01/) · [Catalogue](/lattice-system/formalization/legacy/) · [Single-mode fermion (P2 skeleton) →](/lattice-system/formalization/legacy/29-single-mode-fermion-p2-skeleton/)

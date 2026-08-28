@@ -141,6 +141,7 @@ import LatticeSystem.Tests.LiebShenQiuDischarge
 import LatticeSystem.Tests.HubbardImpossibilityLowDensity
 import LatticeSystem.Tests.HubbardImpossibilityLowDensityRoth
 import LatticeSystem.Tests.HubbardImpossibilityLowDensityWeights
+import LatticeSystem.Tests.Problem24b
 
 /-!
 # Test aggregator for the `lattice-system` library

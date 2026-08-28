@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.MultiSiteCore
+import LatticeSystem.Math.Combinatorics.SqrtChooseLadder
 import LatticeSystem.Math.MvPolynomial.WeylSpinMap
 import Mathlib.Algebra.MvPolynomial.PDeriv
 
@@ -33,55 +34,6 @@ open MvPolynomial LatticeSystem.Math
 namespace LatticeSystem.Quantum
 
 variable {L N : ℕ}
-
-/-! ## The Clebsch–Gordan step of the binomial weights -/
-
-/-- **The single arithmetic fact behind both ladders.**  The `√`-form of
-`Nat.choose_succ_right_eq` (`binom(n,t+1)·(t+1) = binom(n,t)·(n−t)`): the Clebsch–Gordan weights
-`√(binom(n,·))` of neighbouring site states are related by the ladder matrix elements `√(t+1)` and
-`√(n−t)`.  No hypothesis `t < n` is needed: above the top both sides vanish. -/
-private theorem sqrt_choose_step (n t : ℕ) :
-    Real.sqrt (n.choose (t + 1)) * Real.sqrt ((t : ℝ) + 1)
-      = Real.sqrt (n.choose t) * Real.sqrt ((n - t : ℕ) : ℝ) := by
-  rw [← Real.sqrt_mul (Nat.cast_nonneg _), ← Real.sqrt_mul (Nat.cast_nonneg _)]
-  congr 1
-  exact_mod_cast Nat.choose_succ_right_eq n t
-
-/-- Coefficient identity of the raising ladder: the `Ŝ^+` matrix element `√((t+1)(n−t))` times the
-weight `√(binom(n,t))` of the target state equals the weight `√(binom(n,t+1))` of the source state
-times the `v`-exponent `t+1` produced by `∂_v`.  The real subtraction `(n:ℝ) − (t+1) + 1` of
-`spinSOpPlus` is bridged to the truncated `n − t` of `mdSite` by `t < n`. -/
-private theorem sqrt_raise_coeff {n t : ℕ} (ht : t < n) :
-    Real.sqrt (((t : ℝ) + 1) * ((n : ℝ) - ((t : ℝ) + 1) + 1)) * Real.sqrt (n.choose t)
-      = Real.sqrt (n.choose (t + 1)) * ((t : ℝ) + 1) := by
-  have hcast : (n : ℝ) - ((t : ℝ) + 1) + 1 = ((n - t : ℕ) : ℝ) := by
-    rw [Nat.cast_sub ht.le]
-    ring
-  have hsq : Real.sqrt ((t : ℝ) + 1) * Real.sqrt ((t : ℝ) + 1) = (t : ℝ) + 1 :=
-    Real.mul_self_sqrt (by positivity)
-  rw [hcast, Real.sqrt_mul (by positivity)]
-  calc Real.sqrt ((t : ℝ) + 1) * Real.sqrt ((n - t : ℕ) : ℝ) * Real.sqrt (n.choose t)
-      = Real.sqrt (n.choose t) * Real.sqrt ((n - t : ℕ) : ℝ) * Real.sqrt ((t : ℝ) + 1) := by ring
-    _ = Real.sqrt (n.choose (t + 1)) * Real.sqrt ((t : ℝ) + 1) * Real.sqrt ((t : ℝ) + 1) := by
-        rw [sqrt_choose_step]
-    _ = Real.sqrt (n.choose (t + 1)) * ((t : ℝ) + 1) := by rw [mul_assoc, hsq]
-
-/-- Coefficient identity of the lowering ladder: the `Ŝ^-` matrix element `√((n−t)(t+1))` times the
-weight `√(binom(n,t+1))` of the target state equals the weight `√(binom(n,t))` of the source state
-times the `u`-exponent `n − t` produced by `∂_u`. -/
-private theorem sqrt_lower_coeff {n t : ℕ} (ht : t < n) :
-    Real.sqrt (((n : ℝ) - (t : ℝ)) * ((t : ℝ) + 1)) * Real.sqrt (n.choose (t + 1))
-      = Real.sqrt (n.choose t) * ((n - t : ℕ) : ℝ) := by
-  have hcast : (n : ℝ) - (t : ℝ) = ((n - t : ℕ) : ℝ) := (Nat.cast_sub ht.le).symm
-  have hsq : Real.sqrt ((n - t : ℕ) : ℝ) * Real.sqrt ((n - t : ℕ) : ℝ) = ((n - t : ℕ) : ℝ) :=
-    Real.mul_self_sqrt (Nat.cast_nonneg _)
-  rw [hcast, Real.sqrt_mul (Nat.cast_nonneg _)]
-  calc Real.sqrt ((n - t : ℕ) : ℝ) * Real.sqrt ((t : ℝ) + 1) * Real.sqrt (n.choose (t + 1))
-      = Real.sqrt (n.choose (t + 1)) * Real.sqrt ((t : ℝ) + 1)
-          * Real.sqrt ((n - t : ℕ) : ℝ) := by ring
-    _ = Real.sqrt (n.choose t) * Real.sqrt ((n - t : ℕ) : ℝ)
-          * Real.sqrt ((n - t : ℕ) : ℝ) := by rw [sqrt_choose_step]
-    _ = Real.sqrt (n.choose t) * ((n - t : ℕ) : ℝ) := by rw [mul_assoc, hsq]
 
 /-! ## Multidegree bookkeeping of a single ladder step -/
 

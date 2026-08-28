@@ -20712,6 +20712,55 @@ what the sources state today is the lower bound
 The theorem being closed is H.~Tasaki, \emph{Physics and Mathematics of Quantum
 Many-Body Systems}, Springer 2020, §2.4 Theorem~2.1, p.~34.
 
+\textbf{Problem 2.4.b: saturated coherent state, product form.} The new file
+\texttt{Quantum/SpinS/SaturatedCoherentAmplitude.lean} defines the generic-spin
+($N = 2S$) saturated coherent state
+\(\Xi_{\theta,\varphi} := \hat U^{(3)}_{\varphi}\hat U^{(2)}_{\theta}\Phi^\uparrow\)
+(\texttt{saturatedCoherentState}, built from the total-spin rotation matrix
+exponentials \texttt{saturatedGlobalRot2}/\texttt{saturatedGlobalRot3}) and the
+one-site amplitude
+\[
+  \texttt{saturatedCoherentAmp}\,N\,\theta\,j
+  \;=\; \sqrt{\binom{N}{j}}\,\cos(\theta/2)^{N-j}\sin(\theta/2)^{j}.
+\]
+The capstone theorem \texttt{saturatedCoherentState\_zero\_apply} proves that at
+\(\varphi = 0\) the coefficient of \(\Xi_{\theta,0}\) at basis configuration
+\(\sigma\) is the product of one-site amplitudes,
+\[
+  \Xi_{\theta,0}(\sigma) \;=\; \prod_{x} \texttt{saturatedCoherentAmp}\,N\,\theta\,(\sigma\,x).
+\]
+The proof runs through uniqueness of solutions of the linear ODE
+\(\dot x = -i\,\hat S^{(2)}_{\mathrm{tot}}\,x\) (via \texttt{onSiteS\_mulVec\_prod},
+the Leibniz action of a one-site operator on a product state): both the
+matrix-exponential coherent state and the amplitude product solve this ODE and
+agree at \(\theta = 0\), so the half-angle \(\theta/2\) in the amplitude is
+forced by the ODE rather than inserted by hand. The square-root binomial
+identities that move a ladder matrix element \(\sqrt{(t+1)(n-t)}\) between the
+neighbouring Clebsch--Gordan weights \(\sqrt{\binom{n}{t}}\) and
+\(\sqrt{\binom{n}{t+1}}\) live in the shared file
+\texttt{Math/Combinatorics/SqrtChooseLadder.lean}, which the per-site Weyl
+transport of \(\hat S^{\pm}\)
+(\texttt{Quantum/SpinS/GeneralSWeylLadder.lean}) consumes as well.
+\texttt{lake build} is
+warning-free and \texttt{\#print axioms saturatedCoherentState\_zero\_apply}
+yields only \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
+(axiom-free). This is the first PR of the Problem 2.4.b arc: it establishes
+only the product form of eq.~(S.18), which belongs to the solution of
+Problem~2.4.c and is what the solution of Problem~2.4.b starts from (that
+solution expands \(\hat U^{(2)}_{\theta}\Phi^\uparrow = \sum_M c_M \Phi_M\) and
+needs every \(c_M\) to be nonzero); the Fourier-inversion capstone eq.~(S.17),
+which is the solution of Problem~2.4.b itself and expresses \(\Phi_M\) in terms
+of \(\Xi_{\theta,\varphi}\), is deferred to a follow-up PR. References:
+H.~Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems},
+Springer 2020: the coherent state
+\(\Xi_{\theta,\varphi} := \hat U^{(3)}_{\varphi}\hat U^{(2)}_{\theta}\Phi^\uparrow\)
+is eq.~(2.4.6), p.~33, and the global rotation
+\(\hat U^{(\alpha)}_{\theta} = \exp[-i\theta\,\hat S^{(\alpha)}_{\mathrm{tot}}]\)
+is eq.~(2.2.11), p.~22; the site-product form is eq.~(S.18) of the solution to
+Problem~2.4.c (statement p.~34, solution p.~497, stated there for
+\(S = 1/2\)); Problem~2.4.b is stated on p.~34 with solution on
+pp.~496--497, eq.~(S.17).
+
 \subsection*{DONE: Tasaki Problem 2.2.c}
 
 \textbf{Statement} (Tasaki §2.2, eq.~(2.2.15), p.~24): The
