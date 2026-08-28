@@ -130,4 +130,33 @@ private theorem sum_adj_normSq_sub [Fintype Λ]
     hswap (fun x y => (starRingEnd ℂ) (g y) * g x)]
   ring
 
+/-- **Tasaki Problem 2.4.d, eq. (2.4.14), p. 35** (solution p. 497, eq. (S.20)): for a finite
+graph `(Λ, B)` with lattice Laplacian `Δ = A - D` of eq. (2.4.13) and arbitrary `g : Λ → ℂ`,
+
+`Σ_{x,y ∈ Λ} conj(g_x) Δ_{x,y} g_y = -Σ_{{x,y} ∈ B} |g_x - g_y|²`,
+
+the right-hand side being an unordered sum over the bonds `B = G.edgeFinset`. The identity is
+unconditional: no connectivity, non-emptiness, or hypothesis on `g` is required. -/
+theorem tasaki_problem_2_4_d_graph_quadratic_form [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (g : Λ → ℂ) :
+    ∑ x : Λ, ∑ y : Λ, (starRingEnd ℂ) (g x) * latticeLaplacian G x y * g y
+      = -∑ e ∈ G.edgeFinset,
+          Sym2.lift ⟨fun x y => ((Complex.normSq (g x - g y) : ℝ) : ℂ),
+            fun a b => by
+              change ((Complex.normSq (g a - g b) : ℝ) : ℂ)
+                = ((Complex.normSq (g b - g a) : ℝ) : ℂ)
+              rw [← Complex.normSq_neg (g a - g b), neg_sub]⟩ e := by
+  have hbridge := two_sum_edgeFinset_lift_eq_sum_adj G
+    (⟨fun x y => ((Complex.normSq (g x - g y) : ℝ) : ℂ),
+      fun a b => by
+        change ((Complex.normSq (g a - g b) : ℝ) : ℂ)
+          = ((Complex.normSq (g b - g a) : ℝ) : ℂ)
+        rw [← Complex.normSq_neg (g a - g b), neg_sub]⟩ :
+      {f : Λ → Λ → ℂ // ∀ a b, f a b = f b a})
+  dsimp only at hbridge
+  rw [sum_adj_normSq_sub] at hbridge
+  refine mul_left_cancel₀ (show (2 : ℂ) ≠ 0 by norm_num) ?_
+  rw [sum_conj_mul_latticeLaplacian_mul]
+  linear_combination hbridge
+
 end LatticeSystem.Lattice
