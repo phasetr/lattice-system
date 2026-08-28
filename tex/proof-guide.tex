@@ -1321,6 +1321,126 @@ level splitting (S.39)--(S.41) are not part of this layer.
 \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
 (axiom-free).
 
+\subsection{The low-energy eigenvalue equation and its parity
+ansatz pair (Tasaki Problem 3.3.a)}
+\label{subsec:ising-low-energy-eigenvectors}
+
+\emph{Source file:}
+\texttt{LatticeSystem/Quantum/IsingLowEnergyProblem33aEigenvectors.lean};
+regression fixtures in
+\texttt{LatticeSystem/Tests/Problem33aLowEnergy.lean}.
+
+\emph{Reference:} Tasaki~\cite{Tasaki:QMB}, Problem~3.3.a: statement
+p.~59, solution eqs.~(S.28)--(S.31) on p.~499 and eqs.~(S.32)--(S.34)
+on p.~500. The model is eq.~(3.3.1), p.~56, with open boundary
+conditions; with the spin-$1/2$ convention
+$\hat\sigma^{(\alpha)} = 2\hat S^{(\alpha)}$ of §2.1,
+eqs.~(2.1.7)--(2.1.8), p.~15, it is
+\texttt{quantumIsingHamiltonian $N$ $(1/4)$ $(\lambda/2)$} on $L = N+1$
+sites, and its compression to the $2L$ low-energy configurations is
+\texttt{lowEnergyMatrix $N$ $\lambda$} of
+§\ref{subsec:ising-low-energy-matrix}.
+
+Expanding a low-energy state as
+$|\Phi\rangle = \sum_j \varphi_j |\Phi_j\rangle$ over the $2L$ basis
+configurations, eq.~(S.28), turns the eigenvector equation (S.29) into
+the scalar recursion (S.30).
+
+\begin{theorem}[\texttt{lowEnergyMatrix\_mulVec\_eq\_iff}]
+For $L \ge 2$ and any $\varepsilon \in \mathbb{R}$ and
+$\varphi : \mathbb{Z}/2L\mathbb{Z} \to \mathbb{C}$,
+\[
+  \texttt{lowEnergyMatrix}\,N\,\lambda \cdot \varphi
+    = \left(-\tfrac{N}{4} + \varepsilon\right)\varphi
+  \iff
+  \varepsilon\varphi_j
+    = -\frac{\lambda}{2}\left(\varphi_{j-1} + \varphi_{j+1}\right)
+      + v_j\,\varphi_j
+  \quad\text{for all } j \in \mathbb{Z}/2L\mathbb{Z},
+\]
+where $v_j = \texttt{ringPotential}\,N\,j$ is the potential of
+eq.~(S.30).
+\end{theorem}
+
+The recursion is asserted at \emph{every} label, $j = 0$ included.
+Eq.~(S.30) is printed ``for any $j = 1,\dots,2L-1$'', yet p.~500
+derives (S.33) from it ``with $j = 0$ or $L$''; the quantified form is
+the eigenvector equation of the $2L \times 2L$ matrix and subsumes both
+readings. The hypothesis $L \ge 2$ is needed because the two ring
+neighbours $j+1$ and $j-1$ of a label are distinct only then.
+
+\begin{definition}[\texttt{tightBindingEnergy},
+\texttt{lowEnergyAnsatz}, \texttt{rootEquation}]
+Eq.~(S.31) is the eigenvalue
+\[
+  \varepsilon
+  \;=\; \texttt{tightBindingEnergy}\,\lambda\,\kappa
+  \;=\; -\frac{\lambda}{2}\left(e^{\kappa} + e^{-\kappa}\right)
+        + \frac{1}{2},
+\]
+eq.~(S.32) is the two-branch ansatz
+\[
+  \varphi_j =
+  \begin{cases}
+    e^{-\kappa j} + s\,e^{-\kappa(L-j)}, & j = 0,\dots,L,\\
+    s\,e^{-\kappa(j-L)} + e^{-\kappa(2L-j)}, & j = L,\dots,2L,
+  \end{cases}
+\]
+and eq.~(S.34) is the root equation
+\[
+  e^{\kappa} - e^{-\kappa}
+    \;=\; \lambda^{-1}\,
+      \frac{1 + s\,e^{-\kappa L}}{1 - s\,e^{-\kappa L}} .
+\]
+The source's $\pm$ in the ansatz and its $\pm$/$\mp$ pair in (S.34) are
+encoded by a single sign $s = \pm 1$, shared by the ansatz, the
+numerator and the denominator: $s = +1$ is the symmetric solution
+($\varphi_L = \varphi_0$) and $s = -1$ the antisymmetric one
+($\varphi_L = -\varphi_0$).
+\end{definition}
+
+The two branches of the ansatz agree at $j = L$, and the second branch
+returns at $j = 2L$ to the value of the first at $j = 0$, so the
+definition is consistent with the periodicity $\varphi_{j+2L} =
+\varphi_j$ of (S.30). All subtractions are carried out in $\mathbb{R}$
+after casting the label, so no truncated natural subtraction occurs.
+
+\begin{theorem}[\texttt{lowEnergyAnsatz\_isEigenvector}]
+Let $L \ge 2$, $\lambda > 0$, $\kappa > 0$ and $s = \pm 1$ satisfy the
+root equation (S.34). Then $\varphi \ne 0$ and
+\[
+  \texttt{lowEnergyMatrix}\,N\,\lambda \cdot \varphi
+    = \left(-\frac{N}{4}
+      + \texttt{tightBindingEnergy}\,\lambda\,\kappa\right)\varphi .
+\]
+\end{theorem}
+
+The proof splits the recursion into the $2L-2$ labels carrying a domain
+wall and the two aligned labels. At a domain-wall label the ansatz
+satisfies $\varphi_{j-1} + \varphi_{j+1} = (e^{\kappa} +
+e^{-\kappa})\varphi_j$ for \emph{every} $\kappa$, which together with
+$v_j = 1/2$ is exactly (S.31); at $j = 0$ and $j = L$ the potential
+vanishes, the two branches meet, and the equation becomes (S.33),
+$\varepsilon(1 + s\,e^{-\kappa L}) = -\lambda(e^{-\kappa} +
+s\,e^{-\kappa(L-1)})$, which for $\lambda > 0$ and $\kappa > 0$ is
+equivalent to (S.34) --- the denominator $1 - s\,e^{-\kappa L}$ is then
+positive for either sign. The value $\varphi_0 = 1 + s\,e^{-\kappa L}$
+is positive, which is what makes the eigenvector nonzero.
+
+\paragraph{Scope.}
+As in §\ref{subsec:ising-low-energy-matrix}, $\hat H$ does not preserve
+the span of the $2L$ configurations, so
+\texttt{tightBindingEnergy $\lambda$ $\kappa$} is an eigenvalue of the
+compression and nothing more: it is not identified with a ground-state
+or first-excited energy of $\hat H$, and the source's non-rigorous
+Taylor steps (S.36)--(S.38) are not asserted. The constant
+$\kappa_\infty$ of (S.35), the existence of the two roots, the sign of
+the splitting (S.40) and the asymptotics (S.41) are not part of this
+layer. \texttt{lake build} is warning-free on both roots and
+\texttt{\#print axioms} on each new declaration yields only
+\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
+(axiom-free).
+
 \subsection{Gibbs state instantiation}
 \label{subsec:ising-gibbs}
 
