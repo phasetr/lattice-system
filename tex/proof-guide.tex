@@ -135,6 +135,75 @@ into a single sum over $\mathrm{Fin}~N$:
 This is the missing piece used to prove the generic-$N$ Ising
 chain bridge.
 
+\subsection{Ordered-pair sum $\leftrightarrow$ unordered-edge sum bridge}
+
+Two generic lemmas in \texttt{LatticeSystem.Lattice.Graph} relate
+the ordered double sum over adjacent pairs to the unordered sum
+over \texttt{G.edgeFinset}, using the dart fibration mathlib uses
+for the handshaking lemma:
+
+\begin{itemize}
+  \item \texttt{sum\_adj\_eq\_sum\_dart}: for
+    $f : \Lambda \to \Lambda \to \alpha$,
+    $\sum_{x,y \in \Lambda} [G.\mathrm{Adj}~x~y]\, f(x,y)
+      = \sum_{d \in G.\mathrm{Dart}} f(d.\mathrm{fst}, d.\mathrm{snd})$.
+  \item \texttt{two\_sum\_edgeFinset\_lift\_eq\_sum\_adj}: for a
+    symmetric $f$ (packaged as a
+    \texttt{\{f // $\forall$ a b, f a b = f b a\}}),
+    $\sum_{e \in G.\mathrm{edgeFinset}} \mathrm{Sym2.lift}~f~e
+      + \sum_{e \in G.\mathrm{edgeFinset}} \mathrm{Sym2.lift}~f~e
+      = \sum_{x,y \in \Lambda} [G.\mathrm{Adj}~x~y]\, f(x,y)$.
+    The factor $2$ is introduced once, as $a+a$, and cancelled
+    once, by \texttt{mul\_left\_cancel}$_0$; division is never used.
+\end{itemize}
+
+\subsection{Lattice Laplacian quadratic form (Tasaki Problem 2.4.d)}
+
+H. Tasaki, \emph{Physics and Mathematics of Quantum Many-Body
+Systems}, Springer 2020, Problem 2.4.d, p.\,35 (solution p.\,497,
+eq.~(S.20)) asks to derive the quadratic-form identity of the
+lattice Laplacian, eq.~(2.4.13)--(2.4.14), p.\,35, for a finite
+graph $(\Lambda, B)$. The lattice Laplacian is
+\begin{align*}
+  \Delta_{x,y} =
+  \begin{cases}
+    -|N(x)| & \text{if } x = y, \\
+    1 & \text{if } \{x,y\} \in B, \\
+    0 & \text{otherwise},
+  \end{cases}
+\end{align*}
+i.e.\ $\Delta = A - D$, the \emph{negative} of mathlib's
+\texttt{SimpleGraph.lapMatrix} (which is $L = D - A$). This is
+implemented as
+\texttt{LatticeSystem.Lattice.latticeLaplacian~G~:=~-(G.lapMatrix~$\mathbb{C}$)}
+in \texttt{LatticeSystem/Lattice/GraphLaplacianQuadraticForm.lean},
+with the sign pinned entrywise, exactly once, by
+\texttt{latticeLaplacian\_apply}; every later step reads only that
+lemma and never unfolds \texttt{lapMatrix} again. (mathlib's own
+\texttt{SimpleGraph.lapMatrix\_toLinearMap}$_2'$ is non-conjugated
+and carries the opposite sign, so it is not reusable for this
+sesquilinear identity.)
+
+The capstone,
+\texttt{tasaki\_problem\_2\_4\_d\_graph\_quadratic\_form}, proves
+eq.~(2.4.14) exactly as printed, for arbitrary $g : \Lambda \to
+\mathbb{C}$:
+\begin{align*}
+  \sum_{x,y \in \Lambda} \overline{g_x}\, \Delta_{x,y}\, g_y
+    = -\sum_{\{x,y\} \in B} |g_x - g_y|^2,
+\end{align*}
+with the right-hand side a genuine unordered sum over
+\texttt{G.edgeFinset} (via \texttt{Sym2.lift}), not a halved
+ordered double sum. The required instances are exactly
+\texttt{[Fintype~$\Lambda$]~[DecidableEq~$\Lambda$]~[DecidableRel~G.Adj]};
+no hypothesis on $g$, no \texttt{Nonempty}, and no connectivity
+assumption is needed. The proof combines the diagonal/off-diagonal
+split of the quadratic form with the ordered-pair expansion of
+$|g_x-g_y|^2$ (both proved in $\mathbb{C}$, never via the real-valued
+\texttt{Complex.normSq\_sub}) and the edge-sum bridge above, closing
+with \texttt{mul\_left\_cancel}$_0$ on $2 \cdot \mathrm{LHS} =
+2 \cdot \mathrm{RHS}$.
+
 \subsection{Future directions}
 
 \begin{itemize}

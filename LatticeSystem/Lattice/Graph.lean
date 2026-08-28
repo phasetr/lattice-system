@@ -46,6 +46,10 @@ This module provides:
 * Identification of `pathGraph (N + 1)` / `cycleGraph (N + 2)`
   adjacency with the elementary `x.val + 1 = y.val ∨ ...` form
   used by `openChainCoupling` / `periodicChainCoupling`.
+* The bridge between an ordered double sum over adjacent pairs and
+  an unordered sum over `G.edgeFinset`, for an arbitrary finite
+  graph (`sum_adj_eq_sum_dart`,
+  `two_sum_edgeFinset_lift_eq_sum_adj`).
 -/
 
 namespace LatticeSystem.Lattice
@@ -381,6 +385,72 @@ lemma sum_pathGraph_adj {α : Type*} [AddCommMonoid α] (N : ℕ)
   simp_rw [key, Finset.sum_add_distrib]
   rw [sum_pathGraph_forward, sum_pathGraph_backward,
     ← Finset.sum_add_distrib]
+
+/-! ## Unordered edge sums
+
+Bridge between the two ways of summing a pairwise quantity over a
+finite graph: the ordered double sum `Σ_{x,y} [x ~ y] f x y` used by
+matrix-level statements, and the unordered sum `Σ_{{x,y} ∈ E} f`
+over `G.edgeFinset` used by the physics literature. Each unordered
+edge splits into exactly two darts, so for symmetric `f` the ordered
+sum is the unordered one taken twice. The doubling is kept as
+`a + a` rather than `2 • a` or a division, so that the lemma stays
+in `AddCommMonoid` and callers cancel the factor `2` explicitly. -/
+
+/-- **Darts realise the ordered adjacency sum**: the ordered double
+sum of `f` restricted to adjacent pairs is the sum of `f` over the
+darts of `G`, i.e. over the ordered pairs `(d.fst, d.snd)` carrying
+an adjacency proof. -/
+theorem sum_adj_eq_sum_dart {α : Type*} [AddCommMonoid α] [Fintype Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (f : Λ → Λ → α) :
+    ∑ x : Λ, ∑ y : Λ, (if G.Adj x y then f x y else 0)
+      = ∑ d : G.Dart, f d.fst d.snd := by
+  rw [← Finset.sum_product', ← Finset.sum_filter]
+  symm
+  apply Finset.sum_bij
+    (fun (d : G.Dart) (_ : d ∈ (Finset.univ : Finset G.Dart)) =>
+      ((d.fst, d.snd) : Λ × Λ))
+  · intro d _
+    simp [d.adj]
+  · intro d₁ _ d₂ _ h
+    exact SimpleGraph.Dart.ext d₁ d₂
+      (Prod.ext (congrArg Prod.fst h) (congrArg Prod.snd h))
+  · intro p hp
+    rw [Finset.mem_filter] at hp
+    exact ⟨⟨p, hp.2⟩, Finset.mem_univ _, rfl⟩
+  · intro d _
+    rfl
+
+/-- **The ordered adjacency sum is the unordered edge sum, doubled.**
+For `f` symmetric (packaged as the domain of `Sym2.lift`), summing
+`Sym2.lift f` over `G.edgeFinset` twice recovers the ordered double
+sum over adjacent pairs, because the dart fibre over each edge is the
+two-element set `{d, d.symm}`. -/
+theorem two_sum_edgeFinset_lift_eq_sum_adj {α : Type*}
+    [AddCommMonoid α] [Fintype Λ] (G : SimpleGraph Λ)
+    [DecidableRel G.Adj]
+    (f : {f : Λ → Λ → α // ∀ a b, f a b = f b a}) :
+    ∑ e ∈ G.edgeFinset, Sym2.lift f e
+        + ∑ e ∈ G.edgeFinset, Sym2.lift f e
+      = ∑ x : Λ, ∑ y : Λ, (if G.Adj x y then f.1 x y else 0) := by
+  classical
+  rw [sum_adj_eq_sum_dart,
+    ← Finset.sum_fiberwise_of_maps_to (g := SimpleGraph.Dart.edge)
+      (t := G.edgeFinset)
+      (fun d _ => SimpleGraph.mem_edgeFinset.2 d.edge_mem),
+    ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun e he => ?_
+  revert he
+  induction e using Sym2.ind with
+  | _ x y =>
+    intro he
+    have hadj : G.Adj x y := SimpleGraph.mem_edgeFinset.1 he
+    have hfib : ({d' : G.Dart | d'.edge = s(x, y)} : Finset _)
+        = {(⟨(x, y), hadj⟩ : G.Dart), (⟨(x, y), hadj⟩ : G.Dart).symm} :=
+      SimpleGraph.Dart.edge_fiber (⟨(x, y), hadj⟩ : G.Dart)
+    rw [hfib, Finset.sum_pair (SimpleGraph.Dart.symm_ne _).symm,
+      Sym2.lift_mk]
+    exact congrArg _ (f.2 x y)
 
 /-- The 2D infinite square lattice on `ℤ × ℤ` as a `SimpleGraph`,
 the box product of two integer chains. Adjacency: nearest neighbours
