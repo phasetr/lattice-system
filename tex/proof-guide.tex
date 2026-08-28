@@ -20861,6 +20861,79 @@ the expansion is Theorem~2.1 / eq.~(2.4.10), p.~34; the coherent state
 \(\Xi_{\theta,\varphi}\) is eq.~(2.4.6), p.~33; the global rotations are
 eq.~(2.2.11), p.~22.
 
+\textbf{Problem 2.4.c capstone: the closed-form coherent-state expansion,
+eq.~(S.19).} The new file
+\texttt{Quantum/SpinS/SaturatedCoherentExpansion.lean} proves the
+closed-form expansion of the coherent state in the sector states
+\(\Phi_M\),
+\[
+  \Xi_{\theta,\varphi} \;=\; \sum_M e^{-iM\varphi}\,
+    \sqrt{\binom{2S_{\max}}{S_{\max}-M}}\,
+    \cos(\theta/2)^{S_{\max}+M}\sin(\theta/2)^{S_{\max}-M}\;\Phi_M,
+\]
+which is the solution of Problem~2.4.c (statement p.~34, solution p.~497,
+eq.~(S.19)). Two new supporting files are used. The file
+\texttt{Math/Combinatorics/ChooseConfigFiber.lean} proves the
+source-independent \(|\Lambda|\)-fold Vandermonde convolution
+\texttt{Math.sum\_prod\_choose\_fiber}: summing \(\prod_x \binom{N}{\sigma_x}\)
+over configurations of fixed total index \(k\) gives \(\binom{|\Lambda|N}{k}\),
+by comparing coefficients of \((1+X)^{|\Lambda|N} = \prod_x (1+X)^N\). The
+file \texttt{Quantum/SpinS/SaturatedLadderComponent.lean} evaluates the
+ladder iterate, its norm, and the sector state \(\Phi_M\) itself in closed
+component form: \texttt{totalSpinSOpMinus\_pow\_allAlignedStateS\_zero\_apply}
+gives \((\hat S^-_{\mathrm{tot}})^k\Phi^\uparrow\) as \(k!\prod_x
+\sqrt{\binom{N}{\sigma_x}}\) on the fiber \(\sum_x \sigma_x = k\) and \(0\)
+off it (via the general one-site matrix-vector action
+\texttt{onSiteS\_mulVec\_apply}, from which the earlier
+\texttt{onSiteS\_mulVec\_prod} is now re-derived);
+\texttt{saturatedLadderNorm\_eq} evaluates its \(\ell^2\) norm to
+\(k!\sqrt{\binom{|\Lambda|N}{k}}\) using the Vandermonde identity; and
+\texttt{saturatedWeightVector\_apply} is eq.~(2.4.11), p.~34, in its
+general-\(S\) form: \(\Phi_M\) is
+\((\sqrt{\binom{|\Lambda|N}{k}})^{-1}\prod_x\sqrt{\binom{N}{\sigma_x}}\) on
+the fiber \(k = S_{\max}-M\) and \(0\) off it (for \(S=1/2\) every one-site
+weight is \(1\), recovering Tasaki's printed uniform-weight form). Combining
+the site-product form of \(\Xi_{\theta,0}\) (eq.~(S.18), proved above) with
+this closed form of \(\Phi_M\) on their common fiber gives the theorem
+\texttt{saturatedCoherentCoeff\_eq}, the closed-form sector coefficient of
+eq.~(S.19),
+\[
+  c_M(\theta) \;=\; \sqrt{\binom{2S_{\max}}{S_{\max}-M}}\,
+    \cos(\theta/2)^{S_{\max}+M}\sin(\theta/2)^{S_{\max}-M},
+\]
+and the capstone theorem \texttt{tasaki\_problem\_2\_4\_c\_coherent\_expansion}
+follows by substituting it into \texttt{saturatedCoherentState\_eq\_sum}
+above. The result is exact for arbitrary real \(\theta\), \(\varphi\), and
+general spin \(S = N/2\); Tasaki states Problem~2.4.c only for \(S = 1/2\),
+noting that a general spin can be represented by \(S=1/2\) spins.
+\texttt{lake build} is warning-free and
+\texttt{\#print axioms tasaki\_problem\_2\_4\_c\_coherent\_expansion} yields
+only \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
+(axiom-free). This completes Problem~2.4.c.
+
+\textbf{Phase convention.} The adopted azimuthal factor is
+\(e^{-iM\varphi}\). The exponent printed in (S.19) is \(e^{-iM\varphi/2}\),
+which is inconsistent with its own neighbours on p.~497 and with the
+definition it is derived from: (S.18), displayed on the same page, carries
+the per-site phases \(e^{-i\varphi/2}\) on \(|\psi^\uparrow\rangle\) and
+\(e^{+i\varphi/2}\) on \(|\psi^\downarrow\rangle\), so a configuration with
+\(n_\uparrow\) up and \(n_\downarrow\) down spins acquires
+\(e^{-i(n_\uparrow-n_\downarrow)\varphi/2} = e^{-iM\varphi}\), because
+\(M = (n_\uparrow-n_\downarrow)/2\); (S.17), displayed immediately above on
+the same page, carries \(e^{i(M-M')\varphi}\) with no \(/2\); and the phase
+factorisation \(\Xi_{\theta,\varphi}(\sigma) = e^{-i\varphi M(\sigma)}
+\Xi_{\theta,0}(\sigma)\), proved above as
+\texttt{saturatedCoherentState\_apply\_phase}, follows directly from
+eqs.~(2.4.6), p.~33, and (2.2.11), p.~22. The capstone therefore uses
+\(e^{-iM\varphi}\) --- literally the factor produced by
+\texttt{saturatedCoherentState\_eq\_sum} --- with the
+\(\sqrt{\phantom{x}}\)-binomial, \(\cos\) and \(\sin\) factors exactly as
+printed. References: H.~Tasaki, \emph{Physics and Mathematics of Quantum
+Many-Body Systems}, Springer 2020: Problem~2.4.c is stated on p.~34 with
+solution on p.~497, eqs.~(S.18)--(S.19); \(\Phi_M\) is eq.~(2.4.9), p.~33;
+eq.~(2.4.11) is on p.~34; the coherent state \(\Xi_{\theta,\varphi}\) is
+eq.~(2.4.6), p.~33; the global rotations are eq.~(2.2.11), p.~22.
+
 \subsection*{DONE: Tasaki Problem 2.2.c}
 
 \textbf{Statement} (Tasaki §2.2, eq.~(2.2.15), p.~24): The
