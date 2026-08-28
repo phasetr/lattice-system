@@ -77,6 +77,7 @@ import LatticeSystem.Quantum.SpinS.CasimirInvariance
 import LatticeSystem.Quantum.SpinS.DiagProjOrtho
 import LatticeSystem.Quantum.SpinS.SpanningTheorem
 import LatticeSystem.Lattice.Scale
+import LatticeSystem.Lattice.GraphLaplacianQuadraticForm
 import LatticeSystem.Quantum.SU2Integral
 import LatticeSystem.Quantum.SpinOneDecomp
 import LatticeSystem.Quantum.Rotation3D
