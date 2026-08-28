@@ -20747,13 +20747,13 @@ transport of \(\hat S^{\pm}\)
 \texttt{lake build} is
 warning-free and \texttt{\#print axioms saturatedCoherentState\_zero\_apply}
 yields only \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
-(axiom-free). This is the first PR of the Problem 2.4.b arc: it establishes
-only the product form of eq.~(S.18), which belongs to the solution of
-Problem~2.4.c and is what the solution of Problem~2.4.b starts from (that
-solution expands \(\hat U^{(2)}_{\theta}\Phi^\uparrow = \sum_M c_M \Phi_M\) and
-needs every \(c_M\) to be nonzero); the Fourier-inversion capstone eq.~(S.17),
-which is the solution of Problem~2.4.b itself and expresses \(\Phi_M\) in terms
-of \(\Xi_{\theta,\varphi}\), is deferred to a follow-up PR. References:
+(axiom-free). This is the product form of eq.~(S.18), which belongs to the
+solution of Problem~2.4.c and is what the solution of Problem~2.4.b starts
+from (that solution expands \(\hat U^{(2)}_{\theta}\Phi^\uparrow = \sum_M c_M
+\Phi_M\) and needs every \(c_M\) to be nonzero); the Fourier-inversion
+capstone eq.~(S.17), which is the solution of Problem~2.4.b itself and
+expresses \(\Phi_M\) in terms of \(\Xi_{\theta,\varphi}\), is proved below.
+References:
 H.~Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems},
 Springer 2020: the coherent state
 \(\Xi_{\theta,\varphi} := \hat U^{(3)}_{\varphi}\hat U^{(2)}_{\theta}\Phi^\uparrow\)
@@ -20764,8 +20764,8 @@ Problem~2.4.c (statement p.~34, solution p.~497, stated there for
 \(S = 1/2\)); Problem~2.4.b is stated on p.~34 with solution on
 pp.~496--497, eq.~(S.17).
 
-\textbf{Problem 2.4.b step 2 of 3: weight vectors, expansion, and coefficient
-nonvanishing (eq.~(S.17) still pending).} The new file
+\textbf{Problem 2.4.b weight vectors, expansion, and coefficient
+nonvanishing.} The new file
 \texttt{Quantum/SpinS/SaturatedCoherentWeight.lean} introduces the normalised
 magnetisation-sector state \(\Phi_M\) of eq.~(2.4.9), p.~33: for
 \(k = |\Lambda|S - M\), \texttt{saturatedLadderNorm} is the \(\ell^2\) norm
@@ -20802,15 +20802,64 @@ is needed. \texttt{lake build} is warning-free and
 \texttt{\#print axioms saturatedCoherentState\_zero\_eq\_sum} and
 \texttt{\#print axioms saturatedCoherentCoeff\_ne\_zero} both yield only
 \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound} (axiom-free).
-This is the second PR of the Problem~2.4.b arc: the expansion and its
-nonvanishing coefficients are exactly the ingredients that the solution of
-Problem~2.4.b needs in order to invert the expansion by Fourier inversion; the
-inversion itself, eq.~(S.17), which expresses \(\Phi_M\) in terms of
-\(\Xi_{\theta,\varphi}\), remains a follow-up PR. References: H.~Tasaki,
-\emph{Physics and Mathematics of Quantum Many-Body Systems}, Springer 2020:
-\(\Phi_M\) is eq.~(2.4.9), p.~33; the expansion
+The expansion and its nonvanishing coefficients are exactly the ingredients
+that the solution of Problem~2.4.b needs in order to invert the expansion by
+Fourier inversion; the inversion itself, eq.~(S.17), which expresses
+\(\Phi_M\) in terms of \(\Xi_{\theta,\varphi}\), is proved below. References:
+H.~Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems},
+Springer 2020: \(\Phi_M\) is eq.~(2.4.9), p.~33; the expansion
 \(\Phi = \sum_M c_M \Phi_M\) is Theorem~2.1 / eq.~(2.4.10), p.~34; Problem~2.4.b
 is stated on p.~34 with solution on pp.~496--497, eq.~(S.17).
+
+\textbf{Problem 2.4.b capstone: the Fourier-inversion projection formula,
+eq.~(S.17).} The new file
+\texttt{Quantum/SpinS/SaturatedCoherentProjection.lean} completes
+Problem~2.4.b. The theorem \texttt{saturatedCoherentState\_apply\_phase}
+proves the azimuthal phase factorisation
+\[
+  \Xi_{\theta,\varphi}(\sigma) \;=\; e^{-i\varphi M(\sigma)}\,\Xi_{\theta,0}(\sigma),
+\]
+the general-\(S\) form of the per-site phases displayed in eq.~(S.18),
+p.~497. Lifting this pointwise identity through the
+\(\Xi_{\theta,0} = \sum_M c_M(\theta)\Phi_M\) expansion gives the theorem
+\texttt{saturatedCoherentState\_eq\_sum}, the general-\(\varphi\) sector
+expansion
+\[
+  \Xi_{\theta,\varphi} \;=\; \sum_M e^{-i\varphi M}\,c_M(\theta)\,\Phi_M,
+\]
+which is the identity that gives the middle member of eq.~(S.17). The new file
+\texttt{Math/Analysis/FiniteExponentialWeightIntegral.lean} supplies the
+source-independent finite-Fourier lemma
+\texttt{Math.integral\_exp\_int\_weight\_smul\_sum}: for a finite family
+indexed by injective integer weights, integrating the weighted sum against
+the conjugate character of one weight over a full period keeps only that
+weight's term, scaled by \(2\pi\); this lemma has no spin or lattice content
+and is stated over an arbitrary complete normed space. Applying it to the
+sector expansion with the integer sector-index weights gives the capstone
+theorem \texttt{tasaki\_problem\_2\_4\_b\_phase\_projection}: for
+\(0 < \theta < \pi\) and every sector \(k\) (with \(M = |\Lambda|S - k\)),
+\(c_M(\theta) \neq 0\),
+\[
+  \int_0^{2\pi}\!d\varphi\;e^{iM\varphi}\,\Xi_{\theta,\varphi}
+  \;=\; 2\pi\,c_M(\theta)\,\Phi_M
+  \qquad \text{(eq.~(S.17))},
+\]
+and consequently
+\[
+  \Phi_M \;=\; \bigl(2\pi\,c_M(\theta)\bigr)^{-1}
+    \int_0^{2\pi}\!d\varphi\;e^{iM\varphi}\,\Xi_{\theta,\varphi}
+\]
+--- the answer to the problem as posed, expressing \(\Phi_M\) through the
+coherent states \(\Xi_{\theta,\varphi}\) alone. \texttt{lake build} is
+warning-free and \texttt{\#print axioms
+tasaki\_problem\_2\_4\_b\_phase\_projection} yields only \texttt{propext},
+\texttt{Classical.choice}, \texttt{Quot.sound} (axiom-free). This completes
+Problem~2.4.b. References: H.~Tasaki, \emph{Physics and Mathematics of
+Quantum Many-Body Systems}, Springer 2020: Problem~2.4.b is stated on p.~34
+with solution on pp.~496--497, eq.~(S.17); \(\Phi_M\) is eq.~(2.4.9), p.~33;
+the expansion is Theorem~2.1 / eq.~(2.4.10), p.~34; the coherent state
+\(\Xi_{\theta,\varphi}\) is eq.~(2.4.6), p.~33; the global rotations are
+eq.~(2.2.11), p.~22.
 
 \subsection*{DONE: Tasaki Problem 2.2.c}
 

@@ -3,6 +3,7 @@ import LatticeSystem.Math.RayleighAtEigenvector
 import LatticeSystem.Math.RealEigenvalueLePF
 import LatticeSystem.Math.EffectiveLimit
 import LatticeSystem.Math.MonotoneEnumeration
+import LatticeSystem.Math.Analysis.FiniteExponentialWeightIntegral
 import LatticeSystem.Math.Analysis.RpowSublinearThreshold
 import LatticeSystem.Math.MatrixAnalysis.Decomposition
 import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationReducedResolvent
@@ -122,6 +123,7 @@ import LatticeSystem.Quantum.SpinS.GeneralSWeylLadder
 import LatticeSystem.Quantum.SpinS.GeneralSWeylCasimir
 import LatticeSystem.Quantum.SpinS.GeneralSCasimirDescent
 import LatticeSystem.Quantum.SpinS.SaturatedCoherentAmplitude
+import LatticeSystem.Quantum.SpinS.SaturatedCoherentProjection
 import LatticeSystem.Quantum.SpinS.SaturatedCoherentWeight
 
 /-!

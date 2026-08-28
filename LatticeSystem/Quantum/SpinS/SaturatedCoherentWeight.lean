@@ -77,7 +77,7 @@ theorem ladderIterateUp_apply_eq_zero_of_magEigenvalueS_ne
     (totalSpinSOpMinus_pow_allAlignedStateS_zero_mem_magSubspaceS k.val) h
 
 /-- The normalisation of a ladder iterate is nonzero, since the iterate itself is nonzero. -/
-private lemma saturatedLadderNorm_ne_zero [Nonempty V] (k : Fin (Fintype.card V * N + 1)) :
+lemma saturatedLadderNorm_ne_zero [Nonempty V] (k : Fin (Fintype.card V * N + 1)) :
     saturatedLadderNorm V N k ≠ 0 := by
   rw [saturatedLadderNorm, norm_ne_zero_iff]
   exact fun h => (ladderIterateUp_hasEigenvector k).right ((WithLp.toLp_eq_zero 2).mp h)
