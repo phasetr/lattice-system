@@ -1181,6 +1181,142 @@ eigenstates of $\hat H$. \texttt{lake build} is warning-free and
 \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
 (axiom-free).
 
+\subsection{The low-energy $2L$ matrix (Tasaki Problem 3.3.a)}
+\label{subsec:ising-low-energy-matrix}
+
+\emph{Source file:}
+\texttt{LatticeSystem/Quantum/IsingLowEnergyProblem33a.lean}; regression
+fixtures in \texttt{LatticeSystem/Tests/Problem33aLowEnergy.lean}.
+
+\emph{Reference:} Tasaki~\cite{Tasaki:QMB}, Problem~3.3.a: statement
+p.~59, solution pp.~498--499 (eqs.~(S.24)--(S.26) on p.~498;
+eqs.~(S.27)--(S.31), the sentence ``All other matrix elements are
+vanishing'' and Fig.~A.1 on p.~499). The model is eq.~(3.3.1), p.~56,
+with open boundary conditions; with the spin-$1/2$ convention
+$\hat\sigma^{(\alpha)} = 2\hat S^{(\alpha)}$ of §2.1,
+eqs.~(2.1.7)--(2.1.8), p.~15, it is
+\texttt{quantumIsingHamiltonian $N$ $(1/4)$ $(\lambda/2)$} on $L = N+1$
+sites.
+
+Problem~3.3.a describes the low-lying states of the chain inside the
+$2L$-dimensional space spanned by the two aligned configurations
+$|\Phi^\uparrow\rangle$, $|\Phi^\downarrow\rangle$ and the
+single-domain-wall configurations
+$|\Phi_j^{\uparrow\downarrow}\rangle$,
+$|\Phi_j^{\downarrow\uparrow}\rangle$ with $j = 1,\dots,L-1$.
+
+\begin{definition}[\texttt{lowEnergyConfig}, \texttt{wallSite}]
+For a label $a \in \mathbb{Z}/2L\mathbb{Z}$, the configuration
+$\texttt{lowEnergyConfig}\,N\,a$ has the spin at site $x$ up exactly
+when $a$ lies in the arc $x+1,\dots,x+L$ of the label ring. The site
+$\texttt{wallSite}\,N\,a \in \mathrm{Fin}(N+1)$ is the fold of the
+label ring onto the chain, $a \bmod L$; it is the domain wall of the
+label $a$.
+\end{definition}
+
+\begin{theorem}[\texttt{lowEnergyConfig\_natCast\_le},
+\texttt{lowEnergyConfig\_natCast\_add}]
+For $0 \le j \le L$ the label $j$ gives the configuration whose site
+$x$ is up iff $x < j$; that is $|\Phi^\downarrow\rangle$ at $j = 0$,
+$|\Phi_j^{\uparrow\downarrow}\rangle$ for $0 < j < L$ and
+$|\Phi^\uparrow\rangle$ at $j = L$. For $0 \le m \le L$ the label
+$L + m$ gives the mirror configuration whose site $x$ is down iff
+$x < m$, that is $|\Phi_m^{\downarrow\uparrow}\rangle$.
+\end{theorem}
+
+\begin{theorem}[\texttt{lowEnergyConfig\_injective}]
+The $2L$ labels give $2L$ pairwise distinct configurations: the
+low-energy space has the dimension $2L$ named in the problem
+statement.
+\end{theorem}
+
+\begin{theorem}[\texttt{lowEnergyConfig\_succ\_eq\_siteFlipAt}]
+Advancing the label by one step is exactly a single-site flip at the
+domain wall:
+$\texttt{lowEnergyConfig}\,N\,(a+1)
+  = \texttt{siteFlipAt}\,(\texttt{lowEnergyConfig}\,N\,a)\,
+    (\texttt{wallSite}\,N\,a)$.
+\end{theorem}
+
+\begin{theorem}[\texttt{lowEnergyConfig\_ne\_of\_not\_adjacent}]
+Let $L \ge 2$ and let $b \notin \{a, a+1, a-1\}$. Then
+$\texttt{lowEnergyConfig}\,N\,b$ is neither equal to nor a single-site
+flip of $\texttt{lowEnergyConfig}\,N\,a$, because the two
+configurations differ at the two distinct domain walls of $a$ and
+$a+1$. This is Tasaki's ``All other matrix elements are vanishing'',
+p.~499, at the level of configurations.
+\end{theorem}
+
+\begin{definition}[\texttt{lowEnergyMatrix}, \texttt{ringPotential},
+\texttt{tightBindingRing}]
+$\texttt{lowEnergyMatrix}\,N\,\lambda$ is the $2L \times 2L$ array of
+matrix elements
+$\langle\Phi_a|\hat H|\Phi_b\rangle$ of
+\texttt{quantumIsingHamiltonian $N$ $(1/4)$ $(\lambda/2)$} in the
+low-energy configuration basis. The potential $v_j$ of eq.~(S.30) is
+$\texttt{ringPotential}\,N\,j = 0$ for $j \in \{0, L\}$ and $1/2$
+otherwise, and $\texttt{tightBindingRing}\,N\,\lambda$ has hopping
+$-\lambda/2$ between ring-adjacent labels together with the diagonal
+potential.
+\end{definition}
+
+\begin{theorem}[\texttt{lowEnergyMatrix\_eq\_add\_tightBindingRing}]
+For $L \ge 2$,
+\[
+  \texttt{lowEnergyMatrix}\,N\,\lambda
+    \;=\; -\frac{N}{4}\,\mathbf{1}
+      \;+\; \texttt{tightBindingRing}\,N\,\lambda .
+\]
+\end{theorem}
+
+This single entrywise identity is Tasaki's eqs.~(S.24)--(S.27)
+together with the ``All other matrix elements are vanishing''
+sentence, p.~499. Because it fixes \emph{every} entry, it subsumes the
+printed index ranges of those equations: (S.25) for
+$j = 1,\dots,L-1$, (S.26) for $j = 1,\dots,L-2$, and the four
+$|\Phi^\uparrow\rangle$/$|\Phi^\downarrow\rangle$ couplings of (S.27).
+The diagonal constant $-N/4$ is
+$E^{(0)}_{\rm GS} = -(L-1)/4$ of (S.24), and the potential jump
+$1/2$ is (S.25).
+
+\paragraph{The ring is a ring of basis labels, not of lattice sites.}
+Eq.~(S.30) carries periodic boundary conditions
+$\varphi_{j+2L} = \varphi_j$, and Tasaki's Fig.~A.1, p.~499, draws the
+corresponding tight-binding model as a ring whose $2L$ sites are the
+$2L$ basis \emph{states}, each labelled by its spin configuration. In
+the formalization the labels have type $\mathbb{Z}/2L\mathbb{Z}$ while
+the lattice sites have type $\mathrm{Fin}(N+1)$; the two types are
+never identified. The physical chain stays open --- the bond sum of
+\texttt{quantumIsingHamiltonian} runs over $\mathrm{Fin}\,N$ --- and
+the periodic \texttt{isingCycleHamiltonian} is a different operator
+which does not occur in this layer. The regression fixtures enforce
+the distinction from both sides: at $L = 2$ the aligned diagonal entry
+is $-1/4 = -(L-1)/4$ and not the $-1/2$ a periodic two-site chain
+would give, while at $L = 3$ the labels $0$ and $2L-1 = 5$ are
+ring-adjacent and hop at $-\lambda/2$ even though the lattice sites
+$0$ and $L-1$ are not neighbours.
+
+\paragraph{Index range of (S.30).}
+Eq.~(S.30) is printed ``for any $j = 1,\dots,2L-1$'', but p.~500
+derives (S.33) from it ``with $j = 0$ or $L$''. The honest reading,
+and the one used here, is the eigenvector equation of the
+$2L \times 2L$ matrix, i.e.\ all labels
+$j \in \mathbb{Z}/2L\mathbb{Z}$.
+
+\paragraph{Scope.}
+This layer is the $2L$ basis and the compressed matrix only. Since
+$\hat H$ does not preserve the span of the $2L$ configurations, no
+entry and no eigenvalue of $\texttt{lowEnergyMatrix}$ is identified
+with the spectrum of $\hat H$; Tasaki himself notes on p.~59 that the
+perturbative analysis of this problem is not mathematically rigorous.
+The expansion (S.28)--(S.30) as a recursion, the ansatz
+(S.31)--(S.34), the constant $\kappa_\infty$ of (S.35), and the
+level splitting (S.39)--(S.41) are not part of this layer.
+\texttt{lake build} is warning-free on both roots and
+\texttt{\#print axioms} on each new declaration yields only
+\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
+(axiom-free).
+
 \subsection{Gibbs state instantiation}
 \label{subsec:ising-gibbs}
 
