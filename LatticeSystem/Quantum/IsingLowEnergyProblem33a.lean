@@ -238,4 +238,52 @@ theorem lowEnergyConfig_natCast_add (N m : ℕ) (hm : m ≤ N + 1) :
     have hv : (((n : ℕ) : ZMod (2 * (N + 1)))).val = n := ZMod.val_cast_of_lt (by omega)
     rw [hcast, if_pos (by rw [hv]; omega), if_neg h]
 
+/-- **(B5)** The `2L` labels give `2L` pairwise distinct configurations, so the low-energy space
+of Tasaki Problem 3.3.a really has the dimension `2L` named in the statement.
+
+Equality of two configurations forces the indicator of the first half of the label ring to be
+invariant under the shift by `b - a`; testing that invariance at the labels `0` and `L - 1`
+forces the shift to vanish. -/
+theorem lowEnergyConfig_injective (N : ℕ) : Function.Injective (lowEnergyConfig N) := by
+  intro a b hab
+  have hstep : ∀ x : Fin (N + 1),
+      ((a - (x.val : ZMod (2 * (N + 1))) - 1).val ≤ N
+        ↔ (b - (x.val : ZMod (2 * (N + 1))) - 1).val ≤ N) := by
+    intro x
+    have h := congrFun hab x
+    simp only [lowEnergyConfig] at h
+    exact (ite_eq_ite_iff (by decide : (0 : Fin 2) ≠ 1)).mp h
+  have hper : ∀ t : ZMod (2 * (N + 1)), (t.val ≤ N ↔ (t + (b - a)).val ≤ N) := by
+    intro t
+    obtain ⟨x, hx⟩ : ∃ x : Fin (N + 1), x = wallSite N (a - 1 - t) := ⟨_, rfl⟩
+    have hw := sub_wallSite N (a - 1 - t)
+    rw [← hx] at hw
+    have hs := hstep x
+    rcases hw with hw | hw
+    · have h1 : a - ((x.val : ℕ) : ZMod (2 * (N + 1))) - 1 = t := by linear_combination hw
+      have h2 : b - ((x.val : ℕ) : ZMod (2 * (N + 1))) - 1 = t + (b - a) := by
+        linear_combination hw
+      rw [h1, h2] at hs
+      exact hs
+    · have h1 : a - ((x.val : ℕ) : ZMod (2 * (N + 1))) - 1
+          = t + ((N + 1 : ℕ) : ZMod (2 * (N + 1))) := by linear_combination hw
+      have h2 : b - ((x.val : ℕ) : ZMod (2 * (N + 1))) - 1
+          = (t + (b - a)) + ((N + 1 : ℕ) : ZMod (2 * (N + 1))) := by linear_combination hw
+      rw [h1, h2, labelRing_val_add_half_le, labelRing_val_add_half_le] at hs
+      exact not_iff_not.mp hs
+  have hcastN : (((N : ℕ) : ZMod (2 * (N + 1)))).val = N := ZMod.val_cast_of_lt (by omega)
+  have h0 := hper 0
+  rw [ZMod.val_zero, zero_add] at h0
+  have hba : (b - a).val ≤ N := h0.mp (Nat.zero_le N)
+  have hN' := hper ((N : ℕ) : ZMod (2 * (N + 1)))
+  have hsum : ((((N : ℕ) : ZMod (2 * (N + 1)))) + (b - a)).val = N + (b - a).val := by
+    rw [ZMod.val_add_of_lt (by rw [hcastN]; omega), hcastN]
+  rw [hcastN, hsum] at hN'
+  have hzero : (b - a).val = 0 := by
+    have := hN'.mp (le_refl N)
+    omega
+  have hsub := labelRing_eq_zero_of_val N hzero
+  rw [sub_eq_zero] at hsub
+  exact hsub.symm
+
 end LatticeSystem.Quantum
