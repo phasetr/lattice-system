@@ -117,4 +117,20 @@ theorem quantumIsingHamiltonian_apply_siteFlip (N : ℕ) (J h : ℝ) (τ : Fin (
   · intro hx
     exact absurd (Finset.mem_univ x) hx
 
+/-- **(A4)** All remaining matrix elements vanish, Tasaki p. 499 ("all other matrix elements are
+vanishing"): configurations that are neither equal nor a single-site flip of one another are not
+connected by `Ĥ`, because the Hamiltonian is a sum of diagonal bond terms and single-site flips. -/
+theorem quantumIsingHamiltonian_apply_eq_zero (N : ℕ) (J h : ℝ)
+    (σ τ : Fin (N + 1) → Fin 2) (h₁ : σ ≠ τ) (h₂ : ∀ x, σ ≠ siteFlipAt τ x) :
+    quantumIsingHamiltonian N J h σ τ = 0 := by
+  have hfield : ∀ i : Fin (N + 1), basisVec τ (siteFlipAt σ i) = 0 := by
+    intro i
+    refine basisVec_of_ne ?_
+    intro hEq
+    exact h₂ i (by rw [← hEq, siteFlipAt_involutive])
+  rw [← mulVec_basisVec_apply (quantumIsingHamiltonian N J h) σ τ,
+    quantumIsingHamiltonian_mulVec_apply, basisVec_of_ne h₁,
+    Finset.sum_eq_zero (fun i _ => hfield i)]
+  ring
+
 end LatticeSystem.Quantum
