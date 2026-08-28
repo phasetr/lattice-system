@@ -20712,7 +20712,7 @@ what the sources state today is the lower bound
 The theorem being closed is H.~Tasaki, \emph{Physics and Mathematics of Quantum
 Many-Body Systems}, Springer 2020, §2.4 Theorem~2.1, p.~34.
 
-\textbf{Problem 2.4.b: saturated coherent state, product form.} The new file
+\textbf{Problem 2.4.c eq.~(S.18) product form (foundation for Problem 2.4.b).} The new file
 \texttt{Quantum/SpinS/SaturatedCoherentAmplitude.lean} defines the generic-spin
 ($N = 2S$) saturated coherent state
 \(\Xi_{\theta,\varphi} := \hat U^{(3)}_{\varphi}\hat U^{(2)}_{\theta}\Phi^\uparrow\)
@@ -20723,7 +20723,10 @@ one-site amplitude
   \texttt{saturatedCoherentAmp}\,N\,\theta\,j
   \;=\; \sqrt{\binom{N}{j}}\,\cos(\theta/2)^{N-j}\sin(\theta/2)^{j}.
 \]
-The capstone theorem \texttt{saturatedCoherentState\_zero\_apply} proves that at
+The theorem \texttt{saturatedCoherentAmp\_ne\_zero} proves that this amplitude
+is nonzero for \(0 < \theta < \pi\), from positivity of the binomial
+coefficient and of \(\cos(\theta/2)\), \(\sin(\theta/2)\) on that range. The
+capstone theorem \texttt{saturatedCoherentState\_zero\_apply} proves that at
 \(\varphi = 0\) the coefficient of \(\Xi_{\theta,0}\) at basis configuration
 \(\sigma\) is the product of one-site amplitudes,
 \[
@@ -20760,6 +20763,54 @@ is eq.~(2.2.11), p.~22; the site-product form is eq.~(S.18) of the solution to
 Problem~2.4.c (statement p.~34, solution p.~497, stated there for
 \(S = 1/2\)); Problem~2.4.b is stated on p.~34 with solution on
 pp.~496--497, eq.~(S.17).
+
+\textbf{Problem 2.4.b step 2 of 3: weight vectors, expansion, and coefficient
+nonvanishing (eq.~(S.17) still pending).} The new file
+\texttt{Quantum/SpinS/SaturatedCoherentWeight.lean} introduces the normalised
+magnetisation-sector state \(\Phi_M\) of eq.~(2.4.9), p.~33: for
+\(k = |\Lambda|S - M\), \texttt{saturatedLadderNorm} is the \(\ell^2\) norm
+\(\|(\hat S^-_{\mathrm{tot}})^k\Phi^\uparrow\|\), and
+\texttt{saturatedWeightVector} divides the ladder iterate
+\((\hat S^-_{\mathrm{tot}})^k\Phi^\uparrow\) by that norm to obtain \(\Phi_M\).
+The coefficient
+\[
+  \texttt{saturatedCoherentCoeff}\,\theta\,k \;=\; \langle \Phi_M, \Xi_{\theta,0}\rangle
+  \;=\; c_M(\theta)
+\]
+is the \(c_M\) of Theorem~2.1 / eq.~(2.4.10), p.~34, taken at
+\(\Phi = \Xi_{\theta,0}\). The capstone theorem
+\texttt{saturatedCoherentState\_zero\_eq\_sum} proves the expansion
+\[
+  \Xi_{\theta,0} \;=\; \sum_M c_M(\theta)\,\Phi_M,
+\]
+which is exactly the \(\Phi = \Xi_{\theta,0}\) instance of Theorem~2.1 /
+eq.~(2.4.10), p.~34: the coherent state lies in the joint
+\((\hat H, (\hat S_{\mathrm{tot}})^2)\)-eigenspace because it is obtained from
+\(\Phi^\uparrow\) by an operator commuting with both \(\hat H\) and
+\((\hat S_{\mathrm{tot}})^2\), that eigenspace is exactly the span of the ladder
+iterates, and pairing the resulting expansion with a single iterate --- using
+their pairwise orthogonality --- identifies each expansion scalar as
+\(c_M(\theta)\) divided by the normalisation. The second capstone theorem
+\texttt{saturatedCoherentCoeff\_ne\_zero} proves that every coefficient
+\(c_M(\theta) \neq 0\) for \(0 < \theta < \pi\): at a configuration \(\sigma\)
+where the \(k\)-th ladder iterate does not vanish, every other sector's
+contribution to the expansion vanishes because the sectors have disjoint
+supports, so \(\Xi_{\theta,0}(\sigma)\) is a nonzero multiple of \(c_M(\theta)\),
+and \(\Xi_{\theta,0}(\sigma)\) is itself a nonzero product of one-site
+amplitudes by the Problem~2.4.c product form above; no closed-form coefficient
+is needed. \texttt{lake build} is warning-free and
+\texttt{\#print axioms saturatedCoherentState\_zero\_eq\_sum} and
+\texttt{\#print axioms saturatedCoherentCoeff\_ne\_zero} both yield only
+\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound} (axiom-free).
+This is the second PR of the Problem~2.4.b arc: the expansion and its
+nonvanishing coefficients are exactly the ingredients that the solution of
+Problem~2.4.b needs in order to invert the expansion by Fourier inversion; the
+inversion itself, eq.~(S.17), which expresses \(\Phi_M\) in terms of
+\(\Xi_{\theta,\varphi}\), remains a follow-up PR. References: H.~Tasaki,
+\emph{Physics and Mathematics of Quantum Many-Body Systems}, Springer 2020:
+\(\Phi_M\) is eq.~(2.4.9), p.~33; the expansion
+\(\Phi = \sum_M c_M \Phi_M\) is Theorem~2.1 / eq.~(2.4.10), p.~34; Problem~2.4.b
+is stated on p.~34 with solution on pp.~496--497, eq.~(S.17).
 
 \subsection*{DONE: Tasaki Problem 2.2.c}
 
