@@ -64,4 +64,18 @@ parity of the block above.
 
 ---
 
+## Authoritative supplemental implementation record (`SpinOpEquivariance` general-state helpers)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+public declarations of `Quantum/TimeReversalMulti/SpinOpEquivariance.lean` that were added to (or
+exposed in) the file after the migration baseline; it is not subject to the frozen byte-for-byte
+parity of the block above.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `onSite_pauliZ_mulVec_apply` | pointwise action of the diagonal site Pauli on an arbitrary state: `((onSite x σ^z).mulVec v) τ = (if τ x = 0 then 1 else -1) · v τ`, the `σ^z` counterpart of `onSite_pauliX_mulVec_apply` above (the two together give the general-state action of a one-site Pauli, and are what a configuration-basis Hamiltonian matrix element is read off from) | `Quantum/TimeReversalMulti/SpinOpEquivariance.lean` |
+| `siteFlipAt_ne` | `siteFlipAt` has no fixed point: `siteFlipAt τ x ≠ τ`, since the value at the flipped slot changes (`1 - τ x ≠ τ x` in `Fin 2`). Completes the per-site flip helpers listed above; it is what makes the transverse-field term of a spin Hamiltonian contribute nothing to a diagonal matrix element | `Quantum/TimeReversalMulti/SpinOpEquivariance.lean` |
+
+---
+
 [← Basis states and raising/lowering for S = 1 (Tasaki §2.1)](/lattice-system/formalization/legacy/12-basis-states-and-raising-lowering-for-s-1-tasaki-2-1/) · [Catalogue](/lattice-system/formalization/legacy/) · [Multi-body operator space (abstract lattice) →](/lattice-system/formalization/legacy/14-multi-body-operator-space-abstract-lattice/)

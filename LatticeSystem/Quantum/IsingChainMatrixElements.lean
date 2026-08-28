@@ -5,8 +5,8 @@ import LatticeSystem.Quantum.TimeReversalMulti.SpinOpEquivariance
 # Configuration-basis matrix elements of the open-chain quantum Ising Hamiltonian
 
 The entries of `quantumIsingHamiltonian N J h`, viewed as a matrix over the computational-basis
-configurations `τ : Fin (N + 1) → Fin 2`, expressed through the domain-wall bond count and the
-single-site flip `siteFlipAt`
+configurations `τ : Fin (N + 1) → Fin 2`, expressed through the signed bond sum (`+1` on an
+aligned bond, `-1` across a domain wall) and the single-site flip `siteFlipAt`
 (`LatticeSystem.Quantum.TimeReversalMulti.SpinOpEquivariance`):
 
 * the action on an arbitrary vector splits into a diagonal `σ^z σ^z` part and an off-diagonal
@@ -17,7 +17,7 @@ single-site flip `siteFlipAt`
 * every other entry vanishes (`quantumIsingHamiltonian_apply_eq_zero`).
 
 The chain is **open**: the bond sum runs over `Fin N`, so there are `L - 1 = N` bonds on
-`L = N + 1` sites and the constant configurations have energy `-J N`. The periodic
+`L = N + 1` sites and the constant configurations have diagonal entry `-J N`. The periodic
 `isingCycleHamiltonian` is a different operator and is deliberately not used here.
 
 These are the matrix elements behind Tasaki, *Physics and Mathematics of Quantum Many-Body
@@ -26,7 +26,7 @@ spin-`1/2` chain `Ĥ = -Σ_x Ŝ_x^(3) Ŝ_{x+1}^(3) - λ Σ_x Ŝ_x^(1)` of eq. (3
 convention `Ŝ^α = σ^α / 2` that Hamiltonian is `quantumIsingHamiltonian N (1/4) (λ/2)`.
 
 The module is pure reuse: `quantumIsingHamiltonian` (`LatticeSystem.Quantum.IsingChain`),
-`siteFlipAt`, `onSite_pauliZ_mulVec_apply`, `onSite_pauliX_mulVec_apply`
+`siteFlipAt`, `siteFlipAt_ne`, `onSite_pauliZ_mulVec_apply`, `onSite_pauliX_mulVec_apply`
 (`…TimeReversalMulti.SpinOpEquivariance`), `basisVec`, `mulVec_basisVec_apply`
 (`LatticeSystem.Quantum.ManyBody`). No spin-flip or sign convention is introduced here.
 -/
@@ -72,19 +72,11 @@ theorem quantumIsingHamiltonian_mulVec_apply (N : ℕ) (J h : ℝ)
     spinZ_bond_mulVec_apply, spinX, onSite_pauliX_mulVec_apply, ← Finset.sum_mul]
   ring
 
-/-- Two configurations of `Fin 2` never satisfy `1 - a = a`, so a single-site flip always
-changes the configuration. -/
+/-- No element of `Fin 2` is fixed by `a ↦ 1 - a`, so flipping the spin at a site always
+changes its value. -/
 private theorem fin2_one_sub_ne (a : Fin 2) : (1 : Fin 2) - a ≠ a := by
   revert a
   decide
-
-/-- A single-site flip never returns the original configuration. -/
-private theorem siteFlipAt_ne {Λ : Type*} [DecidableEq Λ] (τ : Λ → Fin 2) (x : Λ) :
-    siteFlipAt τ x ≠ τ := by
-  intro hEq
-  refine fin2_one_sub_ne (τ x) ?_
-  rw [← siteFlipAt_self τ x]
-  exact congrFun hEq x
 
 /-- **(A2)** Diagonal matrix element, Tasaki eqs. (S.24) and (S.25): `⟨Φ_τ|Ĥ|Φ_τ⟩` is `-J` times
 the signed bond sum of `τ`, with no contribution from the transverse field (a single-site flip

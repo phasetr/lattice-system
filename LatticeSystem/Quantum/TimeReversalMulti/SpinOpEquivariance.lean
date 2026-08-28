@@ -171,6 +171,19 @@ theorem siteFlipAt_involutive (τ : Λ → Fin 2) (x : Λ) :
     | 1 => simp
   · rw [siteFlipAt_of_ne _ hy, siteFlipAt_of_ne _ hy]
 
+omit [Fintype Λ] in
+/-- `siteFlipAt` never fixes a configuration: flipping slot `x`
+changes the value there, so `siteFlipAt τ x ≠ τ`. -/
+theorem siteFlipAt_ne (τ : Λ → Fin 2) (x : Λ) :
+    siteFlipAt τ x ≠ τ := by
+  intro hEq
+  have hx : (1 : Fin 2) - τ x = τ x := by
+    rw [← siteFlipAt_self τ x]
+    exact congrFun hEq x
+  match h : τ x with
+  | 0 => rw [h] at hx; exact absurd hx (by decide)
+  | 1 => rw [h] at hx; exact absurd hx (by decide)
+
 /-- Action of `(onSite x σ^x)` on a basis vector: it swaps the
 spin at site `x`. Tasaki §2.2-style identity for the off-diagonal
 Pauli `σ^x`:

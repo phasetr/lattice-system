@@ -11,12 +11,14 @@ covers only the configuration-basis matrix-element API of `quantumIsingHamiltoni
 (`LatticeSystem/Quantum/IsingChainMatrixElements.lean`), not yet the `2L`-dimensional
 low-energy space of the problem.
 
-**TDD status: Red.** `IsingChainMatrixElements.lean` currently contains only its imports; none of
+The fixtures come in two layers. The signature pins state each of
 `quantumIsingHamiltonian_mulVec_apply`, `quantumIsingHamiltonian_apply_diag`,
-`quantumIsingHamiltonian_apply_siteFlip`, `quantumIsingHamiltonian_apply_eq_zero` exist yet, so
-every fixture below fails to elaborate with `unknown identifier`. Each `example`'s *type* is
-nonetheless already the concrete claim it will discharge once the four lemmas are implemented, so
-the Red pins the exact statements and the exact numeric error modes they must rule out.
+`quantumIsingHamiltonian_apply_siteFlip` and `quantumIsingHamiltonian_apply_eq_zero` in full and
+discharge it by the lemma itself, so a change of statement (index range, sign, argument order)
+breaks the module. The numeric fixtures evaluate the diagonal and single-flip entries at `L = 2`
+and `L = 3` through those lemmas, pinning the concrete values `-(L-1)/4` (aligned), `0`
+(single kink) and `-h`, so a bond-counting or sign error that happens to be invisible on a single
+bond is still caught.
 -/
 
 namespace LatticeSystem.Tests.Problem33aLowEnergy
@@ -27,10 +29,10 @@ open Matrix
 /-! ## Signature pins for the four matrix-element lemmas -/
 
 /-- **A1 signature pin.** `quantumIsingHamiltonian_mulVec_apply` expands `(H *ᵥ v) τ` into the
-domain-wall bond sum times `v τ` plus the field term summed over `siteFlipAt`. This is the base
-identity A2-A4 are derived from; a wrong bond-sum range (`Fin (N+1)` instead of `Fin N`, the
-periodic-ring trap) or a wrong sign on either term breaks this fixture before it ever reaches the
-numeric fixtures below. -/
+signed bond sum (`+1` on an aligned bond, `-1` across a domain wall) times `v τ`, plus the field
+term summed over `siteFlipAt`. This is the base identity A2-A4 are derived from; a wrong bond-sum
+range (`Fin (N+1)` instead of `Fin N`, the periodic-ring trap) or a wrong sign on either term
+breaks this fixture before it ever reaches the numeric fixtures below. -/
 example (N : ℕ) (J h : ℝ) (v : (Fin (N + 1) → Fin 2) → ℂ) (τ : Fin (N + 1) → Fin 2) :
     (quantumIsingHamiltonian N J h *ᵥ v) τ =
       -(J : ℂ) * (∑ i : Fin N, if τ i.castSucc = τ i.succ then (1 : ℂ) else -1) * v τ
@@ -38,8 +40,8 @@ example (N : ℕ) (J h : ℝ) (v : (Fin (N + 1) → Fin 2) → ℂ) (τ : Fin (N
   quantumIsingHamiltonian_mulVec_apply N J h v τ
 
 /-- **A2 signature pin.** `quantumIsingHamiltonian_apply_diag` gives the diagonal entry
-`⟨Φ_τ|H|Φ_τ⟩` as `-J` times the domain-wall bond count, with no field-term contribution (a
-flipped configuration never equals the original). -/
+`⟨Φ_τ|H|Φ_τ⟩` as `-J` times the signed bond sum (`+1` on an aligned bond, `-1` across a domain
+wall), with no field-term contribution (a flipped configuration never equals the original). -/
 example (N : ℕ) (J h : ℝ) (τ : Fin (N + 1) → Fin 2) :
     quantumIsingHamiltonian N J h τ τ =
       -(J : ℂ) * ∑ i : Fin N, (if τ i.castSucc = τ i.succ then (1 : ℂ) else -1) :=
@@ -62,12 +64,13 @@ example (N : ℕ) (J h : ℝ) (σ τ : Fin (N + 1) → Fin 2) (h₁ : σ ≠ τ)
 
 /-! ## Numeric fixtures at `L = 2` (`N = 1`) -/
 
-/-- **Open-boundary trap detector (A2 at `L = 2`).** The all-down configuration has exactly one
-domain-wall bond on the two-site *open* chain, so the diagonal entry is `-1/4 = -(L-1)/4`. Had
+/-- **Open-boundary trap detector (A2 at `L = 2`).** The all-down configuration is aligned across
+the single bond of the two-site *open* chain — one aligned bond and no domain wall — so the
+signed bond sum is `+1` and the diagonal entry is `-J = -1/4 = -(L-1)/4`, Tasaki eq. (S.24). Had
 the bond sum instead run over `Fin (N + 1)` (as the physically periodic `isingCycleHamiltonian`
-would force, counting the wrap-around bond a second time), this value would be `-1/2`; this
-fixture is exactly the guard against that mis-instantiation (design §8 fixture 3, adapted to the
-matrix-element API). -/
+would force, counting the wrap-around bond a second time), the sum would be `+2` and this value
+would be `-1/2`; this fixture is exactly the guard against that mis-instantiation (design §8
+fixture 3, adapted to the matrix-element API). -/
 example :
     quantumIsingHamiltonian 1 (1 / 4 : ℝ) (1 : ℝ) (fun _ => (1 : Fin 2)) (fun _ => (1 : Fin 2))
       = -1 / 4 := by
@@ -92,5 +95,33 @@ example :
       = 0 :=
   quantumIsingHamiltonian_apply_eq_zero 1 (1 / 4) 1 (fun _ => 0) (fun _ => 1) (by decide)
     (by decide)
+
+/-! ## Numeric fixtures at `L = 3` (`N = 2`) -/
+
+/-- **Bond counting (A2 at `L = 3`).** The all-down configuration is aligned across both bonds of
+the three-site open chain, so the signed bond sum is `+2` and the diagonal entry is
+`-2J = -1/2 = -(L-1)/4`, Tasaki eq. (S.24). Together with the `L = 2` fixture above this pins
+`-(L-1)/4` as a formula in `L` rather than at a single bond: an off-by-one bond range agreeing
+with `Fin N` at `N = 1` is caught here. -/
+example :
+    quantumIsingHamiltonian 2 (1 / 4 : ℝ) (1 : ℝ) (fun _ => (1 : Fin 2)) (fun _ => (1 : Fin 2))
+      = -1 / 2 := by
+  rw [quantumIsingHamiltonian_apply_diag 2 (1 / 4) 1 (fun _ => 1)]
+  norm_num
+
+/-- **Single kink (A2 at `L = 3`).** Flipping site `0` of the all-down configuration creates one
+domain wall and leaves one aligned bond, so the signed bond sum is `-1 + 1 = 0` and the diagonal
+entry is `0`. This is Tasaki eq. (S.25), whose value `E_GS^(0) + 1/2 = -(L-1)/4 + 1/2` is `0`
+exactly at `L = 3`. The cancelling pair of bonds is what rules out an unsigned bond sum, be it
+over domain walls or over aligned bonds only: either would give `-J` here. (The overall sign of
+the bond sum is pinned by the aligned fixtures, not by this one, whose value is its own
+negation.) -/
+example :
+    quantumIsingHamiltonian 2 (1 / 4 : ℝ) (1 : ℝ) (siteFlipAt (fun _ => (1 : Fin 2)) 0)
+        (siteFlipAt (fun _ => (1 : Fin 2)) 0)
+      = 0 := by
+  rw [quantumIsingHamiltonian_apply_diag 2 (1 / 4) 1 (siteFlipAt (fun _ => (1 : Fin 2)) 0),
+    Fin.sum_univ_two]
+  norm_num [siteFlipAt, Function.update_apply, Fin.ext_iff]
 
 end LatticeSystem.Tests.Problem33aLowEnergy
