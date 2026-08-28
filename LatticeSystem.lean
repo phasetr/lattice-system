@@ -127,6 +127,7 @@ import LatticeSystem.Quantum.SpinS.SaturatedCoherentAmplitude
 import LatticeSystem.Quantum.SpinS.SaturatedCoherentExpansion
 import LatticeSystem.Quantum.SpinS.SaturatedCoherentProjection
 import LatticeSystem.Quantum.SpinS.SaturatedCoherentWeight
+import LatticeSystem.Quantum.SpinS.SaturatedLadderComponent
 
 /-!
 # `lattice-system` library root
