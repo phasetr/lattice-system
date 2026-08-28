@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.AllAlignedStateExpectations
+import Mathlib.Analysis.InnerProductSpace.PiL2
 
 /-!
 # Orthonormality of the spin-`S` standard basis
@@ -15,6 +16,12 @@ bundles them in Kronecker form.
 
 Corollaries: extremal all-aligned states `|σ_⊤⟩` and `|σ_⊥⟩` are
 orthogonal whenever `0 < N`.
+
+The same orthonormality read at the `ℓ²` (`EuclideanSpace`) level
+gives the two facts needed wherever a state happens to be a bare
+basis vector: pairing an arbitrary vector against `basisVecS σ`
+reads off its `σ`-component, and `basisVecS σ` needs no
+normalisation.
 
 Tracked as part of Tasaki §2.4 / §2.5 spin-`S` infrastructure
 (Issue #412).
@@ -75,5 +82,27 @@ theorem allAlignedStateS_zero_inner_allAlignedStateS_last
   have hval := congrArg Fin.val hx
   simp [Fin.last] at hval
   omega
+
+/-! ## `ℓ²`-level consequences: component read-off and normalisation -/
+
+/-- Pairing an arbitrary vector with a standard basis vector reads off the corresponding
+component: `v ⬝ᵥ star (basisVecS σ) = v σ`.  Together with
+`EuclideanSpace.inner_toLp_toLp` this evaluates any inner product against a basis vector. -/
+theorem dotProduct_star_basisVecS (v : (V → Fin (N + 1)) → ℂ) (σ : V → Fin (N + 1)) :
+    v ⬝ᵥ star (basisVecS σ) = v σ := by
+  simp [dotProduct, basisVecS_apply]
+
+/-- A standard basis vector has `ℓ²` norm `1`, so a state that is a basis vector needs no
+normalisation.  The `EuclideanSpace` ascription is what selects the `ℓ²` norm: the raw function
+type carries the supremum norm instead. -/
+theorem norm_toLp_basisVecS_eq_one (σ : V → Fin (N + 1)) :
+    ‖(WithLp.toLp 2 (basisVecS σ) : EuclideanSpace ℂ (V → Fin (N + 1)))‖ = 1 := by
+  have h := inner_self_eq_norm_sq_to_K
+    (𝕜 := ℂ) (WithLp.toLp 2 (basisVecS σ) : EuclideanSpace ℂ (V → Fin (N + 1)))
+  rw [EuclideanSpace.inner_toLp_toLp, dotProduct_comm, basisVecS_inner_self] at h
+  have h2 : ((‖(WithLp.toLp 2 (basisVecS σ) : EuclideanSpace ℂ (V → Fin (N + 1)))‖ ^ 2 : ℝ) : ℂ)
+      = 1 := by push_cast; exact h.symm
+  have h3 := Complex.ofReal_eq_one.mp h2
+  nlinarith [norm_nonneg (WithLp.toLp 2 (basisVecS σ) : EuclideanSpace ℂ (V → Fin (N + 1)))]
 
 end LatticeSystem.Quantum

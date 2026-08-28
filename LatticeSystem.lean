@@ -23,7 +23,6 @@ import LatticeSystem.Math.ProjectiveRepresentation
 import LatticeSystem.Math.CStarAlgebra.GNS
 import LatticeSystem.Math.MvPolynomial.WeightedHomogeneousLayer
 import LatticeSystem.Math.MvPolynomial.BondFactorDerivation
-import LatticeSystem.Math.Combinatorics.ChooseConfigFiber
 import LatticeSystem.Quantum.HorschVonderLinden
 import LatticeSystem.Quantum.KaplanHorschVonderLinden
 import LatticeSystem.Quantum.SpinS.FalkBruchInfra
@@ -123,11 +122,7 @@ import LatticeSystem.Quantum.SpinS.SpinHalfSpecializationMultiSite
 import LatticeSystem.Quantum.SpinS.GeneralSWeylLadder
 import LatticeSystem.Quantum.SpinS.GeneralSWeylCasimir
 import LatticeSystem.Quantum.SpinS.GeneralSCasimirDescent
-import LatticeSystem.Quantum.SpinS.SaturatedCoherentAmplitude
 import LatticeSystem.Quantum.SpinS.SaturatedCoherentExpansion
-import LatticeSystem.Quantum.SpinS.SaturatedCoherentProjection
-import LatticeSystem.Quantum.SpinS.SaturatedCoherentWeight
-import LatticeSystem.Quantum.SpinS.SaturatedLadderComponent
 
 /-!
 # `lattice-system` library root

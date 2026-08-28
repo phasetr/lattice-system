@@ -20884,7 +20884,8 @@ component form: \texttt{totalSpinSOpMinus\_pow\_allAlignedStateS\_zero\_apply}
 gives \((\hat S^-_{\mathrm{tot}})^k\Phi^\uparrow\) as \(k!\prod_x
 \sqrt{\binom{N}{\sigma_x}}\) on the fiber \(\sum_x \sigma_x = k\) and \(0\)
 off it (via the general one-site matrix-vector action
-\texttt{onSiteS\_mulVec\_apply}, from which the earlier
+\texttt{onSiteS\_mulVec\_apply} of
+\texttt{Quantum/SpinS/MultiSite.lean}, from which the earlier
 \texttt{onSiteS\_mulVec\_prod} is now re-derived);
 \texttt{saturatedLadderNorm\_eq} evaluates its \(\ell^2\) norm to
 \(k!\sqrt{\binom{|\Lambda|N}{k}}\) using the Vandermonde identity; and
@@ -20905,7 +20906,19 @@ and the capstone theorem \texttt{tasaki\_problem\_2\_4\_c\_coherent\_expansion}
 follows by substituting it into \texttt{saturatedCoherentState\_eq\_sum}
 above. The result is exact for arbitrary real \(\theta\), \(\varphi\), and
 general spin \(S = N/2\); Tasaki states Problem~2.4.c only for \(S = 1/2\),
-noting that a general spin can be represented by \(S=1/2\) spins.
+noting that a general spin can be represented by \(S=1/2\) spins. The
+capstone carries exactly one hypothesis on the site set, \texttt{[Nonempty
+V]} (together with the ambient \texttt{[Fintype V]}, \texttt{[DecidableEq
+V]}), inherited from \texttt{saturatedCoherentState\_eq\_sum}, and no
+restriction on \(\theta\) or \(\varphi\); the coefficient identity
+\texttt{saturatedCoherentCoeff\_eq} and the norm
+\texttt{saturatedLadderNorm\_eq} need no nonemptiness at all and hold for
+empty \(V\) as well. The two \(\ell^2\)-level facts about a standard basis
+vector that the regression fixtures use --- pairing a vector against it reads
+off that component, and its \(\ell^2\) norm is \(1\) --- are
+\texttt{dotProduct\_star\_basisVecS} and
+\texttt{norm\_toLp\_basisVecS\_eq\_one} in
+\texttt{Quantum/SpinS/BasisVecSOrthonormal.lean}.
 \texttt{lake build} is warning-free and
 \texttt{\#print axioms tasaki\_problem\_2\_4\_c\_coherent\_expansion} yields
 only \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}

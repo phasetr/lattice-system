@@ -1,3 +1,4 @@
+import LatticeSystem.Quantum.SpinS.BasisVecSOrthonormal
 import LatticeSystem.Quantum.SpinS.SaturatedCoherentWeight
 
 /-!
@@ -52,23 +53,6 @@ example : saturatedCoherentCoeff (Fin 2) 1 (Real.pi / 2) 1 ≠ 0 :=
     (by linarith [Real.pi_pos]) 1
 
 /-! ## `|Λ| = 1`, `N = 1` fixture: the `k ↦ M` orientation -/
-
-/-- A basis vector has `ℓ²` norm `1`, so at `|Λ| = 1` the normalisation of eq. (2.4.9) is
-trivial. -/
-private lemma norm_toLp_basisVecS_eq_one (σ : Fin 1 → Fin 2) :
-    ‖(WithLp.toLp 2 (basisVecS σ) : EuclideanSpace ℂ (Fin 1 → Fin 2))‖ = 1 := by
-  have h := inner_self_eq_norm_sq_to_K
-    (𝕜 := ℂ) (WithLp.toLp 2 (basisVecS σ) : EuclideanSpace ℂ (Fin 1 → Fin 2))
-  rw [EuclideanSpace.inner_toLp_toLp, dotProduct_comm, basisVecS_inner_self] at h
-  have h2 : ((‖(WithLp.toLp 2 (basisVecS σ) : EuclideanSpace ℂ (Fin 1 → Fin 2))‖ ^ 2 : ℝ) : ℂ)
-      = 1 := by push_cast; exact h.symm
-  have h3 := Complex.ofReal_eq_one.mp h2
-  nlinarith [norm_nonneg (WithLp.toLp 2 (basisVecS σ) : EuclideanSpace ℂ (Fin 1 → Fin 2))]
-
-/-- Pairing a vector with a basis vector reads off the corresponding component. -/
-private lemma dotProduct_star_basisVecS (v : (Fin 1 → Fin 2) → ℂ) (σ : Fin 1 → Fin 2) :
-    v ⬝ᵥ star (basisVecS σ) = v σ := by
-  simp [dotProduct, basisVecS_apply]
 
 /-- At `|Λ| = 1`, `N = 1` the `k = 0` ladder iterate is the all-up basis vector. -/
 private lemma ladderIterateUp_fin_one_zero :

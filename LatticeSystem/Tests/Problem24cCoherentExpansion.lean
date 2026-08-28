@@ -3,20 +3,26 @@ import LatticeSystem.Quantum.SpinS.SaturatedCoherentExpansion
 /-!
 # Test coverage for Tasaki Problem 2.4.c — the coherent-state / `Φ_M` expansion
 
-TDD Red fixture for the capstone `tasaki_problem_2_4_c_coherent_expansion`
-(Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Problem 2.4.c, statement p. 34,
-solution p. 497 eq. (S.19)): `Ξ_{θ,φ} = Σ_k c_k(θ, φ) • Φ_k` with
-`c_k(θ, φ) = e^{-iφM(k)} · √(C(|V|N, k)) · cos(θ/2)^{|V|N-k} · sin(θ/2)^k`. The design's §0.1
-corrects (S.19)'s printed `e^{-iMφ/2}` to `e^{-iMφ}` (confirmed against (S.18), (S.17), and the
-already-proved `saturatedCoherentState_apply_phase`); every fixture below uses the corrected
-exponent.
+Fixtures for the capstone `tasaki_problem_2_4_c_coherent_expansion` and for the closed forms it is
+assembled from (Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Problem 2.4.c,
+statement p. 34, solution p. 497, eq. (S.19)): `Ξ_{θ,φ} = Σ_k c_k(θ, φ) • Φ_k` with
+`c_k(θ, φ) = e^{-iφM(k)} · √(C(|V|N, k)) · cos(θ/2)^{|V|N-k} · sin(θ/2)^k`.  The azimuthal
+exponent is `e^{-iMφ}` rather than the printed `e^{-iMφ/2}`; the evidence for that correction is
+recorded in the module header of `SaturatedCoherentExpansion.lean`.
 
-Fixture 1 pins the capstone's exact signature (no hypothesis beyond `[Nonempty V]`, arbitrary
-`θ φ`); fixture 2 pins the corrected phase orientation at `|Λ| = 1`. Fixtures 3-6 pin the
-concrete binomial/`cos`/`sin` shape of the already-existing `saturatedCoherentCoeff` and
-`saturatedWeightVector` (proved directly from their definitions, independent of the capstone) at
-`|Λ| = 1` and `|Λ| = 2`, guarding against a missing `√`-binomial factor, a swapped
-`S_max ± M` exponent orientation, and a formula that is only correct at `N = 1`.
+The fixtures come in two kinds.
+
+* **Signature pins** for the capstone: its exact hypothesis set (nothing beyond `[Nonempty V]`,
+  arbitrary `θ`, `φ`) and, at `|Λ| = 1`, the shape of the phase factor.
+* **Closed-form cross-checks.**  The private lemmas below compute the ladder iterate, its norm,
+  the sector state `Φ_k` and the coefficient `c_k(θ)` at `|Λ| = 2`, `N = 1` and at `|Λ| = 1`,
+  `N = 2` straight from the definitions, never using the closed forms.  The final section then
+  writes out the right-hand side of each closed form — `Math.sum_prod_choose_fiber`,
+  `totalSpinSOpMinus_pow_allAlignedStateS_zero_apply`, `saturatedLadderNorm_eq`,
+  `saturatedWeightVector_apply` (eq. (2.4.11)) and `saturatedCoherentCoeff_eq` (eq. (S.19)) — at
+  those instances and equates it with the independently computed value.  A swapped
+  `cos`/`sin` exponent, a dropped `√`-binomial normalisation, a dropped factorial multiplicity
+  `k!`, or a formula that happens to be correct only at `N = 1` each break these fixtures.
 -/
 
 namespace LatticeSystem.Tests.Problem24cCoherentExpansion
@@ -24,7 +30,7 @@ namespace LatticeSystem.Tests.Problem24cCoherentExpansion
 open LatticeSystem.Quantum
 open _root_.Matrix
 
-/-! ## Capstone signature pin (fails until the capstone is implemented) -/
+/-! ## Capstone signature pin -/
 
 /-- **Capstone signature pin.** The Problem 2.4.c capstone
 (`tasaki_problem_2_4_c_coherent_expansion`) takes exactly `[Fintype V] [DecidableEq V]
@@ -42,13 +48,14 @@ example {V : Type*} [Fintype V] [DecidableEq V] [Nonempty V] {N : ℕ} (θ φ : 
             • saturatedWeightVector V N k :=
   tasaki_problem_2_4_c_coherent_expansion θ φ
 
-/-! ## Phase-orientation pin (fails until the capstone is implemented) -/
+/-! ## Phase-orientation pin -/
 
-/-- **Phase-orientation pin, `|Λ| = 1`, `N = 1`.** Evaluating the capstone at the single
-all-up configuration exposes the `k = 0` term's phase factor `e^{-iφ·(1/2)}`
-(`ladderEigenvalueUp (Fin 1) 1 0 = 1/2`), the corrected exponent of design §0.1. The printed
-`e^{-iMφ/2}` of (S.19) would instead force `e^{-iφ/4}` here, so this pins the corrected
-convention at the point where the `/2`-misprint is detectable. -/
+/-- **Phase-orientation pin, `|Λ| = 1`, `N = 1`.** The capstone evaluated at the single all-up
+configuration, where the `k = 0` phase factor is `e^{-iφ·(1/2)}`
+(`ladderEigenvalueUp (Fin 1) 1 0 = 1/2`).  This is `congrFun` of the signature pin above, so it is
+not an independent check of the capstone; what it adds is a concrete instance in which the
+azimuthal exponent is legible, `e^{-iφM}` and not the printed `e^{-iφM/2}` (which would read
+`e^{-iφ/4}` here). -/
 example (θ φ : ℝ) :
     saturatedCoherentState (Fin 1) 1 θ φ (fun _ => 0)
       = ∑ k : Fin (Fintype.card (Fin 1) * 1 + 1),
@@ -59,22 +66,19 @@ example (θ φ : ℝ) :
             • saturatedWeightVector (Fin 1) 1 k (fun _ => 0) :=
   congrFun (tasaki_problem_2_4_c_coherent_expansion θ φ) (fun _ => 0)
 
-/-! ## `|Λ| = 2`, `N = 1` component fixtures (already provable from existing definitions) -/
+/-! ## `|Λ| = 2`, `N = 1` components, computed from the definitions -/
 
-set_option linter.flexible false in
--- The broad `simp [...]` below feeds a `set`/`fin_cases` split whose branches close by a
--- further `simp`; `linter.flexible`'s narrower `simp only` suggestion does not carry through
--- those branches without per-branch adjustment. Style linter, not soundness.
 /-- The `k`-th unnormalised ladder iterate at `|Λ| = 2`, `N = 1`, `k = 1` is nonzero exactly on
 the two configurations with one up- and one down-spin, each with weight `1`. Component step
-towards `saturatedCoherentCoeff_fin_two_one`. -/
+towards the `|Λ| = 2` sector state and coefficient below. -/
 private lemma ladderIterateUp_fin_two_one_apply (τ : Fin 2 → Fin 2) :
     ladderIterateUp (Fin 2) 1 1 τ = if magSumS τ = 1 then 1 else 0 := by
   rw [ladderIterateUp, show ((1 : Fin (Fintype.card (Fin 2) * 1 + 1)) : ℕ) = 1 from rfl, pow_one]
   rw [totalSpinSOpMinus_def, Matrix.sum_mulVec]
   simp only [Finset.sum_apply, allAlignedStateS, onSiteS_mulVec_basisVecS_apply]
-  simp [Fin.sum_univ_two, onSiteS_apply, allAlignedConfigS, Fin.forall_fin_two, magSumS,
-    Fin.sum_univ_two]
+  simp only [Fin.isValue, onSiteS_apply, ne_eq, Nat.reduceAdd, allAlignedConfigS,
+    Fin.forall_fin_two, Fin.sum_univ_two, not_true_eq_false, IsEmpty.forall_iff, one_ne_zero,
+    not_false_eq_true, forall_const, true_and, zero_ne_one, and_true, magSumS]
   set a := τ 0 with ha
   set b := τ 1 with hb
   clear_value a b
@@ -101,11 +105,9 @@ private lemma saturatedLadderNorm_fin_two_one :
   rw [hcard]
   norm_num
 
-/-- **eq. (2.4.11) literal `S = 1/2` pin.** At `|Λ| = 2`, `N = 1`, `k = 1` the normalised sector
-state `Φ_1` carries exactly the same weight `1/√2` on every configuration of its own sector, and
-vanishes off it — the printed content of (2.4.11): all fiber configurations carry equal weight. A
-formula that made the weight vary across the fiber (rather than being uniform) would fail this
-fixture. -/
+/-- The normalised sector state `Φ_1` at `|Λ| = 2`, `N = 1`, computed from the definitions: it
+carries the same weight `1/√2` on every configuration of its own sector and vanishes off it — the
+printed content of (2.4.11) at `S = 1/2`.  Feeds the eq. (2.4.11) cross-check below. -/
 private lemma saturatedWeightVector_fin_two_one_apply (τ : Fin 2 → Fin 2) :
     saturatedWeightVector (Fin 2) 1 1 τ
       = if magSumS τ = 1 then ((Real.sqrt 2)⁻¹ : ℝ) else 0 := by
@@ -131,10 +133,10 @@ private lemma prod_saturatedCoherentAmp_fin_two_of_magSumS_eq_one (θ : ℝ) (τ
       | (exfalso; revert h; decide)
       | (simp only [saturatedCoherentAmp]; norm_num; try ring)
 
-/-- **`|Λ| = 2` binomial fixture (the decisive one).** `c_1(θ) = √(C(2,1)) · cos(θ/2) sin(θ/2)
-= √2 · cos(θ/2) sin(θ/2)`: a missing/erroneous binomial factor (`1` instead of `√2`, or
-`C(2,1) = 2` instead of `√2`) fails here, since `N = 1` alone (`Problem24bWeightExpansion.lean`)
-never exercises a nontrivial binomial coefficient. -/
+/-- The coefficient `c_1(θ)` at `|Λ| = 2`, `N = 1`, computed from the definitions: pairing the
+two-configuration sector state `Φ_1` with the coherent state gives `√2 cos(θ/2) sin(θ/2)`.  Feeds
+the decisive binomial cross-check below (this is the smallest instance with a nontrivial binomial
+coefficient). -/
 private lemma saturatedCoherentCoeff_fin_two_one (θ : ℝ) :
     saturatedCoherentCoeff (Fin 2) 1 θ 1
       = (Real.sqrt 2 : ℂ) * Complex.cos (θ / 2) * Complex.sin (θ / 2) := by
@@ -178,26 +180,7 @@ private lemma saturatedCoherentCoeff_fin_two_one (θ : ℝ) :
   rw [hsq]
   ring
 
-/-! ## `|Λ| = 2`, `N = 1`, `k = 0` / `k = 2` exponent-orientation fixtures -/
-
-/-- The `ℓ²`-norm of a standard basis vector is `1`. Reused for the `k = 0` sector state, whose
-ladder iterate is exactly the all-up basis vector. -/
-private lemma norm_toLp_basisVecS_eq_one {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
-    (σ : V → Fin (N + 1)) :
-    ‖(WithLp.toLp 2 (basisVecS σ) : EuclideanSpace ℂ (V → Fin (N + 1)))‖ = 1 := by
-  have h := inner_self_eq_norm_sq_to_K
-    (𝕜 := ℂ) (WithLp.toLp 2 (basisVecS σ) : EuclideanSpace ℂ (V → Fin (N + 1)))
-  rw [EuclideanSpace.inner_toLp_toLp, dotProduct_comm, basisVecS_inner_self] at h
-  have h2 : ((‖(WithLp.toLp 2 (basisVecS σ) : EuclideanSpace ℂ (V → Fin (N + 1)))‖ ^ 2 : ℝ) : ℂ)
-      = 1 := by push_cast; exact h.symm
-  have h3 := Complex.ofReal_eq_one.mp h2
-  nlinarith [norm_nonneg (WithLp.toLp 2 (basisVecS σ) : EuclideanSpace ℂ (V → Fin (N + 1)))]
-
-/-- Pairing a vector with a basis vector reads off the corresponding component. -/
-private lemma dotProduct_star_basisVecS {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
-    (v : (V → Fin (N + 1)) → ℂ) (σ : V → Fin (N + 1)) :
-    v ⬝ᵥ star (basisVecS σ) = v σ := by
-  simp [dotProduct, basisVecS_apply]
+/-! ## `|Λ| = 2`, `N = 1`, `k = 0` and `k = 2` components, computed from the definitions -/
 
 /-- The `k = 0` ladder iterate is the all-up basis vector (no lowering applied). -/
 private lemma ladderIterateUp_fin_two_zero :
@@ -206,8 +189,6 @@ private lemma ladderIterateUp_fin_two_zero :
     Matrix.one_mulVec]
   rfl
 
-set_option linter.flexible false in
--- Same rationale as `ladderIterateUp_fin_two_one_apply` above.
 /-- One-step lowering action of `Ŝ^-_tot` on a basis vector at `|Λ| = 2`, `N = 1`: the two
 site-lowering terms of `totalSpinSOpMinus_def` expanded and case-split into their four boolean
 outcomes. Component step for the `k = 1 → k = 2` ladder step below. -/
@@ -218,7 +199,9 @@ private lemma totalSpinSOpMinus_mulVec_basisVecS_fin_two_apply
           + (if τ 0 = c 0 ∧ c 1 = 0 ∧ τ 1 = 1 then 1 else 0) := by
   rw [totalSpinSOpMinus_def, Matrix.sum_mulVec]
   simp only [Finset.sum_apply, onSiteS_mulVec_basisVecS_apply]
-  simp [Fin.sum_univ_two, onSiteS_apply, Fin.forall_fin_two]
+  simp only [onSiteS_apply, ne_eq, Nat.reduceAdd, Fin.forall_fin_two, Fin.isValue,
+    Fin.sum_univ_two, not_true_eq_false, IsEmpty.forall_iff, one_ne_zero, not_false_eq_true,
+    forall_const, true_and, zero_ne_one, and_true]
   set a := τ 0 with ha
   set b := τ 1 with hb
   set p := c 0 with hp
@@ -226,9 +209,6 @@ private lemma totalSpinSOpMinus_mulVec_basisVecS_fin_two_apply
   clear_value a b p q
   fin_cases a <;> fin_cases b <;> fin_cases p <;> fin_cases q <;> simp [spinSOpMinus]
 
-set_option linter.unnecessarySeqFocus false in
--- The `by_cases` case split below closes with just `simp` on some branches and needs `omega`
--- on others; the asymmetric goal counts trip `linter.unnecessarySeqFocus`. Style linter.
 /-- The `k = 1` ladder iterate, rewritten as an explicit sum of the two basis vectors on its
 fiber (rather than the `if`-form of `ladderIterateUp_fin_two_one_apply`), so that
 `Matrix.mulVec_add` can push a further lowering through it termwise. -/
@@ -242,13 +222,13 @@ private lemma ladderIterateUp_fin_two_one_eq :
   have h0 := (τ 0).isLt
   have h1 := (τ 1).isLt
   by_cases h0' : (τ 0 : ℕ) = 0 <;> by_cases h1' : (τ 1 : ℕ) = 0 <;>
-      simp [h0', h1'] <;> omega
+      simp [h0', h1']
+  omega
 
-set_option linter.flexible false in
--- Same rationale as `ladderIterateUp_fin_two_one_apply` above.
 /-- The `k = 2` ladder iterate at `|Λ| = 2`, `N = 1` has value `2` (not `1`) at the all-down
-configuration: `k! = 2!` from the two orders in which the two sites can be lowered. Guards a
-formula that dropped the `k!` factorial multiplicity. -/
+configuration: `k! = 2!` from the two orders in which the two sites can be lowered.  Feeds the
+`k = 2` norm and the ladder-iterate cross-check below, where that factorial is compared with the
+closed form. -/
 private lemma ladderIterateUp_fin_two_two_apply (τ : Fin 2 → Fin 2) :
     ladderIterateUp (Fin 2) 1 2 τ = if magSumS τ = 2 then 2 else 0 := by
   rw [ladderIterateUp, show ((2 : Fin (Fintype.card (Fin 2) * 1 + 1)) : ℕ) = 2 from rfl, pow_two,
@@ -264,7 +244,10 @@ private lemma ladderIterateUp_fin_two_two_apply (τ : Fin 2 → Fin 2) :
   have h0 := (τ 0).isLt
   have h1 := (τ 1).isLt
   by_cases h0' : (τ 0 : ℕ) = 0 <;> by_cases h1' : (τ 1 : ℕ) = 0 <;>
-    simp [h0', h1'] <;> first | omega | (split_ifs <;> first | omega | norm_num at *)
+    simp only [Fin.isValue, h0', h1', Fin.coe_ofNat_eq_mod, Nat.mod_succ, Nat.zero_mod,
+        one_ne_zero, ↓reduceIte, Nat.reduceAdd, zero_ne_one, and_self, and_false, true_and,
+        false_and, add_zero, zero_add, right_eq_ite_iff, OfNat.zero_ne_ofNat, imp_false, ne_eq] <;>
+      first | omega | (split_ifs <;> first | omega | norm_num at *)
 
 /-- The `k = 2` ladder-iterate norm at `|Λ| = 2`, `N = 1` is `2`: the fiber has one config of
 value `2`, so `‖·‖ = √(2²) = 2`, normalising `Φ_2` back down to the plain all-down basis vector. -/
@@ -319,17 +302,18 @@ private lemma saturatedWeightVector_fin_two_two :
       simp [hc, magSumS]
     simp [h, hτ]
 
-/-- **`k = 2` orientation pin.** `c_2(θ) = sin(θ/2)²`, not `cos(θ/2)²`: pairs with the `k = 0`
-fixture below to catch a swapped `S_max ± M` exponent (`cos^{|V|N-k} sin^k` vs. the reverse). -/
+/-- The coefficient `c_2(θ) = sin(θ/2)²` at `|Λ| = 2`, `N = 1`, computed from the definitions
+through the all-down sector state.  Feeds the `k = 2` exponent-orientation cross-check below. -/
 private lemma saturatedCoherentCoeff_fin_two_two (θ : ℝ) :
     saturatedCoherentCoeff (Fin 2) 1 θ 2 = Complex.sin (θ / 2) ^ 2 := by
   rw [saturatedCoherentCoeff, saturatedWeightVector_fin_two_two, EuclideanSpace.inner_toLp_toLp,
     dotProduct_star_basisVecS, saturatedCoherentState_zero_apply]
   simp [saturatedCoherentAmp]
 
-/-- **`k = 0` orientation pin.** `c_0(θ) = cos(θ/2)²`: the `|Λ| = 2` extension of the `|Λ| = 1`
-`c_0 = cos(θ/2)` fixture (`Problem24bWeightExpansion.lean`), confirming the exponent scales with
-`|V|N - k` rather than staying fixed at `1`. -/
+/-- The coefficient `c_0(θ) = cos(θ/2)²` at `|Λ| = 2`, `N = 1`, computed from the definitions
+through the all-up sector state.  Feeds the `k = 0` exponent-orientation cross-check below, where
+the exponent is seen to scale with `|Λ|N - k` rather than staying fixed at `1` as it does at
+`|Λ| = 1` (`Problem24bWeightExpansion.lean`). -/
 private lemma saturatedCoherentCoeff_fin_two_zero (θ : ℝ) :
     saturatedCoherentCoeff (Fin 2) 1 θ 0 = Complex.cos (θ / 2) ^ 2 := by
   rw [saturatedCoherentCoeff, saturatedWeightVector, saturatedLadderNorm,
@@ -338,7 +322,7 @@ private lemma saturatedCoherentCoeff_fin_two_zero (θ : ℝ) :
     saturatedCoherentState_zero_apply]
   simp [saturatedCoherentAmp]
 
-/-! ## `|Λ| = 1`, `N = 2` general-`S` anti-`N = 1` fixture -/
+/-! ## `|Λ| = 1`, `N = 2` components, computed from the definitions -/
 
 /-- The `k = 1` ladder iterate at `|Λ| = 1`, `N = 2` is nonzero only at the middle configuration,
 with value `√2` — the one-site `√(C(N, j))` weight of design §0.3, invisible at every `N = 1`
@@ -400,14 +384,124 @@ private lemma saturatedWeightVector_fin_one_two_one :
       intro hc; exact h (congrFun hc 0)
     simp [h, hτ]
 
-/-- **General-`S` anti-`N = 1` pin.** `c_1(θ) = √(C(2,1)) cos(θ/2) sin(θ/2) = √2 cos(θ/2)
-sin(θ/2)` at `|Λ| = 1`, `N = 2`: a formula correct only at `N = 1` (where every one-site weight is
-trivially `1`) fails here, since the per-site `√C(N, j)` weight is genuinely present. -/
+/-- The coefficient `c_1(θ) = √2 cos(θ/2) sin(θ/2)` at `|Λ| = 1`, `N = 2`, computed from the
+definitions; here the per-site weight `√C(N, j)` is genuinely present, unlike at `N = 1`.  Feeds
+the general-`S` cross-check below. -/
 private lemma saturatedCoherentCoeff_fin_one_two_one (θ : ℝ) :
     saturatedCoherentCoeff (Fin 1) 2 θ 1
       = (Real.sqrt 2 : ℂ) * Complex.cos (θ / 2) * Complex.sin (θ / 2) := by
   rw [saturatedCoherentCoeff, saturatedWeightVector_fin_one_two_one,
     EuclideanSpace.inner_toLp_toLp, dotProduct_star_basisVecS, saturatedCoherentState_zero_apply]
   simp [saturatedCoherentAmp]
+
+/-! ## Closed-form cross-checks
+
+Each fixture below writes out, by hand, the right-hand side of one of the closed forms at a
+concrete instance and equates it with the value computed independently above, straight from the
+definitions.  The proofs are `(closed form).symm.trans (definitional computation)`: a change in
+the shape of a closed form (a swapped exponent, a dropped normalisation) stops matching the
+hand-written left-hand side, and a change in its value stops matching the independently computed
+right-hand side. -/
+
+/-- **Vandermonde fiber-sum cross-check, `|Λ| = 2`, `N = 2`, `k = 2`.** `Math.sum_prod_choose_fiber`
+evaluates the weighted fiber sum `Σ_{Σ σ_x = 2} ∏_x C(2, σ_x)` to `C(4, 2) = 6`, against the
+independent evaluation of the sum.  The site weights are nontrivial at this instance — the
+balanced configuration alone contributes `C(2,1)² = 4` — so an unweighted count of the fiber
+(`3` configurations) would fail here. -/
+example :
+    (∑ σ ∈ Finset.univ.filter (fun σ : Fin 2 → Fin 3 => ∑ x, (σ x).val = 2),
+        ∏ x, (2 : ℕ).choose (σ x).val) = 6 :=
+  (Math.sum_prod_choose_fiber (Fin 2) 2 2).trans (by decide)
+
+/-- **Ladder-iterate cross-check, `|Λ| = 2`, `N = 1`, `k = 2`.**
+`totalSpinSOpMinus_pow_allAlignedStateS_zero_apply` gives the value `k! · ∏_x √(C(1, σ_x))` on the
+fiber, which is `2` here; `ladderIterateUp_fin_two_two_apply` computes the same `2` from the
+definitions.  A closed form without the factorial multiplicity `k!` would give `1`. -/
+example (σ : Fin 2 → Fin 2) :
+    (if magSumS σ = 2 then
+        ((((2 : ℕ).factorial : ℝ) * ∏ x : Fin 2, Real.sqrt ((1 : ℕ).choose (σ x).val) : ℝ) : ℂ)
+      else 0)
+      = if magSumS σ = 2 then 2 else 0 :=
+  (totalSpinSOpMinus_pow_allAlignedStateS_zero_apply (V := Fin 2) (N := 1) 2 σ).symm.trans
+    (ladderIterateUp_fin_two_two_apply σ)
+
+/-- **Sector-normalisation cross-check, `|Λ| = 2`, `N = 1`, `k = 2`.** `saturatedLadderNorm_eq`
+gives `k! · √(C(2,2)) = 2`; the definitional computation gives the same `2`, so both the
+factorial and the binomial factor of the norm are pinned. -/
+example : ((2 : ℕ).factorial : ℝ) * Real.sqrt ((Fintype.card (Fin 2) * 1).choose 2) = 2 :=
+  (saturatedLadderNorm_eq (V := Fin 2) (N := 1) 2).symm.trans saturatedLadderNorm_fin_two_two
+
+/-- **eq. (2.4.11) cross-check, `|Λ| = 2`, `N = 1`, `k = 1`.** `saturatedWeightVector_apply` gives
+`(√(C(2,1)))⁻¹ ∏_x √(C(1, σ_x))` on the fiber; at `S = 1/2` every site weight is `1`, so this must
+be the uniform `(√2)⁻¹` computed from the definitions — the printed content of (2.4.11). -/
+example (τ : Fin 2 → Fin 2) :
+    (if magSumS τ = 1 then
+        (((Real.sqrt ((Fintype.card (Fin 2) * 1).choose 1))⁻¹
+            * ∏ x : Fin 2, Real.sqrt ((1 : ℕ).choose (τ x).val) : ℝ) : ℂ)
+      else 0)
+      = if magSumS τ = 1 then ((Real.sqrt 2)⁻¹ : ℝ) else 0 :=
+  (saturatedWeightVector_apply (V := Fin 2) (N := 1) 1 τ).symm.trans
+    (saturatedWeightVector_fin_two_one_apply τ)
+
+/-- **eq. (2.4.11) general-`S` cross-check, `|Λ| = 1`, `N = 2`, `k = 1`.** Here the one-site weight
+`√(C(2,1)) = √2` is genuinely present and cancels the sector normalisation `√(C(2,1))`, so
+`saturatedWeightVector_apply` must return the bare basis vector computed from the definitions.  A
+closed form that dropped the one-site weights would give `(√2)⁻¹` instead of `1`. -/
+example (τ : Fin 1 → Fin 3) :
+    (if magSumS τ = 1 then
+        (((Real.sqrt ((Fintype.card (Fin 1) * 2).choose 1))⁻¹
+            * ∏ x : Fin 1, Real.sqrt ((2 : ℕ).choose (τ x).val) : ℝ) : ℂ)
+      else 0)
+      = basisVecS (fun _ => (1 : Fin 3)) τ :=
+  (saturatedWeightVector_apply (V := Fin 1) (N := 2) 1 τ).symm.trans
+    (congrFun saturatedWeightVector_fin_one_two_one τ)
+
+/-- **eq. (S.19) cross-check at `k = 0`, `|Λ| = 2`, `N = 1`.** The closed-form coefficient is
+`√(C(2,0)) cos(θ/2)² sin(θ/2)⁰ = cos(θ/2)²`, matching the definitional computation.  Together with
+the `k = 2` fixture below this pins the exponent orientation: `cos^{|Λ|N-k} sin^k` and not the
+reverse. -/
+example (θ : ℝ) :
+    (Real.sqrt ((Fintype.card (Fin 2) * 1).choose 0) : ℂ)
+        * (Real.cos (θ / 2) : ℂ) ^ (Fintype.card (Fin 2) * 1 - 0)
+        * (Real.sin (θ / 2) : ℂ) ^ 0
+      = Complex.cos (θ / 2) ^ 2 :=
+  (saturatedCoherentCoeff_eq (V := Fin 2) (N := 1) θ 0).symm.trans
+    (saturatedCoherentCoeff_fin_two_zero θ)
+
+/-- **eq. (S.19) cross-check at `k = 2`, `|Λ| = 2`, `N = 1`.** The closed-form coefficient is
+`√(C(2,2)) cos(θ/2)⁰ sin(θ/2)² = sin(θ/2)²`, matching the definitional computation; with the
+`k = 0` fixture above, a swapped `cos`/`sin` exponent fails here. -/
+example (θ : ℝ) :
+    (Real.sqrt ((Fintype.card (Fin 2) * 1).choose 2) : ℂ)
+        * (Real.cos (θ / 2) : ℂ) ^ (Fintype.card (Fin 2) * 1 - 2)
+        * (Real.sin (θ / 2) : ℂ) ^ 2
+      = Complex.sin (θ / 2) ^ 2 :=
+  (saturatedCoherentCoeff_eq (V := Fin 2) (N := 1) θ 2).symm.trans
+    (saturatedCoherentCoeff_fin_two_two θ)
+
+/-- **eq. (S.19) binomial cross-check at `k = 1`, `|Λ| = 2`, `N = 1` (the decisive one).** The
+closed-form coefficient is `√(C(2,1)) cos(θ/2) sin(θ/2)`, and the definitional computation gives
+`√2 cos(θ/2) sin(θ/2)`: a closed form without the `√`-binomial factor, or with `C(2,1)` in place
+of `√(C(2,1))`, fails here.  The `|Λ| = 1`, `N = 1` fixtures of
+`Problem24bWeightExpansion.lean` cannot catch it, since `C(1, ·) = 1` there. -/
+example (θ : ℝ) :
+    (Real.sqrt ((Fintype.card (Fin 2) * 1).choose 1) : ℂ)
+        * (Real.cos (θ / 2) : ℂ) ^ (Fintype.card (Fin 2) * 1 - 1)
+        * (Real.sin (θ / 2) : ℂ) ^ 1
+      = (Real.sqrt 2 : ℂ) * Complex.cos (θ / 2) * Complex.sin (θ / 2) :=
+  (saturatedCoherentCoeff_eq (V := Fin 2) (N := 1) θ 1).symm.trans
+    (saturatedCoherentCoeff_fin_two_one θ)
+
+/-- **eq. (S.19) general-`S` cross-check at `k = 1`, `|Λ| = 1`, `N = 2`.** The binomial of the
+closed form is the *global* `C(|Λ|N, k) = C(2,1) = 2`, not a per-site one: at a single site with
+`N = 2` the definitional computation still gives `√2 cos(θ/2) sin(θ/2)`, so a formula correct only
+for `N = 1` fails here. -/
+example (θ : ℝ) :
+    (Real.sqrt ((Fintype.card (Fin 1) * 2).choose 1) : ℂ)
+        * (Real.cos (θ / 2) : ℂ) ^ (Fintype.card (Fin 1) * 2 - 1)
+        * (Real.sin (θ / 2) : ℂ) ^ 1
+      = (Real.sqrt 2 : ℂ) * Complex.cos (θ / 2) * Complex.sin (θ / 2) :=
+  (saturatedCoherentCoeff_eq (V := Fin 1) (N := 2) θ 1).symm.trans
+    (saturatedCoherentCoeff_fin_one_two_one θ)
 
 end LatticeSystem.Tests.Problem24cCoherentExpansion
