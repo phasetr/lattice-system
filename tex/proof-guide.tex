@@ -1044,7 +1044,7 @@ multiplication (local helper \texttt{isHermitian\_smul\_real} using
 $\overline{c} = c$ for $c \in \mathbb{R}$).
 
 \paragraph{References.}
-Tasaki~\cite{Tasaki:QMB}, §3.3, eq.~(3.3.1) on p.~55 states the
+Tasaki~\cite{Tasaki:QMB}, §3.3, eq.~(3.3.1) on p.~56 states the
 one-dimensional transverse-field quantum Ising Hamiltonian on an open
 chain:
 \[
@@ -1057,6 +1057,129 @@ formalization uses the Pauli convention
 $\hat\sigma^{(\alpha)} = 2\hat S^{(\alpha)}$ and introduces an
 explicit coupling $J$ in front of the bond term, so our $H_{J,h}^{N+1}$
 matches Tasaki's (3.3.1) up to the constants $J$ and the Pauli rescaling.
+
+\subsection{Configuration-basis matrix elements (Tasaki Problem 3.3.a)}
+\label{subsec:ising-matrix-elements}
+
+\emph{Source file:}
+\texttt{LatticeSystem/Quantum/IsingChainMatrixElements.lean}; regression
+fixtures in \texttt{LatticeSystem/Tests/Problem33aLowEnergy.lean}.
+
+\emph{Reference:} Tasaki~\cite{Tasaki:QMB}, Problem~3.3.a: statement
+p.~59, solution pp.~498--499, eqs.~(S.24)--(S.27). The model is the
+transverse-field quantum Ising chain of eq.~(3.3.1), p.~56, with open
+boundary conditions,
+\[
+  \hat H \;=\; -\sum_{x=1}^{L-1}\hat S^{(3)}_x \hat S^{(3)}_{x+1}
+    \;-\; \lambda \sum_{x=1}^{L}\hat S^{(1)}_x .
+\]
+With the spin-$1/2$ convention
+$\hat S^{(\alpha)} = \hat\sigma^{(\alpha)}/2$ (§2.1 eqs.~(2.1.7)--(2.1.8),
+p.~15, where Tasaki introduces the Pauli matrices via
+$\hat\sigma^{(\alpha)} = 2\hat S^{(\alpha)}$; Footnote~3, p.~52, cited at
+(3.3.1) itself, concerns the correspondence between the first term of
+(3.3.1) and the classical ferromagnetic Ising model, not this
+convention) this Hamiltonian is exactly
+\texttt{quantumIsingHamiltonian $N$ $(1/4)$ $(\lambda/2)$} on $L = N+1$
+sites: $J = 1/4$ and $h = \lambda/2$.
+
+The solution to Problem~3.3.a begins by reading off the matrix elements
+of $\hat H$ in the configuration basis $|\Phi_\tau\rangle$, indexed by
+$\tau : \mathrm{Fin}(N+1) \to \mathrm{Fin}\,2$. Write
+\[
+  b(\tau) \;=\; \sum_{i=0}^{N-1} s_i(\tau), \qquad
+  s_i(\tau) =
+    \begin{cases}
+      +1 & \tau_i = \tau_{i+1} \quad\text{(aligned bond)},\\
+      -1 & \tau_i \neq \tau_{i+1} \quad\text{(domain wall)},
+    \end{cases}
+\]
+for the \emph{signed} bond sum, and let $\texttt{siteFlipAt}\,\tau\,x$
+be the configuration $\tau$ with the spin at site $x$ flipped. The
+$N$-term range of $b$ is the open-chain bond set; the periodic
+\texttt{isingCycleHamiltonian} is a different operator and is not used
+here. The four theorems below hold for arbitrary $N \in \mathbb{N}$ and
+arbitrary real $J$, $h$.
+
+\begin{theorem}[\texttt{quantumIsingHamiltonian\_mulVec\_apply}]
+For every vector $v$ and every configuration $\tau$,
+\[
+  \bigl(\hat H v\bigr)(\tau)
+    \;=\; -J\,b(\tau)\,v(\tau)
+      \;-\; h \sum_{x=0}^{N} v\bigl(\texttt{siteFlipAt}\,\tau\,x\bigr).
+\]
+\end{theorem}
+
+\begin{theorem}[\texttt{quantumIsingHamiltonian\_apply\_diag}]
+The diagonal entries are $-J$ times the signed bond sum:
+\[
+  \langle\Phi_\tau|\hat H|\Phi_\tau\rangle \;=\; -J\,b(\tau).
+\]
+This is Tasaki's eqs.~(S.24) and~(S.25), p.~498: at $J = 1/4$ the
+aligned configurations give
+$E^{(0)}_{\rm GS} = -J(L-1) = -(L-1)/4$, and a configuration with a
+single domain wall gives $-J(L-3) = E^{(0)}_{\rm GS} + 1/2$.
+\end{theorem}
+
+\begin{theorem}[\texttt{quantumIsingHamiltonian\_apply\_siteFlip}]
+The entry between a configuration and its flip at a single site is
+\[
+  \langle\Phi_{\texttt{siteFlipAt}\,\tau\,x}|\hat H|\Phi_\tau\rangle
+    \;=\; -h,
+\]
+independently of $J$, of $\tau$ and of the site $x$. This is Tasaki's
+eqs.~(S.26) and~(S.27), pp.~498--499: at $h = \lambda/2$ the value is
+$-\lambda/2$.
+\end{theorem}
+
+\begin{theorem}[\texttt{quantumIsingHamiltonian\_apply\_eq\_zero}]
+If $\sigma \neq \tau$ and $\sigma \neq \texttt{siteFlipAt}\,\tau\,x$
+for every site $x$, then
+$\langle\Phi_\sigma|\hat H|\Phi_\tau\rangle = 0$. This is Tasaki's
+``All other matrix elements are vanishing'', p.~499.
+\end{theorem}
+
+\paragraph{Proof technique.}
+Everything is derived from the first theorem, which is proved by
+splitting $\hat H$ into its two sums and evaluating each summand
+pointwise: the bond term uses the diagonal action
+\texttt{onSite\_pauliZ\_mulVec\_apply} twice together with the sign
+identity $(\pm1)(\pm1) = s_i(\tau)$, and the field term uses
+\texttt{onSite\_pauliX\_mulVec\_apply}, the general-state action of a
+one-site $\hat\sigma^{(1)}$ (both in
+\texttt{Quantum/TimeReversalMulti/SpinOpEquivariance.lean}). The three
+matrix-element theorems then evaluate it at $v = |\Phi_\tau\rangle$
+using \texttt{mulVec\_basisVec\_apply}: the field sum drops out of the
+diagonal entry because \texttt{siteFlipAt\_ne} says a single-site flip
+never returns the original configuration; the single-flip entry keeps
+exactly one term of the field sum, namely $x$ itself, by
+\texttt{siteFlipAt\_involutive}, every other term vanishing because
+flipping a site $\neq x$ leaves the spin at $x$ unchanged; and the
+vanishing theorem is the case in which no term of either part
+survives. No new sign or spin-flip convention is
+introduced: the module reuses \texttt{quantumIsingHamiltonian},
+\texttt{siteFlipAt}, \texttt{basisVec} and their existing lemmas.
+
+\paragraph{Numeric checks.}
+The fixtures pin the diagonal entry at $J = 1/4$ for $L = 2$
+($-1/4$, one aligned bond) and $L = 3$ (aligned $-1/2$; a single kink
+$0$, the value $E^{(0)}_{\rm GS} + 1/2$ of eq.~(S.25) at $L = 3$),
+the single-flip entry ($-h$), and one vanishing entry. The $L = 2$ and
+$L = 3$ diagonals together pin $-(L-1)/4$ as a function of $L$, so a
+bond range that accidentally agrees at one bond --- in particular the
+periodic range $\mathrm{Fin}(N+1)$, which would give $-1/2$ already at
+$L = 2$ --- is rejected.
+
+\paragraph{Scope.}
+This layer is only the matrix elements, eqs.~(S.24)--(S.27); the
+$2L$-dimensional low-energy space of Problem~3.3.a, the tight-binding
+model (S.30) it maps onto, and the remaining eqs.~(S.28)--(S.41) are
+not part of it. In particular no matrix entry is identified with an
+energy: with $h \neq 0$ the configuration basis states are not
+eigenstates of $\hat H$. \texttt{lake build} is warning-free and
+\texttt{\#print axioms} on each of the four theorems yields only
+\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
+(axiom-free).
 
 \subsection{Gibbs state instantiation}
 \label{subsec:ising-gibbs}

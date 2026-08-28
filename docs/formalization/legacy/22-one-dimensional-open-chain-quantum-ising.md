@@ -37,6 +37,35 @@ explicit bond coupling `J`.
 
 <!-- legacy-source:end:1301:1324 -->
 
+## Authoritative supplemental implementation record (page-citation correction)
+
+This note is maintained by hand and lies outside the migrated catalogue block above; it is not
+subject to the frozen byte-for-byte parity of the block above. The `p. 55` citation in the frozen
+block above is a historical snapshot and is intentionally left unchanged. For the record: Tasaki,
+*Physics and Mathematics of Quantum Many-Body Systems*, §3.3 heading appears on p. 55, but the
+page breaks mid-paragraph and the numbered Hamiltonian eq. (3.3.1) itself is printed on p. 56
+(verified against the rendered PDF).
+
+## Authoritative supplemental implementation record (Problem 3.3.a configuration-basis matrix elements)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+a new capstone added after the migration baseline (PR #5386); it is not subject to the frozen
+byte-for-byte parity of the block above.
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Problem 3.3.a
+(statement p. 59; solution: eqs. (S.24)-(S.26) on p. 498, eq. (S.27) and the "all other matrix
+elements are vanishing" clause on p. 499), for the model of eq. (3.3.1), p. 56, with open
+boundary conditions. These are **matrix elements, not energies**: with `h ≠ 0` the configuration
+basis states are not eigenstates of the Hamiltonian, and this arc deliberately does not identify
+any of these matrix elements with the true Hamiltonian's spectrum.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `quantumIsingHamiltonian_mulVec_apply` | pointwise action of `quantumIsingHamiltonian N J h` on an arbitrary vector `v` at a configuration `τ`: splits into a diagonal `σ^z σ^z` signed-bond-sum part and an off-diagonal `σ^x` single-site-flip sum; the identity all matrix elements below are read off from | `Quantum/IsingChainMatrixElements.lean` |
+| `quantumIsingHamiltonian_apply_diag` | **diagonal matrix element** (Tasaki eqs. (S.24)-(S.25)): `⟨Φ_τ\|Ĥ\|Φ_τ⟩` is `-J` times the signed bond sum of `τ`, with no transverse-field contribution | `Quantum/IsingChainMatrixElements.lean` |
+| `quantumIsingHamiltonian_apply_siteFlip` | **single-site-flip off-diagonal matrix element** (Tasaki eqs. (S.26)-(S.27)): `⟨Φ_{siteFlipAt τ x}\|Ĥ\|Φ_τ⟩ = -h`, independently of `J`, `τ`, and the flipped site `x` | `Quantum/IsingChainMatrixElements.lean` |
+| `quantumIsingHamiltonian_apply_eq_zero` | all other matrix elements vanish (Tasaki p. 499, "all other matrix elements are vanishing"): configurations that are neither equal nor a single-site flip of one another are not connected by `Ĥ` | `Quantum/IsingChainMatrixElements.lean` |
+
 ---
 
 [← Two-site spin inner product (Tasaki §2.2 eq. (2.2.16))](/lattice-system/formalization/legacy/21-two-site-spin-inner-product-tasaki-2-2-eq-2-2-16/) · [Catalogue](/lattice-system/formalization/legacy/) · [Testing infrastructure →](/lattice-system/formalization/legacy/23-testing-infrastructure/)

@@ -33,7 +33,7 @@ deferred and require a `siteFlipAt` swap analysis. -/
 /-- Pointwise unfolding of `(onSite x pauliZ).mulVec v`: since
 `σ^z` is diagonal, the action is multiplication by
 `if τ x = 0 then 1 else -1` at every configuration `τ`. -/
-private theorem onSite_pauliZ_mulVec_apply
+theorem onSite_pauliZ_mulVec_apply
     (x : Λ) (v : (Λ → Fin 2) → ℂ) (τ : Λ → Fin 2) :
     ((onSite x pauliZ).mulVec v) τ =
       (if τ x = 0 then (1 : ℂ) else -1) * v τ := by
@@ -170,6 +170,19 @@ theorem siteFlipAt_involutive (τ : Λ → Fin 2) (x : Λ) :
     | 0 => simp
     | 1 => simp
   · rw [siteFlipAt_of_ne _ hy, siteFlipAt_of_ne _ hy]
+
+omit [Fintype Λ] in
+/-- `siteFlipAt` never fixes a configuration: flipping slot `x`
+changes the value there, so `siteFlipAt τ x ≠ τ`. -/
+theorem siteFlipAt_ne (τ : Λ → Fin 2) (x : Λ) :
+    siteFlipAt τ x ≠ τ := by
+  intro hEq
+  have hx : (1 : Fin 2) - τ x = τ x := by
+    rw [← siteFlipAt_self τ x]
+    exact congrFun hEq x
+  match h : τ x with
+  | 0 => rw [h] at hx; exact absurd hx (by decide)
+  | 1 => rw [h] at hx; exact absurd hx (by decide)
 
 /-- Action of `(onSite x σ^x)` on a basis vector: it swaps the
 spin at site `x`. Tasaki §2.2-style identity for the off-diagonal
