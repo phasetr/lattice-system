@@ -6,9 +6,9 @@ import LatticeSystem.Quantum.IsingLowEnergyProblem33a
 Fixtures for the low-energy analysis of the open-chain quantum Ising Hamiltonian
 (`quantumIsingHamiltonian N (1/4) (lam/2)`, `S = σ/2` convention), Tasaki, *Physics and
 Mathematics of Quantum Many-Body Systems*, Problem 3.3.a, statement p. 59, solution pp. 498-501,
-eqs. (S.24)-(S.41). This module grows with each PR of the TSK-005 arc.
+eqs. (S.24)-(S.41).
 
-The first block of fixtures (PR-005a, green) covers the configuration-basis matrix-element API of
+The first block of fixtures covers the configuration-basis matrix-element API of
 `quantumIsingHamiltonian` itself (`LatticeSystem/Quantum/IsingChainMatrixElements.lean`): the
 signature pins state each of `quantumIsingHamiltonian_mulVec_apply`,
 `quantumIsingHamiltonian_apply_diag`, `quantumIsingHamiltonian_apply_siteFlip` and
@@ -18,7 +18,7 @@ the diagonal and single-flip entries at `L = 2` and `L = 3` through those lemmas
 concrete values `-(L-1)/4` (aligned), `0` (single kink) and `-h`, so a bond-counting or sign error
 that happens to be invisible on a single bond is still caught.
 
-The second block (PR-005b) covers the `2L`-dimensional low-energy basis and its compression
+The second block covers the `2L`-dimensional low-energy basis and its compression
 (`LatticeSystem/Quantum/IsingLowEnergyProblem33a.lean`): `lowEnergyConfig`, its book-form
 descriptions and injectivity, its adjacency structure under `siteFlipAt`, and the resulting
 matrix identity `lowEnergyMatrix = E_GS^(0) • 1 + tightBindingRing`. The headline hazard here is
@@ -61,9 +61,9 @@ example (N : ℕ) (J h : ℝ) (τ : Fin (N + 1) → Fin 2) (x : Fin (N + 1)) :
     quantumIsingHamiltonian N J h (siteFlipAt τ x) τ = -(h : ℂ) :=
   quantumIsingHamiltonian_apply_siteFlip N J h τ x
 
-/-- **A4 signature pin (this PR's capstone).** `quantumIsingHamiltonian_apply_eq_zero` is the
-source's "all other matrix elements are vanishing": distinct configurations that are also not a
-single-site flip of one another have a zero matrix element. -/
+/-- **A4 signature pin.** `quantumIsingHamiltonian_apply_eq_zero` is the source's "all other
+matrix elements are vanishing": distinct configurations that are also not a single-site flip of
+one another have a zero matrix element. -/
 example (N : ℕ) (J h : ℝ) (σ τ : Fin (N + 1) → Fin 2) (h₁ : σ ≠ τ)
     (h₂ : ∀ x, σ ≠ siteFlipAt τ x) :
     quantumIsingHamiltonian N J h σ τ = 0 :=
@@ -131,7 +131,7 @@ example :
     Fin.sum_univ_two]
   norm_num [siteFlipAt, Function.update_apply, Fin.ext_iff]
 
-/-! ## PR-005b: signature pins for the `2L`-basis and compressed-matrix API -/
+/-! ## Signature pins for the `2L`-basis and compressed-matrix API -/
 
 /-- **B3 signature pin.** `lowEnergyConfig_natCast_le` gives the book form of the low-energy
 configuration at a label `j ≤ L` cast from `ℕ`: site `x` is up (`Fin 2` value `0`) iff `x.val < j`.
@@ -145,8 +145,8 @@ example (N : ℕ) (j : ℕ) (hj : j ≤ N + 1) :
 /-- **B4 signature pin.** `lowEnergyConfig_natCast_add` gives the book form of the low-energy
 configuration at a label `L + m` (`0 ≤ m ≤ L`): site `x` is down (`Fin 2` value `1`) iff
 `x.val < m`, i.e. `|Φ_m^↓↑⟩`, the mirror of B3. Parametrizing by `m` rather than `j.val - L` keeps
-`ℕ`-subtraction out of the statement (design §9 pitfall P3); a fixture built from a `ℕ`-subtracted
-label would already fail to typecheck this signature. -/
+`ℕ`-subtraction out of the statement; a fixture built from a `ℕ`-subtracted label would already
+fail to typecheck this signature. -/
 example (N : ℕ) (m : ℕ) (hm : m ≤ N + 1) :
     lowEnergyConfig N (((N + 1) + m : ℕ) : ZMod (2 * (N + 1)))
       = fun x => if x.val < m then (1 : Fin 2) else 0 :=
@@ -164,10 +164,20 @@ by one step is exactly a single-site flip at `wallSite N a`, the unique domain-w
 `lowEnergyConfig N a`. This is what lets the off-diagonal entries of `lowEnergyMatrix` between
 adjacent labels be read off `quantumIsingHamiltonian_apply_siteFlip` (A3) rather than a fresh
 computation; a wrong `wallSite` formula (e.g. missing the `mod (N + 1)` wrap at the `L`-th label)
-would make this fixture fail even though the two sides look superficially alike. -/
-example (N : ℕ) (hN : 1 ≤ N) (a : ZMod (2 * (N + 1))) :
+would make this fixture fail even though the two sides look superficially alike. The pin also
+records that the statement carries no size hypothesis. -/
+example (N : ℕ) (a : ZMod (2 * (N + 1))) :
     lowEnergyConfig N (a + 1) = siteFlipAt (lowEnergyConfig N a) (wallSite N a) :=
-  lowEnergyConfig_succ_eq_siteFlipAt N hN a
+  lowEnergyConfig_succ_eq_siteFlipAt N a
+
+/-- **B6 at `L = 1` (`N = 0`).** The one-site chain is the degenerate label ring `ZMod 2`, where
+the two ring neighbours `a + 1` and `a - 1` of a label coincide and where the only two labels are
+the aligned `|Φ↓⟩` and `|Φ↑⟩`. The flip identity still holds, and the conjuncts pin the two
+configurations. This fixture stops typechecking if a size hypothesis is put back on the lemma. -/
+example (a : ZMod (2 * (0 + 1))) :
+    lowEnergyConfig 0 (a + 1) = siteFlipAt (lowEnergyConfig 0 a) (wallSite 0 a)
+      ∧ lowEnergyConfig 0 0 = ![1] ∧ lowEnergyConfig 0 1 = ![0] :=
+  ⟨lowEnergyConfig_succ_eq_siteFlipAt 0 a, by decide, by decide⟩
 
 /-- **B7 signature pin.** `lowEnergyConfig_ne_of_not_adjacent` is the source's "all other matrix
 elements are vanishing" transported to the `2L`-basis: labels that are not equal and not
@@ -180,28 +190,29 @@ example (N : ℕ) (hN : 1 ≤ N) {a b : ZMod (2 * (N + 1))} (h₀ : b ≠ a) (h�
       ∧ ∀ x, lowEnergyConfig N b ≠ siteFlipAt (lowEnergyConfig N a) x :=
   lowEnergyConfig_ne_of_not_adjacent N hN h₀ h₁ h₂
 
-/-- **C2 signature pin (this PR's capstone).** `lowEnergyMatrix_eq_add_tightBindingRing` is
-(S.24)-(S.27) plus "all other matrix elements are vanishing" stated as a single entrywise matrix
-identity: the `2L × 2L` compression of `quantumIsingHamiltonian` to the low-energy basis is
-`E_GS^(0)` on the diagonal (`-(N:ℂ)/4 • 1`) plus a tight-binding ring on the labels
-(`tightBindingRing`, hopping `-λ/2` between ring-adjacent labels and potential `ringPotential`
-elsewhere on the diagonal). This needs `1 ≤ N`: at `L = 1` the two-element label ring
-`ZMod 2` has `a + 1 = a - 1`, so the single physical hop would be double-counted (design §9
-pitfall P2). -/
+/-- **C2 signature pin.** `lowEnergyMatrix_eq_add_tightBindingRing` is (S.24)-(S.27) plus "all
+other matrix elements are vanishing" stated as a single entrywise matrix identity: the `2L × 2L`
+compression of `quantumIsingHamiltonian` to the low-energy basis is `E_GS^(0)` on the diagonal
+(`-(N:ℂ)/4 • 1`) plus a tight-binding ring on the labels (`tightBindingRing`, hopping `-λ/2`
+between ring-adjacent labels and potential `ringPotential` elsewhere on the diagonal). The
+`1 ≤ N` hypothesis is what the proof route needs — the non-adjacent entries go through
+`lowEnergyConfig_ne_of_not_adjacent` — and not a structural constraint: `tightBindingRing`
+contributes one hopping `if` per entry, so no hop is double-counted when the two ring neighbours
+`a + 1` and `a - 1` coincide at `L = 1`. -/
 example (N : ℕ) (lam : ℝ) (hN : 1 ≤ N) :
     lowEnergyMatrix N lam
       = (-(N : ℂ) / 4) • (1 : Matrix (ZMod (2 * (N + 1))) (ZMod (2 * (N + 1))) ℂ)
         + tightBindingRing N lam :=
   lowEnergyMatrix_eq_add_tightBindingRing N lam hN
 
-/-! ## PR-005b: numeric fixtures at `L = 2` (`N = 1`) — the pseudo-periodicity guard -/
+/-! ## Low-energy matrix at `L = 2` (`N = 1`) — the pseudo-periodicity guard -/
 
 /-- **Open-chain diagonal matrix element on the ring labels (`L = 2`).** Both aligned labels (`0` =
 `|Φ↓⟩` and `2` = `|Φ↑⟩`) have diagonal entry `E_GS^(0) = -(L-1)/4 = -1/4`, the single-bond open
 chain value. Reaching for the physically periodic `isingCycleHamiltonian` instead of the open
 `quantumIsingHamiltonian` would double the bond count at `L = 2` and give `-1/2`; together with
-the design §8 fixture-6 ring-closure check below, this is the row's headline trap detector
-(design §9 pitfall P1). -/
+the ring-closure check at `L = 3` below, this is the headline detector for confusing the ring of
+basis labels with a periodic lattice. -/
 example (lam : ℝ) :
     lowEnergyMatrix 1 lam 0 0 = -1 / 4 ∧ lowEnergyMatrix 1 lam 2 2 = -1 / 4 := by
   have hN : (1 : ℕ) ≤ 1 := le_refl 1
@@ -236,7 +247,7 @@ example (lam : ℝ) :
     tightBindingRing, ringPotential]
   all_goals norm_num +decide
 
-/-! ## PR-005b: numeric fixtures at `L = 3` (`N = 2`) — book convention and ring closure -/
+/-! ## Low-energy matrix at `L = 3` (`N = 2`) — book convention and ring closure -/
 
 /-- **Book-convention pin (`L = 3`).** Label `1` is `|Φ_1^↑↓⟩` (site `0` up, sites `1, 2` down) and
 label `4 = L + 1` is its mirror `|Φ_1^↓↑⟩` (site `0` down, sites `1, 2` up). Catches an off-by-one
@@ -264,7 +275,7 @@ example (lam : ℝ) : lowEnergyMatrix 2 lam 1 3 = 0 := by
 (`⟨Φ↓|Ĥ|Φ_{L-1}^↓↑⟩`, the last case of Tasaki eq. (S.27)), giving hop `-λ/2`. This is exactly the
 fixture that fails if the `2L` label ring is implemented on `Fin (2 * (N + 1))` with truncated `ℕ`
 arithmetic (where `0 - 1` clamps to `0` instead of wrapping to `2L - 1`) instead of the ring type
-`ZMod (2 * (N + 1))` (design §9 pitfall P3). -/
+`ZMod (2 * (N + 1))`. -/
 example (lam : ℝ) : lowEnergyMatrix 2 lam 0 5 = -(lam : ℂ) / 2 := by
   have hN : (1 : ℕ) ≤ 2 := by norm_num
   rw [lowEnergyMatrix_eq_add_tightBindingRing 2 lam hN]
@@ -272,7 +283,7 @@ example (lam : ℝ) : lowEnergyMatrix 2 lam 0 5 = -(lam : ℂ) / 2 := by
     tightBindingRing, ringPotential]
   norm_num +decide
 
-/-! ## PR-005b: bracket reading -/
+/-! ## Bracket reading -/
 
 /-- **Bracket reading (`L = 2`).** `lowEnergyMatrix` entries really are `⟨Φ_a|Ĥ|Φ_b⟩` in the
 configuration basis, via the existing `basisVec_expectation_eq_diagonal`: no new bracket

@@ -1189,9 +1189,10 @@ eigenstates of $\hat H$. \texttt{lake build} is warning-free and
 fixtures in \texttt{LatticeSystem/Tests/Problem33aLowEnergy.lean}.
 
 \emph{Reference:} Tasaki~\cite{Tasaki:QMB}, Problem~3.3.a: statement
-p.~59, solution pp.~498--499 (eqs.~(S.24)--(S.26) on p.~498;
+p.~59, solution pp.~498--501 (eqs.~(S.24)--(S.26) on p.~498;
 eqs.~(S.27)--(S.31), the sentence ``All other matrix elements are
-vanishing'' and Fig.~A.1 on p.~499). The model is eq.~(3.3.1), p.~56,
+vanishing'' and Fig.~A.1 on p.~499; eqs.~(S.32)--(S.38) on p.~500;
+eqs.~(S.39)--(S.41) on p.~501). The model is eq.~(3.3.1), p.~56,
 with open boundary conditions; with the spin-$1/2$ convention
 $\hat\sigma^{(\alpha)} = 2\hat S^{(\alpha)}$ of §2.1,
 eqs.~(2.1.7)--(2.1.8), p.~15, it is
@@ -1231,11 +1232,14 @@ statement.
 \end{theorem}
 
 \begin{theorem}[\texttt{lowEnergyConfig\_succ\_eq\_siteFlipAt}]
-Advancing the label by one step is exactly a single-site flip at the
-domain wall:
+For every $N$, advancing the label by one step is exactly a single-site
+flip at the domain wall:
 $\texttt{lowEnergyConfig}\,N\,(a+1)
   = \texttt{siteFlipAt}\,(\texttt{lowEnergyConfig}\,N\,a)\,
     (\texttt{wallSite}\,N\,a)$.
+The one-site chain $L = 1$, whose label ring $\mathbb{Z}/2\mathbb{Z}$
+has $a+1 = a-1$, is included: the statement carries no $L \ge 2$
+hypothesis.
 \end{theorem}
 
 \begin{theorem}[\texttt{lowEnergyConfig\_ne\_of\_not\_adjacent}]

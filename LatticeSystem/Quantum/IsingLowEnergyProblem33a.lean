@@ -65,12 +65,6 @@ private theorem labelRing_eq_iff_val (N : ℕ) (a : ZMod (2 * (N + 1))) (k : ℕ
   · intro h; rw [h, ZMod.val_cast_of_lt hk]
   · intro h; rw [← ZMod.natCast_zmod_val a, h]
 
-/-- The label ring has order `2L ≥ 2`, so the `ZMod.val` of its unit is `1`. -/
-private theorem labelRing_val_one (N : ℕ) : (1 : ZMod (2 * (N + 1))).val = 1 := by
-  have h : ((1 : ℕ) : ZMod (2 * (N + 1))) = 1 := Nat.cast_one
-  rw [← h]
-  exact ZMod.val_cast_of_lt (by omega)
-
 /-- The half-turn label `L = N + 1` of the `2L` ring has `ZMod.val` equal to `N + 1`. -/
 private theorem labelRing_val_half (N : ℕ) :
     ((N + 1 : ℕ) : ZMod (2 * (N + 1))).val = N + 1 :=
@@ -82,11 +76,6 @@ private theorem labelRing_natCast_half (N : ℕ) :
     ((N + 1 : ℕ) : ZMod (2 * (N + 1))) = ((N : ℕ) : ZMod (2 * (N + 1))) + 1 := by
   push_cast
   ring
-
-/-- A label whose `ZMod.val` vanishes is the zero label. -/
-private theorem labelRing_eq_zero_of_val (N : ℕ) {s : ZMod (2 * (N + 1))} (h : s.val = 0) :
-    s = 0 := by
-  rw [← ZMod.natCast_zmod_val s, h, Nat.cast_zero]
 
 /-- A label lying in the second half of the ring, detected by a small positive shift that sends
 it to zero: if `t + c = 0` with `0 < c ≤ L`, then `t.val` exceeds `N`. -/
@@ -104,13 +93,13 @@ private theorem labelRing_val_sub_one (N : ℕ) {s : ZMod (2 * (N + 1))} (hs : s
     (s - 1).val + 1 = s.val := by
   have hsum : (s - 1) + 1 = s := by ring
   have hval := ZMod.val_add (s - 1) (1 : ZMod (2 * (N + 1)))
-  rw [hsum, labelRing_val_one] at hval
+  rw [hsum, ZMod.val_one'' (by omega : 2 * (N + 1) ≠ 1)] at hval
   have hlt : (s - 1).val < 2 * (N + 1) := ZMod.val_lt _
   rcases Nat.lt_or_ge ((s - 1).val + 1) (2 * (N + 1)) with h | h
   · rw [Nat.mod_eq_of_lt h] at hval; omega
   · have he : (s - 1).val + 1 = 2 * (N + 1) := by omega
     rw [he, Nat.mod_self] at hval
-    exact absurd (labelRing_eq_zero_of_val N hval) hs
+    exact absurd ((ZMod.val_eq_zero _).mp hval) hs
 
 /-- The half-turn `r ↦ r + L` of the label ring swaps its two halves: exactly one of `r` and
 `r + L` has `ZMod.val` at most `N`. This is the antipodal symmetry behind the `↑↓`/`↓↑` mirror
@@ -282,15 +271,15 @@ theorem lowEnergyConfig_injective (N : ℕ) : Function.Injective (lowEnergyConfi
   have hzero : (b - a).val = 0 := by
     have := hN'.mp (le_refl N)
     omega
-  have hsub := labelRing_eq_zero_of_val N hzero
+  have hsub := (ZMod.val_eq_zero _).mp hzero
   rw [sub_eq_zero] at hsub
   exact hsub.symm
 
 /-- **(B6)** Advancing the label by one step is exactly a single-site flip at the domain wall
 `wallSite N a`. This is what makes the neighbouring entries of `lowEnergyMatrix` readable off
-`quantumIsingHamiltonian_apply_siteFlip`. The hypothesis `1 ≤ N` is carried for uniformity with
-the rest of the arc; the identity itself holds for every `N`. -/
-theorem lowEnergyConfig_succ_eq_siteFlipAt (N : ℕ) (_hN : 1 ≤ N) (a : ZMod (2 * (N + 1))) :
+`quantumIsingHamiltonian_apply_siteFlip`. It holds for every `N`, the one-site chain `L = 1`
+included, where the two ring neighbours `a + 1` and `a - 1` of a label coincide. -/
+theorem lowEnergyConfig_succ_eq_siteFlipAt (N : ℕ) (a : ZMod (2 * (N + 1))) :
     lowEnergyConfig N (a + 1) = siteFlipAt (lowEnergyConfig N a) (wallSite N a) := by
   funext x
   by_cases hx : x = wallSite N a
@@ -331,7 +320,7 @@ theorem lowEnergyConfig_succ_eq_siteFlipAt (N : ℕ) (_hN : 1 ≤ N) (a : ZMod (
       hneL ((labelRing_eq_iff_val N _ (N + 1) (by omega)).mpr hc)
     have hpos : 0 < (a - ((x.val : ℕ) : ZMod (2 * (N + 1)))).val := by
       rcases Nat.eq_zero_or_pos (a - ((x.val : ℕ) : ZMod (2 * (N + 1)))).val with hc | hc
-      · exact absurd (labelRing_eq_zero_of_val N hc) hne0
+      · exact absurd ((ZMod.val_eq_zero _).mp hc) hne0
       · exact hc
     omega
 
@@ -355,7 +344,7 @@ private theorem wallSite_succ_ne (N : ℕ) (hN : 1 ≤ N) (a : ZMod (2 * (N + 1)
     · exact Or.inr (by rw [hw, labelRing_val_half])
   have hva := ZMod.val_add (a - (((wallSite N a).val : ℕ) : ZMod (2 * (N + 1))))
     (1 : ZMod (2 * (N + 1)))
-  rw [labelRing_val_one] at hva
+  rw [ZMod.val_one'' (by omega : 2 * (N + 1) ≠ 1)] at hva
   rcases hu with hu | hu <;> rw [hu, Nat.mod_eq_of_lt (by omega)] at hva <;>
     rcases hu1 with hu1 | hu1 <;> omega
 
@@ -432,7 +421,7 @@ theorem lowEnergyConfig_ne_of_not_adjacent (N : ℕ) (hN : 1 ≤ N) {a b : ZMod 
   have hlt : (b - a).val < 2 * (N + 1) := ZMod.val_lt _
   have hd0 : (b - a).val ≠ 0 := by
     intro h
-    have hz := labelRing_eq_zero_of_val N h
+    have hz := (ZMod.val_eq_zero _).mp h
     rw [sub_eq_zero] at hz
     exact h₀ hz
   have hd1 : (b - a).val ≠ 1 := by
@@ -535,10 +524,7 @@ private theorem bondSum_lowEnergyConfig (N : ℕ) (a : ZMod (2 * (N + 1))) :
         then (1 : ℂ) else -1)
       = (N : ℂ) - 2 * (if a = 0 ∨ a = ((N + 1 : ℕ) : ZMod (2 * (N + 1))) then 0 else 1) := by
   have hlt : a.val < 2 * (N + 1) := ZMod.val_lt _
-  have hzero : (a = 0) ↔ a.val = 0 := by
-    constructor
-    · intro h; rw [h, ZMod.val_zero]
-    · exact labelRing_eq_zero_of_val N
+  have hzero : (a = 0) ↔ a.val = 0 := (ZMod.val_eq_zero a).symm
   have hhalf : (a = ((N + 1 : ℕ) : ZMod (2 * (N + 1)))) ↔ a.val = N + 1 :=
     labelRing_eq_iff_val N a (N + 1) (by omega)
   rcases Nat.lt_or_ge a.val (N + 2) with h | h
@@ -589,8 +575,11 @@ ring on the basis labels.
 
 Because the statement covers every entry, it subsumes the printed index ranges of (S.25)
 (`j = 1, …, L - 1`), (S.26) (`j = 1, …, L - 2`) and (S.27) (the four `|Φ↑⟩`/`|Φ↓⟩` couplings).
-The hypothesis `1 ≤ N` (that is, `L ≥ 2`) is what keeps the domain walls of adjacent labels
-distinct, hence what makes the non-adjacent entries vanish. -/
+The hypothesis `1 ≤ N` (that is, `L ≥ 2`) is what this proof route needs, not a structural
+constraint: the non-adjacent entries come from `lowEnergyConfig_ne_of_not_adjacent`, whose
+two-site witness is produced by `lowEnergyConfig_two_ne` at `c := 2`. Nothing degenerates at
+`L = 1`: `tightBindingRing` carries a single hopping `if` per entry, so the two coinciding ring
+neighbours `a + 1` and `a - 1` of a label cannot contribute twice. -/
 theorem lowEnergyMatrix_eq_add_tightBindingRing (N : ℕ) (lam : ℝ) (hN : 1 ≤ N) :
     lowEnergyMatrix N lam
       = (-(N : ℂ) / 4) • (1 : Matrix (ZMod (2 * (N + 1))) (ZMod (2 * (N + 1))) ℂ)
@@ -598,7 +587,7 @@ theorem lowEnergyMatrix_eq_add_tightBindingRing (N : ℕ) (lam : ℝ) (hN : 1 �
   have hone : (1 : ZMod (2 * (N + 1))) ≠ 0 := by
     intro h
     have hv := congrArg ZMod.val h
-    rw [labelRing_val_one, ZMod.val_zero] at hv
+    rw [ZMod.val_one'' (by omega : 2 * (N + 1) ≠ 1), ZMod.val_zero] at hv
     omega
   ext a b
   simp only [lowEnergyMatrix, Matrix.add_apply, Matrix.smul_apply, Matrix.one_apply,
@@ -622,7 +611,7 @@ theorem lowEnergyMatrix_eq_add_tightBindingRing (N : ℕ) (lam : ℝ) (hN : 1 �
     by_cases hb1 : b = a + 1
     · have hflip : lowEnergyConfig N a
           = siteFlipAt (lowEnergyConfig N b) (wallSite N a) := by
-        rw [hb1, lowEnergyConfig_succ_eq_siteFlipAt N hN a, siteFlipAt_involutive]
+        rw [hb1, lowEnergyConfig_succ_eq_siteFlipAt N a, siteFlipAt_involutive]
       rw [hflip, quantumIsingHamiltonian_apply_siteFlip, if_neg hab, if_neg hab,
         if_pos (Or.inl hb1)]
       push_cast
@@ -631,7 +620,7 @@ theorem lowEnergyMatrix_eq_add_tightBindingRing (N : ℕ) (lam : ℝ) (hN : 1 �
       · have hsucc : a = b + 1 := by linear_combination -hb2
         have hflip : lowEnergyConfig N a
             = siteFlipAt (lowEnergyConfig N b) (wallSite N b) := by
-          rw [hsucc, lowEnergyConfig_succ_eq_siteFlipAt N hN b]
+          rw [hsucc, lowEnergyConfig_succ_eq_siteFlipAt N b]
         rw [hflip, quantumIsingHamiltonian_apply_siteFlip, if_neg hab, if_neg hab,
           if_pos (Or.inr hb2)]
         push_cast
