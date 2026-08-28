@@ -3,12 +3,15 @@ import LatticeSystem.Quantum.SpinS.SaturatedCoherentAmplitude
 /-!
 # Test coverage for Tasaki Problem 2.4.b — coherent-state one-site product form
 
-Signature pin for the not-yet-defined declarations `saturatedCoherentAmp` and
-`saturatedCoherentState_zero_apply` of the PR-002a1 foundation module
-`LatticeSystem/Quantum/SpinS/SaturatedCoherentAmplitude.lean` (Tasaki, *Physics and Mathematics of
-Quantum Many-Body Systems*, Problem 2.4.b, p. 34, solution p. 497, eq. (S.18) at `φ = 0`): the
+Signature pin for the declarations `saturatedCoherentAmp` and `saturatedCoherentState_zero_apply`
+of the foundation module `LatticeSystem/Quantum/SpinS/SaturatedCoherentAmplitude.lean`: the
 saturated-ferromagnet coherent state `Ξ_{θ,0}` at each configuration `σ` equals the product over
 sites of the one-site amplitude `amp N θ (σ x) = √C(N, σ x) · cos(θ/2)^{N − σ x} · sin(θ/2)^{σ x}`.
+That product form is eq. (S.18) of the solution to Problem 2.4.c (Tasaki, *Physics and Mathematics
+of Quantum Many-Body Systems*, statement p. 34, solution p. 497, stated there for `S = 1/2`), taken
+at `φ = 0`; it is the foundation for Problem 2.4.b (statement p. 34, solution pp. 496-497,
+eq. (S.17)), whose solution expands `Û_θ^{(2)} Φ↑ = Σ_M c_M Φ_M` and needs every `c_M`
+to be nonzero.
 The fixtures fix the exact name, binder order, hypothesis set (no expansion or magnetization
 hypothesis) of `saturatedCoherentState_zero_apply`, and pin two concrete instances (`|Λ| = 1` and
 `|Λ| = 2`, both at `N = 1`) that exercise the up/down amplitudes and the site-product structure.
