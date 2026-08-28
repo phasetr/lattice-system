@@ -310,8 +310,10 @@ example (N : ℕ) (lam eps : ℝ) (hN : 1 ≤ N) (phi : ZMod (2 * (N + 1)) → �
   lowEnergyMatrix_mulVec_eq_iff N lam hN eps phi
 
 /-- **Signature pin (`tightBindingEnergy`).** `tightBindingEnergy` is (S.31),
-`ε = -(λ/2)(e^κ + e^-κ) + 1/2`, and the fixture states that shape in full and closes it by `rfl`,
-so any change to the definition's shape breaks it. The numeral is pinned separately below. -/
+`ε = -(λ/2)(e^κ + e^-κ) + 1/2`, and the fixture states that shape in full at `λ = 1`,
+`κ = log 2` and closes it by `rfl`, so it pins the shape only at those values: a variant that
+agrees there, such as the constant term read as `λ/2`, is not separated by it. The numeral is
+pinned separately below. -/
 example : tightBindingEnergy (1 : ℝ) (Real.log 2)
     = -(1 / 2 : ℝ) * (Real.exp (Real.log 2) + Real.exp (-Real.log 2)) + 1 / 2 :=
   rfl
@@ -355,10 +357,13 @@ example (N : ℕ) (kappa : ℝ) :
 /-- **Numeric pin (`L = 2`, `κ = log 2`, first branch, `j = 0, 1, 2`).** With `e^κ = 2`,
 `e^-κ = 1/2` the symmetric ansatz (`s = 1`) takes the values `5/4, 1, 5/4` and the antisymmetric
 one (`s = -1`) takes `3/4, 0, -3/4` at labels `0, 1, 2`. `lowEnergyAnsatz` is a closed formula, so
-these numerals pin the first branch `e^{-κj} + s e^{-κ(L-j)}` of (S.32) itself: a wrong sign in
-either exponent, a wrong `L` in the boundary term, or a misplaced branch threshold changes at
-least one of the six. The middle-label values (`1` vs `0`) are the parity check and the equal
-(resp. negated) end values are the boundary check. -/
+these numerals pin the first-branch expression `e^{-κj} + s e^{-κ(L-j)}` of (S.32) itself: a
+wrong sign in either exponent or a wrong `L` in the boundary term changes at least one of the six.
+The branch threshold is *not* pinned by them: reading it as `j.val < N + 1` rather than
+`j.val ≤ N + 1` moves only the label `j = L`, where the two branch expressions agree — they differ
+only in the order of their two summands — so all six numerals stay the same. The middle-label
+values (`1` vs `0`) are the parity check and the equal (resp. negated) end values are the boundary
+check. -/
 example :
     lowEnergyAnsatz 1 (Real.log 2) 1 0 = 5 / 4 ∧ lowEnergyAnsatz 1 (Real.log 2) 1 1 = 1
       ∧ lowEnergyAnsatz 1 (Real.log 2) 1 2 = 5 / 4
