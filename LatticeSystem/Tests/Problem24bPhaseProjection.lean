@@ -12,11 +12,10 @@ of Quantum Many-Body Systems*, statement p. 34, solution pp. 496-497, eq. (S.17)
 `2π`-normalisation of the finite Fourier-weight integral, and the capstone equality
 `∫₀^{2π} dφ e^{iMφ} Ξ_{θ,φ} = 2π c_M Φ_M`, solved for `Φ_M = (2π c_M)⁻¹ ∫₀^{2π} dφ e^{iMφ} Ξ_{θ,φ}`.
 
-Every fixture's statement mentions only names defined in
-`LatticeSystem/Quantum/SpinS/SaturatedCoherentAmplitude.lean`,
-`LatticeSystem/Quantum/SpinS/SaturatedCoherentWeight.lean`, or
-`LatticeSystem/Quantum/SpinS/SaturatedCoherentProjection.lean` — no proof step in this file is
-elaborated against a name that does not resolve in this file's scope.
+The fixtures pin the `φ`-phase sign, the `θ = 0` and `‖Φ_M‖ = 1` sharpness facts, the `N = 2`
+binomial amplitude, the capstone's exact hypothesis set (`tasaki_problem_2_4_b_phase_projection`,
+which quantifies the Fourier weight `M` via `ladderEigenvalueUp` from `SaturatedFullLadderLI.lean`),
+and the `2π`-normalisation of the underlying finite Fourier-weight lemma.
 
 The conjugation direction of `inner` inside `saturatedCoherentCoeff` (`Φ_M` first argument) is
 **not pinned** here: at `φ = 0` both `Φ_M` and `Ξ_{θ,0}` have real entries, so swapping the two
