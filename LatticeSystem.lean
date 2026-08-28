@@ -23,6 +23,7 @@ import LatticeSystem.Math.ProjectiveRepresentation
 import LatticeSystem.Math.CStarAlgebra.GNS
 import LatticeSystem.Math.MvPolynomial.WeightedHomogeneousLayer
 import LatticeSystem.Math.MvPolynomial.BondFactorDerivation
+import LatticeSystem.Math.Combinatorics.ChooseConfigFiber
 import LatticeSystem.Quantum.HorschVonderLinden
 import LatticeSystem.Quantum.KaplanHorschVonderLinden
 import LatticeSystem.Quantum.SpinS.FalkBruchInfra
