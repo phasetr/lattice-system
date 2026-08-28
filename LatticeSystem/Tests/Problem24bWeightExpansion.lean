@@ -113,12 +113,12 @@ example (θ : ℝ) : saturatedCoherentCoeff (Fin 1) 1 θ 1 = Complex.sin (θ / 2
     saturatedCoherentState_zero_apply]
   simp [saturatedCoherentAmp]
 
-/-! ## `V = Fin 0` value fixture (targets only the PR-002a1 capstone) -/
+/-! ## `V = Fin 0` value fixture (targets only the Problem 2.4.c eq. (S.18) product form) -/
 
 /-- **Empty product at `V = Fin 0`.** For the empty site set the coherent state at any
 configuration is `1` (product over an empty index set), independent of `θ`. This targets only the
-already-proved PR-002a1 capstone `saturatedCoherentState_zero_apply`; it needs no `Nonempty`
-instance and fabricates none. -/
+already-proved Problem 2.4.c eq. (S.18) product form `saturatedCoherentState_zero_apply`; it needs
+no `Nonempty` instance and fabricates none. -/
 example (N : ℕ) (θ : ℝ) (σ : Fin 0 → Fin (N + 1)) :
     saturatedCoherentState (Fin 0) N θ 0 σ = 1 := by
   rw [saturatedCoherentState_zero_apply]
