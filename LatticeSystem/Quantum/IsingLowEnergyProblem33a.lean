@@ -466,4 +466,185 @@ theorem lowEnergyConfig_ne_of_not_adjacent (N : ℕ) (hN : 1 ≤ N) {a b : ZMod 
   · exact hy (by rw [congrFun heq y, siteFlipAt_of_ne _ (Ne.symm hxy)])
   · exact hx (by rw [congrFun heq x, siteFlipAt_of_ne _ hxz])
 
+/-! ### The compressed `2L × 2L` matrix -/
+
+/-- Signed bond sum of a prefix-shaped configuration: a configuration constant on `0, …, j - 1`
+and constant with the other value on `j, …, L - 1` has exactly one broken bond unless it is
+constant, so the sum of `+1` over aligned bonds and `-1` over domain walls is `N` minus twice the
+number of walls. -/
+private theorem bondSum_prefix (N j : ℕ) (hj : j ≤ N + 1) {c d : Fin 2} (hcd : c ≠ d) :
+    (∑ i : Fin N, if (if (i.castSucc : Fin (N + 1)).val < j then c else d)
+        = (if (i.succ : Fin (N + 1)).val < j then c else d) then (1 : ℂ) else -1)
+      = (N : ℂ) - 2 * (if j = 0 ∨ j = N + 1 then 0 else 1) := by
+  have hterm : ∀ i : Fin N,
+      (if (if (i.castSucc : Fin (N + 1)).val < j then c else d)
+          = (if (i.succ : Fin (N + 1)).val < j then c else d) then (1 : ℂ) else -1)
+        = 1 - 2 * (if j = i.val + 1 then (1 : ℂ) else 0) := by
+    intro i
+    rw [Fin.val_castSucc, Fin.val_succ]
+    by_cases h : j = i.val + 1
+    · rw [if_pos h, if_pos (by omega : i.val < j), if_neg (by omega : ¬ i.val + 1 < j),
+        if_neg hcd]
+      norm_num
+    · rw [if_neg h]
+      by_cases h2 : i.val < j
+      · rw [if_pos h2, if_pos (by omega : i.val + 1 < j), if_pos rfl]
+        norm_num
+      · rw [if_neg h2, if_neg (by omega : ¬ i.val + 1 < j), if_pos rfl]
+        norm_num
+  have hcount : (∑ i : Fin N, if j = i.val + 1 then (1 : ℂ) else 0)
+      = if j = 0 ∨ j = N + 1 then 0 else 1 := by
+    by_cases h : j = 0 ∨ j = N + 1
+    · rw [if_pos h]
+      refine Finset.sum_eq_zero (fun i _ => ?_)
+      have hi := i.is_lt
+      refine if_neg ?_
+      rcases h with h | h <;> omega
+    · rw [if_neg h]
+      have hj0 : j ≠ 0 := fun hc => h (Or.inl hc)
+      have hjN : j ≠ N + 1 := fun hc => h (Or.inr hc)
+      obtain ⟨j', rfl⟩ : ∃ j', j = j' + 1 := ⟨j - 1, by omega⟩
+      have hj' : j' < N := by omega
+      rw [Finset.sum_eq_single (⟨j', hj'⟩ : Fin N)]
+      · exact if_pos rfl
+      · intro i _ hi
+        have hval : (⟨j', hj'⟩ : Fin N).val = j' := rfl
+        exact if_neg (fun hc => hi (Fin.ext (by omega)))
+      · intro hc
+        exact absurd (Finset.mem_univ _) hc
+  simp only [hterm]
+  rw [Finset.sum_sub_distrib, ← Finset.mul_sum, hcount]
+  simp
+
+/-- Bond sum of a low-energy configuration presented in book form, through `bondSum_prefix`. -/
+private theorem bondSum_of_prefix (N : ℕ) (a : ZMod (2 * (N + 1))) (j : ℕ) (hj : j ≤ N + 1)
+    {c d : Fin 2} (hcd : c ≠ d)
+    (hform : lowEnergyConfig N a = fun x => if x.val < j then c else d)
+    (hcond : (a = 0 ∨ a = ((N + 1 : ℕ) : ZMod (2 * (N + 1)))) ↔ (j = 0 ∨ j = N + 1)) :
+    (∑ i : Fin N, if lowEnergyConfig N a i.castSucc = lowEnergyConfig N a i.succ
+        then (1 : ℂ) else -1)
+      = (N : ℂ) - 2 * (if a = 0 ∨ a = ((N + 1 : ℕ) : ZMod (2 * (N + 1))) then 0 else 1) := by
+  rw [hform, if_congr hcond rfl rfl]
+  exact bondSum_prefix N j hj hcd
+
+/-- **(B8)** Signed bond sum of every low-energy configuration: `N` for the two aligned labels
+`0` and `L`, and `N - 2` for the `2L - 2` labels carrying a domain wall. Multiplied by `-J`, this
+is Tasaki eq. (S.24) for the aligned labels and eq. (S.25) for the others. -/
+private theorem bondSum_lowEnergyConfig (N : ℕ) (a : ZMod (2 * (N + 1))) :
+    (∑ i : Fin N, if lowEnergyConfig N a i.castSucc = lowEnergyConfig N a i.succ
+        then (1 : ℂ) else -1)
+      = (N : ℂ) - 2 * (if a = 0 ∨ a = ((N + 1 : ℕ) : ZMod (2 * (N + 1))) then 0 else 1) := by
+  have hlt : a.val < 2 * (N + 1) := ZMod.val_lt _
+  have hzero : (a = 0) ↔ a.val = 0 := by
+    constructor
+    · intro h; rw [h, ZMod.val_zero]
+    · exact labelRing_eq_zero_of_val N
+  have hhalf : (a = ((N + 1 : ℕ) : ZMod (2 * (N + 1)))) ↔ a.val = N + 1 :=
+    labelRing_eq_iff_val N a (N + 1) (by omega)
+  rcases Nat.lt_or_ge a.val (N + 2) with h | h
+  · refine bondSum_of_prefix N a a.val (by omega) (c := 0) (d := 1) (by decide) ?_ ?_
+    · have hb := lowEnergyConfig_natCast_le N a.val (by omega)
+      rwa [ZMod.natCast_zmod_val] at hb
+    · rw [hzero, hhalf]
+  · obtain ⟨m, hm⟩ := Nat.exists_eq_add_of_le (by omega : N + 1 ≤ a.val)
+    refine bondSum_of_prefix N a m (by omega) (c := 1) (d := 0) (by decide) ?_ ?_
+    · have hb := lowEnergyConfig_natCast_add N m (by omega)
+      rwa [show (((N + 1) + m : ℕ) : ZMod (2 * (N + 1))) = a by
+        rw [← hm, ZMod.natCast_zmod_val]] at hb
+    · rw [hzero, hhalf]
+      omega
+
+/-- **(B9)** The `2L × 2L` array of matrix elements `⟨Φ_a|Ĥ|Φ_b⟩` of the open-chain quantum
+Ising Hamiltonian `quantumIsingHamiltonian N (1/4) (λ/2)` in the low-energy configuration basis
+(Tasaki Problem 3.3.a, eqs. (S.24)-(S.27)).
+
+Entries are matrix elements of `Ĥ` between the `2L` basis configurations, read off the
+configuration-basis entries as in `basisVec_expectation_eq_diagonal`. Since `Ĥ` does not preserve
+the span of these configurations, no entry and no eigenvalue of this matrix is claimed to be an
+energy of `Ĥ`. -/
+noncomputable def lowEnergyMatrix (N : ℕ) (lam : ℝ) :
+    Matrix (ZMod (2 * (N + 1))) (ZMod (2 * (N + 1))) ℂ :=
+  fun a b =>
+    quantumIsingHamiltonian N (1 / 4) (lam / 2) (lowEnergyConfig N a) (lowEnergyConfig N b)
+
+/-- **(B10)** The on-site potential `v_j` of Tasaki eq. (S.30): `0` at the two aligned labels
+`j = 0` and `j = L`, and `1/2` at the `2L - 2` labels carrying a domain wall. -/
+noncomputable def ringPotential (N : ℕ) (j : ZMod (2 * (N + 1))) : ℂ :=
+  if j = 0 ∨ j = ((N + 1 : ℕ) : ZMod (2 * (N + 1))) then 0 else 1 / 2
+
+/-- **(B11)** The tight-binding operator on the `2L` basis labels of Tasaki eq. (S.30): hopping
+`-λ/2` between ring-adjacent labels, together with the diagonal potential `ringPotential`.
+
+The ring here is the ring of basis labels, obtained by following the domain wall once around in
+both orientations; the lattice underlying `quantumIsingHamiltonian` remains an open chain. -/
+noncomputable def tightBindingRing (N : ℕ) (lam : ℝ) :
+    Matrix (ZMod (2 * (N + 1))) (ZMod (2 * (N + 1))) ℂ :=
+  fun a b => (if b = a + 1 ∨ b = a - 1 then -(lam : ℂ) / 2 else 0)
+    + (if a = b then ringPotential N a else 0)
+
+/-- **(C2)** All `2L × 2L` matrix elements of the compressed Hamiltonian at once: Tasaki
+eqs. (S.24)-(S.27) together with "all other matrix elements are vanishing" (p. 499). The
+compression is the constant `E_GS^(0) = -(L-1)/4 = -N/4` on the diagonal plus a tight-binding
+ring on the basis labels.
+
+Because the statement covers every entry, it subsumes the printed index ranges of (S.25)
+(`j = 1, …, L - 1`), (S.26) (`j = 1, …, L - 2`) and (S.27) (the four `|Φ↑⟩`/`|Φ↓⟩` couplings).
+The hypothesis `1 ≤ N` (that is, `L ≥ 2`) is what keeps the domain walls of adjacent labels
+distinct, hence what makes the non-adjacent entries vanish. -/
+theorem lowEnergyMatrix_eq_add_tightBindingRing (N : ℕ) (lam : ℝ) (hN : 1 ≤ N) :
+    lowEnergyMatrix N lam
+      = (-(N : ℂ) / 4) • (1 : Matrix (ZMod (2 * (N + 1))) (ZMod (2 * (N + 1))) ℂ)
+        + tightBindingRing N lam := by
+  have hone : (1 : ZMod (2 * (N + 1))) ≠ 0 := by
+    intro h
+    have hv := congrArg ZMod.val h
+    rw [labelRing_val_one, ZMod.val_zero] at hv
+    omega
+  ext a b
+  simp only [lowEnergyMatrix, Matrix.add_apply, Matrix.smul_apply, Matrix.one_apply,
+    smul_eq_mul, tightBindingRing, ringPotential]
+  by_cases hba : b = a
+  · rw [hba]
+    have hnb : ¬ (a = a + 1 ∨ a = a - 1) := by
+      rintro (h | h)
+      · exact hone (by linear_combination -h)
+      · exact hone (by linear_combination h)
+    rw [quantumIsingHamiltonian_apply_diag, bondSum_lowEnergyConfig, if_pos rfl, if_pos rfl,
+      if_neg hnb]
+    by_cases hc : a = 0 ∨ a = ((N + 1 : ℕ) : ZMod (2 * (N + 1)))
+    · rw [if_pos hc, if_pos hc]
+      push_cast
+      ring
+    · rw [if_neg hc, if_neg hc]
+      push_cast
+      ring
+  · have hab : a ≠ b := fun h => hba h.symm
+    by_cases hb1 : b = a + 1
+    · have hflip : lowEnergyConfig N a
+          = siteFlipAt (lowEnergyConfig N b) (wallSite N a) := by
+        rw [hb1, lowEnergyConfig_succ_eq_siteFlipAt N hN a, siteFlipAt_involutive]
+      rw [hflip, quantumIsingHamiltonian_apply_siteFlip, if_neg hab, if_neg hab,
+        if_pos (Or.inl hb1)]
+      push_cast
+      ring
+    · by_cases hb2 : b = a - 1
+      · have hsucc : a = b + 1 := by linear_combination -hb2
+        have hflip : lowEnergyConfig N a
+            = siteFlipAt (lowEnergyConfig N b) (wallSite N b) := by
+          rw [hsucc, lowEnergyConfig_succ_eq_siteFlipAt N hN b]
+        rw [hflip, quantumIsingHamiltonian_apply_siteFlip, if_neg hab, if_neg hab,
+          if_pos (Or.inr hb2)]
+        push_cast
+        ring
+      · have hne2 : a ≠ b + 1 := fun h => hb2 (by linear_combination -h)
+        have hne3 : a ≠ b - 1 := fun h => hb1 (by linear_combination -h)
+        obtain ⟨hne, hflip⟩ := lowEnergyConfig_ne_of_not_adjacent N hN hab hne2 hne3
+        have hnb : ¬ (b = a + 1 ∨ b = a - 1) := by
+          rintro (h | h)
+          · exact hb1 h
+          · exact hb2 h
+        rw [quantumIsingHamiltonian_apply_eq_zero N (1 / 4) (lam / 2) _ _ hne hflip,
+          if_neg hab, if_neg hab, if_neg hnb]
+        ring
+
 end LatticeSystem.Quantum

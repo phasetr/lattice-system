@@ -25,7 +25,7 @@ matrix identity `lowEnergyMatrix = E_GS^(0) • 1 + tightBindingRing`. The headl
 that (S.30)'s ring is a ring of *basis labels* (`ZMod (2 * (N + 1))`), not of lattice sites — the
 lattice stays open; the numeric fixtures at `L = 2` and `L = 3` are chosen to make a spurious
 physical-periodicity assumption (e.g. reaching for `isingCycleHamiltonian`) visible as a wrong
-energy value.
+matrix-element value.
 -/
 
 namespace LatticeSystem.Tests.Problem33aLowEnergy
@@ -196,7 +196,7 @@ example (N : ℕ) (lam : ℝ) (hN : 1 ≤ N) :
 
 /-! ## PR-005b: numeric fixtures at `L = 2` (`N = 1`) — the pseudo-periodicity guard -/
 
-/-- **Open-chain ground energy on the ring labels (`L = 2`).** Both fully-aligned labels (`0` =
+/-- **Open-chain diagonal matrix element on the ring labels (`L = 2`).** Both aligned labels (`0` =
 `|Φ↓⟩` and `2` = `|Φ↑⟩`) have diagonal entry `E_GS^(0) = -(L-1)/4 = -1/4`, the single-bond open
 chain value. Reaching for the physically periodic `isingCycleHamiltonian` instead of the open
 `quantumIsingHamiltonian` would double the bond count at `L = 2` and give `-1/2`; together with
@@ -206,8 +206,10 @@ example (lam : ℝ) :
     lowEnergyMatrix 1 lam 0 0 = -1 / 4 ∧ lowEnergyMatrix 1 lam 2 2 = -1 / 4 := by
   have hN : (1 : ℕ) ≤ 1 := le_refl 1
   rw [lowEnergyMatrix_eq_add_tightBindingRing 1 lam hN]
-  simp [tightBindingRing, ringPotential]
-  norm_num
+  constructor
+  all_goals simp only [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, Matrix.one_apply,
+    tightBindingRing, ringPotential]
+  all_goals norm_num +decide
 
 /-- **Single domain wall (`L = 2`).** The label `1` (`|Φ_1^↑↓⟩` at `L = 2`) has diagonal entry
 `E_GS^(0) + 1/2 = -1/4 + 1/2`, Tasaki eq. (S.25); together with the aligned fixture above this
@@ -216,8 +218,9 @@ where both branches of `ringPotential` are exercised. -/
 example (lam : ℝ) : lowEnergyMatrix 1 lam 1 1 = -1 / 4 + 1 / 2 := by
   have hN : (1 : ℕ) ≤ 1 := le_refl 1
   rw [lowEnergyMatrix_eq_add_tightBindingRing 1 lam hN]
-  simp [tightBindingRing, ringPotential]
-  norm_num
+  simp only [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, Matrix.one_apply,
+    tightBindingRing, ringPotential]
+  norm_num +decide
 
 /-- **Hopping and vanishing (`L = 2`).** Ring-adjacent labels `0` and `1` hop at `-λ/2`
 (Tasaki eq. (S.27)); labels `0` and `2`, at ring-distance `2` (not adjacent although the ring has
@@ -228,8 +231,10 @@ example (lam : ℝ) :
     lowEnergyMatrix 1 lam 0 1 = -(lam : ℂ) / 2 ∧ lowEnergyMatrix 1 lam 0 2 = 0 := by
   have hN : (1 : ℕ) ≤ 1 := le_refl 1
   rw [lowEnergyMatrix_eq_add_tightBindingRing 1 lam hN]
-  simp [tightBindingRing, ringPotential]
-  norm_num
+  constructor
+  all_goals simp only [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, Matrix.one_apply,
+    tightBindingRing, ringPotential]
+  all_goals norm_num +decide
 
 /-! ## PR-005b: numeric fixtures at `L = 3` (`N = 2`) — book convention and ring closure -/
 
@@ -237,8 +242,13 @@ example (lam : ℝ) :
 label `4 = L + 1` is its mirror `|Φ_1^↓↑⟩` (site `0` down, sites `1, 2` up). Catches an off-by-one
 in the domain-wall arc (`<` vs `≤`) and a swapped `↑↓`/`↓↑` family, at the smallest `L` where the
 two families are both nontrivial. -/
-example : lowEnergyConfig 2 1 = ![0, 1, 1] ∧ lowEnergyConfig 2 4 = ![1, 0, 0] :=
-  ⟨lowEnergyConfig_natCast_le 2 1 (by norm_num), lowEnergyConfig_natCast_add 2 1 (by norm_num)⟩
+example : lowEnergyConfig 2 1 = ![0, 1, 1] ∧ lowEnergyConfig 2 4 = ![1, 0, 0] := by
+  have h₁ := lowEnergyConfig_natCast_le 2 1 (by norm_num)
+  have h₂ := lowEnergyConfig_natCast_add 2 1 (by norm_num)
+  norm_num at h₁ h₂
+  refine ⟨?_, ?_⟩
+  · rw [h₁]; funext x; fin_cases x <;> rfl
+  · rw [h₂]; funext x; fin_cases x <;> rfl
 
 /-- **Non-adjacent vanishing at ring-distance `2` (`L = 3`).** Labels `1` and `3` differ by two
 domain-wall moves, so their matrix element vanishes; distinguishes a correct nearest-neighbour
@@ -246,7 +256,9 @@ ring from one that (mistakenly) also connects distance-`2` labels. -/
 example (lam : ℝ) : lowEnergyMatrix 2 lam 1 3 = 0 := by
   have hN : (1 : ℕ) ≤ 2 := by norm_num
   rw [lowEnergyMatrix_eq_add_tightBindingRing 2 lam hN]
-  simp [tightBindingRing, ringPotential]
+  simp only [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, Matrix.one_apply,
+    tightBindingRing, ringPotential]
+  norm_num +decide
 
 /-- **Ring closure (`L = 3`).** Label `2L - 1 = 5` is ring-adjacent to label `0`
 (`⟨Φ↓|Ĥ|Φ_{L-1}^↓↑⟩`, the last case of Tasaki eq. (S.27)), giving hop `-λ/2`. This is exactly the
@@ -256,8 +268,9 @@ arithmetic (where `0 - 1` clamps to `0` instead of wrapping to `2L - 1`) instead
 example (lam : ℝ) : lowEnergyMatrix 2 lam 0 5 = -(lam : ℂ) / 2 := by
   have hN : (1 : ℕ) ≤ 2 := by norm_num
   rw [lowEnergyMatrix_eq_add_tightBindingRing 2 lam hN]
-  simp [tightBindingRing, ringPotential]
-  norm_num
+  simp only [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, Matrix.one_apply,
+    tightBindingRing, ringPotential]
+  norm_num +decide
 
 /-! ## PR-005b: bracket reading -/
 
