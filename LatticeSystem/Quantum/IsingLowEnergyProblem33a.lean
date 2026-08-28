@@ -286,4 +286,184 @@ theorem lowEnergyConfig_injective (N : ℕ) : Function.Injective (lowEnergyConfi
   rw [sub_eq_zero] at hsub
   exact hsub.symm
 
+/-- **(B6)** Advancing the label by one step is exactly a single-site flip at the domain wall
+`wallSite N a`. This is what makes the neighbouring entries of `lowEnergyMatrix` readable off
+`quantumIsingHamiltonian_apply_siteFlip`. The hypothesis `1 ≤ N` is carried for uniformity with
+the rest of the arc; the identity itself holds for every `N`. -/
+theorem lowEnergyConfig_succ_eq_siteFlipAt (N : ℕ) (_hN : 1 ≤ N) (a : ZMod (2 * (N + 1))) :
+    lowEnergyConfig N (a + 1) = siteFlipAt (lowEnergyConfig N a) (wallSite N a) := by
+  funext x
+  by_cases hx : x = wallSite N a
+  · rw [hx, siteFlipAt_self]
+    simp only [lowEnergyConfig]
+    rcases sub_wallSite N a with hw | hw
+    · have h1 : a + 1 - (((wallSite N a).val : ℕ) : ZMod (2 * (N + 1))) - 1 = 0 := by
+        linear_combination hw
+      have h2 : a - (((wallSite N a).val : ℕ) : ZMod (2 * (N + 1))) - 1 = -1 := by
+        linear_combination hw
+      have hneg : ((-1 : ZMod (2 * (N + 1))) + ((1 : ℕ) : ZMod (2 * (N + 1)))) = 0 := by
+        push_cast; ring
+      rw [h1, h2, if_pos (by rw [ZMod.val_zero]; omega),
+        if_neg (labelRing_val_gt N (c := 1) (by omega) (by omega) hneg)]
+      decide
+    · have h1 : a + 1 - (((wallSite N a).val : ℕ) : ZMod (2 * (N + 1))) - 1
+          = ((N + 1 : ℕ) : ZMod (2 * (N + 1))) := by linear_combination hw
+      have h2 : a - (((wallSite N a).val : ℕ) : ZMod (2 * (N + 1))) - 1
+          = ((N : ℕ) : ZMod (2 * (N + 1))) := by
+        linear_combination hw + labelRing_natCast_half N
+      have hvN : (((N : ℕ) : ZMod (2 * (N + 1)))).val = N := ZMod.val_cast_of_lt (by omega)
+      rw [h1, h2, if_neg (by rw [labelRing_val_half]; omega), if_pos (by rw [hvN])]
+      decide
+  · rw [siteFlipAt_of_ne _ hx]
+    simp only [lowEnergyConfig]
+    refine if_congr ?_ rfl rfl
+    have hne : ¬ (a - ((x.val : ℕ) : ZMod (2 * (N + 1))) = 0
+        ∨ a - ((x.val : ℕ) : ZMod (2 * (N + 1))) = ((N + 1 : ℕ) : ZMod (2 * (N + 1)))) :=
+      fun h => hx (eq_wallSite N a x h)
+    have hne0 : a - ((x.val : ℕ) : ZMod (2 * (N + 1))) ≠ 0 := fun h => hne (Or.inl h)
+    have hneL : a - ((x.val : ℕ) : ZMod (2 * (N + 1)))
+        ≠ ((N + 1 : ℕ) : ZMod (2 * (N + 1))) := fun h => hne (Or.inr h)
+    have hstep : a + 1 - ((x.val : ℕ) : ZMod (2 * (N + 1))) - 1
+        = a - ((x.val : ℕ) : ZMod (2 * (N + 1))) := by ring
+    rw [hstep]
+    have hval := labelRing_val_sub_one N hne0
+    have hnv : (a - ((x.val : ℕ) : ZMod (2 * (N + 1)))).val ≠ N + 1 := fun hc =>
+      hneL ((labelRing_eq_iff_val N _ (N + 1) (by omega)).mpr hc)
+    have hpos : 0 < (a - ((x.val : ℕ) : ZMod (2 * (N + 1)))).val := by
+      rcases Nat.eq_zero_or_pos (a - ((x.val : ℕ) : ZMod (2 * (N + 1)))).val with hc | hc
+      · exact absurd (labelRing_eq_zero_of_val N hc) hne0
+      · exact hc
+    omega
+
+/-- The two domain walls attached to `a` and `a + 1` are distinct sites, which is where `1 ≤ N`
+(that is, `L ≥ 2`) enters: on a two-label ring the two walls would coincide. -/
+private theorem wallSite_succ_ne (N : ℕ) (hN : 1 ≤ N) (a : ZMod (2 * (N + 1))) :
+    wallSite N a ≠ wallSite N (a + 1) := by
+  intro hcon
+  have hu : (a - (((wallSite N a).val : ℕ) : ZMod (2 * (N + 1)))).val = 0
+      ∨ (a - (((wallSite N a).val : ℕ) : ZMod (2 * (N + 1)))).val = N + 1 := by
+    rcases sub_wallSite N a with hw | hw
+    · exact Or.inl (by rw [hw, ZMod.val_zero])
+    · exact Or.inr (by rw [hw, labelRing_val_half])
+  have hstep : a + 1 - (((wallSite N a).val : ℕ) : ZMod (2 * (N + 1)))
+      = (a - (((wallSite N a).val : ℕ) : ZMod (2 * (N + 1)))) + 1 := by ring
+  have hu1 : ((a - (((wallSite N a).val : ℕ) : ZMod (2 * (N + 1)))) + 1).val = 0
+      ∨ ((a - (((wallSite N a).val : ℕ) : ZMod (2 * (N + 1)))) + 1).val = N + 1 := by
+    rw [← hstep, hcon]
+    rcases sub_wallSite N (a + 1) with hw | hw
+    · exact Or.inl (by rw [hw, ZMod.val_zero])
+    · exact Or.inr (by rw [hw, labelRing_val_half])
+  have hva := ZMod.val_add (a - (((wallSite N a).val : ℕ) : ZMod (2 * (N + 1))))
+    (1 : ZMod (2 * (N + 1)))
+  rw [labelRing_val_one] at hva
+  rcases hu with hu | hu <;> rw [hu, Nat.mod_eq_of_lt (by omega)] at hva <;>
+    rcases hu1 with hu1 | hu1 <;> omega
+
+/-- Two sites at which the configurations of two labels at ring distance between `2` and `L`
+differ: the domain walls of `a` and of `a + 1`. Both ends of the distance range matter — at
+distance `1` the two configurations differ at a single site only. -/
+private theorem lowEnergyConfig_two_ne (N : ℕ) (hN : 1 ≤ N) {a b : ZMod (2 * (N + 1))}
+    (h2 : 2 ≤ (b - a).val) (hL : (b - a).val ≤ N + 1) :
+    ∃ x y : Fin (N + 1), x ≠ y
+      ∧ lowEnergyConfig N b x ≠ lowEnergyConfig N a x
+      ∧ lowEnergyConfig N b y ≠ lowEnergyConfig N a y := by
+  have hone : b - a ≠ 0 := by
+    intro h
+    rw [h, ZMod.val_zero] at h2
+    omega
+  have hv1 : (b - a - 1).val + 1 = (b - a).val := labelRing_val_sub_one N hone
+  have hone' : b - a - 1 ≠ 0 := by
+    intro h
+    rw [h, ZMod.val_zero] at hv1
+    omega
+  have hv2 : (b - a - 1 - 1).val + 1 = (b - a - 1).val := labelRing_val_sub_one N hone'
+  have hvN : (((N : ℕ) : ZMod (2 * (N + 1)))).val = N := ZMod.val_cast_of_lt (by omega)
+  refine ⟨wallSite N a, wallSite N (a + 1), wallSite_succ_ne N hN a, ?_, ?_⟩
+  · simp only [lowEnergyConfig]
+    rw [ne_eq, ite_eq_ite_iff (by decide : (0 : Fin 2) ≠ 1)]
+    rcases sub_wallSite N a with hw | hw
+    · have h1 : a - (((wallSite N a).val : ℕ) : ZMod (2 * (N + 1))) - 1 = -1 := by
+        linear_combination hw
+      have h3 : b - (((wallSite N a).val : ℕ) : ZMod (2 * (N + 1))) - 1 = b - a - 1 := by
+        linear_combination hw
+      have hneg : ((-1 : ZMod (2 * (N + 1))) + ((1 : ℕ) : ZMod (2 * (N + 1)))) = 0 := by
+        push_cast; ring
+      rw [h1, h3]
+      exact fun hc => labelRing_val_gt N (c := 1) (by omega) (by omega) hneg (hc.mp (by omega))
+    · have h1 : a - (((wallSite N a).val : ℕ) : ZMod (2 * (N + 1))) - 1
+          = ((N : ℕ) : ZMod (2 * (N + 1))) := by
+        linear_combination hw + labelRing_natCast_half N
+      have h3 : b - (((wallSite N a).val : ℕ) : ZMod (2 * (N + 1))) - 1
+          = (b - a - 1) + ((N + 1 : ℕ) : ZMod (2 * (N + 1))) := by linear_combination hw
+      rw [h1, h3, labelRing_val_add_half_le, hvN]
+      exact fun hc => (hc.mpr (le_refl N)) (by omega)
+  · obtain ⟨n, hn⟩ := Nat.exists_eq_add_of_le hN
+    have hvn : (((n : ℕ) : ZMod (2 * (N + 1)))).val = n := ZMod.val_cast_of_lt (by omega)
+    simp only [lowEnergyConfig]
+    rw [ne_eq, ite_eq_ite_iff (by decide : (0 : Fin 2) ≠ 1)]
+    rcases sub_wallSite N (a + 1) with hw | hw
+    · have h1 : a - (((wallSite N (a + 1)).val : ℕ) : ZMod (2 * (N + 1))) - 1 = -1 - 1 := by
+        linear_combination hw
+      have h3 : b - (((wallSite N (a + 1)).val : ℕ) : ZMod (2 * (N + 1))) - 1
+          = b - a - 1 - 1 := by linear_combination hw
+      have hneg : (((-1 : ZMod (2 * (N + 1))) - 1) + ((2 : ℕ) : ZMod (2 * (N + 1)))) = 0 := by
+        push_cast; ring
+      rw [h1, h3]
+      exact fun hc => labelRing_val_gt N (c := 2) (by omega) (by omega) hneg (hc.mp (by omega))
+    · have hcast2 : ((N + 1 : ℕ) : ZMod (2 * (N + 1)))
+          = ((n : ℕ) : ZMod (2 * (N + 1))) + 2 := by
+        rw [show N + 1 = n + 2 by omega]
+        push_cast
+        ring
+      have h1 : a - (((wallSite N (a + 1)).val : ℕ) : ZMod (2 * (N + 1))) - 1
+          = ((n : ℕ) : ZMod (2 * (N + 1))) := by linear_combination hw + hcast2
+      have h3 : b - (((wallSite N (a + 1)).val : ℕ) : ZMod (2 * (N + 1))) - 1
+          = (b - a - 1 - 1) + ((N + 1 : ℕ) : ZMod (2 * (N + 1))) := by linear_combination hw
+      rw [h1, h3, labelRing_val_add_half_le, hvn]
+      exact fun hc => (hc.mpr (by omega)) (by omega)
+
+/-- **(B7)** Tasaki's "all other matrix elements are vanishing" (p. 499) at the level of
+configurations: labels that are neither equal nor ring-adjacent give configurations that are
+neither equal nor a single-site flip of one another, because they differ at two distinct sites. -/
+theorem lowEnergyConfig_ne_of_not_adjacent (N : ℕ) (hN : 1 ≤ N) {a b : ZMod (2 * (N + 1))}
+    (h₀ : b ≠ a) (h₁ : b ≠ a + 1) (h₂ : b ≠ a - 1) :
+    lowEnergyConfig N b ≠ lowEnergyConfig N a
+      ∧ ∀ x, lowEnergyConfig N b ≠ siteFlipAt (lowEnergyConfig N a) x := by
+  have hlt : (b - a).val < 2 * (N + 1) := ZMod.val_lt _
+  have hd0 : (b - a).val ≠ 0 := by
+    intro h
+    have hz := labelRing_eq_zero_of_val N h
+    rw [sub_eq_zero] at hz
+    exact h₀ hz
+  have hd1 : (b - a).val ≠ 1 := by
+    intro h
+    have hz : b - a = ((1 : ℕ) : ZMod (2 * (N + 1))) :=
+      (labelRing_eq_iff_val N _ 1 (by omega)).mpr h
+    exact h₁ (by push_cast at hz; linear_combination hz)
+  have hd2 : (b - a).val ≠ 2 * N + 1 := by
+    intro h
+    have hz : b - a = ((2 * N + 1 : ℕ) : ZMod (2 * (N + 1))) :=
+      (labelRing_eq_iff_val N _ (2 * N + 1) (by omega)).mpr h
+    have hs : ((2 * (N + 1) : ℕ) : ZMod (2 * (N + 1))) = 0 := ZMod.natCast_self _
+    push_cast at hz hs
+    exact h₂ (by linear_combination hz + hs)
+  obtain ⟨x, y, hxy, hx, hy⟩ : ∃ x y : Fin (N + 1), x ≠ y
+      ∧ lowEnergyConfig N b x ≠ lowEnergyConfig N a x
+      ∧ lowEnergyConfig N b y ≠ lowEnergyConfig N a y := by
+    rcases Nat.lt_or_ge (b - a).val (N + 2) with h | h
+    · exact lowEnergyConfig_two_ne N hN (by omega) (by omega)
+    · have hswap : a - b = -(b - a) := by ring
+      have hneg : (a - b).val = 2 * (N + 1) - (b - a).val := by
+        rw [hswap, ZMod.neg_val, if_neg]
+        intro hc
+        rw [hc, ZMod.val_zero] at hd0
+        exact hd0 rfl
+      obtain ⟨x, y, hxy, hx, hy⟩ :=
+        lowEnergyConfig_two_ne N hN (a := b) (b := a) (by omega) (by omega)
+      exact ⟨x, y, hxy, hx.symm, hy.symm⟩
+  refine ⟨fun heq => hx (congrFun heq x), fun z heq => ?_⟩
+  rcases eq_or_ne x z with rfl | hxz
+  · exact hy (by rw [congrFun heq y, siteFlipAt_of_ne _ (Ne.symm hxy)])
+  · exact hx (by rw [congrFun heq x, siteFlipAt_of_ne _ hxz])
+
 end LatticeSystem.Quantum
