@@ -14,7 +14,7 @@ permalink: /formalization/legacy/22-one-dimensional-open-chain-quantum-ising/
 ### One-dimensional open-chain quantum Ising
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
-Systems*, §3.3 eq. (3.3.1), p. 55 (transverse-field Ising on an open
+Systems*, §3.3 eq. (3.3.1), p. 56 (transverse-field Ising on an open
 chain). Our formalization uses the Pauli convention `σ = 2·S` and an
 explicit bond coupling `J`.
 
