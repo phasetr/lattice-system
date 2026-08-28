@@ -66,6 +66,48 @@ any of these matrix elements with the true Hamiltonian's spectrum.
 | `quantumIsingHamiltonian_apply_siteFlip` | **single-site-flip off-diagonal matrix element** (Tasaki eqs. (S.26)-(S.27)): `⟨Φ_{siteFlipAt τ x}\|Ĥ\|Φ_τ⟩ = -h`, independently of `J`, `τ`, and the flipped site `x` | `Quantum/IsingChainMatrixElements.lean` |
 | `quantumIsingHamiltonian_apply_eq_zero` | all other matrix elements vanish (Tasaki p. 499, "all other matrix elements are vanishing"): configurations that are neither equal nor a single-site flip of one another are not connected by `Ĥ` | `Quantum/IsingChainMatrixElements.lean` |
 
+## Authoritative supplemental implementation record (Problem 3.3.a low-energy 2L matrix)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+a new capstone added after the migration baseline (PR #5387); it is not subject to the frozen
+byte-for-byte parity of the block above.
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Problem 3.3.a
+(statement p. 59; solution: eqs. (S.24)-(S.26) on p. 498, eqs. (S.27)-(S.31) and Fig. A.1 on
+p. 499), for the model of eq. (3.3.1), p. 56, with open boundary conditions. The spin-`1/2`
+convention `σ̂ = 2Ŝ` is §2.1, eqs. (2.1.7)-(2.1.8), p. 15, so the Hamiltonian is
+`quantumIsingHamiltonian N (1/4) (λ/2)` on `L = N + 1` sites.
+
+**The `2L` ring of eq. (S.30) is a ring of basis labels, not of lattice sites.** Tasaki's own
+Fig. A.1 (p. 499) draws it as a ring of the `2L` basis states `|Φ↓⟩`, `|Φ_j^↑↓⟩`, `|Φ↑⟩`,
+`|Φ_j^↓↑⟩` with a spin configuration attached to each site of the ring. Here the labels have type
+`ZMod (2 * (N + 1))` while the lattice sites have type `Fin (N + 1)`; the two are never
+identified, the chain stays open, and the periodic `isingCycleHamiltonian` is not used. Eq. (S.30)
+is printed for `j = 1, …, 2L - 1` but p. 500 uses it at `j = 0`, so the formalization quantifies
+over all labels.
+
+These are **matrix elements, not energies**: `Ĥ` does not preserve the span of the `2L`
+configurations, so no entry and no eigenvalue of `lowEnergyMatrix` is identified with the true
+Hamiltonian's spectrum. Tasaki notes on p. 59 that the analysis of this problem is not
+mathematically rigorous.
+
+Every declaration below is **PROVED**; `#print axioms` on each yields only `propext`,
+`Classical.choice`, `Quot.sound` (`wallSite` and the two book-form lemmas need even less).
+
+| Lean name | Statement | File |
+|---|---|---|
+| `lowEnergyConfig`, `wallSite` | the `2L` low-energy configurations indexed by a label in `ZMod (2 * (N + 1))` (site `x` is up iff the label lies in the arc `x + 1, …, x + L`), and the fold of the label ring onto the chain that names the domain wall of a label | `Quantum/IsingLowEnergyProblem33a.lean` |
+| `lowEnergyConfig_natCast_le`, `lowEnergyConfig_natCast_add` | book form of the two families: labels `0, …, L` give `\|Φ↓⟩`, `\|Φ_j^↑↓⟩`, `\|Φ↑⟩` (site `x` up iff `x < j`) and labels `L, …, 2L` give the mirror family `\|Φ_m^↓↑⟩` (site `x` down iff `x < m`) | `Quantum/IsingLowEnergyProblem33a.lean` |
+| `lowEnergyConfig_injective` | the `2L` labels give `2L` pairwise distinct configurations, i.e. the low-energy space has the dimension `2L` named in the problem statement | `Quantum/IsingLowEnergyProblem33a.lean` |
+| `lowEnergyConfig_succ_eq_siteFlipAt` | advancing the label by one step is exactly the single-site flip `siteFlipAt` at the domain wall `wallSite`; holds for every `N`, the one-site chain `L = 1` included (no `L ≥ 2` hypothesis) | `Quantum/IsingLowEnergyProblem33a.lean` |
+| `lowEnergyConfig_ne_of_not_adjacent` | labels that are neither equal nor ring-adjacent give configurations that are neither equal nor a single-site flip of one another (Tasaki p. 499, "all other matrix elements are vanishing", at configuration level); needs `1 ≤ N`, i.e. `L ≥ 2` | `Quantum/IsingLowEnergyProblem33a.lean` |
+| `lowEnergyMatrix`, `ringPotential`, `tightBindingRing` | the `2L × 2L` array of **matrix elements** `⟨Φ_a\|Ĥ\|Φ_b⟩` in the low-energy configuration basis; the potential `v_j` of eq. (S.30) (`0` at the aligned labels `0` and `L`, `1/2` elsewhere); the tight-binding operator on the labels with hopping `-λ/2` between ring-adjacent labels | `Quantum/IsingLowEnergyProblem33a.lean` |
+| `lowEnergyMatrix_eq_add_tightBindingRing` | **capstone of PR #5387**: every entry at once, `lowEnergyMatrix N λ = (-N/4) • 1 + tightBindingRing N λ` for `1 ≤ N` — Tasaki eqs. (S.24)-(S.27) together with "all other matrix elements are vanishing" (p. 499), subsuming the printed index ranges of (S.25) and (S.26) | `Quantum/IsingLowEnergyProblem33a.lean` |
+
+Regression fixtures live in `LatticeSystem/Tests/Problem33aLowEnergy.lean`: the `L = 2` diagonal
+entries pin `E_GS^(0) = -(L-1)/4 = -1/4` (a physically periodic chain would give `-1/2`), and the
+`L = 3` entry between the labels `0` and `2L - 1 = 5` pins the wrap-around of the label ring.
+
 ---
 
 [← Two-site spin inner product (Tasaki §2.2 eq. (2.2.16))](/lattice-system/formalization/legacy/21-two-site-spin-inner-product-tasaki-2-2-eq-2-2-16/) · [Catalogue](/lattice-system/formalization/legacy/) · [Testing infrastructure →](/lattice-system/formalization/legacy/23-testing-infrastructure/)
