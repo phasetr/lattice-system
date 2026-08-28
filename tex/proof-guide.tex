@@ -20734,7 +20734,14 @@ The proof runs through uniqueness of solutions of the linear ODE
 the Leibniz action of a one-site operator on a product state): both the
 matrix-exponential coherent state and the amplitude product solve this ODE and
 agree at \(\theta = 0\), so the half-angle \(\theta/2\) in the amplitude is
-forced by the ODE rather than inserted by hand. \texttt{lake build} is
+forced by the ODE rather than inserted by hand. The square-root binomial
+identities that move a ladder matrix element \(\sqrt{(t+1)(n-t)}\) between the
+neighbouring Clebsch--Gordan weights \(\sqrt{\binom{n}{t}}\) and
+\(\sqrt{\binom{n}{t+1}}\) live in the shared file
+\texttt{Math/Combinatorics/SqrtChooseLadder.lean}, which the per-site Weyl
+transport of \(\hat S^{\pm}\)
+(\texttt{Quantum/SpinS/GeneralSWeylLadder.lean}) consumes as well.
+\texttt{lake build} is
 warning-free and \texttt{\#print axioms saturatedCoherentState\_zero\_apply}
 yields only \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
 (axiom-free). This is the first PR of the Problem 2.4.b arc: it establishes

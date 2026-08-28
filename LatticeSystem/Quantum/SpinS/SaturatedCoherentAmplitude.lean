@@ -1,3 +1,4 @@
+import LatticeSystem.Math.Combinatorics.SqrtChooseLadder
 import LatticeSystem.Quantum.SpinS.AllAlignedStateCore
 import Mathlib.Analysis.Calculus.Deriv.Pow
 import Mathlib.Analysis.Calculus.Deriv.Prod
@@ -34,53 +35,6 @@ namespace LatticeSystem.Quantum
 
 open Matrix NormedSpace
 
-/-! ## Binomial square-root ladder identities -/
-
-/-- Raising-step normalisation: `√((j+1)(N-j)) · √(binom N (j+1)) = (N-j) · √(binom N j)`.
-This is the identity that makes `Ŝ^+` act on the one-site amplitudes of Tasaki's coherent state
-(*Physics and Mathematics of Quantum Many-Body Systems*, eq. (2.4.6), p. 33; site-product form
-eq. (S.18) of the solution to Problem 2.4.c, p. 497) by a shift of the exponents alone. -/
-private lemma sqrt_choose_raise (N : ℕ) {i : ℕ} (hi : i < N) :
-    Real.sqrt (((i : ℝ) + 1) * ((N : ℝ) - ((i : ℝ) + 1) + 1)) *
-        Real.sqrt ((N.choose (i + 1) : ℕ) : ℝ)
-      = ((N : ℝ) - (i : ℝ)) * Real.sqrt ((N.choose i : ℕ) : ℝ) := by
-  have hiN : (i : ℝ) ≤ (N : ℝ) := by exact_mod_cast hi.le
-  have hNi : (0 : ℝ) ≤ (N : ℝ) - (i : ℝ) := by linarith
-  have harg : ((i : ℝ) + 1) * ((N : ℝ) - ((i : ℝ) + 1) + 1)
-      = ((i : ℝ) + 1) * ((N : ℝ) - (i : ℝ)) := by ring
-  have hcast : ((N.choose (i + 1) : ℕ) : ℝ) * ((i : ℝ) + 1)
-      = ((N.choose i : ℕ) : ℝ) * ((N : ℝ) - (i : ℝ)) := by
-    have h := congrArg (fun k : ℕ => (k : ℝ)) (Nat.choose_succ_right_eq N i)
-    push_cast [Nat.cast_sub hi.le] at h
-    linarith
-  have hR : ((N : ℝ) - (i : ℝ)) * Real.sqrt ((N.choose i : ℕ) : ℝ)
-      = Real.sqrt ((((N : ℝ) - (i : ℝ)) ^ 2) * ((N.choose i : ℕ) : ℝ)) := by
-    rw [Real.sqrt_mul (by positivity), Real.sqrt_sq hNi]
-  rw [harg, hR, ← Real.sqrt_mul (mul_nonneg (by positivity) hNi)]
-  congr 1
-  linear_combination ((N : ℝ) - (i : ℝ)) * hcast
-
-/-- Lowering-step normalisation: `√((N-k)(k+1)) · √(binom N k) = (k+1) · √(binom N (k+1))`.
-Companion of `sqrt_choose_raise` for the action of `Ŝ^-` on the one-site amplitudes of Tasaki's
-coherent state (*Physics and Mathematics of Quantum Many-Body Systems*, eq. (2.4.6), p. 33;
-site-product form eq. (S.18) of the solution to Problem 2.4.c, p. 497). -/
-private lemma sqrt_choose_lower (N : ℕ) {k : ℕ} (hk : k + 1 ≤ N) :
-    Real.sqrt (((N : ℝ) - (k : ℝ)) * ((k : ℝ) + 1)) * Real.sqrt ((N.choose k : ℕ) : ℝ)
-      = ((k : ℝ) + 1) * Real.sqrt ((N.choose (k + 1) : ℕ) : ℝ) := by
-  have hkN : (k : ℝ) ≤ (N : ℝ) := by exact_mod_cast Nat.le_of_succ_le hk
-  have hNk : (0 : ℝ) ≤ (N : ℝ) - (k : ℝ) := by linarith
-  have hcast : ((N.choose (k + 1) : ℕ) : ℝ) * ((k : ℝ) + 1)
-      = ((N.choose k : ℕ) : ℝ) * ((N : ℝ) - (k : ℝ)) := by
-    have h := congrArg (fun j : ℕ => (j : ℝ)) (Nat.choose_succ_right_eq N k)
-    push_cast [Nat.cast_sub (Nat.le_of_succ_le hk)] at h
-    linarith
-  have hR : ((k : ℝ) + 1) * Real.sqrt ((N.choose (k + 1) : ℕ) : ℝ)
-      = Real.sqrt ((((k : ℝ) + 1) ^ 2) * ((N.choose (k + 1) : ℕ) : ℝ)) := by
-    rw [Real.sqrt_mul (by positivity), Real.sqrt_sq (by positivity)]
-  rw [hR, ← Real.sqrt_mul (mul_nonneg hNk (by positivity))]
-  congr 1
-  linear_combination (-((k : ℝ) + 1)) * hcast
-
 /-! ## One-site coherent amplitude -/
 
 /-- **One-site coherent amplitude** `√(binom N j) · cos(θ/2)^{N-j} · sin(θ/2)^j` of the spin-`S`
@@ -105,7 +59,13 @@ private lemma spinSOpPlus_mulVec_saturatedCoherentAmp (N : ℕ) (θ : ℝ) (i : 
   · have hsucc : (i : ℕ) + 1 < N + 1 := by omega
     rw [Finset.sum_eq_single (⟨(i : ℕ) + 1, hsucc⟩ : Fin (N + 1))]
     · rw [spinSOpPlus_apply_raise N (i := i) (j := ⟨(i : ℕ) + 1, hsucc⟩) rfl]
-      have hk := sqrt_choose_raise N hlt
+      have hk : Real.sqrt ((((i : ℕ) : ℝ) + 1) * ((N : ℝ) - (((i : ℕ) : ℝ) + 1) + 1)) *
+            Real.sqrt ((N.choose ((i : ℕ) + 1) : ℕ) : ℝ)
+          = ((N : ℝ) - ((i : ℕ) : ℝ)) * Real.sqrt ((N.choose (i : ℕ) : ℕ) : ℝ) := by
+        rw [show (((i : ℕ) : ℝ) + 1) * ((N : ℝ) - (((i : ℕ) : ℝ) + 1) + 1)
+              = ((N : ℝ) - ((i : ℕ) : ℝ)) * (((i : ℕ) : ℝ) + 1) from by ring,
+          Math.sqrt_lower_coeff hlt, Nat.cast_sub hlt.le]
+        ring
       have hk2 : ((Real.sqrt ((((i : ℕ) + 1 : ℕ) : ℝ) *
               ((N : ℝ) - (((i : ℕ) + 1 : ℕ) : ℝ) + 1)) : ℝ) : ℂ) *
             ((Real.sqrt ((N.choose ((i : ℕ) + 1) : ℕ) : ℝ) : ℝ) : ℂ)
@@ -145,7 +105,13 @@ private lemma spinSOpMinus_mulVec_saturatedCoherentAmp (N : ℕ) (θ : ℝ) (i :
     have hkle : k + 1 ≤ N := by omega
     rw [Finset.sum_eq_single (⟨k, hklt⟩ : Fin (N + 1))]
     · rw [spinSOpMinus_apply_lower N (i := i) (j := ⟨k, hklt⟩) (by simp [hk0])]
-      have hk := sqrt_choose_lower N hkle
+      have hk : Real.sqrt (((N : ℝ) - (k : ℝ)) * ((k : ℝ) + 1)) *
+            Real.sqrt ((N.choose k : ℕ) : ℝ)
+          = ((k : ℝ) + 1) * Real.sqrt ((N.choose (k + 1) : ℕ) : ℝ) := by
+        rw [show ((N : ℝ) - (k : ℝ)) * ((k : ℝ) + 1)
+              = ((k : ℝ) + 1) * ((N : ℝ) - ((k : ℝ) + 1) + 1) from by ring,
+          Math.sqrt_raise_coeff hkle]
+        ring
       have hk2 : ((Real.sqrt (((N : ℝ) - (k : ℝ)) * ((k : ℝ) + 1)) : ℝ) : ℂ) *
             ((Real.sqrt ((N.choose k : ℕ) : ℝ) : ℝ) : ℂ)
           = (((k + 1 : ℕ) : ℂ)) * ((Real.sqrt ((N.choose (k + 1) : ℕ) : ℝ) : ℝ) : ℂ) := by

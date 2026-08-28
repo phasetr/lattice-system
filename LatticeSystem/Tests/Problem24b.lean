@@ -23,12 +23,14 @@ open LatticeSystem.Quantum
 
 /-! ## Signature pin: no extra hypothesis beyond the standing spin-`S` assumptions -/
 
-/-- **Signature pin.** For any site set `V` (`Fintype`, `DecidableEq`, `Nonempty`) and spin data
-`N`, any angle `θ`, and any configuration `σ`, the coherent state at `φ = 0` factorizes as the
-site-product of one-site amplitudes. This fixture pins `saturatedCoherentState_zero_apply`'s exact
-name, binder order (`V N` implicit-typeclass, `θ σ` explicit) and hypothesis set: no expansion
-hypothesis, no magnetization hypothesis, no coefficient-nonzero hypothesis. -/
-example {V : Type*} [Fintype V] [DecidableEq V] [Nonempty V] {N : ℕ}
+/-- **Signature pin.** For any site set `V` (`Fintype`, `DecidableEq` only) and spin data `N`, any
+angle `θ`, and any configuration `σ`, the coherent state at `φ = 0` factorizes as the site-product
+of one-site amplitudes. This fixture pins `saturatedCoherentState_zero_apply`'s exact name, binder
+order (`V N` implicit-typeclass, `θ σ` explicit) and hypothesis set: no expansion hypothesis, no
+magnetization hypothesis, no coefficient-nonzero hypothesis, and in particular no `Nonempty V` —
+supplying an instance the capstone does not need would make this pin accept a strengthened
+hypothesis set. -/
+example {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
     (θ : ℝ) (σ : V → Fin (N + 1)) :
     saturatedCoherentState V N θ 0 σ = ∏ x : V, saturatedCoherentAmp N θ (σ x) :=
   saturatedCoherentState_zero_apply θ σ
