@@ -209,4 +209,33 @@ theorem saturatedLadderNorm_eq (k : Fin (Fintype.card V * N + 1)) :
   rw [Finset.sum_congr rfl (fun σ _ => hterm σ), ← Finset.sum_filter, ← Finset.mul_sum, hcast,
     Real.sqrt_mul (sq_nonneg _), Real.sqrt_sq (Nat.cast_nonneg _)]
 
+/-! ## The magnetisation-sector state in closed component form (eq. (2.4.11)) -/
+
+/-- **Tasaki eq. (2.4.11)**, *Physics and Mathematics of Quantum Many-Body Systems*, p. 34, in its
+general-`S` form: the normalised magnetisation-sector state `Φ_M` (`M = |Λ|S - k`) is supported on
+the configurations of total lowering count `k`, where its value is the product of the one-site
+Clebsch–Gordan weights `√(binom N σ_x)` divided by `√(binom (|Λ| N) k)`; the factorial `k!` of the
+iterate and of its norm cancels.
+
+For `S = 1/2` (`N = 1`) every one-site weight is `binom 1 σ_x = 1`, so the value is the constant
+`(√(binom |Λ| k))⁻¹ = √[(S_max+M)!(S_max−M)!/(2S_max)!]` on the whole sector — the printed form of
+(2.4.11), in which all configurations of the sector carry exactly the same weight. -/
+theorem saturatedWeightVector_apply (k : Fin (Fintype.card V * N + 1)) (σ : V → Fin (N + 1)) :
+    saturatedWeightVector V N k σ
+      = if magSumS σ = k.val then
+          (((Real.sqrt ((Fintype.card V * N).choose k.val))⁻¹
+              * ∏ x : V, Real.sqrt (N.choose (σ x).val) : ℝ) : ℂ)
+        else 0 := by
+  have hchoose : (0 : ℝ) < Real.sqrt ((Fintype.card V * N).choose k.val) :=
+    Real.sqrt_pos.mpr (by exact_mod_cast Nat.choose_pos (Nat.lt_succ_iff.mp k.isLt))
+  have hs : Real.sqrt ((Fintype.card V * N).choose k.val) ≠ 0 := ne_of_gt hchoose
+  have hfac : (k.val.factorial : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero _)
+  rw [saturatedWeightVector, Pi.smul_apply, smul_eq_mul, saturatedLadderNorm_eq,
+    ladderIterateUp, totalSpinSOpMinus_pow_allAlignedStateS_zero_apply]
+  by_cases h : magSumS σ = k.val
+  · rw [if_pos h, if_pos h, ← Complex.ofReal_inv, ← Complex.ofReal_mul]
+    congr 1
+    field_simp
+  · rw [if_neg h, if_neg h, mul_zero]
+
 end LatticeSystem.Quantum
