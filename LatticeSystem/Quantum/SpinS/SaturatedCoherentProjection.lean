@@ -72,8 +72,9 @@ theorem saturatedCoherentState_apply_phase (θ φ : ℝ) (σ : V → Fin (N + 1)
 
 /-! ## The sector expansion at a general azimuthal angle -/
 
-/-- **Sector expansion at a general `φ`**: `Ξ_{θ,φ} = Σ_M e^{-iφM} c_M(θ) Φ_M`, the middle member
-of Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, eq. (S.17), p. 497.
+/-- **Sector expansion at a general `φ`**: `Ξ_{θ,φ} = Σ_M e^{-iφM} c_M(θ) Φ_M`, the identity that
+gives the middle member of Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, eq.
+(S.17), p. 497.
 
 Each sector state is supported on the configurations of its own magnetisation, so the phase
 `e^{-iφM(σ)}` produced by the axis-3 rotation is constant on the support of the `M`-th term and can

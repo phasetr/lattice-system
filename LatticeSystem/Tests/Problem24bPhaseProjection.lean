@@ -6,20 +6,17 @@ import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 /-!
 # Test coverage for Tasaki Problem 2.4.b — `φ`-phase orientation and the capstone
 
-Fixtures for the still-unimplemented completion of Problem 2.4.b (Tasaki, *Physics and Mathematics
+Fixtures for the completion of Problem 2.4.b (Tasaki, *Physics and Mathematics
 of Quantum Many-Body Systems*, statement p. 34, solution pp. 496-497, eq. (S.17)): the pointwise
 `φ`-phase of the coherent state `Ξ_{θ,φ}` (the `S = 1/2` instance of (S.18), solution p. 497), the
 `2π`-normalisation of the finite Fourier-weight integral, and the capstone equality
 `∫₀^{2π} dφ e^{iMφ} Ξ_{θ,φ} = 2π c_M Φ_M`, solved for `Φ_M = (2π c_M)⁻¹ ∫₀^{2π} dφ e^{iMφ} Ξ_{θ,φ}`.
 
-Every fixture whose statement mentions only names already defined in
-`LatticeSystem/Quantum/SpinS/SaturatedCoherentAmplitude.lean` or
-`LatticeSystem/Quantum/SpinS/SaturatedCoherentWeight.lean` is expected to elaborate; the fixtures
-that consume the not-yet-implemented phase lemma, capstone, or the not-yet-implemented finite
-Fourier-weight lemma fail with `unknown identifier`, and the fixture that needs the
-normalisation-nonzero fact fails the same way because that fact is `private` to a different module
-(mathlib-style file privacy, not a missing declaration) — no proof step in this file is elaborated
-against a name that does not resolve in this file's scope.
+Every fixture's statement mentions only names defined in
+`LatticeSystem/Quantum/SpinS/SaturatedCoherentAmplitude.lean`,
+`LatticeSystem/Quantum/SpinS/SaturatedCoherentWeight.lean`, or
+`LatticeSystem/Quantum/SpinS/SaturatedCoherentProjection.lean` — no proof step in this file is
+elaborated against a name that does not resolve in this file's scope.
 
 The conjugation direction of `inner` inside `saturatedCoherentCoeff` (`Φ_M` first argument) is
 **not pinned** here: at `φ = 0` both `Φ_M` and `Ξ_{θ,0}` have real entries, so swapping the two
@@ -38,8 +35,8 @@ open LatticeSystem.Quantum
 /-- **Up-configuration phase orientation.** At the single up-site configuration, the `φ`-rotated
 coherent state carries the phase `e^{-iφ/2}` (not `e^{+iφ/2}`) on the `cos(θ/2)` amplitude — the
 sign fixed by the repo's `magEigenvalueS` convention and matching (S.18) as printed. This is the
-fixture whose sign is load-bearing: flipping it in the eventual proof of
-`saturatedCoherentState_apply_phase` makes this example fail to close. -/
+fixture whose sign is load-bearing: flipping it in `saturatedCoherentState_apply_phase` makes this
+example fail to close. -/
 example (θ φ : ℝ) :
     saturatedCoherentState (Fin 1) 1 θ φ (fun _ => 0)
       = Complex.exp (-((φ : ℂ) * Complex.I) / 2) * Complex.cos (θ / 2) := by
@@ -63,8 +60,7 @@ example (θ φ : ℝ) :
 
 /-- **Sharpness of `0 < θ`.** At `θ = 0` the coherent state collapses to the all-up state, so
 every non-maximal weight-sector coefficient vanishes: the strict lower bound on `θ` in
-`saturatedCoherentCoeff_ne_zero` (and hence in the eventual capstone) is not a decorative
-hypothesis. -/
+`saturatedCoherentCoeff_ne_zero` (and hence in the capstone) is not a decorative hypothesis. -/
 example {V : Type*} [Fintype V] [DecidableEq V] [Nonempty V] {N : ℕ}
     (k : Fin (Fintype.card V * N + 1)) (hk : k ≠ 0) :
     saturatedCoherentCoeff V N 0 k = 0 := by
@@ -144,9 +140,9 @@ example : saturatedCoherentCoeff (Fin 2) 1 (Real.pi / 2) 1 ≠ 0 :=
 
 /-! ## `2π` normalisation of the finite Fourier-weight lemma -/
 
-/-- **`2π`, not `π` and not `(2π)⁻¹`.** A two-term instance of the not-yet-implemented finite
-Fourier-weight integral lemma, exercising both the matching-weight branch (`j = 0`) and the
-distinct-weight branch (`j = 1`) of the underlying character sum. -/
+/-- **`2π`, not `π` and not `(2π)⁻¹`.** A two-term instance of the finite Fourier-weight integral
+lemma, exercising both the matching-weight branch (`j = 0`) and the distinct-weight
+branch (`j = 1`) of the underlying character sum. -/
 example (v : Fin 2 → ℂ) :
     (∫ φ in (0 : ℝ)..(2 * Real.pi),
         ∑ j : Fin 2, Complex.exp (((((![(0 : ℤ), 1] j) : ℤ) : ℂ)
