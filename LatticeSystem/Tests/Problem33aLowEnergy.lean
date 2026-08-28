@@ -70,8 +70,9 @@ fixture is exactly the guard against that mis-instantiation (design §8 fixture 
 matrix-element API). -/
 example :
     quantumIsingHamiltonian 1 (1 / 4 : ℝ) (1 : ℝ) (fun _ => (1 : Fin 2)) (fun _ => (1 : Fin 2))
-      = -1 / 4 :=
-  quantumIsingHamiltonian_apply_diag 1 (1 / 4) 1 (fun _ => 1)
+      = -1 / 4 := by
+  rw [quantumIsingHamiltonian_apply_diag 1 (1 / 4) 1 (fun _ => 1)]
+  norm_num
 
 /-- **Field-term value (A3 at `L = 2`).** The matrix element between the all-down configuration
 and its site-`0` flip is exactly `-h`; here `h = 1`. A wrong sign, a stray factor of `J`, or a
