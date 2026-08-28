@@ -15,9 +15,12 @@ sesquilinear edge identity
 `Σ_{x,y ∈ Λ} conj(g_x) Δ_{x,y} g_y = -Σ_{{x,y} ∈ B} |g_x - g_y|²`
 
 for arbitrary `g : Λ → ℂ`. The right-hand side is a genuine unordered sum over `G.edgeFinset`,
-as printed in the book, rather than a halved ordered double sum; the factor `2` relating the two
-is supplied once by `LatticeSystem.Lattice.two_sum_edgeFinset_lift_eq_sum_adj` and cancelled
-once, by `mul_left_cancel₀`, so no division occurs anywhere.
+as printed in the book, rather than a halved ordered double sum. The identity is proved in its
+doubled form: `LatticeSystem.Lattice.two_sum_edgeFinset_lift_eq_sum_adj` equates twice the bond sum
+with the ordered adjacency sum, and `mul_left_cancel₀` discharges that factor `2` by reducing the
+goal to the doubled identity rather than by dividing, so no division occurs anywhere. The `2 *` in
+`sum_adj_normSq_sub` is a separate, genuinely algebraic coefficient coming from the expansion of
+`|g_x - g_y|²`, not the bridge's factor.
 
 The sign convention is pinned in exactly one place, `latticeLaplacian_apply`; everything
 downstream reads only that lemma and never unfolds `SimpleGraph.lapMatrix` again.

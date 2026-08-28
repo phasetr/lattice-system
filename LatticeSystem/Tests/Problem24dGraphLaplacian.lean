@@ -138,8 +138,10 @@ example :
 /-- **Factor-of-2 fixture, right-hand side.** The capstone's bond sum over the two bonds of
 `pathGraph 3` contributes `|0 - 1|² + |1 - 0|² = 2`, hence `-2`. This is the discriminating case
 for the ordered-pair-sum-vs-bond-sum bookkeeping: summing ordered pairs without the bond
-correction would give `-4`, and halving the correct bond sum would give `-1`. The 2-vertex
-fixtures cannot catch either mode, having one bond and only degree-`1` vertices. -/
+correction would give `-4`, and halving the correct bond sum would give `-1`. What the 2-vertex
+fixtures cannot see is the degree-coefficient mode of the left-hand fixture above: every vertex of
+`pathGraph 2` has degree `1`, so replacing the diagonal `-|N(x)|` by a constant `-1` leaves both
+2-vertex fixtures unchanged. -/
 example :
     -∑ e ∈ (SimpleGraph.pathGraph 3).edgeFinset,
         Sym2.lift ⟨fun x y => ((Complex.normSq (![(0 : ℂ), 1, 0] x - ![(0 : ℂ), 1, 0] y) : ℝ) : ℂ),
