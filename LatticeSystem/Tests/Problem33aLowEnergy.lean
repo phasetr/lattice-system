@@ -297,11 +297,11 @@ example (lam : ℝ) :
 
 /-! ## The eigenvalue equation and the parity ansätze -/
 
-/-- **C3 signature pin.** `lowEnergyMatrix_mulVec_eq_iff` rewrites the eigenvector equation
-`lowEnergyMatrix * φ = (E_GS^(0) + ε) • φ` as the (S.30) tight-binding recursion at every ring
-label at once. This is what turns matrix-eigenvector reasoning into the scalar recurrence solved
-by the (S.32) ansätze below; a wrong sign on the hopping term or on `ε` here would silently break
-every downstream eigenvector fixture. -/
+/-- **Signature pin (eigenvector equation as recursion).** `lowEnergyMatrix_mulVec_eq_iff`
+rewrites the eigenvector equation `lowEnergyMatrix * φ = (E_GS^(0) + ε) • φ` as the (S.30)
+tight-binding recursion at every ring label at once. This is what turns matrix-eigenvector
+reasoning into the scalar recurrence solved by the (S.32) ansätze below; a wrong sign on the
+hopping term or on `ε` here would silently break every downstream eigenvector fixture. -/
 example (N : ℕ) (lam eps : ℝ) (hN : 1 ≤ N) (phi : ZMod (2 * (N + 1)) → ℂ) :
     lowEnergyMatrix N lam *ᵥ phi = ((-(N : ℝ) / 4 + eps : ℝ) : ℂ) • phi ↔
       ∀ j : ZMod (2 * (N + 1)),
@@ -309,23 +309,25 @@ example (N : ℕ) (lam eps : ℝ) (hN : 1 ≤ N) (phi : ZMod (2 * (N + 1)) → �
           = -((lam : ℂ) / 2) * (phi (j - 1) + phi (j + 1)) + ringPotential N j * phi j :=
   lowEnergyMatrix_mulVec_eq_iff N lam hN eps phi
 
-/-- **D1 signature/value pin.** `tightBindingEnergy` is (S.31),
-`ε = -(λ/2)(e^κ + e^-κ) + 1/2`. At `κ = log 2` (`e^κ = 2`, `e^-κ = 1/2`) and `λ = 1` this
-evaluates to `-3/4`; a missing `1/2` shift or a swapped sign on the `λ` term would change this
-numeral. -/
+/-- **Signature pin (`tightBindingEnergy`).** `tightBindingEnergy` is (S.31),
+`ε = -(λ/2)(e^κ + e^-κ) + 1/2`, and the fixture states that shape in full and closes it by `rfl`,
+so any change to the definition's shape breaks it. The numeral is pinned separately below. -/
 example : tightBindingEnergy (1 : ℝ) (Real.log 2)
     = -(1 / 2 : ℝ) * (Real.exp (Real.log 2) + Real.exp (-Real.log 2)) + 1 / 2 :=
   rfl
 
+/-- **Numeric pin (`tightBindingEnergy` at `λ = 1`, `κ = log 2`).** Evaluating (S.31) at
+`e^κ = 2`, `e^-κ = 1/2` gives `-(1/2)(2 + 1/2) + 1/2 = -3/4`. A missing `1/2` shift, a swapped
+sign on the `λ` term, or `e^{-κ}` read as `e^{κ}` changes this numeral. -/
 example : tightBindingEnergy (1 : ℝ) (Real.log 2) = -3 / 4 := by
   unfold tightBindingEnergy
   rw [Real.exp_log (by norm_num), Real.exp_neg, Real.exp_log (by norm_num)]
   norm_num
 
-/-- **D3 signature pin.** `rootEquation` is (S.34) in cleared form, with `s = ±1` folding the
-`±`/`∓` pair of the source into a single sign parameter shared by numerator and denominator; a
-version with independent signs on the two occurrences would silently swap the symmetric and
-antisymmetric root conditions. -/
+/-- **Signature pin (`rootEquation`).** `rootEquation` is (S.34) in cleared form, with `s = ±1`
+folding the `±`/`∓` pair of the source into a single sign parameter shared by numerator and
+denominator; a version with independent signs on the two occurrences would silently swap the
+symmetric and antisymmetric root conditions. -/
 example (N : ℕ) (lam kappa s : ℝ) :
     rootEquation N lam kappa s ↔
       Real.exp kappa - Real.exp (-kappa)
@@ -333,7 +335,7 @@ example (N : ℕ) (lam kappa s : ℝ) :
             / (1 - s * Real.exp (-kappa * (N + 1 : ℕ)))) :=
   Iff.rfl
 
-/-- **D2 parity pin.** `φ_L = ±φ_0` under `s = ±1` — the source's own definition of the
+/-- **Parity pin.** `φ_L = ±φ_0` under `s = ±1` — the source's own definition of the
 symmetric/antisymmetric ansatz — holds for every `N` and `κ`, independently of the root equation.
 A swapped `s` convention flips which root is later called "symmetric", which flips the sign of the
 splitting in (S.40)/(S.41). -/
@@ -350,12 +352,13 @@ example (N : ℕ) (kappa : ℝ) :
       push_cast
       ring
 
-/-- **D2 numeric pin (`L = 2`, `κ = log 2`, first branch, `j = 0, 1, 2`).** With
-`e^κ = 2`, `e^-κ = 1/2` the symmetric ansatz (`s = 1`) takes the values `5/4, 1, 5/4` and the
-antisymmetric one (`s = -1`) takes `3/4, 0, -3/4` at labels `0, 1, 2`. A wrong interior recurrence
-(D6) or a wrong choice of `L` in the boundary exponent (P3's `ℕ`-subtraction hazard) changes at
-least one of these six numerals; the constant middle-label sign flip (`1` vs `0`) is the parity
-check, and the equal (resp. negated) end values are the boundary check. -/
+/-- **Numeric pin (`L = 2`, `κ = log 2`, first branch, `j = 0, 1, 2`).** With `e^κ = 2`,
+`e^-κ = 1/2` the symmetric ansatz (`s = 1`) takes the values `5/4, 1, 5/4` and the antisymmetric
+one (`s = -1`) takes `3/4, 0, -3/4` at labels `0, 1, 2`. `lowEnergyAnsatz` is a closed formula, so
+these numerals pin the first branch `e^{-κj} + s e^{-κ(L-j)}` of (S.32) itself: a wrong sign in
+either exponent, a wrong `L` in the boundary term, or a misplaced branch threshold changes at
+least one of the six. The middle-label values (`1` vs `0`) are the parity check and the equal
+(resp. negated) end values are the boundary check. -/
 example :
     lowEnergyAnsatz 1 (Real.log 2) 1 0 = 5 / 4 ∧ lowEnergyAnsatz 1 (Real.log 2) 1 1 = 1
       ∧ lowEnergyAnsatz 1 (Real.log 2) 1 2 = 5 / 4
@@ -373,12 +376,12 @@ example :
     norm_num
   norm_num [lowEnergyAnsatz, h0, h1, h2, hc1, hc2]
 
-/-- **D2 numeric pin (`L = 2`, `κ = log 2`, second branch, `j = 3`).** Label `3` lies in the
-`j = L, …, 2L` branch of (S.32); the values `1` (`s = 1`) and `0` (`s = -1`) coincide with the
-`j = 1` values above only because `L = 2` makes the two branch formulas numerically symmetric at
-this size. Swapping `j - L` and `2L - j` inside the second branch changes both numerals (to
-`2` and `-3/2` respectively), so this fixture catches exactly that transcription error and is
-independent of the `j = 0, 1, 2` fixture above. -/
+/-- **Numeric pin (`L = 2`, `κ = log 2`, second branch, `j = 3`).** Label `3` lies in the
+`j = L, …, 2L` branch of (S.32), which the labels `0, 1, 2` above never reach; the values `1`
+(`s = 1`) and `0` (`s = -1`) coincide with the `j = 1` values because `3` is the mirror of `1`
+across `L = 2`. This pins the branch at the smallest size where it is nonempty, but it cannot
+separate the two exponents of that branch: at `L = 2`, `j = 3` both `j - L` and `2L - j` equal
+`1`. The `L = 3` fixture below separates them. -/
 example :
     lowEnergyAnsatz 1 (Real.log 2) 1 3 = 1 ∧ lowEnergyAnsatz 1 (Real.log 2) (-1) 3 = 0 := by
   have h3 : ((3 : ZMod (2 * (1 + 1)))).val = 3 := rfl
@@ -387,11 +390,28 @@ example :
     norm_num
   norm_num [lowEnergyAnsatz, h3, hc1]
 
-/-- **C4 signature pin.** `lowEnergyAnsatz_isEigenvector` is the PR's capstone: under the root
-equation the ansatz is a nonzero eigenvector of `lowEnergyMatrix` with eigenvalue
-`E_GS^(0) + tightBindingEnergy lam kappa`, i.e. (S.28)-(S.34) assembled. This is the exact
-statement quantified as conjunct 4 of the eventual `tasaki_problem_3_3_a_low_energy_spectrum`
-capstone; nothing here claims `ε_±` is an energy of the original Hamiltonian. -/
+/-- **Numeric pin (`L = 3`, `κ = log 2`, second branch, `j = 4`).** This is the smallest size at
+which the two exponents of the second branch `s e^{-κ(j-L)} + e^{-κ(2L-j)}` of (S.32) differ:
+`j - L = 1` while `2L - j = 2`, giving `s/2 + 1/4`, i.e. `3/4` at `s = 1` and `-1/4` at `s = -1`.
+Reading the branch with `j - L` and `2L - j` interchanged yields `s/4 + 1/2`, hence `+1/4` at
+`s = -1`: the antisymmetric value is what pins which exponent carries the sign `s`, the symmetric
+value being unchanged by that swap. -/
+example :
+    lowEnergyAnsatz 2 (Real.log 2) 1 4 = 3 / 4
+      ∧ lowEnergyAnsatz 2 (Real.log 2) (-1) 4 = -1 / 4 := by
+  have h4 : ((4 : ZMod (2 * (2 + 1)))).val = 4 := rfl
+  have hc1 : Complex.exp (-Complex.log 2) = 1 / 2 := by
+    rw [Complex.exp_neg, Complex.exp_log (by norm_num : (2 : ℂ) ≠ 0)]
+    norm_num
+  have hc2 : Complex.exp (-(Complex.log 2 * 2)) = 1 / 4 := by
+    rw [show -(Complex.log 2 * 2) = -Complex.log 2 + -Complex.log 2 by ring, Complex.exp_add, hc1]
+    norm_num
+  constructor <;> norm_num [lowEnergyAnsatz, h4, hc1, hc2]
+
+/-- **Signature pin (capstone eigenvector theorem).** `lowEnergyAnsatz_isEigenvector` is the
+capstone of this module: under the root equation the ansatz is a nonzero eigenvector of
+`lowEnergyMatrix` with eigenvalue `E_GS^(0) + tightBindingEnergy lam kappa`, i.e. (S.28)-(S.34)
+assembled. Nothing here claims `ε_±` is an energy of the original Hamiltonian. -/
 example (N : ℕ) (lam kappa s : ℝ) (hN : 1 ≤ N) (hlam : 0 < lam) (hk : 0 < kappa)
     (hs : s = 1 ∨ s = -1) (hroot : rootEquation N lam kappa s) :
     lowEnergyAnsatz N kappa s ≠ 0

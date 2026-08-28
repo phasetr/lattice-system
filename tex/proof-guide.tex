@@ -1366,8 +1366,11 @@ The recursion is asserted at \emph{every} label, $j = 0$ included.
 Eq.~(S.30) is printed ``for any $j = 1,\dots,2L-1$'', yet p.~500
 derives (S.33) from it ``with $j = 0$ or $L$''; the quantified form is
 the eigenvector equation of the $2L \times 2L$ matrix and subsumes both
-readings. The hypothesis $L \ge 2$ is needed because the two ring
-neighbours $j+1$ and $j-1$ of a label are distinct only then.
+readings. The hypothesis $L \ge 2$ enters twice: it is inherited from
+\texttt{lowEnergyMatrix\_eq\_add\_tightBindingRing} of
+§\ref{subsec:ising-low-energy-matrix}, and it is needed again here
+because the two ring neighbours $j+1$ and $j-1$ of a label are distinct
+only then.
 
 \begin{definition}[\texttt{tightBindingEnergy},
 \texttt{lowEnergyAnsatz}, \texttt{rootEquation}]
