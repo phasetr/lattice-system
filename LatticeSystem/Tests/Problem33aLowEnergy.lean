@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.IsingLowEnergyProblem33a
+import LatticeSystem.Quantum.IsingLowEnergyProblem33aEigenvectors
 
 /-!
 # Test coverage for Tasaki Problem 3.3.a — the low-energy `2L` matrix (TSK-005)
@@ -342,7 +342,13 @@ example (N : ℕ) (kappa : ℝ) :
         = lowEnergyAnsatz N kappa 1 0
       ∧ lowEnergyAnsatz N kappa (-1) ((N + 1 : ℕ) : ZMod (2 * (N + 1)))
           = -lowEnergyAnsatz N kappa (-1) 0 := by
-  constructor <;> rfl
+  have hvalL : (((N + 1 : ℕ)) : ZMod (2 * (N + 1))).val = N + 1 := ZMod.val_cast_of_lt (by omega)
+  have hval0 : ((0 : ZMod (2 * (N + 1)))).val = 0 := ZMod.val_zero
+  constructor <;>
+    · simp only [lowEnergyAnsatz, hvalL, hval0, if_pos (le_refl (N + 1)),
+        if_pos (Nat.zero_le (N + 1)), Nat.cast_zero, sub_self, sub_zero, mul_zero, Real.exp_zero]
+      push_cast
+      ring
 
 /-- **D2 numeric pin (`L = 2`, `κ = log 2`, first branch, `j = 0, 1, 2`).** With
 `e^κ = 2`, `e^-κ = 1/2` the symmetric ansatz (`s = 1`) takes the values `5/4, 1, 5/4` and the
@@ -356,8 +362,16 @@ example :
       ∧ lowEnergyAnsatz 1 (Real.log 2) (-1) 0 = 3 / 4
       ∧ lowEnergyAnsatz 1 (Real.log 2) (-1) 1 = 0
       ∧ lowEnergyAnsatz 1 (Real.log 2) (-1) 2 = -3 / 4 := by
-  unfold lowEnergyAnsatz
-  norm_num [ZMod.val_cast_of_lt, Real.exp_log, Real.exp_neg]
+  have h0 : ((0 : ZMod (2 * (1 + 1)))).val = 0 := rfl
+  have h1 : ((1 : ZMod (2 * (1 + 1)))).val = 1 := rfl
+  have h2 : ((2 : ZMod (2 * (1 + 1)))).val = 2 := rfl
+  have hc1 : Complex.exp (-Complex.log 2) = 1 / 2 := by
+    rw [Complex.exp_neg, Complex.exp_log (by norm_num : (2 : ℂ) ≠ 0)]
+    norm_num
+  have hc2 : Complex.exp (-(Complex.log 2 * 2)) = 1 / 4 := by
+    rw [show -(Complex.log 2 * 2) = -Complex.log 2 + -Complex.log 2 by ring, Complex.exp_add, hc1]
+    norm_num
+  norm_num [lowEnergyAnsatz, h0, h1, h2, hc1, hc2]
 
 /-- **D2 numeric pin (`L = 2`, `κ = log 2`, second branch, `j = 3`).** Label `3` lies in the
 `j = L, …, 2L` branch of (S.32); the values `1` (`s = 1`) and `0` (`s = -1`) coincide with the
@@ -367,8 +381,11 @@ this size. Swapping `j - L` and `2L - j` inside the second branch changes both n
 independent of the `j = 0, 1, 2` fixture above. -/
 example :
     lowEnergyAnsatz 1 (Real.log 2) 1 3 = 1 ∧ lowEnergyAnsatz 1 (Real.log 2) (-1) 3 = 0 := by
-  unfold lowEnergyAnsatz
-  norm_num [ZMod.val_cast_of_lt, Real.exp_log, Real.exp_neg]
+  have h3 : ((3 : ZMod (2 * (1 + 1)))).val = 3 := rfl
+  have hc1 : Complex.exp (-Complex.log 2) = 1 / 2 := by
+    rw [Complex.exp_neg, Complex.exp_log (by norm_num : (2 : ℂ) ≠ 0)]
+    norm_num
+  norm_num [lowEnergyAnsatz, h3, hc1]
 
 /-- **C4 signature pin.** `lowEnergyAnsatz_isEigenvector` is the PR's capstone: under the root
 equation the ansatz is a nonzero eigenvector of `lowEnergyMatrix` with eigenvalue
