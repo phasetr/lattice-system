@@ -38,12 +38,14 @@ allows only while the ring size stays below a multiple of `λ e^κ∞`. The last
 `LatticeSystem/Quantum/IsingLowEnergyProblem33aSpectrum.lean`, which are limits in `λ` at no fixed
 ring size and are not combined with the `L ↑ ∞` limit of this module.
 
-`tightBindingEnergy λ κ` is an eigenvalue of the compression `lowEnergyMatrix N λ` of `Ĥ` to a
-span that `Ĥ` does not preserve, so `ε_±` and their difference are eigenvalue data of the
-compressed matrix and are not identified with a ground-state or first-excited energy of `Ĥ`.
-Tasaki notes on p. 59 that the perturbative analysis of this problem is not mathematically
-rigorous. The ring carrying the labels `j` is a ring of basis labels of type `ZMod (2 * (N + 1))`,
-not of lattice sites: the chain itself stays open.
+`tightBindingEnergy λ κ` is an eigenvalue of the compression `lowEnergyMatrix N λ` only after the
+shift by `E_GS^(0) = -N/4`; on its own it is an eigenvalue of the tight-binding part
+`tightBindingRing N λ`. That the compression restricts `Ĥ` to an invariant subspace is not
+established here, so `ε_±` and their difference are eigenvalue data of the compressed matrix and
+are not identified with a ground-state or first-excited energy of `Ĥ`. Tasaki notes on p. 59 that
+the perturbative analysis of this problem is not mathematically rigorous. The ring carrying the
+labels `j` is a ring of basis labels of type `ZMod (2 * (N + 1))`, not of lattice sites: the chain
+itself stays open.
 -/
 
 namespace LatticeSystem.Quantum
@@ -430,8 +432,9 @@ and the ring size growing, which is the order of limits of the source's footnote
 final step `≃ 2 λ^L` of (S.41) is a separate small-`λ` statement and is not asserted here.
 
 No uniqueness of either root is assumed: `kp` and `km` range over arbitrary eventually-positive
-root families of their sectors. `tightBindingEnergy` is an eigenvalue of the compression
-`lowEnergyMatrix N λ` of `Ĥ`, not an energy of `Ĥ`. -/
+root families of their sectors. `tightBindingEnergy` is an eigenvalue of the tight-binding part
+`tightBindingRing N λ` — of the compression `lowEnergyMatrix N λ` only after the shift by `-N/4` —
+and not an energy of `Ĥ`. -/
 theorem tendsto_splitting_ratio (lam : ℝ) (hlam : 0 < lam) (kp km : ℕ → ℝ)
     (hkp : ∀ᶠ N : ℕ in Filter.atTop, 0 < kp N ∧ rootEquation N lam (kp N) 1)
     (hkm : ∀ᶠ N : ℕ in Filter.atTop, 0 < km N ∧ rootEquation N lam (km N) (-1)) :

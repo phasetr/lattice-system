@@ -22,11 +22,13 @@ records `tanh κ∞ = 1/√(1 + 4λ²)`, which is the ratio `(e^κ∞ - e^-κ∞
 (S.40) and (S.41), and the two `Tendsto` statements record the small-`λ` replacements
 `e^-κ∞ ≃ λ` (p. 500, below (S.35)) and `tanh κ∞ ≃ 1` behind the final form `≃ 2 λ^L` of (S.41).
 
-`tightBindingEnergy λ κ` is an eigenvalue of the compression `lowEnergyMatrix N λ` of `Ĥ` to a
-span that `Ĥ` does not preserve, so `ε∞` is the `L ↑ ∞` value of such an eigenvalue and is not
-identified with a ground-state or first-excited energy of `Ĥ`; the source's non-rigorous Taylor
-steps (S.36)-(S.38) are not asserted. Tasaki notes on p. 59 that the perturbative analysis of this
-problem is not mathematically rigorous.
+`tightBindingEnergy λ κ` is an eigenvalue of the compression `lowEnergyMatrix N λ` only after the
+shift by `E_GS^(0) = -N/4`; on its own it is an eigenvalue of the tight-binding part
+`tightBindingRing N λ`. That the compression restricts `Ĥ` to an invariant subspace is not
+established here, so `ε∞` is the `L ↑ ∞` value of such an eigenvalue and is not identified with a
+ground-state or first-excited energy of `Ĥ`; the source's non-rigorous Taylor steps (S.36)-(S.38)
+are not asserted. Tasaki notes on p. 59 that the perturbative analysis of this problem is not
+mathematically rigorous.
 -/
 
 namespace LatticeSystem.Quantum
@@ -78,7 +80,8 @@ theorem exp_neg_kappaInf_eq {lam : ℝ} (hlam : 0 < lam) :
 
 /-! ### The limiting eigenvalue (S.39) -/
 
-/-- Tasaki eq. (S.39), p. 501, middle equality: the `L ↑ ∞` eigenvalue of the compressed matrix is
+/-- Tasaki eq. (S.39), p. 501, middle equality: the `L ↑ ∞` value of the tight-binding eigenvalue
+(S.31) — an eigenvalue of the compressed matrix only after the shift by `E_GS^(0)` — is
 `ε∞ = -(λ/2)(e^κ∞ + e^-κ∞) + 1/2 = -√(1 + 4λ²)/2 + 1/2`. The trailing `≃ -λ²` of the printed
 equation is a small-`λ` approximation and is not part of this statement. -/
 theorem tightBindingEnergy_kappaInf_eq {lam : ℝ} (hlam : 0 < lam) :

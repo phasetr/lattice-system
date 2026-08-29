@@ -32,10 +32,11 @@ The lattice itself stays open: its site type is `Fin (N + 1)`, the bond sum of
 `quantumIsingHamiltonian` runs over `Fin N`, and the periodic `isingCycleHamiltonian` is a
 different operator that never appears here. The two index types are never identified.
 
-`lowEnergyMatrix` is the compression of `Ĥ` to the span of these `2L` configurations, and `Ĥ`
-does not preserve that span, so its entries are matrix elements and nothing more: no entry, and
-no eigenvalue of `lowEnergyMatrix`, is asserted to be an energy of `Ĥ`. Tasaki himself notes on
-p. 59 that the perturbative analysis of this problem is not mathematically rigorous.
+`lowEnergyMatrix` is the compression of `Ĥ` to the span of these `2L` configurations. That this
+compression restricts `Ĥ` to an invariant subspace is not established here, so its entries are
+matrix elements and nothing more: no entry, and no eigenvalue of `lowEnergyMatrix`, is asserted
+to be an energy of `Ĥ`. Tasaki himself notes on p. 59 that the perturbative analysis of this
+problem is not mathematically rigorous.
 
 Two index conventions of the source are worth recording. Eq. (S.30) is printed "for any
 `j = 1, …, 2L - 1`", but p. 500 derives (S.33) from it "with `j = 0` or `L`"; the honest reading,
@@ -176,9 +177,9 @@ private theorem eq_wallSite (N : ℕ) (a : ZMod (2 * (N + 1))) (x : Fin (N + 1))
     rw [ha, ZMod.val_cast_of_lt (by omega : N + 1 + x.val < 2 * (N + 1)), Nat.add_mod_left,
       Nat.mod_eq_of_lt hx]
 
-/-- **(B3)** Book form of the first family, Tasaki's `|Φ↓⟩`, `|Φ_j^↑↓⟩` and `|Φ↑⟩`: at the label
-`j ≤ L` cast from `ℕ`, site `x` is up exactly when `x.val < j`. The label `0` gives the all-down
-`|Φ↓⟩`, the label `L` the all-up `|Φ↑⟩`, and `0 < j < L` the domain-wall state `|Φ_j^↑↓⟩`. -/
+/-- Book form of the first family, Tasaki's `|Φ↓⟩`, `|Φ_j^↑↓⟩` and `|Φ↑⟩`: at the label `j ≤ L`
+cast from `ℕ`, site `x` is up exactly when `x.val < j`. The label `0` gives the all-down `|Φ↓⟩`,
+the label `L` the all-up `|Φ↑⟩`, and `0 < j < L` the domain-wall state `|Φ_j^↑↓⟩`. -/
 theorem lowEnergyConfig_natCast_le (N j : ℕ) (hj : j ≤ N + 1) :
     lowEnergyConfig N (j : ZMod (2 * (N + 1)))
       = fun x => if x.val < j then (0 : Fin 2) else 1 := by
@@ -197,9 +198,9 @@ theorem lowEnergyConfig_natCast_le (N j : ℕ) (hj : j ≤ N + 1) :
         + ((k + 1 : ℕ) : ZMod (2 * (N + 1))) = 0 := by rw [hk]; push_cast; ring
     rw [if_neg (labelRing_val_gt N (c := k + 1) (by omega) (by omega) hz), if_neg h]
 
-/-- **(B4)** Book form of the second family, Tasaki's mirror states `|Φ_m^↓↑⟩`: at the label
-`L + m` (`0 ≤ m ≤ L`) cast from `ℕ`, site `x` is down exactly when `x.val < m`. Parametrizing by
-`m` rather than by `j - L` keeps `ℕ`-subtraction out of the statement. -/
+/-- Book form of the second family, Tasaki's mirror states `|Φ_m^↓↑⟩`: at the label `L + m`
+(`0 ≤ m ≤ L`) cast from `ℕ`, site `x` is down exactly when `x.val < m`. Parametrizing by `m`
+rather than by `j - L` keeps `ℕ`-subtraction out of the statement. -/
 theorem lowEnergyConfig_natCast_add (N m : ℕ) (hm : m ≤ N + 1) :
     lowEnergyConfig N (((N + 1) + m : ℕ) : ZMod (2 * (N + 1)))
       = fun x => if x.val < m then (1 : Fin 2) else 0 := by
@@ -227,8 +228,8 @@ theorem lowEnergyConfig_natCast_add (N m : ℕ) (hm : m ≤ N + 1) :
     have hv : (((n : ℕ) : ZMod (2 * (N + 1)))).val = n := ZMod.val_cast_of_lt (by omega)
     rw [hcast, if_pos (by rw [hv]; omega), if_neg h]
 
-/-- **(B5)** The `2L` labels give `2L` pairwise distinct configurations, so the low-energy space
-of Tasaki Problem 3.3.a really has the dimension `2L` named in the statement.
+/-- The `2L` labels give `2L` pairwise distinct configurations, so the low-energy space of Tasaki
+Problem 3.3.a really has the dimension `2L` named in the statement.
 
 Equality of two configurations forces the indicator of the first half of the label ring to be
 invariant under the shift by `b - a`; testing that invariance at the labels `0` and `L - 1`
@@ -275,7 +276,7 @@ theorem lowEnergyConfig_injective (N : ℕ) : Function.Injective (lowEnergyConfi
   rw [sub_eq_zero] at hsub
   exact hsub.symm
 
-/-- **(B6)** Advancing the label by one step is exactly a single-site flip at the domain wall
+/-- Advancing the label by one step is exactly a single-site flip at the domain wall
 `wallSite N a`. This is what makes the neighbouring entries of `lowEnergyMatrix` readable off
 `quantumIsingHamiltonian_apply_siteFlip`. It holds for every `N`, the one-site chain `L = 1`
 included, where the two ring neighbours `a + 1` and `a - 1` of a label coincide. -/
@@ -411,9 +412,9 @@ private theorem lowEnergyConfig_two_ne (N : ℕ) (hN : 1 ≤ N) {a b : ZMod (2 *
       rw [h1, h3, labelRing_val_add_half_le, hvn]
       exact fun hc => (hc.mpr (by omega)) (by omega)
 
-/-- **(B7)** Tasaki's "all other matrix elements are vanishing" (p. 499) at the level of
-configurations: labels that are neither equal nor ring-adjacent give configurations that are
-neither equal nor a single-site flip of one another, because they differ at two distinct sites. -/
+/-- Tasaki's "all other matrix elements are vanishing" (p. 499) at the level of configurations:
+labels that are neither equal nor ring-adjacent give configurations that are neither equal nor a
+single-site flip of one another, because they differ at two distinct sites. -/
 theorem lowEnergyConfig_ne_of_not_adjacent (N : ℕ) (hN : 1 ≤ N) {a b : ZMod (2 * (N + 1))}
     (h₀ : b ≠ a) (h₁ : b ≠ a + 1) (h₂ : b ≠ a - 1) :
     lowEnergyConfig N b ≠ lowEnergyConfig N a
@@ -516,9 +517,9 @@ private theorem bondSum_of_prefix (N : ℕ) (a : ZMod (2 * (N + 1))) (j : ℕ) (
   rw [hform, if_congr hcond rfl rfl]
   exact bondSum_prefix N j hj hcd
 
-/-- **(B8)** Signed bond sum of every low-energy configuration: `N` for the two aligned labels
-`0` and `L`, and `N - 2` for the `2L - 2` labels carrying a domain wall. Multiplied by `-J`, this
-is Tasaki eq. (S.24) for the aligned labels and eq. (S.25) for the others. -/
+/-- Signed bond sum of every low-energy configuration: `N` for the two aligned labels `0` and `L`,
+and `N - 2` for the `2L - 2` labels carrying a domain wall. Multiplied by `-J`, this is Tasaki
+eq. (S.24) for the aligned labels and eq. (S.25) for the others. -/
 private theorem bondSum_lowEnergyConfig (N : ℕ) (a : ZMod (2 * (N + 1))) :
     (∑ i : Fin N, if lowEnergyConfig N a i.castSucc = lowEnergyConfig N a i.succ
         then (1 : ℂ) else -1)
@@ -540,26 +541,26 @@ private theorem bondSum_lowEnergyConfig (N : ℕ) (a : ZMod (2 * (N + 1))) :
     · rw [hzero, hhalf]
       omega
 
-/-- **(B9)** The `2L × 2L` array of matrix elements `⟨Φ_a|Ĥ|Φ_b⟩` of the open-chain quantum
-Ising Hamiltonian `quantumIsingHamiltonian N (1/4) (λ/2)` in the low-energy configuration basis
+/-- The `2L × 2L` array of matrix elements `⟨Φ_a|Ĥ|Φ_b⟩` of the open-chain quantum Ising
+Hamiltonian `quantumIsingHamiltonian N (1/4) (λ/2)` in the low-energy configuration basis
 (Tasaki Problem 3.3.a, eqs. (S.24)-(S.27)).
 
 Entries are matrix elements of `Ĥ` between the `2L` basis configurations, read off the
-configuration-basis entries as in `basisVec_expectation_eq_diagonal`. Since `Ĥ` does not preserve
-the span of these configurations, no entry and no eigenvalue of this matrix is claimed to be an
-energy of `Ĥ`. -/
+configuration-basis entries as in `basisVec_expectation_eq_diagonal`. That this compression
+restricts `Ĥ` to an invariant subspace is not established here, so no entry and no eigenvalue of
+this matrix is claimed to be an energy of `Ĥ`. -/
 noncomputable def lowEnergyMatrix (N : ℕ) (lam : ℝ) :
     Matrix (ZMod (2 * (N + 1))) (ZMod (2 * (N + 1))) ℂ :=
   fun a b =>
     quantumIsingHamiltonian N (1 / 4) (lam / 2) (lowEnergyConfig N a) (lowEnergyConfig N b)
 
-/-- **(B10)** The on-site potential `v_j` of Tasaki eq. (S.30): `0` at the two aligned labels
-`j = 0` and `j = L`, and `1/2` at the `2L - 2` labels carrying a domain wall. -/
+/-- The on-site potential `v_j` of Tasaki eq. (S.30): `0` at the two aligned labels `j = 0` and
+`j = L`, and `1/2` at the `2L - 2` labels carrying a domain wall. -/
 noncomputable def ringPotential (N : ℕ) (j : ZMod (2 * (N + 1))) : ℂ :=
   if j = 0 ∨ j = ((N + 1 : ℕ) : ZMod (2 * (N + 1))) then 0 else 1 / 2
 
-/-- **(B11)** The tight-binding operator on the `2L` basis labels of Tasaki eq. (S.30): hopping
-`-λ/2` between ring-adjacent labels, together with the diagonal potential `ringPotential`.
+/-- The tight-binding operator on the `2L` basis labels of Tasaki eq. (S.30): hopping `-λ/2`
+between ring-adjacent labels, together with the diagonal potential `ringPotential`.
 
 The ring here is the ring of basis labels, obtained by following the domain wall once around in
 both orientations; the lattice underlying `quantumIsingHamiltonian` remains an open chain. -/
@@ -568,7 +569,7 @@ noncomputable def tightBindingRing (N : ℕ) (lam : ℝ) :
   fun a b => (if b = a + 1 ∨ b = a - 1 then -(lam : ℂ) / 2 else 0)
     + (if a = b then ringPotential N a else 0)
 
-/-- **(C2)** All `2L × 2L` matrix elements of the compressed Hamiltonian at once: Tasaki
+/-- All `2L × 2L` matrix elements of the compressed Hamiltonian at once: Tasaki
 eqs. (S.24)-(S.27) together with "all other matrix elements are vanishing" (p. 499). The
 compression is the constant `E_GS^(0) = -(L-1)/4 = -N/4` on the diagonal plus a tight-binding
 ring on the basis labels.

@@ -52,9 +52,9 @@ private theorem spinZ_bond_mulVec_apply (N : ℕ) (i : Fin N)
   unfold spinZ
   simp only [onSite_pauliZ_mulVec_apply, ← mul_assoc, pauliZ_sign_mul]
 
-/-- **(A1)** Pointwise action of the open-chain quantum Ising Hamiltonian on a vector: the
-`σ^z σ^z` part multiplies by the signed bond sum, the transverse `σ^x` part sums the values at
-all single-site flips.
+/-- Pointwise action of the open-chain quantum Ising Hamiltonian on a vector: the `σ^z σ^z` part
+multiplies by the signed bond sum, the transverse `σ^x` part sums the values at all single-site
+flips.
 
   `(Ĥ *ᵥ v) τ = -J (Σ_i ±1) v τ - h Σ_x v (siteFlipAt τ x)`,
 
@@ -78,9 +78,9 @@ private theorem fin2_one_sub_ne (a : Fin 2) : (1 : Fin 2) - a ≠ a := by
   revert a
   decide
 
-/-- **(A2)** Diagonal matrix element, Tasaki eqs. (S.24) and (S.25): `⟨Φ_τ|Ĥ|Φ_τ⟩` is `-J` times
-the signed bond sum of `τ`, with no contribution from the transverse field (a single-site flip
-never reproduces `τ`). For the constant configurations this is `-J N = -(L - 1) J`. -/
+/-- Diagonal matrix element, Tasaki eqs. (S.24) and (S.25): `⟨Φ_τ|Ĥ|Φ_τ⟩` is `-J` times the signed
+bond sum of `τ`, with no contribution from the transverse field (a single-site flip never reproduces
+`τ`). For the constant configurations this is `-J N = -(L - 1) J`. -/
 theorem quantumIsingHamiltonian_apply_diag (N : ℕ) (J h : ℝ) (τ : Fin (N + 1) → Fin 2) :
     quantumIsingHamiltonian N J h τ τ =
       -(J : ℂ) * ∑ i : Fin N, (if τ i.castSucc = τ i.succ then (1 : ℂ) else -1) := by
@@ -89,9 +89,9 @@ theorem quantumIsingHamiltonian_apply_diag (N : ℕ) (J h : ℝ) (τ : Fin (N + 
     Finset.sum_eq_zero (fun i _ => basisVec_of_ne (siteFlipAt_ne τ i))]
   ring
 
-/-- **(A3)** Off-diagonal matrix element between a configuration and its flip at a single site,
-Tasaki eqs. (S.26) and (S.27): `⟨Φ_{siteFlipAt τ x}|Ĥ|Φ_τ⟩ = -h`, independently of `J`, of `τ`
-and of the flipped site `x`. -/
+/-- Off-diagonal matrix element between a configuration and its flip at a single site, Tasaki eqs.
+(S.26) and (S.27): `⟨Φ_{siteFlipAt τ x}|Ĥ|Φ_τ⟩ = -h`, independently of `J`, of `τ` and of the
+flipped site `x`. -/
 theorem quantumIsingHamiltonian_apply_siteFlip (N : ℕ) (J h : ℝ) (τ : Fin (N + 1) → Fin 2)
     (x : Fin (N + 1)) :
     quantumIsingHamiltonian N J h (siteFlipAt τ x) τ = -(h : ℂ) := by
@@ -109,9 +109,9 @@ theorem quantumIsingHamiltonian_apply_siteFlip (N : ℕ) (J h : ℝ) (τ : Fin (
   · intro hx
     exact absurd (Finset.mem_univ x) hx
 
-/-- **(A4)** All remaining matrix elements vanish, Tasaki p. 499 ("all other matrix elements are
-vanishing"): configurations that are neither equal nor a single-site flip of one another are not
-connected by `Ĥ`, because the Hamiltonian is a sum of diagonal bond terms and single-site flips. -/
+/-- All remaining matrix elements vanish, Tasaki p. 499 ("all other matrix elements are vanishing"):
+configurations that are neither equal nor a single-site flip of one another are not connected by
+`Ĥ`, because the Hamiltonian is a sum of diagonal bond terms and single-site flips. -/
 theorem quantumIsingHamiltonian_apply_eq_zero (N : ℕ) (J h : ℝ)
     (σ τ : Fin (N + 1) → Fin 2) (h₁ : σ ≠ τ) (h₂ : ∀ x, σ ≠ siteFlipAt τ x) :
     quantumIsingHamiltonian N J h σ τ = 0 := by

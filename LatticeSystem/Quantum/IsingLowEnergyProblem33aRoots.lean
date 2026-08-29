@@ -37,8 +37,10 @@ size, whereas the antisymmetric one is produced only for large `L` — the defec
 equation at `κ ↓ 0` is negative only once `L` exceeds a multiple of `λ` — so its existence is
 stated with `∀ᶠ N in atTop`.
 
-`tightBindingEnergy λ κ` is an eigenvalue of the compression `lowEnergyMatrix N λ` of `Ĥ` to a span
-that `Ĥ` does not preserve; it is not identified with a ground-state or first-excited energy of
+`tightBindingEnergy λ κ` is an eigenvalue of the compression `lowEnergyMatrix N λ` only after the
+shift by `E_GS^(0) = -N/4`; on its own it is an eigenvalue of the tight-binding part
+`tightBindingRing N λ`. That the compression restricts `Ĥ` to an invariant subspace is not
+established here, so the value is not identified with a ground-state or first-excited energy of
 `Ĥ`. Tasaki notes on p. 59 that the perturbative analysis of this problem is not mathematically
 rigorous. The ring carrying the labels `j` is a ring of basis labels of type `ZMod (2 * (N + 1))`,
 not of lattice sites: the chain itself stays open.
@@ -312,7 +314,9 @@ is not assumed: it follows from either root hypothesis, since a positive `κ` ma
 side of (S.34) positive.
 
 The statement carries no asymptotics; the displayed `≃` form of (S.40) is not asserted, and
-`tightBindingEnergy` is an eigenvalue of the compressed matrix rather than an energy of `Ĥ`. -/
+`tightBindingEnergy` is an eigenvalue of the tight-binding part `tightBindingRing` — of the
+compressed matrix `lowEnergyMatrix` only after the shift by `-N/4` — rather than an energy of
+`Ĥ`. -/
 theorem tightBindingEnergy_lt_of_roots (N : ℕ) (lam kp km : ℝ) (hkp : 0 < kp) (hkm : 0 < km)
     (hroot_p : rootEquation N lam kp 1) (hroot_m : rootEquation N lam km (-1)) :
     tightBindingEnergy lam kp < tightBindingEnergy lam km := by

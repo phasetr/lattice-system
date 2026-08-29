@@ -1308,11 +1308,12 @@ $2L \times 2L$ matrix, i.e.\ all labels
 $j \in \mathbb{Z}/2L\mathbb{Z}$.
 
 \paragraph{Scope.}
-This layer is the $2L$ basis and the compressed matrix only. Since
-$\hat H$ does not preserve the span of the $2L$ configurations, no
-entry and no eigenvalue of $\texttt{lowEnergyMatrix}$ is identified
-with the spectrum of $\hat H$; Tasaki himself notes on p.~59 that the
-perturbative analysis of this problem is not mathematically rigorous.
+This layer is the $2L$ basis and the compressed matrix only. That the
+compression restricts $\hat H$ to an invariant subspace is nowhere
+established here, so no entry and no eigenvalue of
+$\texttt{lowEnergyMatrix}$ is identified with the spectrum of
+$\hat H$; Tasaki himself notes on p.~59 that the perturbative analysis
+of this problem is not mathematically rigorous.
 The expansion (S.28)--(S.30) as a recursion, the ansatz
 (S.31)--(S.34), the constant $\kappa_\infty$ of (S.35), and the
 level splitting (S.39)--(S.41) are not part of this layer.
@@ -1431,13 +1432,15 @@ positive for either sign. The value $\varphi_0 = 1 + s\,e^{-\kappa L}$
 is positive, which is what makes the eigenvector nonzero.
 
 \paragraph{Scope.}
-As in §\ref{subsec:ising-low-energy-matrix}, $\hat H$ does not preserve
-the span of the $2L$ configurations, so
-\texttt{tightBindingEnergy $\lambda$ $\kappa$} is an eigenvalue of the
-compression and nothing more: it is not identified with a ground-state
-or first-excited energy of $\hat H$, and the source's non-rigorous
-Taylor steps (S.36)--(S.38) are not asserted. The constant
-$\kappa_\infty$ of (S.35), the existence of the two roots, the sign of
+As in §\ref{subsec:ising-low-energy-matrix}, that the compression
+restricts $\hat H$ to an invariant subspace is nowhere established
+here, so \texttt{tightBindingEnergy $\lambda$ $\kappa$} --- an
+eigenvalue of \texttt{lowEnergyMatrix} shifted by $-N/4$, equivalently
+an eigenvalue of the tight-binding part \texttt{tightBindingRing} ---
+is not identified with a ground-state or first-excited energy of
+$\hat H$, and the source's non-rigorous Taylor steps (S.36)--(S.38) are
+not asserted. The constant $\kappa_\infty$ of (S.35), the existence of
+the two roots, the sign of
 the splitting (S.40) and the asymptotics (S.41) are not part of this
 layer. \texttt{lake build} is warning-free on both roots and
 \texttt{\#print axioms} on each new declaration yields only
@@ -1517,9 +1520,11 @@ $\tanh \kappa_\infty \to 1$, both as $\lambda \downarrow 0$
 \texttt{tendsto\_tanh\_kappaInf\_atZero}).
 
 \paragraph{Scope.}
-As in §\ref{subsec:ising-low-energy-eigenvectors}, $\hat H$ does not
-preserve the span of the $2L$ configurations, so $\varepsilon_\infty$
-is the $L \uparrow \infty$ value of an eigenvalue of the compression
+As in §\ref{subsec:ising-low-energy-eigenvectors}, that the compression
+restricts $\hat H$ to an invariant subspace is nowhere established
+here, so $\varepsilon_\infty$ is the $L \uparrow \infty$ value of an
+eigenvalue of \texttt{lowEnergyMatrix} shifted by $-N/4$ ---
+equivalently, of the tight-binding part \texttt{tightBindingRing} ---
 and is not identified with a ground-state or first-excited energy of
 $\hat H$; the source's non-rigorous Taylor steps (S.36)--(S.38) are not
 asserted. The existence of the two finite-$L$ roots, the sign of the
@@ -1632,12 +1637,14 @@ which the source derives from the non-rigorous Taylor steps
 (S.36)--(S.38), is not asserted, and the comparison above uses no
 asymptotics. Uniqueness of the root in either sector is neither proved
 nor used --- every statement quantifies over all positive roots. As in
-§\ref{subsec:ising-low-energy-eigenvectors}, $\hat H$ does not preserve
-the span of the $2L$ configurations, so
-\texttt{tightBindingEnergy} is an eigenvalue of the compression and is
-not identified with a ground-state or first-excited energy of
-$\hat H$; the label ring is a ring of basis labels, not of lattice
-sites, and the chain stays open. The asymptotics (S.41) are not part of
+§\ref{subsec:ising-low-energy-eigenvectors}, that the compression
+restricts $\hat H$ to an invariant subspace is nowhere established
+here, so \texttt{tightBindingEnergy} is an eigenvalue of
+\texttt{lowEnergyMatrix} shifted by $-N/4$ --- equivalently, of the
+tight-binding part \texttt{tightBindingRing} --- and is not identified
+with a ground-state or first-excited energy of $\hat H$; the label ring
+is a ring of basis labels, not of lattice sites, and the chain stays
+open. The asymptotics (S.41) are not part of
 this layer. \texttt{lake build} is warning-free on both roots and
 \texttt{\#print axioms} on each new declaration yields only
 \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
@@ -1748,10 +1755,13 @@ small-$\lambda$ replacements,
 no fixed ring size and are not combined with the
 $L \uparrow \infty$ limit above. Uniqueness of the root in either sector is neither proved nor
 used --- the limit quantifies over arbitrary families of positive
-roots. As in §\ref{subsec:ising-low-energy-roots}, $\hat H$ does not
-preserve the span of the $2L$ configurations, so the difference above is
-a difference of eigenvalues of the compression and is not identified
-with $E_{\mathrm{1st}} - E_{\mathrm{GS}}$ of $\hat H$; the label ring is
+roots. As in §\ref{subsec:ising-low-energy-roots}, that the compression
+restricts $\hat H$ to an invariant subspace is nowhere established
+here, so the difference above is a difference of eigenvalues of the
+compression --- equally, of the tight-binding part
+\texttt{tightBindingRing}, the shift by $-N/4$ cancelling in a
+difference --- and is not identified with
+$E_{\mathrm{1st}} - E_{\mathrm{GS}}$ of $\hat H$; the label ring is
 a ring of basis labels, not of lattice sites, and the chain stays open.
 The declarations \texttt{hop}, \texttt{hop\_strictMono} and
 \texttt{hop\_kappaInf\_eq\_one} of

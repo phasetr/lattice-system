@@ -29,11 +29,12 @@ stays open, and no periodic lattice Hamiltonian occurs anywhere in this arc. Eq.
 "for any `j = 1, …, 2L - 1`", but p. 500 uses it at `j = 0` to derive (S.33); the reading used
 here is the eigenvector equation of the `2L × 2L` matrix, i.e. all `j : ZMod (2 * (N + 1))`.
 
-`lowEnergyMatrix` is the compression of `Ĥ` to a span that `Ĥ` does not preserve, so
-`tightBindingEnergy λ κ` is an eigenvalue of that compression and nothing more: it is not
-asserted to be an energy of `Ĥ`, and the identifications (S.36)-(S.38) of the source, which
-Tasaki writes with `≃`, are not asserted here. Tasaki notes on p. 59 that the perturbative
-analysis of this problem is not mathematically rigorous.
+`tightBindingEnergy λ κ` is an eigenvalue of the compression `lowEnergyMatrix N λ` only after the
+shift by `E_GS^(0) = -N/4`; on its own it is an eigenvalue of the tight-binding part
+`tightBindingRing N λ`. That the compression restricts `Ĥ` to an invariant subspace is not
+established here, so the value is not asserted to be an energy of `Ĥ`, and the identifications
+(S.36)-(S.38) of the source, which Tasaki writes with `≃`, are not asserted here. Tasaki notes on
+p. 59 that the perturbative analysis of this problem is not mathematically rigorous.
 -/
 
 namespace LatticeSystem.Quantum
@@ -116,7 +117,8 @@ theorem lowEnergyMatrix_mulVec_eq_iff (N : ℕ) (lam : ℝ) (hN : 1 ≤ N) (eps 
 /-- Tasaki eq. (S.31): the eigenvalue `ε = -(λ/2)(e^κ + e^{-κ}) + 1/2` carried by the
 ansatz `lowEnergyAnsatz` with decay rate `κ`.
 
-This is an eigenvalue of the compressed matrix `lowEnergyMatrix`, shifted by `E_GS^(0)`; it is not
+This is an eigenvalue of the compressed matrix `lowEnergyMatrix` only after the shift by
+`E_GS^(0)`; on its own it is an eigenvalue of the tight-binding part `tightBindingRing`. It is not
 asserted to be an energy of the Hamiltonian itself. -/
 noncomputable def tightBindingEnergy (lam kappa : ℝ) : ℝ :=
   -(lam / 2) * (Real.exp kappa + Real.exp (-kappa)) + 1 / 2
@@ -316,8 +318,9 @@ recursion of the ansatz cancels the potential `1/2` against (S.31)); the root eq
 the remaining condition at the two aligned labels `0` and `L`, where the potential vanishes and
 where the two branches of the ansatz meet.
 
-The eigenvalue is an eigenvalue of the compression `lowEnergyMatrix`, which is not an invariant
-subspace of the Hamiltonian; no claim is made about the spectrum of the Hamiltonian itself. -/
+The eigenvalue is an eigenvalue of the compression `lowEnergyMatrix` shifted by `E_GS^(0)`; that
+the compression restricts the Hamiltonian to an invariant subspace is not established here, so no
+claim is made about the spectrum of the Hamiltonian itself. -/
 theorem lowEnergyAnsatz_isEigenvector (N : ℕ) (lam kappa s : ℝ) (hN : 1 ≤ N) (hlam : 0 < lam)
     (hk : 0 < kappa) (hs : s = 1 ∨ s = -1) (hroot : rootEquation N lam kappa s) :
     lowEnergyAnsatz N kappa s ≠ 0
