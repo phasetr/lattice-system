@@ -193,6 +193,59 @@ Regression fixtures live in `LatticeSystem/Tests/Problem33aLowEnergy.lean`: the 
 `λ = 1/2` pins `ε∞ = (1 - √2)/2` from the middle equality of (S.39), and the companion fixture
 pins the prefactor `2 tanh κ∞ = √2` of (S.41) at the same `λ`.
 
+## Authoritative supplemental implementation record (Problem 3.3.a root existence and ordering)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+a new capstone added after the migration baseline (PR #5390); it is not subject to the frozen
+byte-for-byte parity of the block above.
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Problem 3.3.a
+(statement p. 59; solution: eqs. (S.33) and (S.34) on p. 500, eq. (S.40) on p. 501), for the model
+of eq. (3.3.1), p. 56, with open boundary conditions and the spin-`1/2` convention `σ̂ = 2Ŝ` of
+§2.1, eqs. (2.1.7)-(2.1.8), p. 15.
+
+Substituting the ansatz (S.32) into the recursion (S.30) at the label `j = 0` (equivalently at
+`j = L`) gives (S.33), `ε (1 ± e^-κL) = -λ (e^-κ ± e^-κ(L-1))` with the same sign on both sides,
+and eliminating `ε` through (S.31) gives the root equation (S.34),
+`e^κ - e^-κ = λ^-1 (1 ± e^-κL) / (1 ∓ e^-κL)`, whose numerator and denominator carry *opposite*
+signs; the upper signs belong to the symmetric and the lower ones to the antisymmetric solution.
+Both readings were taken from the rendered source page.
+
+`rootEquation_iff_cleared` removes that denominator, turning (S.34) into
+`λ (e^κ - e^-κ) (1 - s e^-κL) = 1 + s e^-κL`. The left factor `λ (e^κ - e^-κ) = 2 λ sinh κ` is
+strictly increasing and equals `1` at the `L ↑ ∞` rate `κ∞` of (S.35), so a sign change of the
+cleared equation's defect locates a root by the intermediate value theorem. This yields a root in
+the symmetric sector at every ring size and one in the antisymmetric sector for all large `L`;
+comparing the two sectors gives the exact ordering that the source states after (S.40),
+`ε_± ≃ ε∞ ∓ [(e^κ∞ - e^-κ∞)/(e^κ∞ + e^-κ∞)] e^-κ∞L`, namely "We see that the symmetric
+solution has a lower energy, as it should be".
+
+Only that ordering is asserted. The displayed `≃` form of (S.40), which the source derives from the
+non-rigorous Taylor steps (S.36)-(S.38), is not asserted, and the comparison uses no asymptotics.
+Uniqueness of the root in either sector is neither proved nor used: every statement quantifies over
+all positive roots. The antisymmetric root is produced only once `L` exceeds a multiple of `λ`, so
+its existence is stated for all sufficiently large ring sizes rather than for every one.
+
+These remain **eigenvalues of the compression, not energies**: `Ĥ` does not preserve the span of
+the `2L` configurations, so `tightBindingEnergy` is an eigenvalue of `lowEnergyMatrix` and is not
+identified with a ground-state or first-excited energy of `Ĥ`. Tasaki notes on p. 59 that the
+analysis of this problem is not mathematically rigorous. The ring carrying the labels `j` is a ring
+of basis labels of type `ZMod (2 * (N + 1))`, not of lattice sites: the chain itself stays open.
+
+Every declaration below is **PROVED**; `#print axioms` on each yields only `propext`,
+`Classical.choice`, `Quot.sound`.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `rootEquation_iff_cleared` | Tasaki eq. (S.34) with its denominator cleared: for `0 < κ` and `s = ±1`, the root equation is equivalent to `λ (e^κ - e^-κ) (1 - s e^-κL) = 1 + s e^-κL` | `Quantum/IsingLowEnergyProblem33aRoots.lean` |
+| `exists_root_symmetric` | for every ring size and every `0 < λ`, the symmetric (`s = 1`) root equation (S.34) has a positive solution `κ` | `Quantum/IsingLowEnergyProblem33aRoots.lean` |
+| `eventually_exists_root_antisymmetric` | for every `0 < λ` and every sufficiently large ring size, the antisymmetric (`s = -1`) root equation (S.34) has a positive solution `κ` | `Quantum/IsingLowEnergyProblem33aRoots.lean` |
+| `tightBindingEnergy_lt_of_roots` | **capstone of PR #5390**: the exact ordering behind Tasaki eq. (S.40), `ε_+ < ε_-`, for any positive root of the symmetric and any positive root of the antisymmetric equation | `Quantum/IsingLowEnergyProblem33aRoots.lean` |
+
+Regression fixtures live in `LatticeSystem/Tests/Problem33aLowEnergy.lean`: each of the four
+declarations above has a signature fixture restating it in full and discharging it by the
+declaration itself.
+
 ---
 
 [← Two-site spin inner product (Tasaki §2.2 eq. (2.2.16))](/lattice-system/formalization/legacy/21-two-site-spin-inner-product-tasaki-2-2-eq-2-2-16/) · [Catalogue](/lattice-system/formalization/legacy/) · [Testing infrastructure →](/lattice-system/formalization/legacy/23-testing-infrastructure/)
