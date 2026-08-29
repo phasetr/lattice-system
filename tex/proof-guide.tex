@@ -1529,6 +1529,120 @@ splitting (S.40) and the asymptotics (S.41) are not part of this layer.
 \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
 (axiom-free).
 
+\subsection{Existence of the two parity roots and the ordering (S.40)
+(Tasaki Problem 3.3.a)}
+\label{subsec:ising-low-energy-roots}
+
+\emph{Source file:}
+\texttt{LatticeSystem/Quantum/IsingLowEnergyProblem33aRoots.lean};
+regression fixtures in
+\texttt{LatticeSystem/Tests/Problem33aLowEnergy.lean}.
+
+\emph{Reference:} Tasaki~\cite{Tasaki:QMB}, Problem~3.3.a: statement
+p.~59, solution eqs.~(S.33)--(S.34) on p.~500 and eq.~(S.40) on
+p.~501. The model is eq.~(3.3.1), p.~56, with open boundary conditions
+and the spin-$1/2$ convention
+$\hat\sigma^{(\alpha)} = 2\hat S^{(\alpha)}$ of §2.1,
+eqs.~(2.1.7)--(2.1.8), p.~15.
+
+Substituting the ansatz (S.32) into the recursion (S.30) at the label
+$j = 0$, equivalently at $j = L$, gives eq.~(S.33),
+\[
+  \varepsilon \left(1 \pm e^{-\kappa L}\right)
+  \;=\; -\lambda \left(e^{-\kappa} \pm e^{-\kappa(L-1)}\right),
+\]
+with the same sign on both sides, and eliminating $\varepsilon$ through
+(S.31) gives the root equation (S.34),
+\[
+  e^{\kappa} - e^{-\kappa}
+  \;=\; \lambda^{-1}\,
+        \frac{1 \pm e^{-\kappa L}}{1 \mp e^{-\kappa L}},
+\]
+whose numerator and denominator carry \emph{opposite} signs; the upper
+signs belong to the symmetric and the lower ones to the antisymmetric
+solution. This subsection solves (S.34) in $\kappa$.
+
+\begin{theorem}[\texttt{rootEquation\_iff\_cleared}]
+Write $w = e^{-\kappa L}$. For $\kappa > 0$ and $s = \pm 1$, eq.~(S.34)
+holds if and only if
+\[
+  \lambda\left(e^{\kappa} - e^{-\kappa}\right)(1 - s\,w)
+  \;=\; 1 + s\,w .
+\]
+No hypothesis on $\lambda$ is needed: for $\lambda \le 0$ both sides of
+the equivalence are false.
+\end{theorem}
+
+Clearing the denominator is legitimate because $\kappa > 0$ forces
+$0 < w < 1$, so $1 - s\,w > 0$ for either sign. The left factor
+$\lambda(e^{\kappa} - e^{-\kappa}) = 2\lambda\sinh\kappa$ is strictly
+increasing in $\kappa$ and, by (S.35), equals $1$ at $\kappa_\infty$;
+so a sign change of the cleared equation's defect locates a root
+through the intermediate value theorem.
+
+\begin{theorem}[\texttt{exists\_root\_symmetric},
+\texttt{eventually\_exists\_root\_antisymmetric}]
+Let $\lambda > 0$. For every ring size the symmetric ($s = 1$) root
+equation (S.34) has a solution $\kappa > 0$, and for every sufficiently
+large ring size so does the antisymmetric ($s = -1$) one.
+\end{theorem}
+
+The symmetric root is found on $[\kappa_\infty, \kappa_\infty + 2]$,
+where the defect is $-2w < 0$ at the left endpoint and positive at the
+right one. The antisymmetric root is found on
+$[1/L, \kappa_\infty]$, where the defect is $2w > 0$ at the right
+endpoint while at $\kappa = 1/L$ the factor
+$\lambda(e^{\kappa} - e^{-\kappa}) \le 2\lambda\kappa e^{\kappa}$ is of
+order $\lambda/L$ against a lower bound on $1 - e^{-\kappa L}$; the
+defect is therefore negative there only once $L$ exceeds a multiple of
+$\lambda$, which is why the antisymmetric statement is restricted to
+large $L$.
+
+\begin{theorem}[\texttt{tightBindingEnergy\_lt\_of\_roots}]
+Let $\kappa_+ > 0$ solve the symmetric and $\kappa_- > 0$ the
+antisymmetric root equation (S.34), for the same ring size. Then
+\[
+  \varepsilon_+ \;=\; \texttt{tightBindingEnergy}\,\lambda\,\kappa_+
+  \;<\;
+  \texttt{tightBindingEnergy}\,\lambda\,\kappa_-
+  \;=\; \varepsilon_- .
+\]
+Positivity of $\lambda$ is not assumed; it follows from either root
+hypothesis.
+\end{theorem}
+
+The cleared equation gives
+$\lambda(e^{\kappa_+} - e^{-\kappa_+}) = (1+w)/(1-w) > 1$ and
+$\lambda(e^{\kappa_-} - e^{-\kappa_-}) = (1-w)/(1+w) < 1$, so
+$\kappa_- < \kappa_+$ by strict monotonicity, and
+$\texttt{tightBindingEnergy}\,\lambda$ is strictly decreasing on the
+positive reals because $\cosh$ is strictly increasing there. This is
+exactly the conclusion the source draws after eq.~(S.40),
+\[
+  \varepsilon_\pm \;\simeq\; \varepsilon_\infty
+    \mp \frac{e^{\kappa_\infty} - e^{-\kappa_\infty}}
+             {e^{\kappa_\infty} + e^{-\kappa_\infty}}\,
+        e^{-\kappa_\infty L},
+\]
+namely that the symmetric solution has the lower energy.
+
+\paragraph{Scope.}
+Only the ordering is asserted: the displayed $\simeq$ form of (S.40),
+which the source derives from the non-rigorous Taylor steps
+(S.36)--(S.38), is not asserted, and the comparison above uses no
+asymptotics. Uniqueness of the root in either sector is neither proved
+nor used --- every statement quantifies over all positive roots. As in
+§\ref{subsec:ising-low-energy-eigenvectors}, $\hat H$ does not preserve
+the span of the $2L$ configurations, so
+\texttt{tightBindingEnergy} is an eigenvalue of the compression and is
+not identified with a ground-state or first-excited energy of
+$\hat H$; the label ring is a ring of basis labels, not of lattice
+sites, and the chain stays open. The asymptotics (S.41) are not part of
+this layer. \texttt{lake build} is warning-free on both roots and
+\texttt{\#print axioms} on each new declaration yields only
+\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
+(axiom-free).
+
 \subsection{Gibbs state instantiation}
 \label{subsec:ising-gibbs}
 
