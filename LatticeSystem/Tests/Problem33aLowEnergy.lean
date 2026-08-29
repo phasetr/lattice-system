@@ -467,12 +467,13 @@ example :
 of (S.34) times `λ`), together with its strict monotonicity in `kappa`, its value `1` at
 `kappaInf lam` (from (S.35), `e^κ∞ - e^-κ∞ = λ⁻¹`), and its continuity
 (`hop_strictMono`, `hop_kappaInf_eq_one`, `hop_continuous`). Being `private` to its declaring
-module, `hop` is not a reachable identifier from this file and has no `example` of its own; F2,
-C5, C7a, C7b below are its public consumers and are pinned individually.
+module, `hop` is not a reachable identifier from this file and has no `example` of its own.
+C5, C7a and C7b below are its public consumers and are pinned individually; F2 below pins instead
+the expanded form that `hop` abbreviates, naming no `hop`.
 -/
 
 /-- **F2 signature pin.** `rootEquation_iff_cleared` clears the denominator of Tasaki eq. (S.34),
-p. 501: for `0 < kappa` and `s = 1 ∨ s = -1`, `rootEquation N lam kappa s` is equivalent to
+p. 500: for `0 < kappa` and `s = 1 ∨ s = -1`, `rootEquation N lam kappa s` is equivalent to
 `lam * (e^κ - e^-κ) * (1 - s·w) = 1 + s·w` with `w = e^{-κ(N+1)}` — the private `hop lam kappa`
 of F1 written out here as its defining expression, since `hop` itself cannot be named from this
 file. -/
@@ -503,8 +504,9 @@ example (N : ℕ) (lam : ℝ) (hlam : 0 < lam) :
 /-- **C7b signature pin — eventual existence of the antisymmetric root.**
 `eventually_exists_root_antisymmetric` is capstone conjunct 7's second half: for every `λ > 0`,
 for all sufficiently large `N` there is a positive `κ` solving the antisymmetric (`s = -1`) root
-equation (S.34). Unlike the symmetric root, the antisymmetric one need not exist at small `N`, so
-the statement is `∀ᶠ N in atTop` rather than `∀ N`. -/
+equation (S.34). Unlike the symmetric root, the antisymmetric one is produced here only for
+large `N` — the defect of the cleared equation at `κ ↓ 0` is negative only once `N` exceeds a
+multiple of `λ` — so the statement is `∀ᶠ N in atTop` rather than `∀ N`. -/
 example (lam : ℝ) (hlam : 0 < lam) :
     ∀ᶠ N : ℕ in Filter.atTop, ∃ kappa : ℝ, 0 < kappa ∧ rootEquation N lam kappa (-1) :=
   eventually_exists_root_antisymmetric lam hlam

@@ -209,7 +209,6 @@ Substituting the ansatz (S.32) into the recursion (S.30) at the label `j = 0` (e
 and eliminating `ε` through (S.31) gives the root equation (S.34),
 `e^κ - e^-κ = λ^-1 (1 ± e^-κL) / (1 ∓ e^-κL)`, whose numerator and denominator carry *opposite*
 signs; the upper signs belong to the symmetric and the lower ones to the antisymmetric solution.
-Both readings were taken from the rendered source page.
 
 `rootEquation_iff_cleared` removes that denominator, turning (S.34) into
 `λ (e^κ - e^-κ) (1 - s e^-κL) = 1 + s e^-κL`. The left factor `λ (e^κ - e^-κ) = 2 λ sinh κ` is
