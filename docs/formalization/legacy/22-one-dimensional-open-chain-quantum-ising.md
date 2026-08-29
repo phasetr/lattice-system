@@ -310,6 +310,83 @@ Regression fixtures live in `LatticeSystem/Tests/Problem33aLowEnergy.lean`: each
 declarations above has a signature fixture restating it in full and discharging it by the
 declaration itself.
 
+## Authoritative supplemental implementation record (Problem 3.3.a capstone)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+a new capstone added after the migration baseline (PR #5392); it is not subject to the frozen
+byte-for-byte parity of the block above.
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Problem 3.3.a
+(statement p. 59; solution pp. 498-501, eqs. (S.24)-(S.41)), for the model of eq. (3.3.1), p. 56,
+with open boundary conditions.
+
+Problem 3.3.a asks to carry out the degenerate perturbation analysis of the open Ising chain in
+its `2L`-fold low-energy sector and to confirm the conclusions of the text for `L >> 1`. The
+capstone `tasaki_problem_3_3_a_low_energy_spectrum` is the single statement that carries the
+perturbative analysis itself, eqs. (S.24)-(S.41); the remaining part of the request, the closing
+paragraph of the solution on p. 501 after (S.41) that confirms eqs. (3.3.8) and (3.3.9), p. 58,
+is answered by no conjunct and is listed among the exclusions below. It is a pure assembly: it
+introduces no new mathematical content and consumes only the declarations of the five modules of
+this arc, listed in the supplemental sections above.
+
+The nine conjuncts of the capstone, with the equations they carry. Under `1 <= N`, that is
+`L = N + 1 >= 2`: (1) `lowEnergyConfig N` is injective, i.e. the `2L` labels index pairwise
+distinct spin configurations — neither the identification with Tasaki's named low-energy basis
+nor the step from distinctness to the dimension `2L` of the sector is part of the conjunct;
+(2) eqs. (S.24)-(S.27), pp. 498-499, the compression equals a constant diagonal plus a
+tight-binding ring; (3) eqs. (S.28)-(S.30), p. 499, the eigenvalue equation of the compression is
+equivalent to the recursion (S.30) at every label;
+(4) eqs. (S.31)-(S.34), pp. 499-500, a positive root of the quantisation condition in either
+parity sector yields a nonzero eigenvector of the compression with eigenvalue
+`-N/4 + tightBindingEnergy`; (5) below eq. (S.40), p. 501, the symmetric sector lies strictly
+lower. Without restriction on the ring size: (6) eq. (S.39), p. 501, the closed form of the
+energy at the `L` to infinity rate `κ∞` of (S.35); (7) a positive symmetric root at every ring
+size and a positive antisymmetric root at all sufficiently large ring sizes; (8) eq. (S.41),
+p. 501, the ratio of the splitting to `2 tanh κ∞ e^-κ∞L` tends to `1` at fixed `λ`, the order of
+limits of the source's footnote 1 on p. 500; (9) the two `λ` to `0` limits `e^-κ∞/λ` to `1` and
+`tanh κ∞` to `1`, the exact content of the two replacements made in the closing step `≃ 2 λ^L`
+of (S.41).
+
+What the capstone does not assert. The `≃` relations of the source are not asserted: the Taylor
+expansion (S.36)-(S.38) is replaced throughout by exact identities, and the `≃` forms of (S.40)
+and (S.41) together with the final `≃ 2 λ^L` are not stated. The two `λ` to `0` limits standing
+in for that final step are limits at no fixed ring size and are not combined with the `L` to
+infinity limit of conjunct 8. Uniqueness of the root in either sector is neither proved nor used,
+which is why conjunct 8 quantifies over arbitrary families of positive roots. The `∀ᶠ` guarding
+the antisymmetric sector is an artifact of this proof route, not a proven boundary of existence:
+the intermediate value argument evaluates the cleared root equation at the fixed test point
+`κ = 1/L` and needs `L > max (24 λ, 1/κ∞)` to control the sign there, and both that test point and
+the constant `24` are choices of the route. Whether an antisymmetric root exists at ring sizes
+below that threshold is left open, in either direction.
+
+Also not asserted is the closing paragraph of the solution, p. 501 after (S.41):
+`|φ₀| = |φ_L| ≃ 1` with the other components smaller, and with it the confirmation of
+eqs. (3.3.8) and (3.3.9), p. 58, which describe the ground state and the first excited state of
+`Ĥ` itself. Asserting those would require identifying the spectrum of the compression with the
+spectrum of `Ĥ`, the identification this development declines to make.
+
+These remain **eigenvalues of the compression, not energies**: that the compression restricts `Ĥ`
+to an invariant subspace is nowhere established here, so `tightBindingEnergy` is treated only as
+an eigenvalue of `lowEnergyMatrix` shifted by `E_GS^(0)` — equivalently, as an eigenvalue of the
+tight-binding part `tightBindingRing` of conjunct 2 — and neither it nor the difference of
+conjunct 8 is identified with the ground-state energy or the first-excited energy of `Ĥ`. The
+refusal rests on the absence of a proof of invariance rather than on a claim that invariance
+fails: at the smallest ring size `L = 2` the `2L` configurations already exhaust the basis of the
+state space. No claim is made that these are the least two eigenvalues even of the compression.
+Tasaki notes on p. 59 that the analysis of this problem is not mathematically rigorous. The ring
+carrying the labels `j` is a ring of basis labels of type `ZMod (2 * (N + 1))`, not of lattice
+sites: the chain itself stays open, and no periodic chain occurs in this development.
+
+The declaration below is **PROVED**; `#print axioms` on it yields only `propext`,
+`Classical.choice`, `Quot.sound`.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `tasaki_problem_3_3_a_low_energy_spectrum` | **capstone of PR #5392**: the nine conjuncts above, assembling the whole Problem 3.3.a low-energy analysis into one statement | `Quantum/IsingLowEnergyProblem33aCapstone.lean` |
+
+A regression fixture in `LatticeSystem/Tests/Problem33aLowEnergy.lean` restates the capstone in
+full and discharges it by the declaration itself.
+
 ---
 
 [← Two-site spin inner product (Tasaki §2.2 eq. (2.2.16))](/lattice-system/formalization/legacy/21-two-site-spin-inner-product-tasaki-2-2-eq-2-2-16/) · [Catalogue](/lattice-system/formalization/legacy/) · [Testing infrastructure →](/lattice-system/formalization/legacy/23-testing-infrastructure/)
