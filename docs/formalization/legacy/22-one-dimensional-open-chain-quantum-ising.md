@@ -322,15 +322,20 @@ with open boundary conditions.
 
 Problem 3.3.a asks to carry out the degenerate perturbation analysis of the open Ising chain in
 its `2L`-fold low-energy sector and to confirm the conclusions of the text for `L >> 1`. The
-capstone `tasaki_problem_3_3_a_low_energy_spectrum` is the single statement that answers that
-request. It is a pure assembly: it introduces no new mathematical content and consumes only the
-declarations of the five modules of this arc, listed in the supplemental sections above.
+capstone `tasaki_problem_3_3_a_low_energy_spectrum` is the single statement that carries the
+perturbative analysis itself, eqs. (S.24)-(S.41); the remaining part of the request, the closing
+paragraph of the solution on p. 501 after (S.41) that confirms eqs. (3.3.8) and (3.3.9), p. 58,
+is answered by no conjunct and is listed among the exclusions below. It is a pure assembly: it
+introduces no new mathematical content and consumes only the declarations of the five modules of
+this arc, listed in the supplemental sections above.
 
 The nine conjuncts of the capstone, with the equations they carry. Under `1 <= N`, that is
-`L = N + 1 >= 2`: (1) the `2L` low-energy configurations are pairwise distinct, so the low-energy
-sector has the dimension `2L` named in the problem; (2) eqs. (S.24)-(S.27), p. 499, the
-compression equals a constant diagonal plus a tight-binding ring; (3) eqs. (S.28)-(S.30), p. 499,
-the eigenvalue equation of the compression is equivalent to the recursion (S.30) at every label;
+`L = N + 1 >= 2`: (1) `lowEnergyConfig N` is injective, i.e. the `2L` labels index pairwise
+distinct spin configurations — neither the identification with Tasaki's named low-energy basis
+nor the step from distinctness to the dimension `2L` of the sector is part of the conjunct;
+(2) eqs. (S.24)-(S.27), pp. 498-499, the compression equals a constant diagonal plus a
+tight-binding ring; (3) eqs. (S.28)-(S.30), p. 499, the eigenvalue equation of the compression is
+equivalent to the recursion (S.30) at every label;
 (4) eqs. (S.31)-(S.34), pp. 499-500, a positive root of the quantisation condition in either
 parity sector yields a nonzero eigenvector of the compression with eigenvalue
 `-N/4 + tightBindingEnergy`; (5) below eq. (S.40), p. 501, the symmetric sector lies strictly
@@ -348,18 +353,28 @@ and (S.41) together with the final `≃ 2 λ^L` are not stated. The two `λ` to 
 in for that final step are limits at no fixed ring size and are not combined with the `L` to
 infinity limit of conjunct 8. Uniqueness of the root in either sector is neither proved nor used,
 which is why conjunct 8 quantifies over arbitrary families of positive roots. The `∀ᶠ` guarding
-the antisymmetric sector is what the proof establishes rather than a weakening for convenience:
-the defect of the cleared root equation at `κ` near `0` turns negative, which is what the
-intermediate value theorem consumes, only once `L` exceeds a multiple of `λ`.
+the antisymmetric sector is an artifact of this proof route, not a proven boundary of existence:
+the intermediate value argument evaluates the cleared root equation at the fixed test point
+`κ = 1/L` and needs `L > max (24 λ, 1/κ∞)` to control the sign there, and both that test point and
+the constant `24` are choices of the route. Whether an antisymmetric root exists at ring sizes
+below that threshold is left open, in either direction.
 
-These remain **eigenvalues of the compression, not energies**: `Ĥ` does not preserve the span of
-the `2L` configurations, so `tightBindingEnergy` is an eigenvalue of `lowEnergyMatrix`, and
-neither it nor the difference of conjunct 8 is identified with the ground-state energy or the
-first-excited energy of `Ĥ`; no claim is made that these are the least two eigenvalues even of
-the compression. Tasaki notes on p. 59 that the analysis of this problem is not mathematically
-rigorous. The ring carrying the labels `j` is a ring of basis labels of type `ZMod (2 * (N + 1))`,
-not of lattice sites: the chain itself stays open, and no periodic chain occurs in this
-development.
+Also not asserted is the closing paragraph of the solution, p. 501 after (S.41):
+`|φ₀| = |φ_L| ≃ 1` with the other components smaller, and with it the confirmation of
+eqs. (3.3.8) and (3.3.9), p. 58, which describe the ground state and the first excited state of
+`Ĥ` itself. Asserting those would require identifying the spectrum of the compression with the
+spectrum of `Ĥ`, the identification this development declines to make.
+
+These remain **eigenvalues of the compression, not energies**: that the compression restricts `Ĥ`
+to an invariant subspace is nowhere established here, so `tightBindingEnergy` is treated only as
+an eigenvalue of `lowEnergyMatrix`, and neither it nor the difference of conjunct 8 is identified
+with the ground-state energy or the first-excited energy of `Ĥ`. The refusal rests on the absence
+of a proof of invariance rather than on a claim that invariance fails: at the smallest ring size
+`L = 2` the `2L` configurations already exhaust the basis of the state space. No claim is made
+that these are the least two eigenvalues even of the compression. Tasaki notes on p. 59 that the
+analysis of this problem is not mathematically rigorous. The ring carrying the labels `j` is a
+ring of basis labels of type `ZMod (2 * (N + 1))`, not of lattice sites: the chain itself stays
+open, and no periodic chain occurs in this development.
 
 The declaration below is **PROVED**; `#print axioms` on it yields only `propext`,
 `Classical.choice`, `Quot.sound`.

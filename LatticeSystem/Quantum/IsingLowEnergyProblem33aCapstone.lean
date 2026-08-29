@@ -6,17 +6,19 @@ import LatticeSystem.Quantum.IsingLowEnergyProblem33aSplitting
 Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Problem 3.3.a (statement p. 59,
 solution pp. 498-501, eqs. (S.24)-(S.41)) asks to carry out the degenerate perturbation analysis
 of the open Ising chain in its `2L`-fold low-energy sector and to confirm the conclusions of the
-text for `L ≫ 1`. `tasaki_problem_3_3_a_low_energy_spectrum` is the single statement that answers
-that request, assembling the four modules it depends on; its nine conjuncts and their sources are
-listed in its own doc comment.
+text for `L ≫ 1`. `tasaki_problem_3_3_a_low_energy_spectrum` is the single statement that carries
+the perturbative analysis itself, eqs. (S.24)-(S.41), assembling the five modules it depends on;
+its nine conjuncts and their sources are listed in its own doc comment. The remaining part of the
+request, the closing paragraph of the solution on p. 501 after (S.41) that confirms eqs. (3.3.8)
+and (3.3.9), is answered by no conjunct; see below.
 
 ## What the formalisation asserts
 
 The compression of the Hamiltonian to the span of the `2L` low-energy configurations is a
 `2L × 2L` matrix over the label ring `ZMod (2 * (N + 1))`, and that compression equals a constant
 diagonal plus a tight-binding ring, eqs. (S.24)-(S.27). Its eigenvalue equation is equivalent to
-the recursion (S.30). Every positive root of the quantisation condition (S.34) in either parity
-sector yields a nonzero eigenvector of the compression, eqs. (S.31)-(S.33), with eigenvalue
+the recursion (S.30). Every positive root of the quantisation condition in either parity sector
+yields a nonzero eigenvector of the compression, eqs. (S.31)-(S.34), with eigenvalue
 `-N/4 + tightBindingEnergy λ κ`; the symmetric sector always gives the strictly smaller
 `tightBindingEnergy`, the ordering asserted below (S.40). The `L ↑ ∞` rate `κ∞` of (S.35) has the
 closed-form energy (S.39), a positive symmetric root exists at every ring size, a positive
@@ -27,12 +29,14 @@ ingredients, `e^{-κ∞}/λ → 1` and `tanh κ∞ → 1`.
 
 ## What the formalisation does not assert
 
-`tightBindingEnergy` values are eigenvalues of the compressed matrix, which is not the restriction
-of the Hamiltonian to an invariant subspace: the Hamiltonian does not preserve the span of the
-`2L` configurations. They are therefore never identified with the ground-state energy or the
-first-excited energy of the Hamiltonian, and no claim is made that they are the least two
-eigenvalues even of the compression. Tasaki notes on p. 59 that the analysis of this problem is
-not mathematically rigorous.
+`tightBindingEnergy` values are eigenvalues of the compressed matrix `lowEnergyMatrix`. That this
+compression is the restriction of the Hamiltonian to an invariant subspace is nowhere established
+here, which is why its eigenvalues are never identified with the ground-state energy or the
+first-excited energy of the Hamiltonian; the refusal rests on the absence of a proof of
+invariance, not on a claim that invariance fails, and at the smallest ring size `L = 2` the `2L`
+configurations already exhaust the basis of the state space. No claim is made that the two values
+are the least two eigenvalues even of the compression. Tasaki notes on p. 59 that the analysis of
+this problem is not mathematically rigorous.
 
 The `≃` steps of the source are not asserted. The Taylor expansion (S.36)-(S.38) is replaced by
 exact identities, so no lowest-order approximation appears; the `≃` forms of (S.40) and (S.41),
@@ -40,9 +44,17 @@ and the last step `≃ 2 λ^L`, are not stated, and the two `λ ↓ 0` limits st
 step are limits at no fixed ring size and are not combined with the `L ↑ ∞` limit of the
 splitting conjunct. Uniqueness of the root in either sector is neither proved nor used, which is
 why the splitting conjunct quantifies over arbitrary families of positive roots. The `∀ᶠ`
-guarding the antisymmetric sector is what the proof establishes and not a weakening for
-convenience: the defect of the cleared root equation at `κ ↓ 0` turns negative, which is what the
-intermediate value theorem consumes, only once `L` exceeds a multiple of `λ`.
+guarding the antisymmetric sector is an artifact of this proof route, not a proven boundary of
+existence: the intermediate value argument evaluates the cleared root equation at the fixed test
+point `κ = 1/L` and needs `L > max (24 λ, 1/κ∞)` to control the sign there, and both that test
+point and the constant `24` are choices of the route. Whether an antisymmetric root exists at
+ring sizes below that threshold is left open, in either direction.
+
+The closing paragraph of the solution, p. 501 after (S.41), is not asserted: `|φ₀| = |φ_L| ≃ 1`
+with the other components smaller, and with it the confirmation of eqs. (3.3.8) and (3.3.9),
+p. 58, which describe the ground state and the first excited state of the Hamiltonian itself.
+Asserting those would require identifying the spectrum of the compression with the spectrum of
+the Hamiltonian, the identification this development declines to make.
 
 The ring `ZMod (2 * (N + 1))` indexes the `2L` low-energy basis labels, not lattice sites; the
 chain itself is open, and no periodic chain occurs anywhere in this development.
@@ -58,9 +70,10 @@ conjuncts.
 
 Under `1 ≤ N`, that is `L = N + 1 ≥ 2`:
 
-1. the `2L` low-energy configurations `lowEnergyConfig N` are pairwise distinct, so the low-energy
-   sector has the dimension `2L` named in the problem;
-2. eqs. (S.24)-(S.27), p. 499: the compression `lowEnergyMatrix N lam` equals
+1. `lowEnergyConfig N` is injective: the `2L` labels index pairwise distinct spin configurations.
+   Neither the identification of these with Tasaki's named low-energy basis nor the step from
+   distinctness to the dimension `2L` of the sector is part of this conjunct;
+2. eqs. (S.24)-(S.27), pp. 498-499: the compression `lowEnergyMatrix N lam` equals
    `(-N/4) • 1 + tightBindingRing N lam`;
 3. eqs. (S.28)-(S.30), p. 499: the eigenvalue equation of the compression at `-N/4 + ε` is
    equivalent to the tight-binding recursion (S.30) at every label;
@@ -82,10 +95,12 @@ Without any restriction on the ring size:
 9. the two `λ ↓ 0` limits `e^{-κ∞(λ)}/λ → 1` and `tanh κ∞(λ) → 1`, the exact content of the
    two replacements made in the source's closing step `≃ 2 λ^L` of (S.41).
 
-`tightBindingEnergy` is an eigenvalue of the compressed matrix `lowEnergyMatrix`, whose span the
-Hamiltonian does not preserve; it is not identified here with a ground-state or first-excited
-energy of the Hamiltonian. The `≃` relations (S.36)-(S.38), (S.40), (S.41) are not asserted, and
-root uniqueness is neither proved nor used. -/
+`tightBindingEnergy` is an eigenvalue of the compressed matrix `lowEnergyMatrix`; that this
+compression restricts the Hamiltonian to an invariant subspace is not established here, so the
+value is not identified with a ground-state or first-excited energy of the Hamiltonian. The `≃`
+relations (S.36)-(S.38), (S.40), (S.41) are not asserted, root uniqueness is neither proved nor
+used, and the closing paragraph of the solution on p. 501, which confirms eqs. (3.3.8) and
+(3.3.9), is carried by no conjunct. -/
 theorem tasaki_problem_3_3_a_low_energy_spectrum (lam : ℝ) (hlam : 0 < lam) :
     (∀ N : ℕ, 1 ≤ N →
         Function.Injective (lowEnergyConfig N)

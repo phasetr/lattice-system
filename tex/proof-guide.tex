@@ -1777,7 +1777,11 @@ eq.~(3.3.1), p.~56, with open boundary conditions.
 Problem~3.3.a asks to carry out the degenerate perturbation analysis of
 the open Ising chain in its $2L$-fold low-energy sector and to confirm
 the conclusions of the text for $L \gg 1$. The theorem below is the
-single statement that answers that request. It is a pure assembly: it
+single statement that carries the perturbative analysis itself,
+eqs.~(S.24)--(S.41); the remaining part of the request, the closing
+paragraph of the solution on p.~501 after (S.41) that confirms
+eqs.~(3.3.8) and~(3.3.9), p.~58, is answered by no conjunct and is
+listed among the exclusions below. It is a pure assembly: it
 introduces no new mathematical content and consumes only the
 declarations of §\ref{subsec:ising-low-energy-matrix},
 §\ref{subsec:ising-low-energy-eigenvectors},
@@ -1790,10 +1794,12 @@ Let $\lambda > 0$. Then all nine of the following hold.
 
 For every ring size with $L = N + 1 \ge 2$:
 \begin{enumerate}
-  \item the $2L$ low-energy configurations \texttt{lowEnergyConfig}~$N$
-        are pairwise distinct, so the low-energy sector has the
-        dimension $2L$ named in the problem;
-  \item eqs.~(S.24)--(S.27), p.~499: the compression satisfies
+  \item \texttt{lowEnergyConfig}~$N$ is injective: the $2L$ labels
+        index pairwise distinct spin configurations. Neither the
+        identification of these with Tasaki's named low-energy basis nor
+        the step from distinctness to the dimension $2L$ of the sector
+        is part of this conjunct;
+  \item eqs.~(S.24)--(S.27), pp.~498--499: the compression satisfies
         $\texttt{lowEnergyMatrix}\,N\,\lambda
          = (-N/4)\,\mathbf{1} + \texttt{tightBindingRing}\,N\,\lambda$;
   \item eqs.~(S.28)--(S.30), p.~499: for all $\varepsilon$ and $\varphi$,
@@ -1849,22 +1855,38 @@ The two limits of conjunct 9 are taken at no fixed ring size and are not
 combined with the $L \uparrow \infty$ limit of conjunct 8. Uniqueness of
 the root in either sector is neither proved nor used, which is why
 conjunct 8 quantifies over arbitrary families of positive roots; the
-"eventually" guarding the antisymmetric sector is what the proof of
-§\ref{subsec:ising-low-energy-roots} establishes rather than a weakening
-for convenience.
+"eventually" guarding the antisymmetric sector is an artifact of the
+proof route of §\ref{subsec:ising-low-energy-roots}, not a proven
+boundary of existence --- that argument evaluates the cleared root
+equation at the fixed test point $\kappa = 1/L$ and needs
+$L > \max(24\lambda,\, 1/\kappa_\infty)$ to control the sign there,
+and both that test point and the constant $24$ are choices of the route.
+Whether an antisymmetric root exists at ring sizes below that threshold
+is left open, in either direction.
+
+Also not asserted is the closing paragraph of the solution, p.~501 after
+(S.41): $|\varphi_0| = |\varphi_L| \simeq 1$ with the other components
+smaller, and with it the confirmation of eqs.~(3.3.8) and~(3.3.9),
+p.~58, which describe the ground state and the first excited state of
+$\hat H$ itself. Asserting those would require identifying the spectrum
+of the compression with the spectrum of $\hat H$, the identification
+this development declines to make.
 
 \paragraph{Scope.}
-As throughout §\ref{subsec:ising-low-energy-matrix} onwards, $\hat H$
-does not preserve the span of the $2L$ configurations, so
-\texttt{tightBindingEnergy} is an eigenvalue of the compression
-\texttt{lowEnergyMatrix} and neither it nor the difference of conjunct 8
-is identified with the ground-state energy or the first-excited energy
-of $\hat H$; no claim is made that these are the least two eigenvalues
-even of the compression. Tasaki notes on p.~59 that the analysis of this
-problem is not mathematically rigorous. The ring carrying the labels is
-a ring of basis labels of type $\mathbb{Z}/2L\mathbb{Z}$, not of lattice
-sites: the chain itself stays open, and no periodic chain occurs in this
-development. \texttt{lake build} is warning-free on both roots and
+That the compression restricts $\hat H$ to an invariant subspace is
+nowhere established here, so \texttt{tightBindingEnergy} is treated only
+as an eigenvalue of \texttt{lowEnergyMatrix}, and neither it nor the
+difference of conjunct 8 is identified with the ground-state energy or
+the first-excited energy of $\hat H$. The refusal rests on the absence
+of a proof of invariance rather than on a claim that invariance fails:
+at the smallest ring size $L = 2$ the $2L$ configurations already
+exhaust the basis of the state space. No claim is made that these are
+the least two eigenvalues even of the compression. Tasaki notes on
+p.~59 that the analysis of this problem is not mathematically rigorous.
+The ring carrying the labels is a ring of basis labels of type
+$\mathbb{Z}/2L\mathbb{Z}$, not of lattice sites: the chain itself stays
+open, and no periodic chain occurs in this development.
+\texttt{lake build} is warning-free on both roots and
 \texttt{\#print axioms} on the capstone yields only \texttt{propext},
 \texttt{Classical.choice}, \texttt{Quot.sound} (axiom-free).
 
