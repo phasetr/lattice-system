@@ -190,8 +190,8 @@ Every declaration below is **PROVED**; `#print axioms` on each yields only `prop
 | `tendsto_exp_neg_kappaInf_div_atZero`, `tendsto_tanh_kappaInf_atZero` | the two small-`λ` replacements behind the final form of Tasaki eq. (S.41): `e^-κ∞ / λ → 1` and `tanh κ∞ → 1` as `λ ↓ 0` | `Quantum/IsingLowEnergyProblem33aSpectrum.lean` |
 
 Regression fixtures live in `LatticeSystem/Tests/Problem33aLowEnergy.lean`: the value fixture at
-`λ = 1/2` pins `ε∞ = (1 - √2)/2`, which is reached only through the radical of (S.39), and the
-companion fixture pins the prefactor `2 tanh κ∞ = √2` of (S.41) at the same `λ`.
+`λ = 1/2` pins `ε∞ = (1 - √2)/2` from the middle equality of (S.39), and the companion fixture
+pins the prefactor `2 tanh κ∞ = √2` of (S.41) at the same `λ`.
 
 ---
 

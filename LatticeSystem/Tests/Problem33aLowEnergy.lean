@@ -414,15 +414,16 @@ example (lam : ℝ) (hlam : 0 < lam) :
 
 /-- **C6 signature pin — (S.39).** `tightBindingEnergy_kappaInf_eq` is the source's `ε∞`,
 `ε∞ = -(λ/2)(e^κ∞ + e^-κ∞) + 1/2 = -√(1 + 4λ²)/2 + 1/2`, the middle equality of (S.39). The
-radical is confirmed present on the rendered PDF page 501 (printed p. 501); the `.txt` extract
-drops it. The final `≃ -λ²` of (S.39) is a small-`λ` approximation and is not asserted here. -/
+radical is confirmed present on the rendered PDF page 501 (printed p. 501); in the `.txt`
+extract the `√` and its radicand sit on separate lines above the equation body, so reading the
+equation's own line alone loses them — take (S.39) from the rendered PDF. The final `≃ -λ²` of
+(S.39) is a small-`λ` approximation and is not asserted here. -/
 example (lam : ℝ) (hlam : 0 < lam) :
     tightBindingEnergy lam (kappaInf lam) = (1 - Real.sqrt (1 + 4 * lam ^ 2)) / 2 :=
   tightBindingEnergy_kappaInf_eq hlam
 
-/-- **C6 numeric pin at `λ = 1/2`.** `1 + 4 * (1/2)^2 = 2`, so `ε∞ = (1 - √2)/2` — a concrete
-value that is only reached through the radical of (S.39): a dropped-radical mis-transcription
-(reading (S.39) as `ε∞ = (1 - λ)/2` or similar) gives a different rational value here. -/
+/-- **C6 numeric pin at `λ = 1/2`.** `1 + 4 * (1/2)^2 = 2`, so this pins the value
+`ε∞ = (1 - √2)/2` taken by the middle equality of Tasaki eq. (S.39) at `λ = 1/2`. -/
 example : tightBindingEnergy (1 / 2 : ℝ) (kappaInf (1 / 2)) = (1 - Real.sqrt 2) / 2 := by
   have h := tightBindingEnergy_kappaInf_eq (lam := (1 / 2 : ℝ)) (by norm_num)
   norm_num at h
