@@ -511,4 +511,50 @@ example (lam : ℝ) (hlam : 0 < lam) :
     ∀ᶠ N : ℕ in Filter.atTop, ∃ kappa : ℝ, 0 < kappa ∧ rootEquation N lam kappa (-1) :=
   eventually_exists_root_antisymmetric lam hlam
 
+/-! ## The splitting-limit layer (Tasaki eq. (S.41), TSK-005f)
+
+The three fixtures below are Red: `root_symmetric_gt_kappaInf`,
+`eventually_root_antisymmetric_mem_Ico` and `tendsto_splitting_ratio` are not yet declared
+anywhere in `LatticeSystem`. They pin the S2, S3 and S7 layer of
+`.self-local/reports/design-tsk005-pr005f-scope.md` §7, the localization of both parity roots
+around `kappaInf lam` and the resulting `L ↑ ∞` limit of the splitting ratio. No new import is
+added for these fixtures: the intended home
+`LatticeSystem.Quantum.IsingLowEnergyProblem33aSplitting` does not exist yet, so `lake build`
+must fail with `unknown identifier`, never with a missing-module import error. -/
+
+/-- **S2 signature pin.** `root_symmetric_gt_kappaInf` locates every positive root of the
+symmetric (`s = 1`) root equation (S.34) strictly above `kappaInf lam`: the cleared equation
+gives `hop λ kp = (1 + w)/(1 - w) > 1 = hop λ κ∞`, and `hop λ ·` is strictly increasing. Used to
+replace the source's non-rigorous "`κ ≃ κ∞`" of (S.36) with an exact one-sided localization. -/
+example (N : ℕ) (lam kp : ℝ) (hkp : 0 < kp) (hroot : rootEquation N lam kp 1) :
+    kappaInf lam < kp :=
+  root_symmetric_gt_kappaInf N lam kp hkp hroot
+
+/-- **S3 signature pin.** `eventually_root_antisymmetric_mem_Ico` gives the two-sided
+localization of every positive root of the antisymmetric (`s = -1`) root equation, eventually in
+`N`: `arsinh (3/(8λ)) ≤ km < kappaInf lam`. The lower bound is the two-case argument of
+`.self-local/reports/design-tsk005-pr005f-scope.md` §4.2; the upper bound is the antisymmetric
+mirror of S2. -/
+example (lam : ℝ) (hlam : 0 < lam) :
+    ∀ᶠ N : ℕ in Filter.atTop, ∀ km : ℝ, 0 < km → rootEquation N lam km (-1) →
+      Real.arsinh (3 / (8 * lam)) ≤ km ∧ km < kappaInf lam :=
+  eventually_root_antisymmetric_mem_Ico lam hlam
+
+/-- **S7 signature pin — (S.41) splitting-ratio limit, this layer's headline result.**
+`tendsto_splitting_ratio` is the rigorous substitute for the source's `E_1st - E_GS ≃ 2 tanh(κ∞)
+e^-κ∞L`: for any pair of root families `kp`, `km`, each eventually positive and solving the
+respective parity root equation, the ratio of the tight-binding energy gap to
+`2 tanh(κ∞) e^-κ∞(N+1)` tends to `1` along `N → ∞`. Obtained by the mean value theorem plus
+squeeze (`.self-local/reports/design-tsk005-pr005f-scope.md` §4.3-§4.4), never by asserting the
+source's `≃` steps (S.36)-(S.38). No uniqueness of either root is assumed or needed: `kp`, `km`
+range over *any* eventually-positive root families of their sectors. -/
+example (lam : ℝ) (hlam : 0 < lam) (kp km : ℕ → ℝ)
+    (hkp : ∀ᶠ N : ℕ in Filter.atTop, 0 < kp N ∧ rootEquation N lam (kp N) 1)
+    (hkm : ∀ᶠ N : ℕ in Filter.atTop, 0 < km N ∧ rootEquation N lam (km N) (-1)) :
+    Filter.Tendsto
+      (fun N : ℕ => (tightBindingEnergy lam (km N) - tightBindingEnergy lam (kp N))
+        / (2 * Real.tanh (kappaInf lam) * Real.exp (-(kappaInf lam)) ^ (N + 1)))
+      Filter.atTop (nhds 1) :=
+  tendsto_splitting_ratio lam hlam kp km hkp hkm
+
 end LatticeSystem.Tests.Problem33aLowEnergy
