@@ -293,9 +293,9 @@ analysis of this problem is not mathematically rigorous. The ring carrying the l
 ring of basis labels of type `ZMod (2 * (N + 1))`, not of lattice sites: the chain itself stays
 open.
 
-`hop`, `hop_strictMono`, `hop_kappaInf_eq_one` and `hop_continuous` of
-`Quantum/IsingLowEnergyProblem33aRoots.lean`, previously `private` to that module, are public in
-this PR so that the splitting layer consumes them from their single defining site.
+`hop`, `hop_strictMono` and `hop_kappaInf_eq_one` of
+`Quantum/IsingLowEnergyProblem33aRoots.lean` are public so that the splitting layer consumes them
+from their single defining site.
 
 Every declaration below is **PROVED**; `#print axioms` on each yields only `propext`,
 `Classical.choice`, `Quot.sound`.

@@ -465,10 +465,11 @@ example :
 **F1 (not independently pinned).** This layer's workhorse is
 `hop lam kappa := lam * (Real.exp kappa - Real.exp (-kappa))` (`= 2λ sinh κ`, the left-hand side
 of (S.34) times `λ`), together with its strict monotonicity in `kappa`, its value `1` at
-`kappaInf lam` (from (S.35), `e^κ∞ - e^-κ∞ = λ⁻¹`), and its continuity
-(`hop_strictMono`, `hop_kappaInf_eq_one`, `hop_continuous`). C5, C7a, C7b and the S2, S3, S7
-fixtures below are its consumers and are pinned individually; F2 below pins instead the expanded
-form that `hop` abbreviates, in the shape in which (S.34) prints it.
+`kappaInf lam` (from (S.35), `e^κ∞ - e^-κ∞ = λ⁻¹`): `hop`, `hop_strictMono` and
+`hop_kappaInf_eq_one`, the three names the splitting layer consumes. They carry no pin of their
+own because C5, C7a, C7b and the S2, S3, S7 fixtures below are their consumers and are pinned
+individually. F2 below pins instead the expanded form that `hop` abbreviates, in the shape in
+which (S.34) prints it.
 -/
 
 /-- **F2 signature pin.** `rootEquation_iff_cleared` clears the denominator of Tasaki eq. (S.34),

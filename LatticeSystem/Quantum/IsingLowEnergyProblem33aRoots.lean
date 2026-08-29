@@ -72,7 +72,7 @@ theorem hop_kappaInf_eq_one {lam : ℝ} (hlam : 0 < lam) : hop lam (kappaInf lam
 
 /-- `hop λ ·` is continuous, the hypothesis under which the intermediate value theorem applies to
 the defect of the cleared root equation. -/
-theorem hop_continuous (lam : ℝ) : Continuous (hop lam) := by
+private theorem hop_continuous (lam : ℝ) : Continuous (hop lam) := by
   change Continuous fun k : ℝ => lam * (Real.exp k - Real.exp (-k))
   fun_prop
 

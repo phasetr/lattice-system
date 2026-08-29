@@ -141,8 +141,9 @@ theorem root_symmetric_gt_kappaInf (N : ℕ) (lam kp : ℝ) (hkp : 0 < kp)
 in `[arsinh (3/(8λ)), κ∞)`, for all sufficiently large ring sizes. The upper bound holds at every
 ring size, since the cleared equation gives `hop λ κ = (1 - e^-κL)/(1 + e^-κL) < 1 = hop λ κ∞`.
 The lower bound splits on `w = e^-κL`: for `w ≤ 1/8` the same equation gives
-`hop λ κ ≥ (7/8)/(9/8) ≥ 3/4 = hop λ (arsinh (3/(8λ)))`, while `w > 1/8` forces
-`κL < 7` and hence `L < 32 λ e^κ∞`, which the ring size eventually exceeds. -/
+`hop λ κ ≥ (7/8)/(9/8) ≥ 3/4 = hop λ (arsinh (3/(8λ)))`, while `w > 1/8` gives
+`κL/16 < hop λ κ ≤ 2λκ e^κ∞` and hence `L < 32 λ e^κ∞`, which the ring size eventually
+exceeds. -/
 theorem eventually_root_antisymmetric_mem_Ico (lam : ℝ) (hlam : 0 < lam) :
     ∀ᶠ N : ℕ in Filter.atTop, ∀ km : ℝ, 0 < km → rootEquation N lam km (-1) →
       Real.arsinh (3 / (8 * lam)) ≤ km ∧ km < kappaInf lam := by
@@ -178,8 +179,6 @@ theorem eventually_root_antisymmetric_mem_Ico (lam : ℝ) (hlam : 0 < lam) :
     have hprod : Real.exp (km * ((N + 1 : ℕ) : ℝ)) * w = 1 := by
       rw [hwdef, ← Real.exp_add]
       norm_num
-    have hEpos : (0 : ℝ) < Real.exp (km * ((N + 1 : ℕ) : ℝ)) := Real.exp_pos _
-    have hlt8 : Real.exp (km * ((N + 1 : ℕ) : ℝ)) < 8 := by nlinarith
     have hlin : km * ((N + 1 : ℕ) : ℝ) + 1 ≤ Real.exp (km * ((N + 1 : ℕ) : ℝ)) :=
       Real.add_one_le_exp _
     have hlow : km * ((N + 1 : ℕ) : ℝ) * w ≤ 1 - w := by
@@ -346,16 +345,6 @@ private theorem tendsto_root_family (lam : ℝ) (hlam : 0 < lam) (s : ℝ) (hs :
 
 /-! ### The exact factorization replacing the Taylor step -/
 
-/-- The prefactor `(e^κ - e^-κ)/(e^κ + e^-κ)` that Tasaki eqs. (S.40) and (S.41), p. 501, print
-in front of `e^-κ∞L`, in the form `(e^{κ+κ} - 1)/(e^{κ+κ} + 1)` produced by the factorization
-`tightBindingEnergy_sub_eq`. -/
-private theorem exp_add_ratio_eq_tanh (x : ℝ) :
-    (Real.exp (x + x) - 1) / (Real.exp (x + x) + 1) = Real.tanh x := by
-  have hx : Real.exp x ≠ 0 := (Real.exp_pos x).ne'
-  have hd : Real.exp x * Real.exp x + 1 ≠ 0 := by positivity
-  rw [Real.tanh_eq_sinh_div_cosh, Real.sinh_eq, Real.cosh_eq, Real.exp_add, Real.exp_neg]
-  field_simp
-
 /-- The exact identity that replaces the source's Taylor step (S.36)-(S.38), p. 500: for all
 `x`, `y`, the difference of the eigenvalue (S.31) at the two arguments factors as
 `ε(y) - ε(x) = tanh((x + y)/2) (hop λ x - hop λ y)/2`, here with `tanh` written in the
@@ -479,9 +468,13 @@ theorem tendsto_splitting_ratio (lam : ℝ) (hlam : 0 < lam) (kp km : ℕ → �
       Filter.atTop (nhds (Real.tanh (kappaInf lam))) := by
     have hsum : Filter.Tendsto (fun N : ℕ => kp N + km N) Filter.atTop
         (nhds (kappaInf lam + kappaInf lam)) := hkp_tend.add hkm_tend
+    have hval : (Real.exp (kappaInf lam + kappaInf lam) - 1)
+        / (Real.exp (kappaInf lam + kappaInf lam) + 1) = Real.tanh (kappaInf lam) := by
+      have hx : Real.exp (kappaInf lam) ≠ 0 := (Real.exp_pos _).ne'
+      rw [Real.tanh_eq, Real.exp_add, Real.exp_neg]
+      field_simp
     have := (hcont.tendsto (kappaInf lam + kappaInf lam)).comp hsum
-    rw [exp_add_ratio_eq_tanh] at this
-    exact this
+    rwa [hval] at this
   have htanhpos : 0 < Real.tanh (kappaInf lam) := by
     rw [tanh_kappaInf_eq hlam]
     positivity

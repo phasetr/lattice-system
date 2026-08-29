@@ -1753,11 +1753,10 @@ preserve the span of the $2L$ configurations, so the difference above is
 a difference of eigenvalues of the compression and is not identified
 with $E_{\mathrm{1st}} - E_{\mathrm{GS}}$ of $\hat H$; the label ring is
 a ring of basis labels, not of lattice sites, and the chain stays open.
-The declarations \texttt{hop}, \texttt{hop\_strictMono},
-\texttt{hop\_kappaInf\_eq\_one} and \texttt{hop\_continuous}, previously
-\texttt{private} to
-\texttt{IsingLowEnergyProblem33aRoots.lean}, are public from this layer
-on, so that they are consumed from their single defining site.
+The declarations \texttt{hop}, \texttt{hop\_strictMono} and
+\texttt{hop\_kappaInf\_eq\_one} of
+\texttt{IsingLowEnergyProblem33aRoots.lean} are public, so that the
+splitting layer consumes them from their single defining site.
 \texttt{lake build} is warning-free on both roots and
 \texttt{\#print axioms} on each new declaration yields only
 \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
