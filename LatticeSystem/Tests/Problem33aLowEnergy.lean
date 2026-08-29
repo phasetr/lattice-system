@@ -559,7 +559,7 @@ example (lam : ℝ) (hlam : 0 < lam) (kp km : ℕ → ℝ)
 conjuncts pinned by the fixtures above: for every `N ≥ 1`, injectivity of `lowEnergyConfig`
 (conjunct 1); the low-energy matrix identity `lowEnergyMatrix = E_GS^(0) • 1 + tightBindingRing`
 (conjunct 2); the eigenvalue equation stated as the tight-binding recursion (conjunct 3); both
-parity ansätze being nonzero eigenvectors of `lowEnergyMatrix` at `tightBindingEnergy`
+parity ansätze being nonzero eigenvectors of `lowEnergyMatrix` at `E_GS^(0) + tightBindingEnergy`
 (conjunct 4); and the symmetric root always giving a strictly lower `tightBindingEnergy` than the
 antisymmetric root (conjunct 5). Outside the `∀ N` block: `tightBindingEnergy lam (kappaInf lam)
 = (1 - Real.sqrt (1 + 4 * lam ^ 2)) / 2` (conjunct 6); existence of a positive symmetric root for
@@ -568,8 +568,9 @@ limit of the ratio of the `tightBindingEnergy` gap between any eventually-positi
 and symmetric root families to `2 * Real.tanh (kappaInf lam) * Real.exp (-(kappaInf lam)) ^
 (N + 1)`, tending to `1` (conjunct 8); and the two `l ↓ 0` limits `Real.exp (-(kappaInf l)) / l →
 1` and `Real.tanh (kappaInf l) → 1` (conjunct 9). `tightBindingEnergy` is an eigenvalue of the
-compressed matrix `lowEnergyMatrix`, never identified here with the true Hamiltonian's
-ground-state or first-excited energy. -/
+compressed matrix `lowEnergyMatrix` shifted by `E_GS^(0)`, equivalently of the tight-binding
+part `tightBindingRing`, and is never identified here with the true Hamiltonian's ground-state
+or first-excited energy. -/
 example (lam : ℝ) (hlam : 0 < lam) :
     (∀ N : ℕ, 1 ≤ N →
         Function.Injective (lowEnergyConfig N)

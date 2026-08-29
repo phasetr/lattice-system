@@ -29,7 +29,8 @@ ingredients, `e^{-κ∞}/λ → 1` and `tanh κ∞ → 1`.
 
 ## What the formalisation does not assert
 
-`tightBindingEnergy` values are eigenvalues of the compressed matrix `lowEnergyMatrix`. That this
+`tightBindingEnergy` values are eigenvalues of the tight-binding part `tightBindingRing`, hence
+eigenvalues of the compressed matrix `lowEnergyMatrix` only after the shift by `-N/4`. That this
 compression is the restriction of the Hamiltonian to an invariant subspace is nowhere established
 here, which is why its eigenvalues are never identified with the ground-state energy or the
 first-excited energy of the Hamiltonian; the refusal rests on the absence of a proof of
@@ -95,12 +96,13 @@ Without any restriction on the ring size:
 9. the two `λ ↓ 0` limits `e^{-κ∞(λ)}/λ → 1` and `tanh κ∞(λ) → 1`, the exact content of the
    two replacements made in the source's closing step `≃ 2 λ^L` of (S.41).
 
-`tightBindingEnergy` is an eigenvalue of the compressed matrix `lowEnergyMatrix`; that this
-compression restricts the Hamiltonian to an invariant subspace is not established here, so the
-value is not identified with a ground-state or first-excited energy of the Hamiltonian. The `≃`
-relations (S.36)-(S.38), (S.40), (S.41) are not asserted, root uniqueness is neither proved nor
-used, and the closing paragraph of the solution on p. 501, which confirms eqs. (3.3.8) and
-(3.3.9), is carried by no conjunct. -/
+Per conjunct 4, `tightBindingEnergy` is an eigenvalue of the compressed matrix `lowEnergyMatrix`
+only after the shift by `-N/4`; on its own it is an eigenvalue of the tight-binding part
+`tightBindingRing` of conjunct 2. That this compression restricts the Hamiltonian to an invariant
+subspace is not established here, so the value is not identified with a ground-state or
+first-excited energy of the Hamiltonian. The `≃` relations (S.36)-(S.38), (S.40), (S.41) are not
+asserted, root uniqueness is neither proved nor used, and the closing paragraph of the solution
+on p. 501, which confirms eqs. (3.3.8) and (3.3.9), is carried by no conjunct. -/
 theorem tasaki_problem_3_3_a_low_energy_spectrum (lam : ℝ) (hlam : 0 < lam) :
     (∀ N : ℕ, 1 ≤ N →
         Function.Injective (lowEnergyConfig N)
