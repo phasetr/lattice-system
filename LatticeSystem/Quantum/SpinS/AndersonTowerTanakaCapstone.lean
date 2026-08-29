@@ -92,22 +92,6 @@ theorem tanakaTowerTerm_dotProduct_cross_eq_zero {Λ : Type*} [Fintype Λ] [Deci
   rw [pow_succ] at h
   exact (mul_eq_zero.mp (by linear_combination h : (2 : ℂ) * (-1) ^ M = 0)).resolve_left two_ne_zero
 
-/-- **Unit normalization has unit norm**: `⟨w/‖w‖, w/‖w‖⟩ = 1` when `‖w‖² = vecNormSqRe w > 0`. -/
-theorem unitNormalize_dotProduct_self {ι : Type*} [Fintype ι] (w : ι → ℂ)
-    (hw : 0 < vecNormSqRe w) : star (unitNormalize w) ⬝ᵥ unitNormalize w = 1 := by
-  have him : (star w ⬝ᵥ w).im = 0 := ((Complex.le_def.mp (dotProduct_star_self_nonneg w)).2).symm
-  have hself : star w ⬝ᵥ w = ((vecNormSqRe w : ℝ) : ℂ) := by
-    apply Complex.ext
-    · rw [Complex.ofReal_re]; rfl
-    · rw [Complex.ofReal_im]; exact him
-  have hrc : ((Real.sqrt (vecNormSqRe w) : ℝ) : ℂ) ≠ 0 :=
-    by exact_mod_cast (Real.sqrt_pos.mpr hw).ne'
-  have hV : ((vecNormSqRe w : ℝ) : ℂ) = ((Real.sqrt (vecNormSqRe w) : ℝ) : ℂ) ^ 2 := by
-    rw [← Complex.ofReal_pow, Real.sq_sqrt hw.le]
-  rw [unitNormalize, star_smul_dotProduct_smul, hself, hV, Complex.star_def, map_inv₀,
-    Complex.conj_ofReal]
-  field_simp
-
 /-- **Rayleigh quotient is normalization-invariant**: `expectationRatioRe H (w/‖w‖) =
 expectationRatioRe H w` when `vecNormSqRe w > 0` (they differ by the nonzero real scalar). -/
 theorem expectationRatioRe_unitNormalize {ι : Type*} [Fintype ι] (H : Matrix ι ι ℂ) (w : ι → ℂ)
