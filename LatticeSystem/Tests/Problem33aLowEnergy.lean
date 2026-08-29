@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.IsingLowEnergyProblem33aSpectrum
+import LatticeSystem.Quantum.IsingLowEnergyProblem33aRoots
 
 /-!
 # Test coverage for Tasaki Problem 3.3.a — the low-energy `2L` matrix (TSK-005)
