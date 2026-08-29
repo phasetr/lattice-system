@@ -541,7 +541,8 @@ respective parity root equation, the ratio of the tight-binding energy gap to
 `2 tanh(κ∞) e^-κ∞(N+1)` tends to `1` along `N → ∞`, at fixed `λ` — the order of limits of the
 source's footnote 1, p. 500. The source's `≃` steps (S.36)-(S.38), p. 500, are not asserted. No
 uniqueness of either root is assumed or needed: `kp`, `km` range over *any* eventually-positive
-root families of their sectors. -/
+root families of their sectors. `tightBindingEnergy` is an eigenvalue of the compressed matrix
+`lowEnergyMatrix`, so the difference pinned here is not `E_1st - E_GS` of `Ĥ`. -/
 example (lam : ℝ) (hlam : 0 < lam) (kp km : ℕ → ℝ)
     (hkp : ∀ᶠ N : ℕ in Filter.atTop, 0 < kp N ∧ rootEquation N lam (kp N) 1)
     (hkm : ∀ᶠ N : ℕ in Filter.atTop, 0 < km N ∧ rootEquation N lam (km N) (-1)) :
