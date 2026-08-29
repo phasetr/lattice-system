@@ -1762,6 +1762,113 @@ splitting layer consumes them from their single defining site.
 \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
 (axiom-free).
 
+\subsection{The low-energy spectrum: capstone (Tasaki Problem 3.3.a)}
+\label{subsec:ising-low-energy-capstone}
+
+\emph{Source file:}
+\texttt{LatticeSystem/Quantum/IsingLowEnergyProblem33aCapstone.lean};
+regression fixture in
+\texttt{LatticeSystem/Tests/Problem33aLowEnergy.lean}.
+
+\emph{Reference:} Tasaki~\cite{Tasaki:QMB}, Problem~3.3.a: statement
+p.~59, solution pp.~498--501, eqs.~(S.24)--(S.41). The model is
+eq.~(3.3.1), p.~56, with open boundary conditions.
+
+Problem~3.3.a asks to carry out the degenerate perturbation analysis of
+the open Ising chain in its $2L$-fold low-energy sector and to confirm
+the conclusions of the text for $L \gg 1$. The theorem below is the
+single statement that answers that request. It is a pure assembly: it
+introduces no new mathematical content and consumes only the
+declarations of §\ref{subsec:ising-low-energy-matrix},
+§\ref{subsec:ising-low-energy-eigenvectors},
+§\ref{subsec:ising-low-energy-kappa-infinity},
+§\ref{subsec:ising-low-energy-roots} and
+§\ref{subsec:ising-low-energy-splitting}.
+
+\begin{theorem}[\texttt{tasaki\_problem\_3\_3\_a\_low\_energy\_spectrum}]
+Let $\lambda > 0$. Then all nine of the following hold.
+
+For every ring size with $L = N + 1 \ge 2$:
+\begin{enumerate}
+  \item the $2L$ low-energy configurations \texttt{lowEnergyConfig}~$N$
+        are pairwise distinct, so the low-energy sector has the
+        dimension $2L$ named in the problem;
+  \item eqs.~(S.24)--(S.27), p.~499: the compression satisfies
+        $\texttt{lowEnergyMatrix}\,N\,\lambda
+         = (-N/4)\,\mathbf{1} + \texttt{tightBindingRing}\,N\,\lambda$;
+  \item eqs.~(S.28)--(S.30), p.~499: for all $\varepsilon$ and $\varphi$,
+        $\texttt{lowEnergyMatrix}\,N\,\lambda \, \varphi
+         = (-N/4 + \varepsilon)\varphi$ holds if and only if the
+        tight-binding recursion (S.30) holds at every label;
+  \item eqs.~(S.31)--(S.34), pp.~499--500: for either parity
+        $s = \pm 1$, every $\kappa > 0$ solving (S.34) makes
+        $\texttt{lowEnergyAnsatz}\,N\,\kappa\,s$ a nonzero eigenvector
+        of the compression with eigenvalue
+        $-N/4 + \texttt{tightBindingEnergy}\,\lambda\,\kappa$;
+  \item below eq.~(S.40), p.~501: for any positive roots of the two
+        sectors, $\varepsilon_+ < \varepsilon_-$.
+\end{enumerate}
+
+Without any restriction on the ring size:
+\begin{enumerate}\setcounter{enumi}{5}
+  \item eq.~(S.39), p.~501:
+        $\texttt{tightBindingEnergy}\,\lambda\,\kappa_\infty
+         = (1 - \sqrt{1 + 4\lambda^2})/2$;
+  \item a positive symmetric root exists at every ring size, and a
+        positive antisymmetric root exists at all sufficiently large
+        ring sizes;
+  \item eq.~(S.41), p.~501: for arbitrary families $\kappa_\pm(N)$ of
+        eventually-positive roots of the two sectors,
+        \[
+          \lim_{N \to \infty}
+          \frac{\varepsilon_-(N) - \varepsilon_+(N)}
+               {2 \tanh(\kappa_\infty)\,
+                \left(e^{-\kappa_\infty}\right)^{N+1}} \;=\; 1;
+        \]
+  \item the two limits
+        $\lim_{\lambda \downarrow 0} e^{-\kappa_\infty(\lambda)}/\lambda
+         = 1$ and
+        $\lim_{\lambda \downarrow 0} \tanh \kappa_\infty(\lambda) = 1$.
+\end{enumerate}
+\end{theorem}
+
+\paragraph{What is asserted, and what is not.}
+Conjuncts 1--5 and 7 are exact statements about the compression and its
+quantisation condition, carrying eqs.~(S.24)--(S.34) and the ordering
+stated below (S.40); conjunct 6 is eq.~(S.39) verbatim. Conjunct 8
+carries the middle expression of (S.41) as an exact limit at fixed
+$\lambda$ with the ring size growing, the order of limits of the
+source's footnote~1 on p.~500, and conjunct 9 carries the two exact
+replacements that the source's closing step $\simeq 2\lambda^{L}$ makes.
+
+None of the source's $\simeq$ relations is asserted. The Taylor
+expansion (S.36)--(S.38) is replaced throughout by exact identities, so
+no lowest-order approximation appears anywhere; the $\simeq$ forms of
+(S.40) and (S.41), and the final $\simeq 2\lambda^{L}$, are not stated.
+The two limits of conjunct 9 are taken at no fixed ring size and are not
+combined with the $L \uparrow \infty$ limit of conjunct 8. Uniqueness of
+the root in either sector is neither proved nor used, which is why
+conjunct 8 quantifies over arbitrary families of positive roots; the
+"eventually" guarding the antisymmetric sector is what the proof of
+§\ref{subsec:ising-low-energy-roots} establishes rather than a weakening
+for convenience.
+
+\paragraph{Scope.}
+As throughout §\ref{subsec:ising-low-energy-matrix} onwards, $\hat H$
+does not preserve the span of the $2L$ configurations, so
+\texttt{tightBindingEnergy} is an eigenvalue of the compression
+\texttt{lowEnergyMatrix} and neither it nor the difference of conjunct 8
+is identified with the ground-state energy or the first-excited energy
+of $\hat H$; no claim is made that these are the least two eigenvalues
+even of the compression. Tasaki notes on p.~59 that the analysis of this
+problem is not mathematically rigorous. The ring carrying the labels is
+a ring of basis labels of type $\mathbb{Z}/2L\mathbb{Z}$, not of lattice
+sites: the chain itself stays open, and no periodic chain occurs in this
+development. \texttt{lake build} is warning-free on both roots and
+\texttt{\#print axioms} on the capstone yields only \texttt{propext},
+\texttt{Classical.choice}, \texttt{Quot.sound} (axiom-free).
+
+
 \subsection{Gibbs state instantiation}
 \label{subsec:ising-gibbs}
 

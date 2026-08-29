@@ -470,7 +470,6 @@ theorem tendsto_splitting_ratio (lam : ℝ) (hlam : 0 < lam) (kp km : ℕ → �
         (nhds (kappaInf lam + kappaInf lam)) := hkp_tend.add hkm_tend
     have hval : (Real.exp (kappaInf lam + kappaInf lam) - 1)
         / (Real.exp (kappaInf lam + kappaInf lam) + 1) = Real.tanh (kappaInf lam) := by
-      have hx : Real.exp (kappaInf lam) ≠ 0 := (Real.exp_pos _).ne'
       rw [Real.tanh_eq, Real.exp_add, Real.exp_neg]
       field_simp
     have := (hcont.tendsto (kappaInf lam + kappaInf lam)).comp hsum

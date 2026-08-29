@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.IsingLowEnergyProblem33aSplitting
+import LatticeSystem.Quantum.IsingLowEnergyProblem33aCapstone
 
 /-!
 # Test coverage for Tasaki Problem 3.3.a — the low-energy `2L` matrix (TSK-005)
