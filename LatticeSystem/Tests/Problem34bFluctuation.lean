@@ -19,35 +19,36 @@ of `Φ_GS`, and (3.4.4); the fixtures below reflect that. Eq. (3.4.16), the Schw
 
 ## What each fixture pins
 
-The first block pins the seven public declarations of the design in full, each restated as the
-declaration's own signature and discharged only by the declaration (the
-`Problem33aLowEnergy.lean` idiom): the two state constructors `hvlTrialState` / `hvlPlusState`,
+The first block pins the seven public declarations in full, each restated as the declaration's
+own signature and discharged only by the declaration (the `Problem33aLowEnergy.lean` idiom): the
+two state constructors `hvlTrialState` / `hvlPlusState`,
 the four per-`L` identities `hvlPlusState_dotProduct_self` (3.4.14 normalization),
 `hvlPlusState_order_mean` (3.4.15), `hvlPlusState_order_second_moment` (S.42),
 `hvlPlusState_order_variance` (S.43), and the capstone
 `tasaki_problem_3_4_b_order_fluctuation` (Problem 3.4.b itself: the `L^d`-normalized fluctuation
 of `Ô_L` in `Ξ₊` tends to `0` under (3.4.18)).
 
-The second block gives three concrete numeric fixtures.
+The second block gives two concrete numeric instances and one satisfiability witness.
 
-**Fixture A** (`n = Fin 2`, `O` = Pauli `X`, `Φ = e₀`) pins the normalization step of (3.4.14): a
-dropped `1/√2` in `hvlPlusState` would give `⟨Ξ₊|Ô|Ξ₊⟩ = 2` instead of `1`. It **cannot** detect
-any defect in the fourth-moment expansion (S.42)/(S.43): at this instance `m₂ = m₄ = 1`, so
-`m₄ = m₂²` and `m₄ / m₂` coincide with every candidate expansion, i.e. the fixture is blind to
-exactly the content Problem 3.4.b is about. Fixture B supplies that coverage.
+**Fixture A** (`n = Fin 2`, `O` = Pauli `X`, `Φ = e₀`) pins the normalization constant of
+`hvlPlusState`: a dropped `1/√2` would give `⟨Ξ₊|Ξ₊⟩ = 2` instead of `1`. Its coverage of the
+fourth-moment expansion (S.42)/(S.43) is only partial. At this instance `m₂ = m₄ = 1`, so the
+correct `⟨Ξ₊|Ô²|Ξ₊⟩ = (1/2)(m₂ + m₄/m₂)` evaluates to `1`, which does separate the dropped-`1/2`
+variant and the unnormalized-`Ξ₊` variant (both give `2`). It does **not** separate the two
+variants that agree with the correct value at `m₂ = m₄ = 1`: `m₄/m₂²` in place of `m₄/m₂`, and
+`Γ` normalized by `m₂` instead of `√m₂` (both give `1`). Fixture B separates those two.
 
 **Fixture B** (`n = Fin 4`, `O = diagonal ![1,-1,2,-2]`, `Φ = (1/2,1/2,1/2,1/2)`) pins the
-second-moment identity (S.42) at a point where the four wrong variants identified in the design
-(dropped `1/2`, `m₄/m₂²` instead of `m₄/m₂`, `Γ` normalized by `m₂` instead of `√m₂`, an
-unnormalized `Ξ₊`) all give numerically distinct wrong answers from the correct `⟨Ξ₊|Ô²|Ξ₊⟩ =
-59/20` and variance `9/20`.
+second-moment identity (S.42) at a point where all four wrong variants (dropped `1/2`, `m₄/m₂²`
+instead of `m₄/m₂`, `Γ` normalized by `m₂` instead of `√m₂`, an unnormalized `Ξ₊`) give
+numerically distinct wrong answers from the correct `⟨Ξ₊|Ô²|Ξ₊⟩ = 59/20` and variance `9/20`.
 
 **Fixture C** instantiates the capstone at a concrete `L`-indexed family (`O L = L^d • X`,
 `Φ L = e₀`, `q₀ = 1`) to witness that the `1 ≤ L`-guarded hypothesis bundle is satisfiable: without
 such a witness, an `L = 0` slip in the capstone's `hLRO` guard could make the theorem vacuously
-true for every family. The six hypotheses of the capstone (`hHerm`, `hΦ`, `hodd1`, `hodd3`,
-`hLRO`, `hFourth`) are proved outright for this family (they never mention `hvlPlusState`); only
-the final application to the not-yet-defined capstone is left unresolved.
+true for every family. The seven hypotheses of the capstone (`hq₀`, `hHerm`, `hΦ`, `hodd1`,
+`hodd3`, `hLRO`, `hFourth`) are proved outright for this family, and the capstone is applied to
+them at the end of the file.
 -/
 
 namespace LatticeSystem.Tests.Problem34bFluctuation
@@ -197,18 +198,19 @@ example : star (hvlPlusState fixtureAMatrix fixtureAVector)
   hvlPlusState_dotProduct_self fixtureAMatrix fixtureAVector fixtureA_herm fixtureA_norm
     fixtureA_odd1 fixtureA_m2pos
 
-/-- **Fixture A, order mean (3.4.15).** With the same data, `⟨Ξ₊|Ô|Ξ₊⟩ = 1`; the fourth-moment
-expansion (S.42)/(S.43) is *not* exercised here since `m₂ = m₄ = 1` makes every candidate
-expansion (correct or not) coincide numerically — see the module doc comment. -/
+/-- **Fixture A, order mean (3.4.15).** With the same data, `⟨Ξ₊|Ô|Ξ₊⟩ = √m₂ = 1`. This value
+does not involve `m₄`, so the example separates a misplaced `1/√2` (an unnormalized `Ξ₊` would
+give `2`) but says nothing about the shape of the fourth-moment expansion (S.42)/(S.43);
+Fixture B is the discriminating instance for that — see the module doc comment. -/
 example : rayleighOnVec fixtureAMatrix (hvlPlusState fixtureAMatrix fixtureAVector) = 1 := by
   simpa [fixtureA_raySq] using
     hvlPlusState_order_mean fixtureAMatrix fixtureAVector fixtureA_herm fixtureA_odd1
       fixtureA_odd3 fixtureA_m2pos
 
-/-- **Fixture A, second moment (S.42).** With the same data, `⟨Ξ₊|Ô²|Ξ₊⟩ = 1`.  Since
-`m₂ = m₄ = 1` here, this value agrees with several wrong variants of the expansion and therefore
-pins only that the identity evaluates, not its shape; Fixture B supplies the discriminating
-instance. -/
+/-- **Fixture A, second moment (S.42).** With the same data, `⟨Ξ₊|Ô²|Ξ₊⟩ = 1`.  At `m₂ = m₄ = 1`
+this value already excludes a dropped `1/2` and an unnormalized `Ξ₊` (both give `2`), but it
+agrees with `m₄/m₂²` in place of `m₄/m₂` and with `Γ` normalized by `m₂` instead of `√m₂`;
+Fixture B is the instance that separates those two. -/
 example : rayleighOnVec (fixtureAMatrix ^ 2) (hvlPlusState fixtureAMatrix fixtureAVector) = 1 := by
   rw [hvlPlusState_order_second_moment fixtureAMatrix fixtureAVector fixtureA_herm fixtureA_odd3
       fixtureA_m2pos, fixtureA_raySq, fixtureA_ray4]
@@ -261,7 +263,7 @@ private lemma fixtureB_m2pos : (0 : ℝ) < rayleighOnVec (fixtureBMatrix ^ 2) fi
 
 /-- **Fixture B, second moment (S.42).** With `O = diagonal ![1,-1,2,-2]` and `Φ` the uniform
 vector `(1/2,1/2,1/2,1/2)`, `m₂ = 5/2`, `m₄ = 17/2`, and `⟨Ξ₊|Ô²|Ξ₊⟩ = 59/20`. This value is
-numerically distinct from every wrong variant identified in the design (dropped `1/2` → `59/10`;
+numerically distinct from each of the four wrong variants (dropped `1/2` → `59/10`;
 `m₄/m₂²` instead of `m₄/m₂` → `193/100`; `Γ` normalized by `m₂` instead of `√m₂` → `193/100`;
 unnormalized `Ξ₊` → `59/10`). -/
 example : rayleighOnVec (fixtureBMatrix ^ 2) (hvlPlusState fixtureBMatrix fixtureBVector)
@@ -372,7 +374,8 @@ private lemma fixtureC_hLRO (d : ℕ) :
   rw [div_self (by positivity)]
 
 /-- The Fixture-C fourth-moment condition (3.4.18) holds: the normalized fluctuation of the
-ground state `Φ` is identically `0` (the family has no `L`-dependence to detect). -/
+reference vector `Φ` is identically `0`, because `O L = L^d • X` scales exactly with the volume
+factor, so the normalized moments are `L`-independent even though `O L` is not. -/
 private lemma fixtureC_hFourth (d : ℕ) :
     Filter.Tendsto
       (fun L : ℕ => rayleighOnVec ((fixtureCMatrix d L) ^ 4) fixtureCVector / ((L : ℝ) ^ d) ^ 4

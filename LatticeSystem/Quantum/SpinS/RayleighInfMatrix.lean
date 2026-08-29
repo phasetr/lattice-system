@@ -21,10 +21,12 @@ every Rayleigh-style quantity of this repository is written, and is consumed
 by ground-state normalisation arguments across multiple chapters.
 
 The same reasoning places the `dotProduct`-level normalisation vocabulary here:
-the squared norm `vecNormSqRe`, the unit normalisation `unitNormalize` and its
-unit-norm identity `unitNormalize_dotProduct_self`.  They depend only on
-mathlib, and trial states normalised as `w/‖w‖` occur in several chapters, so
-this shared base is their common ancestor.
+the squared norm `vecNormSqRe`, the unit normalisation `unitNormalize`, its
+unit-norm identity `unitNormalize_dotProduct_self`, and the scalar identity
+`sqrt2_inv_mul_sqrt2_inv` for the `(√2)⁻¹` prefactor of an equal-weight
+two-term superposition.  They depend only on mathlib, and both `w/‖w‖` trial
+states and equal-weight superpositions occur in several chapters, so this
+shared base is their common ancestor.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, §2.5 Theorem 2.4, p. 43–44.
@@ -99,5 +101,13 @@ theorem unitNormalize_dotProduct_self {ι : Type*} [Fintype ι] (w : ι → ℂ)
   rw [unitNormalize, star_smul, smul_dotProduct, dotProduct_smul, smul_eq_mul, smul_eq_mul, hself,
     hV, Complex.star_def, map_inv₀, Complex.conj_ofReal]
   field_simp
+
+/-- `(√2)⁻¹ * (√2)⁻¹ = 1/2` in `ℂ`: the normalisation identity for the `(√2)⁻¹` prefactor
+of an equal-weight two-term superposition. -/
+lemma sqrt2_inv_mul_sqrt2_inv :
+    ((Real.sqrt 2 : ℂ)⁻¹) * ((Real.sqrt 2 : ℂ)⁻¹) = (1 / 2 : ℂ) := by
+  rw [← mul_inv, ← Complex.ofReal_mul,
+    Real.mul_self_sqrt (by norm_num : (0:ℝ) ≤ 2)]
+  push_cast; ring
 
 end LatticeSystem.Quantum

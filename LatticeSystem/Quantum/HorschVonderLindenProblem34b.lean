@@ -75,7 +75,8 @@ private theorem even_moment_ofReal {n : Type*} [Fintype n] [DecidableEq n]
   · rw [Complex.ofReal_im]; exact him
 
 /-- Expansion of a sandwiched form on a scaled sum: `⟨c(u+v), A c(u+v)⟩` is `conj c · c` times the
-sum of the four pairings.  The cross terms are kept, since for `Ξ₊` they do not vanish. -/
+sum of the four pairings.  All four are kept, since which of them survive depends on the
+sandwiched `A`: for `Ξ₊` the cross terms vanish in the normalisation but carry all of (3.4.15). -/
 private theorem smul_add_dotProduct_mulVec {n : Type*} [Fintype n] (c : ℂ)
     (A : Matrix n n ℂ) (u v : n → ℂ) :
     star (c • (u + v)) ⬝ᵥ (A *ᵥ (c • (u + v)))
@@ -97,53 +98,40 @@ reference vector and the Horsch–von der Linden trial state. -/
 noncomputable def hvlPlusState {n : Type*} [Fintype n] (O : Matrix n n ℂ) (Φ : n → ℂ) : n → ℂ :=
   ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ • (Φ + hvlTrialState O Φ)
 
-/-- Scaling `Γ` back by `√m₂` recovers `Ô_L|Φ_GS⟩`, where `m₂ = ⟨Φ_GS|(Ô_L)²|Φ_GS⟩`. -/
-private theorem smul_trialState_eq {n : Type*} [Fintype n] [DecidableEq n] {O : Matrix n n ℂ}
-    (hO : O.IsHermitian) (Φ : n → ℂ) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) :
-    ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ) • hvlTrialState O Φ = O *ᵥ Φ := by
-  have hne : ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ) ≠ 0 := by
-    exact_mod_cast (Real.sqrt_pos.mpr hm2).ne'
-  rw [hvlTrialState, unitNormalize, vecNormSqRe_mulVec_eq_rayleigh hO Φ, smul_smul,
-    mul_inv_cancel₀ hne, one_smul]
-
-/-- `Γ` written out as the scalar multiple `(√m₂)⁻¹ • (Ô_L|Φ_GS⟩)`. -/
+/-- `Γ` written out as the scalar multiple `(√m₂)⁻¹ • (Ô_L|Φ_GS⟩)`.  This is the defining
+unfolding of `unitNormalize`, so no positivity of `m₂` is needed. -/
 private theorem trialState_eq_smul {n : Type*} [Fintype n] [DecidableEq n] {O : Matrix n n ℂ}
-    (hO : O.IsHermitian) (Φ : n → ℂ) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) :
+    (hO : O.IsHermitian) (Φ : n → ℂ) :
     hvlTrialState O Φ = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ • (O *ᵥ Φ) := by
-  have hne : ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ) ≠ 0 := by
-    exact_mod_cast (Real.sqrt_pos.mpr hm2).ne'
-  rw [← smul_trialState_eq hO Φ hm2, smul_smul, inv_mul_cancel₀ hne, one_smul]
+  rw [hvlTrialState, unitNormalize, vecNormSqRe_mulVec_eq_rayleigh hO Φ]
 
 /-- Ket-side absorption: `⟨Φ_GS, (Ô_L)^k Γ⟩ = (√m₂)⁻¹ ⟨Φ_GS, (Ô_L)^{k+1} Φ_GS⟩`. -/
 private theorem dotProduct_mulVec_trialState {n : Type*} [Fintype n] [DecidableEq n]
-    {O : Matrix n n ℂ} (hO : O.IsHermitian) (Φ : n → ℂ) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ)
-    (k : ℕ) :
+    {O : Matrix n n ℂ} (hO : O.IsHermitian) (Φ : n → ℂ) (k : ℕ) :
     star Φ ⬝ᵥ ((O ^ k) *ᵥ hvlTrialState O Φ)
       = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ * (star Φ ⬝ᵥ ((O ^ (k + 1)) *ᵥ Φ)) := by
-  rw [trialState_eq_smul hO Φ hm2, Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul,
+  rw [trialState_eq_smul hO Φ, Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul,
     Matrix.mulVec_mulVec, ← pow_succ]
 
 /-- Bra-side adjoint transfer: `⟨Γ, (Ô_L)^k Φ_GS⟩ = (√m₂)⁻¹ ⟨Φ_GS, (Ô_L)^{k+1} Φ_GS⟩`, using
 `Ô_L^† = Ô_L` to move the operator across the pairing. -/
 private theorem trialState_dotProduct_mulVec {n : Type*} [Fintype n] [DecidableEq n]
-    {O : Matrix n n ℂ} (hO : O.IsHermitian) (Φ : n → ℂ) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ)
-    (k : ℕ) :
+    {O : Matrix n n ℂ} (hO : O.IsHermitian) (Φ : n → ℂ) (k : ℕ) :
     star (hvlTrialState O Φ) ⬝ᵥ ((O ^ k) *ᵥ Φ)
       = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ * (star Φ ⬝ᵥ ((O ^ (k + 1)) *ᵥ Φ)) := by
-  rw [trialState_eq_smul hO Φ hm2, star_smul, smul_dotProduct, smul_eq_mul, Complex.star_def,
+  rw [trialState_eq_smul hO Φ, star_smul, smul_dotProduct, smul_eq_mul, Complex.star_def,
     map_inv₀, Complex.conj_ofReal, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, hO.eq,
     Matrix.mulVec_mulVec, ← pow_succ']
 
 /-- Diagonal term: `⟨Γ, (Ô_L)^k Γ⟩ = ((√m₂)⁻¹)² ⟨Φ_GS, (Ô_L)^{k+2} Φ_GS⟩`. -/
 private theorem trialState_dotProduct_mulVec_trialState {n : Type*} [Fintype n] [DecidableEq n]
-    {O : Matrix n n ℂ} (hO : O.IsHermitian) (Φ : n → ℂ) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ)
-    (k : ℕ) :
+    {O : Matrix n n ℂ} (hO : O.IsHermitian) (Φ : n → ℂ) (k : ℕ) :
     star (hvlTrialState O Φ) ⬝ᵥ ((O ^ k) *ᵥ hvlTrialState O Φ)
       = (((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹) ^ 2
         * (star Φ ⬝ᵥ ((O ^ (k + 2)) *ᵥ Φ)) := by
   have hpow : (O * O ^ k) * O = O ^ (k + 2) := by
     rw [← pow_succ', ← pow_succ]
-  rw [trialState_eq_smul hO Φ hm2, star_smul, Matrix.mulVec_smul, smul_dotProduct,
+  rw [trialState_eq_smul hO Φ, star_smul, Matrix.mulVec_smul, smul_dotProduct,
     dotProduct_smul, smul_eq_mul, smul_eq_mul, Complex.star_def, map_inv₀, Complex.conj_ofReal,
     Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, hO.eq, Matrix.mulVec_mulVec,
     Matrix.mulVec_mulVec, hpow]
@@ -160,14 +148,6 @@ private theorem trialState_dotProduct_self {n : Type*} [Fintype n] [DecidableEq 
 
 /-! ### The moments of `Ξ₊` -/
 
-/-- The scalar of eq. (3.4.14) squares to one half: `conj((√2)⁻¹)·(√2)⁻¹ = 1/2`. -/
-private theorem sqrtTwoInv_sq : ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ * ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ = 1 / 2 := by
-  have h2 : ((Real.sqrt 2 : ℝ) : ℂ) ^ 2 = 2 := by
-    rw [← Complex.ofReal_pow, Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 2)]
-    norm_num
-  rw [← mul_inv, ← sq, h2]
-  norm_num
-
 /-- **Normalisation of `Ξ₊`** (Tasaki eq. (3.4.14)): `⟨Ξ₊|Ξ₊⟩ = 1`.  The two cross terms
 `⟨Φ_GS|Γ⟩` and `⟨Γ|Φ_GS⟩` vanish by the first odd-moment assumption (3.4.4), and both diagonal
 terms are `1`, so the global `1/√2` normalises the sum. -/
@@ -176,9 +156,9 @@ theorem hvlPlusState_dotProduct_self {n : Type*} [Fintype n] [DecidableEq n] (O 
     (hodd1 : star Φ ⬝ᵥ (O *ᵥ Φ) = 0) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) :
     star (hvlPlusState O Φ) ⬝ᵥ hvlPlusState O Φ = 1 := by
   have hΦΓ : star Φ ⬝ᵥ hvlTrialState O Φ = 0 := by
-    simpa [hodd1] using dotProduct_mulVec_trialState hHerm Φ hm2 0
+    simpa [hodd1] using dotProduct_mulVec_trialState hHerm Φ 0
   have hΓΦ : star (hvlTrialState O Φ) ⬝ᵥ Φ = 0 := by
-    simpa [hodd1] using trialState_dotProduct_mulVec hHerm Φ hm2 0
+    simpa [hodd1] using trialState_dotProduct_mulVec hHerm Φ 0
   have hΓΓ : star (hvlTrialState O Φ) ⬝ᵥ hvlTrialState O Φ = 1 :=
     trialState_dotProduct_self hHerm Φ hm2
   have hone : star (hvlPlusState O Φ) ⬝ᵥ hvlPlusState O Φ
@@ -186,7 +166,7 @@ theorem hvlPlusState_dotProduct_self {n : Type*} [Fintype n] [DecidableEq n] (O 
     rw [Matrix.one_mulVec]
   rw [hone, hvlPlusState, smul_add_dotProduct_mulVec]
   simp only [Matrix.one_mulVec]
-  rw [hΦ, hΦΓ, hΓΦ, hΓΓ, Complex.star_def, map_inv₀, Complex.conj_ofReal, sqrtTwoInv_sq]
+  rw [hΦ, hΦΓ, hΓΦ, hΓΓ, Complex.star_def, map_inv₀, Complex.conj_ofReal, sqrt2_inv_mul_sqrt2_inv]
   norm_num
 
 /-- **The order parameter of `Ξ₊`** (Tasaki eq. (3.4.15)):
@@ -203,19 +183,19 @@ theorem hvlPlusState_order_mean {n : Type*} [Fintype n] [DecidableEq n] (O : Mat
     rw [even_moment_ofReal hHerm Φ, ← Complex.ofReal_pow, Real.sq_sqrt hm2.le]
   have hbra : star (hvlTrialState O Φ) ⬝ᵥ (O *ᵥ Φ)
       = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ * (star Φ ⬝ᵥ ((O ^ 2) *ᵥ Φ)) := by
-    simpa only [pow_one, Nat.reduceAdd] using trialState_dotProduct_mulVec hHerm Φ hm2 1
+    simpa only [pow_one, Nat.reduceAdd] using trialState_dotProduct_mulVec hHerm Φ 1
   have hket : star Φ ⬝ᵥ (O *ᵥ hvlTrialState O Φ)
       = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ * (star Φ ⬝ᵥ ((O ^ 2) *ᵥ Φ)) := by
-    simpa only [pow_one, Nat.reduceAdd] using dotProduct_mulVec_trialState hHerm Φ hm2 1
+    simpa only [pow_one, Nat.reduceAdd] using dotProduct_mulVec_trialState hHerm Φ 1
   have hdiag : star (hvlTrialState O Φ) ⬝ᵥ (O *ᵥ hvlTrialState O Φ)
       = (((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹) ^ 2
         * (star Φ ⬝ᵥ ((O ^ 3) *ᵥ Φ)) := by
     simpa only [pow_one, Nat.reduceAdd] using
-      trialState_dotProduct_mulVec_trialState hHerm Φ hm2 1
+      trialState_dotProduct_mulVec_trialState hHerm Φ 1
   have hkey : star (hvlPlusState O Φ) ⬝ᵥ (O *ᵥ hvlPlusState O Φ)
       = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ) := by
     rw [hvlPlusState, smul_add_dotProduct_mulVec, hodd1, hbra, hket, hdiag, hodd3, hm2s,
-      Complex.star_def, map_inv₀, Complex.conj_ofReal, sqrtTwoInv_sq]
+      Complex.star_def, map_inv₀, Complex.conj_ofReal, sqrt2_inv_mul_sqrt2_inv]
     field_simp
     ring
   have hdef : rayleighOnVec O (hvlPlusState O Φ)
@@ -244,19 +224,19 @@ theorem hvlPlusState_order_second_moment {n : Type*} [Fintype n] [DecidableEq n]
     rwa [hpow4] at h
   have hbra : star (hvlTrialState O Φ) ⬝ᵥ ((O ^ 2) *ᵥ Φ)
       = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ * (star Φ ⬝ᵥ ((O ^ 3) *ᵥ Φ)) := by
-    simpa only [Nat.reduceAdd] using trialState_dotProduct_mulVec hHerm Φ hm2 2
+    simpa only [Nat.reduceAdd] using trialState_dotProduct_mulVec hHerm Φ 2
   have hket : star Φ ⬝ᵥ ((O ^ 2) *ᵥ hvlTrialState O Φ)
       = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ * (star Φ ⬝ᵥ ((O ^ 3) *ᵥ Φ)) := by
-    simpa only [Nat.reduceAdd] using dotProduct_mulVec_trialState hHerm Φ hm2 2
+    simpa only [Nat.reduceAdd] using dotProduct_mulVec_trialState hHerm Φ 2
   have hdiag : star (hvlTrialState O Φ) ⬝ᵥ ((O ^ 2) *ᵥ hvlTrialState O Φ)
       = (((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹) ^ 2
         * (star Φ ⬝ᵥ ((O ^ 4) *ᵥ Φ)) := by
-    simpa only [Nat.reduceAdd] using trialState_dotProduct_mulVec_trialState hHerm Φ hm2 2
+    simpa only [Nat.reduceAdd] using trialState_dotProduct_mulVec_trialState hHerm Φ 2
   have hkey : star (hvlPlusState O Φ) ⬝ᵥ ((O ^ 2) *ᵥ hvlPlusState O Φ)
       = ((1 / 2 * (rayleighOnVec (O ^ 2) Φ
           + rayleighOnVec (O ^ 4) Φ / rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ) := by
     rw [hvlPlusState, smul_add_dotProduct_mulVec, hbra, hket, hdiag, hodd3, hm2c, hm4c,
-      Complex.star_def, map_inv₀, Complex.conj_ofReal, sqrtTwoInv_sq]
+      Complex.star_def, map_inv₀, Complex.conj_ofReal, sqrt2_inv_mul_sqrt2_inv]
     push_cast
     rw [← hsq]
     field_simp
@@ -307,11 +287,11 @@ normalised second moment stays above an `L`-independent `q₀ > 0` (3.4.3), the 
 and the fluctuation identity (S.43); and, assuming (3.4.18), the fluctuation of `Ô_L/L^d` in
 `|Ξ₊⟩` tends to `0` as `L ↑ ∞`.
 
-The Hamiltonian never appears: the low-lying energy bound of (3.4.14) and the ground-state
-property of `|Φ_GS⟩` are not assumed, matching the published solution, which derives (S.42)/(S.43)
-from Hermiticity, normalisation and (3.4.4) alone.  The informal conclusion that `|Ξ₊⟩` "can be
-regarded as a physical ground state" is not formalised here; the source itself defers its precise
-formulation to §4.3. -/
+The Hamiltonian never appears: the low-lying energy bound of the unnumbered sentence following
+(3.4.14) (p. 68) and the ground-state property of `|Φ_GS⟩` are not assumed, matching the published
+solution, which derives (S.42)/(S.43) from Hermiticity, normalisation and (3.4.4) alone.  The
+informal conclusion that `|Ξ₊⟩` "can be regarded as a physical ground state" is not formalised
+here; the source itself defers its precise formulation to §4.3. -/
 theorem tasaki_problem_3_4_b_order_fluctuation {n : ℕ → Type*} [∀ L, Fintype (n L)]
     [∀ L, DecidableEq (n L)] (d : ℕ) {q₀ : ℝ} (hq₀ : 0 < q₀)
     (O : (L : ℕ) → Matrix (n L) (n L) ℂ) (Φ : (L : ℕ) → n L → ℂ)

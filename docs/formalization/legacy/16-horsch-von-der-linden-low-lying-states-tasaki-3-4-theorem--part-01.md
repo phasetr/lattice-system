@@ -149,14 +149,14 @@ instance per `L`), matching the fact that the solution's algebra uses no lattice
 Hamiltonian structure.
 
 **What these declarations do not assert.** The Hamiltonian never appears: neither the low-lying
-energy bound of (3.4.14) nor the ground-state property of `Φ_GS` is assumed. Locality of `Ô_L`
-(eqs. (3.4.1)-(3.4.2)) is not assumed, so nothing here certifies a concrete model — in particular
-neither that the quantum Ising model satisfies (3.4.18) nor that the antiferromagnetic Heisenberg
-model fails it, the contrast Tasaki draws on p. 69. The informal notion of a physical "ground
-state" of p. 69 is not formalised; the book defers its precise formulation to §4.3. Eq. (3.4.16)
-`⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q₀`, the Schwarz remark (3.4.17) and the mirror state `Ξ₋` are outside this
-development. The `L ↑ ∞` statement is a limit of finite-volume real numbers, not a statement
-about a state on a quasi-local C\*-algebra.
+energy bound of the unnumbered sentence following (3.4.14) (p. 68) nor the ground-state property of
+`Φ_GS` is assumed. Locality of `Ô_L` (eqs. (3.4.1)-(3.4.2)) is not assumed, so nothing here
+certifies a concrete model — in particular neither that the quantum Ising model satisfies (3.4.18)
+nor that the antiferromagnetic Heisenberg model fails it, the contrast Tasaki draws on p. 69. The
+informal notion of a physical "ground state" of p. 69 is not formalised; the book defers its
+precise formulation to §4.3. Eq. (3.4.16) `⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q₀`, the Schwarz remark (3.4.17) and
+the mirror state `Ξ₋` are outside this development. The `L ↑ ∞` statement is a limit of
+finite-volume real numbers, not a statement about a state on a quasi-local C\*-algebra.
 
 All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
 `Classical.choice`, `Quot.sound`.
