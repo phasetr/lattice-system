@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.IsingLowEnergyProblem33a
+import LatticeSystem.Quantum.IsingLowEnergyProblem33aEigenvectors
 
 /-!
 # Test coverage for Tasaki Problem 3.3.a — the low-energy `2L` matrix (TSK-005)
@@ -12,20 +12,16 @@ The first block of fixtures covers the configuration-basis matrix-element API of
 `quantumIsingHamiltonian` itself (`LatticeSystem/Quantum/IsingChainMatrixElements.lean`): the
 signature pins state each of `quantumIsingHamiltonian_mulVec_apply`,
 `quantumIsingHamiltonian_apply_diag`, `quantumIsingHamiltonian_apply_siteFlip` and
-`quantumIsingHamiltonian_apply_eq_zero` in full and discharge it by the lemma itself, so a change
-of statement (index range, sign, argument order) breaks the module. The numeric fixtures evaluate
-the diagonal and single-flip entries at `L = 2` and `L = 3` through those lemmas, pinning the
-concrete values `-(L-1)/4` (aligned), `0` (single kink) and `-h`, so a bond-counting or sign error
-that happens to be invisible on a single bond is still caught.
+`quantumIsingHamiltonian_apply_eq_zero` in full and discharge it by the lemma itself. The numeric
+fixtures evaluate the diagonal and single-flip entries at `L = 2` and `L = 3` through those
+lemmas, pinning the concrete values `-(L-1)/4` (aligned), `0` (single kink) and `-h`.
 
 The second block covers the `2L`-dimensional low-energy basis and its compression
 (`LatticeSystem/Quantum/IsingLowEnergyProblem33a.lean`): `lowEnergyConfig`, its book-form
 descriptions and injectivity, its adjacency structure under `siteFlipAt`, and the resulting
-matrix identity `lowEnergyMatrix = E_GS^(0) • 1 + tightBindingRing`. The headline hazard here is
-that (S.30)'s ring is a ring of *basis labels* (`ZMod (2 * (N + 1))`), not of lattice sites — the
-lattice stays open; the numeric fixtures at `L = 2` and `L = 3` are chosen to make a spurious
-physical-periodicity assumption (e.g. reaching for `isingCycleHamiltonian`) visible as a wrong
-matrix-element value.
+matrix identity `lowEnergyMatrix = E_GS^(0) • 1 + tightBindingRing`. The ring of (S.30) is a ring
+of *basis labels* (`ZMod (2 * (N + 1))`), not of lattice sites — the lattice stays open. The
+numeric fixtures at `L = 2` and `L = 3` evaluate individual entries of that identity.
 -/
 
 namespace LatticeSystem.Tests.Problem33aLowEnergy
@@ -37,9 +33,7 @@ open Matrix
 
 /-- **A1 signature pin.** `quantumIsingHamiltonian_mulVec_apply` expands `(H *ᵥ v) τ` into the
 signed bond sum (`+1` on an aligned bond, `-1` across a domain wall) times `v τ`, plus the field
-term summed over `siteFlipAt`. This is the base identity A2-A4 are derived from; a wrong bond-sum
-range (`Fin (N+1)` instead of `Fin N`, the periodic-ring trap) or a wrong sign on either term
-breaks this fixture before it ever reaches the numeric fixtures below. -/
+term summed over `siteFlipAt`. This is the base identity A2-A4 are derived from. -/
 example (N : ℕ) (J h : ℝ) (v : (Fin (N + 1) → Fin 2) → ℂ) (τ : Fin (N + 1) → Fin 2) :
     (quantumIsingHamiltonian N J h *ᵥ v) τ =
       -(J : ℂ) * (∑ i : Fin N, if τ i.castSucc = τ i.succ then (1 : ℂ) else -1) * v τ
@@ -71,13 +65,10 @@ example (N : ℕ) (J h : ℝ) (σ τ : Fin (N + 1) → Fin 2) (h₁ : σ ≠ τ)
 
 /-! ## Numeric fixtures at `L = 2` (`N = 1`) -/
 
-/-- **Open-boundary trap detector (A2 at `L = 2`).** The all-down configuration is aligned across
+/-- **Aligned diagonal entry (A2 at `L = 2`).** The all-down configuration is aligned across
 the single bond of the two-site *open* chain — one aligned bond and no domain wall — so the
-signed bond sum is `+1` and the diagonal entry is `-J = -1/4 = -(L-1)/4`, Tasaki eq. (S.24). Had
-the bond sum instead run over `Fin (N + 1)` (as the physically periodic `isingCycleHamiltonian`
-would force, counting the wrap-around bond a second time), the sum would be `+2` and this value
-would be `-1/2`; this fixture is exactly the guard against that mis-instantiation (design §8
-fixture 3, adapted to the matrix-element API). -/
+signed bond sum is `+1` and the diagonal entry is `-J = -1/4 = -(L-1)/4`, Tasaki eq. (S.24).
+Corresponds to design §8 fixture 3, adapted to the matrix-element API. -/
 example :
     quantumIsingHamiltonian 1 (1 / 4 : ℝ) (1 : ℝ) (fun _ => (1 : Fin 2)) (fun _ => (1 : Fin 2))
       = -1 / 4 := by
@@ -85,8 +76,7 @@ example :
   norm_num
 
 /-- **Field-term value (A3 at `L = 2`).** The matrix element between the all-down configuration
-and its site-`0` flip is exactly `-h`; here `h = 1`. A wrong sign, a stray factor of `J`, or a
-doubled field term (counting the flipped site twice) would each change this numeric value. -/
+and its site-`0` flip is exactly `-h`; here `h = 1`. -/
 example :
     quantumIsingHamiltonian 1 (1 / 4 : ℝ) (1 : ℝ) (siteFlipAt (fun _ => (1 : Fin 2)) 0)
         (fun _ => (1 : Fin 2))
@@ -107,9 +97,7 @@ example :
 
 /-- **Bond counting (A2 at `L = 3`).** The all-down configuration is aligned across both bonds of
 the three-site open chain, so the signed bond sum is `+2` and the diagonal entry is
-`-2J = -1/2 = -(L-1)/4`, Tasaki eq. (S.24). Together with the `L = 2` fixture above this pins
-`-(L-1)/4` as a formula in `L` rather than at a single bond: an off-by-one bond range agreeing
-with `Fin N` at `N = 1` is caught here. -/
+`-2J = -1/2 = -(L-1)/4`, Tasaki eq. (S.24). -/
 example :
     quantumIsingHamiltonian 2 (1 / 4 : ℝ) (1 : ℝ) (fun _ => (1 : Fin 2)) (fun _ => (1 : Fin 2))
       = -1 / 2 := by
@@ -119,10 +107,7 @@ example :
 /-- **Single kink (A2 at `L = 3`).** Flipping site `0` of the all-down configuration creates one
 domain wall and leaves one aligned bond, so the signed bond sum is `-1 + 1 = 0` and the diagonal
 entry is `0`. This is Tasaki eq. (S.25), whose value `E_GS^(0) + 1/2 = -(L-1)/4 + 1/2` is `0`
-exactly at `L = 3`. The cancelling pair of bonds is what rules out an unsigned bond sum, be it
-over domain walls or over aligned bonds only: either would give `-J` here. (The overall sign of
-the bond sum is pinned by the aligned fixtures, not by this one, whose value is its own
-negation.) -/
+exactly at `L = 3`. -/
 example :
     quantumIsingHamiltonian 2 (1 / 4 : ℝ) (1 : ℝ) (siteFlipAt (fun _ => (1 : Fin 2)) 0)
         (siteFlipAt (fun _ => (1 : Fin 2)) 0)
@@ -136,8 +121,7 @@ example :
 /-- **B3 signature pin.** `lowEnergyConfig_natCast_le` gives the book form of the low-energy
 configuration at a label `j ≤ L` cast from `ℕ`: site `x` is up (`Fin 2` value `0`) iff `x.val < j`.
 At `j = 0` this is the all-down `|Φ↓⟩`; at `j = L` it is the all-up `|Φ↑⟩`; for `0 < j < L` it is
-the single-domain-wall state `|Φ_j^↑↓⟩`. A wrong strict/non-strict inequality here shifts every
-domain-wall position by one site. -/
+the single-domain-wall state `|Φ_j^↑↓⟩`. -/
 example (N : ℕ) (j : ℕ) (hj : j ≤ N + 1) :
     lowEnergyConfig N (j : ZMod (2 * (N + 1))) = fun x => if x.val < j then (0 : Fin 2) else 1 :=
   lowEnergyConfig_natCast_le N j hj
@@ -145,8 +129,7 @@ example (N : ℕ) (j : ℕ) (hj : j ≤ N + 1) :
 /-- **B4 signature pin.** `lowEnergyConfig_natCast_add` gives the book form of the low-energy
 configuration at a label `L + m` (`0 ≤ m ≤ L`): site `x` is down (`Fin 2` value `1`) iff
 `x.val < m`, i.e. `|Φ_m^↓↑⟩`, the mirror of B3. Parametrizing by `m` rather than `j.val - L` keeps
-`ℕ`-subtraction out of the statement; a fixture built from a `ℕ`-subtracted label would already
-fail to typecheck this signature. -/
+`ℕ`-subtraction out of the statement. -/
 example (N : ℕ) (m : ℕ) (hm : m ≤ N + 1) :
     lowEnergyConfig N (((N + 1) + m : ℕ) : ZMod (2 * (N + 1)))
       = fun x => if x.val < m then (1 : Fin 2) else 0 :=
@@ -154,8 +137,7 @@ example (N : ℕ) (m : ℕ) (hm : m ≤ N + 1) :
 
 /-- **B5/C1 signature pin.** `lowEnergyConfig_injective` records that the `2L` labels give `2L`
 pairwise distinct configurations — the low-energy space genuinely has the dimension the problem
-statement claims. Without this, `lowEnergyMatrix` could silently collapse rows/columns that the
-book treats as independent basis states. -/
+statement claims. -/
 example (N : ℕ) : Function.Injective (lowEnergyConfig N) :=
   lowEnergyConfig_injective N
 
@@ -163,9 +145,7 @@ example (N : ℕ) : Function.Injective (lowEnergyConfig N) :=
 by one step is exactly a single-site flip at `wallSite N a`, the unique domain-wall site of
 `lowEnergyConfig N a`. This is what lets the off-diagonal entries of `lowEnergyMatrix` between
 adjacent labels be read off `quantumIsingHamiltonian_apply_siteFlip` (A3) rather than a fresh
-computation; a wrong `wallSite` formula (e.g. missing the `mod (N + 1)` wrap at the `L`-th label)
-would make this fixture fail even though the two sides look superficially alike. The pin also
-records that the statement carries no size hypothesis. -/
+computation. The pin also records that the statement carries no size hypothesis. -/
 example (N : ℕ) (a : ZMod (2 * (N + 1))) :
     lowEnergyConfig N (a + 1) = siteFlipAt (lowEnergyConfig N a) (wallSite N a) :=
   lowEnergyConfig_succ_eq_siteFlipAt N a
@@ -173,7 +153,7 @@ example (N : ℕ) (a : ZMod (2 * (N + 1))) :
 /-- **B6 at `L = 1` (`N = 0`).** The one-site chain is the degenerate label ring `ZMod 2`, where
 the two ring neighbours `a + 1` and `a - 1` of a label coincide and where the only two labels are
 the aligned `|Φ↓⟩` and `|Φ↑⟩`. The flip identity still holds, and the conjuncts pin the two
-configurations. This fixture stops typechecking if a size hypothesis is put back on the lemma. -/
+configurations. -/
 example (a : ZMod (2 * (0 + 1))) :
     lowEnergyConfig 0 (a + 1) = siteFlipAt (lowEnergyConfig 0 a) (wallSite 0 a)
       ∧ lowEnergyConfig 0 0 = ![1] ∧ lowEnergyConfig 0 1 = ![0] :=
@@ -205,14 +185,11 @@ example (N : ℕ) (lam : ℝ) (hN : 1 ≤ N) :
         + tightBindingRing N lam :=
   lowEnergyMatrix_eq_add_tightBindingRing N lam hN
 
-/-! ## Low-energy matrix at `L = 2` (`N = 1`) — the pseudo-periodicity guard -/
+/-! ## Low-energy matrix at `L = 2` (`N = 1`) -/
 
 /-- **Open-chain diagonal matrix element on the ring labels (`L = 2`).** Both aligned labels (`0` =
 `|Φ↓⟩` and `2` = `|Φ↑⟩`) have diagonal entry `E_GS^(0) = -(L-1)/4 = -1/4`, the single-bond open
-chain value. Reaching for the physically periodic `isingCycleHamiltonian` instead of the open
-`quantumIsingHamiltonian` would double the bond count at `L = 2` and give `-1/2`; together with
-the ring-closure check at `L = 3` below, this is the headline detector for confusing the ring of
-basis labels with a periodic lattice. -/
+chain value. -/
 example (lam : ℝ) :
     lowEnergyMatrix 1 lam 0 0 = -1 / 4 ∧ lowEnergyMatrix 1 lam 2 2 = -1 / 4 := by
   have hN : (1 : ℕ) ≤ 1 := le_refl 1
@@ -223,9 +200,9 @@ example (lam : ℝ) :
   all_goals norm_num +decide
 
 /-- **Single domain wall (`L = 2`).** The label `1` (`|Φ_1^↑↓⟩` at `L = 2`) has diagonal entry
-`E_GS^(0) + 1/2 = -1/4 + 1/2`, Tasaki eq. (S.25); together with the aligned fixture above this
-pins the potential jump `v_j = 1/2` for `j ≠ 0, L` against `v_0 = v_L = 0` at the smallest size
-where both branches of `ringPotential` are exercised. -/
+`E_GS^(0) + 1/2 = -1/4 + 1/2`, Tasaki eq. (S.25). `L = 2` is the smallest size at which
+`ringPotential` takes its nonzero value `1/2`: on a shorter label ring the only labels are `0`
+and `L`, where it vanishes. -/
 example (lam : ℝ) : lowEnergyMatrix 1 lam 1 1 = -1 / 4 + 1 / 2 := by
   have hN : (1 : ℕ) ≤ 1 := le_refl 1
   rw [lowEnergyMatrix_eq_add_tightBindingRing 1 lam hN]
@@ -235,9 +212,7 @@ example (lam : ℝ) : lowEnergyMatrix 1 lam 1 1 = -1 / 4 + 1 / 2 := by
 
 /-- **Hopping and vanishing (`L = 2`).** Ring-adjacent labels `0` and `1` hop at `-λ/2`
 (Tasaki eq. (S.27)); labels `0` and `2`, at ring-distance `2` (not adjacent although the ring has
-only `4` labels), have vanishing matrix element. A doubled or halved hop, or a spurious nonzero
-"long-range" entry from mis-treating the label ring as a graph with extra edges, is caught here.
--/
+only `4` labels), have vanishing matrix element. -/
 example (lam : ℝ) :
     lowEnergyMatrix 1 lam 0 1 = -(lam : ℂ) / 2 ∧ lowEnergyMatrix 1 lam 0 2 = 0 := by
   have hN : (1 : ℕ) ≤ 1 := le_refl 1
@@ -250,9 +225,7 @@ example (lam : ℝ) :
 /-! ## Low-energy matrix at `L = 3` (`N = 2`) — book convention and ring closure -/
 
 /-- **Book-convention pin (`L = 3`).** Label `1` is `|Φ_1^↑↓⟩` (site `0` up, sites `1, 2` down) and
-label `4 = L + 1` is its mirror `|Φ_1^↓↑⟩` (site `0` down, sites `1, 2` up). Catches an off-by-one
-in the domain-wall arc (`<` vs `≤`) and a swapped `↑↓`/`↓↑` family, at the smallest `L` where the
-two families are both nontrivial. -/
+label `4 = L + 1` is its mirror `|Φ_1^↓↑⟩` (site `0` down, sites `1, 2` up). -/
 example : lowEnergyConfig 2 1 = ![0, 1, 1] ∧ lowEnergyConfig 2 4 = ![1, 0, 0] := by
   have h₁ := lowEnergyConfig_natCast_le 2 1 (by norm_num)
   have h₂ := lowEnergyConfig_natCast_add 2 1 (by norm_num)
@@ -262,8 +235,7 @@ example : lowEnergyConfig 2 1 = ![0, 1, 1] ∧ lowEnergyConfig 2 4 = ![1, 0, 0] 
   · rw [h₂]; funext x; fin_cases x <;> rfl
 
 /-- **Non-adjacent vanishing at ring-distance `2` (`L = 3`).** Labels `1` and `3` differ by two
-domain-wall moves, so their matrix element vanishes; distinguishes a correct nearest-neighbour
-ring from one that (mistakenly) also connects distance-`2` labels. -/
+domain-wall moves, so their matrix element vanishes. -/
 example (lam : ℝ) : lowEnergyMatrix 2 lam 1 3 = 0 := by
   have hN : (1 : ℕ) ≤ 2 := by norm_num
   rw [lowEnergyMatrix_eq_add_tightBindingRing 2 lam hN]
@@ -272,10 +244,8 @@ example (lam : ℝ) : lowEnergyMatrix 2 lam 1 3 = 0 := by
   norm_num +decide
 
 /-- **Ring closure (`L = 3`).** Label `2L - 1 = 5` is ring-adjacent to label `0`
-(`⟨Φ↓|Ĥ|Φ_{L-1}^↓↑⟩`, the last case of Tasaki eq. (S.27)), giving hop `-λ/2`. This is exactly the
-fixture that fails if the `2L` label ring is implemented on `Fin (2 * (N + 1))` with truncated `ℕ`
-arithmetic (where `0 - 1` clamps to `0` instead of wrapping to `2L - 1`) instead of the ring type
-`ZMod (2 * (N + 1))`. -/
+(`⟨Φ↓|Ĥ|Φ_{L-1}^↓↑⟩`, the last case of Tasaki eq. (S.27)), giving hop `-λ/2`. The labels form
+the ring type `ZMod (2 * (N + 1))`, in which `0 - 1` wraps to `2L - 1`. -/
 example (lam : ℝ) : lowEnergyMatrix 2 lam 0 5 = -(lam : ℂ) / 2 := by
   have hN : (1 : ℕ) ≤ 2 := by norm_num
   rw [lowEnergyMatrix_eq_add_tightBindingRing 2 lam hN]
@@ -294,5 +264,124 @@ example (lam : ℝ) :
       = lowEnergyMatrix 1 lam 0 0 :=
   basisVec_expectation_eq_diagonal (lowEnergyConfig 1 0)
     (quantumIsingHamiltonian 1 (1 / 4) (lam / 2))
+
+/-! ## The eigenvalue equation and the parity ansätze -/
+
+/-- **Signature pin (eigenvector equation as recursion).** `lowEnergyMatrix_mulVec_eq_iff`
+rewrites the eigenvector equation `lowEnergyMatrix * φ = (E_GS^(0) + ε) • φ` as the (S.30)
+tight-binding recursion at every ring label at once. This is what turns matrix-eigenvector
+reasoning into the scalar recurrence solved by the (S.32) ansätze below. -/
+example (N : ℕ) (lam eps : ℝ) (hN : 1 ≤ N) (phi : ZMod (2 * (N + 1)) → ℂ) :
+    lowEnergyMatrix N lam *ᵥ phi = ((-(N : ℝ) / 4 + eps : ℝ) : ℂ) • phi ↔
+      ∀ j : ZMod (2 * (N + 1)),
+        (eps : ℂ) * phi j
+          = -((lam : ℂ) / 2) * (phi (j - 1) + phi (j + 1)) + ringPotential N j * phi j :=
+  lowEnergyMatrix_mulVec_eq_iff N lam hN eps phi
+
+/-- **Signature pin (`tightBindingEnergy`).** `tightBindingEnergy` is (S.31),
+`ε = -(λ/2)(e^κ + e^-κ) + 1/2`, and the fixture states that shape in full at `λ = 1`,
+`κ = log 2` and closes it by `rfl`, so it pins the shape only at those values: a variant that
+agrees there, such as the constant term read as `λ/2`, is not separated by it. The numeral is
+pinned separately below. -/
+example : tightBindingEnergy (1 : ℝ) (Real.log 2)
+    = -(1 / 2 : ℝ) * (Real.exp (Real.log 2) + Real.exp (-Real.log 2)) + 1 / 2 :=
+  rfl
+
+/-- **Numeric pin (`tightBindingEnergy` at `λ = 1`, `κ = log 2`).** Evaluating (S.31) at
+`e^κ = 2`, `e^-κ = 1/2` gives `-(1/2)(2 + 1/2) + 1/2 = -3/4`. -/
+example : tightBindingEnergy (1 : ℝ) (Real.log 2) = -3 / 4 := by
+  unfold tightBindingEnergy
+  rw [Real.exp_log (by norm_num), Real.exp_neg, Real.exp_log (by norm_num)]
+  norm_num
+
+/-- **Signature pin (`rootEquation`).** `rootEquation` is (S.34) in cleared form, with `s = ±1`
+folding the `±`/`∓` pair of the source into a single sign parameter shared by numerator and
+denominator. -/
+example (N : ℕ) (lam kappa s : ℝ) :
+    rootEquation N lam kappa s ↔
+      Real.exp kappa - Real.exp (-kappa)
+        = lam⁻¹ * ((1 + s * Real.exp (-kappa * (N + 1 : ℕ)))
+            / (1 - s * Real.exp (-kappa * (N + 1 : ℕ)))) :=
+  Iff.rfl
+
+/-- **Parity pin.** `φ_L = ±φ_0` under `s = ±1` — the source's own definition of the
+symmetric/antisymmetric ansatz — holds for every `N` and `κ`, independently of the root
+equation. -/
+example (N : ℕ) (kappa : ℝ) :
+    lowEnergyAnsatz N kappa 1 ((N + 1 : ℕ) : ZMod (2 * (N + 1)))
+        = lowEnergyAnsatz N kappa 1 0
+      ∧ lowEnergyAnsatz N kappa (-1) ((N + 1 : ℕ) : ZMod (2 * (N + 1)))
+          = -lowEnergyAnsatz N kappa (-1) 0 := by
+  have hvalL : (((N + 1 : ℕ)) : ZMod (2 * (N + 1))).val = N + 1 := ZMod.val_cast_of_lt (by omega)
+  have hval0 : ((0 : ZMod (2 * (N + 1)))).val = 0 := ZMod.val_zero
+  constructor <;>
+    · simp only [lowEnergyAnsatz, hvalL, hval0, if_pos (le_refl (N + 1)),
+        if_pos (Nat.zero_le (N + 1)), Nat.cast_zero, sub_self, sub_zero, mul_zero, Real.exp_zero]
+      push_cast
+      ring
+
+/-- **Numeric pin (`L = 2`, `κ = log 2`, first branch, `j = 0, 1, 2`).** With `e^κ = 2`,
+`e^-κ = 1/2` the symmetric ansatz (`s = 1`) takes the values `5/4, 1, 5/4` and the antisymmetric
+one (`s = -1`) takes `3/4, 0, -3/4` at labels `0, 1, 2`. These are values of the first-branch
+expression `e^{-κj} + s e^{-κ(L-j)}` of (S.32). The branch threshold is *not* pinned by them:
+reading it as `j.val < N + 1` rather than `j.val ≤ N + 1` moves only the label `j = L`, where the
+two branch expressions agree — they differ only in the order of their two summands — so all six
+numerals stay the same. -/
+example :
+    lowEnergyAnsatz 1 (Real.log 2) 1 0 = 5 / 4 ∧ lowEnergyAnsatz 1 (Real.log 2) 1 1 = 1
+      ∧ lowEnergyAnsatz 1 (Real.log 2) 1 2 = 5 / 4
+      ∧ lowEnergyAnsatz 1 (Real.log 2) (-1) 0 = 3 / 4
+      ∧ lowEnergyAnsatz 1 (Real.log 2) (-1) 1 = 0
+      ∧ lowEnergyAnsatz 1 (Real.log 2) (-1) 2 = -3 / 4 := by
+  have h0 : ((0 : ZMod (2 * (1 + 1)))).val = 0 := rfl
+  have h1 : ((1 : ZMod (2 * (1 + 1)))).val = 1 := rfl
+  have h2 : ((2 : ZMod (2 * (1 + 1)))).val = 2 := rfl
+  have hc1 : Complex.exp (-Complex.log 2) = 1 / 2 := by
+    rw [Complex.exp_neg, Complex.exp_log (by norm_num : (2 : ℂ) ≠ 0)]
+    norm_num
+  have hc2 : Complex.exp (-(Complex.log 2 * 2)) = 1 / 4 := by
+    rw [show -(Complex.log 2 * 2) = -Complex.log 2 + -Complex.log 2 by ring, Complex.exp_add, hc1]
+    norm_num
+  norm_num [lowEnergyAnsatz, h0, h1, h2, hc1, hc2]
+
+/-- **Numeric pin (`L = 2`, `κ = log 2`, second branch, `j = 3`).** Label `3` lies in the
+`j = L, …, 2L` branch of (S.32), which the labels `0, 1, 2` above never reach; the values `1`
+(`s = 1`) and `0` (`s = -1`) coincide with the `j = 1` values because `3` is the mirror of `1`
+across `L = 2`. At `L = 2`, `j = 3` both `j - L` and `2L - j` equal `1`, so these values do not
+distinguish the two exponents of that branch. -/
+example :
+    lowEnergyAnsatz 1 (Real.log 2) 1 3 = 1 ∧ lowEnergyAnsatz 1 (Real.log 2) (-1) 3 = 0 := by
+  have h3 : ((3 : ZMod (2 * (1 + 1)))).val = 3 := rfl
+  have hc1 : Complex.exp (-Complex.log 2) = 1 / 2 := by
+    rw [Complex.exp_neg, Complex.exp_log (by norm_num : (2 : ℂ) ≠ 0)]
+    norm_num
+  norm_num [lowEnergyAnsatz, h3, hc1]
+
+/-- **Numeric pin (`L = 3`, `κ = log 2`, second branch, `j = 4`).** This is the smallest size at
+which the two exponents of the second branch `s e^{-κ(j-L)} + e^{-κ(2L-j)}` of (S.32) differ:
+`j - L = 1` while `2L - j = 2`, giving `s/2 + 1/4`, i.e. `3/4` at `s = 1` and `-1/4` at
+`s = -1`. -/
+example :
+    lowEnergyAnsatz 2 (Real.log 2) 1 4 = 3 / 4
+      ∧ lowEnergyAnsatz 2 (Real.log 2) (-1) 4 = -1 / 4 := by
+  have h4 : ((4 : ZMod (2 * (2 + 1)))).val = 4 := rfl
+  have hc1 : Complex.exp (-Complex.log 2) = 1 / 2 := by
+    rw [Complex.exp_neg, Complex.exp_log (by norm_num : (2 : ℂ) ≠ 0)]
+    norm_num
+  have hc2 : Complex.exp (-(Complex.log 2 * 2)) = 1 / 4 := by
+    rw [show -(Complex.log 2 * 2) = -Complex.log 2 + -Complex.log 2 by ring, Complex.exp_add, hc1]
+    norm_num
+  constructor <;> norm_num [lowEnergyAnsatz, h4, hc1, hc2]
+
+/-- **Signature pin (capstone eigenvector theorem).** `lowEnergyAnsatz_isEigenvector` is the
+capstone of this module: under the root equation the ansatz is a nonzero eigenvector of
+`lowEnergyMatrix` with eigenvalue `E_GS^(0) + tightBindingEnergy lam kappa`, i.e. (S.28)-(S.34)
+assembled. Nothing here claims `ε_±` is an energy of the original Hamiltonian. -/
+example (N : ℕ) (lam kappa s : ℝ) (hN : 1 ≤ N) (hlam : 0 < lam) (hk : 0 < kappa)
+    (hs : s = 1 ∨ s = -1) (hroot : rootEquation N lam kappa s) :
+    lowEnergyAnsatz N kappa s ≠ 0
+      ∧ lowEnergyMatrix N lam *ᵥ lowEnergyAnsatz N kappa s
+          = ((-(N : ℝ) / 4 + tightBindingEnergy lam kappa : ℝ) : ℂ) • lowEnergyAnsatz N kappa s :=
+  lowEnergyAnsatz_isEigenvector N lam kappa s hN hlam hk hs hroot
 
 end LatticeSystem.Tests.Problem33aLowEnergy

@@ -108,6 +108,47 @@ Regression fixtures live in `LatticeSystem/Tests/Problem33aLowEnergy.lean`: the 
 entries pin `E_GS^(0) = -(L-1)/4 = -1/4` (a physically periodic chain would give `-1/2`), and the
 `L = 3` entry between the labels `0` and `2L - 1 = 5` pins the wrap-around of the label ring.
 
+## Authoritative supplemental implementation record (Problem 3.3.a eigenvalue equation and ansatz)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+a new capstone added after the migration baseline (PR #5388); it is not subject to the frozen
+byte-for-byte parity of the block above.
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Problem 3.3.a
+(statement p. 59; solution: eqs. (S.28)-(S.31) on p. 499, eqs. (S.32)-(S.34) on p. 500), for the
+model of eq. (3.3.1), p. 56, with open boundary conditions and the spin-`1/2` convention
+`σ̂ = 2Ŝ` of §2.1, eqs. (2.1.7)-(2.1.8), p. 15.
+
+This layer turns the compressed matrix of the previous section into explicit eigenvectors. The
+expansion (S.28)-(S.29) of a low-energy state in the `2L` basis configurations makes the
+eigenvector equation of `lowEnergyMatrix` equivalent to the scalar recursion (S.30); the ansatz
+(S.32) solves the recursion at every label carrying a domain wall for any decay rate `κ`, and the
+root equation (S.34) is exactly the remaining condition at the two aligned labels `0` and `L`.
+
+The recursion is quantified over **all** labels `j : ZMod (2 * (N + 1))`. Eq. (S.30) is printed
+"for any `j = 1, …, 2L - 1`", yet p. 500 derives (S.33) from it at `j = 0` and `j = L`; the
+quantified form is the eigenvector equation of the `2L × 2L` matrix and subsumes both readings.
+
+These are **eigenvalues of the compression, not energies**: `Ĥ` does not preserve the span of the
+`2L` configurations, so `tightBindingEnergy λ κ` is not identified with a ground-state or
+first-excited energy of `Ĥ`, and the source's non-rigorous identifications (S.36)-(S.38) are not
+asserted. Tasaki notes on p. 59 that the analysis of this problem is not mathematically rigorous.
+
+Every declaration below is **PROVED**; `#print axioms` on each yields only `propext`,
+`Classical.choice`, `Quot.sound`.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `lowEnergyMatrix_mulVec_eq_iff` | Tasaki eqs. (S.28)-(S.30): for `1 ≤ N`, the eigenvector equation `lowEnergyMatrix N λ *ᵥ φ = (E_GS^(0) + ε) • φ` holds exactly when `ε φ_j = -(λ/2)(φ_{j-1} + φ_{j+1}) + v_j φ_j` at every label `j`, with `v_j = ringPotential N j` | `Quantum/IsingLowEnergyProblem33aEigenvectors.lean` |
+| `tightBindingEnergy`, `lowEnergyAnsatz`, `rootEquation` | the eigenvalue `ε = -(λ/2)(e^κ + e^-κ) + 1/2` of eq. (S.31); the two-branch ansatz of eq. (S.32), `φ_j = e^-κj + s e^-κ(L-j)` for `j = 0, …, L` and `φ_j = s e^-κ(j-L) + e^-κ(2L-j)` for `j = L, …, 2L`, the sign `s = ±1` selecting the symmetric resp. antisymmetric solution `φ_L = s φ_0`; the root equation of eq. (S.34), `e^κ - e^-κ = λ^-1 (1 + s e^-κL)/(1 - s e^-κL)`, carrying the same sign in numerator and denominator | `Quantum/IsingLowEnergyProblem33aEigenvectors.lean` |
+| `lowEnergyAnsatz_ne_zero` | the ansatz is not the zero vector: its value `1 + s e^-κL` at the label `0` is positive for `0 < κ` and either sign | `Quantum/IsingLowEnergyProblem33aEigenvectors.lean` |
+| `lowEnergyAnsatz_isEigenvector` | **capstone of PR #5388**: Tasaki eqs. (S.28)-(S.34) assembled — for `1 ≤ N`, `0 < λ`, `0 < κ` and `s = ±1` satisfying the root equation, the ansatz is a nonzero eigenvector of `lowEnergyMatrix N λ` with eigenvalue `E_GS^(0) + tightBindingEnergy λ κ` | `Quantum/IsingLowEnergyProblem33aEigenvectors.lean` |
+
+Regression fixtures live in `LatticeSystem/Tests/Problem33aLowEnergy.lean`: the parity fixture
+pins `φ_L = s φ_0`, and the numeric fixtures at `L = 2`, `κ = log 2` pin the six values
+`5/4, 1, 5/4` (symmetric) and `3/4, 0, -3/4` (antisymmetric) on the labels `0, 1, 2` together
+with the second-branch value at the label `3`.
+
 ---
 
 [← Two-site spin inner product (Tasaki §2.2 eq. (2.2.16))](/lattice-system/formalization/legacy/21-two-site-spin-inner-product-tasaki-2-2-eq-2-2-16/) · [Catalogue](/lattice-system/formalization/legacy/) · [Testing infrastructure →](/lattice-system/formalization/legacy/23-testing-infrastructure/)
