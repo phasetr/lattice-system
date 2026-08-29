@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.IsingLowEnergyProblem33aEigenvectors
+import LatticeSystem.Quantum.IsingLowEnergyProblem33aSpectrum
 
 /-!
 # Test coverage for Tasaki Problem 3.3.a — the low-energy `2L` matrix (TSK-005)
@@ -387,8 +387,13 @@ example (N : ℕ) (lam kappa s : ℝ) (hN : 1 ≤ N) (hlam : 0 < lam) (hk : 0 < 
 /-! ## The `κ∞` layer: (S.35)-(S.39) -/
 
 /-- **E1 signature/value pin.** `kappaInf` is the `L → ∞` root `κ∞` of (S.34), defined directly
-by (S.35), `e^κ∞ - e^-κ∞ = λ⁻¹`, via `Real.arsinh`. At `λ = 1` this is `arsinh (1/2)`. -/
-example : kappaInf (1 : ℝ) = Real.arsinh (1 / 2) := rfl
+by (S.35), `e^κ∞ - e^-κ∞ = λ⁻¹`, via `Real.arsinh`: since the left-hand side is `2 sinh κ∞`, the
+argument of `arsinh` is `1 / (2λ)`, which at `λ = 1` is `1/2`. The value at `λ = 1` alone does not
+separate that argument from `λ/2`, with which it agrees there; the argument is pinned as a
+function of `λ` by `exp_kappaInf_sub_exp_neg` below. The two sides are not definitionally equal
+(`1 / (2 * 1)` is not reducible to `1 / 2` in `ℝ`), so the numeral is normalized first. -/
+example : kappaInf (1 : ℝ) = Real.arsinh (1 / 2) := by
+  norm_num [kappaInf]
 
 /-- **E2 signature pin.** `kappaInf_pos` records `κ∞ > 0` for `λ > 0`, matching the source's
 "`κ > 0` is a constant to be determined" (below (S.30)) transported to the `L → ∞` limit. -/
@@ -428,5 +433,29 @@ later needs (`E_1st - E_GS ≃ 2 tanh(κ∞) e^-κ∞L`), stated here purely in 
 example (lam : ℝ) (hlam : 0 < lam) :
     Real.tanh (kappaInf lam) = (Real.sqrt (1 + 4 * lam ^ 2))⁻¹ :=
   tanh_kappaInf_eq hlam
+
+/-- **E5 numeric pin at `λ = 1/2`.** `1 + 4 * (1/2)^2 = 2`, so `2 tanh κ∞ = 2/√2 = √2` — the
+constant standing in front of `e^-κ∞L` in Tasaki eq. (S.41). -/
+example : 2 * Real.tanh (kappaInf (1 / 2 : ℝ)) = Real.sqrt 2 := by
+  have h := tanh_kappaInf_eq (lam := (1 / 2 : ℝ)) (by norm_num)
+  have harg : (1 : ℝ) + 4 * (1 / 2 : ℝ) ^ 2 = 2 := by norm_num
+  rw [harg] at h
+  rw [h, ← div_eq_mul_inv]
+  exact Real.div_sqrt
+
+/-- **C8 signature pin.** `tendsto_exp_neg_kappaInf_div_atZero` is the first of the two small-`λ`
+replacements behind the final form `≃ 2 λ^L` of (S.41): `e^-κ∞ / λ → 1` as `λ ↓ 0`, the limit
+form of the source's `e^κ∞ ≃ λ⁻¹` (p. 500, below (S.35)). -/
+example :
+    Filter.Tendsto (fun l : ℝ => Real.exp (-(kappaInf l)) / l)
+      (nhdsWithin 0 (Set.Ioi 0)) (nhds 1) :=
+  tendsto_exp_neg_kappaInf_div_atZero
+
+/-- **C9 signature pin.** `tendsto_tanh_kappaInf_atZero` is the second small-`λ` replacement of
+(S.41): the prefactor `tanh κ∞` tends to `1` as `λ ↓ 0`. -/
+example :
+    Filter.Tendsto (fun l : ℝ => Real.tanh (kappaInf l))
+      (nhdsWithin 0 (Set.Ioi 0)) (nhds 1) :=
+  tendsto_tanh_kappaInf_atZero
 
 end LatticeSystem.Tests.Problem33aLowEnergy
