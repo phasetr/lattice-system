@@ -32,10 +32,11 @@ The lattice itself stays open: its site type is `Fin (N + 1)`, the bond sum of
 `quantumIsingHamiltonian` runs over `Fin N`, and the periodic `isingCycleHamiltonian` is a
 different operator that never appears here. The two index types are never identified.
 
-`lowEnergyMatrix` is the compression of `Ĥ` to the span of these `2L` configurations, and `Ĥ`
-does not preserve that span, so its entries are matrix elements and nothing more: no entry, and
-no eigenvalue of `lowEnergyMatrix`, is asserted to be an energy of `Ĥ`. Tasaki himself notes on
-p. 59 that the perturbative analysis of this problem is not mathematically rigorous.
+`lowEnergyMatrix` is the compression of `Ĥ` to the span of these `2L` configurations. That this
+compression restricts `Ĥ` to an invariant subspace is not established here, so its entries are
+matrix elements and nothing more: no entry, and no eigenvalue of `lowEnergyMatrix`, is asserted
+to be an energy of `Ĥ`. Tasaki himself notes on p. 59 that the perturbative analysis of this
+problem is not mathematically rigorous.
 
 Two index conventions of the source are worth recording. Eq. (S.30) is printed "for any
 `j = 1, …, 2L - 1`", but p. 500 derives (S.33) from it "with `j = 0` or `L`"; the honest reading,
@@ -545,9 +546,9 @@ Ising Hamiltonian `quantumIsingHamiltonian N (1/4) (λ/2)` in the low-energy con
 (Tasaki Problem 3.3.a, eqs. (S.24)-(S.27)).
 
 Entries are matrix elements of `Ĥ` between the `2L` basis configurations, read off the
-configuration-basis entries as in `basisVec_expectation_eq_diagonal`. Since `Ĥ` does not preserve
-the span of these configurations, no entry and no eigenvalue of this matrix is claimed to be an
-energy of `Ĥ`. -/
+configuration-basis entries as in `basisVec_expectation_eq_diagonal`. That this compression
+restricts `Ĥ` to an invariant subspace is not established here, so no entry and no eigenvalue of
+this matrix is claimed to be an energy of `Ĥ`. -/
 noncomputable def lowEnergyMatrix (N : ℕ) (lam : ℝ) :
     Matrix (ZMod (2 * (N + 1))) (ZMod (2 * (N + 1))) ℂ :=
   fun a b =>

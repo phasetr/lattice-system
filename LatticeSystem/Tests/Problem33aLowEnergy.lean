@@ -1,7 +1,7 @@
 import LatticeSystem.Quantum.IsingLowEnergyProblem33aCapstone
 
 /-!
-# Test coverage for Tasaki Problem 3.3.a — the low-energy `2L` matrix (TSK-005)
+# Test coverage for Tasaki Problem 3.3.a — the low-energy `2L` matrix
 
 Fixtures for the low-energy analysis of the open-chain quantum Ising Hamiltonian
 (`quantumIsingHamiltonian N (1/4) (lam/2)`, `S = σ/2` convention), Tasaki, *Physics and
@@ -31,33 +31,34 @@ open Matrix
 
 /-! ## Signature pins for the four matrix-element lemmas -/
 
-/-- **A1 signature pin.** `quantumIsingHamiltonian_mulVec_apply` expands `(H *ᵥ v) τ` into the
-signed bond sum (`+1` on an aligned bond, `-1` across a domain wall) times `v τ`, plus the field
-term summed over `siteFlipAt`. This is the base identity A2-A4 are derived from. -/
+/-- **Signature pin (matrix-vector expansion).** `quantumIsingHamiltonian_mulVec_apply` expands
+`(H *ᵥ v) τ` into the signed bond sum (`+1` on an aligned bond, `-1` across a domain wall) times
+`v τ`, plus the field term summed over `siteFlipAt`. This is the base identity the three entrywise
+lemmas below are derived from. -/
 example (N : ℕ) (J h : ℝ) (v : (Fin (N + 1) → Fin 2) → ℂ) (τ : Fin (N + 1) → Fin 2) :
     (quantumIsingHamiltonian N J h *ᵥ v) τ =
       -(J : ℂ) * (∑ i : Fin N, if τ i.castSucc = τ i.succ then (1 : ℂ) else -1) * v τ
         - (h : ℂ) * ∑ i : Fin (N + 1), v (siteFlipAt τ i) :=
   quantumIsingHamiltonian_mulVec_apply N J h v τ
 
-/-- **A2 signature pin.** `quantumIsingHamiltonian_apply_diag` gives the diagonal entry
-`⟨Φ_τ|H|Φ_τ⟩` as `-J` times the signed bond sum (`+1` on an aligned bond, `-1` across a domain
+/-- **Signature pin (diagonal entry).** `quantumIsingHamiltonian_apply_diag` gives the diagonal
+entry `⟨Φ_τ|H|Φ_τ⟩` as `-J` times the signed bond sum (`+1` on an aligned bond, `-1` across a domain
 wall), with no field-term contribution (a flipped configuration never equals the original). -/
 example (N : ℕ) (J h : ℝ) (τ : Fin (N + 1) → Fin 2) :
     quantumIsingHamiltonian N J h τ τ =
       -(J : ℂ) * ∑ i : Fin N, (if τ i.castSucc = τ i.succ then (1 : ℂ) else -1) :=
   quantumIsingHamiltonian_apply_diag N J h τ
 
-/-- **A3 signature pin.** `quantumIsingHamiltonian_apply_siteFlip` gives the matrix element
-between a configuration and its single-site flip: exactly `-h`, independent of `J` and of the
-flipped site. -/
+/-- **Signature pin (single-site-flip entry).** `quantumIsingHamiltonian_apply_siteFlip` gives the
+matrix element between a configuration and its single-site flip: exactly `-h`, independent of `J`
+and of the flipped site. -/
 example (N : ℕ) (J h : ℝ) (τ : Fin (N + 1) → Fin 2) (x : Fin (N + 1)) :
     quantumIsingHamiltonian N J h (siteFlipAt τ x) τ = -(h : ℂ) :=
   quantumIsingHamiltonian_apply_siteFlip N J h τ x
 
-/-- **A4 signature pin.** `quantumIsingHamiltonian_apply_eq_zero` is the source's "all other
-matrix elements are vanishing": distinct configurations that are also not a single-site flip of
-one another have a zero matrix element. -/
+/-- **Signature pin (vanishing entries).** `quantumIsingHamiltonian_apply_eq_zero` is the source's
+"all other matrix elements are vanishing": distinct configurations that are also not a single-site
+flip of one another have a zero matrix element. -/
 example (N : ℕ) (J h : ℝ) (σ τ : Fin (N + 1) → Fin 2) (h₁ : σ ≠ τ)
     (h₂ : ∀ x, σ ≠ siteFlipAt τ x) :
     quantumIsingHamiltonian N J h σ τ = 0 :=
@@ -65,17 +66,16 @@ example (N : ℕ) (J h : ℝ) (σ τ : Fin (N + 1) → Fin 2) (h₁ : σ ≠ τ)
 
 /-! ## Numeric fixtures at `L = 2` (`N = 1`) -/
 
-/-- **Aligned diagonal entry (A2 at `L = 2`).** The all-down configuration is aligned across
+/-- **Aligned diagonal entry (`L = 2`).** The all-down configuration is aligned across
 the single bond of the two-site *open* chain — one aligned bond and no domain wall — so the
-signed bond sum is `+1` and the diagonal entry is `-J = -1/4 = -(L-1)/4`, Tasaki eq. (S.24).
-Corresponds to design §8 fixture 3, adapted to the matrix-element API. -/
+signed bond sum is `+1` and the diagonal entry is `-J = -1/4 = -(L-1)/4`, Tasaki eq. (S.24). -/
 example :
     quantumIsingHamiltonian 1 (1 / 4 : ℝ) (1 : ℝ) (fun _ => (1 : Fin 2)) (fun _ => (1 : Fin 2))
       = -1 / 4 := by
   rw [quantumIsingHamiltonian_apply_diag 1 (1 / 4) 1 (fun _ => 1)]
   norm_num
 
-/-- **Field-term value (A3 at `L = 2`).** The matrix element between the all-down configuration
+/-- **Field-term value (`L = 2`).** The matrix element between the all-down configuration
 and its site-`0` flip is exactly `-h`; here `h = 1`. -/
 example :
     quantumIsingHamiltonian 1 (1 / 4 : ℝ) (1 : ℝ) (siteFlipAt (fun _ => (1 : Fin 2)) 0)
@@ -83,10 +83,9 @@ example :
       = -1 :=
   quantumIsingHamiltonian_apply_siteFlip 1 (1 / 4) 1 (fun _ => 1) 0
 
-/-- **Vanishing at distance `2` (A4 at `L = 2`).** The all-up and all-down configurations differ
+/-- **Vanishing at distance `2` (`L = 2`).** The all-up and all-down configurations differ
 at both sites of the two-site chain, so neither is the other nor a single-site flip of the other;
-their matrix element is `0`. Matches design §8 fixture 5's second clause
-(`lowEnergyMatrix 1 lam 0 2 = 0`) at the matrix-element level, one PR earlier. -/
+their matrix element is `0` — the matrix-element form of `lowEnergyMatrix 1 lam 0 2 = 0`. -/
 example :
     quantumIsingHamiltonian 1 (1 / 4 : ℝ) (1 : ℝ) (fun _ => (0 : Fin 2)) (fun _ => (1 : Fin 2))
       = 0 :=
@@ -95,7 +94,7 @@ example :
 
 /-! ## Numeric fixtures at `L = 3` (`N = 2`) -/
 
-/-- **Bond counting (A2 at `L = 3`).** The all-down configuration is aligned across both bonds of
+/-- **Bond counting (`L = 3`).** The all-down configuration is aligned across both bonds of
 the three-site open chain, so the signed bond sum is `+2` and the diagonal entry is
 `-2J = -1/2 = -(L-1)/4`, Tasaki eq. (S.24). -/
 example :
@@ -104,7 +103,7 @@ example :
   rw [quantumIsingHamiltonian_apply_diag 2 (1 / 4) 1 (fun _ => 1)]
   norm_num
 
-/-- **Single kink (A2 at `L = 3`).** Flipping site `0` of the all-down configuration creates one
+/-- **Single kink (`L = 3`).** Flipping site `0` of the all-down configuration creates one
 domain wall and leaves one aligned bond, so the signed bond sum is `-1 + 1 = 0` and the diagonal
 entry is `0`. This is Tasaki eq. (S.25), whose value `E_GS^(0) + 1/2 = -(L-1)/4 + 1/2` is `0`
 exactly at `L = 3`. -/
@@ -118,67 +117,68 @@ example :
 
 /-! ## Signature pins for the `2L`-basis and compressed-matrix API -/
 
-/-- **B3 signature pin.** `lowEnergyConfig_natCast_le` gives the book form of the low-energy
-configuration at a label `j ≤ L` cast from `ℕ`: site `x` is up (`Fin 2` value `0`) iff `x.val < j`.
-At `j = 0` this is the all-down `|Φ↓⟩`; at `j = L` it is the all-up `|Φ↑⟩`; for `0 < j < L` it is
-the single-domain-wall state `|Φ_j^↑↓⟩`. -/
+/-- **Signature pin (book form at labels `j ≤ L`).** `lowEnergyConfig_natCast_le` gives the book
+form of the low-energy configuration at a label `j ≤ L` cast from `ℕ`: site `x` is up (`Fin 2` value
+`0`) iff `x.val < j`. At `j = 0` this is the all-down `|Φ↓⟩`; at `j = L` it is the all-up `|Φ↑⟩`;
+for `0 < j < L` it is the single-domain-wall state `|Φ_j^↑↓⟩`. -/
 example (N : ℕ) (j : ℕ) (hj : j ≤ N + 1) :
     lowEnergyConfig N (j : ZMod (2 * (N + 1))) = fun x => if x.val < j then (0 : Fin 2) else 1 :=
   lowEnergyConfig_natCast_le N j hj
 
-/-- **B4 signature pin.** `lowEnergyConfig_natCast_add` gives the book form of the low-energy
-configuration at a label `L + m` (`0 ≤ m ≤ L`): site `x` is down (`Fin 2` value `1`) iff
-`x.val < m`, i.e. `|Φ_m^↓↑⟩`, the mirror of B3. Parametrizing by `m` rather than `j.val - L` keeps
-`ℕ`-subtraction out of the statement. -/
+/-- **Signature pin (book form at labels `L + m`).** `lowEnergyConfig_natCast_add` gives the book
+form of the low-energy configuration at a label `L + m` (`0 ≤ m ≤ L`): site `x` is down (`Fin 2`
+value `1`) iff `x.val < m`, i.e. `|Φ_m^↓↑⟩`, the mirror of the `j ≤ L` form above. Parametrizing by
+`m` rather than `j.val - L` keeps `ℕ`-subtraction out of the statement. -/
 example (N : ℕ) (m : ℕ) (hm : m ≤ N + 1) :
     lowEnergyConfig N (((N + 1) + m : ℕ) : ZMod (2 * (N + 1)))
       = fun x => if x.val < m then (1 : Fin 2) else 0 :=
   lowEnergyConfig_natCast_add N m hm
 
-/-- **B5/C1 signature pin.** `lowEnergyConfig_injective` records that the `2L` labels give `2L`
-pairwise distinct configurations — the low-energy space genuinely has the dimension the problem
-statement claims. -/
+/-- **Signature pin (injectivity of the `2L` labels).** `lowEnergyConfig_injective` records that the
+`2L` labels give `2L` pairwise distinct configurations — the low-energy space genuinely has the
+dimension the problem statement claims. -/
 example (N : ℕ) : Function.Injective (lowEnergyConfig N) :=
   lowEnergyConfig_injective N
 
-/-- **B6 signature pin.** `lowEnergyConfig_succ_eq_siteFlipAt` says that advancing the ring label
-by one step is exactly a single-site flip at `wallSite N a`, the unique domain-wall site of
-`lowEnergyConfig N a`. This is what lets the off-diagonal entries of `lowEnergyMatrix` between
-adjacent labels be read off `quantumIsingHamiltonian_apply_siteFlip` (A3) rather than a fresh
-computation. The pin also records that the statement carries no size hypothesis. -/
+/-- **Signature pin (label step is a single-site flip).** `lowEnergyConfig_succ_eq_siteFlipAt` says
+that advancing the ring label by one step is exactly a single-site flip at `wallSite N a`, the
+unique domain-wall site of `lowEnergyConfig N a`. This is what lets the off-diagonal entries of
+`lowEnergyMatrix` between adjacent labels be read off `quantumIsingHamiltonian_apply_siteFlip`
+rather than a fresh computation. The pin also records that the statement carries no size
+hypothesis. -/
 example (N : ℕ) (a : ZMod (2 * (N + 1))) :
     lowEnergyConfig N (a + 1) = siteFlipAt (lowEnergyConfig N a) (wallSite N a) :=
   lowEnergyConfig_succ_eq_siteFlipAt N a
 
-/-- **B6 at `L = 1` (`N = 0`).** The one-site chain is the degenerate label ring `ZMod 2`, where
-the two ring neighbours `a + 1` and `a - 1` of a label coincide and where the only two labels are
-the aligned `|Φ↓⟩` and `|Φ↑⟩`. The flip identity still holds, and the conjuncts pin the two
+/-- **Label step at `L = 1` (`N = 0`).** The one-site chain is the degenerate label ring `ZMod 2`,
+where the two ring neighbours `a + 1` and `a - 1` of a label coincide and where the only two labels
+are the aligned `|Φ↓⟩` and `|Φ↑⟩`. The flip identity still holds, and the conjuncts pin the two
 configurations. -/
 example (a : ZMod (2 * (0 + 1))) :
     lowEnergyConfig 0 (a + 1) = siteFlipAt (lowEnergyConfig 0 a) (wallSite 0 a)
       ∧ lowEnergyConfig 0 0 = ![1] ∧ lowEnergyConfig 0 1 = ![0] :=
   ⟨lowEnergyConfig_succ_eq_siteFlipAt 0 a, by decide, by decide⟩
 
-/-- **B7 signature pin.** `lowEnergyConfig_ne_of_not_adjacent` is the source's "all other matrix
-elements are vanishing" transported to the `2L`-basis: labels that are not equal and not
-ring-adjacent give configurations that are neither equal nor a single-site flip of one another, so
-`quantumIsingHamiltonian_apply_eq_zero` (A4) applies. This is the non-diagonal, non-adjacent branch
-of C2 below. -/
+/-- **Signature pin (non-adjacent labels).** `lowEnergyConfig_ne_of_not_adjacent` is the source's
+"all other matrix elements are vanishing" transported to the `2L`-basis: labels that are not equal
+and not ring-adjacent give configurations that are neither equal nor a single-site flip of one
+another, so `quantumIsingHamiltonian_apply_eq_zero` applies. This is the non-diagonal, non-adjacent
+branch of the compressed-matrix identity below. -/
 example (N : ℕ) (hN : 1 ≤ N) {a b : ZMod (2 * (N + 1))} (h₀ : b ≠ a) (h₁ : b ≠ a + 1)
     (h₂ : b ≠ a - 1) :
     lowEnergyConfig N b ≠ lowEnergyConfig N a
       ∧ ∀ x, lowEnergyConfig N b ≠ siteFlipAt (lowEnergyConfig N a) x :=
   lowEnergyConfig_ne_of_not_adjacent N hN h₀ h₁ h₂
 
-/-- **C2 signature pin.** `lowEnergyMatrix_eq_add_tightBindingRing` is (S.24)-(S.27) plus "all
-other matrix elements are vanishing" stated as a single entrywise matrix identity: the `2L × 2L`
-compression of `quantumIsingHamiltonian` to the low-energy basis is `E_GS^(0)` on the diagonal
-(`-(N:ℂ)/4 • 1`) plus a tight-binding ring on the labels (`tightBindingRing`, hopping `-λ/2`
-between ring-adjacent labels and potential `ringPotential` elsewhere on the diagonal). The
-`1 ≤ N` hypothesis is what the proof route needs — the non-adjacent entries go through
-`lowEnergyConfig_ne_of_not_adjacent` — and not a structural constraint: `tightBindingRing`
-contributes one hopping `if` per entry, so no hop is double-counted when the two ring neighbours
-`a + 1` and `a - 1` coincide at `L = 1`. -/
+/-- **Signature pin (compressed-matrix identity).** `lowEnergyMatrix_eq_add_tightBindingRing` is
+(S.24)-(S.27) plus "all other matrix elements are vanishing" stated as a single entrywise matrix
+identity: the `2L × 2L` compression of `quantumIsingHamiltonian` to the low-energy basis is
+`E_GS^(0)` on the diagonal (`-(N:ℂ)/4 • 1`) plus a tight-binding ring on the labels
+(`tightBindingRing`, hopping `-λ/2` between ring-adjacent labels and potential `ringPotential`
+elsewhere on the diagonal). The `1 ≤ N` hypothesis is what the proof route needs — the non-adjacent
+entries go through `lowEnergyConfig_ne_of_not_adjacent` — and not a structural constraint:
+`tightBindingRing` contributes one hopping `if` per entry, so no hop is double-counted when the two
+ring neighbours `a + 1` and `a - 1` coincide at `L = 1`. -/
 example (N : ℕ) (lam : ℝ) (hN : 1 ≤ N) :
     lowEnergyMatrix N lam
       = (-(N : ℂ) / 4) • (1 : Matrix (ZMod (2 * (N + 1))) (ZMod (2 * (N + 1))) ℂ)
@@ -386,33 +386,36 @@ example (N : ℕ) (lam kappa s : ℝ) (hN : 1 ≤ N) (hlam : 0 < lam) (hk : 0 < 
 
 /-! ## The `κ∞` layer: (S.35)-(S.39) -/
 
-/-- **E1 signature/value pin.** `kappaInf` is the `L → ∞` root `κ∞` of (S.34), defined directly
-by (S.35), `e^κ∞ - e^-κ∞ = λ⁻¹`, via `Real.arsinh`: since the left-hand side is `2 sinh κ∞`, the
-argument of `arsinh` is `1 / (2λ)`, which at `λ = 1` is `1/2`. The value at `λ = 1` alone does not
-separate that argument from `λ/2`, with which it agrees there; the argument is pinned as a
-function of `λ` by `exp_kappaInf_sub_exp_neg` below. The two sides are not definitionally equal
-(`1 / (2 * 1)` is not reducible to `1 / 2` in `ℝ`), so the numeral is normalized first. -/
+/-- **Signature and value pin (`kappaInf` at `λ = 1`).** `kappaInf` is the `L → ∞` root `κ∞` of
+(S.34), defined directly by (S.35), `e^κ∞ - e^-κ∞ = λ⁻¹`, via `Real.arsinh`: since the left-hand
+side is `2 sinh κ∞`, the argument of `arsinh` is `1 / (2λ)`, which at `λ = 1` is `1/2`. The value at
+`λ = 1` alone does not separate that argument from `λ/2`, with which it agrees there; the argument
+is pinned as a function of `λ` by `exp_kappaInf_sub_exp_neg` below. The two sides are not
+definitionally equal (`1 / (2 * 1)` is not reducible to `1 / 2` in `ℝ`), so the numeral is
+normalized first. -/
 example : kappaInf (1 : ℝ) = Real.arsinh (1 / 2) := by
   norm_num [kappaInf]
 
-/-- **E2 signature pin.** `kappaInf_pos` records `κ∞ > 0` for `λ > 0`, matching the source's
-"`κ > 0` is a constant to be determined" (below (S.30)) transported to the `L → ∞` limit. -/
+/-- **Signature pin (positivity of `κ∞`).** `kappaInf_pos` records `κ∞ > 0` for `λ > 0`, matching
+the source's "`κ > 0` is a constant to be determined" (below (S.30)) transported to the `L → ∞`
+limit. -/
 example (lam : ℝ) (hlam : 0 < lam) : 0 < kappaInf lam :=
   kappaInf_pos hlam
 
-/-- **E3 signature pin.** `exp_kappaInf_sub_exp_neg` is (S.35) itself,
+/-- **Signature pin ((S.35) for `kappaInf`).** `exp_kappaInf_sub_exp_neg` is (S.35) itself,
 `e^κ∞ - e^-κ∞ = λ⁻¹`, stated for `kappaInf`. -/
 example (lam : ℝ) (hlam : 0 < lam) :
     Real.exp (kappaInf lam) - Real.exp (-(kappaInf lam)) = lam⁻¹ :=
   exp_kappaInf_sub_exp_neg hlam
 
-/-- **E4 signature pin.** `exp_neg_kappaInf_eq` gives `e^-κ∞` in closed radical form,
-`2λ / (1 + √(1 + 4λ²))`, the ingredient `Real.exp_arsinh` supplies for C6/E5 below. -/
+/-- **Signature pin (`e^-κ∞` in radical form).** `exp_neg_kappaInf_eq` gives `e^-κ∞` in closed
+radical form, `2λ / (1 + √(1 + 4λ²))`, the ingredient `Real.exp_arsinh` supplies for the `ε∞` and
+`tanh κ∞` pins below. -/
 example (lam : ℝ) (hlam : 0 < lam) :
     Real.exp (-(kappaInf lam)) = 2 * lam / (1 + Real.sqrt (1 + 4 * lam ^ 2)) :=
   exp_neg_kappaInf_eq hlam
 
-/-- **C6 signature pin — (S.39).** `tightBindingEnergy_kappaInf_eq` is the source's `ε∞`,
+/-- **Signature pin — (S.39).** `tightBindingEnergy_kappaInf_eq` is the source's `ε∞`,
 `ε∞ = -(λ/2)(e^κ∞ + e^-κ∞) + 1/2 = -√(1 + 4λ²)/2 + 1/2`, the middle equality of (S.39). The
 radical is confirmed present on the rendered PDF page 501 (printed p. 501); in the `.txt`
 extract the `√` and its radicand sit on separate lines above the equation body, so reading the
@@ -422,21 +425,22 @@ example (lam : ℝ) (hlam : 0 < lam) :
     tightBindingEnergy lam (kappaInf lam) = (1 - Real.sqrt (1 + 4 * lam ^ 2)) / 2 :=
   tightBindingEnergy_kappaInf_eq hlam
 
-/-- **C6 numeric pin at `λ = 1/2`.** `1 + 4 * (1/2)^2 = 2`, so this pins the value
+/-- **Numeric pin ((S.39) at `λ = 1/2`).** `1 + 4 * (1/2)^2 = 2`, so this pins the value
 `ε∞ = (1 - √2)/2` taken by the middle equality of Tasaki eq. (S.39) at `λ = 1/2`. -/
 example : tightBindingEnergy (1 / 2 : ℝ) (kappaInf (1 / 2)) = (1 - Real.sqrt 2) / 2 := by
   have h := tightBindingEnergy_kappaInf_eq (lam := (1 / 2 : ℝ)) (by norm_num)
   norm_num at h
   linarith [h]
 
-/-- **E5 signature pin.** `tanh_kappaInf_eq` is `tanh κ∞ = 1/√(1 + 4λ²)`, the ingredient (S.41)
-later needs (`E_1st - E_GS ≃ 2 tanh(κ∞) e^-κ∞L`), stated here purely in terms of `kappaInf`. -/
+/-- **Signature pin (`tanh κ∞`).** `tanh_kappaInf_eq` is `tanh κ∞ = 1/√(1 + 4λ²)`, the ingredient
+(S.41) later needs (`E_1st - E_GS ≃ 2 tanh(κ∞) e^-κ∞L`), stated here purely in terms of
+`kappaInf`. -/
 example (lam : ℝ) (hlam : 0 < lam) :
     Real.tanh (kappaInf lam) = (Real.sqrt (1 + 4 * lam ^ 2))⁻¹ :=
   tanh_kappaInf_eq hlam
 
-/-- **E5 numeric pin at `λ = 1/2`.** `1 + 4 * (1/2)^2 = 2`, so `2 tanh κ∞ = 2/√2 = √2` — the
-constant standing in front of `e^-κ∞L` in Tasaki eq. (S.41). -/
+/-- **Numeric pin (`tanh κ∞` at `λ = 1/2`).** `1 + 4 * (1/2)^2 = 2`, so `2 tanh κ∞ = 2/√2 = √2` —
+the constant standing in front of `e^-κ∞L` in Tasaki eq. (S.41). -/
 example : 2 * Real.tanh (kappaInf (1 / 2 : ℝ)) = Real.sqrt 2 := by
   have h := tanh_kappaInf_eq (lam := (1 / 2 : ℝ)) (by norm_num)
   have harg : (1 : ℝ) + 4 * (1 / 2 : ℝ) ^ 2 = 2 := by norm_num
@@ -444,16 +448,16 @@ example : 2 * Real.tanh (kappaInf (1 / 2 : ℝ)) = Real.sqrt 2 := by
   rw [h, ← div_eq_mul_inv]
   exact Real.div_sqrt
 
-/-- **C8 signature pin.** `tendsto_exp_neg_kappaInf_div_atZero` is the first of the two small-`λ`
-replacements behind the final form `≃ 2 λ^L` of (S.41): `e^-κ∞ / λ → 1` as `λ ↓ 0`, the limit
-form of the source's `e^κ∞ ≃ λ⁻¹` (p. 500, below (S.35)). -/
+/-- **Signature pin (first small-`λ` replacement).** `tendsto_exp_neg_kappaInf_div_atZero` is the
+first of the two small-`λ` replacements behind the final form `≃ 2 λ^L` of (S.41): `e^-κ∞ / λ → 1`
+as `λ ↓ 0`, the limit form of the source's `e^κ∞ ≃ λ⁻¹` (p. 500, below (S.35)). -/
 example :
     Filter.Tendsto (fun l : ℝ => Real.exp (-(kappaInf l)) / l)
       (nhdsWithin 0 (Set.Ioi 0)) (nhds 1) :=
   tendsto_exp_neg_kappaInf_div_atZero
 
-/-- **C9 signature pin.** `tendsto_tanh_kappaInf_atZero` is the second small-`λ` replacement of
-(S.41): the prefactor `tanh κ∞` tends to `1` as `λ ↓ 0`. -/
+/-- **Signature pin (second small-`λ` replacement).** `tendsto_tanh_kappaInf_atZero` is the second
+small-`λ` replacement of (S.41): the prefactor `tanh κ∞` tends to `1` as `λ ↓ 0`. -/
 example :
     Filter.Tendsto (fun l : ℝ => Real.tanh (kappaInf l))
       (nhdsWithin 0 (Set.Ioi 0)) (nhds 1) :=
@@ -462,20 +466,21 @@ example :
 /-! ## Root existence and the (S.40) energy ordering -/
 
 /-!
-**F1 (not independently pinned).** This layer's workhorse is
+**The `hop` abbreviation (not independently pinned).** This layer's workhorse is
 `hop lam kappa := lam * (Real.exp kappa - Real.exp (-kappa))` (`= 2λ sinh κ`, the left-hand side
 of (S.34) times `λ`), together with its strict monotonicity in `kappa`, its value `1` at
 `kappaInf lam` (from (S.35), `e^κ∞ - e^-κ∞ = λ⁻¹`): `hop`, `hop_strictMono` and
 `hop_kappaInf_eq_one`, the three names the splitting layer consumes. They carry no pin of their
-own because C5, C7a, C7b and the S2, S3, S7 fixtures below are their consumers and are pinned
-individually. F2 below pins instead the expanded form that `hop` abbreviates, in the shape in
-which (S.34) prints it.
+own because the ordering, root-existence and splitting fixtures below are their consumers and are
+pinned individually. The fixture below pins instead the expanded form that `hop` abbreviates, in
+the shape in which (S.34) prints it.
 -/
 
-/-- **F2 signature pin.** `rootEquation_iff_cleared` clears the denominator of Tasaki eq. (S.34),
-p. 500: for `0 < kappa` and `s = 1 ∨ s = -1`, `rootEquation N lam kappa s` is equivalent to
-`lam * (e^κ - e^-κ) * (1 - s·w) = 1 + s·w` with `w = e^{-κ(N+1)}` — the `hop lam kappa` of F1
-written out here as its defining expression, the shape in which (S.34) prints it. -/
+/-- **Signature pin (cleared root equation).** `rootEquation_iff_cleared` clears the denominator of
+Tasaki eq. (S.34), p. 500: for `0 < kappa` and `s = 1 ∨ s = -1`, `rootEquation N lam kappa s` is
+equivalent to `lam * (e^κ - e^-κ) * (1 - s·w) = 1 + s·w` with `w = e^{-κ(N+1)}` — the
+`hop lam kappa` above written out here as its defining expression, the shape in which (S.34) prints
+it. -/
 example (N : ℕ) (lam kappa s : ℝ) (hk : 0 < kappa) (hs : s = 1 ∨ s = -1) :
     rootEquation N lam kappa s ↔
       lam * (Real.exp kappa - Real.exp (-kappa))
@@ -483,7 +488,7 @@ example (N : ℕ) (lam kappa s : ℝ) (hk : 0 < kappa) (hs : s = 1 ∨ s = -1) :
         = 1 + s * Real.exp (-kappa * (N + 1 : ℕ)) :=
   rootEquation_iff_cleared N lam kappa s hk hs
 
-/-- **C5 signature pin — (S.40) energy ordering.** `tightBindingEnergy_lt_of_roots` is capstone
+/-- **Signature pin — (S.40) energy ordering.** `tightBindingEnergy_lt_of_roots` is capstone
 conjunct 5: given a positive root `kp` of the symmetric (`s = 1`) root equation and a positive
 root `km` of the antisymmetric (`s = -1`) one, the symmetric root's tight-binding energy is
 strictly the smaller. This is Tasaki's remark after (S.40), p. 501, "We see that the symmetric
@@ -493,14 +498,14 @@ example (N : ℕ) (lam kp km : ℝ) (hkp : 0 < kp) (hkm : 0 < km)
     tightBindingEnergy lam kp < tightBindingEnergy lam km :=
   tightBindingEnergy_lt_of_roots N lam kp km hkp hkm hroot_p hroot_m
 
-/-- **C7a signature pin — existence of the symmetric root.** `exists_root_symmetric` is capstone
+/-- **Signature pin — existence of the symmetric root.** `exists_root_symmetric` is capstone
 conjunct 7's first half: for every `N` and every `λ > 0` there is a positive `κ` solving the
 symmetric (`s = 1`) root equation (S.34), for every ring size (no lower bound on `N`). -/
 example (N : ℕ) (lam : ℝ) (hlam : 0 < lam) :
     ∃ kappa : ℝ, 0 < kappa ∧ rootEquation N lam kappa 1 :=
   exists_root_symmetric N lam hlam
 
-/-- **C7b signature pin — eventual existence of the antisymmetric root.**
+/-- **Signature pin — eventual existence of the antisymmetric root.**
 `eventually_exists_root_antisymmetric` is capstone conjunct 7's second half: for every `λ > 0`,
 for all sufficiently large `N` there is a positive `κ` solving the antisymmetric (`s = -1`) root
 equation (S.34). Unlike the symmetric root, the antisymmetric one is produced here only for
@@ -517,33 +522,35 @@ The three fixtures below pin the public declarations of
 parity roots of (S.34), p. 500, around `kappaInf lam`, and the `L ↑ ∞` limit that replaces the
 `≃` of (S.41), p. 501. -/
 
-/-- **S2 signature pin.** `root_symmetric_gt_kappaInf` locates every positive root of the
-symmetric (`s = 1`) root equation (S.34), p. 500, strictly above `kappaInf lam`: the cleared
-equation gives `hop λ kp = (1 + w)/(1 - w) > 1 = hop λ κ∞`, and `hop λ ·` is strictly increasing.
-This is the exact one-sided localization that replaces the source's `κ = κ∞ + δ` of (S.36). -/
+/-- **Signature pin (symmetric root above `κ∞`).** `root_symmetric_gt_kappaInf` locates every
+positive root of the symmetric (`s = 1`) root equation (S.34), p. 500, strictly above
+`kappaInf lam`: the cleared equation gives `hop λ kp = (1 + w)/(1 - w) > 1 = hop λ κ∞`, and
+`hop λ ·` is strictly increasing. This is the exact one-sided localization that replaces the
+source's `κ = κ∞ + δ` of (S.36). -/
 example (N : ℕ) (lam kp : ℝ) (hkp : 0 < kp) (hroot : rootEquation N lam kp 1) :
     kappaInf lam < kp :=
   root_symmetric_gt_kappaInf N lam kp hkp hroot
 
-/-- **S3 signature pin.** `eventually_root_antisymmetric_mem_Ico` gives the two-sided
-localization of every positive root of the antisymmetric (`s = -1`) root equation, eventually in
-`N`: `arsinh (3/(8λ)) ≤ km < kappaInf lam`. The upper bound is the antisymmetric mirror of S2,
-where the cleared form of (S.34), p. 500, gives `hop λ km = (1 - w)/(1 + w) < 1`; the lower bound
-splits on `w = e^-κL` at `1/8`. -/
+/-- **Signature pin (antisymmetric-root localization).** `eventually_root_antisymmetric_mem_Ico`
+gives the two-sided localization of every positive root of the antisymmetric (`s = -1`) root
+equation, eventually in `N`: `arsinh (3/(8λ)) ≤ km < kappaInf lam`. The upper bound is the
+antisymmetric mirror of the localization above, where the cleared form of (S.34), p. 500, gives
+`hop λ km = (1 - w)/(1 + w) < 1`; the lower bound splits on `w = e^-κL` at `1/8`. -/
 example (lam : ℝ) (hlam : 0 < lam) :
     ∀ᶠ N : ℕ in Filter.atTop, ∀ km : ℝ, 0 < km → rootEquation N lam km (-1) →
       Real.arsinh (3 / (8 * lam)) ≤ km ∧ km < kappaInf lam :=
   eventually_root_antisymmetric_mem_Ico lam hlam
 
-/-- **S7 signature pin — (S.41) splitting-ratio limit, this layer's headline result.**
+/-- **Signature pin — (S.41) splitting-ratio limit, this layer's headline result.**
 `tendsto_splitting_ratio` is the rigorous substitute for the source's `E_1st - E_GS ≃ 2 tanh(κ∞)
 e^-κ∞L`: for any pair of root families `kp`, `km`, each eventually positive and solving the
 respective parity root equation, the ratio of the tight-binding energy gap to
 `2 tanh(κ∞) e^-κ∞(N+1)` tends to `1` along `N → ∞`, at fixed `λ` — the order of limits of the
 source's footnote 1, p. 500. The source's `≃` steps (S.36)-(S.38), p. 500, are not asserted. No
 uniqueness of either root is assumed or needed: `kp`, `km` range over *any* eventually-positive
-root families of their sectors. `tightBindingEnergy` is an eigenvalue of the compressed matrix
-`lowEnergyMatrix`, so the difference pinned here is not `E_1st - E_GS` of `Ĥ`. -/
+root families of their sectors. `tightBindingEnergy` is an eigenvalue of the tight-binding part
+`tightBindingRing` — of the compressed matrix `lowEnergyMatrix` only after the shift by `-N/4` —
+so the difference pinned here is not `E_1st - E_GS` of `Ĥ`. -/
 example (lam : ℝ) (hlam : 0 < lam) (kp km : ℕ → ℝ)
     (hkp : ∀ᶠ N : ℕ in Filter.atTop, 0 < kp N ∧ rootEquation N lam (kp N) 1)
     (hkm : ∀ᶠ N : ℕ in Filter.atTop, 0 < km N ∧ rootEquation N lam (km N) (-1)) :
@@ -568,9 +575,9 @@ limit of the ratio of the `tightBindingEnergy` gap between any eventually-positi
 and symmetric root families to `2 * Real.tanh (kappaInf lam) * Real.exp (-(kappaInf lam)) ^
 (N + 1)`, tending to `1` (conjunct 8); and the two `l ↓ 0` limits `Real.exp (-(kappaInf l)) / l →
 1` and `Real.tanh (kappaInf l) → 1` (conjunct 9). `tightBindingEnergy` is an eigenvalue of the
-compressed matrix `lowEnergyMatrix` shifted by `E_GS^(0)`, equivalently of the tight-binding
-part `tightBindingRing`, and is never identified here with the true Hamiltonian's ground-state
-or first-excited energy. -/
+compressed matrix `lowEnergyMatrix` only after the shift by `E_GS^(0)`; on its own it is an
+eigenvalue of the tight-binding part `tightBindingRing`, and it is never identified here with the
+true Hamiltonian's ground-state or first-excited energy. -/
 example (lam : ℝ) (hlam : 0 < lam) :
     (∀ N : ℕ, 1 ≤ N →
         Function.Injective (lowEnergyConfig N)
