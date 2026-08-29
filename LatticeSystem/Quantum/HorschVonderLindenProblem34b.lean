@@ -158,4 +158,68 @@ private theorem trialState_dotProduct_self {n : Type*} [Fintype n] [DecidableEq 
   rw [hvlTrialState]
   exact unitNormalize_dotProduct_self (O *ᵥ Φ) hpos
 
+/-! ### The moments of `Ξ₊` -/
+
+/-- The scalar of eq. (3.4.14) squares to one half: `conj((√2)⁻¹)·(√2)⁻¹ = 1/2`. -/
+private theorem sqrtTwoInv_sq : ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ * ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ = 1 / 2 := by
+  have h2 : ((Real.sqrt 2 : ℝ) : ℂ) ^ 2 = 2 := by
+    rw [← Complex.ofReal_pow, Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 2)]
+    norm_num
+  rw [← mul_inv, ← sq, h2]
+  norm_num
+
+/-- **Normalisation of `Ξ₊`** (Tasaki eq. (3.4.14)): `⟨Ξ₊|Ξ₊⟩ = 1`.  The two cross terms
+`⟨Φ_GS|Γ⟩` and `⟨Γ|Φ_GS⟩` vanish by the first odd-moment assumption (3.4.4), and both diagonal
+terms are `1`, so the global `1/√2` normalises the sum. -/
+theorem hvlPlusState_dotProduct_self {n : Type*} [Fintype n] [DecidableEq n] (O : Matrix n n ℂ)
+    (Φ : n → ℂ) (hHerm : O.IsHermitian) (hΦ : star Φ ⬝ᵥ Φ = 1)
+    (hodd1 : star Φ ⬝ᵥ (O *ᵥ Φ) = 0) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) :
+    star (hvlPlusState O Φ) ⬝ᵥ hvlPlusState O Φ = 1 := by
+  have hΦΓ : star Φ ⬝ᵥ hvlTrialState O Φ = 0 := by
+    simpa [hodd1] using dotProduct_mulVec_trialState hHerm Φ hm2 0
+  have hΓΦ : star (hvlTrialState O Φ) ⬝ᵥ Φ = 0 := by
+    simpa [hodd1] using trialState_dotProduct_mulVec hHerm Φ hm2 0
+  have hΓΓ : star (hvlTrialState O Φ) ⬝ᵥ hvlTrialState O Φ = 1 :=
+    trialState_dotProduct_self hHerm Φ hm2
+  have hone : star (hvlPlusState O Φ) ⬝ᵥ hvlPlusState O Φ
+      = star (hvlPlusState O Φ) ⬝ᵥ ((1 : Matrix n n ℂ) *ᵥ hvlPlusState O Φ) := by
+    rw [Matrix.one_mulVec]
+  rw [hone, hvlPlusState, smul_add_dotProduct_mulVec]
+  simp only [Matrix.one_mulVec]
+  rw [hΦ, hΦΓ, hΓΦ, hΓΓ, Complex.star_def, map_inv₀, Complex.conj_ofReal, sqrtTwoInv_sq]
+  norm_num
+
+/-- **The order parameter of `Ξ₊`** (Tasaki eq. (3.4.15)):
+`⟨Ξ₊|Ô_L|Ξ₊⟩ = √(⟨Φ_GS|(Ô_L)²|Φ_GS⟩)`.  The two diagonal terms vanish by the first and third
+odd-moment assumptions (3.4.4), and each cross term contributes `m₂/√m₂ = √m₂`. -/
+theorem hvlPlusState_order_mean {n : Type*} [Fintype n] [DecidableEq n] (O : Matrix n n ℂ)
+    (Φ : n → ℂ) (hHerm : O.IsHermitian) (hodd1 : star Φ ⬝ᵥ (O *ᵥ Φ) = 0)
+    (hodd3 : star Φ ⬝ᵥ ((O ^ 3) *ᵥ Φ) = 0) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) :
+    rayleighOnVec O (hvlPlusState O Φ) = Real.sqrt (rayleighOnVec (O ^ 2) Φ) := by
+  have hsqrt : ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ) ≠ 0 := by
+    exact_mod_cast (Real.sqrt_pos.mpr hm2).ne'
+  have hm2s : star Φ ⬝ᵥ ((O ^ 2) *ᵥ Φ)
+      = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ) ^ 2 := by
+    rw [even_moment_ofReal hHerm Φ, ← Complex.ofReal_pow, Real.sq_sqrt hm2.le]
+  have hbra : star (hvlTrialState O Φ) ⬝ᵥ (O *ᵥ Φ)
+      = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ * (star Φ ⬝ᵥ ((O ^ 2) *ᵥ Φ)) := by
+    simpa only [pow_one, Nat.reduceAdd] using trialState_dotProduct_mulVec hHerm Φ hm2 1
+  have hket : star Φ ⬝ᵥ (O *ᵥ hvlTrialState O Φ)
+      = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ * (star Φ ⬝ᵥ ((O ^ 2) *ᵥ Φ)) := by
+    simpa only [pow_one, Nat.reduceAdd] using dotProduct_mulVec_trialState hHerm Φ hm2 1
+  have hdiag : star (hvlTrialState O Φ) ⬝ᵥ (O *ᵥ hvlTrialState O Φ)
+      = (((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹) ^ 2
+        * (star Φ ⬝ᵥ ((O ^ 3) *ᵥ Φ)) := by
+    simpa only [pow_one, Nat.reduceAdd] using
+      trialState_dotProduct_mulVec_trialState hHerm Φ hm2 1
+  have hkey : star (hvlPlusState O Φ) ⬝ᵥ (O *ᵥ hvlPlusState O Φ)
+      = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ) := by
+    rw [hvlPlusState, smul_add_dotProduct_mulVec, hodd1, hbra, hket, hdiag, hodd3, hm2s,
+      Complex.star_def, map_inv₀, Complex.conj_ofReal, sqrtTwoInv_sq]
+    field_simp
+    ring
+  have hdef : rayleighOnVec O (hvlPlusState O Φ)
+      = (star (hvlPlusState O Φ) ⬝ᵥ (O *ᵥ hvlPlusState O Φ)).re := rfl
+  rw [hdef, hkey, Complex.ofReal_re]
+
 end LatticeSystem.Quantum
