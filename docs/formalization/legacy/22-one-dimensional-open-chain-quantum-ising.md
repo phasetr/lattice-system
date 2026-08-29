@@ -245,6 +245,71 @@ Regression fixtures live in `LatticeSystem/Tests/Problem33aLowEnergy.lean`: each
 declarations above has a signature fixture restating it in full and discharging it by the
 declaration itself.
 
+## Authoritative supplemental implementation record (Problem 3.3.a splitting limit (S.41))
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+a new capstone added after the migration baseline (PR #5391); it is not subject to the frozen
+byte-for-byte parity of the block above.
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Problem 3.3.a
+(statement p. 59; solution: eqs. (S.34)-(S.38) and footnote 1 on p. 500, eqs. (S.39)-(S.41) on
+p. 501), for the model of eq. (3.3.1), p. 56, with open boundary conditions.
+
+The source fixes the decay rate by writing `κ = κ∞ + δ` and expanding: (S.36),
+`e^{κ∞+δ} - e^{-κ∞-δ} ≃ λ^-1 (1 ± 2 e^-κ∞L)`; (S.37),
+`δ ≃ ±λ^-1 2 e^-κ∞L/(e^κ∞ + e^-κ∞)`, introduced by "Expanding the left-hand side in `δ` to the
+lowest order"; (S.38), `ε ≃ ε∞ - (λ/2)(e^κ∞ - e^-κ∞) δ`. Substituting (S.37) it then states
+(S.40), `ε_± ≃ ε∞ ∓ [(e^κ∞ - e^-κ∞)/(e^κ∞ + e^-κ∞)] e^-κ∞L`, and (S.41),
+`E_1st - E_GS = ε_- - ε_+ ≃ 2 [(e^κ∞ - e^-κ∞)/(e^κ∞ + e^-κ∞)] e^-κ∞L ≃ 2 λ^L`.
+
+None of those `≃` is asserted. `tendsto_splitting_ratio` asserts the middle expression of (S.41)
+as an exact limit: the ratio of the difference of the two sectors' eigenvalues to
+`2 tanh κ∞ e^-κ∞L` tends to `1` as the ring size grows, at fixed `λ` — the order of limits of
+the source's footnote 1 on p. 500, "we fix small `λ`, and then make `L` large". The prefactor is
+`tanh κ∞` because `(e^κ∞ - e^-κ∞)/(e^κ∞ + e^-κ∞)` is exactly that.
+
+Two exact ingredients replace the source's two non-rigorous moves. The Taylor step
+(S.36)-(S.38) is replaced by the identity
+`ε(κ_-) - ε(κ_+) = tanh((κ_+ + κ_-)/2) (hop λ κ_+ - hop λ κ_-)/2`, an equality valid at all
+arguments, where `hop λ κ = λ (e^κ - e^-κ)` is the left-hand side of (S.34) times `λ`. The
+source's "`L ≫ 1`" is replaced by localization of the roots: `root_symmetric_gt_kappaInf` places
+every positive symmetric root strictly above `κ∞` at every ring size, and
+`eventually_root_antisymmetric_mem_Ico` places every positive antisymmetric root in
+`[arsinh (3/(8λ)), κ∞)` for all sufficiently large ring sizes, so that the limit statement is
+taken along `∀ᶠ N in atTop`.
+
+Limitations measured in this layer. Uniqueness of the root in either sector is neither proved nor
+used: the limit quantifies over arbitrary families of positive roots of the two sectors, one per
+ring size. The `∀ᶠ` of the antisymmetric localization is not cosmetic: the lower bound excludes
+roots with `e^-κL > 1/8`, which the cleared equation permits only while the ring size stays below
+a multiple of `λ e^κ∞`. The final step `≃ 2 λ^L` of (S.41) is not asserted here; its two
+small-`λ` replacements, `tendsto_exp_neg_kappaInf_div_atZero` and `tendsto_tanh_kappaInf_atZero`,
+are limits in `λ` at no fixed ring size and are not combined with the `L ↑ ∞` limit above.
+
+These remain **eigenvalues of the compression, not energies**: `Ĥ` does not preserve the span of
+the `2L` configurations, so `tightBindingEnergy` is an eigenvalue of `lowEnergyMatrix` and the
+difference above is not identified with `E_1st - E_GS` of `Ĥ`. Tasaki notes on p. 59 that the
+analysis of this problem is not mathematically rigorous. The ring carrying the labels `j` is a
+ring of basis labels of type `ZMod (2 * (N + 1))`, not of lattice sites: the chain itself stays
+open.
+
+`hop`, `hop_strictMono`, `hop_kappaInf_eq_one` and `hop_continuous` of
+`Quantum/IsingLowEnergyProblem33aRoots.lean`, previously `private` to that module, are public in
+this PR so that the splitting layer consumes them from their single defining site.
+
+Every declaration below is **PROVED**; `#print axioms` on each yields only `propext`,
+`Classical.choice`, `Quot.sound`.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `root_symmetric_gt_kappaInf` | every positive root of the symmetric (`s = 1`) form of (S.34) lies strictly above `κ∞`, at every ring size | `Quantum/IsingLowEnergyProblem33aSplitting.lean` |
+| `eventually_root_antisymmetric_mem_Ico` | for all sufficiently large ring sizes, every positive root of the antisymmetric (`s = -1`) form of (S.34) lies in `[arsinh (3/(8λ)), κ∞)` | `Quantum/IsingLowEnergyProblem33aSplitting.lean` |
+| `tendsto_splitting_ratio` | **capstone of PR #5391**: for arbitrary families of positive roots of the two sectors, the ratio of the eigenvalue difference to `2 tanh κ∞ (e^-κ∞)^(N+1)` tends to `1`, the middle expression of (S.41) as an exact limit | `Quantum/IsingLowEnergyProblem33aSplitting.lean` |
+
+Regression fixtures live in `LatticeSystem/Tests/Problem33aLowEnergy.lean`: each of the three
+declarations above has a signature fixture restating it in full and discharging it by the
+declaration itself.
+
 ---
 
 [← Two-site spin inner product (Tasaki §2.2 eq. (2.2.16))](/lattice-system/formalization/legacy/21-two-site-spin-inner-product-tasaki-2-2-eq-2-2-16/) · [Catalogue](/lattice-system/formalization/legacy/) · [Testing infrastructure →](/lattice-system/formalization/legacy/23-testing-infrastructure/)

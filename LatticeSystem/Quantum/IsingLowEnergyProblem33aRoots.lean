@@ -52,12 +52,12 @@ namespace LatticeSystem.Quantum
 `hop λ κ = λ (e^κ - e^-κ) = 2 λ sinh κ`. Clearing the denominator of (S.34) rewrites the root
 equation as `hop λ κ (1 - s e^-κL) = 1 + s e^-κL`, so `hop λ ·` is the quantity whose comparison
 with `1` locates a root. -/
-private noncomputable def hop (lam kappa : ℝ) : ℝ :=
+noncomputable def hop (lam kappa : ℝ) : ℝ :=
   lam * (Real.exp kappa - Real.exp (-kappa))
 
 /-- For a positive transverse field `hop λ ·` is strictly increasing, because `e^κ` increases and
 `e^-κ` decreases. -/
-private theorem hop_strictMono {lam : ℝ} (hlam : 0 < lam) : StrictMono (hop lam) := by
+theorem hop_strictMono {lam : ℝ} (hlam : 0 < lam) : StrictMono (hop lam) := by
   intro x y hxy
   have h1 : Real.exp x < Real.exp y := Real.exp_lt_exp.mpr hxy
   have h2 : Real.exp (-y) < Real.exp (-x) := Real.exp_lt_exp.mpr (by linarith)
@@ -66,13 +66,13 @@ private theorem hop_strictMono {lam : ℝ} (hlam : 0 < lam) : StrictMono (hop la
 
 /-- Tasaki eq. (S.35), p. 500, in cleared form: `hop λ κ∞ = λ (e^κ∞ - e^-κ∞) = λ λ⁻¹ = 1`. The
 value `1` is the `L ↑ ∞` right-hand side of the cleared root equation. -/
-private theorem hop_kappaInf_eq_one {lam : ℝ} (hlam : 0 < lam) : hop lam (kappaInf lam) = 1 := by
+theorem hop_kappaInf_eq_one {lam : ℝ} (hlam : 0 < lam) : hop lam (kappaInf lam) = 1 := by
   rw [hop, exp_kappaInf_sub_exp_neg hlam]
   field_simp
 
 /-- `hop λ ·` is continuous, the hypothesis under which the intermediate value theorem applies to
 the defect of the cleared root equation. -/
-private theorem hop_continuous (lam : ℝ) : Continuous (hop lam) := by
+theorem hop_continuous (lam : ℝ) : Continuous (hop lam) := by
   change Continuous fun k : ℝ => lam * (Real.exp k - Real.exp (-k))
   fun_prop
 
