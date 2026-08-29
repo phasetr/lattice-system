@@ -384,4 +384,49 @@ example (N : ℕ) (lam kappa s : ℝ) (hN : 1 ≤ N) (hlam : 0 < lam) (hk : 0 < 
           = ((-(N : ℝ) / 4 + tightBindingEnergy lam kappa : ℝ) : ℂ) • lowEnergyAnsatz N kappa s :=
   lowEnergyAnsatz_isEigenvector N lam kappa s hN hlam hk hs hroot
 
+/-! ## The `κ∞` layer: (S.35)-(S.39) -/
+
+/-- **E1 signature/value pin.** `kappaInf` is the `L → ∞` root `κ∞` of (S.34), defined directly
+by (S.35), `e^κ∞ - e^-κ∞ = λ⁻¹`, via `Real.arsinh`. At `λ = 1` this is `arsinh (1/2)`. -/
+example : kappaInf (1 : ℝ) = Real.arsinh (1 / 2) := rfl
+
+/-- **E2 signature pin.** `kappaInf_pos` records `κ∞ > 0` for `λ > 0`, matching the source's
+"`κ > 0` is a constant to be determined" (below (S.30)) transported to the `L → ∞` limit. -/
+example (lam : ℝ) (hlam : 0 < lam) : 0 < kappaInf lam :=
+  kappaInf_pos hlam
+
+/-- **E3 signature pin.** `exp_kappaInf_sub_exp_neg` is (S.35) itself,
+`e^κ∞ - e^-κ∞ = λ⁻¹`, stated for `kappaInf`. -/
+example (lam : ℝ) (hlam : 0 < lam) :
+    Real.exp (kappaInf lam) - Real.exp (-(kappaInf lam)) = lam⁻¹ :=
+  exp_kappaInf_sub_exp_neg hlam
+
+/-- **E4 signature pin.** `exp_neg_kappaInf_eq` gives `e^-κ∞` in closed radical form,
+`2λ / (1 + √(1 + 4λ²))`, the ingredient `Real.exp_arsinh` supplies for C6/E5 below. -/
+example (lam : ℝ) (hlam : 0 < lam) :
+    Real.exp (-(kappaInf lam)) = 2 * lam / (1 + Real.sqrt (1 + 4 * lam ^ 2)) :=
+  exp_neg_kappaInf_eq hlam
+
+/-- **C6 signature pin — (S.39).** `tightBindingEnergy_kappaInf_eq` is the source's `ε∞`,
+`ε∞ = -(λ/2)(e^κ∞ + e^-κ∞) + 1/2 = -√(1 + 4λ²)/2 + 1/2`, the middle equality of (S.39). The
+radical is confirmed present on the rendered PDF page 501 (printed p. 501); the `.txt` extract
+drops it. The final `≃ -λ²` of (S.39) is a small-`λ` approximation and is not asserted here. -/
+example (lam : ℝ) (hlam : 0 < lam) :
+    tightBindingEnergy lam (kappaInf lam) = (1 - Real.sqrt (1 + 4 * lam ^ 2)) / 2 :=
+  tightBindingEnergy_kappaInf_eq hlam
+
+/-- **C6 numeric pin at `λ = 1/2`.** `1 + 4 * (1/2)^2 = 2`, so `ε∞ = (1 - √2)/2` — a concrete
+value that is only reached through the radical of (S.39): a dropped-radical mis-transcription
+(reading (S.39) as `ε∞ = (1 - λ)/2` or similar) gives a different rational value here. -/
+example : tightBindingEnergy (1 / 2 : ℝ) (kappaInf (1 / 2)) = (1 - Real.sqrt 2) / 2 := by
+  have h := tightBindingEnergy_kappaInf_eq (lam := (1 / 2 : ℝ)) (by norm_num)
+  norm_num at h
+  linarith [h]
+
+/-- **E5 signature pin.** `tanh_kappaInf_eq` is `tanh κ∞ = 1/√(1 + 4λ²)`, the ingredient (S.41)
+later needs (`E_1st - E_GS ≃ 2 tanh(κ∞) e^-κ∞L`), stated here purely in terms of `kappaInf`. -/
+example (lam : ℝ) (hlam : 0 < lam) :
+    Real.tanh (kappaInf lam) = (Real.sqrt (1 + 4 * lam ^ 2))⁻¹ :=
+  tanh_kappaInf_eq hlam
+
 end LatticeSystem.Tests.Problem33aLowEnergy
