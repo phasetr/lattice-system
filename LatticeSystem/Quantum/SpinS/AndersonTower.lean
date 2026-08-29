@@ -68,16 +68,6 @@ noncomputable def expectationRatioRe {ι : Type*} [Fintype ι]
     (O : Matrix ι ι ℂ) (w : ι → ℂ) : ℝ :=
   (star w ⬝ᵥ O.mulVec w).re / (star w ⬝ᵥ w).re
 
-/-- The squared `L²` norm of a vector, as a real number: `vecNormSqRe w = (⟨w, w⟩).re`.  Used as the
-positive denominator in Rayleigh quotients and as the well-definedness witness for normalization. -/
-noncomputable def vecNormSqRe {ι : Type*} [Fintype ι] (w : ι → ℂ) : ℝ :=
-  (star w ⬝ᵥ w).re
-
-/-- **Unit normalization** of a vector in the `L²` inner product: `unitNormalize w = ‖w‖⁻¹ • w`
-(with `‖w‖ = √⟨w, w⟩`, and `0` when `w = 0`). -/
-noncomputable def unitNormalize {ι : Type*} [Fintype ι] (w : ι → ℂ) : ι → ℂ :=
-  ((Real.sqrt (vecNormSqRe w) : ℝ) : ℂ)⁻¹ • w
-
 /-- The (unnormalized) `k`-th **Tanaka tower term** `(Ô_L^{(1)})^k Φ`, built with the `1`-axis
 staggered order operator. -/
 noncomputable def tanakaTowerTerm (A : Λ → Bool) (N k : ℕ)

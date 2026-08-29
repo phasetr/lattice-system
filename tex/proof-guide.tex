@@ -12772,6 +12772,48 @@ using $h>0$, and bound $R(H)\Psi\ge E_0$.  The double limit $L\uparrow\infty$, $
 the essential bound $\langle\Xi_+,O_L/L^d\,\Xi_+\rangle\ge\sqrt{q_0}$) then gives the $\sqrt{q_0}$
 order-parameter bound (3.4.22) --- the thermodynamic input, which is not part of the formalized core.  Chapters~3--10 backfill.
 
+\noindent\textbf{Problem 3.4.b} (Tasaki~\cite{Tasaki:QMB} §3.4, statement p.~69 eq.~(3.4.18),
+solution p.~501 eqs.~(S.42)--(S.43), with the surrounding eqs.~(3.4.3), (3.4.4), (3.4.7),
+(3.4.14)--(3.4.15), pp.~65--69; \textbf{discharged axiom-free},
+\texttt{Quantum/HorschVonderLindenProblem34b.lean}, fixtures in
+\texttt{Tests/Problem34bFluctuation.lean}).  Tasaki asks to show that vanishing of the
+fourth-moment combination
+$\langle\Phi_{\mathrm{GS}}|(\hat O_L/L^d)^4|\Phi_{\mathrm{GS}}\rangle-
+(\langle\Phi_{\mathrm{GS}}|(\hat O_L/L^d)^2|\Phi_{\mathrm{GS}}\rangle)^2\to0$ as $L\uparrow\infty$
+forces the fluctuation of $\hat O_L/L^d$ in the state $\Xi_+$ to vanish, so that $\Xi_+$ may be
+regarded as a physical ``ground state''.  The state is constructed rather than assumed:
+\texttt{hvlTrialState} is $\Gamma=\hat O_L|\Phi_{\mathrm{GS}}\rangle/
+\lVert\hat O_L|\Phi_{\mathrm{GS}}\rangle\rVert$ (eq.~(3.4.7)) and \texttt{hvlPlusState} is
+$\Xi_+=(1/\sqrt2)(|\Phi_{\mathrm{GS}}\rangle+|\Gamma\rangle)$ (eq.~(3.4.14)).  Writing
+$m_2=\langle\Phi_{\mathrm{GS}}|(\hat O_L)^2|\Phi_{\mathrm{GS}}\rangle$ and
+$m_4=\langle\Phi_{\mathrm{GS}}|(\hat O_L)^4|\Phi_{\mathrm{GS}}\rangle$, the four finite-volume
+identities are \texttt{hvlPlusState\_dotProduct\_self} ($\langle\Xi_+|\Xi_+\rangle=1$, the remark
+after eq.~(3.4.14)), \texttt{hvlPlusState\_order\_mean}
+($\langle\Xi_+|\hat O_L|\Xi_+\rangle=\sqrt{m_2}$, eq.~(3.4.15)),
+\texttt{hvlPlusState\_order\_second\_moment}
+($\langle\Xi_+|(\hat O_L)^2|\Xi_+\rangle=\tfrac12(m_2+m_4/m_2)$, eq.~(S.42)) and
+\texttt{hvlPlusState\_order\_variance} (eq.~(S.43) in the $L^d$-normalized form).  These are exact
+equalities at every finite volume: the source introduces no approximation here, and none is
+introduced in the formalization.  The capstone
+\texttt{tasaki\_problem\_3\_4\_b\_order\_fluctuation} collects the four identities for every
+$L\ge1$ and adds the elementary bounded-prefactor squeeze that turns (3.4.18) into the vanishing
+of the fluctuation, using the $L$-uniform lower bound $q_0>0$ of (3.4.3) to keep the prefactor
+$1/m_2$ bounded.  Assumption~(3.4.4) enters as
+$\langle\Phi_{\mathrm{GS}}|(\hat O_L)^k|\Phi_{\mathrm{GS}}\rangle=0$ for $k=1,3$, which for
+Hermitian $\hat O_L$ is equivalent to the vanishing of the (automatically real) odd moments; the
+third moment is genuinely needed, since it is carried by one diagonal term of~(3.4.15) and by both
+cross terms of~(S.42).  Every per-$L$ statement is guarded by $L\ge1$, because the normalization
+$L^d$ degenerates at $L=0$; a concrete family witnesses that the guarded hypothesis bundle is
+satisfiable.  \emph{Not asserted.}  The Hamiltonian never appears: neither the low-lying energy
+bound of the unnumbered sentence following~(3.4.14) (p.~68) nor the ground-state property of
+$\Phi_{\mathrm{GS}}$ is assumed, matching the published solution, which uses only Hermiticity,
+normalization and~(3.4.4).  Locality of $\hat O_L$ (eqs.~(3.4.1)--(3.4.2)) is not assumed either,
+so nothing here certifies a concrete model --- in particular neither that the quantum Ising model
+satisfies~(3.4.18) nor that the antiferromagnetic Heisenberg model fails it.  The informal notion
+of a physical ``ground state'' of p.~69 is not formalized; the book defers its precise formulation
+to §4.3.  Eq.~(3.4.16) $\langle\Xi_+|\hat O_L/L^d|\Xi_+\rangle\ge\sqrt{q_0}$, the Schwarz
+remark~(3.4.17) and the mirror state $\Xi_-$ are outside this development.
+
 \noindent\textbf{Theorem 4.1} (Dyson--Lieb--Simon / Neves--Perez / Kennedy--Lieb--Shastry, Tasaki
 §4.1, eq.~(4.1.7), pp.~88--90; \texttt{Quantum/SpinS/DysonLiebSimon.lean}, Issue \#4485).  Existence
 of N\'eel long-range order: for the antiferromagnetic Heisenberg model in dimension $d\ge3$ (any $S$)

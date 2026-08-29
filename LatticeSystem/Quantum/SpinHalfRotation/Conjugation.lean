@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinHalfRotation
+import LatticeSystem.Quantum.SpinS.RayleighInfMatrix
 
 /-!
 # SpinHalfRotation conjugation, exp form, coherent state, Hadamard
@@ -370,14 +371,6 @@ basis change that, with `Matrix.exp_units_conj`, would extend
 Problem 2.1.b to axes 1 and 2. -/
 noncomputable def hadamard : Matrix (Fin 2) (Fin 2) ℂ :=
   ((Real.sqrt 2 : ℂ)⁻¹) • !![1, 1; 1, -1]
-
-/-- `(√2)⁻¹ * (√2)⁻¹ = 1/2` in `ℂ`: the normalisation identity for the `(√2)⁻¹` prefactor,
-which is the only irrational input of the Hadamard and matrix-product evaluations. -/
-lemma sqrt2_inv_mul_sqrt2_inv :
-    ((Real.sqrt 2 : ℂ)⁻¹) * ((Real.sqrt 2 : ℂ)⁻¹) = (1 / 2 : ℂ) := by
-  rw [← mul_inv, ← Complex.ofReal_mul,
-    Real.mul_self_sqrt (by norm_num : (0:ℝ) ≤ 2)]
-  push_cast; ring
 
 /-- `W · W = 1` (the Hadamard matrix is its own inverse). -/
 theorem hadamard_mul_self : hadamard * hadamard = 1 := by

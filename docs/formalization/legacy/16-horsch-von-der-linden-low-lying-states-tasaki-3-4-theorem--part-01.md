@@ -117,6 +117,65 @@ scope). Tasaki §3.4, Theorem 3.1, eqs. (3.4.7)–(3.4.12), pp. 66–67.
 | `shastry_staggered_susceptibility_bound` | **Shastry susceptibility bound χ(k*)≤C·L** (§4.1, DOCUMENTED AXIOM; toward Corollary 4.3): for the zero-field 1D AFM Heisenberg ring on **even** `L ≥ 2` sites (`Even L`, bipartite) there is a size-uniform `C ≥ 0` with every normalized ground state admitting a potential `y` for `ÔΦ` (`(Ĥ−E₀)y=ÔΦ`) of `O(L)` static staggered susceptibility `Re⟨y,ÔΦ⟩ ≤ C·L` (physically `χ(k*)=L·f_L^(-1)(k*)`). Tasaki does **not** prove this in the book — footnote 3 (p. 76) cites Shastry [58] / the rigorous formulation of Tanaka–Takeda–Idogaki [63], and footnote 9 (p. 83) singles out the `f_L^(-1)(k*)` bound as the only "nontrivial part that requires some hard analysis". Per the project's explicit instruction this genuinely external hard-analysis estimate (massive-Green / inverse-Fourier `k*=π` control) based on Shastry J.Phys.A 25 L249 (1992) [58] and Tanaka–Takeda–Idogaki JMMM 272–276 908 (2004) [63] is a documented axiom; it discharges `no_long_range_order_1d` (PR #5003) | `Quantum/SpinS/NoLongRangeOrder1D.lean` |
 <!-- legacy-source:end:549:652 -->
 
+## Authoritative supplemental implementation record (Problem 3.4.b)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+declarations added after the migration baseline; it is not subject to the frozen byte-for-byte
+parity of the block above.
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4, Problem 3.4.b:
+statement p. 69 eq. (3.4.18), solution p. 501 eqs. (S.42)-(S.43), with the surrounding
+eqs. (3.4.1)-(3.4.4), (3.4.7) and (3.4.14)-(3.4.15), pp. 65-69.
+
+Problem 3.4.b asks to show that vanishing of the fourth-moment combination
+`⟨Φ_GS|(Ô_L/L^d)⁴|Φ_GS⟩ − (⟨Φ_GS|(Ô_L/L^d)²|Φ_GS⟩)²` as `L ↑ ∞` forces the fluctuation of
+`Ô_L/L^d` in the state `Ξ₊` to vanish. The state is **constructed** here rather than assumed:
+`hvlTrialState` is the Horsch-von der Linden trial state `|Γ⟩ = Ô_L|Φ_GS⟩ / ‖Ô_L|Φ_GS⟩‖`
+(eq. (3.4.7)) and `hvlPlusState` is `|Ξ₊⟩ = (1/√2)(|Φ_GS⟩ + |Γ⟩)` (eq. (3.4.14)). Writing
+`m₂ = ⟨Φ_GS|(Ô_L)²|Φ_GS⟩` and `m₄ = ⟨Φ_GS|(Ô_L)⁴|Φ_GS⟩`, the four finite-volume identities are
+exact equalities, not approximations: the source introduces no `≃` at this point, and none is
+introduced here.
+
+Assumption (3.4.4) enters as the complex equalities `⟨Φ_GS|(Ô_L)^k|Φ_GS⟩ = 0` for `k = 1, 3`,
+which for Hermitian `Ô_L` is equivalent to the vanishing of the (automatically real) odd moments.
+The third moment is load-bearing: it is carried by one diagonal term of (3.4.15) and by both
+cross terms of (S.42). Normalisation of `Φ_GS` is used only for `⟨Ξ₊|Ξ₊⟩ = 1`; the other three
+identities do not need it, since `rayleighOnVec` carries no denominator. Every per-`L` statement
+is guarded by `1 ≤ L`, because the normalisation `L^d` degenerates at `L = 0`; a concrete family
+in the regression fixtures witnesses that the guarded hypothesis bundle is satisfiable.
+
+The `L`-indexed family is typed abstractly (`n : ℕ → Type*` with a `Fintype` and a `DecidableEq`
+instance per `L`), matching the fact that the solution's algebra uses no lattice, locality or
+Hamiltonian structure.
+
+**What these declarations do not assert.** The Hamiltonian never appears: neither the low-lying
+energy bound of the unnumbered sentence following (3.4.14) (p. 68) nor the ground-state property of
+`Φ_GS` is assumed. Locality of `Ô_L` (eqs. (3.4.1)-(3.4.2)) is not assumed, so nothing here
+certifies a concrete model — in particular neither that the quantum Ising model satisfies (3.4.18)
+nor that the antiferromagnetic Heisenberg model fails it, the contrast Tasaki draws on p. 69. The
+informal notion of a physical "ground state" of p. 69 is not formalised; the book defers its
+precise formulation to §4.3. Eq. (3.4.16) `⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q₀`, the Schwarz remark (3.4.17) and
+the mirror state `Ξ₋` are outside this development. The `L ↑ ∞` statement is a limit of
+finite-volume real numbers, not a statement about a state on a quasi-local C\*-algebra.
+
+All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
+`Classical.choice`, `Quot.sound`.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `hvlTrialState` | the Horsch-von der Linden trial state `\|Γ⟩` of eq. (3.4.7): `Ô_L\|Φ_GS⟩` unit-normalised in the `L²` pairing | `Quantum/HorschVonderLindenProblem34b.lean` |
+| `hvlPlusState` | the state `\|Ξ₊⟩ = (1/√2)(\|Φ_GS⟩ + \|Γ⟩)` of eq. (3.4.14) | `Quantum/HorschVonderLindenProblem34b.lean` |
+| `hvlPlusState_dotProduct_self` | the remark after eq. (3.4.14): `⟨Ξ₊\|Ξ₊⟩ = 1`, from `⟨Γ\|Γ⟩ = 1` and the vanishing of `⟨Φ_GS\|Γ⟩` | `Quantum/HorschVonderLindenProblem34b.lean` |
+| `hvlPlusState_order_mean` | eq. (3.4.15): `⟨Ξ₊\|Ô_L\|Ξ₊⟩ = √m₂`, under the vanishing of the first and third odd moments | `Quantum/HorschVonderLindenProblem34b.lean` |
+| `hvlPlusState_order_second_moment` | eq. (S.42): `⟨Ξ₊\|(Ô_L)²\|Ξ₊⟩ = (1/2)(m₂ + m₄/m₂)`, under the vanishing of the third odd moment | `Quantum/HorschVonderLindenProblem34b.lean` |
+| `hvlPlusState_order_variance` | eq. (S.43) in the volume-normalised form: the variance of `Ô_L/V` in `Ξ₊` equals `(1/2)(m₄/V⁴ − (m₂/V²)²)/(m₂/V²)`, for any `V > 0` | `Quantum/HorschVonderLindenProblem34b.lean` |
+| `tasaki_problem_3_4_b_order_fluctuation` (**capstone**) | Problem 3.4.b: the four identities above at every `L ≥ 1`, plus the `L ↑ ∞` vanishing of the `Ô_L/L^d`-fluctuation in `Ξ₊` under (3.4.18), with the `L`-uniform bound `q₀ > 0` of (3.4.3) keeping the prefactor `1/m₂` bounded | `Quantum/HorschVonderLindenProblem34b.lean` |
+
+Regression fixtures live in `LatticeSystem/Tests/Problem34bFluctuation.lean`: each of the seven
+declarations above has a signature fixture restating it in full and discharging it by the
+declaration itself, together with two concrete numeric instances and one satisfiability witness
+for the capstone's hypothesis bundle.
+
 ---
 
 [← Generic matrix-analysis helpers (`Math/MatrixAnalysis/`)](/lattice-system/formalization/legacy/15-generic-matrix-analysis-helpers/) · [Catalogue](/lattice-system/formalization/legacy/) · [Horsch–von der Linden low-lying states (Tasaki §3.4, Theorem 3.1) →](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-02/)

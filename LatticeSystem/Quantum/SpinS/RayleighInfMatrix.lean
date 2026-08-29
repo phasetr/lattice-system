@@ -1,4 +1,5 @@
 import Mathlib.Analysis.InnerProductSpace.PiL2
+import Mathlib.LinearAlgebra.Matrix.DotProduct
 import Mathlib.Topology.Instances.Matrix
 
 /-!
@@ -18,6 +19,14 @@ The normalisation identity `star φ ⬝ᵥ φ = 1` for a unit `EuclideanSpace` v
 bridge between the `EuclideanSpace` norm and the `dotProduct` pairing in which
 every Rayleigh-style quantity of this repository is written, and is consumed
 by ground-state normalisation arguments across multiple chapters.
+
+The same reasoning places the `dotProduct`-level normalisation vocabulary here:
+the squared norm `vecNormSqRe`, the unit normalisation `unitNormalize`, its
+unit-norm identity `unitNormalize_dotProduct_self`, and the scalar identity
+`sqrt2_inv_mul_sqrt2_inv` for the `(√2)⁻¹` prefactor of an equal-weight
+two-term superposition.  They depend only on mathlib, and both `w/‖w‖` trial
+states and equal-weight superpositions occur in several chapters, so this
+shared base is their common ancestor.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, §2.5 Theorem 2.4, p. 43–44.
@@ -65,5 +74,40 @@ theorem rayleighOnVec_add_matrix (M N : Matrix n n ℂ) (ψ : n → ℂ) :
   unfold rayleighOnVec
   rw [Matrix.add_mulVec, dotProduct_add, Complex.add_re]
 
+
+/-- The squared `L²` norm of a vector, as a real number: `vecNormSqRe w = (⟨w, w⟩).re`.  Used as the
+positive denominator in Rayleigh quotients and as the well-definedness witness for normalization. -/
+noncomputable def vecNormSqRe {ι : Type*} [Fintype ι] (w : ι → ℂ) : ℝ :=
+  (star w ⬝ᵥ w).re
+
+/-- **Unit normalization** of a vector in the `L²` inner product: `unitNormalize w = ‖w‖⁻¹ • w`
+(with `‖w‖ = √⟨w, w⟩`, and `0` when `w = 0`). -/
+noncomputable def unitNormalize {ι : Type*} [Fintype ι] (w : ι → ℂ) : ι → ℂ :=
+  ((Real.sqrt (vecNormSqRe w) : ℝ) : ℂ)⁻¹ • w
+
+open scoped ComplexOrder in
+/-- **Unit normalization has unit norm**: `⟨w/‖w‖, w/‖w‖⟩ = 1` when `‖w‖² = vecNormSqRe w > 0`. -/
+theorem unitNormalize_dotProduct_self {ι : Type*} [Fintype ι] (w : ι → ℂ)
+    (hw : 0 < vecNormSqRe w) : star (unitNormalize w) ⬝ᵥ unitNormalize w = 1 := by
+  have him : (star w ⬝ᵥ w).im = 0 := ((Complex.le_def.mp (dotProduct_star_self_nonneg w)).2).symm
+  have hself : star w ⬝ᵥ w = ((vecNormSqRe w : ℝ) : ℂ) := by
+    apply Complex.ext
+    · rw [Complex.ofReal_re]; rfl
+    · rw [Complex.ofReal_im]; exact him
+  have hrc : ((Real.sqrt (vecNormSqRe w) : ℝ) : ℂ) ≠ 0 :=
+    by exact_mod_cast (Real.sqrt_pos.mpr hw).ne'
+  have hV : ((vecNormSqRe w : ℝ) : ℂ) = ((Real.sqrt (vecNormSqRe w) : ℝ) : ℂ) ^ 2 := by
+    rw [← Complex.ofReal_pow, Real.sq_sqrt hw.le]
+  rw [unitNormalize, star_smul, smul_dotProduct, dotProduct_smul, smul_eq_mul, smul_eq_mul, hself,
+    hV, Complex.star_def, map_inv₀, Complex.conj_ofReal]
+  field_simp
+
+/-- `(√2)⁻¹ * (√2)⁻¹ = 1/2` in `ℂ`: the normalisation identity for the `(√2)⁻¹` prefactor
+of an equal-weight two-term superposition. -/
+lemma sqrt2_inv_mul_sqrt2_inv :
+    ((Real.sqrt 2 : ℂ)⁻¹) * ((Real.sqrt 2 : ℂ)⁻¹) = (1 / 2 : ℂ) := by
+  rw [← mul_inv, ← Complex.ofReal_mul,
+    Real.mul_self_sqrt (by norm_num : (0:ℝ) ≤ 2)]
+  push_cast; ring
 
 end LatticeSystem.Quantum
