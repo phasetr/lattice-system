@@ -553,4 +553,56 @@ example (lam : ℝ) (hlam : 0 < lam) (kp km : ℕ → ℝ)
       Filter.atTop (nhds 1) :=
   tendsto_splitting_ratio lam hlam kp km hkp hkm
 
+/-! ## The capstone assembly (Tasaki Problem 3.3.a) -/
+
+/-- **Capstone signature pin.** `tasaki_problem_3_3_a_low_energy_spectrum` assembles the nine
+conjuncts pinned by the fixtures above: for every `N ≥ 1`, injectivity of `lowEnergyConfig`
+(conjunct 1); the low-energy matrix identity `lowEnergyMatrix = E_GS^(0) • 1 + tightBindingRing`
+(conjunct 2); the eigenvalue equation stated as the tight-binding recursion (conjunct 3); both
+parity ansätze being nonzero eigenvectors of `lowEnergyMatrix` at `tightBindingEnergy`
+(conjunct 4); and the symmetric root always giving a strictly lower `tightBindingEnergy` than the
+antisymmetric root (conjunct 5). Outside the `∀ N` block: `tightBindingEnergy lam (kappaInf lam)
+= (1 - Real.sqrt (1 + 4 * lam ^ 2)) / 2` (conjunct 6); existence of a positive symmetric root for
+every `N`, and, eventually in `N`, of a positive antisymmetric root (conjunct 7); the `N → ∞`
+limit of the ratio of the `tightBindingEnergy` gap between any eventually-positive antisymmetric
+and symmetric root families to `2 * Real.tanh (kappaInf lam) * Real.exp (-(kappaInf lam)) ^
+(N + 1)`, tending to `1` (conjunct 8); and the two `l ↓ 0` limits `Real.exp (-(kappaInf l)) / l →
+1` and `Real.tanh (kappaInf l) → 1` (conjunct 9). `tightBindingEnergy` is an eigenvalue of the
+compressed matrix `lowEnergyMatrix`, never identified here with the true Hamiltonian's
+ground-state or first-excited energy. -/
+example (lam : ℝ) (hlam : 0 < lam) :
+    (∀ N : ℕ, 1 ≤ N →
+        Function.Injective (lowEnergyConfig N)
+        ∧ lowEnergyMatrix N lam
+            = (-(N : ℂ) / 4) • (1 : Matrix (ZMod (2 * (N + 1))) (ZMod (2 * (N + 1))) ℂ)
+              + tightBindingRing N lam
+        ∧ (∀ (eps : ℝ) (phi : ZMod (2 * (N + 1)) → ℂ),
+            lowEnergyMatrix N lam *ᵥ phi = ((-(N : ℝ) / 4 + eps : ℝ) : ℂ) • phi ↔
+              ∀ j : ZMod (2 * (N + 1)),
+                (eps : ℂ) * phi j
+                  = -((lam : ℂ) / 2) * (phi (j - 1) + phi (j + 1)) + ringPotential N j * phi j)
+        ∧ (∀ kappa s : ℝ, 0 < kappa → (s = 1 ∨ s = -1) → rootEquation N lam kappa s →
+            lowEnergyAnsatz N kappa s ≠ 0
+              ∧ lowEnergyMatrix N lam *ᵥ lowEnergyAnsatz N kappa s
+                  = ((-(N : ℝ) / 4 + tightBindingEnergy lam kappa : ℝ) : ℂ)
+                    • lowEnergyAnsatz N kappa s)
+        ∧ (∀ kp km : ℝ, 0 < kp → 0 < km →
+            rootEquation N lam kp 1 → rootEquation N lam km (-1) →
+            tightBindingEnergy lam kp < tightBindingEnergy lam km))
+    ∧ tightBindingEnergy lam (kappaInf lam) = (1 - Real.sqrt (1 + 4 * lam ^ 2)) / 2
+    ∧ (∀ N : ℕ, ∃ kappa, 0 < kappa ∧ rootEquation N lam kappa 1)
+    ∧ (∀ᶠ N : ℕ in Filter.atTop, ∃ kappa, 0 < kappa ∧ rootEquation N lam kappa (-1))
+    ∧ (∀ kp km : ℕ → ℝ,
+        (∀ᶠ N in Filter.atTop, 0 < kp N ∧ rootEquation N lam (kp N) 1) →
+        (∀ᶠ N in Filter.atTop, 0 < km N ∧ rootEquation N lam (km N) (-1)) →
+        Filter.Tendsto
+          (fun N : ℕ => (tightBindingEnergy lam (km N) - tightBindingEnergy lam (kp N))
+            / (2 * Real.tanh (kappaInf lam) * Real.exp (-(kappaInf lam)) ^ (N + 1)))
+          Filter.atTop (nhds 1))
+    ∧ Filter.Tendsto (fun l : ℝ => Real.exp (-(kappaInf l)) / l)
+        (nhdsWithin 0 (Set.Ioi 0)) (nhds 1)
+    ∧ Filter.Tendsto (fun l : ℝ => Real.tanh (kappaInf l))
+        (nhdsWithin 0 (Set.Ioi 0)) (nhds 1) :=
+  tasaki_problem_3_3_a_low_energy_spectrum lam hlam
+
 end LatticeSystem.Tests.Problem33aLowEnergy
