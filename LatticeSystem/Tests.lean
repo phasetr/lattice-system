@@ -147,6 +147,7 @@ import LatticeSystem.Tests.Problem24bPhaseProjection
 import LatticeSystem.Tests.Problem24cCoherentExpansion
 import LatticeSystem.Tests.Problem24dGraphLaplacian
 import LatticeSystem.Tests.Problem33aLowEnergy
+import LatticeSystem.Tests.Problem34bFluctuation
 
 /-!
 # Test aggregator for the `lattice-system` library
