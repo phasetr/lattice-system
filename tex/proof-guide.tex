@@ -1444,6 +1444,91 @@ layer. \texttt{lake build} is warning-free on both roots and
 \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
 (axiom-free).
 
+\subsection{The infinite-chain decay rate \(\kappa_\infty\)
+(Tasaki Problem 3.3.a)}
+\label{subsec:ising-low-energy-kappa-infinity}
+
+\emph{Source file:}
+\texttt{LatticeSystem/Quantum/IsingLowEnergyProblem33aSpectrum.lean};
+regression fixtures in
+\texttt{LatticeSystem/Tests/Problem33aLowEnergy.lean}.
+
+\emph{Reference:} Tasaki~\cite{Tasaki:QMB}, Problem~3.3.a: statement
+p.~59, solution eq.~(S.35) on p.~500 and eq.~(S.39) on p.~501. The
+model is eq.~(3.3.1), p.~56, with open boundary conditions and the
+spin-$1/2$ convention $\hat\sigma^{(\alpha)} = 2\hat S^{(\alpha)}$ of
+§2.1, eqs.~(2.1.7)--(2.1.8), p.~15.
+
+Letting $L \uparrow \infty$ in the root equation (S.34) of
+§\ref{subsec:ising-low-energy-eigenvectors} sends its right-hand side
+to $\lambda^{-1}$, so the two parity sectors share one limiting decay
+rate $\kappa_\infty$.
+
+\begin{definition}[\texttt{kappaInf}]
+Eq.~(S.35) characterises the limiting decay rate by
+\[
+  e^{\kappa_\infty} - e^{-\kappa_\infty} = \lambda^{-1}.
+\]
+Its left-hand side is $2\sinh\kappa_\infty$, so
+\[
+  \texttt{kappaInf}\,\lambda
+  \;=\; \operatorname{arsinh}\!\left(\frac{1}{2\lambda}\right),
+\]
+and $\kappa_\infty > 0$ for $\lambda > 0$
+(\texttt{kappaInf\_pos}). Inverting
+$e^{\kappa_\infty} = \bigl(1 + \sqrt{1 + 4\lambda^2}\bigr)/(2\lambda)$
+gives the closed radical form
+$e^{-\kappa_\infty} = 2\lambda/\bigl(1 + \sqrt{1+4\lambda^2}\bigr)$
+(\texttt{exp\_neg\_kappaInf\_eq}).
+\end{definition}
+
+\begin{theorem}[\texttt{tightBindingEnergy\_kappaInf\_eq}]
+For $\lambda > 0$, the eigenvalue (S.31) evaluated at
+$\kappa_\infty$ is eq.~(S.39):
+\[
+  \varepsilon_\infty
+  \;=\; -\frac{\lambda}{2}
+        \left(e^{\kappa_\infty} + e^{-\kappa_\infty}\right)
+        + \frac{1}{2}
+  \;=\; -\frac{\sqrt{1 + 4\lambda^{2}}}{2} + \frac{1}{2} .
+\]
+\end{theorem}
+
+The radical $\sqrt{1+4\lambda^{2}}$ is present in the rendered source
+on p.~501. Only the middle equality above is asserted; the trailing
+$\simeq -\lambda^{2}$ of the printed (S.39) is a small-$\lambda$
+approximation.
+
+The same computation gives the ratio that eqs.~(S.40) and (S.41),
+p.~501, carry in front of $e^{-\kappa_\infty L}$,
+\[
+  \tanh \kappa_\infty
+  \;=\; \frac{e^{\kappa_\infty} - e^{-\kappa_\infty}}
+             {e^{\kappa_\infty} + e^{-\kappa_\infty}}
+  \;=\; \frac{1}{\sqrt{1 + 4\lambda^{2}}}
+\]
+(\texttt{tanh\_kappaInf\_eq}), together with the two small-$\lambda$
+replacements behind the final form
+$E_{1\mathrm{st}} - E_{\mathrm{GS}} \simeq 2\lambda^{L}$ of (S.41):
+$e^{-\kappa_\infty}/\lambda \to 1$, the limit form of the source's
+$e^{\kappa_\infty} \simeq \lambda^{-1}$ on p.~500, and
+$\tanh \kappa_\infty \to 1$, both as $\lambda \downarrow 0$
+(\texttt{tendsto\_exp\_neg\_kappaInf\_div\_atZero},
+\texttt{tendsto\_tanh\_kappaInf\_atZero}).
+
+\paragraph{Scope.}
+As in §\ref{subsec:ising-low-energy-eigenvectors}, $\hat H$ does not
+preserve the span of the $2L$ configurations, so $\varepsilon_\infty$
+is the $L \uparrow \infty$ value of an eigenvalue of the compression
+and is not identified with a ground-state or first-excited energy of
+$\hat H$; the source's non-rigorous Taylor steps (S.36)--(S.38) are not
+asserted. The existence of the two finite-$L$ roots, the sign of the
+splitting (S.40) and the asymptotics (S.41) are not part of this layer.
+\texttt{lake build} is warning-free on both roots and
+\texttt{\#print axioms} on each new declaration yields only
+\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
+(axiom-free).
+
 \subsection{Gibbs state instantiation}
 \label{subsec:ising-gibbs}
 

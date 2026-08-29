@@ -149,6 +149,50 @@ pins `φ_L = s φ_0`, and the numeric fixtures at `L = 2`, `κ = log 2` pin the 
 `5/4, 1, 5/4` (symmetric) and `3/4, 0, -3/4` (antisymmetric) on the labels `0, 1, 2` together
 with the second-branch value at the label `3`.
 
+## Authoritative supplemental implementation record (Problem 3.3.a infinite-chain decay rate)
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+a new capstone added after the migration baseline (PR #5389); it is not subject to the frozen
+byte-for-byte parity of the block above.
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Problem 3.3.a
+(statement p. 59; solution: eq. (S.35) on p. 500, eq. (S.39) on p. 501), for the model of
+eq. (3.3.1), p. 56, with open boundary conditions and the spin-`1/2` convention `σ̂ = 2Ŝ` of §2.1,
+eqs. (2.1.7)-(2.1.8), p. 15.
+
+Letting `L ↑ ∞` in the root equation (S.34) of the previous section sends its right-hand side to
+`λ^-1`, so the two parity sectors share one limiting decay rate `κ∞`, characterised by (S.35) as
+`e^κ∞ - e^-κ∞ = λ^-1`. Since the left-hand side is `2 sinh κ∞`, the solution is
+`arsinh (1 / (2λ))`, and substituting it into the eigenvalue (S.31) gives the middle equality of
+(S.39), `ε∞ = -(λ/2)(e^κ∞ + e^-κ∞) + 1/2 = -√(1 + 4λ²)/2 + 1/2`. The radical `√(1 + 4λ²)` is
+present in the rendered source on p. 501.
+
+The trailing `≃ -λ²` of (S.39) is a small-`λ` approximation and is not asserted. The two limits
+recorded below are the small-`λ` replacements `e^-κ∞ ≃ λ` (p. 500, below (S.35)) and
+`tanh κ∞ ≃ 1` behind the final form `E_1st - E_GS ≃ 2 λ^L` of (S.41).
+
+These remain **eigenvalues of the compression, not energies**: `Ĥ` does not preserve the span of
+the `2L` configurations, so `ε∞` is the `L ↑ ∞` value of an eigenvalue of `lowEnergyMatrix` and is
+not identified with a ground-state or first-excited energy of `Ĥ`; the source's non-rigorous
+Taylor steps (S.36)-(S.38) are not asserted. Tasaki notes on p. 59 that the analysis of this
+problem is not mathematically rigorous.
+
+Every declaration below is **PROVED**; `#print axioms` on each yields only `propext`,
+`Classical.choice`, `Quot.sound`.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `kappaInf`, `kappaInf_pos` | the `L ↑ ∞` decay rate of Tasaki eq. (S.35), `arsinh (1 / (2λ))`, and its positivity for `0 < λ` | `Quantum/IsingLowEnergyProblem33aSpectrum.lean` |
+| `exp_kappaInf_sub_exp_neg` | Tasaki eq. (S.35) itself: `e^κ∞ - e^-κ∞ = λ^-1` for `0 < λ` | `Quantum/IsingLowEnergyProblem33aSpectrum.lean` |
+| `exp_neg_kappaInf_eq` | the closed radical form `e^-κ∞ = 2λ / (1 + √(1 + 4λ²))`, the reciprocal of `e^κ∞ = (1 + √(1 + 4λ²)) / (2λ)` | `Quantum/IsingLowEnergyProblem33aSpectrum.lean` |
+| `tightBindingEnergy_kappaInf_eq` | **capstone of PR #5389**: the middle equality of Tasaki eq. (S.39), `ε∞ = -(λ/2)(e^κ∞ + e^-κ∞) + 1/2 = (1 - √(1 + 4λ²))/2` for `0 < λ` | `Quantum/IsingLowEnergyProblem33aSpectrum.lean` |
+| `tanh_kappaInf_eq` | `tanh κ∞ = 1/√(1 + 4λ²)`, the ratio `(e^κ∞ - e^-κ∞)/(e^κ∞ + e^-κ∞)` carried by Tasaki eqs. (S.40) and (S.41) | `Quantum/IsingLowEnergyProblem33aSpectrum.lean` |
+| `tendsto_exp_neg_kappaInf_div_atZero`, `tendsto_tanh_kappaInf_atZero` | the two small-`λ` replacements behind the final form of Tasaki eq. (S.41): `e^-κ∞ / λ → 1` and `tanh κ∞ → 1` as `λ ↓ 0` | `Quantum/IsingLowEnergyProblem33aSpectrum.lean` |
+
+Regression fixtures live in `LatticeSystem/Tests/Problem33aLowEnergy.lean`: the value fixture at
+`λ = 1/2` pins `ε∞ = (1 - √2)/2` from the middle equality of (S.39), and the companion fixture
+pins the prefactor `2 tanh κ∞ = √2` of (S.41) at the same `λ`.
+
 ---
 
 [← Two-site spin inner product (Tasaki §2.2 eq. (2.2.16))](/lattice-system/formalization/legacy/21-two-site-spin-inner-product-tasaki-2-2-eq-2-2-16/) · [Catalogue](/lattice-system/formalization/legacy/) · [Testing infrastructure →](/lattice-system/formalization/legacy/23-testing-infrastructure/)
