@@ -1643,6 +1643,125 @@ this layer. \texttt{lake build} is warning-free on both roots and
 \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
 (axiom-free).
 
+\subsection{The splitting limit (S.41) (Tasaki Problem 3.3.a)}
+\label{subsec:ising-low-energy-splitting}
+
+\emph{Source file:}
+\texttt{LatticeSystem/Quantum/IsingLowEnergyProblem33aSplitting.lean};
+regression fixtures in
+\texttt{LatticeSystem/Tests/Problem33aLowEnergy.lean}.
+
+\emph{Reference:} Tasaki~\cite{Tasaki:QMB}, Problem~3.3.a: statement
+p.~59, solution eqs.~(S.34)--(S.38) and footnote~1 on p.~500,
+eqs.~(S.39)--(S.41) on p.~501. The model is eq.~(3.3.1), p.~56, with
+open boundary conditions.
+
+Writing $\kappa = \kappa_\infty + \delta$, the source expands the root
+equation (S.34) and obtains, with (S.36)
+$e^{\kappa_\infty+\delta} - e^{-\kappa_\infty-\delta}
+ \simeq \lambda^{-1}(1 \pm 2 e^{-\kappa_\infty L})$ and then, "expanding
+the left-hand side in $\delta$ to the lowest order", (S.37)
+\[
+  \delta \;\simeq\; \pm \lambda^{-1}\,
+    \frac{2\,e^{-\kappa_\infty L}}
+         {e^{\kappa_\infty} + e^{-\kappa_\infty}},
+\]
+whence (S.38) and (S.40),
+$\varepsilon_\pm \simeq \varepsilon_\infty
+ \mp [(e^{\kappa_\infty} - e^{-\kappa_\infty})/
+      (e^{\kappa_\infty} + e^{-\kappa_\infty})] e^{-\kappa_\infty L}$,
+and finally (S.41),
+\[
+  E_{\mathrm{1st}} - E_{\mathrm{GS}}
+  \;=\; \varepsilon_- - \varepsilon_+
+  \;\simeq\; 2\,\frac{e^{\kappa_\infty} - e^{-\kappa_\infty}}
+                     {e^{\kappa_\infty} + e^{-\kappa_\infty}}\,
+             e^{-\kappa_\infty L}
+  \;\simeq\; 2\,\lambda^{L}.
+\]
+None of these $\simeq$ is asserted. This subsection asserts the middle
+expression of (S.41) as an exact limit, its prefactor being
+$\tanh\kappa_\infty$.
+
+\begin{theorem}[\texttt{root\_symmetric\_gt\_kappaInf},
+\texttt{eventually\_root\_antisymmetric\_mem\_Ico}]
+Every $\kappa > 0$ solving the symmetric ($s = 1$) form of (S.34)
+satisfies $\kappa_\infty < \kappa$, at every ring size. For every
+$\lambda > 0$ and every sufficiently large ring size, every $\kappa > 0$
+solving the antisymmetric ($s = -1$) form satisfies
+$\operatorname{arsinh}(3/(8\lambda)) \le \kappa < \kappa_\infty$.
+\end{theorem}
+
+Both bounds come from the cleared equation of
+§\ref{subsec:ising-low-energy-roots}, which gives
+$\texttt{hop}\,\lambda\,\kappa = (1 + w)/(1 - w) > 1$ in the symmetric
+and $(1 - w)/(1 + w) < 1$ in the antisymmetric sector, with
+$w = e^{-\kappa L}$; the value of $\texttt{hop}\,\lambda\,\cdot$ at
+$\kappa_\infty$ is $1$ by (S.35), and it is strictly increasing. The
+lower bound splits on $w$ at $1/8$: for $w \le 1/8$ the same equation
+gives $\texttt{hop}\,\lambda\,\kappa \ge (7/8)/(9/8) \ge 3/4
+= \texttt{hop}\,\lambda\,(\operatorname{arsinh}(3/(8\lambda)))$, while
+$w > 1/8$ forces $\kappa L < 7$ and hence
+$L < 32\lambda e^{\kappa_\infty}$, which the ring size eventually
+exceeds. This localization is what replaces the source's "$L \gg 1$".
+
+\begin{theorem}[\texttt{tendsto\_splitting\_ratio}]
+Let $\lambda > 0$ and let $\kappa_+(N)$, $\kappa_-(N)$ be, for all
+sufficiently large $N$, positive solutions of the symmetric resp.\
+antisymmetric form of (S.34) at ring size $N$. Then
+\[
+  \lim_{N \to \infty}
+  \frac{\varepsilon_-(N) - \varepsilon_+(N)}
+       {2 \tanh(\kappa_\infty)\,
+        \left(e^{-\kappa_\infty}\right)^{N+1}}
+  \;=\; 1,
+\]
+where $\varepsilon_\pm(N) =
+\texttt{tightBindingEnergy}\,\lambda\,\kappa_\pm(N)$.
+\end{theorem}
+
+The Taylor step (S.36)--(S.38) is replaced by the exact identity
+\[
+  \varepsilon(\kappa_-) - \varepsilon(\kappa_+)
+  \;=\; \tanh\!\left(\frac{\kappa_+ + \kappa_-}{2}\right)
+        \frac{\texttt{hop}\,\lambda\,\kappa_+
+              - \texttt{hop}\,\lambda\,\kappa_-}{2},
+\]
+valid at all arguments, together with the exact consequence
+$s\,(\texttt{hop}\,\lambda\,\kappa - 1)
+ = e^{-\kappa L}\,(1 + \texttt{hop}\,\lambda\,\kappa)$ of the cleared
+equation. The localization above yields
+$|\kappa - \kappa_\infty| \le (4/\lambda)\,e^{-aL}$ with
+$a = \operatorname{arsinh}(3/(8\lambda)) > 0$, so
+$L\,|\kappa - \kappa_\infty| \to 0$ and hence
+$e^{-\kappa L}/e^{-\kappa_\infty L} \to 1$; the two factors of the
+identity then converge to $\tanh\kappa_\infty$ and to $4$.
+
+\paragraph{Scope.}
+The limit is taken at fixed $\lambda$ with the ring size growing, which
+is the order of limits of the source's footnote~1 on p.~500. The final
+step $\simeq 2\lambda^{L}$ of (S.41) is not asserted here: its two
+small-$\lambda$ replacements,
+\texttt{tendsto\_exp\_neg\_kappaInf\_div\_atZero} and
+\texttt{tendsto\_tanh\_kappaInf\_atZero} of
+§\ref{subsec:ising-low-energy-kappa-infinity}, are limits in $\lambda$ at
+no fixed ring size and are not combined with the
+$L \uparrow \infty$ limit above. Uniqueness of the root in either sector is neither proved nor
+used --- the limit quantifies over arbitrary families of positive
+roots. As in §\ref{subsec:ising-low-energy-roots}, $\hat H$ does not
+preserve the span of the $2L$ configurations, so the difference above is
+a difference of eigenvalues of the compression and is not identified
+with $E_{\mathrm{1st}} - E_{\mathrm{GS}}$ of $\hat H$; the label ring is
+a ring of basis labels, not of lattice sites, and the chain stays open.
+The declarations \texttt{hop}, \texttt{hop\_strictMono} and
+\texttt{hop\_kappaInf\_eq\_one} of
+\texttt{IsingLowEnergyProblem33aRoots.lean} are public, so that the
+splitting layer consumes them from their single defining site.
+\texttt{lake build} is warning-free on both roots and
+\texttt{\#print axioms} on each new declaration yields only
+\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
+(axiom-free).
+
 \subsection{Gibbs state instantiation}
 \label{subsec:ising-gibbs}
 
