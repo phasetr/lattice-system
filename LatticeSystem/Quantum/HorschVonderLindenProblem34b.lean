@@ -281,4 +281,102 @@ theorem hvlPlusState_order_variance {n : Type*} [Fintype n] [DecidableEq n] (O :
   field_simp
   ring
 
+/-! ### The vanishing of the fluctuation -/
+
+/-- Scalar squeeze: if the second moments stay above a positive constant `q₀` for `L ≥ 1` and the
+fourth-moment combination tends to `0`, then so does the ratio appearing in eq. (S.43). -/
+private theorem tendsto_variance_ratio_of_tendsto_sub {q₀ : ℝ} (hq₀ : 0 < q₀) (M2 M4 : ℕ → ℝ)
+    (hM2 : ∀ L : ℕ, 1 ≤ L → q₀ ≤ M2 L)
+    (hsub : Filter.Tendsto (fun L : ℕ => M4 L - (M2 L) ^ 2) Filter.atTop (nhds 0)) :
+    Filter.Tendsto (fun L : ℕ => 1 / 2 * (M4 L - (M2 L) ^ 2) / M2 L) Filter.atTop (nhds 0) := by
+  refine squeeze_zero_norm' (a := fun L : ℕ => |M4 L - (M2 L) ^ 2| / (2 * q₀)) ?_ ?_
+  · filter_upwards [Filter.eventually_ge_atTop 1] with L hL
+    have hpos : 0 < M2 L := lt_of_lt_of_le hq₀ (hM2 L hL)
+    have hrw : 1 / 2 * (M4 L - (M2 L) ^ 2) / M2 L
+        = (M4 L - (M2 L) ^ 2) / (2 * M2 L) := by ring
+    rw [Real.norm_eq_abs, hrw, abs_div, abs_of_pos (by positivity : (0 : ℝ) < 2 * M2 L)]
+    exact div_le_div_of_nonneg_left (abs_nonneg _) (by linarith) (by linarith [hM2 L hL])
+  · simpa using (hsub.abs).div_const (2 * q₀)
+
+/-- **Tasaki Problem 3.4.b** (statement p. 69 eq. (3.4.18), solution p. 501 eqs. (S.42)–(S.43)).
+For an `L`-indexed family of finite-dimensional spaces carrying Hermitian order operators `Ô_L`
+and normalised reference vectors `|Φ_GS⟩` whose first and third moments vanish (3.4.4), and whose
+normalised second moment stays above an `L`-independent `q₀ > 0` (3.4.3), the constructed states
+`|Ξ₊⟩ = (1/√2)(|Φ_GS⟩ + Ô_L|Φ_GS⟩/‖Ô_L|Φ_GS⟩‖)` satisfy, at every `L ≥ 1`, the normalisation
+`⟨Ξ₊|Ξ₊⟩ = 1` (3.4.14), the order-parameter identity (3.4.15), the second-moment identity (S.42)
+and the fluctuation identity (S.43); and, assuming (3.4.18), the fluctuation of `Ô_L/L^d` in
+`|Ξ₊⟩` tends to `0` as `L ↑ ∞`.
+
+The Hamiltonian never appears: the low-lying energy bound of (3.4.14) and the ground-state
+property of `|Φ_GS⟩` are not assumed, matching the published solution, which derives (S.42)/(S.43)
+from Hermiticity, normalisation and (3.4.4) alone.  The informal conclusion that `|Ξ₊⟩` "can be
+regarded as a physical ground state" is not formalised here; the source itself defers its precise
+formulation to §4.3. -/
+theorem tasaki_problem_3_4_b_order_fluctuation {n : ℕ → Type*} [∀ L, Fintype (n L)]
+    [∀ L, DecidableEq (n L)] (d : ℕ) {q₀ : ℝ} (hq₀ : 0 < q₀)
+    (O : (L : ℕ) → Matrix (n L) (n L) ℂ) (Φ : (L : ℕ) → n L → ℂ)
+    (hHerm : ∀ L, (O L).IsHermitian)
+    (hΦ : ∀ L, star (Φ L) ⬝ᵥ Φ L = 1)
+    (hodd1 : ∀ L, star (Φ L) ⬝ᵥ (O L) *ᵥ Φ L = 0)
+    (hodd3 : ∀ L, star (Φ L) ⬝ᵥ ((O L) ^ 3) *ᵥ Φ L = 0)
+    (hLRO : ∀ L : ℕ, 1 ≤ L → q₀ ≤ rayleighOnVec ((O L) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2)
+    (hFourth : Filter.Tendsto
+      (fun L : ℕ => rayleighOnVec ((O L) ^ 4) (Φ L) / ((L : ℝ) ^ d) ^ 4
+        - (rayleighOnVec ((O L) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2) ^ 2)
+      Filter.atTop (nhds 0)) :
+    (∀ L : ℕ, 1 ≤ L →
+        star (hvlPlusState (O L) (Φ L)) ⬝ᵥ hvlPlusState (O L) (Φ L) = 1
+      ∧ rayleighOnVec (O L) (hvlPlusState (O L) (Φ L)) / (L : ℝ) ^ d
+          = Real.sqrt (rayleighOnVec ((O L) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2)
+      ∧ rayleighOnVec ((O L) ^ 2) (hvlPlusState (O L) (Φ L)) / ((L : ℝ) ^ d) ^ 2
+          = 1 / 2 * (rayleighOnVec ((O L) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2
+              + rayleighOnVec ((O L) ^ 4) (Φ L) / ((L : ℝ) ^ d) ^ 4
+                / (rayleighOnVec ((O L) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2))
+      ∧ rayleighOnVec ((O L) ^ 2) (hvlPlusState (O L) (Φ L)) / ((L : ℝ) ^ d) ^ 2
+          - (rayleighOnVec (O L) (hvlPlusState (O L) (Φ L)) / (L : ℝ) ^ d) ^ 2
+          = 1 / 2 * (rayleighOnVec ((O L) ^ 4) (Φ L) / ((L : ℝ) ^ d) ^ 4
+              - (rayleighOnVec ((O L) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2) ^ 2)
+            / (rayleighOnVec ((O L) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2))
+    ∧ Filter.Tendsto
+        (fun L : ℕ =>
+          rayleighOnVec ((O L) ^ 2) (hvlPlusState (O L) (Φ L)) / ((L : ℝ) ^ d) ^ 2
+            - (rayleighOnVec (O L) (hvlPlusState (O L) (Φ L)) / (L : ℝ) ^ d) ^ 2)
+        Filter.atTop (nhds 0) := by
+  have hmain : ∀ L : ℕ, 1 ≤ L →
+      star (hvlPlusState (O L) (Φ L)) ⬝ᵥ hvlPlusState (O L) (Φ L) = 1
+    ∧ rayleighOnVec (O L) (hvlPlusState (O L) (Φ L)) / (L : ℝ) ^ d
+        = Real.sqrt (rayleighOnVec ((O L) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2)
+    ∧ rayleighOnVec ((O L) ^ 2) (hvlPlusState (O L) (Φ L)) / ((L : ℝ) ^ d) ^ 2
+        = 1 / 2 * (rayleighOnVec ((O L) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2
+            + rayleighOnVec ((O L) ^ 4) (Φ L) / ((L : ℝ) ^ d) ^ 4
+              / (rayleighOnVec ((O L) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2))
+    ∧ rayleighOnVec ((O L) ^ 2) (hvlPlusState (O L) (Φ L)) / ((L : ℝ) ^ d) ^ 2
+        - (rayleighOnVec (O L) (hvlPlusState (O L) (Φ L)) / (L : ℝ) ^ d) ^ 2
+        = 1 / 2 * (rayleighOnVec ((O L) ^ 4) (Φ L) / ((L : ℝ) ^ d) ^ 4
+            - (rayleighOnVec ((O L) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2) ^ 2)
+          / (rayleighOnVec ((O L) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2) := by
+    intro L hL
+    have hV : (0 : ℝ) < (L : ℝ) ^ d := pow_pos (by exact_mod_cast hL) d
+    have hm2 : 0 < rayleighOnVec ((O L) ^ 2) (Φ L) := by
+      have hq : 0 < rayleighOnVec ((O L) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2 :=
+        lt_of_lt_of_le hq₀ (hLRO L hL)
+      have hid : rayleighOnVec ((O L) ^ 2) (Φ L)
+          = rayleighOnVec ((O L) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2 * ((L : ℝ) ^ d) ^ 2 := by
+        field_simp
+      rw [hid]
+      exact mul_pos hq (by positivity)
+    refine ⟨hvlPlusState_dotProduct_self (O L) (Φ L) (hHerm L) (hΦ L) (hodd1 L) hm2, ?_, ?_,
+      hvlPlusState_order_variance (O L) (Φ L) ((L : ℝ) ^ d) (hHerm L) (hodd1 L) (hodd3 L) hm2 hV⟩
+    · rw [hvlPlusState_order_mean (O L) (Φ L) (hHerm L) (hodd1 L) (hodd3 L) hm2,
+        Real.sqrt_div' _ (by positivity), Real.sqrt_sq hV.le]
+    · rw [hvlPlusState_order_second_moment (O L) (Φ L) (hHerm L) (hodd3 L) hm2]
+      field_simp
+  refine ⟨hmain, ?_⟩
+  refine Filter.Tendsto.congr' ?_
+    (tendsto_variance_ratio_of_tendsto_sub hq₀
+      (fun L : ℕ => rayleighOnVec ((O L) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2)
+      (fun L : ℕ => rayleighOnVec ((O L) ^ 4) (Φ L) / ((L : ℝ) ^ d) ^ 4) hLRO hFourth)
+  filter_upwards [Filter.eventually_ge_atTop 1] with L hL
+  exact ((hmain L hL).2.2.2).symm
+
 end LatticeSystem.Quantum

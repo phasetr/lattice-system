@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.HorschVonderLinden
+import LatticeSystem.Quantum.HorschVonderLindenProblem34b
 
 /-!
 # Test coverage for Tasaki Problem 3.4.b — order fluctuation in `Ξ₊`
@@ -59,12 +59,14 @@ open Matrix
 
 /-- **Signature pin (D1, the trial state).** `hvlTrialState` is Tasaki's `|Γ⟩`, eq. (3.4.7):
 the Hermitian image `O *ᵥ Φ` unit-normalized in the `L²` inner product. -/
-example {n : Type*} [Fintype n] [DecidableEq n] (O : Matrix n n ℂ) (Φ : n → ℂ) : n → ℂ :=
+noncomputable example {n : Type*} [Fintype n] [DecidableEq n] (O : Matrix n n ℂ) (Φ : n → ℂ) :
+    n → ℂ :=
   hvlTrialState O Φ
 
 /-- **Signature pin (D2, the state `Ξ₊`).** `hvlPlusState` is Tasaki's `|Ξ₊⟩`, eq. (3.4.14):
 `(1/√2)(Φ + Γ)` where `Γ = hvlTrialState O Φ`. -/
-example {n : Type*} [Fintype n] [DecidableEq n] (O : Matrix n n ℂ) (Φ : n → ℂ) : n → ℂ :=
+noncomputable example {n : Type*} [Fintype n] [DecidableEq n] (O : Matrix n n ℂ) (Φ : n → ℂ) :
+    n → ℂ :=
   hvlPlusState O Φ
 
 /-- **Signature pin (L6, normalization).** `hvlPlusState_dotProduct_self` gives Tasaki's remark
@@ -77,34 +79,37 @@ example {n : Type*} [Fintype n] [DecidableEq n] (O : Matrix n n ℂ) (Φ : n →
   hvlPlusState_dotProduct_self O Φ hHerm hΦ hodd1 hm2
 
 /-- **Signature pin (L8, the mean).** `hvlPlusState_order_mean` gives Tasaki eq. (3.4.15),
-`⟨Ξ₊|Ô|Ξ₊⟩ = √(⟨Φ_GS|Ô²|Φ_GS⟩)`, under the same hypotheses as L6. -/
+`⟨Ξ₊|Ô|Ξ₊⟩ = √(⟨Φ_GS|Ô²|Φ_GS⟩)`, under Hermiticity of `O` and the vanishing of the first and
+third odd moments of `Φ` (both diagonal terms of the expansion carry an odd moment), together
+with positivity of the second moment. -/
 example {n : Type*} [Fintype n] [DecidableEq n] (O : Matrix n n ℂ) (Φ : n → ℂ)
-    (hHerm : O.IsHermitian) (hΦ : star Φ ⬝ᵥ Φ = 1) (hodd1 : star Φ ⬝ᵥ (O *ᵥ Φ) = 0)
-    (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) :
+    (hHerm : O.IsHermitian) (hodd1 : star Φ ⬝ᵥ (O *ᵥ Φ) = 0)
+    (hodd3 : star Φ ⬝ᵥ ((O ^ 3) *ᵥ Φ) = 0) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) :
     rayleighOnVec O (hvlPlusState O Φ) = Real.sqrt (rayleighOnVec (O ^ 2) Φ) :=
-  hvlPlusState_order_mean O Φ hHerm hΦ hodd1 hm2
+  hvlPlusState_order_mean O Φ hHerm hodd1 hodd3 hm2
 
 /-- **Signature pin (L9, the second moment).** `hvlPlusState_order_second_moment` gives Tasaki
-eq. (S.42), `⟨Ξ₊|Ô²|Ξ₊⟩ = (1/2){m₂ + m₄/m₂}`, additionally under the third odd-moment vanishing of
-`Φ` (needed for the `Ô⁴`-sandwiched cross terms). -/
+eq. (S.42), `⟨Ξ₊|Ô²|Ξ₊⟩ = (1/2){m₂ + m₄/m₂}`, under Hermiticity of `O`, the third odd-moment
+vanishing of `Φ` (the two cross terms of the `Ô²`-sandwich carry the third moment) and positivity
+of the second moment. -/
 example {n : Type*} [Fintype n] [DecidableEq n] (O : Matrix n n ℂ) (Φ : n → ℂ)
-    (hHerm : O.IsHermitian) (hΦ : star Φ ⬝ᵥ Φ = 1) (hodd1 : star Φ ⬝ᵥ (O *ᵥ Φ) = 0)
+    (hHerm : O.IsHermitian)
     (hodd3 : star Φ ⬝ᵥ ((O ^ 3) *ᵥ Φ) = 0) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) :
     rayleighOnVec (O ^ 2) (hvlPlusState O Φ)
       = 1 / 2 * (rayleighOnVec (O ^ 2) Φ + rayleighOnVec (O ^ 4) Φ / rayleighOnVec (O ^ 2) Φ) :=
-  hvlPlusState_order_second_moment O Φ hHerm hΦ hodd1 hodd3 hm2
+  hvlPlusState_order_second_moment O Φ hHerm hodd3 hm2
 
 /-- **Signature pin (L10, the fluctuation identity).** `hvlPlusState_order_variance` gives Tasaki
 eq. (S.43), the `L^d`-normalized fourth-moment identity for the `Ô_L`-variance in `Ξ₊`, for any
 positive volume factor `V`. -/
 example {n : Type*} [Fintype n] [DecidableEq n] (O : Matrix n n ℂ) (Φ : n → ℂ) (V : ℝ)
-    (hHerm : O.IsHermitian) (hΦ : star Φ ⬝ᵥ Φ = 1) (hodd1 : star Φ ⬝ᵥ (O *ᵥ Φ) = 0)
+    (hHerm : O.IsHermitian) (hodd1 : star Φ ⬝ᵥ (O *ᵥ Φ) = 0)
     (hodd3 : star Φ ⬝ᵥ ((O ^ 3) *ᵥ Φ) = 0) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) (hV : 0 < V) :
     rayleighOnVec (O ^ 2) (hvlPlusState O Φ) / V ^ 2
         - (rayleighOnVec O (hvlPlusState O Φ) / V) ^ 2
       = 1 / 2 * (rayleighOnVec (O ^ 4) Φ / V ^ 4 - (rayleighOnVec (O ^ 2) Φ / V ^ 2) ^ 2)
           / (rayleighOnVec (O ^ 2) Φ / V ^ 2) :=
-  hvlPlusState_order_variance O Φ V hHerm hΦ hodd1 hodd3 hm2 hV
+  hvlPlusState_order_variance O Φ V hHerm hodd1 hodd3 hm2 hV
 
 /-- **Signature pin (capstone).** `tasaki_problem_3_4_b_order_fluctuation` assembles, for every
 `L ≥ 1`, the four conjuncts pinned above (normalization, (3.4.15), (S.42), (S.43)) plus, as the
@@ -197,8 +202,17 @@ expansion (S.42)/(S.43) is *not* exercised here since `m₂ = m₄ = 1` makes ev
 expansion (correct or not) coincide numerically — see the module doc comment. -/
 example : rayleighOnVec fixtureAMatrix (hvlPlusState fixtureAMatrix fixtureAVector) = 1 := by
   simpa [fixtureA_raySq] using
-    hvlPlusState_order_mean fixtureAMatrix fixtureAVector fixtureA_herm fixtureA_norm
-      fixtureA_odd1 fixtureA_m2pos
+    hvlPlusState_order_mean fixtureAMatrix fixtureAVector fixtureA_herm fixtureA_odd1
+      fixtureA_odd3 fixtureA_m2pos
+
+/-- **Fixture A, second moment (S.42).** With the same data, `⟨Ξ₊|Ô²|Ξ₊⟩ = 1`.  Since
+`m₂ = m₄ = 1` here, this value agrees with several wrong variants of the expansion and therefore
+pins only that the identity evaluates, not its shape; Fixture B supplies the discriminating
+instance. -/
+example : rayleighOnVec (fixtureAMatrix ^ 2) (hvlPlusState fixtureAMatrix fixtureAVector) = 1 := by
+  rw [hvlPlusState_order_second_moment fixtureAMatrix fixtureAVector fixtureA_herm fixtureA_odd3
+      fixtureA_m2pos, fixtureA_raySq, fixtureA_ray4]
+  norm_num
 
 /-! ## Fixture B: `diagonal ![1,-1,2,-2]`, moment expansion -/
 
@@ -252,22 +266,27 @@ numerically distinct from every wrong variant identified in the design (dropped 
 unnormalized `Ξ₊` → `59/10`). -/
 example : rayleighOnVec (fixtureBMatrix ^ 2) (hvlPlusState fixtureBMatrix fixtureBVector)
     = 59 / 20 := by
-  simpa [fixtureB_raySq, fixtureB_ray4] using
-    hvlPlusState_order_second_moment fixtureBMatrix fixtureBVector fixtureB_herm fixtureB_norm
-      fixtureB_odd1 fixtureB_odd3 fixtureB_m2pos
+  rw [hvlPlusState_order_second_moment fixtureBMatrix fixtureBVector fixtureB_herm fixtureB_odd3
+      fixtureB_m2pos, fixtureB_raySq, fixtureB_ray4]
+  norm_num
+
+/-- **Fixture B, normalization (3.4.14).** With the same data, `⟨Ξ₊|Ξ₊⟩ = 1`. -/
+example : star (hvlPlusState fixtureBMatrix fixtureBVector)
+    ⬝ᵥ hvlPlusState fixtureBMatrix fixtureBVector = 1 :=
+  hvlPlusState_dotProduct_self fixtureBMatrix fixtureBVector fixtureB_herm fixtureB_norm
+    fixtureB_odd1 fixtureB_m2pos
 
 /-- **Fixture B, variance (S.43).** With the same data, the `Ô`-variance in `Ξ₊` is `9/20`. -/
 example :
     rayleighOnVec (fixtureBMatrix ^ 2) (hvlPlusState fixtureBMatrix fixtureBVector)
       - (rayleighOnVec fixtureBMatrix (hvlPlusState fixtureBMatrix fixtureBVector)) ^ 2
         = 9 / 20 := by
-  simpa [fixtureB_raySq, fixtureB_ray4, Real.sq_sqrt (show (0 : ℝ) ≤ 5 / 2 by norm_num)] using
-    congrArg₂ (· - ·)
-      (hvlPlusState_order_second_moment fixtureBMatrix fixtureBVector fixtureB_herm fixtureB_norm
-        fixtureB_odd1 fixtureB_odd3 fixtureB_m2pos)
-      (congrArg (· ^ 2)
-        (hvlPlusState_order_mean fixtureBMatrix fixtureBVector fixtureB_herm fixtureB_norm
-          fixtureB_odd1 fixtureB_m2pos))
+  rw [hvlPlusState_order_second_moment fixtureBMatrix fixtureBVector fixtureB_herm fixtureB_odd3
+      fixtureB_m2pos,
+    hvlPlusState_order_mean fixtureBMatrix fixtureBVector fixtureB_herm fixtureB_odd1
+      fixtureB_odd3 fixtureB_m2pos,
+    fixtureB_raySq, fixtureB_ray4, Real.sq_sqrt (show (0 : ℝ) ≤ 5 / 2 by norm_num)]
+  norm_num
 
 /-! ## Fixture C: satisfiability of the capstone's hypothesis bundle -/
 
