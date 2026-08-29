@@ -222,4 +222,63 @@ theorem hvlPlusState_order_mean {n : Type*} [Fintype n] [DecidableEq n] (O : Mat
       = (star (hvlPlusState O Φ) ⬝ᵥ (O *ᵥ hvlPlusState O Φ)).re := rfl
   rw [hdef, hkey, Complex.ofReal_re]
 
+/-- **The second moment of `Ξ₊`** (Tasaki eq. (S.42)):
+`⟨Ξ₊|(Ô_L)²|Ξ₊⟩ = (1/2){m₂ + m₄/m₂}` with `m₂ = ⟨Φ_GS|(Ô_L)²|Φ_GS⟩` and
+`m₄ = ⟨Φ_GS|(Ô_L)⁴|Φ_GS⟩`.  The cross terms carry the third moment and vanish by (3.4.4). -/
+theorem hvlPlusState_order_second_moment {n : Type*} [Fintype n] [DecidableEq n]
+    (O : Matrix n n ℂ) (Φ : n → ℂ) (hHerm : O.IsHermitian)
+    (hodd3 : star Φ ⬝ᵥ ((O ^ 3) *ᵥ Φ) = 0) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) :
+    rayleighOnVec (O ^ 2) (hvlPlusState O Φ)
+      = 1 / 2 * (rayleighOnVec (O ^ 2) Φ + rayleighOnVec (O ^ 4) Φ / rayleighOnVec (O ^ 2) Φ) := by
+  have hsqrt : ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ) ≠ 0 := by
+    exact_mod_cast (Real.sqrt_pos.mpr hm2).ne'
+  have hm2z : ((rayleighOnVec (O ^ 2) Φ : ℝ) : ℂ) ≠ 0 := by exact_mod_cast hm2.ne'
+  have hsq : ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ) ^ 2
+      = ((rayleighOnVec (O ^ 2) Φ : ℝ) : ℂ) := by
+    rw [← Complex.ofReal_pow, Real.sq_sqrt hm2.le]
+  have hm2c : star Φ ⬝ᵥ ((O ^ 2) *ᵥ Φ) = ((rayleighOnVec (O ^ 2) Φ : ℝ) : ℂ) :=
+    even_moment_ofReal hHerm Φ
+  have hpow4 : ((O ^ 2) ^ 2 : Matrix n n ℂ) = O ^ 4 := by rw [← pow_mul]
+  have hm4c : star Φ ⬝ᵥ ((O ^ 4) *ᵥ Φ) = ((rayleighOnVec (O ^ 4) Φ : ℝ) : ℂ) := by
+    have h := even_moment_ofReal (hHerm.pow 2) Φ
+    rwa [hpow4] at h
+  have hbra : star (hvlTrialState O Φ) ⬝ᵥ ((O ^ 2) *ᵥ Φ)
+      = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ * (star Φ ⬝ᵥ ((O ^ 3) *ᵥ Φ)) := by
+    simpa only [Nat.reduceAdd] using trialState_dotProduct_mulVec hHerm Φ hm2 2
+  have hket : star Φ ⬝ᵥ ((O ^ 2) *ᵥ hvlTrialState O Φ)
+      = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ * (star Φ ⬝ᵥ ((O ^ 3) *ᵥ Φ)) := by
+    simpa only [Nat.reduceAdd] using dotProduct_mulVec_trialState hHerm Φ hm2 2
+  have hdiag : star (hvlTrialState O Φ) ⬝ᵥ ((O ^ 2) *ᵥ hvlTrialState O Φ)
+      = (((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹) ^ 2
+        * (star Φ ⬝ᵥ ((O ^ 4) *ᵥ Φ)) := by
+    simpa only [Nat.reduceAdd] using trialState_dotProduct_mulVec_trialState hHerm Φ hm2 2
+  have hkey : star (hvlPlusState O Φ) ⬝ᵥ ((O ^ 2) *ᵥ hvlPlusState O Φ)
+      = ((1 / 2 * (rayleighOnVec (O ^ 2) Φ
+          + rayleighOnVec (O ^ 4) Φ / rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ) := by
+    rw [hvlPlusState, smul_add_dotProduct_mulVec, hbra, hket, hdiag, hodd3, hm2c, hm4c,
+      Complex.star_def, map_inv₀, Complex.conj_ofReal, sqrtTwoInv_sq]
+    push_cast
+    rw [← hsq]
+    field_simp
+    ring
+  have hdef : rayleighOnVec (O ^ 2) (hvlPlusState O Φ)
+      = (star (hvlPlusState O Φ) ⬝ᵥ ((O ^ 2) *ᵥ hvlPlusState O Φ)).re := rfl
+  rw [hdef, hkey, Complex.ofReal_re]
+
+/-- **The fluctuation identity for `Ξ₊`** (Tasaki eq. (S.43)), in the `L^d`-normalised form used by
+Problem 3.4.b.  Writing `V` for the volume factor `L^d`, the variance of `Ô_L/V` in `Ξ₊` equals
+`(1/2){⟨Φ_GS|(Ô_L/V)²|Φ_GS⟩}^{-1}[⟨Φ_GS|(Ô_L/V)⁴|Φ_GS⟩ − {⟨Φ_GS|(Ô_L/V)²|Φ_GS⟩}²]`.  This is an
+exact identity at every finite volume, not an asymptotic statement. -/
+theorem hvlPlusState_order_variance {n : Type*} [Fintype n] [DecidableEq n] (O : Matrix n n ℂ)
+    (Φ : n → ℂ) (V : ℝ) (hHerm : O.IsHermitian) (hodd1 : star Φ ⬝ᵥ (O *ᵥ Φ) = 0)
+    (hodd3 : star Φ ⬝ᵥ ((O ^ 3) *ᵥ Φ) = 0) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) (hV : 0 < V) :
+    rayleighOnVec (O ^ 2) (hvlPlusState O Φ) / V ^ 2
+        - (rayleighOnVec O (hvlPlusState O Φ) / V) ^ 2
+      = 1 / 2 * (rayleighOnVec (O ^ 4) Φ / V ^ 4 - (rayleighOnVec (O ^ 2) Φ / V ^ 2) ^ 2)
+          / (rayleighOnVec (O ^ 2) Φ / V ^ 2) := by
+  rw [hvlPlusState_order_second_moment O Φ hHerm hodd3 hm2,
+    hvlPlusState_order_mean O Φ hHerm hodd1 hodd3 hm2, div_pow, Real.sq_sqrt hm2.le]
+  field_simp
+  ring
+
 end LatticeSystem.Quantum
