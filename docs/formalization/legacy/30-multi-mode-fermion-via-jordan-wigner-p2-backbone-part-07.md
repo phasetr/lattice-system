@@ -37,8 +37,7 @@ This section is maintained by hand, lies outside the migrated catalogue block, a
 table started in the PR-2 section above (Issue #5347, PR #5350); it is not subject to the
 frozen byte-for-byte parity of the migrated block. The Theorem 10.6 arc is recorded on its own
 part of this series, apart from the parts that carry migrated-block slices, so that every part
-stays below the hard page-size limit `scripts/check_docs_hierarchy.py` fails on; that checker's
-soft threshold only warns, and one migrated-block part of this series is still above it.
+stays below the hard page-size limit `scripts/check_docs_hierarchy.py` fails on.
 
 | Lean name | Statement | File |
 |---|---|---|
