@@ -117,7 +117,7 @@ scope). Tasaki §3.4, Theorem 3.1, eqs. (3.4.7)–(3.4.12), pp. 66–67.
 | `shastry_staggered_susceptibility_bound` | **Shastry susceptibility bound χ(k*)≤C·L** (§4.1, DOCUMENTED AXIOM; toward Corollary 4.3): for the zero-field 1D AFM Heisenberg ring on **even** `L ≥ 2` sites (`Even L`, bipartite) there is a size-uniform `C ≥ 0` with every normalized ground state admitting a potential `y` for `ÔΦ` (`(Ĥ−E₀)y=ÔΦ`) of `O(L)` static staggered susceptibility `Re⟨y,ÔΦ⟩ ≤ C·L` (physically `χ(k*)=L·f_L^(-1)(k*)`). Tasaki does **not** prove this in the book — footnote 3 (p. 76) cites Shastry [58] / the rigorous formulation of Tanaka–Takeda–Idogaki [63], and footnote 9 (p. 83) singles out the `f_L^(-1)(k*)` bound as the only "nontrivial part that requires some hard analysis". Per the project's explicit instruction this genuinely external hard-analysis estimate (massive-Green / inverse-Fourier `k*=π` control) based on Shastry J.Phys.A 25 L249 (1992) [58] and Tanaka–Takeda–Idogaki JMMM 272–276 908 (2004) [63] is a documented axiom; it discharges `no_long_range_order_1d` (PR #5003) | `Quantum/SpinS/NoLongRangeOrder1D.lean` |
 <!-- legacy-source:end:549:652 -->
 
-## Authoritative supplemental implementation record (§3.4 trial state and Problem 3.4.b)
+## Authoritative supplemental implementation record (§3.4 trial state, locality core, and Problem 3.4.b)
 
 This section is maintained by hand, lies outside the migrated catalogue block above, and records
 declarations added after the migration baseline; it is not subject to the frozen byte-for-byte
@@ -127,7 +127,8 @@ parity of the block above.
 
 Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4, Problem 3.4.b:
 statement p. 69 eq. (3.4.18), solution p. 501 eqs. (S.42)-(S.43), with the surrounding
-eqs. (3.4.1)-(3.4.4), (3.4.7) and (3.4.14)-(3.4.15), pp. 65-69.
+eqs. (3.4.3), (3.4.4), (3.4.7) and (3.4.14)-(3.4.15), pp. 65-69 (locality of `Ô_L`,
+eqs. (3.4.1)-(3.4.2), is not assumed by this module).
 
 Problem 3.4.b asks to show that vanishing of the fourth-moment combination
 `⟨Φ_GS|(Ô_L/L^d)⁴|Φ_GS⟩ − (⟨Φ_GS|(Ô_L/L^d)²|Φ_GS⟩)²` as `L ↑ ∞` forces the fluctuation of
@@ -236,6 +237,58 @@ there `σ¹` is involutive and `Φ_GS` a coordinate vector, so `m₂ = 4` coinci
 multiple of the identity, `m₂ = 100` against `‖Φ_GS‖² = 2` and `√m₂ = 10` against `m₂/2 = 50`, and
 both sides equal `−1/25`. Neither reference vector is a unit vector, so the normalisation of `Γ`
 is load-bearing in every number the instances check.
+
+### Locality of the double commutator, eqs. (3.4.9)-(3.4.11)
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4, eqs. (3.4.1)-
+(3.4.2) p. 65, eq. (3.4.9) p. 66, eqs. (3.4.10)-(3.4.11) p. 67; operator-norm properties
+(A.2.5)/(A.2.6), p. 463.
+
+`Quantum/SpinS/LocalDoubleCommutatorBound.lean` turns the locality of `Ĥ = Σ_{b∈B} ĥ_b` and
+`Ô = Σ_{x∈Λ} ô_x` into the numerator estimate that eq. (3.4.8) consumes. Locality is expressed
+by plain commutation hypotheses rather than a support predicate: `ĥ_b` commutes with every `ô_z`
+seated outside a window `W b` (the Lean content of eq. (3.4.1)'s "acts nontrivially only on the
+spins at `x` and `y`"), and distinct sites carry commuting order operators (eq. (3.4.2)). The
+window `W` and its cardinality bound `mW` are parameters, so the counting that produces the book's
+constant is proved in general and the bond case is the instance `mW = 2`, `4 · 2² = 16`. Norm
+hypotheses are stated as `≤` rather than the book's `=`, and `0 ≤ o₀` is an explicit hypothesis
+because an empty site type makes it underivable from the per-site bounds.
+
+The commutator norm inequality `‖[Â, B̂]‖ ≤ 2‖Â‖‖B̂‖` used twice per term is
+`manyBodyOperatorNormS_comm_le`, which lives in `Quantum/SpinS/ManyBodyOperatorNorm.lean` next to
+the submultiplicativity and triangle inequalities it is proved from, and the commutator/finite-sum
+distribution is `Math/CommutatorSum.lean`, shared with the §4.1 staggered-order expansion.
+
+**What these declarations do not assert.** Self-adjointness of `ĥ_b` and `ô_x` is not assumed
+anywhere: the first inequality of (3.4.11) is taken on the real part of the expectation, so no
+reality obligation arises. The long-range order condition (3.4.3) and the no-SSB condition
+(3.4.4) are unused here — they are first consumed at (3.4.12). No lattice structure is imposed:
+`|B_L| = d L^d` enters only as the numeric hypothesis `|B| ≤ d L^d`, and neither `1 ≤ d` nor
+`1 ≤ L` is required.
+
+All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
+`Classical.choice`, `Quot.sound`.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `commutator_sum_right` | `[A, Σ_{i∈s} f i] = Σ_{i∈s} [A, f i]` in any ring | `Math/CommutatorSum.lean` |
+| `commutator_sum_left` | `[Σ_{i∈s} f i, A] = Σ_{i∈s} [f i, A]` in any ring | `Math/CommutatorSum.lean` |
+| `commutator_sum_smul_right` | `[A, Σ_{i∈s} c i • B i] = Σ_{i∈s} c i • [A, B i]` in a `K`-algebra | `Math/CommutatorSum.lean` |
+| `commutator_sum_smul_left` | `[Σ_{i∈s} c i • B i, A] = Σ_{i∈s} c i • [B i, A]` in a `K`-algebra | `Math/CommutatorSum.lean` |
+| `commutator_orderSum_eq_windowSum` | eq. (3.4.9): `[Ĥ, Ô] = Σ_{b∈B} Σ_{z∈W b} [ĥ_b, ô_z]` | `Quantum/SpinS/LocalDoubleCommutatorBound.lean` |
+| `doubleCommutator_orderSum_eq_windowSum` | eq. (3.4.10): `[Ô, [Ĥ, Ô]] = Σ_{b∈B} Σ_{x∈W b} Σ_{z∈W b} [ô_x, [ĥ_b, ô_z]]` | `Quantum/SpinS/LocalDoubleCommutatorBound.lean` |
+| `manyBodyOperatorNormS_doubleCommutator_le_of_windows` | general-window norm kernel: `‖[Ô, [Ĥ, Ô]]‖ ≤ 4 mW² h₀ o₀² \|B\|` | `Quantum/SpinS/LocalDoubleCommutatorBound.lean` |
+| `doubleCommutator_bondLocal_expectation_le` | eq. (3.4.11): `⟨Φ\|[Ô,[Ĥ,Ô]]\|Φ⟩ ≤ ‖[Ô,[Ĥ,Ô]]‖ ≤ 16 d h₀ o₀² L^d` for normalised `Φ` and bond-local windows | `Quantum/SpinS/LocalDoubleCommutatorBound.lean` |
+
+Regression fixtures live in `LatticeSystem/Tests/LocalDoubleCommutatorBound.lean`: each of the four
+§3.4 declarations has a signature fixture restating it in full and discharging it by the
+declaration itself, and the two collapse identities are pinned with `W b` on **both** window index
+positions, so a vacuous `W b = univ` reading would not satisfy the pin. Two numeric fixtures pin
+the constants over abstract data constrained only by the hypotheses, so no arithmetic tautology can
+close them: the kernel at `mW = 3`, `h₀ = 5/2`, `o₀ = 1/2`, `|B| = 7` gives `315/2`, a point away
+from `mW = 2` where `4mW²`, `8mW`, `2mW³` and `mW⁴` all coincide; the capstone at `d = 3`, `L = 4`,
+`h₀ = 5/2`, `o₀ = 1/2` gives `1920`, where `L^d = 64 ≠ d^L = 81` also separates the `d · L^d` shape
+from a `d^L` slip.
 
 ---
 

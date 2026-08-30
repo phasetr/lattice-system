@@ -79,6 +79,19 @@ theorem manyBodyOperatorNormS_mul_le (M₁ M₂ : ManyBodyOpS Λ N) :
     manyBodyOperatorNormS_eq_toEuclideanCLM, map_mul]
   exact norm_mul_le _ _
 
+/-- **Commutator norm bound** `‖⁅A, Y⁆‖ ≤ 2‖A‖‖Y‖` for the `L²` operator norm: the subtraction
+triangle inequality plus submultiplicativity in both orders. -/
+theorem manyBodyOperatorNormS_comm_le (A Y : ManyBodyOpS Λ N) :
+    manyBodyOperatorNormS (A * Y - Y * A)
+      ≤ 2 * manyBodyOperatorNormS A * manyBodyOperatorNormS Y := by
+  calc manyBodyOperatorNormS (A * Y - Y * A)
+      ≤ manyBodyOperatorNormS (A * Y) + manyBodyOperatorNormS (Y * A) :=
+        manyBodyOperatorNormS_sub_le _ _
+    _ ≤ manyBodyOperatorNormS A * manyBodyOperatorNormS Y
+          + manyBodyOperatorNormS Y * manyBodyOperatorNormS A :=
+        add_le_add (manyBodyOperatorNormS_mul_le _ _) (manyBodyOperatorNormS_mul_le _ _)
+    _ = 2 * manyBodyOperatorNormS A * manyBodyOperatorNormS Y := by ring
+
 /-- **Finite-sum triangle inequality** for the many-body `L²` operator norm. -/
 theorem manyBodyOperatorNormS_sum_le {ι : Type*} (s : Finset ι) (f : ι → ManyBodyOpS Λ N) :
     manyBodyOperatorNormS (∑ x ∈ s, f x) ≤ ∑ x ∈ s, manyBodyOperatorNormS (f x) := by

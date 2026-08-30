@@ -7,6 +7,7 @@ distributes over the sites: `[Ô, C] = Σ_x ε_x [Ŝ_x^{(3)}, C]`.  Applied twic
 and to `Ô` inside) this expands the double commutator `[Ô, [Ĥ, Ô]]` into a double site sum, whose
 terms vanish unless the two sites are adjacent — reducing the naive `O(L²)` count to `O(L)`.
 -/
+import LatticeSystem.Math.CommutatorSum
 import LatticeSystem.Quantum.SpinS.DysonLiebSimon
 
 namespace LatticeSystem.Quantum
@@ -21,8 +22,7 @@ theorem staggeredOrderOpS_commutator (A : Λ → Bool) (N : ℕ) (C : ManyBodyOp
     staggeredOrderOpS A N * C - C * staggeredOrderOpS A N
       = ∑ x : Λ, (if A x then (1 : ℂ) else -1)
           • (spinSSiteOp3 x N * C - C * spinSSiteOp3 x N) := by
-  rw [staggeredOrderOpS, Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
-  refine Finset.sum_congr rfl (fun x _ => ?_)
-  rw [smul_mul_assoc, mul_smul_comm, smul_sub]
+  rw [staggeredOrderOpS]
+  exact commutator_sum_smul_left _ C _ _
 
 end LatticeSystem.Quantum
