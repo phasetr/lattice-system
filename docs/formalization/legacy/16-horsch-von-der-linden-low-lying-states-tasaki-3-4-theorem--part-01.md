@@ -127,7 +127,8 @@ parity of the block above.
 
 Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4, Problem 3.4.b:
 statement p. 69 eq. (3.4.18), solution p. 501 eqs. (S.42)-(S.43), with the surrounding
-eqs. (3.4.1)-(3.4.4), (3.4.7) and (3.4.14)-(3.4.15), pp. 65-69.
+eqs. (3.4.3), (3.4.4), (3.4.7) and (3.4.14)-(3.4.15), pp. 65-69 (locality of `Ô_L`,
+eqs. (3.4.1)-(3.4.2), is not assumed by this module).
 
 Problem 3.4.b asks to show that vanishing of the fourth-moment combination
 `⟨Φ_GS|(Ô_L/L^d)⁴|Φ_GS⟩ − (⟨Φ_GS|(Ô_L/L^d)²|Φ_GS⟩)²` as `L ↑ ∞` forces the fluctuation of
