@@ -187,12 +187,16 @@ CHAPTER_EXPECTED_TARGETS = {
     10: (
         "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-03/#tasaki-chapter-10-part-01",
         "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-04/#tasaki-chapter-10-part-02",
-        "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-05/#tasaki-chapter-10-part-03",
+        "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-05/#authoritative-supplemental-implementation-record-1022-eq-1029-uniformsymmetric-ground-submodule-reduction",
+        "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-06/#tasaki-chapter-10-part-03",
+        "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-07/#authoritative-supplemental-implementation-record-theorem-106-discharge-arc-pr-1-staggered-spin-component-algebra",
+        "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-08/#authoritative-supplemental-implementation-record-theorem-108-discharge-arc-pr-1-generic-shiftuniqueness-lemmas-and-the-shiba-hamiltonian-bridge",
     ),
     11: (
         "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-02/#tasaki-chapter-11-part-01",
         "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-03/#tasaki-chapter-11-part-02",
         "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-04/#tasaki-chapter-11-part-03",
+        "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-09/#authoritative-supplemental-implementation-record-theorem-114-discharge-arc-pr-1-axiom-hypothesis-correction",
     ),
     "appendix-a": (
         "/formalization/legacy/15-generic-matrix-analysis-helpers/#legacy-catalogue-generic-matrix-analysis-helpers-mathmatrixanalysis",
@@ -332,7 +336,27 @@ def _drop_working_note_prose_citation(text: str) -> str:
     return _WORKING_NOTE_PROSE_CITATION.sub("See Issue #3542.", text)
 
 
-def approved_changes(text: str) -> str:
+# One baseline catalogue row points at this repository's private, gitignored project-instructions
+# file. The pointer is dropped from the published row; the sentence it trailed stands on its own.
+# Matched structurally, by the shape of a parenthesised dotted Markdown filename, so that the
+# private identifier is not reproduced here.
+_PRIVATE_INSTRUCTIONS_REF = re.compile(r" \(\w+\.\w+\.md\)")
+
+# Number of sites the removal above matches. Counted on the post-replacement baseline, which is the
+# text the removal actually runs against, so that a literal rewrite introducing a match cannot slip
+# past the audit. Pinned for the same reason as WORKING_NOTE_REMOVAL_COUNTS: a structural pattern
+# that starts matching more (or fewer) sites than audited must fail loudly instead of silently
+# editing the baseline.
+PRIVATE_INSTRUCTIONS_REMOVAL_COUNT = 1
+
+
+def _drop_private_instructions_ref(text: str) -> str:
+    """Drop the catalogue-row pointer to the private project-instructions file."""
+    return _PRIVATE_INSTRUCTIONS_REF.sub("", text)
+
+
+def _approved_replacements(text: str) -> str:
+    """Apply every audited literal rewrite, before the structural removals that follow them."""
     return _drop_working_note_citations(
         text.replace("(refactoring-conventions.html)", "(/lattice-system/refactoring-conventions/)")
         .replace(
@@ -854,6 +878,10 @@ def approved_changes(text: str) -> str:
     )
 
 
+def approved_changes(text: str) -> str:
+    return _drop_private_instructions_ref(_approved_replacements(text))
+
+
 MOVED_PROSE_LINK_REWRITES = (
     ("(refactoring-conventions.html)", "(/lattice-system/refactoring-conventions/)"),
     (
@@ -1174,6 +1202,14 @@ def main() -> None:
     # Catalogue rows must retain exact global order after the two evidenced status corrections.
     # Long cells are reconstructed from one compact table reference and one grouped detail record.
     catalogue_baseline = "".join(old_lines[216:2731])
+    private_instructions_removals = len(
+        _PRIVATE_INSTRUCTIONS_REF.findall(_approved_replacements(catalogue_baseline))
+    )
+    if private_instructions_removals != PRIVATE_INSTRUCTIONS_REMOVAL_COUNT:
+        fail(
+            "audited private project-instructions removal count differs: "
+            f"expected={PRIVATE_INSTRUCTIONS_REMOVAL_COUNT}, actual={private_instructions_removals}"
+        )
     working_note_counts = [
         len(_WORKING_NOTE_CITATION.findall(catalogue_baseline)),
         len(_WORKING_NOTE_SECTION_REF.findall(catalogue_baseline)),
