@@ -12775,7 +12775,8 @@ order-parameter bound (3.4.22) --- the thermodynamic input, which is not part of
 \noindent\textbf{Problem 3.4.b} (Tasaki~\cite{Tasaki:QMB} §3.4, statement p.~69 eq.~(3.4.18),
 solution p.~501 eqs.~(S.42)--(S.43), with the surrounding eqs.~(3.4.3), (3.4.4), (3.4.7),
 (3.4.14)--(3.4.15), pp.~65--69; \textbf{discharged axiom-free},
-\texttt{Quantum/HorschVonderLindenProblem34b.lean}, fixtures in
+\texttt{Quantum/HorschVonderLindenProblem34b.lean}, with the trial state and its algebra in
+\texttt{Quantum/HorschVonderLindenTrialState.lean}, fixtures in
 \texttt{Tests/Problem34bFluctuation.lean}).  Tasaki asks to show that vanishing of the
 fourth-moment combination
 $\langle\Phi_{\mathrm{GS}}|(\hat O_L/L^d)^4|\Phi_{\mathrm{GS}}\rangle-
@@ -12813,6 +12814,57 @@ satisfies~(3.4.18) nor that the antiferromagnetic Heisenberg model fails it.  Th
 of a physical ``ground state'' of p.~69 is not formalized; the book defers its precise formulation
 to §4.3.  Eq.~(3.4.16) $\langle\Xi_+|\hat O_L/L^d|\Xi_+\rangle\ge\sqrt{q_0}$, the Schwarz
 remark~(3.4.17) and the mirror state $\Xi_-$ are outside this development.
+
+\noindent\textbf{Basic variational estimate, eq.~(3.4.8)} (Tasaki~\cite{Tasaki:QMB} §3.4,
+``Setting and assumptions'' p.~65, eqs.~(3.4.7)--(3.4.8), p.~66; \textbf{discharged axiom-free},
+\texttt{Quantum/HorschVonderLindenTrialState.lean}, fixtures in
+\texttt{Tests/HorschVonderLindenTrialStateVariational.lean}).  This module is the shared §3.4 home
+of the normalized Horsch--von der Linden trial state $\Gamma=\hat O_L|\Phi_{\mathrm{GS}}\rangle/
+\lVert\hat O_L|\Phi_{\mathrm{GS}}\rangle\rVert$ (eq.~(3.4.7), \texttt{hvlTrialState}), of the
+algebra that moves powers of $\hat O_L$ across the $L^2$ pairing between $\Gamma$ and
+$\Phi_{\mathrm{GS}}$ (\texttt{dotProduct\_mulVec\_trialState},
+\texttt{trialState\_dotProduct\_mulVec},
+\texttt{trialState\_dotProduct\_mulVec\_trialState}, \texttt{trialState\_dotProduct\_self}),
+and of the basic variational estimate itself.  Writing
+$m_2=\langle\Phi_{\mathrm{GS}}|(\hat O_L)^2|\Phi_{\mathrm{GS}}\rangle$,
+\texttt{hvlTrialState\_energy\_sub\_eq} is eq.~(3.4.8),
+\[\langle\Gamma|\hat H|\Gamma\rangle-E_{\mathrm{GS}}
+=\frac{\langle\Phi_{\mathrm{GS}}|[\hat O_L,[\hat H,\hat O_L]]|\Phi_{\mathrm{GS}}\rangle}{2m_2},\]
+which Tasaki reads off ``by inspection''.  Proof: the un-normalized double-commutator identity
+\texttt{double\_commutator\_ground\_state\_eq}
+(\texttt{Quantum/SpinS/DoubleCommutatorVariational.lean}) gives
+$\langle\Phi_{\mathrm{GS}}|[\hat O_L,[\hat H,\hat O_L]]|\Phi_{\mathrm{GS}}\rangle
+=2\langle\hat O_L\Phi_{\mathrm{GS}}|\hat H|\hat O_L\Phi_{\mathrm{GS}}\rangle
+-2E_{\mathrm{GS}}\langle\hat O_L\Phi_{\mathrm{GS}}|\hat O_L\Phi_{\mathrm{GS}}\rangle$;
+Hermiticity of $\hat O_L$ makes the last pairing $m_2$, and
+$\Gamma=(\sqrt{m_2})^{-1}\,\hat O_L|\Phi_{\mathrm{GS}}\rangle$ makes the left-hand Rayleigh
+quotient $\langle\hat O_L\Phi_{\mathrm{GS}}|\hat H|\hat O_L\Phi_{\mathrm{GS}}\rangle/m_2$, so
+dividing by $2m_2\neq0$ matches the two sides.  The identity holds at \emph{any} eigenvector
+$\Phi_{\mathrm{GS}}$ of $\hat H$ with eigenvalue $E_{\mathrm{GS}}$: neither the long-range
+order~(3.4.3) nor the no-SSB condition~(3.4.4) is used, and $m_2>0$ enters only through the
+normalization of $\Gamma$.  \emph{Not asserted.}  The lower bound
+$0\le\langle\Gamma|\hat H|\Gamma\rangle-E_{\mathrm{GS}}$, which is the left half of
+eq.~(3.4.12), p.~67, does not follow from the identity and is not stated here: it requires
+$E_{\mathrm{GS}}$ to be a \emph{ground-state} energy, i.e.\ the minimum of the Rayleigh quotient
+of $\hat H$ over normalized vectors --- the running assumption of the ``Setting and assumptions''
+paragraph on p.~65.  It cannot be dropped: at
+$\hat H=\hat\sigma^3$, $\hat O_L=\hat\sigma^1$, $\Phi_{\mathrm{GS}}=(2,0)$ the eigenvalue
+$E_{\mathrm{GS}}=1$ is not the ground energy and both sides of~(3.4.8) equal $-2$.  The numeric
+fixtures pin that instance and a second one,
+$\hat H=\hat\sigma^1$, $\hat O_L=4\hat\sigma^1+\hat\sigma^3+3\cdot\mathbf{1}$,
+$\Phi_{\mathrm{GS}}=(1,1)$, where both sides equal $-1/25$.  Neither reference vector is
+normalized.  At the first point $\hat\sigma^1$ is involutive and $\Phi_{\mathrm{GS}}$ a coordinate
+vector, so $m_2=4$ coincides with $\lVert\Phi_{\mathrm{GS}}\rVert^2$, the normalizing length
+$\lVert\hat O_L\Phi_{\mathrm{GS}}\rVert$ with $\lVert\Phi_{\mathrm{GS}}\rVert$, and $\sqrt{m_2}$
+with $m_2/2$; at the second, $\hat O_L$ is Hermitian but not involutive and $(\hat O_L)^2$ is not
+a multiple of the identity, and $m_2=100$, $\lVert\Phi_{\mathrm{GS}}\rVert^2=2$, $\sqrt{m_2}=10$
+and $m_2/2=50$ are pairwise distinct, so the second moment and the normalization of $\Gamma$ are
+separately load-bearing in the values checked.  Locality of
+$\hat O_L$ (eqs.~(3.4.1)--(3.4.2)) is not assumed, so nothing here certifies a concrete model.
+The $C\,L^{-d}$ low-lying bound~(3.4.12)
+that~(3.4.8) feeds is not yet formalized: it is the input $\delta$ that Theorem~3.1
+(\texttt{horsch\_vonderLinden\_lowLying}, \texttt{Quantum/HorschVonderLinden.lean}) consumes as
+its hypothesis \texttt{hvar}.
 
 \noindent\textbf{Theorem 4.1} (Dyson--Lieb--Simon / Neves--Perez / Kennedy--Lieb--Shastry, Tasaki
 §4.1, eq.~(4.1.7), pp.~88--90; \texttt{Quantum/SpinS/DysonLiebSimon.lean}, Issue \#4485).  Existence
