@@ -32,10 +32,7 @@ Tasaki's deliberately weakened form).  The non-vanishing conjunct is
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §5.3, Theorem 5.2, eq. (5.3.4), footnote 8, pp. 140–141 (Koma–Tasaki [21]); the
-Anderson-tower engine is §4.2.2 Theorem 4.6, eqs. (4.2.31)/(4.2.37), pp. 105–106.  The
-pre-implementation
-mathematical derivation is `.self-local/docs/math-thm52-bec-tower.md` §4.3 and the arc design note
-`.self-local/reports/design-thm52-final-arc.md` §PR-5.
+Anderson-tower engine is §4.2.2 Theorem 4.6, eqs. (4.2.31)/(4.2.37), pp. 105–106.
 -/
 
 namespace LatticeSystem.Quantum

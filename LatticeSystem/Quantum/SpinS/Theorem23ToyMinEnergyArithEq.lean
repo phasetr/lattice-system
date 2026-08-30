@@ -4,8 +4,7 @@ import Mathlib.Analysis.RCLike.Basic
 # Strict (equality) form of the arithmetic core
 
 Issue #3542 (sound Perron–Frobenius route to Tasaki §2.5 Theorem 2.3), option (a) —
-the equality case of `tasaki23_toy_min_energy_arith` (see
-`.self-local/tex/3716-tasaki-2-5-toy-min-energy-bound.tex`).
+the equality case of `tasaki23_toy_min_energy_arith`.
 
 When the toy energy attains its minimum, the arithmetic inequality
 `f(s_A,s_B) ≤ f(a,b)` is an equality, and (for a non-degenerate `s_B > 0`) the

@@ -7,7 +7,7 @@ import LatticeSystem.Quantum.SpinS.AllAlignedState
 # General-`J` non-admissible-sector lower bound via the SU(2) inward ladder
 
 Issue #3542 (sound Perron–Frobenius route to Tasaki §2.5 Theorem 2.3), general-`J`
-`hOutside` thread, steps 2–3 (see `.self-local/docs/tasaki-2-5-lieb-mattis-hOutside-design.md`).
+`hOutside` thread, steps 2–3.
 
 `tasaki23_general_hOutside` discharges, for an ARBITRARY connected bipartite
 antiferromagnetic coupling `J`, the non-admissible-sector lower bound that the global

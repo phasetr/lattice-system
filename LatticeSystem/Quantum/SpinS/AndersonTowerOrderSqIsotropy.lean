@@ -19,7 +19,7 @@ This is a pure wrapper: the two transverse/longitudinal singlet equalities
 `staggeredOrder_sq_expectation_eq_23` (`⟨(ô²)²⟩ = ⟨(ô³)²⟩`, from the `Ŝ¹`-singlet) supply the
 Lie-algebra mechanism; here they are merely chained through the `Fin 3` expansion of `orderSqOp`.
 The factor `3` is load-bearing for the collapse `⟨ô²⟩/(‖Φ‖²V²) → q₀ = (mStar)²` via conjectural
-`mStar = √(3qStar)` combined with Theorem 4.9 `mStar = √q₀`. **Notation clarification** (design §5):
+`mStar = √(3qStar)` combined with Theorem 4.9 `mStar = √q₀`. **Notation clarification**:
 `q₀ = axis-1 LRO limit = mStar²`, `qStar = axis-3 limit`, so `q₀ = 3·qStar` and
 total limit `3·qStar = q₀ = mStar²`.
 

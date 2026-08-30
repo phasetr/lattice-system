@@ -24,7 +24,7 @@ If `m∗` were a free parameter one could take `m∗ := 0` together with a genui
 family (`q₀ > 0`), making `√(2 q₀) ≤ 0` FALSE and `False` derivable (cf. the
 `Axiom ∀ must hold for all` discipline; the `SU(2)` sibling documents the same trap).  We instead
 pin `m∗` to the genuine coherent order parameter: `IsRealizingBECCoherentFamily` requires the
-**uniform window-ratio concentration** (math-note §3.4, refinement 2) — eventually every one-step
+**uniform window-ratio concentration** — eventually every one-step
 ratio `r_M = ⟨Γ_{M+1}, Ô⁺ Γ_M⟩ / L^d` in the (slow) window is within `ε` of `m∗` — which subsumes
 the `θ = 0` mean pinning `⟨Ξ_0, Ô^{(1)} Ξ_0⟩ / L^d → m∗` (eq. (5.3.7)) and additionally drives the
 second-moment concentration (eq. (5.3.8)) from the same source, fixing `m∗` as the true SSB order
@@ -64,12 +64,12 @@ Eventually in even `L`:
 * the tower states are nonzero across the window (`|M| ≤ C₁ L^{d/2}`), so the `Γ_M` normalize.
 
 The **pinning conjunct** fixes `m∗` as the exact coherent order parameter by the **uniform
-window-ratio concentration** (math-note §3.4, 2026-07-17 refinement 2): eventually, for *every* `M`
+window-ratio concentration**: eventually, for *every* `M`
 in the raising window, the one-step off-diagonal ratio `r_M = ⟨Γ_{M+1}, Ô⁺ Γ_M⟩ / L^d` is within
 `ε` of `m∗`.  This uniform form is strictly stronger than the `θ = 0` mean pinning
 `⟨Ξ_0, Ô^{(1)} Ξ_0⟩ / L^d → m∗` (which it subsumes, that mean being the window average of the
 `r_M`) and is exactly what lets *both* the first moments (eq. (5.3.7)) and the second moments
-(eq. (5.3.8), the window sums `S₂ = avg r_M²`, `S₁₁ = avg r_M r_{M+1}` — see math-note §2⑤)
+(eq. (5.3.8), the window sums `S₂ = avg r_M²`, `S₁₁ = avg r_M r_{M+1}`)
 converge to `m∗` / `m∗²` **axiom-free** from a single concentration source.  Together with
 `0 < m∗` this makes `m∗` the genuine SSB order parameter, the value the documented axiom
 `becMStar_ge_sqrt_twoQ` bounds below by `√(2 q₀)`. -/

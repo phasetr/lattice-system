@@ -7,7 +7,7 @@ import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensate
 
 This file discharges the **XY-planar variational-numerator bound** of the Bose–Einstein-condensation
 tower (`tasaki_5_2_bec_tower`, Tasaki §5.3, eq. (5.3.4)) at half filling.  The route is the
-definitional Hamiltonian split (route (i) of the design note `math-thm52-pr4b-zz-numerator.md`):
+definitional Hamiltonian split:
 `Ĥ_XY = Ĥ_Heis − Ĥ_ZZ` (with `Ĥ_ZZ = Σ_{x,y} J_{xy} Ŝ³_x Ŝ³_y`), coming for free from
 `spinSDotXXZ_eq_spinSDot_add` at anisotropy `λ = 0`.  Because the tower operator
 `A = (Ô_L^{sgn M})^{|M|}` is identical to the Anderson-tower operator, the double commutator is
@@ -28,8 +28,7 @@ what lets `xy_tower_numerator_bound` combine the two bounds into a single right-
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §5.1 eq. (5.1.5), §5.3 Theorem 5.2, eqs. (5.3.2)/(5.3.4), pp. 140–141 (Koma–Tasaki [21]); the
-Anderson-tower numerator engine is `tower_numerator_bound` (§4.2.2 Theorem 4.6).  The
-pre-implementation mathematical derivation is `.self-local/docs/math-thm52-pr4b-zz-numerator.md`.
+Anderson-tower numerator engine is `tower_numerator_bound` (§4.2.2 Theorem 4.6).
 -/
 
 namespace LatticeSystem.Quantum
@@ -380,7 +379,7 @@ theorem zz_tower_numerator_bound (d L N M : ℕ) [NeZero L] (hN : 1 ≤ N) (hL :
 
 /-! ### The XY-planar numerator bound -/
 
-/-- **XY-planar variational numerator bound** (design-note math (2.1)).  For the half-filling XY
+/-- **XY-planar variational numerator bound**.  For the half-filling XY
 tower (`N = 1`), the pure-XY variational numerator with `Ĥ' = 2 Ĥ_XY` splits by
 `Ĥ_XY = Ĥ_Heis − Ĥ_ZZ` and Hamiltonian-linearity into `2 · (Heisenberg numerator) − 2 · (ZZ
 numerator)`; the triangle inequality with `tower_numerator_bound` (Anderson-tower Theorem 4.6) and
@@ -389,8 +388,7 @@ numerator)`; the triangle inequality with `tower_numerator_bound` (Anderson-towe
 bounds it by `4` copies of that common `O(M²/V)` right-hand side.  This numerator is consumed by
 the half-filling tower assembly in `BoseEinsteinCondensateTower`.
 
-Reference: Tasaki §5.3 Theorem 5.2, eq. (5.3.4), p. 141; math note
-`.self-local/docs/math-thm52-pr4b-zz-numerator.md` §2 eq. (2.1). -/
+Reference: Tasaki §5.3 Theorem 5.2, eq. (5.3.4), p. 141. -/
 theorem xy_tower_numerator_bound (d L M : ℕ) [NeZero L] (hL : 2 ≤ L)
     (Φ : (HypercubicTorus d L → Fin 2) → ℂ)
     (hsing : (totalSpinSOp3 (HypercubicTorus d L) 1).mulVec Φ = 0) {q₀ : ℝ}

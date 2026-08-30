@@ -6,8 +6,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23Sectors
 /-!
 # Tasaki §2.5 Theorem 2.3 — pinning the ground-state Casimir value via overlap
 
-Sound Perron–Frobenius route (Issue #3542; see
-`.self-local/docs/tasaki-2-5-pf-route-design.md`).  Tasaki's overlap step
+Sound Perron–Frobenius route (Issue #3542).  Tasaki's overlap step
 (§2.5, eq. 2.5.12): the antiferromagnetic Heisenberg ground state and the
 toy-Hamiltonian ground state are both Marshall positive, so their overlap is
 non-zero, and since both are total-Casimir eigenvectors their Casimir values

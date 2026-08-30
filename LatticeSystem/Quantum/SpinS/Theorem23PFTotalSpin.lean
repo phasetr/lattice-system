@@ -6,8 +6,7 @@ import LatticeSystem.Quantum.SpinS.TotalSquared
 /-!
 # Tasaki §2.5 Theorem 2.3 — total-spin determination (overlap positivity)
 
-Sound Perron–Frobenius route (Issue #3542; see
-`.self-local/docs/tasaki-2-5-pf-route-design.md`).  The remaining global
+Sound Perron–Frobenius route (Issue #3542).  The remaining global
 obligation of the route is to show that the per-sector Marshall-positive
 Heisenberg ground state lies in the predicted toy ground-state subspace
 (i.e. has the predicted total spin `S_tot = (|A| − |B|)·N/2`).

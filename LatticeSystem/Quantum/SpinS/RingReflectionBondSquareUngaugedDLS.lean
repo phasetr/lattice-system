@@ -25,9 +25,6 @@ of the merged left-half Hamiltonian `ringBondSquareLeftFieldHamiltonian` (Tasaki
 p.90).  The gauge crux, physical-field identification, and reflection step are deferred to
 PR-BS8a-ii (new file, name to be chosen since `RingReflectionBondSquareFieldPartition.lean` is taken
 by BS2) and PR-BS8b.
-
-See `.self-local/docs/math-tasaki-4-1-51-bond-square-physical-field-reflection-step.md` (issue
-#4777, §5 PR-BS8a-i).
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareTwoFieldWeight
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareField

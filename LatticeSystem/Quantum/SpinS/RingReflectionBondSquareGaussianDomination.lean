@@ -26,9 +26,7 @@ Exponentiating the resulting `(1/2n) Σ_j (−log Z^{BS}_β(fun _ => h j)) ≤ �
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §4.1, reflection bound (4.1.51) and uniform-field bound (4.1.49)/(4.1.52), pp. 85–86;
 chessboard estimate Lemma 4.5, (4.1.55)–(4.1.57), pp. 87–88; DLS 1978; FILS, Comm. Math. Phys. 62
-(1978) 1–34.  See
-`.self-local/docs/math-tasaki-4-1-51-bond-square-physical-field-reflection-step.md` §5
-(issue #4777).
+(1978) 1–34.
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquarePhysId
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareFieldPartition

@@ -6,7 +6,7 @@ import LatticeSystem.Math.ComplexVectorKernel
 # Sublattice Casimir dominates `S^3(S^3 ± 1)` (magnitude bound)
 
 Issue #3542 (sound Perron–Frobenius route to Tasaki §2.5 Theorem 2.3), option (a),
-Route 5 brick 0 (see `.self-local/tex/3717-coupled-total-spin-lower-bound.tex`).
+Route 5 brick 0.
 
 For a simultaneous eigenvector of the sublattice Casimir `(Ŝ_A)²` (eigenvalue `γ`) and
 `Ŝ_A^(3)` (eigenvalue `q`), the transverse part is positive semidefinite:

@@ -5,9 +5,8 @@ import LatticeSystem.Quantum.SpinS.AKLTKnabe.WindowReductionE4
 /-!
 # Gate E5: from the highest-weight blocks to the Knabe window inequality
 
-This module (Issue #5094; Tasaki §7.1.4, Knabe's argument, pp. 188–190) carries out steps **(F)**
-(interface) and **(G)** (landing) of the design note
-`aklt-theorem-7-1-e1a-general-window-bound-design.md` §2.1, on top of the Gate E4 spectral
+This module (Issue #5094; Tasaki §7.1.4, Knabe's argument, pp. 188–190) carries out the block
+interface and the spectral landing, on top of the Gate E4 spectral
 reduction `akltWindow3H_eigenvalue_reduction_highestWeightE4`.
 
 The chain implemented here is:
@@ -60,7 +59,7 @@ theorem akltWindow3H_isHermitianE5 : (akltWindow3H : ManyBodyOpS (Fin 4) 2).IsHe
     (Matrix.IsHermitian.add (bondSpin2ProjectionS_isHermitian _ _)
       (bondSpin2ProjectionS_isHermitian _ _)) (bondSpin2ProjectionS_isHermitian _ _)
 
-/-! ## 2. The block interface (design §2.1 (F)) -/
+/-! ## 2. The block interface -/
 
 /-- **The Knabe block bound at the highest-weight index `k`**: the window `ĥ` restricted to the
 highest-weight space `hw_k = V_k ∩ ker Ŝ⁺_tot` has no eigenvalue in the open interval `(0, 2/5)`,
@@ -100,7 +99,7 @@ private theorem akltWindow3H_apply_upConfigE5 :
 `hw_0 = V_0` (the line spanned by the all-up configuration) the window acts by the scalar `3`, so
 its only eigenvalue there is `μ = 3` and `0 ≤ 3 · 3 − (2/5) · 3 = 39/5`.
 
-This is the `S = 4` multiplet of the design note §1, whose block matrix is the `1 × 1` matrix
+This is the `S = 4` multiplet, whose block matrix is the `1 × 1` matrix
 `[39/5]`. -/
 theorem knabeBlockBoundE5_zero : KnabeBlockBoundE5 0 := by
   intro μ u hu hu0 heig
@@ -131,7 +130,7 @@ theorem knabeBlockBoundE5_zero : KnabeBlockBoundE5 0 := by
   rw [hμr]
   norm_num
 
-/-! ## 4. The spectral landing (design §2.1 (G)) -/
+/-! ## 4. The spectral landing -/
 
 /-- **The spectral landing, generic form.**  If every eigenvalue `μ` of a Hermitian matrix `H`
 satisfies `0 ≤ μ² − γ μ`, then `H² − γ H` is positive semidefinite.
@@ -198,7 +197,7 @@ holds for the open three-bond window `ĥ = P̂₀₁ + P̂₁₂ + P̂₂₃` of
 
 The statement is the one of `akltWindow3H_knabe_posSemidef`, whose current proof goes through the
 `81 × 81` rational certificate; this route replaces that certificate by the five highest-weight
-blocks (design note §2.1).
+blocks.
 
 **Normalisation (pitfall R4).**  The constant `2/5` belongs to the normalisation `ĥ = Σ P̂` and to
 no other: it becomes `1/10` for Tasaki's `Ĥ'` of eq. (7.1.7) and `1/5` for the (7.1.1)-normalised

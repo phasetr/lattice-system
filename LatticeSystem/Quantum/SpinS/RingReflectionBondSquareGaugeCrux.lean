@@ -23,10 +23,6 @@ reindexing
 to `θ` of the left single-ion.  Assembling gives the gauge crux (G)
 `rightGauge_conj_ringBondSquareFieldHamiltonian`, on which PR-BS8b builds the physical-field
 identification and the one reflection step.
-
-See `.self-local/docs/math-tasaki-4-1-51-bond-square-physical-field-reflection-step.md`
-(issue #4777,
-§2/§2.5, PR-BS8a-ii).
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareUngaugedDLS
 import LatticeSystem.Quantum.SpinS.RingReflectionFieldPartition
@@ -40,8 +36,7 @@ open Matrix
 
 variable {n N : ℕ}
 
-/-- **Staggered wrapper of the split field** (Tasaki §4.1 (4.1.48)/(4.1.65), book pp.86,90;
-note §2.5):
+/-- **Staggered wrapper of the split field** (Tasaki §4.1 (4.1.48)/(4.1.65), book pp.86,90):
 `physBondSquareFieldOf n a b z = (−1)ᶻ · physFieldOf n a b z`.  It is the spin-basis physical field
 whose T̂-basis (bare) split field is the linear `physFieldOf a b`.  Feeding it as the physical
 bond-square field cancels the physical Hamiltonian's internal `(−1)ᶻ` staggering (via
@@ -51,7 +46,7 @@ square is the bare
 def physBondSquareFieldOf (n : ℕ) (a b : Fin (2 * n) → ℝ) : Fin (2 * n) → ℝ :=
   fun z => (-1) ^ (z : ℕ) * physFieldOf n a b z
 
-/-- **(W1) staggering elimination** (note §2.5): the physical staggered field of the wrapper is the
+/-- **(W1) staggering elimination**: the physical staggered field of the wrapper is the
 bare linear split field,
 `ringBondSquareStagField (physBondSquareFieldOf n a b) = physFieldOf n a b`, since
 `(−1)ᶻ · (−1)ᶻ = 1`.  This is the only new lemma the crux needs beyond the linear machinery: it
@@ -184,7 +179,7 @@ term.**  For a right bond `(x, x+1)` (`n ≤ x`, `x+1 < 2n`) the kinetic factors
 (`(−Ŝ¹)(−Ŝ¹) = Ŝ¹Ŝ¹`, `Ŝ²` unchanged) and the longitudinal base is negated (`(−base)² = base²`); the
 two right-half minus signs — the gauge `−Ŝ³` and the `−b(r·)` slot of `physFieldOf` — cancel, so
 after the reflection reindex `x' = r(x+1)` the term is `θ(ringBondSquareBondTermOf b x')` (Tasaki
-§4.1 sign crux, note §2, book pp.86,90). -/
+§4.1 sign crux, book pp.86,90). -/
 private theorem rightGauge_conj_ringBondSquareBondTermOf_right (G : AxisTwoPiRotS N) (n : ℕ)
     [NeZero n] (a b : Fin (2 * n) → ℝ) {x : Fin (2 * n)} (hx : n ≤ (x : ℕ))
     (hx2 : (x : ℕ) + 1 < 2 * n) :
@@ -251,7 +246,7 @@ bond-square sum.**  Reindexing the intra-right directed bonds by the reflection 
 applying the per-bond identity `rightGauge_conj_ringBondSquareBondTermOf_right`, the gauged
 intra-right
 sum equals `θ(ringBondSquareLeftBondSum b)` — the right-half double-sign cancellation of the linear
-crux, threaded through the un-expanded square (Tasaki §4.1, note §2/§2.5, book pp.86,90). -/
+crux, threaded through the un-expanded square (Tasaki §4.1, book pp.86,90). -/
 theorem rightGauge_conj_ringBondSquareRightBondSum (G : AxisTwoPiRotS N) (n : ℕ) [NeZero n]
     (a b : Fin (2 * n) → ℝ) :
     G.rightGauge n * ringBondSquareRightBondSum n N (physFieldOf n a b) * G.rightGaugeInv n
@@ -299,7 +294,7 @@ private theorem rightGauge_conj_base_cross (G : AxisTwoPiRotS N) (n : ℕ) {p q 
 `½(A − B)² = ½A² + ½B² − AB` with `A = Ŝ³_p − a_p·1`, `B = Ŝ³_q − b_p·1`: the two boundary
 half-squares `½A²` (left) and `½B² = θ(½(Ŝ³_p − b_p·1)²)` (reflected), and the negated crossing
 block `−∑_α θ(C_{i,α}(b))·C_{i,α}(a)` (kinetic `Ŝ¹`/`Ŝ²` and longitudinal `AB`), the `O(1)` end of
-the DLS decomposition (Tasaki (4.1.69), book p.90, note §2). -/
+the DLS decomposition (Tasaki (4.1.69), book p.90). -/
 private theorem rightGauge_conj_crossSym (G : AxisTwoPiRotS N) (n : ℕ) [NeZero n]
     (a b : Fin (2 * n) → ℝ) (i : Fin 2) :
     G.rightGauge n * (onSiteS (ringCrossingSite n i) (spinSOp1 N)
@@ -364,7 +359,7 @@ effective (bare) field is the linear split `physFieldOf a b` (W1), conjugating t
 (BS8a-i) by the right-half Marshall gauge lands on `H_L(a) + θ(H_L(b)) − crossing(a,b)`: the
 intra-left bulk is gauge-fixed to `H_L(a)`'s bulk, the intra-right bulk reindexes to `θ(H_L(b))`'s
 bulk, the two crossing bonds complete into the boundary half-squares and the field crossing, and the
-single-ion term splits left/`θ`-right (Tasaki §4.1 (4.1.69), book p.90; DLS 1978 §2–3; note §2). -/
+single-ion term splits left/`θ`-right (Tasaki §4.1 (4.1.69), book p.90; DLS 1978 §2–3). -/
 theorem rightGauge_conj_ringBondSquareFieldHamiltonian (G : AxisTwoPiRotS N) (n : ℕ) [NeZero n]
     (a b : Fin (2 * n) → ℝ) :
     G.rightGauge n * ringBondSquareFieldHamiltonian n N (physBondSquareFieldOf n a b)

@@ -13,8 +13,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23PFLadderLink
 /-!
 # Tasaki §2.5 Theorem 2.3 — the Perron ground state is a total-Casimir eigenvector
 
-Sound Perron–Frobenius route (Issue #3542; see
-`.self-local/docs/tasaki-2-5-pf-route-design.md`).  Step 1 of the total-spin
+Sound Perron–Frobenius route (Issue #3542).  Step 1 of the total-spin
 determination: the per-sector Marshall-positive Heisenberg ground state is a
 joint eigenvector of the total Casimir `(Ŝtot)²`.
 

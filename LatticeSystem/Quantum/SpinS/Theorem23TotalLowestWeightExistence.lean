@@ -5,7 +5,7 @@ import LatticeSystem.Quantum.SpinS.BipartiteToyGSLadderInvariant
 # Existence of a total lowest weight with joint Casimir eigenvalues
 
 Issue #3542 (sound Perron–Frobenius route to Tasaki §2.5 Theorem 2.3), option (a),
-Route 5 brick 3b-engine (see `.self-local/tex/3717-coupled-total-spin-lower-bound.tex`).
+Route 5 brick 3b-engine.
 
 A non-zero simultaneous eigenvector of `(Ŝ_tot)²`, `(Ŝ_A)²`, `(Ŝ_¬A)²` generates, by
 repeatedly lowering with `Ŝ⁻_tot`, a non-zero **total lowest-weight** vector

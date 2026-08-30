@@ -4,8 +4,8 @@ import LatticeSystem.Quantum.SpinS.AKLTKnabe.TotalSpinCommuteE1b
 /-!
 # Gate E4: reduction of the spectrum of the AKLT window to the highest-weight blocks
 
-This module (Issue #5094; Tasaki §7.1.4, Knabe's argument, pp. 188–190) carries out step **(E)** of
-the design note `aklt-theorem-7-1-e1a-general-window-bound-design.md` §2.1: the *spectral reduction*
+This module (Issue #5094; Tasaki §7.1.4, Knabe's argument, pp. 188–190) carries out the
+*spectral reduction*
 
   every eigenvalue of the open three-bond window `ĥ = P̂₀₁ + P̂₁₂ + P̂₂₃` on `(ℂ³)^{⊗4}` is already
   an eigenvalue of `ĥ` restricted to one of the five highest-weight spaces `hw_k`
@@ -26,8 +26,8 @@ computation occurs anywhere**.  The chain is:
    self-adjointness of `ĥ` is needed: the ladder itself performs the reduction;
 3. *the `2k > |Λ|N` side* — for those sectors the ladder norm identity `ladderNormSqE3` makes
    `Ŝ⁺_tot` injective on `V_k`, i.e. `hw_k = 0`, which is what confines the index `j` produced by
-   the induction to `2j ≤ |Λ|N`, i.e. `j ≤ 4` for the window.  The total-spin-flip unitary of the
-   design note §2.1 (E) is **not** needed;
+   the induction to `2j ≤ |Λ|N`, i.e. `j ≤ 4` for the window.  A total-spin-flip unitary is
+   **not** needed;
 4. *reduction to a sector* — a general eigenvector need not lie in a single `V_k`, so its
    magnetisation components `sectorProjE4 k v` are used; sector invariance makes each of them an
    eigenvector for the same eigenvalue, and at least one of them is nonzero.
@@ -128,7 +128,7 @@ theorem mem_magSectorE4_of_totalSpinSOp3_apply (k : ℕ) (w : ManyBodyVecE2 Λ N
   · exact absurd h hne
   · exact h
 
-/-- **Design §2.1 (E), step 1**: an operator commuting with `Ŝ³_tot` preserves every magnetisation
+/-- An operator commuting with `Ŝ³_tot` preserves every magnetisation
 sector `V_k`. -/
 theorem manyBodyLinE4_mem_magSector (A : ManyBodyOpS Λ N) (hA : Commute A (totalSpinSOp3 Λ N))
     (k : ℕ) (v : ManyBodyVecE2 Λ N) (hv : v ∈ magSectorE2 Λ N k) :
@@ -139,8 +139,8 @@ theorem manyBodyLinE4_mem_magSector (A : ManyBodyOpS Λ N) (hA : Commute A (tota
 
 /-! ## 3. The high sectors carry no highest-weight vector -/
 
-/-- **Design §2.1 (E), the `m < 0` side**: for `2k > |Λ|N` the highest-weight space `hw_k` is
-trivial.  Instead of the total-spin-flip unitary of the design note this is the *dual* of the Gate
+/-- **The `m < 0` side**: for `2k > |Λ|N` the highest-weight space `hw_k` is
+trivial.  Instead of a total-spin-flip unitary this is the *dual* of the Gate
 E3 injectivity statement: the ladder norm identity `‖Ŝ⁻v‖² = ‖Ŝ⁺v‖² + (|Λ|N − 2k)‖v‖²` forces
 `‖v‖ = 0` as soon as `Ŝ⁺v = 0` and `|Λ|N − 2k < 0`. -/
 theorem eq_zero_of_mem_highestWeightE4 (k : ℕ) (hk : Fintype.card Λ * N < 2 * k)
@@ -163,7 +163,7 @@ theorem eq_zero_of_mem_highestWeightE4 (k : ℕ) (hk : Fintype.card Λ * N < 2 *
 
 /-! ## 4. The descending ladder induction -/
 
-/-- **Design §2.1 (E), descending induction**: a nonzero eigenvector of `A` lying in the
+/-- **Descending induction**: a nonzero eigenvector of `A` lying in the
 magnetisation sector `V_k` produces a nonzero eigenvector of `A` for the *same* eigenvalue lying in
 a highest-weight space `hw_j` with `j ≤ k`.
 
@@ -285,7 +285,7 @@ theorem exists_sectorProjE4_ne_zero (v : ManyBodyVecE2 Λ N) (hv : v ≠ 0) :
     rw [ofLp_sectorProjE4, if_pos rfl] at h'
     exact h'
 
-/-- **Design §2.1 (E), step 4**: the sector components of an eigenvector are eigenvectors for the
+/-- The sector components of an eigenvector are eigenvectors for the
 same eigenvalue.  Only the sector invariance of `A` and the magnetisation decomposition are
 used. -/
 theorem sectorProjE4_eigen (A : ManyBodyOpS Λ N) (hA : Commute A (totalSpinSOp3 Λ N)) (μ : ℂ)
@@ -308,7 +308,7 @@ theorem sectorProjE4_eigen (A : ManyBodyOpS Λ N) (hA : Commute A (totalSpinSOp3
 
 /-! ## 6. The general spectral reduction -/
 
-/-- **Design §2.1 (E), general form**: if `A` commutes with `Ŝ⁺_tot` and with `Ŝ³_tot`, then every
+/-- **General form**: if `A` commutes with `Ŝ⁺_tot` and with `Ŝ³_tot`, then every
 eigenvalue of `A` on the many-body Hilbert space is already an eigenvalue of `A` on one of the
 highest-weight spaces `hw_j` with `2j ≤ |Λ|N`.
 
@@ -369,7 +369,7 @@ already an eigenvalue of `ĥ` restricted to one of the five highest-weight space
 `k = 0, 1, 2, 3, 4`, whose dimensions are `1, 3, 6, 6, 3` (Gate E3
 `finrank_highestWeightE3_window`).
 
-This is the dimensional reduction `81 → 1 + 3 + 6 + 6 + 3` announced in the design note §2.1 (E):
+This is the dimensional reduction `81 → 1 + 3 + 6 + 6 + 3`:
 the Knabe inequality `ĥ² ≥ (2/5) ĥ` (Tasaki §7.1.4, pp. 188–190; Knabe 1988) now only has to be
 checked on those five blocks, since a nonzero `u ∈ hw_k` with `ĥ u = μ u` gives
 `⟪u, (ĥ² − (2/5)ĥ) u⟫ = (μ² − (2/5)μ) ‖u‖²`.

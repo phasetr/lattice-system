@@ -4,7 +4,7 @@ import LatticeSystem.Quantum.SpinS.SublatticeMagWeightComponent
 # Sublattice magnetization-projection infrastructure
 
 Issue #3542 (sound Perron–Frobenius route to Tasaki §2.5 Theorem 2.3), option (a),
-Route 5 brick 2a (see `.self-local/tex/3717-coupled-total-spin-lower-bound.tex`).
+Route 5 brick 2a.
 
 Basic algebraic facts about the pointwise sublattice-`A` magnetization projector
 `sublatticeMagProjFn A M`:

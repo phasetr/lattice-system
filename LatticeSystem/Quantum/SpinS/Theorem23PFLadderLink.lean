@@ -7,8 +7,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23PredictedEndpoint
 /-!
 # Tasaki §2.5 Theorem 2.3 — Perron–Frobenius adjacent-sector ladder link
 
-Sound replacement for the deleted saturated-ladder-iterate route (Issue
-#3542; see `.self-local/docs/tasaki-2-5-pf-route-design.md`).  The
+Sound replacement for the deleted saturated-ladder-iterate route (Issue #3542).  The
 per-sector Marshall-positive Perron–Frobenius ground state
 (`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`) is
 chained across adjacent

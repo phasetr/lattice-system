@@ -7,7 +7,7 @@ import LatticeSystem.Quantum.SpinS.JointLadderIterateSublatticeMag
 # The bottom sublattice-`A` magnetization component is `Ŝ_A^-`-killed
 
 Issue #3542 (sound Perron–Frobenius route to Tasaki §2.5 Theorem 2.3), option (a),
-Route 5 brick 2b (see `.self-local/tex/3717-coupled-total-spin-lower-bound.tex`).
+Route 5 brick 2b.
 
 For a total lowest-weight vector `w` (`Ŝ⁻_tot w = 0`, total magnetization `m`,
 simultaneous sublattice-Casimir eigenvector at `α, β`), the **minimal-`A`-magnetization

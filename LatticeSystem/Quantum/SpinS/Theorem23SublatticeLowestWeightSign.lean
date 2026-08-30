@@ -5,7 +5,7 @@ import LatticeSystem.Quantum.SpinS.SublatticeLowestWeight
 # A sublattice lowest weight has non-positive magnetization
 
 Issue #3542 (sound Perron–Frobenius route to Tasaki §2.5 Theorem 2.3), option (a),
-Route 5 brick 1 (see `.self-local/tex/3717-coupled-total-spin-lower-bound.tex`).
+Route 5 brick 1.
 
 A sublattice lowest-weight vector (`Ŝ_A^- v = 0`, `Ŝ_A^(3) v = q v`, `v ≠ 0`) has
 `q.re ≤ 0`: the lowest-weight Casimir relation `(Ŝ_A)² = q(q−1)`

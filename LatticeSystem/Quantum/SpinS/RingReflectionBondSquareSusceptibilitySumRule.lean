@@ -21,8 +21,7 @@ The capstone `ringBondSquareField_susceptibility_sum_rule` is phrased in the `hs
 next stage (χ3); this file stops at the general-field sum rule.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020, §4.1,
-eqs. (4.1.38)–(4.1.41), book p. 84.  See
-`.self-local/docs/math-tasaki-4-1-41-susceptibility-sum-rule.md`.
+eqs. (4.1.38)–(4.1.41), book p. 84.
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareSusceptibility
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareGroundEnergy

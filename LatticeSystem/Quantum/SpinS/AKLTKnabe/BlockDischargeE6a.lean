@@ -10,7 +10,7 @@ It removes **all four** hypotheses of the Gate E5 conditional capstone
     4`,
 so that the Knabe window inequality is obtained unconditionally.
 
-The simplification found at Gate E5 (report §4) is exploited in a stronger form: for `k ≤ 2` the
+The simplification found at Gate E5 is exploited in a stronger form: for `k ≤ 2` the
 *linear* form `ĥ − (2/5)` is already positive semidefinite on the **whole magnetisation sector**
 `V_k`, not merely on the highest-weight subspace `hw_k ⊆ V_k`.  Consequently
 
