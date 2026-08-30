@@ -21,9 +21,8 @@ theorem staggeredOrderOpS_commutator' (A : Λ → Bool) (N : ℕ) (C : ManyBodyO
     C * staggeredOrderOpS A N - staggeredOrderOpS A N * C
       = ∑ x : Λ, (if A x then (1 : ℂ) else -1)
           • (C * spinSSiteOp3 x N - spinSSiteOp3 x N * C) := by
-  rw [staggeredOrderOpS, Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib]
-  refine Finset.sum_congr rfl (fun x _ => ?_)
-  rw [mul_smul_comm, smul_mul_assoc, smul_sub]
+  rw [staggeredOrderOpS]
+  exact commutator_sum_smul_right _ C _ _
 
 /-- **The staggered order double commutator as a double site sum**:
 `[Ô, [Ĥ, Ô]] = Σ_x Σ_z ε_x ε_z [Ŝ_x^{(3)}, [Ĥ, Ŝ_z^{(3)}]]`. -/
@@ -41,8 +40,9 @@ theorem staggeredOrderOpS_double_commutator (A : Λ → Bool) (N : ℕ) (H : Man
     (∑ z : Λ, (if A z then (1 : ℂ) else -1) • (H * spinSSiteOp3 z N - spinSSiteOp3 z N * H))]
   refine Finset.sum_congr rfl (fun x _ => ?_)
   -- distribute `[Ŝ_x^{(3)}, ·]` over the inner sum
-  rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib, Finset.smul_sum]
-  refine Finset.sum_congr rfl (fun z _ => ?_)
-  rw [mul_smul_comm, smul_mul_assoc, ← smul_sub, smul_smul]
+  rw [commutator_sum_smul_right Finset.univ (spinSSiteOp3 x N)
+    (fun z => if A z then (1 : ℂ) else -1)
+    (fun z => H * spinSSiteOp3 z N - spinSSiteOp3 z N * H), Finset.smul_sum]
+  exact Finset.sum_congr rfl (fun z _ => by rw [smul_smul])
 
 end LatticeSystem.Quantum
