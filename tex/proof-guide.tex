@@ -12849,9 +12849,17 @@ $E_{\mathrm{GS}}$ to be a \emph{ground-state} energy, i.e.\ the minimum of the R
 of $\hat H$ over normalized vectors --- the running assumption of the ``Setting and assumptions''
 paragraph on p.~65.  It cannot be dropped: at
 $\hat H=\hat\sigma^3$, $\hat O_L=\hat\sigma^1$, $\Phi_{\mathrm{GS}}=(2,0)$ the eigenvalue
-$E_{\mathrm{GS}}=1$ is not the ground energy and both sides of~(3.4.8) equal $-2$; the two numeric
-fixtures pin exactly that instance, with $\Phi_{\mathrm{GS}}$ deliberately left un-normalized so
-that $m_2=4$ and its square root are both load-bearing in the values they check.  Locality of
+$E_{\mathrm{GS}}=1$ is not the ground energy and both sides of~(3.4.8) equal $-2$.  The numeric
+fixtures pin that instance and a second one,
+$\hat H=\hat\sigma^1$, $\hat O_L=4\hat\sigma^1+\hat\sigma^3+3\cdot\mathbf{1}$,
+$\Phi_{\mathrm{GS}}=(1,1)$, where both sides equal $-1/25$.  Neither reference vector is
+normalized.  At the first point $\hat\sigma^1$ is involutive and $\Phi_{\mathrm{GS}}$ a coordinate
+vector, so $m_2=4$ coincides with $\lVert\Phi_{\mathrm{GS}}\rVert^2$, the normalizing length
+$\lVert\hat O_L\Phi_{\mathrm{GS}}\rVert$ with $\lVert\Phi_{\mathrm{GS}}\rVert$, and $\sqrt{m_2}$
+with $m_2/2$; at the second, $\hat O_L$ is Hermitian but not involutive and $(\hat O_L)^2$ is not
+a multiple of the identity, and $m_2=100$, $\lVert\Phi_{\mathrm{GS}}\rVert^2=2$, $\sqrt{m_2}=10$
+and $m_2/2=50$ are pairwise distinct, so the second moment and the normalization of $\Gamma$ are
+separately load-bearing in the values checked.  Locality of
 $\hat O_L$ (eqs.~(3.4.1)--(3.4.2)) is not assumed, so nothing here certifies a concrete model.
 The $C\,L^{-d}$ low-lying bound~(3.4.12)
 that~(3.4.8) feeds is not yet formalized: it is the input $\delta$ that Theorem~3.1

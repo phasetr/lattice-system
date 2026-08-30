@@ -228,9 +228,14 @@ All declarations below are **PROVED**; `#print axioms` on each yields only `prop
 Regression fixtures live in `LatticeSystem/Tests/HorschVonderLindenTrialStateVariational.lean`:
 each of the five declarations above has a signature fixture restating it in full and discharging it
 by the declaration itself, so the fixture fails to elaborate if the name is not resolvable from
-another module, together with two numeric instances that evaluate both sides of (3.4.8) at
-`Ĥ = σ³`, `Ô_L = σ¹`, `Φ_GS = (2, 0)`. The reference vector is deliberately not a unit vector, so
-the second moment `m₂ = 4` and its square root both enter the numbers the instances check.
+another module, together with numeric instances that evaluate both sides of (3.4.8) at two
+concrete points. The first is `Ĥ = σ³`, `Ô_L = σ¹`, `Φ_GS = (2, 0)`, where both sides equal `−2`;
+there `σ¹` is involutive and `Φ_GS` a coordinate vector, so `m₂ = 4` coincides with `‖Φ_GS‖²`,
+`‖Ô_LΦ_GS‖` with `‖Φ_GS‖`, and `√m₂` with `m₂/2`. The second, `Ĥ = σ¹`, `Ô_L = 4σ¹ + σ³ + 3·1`,
+`Φ_GS = (1, 1)`, separates them: `Ô_L` is Hermitian but not involutive, its square is not a
+multiple of the identity, `m₂ = 100` against `‖Φ_GS‖² = 2` and `√m₂ = 10` against `m₂/2 = 50`, and
+both sides equal `−1/25`. Neither reference vector is a unit vector, so the normalisation of `Γ`
+is load-bearing in every number the instances check.
 
 ---
 
