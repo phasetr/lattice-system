@@ -6,6 +6,7 @@ This file develops the operator-norm locality of the double commutator
 building on the Lemma R1 layer in `AndersonTowerEnergyBound`.
 -/
 import LatticeSystem.Quantum.SpinS.AndersonTowerEnergyBound
+import LatticeSystem.Math.CommutatorSum
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
 
 namespace LatticeSystem.Quantum
@@ -332,22 +333,6 @@ theorem bondDoubleComm_norm_le (d L N : ℕ) [NeZero L] {x y : HypercubicTorus d
     (hxy : x ≠ y) (hN : 1 ≤ N) :
     manyBodyOperatorNormS (bondDoubleComm d L N x y) ≤ 48 * (N : ℝ) ^ 4 :=
   bondDoubleCommutator_norm_le (torusParitySublattice d L) x y hxy hN
-
-/-- A commutator distributes over a scalar-weighted finite sum on the right. -/
-theorem commutator_sum_smul_right {ι : Type*} (s : Finset ι) (A : ManyBodyOpS Λ N)
-    (c : ι → ℂ) (B : ι → ManyBodyOpS Λ N) :
-    A * (∑ i ∈ s, c i • B i) - (∑ i ∈ s, c i • B i) * A
-      = ∑ i ∈ s, c i • (A * B i - B i * A) := by
-  rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib]
-  exact Finset.sum_congr rfl (fun i _ => by rw [mul_smul_comm, smul_mul_assoc, smul_sub])
-
-/-- A commutator distributes over a scalar-weighted finite sum on the left. -/
-theorem commutator_sum_smul_left {ι : Type*} (s : Finset ι) (A : ManyBodyOpS Λ N)
-    (c : ι → ℂ) (B : ι → ManyBodyOpS Λ N) :
-    (∑ i ∈ s, c i • B i) * A - A * (∑ i ∈ s, c i • B i)
-      = ∑ i ∈ s, c i • (B i * A - A * B i) := by
-  rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib]
-  exact Finset.sum_congr rfl (fun i _ => by rw [smul_mul_assoc, mul_smul_comm, smul_sub])
 
 /-- **Bilinear expansion of the spatial double commutator** `[Ô⁺, [Ĥ, Ô⁻]] = Σ_{x,y} J x y ĝ_{x,y}`
 over the bonds, by distributing the commutator across the Hamiltonian sum. -/
