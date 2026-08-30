@@ -37,4 +37,42 @@ theorem commutator_orderSum_eq_windowSum {ι : Type*} (B : Finset ι)
   refine (Finset.sum_subset (Finset.subset_univ (W b)) fun z _ hz => ?_).symm
   exact sub_eq_zero.mpr (hW b hbB z hz).eq
 
+/-- **Tasaki eq. (3.4.10), p. 67** — the double commutator of the order operator with the windowed
+Hamiltonian collapses onto the windows on *both* index positions:
+`[Ô, [Ĥ, Ô]] = Σ_{b∈B} Σ_{x∈W b} Σ_{z∈W b} [ô_x, [ĥ_b, ô_z]]`.
+Beyond the window hypothesis `hW` of eq. (3.4.9) this needs `hoo`, the Lean content of "`ô_x` acts
+nontrivially only on the spin at `x`": distinct sites carry commuting order operators, which is what
+makes the outer sum collapse onto `W b` as well. -/
+theorem doubleCommutator_orderSum_eq_windowSum {ι : Type*} (B : Finset ι)
+    (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N) (W : ι → Finset Λ)
+    (hW : ∀ b ∈ B, ∀ z ∉ W b, Commute (hb b) (o z))
+    (hoo : ∀ x z : Λ, x ≠ z → Commute (o x) (o z)) :
+    (∑ x : Λ, o x) * ((∑ b ∈ B, hb b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b ∈ B, hb b))
+        - ((∑ b ∈ B, hb b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b ∈ B, hb b)) * (∑ x : Λ, o x)
+      = ∑ b ∈ B, ∑ x ∈ W b, ∑ z ∈ W b,
+          (o x * (hb b * o z - o z * hb b) - (hb b * o z - o z * hb b) * o x) := by
+  have hinner : ∀ x : Λ,
+      o x * (∑ b ∈ B, ∑ z ∈ W b, (hb b * o z - o z * hb b))
+          - (∑ b ∈ B, ∑ z ∈ W b, (hb b * o z - o z * hb b)) * o x
+        = ∑ b ∈ B, (o x * (∑ z ∈ W b, (hb b * o z - o z * hb b))
+            - (∑ z ∈ W b, (hb b * o z - o z * hb b)) * o x) := fun x =>
+    commutator_sum_right B (o x) fun b => ∑ z ∈ W b, (hb b * o z - o z * hb b)
+  rw [commutator_orderSum_eq_windowSum B hb o W hW,
+    commutator_sum_left Finset.univ (∑ b ∈ B, ∑ z ∈ W b, (hb b * o z - o z * hb b)) o]
+  simp only [hinner]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun b hbB => ?_
+  have hcollapse : ∑ x ∈ W b, (o x * (∑ z ∈ W b, (hb b * o z - o z * hb b))
+          - (∑ z ∈ W b, (hb b * o z - o z * hb b)) * o x)
+      = ∑ x : Λ, (o x * (∑ z ∈ W b, (hb b * o z - o z * hb b))
+          - (∑ z ∈ W b, (hb b * o z - o z * hb b)) * o x) := by
+    refine Finset.sum_subset (Finset.subset_univ (W b)) fun x _ hx => ?_
+    refine sub_eq_zero.mpr (Commute.sum_right _ _ _ fun z hz => ?_).eq
+    have hxz : x ≠ z := by rintro rfl; exact hx hz
+    exact ((hW b hbB x hx).symm.mul_right (hoo x z hxz)).sub_right
+      ((hoo x z hxz).mul_right (hW b hbB x hx).symm)
+  rw [← hcollapse]
+  exact Finset.sum_congr rfl fun x _ =>
+    commutator_sum_right (W b) (o x) fun z => hb b * o z - o z * hb b
+
 end LatticeSystem.Quantum
