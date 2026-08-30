@@ -163,7 +163,7 @@ All declarations below are **PROVED**; `#print axioms` on each yields only `prop
 
 | Lean name | Statement | File |
 |---|---|---|
-| `hvlTrialState` | the Horsch-von der Linden trial state `\|Γ⟩` of eq. (3.4.7): `Ô_L\|Φ_GS⟩` unit-normalised in the `L²` pairing | `Quantum/HorschVonderLindenProblem34b.lean` |
+| `hvlTrialState` | the Horsch-von der Linden trial state `\|Γ⟩` of eq. (3.4.7): `Ô_L\|Φ_GS⟩` unit-normalised in the `L²` pairing | `Quantum/HorschVonderLindenTrialState.lean` |
 | `hvlPlusState` | the state `\|Ξ₊⟩ = (1/√2)(\|Φ_GS⟩ + \|Γ⟩)` of eq. (3.4.14) | `Quantum/HorschVonderLindenProblem34b.lean` |
 | `hvlPlusState_dotProduct_self` | the remark after eq. (3.4.14): `⟨Ξ₊\|Ξ₊⟩ = 1`, from `⟨Γ\|Γ⟩ = 1` and the vanishing of `⟨Φ_GS\|Γ⟩` | `Quantum/HorschVonderLindenProblem34b.lean` |
 | `hvlPlusState_order_mean` | eq. (3.4.15): `⟨Ξ₊\|Ô_L\|Ξ₊⟩ = √m₂`, under the vanishing of the first and third odd moments | `Quantum/HorschVonderLindenProblem34b.lean` |
@@ -175,6 +175,64 @@ Regression fixtures live in `LatticeSystem/Tests/Problem34bFluctuation.lean`: ea
 declarations above has a signature fixture restating it in full and discharging it by the
 declaration itself, together with two concrete numeric instances and one satisfiability witness
 for the capstone's hypothesis bundle.
+
+## Authoritative supplemental implementation record (trial state, eq. (3.4.8))
+
+This section is maintained by hand, lies outside the migrated catalogue block above, and records
+declarations added after the migration baseline; it is not subject to the frozen byte-for-byte
+parity of the block above.
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4, "Setting and
+assumptions" p. 65, eqs. (3.4.7)-(3.4.8), p. 66.
+
+`Quantum/HorschVonderLindenTrialState.lean` is the shared §3.4 home of the normalised trial state
+`|Γ⟩ = Ô_L|Φ_GS⟩ / ‖Ô_L|Φ_GS⟩‖` (eq. (3.4.7), the definition `hvlTrialState` catalogued in the
+Problem 3.4.b record above), of the algebra that moves powers of `Ô_L` across the `L²` pairing
+between `Γ` and `Φ_GS`, and of the basic variational estimate
+
+`⟨Γ|Ĥ|Γ⟩ − E_GS = ⟨Φ_GS|[Ô_L,[Ĥ,Ô_L]]|Φ_GS⟩ / (2⟨Φ_GS|(Ô_L)²|Φ_GS⟩)` (eq. (3.4.8))
+
+that Tasaki reads off "by inspection" on p. 66. The modules that build states on top of `Γ` — the
+symmetric combination `Ξ₊` of eq. (3.4.14) and its mirror — import it.
+
+Eq. (3.4.8) is the un-normalised double-commutator identity
+`double_commutator_ground_state_eq` (`Quantum/SpinS/DoubleCommutatorVariational.lean`) divided by
+`2 m₂` with `m₂ = ⟨Φ_GS|(Ô_L)²|Φ_GS⟩`: taking real parts turns its right-hand side into
+`2⟨Ô_LΦ_GS|Ĥ|Ô_LΦ_GS⟩ − 2 E_GS m₂`, while `Γ = (√m₂)⁻¹ • Ô_L|Φ_GS⟩` makes the left-hand Rayleigh
+quotient `⟨Ô_LΦ_GS|Ĥ|Ô_LΦ_GS⟩/m₂`. The identity therefore holds at **any** eigenvector `Φ_GS` of
+`Ĥ` with eigenvalue `E_GS`, with no long-range-order (3.4.3) or odd-moment (3.4.4) hypothesis;
+positivity of `m₂` enters only through the normalisation of `Γ`.
+
+**What these declarations do not assert.** The non-negativity of the left-hand side of (3.4.8) is
+*not* a consequence of the identity. It needs `E_GS` to be a ground-state energy, i.e. the minimum
+of the Rayleigh quotient of `Ĥ` over normalised vectors — the running assumption of the "Setting
+and assumptions" paragraph on p. 65, which the source uses silently at (3.4.8) — so that is carried
+as the explicit hypothesis `hGS` of `hvlTrialState_energy_sub_nonneg`, applied at the normalised
+`Γ`. It cannot be dropped: at `Ĥ = σ³`, `Ô_L = σ¹`, `Φ_GS = e₀` the eigenvalue `E_GS = 1` is not
+the ground energy and both sides of (3.4.8) equal `−2`. Locality of `Ô_L` (eqs. (3.4.1)-(3.4.2))
+and any lattice structure are absent here, so nothing in this module certifies a concrete model;
+the `C L^{-d}` low-lying bound (3.4.12) that (3.4.8) feeds is proved in
+`Quantum/HorschVonderLinden.lean`.
+
+All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
+`Classical.choice`, `Quot.sound`.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `hermitianSq_dotProduct_split` | a Hermitian square splits as a self-pairing: `⟨v, A²v⟩ = ⟨Av, Av⟩` | `Quantum/HorschVonderLindenTrialState.lean` |
+| `trialState_eq_smul` | `Γ` as the scalar multiple `(√m₂)⁻¹ • (Ô_L\|Φ_GS⟩)`, the defining unfolding of the unit normalisation | `Quantum/HorschVonderLindenTrialState.lean` |
+| `dotProduct_mulVec_trialState` | ket-side absorption: `⟨Φ_GS, (Ô_L)^k Γ⟩ = (√m₂)⁻¹ ⟨Φ_GS, (Ô_L)^{k+1} Φ_GS⟩` | `Quantum/HorschVonderLindenTrialState.lean` |
+| `trialState_dotProduct_mulVec` | bra-side adjoint transfer: `⟨Γ, (Ô_L)^k Φ_GS⟩ = (√m₂)⁻¹ ⟨Φ_GS, (Ô_L)^{k+1} Φ_GS⟩` | `Quantum/HorschVonderLindenTrialState.lean` |
+| `trialState_dotProduct_mulVec_trialState` | diagonal absorption: `⟨Γ, (Ô_L)^k Γ⟩ = ((√m₂)⁻¹)² ⟨Φ_GS, (Ô_L)^{k+2} Φ_GS⟩` | `Quantum/HorschVonderLindenTrialState.lean` |
+| `trialState_dotProduct_self` | `⟨Γ\|Γ⟩ = 1`, the unit normalisation of the trial state, given `m₂ > 0` | `Quantum/HorschVonderLindenTrialState.lean` |
+| `hvlTrialState_energy_sub_eq` | eq. (3.4.8): `⟨Γ\|Ĥ\|Γ⟩ − E_GS = ⟨Φ_GS\|[Ô_L,[Ĥ,Ô_L]]\|Φ_GS⟩ / (2 m₂)`, for Hermitian `Ĥ`, `Ô_L` and any eigenvector `Φ_GS` of `Ĥ` | `Quantum/HorschVonderLindenTrialState.lean` |
+| `hvlTrialState_energy_sub_nonneg` | the non-negativity side of eq. (3.4.8): `0 ≤ ⟨Γ\|Ĥ\|Γ⟩ − E_GS`, under the explicit ground-state-minimality hypothesis on `E_GS` | `Quantum/HorschVonderLindenTrialState.lean` |
+
+Regression fixtures live in `LatticeSystem/Tests/HorschVonderLindenTrialStateRelocation.lean`:
+each relocated declaration has a signature fixture restating it in full and discharging it by the
+declaration itself, so the fixture fails to elaborate if the name is not resolvable from another
+module, and the two eq. (3.4.8) declarations are pinned the same way, together with two numeric
+instances that evaluate both sides of (3.4.8) at `Ĥ = σ³`, `Ô_L = σ¹`, `Φ_GS = e₀`.
 
 ---
 
