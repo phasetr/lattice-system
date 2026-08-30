@@ -1,11 +1,11 @@
 ---
 layout: page
-title: "Legacy catalogue: Multi-mode fermion via Jordan–Wigner (P2 backbone) (part 3 of 5)"
+title: "Legacy catalogue: Multi-mode fermion via Jordan–Wigner (P2 backbone) (part 3 of 9)"
 permalink: /formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-03/
 ---
 
 <a id="legacy-catalogue-multi-mode-fermion-via-jordanwigner-p2-backbone-part-3-of-4"></a>
-# Legacy catalogue: Multi-mode fermion via Jordan–Wigner (P2 backbone) (part 3 of 5)
+# Legacy catalogue: Multi-mode fermion via Jordan–Wigner (P2 backbone) (part 3 of 9)
 
 > **Interim authority.** This lossless catalogue chunk remains authoritative for formalization status and capstone identification until Issue #5228. The version 1 JSON catalogue is still a non-authoritative prototype.
 

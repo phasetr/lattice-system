@@ -336,8 +336,25 @@ def _drop_working_note_prose_citation(text: str) -> str:
     return _WORKING_NOTE_PROSE_CITATION.sub("See Issue #3542.", text)
 
 
+# One baseline catalogue row points at this repository's private, gitignored project-instructions
+# file. The pointer is dropped from the published row; the sentence it trailed stands on its own.
+# Matched structurally, by the shape of a parenthesised dotted Markdown filename, so that the
+# private identifier is not reproduced here.
+_PRIVATE_INSTRUCTIONS_REF = re.compile(r" \(\w+\.\w+\.md\)")
+
+# Number of baseline sites the removal above matches. Pinned for the same reason as
+# WORKING_NOTE_REMOVAL_COUNTS: a structural pattern that starts matching more (or fewer) sites than
+# audited must fail loudly instead of silently editing the baseline.
+PRIVATE_INSTRUCTIONS_REMOVAL_COUNT = 1
+
+
+def _drop_private_instructions_ref(text: str) -> str:
+    """Drop the catalogue-row pointer to the private project-instructions file."""
+    return _PRIVATE_INSTRUCTIONS_REF.sub("", text)
+
+
 def approved_changes(text: str) -> str:
-    return _drop_working_note_citations(
+    changed = _drop_working_note_citations(
         text.replace("(refactoring-conventions.html)", "(/lattice-system/refactoring-conventions/)")
         .replace(
             "(deprecations.html#remaining-linter-suppressions)",
@@ -856,6 +873,7 @@ def approved_changes(text: str) -> str:
             "`Fermion/JordanWigner/Hubbard/LiebShenQiuDischarge.lean` |",
         )
     )
+    return _drop_private_instructions_ref(changed)
 
 
 MOVED_PROSE_LINK_REWRITES = (
@@ -1178,6 +1196,12 @@ def main() -> None:
     # Catalogue rows must retain exact global order after the two evidenced status corrections.
     # Long cells are reconstructed from one compact table reference and one grouped detail record.
     catalogue_baseline = "".join(old_lines[216:2731])
+    private_instructions_removals = len(_PRIVATE_INSTRUCTIONS_REF.findall(catalogue_baseline))
+    if private_instructions_removals != PRIVATE_INSTRUCTIONS_REMOVAL_COUNT:
+        fail(
+            "audited private project-instructions removal count differs: "
+            f"expected={PRIVATE_INSTRUCTIONS_REMOVAL_COUNT}, actual={private_instructions_removals}"
+        )
     working_note_counts = [
         len(_WORKING_NOTE_CITATION.findall(catalogue_baseline)),
         len(_WORKING_NOTE_SECTION_REF.findall(catalogue_baseline)),

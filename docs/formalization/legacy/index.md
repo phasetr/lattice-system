@@ -88,11 +88,11 @@ the current formalization-status and capstone authority during migration.
 ### Fermions and Hubbard models
 
 - [Single-mode fermion (P2 skeleton)](/lattice-system/formalization/legacy/29-single-mode-fermion-p2-skeleton/)
-- [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 1 of 5](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-01/)
-- [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 2 of 5](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-02/)
-- [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 3 of 5](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-03/)
-- [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 4 of 5](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-04/)
-- [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 5 of 5](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-05/)
+- [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 1 of 9](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-01/)
+- [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 2 of 9](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-02/)
+- [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 3 of 9](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-03/)
+- [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 4 of 9](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-04/)
+- [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 5 of 9](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-05/)
 - [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 6 of 9](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-06/)
 - [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 7 of 9](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-07/)
 - [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 8 of 9](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-08/)
