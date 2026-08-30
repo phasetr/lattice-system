@@ -143,4 +143,18 @@ theorem hvlTrialState_energy_sub_eq {n : Type*} [Fintype n] [DecidableEq n]
   rw [hnum, hscale]
   field_simp
 
+/-- **Non-negativity of the basic variational estimate** (Tasaki eq. (3.4.8), p. 66):
+`⟨Γ|Ĥ|Γ⟩ − E_GS ≥ 0`.  Unlike the identity itself this direction needs `E_GS` to be a ground-state
+energy: `hGS` is the book's running assumption of the "Setting and assumptions" paragraph (p. 65),
+that `E_GS` is the minimum of the Rayleigh quotient over normalised vectors, and it is applied at
+the normalised trial state `Γ`.  At a non-minimal eigenvalue the difference is genuinely negative,
+so `hGS` cannot be dropped.  The Hermiticity of `Ĥ` and the eigenvector hypothesis are carried for
+uniformity with `hvlTrialState_energy_sub_eq` and are not used by this direction. -/
+theorem hvlTrialState_energy_sub_nonneg {n : Type*} [Fintype n] [DecidableEq n]
+    {H O : Matrix n n ℂ} {Φ : n → ℂ} {E₀ : ℝ} (_hH : H.IsHermitian) (hO : O.IsHermitian)
+    (_hΦE : H *ᵥ Φ = (E₀ : ℂ) • Φ) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ)
+    (hGS : ∀ ψ : n → ℂ, star ψ ⬝ᵥ ψ = 1 → (E₀ : ℝ) ≤ rayleighOnVec H ψ) :
+    0 ≤ rayleighOnVec H (hvlTrialState O Φ) - E₀ :=
+  sub_nonneg.mpr (hGS (hvlTrialState O Φ) (trialState_dotProduct_self hO Φ hm2))
+
 end LatticeSystem.Quantum
