@@ -4,11 +4,10 @@ import LatticeSystem.Quantum.SpinS.StaggeredOrderDoubleCommutator
 /-!
 # Test coverage for the §3.4 locality core, eqs. (3.4.9)-(3.4.11)
 
-Fixtures for `LatticeSystem/Quantum/SpinS/LocalDoubleCommutatorBound.lean` (PR-2 of the §3.4
-backfill arc), covering H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st
-ed., Springer, 2020), §3.4, pp. 66-67: the localised inner commutator eq. (3.4.9), the localised
-double commutator eq. (3.4.10), the general-window norm kernel it feeds, and the capstone eq.
-(3.4.11). Design frozen in `.self-local/reports/design-pr2-eq3411.md`.
+Fixtures for `LatticeSystem/Quantum/SpinS/LocalDoubleCommutatorBound.lean`, covering H. Tasaki,
+*Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer, 2020), §3.4, pp. 66-67:
+the localised inner commutator eq. (3.4.9), the localised double commutator eq. (3.4.10), the
+general-window norm kernel they feed, and the capstone eq. (3.4.11).
 
 ## What each block pins
 
@@ -20,62 +19,52 @@ as the declaration's own statement, discharged only by the identifier itself, so
 exactly when the identifier does not resolve. The two collapse identities are pinned with `W b` on
 **both** the outer window index and the inner window index (not `Finset.univ`), so a vacuous
 `W b = univ` instantiation would not satisfy the pin. The kernel pin fixes the exact constant
-`4 * (mW : ℝ) ^ 2 * h₀ * o₀ ^ 2 * (B.card : ℝ)` with `mW` left as a *variable*, per the design's
-generality obligation (§6-7): a hard-coded `mW = 2` bond-only statement would not distinguish the
-correct counting from the four wrong constants the design records. The capstone pin fixes both
-conjuncts, the literal `16`, the `(L : ℝ) ^ d` factor, and the exact hypothesis list — in
-particular that **no** (3.4.3)/(3.4.4)/Hermiticity hypothesis appears anywhere among the eight
-named hypotheses (`hW`, `hoo`, `hnh`, `hno`, `hh₀`, `ho₀`, `hbond`, `hB`) plus the normalization
-`hΦ`.
+`4 * (mW : ℝ) ^ 2 * h₀ * o₀ ^ 2 * (B.card : ℝ)` with `mW` left as a *variable*: at the bond point
+`mW = 2` the candidate constants `4 mW²`, `8 mW`, `2 mW³` and `mW⁴` all coincide with `16`, so a
+hard-coded `mW = 2` statement could not separate them. The capstone pin fixes both conjuncts, the
+literal `16`, the `(L : ℝ) ^ d` factor, and the exact hypothesis list — in particular that **no**
+(3.4.3)/(3.4.4)/Hermiticity hypothesis appears anywhere among the eight named hypotheses (`hW`,
+`hoo`, `hnh`, `hno`, `hh₀`, `ho₀`, `hbond`, `hB`) plus the normalization `hΦ`.
 
-**Numeric fixtures.** The kernel constant-correctness guard from the design (§7): at
-`mW := 3`, `h₀ := 5/2`, `o₀ := 1/2`, `B.card := 7` the correct constant evaluates to `315/2`. The
-design records five plausible mis-countings that each give a *different* wrong value at this point
-(`52.5`, `78.75`, `315`, `472.5`, `787.5`), so a `≤ 315/2` fixture built from a bound *tighter* than
-`315/2` (`≤` in the same direction as every one of the five, since all five exceed `315/2` except
-one — see the per-value note below) would not be reachable from any of them; the fixture is stated
-as an `≤` inequality on `manyBodyOperatorNormS`, matching the kernel's own conclusion shape, rather
-than as an equality, since the kernel produces a bound not an identity. `mW = 3 ≠ 2` is deliberate:
-at the bond point `mW = 2`, `4 mW²`, `8 mW`, `2 mW³` and `mW⁴` all coincide with `16`, so a fixture
-at `mW = 2` could not separate the correct exponent/factor pattern from any of them. The capstone
-fixture instantiates at `d := 3`, `L := 4`, `h₀ := 5/2`, `o₀ := 1/2`, giving the literal `1920`
-(`16 · 3 · (5/2) · (1/4) · 64`); `d ≠ L` and `L^d = 64 ≠ d^L = 81` pin the `d · L^d` shape against a
-`d^L` slip, and a `32` or `8` leading constant would give `3840` or `960` respectively.
+**Numeric fixtures.** The kernel fixture instantiates at `mW := 3`, `h₀ := 5/2`, `o₀ := 1/2`,
+`B.card := 7`, where the correct constant evaluates to `315/2` and the three competing patterns take
+the pairwise distinct values `105` (`8 mW`), `945/4` (`2 mW³`) and `2835/8` (`mW⁴`). The
+discriminating step is the intermediate `have`, whose constant is spelled out as
+`4 * (3 : ℝ) ^ 2 * (5 / 2) * (1 / 2) ^ 2 * (B.card : ℝ)` and which is closed by the kernel itself:
+a kernel with a different exponent/factor pattern yields a syntactically different constant and
+does not close that `have`. The final `≤ 315/2` goal is strictly weaker — `8 mW` would give
+`105 ≤ 315/2` and still satisfy it — so the numeric endpoint alone rules out only the patterns
+whose value at this point exceeds `315/2`. The fixture is stated as an `≤` inequality on
+`manyBodyOperatorNormS`, matching the kernel's own conclusion shape, since the kernel produces a
+bound and not an identity. The capstone fixture instantiates at `d := 3`, `L := 4`, `h₀ := 5/2`,
+`o₀ := 1/2`, giving the literal `1920` (`16 · 3 · (5/2) · (1/4) · 64`); `d ≠ L` and
+`L^d = 64 ≠ d^L = 81` pin the `d · L^d` shape against a `d^L` slip, and a `32` or `8` leading
+constant would give `3840` or `960` respectively.
 
-## Off-by-two window-index guard (design §7, closing remark)
+## One window, not two
 
-The design records that the collapse in (3.4.10) uses `|W b| ≤ mW` for **both** the innermost
-(`z`) sum and the middle (`x`) sum of the norm kernel's triple sum — i.e. it is genuinely a single
-window applied on both index positions, not two independently-bounded windows `W`/`W₂` that happen
-to coincide. Per the frozen decision (design §0 item 2, §3.B "why one window and not two"), the
-statement itself carries only one window parameter `W` and one bound `mW`; there is no `W₂`/`mW₂`
-pair to instantiate unequally, so **the swap the coordinator originally flagged cannot be expressed
-by any instantiation of this signature** — a fixture that tried to make `|W b| ≤ mW` apply to `x`
-and a *different* `mW₂` apply to `z` would not type-check against
-`manyBodyOperatorNormS_doubleCommutator_le_of_windows`'s actual hypothesis list (`hcard : ∀ b ∈ B,
-(W b).card ≤ mW`, one bound, no second bound). This is recorded here explicitly, per the
-orchestrator's instruction, rather than manufactured as a fixture that could not fail: the
-single-window numeric guard above (`mW := 3` distinguishing `4mW²` from `8mW`/`2mW³`/`mW⁴`) is the
-residual check the frozen design leaves available, and it *is* exercised as fixture 1.
+The collapse in (3.4.10) uses `|W b| ≤ mW` for **both** the innermost (`z`) sum and the middle
+(`x`) sum of the norm kernel's triple sum: a single window is applied on both index positions, not
+two independently-bounded windows `W`/`W₂` that happen to coincide. The statement carries one
+window parameter `W` and one bound `mW`, with the single cardinality hypothesis
+`hcard : ∀ b ∈ B, (W b).card ≤ mW`. There is therefore no `W₂`/`mW₂` pair that could be
+instantiated unequally, and no fixture can exhibit a mismatch between the two index positions; the
+numeric kernel fixture is the constant check this signature admits.
 
 ## Duplicate assessment
 
-`manyBodyOperatorNormS_comm_le` (`ManyBodyOperatorNorm.lean`, relocated from
-`LiebSchultzMattisTaylorBound.lean` by this same PR) and `expectation_abs_le_manyBodyOperatorNormS`
-(`ExpectationNormBound.lean`) are both consumed by, but not restated by, the capstone pin: the
-first conjunct of `doubleCommutator_bondLocal_expectation_le` is exactly
-`expectation_abs_le_manyBodyOperatorNormS` composed with `le_abs_self`, per the design (§3.D), so it
-is not re-pinned here as an independent fact — only the capstone's own two-conjunct signature is
-pinned, once, above.
+`manyBodyOperatorNormS_comm_le` (`ManyBodyOperatorNorm.lean`) and
+`expectation_abs_le_manyBodyOperatorNormS` (`ExpectationNormBound.lean`) are both consumed by, but
+not restated by, the capstone pin: the first conjunct of `doubleCommutator_bondLocal_expectation_le`
+is exactly `expectation_abs_le_manyBodyOperatorNormS` composed with `le_abs_self`, so it is not
+re-pinned here as an independent fact — only the capstone's own two-conjunct signature is pinned,
+once, above.
 
 ## Re-derivation pin
 
-`staggeredOrderOpS_double_commutator` (`StaggeredOrderDoubleCommutator.lean`) is expected to keep
-its statement unchanged after being re-derived (design §5) from the new `Math/CommutatorSum.lean`
-primitives. This is pinned as a signature pin against its **current** (pre-re-derivation) statement,
-so that after the re-derivation lands, this same pin continues to typecheck only if the statement
-was not altered; a change to the statement would make this pin fail to elaborate against the new
-declaration, which is the intended regression signal.
+`staggeredOrderOpS_double_commutator` (`StaggeredOrderDoubleCommutator.lean`) is derived from the
+`Math/CommutatorSum.lean` primitives. Its full statement is pinned here as a signature pin, so any
+alteration of that statement makes the pin fail to elaborate.
 -/
 
 namespace LatticeSystem.Tests.LocalDoubleCommutatorBound
@@ -158,9 +147,8 @@ example {ι : Type*} (B : Finset ι) (hb : ι → ManyBodyOpS Λ N) (o : Λ → 
 
 /-! ## Re-derivation pin -/
 
-/-- **Signature pin (re-derivation).** `staggeredOrderOpS_double_commutator` must keep this exact
-statement after being re-derived (design §5) from the `Math/CommutatorSum.lean` primitives instead
-of an inline distribution argument. -/
+/-- **Signature pin (re-derivation).** `staggeredOrderOpS_double_commutator`, derived from the
+`Math/CommutatorSum.lean` primitives, has exactly this statement. -/
 example (A : Λ → Bool) (H : ManyBodyOpS Λ N) :
     staggeredOrderOpS A N * (H * staggeredOrderOpS A N - staggeredOrderOpS A N * H)
         - (H * staggeredOrderOpS A N - staggeredOrderOpS A N * H) * staggeredOrderOpS A N
@@ -170,14 +158,15 @@ example (A : Λ → Bool) (H : ManyBodyOpS Λ N) :
                 - (H * spinSSiteOp3 z N - spinSSiteOp3 z N * H) * spinSSiteOp3 x N) :=
   staggeredOrderOpS_double_commutator A N H
 
-/-! ## Numeric fixture 1: the kernel constant-correctness guard (design §7 item 3) -/
+/-! ## Numeric fixture 1: the kernel constant-correctness guard -/
 
 /-- **Fixture (kernel constant guard).** At `mW := 3`, `h₀ := 5/2`, `o₀ := 1/2`, `B.card := 7` the
-kernel's constant evaluates to `315/2`. Every one of the design's five plausible mis-countings
-gives a numerically distinct value at this point (`52.5`, `78.75`, `315`, `472.5`, `787.5`), so this
-is a genuine discrimination point and not merely a plausibility check. Stated over *abstract*
-`B, hb, o, W` constrained only by the kernel's own hypotheses, so `norm_num` cannot close the goal
-without invoking the theorem. -/
+kernel's constant evaluates to `315/2`, while `8 mW`, `2 mW³` and `mW⁴` give the distinct values
+`105`, `945/4` and `2835/8`. The discrimination is carried by the intermediate `have`, which spells
+the constant out as `4 * (3 : ℝ) ^ 2 * (5 / 2) * (1 / 2) ^ 2 * (B.card : ℝ)` and is closed by the
+kernel itself, so a kernel with a different exponent/factor pattern does not close it. Stated over
+*abstract* `B, hb, o, W` constrained only by the kernel's own hypotheses, so `norm_num` cannot close
+the goal without invoking the theorem. -/
 example {ι : Type*} (B : Finset ι) (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N)
     (W : ι → Finset Λ)
     (hW : ∀ b ∈ B, ∀ z ∉ W b, Commute (hb b) (o z))
@@ -201,7 +190,7 @@ example {ι : Type*} (B : Finset ι) (hb : ι → ManyBodyOpS Λ N) (o : Λ → 
   norm_num at h
   exact h
 
-/-! ## Numeric fixture 2: the capstone constant (design §7 item 4) -/
+/-! ## Numeric fixture 2: the capstone constant -/
 
 /-- **Fixture (capstone constant guard).** At `d := 3`, `L := 4`, `h₀ := 5/2`, `o₀ := 1/2` the
 capstone's upper bound `16 d h₀ o₀² L^d` evaluates to `1920`, obtained by applying the capstone

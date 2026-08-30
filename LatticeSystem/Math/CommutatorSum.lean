@@ -7,10 +7,11 @@ term, `[A, Σ_{i∈s} f i] = Σ_{i∈s} [A, f i]` (`commutator_sum_right`) and i
 `commutator_sum_smul_right` / `commutator_sum_smul_left` pull the coefficients of a `K`-algebra
 out of the resulting sum.
 
-These are the single home of the commutator-distribution argument: it is consumed both by the
-staggered-order double-commutator expansion (Tasaki §4.1) and by the localised commutator identities
-of Tasaki §3.4, eqs. (3.4.9)-(3.4.10) (H. Tasaki, *Physics and Mathematics of Quantum Many-Body
-Systems*, 1st ed., Springer 2020, pp. 66-67).
+These are the single home of the commutator-distribution argument.  It is consumed by the
+staggered-order commutator and double-commutator expansions of Tasaki §4.1, by the Anderson-tower
+locality, local-decay and same-sign-decay layers of Tasaki §4.2.2, and by the localised commutator
+identities of Tasaki §3.4, eqs. (3.4.9)-(3.4.10) (H. Tasaki, *Physics and Mathematics of Quantum
+Many-Body Systems*, 1st ed., Springer 2020, pp. 66-67).
 -/
 import Mathlib.Algebra.BigOperators.Ring.Finset
 import Mathlib.Algebra.Ring.Basic
