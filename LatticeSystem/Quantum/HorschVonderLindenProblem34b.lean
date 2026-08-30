@@ -81,20 +81,6 @@ reference vector and the Horsch–von der Linden trial state. -/
 noncomputable def hvlPlusState {n : Type*} [Fintype n] (O : Matrix n n ℂ) (Φ : n → ℂ) : n → ℂ :=
   ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ • (Φ + hvlTrialState O Φ)
 
-/-- Diagonal term: `⟨Γ, (Ô_L)^k Γ⟩ = ((√m₂)⁻¹)² ⟨Φ_GS, (Ô_L)^{k+2} Φ_GS⟩`. -/
-private theorem trialState_dotProduct_mulVec_trialState {n : Type*} [Fintype n] [DecidableEq n]
-    {O : Matrix n n ℂ} (hO : O.IsHermitian) (Φ : n → ℂ) (k : ℕ) :
-    star (hvlTrialState O Φ) ⬝ᵥ ((O ^ k) *ᵥ hvlTrialState O Φ)
-      = (((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹) ^ 2
-        * (star Φ ⬝ᵥ ((O ^ (k + 2)) *ᵥ Φ)) := by
-  have hpow : (O * O ^ k) * O = O ^ (k + 2) := by
-    rw [← pow_succ', ← pow_succ]
-  rw [trialState_eq_smul hO Φ, star_smul, Matrix.mulVec_smul, smul_dotProduct,
-    dotProduct_smul, smul_eq_mul, smul_eq_mul, Complex.star_def, map_inv₀, Complex.conj_ofReal,
-    Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, hO.eq, Matrix.mulVec_mulVec,
-    Matrix.mulVec_mulVec, hpow]
-  ring
-
 /-! ### The moments of `Ξ₊` -/
 
 /-- **Normalisation of `Ξ₊`** (Tasaki eq. (3.4.14)): `⟨Ξ₊|Ξ₊⟩ = 1`.  The two cross terms
