@@ -25,7 +25,6 @@ import LatticeSystem.Math.MvPolynomial.WeightedHomogeneousLayer
 import LatticeSystem.Math.MvPolynomial.BondFactorDerivation
 import LatticeSystem.Quantum.HorschVonderLinden
 import LatticeSystem.Quantum.KaplanHorschVonderLinden
-import LatticeSystem.Quantum.HorschVonderLindenTrialState
 import LatticeSystem.Quantum.HorschVonderLindenProblem34b
 import LatticeSystem.Quantum.SpinS.FalkBruchInfra
 import LatticeSystem.Quantum.SpinS.NoLongRangeOrder1D

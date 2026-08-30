@@ -56,7 +56,9 @@ private theorem even_moment_ofReal {n : Type*} [Fintype n] [DecidableEq n]
     {A : Matrix n n ℂ} (hA : A.IsHermitian) (v : n → ℂ) :
     star v ⬝ᵥ ((A ^ 2) *ᵥ v) = ((rayleighOnVec (A ^ 2) v : ℝ) : ℂ) := by
   have him : (star v ⬝ᵥ ((A ^ 2) *ᵥ v)).im = 0 := by
-    rw [hermitianSq_dotProduct_split hA v]
+    have hsplit := hermitian_pow_dotProduct_split hA 1 1 v
+    rw [pow_one, show (1 : ℕ) + 1 = 2 from rfl] at hsplit
+    rw [← hsplit]
     exact ((Complex.le_def.mp (dotProduct_star_self_nonneg _)).2).symm
   apply Complex.ext
   · rw [Complex.ofReal_re]; rfl

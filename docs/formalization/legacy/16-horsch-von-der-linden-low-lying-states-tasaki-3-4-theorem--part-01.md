@@ -117,11 +117,13 @@ scope). Tasaki §3.4, Theorem 3.1, eqs. (3.4.7)–(3.4.12), pp. 66–67.
 | `shastry_staggered_susceptibility_bound` | **Shastry susceptibility bound χ(k*)≤C·L** (§4.1, DOCUMENTED AXIOM; toward Corollary 4.3): for the zero-field 1D AFM Heisenberg ring on **even** `L ≥ 2` sites (`Even L`, bipartite) there is a size-uniform `C ≥ 0` with every normalized ground state admitting a potential `y` for `ÔΦ` (`(Ĥ−E₀)y=ÔΦ`) of `O(L)` static staggered susceptibility `Re⟨y,ÔΦ⟩ ≤ C·L` (physically `χ(k*)=L·f_L^(-1)(k*)`). Tasaki does **not** prove this in the book — footnote 3 (p. 76) cites Shastry [58] / the rigorous formulation of Tanaka–Takeda–Idogaki [63], and footnote 9 (p. 83) singles out the `f_L^(-1)(k*)` bound as the only "nontrivial part that requires some hard analysis". Per the project's explicit instruction this genuinely external hard-analysis estimate (massive-Green / inverse-Fourier `k*=π` control) based on Shastry J.Phys.A 25 L249 (1992) [58] and Tanaka–Takeda–Idogaki JMMM 272–276 908 (2004) [63] is a documented axiom; it discharges `no_long_range_order_1d` (PR #5003) | `Quantum/SpinS/NoLongRangeOrder1D.lean` |
 <!-- legacy-source:end:549:652 -->
 
-## Authoritative supplemental implementation record (Problem 3.4.b)
+## Authoritative supplemental implementation record (§3.4 trial state and Problem 3.4.b)
 
 This section is maintained by hand, lies outside the migrated catalogue block above, and records
 declarations added after the migration baseline; it is not subject to the frozen byte-for-byte
 parity of the block above.
+
+### Problem 3.4.b
 
 Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4, Problem 3.4.b:
 statement p. 69 eq. (3.4.18), solution p. 501 eqs. (S.42)-(S.43), with the surrounding
@@ -176,11 +178,7 @@ declarations above has a signature fixture restating it in full and discharging 
 declaration itself, together with two concrete numeric instances and one satisfiability witness
 for the capstone's hypothesis bundle.
 
-## Authoritative supplemental implementation record (trial state, eq. (3.4.8))
-
-This section is maintained by hand, lies outside the migrated catalogue block above, and records
-declarations added after the migration baseline; it is not subject to the frozen byte-for-byte
-parity of the block above.
+### Trial state and the basic variational estimate, eq. (3.4.8)
 
 Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4, "Setting and
 assumptions" p. 65, eqs. (3.4.7)-(3.4.8), p. 66.
@@ -203,36 +201,34 @@ quotient `⟨Ô_LΦ_GS|Ĥ|Ô_LΦ_GS⟩/m₂`. The identity therefore holds at **
 `Ĥ` with eigenvalue `E_GS`, with no long-range-order (3.4.3) or odd-moment (3.4.4) hypothesis;
 positivity of `m₂` enters only through the normalisation of `Γ`.
 
-**What these declarations do not assert.** The non-negativity of the left-hand side of (3.4.8) is
-*not* a consequence of the identity. It needs `E_GS` to be a ground-state energy, i.e. the minimum
-of the Rayleigh quotient of `Ĥ` over normalised vectors — the running assumption of the "Setting
-and assumptions" paragraph on p. 65, which the source uses silently at (3.4.8) — so that is carried
-as the explicit hypothesis `hGS` of `hvlTrialState_energy_sub_nonneg`, applied at the normalised
-`Γ`. It cannot be dropped: at `Ĥ = σ³`, `Ô_L = σ¹`, `Φ_GS = e₀` the eigenvalue `E_GS = 1` is not
-the ground energy and both sides of (3.4.8) equal `−2`. Locality of `Ô_L` (eqs. (3.4.1)-(3.4.2))
-and any lattice structure are absent here, so nothing in this module certifies a concrete model;
-the `C L^{-d}` low-lying bound (3.4.12) that (3.4.8) feeds is proved in
-`Quantum/HorschVonderLinden.lean`.
+**What these declarations do not assert.** The lower bound `0 ≤ ⟨Γ|Ĥ|Γ⟩ − E_GS`, which is the
+left half of eq. (3.4.12) (p. 67), is *not* a consequence of the identity and is not stated here.
+It needs `E_GS` to be a ground-state energy, i.e. the minimum of the Rayleigh quotient of `Ĥ` over
+normalised vectors — the running assumption of the "Setting and assumptions" paragraph on p. 65.
+It cannot be dropped: at `Ĥ = σ³`, `Ô_L = σ¹`, `Φ_GS = e₀` the eigenvalue `E_GS = 1` is not the
+ground energy and both sides of (3.4.8) equal `−2`. Locality of `Ô_L` (eqs. (3.4.1)-(3.4.2))
+and any lattice structure are absent here, so nothing in this module certifies a concrete model.
+The `C L^{-d}` low-lying bound (3.4.12) that (3.4.8) feeds is not yet formalised: it is the input
+`δ` that `horsch_vonderLinden_lowLying` (`Quantum/HorschVonderLinden.lean`, Theorem 3.1) consumes
+as the hypothesis `hvar`.
 
 All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
 `Classical.choice`, `Quot.sound`.
 
 | Lean name | Statement | File |
 |---|---|---|
-| `hermitianSq_dotProduct_split` | a Hermitian square splits as a self-pairing: `⟨v, A²v⟩ = ⟨Av, Av⟩` | `Quantum/HorschVonderLindenTrialState.lean` |
 | `trialState_eq_smul` | `Γ` as the scalar multiple `(√m₂)⁻¹ • (Ô_L\|Φ_GS⟩)`, the defining unfolding of the unit normalisation | `Quantum/HorschVonderLindenTrialState.lean` |
 | `dotProduct_mulVec_trialState` | ket-side absorption: `⟨Φ_GS, (Ô_L)^k Γ⟩ = (√m₂)⁻¹ ⟨Φ_GS, (Ô_L)^{k+1} Φ_GS⟩` | `Quantum/HorschVonderLindenTrialState.lean` |
 | `trialState_dotProduct_mulVec` | bra-side adjoint transfer: `⟨Γ, (Ô_L)^k Φ_GS⟩ = (√m₂)⁻¹ ⟨Φ_GS, (Ô_L)^{k+1} Φ_GS⟩` | `Quantum/HorschVonderLindenTrialState.lean` |
 | `trialState_dotProduct_mulVec_trialState` | diagonal absorption: `⟨Γ, (Ô_L)^k Γ⟩ = ((√m₂)⁻¹)² ⟨Φ_GS, (Ô_L)^{k+2} Φ_GS⟩` | `Quantum/HorschVonderLindenTrialState.lean` |
 | `trialState_dotProduct_self` | `⟨Γ\|Γ⟩ = 1`, the unit normalisation of the trial state, given `m₂ > 0` | `Quantum/HorschVonderLindenTrialState.lean` |
 | `hvlTrialState_energy_sub_eq` | eq. (3.4.8): `⟨Γ\|Ĥ\|Γ⟩ − E_GS = ⟨Φ_GS\|[Ô_L,[Ĥ,Ô_L]]\|Φ_GS⟩ / (2 m₂)`, for Hermitian `Ĥ`, `Ô_L` and any eigenvector `Φ_GS` of `Ĥ` | `Quantum/HorschVonderLindenTrialState.lean` |
-| `hvlTrialState_energy_sub_nonneg` | the non-negativity side of eq. (3.4.8): `0 ≤ ⟨Γ\|Ĥ\|Γ⟩ − E_GS`, under the explicit ground-state-minimality hypothesis on `E_GS` | `Quantum/HorschVonderLindenTrialState.lean` |
 
-Regression fixtures live in `LatticeSystem/Tests/HorschVonderLindenTrialStateRelocation.lean`:
-each relocated declaration has a signature fixture restating it in full and discharging it by the
-declaration itself, so the fixture fails to elaborate if the name is not resolvable from another
-module, and the two eq. (3.4.8) declarations are pinned the same way, together with two numeric
-instances that evaluate both sides of (3.4.8) at `Ĥ = σ³`, `Ô_L = σ¹`, `Φ_GS = e₀`.
+Regression fixtures live in `LatticeSystem/Tests/HorschVonderLindenTrialStateVariational.lean`:
+each of the six declarations above has a signature fixture restating it in full and discharging it
+by the declaration itself, so the fixture fails to elaborate if the name is not resolvable from
+another module, together with two numeric instances that evaluate both sides of (3.4.8) at
+`Ĥ = σ³`, `Ô_L = σ¹`, `Φ_GS = e₀`.
 
 ---
 

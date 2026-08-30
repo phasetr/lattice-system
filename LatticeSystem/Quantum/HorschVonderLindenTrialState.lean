@@ -12,9 +12,8 @@ vector `Φ_GS`, and the basic variational estimate
 
 `⟨Γ|Ĥ|Γ⟩ − E_GS = ⟨Φ_GS|[Ô_L, [Ĥ, Ô_L]]|Φ_GS⟩ / (2⟨Φ_GS|(Ô_L)²|Φ_GS⟩)` (eq. (3.4.8))
 
-together with its non-negativity side.  This is the shared `Γ`-vocabulary of §3.4: the states built
-on top of `Γ` (the symmetric combination `Ξ₊` of eq. (3.4.14) and its mirror) live in the modules
-that import this one.
+This is the shared `Γ`-vocabulary of §3.4: the states built on top of `Γ` (the symmetric
+combination `Ξ₊` of eq. (3.4.14) and its mirror) live in the modules that import this one.
 
 Everything is stated for an arbitrary finite index type and an arbitrary Hermitian `Ô_L`; the only
 quantitative input is positivity of the second moment `m₂ = ⟨Φ_GS|(Ô_L)²|Φ_GS⟩`, which is what
@@ -24,10 +23,10 @@ the trial-state algebra, so nothing here certifies a concrete model.
 Eq. (3.4.8) is the un-normalised double-commutator identity `double_commutator_ground_state_eq`
 divided by `2 m₂`, rewritten through the unit normalisation of `Γ`; as such it holds at any
 eigenvector `Φ_GS` of `Ĥ`, with `E_GS` its eigenvalue, and needs no long-range-order or odd-moment
-assumption.  Its non-negativity side genuinely needs `E_GS` to be a *ground-state* energy, i.e. the
-minimum of the Rayleigh quotient over normalised vectors — the book's running assumption of the
-"Setting and assumptions" paragraph, p. 65, used silently at (3.4.8) — so that hypothesis is
-carried explicitly: at a non-minimal eigenvalue the difference is genuinely negative.
+assumption.  Not asserted here: the lower bound `0 ≤ ⟨Γ|Ĥ|Γ⟩ − E_GS`, which is the left half of
+eq. (3.4.12), p. 67, and which needs `E_GS` to be a *ground-state* energy — the minimum of the
+Rayleigh quotient over normalised vectors, the book's running assumption of the "Setting and
+assumptions" paragraph, p. 65.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §3.4, "Setting and assumptions" p. 65, eqs. (3.4.7)–(3.4.8), p. 66.
@@ -39,18 +38,15 @@ open Matrix
 
 /-! ### Sesquilinear reductions -/
 
-/-- A Hermitian square splits as a self-pairing: `⟨v, A² v⟩ = ⟨A v, A v⟩`. -/
-theorem hermitianSq_dotProduct_split {n : Type*} [Fintype n] [DecidableEq n]
-    {A : Matrix n n ℂ} (hA : A.IsHermitian) (v : n → ℂ) :
-    star v ⬝ᵥ ((A ^ 2) *ᵥ v) = star (A *ᵥ v) ⬝ᵥ (A *ᵥ v) := by
-  rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, hA.eq, Matrix.mulVec_mulVec, pow_two]
-
 /-- The squared norm of `A v` is the Rayleigh quotient of `A²` at `v`, for Hermitian `A`. -/
 private theorem vecNormSqRe_mulVec_eq_rayleigh {n : Type*} [Fintype n] [DecidableEq n]
     {A : Matrix n n ℂ} (hA : A.IsHermitian) (v : n → ℂ) :
     vecNormSqRe (A *ᵥ v) = rayleighOnVec (A ^ 2) v := by
+  have hsplit : star (A *ᵥ v) ⬝ᵥ (A *ᵥ v) = star v ⬝ᵥ ((A ^ 2) *ᵥ v) := by
+    have h := hermitian_pow_dotProduct_split hA 1 1 v
+    rwa [pow_one, show (1 : ℕ) + 1 = 2 from rfl] at h
   unfold vecNormSqRe rayleighOnVec
-  rw [hermitianSq_dotProduct_split hA v]
+  rw [hsplit]
 
 /-! ### The trial state `Γ` (eq. (3.4.7)) -/
 
@@ -112,8 +108,8 @@ theorem trialState_dotProduct_self {n : Type*} [Fintype n] [DecidableEq n]
 /-- **The basic variational estimate** (Tasaki eq. (3.4.8), p. 66):
 `⟨Γ|Ĥ|Γ⟩ − E_GS = ⟨Φ_GS|[Ô_L, [Ĥ, Ô_L]]|Φ_GS⟩ / (2⟨Φ_GS|(Ô_L)²|Φ_GS⟩)`.  It is the un-normalised
 double-commutator identity divided by `2 m₂`, so it holds at any eigenvector `Φ_GS` of `Ĥ` with
-eigenvalue `E_GS`; the ground-state property of `Φ_GS` is used only for the non-negativity of the
-left-hand side, not for the identity. -/
+eigenvalue `E_GS`.  The ground-state property of `Φ_GS` is not needed here: it is what makes the
+left-hand side non-negative, which is the left half of eq. (3.4.12), p. 67. -/
 theorem hvlTrialState_energy_sub_eq {n : Type*} [Fintype n] [DecidableEq n]
     {H O : Matrix n n ℂ} {Φ : n → ℂ} {E₀ : ℝ} (hH : H.IsHermitian) (hO : O.IsHermitian)
     (hΦE : H *ᵥ Φ = (E₀ : ℂ) • Φ) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) :
@@ -142,19 +138,5 @@ theorem hvlTrialState_energy_sub_eq {n : Type*} [Fintype n] [DecidableEq n]
     rfl
   rw [hnum, hscale]
   field_simp
-
-/-- **Non-negativity of the basic variational estimate** (Tasaki eq. (3.4.8), p. 66):
-`⟨Γ|Ĥ|Γ⟩ − E_GS ≥ 0`.  Unlike the identity itself this direction needs `E_GS` to be a ground-state
-energy: `hGS` is the book's running assumption of the "Setting and assumptions" paragraph (p. 65),
-that `E_GS` is the minimum of the Rayleigh quotient over normalised vectors, and it is applied at
-the normalised trial state `Γ`.  At a non-minimal eigenvalue the difference is genuinely negative,
-so `hGS` cannot be dropped.  The Hermiticity of `Ĥ` and the eigenvector hypothesis are carried for
-uniformity with `hvlTrialState_energy_sub_eq` and are not used by this direction. -/
-theorem hvlTrialState_energy_sub_nonneg {n : Type*} [Fintype n] [DecidableEq n]
-    {H O : Matrix n n ℂ} {Φ : n → ℂ} {E₀ : ℝ} (_hH : H.IsHermitian) (hO : O.IsHermitian)
-    (_hΦE : H *ᵥ Φ = (E₀ : ℂ) • Φ) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ)
-    (hGS : ∀ ψ : n → ℂ, star ψ ⬝ᵥ ψ = 1 → (E₀ : ℝ) ≤ rayleighOnVec H ψ) :
-    0 ≤ rayleighOnVec H (hvlTrialState O Φ) - E₀ :=
-  sub_nonneg.mpr (hGS (hvlTrialState O Φ) (trialState_dotProduct_self hO Φ hm2))
 
 end LatticeSystem.Quantum
