@@ -14,9 +14,9 @@ permalink: /formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-back
 
 This section is maintained by hand, lies outside the migrated catalogue block, and records new
 supporting declarations added after the migration baseline (Issue #5357, PR #5358); it is not
-subject to the frozen byte-for-byte parity of the migrated block. New capacity is recorded here
-rather than in [part 4](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-04/),
-whose migrated-block byte budget is near its `HARD_BYTES` limit (`scripts/check_docs_hierarchy.py`).
+subject to the frozen byte-for-byte parity of the migrated block. The Theorem 10.8 arc is
+recorded on its own part of this series, apart from the parts that carry migrated-block slices,
+so that every part stays within the page-size limits enforced by `scripts/check_docs_hierarchy.py`.
 
 | Lean name | Statement | File |
 |---|---|---|

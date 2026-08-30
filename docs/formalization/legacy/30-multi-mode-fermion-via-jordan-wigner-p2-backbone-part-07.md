@@ -35,9 +35,9 @@ subject to the frozen byte-for-byte parity of the migrated block.
 
 This section is maintained by hand, lies outside the migrated catalogue block, and continues the
 table started in the PR-2 section above (Issue #5347, PR #5350); it is not subject to the
-frozen byte-for-byte parity of the migrated
-block. New capacity is recorded here rather than in part 4, whose migrated-block byte budget is
-near its `HARD_BYTES` limit (`scripts/check_docs_hierarchy.py`).
+frozen byte-for-byte parity of the migrated block. The Theorem 10.6 arc is recorded on its own
+part of this series, apart from the parts that carry migrated-block slices, so that every part
+stays within the page-size limits enforced by `scripts/check_docs_hierarchy.py`.
 
 | Lean name | Statement | File |
 |---|---|---|
