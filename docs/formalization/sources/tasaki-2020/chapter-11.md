@@ -13,3 +13,4 @@ These links project explicit Tasaki chapter headings or citations from the inter
 - [Tasaki Chapter 11, first catalogue chunk](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-02/#tasaki-chapter-11-part-01)
 - [Tasaki Chapter 11, continued catalogue chunk](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-03/#tasaki-chapter-11-part-02)
 - [Tasaki Chapter 11, final catalogue chunk](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-04/#tasaki-chapter-11-part-03)
+- [Tasaki Chapter 11, Theorem 11.4 discharge arc](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-09/#authoritative-supplemental-implementation-record-theorem-114-discharge-arc-pr-1-axiom-hypothesis-correction)

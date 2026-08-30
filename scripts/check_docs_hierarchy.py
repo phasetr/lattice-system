@@ -188,11 +188,13 @@ CHAPTER_EXPECTED_TARGETS = {
         "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-03/#tasaki-chapter-10-part-01",
         "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-04/#tasaki-chapter-10-part-02",
         "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-05/#tasaki-chapter-10-part-03",
+        "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-08/#authoritative-supplemental-implementation-record-theorem-108-discharge-arc-pr-1-generic-shiftuniqueness-lemmas-and-the-shiba-hamiltonian-bridge",
     ),
     11: (
         "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-02/#tasaki-chapter-11-part-01",
         "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-03/#tasaki-chapter-11-part-02",
         "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-04/#tasaki-chapter-11-part-03",
+        "/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-09/#authoritative-supplemental-implementation-record-theorem-114-discharge-arc-pr-1-axiom-hypothesis-correction",
     ),
     "appendix-a": (
         "/formalization/legacy/15-generic-matrix-analysis-helpers/#legacy-catalogue-generic-matrix-analysis-helpers-mathmatrixanalysis",
