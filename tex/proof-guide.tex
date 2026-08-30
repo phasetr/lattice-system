@@ -12866,6 +12866,56 @@ that~(3.4.8) feeds is not yet formalized: it is the input $\delta$ that Theorem~
 (\texttt{horsch\_vonderLinden\_lowLying}, \texttt{Quantum/HorschVonderLinden.lean}) consumes as
 its hypothesis \texttt{hvar}.
 
+\noindent\textbf{Locality of the double commutator, eqs.~(3.4.9)--(3.4.11)}
+(Tasaki~\cite{Tasaki:QMB} §3.4, eqs.~(3.4.1)--(3.4.2) p.~65, eq.~(3.4.9) p.~66,
+eqs.~(3.4.10)--(3.4.11) p.~67, with the operator-norm properties (A.2.5)/(A.2.6) p.~463;
+\textbf{discharged axiom-free}, \texttt{Quantum/SpinS/LocalDoubleCommutatorBound.lean}, fixtures in
+\texttt{Tests/LocalDoubleCommutatorBound.lean}).  For a Hamiltonian $\hat H=\sum_{b\in B}\hat h_b$
+and an order operator $\hat O=\sum_{x\in\Lambda}\hat o_x$, locality is formalized by plain
+commutation hypotheses instead of a support predicate: $\hat h_b$ commutes with every $\hat o_z$
+seated outside a window $W_b$ --- the content of eq.~(3.4.1)'s ``acts nontrivially only on the
+spins at $x$ and $y$'' --- and $\hat o_x$, $\hat o_z$ commute for $x\neq z$, the content of
+eq.~(3.4.2).  \texttt{commutator\_orderSum\_eq\_windowSum} is eq.~(3.4.9),
+\[[\hat H,\hat O]=\sum_{b\in B}\sum_{z\in W_b}[\hat h_b,\hat o_z],\]
+obtained by distributing the commutator over both sums (\texttt{Math/CommutatorSum.lean}) and
+collapsing the site sum onto $W_b$, the off-window summands vanishing by the first hypothesis.
+\texttt{doubleCommutator\_orderSum\_eq\_windowSum} is eq.~(3.4.10),
+\[[\hat O,[\hat H,\hat O]]
+=\sum_{b\in B}\sum_{x\in W_b}\sum_{z\in W_b}[\hat o_x,[\hat h_b,\hat o_z]];\]
+here the site sum must be exchanged with the bond sum \emph{before} the outer collapse, since the
+window depends on the bond, and the off-window summand vanishes because $\hat o_x$ commutes with
+the whole inner window sum when $x\notin W_b$ (both hypotheses are used).  Tasaki performs both
+collapses in one line, citing ``the locality of $\hat h_{x,y}$ and $\hat o_x$''.
+
+The norm kernel \texttt{manyBodyOperatorNormS\_doubleCommutator\_le\_of\_windows} bounds each of
+the resulting $|B|\cdot|W_b|^2$ terms by
+$\lVert[\hat o_x,[\hat h_b,\hat o_z]]\rVert\le 2o_0\cdot 2h_0o_0=4h_0o_0^2$, using
+$\lVert[\hat A,\hat B]\rVert\le 2\lVert\hat A\rVert\lVert\hat B\rVert$
+(\texttt{manyBodyOperatorNormS\_comm\_le}, \texttt{Quantum/SpinS/ManyBodyOperatorNorm.lean}) twice,
+and aggregates with the finite-sum triangle inequality to
+\[\lVert[\hat O,[\hat H,\hat O]]\rVert\le 4\,m_W^2\,h_0\,o_0^2\,|B|.\]
+The window cardinality bound $m_W$ is kept a \emph{variable}: the counting is therefore proved in
+general rather than only at the bond point $m_W=2$, where $4m_W^2$, $8m_W$, $2m_W^3$ and $m_W^4$
+all coincide with $16$.  The capstone
+\texttt{doubleCommutator\_bondLocal\_expectation\_le} is eq.~(3.4.11) as printed, the two-step chain
+\[\langle\Phi_{\mathrm{GS}}|[\hat O,[\hat H,\hat O]]|\Phi_{\mathrm{GS}}\rangle
+\le\lVert[\hat O,[\hat H,\hat O]]\rVert\le\{16\,d\,h_0\,o_0^2\}L^d,\]
+the first inequality being the operator-norm bound on the expectation in a unit vector
+(\texttt{expectation\_abs\_le\_manyBodyOperatorNormS}) and the second the kernel at $m_W=2$ with
+$|B_L|\le dL^d$.
+
+\emph{Hypothesis ledger.}  The book's $\lVert\hat h_{x,y}\rVert=h_0$ and
+$\lVert\hat o_x\rVert=o_0$ are weakened to $\le$, which is strictly weaker and suffices;
+$0\le o_0$ is an \emph{explicit} hypothesis, since an empty site type makes it underivable from
+the per-site bounds, while $0\le h_0$ is needed only at the capstone (inside a branch $b\in B$ it
+follows from $0\le\lVert\hat h_b\rVert\le h_0$).  \emph{Not assumed.}  Self-adjointness of
+$\hat h_b$ and $\hat o_x$ appears nowhere: the first inequality of~(3.4.11) is taken on the real
+part of the expectation, so the tacit reality of $\langle[\hat O,[\hat H,\hat O]]\rangle$ carries
+no obligation.  The long-range order condition~(3.4.3) and the no-SSB condition~(3.4.4) are unused
+--- they are first consumed at~(3.4.12).  No lattice structure is imposed: the hypercubic bond
+count $|B_L|=dL^d$ enters only as the numeric hypothesis $|B|\le dL^d$, and neither $1\le d$ nor
+$1\le L$ is required.
+
 \noindent\textbf{Theorem 4.1} (Dyson--Lieb--Simon / Neves--Perez / Kennedy--Lieb--Shastry, Tasaki
 §4.1, eq.~(4.1.7), pp.~88--90; \texttt{Quantum/SpinS/DysonLiebSimon.lean}, Issue \#4485).  Existence
 of N\'eel long-range order: for the antiferromagnetic Heisenberg model in dimension $d\ge3$ (any $S$)

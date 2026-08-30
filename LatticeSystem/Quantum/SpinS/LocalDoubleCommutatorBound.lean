@@ -134,4 +134,43 @@ theorem manyBodyOperatorNormS_doubleCommutator_le_of_windows {ι : Type*} (B : F
   rw [Finset.sum_const, nsmul_eq_mul]
   exact le_of_eq (by ring)
 
+/-- **Tasaki eq. (3.4.11), p. 67** — the printed two-step bound
+`⟨Φ_GS|[Ô,[Ĥ,Ô]]|Φ_GS⟩ ≤ ‖[Ô,[Ĥ,Ô]]‖ ≤ {16 d h₀ o₀²} L^d`
+for a normalized state `Φ`, bond-local Hamiltonian terms (each window has at most the two endpoints
+of a bond) and the hypercubic bond count `|B_L| = d L^d`.  The first inequality is the
+operator-norm bound on the expectation in a unit vector and needs no self-adjointness, since it is
+taken on the real part; the second is the norm kernel at `mW = 2`, where `4 · 2² = 16`. -/
+theorem doubleCommutator_bondLocal_expectation_le {ι : Type*} (B : Finset ι)
+    (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N) (W : ι → Finset Λ)
+    (d L : ℕ) (h₀ o₀ : ℝ) {Φ : (Λ → Fin (N + 1)) → ℂ}
+    (hW : ∀ b ∈ B, ∀ z ∉ W b, Commute (hb b) (o z))
+    (hoo : ∀ x z : Λ, x ≠ z → Commute (o x) (o z))
+    (hnh : ∀ b ∈ B, manyBodyOperatorNormS (hb b) ≤ h₀)
+    (hno : ∀ x : Λ, manyBodyOperatorNormS (o x) ≤ o₀)
+    (hh₀ : 0 ≤ h₀) (ho₀ : 0 ≤ o₀)
+    (hbond : ∀ b ∈ B, (W b).card ≤ 2)
+    (hB : (B.card : ℝ) ≤ (d : ℝ) * (L : ℝ) ^ d)
+    (hΦ : star Φ ⬝ᵥ Φ = 1) :
+    rayleighOnVec
+        ((∑ x : Λ, o x) * ((∑ b ∈ B, hb b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b ∈ B, hb b))
+          - ((∑ b ∈ B, hb b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b ∈ B, hb b))
+            * (∑ x : Λ, o x)) Φ
+      ≤ manyBodyOperatorNormS
+          ((∑ x : Λ, o x) * ((∑ b ∈ B, hb b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b ∈ B, hb b))
+            - ((∑ b ∈ B, hb b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b ∈ B, hb b))
+              * (∑ x : Λ, o x))
+      ∧ manyBodyOperatorNormS
+          ((∑ x : Λ, o x) * ((∑ b ∈ B, hb b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b ∈ B, hb b))
+            - ((∑ b ∈ B, hb b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b ∈ B, hb b))
+              * (∑ x : Λ, o x))
+        ≤ 16 * (d : ℝ) * h₀ * o₀ ^ 2 * (L : ℝ) ^ d := by
+  refine ⟨le_trans (le_abs_self _) (expectation_abs_le_manyBodyOperatorNormS _ hΦ), ?_⟩
+  refine le_trans (manyBodyOperatorNormS_doubleCommutator_le_of_windows B hb o W h₀ o₀ 2
+    hW hoo hnh hno ho₀ hbond) ?_
+  have hK : (0 : ℝ) ≤ 16 * h₀ * o₀ ^ 2 := mul_nonneg (by linarith) (sq_nonneg o₀)
+  calc 4 * ((2 : ℕ) : ℝ) ^ 2 * h₀ * o₀ ^ 2 * (B.card : ℝ)
+      = 16 * h₀ * o₀ ^ 2 * (B.card : ℝ) := by push_cast; ring
+    _ ≤ 16 * h₀ * o₀ ^ 2 * ((d : ℝ) * (L : ℝ) ^ d) := mul_le_mul_of_nonneg_left hB hK
+    _ = 16 * (d : ℝ) * h₀ * o₀ ^ 2 * (L : ℝ) ^ d := by ring
+
 end LatticeSystem.Quantum
