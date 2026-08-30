@@ -342,9 +342,11 @@ def _drop_working_note_prose_citation(text: str) -> str:
 # private identifier is not reproduced here.
 _PRIVATE_INSTRUCTIONS_REF = re.compile(r" \(\w+\.\w+\.md\)")
 
-# Number of baseline sites the removal above matches. Pinned for the same reason as
-# WORKING_NOTE_REMOVAL_COUNTS: a structural pattern that starts matching more (or fewer) sites than
-# audited must fail loudly instead of silently editing the baseline.
+# Number of sites the removal above matches. Counted on the post-replacement baseline, which is the
+# text the removal actually runs against, so that a literal rewrite introducing a match cannot slip
+# past the audit. Pinned for the same reason as WORKING_NOTE_REMOVAL_COUNTS: a structural pattern
+# that starts matching more (or fewer) sites than audited must fail loudly instead of silently
+# editing the baseline.
 PRIVATE_INSTRUCTIONS_REMOVAL_COUNT = 1
 
 
@@ -353,8 +355,9 @@ def _drop_private_instructions_ref(text: str) -> str:
     return _PRIVATE_INSTRUCTIONS_REF.sub("", text)
 
 
-def approved_changes(text: str) -> str:
-    changed = _drop_working_note_citations(
+def _approved_replacements(text: str) -> str:
+    """Apply every audited literal rewrite, before the structural removals that follow them."""
+    return _drop_working_note_citations(
         text.replace("(refactoring-conventions.html)", "(/lattice-system/refactoring-conventions/)")
         .replace(
             "(deprecations.html#remaining-linter-suppressions)",
@@ -873,7 +876,10 @@ def approved_changes(text: str) -> str:
             "`Fermion/JordanWigner/Hubbard/LiebShenQiuDischarge.lean` |",
         )
     )
-    return _drop_private_instructions_ref(changed)
+
+
+def approved_changes(text: str) -> str:
+    return _drop_private_instructions_ref(_approved_replacements(text))
 
 
 MOVED_PROSE_LINK_REWRITES = (
@@ -1196,7 +1202,9 @@ def main() -> None:
     # Catalogue rows must retain exact global order after the two evidenced status corrections.
     # Long cells are reconstructed from one compact table reference and one grouped detail record.
     catalogue_baseline = "".join(old_lines[216:2731])
-    private_instructions_removals = len(_PRIVATE_INSTRUCTIONS_REF.findall(catalogue_baseline))
+    private_instructions_removals = len(
+        _PRIVATE_INSTRUCTIONS_REF.findall(_approved_replacements(catalogue_baseline))
+    )
     if private_instructions_removals != PRIVATE_INSTRUCTIONS_REMOVAL_COUNT:
         fail(
             "audited private project-instructions removal count differs: "
