@@ -196,7 +196,8 @@ Mwin atTop atTop` is **insufficient**: a fast window outrunning `C₁ L^{d/2}` d
 normalization and admits a false witness pinning `m∗` below `√(2q₀)`, an over-quantification defect)
 + eventual `μ=0` half-filling GS with `Ŝ³_tot Φ=0`, two-axis ODLRO `≥ q₀`, nonzero window tower
 states, and the **uniform window-ratio pinning** — eventually every one-step ratio `r_M = ⟨Γ_{M+1},
-Ô⁺ Γ_M⟩/L^d` in the window is within `ε` of `m∗`, which subsumes the `θ=0` mean limit `⟨Ξ_0, Ô^(1) Ξ_0⟩/L^d → m∗` (eq. 5.3.7) **and** drives the eq. 5.3.8 second-moment
+Ô⁺ Γ_M⟩/L^d` in the window is within `ε` of `m∗`, which subsumes the `θ=0` mean limit `⟨Ξ_0, Ô^(1)
+Ξ_0⟩/L^d → m∗` (eq. 5.3.7) **and** drives the eq. 5.3.8 second-moment
 concentration (`S₂=avg r_M²`, `S₁₁=avg r_M r_{M+1} → m∗²`) axiom-free from one source; axis-1
 singlet and reversal invariance are **not** imposed, unlike the SU(2) family, so it is directly
 instantiable by the BEC ground state). A free `m∗` would make the bound FALSE (`m∗:=0`, `q₀>0`),

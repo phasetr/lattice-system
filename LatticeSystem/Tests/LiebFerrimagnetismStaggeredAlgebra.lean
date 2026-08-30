@@ -17,7 +17,7 @@ Specification suite for
 `fermionStaggeredTransverse_expectation_le_staggeredCasimir_expectation` and
 `fermionStaggeredCasimirOp_zero_eq_totalSpinSquared`, mirroring the discharged SpinS template
 `Quantum/SpinS/FerrimagneticLROComponentAlgebra.lean`, so that the implementation cannot silently
-drift from the design's exact statements.  The closing `N = 0` sanity check is the cheapest
+drift from the statements pinned here.  The closing `N = 0` sanity check is the cheapest
 falsifier of a staggered-sign or normalization slip: on a single site the staggered gauge squares
 to `+1`, so the staggered order parameter collapses to the plain total-spin Casimir.
 -/
@@ -95,13 +95,12 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (v : (Fin (2 * N + 2) → Fin 2) �
 
 /-! ## 5. `N = 0` sanity check -/
 
-/-- **`A0b`: single-site collapse, living in the library.**  For `N = 0`
-the only pair is `x = y = 0`, whose staggered weight is `ε₀ ε₀ = +1` for either sublattice choice,
-so the staggered order parameter `(Ô_L)²` is the plain total-spin Casimir `(Ŝ_tot)²`. PR-8's
-`N = 0` branch (`E1`, `liebFerrimagnetism_N_zero`) needs this from the library, not the `Tests`
-root, so the statement moves to `LiebFerrimagnetismStaggeredAlgebra.lean` (this pin only calls it).
-This pin fails to compile until the library declaration lands: re-proving it here while the
-library copy also exists would be a banned duplicate statement. -/
+/-- **`A0b`: single-site collapse.**  For `N = 0` the only pair is `x = y = 0`, whose staggered
+weight is `ε₀ ε₀ = +1` for either sublattice choice, so the staggered order parameter `(Ô_L)²` is
+the plain total-spin Casimir `(Ŝ_tot)²`.  The statement lives in
+`LiebFerrimagnetismStaggeredAlgebra.lean` because the `N = 0` branch of the capstone
+(`liebFerrimagnetism_N_zero`) consumes it from the library rather than from the `Tests` root; this
+pin only calls it, so that no duplicate statement is created. -/
 example (A : Finset (Fin 1)) :
     fermionStaggeredCasimirOp 0 A = fermionTotalSpinSquared 0 :=
   fermionStaggeredCasimirOp_zero_eq_totalSpinSquared A

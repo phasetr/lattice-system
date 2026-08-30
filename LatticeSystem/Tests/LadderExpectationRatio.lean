@@ -26,13 +26,12 @@ hand-computed values, so a drift in either conclusion (a wrong scalar, a swapped
 misplaced `star`) is caught by an actual computation rather than by a tautological signature pin.
 
 These generalize the `SpinS`-specific pair `su2_expectation_ladder_cross` /
-`su2_expectationRatioRe_ladder_invariant`
-(`Quantum/SpinS/SU2ExpectationLadderInvariant.lean`) to any `Matrix ι ι ℂ`, so that the fermion
-side (`fermionSpinMinus_expectationRatioRe_invariant`) and the retrofitted `SpinS` version can
-both instantiate the same proof instead of duplicating it (this arc's PR-4 design). Mirrors the
-specification style of `Tests/LiebFerrimagnetismStaggeredAlgebra.lean` /
+`su2_expectationRatioRe_ladder_invariant` (`Quantum/SpinS/SU2ExpectationLadderInvariant.lean`) to
+any `Matrix ι ι ℂ`, so that the fermion side (`fermionSpinMinus_expectationRatioRe_invariant`) and
+the retrofitted `SpinS` version can both instantiate the same proof instead of duplicating it.
+Mirrors the specification style of `Tests/LiebFerrimagnetismStaggeredAlgebra.lean` /
 `Tests/LiebFerrimagnetismTransverseCasimir.lean` / `Tests/LiebFerrimagnetismSU2Invariance.lean`,
-so that the implementation cannot silently drift from the design's exact statements.
+so that the implementation cannot silently drift from the statements pinned here.
 -/
 
 namespace LatticeSystem.Tests.LadderExpectationRatio

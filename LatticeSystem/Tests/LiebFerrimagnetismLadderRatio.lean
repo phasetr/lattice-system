@@ -17,9 +17,8 @@ the fermion-level instantiation of the generic
 (`(Ŝ⁻_tot)ᴴ = Ŝ⁺_tot`, `SpinTotHermitian.lean:35`) for the adjoint hypothesis and
 `fermionTotalSpinPlus_mul_fermionTotalSpinMinus` (`Ŝ⁺_tot Ŝ⁻_tot = (Ŝ_tot)² − Ŝ³_tot(Ŝ³_tot − 1)`,
 `WeakNagaokaTheorem.lean:45`) for the scalar action `c = γ − m² + m` on a joint `Ŝ³_tot` /
-Casimir eigenvector, so that the implementation cannot silently drift from the design's exact
-statement (this arc's PR-4 design). Mirrors the specification style of
-`Tests/LiebFerrimagnetismSU2Invariance.lean`.
+Casimir eigenvector, so that the implementation cannot silently drift from the statement pinned
+here. Mirrors the specification style of `Tests/LiebFerrimagnetismSU2Invariance.lean`.
 -/
 
 namespace LatticeSystem.Tests.LiebFerrimagnetismLadderRatio

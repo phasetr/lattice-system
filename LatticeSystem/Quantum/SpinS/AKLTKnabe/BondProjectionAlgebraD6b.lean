@@ -16,10 +16,10 @@ consume:
 * **positive semidefiniteness of the product** of two such disjoint bond projections, which is the
   reason the offset sums `D_d` with `d ∉ {0, 1, −1}` may be discarded in eq. (7.1.36);
 * the **conjugate transpose** of a block embedding and, as its corollary, the transport of positive
-  semidefiniteness along `onEmbS` (design item B5f), which is what turns the four-site window
+  semidefiniteness along `onEmbS` (item A9 below), which is what turns the four-site window
   certificate `ε₃ ≥ 2/5` into a certificate for every window of a long chain.
 
-## Periodic ring versus open window (design risk R3 — read before consuming this file)
+## Periodic ring versus open window (read before consuming this file)
 
 Tasaki's §7.1.4 argument is stated for a **periodic** chain: `Ĥ'_AKLT = Σ_{x=1}^{L} P̂_{x,x+1}`
 of eq. (7.1.7) **includes the wrap bond** `{L−1, 0}`, whereas the Knabe window
@@ -80,7 +80,7 @@ private theorem sector2P2Sq_eq_two (b c d : Fin 3) :
   fin_cases b <;> fin_cases c <;> fin_cases d <;>
     norm_num [sector2P2Sq, sector2P2Entry, Fin.mk.injEq, Fin.ext_iff]
 
-/-- **The frozen rational two-site table is idempotent** (design item A1). All `81` entries of the
+/-- **The frozen rational two-site table is idempotent** (item A1). All `81` entries of the
 square of `sector2P2Entry`, as a `9 × 9` rational matrix indexed by the two-site labels `(a, b)`
 and `(c, d)`, agree with `sector2P2Entry` itself: the table really is the matrix of a projection,
 which is Tasaki's `P̂² = P̂` for the bond projector `P̂₂[Ŝ_x + Ŝ_y]` of eq. (7.1.6). -/
@@ -93,7 +93,7 @@ private theorem sector2P2Sq_eq (a b c d : Fin 3) :
 
 /-! ## A2–A3: idempotence of the bond projection -/
 
-/-- **The two-site bond projection is idempotent** (design item A2). On the two-site chain
+/-- **The two-site bond projection is idempotent** (item A2). On the two-site chain
 `Fin 2` the operator `P̂₂[Ŝ₀ + Ŝ₁]` satisfies `P̂ P̂ = P̂`. The `9`-term fibre sum produced by
 `Matrix.mul_apply` is enumerated once by `sum_fin2_fin3` and then matched against the rational
 identity `sector2P2Sq_eq`; the spectator guard is vacuous because the chain has only the two bond
@@ -110,7 +110,7 @@ theorem bondSpin2ProjectionS_fin2_mul_self :
   push_cast
   ring
 
-/-- **Every bond projection of a chain is idempotent** (design item A3, Tasaki `P̂² = P̂`, used to
+/-- **Every bond projection of a chain is idempotent** (item A3, Tasaki `P̂² = P̂`, used to
 pass from `(Ĥ')²` to eq. (7.1.26)). For any two *distinct* sites `x ≠ y` of `Fin L` — adjacent or
 not, wrap bond or not — `P̂₂[Ŝ_x + Ŝ_y]` is a projection. The proof transports the two-site
 statement along the block embedding, whose multiplicativity `onEmbS_mul` needs exactly the
@@ -123,7 +123,7 @@ theorem bondSpin2ProjectionS_mul_self {L : ℕ} {x y : Fin L} (hxy : x ≠ y) :
 
 /-! ## A4: Hermiticity of the bond projection -/
 
-/-- **The bond projection is Hermitian** (design item A4). It is the polynomial
+/-- **The bond projection is Hermitian** (item A4). It is the polynomial
 `½ D + ⅙ D² + ⅓` in the Hermitian bond operator `D = Ŝ_x · Ŝ_y` with real coefficients, and `D`
 commutes with itself, so every summand is Hermitian. -/
 theorem bondSpin2ProjectionS_isHermitian {L : ℕ} (x y : Fin L) :
@@ -154,7 +154,7 @@ theorem bondSpin2ProjectionS_posSemidef {L : ℕ} {x y : Fin L} (hxy : x ≠ y) 
 
 /-! ## A5–A6: commutation of bond operators on disjoint site pairs -/
 
-/-- **Two bond Heisenberg operators on disjoint site pairs commute** (design item A5). The four
+/-- **Two bond Heisenberg operators on disjoint site pairs commute** (item A5). The four
 cross conditions `a ≠ c`, `a ≠ d`, `b ≠ c`, `b ≠ d` say that the bonds `{a, b}` and `{c, d}` share
 no site; `a = b` or `c = d` is *not* excluded and is not needed. Each of the nine axis pairs is a
 product of four site embeddings at pairwise distinct sites, which commute by
@@ -177,7 +177,7 @@ theorem spinSDot_commute_of_disjoint {L : ℕ} {a b c d : Fin L}
       (Commute.add_right (Commute.add_right (step _ _ _ _) (step _ _ _ _)) (step _ _ _ _)))
     (Commute.add_right (Commute.add_right (step _ _ _ _) (step _ _ _ _)) (step _ _ _ _))
 
-/-- **Two bond projections on disjoint site pairs commute** (design item A6). This is Tasaki's
+/-- **Two bond projections on disjoint site pairs commute** (item A6). This is Tasaki's
 remark after eq. (7.1.29): for offsets `r ≥ 2` the two projections in `Ĉ_r` act on disjoint bonds
 and commute. Each projection is the polynomial `½ D + ⅙ D² + ⅓` in its own bond operator, so
 commutation follows from `spinSDot_commute_of_disjoint` term by term. -/
@@ -210,7 +210,7 @@ theorem bondSpin2ProjectionS_commute_of_disjoint {L : ℕ} {a b c d : Fin L}
 /-! ## A7: the product of two disjoint bond projections is positive semidefinite -/
 
 /-- **The product of two bond projections on four distinct sites is positive semidefinite**
-(design item A7). Under the six distinctness hypotheses the two projections commute, so their
+(item A7). Under the six distinctness hypotheses the two projections commute, so their
 product `M = P̂_{a,b} P̂_{c,d}` is again a Hermitian idempotent, whence `M = Mᴴ M ≥ 0`. This is the
 fact that lets Stage C discard the offset sums `D_d` with `d ∉ {0, 1, −1}` from Tasaki's
 eq. (7.1.36) — precisely the sums whose two bonds are disjoint. It is *not* available for
@@ -245,13 +245,13 @@ theorem posSemidef_bondSpin2ProjectionS_mul {L : ℕ} {a b c d : Fin L}
   exact key ▸ Matrix.posSemidef_conjTranspose_mul_self
     (bondSpin2ProjectionS a b * bondSpin2ProjectionS c d : ManyBodyOpS (Fin L) 2)
 
-/-! ## A8–A9 (design item B5f): the block embedding preserves positive semidefiniteness -/
+/-! ## A8–A9: the block embedding preserves positive semidefiniteness -/
 
 section Embedding
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N m : ℕ}
 
-/-- **The block embedding commutes with the conjugate transpose** (design item A8). The spectator
+/-- **The block embedding commutes with the conjugate transpose** (item A8). The spectator
 guard `∀ k ∉ range ι, σ' k = σ k` of `onEmbS` is symmetric in its two configurations, so
 transposing the embedded operator is the same as embedding the transposed one. No injectivity is
 needed. (The `ᴴ` postfix does not parse inside this namespace, so `Matrix.conjTranspose` is
@@ -268,7 +268,7 @@ theorem onEmbS_conjTranspose (ι : Fin m → Λ)
   · exact absurd (fun k hk => (h2 k hk).symm) h1
   · exact (star_zero ℂ).symm
 
-/-- **The block embedding preserves positive semidefiniteness** (design item B5f/A9). If the
+/-- **The block embedding preserves positive semidefiniteness** (item A9). If the
 `m`-site operator `A` is positive semidefinite, so is the many-body operator `onEmbS ι A` obtained
 by letting `A` act on the sites listed by an injective `ι` and the identity elsewhere. The proof
 does *not* decompose the embedding into blocks: it writes `A = Cᴴ C` with `C = √A` (Tasaki

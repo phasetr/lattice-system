@@ -14,7 +14,7 @@ The `example`s pin down the exact signatures of
 style (`Tests/LiebFerrimagnetismStaggeredAlgebra.lean`,
 `Tests/LiebFerrimagnetismTransverseCasimir.lean`) and the discharged SpinS template
 `Quantum/SpinS/StaggeredCasimirSU2Invariance.lean`, so that the implementation cannot silently
-drift from the design's exact statements per this arc's PR-3 design.
+drift from the statements pinned here.
 -/
 
 namespace LatticeSystem.Tests.LiebFerrimagnetismSU2Invariance

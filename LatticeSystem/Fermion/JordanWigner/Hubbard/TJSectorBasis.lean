@@ -9,10 +9,10 @@ The spin-charge-separated basis for the ferromagnetic t-J model: each site is em
 site state to the spinful orbital occupation (`spinfulIndex i 0` occupied iff `s i = 1`,
 `spinfulIndex i 1` iff `s i = 2`).
 
-This file establishes the *basis skeleton* (codex-validated design): the configuration is always
-hard-core (each site occupies at most one orbital), and the total electron number equals the number
-of occupied sites.  The `Ŝ³_tot = ½` constraint, injectivity/orthonormality, and the hop matrix
-elements (with the wrap-hop fermion sign `(-1)^(Ne-1)`) follow in later steps.
+This file establishes the *basis skeleton*: the configuration is always hard-core (each site
+occupies at most one orbital), and the total electron number equals the number of occupied sites.
+The `Ŝ³_tot = ½` constraint, injectivity/orthonormality, and the hop matrix elements (with the
+wrap-hop fermion sign `(-1)^(Ne-1)`) follow in later steps.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed.), §11.5.2, p. 443.

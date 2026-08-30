@@ -25,7 +25,8 @@ This is a **conjecture** — believed, with much supporting evidence, but not pr
 Following the project policy, conjectures are recorded as `def … : Prop` statements that are **never
 asserted true** (no `axiom`/`theorem` derives them).  We formalize here the *spectral-gap* dichotomy
 of the Haldane conjecture; the correlation-decay clauses (HOI3)/(I3) are deferred to a later module
-(they require the additional design of the two-point correlation function and its asymptotics).
+(they require the two-point correlation function and its asymptotics, neither of which is defined
+yet).
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §6.1, eqs. (6.1.1)–(6.1.3), pp. 153–157; F. D. M. Haldane, Phys. Lett. **93A**, 464 (1983)

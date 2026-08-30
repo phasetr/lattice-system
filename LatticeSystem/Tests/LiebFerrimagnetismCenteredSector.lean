@@ -54,7 +54,7 @@ example (N : ℕ) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (hT : ∀ i j, T 
 
 /-! ## `T3` — the centered-sector ground energy equals the sector-agnostic ground energy -/
 
-/-- **`T3`: sector ground energy = ground energy (generalized, PR-3 of #5357).** The unique ground
+/-- **`T3`: sector ground energy = ground energy (generalized).** The unique ground
 energy `E` of `H` on the spin-`z` sector `Ŝ³ = m` at an arbitrary tower exponent
 `k ≤ L := sublatticeImbalance A` (matched to `m` via `hkm`) equals `E₀.re`, the real part of the
 sector-agnostic `(N+1)`-electron ground energy — a two-sided pinch: `E₀.re ≤ E` from `φ`'s
@@ -154,8 +154,9 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N +
 
 /-! ## `T6` — existential capstone -/
 
-/-- **`T6`: existential centered transverse sign.** Combining PR-5's
-`liebRepulsive_ground_exists_topWeight` with `T1` and `T5`, the `(N+1)`-electron ground submodule
+/-- **`T6`: existential centered transverse sign.**
+Combining `liebRepulsive_ground_exists_topWeight` with `T1` and `T5`, the `(N+1)`-electron ground
+submodule
 `G` (assumed nonzero) contains a top-weight vector `w` whose centered tower member carries the `T5`
 transverse-sign pattern — the shape the tower-ratio argument consumes, so the *same*
 top-weight `w` witnesses both the weight equation and the sign pattern. -/

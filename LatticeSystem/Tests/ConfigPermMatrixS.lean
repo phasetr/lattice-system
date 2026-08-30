@@ -57,9 +57,9 @@ example (f : (Λ → Fin (N + 1)) → (Λ → Fin (N + 1))) (hf : Function.Invol
 /-! ## 6. Regression: `manyBodyReversalS` is the `revConfigS` specialization -/
 
 /-- After the refactor, `manyBodyReversalS` must be *definitionally* the generic layer applied to
-`revConfigS` — this is the load-bearing regression the design round demands (no duplicated proof
-pattern; downstream consumers `Theorem24FinrankLeTwoContradiction.lean` and
-`AndersonTowerTanakaMoments.lean` must keep working through the existing lemma names). -/
+`revConfigS` — this is the load-bearing regression (no duplicated proof pattern; downstream
+consumers `Theorem24FinrankLeTwoContradiction.lean` and `AndersonTowerTanakaMoments.lean` must
+keep working through the existing lemma names). -/
 example (Λ : Type*) [Fintype Λ] [DecidableEq Λ] (N : ℕ) :
     manyBodyReversalS Λ N = configPermMatrixS (revConfigS (Λ := Λ) (N := N)) := rfl
 

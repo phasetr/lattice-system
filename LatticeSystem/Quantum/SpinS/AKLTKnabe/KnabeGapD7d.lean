@@ -15,7 +15,7 @@ pp. 188–190).  It assembles the three finished blocks
 * ④-I (`AKLTKnabe.GenericSpectralD7b`) — the generic spectral infrastructure S1–S6;
 * ④-II (`AKLTKnabe.FrustrationFreeD7c`) — frustration-freeness of the ring VBS state,
 
-into the finite-volume gap theorem of §7.1.4, following the Gate D7a design items G1–G7:
+into the finite-volume gap theorem of §7.1.4, through the items G1–G7 below:
 
 * **G1** `posSemidef_ringBond` — a bond projection is `≥ 0` (Hermitian idempotent).
 * **G2** `ringProjHamiltonianS_posSemidef_and_annihilates` — **one** call to Tasaki Lemma A.9

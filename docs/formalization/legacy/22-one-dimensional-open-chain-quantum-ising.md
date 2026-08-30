@@ -377,13 +377,14 @@ These remain **eigenvalues of the compression, not energies**: that the compress
 to an invariant subspace is nowhere established here, so `tightBindingEnergy` is treated only as
 an eigenvalue of the tight-binding part `tightBindingRing` of conjunct 2, i.e. of
 `lowEnergyMatrix` with the constant `E_GS^(0) = -N/4` subtracted, and neither it nor the
-difference of conjunct 8 is identified with the ground-state energy or the first-excited energy of `Ĥ`. The
-refusal rests on the absence of a proof of invariance rather than on a claim that invariance
-fails: at the smallest ring size `L = 2` the `2L` configurations already exhaust the basis of the
-state space. No claim is made that these are the least two eigenvalues even of the compression.
-Tasaki notes on p. 59 that the analysis of this problem is not mathematically rigorous. The ring
-carrying the labels `j` is a ring of basis labels of type `ZMod (2 * (N + 1))`, not of lattice
-sites: the chain itself stays open, and no periodic chain occurs in this development.
+difference of conjunct 8 is identified with the ground-state energy or the first-excited energy of
+`Ĥ`. The refusal rests on the absence of a proof of invariance rather than on a claim that
+invariance fails: at the smallest ring size `L = 2` the `2L` configurations already exhaust the
+basis of the state space. No claim is made that these are the least two eigenvalues even of the
+compression. Tasaki notes on p. 59 that the analysis of this problem is not mathematically
+rigorous. The ring carrying the labels `j` is a ring of basis labels of type `ZMod (2 * (N + 1))`,
+not of lattice sites: the chain itself stays open, and no periodic chain occurs in this
+development.
 
 The declaration below is **PROVED**; `#print axioms` on it yields only `propext`,
 `Classical.choice`, `Quot.sound`.

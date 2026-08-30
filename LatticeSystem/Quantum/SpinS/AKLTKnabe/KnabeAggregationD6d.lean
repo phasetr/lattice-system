@@ -48,7 +48,7 @@ The residual offsets `d ∉ {0, 1, −1}` are exactly those for which the two bo
 `{y+d,y+d+1}` are **disjoint**; there the two projections commute, their product is a Hermitian
 idempotent, and `D_d ≥ 0` (`posSemidef_bondPairSum`, from Gate D6b item A7).
 
-## Periodic ring versus open window (design risk R3 — this file owns the PERIODIC side)
+## Periodic ring versus open window (this file owns the PERIODIC side)
 
 Stage A was on neither side; Stage B was on the **open** side (the window `ĥ_x` has exactly three
 bonds and never a fourth).  **This file owns the periodic side**, and it is the file that must get
@@ -254,7 +254,7 @@ private theorem fin_ne_add_one (hL : 2 ≤ L) (y : Fin L) : y ≠ y + 1 := fun h
 
 /-! ### C1–C3: the offset sums and the square of `Ĥ'` -/
 
-/-- **Translation invariance of the ordered pair sums** (design item C1).  Shifting both bonds of
+/-- **Translation invariance of the ordered pair sums** (item C1).  Shifting both bonds of
 an ordered pair by the same amount changes nothing, so a pair sum depends only on the offset
 `b − a`.  This is the one reindexing lemma of Stage C, and it is used nine times (once per term of
 the expanded window square). -/
@@ -265,7 +265,7 @@ theorem bondPairSum_shift (a b : Fin L) :
   change ringBond (y + a) * ringBond (y + b) = ringBond (y + a) * ringBond (y + a + (b - a))
   rw [show y + a + (b - a) = y + b from by abel]
 
-/-- **`D₀ = Ĥ'`** (design item C2).  Tasaki's `P̂² = P̂` (Gate D6b item A3): the offset-zero pair
+/-- **`D₀ = Ĥ'`** (item C2).  Tasaki's `P̂² = P̂` (Gate D6b item A3): the offset-zero pair
 sum is the sum of the squares of the bond projections, i.e. `Ĥ'` itself.  This is the step that
 turns the diagonal of `(Ĥ')²` into a linear term in eq. (7.1.26). -/
 theorem bondPairSum_zero (hL : 2 ≤ L) : bondPairSum (0 : Fin L) = ringProjHamiltonianS L := by
@@ -274,7 +274,7 @@ theorem bondPairSum_zero (hL : 2 ≤ L) : bondPairSum (0 : Fin L) = ringProjHami
   simp only [ringBond]
   exact bondSpin2ProjectionS_mul_self (fin_ne_add_one hL y)
 
-/-- **`(Ĥ')² = Σ_d D_d`** (design item C3), the ordered-offset form of Tasaki eq. (7.1.26).
+/-- **`(Ĥ')² = Σ_d D_d`** (item C3), the ordered-offset form of Tasaki eq. (7.1.26).
 Expanding the square gives a double sum over ordered pairs of bonds `(y, z)`; reindexing the
 inner sum by `z = y + d` groups the pairs by their offset.  No positivity and no commutation is
 used here — it is a pure bookkeeping identity. -/
@@ -298,7 +298,7 @@ private theorem sum_ringBond_shift (a : Fin L) :
   simp only [ringProjHamiltonianS]
   exact Fintype.sum_bijective (fun y => y + a) (Equiv.addRight a).bijective _ _ fun _ => rfl
 
-/-- **`Σ_x ĥ_x = 3 Ĥ'`** (design item C4), Tasaki eq. (7.1.31) at `ℓ = 3`.  Each of the three
+/-- **`Σ_x ĥ_x = 3 Ĥ'`** (item C4), Tasaki eq. (7.1.31) at `ℓ = 3`.  Each of the three
 bonds of the window contributes, after translation of the summation index, a full copy of `Ĥ'`.
 This is the identity that would fail if the wrap bond were dropped from `Ĥ'`. -/
 theorem sum_akltWindowAt : (∑ x : Fin L, akltWindowAt x) = (3 : ℂ) • ringProjHamiltonianS L := by
@@ -319,7 +319,7 @@ private theorem akltWindowAt_sq_expand (x : Fin L) :
   simp only [akltWindowAt]
   noncomm_ring
 
-/-- **`Σ_x ĥ_x² = 3 D₀ + 2 D₁ + D₂ + 2 D₋₁ + D₋₂`** (design item C5), the ordered-offset form of
+/-- **`Σ_x ĥ_x² = 3 D₀ + 2 D₁ + D₂ + 2 D₋₁ + D₋₂`** (item C5), the ordered-offset form of
 Tasaki eqs. (7.1.32)/(7.1.35) at `ℓ = 3`.  The nine ordered products of the window square carry
 the offsets `0, 1, 2, −1, 0, 1, −2, −1, 0` respectively, and each sums to the corresponding `D_d`
 by translation invariance.  The coefficient `2` of `D₁` (and of `D₋₁`) is what will cancel
@@ -363,7 +363,7 @@ theorem sum_akltWindowAt_sq (hL : 3 ≤ L) :
 
 /-! ### C6: the residual offset sums are positive semidefinite -/
 
-/-- **`D_d ≥ 0` for every offset `d ∉ {0, 1, −1}`** (design item C6).  For such `d` the four sites
+/-- **`D_d ≥ 0` for every offset `d ∉ {0, 1, −1}`** (item C6).  For such `d` the four sites
 `y, y+1, y+d, y+d+1` are pairwise distinct, i.e. the two bonds are **disjoint**, so their
 projections commute and the product is a Hermitian idempotent (Gate D6b item A7), hence positive
 semidefinite; a sum of positive-semidefinite matrices is positive semidefinite.  The excluded
@@ -389,7 +389,7 @@ theorem posSemidef_bondPairSum (hL : 2 ≤ L) {d : Fin L}
 
 /-! ### C7: the master identity -/
 
-/-- **The Knabe master identity** (design item C7): the whole of Tasaki
+/-- **The Knabe master identity** (item C7): the whole of Tasaki
 eqs. (7.1.26)–(7.1.38) at `ℓ = 3`, as a single operator equation,
 
   `(Ĥ')² − (1/10) Ĥ' = (1/2) Σ_x (ĥ_x² − (2/5) ĥ_x) + (1/2) D₂ + (1/2) D₋₂
@@ -458,7 +458,7 @@ theorem ringProjHamiltonianS_sq_sub_smul_eq (hL : 5 ≤ L) :
 
 /-! ### C8: the capstone -/
 
-/-- **Knabe's inequality for the AKLT ring projector Hamiltonian** (design item C8, Tasaki
+/-- **Knabe's inequality for the AKLT ring projector Hamiltonian** (item C8, Tasaki
 eq. (7.1.38) at `ℓ = 3`):
 
   `(Ĥ')² ≥ (1/10) Ĥ'`,   equivalently   `(Ĥ')² − (1/10) Ĥ' ≥ 0`,

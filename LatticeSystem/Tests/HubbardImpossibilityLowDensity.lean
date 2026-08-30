@@ -436,14 +436,14 @@ example {M : ℕ} (t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) (w : Fin (M + 1) 
 
 The eight Reds below pin the four PR-5 declarations of
 `LatticeSystem/Math/MatrixAnalysis/PermInvariantUniformEigenvector.lean`
-(`commute_toPEquiv_toMatrix_of_perm_invariant`,
-`norm_apply_eq_norm_apply_of_comp_perm_smul`, `eigenspace_mulVecLin_ne_bot_of_map_eq`,
+(`commute_toPEquiv_toMatrix_of_perm_invariant`, `norm_apply_eq_norm_apply_of_comp_perm_smul`,
+`eigenspace_mulVecLin_ne_bot_of_map_eq`,
 `exists_uniformModulus_eigenvector_of_transitive_perm_invariance`).  Reds 20/21/21b consume the
-capstone A4 — its
-normalisation at two sizes, then its eigen-equation on a non-diagonal matrix at a nonzero
-eigenvalue; Reds 23/23b pin A1 and the failure of A1's hypothesis; Red 24 pins A3 and Red 25 pins
-A2 in isolation.  Red 22 alone references none of the four: it is the standalone sharpness
-counterexample, built from existing mathlib API, showing `_htransitive` cannot be dropped from A4.
+capstone A4 — its normalisation at two sizes, then its eigen-equation on a non-diagonal matrix at
+a nonzero eigenvalue; Reds 23/23b pin A1 and the failure of A1's hypothesis; Red 24 pins A3 and
+Red 25 pins A2 in isolation.  Red 22 alone references none of the four: it is the standalone
+sharpness counterexample, built from existing mathlib API, showing `_htransitive` cannot be
+dropped from A4.
 -/
 
 /-- **Red 20.** Application-shape / non-vacuity guard for A4 at `M = 1`. With `σ = Equiv.swap 0 1`
@@ -606,16 +606,14 @@ are referenced directly: `eq_comp_sort_of_monotone_of_map_eq` = C1 (Red 26),
 `exists_lowestLevels_finset_of_map_eq` = C3 (Reds 28 and 31), `sum_lowestLevels_succ` = C5
 (Red 29). Red 27 reads against the weighted lemmas W1 (`sum_lowestLevels_le_sum_weighted`) and W2
 (`sum_lowestLevels_le_sum_weighted_of_map_eq`, pinned separately in the PR-7b section of
-`LatticeSystem.Tests.HubbardImpossibilityLowDensityRoth`), on
-the same fixture. Red 30 is the standalone sharpness counterexample for `hmono`, read against
-W2, and
-references neither C1/C3/C5 nor W1/W2. The primary fixture for
-Reds 26/28/29/31 is `m = 3`, `α = ℕ`, `ε := ![0, 1, 2]`, `g := ![2, 0, 1]`, chosen so
-`hspec`/`hmono`/every concrete sum is `decide`-able; Red 27 restates the same values over `ℝ`
-(`decide` does not reduce on `ℝ`, so `ε := fun i => (i : ℝ)` for a computable `Monotone` proof and
-`g := ![2, 0, 1] : Fin 3 → ℝ`, with `hspec` via `List.rotate_perm` rather than `decide`), since
-W1/W2 are stated over `ℝ`. Red 31 is the junction guard
-at the real consumer's types (`Matrix.IsHermitian.eigenvalues` / `occupiedEigenEnergy`).
+`LatticeSystem.Tests.HubbardImpossibilityLowDensityRoth`), on the same fixture. Red 30 is the
+standalone sharpness counterexample for `hmono`, read against W2, and references neither C1/C3/C5
+nor W1/W2. The primary fixture for Reds 26/28/29/31 is `m = 3`, `α = ℕ`, `ε := ![0, 1, 2]`,
+`g := ![2, 0, 1]`, chosen so `hspec`/`hmono`/every concrete sum is `decide`-able; Red 27 restates
+the same values over `ℝ` (`decide` does not reduce on `ℝ`, so `ε := fun i => (i : ℝ)` for a
+computable `Monotone` proof and `g := ![2, 0, 1] : Fin 3 → ℝ`, with `hspec` via `List.rotate_perm`
+rather than `decide`), since W1/W2 are stated over `ℝ`. Red 31 is the junction guard at the real
+consumer's types (`Matrix.IsHermitian.eigenvalues` / `occupiedEigenEnergy`).
 -/
 
 /-- **Red 26 (C1 pinned).** On the fixture, `ε = g ∘ Tuple.sort g`. Guards the direction of the
@@ -629,13 +627,12 @@ example :
       = (Finset.univ : Finset (Fin 3)).val.map (![2, 0, 1] : Fin 3 → ℕ) := by decide
   exact LatticeSystem.Math.eq_comp_sort_of_monotone_of_map_eq hmono hspec
 
-/-- **Red 27 (W2 pinned, with the inequality direction — retargeted from the deleted C4).**
-`k = 2`, `w := ![1, 0, 1] : Fin 3 → ℝ` (the indicator of `S = {0, 2}`, so `∑ j, g j * w j
-= g 0 + g 2 = 3`), while `∑ i : Fin 2, ε (castLE _ i) = 1`. Asserts the *consequence* `1 ≤ 3`
-obtained through W2 (`sum_lowestLevels_le_sum_weighted_of_map_eq`, the successor of the deleted
-`sum_lowestLevels_le_sum_of_map_eq` = C4), so a flipped inequality fails to compile. The `{0,
-1}`-valued `w` reproduces C4's original `S`-indicator consumption exactly, so the sharpness
-coverage C4 provided does not decrease after its deletion. -/
+/-- **Red 27 (W2 pinned, with the inequality direction).** `k = 2`,
+`w := ![1, 0, 1] : Fin 3 → ℝ` (the indicator of `S = {0, 2}`, so `∑ j, g j * w j = g 0 + g 2 = 3`),
+while `∑ i : Fin 2, ε (castLE _ i) = 1`. Asserts the *consequence* `1 ≤ 3`
+obtained through W2 (`sum_lowestLevels_le_sum_weighted_of_map_eq`), so a flipped inequality fails
+to compile. The `{0, 1}`-valued `w` is exactly an `S`-indicator, so this pin also covers the
+unweighted `∑_{p ∈ S} g p` shape that the Fermion layer consumes. -/
 example : (1 : ℝ) ≤ 3 := by
   have hmono : Monotone (fun i : Fin 3 => (i : ℝ)) := fun a b hab => by
     change (a : ℝ) ≤ (b : ℝ)
@@ -706,8 +703,8 @@ example : (3 : ℕ) = 1 + 2 := by
 /-- **Red 30 (sharpness of `hmono` — the load-bearing hypothesis, read against W2).** Standalone,
 using none of C1/C3/C5 or W1/W2. With `ε := ![2, 0, 1]` and `g := ε` (so `hspec` is `rfl` and
 monotonicity fails), `k = 1`, `S = {1}`: `∑ i : Fin 1, ε (castLE _ i) = 2` but `∑ p ∈ S, g p = 0`,
-so the unweighted specialisation of W2's conclusion (the deleted C4's statement) is *false* without
-`Monotone ε`. Mirrors Red 22's discipline and is the test a reviewer will ask for. -/
+so W2's conclusion at an `S`-indicator weight is *false* without `Monotone ε`. Mirrors Red 22's
+discipline and is the test a reviewer will ask for. -/
 example :
     ¬ (∑ i : Fin 1, (![2, 0, 1] : Fin 3 → ℕ) (Fin.castLE (by decide : (1 : ℕ) ≤ 3) i)
         ≤ ∑ p ∈ ({1} : Finset (Fin 3)), (![2, 0, 1] : Fin 3 → ℕ) p) := by

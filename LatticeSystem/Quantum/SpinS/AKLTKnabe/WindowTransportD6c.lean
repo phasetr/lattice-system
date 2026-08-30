@@ -21,7 +21,7 @@ The chain of the transport is
 `ĥ² − (2/5) ĥ` inside the embedding, then `onEmbS_posSemidef`.  No `Matrix.PosSemidef` is ever
 re-derived from entries here: the only certificate consumed is the Gate D5b Stage 4 one.
 
-## Periodic ring versus open window (design risk R3 — this file is on the OPEN side)
+## Periodic ring versus open window (this file is on the OPEN side)
 
 Gate D6b Stage A was deliberately on *neither* side of the periodic/open distinction (all its
 lemmas speak about arbitrary bonds under distinctness hypotheses only).  **Stage B is on the
@@ -46,9 +46,9 @@ agree for `2 ≤ L` but no bridge lemma is needed in Stage B, because no stateme
 
 ## Hypothesis strength
 
-The design sheet uses `5 ≤ L` throughout the three stages, that being what Stage C's five distinct
-offsets `0, 1, 2, −1, −2` require.  Stage B needs only the four window sites to be distinct, i.e.
-**`4 ≤ L`**, and is stated under that weaker hypothesis (weakest-hypothesis discipline, as in
+Stage C needs `5 ≤ L` throughout, that being what its five distinct offsets `0, 1, 2, −1, −2`
+require.  Stage B needs only the four window sites to be distinct, i.e. **`4 ≤ L`**, and is
+stated under that weaker hypothesis (weakest-hypothesis discipline, as in
 Gate D6b item A5).  Stage C's `5 ≤ L` implies it.  The `4 ≤ L` boundary is not vacuous: the exact
 rational contrast run before this file was written confirms the transport identity and the
 transported certificate at `L = 4`, and confirms that both fail at `L = 3`.
@@ -63,7 +63,7 @@ open scoped ComplexOrder
 
 /-! ## B3: a bond projection of a subchain is the block embedding of a bond projection -/
 
-/-- **Transport of a bond projection along an injective site list** (design item B3).  If
+/-- **Transport of a bond projection along an injective site list** (item B3).  If
 `ι : Fin m → Fin L` lists `m` distinct sites of the chain `Fin L`, then the bond projection of the
 big chain on the two sites `ι i`, `ι j` is the block embedding along `ι` of the bond projection of
 the small chain on the sites `i`, `j`.
@@ -113,9 +113,9 @@ variable {L : ℕ} [NeZero L]
 
 /-- The **window site list** `windowEmb x = (x, x+1, x+2, x+3)`, i.e. the four sites carrying the
 open three-bond window `ĥ_{x,x+3}` of Tasaki eq. (7.1.30).  It is written as `i ↦ x + ofNat i`
-rather than as the literal `![x, x+1, x+2, x+3]` of the design sheet: the two are the same
-function (see `windowEmb_apply_*` below), but this form makes injectivity a one-line cancellation
-and avoids the `Matrix.cons_val_one` normal-form hazard of `![·]` entirely.
+rather than as the literal `![x, x+1, x+2, x+3]`: the two are the same function (see
+`windowEmb_apply_*` below), but this form makes injectivity a one-line cancellation and avoids the
+`Matrix.cons_val_one` normal-form hazard of `![·]` entirely.
 
 `Fin.ofNat L` is used rather than the coercion `(· : ℕ) → Fin L`, because in this import context
 the coercion is unavailable: mathlib makes `Fin.instAddMonoidWithOne` a *scoped* instance
@@ -127,7 +127,7 @@ def windowEmb (x : Fin L) : Fin 4 → Fin L := fun i => x + Fin.ofNat L i.val
 private theorem windowEmb_apply (x : Fin L) (i : Fin 4) :
     windowEmb x i = x + Fin.ofNat L i.val := rfl
 
-/-- **The four window sites are distinct** (design item B2).  As soon as the chain has at least
+/-- **The four window sites are distinct** (item B2).  As soon as the chain has at least
 four sites, `x, x+1, x+2, x+3` are pairwise distinct, so the window site list is injective and
 `onEmbS_mul` / `onEmbS_posSemidef` apply along it.  At `L = 3` the statement is false (the exact
 rational contrast confirms that the transport identity itself fails there). -/
@@ -201,7 +201,7 @@ noncomputable def akltWindowAt (x : Fin L) : ManyBodyOpS (Fin L) 2 :=
 
 /-! ## B4: the window is the block embedding of the four-site window -/
 
-/-- **The window at `x` is the block embedding of the four-site window** (design item B4).  The
+/-- **The window at `x` is the block embedding of the four-site window** (item B4).  The
 three bonds of `akltWindowAt x` are the images under `windowEmb x` of the three bonds
 `{0,1}, {1,2}, {2,3}` of `akltWindow3H`, so `akltWindowAt x` is `akltWindow3H` embedded along the
 four window sites.  This is the exact point at which the *open* character of the window is used:

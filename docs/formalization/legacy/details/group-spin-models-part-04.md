@@ -133,7 +133,7 @@ non-canonical config, a single HAF ladder move to another balanced config of sma
 `±` spin at `p ≤ L−2`, sliding past a `0` or annihilating an adjacent opposite `±`);
 `hhaf_reachable_to_canonical` / `hhaf_reachable_canonical` (strong induction on `hhafS`) then show
 **every balanced hidden-AFM configuration is HAF-reachable from the canonical all-`0`
-configuration** (with `RaiseLowerReachableSHhaf_symm` for the reverse). **Note**: the *full*
+configuration** (with `RaiseLowerReachableSHhaf_symm` for the reverse). **Design note**: the *full*
 HAF matrix is reducible — a single-`±` config (`pmCount = 1`, magnetization `±1`) is vacuously
 hidden-AFM but unreachable from `canonical` (the moves conserve magnetization), so irreducibility
 holds only within the balanced (charge-`0`) sector; this is the sector containing the

@@ -6,8 +6,8 @@ import LatticeSystem.Math.MvPolynomial.BilinearFactorCoprime
 # Specification tests for the bond-factor derivation layer (PR-3a, #5292)
 
 Signature/behaviour specification for
-`LatticeSystem.Math.MvPolynomial.BondFactorDerivation` (PR-3 design round §2.1 fact (K1) and the
-bidegree-lowering half of §2 "genuinely laborious" remark on `IsWeightedHomogeneous.pderiv`).
+`LatticeSystem.Math.MvPolynomial.BondFactorDerivation`: the Leibniz commutator identity (K1)
+listed below, and the bidegree-lowering behaviour of `IsWeightedHomogeneous` under `pderiv`.
 
 `Ω := ∂_a∂_b − ∂_c∂_d` (`bondOmega a b c d`) is the two-site derivative operator whose instance at
 the bond factor `f = X a * X b - X c * X d` (`bondFactor a b c d`) drives the Casimir-descent route
@@ -18,8 +18,7 @@ pair of distinct sites `x y : Fin L`.
 
 Every `example` below is a signature/behaviour pin against the production declarations in
 `BondFactorDerivation.lean` (there is no test runner separate from `lake build`).  The two numeric
-`example`s at the bottom pin the `N = 2` sanity checks from the design round (§2.1:
-`Ω(u₀²u₁²) = 0`, `Ω(f₂²) = 6·f₂`).
+`example`s at the bottom pin the `N = 2` sanity checks `Ω(u₀²u₁²) = 0` and `Ω(f₂²) = 6·f₂`.
 
 Required production API (all in `LatticeSystem.Math`, generic `σ` unless noted):
 
@@ -117,7 +116,7 @@ example {L : ℕ} {x y : Fin L} (hxy : x ≠ y) {m n : ℕ} {p : MvPolynomial (F
         + ((m + n + 2 : ℕ) : ℂ) • p := by
   simpa [hxy, hxy.symm] using bondOmega_bond_mul_of_isWeightedHomogeneous hxy hp
 
-/-! ## `N = 2` numeric checks (design round §2.1: `Ω(u₀²u₁²) = 0`, `Ω(f₂²) = 6f₂`) -/
+/-! ## `N = 2` numeric checks: `Ω(u₀²u₁²) = 0`, `Ω(f₂²) = 6f₂` -/
 
 /-- `Ω(u₀²u₁²) = 0` at `N = 2`: `u₀²u₁²` has site-`0` degree `2` from `u₀` alone and site-`1`
 degree `2` from `u₁` alone, so neither derivative branch of `Ω` sees both of its variables. -/
@@ -130,7 +129,7 @@ example :
     simpa using (pderiv (R := ℂ) ((0 : Fin 2), (1 : Fin 2))).map_natCast 2
   simp [h2, Prod.mk.injEq]
 
-/-- `Ω(f₂²) = 6·f₂` at `N = 2` (design round §2.1, the `Ĉ p = 0` check on `p = f₂²`, `J = 0`):
+/-- `Ω(f₂²) = 6·f₂` at `N = 2` (the `Ĉ p = 0` check on `p = f₂²`, `J = 0`):
 derived from the headline instance applied at `p = f₂` itself (`m = n = 1`) together with `Ω f₂ =
 2`. -/
 example :

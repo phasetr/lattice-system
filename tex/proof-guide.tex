@@ -4916,39 +4916,13 @@ Let $n$ be a finite type and $A : \mathrm{Matrix}(n,n,\mathbb{R})$ be:
     there exists $k>0$ with $(A^k)_{ij} > 0$.
 \end{itemize}
 
-\subsection{Non-negative max eigenvector (\texttt{exists\_nonneg\_eigenvec\_max})}
-
-\textbf{Statement (sorry).}
-There exists a maximum eigenvalue $\mu$ and a non-zero non-negative eigenvector
-$v : n \to \mathbb{R}$ satisfying $Av = \mu v$, $v \neq 0$,
-$v_i \geq 0$ for all $i$, and $\lambda_k \leq \mu$ for every eigenvalue $\lambda_k$.
-
-\textbf{Mathematical proof sketch.}
-Let $v$ be any max eigenvector (from the spectral theorem) and set $w_i = |v_i|$.
-Since $A_{ij} \geq 0$,
-\[
-  (Aw)_i = \sum_j A_{ij}|v_j| \geq \left|\sum_j A_{ij}v_j\right| = |\mu v_i| = \mu|v_i|,
-\]
-so $w \cdot (Aw) \geq \mu\|w\|^2$.
-The Rayleigh quotient bound gives $w \cdot (Aw) \leq \mu\|w\|^2$, hence equality.
-By the eigenbasis expansion $w \cdot (Aw) = \sum_k \lambda_k c_k^2$ and
-$\|w\|^2 = \sum_k c_k^2$ where $c_k = \langle e_k, w\rangle$,
-equality forces $c_k = 0$ for $\lambda_k < \mu$, giving $Aw = \mu w$.
-
-\textbf{Lean status.}
-The proof is \texttt{sorry}: the Rayleigh equality condition
-$\langle w, Aw\rangle = \mu\|w\|^2 \Rightarrow Aw = \mu w$
-requires computing $\langle w, Aw\rangle$ via the eigenbasis inner product,
-which is blocked by the \texttt{EuclideanSpace}/\texttt{n $\to$ $\mathbb{R}$} API gap in Mathlib.
-Tracked in Issue~\#405.
-
 \subsection{Collatz--Wielandt main results (\texttt{PerronFrobeniusMain})}
 \label{sec:pf-main}
 
 \emph{Source file:} \texttt{LatticeSystem/Math/PerronFrobeniusMain.lean}.
 
 \medskip
-The key results eliminating the sorry from \texttt{exists\_pos\_eigenvec\_max}.
+The key results behind \texttt{exists\_pos\_eigenvec\_max}.
 
 \begin{itemize}
 \item \textbf{\texttt{pos\_of\_nonneg\_eigenvec}.}
@@ -4987,9 +4961,6 @@ $\exists\,\mu\,\exists\,v,\; Av = \mu v \;\land\; v \neq 0 \;\land\; \forall i,\
 
 \textbf{Proof.}
 Call \texttt{exists\_positive\_eigenvector\_of\_irreducible} directly.
-The sorry-bearing \texttt{exists\_nonneg\_eigenvec\_max} is bypassed entirely.
-(The sorry is retained in that function for documentation of the unresolved
-Rayleigh equality approach.)
 
 \subsection{Uniqueness (\texttt{pos\_eigenvec\_unique})}
 
@@ -5015,8 +4986,6 @@ Lean name & Status & Notes \\
 \texttt{pos\_of\_nonneg\_eigenvec} & proved & PR C \\
 \texttt{exists\_positive\_eigenvector\_of\_primitive} & proved & PR C; Seneta \S1.2 \\
 \texttt{exists\_positive\_eigenvector\_of\_irreducible} & proved & PR C; Seneta \S1.2 \\
-\texttt{exists\_nonneg\_eigenvec\_max} & sorry & Rayleigh step; retained for docs \\
-\texttt{exists\_pos\_eigenvec\_max} & \textbf{sorry-free} & bypasses sorry via PR C \\
 \texttt{pos\_eigenvec\_unique} & proved & $r = \sup_i w_i/v_i$ \\
 \hline
 \end{tabular}

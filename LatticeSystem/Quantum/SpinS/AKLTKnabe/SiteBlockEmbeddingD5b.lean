@@ -32,9 +32,8 @@ The capstone is the **open three-bond window** of Tasaki eq. (7.1.30) with `ℓ 
 proved entrywise equal to the cast of the frozen rational model `physicalHEntry`.  Note that the
 window is **open**: it is written with the three explicit pairs and never through
 `akltHamiltonianS`, whose `ringCoupling` would add the periodic fourth bond `{3, 0}` because
-`ringSucc 3 = 0` on `Fin 4` (design risk R3).  The spectator sites of the middle bond are `0`
-and `3`, which are *not* contiguous (design risk R6); the three guard lemmas below record each
-spectator pair separately.
+`ringSucc 3 = 0` on `Fin 4`.  The spectator sites of the middle bond are `0` and `3`, which are
+*not* contiguous; the three guard lemmas below record each spectator pair separately.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §7.1.4, eq. (7.1.30), p. 189.
@@ -107,8 +106,8 @@ theorem onEmbS_smul (ι : Fin m → Λ) (c : ℂ)
   · rfl
   · rw [mul_zero]
 
-/-- **Multiplicativity of the block embedding** (design item B5c).  For an injective site list
-`ι`, embedding is a ring homomorphism on products: the `τ`-sum over all configurations of `Λ`
+/-- **Multiplicativity of the block embedding**.  For an injective site list `ι`, embedding is a
+ring homomorphism on products: the `τ`-sum over all configurations of `Λ`
 collapses onto the `m`-site fibre through `τ ↦ τ ∘ ι`, whose inverse on the fibre is
 `a ↦ Function.extend ι a σ`.  This is the step that makes the polynomial
 `½ D + ⅙ D² + ⅓` defining `bondSpin2ProjectionS` transport along the embedding. -/
@@ -214,9 +213,8 @@ private theorem emb_two_guard_iff {x y : Λ} (σ' σ : Λ → Fin (N + 1)) :
     · rw [← h0]; exact (hk 0).symm
     · rw [← h1]; exact (hk 1).symm
 
-/-- **The bond Heisenberg operator is a two-site block embedding** (design item B5d).  For
-distinct sites `x ≠ y`, `Ŝ_x · Ŝ_y` on `Λ` is the embedding along `![x, y]` of the two-site
-`Ŝ₀ · Ŝ₁` on `Fin 2`. -/
+/-- **The bond Heisenberg operator is a two-site block embedding**.  For distinct sites `x ≠ y`,
+`Ŝ_x · Ŝ_y` on `Λ` is the embedding along `![x, y]` of the two-site `Ŝ₀ · Ŝ₁` on `Fin 2`. -/
 theorem spinSDot_eq_onEmbS {x y : Λ} (hxy : x ≠ y) (N : ℕ) :
     (spinSDot x y N : ManyBodyOpS Λ N) = onEmbS ![x, y] (spinSDot (0 : Fin 2) 1 N) := by
   ext σ' σ
@@ -245,9 +243,9 @@ section Chain
 
 variable {L : ℕ}
 
-/-- **The bond spin-two projection is a two-site block embedding** (design item B5e).  For
-distinct sites `x ≠ y` of the chain `Fin L`, `P̂₂[Ŝ_x + Ŝ_y]` is the embedding along `![x, y]` of
-the two-site projection on `Fin 2`.  The squaring inside the defining polynomial
+/-- **The bond spin-two projection is a two-site block embedding**.  For distinct sites `x ≠ y`
+of the chain `Fin L`, `P̂₂[Ŝ_x + Ŝ_y]` is the embedding along `![x, y]` of the two-site
+projection on `Fin 2`.  The squaring inside the defining polynomial
 `½ D + ⅙ D² + ⅓` is transported by `onEmbS_mul`. -/
 theorem bondSpin2ProjectionS_eq_onEmbS {x y : Fin L} (hxy : x ≠ y) :
     (bondSpin2ProjectionS x y : ManyBodyOpS (Fin L) 2)

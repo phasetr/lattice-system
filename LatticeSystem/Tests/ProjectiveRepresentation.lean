@@ -2,7 +2,7 @@ import LatticeSystem.Math.ProjectiveRepresentation
 import LatticeSystem.Quantum.Pauli
 
 /-!
-# Tests: §8.3.5 projective-representation definition layer (PR-1 of #5306)
+# Tests: §8.3.5 projective-representation definition layer
 
 Behavioural tests for `LatticeSystem.Math.ProjectiveRepresentation`:
 
@@ -29,7 +29,7 @@ Behavioural tests for `LatticeSystem.Math.ProjectiveRepresentation`:
   representation is trivial.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §8.3.5,
-eqs. (8.3.40)-(8.3.43), pp. 277-278; §2.1, eq. (2.1.31), p. 20.  Refs #5306, #4718.
+eqs. (8.3.40)-(8.3.43), pp. 277-278; §2.1, eq. (2.1.31), p. 20.
 -/
 
 namespace LatticeSystem.Tests

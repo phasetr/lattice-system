@@ -6,16 +6,15 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismCenteredBoun
 Specification suite for
 `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismCenteredBound.lean` (PR-7 of the
 Theorem 10.6 discharge arc, issue #5347). The `example`s pin the exact type signature (and,
-crucially, the exact *hypothesis set*) of the five public declarations per this arc's PR-7
-design: the generic sum-linearity of
-`vectorExpectation` (`D1`), the sign-transport bound onto the double-sum transverse operator
+crucially, the exact *hypothesis set*) of the five public declarations: the generic sum-linearity
+of `vectorExpectation` (`D1`), the sign-transport bound onto the double-sum transverse operator
 (`D3`), the Casimir identity on the centered tower member (`D4`), the capstone ratio bound with
 **weakest hypotheses** (`D7`, no `hbip`/`hT_conn`/`hU`/`1 ≤ N`), and the existential capstone
 consuming PR-6's `liebRepulsive_exists_centered_transverse_sign` (`D8`). Mirrors the specification
 style of `Tests/LiebFerrimagnetismCenteredSector.lean` and
-`Tests/LiebFerrimagnetismGroundTower.lean`.
-`D0`'s de-privatization, and the `private` `D2`/`D5`/`D6` arithmetic/pair-sign lemmas, are not
-pinned here (repo convention: only public declarations get a `Tests/` pin).
+`Tests/LiebFerrimagnetismGroundTower.lean`. `D0`'s de-privatization, and the `private`
+`D2`/`D5`/`D6` arithmetic/pair-sign lemmas, are not pinned here (repo convention: only public
+declarations get a `Tests/` pin).
 
 Notation: `L := sublatticeImbalance A`, `k₀ := L / 2` (ℕ division), `S₀ := L/2 : ℝ`,
 `γ₀ := liebRepulsiveSpinCasimir A`, `u := ((fermionTotalSpinMinus N) ^ k₀).mulVec w`,

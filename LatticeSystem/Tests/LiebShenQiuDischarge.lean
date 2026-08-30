@@ -38,8 +38,9 @@ namespace LatticeSystem.Tests.LiebShenQiuDischarge
 open LatticeSystem.Fermion LatticeSystem.Quantum LatticeSystem.Math Matrix
 
 /-- Pins **CAP**: the elaborated statement of `theorem_10_8_lieb_shen_qiu_superconductivity` must
-be *byte-for-byte* the type restated below, so that reordering, adding or dropping any binder or
-conjunct breaks this pin. -/
+be *byte-for-byte* the type restated below.  That type is the whole of the Theorem 10.8 obligation,
+so the pin guards not only the interface shape but that the theorem carries the obligation in full
+rather than a weakened variant: reordering, adding or dropping any binder or conjunct breaks it. -/
 example :
     ∀ (N Ne : ℕ) (A : Finset (Fin (N + 1))),
       Even Ne →

@@ -26,15 +26,14 @@ minimality proof (`liebRepulsive_groundSubmodule_le_comap_of_commute`,
 Reuses `ham_su2_multiplet_companion` (`Math/AngularMomentum/Multiplet.lean:56`) rather than the
 highest-weight tower `highestWeight_spinMultiplet_general`, per the arc's main-agent decision
 (the companion lemma manufactures the top state internally and carries the `Ĥ`/`N̂` eigenvalues
-along, so no separate highest-weight certificate is needed). See the design round's "Route note"
-for the full argument against the tower route.
+along, so no separate highest-weight certificate is needed).
 
 ## Contents (this file)
 
 * `liebRepulsive_su2_weight_transport` — specializes `ham_su2_multiplet_companion` to the physical
   symmetric repulsive Hamiltonian: from a joint `(Ĥ, N̂, Ŝ³, Ŝ²)`-eigenvector of spin `J`, produces
   a nonzero companion at every weight `J − k` (`k ≤ 2J`) with the same `Ĥ` and `N̂` eigenvalues
-  (steps 2/3 of the design round's closing argument).
+  (steps 2/3 of the closing argument below).
 * `liebRepulsive_admissibleSector_groundState_casimir_eigenvector` — per-admissible-sector step
   (step 1): the unique ground state on `numberSpinZSectorEuclidean` at an admissible `Ŝ³` value is
   an `Ŝ²`-eigenvector at `liebRepulsiveSpinCasimir A`, via `exists_unique_casimir_sector_strict_min`
@@ -165,8 +164,8 @@ theorem liebRepulsive_transport_to_sector (N q k : ℕ)
 
 /-! ## Step 1: per-admissible-sector ground state is a Casimir eigenvector -/
 
-/-- **Per-admissible-sector step (step 1 of the design round's closing argument).** For an
-admissible `Ŝ³` value (indexed by `nUp`, `1 ≤ |A|`, `1 ≤ |B|`), the unique ground state `φ` of the
+/-- **Per-admissible-sector step (step 1 of the closing argument).** For an admissible `Ŝ³`
+value (indexed by `nUp`, `1 ≤ |A|`, `1 ≤ |B|`), the unique ground state `φ` of the
 physical symmetric repulsive Hamiltonian on `numberSpinZSectorEuclidean N (N+1) m₀` is an
 `Ŝ²`-eigenvector at `liebRepulsiveSpinCasimir A`. Combines
 `repulsiveSpinZSector_ground_unique_on_numberSpinZSector`
