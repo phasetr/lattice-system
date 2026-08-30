@@ -53,6 +53,14 @@ theorem trialState_eq_smul {n : Type*} [Fintype n] [DecidableEq n] {O : Matrix n
     hvlTrialState O Φ = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ • (O *ᵥ Φ) := by
   rw [hvlTrialState, unitNormalize, vecNormSqRe_mulVec_eq_rayleigh hO Φ]
 
+/-- Ket-side absorption: `⟨Φ_GS, (Ô_L)^k Γ⟩ = (√m₂)⁻¹ ⟨Φ_GS, (Ô_L)^{k+1} Φ_GS⟩`. -/
+theorem dotProduct_mulVec_trialState {n : Type*} [Fintype n] [DecidableEq n]
+    {O : Matrix n n ℂ} (hO : O.IsHermitian) (Φ : n → ℂ) (k : ℕ) :
+    star Φ ⬝ᵥ ((O ^ k) *ᵥ hvlTrialState O Φ)
+      = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ * (star Φ ⬝ᵥ ((O ^ (k + 1)) *ᵥ Φ)) := by
+  rw [trialState_eq_smul hO Φ, Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul,
+    Matrix.mulVec_mulVec, ← pow_succ]
+
 /-- `Γ` is a unit vector: `⟨Γ, Γ⟩ = 1`, since `‖Ô_L|Φ_GS⟩‖² = m₂ > 0`. -/
 theorem trialState_dotProduct_self {n : Type*} [Fintype n] [DecidableEq n]
     {O : Matrix n n ℂ} (hO : O.IsHermitian) (Φ : n → ℂ) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) :

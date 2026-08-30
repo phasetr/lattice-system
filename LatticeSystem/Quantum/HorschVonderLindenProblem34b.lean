@@ -81,14 +81,6 @@ reference vector and the Horsch–von der Linden trial state. -/
 noncomputable def hvlPlusState {n : Type*} [Fintype n] (O : Matrix n n ℂ) (Φ : n → ℂ) : n → ℂ :=
   ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ • (Φ + hvlTrialState O Φ)
 
-/-- Ket-side absorption: `⟨Φ_GS, (Ô_L)^k Γ⟩ = (√m₂)⁻¹ ⟨Φ_GS, (Ô_L)^{k+1} Φ_GS⟩`. -/
-private theorem dotProduct_mulVec_trialState {n : Type*} [Fintype n] [DecidableEq n]
-    {O : Matrix n n ℂ} (hO : O.IsHermitian) (Φ : n → ℂ) (k : ℕ) :
-    star Φ ⬝ᵥ ((O ^ k) *ᵥ hvlTrialState O Φ)
-      = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ * (star Φ ⬝ᵥ ((O ^ (k + 1)) *ᵥ Φ)) := by
-  rw [trialState_eq_smul hO Φ, Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul,
-    Matrix.mulVec_mulVec, ← pow_succ]
-
 /-- Bra-side adjoint transfer: `⟨Γ, (Ô_L)^k Φ_GS⟩ = (√m₂)⁻¹ ⟨Φ_GS, (Ô_L)^{k+1} Φ_GS⟩`, using
 `Ô_L^† = Ô_L` to move the operator across the pairing. -/
 private theorem trialState_dotProduct_mulVec {n : Type*} [Fintype n] [DecidableEq n]
