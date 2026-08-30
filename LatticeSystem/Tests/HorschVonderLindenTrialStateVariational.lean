@@ -1,6 +1,5 @@
 import LatticeSystem.Quantum.HorschVonderLindenProblem34b
 import LatticeSystem.Quantum.Pauli
-import LatticeSystem.Quantum.SpinS.DoubleCommutatorVariational
 
 /-!
 # Test coverage for the §3.4 trial state and the basic variational estimate
@@ -12,17 +11,15 @@ p. 66.
 
 ## What each block pins
 
-**Trial-state block.** `HorschVonderLindenTrialState.lean` is the public §3.4 home of five
-theorems about the trial state `Γ = hvlTrialState O Φ` (eq. (3.4.7)): its scaling form
-(`trialState_eq_smul`), its unit-norm identity (`trialState_dotProduct_self`), and three
-absorption identities that move a power of `O` across the `⟨·,·⟩` pairing onto `Φ`
-(`dotProduct_mulVec_trialState`, `trialState_dotProduct_mulVec`,
+**Trial-state block.** `HorschVonderLindenTrialState.lean` is the public §3.4 home of four
+theorems about the trial state `Γ = hvlTrialState O Φ` (eq. (3.4.7)): its unit-norm identity
+(`trialState_dotProduct_self`) and three absorption identities that move a power of `O` across the
+`⟨·,·⟩` pairing onto `Φ` (`dotProduct_mulVec_trialState`, `trialState_dotProduct_mulVec`,
 `trialState_dotProduct_mulVec_trialState`). The `Ξ₊`-specific moment identities of
-`HorschVonderLindenProblem34b.lean` and the states of the later §3.4 modules (the symmetric
-combination `Ξ₊` of eq. (3.4.14) and its mirror `Ξ₋`) use this vocabulary independently of one
-another. Each theorem is pinned below as a **signature pin**: the declaration's own statement,
-discharged only by applying the identifier itself, so the pin fails exactly when the identifier
-cannot be resolved from another module.
+`HorschVonderLindenProblem34b.lean` are the current consumers of this vocabulary; the mirror state
+`Ξ₋` (pp. 68-69) has no declaration yet and is therefore not pinned. Each theorem is pinned below
+as a **signature pin**: the declaration's own statement, discharged only by applying the identifier
+itself, so the pin fails exactly when the identifier cannot be resolved from another module.
 
 **Eq. (3.4.8) block.** `hvlTrialState_energy_sub_eq` pins the identity
 `⟨Γ|Ĥ|Γ⟩ − E_GS = ⟨Φ_GS|[Ô_L,[Ĥ,Ô_L]]|Φ_GS⟩ / (2⟨Φ_GS|(Ô_L)²|Φ_GS⟩)`, for an arbitrary Hermitian
@@ -48,19 +45,29 @@ and the rewrite into `hvlTrialState`/`rayleighOnVec` form) rather than a restate
 ## Fixtures and their perturbations
 
 The two numeric examples in the final block instantiate `H = pauliZ`, `O = pauliX` and
-`Φ = e₀ = (1, 0)` on `Fin 2 → ℂ`, an eigenvector of `H` with eigenvalue `E₀ = 1` (not the ground
-state, since `pauliZ`'s ground eigenvalue is `−1` — deliberately, since (3.4.8) itself needs no
-ground-state hypothesis). `pauliX *ᵥ e₀ = e₁`, so `Γ = e₁` exactly (no normalization correction,
-since `‖e₁‖ = 1`), giving `rayleighOnVec pauliZ Γ − 1 = −1 − 1 = −2` on the LHS of (3.4.8), and
-`⟨e₀|[pauliX,[pauliZ,pauliX]]|e₀⟩ / (2·⟨e₀|pauliX²|e₀⟩) = −4 / 2 = −2` on the RHS, matching. Each
-example was checked to fail by perturbation before being fixed at its stated value: replacing the
-denominator's factor `2` with `4` turns the RHS example's goal into the false statement
-`-1 = -2` (verified to produce an `unsolved goals ⊢ False` build error); the LHS example was
-checked the same way by replacing its target `-2` with `-1`. Both examples use the production
-Pauli matrices `pauliZ`/`pauliX` (`Quantum/Pauli.lean`) together with `hvlTrialState`,
-`rayleighOnVec` and matrix/`dotProduct` operations, so they build (and are checked by `norm_num`)
-independently of the pins above; the only definition made here is the reference vector
-`e0Fixture`, which has no production counterpart. Rather than applying
+`Φ = (2, 0)` on `Fin 2 → ℂ`, an eigenvector of `H` with eigenvalue `E₀ = 1` (not the ground state,
+since `pauliZ`'s ground eigenvalue is `−1` — deliberately, since (3.4.8) itself needs no
+ground-state hypothesis). `Φ` is deliberately *not* a unit vector, which makes the two ingredients
+characterizing (3.4.8) load-bearing in the numbers below and at the same time exercises the
+identity's independence of `‖Φ‖`: the second moment is `m₂ = ⟨Φ|(pauliX)²|Φ⟩ = 4`, so the
+normalization of `Γ` divides by the square root `√m₂ = 2` rather than by `m₂` or by `1`. Concretely
+`pauliX *ᵥ Φ = (0, 2)` and `Γ = 2⁻¹ • (0, 2) = e₁`, giving `rayleighOnVec pauliZ Γ − 1 = −1 − 1 =
+−2` on the LHS of (3.4.8), and `⟨Φ|[pauliX,[pauliZ,pauliX]]|Φ⟩ / (2·⟨Φ|pauliX²|Φ⟩) = −16 / 8 = −2`
+on the RHS, matching.
+
+Each example was checked to fail under perturbation before being fixed at its stated value; five
+perturbations were tried and each produces a build error. On the RHS example: replacing the
+denominator's factor `2` with `4` makes the true value `−1`; cubing the second-moment factor to
+`2 * (rayleighOnVec (pauliX ^ 2) phiFixture) ^ 3` makes it `−1/8`; deleting that factor outright,
+leaving `… .re / 2`, makes it `−8`. On the LHS example: replacing the target `−2` with `−1` (the
+value obtained by dropping the `− E₀` term) is false, and so is dropping the `Real.sqrt` from the
+normalization of `Γ`, which scales `Γ` by `m₂⁻¹ = 1/4` instead of `(√m₂)⁻¹ = 1/2` and makes the
+true value `−5/4`.
+
+Both examples use the production Pauli matrices `pauliZ`/`pauliX` (`Quantum/Pauli.lean`) together
+with `hvlTrialState`, `rayleighOnVec` and matrix/`dotProduct` operations, so they build (and are
+checked by `norm_num`) independently of the pins above; the only definition made here is the
+reference vector `phiFixture`, which has no production counterpart. Rather than applying
 `hvlTrialState_energy_sub_eq`, they evaluate its two sides separately, so that a defect in the
 identity's proof cannot propagate into the numbers they check.
 -/
@@ -70,14 +77,7 @@ namespace LatticeSystem.Tests.HorschVonderLindenTrialStateVariational
 open LatticeSystem.Quantum
 open Matrix
 
-/-! ## Signature pins: the five shared trial-state helpers -/
-
-/-- **Signature pin (scaling).** `Γ` written as `(√m₂)⁻¹ • (Ô_L|Φ_GS⟩)`, the defining unfolding of
-`unitNormalize` used throughout the arc's downstream absorption identities. -/
-example {n : Type*} [Fintype n] [DecidableEq n] {O : Matrix n n ℂ} (hO : O.IsHermitian)
-    (Φ : n → ℂ) :
-    hvlTrialState O Φ = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ • (O *ᵥ Φ) :=
-  trialState_eq_smul hO Φ
+/-! ## Signature pins: the four shared trial-state helpers -/
 
 /-- **Signature pin (ket-side absorption).** `⟨Φ_GS, (Ô_L)^k Γ⟩ = (√m₂)⁻¹ ⟨Φ_GS, (Ô_L)^{k+1}
 Φ_GS⟩`, moving a power of `O` from the ket `Γ` back onto `Φ`. -/
@@ -125,32 +125,41 @@ example {n : Type*} [Fintype n] [DecidableEq n] {H O : Matrix n n ℂ} {Φ : n �
           / (2 * rayleighOnVec (O ^ 2) Φ) :=
   hvlTrialState_energy_sub_eq hH hO hΦE hm2
 
-/-! ## Numeric fixtures: `H = pauliZ`, `O = pauliX`, `Φ = e₀` on `Fin 2 → ℂ` -/
+/-! ## Numeric fixtures: `H = pauliZ`, `O = pauliX`, `Φ = (2, 0)` on `Fin 2 → ℂ` -/
 
-/-- The reference vector `Φ = e₀ = (1, 0)`, an eigenvector of `pauliZ` with eigenvalue `1`
-(the excited, not ground, eigenvalue: (3.4.8) itself needs no ground-state hypothesis). -/
-noncomputable def e0Fixture : Fin 2 → ℂ := ![1, 0]
+/-- The reference vector `Φ = (2, 0)`, an eigenvector of `pauliZ` with eigenvalue `1` (the excited,
+not ground, eigenvalue: (3.4.8) itself needs no ground-state hypothesis). Its norm is `2`, not `1`,
+so the second moment `m₂ = 4` and its square root are both visible in the fixtures below. -/
+noncomputable def phiFixture : Fin 2 → ℂ := ![2, 0]
 
-/-- **Fixture (LHS of (3.4.8)).** `⟨Γ|Ĥ|Γ⟩ − E₀ = −2` at the concrete instance above: `Γ =
-pauliX *ᵥ e0Fixture = e₁` exactly (already unit-norm), so `⟨Γ|Ĥ|Γ⟩ = −1` and `−1 − 1 = −2`.
-Checked to fail by perturbation: replacing the target `-2` with `-1` (the value obtained by
-dropping the `− E₀` term) makes this `norm_num` call leave `unsolved goals ⊢ False`. -/
+/-- **Fixture (LHS of (3.4.8)).** `⟨Γ|Ĥ|Γ⟩ − E₀ = −2` at the concrete instance above: `pauliX *ᵥ
+phiFixture = (0, 2)` has squared norm `m₂ = 4`, so `Γ = (√4)⁻¹ • (0, 2) = e₁`, `⟨Γ|Ĥ|Γ⟩ = −1` and
+`−1 − 1 = −2`. Checked to fail by perturbation: replacing the target `-2` with `-1` (the value
+obtained by dropping the `− E₀` term), and replacing `√m₂` by `m₂` in the normalization of `Γ`
+(true value `-5/4`), both leave an unprovable `norm_num` goal. -/
 example :
-    rayleighOnVec pauliZ (hvlTrialState pauliX e0Fixture) - (1 : ℝ) = -2 := by
-  unfold rayleighOnVec hvlTrialState unitNormalize vecNormSqRe pauliX pauliZ e0Fixture
+    rayleighOnVec pauliZ (hvlTrialState pauliX phiFixture) - (1 : ℝ) = -2 := by
+  have hnorm : Real.sqrt (vecNormSqRe (pauliX *ᵥ phiFixture)) = 2 := by
+    unfold vecNormSqRe pauliX phiFixture
+    norm_num [Matrix.mulVec, dotProduct, Fin.sum_univ_two]
+    rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.sqrt_sq (by norm_num : (0 : ℝ) ≤ 2)]
+  unfold rayleighOnVec hvlTrialState unitNormalize
+  rw [hnorm]
+  unfold pauliX pauliZ phiFixture
   norm_num [Matrix.mulVec, dotProduct, Fin.sum_univ_two]
 
-/-- **Fixture (RHS of (3.4.8)).** `⟨Φ_GS|[Ô_L,[Ĥ,Ô_L]]|Φ_GS⟩ / (2⟨Φ_GS|(Ô_L)²|Φ_GS⟩) = −2` at the
-same instance, matching the LHS fixture above and confirming (3.4.8) is not vacuous at this point.
-Checked to fail by perturbation: replacing the denominator's factor `2` with `4` (a dropped-`1/2`
-defect) turns the goal into the false statement `-1 = -2`, which `norm_num` cannot discharge. -/
+/-- **Fixture (RHS of (3.4.8)).** `⟨Φ_GS|[Ô_L,[Ĥ,Ô_L]]|Φ_GS⟩ / (2⟨Φ_GS|(Ô_L)²|Φ_GS⟩) = −16/8 = −2`
+at the same instance, matching the LHS fixture above and confirming (3.4.8) is not vacuous at this
+point. Checked to fail by perturbation: replacing the denominator's factor `2` with `4` (a
+dropped-`1/2` defect, true value `-1`), cubing the second-moment factor (true value `-1/8`), and
+deleting that factor outright (true value `-8`) each leave an unprovable `norm_num` goal. -/
 example :
-    (star e0Fixture ⬝ᵥ
+    (star phiFixture ⬝ᵥ
         ((pauliX * (pauliZ * pauliX - pauliX * pauliZ)
             - (pauliZ * pauliX - pauliX * pauliZ) * pauliX)
-          *ᵥ e0Fixture)).re
-      / (2 * rayleighOnVec (pauliX ^ 2) e0Fixture) = -2 := by
-  unfold rayleighOnVec pauliX pauliZ e0Fixture
+          *ᵥ phiFixture)).re
+      / (2 * rayleighOnVec (pauliX ^ 2) phiFixture) = -2 := by
+  unfold rayleighOnVec pauliX pauliZ phiFixture
   norm_num [Matrix.mulVec, dotProduct, Fin.sum_univ_two, Matrix.mul_apply, Matrix.sub_apply,
     pow_two]
 

@@ -12,8 +12,10 @@ vector `Φ_GS`, and the basic variational estimate
 
 `⟨Γ|Ĥ|Γ⟩ − E_GS = ⟨Φ_GS|[Ô_L, [Ĥ, Ô_L]]|Φ_GS⟩ / (2⟨Φ_GS|(Ô_L)²|Φ_GS⟩)` (eq. (3.4.8))
 
-This is the shared `Γ`-vocabulary of §3.4: the states built on top of `Γ` (the symmetric
-combination `Ξ₊` of eq. (3.4.14) and its mirror) live in the modules that import this one.
+This is the shared `Γ`-vocabulary of §3.4.  The symmetric combination
+`Ξ₊ = (|Φ_GS⟩ + |Γ⟩)/√2` of eq. (3.4.14) is built on top of it in
+`HorschVonderLindenProblem34b.lean`, which imports this module.  Its mirror `Ξ₋` (pp. 68-69) is
+not formalised anywhere yet; it is left to a later stage of the §3.4 development.
 
 Everything is stated for an arbitrary finite index type and an arbitrary Hermitian `Ô_L`; the only
 quantitative input is positivity of the second moment `m₂ = ⟨Φ_GS|(Ô_L)²|Φ_GS⟩`, which is what
@@ -57,7 +59,7 @@ noncomputable def hvlTrialState {n : Type*} [Fintype n] (O : Matrix n n ℂ) (Φ
 
 /-- `Γ` written out as the scalar multiple `(√m₂)⁻¹ • (Ô_L|Φ_GS⟩)`.  This is the defining
 unfolding of `unitNormalize`, so no positivity of `m₂` is needed. -/
-theorem trialState_eq_smul {n : Type*} [Fintype n] [DecidableEq n] {O : Matrix n n ℂ}
+private theorem trialState_eq_smul {n : Type*} [Fintype n] [DecidableEq n] {O : Matrix n n ℂ}
     (hO : O.IsHermitian) (Φ : n → ℂ) :
     hvlTrialState O Φ = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ • (O *ᵥ Φ) := by
   rw [hvlTrialState, unitNormalize, vecNormSqRe_mulVec_eq_rayleigh hO Φ]

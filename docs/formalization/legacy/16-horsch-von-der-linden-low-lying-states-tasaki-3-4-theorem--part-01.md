@@ -190,8 +190,10 @@ between `Γ` and `Φ_GS`, and of the basic variational estimate
 
 `⟨Γ|Ĥ|Γ⟩ − E_GS = ⟨Φ_GS|[Ô_L,[Ĥ,Ô_L]]|Φ_GS⟩ / (2⟨Φ_GS|(Ô_L)²|Φ_GS⟩)` (eq. (3.4.8))
 
-that Tasaki reads off "by inspection" on p. 66. The modules that build states on top of `Γ` — the
-symmetric combination `Ξ₊` of eq. (3.4.14) and its mirror — import it.
+that Tasaki reads off "by inspection" on p. 66. The symmetric combination `Ξ₊` of eq. (3.4.14)
+(`Quantum/HorschVonderLindenProblem34b.lean`) is built on top of `Γ` and imports this module; the
+mirror state `Ξ₋` (pp. 68-69) is not formalised anywhere yet and is left to a later stage of the
+§3.4 development.
 
 Eq. (3.4.8) is the un-normalised double-commutator identity
 `double_commutator_ground_state_eq` (`Quantum/SpinS/DoubleCommutatorVariational.lean`) divided by
@@ -205,7 +207,7 @@ positivity of `m₂` enters only through the normalisation of `Γ`.
 left half of eq. (3.4.12) (p. 67), is *not* a consequence of the identity and is not stated here.
 It needs `E_GS` to be a ground-state energy, i.e. the minimum of the Rayleigh quotient of `Ĥ` over
 normalised vectors — the running assumption of the "Setting and assumptions" paragraph on p. 65.
-It cannot be dropped: at `Ĥ = σ³`, `Ô_L = σ¹`, `Φ_GS = e₀` the eigenvalue `E_GS = 1` is not the
+It cannot be dropped: at `Ĥ = σ³`, `Ô_L = σ¹`, `Φ_GS = (2, 0)` the eigenvalue `E_GS = 1` is not the
 ground energy and both sides of (3.4.8) equal `−2`. Locality of `Ô_L` (eqs. (3.4.1)-(3.4.2))
 and any lattice structure are absent here, so nothing in this module certifies a concrete model.
 The `C L^{-d}` low-lying bound (3.4.12) that (3.4.8) feeds is not yet formalised: it is the input
@@ -217,7 +219,6 @@ All declarations below are **PROVED**; `#print axioms` on each yields only `prop
 
 | Lean name | Statement | File |
 |---|---|---|
-| `trialState_eq_smul` | `Γ` as the scalar multiple `(√m₂)⁻¹ • (Ô_L\|Φ_GS⟩)`, the defining unfolding of the unit normalisation | `Quantum/HorschVonderLindenTrialState.lean` |
 | `dotProduct_mulVec_trialState` | ket-side absorption: `⟨Φ_GS, (Ô_L)^k Γ⟩ = (√m₂)⁻¹ ⟨Φ_GS, (Ô_L)^{k+1} Φ_GS⟩` | `Quantum/HorschVonderLindenTrialState.lean` |
 | `trialState_dotProduct_mulVec` | bra-side adjoint transfer: `⟨Γ, (Ô_L)^k Φ_GS⟩ = (√m₂)⁻¹ ⟨Φ_GS, (Ô_L)^{k+1} Φ_GS⟩` | `Quantum/HorschVonderLindenTrialState.lean` |
 | `trialState_dotProduct_mulVec_trialState` | diagonal absorption: `⟨Γ, (Ô_L)^k Γ⟩ = ((√m₂)⁻¹)² ⟨Φ_GS, (Ô_L)^{k+2} Φ_GS⟩` | `Quantum/HorschVonderLindenTrialState.lean` |
@@ -225,10 +226,11 @@ All declarations below are **PROVED**; `#print axioms` on each yields only `prop
 | `hvlTrialState_energy_sub_eq` | eq. (3.4.8): `⟨Γ\|Ĥ\|Γ⟩ − E_GS = ⟨Φ_GS\|[Ô_L,[Ĥ,Ô_L]]\|Φ_GS⟩ / (2 m₂)`, for Hermitian `Ĥ`, `Ô_L` and any eigenvector `Φ_GS` of `Ĥ` | `Quantum/HorschVonderLindenTrialState.lean` |
 
 Regression fixtures live in `LatticeSystem/Tests/HorschVonderLindenTrialStateVariational.lean`:
-each of the six declarations above has a signature fixture restating it in full and discharging it
+each of the five declarations above has a signature fixture restating it in full and discharging it
 by the declaration itself, so the fixture fails to elaborate if the name is not resolvable from
 another module, together with two numeric instances that evaluate both sides of (3.4.8) at
-`Ĥ = σ³`, `Ô_L = σ¹`, `Φ_GS = e₀`.
+`Ĥ = σ³`, `Ô_L = σ¹`, `Φ_GS = (2, 0)`. The reference vector is deliberately not a unit vector, so
+the second moment `m₂ = 4` and its square root both enter the numbers the instances check.
 
 ---
 
