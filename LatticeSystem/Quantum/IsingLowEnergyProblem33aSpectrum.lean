@@ -25,10 +25,10 @@ records `tanh κ∞ = 1/√(1 + 4λ²)`, which is the ratio `(e^κ∞ - e^-κ∞
 `tightBindingEnergy λ κ` is an eigenvalue of the compression `lowEnergyMatrix N λ` only after the
 shift by `E_GS^(0) = -N/4`; on its own it is an eigenvalue of the tight-binding part
 `tightBindingRing N λ`. That the compression restricts `Ĥ` to an invariant subspace is not
-established here, so `ε∞` is the `L ↑ ∞` value of such an eigenvalue and is not identified with a
-ground-state or first-excited energy of `Ĥ`; the source's non-rigorous Taylor steps (S.36)-(S.38)
-are not asserted. Tasaki notes on p. 59 that the perturbative analysis of this problem is not
-mathematically rigorous.
+established here, so `ε∞` is the `L ↑ ∞` value of a `tightBindingRing` eigenvalue and is not
+identified with a ground-state or first-excited energy of `Ĥ`; the source's non-rigorous Taylor
+steps (S.36)-(S.38) are not asserted. Tasaki notes on p. 59 that the perturbative analysis of
+this problem is not mathematically rigorous.
 -/
 
 namespace LatticeSystem.Quantum

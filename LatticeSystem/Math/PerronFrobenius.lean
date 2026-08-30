@@ -22,31 +22,28 @@ so `w ⬝ᵥ (A *ᵥ w) ≥ μ ‖w‖²`. The max-Rayleigh bound gives `w ⬝�
 hence equality holds. By the eigenbasis expansion (spectral theorem):
 `w ⬝ᵥ (A *ᵥ w) = Σ_k λ_k c_k²` and `‖w‖² = Σ_k c_k²` where `c_k = ⟨e_k, w⟩`.
 Equality `Σ_k (μ - λ_k) c_k² = 0` with each term ≤ 0 forces `c_k = 0` for `λ_k < μ`,
-giving `A *ᵥ w = μ • w`. **[Currently `sorry`; requires Mathlib eigenbasis inner product API.]**
+giving `A *ᵥ w = μ • w`.
 
 ### Step 2 — Strict positivity (irreducible case)
 Given the nonneg eigenvector `w` from Step 1: if `w_i = 0` for some `i`, then
 `(A *ᵥ w)_i = μ w_i = 0`, forcing `A_ij w_j = 0` for all `j`. By
 `isIrreducible_iff_exists_pow_pos`, for any `j` there exists `k > 0` with
 `(A^k)_{ij} > 0`, and then `(A^k)_{ij} w_j = 0` with `(A^k)_{ij} > 0` forces `w_j = 0`.
-Hence `w = 0` — contradiction. **[Fully proved.]**
+Hence `w = 0` — contradiction.
 
 ### Step 3 — Uniqueness
 If `Av = μv`, `Au = μu` with `v, u > 0`, set `r = sup_i u_i / v_i`.
 Then `u ≤ r v` componentwise and `(u - r v)_{i_0} = 0` for a maximizer `i_0`.
 Setting `w = r v - u ≥ 0` with `w_{i_0} = 0` and `A *ᵥ w = μ • w`,
-the Step 2 argument gives `w = 0`, hence `u = r v`. **[Fully proved.]**
+the Step 2 argument gives `w = 0`, hence `u = r v`.
 
-## Sorry inventory
-
-None.  (The former documentation-only `exists_nonneg_eigenvec_max`, which carried
-a `sorry` for the Rayleigh equality step, was removed: it was never on the main
-proof path — `exists_pos_eigenvec_max` calls
-`exists_positive_eigenvector_of_irreducible` from `PerronFrobeniusMain` directly
-via the Collatz–Wielandt approach.)
+Step 1 is stated here for orientation only; the main proof path does not go
+through it.  `exists_pos_eigenvec_max` obtains the strictly positive eigenvector
+from `exists_positive_eigenvector_of_irreducible` (`PerronFrobeniusMain`), which
+follows the Collatz–Wielandt route instead.
 
 References: Seneta, *Non-negative Matrices and Markov Chains*, Ch. 1;
-Tasaki §11.2 (application to Nagaoka's theorem). Tracked in Issue #405.
+Tasaki §11.2 (application to Nagaoka's theorem).
 -/
 
 namespace LatticeSystem.Math.PerronFrobenius

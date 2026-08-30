@@ -6,8 +6,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveReflection
 Twenty-eighth layer (PR28) toward discharging
 `theorem_10_2_lieb_attractive_unique_singlet` (Lieb's theorem for the attractive
 Hubbard model). **First layer of the corrected spin-reflection endgame** (the earlier
-"polar replacement" route was unsound; see
-`.self-local/docs/lieb-10-2-endgame-hermitian-W-design.md`).
+"polar replacement" route was unsound).
 
 Lieb's spin-space reflection positivity argument (Tasaki §10.2.4, p.363–367) works with
 the coefficient matrix of a state in the **Hermitian** form `W` (the `|Γ(W)⟩`

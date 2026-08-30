@@ -7,8 +7,7 @@ import Mathlib.Data.Real.Basic
 
 Twenty-ninth layer (PR29) toward discharging
 `theorem_10_2_lieb_attractive_unique_singlet` (Lieb's theorem for the attractive
-Hubbard model), in the **corrected Hermitian-`W` endgame** (design doc at
-`.self-local/docs/lieb-10-2-endgame-hermitian-W-design.md`).
+Hubbard model), in the **corrected Hermitian-`W` endgame**.
 
 The mathematical heart of Lieb's spin-space reflection-positivity inequality
 `E(W) ≥ E(|W|)` (Tasaki eq. (10.2.41)→(10.2.43)) is an **elementary eigenvalue
