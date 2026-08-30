@@ -303,8 +303,29 @@ def table_data_rows(lines: list[str]) -> list[str]:
     return result
 
 
+# Two Marshall-Lieb-Mattis catalogue rows in the baseline ended with a "; see ... (Issue #3542)."
+# citation of a working note that is not part of this repository. The clause is dropped from the
+# published rows; the issue reference it carried is kept.
+_WORKING_NOTE_CITATION = re.compile(r"; see `[^`]+` \(Issue #3542\)\.")
+
+
+def _drop_working_note_citations(text: str) -> str:
+    text = _WORKING_NOTE_CITATION.sub(" (Issue #3542).", text)
+    text = text.replace(" (math-note §3.4 refinement 2)", "")
+    return text.replace("**Design note**:", "**Note**:")
+
+
+# The same class of citation appears once in baseline prose rather than in a table row, in the
+# whitespace-normalized (still blockquote-prefixed) form handled here.
+_WORKING_NOTE_PROSE_CITATION = re.compile(r"See > `[^`]+` and Issue #3542\.")
+
+
+def _drop_working_note_prose_citation(text: str) -> str:
+    return _WORKING_NOTE_PROSE_CITATION.sub("See Issue #3542.", text)
+
+
 def approved_changes(text: str) -> str:
-    return (
+    return _drop_working_note_citations(
         text.replace("(refactoring-conventions.html)", "(/lattice-system/refactoring-conventions/)")
         .replace(
             "(deprecations.html#remaining-linter-suppressions)",
@@ -1265,7 +1286,9 @@ def main() -> None:
         if 217 <= start <= 2731:
             current = "\n".join(line for line in current.splitlines() if not line.startswith("|"))
         expected_prose_stream.append(
-            whitespace_normalized(apply_moved_prose_link_rewrites(expected, rewrite_counts))
+            _drop_working_note_prose_citation(
+                whitespace_normalized(apply_moved_prose_link_rewrites(expected, rewrite_counts))
+            )
         )
         actual_prose_stream.append(normalize_current_moved_prose(start, end, current, old_lines))
     if tuple(rewrite_counts) != MOVED_PROSE_LINK_REWRITE_COUNTS:
