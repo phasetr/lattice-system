@@ -61,6 +61,16 @@ theorem dotProduct_mulVec_trialState {n : Type*} [Fintype n] [DecidableEq n]
   rw [trialState_eq_smul hO Φ, Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul,
     Matrix.mulVec_mulVec, ← pow_succ]
 
+/-- Bra-side adjoint transfer: `⟨Γ, (Ô_L)^k Φ_GS⟩ = (√m₂)⁻¹ ⟨Φ_GS, (Ô_L)^{k+1} Φ_GS⟩`, using
+`Ô_L^† = Ô_L` to move the operator across the pairing. -/
+theorem trialState_dotProduct_mulVec {n : Type*} [Fintype n] [DecidableEq n]
+    {O : Matrix n n ℂ} (hO : O.IsHermitian) (Φ : n → ℂ) (k : ℕ) :
+    star (hvlTrialState O Φ) ⬝ᵥ ((O ^ k) *ᵥ Φ)
+      = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ * (star Φ ⬝ᵥ ((O ^ (k + 1)) *ᵥ Φ)) := by
+  rw [trialState_eq_smul hO Φ, star_smul, smul_dotProduct, smul_eq_mul, Complex.star_def,
+    map_inv₀, Complex.conj_ofReal, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, hO.eq,
+    Matrix.mulVec_mulVec, ← pow_succ']
+
 /-- `Γ` is a unit vector: `⟨Γ, Γ⟩ = 1`, since `‖Ô_L|Φ_GS⟩‖² = m₂ > 0`. -/
 theorem trialState_dotProduct_self {n : Type*} [Fintype n] [DecidableEq n]
     {O : Matrix n n ℂ} (hO : O.IsHermitian) (Φ : n → ℂ) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) :
