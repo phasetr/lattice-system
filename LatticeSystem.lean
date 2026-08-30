@@ -125,6 +125,7 @@ import LatticeSystem.Quantum.SpinS.GeneralSWeylLadder
 import LatticeSystem.Quantum.SpinS.GeneralSWeylCasimir
 import LatticeSystem.Quantum.SpinS.GeneralSCasimirDescent
 import LatticeSystem.Quantum.SpinS.SaturatedCoherentExpansion
+import LatticeSystem.Quantum.SpinS.LocalDoubleCommutatorBound
 import LatticeSystem.Quantum.IsingLowEnergyProblem33aCapstone
 
 /-!
