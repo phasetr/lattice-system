@@ -15,12 +15,10 @@ sector's unique ground state `T4`, the transverse-sign transport `T5`, and the e
 
 `T3`'s underlying declaration `liebRepulsive_sectorGroundEnergy_eq_groundEnergy` is stated for an
 arbitrary tower exponent `(k : ℕ) (hk : k ≤ sublatticeImbalance A)` rather than the centered
-`k₀ = sublatticeImbalance A / 2`,
-with the sector weight supplied via a matching hypothesis `{m : ℂ}
-(hkm : (sublatticeImbalance A : ℂ) / 2 - (k : ℂ) = m)`. The
-`T3` pin below uses that generalized signature, instantiated at `k := L/2,
-hkm := liebRepulsive_centeredWeight_eq A` so that it remains a byte-for-byte regression check of
-the centered statement.
+`k₀ = sublatticeImbalance A / 2`, with the sector weight supplied via a matching hypothesis
+`{m : ℂ} (hkm : (sublatticeImbalance A : ℂ) / 2 - (k : ℂ) = m)`. The `T3` pin below uses that
+generalized signature, instantiated at `k := L/2, hkm := liebRepulsive_centeredWeight_eq A` so
+that it remains a byte-for-byte regression check of the centered statement.
 
 Carrier throughout: `H := symmetricRepulsiveHubbardHamiltonian N T U`,
 `G := hubbardGroundSubmoduleAtElectronNumber H E₀ (N+1)`, `k₀ := sublatticeImbalance A / 2`
