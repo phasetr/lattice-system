@@ -177,9 +177,8 @@ These remain **eigenvalues of the compression, not energies**: that the compress
 an invariant subspace is nowhere established here, so `ε∞` is the `L ↑ ∞` value of an eigenvalue of
 the tight-binding part `tightBindingRing`, i.e. of `lowEnergyMatrix` with the constant
 `E_GS^(0) = -N/4` subtracted, and is not identified with a ground-state or first-excited energy of
-`Ĥ`; the source's
-non-rigorous Taylor steps (S.36)-(S.38) are not asserted. Tasaki notes on p. 59 that the analysis of
-this problem is not mathematically rigorous.
+`Ĥ`; the source's non-rigorous Taylor steps (S.36)-(S.38) are not asserted. Tasaki notes on p. 59
+that the analysis of this problem is not mathematically rigorous.
 
 Every declaration below is **PROVED**; `#print axioms` on each yields only `propext`,
 `Classical.choice`, `Quot.sound`.
@@ -233,8 +232,8 @@ These remain **eigenvalues of the compression, not energies**: that the compress
 an invariant subspace is nowhere established here, so `tightBindingEnergy` is an eigenvalue of
 the tight-binding part `tightBindingRing`, i.e. of `lowEnergyMatrix` with the constant
 `E_GS^(0) = -N/4` subtracted, and is not identified with a ground-state or first-excited energy of
-`Ĥ`. Tasaki notes on p. 59
-that the analysis of this problem is not mathematically rigorous. The ring carrying the labels `j`
+`Ĥ`. Tasaki notes on p. 59 that the analysis of this problem is not mathematically rigorous.
+The ring carrying the labels `j`
 is a ring of basis labels of type `ZMod (2 * (N + 1))`, not of lattice sites: the chain itself stays
 open.
 
@@ -297,8 +296,8 @@ These remain **eigenvalues of the compression, not energies**: that the compress
 an invariant subspace is nowhere established here, so `tightBindingEnergy` is an eigenvalue of
 the tight-binding part `tightBindingRing`, i.e. of `lowEnergyMatrix` with the constant
 `E_GS^(0) = -N/4` subtracted, and the difference above is not identified with `E_1st - E_GS` of
-`Ĥ`. Tasaki notes on p. 59 that
-the analysis of this problem is not mathematically rigorous. The ring carrying the labels `j` is a
+`Ĥ`. Tasaki notes on p. 59 that the analysis of this problem is not mathematically rigorous.
+The ring carrying the labels `j` is a
 ring of basis labels of type `ZMod (2 * (N + 1))`, not of lattice sites: the chain itself stays
 open.
 
@@ -377,8 +376,8 @@ spectrum of `Ĥ`, the identification this development declines to make.
 These remain **eigenvalues of the compression, not energies**: that the compression restricts `Ĥ`
 to an invariant subspace is nowhere established here, so `tightBindingEnergy` is treated only as
 an eigenvalue of the tight-binding part `tightBindingRing` of conjunct 2, i.e. of
-`lowEnergyMatrix` with the constant `E_GS^(0) = -N/4` subtracted, and neither it nor the difference of
-conjunct 8 is identified with the ground-state energy or the first-excited energy of `Ĥ`. The
+`lowEnergyMatrix` with the constant `E_GS^(0) = -N/4` subtracted, and neither it nor the
+difference of conjunct 8 is identified with the ground-state energy or the first-excited energy of `Ĥ`. The
 refusal rests on the absence of a proof of invariance rather than on a claim that invariance
 fails: at the smallest ring size `L = 2` the `2L` configurations already exhaust the basis of the
 state space. No claim is made that these are the least two eigenvalues even of the compression.
