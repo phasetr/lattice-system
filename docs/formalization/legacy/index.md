@@ -93,5 +93,6 @@ the current formalization-status and capstone authority during migration.
 - [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 3 of 5](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-03/)
 - [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 4 of 5](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-04/)
 - [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 5 of 5](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-05/)
+- [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 7 of 9](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-07/)
 - [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 8 of 9](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-08/)
 - [Multi-mode fermion via Jordan–Wigner (P2 backbone) — part 9 of 9](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-09/)

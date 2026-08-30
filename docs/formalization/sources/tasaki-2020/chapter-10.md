@@ -13,4 +13,5 @@ These links project explicit Tasaki chapter headings or citations from the inter
 - [Tasaki Chapter 10, first catalogue chunk](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-03/#tasaki-chapter-10-part-01)
 - [Tasaki Chapter 10, continued catalogue chunk](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-04/#tasaki-chapter-10-part-02)
 - [Tasaki Chapter 10, final catalogue chunk](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-05/#tasaki-chapter-10-part-03)
+- [Tasaki Chapter 10, Theorem 10.6 discharge arc](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-07/#authoritative-supplemental-implementation-record-theorem-106-discharge-arc-pr-1-staggered-spin-component-algebra)
 - [Tasaki Chapter 10, Theorem 10.8 discharge arc](/lattice-system/formalization/legacy/30-multi-mode-fermion-via-jordan-wigner-p2-backbone-part-08/#authoritative-supplemental-implementation-record-theorem-108-discharge-arc-pr-1-generic-shiftuniqueness-lemmas-and-the-shiba-hamiltonian-bridge)
