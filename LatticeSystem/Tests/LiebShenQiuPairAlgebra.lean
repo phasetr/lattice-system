@@ -4,11 +4,10 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveShibaSpinOp
 
 /-!
-# Test coverage for the Theorem 10.8 pair/ladder algebra (PR-4)
+# Test coverage for the Theorem 10.8 pair/ladder algebra
 
-Pins the API contract of PR-4 of the Theorem 10.8 discharge (design report
-`.self-local/docs/theorem-10-8-design.md` §1 "New file `LiebShenQiuPairAlgebra.lean`"),
-against `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebShenQiuPairAlgebra.lean`.
+Pins the API contract of
+`LatticeSystem/Fermion/JordanWigner/Hubbard/LiebShenQiuPairAlgebra.lean`.
 
 1. **PA1** `totalPairCreationOperator_eq_conjTranspose` — `b̂† = b̂ᴴ` (generalizing the former
    inline `hPadj` block, now removed).
@@ -27,13 +26,13 @@ against `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebShenQiuPairAlgebra.lean`
 6. **PA6** `liebShenQiuPairLowerBound_le_casimir_gap` — the real arithmetic
    `(a−n)(n−b) ≤ S₀(S₀+1) − m(m−1)` under `b ≤ n ≤ a`.
 7. **PA7** `liebShenQiu_towerExponent_le_sublatticeImbalance` — the tower-exponent upper bound
-   `k = |A| − Ne/2 ≤ sublatticeImbalance A` (design's "N1 resolution": makes the PR-3 hypothesis
-   `hk : k ≤ sublatticeImbalance A` dischargeable from the same `b ≤ n ≤ a` side conditions).
+   `k = |A| − Ne/2 ≤ sublatticeImbalance A`, which makes the sector hypothesis
+   `hk : k ≤ sublatticeImbalance A` dischargeable from the same `b ≤ n ≤ a` side conditions.
 
 Each `example` fails to elaborate unless the corresponding declaration exists, is public, and has
 exactly this signature.
 
-**Not covered here**: the capstone assembly and the `Ne = 2(N+1)` degenerate branch (PR-5).
+**Not covered here**: the capstone assembly and the `Ne = 2(N+1)` degenerate branch.
 -/
 
 namespace LatticeSystem.Tests.LiebShenQiuPairAlgebra

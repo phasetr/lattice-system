@@ -95,7 +95,7 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (v : (Fin (2 * N + 2) → Fin 2) �
 
 /-! ## 5. `N = 0` sanity check -/
 
-/-- **`A0b` (PR-8 design §2 layer A): single-site collapse, moved to the library.**  For `N = 0`
+/-- **`A0b`: single-site collapse, living in the library.**  For `N = 0`
 the only pair is `x = y = 0`, whose staggered weight is `ε₀ ε₀ = +1` for either sublattice choice,
 so the staggered order parameter `(Ô_L)²` is the plain total-spin Casimir `(Ŝ_tot)²`. PR-8's
 `N = 0` branch (`E1`, `liebFerrimagnetism_N_zero`) needs this from the library, not the `Tests`

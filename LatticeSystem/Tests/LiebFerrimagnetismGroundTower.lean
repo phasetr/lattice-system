@@ -7,10 +7,9 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismGroundTower
 §10.2.3, p. 356.)
 
 Specification suite for
-`LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismGroundTower.lean` (PR-5 of the
-Theorem 10.6 discharge arc, issue #5347). The `example`s pin down the exact signatures of the
-eight declarations `L0`–`L7` of the confirmed design
-(`.self-local/docs/theorem-10-6-pr5-design.md`, 2026-08-24): the general weight-band bound `L0`,
+`LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismGroundTower.lean`. The `example`s
+pin down the exact signatures of the
+eight declarations `L0`–`L7`: the general weight-band bound `L0`,
 the `Ŝ³`-weight band `L1`, the top-weight existence `L2`, tower-membership `L3`, tower
 nonvanishing `L4`, tower linear independence `L5`, the ground-submodule span identity `L6`, and the
 weight-orthogonal cross-term vanishing `L7`. Mirrors the specification style of
@@ -25,7 +24,7 @@ conclusion in the submodule-wide form `hcas : ∀ v ∈ G, …` even though each
 single vector `w` alone; that is the shape Theorem 10.4 exports, not the pointwise-weakest
 hypothesis.
 
-The closing section instantiates the design's degenerate cases: the balanced bipartition
+The closing section instantiates the degenerate cases: the balanced bipartition
 `L = sublatticeImbalance A = 0` (single-member tower) and the one-site model `N = 0`, `A = univ`
 (`L = 1`, a spin-`1/2` doublet), which fix the `Fin (L + 1)` indexing and the `finrank` arithmetic
 against `liebRepulsiveGroundMultiplicity`.
@@ -39,8 +38,7 @@ open Matrix Module LatticeSystem.Fermion LatticeSystem.Quantum
 
 /-- **`L0`: general weight-band bound.** A nonzero joint eigenvector of `(Ŝ_tot)²` (eigenvalue
 `Jr(Jr+1)`, `Jr ≥ 0`) and `Ŝ³_tot` (eigenvalue `m`) has `|m| ≤ Jr`. Factored out of the two inline
-copies in `LiebAttractiveFullSectorUnique.lean` and `LiebRepulsiveMultipletCompanion.lean`
-(design §2 `L0`). -/
+copies in `LiebAttractiveFullSectorUnique.lean` and `LiebRepulsiveMultipletCompanion.lean`. -/
 example (N : ℕ) {w : (Fin (2 * N + 2) → Fin 2) → ℂ} (hw : w ≠ 0)
     {Jr m : ℝ} (hJ : 0 ≤ Jr)
     (hcas : (fermionTotalSpinSquared N).mulVec w = ((Jr * (Jr + 1) : ℝ) : ℂ) • w)
@@ -72,7 +70,7 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N +
 
 /-- **`L2`: top-weight existence.** If the `(N+1)`-electron ground submodule `G` is nonzero, it
 contains a nonzero highest-weight vector: `Ŝ⁺_tot w = 0` and `Ŝ³_tot w = (||A|−|B||/2) w`. The only
-nontrivial proof of the PR (design §2 `L2`), assembled from
+nontrivial proof here, assembled from
 `exists_eigenvector_in_invariant_submodule`, the raising-tower termination via `Nat.find`, and the
 `L1` band excluding the spurious Casimir root. -/
 example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
@@ -316,12 +314,12 @@ example (T : Matrix (Fin (0 + 1)) (Fin (0 + 1)) ℝ) (hT : ∀ i j, T i j = T j 
       (liebRepulsive_ground_tower_linearIndependent 0 _ T U E₀ hcas hw0 hwG hz'),
     Fintype.card_fin, himb]
 
-/-! ## `A0a` (PR-8) — de-privatized Casimir realification -/
+/-! ## `A0a` — public Casimir realification -/
 
-/-- **`A0a` (PR-8 design §2 layer A): `liebRepulsiveSpinCasimir_eq_ofReal` must be public.**
-Theorem 10.4's Casimir eigenvalue rewritten as the real cast `J (J + 1)` at `J = L/2`; PR-8's
-`N = 0` branch (`E1`, `liebFerrimagnetism_N_zero`) needs it from outside this module, so it must be
-de-privatized in place (no restatement). This pin fails to compile while the declaration stays
+/-- **`A0a`: `liebRepulsiveSpinCasimir_eq_ofReal` must be public.**
+Theorem 10.4's Casimir eigenvalue rewritten as the real cast `J (J + 1)` at `J = L/2`; the
+`N = 0` branch (`E1`, `liebFerrimagnetism_N_zero`) needs it from outside its module, so it must be
+public there rather than restated. This pin fails to compile while the declaration stays
 `private` in `LiebFerrimagnetismGroundTower.lean`. -/
 example {N : ℕ} (A : Finset (Fin (N + 1))) :
     liebRepulsiveSpinCasimir A =

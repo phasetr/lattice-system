@@ -438,8 +438,8 @@ The eight Reds below pin the four PR-5 declarations of
 `LatticeSystem/Math/MatrixAnalysis/PermInvariantUniformEigenvector.lean`
 (`commute_toPEquiv_toMatrix_of_perm_invariant`,
 `norm_apply_eq_norm_apply_of_comp_perm_smul`, `eigenspace_mulVecLin_ne_bot_of_map_eq`,
-`exists_uniformModulus_eigenvector_of_transitive_perm_invariance`), per
-`.self-local/docs/theorem-11-4-pr5-design.md` §5.  Reds 20/21/21b consume the capstone A4 — its
+`exists_uniformModulus_eigenvector_of_transitive_perm_invariance`).  Reds 20/21/21b consume the
+capstone A4 — its
 normalisation at two sizes, then its eigen-equation on a non-diagonal matrix at a nonzero
 eigenvalue; Reds 23/23b pin A1 and the failure of A1's hypothesis; Red 24 pins A3 and Red 25 pins
 A2 in isolation.  Red 22 alone references none of the four: it is the standalone sharpness
@@ -604,22 +604,17 @@ example :
 The six Reds below cover `LatticeSystem/Math/MonotoneEnumeration.lean`. Three of its declarations
 are referenced directly: `eq_comp_sort_of_monotone_of_map_eq` = C1 (Red 26),
 `exists_lowestLevels_finset_of_map_eq` = C3 (Reds 28 and 31), `sum_lowestLevels_succ` = C5
-(Red 29). Red 27 was originally C4's pinning test (`sum_lowestLevels_le_sum_of_map_eq`); per
-`.self-local/docs/theorem-11-4-pr7b-design.md` §5, C4 — together with
-`sum_lowestLevels_le_sum_of_monotone` = C4a and the private `val_le_val_of_strictMono` = C2 — is
-**deleted** and subsumed by the weighted lemmas W1 (`sum_lowestLevels_le_sum_weighted`) and W2
+(Red 29). Red 27 reads against the weighted lemmas W1 (`sum_lowestLevels_le_sum_weighted`) and W2
 (`sum_lowestLevels_le_sum_weighted_of_map_eq`, pinned separately in the PR-7b section of
-`LatticeSystem.Tests.HubbardImpossibilityLowDensityRoth`), so Red 27 below is retargeted onto W2 on
-the same fixture. Red 30 is the standalone sharpness counterexample for `hmono` (now read against
-W2 rather than the deleted C4) and
-references neither C1/C3/C5 nor W1/W2. The numbering follows
-`.self-local/docs/theorem-11-4-pr5b-design.md` §5 (Reds 26–31) and
-`.self-local/docs/theorem-11-4-pr7b-design.md` §5 (the Red 27 retarget). The primary fixture for
+`LatticeSystem.Tests.HubbardImpossibilityLowDensityRoth`), on
+the same fixture. Red 30 is the standalone sharpness counterexample for `hmono`, read against
+W2, and
+references neither C1/C3/C5 nor W1/W2. The primary fixture for
 Reds 26/28/29/31 is `m = 3`, `α = ℕ`, `ε := ![0, 1, 2]`, `g := ![2, 0, 1]`, chosen so
 `hspec`/`hmono`/every concrete sum is `decide`-able; Red 27 restates the same values over `ℝ`
 (`decide` does not reduce on `ℝ`, so `ε := fun i => (i : ℝ)` for a computable `Monotone` proof and
 `g := ![2, 0, 1] : Fin 3 → ℝ`, with `hspec` via `List.rotate_perm` rather than `decide`), since
-W1/W2 are stated over `ℝ` rather than the deleted generic-`α` C4/C4a. Red 31 is the junction guard
+W1/W2 are stated over `ℝ`. Red 31 is the junction guard
 at the real consumer's types (`Matrix.IsHermitian.eigenvalues` / `occupiedEigenEnergy`).
 -/
 

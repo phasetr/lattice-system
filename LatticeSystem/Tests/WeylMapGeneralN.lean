@@ -6,8 +6,7 @@ import LatticeSystem.Math.MvPolynomial.WeightedHomogeneousLayer
 
 `LatticeSystem.Math.weylMap` and its supporting declarations (`mdSite`, `md`, `cgSite`, `cgNorm`,
 `weylMono`) were generalized from the hard-wired spin-`1` case (site-state type `Fin 3`) to a
-general spin-`S` case with `N = 2S` (site-state type `Fin (N + 1)`), per Issue #5292 PR-1 (design:
-`.self-local/reports/design-5292-pr1-weylmap-generalization-round1-20260819.md`). This file is the
+general spin-`S` case with `N = 2S` (site-state type `Fin (N + 1)`). This file is the
 regression gate that certifies the generalization does not silently change the pre-PR spin-`1`
 statements when `N` is instantiated to `2`.
 
@@ -29,8 +28,8 @@ Four groups:
    would pass groups 1-3.
 
 No production code is written here. `weylMap` and its supporting declarations already carry the
-general-`N` parameter (`weylMap_isHomogeneous`, `weylMapWeight_apply`, and the rest of §2/§3 of the
-design note): most take `N` implicitly as `{N : ℕ}`, but `weylMapWeight_apply` takes it as an
+general-`N` parameter (`weylMap_isHomogeneous`, `weylMapWeight_apply`, and the rest): most take
+`N` implicitly as `{N : ℕ}`, but `weylMapWeight_apply` takes it as an
 explicit first argument (see Group 1 below).
 -/
 

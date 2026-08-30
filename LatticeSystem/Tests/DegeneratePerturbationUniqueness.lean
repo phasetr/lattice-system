@@ -21,19 +21,19 @@ Pins the API contract of `Math/MatrixAnalysis/DegeneratePerturbationUniqueness.l
    space — the first conjunct of `tasaki_lemma_10_1_degenerate_perturbation`'s conclusion, under
    exactly its hypotheses.
 
-**Provenance honesty (design report §1, R2).** Step 3's antisymmetric-combination argument is
+**Provenance honesty.** Step 3's antisymmetric-combination argument is
 *not* Tasaki's proof (which uses continuity + linear-independence counting over `D₀` branches);
 it is this arc's replacement, reaching the same conclusion by a different, mathlib-only route.
 
 Also machine-checks, reusing the two-site witness exposed by
 `Tests/DegeneratePerturbationGroundEnergy.lean` and the coordinate readout of
-`Tests/DegeneratePerturbationWitness.lean` (design report §7 pitfall P-g, so as not to duplicate
+`Tests/DegeneratePerturbationWitness.lean` (so as not to duplicate
 declarations):
 
-* the **two-site non-vacuity witness** (design report §9 item 2) — `hEffGS` is fully discharged on
+* the **two-site non-vacuity witness** — `hEffGS` is fully discharged on
   the two-site data (`ker Ĥ₀ = ℂe₀` is one-dimensional, so uniqueness is free once membership is
   known), instantiating U3's hypothesis bundle non-vacuously;
-* the **`hEffGS`-is-load-bearing soundness guard** (design report §9 item 4, §11 item 5) — a
+* the **`hEffGS`-is-load-bearing soundness guard** — a
   4-dimensional witness (`Ĥ₀ = diag(0,0,1,1)`, `V̂` coupling `e₀↔e₂` and `e₁↔e₃` with equal
   weight) where `Ĥeff` restricted to `ker Ĥ₀` is the scalar matrix `−1·I₂`: genuinely degenerate,
   so `Ĥeff` has **no** unique ground state on `ker Ĥ₀`. What is machine-checked below is the full
@@ -41,12 +41,11 @@ declarations):
   ¬ ∃ Eeff Φeff, IsUniqueGroundStateOn (ker Ĥ₀) Ĥeff Eeff Φeff`, together with the fact that the
   witness satisfies every *other* hypothesis of U3 (`Ĥ₀ ≥ 0`, `V̂` Hermitian, reduced inverse,
   vanishing first-order term), so `hEffGS` is the single hypothesis that fails on it.
-  **Deviation from the design report**: §9 item 4 proposed a 3-dimensional
-  witness (`Ĥ₀ = diag(0,0,1)`, both kernel vectors coupled symmetrically to a single excited mode
-  `e₂`). Hand computation shows that witness is a rank-one correction
+  **Why four dimensions and not three**: the obvious 3-dimensional candidate
+  (`Ĥ₀ = diag(0,0,1)`, both kernel vectors coupled symmetrically to a single excited mode
+  `e₂`) does not work. It is a rank-one correction
   `Ĥeff|_{ker} = −(a,b)ᵀ(a,b)` with `a = b`, which has eigenvalues `{−2a², 0}` — **not** degenerate,
-  so it does *not* in fact violate `hEffGS`. The 4-dimensional two-excited-mode witness used here
-  is the smallest one the author could verify by hand to genuinely produce a degenerate `Ĥeff`.
+  so it does *not* violate `hEffGS`. Two excited modes are what make `Ĥeff` genuinely degenerate.
   The harder direction — that `Ĥ(λ)`'s ground state is *also* non-unique at this witness, which is
   what would show U3's *conclusion* fails once `hEffGS` is dropped — is **not** machine-checked
   here; it is a hand computation only: by the `0↔1, 2↔3` block-permutation symmetry of both
@@ -60,7 +59,7 @@ declarations):
 
 **Not covered here (deliberately):**
 * Any test of the explicit `λ₀` value `min 1 (min (g/(4v+1)) (δ/(c₃+C+1)))` — U3 packages `λ₀`
-  existentially (design report §11 item 1), so no closed form is pinned.
+  existentially, so no closed form is pinned.
 * `IsReducedInverse.unique` is exercised in `Tests/DegeneratePerturbationReducedResolvent.lean`,
   where it plays its own role: it is the statement that Tasaki's notation `Ĥ₀⁻¹`, and hence
   `Ĥeff` (10.1.20), is well defined even though the capstone takes `H0inv` as data.
@@ -80,7 +79,7 @@ example (V : Matrix n n ℂ) :
     ∃ v : ℝ, 0 ≤ v ∧ ∀ u : EuclideanSpace ℂ n, ‖Matrix.toEuclideanLin V u‖ ≤ v * ‖u‖ :=
   exists_norm_toEuclideanLin_le V
 
-/-- Pins **U0**, the quadratic-form engine (design report §2 Step 1, §3 row U0). For an exact
+/-- Pins **U0**, the quadratic-form engine. For an exact
 `(Φ,Γ)`-split `E`-eigenvector `Φ + Γ` of `Ĥ(λ) = Ĥ₀ + λV̂` with `Φ ∈ ker Ĥ₀`, `Γ ∈ (ker Ĥ₀)ᗮ`,
 under the smallness hypotheses `0 < g`, `0 < λ`, `|E| ≤ λv`, `4λv ≤ g`, the effective-Hamiltonian
 energy `λ²re⟪Φ,ĤeffΦ⟫` differs from `E‖Φ‖²` by at most `Cλ³‖Φ‖²`, `C = 4v³/g²`. -/
@@ -100,7 +99,7 @@ example {H0 V H0inv : Matrix n n ℂ} {g v lam E : ℝ} {Φ Γ : EuclideanSpace 
   abs_inner_secondOrderEffectiveHamiltonian_sub_mul_norm_sq_le hH0 hV hInv hFirstOrder hgap hv
     hgpos hlam hEabs hsmall4 hΦ hΓ heig
 
-/-- Pins **U1**, kernel-triviality (design report §2 Step 2, §3 row U1): under the smallness
+/-- Pins **U1**, kernel-triviality: under the smallness
 hypotheses of U0 (which U1 invokes), the `δ`-gap of `Ĥeff` above its ground state `Φeff` inside
 `ker Ĥ₀`, the energy-order bound `E ≤ λ²Eeff + c₃λ³`, and smallness `(c₃ + C)λ < δ`, any
 `E`-eigenvector `Ξ` of `Ĥ(λ)` with `⟪Φeff, P₀Ξ⟫ = 0` is zero. -/
@@ -123,7 +122,7 @@ example {H0 V H0inv : Matrix n n ℂ} {g v lam E Eeff δ c₃ : ℝ} {Φeff Ξ :
   perturbedHamiltonian_eigenvector_eq_zero_of_inner_starProjection_eq_zero hH0 hV hInv
     hFirstOrder hgap hv hgpos hlam hEabs hsmall4 hδgap hEup hsmallδ hΞ hperp
 
-/-- Pins **U2** (design report §2 Step 3, §3 row U2): at a fixed `λ` satisfying the smallness
+/-- Pins **U2**: at a fixed `λ` satisfying the smallness
 hypotheses (`0 < λ`, `4λv ≤ g`, `(c₃+C)λ < δ`) and given the energy-order bound `hc₃` for
 every ground eigenvalue on the whole space, `Ĥ(λ)` has a unique ground state on `⊤`. -/
 example {H0 V H0inv : Matrix n n ℂ} {g v lam Eeff δ c₃ : ℝ} {Φeff : EuclideanSpace ℂ n}
@@ -160,7 +159,7 @@ example {H0 V H0inv : Matrix n n ℂ} {Eeff : ℝ} {Φeff : EuclideanSpace ℂ n
         (perturbedHamiltonian H0 V lam) E φ :=
   exists_lam0_isUniqueGroundStateOn_perturbedHamiltonian hH0pos hV hInv hFirstOrder hEffGS
 
-/-! ### Two-site non-vacuity witness (design report §9 item 2)
+/-! ### Two-site non-vacuity witness
 
 Reuses `twoSiteH0`, `twoSiteV`, `twoSiteGround` etc. exposed by
 `Tests/DegeneratePerturbationGroundEnergy.lean`. `ker twoSiteH0 = ℂ ∙ twoSiteGround` is
@@ -207,7 +206,7 @@ example : ∃ lam0 : ℝ, 0 < lam0 ∧ ∀ lam : ℝ, 0 < lam → lam < lam0 →
   exists_lam0_isUniqueGroundStateOn_perturbedHamiltonian twoSite_h0_posSemidef
     twoSite_v_isHermitian twoSite_isReducedInverse twoSite_firstOrder twoSite_hEffGS
 
-/-! ### The `hEffGS`-necessity witness (design report §9 item 4, §11 item 5)
+/-! ### The `hEffGS`-necessity witness
 
 `n = Fin 4`, `Ĥ₀ = diag(0,0,1,1)`, `V̂` couples `e₀ ↔ e₂` and `e₁ ↔ e₃` each with unit weight, all
 other entries zero. `ker Ĥ₀ = span{e₀, e₁}` (two-dimensional), and
@@ -383,7 +382,7 @@ example : gapWitnessH0.PosSemidef ∧ gapWitnessV.IsHermitian ∧
 `ker Ĥ₀ = span{e₀,e₁}`, so a candidate normalized ground state forces `Eeff = −1`, and then both
 `e₀` and `e₁` are `Eeff`-eigenvectors inside `ker Ĥ₀`; the uniqueness clause would make each of
 them a multiple of `Φeff`, which is impossible since `e₁`'s `0`-th coordinate vanishes while
-`e₀`'s does not. This is the necessity witness for `hEffGS` that design report §9 item 4 asks for;
+`e₀`'s does not. This is the necessity witness for `hEffGS`;
 the harder direction (that `Ĥ(λ)`'s ground state is *also* non-unique here, for every `λ`, by the
 `0↔1, 2↔3` block-permutation symmetry noted in the module doc) is a hand computation that is
 deliberately not formalized, being off the critical path of Lemma 10.1. -/

@@ -2,12 +2,11 @@ import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationGroundEnergy
 import LatticeSystem.Tests.DegeneratePerturbationWitness
 
 /-!
-# Test coverage for the trial-state variational bound (Tasaki Lemma 10.1, PR-4)
+# Test coverage for the trial-state variational bound (Tasaki Lemma 10.1)
 
 Pins the API contract of the declarations that
-`Math/MatrixAnalysis/DegeneratePerturbationGroundEnergy.lean` is designed to add on top of
-`DegeneratePerturbation.lean` (PR-1 only; see
-`.self-local/reports/design-lemma101-pr4-variational-bound.md` §4):
+`Math/MatrixAnalysis/DegeneratePerturbationGroundEnergy.lean` adds on top of
+`DegeneratePerturbation.lean`:
 
 1. `IsGroundEigenvalueOn.mul_norm_sq_le` (B1) — the variational principle in the arc's own
    vocabulary: on an invariant subspace, the ground eigenvalue lower-bounds the energy quadratic
@@ -23,10 +22,10 @@ Pins the API contract of the declarations that
 6. `exists_const_isGroundEigenvalue_perturbedHamiltonian_le` (L4) — **the PR's headline
    result**: the variational upper bound `Elam ≤ λ²Eeff + c₃λ³` for `0 < λ ≤ 1`.
 7. `abs_isGroundEigenvalue_perturbedHamiltonian_le` (L5) — the two-sided energy bound
-   `|Elam| ≤ λv`, fused, drop-in for PR-3's `perturbedHamiltonian_eigenvector_iff` consumer
+   `|Elam| ≤ λv`, fused, drop-in for the `perturbedHamiltonian_eigenvector_iff` consumer
    (C6's `hEle` hypothesis).
 
-**Provenance honesty (design report §1, risk R6).** Tasaki's proof of Lemma 10.1 (pp. 346–347)
+**Provenance honesty.** Tasaki's proof of Lemma 10.1 (pp. 346–347)
 contains *no* variational estimate: its analytic input is the unproved continuity/Rellich–Kato
 sentence "there are exactly `D₀` … eigenstates … depend[ing] continuously on `λ`". None of the
 seven declarations pinned below is a transcription of that argument. They are this arc's
@@ -38,7 +37,7 @@ replacement*, not as testing "Tasaki's proof, formalized". The capstone
 
 Also machine-checks two instances built from explicit matrices:
 
-* the **`V = 0` corner** (design report §8, item 2): at `H0 = V = H0inv = 0` (`n = Fin 1`),
+* the **`V = 0` corner**: at `H0 = V = H0inv = 0` (`n = Fin 1`),
   `matrixKernel 0 = ⊤`, `hFirstOrder` holds trivially, and L1's residual identity degenerates to
   `0 = 0`, exercising the degenerate `ker Ĥ₀ = ⊤` branch;
 * the **two-site witness** (`n = Fin 2`): `Ĥ₀ = diag(0,1)`, `V̂ = offdiag(1,1)`,
@@ -47,21 +46,19 @@ Also machine-checks two instances built from explicit matrices:
   singlet sector of Tasaki's two-electron two-site Hubbard model (pp. 341–342, eq. (10.1.1)) at
   `U = 1`, `t = λ/2`, with `Ĥ₀` the on-site interaction and `V̂` the hopping. It discharges the
   *entire* hypothesis bundle of L4 and L5 on explicit data, so neither statement is vacuous; fused
-  with B2 (which supplies the ground eigenvalue) both become unconditional. The design report
-  placed this witness in PR-6 and recorded either placement as defensible (§10, item 4); it is
-  built here.
+  with B2 (which supplies the ground eigenvalue) both become unconditional.
 
-**Not covered here (deliberately, per the design report):**
-* Any counterexample family showing `lam ≤ 1` is load-bearing in L4 — the design report classifies
-  it as a convenience, not a soundness guard (§8 item 3), so none is supplied; the pin for L4
+**Not covered here, deliberately:**
+* Any counterexample family showing `lam ≤ 1` is load-bearing in L4 — that inequality is a
+  convenience, not a soundness guard, so none is supplied; the pin for L4
   already quantifies over every `0 < lam ≤ 1`, including `lam = 1`.
-* A pin of L4's constant inside the API: L4 packages `c₃` existentially (design report §10,
-  item 2), so the closed form `c₃ = |re⟪u, V̂u⟫| + |Eeff|‖u‖²` is checked only at the two-site
+* A pin of L4's constant inside the API: L4 packages `c₃` existentially,
+  so the closed form `c₃ = |re⟪u, V̂u⟫| + |Eeff|‖u‖²` is checked only at the two-site
   witness, where it evaluates to `1` and the resulting bound `E ≤ −λ² + λ³` is machine-checked
   from B1 and L2 directly.
 
-**Which witness helpers are not `private`.** `Tests/DegeneratePerturbationUniqueness.lean` (PR-5,
-design report §7 pitfall P-g) instantiates its own pins on the same two-site model, and rebuilding
+**Which witness helpers are not `private`.** `Tests/DegeneratePerturbationUniqueness.lean`
+instantiates its own pins on the same two-site model, and rebuilding
 those matrices there would be a duplicate declaration. The eleven declarations it consumes —
 `twoSiteH0`, `twoSiteV`, `twoSiteGround`, `twoSite_matrixKernel`, `twoSite_ground_mem`,
 `twoSite_norm_ground`, `twoSite_h0_posSemidef`, `twoSite_v_isHermitian`,
@@ -146,7 +143,7 @@ example {H0 V H0inv : Matrix n n ℂ} {Eeff : ℝ} {Φeff : EuclideanSpace ℂ n
       E ≤ lam ^ 2 * Eeff + c₃ * lam ^ 3 :=
   exists_const_isGroundEigenvalue_perturbedHamiltonian_le hH0 hV hInv hFirstOrder hΦeff hnorm hEeff
 
-/-- **L4 instantiated at `λ = 1`** (design report §8 item 3: `lam ≤ 1` is a convenience, not a
+/-- **L4 instantiated at `λ = 1`** (`lam ≤ 1` is a convenience, not a
 soundness guard that needs a dedicated counterexample family). This is a direct corollary of the
 pin above, kept as a separate `example` only to record that the bound is genuinely usable at the
 right endpoint `λ = 1`, not merely in some open neighbourhood of `0`. -/
@@ -178,7 +175,7 @@ example {H0 V : Matrix n n ℂ} {v lam E : ℝ} {Φeff : EuclideanSpace ℂ n}
     |E| ≤ lam * v :=
   abs_isGroundEigenvalue_perturbedHamiltonian_le hH0pos hV hv hFirstOrder hΦeff hnorm hlam hE
 
-/-- **`V = 0` corner** (design report §8 item 2): at `H0 = V = H0inv = 0` on `n = Fin 1`,
+/-- **`V = 0` corner**: at `H0 = V = H0inv = 0` on `n = Fin 1`,
 `matrixKernel 0 = ⊤`, `hFirstOrder` holds trivially, and L1's exact residual identity
 degenerates to `Ĥ(λ)Φ = 0 = −λ²•0`. Exercises the degenerate `ker Ĥ₀ = ⊤` branch that the
 two-site non-vacuity witness built below does not cover, its kernel being the proper line

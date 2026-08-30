@@ -33,7 +33,7 @@ eqs. (8.3.45)-(8.3.48)) and the relaxed Theorem 7.6 hypothesis (`GeneratesSameMP
   `IsInjectiveMPS` is uninhabited at `D = 0` (the transfer-matrix algebra collapses to the trivial
   ring, whose `spectrum` is empty), so this case can only be guarded by `Subsingleton`, never
   exercised by a concrete injective fixture; see the caveat in `t9_matrix_subsingleton_of_D_zero`.
-* **T10** (PR-3) negative control for the design report's discovery: at `L = 1`, `fixtureP`'s
+* **T10** (PR-3) negative control: at `L = 1`, `fixtureP`'s
   trace coefficients all vanish (`tr σ^α = 0`), so `GeneratesPhasedMPS` imposes **no constraint** on
   `η 1`: two different phase functions differing only at `L = 1` both satisfy the hypothesis for the
   same pair `(fixtureP, fixtureP)`. This is the machine-checked witness that "`η_L = c^L` for any
@@ -473,8 +473,8 @@ private lemma t6_symmetryTransportMPS_fixtureP :
 /-! ## T7: non-vacuity of `exists_unitary_gauge_of_invariance` -/
 
 /-- T7: the trivial instance `ε = 1, u = 1, η ≡ 1` at `A := fixtureP` genuinely instantiates
-`exists_unitary_gauge_of_invariance` (design report §4.2, PR-3's non-vacuity requirement, the T7
-analogue of PR-2's T2). Without this, the whole PR-3 gauge capstone could be vacuous. -/
+`exists_unitary_gauge_of_invariance`, the T7 analogue of T2. Without this, the gauge capstone
+could be vacuous. -/
 private lemma t7_exists_unitary_gauge_of_invariance_nonvacuous :
     ∃ (ζ : Circle) (U : Matrix (Fin 2) (Fin 2) ℂ), U ∈ Matrix.unitaryGroup (Fin 2) ℂ ∧
       ∀ σ, symmetryTransportMPS (1 : ℤˣ) (1 : Matrix (Fin 3) (Fin 3) ℂ) fixtureP σ =
@@ -562,7 +562,7 @@ private lemma t10_generatesPhasedMPS_fixtureP_fixtureP_phaseVariant (z : Circle)
 
 /-- T10: two different values of `η 1` are both compatible with the same underlying pair
 `(fixtureP, fixtureP)`, so `η 1` is genuinely unconstrained: this is the negative-control witness
-for the design report's discovery that "`η_L = c^L` for any `L`" is false as stated (it only holds
+that "`η_L = c^L` for any `L`" is false as stated (it only holds
 for `L` at least twice the spanning length). -/
 private lemma t10_phase_at_length_one_unconstrained :
     GeneratesPhasedMPS fixtureP fixtureP (phaseVariant (1 : Circle)) ∧

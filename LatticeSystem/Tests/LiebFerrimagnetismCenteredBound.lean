@@ -21,8 +21,8 @@ Notation: `L := sublatticeImbalance A`, `k₀ := L / 2` (ℕ division), `S₀ :=
 `γ₀ := liebRepulsiveSpinCasimir A`, `u := ((fermionTotalSpinMinus N) ^ k₀).mulVec w`,
 `Ô² := fermionStaggeredCasimirOp N A`.
 
-The closing section pins the design's cheapest possible sign-direction counter-check
-(design §5, "符号の向き"): flipping the sign of a strictly negative real makes it strictly
+The closing section pins the cheapest possible sign-direction counter-check:
+flipping the sign of a strictly negative real makes it strictly
 positive and equal to its absolute value, as pure `ℝ` arithmetic (no state vector needed) —
 the shape `D2`'s off-sublattice branch (`gaugeSign` product `= -1`) relies on.
 -/
@@ -136,7 +136,7 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N +
   liebRepulsive_exists_centered_ratioRe_ge_sq N A T hT hbip hT_conn U hU hN E₀ (hne := hne)
     (hmin := hmin) (hcas := hcas)
 
-/-! ## Sign-direction sanity check (design §5, independent of any state vector) -/
+/-! ## Sign-direction sanity check (independent of any state vector) -/
 
 /-- **Cheapest sign-direction counter-check.** Flipping the sign of a strictly negative real
 makes it strictly positive and equal to its absolute value — the pure-`ℝ` shape `D2`'s

@@ -391,13 +391,13 @@ private lemma t5_not_isTrivialProjectiveRep :
   t5_not_isPhaseCoboundary
     ((isTrivialProjectiveRep_iff_isPhaseCoboundary uPauli_isProjectiveRep).mp h)
 
-/-! ## T6: entrywise-conjugation API (M1-M9 of #5306 PR-2, design §5a)
+/-! ## T6: entrywise-conjugation API (M1-M9)
 
 Behavioural tests for the extension of `LatticeSystem.Math.ProjectiveRepresentation` with
 involutivity, adjoint, unitary-preservation, spectrum, and rank/kernel-finrank lemmas for
 `signConj`/`signConjMatrix` (Tasaki §8.3.5 eq. (8.3.40)'s `C_g`). Each test both locks the exact
-public name/signature `dev-implement` must produce and exercises the mathematical content, so it
-cannot pass by an accidentally vacuous statement. Refs #5306, #4718. -/
+public name/signature and exercises the mathematical content, so it
+cannot pass by an accidentally vacuous statement. -/
 
 /-- M1 (unitary case): `signConj` at `ε = 1` is the identity. -/
 private lemma t6_signConj_one_id (z : ℂ) : signConj (1 : ℤˣ) z = z :=
