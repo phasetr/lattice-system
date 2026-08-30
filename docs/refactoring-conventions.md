@@ -287,7 +287,7 @@ deprecation warning text itself is captured by `#guard_msgs`
 - [ ] New per-theorem suppressions added to `docs/deprecations.md`
   transparency table.
 
-## 6. Public-doc synchronisation (CLAUDE.local.md, longstanding)
+## 6. Public-doc synchronisation
 
 For every PR adding `def` / `theorem` / `lemma`, the same PR must:
 

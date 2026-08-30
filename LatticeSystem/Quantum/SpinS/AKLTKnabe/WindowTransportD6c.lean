@@ -46,12 +46,15 @@ agree for `2 ≤ L` but no bridge lemma is needed in Stage B, because no stateme
 
 ## Hypothesis strength
 
-Stage C needs `5 ≤ L` throughout, that being what its five distinct offsets `0, 1, 2, −1, −2`
-require.  Stage B needs only the four window sites to be distinct, i.e. **`4 ≤ L`**, and is
-stated under that weaker hypothesis (weakest-hypothesis discipline, as in
-Gate D6b item A5).  Stage C's `5 ≤ L` implies it.  The `4 ≤ L` boundary is not vacuous: the exact
-rational contrast run before this file was written confirms the transport identity and the
-transported certificate at `L = 4`, and confirms that both fail at `L = 3`.
+Stage C's threshold varies by lemma: `bondPairSum_zero` and `posSemidef_bondPairSum` need
+`2 ≤ L`, `sum_akltWindowAt_sq` needs `3 ≤ L`, and `5 ≤ L` is needed only by the C7/C8 capstones
+(`ringProjHamiltonianS_sq_sub_smul_eq`, `ringProjHamiltonianS_knabe_posSemidef`), that being what
+their five distinct offsets `0, 1, 2, −1, −2` require.  Stage B needs only the four window sites
+to be distinct, i.e. **`4 ≤ L`**, and is stated under that weaker hypothesis
+(weakest-hypothesis discipline, as in Gate D6b item A5).  The capstones' `5 ≤ L` implies it.
+The `4 ≤ L` boundary is not vacuous: the exact rational contrast run before this file was written
+confirms the transport identity and the transported certificate at `L = 4`, and confirms that
+both fail at `L = 3`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §7.1.4, eqs. (7.1.7), (7.1.30), pp. 188–190.

@@ -50,7 +50,7 @@ Other status-bearing surfaces are intentionally not replaced wholesale:
   statements, and actual axiom dependencies.
 - `README.md` is a concise project introduction and points readers to the
   published project page. It is not a theorem-status database.
-- `docs/refactoring-conventions.md`, `CLAUDE.local.md`, and agent instructions
+- `docs/refactoring-conventions.md` and agent instructions
   currently require the complete legacy catalogue tree to be consulted for
   documentation and capstone checks. Issue #5228 owns changing those consumers
   to validated structured records.

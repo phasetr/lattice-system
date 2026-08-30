@@ -632,7 +632,7 @@ example :
 while `∑ i : Fin 2, ε (castLE _ i) = 1`. Asserts the *consequence* `1 ≤ 3`
 obtained through W2 (`sum_lowestLevels_le_sum_weighted_of_map_eq`), so a flipped inequality fails
 to compile. The `{0, 1}`-valued `w` is exactly an `S`-indicator, so this pin also covers the
-unweighted `∑_{p ∈ S} g p` shape that the Fermion layer consumes. -/
+unweighted `∑_{p ∈ S} g p` shape. -/
 example : (1 : ℝ) ≤ 3 := by
   have hmono : Monotone (fun i : Fin 3 => (i : ℝ)) := fun a b hab => by
     change (a : ℝ) ≤ (b : ℝ)
