@@ -94,19 +94,6 @@ theorem manyBodyOperatorNormS_expConjOp (A Y : ManyBodyOpS Λ N)
   rw [hadj] at h
   exact h
 
-/-- **Commutator norm bound** `‖⁅A, Y⁆‖ ≤ 2‖A‖‖Y‖` for the `L²` operator norm: the subtraction
-triangle inequality plus submultiplicativity in both orders. -/
-theorem manyBodyOperatorNormS_comm_le (A Y : ManyBodyOpS Λ N) :
-    manyBodyOperatorNormS (A * Y - Y * A)
-      ≤ 2 * manyBodyOperatorNormS A * manyBodyOperatorNormS Y := by
-  calc manyBodyOperatorNormS (A * Y - Y * A)
-      ≤ manyBodyOperatorNormS (A * Y) + manyBodyOperatorNormS (Y * A) :=
-        manyBodyOperatorNormS_sub_le _ _
-    _ ≤ manyBodyOperatorNormS A * manyBodyOperatorNormS Y
-          + manyBodyOperatorNormS Y * manyBodyOperatorNormS A :=
-        add_le_add (manyBodyOperatorNormS_mul_le _ _) (manyBodyOperatorNormS_mul_le _ _)
-    _ = 2 * manyBodyOperatorNormS A * manyBodyOperatorNormS Y := by ring
-
 /-- **Second-order symmetric-difference twist bound** (Tasaki §6.2, Lemma 6.4, eqs. (6.2.28)–
 (6.2.30), pp. 164–165).  For a Hermitian `M` and arbitrary `X`,
 `‖ exp(+iM) X exp(−iM) + exp(−iM) X exp(+iM) − 2X ‖ ≤ 8 ‖M‖² ‖X‖`
