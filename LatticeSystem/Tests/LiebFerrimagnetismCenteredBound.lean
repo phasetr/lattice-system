@@ -6,23 +6,22 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismCenteredBoun
 Specification suite for
 `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismCenteredBound.lean` (PR-7 of the
 Theorem 10.6 discharge arc, issue #5347). The `example`s pin the exact type signature (and,
-crucially, the exact *hypothesis set*) of the five public declarations per this arc's PR-7
-design: the generic sum-linearity of
-`vectorExpectation` (`D1`), the sign-transport bound onto the double-sum transverse operator
+crucially, the exact *hypothesis set*) of the five public declarations: the generic sum-linearity
+of `vectorExpectation` (`D1`), the sign-transport bound onto the double-sum transverse operator
 (`D3`), the Casimir identity on the centered tower member (`D4`), the capstone ratio bound with
 **weakest hypotheses** (`D7`, no `hbip`/`hT_conn`/`hU`/`1 ≤ N`), and the existential capstone
 consuming PR-6's `liebRepulsive_exists_centered_transverse_sign` (`D8`). Mirrors the specification
 style of `Tests/LiebFerrimagnetismCenteredSector.lean` and
-`Tests/LiebFerrimagnetismGroundTower.lean`.
-`D0`'s de-privatization, and the `private` `D2`/`D5`/`D6` arithmetic/pair-sign lemmas, are not
-pinned here (repo convention: only public declarations get a `Tests/` pin).
+`Tests/LiebFerrimagnetismGroundTower.lean`. `D0`'s de-privatization, and the `private`
+`D2`/`D5`/`D6` arithmetic/pair-sign lemmas, are not pinned here (repo convention: only public
+declarations get a `Tests/` pin).
 
 Notation: `L := sublatticeImbalance A`, `k₀ := L / 2` (ℕ division), `S₀ := L/2 : ℝ`,
 `γ₀ := liebRepulsiveSpinCasimir A`, `u := ((fermionTotalSpinMinus N) ^ k₀).mulVec w`,
 `Ô² := fermionStaggeredCasimirOp N A`.
 
-The closing section pins the design's cheapest possible sign-direction counter-check
-(design §5, "符号の向き"): flipping the sign of a strictly negative real makes it strictly
+The closing section pins the cheapest possible sign-direction counter-check:
+flipping the sign of a strictly negative real makes it strictly
 positive and equal to its absolute value, as pure `ℝ` arithmetic (no state vector needed) —
 the shape `D2`'s off-sublattice branch (`gaugeSign` product `= -1`) relies on.
 -/
@@ -136,7 +135,7 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N +
   liebRepulsive_exists_centered_ratioRe_ge_sq N A T hT hbip hT_conn U hU hN E₀ (hne := hne)
     (hmin := hmin) (hcas := hcas)
 
-/-! ## Sign-direction sanity check (design §5, independent of any state vector) -/
+/-! ## Sign-direction sanity check (independent of any state vector) -/
 
 /-- **Cheapest sign-direction counter-check.** Flipping the sign of a strictly negative real
 makes it strictly positive and equal to its absolute value — the pure-`ℝ` shape `D2`'s

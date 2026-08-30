@@ -6,8 +6,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23Casimir
 # The coupled total-spin lower bound `(Ŝ_tot)² ≥ |a−b|(|a−b|+1)`
 
 Issue #3542 (sound Perron–Frobenius route to Tasaki §2.5 Theorem 2.3), option (a),
-Route 5 brick 3b — the Clebsch–Gordan triangle inequality (see
-`.self-local/tex/3717-coupled-total-spin-lower-bound.tex`).
+Route 5 brick 3b — the Clebsch–Gordan triangle inequality.
 
 On the joint sublattice-Casimir eigenspace `W_{a,b}` (`(Ŝ_A)² = a(a+1)`,
 `(Ŝ_¬A)² = b(b+1)`), every `(Ŝ_tot)²`-eigenvalue is `≥ |a−b|(|a−b|+1)`.  Reducing to a

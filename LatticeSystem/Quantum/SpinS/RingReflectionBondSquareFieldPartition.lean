@@ -12,8 +12,6 @@ pulls out of both the trace and the real part, giving the reduction
 finite-`β` form of the uniform field bound).  This equation lets PR-BS3 onward reuse the merged
 single-field symmetries of `ringFieldPartitionRe` for the bond-square partition function without
 redefining `Z` on a field map.
-
-See `.self-local/docs/math-tasaki-4-1-49-bond-square-partition-reduction.md` (issue #4777).
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareField
 

@@ -318,7 +318,8 @@ recursion of the ansatz cancels the potential `1/2` against (S.31)); the root eq
 the remaining condition at the two aligned labels `0` and `L`, where the potential vanishes and
 where the two branches of the ansatz meet.
 
-The eigenvalue is an eigenvalue of the compression `lowEnergyMatrix` shifted by `E_GS^(0)`; that
+The eigenvalue is `E_GS^(0) + tightBindingEnergy λ κ` with `E_GS^(0) = -N/4`, an eigenvalue of the
+compression `lowEnergyMatrix`; that
 the compression restricts the Hamiltonian to an invariant subspace is not established here, so no
 claim is made about the spectrum of the Hamiltonian itself. -/
 theorem lowEnergyAnsatz_isEigenvector (N : ℕ) (lam kappa s : ℝ) (hN : 1 ≤ N) (hlam : 0 < lam)

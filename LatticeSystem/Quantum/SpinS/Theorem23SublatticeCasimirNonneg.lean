@@ -4,8 +4,7 @@ import LatticeSystem.Quantum.SpinS.SublatticeSpinLadderDef
 # The sublattice Casimir is positive semidefinite
 
 Issue #3542 (sound Perron–Frobenius route to Tasaki §2.5 Theorem 2.3), option (a),
-toy minimum-energy bound ingredient (see
-`.self-local/tex/3716-tasaki-2-5-toy-min-energy-bound.tex`).
+toy minimum-energy bound ingredient.
 
 `(Ŝ_A)² = Ŝ_A^(1)² + Ŝ_A^(2)² + Ŝ_A^(3)²` is a sum of squares of Hermitian operators,
 hence positive semidefinite: every eigenvalue has non-negative real part.  This lets us

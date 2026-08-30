@@ -303,8 +303,37 @@ def table_data_rows(lines: list[str]) -> list[str]:
     return result
 
 
+# Baseline catalogue rows carry two kinds of pointer to a working note that is not part of this
+# repository: a trailing "; see ... (Issue #3542)." clause, and a parenthesised section pointer
+# sitting directly after a backticked symbol. Both are dropped from the published rows; the issue
+# reference the first one carries is kept. Each pattern is matched structurally, by the shape of
+# its punctuation, so that the removed text is not reproduced here.
+_WORKING_NOTE_CITATION = re.compile(r"; see `[^`]+` \(Issue #3542\)\.")
+_WORKING_NOTE_SECTION_REF = re.compile(r" \(\w[\w-]* §\d+\.\d+ \w+ \d+\)")
+
+# The same class of pointer appears once in baseline prose rather than in a table row, in the
+# whitespace-normalized (still blockquote-prefixed) form handled here.
+_WORKING_NOTE_PROSE_CITATION = re.compile(r"See > `[^`]+` and Issue #3542\.")
+
+# Number of baseline sites each of the three removals above matches, in declaration order. Pinned
+# for the same reason as MOVED_PROSE_LINK_REWRITE_COUNTS: a structural pattern that starts matching
+# more (or fewer) sites than audited must fail loudly instead of silently editing the baseline.
+WORKING_NOTE_REMOVAL_COUNTS = (2, 1, 1)
+
+
+def _drop_working_note_citations(text: str) -> str:
+    """Drop both catalogue-row pointers to the working note outside this repository."""
+    text = _WORKING_NOTE_CITATION.sub(" (Issue #3542).", text)
+    return _WORKING_NOTE_SECTION_REF.sub("", text)
+
+
+def _drop_working_note_prose_citation(text: str) -> str:
+    """Drop the prose form of the same working-note pointer."""
+    return _WORKING_NOTE_PROSE_CITATION.sub("See Issue #3542.", text)
+
+
 def approved_changes(text: str) -> str:
-    return (
+    return _drop_working_note_citations(
         text.replace("(refactoring-conventions.html)", "(/lattice-system/refactoring-conventions/)")
         .replace(
             "(deprecations.html#remaining-linter-suppressions)",
@@ -1144,7 +1173,13 @@ def main() -> None:
 
     # Catalogue rows must retain exact global order after the two evidenced status corrections.
     # Long cells are reconstructed from one compact table reference and one grouped detail record.
-    expected_rows = table_data_rows(approved_changes("".join(old_lines[216:2731])).splitlines())
+    catalogue_baseline = "".join(old_lines[216:2731])
+    working_note_counts = [
+        len(_WORKING_NOTE_CITATION.findall(catalogue_baseline)),
+        len(_WORKING_NOTE_SECTION_REF.findall(catalogue_baseline)),
+        0,
+    ]
+    expected_rows = table_data_rows(approved_changes(catalogue_baseline).splitlines())
     expected_by_line: dict[int, str] = {}
     expected_long_lines: set[int] = set()
     for line_number in range(217, 2732):
@@ -1264,14 +1299,21 @@ def main() -> None:
         current = "".join(text for _page, text in sorted(markers[source_range], key=lambda item: str(item[0])))
         if 217 <= start <= 2731:
             current = "\n".join(line for line in current.splitlines() if not line.startswith("|"))
-        expected_prose_stream.append(
-            whitespace_normalized(apply_moved_prose_link_rewrites(expected, rewrite_counts))
+        normalized_expected = whitespace_normalized(
+            apply_moved_prose_link_rewrites(expected, rewrite_counts)
         )
+        working_note_counts[2] += len(_WORKING_NOTE_PROSE_CITATION.findall(normalized_expected))
+        expected_prose_stream.append(_drop_working_note_prose_citation(normalized_expected))
         actual_prose_stream.append(normalize_current_moved_prose(start, end, current, old_lines))
     if tuple(rewrite_counts) != MOVED_PROSE_LINK_REWRITE_COUNTS:
         fail(
             "audited moved-prose link rewrite counts differ: "
             f"expected={MOVED_PROSE_LINK_REWRITE_COUNTS}, actual={tuple(rewrite_counts)}"
+        )
+    if tuple(working_note_counts) != WORKING_NOTE_REMOVAL_COUNTS:
+        fail(
+            "audited working-note removal counts differ: "
+            f"expected={WORKING_NOTE_REMOVAL_COUNTS}, actual={tuple(working_note_counts)}"
         )
     if expected_prose_stream != actual_prose_stream:
         first = next(

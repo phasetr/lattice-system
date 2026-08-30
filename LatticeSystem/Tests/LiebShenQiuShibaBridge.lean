@@ -7,11 +7,10 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismCenteredSect
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebShenQiuSectorCasimir
 
 /-!
-# Test coverage for the Theorem 10.8 Shiba Hamiltonian bridge (PR-1) and spin-transport (PR-2)
+# Test coverage for the Theorem 10.8 Shiba Hamiltonian bridge and spin-transport
 
 Pins the API contract of the constant-shift identity and the Shiba conjugation bridge of
-`LatticeSystem/Fermion/JordanWigner/Hubbard/LiebShenQiuShibaBridge.lean` (PR-1 of the
-Theorem 10.8 discharge, design report `.self-local/docs/theorem-10-8-design.md` §1), plus the
+`LatticeSystem/Fermion/JordanWigner/Hubbard/LiebShenQiuShibaBridge.lean`, plus the
 four public `euclideanExpectation` helpers of `LiebAttractive.lean`:
 
 1. **B1** `symmetricAttractiveHubbardHamiltonian_eq_attractive_sub_smul` — the constant-shift
@@ -24,46 +23,42 @@ four public `euclideanExpectation` helpers of `LiebAttractive.lean`:
    `_conjTranspose_mul_self`), public and sitting next to `euclideanExpectation` itself, so that
    the later Theorem 10.8 layers reuse them instead of re-deriving them.
 
-Also pins the API contract of PR-2 (`Ŝ³φ = 0` extraction + Shiba transport,
-`.self-local/docs/theorem-10-8-pr2-design.md` §2), TDD Red:
+Also pins the `Ŝ³φ = 0` extraction and the Shiba transport:
 
 4. **G1** `LatticeSystem.Math.IsUniqueGroundStateOn.conj_unitary` — the generic unitary-conjugation
-   ground-state transport (new file `Math/MatrixAnalysis/UnitaryGroundTransport.lean`), pinning
-   the full two-sided hypothesis list (`hUUc`/`hconj`/`hfwd`/`hbwd`), the fragile part per
-   design §4 R1/R2.
+   ground-state transport (`Math/MatrixAnalysis/UnitaryGroundTransport.lean`), pinning
+   the full two-sided hypothesis list (`hUUc`/`hconj`/`hfwd`/`hbwd`), which is its fragile part.
 5. **S1** `fermionTotalSpinZ_mulVec_eq_zero_of_fermionTotalSpinSquared_mulVec_eq_zero` — the
-   spin-algebra extraction (`LiebAttractiveFullSectorUnique.lean`, design §2.2), plus a sanity
+   spin-algebra extraction (`LiebAttractiveFullSectorUnique.lean`), plus a sanity
    instance at `N = 0`, `f = 0`.
 6. **T1** `shibaTransport_uniqueGroundStateOn_spinZSector` — the plain-attractive face of the
-   Hubbard transport (`LiebRepulsiveBalancedGround.lean`, design §2.3), energy slot `E − (∑ U)/4`.
+   Hubbard transport (`LiebRepulsiveBalancedGround.lean`), energy slot `E − (∑ U)/4`.
 7. **T2** `shibaTransport_uniqueGroundStateOn_spinZSector_symmetricAttractive` — the
-   symmetric-attractive face (new file `LiebShenQiuShibaTransport.lean`, design §2.4), energy slot
+   symmetric-attractive face (`LiebShenQiuShibaTransport.lean`), energy slot
    exactly `E`, obtained by instantiating the shared transport
    `shibaTransport_uniqueGroundStateOn_spinZSector_of_conj` at the residual-free bridge **B2**.
-8. **INV** a statement-invariance pin for `repulsiveSpinZSector_ground_unique` (design §1.1): the
-   full existential type, discharged by the theorem name, so that a future refactor (PR-2's
-   corollary form) cannot silently reorder/add conjuncts without breaking the three positional
+8. **INV** a statement-invariance pin for `repulsiveSpinZSector_ground_unique`: the
+   full existential type, discharged by the theorem name, so that a future refactor
+   cannot silently reorder/add conjuncts without breaking the three positional
    call sites at `LiebRepulsiveCorrelation.lean:144`, `LiebFerrimagnetismCenteredSector.lean:266`,
    `LiebRepulsiveSectorBridgeFinal.lean:159`.
 
-Also pins the API contract of PR-3 (`k₀ → k` sector generalization + Casimir value, design report
-`.self-local/docs/theorem-10-8-pr3-design.md`), TDD Red:
+Also pins the `k₀ → k` sector generalization and the Casimir value:
 
 9. **C1** `liebShenQiu_towerExponent_weight_eq` — the tower-exponent weight arithmetic
-   `L/2 − (a − Ne/2) = (Ne − (N+1))/2` (design §3 item 1), the generalized weight the
+   `L/2 − (a − Ne/2) = (Ne − (N+1))/2`, the generalized weight the
    symmetric-attractive Shiba transport's sector lands at.
 10. **C2** `liebShenQiu_sectorGround_mem_halfFillingGround` — the generalized pinch
-    (`liebRepulsive_sectorGroundEnergy_eq_groundEnergy`, PR-3's `k`-general form) applied to the
-    transport's sector ground state, landing it in the `(N+1)`-electron ground submodule
-    (design §3 item 2).
+    (`liebRepulsive_sectorGroundEnergy_eq_groundEnergy` in its `k`-general form) applied to the
+    transport's sector ground state, landing it in the `(N+1)`-electron ground submodule.
 11. **C3** `liebShenQiu_casimir_eq` — Theorem 10.4's Casimir eigenvalue equation
-    `Ŝ² ψ = S₀(S₀+1) ψ` transported onto that same sector ground state (design §3 item 3).
+    `Ŝ² ψ = S₀(S₀+1) ψ` transported onto that same sector ground state.
 
 Each `example` fails to elaborate unless the corresponding declaration exists, is public, and has
 exactly this signature.
 
-**Not covered here**: the pair/ladder algebra and signed-sum inequality (PR-4); and the capstone
-assembly (PR-5).
+**Not covered here**: the pair/ladder algebra and signed-sum inequality, and the capstone
+assembly.
 -/
 
 namespace LatticeSystem.Tests.LiebShenQiuShibaBridge
@@ -121,7 +116,7 @@ example (M : ManyBodyOp (Fin (2 * N + 2))) (φ : EuclideanSpace ℂ (Fin (2 * N 
       = ((∑ j, Complex.normSq ((M.mulVec φ.ofLp) j) : ℝ) : ℂ) :=
   euclideanExpectation_conjTranspose_mul_self M φ
 
-/-- Pins **G1**, the generic unitary-conjugation ground-state transport (design §2.1), at
+/-- Pins **G1**, the generic unitary-conjugation ground-state transport, at
 abstract carrier `n`. Fails to elaborate unless `IsUniqueGroundStateOn.conj_unitary` exists with
 exactly this two-sided-membership hypothesis list, and with the single unitarity hypothesis
 `U Uᴴ = 1` (its companion `Uᴴ U = 1` being derivable on a square matrix). -/
@@ -137,20 +132,20 @@ example {n : Type*} [Fintype n] [DecidableEq n]
   LatticeSystem.Math.IsUniqueGroundStateOn.conj_unitary hUUc hconj hfwd hbwd hGS
 
 /-- Pins **S1**, the spin-algebra extraction: a null vector of the fermionic Casimir `Ŝ²` is a
-null vector of `Ŝ³` (design §2.2, Tasaki Lemma A.11 route). -/
+null vector of `Ŝ³` (Tasaki Lemma A.11 route). -/
 example {f : (Fin (2 * N + 2) → Fin 2) → ℂ}
     (h : (fermionTotalSpinSquared N).mulVec f = 0) :
     (fermionTotalSpinZ N).mulVec f = 0 :=
   fermionTotalSpinZ_mulVec_eq_zero_of_fermionTotalSpinSquared_mulVec_eq_zero N h
 
 /-- Sanity instance of **S1** at `N = 0`, `f = 0`: forces the `Fin (2 * 0 + 2)` instance path to
-elaborate (design §5 item 3). -/
+elaborate. -/
 example : (fermionTotalSpinZ 0).mulVec (0 : (Fin (2 * 0 + 2) → Fin 2) → ℂ) = 0 :=
   fermionTotalSpinZ_mulVec_eq_zero_of_fermionTotalSpinSquared_mulVec_eq_zero 0
     (by rw [Matrix.mulVec_zero])
 
 /-- Pins **T1**, the plain-attractive Shiba transport of `IsUniqueGroundStateOn` from the
-`N̂ = Ne` electron-number sector to the `Ŝ³ = m` spin-`z` sector (design §2.3), energy slot
+`N̂ = Ne` electron-number sector to the `Ŝ³ = m` spin-`z` sector, energy slot
 `E − (∑ x, U x) / 4`. -/
 example (N Ne : ℕ) {A : Finset (Fin (N + 1))} {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ}
     (hT_symm : ∀ x y, T x y = T y x) (hbip : HoppingRespectsBipartition A T)
@@ -166,7 +161,7 @@ example (N Ne : ℕ) {A : Finset (Fin (N + 1))} {T : Matrix (Fin (N + 1)) (Fin (
       Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1)) ψ = ((N : ℂ) + 1) • ψ :=
   shibaTransport_uniqueGroundStateOn_spinZSector N Ne hT_symm hbip U hGS hsinglet
 
-/-- Pins **T2**, the symmetric-attractive-facing corollary (design §2.4): the same transport
+/-- Pins **T2**, the symmetric-attractive-facing corollary: the same transport
 starting from `symmetricAttractiveHubbardHamiltonian`, with energy slot **exactly** `E` (the
 `¼ΣU` shifts on both sides cancel). -/
 example (N Ne : ℕ) {A : Finset (Fin (N + 1))} {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ}
@@ -183,9 +178,9 @@ example (N Ne : ℕ) {A : Finset (Fin (N + 1))} {T : Matrix (Fin (N + 1)) (Fin (
   shibaTransport_uniqueGroundStateOn_spinZSector_symmetricAttractive N Ne hT_symm hbip U hGS
     hsinglet
 
-/-- **INV**: statement-invariance regression pin for `repulsiveSpinZSector_ground_unique`
-(design §1.1). Restates its full existential type and discharges it by the theorem name, so a
-future refactor (PR-2's corollary form) that reorders/adds a conjunct breaks this pin before it
+/-- **INV**: statement-invariance regression pin for `repulsiveSpinZSector_ground_unique`.
+Restates its full existential type and discharges it by the theorem name, so a
+future refactor that reorders/adds a conjunct breaks this pin before it
 can silently break the three positional call sites
 (`LiebRepulsiveCorrelation.lean:144`, `LiebFerrimagnetismCenteredSector.lean:266`,
 `LiebRepulsiveSectorBridgeFinal.lean:159`). -/
@@ -206,10 +201,9 @@ example (N Ne : ℕ)
         Matrix.toEuclideanLin (fermionTotalNumber (2 * N + 1)) φ = ((N : ℂ) + 1) • φ :=
   repulsiveSpinZSector_ground_unique N Ne hNe_even hNe_pos hNe_lt T hT_symm hbip hT_conn U hU_pos
 
-/-! ## PR-3 (#5357): `k₀ → k` sector generalization + Casimir value
-(`LiebShenQiuSectorCasimir.lean`, new module) -/
+/-! ## `k₀ → k` sector generalization + Casimir value (`LiebShenQiuSectorCasimir.lean`) -/
 
-/-- Pins **C1**, the tower-exponent weight arithmetic (design §3 item 1): at tower exponent
+/-- Pins **C1**, the tower-exponent weight arithmetic: at tower exponent
 `k := A.card - Ne / 2` (`hb`/`ha`/`hNe` are the side conditions `b ≤ Ne/2 ≤ a`, `Even Ne` that make
 `k` land in `[0, L]`), the generalized-pinch weight `L/2 - k` equals the symmetric-attractive
 Shiba transport's sector parameter `(Ne - (N+1))/2`. -/
@@ -220,8 +214,8 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (Ne : ℕ)
   liebShenQiu_towerExponent_weight_eq N A Ne hb ha hNe
 
 /-- Pins **C2**, the generalized pinch applied to the symmetric-attractive Shiba transport's
-sector ground state `ψ` (design §3 item 2): under the Theorem 10.4 hypotheses (`hmin`/`hE₀`/`hcas`)
-and PR-3's `(k, hk, hkm)` matching the transport's sector, `ψ` (unique ground state `hGS` at
+sector ground state `ψ`: under the Theorem 10.4 hypotheses (`hmin`/`hE₀`/`hcas`)
+and with `(k, hk, hkm)` matching the transport's sector, `ψ` (unique ground state `hGS` at
 half filling `hψN`) lies in the `(N+1)`-electron `E₀`-ground submodule. -/
 example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
     (hT : ∀ i j, T i j = T j i) (U : Fin (N + 1) → ℝ) (E₀ : ℂ)
@@ -247,8 +241,8 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N +
     (hcas := hcas) (hw0 := hw0) (hwG := hwG) (hz := hz) (k := k) (hk := hk) (hkm := hkm)
     (hGS := hGS) (hψN := hψN)
 
-/-- Pins **C3**, the Casimir value on that same sector ground state (design §3 item 3): under the
-full Theorem 10.5 model hypotheses (`hbip`, `hT_conn`, `hU`) and PR-3's `(k, hk, hkm)`, `ψ` is an
+/-- Pins **C3**, the Casimir value on that same sector ground state: under the
+full Theorem 10.5 model hypotheses (`hbip`, `hT_conn`, `hU`) and with `(k, hk, hkm)`, `ψ` is an
 eigenvector of the total-spin Casimir `Ŝ²` with eigenvalue `liebRepulsiveSpinCasimir A =
 S₀(S₀+1)`, `S₀ := L/2`. -/
 example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)

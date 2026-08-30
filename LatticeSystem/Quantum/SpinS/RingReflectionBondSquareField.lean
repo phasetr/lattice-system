@@ -10,8 +10,6 @@ cancelling the single-ion terms against `−d Σ (Ŝ³ₓ)²` (`d = 1`), and reg
 scalar parts.  The scalar constant `C(h)` and the collapse inequality `e^{−βC} ≤ 1` are consumed
 at later reflection-positivity stages (PR-BS3 constant-field, PR-BS10 uniform-field);
 `(★)` and Hermiticity are all that PR-BS1 provides.
-
-See `.self-local/docs/math-tasaki-4-1-48-bond-square-reduction.md` (issue #4777).
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionFieldPartitionSymmetry
 import LatticeSystem.Quantum.SpinS.RingReflectionRightEqTheta

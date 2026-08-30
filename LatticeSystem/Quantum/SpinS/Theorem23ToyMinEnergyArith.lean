@@ -6,7 +6,7 @@ import Mathlib.Analysis.RCLike.Basic
 Issue #3542 (sound Perron–Frobenius route to Tasaki §2.5 Theorem 2.3).
 
 This file isolates the purely real-arithmetic step of the toy minimum-energy bound
-(option (a); see `.self-local/tex/3716-tasaki-2-5-toy-min-energy-bound.tex`).
+(option (a)).
 
 On the joint sublattice-Casimir eigenspace `W_{a,b}` (sublattice spins `a ≤ s_A`,
 `b ≤ s_B` with `s_B ≤ s_A`) the toy Hamiltonian

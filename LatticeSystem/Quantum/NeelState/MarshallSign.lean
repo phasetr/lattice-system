@@ -47,8 +47,7 @@ configuration `σ : V → Fin 2`, returns `(-1)^(N_A^↓)`:
 
 This is the generic form of the chain / 2D / 3D Marshall signs;
 those are obtained by instantiating `A` with the corresponding
-parity colouring. Aligns with the project-wide graph-centric
-design philosophy (CLAUDE.local.md). -/
+parity colouring. -/
 noncomputable def marshallSignOf {V : Type*} [Fintype V]
     (A : V → Bool) (σ : V → Fin 2) : ℂ :=
   ∏ x : V, if A x then ((-1 : ℂ) ^ (σ x : ℕ)) else 1

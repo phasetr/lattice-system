@@ -12,8 +12,7 @@ converge to the respective ground-state energies (`(χ1-a)`,
 (`le_of_tendsto_of_tendsto`) yields `E_GS(0) ≤ E_GS(h)`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §4.1, (4.1.40)/(4.1.49), book pp. 85–86.  See
-`.self-local/docs/math-tasaki-4-1-40-free-energy-t0-ground-energy.md` (issue #4777).
+2020), §4.1, (4.1.40)/(4.1.49), book pp. 85–86.
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareUniformBound
 import LatticeSystem.Quantum.SpinS.FreeEnergyGroundEnergyLimit

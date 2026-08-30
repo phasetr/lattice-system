@@ -1,10 +1,10 @@
 import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbation
 
 /-!
-# Test coverage for the generic `IsUniqueGroundStateOn` shift/uniqueness lemmas (Theorem 10.8, PR-1)
+# Test coverage for the generic `IsUniqueGroundStateOn` shift/uniqueness lemmas (Theorem 10.8)
 
 Pins the API contract of the generic `IsUniqueGroundStateOn` infrastructure that Theorem 10.8's
-discharge (design report `.self-local/docs/theorem-10-8-design.md` §1) needs, and that must live
+discharge needs, and that must live
 in `Math/MatrixAnalysis/DegeneratePerturbation.lean` next to
 `IsUniqueGroundStateOn.smul_of_norm_one`:
 

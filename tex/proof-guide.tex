@@ -1435,8 +1435,8 @@ is positive, which is what makes the eigenvector nonzero.
 As in §\ref{subsec:ising-low-energy-matrix}, that the compression
 restricts $\hat H$ to an invariant subspace is nowhere established
 here, so \texttt{tightBindingEnergy $\lambda$ $\kappa$} --- an
-eigenvalue of \texttt{lowEnergyMatrix} shifted by $-N/4$, equivalently
-an eigenvalue of the tight-binding part \texttt{tightBindingRing} ---
+eigenvalue of the tight-binding part \texttt{tightBindingRing}, i.e.\ of
+\texttt{lowEnergyMatrix} with the constant $-N/4$ subtracted ---
 is not identified with a ground-state or first-excited energy of
 $\hat H$, and the source's non-rigorous Taylor steps (S.36)--(S.38) are
 not asserted. The constant $\kappa_\infty$ of (S.35), the existence of
@@ -1523,8 +1523,8 @@ $\tanh \kappa_\infty \to 1$, both as $\lambda \downarrow 0$
 As in §\ref{subsec:ising-low-energy-eigenvectors}, that the compression
 restricts $\hat H$ to an invariant subspace is nowhere established
 here, so $\varepsilon_\infty$ is the $L \uparrow \infty$ value of an
-eigenvalue of \texttt{lowEnergyMatrix} shifted by $-N/4$ ---
-equivalently, of the tight-binding part \texttt{tightBindingRing} ---
+eigenvalue of the tight-binding part \texttt{tightBindingRing}, i.e.\ of
+\texttt{lowEnergyMatrix} with the constant $-N/4$ subtracted,
 and is not identified with a ground-state or first-excited energy of
 $\hat H$; the source's non-rigorous Taylor steps (S.36)--(S.38) are not
 asserted. The existence of the two finite-$L$ roots, the sign of the
@@ -1639,9 +1639,9 @@ asymptotics. Uniqueness of the root in either sector is neither proved
 nor used --- every statement quantifies over all positive roots. As in
 §\ref{subsec:ising-low-energy-eigenvectors}, that the compression
 restricts $\hat H$ to an invariant subspace is nowhere established
-here, so \texttt{tightBindingEnergy} is an eigenvalue of
-\texttt{lowEnergyMatrix} shifted by $-N/4$ --- equivalently, of the
-tight-binding part \texttt{tightBindingRing} --- and is not identified
+here, so \texttt{tightBindingEnergy} is an eigenvalue of the
+tight-binding part \texttt{tightBindingRing}, i.e.\ of
+\texttt{lowEnergyMatrix} with the constant $-N/4$ subtracted, and is not identified
 with a ground-state or first-excited energy of $\hat H$; the label ring
 is a ring of basis labels, not of lattice sites, and the chain stays
 open. The asymptotics (S.41) are not part of
@@ -1885,9 +1885,9 @@ this development declines to make.
 \paragraph{Scope.}
 That the compression restricts $\hat H$ to an invariant subspace is
 nowhere established here, so \texttt{tightBindingEnergy} is treated only
-as an eigenvalue of \texttt{lowEnergyMatrix} shifted by $-N/4$ ---
-equivalently, as an eigenvalue of the tight-binding part
-\texttt{tightBindingRing} of conjunct 2 --- and neither it nor the
+as an eigenvalue of the tight-binding part
+\texttt{tightBindingRing} of conjunct 2, i.e.\ of \texttt{lowEnergyMatrix}
+with the constant $-N/4$ subtracted, and neither it nor the
 difference of conjunct 8 is identified with the ground-state energy or
 the first-excited energy of $\hat H$. The refusal rests on the absence
 of a proof of invariance rather than on a claim that invariance fails:
@@ -4363,8 +4363,8 @@ structure: an alternating spin assignment from a Boolean
 sublattice indicator, and a per-bond $\hat S_x \cdot \hat S_y$
 action / expectation governed by whether the bond crosses the
 sublattice partition.  Tasaki §2.5 abstracts this to any bipartite
-graph; the Lean formalisation captures the abstraction
-(graph-centric design, \texttt{CLAUDE.local.md}) via a single
+graph; following the project-wide graph-centric design, the
+Lean formalisation captures that abstraction in a single
 generic $\texttt{neelStateOf}$ from a Boolean indicator
 $A : V \to \texttt{Bool}$.
 
@@ -4908,39 +4908,16 @@ Lean: \texttt{dressedHeisenbergShifted\_offdiag\_nonneg},
 
 \medskip
 \textbf{Setting.}
-Let $n$ be a finite type and $A : \mathrm{Matrix}(n,n,\mathbb{R})$ be:
+Let $n$ be a finite type and $A : \mathrm{Matrix}(n,n,\mathbb{R})$, subject to:
 \begin{itemize}
-  \item \emph{symmetric} (\texttt{A.IsHermitian}),
+  \item $n$ \emph{nonempty} (\texttt{[Nonempty n]}); over an empty index type
+    \texttt{IsIrreducible} holds vacuously while the only vector is $0$, so the
+    strictly positive eigenvector below would not exist,
+  \item $A$ \emph{symmetric} (\texttt{A.IsHermitian}),
   \item \emph{non-negative}: $A_{ij} \geq 0$ for all $i,j$,
   \item \emph{irreducible} (\texttt{A.IsIrreducible}): for every $i,j$
     there exists $k>0$ with $(A^k)_{ij} > 0$.
 \end{itemize}
-
-\subsection{Non-negative max eigenvector (\texttt{exists\_nonneg\_eigenvec\_max})}
-
-\textbf{Statement (sorry).}
-There exists a maximum eigenvalue $\mu$ and a non-zero non-negative eigenvector
-$v : n \to \mathbb{R}$ satisfying $Av = \mu v$, $v \neq 0$,
-$v_i \geq 0$ for all $i$, and $\lambda_k \leq \mu$ for every eigenvalue $\lambda_k$.
-
-\textbf{Mathematical proof sketch.}
-Let $v$ be any max eigenvector (from the spectral theorem) and set $w_i = |v_i|$.
-Since $A_{ij} \geq 0$,
-\[
-  (Aw)_i = \sum_j A_{ij}|v_j| \geq \left|\sum_j A_{ij}v_j\right| = |\mu v_i| = \mu|v_i|,
-\]
-so $w \cdot (Aw) \geq \mu\|w\|^2$.
-The Rayleigh quotient bound gives $w \cdot (Aw) \leq \mu\|w\|^2$, hence equality.
-By the eigenbasis expansion $w \cdot (Aw) = \sum_k \lambda_k c_k^2$ and
-$\|w\|^2 = \sum_k c_k^2$ where $c_k = \langle e_k, w\rangle$,
-equality forces $c_k = 0$ for $\lambda_k < \mu$, giving $Aw = \mu w$.
-
-\textbf{Lean status.}
-The proof is \texttt{sorry}: the Rayleigh equality condition
-$\langle w, Aw\rangle = \mu\|w\|^2 \Rightarrow Aw = \mu w$
-requires computing $\langle w, Aw\rangle$ via the eigenbasis inner product,
-which is blocked by the \texttt{EuclideanSpace}/\texttt{n $\to$ $\mathbb{R}$} API gap in Mathlib.
-Tracked in Issue~\#405.
 
 \subsection{Collatz--Wielandt main results (\texttt{PerronFrobeniusMain})}
 \label{sec:pf-main}
@@ -4948,7 +4925,7 @@ Tracked in Issue~\#405.
 \emph{Source file:} \texttt{LatticeSystem/Math/PerronFrobeniusMain.lean}.
 
 \medskip
-The key results eliminating the sorry from \texttt{exists\_pos\_eigenvec\_max}.
+The Collatz--Wielandt results from which \texttt{exists\_pos\_eigenvec\_max} is proved.
 
 \begin{itemize}
 \item \textbf{\texttt{pos\_of\_nonneg\_eigenvec}.}
@@ -4986,10 +4963,9 @@ Under the above hypotheses,
 $\exists\,\mu\,\exists\,v,\; Av = \mu v \;\land\; v \neq 0 \;\land\; \forall i,\; v_i > 0$.
 
 \textbf{Proof.}
-Call \texttt{exists\_positive\_eigenvector\_of\_irreducible} directly.
-The sorry-bearing \texttt{exists\_nonneg\_eigenvec\_max} is bypassed entirely.
-(The sorry is retained in that function for documentation of the unresolved
-Rayleigh equality approach.)
+Call \texttt{exists\_positive\_eigenvector\_of\_irreducible} (\S\ref{sec:pf-main}),
+whose Collatz--Wielandt route supplies $\mu$ and $v>0$ with $Av=\mu v$;
+$v \neq 0$ follows from $v_i > 0$ at any index.
 
 \subsection{Uniqueness (\texttt{pos\_eigenvec\_unique})}
 
@@ -5015,8 +4991,7 @@ Lean name & Status & Notes \\
 \texttt{pos\_of\_nonneg\_eigenvec} & proved & PR C \\
 \texttt{exists\_positive\_eigenvector\_of\_primitive} & proved & PR C; Seneta \S1.2 \\
 \texttt{exists\_positive\_eigenvector\_of\_irreducible} & proved & PR C; Seneta \S1.2 \\
-\texttt{exists\_nonneg\_eigenvec\_max} & sorry & Rayleigh step; retained for docs \\
-\texttt{exists\_pos\_eigenvec\_max} & \textbf{sorry-free} & bypasses sorry via PR C \\
+\texttt{exists\_pos\_eigenvec\_max} & proved & Collatz--Wielandt route (\S\ref{sec:pf-main}) \\
 \texttt{pos\_eigenvec\_unique} & proved & $r = \sup_i w_i/v_i$ \\
 \hline
 \end{tabular}
@@ -6647,8 +6622,7 @@ $\operatorname{Tr}[W_{\rm GS}S^{x,y}W_{\rm GS}(S^{x,y})^{\mathsf H}]>0$; reality
 $S^{x,y}$ with Hermitian $W_{\rm GS}$ makes the imaginary part vanish. The only
 new Lean work is $S^{x,y}$, the single-hop $\hat c^\dagger_{x,\sigma}\hat
 c_{y,\sigma}$ matrix element, and the factorization; the endgame is the existing
-trace lemma. (Design note:
-\texttt{.self-local/docs/theorem-10-3-tian-pair-correlation-discharge-design.md}.)
+trace lemma.
 
 \medskip
 \noindent\textbf{Spin-reflection-positivity foundation (PR1 toward discharging
@@ -14936,7 +14910,7 @@ $\sqrt{2q_0}$) plus an eventual $\mu=0$ half-filling GS
 with $\hat S_{\mathrm{tot}}^{(3)}\Phi=0$, two-axis ODLRO $\ge q_0$, nonzero window tower states, and
 the \textbf{uniform window-ratio pinning} --- eventually every one-step ratio
 $r_M=\langle\Gamma_{M+1},\hat O_L^+\Gamma_M\rangle/L^d$ in the window is within $\varepsilon$ of
-$m^\ast$ (math-note §3.4 refinement 2), which subsumes the $\theta=0$ mean limit
+$m^\ast$, which subsumes the $\theta=0$ mean limit
 $\langle\Xi_0,\hat O_L^{(1)}\Xi_0\rangle/L^d\to m^\ast$ (eq.~5.3.7) \emph{and} drives the eq.~5.3.8
 second-moment concentration ($S_2=\mathrm{avg}\,r_M^2$, $S_{11}=\mathrm{avg}\,r_M r_{M+1}\to
 m^{\ast 2}$) axiom-free from one source; the axis-1 singlet and reversal invariance of the SU(2)
@@ -17576,8 +17550,7 @@ argument is Tasaki's eq.~(2.5.12) (p.~41, in the proof of Theorem~2.2, of which
 the proof of Theorem~2.3 is a modification): the toy ground state has the same
 Marshall-positive expansion, so its overlap with the antiferromagnetic ground
 state cannot vanish, which with the uniqueness inside the sector pins that
-state's total Casimir.  See
-\texttt{.self-local/docs/tasaki-2-5-pf-route-design.md} and Issue~\#3542.
+state's total Casimir.  (Issue~\#3542.)
 
 \textbf{Where the current account is.}  The state of Theorem~2.3 today is the
 next subsection, \emph{DONE: Tasaki §2.5 Theorem 2.3 for the standard bipartite
@@ -22151,9 +22124,7 @@ used at the current stage.
 \end{thebibliography}
 
 \begin{remark}
-The bibliography lists every reference named in either
-\texttt{CLAUDE.local.md} (local planning notes) or this guide. Entries
-labelled \emph{not yet used} are retained so that future work can cite
+Entries labelled \emph{not yet used} are retained so that future work can cite
 them without re-establishing the bibliography; the current code uses
 only the entries explicitly referenced above.
 \end{remark}

@@ -28,7 +28,7 @@ namespace LatticeSystem.Tests.AKLTOpenChainProblem723b
 open MvPolynomial
 open LatticeSystem.Quantum LatticeSystem.Math LatticeSystem.Quantum.AKLTUniqueness
 
-/-! ## 1. `WeightedHomogeneousLayer` additions (design §3(A)) -/
+/-! ## 1. `WeightedHomogeneousLayer` additions -/
 
 /-- `weight_siteWeight_apply`: the per-site weight of a multidegree `d`, evaluated at a single site
 `y`, is exactly the total exponent of `y`'s two Weyl variables `(y,0)` and `(y,1)`. -/
@@ -42,7 +42,7 @@ example (L : ℕ) (y : Fin L) :
     (∑ x : Fin L, Finsupp.single x 2 : Fin L →₀ ℕ) y = 2 :=
   weylMapWeight_apply 2 y
 
-/-! ## 2. `ProductBondDivisibility` refactor: `_of_witness` split (design §3(B)) -/
+/-! ## 2. `ProductBondDivisibility` refactor: `_of_witness` split -/
 
 /-- `fBond_isRelPrime_of_witness`: the general witness-based coprimality lemma, valid for `1 < L`
 (no `3 ≤ L` needed), so it can be reused at `L = 2` on `openBonds`. -/
@@ -64,7 +64,7 @@ example (L : ℕ) (hL : 3 ≤ L) (Ψ : (Fin L → Fin 3) → ℂ) (hΨ0 : Ψ ≠
     ∃ c : ℂ, weylMap Ψ = MvPolynomial.C c * ∏ x : Fin L, fBond x :=
   weylMap_ground_form_eq_const_smul_prod hL Ψ hΨ0 hΨ
 
-/-! ## 3. Open-bond separation and coprimality (design §3(C1)) -/
+/-! ## 3. Open-bond separation and coprimality -/
 
 /-- `exists_open_bond_var_witness`: distinct open bonds have a separating variable witness, with
 **no** hypothesis on `L` at all (unlike the cyclic `exists_bond_var_witness`, which needs
@@ -80,7 +80,7 @@ example (L : ℕ) (hL : 2 ≤ L) {x y : Fin L} (hx : x ∈ openBonds L) (hy : y 
     IsRelPrime (fBond x) (fBond y) :=
   fBond_isRelPrime_openBonds hL hx hy hxy
 
-/-! ## 4. Per-site homogeneity of the bond factor and of the bond product (design §3(C2)) -/
+/-! ## 4. Per-site homogeneity of the bond factor and of the bond product -/
 
 /-- `fBond_isWeightedHomogeneous`: each global bond factor `f_x` is `siteWeight`-homogeneous of
 the two-site degree `single x 1 + single (ringSucc x) 1`. -/
@@ -101,7 +101,7 @@ load-bearing `hq0` hypothesis of the weighted cofactor lemma. -/
 example (L : ℕ) (hL : 1 < L) : (∏ x ∈ openBonds L, fBond x) ≠ 0 :=
   prod_openBonds_fBond_ne_zero hL
 
-/-! ## 5. Per-site bookkeeping: the boundary/interior degree split (design §3(C3)) -/
+/-! ## 5. Per-site bookkeeping: the boundary/interior degree split -/
 
 /-- **Wrap-bond leak control**, part 1: at an *interior* site (both neighbours present) the summed
 open-bond degree is `2` — this is the value **every** site would carry if the sum ranged over
@@ -131,10 +131,10 @@ example :
         ⟨0, by omega⟩ = 1 :=
   prodWeight_apply_first (L := 3) (by norm_num)
 
-/-! ## 6. (S.77) itself — the boundary-quadratic factorization (design §3(C5)) -/
+/-! ## 6. (S.77) itself — the boundary-quadratic factorization -/
 
 /-- **Tasaki Problem 7.2.3.b, eq. (S.77), p. 508** (printed upper product index `L` corrected to
-`L - 1`, design §1).  The Weyl image of any open-chain ground form factors as a boundary quadratic
+`L - 1`).  The Weyl image of any open-chain ground form factors as a boundary quadratic
 `Σ c_{ab} X_{(first,a)} X_{(last,b)}` — involving **only** the two boundary sites, never an interior
 one — times the product of the `L − 1` open bond factors. -/
 example {m : ℕ} (Ψ : (Fin (m + 2) → Fin 3) → ℂ)
@@ -147,7 +147,7 @@ example {m : ℕ} (Ψ : (Fin (m + 2) → Fin 3) → ℂ)
             * ∏ x ∈ openBonds (m + 2), fBond x :=
   weylMap_openGroundForm_eq_boundary_smul_prod Ψ hΨ
 
-/-! ## 7. Completeness capstone (design §3(D)) -/
+/-! ## 7. Completeness capstone -/
 
 /-- `openGroundSpace_isVBSGroundForm`: the open spectral bridge — every ground state of the open
 AKLT chain has the VBS singlet-tensor form at every open bond. -/

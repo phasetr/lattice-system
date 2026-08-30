@@ -36,9 +36,9 @@ Five groups, mirroring the general-`N` Weyl-map gate `WeylMapGeneralN.lean`:
    `bondLocal_ker_eq_vbsBondSubspace`, `f2_dvd_weylMap_of_mem_vbsBondSubspace`).  Both routes prove
    the *same* proposition, so what is pinned is the signature — that the general-`S` theorem still
    instantiates verbatim to the bespoke spin-one statement — and not a numeric value: the sign of
-   the Casimir-descent scalars (design pitfall 5: the scalars are `N(N+1) − j(j+1)`, not `j(j+1)`)
-   is pinned in `Tests/GeneralSCasimirDescent.lean`, Groups 3–4
-   (`casimirPenaltyScalars 2 1 = [6, 4]`, `casimirDescentStep 2 f₂ = 0`).  Plus `onEmbS_list_prod`
+   the Casimir-descent scalars (they are `N(N+1) − j(j+1)`, not `j(j+1)`) is pinned in
+   `Tests/GeneralSCasimirDescent.lean`, Groups 3–4 (`casimirPenaltyScalars 2 1 = [6, 4]`,
+   `casimirDescentStep 2 f₂ = 0`).  Plus `onEmbS_list_prod`
    referenced from the shared embedding module `SiteBlockEmbeddingD5b` rather than from any
    `N`-specific consumer, which is what lets the general-`S` module reduce a bond term to `onEmbS`
    without importing the `N = 3` certificate tables.

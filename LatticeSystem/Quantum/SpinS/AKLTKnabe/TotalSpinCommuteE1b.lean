@@ -7,7 +7,7 @@ import LatticeSystem.Quantum.SpinS.TotalSpin
 
 This module (Issue #5094; Tasaki §7.1.4, Knabe's argument, pp. 188–190) is the **minimal
 experiment** of the `sl₂`-ladder route to the Knabe window inequality
-`ĥ² ≥ (2/5) ĥ` (design note `aklt-theorem-7-1-e1a-general-window-bound-design.md`, §(h)):
+`ĥ² ≥ (2/5) ĥ`:
 the open three-bond window
 
   `ĥ = P̂₀₁ + P̂₁₂ + P̂₂₃`  on `(ℂ³)^{⊗4}`  (Tasaki eq. (7.1.30) with `ℓ = 3`, p. 189)

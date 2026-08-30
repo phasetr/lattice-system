@@ -18,12 +18,13 @@ equality `m∗ = √(3 q∗)` of Conjecture 4.12, the normalized solid-angle ave
 
 This file provides only the defining predicates and geometry.  The proposition itself is *proved*
 (conditional on Conjecture 4.12 and the `ô²`-concentration documented axiom) downstream in
-`AndersonTowerSphereGroundState` as `tanakaSphereAverage_groundState`.  Following the established
-design: the solid-angle average is the Bochner integral over the unit sphere in
-`EuclideanSpace ℝ (Fin 3)` with the surface measure `volume.toSphere` (`solidAngleAverageTanaka`);
-Conjecture 4.12 is an explicit `Prop` hypothesis (`IsConjecture412Equality`, never asserted as true
-here); the convergence is stated up to a unimodular phase (`Φ_GS` is only defined up to phase); and
-it is conditional on long-range order (vacuous in one dimension by Corollary 4.3).
+`AndersonTowerSphereGroundState` as `tanakaSphereAverage_groundState`.  The conventions fixed
+here: the solid-angle average is the Bochner integral over the unit sphere in
+`EuclideanSpace ℝ (Fin 3)` with the surface measure `volume.toSphere`
+(`solidAngleAverageTanaka`); Conjecture 4.12 is an explicit `Prop` hypothesis
+(`IsConjecture412Equality`, never asserted as true here); the convergence is stated up to a
+unimodular phase (`Φ_GS` is only defined up to phase); and it is conditional on long-range order
+(vacuous in one dimension by Corollary 4.3).
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §4.2.1, Proposition 4.10, eqs. (4.2.17)–(4.2.22), pp. 99–100.

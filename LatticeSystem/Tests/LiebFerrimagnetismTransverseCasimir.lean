@@ -9,10 +9,9 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismTransverseCa
 Specification suite for
 `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismTransverseCasimir.lean`.
 The `example` pins down the exact signature of
-`sum_fermionSpinTransverse_eq_totalSpinSquared_sub_spinZ_sq`, mirroring PR-1's specification style
-(`Tests/LiebFerrimagnetismStaggeredAlgebra.lean`), so that the implementation cannot silently
-drift from the design's exact statement
-(`.self-local/docs/theorem-10-6-design.md`, PR-2 section).
+`sum_fermionSpinTransverse_eq_totalSpinSquared_sub_spinZ_sq`, mirroring the specification style of
+`Tests/LiebFerrimagnetismStaggeredAlgebra.lean`, so that the implementation cannot silently
+drift from the pinned statement.
 -/
 
 namespace LatticeSystem.Tests.LiebFerrimagnetismTransverseCasimir

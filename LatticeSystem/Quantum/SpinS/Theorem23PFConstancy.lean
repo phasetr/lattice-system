@@ -4,8 +4,7 @@ import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorEigenvalueUnique
 /-!
 # Tasaki §2.5 Theorem 2.3 — Perron–Frobenius adjacent-sector energy bound
 
-Sound Perron–Frobenius route (Issue #3542; see
-`.self-local/docs/tasaki-2-5-pf-route-design.md`).  Combining the
+Sound Perron–Frobenius route (Issue #3542).  Combining the
 adjacent-sector ladder link (`Theorem23PFLadderLink.lean`) with the
 per-sector spectral lower bound for Marshall-positive ground states
 (`heisenbergHamiltonianSReMatrixOnMagSector_eigenvalue_ge_of_marshallPositive`),

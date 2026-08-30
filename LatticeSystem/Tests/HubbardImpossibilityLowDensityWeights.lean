@@ -8,7 +8,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaGroundStateCore
 
 Continues the numbering of `LatticeSystem.Tests.HubbardImpossibilityLowDensity` (Red 1–31) and
 `LatticeSystem.Tests.HubbardImpossibilityLowDensityRoth` (Red 32–41) in a sibling module, per the
-PR-6 precedent: the first module is already at 714 lines, past the 700-line review trigger.
+PR-6 precedent: the first module is already past the 700-line review trigger.
 
 The three checks pin the `Ŝ³`-weight machinery of `hubbardEigenspaceAt` and the `SU(2)`
 raising-chain existence lemma `exists_topWeight_of_maxSpin`:

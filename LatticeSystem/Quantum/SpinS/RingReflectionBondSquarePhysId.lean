@@ -27,9 +27,6 @@ field-carrying slots of the reflection step collapse to Tasaki's **sign-free cla
 `Z^{BS}(g)² ≤ Z^{BS}(reflectLeft n g)·Z^{BS}(reflectRight n g)`
 (`ringBondSquareFieldPartitionRe_reflection_step`), the finite-β partition-function form of Tasaki's
 bond-square reflection bound (4.1.51) (of which the T = 0 bound is the `β → ∞` shadow).
-
-See `.self-local/docs/math-tasaki-4-1-51-bond-square-physical-field-reflection-step.md`
-(issue #4777, §2/§4, PR-BS8b).
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareGaugeCrux
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareFieldPartition
@@ -69,7 +66,7 @@ theorem ringBondSquareFieldPartitionRe_physFieldOf (G : AxisTwoPiRotS N) (n : �
   rw [ringBondSquareFieldPartitionRe, thermalPartitionFnS, thermalGibbsOpS,
     ringBondSquareTwoFieldWeight, hexp, G.trace_rightGauge_conj n]
 
-/-- **Bridge to the staggered relabel** (note §4 (REL)): the staggered wrapper of the linear split
+/-- **Bridge to the staggered relabel** `(REL)`: the staggered wrapper of the linear split
 field is literally the staggered relabel `P = ringStaggeredRelabel n` of the linear split field,
 `physBondSquareFieldOf n a b = ringStaggeredRelabel n (physFieldOf n a b)` (both sides
 `fun z ↦ (−1)ᶻ · physFieldOf n a b z`).  This is what makes the reflection step's three field slots
@@ -77,7 +74,7 @@ collapse to the sign-free classical mirrors (4.1.50) rather than the signed line
 private theorem physBondSquareFieldOf_eq_relabel (n : ℕ) [NeZero n] (a b : Fin (2 * n) → ℝ) :
     physBondSquareFieldOf n a b = ringStaggeredRelabel n (physFieldOf n a b) := rfl
 
-/-- **The diagonal wrapper field is its own splitting** (note §4 L1).  With right field
+/-- **The diagonal wrapper field is its own splitting** `(L1)`.  With right field
 `b x = −(P g)(r x)` the staggered wrapper `physBondSquareFieldOf n (P g) b` collapses to `g`:
 via the bridge `(REL)` it is `P(physFieldOf n (P g)(−(P g)∘r)) = P(P g) = g` (`physFieldOf_self`
 gives the inner `= P g`, `ringStaggeredRelabel_involutive` closes `P(P g) = g`).  This exhibits an
@@ -88,7 +85,7 @@ theorem physBondSquareFieldOf_self (n : ℕ) [NeZero n] (g : Fin (2 * n) → ℝ
         (fun x => - (ringStaggeredRelabel n g) (ringReflect n x)) = g := by
   rw [physBondSquareFieldOf_eq_relabel, physFieldOf_self, ringStaggeredRelabel_involutive n g]
 
-/-- **Diagonal-left collapse to the classical mirror** (note §4 L2).  The diagonal wrapper split at
+/-- **Diagonal-left collapse to the classical mirror** `(L2)`.  The diagonal wrapper split at
 the relabelled field is Tasaki's sign-free left reflected copy (4.1.50):
 `physBondSquareFieldOf n (P g)(P g) = LatticeSystem.Math.reflectLeft n g`.  Via `(REL)` it equals
 `P(physFieldOf n (P g)(P g)) = P(ringFieldReflectLeft n (P g)) = P(P(reflectLeft n g))
@@ -103,7 +100,7 @@ private theorem physBondSquareFieldOf_diag_left (n : ℕ) [NeZero n] (g : Fin (2
   rw [← ringStaggeredRelabel_reflectLeft n g]
   exact ringStaggeredRelabel_involutive n (LatticeSystem.Math.reflectLeft n g)
 
-/-- **Diagonal-right collapse to the classical mirror** (note §4 L3).  Symmetric to the left case:
+/-- **Diagonal-right collapse to the classical mirror** `(L3)`.  Symmetric to the left case:
 `physBondSquareFieldOf n (−(P g)∘r)(−(P g)∘r) = LatticeSystem.Math.reflectRight n g`, Tasaki's
 sign-free right reflected copy (4.1.50), via `(REL)` and the cancellation of the two staggered
 relabels (`ringStaggeredRelabel_reflectRight` + `ringStaggeredRelabel_involutive`). -/

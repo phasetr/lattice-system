@@ -9,7 +9,7 @@ import Mathlib.Order.Interval.Finset.Fin
 
 This file builds, from mathlib's Hermitian spectral theorem and the Loewner order, the ingredients
 of Weyl eigenvalue monotonicity (Tasaki Theorem A.7), discharging
-`hermitian_eigenvalues₀_monotone`.  See `.self-local/docs/courant-fischer-design.md`.
+`hermitian_eigenvalues₀_monotone`.
 
 The first layer records the *pointwise Rayleigh monotonicity* of the (unnormalized) energy
 quadratic form `rayleighOnVec M v = (star v ⬝ᵥ M v).re` under the Loewner order: `A ≤ B` is exactly

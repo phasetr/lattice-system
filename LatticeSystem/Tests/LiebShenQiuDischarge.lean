@@ -1,51 +1,46 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebShenQiuDischarge
 
 /-!
-# Test coverage for the Theorem 10.8 capstone assembly and axiom discharge (PR-5)
+# Test coverage for the Theorem 10.8 capstone assembly and axiom discharge
 
-Pins the API contract of PR-5 of the Theorem 10.8 discharge, PR-5 design §2 "New file
-`LiebShenQiuDischarge.lean`", against
+Pins the API contract of
 `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebShenQiuDischarge.lean`.
 
-The design's 6 helper lemmas (items 1–6, design §2) are `private` to that file by construction
-(design §2 header: "6 `private` + 1 public capstone"), so they cannot be referenced by name from
-this file and are **not** pinned here individually; their correctness is exercised only through the
-one public declaration below.
+The six helper lemmas of that file are `private` by construction, so they cannot be referenced by
+name from here and are **not** pinned individually; their correctness is exercised only through
+the one public declaration below.
 
-1. **CAP** `theorem_10_8_lieb_shen_qiu_superconductivity` — the capstone (design §2 item 7),
-   **statement-identity pin**: the elaborated type is captured verbatim from the current `axiom`
-   in `LiebShenQiu.lean` (before its deletion) via
-   `lake env lean` on `#check @theorem_10_8_lieb_shen_qiu_superconductivity`, and restated here in
+1. **CAP** `theorem_10_8_lieb_shen_qiu_superconductivity` — the capstone,
+   **statement-identity pin**: the elaborated type, as reported by `lake env lean` on
+   `#check @theorem_10_8_lieb_shen_qiu_superconductivity`, is restated here in
    full so that a future refactor of the capstone's proof cannot silently reorder/add/drop a
-   binder or a conjunct without breaking this pin (design §3 step 6, the PR-2 `INV`-pin
-   precedent, `Tests/LiebShenQiuShibaBridge.lean` `INV`).
+   binder or a conjunct without breaking this pin (the same discipline as the `INV` pin of
+   `Tests/LiebShenQiuShibaBridge.lean`).
 
-This file **fails to elaborate** until `LiebShenQiuDischarge.lean` exists, is wired into
-`LatticeSystem/Fermion/JordanWigner.lean` (build root), and its capstone theorem carries exactly
-the pinned type below (TDD Red for the whole PR-5 arc: design §3, §7 "Statement pin").
+This file **fails to elaborate** unless `LiebShenQiuDischarge.lean` is wired into
+`LatticeSystem/Fermion/JordanWigner.lean` (build root) and its capstone theorem carries exactly
+the pinned type below.
 
-**Not covered here** (design §7, not independently testable from this file):
-* the "instantiation smoke test" at `N = 1`, `A = {0}`, `Ne = 2` is omitted — fabricating a
+**Not covered here** (not independently testable from this file):
+* an "instantiation smoke test" at `N = 1`, `A = {0}`, `Ne = 2` — fabricating a
   placeholder `hGS : IsUniqueGroundStateOn ... E φ` witness without `sorry` (repo policy) requires
   actually producing a ground state, which duplicates Theorem 10.2/10.4's own tests; the capstone
-  is exercised end-to-end instead by the eventual proof body itself.
+  is exercised end-to-end instead by its own proof body.
 * the "degenerate-branch witness" (`liebShenQiuPairLowerBound A Ne = 0` when
-  `A.card = N + 1 ∧ Ne = 2 * (N + 1)`) is a fact about the *existing* `liebShenQiuPairLowerBound`
-  definition alone (already provable against `main`, independent of this PR's new file), so it is
-  not a Red regression for PR-5 and is left to the design's own verification notes rather than
-  duplicated here.
-* helper #4 sanity (`liebShenQiu_spinPlusMinus_expectation_eq` at `N = 0`) is `private`
-  (design §2 item 4) and hence unreachable from this file.
+  `A.card = N + 1 ∧ Ne = 2 * (N + 1)`) is a fact about the `liebShenQiuPairLowerBound`
+  definition alone and is independent of the discharge file, so it guards nothing here.
+* helper sanity for `liebShenQiu_spinPlusMinus_expectation_eq` at `N = 0`, which is `private`
+  and hence unreachable from this file.
 -/
 
 namespace LatticeSystem.Tests.LiebShenQiuDischarge
 
 open LatticeSystem.Fermion LatticeSystem.Quantum LatticeSystem.Math Matrix
 
-/-- Pins **CAP**: the statement of `theorem_10_8_lieb_shen_qiu_superconductivity` after PR-5's
-axiom deletion and re-proof must be *byte-for-byte* the same elaborated type as the `axiom` it
-replaces (design §3). The type below is the verbatim `#check` output captured against the `axiom`
-in `LiebShenQiu.lean` on this branch, before deletion. -/
+/-- Pins **CAP**: the elaborated statement of `theorem_10_8_lieb_shen_qiu_superconductivity` must
+be *byte-for-byte* the type restated below.  That type is the whole of the Theorem 10.8 obligation,
+so the pin guards not only the interface shape but that the theorem carries the obligation in full
+rather than a weakened variant: reordering, adding or dropping any binder or conjunct breaks it. -/
 example :
     ∀ (N Ne : ℕ) (A : Finset (Fin (N + 1))),
       Even Ne →

@@ -6,7 +6,7 @@ import LatticeSystem.Math.ComplexVectorKernel
 # Non-vanishing of one total-spin lowering/raising step on a weight vector
 
 Issue #3542 (sound Perron–Frobenius route to Tasaki §2.5 Theorem 2.3), general-`J`
-`hOutside` thread, step 1 (see `.self-local/docs/tasaki-2-5-lieb-mattis-hOutside-design.md`).
+`hOutside` thread, step 1.
 
 From the SU(2) commutator `[Ŝ⁺_tot, Ŝ⁻_tot] = 2 Ŝ³_tot` (equivalently
 `Ŝ⁺Ŝ⁻ = Ŝ⁻Ŝ⁺ + 2Ŝ³`) and the adjointness `(Ŝ⁻)† = Ŝ⁺`, a weight-`w` vector `Φ`

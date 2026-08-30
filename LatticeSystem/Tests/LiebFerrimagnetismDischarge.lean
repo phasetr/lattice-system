@@ -8,7 +8,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismDischarge
 
 Specification suite for
 `LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismDischarge.lean` (PR-8, the final PR
-of the Theorem 10.6 discharge arc, issue #5347), per the confirmed design (layers C/D/E). The
+of the Theorem 10.6 discharge arc, issue #5347), whose layers are C/D/E below. The
 `example`s pin down the exact signatures of the five **public** declarations: the tower
 ratio-transport equality (`C1`) and its `S₀² ≤ …` corollary (`C2`), the universal
 ground-vector bound (`D2`), the assembled symmetric-form bound (`E2`), and the capstone (`E3`,

@@ -35,7 +35,7 @@ open _root_.Matrix
 /-- **Capstone signature pin.** The Problem 2.4.c capstone
 (`tasaki_problem_2_4_c_coherent_expansion`) takes exactly `[Fintype V] [DecidableEq V]
 [Nonempty V]` and arbitrary `θ φ : ℝ` — no `0 < θ < π` side hypothesis (the route is an exact
-algebraic computation, valid for all real `θ`, `φ`; design §2 L5) and no further typeclass. This
+algebraic computation, valid for all real `θ`, `φ`) and no further typeclass. This
 fixture is fail-closed against a later-added angle hypothesis: adding one to the capstone's own
 signature (not this fixture's) breaks the match. -/
 example {V : Type*} [Fintype V] [DecidableEq V] [Nonempty V] {N : ℕ} (θ φ : ℝ) :
@@ -325,7 +325,7 @@ private lemma saturatedCoherentCoeff_fin_two_zero (θ : ℝ) :
 /-! ## `|Λ| = 1`, `N = 2` components, computed from the definitions -/
 
 /-- The `k = 1` ladder iterate at `|Λ| = 1`, `N = 2` is nonzero only at the middle configuration,
-with value `√2` — the one-site `√(C(N, j))` weight of design §0.3, invisible at every `N = 1`
+with value `√2` — the one-site `√(C(N, j))` weight, invisible at every `N = 1`
 fixture (`C(1, ·) = 1` there). -/
 private lemma ladderIterateUp_fin_one_two_one_apply (τ : Fin 1 → Fin 3) :
     ladderIterateUp (Fin 1) 2 1 τ = if τ 0 = 1 then (Real.sqrt 2 : ℂ) else 0 := by

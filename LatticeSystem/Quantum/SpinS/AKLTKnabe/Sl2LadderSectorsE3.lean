@@ -5,8 +5,7 @@ import LatticeSystem.Quantum.SpinS.MultiSiteCartanPlusMinus
 # Gate E3: the `sl₂` ladder algebra and the magnetisation-sector structure
 
 This module (Issue #5094; Tasaki §7.1.4, Knabe's argument, pp. 188–190) carries out the residual
-work listed in §(f) of the Gate E2 probe report (`aklt-theorem-7-1-e2-submodule-probe.md`), i.e.
-steps (B), (D) of the design note `aklt-theorem-7-1-e1a-general-window-bound-design.md` §2.1:
+work left open by the Gate E2 submodule probe:
 
 1. the third Cartan relation for the **total** spin operators, `[Ŝ⁺_tot, Ŝ⁻_tot] = 2 Ŝ³_tot`,
    is the production lemma `totalSpinSOpPlus_commutator_totalSpinSOpMinus`
@@ -22,7 +21,7 @@ steps (B), (D) of the design note `aklt-theorem-7-1-e1a-general-window-bound-des
 
 For the AKLT window (`Λ = Fin 4`, `N = 2`, i.e. four spin-`1` sites) this yields the highest-weight
 dimensions `dim hw_k = 1, 3, 6, 6, 3` for `k = 0, 1, 2, 3, 4`, which are the multiplicities
-`k_S` of the total-spin `S = 4, 3, 2, 1, 0` sectors of `(ℂ³)^{⊗4}` (design note §1).
+`k_S` of the total-spin `S = 4, 3, 2, 1, 0` sectors of `(ℂ³)^{⊗4}`.
 
 The indexing convention is the natural-number magnetisation index `magSumS σ = Σ_x (σ x).val`,
 which *decreases* when the physical magnetic quantum number increases; the physical value is
@@ -171,7 +170,7 @@ private theorem totalSpinSOp3_mulVec_of_magSectorE3 (k : ℕ) (w : (Λ → Fin (
 
 /-! ## 2. The ladder norm identity and injectivity of `Ŝ⁻_tot` -/
 
-/-- **Design §2.1 (B), assembled**: on the magnetisation sector `V_k` the ladder commutator acts by
+/-- On the magnetisation sector `V_k` the ladder commutator acts by
 the scalar `|Λ|N − 2k`, i.e. `Ŝ⁺Ŝ⁻v − Ŝ⁻Ŝ⁺v = (|Λ|N − 2k) v`. -/
 theorem ladderCommutatorApplyE3 (k : ℕ) (v : ManyBodyVecE2 Λ N)
     (hv : v ∈ magSectorE2 Λ N k) :
@@ -193,7 +192,7 @@ theorem ladderCommutatorApplyE3 (k : ℕ) (v : ManyBodyVecE2 Λ N)
   congr 1
   ring
 
-/-- **Design §2.1 (B)**: the ladder norm identity on the magnetisation sector `V_k`,
+/-- The ladder norm identity on the magnetisation sector `V_k`,
 `‖Ŝ⁻v‖² = ‖Ŝ⁺v‖² + (|Λ|N − 2k)‖v‖²`.  Combines the E2 operator half `ladderInnerNormSqE2`
 with the Cartan relation and the scalar action of `Ŝ³_tot` on `V_k`. -/
 theorem ladderNormSqE3 (k : ℕ) (v : ManyBodyVecE2 Λ N) (hv : v ∈ magSectorE2 Λ N k) :
@@ -215,7 +214,7 @@ theorem ladderNormSqE3 (k : ℕ) (v : ManyBodyVecE2 Λ N) (hv : v ∈ magSectorE
     linear_combination -h2
   exact_mod_cast h3
 
-/-- **Design §2.1 (B), consequence**: `Ŝ⁻_tot` is injective on the magnetisation sector `V_k` as
+/-- `Ŝ⁻_tot` is injective on the magnetisation sector `V_k` as
 soon as `2k < |Λ|N`, i.e. as soon as the physical magnetisation of `V_k` is positive. -/
 theorem eq_zero_of_totalMinusLinE3_eq_zero (k : ℕ) (hk : 2 * k < Fintype.card Λ * N)
     (v : ManyBodyVecE2 Λ N) (hv : v ∈ magSectorE2 Λ N k)
@@ -233,7 +232,7 @@ theorem eq_zero_of_totalMinusLinE3_eq_zero (k : ℕ) (hk : 2 * k < Fintype.card 
 
 /-! ## 3. Surjectivity of `Ŝ⁺_tot` and the highest-weight dimensions -/
 
-/-- **Design §2.1 (D)**: for `2k < |Λ|N` the total raising operator restricted to `V_{k+1}` has
+/-- For `2k < |Λ|N` the total raising operator restricted to `V_{k+1}` has
 image exactly `V_k`.  The inclusion is the sector transport; surjectivity follows from the
 orthogonal decomposition of `V_k` along the image together with the injectivity of `Ŝ⁻_tot` on
 `V_k` (a vector of `V_k` orthogonal to the image is killed by the adjoint `Ŝ⁻_tot`). -/
@@ -263,7 +262,7 @@ theorem range_domRestrict_totalPlusLinE3 (k : ℕ) (hk : 2 * k < Fintype.card Λ
   rw [hz0, add_zero]
   exact hy
 
-/-- **Design §2.1 (D)**: for `2k < |Λ|N`, `dim V_k + dim hw_{k+1} = dim V_{k+1}`, where
+/-- For `2k < |Λ|N`, `dim V_k + dim hw_{k+1} = dim V_{k+1}`, where
 `hw_m = V_m ∩ ker Ŝ⁺_tot`.  Rank–nullity (E2) plus the surjectivity above. -/
 theorem finrank_magSector_add_finrank_highestWeightE3 (k : ℕ)
     (hk : 2 * k < Fintype.card Λ * N) :
@@ -307,7 +306,7 @@ noncomputable def magSectorEquivE3 (k : ℕ) :
     change (if h : magSumS σ.1 = k then f ⟨σ.1, h⟩ else 0) = f σ
     rw [dif_pos σ.2]
 
-/-- **Design §2.1 (D), dimension input**: the magnetisation sector `V_k` has dimension the number
+/-- The magnetisation sector `V_k` has dimension the number
 of configurations with `magSumS σ = k`. -/
 theorem finrank_magSectorE3 (k : ℕ) :
     Module.finrank ℂ (magSectorE2 Λ N k)
@@ -337,7 +336,7 @@ private theorem cardMagE3_four :
     Fintype.card {σ : Fin 4 → Fin (2 + 1) // magSumS σ = 4} = 19 := by decide
 
 /-- The magnetisation-sector dimensions of the four-site spin-`1` chain,
-`dim V_k = 1, 4, 10, 16, 19` for `k = 0, 1, 2, 3, 4` (design note §2.1). -/
+`dim V_k = 1, 4, 10, 16, 19` for `k = 0, 1, 2, 3, 4`. -/
 theorem finrank_magSectorE3_window :
     Module.finrank ℂ (magSectorE2 (Fin 4) 2 0) = 1
       ∧ Module.finrank ℂ (magSectorE2 (Fin 4) 2 1) = 4
@@ -364,7 +363,7 @@ private theorem cardTimesNE3 : Fintype.card (Fin 4) * 2 = 8 := by
 `dim hw_k = 1, 3, 6, 6, 3` for `k = 0, 1, 2, 3, 4`.
 
 These are the multiplicities `k_S` of the total-spin sectors `S = 4, 3, 2, 1, 0` of `(ℂ³)^{⊗4}`
-(design note §1: `k_4 = 1`, `k_3 = 3`, `k_2 = 6`, `k_1 = 6`, `k_0 = 3`, with
+(`k_4 = 1`, `k_3 = 3`, `k_2 = 6`, `k_1 = 6`, `k_0 = 3`, with
 `Σ_S (2S+1) k_S = 81`), which is exactly the dimensional reduction `81 → 1 + 3 + 6 + 6 + 3` that
 the Knabe window bound `ĥ² ≥ (2/5) ĥ` will be checked on. -/
 theorem finrank_highestWeightE3_window :

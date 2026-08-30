@@ -2,12 +2,11 @@ import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationFeshbach
 import LatticeSystem.Tests.DegeneratePerturbationWitness
 
 /-!
-# Test coverage for the exact Feshbach equivalence (Tasaki Lemma 10.1, PR-3)
+# Test coverage for the exact Feshbach equivalence (Tasaki Lemma 10.1)
 
 Pins the API contract of the declarations that
 `Math/MatrixAnalysis/DegeneratePerturbationFeshbach.lean` adds on top of
-`DegeneratePerturbationReducedResolvent.lean` (see
-`.self-local/reports/design-lemma101-pr3-feshbach-equivalence.md` §3b):
+`DegeneratePerturbationReducedResolvent.lean`:
 
 1. `secondOrderEffectiveHamiltonian_isHermitian` (C1) — Hermiticity of the second-order
    effective Hamiltonian, generic in its third argument (serves both `Ĥeff` and `K(λ,E)`).
@@ -26,9 +25,9 @@ Pins the API contract of the declarations that
    `‖K u − Ĥeff u‖ ≤ (4v³/g²) |λ| ‖u‖` under `0 < g`, `|E| ≤ |λ|v` and `4|λ|v ≤ g`.
 
 Also machine-checks the `λ = E = 0` degeneration of C3's `K` to eq. (10.1.20)'s `Ĥeff` (reusing
-PR-2's `IsReducedInverse.unique`), and two `Fin 1` counterexamples showing that `hFirstOrder`
-and `Γ ∈ (matrixKernel H0)ᗮ` are each independently load-bearing in C3 (design report §7.3/§7.4,
-risk R3): dropping either hypothesis produces a genuine (not merely unproved) failure of the
+`IsReducedInverse.unique`), and two `Fin 1` counterexamples showing that `hFirstOrder`
+and `Γ ∈ (matrixKernel H0)ᗮ` are each independently load-bearing in C3:
+dropping either hypothesis produces a genuine (not merely unproved) failure of the
 forward direction, witnessed concretely via `Submodule.starProjection_top`. The `Fin 1`
 scaffolding those two counterexamples run on lives in `Tests/DegeneratePerturbationWitness.lean`,
 shared with the trial-state test file's `V = 0` corner.
@@ -131,7 +130,7 @@ example {H0 V H0inv R : Matrix n n ℂ} (hH0 : H0.IsHermitian)
   rw [h00] at hR
   rw [hR.unique hInv0]
 
-/-- **`hFirstOrder` is load-bearing in C3** (design report §7.3, risk R3): at `n = Fin 1`, take
+/-- **`hFirstOrder` is load-bearing in C3**: at `n = Fin 1`, take
 `H0 = 0`, `V = 1`, `lam = E = 1`, `R = 0` (a reduced inverse of `A(1,1) = 0`, since `P̂₀ = 1`
 collapses the compression). Then `Φ = e₀ ∈ ker Ĥ₀ = ⊤`, `Γ = 0 ∈ (ker Ĥ₀)ᗮ`, and
 `Ξ := Φ + Γ = e₀` genuinely is a `1`-eigenvector of `Ĥ(1) = 0 + 1 • 1 = 1`; every hypothesis of
@@ -176,7 +175,7 @@ example :
     rw [hK0, smul_zero, Complex.ofReal_one, one_smul]
     exact fun h => he0ne h.symm
 
-/-- **`Γ ∈ (ker Ĥ₀)ᗮ` is load-bearing in C3** (design report §7.4, risk R3): at `n = Fin 1`, take
+/-- **`Γ ∈ (ker Ĥ₀)ᗮ` is load-bearing in C3**: at `n = Fin 1`, take
 `H0 = V = 0`, `lam = E = 0`, `R = 0` (a reduced inverse of `A(0,0) = 0`). Since `ker Ĥ₀ = ⊤`,
 `(ker Ĥ₀)ᗮ = ⊥`, so `Γ := e₀ ∉ (ker Ĥ₀)ᗮ`. With `Φ = 0 ∈ ker Ĥ₀`, `Ξ := Φ + Γ = e₀` is a genuine
 `0`-eigenvector of `Ĥ(0) = 0` (the zero operator kills everything); every hypothesis of C3 holds

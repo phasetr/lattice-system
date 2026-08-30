@@ -62,7 +62,7 @@ private lemma t1_signConjMatrix_signConjMatrix_mul {D : Type*} [Fintype D] [Deci
 
 /-- T1b: concretely, two antiunitary twists compose to the identity twist (`(-1) * (-1) = 1`) on a
 genuinely complex `1 × 1` matrix — the fact that reproves the existing involution
-`signConjMatrix_signConjMatrix` from the new lemma, per the design report §2.1. -/
+`signConjMatrix_signConjMatrix` from the general lemma. -/
 private lemma t1_neg_one_neg_one_cancels :
     signConjMatrix (-1 : ℤˣ) (signConjMatrix (-1 : ℤˣ)
       (Complex.I • (1 : Matrix (Fin 1) (Fin 1) ℂ))) =
@@ -91,7 +91,7 @@ private lemma t2_mpsMix_smul_pauliX :
 
 /-! ## T3: the generalised two-sign `symmetryTransportMPS_symmetryTransportMPS` -/
 
-/-- T3: locks the *two-sign* generalisation (§2.2 of the design report): the current production
+/-- T3: locks the *two-sign* generalisation: the current production
 lemma takes a single shared sign `ε` for both transports, so this call — with independent signs
 `ε`, `δ` and the corresponding output `symmetryTransportMPS (ε * δ) (u * signConjMatrix ε v) A`
 (not a bare `mpsMix`) — is a genuine arity/shape change, not merely a missing declaration. -/
@@ -112,8 +112,8 @@ private lemma t3_trivial_instance {D N : ℕ} (A : MPSMatrices D N) :
 
 /-! ## T4: `symmetryTransportMPS_conj` -/
 
-/-- T4a: locks the exact public name/signature of the gauge-transport lemma (§0 step 2 / §2.2 of
-the design report), the one-screen computation that `R_g` moves through a phased conjugate
+/-- T4a: locks the exact public name/signature of the gauge-transport lemma, the one-screen
+computation that `R_g` moves through a phased conjugate
 family. -/
 private lemma t4_symmetryTransportMPS_conj {D N : ℕ} (ε : ℤˣ)
     (u : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) (z : Circle) (V : Matrix (Fin D) (Fin D) ℂ)
@@ -150,8 +150,8 @@ private lemma t4_symmetryTransportMPS_conj_trivial {D N : ℕ} (z : Circle)
 
 /-! ## T5: `pos_of_isInjectiveMPS` -/
 
-/-- T5a: locks the exact public name/signature of the `D = 0` exclusion (§1 of the design report:
-`IsInjectiveMPS` already forces `D ≠ 0`, so `SymmetricInjectiveMPSExists` needs no separate
+/-- T5a: locks the exact public name/signature of the `D = 0` exclusion
+(`IsInjectiveMPS` already forces `D ≠ 0`, so `SymmetricInjectiveMPSExists` needs no separate
 `0 < D` conjunct). -/
 private lemma t5_pos_of_isInjectiveMPS {D N : ℕ} {A : MPSMatrices D N} {lam : ℝ}
     (hA : IsInjectiveMPS A lam) : 0 < D :=
@@ -234,8 +234,8 @@ private lemma t5b_pos_of_isInjectiveMPS_unitA : (0 : ℕ) < 1 :=
 
 /-! ## T6: `eq_one_of_unitary_conj_smul` (footnote 52's `c = 1`) -/
 
-/-- T6: locks the exact public name/signature of the design report's shortened footnote-52 route
-(word induction + `Theorem 7.5(ii)` + `LinearMap.ext_on`, §0 "`c = 1`" and §2.4). -/
+/-- T6: locks the exact public name/signature of the shortened footnote-52 route
+(word induction + `Theorem 7.5(ii)` + `LinearMap.ext_on`). -/
 private lemma t6_eq_one_of_unitary_conj_smul {D N : ℕ} {A : MPSMatrices D N} {lam : ℝ}
     (hA : IsInjectiveMPS A lam) {T : Matrix (Fin D) (Fin D) ℂ}
     (hT : T ∈ Matrix.unitaryGroup (Fin D) ℂ) {c : Circle}
@@ -256,8 +256,8 @@ private lemma t7_symmetryTransportMPS_mul_of_isProjectiveRep {G : Type*} [Group 
 
 /-! ## T8: `isPhaseCoboundary_of_invariantInjectiveMPS` (the cocycle chase itself) -/
 
-/-- T8: locks the exact public name/signature of the forward cocycle chase (§0 steps 1-4 of the
-design report): a projective representation whose transported family agrees with the original
+/-- T8: locks the exact public name/signature of the forward cocycle chase:
+a projective representation whose transported family agrees with the original
 one up to a phase, on an injective MPS, has a phase function that is a coboundary — this is the
 substance behind Theorem 8.7. -/
 private lemma t8_isPhaseCoboundary_of_invariantInjectiveMPS {G : Type*} [Group G] {N : ℕ}
@@ -292,8 +292,8 @@ private lemma symmetryTransportMPS_uTrivial_unitA (g : Multiplicative (ZMod 2)) 
   change symmetryTransportMPS (1 : ℤˣ) (1 : Matrix (Fin 1) (Fin 1) ℂ) unitA = unitA
   exact symmetryTransportMPS_one_one unitA
 
-/-- T9a: `SymmetricInjectiveMPSExists uTrivial 1` is genuinely satisfiable — the design report's
-non-vacuity requirement (§5, item 3) — witnessed by `unitA` and the identically-`1` phase
+/-- T9a: `SymmetricInjectiveMPSExists uTrivial 1` is genuinely satisfiable — the non-vacuity
+requirement — witnessed by `unitA` and the identically-`1` phase
 family. -/
 private lemma t9a_symmetricInjectiveMPSExists_nonvacuous :
     SymmetricInjectiveMPSExists uTrivial (1 : Multiplicative (ZMod 2) →* ℤˣ) :=

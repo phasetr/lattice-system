@@ -15,8 +15,7 @@ on top of the merged chessboard Gaussian-domination bound (PR-BS9,
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §4.1, uniform-field bound (4.1.49)/(4.1.52), pp. 85–86 (chessboard estimate Lemma 4.5,
-(4.1.55)–(4.1.57), pp. 87–88; DLS 1978; FILS, Comm. Math. Phys. 62 (1978) 1–34).  See
-`.self-local/reports/design-thm-4-2-bond-square-BS10-uniform-bound.md` (issue #4777).
+(4.1.55)–(4.1.57), pp. 87–88; DLS 1978; FILS, Comm. Math. Phys. 62 (1978) 1–34).
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareGaussianDomination
 

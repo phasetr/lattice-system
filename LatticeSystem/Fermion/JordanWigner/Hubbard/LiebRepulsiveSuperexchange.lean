@@ -15,7 +15,7 @@ superexchange identity — Tasaki's eq. (10.1.10), p. 345 — by
    sublattice-indicator graph `bipartiteGraphFromA`
    (`Quantum/MarshallLiebMattis/BipartiteGraph.lean`);
 2. reducing the coefficient `t_{yx} · t_{xy}` to the endpoint-graph indicator via the symmetry
-   hypothesis `hT` (necessary, not decoration — see the design-round note reproduced below);
+   hypothesis `hT` (necessary, not decoration — see the note reproduced below);
 3. collapsing the diagonal (number-operator) part of `fermionHopReturn_eq`'s right-hand side on the
    half-filled hard-core sector, where `n̂_y` and `n̂_x n̂_y` act with eigenvalue `1`;
 4. lifting the whole-Fock-space collapse to the compressed sector via
@@ -135,9 +135,9 @@ theorem liebEndpointHopping_mul_symm_eq_indicator {N : ℕ} {A : Finset (Fin (N 
 
 /-! ## Half-filling diagonal collapse of `fermionHopReturn` -/
 
-/-- **Half-filling diagonal collapse** (step 3 of the PR-8b design round). For `x ≠ y` and `c`
-singly occupied at every site, `fermionHopReturn_eq`'s number-operator remainder
-`n̂_y − ½ n̂_x n̂_y` collapses to `½ n̂_x n̂_y` (both `n̂_x` and `n̂_y` act with eigenvalue `1` on
+/-- **Half-filling diagonal collapse** (step 3 above). For `x ≠ y` and `c` singly occupied at
+every site, `fermionHopReturn_eq`'s number-operator remainder `n̂_y − ½ n̂_x n̂_y`
+collapses to `½ n̂_x n̂_y` (both `n̂_x` and `n̂_y` act with eigenvalue `1` on
 `c`, `fermionSiteNumber_mulVec_basisVec`, `TJDiagonalMatrixElement.lean`), turning the identity
 into `2 ((1/4) n̂_x n̂_y − Ŝ_x·Ŝ_y)` entrywise against an arbitrary bra `e`. This is where
 half-filling is indispensable: with an empty site, `n̂_x n̂_y` would not agree with `n̂_y` there.
@@ -164,7 +164,7 @@ theorem fermionHopReturn_apply_eq_of_singly_occupied {N : ℕ} {x y : Fin (N + 1
 
 /-! ## Sector lift of `V̂ · V̂` -/
 
-/-- **Sector lift** (step 4 of the PR-8b design round). The compressed product `V̂|_K · V̂|_K`
+/-- **Sector lift** (step 4 above). The compressed product `V̂|_K · V̂|_K`
 equals the compression of the whole-Fock-space product `V̂ · V̂`, via
 `configSectorCompress_mul_of_preserves` (`HubbardImpossibilityLowUVariationalCore.lean`) applied to
 PR-6's sector-preservation lemma `liebPerturbationV_preserves_liebHalfFillingPred`

@@ -144,7 +144,7 @@ theorem becOffDiagonal_eq_norm_ratio (A : Λ → Bool) {M : ℤ} (hM : 0 ≤ M)
   field_simp
 
 /-- **Off-diagonal element as an inverse norm ratio on the lowering side** (Tasaki §5.3, eqs.
-(5.3.3), (5.3.6); math-note §2② 2026-07-17 refinement): for `M ≤ −1` (both tower states nonzero) the
+(5.3.3), (5.3.6)): for `M ≤ −1` (both tower states nonzero) the
 same `Ô⁺`-sandwiched adjacent element is the **inverse** ratio `⟨Γ_{M+1}, Ô⁺ Γ_M⟩ = √(D_M/D_{M+1})`,
 `D_M = vecNormSqRe (towerState … M Φ)`.  Here the tower is built with `Ô⁻`, so `Ô⁺ Γ_M` is *not*
 parallel to `Γ_{M+1}`; instead `(Ô⁺)ᴴ = Ô⁻` (`staggeredRaisingOpS_conjTranspose`) moves `Ô⁺` onto

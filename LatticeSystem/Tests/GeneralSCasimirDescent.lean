@@ -123,7 +123,7 @@ example : casimirPenaltyScalars 2 1 = (casimirPenaltyScalars 1 1).map (· + 4) :
 /-- **Singlet sanity check.** `casimirDescentStep 2 f₂ = 2 • f₂ − f₂ · Ω f₂ = 2f₂ − 2f₂ = 0`
 (`bondOmega_bondFactor_self : Ω f₂ = 2`), the same `J = 0` computation recorded in
 `GeneralSWeylCasimir.weylMap_mulVec_bondCasimirS`'s doc comment. Catches a sign slip in
-`casimirDescentStep` (pitfall 5 of the design report). -/
+`casimirDescentStep`. -/
 example : casimirDescentStep (2 : ℂ) f2 = 0 := by
   have h : bondOmega ((0 : Fin 2), (0 : Fin 2)) (1, 1) (0, 1) (1, 0) f2 = 2 := by
     rw [f2]
@@ -164,8 +164,7 @@ example {m : ℕ} {p : MvPolynomial (Fin 2 × Fin 2) ℂ}
 /-- **`m = 0` base instance of the annihilating polynomial.** At bidegree `(0, 0)` every polynomial
 is a constant (`MvPolynomial.isWeightedHomogeneous_C`), so `Ω p = 0` and the single-step fold with
 scalar list `casimirPenaltyScalars 0 0 = [0]` collapses to `0 • p − f₂ · 0 = 0`.  This is exactly
-the base case of the induction that proves `casimirDescentFold_self_eq_zero` (design report §2.1,
-"Proof of `casimirDescentFold_self_eq_zero`, induction on `m`: `0` —…"). -/
+the base case of the induction that proves `casimirDescentFold_self_eq_zero`. -/
 example :
     List.foldr casimirDescentStep (C (5 : ℂ) : MvPolynomial (Fin 2 × Fin 2) ℂ)
       (casimirPenaltyScalars 0 0) = 0 :=
@@ -176,7 +175,7 @@ example :
 /-- **`m = 1` numeric instance: `Ĉ(Ĉ − 2) = 0` on two spin-1/2 sites.** The scalar list
 `casimirPenaltyScalars 1 1 = [2, 0]` (already pinned in Group 3) folded against the bond factor
 `f₂` itself (bidegree `(1, 1)`, `bondFactor_isWeightedHomogeneous`) vanishes: the `S = 1` sanity
-check of the design report ("`m = 1` gives `Ĉ(Ĉ − 2) = 0` on two spin-1/2 sites"). -/
+check, `m = 1` giving `Ĉ(Ĉ − 2) = 0` on two spin-1/2 sites. -/
 example :
     List.foldr casimirDescentStep (f2 : MvPolynomial (Fin 2 × Fin 2) ℂ)
       (casimirPenaltyScalars 1 1) = 0 := by

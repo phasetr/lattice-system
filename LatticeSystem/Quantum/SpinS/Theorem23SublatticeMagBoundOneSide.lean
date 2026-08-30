@@ -5,7 +5,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23SublatticeLowestWeightSign
 # One-sided total-magnetization bound for a total lowest weight
 
 Issue #3542 (sound Perron–Frobenius route to Tasaki §2.5 Theorem 2.3), option (a),
-Route 5 brick 3a (see `.self-local/tex/3717-coupled-total-spin-lower-bound.tex`).
+Route 5 brick 3a.
 
 For a total lowest weight `w` in the joint sublattice-Casimir eigenspace with
 sublattice spins `a, b` (`(Ŝ_A)² = a(a+1)`, `(Ŝ_¬A)² = b(b+1)`), the total

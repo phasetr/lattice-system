@@ -12,7 +12,7 @@ proves that the explicit periodic matrix-product AKLT state
 spin-2 projection `P̂₂[Ŝ_x + Ŝ_{x+1}]` at **every** bond `x` of the ring, the wrap bond included:
 the AKLT ring Hamiltonian is *frustration free* on it.
 
-The route is the one fixed by the Gate D7a design, block ④-II (F0–F8):
+The route runs through the items F0–F8 below:
 
 * **F0** `ringSucc_eq_add_one` — the single point of contact between the production cyclic
   successor `ringSucc` (`AKLTBondProjection.lean:42`) and the group successor `x + 1` of `Fin L`.

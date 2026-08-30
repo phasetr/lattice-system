@@ -19,8 +19,7 @@ import Mathlib.LinearAlgebra.Matrix.Charpoly.Basic
 # Test coverage for Theorem 11.4 PR-6 (Roth's variational bound)
 
 Continues the numbering of `LatticeSystem.Tests.HubbardImpossibilityLowDensity` (which ends at
-Red 31) in a sibling module, per the PR-6 design (`.self-local/docs/theorem-11-4-pr6-design.md`
-§5/§8 decision 3): the existing module is already at 714 lines, past the 700-line review trigger.
+Red 31) in a sibling module: that module is already past the 700-line review trigger.
 
 These tests pin the three PR-6 modules:
 

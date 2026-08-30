@@ -4,36 +4,33 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetismCenteredSect
 # §10.2.3 Theorem 10.6 — centered sector ↔ Theorem 10.5 bridge (specification)
 
 Specification suite for
-`LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismCenteredSector.lean` (PR-6 of the
-Theorem 10.6 discharge arc, issue #5347). The `example`s pin down the exact signatures of the
-five public declarations `T1`–`T6` (`T2` is `private`, so it is not pinned here) of
-this arc's PR-6 design: the ground-energy realification
+`LatticeSystem/Fermion/JordanWigner/Hubbard/LiebFerrimagnetismCenteredSector.lean`. The
+`example`s pin down the exact signatures of the
+five public declarations `T1`–`T6` (`T2` is `private`, so it is not pinned here): the
+ground-energy realification
 `T1`, the sector/ground energy match `T3`, the centered tower member's collinearity with the
 sector's unique ground state `T4`, the transverse-sign transport `T5`, and the existential capstone
-`T6` (consuming PR-5's `liebRepulsive_ground_exists_topWeight`). Mirrors the specification style of
+`T6` (consuming `liebRepulsive_ground_exists_topWeight`). Mirrors the specification style of
 `Tests/LiebFerrimagnetismGroundTower.lean`.
 
-**PR-3 of the Theorem 10.8 discharge arc (issue #5357) generalizes `T3`'s underlying
-declaration** `liebRepulsive_sectorGroundEnergy_eq_groundEnergy` from the hard-wired centered
-exponent `k₀ = sublatticeImbalance A / 2` to an arbitrary `(k : ℕ) (hk : k ≤ sublatticeImbalance A)`
-with the sector weight supplied via a matching hypothesis `{m : ℂ}
-(hkm : (sublatticeImbalance A : ℂ) / 2 - (k : ℂ) = m)`, and de-privatizes
-`liebRepulsive_centeredWeight_eq` (design `.self-local/docs/theorem-10-8-pr3-design.md` §2). The
-`T3` pin below is updated to the generalized signature, instantiated at `k := L/2,
-hkm := liebRepulsive_centeredWeight_eq A` so that it remains a byte-for-byte regression check of
-the original centered statement (design §2.1/§8 "Regression").
+`T3`'s underlying declaration `liebRepulsive_sectorGroundEnergy_eq_groundEnergy` is stated for an
+arbitrary tower exponent `(k : ℕ) (hk : k ≤ sublatticeImbalance A)` rather than the centered
+`k₀ = sublatticeImbalance A / 2`, with the sector weight supplied via a matching hypothesis
+`{m : ℂ} (hkm : (sublatticeImbalance A : ℂ) / 2 - (k : ℂ) = m)`. The `T3` pin below uses that
+generalized signature, instantiated at `k := L/2, hkm := liebRepulsive_centeredWeight_eq A` so
+that it remains a byte-for-byte regression check of the centered statement.
 
 Carrier throughout: `H := symmetricRepulsiveHubbardHamiltonian N T U`,
 `G := hubbardGroundSubmoduleAtElectronNumber H E₀ (N+1)`, `k₀ := sublatticeImbalance A / 2`
 (ℕ division), `mCentered := ((N + 1 + sublatticeImbalance A % 2 : ℕ : ℂ) - ((N : ℂ) + 1)) / 2` the
 centered spin-`z` sector parameter that Theorem 10.5's `spinZSectorEuclidean` consumes. Each pin
-records the hypothesis set the design fixes, so a later edit cannot silently widen it: `T3`–`T6`
+records the intended hypothesis set, so a later edit cannot silently widen it: `T3`–`T6`
 take `hmin`/`hcas` in the same submodule-wide shape Theorem 10.4 exports (not the pointwise-weakest
 hypothesis), and `T5`/`T6` need the full Theorem 10.5 model hypotheses (`hbip`, `hT_conn`, `hU`)
-plus the design's single extra side condition `1 ≤ N` (no `B.Nonempty` hypothesis).
+plus the single extra side condition `1 ≤ N` (no `B.Nonempty` hypothesis).
 
-The closing section pins the centered-weight arithmetic that the design identifies as the only new
-mathematics of the PR (design §2): `L % 2 = (N+1) % 2` (`N = 1`, two instantiations) and `Ne₀`'s
+The closing section pins the centered-weight arithmetic, which is the only new
+mathematics here: `L % 2 = (N+1) % 2` (`N = 1`, two instantiations) and `Ne₀`'s
 side conditions (`Even`, `0 < Ne₀ < 2(N+1)`) at `N = 1`, proved directly from
 `bipartitionComplement_card_add` + `omega` without depending on the (private) `P1`.
 -/
@@ -46,7 +43,7 @@ open Matrix Module LatticeSystem.Fermion LatticeSystem.Quantum LatticeSystem.Mat
 
 /-- **`T1`: ground energy is real.** If the `(N+1)`-electron ground submodule `G` of
 `symmetricRepulsiveHubbardHamiltonian N T U` at `E₀` is nonzero, `E₀` is the complex cast of its own
-real part: `((E₀.re : ℝ) : ℂ) = E₀`. Route (design §3 `T1`): Hermiticity
+real part: `((E₀.re : ℝ) : ℂ) = E₀`. Route: Hermiticity
 (`symmetricRepulsiveHubbardHamiltonian_isHermitian`) + `isHermitian_mulVec_eigenvalue_eq_ofReal`. -/
 example (N : ℕ) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (hT : ∀ i j, T i j = T j i)
     (U : Fin (N + 1) → ℝ) (E₀ : ℂ)
@@ -57,11 +54,11 @@ example (N : ℕ) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (hT : ∀ i j, T 
 
 /-! ## `T3` — the centered-sector ground energy equals the sector-agnostic ground energy -/
 
-/-- **`T3`: sector ground energy = ground energy (generalized, PR-3 of #5357).** The unique ground
+/-- **`T3`: sector ground energy = ground energy (generalized).** The unique ground
 energy `E` of `H` on the spin-`z` sector `Ŝ³ = m` at an arbitrary tower exponent
 `k ≤ L := sublatticeImbalance A` (matched to `m` via `hkm`) equals `E₀.re`, the real part of the
-sector-agnostic `(N+1)`-electron ground energy — a two-sided pinch (design
-`.self-local/docs/theorem-10-8-pr3-design.md` §2.1): `E₀.re ≤ E` from `φ`'s half-filling number
+sector-agnostic `(N+1)`-electron ground energy — a two-sided pinch: `E₀.re ≤ E` from `φ`'s
+half-filling number
 eigenvalue `hφN` transported through `mulVec_eq_smul_iff_toEuclideanLin_toLp_eq_smul` and `hmin`;
 `E ≤ E₀.re` from the `k`-th tower member `(Ŝ⁻_tot)^k w` witnessing `IsGroundEigenvalueOn`'s
 minimality clause. Instantiated here at `k := L/2`, `hkm := liebRepulsive_centeredWeight_eq A` as a
@@ -96,7 +93,7 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N +
 /-- **`T4`: centered tower ∼ sector ground state.** Under the `T3` hypotheses, the centered tower
 member `(Ŝ⁻_tot)^{k₀} w` (`k₀ := L/2`) equals `c • φ` for some nonzero `c : ℂ`: `T3`'s energy match
 feeds `IsUniqueGroundStateOn`'s uniqueness clause (`DegeneratePerturbation.lean:287-288`), and
-`c ≠ 0` follows from PR-5's `liebRepulsive_ground_tower_ne_zero` (design §3 `T4`). -/
+`c ≠ 0` follows from `liebRepulsive_ground_tower_ne_zero`. -/
 example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
     (hT : ∀ i j, T i j = T j i) (U : Fin (N + 1) → ℝ) (E₀ : ℂ)
     (hmin : ∀ E : ℂ, hubbardGroundSubmoduleAtElectronNumber
@@ -124,10 +121,10 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N +
 /-! ## `T5` — the transverse-sign transport onto the centered tower member -/
 
 /-- **`T5`: centered transverse sign.** Under the full Theorem 10.5 model hypotheses (`hbip`,
-`hT_conn`, `hU`) plus the design's single extra side condition `1 ≤ N`, the transverse spin
+`hT_conn`, `hU`) plus the single extra side condition `1 ≤ N`, the transverse spin
 correlation evaluated on the centered tower member `(Ŝ⁻_tot)^{k₀} w` has zero imaginary part and the
-same same-sublattice / different-sublattice sign pattern as Theorem 10.5, transported through `T4`
-(design §3 `T5`). -/
+same same-sublattice / different-sublattice sign pattern as Theorem 10.5, transported through
+`T4`. -/
 example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
     (hT : ∀ i j, T i j = T j i) (hbip : HoppingRespectsBipartition A T)
     (hT_conn : (hoppingSupportGraph T).Preconnected)
@@ -157,11 +154,12 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N +
 
 /-! ## `T6` — existential capstone -/
 
-/-- **`T6`: existential centered transverse sign.** Combining PR-5's
-`liebRepulsive_ground_exists_topWeight` with `T1` and `T5`, the `(N+1)`-electron ground submodule
+/-- **`T6`: existential centered transverse sign.**
+Combining `liebRepulsive_ground_exists_topWeight` with `T1` and `T5`, the `(N+1)`-electron ground
+submodule
 `G` (assumed nonzero) contains a top-weight vector `w` whose centered tower member carries the `T5`
-transverse-sign pattern — the shape PR-7 consumes for the tower-ratio argument, so the *same*
-top-weight `w` witnesses both the weight equation and the sign pattern (design §3 `T6`). -/
+transverse-sign pattern — the shape the tower-ratio argument consumes, so the *same*
+top-weight `w` witnesses both the weight equation and the sign pattern. -/
 example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
     (hT : ∀ i j, T i j = T j i) (hbip : HoppingRespectsBipartition A T)
     (hT_conn : (hoppingSupportGraph T).Preconnected)
@@ -189,7 +187,7 @@ example (N : ℕ) (A : Finset (Fin (N + 1))) (T : Matrix (Fin (N + 1)) (Fin (N +
   liebRepulsive_exists_centered_transverse_sign N A T hT hbip hT_conn U hU hN E₀ (hne := hne)
     (hmin := hmin) (hcas := hcas)
 
-/-! ## Centered-weight arithmetic sanity checks (design §2, independent of `P1`/`P2`) -/
+/-! ## Centered-weight arithmetic sanity checks (independent of `P1`/`P2`) -/
 
 /-- **Parity `L % 2 = (N+1) % 2` at `N = 1`, `A = univ` (`L = 2`).** The balanced bipartition of
 `Fin 2` has `|A| = 2`, `|B| = 0`, `L = 2`, and `L % 2 = 0 = (1 + 1) % 2`. -/
@@ -210,7 +208,7 @@ example :
   omega
 
 /-- **`Ne₀` side conditions at `N = 1`, `A = univ` (`L = 2`, `Ne₀ = N + 1 + L % 2 = 2`).** `Ne₀` is
-even, positive, and strictly below `2(N+1) = 4`: the `L % 2 = 0` branch of the design's parity
+even, positive, and strictly below `2(N+1) = 4`: the `L % 2 = 0` branch of the parity
 split, which needs no extra hypothesis beyond the arithmetic itself. -/
 example :
     Even (1 + 1 + sublatticeImbalance (Finset.univ : Finset (Fin (1 + 1))) % 2) ∧
@@ -223,10 +221,10 @@ example :
   rw [himb, Nat.even_iff]
   omega
 
-/-- **`Ne₀` side conditions at `N = 2`, `A = univ` (`L = 3`, odd), the design's other parity
+/-- **`Ne₀` side conditions at `N = 2`, `A = univ` (`L = 3`, odd), the other parity
 branch.** `|A| = 3`, `|B| = 0`, so `L = 3`, `L % 2 = 1`, `Ne₀ = N + 1 + L % 2 = 4`, which is even,
-positive, and strictly below `2(N + 1) = 6` — the `1 ≤ N` side condition the design claims suffices
-for the odd-`L` branch (design §2, `N = 0` is the excluded degenerate boundary `Ne₀ = 2(N+1)`). -/
+positive, and strictly below `2(N + 1) = 6` — the `1 ≤ N` side condition that suffices
+for the odd-`L` branch (`N = 0` is the excluded degenerate boundary `Ne₀ = 2(N+1)`). -/
 example :
     Even (2 + 1 + sublatticeImbalance (Finset.univ : Finset (Fin (2 + 1))) % 2) ∧
       0 < 2 + 1 + sublatticeImbalance (Finset.univ : Finset (Fin (2 + 1))) % 2 ∧

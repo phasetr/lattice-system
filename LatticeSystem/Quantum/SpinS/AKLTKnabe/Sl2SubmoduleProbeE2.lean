@@ -8,9 +8,8 @@ import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 # Gate E2 probe: the `Matrix ↔ Submodule` round trip for the `sl₂` route
 
 This module (Issue #5094; Tasaki §7.1.4, Knabe's argument, pp. 188–190) is the
-**feasibility probe** for steps (B), (C), (D) of the design note
-`aklt-theorem-7-1-e1a-general-window-bound-design.md` §2.1, i.e. for the passage between the
-matrix world (`ManyBodyOpS Λ N = Matrix (Λ → Fin (N+1)) (Λ → Fin (N+1)) ℂ`) and the
+**feasibility probe** for the passage between the matrix world
+(`ManyBodyOpS Λ N = Matrix (Λ → Fin (N+1)) (Λ → Fin (N+1)) ℂ`) and the
 `Submodule` / `LinearMap` world on the Euclidean space `EuclideanSpace ℂ (Λ → Fin (N+1))`.
 
 Four things are checked, each by an actual declaration that has to type check:
@@ -22,10 +21,10 @@ Four things are checked, each by an actual declaration that has to type check:
 3. the adjoint relation `(Ŝ⁺_tot)† = Ŝ⁻_tot` transports to the operator adjoint, which yields both
    the orthogonality statement `(range Ŝ⁻_tot)ᗮ = ker Ŝ⁺_tot` — so the `Submodule.orthogonal`
    inner-product-space instance does resolve — and the operator half of the ladder identity
-   `⟪v, Ŝ⁺Ŝ⁻v⟫ − ⟪v, Ŝ⁻Ŝ⁺v⟫ = ‖Ŝ⁻v‖² − ‖Ŝ⁺v‖²` (design §2.1 (B); the remaining half is the matrix
-   identity `[Ŝ⁺, Ŝ⁻] = 2 Ŝ³`, which is *not* part of this probe);
-4. the rank–nullity theorem applies to `Ŝ⁺_tot` restricted to `V_m`, in the exact form used by
-   design §2.1 (D): `dim (range) + dim hw_m = dim V_m`.
+   `⟪v, Ŝ⁺Ŝ⁻v⟫ − ⟪v, Ŝ⁻Ŝ⁺v⟫ = ‖Ŝ⁻v‖² − ‖Ŝ⁺v‖²` (the remaining half is the matrix identity
+   `[Ŝ⁺, Ŝ⁻] = 2 Ŝ³`, which is *not* part of this probe);
+4. the rank–nullity theorem applies to `Ŝ⁺_tot` restricted to `V_m`, in the exact form the
+   sector dimension count needs: `dim (range) + dim hw_m = dim V_m`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §7.1.4, pp. 188–190; S. Knabe, *J. Stat. Phys.* **52**, 627–638 (1988).
@@ -53,8 +52,8 @@ noncomputable def totalMinusLinE2 : ManyBodyVecE2 Λ N →ₗ[ℂ] ManyBodyVecE2
   Matrix.toEuclideanLin (totalSpinSOpMinus Λ N)
 
 /-- Component description of `totalPlusLinE2`: applying it and forgetting the `ℓ²` structure is
-matrix–vector multiplication by `Ŝ⁺_tot`.  This is the bridge that step (F) of the design (the
-explicit highest-weight vectors) will use to compute `Ŝ⁺_tot u = 0` entrywise. -/
+matrix–vector multiplication by `Ŝ⁺_tot`.  This is the bridge through which `Ŝ⁺_tot u = 0` is
+computed entrywise on explicit highest-weight vectors. -/
 theorem ofLp_totalPlusLinE2 (v : ManyBodyVecE2 Λ N) :
     WithLp.ofLp (totalPlusLinE2 Λ N v) = (totalSpinSOpPlus Λ N).mulVec (WithLp.ofLp v) := rfl
 
@@ -72,14 +71,15 @@ theorem adjoint_totalMinusLinE2 :
   unfold totalPlusLinE2 totalMinusLinE2
   rw [← totalSpinSOpMinus_conjTranspose, Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
 
-/-- **Design §2.1 (C), ambient form**: the orthogonal complement of the image of the total lowering
-operator is the kernel of the total raising operator, `(im Ŝ⁻_tot)ᗮ = ker Ŝ⁺_tot`.  This is the
-statement whose `Submodule.orthogonal` instance was the main open risk of the route. -/
+/-- **Whole-space form** (no magnetisation sector yet): the orthogonal complement of the image of
+the total lowering operator is the kernel of the total raising operator,
+`(im Ŝ⁻_tot)ᗮ = ker Ŝ⁺_tot`.  This is the statement whose `Submodule.orthogonal` instance was the
+main open risk of the route. -/
 theorem orthogonal_range_totalMinusLinE2 :
     (LinearMap.range (totalMinusLinE2 Λ N))ᗮ = LinearMap.ker (totalPlusLinE2 Λ N) := by
   rw [LinearMap.orthogonal_range, adjoint_totalMinusLinE2]
 
-/-- **Design §2.1 (B), operator half**: for every vector `v`,
+/-- **Operator half of the ladder identity**: for every vector `v`,
 `⟪v, Ŝ⁺Ŝ⁻v⟫ − ⟪v, Ŝ⁻Ŝ⁺v⟫ = ‖Ŝ⁻v‖² − ‖Ŝ⁺v‖²`.  Only the adjoint relations are used; combining this
 with the matrix commutator identity `[Ŝ⁺_tot, Ŝ⁻_tot] = 2 Ŝ³_tot` and `Ŝ³_tot v = m v` on the
 magnetisation sector `V_m` gives `‖Ŝ⁻v‖² = ‖Ŝ⁺v‖² + 2m‖v‖²`. -/
@@ -115,13 +115,14 @@ noncomputable def magSectorE2 (m : ℕ) : Submodule ℂ (ManyBodyVecE2 Λ N) whe
     have hca : WithLp.ofLp (c • a) σ = c * WithLp.ofLp a σ := rfl
     rw [hca, ha σ hσ, mul_zero]
 
-/-- The highest-weight space `hw_m = V_m ∩ ker Ŝ⁺_tot` of design §2.1 (C). -/
+/-- The highest-weight space `hw_m = V_m ∩ ker Ŝ⁺_tot`. -/
 noncomputable def highestWeightE2 (m : ℕ) : Submodule ℂ (ManyBodyVecE2 Λ N) :=
   magSectorE2 Λ N m ⊓ LinearMap.ker (totalPlusLinE2 Λ N)
 
-/-- **Design §2.1 (D)**: rank–nullity for `Ŝ⁺_tot` restricted to the magnetisation sector `V_m`,
-`dim (Ŝ⁺_tot V_m) + dim hw_m = dim V_m`.  Together with the surjectivity of `Ŝ⁺_tot : V_m → V_{m+1}`
-(which is the content of (B), not proved here) this gives `dim hw_m = dim V_m − dim V_{m+1}`. -/
+/-- Rank–nullity for `Ŝ⁺_tot` restricted to the magnetisation sector `V_m`,
+`dim (Ŝ⁺_tot V_m) + dim hw_m = dim V_m`.  Together with the surjectivity of
+`Ŝ⁺_tot : V_m → V_{m+1}` — which is *not* proved here — this gives
+`dim hw_m = dim V_m − dim V_{m+1}`. -/
 theorem finrank_range_add_finrank_highestWeightE2 (m : ℕ) :
     Module.finrank ℂ ↥(LinearMap.range ((totalPlusLinE2 Λ N).domRestrict (magSectorE2 Λ N m)))
         + Module.finrank ℂ ↥(highestWeightE2 Λ N m)

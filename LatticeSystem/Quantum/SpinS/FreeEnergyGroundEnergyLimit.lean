@@ -16,8 +16,7 @@ Two lemmas are established:
   subleading: `(1/β) log card → 0`).
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §4.1, (4.1.40)/(4.1.49), book pp. 85–86.  See
-`.self-local/docs/math-tasaki-4-1-40-free-energy-t0-ground-energy.md` (issue #4777).
+2020), §4.1, (4.1.40)/(4.1.49), book pp. 85–86.
 -/
 import LatticeSystem.Math.MatrixAnalysis.TraceExpMonotone
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueViaRayleigh
