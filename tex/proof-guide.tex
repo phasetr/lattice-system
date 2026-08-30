@@ -1435,8 +1435,8 @@ is positive, which is what makes the eigenvector nonzero.
 As in §\ref{subsec:ising-low-energy-matrix}, that the compression
 restricts $\hat H$ to an invariant subspace is nowhere established
 here, so \texttt{tightBindingEnergy $\lambda$ $\kappa$} --- an
-eigenvalue of \texttt{lowEnergyMatrix} shifted by $-N/4$, equivalently
-an eigenvalue of the tight-binding part \texttt{tightBindingRing} ---
+eigenvalue of the tight-binding part \texttt{tightBindingRing}, i.e.\ of
+\texttt{lowEnergyMatrix} with the constant $-N/4$ subtracted ---
 is not identified with a ground-state or first-excited energy of
 $\hat H$, and the source's non-rigorous Taylor steps (S.36)--(S.38) are
 not asserted. The constant $\kappa_\infty$ of (S.35), the existence of
@@ -1523,8 +1523,8 @@ $\tanh \kappa_\infty \to 1$, both as $\lambda \downarrow 0$
 As in §\ref{subsec:ising-low-energy-eigenvectors}, that the compression
 restricts $\hat H$ to an invariant subspace is nowhere established
 here, so $\varepsilon_\infty$ is the $L \uparrow \infty$ value of an
-eigenvalue of \texttt{lowEnergyMatrix} shifted by $-N/4$ ---
-equivalently, of the tight-binding part \texttt{tightBindingRing} ---
+eigenvalue of the tight-binding part \texttt{tightBindingRing}, i.e.\ of
+\texttt{lowEnergyMatrix} with the constant $-N/4$ subtracted,
 and is not identified with a ground-state or first-excited energy of
 $\hat H$; the source's non-rigorous Taylor steps (S.36)--(S.38) are not
 asserted. The existence of the two finite-$L$ roots, the sign of the
@@ -1639,9 +1639,9 @@ asymptotics. Uniqueness of the root in either sector is neither proved
 nor used --- every statement quantifies over all positive roots. As in
 §\ref{subsec:ising-low-energy-eigenvectors}, that the compression
 restricts $\hat H$ to an invariant subspace is nowhere established
-here, so \texttt{tightBindingEnergy} is an eigenvalue of
-\texttt{lowEnergyMatrix} shifted by $-N/4$ --- equivalently, of the
-tight-binding part \texttt{tightBindingRing} --- and is not identified
+here, so \texttt{tightBindingEnergy} is an eigenvalue of the
+tight-binding part \texttt{tightBindingRing}, i.e.\ of
+\texttt{lowEnergyMatrix} with the constant $-N/4$ subtracted, and is not identified
 with a ground-state or first-excited energy of $\hat H$; the label ring
 is a ring of basis labels, not of lattice sites, and the chain stays
 open. The asymptotics (S.41) are not part of
@@ -1885,9 +1885,9 @@ this development declines to make.
 \paragraph{Scope.}
 That the compression restricts $\hat H$ to an invariant subspace is
 nowhere established here, so \texttt{tightBindingEnergy} is treated only
-as an eigenvalue of \texttt{lowEnergyMatrix} shifted by $-N/4$ ---
-equivalently, as an eigenvalue of the tight-binding part
-\texttt{tightBindingRing} of conjunct 2 --- and neither it nor the
+as an eigenvalue of the tight-binding part
+\texttt{tightBindingRing} of conjunct 2, i.e.\ of \texttt{lowEnergyMatrix}
+with the constant $-N/4$ subtracted, and neither it nor the
 difference of conjunct 8 is identified with the ground-state energy or
 the first-excited energy of $\hat H$. The refusal rests on the absence
 of a proof of invariance rather than on a claim that invariance fails:
@@ -6647,8 +6647,7 @@ $\operatorname{Tr}[W_{\rm GS}S^{x,y}W_{\rm GS}(S^{x,y})^{\mathsf H}]>0$; reality
 $S^{x,y}$ with Hermitian $W_{\rm GS}$ makes the imaginary part vanish. The only
 new Lean work is $S^{x,y}$, the single-hop $\hat c^\dagger_{x,\sigma}\hat
 c_{y,\sigma}$ matrix element, and the factorization; the endgame is the existing
-trace lemma. (Design note:
-\texttt{.self-local/docs/theorem-10-3-tian-pair-correlation-discharge-design.md}.)
+trace lemma.
 
 \medskip
 \noindent\textbf{Spin-reflection-positivity foundation (PR1 toward discharging
@@ -14936,7 +14935,7 @@ $\sqrt{2q_0}$) plus an eventual $\mu=0$ half-filling GS
 with $\hat S_{\mathrm{tot}}^{(3)}\Phi=0$, two-axis ODLRO $\ge q_0$, nonzero window tower states, and
 the \textbf{uniform window-ratio pinning} --- eventually every one-step ratio
 $r_M=\langle\Gamma_{M+1},\hat O_L^+\Gamma_M\rangle/L^d$ in the window is within $\varepsilon$ of
-$m^\ast$ (math-note §3.4 refinement 2), which subsumes the $\theta=0$ mean limit
+$m^\ast$, which subsumes the $\theta=0$ mean limit
 $\langle\Xi_0,\hat O_L^{(1)}\Xi_0\rangle/L^d\to m^\ast$ (eq.~5.3.7) \emph{and} drives the eq.~5.3.8
 second-moment concentration ($S_2=\mathrm{avg}\,r_M^2$, $S_{11}=\mathrm{avg}\,r_M r_{M+1}\to
 m^{\ast 2}$) axiom-free from one source; the axis-1 singlet and reversal invariance of the SU(2)
@@ -17576,8 +17575,7 @@ argument is Tasaki's eq.~(2.5.12) (p.~41, in the proof of Theorem~2.2, of which
 the proof of Theorem~2.3 is a modification): the toy ground state has the same
 Marshall-positive expansion, so its overlap with the antiferromagnetic ground
 state cannot vanish, which with the uniqueness inside the sector pins that
-state's total Casimir.  See
-\texttt{.self-local/docs/tasaki-2-5-pf-route-design.md} and Issue~\#3542.
+state's total Casimir.  (Issue~\#3542.)
 
 \textbf{Where the current account is.}  The state of Theorem~2.3 today is the
 next subsection, \emph{DONE: Tasaki §2.5 Theorem 2.3 for the standard bipartite
