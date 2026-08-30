@@ -4922,7 +4922,7 @@ Let $n$ be a finite type and $A : \mathrm{Matrix}(n,n,\mathbb{R})$ be:
 \emph{Source file:} \texttt{LatticeSystem/Math/PerronFrobeniusMain.lean}.
 
 \medskip
-The key results behind \texttt{exists\_pos\_eigenvec\_max}.
+The Collatz--Wielandt results from which \texttt{exists\_pos\_eigenvec\_max} is proved.
 
 \begin{itemize}
 \item \textbf{\texttt{pos\_of\_nonneg\_eigenvec}.}
@@ -4960,7 +4960,9 @@ Under the above hypotheses,
 $\exists\,\mu\,\exists\,v,\; Av = \mu v \;\land\; v \neq 0 \;\land\; \forall i,\; v_i > 0$.
 
 \textbf{Proof.}
-Call \texttt{exists\_positive\_eigenvector\_of\_irreducible} directly.
+Call \texttt{exists\_positive\_eigenvector\_of\_irreducible} (\S\ref{sec:pf-main}),
+whose Collatz--Wielandt route supplies $\mu$ and $v>0$ with $Av=\mu v$;
+$v \neq 0$ follows from $v_i > 0$ at any index.
 
 \subsection{Uniqueness (\texttt{pos\_eigenvec\_unique})}
 
@@ -4986,6 +4988,7 @@ Lean name & Status & Notes \\
 \texttt{pos\_of\_nonneg\_eigenvec} & proved & PR C \\
 \texttt{exists\_positive\_eigenvector\_of\_primitive} & proved & PR C; Seneta \S1.2 \\
 \texttt{exists\_positive\_eigenvector\_of\_irreducible} & proved & PR C; Seneta \S1.2 \\
+\texttt{exists\_pos\_eigenvec\_max} & proved & Collatz--Wielandt route (\S\ref{sec:pf-main}) \\
 \texttt{pos\_eigenvec\_unique} & proved & $r = \sup_i w_i/v_i$ \\
 \hline
 \end{tabular}
