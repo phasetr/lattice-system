@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.RayleighInfMatrix
+import LatticeSystem.Quantum.HorschVonderLindenTrialState
 import Mathlib.Analysis.Normed.Group.Continuity
 import Mathlib.Data.Real.Sqrt
 import Mathlib.LinearAlgebra.Matrix.Hermitian
@@ -12,8 +12,9 @@ Tasaki's Problem 3.4.b asks to show that vanishing of the fourth-moment combinat
 fluctuation of `Ô_L/L^d` in the state `|Ξ₊⟩` to vanish, so that `|Ξ₊⟩` behaves like a physical
 "ground state".
 
-The state is built here rather than hypothesised: `hvlTrialState` is the Horsch–von der Linden
-trial state `|Γ⟩ = Ô_L|Φ_GS⟩ / ‖Ô_L|Φ_GS⟩‖` (eq. (3.4.7)) and `hvlPlusState` is
+The state is built rather than hypothesised: on top of the trial state
+`|Γ⟩ = Ô_L|Φ_GS⟩ / ‖Ô_L|Φ_GS⟩‖` (eq. (3.4.7)) and its absorption algebra, imported from
+`HorschVonderLindenTrialState`, `hvlPlusState` is the symmetric combination
 `|Ξ₊⟩ = (1/√2)(|Φ_GS⟩ + |Γ⟩)` (eq. (3.4.14)).  The exact finite-`L` identities of the published
 solution — `⟨Ξ₊|Ô_L|Ξ₊⟩ = √(⟨Φ_GS|(Ô_L)²|Φ_GS⟩)` (eq. (3.4.15)),
 `⟨Ξ₊|(Ô_L)²|Ξ₊⟩ = (1/2){⟨Φ_GS|(Ô_L)²|Φ_GS⟩ + ⟨Φ_GS|(Ô_L)⁴|Φ_GS⟩/⟨Φ_GS|(Ô_L)²|Φ_GS⟩}` (eq. (S.42))
@@ -48,19 +49,6 @@ open Matrix
 
 /-! ### Sesquilinear reductions -/
 
-/-- A Hermitian square splits as a self-pairing: `⟨v, A² v⟩ = ⟨A v, A v⟩`. -/
-private theorem hermitianSq_dotProduct_split {n : Type*} [Fintype n] [DecidableEq n]
-    {A : Matrix n n ℂ} (hA : A.IsHermitian) (v : n → ℂ) :
-    star v ⬝ᵥ ((A ^ 2) *ᵥ v) = star (A *ᵥ v) ⬝ᵥ (A *ᵥ v) := by
-  rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, hA.eq, Matrix.mulVec_mulVec, pow_two]
-
-/-- The squared norm of `A v` is the Rayleigh quotient of `A²` at `v`, for Hermitian `A`. -/
-private theorem vecNormSqRe_mulVec_eq_rayleigh {n : Type*} [Fintype n] [DecidableEq n]
-    {A : Matrix n n ℂ} (hA : A.IsHermitian) (v : n → ℂ) :
-    vecNormSqRe (A *ᵥ v) = rayleighOnVec (A ^ 2) v := by
-  unfold vecNormSqRe rayleighOnVec
-  rw [hermitianSq_dotProduct_split hA v]
-
 open scoped ComplexOrder in
 /-- The even moment `⟨v, A² v⟩` of a Hermitian `A` is real, hence the coercion of its Rayleigh
 quotient.  Instantiated at `A = Ô_L` for `m₂` and at `A = (Ô_L)²` for `m₄`. -/
@@ -86,24 +74,12 @@ private theorem smul_add_dotProduct_mulVec {n : Type*} [Fintype n] (c : ℂ)
     star_add, Matrix.mulVec_add, dotProduct_add, add_dotProduct]
   ring
 
-/-! ### The Horsch–von der Linden trial state `Γ` and the state `Ξ₊` -/
-
-/-- The **Horsch–von der Linden trial state** `|Γ⟩ = Ô_L|Φ_GS⟩ / ‖Ô_L|Φ_GS⟩‖` (eq. (3.4.7)): the
-image of the reference vector under the order operator, unit-normalised in the `L²` pairing. -/
-noncomputable def hvlTrialState {n : Type*} [Fintype n] (O : Matrix n n ℂ) (Φ : n → ℂ) : n → ℂ :=
-  unitNormalize (O *ᵥ Φ)
+/-! ### The state `Ξ₊` -/
 
 /-- The **state `|Ξ₊⟩ = (1/√2)(|Φ_GS⟩ + |Γ⟩)`** (eq. (3.4.14)), the symmetric combination of the
 reference vector and the Horsch–von der Linden trial state. -/
 noncomputable def hvlPlusState {n : Type*} [Fintype n] (O : Matrix n n ℂ) (Φ : n → ℂ) : n → ℂ :=
   ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ • (Φ + hvlTrialState O Φ)
-
-/-- `Γ` written out as the scalar multiple `(√m₂)⁻¹ • (Ô_L|Φ_GS⟩)`.  This is the defining
-unfolding of `unitNormalize`, so no positivity of `m₂` is needed. -/
-private theorem trialState_eq_smul {n : Type*} [Fintype n] [DecidableEq n] {O : Matrix n n ℂ}
-    (hO : O.IsHermitian) (Φ : n → ℂ) :
-    hvlTrialState O Φ = ((Real.sqrt (rayleighOnVec (O ^ 2) Φ) : ℝ) : ℂ)⁻¹ • (O *ᵥ Φ) := by
-  rw [hvlTrialState, unitNormalize, vecNormSqRe_mulVec_eq_rayleigh hO Φ]
 
 /-- Ket-side absorption: `⟨Φ_GS, (Ô_L)^k Γ⟩ = (√m₂)⁻¹ ⟨Φ_GS, (Ô_L)^{k+1} Φ_GS⟩`. -/
 private theorem dotProduct_mulVec_trialState {n : Type*} [Fintype n] [DecidableEq n]
@@ -136,15 +112,6 @@ private theorem trialState_dotProduct_mulVec_trialState {n : Type*} [Fintype n] 
     Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, hO.eq, Matrix.mulVec_mulVec,
     Matrix.mulVec_mulVec, hpow]
   ring
-
-/-- `Γ` is a unit vector: `⟨Γ, Γ⟩ = 1`, since `‖Ô_L|Φ_GS⟩‖² = m₂ > 0`. -/
-private theorem trialState_dotProduct_self {n : Type*} [Fintype n] [DecidableEq n]
-    {O : Matrix n n ℂ} (hO : O.IsHermitian) (Φ : n → ℂ) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) :
-    star (hvlTrialState O Φ) ⬝ᵥ hvlTrialState O Φ = 1 := by
-  have hpos : 0 < vecNormSqRe (O *ᵥ Φ) := by
-    rw [vecNormSqRe_mulVec_eq_rayleigh hO Φ]; exact hm2
-  rw [hvlTrialState]
-  exact unitNormalize_dotProduct_self (O *ᵥ Φ) hpos
 
 /-! ### The moments of `Ξ₊` -/
 
