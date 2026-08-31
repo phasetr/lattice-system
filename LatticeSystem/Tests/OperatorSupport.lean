@@ -1,12 +1,13 @@
 import LatticeSystem.Quantum.SpinS.MultiSiteCore
+import LatticeSystem.Quantum.SpinS.OperatorSupport
 
 /-!
 # Test coverage for the operator-support predicate (`Quantum/SpinS/OperatorSupport.lean`)
 
-Fixtures for the not-yet-written `LatticeSystem/Quantum/SpinS/OperatorSupport.lean`: the support
-predicate `SupportedOnS` used by Problem 3.4.a, eq. (3.4.13), to phrase Tasaki's unqualified
-"acts only on sites within range `r`" as a genuine site-support condition on the many-body matrix
-elements, rather than as a bare commutation hypothesis.
+Fixtures for `LatticeSystem/Quantum/SpinS/OperatorSupport.lean`: the support predicate
+`SupportedOnS` used by Problem 3.4.a, eq. (3.4.13), to phrase Tasaki's unqualified "acts only on
+sites within range `r`" as a genuine site-support condition on the many-body matrix elements,
+rather than as a bare commutation hypothesis.
 
 ## What each pin guarantees
 
