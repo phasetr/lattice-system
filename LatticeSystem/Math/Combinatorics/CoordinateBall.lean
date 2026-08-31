@@ -14,8 +14,11 @@ near-duplicates at `d = 1`.
 
 The sup-norm reading of Tasaki's unqualified `|x - y| ≤ r` is chosen because the Euclidean ball is
 contained in the sup-norm ball: a locality hypothesis phrased on the sup-norm ball is the weaker
-one, and it is the reading under which a radius-`r` ball has exactly `(2r+1)^d` sites; the counts
-this file's transport delivers to Problem 3.4.a are at radii `2r` and `4r`.
+one, and in `ℤ^d` itself it is the reading under which a radius-`r` ball has exactly `(2r+1)^d`
+sites. The transported torus count (`card_siteBall_torusSupDist_le`) only inherits this file's
+`≤ (2r+1)^d` bound, not the equality — it is strictly smaller once the torus side length `L` is
+below `2r+1`. The counts this file's transport delivers to Problem 3.4.a are at radii `2r` and
+`4r`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §3.4, Problem 3.4.a, statement pp. 67-68, printed solution p. 501.

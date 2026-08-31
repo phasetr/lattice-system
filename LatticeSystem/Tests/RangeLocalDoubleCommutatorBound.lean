@@ -5,9 +5,9 @@ import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
 /-!
 # Test coverage for the general range-`r` bound, Problem 3.4.a (not eq. (3.4.13) as printed)
 
-Fixtures for the rewritten `LatticeSystem/Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean`
-(honest support-predicate form), the new `LatticeSystem/Math/Combinatorics/SiteBall.lean`, and the
-new `LatticeSystem/Quantum/SpinS/TorusSupDistance.lean`, plus the extension of
+Fixtures for `LatticeSystem/Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean` (support-predicate
+form), `LatticeSystem/Math/Combinatorics/SiteBall.lean`,
+`LatticeSystem/Quantum/SpinS/TorusSupDistance.lean`, and
 `LatticeSystem/Quantum/SpinS/RingDistance.lean`. Reference: H. Tasaki, *Physics and Mathematics of
 Quantum Many-Body Systems* (1st ed., Springer, 2020), §3.4, Problem 3.4.a, statement pp. 67-68,
 printed solution p. 501.
@@ -18,25 +18,25 @@ resolve against.
 
 ## What each block pins
 
-**Signature pins on the pre-existing production code.** `coordSupBall`, `mem_coordSupBall`,
+**Signature pins on the coordinate-ball and two-window layers.** `coordSupBall`, `mem_coordSupBall`,
 `card_coordSupBall_le` (`Math/Combinatorics/CoordinateBall.lean`) and the two-window collapse /
 kernel (`doubleCommutator_orderSum_eq_twoWindowSum`,
 `manyBodyOperatorNormS_doubleCommutator_le_of_twoWindows`,
 `Quantum/SpinS/LocalDoubleCommutatorBound.lean`); F-2 (the `Fin 2 → Fin 3` tightness fixture) and
 F-3 (the two-window kernel constant).
 
-**New signature pins.** `siteBall`, `mem_siteBall`, `disjoint_siteBall_of_lt`
-(`Math/Combinatorics/SiteBall.lean`); `ringDist_comm`, `ringDist_self`, `ringDist_triangle`,
-`signedRingDisp_self`, `signedRingDisp_injective` (extension of
+**Signature pins on the abstract distance layer.** `siteBall`, `mem_siteBall`,
+`disjoint_siteBall_of_lt` (`Math/Combinatorics/SiteBall.lean`); `ringDist_comm`, `ringDist_self`,
+`ringDist_triangle`, `signedRingDisp_self`, `signedRingDisp_injective` (extension of
 `Quantum/SpinS/RingDistance.lean`); `torusSupDist`, `torusSupDist_le_iff`, `torusSupDist_comm`,
 `torusSupDist_triangle`, `card_siteBall_torusSupDist_le`
 (`Quantum/SpinS/TorusSupDistance.lean`); and
-`manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal` together with the rewritten capstone
+`manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal` together with the capstone
 `tasaki_problem_3_4_a_doubleCommutator_expectation_le`
 (`Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean`), whose locality hypotheses are now
 `SupportedOnS`-based rather than raw commutation hypotheses.
 
-**New numeric fixtures.**
+**Numeric fixtures.**
 - F-1 (periodic wraparound, `by decide`): on the torus `Fin 2 → Fin 5`, the sup-distance from the
   origin to the antipode-by-coordinate `fun _ => 4` is `1` (the *cyclic* arc `4 → 0`, length `1`,
   not the linear gap `4`), and the radius-`1` ball around the origin contains `fun _ => 4` but not
@@ -64,15 +64,15 @@ F-3 (the two-window kernel constant).
 The kernel and capstone fixtures (F-3, F-4′) discriminate the constant only while the library
 statement and the fixture's intermediate `have` are not both changed to the *same* wrong constant
 at once. `4 m₁ m₂` is symmetric in `m₁` and `m₂`, so **no numeric fixture on the constant alone can
-detect an `m₁ ↔ m₂` swap** (the inner-`r`/outer-`2r` window swap). In this rewritten,
+detect an `m₁ ↔ m₂` swap** (the inner-`r`/outer-`2r` window swap). In this
 `SupportedOnS`-based form what pins the window roles is **provability**, not a fixture: assembling
 the swapped windows into `manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal`'s `hWW`
 obligation (`∀ x ∉ (outer ball), ∀ z ∈ (inner ball), Commute (o x) (h b * o z - o z * h b)`)
 requires deriving `2 * r < dist x z` from `4 * r < dist x b` and `dist z b ≤ 2 * r`, which needs
 the outer ball to be the *wider* one; with the windows swapped this derivation is not available
 and the proof does not go through. This is a **provability** claim, not an
-unprovability-*by-*obligation claim in the old hypothesis-form sense: the argument above does not
-hold for the hypothesis form of the capstone and must not be restated for it.
+unprovability-*by-*obligation claim about the hypothesis-form capstone: the argument above does
+not hold for the hypothesis form and must not be restated for it.
 -/
 
 namespace LatticeSystem.Tests.RangeLocalDoubleCommutatorBound
@@ -137,7 +137,7 @@ example {ι : Type*} (B : Finset ι) (hb : ι → ManyBodyOpS Λ N) (o : Λ → 
   manyBodyOperatorNormS_doubleCommutator_le_of_twoWindows B hb o W₁ W₂ h₀ o₀ m₁ m₂
     hW hWW hnh hno ho₀ hcard₁ hcard₂
 
-/-! ## New signature pins: `Math/Combinatorics/SiteBall.lean` -/
+/-! ## Signature pins: `Math/Combinatorics/SiteBall.lean` -/
 
 /-- **Signature pin (`siteBall`).** `siteBall dist r x = {y : dist y x ≤ r}` for an abstract
 distance function `dist : Λ → Λ → ℕ`, generalising `coordSupBall` off the coordinate embedding. -/
@@ -157,7 +157,7 @@ example {dist : Λ → Λ → ℕ} (hsymm : ∀ a b, dist a b = dist b a)
     Disjoint (siteBall dist r x) (siteBall dist r y) :=
   disjoint_siteBall_of_lt hsymm htri h
 
-/-! ## New signature pins: the `RingDistance.lean` extension -/
+/-! ## Signature pins: the `RingDistance.lean` extension -/
 
 /-- **Signature pin (`ringDist_comm`).** The ring distance is symmetric. -/
 example (L : ℕ) (x y : Fin L) : ringDist L x y = ringDist L y x :=
@@ -182,7 +182,7 @@ injective (needed to pull the sup-distance ball count back to `card_coordSupBall
 example (L : ℕ) (x : Fin L) : Function.Injective (signedRingDisp L x) :=
   signedRingDisp_injective L x
 
-/-! ## New signature pins: `Quantum/SpinS/TorusSupDistance.lean` -/
+/-! ## Signature pins: `Quantum/SpinS/TorusSupDistance.lean` -/
 
 /-- **Signature pin (`torusSupDist`).** The sup-norm of per-coordinate ring distances on the
 `d`-torus `Fin d → Fin L`. -/
@@ -212,7 +212,7 @@ example (d L r : ℕ) (x : Fin d → Fin L) :
     (siteBall (torusSupDist d L) r x).card ≤ (2 * r + 1) ^ d :=
   card_siteBall_torusSupDist_le d L r x
 
-/-! ## New signature pins: the rewritten `RangeLocalDoubleCommutatorBound.lean` -/
+/-! ## Signature pins: `Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean` -/
 
 /-- **Signature pin (`manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal`).** The abstract
 range-`r` norm bound over any symmetric, triangle-inequality-satisfying distance `dist`, with
@@ -304,7 +304,7 @@ The radius-`1` ball around the origin on the `d = 2`, `L = 5` torus has exactly
 `9 < 25`. -/
 example : (siteBall (torusSupDist 2 5) 1 (fun _ => (0 : Fin 5))).card = 9 := by decide
 
-/-- Companion half of the previous fixture: the ball is a *proper* subset of `Λ`, i.e. locality is
+/-- Companion half of the fixture above: the ball is a *proper* subset of `Λ`, i.e. locality is
 non-vacuous at these parameters. -/
 example : (siteBall (torusSupDist 2 5) 1 (fun _ => (0 : Fin 5))).card < Fintype.card (Fin 2 → Fin 5)
     := by decide
@@ -378,7 +378,8 @@ Hamiltonian term `h x := onSiteS x (spinSOp1 1) + onSiteS (shift x) (spinSOp1 1)
 of them reached by *wrapping* the ring coordinate — a support **upper bound**, not a proof that
 the support is exactly these two sites. Both sites lie in the radius-`1` ball around `x`, since
 `ringDist 5 (x 0 + 1) (x 0) = 1` and every other coordinate contributes distance `0`
-(`ringDist_self`). The order term `o x := onSiteS x (spinSOp3 1)` has singleton support `{x}`. The
+(`ringDist_self`). The order term `o x := onSiteS x (spinSOp3 1)` is `SupportedOnS` on `{x}` — an
+upper bound, not a proof that the support is exactly `{x}`. The
 norm bounds `h₀ = 2`, `o₀ = 1/2` come from `onSiteS_spinSOp1_manyBodyOperatorNormS_le` (triangle
 inequality over the two-term sum) and `onSiteS_spinSOp3_manyBodyOperatorNormS_le`. No hypothesis of
 the capstone is discharged by `sorry` or assumed abstractly: every one is proved from this concrete

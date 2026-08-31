@@ -364,7 +364,7 @@ dropped square, a dropped factor of two and a dropped `q₀` are pairwise distin
 numeric endpoint is one-sided and blind to a wrongly small constant, each fixture routes through an
 intermediate step that spells the constant out syntactically.
 
-### The general range-`r` bound, Problem 3.4.a and eq. (3.4.13)
+### The general range-`r` bound, Problem 3.4.a (not eq. (3.4.13) as printed)
 
 Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §2.1 p. 52 (periodic
 lattice), §3.4, Problem 3.4.a, statement pp. 67-68, printed solution p. 501; operator-norm

@@ -125,11 +125,11 @@ Each of the `|B| · m₂ · m₁` surviving terms of the two-window collapse is 
 `‖[ô_x, [ĥ_b, ô_z]]‖ ≤ 2 o₀ · 2 h₀ o₀ = 4 h₀ o₀²` through the commutator norm inequality
 `‖[Â, B̂]‖ ≤ 2‖Â‖‖B̂‖` (Tasaki (A.2.5)/(A.2.6), p. 463) applied twice.
 The two window bounds occupy fixed index positions: `m₂` counts the outer sum, over `x`, and `m₁`
-the inner sum, over `z`.  Tasaki Problem 3.4.a (pp. 67-68) instantiates them, under the range-`r`
-support premise, at `m₁ = (4r+1)^d` and `m₂ = (8r+1)^d`; the printed solution (p. 501) instead
-gives the pair `m₁ = (2r+1)^d`, `m₂ = (4r+1)^d`, which is its own counting and does not follow from
-the range-`r` premise (see `RangeLocalDoubleCommutatorBound.lean`).  Nonnegativity of `h₀` is not
-a hypothesis: inside a branch
+the inner sum, over `z`.  Instantiating them under the range-`r` support premise of Tasaki
+Problem 3.4.a (pp. 67-68) gives `m₁ = (4r+1)^d` and `m₂ = (8r+1)^d`; the printed solution (p. 501)
+gives the different pair `m₁ = (2r+1)^d`, `m₂ = (4r+1)^d`, which is its own counting and does not
+follow from the range-`r` premise (see `RangeLocalDoubleCommutatorBound.lean`).  Nonnegativity of
+`h₀` is not a hypothesis: inside a branch
 `b ∈ B` it follows from `0 ≤ ‖ĥ_b‖ ≤ h₀`.  Nonnegativity of `o₀` is one, since with `Λ` empty
 nothing forces it. -/
 theorem manyBodyOperatorNormS_doubleCommutator_le_of_twoWindows {ι : Type*} (B : Finset ι)
