@@ -248,15 +248,18 @@ Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4
 (3.4.2) p. 65, eq. (3.4.9) p. 66, eqs. (3.4.10)-(3.4.11) p. 67; operator-norm properties
 (A.2.5)/(A.2.6), p. 463.
 
-`Quantum/SpinS/LocalDoubleCommutatorBound.lean` turns the locality of `Ĥ = Σ_{b∈B} ĥ_b` and
-`Ô = Σ_{x∈Λ} ô_x` into the numerator estimate that eq. (3.4.8) consumes. Locality is expressed
-by plain commutation hypotheses rather than a support predicate: `ĥ_b` commutes with every `ô_z`
+`Quantum/SpinS/LocalDoubleCommutatorBound.lean` turns the locality of `Ĥ = Σ_{b∈B} ĥ_b` and `Ô =
+Σ_{x∈Λ} ô_x` into the numerator estimate that eq. (3.4.8) consumes. Locality is expressed by
+plain commutation hypotheses rather than a support predicate: `ĥ_b` commutes with every `ô_z`
 seated outside a window `W b` (the Lean content of eq. (3.4.1)'s "acts nontrivially only on the
 spins at `x` and `y`"), and distinct sites carry commuting order operators (eq. (3.4.2)). The
-window `W` and its cardinality bound `mW` are parameters, so the counting that produces the book's
-constant is proved in general and the bond case is the instance `mW = 2`, `4 · 2² = 16`. Norm
-hypotheses are stated as `≤` rather than the book's `=`, and `0 ≤ o₀` is an explicit hypothesis
-because an empty site type makes it underivable from the per-site bounds.
+collapse carries **two** windows, an inner `W₁ b` off which `ĥ_b` commutes with the order terms
+and an outer `W₂ b` off which the order terms commute with the inner commutators, with
+independent cardinality bounds `m₁` and `m₂` and kernel constant `4 m₁ m₂ h₀ o₀² |B|`. The
+one-window statements are the instance `W₁ = W₂`, `m₁ = m₂ = mW`, and the bond case is `mW = 2`,
+`4 · 2² = 16`; the counting that produces the book's constant is therefore proved in general.
+Norm hypotheses are stated as `≤` rather than the book's `=`, and `0 ≤ o₀` is an explicit
+hypothesis because an empty site type makes it underivable from the per-site bounds.
 
 The commutator norm inequality `‖[Â, B̂]‖ ≤ 2‖Â‖‖B̂‖` used twice per term is
 `manyBodyOperatorNormS_comm_le`, which lives in `Quantum/SpinS/ManyBodyOperatorNorm.lean` next to
@@ -282,14 +285,20 @@ All declarations below are **PROVED**; `#print axioms` on each yields only `prop
 | `commutator_sum_smul_right` | `[A, Σ_{i∈s} c i • B i] = Σ_{i∈s} c i • [A, B i]` in a `K`-algebra | `Math/CommutatorSum.lean` |
 | `commutator_sum_smul_left` | `[Σ_{i∈s} c i • B i, A] = Σ_{i∈s} c i • [B i, A]` in a `K`-algebra | `Math/CommutatorSum.lean` |
 | `commutator_orderSum_eq_windowSum` | eq. (3.4.9): `[Ĥ, Ô] = Σ_{b∈B} Σ_{z∈W b} [ĥ_b, ô_z]` | `Quantum/SpinS/LocalDoubleCommutatorBound.lean` |
-| `doubleCommutator_orderSum_eq_windowSum` | eq. (3.4.10): `[Ô, [Ĥ, Ô]] = Σ_{b∈B} Σ_{x∈W b} Σ_{z∈W b} [ô_x, [ĥ_b, ô_z]]` | `Quantum/SpinS/LocalDoubleCommutatorBound.lean` |
-| `manyBodyOperatorNormS_doubleCommutator_le_of_windows` | general-window norm kernel: `‖[Ô, [Ĥ, Ô]]‖ ≤ 4 mW² h₀ o₀² \|B\|` | `Quantum/SpinS/LocalDoubleCommutatorBound.lean` |
+| `doubleCommutator_orderSum_eq_twoWindowSum` | two-window form of eq. (3.4.10): `[Ô, [Ĥ, Ô]] = Σ_{b∈B} Σ_{x∈W₂ b} Σ_{z∈W₁ b} [ô_x, [ĥ_b, ô_z]]` | `Quantum/SpinS/LocalDoubleCommutatorBound.lean` |
+| `manyBodyOperatorNormS_doubleCommutator_le_of_twoWindows` | two-window norm kernel: `‖[Ô, [Ĥ, Ô]]‖ ≤ 4 m₁ m₂ h₀ o₀² \|B\|` | `Quantum/SpinS/LocalDoubleCommutatorBound.lean` |
+| `doubleCommutator_orderSum_eq_windowSum` | eq. (3.4.10): `[Ô, [Ĥ, Ô]] = Σ_{b∈B} Σ_{x∈W b} Σ_{z∈W b} [ô_x, [ĥ_b, ô_z]]` (the `W₁ = W₂` instance of the two-window form) | `Quantum/SpinS/LocalDoubleCommutatorBound.lean` |
+| `manyBodyOperatorNormS_doubleCommutator_le_of_windows` | general-window norm kernel: `‖[Ô, [Ĥ, Ô]]‖ ≤ 4 mW² h₀ o₀² \|B\|` (the `m₁ = m₂ = mW` instance) | `Quantum/SpinS/LocalDoubleCommutatorBound.lean` |
 | `doubleCommutator_bondLocal_expectation_le` | eq. (3.4.11): `⟨Φ\|[Ô,[Ĥ,Ô]]\|Φ⟩ ≤ ‖[Ô,[Ĥ,Ô]]‖ ≤ 16 d h₀ o₀² L^d` for normalised `Φ` and bond-local windows | `Quantum/SpinS/LocalDoubleCommutatorBound.lean` |
 
-Regression fixtures live in `LatticeSystem/Tests/LocalDoubleCommutatorBound.lean`: each of the four
-§3.4 declarations has a signature fixture restating it in full and discharging it by the
-declaration itself, and the two collapse identities are pinned with `W b` on **both** window index
-positions, so a vacuous `W b = univ` reading would not satisfy the pin. Two numeric fixtures pin
+Regression fixtures live in `LatticeSystem/Tests/LocalDoubleCommutatorBound.lean`: each of the
+four **one-window** §3.4 declarations has a signature fixture restating it in full and
+discharging it by the declaration itself (the two-window pins for
+`doubleCommutator_orderSum_eq_twoWindowSum` and
+`manyBodyOperatorNormS_doubleCommutator_le_of_twoWindows` live instead in
+`LatticeSystem/Tests/RangeLocalDoubleCommutatorBound.lean`), and the two collapse identities are
+pinned with `W b` on **both** window index positions, so a vacuous `W b = univ` reading would not
+satisfy the pin. Two numeric fixtures pin
 the constants over abstract data constrained only by the hypotheses, so no arithmetic tautology can
 close them: the kernel at `mW = 3`, `h₀ = 5/2`, `o₀ = 1/2`, `|B| = 7` gives `315/2`, a point away
 from `mW = 2` where `4mW²`, `8mW`, `2mW³` and `mW⁴` all coincide; the capstone at `d = 3`, `L = 4`,
@@ -354,6 +363,113 @@ candidate leading constants `16` and `8`, and `q₀ = 3/4` differs from `1`, `q�
 dropped square, a dropped factor of two and a dropped `q₀` are pairwise distinguishable. Since a
 numeric endpoint is one-sided and blind to a wrongly small constant, each fixture routes through an
 intermediate step that spells the constant out syntactically.
+
+### The general range-`r` bound, Problem 3.4.a (not eq. (3.4.13) as printed)
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §2.1 p. 52 (periodic
+lattice), §3.4, Problem 3.4.a, statement pp. 67-68, printed solution p. 501; operator-norm
+properties (A.2.5)/(A.2.6), p. 463.
+
+Problem 3.4.a generalizes the bond-local estimate (3.4.11) to a Hamiltonian and an order operator
+that are both sums over *every* site of Tasaki's **periodic** lattice `Λ_L = Fin d → Fin L`
+(p. 52), `Ĥ = Σ_{x∈Λ_L} ĥ_x` and `Ô_L = Σ_{x∈Λ_L} ô_x`, with each local term acting only on sites
+within distance `r` of its own site. That premise is a statement about operator *support*, and is
+taken here as one, `SupportedOnS` (`Quantum/SpinS/OperatorSupport.lean`: `A` lies in the subalgebra
+`B(H_S) ⊗ I_{Λ∖S}`), on the radius-`r` torus sup-distance ball of `x` — the sup norm since Tasaki's
+unqualified `|x − y| ≤ r` (p. 52 is Euclidean) is read in the weaker of the two, the Euclidean ball
+sitting inside the sup-norm ball. Disjointly supported operators commute
+(`commute_of_supportedOnS_disjoint`), so the commutation relations the estimate needs are *derived*
+from this premise rather than assumed alongside it, and deriving them fixes both windows: a
+nonzero `[ĥ_x, ô_y]` forces the two `r`-balls to meet, so `y` ranges over the `2r`-ball of `x`; the
+commutator is supported in `B_r(x) ∪ B_r(y) ⊆ B_{3r}(x)`, so a non-commuting `ô_z` has `z` in the
+`4r`-ball of `x`. Counting those windows on the torus
+(`card_siteBall_torusSupDist_le`, `Quantum/SpinS/TorusSupDistance.lean`, which transports a torus
+ball to a coordinate sup-norm ball via the injective signed cyclic displacement
+`signedRingDisp`/`RingDistance.lean` and reuses `card_coordSupBall_le`) gives `m₁ ≤ (4r+1)^d` on
+the `2r`-ball and `m₂ ≤ (8r+1)^d` on the `4r`-ball, giving
+
+`⟨Φ_GS|[Ô_L,[Ĥ,Ô_L]]|Φ_GS⟩ ≤ 4 (4r+1)^d (8r+1)^d h₀ o₀² L^d`.
+
+`Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean` proves this display. The estimate is the
+two-window kernel of `LocalDoubleCommutatorBound.lean` at `m₁ = (4r+1)^d`, `m₂ = (8r+1)^d` and
+`|B| = |Λ_L| = L^d` — now an identity on the periodic lattice, not a bound — followed by the
+operator-norm bound on the expectation in a unit vector. Book order note: Problem 3.4.a is
+textually earlier than the `Ξ₊` material but is logically independent of it — Theorem 3.1's own
+proof uses the concrete eq. (3.4.11), not this generalization.
+
+**Corrigendum (index ranges).** The printed solution (Tasaki, *Physics and Mathematics of Quantum
+Many-Body Systems*, 1st ed., Springer 2020, Problem 3.4.a, solution p. 501) counts over
+`|x − y| ≤ r` and `|x − z| ≤ 2r`. Those ranges do not follow from the range-`r` premise stated in
+the Problem (pp. 67-68) — they are what a range-`r/2` premise would give. Under the printed
+solution's own conditions the printed constant `4 (2r+1)^d (4r+1)^d h₀ o₀² L^d` is itself
+provable: it is the two-window kernel `manyBodyOperatorNormS_doubleCommutator_le_of_twoWindows`
+instantiated at `m₁ = (2r+1)^d`, `m₂ = (4r+1)^d`, so the discrepancy is a premise mismatch, not an
+arithmetic slip. Whether the printed constant is nevertheless true under the range-`r` premise
+itself is **open**: this repository neither proves nor refutes it; what is proved is the bound
+above, at the windows the premise actually yields.
+
+**Corrigendum (exponent typo, a separate defect).** The printed solution (p. 501) gives the
+intermediate `y`-count as `(2r+1)²` while giving the `z`-count as `(4r+1)^d`. The exponent `2` is a
+misprint: the target it claims to reach, eq. (3.4.13) on p. 68, carries `(2r+1)^d`, and counting
+the lattice points within distance `r` of a site in `d` dimensions gives `(2r+1)^d`. No declaration
+in this repository states the `(2r+1)²` form.
+
+**What these declarations do not assert.** Self-adjointness of `ĥ_x` and `ô_x` is not assumed; the
+expectation is taken on its real part. The long-range order condition (3.4.3) and the no-SSB
+condition (3.4.4) are unused. No `1 ≤ d` and no `1 ≤ L` is required. The Problem's closing remark —
+that Theorem 3.1 extends to this class given (3.4.3) and `⟨Φ_GS|Ô_L|Φ_GS⟩ = 0` — is not formalized
+here; it is the composition of this bound with the (3.4.12) route, at a different object class.
+
+All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
+`Classical.choice`, `Quot.sound`.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `coordSupBall` | the coordinate sup-norm ball `{y : ∀ i, \|pos yᵢ − pos xᵢ\| ≤ r}` as a `Finset Λ` | `Math/Combinatorics/CoordinateBall.lean` |
+| `mem_coordSupBall` | `y ∈ coordSupBall pos r x ↔ ∀ i, \|pos yᵢ − pos xᵢ\| ≤ r` | `Math/Combinatorics/CoordinateBall.lean` |
+| `card_coordSupBall_le` | `\|B_r(x)\| ≤ (2r+1)^d` for injective coordinates; at radius `2r` it gives `(4r+1)^d` | `Math/Combinatorics/CoordinateBall.lean` |
+| `SupportedOnS` | `A` lies in the subalgebra `B(H_S) ⊗ I_{Λ∖S}`: entries vanish unless row/column agree off `S`, and depend only on the restriction to `S` | `Quantum/SpinS/OperatorSupport.lean` |
+| `SupportedOnS.add` | a sum of two operators supported on the same `S` is supported on `S` | `Quantum/SpinS/OperatorSupport.lean` |
+| `commute_of_supportedOnS_disjoint` | operators supported on disjoint site sets commute | `Quantum/SpinS/OperatorSupport.lean` |
+| `supportedOnS_onSiteS` | the single-site embedding `onSiteS i A` is supported on any `S ∋ i` | `Quantum/SpinS/OperatorSupport.lean` |
+| `siteBall` | the ball `{y : dist y x ≤ r}` as a `Finset Λ`, for an abstract `ℕ`-valued distance | `Math/Combinatorics/SiteBall.lean` |
+| `mem_siteBall` | `y ∈ siteBall dist r x ↔ dist y x ≤ r` | `Math/Combinatorics/SiteBall.lean` |
+| `disjoint_siteBall_of_lt` | `2r < dist x y` gives disjoint `r`-balls, from symmetry and the triangle inequality | `Math/Combinatorics/SiteBall.lean` |
+| `ringDist_comm` | the ring distance on `Fin L` is symmetric | `Quantum/SpinS/RingDistance.lean` |
+| `ringDist_self` | the ring distance from a site to itself is `0` | `Quantum/SpinS/RingDistance.lean` |
+| `ringDist_triangle` | the ring distance satisfies the triangle inequality | `Quantum/SpinS/RingDistance.lean` |
+| `signedRingDisp_self` | the signed cyclic displacement of a site to itself is `0` | `Quantum/SpinS/RingDistance.lean` |
+| `signedRingDisp_injective` | for fixed `x`, `y ↦ signedRingDisp L x y` is injective | `Quantum/SpinS/RingDistance.lean` |
+| `torusSupDist` | the sup-norm of per-coordinate ring distances on `Fin d → Fin L` | `Quantum/SpinS/TorusSupDistance.lean` |
+| `torusSupDist_le_iff` | `torusSupDist d L x y ≤ r ↔ ∀ i, ringDist L (x i) (y i) ≤ r` | `Quantum/SpinS/TorusSupDistance.lean` |
+| `torusSupDist_comm` | the torus sup-distance is symmetric | `Quantum/SpinS/TorusSupDistance.lean` |
+| `torusSupDist_triangle` | the torus sup-distance satisfies the triangle inequality | `Quantum/SpinS/TorusSupDistance.lean` |
+| `card_siteBall_torusSupDist_le` | `\|B_r(x)\| ≤ (2r+1)^d` for the torus sup-distance ball | `Quantum/SpinS/TorusSupDistance.lean` |
+| `manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal` | `‖[Ô,[Ĥ,Ô]]‖ ≤ 4 m₁ m₂ h₀ o₀² \|Λ\|` for `SupportedOnS`-local terms over an abstract distance, `m₁`/`m₂` the `2r`-/`4r`-ball counts | `Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean` |
+| `tasaki_problem_3_4_a_doubleCommutator_expectation_le` | Problem 3.4.a, with the constant the range-`r` premise yields (not eq. (3.4.13) as printed): `⟨Φ\|[Ô,[Ĥ,Ô]]\|Φ⟩ ≤ 4 (4r+1)^d (8r+1)^d h₀ o₀² L^d` for a normalised `Φ` and range-`r` `SupportedOnS` site-local terms on `Λ_L` | `Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean` |
+
+Regression fixtures live in `LatticeSystem/Tests/OperatorSupport.lean` (signature pins on
+`SupportedOnS` and its three lemmas) and `LatticeSystem/Tests/RangeLocalDoubleCommutatorBound.lean`
+(signature pins on the remaining declarations above, plus numeric fixtures): F-1, periodic
+wraparound on `Fin 2 → Fin 5` (the torus sup-distance from the origin to `fun _ => 4` is the
+*cyclic* arc length `1`, not the linear gap `4`); F-2 — `coordSupBall`
+tightness on `Fin 2 → Fin 3`, every site lies in the radius-`1` coordinate ball, exhausting the
+`(2·1+1)^2 = 9`-site bound; F-2′, ball-count tightness — the radius-`1` `siteBall`/`torusSupDist`
+ball on `d = 2`, `L = 5` has exactly `9 = (2·1+1)²` sites out of `25`; F-3, the two-window kernel
+constant at `m₁ = 3 ≠ 5 = m₂`, `h₀ = 5/2`, `o₀ = 1/2`, `|B| = 7`, giving `525/2`, a point where
+`4m₁m₂`, `4m₁²`, `4m₂²` and `8m₁m₂` take the pairwise distinct values `262.5`, `157.5`, `437.5` and
+`525`; F-4′, the capstone constant at `r = 1`, `d = 2`, `L = 5`, `h₀ = 2`, `o₀ = 1/2`, giving
+`101250`, discriminated from the book-solution printed-constant form (`11250`) and from the
+exponent-shape slip `L^d = 25 ≠ d^L = 32`; and F-5, a concrete witness — a `SupportedOnS`-bound
+support of at most two sites (one reached by ring-wrapping) and a singleton-support order term on
+`Fin 2 → Fin 5` — whose `SupportedOnS` hypotheses are *discharged by proof* rather than assumed,
+giving the same `101250`
+bound. Since
+`4 m₁ m₂` is symmetric, a swap of the two window bounds is invisible to any numeric fixture on the
+constant alone; in this `SupportedOnS`-based form the window roles are pinned by **provability**
+instead — assembling the swapped windows into the kernel's outer-commutation obligation requires
+deriving `2r < dist x z` from `4r < dist x b` and `dist z b ≤ 2r`, which needs the outer ball to be
+the *wider* one, and with the windows swapped this derivation is not available.
 
 ---
 

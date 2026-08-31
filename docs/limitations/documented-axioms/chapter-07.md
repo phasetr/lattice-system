@@ -168,7 +168,7 @@ by two declarations in `LatticeSystem/Quantum/SpinS/AKLTStability.lean`:
   `connectedChainCorrelation` (line 71), `IsUniqueChainGroundState` (line 81),
   `IsLocalRangeR` (`LiebSchultzMattisGeneral.lean`, line 52), `IsPositiveSpectralGap`
   (`HaldaneConjecture.lean`, line 67), `manyBodyOperatorNormS`
-  (`ManyBodyOperatorNorm.lean`, line 21) and `ringDist` (`RingDistance.lean`, line 19).
+  (`ManyBodyOperatorNorm.lean`, line 21) and `ringDist` (`RingDistance.lean`, line 28).
 - **What the axiom statement literally asserts:** for every range r and bound v₀
   there is ε₀ > 0 such that for every |ε| < ε₀ there are ΔE, C, ξ > 0 — quantified
   outside ∀L and hence genuinely L-independent — such that for every L ≥ 3 and every

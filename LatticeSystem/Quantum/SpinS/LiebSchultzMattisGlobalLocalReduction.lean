@@ -137,30 +137,6 @@ theorem exp_smul_localTwistGen_eq_diagonal (L N r : ℕ) (x : Fin L) (c : ℂ) :
 
 /-! ## The ring-winding correction (spinor two-valued `2π` scalar as an integer) -/
 
-/-- The signed ring displacement `δ(x,y)` is congruent to the raw index gap `y − x` modulo `L`:
-their difference is divisible by `L`.  This captures the periodic-seam winding by which the linear
-LSM angle `θ_y = 2π(y+1)/L` differs from the ring-centered angle `(2π/L) δ(x,y)`. -/
-theorem dvd_sub_signedRingDisp (L : ℕ) (x y : Fin L) :
-    (L : ℤ) ∣ ((y.val : ℤ) - (x.val : ℤ) - signedRingDisp L x y) := by
-  have hx := x.isLt
-  have hy := y.isLt
-  have key : (signedRingDisp L x y : ℤ) ≡ (y.val : ℤ) - (x.val : ℤ) [ZMOD (L : ℤ)] := by
-    have hxL : x.val ≤ y.val + L := by omega
-    have hyL : y.val ≤ x.val + L := by omega
-    unfold signedRingDisp
-    split_ifs with h
-    · calc (((y.val + L - x.val) % L : ℕ) : ℤ)
-          = ((y.val + L - x.val : ℕ) : ℤ) % (L : ℤ) := by rw [Int.natCast_mod]
-        _ ≡ ((y.val + L - x.val : ℕ) : ℤ) [ZMOD (L : ℤ)] := Int.mod_modEq _ _
-        _ = (y.val : ℤ) + (L : ℤ) - (x.val : ℤ) := by rw [Nat.cast_sub hxL]; push_cast; ring
-        _ ≡ (y.val : ℤ) - (x.val : ℤ) [ZMOD (L : ℤ)] := Int.modEq_iff_dvd.mpr ⟨-1, by ring⟩
-    · calc (-(((x.val + L - y.val) % L : ℕ) : ℤ))
-          = -(((x.val + L - y.val : ℕ) : ℤ) % (L : ℤ)) := by rw [Int.natCast_mod]
-        _ ≡ -(((x.val + L - y.val : ℕ) : ℤ)) [ZMOD (L : ℤ)] := (Int.mod_modEq _ _).neg
-        _ = -((x.val : ℤ) + (L : ℤ) - (y.val : ℤ)) := by rw [Nat.cast_sub hyL]; push_cast; ring
-        _ ≡ (y.val : ℤ) - (x.val : ℤ) [ZMOD (L : ℤ)] := Int.modEq_iff_dvd.mpr ⟨1, by ring⟩
-  exact Int.modEq_iff_dvd.mp key
-
 /-- The **ring-winding count** `k(x,y) := (y − x − δ(x,y)) / L ∈ ℤ`: the integer number of full `2π`
 turns separating the linear LSM angle from the ring-centered angle at site `y`. -/
 def ringWrap (L : ℕ) (x y : Fin L) : ℤ :=

@@ -128,6 +128,7 @@ import LatticeSystem.Quantum.SpinS.GeneralSCasimirDescent
 import LatticeSystem.Quantum.SpinS.SaturatedCoherentExpansion
 import LatticeSystem.Quantum.SpinS.LocalDoubleCommutatorBound
 import LatticeSystem.Quantum.IsingLowEnergyProblem33aCapstone
+import LatticeSystem.Quantum.SpinS.RangeLocalDoubleCommutatorBound
 
 /-!
 # `lattice-system` library root

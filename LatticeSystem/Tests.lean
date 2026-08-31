@@ -151,6 +151,8 @@ import LatticeSystem.Tests.Problem34bFluctuation
 import LatticeSystem.Tests.HorschVonderLindenEnergyBound
 import LatticeSystem.Tests.HorschVonderLindenTrialStateVariational
 import LatticeSystem.Tests.LocalDoubleCommutatorBound
+import LatticeSystem.Tests.RangeLocalDoubleCommutatorBound
+import LatticeSystem.Tests.OperatorSupport
 
 /-!
 # Test aggregator for the `lattice-system` library

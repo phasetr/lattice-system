@@ -12874,7 +12874,17 @@ and aggregates with the finite-sum triangle inequality to
 \[\lVert[\hat O,[\hat H,\hat O]]\rVert\le 4\,m_W^2\,h_0\,o_0^2\,|B|.\]
 The window cardinality bound $m_W$ is kept a \emph{variable}: the counting is therefore proved in
 general rather than only at the bond point $m_W=2$, where $4m_W^2$, $8m_W$, $2m_W^3$ and $m_W^4$
-all coincide with $16$.  The capstone
+all coincide with $16$.
+
+The kernel is proved with two independent windows --- an inner $W_1^b$ off which $\hat h_b$
+commutes with the order terms, and an outer $W_2^b$ off which the order terms commute with the
+inner commutators --- giving
+\[\lVert[\hat O,[\hat H,\hat O]]\rVert\le 4\,m_1\,m_2\,h_0\,o_0^2\,|B|,\]
+of which the displayed one-window bound is the instance $W_1=W_2$, $m_1=m_2=m_W$. The two windows
+are genuinely unequal in Problem 3.4.a below, where the inner range is $2r$ and the outer range
+$4r$.
+
+The capstone
 \texttt{doubleCommutator\_bondLocal\_expectation\_le} is eq.~(3.4.11) as printed, the two-step chain
 \[\langle\Phi_{\mathrm{GS}}|[\hat O,[\hat H,\hat O]]|\Phi_{\mathrm{GS}}\rangle
 \le\lVert[\hat O,[\hat H,\hat O]]\rVert\le\{16\,d\,h_0\,o_0^2\}L^d,\]
@@ -12943,6 +12953,58 @@ single~$L$ --- an implication between hypotheses and conclusion at that same~$L$
 ``for sufficiently large $L$'' reading of~(3.4.3)--(3.4.4) is a statement about a family and is not
 formalized here.  Neither the mirror $-\hat O_L$ instance nor the symmetric state $\Xi_+$ of
 eq.~(3.4.14), p.~68, is treated here.
+
+\noindent\textbf{Problem 3.4.a: the general range-$r$ bound, with the constant the
+range-$r$ premise yields (not eq.~(3.4.13) as printed)}
+(Tasaki~\cite{Tasaki:QMB} §3.4, Problem 3.4.a, statement pp.~67--68, printed solution p.~501, with
+the operator-norm properties (A.2.5)/(A.2.6) p.~463; \textbf{discharged axiom-free},
+\texttt{Quantum/SpinS/OperatorSupport.lean},
+\texttt{Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean},
+\texttt{Math/Combinatorics/SiteBall.lean}, \texttt{Quantum/SpinS/TorusSupDistance.lean}, and
+\texttt{Math/Combinatorics/CoordinateBall.lean}, fixtures in
+\texttt{Tests/RangeLocalDoubleCommutatorBound.lean} and \texttt{Tests/OperatorSupport.lean}).
+Here $\hat H=\sum_{x\in\Lambda_L}\hat h_x$
+and $\hat O_L=\sum_{x\in\Lambda_L}\hat o_x$ are both sums over every site of the periodic lattice
+$\Lambda_L=\mathrm{Fin}\,d\to\mathrm{Fin}\,L$ (the periodic identification of p.~52), each local
+term \emph{supported on} the radius-$r$ torus sup-distance ball of its own site
+(\texttt{SupportedOnS}, the subalgebra $B(\mathcal H_S)\otimes I_{\Lambda\setminus S}$ rather than a
+commutation hypothesis assumed alongside the premise). Disjointly supported operators commute
+(\texttt{commute\_of\_supportedOnS\_disjoint}), and deriving the commutation relations from the
+support premise fixes both windows: a nonzero $[\hat h_x,\hat o_y]$ forces the two $r$-balls to
+meet, so $y$ ranges over the $2r$-ball of $x$; the commutator is supported in
+$B_r(x)\cup B_r(y)\subseteq B_{3r}(x)$, so a non-commuting $\hat o_z$ has $z$ in the $4r$-ball of
+$x$. Counting those windows on the torus (\texttt{card\_siteBall\_torusSupDist\_le}, which
+transports a torus ball to a coordinate sup-norm ball via the injective signed cyclic displacement
+and reuses \texttt{card\_coordSupBall\_le}) gives $m_1\le(4r+1)^d$ on the $2r$-ball and
+$m_2\le(8r+1)^d$ on the $4r$-ball, and the two-window kernel together with $|\Lambda_L|=L^d$ (an
+identity on this lattice, not a bound) then gives
+\[\langle\Phi_{\mathrm{GS}}|[\hat O_L,[\hat H,\hat O_L]]|\Phi_{\mathrm{GS}}\rangle
+\le 4(4r+1)^d(8r+1)^d h_0 o_0^2 L^d,\]
+followed by the operator-norm bound on the expectation in a unit vector. Reading Tasaki's
+unqualified $|x-y|\le r$ in the sup norm is the weaker locality hypothesis, since the Euclidean
+ball is contained in the sup-norm ball.
+
+\emph{Corrigendum (index ranges).} The printed solution (p.~501) counts over $|x-y|\le r$ and
+$|x-z|\le 2r$. Those ranges do not follow from the range-$r$ premise stated in the Problem
+(pp.~67--68) --- they are what a range-$r/2$ premise would give. Under the printed solution's own
+conditions the printed constant $4(2r+1)^d(4r+1)^d h_0o_0^2L^d$ is itself provable: it is the
+two-window kernel \texttt{manyBodyOperatorNormS\_doubleCommutator\_le\_of\_twoWindows} instantiated
+at $m_1=(2r+1)^d$, $m_2=(4r+1)^d$, so the discrepancy is a premise mismatch rather than an
+arithmetic slip. Whether the printed constant is nevertheless true under the range-$r$ premise
+itself is \textbf{open}: this repository neither proves nor refutes it; what is proved is the
+bound above, at the windows the premise actually yields.
+
+\emph{Corrigendum (exponent typo, distinct from the above).} The printed solution (p.~501) gives
+the intermediate $y$-count as $(2r+1)^2$ while giving the $z$-count as $(4r+1)^d$. The exponent $2$
+is a misprint: the target it claims to reach, eq.~(3.4.13) on p.~68, carries $(2r+1)^d$, and
+counting the lattice sites within distance $r$ of a given site in $d$ dimensions gives
+$(2r+1)^d$. No declaration in this repository states the $(2r+1)^2$ form.
+
+\emph{Not assumed.} Self-adjointness of $\hat h_x$ and $\hat o_x$ appears nowhere; the expectation
+is taken on its real part. Conditions~(3.4.3) and~(3.4.4) are unused, and neither $1\le d$ nor
+$1\le L$ is required. The Problem's closing remark, that Theorem~3.1 extends to this class
+given~(3.4.3) and $\langle\Phi_{\mathrm{GS}}|\hat O_L|\Phi_{\mathrm{GS}}\rangle=0$, is not
+formalized here.
 
 \noindent\textbf{Theorem 4.1} (Dyson--Lieb--Simon / Neves--Perez / Kennedy--Lieb--Shastry, Tasaki
 §4.1, eq.~(4.1.7), pp.~88--90; \texttt{Quantum/SpinS/DysonLiebSimon.lean}, Issue \#4485).  Existence
@@ -15191,7 +15253,7 @@ $\le2\pi r/L$ (the centering gives $|\delta|=\mathtt{ringDist}\le r$ via
 \texttt{natAbs\_signedRingDisp\_eq\_ringDist}, so the raw angle's $2\pi$ seam spread is avoided) and
 each $\|\hat S_y^{(3)}\|\le N/2$, over a window of $\le2r+1$ sites (\texttt{window\_card\_le}: the
 signed displacement injects $W_x$ into $\{-r,\dots,r\}$, injectivity from
-\texttt{dvd\_sub\_signedRingDisp}).  This uniform $O(1/L)$ bound feeds the $O(\|\hat M_x\|^2)$
+\texttt{signedRingDisp\_injective}).  This uniform $O(1/L)$ bound feeds the $O(\|\hat M_x\|^2)$
 second-order twist-conjugation bound (PR-6/PR-7), whose sum over the $L$ sites gives the Lemma~6.4
 $C/L$.  PR-6 (CRUX B, PR~\#5076,
 \texttt{Quantum/SpinS/LiebSchultzMattisTaylorBound.lean}): the \emph{second-order Taylor
