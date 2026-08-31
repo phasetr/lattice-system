@@ -1,10 +1,6 @@
-import LatticeSystem.Quantum.SpinS.LocalDoubleCommutatorBound
-import LatticeSystem.Quantum.SpinS.MultiSiteCore
+import LatticeSystem.Quantum.SpinS.RangeLocalDoubleCommutatorBound
 import LatticeSystem.Quantum.SpinS.AndersonTowerLocality
 import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
-import LatticeSystem.Quantum.SpinS.LiebSchultzMattisGeneral
-import LatticeSystem.Quantum.SpinS.RingDistance
-import LatticeSystem.Math.Combinatorics.CoordinateBall
 
 /-!
 # Test coverage for the general range-`r` bound, Problem 3.4.a, eq. (3.4.13)
@@ -16,12 +12,9 @@ new `LatticeSystem/Quantum/SpinS/TorusSupDistance.lean`, plus the extension of
 Quantum Many-Body Systems* (1st ed., Springer, 2020), §3.4, Problem 3.4.a, statement pp. 67-68,
 printed solution p. 501.
 
-This file **does not import** `LatticeSystem.Quantum.SpinS.RangeLocalDoubleCommutatorBound`: that
-module currently still holds the *old*, hypothesis-form capstone of the same name
-(`tasaki_problem_3_4_a_doubleCommutator_expectation_le`), which this PR replaces. Importing it here
-would let the pin below resolve against the stale declaration instead of failing as an unknown
-identifier. Once the library module is rewritten, importing it is expected to make every pin below
-resolve.
+The capstone `tasaki_problem_3_4_a_doubleCommutator_expectation_le` exists only in its
+support-predicate form: there is no hypothesis-form declaration of that name for these pins to
+resolve against.
 
 ## What each block pins
 
@@ -390,16 +383,18 @@ data. -/
 example {Φ : ((Fin 2 → Fin 5) → Fin 2) → ℂ} (hΦ : star Φ ⬝ᵥ Φ = 1) :
     rayleighOnVec
         ((∑ x, (onSiteS x (spinSOp3 1) : ManyBodyOpS (Fin 2 → Fin 5) 1))
-            * ((∑ b, onSiteS b (spinSOp1 1) + onSiteS (Function.update b 0 (b 0 + 1)) (spinSOp1 1))
+            * ((∑ b, (onSiteS b (spinSOp1 1)
+                    + onSiteS (Function.update b 0 (b 0 + 1)) (spinSOp1 1)))
                 * (∑ x, (onSiteS x (spinSOp3 1) : ManyBodyOpS (Fin 2 → Fin 5) 1))
               - (∑ x, (onSiteS x (spinSOp3 1) : ManyBodyOpS (Fin 2 → Fin 5) 1))
-                * (∑ b, onSiteS b (spinSOp1 1) + onSiteS (Function.update b 0 (b 0 + 1))
-                    (spinSOp1 1)))
-          - ((∑ b, onSiteS b (spinSOp1 1) + onSiteS (Function.update b 0 (b 0 + 1)) (spinSOp1 1))
+                * (∑ b, (onSiteS b (spinSOp1 1)
+                    + onSiteS (Function.update b 0 (b 0 + 1)) (spinSOp1 1))))
+          - ((∑ b, (onSiteS b (spinSOp1 1)
+                    + onSiteS (Function.update b 0 (b 0 + 1)) (spinSOp1 1)))
                 * (∑ x, (onSiteS x (spinSOp3 1) : ManyBodyOpS (Fin 2 → Fin 5) 1))
               - (∑ x, (onSiteS x (spinSOp3 1) : ManyBodyOpS (Fin 2 → Fin 5) 1))
-                * (∑ b, onSiteS b (spinSOp1 1) + onSiteS (Function.update b 0 (b 0 + 1))
-                    (spinSOp1 1)))
+                * (∑ b, (onSiteS b (spinSOp1 1)
+                    + onSiteS (Function.update b 0 (b 0 + 1)) (spinSOp1 1))))
             * (∑ x, (onSiteS x (spinSOp3 1) : ManyBodyOpS (Fin 2 → Fin 5) 1))) Φ
       ≤ (101250 : ℝ) := by
   have hring : ∀ a : Fin 5, ringDist 5 (a + 1) a = 1 := by decide
