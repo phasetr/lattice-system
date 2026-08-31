@@ -16,9 +16,11 @@ The sup-norm reading of Tasaki's unqualified `|x - y| ≤ r` is chosen because t
 contained in the sup-norm ball: a locality hypothesis phrased on the sup-norm ball is the weaker
 one, and in `ℤ^d` itself it is the reading under which a radius-`r` ball has exactly `(2r+1)^d`
 sites. The transported torus count (`card_siteBall_torusSupDist_le`) only inherits this file's
-`≤ (2r+1)^d` bound, not the equality — it is strictly smaller once the torus side length `L` is
-below `2r+1`. The counts this file's transport delivers to Problem 3.4.a are at radii `2r` and
-`4r`.
+`≤ (2r+1)^d` bound, not the equality: for `1 ≤ d` and a nonzero torus side length `L` below
+`2r+1`, the per-axis ring ball already saturates at `L` sites, so the true count is `L^d`, strictly
+smaller than `(2r+1)^d`; at `d = 0` there is exactly one site regardless of `L` or `r`, so both
+sides equal `1` and no strict inequality is possible. The counts this file's transport delivers to
+Problem 3.4.a are at radii `2r` and `4r`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §3.4, Problem 3.4.a, statement pp. 67-68, printed solution p. 501.

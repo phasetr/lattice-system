@@ -27,13 +27,13 @@ F-3 (the two-window kernel constant).
 
 **Signature pins on the abstract distance layer.** `siteBall`, `mem_siteBall`,
 `disjoint_siteBall_of_lt` (`Math/Combinatorics/SiteBall.lean`); `ringDist_comm`, `ringDist_self`,
-`ringDist_triangle`, `signedRingDisp_self`, `signedRingDisp_injective` (extension of
-`Quantum/SpinS/RingDistance.lean`); `torusSupDist`, `torusSupDist_le_iff`, `torusSupDist_comm`,
+`ringDist_triangle`, `signedRingDisp_self`, `signedRingDisp_injective`
+(`Quantum/SpinS/RingDistance.lean`); `torusSupDist`, `torusSupDist_le_iff`, `torusSupDist_comm`,
 `torusSupDist_triangle`, `card_siteBall_torusSupDist_le`
 (`Quantum/SpinS/TorusSupDistance.lean`); and
 `manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal` together with the capstone
 `tasaki_problem_3_4_a_doubleCommutator_expectation_le`
-(`Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean`), whose locality hypotheses are now
+(`Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean`), whose locality hypotheses are
 `SupportedOnS`-based rather than raw commutation hypotheses.
 
 **Numeric fixtures.**
@@ -55,7 +55,7 @@ F-3 (the two-window kernel constant).
   `shift x := Function.update x 0 (x 0 + 1)` (`h₀ = 2`, `SupportedOnS`-bound support of at most
   **2** sites, wrapping the ring coordinate) — whose `SupportedOnS` hypotheses are **discharged by
   proof** (`supportedOnS_onSiteS`, `SupportedOnS.add`, `ringDist_self`, and `∀ a : Fin 5,
-  ringDist 5 (a + 1) a = 1` by `decide`), not assumed. No prior test ever witnessed the range-`r`
+  ringDist 5 (a + 1) a = 1` by `decide`), not assumed. This fixture witnesses the range-`r`
   locality hypotheses being jointly satisfiable in a non-degenerate (support bound not a singleton,
   ball ⊊ `Λ`, wrapping) way.
 
@@ -70,9 +70,10 @@ the swapped windows into `manyBodyOperatorNormS_doubleCommutator_le_of_rangeLoca
 obligation (`∀ x ∉ (outer ball), ∀ z ∈ (inner ball), Commute (o x) (h b * o z - o z * h b)`)
 requires deriving `2 * r < dist x z` from `4 * r < dist x b` and `dist z b ≤ 2 * r`, which needs
 the outer ball to be the *wider* one; with the windows swapped this derivation is not available
-and the proof does not go through. This is a **provability** claim, not an
-unprovability-*by-*obligation claim about the hypothesis-form capstone: the argument above does
-not hold for the hypothesis form and must not be restated for it.
+and the proof does not go through. This is a **provability** claim about the
+`SupportedOnS`-based capstone, not an unprovability-*by-*obligation claim about a hypothesis-form
+variant of it — no such declaration exists in this tree, and the argument above must not be
+restated as if it did.
 -/
 
 namespace LatticeSystem.Tests.RangeLocalDoubleCommutatorBound
@@ -157,7 +158,7 @@ example {dist : Λ → Λ → ℕ} (hsymm : ∀ a b, dist a b = dist b a)
     Disjoint (siteBall dist r x) (siteBall dist r y) :=
   disjoint_siteBall_of_lt hsymm htri h
 
-/-! ## Signature pins: the `RingDistance.lean` extension -/
+/-! ## Signature pins: `RingDistance.lean` -/
 
 /-- **Signature pin (`ringDist_comm`).** The ring distance is symmetric. -/
 example (L : ℕ) (x y : Fin L) : ringDist L x y = ringDist L y x :=
@@ -379,8 +380,8 @@ of them reached by *wrapping* the ring coordinate — a support **upper bound**,
 the support is exactly these two sites. Both sites lie in the radius-`1` ball around `x`, since
 `ringDist 5 (x 0 + 1) (x 0) = 1` and every other coordinate contributes distance `0`
 (`ringDist_self`). The order term `o x := onSiteS x (spinSOp3 1)` is `SupportedOnS` on `{x}` — an
-upper bound, not a proof that the support is exactly `{x}`. The
-norm bounds `h₀ = 2`, `o₀ = 1/2` come from `onSiteS_spinSOp1_manyBodyOperatorNormS_le` (triangle
+upper bound, not a proof that the support is exactly `{x}`. The norm bounds `h₀ = 2`, `o₀ = 1/2`
+come from `onSiteS_spinSOp1_manyBodyOperatorNormS_le` (triangle
 inequality over the two-term sum) and `onSiteS_spinSOp3_manyBodyOperatorNormS_le`. No hypothesis of
 the capstone is discharged by `sorry` or assumed abstractly: every one is proved from this concrete
 data. -/
