@@ -141,27 +141,29 @@ example {d : ℕ} (pos : Λ → (Fin d → ℤ)) (hpos : Function.Injective pos)
 /-- **Fixture (ball-count tightness).** On `Λ := Fin 2 → Fin 3` with `pos y i := ((y i : ℕ) : ℤ)`
 (injective) and centre `c := fun _ => (1 : Fin 3)`, every coordinate `y i ∈ {0,1,2}` satisfies
 `|y i - 1| ≤ 1`, so the radius-`1` ball is *all* of `Λ`: `coordSupBall pos 1 c = Finset.univ`, of
-card `Fintype.card (Fin 2 → Fin 3) = 3^2 = 9 = (2·1+1)^2`. The bound is therefore attained, which
-rules out a wrongly-large closed form (a one-sided numeric endpoint alone could not). -/
+card `Fintype.card (Fin 2 → Fin 3) = 3^2 = 9 = (2·1+1)^2`. The card is computed by
+`le_antisymm` *through* `card_coordSupBall_le`, so a wrongly-large closed form breaks the fixture:
+with a bound `> 9` the upper branch could not be discharged against the value `9` that the lower
+branch forces. A one-sided numeric endpoint alone could not do this. -/
 example :
     (coordSupBall (Λ := Fin 2 → Fin 3) (fun y i => ((y i : ℕ) : ℤ)) 1
         (fun _ => (1 : Fin 3))).card = 9 := by
   have hpos : Function.Injective (fun y : Fin 2 → Fin 3 => fun i => ((y i : ℕ) : ℤ)) := by
     intro y y' hyy'
     funext i
-    have := congrFun hyy' i
-    simpa using Fin.val_injective (by exact_mod_cast this)
+    have hi := congrFun hyy' i
+    simp only at hi
+    exact Fin.val_injective (by exact_mod_cast hi)
   have hall : coordSupBall (Λ := Fin 2 → Fin 3) (fun y i => ((y i : ℕ) : ℤ)) 1
       (fun _ => (1 : Fin 3)) = Finset.univ := by
-    apply Finset.eq_univ_of_forall
-    intro y
-    apply mem_coordSupBall.mpr
-    intro i
-    fin_cases i <;> fin_cases y i <;> decide
-  rw [hall]
-  have hcard := card_coordSupBall_le (Λ := Fin 2 → Fin 3)
-    (fun y i => ((y i : ℕ) : ℤ)) hpos 1 (fun _ => (1 : Fin 3))
-  simp [Finset.card_univ]
+    refine Finset.eq_univ_of_forall fun y => mem_coordSupBall.mpr fun i => ?_
+    have hlt : (y i).val < 3 := (y i).isLt
+    have h1 : ((fun _ : Fin 2 => (1 : Fin 3)) i).val = 1 := rfl
+    rw [abs_le]
+    omega
+  refine le_antisymm (le_trans (card_coordSupBall_le (Λ := Fin 2 → Fin 3)
+    (fun y i => ((y i : ℕ) : ℤ)) hpos 1 (fun _ => (1 : Fin 3))) (by norm_num)) ?_
+  rw [hall, Finset.card_univ, Fintype.card_fun, Fintype.card_fin, Fintype.card_fin]
 
 /-! ## Numeric fixture F-3: two-window kernel constant (`m₁ ≠ m₂`) -/
 
