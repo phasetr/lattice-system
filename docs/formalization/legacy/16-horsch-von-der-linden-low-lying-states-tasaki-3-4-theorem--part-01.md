@@ -446,14 +446,16 @@ All declarations below are **PROVED**; `#print axioms` on each yields only `prop
 | `torusSupDist_triangle` | the torus sup-distance satisfies the triangle inequality | `Quantum/SpinS/TorusSupDistance.lean` |
 | `card_siteBall_torusSupDist_le` | `\|B_r(x)\| ≤ (2r+1)^d` for the torus sup-distance ball | `Quantum/SpinS/TorusSupDistance.lean` |
 | `manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal` | `‖[Ô,[Ĥ,Ô]]‖ ≤ 4 m₁ m₂ h₀ o₀² \|Λ\|` for `SupportedOnS`-local terms over an abstract distance, `m₁`/`m₂` the `2r`-/`4r`-ball counts | `Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean` |
-| `tasaki_problem_3_4_a_doubleCommutator_expectation_le` | eq. (3.4.13): `⟨Φ\|[Ô,[Ĥ,Ô]]\|Φ⟩ ≤ 4 (4r+1)^d (8r+1)^d h₀ o₀² L^d` for a normalised `Φ` and range-`r` `SupportedOnS` site-local terms on `Λ_L` | `Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean` |
+| `tasaki_problem_3_4_a_doubleCommutator_expectation_le` | Problem 3.4.a, with the constant the range-`r` premise yields (not eq. (3.4.13) as printed): `⟨Φ\|[Ô,[Ĥ,Ô]]\|Φ⟩ ≤ 4 (4r+1)^d (8r+1)^d h₀ o₀² L^d` for a normalised `Φ` and range-`r` `SupportedOnS` site-local terms on `Λ_L` | `Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean` |
 
 Regression fixtures live in `LatticeSystem/Tests/OperatorSupport.lean` (signature pins on
 `SupportedOnS` and its three lemmas) and `LatticeSystem/Tests/RangeLocalDoubleCommutatorBound.lean`
 (signature pins on the remaining declarations above, plus numeric fixtures): F-1, periodic
 wraparound on `Fin 2 → Fin 5` (the torus sup-distance from the origin to `fun _ => 4` is the
-*cyclic* arc length `1`, not the linear gap `4`); F-2, ball-count tightness — the radius-`1` ball
-on `d = 2`, `L = 5` has exactly `9 = (2·1+1)²` sites out of `25`; F-3, the two-window kernel
+*cyclic* arc length `1`, not the linear gap `4`); F-2, kept from PR-4 as-is — `coordSupBall`
+tightness on `Fin 2 → Fin 3`, every site lies in the radius-`1` coordinate ball, exhausting the
+`(2·1+1)^2 = 9`-site bound; F-2′, ball-count tightness — the radius-`1` `siteBall`/`torusSupDist`
+ball on `d = 2`, `L = 5` has exactly `9 = (2·1+1)²` sites out of `25`; F-3, the two-window kernel
 constant at `m₁ = 3 ≠ 5 = m₂`, `h₀ = 5/2`, `o₀ = 1/2`, `|B| = 7`, giving `525/2`, a point where
 `4m₁m₂`, `4m₁²`, `4m₂²` and `8m₁m₂` take the pairwise distinct values `262.5`, `157.5`, `437.5` and
 `525`; F-4′, the capstone constant at `r = 1`, `d = 2`, `L = 5`, `h₀ = 2`, `o₀ = 1/2`, giving

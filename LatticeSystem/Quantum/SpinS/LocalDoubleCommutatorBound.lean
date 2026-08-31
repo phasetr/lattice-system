@@ -68,8 +68,8 @@ the collapse of `[Ĥ, Ô]` exactly as in eq. (3.4.9).  The outer window carries 
 commutes with `[ĥ_b, ô_z]` for `x` outside `W₂ b` and `z` inside `W₁ b`", which is what makes the
 remaining site sum collapse onto `W₂ b`.
 Two genuinely different windows are needed by Tasaki Problem 3.4.a (pp. 67-68, solution p. 501),
-where range-`r` local terms give `W₁` the radius `r` and `W₂` the radius `2r`; there the single-site
-hypothesis `hoo` of the one-window form below need not hold. -/
+where range-`r` local terms give `W₁` the radius `2r` and `W₂` the radius `4r`; there the
+single-site hypothesis `hoo` of the one-window form below need not hold. -/
 theorem doubleCommutator_orderSum_eq_twoWindowSum {ι : Type*} (B : Finset ι)
     (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N) (W₁ W₂ : ι → Finset Λ)
     (hW : ∀ b ∈ B, ∀ z ∉ W₁ b, Commute (hb b) (o z))

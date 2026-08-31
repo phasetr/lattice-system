@@ -97,7 +97,8 @@ theorem manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal
 
 end Abstract
 
-/-- **Tasaki Problem 3.4.a, eq. (3.4.13), pp. 67-68 (printed solution p. 501)** — on the periodic
+/-- **Tasaki Problem 3.4.a, pp. 67-68, with the constant the range-`r` premise yields (not
+eq. (3.4.13) as printed, solution p. 501)** — on the periodic
 lattice `Λ_L = Fin d → Fin L`, for a Hamiltonian `Ĥ = Σ_x ĥ_x` and an order operator
 `Ô_L = Σ_x ô_x` whose local terms are supported on the radius-`r` torus sup-distance ball of their
 own site, and a normalized state `Φ`,

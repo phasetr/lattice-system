@@ -15,9 +15,22 @@ support they depend only on the restricted configurations.
 
 `LatticeSystem.Quantum.SupportedOn` (`Quantum/SpinS/AndersonTowerLocalDecay.lean`) is a third
 encoding of the same "acts only on `S`" concept, phrased in commutant form: `G` is supported on `S`
-when it commutes with every on-site factor located off `S`. It is not α-equivalent to
-`SupportedOnS` or `SupportedOnLeftS`, so all three coexist without conflict; unifying the three
-encodings into one predicate is tracked work, not done here.
+when it commutes with every on-site factor located off `S`. A fourth encoding,
+`IsLocalRangeR` (`Quantum/SpinS/LiebSchultzMattisGeneral.lean`), phrases the same idea for a fixed
+centre and radius on a ring, again in commutant form; its own doc comment notes it is equivalent,
+by the factor double-commutant theorem, to a support condition, and that the commutant phrasing is
+deliberate (it is shared with the §7.1.3 Theorem 7.3 axiom hypothesis). None of the four is
+α-equivalent to any other, so all coexist without conflict; unifying them into one predicate is
+tracked work, not done here.
+
+`SupportedOn` and `SupportedOnS` are a particular hazard: both have signature
+`Finset Λ → ManyBodyOpS Λ N → Prop`, both live in namespace `LatticeSystem.Quantum`, they differ
+by one character, and (being both "commutes with every off-support on-site factor" versus "vanishes
+off support, depends only on support") they are logically equivalent for `ManyBodyOpS`. Picking the
+wrong one therefore still type-checks. No bridge lemma from `IsLocalRangeR` or `SupportedOn` to
+`SupportedOnS` (or back) is proved in either direction, so a caller holding a hypothesis phrased in
+one of these predicates cannot currently invoke a capstone stated in another; closing that gap is
+tracked work alongside the unification above.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §3.4, Problem 3.4.a, statement pp. 67-68.

@@ -387,5 +387,5 @@ Cauchy–Schwarz), giving `Δ₊ ≤ C/L` with `C = 8B²|h₀|+1`. The unused op
 
 **Correction (outside the frozen record above).** The frozen record from former line 747 cites
 `dvd_sub_signedRingDisp` for the injectivity used by `window_card_le`; the current source names
-that lemma `signedRingDisp_injective` (`Quantum/SpinS/LiebSchultzMattisGeneratorNorm.lean`). The
+that lemma `signedRingDisp_injective` (`Quantum/SpinS/RingDistance.lean`). The
 frozen record text above is left unedited to preserve exact historical parity.

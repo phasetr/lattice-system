@@ -4,12 +4,13 @@ Coordinate sup-norm balls in `ℤ^d`.
 For a finite site set `Λ` carrying injective integer coordinates `pos : Λ → (Fin d → ℤ)`, the
 **coordinate sup-norm ball** `B_r(x) = {y ∈ Λ : ∀ i, |pos y i - pos x i| ≤ r}` has cardinality at
 most `(2r+1)^d`. This is the `d`-dimensional analogue of the 1-D displacement-window count already
-used at `Quantum/SpinS/LiebSchultzMattisGeneratorNorm.lean`: the cyclic ring window of that count
-*is* recovered from this coordinate ball, via `card_siteBall_torusSupDist_le`
-(`Quantum/SpinS/TorusSupDistance.lean`), which transports the torus sup-distance ball onto a
-coordinate ball with `pos y i := signedRingDisp L (x i) (y i)` and reuses `card_coordSupBall_le`
-unchanged. It is used indirectly, once, inside that transport, at the radii `2r` and `4r` needed by
-Tasaki Problem 3.4.a, eq. (3.4.13).
+used at `Quantum/SpinS/LiebSchultzMattisGeneratorNorm.lean`: `card_siteBall_torusSupDist_le`
+(`Quantum/SpinS/TorusSupDistance.lean`) recovers the *torus sup-distance ball count* from this
+coordinate ball, transporting it via `pos y i := signedRingDisp L (x i) (y i)` and reusing
+`card_coordSupBall_le` unchanged, at the radii `2r` and `4r` needed by Tasaki Problem 3.4.a. The
+1-D window count `window_card_le` itself is *not* routed through that transport — it keeps its own
+independent `card_le_card_of_injOn`-into-`Finset.Icc` proof, so the two counting arguments remain
+near-duplicates at `d = 1`.
 
 The sup-norm reading of Tasaki's unqualified `|x - y| ≤ r` is chosen because the Euclidean ball is
 contained in the sup-norm ball: a locality hypothesis phrased on the sup-norm ball is the weaker
