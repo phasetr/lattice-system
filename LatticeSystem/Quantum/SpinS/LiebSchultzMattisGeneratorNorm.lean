@@ -20,7 +20,7 @@ The three ingredients are:
   centering resolves).
 * **Per-site spin norm** `‖Ŝ_y^{(3)}‖ ≤ N/2` (`= S`, `onSiteS_spinSOp3_manyBodyOperatorNormS_le`).
 * **Window cardinality** `|W_x| ≤ 2r+1` (`window_card_le`): the signed displacement injects `W_x`
-  into `{−r, …, r}` (injectivity from `dvd_sub_signedRingDisp`, the range from
+  into `{−r, …, r}` (injectivity from `signedRingDisp_injective`, the range from
   `natAbs_signedRingDisp_eq_ringDist`).
 
 Combined through the finite-sum triangle inequality and scalar homogeneity of the `L²` operator norm

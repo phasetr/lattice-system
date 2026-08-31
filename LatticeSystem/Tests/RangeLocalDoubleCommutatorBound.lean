@@ -42,9 +42,9 @@ tightness fixture) and F-3 (the two-window kernel constant) are kept as-is.
   not the linear gap `4`), and the radius-`1` ball around the origin contains `fun _ => 4` but not
   `fun _ => 2`. A non-periodic coordinate ball would instead give distance `4` and exclude
   `fun _ => 4`, so this fixture is exactly what makes periodicity load-bearing.
-- F-2 (ball-count tightness, `d = 2`, `r = 1`, `L = 5`, `by decide`): the radius-`1` ball around the
-  origin has exactly `9 = (2·1+1)^2` sites, out of `|Λ| = 5^2 = 25`, so the bound is attained and
-  locality is non-trivial (`9 < 25`).
+- F-2' (ball-count tightness, `d = 2`, `r = 1`, `L = 5`, `by decide`): the radius-`1` ball around
+  the origin has exactly `9 = (2·1+1)^2` sites, out of `|Λ| = 5^2 = 25`, so the bound is attained
+  and locality is non-trivial (`9 < 25`).
 - F-4′ (capstone constant, `r = 1`, `d = 2`, `L = 5`, `h₀ = 2`, `o₀ = 1/2`): the correct bound
   `4(4r+1)^d(8r+1)^d h₀ o₀² L^d` evaluates to `4·25·81·2·(1/4)·25 = 101250`, discriminated from the
   book-solution printed-constant form `4(2r+1)^d(4r+1)^d h₀ o₀² L^d = 4·9·25·2·(1/4)·25 = 11250`
@@ -71,9 +71,8 @@ obligation (`∀ x ∉ (outer ball), ∀ z ∈ (inner ball), Commute (o x) (h b 
 requires deriving `2 * r < dist x z` from `4 * r < dist x b` and `dist z b ≤ 2 * r`, which needs
 the outer ball to be the *wider* one; with the windows swapped this derivation is not available
 and the proof does not go through. This is a **provability** claim, not an
-unprovability-*by-*obligation claim in the old hypothesis-form sense — a reviewer separately
-compiled the swapped *old* capstone successfully, so the analogous claim must not be restated for
-that form.
+unprovability-*by-*obligation claim in the old hypothesis-form sense: the argument above does not
+hold for the hypothesis form of the capstone and must not be restated for it.
 -/
 
 namespace LatticeSystem.Tests.RangeLocalDoubleCommutatorBound
@@ -270,7 +269,8 @@ also the cyclic distance, since `5 - 2 = 3 > 2`) is excluded from the same ball.
 example : (fun _ => (2 : Fin 5)) ∉ siteBall (torusSupDist 2 5) 1 (fun _ => (0 : Fin 5)) := by
   decide
 
-/-! ## Numeric fixture F-2: ball-count tightness (`d = 2`, `r = 1`, `L = 5`) -/
+/-! ## Numeric fixtures F-2 (kept) and F-2' (new): ball-count tightness
+(`d = 2`, `r = 1`, `L = 5`) -/
 
 /-- **Fixture (kept, `coordSupBall` tightness, `Fin 2 → Fin 3`).** As in PR-4: every site lies in
 the radius-`1` ball, so `coordSupBall pos 1 c = Finset.univ`, of card `9 = (2·1+1)^2`, forcing an
@@ -296,7 +296,8 @@ example :
   rw [hall, Finset.card_univ, Fintype.card_fun, Fintype.card_fin, Fintype.card_fin]
   norm_num
 
-/-- **Fixture (new, `siteBall`/`torusSupDist` tightness, `d = 2`, `r = 1`, `L = 5`, `by decide`).**
+/-- **Fixture F-2' (new, `siteBall`/`torusSupDist` tightness, `d = 2`, `r = 1`, `L = 5`,
+`by decide`).**
 The radius-`1` ball around the origin on the `d = 2`, `L = 5` torus has exactly
 `9 = (2·1+1)^2` sites (the bound is attained), out of `|Λ| = 25`, so locality is non-trivial:
 `9 < 25`. -/
@@ -372,9 +373,10 @@ example (h o : (Fin 2 → Fin 5) → ManyBodyOpS (Fin 2 → Fin 5) N)
 
 /-- **Fixture (premise witness, `Λ = Fin 2 → Fin 5`, `N = 1`, `r = 1`).** The site-`0`-and-shifted
 Hamiltonian term `h x := onSiteS x (spinSOp1 1) + onSiteS (shift x) (spinSOp1 1)`, with
-`shift x := Function.update x 0 (x 0 + 1)`, has support **exactly** `{x, shift x}` — two sites, one
-of them reached by *wrapping* the ring coordinate — and both lie in the radius-`1` ball around `x`,
-since `ringDist 5 (x 0 + 1) (x 0) = 1` and every other coordinate contributes distance `0`
+`shift x := Function.update x 0 (x 0 + 1)`, is `SupportedOnS` on `{x, shift x}` — two sites, one
+of them reached by *wrapping* the ring coordinate — a support **upper bound**, not a proof that
+the support is exactly these two sites. Both sites lie in the radius-`1` ball around `x`, since
+`ringDist 5 (x 0 + 1) (x 0) = 1` and every other coordinate contributes distance `0`
 (`ringDist_self`). The order term `o x := onSiteS x (spinSOp3 1)` has singleton support `{x}`. The
 norm bounds `h₀ = 2`, `o₀ = 1/2` come from `onSiteS_spinSOp1_manyBodyOperatorNormS_le` (triangle
 inequality over the two-term sum) and `onSiteS_spinSOp3_manyBodyOperatorNormS_le`. No hypothesis of

@@ -50,8 +50,9 @@ constant `4 m₁ m₂ h₀ o₀² |B|`. The one-window statements pinned above a
 two-window core, so no argument is proved twice. Since `4 m₁ m₂` is symmetric in `m₁` and `m₂`, no
 numeric fixture can separate a swap of the two window bounds; what pins the roles is the hypothesis
 shape — `hW` constrains the inner window and the `x ∉ W₂ b` binder the outer one — together with
-the range-`r` capstone of `Tests/RangeLocalDoubleCommutatorBound.lean`, where the outer window is
-the `2r`-ball and cannot be bounded by `(2r+1)^d`.
+the range-`r` capstone of `Tests/RangeLocalDoubleCommutatorBound.lean`, where the inner window is
+the `2r`-ball, bounded by `(4r+1)^d`, and the outer window is the `4r`-ball, bounded by
+`(8r+1)^d`, so the two window bounds are not interchangeable.
 
 ## Duplicate assessment
 

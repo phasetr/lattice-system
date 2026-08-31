@@ -13,6 +13,12 @@ The predicate has the same two-clause shape as the half-ring predicate `Supporte
 membership in an arbitrary `S : Finset Λ`: the entries vanish off the support, and inside the
 support they depend only on the restricted configurations.
 
+`LatticeSystem.Quantum.SupportedOn` (`Quantum/SpinS/AndersonTowerLocalDecay.lean`) is a third
+encoding of the same "acts only on `S`" concept, phrased in commutant form: `G` is supported on `S`
+when it commutes with every on-site factor located off `S`. It is not α-equivalent to
+`SupportedOnS` or `SupportedOnLeftS`, so all three coexist without conflict; unifying the three
+encodings into one predicate is tracked work, not done here.
+
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §3.4, Problem 3.4.a, statement pp. 67-68.
 -/

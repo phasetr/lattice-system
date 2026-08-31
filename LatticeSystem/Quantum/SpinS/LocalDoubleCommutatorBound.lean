@@ -13,7 +13,7 @@ The collapse is proved with **two independent windows**: an inner window `W₁ b
 commutes with the order terms, and an outer window `W₂ b`, off which the order terms commute with
 the inner commutators. The one-window form used by the bond-local eq. (3.4.11) is the instance
 `W₁ = W₂`, and the general range-`r` estimate of Problem 3.4.a needs the two windows genuinely
-unequal, since there the inner and outer ranges differ (`r` and `2r`).
+unequal, since there the inner and outer ranges differ (`2r` and `4r`).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §3.4, eqs. (3.4.9)-(3.4.11), pp. 66-67; Problem 3.4.a, pp. 67-68, whose solution (p. 501) is
@@ -125,8 +125,11 @@ Each of the `|B| · m₂ · m₁` surviving terms of the two-window collapse is 
 `‖[ô_x, [ĥ_b, ô_z]]‖ ≤ 2 o₀ · 2 h₀ o₀ = 4 h₀ o₀²` through the commutator norm inequality
 `‖[Â, B̂]‖ ≤ 2‖Â‖‖B̂‖` (Tasaki (A.2.5)/(A.2.6), p. 463) applied twice.
 The two window bounds occupy fixed index positions: `m₂` counts the outer sum, over `x`, and `m₁`
-the inner sum, over `z`.  Tasaki Problem 3.4.a (pp. 67-68, solution p. 501) instantiates them at
-`m₁ = (2r+1)^d` and `m₂ = (4r+1)^d`.  Nonnegativity of `h₀` is not a hypothesis: inside a branch
+the inner sum, over `z`.  Tasaki Problem 3.4.a (pp. 67-68) instantiates them, under the range-`r`
+support premise, at `m₁ = (4r+1)^d` and `m₂ = (8r+1)^d`; the printed solution (p. 501) instead
+gives the pair `m₁ = (2r+1)^d`, `m₂ = (4r+1)^d`, which is its own counting and does not follow from
+the range-`r` premise (see `RangeLocalDoubleCommutatorBound.lean`).  Nonnegativity of `h₀` is not
+a hypothesis: inside a branch
 `b ∈ B` it follows from `0 ≤ ‖ĥ_b‖ ≤ h₀`.  Nonnegativity of `o₀` is one, since with `Λ` empty
 nothing forces it. -/
 theorem manyBodyOperatorNormS_doubleCommutator_le_of_twoWindows {ι : Type*} (B : Finset ι)

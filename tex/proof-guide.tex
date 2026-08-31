@@ -12961,7 +12961,8 @@ the operator-norm properties (A.2.5)/(A.2.6) p.~463; \textbf{discharged axiom-fr
 \texttt{Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean},
 \texttt{Math/Combinatorics/SiteBall.lean}, \texttt{Quantum/SpinS/TorusSupDistance.lean}, and
 \texttt{Math/Combinatorics/CoordinateBall.lean}, fixtures in
-\texttt{Tests/RangeLocalDoubleCommutatorBound.lean}). Here $\hat H=\sum_{x\in\Lambda_L}\hat h_x$
+\texttt{Tests/RangeLocalDoubleCommutatorBound.lean} and \texttt{Tests/OperatorSupport.lean}).
+Here $\hat H=\sum_{x\in\Lambda_L}\hat h_x$
 and $\hat O_L=\sum_{x\in\Lambda_L}\hat o_x$ are both sums over every site of the periodic lattice
 $\Lambda_L=\mathrm{Fin}\,d\to\mathrm{Fin}\,L$ (the periodic identification of p.~52), each local
 term \emph{supported on} the radius-$r$ torus sup-distance ball of its own site
@@ -15251,7 +15252,7 @@ $\le2\pi r/L$ (the centering gives $|\delta|=\mathtt{ringDist}\le r$ via
 \texttt{natAbs\_signedRingDisp\_eq\_ringDist}, so the raw angle's $2\pi$ seam spread is avoided) and
 each $\|\hat S_y^{(3)}\|\le N/2$, over a window of $\le2r+1$ sites (\texttt{window\_card\_le}: the
 signed displacement injects $W_x$ into $\{-r,\dots,r\}$, injectivity from
-\texttt{dvd\_sub\_signedRingDisp}).  This uniform $O(1/L)$ bound feeds the $O(\|\hat M_x\|^2)$
+\texttt{signedRingDisp\_injective}).  This uniform $O(1/L)$ bound feeds the $O(\|\hat M_x\|^2)$
 second-order twist-conjugation bound (PR-6/PR-7), whose sum over the $L$ sites gives the Lemma~6.4
 $C/L$.  PR-6 (CRUX B, PR~\#5076,
 \texttt{Quantum/SpinS/LiebSchultzMattisTaylorBound.lean}): the \emph{second-order Taylor

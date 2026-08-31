@@ -1,10 +1,13 @@
 /-
 Metric balls on a finite site set carrying an abstract `ℕ`-valued distance.
 
-`siteBall dist r x` is the set of sites within distance `r` of `x`.  The only property the
-double-commutator locality argument needs of `dist` is that balls of radius `r` around centres more
-than `2r` apart are disjoint, which follows from symmetry and the triangle inequality alone; no
-metric-space structure, no coordinate embedding, and no concrete lattice are assumed.
+`siteBall dist r x` is the set of sites within distance `r` of `x`.  The double-commutator
+locality argument needs symmetry and the triangle inequality of `dist`: `disjoint_siteBall_of_lt`
+packages them into ball disjointness for well-separated centres, but
+`manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal`
+(`Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean`) also uses symmetry and the triangle
+inequality directly, outside that packaged lemma, to route distances between the inner and outer
+windows.  No metric-space structure, no coordinate embedding, and no concrete lattice are assumed.
 
 This is the geometric side of the locality bookkeeping, kept apart from `CoordinateBall.lean`,
 whose ball is defined through an integer coordinate embedding and exists to *count*.  A concrete
@@ -32,8 +35,8 @@ theorem mem_siteBall {dist : Λ → Λ → ℕ} {r : ℕ} {x y : Λ} :
 
 /-- **Well-separated centres have disjoint balls**: if `dist x y > 2r` then `B_r(x)` and `B_r(y)`
 are disjoint, since a common point would join `x` to `y` by two arcs of length at most `r`.  This
-is the only geometric input the locality argument needs, and it uses nothing about `dist` beyond
-symmetry and the triangle inequality. -/
+packages `hsymm`/`htri` for the disjointness step; the locality argument also uses `hsymm`/`htri`
+directly elsewhere, and uses nothing about `dist` beyond them. -/
 theorem disjoint_siteBall_of_lt {dist : Λ → Λ → ℕ}
     (hsymm : ∀ a b, dist a b = dist b a)
     (htri : ∀ a b c, dist a c ≤ dist a b + dist b c)

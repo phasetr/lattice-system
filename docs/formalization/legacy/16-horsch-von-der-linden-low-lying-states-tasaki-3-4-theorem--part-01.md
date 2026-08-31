@@ -459,8 +459,9 @@ constant at `m₁ = 3 ≠ 5 = m₂`, `h₀ = 5/2`, `o₀ = 1/2`, `|B| = 7`, givi
 `525`; F-4′, the capstone constant at `r = 1`, `d = 2`, `L = 5`, `h₀ = 2`, `o₀ = 1/2`, giving
 `101250`, discriminated from the book-solution printed-constant form (`11250`) and from the
 exponent-shape slip `L^d = 25 ≠ d^L = 32`; and F-5, a concrete witness — a two-site,
-ring-wrapping Hamiltonian term and a singlet order term on `Fin 2 → Fin 5` — whose `SupportedOnS`
-hypotheses are *discharged by proof* rather than assumed, giving the same `101250` bound. Since
+ring-wrapping Hamiltonian term and a singleton-support order term on `Fin 2 → Fin 5` — whose
+`SupportedOnS` hypotheses are *discharged by proof* rather than assumed, giving the same `101250`
+bound. Since
 `4 m₁ m₂` is symmetric, a swap of the two window bounds is invisible to any numeric fixture on the
 constant alone; in this `SupportedOnS`-based form the window roles are pinned by **provability**
 instead — assembling the swapped windows into the kernel's outer-commutation obligation requires
