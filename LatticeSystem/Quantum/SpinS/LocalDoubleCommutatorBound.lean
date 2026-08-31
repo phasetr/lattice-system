@@ -9,8 +9,15 @@ resulting finitely many terms are bounded one by one by the commutator operator-
 This yields the bound `⟨Φ|[Ô,[Ĥ,Ô]]|Φ⟩ ≤ ‖[Ô,[Ĥ,Ô]]‖ ≤ 16 d h₀ o₀² L^d` on a normalized state,
 which is the numerator estimate feeding the Horsch-von der Linden variational argument.
 
+The collapse is proved with **two independent windows**: an inner window `W₁ b`, off which `ĥ_b`
+commutes with the order terms, and an outer window `W₂ b`, off which the order terms commute with
+the inner commutators. The one-window form used by the bond-local eq. (3.4.11) is the instance
+`W₁ = W₂`, and the general range-`r` estimate of Problem 3.4.a needs the two windows genuinely
+unequal, since there the inner and outer ranges differ (`r` and `2r`).
+
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
-2020, §3.4, eqs. (3.4.9)-(3.4.11), pp. 66-67; operator-norm properties (A.2.5)/(A.2.6), p. 463.
+2020, §3.4, eqs. (3.4.9)-(3.4.11), pp. 66-67; Problem 3.4.a, pp. 67-68, whose solution (p. 501) is
+the source of the two-window form; operator-norm properties (A.2.5)/(A.2.6), p. 463.
 -/
 import LatticeSystem.Math.CommutatorSum
 import LatticeSystem.Quantum.SpinS.ExpectationNormBound
