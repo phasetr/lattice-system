@@ -1,53 +1,86 @@
 import LatticeSystem.Quantum.SpinS.LocalDoubleCommutatorBound
-import LatticeSystem.Quantum.SpinS.RangeLocalDoubleCommutatorBound
+import LatticeSystem.Quantum.SpinS.MultiSiteCore
+import LatticeSystem.Quantum.SpinS.AndersonTowerLocality
+import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
+import LatticeSystem.Quantum.SpinS.LiebSchultzMattisGeneral
+import LatticeSystem.Quantum.SpinS.RingDistance
 import LatticeSystem.Math.Combinatorics.CoordinateBall
 
 /-!
 # Test coverage for the general range-`r` bound, Problem 3.4.a, eq. (3.4.13)
 
-Fixtures for `LatticeSystem/Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean` and
-`LatticeSystem/Math/Combinatorics/CoordinateBall.lean`, covering H. Tasaki, *Physics and
-Mathematics of Quantum Many-Body Systems* (1st ed., Springer, 2020), §3.4, Problem 3.4.a,
-statement pp. 67-68, printed solution p. 501: the coordinate sup-norm ball, the two-window
-generalisation of the (3.4.10) collapse and its norm kernel, and the eq. (3.4.13) capstone.
+Fixtures for the rewritten `LatticeSystem/Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean`
+(honest support-predicate form), the new `LatticeSystem/Math/Combinatorics/SiteBall.lean`, and the
+new `LatticeSystem/Quantum/SpinS/TorusSupDistance.lean`, plus the extension of
+`LatticeSystem/Quantum/SpinS/RingDistance.lean`. Reference: H. Tasaki, *Physics and Mathematics of
+Quantum Many-Body Systems* (1st ed., Springer, 2020), §3.4, Problem 3.4.a, statement pp. 67-68,
+printed solution p. 501.
+
+This file **does not import** `LatticeSystem.Quantum.SpinS.RangeLocalDoubleCommutatorBound`: that
+module currently still holds the *old*, hypothesis-form capstone of the same name
+(`tasaki_problem_3_4_a_doubleCommutator_expectation_le`), which this PR replaces. Importing it here
+would let the pin below resolve against the stale declaration instead of failing as an unknown
+identifier. Once the library module is rewritten, importing it is expected to make every pin below
+resolve.
 
 ## What each block pins
 
-**Signature pins.** `coordSupBall`, `mem_coordSupBall` and `card_coordSupBall_le`
-(`Math/Combinatorics/CoordinateBall.lean`); `doubleCommutator_orderSum_eq_twoWindowSum` and
-`manyBodyOperatorNormS_doubleCommutator_le_of_twoWindows`
-(`Quantum/SpinS/LocalDoubleCommutatorBound.lean`); and
+**Kept from PR-4 (unchanged production code).** `coordSupBall`, `mem_coordSupBall`,
+`card_coordSupBall_le` (`Math/Combinatorics/CoordinateBall.lean`) and the two-window collapse /
+kernel (`doubleCommutator_orderSum_eq_twoWindowSum`,
+`manyBodyOperatorNormS_doubleCommutator_le_of_twoWindows`,
+`Quantum/SpinS/LocalDoubleCommutatorBound.lean`) are re-pinned as-is; F-2 (the `Fin 2 → Fin 3`
+tightness fixture) and F-3 (the two-window kernel constant) are kept as-is.
+
+**New signature pins.** `siteBall`, `mem_siteBall`, `disjoint_siteBall_of_lt`
+(`Math/Combinatorics/SiteBall.lean`); `ringDist_comm`, `ringDist_self`, `ringDist_triangle`,
+`signedRingDisp_self`, `signedRingDisp_injective` (extension of
+`Quantum/SpinS/RingDistance.lean`); `torusSupDist`, `torusSupDist_le_iff`, `torusSupDist_comm`,
+`torusSupDist_triangle`, `card_siteBall_torusSupDist_le`
+(`Quantum/SpinS/TorusSupDistance.lean`); and
+`manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal` together with the rewritten capstone
 `tasaki_problem_3_4_a_doubleCommutator_expectation_le`
-(`Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean`) are each pinned as the declaration's own
-statement, discharged only by the identifier itself. The two-window collapse and kernel pins use
-**syntactically distinct** `W₁ W₂` and `m₁ m₂` binders, so a statement that secretly identified the
-two windows or the two bounds would not satisfy the pin.
+(`Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean`), whose locality hypotheses are now
+`SupportedOnS`-based rather than raw commutation hypotheses.
 
-**Numeric fixtures.**
-- F-2 (ball-count tightness, `r = 1`, `d = 2`): on `Λ := Fin 2 → Fin 3` with coordinates
-  `pos y i := ((y i : ℕ) : ℤ)` and centre `c := fun _ => (1 : Fin 3)`, every site lies in the
-  radius-`1` ball, so `coordSupBall pos 1 c = Finset.univ` and its card is
-  `9 = (2·1+1)^2`, i.e. the bound `card_coordSupBall_le` gives is *attained*. A one-sided endpoint
-  alone cannot rule out an over-large closed form; this fixture does, because it forces equality.
-- F-3 (two-window kernel constant, `m₁ ≠ m₂`): abstract `B, hb, o, W₁, W₂` at `m₁ := 3`, `m₂ := 5`,
-  `h₀ := 5/2`, `o₀ := 1/2`, `B.card := 7`, giving the correct constant `525/2`, discriminated from
-  the competing patterns `4m₁² = 315/2`, `4m₂² = 875/2`, `8m₁m₂ = 525`, `2m₁m₂ = 525/4`
-  (values re-derived below; see the fixture's own doc comment for the exact numbers).
-- F-4 (capstone constant, `r = 1`, `d = 3`, `L = 2`, `h₀ = 5/2`, `o₀ = 1/2`): the correct bound is
-  `67500`, discriminated from the book-solution misprint form `(2r+1)²(4r+1)^d` (`22500`) and from
-  `L^d = 8 ≠ d^L = 9`.
+**New numeric fixtures.**
+- F-1 (periodic wraparound, `by decide`): on the torus `Fin 2 → Fin 5`, the sup-distance from the
+  origin to the antipode-by-coordinate `fun _ => 4` is `1` (the *cyclic* arc `4 → 0`, length `1`,
+  not the linear gap `4`), and the radius-`1` ball around the origin contains `fun _ => 4` but not
+  `fun _ => 2`. A non-periodic coordinate ball would instead give distance `4` and exclude
+  `fun _ => 4`, so this fixture is exactly what makes periodicity load-bearing.
+- F-2 (ball-count tightness, `d = 2`, `r = 1`, `L = 5`, `by decide`): the radius-`1` ball around the
+  origin has exactly `9 = (2·1+1)^2` sites, out of `|Λ| = 5^2 = 25`, so the bound is attained and
+  locality is non-trivial (`9 < 25`).
+- F-4′ (capstone constant, `r = 1`, `d = 2`, `L = 5`, `h₀ = 2`, `o₀ = 1/2`): the correct bound
+  `4(4r+1)^d(8r+1)^d h₀ o₀² L^d` evaluates to `4·25·81·2·(1/4)·25 = 101250`, discriminated from the
+  book-solution printed-constant form `4(2r+1)^d(4r+1)^d h₀ o₀² L^d = 4·9·25·2·(1/4)·25 = 11250`
+  and from the exponent-shape slip `L^d = 25 ≠ d^L = 32`.
+- F-5 (premise witness): a concrete `Λ = Fin 2 → Fin 5`, `N = 1`, `r = 1` instance — order term
+  `o x := onSiteS x (spinSOp3 1)` (`o₀ = 1/2`) and Hamiltonian term
+  `h x := onSiteS x (spinSOp1 1) + onSiteS (shift x) (spinSOp1 1)` with
+  `shift x := Function.update x 0 (x 0 + 1)` (`h₀ = 2`, support = **2** sites, wrapping the ring
+  coordinate) — whose `SupportedOnS` hypotheses are **discharged by proof**
+  (`supportedOnS_onSiteS`, `SupportedOnS.add`, `ringDist_self`, and `∀ a : Fin 5,
+  ringDist 5 (a + 1) a = 1` by `decide`), not assumed. No prior test ever witnessed the range-`r`
+  locality hypotheses being jointly satisfiable in a non-degenerate (non-singleton-support, ball
+  ⊊ `Λ`, wrapping) way.
 
-## Coverage limits (stated honestly, following PR-2's precedent)
+## Coverage limits (stated honestly)
 
-The kernel and capstone fixtures discriminate the constant only while the library statement and
-the fixture's intermediate `have` are not both changed to the *same* wrong constant at once; a
-future regression could still slip past if it altered both in lock-step. The one-sided `≤`
-fixtures (F-3, F-4) cannot reject an *under-large* competing constant on their own — only F-2, which
-forces an equality via `Finset.card_univ`, does that. The `m₁ ↔ m₂` swap is undetectable by any
-numeric fixture on the *constant* alone, since `4 m₁ m₂` is symmetric in `m₁` and `m₂`: what pins
-the window roles is the hypothesis shape (`hW`/`hWW` constrain `W₁`/`W₂` asymmetrically, and at the
-capstone the outer window is forced to be the `2r`-ball because `card (coordSupBall pos (2*r) x) ≤
-(2r+1)^d` is not a provable obligation).
+The kernel and capstone fixtures (F-3, F-4′) discriminate the constant only while the library
+statement and the fixture's intermediate `have` are not both changed to the *same* wrong constant
+at once. `4 m₁ m₂` is symmetric in `m₁` and `m₂`, so **no numeric fixture on the constant alone can
+detect an `m₁ ↔ m₂` swap** (the inner-`r`/outer-`2r` window swap). In this rewritten,
+`SupportedOnS`-based form what pins the window roles is **provability**, not a fixture: assembling
+the swapped windows into `manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal`'s `hWW`
+obligation (`∀ x ∉ (outer ball), ∀ z ∈ (inner ball), Commute (o x) (h b * o z - o z * h b)`)
+requires deriving `2 * r < dist x z` from `4 * r < dist x b` and `dist z b ≤ 2 * r`, which needs
+the outer ball to be the *wider* one; with the windows swapped this derivation is not available
+and the proof does not go through. This is a **provability** claim, not an
+unprovability-*by-*obligation claim in the old hypothesis-form sense — a reviewer separately
+compiled the swapped *old* capstone successfully, so the analogous claim must not be restated for
+that form.
 -/
 
 namespace LatticeSystem.Tests.RangeLocalDoubleCommutatorBound
@@ -59,7 +92,7 @@ open Matrix
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-/-! ## Signature pins: `Math/Combinatorics/CoordinateBall.lean` -/
+/-! ## Kept from PR-4: signature pins on `Math/Combinatorics/CoordinateBall.lean` -/
 
 /-- **Signature pin (`coordSupBall`).** The coordinate sup-norm ball
 `B_r(x) = {y : ∀ i, |pos y i - pos x i| ≤ r}` as a `Finset Λ`, for `pos : Λ → (Fin d → ℤ)`. -/
@@ -79,7 +112,7 @@ example {d : ℕ} (pos : Λ → (Fin d → ℤ)) (hpos : Function.Injective pos)
     (coordSupBall pos r x).card ≤ (2 * r + 1) ^ d :=
   card_coordSupBall_le pos hpos r x
 
-/-! ## Signature pins: the two-window core (`LocalDoubleCommutatorBound.lean`) -/
+/-! ## Kept from PR-4: signature pins on the two-window core -/
 
 /-- **Signature pin (two-window collapse).** The double commutator collapses onto an *inner*
 window `W₁ b` and an *outer* window `W₂ b`, syntactically distinct binders so a statement that
@@ -112,39 +145,143 @@ example {ι : Type*} (B : Finset ι) (hb : ι → ManyBodyOpS Λ N) (o : Λ → 
   manyBodyOperatorNormS_doubleCommutator_le_of_twoWindows B hb o W₁ W₂ h₀ o₀ m₁ m₂
     hW hWW hnh hno ho₀ hcard₁ hcard₂
 
-/-! ## Signature pin: the eq. (3.4.13) capstone -/
+/-! ## New signature pins: `Math/Combinatorics/SiteBall.lean` -/
 
-/-- **Signature pin (eq. (3.4.13) capstone).** `⟨Φ_GS|[Ô_L,[Ĥ,Ô_L]]|Φ_GS⟩ ≤
-4 (2r+1)^d (4r+1)^d h₀ o₀² L^d` for a normalized `Φ`, injective coordinates, range-`r`/`2r` support
-conditions, and `|Λ| ≤ L^d`. No `1 ≤ d`, no `1 ≤ L`, no (3.4.3)/(3.4.4)/Hermiticity hypothesis
-appears among the named hypotheses. -/
-example {d : ℕ} (pos : Λ → (Fin d → ℤ)) (hpos : Function.Injective pos)
-    (h o : Λ → ManyBodyOpS Λ N) (r L : ℕ) (h₀ o₀ : ℝ) {Φ : (Λ → Fin (N + 1)) → ℂ}
-    (hHloc : ∀ x z : Λ, z ∉ coordSupBall pos r x → Commute (h x) (o z))
-    (hOloc : ∀ x z : Λ, z ∉ coordSupBall pos (2 * r) x →
-      ∀ y ∈ coordSupBall pos r x, Commute (o z) (h x * o y - o y * h x))
-    (hnh : ∀ x : Λ, manyBodyOperatorNormS (h x) ≤ h₀)
-    (hno : ∀ x : Λ, manyBodyOperatorNormS (o x) ≤ o₀)
-    (hh₀ : 0 ≤ h₀) (ho₀ : 0 ≤ o₀)
-    (hΛ : (Fintype.card Λ : ℝ) ≤ (L : ℝ) ^ d)
+/-- **Signature pin (`siteBall`).** `siteBall dist r x = {y : dist y x ≤ r}` for an abstract
+distance function `dist : Λ → Λ → ℕ`, generalising `coordSupBall` off the coordinate embedding. -/
+example (dist : Λ → Λ → ℕ) (r : ℕ) (x : Λ) :
+    siteBall dist r x = Finset.univ.filter fun y => dist y x ≤ r := by
+  rfl
+
+/-- **Signature pin (`mem_siteBall`).** Membership unfolds to the distance bound. -/
+example {dist : Λ → Λ → ℕ} {r : ℕ} {x y : Λ} :
+    y ∈ siteBall dist r x ↔ dist y x ≤ r :=
+  mem_siteBall
+
+/-- **Signature pin (`disjoint_siteBall_of_lt`).** Balls of radius `r` around sites more than
+`2r` apart (w.r.t. a symmetric triangle-inequality-satisfying `dist`) are disjoint. -/
+example {dist : Λ → Λ → ℕ} (hsymm : ∀ a b, dist a b = dist b a)
+    (htri : ∀ a b c, dist a c ≤ dist a b + dist b c) {r : ℕ} {x y : Λ} (h : 2 * r < dist x y) :
+    Disjoint (siteBall dist r x) (siteBall dist r y) :=
+  disjoint_siteBall_of_lt hsymm htri h
+
+/-! ## New signature pins: the `RingDistance.lean` extension -/
+
+/-- **Signature pin (`ringDist_comm`).** The ring distance is symmetric. -/
+example (L : ℕ) (x y : Fin L) : ringDist L x y = ringDist L y x :=
+  ringDist_comm L x y
+
+/-- **Signature pin (`ringDist_self`).** The ring distance from a site to itself is `0`. -/
+example (L : ℕ) (x : Fin L) : ringDist L x x = 0 :=
+  ringDist_self L x
+
+/-- **Signature pin (`ringDist_triangle`).** The ring distance satisfies the triangle
+inequality. -/
+example (L : ℕ) (x y z : Fin L) : ringDist L x z ≤ ringDist L x y + ringDist L y z :=
+  ringDist_triangle L x y z
+
+/-- **Signature pin (`signedRingDisp_self`).** The signed cyclic displacement of a site to itself
+vanishes. -/
+example (L : ℕ) (x : Fin L) : signedRingDisp L x x = 0 :=
+  signedRingDisp_self L x
+
+/-- **Signature pin (`signedRingDisp_injective`).** For fixed `x`, `y ↦ signedRingDisp L x y` is
+injective (needed to pull the sup-distance ball count back to `card_coordSupBall_le`). -/
+example (L : ℕ) (x : Fin L) : Function.Injective (signedRingDisp L x) :=
+  signedRingDisp_injective L x
+
+/-! ## New signature pins: `Quantum/SpinS/TorusSupDistance.lean` -/
+
+/-- **Signature pin (`torusSupDist`).** The sup-norm of per-coordinate ring distances on the
+`d`-torus `Fin d → Fin L`. -/
+example (d L : ℕ) (x y : Fin d → Fin L) :
+    torusSupDist d L x y = Finset.univ.sup fun i => ringDist L (x i) (y i) := by
+  rfl
+
+/-- **Signature pin (`torusSupDist_le_iff`).** The sup-distance bound is coordinate-wise. -/
+example {d L : ℕ} {x y : Fin d → Fin L} {r : ℕ} :
+    torusSupDist d L x y ≤ r ↔ ∀ i, ringDist L (x i) (y i) ≤ r :=
+  torusSupDist_le_iff
+
+/-- **Signature pin (`torusSupDist_comm`).** The torus sup-distance is symmetric. -/
+example (d L : ℕ) (x y : Fin d → Fin L) : torusSupDist d L x y = torusSupDist d L y x :=
+  torusSupDist_comm d L x y
+
+/-- **Signature pin (`torusSupDist_triangle`).** The torus sup-distance satisfies the triangle
+inequality. -/
+example (d L : ℕ) (x y z : Fin d → Fin L) :
+    torusSupDist d L x z ≤ torusSupDist d L x y + torusSupDist d L y z :=
+  torusSupDist_triangle d L x y z
+
+/-- **Signature pin (`card_siteBall_torusSupDist_le`).** `|B_r(x)| ≤ (2r+1)^d` for the torus
+sup-distance ball, matching `card_coordSupBall_le`'s bound with no injectivity hypothesis needed
+(periodicity supplies it via `signedRingDisp_injective`). -/
+example (d L r : ℕ) (x : Fin d → Fin L) :
+    (siteBall (torusSupDist d L) r x).card ≤ (2 * r + 1) ^ d :=
+  card_siteBall_torusSupDist_le d L r x
+
+/-! ## New signature pins: the rewritten `RangeLocalDoubleCommutatorBound.lean` -/
+
+/-- **Signature pin (`manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal`).** The abstract
+range-`r` norm bound over any symmetric, triangle-inequality-satisfying distance `dist`, with
+`SupportedOnS`-based (not commutation-based) locality hypotheses `hsh`, `hso`. -/
+example (dist : Λ → Λ → ℕ) (hsymm : ∀ a b, dist a b = dist b a)
+    (htri : ∀ a b c, dist a c ≤ dist a b + dist b c)
+    (h o : Λ → ManyBodyOpS Λ N) (r : ℕ) (h₀ o₀ : ℝ) (m₁ m₂ : ℕ)
+    (hsh : ∀ x, SupportedOnS (siteBall dist r x) (h x))
+    (hso : ∀ x, SupportedOnS (siteBall dist r x) (o x))
+    (hnh : ∀ x, manyBodyOperatorNormS (h x) ≤ h₀)
+    (hno : ∀ x, manyBodyOperatorNormS (o x) ≤ o₀)
+    (ho₀ : 0 ≤ o₀)
+    (hm₁ : ∀ b : Λ, (siteBall dist (2 * r) b).card ≤ m₁)
+    (hm₂ : ∀ b : Λ, (siteBall dist (4 * r) b).card ≤ m₂) :
+    manyBodyOperatorNormS
+        ((∑ x : Λ, o x) * ((∑ b : Λ, h b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b : Λ, h b))
+          - ((∑ b : Λ, h b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b : Λ, h b))
+            * (∑ x : Λ, o x))
+      ≤ 4 * (m₁ : ℝ) * (m₂ : ℝ) * h₀ * o₀ ^ 2 * (Fintype.card Λ : ℝ) :=
+  manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal
+    dist hsymm htri h o r h₀ o₀ m₁ m₂ hsh hso hnh hno ho₀ hm₁ hm₂
+
+/-- **Signature pin (eq. (3.4.13) capstone, honest support form).** No `pos`/injectivity, no
+`hΛ : |Λ| ≤ L^d` slack hypothesis — `Λ` is fixed to the periodic torus `Fin d → Fin L`, and
+locality is a genuine `SupportedOnS` condition rather than a commutation hypothesis. -/
+example {d L : ℕ} (h o : (Fin d → Fin L) → ManyBodyOpS (Fin d → Fin L) N) (r : ℕ) (h₀ o₀ : ℝ)
+    {Φ : ((Fin d → Fin L) → Fin (N + 1)) → ℂ}
+    (hsh : ∀ x, SupportedOnS (siteBall (torusSupDist d L) r x) (h x))
+    (hso : ∀ x, SupportedOnS (siteBall (torusSupDist d L) r x) (o x))
+    (hnh : ∀ x, manyBodyOperatorNormS (h x) ≤ h₀)
+    (hno : ∀ x, manyBodyOperatorNormS (o x) ≤ o₀)
+    (ho₀ : 0 ≤ o₀)
     (hΦ : star Φ ⬝ᵥ Φ = 1) :
     rayleighOnVec
-        ((∑ x : Λ, o x) * ((∑ x : Λ, h x) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ x : Λ, h x))
-          - ((∑ x : Λ, h x) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ x : Λ, h x))
-            * (∑ x : Λ, o x)) Φ
-      ≤ 4 * (2 * (r : ℝ) + 1) ^ d * (4 * (r : ℝ) + 1) ^ d * h₀ * o₀ ^ 2 * (L : ℝ) ^ d :=
-  tasaki_problem_3_4_a_doubleCommutator_expectation_le pos hpos h o r L h₀ o₀
-    hHloc hOloc hnh hno hh₀ ho₀ hΛ hΦ
+        ((∑ x, o x) * ((∑ b, h b) * (∑ x, o x) - (∑ x, o x) * (∑ b, h b))
+          - ((∑ b, h b) * (∑ x, o x) - (∑ x, o x) * (∑ b, h b)) * (∑ x, o x)) Φ
+      ≤ 4 * (4 * (r : ℝ) + 1) ^ d * (8 * (r : ℝ) + 1) ^ d * h₀ * o₀ ^ 2 * (L : ℝ) ^ d :=
+  tasaki_problem_3_4_a_doubleCommutator_expectation_le d L N r h o h₀ o₀ hsh hso hnh hno ho₀ hΦ
 
-/-! ## Numeric fixture F-2: ball-count tightness (`r ≥ 1`, `d ≥ 2`) -/
+/-! ## Numeric fixture F-1: periodic wraparound (`d = 2`, `L = 5`, `by decide`) -/
 
-/-- **Fixture (ball-count tightness).** On `Λ := Fin 2 → Fin 3` with `pos y i := ((y i : ℕ) : ℤ)`
-(injective) and centre `c := fun _ => (1 : Fin 3)`, every coordinate `y i ∈ {0,1,2}` satisfies
-`|y i - 1| ≤ 1`, so the radius-`1` ball is *all* of `Λ`: `coordSupBall pos 1 c = Finset.univ`, of
-card `Fintype.card (Fin 2 → Fin 3) = 3^2 = 9 = (2·1+1)^2`. The card is computed by
-`le_antisymm` *through* `card_coordSupBall_le`, so a wrongly-large closed form breaks the fixture:
-with a bound `> 9` the upper branch could not be discharged against the value `9` that the lower
-branch forces. A one-sided numeric endpoint alone could not do this. -/
+/-- **Fixture (periodic wraparound, sup-distance).** The torus sup-distance from the origin to
+`fun _ => 4` on `Fin 2 → Fin 5` is the *cyclic* arc length `1` (`4 → 0`), not the linear gap `4`: a
+non-periodic coordinate ball would instead give distance `4`. -/
+example : torusSupDist 2 5 (fun _ => (0 : Fin 5)) (fun _ => (4 : Fin 5)) = 1 := by decide
+
+/-- **Fixture (periodic wraparound, membership).** The wrapping site `fun _ => 4` lies in the
+radius-`1` ball around the origin, exactly because the wraparound distance is `1`. -/
+example : (fun _ => (4 : Fin 5)) ∈ siteBall (torusSupDist 2 5) 1 (fun _ => (0 : Fin 5)) := by
+  decide
+
+/-- **Fixture (periodic wraparound, non-membership).** The site `fun _ => 2` (linear distance `2`,
+also the cyclic distance, since `5 - 2 = 3 > 2`) is excluded from the same ball. -/
+example : (fun _ => (2 : Fin 5)) ∉ siteBall (torusSupDist 2 5) 1 (fun _ => (0 : Fin 5)) := by
+  decide
+
+/-! ## Numeric fixture F-2: ball-count tightness (`d = 2`, `r = 1`, `L = 5`) -/
+
+/-- **Fixture (kept, `coordSupBall` tightness, `Fin 2 → Fin 3`).** As in PR-4: every site lies in
+the radius-`1` ball, so `coordSupBall pos 1 c = Finset.univ`, of card `9 = (2·1+1)^2`, forcing an
+equality (not just a one-sided bound) through `le_antisymm`. -/
 example :
     (coordSupBall (Λ := Fin 2 → Fin 3) (fun y i => ((y i : ℕ) : ℤ)) 1
         (fun _ => (1 : Fin 3))).card = 9 := by
@@ -166,7 +303,18 @@ example :
   rw [hall, Finset.card_univ, Fintype.card_fun, Fintype.card_fin, Fintype.card_fin]
   norm_num
 
-/-! ## Numeric fixture F-3: two-window kernel constant (`m₁ ≠ m₂`) -/
+/-- **Fixture (new, `siteBall`/`torusSupDist` tightness, `d = 2`, `r = 1`, `L = 5`, `by decide`).**
+The radius-`1` ball around the origin on the `d = 2`, `L = 5` torus has exactly
+`9 = (2·1+1)^2` sites (the bound is attained), out of `|Λ| = 25`, so locality is non-trivial:
+`9 < 25`. -/
+example : (siteBall (torusSupDist 2 5) 1 (fun _ => (0 : Fin 5))).card = 9 := by decide
+
+/-- Companion half of the previous fixture: the ball is a *proper* subset of `Λ`, i.e. locality is
+non-vacuous at these parameters. -/
+example : (siteBall (torusSupDist 2 5) 1 (fun _ => (0 : Fin 5))).card < Fintype.card (Fin 2 → Fin 5)
+    := by decide
+
+/-! ## Numeric fixture F-3: two-window kernel constant (`m₁ ≠ m₂`, kept as-is) -/
 
 /-- **Fixture (two-window kernel constant, `m₁ ≠ m₂`).** At `m₁ := 3`, `m₂ := 5`, `h₀ := 5/2`,
 `o₀ := 1/2`, `B.card := 7` the kernel's constant evaluates to `4·3·5·(5/2)·(1/2)²·7 = 525/2`. The
@@ -198,38 +346,107 @@ example {ι : Type*} (B : Finset ι) (hb : ι → ManyBodyOpS Λ N) (o : Λ → 
   norm_num at h
   exact h
 
-/-! ## Numeric fixture F-4: capstone constant (`r = 1`, `d = 3`, `L = 2`) -/
+/-! ## Numeric fixture F-4′: capstone constant (`r = 1`, `d = 2`, `L = 5`) -/
 
-/-- **Fixture (capstone constant, `r = 1`, `d = 3`, `L = 2`).** At `h₀ := 5/2`, `o₀ := 1/2` the
-capstone's bound `4 (2r+1)^d (4r+1)^d h₀ o₀² L^d` evaluates to
-`4 · 27 · 125 · (5/2) · (1/4) · 8 = 67500`. This separates the book-solution misprint
-`(2r+1)²(4r+1)^d` form (`22500`), the swapped-power forms `4m₁² = 14580` and `4m₂² = 312500`
-(`m₁ = 27`, `m₂ = 125`), `8m₁m₂ = 135000`, and the exponent-shape slip `L^d = 8 ≠ d^L = 9`.
-Instantiated over abstract `pos, h, o, Φ` constrained only by the capstone's own hypotheses, so
-`norm_num` cannot close the goal without invoking the theorem. -/
-example (pos : Λ → (Fin 3 → ℤ)) (hpos : Function.Injective pos)
-    (h o : Λ → ManyBodyOpS Λ N) {Φ : (Λ → Fin (N + 1)) → ℂ}
-    (hHloc : ∀ x z : Λ, z ∉ coordSupBall pos 1 x → Commute (h x) (o z))
-    (hOloc : ∀ x z : Λ, z ∉ coordSupBall pos 2 x →
-      ∀ y ∈ coordSupBall pos 1 x, Commute (o z) (h x * o y - o y * h x))
-    (hnh : ∀ x : Λ, manyBodyOperatorNormS (h x) ≤ (5 / 2 : ℝ))
-    (hno : ∀ x : Λ, manyBodyOperatorNormS (o x) ≤ (1 / 2 : ℝ))
-    (hΛ : (Fintype.card Λ : ℝ) ≤ (2 : ℝ) ^ (3 : ℕ))
+/-- **Fixture (capstone constant, `r = 1`, `d = 2`, `L = 5`, `h₀ = 2`, `o₀ = 1/2`).** The
+capstone's bound `4 (4r+1)^d (8r+1)^d h₀ o₀² L^d` evaluates to `4·25·81·2·(1/4)·25 = 101250`. This
+separates the book-solution printed-constant form `4 (2r+1)^d (4r+1)^d h₀ o₀² L^d`
+(`4·9·25·2·(1/4)·25 = 11250`), and the exponent-shape slip `L^d = 25 ≠ d^L = 32`. Instantiated over
+abstract `h, o, Φ` constrained only by the capstone's own hypotheses, so `norm_num` cannot close
+the goal without invoking the theorem. -/
+example (h o : (Fin 2 → Fin 5) → ManyBodyOpS (Fin 2 → Fin 5) N)
+    {Φ : ((Fin 2 → Fin 5) → Fin (N + 1)) → ℂ}
+    (hsh : ∀ x, SupportedOnS (siteBall (torusSupDist 2 5) 1 x) (h x))
+    (hso : ∀ x, SupportedOnS (siteBall (torusSupDist 2 5) 1 x) (o x))
+    (hnh : ∀ x, manyBodyOperatorNormS (h x) ≤ (2 : ℝ))
+    (hno : ∀ x, manyBodyOperatorNormS (o x) ≤ (1 / 2 : ℝ))
     (hΦ : star Φ ⬝ᵥ Φ = 1) :
     rayleighOnVec
-        ((∑ x : Λ, o x) * ((∑ x : Λ, h x) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ x : Λ, h x))
-          - ((∑ x : Λ, h x) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ x : Λ, h x))
-            * (∑ x : Λ, o x)) Φ
-      ≤ (67500 : ℝ) := by
+        ((∑ x, o x) * ((∑ b, h b) * (∑ x, o x) - (∑ x, o x) * (∑ b, h b))
+          - ((∑ b, h b) * (∑ x, o x) - (∑ x, o x) * (∑ b, h b)) * (∑ x, o x)) Φ
+      ≤ (101250 : ℝ) := by
   have h' : rayleighOnVec
-        ((∑ x : Λ, o x) * ((∑ x : Λ, h x) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ x : Λ, h x))
-          - ((∑ x : Λ, h x) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ x : Λ, h x))
-            * (∑ x : Λ, o x)) Φ
-      ≤ 4 * (2 * ((1 : ℕ) : ℝ) + 1) ^ (3 : ℕ) * (4 * ((1 : ℕ) : ℝ) + 1) ^ (3 : ℕ) * (5 / 2 : ℝ)
-          * (1 / 2 : ℝ) ^ 2 * (((2 : ℕ) : ℝ)) ^ (3 : ℕ) :=
-    tasaki_problem_3_4_a_doubleCommutator_expectation_le pos hpos h o 1 2 (5 / 2) (1 / 2)
-      hHloc hOloc hnh hno (by norm_num) (by norm_num) hΛ hΦ
+        ((∑ x, o x) * ((∑ b, h b) * (∑ x, o x) - (∑ x, o x) * (∑ b, h b))
+          - ((∑ b, h b) * (∑ x, o x) - (∑ x, o x) * (∑ b, h b)) * (∑ x, o x)) Φ
+      ≤ 4 * (4 * ((1 : ℕ) : ℝ) + 1) ^ (2 : ℕ) * (8 * ((1 : ℕ) : ℝ) + 1) ^ (2 : ℕ) * (2 : ℝ)
+          * (1 / 2 : ℝ) ^ 2 * (((5 : ℕ) : ℝ)) ^ (2 : ℕ) :=
+    tasaki_problem_3_4_a_doubleCommutator_expectation_le 2 5 N 1 h o 2 (1 / 2)
+      hsh hso hnh hno (by norm_num) hΦ
   norm_num at h'
   exact h'
+
+/-! ## Numeric fixture F-5: a witness jointly satisfying the range-`r` premises -/
+
+/-- **Fixture (premise witness, `Λ = Fin 2 → Fin 5`, `N = 1`, `r = 1`).** The site-`0`-and-shifted
+Hamiltonian term `h x := onSiteS x (spinSOp1 1) + onSiteS (shift x) (spinSOp1 1)`, with
+`shift x := Function.update x 0 (x 0 + 1)`, has support **exactly** `{x, shift x}` — two sites, one
+of them reached by *wrapping* the ring coordinate — and both lie in the radius-`1` ball around `x`,
+since `ringDist 5 (x 0 + 1) (x 0) = 1` and every other coordinate contributes distance `0`
+(`ringDist_self`). The order term `o x := onSiteS x (spinSOp3 1)` has singleton support `{x}`. The
+norm bounds `h₀ = 2`, `o₀ = 1/2` come from `onSiteS_spinSOp1_manyBodyOperatorNormS_le` (triangle
+inequality over the two-term sum) and `onSiteS_spinSOp3_manyBodyOperatorNormS_le`. No hypothesis of
+the capstone is discharged by `sorry` or assumed abstractly: every one is proved from this concrete
+data. -/
+example {Φ : ((Fin 2 → Fin 5) → Fin 2) → ℂ} (hΦ : star Φ ⬝ᵥ Φ = 1) :
+    rayleighOnVec
+        ((∑ x, (onSiteS x (spinSOp3 1) : ManyBodyOpS (Fin 2 → Fin 5) 1))
+            * ((∑ b, onSiteS b (spinSOp1 1) + onSiteS (Function.update b 0 (b 0 + 1)) (spinSOp1 1))
+                * (∑ x, (onSiteS x (spinSOp3 1) : ManyBodyOpS (Fin 2 → Fin 5) 1))
+              - (∑ x, (onSiteS x (spinSOp3 1) : ManyBodyOpS (Fin 2 → Fin 5) 1))
+                * (∑ b, onSiteS b (spinSOp1 1) + onSiteS (Function.update b 0 (b 0 + 1))
+                    (spinSOp1 1)))
+          - ((∑ b, onSiteS b (spinSOp1 1) + onSiteS (Function.update b 0 (b 0 + 1)) (spinSOp1 1))
+                * (∑ x, (onSiteS x (spinSOp3 1) : ManyBodyOpS (Fin 2 → Fin 5) 1))
+              - (∑ x, (onSiteS x (spinSOp3 1) : ManyBodyOpS (Fin 2 → Fin 5) 1))
+                * (∑ b, onSiteS b (spinSOp1 1) + onSiteS (Function.update b 0 (b 0 + 1))
+                    (spinSOp1 1)))
+            * (∑ x, (onSiteS x (spinSOp3 1) : ManyBodyOpS (Fin 2 → Fin 5) 1))) Φ
+      ≤ (101250 : ℝ) := by
+  have hring : ∀ a : Fin 5, ringDist 5 (a + 1) a = 1 := by decide
+  have hself : ∀ x : Fin 2 → Fin 5, x ∈ siteBall (torusSupDist 2 5) 1 x := fun x =>
+    mem_siteBall.mpr (torusSupDist_le_iff.mpr fun i => by rw [ringDist_self]; exact Nat.zero_le 1)
+  have hshift : ∀ x : Fin 2 → Fin 5,
+      Function.update x 0 (x 0 + 1) ∈ siteBall (torusSupDist 2 5) 1 x := by
+    intro x
+    refine mem_siteBall.mpr (torusSupDist_le_iff.mpr fun i => ?_)
+    by_cases hi : i = 0
+    · subst hi
+      rw [Function.update_self]
+      exact le_of_eq (hring (x 0))
+    · rw [Function.update_of_ne hi, ringDist_self]
+      exact Nat.zero_le 1
+  have hsh : ∀ x : Fin 2 → Fin 5,
+      SupportedOnS (siteBall (torusSupDist 2 5) 1 x)
+        ((onSiteS x (spinSOp1 1)
+            + onSiteS (Function.update x 0 (x 0 + 1)) (spinSOp1 1) :
+              ManyBodyOpS (Fin 2 → Fin 5) 1)) := fun x =>
+    SupportedOnS.add (supportedOnS_onSiteS (hself x) (spinSOp1 1))
+      (supportedOnS_onSiteS (hshift x) (spinSOp1 1))
+  have hso : ∀ x : Fin 2 → Fin 5,
+      SupportedOnS (siteBall (torusSupDist 2 5) 1 x)
+        (onSiteS x (spinSOp3 1) : ManyBodyOpS (Fin 2 → Fin 5) 1) := fun x =>
+    supportedOnS_onSiteS (hself x) (spinSOp3 1)
+  have hnh : ∀ x : Fin 2 → Fin 5,
+      manyBodyOperatorNormS
+          ((onSiteS x (spinSOp1 1) + onSiteS (Function.update x 0 (x 0 + 1)) (spinSOp1 1) :
+              ManyBodyOpS (Fin 2 → Fin 5) 1)) ≤ (2 : ℝ) := by
+    intro x
+    refine le_trans (manyBodyOperatorNormS_add_le _ _) ?_
+    have h1 := onSiteS_spinSOp1_manyBodyOperatorNormS_le (N := 1) x (le_refl 1)
+    have h2 := onSiteS_spinSOp1_manyBodyOperatorNormS_le (N := 1)
+      (Function.update x 0 (x 0 + 1)) (le_refl 1)
+    push_cast at h1 h2
+    linarith
+  have hno : ∀ x : Fin 2 → Fin 5,
+      manyBodyOperatorNormS
+        (onSiteS x (spinSOp3 1) : ManyBodyOpS (Fin 2 → Fin 5) 1) ≤ (1 / 2 : ℝ) :=
+    fun x => by
+      have := onSiteS_spinSOp3_manyBodyOperatorNormS_le (N := 1) x
+      push_cast at this
+      linarith
+  refine le_trans (tasaki_problem_3_4_a_doubleCommutator_expectation_le 2 5 1 1
+    (fun b => onSiteS b (spinSOp1 1) + onSiteS (Function.update b 0 (b 0 + 1)) (spinSOp1 1))
+    (fun x => onSiteS x (spinSOp3 1)) 2 (1 / 2) hsh hso hnh hno (by norm_num) hΦ) ?_
+  norm_num
 
 end LatticeSystem.Tests.RangeLocalDoubleCommutatorBound
