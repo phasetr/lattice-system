@@ -111,32 +111,36 @@ theorem doubleCommutator_orderSum_eq_windowSum {ι : Type*} (B : Finset ι)
   doubleCommutator_orderSum_eq_twoWindowSum B hb o W W hW
     (commute_order_windowCommutator hW hoo)
 
-/-- **Operator-norm bound for the windowed double commutator** (Tasaki §3.4, p. 67, the unnumbered
-estimate preceding eq. (3.4.11)):
-`‖[Ô, [Ĥ, Ô]]‖ ≤ 4 mW² h₀ o₀² |B|` whenever every `ĥ_b` has norm at most `h₀`, every `ô_x` has norm
-at most `o₀`, and every window `W b` has at most `mW` sites.  Each of the `|B| · mW · mW` surviving
-terms of eq. (3.4.10) is bounded by `‖[ô_x, [ĥ_b, ô_z]]‖ ≤ 2 o₀ · 2 h₀ o₀ = 4 h₀ o₀²` through the
-commutator norm inequality `‖[Â, B̂]‖ ≤ 2‖Â‖‖B̂‖` (Tasaki (A.2.5)/(A.2.6), p. 463) applied twice.
-The window bound `mW` is kept variable: the bond case `mW = 2` is the instance yielding the book's
-constant `16`. -/
-theorem manyBodyOperatorNormS_doubleCommutator_le_of_windows {ι : Type*} (B : Finset ι)
-    (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N) (W : ι → Finset Λ)
-    (h₀ o₀ : ℝ) (mW : ℕ)
-    (hW : ∀ b ∈ B, ∀ z ∉ W b, Commute (hb b) (o z))
-    (hoo : ∀ x z : Λ, x ≠ z → Commute (o x) (o z))
+/-- **Two-window operator-norm kernel for the double commutator**
+`‖[Ô, [Ĥ, Ô]]‖ ≤ 4 m₁ m₂ h₀ o₀² |B|`, where `m₁` bounds the *inner* windows `W₁ b` and `m₂` the
+*outer* windows `W₂ b`, every `ĥ_b` has norm at most `h₀` and every `ô_x` norm at most `o₀`.
+Each of the `|B| · m₂ · m₁` surviving terms of the two-window collapse is bounded by
+`‖[ô_x, [ĥ_b, ô_z]]‖ ≤ 2 o₀ · 2 h₀ o₀ = 4 h₀ o₀²` through the commutator norm inequality
+`‖[Â, B̂]‖ ≤ 2‖Â‖‖B̂‖` (Tasaki (A.2.5)/(A.2.6), p. 463) applied twice.
+The two window bounds occupy fixed index positions: `m₂` counts the outer sum, over `x`, and `m₁`
+the inner sum, over `z`.  Tasaki Problem 3.4.a (pp. 67-68, solution p. 501) instantiates them at
+`m₁ = (2r+1)^d` and `m₂ = (4r+1)^d`.  Nonnegativity of `h₀` is not a hypothesis: inside a branch
+`b ∈ B` it follows from `0 ≤ ‖ĥ_b‖ ≤ h₀`.  Nonnegativity of `o₀` is one, since with `Λ` empty
+nothing forces it. -/
+theorem manyBodyOperatorNormS_doubleCommutator_le_of_twoWindows {ι : Type*} (B : Finset ι)
+    (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N) (W₁ W₂ : ι → Finset Λ)
+    (h₀ o₀ : ℝ) (m₁ m₂ : ℕ)
+    (hW : ∀ b ∈ B, ∀ z ∉ W₁ b, Commute (hb b) (o z))
+    (hWW : ∀ b ∈ B, ∀ x ∉ W₂ b, ∀ z ∈ W₁ b, Commute (o x) (hb b * o z - o z * hb b))
     (hnh : ∀ b ∈ B, manyBodyOperatorNormS (hb b) ≤ h₀)
     (hno : ∀ x : Λ, manyBodyOperatorNormS (o x) ≤ o₀)
     (ho₀ : 0 ≤ o₀)
-    (hcard : ∀ b ∈ B, (W b).card ≤ mW) :
+    (hcard₁ : ∀ b ∈ B, (W₁ b).card ≤ m₁)
+    (hcard₂ : ∀ b ∈ B, (W₂ b).card ≤ m₂) :
     manyBodyOperatorNormS
         ((∑ x : Λ, o x) * ((∑ b ∈ B, hb b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b ∈ B, hb b))
           - ((∑ b ∈ B, hb b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b ∈ B, hb b))
             * (∑ x : Λ, o x))
-      ≤ 4 * (mW : ℝ) ^ 2 * h₀ * o₀ ^ 2 * (B.card : ℝ) := by
+      ≤ 4 * (m₁ : ℝ) * (m₂ : ℝ) * h₀ * o₀ ^ 2 * (B.card : ℝ) := by
   have hbound : ∀ b ∈ B, manyBodyOperatorNormS
-      (∑ x ∈ W b, ∑ z ∈ W b,
+      (∑ x ∈ W₂ b, ∑ z ∈ W₁ b,
         (o x * (hb b * o z - o z * hb b) - (hb b * o z - o z * hb b) * o x))
-      ≤ 4 * (mW : ℝ) ^ 2 * h₀ * o₀ ^ 2 := by
+      ≤ 4 * (m₁ : ℝ) * (m₂ : ℝ) * h₀ * o₀ ^ 2 := by
     intro b hbB
     have hh₀ : 0 ≤ h₀ := le_trans (manyBodyOperatorNormS_nonneg (hb b)) (hnh b hbB)
     have hK : (0 : ℝ) ≤ 4 * h₀ * o₀ ^ 2 := mul_nonneg (by linarith) (sq_nonneg o₀)
@@ -159,16 +163,47 @@ theorem manyBodyOperatorNormS_doubleCommutator_le_of_windows {ι : Type*} (B : F
       le_trans (manyBodyOperatorNormS_sum_le _ _)
         (Finset.sum_le_sum fun z _ => hterm x z)) ?_
     rw [Finset.sum_const, Finset.sum_const, nsmul_eq_mul, nsmul_eq_mul]
-    have hc : ((W b).card : ℝ) ≤ (mW : ℝ) := by exact_mod_cast hcard b hbB
-    have hc0 : (0 : ℝ) ≤ ((W b).card : ℝ) := Nat.cast_nonneg _
-    refine le_trans (mul_le_mul hc (mul_le_mul_of_nonneg_right hc hK)
-      (mul_nonneg hc0 hK) (le_trans hc0 hc)) ?_
+    have hc₁ : ((W₁ b).card : ℝ) ≤ (m₁ : ℝ) := by exact_mod_cast hcard₁ b hbB
+    have hc₂ : ((W₂ b).card : ℝ) ≤ (m₂ : ℝ) := by exact_mod_cast hcard₂ b hbB
+    have hc₁0 : (0 : ℝ) ≤ ((W₁ b).card : ℝ) := Nat.cast_nonneg _
+    have hc₂0 : (0 : ℝ) ≤ ((W₂ b).card : ℝ) := Nat.cast_nonneg _
+    refine le_trans (mul_le_mul hc₂ (mul_le_mul_of_nonneg_right hc₁ hK)
+      (mul_nonneg hc₁0 hK) (le_trans hc₂0 hc₂)) ?_
     exact le_of_eq (by ring)
-  rw [doubleCommutator_orderSum_eq_windowSum B hb o W hW hoo]
+  rw [doubleCommutator_orderSum_eq_twoWindowSum B hb o W₁ W₂ hW hWW]
   refine le_trans (manyBodyOperatorNormS_sum_le _ _) ?_
   refine le_trans (Finset.sum_le_sum hbound) ?_
   rw [Finset.sum_const, nsmul_eq_mul]
   exact le_of_eq (by ring)
+
+/-- **Operator-norm bound for the windowed double commutator** (Tasaki §3.4, p. 67, the unnumbered
+estimate preceding eq. (3.4.11)):
+`‖[Ô, [Ĥ, Ô]]‖ ≤ 4 mW² h₀ o₀² |B|` whenever every `ĥ_b` has norm at most `h₀`, every `ô_x` has norm
+at most `o₀`, and every window `W b` has at most `mW` sites.  Each of the `|B| · mW · mW` surviving
+terms of eq. (3.4.10) is bounded by `‖[ô_x, [ĥ_b, ô_z]]‖ ≤ 2 o₀ · 2 h₀ o₀ = 4 h₀ o₀²` through the
+commutator norm inequality `‖[Â, B̂]‖ ≤ 2‖Â‖‖B̂‖` (Tasaki (A.2.5)/(A.2.6), p. 463) applied twice.
+The window bound `mW` is kept variable: the bond case `mW = 2` is the instance yielding the book's
+constant `16`.
+This is the instance `W₁ = W₂ = W`, `m₁ = m₂ = mW` of
+`manyBodyOperatorNormS_doubleCommutator_le_of_twoWindows`, where `4 m₁ m₂` collapses to `4 mW²`;
+the estimate is proved once, there. -/
+theorem manyBodyOperatorNormS_doubleCommutator_le_of_windows {ι : Type*} (B : Finset ι)
+    (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N) (W : ι → Finset Λ)
+    (h₀ o₀ : ℝ) (mW : ℕ)
+    (hW : ∀ b ∈ B, ∀ z ∉ W b, Commute (hb b) (o z))
+    (hoo : ∀ x z : Λ, x ≠ z → Commute (o x) (o z))
+    (hnh : ∀ b ∈ B, manyBodyOperatorNormS (hb b) ≤ h₀)
+    (hno : ∀ x : Λ, manyBodyOperatorNormS (o x) ≤ o₀)
+    (ho₀ : 0 ≤ o₀)
+    (hcard : ∀ b ∈ B, (W b).card ≤ mW) :
+    manyBodyOperatorNormS
+        ((∑ x : Λ, o x) * ((∑ b ∈ B, hb b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b ∈ B, hb b))
+          - ((∑ b ∈ B, hb b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b ∈ B, hb b))
+            * (∑ x : Λ, o x))
+      ≤ 4 * (mW : ℝ) ^ 2 * h₀ * o₀ ^ 2 * (B.card : ℝ) :=
+  le_trans (manyBodyOperatorNormS_doubleCommutator_le_of_twoWindows B hb o W W h₀ o₀ mW mW
+      hW (commute_order_windowCommutator hW hoo) hnh hno ho₀ hcard hcard)
+    (le_of_eq (by ring))
 
 /-- **Tasaki eq. (3.4.11), p. 67** — the printed two-step bound
 `⟨Φ_GS|[Ô,[Ĥ,Ô]]|Φ_GS⟩ ≤ ‖[Ô,[Ĥ,Ô]]‖ ≤ {16 d h₀ o₀²} L^d`
