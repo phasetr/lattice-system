@@ -81,8 +81,8 @@ p. 65) gives the printed two-sided bound
 
 The left half is the variational hypothesis `hmin` applied to the unit vector `Γ`; the right half
 is the abstract bound above at `Ld = L^d`, fed by eq. (3.4.11), p. 67.  The no-SSB condition
-(3.4.4), p. 65, is not used: it is first needed for the states `Ξ±` of eqs. (3.4.14)–(3.4.15),
-pp. 68–69. -/
+(3.4.4), p. 65, is not used in this derivation; the only declarations that take it as a named
+hypothesis are the odd-moment hypotheses of `HorschVonderLindenProblem34b.lean`. -/
 theorem tasaki_eq_3_4_12_trialState_energy_bound {ι : Type*} (B : Finset ι)
     (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N) (W : ι → Finset Λ)
     (d L : ℕ) (q₀ h₀ o₀ : ℝ) {Φ : (Λ → Fin (N + 1)) → ℂ} {E₀ : ℝ}

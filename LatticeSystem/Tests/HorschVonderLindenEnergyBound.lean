@@ -37,14 +37,16 @@ the `8 * … / q₀ / L^d` shape. The candidate `16 d h₀ o₀² / q₀` (dropp
 `2`) gives `20/9 > 10/9` and is caught by the numeric endpoint as well as the `have`. The Layer-A
 fixture (`K := 9`, `q₀ := 3/4`, `Ld := 3`, correct value `2/3`) is stated the same way.
 
-**Witness (§3 discharge of `hmin`).** `hmin` is taken as an explicit hypothesis on the capstone
-rather than derived from `hermitianMinEigenvalue`, on hypothesis-strength grounds (`hmin` is
-implied by, but strictly weaker than, "`E₀` is *the* Rayleigh-Ritz minimum"). To close the risk
-that `hmin` becomes a permanently-unproven standing assumption, the witness block below
-instantiates `E₀ := hermitianMinEigenvalue hH` and discharges `hmin` from
-`hermitianMinEigenvalue_le_rayleighOnVec_of_unit` (`RayleighRitzEquality.lean`). This import is
-Tests-only; the library module `HorschVonderLindenEnergyBound.lean` does not import
-`RayleighRitzEquality`.
+**Witness for `hmin`.** `hmin` is taken as an explicit hypothesis on the capstone rather than
+derived from `hermitianMinEigenvalue`. It is not the weaker assumption: the capstone's `hΦ` and
+`hΦE` already force the Rayleigh quotient of `Φ` to equal `E₀`, so `hmin` says exactly that `E₀`
+*is* the minimum of that quotient over unit vectors. What the explicit form buys is that a caller
+may supply the minimality directly, without routing through `hermitianMinEigenvalue` and the
+`Nonempty` instance it requires. To close the risk that `hmin` becomes a permanently-unproven
+standing assumption, the witness block below instantiates `E₀ := hermitianMinEigenvalue hH` and
+discharges `hmin` from `hermitianMinEigenvalue_le_rayleighOnVec_of_unit`
+(`RayleighRitzEquality.lean`). This import is Tests-only; the library module
+`HorschVonderLindenEnergyBound.lean` does not import `RayleighRitzEquality`.
 
 ## Duplicate assessment
 
@@ -169,8 +171,7 @@ example {ι : Type*} (B : Finset ι) (hb : ι → ManyBodyOpS Λ N) (o : Λ → 
 hH`, the canonical ground-state energy, and discharges `hmin` from
 `hermitianMinEigenvalue_le_rayleighOnVec_of_unit`, showing `hmin` is a dischargeable fact (not a
 permanently standing assumption) and that the capstone is non-vacuous at a genuine ground state.
-This import (`RayleighRitzEquality.lean`) is Tests-only; the library module does not import it
-(§3 of the design). -/
+This import (`RayleighRitzEquality.lean`) is Tests-only; the library module does not import it. -/
 example [Nonempty (Λ → Fin (N + 1))] {ι : Type*} (B : Finset ι)
     (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N) (W : ι → Finset Λ)
     (d L : ℕ) (q₀ h₀ o₀ : ℝ) {Φ : (Λ → Fin (N + 1)) → ℂ}

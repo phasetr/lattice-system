@@ -12837,10 +12837,12 @@ and $m_2/2=50$ are pairwise distinct, so the second moment and the normalization
 separately load-bearing in the values checked.  Locality of
 $\hat O_L$ (eqs.~(3.4.1)--(3.4.2)) is not assumed, so nothing here certifies a concrete model.
 The $C\,L^{-d}$ low-lying bound~(3.4.12)
-that~(3.4.8) feeds is \texttt{Quantum/HorschVonderLindenEnergyBound.lean} (below); it produces the
-input $\delta$ that Theorem~3.1
-(\texttt{horsch\_vonderLinden\_lowLying}, \texttt{Quantum/HorschVonderLinden.lean}) consumes as
-its hypothesis \texttt{hvar}.
+that~(3.4.8) feeds is \texttt{Quantum/HorschVonderLindenEnergyBound.lean} (below).  Its
+composition with Theorem~3.1 (\texttt{horsch\_vonderLinden\_lowLying},
+\texttt{Quantum/HorschVonderLinden.lean}), which would discharge that theorem's hypothesis
+\texttt{hvar}, is not formalized: Theorem~3.1 also demands its orthogonality hypothesis
+\texttt{hortho} and $E_{\mathrm{GS}}$ presented as a minimal eigenvalue of $\hat H$, and~(3.4.12)
+supplies neither.
 
 \noindent\textbf{Locality of the double commutator, eqs.~(3.4.9)--(3.4.11)}
 (Tasaki~\cite{Tasaki:QMB} §3.4, eqs.~(3.4.1)--(3.4.2) p.~65, eq.~(3.4.9) p.~66,
@@ -12888,9 +12890,9 @@ follows from $0\le\lVert\hat h_b\rVert\le h_0$).  \emph{Not assumed.}  Self-adjo
 $\hat h_b$ and $\hat o_x$ appears nowhere: the first inequality of~(3.4.11) is taken on the real
 part of the expectation, so the tacit reality of $\langle[\hat O,[\hat H,\hat O]]\rangle$ carries
 no obligation.  The long-range order condition~(3.4.3) and the no-SSB condition~(3.4.4) are unused
-here.  Only~(3.4.3) is consumed at~(3.4.12); (3.4.4) is not needed there either, and is first
-consumed by the symmetric state $\Xi_+$ of eq.~(3.4.14), p.~68
-(\texttt{Quantum/HorschVonderLindenProblem34b.lean}).  No lattice structure is imposed: the
+here.  Only~(3.4.3) is consumed at~(3.4.12); (3.4.4) is not used in that derivation either, and
+the only declarations that take it as a named hypothesis are the odd-moment hypotheses of
+\texttt{Quantum/HorschVonderLindenProblem34b.lean}.  No lattice structure is imposed: the
 hypercubic bond count $|B_L|=dL^d$ enters only as the numeric hypothesis $|B|\le dL^d$, and neither
 $1\le d$ nor $1\le L$ is required.
 
@@ -12926,19 +12928,21 @@ consequence of $E_{\mathrm{GS}}$ being the minimum of the Rayleigh quotient.
 \emph{Hypothesis ledger.}  The ground-state assumption is rendered as three separate facts:
 $\langle\Phi_{\mathrm{GS}}|\Phi_{\mathrm{GS}}\rangle=1$,
 $\hat H|\Phi_{\mathrm{GS}}\rangle=E_{\mathrm{GS}}|\Phi_{\mathrm{GS}}\rangle$, and
-$E_{\mathrm{GS}}\le\langle v|\hat H|v\rangle$ for every normalized $v$.  The last is a property of
-the caller's data and is strictly weaker than pinning $E_{\mathrm{GS}}$ to be the Rayleigh--Ritz
-minimum; a fixture discharges it from
+$E_{\mathrm{GS}}\le\langle v|\hat H|v\rangle$ for every normalized $v$.  The first two give
+$\langle\Phi_{\mathrm{GS}}|\hat H|\Phi_{\mathrm{GS}}\rangle=E_{\mathrm{GS}}$, so the third is
+\emph{equivalent} to $E_{\mathrm{GS}}$ being the minimum of the Rayleigh quotient over normalized
+vectors and covers exactly the same data; what the explicit form buys is that a caller may supply
+the minimality directly, without routing through \texttt{hermitianMinEigenvalue} and the
+\texttt{Nonempty} instance it requires.  A fixture discharges it from
 \texttt{hermitianMinEigenvalue\_le\_rayleighOnVec\_of\_unit} at a genuine ground state, so it is
 not a standing assumption.  Self-adjointness of $\hat H$ and $\hat O_L$ is taken at the level of
-the sums rather than per term, again the weaker form.  $q_0>0$ is printed in~(3.4.3) itself, and
+the sums rather than per term, the weaker form.  $q_0>0$ is printed in~(3.4.3) itself, and
 $1\le L$ serves only to make $L^d$ positive.  \emph{Not asserted.}  The no-SSB
 condition~(3.4.4), p.~65, is unused: only~(3.4.3) is consumed here.  The statement is at a
 single~$L$ --- an implication between hypotheses and conclusion at that same~$L$ --- since the
-``for sufficiently large $L$'' reading of~(3.4.3)--(3.4.4) is a statement about a family and
-belongs to the later assembly, which composes this one without restating it.  Neither the mirror
-$-\hat O_L$ instance nor the states $\Xi_\pm$ of eqs.~(3.4.14)--(3.4.15), pp.~68--69, are treated
-here.
+``for sufficiently large $L$'' reading of~(3.4.3)--(3.4.4) is a statement about a family and is not
+formalized here.  Neither the mirror $-\hat O_L$ instance nor the symmetric state $\Xi_+$ of
+eq.~(3.4.14), p.~68, is treated here.
 
 \noindent\textbf{Theorem 4.1} (Dyson--Lieb--Simon / Neves--Perez / Kennedy--Lieb--Shastry, Tasaki
 §4.1, eq.~(4.1.7), pp.~88--90; \texttt{Quantum/SpinS/DysonLiebSimon.lean}, Issue \#4485).  Existence

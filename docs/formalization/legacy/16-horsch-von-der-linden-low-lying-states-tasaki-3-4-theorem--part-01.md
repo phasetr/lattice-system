@@ -213,9 +213,11 @@ It cannot be dropped: at `Ĥ = σ³`, `Ô_L = σ¹`, `Φ_GS = (2, 0)` the eigenv
 ground energy and both sides of (3.4.8) equal `−2`. Locality of `Ô_L` (eqs. (3.4.1)-(3.4.2))
 and any lattice structure are absent here, so nothing in this module certifies a concrete model.
 The `C L^{-d}` low-lying bound (3.4.12) that (3.4.8) feeds is
-`Quantum/HorschVonderLindenEnergyBound.lean`, described below; it produces the input `δ` that
-`horsch_vonderLinden_lowLying` (`Quantum/HorschVonderLinden.lean`, Theorem 3.1) consumes as the
-hypothesis `hvar`.
+`Quantum/HorschVonderLindenEnergyBound.lean`, described below. Its composition with
+`horsch_vonderLinden_lowLying` (`Quantum/HorschVonderLinden.lean`, Theorem 3.1), which would
+discharge that theorem's hypothesis `hvar`, is not formalised: Theorem 3.1 also demands its
+orthogonality hypothesis `hortho` and `E_GS` presented as a minimal eigenvalue of `Ĥ`, and
+(3.4.12) supplies neither.
 
 All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
 `Classical.choice`, `Quot.sound`.
@@ -264,9 +266,9 @@ distribution is `Math/CommutatorSum.lean`, shared with the §4.1 staggered-order
 **What these declarations do not assert.** Self-adjointness of `ĥ_b` and `ô_x` is not assumed
 anywhere: the first inequality of (3.4.11) is taken on the real part of the expectation, so no
 reality obligation arises. The long-range order condition (3.4.3) and the no-SSB condition
-(3.4.4) are unused here. Only (3.4.3) is consumed at (3.4.12); (3.4.4) is not needed there either,
-and is first consumed by the symmetric state `Ξ₊` of eq. (3.4.14), p. 68
-(`Quantum/HorschVonderLindenProblem34b.lean`). No lattice structure is imposed:
+(3.4.4) are unused here. Only (3.4.3) is consumed at (3.4.12); (3.4.4) is not used in that
+derivation either, and the only declarations that take it as a named hypothesis are the odd-moment
+hypotheses of `Quantum/HorschVonderLindenProblem34b.lean`. No lattice structure is imposed:
 `|B_L| = d L^d` enters only as the numeric hypothesis `|B| ≤ d L^d`, and neither `1 ≤ d` nor
 `1 ≤ L` is required.
 
@@ -315,19 +317,20 @@ constant. The left half is the variational hypothesis applied to the unit vector
 normalisation is `trialState_dotProduct_self`.
 
 **Hypothesis ledger.** The ground-state assumption of p. 65 is rendered as the three separate facts
-`⟨Φ_GS|Φ_GS⟩ = 1`, `Ĥ|Φ_GS⟩ = E_GS|Φ_GS⟩` and `E_GS ≤ ⟨v|Ĥ|v⟩` for every normalised `v`; the last
-is a property of the caller's data, strictly weaker than pinning `E_GS` to be the Rayleigh-Ritz
-minimum, and a regression fixture discharges it from
-`hermitianMinEigenvalue_le_rayleighOnVec_of_unit` at a genuine ground state. Self-adjointness of
-`Ĥ` and `Ô_L` is taken at the level of the sums, not per term, which is again the weaker form.
-`q₀ > 0` is printed in (3.4.3) itself. `1 ≤ L` is used only to make `L^d` positive.
+`⟨Φ_GS|Φ_GS⟩ = 1`, `Ĥ|Φ_GS⟩ = E_GS|Φ_GS⟩` and `E_GS ≤ ⟨v|Ĥ|v⟩` for every normalised `v`. The
+first two give `⟨Φ_GS|Ĥ|Φ_GS⟩ = E_GS`, so the third is *equivalent* to `E_GS` being the minimum of
+the Rayleigh quotient over normalised vectors and covers exactly the same data; what the explicit
+form buys is that a caller may supply the minimality directly, without routing through
+`hermitianMinEigenvalue` and the `Nonempty` instance it requires. A regression fixture discharges
+it from `hermitianMinEigenvalue_le_rayleighOnVec_of_unit` at a genuine ground state.
+Self-adjointness of `Ĥ` and `Ô_L` is taken at the level of the sums, not per term, which is the
+weaker form. `q₀ > 0` is printed in (3.4.3) itself. `1 ≤ L` is used only to make `L^d` positive.
 
 **What these declarations do not assert.** The no-SSB condition (3.4.4), p. 65, is not used: only
 (3.4.3) is consumed here. The statement is at a single `L`, an implication between hypotheses and
 conclusion at that same `L`; the "for sufficiently large `L`" reading of (3.4.3)-(3.4.4) is a
-statement about a family and belongs to the later assembly, which composes this one without
-restating it. Neither the mirror `−Ô_L` instance nor the states `Ξ±` of eqs. (3.4.14)-(3.4.15),
-pp. 68-69, are formalised here.
+statement about a family and is not formalised here. Neither the mirror `−Ô_L` instance nor the
+symmetric state `Ξ₊` of eq. (3.4.14), p. 68, is treated here.
 
 All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
 `Classical.choice`, `Quot.sound`.
