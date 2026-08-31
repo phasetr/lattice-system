@@ -37,12 +37,69 @@ theorem commutator_orderSum_eq_windowSum {ι : Type*} (B : Finset ι)
   refine (Finset.sum_subset (Finset.subset_univ (W b)) fun z _ hz => ?_).symm
   exact sub_eq_zero.mpr (hW b hbB z hz).eq
 
+/-- Bridge from site-disjoint commutation of the order terms to the outer-window vanishing
+hypothesis of the two-window collapse.  If `ĥ_b` commutes with every `ô_z` outside `W b` and
+distinct sites carry commuting order operators, then for `x` outside `W b` and `z` inside it the
+order term `ô_x` commutes with the inner commutator `[ĥ_b, ô_z]`.  This is exactly the content of
+the single-site hypothesis that the one-window statements below carry, and it is the only place it
+is used. -/
+private theorem commute_order_windowCommutator {ι : Type*} {B : Finset ι}
+    {hb : ι → ManyBodyOpS Λ N} {o : Λ → ManyBodyOpS Λ N} {W : ι → Finset Λ}
+    (hW : ∀ b ∈ B, ∀ z ∉ W b, Commute (hb b) (o z))
+    (hoo : ∀ x z : Λ, x ≠ z → Commute (o x) (o z)) :
+    ∀ b ∈ B, ∀ x ∉ W b, ∀ z ∈ W b, Commute (o x) (hb b * o z - o z * hb b) := by
+  intro b hbB x hx z hz
+  have hxz : x ≠ z := by rintro rfl; exact hx hz
+  exact ((hW b hbB x hx).symm.mul_right (hoo x z hxz)).sub_right
+    ((hoo x z hxz).mul_right (hW b hbB x hx).symm)
+
+/-- **Two-window form of Tasaki eq. (3.4.10), p. 67** — the double commutator collapses onto an
+*inner* window `W₁ b` and an *outer* window `W₂ b`, which need not coincide:
+`[Ô, [Ĥ, Ô]] = Σ_{b∈B} Σ_{x∈W₂ b} Σ_{z∈W₁ b} [ô_x, [ĥ_b, ô_z]]`.
+The inner window carries `hW`, "`ĥ_b` commutes with every `ô_z` seated outside `W₁ b`", and drives
+the collapse of `[Ĥ, Ô]` exactly as in eq. (3.4.9).  The outer window carries `hWW`, "`ô_x`
+commutes with `[ĥ_b, ô_z]` for `x` outside `W₂ b` and `z` inside `W₁ b`", which is what makes the
+remaining site sum collapse onto `W₂ b`.
+Two genuinely different windows are needed by Tasaki Problem 3.4.a (pp. 67-68, solution p. 501),
+where range-`r` local terms give `W₁` the radius `r` and `W₂` the radius `2r`; there the single-site
+hypothesis `hoo` of the one-window form below is false. -/
+theorem doubleCommutator_orderSum_eq_twoWindowSum {ι : Type*} (B : Finset ι)
+    (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N) (W₁ W₂ : ι → Finset Λ)
+    (hW : ∀ b ∈ B, ∀ z ∉ W₁ b, Commute (hb b) (o z))
+    (hWW : ∀ b ∈ B, ∀ x ∉ W₂ b, ∀ z ∈ W₁ b, Commute (o x) (hb b * o z - o z * hb b)) :
+    (∑ x : Λ, o x) * ((∑ b ∈ B, hb b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b ∈ B, hb b))
+        - ((∑ b ∈ B, hb b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b ∈ B, hb b)) * (∑ x : Λ, o x)
+      = ∑ b ∈ B, ∑ x ∈ W₂ b, ∑ z ∈ W₁ b,
+          (o x * (hb b * o z - o z * hb b) - (hb b * o z - o z * hb b) * o x) := by
+  have hinner : ∀ x : Λ,
+      o x * (∑ b ∈ B, ∑ z ∈ W₁ b, (hb b * o z - o z * hb b))
+          - (∑ b ∈ B, ∑ z ∈ W₁ b, (hb b * o z - o z * hb b)) * o x
+        = ∑ b ∈ B, (o x * (∑ z ∈ W₁ b, (hb b * o z - o z * hb b))
+            - (∑ z ∈ W₁ b, (hb b * o z - o z * hb b)) * o x) := fun x =>
+    commutator_sum_right B (o x) fun b => ∑ z ∈ W₁ b, (hb b * o z - o z * hb b)
+  rw [commutator_orderSum_eq_windowSum B hb o W₁ hW,
+    commutator_sum_left Finset.univ (∑ b ∈ B, ∑ z ∈ W₁ b, (hb b * o z - o z * hb b)) o]
+  simp only [hinner]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun b hbB => ?_
+  have hcollapse : ∑ x ∈ W₂ b, (o x * (∑ z ∈ W₁ b, (hb b * o z - o z * hb b))
+          - (∑ z ∈ W₁ b, (hb b * o z - o z * hb b)) * o x)
+      = ∑ x : Λ, (o x * (∑ z ∈ W₁ b, (hb b * o z - o z * hb b))
+          - (∑ z ∈ W₁ b, (hb b * o z - o z * hb b)) * o x) := by
+    refine Finset.sum_subset (Finset.subset_univ (W₂ b)) fun x _ hx => ?_
+    exact sub_eq_zero.mpr (Commute.sum_right _ _ _ fun z hz => hWW b hbB x hx z hz).eq
+  rw [← hcollapse]
+  exact Finset.sum_congr rfl fun x _ =>
+    commutator_sum_right (W₁ b) (o x) fun z => hb b * o z - o z * hb b
+
 /-- **Tasaki eq. (3.4.10), p. 67** — the double commutator of the order operator with the windowed
 Hamiltonian collapses onto the windows on *both* index positions:
 `[Ô, [Ĥ, Ô]] = Σ_{b∈B} Σ_{x∈W b} Σ_{z∈W b} [ô_x, [ĥ_b, ô_z]]`.
 Beyond the window hypothesis `hW` of eq. (3.4.9) this needs `hoo`, the Lean content of "`ô_x` acts
 nontrivially only on the spin at `x`": distinct sites carry commuting order operators, which is what
-makes the outer sum collapse onto `W b` as well. -/
+makes the outer sum collapse onto `W b` as well.
+This is the instance `W₁ = W₂ = W` of `doubleCommutator_orderSum_eq_twoWindowSum`; the collapse is
+proved once, there. -/
 theorem doubleCommutator_orderSum_eq_windowSum {ι : Type*} (B : Finset ι)
     (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N) (W : ι → Finset Λ)
     (hW : ∀ b ∈ B, ∀ z ∉ W b, Commute (hb b) (o z))
@@ -50,30 +107,9 @@ theorem doubleCommutator_orderSum_eq_windowSum {ι : Type*} (B : Finset ι)
     (∑ x : Λ, o x) * ((∑ b ∈ B, hb b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b ∈ B, hb b))
         - ((∑ b ∈ B, hb b) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ b ∈ B, hb b)) * (∑ x : Λ, o x)
       = ∑ b ∈ B, ∑ x ∈ W b, ∑ z ∈ W b,
-          (o x * (hb b * o z - o z * hb b) - (hb b * o z - o z * hb b) * o x) := by
-  have hinner : ∀ x : Λ,
-      o x * (∑ b ∈ B, ∑ z ∈ W b, (hb b * o z - o z * hb b))
-          - (∑ b ∈ B, ∑ z ∈ W b, (hb b * o z - o z * hb b)) * o x
-        = ∑ b ∈ B, (o x * (∑ z ∈ W b, (hb b * o z - o z * hb b))
-            - (∑ z ∈ W b, (hb b * o z - o z * hb b)) * o x) := fun x =>
-    commutator_sum_right B (o x) fun b => ∑ z ∈ W b, (hb b * o z - o z * hb b)
-  rw [commutator_orderSum_eq_windowSum B hb o W hW,
-    commutator_sum_left Finset.univ (∑ b ∈ B, ∑ z ∈ W b, (hb b * o z - o z * hb b)) o]
-  simp only [hinner]
-  rw [Finset.sum_comm]
-  refine Finset.sum_congr rfl fun b hbB => ?_
-  have hcollapse : ∑ x ∈ W b, (o x * (∑ z ∈ W b, (hb b * o z - o z * hb b))
-          - (∑ z ∈ W b, (hb b * o z - o z * hb b)) * o x)
-      = ∑ x : Λ, (o x * (∑ z ∈ W b, (hb b * o z - o z * hb b))
-          - (∑ z ∈ W b, (hb b * o z - o z * hb b)) * o x) := by
-    refine Finset.sum_subset (Finset.subset_univ (W b)) fun x _ hx => ?_
-    refine sub_eq_zero.mpr (Commute.sum_right _ _ _ fun z hz => ?_).eq
-    have hxz : x ≠ z := by rintro rfl; exact hx hz
-    exact ((hW b hbB x hx).symm.mul_right (hoo x z hxz)).sub_right
-      ((hoo x z hxz).mul_right (hW b hbB x hx).symm)
-  rw [← hcollapse]
-  exact Finset.sum_congr rfl fun x _ =>
-    commutator_sum_right (W b) (o x) fun z => hb b * o z - o z * hb b
+          (o x * (hb b * o z - o z * hb b) - (hb b * o z - o z * hb b) * o x) :=
+  doubleCommutator_orderSum_eq_twoWindowSum B hb o W W hW
+    (commute_order_windowCommutator hW hoo)
 
 /-- **Operator-norm bound for the windowed double commutator** (Tasaki §3.4, p. 67, the unnumbered
 estimate preceding eq. (3.4.11)):
