@@ -3,8 +3,10 @@ Coordinate sup-norm balls in `ℤ^d`.
 
 For a finite site set `Λ` carrying injective integer coordinates `pos : Λ → (Fin d → ℤ)`, the
 **coordinate sup-norm ball** `B_r(x) = {y ∈ Λ : ∀ i, |pos y i - pos x i| ≤ r}` has cardinality at
-most `(2r+1)^d`. This is the `d`-fold generalisation of the 1-D displacement-window count already
-used at `Quantum/SpinS/LiebSchultzMattisGeneratorNorm.lean`, and it is the counting input needed
+most `(2r+1)^d`. This is the `d`-dimensional analogue of the 1-D displacement-window count already
+used at `Quantum/SpinS/LiebSchultzMattisGeneratorNorm.lean` — not a generalisation of it, since
+that count is over a *cyclic* ring window and is not recoverable from this coordinate ball at
+`d = 1` — and it is the counting input needed
 twice (at radius `r` and at radius `2r`) by Tasaki Problem 3.4.a, eq. (3.4.13).
 
 The sup-norm reading of Tasaki's unqualified `|x - y| ≤ r` is chosen because the Euclidean ball is

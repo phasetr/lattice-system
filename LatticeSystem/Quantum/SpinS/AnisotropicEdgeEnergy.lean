@@ -16,10 +16,11 @@ The variational argument of §8.1.3 needs three quantitative facts about the ope
 
 Tasaki (p. 238) proves only the single-commutator vanishing and then asserts the key estimate
 `‖[Ô_string, [Ĥ, Ô_string]]‖ ≤ (const.) L` without a constant; the counting below is therefore
-supplied here, in the shape of Problem 3.4.a, (3.4.13), p. 67.
+supplied here, in the shape of Problem 3.4.a (pp. 67–68), (3.4.13), p. 68.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §3.4, eqs. (3.4.8)–(3.4.13), pp. 66–67; §8.1.3, p. 238.
+2020), §3.4, eqs. (3.4.8)–(3.4.12) pp. 66–67, Problem 3.4.a pp. 67–68, (3.4.13) p. 68;
+§8.1.3, p. 238.
 -/
 
 namespace LatticeSystem.Quantum
@@ -300,7 +301,7 @@ private theorem not_mem_edgeBondSupport (L : ℕ) (z : Fin L) {x : Fin L}
 
 /-- **The uniform `O(L)` double-commutator bound** for the string operator.  Tasaki (p. 238) states
 this as `‖[Ô_string, [Ĥ, Ô_string]]‖ ≤ (const.) L` without a constant; the explicit value below
-comes from the Problem 3.4.a counting shape (3.4.13), p. 67: at most two sites carry each local
+comes from the Problem 3.4.a counting shape (3.4.13), p. 68: at most two sites carry each local
 term, each string term and each prefix rotation has norm at most one, and `‖ĥ_z‖ ≤ 3 + D`.  The
 numeral is deliberately generous; the invariant is that no factor of `L` hides in it. -/
 theorem edgeDoubleCommutator_manyBodyOperatorNormS_le (L : ℕ) {D : ℝ} (hD : 0 ≤ D)

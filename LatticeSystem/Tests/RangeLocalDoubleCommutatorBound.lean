@@ -31,7 +31,7 @@ two windows or the two bounds would not satisfy the pin.
   alone cannot rule out an over-large closed form; this fixture does, because it forces equality.
 - F-3 (two-window kernel constant, `m₁ ≠ m₂`): abstract `B, hb, o, W₁, W₂` at `m₁ := 3`, `m₂ := 5`,
   `h₀ := 5/2`, `o₀ := 1/2`, `B.card := 7`, giving the correct constant `525/2`, discriminated from
-  the competing patterns `4m₁² = 315/2`, `4m₂² = 875/2`, `8m₁m₂ = 525`, `2m₁m₂ = 262.5/2`
+  the competing patterns `4m₁² = 315/2`, `4m₂² = 875/2`, `8m₁m₂ = 525`, `2m₁m₂ = 525/4`
   (values re-derived below; see the fixture's own doc comment for the exact numbers).
 - F-4 (capstone constant, `r = 1`, `d = 3`, `L = 2`, `h₀ = 5/2`, `o₀ = 1/2`): the correct bound is
   `67500`, discriminated from the book-solution misprint form `(2r+1)²(4r+1)^d` (`22500`) and from

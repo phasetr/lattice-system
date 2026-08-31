@@ -48,8 +48,8 @@ theorem commutator_orderSum_eq_windowSum {ι : Type*} (B : Finset ι)
 hypothesis of the two-window collapse.  If `ĥ_b` commutes with every `ô_z` outside `W b` and
 distinct sites carry commuting order operators, then for `x` outside `W b` and `z` inside it the
 order term `ô_x` commutes with the inner commutator `[ĥ_b, ô_z]`.  This is exactly the content of
-the single-site hypothesis that the one-window statements below carry, and it is the only place it
-is used. -/
+the single-site hypothesis `hoo` that the one-window statements below carry, and this lemma is the
+only place `hoo` is used. -/
 private theorem commute_order_windowCommutator {ι : Type*} {B : Finset ι}
     {hb : ι → ManyBodyOpS Λ N} {o : Λ → ManyBodyOpS Λ N} {W : ι → Finset Λ}
     (hW : ∀ b ∈ B, ∀ z ∉ W b, Commute (hb b) (o z))
@@ -69,7 +69,7 @@ commutes with `[ĥ_b, ô_z]` for `x` outside `W₂ b` and `z` inside `W₁ b`", 
 remaining site sum collapse onto `W₂ b`.
 Two genuinely different windows are needed by Tasaki Problem 3.4.a (pp. 67-68, solution p. 501),
 where range-`r` local terms give `W₁` the radius `r` and `W₂` the radius `2r`; there the single-site
-hypothesis `hoo` of the one-window form below is false. -/
+hypothesis `hoo` of the one-window form below need not hold. -/
 theorem doubleCommutator_orderSum_eq_twoWindowSum {ι : Type*} (B : Finset ι)
     (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N) (W₁ W₂ : ι → Finset Λ)
     (hW : ∀ b ∈ B, ∀ z ∉ W₁ b, Commute (hb b) (o z))

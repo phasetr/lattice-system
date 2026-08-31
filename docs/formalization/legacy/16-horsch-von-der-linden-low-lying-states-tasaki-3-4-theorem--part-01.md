@@ -248,17 +248,18 @@ Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4
 (3.4.2) p. 65, eq. (3.4.9) p. 66, eqs. (3.4.10)-(3.4.11) p. 67; operator-norm properties
 (A.2.5)/(A.2.6), p. 463.
 
-`Quantum/SpinS/LocalDoubleCommutatorBound.lean` turns the locality of `Ĥ = Σ_{b∈B} ĥ_b` and
-`Ô = Σ_{x∈Λ} ô_x` into the numerator estimate that eq. (3.4.8) consumes. Locality is expressed
-by plain commutation hypotheses rather than a support predicate: `ĥ_b` commutes with every `ô_z`
+`Quantum/SpinS/LocalDoubleCommutatorBound.lean` turns the locality of `Ĥ = Σ_{b∈B} ĥ_b` and `Ô =
+Σ_{x∈Λ} ô_x` into the numerator estimate that eq. (3.4.8) consumes. Locality is expressed by
+plain commutation hypotheses rather than a support predicate: `ĥ_b` commutes with every `ô_z`
 seated outside a window `W b` (the Lean content of eq. (3.4.1)'s "acts nontrivially only on the
-spins at `x` and `y`"), and distinct sites carry commuting order operators (eq. (3.4.2)). The collapse carries **two** windows, an inner `W₁ b` off which `ĥ_b` commutes with the order
-terms and an outer `W₂ b` off which the order terms commute with the inner commutators, with
+spins at `x` and `y`"), and distinct sites carry commuting order operators (eq. (3.4.2)). The
+collapse carries **two** windows, an inner `W₁ b` off which `ĥ_b` commutes with the order terms
+and an outer `W₂ b` off which the order terms commute with the inner commutators, with
 independent cardinality bounds `m₁` and `m₂` and kernel constant `4 m₁ m₂ h₀ o₀² |B|`. The
 one-window statements are the instance `W₁ = W₂`, `m₁ = m₂ = mW`, and the bond case is `mW = 2`,
-`4 · 2² = 16`; the counting that produces the book's constant is therefore proved in general. Norm
-hypotheses are stated as `≤` rather than the book's `=`, and `0 ≤ o₀` is an explicit hypothesis
-because an empty site type makes it underivable from the per-site bounds.
+`4 · 2² = 16`; the counting that produces the book's constant is therefore proved in general.
+Norm hypotheses are stated as `≤` rather than the book's `=`, and `0 ≤ o₀` is an explicit
+hypothesis because an empty site type makes it underivable from the per-site bounds.
 
 The commutator norm inequality `‖[Â, B̂]‖ ≤ 2‖Â‖‖B̂‖` used twice per term is
 `manyBodyOperatorNormS_comm_le`, which lives in `Quantum/SpinS/ManyBodyOperatorNorm.lean` next to
@@ -290,10 +291,14 @@ All declarations below are **PROVED**; `#print axioms` on each yields only `prop
 | `manyBodyOperatorNormS_doubleCommutator_le_of_windows` | general-window norm kernel: `‖[Ô, [Ĥ, Ô]]‖ ≤ 4 mW² h₀ o₀² \|B\|` (the `m₁ = m₂ = mW` instance) | `Quantum/SpinS/LocalDoubleCommutatorBound.lean` |
 | `doubleCommutator_bondLocal_expectation_le` | eq. (3.4.11): `⟨Φ\|[Ô,[Ĥ,Ô]]\|Φ⟩ ≤ ‖[Ô,[Ĥ,Ô]]‖ ≤ 16 d h₀ o₀² L^d` for normalised `Φ` and bond-local windows | `Quantum/SpinS/LocalDoubleCommutatorBound.lean` |
 
-Regression fixtures live in `LatticeSystem/Tests/LocalDoubleCommutatorBound.lean`: each of the four
-§3.4 declarations has a signature fixture restating it in full and discharging it by the
-declaration itself, and the two collapse identities are pinned with `W b` on **both** window index
-positions, so a vacuous `W b = univ` reading would not satisfy the pin. Two numeric fixtures pin
+Regression fixtures live in `LatticeSystem/Tests/LocalDoubleCommutatorBound.lean`: each of the
+four **one-window** §3.4 declarations has a signature fixture restating it in full and
+discharging it by the declaration itself (the two-window pins for
+`doubleCommutator_orderSum_eq_twoWindowSum` and
+`manyBodyOperatorNormS_doubleCommutator_le_of_twoWindows` live instead in
+`LatticeSystem/Tests/RangeLocalDoubleCommutatorBound.lean`), and the two collapse identities are
+pinned with `W b` on **both** window index positions, so a vacuous `W b = univ` reading would not
+satisfy the pin. Two numeric fixtures pin
 the constants over abstract data constrained only by the hypotheses, so no arithmetic tautology can
 close them: the kernel at `mW = 3`, `h₀ = 5/2`, `o₀ = 1/2`, `|B| = 7` gives `315/2`, a point away
 from `mW = 2` where `4mW²`, `8mW`, `2mW³` and `mW⁴` all coincide; the capstone at `d = 3`, `L = 4`,
@@ -408,11 +413,15 @@ All declarations below are **PROVED**; `#print axioms` on each yields only `prop
 | Lean name | Statement | File |
 |---|---|---|
 | `coordSupBall` | the coordinate sup-norm ball `{y : ∀ i, \|pos yᵢ − pos xᵢ\| ≤ r}` as a `Finset Λ` | `Math/Combinatorics/CoordinateBall.lean` |
+| `mem_coordSupBall` | `y ∈ coordSupBall pos r x ↔ ∀ i, \|pos yᵢ − pos xᵢ\| ≤ r` | `Math/Combinatorics/CoordinateBall.lean` |
 | `card_coordSupBall_le` | `\|B_r(x)\| ≤ (2r+1)^d` for injective coordinates; at radius `2r` it gives `(4r+1)^d` | `Math/Combinatorics/CoordinateBall.lean` |
 | `tasaki_problem_3_4_a_doubleCommutator_expectation_le` | eq. (3.4.13): `⟨Φ\|[Ô,[Ĥ,Ô]]\|Φ⟩ ≤ 4 (2r+1)^d (4r+1)^d h₀ o₀² L^d` for a normalised `Φ` and range-`r` site-local terms | `Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean` |
 
 Regression fixtures live in `LatticeSystem/Tests/RangeLocalDoubleCommutatorBound.lean`: a
-signature fixture for each declaration; a tightness fixture at `d = 2`, `r = 1` on
+signature fixture for each of the six declarations pinned in this file (`coordSupBall`,
+`mem_coordSupBall`, `card_coordSupBall_le`, `doubleCommutator_orderSum_eq_twoWindowSum`,
+`manyBodyOperatorNormS_doubleCommutator_le_of_twoWindows`, and the eq. (3.4.13) capstone); a
+tightness fixture at `d = 2`, `r = 1` on
 `Λ = Fin 2 → Fin 3` where the ball is all of `Λ` and the count `9 = (2·1+1)²` is *attained*, which
 is what rules out a wrongly-large closed form; the two-window kernel constant at `m₁ = 3 ≠ 5 = m₂`,
 `h₀ = 5/2`, `o₀ = 1/2`, `|B| = 7`, giving `525/2`, a point where `4m₁m₂`, `4m₁²`, `4m₂²`, `8m₁m₂`
