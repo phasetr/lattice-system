@@ -148,6 +148,7 @@ import LatticeSystem.Tests.Problem24cCoherentExpansion
 import LatticeSystem.Tests.Problem24dGraphLaplacian
 import LatticeSystem.Tests.Problem33aLowEnergy
 import LatticeSystem.Tests.Problem34bFluctuation
+import LatticeSystem.Tests.HorschVonderLindenEnergyBound
 import LatticeSystem.Tests.HorschVonderLindenTrialStateVariational
 import LatticeSystem.Tests.LocalDoubleCommutatorBound
 
