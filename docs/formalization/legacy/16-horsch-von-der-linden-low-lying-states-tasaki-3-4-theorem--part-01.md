@@ -452,7 +452,7 @@ Regression fixtures live in `LatticeSystem/Tests/OperatorSupport.lean` (signatur
 `SupportedOnS` and its three lemmas) and `LatticeSystem/Tests/RangeLocalDoubleCommutatorBound.lean`
 (signature pins on the remaining declarations above, plus numeric fixtures): F-1, periodic
 wraparound on `Fin 2 → Fin 5` (the torus sup-distance from the origin to `fun _ => 4` is the
-*cyclic* arc length `1`, not the linear gap `4`); F-2, kept from PR-4 as-is — `coordSupBall`
+*cyclic* arc length `1`, not the linear gap `4`); F-2 — `coordSupBall`
 tightness on `Fin 2 → Fin 3`, every site lies in the radius-`1` coordinate ball, exhausting the
 `(2·1+1)^2 = 9`-site bound; F-2′, ball-count tightness — the radius-`1` `siteBall`/`torusSupDist`
 ball on `d = 2`, `L = 5` has exactly `9 = (2·1+1)²` sites out of `25`; F-3, the two-window kernel
@@ -460,9 +460,10 @@ constant at `m₁ = 3 ≠ 5 = m₂`, `h₀ = 5/2`, `o₀ = 1/2`, `|B| = 7`, givi
 `4m₁m₂`, `4m₁²`, `4m₂²` and `8m₁m₂` take the pairwise distinct values `262.5`, `157.5`, `437.5` and
 `525`; F-4′, the capstone constant at `r = 1`, `d = 2`, `L = 5`, `h₀ = 2`, `o₀ = 1/2`, giving
 `101250`, discriminated from the book-solution printed-constant form (`11250`) and from the
-exponent-shape slip `L^d = 25 ≠ d^L = 32`; and F-5, a concrete witness — a two-site,
-ring-wrapping Hamiltonian term and a singleton-support order term on `Fin 2 → Fin 5` — whose
-`SupportedOnS` hypotheses are *discharged by proof* rather than assumed, giving the same `101250`
+exponent-shape slip `L^d = 25 ≠ d^L = 32`; and F-5, a concrete witness — a `SupportedOnS`-bound
+support of at most two sites (one reached by ring-wrapping) and a singleton-support order term on
+`Fin 2 → Fin 5` — whose `SupportedOnS` hypotheses are *discharged by proof* rather than assumed,
+giving the same `101250`
 bound. Since
 `4 m₁ m₂` is symmetric, a swap of the two window bounds is invisible to any numeric fixture on the
 constant alone; in this `SupportedOnS`-based form the window roles are pinned by **provability**

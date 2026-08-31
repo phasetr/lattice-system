@@ -13,24 +13,27 @@ The predicate has the same two-clause shape as the half-ring predicate `Supporte
 membership in an arbitrary `S : Finset Λ`: the entries vanish off the support, and inside the
 support they depend only on the restricted configurations.
 
-`LatticeSystem.Quantum.SupportedOn` (`Quantum/SpinS/AndersonTowerLocalDecay.lean`) is a third
+`LatticeSystem.Quantum.SupportedOn` (`Quantum/SpinS/AndersonTowerLocalDecay.lean`) is another
 encoding of the same "acts only on `S`" concept, phrased in commutant form: `G` is supported on `S`
-when it commutes with every on-site factor located off `S`. A fourth encoding,
-`IsLocalRangeR` (`Quantum/SpinS/LiebSchultzMattisGeneral.lean`), phrases the same idea for a fixed
-centre and radius on a ring, again in commutant form; its own doc comment notes it is equivalent,
+when it commutes with every on-site factor located off `S`. Further encodings exist elsewhere in
+the library, e.g. `IsLocalRangeR` (`Quantum/SpinS/LiebSchultzMattisGeneral.lean`), which phrases
+the same idea for a fixed centre and radius on a ring (its own doc comment notes it is equivalent,
 by the factor double-commutant theorem, to a support condition, and that the commutant phrasing is
-deliberate (it is shared with the §7.1.3 Theorem 7.3 axiom hypothesis). None of the four is
-α-equivalent to any other, so all coexist without conflict; unifying them into one predicate is
-tracked work, not done here.
+deliberate: it is shared with the §7.1.3 Theorem 7.3 axiom hypothesis), and `IsLocalWindowS`
+(`Quantum/SpinS/KennedyTasakiProp84.lean`), the open-chain window analogue of `IsLocalRangeR`. This
+family of "acts only on a subset of sites" encodings is larger than this module and has not been
+enumerated exhaustively; new encodings should not be assumed absent just because a comment does not
+mention them. Unifying the family into one predicate is tracked work, not done here.
 
 `SupportedOn` and `SupportedOnS` are a particular hazard: both have signature
-`Finset Λ → ManyBodyOpS Λ N → Prop`, both live in namespace `LatticeSystem.Quantum`, they differ
-by one character, and (being both "commutes with every off-support on-site factor" versus "vanishes
-off support, depends only on support") they are logically equivalent for `ManyBodyOpS`. Picking the
-wrong one therefore still type-checks. No bridge lemma from `IsLocalRangeR` or `SupportedOn` to
-`SupportedOnS` (or back) is proved in either direction, so a caller holding a hypothesis phrased in
-one of these predicates cannot currently invoke a capstone stated in another; closing that gap is
-tracked work alongside the unification above.
+`Finset Λ → ManyBodyOpS Λ N → Prop`, both live in namespace `LatticeSystem.Quantum`, and they
+differ by one character. Picking the wrong one therefore still type-checks. Being both "commutes
+with every off-support on-site factor" versus "vanishes off support, depends only on support", the
+two are expected to be logically equivalent for `ManyBodyOpS`, but no bridge lemma between them (or
+between either of them and `IsLocalRangeR`) is proved in either direction anywhere in the repo, so
+this equivalence is not formalised here. A caller holding a hypothesis phrased in one of these
+predicates cannot currently invoke a capstone stated in another; closing that gap is tracked work
+alongside the unification above.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §3.4, Problem 3.4.a, statement pp. 67-68.

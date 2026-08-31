@@ -3,7 +3,7 @@ import LatticeSystem.Quantum.SpinS.AndersonTowerLocality
 import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
 
 /-!
-# Test coverage for the general range-`r` bound, Problem 3.4.a, eq. (3.4.13)
+# Test coverage for the general range-`r` bound, Problem 3.4.a (not eq. (3.4.13) as printed)
 
 Fixtures for the rewritten `LatticeSystem/Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean`
 (honest support-predicate form), the new `LatticeSystem/Math/Combinatorics/SiteBall.lean`, and the
@@ -18,12 +18,12 @@ resolve against.
 
 ## What each block pins
 
-**Kept from PR-4 (unchanged production code).** `coordSupBall`, `mem_coordSupBall`,
+**Signature pins on the pre-existing production code.** `coordSupBall`, `mem_coordSupBall`,
 `card_coordSupBall_le` (`Math/Combinatorics/CoordinateBall.lean`) and the two-window collapse /
 kernel (`doubleCommutator_orderSum_eq_twoWindowSum`,
 `manyBodyOperatorNormS_doubleCommutator_le_of_twoWindows`,
-`Quantum/SpinS/LocalDoubleCommutatorBound.lean`) are re-pinned as-is; F-2 (the `Fin 2 → Fin 3`
-tightness fixture) and F-3 (the two-window kernel constant) are kept as-is.
+`Quantum/SpinS/LocalDoubleCommutatorBound.lean`); F-2 (the `Fin 2 → Fin 3` tightness fixture) and
+F-3 (the two-window kernel constant).
 
 **New signature pins.** `siteBall`, `mem_siteBall`, `disjoint_siteBall_of_lt`
 (`Math/Combinatorics/SiteBall.lean`); `ringDist_comm`, `ringDist_self`, `ringDist_triangle`,
@@ -42,7 +42,7 @@ tightness fixture) and F-3 (the two-window kernel constant) are kept as-is.
   not the linear gap `4`), and the radius-`1` ball around the origin contains `fun _ => 4` but not
   `fun _ => 2`. A non-periodic coordinate ball would instead give distance `4` and exclude
   `fun _ => 4`, so this fixture is exactly what makes periodicity load-bearing.
-- F-2' (ball-count tightness, `d = 2`, `r = 1`, `L = 5`, `by decide`): the radius-`1` ball around
+- F-2′ (ball-count tightness, `d = 2`, `r = 1`, `L = 5`, `by decide`): the radius-`1` ball around
   the origin has exactly `9 = (2·1+1)^2` sites, out of `|Λ| = 5^2 = 25`, so the bound is attained
   and locality is non-trivial (`9 < 25`).
 - F-4′ (capstone constant, `r = 1`, `d = 2`, `L = 5`, `h₀ = 2`, `o₀ = 1/2`): the correct bound
@@ -52,12 +52,12 @@ tightness fixture) and F-3 (the two-window kernel constant) are kept as-is.
 - F-5 (premise witness): a concrete `Λ = Fin 2 → Fin 5`, `N = 1`, `r = 1` instance — order term
   `o x := onSiteS x (spinSOp3 1)` (`o₀ = 1/2`) and Hamiltonian term
   `h x := onSiteS x (spinSOp1 1) + onSiteS (shift x) (spinSOp1 1)` with
-  `shift x := Function.update x 0 (x 0 + 1)` (`h₀ = 2`, support = **2** sites, wrapping the ring
-  coordinate) — whose `SupportedOnS` hypotheses are **discharged by proof**
-  (`supportedOnS_onSiteS`, `SupportedOnS.add`, `ringDist_self`, and `∀ a : Fin 5,
+  `shift x := Function.update x 0 (x 0 + 1)` (`h₀ = 2`, `SupportedOnS`-bound support of at most
+  **2** sites, wrapping the ring coordinate) — whose `SupportedOnS` hypotheses are **discharged by
+  proof** (`supportedOnS_onSiteS`, `SupportedOnS.add`, `ringDist_self`, and `∀ a : Fin 5,
   ringDist 5 (a + 1) a = 1` by `decide`), not assumed. No prior test ever witnessed the range-`r`
-  locality hypotheses being jointly satisfiable in a non-degenerate (non-singleton-support, ball
-  ⊊ `Λ`, wrapping) way.
+  locality hypotheses being jointly satisfiable in a non-degenerate (support bound not a singleton,
+  ball ⊊ `Λ`, wrapping) way.
 
 ## Coverage limits (stated honestly)
 
@@ -84,7 +84,7 @@ open Matrix
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-/-! ## Kept from PR-4: signature pins on `Math/Combinatorics/CoordinateBall.lean` -/
+/-! ## Signature pins on `Math/Combinatorics/CoordinateBall.lean` -/
 
 /-- **Signature pin (`coordSupBall`).** The coordinate sup-norm ball
 `B_r(x) = {y : ∀ i, |pos y i - pos x i| ≤ r}` as a `Finset Λ`, for `pos : Λ → (Fin d → ℤ)`. -/
@@ -104,7 +104,7 @@ example {d : ℕ} (pos : Λ → (Fin d → ℤ)) (hpos : Function.Injective pos)
     (coordSupBall pos r x).card ≤ (2 * r + 1) ^ d :=
   card_coordSupBall_le pos hpos r x
 
-/-! ## Kept from PR-4: signature pins on the two-window core -/
+/-! ## Signature pins on the two-window core -/
 
 /-- **Signature pin (two-window collapse).** The double commutator collapses onto an *inner*
 window `W₁ b` and an *outer* window `W₂ b`, syntactically distinct binders so a statement that
@@ -235,7 +235,8 @@ example (dist : Λ → Λ → ℕ) (hsymm : ∀ a b, dist a b = dist b a)
   manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal
     dist hsymm htri h o r h₀ o₀ m₁ m₂ hsh hso hnh hno ho₀ hm₁ hm₂
 
-/-- **Signature pin (eq. (3.4.13) capstone, honest support form).** No `pos`/injectivity, no
+/-- **Signature pin (Problem 3.4.a capstone, honest support form; constant not eq. (3.4.13) as
+printed).** No `pos`/injectivity, no
 `hΛ : |Λ| ≤ L^d` slack hypothesis — `Λ` is fixed to the periodic torus `Fin d → Fin L`, and
 locality is a genuine `SupportedOnS` condition rather than a commutation hypothesis. -/
 example {d L : ℕ} (h o : (Fin d → Fin L) → ManyBodyOpS (Fin d → Fin L) N) (r : ℕ) (h₀ o₀ : ℝ)
@@ -269,10 +270,10 @@ also the cyclic distance, since `5 - 2 = 3 > 2`) is excluded from the same ball.
 example : (fun _ => (2 : Fin 5)) ∉ siteBall (torusSupDist 2 5) 1 (fun _ => (0 : Fin 5)) := by
   decide
 
-/-! ## Numeric fixtures F-2 (kept) and F-2' (new): ball-count tightness
+/-! ## Numeric fixtures F-2 and F-2′: ball-count tightness
 (`d = 2`, `r = 1`, `L = 5`) -/
 
-/-- **Fixture (kept, `coordSupBall` tightness, `Fin 2 → Fin 3`).** As in PR-4: every site lies in
+/-- **Fixture (`coordSupBall` tightness, `Fin 2 → Fin 3`).** Every site lies in
 the radius-`1` ball, so `coordSupBall pos 1 c = Finset.univ`, of card `9 = (2·1+1)^2`, forcing an
 equality (not just a one-sided bound) through `le_antisymm`. -/
 example :
@@ -296,7 +297,7 @@ example :
   rw [hall, Finset.card_univ, Fintype.card_fun, Fintype.card_fin, Fintype.card_fin]
   norm_num
 
-/-- **Fixture F-2' (new, `siteBall`/`torusSupDist` tightness, `d = 2`, `r = 1`, `L = 5`,
+/-- **Fixture F-2′ (`siteBall`/`torusSupDist` tightness, `d = 2`, `r = 1`, `L = 5`,
 `by decide`).**
 The radius-`1` ball around the origin on the `d = 2`, `L = 5` torus has exactly
 `9 = (2·1+1)^2` sites (the bound is attained), out of `|Λ| = 25`, so locality is non-trivial:
@@ -308,7 +309,7 @@ non-vacuous at these parameters. -/
 example : (siteBall (torusSupDist 2 5) 1 (fun _ => (0 : Fin 5))).card < Fintype.card (Fin 2 → Fin 5)
     := by decide
 
-/-! ## Numeric fixture F-3: two-window kernel constant (`m₁ ≠ m₂`, kept as-is) -/
+/-! ## Numeric fixture F-3: two-window kernel constant (`m₁ ≠ m₂`) -/
 
 /-- **Fixture (two-window kernel constant, `m₁ ≠ m₂`).** At `m₁ := 3`, `m₂ := 5`, `h₀ := 5/2`,
 `o₀ := 1/2`, `B.card := 7` the kernel's constant evaluates to `4·3·5·(5/2)·(1/2)²·7 = 525/2`. The
