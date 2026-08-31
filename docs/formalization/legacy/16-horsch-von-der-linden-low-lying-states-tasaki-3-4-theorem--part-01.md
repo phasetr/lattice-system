@@ -307,14 +307,16 @@ assumptions" and eq. (3.4.3) p. 65, eq. (3.4.8) p. 66, eqs. (3.4.11)-(3.4.12) p.
 
 out of the basic variational estimate (3.4.8) and the locality bound (3.4.11). The abstract upper
 half is stated first, with the system size entering only as a positive real parameter `Ld` and the
-long-range order (3.4.3) as the lower bound `q₀ ≤ ⟨Φ_GS|(Ô_L)²|Φ_GS⟩ / Ld²`; in that form it
-applies unchanged at `Ô_L` and at its mirror `−Ô_L`. Its proof divides (3.4.8) by the second moment
-and compares numerator and denominator in two separate monotone steps, so it needs only `0 ≤ K` for
-the numerator bound `K` — no sign information about the double-commutator expectation, hence no
-ground-state property of `Φ_GS`. The capstone specialises it at `Ld = L^d`, feeds it (3.4.11)'s
-`K = 16 d h₀ o₀² L^d`, and reduces `16 L^d / (2 q₀ (L^d)²)` to `8 / (q₀ L^d)`, which is the book's
-constant. The left half is the variational hypothesis applied to the unit vector `Γ`, whose
-normalisation is `trialState_dotProduct_self`.
+long-range order (3.4.3) as the lower bound `q₀ ≤ ⟨Φ_GS|(Ô_L)²|Φ_GS⟩ / Ld²`; it applies unchanged
+at `Ô_L` and at its mirror `−Ô_L`, because `(−Ô_L)² = (Ô_L)²` and
+`[−Ô_L, [Ĥ, −Ô_L]] = [Ô_L, [Ĥ, Ô_L]]`. Its proof takes (3.4.8), whose right-hand side already
+carries the denominator `2 m₂` with `m₂ = ⟨Φ_GS|(Ô_L)²|Φ_GS⟩`, and compares that quotient with
+`K / (2 q₀ Ld²)` in two separate monotone steps, first in the numerator and then in the
+denominator, so it needs only `0 ≤ K` for the numerator bound `K` — no sign information about the
+double-commutator expectation, hence no ground-state property of `Φ_GS`. The capstone specialises
+it at `Ld = L^d`, feeds it (3.4.11)'s `K = 16 d h₀ o₀² L^d`, and reduces `16 L^d / (2 q₀ (L^d)²)`
+to `8 / (q₀ L^d)`, which is the book's constant. The left half is the variational hypothesis
+applied to the unit vector `Γ`, whose normalisation is `trialState_dotProduct_self`.
 
 **Hypothesis ledger.** The ground-state assumption of p. 65 is rendered as the three separate facts
 `⟨Φ_GS|Φ_GS⟩ = 1`, `Ĥ|Φ_GS⟩ = E_GS|Φ_GS⟩` and `E_GS ≤ ⟨v|Ĥ|v⟩` for every normalised `v`. The

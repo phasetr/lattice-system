@@ -17,8 +17,9 @@ The Layer-A pin fixes the exact denominator `2 * q₀ * Ld ^ 2` and that the hyp
 **no** `hmin` and **no** `star Φ ⬝ᵥ Φ = 1` (Layer A needs no ground-state or normalisation fact,
 only the abstract eq. (3.4.8) denominator positivity). The capstone pin fixes both conjuncts, the
 literal constant `8 * (d : ℝ) * h₀ * o₀ ^ 2 / q₀ / (L : ℝ) ^ d`, and that **no** (3.4.4)/`hodd`
-hypothesis and **no** `1 ≤ d` hypothesis appears among the named hypotheses — only eq. (3.4.3)
-(via `hLRO`) and ground-stateness (via `hmin`) are consumed.
+hypothesis and **no** `1 ≤ d` hypothesis appears among the named hypotheses, which are eq. (3.4.3)
+(via `hLRO`), ground-stateness (via `hmin`, `hΦ`, `hΦE`), the locality and norm hypotheses of
+eqs. (3.4.1)–(3.4.2), `0 < q₀` and `1 ≤ L`.
 
 **Numeric fixtures (constant guard).** At `d := 3`, `L := 2`, `h₀ := 5/2`, `o₀ := 1/3`, `q₀ := 3/4`
 the capstone's constant evaluates to `C = 8 · 3 · (5/2) · (1/3)² / (3/4) = 80/9`, and the bound
@@ -84,8 +85,9 @@ example {n : Type*} [Fintype n] [DecidableEq n] {H O : Matrix n n ℂ} {Φ : n �
 /-! ## Signature pin 2 — Layer B, `tasaki_eq_3_4_12_trialState_energy_bound` -/
 
 /-- **Signature pin (capstone).** Pins both conjuncts of eq. (3.4.12), the literal constant
-`8 * (d : ℝ) * h₀ * o₀ ^ 2 / q₀ / (L : ℝ) ^ d`, and that the hypothesis list uses only eq. (3.4.3)
-(`hLRO`) and ground-stateness (`hmin`, `hΦ`, `hΦE`) — no (3.4.4)/`hodd` hypothesis, no `1 ≤ d`.
+`8 * (d : ℝ) * h₀ * o₀ ^ 2 / q₀ / (L : ℝ) ^ d`, and that the hypothesis list carries eq. (3.4.3)
+(`hLRO`), ground-stateness (`hmin`, `hΦ`, `hΦE`), the locality and norm hypotheses of
+eqs. (3.4.1)–(3.4.2), `0 < q₀` and `1 ≤ L`, but no (3.4.4)/`hodd` hypothesis and no `1 ≤ d`.
 Discharged only by the identifier itself. -/
 example {ι : Type*} (B : Finset ι)
     (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N) (W : ι → Finset Λ)

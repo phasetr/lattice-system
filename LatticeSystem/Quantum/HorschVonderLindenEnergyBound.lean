@@ -14,8 +14,9 @@ is assembled here out of the basic variational estimate `hvlTrialState_energy_su
 
 The abstract upper half is stated first, with the system size entering only as a positive real
 parameter `Ld` and the long-range-order input of eq. (3.4.3), p. 65, as the lower bound `q₀` on the
-normalised second moment.  In that form it applies to `Ô_L` and to its mirror `−Ô_L` alike, and it
-uses no ground-state property of the reference vector.  The capstone then specialises it at
+normalised second moment.  It applies to `Ô_L` and to its mirror `−Ô_L` alike, because
+`(−Ô_L)² = (Ô_L)²` and `[−Ô_L, [Ĥ, −Ô_L]] = [Ô_L, [Ĥ, Ô_L]]`, and it uses no ground-state property
+of the reference vector.  The capstone then specialises it at
 `Ld = L^d` to the bond-local spin-`S` setting of eqs. (3.4.1)–(3.4.2), p. 65, where eq. (3.4.11)
 supplies the numerator bound `16 d h₀ (o₀)² L^d` and `16/(2 q₀) = 8/q₀`, `L^d/(L^d)² = L^{-d}`
 produce the printed constant `C = 8 d h₀ (o₀)² / q₀`.
@@ -50,8 +51,9 @@ turns any bound `K` on the double-commutator expectation into
 The bound is eq. (3.4.8), p. 66, followed by monotonicity first in the numerator and then in the
 denominator; splitting the comparison that way needs only `0 ≤ K` and no sign information about the
 double-commutator expectation, so the ground-state property of `Φ_GS` — which is what the left half
-of eq. (3.4.12) rests on — is not used here.  Keeping `Ld` an abstract positive real, rather than
-`L^d`, makes the statement apply unchanged at `Ô_L` and at its mirror `−Ô_L`. -/
+of eq. (3.4.12) rests on — is not used here.  `Ld` is an abstract positive real, which the capstone
+instantiates at `L^d`.  The statement applies unchanged at the mirror `−Ô_L` as well, because
+`(−Ô_L)² = (Ô_L)²` and `[−Ô_L, [Ĥ, −Ô_L]] = [Ô_L, [Ĥ, Ô_L]]`. -/
 theorem hvlTrialState_energy_sub_le_of_lro {n : Type*} [Fintype n] [DecidableEq n]
     {H O : Matrix n n ℂ} {Φ : n → ℂ} {E₀ q₀ Ld K : ℝ}
     (hH : H.IsHermitian) (hO : O.IsHermitian)
