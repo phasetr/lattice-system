@@ -41,15 +41,17 @@ bound and not an identity. The capstone fixture instantiates at `d := 3`, `L := 
 `L^d = 64 ≠ d^L = 81` pin the `d · L^d` shape against a `d^L` slip, and a `32` or `8` leading
 constant would give `3840` or `960` respectively.
 
-## One window, not two
+## Two windows, and the one-window instance
 
-The collapse in (3.4.10) uses `|W b| ≤ mW` for **both** the innermost (`z`) sum and the middle
-(`x`) sum of the norm kernel's triple sum: a single window is applied on both index positions, not
-two independently-bounded windows `W`/`W₂` that happen to coincide. The statement carries one
-window parameter `W` and one bound `mW`, with the single cardinality hypothesis
-`hcard : ∀ b ∈ B, (W b).card ≤ mW`. There is therefore no `W₂`/`mW₂` pair that could be
-instantiated unequally, and no fixture can exhibit a mismatch between the two index positions; the
-numeric kernel fixture is the constant check this signature admits.
+The collapse of the triple sum uses an inner window `W₁ b` on the innermost (`z`) sum and an outer
+window `W₂ b` on the middle (`x`) sum, bounded independently by `m₁` and `m₂`, with the kernel
+constant `4 m₁ m₂ h₀ o₀² |B|`. The one-window statements pinned above are the instance
+`W₁ = W₂`, `m₁ = m₂ = mW`, where `4 m₁ m₂` collapses to `4 mW²`; they are *derived* from the
+two-window core, so no argument is proved twice. Since `4 m₁ m₂` is symmetric in `m₁` and `m₂`, no
+numeric fixture can separate a swap of the two window bounds; what pins the roles is the hypothesis
+shape — `hW` constrains the inner window and the `x ∉ W₂ b` binder the outer one — together with
+the range-`r` capstone of `Tests/RangeLocalDoubleCommutatorBound.lean`, where the outer window is
+the `2r`-ball and cannot be bounded by `(2r+1)^d`.
 
 ## Duplicate assessment
 

@@ -164,6 +164,7 @@ example :
   refine le_antisymm (le_trans (card_coordSupBall_le (Λ := Fin 2 → Fin 3)
     (fun y i => ((y i : ℕ) : ℤ)) hpos 1 (fun _ => (1 : Fin 3))) (by norm_num)) ?_
   rw [hall, Finset.card_univ, Fintype.card_fun, Fintype.card_fin, Fintype.card_fin]
+  norm_num
 
 /-! ## Numeric fixture F-3: two-window kernel constant (`m₁ ≠ m₂`) -/
 
@@ -224,8 +225,8 @@ example (pos : Λ → (Fin 3 → ℤ)) (hpos : Function.Injective pos)
         ((∑ x : Λ, o x) * ((∑ x : Λ, h x) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ x : Λ, h x))
           - ((∑ x : Λ, h x) * (∑ x : Λ, o x) - (∑ x : Λ, o x) * (∑ x : Λ, h x))
             * (∑ x : Λ, o x)) Φ
-      ≤ 4 * (2 * (1 : ℝ) + 1) ^ (3 : ℕ) * (4 * (1 : ℝ) + 1) ^ (3 : ℕ) * (5 / 2 : ℝ)
-          * (1 / 2 : ℝ) ^ 2 * (2 : ℝ) ^ (3 : ℕ) :=
+      ≤ 4 * (2 * ((1 : ℕ) : ℝ) + 1) ^ (3 : ℕ) * (4 * ((1 : ℕ) : ℝ) + 1) ^ (3 : ℕ) * (5 / 2 : ℝ)
+          * (1 / 2 : ℝ) ^ 2 * (((2 : ℕ) : ℝ)) ^ (3 : ℕ) :=
     tasaki_problem_3_4_a_doubleCommutator_expectation_le pos hpos h o 1 2 (5 / 2) (1 / 2)
       hHloc hOloc hnh hno (by norm_num) (by norm_num) hΛ hΦ
   norm_num at h'
