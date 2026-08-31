@@ -35,8 +35,7 @@ namespace LatticeSystem.Quantum
 open Matrix
 
 /-- The **range-`r` window is small**: `|W_x| ≤ 2r+1` (Tasaki §6.2).  The signed cyclic displacement
-`δ(x,·) = signedRingDisp L x ·` is injective on the window (two sites with equal displacement are
-congruent modulo `L` by `dvd_sub_signedRingDisp`, hence equal in `Fin L`) and lands in the integer
+`δ(x,·) = signedRingDisp L x ·` is injective (`signedRingDisp_injective`) and lands in the integer
 interval `[−r, r]` (its magnitude is `ringDist ≤ r`), which has `2r+1` elements. -/
 theorem window_card_le (L r : ℕ) (x : Fin L) : (window L r x).card ≤ 2 * r + 1 := by
   have hmaps : ∀ y ∈ window L r x, signedRingDisp L x y ∈ Finset.Icc (-(r : ℤ)) (r : ℤ) := by
@@ -45,23 +44,8 @@ theorem window_card_le (L r : ℕ) (x : Fin L) : (window L r x).card ≤ 2 * r +
     have habs : (signedRingDisp L x y).natAbs ≤ r := by
       rw [natAbs_signedRingDisp_eq_ringDist]; exact hrd
     rw [Finset.mem_Icc]; omega
-  have hinj : Set.InjOn (signedRingDisp L x) (window L r x : Set (Fin L)) := by
-    intro y₁ _ y₂ _ heq
-    have hd1 := dvd_sub_signedRingDisp L x y₁
-    have hd2 := dvd_sub_signedRingDisp L x y₂
-    rw [heq] at hd1
-    have hdvd : (L : ℤ) ∣ ((y₁.val : ℤ) - (y₂.val : ℤ)) := by
-      have hs := dvd_sub hd1 hd2
-      have hcalc : ((y₁.val : ℤ) - x.val - signedRingDisp L x y₂)
-          - ((y₂.val : ℤ) - x.val - signedRingDisp L x y₂) = (y₁.val : ℤ) - (y₂.val : ℤ) := by ring
-      rwa [hcalc] at hs
-    have h1 : (y₁.val : ℤ) < L := by exact_mod_cast y₁.isLt
-    have h2 : (y₂.val : ℤ) < L := by exact_mod_cast y₂.isLt
-    have hzero : (y₁.val : ℤ) - (y₂.val : ℤ) = 0 := by
-      by_contra hne
-      have hle := Int.natAbs_le_of_dvd_ne_zero hdvd hne
-      omega
-    exact Fin.ext (by omega)
+  have hinj : Set.InjOn (signedRingDisp L x) (window L r x : Set (Fin L)) :=
+    fun _ _ _ _ heq => signedRingDisp_injective L x heq
   calc (window L r x).card
       ≤ (Finset.Icc (-(r : ℤ)) (r : ℤ)).card :=
         Finset.card_le_card_of_injOn (signedRingDisp L x) hmaps hinj

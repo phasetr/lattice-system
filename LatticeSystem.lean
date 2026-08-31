@@ -130,6 +130,8 @@ import LatticeSystem.Quantum.SpinS.LocalDoubleCommutatorBound
 import LatticeSystem.Quantum.SpinS.OperatorSupport
 import LatticeSystem.Quantum.IsingLowEnergyProblem33aCapstone
 import LatticeSystem.Math.Combinatorics.CoordinateBall
+import LatticeSystem.Math.Combinatorics.SiteBall
+import LatticeSystem.Quantum.SpinS.TorusSupDistance
 import LatticeSystem.Quantum.SpinS.RangeLocalDoubleCommutatorBound
 
 /-!
