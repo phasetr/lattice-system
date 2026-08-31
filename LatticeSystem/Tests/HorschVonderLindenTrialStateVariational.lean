@@ -26,9 +26,11 @@ itself, so the pin fails exactly when the identifier cannot be resolved from ano
 `H`/`O` pair and an arbitrary eigenvector `Φ` of `H` with eigenvalue `E₀` (not assumed to be the
 ground state): the identity uses no long-range-order or odd-moment hypothesis, so none is pinned
 here. The lower bound `0 ≤ ⟨Γ|Ĥ|Γ⟩ − E_GS` is the left half of eq. (3.4.12), p. 67, and is not
-part of this module, so it is not pinned either. The pins reuse `Matrix.IsHermitian` for `H`/`O`,
-`rayleighOnVec` for the sandwiched expectation values, and `hvlTrialState` for `Γ` from the
-existing production code, rather than inventing new vocabulary in this file.
+part of this module: it lives in `HorschVonderLindenEnergyBound.lean` and is pinned in
+`Tests/HorschVonderLindenEnergyBound.lean`, so it is not pinned here. The pins reuse
+`Matrix.IsHermitian` for `H`/`O`, `rayleighOnVec` for the sandwiched expectation values, and
+`hvlTrialState` for `Γ` from the existing production code, rather than inventing new vocabulary in
+this file.
 
 ## Duplicate assessment
 
