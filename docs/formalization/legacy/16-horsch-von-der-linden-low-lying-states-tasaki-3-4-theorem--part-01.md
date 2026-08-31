@@ -205,15 +205,17 @@ quotient `⟨Ô_LΦ_GS|Ĥ|Ô_LΦ_GS⟩/m₂`. The identity therefore holds at **
 positivity of `m₂` enters only through the normalisation of `Γ`.
 
 **What these declarations do not assert.** The lower bound `0 ≤ ⟨Γ|Ĥ|Γ⟩ − E_GS`, which is the
-left half of eq. (3.4.12) (p. 67), is *not* a consequence of the identity and is not stated here.
+left half of eq. (3.4.12) (p. 67), is *not* a consequence of the identity and is not stated in this
+module; it is proved in `Quantum/HorschVonderLindenEnergyBound.lean`, described below.
 It needs `E_GS` to be a ground-state energy, i.e. the minimum of the Rayleigh quotient of `Ĥ` over
 normalised vectors — the running assumption of the "Setting and assumptions" paragraph on p. 65.
 It cannot be dropped: at `Ĥ = σ³`, `Ô_L = σ¹`, `Φ_GS = (2, 0)` the eigenvalue `E_GS = 1` is not the
 ground energy and both sides of (3.4.8) equal `−2`. Locality of `Ô_L` (eqs. (3.4.1)-(3.4.2))
 and any lattice structure are absent here, so nothing in this module certifies a concrete model.
-The `C L^{-d}` low-lying bound (3.4.12) that (3.4.8) feeds is not yet formalised: it is the input
-`δ` that `horsch_vonderLinden_lowLying` (`Quantum/HorschVonderLinden.lean`, Theorem 3.1) consumes
-as the hypothesis `hvar`.
+The `C L^{-d}` low-lying bound (3.4.12) that (3.4.8) feeds is
+`Quantum/HorschVonderLindenEnergyBound.lean`, described below; it produces the input `δ` that
+`horsch_vonderLinden_lowLying` (`Quantum/HorschVonderLinden.lean`, Theorem 3.1) consumes as the
+hypothesis `hvar`.
 
 All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
 `Classical.choice`, `Quot.sound`.
@@ -262,7 +264,9 @@ distribution is `Math/CommutatorSum.lean`, shared with the §4.1 staggered-order
 **What these declarations do not assert.** Self-adjointness of `ĥ_b` and `ô_x` is not assumed
 anywhere: the first inequality of (3.4.11) is taken on the real part of the expectation, so no
 reality obligation arises. The long-range order condition (3.4.3) and the no-SSB condition
-(3.4.4) are unused here — they are first consumed at (3.4.12). No lattice structure is imposed:
+(3.4.4) are unused here. Only (3.4.3) is consumed at (3.4.12); (3.4.4) is not needed there either,
+and is first consumed by the symmetric state `Ξ₊` of eq. (3.4.14), p. 68
+(`Quantum/HorschVonderLindenProblem34b.lean`). No lattice structure is imposed:
 `|B_L| = d L^d` enters only as the numeric hypothesis `|B| ≤ d L^d`, and neither `1 ≤ d` nor
 `1 ≤ L` is required.
 
@@ -289,6 +293,62 @@ close them: the kernel at `mW = 3`, `h₀ = 5/2`, `o₀ = 1/2`, `|B| = 7` gives 
 from `mW = 2` where `4mW²`, `8mW`, `2mW³` and `mW⁴` all coincide; the capstone at `d = 3`, `L = 4`,
 `h₀ = 5/2`, `o₀ = 1/2` gives `1920`, where `L^d = 64 ≠ d^L = 81` also separates the `d · L^d` shape
 from a `d^L` slip.
+
+### The two-sided energy bound, eq. (3.4.12)
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4, "Setting and
+assumptions" and eq. (3.4.3) p. 65, eq. (3.4.8) p. 66, eqs. (3.4.11)-(3.4.12) p. 67.
+
+`Quantum/HorschVonderLindenEnergyBound.lean` assembles the printed display
+
+`0 ≤ ⟨Γ|Ĥ|Γ⟩ − E_GS ≤ C L^{-d}`, `C = 8 d h₀ o₀² / q₀`
+
+out of the basic variational estimate (3.4.8) and the locality bound (3.4.11). The abstract upper
+half is stated first, with the system size entering only as a positive real parameter `Ld` and the
+long-range order (3.4.3) as the lower bound `q₀ ≤ ⟨Φ_GS|(Ô_L)²|Φ_GS⟩ / Ld²`; in that form it
+applies unchanged at `Ô_L` and at its mirror `−Ô_L`. Its proof divides (3.4.8) by the second moment
+and compares numerator and denominator in two separate monotone steps, so it needs only `0 ≤ K` for
+the numerator bound `K` — no sign information about the double-commutator expectation, hence no
+ground-state property of `Φ_GS`. The capstone specialises it at `Ld = L^d`, feeds it (3.4.11)'s
+`K = 16 d h₀ o₀² L^d`, and reduces `16 L^d / (2 q₀ (L^d)²)` to `8 / (q₀ L^d)`, which is the book's
+constant. The left half is the variational hypothesis applied to the unit vector `Γ`, whose
+normalisation is `trialState_dotProduct_self`.
+
+**Hypothesis ledger.** The ground-state assumption of p. 65 is rendered as the three separate facts
+`⟨Φ_GS|Φ_GS⟩ = 1`, `Ĥ|Φ_GS⟩ = E_GS|Φ_GS⟩` and `E_GS ≤ ⟨v|Ĥ|v⟩` for every normalised `v`; the last
+is a property of the caller's data, strictly weaker than pinning `E_GS` to be the Rayleigh-Ritz
+minimum, and a regression fixture discharges it from
+`hermitianMinEigenvalue_le_rayleighOnVec_of_unit` at a genuine ground state. Self-adjointness of
+`Ĥ` and `Ô_L` is taken at the level of the sums, not per term, which is again the weaker form.
+`q₀ > 0` is printed in (3.4.3) itself. `1 ≤ L` is used only to make `L^d` positive.
+
+**What these declarations do not assert.** The no-SSB condition (3.4.4), p. 65, is not used: only
+(3.4.3) is consumed here. The statement is at a single `L`, an implication between hypotheses and
+conclusion at that same `L`; the "for sufficiently large `L`" reading of (3.4.3)-(3.4.4) is a
+statement about a family and belongs to the later assembly, which composes this one without
+restating it. Neither the mirror `−Ô_L` instance nor the states `Ξ±` of eqs. (3.4.14)-(3.4.15),
+pp. 68-69, are formalised here.
+
+All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
+`Classical.choice`, `Quot.sound`.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `hvlTrialState_energy_sub_le_of_lro` | abstract upper half of eq. (3.4.12): `⟨Γ\|Ĥ\|Γ⟩ − E_GS ≤ K / (2 q₀ Ld²)` from `q₀ ≤ ⟨Φ_GS\|(Ô_L)²\|Φ_GS⟩ / Ld²` and a numerator bound `K ≥ 0` | `Quantum/HorschVonderLindenEnergyBound.lean` |
+| `tasaki_eq_3_4_12_trialState_energy_bound` | eq. (3.4.12): `0 ≤ ⟨Γ\|Ĥ\|Γ⟩ − E_GS ≤ 8 d h₀ o₀² / q₀ / L^d` for a bond-local `Ĥ` at a normalised ground state with long-range order | `Quantum/HorschVonderLindenEnergyBound.lean` |
+
+Regression fixtures live in `LatticeSystem/Tests/HorschVonderLindenEnergyBound.lean`: a signature
+fixture for each declaration restating it in full and discharging it by the declaration itself —
+the abstract one pinning that neither the variational hypothesis nor `⟨Φ_GS|Φ_GS⟩ = 1` appears in
+it, the capstone pinning both conjuncts and that no (3.4.4) hypothesis and no `1 ≤ d` is required —
+a numeric fixture for each constant over abstract data constrained only by the hypotheses, and the
+witness that discharges the variational hypothesis at the canonical ground-state energy. The
+capstone's numeric point is `d = 3`, `L = 2`, `h₀ = 5/2`, `o₀ = 1/3`, `q₀ = 3/4`, giving `10/9`;
+`o₀ = 1/3` is chosen so that the ratio `o₀ : o₀² = 3` differs from the factor `2` separating the
+candidate leading constants `16` and `8`, and `q₀ = 3/4` differs from `1`, `q₀²` and `2q₀`, so a
+dropped square, a dropped factor of two and a dropped `q₀` are pairwise distinguishable. Since a
+numeric endpoint is one-sided and blind to a wrongly small constant, each fixture routes through an
+intermediate step that spells the constant out syntactically.
 
 ---
 

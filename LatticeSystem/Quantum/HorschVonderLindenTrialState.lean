@@ -28,7 +28,8 @@ eigenvector `Φ_GS` of `Ĥ`, with `E_GS` its eigenvalue, and needs no long-range
 assumption.  Not asserted here: the lower bound `0 ≤ ⟨Γ|Ĥ|Γ⟩ − E_GS`, which is the left half of
 eq. (3.4.12), p. 67, and which needs `E_GS` to be a *ground-state* energy — the minimum of the
 Rayleigh quotient over normalised vectors, the book's running assumption of the "Setting and
-assumptions" paragraph, p. 65.
+assumptions" paragraph, p. 65.  Both halves of eq. (3.4.12) are proved in
+`HorschVonderLindenEnergyBound.lean`, which imports this module.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §3.4, "Setting and assumptions" p. 65, eqs. (3.4.7)–(3.4.8), p. 66.
@@ -111,7 +112,8 @@ theorem trialState_dotProduct_self {n : Type*} [Fintype n] [DecidableEq n]
 `⟨Γ|Ĥ|Γ⟩ − E_GS = ⟨Φ_GS|[Ô_L, [Ĥ, Ô_L]]|Φ_GS⟩ / (2⟨Φ_GS|(Ô_L)²|Φ_GS⟩)`.  It is the un-normalised
 double-commutator identity divided by `2 m₂`, so it holds at any eigenvector `Φ_GS` of `Ĥ` with
 eigenvalue `E_GS`.  The ground-state property of `Φ_GS` is not needed here: it is what makes the
-left-hand side non-negative, which is the left half of eq. (3.4.12), p. 67. -/
+left-hand side non-negative, which is the left half of eq. (3.4.12), p. 67, proved in
+`HorschVonderLindenEnergyBound.lean`. -/
 theorem hvlTrialState_energy_sub_eq {n : Type*} [Fintype n] [DecidableEq n]
     {H O : Matrix n n ℂ} {Φ : n → ℂ} {E₀ : ℝ} (hH : H.IsHermitian) (hO : O.IsHermitian)
     (hΦE : H *ᵥ Φ = (E₀ : ℂ) • Φ) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) :

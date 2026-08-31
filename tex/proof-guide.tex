@@ -12818,7 +12818,8 @@ $\Phi_{\mathrm{GS}}$ of $\hat H$ with eigenvalue $E_{\mathrm{GS}}$: neither the 
 order~(3.4.3) nor the no-SSB condition~(3.4.4) is used, and $m_2>0$ enters only through the
 normalization of $\Gamma$.  \emph{Not asserted.}  The lower bound
 $0\le\langle\Gamma|\hat H|\Gamma\rangle-E_{\mathrm{GS}}$, which is the left half of
-eq.~(3.4.12), p.~67, does not follow from the identity and is not stated here: it requires
+eq.~(3.4.12), p.~67, does not follow from the identity and is not stated in this module; it is
+proved in \texttt{Quantum/HorschVonderLindenEnergyBound.lean} (below).  It requires
 $E_{\mathrm{GS}}$ to be a \emph{ground-state} energy, i.e.\ the minimum of the Rayleigh quotient
 of $\hat H$ over normalized vectors --- the running assumption of the ``Setting and assumptions''
 paragraph on p.~65.  It cannot be dropped: at
@@ -12836,7 +12837,8 @@ and $m_2/2=50$ are pairwise distinct, so the second moment and the normalization
 separately load-bearing in the values checked.  Locality of
 $\hat O_L$ (eqs.~(3.4.1)--(3.4.2)) is not assumed, so nothing here certifies a concrete model.
 The $C\,L^{-d}$ low-lying bound~(3.4.12)
-that~(3.4.8) feeds is not yet formalized: it is the input $\delta$ that Theorem~3.1
+that~(3.4.8) feeds is \texttt{Quantum/HorschVonderLindenEnergyBound.lean} (below); it produces the
+input $\delta$ that Theorem~3.1
 (\texttt{horsch\_vonderLinden\_lowLying}, \texttt{Quantum/HorschVonderLinden.lean}) consumes as
 its hypothesis \texttt{hvar}.
 
@@ -12886,9 +12888,57 @@ follows from $0\le\lVert\hat h_b\rVert\le h_0$).  \emph{Not assumed.}  Self-adjo
 $\hat h_b$ and $\hat o_x$ appears nowhere: the first inequality of~(3.4.11) is taken on the real
 part of the expectation, so the tacit reality of $\langle[\hat O,[\hat H,\hat O]]\rangle$ carries
 no obligation.  The long-range order condition~(3.4.3) and the no-SSB condition~(3.4.4) are unused
---- they are first consumed at~(3.4.12).  No lattice structure is imposed: the hypercubic bond
-count $|B_L|=dL^d$ enters only as the numeric hypothesis $|B|\le dL^d$, and neither $1\le d$ nor
-$1\le L$ is required.
+here.  Only~(3.4.3) is consumed at~(3.4.12); (3.4.4) is not needed there either, and is first
+consumed by the symmetric state $\Xi_+$ of eq.~(3.4.14), p.~68
+(\texttt{Quantum/HorschVonderLindenProblem34b.lean}).  No lattice structure is imposed: the
+hypercubic bond count $|B_L|=dL^d$ enters only as the numeric hypothesis $|B|\le dL^d$, and neither
+$1\le d$ nor $1\le L$ is required.
+
+\noindent\textbf{The two-sided energy bound, eq.~(3.4.12)} (Tasaki~\cite{Tasaki:QMB} §3.4,
+``Setting and assumptions'' and eq.~(3.4.3) p.~65, eq.~(3.4.8) p.~66, eqs.~(3.4.11)--(3.4.12)
+p.~67; \textbf{discharged axiom-free},
+\texttt{Quantum/HorschVonderLindenEnergyBound.lean}, fixtures in
+\texttt{Tests/HorschVonderLindenEnergyBound.lean}).  This module assembles the printed display
+\[0\le\langle\Gamma|\hat H|\Gamma\rangle-E_{\mathrm{GS}}\le C\,L^{-d},\qquad
+C=\frac{8\,d\,h_0\,o_0^2}{q_0},\]
+from the basic variational estimate~(3.4.8) and the locality bound~(3.4.11).  The abstract upper
+half \texttt{hvlTrialState\_energy\_sub\_le\_of\_lro} keeps the system size as a positive real
+parameter $L_d$ and takes the long-range order~(3.4.3) in the form
+$q_0\le\langle\Phi_{\mathrm{GS}}|(\hat O_L)^2|\Phi_{\mathrm{GS}}\rangle/L_d^2$ with $q_0>0$, which
+is how the book prints it; it then reads
+\[\langle\Gamma|\hat H|\Gamma\rangle-E_{\mathrm{GS}}\le\frac{K}{2q_0L_d^2}\]
+for any bound $K\ge0$ on the double-commutator expectation.  Proof: (3.4.3) gives
+$q_0L_d^2\le m_2$, hence $m_2>0$ and $\Gamma$ is normalized, so~(3.4.8) applies; the resulting
+quotient is then compared with $K/(2q_0L_d^2)$ in \emph{two} monotone steps, first in the numerator
+and then in the denominator.  Doing it in one step would need $0\le\langle\Phi_{\mathrm{GS}}|
+[\hat O_L,[\hat H,\hat O_L]]|\Phi_{\mathrm{GS}}\rangle$ and thus drag the ground-state property
+into the abstract layer; splitting it needs only $0\le K$.  Keeping $L_d$ abstract also makes the
+statement apply verbatim at the mirror $-\hat O_L$, for which $(-\hat O_L)^2$ and the double
+commutator are unchanged.
+
+The capstone \texttt{tasaki\_eq\_3\_4\_12\_trialState\_energy\_bound} is~(3.4.12) as printed.  Its
+right half specializes the above at $L_d=L^d$ and $K=16\,d\,h_0\,o_0^2\,L^d$, the value supplied
+by~(3.4.11), the two arithmetic reductions being $16/(2q_0)=8/q_0$ and $L^d/(L^d)^2=L^{-d}$.  Its
+left half is the ground-state assumption of p.~65 applied to the unit vector $\Gamma$, whose
+normalization is \texttt{trialState\_dotProduct\_self}; Tasaki states it as the immediate
+consequence of $E_{\mathrm{GS}}$ being the minimum of the Rayleigh quotient.
+
+\emph{Hypothesis ledger.}  The ground-state assumption is rendered as three separate facts:
+$\langle\Phi_{\mathrm{GS}}|\Phi_{\mathrm{GS}}\rangle=1$,
+$\hat H|\Phi_{\mathrm{GS}}\rangle=E_{\mathrm{GS}}|\Phi_{\mathrm{GS}}\rangle$, and
+$E_{\mathrm{GS}}\le\langle v|\hat H|v\rangle$ for every normalized $v$.  The last is a property of
+the caller's data and is strictly weaker than pinning $E_{\mathrm{GS}}$ to be the Rayleigh--Ritz
+minimum; a fixture discharges it from
+\texttt{hermitianMinEigenvalue\_le\_rayleighOnVec\_of\_unit} at a genuine ground state, so it is
+not a standing assumption.  Self-adjointness of $\hat H$ and $\hat O_L$ is taken at the level of
+the sums rather than per term, again the weaker form.  $q_0>0$ is printed in~(3.4.3) itself, and
+$1\le L$ serves only to make $L^d$ positive.  \emph{Not asserted.}  The no-SSB
+condition~(3.4.4), p.~65, is unused: only~(3.4.3) is consumed here.  The statement is at a
+single~$L$ --- an implication between hypotheses and conclusion at that same~$L$ --- since the
+``for sufficiently large $L$'' reading of~(3.4.3)--(3.4.4) is a statement about a family and
+belongs to the later assembly, which composes this one without restating it.  Neither the mirror
+$-\hat O_L$ instance nor the states $\Xi_\pm$ of eqs.~(3.4.14)--(3.4.15), pp.~68--69, are treated
+here.
 
 \noindent\textbf{Theorem 4.1} (Dyson--Lieb--Simon / Neves--Perez / Kennedy--Lieb--Shastry, Tasaki
 §4.1, eq.~(4.1.7), pp.~88--90; \texttt{Quantum/SpinS/DysonLiebSimon.lean}, Issue \#4485).  Existence
