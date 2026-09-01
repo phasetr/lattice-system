@@ -610,8 +610,7 @@ example :
   · rw [hox]; exact hodd3w_holds
   · rw [hox]; exact hLROw_holds
 
-/-! ## Signature pins — the mirror state `Ξ₋` (PR-6, destined for
-`HorschVonderLindenTrialState.lean` and `HorschVonderLindenLowLyingState.lean`) -/
+/-! ## Signature pins — the mirror state `Ξ₋` -/
 
 /-- **Signature pin.** Pins `hvlTrialState_neg`: `hvlTrialState (-O) Φ = -hvlTrialState O Φ`, with
 no hypothesis at all. Discharged only by the identifier itself. -/

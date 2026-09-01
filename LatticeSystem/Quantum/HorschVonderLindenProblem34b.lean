@@ -37,7 +37,8 @@ of the (automatically real) odd moments.
 
 Eq. (3.4.16) `⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q₀` and the Schwarz remark (3.4.17) are in
 `HorschVonderLindenLowLyingState.lean`, which reads eq. (3.4.15) below against the long-range-order
-assumption (3.4.3).  The mirror state `Ξ₋` of pp. 68-69 is not formalised.
+assumption (3.4.3).  The mirror state `Ξ₋` of pp. 68-69 is built there too, on the sign identity
+`hvlTrialState_neg` of `HorschVonderLindenTrialState.lean`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §3.4, Problem 3.4.b, statement p. 69 eq. (3.4.18), solution p. 501 eqs. (S.42)–(S.43),

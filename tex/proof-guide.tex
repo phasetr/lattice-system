@@ -13069,9 +13069,12 @@ $\Gamma(-\hat O_L)=-\Gamma(\hat O_L)$ (\texttt{hvlTrialState\_neg},
 $\lVert\hat O_L|\Phi_{\mathrm{GS}}\rangle\rVert$ is even in the sign of $\hat O_L$, so mirroring
 the order operator only flips the sign of the vector that factor scales.  This gives the bridge
 $\Xi_-(\hat O_L)=\Xi_+(-\hat O_L)$ (\texttt{hvlMinusState\_eq\_hvlPlusState\_neg}), needing neither
-Hermiticity of $\hat O_L$ nor normalization of $\Phi_{\mathrm{GS}}$, so every $\Xi_-$ statement
-below other than orthogonality is obtained by instantiating its $\Xi_+$ counterpart above at
-$-\hat O_L$; the mirror argument itself is never replayed.  The energy identity is \emph{even} in
+Hermiticity of $\hat O_L$ nor normalization of $\Phi_{\mathrm{GS}}$.  Four $\Xi_-$ declarations are
+obtained by instantiating their $\Xi_+$ counterpart above at $-\hat O_L$: normalization
+(\texttt{hvlMinusState\_dotProduct\_self}), the energy identity
+(\texttt{hvlMinusState\_energy\_eq}), the order mean (\texttt{hvlMinusState\_order\_mean}), and the
+order bound (\texttt{hvlMinusState\_order\_mean\_le\_neg\_sqrt}); the mirror argument itself is
+never replayed there.  The energy identity is \emph{even} in
 the sign of the trial state, so $\langle\Xi_-|\hat H|\Xi_-\rangle$ reduces to the same right-hand
 side $(E_{\mathrm{GS}}+\langle\Gamma|\hat H|\Gamma\rangle)/2$ as $\langle\Xi_+|\hat H|\Xi_+\rangle$,
 while the order mean is \emph{odd}, so its $\Xi_-$ form carries a minus sign against
@@ -13082,7 +13085,8 @@ $\Xi_+$ counterpart to instantiate --- from the diagonal terms
 $\langle\Phi_{\mathrm{GS}}|\Phi_{\mathrm{GS}}\rangle=1$ and $\langle\Gamma|\Gamma\rangle=1$
 cancelling against each other and both cross terms vanishing by the first odd-moment
 assumption~(3.4.4), together with the normalization of $\Phi_{\mathrm{GS}}$ and of $\Gamma$.  The
-capstone \texttt{tasaki\_mirrorLowLyingState\_ssb} states the mirror-state sentence of p.~68 in
+capstone \texttt{tasaki\_mirrorLowLyingState\_ssb} is likewise not among the four (its own route is
+below).  It states the mirror-state sentence of p.~68 in
 the bond-local spin-$S$ setting as five conjuncts: normalization $\langle\Xi_-|\Xi_-\rangle=1$,
 orthogonality $\langle\Xi_-|\Xi_+\rangle=0$, the two-sided energy bound
 $0\le\langle\Xi_-|\hat H|\Xi_-\rangle-E_{\mathrm{GS}}\le(C/2)L^{-d}$ with the same
@@ -13097,13 +13101,15 @@ text (including eq.~(3.4.14) itself) places it in subscript, $|\Xi_+\rangle$.  U
 reading the referent is the same state, the one of eq.~(3.4.14); no value or derivation in this
 repository depends on which reading is intended.  \texttt{hvlMinusState\_dotProduct\_hvlPlusState}
 states orthogonality against \texttt{hvlPlusState}, the eq.~(3.4.14) state.  \emph{Boundary facts,
-checked against the tree.}  Where the order-square Rayleigh quotient vanishes, $\Gamma$ is the
-zero vector so $\Xi_-$ coincides with $\Xi_+$; the positivity hypothesis $0<m_2$ taken by
-\texttt{hvlMinusState\_dotProduct\_self} and \texttt{hvlMinusState\_dotProduct\_hvlPlusState} is
-therefore a \emph{truth condition}, not proof convenience --- a concrete one-dimensional instance
-at $\hat O_L=0$ gives both $\langle\Xi_-|\Xi_-\rangle$ and $\langle\Xi_-|\Xi_+\rangle$ equal to
-$1/2$, while the energy identity still holds there.  A negative size parameter falsifies the
-mirror order bound (checked at $Ld=-2$, $q_0=1$).  \emph{Not machine-checked}: whether the mirror
+checked against the tree.}  At the concrete one-dimensional instance $\hat O_L=0$ the
+order-square Rayleigh quotient vanishes, $\Gamma$ is the zero vector, and $\Xi_-$ coincides with
+$\Xi_+$: the positivity hypothesis $0<m_2$ taken by \texttt{hvlMinusState\_dotProduct\_self} and
+\texttt{hvlMinusState\_dotProduct\_hvlPlusState} is therefore a \emph{truth condition} at this
+instance, not proof convenience --- $\langle\Xi_-|\Xi_-\rangle$ and $\langle\Xi_-|\Xi_+\rangle$
+both come out $1/2$, while the energy identity still holds there.  A negative size parameter
+falsifies the mirror order bound (checked at $Ld=-2$, $q_0=1$).  \emph{Not machine-checked}:
+whether $\Gamma$ is the zero vector, and $\Xi_-$ coincides with $\Xi_+$, at every vanishing
+order-square Rayleigh quotient beyond the one instance $\hat O_L=0$ checked; whether the mirror
 order bound fails at every negative $Ld$, beyond that one instance; and the vacuity/falsity
 distinction at $d=0$, where the energy conjuncts of the capstone read $0\le0\le0$ while
 normalization, orthogonality and the order conjunct keep content.  \emph{Fixtures.}  Since $\Xi_-$
@@ -13112,8 +13118,10 @@ correct sign: a direct pin on the mirror state's four entries on the two-spin in
 identity together with the sign-discriminating value $-2$ against $\Xi_+$'s $+2$; orthogonality
 and normalization pinned together (substituting $\Xi_+$ for $\Xi_-$ there reads $1=0$); a tight
 instance at $q_0=1$, $Ld=2$; a negative-$Ld$ instance where the mirror bound's own conclusion
-fails; and two boundary instances at a vanishing order-square Rayleigh quotient, discharged by
-proof rather than assumed satisfiable.
+fails; two boundary instances at a vanishing order-square Rayleigh quotient, discharged by
+proof rather than assumed satisfiable; and a mirror capstone non-vacuity witness at the same data
+as the $\Xi_+$ capstone's, showing \texttt{tasaki\_mirrorLowLyingState\_ssb} is not vacuously true
+for every instance.
 
 \noindent\textbf{Theorem 4.1} (Dyson--Lieb--Simon / Neves--Perez / Kennedy--Lieb--Shastry, Tasaki
 §4.1, eq.~(4.1.7), pp.~88--90; \texttt{Quantum/SpinS/DysonLiebSimon.lean}, Issue \#4485).  Existence

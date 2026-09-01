@@ -45,7 +45,7 @@ composing the two and taking the double limit is not carried out here.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §3.4, "Setting and assumptions" p. 65, eqs. (3.4.3), (3.4.4), (3.4.7), (3.4.12), (3.4.14)-
-(3.4.17) and the mirror-state display, pp. 65-69.
+(3.4.17) and the mirror-state sentence, pp. 65-69.
 -/
 
 namespace LatticeSystem.Quantum
