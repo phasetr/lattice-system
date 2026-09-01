@@ -12,10 +12,12 @@ The heart of the proof (eq. (3.4.21)) is the **finite-volume variational lower b
 perturbed ground state `Φ_GS,h` minimizes `Ĥ_h`, for any trial state `Ξ`
 `⟨Φ_GS,h| Ô_L |Φ_GS,h⟩ ≥ ⟨Ξ| Ô_L |Ξ⟩ + (1/h)(⟨Φ_GS,h|Ĥ|Φ_GS,h⟩ − ⟨Ξ|Ĥ|Ξ⟩)`,
 which is `≥ ⟨Ξ| Ô_L |Ξ⟩ + (1/h)(E_GS − ⟨Ξ|Ĥ|Ξ⟩)`.
-We discharge exactly this finite-dimensional core (axiom-free); taking `Ξ = Ξ₊` (the Horsch–von der
-Linden state, with the essential bound `⟨Ξ₊| Ô_L/L^d |Ξ₊⟩ ≥ √q₀` and
-`|E_GS − ⟨Ξ₊|Ĥ|Ξ₊⟩| ≤ C·L^{-d}/2`) and the double limit `L↑∞`, `h↓0` then gives Theorem 3.2 —
-the thermodynamic/infinite-volume input.
+We discharge exactly this finite-dimensional core (axiom-free).  Its trial-state input at `Ξ = Ξ₊`
+is `tasaki_eq_3_4_16_lowLyingState_ssb` (`HorschVonderLindenLowLyingState.lean`), which supplies the
+normalisation `⟨Ξ₊|Ξ₊⟩ = 1`, the two-sided energy bound `0 ≤ ⟨Ξ₊|Ĥ|Ξ₊⟩ − E_GS ≤ (C/2) L^{-d}` and
+the order-parameter bound `⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q₀` (eq. (3.4.16)) at every finite volume.  Composing
+the two and taking the double limit `L↑∞`, `h↓0` gives Theorem 3.2; that composition and the
+thermodynamic/infinite-volume input are not carried out here.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §3.4, Theorem 3.2, eqs. (3.4.16)–(3.4.22), pp. 68–70.

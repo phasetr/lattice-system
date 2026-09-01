@@ -2,31 +2,23 @@ import LatticeSystem.Quantum.HorschVonderLindenLowLyingState
 import LatticeSystem.Quantum.SpinS.ClusterState
 
 /-!
-# Test coverage for eqs. (3.4.16)/(3.4.17), the `Ξ₊` low-lying state (TDD Red)
+# Test coverage for eqs. (3.4.16)/(3.4.17), the `Ξ₊` low-lying state
 
-Fixtures for the not-yet-implemented `LatticeSystem/Quantum/HorschVonderLindenLowLyingState.lean`
-(PR-5 of the §3.4 backfill arc, issue #5395): the `Ξ₊` energy identity, eq. (3.4.16)'s abstract
-lower bound, the Schwarz remark eq. (3.4.17), and the bond-local low-lying-state capstone.
-
-## Red state
-
-Every signature pin below is discharged only by applying the named identifier to itself, so each
-pin fails with `Unknown identifier` on that name once the identifiers do not exist. The fixture
-data (`ow`, `Φw`, `fH`/`fO`/`fPhi`, etc.) and every arithmetic `have` compile independently of the
-four pinned declarations; only the final `example`s that apply the pinned names fail, and they
-fail on the identifier, not on an import — every hypothesis supplied to them type-checks against
-genuine `ManyBodyOpS`/`rayleighOnVec`/`Matrix` declarations.
+Fixtures for `LatticeSystem/Quantum/HorschVonderLindenLowLyingState.lean`: the `Ξ₊` energy
+identity, eq. (3.4.16)'s abstract lower bound, the Schwarz remark eq. (3.4.17), and the bond-local
+low-lying-state capstone.
 
 ## What each block pins
 
-**Signature pins.** The energy-identity pin (`hvlPlusState_energy_eq`) fixes that the hypothesis
-list carries no positivity of the order-square Rayleigh quotient. The eq. (3.4.16) pin
-(`hvlPlusState_order_mean_ge_sqrt`) fixes that it carries no normalisation hypothesis
-`star Φ ⬝ᵥ Φ = 1`. The eq. (3.4.17) pin (`tasaki_eq_3_4_17_order_mean_abs_le_sqrt`) fixes the
-Hermitian hypothesis on the order operator. The capstone pin
-(`tasaki_eq_3_4_16_lowLyingState_ssb`) fixes all four conjuncts, the literal constant
-`4 * (d : ℝ) * h₀ * o₀ ^ 2 / q₀ / (L : ℝ) ^ d`, and that the two odd-moment hypotheses `hodd1`,
-`hodd3` are present (unlike eq. (3.4.12)'s capstone, which needs neither).
+**Signature pins.** Each pin restates a declaration's own statement and is discharged only by
+applying that identifier, so it breaks if the hypothesis list or the conclusion moves. The
+energy-identity pin (`hvlPlusState_energy_eq`) fixes that the hypothesis list carries no positivity
+of the order-square Rayleigh quotient. The eq. (3.4.16) pin (`hvlPlusState_order_mean_ge_sqrt`)
+fixes that it carries no normalisation hypothesis `star Φ ⬝ᵥ Φ = 1`. The eq. (3.4.17) pin
+(`tasaki_eq_3_4_17_order_mean_abs_le_sqrt`) fixes the Hermitian hypothesis on the order operator.
+The capstone pin (`tasaki_eq_3_4_16_lowLyingState_ssb`) fixes its four conjuncts, the literal
+constant `4 * (d : ℝ) * h₀ * o₀ ^ 2 / q₀ / (L : ℝ) ^ d`, and the presence of the two odd-moment
+hypotheses `hodd1`, `hodd3`, which eq. (3.4.12)'s capstone does not take.
 
 **Numeric fixture (the two-spin `Ξ₊` instance).** On `Fin 4` with basis order
 `(↑↑, ↑↓, ↓↑, ↓↓)`, `fH := diagonal ![-1, 3, 3, -1]` and the transverse order operator
@@ -39,19 +31,19 @@ inside the ground eigenspace and collapse `rayleighOnVec fH Γ` to `E₀`, so `f
 against the diagonal `fH` by construction, not incidentally.  The energy identity reads
 `1 = (-1 + 3) / 2`, separating it from the un-halved `2`, the `E₀`-free `3/2`, and the
 sign-flipped `-2`: since `E₀ ≠ 0` and `E₀ + rayleighOnVec fH Γ = 2 ≠ 0`, none of those variants
-can coincide with the correct value at this point. Eq. (3.4.16) is **tight** at `q₀ = 1`,
-`Ld = (2 : ℝ) = 2 ^ 1`: `rayleighOnVec (fO ^ 2) fPhi / Ld ^ 2 = 4 / 4 = 1 = q₀`, and
-`rayleighOnVec fO (hvlPlusState fO fPhi) / Ld = 2 / 2 = 1 = √q₀`, so the fixture cannot pass a
-candidate with a strictly larger right-hand side (e.g. `Real.sqrt (4 * m₂) / Ld` or `m₂ / Ld` in
-place of `√(m₂ / Ld ^ 2)`).
+coincides with the correct value at this point. Eq. (3.4.16) is **tight** here at `q₀ = 1`,
+`Ld = (2 : ℝ) = 2 ^ 1`: `rayleighOnVec (fO ^ 2) fPhi / Ld ^ 2 = 4 / 4 = 1 = q₀` and
+`rayleighOnVec fO (hvlPlusState fO fPhi) / Ld = 2 / 2 = 1 = √q₀`, so a candidate whose right-hand
+side is strictly smaller at this data — dividing by `Ld ^ 2` instead of `Ld`, say — is not
+`≤`-provable here.
 
 **Eq. (3.4.17) fixtures.** A strict rational instance
 (`O' := diagonal ![2, 0, 0, -2]`, `v := ![3/5, 4/5, 0, 0]`, `Ld := 2`) gives
 `|rayleighOnVec O' v / Ld| = 9/25` against `Real.sqrt (rayleighOnVec (O' ^ 2) v / Ld ^ 2) = 3/5`,
 both rational and strict; a tight instance at `O := fO`, `v := hvlPlusState fO fPhi`, `Ld := 2`
-gives equality `1 = 1`.  Each fixture routes through an intermediate `have` whose right-hand side
-spells `Real.sqrt (rayleighOnVec (O ^ 2) v / Ld ^ 2)` out syntactically, since a bare `≤` endpoint
-cannot by itself exclude a wrongly *larger* right-hand side.
+gives equality `1 = 1`.  Since a bare `≤` endpoint cannot by itself exclude a wrongly *larger*
+right-hand side, the strict instance carries those two values as their own conjuncts, spelling the
+radicand `rayleighOnVec (O' ^ 2) v / Ld ^ 2` out syntactically.
 
 **Capstone satisfiability witness.** The bundle in the `ManyBodyOpS Λ N` packaging is instantiated
 at `Λ := Fin 1`, `N := 1`, `B := (∅ : Finset Unit)`, `o 0 := pauliXS (0 : Fin 1)` (the single-site
@@ -62,22 +54,21 @@ hypothesis is **discharged by proof** against these declarations, not assumed: `
 are direct computations; `hodd1`/`hodd3`/`hLRO` follow from `pauliXS_apply`'s explicit
 basis-flip formula plus the involution `flipSite (flipSite σ x) x = σ`, which gives
 `(∑ x, o x) ^ 2 = 1` at the matrix level and hence `rayleighOnVec ((∑ x, o x) ^ 2) Φ = 1`;
-`hno` follows from that same square-to-`1` fact via the unitary-norm lemma. This shows the
-capstone's hypothesis bundle is jointly satisfiable in the packaging it is stated in — the
-question the design report flagged as unresolved.
+`hno` follows from that same square-to-`1` fact via the unitary-norm lemma. The capstone's
+hypothesis bundle is therefore jointly satisfiable in the packaging it is stated in, so the
+capstone is not vacuously true for every instance.
 
-## Boundary facts recorded (not re-derived here; see the design report and reaudit ledger)
+## Boundary facts
 
 `hLd` in eq. (3.4.16) is load-bearing at *negative* `Ld`, not at `Ld = 0` (at `Ld = 0` the LRO
 hypothesis becomes `q₀ ≤ 0`, so the statement is vacuous there, not false). `hLd` in eq. (3.4.17)
-is proof-convenience only: the statement holds for every real `Ld`. `hL : 1 ≤ L` in the capstone
-excludes nothing false. At `d = 0` the capstone's two energy conjuncts read `0 ≤ 0 ≤ 0` but keep
-their content (they are not vacuous and not false); the third and fourth conjuncts are unaffected
-by `d = 0`. The empty-carrier story differs per declaration: the energy identity and eq. (3.4.17)
-go vacuous through the normalisation hypothesis, eq. (3.4.16) through the LRO-and-positivity pair;
-the capstone's own carrier `Λ → Fin (N + 1)` is never empty (it always contains the all-zero
-configuration), though an empty `Λ` still makes the capstone's *conclusion* vacuous in the sense
-that every operator on it is `0`.
+is proof convenience rather than a truth condition: at `Ld = 0` both sides of its conclusion are
+`0`. `hL : 1 ≤ L` in the capstone excludes nothing false. At `d = 0` the capstone's two energy
+conjuncts read `0 ≤ 0 ≤ 0` — energy-trivial, neither vacuous nor false — while its normalisation
+and eq. (3.4.16) conjuncts keep their content. The empty-carrier route to vacuity differs per
+declaration: the energy identity and eq. (3.4.17) go vacuous through the normalisation hypothesis,
+eq. (3.4.16) through the LRO-and-positivity pair; the capstone's own carrier `Λ → Fin (N + 1)` is
+never empty, since it always contains the all-zero configuration.
 -/
 
 namespace LatticeSystem.Tests.HorschVonderLindenLowLyingState
@@ -92,10 +83,10 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-- **Signature pin.** Pins the energy identity of eq. (3.4.14)'s state: `Φ` a Hermitian-`H`
 eigenvector, normalised, with the first odd moment `⟨Φ|O|Φ⟩ = 0`, and **no** positivity hypothesis
-on the order-square Rayleigh quotient `rayleighOnVec (O ^ 2) Φ`. Discharged only by the identifier
-itself, so it fails with `Unknown identifier hvlPlusState_energy_eq` until the declaration
-exists. -/
-example {n : Type*} [Fintype n] [DecidableEq n] {H O : Matrix n n ℂ} {Φ : n → ℂ} {E₀ : ℝ}
+on the order-square Rayleigh quotient `rayleighOnVec (O ^ 2) Φ`, and no `DecidableEq` instance on
+the index type. Discharged only by the identifier itself, so a move in the hypothesis list or the
+conclusion breaks it. -/
+example {n : Type*} [Fintype n] {H O : Matrix n n ℂ} {Φ : n → ℂ} {E₀ : ℝ}
     (hH : H.IsHermitian) (hO : O.IsHermitian) (hΦE : H *ᵥ Φ = (E₀ : ℂ) • Φ)
     (hΦ : star Φ ⬝ᵥ Φ = 1) (hodd1 : star Φ ⬝ᵥ (O *ᵥ Φ) = 0) :
     rayleighOnVec H (hvlPlusState O Φ)
@@ -117,8 +108,8 @@ example {n : Type*} [Fintype n] [DecidableEq n] (O : Matrix n n ℂ) (Φ : n →
 /-! ## Signature pin 3 — eq. (3.4.17), `tasaki_eq_3_4_17_order_mean_abs_le_sqrt` -/
 
 /-- **Signature pin.** Pins the Schwarz remark eq. (3.4.17), including the Hermitian hypothesis on
-the order operator (load-bearing: see the fixture below). Discharged only by the identifier
-itself. -/
+the order operator, without which the inequality fails at a nilpotent order operator. Discharged
+only by the identifier itself. -/
 example {n : Type*} [Fintype n] [DecidableEq n] {O : Matrix n n ℂ} {Φ : n → ℂ} {Ld : ℝ}
     (hO : O.IsHermitian) (hΦ : star Φ ⬝ᵥ Φ = 1) (hLd : 0 < Ld) :
     |rayleighOnVec O Φ / Ld| ≤ Real.sqrt (rayleighOnVec (O ^ 2) Φ / Ld ^ 2) :=
@@ -126,7 +117,7 @@ example {n : Type*} [Fintype n] [DecidableEq n] {O : Matrix n n ℂ} {Φ : n →
 
 /-! ## Signature pin 4 — the capstone, `tasaki_eq_3_4_16_lowLyingState_ssb` -/
 
-/-- **Signature pin (capstone).** Pins all four conjuncts (normalisation,
+/-- **Signature pin (capstone).** Pins the four conjuncts of the conclusion (normalisation,
 `0 ≤ ⟨Ξ₊|Ĥ|Ξ₊⟩ − E₀ ≤ 4 d h₀ o₀² / q₀ / L^d`, and eq. (3.4.16)), the literal constant, and that
 the hypothesis list carries **both** odd-moment hypotheses `hodd1`/`hodd3` (unlike eq. (3.4.12)'s
 capstone, which needs neither). Discharged only by the identifier itself. -/
@@ -319,45 +310,52 @@ private lemma fPhi_orderSq : rayleighOnVec (fO ^ 2) fPhi = 4 := by
 
 /-! ## Fixture 1 — the energy identity is discriminating -/
 
-/-- **Fixture (energy identity, discriminating).** At the two-spin instance, the identity reads
-`1 = (-1 + 3) / 2`. Because `E₀ = -1 ≠ 0` and `E₀ + rayleighOnVec fH Γ = 2 ≠ 0`, the un-halved
-value `2`, the `E₀`-free value `3 / 2`, and the sign-flipped value `-2` are all pairwise distinct
-from `1`, so none of those variants could close this `have` instead. -/
+/-- **Fixture (energy identity, discriminating).** At the two-spin instance the identity reads
+`1 = (-1 + 3) / 2`, and the two Rayleigh quotients it relates are asserted alongside it. Because
+`E₀ = -1 ≠ 0` and `E₀ + rayleighOnVec fH Γ = 2 ≠ 0`, the un-halved value `2`, the `E₀`-free value
+`3 / 2`, and the sign-flipped value `-2` are pairwise distinct from `1`, so a candidate of any of
+those shapes could not satisfy all three conjuncts here. -/
 example :
     rayleighOnVec fH (hvlPlusState fO fPhi)
-      = (((-1 : ℝ)) + rayleighOnVec fH (hvlTrialState fO fPhi)) / 2 := by
-  have h := hvlPlusState_energy_eq fH_herm fO_herm fH_eigen fPhi_norm f_odd1
-  have hc : (((-1 : ℝ)) + rayleighOnVec fH (hvlTrialState fO fPhi)) / 2
-      = (((-1 : ℝ)) + rayleighOnVec fH (hvlTrialState fO fPhi)) / 2 := rfl
-  rw [hc]; exact h
+        = (((-1 : ℝ)) + rayleighOnVec fH (hvlTrialState fO fPhi)) / 2
+    ∧ rayleighOnVec fH (hvlPlusState fO fPhi) = 1
+    ∧ rayleighOnVec fH (hvlTrialState fO fPhi) = 3 :=
+  ⟨hvlPlusState_energy_eq fH_herm fO_herm fH_eigen fPhi_norm f_odd1, fXiH, fGammaH⟩
 
 /-! ## Fixture 2 — eq. (3.4.16) is tight -/
 
-/-- **Fixture (eq. (3.4.16), tight).** At `q₀ = 1`, `Ld = 2` (`L = 2`, `d = 1`), the LRO hypothesis
-`q₀ ≤ m₂ / Ld ^ 2 = 4 / 4 = 1` holds with equality, and the conclusion
-`√q₀ = 1 ≤ rayleighOnVec fO Ξ₊ / Ld = 2 / 2 = 1` is likewise an equality: any candidate with a
-strictly smaller right-hand side (dividing by `Ld ^ 2` instead of `Ld`, or reporting `1 / 2`)
-fails to be `≤`-provable at this instance, since `1 ≤ 1` is the tightest possible bound. -/
+/-- **Fixture (eq. (3.4.16), tight).** At `q₀ = 1`, `Ld = 2` (`L = 2`, `d = 1`), the LRO
+hypothesis `q₀ ≤ m₂ / Ld ^ 2 = 4 / 4 = 1` holds with equality, and the conclusion
+`√q₀ = 1 ≤ rayleighOnVec fO Ξ₊ / Ld = 2 / 2 = 1` is likewise an equality, as the second conjunct
+records. A candidate whose right-hand side is strictly smaller at this data — dividing by `Ld ^ 2`
+instead of `Ld`, say — is not `≤`-provable here, since `1 ≤ 1` is the tightest possible bound. -/
 example :
-    Real.sqrt (1 : ℝ) ≤ rayleighOnVec fO (hvlPlusState fO fPhi) / (2 : ℝ) := by
+    Real.sqrt (1 : ℝ) ≤ rayleighOnVec fO (hvlPlusState fO fPhi) / (2 : ℝ)
+    ∧ rayleighOnVec fO (hvlPlusState fO fPhi) / (2 : ℝ) = 1 := by
   have hLRO : (1 : ℝ) ≤ rayleighOnVec (fO ^ 2) fPhi / (2 : ℝ) ^ 2 := by
     rw [fPhi_orderSq]; norm_num
-  have h := hvlPlusState_order_mean_ge_sqrt fO fPhi fO_herm f_odd1 f_odd3
-    (by norm_num : (0 : ℝ) < 1) (by norm_num : (0 : ℝ) < 2) hLRO
-  exact h
+  refine ⟨hvlPlusState_order_mean_ge_sqrt fO fPhi fO_herm f_odd1 f_odd3
+    (by norm_num : (0 : ℝ) < 1) (by norm_num : (0 : ℝ) < 2) hLRO, ?_⟩
+  rw [fXiO]; norm_num
 
 /-! ## Fixture 3 — eq. (3.4.17), a strict rational instance and a tight instance -/
 
 /-- **Fixture (eq. (3.4.17), strict).** `O' = diagonal ![2,0,0,-2]`, `v = (3/5, 4/5, 0, 0)`,
-`Ld = 2`: `rayleighOnVec O' v / Ld = 9 / 25`, `Real.sqrt (rayleighOnVec (O' ^ 2) v / Ld ^ 2)
-= 3 / 5`, both rational and strict. The intermediate `have` spells the radicand out
-syntactically, since the endpoint alone cannot exclude a wrongly *larger* right-hand side such as
-`Real.sqrt (rayleighOnVec (O' ^ 2) v) / Ld ^ 2 = (6 / 5) / 4 = 3 / 10 < 9 / 25`. -/
+`Ld = 2`: the declaration's conclusion holds, and the two sides evaluate to `9 / 25` and `3 / 5`,
+so the instance is strict and both endpoints are rational. The two evaluation conjuncts spell the
+radicand out syntactically, since the `≤` endpoint alone cannot exclude a wrongly *larger*
+right-hand side such as `Real.sqrt (rayleighOnVec (O' ^ 2) v) / Ld ^ 2 = (6 / 5) / 4
+= 3 / 10 < 9 / 25`. -/
 example :
     |rayleighOnVec (Matrix.diagonal ![(2 : ℂ), 0, 0, -2]) ![3/5, 4/5, 0, 0] / (2 : ℝ)|
       ≤ Real.sqrt
           (rayleighOnVec ((Matrix.diagonal ![(2 : ℂ), 0, 0, -2]) ^ 2) ![3/5, 4/5, 0, 0]
-            / (2 : ℝ) ^ 2) := by
+            / (2 : ℝ) ^ 2)
+    ∧ |rayleighOnVec (Matrix.diagonal ![(2 : ℂ), 0, 0, -2]) ![3/5, 4/5, 0, 0] / (2 : ℝ)|
+        = 9 / 25
+    ∧ Real.sqrt
+        (rayleighOnVec ((Matrix.diagonal ![(2 : ℂ), 0, 0, -2]) ^ 2) ![3/5, 4/5, 0, 0]
+          / (2 : ℝ) ^ 2) = 3 / 5 := by
   have hO' : (Matrix.diagonal ![(2 : ℂ), 0, 0, -2]).IsHermitian := by
     unfold Matrix.IsHermitian
     ext i j; fin_cases i <;> fin_cases j <;> simp [Matrix.diagonal]
@@ -366,29 +364,28 @@ example :
       Matrix.cons_val_one, Matrix.cons_val_two, Matrix.cons_val_three, Matrix.head_cons,
       Matrix.tail_cons]
     norm_num
-  have h := tasaki_eq_3_4_17_order_mean_abs_le_sqrt hO' hv (by norm_num : (0 : ℝ) < 2)
   have hL : rayleighOnVec (Matrix.diagonal ![(2 : ℂ), 0, 0, -2]) ![(3 : ℂ)/5, 4/5, 0, 0] / 2
       = (9 : ℝ) / 25 := by
     unfold rayleighOnVec
-    simp [dotProduct, mulVec, Fin.sum_univ_four, Matrix.diagonal]
+    simp [dotProduct, mulVec, Fin.sum_univ_four, Matrix.diagonal, Complex.div_re,
+      Complex.normSq_apply]
     norm_num
   have hR : rayleighOnVec ((Matrix.diagonal ![(2 : ℂ), 0, 0, -2]) ^ 2) ![(3 : ℂ)/5, 4/5, 0, 0]
       / (2 : ℝ) ^ 2 = (36 : ℝ) / 100 := by
     have hsq : (Matrix.diagonal ![(2 : ℂ), 0, 0, -2]) ^ 2
         = Matrix.diagonal ![(4 : ℂ), 0, 0, 4] := by
-      ext i j; fin_cases i <;> fin_cases j <;> simp [pow_two, Matrix.mul_apply, Matrix.diagonal]
+      ext i j; fin_cases i <;> fin_cases j <;>
+        simp [pow_two, Matrix.mul_apply, Matrix.diagonal] <;> norm_num
     rw [hsq]
     unfold rayleighOnVec
-    simp [dotProduct, mulVec, Fin.sum_univ_four, Matrix.diagonal]
+    simp [dotProduct, mulVec, Fin.sum_univ_four, Matrix.diagonal, Complex.div_re,
+      Complex.normSq_apply]
     norm_num
-  rw [hL, hR] at h
   have hc : Real.sqrt ((36 : ℝ) / 100) = 3 / 5 := by
     rw [show (36 : ℝ) / 100 = (3 / 5 : ℝ) ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
-  rw [hc] at h
-  have habs : |(9 : ℝ) / 25| = 9 / 25 := by norm_num
-  rw [habs] at h
-  calc |(9 : ℝ) / 25| = (9 : ℝ) / 25 := habs
-    _ ≤ 3 / 5 := by norm_num
+  refine ⟨tasaki_eq_3_4_17_order_mean_abs_le_sqrt hO' hv (by norm_num : (0 : ℝ) < 2), ?_, ?_⟩
+  · rw [hL]; norm_num
+  · rw [hR, hc]
 
 /-- **Fixture (eq. (3.4.17), tight).** `O = fO`, `v = hvlPlusState fO fPhi`, `Ld = 2`: both sides
 equal `1`. -/
@@ -526,9 +523,8 @@ private theorem hminw_holds : ∀ v : (Λw → Fin (Nw + 1)) → ℂ, star v ⬝
 /-- **The capstone's hypothesis bundle is jointly satisfiable.** At `Λ = Fin 1`, `N = 1`, `B = ∅`,
 `o 0 = pauliXS 0`, `Φ = basisVecS (fun _ => 0)`, `d = L = q₀ = o₀ = 1`, `h₀ = 0`, `E₀ = 0`, every
 named hypothesis of the capstone `tasaki_eq_3_4_16_lowLyingState_ssb` holds — discharged above by
-proof against genuine `ManyBodyOpS`/`rayleighOnVec` declarations, not assumed. This is the
-witness the design report required: it rules out that the capstone is vacuously true for every
-instance. -/
+proof against genuine `ManyBodyOpS`/`rayleighOnVec` declarations, not assumed. It therefore rules
+out that the capstone is vacuously true for every instance. -/
 example :
     (∑ _b ∈ (∅ : Finset Unit), (0 : ManyBodyOpS Λw Nw)).IsHermitian
     ∧ (∑ _x : Λw, ow _x).IsHermitian
