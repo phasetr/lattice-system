@@ -13831,13 +13831,19 @@ documented Shastry susceptibility axiom \texttt{shastry\_staggered\_susceptibili
 ($\chi(k^\ast)=o(L^3)$) into the conditional reduction
 \texttt{no\_long\_range\_order\_1d\_of\_susceptibility} for $N\ge1$, the degenerate spin-$0$ case
 $N=0$ being unconditional (the staggered order operator vanishes).  Tasaki does \textbf{not} prove
-the susceptibility bound in the book: footnote~3 (p.~76) cites Shastry [58] with the rigorous
-formulation of Tanaka--Takeda--Idogaki [63], and footnote~9 (p.~83) singles out the
-$f_L^{(-1)}(k^\ast)$ bound as the only ``nontrivial part that requires some hard analysis'', deferring
-it to the external literature (Shastry, J.~Phys.~A \textbf{25}, L249 (1992) [58];
-Tanaka--Takeda--Idogaki, J.~Magn.~Magn.~Mater.\ \textbf{272--276}, 908 (2004) [63]).  Per the project's
-explicit instruction this genuinely external, hard-analysis estimate (massive-Green / inverse-Fourier
-control of the $k^\ast=\pi$ singularity) is recorded as a documented axiom.  In the book Corollary 4.3
+the susceptibility bound in the book, and \textbf{no published source states one} at the
+antiferromagnetic wavevector $k^\ast=\pi$.  His ``This is nontrivial, and requires a hard analysis''
+(p.~83) is about bounding $f_L^{(-1)}(k)$ \emph{inside the derivation of the infrared bound}
+(4.1.24), which §4.1.2 uses to prove Theorem 4.1 --- and (4.1.24) is stated on p.~81 only ``for any
+$k\in\mathcal{K}_L\setminus\{k^\ast\}$'', with a right-hand side that is roughly
+$(\mathrm{const.})/|k-k^\ast|$ and hence \emph{diverges} as $k\to k^\ast$.  Footnote~9 (p.~83) only
+warns that $f_L^{(-1)}(k)$, though called the susceptibility, is not the physically relevant magnetic
+susceptibility of an antiferromagnet; footnote~3 (p.~76) declines to prove \emph{Theorem 4.2} and
+refers to Shastry [58] (J.~Phys.~A \textbf{25}, L249 (1992)) with the mathematical formulation of
+Tanaka--Takeda--Idogaki [63] (J.~Magn.~Magn.~Mater.\ \textbf{272--276}, 908 (2004)) for that, not for
+a bound at $k^\ast$; and Shastry's own upper bound (his eq.~(22), p.~L252) diverges at $q=Q$ in the
+same way.  What is recorded as a documented axiom is therefore an assumption of this project rather
+than a transcription of a published estimate.  In the book Corollary 4.3
 is instead a corollary of Shastry's Theorem 4.2 (a conditional theorem in
 \texttt{ShastryNoSSBReduction.lean} resting on the documented axiom \texttt{shastryEnergyGain}, the
 stronger iterated-limit field statement) together with Theorems 3.2

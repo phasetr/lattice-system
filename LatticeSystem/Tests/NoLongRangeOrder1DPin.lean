@@ -3,18 +3,19 @@ import LatticeSystem.Quantum.SpinS.NoLongRangeOrder1D
 /-!
 # Signature pins: `no_long_range_order_1d` and the `hsusc` guard shape
 
-Tasaki §4.1 Corollary 4.3 (PR #5414, the `shastry_staggered_susceptibility_bound` →
-`shastry_staggered_susceptibility_subcubic` rename). Two independent pins:
+Two independent pins on the public interface of Tasaki §4.1 Corollary 4.3:
 
-1. `no_long_range_order_1d` itself must **not change** across this rename: it is written out here
-   in full, independently of `no_long_range_order_1d_of_susceptibility`, so an added hypothesis, an
-   altered quantifier order, or `Even L` drift breaks this file even though the internal axiom the
-   theorem rests on changed.
+1. `no_long_range_order_1d` is written out here in full, independently of the conditional reduction
+   `no_long_range_order_1d_of_susceptibility` it is discharged from.  The theorem's own `ε`–`δ`
+   statement is what consumers see, so it is fixed on its own: an added hypothesis, an altered
+   quantifier order or `Even L` drift breaks this file even when the quantitative input its proof
+   consumes is exchanged for another one.
 2. `no_long_range_order_1d_of_susceptibility`'s `hsusc` hypothesis binder is pinned in the exact
-   shape the new axiom must supply: `∀ δ > 0, ∃ L₀, ∀ L, L₀ ≤ L → 2 ≤ L → Even L → …`. This
-   double-pins the `∃ L₀` threshold (a bare `∀ L` is a strictly stronger, false statement — see
-   the module doc of `ShastrySusceptibilitySubcubicPin.lean`) and the `2 ≤ L`/`Even L` guards
-   (odd and degenerate ring sizes are excluded, both here and at the axiom).
+   shape the susceptibility axiom must supply:
+   `∀ δ > 0, ∃ L₀, ∀ L, L₀ ≤ L → 2 ≤ L → Even L → …`.  This double-pins the `∃ L₀` threshold (a bare
+   `∀ L` is a strictly stronger, false statement — see the module doc of
+   `ShastrySusceptibilitySubcubicPin.lean`) and the `2 ≤ L`/`Even L` guards (odd and degenerate
+   ring sizes are excluded, both here and at the axiom).
 -/
 
 namespace LatticeSystem.Tests.NoLongRangeOrder1DPin

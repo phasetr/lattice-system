@@ -113,14 +113,22 @@ and 9 (p. 83)) rests on one **documented axiom**,
   vanishing. `o(L³)` follows both from a gapped chain and from the `χ ≍ L²`
   growth small-ring exact diagonalisation indicates (numerics, no Lean
   witness), so the statement stays neutral on the open Haldane-gap question.
-- **Axiom reason (documented):** Tasaki's footnote 9 (§4.1, p. 83) singles out
-  exactly this bound on `f_L^{(-1)}(k*)` as "the only nontrivial part that
-  requires some hard analysis," deferring it to Shastry's original bound
-  (B. S. Shastry, *J. Phys. A: Math. Gen.* **25**, L249, 1992) and its
-  rigorous formulation in Tanaka–Takeda–Idogaki (*J. Magn. Magn. Mater.*
-  **272-276**, 908, 2004) [63], cited by Tasaki's footnote 3 (p. 76), via a
-  massive-Green-function / inverse-Fourier reflection-positivity analysis
-  with `O(L)` control of the `k* = π` singularity. As with Theorem 4.2 above,
+- **Axiom reason (documented):** no published source states a bound on
+  `f_L^{(-1)}(k*)`. Tasaki's "This is nontrivial, and requires a hard
+  analysis" (§4.1, p. 83) is about bounding `f_L^{(-1)}(k)` *inside the
+  derivation of the infrared bound* (4.1.24), which §4.1.2 uses to prove
+  Theorem 4.1; that bound is stated on p. 81 only "for any
+  `k ∈ 𝒦_L \ {k*}`", and its right-hand side is roughly
+  `(const.)/|k − k*|`, so it *diverges* as `k → k*`. Footnote 9 (p. 83) only
+  warns that `f_L^{(-1)}(k)`, though called the susceptibility, is not the
+  physically relevant magnetic susceptibility; footnote 3 (p. 76) declines to
+  prove *Theorem 4.2* and refers to Shastry (B. S. Shastry, *J. Phys. A: Math.
+  Gen.* **25**, L249, 1992) with the mathematical formulation of
+  Tanaka–Takeda–Idogaki (*J. Magn. Magn. Mater.* **272-276**, 908, 2004)
+  [63] for that, not for a bound at `k*`; and Shastry's own upper bound (his
+  eq. (22), p. L252) diverges at `q = Q` in the same way. What is recorded
+  here is therefore an assumption of this project rather than a transcription
+  of a published estimate. As with Theorem 4.2 above,
   per the 2026-07-05 policy override this is classified in the same
   "1D-ring RP infrastructure incomplete" class (not Theorem 5.1's
   "`d`-dimensional RP/IR-bound intractable" class, and not an
