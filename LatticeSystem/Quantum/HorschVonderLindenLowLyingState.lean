@@ -92,4 +92,65 @@ theorem hvlPlusState_energy_eq {n : Type*} [Fintype n]
   rw [hΓdef]
   ring
 
+/-! ### Eq. (3.4.16), the order parameter of `Ξ₊` -/
+
+/-- **Tasaki eq. (3.4.16), p. 68, abstract form**: `√q₀ ≤ ⟨Ξ₊|Ô_L|Ξ₊⟩ / Ld` for a Hermitian order
+operator `Ô_L` whose first and third moments at `Φ_GS` vanish (assumption (3.4.4), p. 65), under
+long-range order (eq. (3.4.3), p. 65) in the form `q₀ ≤ ⟨Φ_GS|(Ô_L)²|Φ_GS⟩ / Ld²` with `q₀ > 0`.
+
+It is eq. (3.4.15) followed by monotonicity of `Real.sqrt`, the size parameter moving under the
+root by `√m₂ / Ld = √(m₂ / Ld²)`.  Normalisation of `Φ_GS` is not assumed, since eq. (3.4.15) does
+not use it.  The hypothesis `0 < Ld` is load-bearing at negative values rather than at zero: at
+`Ld = 0` the long-range-order hypothesis reads `q₀ ≤ 0` and contradicts `0 < q₀`, whereas at
+`Ld = -2` with `q₀ = 1` there is data satisfying every hypothesis and failing the conclusion.  `Ld`
+is an abstract positive real, which the capstone instantiates at `L^d`. -/
+theorem hvlPlusState_order_mean_ge_sqrt {n : Type*} [Fintype n] [DecidableEq n]
+    (O : Matrix n n ℂ) (Φ : n → ℂ) {q₀ Ld : ℝ}
+    (hO : O.IsHermitian) (hodd1 : star Φ ⬝ᵥ (O *ᵥ Φ) = 0)
+    (hodd3 : star Φ ⬝ᵥ ((O ^ 3) *ᵥ Φ) = 0) (hq₀ : 0 < q₀) (hLd : 0 < Ld)
+    (hLRO : q₀ ≤ rayleighOnVec (O ^ 2) Φ / Ld ^ 2) :
+    Real.sqrt q₀ ≤ rayleighOnVec O (hvlPlusState O Φ) / Ld := by
+  have hLd2 : (0 : ℝ) < Ld ^ 2 := pow_pos hLd 2
+  have hm2 : 0 < rayleighOnVec (O ^ 2) Φ :=
+    lt_of_lt_of_le (mul_pos hq₀ hLd2) ((le_div_iff₀ hLd2).mp hLRO)
+  have hrw : Real.sqrt (rayleighOnVec (O ^ 2) Φ) / Ld
+      = Real.sqrt (rayleighOnVec (O ^ 2) Φ / Ld ^ 2) := by
+    rw [Real.sqrt_div' _ (sq_nonneg Ld), Real.sqrt_sq hLd.le]
+  rw [hvlPlusState_order_mean O Φ hO hodd1 hodd3 hm2, hrw]
+  exact Real.sqrt_le_sqrt hLRO
+
+/-! ### Eq. (3.4.17), the Schwarz remark -/
+
+open scoped ComplexOrder in
+/-- **Tasaki eq. (3.4.17), p. 69** (the Schwarz remark):
+`|⟨Φ|Ô_L/Ld|Φ⟩| ≤ √(⟨Φ|(Ô_L/Ld)²|Φ⟩)` for a normalised `Φ` and a Hermitian `Ô_L`.  This is the
+source's reason why symmetry breaking forces long-range order; the derivation of eq. (3.4.16) above
+does not use it.
+
+Real Cauchy–Schwarz at the identity matrix, applied to `Φ` and `Ô_L Φ` and combined with
+`⟨Ô_L Φ|Ô_L Φ⟩ = ⟨Φ|(Ô_L)²|Φ⟩`, gives `(⟨Φ|Ô_L|Φ⟩)² ≤ ⟨Φ|(Ô_L)²|Φ⟩`; taking square roots produces
+the absolute value.  Hermiticity of `Ô_L` is what makes the statement true: at the nilpotent
+`Ô_L = !![0,1;0,0]` with `Φ = (1/√2, 1/√2)` and `Ld = 1` the right-hand side is `0` while the
+left-hand side is `1/2`.  The hypothesis `0 < Ld` supports moving the size parameter under the
+root; at `Ld = 0` both sides of the conclusion are `0`. -/
+theorem tasaki_eq_3_4_17_order_mean_abs_le_sqrt {n : Type*} [Fintype n] [DecidableEq n]
+    {O : Matrix n n ℂ} {Φ : n → ℂ} {Ld : ℝ}
+    (hO : O.IsHermitian) (hΦ : star Φ ⬝ᵥ Φ = 1) (hLd : 0 < Ld) :
+    |rayleighOnVec O Φ / Ld| ≤ Real.sqrt (rayleighOnVec (O ^ 2) Φ / Ld ^ 2) := by
+  have hsplit : star ((O ^ 1) *ᵥ Φ) ⬝ᵥ ((O ^ 1) *ᵥ Φ) = star Φ ⬝ᵥ ((O ^ (1 + 1)) *ᵥ Φ) :=
+    hermitian_pow_dotProduct_split hO 1 1 Φ
+  rw [pow_one, show (1 : ℕ) + 1 = 2 from rfl] at hsplit
+  have hcs := posSemidef_re_dotProduct_mulVec_sq_le (M := (1 : Matrix n n ℂ))
+    Matrix.PosSemidef.one Φ (O *ᵥ Φ)
+  simp only [Matrix.one_mulVec] at hcs
+  rw [hΦ, hsplit] at hcs
+  have hsq : (rayleighOnVec O Φ) ^ 2 ≤ rayleighOnVec (O ^ 2) Φ := by
+    simpa [rayleighOnVec] using hcs
+  have hdiv : (rayleighOnVec O Φ / Ld) ^ 2 ≤ rayleighOnVec (O ^ 2) Φ / Ld ^ 2 := by
+    rw [div_pow]
+    exact div_le_div_of_nonneg_right hsq (pow_pos hLd 2).le
+  calc |rayleighOnVec O Φ / Ld|
+      = Real.sqrt ((rayleighOnVec O Φ / Ld) ^ 2) := (Real.sqrt_sq_eq_abs _).symm
+    _ ≤ Real.sqrt (rayleighOnVec (O ^ 2) Φ / Ld ^ 2) := Real.sqrt_le_sqrt hdiv
+
 end LatticeSystem.Quantum
