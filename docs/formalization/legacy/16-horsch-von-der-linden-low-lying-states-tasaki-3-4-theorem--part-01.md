@@ -492,8 +492,9 @@ terms vanish — `Φ_GS` is an eigenvector of the Hermitian `Ĥ` and `⟨Φ_GS|�
 assumption (3.4.4). That identity is the step the source covers with the word "obviously"; it needs
 no positivity of the second moment, and at a vanishing second moment `Γ` is the zero vector and the
 identity still holds. Eq. (3.4.16) is eq. (3.4.15) read against eq. (3.4.3) through monotonicity of
-`Real.sqrt`; of the declarations here, only `hvlPlusState_order_mean_ge_sqrt` takes assumption
-(3.4.4) in its third-moment form (the vanishing of `⟨Φ_GS|(Ô_L)³|Φ_GS⟩`). The
+`Real.sqrt`; `hvlPlusState_order_mean_ge_sqrt` takes assumption (3.4.4) in its third-moment form
+(the vanishing of `⟨Φ_GS|(Ô_L)³|Φ_GS⟩`), and the capstone takes the same third-moment hypothesis to
+assemble that lemma's conclusion into eq. (3.4.16)'s conjunct. The
 Schwarz remark (3.4.17) holds for any normalised vector and is not used in the derivation of
 eq. (3.4.16); Hermiticity of the order operator is essential there, since for a nilpotent operator
 the right-hand side can vanish while the left-hand side does not.

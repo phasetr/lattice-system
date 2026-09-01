@@ -13031,10 +13031,11 @@ $\langle\Phi_{\mathrm{GS}}|\Gamma\rangle=0$ by the no-SSB assumption~(3.4.4).  T
 source covers with ``obviously''; the identity assumes no positivity of the second moment, and at a
 vanishing second moment $\Gamma$ is the zero vector and it still holds.  Eq.~(3.4.16)
 (\texttt{hvlPlusState\_order\_mean\_ge\_sqrt}) is eq.~(3.4.15) read against eq.~(3.4.3) through
-monotonicity of $\sqrt{\cdot}$; of the declarations here, only
-\texttt{hvlPlusState\_order\_mean\_ge\_sqrt} takes assumption~(3.4.4) in its third-moment form (the
-vanishing of $\langle\Phi_{\mathrm{GS}}|(\hat O_L)^3|\Phi_{\mathrm{GS}}\rangle$).  The Schwarz
-remark~(3.4.17)
+monotonicity of $\sqrt{\cdot}$; \texttt{hvlPlusState\_order\_mean\_ge\_sqrt} takes
+assumption~(3.4.4) in its third-moment form (the vanishing of
+$\langle\Phi_{\mathrm{GS}}|(\hat O_L)^3|\Phi_{\mathrm{GS}}\rangle$), and the capstone takes the same
+third-moment hypothesis to assemble that lemma's conclusion into eq.~(3.4.16)'s conjunct.  The
+Schwarz remark~(3.4.17)
 (\texttt{tasaki\_eq\_3\_4\_17\_order\_mean\_abs\_le\_sqrt}) holds for any normalized vector and is
 not used in deriving eq.~(3.4.16); Hermiticity of the order operator is essential there, since for a
 nilpotent operator the right-hand side can vanish while the left-hand side does not.  As with
@@ -13048,9 +13049,12 @@ $\langle\Gamma|\hat H|\Gamma\rangle=3$ and $\langle\Xi_+|\hat H|\Xi_+\rangle=1$,
 separate the halved identity from the un-halved, the $E_{\mathrm{GS}}$-free and the sign-flipped
 shapes, and at which eq.~(3.4.16) is tight; plus a strict instance of~(3.4.17), the same instance at
 a negative size parameter (proved directly, since the declaration's own $0<L_d$ hypothesis does not
-apply there), and a tight instance.  A one-sided numeric endpoint is blind to a wrongly large
-right-hand side, so the strict instance routes through an intermediate step spelling the constant
-and radicand out syntactically.
+apply there), and a tight instance; and a capstone satisfiability witness
+($\Lambda=\mathrm{Fin}\,1$, $N=1$, $B=\emptyset$, single-site Pauli $X$ as the order operator)
+whose hypothesis bundle is discharged by proof, showing the capstone is not vacuously true for
+every instance.  A one-sided numeric endpoint is blind to a wrongly large right-hand side, so the
+strict instance routes through an intermediate step spelling the constant and radicand out
+syntactically.
 
 \noindent\textbf{Theorem 4.1} (Dyson--Lieb--Simon / Neves--Perez / Kennedy--Lieb--Shastry, Tasaki
 §4.1, eq.~(4.1.7), pp.~88--90; \texttt{Quantum/SpinS/DysonLiebSimon.lean}, Issue \#4485).  Existence

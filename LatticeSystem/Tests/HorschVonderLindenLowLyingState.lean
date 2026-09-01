@@ -342,14 +342,14 @@ example :
     (by norm_num : (0 : ℝ) < 1) (by norm_num : (0 : ℝ) < 2) hLRO, ?_⟩
   rw [fXiO]; norm_num
 
-/-! ## Fixture 3 — eq. (3.4.17), a strict rational instance and a tight instance -/
+/-! ## Fixture 3 — eq. (3.4.17), rational and tight instances -/
 
 /-- **Fixture (eq. (3.4.17), strict).** `O' = diagonal ![2,0,0,-2]`, `v = (3/5, 4/5, 0, 0)`,
 `Ld = 2`: the declaration's conclusion holds, and the two sides evaluate to `9 / 25` and `3 / 5`,
 so the instance is strict and both endpoints are rational. The two evaluation conjuncts spell the
 radicand out syntactically, since the `≤` endpoint alone cannot exclude a wrongly *larger*
-right-hand side such as `Real.sqrt (rayleighOnVec (O' ^ 2) v) / Ld ^ 2 = (6 / 5) / 4
-= 3 / 10 < 9 / 25`. -/
+right-hand side such as one dividing the radicand by `Ld` instead of `Ld ^ 2`:
+`Real.sqrt (rayleighOnVec (O' ^ 2) v / Ld) = Real.sqrt (18 / 25) ≈ 0.849 > 3 / 5`. -/
 example :
     |rayleighOnVec (Matrix.diagonal ![(2 : ℂ), 0, 0, -2]) ![3/5, 4/5, 0, 0] / (2 : ℝ)|
       ≤ Real.sqrt
