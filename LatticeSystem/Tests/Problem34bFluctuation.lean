@@ -19,14 +19,16 @@ of `Φ_GS`, and (3.4.4); the fixtures below reflect that. Eq. (3.4.16), the Schw
 
 ## What each fixture pins
 
-The first block pins the seven public declarations in full, each restated as the declaration's
-own signature and discharged only by the declaration (the `Problem33aLowEnergy.lean` idiom): the
+The first block pins each of the following declarations in full, restated as the declaration's own
+signature and discharged only by the declaration (the `Problem33aLowEnergy.lean` idiom): the
 two state constructors `hvlTrialState` / `hvlPlusState`,
 the four per-`L` identities `hvlPlusState_dotProduct_self` (3.4.14 normalization),
 `hvlPlusState_order_mean` (3.4.15), `hvlPlusState_order_second_moment` (S.42),
 `hvlPlusState_order_variance` (S.43), and the capstone
 `tasaki_problem_3_4_b_order_fluctuation` (Problem 3.4.b itself: the `L^d`-normalized fluctuation
-of `Ô_L` in `Ξ₊` tends to `0` under (3.4.18)).
+of `Ô_L` in `Ξ₊` tends to `0` under (3.4.18)). The sandwiched-scaled-sum expansion
+`smul_add_dotProduct_mulVec`, also public in `HorschVonderLindenProblem34b.lean`, has no dedicated
+pin here; it is exercised only indirectly, through the declarations above that use it.
 
 The second block gives two concrete numeric instances and one satisfiability witness.
 
@@ -56,7 +58,7 @@ namespace LatticeSystem.Tests.Problem34bFluctuation
 open LatticeSystem.Quantum
 open Matrix
 
-/-! ## Signature pins for the seven public declarations -/
+/-! ## Signature pins for the state constructors, per-`L` identities, and capstone -/
 
 /-- **Signature pin (D1, the trial state).** `hvlTrialState` is Tasaki's `|Γ⟩`, eq. (3.4.7):
 the Hermitian image `O *ᵥ Φ` unit-normalized in the `L²` inner product. -/

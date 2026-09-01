@@ -157,8 +157,9 @@ energy bound of the unnumbered sentence following (3.4.14) (p. 68) nor the groun
 certifies a concrete model — in particular neither that the quantum Ising model satisfies (3.4.18)
 nor that the antiferromagnetic Heisenberg model fails it, the contrast Tasaki draws on p. 69. The
 informal notion of a physical "ground state" of p. 69 is not formalised; the book defers its
-precise formulation to §4.3. Eq. (3.4.16) `⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q₀`, the Schwarz remark (3.4.17) and
-the mirror state `Ξ₋` are outside this development. The `L ↑ ∞` statement is a limit of
+precise formulation to §4.3. Eq. (3.4.16) `⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q₀` and the Schwarz remark
+(3.4.17) are recorded below under "The low-lying state `Ξ₊`, eqs. (3.4.16)-(3.4.17)"; the mirror
+state `Ξ₋` is outside this development. The `L ↑ ∞` statement is a limit of
 finite-volume real numbers, not a statement about a state on a quasi-local C\*-algebra.
 
 All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
@@ -167,6 +168,7 @@ All declarations below are **PROVED**; `#print axioms` on each yields only `prop
 | Lean name | Statement | File |
 |---|---|---|
 | `hvlTrialState` | the Horsch-von der Linden trial state `\|Γ⟩` of eq. (3.4.7): `Ô_L\|Φ_GS⟩` unit-normalised in the `L²` pairing | `Quantum/HorschVonderLindenTrialState.lean` |
+| `smul_add_dotProduct_mulVec` | the sandwiched-form expansion `⟨c(u+v)\|A\|c(u+v)⟩ = (c̄c)(⟨u\|A\|u⟩ + ⟨u\|A\|v⟩ + ⟨v\|A\|u⟩ + ⟨v\|A\|v⟩)` for any scalar `c` and matrix `A` | `Quantum/HorschVonderLindenProblem34b.lean` |
 | `hvlPlusState` | the state `\|Ξ₊⟩ = (1/√2)(\|Φ_GS⟩ + \|Γ⟩)` of eq. (3.4.14) | `Quantum/HorschVonderLindenProblem34b.lean` |
 | `hvlPlusState_dotProduct_self` | the remark after eq. (3.4.14): `⟨Ξ₊\|Ξ₊⟩ = 1`, from `⟨Γ\|Γ⟩ = 1` and the vanishing of `⟨Φ_GS\|Γ⟩` | `Quantum/HorschVonderLindenProblem34b.lean` |
 | `hvlPlusState_order_mean` | eq. (3.4.15): `⟨Ξ₊\|Ô_L\|Ξ₊⟩ = √m₂`, under the vanishing of the first and third odd moments | `Quantum/HorschVonderLindenProblem34b.lean` |
@@ -174,10 +176,10 @@ All declarations below are **PROVED**; `#print axioms` on each yields only `prop
 | `hvlPlusState_order_variance` | eq. (S.43) in the volume-normalised form: the variance of `Ô_L/V` in `Ξ₊` equals `(1/2)(m₄/V⁴ − (m₂/V²)²)/(m₂/V²)`, for any `V > 0` | `Quantum/HorschVonderLindenProblem34b.lean` |
 | `tasaki_problem_3_4_b_order_fluctuation` (**capstone**) | Problem 3.4.b: the four identities above at every `L ≥ 1`, plus the `L ↑ ∞` vanishing of the `Ô_L/L^d`-fluctuation in `Ξ₊` under (3.4.18), with the `L`-uniform bound `q₀ > 0` of (3.4.3) keeping the prefactor `1/m₂` bounded | `Quantum/HorschVonderLindenProblem34b.lean` |
 
-Regression fixtures live in `LatticeSystem/Tests/Problem34bFluctuation.lean`: each of the seven
-declarations above has a signature fixture restating it in full and discharging it by the
-declaration itself, together with two concrete numeric instances and one satisfiability witness
-for the capstone's hypothesis bundle.
+Regression fixtures live in `LatticeSystem/Tests/Problem34bFluctuation.lean`: each of the
+declarations above other than `smul_add_dotProduct_mulVec` has a signature fixture restating it in
+full and discharging it by the declaration itself, together with two concrete numeric instances and
+one satisfiability witness for the capstone's hypothesis bundle.
 
 ### Trial state and the basic variational estimate, eq. (3.4.8)
 
@@ -470,6 +472,64 @@ constant alone; in this `SupportedOnS`-based form the window roles are pinned by
 instead — assembling the swapped windows into the kernel's outer-commutation obligation requires
 deriving `2r < dist x z` from `4r < dist x b` and `dist z b ≤ 2r`, which needs the outer ball to be
 the *wider* one, and with the windows swapped this derivation is not available.
+
+
+### The low-lying state `Ξ₊`, eqs. (3.4.16)-(3.4.17)
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4, "Setting and
+assumptions" and eq. (3.4.3) p. 65, eq. (3.4.12) p. 67, eqs. (3.4.14)-(3.4.16) p. 68, the Schwarz
+remark eq. (3.4.17) p. 69.
+
+`Quantum/HorschVonderLindenLowLyingState.lean` carries the sentence of p. 68 that `|Ξ₊⟩` "is a
+low-lying state" which "exhibits symmetry breaking": the normalisation `⟨Ξ₊|Ξ₊⟩ = 1`, the two-sided
+energy bound `0 ≤ ⟨Ξ₊|Ĥ|Ξ₊⟩ − E_GS ≤ (C/2) L^{-d}` with the `C = 8 d h₀ o₀² / q₀` of eq. (3.4.12),
+and eq. (3.4.16) `⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q₀`. The capstone `tasaki_eq_3_4_16_lowLyingState_ssb` states
+these as four conjuncts (normalisation; `0 ≤ ⟨Ξ₊|Ĥ|Ξ₊⟩ − E_GS`; `≤ (C/2) L^{-d}`; eq. (3.4.16)) in
+the bond-local spin-`S` setting of eqs. (3.4.1)-(3.4.2).
+
+The factor `C/2` is not an estimate: `⟨Ξ₊|Ĥ|Ξ₊⟩ = (E_GS + ⟨Γ|Ĥ|Γ⟩)/2` exactly, because both cross
+terms vanish — `Φ_GS` is an eigenvector of the Hermitian `Ĥ` and `⟨Φ_GS|Γ⟩ = 0` by the no-SSB
+assumption (3.4.4). That identity is the step the source covers with the word "obviously"; it needs
+no positivity of the second moment, and at a vanishing second moment `Γ` is the zero vector and the
+identity still holds. Eq. (3.4.16) is eq. (3.4.15) read against eq. (3.4.3) through monotonicity of
+`Real.sqrt`; `hvlPlusState_order_mean_ge_sqrt` takes assumption (3.4.4) in its third-moment form
+(the vanishing of `⟨Φ_GS|(Ô_L)³|Φ_GS⟩`), and the capstone takes the same third-moment hypothesis to
+assemble that lemma's conclusion into eq. (3.4.16)'s conjunct. The
+Schwarz remark (3.4.17) holds for any normalised vector and is not used in the derivation of
+eq. (3.4.16); Hermiticity of the order operator is essential there, since for a nilpotent operator
+the right-hand side can vanish while the left-hand side does not.
+
+The abstract layer takes the volume as a positive real parameter and the capstone instantiates it at
+`L^d`, the same two-layer split as eq. (3.4.12). The `L ↑ ∞` and `h ↓ 0` limits of Theorem 3.2 are
+not taken.
+
+All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
+`Classical.choice`, `Quot.sound`.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `hvlPlusState_energy_eq` | `⟨Ξ₊\|Ĥ\|Ξ₊⟩ = (E_GS + ⟨Γ\|Ĥ\|Γ⟩)/2` for an eigenvector `Φ_GS` of a Hermitian `Ĥ`, under normalisation and the first odd-moment vanishing (3.4.4) | `Quantum/HorschVonderLindenLowLyingState.lean` |
+| `hvlPlusState_order_mean_ge_sqrt` | eq. (3.4.16) with the volume as a positive real parameter: `√q₀ ≤ ⟨Ξ₊\|Ô_L\|Ξ₊⟩ / Ld` from eq. (3.4.3) | `Quantum/HorschVonderLindenLowLyingState.lean` |
+| `tasaki_eq_3_4_17_order_mean_abs_le_sqrt` | eq. (3.4.17): `\|⟨Φ\|Ô_L/Ld\|Φ⟩\| ≤ √(⟨Φ\|(Ô_L/Ld)²\|Φ⟩)` for any normalised `Φ` and Hermitian `Ô_L` | `Quantum/HorschVonderLindenLowLyingState.lean` |
+| `tasaki_eq_3_4_16_lowLyingState_ssb` (**capstone**) | the low-lying state with LRO and SSB of p. 68: `⟨Ξ₊\|Ξ₊⟩ = 1`, `0 ≤ ⟨Ξ₊\|Ĥ\|Ξ₊⟩ − E_GS ≤ (C/2) L^{-d}` with `C = 8 d h₀ o₀² / q₀`, and eq. (3.4.16), in the bond-local spin-`S` setting of eqs. (3.4.1)-(3.4.2) | `Quantum/HorschVonderLindenLowLyingState.lean` |
+
+Regression fixtures live in `LatticeSystem/Tests/HorschVonderLindenLowLyingState.lean`: signature
+pins on the four declarations (the energy-identity pin fixing that no second-moment positivity
+hypothesis appears, the eq. (3.4.16) pin fixing that no normalisation hypothesis appears, and the
+capstone pin fixing the literal `4 d h₀ o₀² / q₀ / L^d` together with the two odd-moment hypotheses
+that eq. (3.4.12) does not take); a concrete two-spin instance on `Fin 4` with a diagonal
+Hamiltonian `diagonal ![-1,3,3,-1]` and a transverse order operator, whose (3.4.4) hypotheses are
+*discharged by proof*, where `E_GS = -1`, `⟨Γ\|Ĥ\|Γ⟩ = 3`,
+`⟨Ξ₊\|Ĥ\|Ξ₊⟩ = 1` separate the halved
+identity from the un-halved, the `E_GS`-free and the sign-flipped shapes, and where eq. (3.4.16) is
+*tight* at `q₀ = 1`, `L^d = 2`; three eq. (3.4.17) instances, a strict rational one, the same
+instance at a negative size parameter (proved directly, since the declaration's own `0 < Ld`
+hypothesis does not apply there), and a tight one at an eigenvector of the order operator; and a
+capstone satisfiability witness (`Λ = Fin 1`, `N = 1`, `B = ∅`, single-site Pauli `X` as the order
+operator) whose hypothesis bundle is discharged by proof, showing the capstone is not vacuously
+true for every instance. Since a one-sided numeric endpoint is blind to a wrongly large right-hand
+side, the strict eq. (3.4.17) instance routes through an intermediate step that spells the constant
+and the radicand out syntactically.
 
 ---
 
