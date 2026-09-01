@@ -126,6 +126,23 @@ no longer current: the double limit (eq. (3.4.22)) is now formalized, in
 "Theorem 3.2 (Kaplan–Horsch–von der Linden), eqs. (3.4.21)-(3.4.22)", for the current declarations
 and their statements.
 
+**Correction addendum (outside the frozen block above).** The
+`shastry_no_symmetry_breaking_1d` row above — whose statement cell is held in the grouped detail
+record, frozen at the byte-for-byte parity this migrated block requires — calls Theorem 4.2 a
+documented axiom in `Quantum/SpinS/ShastryNoSSB.lean`. That is no longer current on two counts.
+The declaration is now a `theorem` in `Quantum/SpinS/ShastryNoSSBReduction.lean`, with its
+statement unchanged, obtained by applying the conditional capstone
+`shastry_no_symmetry_breaking_1d_of_energy_gain` to the documented axiom `shastryEnergyGain` in
+that same file; `ShastryNoSSB.lean` now carries only the model (`ringCoupling`,
+`ringStaggeredSublattice`, `staggeredFieldChainHamiltonianS`, `ringCoupling_self_star`,
+`staggeredFieldChainHamiltonianS_isHermitian`). The mathematical content is not discharged:
+`shastryEnergyGain` is equivalent in strength to an `L`-uniform form of Theorem 4.2, so
+`#print axioms shastry_no_symmetry_breaking_1d` reports
+`[propext, Classical.choice, Quot.sound, shastryEnergyGain]`. The variational layer it rests on
+(`chainGroundEnergy` and its evenness, concavity, zero-field maximality and order-parameter
+sandwich) is in `Quantum/SpinS/ReversalSymmetricGroundEnergy.lean`. See the Theorem 4.2 support
+entry of the Chapter 4 documented-axiom ledger for the current status.
+
 ---
 
 [← Generic matrix-analysis helpers (`Math/MatrixAnalysis/`)](/lattice-system/formalization/legacy/15-generic-matrix-analysis-helpers/) · [Catalogue](/lattice-system/formalization/legacy/) · [Horsch–von der Linden low-lying states (Tasaki §3.4, Theorem 3.1) →](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-02/)

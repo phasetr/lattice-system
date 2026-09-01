@@ -13186,8 +13186,9 @@ graphs, e.g.\ with vanishing coupling), and its proof rests on reflection positi
 framework is in place (infinite-volume systems are in scope --- a deferral pending infrastructure,
 not an exclusion).  Chapters~3--10 backfill.
 
-\noindent\textbf{Theorem 4.2} (Shastry, Tasaki §4.1, eqs.~(4.1.9)--(4.1.10), pp.~76--77; \textbf{cite-only}
-\textbf{documented axiom}, \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  \textbf{Tasaki
+\noindent\textbf{Theorem 4.2} (Shastry, Tasaki §4.1, eqs.~(4.1.9)--(4.1.10), pp.~76--77;
+\textbf{conditional theorem} resting on one \textbf{documented axiom},
+\texttt{Quantum/SpinS/ShastryNoSSBReduction.lean}, Issue \#4485).  \textbf{Tasaki
 §4.1 footnote 3 explicitly states ``We do not prove Theorem 4.2 in the present book'' and refers to
 Shastry [58] (J.~Phys.~A 25:~L249, 1992) and Tanaka--Takeda--Idogaki [63] (J.~Magn.~Magn.~Mater.~272--276:~908, 2004); hence Theorem 4.2 is a documented axiom.}  Absence of spontaneous symmetry
 breaking in one dimension: for the 1D spin-$S$ antiferromagnetic Heisenberg ring under a staggered
@@ -13196,12 +13197,36 @@ staggered order parameter of any normalized ground state vanishes in the iterate
 $\lim_{h\downarrow0}\lim_{L\uparrow\infty}\langle\Phi_{\mathrm{GS},h}|\hat O_L^{(3)}/L
 |\Phi_{\mathrm{GS},h}\rangle=0$ (eq.~(4.1.10)).  We define the ring nearest-neighbor coupling
 (\texttt{ringCoupling}), the staggered sublattice (\texttt{ringStaggeredSublattice}), and the
-staggered-field chain Hamiltonian (\texttt{staggeredFieldChainHamiltonianS}), and record
+staggered-field chain Hamiltonian (\texttt{staggeredFieldChainHamiltonianS}) together with its
+Hermiticity (\texttt{staggeredFieldChainHamiltonianS\_isHermitian}), and state
 \texttt{shastry\_no\_symmetry\_breaking\_1d} as the iterated limit in explicit $\varepsilon$--$\delta$
-form over normalized energy-minimizing ground states (so the per-site bound is scale-invariant).  We
-record it as a faithful documented axiom over the concrete ring family (Tasaki does not prove
-it, citing Shastry [58] and its rigorous formulation [63]); the deep infinite-volume argument is
-faithfully axiomatized, not re-proved. The \emph{reflection-positivity infrastructure} project
+form over normalized energy-minimizing ground states (so the per-site bound is scale-invariant).
+\emph{Variational reduction to a scalar energy-gain condition.}  Writing $E_L(\eta)$ for the minimum
+eigenvalue of $\hat H_\eta$, the ring is an instance of Tasaki's abstract symmetry-breaking field
+family $\hat H_h=\hat H-h\hat O_L$ (eq.~(3.4.19), p.~69), whose variational comparison
+(eq.~(3.4.20), p.~70) is developed at the \texttt{ManyBodyOpS} level in
+\texttt{ReversalSymmetricGroundEnergy.lean}: $E$ is even in the field
+(\texttt{chainGroundEnergy\_neg}, from the reversal $\Theta\hat H_h\Theta=\hat H_{-h}$ of
+\texttt{staggeredFieldChainHamiltonianS\_conj\_manyBodyReversalS} and the spectrum-invariance of
+conjugation by a unit), concave as a pointwise minimum of affine functions
+(\texttt{chainGroundEnergy\_concave}), hence maximal at $h=0$
+(\texttt{chainGroundEnergy\_le\_zero\_field}); running the variational comparison in both directions
+against one normalized ground state gives the sandwich
+$0\le E_L(0)-E_L(h)\le h\langle\hat O_L^{(3)}\rangle_h\le E_L(0)-E_L(2h)$
+(\texttt{chainGroundState\_order\_mean\_sandwich}).  Consequently the conditional capstone
+\texttt{shastry\_no\_symmetry\_breaking\_1d\_of\_energy\_gain} derives eq.~(4.1.10) from the single
+scalar hypothesis that the staggered-field energy gain is $o(\eta)$ per site uniformly in large $L$:
+for every $\varepsilon>0$ there is $\eta_0>0$ such that for each $0<\eta<\eta_0$ there is a threshold
+$L_0$ with $E_L(0)-E_L(2\eta)\le\varepsilon\,\eta\,L$ for all $L\ge L_0$.  That hypothesis is the
+documented axiom \texttt{shastryEnergyGain}; the exponent must be linear in $\eta$ (the physical
+response is $\asymp L\eta^{4/3}$ for half-integer spin, so an $\eta^2$ form would be false), and the
+threshold $L_0$ is required because a bare $\forall L$ fails at $L=1$ (where
+$E_1(0)-E_1(2\eta)=\eta N$ exactly) and at the frustrated triangle $L=3$, $N=1$ (where
+$E_3(0)-E_3(2\eta)\ge\tfrac53\eta$).  \textbf{This is a relocation of the gap, not a discharge}: the
+axiom is equivalent in strength to an $L$-uniform form of Theorem 4.2, so
+\texttt{\#print axioms shastry\_no\_symmetry\_breaking\_1d} still names it, and the deep
+infinite-volume argument remains faithfully axiomatized rather than re-proved --- what the reduction
+removes is the eigenvector quantifiers, the ground-state degeneracy and the inner limit. The \emph{reflection-positivity infrastructure} project
 (Issue \#4777) formalizes supporting finite-dim RP layers for Cor.~4.3 discharge and related RP
 machinery, not a re-proof of Thm.~4.2 itself.  The first layer establishes the even-ring \emph{bond reflection}
 $r(x) = 2n-1-x$ (\texttt{RingBondReflection.lean}: involutive, swapping the two halves, flipping the
@@ -13803,8 +13828,9 @@ it to the external literature (Shastry, J.~Phys.~A \textbf{25}, L249 (1992) [58]
 Tanaka--Takeda--Idogaki, J.~Magn.~Magn.~Mater.\ \textbf{272--276}, 908 (2004) [63]).  Per the project's
 explicit instruction this genuinely external, hard-analysis estimate (massive-Green / inverse-Fourier
 control of the $k^\ast=\pi$ singularity) is recorded as a documented axiom.  In the book Corollary 4.3
-is instead a corollary of Shastry's Theorem 4.2 (still a documented axiom in
-\texttt{ShastryNoSSB.lean}, the stronger iterated-limit field statement) together with Theorems 3.2
+is instead a corollary of Shastry's Theorem 4.2 (a conditional theorem in
+\texttt{ShastryNoSSBReduction.lean} resting on the documented axiom \texttt{shastryEnergyGain}, the
+stronger iterated-limit field statement) together with Theorems 3.2
 and 2.2; that double-limit route is not reachable by the static-susceptibility argument used here.
 Chapters~3--10 backfill.
 
