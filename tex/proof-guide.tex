@@ -12737,20 +12737,22 @@ variational estimate~(3.4.12)) supplies the input $\delta$.
 
 \noindent\textbf{Theorem 3.2, finite-volume core} (Kaplan--Horsch--von der Linden, Tasaki §3.4, eqs.~(3.4.16)--(3.4.22),
 pp.~68--70; \textbf{discharged axiom-free}, \texttt{Quantum/KaplanHorschVonderLinden.lean}, Issue
-\#4485).  An infinitesimal symmetry-breaking field triggers SSB.  We discharge the finite-volume variational \emph{core} (eq.~(3.4.21)); the thermodynamic double limit (3.4.22) is not yet formalized.  The core is a
+\#4485).  An infinitesimal symmetry-breaking field triggers SSB.  We discharge the finite-volume variational \emph{core} (eq.~(3.4.21)); the double limit (3.4.22) is discharged separately, in
+\texttt{Quantum/KaplanHorschVonderLindenTheorem32.lean} (below).  The core is a
 finite-volume variational lower bound, \texttt{kaplan\_horsch\_vonderLinden\_order\_lower\_bound}:
 since the perturbed ground state $\Psi$ minimizes $H-hO$ ($h>0$), for any trial $\Xi$ the order
 parameter obeys $\langle\Xi,O\Xi\rangle+(E_0-\langle\Xi,H\Xi\rangle)/h\le\langle\Psi,O\Psi\rangle$.
 Proof: $R(H-hO)\Psi\le R(H-hO)\Xi$ with $R(H-hO)=R(H)-h\,R(O)$ (Rayleigh real-linearity), rearrange
 using $h>0$, and bound $R(H)\Psi\ge E_0$.  The double limit $L\uparrow\infty$, $h\downarrow0$ (with
 the essential bound $\langle\Xi_+,O_L/L^d\,\Xi_+\rangle\ge\sqrt{q_0}$) then gives the $\sqrt{q_0}$
-order-parameter bound (3.4.22) --- the thermodynamic input, which is not part of the formalized
-core.  At the trial state $\Xi=\Xi_+$, the capstone
+order-parameter bound (3.4.22) --- the thermodynamic input, formalized as the capstone
+\texttt{tasaki\_theorem\_3\_2\_kaplanHorschVonderLinden} discussed below.  At the trial state
+$\Xi=\Xi_+$, the capstone
 \texttt{tasaki\_eq\_3\_4\_16\_lowLyingState\_ssb}
 (\texttt{Quantum/HorschVonderLindenLowLyingState.lean}) supplies that essential bound together with
 the normalization and energy conjuncts the core's variational step needs, at a single finite
-volume; composing it with the core and taking the double limit is what Theorem~3.2 still requires
-beyond it.  Chapters~3--10 backfill.
+volume; composing it with the core and taking the double limit is exactly what the eq.~(3.4.22)
+capstone below does.  Chapters~3--10 backfill.
 
 \noindent\textbf{Problem 3.4.b} (Tasaki~\cite{Tasaki:QMB} §3.4, statement p.~69 eq.~(3.4.18),
 solution p.~501 eqs.~(S.42)--(S.43), with the surrounding eqs.~(3.4.3), (3.4.4), (3.4.7),
@@ -13043,8 +13045,9 @@ Schwarz remark~(3.4.17)
 not used in deriving eq.~(3.4.16); Hermiticity of the order operator is essential there, since for a
 nilpotent operator the right-hand side can vanish while the left-hand side does not.  As with
 eq.~(3.4.12), the abstract layer carries the volume as a positive real parameter and the capstone
-instantiates it at $L^d$.  \emph{Not asserted.}  The limits $L\uparrow\infty$ and $h\downarrow0$ of
-Theorem~3.2 (eq.~(3.4.22), p.~70) are not taken, and
+instantiates it at $L^d$.  \emph{Not asserted here.}  The limits $L\uparrow\infty$ and $h\downarrow0$ of
+Theorem~3.2 (eq.~(3.4.22), p.~70) are taken separately, in
+\texttt{Quantum/KaplanHorschVonderLindenTheorem32.lean} (below), and
 the informal notion of a physical ``ground state'' is not formalized.  Fixtures: a concrete two-spin
 instance on $\mathrm{Fin}\,4$ with $\hat H=\mathrm{diagonal}(-1,3,3,-1)$ and a transverse order
 operator, whose~(3.4.4) hypotheses are discharged by proof, giving $E_{\mathrm{GS}}=-1$,
@@ -13122,6 +13125,33 @@ fails; two boundary instances at a vanishing order-square Rayleigh quotient, dis
 proof rather than assumed satisfiable; and a mirror capstone non-vacuity witness at the same data
 as the $\Xi_+$ capstone's, showing \texttt{tasaki\_mirrorLowLyingState\_ssb} is not vacuously true
 for every instance.
+
+\noindent\textbf{Theorem 3.2 (Kaplan--Horsch--von der Linden), eqs.~(3.4.21)--(3.4.22)}
+(Tasaki~\cite{Tasaki:QMB} §3.4, eq.~(3.4.12) p.~67, eq.~(3.4.16) p.~69, Theorem~3.2 with
+footnote~24 and eqs.~(3.4.19)--(3.4.22), pp.~69--70; \textbf{discharged axiom-free},
+\texttt{Quantum/KaplanHorschVonderLindenTheorem32.lean}, fixtures in
+\texttt{Tests/KaplanHorschVonderLindenTheorem32.lean}).  Eq.~(3.4.21)'s printed second line
+(\texttt{tasaki\_eq\_3\_4\_21\_perVolume}) is the variational core
+\texttt{kaplan\_horsch\_vonderLinden\_order\_lower\_bound} divided by the volume and read against
+eq.~(3.4.16) at the trial state $\Xi_+$: the order-parameter bound of eq.~(3.4.16) supplies the
+lower bound \texttt{hXi} that the per-volume statement takes abstractly.  Feeding the halved
+eq.~(3.4.12) energy bound $\langle\Xi_+|\hat H|\Xi_+\rangle-E_{\mathrm{GS}}\le(C/2)L^{-d}$ in place
+of that abstract error term (\texttt{tasaki\_eq\_3\_4\_21\_perVolume\_energyBound}) turns the
+correction into an $L^{2d}$ term, \emph{because the energy bound supplied is itself of order
+$L^{-d}$}: one factor of $L^{-d}$ comes from that bound and a second from dividing the order
+parameter by the volume.  Eq.~(3.4.22)
+(\texttt{tasaki\_theorem\_3\_2\_kaplanHorschVonderLinden}) is stated with \texttt{Filter.liminf}
+in \emph{both} limits, per footnote~24 (p.~70), and in the printed order: the inner limit over the
+volume index $L$ along \texttt{atTop}, the outer limit over the field strength $h$ along
+$\mathcal N[{>}]\,0$.  The order is not cosmetic --- with the limits exchanged the statement is
+false, and a fixture in \texttt{Tests/KaplanHorschVonderLindenTheorem32.lean} exhibits the bounded
+family $\min(h\cdot L,1)$ whose printed-order value is $1$ and whose exchanged-order value is $0$.
+\emph{Not asserted.}  The $L$-indexed and $h$-indexed family is carried as abstract per-volume
+matrices whose hypotheses are the $\Xi_+$ capstone's conjuncts together with eq.~(3.4.20); a
+spin-$S$ family whose vertex set grows with the volume is not built here.  The limiting state the
+source discusses after Theorem~3.2 is not constructed.  The uniform bound
+(\texttt{tasaki\_orderParameter\_uniformBound}) needs a carrier hypothesis $\#\Lambda\le L^d$ that
+eq.~(3.4.12)'s bond-count hypothesis does not supply.
 
 \noindent\textbf{Theorem 4.1} (Dyson--Lieb--Simon / Neves--Perez / Kennedy--Lieb--Shastry, Tasaki
 §4.1, eq.~(4.1.7), pp.~88--90; \texttt{Quantum/SpinS/DysonLiebSimon.lean}, Issue \#4485).  Existence

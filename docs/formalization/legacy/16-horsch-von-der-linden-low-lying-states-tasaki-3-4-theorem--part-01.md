@@ -118,6 +118,14 @@ scope). Tasaki §3.4, Theorem 3.1, eqs. (3.4.7)–(3.4.12), pp. 66–67.
 | `shastry_staggered_susceptibility_bound` | **Shastry susceptibility bound χ(k*)≤C·L** (§4.1, DOCUMENTED AXIOM; toward Corollary 4.3): for the zero-field 1D AFM Heisenberg ring on **even** `L ≥ 2` sites (`Even L`, bipartite) there is a size-uniform `C ≥ 0` with every normalized ground state admitting a potential `y` for `ÔΦ` (`(Ĥ−E₀)y=ÔΦ`) of `O(L)` static staggered susceptibility `Re⟨y,ÔΦ⟩ ≤ C·L` (physically `χ(k*)=L·f_L^(-1)(k*)`). Tasaki does **not** prove this in the book — footnote 3 (p. 76) cites Shastry [58] / the rigorous formulation of Tanaka–Takeda–Idogaki [63], and footnote 9 (p. 83) singles out the `f_L^(-1)(k*)` bound as the only "nontrivial part that requires some hard analysis". Per the project's explicit instruction this genuinely external hard-analysis estimate (massive-Green / inverse-Fourier `k*=π` control) based on Shastry J.Phys.A 25 L249 (1992) [58] and Tanaka–Takeda–Idogaki JMMM 272–276 908 (2004) [63] is a documented axiom; it discharges `no_long_range_order_1d` (PR #5003) | `Quantum/SpinS/NoLongRangeOrder1D.lean` |
 <!-- legacy-source:end:549:652 -->
 
+**Correction addendum (outside the frozen block above).** The
+`kaplan_horsch_vonderLinden_order_lower_bound` row above, frozen at the byte-for-byte parity this
+migrated block requires, calls Theorem 3.2's `L ↑ ∞, h ↓ 0` double limit "not formalized". That is
+no longer current: the double limit (eq. (3.4.22)) is now formalized, in
+`Quantum/KaplanHorschVonderLindenTheorem32.lean`. See part 4 of this catalogue chunk, section
+"Theorem 3.2 (Kaplan–Horsch–von der Linden), eqs. (3.4.21)-(3.4.22)", for the current declarations
+and their statements.
+
 ---
 
 [← Generic matrix-analysis helpers (`Math/MatrixAnalysis/`)](/lattice-system/formalization/legacy/15-generic-matrix-analysis-helpers/) · [Catalogue](/lattice-system/formalization/legacy/) · [Horsch–von der Linden low-lying states (Tasaki §3.4, Theorem 3.1) →](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-02/)

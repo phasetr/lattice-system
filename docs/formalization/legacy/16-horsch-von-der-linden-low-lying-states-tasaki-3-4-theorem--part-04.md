@@ -41,7 +41,8 @@ the right-hand side can vanish while the left-hand side does not.
 
 The abstract layer takes the volume as a positive real parameter and the capstone instantiates it at
 `L^d`, the same two-layer split as eq. (3.4.12). The `L ↑ ∞` and `h ↓ 0` limits of Theorem 3.2 are
-not taken.
+taken in `Quantum/KaplanHorschVonderLindenTheorem32.lean` (below, "Theorem 3.2" section of this
+part).
 
 All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
 `Classical.choice`, `Quot.sound`.
@@ -113,7 +114,9 @@ eq. (3.4.14) state.
 the four `Ξ₋` declarations named above, and separately, directly at `+Ô_L` (not through any
 instantiation), in the orthogonality proof `hvlMinusState_dotProduct_hvlPlusState`
 (`Quantum/HorschVonderLindenLowLyingState.lean:331`). The `L ↑ ∞` and `h ↓ 0` limits of Theorem 3.2
-are not taken here either.
+are taken in `Quantum/KaplanHorschVonderLindenTheorem32.lean` (below, "Theorem 3.2" section of this
+part), but the mirror state `Ξ₋` does not enter there: the capstone's trial-state hypothesis is
+eq. (3.4.16) at `Ξ₊`, not its mirror form.
 
 All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
 `Classical.choice`, `Quot.sound`.
@@ -162,6 +165,42 @@ where the mirror bound's own conclusion fails; two boundary instances at a vanis
 order-square Rayleigh quotient, discharged by proof rather than assumed satisfiable; and a mirror
 capstone non-vacuity witness at the same data as the `Ξ₊` capstone's, showing
 `tasaki_mirrorLowLyingState_ssb` is not vacuously true for every instance.
+
+## Theorem 3.2 (Kaplan–Horsch–von der Linden), eqs. (3.4.21)-(3.4.22)
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4, eq. (3.4.12)
+p. 67, eq. (3.4.16) p. 69, Theorem 3.2 with footnote 24 and eqs. (3.4.19)-(3.4.22), pp. 69-70.
+
+All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
+`Classical.choice`, `Quot.sound`.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `tasaki_eq_3_4_21_perVolume` | eq. (3.4.21)'s printed second line, per volume: the finite-volume variational bound divided through by a volume `Ld > 0`, with the trial-state order mean carried abstractly via `hXi` | `Quantum/KaplanHorschVonderLindenTheorem32.lean` |
+| `tasaki_eq_3_4_21_perVolume_energyBound` | the same per-volume bound with the halved eq. (3.4.12) trial-energy bound made explicit, giving the `L^{2d}` error denominator | `Quantum/KaplanHorschVonderLindenTheorem32.lean` |
+| `tasaki_orderParameter_uniformBound` | the order parameter per volume is bounded by a per-site operator-norm bound, given a carrier hypothesis `#Λ ≤ L^d` | `Quantum/KaplanHorschVonderLindenTheorem32.lean` |
+| `tasaki_eq_3_4_21_volumeLiminf` | the inner `L ↑ ∞` limit of eq. (3.4.22): `m ≤ liminf_{L↑∞} ⟨Ψ L\|O L\|Ψ L⟩/L^d` | `Quantum/KaplanHorschVonderLindenTheorem32.lean` |
+| `tasaki_theorem_3_2_kaplanHorschVonderLinden` (**capstone**) | eq. (3.4.22): `√q₀ ≤ liminf_{h↓0} liminf_{L↑∞} ⟨Ψ h L\|O L\|Ψ h L⟩/L^d`, both limits `Filter.liminf` per footnote 24, in the printed order | `Quantum/KaplanHorschVonderLindenTheorem32.lean` |
+
+Eq. (3.4.21) is the variational core (`kaplan_horsch_vonderLinden_order_lower_bound`,
+`Quantum/KaplanHorschVonderLinden.lean`) divided by the volume and read against eq. (3.4.16) at the
+trial state `Ξ₊`: the order-parameter bound of eq. (3.4.16) supplies the lower bound `hXi` that the
+per-volume statement takes abstractly. Feeding the halved eq. (3.4.12) energy bound
+`⟨Ξ₊|Ĥ|Ξ₊⟩ − E_GS ≤ (C/2)L^{-d}` in place of the abstract error term turns the correction into an
+`L^{2d}` term, because the energy bound supplied is itself of order `L^{-d}`: one factor of
+`L^{-d}` comes from that bound and a second from dividing the order parameter by the volume.
+Eq. (3.4.22) is stated with `Filter.liminf` in both limits per footnote 24 (p. 70), and in the
+printed order: the inner limit over the volume index `L` along `atTop`, the outer limit over the
+field strength `h` along `𝓝[>] 0`. The order is not cosmetic — with the limits exchanged the
+statement is false, and a fixture in `LatticeSystem/Tests/KaplanHorschVonderLindenTheorem32.lean`
+exhibits the bounded family `min (h·L) 1` whose printed-order value is `1` and whose
+exchanged-order value is `0`.
+
+**What these declarations do not assert.** The `L`-indexed and `h`-indexed family is carried as
+abstract per-volume matrices whose hypotheses are the `Ξ₊` capstone's conjuncts together with
+eq. (3.4.20); a spin-`S` family whose vertex set grows with the volume is not built here. The
+limiting state the source discusses after Theorem 3.2 is not constructed. The uniform bound needs a
+carrier hypothesis `#Λ ≤ L^d` that eq. (3.4.12)'s bond-count hypothesis does not supply.
 
 ---
 
