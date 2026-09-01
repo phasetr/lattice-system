@@ -37,7 +37,7 @@ halved eq. (3.4.12) bound `⟨Ξ₊|Ĥ|Ξ₊⟩ − E_GS ≤ (C/2)L^{-d}` enters
 the instantiation of those hypotheses rather than through a declaration in this module.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §3.4, eq. (3.4.12), p. 67, eq. (3.4.16), p. 69, Theorem 3.2 with footnote 24 and
+2020), §3.4, eq. (3.4.12), p. 67, eq. (3.4.16), p. 68, Theorem 3.2 with footnote 24 and
 eqs. (3.4.19)-(3.4.22), pp. 69-70.
 -/
 
@@ -170,6 +170,30 @@ theorem tasaki_orderParameter_uniformBound {Λ : Type*} [Fintype Λ] [DecidableE
 
 /-! ### The volume limit and the capstone -/
 
+/-- The family-level form of `kaplanHorschVonderLinden_liminf_bounds`.  At every `L ≥ 1` the
+per-volume bound `tasaki_eq_3_4_21_perVolume_energyBound` supplies the minorant
+`m − C/(h·(L^d)^2)` and `hub` supplies the majorant `o₀`, so the order mean's `liminf` lies between
+`m` and `o₀`.  Both halves are produced together because the upper one is not a weakening of the
+lower: the outer `liminf` of `tasaki_theorem_3_2_kaplanHorschVonderLinden` consumes it as a
+coboundedness witness, while `tasaki_eq_3_4_21_volumeLiminf` exposes only the lower one. -/
+private theorem kaplanHorschVonderLinden_volumeLiminf_bounds {n : ℕ → Type*} [∀ L, Fintype (n L)]
+    (H O : (L : ℕ) → Matrix (n L) (n L) ℂ) (Ψ Ξ : (L : ℕ) → n L → ℂ) (E : ℕ → ℝ)
+    {d : ℕ} {h m C o₀ : ℝ} (hd : 1 ≤ d) (hh : 0 < h)
+    (hvar : ∀ L : ℕ, 1 ≤ L → rayleighOnVec (H L - (h : ℂ) • O L) (Ψ L)
+      ≤ rayleighOnVec (H L - (h : ℂ) • O L) (Ξ L))
+    (hE : ∀ L : ℕ, 1 ≤ L → E L ≤ rayleighOnVec (H L) (Ψ L))
+    (hXi : ∀ L : ℕ, 1 ≤ L → m ≤ rayleighOnVec (O L) (Ξ L) / (L : ℝ) ^ d)
+    (hen : ∀ L : ℕ, 1 ≤ L → rayleighOnVec (H L) (Ξ L) - E L ≤ C / (L : ℝ) ^ d)
+    (hub : ∀ L : ℕ, 1 ≤ L → rayleighOnVec (O L) (Ψ L) / (L : ℝ) ^ d ≤ o₀) :
+    m ≤ liminf (fun L : ℕ => rayleighOnVec (O L) (Ψ L) / (L : ℝ) ^ d) atTop
+      ∧ liminf (fun L : ℕ => rayleighOnVec (O L) (Ψ L) / (L : ℝ) ^ d) atTop ≤ o₀ :=
+  kaplanHorschVonderLinden_liminf_bounds hd hh (fun L hL => by
+    have hLpos : (0 : ℝ) < (L : ℝ) ^ d := by
+      have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast hL
+      positivity
+    exact tasaki_eq_3_4_21_perVolume_energyBound (H L) (O L) hh hLpos (Ψ L) (Ξ L)
+      (hvar L hL) (hE L hL) (hXi L hL) (hen L hL)) hub
+
 /-- **The inner volume limit of eq. (3.4.22)** (Tasaki §3.4, p. 70).  For an `L`-indexed family of
 matrices, perturbed states `Ψ L`, trial states `Ξ L` and ground energies `E L` satisfying the
 hypotheses of `tasaki_eq_3_4_21_perVolume_energyBound` at every `L ≥ 1` with `Ld = L^d`, together
@@ -188,12 +212,7 @@ theorem tasaki_eq_3_4_21_volumeLiminf {n : ℕ → Type*} [∀ L, Fintype (n L)]
     (hen : ∀ L : ℕ, 1 ≤ L → rayleighOnVec (H L) (Ξ L) - E L ≤ C / (L : ℝ) ^ d)
     (hub : ∀ L : ℕ, 1 ≤ L → rayleighOnVec (O L) (Ψ L) / (L : ℝ) ^ d ≤ o₀) :
     m ≤ liminf (fun L : ℕ => rayleighOnVec (O L) (Ψ L) / (L : ℝ) ^ d) atTop :=
-  (kaplanHorschVonderLinden_liminf_bounds hd hh (fun L hL => by
-    have hLpos : (0 : ℝ) < (L : ℝ) ^ d := by
-      have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast hL
-      positivity
-    exact tasaki_eq_3_4_21_perVolume_energyBound (H L) (O L) hh hLpos (Ψ L) (Ξ L)
-      (hvar L hL) (hE L hL) (hXi L hL) (hen L hL)) hub).1
+  (kaplanHorschVonderLinden_volumeLiminf_bounds H O Ψ Ξ E hd hh hvar hE hXi hen hub).1
 
 /-- **Tasaki Theorem 3.2 (Kaplan–Horsch–von der Linden), eq. (3.4.22)** (§3.4, p. 70).  For an
 `L`-indexed family of Hamiltonians `H L` and order operators `O L`, trial states `Ξ L`, ground
@@ -220,18 +239,13 @@ theorem tasaki_theorem_3_2_kaplanHorschVonderLinden {n : ℕ → Type*} [∀ L, 
     Real.sqrt q₀ ≤ liminf (fun h : ℝ => liminf (fun L : ℕ =>
       rayleighOnVec (O L) (Ψ h L) / (L : ℝ) ^ d) atTop) (𝓝[>] (0 : ℝ)) := by
   have hpos : ∀ᶠ h : ℝ in 𝓝[>] (0 : ℝ), 0 < h := self_mem_nhdsWithin
-  have key : ∀ h : ℝ, 0 < h →
-      Real.sqrt q₀ ≤ liminf (fun L : ℕ => rayleighOnVec (O L) (Ψ h L) / (L : ℝ) ^ d) atTop
-      ∧ liminf (fun L : ℕ => rayleighOnVec (O L) (Ψ h L) / (L : ℝ) ^ d) atTop ≤ o₀ := by
-    intro h hh
-    refine kaplanHorschVonderLinden_liminf_bounds (C := C) hd hh (fun L hL => ?_) (hub h hh)
-    have hLpos : (0 : ℝ) < (L : ℝ) ^ d := by
-      have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast hL
-      positivity
-    exact tasaki_eq_3_4_21_perVolume_energyBound (H L) (O L) hh hLpos (Ψ h L) (Ξ L)
-      (hvar h hh L hL) (hE h hh L hL) (hXi L hL) (hen L hL)
+  have hcobound : ∀ h : ℝ, 0 < h →
+      liminf (fun L : ℕ => rayleighOnVec (O L) (Ψ h L) / (L : ℝ) ^ d) atTop ≤ o₀ := fun h hh =>
+    (kaplanHorschVonderLinden_volumeLiminf_bounds H O (Ψ h) Ξ E hd hh (hvar h hh) (hE h hh) hXi
+      hen (hub h hh)).2
   refine le_liminf_of_le (isCoboundedUnder_ge_of_eventually_le _ (x := o₀) ?_) ?_
-  · filter_upwards [hpos] with h hh using (key h hh).2
-  · filter_upwards [hpos] with h hh using (key h hh).1
+  · filter_upwards [hpos] with h hh using hcobound h hh
+  · filter_upwards [hpos] with h hh using
+      tasaki_eq_3_4_21_volumeLiminf H O (Ψ h) Ξ E hd hh (hvar h hh) (hE h hh) hXi hen (hub h hh)
 
 end LatticeSystem.Quantum

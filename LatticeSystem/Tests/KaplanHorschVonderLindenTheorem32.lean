@@ -16,8 +16,10 @@ Several steps of the statement typecheck when written wrongly, which is what the
 blocks are for. The `L^d` and `L^{2d}` error denominators agree at `L^d = 1`, so the sharpness
 family is read at `d = 1` and pins its per-volume value exactly. The exchanged limit order also
 elaborates and is false, so both orders are computed on one shared bounded family. The variational
-hypothesis's direction is not caught by an instance that is tight everywhere, so the uniform bound
-carries a slack instance next to the tight one.
+hypothesis's direction is pinned by the four signature examples that carry it, each of which
+typechecks only against the exact inequality written, and not by any numeric instance. The uniform
+bound carries no variational hypothesis at all; its tight and slack instances exercise the carrier
+hypothesis `hcard` at and away from equality.
 -/
 
 namespace LatticeSystem.Quantum
@@ -165,13 +167,15 @@ private theorem sharpnessHamiltonian_atPsi (L : ℕ) :
   simp [rayleighOnVec, sharpnessHamiltonian, Matrix.mulVec, dotProduct, Fin.sum_univ_two,
     Matrix.diagonal]
 
-/-- Sharpness fixture: at `d = 1`, `h = 1`, `C = 1`, `m = 1`, the two-level family satisfies the
-variational, ground-energy and energy-bound hypotheses at equality, its per-volume order mean is
-strictly below `m = 1` at every `L ≥ 1`, and that mean equals `1 - 1/(L^1)^2` — which is
-`m - C/(h * (L^d)^2)` exactly, so the bound of
-`tasaki_eq_3_4_21_perVolume_energyBound` is attained here while the finite-volume statement
-`m ≤ ⟨Ψ|O|Ψ⟩/L^d` is false. The exact value is what pins the error term's denominator: the variant
-with `L^d` in place of `L^{2d}` also typechecks. -/
+/-- Sharpness fixture: at `d = 1`, `h = 1`, `C = 1`, `m = 1`, the two-level family meets
+`tasaki_eq_3_4_21_perVolume_energyBound`'s `hvar`, `hE₀`, `hXi` and `hen` at equality, its
+per-volume order mean is strictly below `m = 1` at every `L ≥ 1`, and that mean equals
+`1 - 1/(L^1)^2`, which is `m - C/(h * (L^d)^2)` exactly, so that bound is attained here while the
+finite-volume statement `m ≤ ⟨Ψ|O|Ψ⟩/L^d` is false. That the order bound `hXi` is tight too is what
+makes the attainment informative: `m = 1` is the largest value it admits on this data, so the
+conclusion is met with equality without any of those four inequalities being slack. The exact value
+is what pins the error term's denominator: the variant with `L^d` in place of `L^{2d}` also
+typechecks. -/
 example :
     (∀ L : ℕ, 1 ≤ L →
       rayleighOnVec (sharpnessHamiltonian L - ((1 : ℝ) : ℂ) • sharpnessOrderOperator L) ![0, 1]
@@ -279,8 +283,10 @@ example : liminf (fun h : ℝ => liminf (fun L : ℕ => min (h * L) 1) atTop) (�
   rw [liminf_congr hin, liminf_const]
 
 /-- The exchanged nesting `liminf_L (liminf_h …)` on the same family gives `0`: for fixed `L`,
-`min (h * L) 1 → 0` as `h ↓ 0`. This is Tasaki's own stated reason for the printed order
-(footnote 24: at finite `L`, the field-perturbed quantity tends to `0` as `h ↓ 0`). -/
+`min (h * L) 1 → 0` as `h ↓ 0`. This is Tasaki's own stated reason for the printed order, given in
+the body text just after eq. (3.4.22) on p. 70: at any finite `L` the field-perturbed quantity
+tends to `0` as `h ↓ 0` by continuity. Footnote 24 on the same page makes the different point that
+the printed limits should rigorously be `liminf`. -/
 example : liminf (fun L : ℕ => liminf (fun h : ℝ => min (h * L) 1) (𝓝[>] (0 : ℝ))) atTop = 0 := by
   have hin : ∀ L : ℕ, liminf (fun h : ℝ => min (h * L) 1) (𝓝[>] (0 : ℝ)) = 0 := by
     intro L

@@ -169,7 +169,7 @@ capstone non-vacuity witness at the same data as the `Ξ₊` capstone's, showing
 ## Theorem 3.2 (Kaplan–Horsch–von der Linden), eqs. (3.4.21)-(3.4.22)
 
 Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4, eq. (3.4.12)
-p. 67, eq. (3.4.16) p. 69, Theorem 3.2 with footnote 24 and eqs. (3.4.19)-(3.4.22), pp. 69-70.
+p. 67, eq. (3.4.16) p. 68, Theorem 3.2 with footnote 24 and eqs. (3.4.19)-(3.4.22), pp. 69-70.
 
 All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
 `Classical.choice`, `Quot.sound`.
@@ -191,16 +191,21 @@ per-volume statement takes abstractly. Feeding the halved eq. (3.4.12) energy bo
 `L^{-d}` comes from that bound and a second from dividing the order parameter by the volume.
 Eq. (3.4.22) is stated with `Filter.liminf` in both limits per footnote 24 (p. 70), and in the
 printed order: the inner limit over the volume index `L` along `atTop`, the outer limit over the
-field strength `h` along `𝓝[>] 0`. The order is not cosmetic — with the limits exchanged the
-statement is false, and a fixture in `LatticeSystem/Tests/KaplanHorschVonderLindenTheorem32.lean`
-exhibits the bounded family `min (h·L) 1` whose printed-order value is `1` and whose
-exchanged-order value is `0`.
+field strength `h` along `𝓝[>] 0`. The order is not cosmetic: a fixture in
+`LatticeSystem/Tests/KaplanHorschVonderLindenTheorem32.lean` evaluates both nestings on the bounded
+family `min (h·L) 1` and pins the printed-order value at `1` and the exchanged-order value at `0`.
+That family is not an instance of the capstone's data, so what is machine-checked there is the
+separation of the two nestings, not the falsity of the capstone with its limits exchanged.
 
 **What these declarations do not assert.** The `L`-indexed and `h`-indexed family is carried as
-abstract per-volume matrices whose hypotheses are the `Ξ₊` capstone's conjuncts together with
-eq. (3.4.20); a spin-`S` family whose vertex set grows with the volume is not built here. The
-limiting state the source discusses after Theorem 3.2 is not constructed. The uniform bound needs a
-carrier hypothesis `#Λ ≤ L^d` that eq. (3.4.12)'s bond-count hypothesis does not supply.
+abstract per-volume matrices; a spin-`S` family whose vertex set grows with the volume is not built
+here. The trial states reach the Theorem 3.2 capstone only through the eq. (3.4.16) order bound and
+the halved eq. (3.4.12) energy bound: of the `Ξ₊` capstone's four conjuncts only those two become
+hypotheses there, the normalisation and the lower energy conjunct do not. The perturbed states
+reach it through eq. (3.4.20), a lower bound on their Rayleigh energy, and the uniform order bound;
+the dimension enters through `1 ≤ d`. The limiting state the
+source discusses after Theorem 3.2 is not constructed. The uniform bound needs a carrier hypothesis
+`#Λ ≤ L^d` that eq. (3.4.12)'s bond-count hypothesis does not supply.
 
 ---
 

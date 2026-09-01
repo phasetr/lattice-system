@@ -16,8 +16,10 @@ We discharge exactly this finite-dimensional core (axiom-free).  Its trial-state
 is `tasaki_eq_3_4_16_lowLyingState_ssb` (`HorschVonderLindenLowLyingState.lean`), which supplies the
 normalisation `⟨Ξ₊|Ξ₊⟩ = 1`, the two-sided energy bound `0 ≤ ⟨Ξ₊|Ĥ|Ξ₊⟩ − E_GS ≤ (C/2) L^{-d}` and
 the order-parameter bound `⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q₀` (eq. (3.4.16)) at every volume `L ≥ 1`.  Composing
-the two and taking the double limit `L↑∞`, `h↓0` gives Theorem 3.2; that composition and the
-thermodynamic/infinite-volume input are not carried out here.
+the two and taking the double limit `L↑∞`, `h↓0` gives Theorem 3.2.  Not asserted here: that double
+limit is taken separately, in `Quantum/KaplanHorschVonderLindenTheorem32.lean`, which carries the
+`L`-indexed family abstractly and receives the eq. (3.4.16) and eq. (3.4.12) bounds as hypotheses;
+neither module builds a spin-`S` family whose vertex set grows with the volume.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §3.4, Theorem 3.2, eqs. (3.4.16)–(3.4.22), pp. 68–70.
