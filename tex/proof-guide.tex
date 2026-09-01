@@ -13666,22 +13666,25 @@ norm--expectation bridge --- the $O(L)$ numerator of the ground-state Falk--Bruc
 $2(\operatorname{Re}\langle\Phi,\hat O^2\Phi\rangle)^2\le12N^3\,L\cdot\operatorname{Re}\langle y,\hat O\Phi\rangle$,
 since the oscillator factor is $\le12N^3L$ and the susceptibility $\chi=\operatorname{Re}\langle y,\hat
 O\Phi\rangle=\operatorname{Re}\langle y,(\hat H-E_0)y\rangle\ge0$ is PSD.  This reduces Corollary 4.3 to the
-susceptibility bound $\chi\le C\,L$ (the reflection-positivity infrared bound): then $\langle\hat
-O^2\rangle\le\sqrt{6N^3C}\,L$, so $\langle(\hat O/L)^2\rangle\to0$.
+sub-cubic susceptibility bound $\chi=o(L^3)$: from $\chi\le\delta L^3$ one gets $\langle\hat
+O^2\rangle\le\sqrt{6N^3\delta}\,L^2$ for every margin $\delta>0$, so $\langle(\hat
+O/L)^2\rangle\to0$.  A fixed $\chi\le C\,L^3$ would only bound $\langle(\hat O/L)^2\rangle$, not
+send it to $0$; the margin has to be arbitrary.
 \texttt{HermitianGroundStateEigenvalue.lean} bridges the axiom hypothesis to this interface with
 \texttt{groundState\_mulVec\_eq\_hermitianMinEigenvalue}: for a Hermitian $H$ and a normalized
 eigenvector $\Phi$ ($H\Phi=E_0\Phi$) whose $E_0$ has minimal real part over all eigenpairs,
 $H\Phi=(\texttt{hermitianMinEigenvalue}\,H)\,\Phi$ ($E_0$ is real by Hermiticity, and $E_0.\mathrm{re}$ is
 squeezed between the variational lower bound and the minimizing eigenvector).  \texttt{NoLongRangeOrderConditional.lean}
 assembles the whole chain into the exact $\varepsilon$--$\delta$ statement of Corollary 4.3 \emph{modulo
-the susceptibility bound}, \texttt{no\_long\_range\_order\_1d\_of\_susceptibility}: if there is $C\ge0$
-such that every normalized ground state of an even zero-field ring ($L\ge 2$, $L$ even) has a potential $y$ for $\hat O\Phi$ with
-$\operatorname{Re}\langle y,\hat O\Phi\rangle\le C\,L$, then for every $\varepsilon>0$ there is $L_0$ beyond
+the sub-cubic susceptibility bound}, \texttt{no\_long\_range\_order\_1d\_of\_susceptibility}: if for
+every margin $\delta>0$ there is a threshold $L_0$ such that every normalized ground state of an even
+zero-field ring ($L_0\le L$, $L\ge2$, $L$ even) has a potential $y$ for $\hat O\Phi$ with
+$\operatorname{Re}\langle y,\hat O\Phi\rangle\le\delta\,L^3$, then for every $\varepsilon>0$ there is $L_0$ beyond
 which every normalized ground state has $|\langle\Phi,\hat O^2\Phi\rangle_{\mathrm{re}}/L^2|<\varepsilon$
-(combining the $O(L)$ oscillator bound, the susceptibility reduction, the ground-state bridge, and an
-Archimedean $\varepsilon$--$\delta$).  This isolates the unconditional Corollary 4.3 to the
-reflection-positivity infrared bound $\operatorname{Re}\langle y,\hat O\Phi\rangle\le C\,L$; the documented
-axiom \texttt{no\_long\_range\_order\_1d} remains until that bound is established.
+(combining the $O(L)$ oscillator bound, the susceptibility reduction, the ground-state bridge, and the
+margin $\delta=\varepsilon^2/(24N^3)$).  This isolates the unconditional Corollary 4.3 to the sub-cubic
+bound $\operatorname{Re}\langle y,\hat O\Phi\rangle\le\delta\,L^3$, which is supplied by the documented
+axiom \texttt{shastry\_staggered\_susceptibility\_subcubic}.
 
 \medskip\noindent\textbf{Susceptibility phase $\chi_1$: Free energy and ground-state energy limit}
 (Tasaki §4.1, (4.1.40)/(4.1.49), pp.~85--86; PR-$\chi_1$, Issue \#4777).  The
@@ -13807,8 +13810,11 @@ to force the $\lambda^2$-coefficient to be non-negative: $0 \le C(h) - \chi$, yi
 \[
 \chi = \operatorname{Re} \langle y, V \Phi \rangle \le C(h) = \tfrac{1}{2}\sum(f_x + f_{x+1})^2.
 \]
-Phrased in the $\texttt{hsusc}$ shape (hypothetical-susceptibility carrier from \texttt{no\_long\_range\_order\_1d\_of\_susceptibility})
-for general field $h$; staggered specialisation and the Green-function $\le C \cdot L$ bound belong to $\chi$3 (next stage).
+Phrased as a hypothetical-susceptibility carrier for general field $h$: the resolvent/susceptibility
+conjunct $(\hat H-E_0)y=V\Phi$ together with $\operatorname{Re}\langle y,V\Phi\rangle\le C(h)$.  The
+consumer \texttt{no\_long\_range\_order\_1d\_of\_susceptibility} takes a sub-cubic form of the same
+conjunct ($\le\delta\,L^3$ beyond a threshold, for every margin $\delta>0$), so turning the scalar
+$C(h)$ into such a bound is the staggered specialisation, which belongs to $\chi$3 (next stage).
 This is the second-order perturbation gate toward Theorem 4.2 long-range order, closing the susceptibility `free energy $\to$ ground state'
 inference ($\chi$1 $\to$ $\chi$2 $\to$ Theorem 4.2).
 
@@ -13821,8 +13827,8 @@ site vanishes in the thermodynamic limit,
 $\lim_{L\uparrow\infty}\langle\Phi_{\mathrm{GS}}|(\hat O_L^{(3)}/L)^2|\Phi_{\mathrm{GS}}\rangle=0$
 (eq.~(4.1.11)).  We record \texttt{no\_long\_range\_order\_1d} in explicit $\varepsilon$--$\delta$ form
 over the zero-field ring family with normalized ground states.  It is \emph{discharged} by feeding the
-documented Shastry susceptibility axiom \texttt{shastry\_staggered\_susceptibility\_bound}
-($\chi(k^\ast)\le C\cdot L$) into the conditional reduction
+documented Shastry susceptibility axiom \texttt{shastry\_staggered\_susceptibility\_subcubic}
+($\chi(k^\ast)=o(L^3)$) into the conditional reduction
 \texttt{no\_long\_range\_order\_1d\_of\_susceptibility} for $N\ge1$, the degenerate spin-$0$ case
 $N=0$ being unconditional (the staggered order operator vanishes).  Tasaki does \textbf{not} prove
 the susceptibility bound in the book: footnote~3 (p.~76) cites Shastry [58] with the rigorous

@@ -81,26 +81,38 @@ permalink: /limitations/documented-axioms/chapter-04/
 
 **Tasaki §4.1, Corollary 4.3** (eq. (4.1.11), p. 77, with footnotes 3 (p. 76)
 and 9 (p. 83)) rests on one **documented axiom**,
-`shastry_staggered_susceptibility_bound`
-(`LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean`, declaration line 64).
+`shastry_staggered_susceptibility_subcubic`
+(`LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean`, declaration line 96).
 
 - **Proved (axiom-free):** Corollary 4.3 itself, `no_long_range_order_1d`
-  (`NoLongRangeOrder1D.lean:109`), is a genuine **theorem**, obtained by
+  (`NoLongRangeOrder1D.lean:142`), is a genuine **theorem**, obtained by
   feeding this axiom as the single quantitative input into the conditional
   reduction `no_long_range_order_1d_of_susceptibility`
-  (`NoLongRangeOrderConditional.lean:37`); only the susceptibility estimate
+  (`NoLongRangeOrderConditional.lean:39`); only the susceptibility estimate
   below remains axiomatized.
 - **What the axiom statement literally asserts:** for the zero-field
   one-dimensional spin-`S` antiferromagnetic Heisenberg ring on an **even**
-  number `L ≥ 2` of sites, there is a size-uniform constant `C ≥ 0` such that
-  every normalized ground state `Φ` admits a potential `y` for `ÔΦ` (i.e.
-  `(Ĥ − E₀) y = ÔΦ`) with static staggered susceptibility `Re⟨y, ÔΦ⟩ ≤ C·L`
-  (physically `χ(k*) = L · f_L^{(-1)}(k*)` at the antiferromagnetic wavevector
-  `k* = π`). Restricted to even `L` because only bipartite rings have a
+  number `L ≥ 2` of sites, for every margin `δ > 0` there is a size threshold
+  `L₀` beyond which every normalized ground state `Φ` admits a potential `y`
+  for `ÔΦ` (i.e. `(Ĥ − E₀) y = ÔΦ`) with static staggered susceptibility
+  `Re⟨y, ÔΦ⟩ ≤ δ·L³` (physically `χ(k*) = L · f_L^{(-1)}(k*)` at the
+  antiferromagnetic wavevector `k* = π`); that is, `χ(k*) = o(L³)`.
+  Restricted to even `L` because only bipartite rings have a
   balanced staggered sublattice (`Σ_x ε_x = 0`), which is what makes the
   ground state an SU(2)-singlet with `⟨Φ, ÔΦ⟩ = 0` and hence `ÔΦ` orthogonal
   to the ground space, so the resolvent potential `y` genuinely exists; odd
   rings lie outside Tasaki's §4.1 setting.
+- **Why the `∃ L₀` threshold is part of the statement:** a bare `∀ L` would be
+  false at `N = 1`, `L = 2`, where the two-site ring is the dimer
+  `Ĥ = 2 Ŝ₀·Ŝ₁` with `χ = 1/2` against `δ·2³ = 8δ`, so every `δ < 1/16`
+  refutes it. That is a hand computation, not a Lean witness; mechanising it
+  would need a two-site spectral result this repository does not have.
+- **Why `o(L³)` and nothing stronger:** the only route from `χ` to Corollary
+  4.3 available here is `staggeredOrder_sq_le_susceptibility`, `s² ≤ 6N³Lχ`
+  with `s = ⟨Φ, Ô²Φ⟩.re`; a fixed `χ ≤ C·L³` leaves `s/L²` bounded rather than
+  vanishing. `o(L³)` follows both from a gapped chain and from the `χ ≍ L²`
+  growth small-ring exact diagonalisation indicates (numerics, no Lean
+  witness), so the statement stays neutral on the open Haldane-gap question.
 - **Axiom reason (documented):** Tasaki's footnote 9 (§4.1, p. 83) singles out
   exactly this bound on `f_L^{(-1)}(k*)` as "the only nontrivial part that
   requires some hard analysis," deferring it to Shastry's original bound

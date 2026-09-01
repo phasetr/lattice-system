@@ -2,13 +2,13 @@
   "records": [
     {
       "axiom_dependencies": [
-        "LatticeSystem.Quantum.shastry_staggered_susceptibility_bound"
+        "LatticeSystem.Quantum.shastry_staggered_susceptibility_subcubic"
       ],
       "capstone": false,
       "declaration_kind": "axiom",
       "id": "shastry-1992-staggered-susceptibility-bound",
       "implementation_state": "implemented",
-      "lean_name": "LatticeSystem.Quantum.shastry_staggered_susceptibility_bound",
+      "lean_name": "LatticeSystem.Quantum.shastry_staggered_susceptibility_subcubic",
       "module": "LatticeSystem.Quantum.SpinS.NoLongRangeOrder1D",
       "origin": "literature",
       "proof_guide_anchor": null,
@@ -28,7 +28,7 @@
           "source_item_id": "tanaka-takeda-idogaki-2004-no-ssb"
         }
       ],
-      "summary": "The static staggered susceptibility of normalized ground states on even one-dimensional antiferromagnetic Heisenberg rings is bounded by a size-uniform constant times the ring length.",
+      "summary": "For every positive margin there is a ring-size threshold beyond which the static staggered susceptibility of every normalized ground state on an even one-dimensional antiferromagnetic Heisenberg ring is at most that margin times the cube of the ring length.",
       "topic_ids": [
         "quantum-spin",
         "symmetry-breaking"
