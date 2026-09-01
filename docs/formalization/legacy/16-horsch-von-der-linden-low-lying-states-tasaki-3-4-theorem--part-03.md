@@ -51,7 +51,9 @@ certifies a concrete model — in particular neither that the quantum Ising mode
 nor that the antiferromagnetic Heisenberg model fails it, the contrast Tasaki draws on p. 69. The
 informal notion of a physical "ground state" of p. 69 is not formalised; the book defers its
 precise formulation to §4.3. Eq. (3.4.16) `⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q₀` and the Schwarz remark
-(3.4.17) are recorded below under "The low-lying state `Ξ₊`, eqs. (3.4.16)-(3.4.17)"; the mirror
+(3.4.17) are recorded in
+[part 4](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-04/)
+under "The low-lying state `Ξ₊`, eqs. (3.4.16)-(3.4.17)"; the mirror
 state `Ξ₋` is outside this development. The `L ↑ ∞` statement is a limit of
 finite-volume real numbers, not a statement about a state on a quasi-local C\*-algebra.
 
@@ -165,8 +167,12 @@ distribution is `Math/CommutatorSum.lean`, shared with the §4.1 staggered-order
 anywhere: the first inequality of (3.4.11) is taken on the real part of the expectation, so no
 reality obligation arises. The long-range order condition (3.4.3) and the no-SSB condition
 (3.4.4) are unused here. Only (3.4.3) is consumed at (3.4.12); (3.4.4) is not used in that
-derivation either, and the only declarations that take it as a named hypothesis are the odd-moment
-hypotheses of `Quantum/HorschVonderLindenProblem34b.lean`. No lattice structure is imposed:
+derivation either. `Quantum/HorschVonderLindenProblem34b.lean` takes it as a named hypothesis in
+its first- and third-odd-moment forms; on
+[part 4](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-04/),
+`hvlPlusState_energy_eq` takes its first-moment form, and `hvlPlusState_order_mean_ge_sqrt`
+together with the capstone `tasaki_eq_3_4_16_lowLyingState_ssb` take its third-moment form.
+No lattice structure is imposed:
 `|B_L| = d L^d` enters only as the numeric hypothesis `|B| ≤ d L^d`, and neither `1 ≤ d` nor
 `1 ≤ L` is required.
 

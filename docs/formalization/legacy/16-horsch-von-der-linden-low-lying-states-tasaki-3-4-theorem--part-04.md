@@ -16,7 +16,6 @@ This section is maintained by hand, lies outside the migrated catalogue block, a
 declarations added after the migration baseline; it is not subject to the frozen byte-for-byte
 parity of the migrated block.
 
-
 Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4, "Setting and
 assumptions" and eq. (3.4.3) p. 65, eq. (3.4.12) p. 67, eqs. (3.4.14)-(3.4.16) p. 68, the Schwarz
 remark eq. (3.4.17) p. 69.
