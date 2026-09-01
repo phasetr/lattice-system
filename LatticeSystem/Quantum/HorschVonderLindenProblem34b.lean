@@ -35,8 +35,9 @@ required.  Assumption (3.4.4) is used in the form of complex equalities
 `⟨Φ_GS|(Ô_L)^k|Φ_GS⟩ = 0` for `k = 1, 3`, which for Hermitian `Ô_L` is equivalent to the vanishing
 of the (automatically real) odd moments.
 
-Out of scope here: eq. (3.4.16) `⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q₀`, the Schwarz remark (3.4.17), and the
-mirror state `Ξ₋`.
+Eq. (3.4.16) `⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q₀` and the Schwarz remark (3.4.17) are in
+`HorschVonderLindenLowLyingState.lean`, which reads eq. (3.4.15) below against the long-range-order
+assumption (3.4.3).  The mirror state `Ξ₋` of pp. 68-69 is not formalised.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §3.4, Problem 3.4.b, statement p. 69 eq. (3.4.18), solution p. 501 eqs. (S.42)–(S.43),
@@ -66,8 +67,10 @@ private theorem even_moment_ofReal {n : Type*} [Fintype n] [DecidableEq n]
 
 /-- Expansion of a sandwiched form on a scaled sum: `⟨c(u+v), A c(u+v)⟩` is `conj c · c` times the
 sum of the four pairings.  All four are kept, since which of them survive depends on the
-sandwiched `A`: for `Ξ₊` the cross terms vanish in the normalisation but carry all of (3.4.15). -/
-private theorem smul_add_dotProduct_mulVec {n : Type*} [Fintype n] (c : ℂ)
+sandwiched `A`: for `Ξ₊` the cross terms vanish in the normalisation but carry all of (3.4.15).
+Against the Hamiltonian both cross terms vanish instead, which is the identity behind the
+low-lying energy bound of `HorschVonderLindenLowLyingState.lean`. -/
+theorem smul_add_dotProduct_mulVec {n : Type*} [Fintype n] (c : ℂ)
     (A : Matrix n n ℂ) (u v : n → ℂ) :
     star (c • (u + v)) ⬝ᵥ (A *ᵥ (c • (u + v)))
       = (star c * c) * (star u ⬝ᵥ (A *ᵥ u) + star u ⬝ᵥ (A *ᵥ v) + star v ⬝ᵥ (A *ᵥ u)
