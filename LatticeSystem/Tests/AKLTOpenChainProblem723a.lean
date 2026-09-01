@@ -30,7 +30,7 @@ open scoped ComplexOrder
 /-! ## 1. Signature specification: `openBondCoupling` -/
 
 /-- `openBondCoupling` must have exactly the directed unit-weight signature used by
-`ringCoupling` (`ShastryNoSSB.lean:41`), generalized to the open (non-modular) successor: no
+`ringCoupling` (`ShastryNoSSB.lean:42`), generalized to the open (non-modular) successor: no
 `[NeZero L]` instance, plain `Fin L → Fin L → ℂ`. -/
 example (L : ℕ) (x y : Fin L) : ℂ := openBondCoupling L x y
 

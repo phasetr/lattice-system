@@ -133,9 +133,11 @@ documented axiom in `Quantum/SpinS/ShastryNoSSB.lean`. That is no longer current
 The declaration is now a `theorem` in `Quantum/SpinS/ShastryNoSSBReduction.lean`, with its
 statement unchanged, obtained by applying the conditional capstone
 `shastry_no_symmetry_breaking_1d_of_energy_gain` to the documented axiom `shastryEnergyGain` in
-that same file; `ShastryNoSSB.lean` now carries only the model (`ringCoupling`,
-`ringStaggeredSublattice`, `staggeredFieldChainHamiltonianS`, `ringCoupling_self_star`,
-`staggeredFieldChainHamiltonianS_isHermitian`). The mathematical content is not discharged:
+that same file; `ShastryNoSSB.lean` now carries only the model, in four declarations
+(`ringCoupling`, `ringCoupling_self_star`, `ringStaggeredSublattice`,
+`staggeredFieldChainHamiltonianS`), with `staggeredFieldChainHamiltonianS_isHermitian` stated in
+`ShastryNoSSBReduction.lean` as the ring instance of the generic `fieldOpS_isHermitian`. The
+mathematical content is not discharged:
 `shastryEnergyGain` is equivalent in strength to an `L`-uniform form of Theorem 4.2, so
 `#print axioms shastry_no_symmetry_breaking_1d` reports
 `[propext, Classical.choice, Quot.sound, shastryEnergyGain]`. The variational layer it rests on

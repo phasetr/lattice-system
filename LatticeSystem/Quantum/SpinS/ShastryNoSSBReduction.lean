@@ -38,11 +38,27 @@ namespace LatticeSystem.Quantum
 
 open Matrix
 
+/-- **The staggered-field chain Hamiltonian is Hermitian** (eq. (4.1.9), p. 76): the ring instance
+of the generic `fieldOpS_isHermitian`, applied to the Hermitian ring Heisenberg Hamiltonian
+(`heisenbergHamiltonianS_isHermitian_of_real` at the real `0`/`1` coupling `ringCoupling_self_star`)
+and the Hermitian staggered order operator (`staggeredOrderOpS_isHermitian`).  It lives here rather
+than beside the model in `ShastryNoSSB.lean` so that the fact is proved once, in its general form,
+and not a second time at the ring.  No parity or positivity restriction on `L` is used: it holds
+verbatim at `L = 0` (one-dimensional Hilbert space, both summands empty) and at `L = 1` (where
+`ringCoupling 1` degenerates to the self-loop `J 0 0 = 1`).
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §4.1, eq. (4.1.9), p. 76. -/
+theorem staggeredFieldChainHamiltonianS_isHermitian (L : ℕ) (h : ℝ) (N : ℕ) :
+    (staggeredFieldChainHamiltonianS L h N).IsHermitian :=
+  fieldOpS_isHermitian (heisenbergHamiltonianS_isHermitian_of_real (ringCoupling_self_star L) N)
+    (staggeredOrderOpS_isHermitian (ringStaggeredSublattice L) N) h
+
 /-- **The many-body spin reversal fixes the Heisenberg Hamiltonian**: `Θ Ĥ_J Θ = Ĥ_J` for every
 coupling `J` (Tasaki's `Ĥ` of eq. (3.4.19), p. 69, at the ring coupling of eq. (4.1.9), p. 76).
-Immediate from the anisotropic case at `λ = 1`, `D = 0`.  Private: it is used only twice, in
-`staggeredFieldChainHamiltonianS_conj_manyBodyReversalS` and in the capstone below, and is a
-one-line specialisation of `manyBodyReversalS_conj_anisotropicHeisenbergS`.
+Immediate from the anisotropic case at `λ = 1`, `D = 0`.  Private: its only use is in
+`staggeredFieldChainHamiltonianS_conj_manyBodyReversalS` below, and it is a one-line specialisation
+of `manyBodyReversalS_conj_anisotropicHeisenbergS`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §3.4, eq. (3.4.19), p. 69; §4.1, eq. (4.1.9), p. 76. -/
@@ -86,32 +102,49 @@ is therefore a **conditional reduction of Theorem 4.2, not a discharge of its ma
 content**; what it removes is the eigenvector quantifiers, the ground-state degeneracy and the
 inner thermodynamic limit, leaving a single inequality between real numbers.
 
-**Why the exponent on `η` is `1` and not `2`.**  The physical zero-temperature response of the
-one-dimensional antiferromagnetic chain to a staggered field is `E_L(0) − E_L(η) ≍ L · η^{4/3}`
-(up to logarithmic corrections) for half-integer spin, and `≍ L · η²` only in the gapped
-integer-spin case.  Since `4/3 < 2`, an `η²` bound is **false** for the half-integer chains the
-statement quantifies over, while `η^{4/3} = o(η)` makes the linear form `ε · η · L` true for every
-`ε` once `η` is small.  The linear shape is thus the weakest form that is both true and strong
-enough to drive the reduction.
+**Why the exponent on `η` is `1` and not `2`.**  The linear form is the *weaker* of the two, and it
+is the whole of what the reduction consumes: a bound `E_L(0) − E_L(2η) ≤ C · η² · L` with `C > 0`
+implies this axiom outright (take `η₀ = ε / C`, `L₀ = 0`), so replacing `ε · η · L` by an `η²` shape
+would assume strictly more without buying anything.  It would in addition assume a *quadratic*
+zero-temperature response to the staggered field.  That is the behaviour expected of the gapped
+integer-spin chains only; the half-integer chains — `N` is a parameter of this axiom, so odd `N` is
+among the instances asserted — are gapless and are expected to respond as `L · η^{4/3}` up to
+logarithmic corrections, which, `4/3` being below `2`, would falsify the `η²` shape there.  That
+expected scaling is a statement of the physics literature: it is **not** formalised anywhere in this
+development, is not derived from anything cited here, and is recorded only as the reason for not
+strengthening the exponent.  Nothing below depends on it.
 
 **Why the `∃ L₀` is present, and required.**  With `∀ L` in place of `∃ L₀, ∀ L ≥ L₀` the statement
-is *false*, so writing it that way would make `False` derivable.  Two explicit failures, both
-inside the range such a `∀ L` would quantify over:
+is *false for every `N ≥ 1`*, so writing it that way would make `False` derivable at each such `N`.
+It is not false at `N = 0`: there `Ŝ^{(3)} = 0`, every gain is `0`, and the `∀ L` form holds.  Two
+explicit failures at `N ≥ 1`, both inside the range such a `∀ L` would quantify over:
 * `L = 1`.  Here `ringCoupling 1` is the self-loop `J 0 0 = 1`, so `Ĥ_0 = Ŝ_0 · Ŝ_0 = S(S+1)·1` is a
   multiple of the identity and `Ô_1^{(3)} = Ŝ_0^{(3)}` has largest eigenvalue `S = N/2`.  Hence
-  `E_1(0) − E_1(2η) = 2η·S = η·N` exactly, which exceeds `ε · η · 1` for every `ε < N`.
+  `E_1(0) − E_1(2η) = 2η·S = η·N` exactly, which exceeds `ε · η · 1` exactly when `ε < N`; since `ε`
+  ranges over all positive reals, such an `ε` exists precisely when `N ≥ 1`.
 * `L = 3`, `N = 1` (the frustrated spin-`½` triangle).  `Ĥ_0 = Ŝ_0·Ŝ_1 + Ŝ_1·Ŝ_2 + Ŝ_2·Ŝ_0` has a
   four-fold degenerate `S_tot = ½` ground space, on which the staggered operator
   `Ô_3^{(3)} = Ŝ_0^{(3)} − Ŝ_1^{(3)} + Ŝ_2^{(3)}` attains the value `5/6`; the corresponding
   ground-space vector is a variational trial state for `Ĥ_{2η}`, giving
   `E_3(0) − E_3(2η) ≥ 2η·(5/6) = (5/3)·η` for every `η > 0`, which exceeds `ε · η · 3` for every
   `ε < 5/9`.
-Both failures are `O(1)` boundary/frustration effects that the factor `L` on the right-hand side
-absorbs once `L` is large, which is exactly what the `∃ L₀` records — and it is all the capstone
-needs, since Theorem 4.2's own conclusion is likewise only asserted beyond a size threshold.  The
-`∃ L₀` sits *inside* `∀ η` because the correction is `O(1/L)` relative to the `ε·η` budget, so the
-threshold must be allowed to grow as `η ↓ 0`; the resulting quantifier nest `ε → η₀ → η → L₀ → L`
-is the same one Theorem 4.2 itself uses.
+Both are hand computations from the definitions above; **neither is witnessed in Lean**, and the
+`∃ L₀` is stated so that neither has to be.  Both are `O(1)` boundary/frustration effects that the
+factor `L` on the right-hand side absorbs once `L` is large, which is exactly what the `∃ L₀`
+records — and it is all the capstone needs, since Theorem 4.2's own conclusion is likewise only
+asserted beyond a size threshold.  The `∃ L₀` sits *inside* `∀ η` because the correction is `O(1/L)`
+relative to the `ε·η` budget, so the threshold must be allowed to grow as `η ↓ 0`; the resulting
+quantifier nest `ε → η₀ → η → L₀ → L` is the same one Theorem 4.2 itself uses.
+
+**Odd `L` is asserted too, and the wrap-around defect does not exempt it.**  On an odd ring the
+staggered pattern `ε_x = (−1)^x` has a sign defect: sites `L − 1` and `0` are both `+1` and
+adjacent, so no perfect alternation exists.  That defect is again an `O(1)` effect of the kind the
+factor `L` absorbs.  The odd ring differs from the open chain on the same `L` sites — where
+`(−1)^x` does alternate without defect — only by the single wrap bond `Ŝ_{L−1} · Ŝ_0`, whose
+operator norm is at most `3S²`, independently of `L` and of `η`; and a minimum eigenvalue is
+`1`-Lipschitz in the operator norm, so the two energy gains differ by at most `6S²`, a constant that
+`ε · η · L` dominates once `L` is large.  Odd rings therefore stand or fall with the open chain,
+which is the object the cited argument is about.
 
 Two boundary cases are *not* excluded and hold outright.  At `N = 0` every site carries a single
 spin state, `Ŝ^{(3)} = 0`, so `Ô_L^{(3)} = 0` and `Ĥ_c = Ĥ_0` for all `c`: the gain is `0`.  At
@@ -138,8 +171,8 @@ Proof.  Fix `ε > 0` and run `hgain` at `ε/2`, taking `h₀ := η₀`.  For `0 
 supplies (enlarged to at least `1`, so that division by `L` is legitimate).  For a normalized ground
 state `Φ` of `Ĥ_h`, `groundState_mulVec_eq_hermitianMinEigenvalue` identifies its eigenvalue with
 `E_L(h)`, and `chainGroundState_order_mean_sandwich` — fed the reversal symmetry
-`staggeredFieldChainHamiltonianS_conj_manyBodyReversalS` in the split form
-`Θ Ĥ Θ = Ĥ`, `Θ Ô Θ = −Ô` — gives
+`staggeredFieldChainHamiltonianS_conj_manyBodyReversalS` in the split form `Θ Ĥ Θ = Ĥ`,
+`Θ Ô Θ = −Ô`, recovered from it by reading it at `h = 0` and at `h = 1` — gives
 `0 ≤ E_L(0) − E_L(h) ≤ h⟨Ô_L^{(3)}⟩ ≤ E_L(0) − E_L(2h)`.  The left half forces `⟨Ô_L^{(3)}⟩ ≥ 0`;
 the right half together with `hgain` gives `h⟨Ô_L^{(3)}⟩ ≤ (ε/2)·h·L`, so
 `0 ≤ ⟨Ô_L^{(3)}⟩/L ≤ ε/2 < ε`.
@@ -182,10 +215,19 @@ theorem shastry_no_symmetry_breaking_1d_of_energy_gain (N : ℕ)
     rw [hbridge h]
     exact groundState_mulVec_eq_hermitianMinEigenvalue
       (staggeredFieldChainHamiltonianS_isHermitian L h N) hΦnorm heig hmin
+  have hΘH : manyBodyReversalS (Fin L) N * heisenbergHamiltonianS (ringCoupling L) N *
+      manyBodyReversalS (Fin L) N = heisenbergHamiltonianS (ringCoupling L) N := by
+    have h0 := staggeredFieldChainHamiltonianS_conj_manyBodyReversalS L 0 N
+    simpa only [staggeredFieldChainHamiltonianS, neg_zero, Complex.ofReal_zero, zero_smul,
+      sub_zero] using h0
+  have hΘO : manyBodyReversalS (Fin L) N * staggeredOrderOpS (ringStaggeredSublattice L) N *
+      manyBodyReversalS (Fin L) N = -staggeredOrderOpS (ringStaggeredSublattice L) N := by
+    have h1 := staggeredFieldChainHamiltonianS_conj_manyBodyReversalS L 1 N
+    simp only [staggeredFieldChainHamiltonianS, mul_sub, sub_mul, hΘH, Complex.ofReal_one,
+      Complex.ofReal_neg, neg_smul, one_smul] at h1
+    exact sub_right_inj.mp h1
   obtain ⟨hs1, _hs2, hs3⟩ := chainGroundState_order_mean_sandwich hHring hOring
-    (manyBodyReversalS_mul_self (Fin L) N)
-    (manyBodyReversalS_conj_heisenbergHamiltonianS (ringCoupling L) N)
-    (manyBodyReversalS_conj_staggeredOrderOpS (ringStaggeredSublattice L)) h hh0.le hΦnorm hΦE
+    (manyBodyReversalS_mul_self (Fin L) N) hΘH hΘO h hh0.le hΦnorm hΦE
   have hgainL := hL₀ L (le_trans (le_max_left _ _) hL)
   rw [← hbridge 0, ← hbridge (2 * h)] at hgainL
   set eO := (star Φ ⬝ᵥ (staggeredOrderOpS (ringStaggeredSublattice L) N).mulVec Φ).re with heOdef

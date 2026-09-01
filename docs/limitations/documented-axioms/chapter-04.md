@@ -14,7 +14,7 @@ permalink: /limitations/documented-axioms/chapter-04/
 
 **Tasaki §4.1, Theorem 4.2** (eqs. (4.1.9)-(4.1.10), pp. 76-77) rests on one
 **documented axiom**, `shastryEnergyGain`
-(`LatticeSystem/Quantum/SpinS/ShastryNoSSBReduction.lean`, declaration line 125).
+(`LatticeSystem/Quantum/SpinS/ShastryNoSSBReduction.lean`, declaration line 158).
 
 - **Proved (axiom-free):** the whole reduction chain that consumes it. For
   Tasaki's field family `Ĥ_h = Ĥ − h Ô_L` (eq. (3.4.19), p. 69) the abstract
@@ -25,8 +25,8 @@ permalink: /limitations/documented-axioms/chapter-04/
   — all in `ReversalSymmetricGroundEnergy.lean`. The ring instance adds
   `staggeredFieldChainHamiltonianS_isHermitian` and `Θ Ĥ_h Θ = Ĥ_{−h}`
   (`staggeredFieldChainHamiltonianS_conj_manyBodyReversalS`). Feeding the axiom
-  into `shastry_no_symmetry_breaking_1d_of_energy_gain` (same file, line 149) makes
-  `shastry_no_symmetry_breaking_1d` (line 222) a `theorem`, statement unchanged.
+  into `shastry_no_symmetry_breaking_1d_of_energy_gain` (same file, line 182) makes
+  `shastry_no_symmetry_breaking_1d` (line 264) a `theorem`, statement unchanged.
 - **This records where the axiom now sits; it is not a discharge and not a policy
   change.** `#print axioms shastry_no_symmetry_breaking_1d` names
   `shastryEnergyGain`, which is **equivalent in strength to an `L`-uniform form of
@@ -38,18 +38,18 @@ permalink: /limitations/documented-axioms/chapter-04/
   `E_L(c) = hermitianMinEigenvalue (Ĥ_c)` for the minimum eigenvalue of
   `staggeredFieldChainHamiltonianS L c N` (eq. (4.1.9)): for every `ε > 0` there is
   `η₀ > 0` such that for each `0 < η < η₀` there is a size threshold `L₀` beyond
-  which `E_L(0) − E_L(2η) ≤ ε · η · L`. The shape is linear in `η` because the
-  physical response is `≍ L·η^{4/3}` (half-integer spin) or `≍ L·η²` (gapped integer
-  spin), so an `η²` form would be false for half-integer spin.
+  which `E_L(0) − E_L(2η) ≤ ε · η · L`. The linear shape is the weakest the reduction
+  needs (a `C·η²·L` bound would imply it); the expected `≍ L·η^{4/3}` response of the
+  gapless half-integer chains, not formalised here, is why it is not strengthened.
 - **Why the `∃ L₀` is part of the statement:** a bare `∀ L` would be false at small
-  rings, hence over-quantified. At `L = 1` the coupling degenerates to the self-loop
-  `J 0 0 = 1` and `E_1(0) − E_1(2η) = η·N` exactly, exceeding `ε·η·1` for every
-  `ε < N`; at `L = 3`, `N = 1` the frustrated triangle gives
-  `E_3(0) − E_3(2η) ≥ (5/3)·η`, exceeding `ε·η·3` for every `ε < 5/9`. Both are
-  `O(1)` effects the factor `L` absorbs once `L` is large, and Theorem 4.2's own
-  conclusion is likewise asserted only beyond a size threshold. `N = 0` and `L = 0`
-  are *not* excluded and hold outright; the declaration's doc comment has the full
-  case-by-case derivation.
+  rings for every `N ≥ 1` (at `N = 0` it is true), hence over-quantified. At `L = 1`
+  the coupling degenerates to the self-loop `J 0 0 = 1` and `E_1(0) − E_1(2η) = η·N`
+  exactly, exceeding `ε·η·1` for every `ε < N`; at `L = 3`, `N = 1` the frustrated
+  triangle gives `E_3(0) − E_3(2η) ≥ (5/3)·η`, exceeding `ε·η·3` for every `ε < 5/9`.
+  Both are hand computations, not Lean witnesses, and both are `O(1)` effects the
+  factor `L` absorbs once `L` is large — as is the wrap-around sign defect of odd
+  rings. `N = 0` and `L = 0` are *not* excluded and hold outright; the declaration's
+  doc comment has the full case-by-case derivation.
 - **Axiom reason (documented):** Tasaki §4.1 footnote 3 (p. 76) reports
   Shastry's original argument (B. S. Shastry, *J. Phys. A* **25**, L249,
   1992) and its rigorous formulation in Tanaka–Takeda–Idogaki (*J. Magn.

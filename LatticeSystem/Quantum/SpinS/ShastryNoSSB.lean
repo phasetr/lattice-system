@@ -16,11 +16,15 @@ designed to enhance the staggered moment.
 Tasaki does **not** prove Theorem 4.2 (footnote 3, p. 76: the original argument of Shastry [58] is
 not stated as a mathematical theorem; a rigorous formulation is in [63]).
 
-This file carries only the *model*: the ring nearest-neighbor coupling, the staggered-field chain
-Hamiltonian of eq. (4.1.9), and its Hermiticity.  Theorem 4.2 itself, the variational reduction of
-it to a scalar energy-gain condition, and the documented axiom carrying that condition, live in
-`ShastryNoSSBReduction.lean`, which needs the minimum-eigenvalue machinery this file deliberately
-does not import.
+This file carries only the *model*, in four declarations: the ring nearest-neighbor coupling
+`ringCoupling`, its reality `ringCoupling_self_star`, the staggered sublattice sign
+`ringStaggeredSublattice`, and the staggered-field chain Hamiltonian
+`staggeredFieldChainHamiltonianS` of eq. (4.1.9).  Its Hermiticity
+`staggeredFieldChainHamiltonianS_isHermitian` — the ring instance of the generic
+`fieldOpS_isHermitian`, not a second proof of it — together with Theorem 4.2 itself, the variational
+reduction of it to a scalar energy-gain condition, and the documented axiom carrying that condition,
+live in `ShastryNoSSBReduction.lean`, which needs the minimum-eigenvalue machinery this file
+deliberately does not import.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §4.1, Theorem 4.2, eqs. (4.1.9)–(4.1.10), pp. 76–77 (Shastry [58]; cf. [63]).
@@ -56,24 +60,5 @@ noncomputable def staggeredFieldChainHamiltonianS (L : ℕ) (h : ℝ) (N : ℕ) 
     ManyBodyOpS (Fin L) N :=
   heisenbergHamiltonianS (ringCoupling L) N
     - (h : ℂ) • staggeredOrderOpS (ringStaggeredSublattice L) N
-
-/-- **The staggered-field chain Hamiltonian is Hermitian** (eq. (4.1.9), p. 76).  `Ĥ_h` is the
-difference of the Hermitian ring Heisenberg Hamiltonian
-(`heisenbergHamiltonianS_isHermitian_of_real` at the real `0`/`1` coupling `ringCoupling_self_star`)
-and the real scalar multiple `h · Ô_L^{(3)}` of the Hermitian staggered order operator
-(`staggeredOrderOpS_isHermitian`), hence Hermitian for every ring size `L`, every real field `h` and
-every spin `N`.  No parity or positivity restriction on `L` is used: the statement holds verbatim at
-`L = 0` (one-dimensional Hilbert space, both summands empty) and at `L = 1` (where `ringCoupling 1`
-degenerates to the self-loop `J 0 0 = 1`).
-
-Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §4.1, eq. (4.1.9), p. 76. -/
-theorem staggeredFieldChainHamiltonianS_isHermitian (L : ℕ) (h : ℝ) (N : ℕ) :
-    (staggeredFieldChainHamiltonianS L h N).IsHermitian := by
-  unfold staggeredFieldChainHamiltonianS
-  refine (heisenbergHamiltonianS_isHermitian_of_real (ringCoupling_self_star L) N).sub
-    ((staggeredOrderOpS_isHermitian (ringStaggeredSublattice L) N).smul ?_)
-  rw [isSelfAdjoint_iff]
-  exact Complex.conj_ofReal h
 
 end LatticeSystem.Quantum

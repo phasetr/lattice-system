@@ -13,18 +13,19 @@ eqs. (4.1.9)–(4.1.10), pp. 76–77) to a single scalar energy-gain condition:
 5. the conditional capstone `shastry_no_symmetry_breaking_1d_of_energy_gain` and the documented
    axiom `shastryEnergyGain` that carries the energy-gain hypothesis it consumes.
 
-Items 2–4 are typed at the abstract `ManyBodyOpS Λ N` level of Tasaki's symmetry-breaking field
+Items 2b–4 are typed at the abstract `ManyBodyOpS Λ N` level of Tasaki's symmetry-breaking field
 family `Ĥ_h = Ĥ − h Ô_L` (eq. (3.4.19), p. 69): an arbitrary Hermitian `H`, Hermitian `O`, and a
-reversal `Θ` with `Θ Θ = 1`, `Θ H Θ = H`, `Θ O Θ = −O`.  The ring specialisation appears only in
-item 1 and in the capstone.
+reversal `Θ` with `Θ Θ = 1`, `Θ H Θ = H`, `Θ O Θ = −O`.  The ring specialisation appears in items 1
+and 2a, and in the capstone.
 
 **The energy-gain hypothesis carries an `∃ L₀` that an earlier draft of these fixtures omitted.**
-Without it the statement is false, so a `∀ L` form would make `False` derivable; the two explicit
-counterexamples (`L = 1` and the frustrated `L = 3`, `N = 1` triangle) are recorded in the doc
-comment of `shastryEnergyGain` and are the reason the fixtures below instantiate the hypothesis at
-`L`s taken beyond its own threshold rather than at literal small `L`.  The two small-`L` fixtures
-here therefore test what *does* hold at `L = 0` and `L = 1` — that the Hermiticity statement of
-item 1 elaborates and applies there at all.
+Without it the statement is false for every `N ≥ 1` (at `N = 0` it is true, every gain being `0`),
+so a `∀ L` form would make `False` derivable at each such `N`; the two hand-computed
+counterexamples (`L = 1` for any `N ≥ 1`, and the frustrated `L = 3`, `N = 1` triangle) are recorded
+in the doc comment of `shastryEnergyGain`, are not witnessed in Lean, and are the reason the
+fixtures below instantiate the hypothesis at `L`s taken beyond its own threshold rather than at
+literal small `L`.  The two small-`L` fixtures here therefore test what *does* hold at `L = 0` and
+`L = 1` — that the Hermiticity statement of item 1 elaborates and applies there at all.
 -/
 
 namespace LatticeSystem.Tests.ShastryEnergyGainReduction
@@ -53,9 +54,9 @@ example (h : ℝ) (N : ℕ) :
 
 /-- **Boundary fixture (`L = 1`).** `ringCoupling 1` has `J 0 0 = 1`, a self-loop (the unique site
 is its own cyclic successor), so `Ĥ_0` is a multiple of the identity; Hermiticity must still hold.
-This is exactly the ring at which the *energy-gain* bound fails — `E_1(0) − E_1(2η) = η·N` there,
-which no `ε·η·1` can dominate — so the fixture pins the item-1 statement rather than the
-hypothesis. -/
+This is exactly the ring at which the *energy-gain* bound fails once `N ≥ 1` —
+`E_1(0) − E_1(2η) = η·N` there, which no `ε·η·1` with `ε < N` can dominate — so the fixture pins the
+item-1 statement rather than the hypothesis. -/
 example (h : ℝ) (N : ℕ) :
     (staggeredFieldChainHamiltonianS 1 h N).IsHermitian :=
   staggeredFieldChainHamiltonianS_isHermitian 1 h N
@@ -134,10 +135,10 @@ example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] [Nonempty (Λ → Fin (N + 1)
 /-! ## Signature pin 5a — the documented axiom `shastryEnergyGain` -/
 
 /-- **Signature pin.** The energy-gain hypothesis, quantified in `ε`, `η`, `L` and stated in the
-`≤ ε · η · L` form (linear in `η`; the physical rate is `η^(4/3)`, so a linear bound is the correct,
-non-degenerate exponent choice — see the exponent fixture below for why `η²` would be a genuinely
-different, unsound statement).  The `∃ L₀ : ℕ, ∀ L, L₀ ≤ L →` nest is part of the statement and not
-an artefact: see the module header. -/
+`≤ ε · η · L` form (linear in `η`, which is the weakest shape the reduction needs — see the exponent
+fixture below for why `η²` would be a genuinely different, strictly stronger statement).  The
+`∃ L₀ : ℕ, ∀ L, L₀ ≤ L →` nest is part of the statement and not an artefact: see the module
+header. -/
 example (N : ℕ) :
     ∀ ε : ℝ, 0 < ε → ∃ η₀ : ℝ, 0 < η₀ ∧
       ∀ η : ℝ, 0 < η → η < η₀ → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L →
@@ -166,8 +167,9 @@ example : ∀ ε : ℝ, 0 < ε → ∃ η₀ : ℝ, 0 < η₀ ∧
 cycle the staggered sublattice sign is not a bipartition (site `L − 1` and site `0` are both "even"
 and adjacent), and the axiom nevertheless asserts the bound there; this pins that the `∀ L` beyond
 the threshold has not been quietly narrowed to even `L`.  It is the *unbounded* odd rings that are
-covered: the fixed odd ring `L = 3` at `N = 1` genuinely violates the inequality (see
-`shastryEnergyGain`'s doc comment), which is what the threshold exists for. -/
+covered: the fixed odd ring `L = 3` at `N = 1` violates the inequality (a hand computation recorded
+in `shastryEnergyGain`'s doc comment, together with the reason the wrap-around defect of large odd
+rings is harmless), which is what the threshold exists for. -/
 example (N : ℕ) (ε : ℝ) (hε : 0 < ε) :
     ∃ η₀ : ℝ, 0 < η₀ ∧ ∀ η : ℝ, 0 < η → η < η₀ → ∃ L₀ : ℕ,
       hermitianMinEigenvalue (staggeredFieldChainHamiltonianS_isHermitian (2 * L₀ + 1) 0 N) -
@@ -185,8 +187,9 @@ example (N : ℕ) (ε : ℝ) (hε : 0 < ε) :
 inside the existentially-given window, at `η := η₀ / 2`, then at the threshold `L := L₀` it hands
 back.  The right-hand side the axiom returns is *syntactically* `1 * (η₀ / 2) * (L₀ : ℝ)`; the
 `have hshape` states the equal-but-differently-written form and `rw`s it into `h`.  If the exponent
-on `η` were `2` instead of `1` (the physically false stronger form — the true rate is `η^(4/3)`),
-the right-hand side would be `1 * (η₀ / 2) ^ 2 * L₀`, which does **not** syntactically contain the
+on `η` were `2` instead of `1` (the strictly stronger form, which the reduction does not need and
+which the expected `η^(4/3)` response of the gapless half-integer chains would falsify), the
+right-hand side would be `1 * (η₀ / 2) ^ 2 * L₀`, which does **not** syntactically contain the
 pattern rewritten here, so `rw [hshape] at h` would fail: the fixture discriminates the exponent
 rather than merely asserting an inequality a stronger bound would also satisfy. -/
 example (N : ℕ) : True := by

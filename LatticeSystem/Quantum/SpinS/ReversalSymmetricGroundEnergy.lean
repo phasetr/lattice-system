@@ -38,10 +38,12 @@ open Matrix
 
 /-- **The field-dressed operator `H − h·O` is Hermitian** for real `h` (Tasaki eq. (3.4.19),
 p. 69): a difference of a Hermitian operator and a self-adjoint (real) scalar multiple of a
-Hermitian operator.  Private because it exists only to supply `chainGroundEnergy` with the
-`IsHermitian` argument `hermitianMinEigenvalue` demands; the concrete ring instance of the same
-fact is the public `staggeredFieldChainHamiltonianS_isHermitian`. -/
-private theorem fieldOpS_isHermitian {Λ : Type*} {N : ℕ}
+Hermitian operator.  It supplies the `IsHermitian` argument `hermitianMinEigenvalue` demands, in
+`chainGroundEnergy` and at each trial-state comparison of `chainGroundEnergy_concave` and
+`chainGroundState_order_mean_sandwich`, and is public because the concrete ring instance
+`staggeredFieldChainHamiltonianS_isHermitian` (in `ShastryNoSSBReduction.lean`) is *this* lemma
+applied to the ring data rather than a second proof of the same fact. -/
+theorem fieldOpS_isHermitian {Λ : Type*} {N : ℕ}
     {H O : ManyBodyOpS Λ N} (hH : H.IsHermitian) (hO : O.IsHermitian) (h : ℝ) :
     (H - (h : ℂ) • O).IsHermitian := by
   refine hH.sub (hO.smul ?_)
@@ -140,8 +142,9 @@ theorem chainGroundEnergy_concave {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N 
 
 /-- **Zero field maximises the ground energy**: `E(h) ≤ E(0)`.  `E` is concave
 (`chainGroundEnergy_concave`) and even (`chainGroundEnergy_neg`), so the midpoint bound at
-`t = 1/2`, `h₁ = h`, `h₂ = −h` reads `½E(h) + ½E(−h) ≤ E(0)`, i.e. `E(h) ≤ E(0)`.  This is the
-`h ≥ 0` monotonicity that makes the staggered field of eq. (4.1.9), p. 76, lower the ground energy.
+`t = 1/2`, `h₁ = h`, `h₂ = −h` reads `½E(h) + ½E(−h) ≤ E(0)`, i.e. `E(h) ≤ E(0)`.  There is no sign
+hypothesis on `h`: `0` maximises the even concave function `E` on all of `ℝ`.  This is what makes
+the staggered field of eq. (4.1.9), p. 76, lower the ground energy, in either direction.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §3.4, eq. (3.4.19), p. 69; §4.1, eq. (4.1.9), p. 76. -/

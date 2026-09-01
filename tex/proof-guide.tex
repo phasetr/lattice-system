@@ -13190,7 +13190,7 @@ not an exclusion).  Chapters~3--10 backfill.
 \textbf{conditional theorem} resting on one \textbf{documented axiom},
 \texttt{Quantum/SpinS/ShastryNoSSBReduction.lean}, Issue \#4485).  \textbf{Tasaki
 §4.1 footnote 3 explicitly states ``We do not prove Theorem 4.2 in the present book'' and refers to
-Shastry [58] (J.~Phys.~A 25:~L249, 1992) and Tanaka--Takeda--Idogaki [63] (J.~Magn.~Magn.~Mater.~272--276:~908, 2004); hence Theorem 4.2 is a documented axiom.}  Absence of spontaneous symmetry
+Shastry [58] (J.~Phys.~A 25:~L249, 1992) and Tanaka--Takeda--Idogaki [63] (J.~Magn.~Magn.~Mater.~272--276:~908, 2004); the argument he does not supply is carried here by the documented axiom \texttt{shastryEnergyGain}, to which Theorem 4.2 is reduced, not discharged.}  Absence of spontaneous symmetry
 breaking in one dimension: for the 1D spin-$S$ antiferromagnetic Heisenberg ring under a staggered
 field $\hat H_h=\sum_x\hat S_x\cdot\hat S_{x+1}-h\,\hat O_L^{(3)}$ (eq.~(4.1.9)), the per-site
 staggered order parameter of any normalized ground state vanishes in the iterated limit
@@ -13218,11 +13218,13 @@ $0\le E_L(0)-E_L(h)\le h\langle\hat O_L^{(3)}\rangle_h\le E_L(0)-E_L(2h)$
 scalar hypothesis that the staggered-field energy gain is $o(\eta)$ per site uniformly in large $L$:
 for every $\varepsilon>0$ there is $\eta_0>0$ such that for each $0<\eta<\eta_0$ there is a threshold
 $L_0$ with $E_L(0)-E_L(2\eta)\le\varepsilon\,\eta\,L$ for all $L\ge L_0$.  That hypothesis is the
-documented axiom \texttt{shastryEnergyGain}; the exponent must be linear in $\eta$ (the physical
-response is $\asymp L\eta^{4/3}$ for half-integer spin, so an $\eta^2$ form would be false), and the
-threshold $L_0$ is required because a bare $\forall L$ fails at $L=1$ (where
-$E_1(0)-E_1(2\eta)=\eta N$ exactly) and at the frustrated triangle $L=3$, $N=1$ (where
-$E_3(0)-E_3(2\eta)\ge\tfrac53\eta$).  \textbf{This is a relocation of the gap, not a discharge}: the
+documented axiom \texttt{shastryEnergyGain}; the exponent is linear in $\eta$ because that is the
+weakest shape the reduction needs (a $C\eta^2L$ bound would imply it, and the expected
+$\asymp L\eta^{4/3}$ response of the gapless half-integer chains --- not formalized here --- would
+falsify the $\eta^2$ shape), and the threshold $L_0$ is required because for $N\ge1$ a bare
+$\forall L$ fails at $L=1$ (where $E_1(0)-E_1(2\eta)=\eta N$ exactly, so any $\varepsilon<N$ refutes
+it) and at the frustrated triangle $L=3$, $N=1$ (where $E_3(0)-E_3(2\eta)\ge\tfrac53\eta$); both are
+hand computations, not Lean witnesses, and at $N=0$ the bare $\forall L$ form is in fact true.  \textbf{This is a relocation of the gap, not a discharge}: the
 axiom is equivalent in strength to an $L$-uniform form of Theorem 4.2, so
 \texttt{\#print axioms shastry\_no\_symmetry\_breaking\_1d} still names it, and the deep
 infinite-volume argument remains faithfully axiomatized rather than re-proved --- what the reduction
