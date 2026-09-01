@@ -570,6 +570,22 @@ private theorem hminw_holds : ∀ v : (Λw → Fin (Nw + 1)) → ℂ, star v ⬝
   intro v _
   simp [rayleighOnVec]
 
+/-- `hO` at the witness: `(∑ x : Λw, ow x).IsHermitian`, from `ow 0` (the sum reduces to its only
+term) and the same Pauli-`X` Hermiticity argument as `hnow_holds`. -/
+private theorem hOw_holds : (∑ x : Λw, ow x).IsHermitian := by
+  rw [show (∑ x : Λw, ow x) = ow (0 : Fin 1) by simp]
+  unfold ow pauliXS spinSSiteOp1
+  refine Matrix.IsHermitian.smul (onSiteS_isHermitian 0 (spinSOp1_isHermitian 1)) ?_
+  change star (2 : ℂ) = 2
+  simp
+
+/-- `hno` at every site: `∀ x : Λw, manyBodyOperatorNormS (ow x) ≤ 1`, from `hnow_holds` at the
+unique site of `Λw`. -/
+private theorem hnoAllw_holds : ∀ x : Λw, manyBodyOperatorNormS (ow x) ≤ (1 : ℝ) := by
+  intro x
+  rw [show ow x = ow (0 : Fin 1) from congrArg ow (Subsingleton.elim x 0)]
+  exact hnow_holds
+
 /-- **The capstone's hypothesis bundle is jointly satisfiable.** At `Λ = Fin 1`, `N = 1`, `B = ∅`,
 `o 0 = pauliXS 0`, `Φ = basisVecS (fun _ => 0)`, `d = L = q₀ = o₀ = 1`, `h₀ = 0`, `E₀ = 0`, every
 named hypothesis of the capstone `tasaki_eq_3_4_16_lowLyingState_ssb` holds — discharged above by
@@ -861,7 +877,8 @@ example :
 non-vacuity fixture (`Λw = Fin 1`, `N = 1`, `B = ∅`, `o 0 = pauliXS 0`, `d = L = q₀ = o₀ = 1`,
 `h₀ = 0`, `E₀ = 0`), produces its five conjuncts concretely. The hypothesis bundle is already
 discharged above (`hΦw_holds`, `hΦEw_holds`, `hminw_holds`, `hodd1w_holds`, `hodd3w_holds`,
-`hLROw_holds`, `hnow_holds`) for the `Ξ₊` capstone and is reused here rather than restated. -/
+`hLROw_holds`, `hOw_holds`, `hnoAllw_holds`) for the `Ξ₊` capstone and is reused here rather than
+restated. -/
 example :
     star (hvlMinusState (∑ x : Λw, ow x) Φw) ⬝ᵥ hvlMinusState (∑ x : Λw, ow x) Φw = 1
     ∧ star (hvlMinusState (∑ x : Λw, ow x) Φw) ⬝ᵥ hvlPlusState (∑ x : Λw, ow x) Φw = 0
@@ -873,20 +890,10 @@ example :
     ∧ rayleighOnVec (∑ x : Λw, ow x) (hvlMinusState (∑ x : Λw, ow x) Φw)
         / ((1 : ℕ) : ℝ) ^ (1 : ℕ) ≤ -Real.sqrt 1 := by
   have hox : (∑ x : Λw, ow x) = ow (0 : Fin 1) := by simp
-  have hOw : (∑ x : Λw, ow x).IsHermitian := by
-    rw [hox]
-    unfold ow pauliXS spinSSiteOp1
-    refine Matrix.IsHermitian.smul (onSiteS_isHermitian 0 (spinSOp1_isHermitian 1)) ?_
-    change star (2 : ℂ) = 2
-    simp
-  have hnoall : ∀ x : Λw, manyBodyOperatorNormS (ow x) ≤ (1 : ℝ) := by
-    intro x
-    rw [show ow x = ow (0 : Fin 1) from congrArg ow (Subsingleton.elim x 0)]
-    exact hnow_holds
   exact tasaki_mirrorLowLyingState_ssb (∅ : Finset Unit) (fun _ => (0 : ManyBodyOpS Λw Nw)) ow
-    (fun _ => (∅ : Finset Λw)) 1 1 1 0 1 Matrix.isHermitian_zero hOw (by simp)
+    (fun _ => (∅ : Finset Λw)) 1 1 1 0 1 Matrix.isHermitian_zero hOw_holds (by simp)
     (fun x z hxz => absurd (Subsingleton.elim x z) hxz) (by simp)
-    hnoall
+    hnoAllw_holds
     (le_refl _) zero_le_one (by simp) (by simp) hΦw_holds hΦEw_holds hminw_holds
     (by rw [hox]; exact hodd1w_holds) (by rw [hox]; exact hodd3w_holds) one_pos (le_refl _)
     (by rw [hox]; exact hLROw_holds)

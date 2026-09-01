@@ -83,9 +83,12 @@ normalisation factor `‖Ô_L|Φ_GS⟩‖` is even in the sign of `Ô_L`, so mir
 only flips the sign of the vector that factor scales. This gives the bridge
 `hvlMinusState_eq_hvlPlusState_neg : Ξ₋(Ô_L) = Ξ₊(−Ô_L)`, needing neither Hermiticity of `Ô_L` nor
 normalisation of `Φ_GS`. Four `Ξ₋` declarations below are obtained by instantiating their `Ξ₊`
-counterpart (part 4, "The low-lying state `Ξ₊`") at `−Ô_L`: normalisation
-(`hvlMinusState_dotProduct_self`), the energy identity (`hvlMinusState_energy_eq`), the order mean
-(`hvlMinusState_order_mean`), and the order bound (`hvlMinusState_order_mean_le_neg_sqrt`); the
+counterpart at `−Ô_L`: normalisation (`hvlMinusState_dotProduct_self`, from
+`hvlPlusState_dotProduct_self`, part 3, "Authoritative supplemental implementation record") and the
+order mean (`hvlMinusState_order_mean`, from `hvlPlusState_order_mean`, same section of part 3), and
+the energy identity (`hvlMinusState_energy_eq`, from `hvlPlusState_energy_eq`, part 4, "The
+low-lying state `Ξ₊`") and the order bound (`hvlMinusState_order_mean_le_neg_sqrt`, from
+`hvlPlusState_order_mean_ge_sqrt`, same section of part 4); the
 mirror argument itself is never replayed there. The energy identity is **even** in the sign of the
 trial state, so `⟨Ξ₋|Ĥ|Ξ₋⟩` reduces to the same right-hand side `(E_GS + ⟨Γ|Ĥ|Γ⟩)/2` as
 `⟨Ξ₊|Ĥ|Ξ₊⟩`, while the order mean is **odd**, so its `Ξ₋` form carries a minus sign against
@@ -106,9 +109,11 @@ eq. (3.4.14); no value or derivation in this repository depends on which reading
 eq. (3.4.14) state.
 
 **What these declarations do not assert.** Hermiticity of `Ô_L` is not assumed by
-`hvlTrialState_neg` or the bridge; it enters only from `hvlPlusState_energy_eq`/
-`hvlPlusState_order_mean_ge_sqrt` onward, through the instantiation at `−Ô_L`. The `L ↑ ∞` and
-`h ↓ 0` limits of Theorem 3.2 are not taken here either.
+`hvlTrialState_neg` or the bridge; it first enters through the instantiation at `−Ô_L`, in each of
+the four `Ξ₋` declarations named above, and separately, directly at `+Ô_L` (not through any
+instantiation), in the orthogonality proof `hvlMinusState_dotProduct_hvlPlusState`
+(`Quantum/HorschVonderLindenLowLyingState.lean:331`). The `L ↑ ∞` and `h ↓ 0` limits of Theorem 3.2
+are not taken here either.
 
 All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
 `Classical.choice`, `Quot.sound`.
@@ -132,14 +137,16 @@ and `hvlMinusState_dotProduct_hvlPlusState` is therefore a **truth condition** f
 and orthogonality at this instance, not proof convenience — `⟨Ξ₋|Ξ₋⟩` and `⟨Ξ₋|Ξ₊⟩` both come out
 `1/2` rather than `1` and `0`. The energy identity still holds at that same degenerate instance
 (`Ô_L = 0`, `Ĥ = diagonal ![5]`); the fixture pins the identity itself, not a bare numeric value. A
-negative size parameter falsifies the mirror order bound: at `Ld = −2` with `q₀ = 1` the hypotheses
-of `hvlMinusState_order_mean_le_neg_sqrt` are satisfiable while its conclusion fails. Argued but
-**not** machine-checked in this repository: whether `Γ` is the zero vector, and `Ξ₋` coincides with
-`Ξ₊`, at every vanishing order-square Rayleigh quotient, beyond the one instance `Ô_L = 0` checked;
-whether `hvlMinusState_order_mean_le_neg_sqrt` fails at every negative `Ld` (checked only at
-`Ld = −2`); the vacuity/falsity distinction at `d = 0`, where the bond-set hypothesis forces the
-constant `C` to `0` and the energy conjuncts of the capstone read `0 ≤ 0 ≤ 0` while the
-normalisation, orthogonality and order conjuncts keep content.
+negative size parameter falsifies the mirror order bound: at `Ld = −2` with `q₀ = 1` the conclusion
+of `hvlMinusState_order_mean_le_neg_sqrt` fails; the fixture pins that failure but not that the
+remaining hypotheses (in particular the long-range-order hypothesis) hold at this data. Argued but
+**not** machine-checked in this repository: that the long-range-order hypothesis of
+`hvlMinusState_order_mean_le_neg_sqrt` also holds at `Ld = −2`, `q₀ = 1`; whether `Γ` is the zero
+vector, and `Ξ₋` coincides with `Ξ₊`, at every vanishing order-square Rayleigh quotient, beyond the
+one instance `Ô_L = 0` checked; whether `hvlMinusState_order_mean_le_neg_sqrt` fails at every
+negative `Ld` (checked only at `Ld = −2`); the vacuity/falsity distinction at `d = 0`, where the
+bond-set hypothesis forces the constant `C` to `0` and the energy conjuncts of the capstone read
+`0 ≤ 0 ≤ 0` while the normalisation, orthogonality and order conjuncts keep content.
 
 Regression fixtures live in `LatticeSystem/Tests/HorschVonderLindenLowLyingState.lean`, in the
 block "Signature pins — the mirror state" and the "Sign-error fixtures for the mirror state `Ξ₋`"

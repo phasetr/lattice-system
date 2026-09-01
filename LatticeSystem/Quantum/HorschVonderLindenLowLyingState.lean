@@ -302,9 +302,10 @@ is the instance at `−Ô_L`.  The hypotheses are those of that statement: Hermi
 third odd moments (assumption (3.4.4), p. 65), `0 < q₀`, `0 < Ld` and long-range order
 (eq. (3.4.3), p. 65) in the form `q₀ ≤ ⟨Φ_GS|(Ô_L)²|Φ_GS⟩ / Ld²`.
 
-The hypothesis `0 < Ld` is load-bearing at negative values: at `Ld = -2` with `q₀ = 1` there is
-data satisfying every hypothesis and failing the conclusion.  `Ld` is an abstract positive real,
-which the capstone instantiates at `L^d`. -/
+The hypothesis `0 < Ld` is load-bearing at negative values: at `Ld = -2` with `q₀ = 1` the
+regression fixture pins the conclusion failing; that the remaining hypotheses (in particular the
+long-range-order hypothesis `hLRO`) also hold at this data is argued but not itself pinned by that
+fixture.  `Ld` is an abstract positive real, which the capstone instantiates at `L^d`. -/
 theorem hvlMinusState_order_mean_le_neg_sqrt {n : Type*} [Fintype n] [DecidableEq n]
     (O : Matrix n n ℂ) (Φ : n → ℂ) {q₀ Ld : ℝ}
     (hO : O.IsHermitian) (hodd1 : star Φ ⬝ᵥ (O *ᵥ Φ) = 0)
