@@ -24,4 +24,4 @@ permalink: /formalization/legacy/17-bose-einstein-condensation-of-hard-core-boso
 
 ---
 
-[← Horsch–von der Linden low-lying states (Tasaki §3.4, Theorem 3.1)](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-02/) · [Catalogue](/lattice-system/formalization/legacy/) · [Antiferromagnetic Heisenberg chains and the Haldane conjecture (Tasaki §6.1) →](/lattice-system/formalization/legacy/18-antiferromagnetic-heisenberg-chains-and-the-haldane-conjec/)
+[← Horsch–von der Linden low-lying states (Tasaki §3.4, Theorem 3.1)](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-04/) · [Catalogue](/lattice-system/formalization/legacy/) · [Antiferromagnetic Heisenberg chains and the Haldane conjecture (Tasaki §6.1) →](/lattice-system/formalization/legacy/18-antiferromagnetic-heisenberg-chains-and-the-haldane-conjec/)

@@ -68,8 +68,10 @@ the current formalization-status and capstone authority during migration.
 <a id="group-spin-models"></a>
 ### Spin models, Chapters 3–7, and spectral tools
 
-- [Horsch–von der Linden low-lying states (Tasaki §3.4, Theorem 3.1) — part 1 of 2](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-01/)
-- [Horsch–von der Linden low-lying states (Tasaki §3.4, Theorem 3.1) — part 2 of 2](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-02/)
+- [Horsch–von der Linden low-lying states (Tasaki §3.4, Theorem 3.1) — part 1 of 4](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-01/)
+- [Horsch–von der Linden low-lying states (Tasaki §3.4, Theorem 3.1) — part 2 of 4](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-02/)
+- [Horsch–von der Linden low-lying states (Tasaki §3.4, Theorem 3.1) — part 3 of 4](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-03/)
+- [Horsch–von der Linden low-lying states (Tasaki §3.4, Theorem 3.1) — part 4 of 4](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-04/)
 - [Bose–Einstein condensation of hard-core bosons (Tasaki §5.1–§5.2)](/lattice-system/formalization/legacy/17-bose-einstein-condensation-of-hard-core-bosons-tasaki-5-1-/)
 - [Antiferromagnetic Heisenberg chains and the Haldane conjecture (Tasaki §6.1)](/lattice-system/formalization/legacy/18-antiferromagnetic-heisenberg-chains-and-the-haldane-conjec/)
 - [The AKLT model (Tasaki §7.1)](/lattice-system/formalization/legacy/19-the-aklt-model-tasaki-7-1/)
