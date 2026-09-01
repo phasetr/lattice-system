@@ -2,11 +2,25 @@ import LatticeSystem.Quantum.HorschVonderLindenLowLyingState
 import LatticeSystem.Quantum.SpinS.ClusterState
 
 /-!
-# Test coverage for eqs. (3.4.16)/(3.4.17), the `Ξ₊` low-lying state
+# Test coverage for eqs. (3.4.16)/(3.4.17), the `Ξ₊`/`Ξ₋` low-lying states
 
 Fixtures for `LatticeSystem/Quantum/HorschVonderLindenLowLyingState.lean`: the `Ξ₊` energy
-identity, eq. (3.4.16)'s abstract lower bound, the Schwarz remark eq. (3.4.17), and the bond-local
-low-lying-state capstone.
+identity, eq. (3.4.16)'s abstract lower bound, the Schwarz remark eq. (3.4.17), the bond-local
+low-lying-state capstone, and (below, "Signature pins — the mirror state") the mirror state `Ξ₋`
+of p. 68-69: `hvlTrialState_neg`, `hvlMinusState`, its bridge to `hvlPlusState (-O)`, its
+normalisation, energy identity, order mean and order bound, its cross-orthogonality to `Ξ₊`, and
+the capstone `tasaki_mirrorLowLyingState_ssb`.
+
+## Sign-error fixtures for the mirror state `Ξ₋`
+
+`Ξ₋` differs from `Ξ₊` only by signs, so a fixture built for `Ξ₊` can pass for a wrongly-signed
+`Ξ₋`. Fixtures F1-F8 (below the `Ξ₊` fixtures) each carry a value that differs under the sign
+flip: F1 pins the state's four entries directly; F2 pins the energy identity together with the
+sign-discriminating value `rayleighOnVec fO Ξ₋ = -2` (against `Ξ₊`'s `+2`), since the identity's
+own right-hand side is even in the sign of `Γ` and would not itself catch a flipped sign; F3 pins
+orthogonality and normalisation together, since substituting `Ξ₊` for `Ξ₋` reads `1 = 0`; F4 is
+exactly tight at `q₀ = 1`, `Ld = 2`; F5 is a negative-`Ld` instance where the mirror bound's own
+conclusion fails; F6/F7 are boundary instances at a vanishing order-square Rayleigh quotient.
 
 ## What each block pins
 
@@ -556,6 +570,22 @@ private theorem hminw_holds : ∀ v : (Λw → Fin (Nw + 1)) → ℂ, star v ⬝
   intro v _
   simp [rayleighOnVec]
 
+/-- `hO` at the witness: `(∑ x : Λw, ow x).IsHermitian`, from `ow 0` (the sum reduces to its only
+term) and the same Pauli-`X` Hermiticity argument as `hnow_holds`. -/
+private theorem hOw_holds : (∑ x : Λw, ow x).IsHermitian := by
+  rw [show (∑ x : Λw, ow x) = ow (0 : Fin 1) by simp]
+  unfold ow pauliXS spinSSiteOp1
+  refine Matrix.IsHermitian.smul (onSiteS_isHermitian 0 (spinSOp1_isHermitian 1)) ?_
+  change star (2 : ℂ) = 2
+  simp
+
+/-- `hno` at every site: `∀ x : Λw, manyBodyOperatorNormS (ow x) ≤ 1`, from `hnow_holds` at the
+unique site of `Λw`. -/
+private theorem hnoAllw_holds : ∀ x : Λw, manyBodyOperatorNormS (ow x) ≤ (1 : ℝ) := by
+  intro x
+  rw [show ow x = ow (0 : Fin 1) from congrArg ow (Subsingleton.elim x 0)]
+  exact hnow_holds
+
 /-- **The capstone's hypothesis bundle is jointly satisfiable.** At `Λ = Fin 1`, `N = 1`, `B = ∅`,
 `o 0 = pauliXS 0`, `Φ = basisVecS (fun _ => 0)`, `d = L = q₀ = o₀ = 1`, `h₀ = 0`, `E₀ = 0`, every
 named hypothesis of the capstone `tasaki_eq_3_4_16_lowLyingState_ssb` holds — discharged above by
@@ -595,5 +625,277 @@ example :
   · rw [hox]; exact hodd1w_holds
   · rw [hox]; exact hodd3w_holds
   · rw [hox]; exact hLROw_holds
+
+/-! ## Signature pins — the mirror state `Ξ₋` -/
+
+/-- **Signature pin.** Pins `hvlTrialState_neg`: `hvlTrialState (-O) Φ = -hvlTrialState O Φ`, with
+no hypothesis at all. Discharged only by the identifier itself. -/
+example {n : Type*} [Fintype n] (O : Matrix n n ℂ) (Φ : n → ℂ) :
+    hvlTrialState (-O) Φ = -hvlTrialState O Φ :=
+  hvlTrialState_neg O Φ
+
+/-- **Signature pin (definition).** Pins that `hvlMinusState` takes the same parameter shape as
+`hvlPlusState`: a matrix and a vector on a common finite index type, returning a vector on that
+type. -/
+noncomputable example {n : Type*} [Fintype n] (O : Matrix n n ℂ) (Φ : n → ℂ) : n → ℂ :=
+  hvlMinusState O Φ
+
+/-- **Signature pin.** Pins the bridge `hvlMinusState O Φ = hvlPlusState (-O) Φ`, with no
+hypothesis. Discharged only by the identifier itself. -/
+example {n : Type*} [Fintype n] (O : Matrix n n ℂ) (Φ : n → ℂ) :
+    hvlMinusState O Φ = hvlPlusState (-O) Φ :=
+  hvlMinusState_eq_hvlPlusState_neg O Φ
+
+/-- **Signature pin.** Pins the mirror-state normalisation `⟨Ξ₋|Ξ₋⟩ = 1`, at the same hypothesis
+shape as `hvlPlusState_dotProduct_self`. -/
+example {n : Type*} [Fintype n] [DecidableEq n] (O : Matrix n n ℂ) (Φ : n → ℂ)
+    (hO : O.IsHermitian) (hΦ : star Φ ⬝ᵥ Φ = 1) (hodd1 : star Φ ⬝ᵥ (O *ᵥ Φ) = 0)
+    (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) :
+    star (hvlMinusState O Φ) ⬝ᵥ hvlMinusState O Φ = 1 :=
+  hvlMinusState_dotProduct_self O Φ hO hΦ hodd1 hm2
+
+/-- **Signature pin.** Pins the mirror-state energy identity
+`⟨Ξ₋|Ĥ|Ξ₋⟩ = (E₀ + ⟨Γ|Ĥ|Γ⟩) / 2`, the same right-hand side as `hvlPlusState_energy_eq`. A wrongly
+sign-flipped right-hand side `(E₀ - ⟨Γ|Ĥ|Γ⟩) / 2` is *even* in the sign of `Γ`, so it agrees with
+this one on every `Ξ₊` fixture; the fixture below (F2) separates them by an explicit value. -/
+example {n : Type*} [Fintype n] {H O : Matrix n n ℂ} {Φ : n → ℂ} {E₀ : ℝ}
+    (hH : H.IsHermitian) (hO : O.IsHermitian) (hΦE : H *ᵥ Φ = (E₀ : ℂ) • Φ)
+    (hΦ : star Φ ⬝ᵥ Φ = 1) (hodd1 : star Φ ⬝ᵥ (O *ᵥ Φ) = 0) :
+    rayleighOnVec H (hvlMinusState O Φ)
+      = (E₀ + rayleighOnVec H (hvlTrialState O Φ)) / 2 :=
+  hvlMinusState_energy_eq hH hO hΦE hΦ hodd1
+
+/-- **Signature pin.** Pins the mirror-state order mean
+`⟨Ξ₋|Ô|Ξ₋⟩ = -√(⟨Φ|Ô²|Φ⟩)`, negative where `hvlPlusState_order_mean`'s right-hand side
+`Real.sqrt (rayleighOnVec (O ^ 2) Φ)` is positive. -/
+example {n : Type*} [Fintype n] [DecidableEq n] (O : Matrix n n ℂ) (Φ : n → ℂ)
+    (hO : O.IsHermitian) (hodd1 : star Φ ⬝ᵥ (O *ᵥ Φ) = 0)
+    (hodd3 : star Φ ⬝ᵥ ((O ^ 3) *ᵥ Φ) = 0) (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) :
+    rayleighOnVec O (hvlMinusState O Φ) = -Real.sqrt (rayleighOnVec (O ^ 2) Φ) :=
+  hvlMinusState_order_mean O Φ hO hodd1 hodd3 hm2
+
+/-- **Signature pin.** Pins the mirror order bound `⟨Ξ₋|Ô|Ξ₋⟩ / Ld ≤ -√q₀`, an upper bound in the
+opposite direction from `hvlPlusState_order_mean_ge_sqrt`'s lower bound `√q₀ ≤ ⟨Ξ₊|Ô|Ξ₊⟩ / Ld`. -/
+example {n : Type*} [Fintype n] [DecidableEq n] (O : Matrix n n ℂ) (Φ : n → ℂ)
+    {q₀ Ld : ℝ} (hO : O.IsHermitian) (hodd1 : star Φ ⬝ᵥ (O *ᵥ Φ) = 0)
+    (hodd3 : star Φ ⬝ᵥ ((O ^ 3) *ᵥ Φ) = 0) (hq₀ : 0 < q₀) (hLd : 0 < Ld)
+    (hLRO : q₀ ≤ rayleighOnVec (O ^ 2) Φ / Ld ^ 2) :
+    rayleighOnVec O (hvlMinusState O Φ) / Ld ≤ -Real.sqrt q₀ :=
+  hvlMinusState_order_mean_le_neg_sqrt O Φ hO hodd1 hodd3 hq₀ hLd hLRO
+
+/-- **Signature pin.** Pins the cross-orthogonality `⟨Ξ₋|Ξ₊⟩ = 0` between the two mirror states,
+which has no `Ξ₊`-side counterpart obtainable by a sign substitution alone. -/
+example {n : Type*} [Fintype n] [DecidableEq n] (O : Matrix n n ℂ) (Φ : n → ℂ)
+    (hO : O.IsHermitian) (hΦ : star Φ ⬝ᵥ Φ = 1) (hodd1 : star Φ ⬝ᵥ (O *ᵥ Φ) = 0)
+    (hm2 : 0 < rayleighOnVec (O ^ 2) Φ) :
+    star (hvlMinusState O Φ) ⬝ᵥ hvlPlusState O Φ = 0 :=
+  hvlMinusState_dotProduct_hvlPlusState O Φ hO hΦ hodd1 hm2
+
+/-- **Signature pin (capstone).** Pins the five conjuncts of `tasaki_mirrorLowLyingState_ssb`:
+mirror-state normalisation, cross-orthogonality to `Ξ₊`, the same two-sided energy bound as
+`tasaki_eq_3_4_16_lowLyingState_ssb`, and the mirror order bound `≤ -√q₀` in place of that
+declaration's `√q₀ ≤ …`. Discharged only by the identifier itself. -/
+example {ι : Type*} (B : Finset ι)
+    (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N) (W : ι → Finset Λ)
+    (d L : ℕ) (q₀ h₀ o₀ : ℝ) {Φ : (Λ → Fin (N + 1)) → ℂ} {E₀ : ℝ}
+    (hH : (∑ b ∈ B, hb b).IsHermitian) (hO : (∑ x : Λ, o x).IsHermitian)
+    (hW : ∀ b ∈ B, ∀ z ∉ W b, Commute (hb b) (o z))
+    (hoo : ∀ x z : Λ, x ≠ z → Commute (o x) (o z))
+    (hnh : ∀ b ∈ B, manyBodyOperatorNormS (hb b) ≤ h₀)
+    (hno : ∀ x : Λ, manyBodyOperatorNormS (o x) ≤ o₀)
+    (hh₀ : 0 ≤ h₀) (ho₀ : 0 ≤ o₀)
+    (hbond : ∀ b ∈ B, (W b).card ≤ 2)
+    (hB : (B.card : ℝ) ≤ (d : ℝ) * (L : ℝ) ^ d)
+    (hΦ : star Φ ⬝ᵥ Φ = 1)
+    (hΦE : (∑ b ∈ B, hb b) *ᵥ Φ = (E₀ : ℂ) • Φ)
+    (hmin : ∀ v : (Λ → Fin (N + 1)) → ℂ, star v ⬝ᵥ v = 1 →
+      E₀ ≤ rayleighOnVec (∑ b ∈ B, hb b) v)
+    (hodd1 : star Φ ⬝ᵥ ((∑ x : Λ, o x) *ᵥ Φ) = 0)
+    (hodd3 : star Φ ⬝ᵥ (((∑ x : Λ, o x) ^ 3) *ᵥ Φ) = 0)
+    (hq₀ : 0 < q₀) (hL : 1 ≤ L)
+    (hLRO : q₀ ≤ rayleighOnVec ((∑ x : Λ, o x) ^ 2) Φ / ((L : ℝ) ^ d) ^ 2) :
+    star (hvlMinusState (∑ x : Λ, o x) Φ) ⬝ᵥ hvlMinusState (∑ x : Λ, o x) Φ = 1
+    ∧ star (hvlMinusState (∑ x : Λ, o x) Φ) ⬝ᵥ hvlPlusState (∑ x : Λ, o x) Φ = 0
+    ∧ 0 ≤ rayleighOnVec (∑ b ∈ B, hb b) (hvlMinusState (∑ x : Λ, o x) Φ) - E₀
+    ∧ rayleighOnVec (∑ b ∈ B, hb b) (hvlMinusState (∑ x : Λ, o x) Φ) - E₀
+        ≤ 4 * (d : ℝ) * h₀ * o₀ ^ 2 / q₀ / (L : ℝ) ^ d
+    ∧ rayleighOnVec (∑ x : Λ, o x) (hvlMinusState (∑ x : Λ, o x) Φ) / (L : ℝ) ^ d
+        ≤ -Real.sqrt q₀ :=
+  tasaki_mirrorLowLyingState_ssb B hb o W d L q₀ h₀ o₀ hH hO hW hoo hnh hno hh₀ ho₀
+    hbond hB hΦ hΦE hmin hodd1 hodd3 hq₀ hL hLRO
+
+/-! ## Fixture F1 — the mirror state at the two-spin fixture, sign-discriminating -/
+
+/-- **Fixture F1 (state-level, sign-discriminating).** `Ξ₋ = (1/2, -1/2, -1/2, 1/2)` at the
+two-spin fixture `fO`, `fPhi` — differing from `Ξ₊ = fXi = (1/2, 1/2, 1/2, 1/2)` in the sign of
+its middle two entries, so a copy-paste of the `Ξ₊` definition would fail this fixture. -/
+private lemma fXiMinus : hvlMinusState fO fPhi = ![1/2, -(1/2), -(1/2), 1/2] := by
+  have hpre : ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ = c2 := rfl
+  unfold hvlMinusState
+  rw [fTrial, hpre]
+  unfold fPhi
+  ext i
+  fin_cases i <;>
+    simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Matrix.sub_cons, sub_zero, zero_sub,
+      Matrix.empty_sub_empty, Fin.zero_eta, Fin.mk_one, Fin.reduceFinMk, Fin.isValue,
+      Pi.smul_apply, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val,
+      Matrix.head_cons, Matrix.tail_cons, smul_eq_mul, one_div, mul_neg] <;>
+    rw [c2_sq] <;> norm_num
+
+/-! ## Fixture F2 — the energy identity, with sign discrimination -/
+
+/-- `rayleighOnVec fH Ξ₋ = 1`, the same numeric value the `Ξ₊` fixture `fXiH` gives at `Ξ₊`. -/
+private lemma fXiMinusH : rayleighOnVec fH (hvlMinusState fO fPhi) = 1 := by
+  rw [fXiMinus]
+  unfold rayleighOnVec fH
+  simp [dotProduct, mulVec, Fin.sum_univ_four, Matrix.diagonal]
+  norm_num
+
+/-- `rayleighOnVec fO Ξ₋ = -2`, against `fXiO`'s `+2` at `Ξ₊`: the sign-discriminating value that
+an erroneously un-mirrored order operator, or a direction error in `hvlMinusState` itself, would
+fail to reproduce. -/
+private lemma fXiMinusO : rayleighOnVec fO (hvlMinusState fO fPhi) = -2 := by
+  rw [fXiMinus]
+  unfold rayleighOnVec fO
+  simp [dotProduct, mulVec, Fin.sum_univ_four]
+  norm_num
+
+/-- **Fixture F2 (energy identity, sign-discriminating).** The identity reads `1 = (-1 + 1) / 2`
+at the two-spin fixture — the same right-hand-side *shape* as the `Ξ₊` energy identity, but at
+`Γ`'s Ξ₋-side value, alongside the two sign-separating Rayleigh values `rayleighOnVec fH Ξ₋ = 1`
+and `rayleighOnVec fO Ξ₋ = -2`. Since the energy identity's own right-hand side is even in the
+sign of `Γ`, an erroneous minus sign there would still pass this and every `Ξ₊` fixture; the
+`fO`-side conjunct is what would catch a wrongly-signed `hvlMinusState`. -/
+example :
+    rayleighOnVec fH (hvlMinusState fO fPhi)
+        = (((-1 : ℝ)) + rayleighOnVec fH (hvlTrialState fO fPhi)) / 2
+    ∧ rayleighOnVec fH (hvlMinusState fO fPhi) = 1
+    ∧ rayleighOnVec fO (hvlMinusState fO fPhi) = -2 :=
+  ⟨hvlMinusState_energy_eq fH_herm fO_herm fH_eigen fPhi_norm f_odd1, fXiMinusH, fXiMinusO⟩
+
+/-! ## Fixture F3 — orthogonality and normalisation -/
+
+/-- **Fixture F3 (orthogonality, normalisation).** `⟨Ξ₋|Ξ₊⟩ = 0` and `⟨Ξ₋|Ξ₋⟩ = 1` at the
+two-spin fixture. Substituting `Ξ₊` for `Ξ₋` in the first conjunct would read `⟨Ξ₊|Ξ₊⟩ = 1`
+against a claimed `= 0`, i.e. `1 = 0`, so this conjunct alone rules that substitution out. -/
+example :
+    star (hvlMinusState fO fPhi) ⬝ᵥ hvlPlusState fO fPhi = 0
+    ∧ star (hvlMinusState fO fPhi) ⬝ᵥ hvlMinusState fO fPhi = 1 := by
+  have hm2 : 0 < rayleighOnVec (fO ^ 2) fPhi := by rw [fPhi_orderSq]; norm_num
+  exact ⟨hvlMinusState_dotProduct_hvlPlusState fO fPhi fO_herm fPhi_norm f_odd1 hm2,
+    hvlMinusState_dotProduct_self fO fPhi fO_herm fPhi_norm f_odd1 hm2⟩
+
+/-! ## Fixture F4 — the mirror order bound, exactly tight -/
+
+/-- **Fixture F4 (mirror order bound, tight).** At `q₀ = 1`, `Ld = 2` (`L = 2`, `d = 1`), the LRO
+hypothesis `q₀ ≤ m₂ / Ld ^ 2 = 4 / 4 = 1` holds with equality, and the conclusion
+`⟨Ξ₋|Ô|Ξ₋⟩ / Ld = -2 / 2 = -1 = -√q₀` is likewise an equality, as the second conjunct records: both
+the hypothesis and the conclusion are exactly tight, so neither a weakened nor a strengthened
+right-hand side passes here. The third conjunct is the untruncated order-mean identity
+`⟨Ξ₋|Ô|Ξ₋⟩ = -√(⟨Φ|Ô²|Φ⟩)` this bound is built from. -/
+example :
+    rayleighOnVec fO (hvlMinusState fO fPhi) / (2 : ℝ) ≤ -Real.sqrt (1 : ℝ)
+    ∧ rayleighOnVec fO (hvlMinusState fO fPhi) / (2 : ℝ) = -1
+    ∧ rayleighOnVec fO (hvlMinusState fO fPhi) = -Real.sqrt (rayleighOnVec (fO ^ 2) fPhi) := by
+  have hm2 : 0 < rayleighOnVec (fO ^ 2) fPhi := by rw [fPhi_orderSq]; norm_num
+  have hLRO : (1 : ℝ) ≤ rayleighOnVec (fO ^ 2) fPhi / (2 : ℝ) ^ 2 := by
+    rw [fPhi_orderSq]; norm_num
+  refine ⟨hvlMinusState_order_mean_le_neg_sqrt fO fPhi fO_herm f_odd1 f_odd3
+    (by norm_num : (0 : ℝ) < 1) (by norm_num : (0 : ℝ) < 2) hLRO, ?_, ?_⟩
+  · rw [fXiMinusO]; norm_num
+  · exact hvlMinusState_order_mean fO fPhi fO_herm f_odd1 f_odd3 hm2
+
+/-! ## Fixture F5 — negative size parameter falsifies the mirror bound's conclusion -/
+
+/-- **Fixture F5 (negative `Ld`).** At `fO`, `Ξ₋`, `Ld = -2` the conclusion of
+`hvlMinusState_order_mean_le_neg_sqrt` fails: `⟨Ξ₋|Ô|Ξ₋⟩ / (-2) = -2 / (-2) = 1`, which is not
+`≤ -√1 = -1`. The declaration's own hypothesis `0 < Ld` is load-bearing at this data. -/
+example : ¬ (rayleighOnVec fO (hvlMinusState fO fPhi) / (-2 : ℝ) ≤ -Real.sqrt (1 : ℝ)) := by
+  rw [fXiMinusO, Real.sqrt_one]
+  norm_num
+
+/-! ## Fixtures F6/F7 — a vanishing order-square Rayleigh quotient -/
+
+/-- The one-site reference vector for the vanishing-quotient fixtures F6/F7. -/
+private noncomputable def bPhi : Fin 1 → ℂ := ![1]
+
+/-- `bPhi` is normalised. -/
+private lemma bPhi_norm : star bPhi ⬝ᵥ bPhi = 1 := by
+  unfold bPhi
+  simp [dotProduct]
+
+/-- At the zero order operator the trial state is the zero vector. -/
+private lemma bTrial : hvlTrialState (0 : Matrix (Fin 1) (Fin 1) ℂ) bPhi = 0 := by
+  unfold hvlTrialState unitNormalize
+  simp
+
+/-- **Fixture F6 (vanishing order-square quotient).** At `O = 0`, `Φ = bPhi`, the trial state
+collapses to the zero vector, so `Ξ₋` collapses onto `Ξ₊`: both `⟨Ξ₋|Ξ₋⟩` and `⟨Ξ₋|Ξ₊⟩` evaluate
+to `1 / 2` rather than to `1` and `0` respectively. This is evidence that the positivity
+hypothesis `0 < rayleighOnVec (O ^ 2) Φ` in `hvlMinusState_dotProduct_self` and
+`hvlMinusState_dotProduct_hvlPlusState` is a genuine truth condition, not proof convenience: both
+declarations' conclusions fail at this data, so they are not being invoked here. -/
+example :
+    star (hvlMinusState (0 : Matrix (Fin 1) (Fin 1) ℂ) bPhi)
+        ⬝ᵥ hvlMinusState (0 : Matrix (Fin 1) (Fin 1) ℂ) bPhi = 1 / 2
+    ∧ star (hvlMinusState (0 : Matrix (Fin 1) (Fin 1) ℂ) bPhi)
+        ⬝ᵥ hvlPlusState (0 : Matrix (Fin 1) (Fin 1) ℂ) bPhi = 1 / 2
+    ∧ rayleighOnVec (0 : Matrix (Fin 1) (Fin 1) ℂ) bPhi = 0 := by
+  refine ⟨?_, ?_, by simp [rayleighOnVec]⟩
+  · unfold hvlMinusState
+    rw [bTrial]
+    simp only [sub_zero, star_smul, smul_dotProduct, dotProduct_smul, smul_eq_mul,
+      Complex.star_def, map_inv₀, Complex.conj_ofReal, bPhi_norm, mul_one]
+    rw [sqrt2_inv_mul_sqrt2_inv]
+  · unfold hvlMinusState hvlPlusState
+    rw [bTrial]
+    simp only [sub_zero, add_zero, star_smul, smul_dotProduct, dotProduct_smul, smul_eq_mul,
+      Complex.star_def, map_inv₀, Complex.conj_ofReal, bPhi_norm, mul_one]
+    rw [sqrt2_inv_mul_sqrt2_inv]
+
+/-- **Fixture F7 (energy identity at a vanishing order-square quotient).** The energy identity
+carries no positivity hypothesis on the order-square Rayleigh quotient, and holds even where the
+quotient vanishes: at `O = 0`, `H = diagonal ![5]`, both sides of the identity evaluate to `5 / 2`.
+-/
+example :
+    rayleighOnVec (Matrix.diagonal ![(5 : ℂ)]) (hvlMinusState (0 : Matrix (Fin 1) (Fin 1) ℂ) bPhi)
+      = ((5 : ℝ) + rayleighOnVec (Matrix.diagonal ![(5 : ℂ)])
+          (hvlTrialState (0 : Matrix (Fin 1) (Fin 1) ℂ) bPhi)) / 2 := by
+  have hH : (Matrix.diagonal ![(5 : ℂ)]).IsHermitian := by
+    unfold Matrix.IsHermitian
+    ext i j; fin_cases i; fin_cases j; simp [Matrix.diagonal]
+  have hE : (Matrix.diagonal ![(5 : ℂ)]) *ᵥ bPhi = ((5 : ℝ) : ℂ) • bPhi := by
+    unfold bPhi
+    ext i
+    fin_cases i; simp [mulVec, dotProduct, Matrix.diagonal]
+  exact hvlMinusState_energy_eq hH Matrix.isHermitian_zero hE bPhi_norm (by simp)
+
+/-! ## Fixture F8 — capstone non-vacuity, mirror form -/
+
+/-- **Fixture F8 (capstone non-vacuity, mirror form).** The mirror capstone
+`tasaki_mirrorLowLyingState_ssb`, applied at the same witness data as the `Ξ₊` capstone's
+non-vacuity fixture (`Λw = Fin 1`, `N = 1`, `B = ∅`, `o 0 = pauliXS 0`, `d = L = q₀ = o₀ = 1`,
+`h₀ = 0`, `E₀ = 0`), produces its five conjuncts concretely. The hypothesis bundle is already
+discharged above (`hΦw_holds`, `hΦEw_holds`, `hminw_holds`, `hodd1w_holds`, `hodd3w_holds`,
+`hLROw_holds`, `hOw_holds`, `hnoAllw_holds`) for the `Ξ₊` capstone and is reused here rather than
+restated. -/
+example :
+    star (hvlMinusState (∑ x : Λw, ow x) Φw) ⬝ᵥ hvlMinusState (∑ x : Λw, ow x) Φw = 1
+    ∧ star (hvlMinusState (∑ x : Λw, ow x) Φw) ⬝ᵥ hvlPlusState (∑ x : Λw, ow x) Φw = 0
+    ∧ (0 : ℝ) ≤ rayleighOnVec (∑ _b ∈ (∅ : Finset Unit), (0 : ManyBodyOpS Λw Nw))
+        (hvlMinusState (∑ x : Λw, ow x) Φw) - 0
+    ∧ rayleighOnVec (∑ _b ∈ (∅ : Finset Unit), (0 : ManyBodyOpS Λw Nw))
+        (hvlMinusState (∑ x : Λw, ow x) Φw) - 0
+        ≤ 4 * ((1 : ℕ) : ℝ) * 0 * (1 : ℝ) ^ 2 / 1 / ((1 : ℕ) : ℝ) ^ (1 : ℕ)
+    ∧ rayleighOnVec (∑ x : Λw, ow x) (hvlMinusState (∑ x : Λw, ow x) Φw)
+        / ((1 : ℕ) : ℝ) ^ (1 : ℕ) ≤ -Real.sqrt 1 := by
+  have hox : (∑ x : Λw, ow x) = ow (0 : Fin 1) := by simp
+  exact tasaki_mirrorLowLyingState_ssb (∅ : Finset Unit) (fun _ => (0 : ManyBodyOpS Λw Nw)) ow
+    (fun _ => (∅ : Finset Λw)) 1 1 1 0 1 Matrix.isHermitian_zero hOw_holds (by simp)
+    (fun x z hxz => absurd (Subsingleton.elim x z) hxz) (by simp)
+    hnoAllw_holds
+    (le_refl _) zero_le_one (by simp) (by simp) hΦw_holds hΦEw_holds hminw_holds
+    (by rw [hox]; exact hodd1w_holds) (by rw [hox]; exact hodd3w_holds) one_pos (le_refl _)
+    (by rw [hox]; exact hLROw_holds)
 
 end LatticeSystem.Tests.HorschVonderLindenLowLyingState

@@ -32,9 +32,9 @@ terms vanish — `Φ_GS` is an eigenvector of the Hermitian `Ĥ` and `⟨Φ_GS|�
 assumption (3.4.4). That identity is the step the source covers with the word "obviously"; it needs
 no positivity of the second moment, and at a vanishing second moment `Γ` is the zero vector and the
 identity still holds. Eq. (3.4.16) is eq. (3.4.15) read against eq. (3.4.3) through monotonicity of
-`Real.sqrt`; `hvlPlusState_order_mean_ge_sqrt` takes assumption (3.4.4) in its third-moment form
-(the vanishing of `⟨Φ_GS|(Ô_L)³|Φ_GS⟩`), and the capstone takes the same third-moment hypothesis to
-assemble that lemma's conclusion into eq. (3.4.16)'s conjunct. The
+`Real.sqrt`; `hvlPlusState_order_mean_ge_sqrt` takes assumption (3.4.4) in both its first- and
+third-moment forms (`hodd1` and `hodd3`), and the capstone takes the same two odd-moment hypotheses
+to assemble that lemma's conclusion into eq. (3.4.16)'s conjunct. The
 Schwarz remark (3.4.17) holds for any normalised vector and is not used in the derivation of
 eq. (3.4.16); Hermiticity of the order operator is essential there, since for a nilpotent operator
 the right-hand side can vanish while the left-hand side does not.
@@ -70,6 +70,98 @@ operator) whose hypothesis bundle is discharged by proof, showing the capstone i
 true for every instance. Since a one-sided numeric endpoint is blind to a wrongly large right-hand
 side, the strict eq. (3.4.17) instance routes through an intermediate step that spells the constant
 and the radicand out syntactically.
+
+## The mirror state `Ξ₋` (pp. 68-69)
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4, the sentence
+beginning "Of course the state `|Ξ₋⟩ = (|Φ_GS⟩ − |Γ⟩)/√2` ..." on p. 68, the same page as
+eqs. (3.4.14) and (3.4.16).
+
+`Quantum/HorschVonderLindenLowLyingState.lean` builds `Ξ₋` on top of the sign identity
+`hvlTrialState_neg : Γ(−Ô_L) = −Γ(Ô_L)` (`Quantum/HorschVonderLindenTrialState.lean`): the
+normalisation factor `‖Ô_L|Φ_GS⟩‖` is even in the sign of `Ô_L`, so mirroring the order operator
+only flips the sign of the vector that factor scales. This gives the bridge
+`hvlMinusState_eq_hvlPlusState_neg : Ξ₋(Ô_L) = Ξ₊(−Ô_L)`, needing neither Hermiticity of `Ô_L` nor
+normalisation of `Φ_GS`. Four `Ξ₋` declarations below are obtained by instantiating their `Ξ₊`
+counterpart at `−Ô_L`: normalisation (`hvlMinusState_dotProduct_self`, from
+`hvlPlusState_dotProduct_self`, part 3, "Authoritative supplemental implementation record") and the
+order mean (`hvlMinusState_order_mean`, from `hvlPlusState_order_mean`, same section of part 3), and
+the energy identity (`hvlMinusState_energy_eq`, from `hvlPlusState_energy_eq`, part 4, "The
+low-lying state `Ξ₊`") and the order bound (`hvlMinusState_order_mean_le_neg_sqrt`, from
+`hvlPlusState_order_mean_ge_sqrt`, same section of part 4); the
+mirror argument itself is never replayed there. The energy identity is **even** in the sign of the
+trial state, so `⟨Ξ₋|Ĥ|Ξ₋⟩` reduces to the same right-hand side `(E_GS + ⟨Γ|Ĥ|Γ⟩)/2` as
+`⟨Ξ₊|Ĥ|Ξ₊⟩`, while the order mean is **odd**, so its `Ξ₋` form carries a minus sign against
+eq. (3.4.16). Orthogonality `⟨Ξ₋|Ξ₊⟩ = 0` is proved separately from the `Γ` moment algebra rather
+than by substitution — a pairing of two different states has no single-state `Ξ₊` counterpart to
+instantiate — from the diagonal terms `⟨Φ_GS|Φ_GS⟩ = 1` and `⟨Γ|Γ⟩ = 1` cancelling against each
+other and both cross terms vanishing by the first odd-moment assumption (3.4.4), together with the
+normalisation of `Φ_GS` and of `Γ`. The capstone `tasaki_mirrorLowLyingState_ssb` is likewise not
+among the four: it calls the `Ξ₊` capstone at `+Ô_L` and transports its energy conjuncts across the
+energy identity `⟨Ξ₋|Ĥ|Ξ₋⟩ = ⟨Ξ₊|Ĥ|Ξ₊⟩`, so eq. (3.4.12) is not re-derived.
+
+**Corrigendum (printed sub/superscript, not load-bearing).** The orthogonality sentence on p. 68
+names the state `|Ξ_L^+⟩`, carrying an `L` subscript this symbol carries nowhere else in §3.4 and
+placing the `+` in superscript where the surrounding text (including eq. (3.4.14) itself) places
+it in subscript, `|Ξ_+⟩`. Under either reading the referent is the same state, the one of
+eq. (3.4.14); no value or derivation in this repository depends on which reading is intended.
+`hvlMinusState_dotProduct_hvlPlusState` below states orthogonality against `hvlPlusState`, the
+eq. (3.4.14) state.
+
+**What these declarations do not assert.** Hermiticity of `Ô_L` is not assumed by
+`hvlTrialState_neg` or the bridge; it first enters through the instantiation at `−Ô_L`, in each of
+the four `Ξ₋` declarations named above, and separately, directly at `+Ô_L` (not through any
+instantiation), in the orthogonality proof `hvlMinusState_dotProduct_hvlPlusState`
+(`Quantum/HorschVonderLindenLowLyingState.lean:331`). The `L ↑ ∞` and `h ↓ 0` limits of Theorem 3.2
+are not taken here either.
+
+All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
+`Classical.choice`, `Quot.sound`.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `hvlTrialState_neg` | `Γ(−Ô_L) = −Γ(Ô_L)`, the trial state is odd in the order operator; no hypothesis | `Quantum/HorschVonderLindenTrialState.lean` |
+| `hvlMinusState` | the mirror state `\|Ξ₋⟩ = (1/√2)(\|Φ_GS⟩ − \|Γ⟩)`, pp. 68-69 | `Quantum/HorschVonderLindenLowLyingState.lean` |
+| `hvlMinusState_eq_hvlPlusState_neg` | the mirror bridge `Ξ₋(Ô_L) = Ξ₊(−Ô_L)`; no hypothesis | `Quantum/HorschVonderLindenLowLyingState.lean` |
+| `hvlMinusState_dotProduct_self` | `⟨Ξ₋\|Ξ₋⟩ = 1`, from `hvlPlusState_dotProduct_self` at `−Ô_L`, under Hermiticity, normalisation, the first odd moment and `0 < m₂` | `Quantum/HorschVonderLindenLowLyingState.lean` |
+| `hvlMinusState_energy_eq` | `⟨Ξ₋\|Ĥ\|Ξ₋⟩ = (E_GS + ⟨Γ\|Ĥ\|Γ⟩)/2`, from `hvlPlusState_energy_eq` at `−Ô_L`, under Hermiticity of `Ĥ` and `Ô_L`, the eigenvector hypothesis, normalisation and the first odd moment | `Quantum/HorschVonderLindenLowLyingState.lean` |
+| `hvlMinusState_order_mean` | `⟨Ξ₋\|Ô_L\|Ξ₋⟩ = −√m₂`, from `hvlPlusState_order_mean` at `−Ô_L`, under Hermiticity, the first and third odd moments and `0 < m₂` | `Quantum/HorschVonderLindenLowLyingState.lean` |
+| `hvlMinusState_order_mean_le_neg_sqrt` | the mirror form of eq. (3.4.16), `⟨Ξ₋\|Ô_L\|Ξ₋⟩ / Ld ≤ −√q₀`, from `hvlPlusState_order_mean_ge_sqrt` at `−Ô_L`, under Hermiticity, the first and third odd moments, `0 < q₀`, `0 < Ld` and long-range order | `Quantum/HorschVonderLindenLowLyingState.lean` |
+| `hvlMinusState_dotProduct_hvlPlusState` | orthogonality `⟨Ξ₋\|Ξ₊⟩ = 0`, proved from the `Γ` moment algebra, under Hermiticity, normalisation, the first odd moment and `0 < m₂` | `Quantum/HorschVonderLindenLowLyingState.lean` |
+| `tasaki_mirrorLowLyingState_ssb` (**capstone**) | the mirror-state sentence of p. 68 in the bond-local spin-`S` setting: `⟨Ξ₋\|Ξ₋⟩ = 1`, `⟨Ξ₋\|Ξ₊⟩ = 0`, `0 ≤ ⟨Ξ₋\|Ĥ\|Ξ₋⟩ − E_GS ≤ (C/2) L^{-d}` with `C = 8 d h₀ o₀² / q₀`, and `⟨Ξ₋\|Ô_L/L^d\|Ξ₋⟩ ≤ −√q₀`, under the same hypothesis block as `tasaki_eq_3_4_16_lowLyingState_ssb` | `Quantum/HorschVonderLindenLowLyingState.lean` |
+
+**Boundary facts, checked against the tree.** At the concrete one-dimensional instance `Ô_L = 0`
+the order-square Rayleigh quotient `⟨Φ_GS|(Ô_L)²|Φ_GS⟩` vanishes, `Γ` is the zero vector, and `Ξ₋`
+coincides with `Ξ₊`: the positivity hypothesis `0 < m₂` taken by `hvlMinusState_dotProduct_self`
+and `hvlMinusState_dotProduct_hvlPlusState` is therefore a **truth condition** for normalisation
+and orthogonality at this instance, not proof convenience — `⟨Ξ₋|Ξ₋⟩` and `⟨Ξ₋|Ξ₊⟩` both come out
+`1/2` rather than `1` and `0`. The energy identity still holds at that same degenerate instance
+(`Ô_L = 0`, `Ĥ = diagonal ![5]`); the fixture pins the identity itself, not a bare numeric value. A
+negative size parameter falsifies the mirror order bound: at `Ld = −2` with `q₀ = 1` the conclusion
+of `hvlMinusState_order_mean_le_neg_sqrt` fails; the fixture pins that failure but not that the
+remaining hypotheses (in particular the long-range-order hypothesis) hold at this data. Argued but
+**not** machine-checked in this repository: that the long-range-order hypothesis of
+`hvlMinusState_order_mean_le_neg_sqrt` also holds at `Ld = −2`, `q₀ = 1`; whether `Γ` is the zero
+vector, and `Ξ₋` coincides with `Ξ₊`, at every vanishing order-square Rayleigh quotient, beyond the
+one instance `Ô_L = 0` checked; whether `hvlMinusState_order_mean_le_neg_sqrt` fails at every
+negative `Ld` (checked only at `Ld = −2`); the vacuity/falsity distinction at `d = 0`, where the
+bond-set hypothesis forces the constant `C` to `0` and the energy conjuncts of the capstone read
+`0 ≤ 0 ≤ 0` while the normalisation, orthogonality and order conjuncts keep content.
+
+Regression fixtures live in `LatticeSystem/Tests/HorschVonderLindenLowLyingState.lean`, in the
+block "Signature pins — the mirror state" and the "Sign-error fixtures for the mirror state `Ξ₋`"
+that follow it. Because `Ξ₋` differs from `Ξ₊` only by signs, a fixture built for `Ξ₊` can pass on
+a wrongly-signed `Ξ₋`, so each numeric fixture carries a value that discriminates the correct sign:
+a direct pin on the state's four entries on the two-spin instance
+(`hvlMinusState fO fPhi = ![1/2, -(1/2), -(1/2), 1/2]`); the energy identity together with the
+sign-discriminating value `rayleighOnVec fO (hvlMinusState fO fPhi) = -2` against `Ξ₊`'s `+2`
+(needed because the identity's own right-hand side is even in the sign of `Γ` and would not by
+itself catch a flipped sign); orthogonality and normalisation pinned together, since substituting
+`Ξ₊` for `Ξ₋` there reads `1 = 0`; a tight instance at `q₀ = 1`, `Ld = 2`; a negative-`Ld` instance
+where the mirror bound's own conclusion fails; two boundary instances at a vanishing
+order-square Rayleigh quotient, discharged by proof rather than assumed satisfiable; and a mirror
+capstone non-vacuity witness at the same data as the `Ξ₊` capstone's, showing
+`tasaki_mirrorLowLyingState_ssb` is not vacuously true for every instance.
 
 ---
 

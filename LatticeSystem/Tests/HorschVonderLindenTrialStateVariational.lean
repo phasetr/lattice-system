@@ -17,7 +17,8 @@ theorems about the trial state `Γ = hvlTrialState O Φ` (eq. (3.4.7)): its unit
 `⟨·,·⟩` pairing onto `Φ` (`dotProduct_mulVec_trialState`, `trialState_dotProduct_mulVec`,
 `trialState_dotProduct_mulVec_trialState`). The `Ξ₊`-specific moment identities of
 `HorschVonderLindenProblem34b.lean` are the current consumers of this vocabulary; the mirror state
-`Ξ₋` (pp. 68-69) has no declaration yet and is therefore not pinned. Each theorem is pinned below
+`Ξ₋` (pp. 68-69) is built in `HorschVonderLindenLowLyingState.lean` on `hvlTrialState_neg` below and
+pinned in `Tests/HorschVonderLindenLowLyingState.lean`, not here. Each theorem is pinned below
 as a **signature pin**: the declaration's own statement, discharged only by applying the identifier
 itself, so the pin fails exactly when the identifier cannot be resolved from another module.
 

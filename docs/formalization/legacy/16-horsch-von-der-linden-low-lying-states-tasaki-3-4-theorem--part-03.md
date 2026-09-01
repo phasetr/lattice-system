@@ -54,7 +54,9 @@ precise formulation to §4.3. Eq. (3.4.16) `⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q�
 (3.4.17) are recorded in
 [part 4](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-04/)
 under "The low-lying state `Ξ₊`, eqs. (3.4.16)-(3.4.17)"; the mirror
-state `Ξ₋` is outside this development. The `L ↑ ∞` statement is a limit of
+state `Ξ₋` is recorded in the same part 4, in "The mirror state `Ξ₋` (pp. 68-69)": it is `Ξ₊` at
+the mirrored order operator, `Ξ₋(Ô_L) = Ξ₊(−Ô_L)`, since the trial state's normalisation factor is
+even in the sign of the order operator. The `L ↑ ∞` statement is a limit of
 finite-volume real numbers, not a statement about a state on a quasi-local C\*-algebra.
 
 All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
@@ -90,8 +92,10 @@ between `Γ` and `Φ_GS`, and of the basic variational estimate
 
 that Tasaki reads off "by inspection" on p. 66. The symmetric combination `Ξ₊` of eq. (3.4.14)
 (`Quantum/HorschVonderLindenProblem34b.lean`) is built on top of `Γ` and imports this module; the
-mirror state `Ξ₋` (pp. 68-69) is not formalised anywhere yet and is left to a later stage of the
-§3.4 development.
+mirror state `Ξ₋` (pp. 68-69) is built in `Quantum/HorschVonderLindenLowLyingState.lean` on the
+sign identity `hvlTrialState_neg : hvlTrialState (-O) Φ = -hvlTrialState O Φ` defined here, which
+turns a `Ξ₋` statement into its `Ξ₊` counterpart at the mirrored order operator (part 4, "The
+mirror state `Ξ₋` (pp. 68-69)").
 
 Eq. (3.4.8) is the un-normalised double-commutator identity
 `double_commutator_ground_state_eq` (`Quantum/SpinS/DoubleCommutatorVariational.lean`) divided by

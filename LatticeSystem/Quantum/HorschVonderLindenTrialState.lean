@@ -15,7 +15,8 @@ vector `Φ_GS`, and the basic variational estimate
 This is the shared `Γ`-vocabulary of §3.4.  The symmetric combination
 `Ξ₊ = (|Φ_GS⟩ + |Γ⟩)/√2` of eq. (3.4.14) is built on top of it in
 `HorschVonderLindenProblem34b.lean`, which imports this module.  Its mirror `Ξ₋` (pp. 68-69) is
-not formalised anywhere yet; it is left to a later stage of the §3.4 development.
+built in `HorschVonderLindenLowLyingState.lean` on the sign identity `hvlTrialState_neg` below,
+which turns a `Ξ₋` statement into its `Ξ₊` counterpart at the mirrored order operator.
 
 Everything is stated for an arbitrary finite index type and an arbitrary Hermitian `Ô_L`; the only
 quantitative input is positivity of the second moment `m₂ = ⟨Φ_GS|(Ô_L)²|Φ_GS⟩`, which is what
@@ -57,6 +58,21 @@ private theorem vecNormSqRe_mulVec_eq_rayleigh {n : Type*} [Fintype n] [Decidabl
 image of the reference vector under the order operator, unit-normalised in the `L²` pairing. -/
 noncomputable def hvlTrialState {n : Type*} [Fintype n] (O : Matrix n n ℂ) (Φ : n → ℂ) : n → ℂ :=
   unitNormalize (O *ᵥ Φ)
+
+/-- **The trial state is odd in the order operator**: `Γ(−Ô_L) = −Γ(Ô_L)`.  The normalisation
+factor `‖Ô_L|Φ_GS⟩‖` is even in the sign of `Ô_L`, so mirroring the order operator changes only the
+vector that factor scales.  The statement takes no hypothesis at all: neither Hermiticity of `Ô_L`
+nor normalisation of `Φ_GS` enters, and no positivity of the second moment is needed, since
+`unitNormalize` is defined at every vector.  It is what carries a statement about the mirror
+state `Ξ₋` (pp. 68-69) back to its `Ξ₊` counterpart at `−Ô_L`. -/
+theorem hvlTrialState_neg {n : Type*} [Fintype n] (O : Matrix n n ℂ) (Φ : n → ℂ) :
+    hvlTrialState (-O) Φ = -hvlTrialState O Φ := by
+  unfold hvlTrialState unitNormalize
+  rw [Matrix.neg_mulVec]
+  have hnorm : vecNormSqRe (-(O *ᵥ Φ)) = vecNormSqRe (O *ᵥ Φ) := by
+    unfold vecNormSqRe
+    rw [star_neg, neg_dotProduct, dotProduct_neg, neg_neg]
+  rw [hnorm, smul_neg]
 
 /-- `Γ` written out as the scalar multiple `(√m₂)⁻¹ • (Ô_L|Φ_GS⟩)`.  This is the defining
 unfolding of `unitNormalize`, so no positivity of `m₂` is needed. -/
