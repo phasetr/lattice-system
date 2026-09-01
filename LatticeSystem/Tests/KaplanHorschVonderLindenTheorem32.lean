@@ -227,12 +227,15 @@ private theorem fieldWitnessState_ne_trial (L : ℕ) (hL : 1 ≤ L) :
 /-- The six hypotheses of `tasaki_theorem_3_2_kaplanHorschVonderLinden` — `hd`, `hvar`, `hE`,
 `hXi`, `hen`, `hub` — instantiated at the field-dependent witness data: `d = 1`, `q₀ = 1`, `C = 1`,
 `o₀ = 1`, `H = fieldWitnessHam`, `O = fieldWitnessOrderOp`, `Ξ = ![0, 1]`, `Ψ = fieldWitnessState`
-and `E = 0`.  It exists so that the satisfaction of the hypotheses is itself a statement: what the
-fixtures around it claim is that the exchanged limit order is refuted on data the capstone applies
-to, and while that satisfaction lives only inside `fieldWitness_capstone`'s proof term, a later
-edit replacing that proof leaves the claim standing with nothing behind it.  Here the type checker
-holds the claim instead.  `hen` is met at equality and carries the upper half of eq. (3.4.12) as
-printed on p. 67, not the halved bound of the `Ξ₊` instantiation. -/
+and `E = 0`.  The guarantee is narrower than it may look: what the type checker holds is the
+linkage through the `exact` in `fieldWitness_capstone`, so reproving that declaration by another
+route would leave this conjunction standing on its own, no longer checked against the capstone.
+What it does buy is real: the concrete hypotheses are a named, greppable statement rather than
+anonymous goals inside a proof term; they are checked against the capstone for as long as
+`fieldWitness_capstone` applies them; they are written out independently of the capstone's
+signature and so survive a change there; and an orphaned copy would trip the repo's zero-reference
+rule.  `hen` is met at equality and carries the upper half of eq. (3.4.12) as printed on p. 67,
+not the halved bound of the `Ξ₊` instantiation. -/
 private theorem fieldWitness_capstone_hypotheses :
     (1 : ℕ) ≤ 1 ∧
       (∀ h : ℝ, 0 < h → ∀ L : ℕ, 1 ≤ L →
