@@ -31,6 +31,7 @@ import LatticeSystem.Quantum.HorschVonderLindenLowLyingState
 import LatticeSystem.Quantum.KaplanHorschVonderLindenTheorem32
 import LatticeSystem.Quantum.SpinS.FalkBruchInfra
 import LatticeSystem.Quantum.SpinS.NoLongRangeOrder1D
+import LatticeSystem.Quantum.SpinS.ShastryNoSSBReduction
 import LatticeSystem.Quantum.SpinS.MPSTheorem75
 import LatticeSystem.Quantum.SpinS.AKLTMatrixProduct
 import LatticeSystem.Quantum.SpinS.AKLTInfiniteChain
