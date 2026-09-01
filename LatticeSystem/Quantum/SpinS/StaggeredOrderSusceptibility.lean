@@ -19,11 +19,6 @@ namespace LatticeSystem.Quantum
 open Matrix
 open scoped ComplexOrder
 
-/-- The ring nearest-neighbor coupling is real-valued (`0`/`1`), hence self-conjugate. -/
-theorem ringCoupling_self_star (L : ℕ) (x y : Fin L) :
-    star (ringCoupling L x y) = ringCoupling L x y := by
-  unfold ringCoupling; split <;> simp
-
 /-- **The squared staggered order parameter is bounded by `O(L)` times the susceptibility.**  For a
 ground state `Φ` of the zero-field ring (eigenvalue `hermitianMinEigenvalue`) and a potential `y`
 for `ÔΦ` (`(Ĥ − E₀) y = ÔΦ`), `2 (Re⟨Φ, Ô² Φ⟩)² ≤ 12 N³ · L · Re⟨y, ÔΦ⟩`. -/

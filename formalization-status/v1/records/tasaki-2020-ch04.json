@@ -2,18 +2,53 @@
   "records": [
     {
       "axiom_dependencies": [
-        "LatticeSystem.Quantum.shastry_no_symmetry_breaking_1d"
+        "LatticeSystem.Quantum.shastryEnergyGain"
+      ],
+      "capstone": false,
+      "declaration_kind": "axiom",
+      "id": "tasaki-2020-theorem-4-2-shastry-energy-gain",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.shastryEnergyGain",
+      "module": "LatticeSystem.Quantum.SpinS.ShastryNoSSBReduction",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "source_coverage": "partial",
+      "source_path": "LatticeSystem/Quantum/SpinS/ShastryNoSSBReduction.lean",
+      "source_relations": [
+        {
+          "relation": "presents",
+          "source_item_id": "tasaki-2020-theorem-4-2"
+        },
+        {
+          "relation": "attributes",
+          "source_item_id": "shastry-1992-static-susceptibility-argument"
+        },
+        {
+          "relation": "supports",
+          "source_item_id": "tanaka-takeda-idogaki-2004-no-ssb"
+        }
+      ],
+      "summary": "The analytic input Tasaki does not prove: for every positive epsilon there is a field scale below which the staggered-field ground-energy gain E_L(0) - E_L(2*eta) of the one-dimensional antiferromagnetic Heisenberg ring is at most epsilon*eta*L for every sufficiently large ring size L.",
+      "topic_ids": [
+        "quantum-spin",
+        "symmetry-breaking"
+      ],
+      "trust_state": "documented_axiom"
+    },
+    {
+      "axiom_dependencies": [
+        "LatticeSystem.Quantum.shastryEnergyGain"
       ],
       "capstone": true,
-      "declaration_kind": "axiom",
+      "declaration_kind": "theorem",
       "id": "tasaki-2020-theorem-4-2-shastry-no-ssb",
       "implementation_state": "implemented",
       "lean_name": "LatticeSystem.Quantum.shastry_no_symmetry_breaking_1d",
-      "module": "LatticeSystem.Quantum.SpinS.ShastryNoSSB",
+      "module": "LatticeSystem.Quantum.SpinS.ShastryNoSSBReduction",
       "origin": "literature",
       "proof_guide_anchor": null,
       "source_coverage": "complete",
-      "source_path": "LatticeSystem/Quantum/SpinS/ShastryNoSSB.lean",
+      "source_path": "LatticeSystem/Quantum/SpinS/ShastryNoSSBReduction.lean",
       "source_relations": [
         {
           "relation": "presents",
@@ -33,7 +68,7 @@
         "quantum-spin",
         "symmetry-breaking"
       ],
-      "trust_state": "documented_axiom"
+      "trust_state": "depends_on_documented_axioms"
     }
   ],
   "schema_version": 1,

@@ -155,6 +155,7 @@ import LatticeSystem.Tests.KaplanHorschVonderLindenTheorem32
 import LatticeSystem.Tests.LocalDoubleCommutatorBound
 import LatticeSystem.Tests.RangeLocalDoubleCommutatorBound
 import LatticeSystem.Tests.OperatorSupport
+import LatticeSystem.Tests.ShastryEnergyGainReduction
 
 /-!
 # Test aggregator for the `lattice-system` library

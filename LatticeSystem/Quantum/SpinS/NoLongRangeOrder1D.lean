@@ -16,8 +16,8 @@ discharge Corollary 4.3 (`no_long_range_order_1d`) from an axiom into a theorem.
 
 Only the *zero-field* Corollary 4.3 is discharged here; the field version Theorem 4.2
 (`shastry_no_symmetry_breaking_1d`, the iterated `lim_{h↓0} lim_{L↑∞}` double limit) is a strictly
-stronger statement not reachable by this static-susceptibility route and remains a documented axiom
-in `ShastryNoSSB.lean`.
+stronger statement not reachable by this static-susceptibility route.  It is a conditional theorem
+in `ShastryNoSSBReduction.lean`, resting on the documented axiom `shastryEnergyGain`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §4.1, Corollary 4.3, eq. (4.1.11), p. 77 (with footnotes 3, p. 76 and 9, p. 83).

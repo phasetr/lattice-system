@@ -109,6 +109,24 @@ conjugate-linear `*`-automorphism with real exponential coefficients) — the bu
 `e^{-βH_L}` Hamiltonian factor of the full Gibbs reflection-positivity decomposition
 <!-- legacy-detail:end:560 -->
 
+**Correction addendum (outside the frozen block above).** The record above, frozen at the
+byte-for-byte parity this migrated block requires, calls Theorem 4.2 a cite-only documented axiom
+and lists its file as `Quantum/SpinS/ShastryNoSSB.lean`. That is no longer current.
+`shastry_no_symmetry_breaking_1d` is now a `theorem` in
+`Quantum/SpinS/ShastryNoSSBReduction.lean`, with its statement unchanged, obtained by applying the
+conditional capstone `shastry_no_symmetry_breaking_1d_of_energy_gain` to the documented axiom
+`shastryEnergyGain` in that same file. The mathematical content is not discharged:
+`shastryEnergyGain` is equivalent in strength to an `L`-uniform form of Theorem 4.2 — only the
+forward half of that equivalence is in Lean, as the conditional capstone; the converse half is a
+hand argument, not formalised anywhere in the development — so
+`#print axioms shastry_no_symmetry_breaking_1d` reports
+`[propext, Classical.choice, Quot.sound, shastryEnergyGain]`. `ShastryNoSSB.lean` now carries only
+the model, in four declarations (`ringCoupling`, `ringCoupling_self_star`,
+`ringStaggeredSublattice`, `staggeredFieldChainHamiltonianS`); the variational layer the reduction
+rests on (`chainGroundEnergy` and its evenness, concavity, zero-field maximality and
+order-parameter sandwich) is in `Quantum/SpinS/ReversalSymmetricGroundEnergy.lean`. See the
+Theorem 4.2 support entry of the Chapter 4 documented-axiom ledger for the current status.
+
 <a id="record-616"></a>
 ## Record from former line 616
 
