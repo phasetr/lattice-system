@@ -153,4 +153,60 @@ theorem tasaki_eq_3_4_17_order_mean_abs_le_sqrt {n : Type*} [Fintype n] [Decidab
       = Real.sqrt ((rayleighOnVec O Φ / Ld) ^ 2) := (Real.sqrt_sq_eq_abs _).symm
     _ ≤ Real.sqrt (rayleighOnVec (O ^ 2) Φ / Ld ^ 2) := Real.sqrt_le_sqrt hdiv
 
+/-! ### The bond-local low-lying state (eq. (3.4.16)) -/
+
+/-- **Tasaki eq. (3.4.16), p. 68, together with the low-lying-state sentence of the same page.**
+In the bond-local spin-`S` setting of eqs. (3.4.1)-(3.4.2), p. 65, at a normalised ground state
+`Φ_GS` with energy `E_GS` obeying long-range order (eq. (3.4.3)) and the no-SSB condition (3.4.4)
+in its first- and third-moment forms, the state `Ξ₊` of eq. (3.4.14) is normalised, sits within
+`(C/2) L^{-d}` above the ground-state energy with `C = 8 d h₀ (o₀)² / q₀` the constant of
+eq. (3.4.12), p. 67, and carries the order parameter `⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q₀`.
+
+The energy conjuncts are eq. (3.4.12) transported through `hvlPlusState_energy_eq`, which halves
+both sides of the bracket `⟨Γ|Ĥ|Γ⟩ − E_GS`; the order conjunct is
+`hvlPlusState_order_mean_ge_sqrt` at `Ld = L^d`.  The hypothesis block is that of
+`tasaki_eq_3_4_12_trialState_energy_bound` together with the two odd-moment hypotheses, which
+eq. (3.4.12) does not take.  At `d = 0` the bond-set hypothesis forces the bond set empty and the
+printed constant to `0`, leaving the energy conjuncts energy-trivial while the normalisation and
+eq. (3.4.16) conjuncts keep their content. -/
+theorem tasaki_eq_3_4_16_lowLyingState_ssb {ι : Type*} (B : Finset ι)
+    (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N) (W : ι → Finset Λ)
+    (d L : ℕ) (q₀ h₀ o₀ : ℝ) {Φ : (Λ → Fin (N + 1)) → ℂ} {E₀ : ℝ}
+    (hH : (∑ b ∈ B, hb b).IsHermitian) (hO : (∑ x : Λ, o x).IsHermitian)
+    (hW : ∀ b ∈ B, ∀ z ∉ W b, Commute (hb b) (o z))
+    (hoo : ∀ x z : Λ, x ≠ z → Commute (o x) (o z))
+    (hnh : ∀ b ∈ B, manyBodyOperatorNormS (hb b) ≤ h₀)
+    (hno : ∀ x : Λ, manyBodyOperatorNormS (o x) ≤ o₀)
+    (hh₀ : 0 ≤ h₀) (ho₀ : 0 ≤ o₀)
+    (hbond : ∀ b ∈ B, (W b).card ≤ 2)
+    (hB : (B.card : ℝ) ≤ (d : ℝ) * (L : ℝ) ^ d)
+    (hΦ : star Φ ⬝ᵥ Φ = 1)
+    (hΦE : (∑ b ∈ B, hb b) *ᵥ Φ = (E₀ : ℂ) • Φ)
+    (hmin : ∀ v : (Λ → Fin (N + 1)) → ℂ, star v ⬝ᵥ v = 1 →
+      E₀ ≤ rayleighOnVec (∑ b ∈ B, hb b) v)
+    (hodd1 : star Φ ⬝ᵥ ((∑ x : Λ, o x) *ᵥ Φ) = 0)
+    (hodd3 : star Φ ⬝ᵥ (((∑ x : Λ, o x) ^ 3) *ᵥ Φ) = 0)
+    (hq₀ : 0 < q₀) (hL : 1 ≤ L)
+    (hLRO : q₀ ≤ rayleighOnVec ((∑ x : Λ, o x) ^ 2) Φ / ((L : ℝ) ^ d) ^ 2) :
+    star (hvlPlusState (∑ x : Λ, o x) Φ) ⬝ᵥ hvlPlusState (∑ x : Λ, o x) Φ = 1
+    ∧ 0 ≤ rayleighOnVec (∑ b ∈ B, hb b) (hvlPlusState (∑ x : Λ, o x) Φ) - E₀
+    ∧ rayleighOnVec (∑ b ∈ B, hb b) (hvlPlusState (∑ x : Λ, o x) Φ) - E₀
+        ≤ 4 * (d : ℝ) * h₀ * o₀ ^ 2 / q₀ / (L : ℝ) ^ d
+    ∧ Real.sqrt q₀
+        ≤ rayleighOnVec (∑ x : Λ, o x) (hvlPlusState (∑ x : Λ, o x) Φ) / (L : ℝ) ^ d := by
+  have hL' : (1 : ℝ) ≤ (L : ℝ) := by exact_mod_cast hL
+  have hLd : (0 : ℝ) < (L : ℝ) ^ d := pow_pos (lt_of_lt_of_le zero_lt_one hL') d
+  have hLd2 : (0 : ℝ) < ((L : ℝ) ^ d) ^ 2 := pow_pos hLd 2
+  have hm2 : 0 < rayleighOnVec ((∑ x : Λ, o x) ^ 2) Φ :=
+    lt_of_lt_of_le (mul_pos hq₀ hLd2) ((le_div_iff₀ hLd2).mp hLRO)
+  have hgamma := tasaki_eq_3_4_12_trialState_energy_bound B hb o W d L q₀ h₀ o₀ hH hO hW hoo
+    hnh hno hh₀ ho₀ hbond hB hΦ hΦE hmin hq₀ hL hLRO
+  have hid := hvlPlusState_energy_eq hH hO hΦE hΦ hodd1
+  have harith : 4 * (d : ℝ) * h₀ * o₀ ^ 2 / q₀ / (L : ℝ) ^ d
+      = (8 * (d : ℝ) * h₀ * o₀ ^ 2 / q₀ / (L : ℝ) ^ d) / 2 := by ring
+  refine ⟨hvlPlusState_dotProduct_self _ Φ hO hΦ hodd1 hm2, ?_, ?_, ?_⟩
+  · rw [hid]; linarith [hgamma.1]
+  · rw [hid, harith]; linarith [hgamma.2]
+  · exact hvlPlusState_order_mean_ge_sqrt _ Φ hO hodd1 hodd3 hq₀ hLd hLRO
+
 end LatticeSystem.Quantum
