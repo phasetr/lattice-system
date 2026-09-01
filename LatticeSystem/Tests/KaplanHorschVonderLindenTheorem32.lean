@@ -10,10 +10,14 @@ Fixtures for `LatticeSystem/Quantum/KaplanHorschVonderLindenTheorem32.lean`: sig
 sharpness witness whose per-volume value is strictly below the bound at every volume; `d = 0` and
 `h < 0` counterexamples; a limit-order pair on a shared bounded family; and a tight/slack pair for
 the uniform bound. Also pins that `rayleighOnVec_sub_smul`
-(`LatticeSystem/Quantum/KaplanHorschVonderLinden.lean`) has been made non-`private`.
+(`LatticeSystem/Quantum/KaplanHorschVonderLinden.lean`) is visible outside its defining module.
 
-None of the declarations under test exist yet, so every pin below fails at elaboration with
-`Unknown identifier`, not at import resolution: the imports themselves already resolve.
+Several steps of the statement typecheck when written wrongly, which is what the counterexample
+blocks are for. The `L^d` and `L^{2d}` error denominators agree at `L^d = 1`, so the sharpness
+family is read at `d = 1` and pins its per-volume value exactly. The exchanged limit order also
+elaborates and is false, so both orders are computed on one shared bounded family. The variational
+hypothesis's direction is not caught by an instance that is tight everywhere, so the uniform bound
+carries a slack instance next to the tight one.
 -/
 
 namespace LatticeSystem.Quantum
@@ -22,8 +26,8 @@ open Matrix Filter Topology
 
 /-! ### Signature pins -/
 
-/-- Pins that `rayleighOnVec_sub_smul` is exported from its defining module (no longer
-`private`), so it is callable from this separate test file. -/
+/-- Pins that `rayleighOnVec_sub_smul` is exported from its defining module, hence callable from
+this separate test file. -/
 example {n : Type*} [Fintype n] (H O : Matrix n n ℂ) (h : ℝ) (v : n → ℂ) :
     rayleighOnVec (H - (h : ℂ) • O) v = rayleighOnVec H v - h * rayleighOnVec O v :=
   rayleighOnVec_sub_smul H O h v
@@ -125,10 +129,8 @@ example :
 
 /-! ### Sharpness: the two-level `1/L` family, tight at `d = 1`, `h = 1`, `C = 1`, `m = 1` -/
 
-/-- Test-local sharpness order operator `Otest L := diag(L, L - 1/L)`: at the trial vector `e₀`
-its Rayleigh quotient is exactly `L` and at the perturbed vector `e₁` exactly `L - 1/L`. Not
-reused from `LatticeSystem/Tests/HorschVonderLindenLowLyingState.lean`, whose fixture data is
-`private` to that file. -/
+/-- Test-local sharpness order operator `diag(L, L - 1/L)`: at the trial vector `e₀` its Rayleigh
+quotient is exactly `L` and at the perturbed vector `e₁` exactly `L - 1/L`. -/
 private noncomputable def sharpnessOrderOperator (L : ℕ) : Matrix (Fin 2) (Fin 2) ℂ :=
   Matrix.diagonal ![((L : ℝ) : ℂ), (((L : ℝ) - 1 / (L : ℝ) : ℝ) : ℂ)]
 
@@ -164,9 +166,12 @@ private theorem sharpnessHamiltonian_atPsi (L : ℕ) :
     Matrix.diagonal]
 
 /-- Sharpness fixture: at `d = 1`, `h = 1`, `C = 1`, `m = 1`, the two-level family satisfies the
-variational, ground-energy and energy-bound hypotheses at equality, and its per-volume order mean
-`L - 1/L` (`= 1 - 1/L^2` after dividing by `L`) is strictly below `m = 1` at every `L ≥ 1` — no
-finite volume witnesses the (wrong, `L^d`-powered) conclusion `1 ≤ (L - 1/L)/L`. -/
+variational, ground-energy and energy-bound hypotheses at equality, its per-volume order mean is
+strictly below `m = 1` at every `L ≥ 1`, and that mean equals `1 - 1/(L^1)^2` — which is
+`m - C/(h * (L^d)^2)` exactly, so the bound of
+`tasaki_eq_3_4_21_perVolume_energyBound` is attained here while the finite-volume statement
+`m ≤ ⟨Ψ|O|Ψ⟩/L^d` is false. The exact value is what pins the error term's denominator: the variant
+with `L^d` in place of `L^{2d}` also typechecks. -/
 example :
     (∀ L : ℕ, 1 ≤ L →
       rayleighOnVec (sharpnessHamiltonian L - ((1 : ℝ) : ℂ) • sharpnessOrderOperator L) ![0, 1]
@@ -177,12 +182,15 @@ example :
     ∧ (∀ L : ℕ, 1 ≤ L →
         rayleighOnVec (sharpnessHamiltonian L) ![1, 0] - 0 ≤ (1 : ℝ) / (L : ℝ) ^ 1)
     ∧ (∀ L : ℕ, 1 ≤ L →
-        rayleighOnVec (sharpnessOrderOperator L) ![0, 1] / (L : ℝ) ^ 1 < (1 : ℝ)) := by
+        rayleighOnVec (sharpnessOrderOperator L) ![0, 1] / (L : ℝ) ^ 1 < (1 : ℝ))
+    ∧ (∀ L : ℕ, 1 ≤ L → rayleighOnVec (sharpnessOrderOperator L) ![0, 1] / (L : ℝ) ^ 1
+        = 1 - 1 / (((L : ℝ) ^ 1) ^ 2)) := by
   have hL0 : ∀ L : ℕ, 1 ≤ L → (L : ℝ) ≠ 0 := by
     intro L hL
     have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast hL
     positivity
-  refine ⟨fun L hL => ?_, fun L hL => ?_, fun L hL => ?_, fun L hL => ?_, fun L hL => ?_⟩
+  refine ⟨fun L hL => ?_, fun L hL => ?_, fun L hL => ?_, fun L hL => ?_, fun L hL => ?_,
+    fun L hL => ?_⟩
   · rw [rayleighOnVec_sub_smul, rayleighOnVec_sub_smul, sharpnessOrder_atXi, sharpnessOrder_atPsi,
       sharpnessHamiltonian_atXi, sharpnessHamiltonian_atPsi]
     have := hL0 L hL
@@ -201,6 +209,9 @@ example :
     rw [div_lt_one hLpos]
     have : 0 < 1 / (L : ℝ) := by positivity
     linarith
+  · rw [sharpnessOrder_atPsi, pow_one]
+    have h0 := hL0 L hL
+    field_simp
 
 /-! ### `d = 0` counterexample -/
 
@@ -284,10 +295,9 @@ example : liminf (fun L : ℕ => liminf (fun h : ℝ => min (h * L) 1) (𝓝[>] 
 
 /-! ### `tasaki_orderParameter_uniformBound`: a tight instance and a slack instance -/
 
-/-- Tight instance, newly derived (not present in the scratch prototypes): `Λ = Fin 1`, `N = 0`,
-`o x = 1`, `o₀ = 1`, `d = L = 1`. The unique config space `Fin 1 → Fin 1` is `1`-dimensional, so
-the constant normalised vector `Ψ := fun _ => 1` gives `rayleighOnVec (∑ x, o x) Ψ = 1`, and
-`|1 / 1^1| = 1 = o₀`: the conclusion is an equality. -/
+/-- Tight instance: `Λ = Fin 1`, `N = 0`, `o x = 1`, `o₀ = 1`, `d = L = 1`. The config space
+`Fin 1 → Fin 1` is `1`-dimensional, so the constant normalised vector `Ψ := fun _ => 1` gives
+`rayleighOnVec (∑ x, o x) Ψ = 1`, and `|1 / 1^1| = 1 = o₀`: the conclusion is an equality. -/
 example :
     |rayleighOnVec (∑ _x : Fin 1, (1 : ManyBodyOpS (Fin 1) 0)) (fun _ => (1 : ℂ))
         / ((1 : ℕ) : ℝ) ^ 1| ≤ (1 : ℝ) := by
@@ -297,7 +307,7 @@ example :
     (fun _ : Fin 1 => (1 : ManyBodyOpS (Fin 1) 0)) (o₀ := 1) (d := 1) (L := 1)
     (fun _ => le_of_eq manyBodyOperatorNormS_one) (by norm_num) (by simp) le_rfl hΨ
 
-/-- Slack instance, newly derived: same operator and state as the tight instance but `L = 2`, so
+/-- Slack instance: same operator and state as the tight instance but `L = 2`, so
 the carrier hypothesis `1 ≤ 2^1` and the conclusion `1/2 ≤ 1` are both strict — exercising the
 carrier hypothesis `hcard` away from equality. -/
 example :

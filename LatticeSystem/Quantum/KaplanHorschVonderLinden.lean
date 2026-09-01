@@ -28,7 +28,7 @@ namespace LatticeSystem.Quantum
 open Matrix
 
 /-- The Rayleigh quotient of a real-scaled difference splits: `R(H − h·O) v = R(H) v − h·R(O) v`. -/
-private theorem rayleighOnVec_sub_smul {n : Type*} [Fintype n]
+theorem rayleighOnVec_sub_smul {n : Type*} [Fintype n]
     (H O : Matrix n n ℂ) (h : ℝ) (v : n → ℂ) :
     rayleighOnVec (H - (h : ℂ) • O) v = rayleighOnVec H v - h * rayleighOnVec O v := by
   unfold rayleighOnVec
