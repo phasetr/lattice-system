@@ -18,11 +18,12 @@ blocks are for. The `L^d` and `L^{2d}` error denominators agree at `L^d = 1`, so
 family is read at `d = 1` and pins its per-volume value exactly. The exchanged limit order also
 elaborates, so both orders are computed on one shared bounded family, where they come out `1` and
 `0`; the field-dependent witness then instantiates the capstone and refutes the exchanged order on
-that instance. The variational
-hypothesis's direction is pinned by the four signature examples that carry it, each of which
-typechecks only against the exact inequality written, and not by any numeric instance. The uniform
-bound carries no variational hypothesis at all; its tight and slack instances exercise the carrier
-hypothesis `hcard` at and away from equality.
+that instance. The variational hypothesis's direction is pinned twice: by the four signature
+examples that carry it, each of which typechecks only against the exact inequality written, and
+numerically by the field-dependent witness, whose weak branch discharges it as `0 ≤ 1/L − h·L`;
+reversing the inequality would demand `1/L − h·L ≤ 0`, which is false at every `h·L² < 1`. The
+uniform bound carries no variational hypothesis at all; its tight and slack instances exercise the
+carrier hypothesis `hcard` at and away from equality.
 -/
 
 namespace LatticeSystem.Quantum
@@ -145,8 +146,11 @@ private noncomputable def fieldWitnessOrderOp (L : ℕ) : Matrix (Fin 2) (Fin 2)
   Matrix.diagonal ![0, ((L : ℝ) : ℂ)]
 
 /-- Test-local Hamiltonian `diag(0, 1/L)` of the field-dependent witness.  Its `1/L` entry sits on
-`e₁`, so the trial state `Ξ L = e₁` costs the energy `1/L`, meeting eq. (3.4.12)'s bound `C/L^d` at
-`C = 1`, `d = 1` with equality; the ground energy `E L = 0` is attained at `e₀`. -/
+`e₁`, so the trial state `Ξ L = e₁` costs the energy `1/L`, meeting the hypothesis `hen` at
+`C = 1`, `d = 1` with equality.  What `hen` carries here is the upper half of eq. (3.4.12) as
+printed on p. 67, `⟨Γ|Ĥ|Γ⟩ − E_GS ≤ C L^{-d}`; this fixture is not the `Ξ₊` instantiation, where
+the constant fed in is the source's `C/2` and `hen` is the halved bound.  The ground energy
+`E L = 0` is attained at `e₀`. -/
 private noncomputable def fieldWitnessHam (L : ℕ) : Matrix (Fin 2) (Fin 2) ℂ :=
   Matrix.diagonal ![0, ((1 / (L : ℝ) : ℝ) : ℂ)]
 
@@ -332,11 +336,15 @@ per-volume order mean is strictly below `m = 1` at every `L ≥ 1`, and that mea
 `1 - 1/(L^1)^2`, which is `m - C/(h * (L^d)^2)` exactly, so that bound is attained here while the
 finite-volume statement `m ≤ ⟨Ψ|O|Ψ⟩/L^d` is false. That the order bound `hXi` is tight too is what
 makes the attainment informative: `m = 1` is the largest value it admits on this data, so the
-conclusion is met with equality without any of those four inequalities being slack. The exact value
-constrains the error term's denominator from one side only: a denominator larger than `L^{2d}` would
-claim a bound strictly above what this family attains and is refuted here, whereas `L^d` in place of
-`L^{2d}` enlarges the error term, so that variant is weaker and stays true on this family. Both are
-equally well-typed, so elaboration alone does not choose between them. -/
+conclusion is met with equality without any of those four inequalities being slack. What the last
+conjunct pins is that exact value; unlike the `d = 0` and `h < 0` blocks below, this block carries
+no `¬` conjunct, so nothing is refuted by it directly. From the exact value it follows in one step
+that the error term's denominator is constrained from one side: a variant with a denominator larger
+than `L^{2d}` claims at every `L ≥ 2` a bound strictly above what this family attains, so no such
+variant holds on it (at `L = 1` both are `0`, which is why the strictness needs `L ≥ 2`).
+Replacing `L^{2d}` by `L^d` instead enlarges the error term, so that variant is weaker and stays
+true on this family. Both are equally well-typed, so elaboration alone does not choose between
+them. -/
 example :
     (∀ L : ℕ, 1 ≤ L →
       rayleighOnVec (sharpnessHamiltonian L - ((1 : ℝ) : ℂ) • sharpnessOrderOperator L) ![0, 1]
