@@ -18,21 +18,23 @@ printed order returns `1` while the exchanged order returns `0`, which is the re
 gives for the order: at a fixed volume `⟨Φ_GS,h|Ô_L/L^d|Φ_GS,h⟩ → 0` as `h ↓ 0` by continuity, so
 the field's effect survives only once the volume limit has been taken first.
 
-The real-valued `liminf` forces side conditions that the physics does not.  A sequence unbounded
-above has real `liminf` equal to `0`, so with no upper bound on the order parameter the conclusion
-would be false rather than merely unprovable; the hypothesis `hub` supplies the coboundedness that
-rules this out, and `tasaki_orderParameter_uniformBound` produces such a bound from a per-site
-operator-norm bound together with a carrier hypothesis `#Λ ≤ L^d`.  Separately, the error term
+The real-valued `liminf` forces side conditions that the physics does not.  `Filter.liminf` on `ℝ`
+is the supremum of the eventual lower bounds, and a real supremum of a set unbounded above is the
+junk value `0`, so an order parameter diverging with the volume would have `liminf` `0`; that is
+why the statement carries an upper bound at all.  The hypothesis `hub` is that bound, and
+`tasaki_orderParameter_uniformBound` produces one from a per-site operator-norm bound together with
+a carrier hypothesis `#Λ ≤ L^d`.  Separately, the error term
 `C/(h·L^{2d})` decays only for `1 ≤ d`; at `d = 0` it is the constant `C/h` and the volume limit
 fails.  The constant that eq. (3.4.12) supplies carries a factor `d`, so it vanishes at `d = 0`,
 but the abstract `C` used here cannot record that.
 
 The finite-volume input is `kaplan_horsch_vonderLinden_order_lower_bound`
 (`Quantum/KaplanHorschVonderLinden.lean`), which is eq. (3.4.21)'s first line rearranged from the
-ground-state inequality eq. (3.4.20).  Its trial-state hypotheses are what
+ground-state inequality eq. (3.4.20).  Two of the conjuncts that
 `tasaki_eq_3_4_16_lowLyingState_ssb` (`Quantum/HorschVonderLindenLowLyingState.lean`) establishes at
-`Ξ = Ξ₊`: the order-parameter bound `⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q₀` of eq. (3.4.16) enters as `hXi`, and the
-halved eq. (3.4.12) bound `⟨Ξ₊|Ĥ|Ξ₊⟩ − E_GS ≤ (C/2)L^{-d}` enters as `hen`.  The `L`-indexed and
+`Ξ = Ξ₊` are hypotheses of the declarations below: the order-parameter bound
+`⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q₀` of eq. (3.4.16) as `hXi`, and the halved eq. (3.4.12) bound
+`⟨Ξ₊|Ĥ|Ξ₊⟩ − E_GS ≤ (C/2)L^{-d}` as `hen`.  The `L`-indexed and
 `h`-indexed family is carried at the matrix level, so the §3.4 packaging meets the limits through
 the instantiation of those hypotheses rather than through a declaration in this module.
 
@@ -64,8 +66,8 @@ private theorem kaplanHorschVonderLinden_errorTerm_tendsto_zero {C h : ℝ} {d :
 /-- The `liminf` kernel of the volume limit.  A real sequence `f` squeezed from below by
 `m − C/(h·(L^d)^2)` and from above by `o₀`, both from `L = 1` on, has `m ≤ liminf f atTop` and
 `liminf f atTop ≤ o₀`.  The lower conjunct is monotonicity of `liminf` against the convergent
-minorant; the upper conjunct is what makes the lower one meaningful, since a real `liminf` is
-insensitive to the sequence being unbounded above and returns `0` there. -/
+minorant; the upper conjunct is what makes the lower one meaningful, since a real `liminf` is a
+supremum of eventual lower bounds and takes the junk value `0` when the sequence diverges. -/
 private theorem kaplanHorschVonderLinden_liminf_bounds {f : ℕ → ℝ} {m C h o₀ : ℝ} {d : ℕ}
     (hd : 1 ≤ d) (hh : 0 < h)
     (hlb : ∀ L : ℕ, 1 ≤ L → m - C / (h * ((L : ℝ) ^ d) ^ 2) ≤ f L)
@@ -143,8 +145,9 @@ family `o : Λ → ManyBodyOpS Λ N` whose members have operator norm at most `o
 state `Ψ`, and a carrier satisfying `#Λ ≤ L^d` with `1 ≤ L`, the mean
 `⟨Ψ|(∑ x, o x)|Ψ⟩/L^d` has absolute value at most `o₀`.  The carrier hypothesis is what converts
 the extensive bound `#Λ · o₀` on the sum into an intensive one; eq. (3.4.12)'s bond-count
-hypothesis bounds the number of interaction bonds and does not supply it.  This is the source of
-the outer coboundedness hypothesis of `tasaki_theorem_3_2_kaplanHorschVonderLinden`. -/
+hypothesis bounds the number of interaction bonds and does not supply it.  The conclusion has the
+shape of the uniform bound `hub` that `tasaki_theorem_3_2_kaplanHorschVonderLinden` takes
+abstractly; no declaration here composes the two. -/
 theorem tasaki_orderParameter_uniformBound {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
     (o : Λ → ManyBodyOpS Λ N) {o₀ : ℝ} {d L : ℕ}
     (hno : ∀ x : Λ, manyBodyOperatorNormS (o x) ≤ o₀) (ho₀ : 0 ≤ o₀)

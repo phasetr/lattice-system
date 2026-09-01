@@ -12745,14 +12745,16 @@ parameter obeys $\langle\Xi,O\Xi\rangle+(E_0-\langle\Xi,H\Xi\rangle)/h\le\langle
 Proof: $R(H-hO)\Psi\le R(H-hO)\Xi$ with $R(H-hO)=R(H)-h\,R(O)$ (Rayleigh real-linearity), rearrange
 using $h>0$, and bound $R(H)\Psi\ge E_0$.  The double limit $L\uparrow\infty$, $h\downarrow0$ (with
 the essential bound $\langle\Xi_+,O_L/L^d\,\Xi_+\rangle\ge\sqrt{q_0}$) then gives the $\sqrt{q_0}$
-order-parameter bound (3.4.22) --- the thermodynamic input, formalized as the capstone
-\texttt{tasaki\_theorem\_3\_2\_kaplanHorschVonderLinden} discussed below.  At the trial state
+order-parameter bound (3.4.22), formalized on an abstract $L$-indexed family as the capstone
+\texttt{tasaki\_theorem\_3\_2\_kaplanHorschVonderLinden} discussed below; no thermodynamic-limit
+construction is built.  At the trial state
 $\Xi=\Xi_+$, the capstone
 \texttt{tasaki\_eq\_3\_4\_16\_lowLyingState\_ssb}
 (\texttt{Quantum/HorschVonderLindenLowLyingState.lean}) supplies that essential bound together with
 the normalization and energy conjuncts the core's variational step needs, at a single finite
-volume; composing it with the core and taking the double limit is exactly what the eq.~(3.4.22)
-capstone below does.  Chapters~3--10 backfill.
+volume; the eq.~(3.4.22) capstone below performs the double limit, but takes those bounds as
+hypotheses on an abstract family rather than composing them with the core.  Chapters~3--10
+backfill.
 
 \noindent\textbf{Problem 3.4.b} (Tasaki~\cite{Tasaki:QMB} §3.4, statement p.~69 eq.~(3.4.18),
 solution p.~501 eqs.~(S.42)--(S.43), with the surrounding eqs.~(3.4.3), (3.4.4), (3.4.7),

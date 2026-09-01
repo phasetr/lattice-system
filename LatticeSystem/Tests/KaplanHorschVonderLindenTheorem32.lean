@@ -15,7 +15,8 @@ the uniform bound. Also pins that `rayleighOnVec_sub_smul`
 Several steps of the statement typecheck when written wrongly, which is what the counterexample
 blocks are for. The `L^d` and `L^{2d}` error denominators agree at `L^d = 1`, so the sharpness
 family is read at `d = 1` and pins its per-volume value exactly. The exchanged limit order also
-elaborates and is false, so both orders are computed on one shared bounded family. The variational
+elaborates, so both orders are computed on one shared bounded family: they come out `1` and `0`
+there, which separates the two nestings without instantiating the capstone. The variational
 hypothesis's direction is pinned by the four signature examples that carry it, each of which
 typechecks only against the exact inequality written, and not by any numeric instance. The uniform
 bound carries no variational hypothesis at all; its tight and slack instances exercise the carrier
@@ -72,8 +73,9 @@ example {n : ℕ → Type*} [∀ L, Fintype (n L)]
     m ≤ liminf (fun L : ℕ => rayleighOnVec (O L) (Ψ L) / (L : ℝ) ^ d) atTop :=
   tasaki_eq_3_4_21_volumeLiminf H O Ψ Ξ E hd hh hvar hE hXi hen hub
 
-/-- Pins `tasaki_orderParameter_uniformBound`, the carrier hypothesis `hcard : #Λ ≤ L^d` supplying
-the outer coboundedness that `tasaki_theorem_3_2_kaplanHorschVonderLinden` needs. -/
+/-- Pins `tasaki_orderParameter_uniformBound`, whose conclusion has the shape of the uniform bound
+`hub` that `tasaki_theorem_3_2_kaplanHorschVonderLinden` takes abstractly; the carrier hypothesis
+`hcard : #Λ ≤ L^d` is what makes that bound intensive. -/
 example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
     (o : Λ → ManyBodyOpS Λ N) {o₀ : ℝ} {d L : ℕ}
     (hno : ∀ x : Λ, manyBodyOperatorNormS (o x) ≤ o₀) (ho₀ : 0 ≤ o₀)
@@ -105,7 +107,7 @@ example {n : ℕ → Type*} [∀ L, Fintype (n L)]
 
 /-- Non-vacuity witness: on `Fin 1`, `O L := L^d • 1` and `H L := 0` for every `L`, with
 `Ξ L = Ψ h L := ![1]` for every `h`, every hypothesis of the capstone is discharged by proof and
-the order mean is the constant sequence `1`, so the conclusion reads `1 ≤ 1`. -/
+the order mean is `1` at every `L ≥ 1`, so the conclusion reads `1 ≤ 1`. -/
 example :
     Real.sqrt 1 ≤ liminf (fun _h : ℝ => liminf (fun L : ℕ =>
         rayleighOnVec ((((L : ℝ) ^ 1 : ℝ) : ℂ) • (1 : Matrix (Fin 1) (Fin 1) ℂ)) ![(1 : ℂ)]
@@ -136,9 +138,10 @@ quotient is exactly `L` and at the perturbed vector `e₁` exactly `L - 1/L`. -/
 private noncomputable def sharpnessOrderOperator (L : ℕ) : Matrix (Fin 2) (Fin 2) ℂ :=
   Matrix.diagonal ![((L : ℝ) : ℂ), (((L : ℝ) - 1 / (L : ℝ) : ℝ) : ℂ)]
 
-/-- Test-local sharpness Hamiltonian `Htest L := diag(1/L, 0)`, giving the field-perturbed
-Hamiltonian `Htest L - Otest L` a strictly lower Rayleigh quotient at `e₁` than at `e₀`, tight at
-eq. (3.4.21)'s per-volume bound. -/
+/-- Test-local sharpness Hamiltonian `Htest L := diag(1/L, 0)`.  Against `Otest L` it makes the
+field-perturbed `Htest L - Otest L` the scalar matrix `(1/L - L) • 1`, so its Rayleigh quotient
+agrees at `e₀` and `e₁` and eq. (3.4.20)'s variational hypothesis holds at equality — which is what
+lets the fixture below attain eq. (3.4.21)'s per-volume bound. -/
 private noncomputable def sharpnessHamiltonian (L : ℕ) : Matrix (Fin 2) (Fin 2) ℂ :=
   Matrix.diagonal ![((1 / (L : ℝ) : ℝ) : ℂ), 0]
 
@@ -174,8 +177,8 @@ per-volume order mean is strictly below `m = 1` at every `L ≥ 1`, and that mea
 finite-volume statement `m ≤ ⟨Ψ|O|Ψ⟩/L^d` is false. That the order bound `hXi` is tight too is what
 makes the attainment informative: `m = 1` is the largest value it admits on this data, so the
 conclusion is met with equality without any of those four inequalities being slack. The exact value
-is what pins the error term's denominator: the variant with `L^d` in place of `L^{2d}` also
-typechecks. -/
+is what fixes the error term's denominator: `L^d` in place of `L^{2d}` is equally well-typed, so
+elaboration alone does not choose between them. -/
 example :
     (∀ L : ℕ, 1 ≤ L →
       rayleighOnVec (sharpnessHamiltonian L - ((1 : ℝ) : ℂ) • sharpnessOrderOperator L) ![0, 1]
@@ -219,9 +222,10 @@ example :
 
 /-! ### `d = 0` counterexample -/
 
-/-- `d = 0` makes the volume-liminf conclusion false while every hypothesis of
-`tasaki_eq_3_4_21_volumeLiminf` holds: at `Fin 1`, `H L := 1 - 1`, `O L := 1`,
-`Ψ L := ![0]`, `Ξ L := ![1]`, `E L := 0`, `m := 1`, `C := 1`, `o₀ := 0`. -/
+/-- `d = 0` makes the volume-liminf conclusion false: at `Fin 1`, `H L := 1 - 1`, `O L := 1`,
+`Ψ L := ![0]`, `Ξ L := ![1]`, `E L := 0`, `m := 1`, `C := 1`, `h := 1`, `o₀ := 0`, the family
+hypotheses `hvar`, `hE`, `hXi`, `hen` and `hub` of `tasaki_eq_3_4_21_volumeLiminf` are discharged
+by proof and its conclusion is refuted, so `1 ≤ d` is not removable. -/
 example :
     (∀ L : ℕ, 1 ≤ L →
       rayleighOnVec ((1 : Matrix (Fin 1) (Fin 1) ℂ) - ((1 : ℝ) : ℂ) • 1) ![(0 : ℂ)]
@@ -252,8 +256,8 @@ example :
 /-! ### `h < 0` counterexample -/
 
 /-- `h < 0` breaks `tasaki_eq_3_4_21_perVolume`: at `Fin 1`, `H := 0`, `O := 1`, `Ld := 1`,
-`E₀ := 0`, `m := 1`, `h := -1`, `Ψ := ![0]`, `Ξ := ![1]`, both hypotheses hold but the conclusion
-fails. -/
+`E₀ := 0`, `m := 1`, `h := -1`, `Ψ := ![0]`, `Ξ := ![1]`, the hypotheses `hvar`, `hE₀` and `hXi`
+hold but the conclusion fails, so `0 < h` is not removable. -/
 example :
     rayleighOnVec ((0 : Matrix (Fin 1) (Fin 1) ℂ) - ((-1 : ℝ) : ℂ) • 1) ![(0 : ℂ)]
         ≤ rayleighOnVec ((0 : Matrix (Fin 1) (Fin 1) ℂ) - ((-1 : ℝ) : ℂ) • 1) ![(1 : ℂ)]
@@ -302,8 +306,10 @@ example : liminf (fun L : ℕ => liminf (fun h : ℝ => min (h * L) 1) (𝓝[>] 
 /-! ### `tasaki_orderParameter_uniformBound`: a tight instance and a slack instance -/
 
 /-- Tight instance: `Λ = Fin 1`, `N = 0`, `o x = 1`, `o₀ = 1`, `d = L = 1`. The config space
-`Fin 1 → Fin 1` is `1`-dimensional, so the constant normalised vector `Ψ := fun _ => 1` gives
-`rayleighOnVec (∑ x, o x) Ψ = 1`, and `|1 / 1^1| = 1 = o₀`: the conclusion is an equality. -/
+`Fin 1 → Fin 1` is `1`-dimensional, so the constant normalised vector `Ψ := fun _ => 1` has
+`rayleighOnVec (∑ x, o x) Ψ = 1`, and both `hcard` (`1 ≤ 1^1`) and the conclusion (`|1 / 1^1| ≤ 1`)
+sit at equality. What the fixture checks is the conclusion; the Rayleigh value is not pinned
+separately here. -/
 example :
     |rayleighOnVec (∑ _x : Fin 1, (1 : ManyBodyOpS (Fin 1) 0)) (fun _ => (1 : ℂ))
         / ((1 : ℕ) : ℝ) ^ 1| ≤ (1 : ℝ) := by
@@ -313,9 +319,9 @@ example :
     (fun _ : Fin 1 => (1 : ManyBodyOpS (Fin 1) 0)) (o₀ := 1) (d := 1) (L := 1)
     (fun _ => le_of_eq manyBodyOperatorNormS_one) (by norm_num) (by simp) le_rfl hΨ
 
-/-- Slack instance: same operator and state as the tight instance but `L = 2`, so
-the carrier hypothesis `1 ≤ 2^1` and the conclusion `1/2 ≤ 1` are both strict — exercising the
-carrier hypothesis `hcard` away from equality. -/
+/-- Slack instance: same operator and state as the tight instance but `L = 2`, so `hcard`
+(`1 ≤ 2^1`) and the conclusion (`|1 / 2^1| ≤ 1`) are both strict — exercising `hcard` away from
+equality. -/
 example :
     |rayleighOnVec (∑ _x : Fin 1, (1 : ManyBodyOpS (Fin 1) 0)) (fun _ => (1 : ℂ))
         / ((2 : ℕ) : ℝ) ^ 1| ≤ (1 : ℝ) := by
