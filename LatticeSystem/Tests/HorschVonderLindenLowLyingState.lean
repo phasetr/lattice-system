@@ -622,7 +622,7 @@ example {n : Type*} [Fintype n] (O : Matrix n n ℂ) (Φ : n → ℂ) :
 /-- **Signature pin (definition).** Pins that `hvlMinusState` takes the same parameter shape as
 `hvlPlusState`: a matrix and a vector on a common finite index type, returning a vector on that
 type. -/
-example {n : Type*} [Fintype n] (O : Matrix n n ℂ) (Φ : n → ℂ) : n → ℂ :=
+noncomputable example {n : Type*} [Fintype n] (O : Matrix n n ℂ) (Φ : n → ℂ) : n → ℂ :=
   hvlMinusState O Φ
 
 /-- **Signature pin.** Pins the bridge `hvlMinusState O Φ = hvlPlusState (-O) Φ`, with no
@@ -848,11 +848,11 @@ example :
           (hvlTrialState (0 : Matrix (Fin 1) (Fin 1) ℂ) bPhi)) / 2 := by
   have hH : (Matrix.diagonal ![(5 : ℂ)]).IsHermitian := by
     unfold Matrix.IsHermitian
-    ext i j; fin_cases i <;> fin_cases j <;> simp [Matrix.diagonal]
+    ext i j; fin_cases i; fin_cases j; simp [Matrix.diagonal]
   have hE : (Matrix.diagonal ![(5 : ℂ)]) *ᵥ bPhi = ((5 : ℝ) : ℂ) • bPhi := by
     unfold bPhi
     ext i
-    fin_cases i <;> simp [mulVec, dotProduct, Matrix.diagonal]
+    fin_cases i; simp [mulVec, dotProduct, Matrix.diagonal]
   exact hvlMinusState_energy_eq hH Matrix.isHermitian_zero hE bPhi_norm (by simp)
 
 /-! ## Fixture F8 — capstone non-vacuity, mirror form -/
