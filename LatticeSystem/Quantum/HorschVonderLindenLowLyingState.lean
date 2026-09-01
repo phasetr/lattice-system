@@ -51,8 +51,8 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 eigenvalue `E_GS`, under the first odd-moment assumption (3.4.4), p. 65.
 
 Both cross terms `⟨Φ_GS|Ĥ|Γ⟩` and `⟨Γ|Ĥ|Φ_GS⟩` vanish: `⟨Φ_GS|Γ⟩ = 0` by (3.4.4), and Hermiticity
-of `Ĥ` moves it onto the eigenvector on either side.  Hermiticity enters only there, through the
-bra-side pairing `⟨Φ_GS|Ĥ = ⟨ĤΦ_GS|`.  No positivity of the order-square Rayleigh quotient
+of `Ĥ` moves it onto the eigenvector on either side, through the bra-side pairing
+`⟨Φ_GS|Ĥ = ⟨ĤΦ_GS|`.  No positivity of the order-square Rayleigh quotient
 `rayleighOnVec (O ^ 2) Φ` is assumed; where that quotient vanishes, `Γ` is the zero vector and both
 sides read `E_GS/2`.  Halving turns the two-sided bound of eq. (3.4.12) into the printed
 `⟨Ξ₊|Ĥ|Ξ₊⟩ ≤ E_GS + (C/2) L^{-d}` of p. 68. -/
@@ -129,10 +129,10 @@ does not use it.
 
 Real Cauchy–Schwarz at the identity matrix, applied to `Φ` and `Ô_L Φ` and combined with
 `⟨Ô_L Φ|Ô_L Φ⟩ = ⟨Φ|(Ô_L)²|Φ⟩`, gives `(⟨Φ|Ô_L|Φ⟩)² ≤ ⟨Φ|(Ô_L)²|Φ⟩`; taking square roots produces
-the absolute value.  Hermiticity of `Ô_L` is what makes the statement true: at the nilpotent
+the absolute value.  Hermiticity of `Ô_L` is load-bearing rather than cosmetic: at the nilpotent
 `Ô_L = !![0,1;0,0]` with `Φ = (1/√2, 1/√2)` and `Ld = 1` the right-hand side is `0` while the
-left-hand side is `1/2`.  The hypothesis `0 < Ld` supports moving the size parameter under the
-root; at `Ld = 0` both sides of the conclusion are `0`. -/
+left-hand side is `1/2`, so the inequality fails there.  The hypothesis `0 < Ld` supports moving
+the size parameter under the root; at `Ld = 0` both sides of the conclusion are `0`. -/
 theorem tasaki_eq_3_4_17_order_mean_abs_le_sqrt {n : Type*} [Fintype n] [DecidableEq n]
     {O : Matrix n n ℂ} {Φ : n → ℂ} {Ld : ℝ}
     (hO : O.IsHermitian) (hΦ : star Φ ⬝ᵥ Φ = 1) (hLd : 0 < Ld) :
