@@ -13,7 +13,8 @@ level: `H` is any Hermitian Hamiltonian, `O` any Hermitian order operator, and `
 (`Θ Θ = 1`) that commutes with `H` and reverses `O` (`Θ O Θ = −O`).
 
 `chainGroundEnergy hH hO h` is the ground energy `E(h)` of `H − h·O`, i.e. the minimum eigenvalue
-of that Hermitian matrix.  Three properties follow from nothing but the variational principle:
+of that Hermitian matrix.  Three properties of it are developed here — the first from invariance of
+the spectrum under conjugation by a unit, the other two from the variational principle:
 
 * `chainGroundEnergy_neg` — `E(h) = E(−h)`, since `Θ` conjugates `H − h·O` into `H + h·O` and
   conjugation by a unit preserves the spectrum;
@@ -171,9 +172,11 @@ trial state at the other two fields: `E(0) ≤ ⟨Ĥ⟩` yields the middle inequ
 `h⟨Ô⟩_h` between two differences of the *scalar* function `E`, eliminating the eigenvector
 quantifiers and any ground-state degeneracy.
 
-The hypothesis `0 ≤ h` is not consumed by the algebra — all three inequalities are proved for every
-real `h` — and is kept because the chain is only informative for `h ≥ 0`: it is exactly there that
-`0 ≤ E(0) − E(h)` forces `0 ≤ ⟨Ô⟩`, which is the sign the Theorem 4.2 reduction needs.
+The hypothesis `0 ≤ h` is retained deliberately, although the algebra never consumes it: all three
+inequalities are proved for every real `h`, and the leading underscore of `_hh` records that it goes
+unused.  It is kept because it marks the only regime in which the chain carries information — for
+`h ≥ 0` the left inequality `0 ≤ E(0) − E(h)` forces `0 ≤ ⟨Ô⟩`, the sign the Theorem 4.2 reduction
+consumes — so it is a documented restriction on callers rather than an oversight.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §3.4, eqs. (3.4.19)–(3.4.20), pp. 69–70; §4.1, eqs. (4.1.9)–(4.1.10), pp. 76–77. -/

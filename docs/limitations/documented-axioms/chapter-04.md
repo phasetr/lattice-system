@@ -14,7 +14,7 @@ permalink: /limitations/documented-axioms/chapter-04/
 
 **Tasaki §4.1, Theorem 4.2** (eqs. (4.1.9)-(4.1.10), pp. 76-77) rests on one
 **documented axiom**, `shastryEnergyGain`
-(`LatticeSystem/Quantum/SpinS/ShastryNoSSBReduction.lean`, declaration line 158).
+(`LatticeSystem/Quantum/SpinS/ShastryNoSSBReduction.lean`, declaration line 164).
 
 - **Proved (axiom-free):** the whole reduction chain that consumes it. For
   Tasaki's field family `Ĥ_h = Ĥ − h Ô_L` (eq. (3.4.19), p. 69) the abstract
@@ -25,15 +25,15 @@ permalink: /limitations/documented-axioms/chapter-04/
   — all in `ReversalSymmetricGroundEnergy.lean`. The ring instance adds
   `staggeredFieldChainHamiltonianS_isHermitian` and `Θ Ĥ_h Θ = Ĥ_{−h}`
   (`staggeredFieldChainHamiltonianS_conj_manyBodyReversalS`). Feeding the axiom
-  into `shastry_no_symmetry_breaking_1d_of_energy_gain` (same file, line 182) makes
-  `shastry_no_symmetry_breaking_1d` (line 264) a `theorem`, statement unchanged.
-- **This records where the axiom now sits; it is not a discharge and not a policy
-  change.** `#print axioms shastry_no_symmetry_breaking_1d` names
-  `shastryEnergyGain`, which is **equivalent in strength to an `L`-uniform form of
-  Theorem 4.2**: the capstone derives Theorem 4.2 from it, and conversely the sandwich
-  `E_L(0) − E_L(η) ≤ η⟨Ô⟩_η` turns a per-site staggered-moment bound back into an
-  energy-gain bound of the same order. What Tasaki does not prove is as unproved as
-  before; the class and override recorded below are unchanged.
+  into `shastry_no_symmetry_breaking_1d_of_energy_gain` (same file, line 188) makes
+  `shastry_no_symmetry_breaking_1d` (line 270) a `theorem`, statement unchanged.
+- **This records where the axiom now sits; it is not a discharge and not a policy change.**
+  `#print axioms shastry_no_symmetry_breaking_1d` names `shastryEnergyGain`, which is
+  **equivalent in strength to an `L`-uniform form of Theorem 4.2**: the capstone derives
+  Theorem 4.2 from it, and conversely the sandwich `E_L(0) − E_L(η) ≤ η⟨Ô⟩_η` turns a
+  per-site staggered-moment bound back into an energy-gain bound of the same order. Only the
+  forward half of that equivalence is in Lean (the capstone); the converse half is a hand
+  argument, not formalised. The class and override recorded below are unchanged.
 - **What the axiom statement literally asserts:** writing
   `E_L(c) = hermitianMinEigenvalue (Ĥ_c)` for the minimum eigenvalue of
   `staggeredFieldChainHamiltonianS L c N` (eq. (4.1.9)): for every `ε > 0` there is
@@ -41,15 +41,15 @@ permalink: /limitations/documented-axioms/chapter-04/
   which `E_L(0) − E_L(2η) ≤ ε · η · L`. The linear shape is the weakest the reduction
   needs (a `C·η²·L` bound would imply it); the expected `≍ L·η^{4/3}` response of the
   gapless half-integer chains, not formalised here, is why it is not strengthened.
-- **Why the `∃ L₀` is part of the statement:** a bare `∀ L` would be false at small
-  rings for every `N ≥ 1` (at `N = 0` it is true), hence over-quantified. At `L = 1`
-  the coupling degenerates to the self-loop `J 0 0 = 1` and `E_1(0) − E_1(2η) = η·N`
-  exactly, exceeding `ε·η·1` for every `ε < N`; at `L = 3`, `N = 1` the frustrated
-  triangle gives `E_3(0) − E_3(2η) ≥ (5/3)·η`, exceeding `ε·η·3` for every `ε < 5/9`.
-  Both are hand computations, not Lean witnesses, and both are `O(1)` effects the
-  factor `L` absorbs once `L` is large — as is the wrap-around sign defect of odd
-  rings. `N = 0` and `L = 0` are *not* excluded and hold outright; the declaration's
-  doc comment has the full case-by-case derivation.
+- **Why the `∃ L₀` is part of the statement:** a bare `∀ L` would be false at small rings
+  for every `N ≥ 1` (at `N = 0` it is true), hence over-quantified. At `L = 1` the coupling
+  degenerates to the self-loop `J 0 0 = 1` and `E_1(0) − E_1(2η) = η·N` exactly, exceeding
+  `ε·η·1` for every `ε < N`; at `L = 3`, `N = 1` the frustrated triangle gives
+  `E_3(0) − E_3(2η) ≥ (5/3)·η`, exceeding `ε·η·3` for every `ε < 5/9`. Both are hand
+  computations, not Lean witnesses, and both are `O(1)` effects the factor `L` absorbs once
+  `L` is large. Odd rings, wrap-around sign defect and all, are asserted on the same footing
+  as even, with no separate argument for either. `N = 0` and `L = 0` are *not* excluded and
+  hold outright; the declaration's doc comment has the full case-by-case derivation.
 - **Axiom reason (documented):** Tasaki §4.1 footnote 3 (p. 76) reports
   Shastry's original argument (B. S. Shastry, *J. Phys. A* **25**, L249,
   1992) and its rigorous formulation in Tanaka–Takeda–Idogaki (*J. Magn.

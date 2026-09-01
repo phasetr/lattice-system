@@ -97,10 +97,12 @@ formulation of Shastry's argument."  Nothing here recovers that missing argument
 **equivalent in strength to an `L`-uniform form of Theorem 4.2**, since the capstone
 `shastry_no_symmetry_breaking_1d_of_energy_gain` derives Theorem 4.2 from it while, conversely, the
 sandwich `E_L(0) − E_L(η) ≤ η⟨Ô⟩_η` of `chainGroundState_order_mean_sandwich` turns a per-site
-staggered-moment bound back into an energy-gain bound of the same order.  The present development
-is therefore a **conditional reduction of Theorem 4.2, not a discharge of its mathematical
-content**; what it removes is the eigenvector quantifiers, the ground-state degeneracy and the
-inner thermodynamic limit, leaving a single inequality between real numbers.
+staggered-moment bound back into an energy-gain bound of the same order.  Only the forward half of
+that equivalence is in Lean, as the capstone itself; the converse half — and with it the equivalence
+as stated — is a hand argument and is **not** formalised anywhere in this development.  The present
+development is therefore a **conditional reduction of Theorem 4.2, not a discharge of its
+mathematical content**; what it removes is the eigenvector quantifiers, the ground-state degeneracy
+and the inner thermodynamic limit, leaving a single inequality between real numbers.
 
 **Why the exponent on `η` is `1` and not `2`.**  The linear form is the *weaker* of the two, and it
 is the whole of what the reduction consumes: a bound `E_L(0) − E_L(2η) ≤ C · η² · L` with `C > 0`
@@ -136,15 +138,19 @@ asserted beyond a size threshold.  The `∃ L₀` sits *inside* `∀ η` because
 relative to the `ε·η` budget, so the threshold must be allowed to grow as `η ↓ 0`; the resulting
 quantifier nest `ε → η₀ → η → L₀ → L` is the same one Theorem 4.2 itself uses.
 
-**Odd `L` is asserted too, and the wrap-around defect does not exempt it.**  On an odd ring the
-staggered pattern `ε_x = (−1)^x` has a sign defect: sites `L − 1` and `0` are both `+1` and
-adjacent, so no perfect alternation exists.  That defect is again an `O(1)` effect of the kind the
-factor `L` absorbs.  The odd ring differs from the open chain on the same `L` sites — where
-`(−1)^x` does alternate without defect — only by the single wrap bond `Ŝ_{L−1} · Ŝ_0`, whose
-operator norm is at most `3S²`, independently of `L` and of `η`; and a minimum eigenvalue is
-`1`-Lipschitz in the operator norm, so the two energy gains differ by at most `6S²`, a constant that
-`ε · η · L` dominates once `L` is large.  Odd rings therefore stand or fall with the open chain,
-which is the object the cited argument is about.
+**Odd `L` is asserted on the same footing as even `L`, with no separate argument for either.**  On
+an odd ring the staggered pattern `ε_x = (−1)^x` has a sign defect: sites `L − 1` and `0` are both
+`+1` and adjacent, so no perfect alternation exists.  The comparison available for it — with the
+open chain on the same `L` sites, where `(−1)^x` alternates without defect — is
+*parity-independent*: `ringCoupling` is nonzero exactly at `y = (x + 1) % L`, so at every `L ≥ 2`,
+even and odd alike, ring and open chain differ by the single wrap bond `Ŝ_{L−1} · Ŝ_0`, whose
+operator norm is `S(S+1) ≤ 3S²`, independently of `L` and of `η`; a minimum eigenvalue is
+`1`-Lipschitz in the operator norm, so the two energy gains differ by at most `6S²`.  That transfers
+an energy-gain bound between ring and open chain in either direction and distinguishes no parity;
+it does not establish the open-chain case, which is established nowhere in this development either.
+So the defect neither exempts odd `L` nor is disposed of here: the axiom asserts odd `L` on exactly
+the terms on which it asserts even `L`.  Like the two failures above, this comparison is a hand
+estimate and is not witnessed in Lean.
 
 Two boundary cases are *not* excluded and hold outright.  At `N = 0` every site carries a single
 spin state, `Ŝ^{(3)} = 0`, so `Ô_L^{(3)} = 0` and `Ĥ_c = Ĥ_0` for all `c`: the gain is `0`.  At

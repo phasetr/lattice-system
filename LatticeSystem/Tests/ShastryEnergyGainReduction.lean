@@ -168,8 +168,9 @@ cycle the staggered sublattice sign is not a bipartition (site `L − 1` and sit
 and adjacent), and the axiom nevertheless asserts the bound there; this pins that the `∀ L` beyond
 the threshold has not been quietly narrowed to even `L`.  It is the *unbounded* odd rings that are
 covered: the fixed odd ring `L = 3` at `N = 1` violates the inequality (a hand computation recorded
-in `shastryEnergyGain`'s doc comment, together with the reason the wrap-around defect of large odd
-rings is harmless), which is what the threshold exists for. -/
+in `shastryEnergyGain`'s doc comment, which also records that odd `L` is asserted on the same
+footing as even `L`, with no separate argument for either), which is what the threshold exists
+for. -/
 example (N : ℕ) (ε : ℝ) (hε : 0 < ε) :
     ∃ η₀ : ℝ, 0 < η₀ ∧ ∀ η : ℝ, 0 < η → η < η₀ → ∃ L₀ : ℕ,
       hermitianMinEigenvalue (staggeredFieldChainHamiltonianS_isHermitian (2 * L₀ + 1) 0 N) -

@@ -138,7 +138,9 @@ that same file; `ShastryNoSSB.lean` now carries only the model, in four declarat
 `staggeredFieldChainHamiltonianS`), with `staggeredFieldChainHamiltonianS_isHermitian` stated in
 `ShastryNoSSBReduction.lean` as the ring instance of the generic `fieldOpS_isHermitian`. The
 mathematical content is not discharged:
-`shastryEnergyGain` is equivalent in strength to an `L`-uniform form of Theorem 4.2, so
+`shastryEnergyGain` is equivalent in strength to an `L`-uniform form of Theorem 4.2 — only the
+forward half of that equivalence is in Lean, as the conditional capstone; the converse half is a
+hand argument, not formalised anywhere in the development — so
 `#print axioms shastry_no_symmetry_breaking_1d` reports
 `[propext, Classical.choice, Quot.sound, shastryEnergyGain]`. The variational layer it rests on
 (`chainGroundEnergy` and its evenness, concavity, zero-field maximality and order-parameter

@@ -13225,7 +13225,9 @@ falsify the $\eta^2$ shape), and the threshold $L_0$ is required because for $N\
 $\forall L$ fails at $L=1$ (where $E_1(0)-E_1(2\eta)=\eta N$ exactly, so any $\varepsilon<N$ refutes
 it) and at the frustrated triangle $L=3$, $N=1$ (where $E_3(0)-E_3(2\eta)\ge\tfrac53\eta$); both are
 hand computations, not Lean witnesses, and at $N=0$ the bare $\forall L$ form is in fact true.  \textbf{This is a relocation of the gap, not a discharge}: the
-axiom is equivalent in strength to an $L$-uniform form of Theorem 4.2, so
+axiom is equivalent in strength to an $L$-uniform form of Theorem 4.2 --- only the forward half of
+that equivalence is in Lean, as the conditional capstone; the converse half is a hand argument, not
+formalized here --- so
 \texttt{\#print axioms shastry\_no\_symmetry\_breaking\_1d} still names it, and the deep
 infinite-volume argument remains faithfully axiomatized rather than re-proved --- what the reduction
 removes is the eigenvector quantifiers, the ground-state degeneracy and the inner limit. The \emph{reflection-positivity infrastructure} project
