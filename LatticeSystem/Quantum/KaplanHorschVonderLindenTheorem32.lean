@@ -221,8 +221,9 @@ theorem tasaki_eq_3_4_21_volumeLiminf {n : ℕ → Type*} [∀ L, Fintype (n L)]
 `L`-indexed family of Hamiltonians `H L` and order operators `O L`, trial states `Ξ L`, ground
 energies `E L`, and a family `Ψ h L` of ground states of the field-perturbed Hamiltonian
 `H L − h·(O L)` satisfying eq. (3.4.20) at every `h > 0` and `L ≥ 1`, whose trial states obey the
-eq. (3.4.16) order bound `hXi` at `√q₀` and the halved eq. (3.4.12) energy bound `hen`, and whose
-order parameters obey the uniform bound `hub`, one has
+eq. (3.4.16) order bound `hXi` at `√q₀` and the eq. (3.4.12) energy bound `hen` at an abstract `C`
+— halved only at the `Ξ₊` instantiation, which this statement does not perform — and whose order
+parameters obey the uniform bound `hub`, one has
 `√q₀ ≤ liminf_{h ↓ 0} liminf_{L ↑ ∞} ⟨Ψ h L|O L|Ψ h L⟩/L^d`.
 Both limits are `liminf` per footnote 24, the inner over `L` along `atTop` and the outer over `h`
 along `𝓝[>] 0`.  The outer `liminf` takes its lower bound from the inner one at each `h > 0`, and
