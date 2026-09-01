@@ -170,8 +170,9 @@ reality obligation arises. The long-range order condition (3.4.3) and the no-SSB
 derivation either. `Quantum/HorschVonderLindenProblem34b.lean` takes it as a named hypothesis in
 its first- and third-odd-moment forms; on
 [part 4](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-04/),
-`hvlPlusState_energy_eq` takes its first-moment form, and `hvlPlusState_order_mean_ge_sqrt`
-together with the capstone `tasaki_eq_3_4_16_lowLyingState_ssb` take its third-moment form.
+`hvlPlusState_energy_eq` takes its first-moment form (`hodd1` alone), while
+`hvlPlusState_order_mean_ge_sqrt` and the capstone `tasaki_eq_3_4_16_lowLyingState_ssb` each take
+both its first- and third-moment forms (`hodd1` and `hodd3`).
 No lattice structure is imposed:
 `|B_L| = d L^d` enters only as the numeric hypothesis `|B| ≤ d L^d`, and neither `1 ≤ d` nor
 `1 ≤ L` is required.
