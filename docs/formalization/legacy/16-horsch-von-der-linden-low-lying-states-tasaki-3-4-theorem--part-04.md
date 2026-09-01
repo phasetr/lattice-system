@@ -113,7 +113,7 @@ eq. (3.4.14) state.
 `hvlTrialState_neg` or the bridge; it first enters through the instantiation at `−Ô_L`, in each of
 the four `Ξ₋` declarations named above, and separately, directly at `+Ô_L` (not through any
 instantiation), in the orthogonality proof `hvlMinusState_dotProduct_hvlPlusState`
-(`Quantum/HorschVonderLindenLowLyingState.lean:331`). The `L ↑ ∞` and `h ↓ 0` limits of Theorem 3.2
+(`Quantum/HorschVonderLindenLowLyingState.lean:334`). The `L ↑ ∞` and `h ↓ 0` limits of Theorem 3.2
 are taken in `Quantum/KaplanHorschVonderLindenTheorem32.lean` (below, "Theorem 3.2" section of this
 part), but the mirror state `Ξ₋` does not enter there: that capstone's trial-state hypothesis has
 the shape of eq. (3.4.16) with the trial state `Ξ L` left abstract, and no instantiation — at `Ξ₊`,
