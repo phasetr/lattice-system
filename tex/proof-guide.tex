@@ -12793,7 +12793,10 @@ so nothing here certifies a concrete model --- in particular neither that the qu
 satisfies~(3.4.18) nor that the antiferromagnetic Heisenberg model fails it.  The informal notion
 of a physical ``ground state'' of p.~69 is not formalized; the book defers its precise formulation
 to §4.3.  Eq.~(3.4.16) $\langle\Xi_+|\hat O_L/L^d|\Xi_+\rangle\ge\sqrt{q_0}$ and the Schwarz
-remark~(3.4.17) are treated below; the mirror state $\Xi_-$ is outside this development.
+remark~(3.4.17) are treated below; the mirror state $\Xi_-$ is treated further below (``The mirror
+state $\Xi_-$, pp.~68--69''): it is $\Xi_+$ at the mirrored order operator,
+$\Xi_-(\hat O_L)=\Xi_+(-\hat O_L)$, since the trial state's normalization factor is even in the
+sign of the order operator.
 
 \noindent\textbf{Basic variational estimate, eq.~(3.4.8)} (Tasaki~\cite{Tasaki:QMB} §3.4,
 ``Setting and assumptions'' p.~65, eqs.~(3.4.7)--(3.4.8), p.~66; \textbf{discharged axiom-free},
@@ -13032,16 +13035,16 @@ source covers with ``obviously''; the identity assumes no positivity of the seco
 vanishing second moment $\Gamma$ is the zero vector and it still holds.  Eq.~(3.4.16)
 (\texttt{hvlPlusState\_order\_mean\_ge\_sqrt}) is eq.~(3.4.15) read against eq.~(3.4.3) through
 monotonicity of $\sqrt{\cdot}$; \texttt{hvlPlusState\_order\_mean\_ge\_sqrt} takes
-assumption~(3.4.4) in its third-moment form (the vanishing of
-$\langle\Phi_{\mathrm{GS}}|(\hat O_L)^3|\Phi_{\mathrm{GS}}\rangle$), and the capstone takes the same
-third-moment hypothesis to assemble that lemma's conclusion into eq.~(3.4.16)'s conjunct.  The
+assumption~(3.4.4) in both its first- and third-moment forms ($\texttt{hodd1}$ and
+$\texttt{hodd3}$), and the capstone takes the same two odd-moment hypotheses to assemble that
+lemma's conclusion into eq.~(3.4.16)'s conjunct.  The
 Schwarz remark~(3.4.17)
 (\texttt{tasaki\_eq\_3\_4\_17\_order\_mean\_abs\_le\_sqrt}) holds for any normalized vector and is
 not used in deriving eq.~(3.4.16); Hermiticity of the order operator is essential there, since for a
 nilpotent operator the right-hand side can vanish while the left-hand side does not.  As with
 eq.~(3.4.12), the abstract layer carries the volume as a positive real parameter and the capstone
 instantiates it at $L^d$.  \emph{Not asserted.}  The limits $L\uparrow\infty$ and $h\downarrow0$ of
-Theorem~3.2 (eq.~(3.4.22), p.~70) are not taken, the mirror state $\Xi_-$ is not constructed, and
+Theorem~3.2 (eq.~(3.4.22), p.~70) are not taken, and
 the informal notion of a physical ``ground state'' is not formalized.  Fixtures: a concrete two-spin
 instance on $\mathrm{Fin}\,4$ with $\hat H=\mathrm{diagonal}(-1,3,3,-1)$ and a transverse order
 operator, whose~(3.4.4) hypotheses are discharged by proof, giving $E_{\mathrm{GS}}=-1$,
@@ -13055,6 +13058,62 @@ whose hypothesis bundle is discharged by proof, showing the capstone is not vacu
 every instance.  A one-sided numeric endpoint is blind to a wrongly large right-hand side, so the
 strict instance routes through an intermediate step spelling the constant and radicand out
 syntactically.
+
+\noindent\textbf{The mirror state $\Xi_-$, pp.~68--69} (Tasaki~\cite{Tasaki:QMB} §3.4, the
+sentence beginning ``Of course the state $|\Xi_-\rangle=(|\Phi_{\mathrm{GS}}\rangle-|\Gamma\rangle)
+/\sqrt2$ \ldots'' on p.~68, the same page as eqs.~(3.4.14) and~(3.4.16); \textbf{discharged
+axiom-free}, \texttt{Quantum/HorschVonderLindenLowLyingState.lean}, fixtures in
+\texttt{Tests/HorschVonderLindenLowLyingState.lean}).  Built on the sign identity
+$\Gamma(-\hat O_L)=-\Gamma(\hat O_L)$ (\texttt{hvlTrialState\_neg},
+\texttt{Quantum/HorschVonderLindenTrialState.lean}): the normalization factor
+$\lVert\hat O_L|\Phi_{\mathrm{GS}}\rangle\rVert$ is even in the sign of $\hat O_L$, so mirroring
+the order operator only flips the sign of the vector that factor scales.  This gives the bridge
+$\Xi_-(\hat O_L)=\Xi_+(-\hat O_L)$ (\texttt{hvlMinusState\_eq\_hvlPlusState\_neg}), needing neither
+Hermiticity of $\hat O_L$ nor normalization of $\Phi_{\mathrm{GS}}$, so every $\Xi_-$ statement
+below other than orthogonality is obtained by instantiating its $\Xi_+$ counterpart above at
+$-\hat O_L$; the mirror argument itself is never replayed.  The energy identity is \emph{even} in
+the sign of the trial state, so $\langle\Xi_-|\hat H|\Xi_-\rangle$ reduces to the same right-hand
+side $(E_{\mathrm{GS}}+\langle\Gamma|\hat H|\Gamma\rangle)/2$ as $\langle\Xi_+|\hat H|\Xi_+\rangle$,
+while the order mean is \emph{odd}, so its $\Xi_-$ form carries a minus sign against
+eq.~(3.4.16).  Orthogonality $\langle\Xi_-|\Xi_+\rangle=0$
+(\texttt{hvlMinusState\_dotProduct\_hvlPlusState}) is proved separately from the $\Gamma$ moment
+algebra rather than by substitution --- a pairing of two different states has no single-state
+$\Xi_+$ counterpart to instantiate --- from the diagonal terms
+$\langle\Phi_{\mathrm{GS}}|\Phi_{\mathrm{GS}}\rangle=1$ and $\langle\Gamma|\Gamma\rangle=1$
+cancelling against each other and both cross terms vanishing by the first odd-moment
+assumption~(3.4.4), together with the normalization of $\Phi_{\mathrm{GS}}$ and of $\Gamma$.  The
+capstone \texttt{tasaki\_mirrorLowLyingState\_ssb} states the mirror-state sentence of p.~68 in
+the bond-local spin-$S$ setting as five conjuncts: normalization $\langle\Xi_-|\Xi_-\rangle=1$,
+orthogonality $\langle\Xi_-|\Xi_+\rangle=0$, the two-sided energy bound
+$0\le\langle\Xi_-|\hat H|\Xi_-\rangle-E_{\mathrm{GS}}\le(C/2)L^{-d}$ with the same
+$C=8dh_0o_0^2/q_0$ as the capstone above, and
+$\langle\Xi_-|\hat O_L/L^d|\Xi_-\rangle\le-\sqrt{q_0}$, the sign opposite to eq.~(3.4.16); the two
+energy conjuncts are moved across the equality $\langle\Xi_-|\hat H|\Xi_-\rangle
+=\langle\Xi_+|\hat H|\Xi_+\rangle$ that the two energy identities give between them, so
+eq.~(3.4.12) is not re-derived. \emph{Corrigendum (printed sub/superscript, not load-bearing).}
+The orthogonality sentence on p.~68 names the state $|\Xi_L^+\rangle$, carrying an $L$ subscript
+this symbol carries nowhere else in §3.4 and placing the $+$ in superscript where the surrounding
+text (including eq.~(3.4.14) itself) places it in subscript, $|\Xi_+\rangle$.  Under either
+reading the referent is the same state, the one of eq.~(3.4.14); no value or derivation in this
+repository depends on which reading is intended.  \texttt{hvlMinusState\_dotProduct\_hvlPlusState}
+states orthogonality against \texttt{hvlPlusState}, the eq.~(3.4.14) state.  \emph{Boundary facts,
+checked against the tree.}  Where the order-square Rayleigh quotient vanishes, $\Gamma$ is the
+zero vector so $\Xi_-$ coincides with $\Xi_+$; the positivity hypothesis $0<m_2$ taken by
+\texttt{hvlMinusState\_dotProduct\_self} and \texttt{hvlMinusState\_dotProduct\_hvlPlusState} is
+therefore a \emph{truth condition}, not proof convenience --- a concrete one-dimensional instance
+at $\hat O_L=0$ gives both $\langle\Xi_-|\Xi_-\rangle$ and $\langle\Xi_-|\Xi_+\rangle$ equal to
+$1/2$, while the energy identity still holds there.  A negative size parameter falsifies the
+mirror order bound (checked at $Ld=-2$, $q_0=1$).  \emph{Not machine-checked}: whether the mirror
+order bound fails at every negative $Ld$, beyond that one instance; and the vacuity/falsity
+distinction at $d=0$, where the energy conjuncts of the capstone read $0\le0\le0$ while
+normalization, orthogonality and the order conjunct keep content.  \emph{Fixtures.}  Since $\Xi_-$
+differs from $\Xi_+$ only by signs, each numeric fixture carries a value discriminating the
+correct sign: a direct pin on the mirror state's four entries on the two-spin instance; the energy
+identity together with the sign-discriminating value $-2$ against $\Xi_+$'s $+2$; orthogonality
+and normalization pinned together (substituting $\Xi_+$ for $\Xi_-$ there reads $1=0$); a tight
+instance at $q_0=1$, $Ld=2$; a negative-$Ld$ instance where the mirror bound's own conclusion
+fails; and two boundary instances at a vanishing order-square Rayleigh quotient, discharged by
+proof rather than assumed satisfiable.
 
 \noindent\textbf{Theorem 4.1} (Dyson--Lieb--Simon / Neves--Perez / Kennedy--Lieb--Shastry, Tasaki
 §4.1, eq.~(4.1.7), pp.~88--90; \texttt{Quantum/SpinS/DysonLiebSimon.lean}, Issue \#4485).  Existence
