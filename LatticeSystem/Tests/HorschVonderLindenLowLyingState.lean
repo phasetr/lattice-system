@@ -40,10 +40,12 @@ side is strictly smaller at this data — dividing by `Ld ^ 2` instead of `Ld`, 
 **Eq. (3.4.17) fixtures.** A strict rational instance
 (`O' := diagonal ![2, 0, 0, -2]`, `v := ![3/5, 4/5, 0, 0]`, `Ld := 2`) gives
 `|rayleighOnVec O' v / Ld| = 9/25` against `Real.sqrt (rayleighOnVec (O' ^ 2) v / Ld ^ 2) = 3/5`,
-both rational and strict; a tight instance at `O := fO`, `v := hvlPlusState fO fPhi`, `Ld := 2`
-gives equality `1 = 1`.  Since a bare `≤` endpoint cannot by itself exclude a wrongly *larger*
-right-hand side, the strict instance carries those two values as their own conjuncts, spelling the
-radicand `rayleighOnVec (O' ^ 2) v / Ld ^ 2` out syntactically.
+both rational and strict; the same `O'`, `v` at `Ld := -2` give the identical `9/25 ≤ 3/5`, proved
+directly since the declaration's own hypothesis `0 < Ld` does not apply there; a tight instance at
+`O := fO`, `v := hvlPlusState fO fPhi`, `Ld := 2` gives equality `1 = 1`.  Since a bare `≤` endpoint
+cannot by itself exclude a wrongly *larger* right-hand side, the strict instance carries those two
+values as their own conjuncts, spelling the radicand `rayleighOnVec (O' ^ 2) v / Ld ^ 2` out
+syntactically.
 
 **Capstone satisfiability witness.** The bundle in the `ManyBodyOpS Λ N` packaging is instantiated
 at `Λ := Fin 1`, `N := 1`, `B := (∅ : Finset Unit)`, `o 0 := pauliXS (0 : Fin 1)` (the single-site
@@ -62,13 +64,14 @@ capstone is not vacuously true for every instance.
 
 `hLd` in eq. (3.4.16) is load-bearing at *negative* `Ld`, not at `Ld = 0` (at `Ld = 0` the LRO
 hypothesis becomes `q₀ ≤ 0`, so the statement is vacuous there, not false). `hLd` in eq. (3.4.17)
-is proof convenience rather than a truth condition: at `Ld = 0` both sides of its conclusion are
-`0`. `hL : 1 ≤ L` in the capstone excludes nothing false. At `d = 0` the capstone's two energy
-conjuncts read `0 ≤ 0 ≤ 0` — energy-trivial, neither vacuous nor false — while its normalisation
-and eq. (3.4.16) conjuncts keep their content. The empty-carrier route to vacuity differs per
-declaration: the energy identity and eq. (3.4.17) go vacuous through the normalisation hypothesis,
-eq. (3.4.16) through the LRO-and-positivity pair; the capstone's own carrier `Λ → Fin (N + 1)` is
-never empty, since it always contains the all-zero configuration.
+is not needed at `Ld = 0`, where both sides of its conclusion are `0`; the negative-`Ld` fixture
+above additionally checks, at one concrete instance, that the conclusion also holds where `hLd`
+supplies no proof at all. `hL : 1 ≤ L` in the capstone excludes nothing false. At `d = 0` the
+capstone's two energy conjuncts read `0 ≤ 0 ≤ 0` — energy-trivial, neither vacuous nor false —
+while its normalisation and eq. (3.4.16) conjuncts keep their content. The empty-carrier route to
+vacuity differs per declaration: the energy identity and eq. (3.4.17) go vacuous through the
+normalisation hypothesis, eq. (3.4.16) through the LRO-and-positivity pair; the capstone's own
+carrier `Λ → Fin (N + 1)` is never empty, since it always contains the all-zero configuration.
 -/
 
 namespace LatticeSystem.Tests.HorschVonderLindenLowLyingState
@@ -151,6 +154,7 @@ example {ι : Type*} (B : Finset ι)
 
 /-! ## Fixture data — the two-spin `Ξ₊` instance -/
 
+/-- The normalisation constant `(√2)⁻¹` for the two-spin `fPhi`/`fXi` fixture data below. -/
 private noncomputable def c2 : ℂ := ((Real.sqrt 2 : ℝ) : ℂ)⁻¹
 
 /-- `c2 * c2 = 1 / 2`, reduced to the repo's `sqrt2_inv_mul_sqrt2_inv`. -/
@@ -386,6 +390,38 @@ example :
   refine ⟨tasaki_eq_3_4_17_order_mean_abs_le_sqrt hO' hv (by norm_num : (0 : ℝ) < 2), ?_, ?_⟩
   · rw [hL]; norm_num
   · rw [hR, hc]
+
+/-- **Fixture (eq. (3.4.17), negative `Ld`).** Same `O'`, `v` as the strict instance above, at
+`Ld = -2` instead of `2`: the conclusion still evaluates to `9 / 25 ≤ 3 / 5`, since `|x / Ld|` and
+`Ld ^ 2` are both insensitive to the sign of `Ld`. The declaration itself does not apply here (its
+hypothesis is `0 < Ld`), so this instance is proved directly. It is one witness, not an exhaustive
+check over all negative `Ld`, but it is the machine-checked support for treating `0 < Ld` as proof
+convenience rather than a truth condition at this data. -/
+example :
+    |rayleighOnVec (Matrix.diagonal ![(2 : ℂ), 0, 0, -2]) ![3/5, 4/5, 0, 0] / (-2 : ℝ)|
+      ≤ Real.sqrt
+          (rayleighOnVec ((Matrix.diagonal ![(2 : ℂ), 0, 0, -2]) ^ 2) ![3/5, 4/5, 0, 0]
+            / (-2 : ℝ) ^ 2) := by
+  have hL : rayleighOnVec (Matrix.diagonal ![(2 : ℂ), 0, 0, -2]) ![(3 : ℂ)/5, 4/5, 0, 0] / (-2)
+      = -((9 : ℝ) / 25) := by
+    unfold rayleighOnVec
+    simp [dotProduct, mulVec, Fin.sum_univ_four, Matrix.diagonal, Complex.div_re,
+      Complex.normSq_apply]
+    norm_num
+  have hR : rayleighOnVec ((Matrix.diagonal ![(2 : ℂ), 0, 0, -2]) ^ 2) ![(3 : ℂ)/5, 4/5, 0, 0]
+      / (-2 : ℝ) ^ 2 = (36 : ℝ) / 100 := by
+    have hsq : (Matrix.diagonal ![(2 : ℂ), 0, 0, -2]) ^ 2
+        = Matrix.diagonal ![(4 : ℂ), 0, 0, 4] := by
+      ext i j; fin_cases i <;> fin_cases j <;>
+        simp [pow_two, Matrix.mul_apply, Matrix.diagonal] <;> norm_num
+    rw [hsq]
+    unfold rayleighOnVec
+    simp [dotProduct, mulVec, Fin.sum_univ_four, Matrix.diagonal, Complex.div_re,
+      Complex.normSq_apply]
+    norm_num
+  rw [hL, abs_neg, abs_of_pos (by norm_num : (0 : ℝ) < 9 / 25), hR,
+    show (36 : ℝ) / 100 = (3 / 5 : ℝ) ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  norm_num
 
 /-- **Fixture (eq. (3.4.17), tight).** `O = fO`, `v = hvlPlusState fO fPhi`, `Ld = 2`: both sides
 equal `1`. -/

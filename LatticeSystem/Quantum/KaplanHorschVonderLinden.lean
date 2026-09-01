@@ -15,7 +15,7 @@ which is `≥ ⟨Ξ| Ô_L |Ξ⟩ + (1/h)(E_GS − ⟨Ξ|Ĥ|Ξ⟩)`.
 We discharge exactly this finite-dimensional core (axiom-free).  Its trial-state input at `Ξ = Ξ₊`
 is `tasaki_eq_3_4_16_lowLyingState_ssb` (`HorschVonderLindenLowLyingState.lean`), which supplies the
 normalisation `⟨Ξ₊|Ξ₊⟩ = 1`, the two-sided energy bound `0 ≤ ⟨Ξ₊|Ĥ|Ξ₊⟩ − E_GS ≤ (C/2) L^{-d}` and
-the order-parameter bound `⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q₀` (eq. (3.4.16)) at every finite volume.  Composing
+the order-parameter bound `⟨Ξ₊|Ô_L/L^d|Ξ₊⟩ ≥ √q₀` (eq. (3.4.16)) at every volume `L ≥ 1`.  Composing
 the two and taking the double limit `L↑∞`, `h↓0` gives Theorem 3.2; that composition and the
 thermodynamic/infinite-volume input are not carried out here.
 

@@ -31,7 +31,8 @@ Hermiticity is essential rather than cosmetic: at the nilpotent `Ô_L = !![0,1;0
 Every statement here is at a single finite volume.  The `L ↑ ∞` and `h ↓ 0` limits of Theorem 3.2
 (eq. (3.4.22), p. 70) are not taken; the variational core of that theorem is
 `kaplan_horsch_vonderLinden_order_lower_bound` in `Quantum/KaplanHorschVonderLinden.lean`, whose
-trial-state input is supplied by the declarations below.
+trial-state input at `Ξ = Ξ₊` the capstone below (`tasaki_eq_3_4_16_lowLyingState_ssb`) supplies;
+composing the two and taking the double limit is not carried out here.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §3.4, "Setting and assumptions" p. 65, eqs. (3.4.3), (3.4.4), (3.4.7), (3.4.12), (3.4.14)-

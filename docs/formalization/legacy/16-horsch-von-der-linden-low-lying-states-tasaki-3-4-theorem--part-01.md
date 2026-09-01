@@ -168,6 +168,7 @@ All declarations below are **PROVED**; `#print axioms` on each yields only `prop
 | Lean name | Statement | File |
 |---|---|---|
 | `hvlTrialState` | the Horsch-von der Linden trial state `\|Γ⟩` of eq. (3.4.7): `Ô_L\|Φ_GS⟩` unit-normalised in the `L²` pairing | `Quantum/HorschVonderLindenTrialState.lean` |
+| `smul_add_dotProduct_mulVec` | the sandwiched-form expansion `⟨c(u+v)\|A\|c(u+v)⟩ = (c̄c)(⟨u\|A\|u⟩ + ⟨u\|A\|v⟩ + ⟨v\|A\|u⟩ + ⟨v\|A\|v⟩)` for any scalar `c` and matrix `A` | `Quantum/HorschVonderLindenProblem34b.lean` |
 | `hvlPlusState` | the state `\|Ξ₊⟩ = (1/√2)(\|Φ_GS⟩ + \|Γ⟩)` of eq. (3.4.14) | `Quantum/HorschVonderLindenProblem34b.lean` |
 | `hvlPlusState_dotProduct_self` | the remark after eq. (3.4.14): `⟨Ξ₊\|Ξ₊⟩ = 1`, from `⟨Γ\|Γ⟩ = 1` and the vanishing of `⟨Φ_GS\|Γ⟩` | `Quantum/HorschVonderLindenProblem34b.lean` |
 | `hvlPlusState_order_mean` | eq. (3.4.15): `⟨Ξ₊\|Ô_L\|Ξ₊⟩ = √m₂`, under the vanishing of the first and third odd moments | `Quantum/HorschVonderLindenProblem34b.lean` |
@@ -175,10 +176,10 @@ All declarations below are **PROVED**; `#print axioms` on each yields only `prop
 | `hvlPlusState_order_variance` | eq. (S.43) in the volume-normalised form: the variance of `Ô_L/V` in `Ξ₊` equals `(1/2)(m₄/V⁴ − (m₂/V²)²)/(m₂/V²)`, for any `V > 0` | `Quantum/HorschVonderLindenProblem34b.lean` |
 | `tasaki_problem_3_4_b_order_fluctuation` (**capstone**) | Problem 3.4.b: the four identities above at every `L ≥ 1`, plus the `L ↑ ∞` vanishing of the `Ô_L/L^d`-fluctuation in `Ξ₊` under (3.4.18), with the `L`-uniform bound `q₀ > 0` of (3.4.3) keeping the prefactor `1/m₂` bounded | `Quantum/HorschVonderLindenProblem34b.lean` |
 
-Regression fixtures live in `LatticeSystem/Tests/Problem34bFluctuation.lean`: each of the seven
-declarations above has a signature fixture restating it in full and discharging it by the
-declaration itself, together with two concrete numeric instances and one satisfiability witness
-for the capstone's hypothesis bundle.
+Regression fixtures live in `LatticeSystem/Tests/Problem34bFluctuation.lean`: each of the
+declarations above other than `smul_add_dotProduct_mulVec` has a signature fixture restating it in
+full and discharging it by the declaration itself, together with two concrete numeric instances and
+one satisfiability witness for the capstone's hypothesis bundle.
 
 ### Trial state and the basic variational estimate, eq. (3.4.8)
 
@@ -491,7 +492,8 @@ terms vanish — `Φ_GS` is an eigenvector of the Hermitian `Ĥ` and `⟨Φ_GS|�
 assumption (3.4.4). That identity is the step the source covers with the word "obviously"; it needs
 no positivity of the second moment, and at a vanishing second moment `Γ` is the zero vector and the
 identity still holds. Eq. (3.4.16) is eq. (3.4.15) read against eq. (3.4.3) through monotonicity of
-`Real.sqrt`, so this is the first §3.4 consumer of assumption (3.4.4) beyond Problem 3.4.b. The
+`Real.sqrt`; of the declarations here, only `hvlPlusState_order_mean_ge_sqrt` takes assumption
+(3.4.4) in its third-moment form (the vanishing of `⟨Φ_GS|(Ô_L)³|Φ_GS⟩`). The
 Schwarz remark (3.4.17) holds for any normalised vector and is not used in the derivation of
 eq. (3.4.16); Hermiticity of the order operator is essential there, since for a nilpotent operator
 the right-hand side can vanish while the left-hand side does not.
@@ -499,6 +501,9 @@ the right-hand side can vanish while the left-hand side does not.
 The abstract layer takes the volume as a positive real parameter and the capstone instantiates it at
 `L^d`, the same two-layer split as eq. (3.4.12). The `L ↑ ∞` and `h ↓ 0` limits of Theorem 3.2 are
 not taken.
+
+All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
+`Classical.choice`, `Quot.sound`.
 
 | Lean name | Statement | File |
 |---|---|---|
@@ -516,11 +521,14 @@ Hamiltonian `diagonal ![-1,3,3,-1]` and a transverse order operator, whose (3.4.
 *discharged by proof*, where `E_GS = -1`, `⟨Γ\|Ĥ\|Γ⟩ = 3`,
 `⟨Ξ₊\|Ĥ\|Ξ₊⟩ = 1` separate the halved
 identity from the un-halved, the `E_GS`-free and the sign-flipped shapes, and where eq. (3.4.16) is
-*tight* at `q₀ = 1`, `L^d = 2`; and two eq. (3.4.17) instances, a strict rational one and a tight
-one at an eigenvector of the order operator. Since a one-sided numeric endpoint is blind to a
-wrongly large right-hand side, each fixture routes through an intermediate step that spells the
-constant or
-the radicand out syntactically.
+*tight* at `q₀ = 1`, `L^d = 2`; three eq. (3.4.17) instances, a strict rational one, the same
+instance at a negative size parameter (proved directly, since the declaration's own `0 < Ld`
+hypothesis does not apply there), and a tight one at an eigenvector of the order operator; and a
+capstone satisfiability witness (`Λ = Fin 1`, `N = 1`, `B = ∅`, single-site Pauli `X` as the order
+operator) whose hypothesis bundle is discharged by proof, showing the capstone is not vacuously
+true for every instance. Since a one-sided numeric endpoint is blind to a wrongly large right-hand
+side, the strict eq. (3.4.17) instance routes through an intermediate step that spells the constant
+and the radicand out syntactically.
 
 ---
 
