@@ -85,4 +85,75 @@ theorem chainGroundEnergy_neg {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : �
   unfold chainGroundEnergy
   exact hermitianMinEigenvalue_eq_of_spectrum_eq _ _ hspec.symm
 
+/-- **The real quadratic form of `H − c·O` splits linearly in the field**,
+`⟨Φ, (H − c·O)Φ⟩.re = ⟨Φ, HΦ⟩.re − c·⟨Φ, OΦ⟩.re` for real `c`: the un-normalised numerator of
+Tasaki's variational comparison (3.4.20), p. 70, of the field Hamiltonian (3.4.19), p. 69.  Private
+because it carries no content beyond `⬝ᵥ`-bilinearity and exists only as the shared algebraic step
+of `chainGroundEnergy_concave` and `chainGroundState_order_mean_sandwich` below.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §3.4, eqs. (3.4.19)–(3.4.20), pp. 69–70. -/
+private theorem fieldOpS_dotProduct_re {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
+    (H O : ManyBodyOpS Λ N) (c : ℝ) (Φ : (Λ → Fin (N + 1)) → ℂ) :
+    (star Φ ⬝ᵥ (H - (c : ℂ) • O).mulVec Φ).re
+      = (star Φ ⬝ᵥ H.mulVec Φ).re - c * (star Φ ⬝ᵥ O.mulVec Φ).re := by
+  rw [Matrix.sub_mulVec, Matrix.smul_mulVec, dotProduct_sub, dotProduct_smul, smul_eq_mul,
+    Complex.sub_re, Complex.re_ofReal_mul]
+
+/-- **The ground energy is concave in the field**: for `0 ≤ t ≤ 1`,
+`t E(h₁) + (1−t) E(h₂) ≤ E(t h₁ + (1−t) h₂)`.  `E` is the pointwise minimum over normalized states
+of the affine functions `h ↦ ⟨Φ, HΦ⟩.re − h⟨Φ, OΦ⟩.re` (Tasaki's field Hamiltonian (3.4.19), p. 69,
+compared as in (3.4.20), p. 70), and a minimum of affine functions is concave: evaluate the
+minimiser at `t h₁ + (1−t) h₂` and bound `E(h₁)`, `E(h₂)` by that same state's energies.  Only
+Hermiticity of `H` and `O` is used — no reversal symmetry.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §3.4, eqs. (3.4.19)–(3.4.20), pp. 69–70. -/
+theorem chainGroundEnergy_concave {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
+    [Nonempty (Λ → Fin (N + 1))] {H O : ManyBodyOpS Λ N}
+    (hH : H.IsHermitian) (hO : O.IsHermitian) (h₁ h₂ t : ℝ) (ht0 : 0 ≤ t) (ht1 : t ≤ 1) :
+    t * chainGroundEnergy hH hO h₁ + (1 - t) * chainGroundEnergy hH hO h₂ ≤
+      chainGroundEnergy hH hO (t * h₁ + (1 - t) * h₂) := by
+  obtain ⟨Φ, hΦnorm, hΦE⟩ := exists_unit_eigenvector_hermitianMinEigenvalue
+    (fieldOpS_isHermitian hH hO (t * h₁ + (1 - t) * h₂))
+  have hle : ∀ c : ℝ, chainGroundEnergy hH hO c ≤
+      (star Φ ⬝ᵥ H.mulVec Φ).re - c * (star Φ ⬝ᵥ O.mulVec Φ).re := by
+    intro c
+    have hv := hermitianMinEigenvalue_le_rayleighOnVec_of_unit (fieldOpS_isHermitian hH hO c) hΦnorm
+    unfold rayleighOnVec at hv
+    rwa [fieldOpS_dotProduct_re] at hv
+  have heq : chainGroundEnergy hH hO (t * h₁ + (1 - t) * h₂) =
+      (star Φ ⬝ᵥ H.mulVec Φ).re - (t * h₁ + (1 - t) * h₂) * (star Φ ⬝ᵥ O.mulVec Φ).re := by
+    have hval : (star Φ ⬝ᵥ (H - ((t * h₁ + (1 - t) * h₂ : ℝ) : ℂ) • O).mulVec Φ).re =
+        chainGroundEnergy hH hO (t * h₁ + (1 - t) * h₂) := by
+      rw [hΦE, dotProduct_smul, smul_eq_mul, hΦnorm, mul_one, Complex.ofReal_re]
+      rfl
+    rw [← hval, fieldOpS_dotProduct_re]
+  have hA := mul_le_mul_of_nonneg_left (hle h₁) ht0
+  have hB := mul_le_mul_of_nonneg_left (hle h₂) (by linarith : (0 : ℝ) ≤ 1 - t)
+  have hring : t * ((star Φ ⬝ᵥ H.mulVec Φ).re - h₁ * (star Φ ⬝ᵥ O.mulVec Φ).re) +
+      (1 - t) * ((star Φ ⬝ᵥ H.mulVec Φ).re - h₂ * (star Φ ⬝ᵥ O.mulVec Φ).re) =
+        (star Φ ⬝ᵥ H.mulVec Φ).re -
+          (t * h₁ + (1 - t) * h₂) * (star Φ ⬝ᵥ O.mulVec Φ).re := by ring
+  rw [heq]
+  linarith [hA, hB, hring]
+
+/-- **Zero field maximises the ground energy**: `E(h) ≤ E(0)`.  `E` is concave
+(`chainGroundEnergy_concave`) and even (`chainGroundEnergy_neg`), so the midpoint bound at
+`t = 1/2`, `h₁ = h`, `h₂ = −h` reads `½E(h) + ½E(−h) ≤ E(0)`, i.e. `E(h) ≤ E(0)`.  This is the
+`h ≥ 0` monotonicity that makes the staggered field of eq. (4.1.9), p. 76, lower the ground energy.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §3.4, eq. (3.4.19), p. 69; §4.1, eq. (4.1.9), p. 76. -/
+theorem chainGroundEnergy_le_zero_field {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
+    [Nonempty (Λ → Fin (N + 1))] {H O Θ : ManyBodyOpS Λ N}
+    (hH : H.IsHermitian) (hO : O.IsHermitian)
+    (hΘ2 : Θ * Θ = 1) (hΘH : Θ * H * Θ = H) (hΘO : Θ * O * Θ = -O) (h : ℝ) :
+    chainGroundEnergy hH hO h ≤ chainGroundEnergy hH hO 0 := by
+  have hc := chainGroundEnergy_concave hH hO h (-h) (1 / 2) (by norm_num) (by norm_num)
+  have hmid : (1 : ℝ) / 2 * h + (1 - 1 / 2) * -h = 0 := by ring
+  rw [hmid] at hc
+  have hneg := chainGroundEnergy_neg hH hO hΘ2 hΘH hΘO h
+  linarith [hc, hneg]
+
 end LatticeSystem.Quantum
