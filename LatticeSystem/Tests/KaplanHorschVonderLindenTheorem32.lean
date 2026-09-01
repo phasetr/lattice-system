@@ -6,17 +6,19 @@ import LatticeSystem.Quantum.KaplanHorschVonderLindenTheorem32
 Fixtures for `LatticeSystem/Quantum/KaplanHorschVonderLindenTheorem32.lean`: signature pins for
 `tasaki_eq_3_4_21_perVolume`, `tasaki_eq_3_4_21_perVolume_energyBound`,
 `tasaki_eq_3_4_21_volumeLiminf`, `tasaki_orderParameter_uniformBound`, and the capstone
-`tasaki_theorem_3_2_kaplanHorschVonderLinden`; a boundedness/non-vacuity witness at `q₀ = 1`; a
-sharpness witness whose per-volume value is strictly below the bound at every volume; `d = 0` and
-`h < 0` counterexamples; a limit-order pair on a shared bounded family; and a tight/slack pair for
-the uniform bound. Also pins that `rayleighOnVec_sub_smul`
+`tasaki_theorem_3_2_kaplanHorschVonderLinden`; a minimal non-vacuity witness at `q₀ = 1`; a
+field-dependent non-vacuity witness on which the capstone holds and the exchanged limit order is
+refuted; a sharpness witness whose per-volume value is strictly below the bound at every volume;
+`d = 0` and `h < 0` counterexamples; a limit-order pair on a shared bounded family; and a
+tight/slack pair for the uniform bound. Also pins that `rayleighOnVec_sub_smul`
 (`LatticeSystem/Quantum/KaplanHorschVonderLinden.lean`) is visible outside its defining module.
 
 Several steps of the statement typecheck when written wrongly, which is what the counterexample
 blocks are for. The `L^d` and `L^{2d}` error denominators agree at `L^d = 1`, so the sharpness
 family is read at `d = 1` and pins its per-volume value exactly. The exchanged limit order also
-elaborates, so both orders are computed on one shared bounded family: they come out `1` and `0`
-there, which separates the two nestings without instantiating the capstone. The variational
+elaborates, so both orders are computed on one shared bounded family, where they come out `1` and
+`0`; the field-dependent witness then instantiates the capstone and refutes the exchanged order on
+that instance. The variational
 hypothesis's direction is pinned by the four signature examples that carry it, each of which
 typechecks only against the exact inequality written, and not by any numeric instance. The uniform
 bound carries no variational hypothesis at all; its tight and slack instances exercise the carrier
@@ -103,11 +105,14 @@ example {n : ℕ → Type*} [∀ L, Fintype (n L)]
       rayleighOnVec (O L) (Ψ h L) / (L : ℝ) ^ d) atTop) (𝓝[>] (0 : ℝ)) :=
   tasaki_theorem_3_2_kaplanHorschVonderLinden H O Ξ Ψ E hd hvar hE hXi hen hub
 
-/-! ### Boundedness / non-vacuity witness at `q₀ = 1` -/
+/-! ### Boundedness / minimal non-vacuity witness at `q₀ = 1` -/
 
-/-- Non-vacuity witness: on `Fin 1`, `O L := L^d • 1` and `H L := 0` for every `L`, with
+/-- Minimal non-vacuity witness: on `Fin 1`, `O L := L^d • 1` and `H L := 0` for every `L`, with
 `Ξ L = Ψ h L := ![1]` for every `h`, every hypothesis of the capstone is discharged by proof and
-the order mean is `1` at every `L ≥ 1`, so the conclusion reads `1 ≤ 1`. -/
+the order mean is `1` at every `L ≥ 1`, so the conclusion reads `1 ≤ 1`. The instance is degenerate
+on four axes at once — `Ψ h L = Ξ L`, `H L = 0` with `C = 0`, no dependence of `Ψ` on `h`, and a
+one-dimensional space at every volume — so what it establishes is that the hypothesis bundle is
+satisfiable, nothing about the limits; the field-dependent witness below carries that. -/
 example :
     Real.sqrt 1 ≤ liminf (fun _h : ℝ => liminf (fun L : ℕ =>
         rayleighOnVec ((((L : ℝ) ^ 1 : ℝ) : ℂ) • (1 : Matrix (Fin 1) (Fin 1) ℂ)) ![(1 : ℂ)]
@@ -130,6 +135,157 @@ example :
   · rw [Real.sqrt_one, key L hL]
   · simp [rayleighOnVec]
   · rw [key L hL]
+
+/-! ### Non-vacuity: a field-dependent witness, and the exchanged limit order refuted -/
+
+/-- Test-local order operator `diag(0, L)` of the field-dependent witness.  Its Rayleigh quotient
+is `0` at `e₀ = ![1, 0]` and `L` at `e₁ = ![0, 1]`, so at `L ≥ 1` the order mean per volume `L^1`
+is `0` at `e₀` and `1` at `e₁`. -/
+private noncomputable def fieldWitnessOrderOp (L : ℕ) : Matrix (Fin 2) (Fin 2) ℂ :=
+  Matrix.diagonal ![0, ((L : ℝ) : ℂ)]
+
+/-- Test-local Hamiltonian `diag(0, 1/L)` of the field-dependent witness.  Its `1/L` entry sits on
+`e₁`, so the trial state `Ξ L = e₁` costs the energy `1/L`, meeting eq. (3.4.12)'s bound `C/L^d` at
+`C = 1`, `d = 1` with equality; the ground energy `E L = 0` is attained at `e₀`. -/
+private noncomputable def fieldWitnessHam (L : ℕ) : Matrix (Fin 2) (Fin 2) ℂ :=
+  Matrix.diagonal ![0, ((1 / (L : ℝ) : ℝ) : ℂ)]
+
+/-- Test-local field-perturbed state family: `e₁` once the field beats the gap (`1 < h·L²`), `e₀`
+below that threshold.  The threshold is exactly where the energy cost `1/L` of `e₁` is repaid by
+the field gain `h·L`, so this family satisfies eq. (3.4.20) at every `h > 0` and `L ≥ 1` while
+genuinely depending on `h`. -/
+private noncomputable def fieldWitnessState (h : ℝ) (L : ℕ) : Fin 2 → ℂ :=
+  if 1 < h * (L : ℝ) ^ 2 then ![0, 1] else ![1, 0]
+
+/-- The witness order operator's Rayleigh quotient at the trial state `e₁ = ![0, 1]` is `L`. -/
+private theorem fieldWitnessOrderOp_atXi (L : ℕ) :
+    rayleighOnVec (fieldWitnessOrderOp L) ![0, 1] = (L : ℝ) := by
+  simp [rayleighOnVec, fieldWitnessOrderOp, Matrix.mulVec, dotProduct, Fin.sum_univ_two,
+    Matrix.diagonal]
+
+/-- The witness order operator's Rayleigh quotient at `e₀ = ![1, 0]` is `0`. -/
+private theorem fieldWitnessOrderOp_atE0 (L : ℕ) :
+    rayleighOnVec (fieldWitnessOrderOp L) ![1, 0] = 0 := by
+  simp [rayleighOnVec, fieldWitnessOrderOp, Matrix.mulVec, dotProduct, Fin.sum_univ_two,
+    Matrix.diagonal]
+
+/-- The witness Hamiltonian's Rayleigh quotient at the trial state `e₁ = ![0, 1]` is `1/L`. -/
+private theorem fieldWitnessHam_atXi (L : ℕ) :
+    rayleighOnVec (fieldWitnessHam L) ![0, 1] = 1 / (L : ℝ) := by
+  simp [rayleighOnVec, fieldWitnessHam, Matrix.mulVec, dotProduct, Fin.sum_univ_two,
+    Matrix.diagonal]
+
+/-- The witness Hamiltonian's Rayleigh quotient at `e₀ = ![1, 0]` is `0`. -/
+private theorem fieldWitnessHam_atE0 (L : ℕ) :
+    rayleighOnVec (fieldWitnessHam L) ![1, 0] = 0 := by
+  simp [rayleighOnVec, fieldWitnessHam, Matrix.mulVec, dotProduct, Fin.sum_univ_two,
+    Matrix.diagonal]
+
+/-- Above the threshold the witness state is the trial state `e₁`. -/
+private theorem fieldWitnessState_of_strong {h : ℝ} {L : ℕ} (hc : 1 < h * (L : ℝ) ^ 2) :
+    fieldWitnessState h L = ![0, 1] := if_pos hc
+
+/-- At or below the threshold the witness state is `e₀`. -/
+private theorem fieldWitnessState_of_weak {h : ℝ} {L : ℕ} (hc : h * (L : ℝ) ^ 2 ≤ 1) :
+    fieldWitnessState h L = ![1, 0] := if_neg (not_lt.mpr hc)
+
+/-- The witness order mean per volume is `1` above the threshold and `0` at or below it. -/
+private theorem fieldWitnessState_orderMean (h : ℝ) (L : ℕ) (hL : 1 ≤ L) :
+    rayleighOnVec (fieldWitnessOrderOp L) (fieldWitnessState h L) / (L : ℝ) ^ 1
+      = if 1 < h * (L : ℝ) ^ 2 then 1 else 0 := by
+  have hL0 : (L : ℝ) ≠ 0 := by
+    have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast hL
+    positivity
+  by_cases hc : 1 < h * (L : ℝ) ^ 2
+  · rw [fieldWitnessState_of_strong hc, fieldWitnessOrderOp_atXi, pow_one, div_self hL0,
+      if_pos hc]
+  · rw [fieldWitnessState_of_weak (not_lt.mp hc), fieldWitnessOrderOp_atE0, zero_div, if_neg hc]
+
+/-- The witness state depends on `h` and is not the trial state at small `h`: at every `L ≥ 1` it
+equals `Ξ L = ![0, 1]` at the field `2/L²`, and differs from `Ξ L` at every field with
+`h·L² ≤ 1`.  Collapsing `Ψ` onto `Ξ` would make the second conjunct false. -/
+private theorem fieldWitnessState_ne_trial (L : ℕ) (hL : 1 ≤ L) :
+    fieldWitnessState (2 / (L : ℝ) ^ 2) L = ![0, 1]
+      ∧ ∀ h : ℝ, h * (L : ℝ) ^ 2 ≤ 1 → fieldWitnessState h L ≠ ![0, 1] := by
+  have hL0 : (0 : ℝ) < (L : ℝ) := by exact_mod_cast hL
+  have hsq : (0 : ℝ) < (L : ℝ) ^ 2 := by positivity
+  refine ⟨fieldWitnessState_of_strong ?_, fun h hc => ?_⟩
+  · rw [div_mul_cancel₀ _ (ne_of_gt hsq)]
+    norm_num
+  · rw [fieldWitnessState_of_weak hc]
+    intro hcon
+    have := congrFun hcon 0
+    simp at this
+
+/-- Non-vacuity witness with a field-dependent state: on `Fin 2` at `d = 1`, `q₀ = 1`, `C = 1`,
+`o₀ = 1` and `E L = 0`, with `H L = fieldWitnessHam L`, `O L = fieldWitnessOrderOp L`,
+`Ξ L = ![0, 1]` and `Ψ h L = fieldWitnessState h L`, every hypothesis of
+`tasaki_theorem_3_2_kaplanHorschVonderLinden` is discharged by proof — `hXi` and `hen` at equality,
+`hvar` at equality above the threshold and by the branch condition `h·L² ≤ 1` below it — and the
+conclusion holds. -/
+private theorem fieldWitness_capstone :
+    Real.sqrt 1 ≤ liminf (fun h : ℝ => liminf (fun L : ℕ =>
+        rayleighOnVec (fieldWitnessOrderOp L) (fieldWitnessState h L) / (L : ℝ) ^ 1) atTop)
+      (𝓝[>] (0 : ℝ)) := by
+  refine tasaki_theorem_3_2_kaplanHorschVonderLinden (n := fun _ => Fin 2)
+    fieldWitnessHam fieldWitnessOrderOp (fun _ => ![0, 1]) fieldWitnessState (fun _ => 0)
+    (d := 1) (q₀ := 1) (C := 1) (o₀ := 1) le_rfl
+    (fun h _ L hL => ?_) (fun h _ L _ => ?_) (fun L hL => ?_) (fun L _ => ?_) (fun h _ L hL => ?_)
+  · have hL1 : (1 : ℝ) ≤ (L : ℝ) := by exact_mod_cast hL
+    have hLpos : (0 : ℝ) < (L : ℝ) := lt_of_lt_of_le zero_lt_one hL1
+    rw [rayleighOnVec_sub_smul, rayleighOnVec_sub_smul, fieldWitnessHam_atXi,
+      fieldWitnessOrderOp_atXi]
+    by_cases hc : 1 < h * (L : ℝ) ^ 2
+    · rw [fieldWitnessState_of_strong hc, fieldWitnessHam_atXi, fieldWitnessOrderOp_atXi]
+    · rw [fieldWitnessState_of_weak (not_lt.mp hc), fieldWitnessHam_atE0,
+        fieldWitnessOrderOp_atE0]
+      have hle : h * (L : ℝ) ≤ 1 / (L : ℝ) := by
+        rw [le_div_iff₀ hLpos]
+        calc h * (L : ℝ) * (L : ℝ) = h * (L : ℝ) ^ 2 := by ring
+          _ ≤ 1 := not_lt.mp hc
+      simpa using hle
+  · by_cases hc : 1 < h * (L : ℝ) ^ 2
+    · rw [fieldWitnessState_of_strong hc, fieldWitnessHam_atXi]
+      positivity
+    · rw [fieldWitnessState_of_weak (not_lt.mp hc), fieldWitnessHam_atE0]
+  · have hL0 : (L : ℝ) ≠ 0 := by
+      have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast hL
+      positivity
+    rw [Real.sqrt_one, fieldWitnessOrderOp_atXi, pow_one, div_self hL0]
+  · rw [fieldWitnessHam_atXi, pow_one, sub_zero]
+  · rw [fieldWitnessState_orderMean h L hL]
+    split <;> norm_num
+
+/-- At every fixed volume the witness order mean tends to `0` as the field vanishes, so the inner
+`liminf` of the exchanged nesting is `0`; below the threshold `h·L² ≤ 1` the state is `e₀`, on
+which the order operator has Rayleigh quotient `0`. -/
+private theorem fieldWitness_fieldLiminf_eq_zero (L : ℕ) :
+    liminf (fun h : ℝ =>
+        rayleighOnVec (fieldWitnessOrderOp L) (fieldWitnessState h L) / (L : ℝ) ^ 1)
+      (𝓝[>] (0 : ℝ)) = 0 := by
+  have hev : ∀ᶠ h : ℝ in 𝓝[>] (0 : ℝ),
+      rayleighOnVec (fieldWitnessOrderOp L) (fieldWitnessState h L) / (L : ℝ) ^ 1 = 0 := by
+    have hc0 : (0 : ℝ) < 1 / ((L : ℝ) ^ 2 + 1) := by positivity
+    have hsmall : ∀ᶠ h : ℝ in 𝓝[>] (0 : ℝ), h < 1 / ((L : ℝ) ^ 2 + 1) :=
+      mem_nhdsWithin_of_mem_nhds (Iio_mem_nhds hc0)
+    filter_upwards [hsmall, self_mem_nhdsWithin] with h hh hpos
+    have hden : (0 : ℝ) < (L : ℝ) ^ 2 + 1 := by positivity
+    have hmul : h * ((L : ℝ) ^ 2 + 1) < 1 := by rwa [← lt_div_iff₀ hden]
+    have hweak : h * (L : ℝ) ^ 2 ≤ 1 := by nlinarith [hpos, hmul]
+    rw [fieldWitnessState_of_weak hweak, fieldWitnessOrderOp_atE0, zero_div]
+  rw [liminf_congr hev, liminf_const]
+
+/-- The exchanged nesting is false on the very data of `fieldWitness_capstone`: its inner `liminf`
+over the field is `0` at every volume, so `liminf_{L↑∞} liminf_{h↓0}` is `0`, which is not at least
+`√q₀ = 1`.  Together with `fieldWitness_capstone` this pins that the printed order of the two
+limits carries content: the same instance satisfies eq. (3.4.22) as printed and refutes it with the
+limits exchanged. -/
+private theorem fieldWitness_exchanged_not_le :
+    ¬ (Real.sqrt 1 ≤ liminf (fun L : ℕ => liminf (fun h : ℝ =>
+        rayleighOnVec (fieldWitnessOrderOp L) (fieldWitnessState h L) / (L : ℝ) ^ 1)
+      (𝓝[>] (0 : ℝ))) atTop) := by
+  simp only [fieldWitness_fieldLiminf_eq_zero, liminf_const, Real.sqrt_one]
+  norm_num
 
 /-! ### Sharpness: the two-level `1/L` family, tight at `d = 1`, `h = 1`, `C = 1`, `m = 1` -/
 
@@ -177,8 +333,10 @@ per-volume order mean is strictly below `m = 1` at every `L ≥ 1`, and that mea
 finite-volume statement `m ≤ ⟨Ψ|O|Ψ⟩/L^d` is false. That the order bound `hXi` is tight too is what
 makes the attainment informative: `m = 1` is the largest value it admits on this data, so the
 conclusion is met with equality without any of those four inequalities being slack. The exact value
-is what fixes the error term's denominator: `L^d` in place of `L^{2d}` is equally well-typed, so
-elaboration alone does not choose between them. -/
+constrains the error term's denominator from one side only: a denominator larger than `L^{2d}` would
+claim a bound strictly above what this family attains and is refuted here, whereas `L^d` in place of
+`L^{2d}` enlarges the error term, so that variant is weaker and stays true on this family. Both are
+equally well-typed, so elaboration alone does not choose between them. -/
 example :
     (∀ L : ℕ, 1 ≤ L →
       rayleighOnVec (sharpnessHamiltonian L - ((1 : ℝ) : ℂ) • sharpnessOrderOperator L) ![0, 1]
@@ -222,10 +380,11 @@ example :
 
 /-! ### `d = 0` counterexample -/
 
-/-- `d = 0` makes the volume-liminf conclusion false: at `Fin 1`, `H L := 1 - 1`, `O L := 1`,
+/-- `d = 0` makes the volume-liminf conclusion false: at `Fin 1`, `H L := 1`, `O L := 1`,
 `Ψ L := ![0]`, `Ξ L := ![1]`, `E L := 0`, `m := 1`, `C := 1`, `h := 1`, `o₀ := 0`, the family
 hypotheses `hvar`, `hE`, `hXi`, `hen` and `hub` of `tasaki_eq_3_4_21_volumeLiminf` are discharged
-by proof and its conclusion is refuted, so `1 ≤ d` is not removable. -/
+by proof and its conclusion is refuted, so `1 ≤ d` is not removable. The `1 - 1` in the first
+conjunct is the field-perturbed `H L − h·O L`, not `H L` itself. -/
 example :
     (∀ L : ℕ, 1 ≤ L →
       rayleighOnVec ((1 : Matrix (Fin 1) (Fin 1) ℂ) - ((1 : ℝ) : ℂ) • 1) ![(0 : ℂ)]

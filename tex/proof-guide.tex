@@ -13145,11 +13145,19 @@ parameter by the volume.  Eq.~(3.4.22)
 (\texttt{tasaki\_theorem\_3\_2\_kaplanHorschVonderLinden}) is stated with \texttt{Filter.liminf}
 in \emph{both} limits, per footnote~24 (p.~70), and in the printed order: the inner limit over the
 volume index $L$ along \texttt{atTop}, the outer limit over the field strength $h$ along
-$\mathcal N[{>}]\,0$.  The order is not cosmetic: a fixture in
-\texttt{Tests/KaplanHorschVonderLindenTheorem32.lean} evaluates both nestings on the bounded family
-$\min(h\cdot L,1)$ and pins the printed-order value at $1$ and the exchanged-order value at $0$.
-That family is not an instance of the capstone's data, so what is machine-checked there is the
-separation of the two nestings, not the falsity of the capstone with its limits exchanged.
+$\mathcal N[{>}]\,0$.  The order is not cosmetic, and exchanging it is machine-checked to be false.
+Two fixtures in \texttt{Tests/KaplanHorschVonderLindenTheorem32.lean} carry this.  The first
+evaluates both nestings on the bounded family $\min(h\cdot L,1)$ and pins the printed-order value at
+$1$ and the exchanged-order value at $0$; that family is not an instance of the capstone's data, so
+it separates the two nestings only.  The second is an instance: on $\mathrm{Fin}\,2$ with
+$H_L=\mathrm{diagonal}(0,1/L)$, $O_L=\mathrm{diagonal}(0,L)$, $\Xi_L=(0,1)$ and the field-dependent
+$\Psi_{h,L}=(0,1)$ when $1<hL^2$ and $(1,0)$ otherwise, at $d=1$, $q_0=1$, $C=1$, $o_0=1$ and
+$E_L=0$, every hypothesis of the capstone is discharged by proof --- \texttt{hXi} and \texttt{hen}
+at equality --- and the capstone's conclusion holds; on that same data
+$\sqrt{q_0}\le\liminf_{L\uparrow\infty}\liminf_{h\downarrow0}
+\langle\Psi_{h,L}|O_L|\Psi_{h,L}\rangle/L^d$ is refuted, its inner $\liminf$ being $0$ at every $L$.
+The state family is pinned to differ from $\Xi_L$ whenever $hL^2\le1$, so collapsing it onto the
+trial state stops the fixture compiling.
 \emph{Not asserted.}  The $L$-indexed and $h$-indexed family is carried as abstract per-volume
 matrices; a spin-$S$ family whose vertex set grows with the volume is not built here.  The trial
 states reach the Theorem~3.2 capstone only through the eq.~(3.4.16) order bound and the halved

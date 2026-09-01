@@ -115,8 +115,9 @@ the four `Ξ₋` declarations named above, and separately, directly at `+Ô_L` (
 instantiation), in the orthogonality proof `hvlMinusState_dotProduct_hvlPlusState`
 (`Quantum/HorschVonderLindenLowLyingState.lean:331`). The `L ↑ ∞` and `h ↓ 0` limits of Theorem 3.2
 are taken in `Quantum/KaplanHorschVonderLindenTheorem32.lean` (below, "Theorem 3.2" section of this
-part), but the mirror state `Ξ₋` does not enter there: the capstone's trial-state hypothesis is
-eq. (3.4.16) at `Ξ₊`, not its mirror form.
+part), but the mirror state `Ξ₋` does not enter there: that capstone's trial-state hypothesis has
+the shape of eq. (3.4.16) with the trial state `Ξ L` left abstract, and no instantiation — at `Ξ₊`,
+at `Ξ₋`, or at any other state — is performed there.
 
 All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
 `Classical.choice`, `Quot.sound`.
@@ -191,11 +192,18 @@ per-volume statement takes abstractly. Feeding the halved eq. (3.4.12) energy bo
 `L^{-d}` comes from that bound and a second from dividing the order parameter by the volume.
 Eq. (3.4.22) is stated with `Filter.liminf` in both limits per footnote 24 (p. 70), and in the
 printed order: the inner limit over the volume index `L` along `atTop`, the outer limit over the
-field strength `h` along `𝓝[>] 0`. The order is not cosmetic: a fixture in
-`LatticeSystem/Tests/KaplanHorschVonderLindenTheorem32.lean` evaluates both nestings on the bounded
-family `min (h·L) 1` and pins the printed-order value at `1` and the exchanged-order value at `0`.
-That family is not an instance of the capstone's data, so what is machine-checked there is the
-separation of the two nestings, not the falsity of the capstone with its limits exchanged.
+field strength `h` along `𝓝[>] 0`. The order is not cosmetic, and exchanging it is machine-checked
+to be false. Two fixtures in `LatticeSystem/Tests/KaplanHorschVonderLindenTheorem32.lean` carry
+this. The first evaluates both nestings on the bounded family `min (h·L) 1` and pins the
+printed-order value at `1` and the exchanged-order value at `0`; that family is not an instance of
+the capstone's data, so it separates the two nestings only. The second is an instance: on `Fin 2`
+with `H L = diagonal ![0, 1/L]`, `O L = diagonal ![0, L]`, `Ξ L = ![0, 1]` and the field-dependent
+`Ψ h L = ![0, 1]` when `1 < h·L²` and `![1, 0]` otherwise, at `d = 1`, `q₀ = 1`, `C = 1`, `o₀ = 1`
+and `E L = 0`, every hypothesis of the capstone is discharged by proof — `hXi` and `hen` at
+equality — and the capstone's conclusion holds; on that same data
+`√q₀ ≤ liminf_{L↑∞} liminf_{h↓0} ⟨Ψ h L|O L|Ψ h L⟩/L^d` is refuted, its inner `liminf` being `0` at
+every `L`. The state family is pinned to differ from `Ξ L` whenever `h·L² ≤ 1`, so collapsing it
+onto the trial state stops the fixture compiling.
 
 **What these declarations do not assert.** The `L`-indexed and `h`-indexed family is carried as
 abstract per-volume matrices; a spin-`S` family whose vertex set grows with the volume is not built
