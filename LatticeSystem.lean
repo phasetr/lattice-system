@@ -28,6 +28,7 @@ import LatticeSystem.Quantum.KaplanHorschVonderLinden
 import LatticeSystem.Quantum.HorschVonderLindenEnergyBound
 import LatticeSystem.Quantum.HorschVonderLindenProblem34b
 import LatticeSystem.Quantum.HorschVonderLindenLowLyingState
+import LatticeSystem.Quantum.KaplanHorschVonderLindenTheorem32
 import LatticeSystem.Quantum.SpinS.FalkBruchInfra
 import LatticeSystem.Quantum.SpinS.NoLongRangeOrder1D
 import LatticeSystem.Quantum.SpinS.MPSTheorem75

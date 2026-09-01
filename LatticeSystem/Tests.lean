@@ -151,6 +151,7 @@ import LatticeSystem.Tests.Problem34bFluctuation
 import LatticeSystem.Tests.HorschVonderLindenEnergyBound
 import LatticeSystem.Tests.HorschVonderLindenLowLyingState
 import LatticeSystem.Tests.HorschVonderLindenTrialStateVariational
+import LatticeSystem.Tests.KaplanHorschVonderLindenTheorem32
 import LatticeSystem.Tests.LocalDoubleCommutatorBound
 import LatticeSystem.Tests.RangeLocalDoubleCommutatorBound
 import LatticeSystem.Tests.OperatorSupport
