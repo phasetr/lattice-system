@@ -46,6 +46,11 @@ odd sites, so the associated sublattice sign is `ε_x = (−1)^x`.  Used with `s
 gives the staggered order operator `Ô_L^{(3)} = Σ_x (−1)^x Ŝ_x^{(3)}`. -/
 def ringStaggeredSublattice (L : ℕ) (x : Fin L) : Bool := x.val % 2 = 0
 
+/-- The ring nearest-neighbor coupling is real-valued (`0`/`1`), hence self-conjugate. -/
+theorem ringCoupling_self_star (L : ℕ) (x y : Fin L) :
+    star (ringCoupling L x y) = ringCoupling L x y := by
+  unfold ringCoupling; split <;> simp
+
 /-- The **one-dimensional staggered-field antiferromagnetic Heisenberg Hamiltonian** on a ring of
 `L` sites (eq. (4.1.9)): `Ĥ_h = Σ_x Ŝ_x · Ŝ_{x+1} − h · Ô_L^{(3)}`, with `Ô_L^{(3)}` the staggered
 order operator.  The staggered field `−h (−1)^x Ŝ_x^{(3)}` is designed to trigger possible symmetry
@@ -54,6 +59,25 @@ noncomputable def staggeredFieldChainHamiltonianS (L : ℕ) (h : ℝ) (N : ℕ) 
     ManyBodyOpS (Fin L) N :=
   heisenbergHamiltonianS (ringCoupling L) N
     - (h : ℂ) • staggeredOrderOpS (ringStaggeredSublattice L) N
+
+/-- **The staggered-field chain Hamiltonian is Hermitian** (eq. (4.1.9), p. 76).  `Ĥ_h` is the
+difference of the Hermitian ring Heisenberg Hamiltonian
+(`heisenbergHamiltonianS_isHermitian_of_real` at the real `0`/`1` coupling `ringCoupling_self_star`)
+and the real scalar multiple `h · Ô_L^{(3)}` of the Hermitian staggered order operator
+(`staggeredOrderOpS_isHermitian`), hence Hermitian for every ring size `L`, every real field `h` and
+every spin `N`.  No parity or positivity restriction on `L` is used: the statement holds verbatim at
+`L = 0` (one-dimensional Hilbert space, both summands empty) and at `L = 1` (where `ringCoupling 1`
+degenerates to the self-loop `J 0 0 = 1`).
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §4.1, eq. (4.1.9), p. 76. -/
+theorem staggeredFieldChainHamiltonianS_isHermitian (L : ℕ) (h : ℝ) (N : ℕ) :
+    (staggeredFieldChainHamiltonianS L h N).IsHermitian := by
+  unfold staggeredFieldChainHamiltonianS
+  refine (heisenbergHamiltonianS_isHermitian_of_real (ringCoupling_self_star L) N).sub
+    ((staggeredOrderOpS_isHermitian (ringStaggeredSublattice L) N).smul ?_)
+  rw [isSelfAdjoint_iff]
+  exact Complex.conj_ofReal h
 
 /-- **Tasaki Theorem 4.2 (Shastry no-SSB in 1D), DOCUMENTED AXIOM.**
 Tasaki §4.1 footnote 3 (p. 76) explicitly states "We do not prove Theorem 4.2 in
