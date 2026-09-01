@@ -156,4 +156,49 @@ theorem chainGroundEnergy_le_zero_field {Λ : Type*} [Fintype Λ] [DecidableEq �
   have hneg := chainGroundEnergy_neg hH hO hΘ2 hΘH hΘO h
   linarith [hc, hneg]
 
+/-- **Order-parameter sandwich in a ground state at field `h`**:
+`0 ≤ E(0) − E(h) ≤ h⟨Ô⟩_h ≤ E(0) − E(2h)` for any normalized ground state `Φ` of `H − h·O`.
+
+This is Tasaki's variational comparison (3.4.20), p. 70, of the field Hamiltonian (3.4.19), p. 69,
+run in both directions against the *same* state `Φ`.  Writing `⟨Ĥ⟩ = ⟨Φ, HΦ⟩.re` and
+`⟨Ô⟩ = ⟨Φ, OΦ⟩.re`, the eigenvalue equation gives `E(h) = ⟨Ĥ⟩ − h⟨Ô⟩` exactly, while `Φ` is only a
+trial state at the other two fields: `E(0) ≤ ⟨Ĥ⟩` yields the middle inequality and
+`E(2h) ≤ ⟨Ĥ⟩ − 2h⟨Ô⟩` the right one (after `E(h) ≤ E(0)`); the left one is
+`chainGroundEnergy_le_zero_field`.  The point of the chain is that it brackets the state-dependent
+`h⟨Ô⟩_h` between two differences of the *scalar* function `E`, eliminating the eigenvector
+quantifiers and any ground-state degeneracy.
+
+The hypothesis `0 ≤ h` is not consumed by the algebra — all three inequalities are proved for every
+real `h` — and is kept because the chain is only informative for `h ≥ 0`: it is exactly there that
+`0 ≤ E(0) − E(h)` forces `0 ≤ ⟨Ô⟩`, which is the sign the Theorem 4.2 reduction needs.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §3.4, eqs. (3.4.19)–(3.4.20), pp. 69–70; §4.1, eqs. (4.1.9)–(4.1.10), pp. 76–77. -/
+theorem chainGroundState_order_mean_sandwich {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
+    [Nonempty (Λ → Fin (N + 1))] {H O Θ : ManyBodyOpS Λ N}
+    (hH : H.IsHermitian) (hO : O.IsHermitian)
+    (hΘ2 : Θ * Θ = 1) (hΘH : Θ * H * Θ = H) (hΘO : Θ * O * Θ = -O)
+    (h : ℝ) (_hh : 0 ≤ h) {Φ : (Λ → Fin (N + 1)) → ℂ} (hΦnorm : star Φ ⬝ᵥ Φ = 1)
+    (hΦE : (H - (h : ℂ) • O).mulVec Φ = ((chainGroundEnergy hH hO h : ℝ) : ℂ) • Φ) :
+    0 ≤ chainGroundEnergy hH hO 0 - chainGroundEnergy hH hO h ∧
+      chainGroundEnergy hH hO 0 - chainGroundEnergy hH hO h ≤
+        h * (star Φ ⬝ᵥ O.mulVec Φ).re ∧
+      h * (star Φ ⬝ᵥ O.mulVec Φ).re ≤
+        chainGroundEnergy hH hO 0 - chainGroundEnergy hH hO (2 * h) := by
+  have hle : ∀ c : ℝ, chainGroundEnergy hH hO c ≤
+      (star Φ ⬝ᵥ H.mulVec Φ).re - c * (star Φ ⬝ᵥ O.mulVec Φ).re := by
+    intro c
+    have hv := hermitianMinEigenvalue_le_rayleighOnVec_of_unit (fieldOpS_isHermitian hH hO c) hΦnorm
+    unfold rayleighOnVec at hv
+    rwa [fieldOpS_dotProduct_re] at hv
+  have heq : chainGroundEnergy hH hO h =
+      (star Φ ⬝ᵥ H.mulVec Φ).re - h * (star Φ ⬝ᵥ O.mulVec Φ).re := by
+    have hval : (star Φ ⬝ᵥ (H - (h : ℂ) • O).mulVec Φ).re = chainGroundEnergy hH hO h := by
+      rw [hΦE, dotProduct_smul, smul_eq_mul, hΦnorm, mul_one, Complex.ofReal_re]
+    rw [← hval, fieldOpS_dotProduct_re]
+  have h0 := hle 0
+  have h2 := hle (2 * h)
+  have hmax := chainGroundEnergy_le_zero_field hH hO hΘ2 hΘH hΘO h
+  exact ⟨by linarith, by linarith, by linarith⟩
+
 end LatticeSystem.Quantum
