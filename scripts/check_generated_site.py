@@ -1956,8 +1956,8 @@ def run_staged_mutation_tests(
         (
             "citation locator",
             "formalization/records/tasaki-2020-section-2-1-pauli-x-involutive.md",
-            "exercise 2.41; section 2.1.3; pages 78",
-            "exercise 2.41; section 2.1.3; pages 79",
+            "exercise 2.41; section 2.1.9; pages 78",
+            "exercise 2.41; section 2.1.9; pages 79",
         ),
         (
             "summary",

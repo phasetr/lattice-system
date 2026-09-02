@@ -82,10 +82,10 @@ permalink: /limitations/documented-axioms/chapter-04/
 **Tasaki §4.1, Corollary 4.3** (eq. (4.1.11), p. 77, with footnotes 3 (p. 76)
 and 9 (p. 83)) rests on one **documented axiom**,
 `shastry_staggered_susceptibility_subcubic`
-(`LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean`, declaration line 101).
+(`LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean`, declaration line 110).
 
 - **Proved (axiom-free):** Corollary 4.3 itself, `no_long_range_order_1d`
-  (`NoLongRangeOrder1D.lean:147`), is a genuine **theorem**, obtained by
+  (`NoLongRangeOrder1D.lean:156`), is a genuine **theorem**, obtained by
   feeding this axiom as the single quantitative input into the conditional
   reduction `no_long_range_order_1d_of_susceptibility`
   (`NoLongRangeOrderConditional.lean:39`); only the susceptibility estimate
