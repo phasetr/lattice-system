@@ -244,6 +244,66 @@ example (N : ℕ) :
             < ε :=
   shastry_no_symmetry_breaking_1d N
 
+/-! ## Signature pin 5c — `hermitianMinEigenvalue_le_re_of_eigenpair` -/
+
+/-- **Signature pin.** Any eigenpair of a Hermitian matrix has real part at least
+`hermitianMinEigenvalue`; the converse direction to
+`groundState_mulVec_eq_hermitianMinEigenvalue`. -/
+example {n : Type*} [Fintype n] [DecidableEq n] [Nonempty n] {H : Matrix n n ℂ}
+    (hH : H.IsHermitian) {E : ℂ} {Ψ : n → ℂ} (hΨ : Ψ ≠ 0) (heig : H.mulVec Ψ = E • Ψ) :
+    hermitianMinEigenvalue hH ≤ E.re :=
+  hermitianMinEigenvalue_le_re_of_eigenpair hH hΨ heig
+
+/-! ## Signature pin 5d — the converse capstone `shastryEnergyGain_of_no_symmetry_breaking_1d` -/
+
+/-- **Signature pin (converse capstone).** The hypothesis is Theorem 4.2's conclusion, copied
+literally from `shastry_no_symmetry_breaking_1d`'s statement; the conclusion is
+`shastryEnergyGain`'s statement, copied literally. Together with item 5b this pins that the two
+directions are stated over the identical pair of shapes, not merely similar ones. -/
+example (N : ℕ)
+    (hssb : ∀ ε : ℝ, 0 < ε → ∃ h₀ : ℝ, 0 < h₀ ∧
+      ∀ h : ℝ, 0 < h → h < h₀ → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L →
+        ∀ Φ : (Fin L → Fin (N + 1)) → ℂ,
+          star Φ ⬝ᵥ Φ = 1 →
+          (∃ E₀ : ℂ, (staggeredFieldChainHamiltonianS L h N).mulVec Φ = E₀ • Φ ∧
+            (∀ E : ℂ, ∀ Ψ : (Fin L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
+              (staggeredFieldChainHamiltonianS L h N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re) ∧
+            Φ ≠ 0) →
+          |(star Φ ⬝ᵥ (staggeredOrderOpS (ringStaggeredSublattice L) N).mulVec Φ).re / (L : ℝ)|
+            < ε) :
+    ∀ ε : ℝ, 0 < ε → ∃ η₀ : ℝ, 0 < η₀ ∧
+      ∀ η : ℝ, 0 < η → η < η₀ → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L →
+        hermitianMinEigenvalue (staggeredFieldChainHamiltonianS_isHermitian L 0 N) -
+            hermitianMinEigenvalue (staggeredFieldChainHamiltonianS_isHermitian L (2 * η) N) ≤
+          ε * η * (L : ℝ) :=
+  shastryEnergyGain_of_no_symmetry_breaking_1d N hssb
+
+/-! ## Round-trip fixture — the acceptance artifact -/
+
+/-- **Round-trip fixture (acceptance artifact).** Composes the forward capstone
+(`shastry_no_symmetry_breaking_1d_of_energy_gain`, gain → Theorem 4.2) with the converse
+(`shastryEnergyGain_of_no_symmetry_breaking_1d`, Theorem 4.2 → gain) and checks the composite has
+the *same* gain-shaped hypothesis and conclusion. It deliberately takes `hgain` as a bound variable
+of `shastryEnergyGain`'s shape rather than invoking the axiom `shastryEnergyGain` itself: had the
+converse trivialised — e.g. by ignoring `hssb` and reconstructing the gain bound from `N` alone, or
+by using `shastryEnergyGain N` internally and discarding `hssb` — this composite would still
+typecheck against the axiom but would prove nothing about `hssb` being an actual converse input;
+by threading an arbitrary `hgain` through both directions with no axiom in sight, the fixture forces
+`shastryEnergyGain_of_no_symmetry_breaking_1d` to genuinely consume the `hssb` it is given. -/
+example (N : ℕ)
+    (hgain : ∀ ε : ℝ, 0 < ε → ∃ η₀ : ℝ, 0 < η₀ ∧
+      ∀ η : ℝ, 0 < η → η < η₀ → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L →
+        hermitianMinEigenvalue (staggeredFieldChainHamiltonianS_isHermitian L 0 N) -
+            hermitianMinEigenvalue (staggeredFieldChainHamiltonianS_isHermitian L (2 * η) N) ≤
+          ε * η * (L : ℝ)) :
+    ∀ ε : ℝ, 0 < ε → ∃ η₀ : ℝ, 0 < η₀ ∧
+      ∀ η : ℝ, 0 < η → η < η₀ → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L →
+        hermitianMinEigenvalue (staggeredFieldChainHamiltonianS_isHermitian L 0 N) -
+            hermitianMinEigenvalue (staggeredFieldChainHamiltonianS_isHermitian L (2 * η) N) ≤
+          ε * η * (L : ℝ) :=
+  shastryEnergyGain_of_no_symmetry_breaking_1d N
+    (shastry_no_symmetry_breaking_1d_of_energy_gain N hgain)
+
 /-! ## Non-vacuity witness — the abstract hypothesis bundle is satisfiable, non-degenerately -/
 
 /-- **Non-vacuity witness.** Instantiates the abstract hypothesis set consumed by items 3–4

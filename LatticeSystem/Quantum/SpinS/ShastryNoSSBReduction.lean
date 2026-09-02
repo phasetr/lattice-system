@@ -29,6 +29,11 @@ Theorem 4.2 is exactly as unproved as before.  What the reduction buys is struct
 eigenvector quantifiers, the ground-state degeneracy and the inner limit are gone, leaving one
 inequality between real numbers.
 
+That "nothing was gained mathematically" is itself checked, not merely stated:
+`shastryEnergyGain_of_no_symmetry_breaking_1d` derives the scalar condition back from Theorem 4.2's
+own conclusion, so the two statements are inter-derivable in Lean and the axiom is exactly as strong
+as the theorem it stands in for.
+
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §4.1, Theorem 4.2, eqs. (4.1.9)–(4.1.10), pp. 76–77, footnote 3, p. 76 (Shastry [58];
 cf. Tanaka–Takeda–Idogaki [63]); §3.4, eqs. (3.4.19)–(3.4.20), pp. 69–70.
@@ -56,9 +61,11 @@ theorem staggeredFieldChainHamiltonianS_isHermitian (L : ℕ) (h : ℝ) (N : ℕ
 
 /-- **The many-body spin reversal fixes the Heisenberg Hamiltonian**: `Θ Ĥ_J Θ = Ĥ_J` for every
 coupling `J` (Tasaki's `Ĥ` of eq. (3.4.19), p. 69, at the ring coupling of eq. (4.1.9), p. 76).
-Immediate from the anisotropic case at `λ = 1`, `D = 0`.  Private: its only use is in
-`staggeredFieldChainHamiltonianS_conj_manyBodyReversalS` below, and it is a one-line specialisation
-of `manyBodyReversalS_conj_anisotropicHeisenbergS`.
+Immediate from the anisotropic case at `λ = 1`, `D = 0`.  Private because it is a one-line
+specialisation of `manyBodyReversalS_conj_anisotropicHeisenbergS` with no independent content; it is
+used inside this module only, by `staggeredFieldChainHamiltonianS_conj_manyBodyReversalS` and by the
+two capstones, which need the reversal symmetry of the Heisenberg part on its own rather than in the
+combined `Θ Ĥ_h Θ = Ĥ_{−h}` form.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §3.4, eq. (3.4.19), p. 69; §4.1, eq. (4.1.9), p. 76. -/
@@ -97,10 +104,11 @@ formulation of Shastry's argument."  Nothing here recovers that missing argument
 **equivalent in strength to an `L`-uniform form of Theorem 4.2**, since the capstone
 `shastry_no_symmetry_breaking_1d_of_energy_gain` derives Theorem 4.2 from it while, conversely, the
 sandwich `E_L(0) − E_L(η) ≤ η⟨Ô⟩_η` of `chainGroundState_order_mean_sandwich` turns a per-site
-staggered-moment bound back into an energy-gain bound of the same order.  Only the forward half of
-that equivalence is in Lean, as the capstone itself; the converse half — and with it the equivalence
-as stated — is a hand argument and is **not** formalised anywhere in this development.  The present
-development is therefore a **conditional reduction of Theorem 4.2, not a discharge of its
+staggered-moment bound back into an energy-gain bound of the same order.  **Both halves of that
+equivalence are in Lean**: the forward one as the capstone, the converse as
+`shastryEnergyGain_of_no_symmetry_breaking_1d` below, which derives this axiom's statement from
+Theorem 4.2's own conclusion.  So the equivalence is not a hand argument but a checked fact, and
+the present development is a **conditional reduction of Theorem 4.2, not a discharge of its
 mathematical content**; what it removes is the eigenvector quantifiers, the ground-state degeneracy
 and the inner thermodynamic limit, leaving a single inequality between real numbers.
 
@@ -176,9 +184,9 @@ ground state vanishes in the iterated limit `lim_{h↓0} lim_{L↑∞}` (eq. (4.
 Proof.  Fix `ε > 0` and run `hgain` at `ε/2`, taking `h₀ := η₀`.  For `0 < h < h₀` take the `L₀` it
 supplies (enlarged to at least `1`, so that division by `L` is legitimate).  For a normalized ground
 state `Φ` of `Ĥ_h`, `groundState_mulVec_eq_hermitianMinEigenvalue` identifies its eigenvalue with
-`E_L(h)`, and `chainGroundState_order_mean_sandwich` — fed the reversal symmetry
-`staggeredFieldChainHamiltonianS_conj_manyBodyReversalS` in the split form `Θ Ĥ Θ = Ĥ`,
-`Θ Ô Θ = −Ô`, recovered from it by reading it at `h = 0` and at `h = 1` — gives
+`E_L(h)`, and `chainGroundState_order_mean_sandwich` — fed the two halves of the reversal symmetry
+separately, `Θ Ĥ Θ = Ĥ` from `manyBodyReversalS_conj_heisenbergHamiltonianS` and `Θ Ô Θ = −Ô` from
+`manyBodyReversalS_conj_staggeredOrderOpS` — gives
 `0 ≤ E_L(0) − E_L(h) ≤ h⟨Ô_L^{(3)}⟩ ≤ E_L(0) − E_L(2h)`.  The left half forces `⟨Ô_L^{(3)}⟩ ≥ 0`;
 the right half together with `hgain` gives `h⟨Ô_L^{(3)}⟩ ≤ (ε/2)·h·L`, so
 `0 ≤ ⟨Ô_L^{(3)}⟩/L ≤ ε/2 < ε`.
@@ -221,17 +229,9 @@ theorem shastry_no_symmetry_breaking_1d_of_energy_gain (N : ℕ)
     rw [hbridge h]
     exact groundState_mulVec_eq_hermitianMinEigenvalue
       (staggeredFieldChainHamiltonianS_isHermitian L h N) hΦnorm heig hmin
-  have hΘH : manyBodyReversalS (Fin L) N * heisenbergHamiltonianS (ringCoupling L) N *
-      manyBodyReversalS (Fin L) N = heisenbergHamiltonianS (ringCoupling L) N := by
-    have h0 := staggeredFieldChainHamiltonianS_conj_manyBodyReversalS L 0 N
-    simpa only [staggeredFieldChainHamiltonianS, neg_zero, Complex.ofReal_zero, zero_smul,
-      sub_zero] using h0
-  have hΘO : manyBodyReversalS (Fin L) N * staggeredOrderOpS (ringStaggeredSublattice L) N *
-      manyBodyReversalS (Fin L) N = -staggeredOrderOpS (ringStaggeredSublattice L) N := by
-    have h1 := staggeredFieldChainHamiltonianS_conj_manyBodyReversalS L 1 N
-    simp only [staggeredFieldChainHamiltonianS, mul_sub, sub_mul, hΘH, Complex.ofReal_one,
-      Complex.ofReal_neg, neg_smul, one_smul] at h1
-    exact sub_right_inj.mp h1
+  have hΘH := manyBodyReversalS_conj_heisenbergHamiltonianS (ringCoupling L) N
+  have hΘO := manyBodyReversalS_conj_staggeredOrderOpS (Λ := Fin L) (N := N)
+    (ringStaggeredSublattice L)
   obtain ⟨hs1, _hs2, hs3⟩ := chainGroundState_order_mean_sandwich hHring hOring
     (manyBodyReversalS_mul_self (Fin L) N) hΘH hΘO h hh0.le hΦnorm hΦE
   have hgainL := hL₀ L (le_trans (le_max_left _ _) hL)
@@ -244,6 +244,113 @@ theorem shastry_no_symmetry_breaking_1d_of_energy_gain (N : ℕ)
   have heO_ub : eO ≤ ε / 2 * (L : ℝ) := le_of_mul_le_mul_left hmul hh0
   rw [abs_of_nonneg (div_nonneg heO_nonneg hLpos.le), div_lt_iff₀ hLpos]
   linarith [heO_ub, mul_pos (half_pos hε) hLpos]
+
+/-- **The converse of the reduction: Theorem 4.2 implies the energy-gain condition.**  From `hssb`
+— the conclusion of `shastry_no_symmetry_breaking_1d` verbatim, that the per-site staggered order
+parameter of every normalized ground state vanishes in the iterated limit (eq. (4.1.10), p. 77) —
+the scalar bound `E_L(0) − E_L(2η) ≤ ε · η · L` of `shastryEnergyGain` follows verbatim, with the
+same `ε → η₀ → η → L₀ → L` quantifier nest.
+
+**What this buys.**  Together with `shastry_no_symmetry_breaking_1d_of_energy_gain` it makes both
+implications between Theorem 4.2 and `shastryEnergyGain` machine-checked, so the two statements are
+inter-derivable in Lean rather than merely asserted to be so.  That assertion — that the axiom is
+*equivalent in strength* to an `L`-uniform form of Theorem 4.2, and hence that the reduction
+relocates the missing analytic input without weakening it — stands in five places in this
+development: the doc comment of `shastryEnergyGain` above, the Chapter 4 documented-axiom ledger,
+the public proof guide, and two records of the legacy catalogue.  Until now it was prose in all
+five.  It is now a theorem, so "this is a relocation, not progress" is checked rather than
+said, and a future reader cannot mistake the reduction for a partial discharge on the strength of an
+unverified equivalence claim.
+
+**Why the field handed to `hssb` is `2η`, not `η`.**  The sandwich
+`0 ≤ E(0) − E(h) ≤ h⟨Ô⟩_h ≤ E(0) − E(2h)` of `chainGroundState_order_mean_sandwich` bounds
+`E(0) − E(h)` — not `E(0) − E(2h)` — by the order parameter *at the same field* `h`.  The prose
+statements of the equivalence all quote that middle inequality in the form
+`E_L(0) − E_L(η) ≤ η⟨Ô⟩_η`, whereas `shastryEnergyGain`'s left-hand side is `E_L(0) − E_L(2η)`.
+The two are matched by running the middle inequality at `h := 2η`: the state whose order parameter
+`hssb` bounds is then a ground state of `Ĥ_{2η}`, which is the field the axiom's left-hand side
+refers to.  This is what fixes `η₀ := h₀/2` — so that `0 < η < η₀` places `2η` inside `hssb`'s own
+field window `(0, h₀)` — and it is the one step of the derivation the prose does not spell out.
+
+**Why the threshold is `max L₀ 1`.**  Theorem 4.2's conclusion bounds `|⟨Ô⟩.re / L|`, and in Lean
+`x / 0 = 0`, so at `L = 0` that conclusion reads `0 < ε` and says nothing whatever about `⟨Ô⟩`.
+Taking `hssb`'s own `L₀` unchanged would therefore let the derivation rest on a vacuous instance at
+`L = 0`.  Enlarging to `max L₀ 1` forces `0 < (L : ℝ)`, which is exactly the hypothesis
+`div_lt_iff₀` needs to convert the per-site bound back into `⟨Ô⟩.re < (ε/2)·L`.  It is load-bearing
+for soundness, not a convenience.
+
+Proof.  Instantiate `hssb` at `ε/2` to obtain `h₀ > 0` and set `η₀ := h₀/2`.  For `0 < η < η₀` put
+`h := 2η`, which lies in `(0, h₀)`, and take the threshold `hssb` supplies there, enlarged to
+`max L₀ 1`.  At `L` beyond it, `exists_unit_eigenvector_hermitianMinEigenvalue` produces a
+normalized minimum eigenvector `Φ` of `Ĥ_{2η}`, and `hermitianMinEigenvalue_le_re_of_eigenpair`
+certifies its eigenvalue as minimal over all eigenpairs, which is what `hssb`'s ground-state
+hypothesis demands; `hssb` then yields `⟨Ô_L^{(3)}⟩.re < (ε/2)·L`.  The middle inequality of
+`chainGroundState_order_mean_sandwich` at field `2η` closes the argument:
+`E_L(0) − E_L(2η) ≤ 2η·⟨Ô_L^{(3)}⟩.re < 2η·(ε/2)·L = ε·η·L`.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §4.1, Theorem 4.2, eqs. (4.1.9)–(4.1.10), pp. 76–77, footnote 3, p. 76; §3.4,
+eqs. (3.4.19)–(3.4.20), pp. 69–70. -/
+theorem shastryEnergyGain_of_no_symmetry_breaking_1d (N : ℕ)
+    (hssb : ∀ ε : ℝ, 0 < ε → ∃ h₀ : ℝ, 0 < h₀ ∧
+      ∀ h : ℝ, 0 < h → h < h₀ → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L →
+        ∀ Φ : (Fin L → Fin (N + 1)) → ℂ,
+          star Φ ⬝ᵥ Φ = 1 →
+          (∃ E₀ : ℂ, (staggeredFieldChainHamiltonianS L h N).mulVec Φ = E₀ • Φ ∧
+            (∀ E : ℂ, ∀ Ψ : (Fin L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
+              (staggeredFieldChainHamiltonianS L h N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re) ∧
+            Φ ≠ 0) →
+          |(star Φ ⬝ᵥ (staggeredOrderOpS (ringStaggeredSublattice L) N).mulVec Φ).re / (L : ℝ)|
+            < ε) :
+    ∀ ε : ℝ, 0 < ε → ∃ η₀ : ℝ, 0 < η₀ ∧
+      ∀ η : ℝ, 0 < η → η < η₀ → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L →
+        hermitianMinEigenvalue (staggeredFieldChainHamiltonianS_isHermitian L 0 N) -
+            hermitianMinEigenvalue (staggeredFieldChainHamiltonianS_isHermitian L (2 * η) N) ≤
+          ε * η * (L : ℝ) := by
+  intro ε hε
+  obtain ⟨h₀, hh₀, hall⟩ := hssb (ε / 2) (by linarith)
+  refine ⟨h₀ / 2, by linarith, fun η hη hηlt => ?_⟩
+  obtain ⟨L₀, hL₀⟩ := hall (2 * η) (by linarith) (by linarith)
+  refine ⟨max L₀ 1, fun L hL => ?_⟩
+  have hL1 : 1 ≤ L := le_trans (le_max_right _ _) hL
+  have hLpos : (0 : ℝ) < (L : ℝ) := by exact_mod_cast hL1
+  have hHring : (heisenbergHamiltonianS (ringCoupling L) N).IsHermitian :=
+    heisenbergHamiltonianS_isHermitian_of_real (ringCoupling_self_star L) N
+  have hOring : (staggeredOrderOpS (ringStaggeredSublattice L) N).IsHermitian :=
+    staggeredOrderOpS_isHermitian (ringStaggeredSublattice L) N
+  have hbridge : ∀ c : ℝ, chainGroundEnergy hHring hOring c =
+      hermitianMinEigenvalue (staggeredFieldChainHamiltonianS_isHermitian L c N) := fun _ => rfl
+  obtain ⟨Φ, hΦnorm, hΦeig⟩ := exists_unit_eigenvector_hermitianMinEigenvalue
+    (staggeredFieldChainHamiltonianS_isHermitian L (2 * η) N)
+  have hΦne : Φ ≠ 0 := by
+    intro h0
+    rw [h0] at hΦnorm
+    simp at hΦnorm
+  have hmin : ∀ E : ℂ, ∀ Ψ : (Fin L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
+      (staggeredFieldChainHamiltonianS L (2 * η) N).mulVec Ψ = E • Ψ →
+      (((hermitianMinEigenvalue
+        (staggeredFieldChainHamiltonianS_isHermitian L (2 * η) N) : ℝ) : ℂ)).re ≤ E.re := by
+    intro E Ψ hΨ hΨeig
+    rw [Complex.ofReal_re]
+    exact hermitianMinEigenvalue_le_re_of_eigenpair _ hΨ hΨeig
+  have habs := hL₀ L (le_trans (le_max_left _ _) hL) Φ hΦnorm ⟨_, hΦeig, hmin, hΦne⟩
+  have hΦE : (heisenbergHamiltonianS (ringCoupling L) N -
+      ((2 * η : ℝ) : ℂ) • staggeredOrderOpS (ringStaggeredSublattice L) N).mulVec Φ =
+      ((chainGroundEnergy hHring hOring (2 * η) : ℝ) : ℂ) • Φ := by
+    rw [hbridge (2 * η)]
+    exact hΦeig
+  have hΘH := manyBodyReversalS_conj_heisenbergHamiltonianS (ringCoupling L) N
+  have hΘO := manyBodyReversalS_conj_staggeredOrderOpS (Λ := Fin L) (N := N)
+    (ringStaggeredSublattice L)
+  obtain ⟨_hs1, hs2, _hs3⟩ := chainGroundState_order_mean_sandwich hHring hOring
+    (manyBodyReversalS_mul_self (Fin L) N) hΘH hΘO (2 * η) (by linarith) hΦnorm hΦE
+  set eO := (star Φ ⬝ᵥ (staggeredOrderOpS (ringStaggeredSublattice L) N).mulVec Φ).re
+  have heO_ub : eO < ε / 2 * (L : ℝ) := (div_lt_iff₀ hLpos).mp (lt_of_abs_lt habs)
+  have hmul : 2 * η * eO ≤ 2 * η * (ε / 2 * (L : ℝ)) :=
+    mul_le_mul_of_nonneg_left heO_ub.le (by linarith)
+  have hshape : 2 * η * (ε / 2 * (L : ℝ)) = ε * η * (L : ℝ) := by ring
+  rw [← hbridge 0, ← hbridge (2 * η)]
+  linarith [hs2, hmul, hshape]
 
 /-- **Tasaki Theorem 4.2 (Shastry's theorem: no symmetry breaking in one dimension).**
 For the one-dimensional spin-`S` antiferromagnetic Heisenberg ring under a staggered magnetic field

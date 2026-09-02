@@ -31,9 +31,13 @@ permalink: /limitations/documented-axioms/chapter-04/
   `#print axioms shastry_no_symmetry_breaking_1d` names `shastryEnergyGain`, which is
   **equivalent in strength to an `L`-uniform form of Theorem 4.2**: the capstone derives
   Theorem 4.2 from it, and conversely the sandwich `E_L(0) − E_L(η) ≤ η⟨Ô⟩_η` turns a
-  per-site staggered-moment bound back into an energy-gain bound of the same order. Only the
-  forward half of that equivalence is in Lean (the capstone); the converse half is a hand
-  argument, not formalised. The class and override recorded below are unchanged.
+  per-site staggered-moment bound back into an energy-gain bound of the same order. **Both
+  halves of that equivalence are now in Lean**: the forward one as the capstone, the converse
+  as `shastryEnergyGain_of_no_symmetry_breaking_1d` (`ShastryNoSSBReduction.lean`, axiom-free,
+  `#print axioms` = the standard three), which derives the axiom's statement from Theorem 4.2's
+  own conclusion by running the sandwich's middle inequality at field `2η`. The equivalence is
+  therefore a checked fact rather than a hand argument, and the axiom is exactly as strong as
+  the theorem it stands in for. The class and override recorded below are unchanged.
 - **What the axiom statement literally asserts:** writing
   `E_L(c) = hermitianMinEigenvalue (Ĥ_c)` for the minimum eigenvalue of
   `staggeredFieldChainHamiltonianS L c N` (eq. (4.1.9)): for every `ε > 0` there is

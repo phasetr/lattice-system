@@ -116,10 +116,10 @@ and lists its file as `Quantum/SpinS/ShastryNoSSB.lean`. That is no longer curre
 `Quantum/SpinS/ShastryNoSSBReduction.lean`, with its statement unchanged, obtained by applying the
 conditional capstone `shastry_no_symmetry_breaking_1d_of_energy_gain` to the documented axiom
 `shastryEnergyGain` in that same file. The mathematical content is not discharged:
-`shastryEnergyGain` is equivalent in strength to an `L`-uniform form of Theorem 4.2 — only the
-forward half of that equivalence is in Lean, as the conditional capstone; the converse half is a
-hand argument, not formalised anywhere in the development — so
-`#print axioms shastry_no_symmetry_breaking_1d` reports
+`shastryEnergyGain` is equivalent in strength to an `L`-uniform form of Theorem 4.2, and both
+halves of that equivalence are now in Lean: the forward one as the conditional capstone, the
+converse as `shastryEnergyGain_of_no_symmetry_breaking_1d` in the same file (axiom-free). So
+`#print axioms shastry_no_symmetry_breaking_1d` still reports
 `[propext, Classical.choice, Quot.sound, shastryEnergyGain]`. `ShastryNoSSB.lean` now carries only
 the model, in four declarations (`ringCoupling`, `ringCoupling_self_star`,
 `ringStaggeredSublattice`, `staggeredFieldChainHamiltonianS`); the variational layer the reduction
