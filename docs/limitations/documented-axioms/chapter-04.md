@@ -77,15 +77,15 @@ permalink: /limitations/documented-axioms/chapter-04/
 
 <a id="entry-corollary-4-3-support"></a>
 
-## Corollary 4.3 support (Shastry staggered susceptibility bound)
+## Corollary 4.3 support (Shastry staggered susceptibility, sub-cubic form)
 
 **Tasaki §4.1, Corollary 4.3** (eq. (4.1.11), p. 77, with footnotes 3 (p. 76)
 and 9 (p. 83)) rests on one **documented axiom**,
 `shastry_staggered_susceptibility_subcubic`
-(`LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean`, declaration line 96).
+(`LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean`, declaration line 101).
 
 - **Proved (axiom-free):** Corollary 4.3 itself, `no_long_range_order_1d`
-  (`NoLongRangeOrder1D.lean:142`), is a genuine **theorem**, obtained by
+  (`NoLongRangeOrder1D.lean:147`), is a genuine **theorem**, obtained by
   feeding this axiom as the single quantitative input into the conditional
   reduction `no_long_range_order_1d_of_susceptibility`
   (`NoLongRangeOrderConditional.lean:39`); only the susceptibility estimate
@@ -113,8 +113,11 @@ and 9 (p. 83)) rests on one **documented axiom**,
   vanishing. `o(L³)` follows both from a gapped chain and from the `χ ≍ L²`
   growth small-ring exact diagonalisation indicates (numerics, no Lean
   witness), so the statement stays neutral on the open Haldane-gap question.
-- **Axiom reason (documented):** no published source states a bound on
-  `f_L^{(-1)}(k*)`. Tasaki's "This is nontrivial, and requires a hard
+- **Axiom reason (documented):** neither source examined here states a bound
+  on `f_L^{(-1)}(k*)`; the two examined are Tasaki (pp. 81, 83) and Shastry
+  (his eq. (22), p. L252). Tanaka–Takeda–Idogaki [63] was *not* examined —
+  this repository has no copy of it — so nothing is claimed here about what
+  [63] does or does not state. Tasaki's "This is nontrivial, and requires a hard
   analysis" (§4.1, p. 83) is about bounding `f_L^{(-1)}(k)` *inside the
   derivation of the infrared bound* (4.1.24), which §4.1.2 uses to prove
   Theorem 4.1; that bound is stated on p. 81 only "for any
@@ -137,10 +140,15 @@ and 9 (p. 83)) rests on one **documented axiom**,
   completing that infrastructure or discharging this axiom, and no successor
   tracking issue is currently open. It returns to a discharged theorem once
   that infrastructure is built.
-- **Re-check condition:** would change once 1D-ring reflection-positivity
-  infrastructure (1D-ring Gibbs decomposition) is built and a math-before-code
-  transcription of the Shastry / Tanaka–Takeda–Idogaki susceptibility
-  estimate on top of it is finished.
+- **Re-check condition:** no published susceptibility estimate to transcribe
+  is known, so the condition is not a transcription. It is met by either of two
+  independent routes. (a) A proof, in this repository, that `χ(k*) = o(L³)` for
+  the even zero-field ring — the bound *derived*, for instance from a
+  spectral-gap estimate or on top of 1D-ring reflection-positivity /
+  Gibbs-decomposition infrastructure once that exists, rather than quoted.
+  (b) A source found to state a genuine upper bound on `f_L^{(-1)}(k*)` at the
+  antiferromagnetic wavevector itself, which could then be transcribed;
+  Tanaka–Takeda–Idogaki [63], not examined here, is the first place to check.
 - **Tracking:** master tracker #4718; Issue #4777 recorded and then closed
   (2026-07-11) this axiom's 1D-ring RP-infrastructure scoping without
   discharging it. No successor discharge issue exists or is to be opened

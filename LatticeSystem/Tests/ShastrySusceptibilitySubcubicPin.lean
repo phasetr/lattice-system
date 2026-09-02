@@ -5,17 +5,26 @@ import LatticeSystem.Quantum.SpinS.NoLongRangeOrder1D
 
 This file pins the quantifier structure of the documented axiom
 `shastry_staggered_susceptibility_subcubic` (Tasaki §4.1, toward Corollary 4.3) in exactly the
-shape its sole consumer `no_long_range_order_1d_of_susceptibility`
-(`NoLongRangeOrderConditional.lean`) applies it in.  Every part of that shape carries a soundness
-obligation, so a re-weakening must stop compiling here rather than pass unnoticed:
+shape it is applied in.  The axiom is consumed once, inside `no_long_range_order_1d`
+(`NoLongRangeOrder1D.lean`), which feeds it to the conditional reduction
+`no_long_range_order_1d_of_susceptibility` (`NoLongRangeOrderConditional.lean`); this file is a
+second reference site.  That shape is load-bearing, so a re-weakening must stop compiling here
+rather than pass unnoticed:
 
 * the margin `∀ δ > 0` cannot be traded for one size-uniform constant with a linear bound
-  (`∃ C ≥ 0, ∀ L, χ ≤ C·L`): at odd `N` the correlation asymptotics force `χ ≳ L (log L)³`, hence
-  `χ/L → ∞`, so that stronger form is false;
+  (`∃ C ≥ 0, ∀ L, χ ≤ C·L`): at `N = 1` the large-separation correlation asymptotic Shastry quotes
+  as what numerical and approximate analytical work "suggests" (p. L252) gives `χ ≳ L (log L)³`,
+  hence `χ/L → ∞`.  That refutation is literature asymptotics with **no Lean witness**, at exactly
+  the strength the axiom's own doc comment records it;
 * the `∃ L₀` threshold cannot be dropped for a bare `∀ L`: the two-site ring `N = 1`, `L = 2` has
-  `χ = 1/2` against `δ·2³`, refuting every `δ < 1/16`;
-* the `2 ≤ L` and `Even L` guards cannot be dropped: only bipartite rings carry a balanced
-  staggered sublattice, and odd or degenerate ring sizes lie outside Tasaki's §4.1 setting.
+  `χ = 1/2` against `δ·2³`, refuting every `δ < 1/16` — again a hand computation with **no Lean
+  witness**;
+* the `Even L` guard cannot be dropped: only bipartite rings carry a balanced staggered
+  sublattice, which is what makes `ÔΦ` orthogonal to the ground space and the resolvent potential
+  `y` exist at all, and odd rings lie outside Tasaki's §4.1 setting.  The `2 ≤ L` guard is
+  faithfulness to that setting rather than soundness: `L = 1` is already excluded by `Even L`, and
+  at `L = 0` the staggered order operator is an empty sum, so `ÔΦ = 0` and `y = 0` satisfy both
+  conjuncts outright.
 -/
 
 namespace LatticeSystem.Tests.ShastrySusceptibilitySubcubicPin

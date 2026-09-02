@@ -977,6 +977,27 @@ def _approved_replacements(text: str) -> str:
             "beyond a threshold), so the staggered specialisation still has to turn `C(h)` into such "
             "a bound — that belongs to χ3 (next stage).",
         )
+        # The axiom row's evidence sentence claimed more than was checked. Only Tasaki (pp. 81,
+        # 83) and Shastry (his eq. (22)) were read; Tanaka-Takeda-Idogaki [63] is not held here,
+        # so the row now scopes the negative claim to those two sources. The same sentence's
+        # refutation of the retired `≤ C·L` form is likewise scoped to `N = 1`, the spin-1/2
+        # chain the quoted asymptotic is about, which alone refutes the `∀ N ≥ 1` form.
+        .replace(
+            "No published source states a bound on `f_L^(-1)(k*)`: Tasaki's \"This is nontrivial, "
+            "and requires a hard analysis\" (p. 83) concerns the infrared bound (4.1.24) used for "
+            "Theorem 4.1, which p. 81 states for `k ≠ k*` only and whose right-hand side diverges "
+            "as `k → k*`. The earlier `≤ C·L` form was false for odd `N`: the `g(r)` asymptotic "
+            "Shastry introduces as what \"numerical and approximate analytical work … suggests\" "
+            "(p. L252) forces `χ ≳ L(log L)³`.",
+            "Neither source examined here states a bound on `f_L^(-1)(k*)`; the two examined are "
+            "Tasaki (pp. 81, 83) and Shastry (his eq. (22)), and Tanaka–Takeda–Idogaki [63] was "
+            "not examined. Tasaki's \"This is nontrivial, and requires a hard analysis\" (p. 83) "
+            "concerns the infrared bound (4.1.24) used for Theorem 4.1, which p. 81 states for "
+            "`k ≠ k*` only and whose right-hand side diverges as `k → k*`. The earlier `≤ C·L` "
+            "form was false at `N = 1`: the `g(r)` asymptotic Shastry introduces as what "
+            "\"numerical and approximate analytical work … suggests\" (p. L252) forces "
+            "`χ ≳ L(log L)³`.",
+        )
     )
 
 

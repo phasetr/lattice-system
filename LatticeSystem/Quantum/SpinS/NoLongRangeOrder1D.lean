@@ -8,10 +8,11 @@ The conditional reduction `no_long_range_order_1d_of_susceptibility`
 *modulo a single quantitative input*: the staggered static susceptibility of every ground state of
 the zero-field one-dimensional antiferromagnetic Heisenberg ring is `o(L³)`, i.e. for every margin
 `δ > 0` there is a size threshold beyond which every ground state admits a potential `y` for `ÔΦ`
-with `Re⟨y, ÔΦ⟩ ≤ δ·L³`.  Tasaki proves no such bound, and no published source states one at the
-antiferromagnetic wavevector `k* = π` either: his "hard analysis" remark (p. 83) concerns the
-infrared bound (4.1.24), which is stated for `k ≠ k*` only and diverges as `k → k*`.  That
-quantitative input is therefore recorded as a documented axiom
+with `Re⟨y, ÔΦ⟩ ≤ δ·L³`.  Tasaki proves no such bound, and neither source examined here states one
+at the antiferromagnetic wavevector `k* = π`: his "hard analysis" remark (p. 83) concerns the
+infrared bound (4.1.24), which is stated for `k ≠ k*` only and diverges as `k → k*`, and Shastry's
+own upper bound (his eq. (22)) diverges at `q = Q` the same way.  That quantitative input is
+therefore recorded as a documented axiom
 `shastry_staggered_susceptibility_subcubic` — an assumption of this project, with the attribution
 analysis and the boundary cases carried at its declaration site — and fed into the conditional
 reduction to discharge Corollary 4.3 (`no_long_range_order_1d`) from an axiom into a theorem.
@@ -37,27 +38,30 @@ the zero-field one-dimensional spin-`S` antiferromagnetic Heisenberg ring on an 
 `Re⟨y, ÔΦ⟩ = χ(k*) = L · f_L^{(-1)}(k*)`, the zero-frequency staggered susceptibility at the
 antiferromagnetic wavevector `k* = π`.
 
-**No published source states a bound on `f_L^{(-1)}(k*)`.**  Tasaki's "This is nontrivial, and
-requires a hard analysis" (§4.1, p. 83) is about bounding `f_L^{(-1)}(k)` *inside the derivation of
-the infrared bound* (4.1.24), which §4.1.2 uses to prove Theorem 4.1 (long-range order for `d ≥ 3`
-and any `S`, or `d = 2` and `S ≥ 1`; p. 75) — not to prove the one-dimensional Corollary 4.3.  That
-infrared bound is stated on p. 81 explicitly "for any `k ∈ 𝒦_L \ {k*}`", and Tasaki notes on the
-same page that its right-hand side is roughly `(const.)/|k − k*|` when `|k − k*| ≪ 1`: it
-*diverges* as `k → k*`.  Shastry's own upper bound (`g_q^x ≤ G(q)`, his eq. (22), p. L252) diverges
-at `q = Q` in the same way.  So the earlier reading of that footnote as a citation for a bound *at*
-`k*` was a misattribution, and what is recorded below is an assumption of this project rather than
-a transcription of a published estimate.
+**Neither source examined here states a bound on `f_L^{(-1)}(k*)`.**  The two examined are Tasaki
+(pp. 81, 83) and Shastry (his eq. (22), p. L252); Tanaka–Takeda–Idogaki [63] was *not* examined —
+this repository has no copy of it — so nothing is claimed here about what [63] does or does not
+state.  Tasaki's "This is nontrivial, and requires a hard analysis" (§4.1, p. 83) is about bounding
+`f_L^{(-1)}(k)` *inside the derivation of the infrared bound* (4.1.24), which §4.1.2 uses to prove
+Theorem 4.1 (long-range order for `d ≥ 3` and any `S`, or `d = 2` and `S ≥ 1`; p. 75) — not to
+prove the one-dimensional Corollary 4.3.  That infrared bound is stated on p. 81 explicitly "for
+any `k ∈ 𝒦_L \ {k*}`", and Tasaki notes on the same page that its right-hand side is roughly
+`(const.)/|k − k*|` when `|k − k*| ≪ 1`: it *diverges* as `k → k*`.  Shastry's own upper bound
+(`g_q^x ≤ G(q)`, his eq. (22), p. L252) diverges at `q = Q` in the same way.  So the earlier
+reading of that footnote as a citation for a bound *at* `k*` was a misattribution, and what is
+recorded below is an assumption of this project rather than a transcription of a published estimate.
 
-**The earlier `≤ C·L` form was false, not merely unsourced.**  For odd `N` (half-odd-integer spin;
-at `N = 1` this is the spin-1/2 chain whose asymptotics Shastry quotes) the large-separation
-behaviour gives `⟨Ô²⟩ ≍ L (log L)^{3/2}`, and running this repository's own
+**The earlier `≤ C·L` form was false, not merely unsourced.**  At `N = 1` — the spin-1/2 chain,
+which is the case the asymptotic Shastry quotes is about — the large-separation behaviour gives
+`⟨Ô²⟩ ≍ L (log L)^{3/2}`, and running this repository's own
 `staggeredOrder_sq_le_susceptibility` (`2⟨Ô²⟩² ≤ 12 N³ L χ`) backwards forces `χ ≳ L (log L)³`.
-Then `χ/L → ∞`, so no size-uniform `C` with `χ ≤ C·L` exists.  The one non-rigorous input to that
-refutation is the correlation asymptotic `g(r) ~ (−1)^r (log r)^{1/2}/r`, which Shastry introduces
-as what "a considerable body of numerical and approximate analytical work at `T = 0` K …
-suggests" (p. L252).  It is recorded at exactly that strength — literature asymptotics, **no Lean
-witness** — the same status this project already gives the `≍ L·η^{4/3}` response of the gapless
-chains.
+Then `χ/L → ∞`, so no size-uniform `C` with `χ ≤ C·L` exists.  That single `N` already refutes the
+`∀ N ≥ 1` form the axiom is stated at; whether the same holds at every odd `N` is an extrapolation
+the quoted source does not make.  The one non-rigorous input to the refutation is the correlation
+asymptotic `g(r) ~ (−1)^r (log r)^{1/2}/r`, which Shastry introduces as what "a considerable body
+of numerical and approximate analytical work at `T = 0` K … suggests" (p. L252).  It is recorded at
+exactly that strength — literature asymptotics, **no Lean witness** — the same status this project
+already gives the `≍ L·η^{4/3}` response of the gapless chains.
 
 **Why the threshold `∃ L₀` is part of the statement.**  The un-thresholded form
 `∀ δ > 0, ∀ L, χ ≤ δ·L³` is false at `N = 1`, `L = 2`: the two-site ring is the dimer
@@ -75,9 +79,9 @@ diagonalisation of small rings indicates (numerics, no Lean witness), so the axi
 the open Haldane-gap question.
 
 **This is a real assumption, not a formality.**  No rigorous upper bound on `χ` for this model
-exists in this repository or, at `k*`, in the cited literature, and the one spectral input the
-repository does have points the other way: `lieb_schultz_mattis_affleck_lieb` (Theorem 6.3) bounds
-the gap from *above* by `8π²S²/L` for odd `N`, which makes `χ` large rather than small.
+exists in this repository or, at `k*`, in the literature examined here, and the one spectral input
+the repository does have points the other way: `lieb_schultz_mattis_affleck_lieb` (Theorem 6.3)
+bounds the gap from *above* by `8π²S²/L` for odd `N`, which makes `χ` large rather than small.
 
 Restricted to **even** rings `L ≥ 2` (`Even L`): only bipartite (even) rings carry a balanced
 staggered sublattice `Σ_x ε_x = 0`, so the ground state is an SU(2)-invariant singlet with
@@ -91,8 +95,9 @@ discharges the even-ring Corollary 4.3.
 
 * B. S. Shastry, *Bounds for correlation functions of the Heisenberg antiferromagnet*,
   J. Phys. A: Math. Gen. **25**, L249 (1992) — Tasaki's [58]; the `g(r)` asymptotic is on p. L252.
-* K. Tanaka, K. Takeda, T. Idogaki, *Rigorous results for the antiferromagnetic Heisenberg model*,
-  J. Magn. Magn. Mater. **272–276**, 908 (2004) — Tasaki's [63]. -/
+* K. Tanaka, K. Takeda, T. Idogaki, *Absence of spontaneous symmetry breaking in the ground state
+  of one-dimensional spin-orbital model*, J. Magn. Magn. Mater. **272–276**, 908–909 (2004) —
+  Tasaki's [63]; not examined here (this repository has no copy). -/
 axiom shastry_staggered_susceptibility_subcubic (N : ℕ) (hN : 1 ≤ N) :
     ∀ δ : ℝ, 0 < δ → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L → 2 ≤ L → Even L →
       ∀ Φ : (Fin L → Fin (N + 1)) → ℂ, star Φ ⬝ᵥ Φ = 1 →

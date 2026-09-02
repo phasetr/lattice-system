@@ -22,13 +22,9 @@
         {
           "relation": "attributes",
           "source_item_id": "tasaki-2020-theorem-4-2"
-        },
-        {
-          "relation": "supports",
-          "source_item_id": "tanaka-takeda-idogaki-2004-no-ssb"
         }
       ],
-      "summary": "For every positive margin there is a ring-size threshold beyond which the static staggered susceptibility of every normalized ground state on an even one-dimensional antiferromagnetic Heisenberg ring is at most that margin times the cube of the ring length.",
+      "summary": "An assumption of this project, not a transcription of a published estimate: for every positive margin there is a ring-size threshold beyond which the static staggered susceptibility of every normalized ground state on an even one-dimensional antiferromagnetic Heisenberg ring is at most that margin times the cube of the ring length.",
       "topic_ids": [
         "quantum-spin",
         "symmetry-breaking"

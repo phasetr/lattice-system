@@ -13,9 +13,9 @@ Two independent pins on the public interface of Tasaki §4.1 Corollary 4.3:
 2. `no_long_range_order_1d_of_susceptibility`'s `hsusc` hypothesis binder is pinned in the exact
    shape the susceptibility axiom must supply:
    `∀ δ > 0, ∃ L₀, ∀ L, L₀ ≤ L → 2 ≤ L → Even L → …`.  This double-pins the `∃ L₀` threshold (a bare
-   `∀ L` is a strictly stronger, false statement — see the module doc of
-   `ShastrySusceptibilitySubcubicPin.lean`) and the `2 ≤ L`/`Even L` guards (odd and degenerate
-   ring sizes are excluded, both here and at the axiom).
+   `∀ L` is strictly stronger, and is refuted at `N = 1`, `L = 2` by a hand computation with no
+   Lean witness — see the module doc of `ShastrySusceptibilitySubcubicPin.lean`) and the
+   `2 ≤ L`/`Even L` guards (odd and degenerate ring sizes are excluded, both here and at the axiom).
 -/
 
 namespace LatticeSystem.Tests.NoLongRangeOrder1DPin
