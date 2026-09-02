@@ -878,7 +878,7 @@ def _approved_replacements(text: str) -> str:
             "`Fermion/JordanWigner/Hubbard/LiebShenQiuDischarge.lean` |",
         )
         # PR-1 of the Theorem 4.2 close-out arc (#5413) repairs the Corollary 4.3 susceptibility
-        # axiom: `shastry_staggered_susceptibility_bound` (`∃ C ≥ 0, χ ≤ C·L`, false for odd `N`
+        # axiom: `shastry_staggered_susceptibility_bound` (`∃ C ≥ 0, χ ≤ C·L`, false at `N = 1`
         # and mis-cited) becomes `shastry_staggered_susceptibility_subcubic`
         # (`∀ δ > 0, ∃ L₀, ∀ L ≥ L₀, χ ≤ δ·L³`). The axiom row, the consumer row and the
         # Corollary 4.3 row (including its `#print axioms` output) are updated together.
@@ -982,6 +982,8 @@ def _approved_replacements(text: str) -> str:
         # so the row now scopes the negative claim to those two sources. The same sentence's
         # refutation of the retired `≤ C·L` form is likewise scoped to `N = 1`, the spin-1/2
         # chain the quoted asymptotic is about, which alone refutes the `∀ N ≥ 1` form.
+        # (Applied last, so what it matches is the evidence sentence the axiom-row replacement
+        # above inserts, not baseline text; the order of those two entries is load-bearing.)
         .replace(
             "No published source states a bound on `f_L^(-1)(k*)`: Tasaki's \"This is nontrivial, "
             "and requires a hard analysis\" (p. 83) concerns the infrared bound (4.1.24) used for "

@@ -131,15 +131,19 @@ and 9 (p. 83)) rests on one **documented axiom**,
   [63] for that, not for a bound at `k*`; and Shastry's own upper bound (his
   eq. (22), p. L252) diverges at `q = Q` in the same way. What is recorded
   here is therefore an assumption of this project rather than a transcription
-  of a published estimate. As with Theorem 4.2 above,
-  per the 2026-07-05 policy override this is classified in the same
-  "1D-ring RP infrastructure incomplete" class (not Theorem 5.1's
-  "`d`-dimensional RP/IR-bound intractable" class, and not an
-  external-cite-only deferral): it needs the 1D-ring RP/Gibbs-decomposition
-  infrastructure issue #4777 scoped; #4777 closed (2026-07-11) without
-  completing that infrastructure or discharging this axiom, and no successor
-  tracking issue is currently open. It returns to a discharged theorem once
-  that infrastructure is built.
+  of a published estimate. Per the 2026-07-05 policy override (an externally
+  cited result the book merely quotes must still be proved, not deferred as
+  external-cite-only) this is **not** a won't-do citation, and it is not
+  Theorem 5.1's "`d`-dimensional RP/IR-bound intractable" class either. Its
+  class is therefore not an infrastructure gap but an **unproved assumption
+  of this project**, carried as a discharge target: with no examined source
+  stating the estimate, there is nothing to transcribe. In particular it is
+  not classified as waiting on 1D-ring reflection-positivity /
+  Gibbs-decomposition infrastructure — such infrastructure would at most be
+  one possible foundation for a derivation of `χ(k*) = o(L³)`, never by
+  itself such a derivation, so building it would not discharge this axiom.
+  What retires the axiom is exactly the re-check condition below, neither of
+  whose two routes has been carried out here.
 - **Re-check condition:** no published susceptibility estimate to transcribe
   is known, so the condition is not a transcription. It is met by either of two
   independent routes. (a) A proof, in this repository, that `χ(k*) = o(L³)` for
