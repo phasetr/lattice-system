@@ -2,6 +2,33 @@
   "records": [
     {
       "axiom_dependencies": [
+        "LatticeSystem.Quantum.shastry_staggered_susceptibility_subcubic"
+      ],
+      "capstone": true,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-corollary-4-3-no-long-range-order-1d",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.no_long_range_order_1d",
+      "module": "LatticeSystem.Quantum.SpinS.NoLongRangeOrder1D",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "source_coverage": "conditional_reduction",
+      "source_path": "LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean",
+      "source_relations": [
+        {
+          "relation": "presents",
+          "source_item_id": "tasaki-2020-corollary-4-3"
+        }
+      ],
+      "summary": "The squared staggered order parameter per site of the zero-field one-dimensional antiferromagnetic Heisenberg ring on an even number of sites vanishes in the thermodynamic limit; a conditional reduction, not a discharge, since the documented susceptibility axiom it consumes is strictly stronger than the corollary itself.",
+      "topic_ids": [
+        "quantum-spin",
+        "symmetry-breaking"
+      ],
+      "trust_state": "depends_on_documented_axioms"
+    },
+    {
+      "axiom_dependencies": [
         "LatticeSystem.Quantum.shastryEnergyGain"
       ],
       "capstone": false,
@@ -47,7 +74,7 @@
       "module": "LatticeSystem.Quantum.SpinS.ShastryNoSSBReduction",
       "origin": "literature",
       "proof_guide_anchor": null,
-      "source_coverage": "complete",
+      "source_coverage": "conditional_reduction",
       "source_path": "LatticeSystem/Quantum/SpinS/ShastryNoSSBReduction.lean",
       "source_relations": [
         {
@@ -63,7 +90,7 @@
           "source_item_id": "tanaka-takeda-idogaki-2004-no-ssb"
         }
       ],
-      "summary": "The staggered order parameter of the one-dimensional antiferromagnetic Heisenberg ring vanishes in the thermodynamic-then-zero-field limit.",
+      "summary": "The staggered order parameter of the one-dimensional antiferromagnetic Heisenberg ring vanishes in the thermodynamic-then-zero-field limit; a conditional reduction, not a discharge, since the documented axiom it consumes is equivalent in strength to an L-uniform form of the theorem itself.",
       "topic_ids": [
         "quantum-spin",
         "symmetry-breaking"

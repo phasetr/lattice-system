@@ -910,6 +910,7 @@
         "item_kind": {
           "enum": [
             "article",
+            "corollary",
             "definition",
             "equation",
             "exercise",

@@ -32,9 +32,13 @@ order parameter of any normalized ground state vanishes in the iterated limit `l
 (eq. (4.1.10), ε–δ form). We record it as a faithful documented axiom over the concrete ring family;
 
 the deep infinite-volume argument is faithfully axiomatized (not re-proved). The
-**reflection-positivity infrastructure project** (#4777) formalizes supporting finite-dim RP layers
-for Cor 4.3 (susceptibility no-LRO, discharged) and related Thm 4.2 RP auxiliary results, not a
-re-proof of Thm 4.2 itself. Defines `ringCoupling`, `ringStaggeredSublattice`,
+**reflection-positivity infrastructure project** (#4777, closed 2026-07-11 and historical)
+formalized supporting finite-dim RP layers for the Cor 4.3 **conditional reduction**
+(susceptibility no-LRO) and related Thm 4.2 RP auxiliary results — not a re-proof of Thm 4.2
+itself, and not a discharge of Cor 4.3: that reduction consumes the documented axiom
+`shastry_staggered_susceptibility_subcubic`, which is strictly stronger than the corollary,
+holding via `staggeredOrder_sq_le_susceptibility` only if `⟨Ô²⟩ = o(L²)` — the corollary's own
+conclusion. The successor discharge issue is #5413. Defines `ringCoupling`, `ringStaggeredSublattice`,
 `staggeredFieldChainHamiltonianS`. **RP infra layer 1 (in progress):** `RingBondReflection.lean` —
 even-ring bond reflection `ringReflect n x = 2n−1−x` (involutive, half-swap, staggered-sign flip);
 
@@ -116,10 +120,10 @@ and lists its file as `Quantum/SpinS/ShastryNoSSB.lean`. That is no longer curre
 `Quantum/SpinS/ShastryNoSSBReduction.lean`, with its statement unchanged, obtained by applying the
 conditional capstone `shastry_no_symmetry_breaking_1d_of_energy_gain` to the documented axiom
 `shastryEnergyGain` in that same file. The mathematical content is not discharged:
-`shastryEnergyGain` is equivalent in strength to an `L`-uniform form of Theorem 4.2 — only the
-forward half of that equivalence is in Lean, as the conditional capstone; the converse half is a
-hand argument, not formalised anywhere in the development — so
-`#print axioms shastry_no_symmetry_breaking_1d` reports
+`shastryEnergyGain` is equivalent in strength to an `L`-uniform form of Theorem 4.2, and both
+halves of that equivalence are now in Lean: the forward one as the conditional capstone, the
+converse as `shastryEnergyGain_of_no_symmetry_breaking_1d` in the same file (axiom-free). So
+`#print axioms shastry_no_symmetry_breaking_1d` still reports
 `[propext, Classical.choice, Quot.sound, shastryEnergyGain]`. `ShastryNoSSB.lean` now carries only
 the model, in four declarations (`ringCoupling`, `ringCoupling_self_star`,
 `ringStaggeredSublattice`, `staggeredFieldChainHamiltonianS`); the variational layer the reduction

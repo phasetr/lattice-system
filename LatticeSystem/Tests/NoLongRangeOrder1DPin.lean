@@ -6,7 +6,7 @@ import LatticeSystem.Quantum.SpinS.NoLongRangeOrder1D
 Two independent pins on the public interface of Tasaki §4.1 Corollary 4.3:
 
 1. `no_long_range_order_1d` is written out here in full, independently of the conditional reduction
-   `no_long_range_order_1d_of_susceptibility` it is discharged from.  The theorem's own `ε`–`δ`
+   `no_long_range_order_1d_of_susceptibility` it is derived from.  The theorem's own `ε`–`δ`
    statement is what consumers see, so it is fixed on its own: an added hypothesis, an altered
    quantifier order or `Even L` drift breaks this file even when the quantitative input its proof
    consumes is exchanged for another one.
@@ -23,7 +23,7 @@ namespace LatticeSystem.Tests.NoLongRangeOrder1DPin
 open Matrix LatticeSystem.Quantum
 
 /-- **Signature pin: `no_long_range_order_1d`.** Written out independently of the conditional
-reduction it is discharged from, so the theorem's own public statement is pinned regardless of how
+reduction it is derived from, so the theorem's own public statement is pinned regardless of how
 its proof (or the axiom it rests on) changes. -/
 example (N : ℕ) :
     ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L → Even L →
