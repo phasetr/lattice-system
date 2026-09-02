@@ -78,6 +78,15 @@ Conversely `o(L³)` follows both from a gapped chain and from the `χ ≍ L²` g
 diagonalisation of small rings indicates (numerics, no Lean witness), so the axiom stays neutral on
 the open Haldane-gap question.
 
+**Strength relative to Corollary 4.3 itself.**  The crude bounds already reach exactly `O(L³)`:
+`⟨Ô²⟩ ≤ ‖Ô‖² ≤ S²L²` for normalized `Φ`, and `χ ≤ ⟨Ô²⟩/Δ` for the gap `Δ` above the ground space,
+so any `Δ ≳ 1/L` gives `χ = O(S²L³)`.  Hence `o(L³)` is the first statement past the trivial
+ceiling, and by `staggeredOrder_sq_le_susceptibility` it holds *only if* `⟨Ô²⟩ = o(L²)` — which is
+Corollary 4.3's own conclusion.  The axiom is therefore strictly stronger than the corollary it
+discharges (the converse would additionally need `Δ ≳ 1/L`, which this repository does not have:
+its only gap result, `lieb_schultz_mattis_affleck_lieb`, bounds `Δ` from *above*), but of the same
+order of difficulty — what separates it from Corollary 4.3 is strength, not only sourcing.
+
 **This is a real assumption, not a formality.**  No rigorous upper bound on `χ` for this model
 exists in this repository or, at `k*`, in the literature examined here, and the one spectral input
 the repository does have points the other way: `lieb_schultz_mattis_affleck_lieb` (Theorem 6.3)

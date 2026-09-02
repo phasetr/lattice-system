@@ -1000,6 +1000,15 @@ def _approved_replacements(text: str) -> str:
             "\"numerical and approximate analytical work … suggests\" (p. L252) forces "
             "`χ ≳ L(log L)³`.",
         )
+        # The axiom's doc comment, the chapter-04 ledger and both signature-pin fixtures all
+        # record the two-site refutation as a hand computation with no Lean witness; the row
+        # stated it flatly. (Applied last, for the same reason as the entry above: what it
+        # matches is text the axiom-row replacement inserts.)
+        .replace(
+            "The `∃ L₀` threshold is required because a bare `∀ L` fails at `N = 1, L = 2`.",
+            "The `∃ L₀` threshold is required because a bare `∀ L` fails at `N = 1, L = 2` — a "
+            "hand computation with no Lean witness.",
+        )
     )
 
 

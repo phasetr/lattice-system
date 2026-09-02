@@ -3,7 +3,8 @@
   "human_publication_root": "/lattice-system/formalization/",
   "machine_publication_root": "/lattice-system/formalization-status/v1/",
   "record_shards": [
-    "records/shastry-1992.json",
+    "records/nielsen-chuang-2010.json",
+    "records/project-assumptions.json",
     "records/tasaki-2020-ch02.json",
     "records/tasaki-2020-ch03.json",
     "records/tasaki-2020-ch04.json"

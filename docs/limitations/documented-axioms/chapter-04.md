@@ -113,6 +113,17 @@ and 9 (p. 83)) rests on one **documented axiom**,
   vanishing. `o(L³)` follows both from a gapped chain and from the `χ ≍ L²`
   growth small-ring exact diagonalisation indicates (numerics, no Lean
   witness), so the statement stays neutral on the open Haldane-gap question.
+- **Strength relative to Corollary 4.3 itself:** the crude bounds already reach
+  exactly `O(L³)` — `⟨Ô²⟩ ≤ ‖Ô‖² ≤ S²L²` for normalized `Φ`, and
+  `χ ≤ ⟨Ô²⟩/Δ` for the gap `Δ` above the ground space, so any `Δ ≳ 1/L` gives
+  `χ = O(S²L³)`. So `o(L³)` is the first statement past the trivial ceiling,
+  and by `staggeredOrder_sq_le_susceptibility` it holds *only if*
+  `⟨Ô²⟩ = o(L²)`, which is exactly Corollary 4.3's own conclusion. The axiom is
+  therefore strictly stronger than the corollary it discharges — the converse
+  would additionally need the lower bound `Δ ≳ 1/L`, which this repository does
+  not have (its only gap result, `lieb_schultz_mattis_affleck_lieb`, bounds `Δ`
+  from *above*) — but of the same order of difficulty. What separates it from
+  Corollary 4.3 is strength, not only sourcing.
 - **Axiom reason (documented):** neither source examined here states a bound
   on `f_L^{(-1)}(k*)`; the two examined are Tasaki (pp. 81, 83) and Shastry
   (his eq. (22), p. L252). Tanaka–Takeda–Idogaki [63] was *not* examined —
