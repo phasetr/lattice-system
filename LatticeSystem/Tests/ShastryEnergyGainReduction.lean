@@ -278,18 +278,24 @@ example (N : ℕ)
           ε * η * (L : ℝ) :=
   shastryEnergyGain_of_no_symmetry_breaking_1d N hssb
 
-/-! ## Round-trip fixture — the acceptance artifact -/
+/-! ## Round-trip fixture — shape parity of the two directions -/
 
-/-- **Round-trip fixture (acceptance artifact).** Composes the forward capstone
+/-- **Round-trip fixture (shape parity).** Composes the forward capstone
 (`shastry_no_symmetry_breaking_1d_of_energy_gain`, gain → Theorem 4.2) with the converse
-(`shastryEnergyGain_of_no_symmetry_breaking_1d`, Theorem 4.2 → gain) and checks the composite has
-the *same* gain-shaped hypothesis and conclusion. It deliberately takes `hgain` as a bound variable
-of `shastryEnergyGain`'s shape rather than invoking the axiom `shastryEnergyGain` itself: had the
-converse trivialised — e.g. by ignoring `hssb` and reconstructing the gain bound from `N` alone, or
-by using `shastryEnergyGain N` internally and discarding `hssb` — this composite would still
-typecheck against the axiom but would prove nothing about `hssb` being an actual converse input;
-by threading an arbitrary `hgain` through both directions with no axiom in sight, the fixture forces
-`shastryEnergyGain_of_no_symmetry_breaking_1d` to genuinely consume the `hssb` it is given. -/
+(`shastryEnergyGain_of_no_symmetry_breaking_1d`, Theorem 4.2 → gain).
+
+**What it pins, and only this**: that the two directions' shapes line up — the forward's hypothesis
+is the converse's conclusion and the forward's conclusion is the converse's hypothesis, both
+verbatim. If either declaration's gain-shaped end drifts (a changed field `2 * η`, a changed
+threshold, a reordered quantifier), the composition stops typechecking here.
+
+**What it does not pin.** Its own hypothesis and conclusion are the *same* statement, so as a
+proposition it is a tautology — `fun h => h` proves it. It therefore cannot force
+`shastryEnergyGain_of_no_symmetry_breaking_1d` to consume the `hssb` it is given: a converse that
+ignored `hssb` and rebuilt the bound from the axiom `shastryEnergyGain N` internally would compose
+here just as well. What rules that out is the axiom set, checked separately and not by this file:
+`#print axioms shastryEnergyGain_of_no_symmetry_breaking_1d` is exactly
+`[propext, Classical.choice, Quot.sound]`, so the axiom cannot be reached from inside it. -/
 example (N : ℕ)
     (hgain : ∀ ε : ℝ, 0 < ε → ∃ η₀ : ℝ, 0 < η₀ ∧
       ∀ η : ℝ, 0 < η → η < η₀ → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L →

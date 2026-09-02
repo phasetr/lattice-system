@@ -13234,8 +13234,14 @@ than asserted, and
 \texttt{\#print axioms shastry\_no\_symmetry\_breaking\_1d} still names it, and the deep
 infinite-volume argument remains faithfully axiomatized rather than re-proved --- what the reduction
 removes is the eigenvector quantifiers, the ground-state degeneracy and the inner limit. The \emph{reflection-positivity infrastructure} project
-(Issue \#4777) formalizes supporting finite-dim RP layers for Cor.~4.3 discharge and related RP
-machinery, not a re-proof of Thm.~4.2 itself.  The first layer establishes the even-ring \emph{bond reflection}
+(Issue \#4777, closed 2026-07-11 and historical) formalized supporting finite-dim RP layers for
+the Corollary 4.3 \emph{conditional reduction} and related RP machinery, not a re-proof of
+Thm.~4.2 itself and not a discharge of Cor.~4.3: that reduction consumes the documented axiom
+\texttt{shastry\_staggered\_susceptibility\_subcubic}, which is strictly stronger than the
+corollary (the crude bounds already reach exactly $O(L^3)$, and through
+\texttt{staggeredOrder\_sq\_le\_susceptibility} the axiom holds only if
+$\langle\hat O^2\rangle = o(L^2)$, the corollary's own conclusion).  The successor discharge
+issue is \#5413.  The first layer establishes the even-ring \emph{bond reflection}
 $r(x) = 2n-1-x$ (\texttt{RingBondReflection.lean}: involutive, swapping the two halves, flipping the
 staggered sign) and the induced \emph{reflection map} $\theta(A)_{\sigma\tau} =
 \overline{A_{\rho\sigma,\rho\tau}}$ (\texttt{RingReflectionTheta.lean}: an antilinear

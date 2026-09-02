@@ -1044,6 +1044,36 @@ def _approved_replacements(text: str) -> str:
             "only if `⟨Ô²⟩ = o(L²)`, the corollary's own conclusion; only the degenerate spin-0 "
             "case `N = 0` is unconditional (the staggered order operator vanishes).",
         )
+        # A third row on the same catalogue page, the axiom row itself, closed by saying the axiom
+        # discharges Corollary 4.3.  It does not: the corollary is only reduced to it, and the
+        # axiom is the strictly stronger statement.  (Applied last: what it matches is the closing
+        # sentence the axiom-row replacement above inserts, not baseline text.)
+        .replace(
+            "An assumption of this project, not a transcription of a published estimate; it "
+            "discharges `no_long_range_order_1d` (PR #5003)",
+            "An assumption of this project, not a transcription of a published estimate; feeding "
+            "it into the conditional reduction makes `no_long_range_order_1d` a theorem "
+            "**conditionally on this axiom** (PR #5003), which is **not** a discharge of Corollary "
+            "4.3 — the axiom is strictly stronger than the corollary, since the crude bounds "
+            "already reach exactly `O(L³)` and, via `staggeredOrder_sq_le_susceptibility`, it "
+            "holds only if `⟨Ô²⟩ = o(L²)`, the corollary's own conclusion",
+        )
+        # The Theorem 4.2 grouped detail record (former line 560) carried the same claim in prose,
+        # and additionally described the closed issue #4777 in the present tense.
+        .replace(
+            "The **reflection-positivity infrastructure project** (#4777) formalizes supporting "
+            "finite-dim RP layers for Cor 4.3 (susceptibility no-LRO, discharged) and related "
+            "Thm 4.2 RP auxiliary results, not a re-proof of Thm 4.2 itself.",
+            "The **reflection-positivity infrastructure project** (#4777, closed 2026-07-11 and "
+            "historical) formalized supporting finite-dim RP layers for the Cor 4.3 "
+            "**conditional reduction** (susceptibility no-LRO) and related Thm 4.2 RP auxiliary "
+            "results — not a re-proof of Thm 4.2 itself, and not a discharge of Cor 4.3: that "
+            "reduction consumes the documented axiom "
+            "`shastry_staggered_susceptibility_subcubic`, which is strictly stronger than the "
+            "corollary, holding via `staggeredOrder_sq_le_susceptibility` only if "
+            "`⟨Ô²⟩ = o(L²)` — the corollary's own conclusion. The successor discharge issue is "
+            "#5413.",
+        )
     )
 
 

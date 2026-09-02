@@ -87,43 +87,88 @@ the precise dependency on these documented axioms auditable.
 This supersedes the third class of the policy text above ("Book theorems that Tasaki states
 without proof"). That paragraph states, in general form, that results Tasaki quotes rather than
 proves are recorded as faithful documented axioms and that reproving the cited external work is
-not an active project goal. **That rule is withdrawn.** It is frozen in place above only because
-the block is held at byte parity with the text it was migrated from.
+not an active project goal. **That rule is withdrawn**, by the 2026-07-05 decision recorded in the
+Chapter 4 entries: an externally cited result the book merely quotes is to be proved, not deferred
+for being cited. The paragraph is frozen in place above only because the block is held at byte
+parity with the text it was migrated from.
 
-**The admissible grounds for a documented axiom are exactly two.**
+**What this correction is, and what it is not.** It withdraws one ground and nothing else. It does
+**not** enumerate the admissible grounds and states no closed list of them. The authority for what
+is excluded from the book-order formalization campaign is the body of the campaign tracking issue
+**#5379**: a target is excluded only if it is a policy-approved actual Lean `axiom` class or an
+exact user-approved defer. The entries on the chapter pages keep their own recorded reasons, which
+are more varied than any list here would capture.
 
-1. **An implementation dependency** — the statement needs machinery this project does not have and
-   is not building. The operator-algebraic class above (Appendix A.21–A.28: states on the
-   quasi-local C\*-algebra, weak-∗ compactness, ground states of infinite systems, GNS, Wigner) is
-   this kind: those axioms wait for an implementation, and what they wait for is named.
-2. **An explicit, dated decision by the project owner** to park one specific statement. Such a
-   decision is recorded with its date in the entry it governs.
+**Effect, entry by entry.** Citation-only status — "Tasaki cites this result instead of proving
+it" — no longer sustains an entry by itself. Thirteen entries currently invoke it. **Six rest on
+it alone**, so the retraction leaves them without a recorded ground:
 
-**Nothing else is a ground.** In particular none of the following is:
+- [Theorem 4.24](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-24) (improved Hohenberg–Mermin–Wagner) and
+  [Theorem 4.25](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-25) (McBryan–Spencer, Koma–Tasaki power-law
+  bound), recorded as "an external analytic technique that Tasaki reports without reproducing".
+  Their re-check conditions ask only for a transcription of that method; neither entry claims any
+  machinery is missing here. Theorem 4.24 calls itself the same class as
+  [Theorem 7.7](/lattice-system/limitations/documented-axioms/chapter-07/#entry-theorem-7-7) and Theorems 4.26/4.27, and Theorem 4.25 the
+  same class as Theorem 4.24; but Theorem 7.7 and Theorems 4.26/4.27 record different grounds of
+  their own, which survive.
+- [Theorem 10.11](/lattice-system/limitations/documented-axioms/chapter-10/#entry-theorem-10-11) (Kubo–Kishi) and
+  [Theorem 11.13](/lattice-system/limitations/documented-axioms/chapter-11/#entry-theorem-11-13) (Mielke), the two the withdrawn
+  paragraph names.
+- [Theorem 11.8](/lattice-system/limitations/documented-axioms/chapter-11/#entry-theorem-11-8) (Nagaoka connectivity classification),
+  "a cited external classification theorem".
+- [Lemma 11.25](/lattice-system/limitations/documented-axioms/chapter-11/#entry-lemma-11-25) (Hubbard–t-J equivalence in the
+  strong-coupling limit), "the technical transfer itself is the original paper's argument".
 
-- **that the result is hard**, or that a proof would be long or unpleasant;
-- **that the source is not to hand.** An estimate that no examined source states is an
-  *assumption of this project* and must be recorded as one, under its own name, rather than
-  presented as a transcription of published work;
-- **that Tasaki cites the result instead of proving it.** The 2026-07-05 decision recorded in the
-  Chapter 4 entries reverses exactly this: an externally cited result the book merely quotes is to
-  be proved, not deferred.
+Being left without a recorded ground does not discharge these six and does not by itself remove
+their Lean axioms; what it removes is their standing as **precedent**. No further axiom may be
+justified by pointing at them, and the cross-references between them calling each other "the same
+class" describe how they were classified when written, not a live class that admits new members.
 
-**Theorem 10.11** (Kubo–Kishi) and **Theorem 11.13** (Mielke) remain documented axioms on the
-standing recorded in [their](/lattice-system/limitations/documented-axioms/chapter-10/#entry-theorem-10-11)
-[own](/lattice-system/limitations/documented-axioms/chapter-11/#entry-theorem-11-13) entries, each
-with its own re-check condition. They are **not a precedent.** The general rule they were taken to
-instantiate is the one withdrawn here, so no further axiom may be justified by pointing at them,
-and the cross-references in those two entries calling each other "the same class" describe how
-they were classified when written, not a live class that admits new members.
+**One entry splits.** [Lemma 4.15 and Theorem 4.11
+support](/lattice-system/limitations/documented-axioms/chapter-04/#entry-lemma-4-15-theorem-4-11-support) carries three axioms on two
+different grounds. Its `p̂` mirror `mStar_eq_phat_ratio_limit` rests on citation-only alone —
+Tasaki's eq. (4.2.40) calls the concentration "elementary, proof omitted; see [66]", and that
+entry's own tracking bullet records that this axiom carries no other marker — so that one axiom
+is in the same position as the six entries above. Its two `ô²` mirrors carry an **explicit dated
+decision (2026-07-12, the "no-overreach boundary")**, recorded in their doc comments, and are
+unaffected.
+
+**Six more invoke citation-only together with a second ground this correction does not touch**,
+and are unaffected in substance:
+
+- [Theorem 8.1](/lattice-system/limitations/documented-axioms/chapter-08-part-01/#entry-theorem-8-1) (large-`D` phase) and
+  [Theorem 8.9](/lattice-system/limitations/documented-axioms/chapter-08-part-03/#entry-theorem-8-9) (stability of the toric code) also
+  stand on the **volume-uniform perturbation-theory** class of the policy text above — a
+  convergent cluster expansion and quasi-adiabatic continuation / Lieb–Robinson bounds
+  respectively. Both entries state in their own text that the "prove theorems Tasaki cites without
+  proof" rule does not override them. That reading stands on the perturbation-theory ground.
+- [Theorem 8.3](/lattice-system/limitations/documented-axioms/chapter-08-part-01/#entry-theorem-8-3) (λ-D model) also stands on the
+  absence of any path-integral / positive quantum-to-classical representation layer here.
+- [Eq. (8.3.3)](/lattice-system/limitations/documented-axioms/chapter-08-part-01/#entry-eq-8-3-3) (Oshikawa parity dependence) and the
+  [general-`S` bond-inversion parity entry](/lattice-system/limitations/documented-axioms/chapter-08-part-02/#entry-general-s-bond-inversion-parity)
+  also stand on the missing general-`S` extension of the existing spin-one VBS / string-order
+  machinery; the parity entry names only that aspect, and has no Lean declaration at all.
+- [Theorem 11.27](/lattice-system/limitations/documented-axioms/chapter-11/#entry-theorem-11-27) (Tanaka–Tasaki metallic ferromagnetism)
+  also stands on a genuine `u₂, U ↑ ∞` limit, the same limit-taking caveat as Theorem 5.4.
+
+**Theorem 7.7 is left exactly where its owner decision put it.** Its entry records a real
+implementation dependency — the two-dimensional VBS / reflection-positivity correlation analysis
+has no base in this repository — together with the inaccessibility of Kennedy–Lieb–Tasaki [41],
+and its disposition rests on an explicit dated decision by the project owner (2026-07-24) to close
+it out as a documented axiom on [41]. This correction does not reach that entry, does not
+reclassify it, and denies no part of its recorded ground; its own re-check condition governs.
 
 **Theorem 4.2** (Shastry; Tasaki §4.1, footnote 3, p. 76) and **Corollary 4.3** (§4.1,
 eq. (4.1.11), p. 77) are results of precisely the kind the withdrawn paragraph would have parked —
 the book cites rather than proves them. They are therefore **open, not deferred.** The axioms
 `shastryEnergyGain` and `shastry_staggered_susceptibility_subcubic` that carry them are live
-discharge targets, tracked in the
-[Chapter 4 entries](/lattice-system/limitations/documented-axioms/chapter-04/); a reader who finds
-them in this ledger should read them as unfinished work, not as settled policy.
+discharge targets, tracked in the [Chapter 4 entries](/lattice-system/limitations/documented-axioms/chapter-04/); a reader who finds them
+in this ledger should read them as unfinished work, not as settled policy.
+
+**Bulk reclassification is out of scope here and is parked.** This section records the withdrawal
+and how far it reaches; it rewrites no chapter entry. Re-deriving the six citation-only-alone
+entries and the `p̂` axiom onto a ground that survives, retiring their axioms, or opening discharge
+work for them is separate work, and belongs to the campaign tracked in **#5379**.
 
 ## Entry pages
 

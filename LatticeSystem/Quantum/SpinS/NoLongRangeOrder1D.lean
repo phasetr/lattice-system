@@ -1,7 +1,7 @@
 import LatticeSystem.Quantum.SpinS.NoLongRangeOrderConditional
 
 /-!
-# Tasaki §4.1: absence of long-range order in one dimension (Corollary 4.3), discharged
+# Tasaki §4.1: absence of long-range order in one dimension (Corollary 4.3), conditional
 
 The conditional reduction `no_long_range_order_1d_of_susceptibility`
 (`NoLongRangeOrderConditional.lean`) proves the exact `ε`–`δ` statement of Tasaki's Corollary 4.3
@@ -15,9 +15,15 @@ own upper bound (his eq. (22)) diverges at `q = Q` the same way.  That quantitat
 therefore recorded as a documented axiom
 `shastry_staggered_susceptibility_subcubic` — an assumption of this project, with the attribution
 analysis and the boundary cases carried at its declaration site — and fed into the conditional
-reduction to discharge Corollary 4.3 (`no_long_range_order_1d`) from an axiom into a theorem.
+reduction to obtain `no_long_range_order_1d`.
 
-Only the *zero-field* Corollary 4.3 is discharged here; the field version Theorem 4.2
+**That is a conditional reduction, not a discharge of Corollary 4.3.**  The axiom is strictly
+stronger than the corollary it is fed into (see "Strength relative to Corollary 4.3 itself"
+below), so `no_long_range_order_1d` is a `theorem` in the bookkeeping sense only:
+`#print axioms` on it names `shastry_staggered_susceptibility_subcubic`.  Only the degenerate
+spin-`0` case `N = 0` is unconditional.
+
+Only the *zero-field* Corollary 4.3 is reduced here; the field version Theorem 4.2
 (`shastry_no_symmetry_breaking_1d`, the iterated `lim_{h↓0} lim_{L↑∞}` double limit) is a strictly
 stronger statement not reachable by this static-susceptibility route.  It is a conditional theorem
 in `ShastryNoSSBReduction.lean`, resting on the documented axiom `shastryEnergyGain`.
@@ -83,7 +89,7 @@ the open Haldane-gap question.
 so any `Δ ≳ 1/L` gives `χ = O(S²L³)`.  Hence `o(L³)` is the first statement past the trivial
 ceiling, and by `staggeredOrder_sq_le_susceptibility` it holds *only if* `⟨Ô²⟩ = o(L²)` — which is
 Corollary 4.3's own conclusion.  The axiom is therefore strictly stronger than the corollary it
-discharges (the converse would additionally need `Δ ≳ 1/L`, which this repository does not have:
+is fed into (the converse would additionally need `Δ ≳ 1/L`, which this repository does not have:
 its only gap result, `lieb_schultz_mattis_affleck_lieb`, bounds `Δ` from *above*), but of the same
 order of difficulty — what separates it from Corollary 4.3 is strength, not only sourcing.
 
@@ -99,8 +105,9 @@ genuinely exists.  Odd rings are non-bipartite: the staggered sublattice is unba
 (`Σ_x ε_x ≠ 0`, e.g. `L = 3`), `ÔΦ` need not be orthogonal to the ground state, no such `y` exists,
 and they lie outside Tasaki's §4.1 setting (whose lattice `(Λ_L, B_L)` is defined for even `L`
 only; §3.1, §4.1.1).  The statement is the `hsusc` hypothesis of
-`no_long_range_order_1d_of_susceptibility`, so feeding it into that conditional reduction
-discharges the even-ring Corollary 4.3.
+`no_long_range_order_1d_of_susceptibility`, so feeding it into that conditional reduction yields
+the even-ring Corollary 4.3 **conditionally on this axiom**.  It does not discharge the
+corollary: by the paragraph above the axiom is strictly stronger than it.
 
 * B. S. Shastry, *Bounds for correlation functions of the Heisenberg antiferromagnet*,
   J. Phys. A: Math. Gen. **25**, L249 (1992) — Tasaki's [58]; the `g(r)` asymptotic is on p. L252.
@@ -137,7 +144,8 @@ private theorem staggeredOrderOpS_spin_zero {Λ : Type*} [Fintype Λ] [Decidable
   refine Finset.sum_eq_zero (fun x _ => ?_)
   rw [spinSSiteOp3_def, h3, onSiteS_zero, smul_zero]
 
-/-- **Tasaki Corollary 4.3 (absence of long-range order in one dimension), THEOREM.**  For the
+/-- **Tasaki Corollary 4.3 (absence of long-range order in one dimension), CONDITIONAL
+THEOREM.**  For the
 zero-field one-dimensional spin-`S` antiferromagnetic Heisenberg ring
 (`heisenbergHamiltonianS (ringCoupling L) N`, i.e. `staggeredFieldChainHamiltonianS L 0 N`), the
 squared staggered order parameter per site vanishes in the thermodynamic limit (eq. (4.1.11)):
@@ -149,10 +157,15 @@ for even `L`, and §4.1.1 states the model "with even L".  Only bipartite (even)
 balanced staggered sublattice underlying the staggered order parameter and the unique-singlet
 ground state (MLM, Thm 2.2); odd rings are non-bipartite and lie outside §4.1's setting.
 
-Discharged from the conditional reduction `no_long_range_order_1d_of_susceptibility` fed with the
-documented Shastry susceptibility axiom `shastry_staggered_susceptibility_subcubic` (for `N ≥ 1`);
-the degenerate spin-`0` case `N = 0` is unconditional since the staggered order operator vanishes
-there (`staggeredOrderOpS_spin_zero`). -/
+**Conditional, not a discharge of Corollary 4.3.**  For `N ≥ 1` this is the conditional reduction
+`no_long_range_order_1d_of_susceptibility` fed with the documented Shastry susceptibility axiom
+`shastry_staggered_susceptibility_subcubic`, which is **strictly stronger** than the corollary —
+the crude bounds `⟨Ô²⟩ ≤ S²L²` and `χ ≤ ⟨Ô²⟩/Δ` already reach exactly `O(L³)`, and via
+`staggeredOrder_sq_le_susceptibility` the axiom holds only if `⟨Ô²⟩ = o(L²)`, which is this
+statement's own conclusion.  So `#print axioms` here names
+`shastry_staggered_susceptibility_subcubic`, and the corollary itself remains open.  Only the
+degenerate spin-`0` case `N = 0` is unconditional, the staggered order operator vanishing there
+(`staggeredOrderOpS_spin_zero`). -/
 theorem no_long_range_order_1d (N : ℕ) :
     ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L → Even L →
       ∀ Φ : (Fin L → Fin (N + 1)) → ℂ,

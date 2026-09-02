@@ -5,7 +5,6 @@
   "record_shards": [
     "records/nielsen-chuang-2010.json",
     "records/project-assumptions.json",
-    "records/project-original.json",
     "records/tasaki-2020-ch02.json",
     "records/tasaki-2020-ch03.json",
     "records/tasaki-2020-ch04.json"
