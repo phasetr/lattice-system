@@ -33,6 +33,18 @@
     },
     {
       "equations": [
+        "4.1.11"
+      ],
+      "id": "tasaki-2020-corollary-4-3",
+      "item_kind": "corollary",
+      "item_number": "4.3",
+      "pages": "77",
+      "section": "4.1",
+      "source_id": "tasaki-2020",
+      "title": "Absence of long-range order in one dimension"
+    },
+    {
+      "equations": [
         "2.1.8"
       ],
       "id": "tasaki-2020-section-2-1-pauli",

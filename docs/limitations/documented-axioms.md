@@ -8,6 +8,12 @@ permalink: /limitations/documented-axioms/
 
 > This current policy text was moved losslessly from the former monolithic index.
 
+> **Read the correction below before applying the policy text.** Its third class ("Book theorems
+> that Tasaki states without proof") states, in general form, a rule this project has withdrawn.
+> The block is frozen at its migrated wording, so the withdrawal is recorded after it, in
+> [Correction: citation-only status is not a ground for a documented
+> axiom](#correction-citation-only-status-is-not-a-ground-for-a-documented-axiom).
+
 <!-- legacy-source:start:155:216 -->
 ### Appendix A: status and axiomatization policy
 
@@ -75,6 +81,49 @@ natural home is elsewhere. The `#print axioms` of every theorem in the repositor
 the precise dependency on these documented axioms auditable.
 
 <!-- legacy-source:end:155:216 -->
+
+## Correction: citation-only status is not a ground for a documented axiom
+
+This supersedes the third class of the policy text above ("Book theorems that Tasaki states
+without proof"). That paragraph states, in general form, that results Tasaki quotes rather than
+proves are recorded as faithful documented axioms and that reproving the cited external work is
+not an active project goal. **That rule is withdrawn.** It is frozen in place above only because
+the block is held at byte parity with the text it was migrated from.
+
+**The admissible grounds for a documented axiom are exactly two.**
+
+1. **An implementation dependency** — the statement needs machinery this project does not have and
+   is not building. The operator-algebraic class above (Appendix A.21–A.28: states on the
+   quasi-local C\*-algebra, weak-∗ compactness, ground states of infinite systems, GNS, Wigner) is
+   this kind: those axioms wait for an implementation, and what they wait for is named.
+2. **An explicit, dated decision by the project owner** to park one specific statement. Such a
+   decision is recorded with its date in the entry it governs.
+
+**Nothing else is a ground.** In particular none of the following is:
+
+- **that the result is hard**, or that a proof would be long or unpleasant;
+- **that the source is not to hand.** An estimate that no examined source states is an
+  *assumption of this project* and must be recorded as one, under its own name, rather than
+  presented as a transcription of published work;
+- **that Tasaki cites the result instead of proving it.** The 2026-07-05 decision recorded in the
+  Chapter 4 entries reverses exactly this: an externally cited result the book merely quotes is to
+  be proved, not deferred.
+
+**Theorem 10.11** (Kubo–Kishi) and **Theorem 11.13** (Mielke) remain documented axioms on the
+standing recorded in [their](/lattice-system/limitations/documented-axioms/chapter-10/#entry-theorem-10-11)
+[own](/lattice-system/limitations/documented-axioms/chapter-11/#entry-theorem-11-13) entries, each
+with its own re-check condition. They are **not a precedent.** The general rule they were taken to
+instantiate is the one withdrawn here, so no further axiom may be justified by pointing at them,
+and the cross-references in those two entries calling each other "the same class" describe how
+they were classified when written, not a live class that admits new members.
+
+**Theorem 4.2** (Shastry; Tasaki §4.1, footnote 3, p. 76) and **Corollary 4.3** (§4.1,
+eq. (4.1.11), p. 77) are results of precisely the kind the withdrawn paragraph would have parked —
+the book cites rather than proves them. They are therefore **open, not deferred.** The axioms
+`shastryEnergyGain` and `shastry_staggered_susceptibility_subcubic` that carry them are live
+discharge targets, tracked in the
+[Chapter 4 entries](/lattice-system/limitations/documented-axioms/chapter-04/); a reader who finds
+them in this ledger should read them as unfinished work, not as settled policy.
 
 ## Entry pages
 

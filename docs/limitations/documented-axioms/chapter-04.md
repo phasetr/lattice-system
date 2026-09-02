@@ -61,23 +61,36 @@ permalink: /limitations/documented-axioms/chapter-04/
   reflection positivity. Per the 2026-07-05 policy override
   (externally-cited theorems the book merely quotes must still be proved,
   not deferred as external-cite-only), this is **not** classified as a
-  won't-do citation. It belongs to its own **"1D-ring RP infrastructure
-  incomplete"** class, distinct from Theorem 5.1's "`d`-dimensional RP/IR-bound
-  intractable at project scale" class below: Theorem 5.1 needs a
-  `d`-dimensional reflection-positivity infrastructure the project does not
-  have and is not building, whereas this axiom needs exactly the 1D-ring
-  reflection-positivity / Gibbs-decomposition infrastructure that issue
-  #4777 scoped; #4777 closed (2026-07-11) without completing that
-  infrastructure or discharging the axiom, and no successor tracking issue is
-  currently open.
-- **Re-check condition:** would change once 1D-ring reflection-positivity
-  infrastructure (1D-ring Gibbs decomposition) is built and a math-before-code
-  transcription of the Shastry / Tanaka–Takeda–Idogaki argument on top of it
-  discharges the scalar `shastryEnergyGain` inequality.
-- **Tracking:** master tracker #4718; Issue #4777 recorded and then closed
-  (2026-07-11) this axiom's 1D-ring RP-infrastructure scoping without
-  discharging it. No successor discharge issue exists or is to be opened
-  while the re-check condition above is unmet.
+  won't-do citation. The class name it was given, **"1D-ring RP
+  infrastructure incomplete"**, is **stale and retained only for continuity**:
+  the 1D-ring reflection-positivity material issue #4777 scoped is in fact
+  **complete and axiom-free** in the build root — Gaussian domination
+  (`ringBondSquareFieldPartition_gaussianDomination`), the uniform-field bound
+  (`ringBondSquareFieldPartitionRe_uniform_bound`), the ground-energy bound
+  (`ringBondSquareFieldHamiltonian_hermitianMinEigenvalue_ge_field_zero`) and
+  the susceptibility sum rule (`ringBondSquareField_susceptibility_sum_rule`)
+  each report exactly the standard three axioms. What is missing is therefore
+  not that infrastructure but a **finite-volume infrared bound for the
+  transverse component at positive staggered field `h > 0`**, which the
+  bond-square construction cannot supply (the `k = π` obstruction recorded in
+  the Corollary 4.3 entry below). It is still not Theorem 5.1's
+  "`d`-dimensional RP/IR-bound intractable at project scale" class: that one
+  needs a `d`-dimensional reflection-positivity infrastructure the project
+  does not have and is not building.
+- **Re-check condition:** the former condition — "once 1D-ring
+  reflection-positivity infrastructure is built" — was **already met when it
+  was written**, so it would have waited forever on nothing; it is replaced.
+  The axiom is retired by a finite-volume infrared bound for the transverse
+  component at positive staggered field `h > 0`, from which the remaining
+  steps of the route are finite-dimensional and reconstructible from material
+  already in this repository. A math-before-code transcription of the
+  Shastry / Tanaka–Takeda–Idogaki argument is an alternative route, but [63]
+  has not been examined here (no copy is available).
+- **Tracking:** issue **#5413** (Theorem 4.2 close-out) is the successor
+  discharge issue and is open. The two trackers named in earlier revisions of
+  this entry, #4718 and #4777, are **closed** and historical only: #4718 was
+  the book-order master tracker, #4777 scoped the 1D-ring RP infrastructure
+  and closed 2026-07-11. Neither is to be reopened or rescoped.
 
 <a id="entry-corollary-4-3-support"></a>
 
@@ -88,12 +101,23 @@ and 9 (p. 83)) rests on one **documented axiom**,
 `shastry_staggered_susceptibility_subcubic`
 (`LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean`, declaration line 110).
 
-- **Proved (axiom-free):** Corollary 4.3 itself, `no_long_range_order_1d`
-  (`NoLongRangeOrder1D.lean:156`), is a genuine **theorem**, obtained by
-  feeding this axiom as the single quantitative input into the conditional
-  reduction `no_long_range_order_1d_of_susceptibility`
-  (`NoLongRangeOrderConditional.lean:39`); only the susceptibility estimate
-  below remains axiomatized.
+- **Conditional, not discharged.** `no_long_range_order_1d`
+  (`NoLongRangeOrder1D.lean:156`) is a `theorem` in the bookkeeping sense
+  only: it is the conditional reduction
+  `no_long_range_order_1d_of_susceptibility`
+  (`NoLongRangeOrderConditional.lean:39`) fed with this axiom as its single
+  quantitative input, so `#print axioms no_long_range_order_1d` names
+  `shastry_staggered_susceptibility_subcubic`. The axiom is **strictly
+  stronger than Corollary 4.3**: the crude bounds already reach exactly
+  `O(L³)`, and via `staggeredOrder_sq_le_susceptibility` the axiom holds only
+  if `⟨Ô²⟩ = o(L²)`, which is the corollary's own conclusion — see "Strength
+  relative to Corollary 4.3 itself" below. This entry therefore records where
+  the content sits; it is **not** a discharge of Corollary 4.3 and must not be
+  read as one. Only the degenerate spin-`0` case `N = 0` is unconditional
+  (the staggered order operator vanishes there). Axiom-free are the
+  surrounding pieces: the conditional reduction itself, the Falk–Bruch bound
+  `staggeredOrder_sq_le_susceptibility`, the `O(L)` oscillator-strength
+  estimate, and the ground-state bridge.
 - **What the axiom statement literally asserts:** for the zero-field
   one-dimensional spin-`S` antiferromagnetic Heisenberg ring on an **even**
   number `L ≥ 2` of sites, for every margin `δ > 0` there is a size threshold
@@ -163,15 +187,45 @@ and 9 (p. 83)) rests on one **documented axiom**,
   is known, so the condition is not a transcription. It is met by either of two
   independent routes. (a) A proof, in this repository, that `χ(k*) = o(L³)` for
   the even zero-field ring — the bound *derived*, for instance from a
-  spectral-gap estimate or on top of 1D-ring reflection-positivity /
-  Gibbs-decomposition infrastructure once that exists, rather than quoted.
+  spectral-gap estimate, rather than quoted. The 1D-ring reflection-positivity
+  material already exists and is axiom-free, but the bond-square construction
+  built on it is not a foundation for this: its field parametrisation
+  annihilates the `k = π` mode, as recorded below.
   (b) A source found to state a genuine upper bound on `f_L^{(-1)}(k*)` at the
   antiferromagnetic wavevector itself, which could then be transcribed;
   Tanaka–Takeda–Idogaki [63], not examined here, is the first place to check.
-- **Tracking:** master tracker #4718; Issue #4777 recorded and then closed
-  (2026-07-11) this axiom's 1D-ring RP-infrastructure scoping without
-  discharging it. No successor discharge issue exists or is to be opened
-  while the re-check condition above is unmet.
+- **The `k = π` obstruction: why the bond-square reflection-positivity route
+  cannot supply the bound.** Three axiom-free declarations in
+  `Quantum/SpinS/RingReflectionBondSquareField.lean` fix this. Writing
+  `f_z = (−1)^z h_z` for the staggered transform the construction applies to a
+  site field `h` (`ringBondSquareStagField`), `ringBondSquareConst_const` says
+  the scalar `C(h) = 0` and `ringBondSquareLinField_const` says the Zeeman
+  coefficient `kOf(h) = 0` whenever `h` is **constant**, `h_z ≡ c`; and
+  `ringBondSquareFieldHamiltonian_const` concludes that the bond-square field
+  Hamiltonian is then exactly the field-free `ringFieldHamiltonian n N 0`, for
+  every `c`. Both vanishings come from the single bond cancellation
+  `f_z + f_{z+1} = (−1)^z c + (−1)^{z+1} c = 0`.
+  **What that establishes:** the constant field is annihilated by the
+  construction, which is what makes the uniform-field bound
+  `ringBondSquareFieldPartitionRe_uniform_bound` collapse exactly rather than
+  through an estimate.
+  **What it does not establish, and cannot:** any bound at the
+  antiferromagnetic wavevector `k* = π`. The constant `h_z ≡ c` is precisely
+  the configuration whose staggered transform `f_z = (−1)^z c` is the `k = π`
+  pattern of the physical staggered Zeeman term
+  `−h Ô_L^{(3)} = −h Σ_z (−1)^z Ŝ_z^{(3)}` of eq. (4.1.9) — and it is the
+  configuration the construction sends to zero. So this parametrisation
+  **cannot produce a physical staggered Zeeman term at all**: at `h_z ≡ c`
+  the susceptibility sum rule `ringBondSquareField_susceptibility_sum_rule`
+  degenerates to `0 ≤ 0`. The obstruction lies in the field parametrisation,
+  **not** in the positivity: no claim is made here about reflection positivity
+  in general, and the reflection-positivity layers themselves are complete and
+  axiom-free (see the Theorem 4.2 entry above).
+- **Tracking:** issue **#5413** (Theorem 4.2 close-out) is the successor
+  discharge issue and is open; it carries this axiom's `o(L³)` repair and the
+  `k = π` obstruction recorded above. The trackers named in earlier revisions
+  of this entry, #4718 and #4777, are **closed** and historical only; neither
+  is to be reopened or rescoped.
 
 <a id="entry-lemma-4-15-theorem-4-11-support"></a>
 

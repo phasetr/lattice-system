@@ -13821,19 +13821,25 @@ $C(h)$ into such a bound is the staggered specialisation, which belongs to $\chi
 This is the second-order perturbation gate toward Theorem 4.2 long-range order, closing the susceptibility `free energy $\to$ ground state'
 inference ($\chi$1 $\to$ $\chi$2 $\to$ Theorem 4.2).
 
-\noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; theorem,
-\texttt{Quantum/SpinS/NoLongRangeOrder1D.lean}, Issue \#4777).  Absence of long-range order in one
+\noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; \emph{conditional} theorem,
+\texttt{Quantum/SpinS/NoLongRangeOrder1D.lean}, Issue \#5413).  Absence of long-range order in one
 dimension on \textbf{even} rings: for the zero-field 1D spin-$S$ antiferromagnetic Heisenberg ring on
 \textbf{even} $L$ sites (faithful to Tasaki §3.1/§4.1.1, which define the lattice for even $L$ only;
 only bipartite rings carry a balanced staggered sublattice), the squared staggered order parameter per
 site vanishes in the thermodynamic limit,
 $\lim_{L\uparrow\infty}\langle\Phi_{\mathrm{GS}}|(\hat O_L^{(3)}/L)^2|\Phi_{\mathrm{GS}}\rangle=0$
 (eq.~(4.1.11)).  We record \texttt{no\_long\_range\_order\_1d} in explicit $\varepsilon$--$\delta$ form
-over the zero-field ring family with normalized ground states.  It is \emph{discharged} by feeding the
-documented Shastry susceptibility axiom \texttt{shastry\_staggered\_susceptibility\_subcubic}
-($\chi(k^\ast)=o(L^3)$) into the conditional reduction
-\texttt{no\_long\_range\_order\_1d\_of\_susceptibility} for $N\ge1$, the degenerate spin-$0$ case
-$N=0$ being unconditional (the staggered order operator vanishes).  Tasaki does \textbf{not} prove
+over the zero-field ring family with normalized ground states.  \textbf{This is a conditional
+reduction, not a discharge of Corollary 4.3.}  For $N\ge1$ it is the conditional reduction
+\texttt{no\_long\_range\_order\_1d\_of\_susceptibility} fed with the documented Shastry
+susceptibility axiom \texttt{shastry\_staggered\_susceptibility\_subcubic}
+($\chi(k^\ast)=o(L^3)$), so \texttt{\#print axioms} names that axiom; only the degenerate
+spin-$0$ case $N=0$ is unconditional (the staggered order operator vanishes).  The axiom is
+\textbf{strictly stronger} than the corollary it is fed into: the crude bounds
+$\langle\hat O^2\rangle\le S^2L^2$ and $\chi\le\langle\hat O^2\rangle/\Delta$ already reach
+exactly $O(L^3)$, and through \texttt{staggeredOrder\_sq\_le\_susceptibility} the $o(L^3)$ form
+holds \emph{only if} $\langle\hat O^2\rangle=o(L^2)$ --- which is Corollary 4.3's own conclusion.
+Tasaki does \textbf{not} prove
 the susceptibility bound in the book, and \textbf{neither source examined here states one} at the
 antiferromagnetic wavevector $k^\ast=\pi$: the two examined are Tasaki (pp.~81 and~83) and Shastry
 (his eq.~(22), p.~L252), while Tanaka--Takeda--Idogaki [63] was \emph{not} examined --- no copy is
