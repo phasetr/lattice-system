@@ -1021,7 +1021,8 @@ def _approved_replacements(text: str) -> str:
             "`shastry_staggered_susceptibility_subcubic`, which makes `no_long_range_order_1d` a "
             "theorem **conditionally on that axiom** (PR #5003) and **not** a discharge of "
             "Corollary 4.3 — the axiom is strictly stronger than the corollary, since the crude "
-            "bounds already reach exactly `O(L³)` and, through this very lemma's Falk–Bruch input "
+            "bounds already reach exactly `O(L³)` once the gap obeys `Δ ≳ 1/L` and, through this "
+            "very lemma's Falk–Bruch input "
             "`staggeredOrder_sq_le_susceptibility`, it holds only if `⟨Ô²⟩ = o(L²)`, the "
             "corollary's own conclusion",
         )
@@ -1040,7 +1041,8 @@ def _approved_replacements(text: str) -> str:
             "conditional reduction `no_long_range_order_1d_of_susceptibility` fed with the "
             "documented Shastry susceptibility axiom `shastry_staggered_susceptibility_subcubic` "
             "(χ(k*)=o(L³)), which is **strictly stronger** than the corollary — the crude bounds "
-            "already reach exactly `O(L³)`, and via `staggeredOrder_sq_le_susceptibility` it holds "
+            "already reach exactly `O(L³)` once the gap obeys `Δ ≳ 1/L`, and via "
+            "`staggeredOrder_sq_le_susceptibility` it holds "
             "only if `⟨Ô²⟩ = o(L²)`, the corollary's own conclusion; only the degenerate spin-0 "
             "case `N = 0` is unconditional (the staggered order operator vanishes).",
         )
@@ -1055,7 +1057,8 @@ def _approved_replacements(text: str) -> str:
             "it into the conditional reduction makes `no_long_range_order_1d` a theorem "
             "**conditionally on this axiom** (PR #5003), which is **not** a discharge of Corollary "
             "4.3 — the axiom is strictly stronger than the corollary, since the crude bounds "
-            "already reach exactly `O(L³)` and, via `staggeredOrder_sq_le_susceptibility`, it "
+            "already reach exactly `O(L³)` once the gap obeys `Δ ≳ 1/L` and, via "
+            "`staggeredOrder_sq_le_susceptibility`, it "
             "holds only if `⟨Ô²⟩ = o(L²)`, the corollary's own conclusion",
         )
         # The Theorem 4.2 grouped detail record (former line 560) carried the same claim in prose,

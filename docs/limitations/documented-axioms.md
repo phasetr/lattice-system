@@ -100,8 +100,11 @@ exact user-approved defer. The entries on the chapter pages keep their own recor
 are more varied than any list here would capture.
 
 **Effect, entry by entry.** Citation-only status — "Tasaki cites this result instead of proving
-it" — no longer sustains an entry by itself. Thirteen entries currently invoke it. **Six rest on
-it alone**, so the retraction leaves them without a recorded ground:
+it" — no longer sustains an entry by itself. The census below is taken over all thirty-five entries
+on the eight chapter ledgers, counting an entry as invoking citation-only when its recorded ground
+states that Tasaki cites or states the result rather than proving it — including entries that name
+the rule only to record that it does not override them. **Sixteen entries invoke it.** **Six rest
+on it alone**, so the retraction leaves them without a recorded ground:
 
 - [Theorem 4.24](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-24) (improved Hohenberg–Mermin–Wagner) and
   [Theorem 4.25](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-25) (McBryan–Spencer, Koma–Tasaki power-law
@@ -133,30 +136,62 @@ is in the same position as the six entries above. Its two `ô²` mirrors carry a
 decision (2026-07-12, the "no-overreach boundary")**, recorded in their doc comments, and are
 unaffected.
 
-**Six more invoke citation-only together with a second ground this correction does not touch**,
+**Nine more invoke citation-only together with a second ground this correction does not touch**,
 and are unaffected in substance:
 
+- [Theorem 7.2](/lattice-system/limitations/documented-axioms/chapter-07/#entry-theorem-7-2) (AKLT infinite chain), whose ground is the
+  operator-algebra / C\*-algebra–GNS class: its proof (Matsui) "is carried out entirely in that
+  operator-algebraic setting and is not reproduced by Tasaki, who states it without proof".
+- [Theorem 7.3](/lattice-system/limitations/documented-axioms/chapter-07/#entry-theorem-7-3) (stability of the AKLT gap), recorded as
+  "Tasaki states Theorem 7.3 without proof and attributes it to … Yarotsky", and standing on the
+  **volume-uniform perturbation-theory** class of the policy text above (a convergent
+  cluster/polymer expansion, absent here). Source access is explicitly not its obstacle.
 - [Theorem 8.1](/lattice-system/limitations/documented-axioms/chapter-08-part-01/#entry-theorem-8-1) (large-`D` phase) and
   [Theorem 8.9](/lattice-system/limitations/documented-axioms/chapter-08-part-03/#entry-theorem-8-9) (stability of the toric code) also
-  stand on the **volume-uniform perturbation-theory** class of the policy text above — a
-  convergent cluster expansion and quasi-adiabatic continuation / Lieb–Robinson bounds
-  respectively. Both entries state in their own text that the "prove theorems Tasaki cites without
-  proof" rule does not override them. That reading stands on the perturbation-theory ground.
+  stand on the **volume-uniform perturbation-theory** class — a convergent cluster expansion and
+  quasi-adiabatic continuation / Lieb–Robinson bounds respectively. That reading stands on the
+  perturbation-theory ground.
 - [Theorem 8.3](/lattice-system/limitations/documented-axioms/chapter-08-part-01/#entry-theorem-8-3) (λ-D model) also stands on the
   absence of any path-integral / positive quantum-to-classical representation layer here.
-- [Eq. (8.3.3)](/lattice-system/limitations/documented-axioms/chapter-08-part-01/#entry-eq-8-3-3) (Oshikawa parity dependence) and the
-  [general-`S` bond-inversion parity entry](/lattice-system/limitations/documented-axioms/chapter-08-part-02/#entry-general-s-bond-inversion-parity)
-  also stand on the missing general-`S` extension of the existing spin-one VBS / string-order
-  machinery; the parity entry names only that aspect, and has no Lean declaration at all.
+- [Eq. (8.3.3)](/lattice-system/limitations/documented-axioms/chapter-08-part-01/#entry-eq-8-3-3) (Oshikawa parity dependence) also stands
+  on the missing general-`S` extension of the existing spin-one VBS / string-order machinery.
+- [Theorem 8.6](/lattice-system/limitations/documented-axioms/chapter-08-part-03/#entry-theorem-8-6) (Lieb–Schultz–Mattis without
+  continuous symmetry), whose entry opens "the book explicitly declines to prove the theorem and
+  defers to an operator-algebraic paper" and then stands on that operator-algebra ground
+  (Ogata–Tasaki, via the split property and the associated Cuntz algebra).
+- [Theorem 8.8](/lattice-system/limitations/documented-axioms/chapter-08-part-03/#entry-theorem-8-8) (index theorem and the SPT phase
+  transition), which records its ground as a **missing layer** — this repository has nowhere to
+  write down infinite-volume gaplessness, ground-state multiplicity, or the `s`-dependence of an
+  infinite-volume expectation — and notes Tasaki's own non-proof separately from it. It is listed
+  because that note is inside its recorded reason; nothing about it turns on the retraction.
 - [Theorem 11.27](/lattice-system/limitations/documented-axioms/chapter-11/#entry-theorem-11-27) (Tanaka–Tasaki metallic ferromagnetism)
   also stands on a genuine `u₂, U ↑ ∞` limit, the same limit-taking caveat as Theorem 5.4.
 
-**Theorem 7.7 is left exactly where its owner decision put it.** Its entry records a real
-implementation dependency — the two-dimensional VBS / reflection-positivity correlation analysis
-has no base in this repository — together with the inaccessibility of Kennedy–Lieb–Tasaki [41],
-and its disposition rests on an explicit dated decision by the project owner (2026-07-24) to close
-it out as a documented axiom on [41]. This correction does not reach that entry, does not
-reclassify it, and denies no part of its recorded ground; its own re-check condition governs.
+Five of these entries — Theorems 7.2, 7.3, 8.1, 8.6 and 8.9 — say in their own text that the
+"prove theorems Tasaki cites without proof" rule does not override them. Each of those readings
+stands on the entry's second ground, not on citation-only, and so survives unchanged.
+
+**Four entries read as though they invoked citation-only, and do not.** The
+[general-`S` bond-inversion parity entry](/lattice-system/limitations/documented-axioms/chapter-08-part-02/#entry-general-s-bond-inversion-parity)
+records only the missing general-`S` extension of the spin-one machinery; the claim it defers is
+Tasaki's own remark that the `S = 1` argument "can be extended to general `S` in a straightforward
+manner", not an external citation, and it has no Lean declaration at all.
+[Theorem 5.4](/lattice-system/limitations/documented-axioms/chapter-05/#entry-theorem-5-4) names the policy only to place itself under the
+**open-conjecture** exclusion — Tasaki's footnote says the existence of the iterated limit is
+itself unproved — "rather than being a tractable finite-dimensional cite-only case".
+[Theorem 4.2](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-2) and
+[Corollary 4.3](/lattice-system/limitations/documented-axioms/chapter-04/#entry-corollary-4-3-support) both say in so many words that they
+are **not** won't-do citations, per the 2026-07-05 override; see below.
+
+**Theorem 7.7 is left exactly where its own entry puts it, and does not invoke citation-only.**
+[That entry](/lattice-system/limitations/documented-axioms/chapter-07/#entry-theorem-7-7) records a real implementation dependency: the
+rigorous two-dimensional honeycomb correlation-decay proof requires Kennedy–Lieb–Tasaki [41], for
+which no open-access or author-hosted copy was found — checked 2026-08-16 via OpenAlex, Unpaywall
+and author homepages, with the entry noting that open-access status is time-varying and should be
+re-checked rather than assumed permanent. Its discharge issue #5132 is closed as not planned
+(2026-08-16); no other dated decision appears in the entry. This correction does not reach it, does
+not reclassify it, and denies no part of its recorded ground; its own re-check condition — [41]
+obtained and transcribed, or an independent [41]-free proof of eq. (7.3.9) — governs.
 
 **Theorem 4.2** (Shastry; Tasaki §4.1, footnote 3, p. 76) and **Corollary 4.3** (§4.1,
 eq. (4.1.11), p. 77) are results of precisely the kind the withdrawn paragraph would have parked —

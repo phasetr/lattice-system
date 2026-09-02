@@ -13238,7 +13238,8 @@ removes is the eigenvector quantifiers, the ground-state degeneracy and the inne
 the Corollary 4.3 \emph{conditional reduction} and related RP machinery, not a re-proof of
 Thm.~4.2 itself and not a discharge of Cor.~4.3: that reduction consumes the documented axiom
 \texttt{shastry\_staggered\_susceptibility\_subcubic}, which is strictly stronger than the
-corollary (the crude bounds already reach exactly $O(L^3)$, and through
+corollary (the crude bounds already reach exactly $O(L^3)$ once the gap obeys
+$\Delta \gtrsim 1/L$, and through
 \texttt{staggeredOrder\_sq\_le\_susceptibility} the axiom holds only if
 $\langle\hat O^2\rangle = o(L^2)$, the corollary's own conclusion).  The successor discharge
 issue is \#5413.  The first layer establishes the even-ring \emph{bond reflection}
@@ -13842,8 +13843,9 @@ susceptibility axiom \texttt{shastry\_staggered\_susceptibility\_subcubic}
 ($\chi(k^\ast)=o(L^3)$), so \texttt{\#print axioms} names that axiom; only the degenerate
 spin-$0$ case $N=0$ is unconditional (the staggered order operator vanishes).  The axiom is
 \textbf{strictly stronger} than the corollary it is fed into: the crude bounds
-$\langle\hat O^2\rangle\le S^2L^2$ and $\chi\le\langle\hat O^2\rangle/\Delta$ already reach
-exactly $O(L^3)$, and through \texttt{staggeredOrder\_sq\_le\_susceptibility} the $o(L^3)$ form
+$\langle\hat O^2\rangle\le S^2L^2$ and $\chi\le\langle\hat O^2\rangle/\Delta$ give only
+$\chi\le S^2L^2/\Delta$, which is exactly $O(L^3)$ once the gap obeys $\Delta\gtrsim 1/L$,
+and through \texttt{staggeredOrder\_sq\_le\_susceptibility} the $o(L^3)$ form
 holds \emph{only if} $\langle\hat O^2\rangle=o(L^2)$ --- which is Corollary 4.3's own conclusion.
 Tasaki does \textbf{not} prove
 the susceptibility bound in the book, and \textbf{neither source examined here states one} at the

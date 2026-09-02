@@ -160,9 +160,9 @@ ground state (MLM, Thm 2.2); odd rings are non-bipartite and lie outside §4.1's
 **Conditional, not a discharge of Corollary 4.3.**  For `N ≥ 1` this is the conditional reduction
 `no_long_range_order_1d_of_susceptibility` fed with the documented Shastry susceptibility axiom
 `shastry_staggered_susceptibility_subcubic`, which is **strictly stronger** than the corollary —
-the crude bounds `⟨Ô²⟩ ≤ S²L²` and `χ ≤ ⟨Ô²⟩/Δ` already reach exactly `O(L³)`, and via
-`staggeredOrder_sq_le_susceptibility` the axiom holds only if `⟨Ô²⟩ = o(L²)`, which is this
-statement's own conclusion.  So `#print axioms` here names
+the crude bounds `⟨Ô²⟩ ≤ S²L²` and `χ ≤ ⟨Ô²⟩/Δ` give only `χ ≤ S²L²/Δ`, which is exactly `O(L³)`
+once the gap obeys `Δ ≳ 1/L`, and via `staggeredOrder_sq_le_susceptibility` the axiom holds only
+if `⟨Ô²⟩ = o(L²)`, which is this statement's own conclusion.  So `#print axioms` here names
 `shastry_staggered_susceptibility_subcubic`, and the corollary itself remains open.  Only the
 degenerate spin-`0` case `N = 0` is unconditional, the staggered order operator vanishing there
 (`staggeredOrderOpS_spin_zero`). -/

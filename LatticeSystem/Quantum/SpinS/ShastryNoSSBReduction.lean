@@ -255,12 +255,12 @@ same `ε → η₀ → η → L₀ → L` quantifier nest.
 implications between Theorem 4.2 and `shastryEnergyGain` machine-checked, so the two statements are
 inter-derivable in Lean rather than merely asserted to be so.  That assertion — that the axiom is
 *equivalent in strength* to an `L`-uniform form of Theorem 4.2, and hence that the reduction
-relocates the missing analytic input without weakening it — stands in five places in this
-development: the doc comment of `shastryEnergyGain` above, the Chapter 4 documented-axiom ledger,
-the public proof guide, and two records of the legacy catalogue.  Until now it was prose in all
-five.  It is now a theorem, so "this is a relocation, not progress" is checked rather than
-said, and a future reader cannot mistake the reduction for a partial discharge on the strength of an
-unverified equivalence claim.
+relocates the missing analytic input without weakening it — is carried as prose in six places in
+this development: the doc comment of `shastryEnergyGain` above, the Chapter 4 documented-axiom
+ledger, the public proof guide, two records of the legacy catalogue, and the machine-readable
+Chapter 4 status record.  It is now also a theorem, so "this is a relocation, not progress" is
+checked rather than said, and a future reader cannot mistake the reduction for a partial discharge
+on the strength of an unverified equivalence claim.
 
 **Why the field handed to `hssb` is `2η`, not `η`.**  The sandwich
 `0 ≤ E(0) − E(h) ≤ h⟨Ô⟩_h ≤ E(0) − E(2h)` of `chainGroundState_order_mean_sandwich` bounds
@@ -274,10 +274,14 @@ field window `(0, h₀)` — and it is the one step of the derivation the prose 
 
 **Why the threshold is `max L₀ 1`.**  Theorem 4.2's conclusion bounds `|⟨Ô⟩.re / L|`, and in Lean
 `x / 0 = 0`, so at `L = 0` that conclusion reads `0 < ε` and says nothing whatever about `⟨Ô⟩`.
-Taking `hssb`'s own `L₀` unchanged would therefore let the derivation rest on a vacuous instance at
-`L = 0`.  Enlarging to `max L₀ 1` forces `0 < (L : ℝ)`, which is exactly the hypothesis
-`div_lt_iff₀` needs to convert the per-site bound back into `⟨Ô⟩.re < (ε/2)·L`.  It is load-bearing
-for soundness, not a convenience.
+This route converts the per-site bound back into `⟨Ô⟩.re < (ε/2)·L` through `div_lt_iff₀`, which
+needs `0 < (L : ℝ)`; enlarging to `max L₀ 1` is what supplies it, and with `hssb`'s own `L₀` left
+unchanged the step has no such hypothesis at `L = 0` and the proof fails to elaborate.
+It is load-bearing for **this proof route**, not for soundness: the goal is
+`∃ L₀, ∀ L ≥ L₀, …`, so raising the threshold only weakens what has to be shown and cannot rule
+out an unsound step.  Nothing is being excluded either — at `L = 0` the goal reads
+`E_0(0) − E_0(2η) ≤ 0`, which holds because the empty ring's Hamiltonian is the zero matrix at
+every field (a hand computation, no Lean witness here).
 
 Proof.  Instantiate `hssb` at `ε/2` to obtain `h₀ > 0` and set `η₀ := h₀/2`.  For `0 < η < η₀` put
 `h := 2η`, which lies in `(0, h₀)`, and take the threshold `hssb` supplies there, enlarged to

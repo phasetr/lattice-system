@@ -14,7 +14,7 @@ permalink: /limitations/documented-axioms/chapter-04/
 
 **Tasaki §4.1, Theorem 4.2** (eqs. (4.1.9)-(4.1.10), pp. 76-77) rests on one
 **documented axiom**, `shastryEnergyGain`
-(`LatticeSystem/Quantum/SpinS/ShastryNoSSBReduction.lean`, declaration line 164).
+(`LatticeSystem/Quantum/SpinS/ShastryNoSSBReduction.lean`, declaration line 172).
 
 - **Proved (axiom-free):** the whole reduction chain that consumes it. For
   Tasaki's field family `Ĥ_h = Ĥ − h Ô_L` (eq. (3.4.19), p. 69) the abstract
@@ -25,8 +25,9 @@ permalink: /limitations/documented-axioms/chapter-04/
   — all in `ReversalSymmetricGroundEnergy.lean`. The ring instance adds
   `staggeredFieldChainHamiltonianS_isHermitian` and `Θ Ĥ_h Θ = Ĥ_{−h}`
   (`staggeredFieldChainHamiltonianS_conj_manyBodyReversalS`). Feeding the axiom
-  into `shastry_no_symmetry_breaking_1d_of_energy_gain` (same file, line 188) makes
-  `shastry_no_symmetry_breaking_1d` (line 270) a `theorem`, statement unchanged.
+  into `shastry_no_symmetry_breaking_1d_of_energy_gain` (`ShastryNoSSBReduction.lean`, line
+  196) makes `shastry_no_symmetry_breaking_1d` (same file, line 381) a `theorem`, statement
+  unchanged.
 - **This records where the axiom now sits; it is not a discharge and not a policy change.**
   `#print axioms shastry_no_symmetry_breaking_1d` names `shastryEnergyGain`, which is
   **equivalent in strength to an `L`-uniform form of Theorem 4.2**: the capstone derives
@@ -99,18 +100,19 @@ permalink: /limitations/documented-axioms/chapter-04/
 **Tasaki §4.1, Corollary 4.3** (eq. (4.1.11), p. 77, with footnotes 3 (p. 76)
 and 9 (p. 83)) rests on one **documented axiom**,
 `shastry_staggered_susceptibility_subcubic`
-(`LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean`, declaration line 110).
+(`LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean`, declaration line 117).
 
 - **Conditional, not discharged.** `no_long_range_order_1d`
-  (`NoLongRangeOrder1D.lean:156`) is a `theorem` in the bookkeeping sense
+  (`NoLongRangeOrder1D.lean:169`) is a `theorem` in the bookkeeping sense
   only: it is the conditional reduction
   `no_long_range_order_1d_of_susceptibility`
   (`NoLongRangeOrderConditional.lean:39`) fed with this axiom as its single
   quantitative input, so `#print axioms no_long_range_order_1d` names
   `shastry_staggered_susceptibility_subcubic`. The axiom is **strictly
   stronger than Corollary 4.3**: the crude bounds already reach exactly
-  `O(L³)`, and via `staggeredOrder_sq_le_susceptibility` the axiom holds only
-  if `⟨Ô²⟩ = o(L²)`, which is the corollary's own conclusion — see "Strength
+  `O(L³)` once the gap obeys `Δ ≳ 1/L`, and via
+  `staggeredOrder_sq_le_susceptibility` the axiom holds only if
+  `⟨Ô²⟩ = o(L²)`, which is the corollary's own conclusion — see "Strength
   relative to Corollary 4.3 itself" below. This entry therefore records where
   the content sits; it is **not** a discharge of Corollary 4.3 and must not be
   read as one. Only the degenerate spin-`0` case `N = 0` is unconditional
@@ -147,7 +149,7 @@ and 9 (p. 83)) rests on one **documented axiom**,
   `χ = O(S²L³)`. So `o(L³)` is the first statement past the trivial ceiling,
   and by `staggeredOrder_sq_le_susceptibility` it holds *only if*
   `⟨Ô²⟩ = o(L²)`, which is exactly Corollary 4.3's own conclusion. The axiom is
-  therefore strictly stronger than the corollary it discharges — the converse
+  therefore strictly stronger than the corollary it is fed into — the converse
   would additionally need the lower bound `Δ ≳ 1/L`, which this repository does
   not have (its only gap result, `lieb_schultz_mattis_affleck_lieb`, bounds `Δ`
   from *above*) — but of the same order of difficulty. What separates it from
