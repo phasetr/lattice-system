@@ -15,10 +15,12 @@ constant, the trial state `ψ_λ = Φ − λ·y` (`y` the pseudoinverse potentia
 `χ_b = Re⟨y, VΦ⟩ ≤ C(h)`.  The first-order term drops because `⟨Φ|V|Φ⟩ = 0`
 (`ringBondSquareLinFieldOp_groundState_expectation_zero`, χ2a).
 
-The capstone `ringBondSquareField_susceptibility_sum_rule` is phrased in the `hsusc` shape of
-`no_long_range_order_1d_of_susceptibility` (`(Ĥ−E₀)y = VΦ ∧ Re⟨y, VΦ⟩ ≤ RHS`), for a general field
-`h` with `RHS = C(h)`.  The staggered specialisation and the Green-function `≤ C·L` bound are the
-next stage (χ3); this file stops at the general-field sum rule.
+The capstone `ringBondSquareField_susceptibility_sum_rule` produces the resolvent/susceptibility
+conjunct `(Ĥ−E₀)y = VΦ ∧ Re⟨y, VΦ⟩ ≤ RHS` for a general field `h` with `RHS = C(h)`.
+`no_long_range_order_1d_of_susceptibility` consumes a *sub-cubic* form of that conjunct
+(`Re⟨y, ÔΦ⟩ ≤ δ·L³` beyond a threshold, for every margin `δ > 0`), so the staggered specialisation
+still has to turn the scalar `C(h)` into such a bound; that is the next stage (χ3) and this file
+stops at the general-field sum rule.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020, §4.1,
 eqs. (4.1.38)–(4.1.41), book p. 84.
@@ -130,8 +132,9 @@ expanding χ1's ground-energy bound `E_GS(λh) ≥ E_GS(0)` to second order at t
 `ψ_λ = Φ − λ·y`: the variational lower bound and the operator identity
 `ringBondSquareFieldHamiltonian_smulField_eq` make `E_GS(λh) ≤ ⟨ψ_λ|Ĥ_λ|ψ_λ⟩/⟨ψ_λ|ψ_λ⟩` a
 `λ`-polynomial with vanishing first order (`⟨Φ|V|Φ⟩ = 0`, χ2a), whose `λ → 0⁺` limit is the sum
-rule.  This is the `hsusc` shape of `no_long_range_order_1d_of_susceptibility` for a general
-field. -/
+rule.  This is the resolvent/susceptibility conjunct that
+`no_long_range_order_1d_of_susceptibility` consumes, here for a general field and with the scalar
+bound `C(h)` in place of that consumer's sub-cubic `δ·L³`. -/
 theorem ringBondSquareField_susceptibility_sum_rule
     (G : AxisTwoPiRotS N) (n : ℕ) [NeZero n] (hn : 1 ≤ n) (h : Fin (2 * n) → ℝ)
     {Φ : (Fin (2 * n) → Fin (N + 1)) → ℂ} (hΦnorm : star Φ ⬝ᵥ Φ = 1)

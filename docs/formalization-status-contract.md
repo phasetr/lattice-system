@@ -543,15 +543,19 @@ library and checks:
   outcomes, mapping/non-legacy disjointness and reachability, and immutable
   cutover-record retention; authoritative state requires that evidence.
 
-The current prototype exercises non-Tasaki data through the Nielsen--Chuang
-cross-check of the Tasaki Pauli presentation, Tasaki's attribution of Theorem
-4.2 to Shastry, and a source-first Shastry 1992 record whose primary `presents`
-edge is narrowly located to the static-susceptibility argument on pages
-L249--L253. That record has `partial` source coverage: it documents the Lean
-axiom's provenance without claiming that the whole article, or every detail of
-its argument, has been formalized. Tanaka--Takeda--Idogaki supplies a supporting
-rigorous formulation. The prototype does not claim comprehensive coverage of
-either non-Tasaki paper.
+The current prototype exercises non-Tasaki data through a source-first
+Nielsen--Chuang record whose primary `formalizes` edge is narrowly located to
+Exercise 2.41 on page 78, the Nielsen--Chuang cross-check of the Tasaki Pauli
+presentation, Tasaki's attribution of Theorem 4.2 to Shastry, and the
+Tanaka--Takeda--Idogaki supporting rigorous formulation. The Nielsen--Chuang
+record has `partial` source coverage: one declaration proves one instance of the
+anti-commutation relations that exercise states, not the whole exercise. The
+staggered-susceptibility axiom behind Corollary 4.3 is `project_original` with
+`not_applicable` coverage, no bibliographic edge, and a `null` shard source: no
+examined source states that estimate, so no `formalizes` or `presents` claim is
+available for it, and Shastry 1992 is cited only where Tasaki attributes Theorem
+4.2 to it. The prototype does not claim comprehensive coverage of any non-Tasaki
+paper.
 
 `--emit-aggregate PATH` writes the canonical aggregate to a repo-local scratch
 path for reproducibility checks. `--emit-lean-check PATH` writes a temporary

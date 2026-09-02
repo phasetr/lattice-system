@@ -1950,14 +1950,14 @@ def run_staged_mutation_tests(
             "axiom dependency",
             "formalization/records/shastry-1992-staggered-susceptibility-bound.md",
             '<dd data-field="axiom-dependency">'
-            "LatticeSystem.Quantum.shastry_staggered_susceptibility_bound</dd>",
+            "LatticeSystem.Quantum.shastry_staggered_susceptibility_subcubic</dd>",
             '<dd data-field="axiom-dependency">LatticeSystem.Quantum.changed</dd>',
         ),
         (
             "citation locator",
             "formalization/records/tasaki-2020-section-2-1-pauli-x-involutive.md",
-            "exercise 2.41; section 2.1.3; pages 78",
-            "exercise 2.41; section 2.1.3; pages 79",
+            "exercise 2.41; section 2.1.9; pages 78",
+            "exercise 2.41; section 2.1.9; pages 79",
         ),
         (
             "summary",
@@ -1968,8 +1968,8 @@ def run_staged_mutation_tests(
         (
             "status count",
             "formalization/status.md",
-            'data-status-label="proved" data-record-count="2">proved: 2',
             'data-status-label="proved" data-record-count="3">proved: 3',
+            'data-status-label="proved" data-record-count="4">proved: 4',
         ),
         (
             "extra unrelated record",
@@ -2206,13 +2206,16 @@ def run_staged_mutation_tests(
             ),
         )
     )
-    shastry_relative = (
-        "formalization/records/shastry-1992-staggered-susceptibility-bound.md"
+    # The citation fixtures need a record carrying several typed relations in canonical
+    # order. The staggered-susceptibility axiom no longer qualifies: it is a project
+    # assumption with no bibliographic edge at all.
+    multi_citation_relative = (
+        "formalization/records/tasaki-2020-theorem-4-2-shastry-no-ssb.md"
     )
-    shastry_text = (source / shastry_relative).read_text(encoding="utf-8")
+    multi_citation_text = (source / multi_citation_relative).read_text(encoding="utf-8")
     citation_rows = re.findall(
         r'<dt data-label-for="citation">.*?</dt>\n<dd data-field="citation"[^>]*>.*?</dd>',
-        shastry_text,
+        multi_citation_text,
     )
     if len(citation_rows) < 2:
         raise AssertionError("staged citation-order fixture lacks two citations")
@@ -2220,8 +2223,8 @@ def run_staged_mutation_tests(
         (
             (
                 "reordered citations",
-                shastry_relative,
-                shastry_text.replace(
+                multi_citation_relative,
+                multi_citation_text.replace(
                     citation_rows[0] + "\n" + citation_rows[1],
                     citation_rows[1] + "\n" + citation_rows[0],
                     1,
@@ -2229,8 +2232,8 @@ def run_staged_mutation_tests(
             ),
             (
                 "extra citation",
-                shastry_relative,
-                shastry_text.replace(
+                multi_citation_relative,
+                multi_citation_text.replace(
                     "</dl>",
                     '<dt data-label-for="citation">Citation</dt>\n'
                     '<dd data-field="citation" data-relation="supports" '

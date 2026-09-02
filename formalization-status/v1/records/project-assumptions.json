@@ -1,0 +1,29 @@
+{
+  "records": [
+    {
+      "axiom_dependencies": [
+        "LatticeSystem.Quantum.shastry_staggered_susceptibility_subcubic"
+      ],
+      "capstone": false,
+      "declaration_kind": "axiom",
+      "id": "shastry-1992-staggered-susceptibility-bound",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.shastry_staggered_susceptibility_subcubic",
+      "module": "LatticeSystem.Quantum.SpinS.NoLongRangeOrder1D",
+      "origin": "project_original",
+      "proof_guide_anchor": null,
+      "source_coverage": "not_applicable",
+      "source_path": "LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean",
+      "source_relations": [],
+      "summary": "An assumption of this project, not a transcription of a published estimate: for every positive margin there is a ring-size threshold beyond which the static staggered susceptibility of every normalized ground state on an even one-dimensional antiferromagnetic Heisenberg ring is at most that margin times the cube of the ring length.",
+      "topic_ids": [
+        "quantum-spin",
+        "symmetry-breaking"
+      ],
+      "trust_state": "documented_axiom"
+    }
+  ],
+  "schema_version": 1,
+  "source_id": null,
+  "source_unit": "project-assumptions"
+}

@@ -877,6 +877,138 @@ def _approved_replacements(text: str) -> str:
             "10.3's strict positivity. | `Fermion/JordanWigner/Hubbard/LiebShenQiu.lean`; "
             "`Fermion/JordanWigner/Hubbard/LiebShenQiuDischarge.lean` |",
         )
+        # PR-1 of the Theorem 4.2 close-out arc (#5413) repairs the Corollary 4.3 susceptibility
+        # axiom: `shastry_staggered_susceptibility_bound` (`∃ C ≥ 0, χ ≤ C·L`, false at `N = 1`
+        # and mis-cited) becomes `shastry_staggered_susceptibility_subcubic`
+        # (`∀ δ > 0, ∃ L₀, ∀ L ≥ L₀, χ ≤ δ·L³`). The axiom row, the consumer row and the
+        # Corollary 4.3 row (including its `#print axioms` output) are updated together.
+        .replace(
+            "| `no_long_range_order_1d_of_susceptibility` | **Cor 4.3 / conditional reduction** "
+            "(`NoLongRangeOrderConditional.lean`, Tasaki §4.1, toward Corollary 4.3): the exact "
+            "`ε`–`δ` statement of Corollary 4.3 *modulo the susceptibility bound* — if there is `C ≥ "
+            "0` such that every normalized ground state of an even zero-field ring (`L≥2, Even L`) "
+            "has a potential `y` for `ÔΦ` with `Re⟨y,ÔΦ⟩ ≤ C·L`, then for every `ε > 0` there is "
+            "`L₀` beyond which every normalized ground state has `\\|⟨Φ,Ô²Φ⟩.re/L²\\| < ε` (assembling "
+            "the `O(L)` oscillator bound + susceptibility reduction + ground-state bridge + an "
+            "Archimedean `ε`–`δ`). This isolates the unconditional Cor 4.3 to the susceptibility "
+            "bound `Re⟨y,ÔΦ⟩ ≤ C·L`; that bound is now supplied by the documented Shastry axiom "
+            "`shastry_staggered_susceptibility_bound`, discharging `no_long_range_order_1d` into a "
+            "theorem (PR #5003) | `Quantum/SpinS/NoLongRangeOrderConditional.lean` |",
+            "| `no_long_range_order_1d_of_susceptibility` | **Cor 4.3 / conditional reduction** "
+            "(`NoLongRangeOrderConditional.lean`, Tasaki §4.1, toward Corollary 4.3): the exact "
+            "`ε`–`δ` statement of Corollary 4.3 *modulo the sub-cubic susceptibility bound* — if for "
+            "every margin `δ > 0` there is a threshold `L₀` such that every normalized ground state "
+            "of an even zero-field ring (`L₀≤L`, `2≤L`, `Even L`) has a potential `y` for `ÔΦ` with "
+            "`Re⟨y,ÔΦ⟩ ≤ δ·L³`, then for every `ε > 0` there is `L₀` beyond which every normalized "
+            "ground state has `\\|⟨Φ,Ô²Φ⟩.re/L²\\| < ε` (assembling the `O(L)` oscillator bound + "
+            "susceptibility reduction + ground-state bridge at the margin `δ = ε²/(24N³)`). This "
+            "isolates the unconditional Cor 4.3 to the sub-cubic susceptibility bound `Re⟨y,ÔΦ⟩ ≤ "
+            "δ·L³`; that bound is supplied by the documented Shastry axiom "
+            "`shastry_staggered_susceptibility_subcubic`, discharging `no_long_range_order_1d` into "
+            "a theorem (PR #5003) | `Quantum/SpinS/NoLongRangeOrderConditional.lean` |",
+        )
+        .replace(
+            "| `no_long_range_order_1d` | **Corollary 4.3** (§4.1, THEOREM; eq. (4.1.11)): absence "
+            "of LRO in 1D on **even** rings. For the zero-field 1D AFM Heisenberg ring on **even** "
+            "`L` sites (`Even L`, bipartite — faithful to Tasaki §3.1/§4.1.1 which define the "
+            "lattice for even `L` only), the squared staggered order parameter per site vanishes in "
+            "the thermodynamic limit `lim_{L↑∞} ⟨Φ_GS\\|(Ô_L^(3)/L)²\\|Φ_GS⟩ = 0` (ε–δ form). "
+            "Discharged (PR #5003) by feeding the documented Shastry susceptibility axiom "
+            "`shastry_staggered_susceptibility_bound` (χ(k*)≤C·L) into the conditional reduction "
+            "`no_long_range_order_1d_of_susceptibility` for `N ≥ 1`; the degenerate spin-0 case `N = "
+            "0` is unconditional (the staggered order operator vanishes). `#print axioms` = "
+            "`[propext, Classical.choice, Quot.sound, shastry_staggered_susceptibility_bound]` | "
+            "`Quantum/SpinS/NoLongRangeOrder1D.lean` |",
+            "| `no_long_range_order_1d` | **Corollary 4.3** (§4.1, THEOREM; eq. (4.1.11)): absence "
+            "of LRO in 1D on **even** rings. For the zero-field 1D AFM Heisenberg ring on **even** "
+            "`L` sites (`Even L`, bipartite — faithful to Tasaki §3.1/§4.1.1 which define the "
+            "lattice for even `L` only), the squared staggered order parameter per site vanishes in "
+            "the thermodynamic limit `lim_{L↑∞} ⟨Φ_GS\\|(Ô_L^(3)/L)²\\|Φ_GS⟩ = 0` (ε–δ form). "
+            "Discharged (PR #5003) by feeding the documented Shastry susceptibility axiom "
+            "`shastry_staggered_susceptibility_subcubic` (χ(k*)=o(L³)) into the conditional "
+            "reduction `no_long_range_order_1d_of_susceptibility` for `N ≥ 1`; the degenerate spin-0 "
+            "case `N = 0` is unconditional (the staggered order operator vanishes). `#print axioms` "
+            "= `[propext, Classical.choice, Quot.sound, shastry_staggered_susceptibility_subcubic]` "
+            "| `Quantum/SpinS/NoLongRangeOrder1D.lean` |",
+        )
+        .replace(
+            "| `shastry_staggered_susceptibility_bound` | **Shastry susceptibility bound χ(k*)≤C·L** "
+            "(§4.1, DOCUMENTED AXIOM; toward Corollary 4.3): for the zero-field 1D AFM Heisenberg "
+            "ring on **even** `L ≥ 2` sites (`Even L`, bipartite) there is a size-uniform `C ≥ 0` "
+            "with every normalized ground state admitting a potential `y` for `ÔΦ` (`(Ĥ−E₀)y=ÔΦ`) of "
+            "`O(L)` static staggered susceptibility `Re⟨y,ÔΦ⟩ ≤ C·L` (physically "
+            "`χ(k*)=L·f_L^(-1)(k*)`). Tasaki does **not** prove this in the book — footnote 3 (p. "
+            "76) cites Shastry [58] / the rigorous formulation of Tanaka–Takeda–Idogaki [63], and "
+            "footnote 9 (p. 83) singles out the `f_L^(-1)(k*)` bound as the only \"nontrivial part "
+            "that requires some hard analysis\". Per the project's explicit instruction this "
+            "genuinely external hard-analysis estimate (massive-Green / inverse-Fourier `k*=π` "
+            "control) based on Shastry J.Phys.A 25 L249 (1992) [58] and Tanaka–Takeda–Idogaki JMMM "
+            "272–276 908 (2004) [63] is a documented axiom; it discharges `no_long_range_order_1d` "
+            "(PR #5003) | `Quantum/SpinS/NoLongRangeOrder1D.lean` |",
+            "| `shastry_staggered_susceptibility_subcubic` | **Shastry staggered susceptibility, "
+            "sub-cubic χ(k*)=o(L³)** (§4.1, DOCUMENTED AXIOM; toward Corollary 4.3): for the "
+            "zero-field 1D AFM Heisenberg ring on **even** `L ≥ 2` sites (`Even L`, bipartite), for "
+            "every margin `δ > 0` there is a threshold `L₀` beyond which every normalized ground "
+            "state admits a potential `y` for `ÔΦ` (`(Ĥ−E₀)y=ÔΦ`) whose static staggered "
+            "susceptibility obeys `Re⟨y,ÔΦ⟩ ≤ δ·L³` (physically `χ(k*)=L·f_L^(-1)(k*)`). No "
+            "published source states a bound on `f_L^(-1)(k*)`: Tasaki's \"This is nontrivial, and "
+            "requires a hard analysis\" (p. 83) concerns the infrared bound (4.1.24) used for Theorem "
+            "4.1, which p. 81 states for `k ≠ k*` only and whose right-hand side diverges as `k → "
+            "k*`. The earlier `≤ C·L` form was false for odd `N`: the `g(r)` asymptotic Shastry "
+            "introduces as what \"numerical and approximate analytical work … suggests\" (p. L252) "
+            "forces `χ ≳ L(log L)³`. The `∃ L₀` threshold is required because a bare `∀ L` fails at "
+            "`N = 1, L = 2`. An assumption of this project, not a transcription of a published "
+            "estimate; it discharges `no_long_range_order_1d` (PR #5003) | "
+            "`Quantum/SpinS/NoLongRangeOrder1D.lean` |",
+        )
+        # The same repair updates the two neighbouring rows that quote the retired `χ ≤ C·L`
+        # target: the Falk-Bruch reduction row and the χ2b sum-rule row (whose `hsusc` wording
+        # named a hypothesis shape the consumer no longer has).
+        .replace(
+            "reduces Cor 4.3 to the susceptibility bound `χ ≤ C·L` (PR #4846)",
+            "reduces Cor 4.3 to the sub-cubic susceptibility bound `χ = o(L³)` (PR #4846)",
+        )
+        .replace(
+            "Phrased in `hsusc` shape (the hypothetical-susceptibility carrier from "
+            "`no_long_range_order_1d_of_susceptibility`) for general field `h`; staggered "
+            "specialisation and the Green-function `≤ C·L` bound belong to χ3 (next stage).",
+            "Phrased as the resolvent/susceptibility conjunct for general field `h`; "
+            "`no_long_range_order_1d_of_susceptibility` consumes a sub-cubic form of it (`≤ δ·L³` "
+            "beyond a threshold), so the staggered specialisation still has to turn `C(h)` into such "
+            "a bound — that belongs to χ3 (next stage).",
+        )
+        # The axiom row's evidence sentence claimed more than was checked. Only Tasaki (pp. 81,
+        # 83) and Shastry (his eq. (22)) were read; Tanaka-Takeda-Idogaki [63] is not held here,
+        # so the row now scopes the negative claim to those two sources. The same sentence's
+        # refutation of the retired `≤ C·L` form is likewise scoped to `N = 1`, the spin-1/2
+        # chain the quoted asymptotic is about, which alone refutes the `∀ N ≥ 1` form.
+        # (Applied last, so what it matches is the evidence sentence the axiom-row replacement
+        # above inserts, not baseline text; the order of those two entries is load-bearing.)
+        .replace(
+            "No published source states a bound on `f_L^(-1)(k*)`: Tasaki's \"This is nontrivial, "
+            "and requires a hard analysis\" (p. 83) concerns the infrared bound (4.1.24) used for "
+            "Theorem 4.1, which p. 81 states for `k ≠ k*` only and whose right-hand side diverges "
+            "as `k → k*`. The earlier `≤ C·L` form was false for odd `N`: the `g(r)` asymptotic "
+            "Shastry introduces as what \"numerical and approximate analytical work … suggests\" "
+            "(p. L252) forces `χ ≳ L(log L)³`.",
+            "Neither source examined here states a bound on `f_L^(-1)(k*)`; the two examined are "
+            "Tasaki (pp. 81, 83) and Shastry (his eq. (22)), and Tanaka–Takeda–Idogaki [63] was "
+            "not examined. Tasaki's \"This is nontrivial, and requires a hard analysis\" (p. 83) "
+            "concerns the infrared bound (4.1.24) used for Theorem 4.1, which p. 81 states for "
+            "`k ≠ k*` only and whose right-hand side diverges as `k → k*`. The earlier `≤ C·L` "
+            "form was false at `N = 1`: the `g(r)` asymptotic Shastry introduces as what "
+            "\"numerical and approximate analytical work … suggests\" (p. L252) forces "
+            "`χ ≳ L(log L)³`.",
+        )
+        # The axiom's doc comment, the chapter-04 ledger and both signature-pin fixtures all
+        # record the two-site refutation as a hand computation with no Lean witness; the row
+        # stated it flatly. (Applied last, for the same reason as the entry above: what it
+        # matches is text the axiom-row replacement inserts.)
+        .replace(
+            "The `∃ L₀` threshold is required because a bare `∀ L` fails at `N = 1, L = 2`.",
+            "The `∃ L₀` threshold is required because a bare `∀ L` fails at `N = 1, L = 2` — a "
+            "hand computation with no Lean witness.",
+        )
     )
 
 
