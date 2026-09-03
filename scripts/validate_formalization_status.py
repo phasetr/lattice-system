@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate and deterministically aggregate formalization-status version 1."""
+"""Validate and deterministically aggregate formalization-status version 2."""
 
 from __future__ import annotations
 
@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any, Iterable
@@ -22,6 +23,7 @@ from formalization_cutover import (
     LEGACY_ROW_KEYS,
     PROTOTYPE_RECORD_IDS,
     exceptional_mapping_map,
+    current_lean_declaration_names,
     lean_declaration_inventory,
     reconstruct_legacy_rows,
     retired_declaration_map,
@@ -32,7 +34,7 @@ from formalization_cutover import (
 )
 
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 GENERATOR_VERSION = 2
 RESERVED_SOURCE_ROUTE_IDS = {"foundations", "index"}
 RESERVED_TOPIC_ROUTE_IDS = {"index"}
@@ -103,6 +105,7 @@ class Contract:
         self.validation = validation
         self.declaration_kinds = self.enum("declaration_kind")
         self.implementation_states = self.enum("implementation_state")
+        self.lifecycles = self.enum("lifecycle")
         self.origins = self.enum("origin")
         self.source_coverages = self.enum("source_coverage")
         self.trust_states = self.enum("trust_state")
@@ -176,9 +179,11 @@ class Contract:
             "id",
             "implementation_state",
             "lean_name",
+            "lifecycle",
             "module",
             "origin",
             "proof_guide_anchor",
+            "retirement",
             "source_coverage",
             "source_path",
             "source_relations",
@@ -206,6 +211,7 @@ class Contract:
             "source_id",
             "title",
         }
+        expected_retirement = {"last_present_commit", "reason", "superseded_by"}
         expected_topic = {"description", "id", "label"}
         expected_relation = {"relation", "source_item_id"}
         expected_aggregate = {
@@ -236,6 +242,7 @@ class Contract:
             ),
             ("cutover_legacy_row", LEGACY_ROW_KEYS, LEGACY_ROW_KEYS),
             ("manifest", MANIFEST_KEYS, MANIFEST_REQUIRED_KEYS),
+            ("record_retirement", expected_retirement, expected_retirement),
             ("record_shard", SHARD_KEYS, SHARD_KEYS),
             ("source", expected_source, expected_source_required),
             ("source_item", expected_item, expected_item),
@@ -348,6 +355,10 @@ class Contract:
         self.validation.require(
             self.implementation_states == {"implemented", "in_progress"},
             "schema parity: implementation_state vocabulary drifted",
+        )
+        self.validation.require(
+            self.lifecycles == {"active", "retired"},
+            "schema parity: lifecycle vocabulary drifted",
         )
         self.validation.require(
             self.source_coverages
@@ -517,6 +528,21 @@ class Contract:
                     },
                 },
             ),
+            implication(
+                "lifecycle",
+                "active",
+                {"properties": {"retirement": {"type": "null"}}},
+            ),
+            implication(
+                "lifecycle",
+                "retired",
+                {
+                    "properties": {
+                        "capstone": {"const": False},
+                        "retirement": {"type": "object"},
+                    }
+                },
+            ),
         ]
         actual_implications = self.defs["declaration_record"].get("allOf", [])
         self.validation.require(
@@ -572,7 +598,7 @@ def validate_schema_instance(
     location: str,
     validation: Validation,
 ) -> None:
-    """Evaluate the JSON Schema subset used by the version-1 contract."""
+    """Evaluate the JSON Schema subset used by the version-2 contract."""
     if not isinstance(schema, dict):
         validation.errors.append(f"{location}: malformed schema node")
         return
@@ -950,14 +976,119 @@ def expected_module(source_path: str) -> str:
     return source_path.removesuffix(".lean").replace("/", ".")
 
 
+def declaration_in_source(source: str, kind: str, lean_name: str) -> bool:
+    """Check one Lean source text for the stated fully qualified declaration."""
+    keyword = "def" if kind == "definition" else kind
+    return keyword in lean_declaration_inventory(source).get(lean_name, set())
+
+
 def source_declares(path: Path, kind: str, lean_name: str) -> bool:
     """Check source syntax for the stated fully qualified declaration name."""
-    keyword = "def" if kind == "definition" else kind
     try:
         source = path.read_text(encoding="utf-8")
     except OSError:
         return False
-    return keyword in lean_declaration_inventory(source).get(lean_name, set())
+    return declaration_in_source(source, kind, lean_name)
+
+
+def git_capture(repo_root: Path, arguments: list[str]) -> subprocess.CompletedProcess[str]:
+    """Run one read-only Git query from the repository root."""
+    return subprocess.run(
+        ["git", *arguments],
+        cwd=repo_root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+
+def validate_retirement(
+    record: dict[str, Any],
+    location: str,
+    contract: Contract,
+    repo_root: Path,
+    records_by_id: dict[str, dict[str, Any]],
+    validation: Validation,
+) -> None:
+    """Enforce the lifecycle axis and history-proven retirement evidence."""
+    lifecycle = record.get("lifecycle")
+    validation.require(
+        isinstance(lifecycle, str) and lifecycle in contract.lifecycles,
+        f"{location}.lifecycle: invalid",
+    )
+    retirement = record.get("retirement")
+    if lifecycle != "retired":
+        validation.require(
+            retirement is None,
+            f"{location}: an active record must not carry retirement evidence",
+        )
+        return
+    validation.require(
+        record.get("capstone") is False,
+        f"{location}: a retired record cannot be a capstone",
+    )
+    if not isinstance(retirement, dict):
+        validation.errors.append(
+            f"{location}: a retired record requires retirement evidence"
+        )
+        return
+    properties, required = contract.object_keys("record_retirement")
+    validation.keys(retirement, properties, required, f"{location}.retirement")
+    require_inline_text(retirement.get("reason"), f"{location}.retirement.reason", validation)
+    superseded = retirement.get("superseded_by")
+    if not isinstance(superseded, list) or not all(
+        isinstance(identifier, str) for identifier in superseded
+    ):
+        validation.errors.append(
+            f"{location}.retirement.superseded_by: expected an array of record IDs"
+        )
+    else:
+        validation.require(
+            superseded == sorted(set(superseded)),
+            f"{location}.retirement.superseded_by: expected sorted unique record IDs",
+        )
+        for identifier in superseded:
+            target = records_by_id.get(identifier)
+            if target is None:
+                validation.errors.append(
+                    f"{location}.retirement.superseded_by: unresolved superseded_by "
+                    f"record {identifier}"
+                )
+            else:
+                validation.require(
+                    target.get("lifecycle") == "active",
+                    f"{location}.retirement.superseded_by: superseded_by record is not "
+                    f"active: {identifier}",
+                )
+    commit = retirement.get("last_present_commit")
+    if not isinstance(commit, str) or re.fullmatch(r"[0-9a-f]{40}", commit) is None:
+        validation.errors.append(
+            f"{location}.retirement.last_present_commit: expected one 40-character commit ID"
+        )
+        return
+    # The retiring change and its evidence land together, and this repository
+    # squash-merges, so the pinned commit is the last one that still contained the
+    # declaration rather than the one that deleted it.
+    if git_capture(repo_root, ["merge-base", "--is-ancestor", commit, "HEAD"]).returncode != 0:
+        validation.errors.append(
+            f"{location}.retirement.last_present_commit: commit is not an ancestor of HEAD"
+        )
+        return
+    kind = record.get("declaration_kind")
+    lean_name = record.get("lean_name")
+    source_path = record.get("source_path")
+    if (
+        not isinstance(kind, str)
+        or not isinstance(lean_name, str)
+        or not isinstance(source_path, str)
+    ):
+        return
+    blob = git_capture(repo_root, ["show", f"{commit}:{source_path}"])
+    if blob.returncode != 0 or not declaration_in_source(blob.stdout, kind, lean_name):
+        validation.errors.append(
+            f"{location}.retirement.last_present_commit: tree does not declare "
+            f"{kind} {lean_name} at {source_path}"
+        )
 
 
 def validate_state_dimensions(record: dict[str, Any], location: str, validation: Validation) -> None:
@@ -1007,6 +1138,7 @@ def validate_record(
     source_items: dict[str, dict[str, Any]],
     topic_ids: set[str],
     validation: Validation,
+    records_by_id: dict[str, dict[str, Any]] | None = None,
 ) -> None:
     """Validate one declaration and its status/provenance semantics."""
     properties, required = contract.object_keys("declaration_record")
@@ -1058,16 +1190,34 @@ def validate_record(
         and ".." not in source_path,
         f"{location}.source_path: invalid Lean source path",
     )
+    retired = record.get("lifecycle") == "retired"
     if isinstance(module, str) and isinstance(source_path, str):
         validation.require(module == expected_module(source_path), f"{location}: module/path mismatch")
         path = safe_relative_path(repo_root, source_path, f"{location}.source_path", validation)
-        if path is not None:
-            validation.require(path.is_file(), f"{location}.source_path: file does not exist")
-        if path is not None and path.is_file() and isinstance(kind, str) and isinstance(lean_name, str):
-            validation.require(
-                source_declares(path, kind, lean_name),
-                f"{location}: source does not declare {kind} {lean_name}",
-            )
+        if retired:
+            if isinstance(kind, str) and isinstance(lean_name, str):
+                validation.require(
+                    lean_name not in current_lean_declaration_names(repo_root)
+                    and not (
+                        path is not None
+                        and path.is_file()
+                        and source_declares(path, kind, lean_name)
+                    ),
+                    f"{location}: a retired record's Lean name is still declared: {lean_name}",
+                )
+        else:
+            if path is not None:
+                validation.require(path.is_file(), f"{location}.source_path: file does not exist")
+            if (
+                path is not None
+                and path.is_file()
+                and isinstance(kind, str)
+                and isinstance(lean_name, str)
+            ):
+                validation.require(
+                    source_declares(path, kind, lean_name),
+                    f"{location}: source does not declare {kind} {lean_name}",
+                )
     dependencies = record.get("axiom_dependencies")
     require_sorted_unique_strings(dependencies, f"{location}.axiom_dependencies", validation)
     for dependency in dependencies if isinstance(dependencies, list) else []:
@@ -1135,6 +1285,9 @@ def validate_record(
                 f"{location}: implemented project-original record requires not_applicable coverage",
             )
     validate_state_dimensions(record, location, validation)
+    validate_retirement(
+        record, location, contract, repo_root, records_by_id or {}, validation
+    )
 
 
 def validate_dependencies(records: list[dict[str, Any]], validation: Validation) -> None:
@@ -1163,6 +1316,12 @@ def validate_dependencies(records: list[dict[str, Any]], validation: Validation)
                     and target.get("trust_state") == "documented_axiom",
                     f"{record.get('id')}: dependency is not a documented-axiom record: {dependency}",
                 )
+                validation.require(
+                    record.get("lifecycle") == "retired"
+                    or target.get("lifecycle") != "retired",
+                    f"{record.get('id')}: active record depends on a retired "
+                    f"declaration: {dependency}",
+                )
 
 
 def validate_shards(
@@ -1178,6 +1337,13 @@ def validate_shards(
     records: list[dict[str, Any]] = []
     ids: set[str] = set()
     names: set[str] = set()
+    records_by_id = {
+        record["id"]: record
+        for _, data in shard_data
+        if isinstance(data, dict) and isinstance(data.get("records"), list)
+        for record in data["records"]
+        if isinstance(record, dict) and isinstance(record.get("id"), str)
+    }
     for shard_path, data in shard_data:
         if not isinstance(data, dict):
             validation.errors.append(f"{shard_path}: expected object")
@@ -1202,7 +1368,16 @@ def validate_shards(
             if not isinstance(record, dict):
                 validation.errors.append(f"{location}: expected object")
                 continue
-            validate_record(record, location, contract, repo_root, source_items, set(topics), validation)
+            validate_record(
+                record,
+                location,
+                contract,
+                repo_root,
+                source_items,
+                set(topics),
+                validation,
+                records_by_id,
+            )
             identifier = record.get("id")
             lean_name = record.get("lean_name")
             validation.require(
@@ -1249,6 +1424,7 @@ def validate_prototype_coverage(
     """Require representative source, capstone, and trust behavior."""
     if catalog_state != "prototype":
         return
+    records = [record for record in records if record.get("lifecycle") != "retired"]
     tasaki_units = {
         data.get("source_unit")
         for _, data in shard_data
@@ -1296,6 +1472,15 @@ def validate_prototype_coverage(
     )
 
 
+def validate_prototype_pin(record_ids: Iterable[str], validation: Validation) -> None:
+    """Require the catalogue to retain every pinned prototype record ID."""
+    missing = sorted(PROTOTYPE_RECORD_IDS - set(record_ids))
+    validation.require(
+        not missing,
+        f"catalogue removed pinned prototype record IDs: {', '.join(missing)}",
+    )
+
+
 def input_digest(inputs: list[tuple[str, bytes]]) -> str:
     """Hash manifest-listed canonical inputs with path framing."""
     digest = hashlib.sha256()
@@ -1331,7 +1516,10 @@ def aggregate(
 
 def lean_check(records: Iterable[dict[str, Any]]) -> str:
     """Generate authoritative defining-module, name, and exact axiom checks."""
-    modules = sorted({record["module"] for record in records})
+    # A retired record describes a declaration that no longer exists, so neither its
+    # assertions nor its import may reach the generated file.
+    active = [record for record in records if record.get("lifecycle") != "retired"]
+    modules = sorted({record["module"] for record in active})
     declarations = sorted(
         {
             (
@@ -1339,7 +1527,7 @@ def lean_check(records: Iterable[dict[str, Any]]) -> str:
                 record["module"],
                 tuple(record["axiom_dependencies"]),
             )
-            for record in records
+            for record in active
         }
     )
     lines = ["import Lean", *(f"import {module}" for module in modules), ""]
@@ -1553,7 +1741,7 @@ end LatticeSystem
     source_validation = Validation()
     validate_sources(
         {
-            "schema_version": 1,
+            "schema_version": SCHEMA_VERSION,
             "sources": [
                 {
                     "authors": ["A. Author"],
@@ -1569,7 +1757,7 @@ end LatticeSystem
     bad_source_validation = Validation()
     validate_sources(
         {
-            "schema_version": 1,
+            "schema_version": SCHEMA_VERSION,
             "sources": [
                 {
                     "authors": ["A. Author"],
@@ -1587,7 +1775,7 @@ end LatticeSystem
         reserved_validation = Validation()
         validate_sources(
             {
-                "schema_version": 1,
+                "schema_version": SCHEMA_VERSION,
                 "sources": [
                     {
                         "authors": ["A. Author"],
@@ -1606,7 +1794,7 @@ end LatticeSystem
     reserved_topic_validation = Validation()
     validate_topics(
         {
-            "schema_version": 1,
+            "schema_version": SCHEMA_VERSION,
             "topics": [
                 {
                     "description": "Reserved route fixture",
@@ -1680,7 +1868,7 @@ end LatticeSystem
     wrong_schema_validation = Validation()
     check(
         safe_expected_relative_path(
-            repo_root / "formalization-status" / "v1",
+            repo_root / "formalization-status" / "v2",
             "records/shastry-1992.json",
             "schema.json",
             "fixture.schema",
@@ -1820,7 +2008,7 @@ end LatticeSystem
         semantic_url_validation = Validation()
         validate_sources(
             {
-                "schema_version": 1,
+                "schema_version": SCHEMA_VERSION,
                 "sources": [
                     {
                         "authors": ["A. Author"],
@@ -1873,7 +2061,7 @@ end LatticeSystem
     )
     check(bool(aggregate_validation.errors), "deleted aggregate input_sha256 property was accepted")
 
-    root = repo_root / "formalization-status" / "v1"
+    root = repo_root / "formalization-status" / "v2"
     fixture_sources = json.loads((root / "sources.json").read_text(encoding="utf-8"))
     fixture_items = json.loads((root / "source-items.json").read_text(encoding="utf-8"))
     fixture_topics = json.loads((root / "topics.json").read_text(encoding="utf-8"))
@@ -1948,7 +2136,7 @@ end LatticeSystem
                 "malformed-shard",
                 {
                     "records": [None, "not-an-object", {}],
-                    "schema_version": 1,
+                    "schema_version": SCHEMA_VERSION,
                     "source_id": None,
                     "source_unit": "fixture",
                 },
@@ -1970,7 +2158,7 @@ end LatticeSystem
                     "malformed-record-array",
                     {
                         "records": malformed_records,
-                        "schema_version": 1,
+                        "schema_version": SCHEMA_VERSION,
                         "source_id": {"not": "a-source-id"},
                         "source_unit": "fixture",
                     },
@@ -1987,6 +2175,30 @@ end LatticeSystem
             bool(malformed_records_validation.errors),
             f"malformed declaration array accepted: {malformed_records!r}",
         )
+    version_one_shard_validation = Validation()
+    validate_shards(
+        [
+            (
+                "version-one-shard",
+                {
+                    "records": [],
+                    "schema_version": 1,
+                    "source_id": None,
+                    "source_unit": "fixture",
+                },
+            )
+        ],
+        contract,
+        repo_root,
+        source_map,
+        item_map,
+        topic_map,
+        version_one_shard_validation,
+    )
+    check(
+        any("bad version" in error for error in version_one_shard_validation.errors),
+        "a version 1 shard was accepted by the version 2 reader",
+    )
     for malformed_registry in (None, "not-an-object", {}):
         registry_validation = Validation()
         validate_sources(malformed_registry, contract, registry_validation)
@@ -1995,18 +2207,18 @@ end LatticeSystem
         check(bool(registry_validation.errors), f"malformed registries accepted: {malformed_registry!r}")
     malformed_members_validation = Validation()
     validate_sources(
-        {"schema_version": 1, "sources": [None, "not-an-object", {}]},
+        {"schema_version": SCHEMA_VERSION, "sources": [None, "not-an-object", {}]},
         contract,
         malformed_members_validation,
     )
     validate_source_items(
-        {"schema_version": 1, "source_items": [None, "not-an-object", {}]},
+        {"schema_version": SCHEMA_VERSION, "source_items": [None, "not-an-object", {}]},
         contract,
         set(source_map),
         malformed_members_validation,
     )
     validate_topics(
-        {"schema_version": 1, "topics": [None, "not-an-object", {}]},
+        {"schema_version": SCHEMA_VERSION, "topics": [None, "not-an-object", {}]},
         contract,
         malformed_members_validation,
     )
@@ -2035,7 +2247,7 @@ end LatticeSystem
         "cutover_record_ids": ["fixture-record"],
         "legacy_rows": baseline_rows,
         "non_legacy_record_ids": [],
-        "schema_version": 1,
+        "schema_version": SCHEMA_VERSION,
     }
     baseline_schema_validation = Validation()
     validate_schema_instance(
@@ -2120,7 +2332,7 @@ end LatticeSystem
         "legacy_mapping_sha256": "2" * 64,
         "non_record_ordinals": [2],
         "retired_declarations": [],
-        "schema_version": 1,
+        "schema_version": SCHEMA_VERSION,
     }
     certificate_schema_validation = Validation()
     validate_schema_instance(
@@ -2194,9 +2406,23 @@ end LatticeSystem
         record.update(overrides)
         return record
 
-    def record_errors(record: dict[str, Any], location: str) -> list[str]:
+    def record_errors(
+        record: dict[str, Any],
+        location: str,
+        records_by_id: dict[str, dict[str, Any]] | None = None,
+    ) -> list[str]:
+        """Validate one fixture record against an optional fixture catalogue."""
         record_validation = Validation()
-        validate_record(record, location, contract, repo_root, item_map, set(topic_map), record_validation)
+        validate_record(
+            record,
+            location,
+            contract,
+            repo_root,
+            item_map,
+            set(topic_map),
+            record_validation,
+            records_by_id,
+        )
         return record_validation.errors
 
     v2_active_errors = record_errors(
@@ -2358,6 +2584,14 @@ end LatticeSystem
         f"was not rejected for the intended reason: {wrong_content_errors}",
     )
 
+    # Supersession resolves against the whole catalogue, so distinguishing an unknown
+    # ID from a retired one requires the record map this fixture catalogue supplies.
+    superseded_catalogue = {
+        "some-other-retired-record": {
+            "id": "some-other-retired-record",
+            "lifecycle": "retired",
+        },
+    }
     for label, superseded_by, expected_phrase in (
         (
             "unknown superseded_by ID",
@@ -2383,6 +2617,7 @@ end LatticeSystem
                 }
             ),
             "fixture",
+            superseded_catalogue,
         )
         check(
             any(expected_phrase in error for error in superseded_errors),
@@ -2512,10 +2747,10 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
-    """Validate the version-1 catalogue and optionally emit deterministic views."""
+    """Validate the version-2 catalogue and optionally emit deterministic views."""
     args = parse_args()
     repo_root = Path(__file__).resolve().parents[1]
-    root = repo_root / "formalization-status" / "v1"
+    root = repo_root / "formalization-status" / "v2"
     validation = Validation()
     manifest_path = root / "manifest.json"
     manifest, manifest_raw = read_json(manifest_path, validation)
@@ -2688,6 +2923,10 @@ def main() -> int:
     validate_prototype_coverage(
         manifest.get("catalog_state"), shard_data, records, source_items, validation
     )
+    validate_prototype_pin(
+        {record["id"] for record in records if isinstance(record.get("id"), str)},
+        validation,
+    )
     if validation.errors:
         return report_errors(validation.errors)
     digest_inputs = [("manifest.json", manifest_raw)] + [
@@ -2714,7 +2953,7 @@ def main() -> int:
         write_output(args.emit_lean_check, lean_check(records))
     self_test_suffix = ", self-tests passed" if args.self_test else ""
     print(
-        f"formalization-status v1: valid {manifest['catalog_state']} catalogue "
+        f"formalization-status v2: valid {manifest['catalog_state']} catalogue "
         f"({len(records)} records, {len(sources)} sources, "
         f"{len(source_items)} source items, {len(topics)} topics{self_test_suffix})"
     )
