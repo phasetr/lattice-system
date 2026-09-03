@@ -35,10 +35,9 @@ the deep infinite-volume argument is faithfully axiomatized (not re-proved). The
 **reflection-positivity infrastructure project** (#4777, closed 2026-07-11 and historical)
 formalized supporting finite-dim RP layers for the Cor 4.3 **conditional reduction**
 (susceptibility no-LRO) and related Thm 4.2 RP auxiliary results — not a re-proof of Thm 4.2
-itself, and not a discharge of Cor 4.3: that reduction consumes the documented axiom
-`shastry_staggered_susceptibility_subcubic`, which is strictly stronger than the corollary,
-holding via `staggeredOrder_sq_le_susceptibility` only if `⟨Ô²⟩ = o(L²)` — the corollary's own
-conclusion. The successor discharge issue is #5413. Defines `ringCoupling`, `ringStaggeredSublattice`,
+itself, and not a discharge of Cor 4.3: that reduction and the documented axiom it consumed have
+since been deleted, Cor 4.3 now following Tasaki's own contraposition from Thm 4.2, which
+leaves both open. The successor discharge issue is #5413. Defines `ringCoupling`, `ringStaggeredSublattice`,
 `staggeredFieldChainHamiltonianS`. **RP infra layer 1 (in progress):** `RingBondReflection.lean` —
 even-ring bond reflection `ringReflect n x = 2n−1−x` (involutive, half-swap, staggered-sign flip);
 

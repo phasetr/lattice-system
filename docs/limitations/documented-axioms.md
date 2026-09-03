@@ -180,8 +180,9 @@ manner", not an external citation, and it has no Lean declaration at all.
 **open-conjecture** exclusion — Tasaki's footnote says the existence of the iterated limit is
 itself unproved — "rather than being a tractable finite-dimensional cite-only case".
 [Theorem 4.2](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-2) and
-[Corollary 4.3](/lattice-system/limitations/documented-axioms/chapter-04/#entry-corollary-4-3-support) both say in so many words that they
-are **not** won't-do citations, per the 2026-07-05 override; see below.
+[Corollary 4.3](/lattice-system/limitations/documented-axioms/chapter-04/#entry-corollary-4-3-support) are **not** won't-do citations, per the
+2026-07-05 override: the Theorem 4.2 entry says so in so many words, and the Corollary 4.3 entry —
+which carries no axiom of its own — inherits the classification from it; see below.
 
 **Theorem 7.7 is left exactly where its own entry puts it, and does not invoke citation-only.**
 [That entry](/lattice-system/limitations/documented-axioms/chapter-07/#entry-theorem-7-7) records a real implementation dependency: the
@@ -195,10 +196,11 @@ obtained and transcribed, or an independent [41]-free proof of eq. (7.3.9) — g
 
 **Theorem 4.2** (Shastry; Tasaki §4.1, footnote 3, p. 76) and **Corollary 4.3** (§4.1,
 eq. (4.1.11), p. 77) are results of precisely the kind the withdrawn paragraph would have parked —
-the book cites rather than proves them. They are therefore **open, not deferred.** The axioms
-`shastryEnergyGain` and `shastry_staggered_susceptibility_subcubic` that carry them are live
-discharge targets, tracked in the [Chapter 4 entries](/lattice-system/limitations/documented-axioms/chapter-04/); a reader who finds them
-in this ledger should read them as unfinished work, not as settled policy.
+the book cites rather than proves them. They are therefore **open, not deferred.** Both are now carried by the
+single axiom `shastryEnergyGain`: Corollary 4.3 is proved from Theorem 4.2 the way the book proves
+it, by contraposition, so it no longer has a susceptibility axiom of its own. That axiom is a live
+discharge target, tracked in the [Chapter 4 entries](/lattice-system/limitations/documented-axioms/chapter-04/); a reader who finds it
+in this ledger should read it as unfinished work, not as settled policy.
 
 **Bulk reclassification is out of scope here and is parked.** This section records the withdrawal
 and how far it reaches; it rewrites no chapter entry. Re-deriving the six citation-only-alone

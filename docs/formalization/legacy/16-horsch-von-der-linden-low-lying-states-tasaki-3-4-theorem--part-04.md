@@ -82,14 +82,15 @@ Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4
 assumptions", eqs. (3.4.1)-(3.4.4) and footnote 21, p. 65, and eqs. (3.4.14)-(3.4.16), p. 68;
 §4.1, eq. (4.1.9), p. 76, and Corollary 4.3, p. 77; §6.1, eq. (6.1.1), p. 153.
 
-**No discharge, and no axiom deleted.** Nothing in this section proves Corollary 4.3 or
-Theorem 4.2, and no documented axiom is removed: `no_long_range_order_1d` still reports
-`shastry_staggered_susceptibility_subcubic` in its axiom set, `shastry_no_symmetry_breaking_1d`
-still reports `shastryEnergyGain`, and both capstone statements are unchanged. What is added are
-the two order-operator inputs an unconditional Corollary 4.3 route would need — the no-SSB
-condition (3.4.4) at the ring, and eq. (3.4.16) read at the ring order operator. Assembling them
-into such a route is tracked in
-[#5416](https://github.com/phasetr/lattice-system/issues/5416).
+**No discharge.** Nothing in this section proves Corollary 4.3 or Theorem 4.2. The two
+order-operator inputs it records — the no-SSB condition (3.4.4) at the ring, and eq. (3.4.16) read
+at the ring order operator — are what Tasaki's own proof of Corollary 4.3 (contraposition against
+Theorem 3.2, p. 77) consumes, and `no_long_range_order_1d` is now assembled from them and
+Theorem 4.2: it reports `shastryEnergyGain` in its axiom set, exactly as
+`shastry_no_symmetry_breaking_1d` does, and both capstone statements are unchanged. That moved the
+corollary off a susceptibility axiom of its own, which is deleted with the reduction that consumed
+it; it discharged nothing, and both Corollary 4.3 and Theorem 4.2 remain open. The assembly is
+tracked in [#5416](https://github.com/phasetr/lattice-system/issues/5416).
 
 The no-SSB condition (3.4.4) at the ring is footnote 21 of p. 65 taken at `Û := Θ`, the many-body
 spin reversal: `Θ` commutes with the ring Hamiltonian and reverses the staggered order operator, so

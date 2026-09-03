@@ -13070,13 +13070,12 @@ p.~65, eqs.~(3.4.14)--(3.4.16) p.~68; §4.1, eq.~(4.1.9) p.~76 and Corollary~4.3
 eq.~(6.1.1) p.~153; \textbf{proved axiom-free},
 \texttt{Quantum/SpinS/HorschVonderLindenAfmRing.lean} and
 \texttt{Quantum/SpinS/AndersonTowerTanakaMoments.lean}, fixtures in
-\texttt{Tests/Corollary43RingSetup.lean}).  \emph{No discharge, and no axiom deleted.}  Nothing
-here proves Corollary~4.3 or Theorem~4.2 and no documented axiom is removed:
-\texttt{no\_long\_range\_order\_1d} still reports
-\texttt{shastry\_staggered\_susceptibility\_subcubic} in its axiom set,
-\texttt{shastry\_no\_symmetry\_breaking\_1d} still reports \texttt{shastryEnergyGain}, and both
-capstone statements are unchanged.  What is added are the two order-operator inputs an
-unconditional Corollary~4.3 route would need.  The no-SSB condition~(3.4.4) at the ring is
+\texttt{Tests/Corollary43RingSetup.lean}).  \emph{No discharge.}  Nothing
+here proves Corollary~4.3 or Theorem~4.2.  What is added are the two order-operator inputs
+Tasaki's own proof of Corollary~4.3 consumes; assembled with Theorem~4.2 they now carry
+\texttt{no\_long\_range\_order\_1d}, which reports \texttt{shastryEnergyGain} in its axiom set
+exactly as \texttt{shastry\_no\_symmetry\_breaking\_1d} does, with both capstone statements
+unchanged.  The no-SSB condition~(3.4.4) at the ring is
 footnote~21 of p.~65 taken at $\hat U:=\Theta$, the many-body spin reversal: $\Theta$ commutes with
 the ring Hamiltonian and reverses the staggered order operator, so on a ground state whose energy
 eigenspace is at most one-dimensional $\Theta$ acts as a sign $\delta=\pm1$ and every odd moment
@@ -13121,8 +13120,8 @@ antiferromagnetic Heisenberg model as an example of this setting on p.~65 only o
 $d$-dimensional hypercubic lattice with $d\ge2$, whereas the instantiation here is at $d=1$, where
 assumption~(3.4.3) is expected to be false.  Its failure is exactly Corollary~4.3 p.~77
 (eq.~(4.1.11), the staggered order parameter per site vanishing on the ring in the thermodynamic
-limit), which \texttt{no\_long\_range\_order\_1d} carries conditionally on the documented Shastry
-susceptibility axiom, and that contradiction is the point of reading §3.4's machinery at the ring:
+limit), which \texttt{no\_long\_range\_order\_1d} carries conditionally on the documented
+staggered-field energy-gain axiom through Theorem~4.2, and that contradiction is the point of reading §3.4's machinery at the ring:
 assuming~(3.4.3) there buys low-lying states within $O(1/L)$ of the ground energy.  Nothing is
 thereby asserted unconditionally at $d=1$ --- every conclusion of
 \texttt{tasaki\_eq\_3\_4\_16\_afmRing\_ssb\_fromGroundState} is conditional on the long-range-order
@@ -13320,13 +13319,9 @@ infinite-volume argument remains faithfully axiomatized rather than re-proved --
 removes is the eigenvector quantifiers, the ground-state degeneracy and the inner limit. The \emph{reflection-positivity infrastructure} project
 (Issue \#4777, closed 2026-07-11 and historical) formalized supporting finite-dim RP layers for
 the Corollary 4.3 \emph{conditional reduction} and related RP machinery, not a re-proof of
-Thm.~4.2 itself and not a discharge of Cor.~4.3: that reduction consumes the documented axiom
-\texttt{shastry\_staggered\_susceptibility\_subcubic}, which is strictly stronger than the
-corollary (the crude bounds already reach exactly $O(L^3)$ once the gap obeys
-$\Delta \gtrsim 1/L$, and through
-\texttt{staggeredOrder\_sq\_le\_susceptibility} the axiom holds only if
-$\langle\hat O^2\rangle = o(L^2)$, the corollary's own conclusion).  The successor discharge
-issue is \#5413.  The first layer establishes the even-ring \emph{bond reflection}
+Thm.~4.2 itself and not a discharge of Cor.~4.3: that reduction and the documented axiom it
+consumed have since been deleted, Cor.~4.3 now following Tasaki's own contraposition from
+Thm.~4.2, which leaves both open.  The successor discharge issue is \#5413.  The first layer establishes the even-ring \emph{bond reflection}
 $r(x) = 2n-1-x$ (\texttt{RingBondReflection.lean}: involutive, swapping the two halves, flipping the
 staggered sign) and the induced \emph{reflection map} $\theta(A)_{\sigma\tau} =
 \overline{A_{\rho\sigma,\rho\tau}}$ (\texttt{RingReflectionTheta.lean}: an antilinear
@@ -13759,26 +13754,19 @@ norm--expectation bridge --- the $O(L)$ numerator of the ground-state Falk--Bruc
 ($(\hat H-E_0)y=\hat O\Phi$),
 $2(\operatorname{Re}\langle\Phi,\hat O^2\Phi\rangle)^2\le12N^3\,L\cdot\operatorname{Re}\langle y,\hat O\Phi\rangle$,
 since the oscillator factor is $\le12N^3L$ and the susceptibility $\chi=\operatorname{Re}\langle y,\hat
-O\Phi\rangle=\operatorname{Re}\langle y,(\hat H-E_0)y\rangle\ge0$ is PSD.  This reduces Corollary 4.3 to the
-sub-cubic susceptibility bound $\chi=o(L^3)$: from $\chi\le\delta L^3$ one gets $\langle\hat
+O\Phi\rangle=\operatorname{Re}\langle y,(\hat H-E_0)y\rangle\ge0$ is PSD.  A sub-cubic susceptibility bound $\chi=o(L^3)$ would reduce
+Corollary 4.3 to it: from $\chi\le\delta L^3$ one gets $\langle\hat
 O^2\rangle\le\sqrt{6N^3\delta}\,L^2$ for every margin $\delta>0$, so $\langle(\hat
-O/L)^2\rangle\to0$.  A fixed $\chi\le C\,L^3$ would only bound $\langle(\hat O/L)^2\rangle$, not
-send it to $0$; the margin has to be arbitrary.
-\texttt{HermitianGroundStateEigenvalue.lean} bridges the axiom hypothesis to this interface with
+O/L)^2\rangle\to0$ (a fixed $\chi\le C\,L^3$ would only bound $\langle(\hat O/L)^2\rangle$, not
+send it to $0$; the margin has to be arbitrary).  No such bound is carried here: Corollary 4.3
+follows Tasaki's own contraposition from Theorem 4.2 instead, and this Falk--Bruch bound is
+recorded as the §4.1 content it is.
+\texttt{HermitianGroundStateEigenvalue.lean} bridges a ground-state hypothesis to this interface with
 \texttt{groundState\_mulVec\_eq\_hermitianMinEigenvalue}: for a Hermitian $H$ and a normalized
 eigenvector $\Phi$ ($H\Phi=E_0\Phi$) whose $E_0$ has minimal real part over all eigenpairs,
 $H\Phi=(\texttt{hermitianMinEigenvalue}\,H)\,\Phi$ ($E_0$ is real by Hermiticity, and $E_0.\mathrm{re}$ is
-squeezed between the variational lower bound and the minimizing eigenvector).  \texttt{NoLongRangeOrderConditional.lean}
-assembles the whole chain into the exact $\varepsilon$--$\delta$ statement of Corollary 4.3 \emph{modulo
-the sub-cubic susceptibility bound}, \texttt{no\_long\_range\_order\_1d\_of\_susceptibility}: if for
-every margin $\delta>0$ there is a threshold $L_0$ such that every normalized ground state of an even
-zero-field ring ($L_0\le L$, $L\ge2$, $L$ even) has a potential $y$ for $\hat O\Phi$ with
-$\operatorname{Re}\langle y,\hat O\Phi\rangle\le\delta\,L^3$, then for every $\varepsilon>0$ there is $L_0$ beyond
-which every normalized ground state has $|\langle\Phi,\hat O^2\Phi\rangle_{\mathrm{re}}/L^2|<\varepsilon$
-(combining the $O(L)$ oscillator bound, the susceptibility reduction, the ground-state bridge, and the
-margin $\delta=\varepsilon^2/(24N^3)$).  This isolates the unconditional Corollary 4.3 to the sub-cubic
-bound $\operatorname{Re}\langle y,\hat O\Phi\rangle\le\delta\,L^3$, which is supplied by the documented
-axiom \texttt{shastry\_staggered\_susceptibility\_subcubic}.
+squeezed between the variational lower bound and the minimizing eigenvector); it is what identifies
+the eigenvalue of the ground state handed to Corollary 4.3 with the ring's own ground energy.
 
 \medskip\noindent\textbf{Susceptibility phase $\chi_1$: Free energy and ground-state energy limit}
 (Tasaki §4.1, (4.1.40)/(4.1.49), pp.~85--86; PR-$\chi_1$, Issue \#4777).  The
@@ -13905,53 +13893,70 @@ to force the $\lambda^2$-coefficient to be non-negative: $0 \le C(h) - \chi$, yi
 \chi = \operatorname{Re} \langle y, V \Phi \rangle \le C(h) = \tfrac{1}{2}\sum(f_x + f_{x+1})^2.
 \]
 Phrased as a hypothetical-susceptibility carrier for general field $h$: the resolvent/susceptibility
-conjunct $(\hat H-E_0)y=V\Phi$ together with $\operatorname{Re}\langle y,V\Phi\rangle\le C(h)$.  The
-consumer \texttt{no\_long\_range\_order\_1d\_of\_susceptibility} takes a sub-cubic form of the same
-conjunct ($\le\delta\,L^3$ beyond a threshold, for every margin $\delta>0$), so turning the scalar
-$C(h)$ into such a bound is the staggered specialisation, which belongs to $\chi$3 (next stage).
+conjunct $(\hat H-E_0)y=V\Phi$ together with $\operatorname{Re}\langle y,V\Phi\rangle\le C(h)$.  Turning the scalar
+$C(h)$ into a sub-cubic staggered bound ($\le\delta\,L^3$ beyond a threshold, for every margin
+$\delta>0$) is the staggered specialisation, which belongs to $\chi$3 --- a stage this repository
+does not carry out, Corollary 4.3 following Tasaki's own contraposition from Theorem 4.2 instead.
 This is the second-order perturbation gate toward Theorem 4.2 long-range order, closing the susceptibility `free energy $\to$ ground state'
 inference ($\chi$1 $\to$ $\chi$2 $\to$ Theorem 4.2).
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; \emph{conditional} theorem,
-\texttt{Quantum/SpinS/NoLongRangeOrder1D.lean}, Issue \#5413).  Absence of long-range order in one
+\texttt{Quantum/SpinS/NoLongRangeOrder1D.lean}, Issue \#5416).  Absence of long-range order in one
 dimension on \textbf{even} rings: for the zero-field 1D spin-$S$ antiferromagnetic Heisenberg ring on
 \textbf{even} $L$ sites (faithful to Tasaki §3.1/§4.1.1, which define the lattice for even $L$ only;
 only bipartite rings carry a balanced staggered sublattice), the squared staggered order parameter per
 site vanishes in the thermodynamic limit,
 $\lim_{L\uparrow\infty}\langle\Phi_{\mathrm{GS}}|(\hat O_L^{(3)}/L)^2|\Phi_{\mathrm{GS}}\rangle=0$
 (eq.~(4.1.11)).  We record \texttt{no\_long\_range\_order\_1d} in explicit $\varepsilon$--$\delta$ form
-over the zero-field ring family with normalized ground states.  \textbf{This is a conditional
-reduction, not a discharge of Corollary 4.3.}  For $N\ge1$ it is the conditional reduction
-\texttt{no\_long\_range\_order\_1d\_of\_susceptibility} fed with the documented Shastry
-susceptibility axiom \texttt{shastry\_staggered\_susceptibility\_subcubic}
-($\chi(k^\ast)=o(L^3)$), so \texttt{\#print axioms} names that axiom; only the degenerate
-spin-$0$ case $N=0$ is unconditional (the staggered order operator vanishes).  The axiom is
-\textbf{strictly stronger} than the corollary it is fed into: the crude bounds
-$\langle\hat O^2\rangle\le S^2L^2$ and $\chi\le\langle\hat O^2\rangle/\Delta$ give only
-$\chi\le S^2L^2/\Delta$, which is exactly $O(L^3)$ once the gap obeys $\Delta\gtrsim 1/L$,
-and through \texttt{staggeredOrder\_sq\_le\_susceptibility} the $o(L^3)$ form
-holds \emph{only if} $\langle\hat O^2\rangle=o(L^2)$ --- which is Corollary 4.3's own conclusion.
-Tasaki does \textbf{not} prove
-the susceptibility bound in the book, and \textbf{neither source examined here states one} at the
-antiferromagnetic wavevector $k^\ast=\pi$: the two examined are Tasaki (pp.~81 and~83) and Shastry
-(his eq.~(22), p.~L252), while Tanaka--Takeda--Idogaki [63] was \emph{not} examined --- no copy is
-available here --- so nothing is claimed about what [63] does or does not state.  Tasaki's ``This
-is nontrivial, and requires a hard analysis'' (p.~83) is about bounding $f_L^{(-1)}(k)$
-\emph{inside the derivation of the infrared bound}
-(4.1.24), which §4.1.2 uses to prove Theorem 4.1 --- and (4.1.24) is stated on p.~81 only ``for any
-$k\in\mathcal{K}_L\setminus\{k^\ast\}$'', with a right-hand side that is roughly
-$(\mathrm{const.})/|k-k^\ast|$ and hence \emph{diverges} as $k\to k^\ast$.  Footnote~9 (p.~83) only
-warns that $f_L^{(-1)}(k)$, though called the susceptibility, is not the physically relevant magnetic
-susceptibility of an antiferromagnet; footnote~3 (p.~76) declines to prove \emph{Theorem 4.2} and
-refers to Shastry [58] (J.~Phys.~A \textbf{25}, L249 (1992)) with the mathematical formulation of
-Tanaka--Takeda--Idogaki [63] (J.~Magn.~Magn.~Mater.\ \textbf{272--276}, 908 (2004)) for that, not for
-a bound at $k^\ast$; and Shastry's own upper bound (his eq.~(22), p.~L252) diverges at $q=Q$ in the
-same way.  What is recorded as a documented axiom is therefore an assumption of this project rather
-than a transcription of a published estimate.  In the book Corollary 4.3
-is instead a corollary of Shastry's Theorem 4.2 (a conditional theorem in
-\texttt{ShastryNoSSBReduction.lean} resting on the documented axiom \texttt{shastryEnergyGain}, the
-stronger iterated-limit field statement) together with Theorems 3.2
-and 2.2; that double-limit route is not reachable by the static-susceptibility argument used here.
+over the zero-field ring family with normalized ground states.
+
+\emph{Tasaki's own proof, by contraposition.}  On p.~77 the corollary is three sentences: ``The
+condition (3.4.4) for Theorem 3.2 is satisfied because of the Marshall--Lieb--Mattis theorem.  Since
+the conclusion (3.4.22) of Theorem 3.2 does not hold, the other condition (3.4.3) must be violated.''
+\texttt{no\_long\_range\_order\_1d\_of\_theorem\_4\_2} is exactly that argument, taking the conclusion
+of Theorem 4.2 verbatim as its hypothesis.  Negating the conclusion produces \emph{one} even volume
+$L$ --- as large as required --- at which some normalized ground state $\Phi$ of the zero-field ring
+carries staggered long-range order at level $q_0=\varepsilon$, i.e.\ assumption~(3.4.3) p.~65.  At
+that $L$, \texttt{afm\_ring\_ground\_state\_data} supplies a ground energy whose eigenspace is
+one-dimensional (Marshall--Lieb--Mattis --- the condition~(3.4.4) input of Tasaki's first sentence),
+and \texttt{groundState\_mulVec\_eq\_hermitianMinEigenvalue} identifies $\Phi$'s own eigenvalue with
+it, the eigenspace datum being about the energy and not about the particular vector.
+Eq.~(3.4.16) (\texttt{tasaki\_eq\_3\_4\_16\_afmRing\_ssb\_fromGroundState}) then produces the
+low-lying trial state $\Xi_+$ of eq.~(3.4.14) p.~68: normalized, within $C/L$ of the ground energy,
+with per-site staggered moment at least $\sqrt{\varepsilon}$.  Feeding $\Xi_+$ and a normalized
+ground state $\Psi$ of the staggered-field ring $\hat H_h$ to the \emph{single-volume}
+eq.~(3.4.21) bound \texttt{tasaki\_eq\_3\_4\_21\_perVolume\_energyBound} gives
+$\sqrt{\varepsilon}-C/(h L^2)\le\langle\Psi|\hat O_L|\Psi\rangle/L$, whose left-hand side exceeds
+$\sqrt{\varepsilon}/2$ at the chosen $L$, while Theorem 4.2 bounds the right-hand side by
+$\sqrt{\varepsilon}/2$ --- a contradiction.  The single-volume form of eq.~(3.4.21) is what the
+argument needs: the Theorem 3.2 capstone
+\texttt{tasaki\_theorem\_3\_2\_kaplanHorschVonderLinden} assumes long-range order at \emph{every}
+volume, which negating an $\exists L_0,\forall L\ge L_0$ statement does not supply.
+
+\textbf{This discharges nothing.}  For $N\ge1$ the corollary is that contraposition applied to
+Theorem 4.2 (\texttt{shastry\_no\_symmetry\_breaking\_1d}), which is itself conditional on the
+documented axiom \texttt{shastryEnergyGain}, so \texttt{\#print axioms no\_long\_range\_order\_1d}
+$=$ \texttt{[propext, Classical.choice, Quot.sound, shastryEnergyGain]}; only the degenerate
+spin-$0$ case $N=0$ is unconditional (the staggered order operator vanishes).  Both Corollary 4.3
+and Theorem 4.2 remain \textbf{open}: Tasaki does not prove Theorem 4.2 (footnote~3, p.~76) and
+nothing here reconstructs the argument he cites.  What changed is only which unproved statement the
+corollary is charged to --- the input Tasaki's own proof uses, rather than a susceptibility
+assumption of its own.
+
+\emph{The retired susceptibility axiom.}  The corollary previously rested on a documented axiom
+asserting $\chi(k^\ast)=o(L^3)$ for the even zero-field ring, fed into a conditional reduction from
+the Falk--Bruch bound \texttt{staggeredOrder\_sq\_le\_susceptibility}.  That axiom was
+\textbf{strictly stronger} than the corollary --- through the same Falk--Bruch bound it holds only
+if $\langle\hat O^2\rangle=o(L^2)$, which is the corollary's own conclusion --- and \textbf{neither
+source examined here states such a bound} at the antiferromagnetic wavevector $k^\ast=\pi$: the two
+examined are Tasaki (pp.~81 and~83) and Shastry (his eq.~(22), p.~L252), while
+Tanaka--Takeda--Idogaki [63] was \emph{not} examined, no copy being available here.  Tasaki's
+``This is nontrivial, and requires a hard analysis'' (p.~83) is about bounding $f_L^{(-1)}(k)$
+\emph{inside the derivation of the infrared bound} (4.1.24), which §4.1.2 uses to prove Theorem 4.1
+--- and (4.1.24) is stated on p.~81 only ``for any $k\in\mathcal{K}_L\setminus\{k^\ast\}$'', with a
+right-hand side that is roughly $(\mathrm{const.})/|k-k^\ast|$ and hence \emph{diverges} as
+$k\to k^\ast$; Shastry's own upper bound diverges at $q=Q$ in the same way.  Both the axiom and the
+reduction are therefore deleted, and the route this corollary now takes is the book's own.
 Chapters~3--10 backfill.
 
 \noindent\textbf{Connected-graph spin-configuration reachability} (Tasaki §2.5, proved axiom-free,
