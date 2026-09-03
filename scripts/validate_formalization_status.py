@@ -20,6 +20,7 @@ from formalization_cutover import (
     CUTOVER_RETIRED_DECLARATION_KEYS,
     CUTOVER_RETIRED_DECLARATION_REQUIRED_KEYS,
     LEGACY_ROW_KEYS,
+    PROTOTYPE_RECORD_IDS,
     exceptional_mapping_map,
     lean_declaration_inventory,
     reconstruct_legacy_rows,
@@ -2179,6 +2180,325 @@ end LatticeSystem
             mutation_validation,
         )
         check(bool(mutation_validation.errors), f"cutover certificate schema accepted {label}")
+
+    # -- status schema v2: retirement / lifecycle regressions (Issue #5424) -----------------
+    # `lifecycle`/`retirement` do not exist on the v1 schema yet (schema still bumps at
+    # commit 2), so every fixture below that adds those keys is rejected today by the
+    # existing `validation.keys` unknown-field gate. Each check therefore asserts on the
+    # *specific* future-facing message/behaviour (not merely `bool(errors)`), so the case
+    # exercises the intended retirement semantics rather than accidentally passing because
+    # of the unrelated unknown-field rejection.
+    def with_record_overrides(overrides: dict[str, Any]) -> dict[str, Any]:
+        """Build a v2-shaped record fixture from the real Pauli-involution record."""
+        record = copy.deepcopy(record_fixture)
+        record.update(overrides)
+        return record
+
+    def record_errors(record: dict[str, Any], location: str) -> list[str]:
+        record_validation = Validation()
+        validate_record(record, location, contract, repo_root, item_map, set(topic_map), record_validation)
+        return record_validation.errors
+
+    v2_active_errors = record_errors(
+        with_record_overrides({"lifecycle": "active", "retirement": None}),
+        "v2-active-record",
+    )
+    check(
+        not v2_active_errors,
+        "v2 fixture with lifecycle=active/retirement=null was rejected (schema v2 not yet "
+        f"wired): {v2_active_errors}",
+    )
+
+    retirement_evidence = {
+        "last_present_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
+        "reason": "superseded by a directly proved converse",
+        "superseded_by": [],
+    }
+    retired_but_present_errors = record_errors(
+        with_record_overrides(
+            {
+                "declaration_kind": "definition",
+                "lean_name": "LatticeSystem.Lattice.spacingOf",
+                "lifecycle": "retired",
+                "module": "LatticeSystem.Lattice.Scale",
+                "retirement": retirement_evidence,
+                "source_path": "LatticeSystem/Lattice/Scale.lean",
+            }
+        ),
+        "retired-but-present-record",
+    )
+    check(
+        any("still declared" in error for error in retired_but_present_errors),
+        "retired record naming a Lean declaration that still exists in the current tree "
+        f"was not rejected for the intended reason: {retired_but_present_errors}",
+    )
+
+    # Every location string below is the neutral "fixture" on purpose: earlier drafts of
+    # this test used descriptive locations (e.g. "retired-capstone-record") whose own text
+    # happened to satisfy loose substring checks against the *unrelated* "unknown fields:
+    # lifecycle, retirement" message that the v1 schema already raises today — a false
+    # green for the wrong reason. Neutral locations plus multi-word phrase checks avoid
+    # that collision.
+    null_retirement_errors = record_errors(
+        with_record_overrides({"lifecycle": "retired", "retirement": None}), "fixture"
+    )
+    check(
+        any("requires retirement evidence" in error for error in null_retirement_errors),
+        "retired record with retirement: null was not rejected for the intended reason: "
+        f"{null_retirement_errors}",
+    )
+    non_null_retirement_on_active_errors = record_errors(
+        with_record_overrides({"lifecycle": "active", "retirement": retirement_evidence}),
+        "fixture",
+    )
+    check(
+        any(
+            "must not carry retirement evidence" in error
+            for error in non_null_retirement_on_active_errors
+        ),
+        "active record with non-null retirement was not rejected for the intended reason: "
+        f"{non_null_retirement_on_active_errors}",
+    )
+
+    retired_capstone_errors = record_errors(
+        with_record_overrides(
+            {"capstone": True, "lifecycle": "retired", "retirement": retirement_evidence}
+        ),
+        "fixture",
+    )
+    check(
+        any("cannot be a capstone" in error for error in retired_capstone_errors),
+        "retired record with capstone: true was not rejected for the intended reason: "
+        f"{retired_capstone_errors}",
+    )
+
+    # Regression pin (existing v1 behaviour): an active record naming a nonexistent
+    # declaration is already rejected today; the retirement branch must not relax this.
+    nonexistent_active_errors = record_errors(
+        with_record_overrides({"lean_name": "LatticeSystem.Quantum.doesNotExistAnywhere"}),
+        "nonexistent-active-record",
+    )
+    check(
+        any("source does not declare" in error for error in nonexistent_active_errors),
+        "active record naming a nonexistent declaration was accepted "
+        f"(regression): {nonexistent_active_errors}",
+    )
+
+    dependency_on_retired_validation = Validation()
+    validate_dependencies(
+        [
+            {
+                "axiom_dependencies": ["LatticeSystem.Axiom.retiredFact"],
+                "id": "active-consumer",
+                "lean_name": "LatticeSystem.Consumer.result",
+                "lifecycle": "active",
+            },
+            {
+                "axiom_dependencies": [],
+                "declaration_kind": "axiom",
+                "id": "retired-axiom",
+                "lean_name": "LatticeSystem.Axiom.retiredFact",
+                "lifecycle": "retired",
+                "trust_state": "documented_axiom",
+            },
+        ],
+        dependency_on_retired_validation,
+    )
+    check(
+        any(
+            "retired" in error
+            for error in dependency_on_retired_validation.errors
+        ),
+        "active record depending on a retired declaration was not rejected for the "
+        f"intended reason: {dependency_on_retired_validation.errors}",
+    )
+
+    non_ancestor_errors = record_errors(
+        with_record_overrides(
+            {
+                "lifecycle": "retired",
+                "retirement": {
+                    "last_present_commit": "0" * 40,
+                    "reason": "fixture: non-ancestor commit",
+                    "superseded_by": [],
+                },
+            }
+        ),
+        "fixture",
+    )
+    check(
+        any("not an ancestor of HEAD" in error for error in non_ancestor_errors),
+        "retired record whose last_present_commit is not an ancestor of HEAD was not "
+        f"rejected for the intended reason: {non_ancestor_errors}",
+    )
+
+    wrong_content_errors = record_errors(
+        with_record_overrides(
+            {
+                "declaration_kind": "definition",
+                "lean_name": "LatticeSystem.Lattice.NeverDeclaredAtThatCommit",
+                "lifecycle": "retired",
+                "module": "LatticeSystem.Lattice.Scale",
+                "retirement": {
+                    "last_present_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
+                    "reason": "fixture: commit tree does not declare this name",
+                    "superseded_by": [],
+                },
+                "source_path": "LatticeSystem/Lattice/Scale.lean",
+            }
+        ),
+        "fixture",
+    )
+    check(
+        any(
+            "does not declare" in error and "last_present_commit" in error
+            for error in wrong_content_errors
+        ),
+        "retired record whose last_present_commit tree does not declare the recorded name "
+        f"was not rejected for the intended reason: {wrong_content_errors}",
+    )
+
+    for label, superseded_by, expected_phrase in (
+        (
+            "unknown superseded_by ID",
+            ["unknown-record-id-does-not-exist"],
+            "unresolved superseded_by",
+        ),
+        (
+            "retired superseded_by ID",
+            ["some-other-retired-record"],
+            "superseded_by record is not active",
+        ),
+        (
+            "unsorted superseded_by",
+            ["zzz-record", "aaa-record"],
+            "superseded_by: expected sorted",
+        ),
+    ):
+        superseded_errors = record_errors(
+            with_record_overrides(
+                {
+                    "lifecycle": "retired",
+                    "retirement": {**retirement_evidence, "superseded_by": superseded_by},
+                }
+            ),
+            "fixture",
+        )
+        check(
+            any(expected_phrase in error for error in superseded_errors),
+            f"retirement.superseded_by fixture ({label}) was not rejected for the "
+            f"intended reason: {superseded_errors}",
+        )
+
+    lean_check_retirement_output = lean_check(
+        [
+            {
+                "axiom_dependencies": [],
+                "lean_name": "LatticeSystem.Consumer.activeResult",
+                "lifecycle": "active",
+                "module": "LatticeSystem.Consumer",
+            },
+            {
+                "axiom_dependencies": [],
+                "lean_name": "LatticeSystem.Retired.formerResult",
+                "lifecycle": "retired",
+                "module": "LatticeSystem.RetiredModule",
+            },
+        ]
+    )
+    check(
+        "LatticeSystem.Consumer.activeResult" in lean_check_retirement_output,
+        "lean_check dropped the active record it should still assert (positive control)",
+    )
+    check(
+        "import LatticeSystem.Consumer" in lean_check_retirement_output,
+        "lean_check dropped the active record's import (positive control)",
+    )
+    check(
+        "LatticeSystem.Retired.formerResult" not in lean_check_retirement_output,
+        "lean_check emitted an #assert/#check/#print line for a retired record",
+    )
+    check(
+        "import LatticeSystem.RetiredModule" not in lean_check_retirement_output,
+        "lean_check emitted an import line for a retired record's (possibly deleted) module",
+    )
+
+    all_shard_data = [
+        (shard_name.name, json.loads(shard_name.read_text(encoding="utf-8")))
+        for shard_name in sorted((root / "records").glob("*.json"))
+    ]
+    all_records = [
+        record
+        for _, shard in all_shard_data
+        for record in shard.get("records", [])
+        if isinstance(record, dict)
+    ]
+    check(
+        PROTOTYPE_RECORD_IDS <= {record.get("id") for record in all_records},
+        "PROTOTYPE_RECORD_IDS is not a subset of the real catalogue's record IDs "
+        "(positive control on main)",
+    )
+    # Negative control (design §5.1 item 1 / #5422): delete a pinned prototype record ID
+    # from the catalogue without adding a retirement entry. Design §4 requires a dedicated
+    # `validate_prototype_pin(record_ids, validation)` guard (imported PROTOTYPE_RECORD_IDS
+    # against the current catalogue's record IDs) to reject this. That guard does not exist
+    # in `main()` yet, so calling it is expected to fail; report that as a check failure
+    # (not an uncaught NameError) so the rest of the self-test suite keeps running.
+    catalogue_without_pinned_id_ids = {
+        record.get("id")
+        for record in all_records
+        if record.get("id") != "shastry-1992-staggered-susceptibility-bound"
+    }
+    prototype_pin_guard = globals().get("validate_prototype_pin")
+    if prototype_pin_guard is None:
+        check(False, "validate_prototype_pin (PROTOTYPE_RECORD_IDS subset guard) does not exist yet")
+    else:
+        missing_pin_validation = Validation()
+        prototype_pin_guard(catalogue_without_pinned_id_ids, missing_pin_validation)
+        check(
+            bool(missing_pin_validation.errors),
+            "deleting a PROTOTYPE_RECORD_IDS member from the catalogue without a "
+            f"retirement entry was accepted: {missing_pin_validation.errors}",
+        )
+        present_pin_validation = Validation()
+        prototype_pin_guard(
+            {record.get("id") for record in all_records}, present_pin_validation
+        )
+        check(
+            not present_pin_validation.errors,
+            "validate_prototype_pin rejected the real, complete catalogue record ID set "
+            f"(positive control): {present_pin_validation.errors}",
+        )
+
+    retired_coverage_records = [
+        {
+            **record,
+            "lifecycle": "retired",
+        }
+        if record.get("id")
+        in {
+            "shastry-1992-staggered-susceptibility-bound",
+            "tasaki-2020-theorem-4-2-shastry-energy-gain",
+            "tasaki-2020-theorem-3-1-finite-dimensional-core",
+        }
+        else record
+        for record in all_records
+    ]
+    retired_coverage_validation = Validation()
+    validate_prototype_coverage(
+        "prototype",
+        all_shard_data,
+        retired_coverage_records,
+        item_map,
+        retired_coverage_validation,
+    )
+    check(
+        bool(retired_coverage_validation.errors),
+        "prototype coverage passed using only retired documented-axiom and capstone "
+        "records; validate_prototype_coverage does not yet filter to active records "
+        f"({retired_coverage_validation.errors})",
+    )
+
     return failures
 
 

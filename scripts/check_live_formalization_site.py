@@ -1298,6 +1298,81 @@ def run_self_tests() -> None:
     else:
         raise AssertionError("workflow-unsafe retry deadline was accepted")
 
+    # -- status schema v2: machine-root and retirement regressions (Issue #5424) ------------
+    # Placed last so every pre-existing self-test above keeps running/passing first.
+    if not all(endpoint.startswith("formalization-status/v2/") for endpoint in JSON_ENDPOINTS):
+        raise AssertionError(
+            f"JSON_ENDPOINTS is not yet the three v2 machine paths: {JSON_ENDPOINTS}"
+        )
+    if len(COMPATIBILITY_RECORD_IDS) != 4:
+        raise AssertionError(
+            "COMPATIBILITY_RECORD_IDS regressed off its 4-entry compatibility promise "
+            f"(regression pin, unchanged by this design): {len(COMPATIBILITY_RECORD_IDS)}"
+        )
+
+    # A published catalogue whose schema_version is 2 (the eventual v2 publication) must
+    # be accepted once the machine root moves; today `verify_responses` still hardcodes
+    # `schema_version == 1` (:438) so this is rejected for that specific reason.
+    v2_schema_fixture = fixture_responses(revision)
+    v2_catalog = json.loads(v2_schema_fixture[JSON_ENDPOINTS[0]].body)
+    v2_catalog["schema_version"] = 2
+    v2_publication = json.loads(v2_schema_fixture[JSON_ENDPOINTS[2]].body)
+    v2_publication["schema_version"] = 2
+    v2_schema_fixture[JSON_ENDPOINTS[0]] = Response(
+        v2_schema_fixture[JSON_ENDPOINTS[0]].status,
+        v2_schema_fixture[JSON_ENDPOINTS[0]].content_type,
+        json.dumps(v2_catalog).encode(),
+        v2_schema_fixture[JSON_ENDPOINTS[0]].final_url,
+    )
+    v2_schema_fixture[JSON_ENDPOINTS[2]] = Response(
+        v2_schema_fixture[JSON_ENDPOINTS[2]].status,
+        v2_schema_fixture[JSON_ENDPOINTS[2]].content_type,
+        json.dumps(v2_publication).encode(),
+        v2_schema_fixture[JSON_ENDPOINTS[2]].final_url,
+    )
+    try:
+        verify_responses(v2_schema_fixture, PAGES_BASE, revision, canonical_schema)
+    except ValueError as error:
+        if "schema_version must both equal 1" not in str(error):
+            raise AssertionError(
+                f"schema_version: 2 fixture was rejected for an unrelated reason: {error}"
+            ) from error
+        raise AssertionError(
+            "a published catalogue/publication pair with schema_version: 2 is not yet "
+            f"accepted (expected once the v1->v2 machine-root move, commit 5, lands): {error}"
+        ) from error
+
+    # A pinned compatibility route whose record carries lifecycle/retirement evidence
+    # (the exact #5420 post-cutover shape) must keep resolving and render as retired.
+    # Today the schema has no `lifecycle`/`retirement` properties, so the published
+    # catalogue is rejected for violating the canonical schema, not accepted.
+    retired_route_fixture = fixture_responses(revision)
+    retired_catalog = json.loads(retired_route_fixture[JSON_ENDPOINTS[0]].body)
+    retired_catalog["records"][0]["lifecycle"] = "retired"
+    retired_catalog["records"][0]["retirement"] = {
+        "last_present_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
+        "reason": "superseded by a directly proved converse",
+        "superseded_by": [],
+    }
+    retired_route_fixture[JSON_ENDPOINTS[0]] = Response(
+        retired_route_fixture[JSON_ENDPOINTS[0]].status,
+        retired_route_fixture[JSON_ENDPOINTS[0]].content_type,
+        json.dumps(retired_catalog).encode(),
+        retired_route_fixture[JSON_ENDPOINTS[0]].final_url,
+    )
+    try:
+        verify_responses(retired_route_fixture, PAGES_BASE, revision, canonical_schema)
+    except ValueError as error:
+        if "violates the canonical schema" not in str(error):
+            raise AssertionError(
+                "a pinned compatibility route resolving to a retired record was "
+                f"rejected for an unrelated reason: {error}"
+            ) from error
+        raise AssertionError(
+            "a pinned compatibility route resolving to a retired record is not yet "
+            f"accepted (expected once v2's lifecycle/retirement schema fields exist): {error}"
+        ) from error
+
 
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments for live verification or self-tests."""

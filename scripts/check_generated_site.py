@@ -2882,6 +2882,105 @@ def run_self_tests() -> None:
         else:
             raise AssertionError("second Pages deployment owner was accepted")
 
+    # -- status schema v2: retired-record rendering regressions (Issue #5424) ---------------
+    # These are placed last so every pre-existing self-test above keeps running/passing
+    # first; a raised AssertionError below stops the function, matching this module's
+    # existing fail-fast self-test idiom.
+    from generate_formalization_site import human_status as generate_human_status
+    from generate_formalization_site import record_lines as generate_record_lines
+
+    retired_record_fixture = {
+        "axiom_dependencies": [],
+        "capstone": False,
+        "declaration_kind": "theorem",
+        "id": "fixture-retired-record",
+        "implementation_state": "implemented",
+        "lean_name": "LatticeSystem.Fixture.formerResult",
+        "lifecycle": "retired",
+        "module": "LatticeSystem.Fixture",
+        "origin": "project_original",
+        "proof_guide_anchor": None,
+        "retirement": {
+            "last_present_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
+            "reason": "superseded by a directly proved converse",
+            "superseded_by": [],
+        },
+        "source_coverage": "not_applicable",
+        "source_path": "LatticeSystem/Fixture.lean",
+        "source_relations": [],
+        "summary": "A retired fixture record.",
+        "topic_ids": [],
+        "trust_state": "axiom_free",
+    }
+    # Positive control: human_status/derived_human_label are a deliberate duplicated pair
+    # (generator + checker) that must move together (design pitfall P5). An *active*
+    # record's label must stay unaffected by the presence of an (unused) lifecycle field.
+    active_control_fixture = {**retired_record_fixture, "lifecycle": "active", "retirement": None}
+    if generate_human_status(active_control_fixture) != "proved":
+        raise AssertionError(
+            "generate_formalization_site.human_status regressed on an ordinary active "
+            "record once it also carries an (unused) lifecycle field (positive control)"
+        )
+    if derived_human_label(active_control_fixture) != "proved":
+        raise AssertionError(
+            "check_generated_site.derived_human_label regressed on an ordinary active "
+            "record once it also carries an (unused) lifecycle field (positive control)"
+        )
+
+    # Negative controls: today neither human_status nor derived_human_label branches on
+    # lifecycle at all, so a retired record's label falls through to the ordinary
+    # implementation_state/declaration_kind/trust_state derivation instead of "retired".
+    if generate_human_status(retired_record_fixture) != "retired":
+        raise AssertionError(
+            "generate_formalization_site.human_status does not yet render "
+            f"lifecycle='retired' as 'retired' (got {generate_human_status(retired_record_fixture)!r})"
+        )
+    retired_derived_label = derived_human_label(retired_record_fixture)
+    if retired_derived_label != "retired":
+        raise AssertionError(
+            "check_generated_site.derived_human_label does not yet render "
+            f"lifecycle='retired' as 'retired' (got {retired_derived_label!r})"
+        )
+    retired_block = "\n".join(generate_record_lines(retired_record_fixture, {}, {}))
+    for expected_row in (
+        '<dd data-field="lifecycle">retired</dd>',
+        '<dd data-field="human-status">retired</dd>',
+        '<dd data-field="retirement-reason">',
+        '<dd data-field="retirement-superseded-by">',
+        '<dd data-field="retirement-last-present-commit">',
+    ):
+        if expected_row not in retired_block:
+            raise AssertionError(
+                f"record_lines does not yet render a v2 retirement row: {expected_row!r}"
+            )
+
+    v1_active_metadata = "\n".join(
+        __import__("generate_formalization_site").metadata(
+            {"catalog_state": "prototype", "input_sha256": "0" * 64, "schema_version": 1},
+            "0" * 40,
+        )
+    )
+    # Positive control: main's own v1 wording is present today and must not silently
+    # vanish before this PR intentionally replaces it in commit 4.
+    if (
+        "version 1 catalogue" not in v1_active_metadata
+        or "version 1 schema" not in v1_active_metadata
+    ):
+        raise AssertionError(
+            "generated sidebar metadata regression: main's own 'version 1' wording "
+            "disappeared before this PR touched it"
+        )
+    # Negative control: the v2 wording/links do not exist yet.
+    if "version 2 catalogue" not in v1_active_metadata or "version 2 schema" not in v1_active_metadata:
+        raise AssertionError(
+            "generated sidebar metadata does not yet advertise version 2 "
+            "(machine root move is commit 2/4, not yet implemented)"
+        )
+    if "/lattice-system/formalization-status/v2/" not in v1_active_metadata:
+        raise AssertionError(
+            "generated sidebar metadata does not yet link /v2/ machine roots"
+        )
+
 
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
