@@ -1690,7 +1690,7 @@ def check_workflow_invariants(repo_root: Path) -> None:
         "timeout-minutes: 5",
         "python3 scripts/check_live_formalization_site.py --self-test",
         "cmp .self-local/tmp/catalog.json "
-        ".self-local/tmp/formalization-site-a/source/formalization-status/v1/catalog.json",
+        ".self-local/tmp/formalization-site-a/source/formalization-status/v2/catalog.json",
         "--expected-catalog .self-local/tmp/catalog.json",
         "--print-regular-file-bytes .self-local/tmp/formalization-site-a/site",
     )
@@ -1730,7 +1730,7 @@ def check_workflow_invariants(repo_root: Path) -> None:
         "python3 scripts/check_live_formalization_site.py",
         "--base-url https://phasetr.github.io/lattice-system/",
         '--revision "$GITHUB_SHA"',
-        "--canonical-schema formalization-status/v1/schema.json",
+        "--canonical-schema formalization-status/v2/schema.json",
         "--attempts 7",
         "--initial-delay 5",
         "--timeout 10",

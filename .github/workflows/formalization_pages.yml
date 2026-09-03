@@ -32,7 +32,7 @@ jobs:
           python3 scripts/generate_formalization_site.py --self-test --output-dir .self-local/tmp/formalization-site-a --revision "$GITHUB_SHA"
           python3 scripts/generate_formalization_site.py --output-dir .self-local/tmp/formalization-site-b --revision "$GITHUB_SHA"
           diff -r .self-local/tmp/formalization-site-a .self-local/tmp/formalization-site-b
-          cmp .self-local/tmp/catalog.json .self-local/tmp/formalization-site-a/source/formalization-status/v1/catalog.json
+          cmp .self-local/tmp/catalog.json .self-local/tmp/formalization-site-a/source/formalization-status/v2/catalog.json
           python3 scripts/check_generated_site.py --self-test --source-dir .self-local/tmp/formalization-site-a/source --expected-catalog .self-local/tmp/catalog.json --revision "$GITHUB_SHA"
 
       - name: Check all JSON inputs and generated machine files
@@ -44,9 +44,9 @@ jobs:
 
           tracked = subprocess.check_output(["git", "ls-files", "*.json"], text=True).splitlines()
           generated = [
-              ".self-local/tmp/formalization-site-a/source/formalization-status/v1/catalog.json",
-              ".self-local/tmp/formalization-site-a/source/formalization-status/v1/publication.json",
-              ".self-local/tmp/formalization-site-a/source/formalization-status/v1/schema.json",
+              ".self-local/tmp/formalization-site-a/source/formalization-status/v2/catalog.json",
+              ".self-local/tmp/formalization-site-a/source/formalization-status/v2/publication.json",
+              ".self-local/tmp/formalization-site-a/source/formalization-status/v2/schema.json",
           ]
           for name in [*tracked, *generated]:
               with Path(name).open(encoding="utf-8") as source:
@@ -127,7 +127,7 @@ jobs:
           python3 scripts/check_live_formalization_site.py \
             --base-url https://phasetr.github.io/lattice-system/ \
             --revision "$GITHUB_SHA" \
-            --canonical-schema formalization-status/v1/schema.json \
+            --canonical-schema formalization-status/v2/schema.json \
             --attempts 7 \
             --initial-delay 5 \
             --timeout 10 \

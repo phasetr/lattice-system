@@ -42,9 +42,9 @@ CORE_HUMAN_ENDPOINTS = (
     "formalization/topics/",
 )
 JSON_ENDPOINTS = (
-    "formalization-status/v1/catalog.json",
-    "formalization-status/v1/schema.json",
-    "formalization-status/v1/publication.json",
+    "formalization-status/v2/catalog.json",
+    "formalization-status/v2/schema.json",
+    "formalization-status/v2/publication.json",
 )
 BOOTSTRAP_ENDPOINTS = (*CORE_HUMAN_ENDPOINTS, *JSON_ENDPOINTS)
 COMPATIBILITY_RECORD_IDS = (
@@ -435,8 +435,8 @@ def verify_responses(
     ):
         raise ValueError("publication sidecar has the wrong generator identity or version")
     digest = catalog.get("input_sha256")
-    if catalog.get("schema_version") != 1 or publication.get("schema_version") != 1:
-        raise ValueError("catalog/publication schema_version must both equal 1")
+    if catalog.get("schema_version") != 2 or publication.get("schema_version") != 2:
+        raise ValueError("catalog/publication schema_version must both equal 2")
     if (
         catalog.get("catalog_state") not in {"prototype", "authoritative"}
         or publication.get("catalog_state") != catalog.get("catalog_state")
@@ -569,7 +569,10 @@ def verify_with_retry(
 
 
 def fixture_responses(
-    revision: str, catalog_state: str = "prototype", record_count: int = 4
+    revision: str,
+    catalog_state: str = "prototype",
+    record_count: int = 4,
+    retired_record_ids: tuple[str, ...] = (),
 ) -> dict[str, Response]:
     """Build a complete scalable-route fixture for dependency-free self-tests."""
     if record_count < len(COMPATIBILITY_RECORD_IDS):
@@ -577,17 +580,28 @@ def fixture_responses(
     digest = "a" * 64
     records = []
     for index, record_id in enumerate(COMPATIBILITY_RECORD_IDS):
+        retired = record_id in retired_record_ids
         records.append(
             {
                 "axiom_dependencies": [],
-                "capstone": bool(index % 2),
+                "capstone": bool(index % 2) and not retired,
                 "declaration_kind": "theorem",
                 "id": record_id,
                 "implementation_state": "implemented",
                 "lean_name": f"LatticeSystem.Fixture.result{index}",
+                "lifecycle": "retired" if retired else "active",
                 "module": "LatticeSystem.Fixture",
                 "origin": "literature",
                 "proof_guide_anchor": None,
+                # Live verification checks the published shape; the catalogue-side
+                # validator is what proves this commit against real history.
+                "retirement": {
+                    "last_present_commit": "0" * 40,
+                    "reason": "Fixture retirement evidence",
+                    "superseded_by": [],
+                }
+                if retired
+                else None,
                 "source_coverage": "complete",
                 "source_path": "LatticeSystem/Fixture.lean",
                 "source_relations": [
@@ -608,7 +622,7 @@ def fixture_responses(
             }
         )
     catalog: dict[str, object] = {
-        "schema_version": 1,
+        "schema_version": 2,
         "catalog_state": catalog_state,
         "generated_by": "scripts/validate_formalization_status.py",
         "generator_version": 2,
@@ -652,7 +666,7 @@ def fixture_responses(
         for endpoint, specification in specifications.items()
     }
     publication = {
-        "schema_version": 1,
+        "schema_version": 2,
         "catalog_state": catalog_state,
         "generated_by": "scripts/generate_formalization_site.py",
         "generator_version": 2,
@@ -666,7 +680,7 @@ def fixture_responses(
             "application/json",
             (
                 Path(__file__).resolve().parents[1]
-                / "formalization-status/v1/schema.json"
+                / "formalization-status/v2/schema.json"
             ).read_bytes(),
         ),
         JSON_ENDPOINTS[2]: ("application/json", json.dumps(publication).encode()),
@@ -1298,80 +1312,66 @@ def run_self_tests() -> None:
     else:
         raise AssertionError("workflow-unsafe retry deadline was accepted")
 
-    # -- status schema v2: machine-root and retirement regressions (Issue #5424) ------------
-    # Placed last so every pre-existing self-test above keeps running/passing first.
+    # -- status schema v2: machine-root and retirement regressions --------------------------
+    # Placed last so every pre-existing self-test above keeps running first.
     if not all(endpoint.startswith("formalization-status/v2/") for endpoint in JSON_ENDPOINTS):
         raise AssertionError(
-            f"JSON_ENDPOINTS is not yet the three v2 machine paths: {JSON_ENDPOINTS}"
+            f"JSON_ENDPOINTS is not the three v2 machine paths: {JSON_ENDPOINTS}"
         )
     if len(COMPATIBILITY_RECORD_IDS) != 4:
         raise AssertionError(
-            "COMPATIBILITY_RECORD_IDS regressed off its 4-entry compatibility promise "
-            f"(regression pin, unchanged by this design): {len(COMPATIBILITY_RECORD_IDS)}"
+            "COMPATIBILITY_RECORD_IDS regressed off its 4-entry compatibility promise: "
+            f"{len(COMPATIBILITY_RECORD_IDS)}"
         )
-
-    # A published catalogue whose schema_version is 2 (the eventual v2 publication) must
-    # be accepted once the machine root moves; today `verify_responses` still hardcodes
-    # `schema_version == 1` (:438) so this is rejected for that specific reason.
-    v2_schema_fixture = fixture_responses(revision)
-    v2_catalog = json.loads(v2_schema_fixture[JSON_ENDPOINTS[0]].body)
-    v2_catalog["schema_version"] = 2
-    v2_publication = json.loads(v2_schema_fixture[JSON_ENDPOINTS[2]].body)
-    v2_publication["schema_version"] = 2
-    v2_schema_fixture[JSON_ENDPOINTS[0]] = Response(
-        v2_schema_fixture[JSON_ENDPOINTS[0]].status,
-        v2_schema_fixture[JSON_ENDPOINTS[0]].content_type,
-        json.dumps(v2_catalog).encode(),
-        v2_schema_fixture[JSON_ENDPOINTS[0]].final_url,
-    )
-    v2_schema_fixture[JSON_ENDPOINTS[2]] = Response(
-        v2_schema_fixture[JSON_ENDPOINTS[2]].status,
-        v2_schema_fixture[JSON_ENDPOINTS[2]].content_type,
-        json.dumps(v2_publication).encode(),
-        v2_schema_fixture[JSON_ENDPOINTS[2]].final_url,
-    )
-    try:
-        verify_responses(v2_schema_fixture, PAGES_BASE, revision, canonical_schema)
-    except ValueError as error:
-        if "schema_version must both equal 1" not in str(error):
+    catalog_body = json.loads(fixture[JSON_ENDPOINTS[0]].body)
+    publication_body = json.loads(fixture[JSON_ENDPOINTS[2]].body)
+    if catalog_body["schema_version"] != 2 or publication_body["schema_version"] != 2:
+        raise AssertionError("published catalogue/publication pair is not schema version 2")
+    for stale_version in (1, 3):
+        stale_fixture = fixture_responses(revision)
+        stale_catalog = json.loads(stale_fixture[JSON_ENDPOINTS[0]].body)
+        stale_catalog["schema_version"] = stale_version
+        stale_fixture[JSON_ENDPOINTS[0]] = Response(
+            stale_fixture[JSON_ENDPOINTS[0]].status,
+            stale_fixture[JSON_ENDPOINTS[0]].content_type,
+            json.dumps(stale_catalog).encode(),
+            stale_fixture[JSON_ENDPOINTS[0]].final_url,
+        )
+        try:
+            verify_responses(stale_fixture, PAGES_BASE, revision, canonical_schema)
+        except ValueError:
+            pass
+        else:
             raise AssertionError(
-                f"schema_version: 2 fixture was rejected for an unrelated reason: {error}"
-            ) from error
-        raise AssertionError(
-            "a published catalogue/publication pair with schema_version: 2 is not yet "
-            f"accepted (expected once the v1->v2 machine-root move, commit 5, lands): {error}"
-        ) from error
+                f"published catalogue with schema_version {stale_version} was accepted"
+            )
 
-    # A pinned compatibility route whose record carries lifecycle/retirement evidence
-    # (the exact #5420 post-cutover shape) must keep resolving and render as retired.
-    # Today the schema has no `lifecycle`/`retirement` properties, so the published
-    # catalogue is rejected for violating the canonical schema, not accepted.
-    retired_route_fixture = fixture_responses(revision)
+    # A pinned compatibility route whose record carries retirement evidence keeps
+    # resolving and renders as retired.
+    retired_route_fixture = fixture_responses(
+        revision, retired_record_ids=(COMPATIBILITY_RECORD_IDS[0],)
+    )
     retired_catalog = json.loads(retired_route_fixture[JSON_ENDPOINTS[0]].body)
-    retired_catalog["records"][0]["lifecycle"] = "retired"
-    retired_catalog["records"][0]["retirement"] = {
-        "last_present_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
-        "reason": "superseded by a directly proved converse",
-        "superseded_by": [],
-    }
-    retired_route_fixture[JSON_ENDPOINTS[0]] = Response(
-        retired_route_fixture[JSON_ENDPOINTS[0]].status,
-        retired_route_fixture[JSON_ENDPOINTS[0]].content_type,
-        json.dumps(retired_catalog).encode(),
-        retired_route_fixture[JSON_ENDPOINTS[0]].final_url,
-    )
-    try:
-        verify_responses(retired_route_fixture, PAGES_BASE, revision, canonical_schema)
-    except ValueError as error:
-        if "violates the canonical schema" not in str(error):
+    retired_record = retired_catalog["records"][0]
+    if (
+        retired_record["id"] != COMPATIBILITY_RECORD_IDS[0]
+        or retired_record["lifecycle"] != "retired"
+        or retired_record["retirement"] is None
+    ):
+        raise AssertionError("retired-route fixture does not publish a retired record")
+    verify_responses(retired_route_fixture, PAGES_BASE, revision, canonical_schema)
+    retired_detail = retired_route_fixture[
+        f"formalization/records/{COMPATIBILITY_RECORD_IDS[0]}/"
+    ].body.decode()
+    for expected_row in (
+        '<dd data-field="lifecycle">retired</dd>',
+        '<dd data-field="human-status">retired</dd>',
+        '<dd data-field="retirement-last-present-commit">',
+    ):
+        if expected_row not in retired_detail:
             raise AssertionError(
-                "a pinned compatibility route resolving to a retired record was "
-                f"rejected for an unrelated reason: {error}"
-            ) from error
-        raise AssertionError(
-            "a pinned compatibility route resolving to a retired record is not yet "
-            f"accepted (expected once v2's lifecycle/retirement schema fields exist): {error}"
-        ) from error
+                f"pinned retired record route lacks its retirement rendering: {expected_row!r}"
+            )
 
 
 def parse_args() -> argparse.Namespace:

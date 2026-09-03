@@ -14,6 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          # The formalization-status validator proves every record retirement
+          # against real history (`git merge-base --is-ancestor`), which a
+          # depth-1 checkout cannot answer.
+          fetch-depth: 0
       # lean-action's own `actions/cache/restore` and `actions/cache/save`
       # steps are gated by the single `use-github-cache` input (see
       # https://github.com/leanprover/lean-action/blob/v1/action.yml), so
