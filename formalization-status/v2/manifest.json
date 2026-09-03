@@ -1,7 +1,7 @@
 {
   "catalog_state": "prototype",
   "human_publication_root": "/lattice-system/formalization/",
-  "machine_publication_root": "/lattice-system/formalization-status/v1/",
+  "machine_publication_root": "/lattice-system/formalization-status/v2/",
   "record_shards": [
     "records/nielsen-chuang-2010.json",
     "records/project-assumptions.json",
@@ -15,5 +15,5 @@
     "topics": "topics.json"
   },
   "schema": "schema.json",
-  "schema_version": 1
+  "schema_version": 2
 }

@@ -23,7 +23,7 @@
           "type": "array"
         },
         "schema_version": {
-          "const": 1
+          "const": 2
         },
         "source_items": {
           "items": {
@@ -95,7 +95,7 @@
           "uniqueItems": true
         },
         "schema_version": {
-          "const": 1
+          "const": 2
         }
       },
       "required": [
@@ -145,7 +145,7 @@
           "type": "array"
         },
         "schema_version": {
-          "const": 1
+          "const": 2
         }
       },
       "required": [
@@ -634,6 +634,47 @@
               }
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "lifecycle": {
+                "const": "active"
+              }
+            },
+            "required": [
+              "lifecycle"
+            ]
+          },
+          "then": {
+            "properties": {
+              "retirement": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "lifecycle": {
+                "const": "retired"
+              }
+            },
+            "required": [
+              "lifecycle"
+            ]
+          },
+          "then": {
+            "properties": {
+              "capstone": {
+                "const": false
+              },
+              "retirement": {
+                "type": "object"
+              }
+            }
+          }
         }
       ],
       "properties": {
@@ -659,6 +700,9 @@
         "lean_name": {
           "$ref": "#/$defs/lean_name"
         },
+        "lifecycle": {
+          "$ref": "#/$defs/lifecycle"
+        },
         "module": {
           "$ref": "#/$defs/module_name"
         },
@@ -669,6 +713,16 @@
           "oneOf": [
             {
               "$ref": "#/$defs/stable_id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "retirement": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/record_retirement"
             },
             {
               "type": "null"
@@ -710,9 +764,11 @@
         "id",
         "implementation_state",
         "lean_name",
+        "lifecycle",
         "module",
         "origin",
         "proof_guide_anchor",
+        "retirement",
         "source_coverage",
         "source_path",
         "source_relations",
@@ -735,6 +791,12 @@
     "lean_name": {
       "pattern": "^LatticeSystem(?:\\.[A-Za-z_\\u0080-\\uFFFF][A-Za-z0-9_'\\u0080-\\uFFFF]*)+$",
       "type": "string"
+    },
+    "lifecycle": {
+      "enum": [
+        "active",
+        "retired"
+      ]
     },
     "manifest": {
       "additionalProperties": false,
@@ -788,7 +850,7 @@
           "const": "schema.json"
         },
         "schema_version": {
-          "const": 1
+          "const": 2
         }
       },
       "required": [
@@ -812,6 +874,31 @@
         "project_original"
       ]
     },
+    "record_retirement": {
+      "additionalProperties": false,
+      "properties": {
+        "last_present_commit": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        "reason": {
+          "$ref": "#/$defs/inline_text"
+        },
+        "superseded_by": {
+          "items": {
+            "$ref": "#/$defs/stable_id"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "last_present_commit",
+        "reason",
+        "superseded_by"
+      ],
+      "type": "object"
+    },
     "record_shard": {
       "additionalProperties": false,
       "properties": {
@@ -822,7 +909,7 @@
           "type": "array"
         },
         "schema_version": {
-          "const": 1
+          "const": 2
         },
         "source_id": {
           "oneOf": [
@@ -973,7 +1060,7 @@
       "additionalProperties": false,
       "properties": {
         "schema_version": {
-          "const": 1
+          "const": 2
         },
         "source_items": {
           "items": {
@@ -996,7 +1083,7 @@
       "additionalProperties": false,
       "properties": {
         "schema_version": {
-          "const": 1
+          "const": 2
         },
         "sources": {
           "items": {
@@ -1061,7 +1148,7 @@
       "additionalProperties": false,
       "properties": {
         "schema_version": {
-          "const": 1
+          "const": 2
         },
         "topics": {
           "items": {
@@ -1084,7 +1171,7 @@
       ]
     }
   },
-  "$id": "https://phasetr.github.io/lattice-system/formalization-status/v1/schema.json",
+  "$id": "https://phasetr.github.io/lattice-system/formalization-status/v2/schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "oneOf": [
     {
