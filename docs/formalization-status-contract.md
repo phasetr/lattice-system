@@ -6,14 +6,14 @@ title: Formalization status data contract
 
 # Formalization status data contract
 
-Status: accepted prototype contract for Issue #5230. The version 1 catalogue has
+Status: accepted prototype contract for Issue #5230. The version 2 catalogue has
 `catalog_state: "prototype"` and is deliberately non-authoritative until the
 governance cutover in Issue #5228.
 
 ## Decision
 
 The project will maintain formalization status as versioned, source-first JSON
-records under `formalization-status/v1/`. A dependency-free validator enforces
+records under `formalization-status/v2/`. A dependency-free validator enforces
 the contract. Human source pages, topic indexes, status summaries, and the
 published machine aggregate will eventually be generated from those records.
 
@@ -68,7 +68,7 @@ After Issue #5228 completes the cutover, authority is divided as follows:
 | Subject | Authority after cutover | Derived or explanatory surfaces |
 |---|---|---|
 | Existence, kind, statement, and namespace of a Lean declaration | Lean source | Catalogue validation and generated pages |
-| Formalization status, capstone flag, source-item association, topics, and declared axiom dependencies | Validated `formalization-status/v1/` records | Human source/topic pages and machine aggregate |
+| Formalization status, capstone flag, source-item association, topics, and declared axiom dependencies | Validated `formalization-status/v2/` records | Human source/topic pages and machine aggregate |
 | Bibliographic identity and locator | `sources.json` and `source-items.json` | Citation text in generated pages |
 | Mathematical motivation, derivation, and proof explanation | `tex/proof-guide.tex` and hand-written explanatory docs | Links from generated pages |
 | Current and future project work | Tracking GitHub Issues and their synchronized mirrors | Roadmap summaries |
@@ -83,12 +83,12 @@ Until cutover, the first row above remains true, while formalization status and
 capstone authority remain in the losslessly partitioned
 `docs/formalization/legacy/` catalogue. Neither the landing page nor the JSON
 prototype is authoritative. The manifest therefore requires `catalog_state`
-and version 1 permits only `prototype` or `authoritative`.
+and version 2 permits only `prototype` or `authoritative`.
 
 ## Directory and sharding model
 
 ```text
-formalization-status/v1/
+formalization-status/v2/
   schema.json
   manifest.json
   sources.json
@@ -179,7 +179,7 @@ inside it are invalid, while prose outside the marker remains hand-written.
 They reject an
 extra or missing output, a path or permalink collision, a wrong projection
 link, or any missing/extra/reordered projection member. These human-rendering
-rules do not alter the version 1 manifest, canonical records, or machine API.
+rules do not alter the version 2 manifest, canonical records, or machine API.
 
 ## Registry model
 
@@ -232,15 +232,30 @@ Each declaration record contains exactly these fields:
 - `axiom_dependencies`: fully qualified non-standard axioms on which the
   declaration depends, sorted and duplicate-free;
 - `proof_guide_anchor`: stable explanatory anchor or `null` while no suitable
-  anchor exists.
+  anchor exists;
+- `lifecycle`: `active` or `retired`; a retired record's catalogue entry is
+  history rather than a live claim;
+- `retirement`: retirement evidence, or `null` while the record is active.
 
 The record ID is lowercase ASCII kebab case. It should describe the result,
 usually with a source prefix, for example
 `tasaki-2020-theorem-3-1-finite-dimensional-core`. It is immutable after
 publication. A Lean rename changes `lean_name`, `module`, and `source_path` but
 not `id`. If the mathematical identity changes materially, create a new ID and
-retain an explicit supersession mapping in the next schema revision rather
-than silently recycling the old ID.
+record the supersession on the superseded record rather than silently recycling
+the old ID.
+
+A published record ID is never deleted and never reused. When a declaration
+leaves the Lean tree, its record is retired: `lifecycle` becomes `retired`, and
+`retirement` records the reason, the sorted `superseded_by` record IDs (possibly
+none), and one 40-hex `last_present_commit` that is an ancestor of the current
+history and whose tree still declares the recorded Lean name at the recorded
+path. The record's Lean name, module, source path, and status dimensions are
+frozen as the historical description of that former declaration. A retired
+record keeps its stable ID, its canonical human route, and its projection
+fragments; it generates no Lean assertion; no active record may depend on it;
+and its Lean name is not available for reuse. Deleting a published record from
+the catalogue remains a breaking change.
 
 Lean names must be fully qualified and begin with `LatticeSystem.`. Valid Lean
 identifier segments may contain Unicode letters and apostrophes. Shorthand,
@@ -267,10 +282,17 @@ its `conditional_reduction` coverage records that it formalizes the
 finite-dimensional core rather than Tasaki's separate long-range-order
 estimate. `conditional_reduction` describes source coverage, not proof trust.
 
-Human views derive familiar labels without storing an overlapping `status`:
+`lifecycle` is a fourth, orthogonal axis. It records whether the catalogue entry
+is a live claim or history, and it does not change the meaning of the three
+status dimensions above: a retired record keeps the dimensions it had, now read
+as the description of a former declaration.
+
+Human views derive familiar labels without storing an overlapping `status`. The
+retired lifecycle takes precedence over the three-dimension derivation:
 
 | Machine combination | Human label |
 |---|---|
+| retired lifecycle | retired |
 | implemented theorem/lemma + axiom-free | proved |
 | implemented theorem/lemma + documented-axiom dependencies | proved with documented axioms |
 | implemented axiom + documented-axiom trust | documented axiom |
@@ -288,7 +310,7 @@ is not represented as a declaration record.
 A capstone is a declaration that represents a review/audit endpoint for a
 source result or major project result. It is a property of the catalogue record
 and has no naming convention. A capstone must be implemented and have complete
-or conditional-reduction source coverage.
+or conditional-reduction source coverage. A retired record is never a capstone.
 
 Every project axiom dependency uses a fully qualified name. The list excludes
 Lean's standard logical foundations such as `propext`, `Classical.choice`, and
@@ -479,9 +501,11 @@ Issue #5229 will implement, but may not silently alter, this interface:
   deployment permissions scoped to that job.
 - The stable human root is `/lattice-system/formalization/`.
 - The stable versioned machine aggregate is
-  `/lattice-system/formalization-status/v1/catalog.json`.
+  `/lattice-system/formalization-status/v2/catalog.json`.
 - The versioned schema is
-  `/lattice-system/formalization-status/v1/schema.json`.
+  `/lattice-system/formalization-status/v2/schema.json`.
+- Version 1's machine URLs are superseded by these version 2 paths at this
+  major bump and are no longer published.
 - A convenience pointer such as
   `/lattice-system/formalization-status/latest/catalog.json` may be additive,
   but versioned clients must not depend on it.
@@ -495,20 +519,20 @@ Issue #5229 will implement, but may not silently alter, this interface:
   evaluated separately from doc-gen4 and must not restore or invoke doc-gen4.
 
 The published machine path is an API contract. Removing fields, changing field
-meaning, weakening ID stability, or changing status-dimension semantics requires a new
-major directory (`v2`). Adding optional output fields may be additive, but
+meaning, weakening ID stability, or changing status-dimension semantics requires the
+next major directory. Adding optional output fields may be additive, but
 checked-in canonical input remains strict: the schema and validator must be
 updated together before a new field appears.
 
 ## Versioning and compatibility
 
-Within `v1`, these are additive changes:
+Within `v2`, these are additive changes:
 
 - adding sources, source items, topics, shards, or records;
 - adding a new optional generated-view field whose absence has defined meaning;
 - adding publication formats that do not change existing stable URLs.
 
-These are breaking changes and require `v2`:
+These are breaking changes and require the next major directory:
 
 - deleting or reusing a published stable ID;
 - changing the meaning of a status dimension, capstone, or axiom dependency;
@@ -516,6 +540,10 @@ These are breaking changes and require `v2`:
 - changing source-item identity so that a record refers to different
   mathematics;
 - removing or repurposing a stable machine URL.
+
+Retiring a record as described under “Declaration record” is not deletion: the
+stable ID, its canonical route, and its projection fragments all survive, so
+retirement is permitted within a major version.
 
 Corrections to spelling, summaries, locators, Lean names after a code rename,
 and module paths are compatible when stable identity and mathematical meaning
@@ -534,6 +562,14 @@ library and checks:
   that each imported declaration belongs to its recorded defining module;
 - source, source-item, topic, typed provenance, and source-origin integrity;
 - implementation/coverage/trust, kind, capstone, and resolved-axiom invariants;
+- retirement evidence: a retired record is not a capstone, its Lean name is
+  absent from the current tree, its `last_present_commit` is an ancestor of the
+  current history whose tree declares that name at the recorded path, and its
+  `superseded_by` IDs resolve to active records;
+- active-only gates: only active records generate Lean assertions, satisfy
+  representative prototype coverage, and may be named by another record's axiom
+  dependencies;
+- retention of every pinned prototype record ID;
 - representative prototype coverage across at least two Tasaki chapters and
   a typed non-Tasaki relation, with a proved capstone and a documented axiom;
 - deterministic aggregate generation and input digest.

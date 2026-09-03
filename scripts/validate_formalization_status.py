@@ -2393,13 +2393,9 @@ end LatticeSystem
         )
         check(bool(mutation_validation.errors), f"cutover certificate schema accepted {label}")
 
-    # -- status schema v2: retirement / lifecycle regressions (Issue #5424) -----------------
-    # `lifecycle`/`retirement` do not exist on the v1 schema yet (schema still bumps at
-    # commit 2), so every fixture below that adds those keys is rejected today by the
-    # existing `validation.keys` unknown-field gate. Each check therefore asserts on the
-    # *specific* future-facing message/behaviour (not merely `bool(errors)`), so the case
-    # exercises the intended retirement semantics rather than accidentally passing because
-    # of the unrelated unknown-field rejection.
+    # -- retirement / lifecycle regressions --------------------------------------------------
+    # Each check asserts on the specific retirement message rather than on `bool(errors)`,
+    # so a fixture cannot pass because of an unrelated structural rejection.
     def with_record_overrides(overrides: dict[str, Any]) -> dict[str, Any]:
         """Build a v2-shaped record fixture from the real Pauli-involution record."""
         record = copy.deepcopy(record_fixture)
@@ -2425,14 +2421,14 @@ end LatticeSystem
         )
         return record_validation.errors
 
-    v2_active_errors = record_errors(
+    active_record_errors = record_errors(
         with_record_overrides({"lifecycle": "active", "retirement": None}),
-        "v2-active-record",
+        "active-record",
     )
     check(
-        not v2_active_errors,
-        "v2 fixture with lifecycle=active/retirement=null was rejected (schema v2 not yet "
-        f"wired): {v2_active_errors}",
+        not active_record_errors,
+        "a record with lifecycle=active and retirement=null was rejected "
+        f"(positive control): {active_record_errors}",
     )
 
     retirement_evidence = {
@@ -2459,12 +2455,10 @@ end LatticeSystem
         f"was not rejected for the intended reason: {retired_but_present_errors}",
     )
 
-    # Every location string below is the neutral "fixture" on purpose: earlier drafts of
-    # this test used descriptive locations (e.g. "retired-capstone-record") whose own text
-    # happened to satisfy loose substring checks against the *unrelated* "unknown fields:
-    # lifecycle, retirement" message that the v1 schema already raises today — a false
-    # green for the wrong reason. Neutral locations plus multi-word phrase checks avoid
-    # that collision.
+    # The location strings below are the neutral "fixture" on purpose: a descriptive
+    # location (e.g. "retired-capstone-record") is echoed inside every error message for
+    # that record, so its own text can satisfy a substring check against an unrelated
+    # error — a green for the wrong reason.
     null_retirement_errors = record_errors(
         with_record_overrides({"lifecycle": "retired", "retirement": None}), "fixture"
     )
@@ -2498,8 +2492,8 @@ end LatticeSystem
         f"{retired_capstone_errors}",
     )
 
-    # Regression pin (existing v1 behaviour): an active record naming a nonexistent
-    # declaration is already rejected today; the retirement branch must not relax this.
+    # Regression pin: the retirement branch must not relax the active path, where a
+    # record naming a nonexistent declaration stays rejected.
     nonexistent_active_errors = record_errors(
         with_record_overrides({"lean_name": "LatticeSystem.Quantum.doesNotExistAnywhere"}),
         "nonexistent-active-record",
@@ -2673,37 +2667,29 @@ end LatticeSystem
         "PROTOTYPE_RECORD_IDS is not a subset of the real catalogue's record IDs "
         "(positive control on main)",
     )
-    # Negative control (design §5.1 item 1 / #5422): delete a pinned prototype record ID
-    # from the catalogue without adding a retirement entry. Design §4 requires a dedicated
-    # `validate_prototype_pin(record_ids, validation)` guard (imported PROTOTYPE_RECORD_IDS
-    # against the current catalogue's record IDs) to reject this. That guard does not exist
-    # in `main()` yet, so calling it is expected to fail; report that as a check failure
-    # (not an uncaught NameError) so the rest of the self-test suite keeps running.
+    # Negative control: retirement keeps a pinned prototype record in the catalogue, so
+    # dropping one of those IDs entirely must fail.
     catalogue_without_pinned_id_ids = {
         record.get("id")
         for record in all_records
         if record.get("id") != "shastry-1992-staggered-susceptibility-bound"
     }
-    prototype_pin_guard = globals().get("validate_prototype_pin")
-    if prototype_pin_guard is None:
-        check(False, "validate_prototype_pin (PROTOTYPE_RECORD_IDS subset guard) does not exist yet")
-    else:
-        missing_pin_validation = Validation()
-        prototype_pin_guard(catalogue_without_pinned_id_ids, missing_pin_validation)
-        check(
-            bool(missing_pin_validation.errors),
-            "deleting a PROTOTYPE_RECORD_IDS member from the catalogue without a "
-            f"retirement entry was accepted: {missing_pin_validation.errors}",
-        )
-        present_pin_validation = Validation()
-        prototype_pin_guard(
-            {record.get("id") for record in all_records}, present_pin_validation
-        )
-        check(
-            not present_pin_validation.errors,
-            "validate_prototype_pin rejected the real, complete catalogue record ID set "
-            f"(positive control): {present_pin_validation.errors}",
-        )
+    missing_pin_validation = Validation()
+    validate_prototype_pin(catalogue_without_pinned_id_ids, missing_pin_validation)
+    check(
+        bool(missing_pin_validation.errors),
+        "deleting a PROTOTYPE_RECORD_IDS member from the catalogue was accepted: "
+        f"{missing_pin_validation.errors}",
+    )
+    present_pin_validation = Validation()
+    validate_prototype_pin(
+        {record.get("id") for record in all_records}, present_pin_validation
+    )
+    check(
+        not present_pin_validation.errors,
+        "validate_prototype_pin rejected the real, complete catalogue record ID set "
+        f"(positive control): {present_pin_validation.errors}",
+    )
 
     retired_coverage_records = [
         {
@@ -2730,8 +2716,7 @@ end LatticeSystem
     check(
         bool(retired_coverage_validation.errors),
         "prototype coverage passed using only retired documented-axiom and capstone "
-        "records; validate_prototype_coverage does not yet filter to active records "
-        f"({retired_coverage_validation.errors})",
+        f"records: {retired_coverage_validation.errors}",
     )
 
     return failures
