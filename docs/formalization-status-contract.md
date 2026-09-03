@@ -575,8 +575,9 @@ library and checks:
   `main`; neither resolving is an error) whose tree declares that name at the
   recorded path, and its `superseded_by` IDs resolve to active records;
 - fail-closed absence of a retired Lean name: beyond the declaration matcher,
-  the retired record is rejected if its short name still occurs as a whole word
-  in any Lean source under `LatticeSystem/`;
+  the retired record is rejected if its short name still occurs in any Lean
+  source under `LatticeSystem/` delimited by Lean identifier boundaries, so that
+  `foo'` and `foo` count as distinct words;
 - active-only gates: only active records generate Lean assertions, satisfy
   representative prototype coverage, and may be named by another active record's
   axiom dependencies;

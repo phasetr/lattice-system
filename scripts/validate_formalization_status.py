@@ -1000,10 +1000,13 @@ def source_declares(path: Path, kind: str, lean_name: str) -> bool:
 def lean_leaf_mention(repo_root: Path, lean_name: str) -> str | None:
     """Return one Lean source that still spells the declaration's short name, if any."""
     leaf = lean_name.rsplit(".", 1)[-1]
-    pattern = re.compile(rf"\b{re.escape(leaf)}\b")
+    # A `\b` boundary cannot see a trailing `'`, which Lean identifiers and the schema's
+    # `lean_name` pattern both allow, so the delimiters spell out the identifier class.
+    identifier_chars = "A-Za-z0-9_'!?\u00c0-\uffff"
+    pattern = re.compile(f"(?<![{identifier_chars}]){re.escape(leaf)}(?![{identifier_chars}])")
     for source_path in sorted((repo_root / "LatticeSystem").rglob("*.lean")):
         try:
-            source = source_path.read_text(encoding="utf-8")
+            source = source_path.read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
         if pattern.search(source):
@@ -2125,9 +2128,13 @@ end LatticeSystem
     source_map = {item["id"]: item for item in fixture_sources["sources"]}
     item_map = {item["id"]: item for item in fixture_items["source_items"]}
     topic_map = {item["id"]: item for item in fixture_topics["topics"]}
-    record_fixture = json.loads(
+    ch02_records = json.loads(
         (root / "records/tasaki-2020-ch02.json").read_text(encoding="utf-8")
-    )["records"][0]
+    )["records"]
+    check(bool(ch02_records), "tasaki-2020-ch02.json holds no record to build fixtures from")
+    # An emptied shard must still reach the pinned-record check in the main validation rather
+    # than abort the run here.
+    record_fixture = ch02_records[0] if ch02_records else {"source_relations": []}
     collision_record = copy.deepcopy(record_fixture)
     collision_record.update(
         {
@@ -2779,12 +2786,10 @@ end LatticeSystem
         f"records: {retired_coverage_validation.errors}",
     )
 
-    # -- P2-1: validate_prototype_coverage must count only active records per shard ---------
-    # `tasaki_units` (validate_formalization_status.py:1428-1432) is derived straight from
-    # shard metadata, not from the active-only `records` list built two lines above it, so a
-    # shard whose records are all retired still counts toward "two Tasaki source units".
-    # Retiring every record in the tasaki-2020-ch02 and tasaki-2020-ch04 shards (leaving only
-    # tasaki-2020-ch03 as the sole active Tasaki record) reproduces review finding P2-1.
+    # -- prototype coverage counts only active records per shard ----------------------------
+    # A shard whose records are all retired must not count toward "two Tasaki source units",
+    # so retiring every record of the ch02 and ch04 shards leaves ch03 as the only active
+    # Tasaki unit and has to be rejected.
     tasaki_ch02_ch04_ids = {
         record.get("id")
         for shard_name, shard in all_shard_data
@@ -2794,7 +2799,7 @@ end LatticeSystem
     }
     check(
         bool(tasaki_ch02_ch04_ids),
-        "P2-1 fixture setup: tasaki-2020-ch02.json/tasaki-2020-ch04.json shard scan found no "
+        "fixture setup: tasaki-2020-ch02.json/tasaki-2020-ch04.json shard scan found no "
         "records (fixture is stale against the live catalogue)",
     )
     ch02_ch04_retired_records = [
@@ -2814,12 +2819,12 @@ end LatticeSystem
             "expected two Tasaki source units" in error
             for error in ch02_ch04_retired_validation.errors
         ),
-        "P2-1 regression: retiring every record in two of three Tasaki shards, leaving only "
+        "active-only coverage: retiring every record in two of three Tasaki shards, leaving "
         "chapter-03 active, was not rejected for the intended reason "
         f"(errors: {ch02_ch04_retired_validation.errors})",
     )
 
-    # -- P1-1 / P2-2: retirement guards exercised against a throwaway git repository --------
+    # -- retirement guards exercised against a throwaway git repository ----------------------
     # These fixtures must not depend on the live LatticeSystem/ tree state, so each builds a
     # dedicated two-commit temp repository under .self-local/tmp (never /tmp; sandbox policy).
     fixture_scratch_root = repo_root / ".self-local" / "tmp"
@@ -2846,12 +2851,10 @@ end LatticeSystem
         """Read the current HEAD commit ID of a fixture repository."""
         return fixture_git(["rev-parse", "HEAD"], cwd).stdout.strip()
 
-    # P1-1: the "declaration is gone" guard (:1197-1207) fails open when the parser
-    # (`lean_declaration_inventory`) does not recognize a still-live declaration's exact
-    # syntax. `nonrec theorem` is one measured miss (review report P1-1); a fixture commit
-    # spells the same declaration as a plain `theorem` first (matching a real
-    # `last_present_commit`), then a second commit adds `nonrec` while the declaration stays
-    # live in the tree.
+    # `lean_declaration_inventory` accepts a fixed modifier set only, and `nonrec theorem` is
+    # a measured miss, so the whole-word scan is what keeps the "declaration is gone" guard
+    # closed. The fixture commits the declaration as a plain `theorem` first (a real
+    # `last_present_commit`), then adds `nonrec` while it stays live in the tree.
     p1_repo_root = Path(
         tempfile.mkdtemp(prefix="retirement-fail-open-", dir=fixture_scratch_root)
     )
@@ -2884,7 +2887,7 @@ end LatticeSystem
                     "module": "LatticeSystem.FailOpenFixture",
                     "retirement": {
                         "last_present_commit": p1_last_present_commit,
-                        "reason": "fixture: P1-1 nonrec-theorem parser miss",
+                        "reason": "fixture: nonrec-theorem parser miss",
                         "superseded_by": [],
                     },
                     "source_path": "LatticeSystem/FailOpenFixture.lean",
@@ -2902,21 +2905,16 @@ end LatticeSystem
                 "still declared" in error and "LatticeSystem.gone" in error
                 for error in fail_open_validation.errors
             ),
-            "P1-1 regression: a retired record naming LatticeSystem.gone, which the tree "
-            "still declares as `nonrec theorem gone`, was accepted "
+            "live nonrec declaration: a retired record naming LatticeSystem.gone, which the "
+            "tree still declares as `nonrec theorem gone`, was accepted "
             f"(errors: {fail_open_validation.errors})",
         )
     finally:
         shutil.rmtree(p1_repo_root, ignore_errors=True)
 
-    # H1: `lean_leaf_mention`'s `\b...\b` pattern is a transition between a `\w` character and
-    # a non-`\w` character, but the schema's own `lean_name` pattern (`$defs.lean_name`)
-    # permits leaves that end in `'`, which is itself not a `\w` character. A trailing `\b`
-    # therefore cannot sit between that `'` and a following non-word delimiter, and the same
-    # non-`\w` treatment lets a `\b` match past the `'` into a following identifier character
-    # that should have excluded the mention. Probe both directions directly against
-    # `lean_leaf_mention`, mirroring the boundary set the schema uses for a Lean identifier
-    # (letters, digits, `_`, `'`, `!`, `?`, non-ASCII letters).
+    # The schema's `lean_name` pattern permits leaves ending in `'`, which `\b` treats as a
+    # non-word character in both directions, so the scan must delimit matches by the Lean
+    # identifier class instead: letters, digits, `_`, `'`, `!`, `?` and non-ASCII letters.
     h1_leaf_mention_root = Path(
         tempfile.mkdtemp(prefix="lean-leaf-mention-apostrophe-", dir=fixture_scratch_root)
     )
@@ -2935,16 +2933,15 @@ end LatticeSystem
             found = lean_leaf_mention(h1_leaf_mention_root, "LatticeSystem.gone'") is not None
             check(
                 found == expect_found,
-                "H1 regression: lean_leaf_mention(..., \"LatticeSystem.gone'\") against a "
+                "primed leaf name: lean_leaf_mention(..., \"LatticeSystem.gone'\") against a "
                 f"file containing {body!r} returned found={found}, expected {expect_found}",
             )
             h1_leaf_mention_probe.unlink()
     finally:
         shutil.rmtree(h1_leaf_mention_root, ignore_errors=True)
 
-    # H1: mirror the P1-1 fixture above through the full `validate_record` path, but for a
-    # Lean name whose leaf ends in `'`, so the same fail-open hole is visible at the point
-    # that actually gates a retirement, not only in the direct probe above.
+    # A primed leaf must also be caught where a retirement is actually gated, not only by the
+    # direct probe above, so the same tree is mirrored through `validate_record`.
     h1_repo_root = Path(
         tempfile.mkdtemp(prefix="retirement-fail-open-apostrophe-", dir=fixture_scratch_root)
     )
@@ -2977,7 +2974,7 @@ end LatticeSystem
                     "module": "LatticeSystem.FailOpenApostropheFixture",
                     "retirement": {
                         "last_present_commit": h1_last_present_commit,
-                        "reason": "fixture: H1 apostrophe-leaf boundary miss",
+                        "reason": "fixture: apostrophe-leaf boundary miss",
                         "superseded_by": [],
                     },
                     "source_path": "LatticeSystem/FailOpenApostropheFixture.lean",
@@ -2995,14 +2992,14 @@ end LatticeSystem
                 "still declared" in error and "LatticeSystem.gone'" in error
                 for error in h1_validation.errors
             ),
-            "H1 regression: a retired record naming LatticeSystem.gone', which the tree "
+            "primed leaf name: a retired record naming LatticeSystem.gone', which the tree "
             "still declares as `nonrec theorem gone'`, was accepted "
             f"(errors: {h1_validation.errors})",
         )
     finally:
         shutil.rmtree(h1_repo_root, ignore_errors=True)
 
-    # P2-2: `last_present_commit` ancestry must be checked against durable `main` history
+    # `last_present_commit` ancestry must be checked against durable `main` history
     # (`origin/main` if present, else `main`), never against `HEAD`. A commit that is only
     # reachable from a side branch must be rejected even though it is trivially an ancestor
     # of its own branch's HEAD.
@@ -3034,7 +3031,7 @@ end LatticeSystem
                     "lifecycle": "retired",
                     "retirement": {
                         "last_present_commit": commit,
-                        "reason": "fixture: P2-2 ancestry regression",
+                        "reason": "fixture: ancestry regression",
                         "superseded_by": [],
                     },
                     "source_path": None,
@@ -3050,7 +3047,7 @@ end LatticeSystem
         side_only_errors = ancestry_errors(side_only_commit)
         check(
             any("ancestor" in error for error in side_only_errors),
-            "P2-2 regression: a last_present_commit reachable only from a side branch "
+            "durable-history ancestry: a last_present_commit reachable only from a side branch "
             "(not from main) was accepted because ancestry was checked against HEAD "
             f"instead of main (errors: {side_only_errors})",
         )
@@ -3063,8 +3060,8 @@ end LatticeSystem
     finally:
         shutil.rmtree(p2_repo_root, ignore_errors=True)
 
-    # P2-2 (fail-closed clause): when neither `origin/main` nor `main` resolves, ancestry
-    # must be rejected outright, never silently skipped by falling back to HEAD.
+    # When neither `origin/main` nor `main` resolves, ancestry must be rejected outright,
+    # never silently skipped by falling back to HEAD.
     p2_no_main_repo_root = Path(
         tempfile.mkdtemp(prefix="retirement-ancestry-no-main-", dir=fixture_scratch_root)
     )
@@ -3083,7 +3080,7 @@ end LatticeSystem
                 "lifecycle": "retired",
                 "retirement": {
                     "last_present_commit": trunk_only_commit,
-                    "reason": "fixture: P2-2 no-resolvable-main regression",
+                    "reason": "fixture: no-resolvable-main regression",
                     "superseded_by": [],
                 },
                 "source_path": None,
@@ -3096,17 +3093,17 @@ end LatticeSystem
         )
         check(
             bool(no_main_validation.errors),
-            "P2-2 regression: a repository with neither `origin/main` nor `main` accepted "
-            "a last_present_commit by silently falling back to HEAD instead of "
+            "durable-history ancestry: a repository with neither `origin/main` nor `main` "
+            "accepted a last_present_commit by silently falling back to HEAD instead of "
             f"failing closed (errors: {no_main_validation.errors})",
         )
     finally:
         shutil.rmtree(p2_no_main_repo_root, ignore_errors=True)
 
-    # -- P2-3 / Tier-1 F1: schema.json must not contradict the frozen cutover validators or
-    # advertise a stale version number. `validate_cutover_baseline`/`validate_cutover_certificate`
-    # (scripts/formalization_cutover.py:412,908, frozen per #5422) reject any
-    # `schema_version` other than 1, so the schema's own const for those two $defs must stay 1.
+    # -- schema.json must agree with the frozen cutover validators --------------------------
+    # `validate_cutover_baseline` and `validate_cutover_certificate` reject any
+    # `schema_version` other than 1, so the schema's const for those two $defs stays 1 even
+    # though the catalogue itself is version 2, and the title must not advertise version 1.
     cutover_defs = contract.defs
     for def_name in ("cutover_baseline", "cutover_certificate"):
         schema_version_const = (
@@ -3114,19 +3111,19 @@ end LatticeSystem
         )
         check(
             schema_version_const == 1,
-            f"P2-3 regression: schema.json $defs.{def_name}.properties.schema_version.const "
+            f"cutover schema parity: schema.json $defs.{def_name}.properties.schema_version.const "
             f"is {schema_version_const!r}, not 1, contradicting the frozen "
             "formalization_cutover.py validators that require exactly 1",
         )
     check(
         "version 2" in contract.schema.get("title", "") and "version 1" not in contract.schema.get("title", ""),
-        "Tier-1 F1 regression: schema.json title does not say 'version 2' "
+        "schema title: schema.json title does not say 'version 2' "
         f"(got {contract.schema.get('title')!r})",
     )
 
-    # -- P3: git_capture must fail closed (not with an uncaught traceback) when git or the
-    # repository path is unavailable, and must decode subprocess output as UTF-8 regardless
-    # of the invoking process's locale.
+    # -- git_capture fails closed and decodes as UTF-8 --------------------------------------
+    # An unavailable git binary or repository path is a failed query rather than a traceback,
+    # and subprocess output must decode as UTF-8 whatever locale the caller runs under.
     try:
         missing_git_result = git_capture(
             Path("/nonexistent/formalization-status-fixture-path"), ["status"]
@@ -3140,7 +3137,7 @@ end LatticeSystem
         missing_git_error is None
         and isinstance(missing_git_result, subprocess.CompletedProcess)
         and missing_git_result.returncode != 0,
-        "P3 regression: git_capture against a nonexistent repository path raised an "
+        "git_capture: a nonexistent repository path raised an "
         f"uncaught OSError instead of returning a failed CompletedProcess: {missing_git_error!r}",
     )
     utf8_repo_root = Path(
@@ -3163,7 +3160,7 @@ end LatticeSystem
         )
         check(
             non_ascii_message in utf8_result.stdout,
-            "P3 fixture setup: git itself did not echo the non-ASCII commit message under "
+            "fixture setup: git itself did not echo the non-ASCII commit message under "
             f"LC_ALL=C (got {utf8_result.stdout!r})",
         )
         # `git_capture` takes no `env` argument, so the only way to exercise it under a
@@ -3174,7 +3171,7 @@ end LatticeSystem
             decoded = git_capture(utf8_repo_root, ["log", "-1", "--format=%s"])
         check(
             non_ascii_message in decoded.stdout,
-            "P3 regression: git_capture did not decode a non-ASCII commit subject as UTF-8 "
+            "git_capture: a non-ASCII commit subject was not decoded as UTF-8 "
             f"under LC_ALL=C (got {decoded.stdout!r})",
         )
     finally:

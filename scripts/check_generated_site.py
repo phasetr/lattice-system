@@ -3005,12 +3005,10 @@ def run_self_tests() -> None:
             "generated sidebar metadata still advertises a version 1 machine root"
         )
 
-    # -- design §5.2 items 12-13: a staged-site fixture containing a retired record ---------
-    # Every retirement check above exercises `record_lines`/`derived_human_label` in
-    # isolation; no fixture here previously ran the retired record through the actual staged
-    # generation pipeline (`create_dynamic_pages` + `replace_markers`), so the id<->page
-    # bijection (`check_staged_record_outputs`) was never proven end-to-end for a retired
-    # record. This closes that gap.
+    # -- a staged-site fixture containing a retired record -----------------------------------
+    # The retirement checks above exercise `record_lines`/`derived_human_label` in isolation,
+    # so the id<->page bijection (`check_staged_record_outputs`) is only proven for a retired
+    # record by driving it through the real staged pipeline.
     from generate_formalization_site import create_dynamic_pages, replace_markers
 
     staged_active_fixture = {**active_control_fixture, "id": "fixture-active-record"}
