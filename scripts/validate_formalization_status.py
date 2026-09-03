@@ -15,6 +15,7 @@ import sys
 import tempfile
 from pathlib import Path
 from typing import Any, Iterable
+from unittest.mock import patch
 
 from formalization_cutover import (
     CUTOVER_BASELINE_KEYS,
@@ -2908,6 +2909,99 @@ end LatticeSystem
     finally:
         shutil.rmtree(p1_repo_root, ignore_errors=True)
 
+    # H1: `lean_leaf_mention`'s `\b...\b` pattern is a transition between a `\w` character and
+    # a non-`\w` character, but the schema's own `lean_name` pattern (`$defs.lean_name`)
+    # permits leaves that end in `'`, which is itself not a `\w` character. A trailing `\b`
+    # therefore cannot sit between that `'` and a following non-word delimiter, and the same
+    # non-`\w` treatment lets a `\b` match past the `'` into a following identifier character
+    # that should have excluded the mention. Probe both directions directly against
+    # `lean_leaf_mention`, mirroring the boundary set the schema uses for a Lean identifier
+    # (letters, digits, `_`, `'`, `!`, `?`, non-ASCII letters).
+    h1_leaf_mention_root = Path(
+        tempfile.mkdtemp(prefix="lean-leaf-mention-apostrophe-", dir=fixture_scratch_root)
+    )
+    try:
+        h1_leaf_mention_dir = h1_leaf_mention_root / "LatticeSystem"
+        h1_leaf_mention_dir.mkdir(parents=True, exist_ok=True)
+        h1_leaf_mention_probe = h1_leaf_mention_dir / "Probe.lean"
+        h1_leaf_mention_cases = {
+            "(gone')": True,
+            "gone' ": True,
+            "agone'": False,
+            "gone'b": False,
+        }
+        for body, expect_found in h1_leaf_mention_cases.items():
+            h1_leaf_mention_probe.write_text(body + "\n", encoding="utf-8")
+            found = lean_leaf_mention(h1_leaf_mention_root, "LatticeSystem.gone'") is not None
+            check(
+                found == expect_found,
+                "H1 regression: lean_leaf_mention(..., \"LatticeSystem.gone'\") against a "
+                f"file containing {body!r} returned found={found}, expected {expect_found}",
+            )
+            h1_leaf_mention_probe.unlink()
+    finally:
+        shutil.rmtree(h1_leaf_mention_root, ignore_errors=True)
+
+    # H1: mirror the P1-1 fixture above through the full `validate_record` path, but for a
+    # Lean name whose leaf ends in `'`, so the same fail-open hole is visible at the point
+    # that actually gates a retirement, not only in the direct probe above.
+    h1_repo_root = Path(
+        tempfile.mkdtemp(prefix="retirement-fail-open-apostrophe-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], h1_repo_root)
+        h1_module = h1_repo_root / "LatticeSystem" / "FailOpenApostropheFixture.lean"
+        h1_module.parent.mkdir(parents=True, exist_ok=True)
+        h1_module.write_text(
+            "namespace LatticeSystem\n\ntheorem gone' : True := trivial\n\nend LatticeSystem\n",
+            encoding="utf-8",
+        )
+        fixture_git(["add", "LatticeSystem/FailOpenApostropheFixture.lean"], h1_repo_root)
+        fixture_git(["commit", "-q", "-m", "add gone' as a plain theorem"], h1_repo_root)
+        h1_last_present_commit = fixture_head(h1_repo_root)
+        h1_module.write_text(
+            "namespace LatticeSystem\n\nnonrec theorem gone' : True := trivial\n\n"
+            "end LatticeSystem\n",
+            encoding="utf-8",
+        )
+        fixture_git(["add", "LatticeSystem/FailOpenApostropheFixture.lean"], h1_repo_root)
+        fixture_git(["commit", "-q", "-m", "refactor gone' to nonrec theorem"], h1_repo_root)
+
+        h1_validation = Validation()
+        validate_record(
+            with_record_overrides(
+                {
+                    "declaration_kind": "theorem",
+                    "lean_name": "LatticeSystem.gone'",
+                    "lifecycle": "retired",
+                    "module": "LatticeSystem.FailOpenApostropheFixture",
+                    "retirement": {
+                        "last_present_commit": h1_last_present_commit,
+                        "reason": "fixture: H1 apostrophe-leaf boundary miss",
+                        "superseded_by": [],
+                    },
+                    "source_path": "LatticeSystem/FailOpenApostropheFixture.lean",
+                }
+            ),
+            "fail-open-apostrophe-fixture",
+            contract,
+            h1_repo_root,
+            item_map,
+            set(topic_map),
+            h1_validation,
+        )
+        check(
+            any(
+                "still declared" in error and "LatticeSystem.gone'" in error
+                for error in h1_validation.errors
+            ),
+            "H1 regression: a retired record naming LatticeSystem.gone', which the tree "
+            "still declares as `nonrec theorem gone'`, was accepted "
+            f"(errors: {h1_validation.errors})",
+        )
+    finally:
+        shutil.rmtree(h1_repo_root, ignore_errors=True)
+
     # P2-2: `last_present_commit` ancestry must be checked against durable `main` history
     # (`origin/main` if present, else `main`), never against `HEAD`. A commit that is only
     # reachable from a side branch must be rejected even though it is trivially an ancestor
@@ -3072,7 +3166,12 @@ end LatticeSystem
             "P3 fixture setup: git itself did not echo the non-ASCII commit message under "
             f"LC_ALL=C (got {utf8_result.stdout!r})",
         )
-        decoded = git_capture(utf8_repo_root, ["log", "-1", "--format=%s"])
+        # `git_capture` takes no `env` argument, so the only way to exercise it under a
+        # non-UTF-8 locale is to patch the *process* environment it inherits (`subprocess.run`
+        # reads `os.environ` at call time, not at import time, so a scoped `patch.dict` is
+        # sufficient and leaves the outer environment untouched).
+        with patch.dict(os.environ, {"LC_ALL": "C", "LANG": "C"}):
+            decoded = git_capture(utf8_repo_root, ["log", "-1", "--format=%s"])
         check(
             non_ascii_message in decoded.stdout,
             "P3 regression: git_capture did not decode a non-ASCII commit subject as UTF-8 "
