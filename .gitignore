@@ -15,3 +15,6 @@
 
 # personal working notes; never committed
 /.self-local/
+
+# untracked scratch dir (raw logs / API dumps); never committed
+/.tmp-im/
