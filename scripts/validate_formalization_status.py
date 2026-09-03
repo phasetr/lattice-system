@@ -2855,27 +2855,27 @@ end LatticeSystem
     # a measured miss, so the whole-word scan is what keeps the "declaration is gone" guard
     # closed. The fixture commits the declaration as a plain `theorem` first (a real
     # `last_present_commit`), then adds `nonrec` while it stays live in the tree.
-    p1_repo_root = Path(
+    hidden_decl_root = Path(
         tempfile.mkdtemp(prefix="retirement-fail-open-", dir=fixture_scratch_root)
     )
     try:
-        fixture_git(["init", "-q", "-b", "main"], p1_repo_root)
-        p1_module = p1_repo_root / "LatticeSystem" / "FailOpenFixture.lean"
-        p1_module.parent.mkdir(parents=True, exist_ok=True)
-        p1_module.write_text(
+        fixture_git(["init", "-q", "-b", "main"], hidden_decl_root)
+        hidden_decl_module = hidden_decl_root / "LatticeSystem" / "FailOpenFixture.lean"
+        hidden_decl_module.parent.mkdir(parents=True, exist_ok=True)
+        hidden_decl_module.write_text(
             "namespace LatticeSystem\n\ntheorem gone : True := trivial\n\nend LatticeSystem\n",
             encoding="utf-8",
         )
-        fixture_git(["add", "LatticeSystem/FailOpenFixture.lean"], p1_repo_root)
-        fixture_git(["commit", "-q", "-m", "add gone as a plain theorem"], p1_repo_root)
-        p1_last_present_commit = fixture_head(p1_repo_root)
-        p1_module.write_text(
+        fixture_git(["add", "LatticeSystem/FailOpenFixture.lean"], hidden_decl_root)
+        fixture_git(["commit", "-q", "-m", "add gone as a plain theorem"], hidden_decl_root)
+        hidden_decl_last_present_commit = fixture_head(hidden_decl_root)
+        hidden_decl_module.write_text(
             "namespace LatticeSystem\n\nnonrec theorem gone : True := trivial\n\n"
             "end LatticeSystem\n",
             encoding="utf-8",
         )
-        fixture_git(["add", "LatticeSystem/FailOpenFixture.lean"], p1_repo_root)
-        fixture_git(["commit", "-q", "-m", "refactor gone to nonrec theorem"], p1_repo_root)
+        fixture_git(["add", "LatticeSystem/FailOpenFixture.lean"], hidden_decl_root)
+        fixture_git(["commit", "-q", "-m", "refactor gone to nonrec theorem"], hidden_decl_root)
 
         fail_open_validation = Validation()
         validate_record(
@@ -2886,7 +2886,7 @@ end LatticeSystem
                     "lifecycle": "retired",
                     "module": "LatticeSystem.FailOpenFixture",
                     "retirement": {
-                        "last_present_commit": p1_last_present_commit,
+                        "last_present_commit": hidden_decl_last_present_commit,
                         "reason": "fixture: nonrec-theorem parser miss",
                         "superseded_by": [],
                     },
@@ -2895,7 +2895,7 @@ end LatticeSystem
             ),
             "fail-open-nonrec-fixture",
             contract,
-            p1_repo_root,
+            hidden_decl_root,
             item_map,
             set(topic_map),
             fail_open_validation,
@@ -2910,61 +2910,61 @@ end LatticeSystem
             f"(errors: {fail_open_validation.errors})",
         )
     finally:
-        shutil.rmtree(p1_repo_root, ignore_errors=True)
+        shutil.rmtree(hidden_decl_root, ignore_errors=True)
 
     # The schema's `lean_name` pattern permits leaves ending in `'`, which `\b` treats as a
     # non-word character in both directions, so the scan must delimit matches by the Lean
     # identifier class instead: letters, digits, `_`, `'`, `!`, `?` and non-ASCII letters.
-    h1_leaf_mention_root = Path(
+    primed_leaf_root = Path(
         tempfile.mkdtemp(prefix="lean-leaf-mention-apostrophe-", dir=fixture_scratch_root)
     )
     try:
-        h1_leaf_mention_dir = h1_leaf_mention_root / "LatticeSystem"
-        h1_leaf_mention_dir.mkdir(parents=True, exist_ok=True)
-        h1_leaf_mention_probe = h1_leaf_mention_dir / "Probe.lean"
-        h1_leaf_mention_cases = {
+        primed_leaf_dir = primed_leaf_root / "LatticeSystem"
+        primed_leaf_dir.mkdir(parents=True, exist_ok=True)
+        primed_leaf_probe = primed_leaf_dir / "Probe.lean"
+        primed_leaf_cases = {
             "(gone')": True,
             "gone' ": True,
             "agone'": False,
             "gone'b": False,
         }
-        for body, expect_found in h1_leaf_mention_cases.items():
-            h1_leaf_mention_probe.write_text(body + "\n", encoding="utf-8")
-            found = lean_leaf_mention(h1_leaf_mention_root, "LatticeSystem.gone'") is not None
+        for body, expect_found in primed_leaf_cases.items():
+            primed_leaf_probe.write_text(body + "\n", encoding="utf-8")
+            found = lean_leaf_mention(primed_leaf_root, "LatticeSystem.gone'") is not None
             check(
                 found == expect_found,
                 "primed leaf name: lean_leaf_mention(..., \"LatticeSystem.gone'\") against a "
                 f"file containing {body!r} returned found={found}, expected {expect_found}",
             )
-            h1_leaf_mention_probe.unlink()
+            primed_leaf_probe.unlink()
     finally:
-        shutil.rmtree(h1_leaf_mention_root, ignore_errors=True)
+        shutil.rmtree(primed_leaf_root, ignore_errors=True)
 
     # A primed leaf must also be caught where a retirement is actually gated, not only by the
     # direct probe above, so the same tree is mirrored through `validate_record`.
-    h1_repo_root = Path(
+    primed_repo_root = Path(
         tempfile.mkdtemp(prefix="retirement-fail-open-apostrophe-", dir=fixture_scratch_root)
     )
     try:
-        fixture_git(["init", "-q", "-b", "main"], h1_repo_root)
-        h1_module = h1_repo_root / "LatticeSystem" / "FailOpenApostropheFixture.lean"
-        h1_module.parent.mkdir(parents=True, exist_ok=True)
-        h1_module.write_text(
+        fixture_git(["init", "-q", "-b", "main"], primed_repo_root)
+        primed_module = primed_repo_root / "LatticeSystem" / "FailOpenApostropheFixture.lean"
+        primed_module.parent.mkdir(parents=True, exist_ok=True)
+        primed_module.write_text(
             "namespace LatticeSystem\n\ntheorem gone' : True := trivial\n\nend LatticeSystem\n",
             encoding="utf-8",
         )
-        fixture_git(["add", "LatticeSystem/FailOpenApostropheFixture.lean"], h1_repo_root)
-        fixture_git(["commit", "-q", "-m", "add gone' as a plain theorem"], h1_repo_root)
-        h1_last_present_commit = fixture_head(h1_repo_root)
-        h1_module.write_text(
+        fixture_git(["add", "LatticeSystem/FailOpenApostropheFixture.lean"], primed_repo_root)
+        fixture_git(["commit", "-q", "-m", "add gone' as a plain theorem"], primed_repo_root)
+        primed_last_present_commit = fixture_head(primed_repo_root)
+        primed_module.write_text(
             "namespace LatticeSystem\n\nnonrec theorem gone' : True := trivial\n\n"
             "end LatticeSystem\n",
             encoding="utf-8",
         )
-        fixture_git(["add", "LatticeSystem/FailOpenApostropheFixture.lean"], h1_repo_root)
-        fixture_git(["commit", "-q", "-m", "refactor gone' to nonrec theorem"], h1_repo_root)
+        fixture_git(["add", "LatticeSystem/FailOpenApostropheFixture.lean"], primed_repo_root)
+        fixture_git(["commit", "-q", "-m", "refactor gone' to nonrec theorem"], primed_repo_root)
 
-        h1_validation = Validation()
+        primed_validation = Validation()
         validate_record(
             with_record_overrides(
                 {
@@ -2973,7 +2973,7 @@ end LatticeSystem
                     "lifecycle": "retired",
                     "module": "LatticeSystem.FailOpenApostropheFixture",
                     "retirement": {
-                        "last_present_commit": h1_last_present_commit,
+                        "last_present_commit": primed_last_present_commit,
                         "reason": "fixture: apostrophe-leaf boundary miss",
                         "superseded_by": [],
                     },
@@ -2982,41 +2982,41 @@ end LatticeSystem
             ),
             "fail-open-apostrophe-fixture",
             contract,
-            h1_repo_root,
+            primed_repo_root,
             item_map,
             set(topic_map),
-            h1_validation,
+            primed_validation,
         )
         check(
             any(
                 "still declared" in error and "LatticeSystem.gone'" in error
-                for error in h1_validation.errors
+                for error in primed_validation.errors
             ),
             "primed leaf name: a retired record naming LatticeSystem.gone', which the tree "
             "still declares as `nonrec theorem gone'`, was accepted "
-            f"(errors: {h1_validation.errors})",
+            f"(errors: {primed_validation.errors})",
         )
     finally:
-        shutil.rmtree(h1_repo_root, ignore_errors=True)
+        shutil.rmtree(primed_repo_root, ignore_errors=True)
 
     # `last_present_commit` ancestry must be checked against durable `main` history
     # (`origin/main` if present, else `main`), never against `HEAD`. A commit that is only
     # reachable from a side branch must be rejected even though it is trivially an ancestor
     # of its own branch's HEAD.
-    p2_repo_root = Path(
+    side_branch_repo_root = Path(
         tempfile.mkdtemp(prefix="retirement-ancestry-", dir=fixture_scratch_root)
     )
     try:
-        fixture_git(["init", "-q", "-b", "main"], p2_repo_root)
-        (p2_repo_root / "trunk.txt").write_text("trunk\n", encoding="utf-8")
-        fixture_git(["add", "trunk.txt"], p2_repo_root)
-        fixture_git(["commit", "-q", "-m", "trunk commit"], p2_repo_root)
-        main_commit = fixture_head(p2_repo_root)
-        fixture_git(["checkout", "-q", "-b", "side"], p2_repo_root)
-        (p2_repo_root / "side.txt").write_text("side\n", encoding="utf-8")
-        fixture_git(["add", "side.txt"], p2_repo_root)
-        fixture_git(["commit", "-q", "-m", "side-only commit"], p2_repo_root)
-        side_only_commit = fixture_head(p2_repo_root)
+        fixture_git(["init", "-q", "-b", "main"], side_branch_repo_root)
+        (side_branch_repo_root / "trunk.txt").write_text("trunk\n", encoding="utf-8")
+        fixture_git(["add", "trunk.txt"], side_branch_repo_root)
+        fixture_git(["commit", "-q", "-m", "trunk commit"], side_branch_repo_root)
+        main_commit = fixture_head(side_branch_repo_root)
+        fixture_git(["checkout", "-q", "-b", "side"], side_branch_repo_root)
+        (side_branch_repo_root / "side.txt").write_text("side\n", encoding="utf-8")
+        fixture_git(["add", "side.txt"], side_branch_repo_root)
+        fixture_git(["commit", "-q", "-m", "side-only commit"], side_branch_repo_root)
+        side_only_commit = fixture_head(side_branch_repo_root)
 
         side_records_by_id: dict[str, dict[str, Any]] = {}
 
@@ -3038,7 +3038,7 @@ end LatticeSystem
                 },
                 "fixture",
                 contract,
-                p2_repo_root,
+                side_branch_repo_root,
                 side_records_by_id,
                 ancestry_validation,
             )
@@ -3058,19 +3058,19 @@ end LatticeSystem
             f"(positive control): {main_commit_errors}",
         )
     finally:
-        shutil.rmtree(p2_repo_root, ignore_errors=True)
+        shutil.rmtree(side_branch_repo_root, ignore_errors=True)
 
     # When neither `origin/main` nor `main` resolves, ancestry must be rejected outright,
     # never silently skipped by falling back to HEAD.
-    p2_no_main_repo_root = Path(
+    no_durable_main_repo_root = Path(
         tempfile.mkdtemp(prefix="retirement-ancestry-no-main-", dir=fixture_scratch_root)
     )
     try:
-        fixture_git(["init", "-q", "-b", "trunk"], p2_no_main_repo_root)
-        (p2_no_main_repo_root / "trunk.txt").write_text("trunk\n", encoding="utf-8")
-        fixture_git(["add", "trunk.txt"], p2_no_main_repo_root)
-        fixture_git(["commit", "-q", "-m", "trunk-only commit"], p2_no_main_repo_root)
-        trunk_only_commit = fixture_head(p2_no_main_repo_root)
+        fixture_git(["init", "-q", "-b", "trunk"], no_durable_main_repo_root)
+        (no_durable_main_repo_root / "trunk.txt").write_text("trunk\n", encoding="utf-8")
+        fixture_git(["add", "trunk.txt"], no_durable_main_repo_root)
+        fixture_git(["commit", "-q", "-m", "trunk-only commit"], no_durable_main_repo_root)
+        trunk_only_commit = fixture_head(no_durable_main_repo_root)
         no_main_validation = Validation()
         validate_retirement(
             {
@@ -3087,7 +3087,7 @@ end LatticeSystem
             },
             "fixture",
             contract,
-            p2_no_main_repo_root,
+            no_durable_main_repo_root,
             {},
             no_main_validation,
         )
@@ -3098,7 +3098,7 @@ end LatticeSystem
             f"failing closed (errors: {no_main_validation.errors})",
         )
     finally:
-        shutil.rmtree(p2_no_main_repo_root, ignore_errors=True)
+        shutil.rmtree(no_durable_main_repo_root, ignore_errors=True)
 
     # -- schema.json must agree with the frozen cutover validators --------------------------
     # `validate_cutover_baseline` and `validate_cutover_certificate` reject any
