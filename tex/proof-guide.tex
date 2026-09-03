@@ -13064,6 +13064,72 @@ every instance.  A one-sided numeric endpoint is blind to a wrongly large right-
 strict instance routes through an intermediate step spelling the constant and radicand out
 syntactically.
 
+\noindent\textbf{The §3.4 setting at the antiferromagnetic ring, eqs.~(3.4.4) and~(3.4.16)}
+(Tasaki~\cite{Tasaki:QMB} §3.4, ``Setting and assumptions'', eqs.~(3.4.1)--(3.4.4) and footnote~21
+p.~65, eqs.~(3.4.14)--(3.4.16) p.~68; §4.1, eq.~(4.1.9) p.~76 and Corollary~4.3 p.~77; §6.1,
+eq.~(6.1.1) p.~153; \textbf{proved axiom-free},
+\texttt{Quantum/SpinS/HorschVonderLindenAfmRing.lean} and
+\texttt{Quantum/SpinS/AndersonTowerTanakaMoments.lean}, fixtures in
+\texttt{Tests/Corollary43RingSetup.lean}).  \emph{No discharge, and no axiom deleted.}  Nothing
+here proves Corollary~4.3 or Theorem~4.2 and no documented axiom is removed:
+\texttt{no\_long\_range\_order\_1d} still reports
+\texttt{shastry\_staggered\_susceptibility\_subcubic} in its axiom set,
+\texttt{shastry\_no\_symmetry\_breaking\_1d} still reports \texttt{shastryEnergyGain}, and both
+capstone statements are unchanged.  What is added are the two order-operator inputs an
+unconditional Corollary~4.3 route would need.  The no-SSB condition~(3.4.4) at the ring is
+footnote~21 of p.~65 taken at $\hat U:=\Theta$, the many-body spin reversal: $\Theta$ commutes with
+the ring Hamiltonian and reverses the staggered order operator, so on a ground state whose energy
+eigenspace is at most one-dimensional $\Theta$ acts as a sign $\delta=\pm1$ and every odd moment
+equals its own negative --- the same input Tasaki's own proof of Corollary~4.3 draws from
+Marshall--Lieb--Mattis.  \texttt{afm\_ring\_staggeredOrderOpS\_odd\_moments\_vanish} states both
+odd moments at once and assumes only $\Phi\neq0$, not normalization.  The repository already
+carried the general spin-$S$ reversal involution \texttt{manyBodyReversalS} and the linear
+conjugation \texttt{manyBodyReversalS\_conj\_staggeredOrderOpS}, so the only new conjugation is the
+cube \texttt{manyBodyReversalS\_conj\_staggeredOrderOpS\_cube},
+$\Theta(\hat O_L^{(3)})^3\Theta=-(\hat O_L^{(3)})^3$, obtained from the linear case because
+conjugation by an involution is multiplicative.  Two spellings of the ring Hamiltonian meet here
+and are not syntactically equal: §4.1's \texttt{staggeredFieldChainHamiltonianS L 0 N} (eq.~(4.1.9)
+at $h=0$) and §6.1's \texttt{afmHeisenbergChainHamiltonianS L N} (eq.~(6.1.1)) differ by a
+\texttt{zero\_smul}/\texttt{sub\_zero} step, now the named lemma
+\texttt{staggeredFieldChainHamiltonianS\_zero\_eq\_afmHeisenberg} rather than an inline step inside
+one proof.  The ring reading of eq.~(3.4.16),
+\texttt{tasaki\_eq\_3\_4\_16\_afmRing\_ssb\_fromGroundState}, is definitional rather than a
+restatement: it is \texttt{tasaki\_eq\_3\_4\_16\_lowLyingState\_ssb} applied at
+$\Lambda:=\mathrm{Fin}\,L$, at the ring's staggered per-site term $\hat o_x=(-1)^x\hat S_x^{(3)}$,
+whose sum over the ring is \texttt{staggeredOrderOpS (ringStaggeredSublattice L) N} by unfolding
+that definition, and at the ring's own bond decomposition --- bond set all of $\mathrm{Fin}\,L$
+with $\hat h_x=\hat{\mathbf S}_x\cdot\hat{\mathbf S}_{x+1}$ supported on $\{x,x+1\}$, $d=1$, and
+the p.~65 norms at the \emph{bound} values $h_0=3N^2$ and $o_0=N/2$.  Tasaki defines $h_0$ and
+$o_0$ by equality on p.~65, whereas what is available here are upper bounds, the ones
+\texttt{spinSDot\_manyBodyOperatorNormS\_le} and
+\texttt{onSiteS\_spinSOp3\_manyBodyOperatorNormS\_le} prove at spin $S=N/2$, with $3N^2$ in
+particular loose because that bound weakens $S\le N$ inside a three-term sum; only the bound
+direction is used, and both values stand in the printed energy bound rather than inside the proof.
+Its caller supplies only the ring size, the spin, the guards, the ground-state data
+\texttt{afm\_ring\_ground\_state\_data} produces, the normalization of that state and
+assumption~(3.4.3), under the guards $\mathrm{Even}\,L$, $2\le L$, $1\le N$ that supplier itself
+requires: ring ground-state uniqueness is proved only for the even, connected-bipartite ring.  The
+generic capstone's own volume guard $1\le L$ (from $2\le L$), the bond-sum form of the Hamiltonian
+with its Hermiticity and eigenvector equation, Hermiticity of $\hat O_L$, the two commutation
+obligations, both norm bounds, the bond and volume counts, the variational minimality of
+$E_{\mathrm{GS}}$ through the minimum eigenvalue, and the two odd moments are all derived.
+Normalization is a genuine assumption rather than an omission:
+\texttt{afm\_ring\_ground\_state\_data} delivers only $\Phi_{\mathrm{GS}}\neq0$,
+$\langle\Xi_+|\Xi_+\rangle=1$ fails for an unnormalized $\Phi_{\mathrm{GS}}$, and Tasaki assumes it
+too on p.~65.  The energy conjuncts are spelled with the bond sum while the hypotheses are spelled
+with \texttt{afmHeisenbergChainHamiltonianS L N}: the two agree only through
+\texttt{heisenbergHamiltonianS\_ringCoupling\_eq\_bondSum\_general}, not definitionally, and the
+bond-sum spelling is what makes the statement \emph{be} the generic capstone's own at the ring
+data; a caller wanting the other spelling rewrites with the same lemma.  Fixtures: signature pins
+on the cube conjugation and on both ring declarations; the cube lemma consumed in exactly the shape
+the third-moment proof consumes it; the odd-moment declaration fed directly from
+\texttt{afm\_ring\_ground\_state\_data}'s output; and, for the eq.~(3.4.16) reading, an equation
+with the generic capstone applied at the ring data, closed by \texttt{rfl}.  Both sides of such an
+equation are proofs of propositions, so definitional proof irrelevance makes \texttt{rfl} succeed
+exactly when the two statements are definitionally equal: that fixture detects statement drift and
+cannot see how the theorem is proved.  No odd-$L$, $L<2$ or $N=0$ boundary instance is pinned,
+those exclusions being structural (the hypotheses themselves) rather than computed edges.
+
 \noindent\textbf{The mirror state $\Xi_-$, pp.~68--69} (Tasaki~\cite{Tasaki:QMB} §3.4, the
 sentence beginning ``Of course the state $|\Xi_-\rangle=(|\Phi_{\mathrm{GS}}\rangle-|\Gamma\rangle)
 /\sqrt2$ \ldots'' on p.~68, the same page as eqs.~(3.4.14) and~(3.4.16); \textbf{discharged

@@ -27,11 +27,9 @@ import LatticeSystem.Quantum.HorschVonderLinden
 import LatticeSystem.Quantum.KaplanHorschVonderLinden
 import LatticeSystem.Quantum.HorschVonderLindenEnergyBound
 import LatticeSystem.Quantum.HorschVonderLindenProblem34b
-import LatticeSystem.Quantum.HorschVonderLindenLowLyingState
 import LatticeSystem.Quantum.KaplanHorschVonderLindenTheorem32
 import LatticeSystem.Quantum.SpinS.FalkBruchInfra
 import LatticeSystem.Quantum.SpinS.NoLongRangeOrder1D
-import LatticeSystem.Quantum.SpinS.ShastryNoSSBReduction
 import LatticeSystem.Quantum.SpinS.MPSTheorem75
 import LatticeSystem.Quantum.SpinS.AKLTMatrixProduct
 import LatticeSystem.Quantum.SpinS.AKLTInfiniteChain
@@ -132,6 +130,7 @@ import LatticeSystem.Quantum.SpinS.SaturatedCoherentExpansion
 import LatticeSystem.Quantum.SpinS.LocalDoubleCommutatorBound
 import LatticeSystem.Quantum.IsingLowEnergyProblem33aCapstone
 import LatticeSystem.Quantum.SpinS.RangeLocalDoubleCommutatorBound
+import LatticeSystem.Quantum.SpinS.HorschVonderLindenAfmRing
 
 /-!
 # `lattice-system` library root

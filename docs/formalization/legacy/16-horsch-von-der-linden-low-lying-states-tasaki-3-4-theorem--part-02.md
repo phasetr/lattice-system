@@ -93,6 +93,14 @@ permalink: /formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasak
 
 <!-- legacy-source:end:653:729 -->
 
+**Addendum (outside the frozen block above).** The `Quantum/SpinS/AndersonTowerTanakaMoments.lean`
+row above, frozen at the byte-for-byte parity this migrated block requires, enumerates that file's
+reversal-conjugation declarations as of the migration baseline. The file has since gained one more,
+`manyBodyReversalS_conj_staggeredOrderOpS_cube` (`Θ (Ô^{(3)})³ Θ = −(Ô^{(3)})³`), which serves
+Tasaki's no-SSB condition (3.4.4), p. 65, at odd power `n = 3` rather than §4.2.2. See part 4 of
+this catalogue chunk, section "The §3.4 setting at the antiferromagnetic ring, eqs. (3.4.4) and
+(3.4.16)", for its statement and status.
+
 ---
 
 [← Horsch–von der Linden low-lying states (Tasaki §3.4, Theorem 3.1)](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-01/) · [Catalogue](/lattice-system/formalization/legacy/) · [Horsch–von der Linden low-lying states (Tasaki §3.4, Theorem 3.1) →](/lattice-system/formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-03/)

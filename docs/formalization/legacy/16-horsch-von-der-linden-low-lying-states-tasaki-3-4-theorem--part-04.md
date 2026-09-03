@@ -72,6 +72,91 @@ true for every instance. Since a one-sided numeric endpoint is blind to a wrongl
 side, the strict eq. (3.4.17) instance routes through an intermediate step that spells the constant
 and the radicand out syntactically.
 
+## The §3.4 setting at the antiferromagnetic ring, eqs. (3.4.4) and (3.4.16)
+
+This section is maintained by hand, lies outside the migrated catalogue block, and records
+declarations added after the migration baseline; it is not subject to the frozen byte-for-byte
+parity of the migrated block.
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4, "Setting and
+assumptions", eqs. (3.4.1)-(3.4.4) and footnote 21, p. 65, and eqs. (3.4.14)-(3.4.16), p. 68;
+§4.1, eq. (4.1.9), p. 76, and Corollary 4.3, p. 77; §6.1, eq. (6.1.1), p. 153.
+
+**No discharge, and no axiom deleted.** Nothing in this section proves Corollary 4.3 or
+Theorem 4.2, and no documented axiom is removed: `no_long_range_order_1d` still reports
+`shastry_staggered_susceptibility_subcubic` in its axiom set, `shastry_no_symmetry_breaking_1d`
+still reports `shastryEnergyGain`, and both capstone statements are unchanged. What is added are
+the two order-operator inputs an unconditional Corollary 4.3 route would need — the no-SSB
+condition (3.4.4) at the ring, and eq. (3.4.16) read at the ring order operator. Assembling them
+into such a route is tracked in
+[#5416](https://github.com/phasetr/lattice-system/issues/5416).
+
+The no-SSB condition (3.4.4) at the ring is footnote 21 of p. 65 taken at `Û := Θ`, the many-body
+spin reversal: `Θ` commutes with the ring Hamiltonian and reverses the staggered order operator, so
+on a ground state whose energy eigenspace is at most one-dimensional the reversal acts as a sign
+`δ = ±1` and every odd moment equals its own negative. This is the same input Tasaki's own proof of
+Corollary 4.3 (p. 77) draws from the Marshall–Lieb–Mattis theorem. Only `Φ ≠ 0` is used, not
+normalisation. The repository already carried the general spin-`S` reversal involution
+`manyBodyReversalS` and the linear conjugation `manyBodyReversalS_conj_staggeredOrderOpS`, so the
+only new conjugation is the cube.
+
+Two spellings of the ring Hamiltonian meet here and are not syntactically equal: §4.1's
+`staggeredFieldChainHamiltonianS L 0 N` (eq. (4.1.9) at `h = 0`) and §6.1's
+`afmHeisenbergChainHamiltonianS L N` (eq. (6.1.1)) differ by a `zero_smul`/`sub_zero` step, which
+is now a named lemma rather than an inline step inside one proof.
+
+The ring reading of eq. (3.4.16) is definitional rather than a restatement: it is the generic
+capstone `tasaki_eq_3_4_16_lowLyingState_ssb` applied at `Λ := Fin L` and at the ring's staggered
+per-site term `ô_x = (−1)^x Ŝ_x^{(3)}`, whose sum over the ring is
+`staggeredOrderOpS (ringStaggeredSublattice L) N` by unfolding that definition. The Hamiltonian
+side, `tasaki_eq_3_4_16_afmRing_ssb_fromGroundState`, is instantiated at the ring too: the bond set
+is all of `Fin L` with `ĥ_x = Ŝ_x · Ŝ_{x+1}` supported on `{x, x+1}`, the dimension is `d = 1`, and
+the two norms of p. 65 are carried at the *bound* values `h₀ = 3N²` and `o₀ = N/2`. Tasaki defines
+`h₀` and `o₀` by equality on p. 65, whereas what is available here are upper bounds — the ones
+`spinSDot_manyBodyOperatorNormS_le` and `onSiteS_spinSOp3_manyBodyOperatorNormS_le` prove at spin
+`S = N/2`, `3N²` in particular being loose, since it weakens `S ≤ N` inside a three-term sum. Only
+the bound direction is used, and both values stand in the printed energy bound rather than inside
+the proof. The caller then supplies only the ring size, the spin, the guards, the ground-state data
+`afm_ring_ground_state_data` produces, the normalisation of that state, and the long-range-order
+assumption (3.4.3), under the guards `Even L`, `2 ≤ L`, `1 ≤ N` that supplier itself requires: ring
+ground-state uniqueness is proved only for the even, connected-bipartite ring. Everything else the
+generic capstone asks for is derived here: its own volume guard `1 ≤ L` (from `2 ≤ L`), the
+bond-sum form of the ring Hamiltonian and with it its Hermiticity and the eigenvector equation,
+Hermiticity of `Ô_L`, the locality of a bond against the off-bond order terms and of the order
+terms against each other, both norm bounds, the bond and volume counts, the variational minimality
+of `E_GS` obtained from `IsGroundEnergy` through the minimum eigenvalue, and the two odd moments.
+Normalisation is a genuine assumption rather than an omission: `afm_ring_ground_state_data`
+delivers only `Φ_GS ≠ 0`, `⟨Ξ₊|Ξ₊⟩ = 1` fails for an unnormalised `Φ_GS`, and Tasaki assumes it too
+on p. 65.
+
+The energy conjuncts are spelled with the bond sum while the hypotheses are spelled with
+`afmHeisenbergChainHamiltonianS L N`. The two agree only through
+`heisenbergHamiltonianS_ringCoupling_eq_bondSum_general`, not definitionally, and the bond-sum
+spelling is what makes the statement *be* the generic capstone's own at the ring data; restating
+the conclusion over `afmHeisenbergChainHamiltonianS` makes the two sides different propositions and
+loses that. A caller wanting that spelling rewrites with the same lemma.
+
+All declarations below are **PROVED**; `#print axioms` on each yields only `propext`,
+`Classical.choice`, `Quot.sound`.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `manyBodyReversalS_conj_staggeredOrderOpS_cube` | the cube conjugation `Θ (Ô_L^{(3)})³ Θ = −(Ô_L^{(3)})³`, the `n = 3` half of the no-SSB condition (3.4.4); conjugation by the involution is multiplicative, so the cube of `Θ Ô Θ = −Ô` is `(−Ô)³ = −Ô³` | `Quantum/SpinS/AndersonTowerTanakaMoments.lean` |
+| `staggeredFieldChainHamiltonianS_zero_eq_afmHeisenberg` | eq. (4.1.9) at `h = 0` is eq. (6.1.1): `staggeredFieldChainHamiltonianS L 0 N = afmHeisenbergChainHamiltonianS L N` | `Quantum/SpinS/HorschVonderLindenAfmRing.lean` |
+| `afm_ring_staggeredOrderOpS_odd_moments_vanish` | the no-SSB condition (3.4.4) at the ring: for `Φ ≠ 0` with `Ĥ Φ = E₀ Φ` and `finrank` of the `E₀`-eigenspace `≤ 1`, both `⟨Φ\|Ô_L\|Φ⟩ = 0` and `⟨Φ\|(Ô_L)³\|Φ⟩ = 0` | `Quantum/SpinS/HorschVonderLindenAfmRing.lean` |
+| `tasaki_eq_3_4_16_afmRing_ssb_fromGroundState` | eq. (3.4.16) at the ring, order operator and Hamiltonian both instantiated (`ô_x = (−1)^x Ŝ_x^{(3)}`, `ĥ_x = Ŝ_x · Ŝ_{x+1}` on `{x, x+1}`, `d = 1`, bound values `h₀ = 3N²`, `o₀ = N/2`), giving `⟨Ξ₊\|Ξ₊⟩ = 1`, `0 ≤ ⟨Ξ₊\|Ĥ\|Ξ₊⟩ − E_GS ≤ (C/2) L^{-1}` and `⟨Ξ₊\|Ô_L/L\|Ξ₊⟩ ≥ √q₀`, and taking only the ring size, the spin, the guards, `afm_ring_ground_state_data`'s ground-state data, the normalisation of that state and assumption (3.4.3) | `Quantum/SpinS/HorschVonderLindenAfmRing.lean` |
+
+Regression fixtures live in `LatticeSystem/Tests/Corollary43RingSetup.lean`: signature pins on the
+cube conjugation and on both ring declarations; the cube lemma consumed in exactly the shape the
+third-moment proof consumes it; the odd-moment declaration fed directly from
+`afm_ring_ground_state_data`'s output, the form its consumer uses; and, for the eq. (3.4.16)
+reading, an equation with the generic capstone applied at the ring data, closed by `rfl`. Both
+sides of such an equation are proofs of propositions, so definitional proof irrelevance makes
+`rfl` succeed exactly when the two statements are definitionally equal: that fixture detects
+statement drift — conjunct order, hypothesis list, printed constants — and cannot see how the
+theorem is proved. The fixture file records why no odd-`L`, `L < 2` or `N = 0` boundary instance is
+pinned: those exclusions are structural (the hypotheses themselves), not computed edges.
+
 ## The mirror state `Ξ₋` (pp. 68-69)
 
 Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4, the sentence
