@@ -521,7 +521,7 @@ def framed_input_digest(inputs: list[tuple[str, bytes]]) -> str:
 
 def recompute_input_digest(catalog: dict[str, Any]) -> None:
     """Independently recompute aggregate content and the framed input digest."""
-    root = REPO_ROOT / "formalization-status/v1"
+    root = REPO_ROOT / "formalization-status/v2"
     manifest_path = root / "manifest.json"
     manifest_raw = manifest_path.read_bytes()
     manifest = json.loads(manifest_raw)
@@ -639,7 +639,7 @@ def assert_metadata(parser: PageParser, catalog: dict[str, Any], revision: str, 
     """Require visible state, schema, digest, revision, and generated notice."""
     authoritative = catalog["catalog_state"] == "authoritative"
     authority_phrase = (
-        "validated version 1 catalogue"
+        "validated version 2 catalogue"
         if authoritative
         else "complete interim legacy catalogue"
     )
@@ -650,14 +650,14 @@ def assert_metadata(parser: PageParser, catalog: dict[str, Any], revision: str, 
     ):
         if expected not in text:
             raise ValueError(f"{label}: missing generated metadata {expected!r}")
-    catalog_href = f"{BASEURL}/formalization-status/v1/catalog.json"
-    schema_href = f"{BASEURL}/formalization-status/v1/schema.json"
-    publication_href = f"{BASEURL}/formalization-status/v1/publication.json"
+    catalog_href = f"{BASEURL}/formalization-status/v2/catalog.json"
+    schema_href = f"{BASEURL}/formalization-status/v2/schema.json"
+    publication_href = f"{BASEURL}/formalization-status/v2/publication.json"
     authority_href = (
         catalog_href if authoritative else f"{BASEURL}/formalization/legacy/"
     )
     authority_label = (
-        "Current authority: validated version 1 catalogue"
+        "Current authority: validated version 2 catalogue"
         if authoritative
         else "Current authority: complete interim legacy catalogue"
     )
@@ -666,8 +666,8 @@ def assert_metadata(parser: PageParser, catalog: dict[str, Any], revision: str, 
         ("schema-version", None, None, f"Schema version: {catalog['schema_version']}"),
         ("input-sha256", None, None, f"Input SHA-256: {catalog['input_sha256']}"),
         ("revision", None, None, f"Deploy revision: {revision}"),
-        ("catalog-link", catalog_href, catalog_href, "Machine data: version 1 catalogue"),
-        ("schema-link", schema_href, schema_href, "Schema: version 1 schema"),
+        ("catalog-link", catalog_href, catalog_href, "Machine data: version 2 catalogue"),
+        ("schema-link", schema_href, schema_href, "Schema: version 2 schema"),
         (
             "publication-link",
             publication_href,
@@ -687,6 +687,8 @@ def assert_metadata(parser: PageParser, catalog: dict[str, Any], revision: str, 
 
 def derived_human_label(record: dict[str, Any]) -> str:
     """Independently derive the human label from orthogonal status fields."""
+    if record["lifecycle"] == "retired":
+        return "retired"
     if record["implementation_state"] == "in_progress":
         return "in progress"
     if record["declaration_kind"] == "axiom":
@@ -737,7 +739,28 @@ def expected_record_structure(
         ("Module", "module", (), record["module"]),
         ("Source path", "source-path", (), record["source_path"]),
         ("Origin", "origin", (), record["origin"]),
+        ("Lifecycle", "lifecycle", (), record["lifecycle"]),
     ]
+    retirement = record["retirement"]
+    if retirement is not None:
+        superseded = retirement["superseded_by"]
+        fields.extend(
+            (
+                ("Retirement reason", "retirement-reason", (), retirement["reason"]),
+                (
+                    "Superseded by",
+                    "retirement-superseded-by",
+                    (),
+                    ", ".join(superseded) if superseded else "none",
+                ),
+                (
+                    "Last present commit",
+                    "retirement-last-present-commit",
+                    (),
+                    retirement["last_present_commit"],
+                ),
+            )
+        )
     fields.extend(("Topic", "topic-id", (), topic_id) for topic_id in record["topic_ids"])
     dependencies = record["axiom_dependencies"]
     if dependencies:
@@ -1150,19 +1173,19 @@ def check_built_site(
         raise ValueError("expected catalogue must be generated independently outside the staged source")
     expected_catalog, expected_raw = load_catalog(expected_path)
     recompute_input_digest(expected_catalog)
-    catalog_path = site / "formalization-status/v1/catalog.json"
-    source_catalog_path = source / "formalization-status/v1/catalog.json"
+    catalog_path = site / "formalization-status/v2/catalog.json"
+    source_catalog_path = source / "formalization-status/v2/catalog.json"
     catalog, catalog_raw = load_catalog(catalog_path)
     _, source_catalog_raw = load_catalog(source_catalog_path)
     if catalog_raw != source_catalog_raw or catalog_raw != expected_raw or catalog != expected_catalog:
         raise ValueError("built/staged catalogue differs byte-for-byte from the independent expected catalogue")
-    built_schema = (site / "formalization-status/v1/schema.json").read_bytes()
-    source_schema = (source / "formalization-status/v1/schema.json").read_bytes()
-    canonical_schema = (REPO_ROOT / "formalization-status/v1/schema.json").read_bytes()
+    built_schema = (site / "formalization-status/v2/schema.json").read_bytes()
+    source_schema = (source / "formalization-status/v2/schema.json").read_bytes()
+    canonical_schema = (REPO_ROOT / "formalization-status/v2/schema.json").read_bytes()
     if not (built_schema == source_schema == canonical_schema):
         raise ValueError("published schema is not byte-identical to the canonical schema")
-    built_publication = (site / "formalization-status/v1/publication.json").read_bytes()
-    source_publication = (source / "formalization-status/v1/publication.json").read_bytes()
+    built_publication = (site / "formalization-status/v2/publication.json").read_bytes()
+    source_publication = (source / "formalization-status/v2/publication.json").read_bytes()
     if built_publication != source_publication:
         raise ValueError("built publication sidecar differs from the staged sidecar")
     publication = json.loads(built_publication)
@@ -1326,13 +1349,13 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
         raise ValueError("expected catalogue must be generated independently outside the staged source")
     expected_catalog, expected_raw = load_catalog(expected_path)
     recompute_input_digest(expected_catalog)
-    catalog, staged_raw = load_catalog(source / "formalization-status/v1/catalog.json")
+    catalog, staged_raw = load_catalog(source / "formalization-status/v2/catalog.json")
     if staged_raw != expected_raw or catalog != expected_catalog:
         raise ValueError("staged catalogue differs byte-for-byte from the independent expected catalogue")
-    schema = (source / "formalization-status/v1/schema.json").read_bytes()
-    if schema != (REPO_ROOT / "formalization-status/v1/schema.json").read_bytes():
+    schema = (source / "formalization-status/v2/schema.json").read_bytes()
+    if schema != (REPO_ROOT / "formalization-status/v2/schema.json").read_bytes():
         raise ValueError("staged schema differs from canonical schema")
-    publication_raw = (source / "formalization-status/v1/publication.json").read_bytes()
+    publication_raw = (source / "formalization-status/v2/publication.json").read_bytes()
     publication = json.loads(publication_raw)
     if canonical_json(publication) != publication_raw or publication.get("revision") != revision:
         raise ValueError("staged publication sidecar is non-canonical or has the wrong revision")
@@ -1378,9 +1401,9 @@ def check_staged_source(source_dir: Path, expected_catalog_path: Path, revision:
                 f"staged marker {match.group(1)}",
             )
             for expected in (
-                "/lattice-system/formalization-status/v1/catalog.json",
-                "/lattice-system/formalization-status/v1/schema.json",
-                "/lattice-system/formalization-status/v1/publication.json",
+                "/lattice-system/formalization-status/v2/catalog.json",
+                "/lattice-system/formalization-status/v2/schema.json",
+                "/lattice-system/formalization-status/v2/publication.json",
             ):
                 if expected not in body:
                     raise ValueError(
@@ -2185,15 +2208,15 @@ def run_staged_mutation_tests(
     mutation_cases.append(("swapped topic hrefs", topic_index_relative, swapped_topic_hrefs))
     metadata_relative = "formalization/sources/nielsen-chuang-2010.md"
     metadata_text = (source / metadata_relative).read_text(encoding="utf-8")
-    catalog_href = f"{BASEURL}/formalization-status/v1/catalog.json"
+    catalog_href = f"{BASEURL}/formalization-status/v2/catalog.json"
     mutation_cases.extend(
         (
             (
                 "removed metadata href",
                 metadata_relative,
                 metadata_text.replace(f'<a href="{catalog_href}">', "", 1).replace(
-                    "Machine data: version 1 catalogue</a>",
-                    "Machine data: version 1 catalogue",
+                    "Machine data: version 2 catalogue</a>",
+                    "Machine data: version 2 catalogue",
                     1,
                 ),
             ),
@@ -2447,8 +2470,10 @@ def run_self_tests() -> None:
             "id": "project-fixture",
             "implementation_state": "implemented",
             "lean_name": "LatticeSystem.Fixture.value",
+            "lifecycle": "active",
             "module": "LatticeSystem.Fixture",
             "origin": "project_original",
+            "retirement": None,
             "source_coverage": "not_applicable",
             "source_path": "LatticeSystem/Fixture.lean",
             "source_relations": [],
@@ -2471,8 +2496,10 @@ def run_self_tests() -> None:
             "id": "literature-fixture",
             "implementation_state": "implemented",
             "lean_name": "LatticeSystem.Fixture.theorem",
+            "lifecycle": "active",
             "module": "LatticeSystem.Fixture",
             "origin": "literature",
+            "retirement": None,
             "source_coverage": "complete",
             "source_path": "LatticeSystem/Fixture.lean",
             "source_relations": [
@@ -2771,12 +2798,12 @@ def run_self_tests() -> None:
             'Generated formalization-status view complete interim legacy catalogue'
             '<ul data-generated-metadata="true">'
             '<li data-meta="catalog-state">Catalogue state: prototype</li>'
-            '<li data-meta="schema-version">Schema version: 1</li>'
+            '<li data-meta="schema-version">Schema version: 2</li>'
             f'<li data-meta="input-sha256">Input SHA-256: {"0" * 64}</li>'
             '<li data-meta="revision">Deploy revision: r</li>'
-            '<li data-meta="catalog-link" data-href="/lattice-system/formalization-status/v1/catalog.json"><a href="/lattice-system/formalization-status/v1/catalog.json">Machine data: version 1 catalogue</a></li>'
-            '<li data-meta="schema-link" data-href="/lattice-system/formalization-status/v1/schema.json"><a href="/lattice-system/formalization-status/v1/schema.json">Schema: version 1 schema</a></li>'
-            '<li data-meta="publication-link" data-href="/lattice-system/formalization-status/v1/publication.json"><a href="/lattice-system/formalization-status/v1/publication.json">Build metadata: publication sidecar</a></li>'
+            '<li data-meta="catalog-link" data-href="/lattice-system/formalization-status/v2/catalog.json"><a href="/lattice-system/formalization-status/v2/catalog.json">Machine data: version 2 catalogue</a></li>'
+            '<li data-meta="schema-link" data-href="/lattice-system/formalization-status/v2/schema.json"><a href="/lattice-system/formalization-status/v2/schema.json">Schema: version 2 schema</a></li>'
+            '<li data-meta="publication-link" data-href="/lattice-system/formalization-status/v2/publication.json"><a href="/lattice-system/formalization-status/v2/publication.json">Build metadata: publication sidecar</a></li>'
             '<li data-meta="authority-link" data-href="/lattice-system/formalization/legacy/"><a href="/lattice-system/formalization/legacy/">Current authority: complete interim legacy catalogue</a></li>'
             '</ul>'
             + index_fixture
@@ -2784,23 +2811,23 @@ def run_self_tests() -> None:
         metadata_parser = parse_record_html(metadata_fixture, "metadata collision fixture")
         assert_metadata(
             metadata_parser,
-            {"catalog_state": "prototype", "input_sha256": "0" * 64, "schema_version": 1},
+            {"catalog_state": "prototype", "input_sha256": "0" * 64, "schema_version": 2},
             "r",
             "metadata collision fixture",
         )
         authoritative_metadata = (
             metadata_fixture.replace(
                 "complete interim legacy catalogue",
-                "validated version 1 catalogue",
+                "validated version 2 catalogue",
             )
             .replace("Catalogue state: prototype", "Catalogue state: authoritative")
             .replace(
                 'data-href="/lattice-system/formalization/legacy/"',
-                'data-href="/lattice-system/formalization-status/v1/catalog.json"',
+                'data-href="/lattice-system/formalization-status/v2/catalog.json"',
             )
             .replace(
                 'href="/lattice-system/formalization/legacy/"',
-                'href="/lattice-system/formalization-status/v1/catalog.json"',
+                'href="/lattice-system/formalization-status/v2/catalog.json"',
             )
         )
         assert_metadata(
@@ -2808,23 +2835,23 @@ def run_self_tests() -> None:
             {
                 "catalog_state": "authoritative",
                 "input_sha256": "0" * 64,
-                "schema_version": 1,
+                "schema_version": 2,
             },
             "r",
             "authoritative metadata fixture",
         )
         require_structure_rejection(
             metadata_fixture.replace(
-                '<a href="/lattice-system/formalization-status/v1/catalog.json">'
-                "Machine data: version 1 catalogue</a>",
-                "Machine data: version 1 catalogue",
+                '<a href="/lattice-system/formalization-status/v2/catalog.json">'
+                "Machine data: version 2 catalogue</a>",
+                "Machine data: version 2 catalogue",
                 1,
             ),
             "removed metadata anchor",
         )
         require_structure_rejection(
             metadata_fixture.replace(
-                '<a href="/lattice-system/formalization-status/v1/schema.json">',
+                '<a href="/lattice-system/formalization-status/v2/schema.json">',
                 '<a href="/lattice-system/wrong-schema.json">',
                 1,
             ),
@@ -2882,10 +2909,9 @@ def run_self_tests() -> None:
         else:
             raise AssertionError("second Pages deployment owner was accepted")
 
-    # -- status schema v2: retired-record rendering regressions (Issue #5424) ---------------
-    # These are placed last so every pre-existing self-test above keeps running/passing
-    # first; a raised AssertionError below stops the function, matching this module's
-    # existing fail-fast self-test idiom.
+    # -- status schema v2: retired-record rendering regressions -----------------------------
+    # These are placed last so every self-test above keeps running first; a raised
+    # AssertionError below stops the function, matching this module's fail-fast idiom.
     from generate_formalization_site import human_status as generate_human_status
     from generate_formalization_site import record_lines as generate_record_lines
 
@@ -2913,32 +2939,31 @@ def run_self_tests() -> None:
         "trust_state": "axiom_free",
     }
     # Positive control: human_status/derived_human_label are a deliberate duplicated pair
-    # (generator + checker) that must move together (design pitfall P5). An *active*
-    # record's label must stay unaffected by the presence of an (unused) lifecycle field.
+    # (generator + checker) that must move together, so an active record's label must
+    # stay unaffected by the lifecycle axis.
     active_control_fixture = {**retired_record_fixture, "lifecycle": "active", "retirement": None}
     if generate_human_status(active_control_fixture) != "proved":
         raise AssertionError(
             "generate_formalization_site.human_status regressed on an ordinary active "
-            "record once it also carries an (unused) lifecycle field (positive control)"
+            "record once it also carries a lifecycle field (positive control)"
         )
     if derived_human_label(active_control_fixture) != "proved":
         raise AssertionError(
             "check_generated_site.derived_human_label regressed on an ordinary active "
-            "record once it also carries an (unused) lifecycle field (positive control)"
+            "record once it also carries a lifecycle field (positive control)"
         )
 
-    # Negative controls: today neither human_status nor derived_human_label branches on
-    # lifecycle at all, so a retired record's label falls through to the ordinary
-    # implementation_state/declaration_kind/trust_state derivation instead of "retired".
+    # The lifecycle axis takes precedence over the three status dimensions in both
+    # copies of the derivation.
     if generate_human_status(retired_record_fixture) != "retired":
         raise AssertionError(
-            "generate_formalization_site.human_status does not yet render "
+            "generate_formalization_site.human_status does not render "
             f"lifecycle='retired' as 'retired' (got {generate_human_status(retired_record_fixture)!r})"
         )
     retired_derived_label = derived_human_label(retired_record_fixture)
     if retired_derived_label != "retired":
         raise AssertionError(
-            "check_generated_site.derived_human_label does not yet render "
+            "check_generated_site.derived_human_label does not render "
             f"lifecycle='retired' as 'retired' (got {retired_derived_label!r})"
         )
     retired_block = "\n".join(generate_record_lines(retired_record_fixture, {}, {}))
@@ -2951,34 +2976,32 @@ def run_self_tests() -> None:
     ):
         if expected_row not in retired_block:
             raise AssertionError(
-                f"record_lines does not yet render a v2 retirement row: {expected_row!r}"
+                f"record_lines does not render a v2 retirement row: {expected_row!r}"
             )
 
-    v1_active_metadata = "\n".join(
+    sidebar_metadata = "\n".join(
         __import__("generate_formalization_site").metadata(
-            {"catalog_state": "prototype", "input_sha256": "0" * 64, "schema_version": 1},
+            {"catalog_state": "prototype", "input_sha256": "0" * 64, "schema_version": 2},
             "0" * 40,
         )
     )
-    # Positive control: main's own v1 wording is present today and must not silently
-    # vanish before this PR intentionally replaces it in commit 4.
     if (
-        "version 1 catalogue" not in v1_active_metadata
-        or "version 1 schema" not in v1_active_metadata
+        "version 2 catalogue" not in sidebar_metadata
+        or "version 2 schema" not in sidebar_metadata
+        or "/lattice-system/formalization-status/v2/" not in sidebar_metadata
     ):
         raise AssertionError(
-            "generated sidebar metadata regression: main's own 'version 1' wording "
-            "disappeared before this PR touched it"
+            "generated sidebar metadata does not advertise the version 2 machine roots"
         )
-    # Negative control: the v2 wording/links do not exist yet.
-    if "version 2 catalogue" not in v1_active_metadata or "version 2 schema" not in v1_active_metadata:
+    # Negative control against a half-finished rename: no version 1 machine root or
+    # wording may survive in the generated sidebar.
+    if (
+        "version 1 catalogue" in sidebar_metadata
+        or "version 1 schema" in sidebar_metadata
+        or "/lattice-system/formalization-status/v1/" in sidebar_metadata
+    ):
         raise AssertionError(
-            "generated sidebar metadata does not yet advertise version 2 "
-            "(machine root move is commit 2/4, not yet implemented)"
-        )
-    if "/lattice-system/formalization-status/v2/" not in v1_active_metadata:
-        raise AssertionError(
-            "generated sidebar metadata does not yet link /v2/ machine roots"
+            "generated sidebar metadata still advertises a version 1 machine root"
         )
 
 

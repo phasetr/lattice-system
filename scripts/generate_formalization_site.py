@@ -123,6 +123,8 @@ def locator(item: dict[str, Any]) -> str:
 
 def human_status(record: dict[str, Any]) -> str:
     """Derive the human label without introducing another stored status."""
+    if record["lifecycle"] == "retired":
+        return "retired"
     if record["implementation_state"] == "in_progress":
         return "in progress"
     if record["declaration_kind"] == "axiom":
@@ -138,17 +140,17 @@ def metadata(aggregate: dict[str, Any], revision: str) -> list[str]:
     """Return the visible provenance header shared by every generated view."""
     authoritative = aggregate["catalog_state"] == "authoritative"
     authority_notice = (
-        "The validated version 1 catalogue is authoritative for formalization status."
+        "The validated version 2 catalogue is authoritative for formalization status."
         if authoritative
         else "The interim legacy catalogue remains authoritative until Issue #5228."
     )
     authority_href = (
-        "/lattice-system/formalization-status/v1/catalog.json"
+        "/lattice-system/formalization-status/v2/catalog.json"
         if authoritative
         else "/lattice-system/formalization/legacy/"
     )
     authority_label = (
-        "Current authority: validated version 1 catalogue"
+        "Current authority: validated version 2 catalogue"
         if authoritative
         else "Current authority: complete interim legacy catalogue"
     )
@@ -162,9 +164,9 @@ def metadata(aggregate: dict[str, Any], revision: str) -> list[str]:
         f'<li data-meta="schema-version">Schema version: {html_text(aggregate["schema_version"])}</li>',
         f'<li data-meta="input-sha256">Input SHA-256: {html_text(aggregate["input_sha256"])}</li>',
         f'<li data-meta="revision">Deploy revision: {html_text(revision)}</li>',
-        '<li data-meta="catalog-link" data-href="/lattice-system/formalization-status/v1/catalog.json"><a href="/lattice-system/formalization-status/v1/catalog.json">Machine data: version 1 catalogue</a></li>',
-        '<li data-meta="schema-link" data-href="/lattice-system/formalization-status/v1/schema.json"><a href="/lattice-system/formalization-status/v1/schema.json">Schema: version 1 schema</a></li>',
-        '<li data-meta="publication-link" data-href="/lattice-system/formalization-status/v1/publication.json"><a href="/lattice-system/formalization-status/v1/publication.json">Build metadata: publication sidecar</a></li>',
+        '<li data-meta="catalog-link" data-href="/lattice-system/formalization-status/v2/catalog.json"><a href="/lattice-system/formalization-status/v2/catalog.json">Machine data: version 2 catalogue</a></li>',
+        '<li data-meta="schema-link" data-href="/lattice-system/formalization-status/v2/schema.json"><a href="/lattice-system/formalization-status/v2/schema.json">Schema: version 2 schema</a></li>',
+        '<li data-meta="publication-link" data-href="/lattice-system/formalization-status/v2/publication.json"><a href="/lattice-system/formalization-status/v2/publication.json">Build metadata: publication sidecar</a></li>',
         f'<li data-meta="authority-link" data-href="{authority_href}"><a href="{authority_href}">{authority_label}</a></li>',
         "</ul>",
         "",
@@ -205,8 +207,27 @@ def record_lines(
         ("Module", "module", record["module"]),
         ("Source path", "source-path", record["source_path"]),
         ("Origin", "origin", record["origin"]),
+        ("Lifecycle", "lifecycle", record["lifecycle"]),
     ):
         lines.extend(field(label, name, value))
+    retirement = record["retirement"]
+    if retirement is not None:
+        superseded = retirement["superseded_by"]
+        lines.extend(field("Retirement reason", "retirement-reason", retirement["reason"]))
+        lines.extend(
+            field(
+                "Superseded by",
+                "retirement-superseded-by",
+                ", ".join(superseded) if superseded else "none",
+            )
+        )
+        lines.extend(
+            field(
+                "Last present commit",
+                "retirement-last-present-commit",
+                retirement["last_present_commit"],
+            )
+        )
     for topic_id in record["topic_ids"]:
         lines.extend(field("Topic", "topic-id", topic_id))
     dependencies = record["axiom_dependencies"]
@@ -542,7 +563,7 @@ def validate_marker_ownership(
 
 def canonical_marker_specs(repo_root: Path) -> tuple[set[str], set[str]]:
     """Derive required and optional committed markers from checked-in registries."""
-    root = repo_root / "formalization-status/v1"
+    root = repo_root / "formalization-status/v2"
     sources = json.loads((root / "sources.json").read_text(encoding="utf-8"))["sources"]
     topics = json.loads((root / "topics.json").read_text(encoding="utf-8"))["topics"]
     required = {"overview", "project-original", "source-index", "status", "topic-index"}
@@ -649,6 +670,7 @@ def run_self_tests(repo_root: Path) -> None:
     fixture = {
         "implementation_state": "implemented",
         "declaration_kind": "theorem",
+        "lifecycle": "active",
         "trust_state": "axiom_free",
     }
     assert human_status(fixture) == "proved"
@@ -659,7 +681,7 @@ def run_self_tests(repo_root: Path) -> None:
                 "catalog_state": "prototype",
                 "input_sha256": "0" * 64,
                 "records": [],
-                "schema_version": 1,
+                "schema_version": 2,
                 "source_items": [],
                 "sources": [],
                 "topics": [],
@@ -677,8 +699,10 @@ def run_self_tests(repo_root: Path) -> None:
         "id": "project-fixture",
         "implementation_state": "implemented",
         "lean_name": "LatticeSystem.Fixture.value",
+        "lifecycle": "active",
         "module": "LatticeSystem.Fixture",
         "origin": "project_original",
+        "retirement": None,
         "source_coverage": "not_applicable",
         "source_path": "LatticeSystem/Fixture.lean",
         "source_relations": [],
@@ -691,7 +715,7 @@ def run_self_tests(repo_root: Path) -> None:
         "catalog_state": "prototype",
         "input_sha256": "0" * 64,
         "records": [project_record],
-        "schema_version": 1,
+        "schema_version": 2,
         "source_items": [],
         "sources": [],
         "topics": [{"description": "Fixture", "id": "fixture-topic", "label": "Fixture"}],
@@ -835,7 +859,7 @@ def run_self_tests(repo_root: Path) -> None:
             pass
         else:
             raise AssertionError("fragment pinning accepted an unresolved heading fragment")
-        (temporary / "formalization-status/v1").mkdir(parents=True)
+        (temporary / "formalization-status/v2").mkdir(parents=True)
         try:
             validate_marker_ownership(temporary, set(), set())
         except ValueError:
@@ -955,7 +979,7 @@ def main() -> int:
         output.mkdir(parents=True)
         source = output / "source"
         shutil.copytree(repo_root / "docs", source)
-        machine = source / "formalization-status" / "v1"
+        machine = source / "formalization-status" / "v2"
         machine.mkdir(parents=True)
         aggregate_path = machine / "catalog.json"
         subprocess.run(
@@ -968,7 +992,7 @@ def main() -> int:
             cwd=repo_root,
             check=True,
         )
-        schema_source = repo_root / "formalization-status" / "v1" / "schema.json"
+        schema_source = repo_root / "formalization-status" / "v2" / "schema.json"
         shutil.copyfile(schema_source, machine / "schema.json")
         aggregate = json.loads(aggregate_path.read_text(encoding="utf-8"))
         publication = {
