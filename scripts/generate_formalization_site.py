@@ -398,7 +398,7 @@ def render_marker(
                 for record in records
                 if human_status(record) == label
             )
-        lines.extend(("</ul>", "", '<p data-generated-notice="note">The three machine status dimensions are visible only on each canonical record page.</p>', ""))
+        lines.extend(("</ul>", "", '<p data-generated-notice="note">The three machine status dimensions and the lifecycle axis are visible only on each canonical record page.</p>', ""))
     elif kind == "source-index" and argument is None:
         lines.extend(('<h2 data-heading-kind="source-index">Generated source index</h2>', "", '<ul data-index="sources">'))
         for source_id, source in sorted(sources.items()):

@@ -145,8 +145,8 @@ page only in the staged Jekyll tree; `docs/formalization/records/` is a reserved
 generated-output root and must not contain committed placeholders. Each detail
 page renders the complete record exactly once, including every canonical field
 and every typed source relation in canonical order. The familiar human status
-label is derived from the three machine dimensions and is explicitly display
-data, not a fourth stored status field.
+label is derived from the three machine status dimensions and the lifecycle
+axis, and is explicitly display data, not a stored status field.
 
 Source, topic, project-original, and status pages are compact projections. They
 contain exact counts and ordered links to canonical record routes, but never a
@@ -343,7 +343,7 @@ enums, Lean names, and module/path patterns already impose stricter grammars.
 
 `manifest.json` declares:
 
-- `schema_version: 1`;
+- `schema_version: 2`;
 - `catalog_state` (`prototype` until #5228, then `authoritative`);
 - the registry paths;
 - an explicit sorted `record_shards` list;
