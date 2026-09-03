@@ -16,11 +16,11 @@ constant, the trial state `ψ_λ = Φ − λ·y` (`y` the pseudoinverse potentia
 (`ringBondSquareLinFieldOp_groundState_expectation_zero`, χ2a).
 
 The capstone `ringBondSquareField_susceptibility_sum_rule` produces the resolvent/susceptibility
-conjunct `(Ĥ−E₀)y = VΦ ∧ Re⟨y, VΦ⟩ ≤ RHS` for a general field `h` with `RHS = C(h)`.
-`no_long_range_order_1d_of_susceptibility` consumes a *sub-cubic* form of that conjunct
-(`Re⟨y, ÔΦ⟩ ≤ δ·L³` beyond a threshold, for every margin `δ > 0`), so the staggered specialisation
-still has to turn the scalar `C(h)` into such a bound; that is the next stage (χ3) and this file
-stops at the general-field sum rule.
+conjunct `(Ĥ−E₀)y = VΦ ∧ Re⟨y, VΦ⟩ ≤ RHS` for a general field `h` with `RHS = C(h)`.  This file
+stops at that general-field sum rule; turning the scalar `C(h)` into a sub-cubic staggered bound
+(`Re⟨y, ÔΦ⟩ ≤ δ·L³` beyond a threshold, for every margin `δ > 0`) is a further stage (χ3) that
+nothing in this repository currently carries out.  Corollary 4.3 does not run through such a bound:
+`no_long_range_order_1d` follows Tasaki's own contraposition from Theorem 4.2 instead.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020, §4.1,
 eqs. (4.1.38)–(4.1.41), book p. 84.
@@ -132,9 +132,9 @@ expanding χ1's ground-energy bound `E_GS(λh) ≥ E_GS(0)` to second order at t
 `ψ_λ = Φ − λ·y`: the variational lower bound and the operator identity
 `ringBondSquareFieldHamiltonian_smulField_eq` make `E_GS(λh) ≤ ⟨ψ_λ|Ĥ_λ|ψ_λ⟩/⟨ψ_λ|ψ_λ⟩` a
 `λ`-polynomial with vanishing first order (`⟨Φ|V|Φ⟩ = 0`, χ2a), whose `λ → 0⁺` limit is the sum
-rule.  This is the resolvent/susceptibility conjunct that
-`no_long_range_order_1d_of_susceptibility` consumes, here for a general field and with the scalar
-bound `C(h)` in place of that consumer's sub-cubic `δ·L³`. -/
+rule.  The conjunct is stated here for a general field and with the scalar bound `C(h)`; the
+sub-cubic staggered form `δ·L³` that a susceptibility route to Corollary 4.3 would need is not
+derived from it anywhere in this repository. -/
 theorem ringBondSquareField_susceptibility_sum_rule
     (G : AxisTwoPiRotS N) (n : ℕ) [NeZero n] (hn : 1 ≤ n) (h : Fin (2 * n) → ℝ)
     {Φ : (Fin (2 * n) → Fin (N + 1)) → ℂ} (hΦnorm : star Φ ⬝ᵥ Φ = 1)
