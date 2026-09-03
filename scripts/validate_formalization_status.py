@@ -9,8 +9,10 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -2526,7 +2528,7 @@ end LatticeSystem
     )
     check(
         any(
-            "retired" in error
+            "active record depends on a retired declaration" in error
             for error in dependency_on_retired_validation.errors
         ),
         "active record depending on a retired declaration was not rejected for the "
@@ -2718,6 +2720,309 @@ end LatticeSystem
         "prototype coverage passed using only retired documented-axiom and capstone "
         f"records: {retired_coverage_validation.errors}",
     )
+
+    # -- P2-1: validate_prototype_coverage must count only active records per shard ---------
+    # `tasaki_units` (validate_formalization_status.py:1428-1432) is derived straight from
+    # shard metadata, not from the active-only `records` list built two lines above it, so a
+    # shard whose records are all retired still counts toward "two Tasaki source units".
+    # Retiring every record in the tasaki-2020-ch02 and tasaki-2020-ch04 shards (leaving only
+    # tasaki-2020-ch03 as the sole active Tasaki record) reproduces review finding P2-1.
+    tasaki_ch02_ch04_ids = {
+        record.get("id")
+        for shard_name, shard in all_shard_data
+        if shard_name in {"tasaki-2020-ch02.json", "tasaki-2020-ch04.json"}
+        for record in shard.get("records", [])
+        if isinstance(record, dict)
+    }
+    check(
+        bool(tasaki_ch02_ch04_ids),
+        "P2-1 fixture setup: tasaki-2020-ch02.json/tasaki-2020-ch04.json shard scan found no "
+        "records (fixture is stale against the live catalogue)",
+    )
+    ch02_ch04_retired_records = [
+        {**record, "lifecycle": "retired"} if record.get("id") in tasaki_ch02_ch04_ids else record
+        for record in all_records
+    ]
+    ch02_ch04_retired_validation = Validation()
+    validate_prototype_coverage(
+        "prototype",
+        all_shard_data,
+        ch02_ch04_retired_records,
+        item_map,
+        ch02_ch04_retired_validation,
+    )
+    check(
+        any(
+            "expected two Tasaki source units" in error
+            for error in ch02_ch04_retired_validation.errors
+        ),
+        "P2-1 regression: retiring every record in two of three Tasaki shards, leaving only "
+        "chapter-03 active, was not rejected for the intended reason "
+        f"(errors: {ch02_ch04_retired_validation.errors})",
+    )
+
+    # -- P1-1 / P2-2: retirement guards exercised against a throwaway git repository --------
+    # These fixtures must not depend on the live LatticeSystem/ tree state, so each builds a
+    # dedicated two-commit temp repository under .self-local/tmp (never /tmp; sandbox policy).
+    fixture_scratch_root = repo_root / ".self-local" / "tmp"
+    fixture_scratch_root.mkdir(parents=True, exist_ok=True)
+
+    def fixture_git(arguments: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
+        """Run one git command against a throwaway fixture repository."""
+        return subprocess.run(
+            ["git", *arguments],
+            cwd=cwd,
+            check=True,
+            capture_output=True,
+            text=True,
+            env={
+                **os.environ,
+                "GIT_AUTHOR_NAME": "formalization-status fixture",
+                "GIT_AUTHOR_EMAIL": "fixture@example.invalid",
+                "GIT_COMMITTER_NAME": "formalization-status fixture",
+                "GIT_COMMITTER_EMAIL": "fixture@example.invalid",
+            },
+        )
+
+    def fixture_head(cwd: Path) -> str:
+        """Read the current HEAD commit ID of a fixture repository."""
+        return fixture_git(["rev-parse", "HEAD"], cwd).stdout.strip()
+
+    # P1-1: the "declaration is gone" guard (:1197-1207) fails open when the parser
+    # (`lean_declaration_inventory`) does not recognize a still-live declaration's exact
+    # syntax. `nonrec theorem` is one measured miss (review report P1-1); a fixture commit
+    # spells the same declaration as a plain `theorem` first (matching a real
+    # `last_present_commit`), then a second commit adds `nonrec` while the declaration stays
+    # live in the tree.
+    p1_repo_root = Path(
+        tempfile.mkdtemp(prefix="retirement-fail-open-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], p1_repo_root)
+        p1_module = p1_repo_root / "LatticeSystem" / "FailOpenFixture.lean"
+        p1_module.parent.mkdir(parents=True, exist_ok=True)
+        p1_module.write_text(
+            "namespace LatticeSystem\n\ntheorem gone : True := trivial\n\nend LatticeSystem\n",
+            encoding="utf-8",
+        )
+        fixture_git(["add", "LatticeSystem/FailOpenFixture.lean"], p1_repo_root)
+        fixture_git(["commit", "-q", "-m", "add gone as a plain theorem"], p1_repo_root)
+        p1_last_present_commit = fixture_head(p1_repo_root)
+        p1_module.write_text(
+            "namespace LatticeSystem\n\nnonrec theorem gone : True := trivial\n\n"
+            "end LatticeSystem\n",
+            encoding="utf-8",
+        )
+        fixture_git(["add", "LatticeSystem/FailOpenFixture.lean"], p1_repo_root)
+        fixture_git(["commit", "-q", "-m", "refactor gone to nonrec theorem"], p1_repo_root)
+
+        fail_open_validation = Validation()
+        validate_record(
+            with_record_overrides(
+                {
+                    "declaration_kind": "theorem",
+                    "lean_name": "LatticeSystem.gone",
+                    "lifecycle": "retired",
+                    "module": "LatticeSystem.FailOpenFixture",
+                    "retirement": {
+                        "last_present_commit": p1_last_present_commit,
+                        "reason": "fixture: P1-1 nonrec-theorem parser miss",
+                        "superseded_by": [],
+                    },
+                    "source_path": "LatticeSystem/FailOpenFixture.lean",
+                }
+            ),
+            "fail-open-nonrec-fixture",
+            contract,
+            p1_repo_root,
+            item_map,
+            set(topic_map),
+            fail_open_validation,
+        )
+        check(
+            any(
+                "still declared" in error and "LatticeSystem.gone" in error
+                for error in fail_open_validation.errors
+            ),
+            "P1-1 regression: a retired record naming LatticeSystem.gone, which the tree "
+            "still declares as `nonrec theorem gone`, was accepted "
+            f"(errors: {fail_open_validation.errors})",
+        )
+    finally:
+        shutil.rmtree(p1_repo_root, ignore_errors=True)
+
+    # P2-2: `last_present_commit` ancestry must be checked against durable `main` history
+    # (`origin/main` if present, else `main`), never against `HEAD`. A commit that is only
+    # reachable from a side branch must be rejected even though it is trivially an ancestor
+    # of its own branch's HEAD.
+    p2_repo_root = Path(
+        tempfile.mkdtemp(prefix="retirement-ancestry-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], p2_repo_root)
+        (p2_repo_root / "trunk.txt").write_text("trunk\n", encoding="utf-8")
+        fixture_git(["add", "trunk.txt"], p2_repo_root)
+        fixture_git(["commit", "-q", "-m", "trunk commit"], p2_repo_root)
+        main_commit = fixture_head(p2_repo_root)
+        fixture_git(["checkout", "-q", "-b", "side"], p2_repo_root)
+        (p2_repo_root / "side.txt").write_text("side\n", encoding="utf-8")
+        fixture_git(["add", "side.txt"], p2_repo_root)
+        fixture_git(["commit", "-q", "-m", "side-only commit"], p2_repo_root)
+        side_only_commit = fixture_head(p2_repo_root)
+
+        side_records_by_id: dict[str, dict[str, Any]] = {}
+
+        def ancestry_errors(commit: str) -> list[str]:
+            """Validate one retirement's last_present_commit ancestry in isolation."""
+            ancestry_validation = Validation()
+            validate_retirement(
+                {
+                    "capstone": False,
+                    "declaration_kind": None,
+                    "lean_name": None,
+                    "lifecycle": "retired",
+                    "retirement": {
+                        "last_present_commit": commit,
+                        "reason": "fixture: P2-2 ancestry regression",
+                        "superseded_by": [],
+                    },
+                    "source_path": None,
+                },
+                "fixture",
+                contract,
+                p2_repo_root,
+                side_records_by_id,
+                ancestry_validation,
+            )
+            return ancestry_validation.errors
+
+        side_only_errors = ancestry_errors(side_only_commit)
+        check(
+            any("ancestor" in error for error in side_only_errors),
+            "P2-2 regression: a last_present_commit reachable only from a side branch "
+            "(not from main) was accepted because ancestry was checked against HEAD "
+            f"instead of main (errors: {side_only_errors})",
+        )
+        main_commit_errors = ancestry_errors(main_commit)
+        check(
+            not main_commit_errors,
+            "a last_present_commit that is an ancestor of main was rejected "
+            f"(positive control): {main_commit_errors}",
+        )
+    finally:
+        shutil.rmtree(p2_repo_root, ignore_errors=True)
+
+    # P2-2 (fail-closed clause): when neither `origin/main` nor `main` resolves, ancestry
+    # must be rejected outright, never silently skipped by falling back to HEAD.
+    p2_no_main_repo_root = Path(
+        tempfile.mkdtemp(prefix="retirement-ancestry-no-main-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "trunk"], p2_no_main_repo_root)
+        (p2_no_main_repo_root / "trunk.txt").write_text("trunk\n", encoding="utf-8")
+        fixture_git(["add", "trunk.txt"], p2_no_main_repo_root)
+        fixture_git(["commit", "-q", "-m", "trunk-only commit"], p2_no_main_repo_root)
+        trunk_only_commit = fixture_head(p2_no_main_repo_root)
+        no_main_validation = Validation()
+        validate_retirement(
+            {
+                "capstone": False,
+                "declaration_kind": None,
+                "lean_name": None,
+                "lifecycle": "retired",
+                "retirement": {
+                    "last_present_commit": trunk_only_commit,
+                    "reason": "fixture: P2-2 no-resolvable-main regression",
+                    "superseded_by": [],
+                },
+                "source_path": None,
+            },
+            "fixture",
+            contract,
+            p2_no_main_repo_root,
+            {},
+            no_main_validation,
+        )
+        check(
+            bool(no_main_validation.errors),
+            "P2-2 regression: a repository with neither `origin/main` nor `main` accepted "
+            "a last_present_commit by silently falling back to HEAD instead of "
+            f"failing closed (errors: {no_main_validation.errors})",
+        )
+    finally:
+        shutil.rmtree(p2_no_main_repo_root, ignore_errors=True)
+
+    # -- P2-3 / Tier-1 F1: schema.json must not contradict the frozen cutover validators or
+    # advertise a stale version number. `validate_cutover_baseline`/`validate_cutover_certificate`
+    # (scripts/formalization_cutover.py:412,908, frozen per #5422) reject any
+    # `schema_version` other than 1, so the schema's own const for those two $defs must stay 1.
+    cutover_defs = contract.defs
+    for def_name in ("cutover_baseline", "cutover_certificate"):
+        schema_version_const = (
+            cutover_defs.get(def_name, {}).get("properties", {}).get("schema_version", {}).get("const")
+        )
+        check(
+            schema_version_const == 1,
+            f"P2-3 regression: schema.json $defs.{def_name}.properties.schema_version.const "
+            f"is {schema_version_const!r}, not 1, contradicting the frozen "
+            "formalization_cutover.py validators that require exactly 1",
+        )
+    check(
+        "version 2" in contract.schema.get("title", "") and "version 1" not in contract.schema.get("title", ""),
+        "Tier-1 F1 regression: schema.json title does not say 'version 2' "
+        f"(got {contract.schema.get('title')!r})",
+    )
+
+    # -- P3: git_capture must fail closed (not with an uncaught traceback) when git or the
+    # repository path is unavailable, and must decode subprocess output as UTF-8 regardless
+    # of the invoking process's locale.
+    try:
+        missing_git_result = git_capture(
+            Path("/nonexistent/formalization-status-fixture-path"), ["status"]
+        )
+    except OSError as error:
+        missing_git_result = None
+        missing_git_error = error
+    else:
+        missing_git_error = None
+    check(
+        missing_git_error is None
+        and isinstance(missing_git_result, subprocess.CompletedProcess)
+        and missing_git_result.returncode != 0,
+        "P3 regression: git_capture against a nonexistent repository path raised an "
+        f"uncaught OSError instead of returning a failed CompletedProcess: {missing_git_error!r}",
+    )
+    utf8_repo_root = Path(
+        tempfile.mkdtemp(prefix="git-capture-utf8-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], utf8_repo_root)
+        (utf8_repo_root / "note.txt").write_text("note\n", encoding="utf-8")
+        fixture_git(["add", "note.txt"], utf8_repo_root)
+        non_ascii_message = "fixture commit éèê non-ASCII message"
+        fixture_git(["commit", "-q", "-m", non_ascii_message], utf8_repo_root)
+        utf8_env = {**os.environ, "LC_ALL": "C"}
+        utf8_result = subprocess.run(
+            ["git", "log", "-1", "--format=%s"],
+            cwd=utf8_repo_root,
+            check=False,
+            capture_output=True,
+            text=True,
+            env=utf8_env,
+        )
+        check(
+            non_ascii_message in utf8_result.stdout,
+            "P3 fixture setup: git itself did not echo the non-ASCII commit message under "
+            f"LC_ALL=C (got {utf8_result.stdout!r})",
+        )
+        decoded = git_capture(utf8_repo_root, ["log", "-1", "--format=%s"])
+        check(
+            non_ascii_message in decoded.stdout,
+            "P3 regression: git_capture did not decode a non-ASCII commit subject as UTF-8 "
+            f"under LC_ALL=C (got {decoded.stdout!r})",
+        )
+    finally:
+        shutil.rmtree(utf8_repo_root, ignore_errors=True)
 
     return failures
 

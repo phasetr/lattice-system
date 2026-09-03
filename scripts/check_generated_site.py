@@ -3004,6 +3004,67 @@ def run_self_tests() -> None:
             "generated sidebar metadata still advertises a version 1 machine root"
         )
 
+    # -- design §5.2 items 12-13: a staged-site fixture containing a retired record ---------
+    # Every retirement check above exercises `record_lines`/`derived_human_label` in
+    # isolation; no fixture here previously ran the retired record through the actual staged
+    # generation pipeline (`create_dynamic_pages` + `replace_markers`), so the id<->page
+    # bijection (`check_staged_record_outputs`) was never proven end-to-end for a retired
+    # record. This closes that gap.
+    from generate_formalization_site import create_dynamic_pages, replace_markers
+
+    staged_active_fixture = {**active_control_fixture, "id": "fixture-active-record"}
+    staged_aggregate = {
+        "catalog_state": "prototype",
+        "input_sha256": "0" * 64,
+        "records": [staged_active_fixture, retired_record_fixture],
+        "schema_version": 2,
+        "source_items": [],
+        "sources": [],
+        "topics": [],
+    }
+    staged_scratch = REPO_ROOT / ".self-local/tmp"
+    staged_scratch.mkdir(parents=True, exist_ok=True)
+    staged_site_temporary = Path(
+        tempfile.mkdtemp(prefix="staged-retirement-bijection-", dir=staged_scratch)
+    )
+    try:
+        create_dynamic_pages(staged_site_temporary, staged_aggregate)
+        replace_markers(staged_site_temporary, staged_aggregate, "0" * 40)
+        # Positive control: a catalogue with one active and one retired record keeps an
+        # exact id<->page bijection.
+        check_staged_record_outputs(staged_site_temporary, staged_aggregate)
+
+        retired_page = (
+            staged_site_temporary / "formalization" / "records" / "fixture-retired-record.md"
+        )
+        retired_detail = retired_page.read_text(encoding="utf-8")
+        for expected_row in (
+            '<dd data-field="human-status">retired</dd>',
+            '<dd data-field="retirement-reason">',
+            '<dd data-field="retirement-superseded-by">',
+            '<dd data-field="retirement-last-present-commit">',
+        ):
+            if expected_row not in retired_detail:
+                raise AssertionError(
+                    "staged retirement record page does not render a v2 retirement "
+                    f"row: {expected_row!r}"
+                )
+
+        # Negative control: dropping the retired record's staged page must fail the
+        # id<->page bijection rather than silently degrading to the active record alone.
+        retired_page.unlink()
+        try:
+            check_staged_record_outputs(staged_site_temporary, staged_aggregate)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(
+                "dropping the retired record's staged page was accepted "
+                "(id<->page bijection negative control)"
+            )
+    finally:
+        shutil.rmtree(staged_site_temporary, ignore_errors=True)
+
 
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
