@@ -245,17 +245,24 @@ not `id`. If the mathematical identity changes materially, create a new ID and
 record the supersession on the superseded record rather than silently recycling
 the old ID.
 
-A published record ID is never deleted and never reused. When a declaration
-leaves the Lean tree, its record is retired: `lifecycle` becomes `retired`, and
+A published record ID is never deleted and never reused. Machine enforcement
+covers the four pinned prototype record IDs, which `validate_prototype_pin` and
+the live-site pinned routes require to remain present; for every other published
+record ID the no-deletion rule is a contract obligation checked in review.
+Retirement is the only legal way to remove a declaration from the active
+catalogue, whether or not the ID is pinned. When a declaration leaves the Lean
+tree, its record is retired: `lifecycle` becomes `retired`, and
 `retirement` records the reason, the sorted `superseded_by` record IDs (possibly
-none), and one 40-hex `last_present_commit` that is an ancestor of the current
-history and whose tree still declares the recorded Lean name at the recorded
-path. The record's Lean name, module, source path, and status dimensions are
-frozen as the historical description of that former declaration. A retired
-record keeps its stable ID, its canonical human route, and its projection
-fragments; it generates no Lean assertion; no active record may depend on it;
-and its Lean name is not available for reuse. Deleting a published record from
-the catalogue remains a breaking change.
+none), and one 40-hex `last_present_commit` that is an ancestor of durable
+main-branch history and whose tree still declares the recorded Lean name at
+the recorded path. The record's Lean name, module, source path, and status
+dimensions are frozen as the historical description of that former
+declaration. A retired record keeps its stable ID, its canonical human route,
+and its projection fragments; it generates no Lean assertion; no active record
+may depend on it; and its Lean name is not available for reuse. Deleting a
+published record from the catalogue remains a breaking change, and deleting
+one instead of retiring it violates this contract even where no checker
+rejects it.
 
 Lean names must be fully qualified and begin with `LatticeSystem.`. Valid Lean
 identifier segments may contain Unicode letters and apostrophes. Shorthand,
@@ -563,12 +570,16 @@ library and checks:
 - source, source-item, topic, typed provenance, and source-origin integrity;
 - implementation/coverage/trust, kind, capstone, and resolved-axiom invariants;
 - retirement evidence: a retired record is not a capstone, its Lean name is
-  absent from the current tree, its `last_present_commit` is an ancestor of the
-  current history whose tree declares that name at the recorded path, and its
-  `superseded_by` IDs resolve to active records;
+  absent from the current tree, its `last_present_commit` is an ancestor of
+  durable main-branch history (`origin/main` if that ref resolves, otherwise
+  `main`; neither resolving is an error) whose tree declares that name at the
+  recorded path, and its `superseded_by` IDs resolve to active records;
+- fail-closed absence of a retired Lean name: beyond the declaration matcher,
+  the retired record is rejected if its short name still occurs as a whole word
+  in any Lean source under `LatticeSystem/`;
 - active-only gates: only active records generate Lean assertions, satisfy
-  representative prototype coverage, and may be named by another record's axiom
-  dependencies;
+  representative prototype coverage, and may be named by another active record's
+  axiom dependencies;
 - retention of every pinned prototype record ID;
 - representative prototype coverage across at least two Tasaki chapters and
   a typed non-Tasaki relation, with a proved capstone and a documented axiom;

@@ -24,8 +24,8 @@ from formalization_cutover import (
     CUTOVER_RETIRED_DECLARATION_REQUIRED_KEYS,
     LEGACY_ROW_KEYS,
     PROTOTYPE_RECORD_IDS,
-    exceptional_mapping_map,
     current_lean_declaration_names,
+    exceptional_mapping_map,
     lean_declaration_inventory,
     reconstruct_legacy_rows,
     retired_declaration_map,
@@ -38,6 +38,9 @@ from formalization_cutover import (
 
 SCHEMA_VERSION = 2
 GENERATOR_VERSION = 2
+# Cutover evidence is versioned independently of the catalogue: the frozen
+# formalization_cutover.py validators accept only version 1 artifacts.
+CUTOVER_SCHEMA_VERSION = 1
 RESERVED_SOURCE_ROUTE_IDS = {"foundations", "index"}
 RESERVED_TOPIC_ROUTE_IDS = {"index"}
 MANIFEST_KEYS = {
@@ -993,15 +996,44 @@ def source_declares(path: Path, kind: str, lean_name: str) -> bool:
     return declaration_in_source(source, kind, lean_name)
 
 
+def lean_leaf_mention(repo_root: Path, lean_name: str) -> str | None:
+    """Return one Lean source that still spells the declaration's short name, if any."""
+    leaf = lean_name.rsplit(".", 1)[-1]
+    pattern = re.compile(rf"\b{re.escape(leaf)}\b")
+    for source_path in sorted((repo_root / "LatticeSystem").rglob("*.lean")):
+        try:
+            source = source_path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        if pattern.search(source):
+            return source_path.relative_to(repo_root).as_posix()
+    return None
+
+
 def git_capture(repo_root: Path, arguments: list[str]) -> subprocess.CompletedProcess[str]:
     """Run one read-only Git query from the repository root."""
-    return subprocess.run(
-        ["git", *arguments],
-        cwd=repo_root,
-        check=False,
-        capture_output=True,
-        text=True,
-    )
+    try:
+        return subprocess.run(
+            ["git", *arguments],
+            cwd=repo_root,
+            check=False,
+            capture_output=True,
+            encoding="utf-8",
+            errors="replace",
+        )
+    except OSError as error:
+        # An absent Git binary or unreadable repository path is a failed query, not a crash:
+        # callers turn it into a validation error instead of a traceback.
+        return subprocess.CompletedProcess(["git", *arguments], 1, "", str(error))
+
+
+def main_history_ref(repo_root: Path) -> str | None:
+    """Resolve the durable main-branch ref that retirement evidence is measured against."""
+    for ref in ("origin/main", "main"):
+        resolved = git_capture(repo_root, ["rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}"])
+        if resolved.returncode == 0:
+            return ref
+    return None
 
 
 def validate_retirement(
@@ -1070,10 +1102,20 @@ def validate_retirement(
         return
     # The retiring change and its evidence land together, and this repository
     # squash-merges, so the pinned commit is the last one that still contained the
-    # declaration rather than the one that deleted it.
-    if git_capture(repo_root, ["merge-base", "--is-ancestor", commit, "HEAD"]).returncode != 0:
+    # declaration rather than the one that deleted it. Squash merges also discard branch
+    # commits, so ancestry is measured against durable main history: a commit that only the
+    # pull-request branch reaches would pass here and fail forever once merged.
+    history_ref = main_history_ref(repo_root)
+    if history_ref is None:
         validation.errors.append(
-            f"{location}.retirement.last_present_commit: commit is not an ancestor of HEAD"
+            f"{location}.retirement.last_present_commit: neither origin/main nor main "
+            "resolves, so ancestry cannot be proven"
+        )
+        return
+    if git_capture(repo_root, ["merge-base", "--is-ancestor", commit, history_ref]).returncode != 0:
+        validation.errors.append(
+            f"{location}.retirement.last_present_commit: commit is not an ancestor of "
+            f"{history_ref}"
         )
         return
     kind = record.get("declaration_kind")
@@ -1198,15 +1240,21 @@ def validate_record(
         path = safe_relative_path(repo_root, source_path, f"{location}.source_path", validation)
         if retired:
             if isinstance(kind, str) and isinstance(lean_name, str):
-                validation.require(
-                    lean_name not in current_lean_declaration_names(repo_root)
-                    and not (
-                        path is not None
-                        and path.is_file()
-                        and source_declares(path, kind, lean_name)
-                    ),
-                    f"{location}: a retired record's Lean name is still declared: {lean_name}",
+                # The declaration matcher recognizes only a fixed modifier set, so it misses
+                # `nonrec`, `partial`, `scoped instance` and similar live forms; absence is
+                # therefore proven by the broader whole-word scan, which fails closed.
+                mention = lean_leaf_mention(repo_root, lean_name)
+                declared = lean_name in current_lean_declaration_names(repo_root) or (
+                    path is not None
+                    and path.is_file()
+                    and source_declares(path, kind, lean_name)
                 )
+                if declared or mention is not None:
+                    where = f" in {mention}" if mention is not None else ""
+                    validation.errors.append(
+                        f"{location}: a retired record's Lean name is still declared or "
+                        f"mentioned: {lean_name}{where}"
+                    )
         else:
             if path is not None:
                 validation.require(path.is_file(), f"{location}.source_path: file does not exist")
@@ -1427,10 +1475,16 @@ def validate_prototype_coverage(
     if catalog_state != "prototype":
         return
     records = [record for record in records if record.get("lifecycle") != "retired"]
+    active_ids = {record.get("id") for record in records}
     tasaki_units = {
         data.get("source_unit")
         for _, data in shard_data
-        if isinstance(data, dict) and data.get("source_id") == "tasaki-2020"
+        if isinstance(data, dict)
+        and data.get("source_id") == "tasaki-2020"
+        and any(
+            isinstance(record, dict) and record.get("id") in active_ids
+            for record in data.get("records") or []
+        )
     }
     validation.require(len(tasaki_units) >= 2, "prototype: expected two Tasaki source units")
     non_tasaki_relation = False
@@ -2249,7 +2303,7 @@ end LatticeSystem
         "cutover_record_ids": ["fixture-record"],
         "legacy_rows": baseline_rows,
         "non_legacy_record_ids": [],
-        "schema_version": SCHEMA_VERSION,
+        "schema_version": CUTOVER_SCHEMA_VERSION,
     }
     baseline_schema_validation = Validation()
     validate_schema_instance(
@@ -2334,7 +2388,7 @@ end LatticeSystem
         "legacy_mapping_sha256": "2" * 64,
         "non_record_ordinals": [2],
         "retired_declarations": [],
-        "schema_version": SCHEMA_VERSION,
+        "schema_version": CUTOVER_SCHEMA_VERSION,
     }
     certificate_schema_validation = Validation()
     validate_schema_instance(
@@ -2549,9 +2603,12 @@ end LatticeSystem
         "fixture",
     )
     check(
-        any("not an ancestor of HEAD" in error for error in non_ancestor_errors),
-        "retired record whose last_present_commit is not an ancestor of HEAD was not "
-        f"rejected for the intended reason: {non_ancestor_errors}",
+        any(
+            "last_present_commit: commit is not an ancestor of" in error
+            for error in non_ancestor_errors
+        ),
+        "retired record whose last_present_commit is not an ancestor of main history was "
+        f"not rejected for the intended reason: {non_ancestor_errors}",
     )
 
     wrong_content_errors = record_errors(

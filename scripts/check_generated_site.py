@@ -2913,6 +2913,7 @@ def run_self_tests() -> None:
     # These are placed last so every self-test above keeps running first; a raised
     # AssertionError below stops the function, matching this module's fail-fast idiom.
     from generate_formalization_site import human_status as generate_human_status
+    from generate_formalization_site import metadata as generate_metadata
     from generate_formalization_site import record_lines as generate_record_lines
 
     retired_record_fixture = {
@@ -2980,7 +2981,7 @@ def run_self_tests() -> None:
             )
 
     sidebar_metadata = "\n".join(
-        __import__("generate_formalization_site").metadata(
+        generate_metadata(
             {"catalog_state": "prototype", "input_sha256": "0" * 64, "schema_version": 2},
             "0" * 40,
         )

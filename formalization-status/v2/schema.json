@@ -95,7 +95,7 @@
           "uniqueItems": true
         },
         "schema_version": {
-          "const": 2
+          "const": 1
         }
       },
       "required": [
@@ -145,7 +145,7 @@
           "type": "array"
         },
         "schema_version": {
-          "const": 2
+          "const": 1
         }
       },
       "required": [
@@ -1199,6 +1199,6 @@
       "$ref": "#/$defs/topic_registry"
     }
   ],
-  "title": "lattice-system formalization status schema version 1",
+  "title": "lattice-system formalization status schema version 2",
   "type": "object"
 }
