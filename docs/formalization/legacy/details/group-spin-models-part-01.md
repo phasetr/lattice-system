@@ -37,7 +37,9 @@ formalized supporting finite-dim RP layers for the Cor 4.3 **conditional reducti
 (susceptibility no-LRO) and related Thm 4.2 RP auxiliary results — not a re-proof of Thm 4.2
 itself, and not a discharge of Cor 4.3: that reduction and the documented axiom it consumed have
 since been deleted, Cor 4.3 now following Tasaki's own contraposition from Thm 4.2, which
-leaves both open. The successor discharge issue is #5413. Defines `ringCoupling`, `ringStaggeredSublattice`,
+leaves both open. Issue #5413, previously named as the successor discharge issue, is closed as not
+planned; #5416 is open and covers Cor 4.3's route rather than the discharge. Defines
+`ringCoupling`, `ringStaggeredSublattice`,
 `staggeredFieldChainHamiltonianS`. **RP infra layer 1 (in progress):** `RingBondReflection.lean` —
 even-ring bond reflection `ringReflect n x = 2n−1−x` (involutive, half-swap, staggered-sign flip);
 

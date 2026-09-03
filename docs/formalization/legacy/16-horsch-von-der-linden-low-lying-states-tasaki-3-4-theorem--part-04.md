@@ -135,7 +135,8 @@ Heisenberg model as an example of this setting on p. 65 only on the `d`-dimensio
 lattice with `d ≥ 2`. The instantiation above is at `d = 1`, where assumption (3.4.3) is expected
 to be false: its failure is exactly Corollary 4.3, p. 77 (eq. (4.1.11), the staggered order
 parameter per site vanishing on the ring in the thermodynamic limit), which
-`no_long_range_order_1d` carries conditionally on the documented Shastry susceptibility axiom.
+`no_long_range_order_1d` carries conditionally on the documented staggered-field energy-gain axiom
+through Theorem 4.2.
 That contradiction is the point of reading §3.4's machinery at the ring: assuming (3.4.3) there
 buys low-lying states within `O(1/L)` of the ground energy. Nothing is thereby asserted
 unconditionally at `d = 1` — every conclusion of `tasaki_eq_3_4_16_afmRing_ssb_fromGroundState` is

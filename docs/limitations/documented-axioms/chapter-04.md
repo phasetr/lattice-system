@@ -87,11 +87,15 @@ permalink: /limitations/documented-axioms/chapter-04/
   already in this repository. A math-before-code transcription of the
   Shastry / Tanaka–Takeda–Idogaki argument is an alternative route, but [63]
   has not been examined here (no copy is available).
-- **Tracking:** issue **#5413** (Theorem 4.2 close-out) is the successor
-  discharge issue and is open. The two trackers named in earlier revisions of
-  this entry, #4718 and #4777, are **closed** and historical only: #4718 was
-  the book-order master tracker, #4777 scoped the 1D-ring RP infrastructure
-  and closed 2026-07-11. Neither is to be reopened or rescoped.
+- **Tracking:** issue #5413 (Theorem 4.2 close-out), named in earlier
+  revisions of this entry as the successor discharge issue, is **closed as not
+  planned** (2026-09-02) and is not one. No issue currently open scopes the
+  discharge of this axiom: **#5416** is open, but it covers Corollary 4.3's
+  route to Theorem 4.2 and explicitly not the discharge. The other two
+  trackers named in earlier revisions, #4718 and #4777, are **closed** and
+  historical only: #4718 was the book-order master tracker, #4777 scoped the
+  1D-ring RP infrastructure and closed 2026-07-11. None of the three is to be
+  reopened or rescoped.
 
 <a id="entry-corollary-4-3-support"></a>
 
@@ -109,11 +113,13 @@ its whole unproved content sits in the Theorem 4.2 entry above.
   `no_long_range_order_1d_of_theorem_4_2` — the contraposition, run at a single
   volume through eq. (3.4.16) and the per-volume eq. (3.4.21) bound — applied
   to Theorem 4.2 (`shastry_no_symmetry_breaking_1d`), so
-  `#print axioms no_long_range_order_1d` names `shastryEnergyGain` and nothing
-  else. Both Corollary 4.3 and Theorem 4.2 remain **open**: Tasaki proves
-  neither (footnote 3, p. 76), and nothing here reconstructs the argument he
-  cites. Only the degenerate spin-`0` case `N = 0` is unconditional (the
-  staggered order operator vanishes there).
+  `#print axioms no_long_range_order_1d` is exactly
+  `[propext, Classical.choice, Quot.sound, shastryEnergyGain]` — the three
+  standard axioms and `shastryEnergyGain`, nothing else. Both Corollary 4.3
+  and Theorem 4.2 remain **open**: Tasaki proves neither (footnote 3, p. 76),
+  and nothing here reconstructs the argument he cites. Only the degenerate
+  spin-`0` case `N = 0` is unconditional (the staggered order operator vanishes
+  there).
 - **The retired susceptibility axiom.** Corollary 4.3 previously rested on a
   documented axiom of its own, asserting `χ(k*) = o(L³)` for the even
   zero-field ring, fed into a conditional reduction from the Falk–Bruch bound
@@ -152,11 +158,14 @@ its whole unproved content sits in the Theorem 4.2 entry above.
   **not** in the positivity: no claim is made here about reflection positivity
   in general, and the reflection-positivity layers themselves are complete and
   axiom-free (see the Theorem 4.2 entry above).
-- **Tracking:** issue **#5413** (Theorem 4.2 close-out) is the successor
-  discharge issue and is open; discharging `shastryEnergyGain` discharges
-  Corollary 4.3 with it. The trackers named in earlier revisions of this
-  entry, #4718 and #4777, are **closed** and historical only; neither is to be
-  reopened or rescoped.
+- **Tracking:** issue **#5416** (Corollary 4.3 via Tasaki's own route) is the
+  open issue carrying this entry's current state. Issue #5413 (Theorem 4.2
+  close-out), named in earlier revisions as the successor discharge issue, is
+  **closed as not planned** (2026-09-02); discharging `shastryEnergyGain` still
+  discharges Corollary 4.3 with it, but no open issue scopes that discharge.
+  The trackers named in earlier revisions of this entry, #4718 and #4777, are
+  **closed** and historical only; none of the three is to be reopened or
+  rescoped.
 
 <a id="entry-lemma-4-15-theorem-4-11-support"></a>
 

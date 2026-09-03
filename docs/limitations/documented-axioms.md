@@ -171,7 +171,7 @@ Five of these entries — Theorems 7.2, 7.3, 8.1, 8.6 and 8.9 — say in their o
 "prove theorems Tasaki cites without proof" rule does not override them. Each of those readings
 stands on the entry's second ground, not on citation-only, and so survives unchanged.
 
-**Four entries read as though they invoked citation-only, and do not.** The
+**Three entries read as though they invoked citation-only, and do not.** The
 [general-`S` bond-inversion parity entry](/lattice-system/limitations/documented-axioms/chapter-08-part-02/#entry-general-s-bond-inversion-parity)
 records only the missing general-`S` extension of the spin-one machinery; the claim it defers is
 Tasaki's own remark that the `S = 1` argument "can be extended to general `S` in a straightforward
@@ -179,10 +179,11 @@ manner", not an external citation, and it has no Lean declaration at all.
 [Theorem 5.4](/lattice-system/limitations/documented-axioms/chapter-05/#entry-theorem-5-4) names the policy only to place itself under the
 **open-conjecture** exclusion — Tasaki's footnote says the existence of the iterated limit is
 itself unproved — "rather than being a tractable finite-dimensional cite-only case".
-[Theorem 4.2](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-2) and
-[Corollary 4.3](/lattice-system/limitations/documented-axioms/chapter-04/#entry-corollary-4-3-support) are **not** won't-do citations, per the
-2026-07-05 override: the Theorem 4.2 entry says so in so many words, and the Corollary 4.3 entry —
-which carries no axiom of its own — inherits the classification from it; see below.
+[Theorem 4.2](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-2) is **not** a won't-do citation, per the
+2026-07-05 override, and says so in so many words. The
+[Corollary 4.3](/lattice-system/limitations/documented-axioms/chapter-04/#entry-corollary-4-3-support) entry is not among the three: it no
+longer names the policy at all, and — carrying no axiom of its own — inherits the classification
+from Theorem 4.2; see below.
 
 **Theorem 7.7 is left exactly where its own entry puts it, and does not invoke citation-only.**
 [That entry](/lattice-system/limitations/documented-axioms/chapter-07/#entry-theorem-7-7) records a real implementation dependency: the

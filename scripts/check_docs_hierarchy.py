@@ -1153,8 +1153,9 @@ def _approved_replacements(text: str) -> str:
             "#5413.",
             "and not a discharge of Cor 4.3: that "
             "reduction and the documented axiom it consumed have since been deleted, Cor 4.3 now "
-            "following Tasaki's own contraposition from Thm 4.2, which leaves both open. The "
-            "successor discharge issue is #5413.",
+            "following Tasaki's own contraposition from Thm 4.2, which leaves both open. Issue "
+            "#5413, previously named as the successor discharge issue, is closed as not planned; "
+            "#5416 is open and covers Cor 4.3's route rather than the discharge.",
         )
     )
 
