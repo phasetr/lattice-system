@@ -14,6 +14,11 @@ the whole Tanaka state, `Θ Ξ = Ξ`.  Together with `Θ` being a real symmetric
 `⟨Ξ| Ô^{(α)} |Ξ⟩ = ⟨Θ Ξ| Ô^{(α)} |Θ Ξ⟩ = ⟨Ξ| Θ Ô^{(α)} Θ |Ξ⟩ = -⟨Ξ| Ô^{(α)} |Ξ⟩ = 0` — the
 transverse moments (4.2.14) vanish exactly at finite volume (Tasaki eq. (4.2.48)).
 
+The same conjugation at the cube, `Θ (Ô^{(3)})³ Θ = -(Ô^{(3)})³`, is recorded alongside the linear
+one: it is the `n = 3` half of the no-SSB condition (3.4.4), p. 65, whose footnote 21 runs the
+identical argument for every odd power, and it is what the §3.4 setting at the antiferromagnetic
+Heisenberg ring consumes.
+
 This file also records two pieces of shared infrastructure for the later relations
 ((4.2.12)/(4.2.13) lower bounds and (4.2.15) transverse fluctuation decay):
 * the general sandwich expansion of `⟨Ξ| O |Ξ⟩` into the four two-term matrix elements (with the two
@@ -72,6 +77,27 @@ theorem manyBodyReversalS_conj_staggeredOrderOpS (A : Λ → Bool) :
   rw [mul_smul_comm, smul_mul_assoc, ← smul_neg]
   congr 1
   rw [spinSSiteOp3_def, manyBodyReversalS_conj_onSiteS, spinReversalS_conj_spinSOp3, onSiteS_neg]
+
+/-- **`Θ` reverses the cube of the `3`-axis staggered order operator**:
+`Θ (Ô_L^{(3)})³ Θ = -(Ô_L^{(3)})³`.  Conjugation by the involution `Θ` is a ring homomorphism
+(`Θ² = 1` cancels between the factors), so the cube of `Θ Ô Θ = -Ô` is `(-Ô)³ = -Ô³`.
+
+This is the `n = 3` half of the no-SSB condition (3.4.4), whose footnote 21 on the same page argues
+exactly this way: a unitary `Û` with `Û† Ĥ Û = Ĥ` and `Û† Ô_L Û = -Ô_L` satisfies
+`Û† (Ô_L)^n Û = -(Ô_L)^n` for every odd `n`, which forces `⟨Φ_GS|(Ô_L)^n|Φ_GS⟩ = 0`.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §3.4, eq. (3.4.4) and footnote 21, p. 65. -/
+theorem manyBodyReversalS_conj_staggeredOrderOpS_cube (A : Λ → Bool) :
+    manyBodyReversalS Λ N * (staggeredOrderOpS A N) ^ 3 * manyBodyReversalS Λ N
+      = -(staggeredOrderOpS A N) ^ 3 := by
+  have hcancel : ∀ X : ManyBodyOpS Λ N,
+      manyBodyReversalS Λ N * (manyBodyReversalS Λ N * X) = X := fun X => by
+    rw [← mul_assoc, manyBodyReversalS_mul_self, one_mul]
+  have hpow : (manyBodyReversalS Λ N * staggeredOrderOpS A N * manyBodyReversalS Λ N) ^ 3
+      = manyBodyReversalS Λ N * (staggeredOrderOpS A N) ^ 3 * manyBodyReversalS Λ N := by
+    simp only [pow_succ, pow_zero, one_mul, mul_assoc, hcancel]
+  rw [← hpow, manyBodyReversalS_conj_staggeredOrderOpS, Odd.neg_pow (by decide)]
 
 /-! ### `Θ` fixes the Tanaka state -/
 

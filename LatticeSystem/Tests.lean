@@ -158,6 +158,7 @@ import LatticeSystem.Tests.OperatorSupport
 import LatticeSystem.Tests.ShastryEnergyGainReduction
 import LatticeSystem.Tests.NoLongRangeOrder1DPin
 import LatticeSystem.Tests.ShastrySusceptibilitySubcubicPin
+import LatticeSystem.Tests.Corollary43RingSetup
 
 /-!
 # Test aggregator for the `lattice-system` library
