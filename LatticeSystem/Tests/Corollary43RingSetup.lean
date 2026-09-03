@@ -50,10 +50,27 @@ existing first-power lemma.
 6. That that declaration's *statement* is `tasaki_eq_3_4_16_lowLyingState_ssb`'s statement at the
    ring data (`B := Finset.univ`, `hb x := spinSDot x (finRotate L x) N`,
    `W x := {x, finRotate L x}`, `d := 1`, `h₀ := 3N²`, `o₀ := N/2`): an equation between the two
-   applications, closed by `rfl`. Both sides are proofs of propositions, so definitional proof
-   irrelevance makes `rfl` succeed exactly when the two statements are definitionally equal; the
-   fixture pins the statement — not how either theorem is proved — and any drift in conjunct order,
-   hypothesis list or printed constants breaks its compilation.
+   applications, closed by `rfl`. It pins the statement — conjunct order, hypothesis list, printed
+   constants — and not how either theorem is proved; the next section states exactly what a green
+   and a red compile of it do and do not establish.
+
+## What the `rfl` pin guarantees
+
+Both sides of fixture 6's equation are proofs of propositions, so proof irrelevance reduces the
+equation to a definitional-equality check on the two *statements*. That check backs the fixture in
+one direction only, and the tempting biconditional ("`rfl` succeeds exactly when the statements are
+definitionally equal") is false, so the two directions are worth separating:
+
+* A green compile establishes that the check accepted the two statements as definitionally equal.
+  That, and nothing about either proof, is what the fixture pins.
+* A red one establishes only that the check did *not* accept. It is not a certificate that the
+  statements differ: the check runs on a heartbeat budget and can stop without reaching a verdict,
+  and even when it reaches one the message may not survive printing. Restating the energy conjuncts
+  of `tasaki_eq_3_4_16_afmRing_ssb_fromGroundState` over `afmHeisenbergChainHamiltonianS` is
+  rejected as a type mismatch whose explanation is replaced, at the default heartbeat budget, by a
+  deterministic `whnf` timeout; raising `maxHeartbeats` prints the mismatch in full.
+* Both outcomes fail the build, so the pin is fail-closed and drift cannot pass silently. The price
+  is that a red fixture has to be diagnosed from the message rather than read as proof of drift.
 
 ## Boundary cases
 
@@ -171,8 +188,10 @@ example (L N : ℕ) (hLeven : Even L) (hL2 : 2 ≤ L) (hN : 1 ≤ N)
 generic capstone `tasaki_eq_3_4_16_lowLyingState_ssb`'s statement at the ring's own bond
 decomposition (`B := Finset.univ`, `hb x := spinSDot x (finRotate L x) N`,
 `W x := {x, finRotate L x}`, `d := 1`) and ring norm bounds (`h₀ := 3N²`, `o₀ := N/2`), closed by
-`rfl`: both sides are proofs of propositions, so definitional proof irrelevance makes `rfl` succeed
-exactly when the two statements agree. The extra hypotheses below
+`rfl`: both sides are proofs of propositions, so proof irrelevance reduces the equation to a
+definitional-equality check on the two statements. A green compile means that check accepted them;
+a red one means only that it did not, the check being budgeted (module doc, "What the `rfl` pin
+guarantees"). The extra hypotheses below
 (`hH`/`hO`/`hW`/`hoo`/`hnh`/`hno`/`hbond`/`hB`/`hΦE'`/`hmin`/`hodd1`/`hodd3`) are *fixture-only*
 stand-ins for what the real declaration
 derives from the ground-state data via `heisenbergHamiltonianS_ringCoupling_eq_bondSum_general`,

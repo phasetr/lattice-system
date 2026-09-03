@@ -17,6 +17,12 @@ state and the long-range-order assumption (3.4.3).
 Nothing here discharges a documented axiom or strengthens an existing statement; it supplies the
 two order-operator inputs that a §4.1 Corollary 4.3 assembly needs.
 
+This file is the only non-`Tests` importer of `Quantum/SpinS/ShastryNoSSBReduction.lean`, which it
+uses for `staggeredFieldChainHamiltonianS_conj_manyBodyReversalS`.  The library root lists only the
+tips of the non-`Tests` import DAG, so that file has no line of its own there, and root coverage of
+it — hence of `shastry_no_symmetry_breaking_1d` and of its documented axiom `shastryEnergyGain` —
+runs through the import below.  Removing that import means giving that file a root line of its own.
+
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §3.4, eqs. (3.4.1)-(3.4.4) and footnote 21, p. 65, eqs. (3.4.14)-(3.4.16), p. 68; §4.1,
 eq. (4.1.9), p. 76, Corollary 4.3, p. 77; §6.1, eq. (6.1.1), p. 153.
@@ -149,12 +155,25 @@ The two energy conjuncts are spelled with the bond sum `Σ_x Ŝ_x · Ŝ_{x+1}` w
 spelled with `afmHeisenbergChainHamiltonianS L N`.  The two agree only through
 `heisenbergHamiltonianS_ringCoupling_eq_bondSum_general`, not definitionally, and the bond-sum
 spelling is what makes this statement *be* the generic capstone's own statement at the ring data —
-the property `Tests/Corollary43RingSetup.lean` pins by `rfl`, which fails outright (the two sides
-stop being the same proposition) if the conclusion is restated over
-`afmHeisenbergChainHamiltonianS`.  A caller wanting that spelling rewrites with the same lemma.
+the property `Tests/Corollary43RingSetup.lean` pins by `rfl`.  Restating the energy conjuncts over
+`afmHeisenbergChainHamiltonianS` makes the two sides different propositions and that fixture stops
+compiling; at the default heartbeat budget Lean reports the type mismatch with its explanation
+replaced by a deterministic `whnf` timeout, so the message has to be read as "the check did not
+accept", not as a printed diff.  A caller wanting that spelling rewrites with the same lemma.
+
+This instantiation is deliberately outside the book's own example range.  Tasaki lists the
+antiferromagnetic Heisenberg model as an example of the §3.4 setting on p. 65 only on the
+`d`-dimensional hypercubic lattice with `d ≥ 2`; here the setting is read at `d = 1`, where
+assumption (3.4.3) is expected to be false — that failure is exactly Corollary 4.3, p. 77
+(eq. (4.1.11), the staggered order parameter per site vanishing on the ring in the thermodynamic
+limit), which `no_long_range_order_1d` carries conditionally on a documented axiom.  The
+contradiction is the point of reading §3.4's machinery here: assuming (3.4.3) at the ring buys
+low-lying states within `O(1/L)` of the ground energy.  Nothing is thereby asserted unconditionally
+at `d = 1` — every conclusion below is conditional on `hLRO`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §3.4, eqs. (3.4.1)-(3.4.4), p. 65 and eqs. (3.4.14)-(3.4.16), p. 68; §6.1, eq. (6.1.1),
+2020), §3.4, eqs. (3.4.1)-(3.4.4), p. 65 (the `d ≥ 2` example range on that page) and
+eqs. (3.4.14)-(3.4.16), p. 68; §4.1, Corollary 4.3 and eq. (4.1.11), p. 77; §6.1, eq. (6.1.1),
 p. 153. -/
 theorem tasaki_eq_3_4_16_afmRing_ssb_fromGroundState (L N : ℕ)
     (hLeven : Even L) (hL2 : 2 ≤ L) (hN : 1 ≤ N)

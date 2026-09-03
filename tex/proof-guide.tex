@@ -13116,7 +13116,17 @@ $E_{\mathrm{GS}}$ through the minimum eigenvalue, and the two odd moments are al
 Normalization is a genuine assumption rather than an omission:
 \texttt{afm\_ring\_ground\_state\_data} delivers only $\Phi_{\mathrm{GS}}\neq0$,
 $\langle\Xi_+|\Xi_+\rangle=1$ fails for an unnormalized $\Phi_{\mathrm{GS}}$, and Tasaki assumes it
-too on p.~65.  The energy conjuncts are spelled with the bond sum while the hypotheses are spelled
+too on p.~65.  \emph{Deliberately outside the book's own example range}: Tasaki lists the
+antiferromagnetic Heisenberg model as an example of this setting on p.~65 only on the
+$d$-dimensional hypercubic lattice with $d\ge2$, whereas the instantiation here is at $d=1$, where
+assumption~(3.4.3) is expected to be false.  Its failure is exactly Corollary~4.3 p.~77
+(eq.~(4.1.11), the staggered order parameter per site vanishing on the ring in the thermodynamic
+limit), which \texttt{no\_long\_range\_order\_1d} carries conditionally on the documented Shastry
+susceptibility axiom, and that contradiction is the point of reading §3.4's machinery at the ring:
+assuming~(3.4.3) there buys low-lying states within $O(1/L)$ of the ground energy.  Nothing is
+thereby asserted unconditionally at $d=1$ --- every conclusion of
+\texttt{tasaki\_eq\_3\_4\_16\_afmRing\_ssb\_fromGroundState} is conditional on the long-range-order
+hypothesis.  The energy conjuncts are spelled with the bond sum while the hypotheses are spelled
 with \texttt{afmHeisenbergChainHamiltonianS L N}: the two agree only through
 \texttt{heisenbergHamiltonianS\_ringCoupling\_eq\_bondSum\_general}, not definitionally, and the
 bond-sum spelling is what makes the statement \emph{be} the generic capstone's own at the ring
@@ -13125,10 +13135,18 @@ on the cube conjugation and on both ring declarations; the cube lemma consumed i
 the third-moment proof consumes it; the odd-moment declaration fed directly from
 \texttt{afm\_ring\_ground\_state\_data}'s output; and, for the eq.~(3.4.16) reading, an equation
 with the generic capstone applied at the ring data, closed by \texttt{rfl}.  Both sides of such an
-equation are proofs of propositions, so definitional proof irrelevance makes \texttt{rfl} succeed
-exactly when the two statements are definitionally equal: that fixture detects statement drift and
-cannot see how the theorem is proved.  No odd-$L$, $L<2$ or $N=0$ boundary instance is pinned,
-those exclusions being structural (the hypotheses themselves) rather than computed edges.
+equation are proofs of propositions, so proof irrelevance reduces it to a definitional-equality
+check on the two statements, and that check backs the fixture in one direction only.  A green
+compile establishes that the two statements were accepted as definitionally equal --- that is the
+drift the fixture detects, conjunct order, hypothesis list and printed constants, never how either
+theorem is proved.  A red one establishes only that the check did \emph{not} accept: it runs on a
+heartbeat budget and can stop without a verdict, and even a verdict need not print --- restating
+the energy conjuncts over \texttt{afmHeisenbergChainHamiltonianS} is rejected as a type mismatch
+whose explanation is replaced, at the default budget, by a deterministic \texttt{whnf} timeout.
+Both outcomes fail the build, so drift cannot pass silently; the cost is that a red fixture must be
+diagnosed from its message rather than read as proof of drift.  No odd-$L$, $L<2$ or $N=0$ boundary
+instance is pinned, those exclusions being structural (the hypotheses themselves) rather than
+computed edges.
 
 \noindent\textbf{The mirror state $\Xi_-$, pp.~68--69} (Tasaki~\cite{Tasaki:QMB} §3.4, the
 sentence beginning ``Of course the state $|\Xi_-\rangle=(|\Phi_{\mathrm{GS}}\rangle-|\Gamma\rangle)

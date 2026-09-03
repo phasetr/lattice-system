@@ -129,6 +129,17 @@ Normalisation is a genuine assumption rather than an omission: `afm_ring_ground_
 delivers only `Φ_GS ≠ 0`, `⟨Ξ₊|Ξ₊⟩ = 1` fails for an unnormalised `Φ_GS`, and Tasaki assumes it too
 on p. 65.
 
+**Deliberately outside the book's own example range.** Tasaki lists the antiferromagnetic
+Heisenberg model as an example of this setting on p. 65 only on the `d`-dimensional hypercubic
+lattice with `d ≥ 2`. The instantiation above is at `d = 1`, where assumption (3.4.3) is expected
+to be false: its failure is exactly Corollary 4.3, p. 77 (eq. (4.1.11), the staggered order
+parameter per site vanishing on the ring in the thermodynamic limit), which
+`no_long_range_order_1d` carries conditionally on the documented Shastry susceptibility axiom.
+That contradiction is the point of reading §3.4's machinery at the ring: assuming (3.4.3) there
+buys low-lying states within `O(1/L)` of the ground energy. Nothing is thereby asserted
+unconditionally at `d = 1` — every conclusion of `tasaki_eq_3_4_16_afmRing_ssb_fromGroundState` is
+conditional on the long-range-order hypothesis.
+
 The energy conjuncts are spelled with the bond sum while the hypotheses are spelled with
 `afmHeisenbergChainHamiltonianS L N`. The two agree only through
 `heisenbergHamiltonianS_ringCoupling_eq_bondSum_general`, not definitionally, and the bond-sum
@@ -151,11 +162,18 @@ cube conjugation and on both ring declarations; the cube lemma consumed in exact
 third-moment proof consumes it; the odd-moment declaration fed directly from
 `afm_ring_ground_state_data`'s output, the form its consumer uses; and, for the eq. (3.4.16)
 reading, an equation with the generic capstone applied at the ring data, closed by `rfl`. Both
-sides of such an equation are proofs of propositions, so definitional proof irrelevance makes
-`rfl` succeed exactly when the two statements are definitionally equal: that fixture detects
-statement drift — conjunct order, hypothesis list, printed constants — and cannot see how the
-theorem is proved. The fixture file records why no odd-`L`, `L < 2` or `N = 0` boundary instance is
-pinned: those exclusions are structural (the hypotheses themselves), not computed edges.
+sides of such an equation are proofs of propositions, so proof irrelevance reduces it to a
+definitional-equality check on the two statements, and that check backs the fixture in one
+direction only. A green compile establishes that the two statements were accepted as definitionally
+equal — that is the drift the fixture detects: conjunct order, hypothesis list, printed constants,
+never how either theorem is proved. A red one establishes only that the check did *not* accept: it
+runs on a heartbeat budget and can stop without a verdict, and even a verdict need not print —
+restating the energy conjuncts over `afmHeisenbergChainHamiltonianS` is rejected as a type mismatch
+whose explanation is replaced, at the default budget, by a deterministic `whnf` timeout. Both
+outcomes fail the build, so drift cannot pass silently; the cost is that a red fixture must be
+diagnosed from its message rather than read as proof of drift. The fixture file records why no
+odd-`L`, `L < 2` or `N = 0` boundary instance is pinned: those exclusions are structural (the
+hypotheses themselves), not computed edges.
 
 ## The mirror state `Ξ₋` (pp. 68-69)
 
