@@ -3322,6 +3322,31 @@ end LatticeSystem
             f"frozen field unchanged from durable main was rejected (errors: {unchanged_errors})",
         )
 
+        # Each of the six frozen fields must be individually pinned: perturbing exactly one at
+        # a time and asserting its own name appears in the error is the only way to prove the
+        # tuple is not a decoy that only `lean_name` actually reads.
+        frozen_field_alternate_values = {
+            "implementation_state": "in_progress",
+            "lean_name": "LatticeSystem.changed",
+            "module": "LatticeSystem.FrozenFixtureChanged",
+            "source_coverage": "complete",
+            "source_path": "LatticeSystem/FrozenFixtureChanged.lean",
+            "trust_state": "documented_axiom",
+        }
+        for frozen_field in FROZEN_RECORD_FIELDS:
+            single_field_errors = frozen_field_errors(
+                {frozen_field: frozen_field_alternate_values[frozen_field]}
+            )
+            check(
+                any(
+                    "frozen-fixture-record" in error and frozen_field in error
+                    for error in single_field_errors
+                ),
+                f"frozen fields: retiring frozen-fixture-record while changing only {frozen_field} "
+                "away from the active record's value recorded on durable main was accepted "
+                f"(errors: {single_field_errors})",
+            )
+
         missing_id_validation = Validation()
         validate_retirement(
             {
@@ -3406,6 +3431,235 @@ end LatticeSystem
     finally:
         shutil.rmtree(no_shard_repo_root, ignore_errors=True)
 
+    # -- retirement is terminal: once durable main publishes an id as retired, a follow-up
+    # record for that id must not silently repoint present_at_commit, must accept a corrected
+    # reason or an appended superseded_by entry, must reject a removed superseded_by entry, and
+    # must reject flipping lifecycle back to active even though every frozen identity field
+    # still matches.
+    retired_main_repo_root = Path(
+        tempfile.mkdtemp(prefix="retirement-terminal-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], retired_main_repo_root)
+        retired_main_module = (
+            retired_main_repo_root / "LatticeSystem" / "RetirementTerminalFixture.lean"
+        )
+        retired_main_module.parent.mkdir(parents=True, exist_ok=True)
+        retired_main_module.write_text(
+            "namespace LatticeSystem\n\n"
+            "theorem retiredTerminalFixture : True := trivial\n\n"
+            "end LatticeSystem\n",
+            encoding="utf-8",
+        )
+        fixture_git(
+            ["add", "LatticeSystem/RetirementTerminalFixture.lean"], retired_main_repo_root
+        )
+        fixture_git(
+            ["commit", "-q", "-m", "add retiredTerminalFixture while it still existed"],
+            retired_main_repo_root,
+        )
+        retired_main_present_at_commit = fixture_head(retired_main_repo_root)
+        retired_main_shard_dir = retired_main_repo_root / "formalization-status" / "v2" / "records"
+        retired_main_shard_dir.mkdir(parents=True, exist_ok=True)
+        retired_main_original_retirement = {
+            "present_at_commit": retired_main_present_at_commit,
+            "reason": "fixture: original retirement reason",
+            "superseded_by": ["retirement-replacement-record"],
+        }
+        (retired_main_shard_dir / "retirement-terminal-shard.json").write_text(
+            json.dumps(
+                {
+                    "records": [
+                        {
+                            "axiom_dependencies": [],
+                            "capstone": False,
+                            "declaration_kind": "theorem",
+                            "id": "retirement-terminal-record",
+                            "implementation_state": "implemented",
+                            "lean_name": "LatticeSystem.retiredTerminalFixture",
+                            "lifecycle": "retired",
+                            "module": "LatticeSystem.RetirementTerminalFixture",
+                            "origin": "project_original",
+                            "proof_guide_anchor": None,
+                            "retirement": retired_main_original_retirement,
+                            "source_coverage": "not_applicable",
+                            "source_path": "LatticeSystem/RetirementTerminalFixture.lean",
+                            "source_relations": [],
+                            "summary": "fixture: retirement is terminal",
+                            "topic_ids": [],
+                            "trust_state": "axiom_free",
+                        },
+                        {
+                            "axiom_dependencies": [],
+                            "capstone": False,
+                            "declaration_kind": "theorem",
+                            "id": "retirement-replacement-record",
+                            "implementation_state": "implemented",
+                            "lean_name": "LatticeSystem.retirementReplacement",
+                            "lifecycle": "active",
+                            "module": "LatticeSystem.RetirementTerminalFixture",
+                            "origin": "project_original",
+                            "proof_guide_anchor": None,
+                            "retirement": None,
+                            "source_coverage": "not_applicable",
+                            "source_path": "LatticeSystem/RetirementTerminalFixture.lean",
+                            "source_relations": [],
+                            "summary": "fixture: retirement replacement target",
+                            "topic_ids": [],
+                            "trust_state": "axiom_free",
+                        },
+                    ],
+                    "schema_version": 2,
+                    "source_id": "retirement-terminal-fixture",
+                    "source_unit": "fixture",
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        fixture_git(
+            ["add", "formalization-status/v2/records/retirement-terminal-shard.json"],
+            retired_main_repo_root,
+        )
+        fixture_git(
+            ["commit", "-q", "-m", "publish retirement-terminal-record as retired"],
+            retired_main_repo_root,
+        )
+
+        def retirement_terminal_record(overrides: dict[str, Any]) -> dict[str, Any]:
+            """Build a follow-up record for retirement-terminal-record with given overrides."""
+            record = {
+                "capstone": False,
+                "declaration_kind": "theorem",
+                "id": "retirement-terminal-record",
+                "implementation_state": "implemented",
+                "lean_name": "LatticeSystem.retiredTerminalFixture",
+                "lifecycle": "retired",
+                "module": "LatticeSystem.RetirementTerminalFixture",
+                "source_coverage": "not_applicable",
+                "source_path": "LatticeSystem/RetirementTerminalFixture.lean",
+                "trust_state": "axiom_free",
+                "retirement": dict(retired_main_original_retirement),
+            }
+            record.update(overrides)
+            return record
+
+        retirement_terminal_records_by_id = {
+            "retirement-terminal-record": retirement_terminal_record({}),
+            "retirement-replacement-record": {"lifecycle": "active"},
+        }
+
+        def retirement_terminal_errors(overrides: dict[str, Any]) -> list[str]:
+            """Validate one follow-up retirement-terminal-record against durable main."""
+            terminal_validation = Validation()
+            validate_retirement(
+                retirement_terminal_record(overrides),
+                "retirement-terminal-fixture",
+                contract,
+                retired_main_repo_root,
+                retirement_terminal_records_by_id,
+                terminal_validation,
+            )
+            return terminal_validation.errors
+
+        # (a) present_at_commit differs from the evidence durable main already publishes.
+        present_at_commit_changed_errors = retirement_terminal_errors(
+            {
+                "retirement": {
+                    "present_at_commit": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+                    "reason": retired_main_original_retirement["reason"],
+                    "superseded_by": list(retired_main_original_retirement["superseded_by"]),
+                }
+            }
+        )
+        check(
+            any(
+                "retirement-terminal-record" in error and "present_at_commit" in error
+                for error in present_at_commit_changed_errors
+            ),
+            "retirement is terminal: changing present_at_commit away from the value durable "
+            "main already publishes for a retired record was accepted, or was rejected without "
+            f"naming present_at_commit (errors: {present_at_commit_changed_errors})",
+        )
+
+        # (b) a corrected reason is accepted; the freeze must not cover free-text prose.
+        reason_changed_errors = retirement_terminal_errors(
+            {
+                "retirement": {
+                    "present_at_commit": retired_main_original_retirement["present_at_commit"],
+                    "reason": "fixture: corrected retirement reason",
+                    "superseded_by": list(retired_main_original_retirement["superseded_by"]),
+                }
+            }
+        )
+        check(
+            not any(
+                "frozen" in error.lower() or "retirement evidence differs" in error
+                for error in reason_changed_errors
+            ),
+            "retirement is terminal: correcting only the retirement reason of an already-"
+            f"retired record was rejected as a frozen-evidence violation (errors: {reason_changed_errors})",
+        )
+
+        # (c) an appended superseded_by entry is accepted (supersession may be discovered later).
+        superseded_by_appended_errors = retirement_terminal_errors(
+            {
+                "retirement": {
+                    "present_at_commit": retired_main_original_retirement["present_at_commit"],
+                    "reason": retired_main_original_retirement["reason"],
+                    "superseded_by": sorted(
+                        {*retired_main_original_retirement["superseded_by"], "retirement-terminal-record-2"}
+                    ),
+                }
+            }
+        )
+        check(
+            not any(
+                "frozen" in error.lower() or "retirement evidence differs" in error
+                for error in superseded_by_appended_errors
+            ),
+            "retirement is terminal: appending a superseded_by entry to an already-retired "
+            f"record was rejected as a frozen-evidence violation (errors: {superseded_by_appended_errors})",
+        )
+
+        # (d) removing a superseded_by entry that main already publishes must be rejected.
+        superseded_by_removed_errors = retirement_terminal_errors(
+            {
+                "retirement": {
+                    "present_at_commit": retired_main_original_retirement["present_at_commit"],
+                    "reason": retired_main_original_retirement["reason"],
+                    "superseded_by": [],
+                }
+            }
+        )
+        check(
+            bool(superseded_by_removed_errors),
+            "retirement is terminal: removing a superseded_by entry that durable main already "
+            f"publishes for a retired record was accepted (errors: {superseded_by_removed_errors})",
+        )
+
+        # (e) retirement is terminal: flipping lifecycle back to active must be rejected even
+        # though every frozen identity field still matches durable main.
+        reactivated_errors = retirement_terminal_errors({"lifecycle": "active", "retirement": None})
+        check(
+            bool(reactivated_errors),
+            "retirement is terminal: a follow-up record with lifecycle flipped back to active "
+            "for an id durable main already publishes as retired was accepted with identity "
+            f"fields unchanged (errors: {reactivated_errors})",
+        )
+
+        # (f) positive control: an unchanged retired record (the steady state after merge) must
+        # not be rejected.
+        retirement_terminal_unchanged_errors = retirement_terminal_errors({})
+        check(
+            not retirement_terminal_unchanged_errors,
+            "retirement is terminal positive control: re-validating retirement-terminal-record "
+            "identical to what durable main already publishes was rejected "
+            f"(errors: {retirement_terminal_unchanged_errors})",
+        )
+    finally:
+        shutil.rmtree(retired_main_repo_root, ignore_errors=True)
+
     # -- the retirement evidence key is present_at_commit, not last_present_commit ----------
     # A committed record naming a commit only proves the declaration was PRESENT there, not
     # that it was the LAST commit to have it (see the ancestry checks above, which accept
@@ -3489,6 +3743,74 @@ end LatticeSystem
             idrest_probe_file.unlink()
     finally:
         shutil.rmtree(idrest_probe_root, ignore_errors=True)
+
+    # -- LEAN_IDENTIFIER_REST_CLASS must equal Lean's own `isIdRest`, not a narrower
+    # approximation: the pinned toolchain's `isLetterLike` accepts Latin-1 supplement and
+    # Latin Extended-A letters and `isSubScriptAlnum` accepts the subscript letter j (U+2C7C),
+    # so a code point from one of those ranges immediately adjacent to an ASCII leaf must
+    # continue the identifier (no boundary), not delimit it.
+    isidrest_boundary_probe_root = Path(
+        tempfile.mkdtemp(prefix="lean-leaf-mention-isidrest-boundary-", dir=fixture_scratch_root)
+    )
+    try:
+        isidrest_boundary_dir = isidrest_boundary_probe_root / "LatticeSystem"
+        isidrest_boundary_dir.mkdir(parents=True, exist_ok=True)
+        isidrest_boundary_file = isidrest_boundary_dir / "Probe.lean"
+        isidrest_boundary_cases = [
+            ("LatticeSystem.hop", "Ĥhop", False),  # U+0124 Ĥ: Latin Extended-A continuation
+            ("LatticeSystem.foo", "fooé", False),  # U+00E9 é: Latin-1 supplement continuation
+            ("LatticeSystem.foo", "fooἀ", False),  # U+1F00 ἀ: polytonic Greek continuation
+            ("LatticeSystem.foo", "fooⱼ", False),  # U+2C7C ⱼ: subscript-j continuation
+            ("LatticeSystem.foo", "foo·", True),  # U+00B7 ·: not letter-like, a real delimiter
+        ]
+        for lean_name, body, expect_found in isidrest_boundary_cases:
+            isidrest_boundary_file.write_text(body + "\n", encoding="utf-8")
+            found = lean_leaf_mention(isidrest_boundary_probe_root, lean_name) is not None
+            check(
+                found == expect_found,
+                f"isIdRest class: lean_leaf_mention(..., {lean_name!r}) against a file "
+                f"containing {body!r} returned found={found}, expected {expect_found}",
+            )
+            isidrest_boundary_file.unlink()
+    finally:
+        shutil.rmtree(isidrest_boundary_probe_root, ignore_errors=True)
+
+    # -- LEAN_IDENTIFIER_REST_CLASS membership must match the pinned toolchain's `isIdRest`
+    # code-point-for-code-point, not merely "adjacent to an ASCII leaf" as the probes above
+    # sample: an oracle table pinned to the boundary of every range `isIdRest` adds beyond the
+    # current class, plus code points that must stay excluded (mathematical-notation look-alikes
+    # `isLetterLike` deliberately excludes, and the existing subscript-Latin boundary).
+    lean_identifier_rest_pattern = re.compile(f"[{LEAN_IDENTIFIER_REST_CLASS}]")
+    lean_isidrest_oracle = (
+        (0x00C0, True),  # Latin-1 supplement letter (À), range start
+        (0x00D6, True),  # Latin-1 supplement letter (Ö), range end before the gap
+        (0x00D7, False),  # × multiplication sign: excluded gap inside the Latin-1 range
+        (0x00D8, True),  # Latin-1 supplement letter (Ø), range restart after the gap
+        (0x00F6, True),  # Latin-1 supplement letter (ö), range end before the gap
+        (0x00F7, False),  # ÷ division sign: excluded gap inside the Latin-1 range
+        (0x00F8, True),  # Latin Extended-A letter (ø), range restart
+        (0x017F, True),  # Latin Extended-A letter (ſ), range end
+        (0x0180, False),  # first code point past Latin Extended-A
+        (0x1F00, True),  # polytonic Greek Extended letter, range start
+        (0x1FFE, True),  # polytonic Greek Extended letter, range end
+        (0x1FFF, False),  # first code point past polytonic Greek Extended
+        (0x2C7C, True),  # subscript Latin letter j (isSubScriptAlnum)
+        (0x2C7D, False),  # not a subscript-alnum code point
+        (0x03BB, False),  # λ: mathematical-notation look-alike isLetterLike excludes
+        (0x03A0, False),  # Π: mathematical-notation look-alike isLetterLike excludes
+        (0x03A3, False),  # Σ: mathematical-notation look-alike isLetterLike excludes
+        (0x2080, True),  # subscript digit 0 (isSubScriptAlnum), already in the current class
+        (0x1D6A, True),  # subscript Latin letter x, the current class's subscript-Latin boundary
+        (0x1D6B, False),  # first code point past the subscript-Latin range
+    )
+    for code_point, expect_member in lean_isidrest_oracle:
+        character = chr(code_point)
+        is_member = lean_identifier_rest_pattern.fullmatch(character) is not None
+        check(
+            is_member == expect_member,
+            f"isIdRest class membership: U+{code_point:04X} membership in "
+            f"LEAN_IDENTIFIER_REST_CLASS was {is_member}, expected {expect_member}",
+        )
 
     # -- schema.json must agree with the frozen cutover validators --------------------------
     # `validate_cutover_baseline` and `validate_cutover_certificate` reject any
@@ -3612,6 +3934,88 @@ end LatticeSystem
         )
     finally:
         shutil.rmtree(invalid_utf8_repo_root, ignore_errors=True)
+
+    # -- the publication runbook must not still promise the retired last-present-commit
+    # vocabulary: `present_at_commit` proves the declaration was present at that commit, not
+    # that it was the last commit to have it, and the runbook's own prose must not overclaim
+    # the opposite of what the schema and the validator now enforce.
+    for docs_vocabulary_relative_path in (
+        "docs/formalization-status-contract.md",
+        "docs/formalization-publication.md",
+    ):
+        docs_vocabulary_path = repo_root / docs_vocabulary_relative_path
+        docs_vocabulary_text = docs_vocabulary_path.read_text(encoding="utf-8")
+        check(
+            "last-present commit" not in docs_vocabulary_text
+            and "last_present_commit" not in docs_vocabulary_text,
+            f"{docs_vocabulary_relative_path}: still uses the retired vocabulary "
+            "'last-present commit' or 'last_present_commit' instead of 'present at commit' / "
+            "present_at_commit",
+        )
+
+    # -- main_record_index must not re-read durable main's record shards from scratch for
+    # every retired record in a catalogue: `validate_frozen_identity` calls it once per
+    # retired record, so an unmemoised implementation re-runs `git ls-tree` plus one `git show`
+    # per shard for every single retired record in the catalogue.
+    from unittest.mock import patch as memoization_patch
+
+    memoization_repo_root = Path(
+        tempfile.mkdtemp(prefix="main-record-index-memoization-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], memoization_repo_root)
+        memoization_shard_dir = memoization_repo_root / "formalization-status" / "v2" / "records"
+        memoization_shard_dir.mkdir(parents=True, exist_ok=True)
+        (memoization_shard_dir / "memoization-fixture-shard.json").write_text(
+            json.dumps(
+                {
+                    "records": [
+                        {
+                            "id": "memoization-fixture-record",
+                            "lifecycle": "active",
+                        }
+                    ],
+                    "schema_version": 2,
+                    "source_id": "memoization-fixture",
+                    "source_unit": "fixture",
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        fixture_git(
+            ["add", "formalization-status/v2/records/memoization-fixture-shard.json"],
+            memoization_repo_root,
+        )
+        fixture_git(["commit", "-q", "-m", "publish one memoization fixture shard"], memoization_repo_root)
+
+        git_capture_call_log: list[None] = []
+        real_git_capture = git_capture
+
+        def counting_git_capture(
+            root: Path, arguments: list[str]
+        ) -> subprocess.CompletedProcess[str]:
+            """Wrap git_capture to count invocations without changing its behaviour."""
+            git_capture_call_log.append(None)
+            return real_git_capture(root, arguments)
+
+        with memoization_patch(
+            f"{__name__}.git_capture", side_effect=counting_git_capture
+        ):
+            main_record_index(memoization_repo_root, "main")
+            calls_after_first_lookup = len(git_capture_call_log)
+            main_record_index(memoization_repo_root, "main")
+            calls_after_second_lookup = len(git_capture_call_log)
+        check(
+            calls_after_second_lookup == calls_after_first_lookup,
+            "main_record_index memoization: a second lookup for the same ref and shard set "
+            f"invoked git_capture {calls_after_second_lookup - calls_after_first_lookup} more "
+            f"time(s) instead of reusing the first lookup's result "
+            f"(first lookup: {calls_after_first_lookup} calls, "
+            f"second lookup: {calls_after_second_lookup} calls)",
+        )
+    finally:
+        shutil.rmtree(memoization_repo_root, ignore_errors=True)
 
     return failures
 
