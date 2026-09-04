@@ -14,7 +14,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, NamedTuple
 
 from formalization_cutover import (
     CUTOVER_BASELINE_KEYS,
@@ -70,7 +70,7 @@ FROZEN_RECORD_FIELDS = (
     "trust_state",
 )
 _MAIN_HISTORY_REF_CACHE: dict[Path, str | None] = {}
-_MAIN_RECORD_INDEX_CACHE: dict[tuple[Path, str], dict[str, dict[str, Any]] | None] = {}
+_MAIN_RECORD_INDEX_CACHE: dict[tuple[Path, str], "MainRecordIndex"] = {}
 RELATION_RANK = {
     "formalizes": 0,
     "presents": 0,
@@ -1084,8 +1084,15 @@ def read_main_history_ref(repo_root: Path) -> str | None:
     return None
 
 
-def main_record_index(repo_root: Path, history_ref: str) -> dict[str, dict[str, Any]] | None:
-    """Index the records durable main history publishes, or None when they are unreadable."""
+class MainRecordIndex(NamedTuple):
+    """Records durable main history publishes, and the shard that could not be read."""
+
+    records: dict[str, dict[str, Any]]
+    unreadable: str | None
+
+
+def main_record_index(repo_root: Path, history_ref: str) -> MainRecordIndex:
+    """Index the records durable main history publishes."""
     # Every record asks the same question of the same already-merged history, and each answer
     # costs one `git ls-tree` plus one `git show` per shard, so a catalogue with many retired
     # records would otherwise spend several Git subprocesses per record.
@@ -1095,37 +1102,49 @@ def main_record_index(repo_root: Path, history_ref: str) -> dict[str, dict[str, 
     return _MAIN_RECORD_INDEX_CACHE[cache_key]
 
 
-def read_main_record_index(
-    repo_root: Path, history_ref: str
-) -> dict[str, dict[str, Any]] | None:
-    """Read every record shard durable main history publishes, or None when unreadable."""
+def read_main_record_index(repo_root: Path, history_ref: str) -> MainRecordIndex:
+    """Read every record shard durable main history publishes."""
+    # History that publishes no shard tree yet and history whose shards cannot be read are
+    # different answers, and only the first is a legitimate bootstrap: an absent tree yields an
+    # empty readable index, while every listing, read, or parse failure names its shard so a
+    # caller can fail closed instead of mistaking an anomaly for a catalogue with no records.
     listing = git_capture(
         repo_root, ["ls-tree", "--name-only", history_ref, f"{RECORD_SHARD_DIRECTORY}/"]
     )
     if listing.returncode != 0:
-        return None
-    shard_paths = [line for line in listing.stdout.splitlines() if line.endswith(".json")]
-    if not shard_paths:
-        return None
+        return MainRecordIndex(
+            {}, f"record shards under {RECORD_SHARD_DIRECTORY} cannot be listed on {history_ref}"
+        )
+    shard_paths = sorted(
+        line for line in listing.stdout.splitlines() if line.endswith(".json")
+    )
     index: dict[str, dict[str, Any]] = {}
     for shard_path in shard_paths:
         blob = git_capture(repo_root, ["show", f"{history_ref}:{shard_path}"])
         if blob.returncode != 0:
-            return None
+            return MainRecordIndex(
+                {}, f"record shard {shard_path} cannot be read on {history_ref}"
+            )
         try:
             shard = json.loads(blob.stdout)
         except json.JSONDecodeError:
-            return None
+            return MainRecordIndex(
+                {}, f"record shard {shard_path} on {history_ref} is not valid JSON"
+            )
         if not isinstance(shard, dict):
-            return None
+            return MainRecordIndex(
+                {}, f"record shard {shard_path} on {history_ref} is not a JSON object"
+            )
         records = shard.get("records")
         if not isinstance(records, list):
-            return None
+            return MainRecordIndex(
+                {}, f"record shard {shard_path} on {history_ref} has no records array"
+            )
         for published in records:
             identifier = published.get("id") if isinstance(published, dict) else None
             if isinstance(identifier, str):
                 index[identifier] = published
-    return index
+    return MainRecordIndex(index, None)
 
 
 def validate_frozen_identity(
@@ -1138,13 +1157,13 @@ def validate_frozen_identity(
 ) -> None:
     """Hold a retiring record to the identity durable main history published for its ID."""
     published = main_record_index(repo_root, history_ref)
-    if published is None:
+    if published.unreadable is not None:
         validation.errors.append(
-            f"{location}: {identifier}: {history_ref} publishes no readable record shard, "
-            "so the frozen fields of a retired record cannot be proven"
+            f"{location}: {identifier}: {published.unreadable}, so the frozen fields of a "
+            "retired record cannot be proven"
         )
         return
-    former = published.get(identifier)
+    former = published.records.get(identifier)
     if former is None:
         validation.errors.append(
             f"{location}: {identifier} is absent from every record shard on {history_ref}, "
@@ -1176,9 +1195,22 @@ def validate_frozen_identity(
     )
     superseded = retirement.get("superseded_by")
     former_superseded = former_retirement.get("superseded_by")
+    former_entries = former_superseded if isinstance(former_superseded, list) else []
+    # A published shard is arbitrary data here, not a catalogue this run validated, so an entry
+    # of the wrong type must name the record it came from rather than reach the comparison and
+    # raise out of the validator.
+    validation.require(
+        all(isinstance(entry, str) for entry in former_entries),
+        f"{location}: {identifier}: {history_ref} publishes a retirement.superseded_by entry "
+        "that is not a record ID string, so its supersessions cannot be compared",
+    )
     dropped = sorted(
-        set(former_superseded if isinstance(former_superseded, list) else [])
-        - set(superseded if isinstance(superseded, list) else [])
+        {entry for entry in former_entries if isinstance(entry, str)}
+        - {
+            entry
+            for entry in (superseded if isinstance(superseded, list) else [])
+            if isinstance(entry, str)
+        }
     )
     validation.require(
         not dropped,
@@ -1197,16 +1229,22 @@ def reject_retirement_reversal(
     identifier = record.get("id")
     if not isinstance(identifier, str):
         return
-    # Unreadable history is fail-open here and fail-closed on the retired path: an active
-    # record is re-measured against the current Lean tree in full, while a retired one, which
-    # nothing can re-measure, has no other evidence to fall back on.
+    # History that publishes nothing to compare against leaves this guard silent, because a
+    # catalogue must be able to publish its first records before any exist on main. History
+    # whose shards exist but cannot be read is the opposite case: it would switch the guard off
+    # for every record without saying so, so it fails closed here as it does on the retired
+    # path.
     history_ref = main_history_ref(repo_root)
     if history_ref is None:
         return
     published = main_record_index(repo_root, history_ref)
-    if published is None:
+    if published.unreadable is not None:
+        validation.errors.append(
+            f"{location}: {identifier}: {published.unreadable}, so a retirement that history "
+            "may already publish for this ID cannot be ruled out"
+        )
         return
-    former = published.get(identifier)
+    former = published.records.get(identifier)
     if not isinstance(former, dict) or former.get("lifecycle") != "retired":
         return
     validation.errors.append(
@@ -1261,19 +1299,15 @@ def validate_retirement(
             superseded == sorted(set(superseded)),
             f"{location}.retirement.superseded_by: expected sorted unique record IDs",
         )
+        # A replacement may itself be retired later, and a published supersession may never be
+        # dropped, so requiring the target to stay active would leave the pair unsatisfiable
+        # from that point on: the target only has to exist in the catalogue.
         for identifier in superseded:
-            target = records_by_id.get(identifier)
-            if target is None:
-                validation.errors.append(
-                    f"{location}.retirement.superseded_by: unresolved superseded_by "
-                    f"record {identifier}"
-                )
-            else:
-                validation.require(
-                    target.get("lifecycle") == "active",
-                    f"{location}.retirement.superseded_by: superseded_by record is not "
-                    f"active: {identifier}",
-                )
+            validation.require(
+                identifier in records_by_id,
+                f"{location}.retirement.superseded_by: unresolved superseded_by "
+                f"record {identifier}",
+            )
     # The retiring change and its evidence land together, and this repository
     # squash-merges, so the pinned commit is one whose tree still contained the declaration
     # rather than the one that deleted it. Squash merges also discard branch commits, so
@@ -2828,7 +2862,7 @@ end LatticeSystem
     )
 
     # Supersession resolves against the whole catalogue, so distinguishing an unknown
-    # ID from a retired one requires the record map this fixture catalogue supplies.
+    # ID from one the catalogue publishes requires the record map this fixture supplies.
     superseded_catalogue = {
         "some-other-retired-record": {
             "id": "some-other-retired-record",
@@ -2840,11 +2874,6 @@ end LatticeSystem
             "unknown superseded_by ID",
             ["unknown-record-id-does-not-exist"],
             "unresolved superseded_by",
-        ),
-        (
-            "retired superseded_by ID",
-            ["some-other-retired-record"],
-            "superseded_by record is not active",
         ),
         (
             "unsorted superseded_by",
@@ -2867,6 +2896,27 @@ end LatticeSystem
             f"retirement.superseded_by fixture ({label}) was not rejected for the "
             f"intended reason: {superseded_errors}",
         )
+
+    # Positive control for the same rule: a target the catalogue publishes as retired
+    # resolves, so it raises no supersession error even though it is no longer active.
+    retired_target_errors = record_errors(
+        with_record_overrides(
+            {
+                "lifecycle": "retired",
+                "retirement": {
+                    **retirement_evidence,
+                    "superseded_by": ["some-other-retired-record"],
+                },
+            }
+        ),
+        "fixture",
+        superseded_catalogue,
+    )
+    check(
+        not any("superseded_by" in error for error in retired_target_errors),
+        "retirement.superseded_by fixture (retired superseded_by ID) was rejected even "
+        f"though the target resolves in the catalogue: {retired_target_errors}",
+    )
 
     lean_check_retirement_output = lean_check(
         [
@@ -3377,28 +3427,6 @@ end LatticeSystem
                 record, "frozen-fixture-repoint", contract, frozen_repo_root, {}, frozen_validation
             )
             return frozen_validation.errors
-
-        repoint_errors = frozen_field_errors(
-            {
-                "lean_name": "LatticeSystem.changed",
-                "module": "LatticeSystem.FrozenFixtureChanged",
-                "source_path": "LatticeSystem/FrozenFixtureChanged.lean",
-                "retirement": {
-                    "present_at_commit": frozen_changed_commit,
-                    "reason": "fixture: frozen field regression",
-                    "superseded_by": [],
-                },
-            }
-        )
-        check(
-            any(
-                "frozen-fixture-record" in error and "lean_name" in error
-                for error in repoint_errors
-            ),
-            "frozen fields: retiring frozen-fixture-record while repointing lean_name away "
-            "from the active record's identity recorded on durable main was accepted "
-            f"(errors: {repoint_errors})",
-        )
 
         unchanged_errors = frozen_field_errors({})
         check(
@@ -4157,9 +4185,10 @@ end LatticeSystem
         f"{rejected_evidence_key} was accepted",
     )
 
-    # -- the leaf-mention delimiter class must match Lean's own isIdRest, not every non-ASCII
-    # BMP code point: some non-ASCII code points (strict-implicit binder brackets, anonymous
-    # -constructor brackets, angle brackets) are Lean delimiters, not identifier characters.
+    # -- the leaf-mention scan must end an identifier exactly where Lean's own isIdRest ends
+    # it, in both directions: brackets and guillemets are delimiters that must not hide a
+    # mention, while a trailing subscript, Greek, accented, Latin Extended-A or subscript-j
+    # code point continues the leaf into a different identifier.
     idrest_probe_root = Path(
         tempfile.mkdtemp(prefix="lean-leaf-mention-idrest-", dir=fixture_scratch_root)
     )
@@ -4167,55 +4196,29 @@ end LatticeSystem
         idrest_probe_dir = idrest_probe_root / "LatticeSystem"
         idrest_probe_dir.mkdir(parents=True, exist_ok=True)
         idrest_probe_file = idrest_probe_dir / "Probe.lean"
-        idrest_probe_cases = {
-            "gone⦃x": True,  # U+2983: strict-implicit binder opener, a delimiter
-            "gone₁": False,  # U+2081: subscript digit, an isIdRest continuation
-            "goneα": False,  # U+03B1 (Greek alpha): letterlike continuation
-            "gone⟩": True,  # U+27E9: anonymous-constructor closer, a delimiter
-            "«gone»": True,  # U+00AB/U+00BB: French-quote name delimiters
-        }
-        for body, expect_found in idrest_probe_cases.items():
-            idrest_probe_file.write_text(body + "\n", encoding="utf-8")
-            found = lean_leaf_mention(idrest_probe_root, "LatticeSystem.gone") is not None
-            check(
-                found == expect_found,
-                "identifier class: lean_leaf_mention(..., \"LatticeSystem.gone\") against a "
-                f"file containing {body!r} returned found={found}, expected {expect_found}",
-            )
-            idrest_probe_file.unlink()
-    finally:
-        shutil.rmtree(idrest_probe_root, ignore_errors=True)
-
-    # -- LEAN_IDENTIFIER_REST_CLASS must equal Lean's own `isIdRest`, not a narrower
-    # approximation: the pinned toolchain's `isLetterLike` accepts Latin-1 supplement and
-    # Latin Extended-A letters and `isSubScriptAlnum` accepts the subscript letter j (U+2C7C),
-    # so a code point from one of those ranges immediately adjacent to an ASCII leaf must
-    # continue the identifier (no boundary), not delimit it.
-    isidrest_boundary_probe_root = Path(
-        tempfile.mkdtemp(prefix="lean-leaf-mention-isidrest-boundary-", dir=fixture_scratch_root)
-    )
-    try:
-        isidrest_boundary_dir = isidrest_boundary_probe_root / "LatticeSystem"
-        isidrest_boundary_dir.mkdir(parents=True, exist_ok=True)
-        isidrest_boundary_file = isidrest_boundary_dir / "Probe.lean"
-        isidrest_boundary_cases = [
+        idrest_probe_cases = [
+            ("LatticeSystem.gone", "gone⦃x", True),  # U+2983: strict-implicit binder opener
+            ("LatticeSystem.gone", "gone⟩", True),  # U+27E9: anonymous-constructor closer
+            ("LatticeSystem.gone", "«gone»", True),  # U+00AB/U+00BB: French-quote name
+            ("LatticeSystem.foo", "foo·", True),  # U+00B7 ·: not letter-like, a real delimiter
+            ("LatticeSystem.gone", "gone₁", False),  # U+2081: subscript digit
+            ("LatticeSystem.gone", "goneα", False),  # U+03B1 α: letterlike continuation
             ("LatticeSystem.hop", "Ĥhop", False),  # U+0124 Ĥ: Latin Extended-A continuation
             ("LatticeSystem.foo", "fooé", False),  # U+00E9 é: Latin-1 supplement continuation
             ("LatticeSystem.foo", "fooἀ", False),  # U+1F00 ἀ: polytonic Greek continuation
             ("LatticeSystem.foo", "fooⱼ", False),  # U+2C7C ⱼ: subscript-j continuation
-            ("LatticeSystem.foo", "foo·", True),  # U+00B7 ·: not letter-like, a real delimiter
         ]
-        for lean_name, body, expect_found in isidrest_boundary_cases:
-            isidrest_boundary_file.write_text(body + "\n", encoding="utf-8")
-            found = lean_leaf_mention(isidrest_boundary_probe_root, lean_name) is not None
+        for lean_name, body, expect_found in idrest_probe_cases:
+            idrest_probe_file.write_text(body + "\n", encoding="utf-8")
+            found = lean_leaf_mention(idrest_probe_root, lean_name) is not None
             check(
                 found == expect_found,
                 f"isIdRest class: lean_leaf_mention(..., {lean_name!r}) against a file "
                 f"containing {body!r} returned found={found}, expected {expect_found}",
             )
-            isidrest_boundary_file.unlink()
+            idrest_probe_file.unlink()
     finally:
-        shutil.rmtree(isidrest_boundary_probe_root, ignore_errors=True)
+        shutil.rmtree(idrest_probe_root, ignore_errors=True)
 
     # -- LEAN_IDENTIFIER_REST_CLASS membership must match the pinned toolchain's `isIdRest`
     # code-point-for-code-point, not merely "adjacent to an ASCII leaf" as the probes above

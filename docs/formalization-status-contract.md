@@ -255,16 +255,23 @@ tree, its record is retired: `lifecycle` becomes `retired`, and
 `retirement` records the reason, the sorted `superseded_by` record IDs (possibly
 none), and one 40-hex `present_at_commit` that is an ancestor of durable
 main-branch history and whose tree still declares the recorded Lean name at
-the recorded path. That commit is one at which the declaration was present, not
-necessarily the last such commit. The record's Lean name, module, source path,
+the recorded path. Every `superseded_by` ID must exist in the catalogue and may
+be active or retired, because a replacement can itself be replaced later. That
+commit is one at which the declaration was present, not necessarily the last
+such commit. The record's Lean name, module, source path,
 and status dimensions are frozen as the historical description of that former
 declaration: they must equal the values durable main-branch history publishes
 for the same record ID, and a record whose ID that history does not publish
 cannot be retired. Retirement is terminal: once that history publishes the ID
 as `retired`, its `lifecycle` cannot return to `active`, and `present_at_commit`
-is frozen alongside the identity fields. Only the `reason` stays editable, and
-`superseded_by` may gain IDs, discovered when a replacement is written later,
-but may never drop one that history already publishes. A retired record keeps
+is frozen alongside the identity fields. Comparison against that history carries
+the bootstrap exception: while durable main-branch history publishes no record
+shard tree at all, active records are not compared against it; any shard that
+exists but cannot be read is a validation error, not a silent skip. Only the
+`reason` stays editable, and `superseded_by` may gain IDs, discovered when a
+replacement is written later, but may never drop one that history already
+publishes. A retired record's `axiom_dependencies` is not frozen: only the
+identity fields named above and `present_at_commit` are. A retired record keeps
 its stable ID, its canonical human route, and its projection fragments; it
 generates no Lean assertion; no active record may depend on it; and its Lean
 name is not available for reuse.
@@ -584,11 +591,12 @@ library and checks:
   durable main-branch history (`origin/main` if that ref resolves, otherwise
   `main`; neither resolving is an error) whose tree declares that name at the
   recorded path, its frozen fields equal those the same history publishes for
-  that record ID, and its `superseded_by` IDs resolve to active records;
-- terminal retirement: once that history publishes a record ID as `retired`, no
-  record may return the ID to `active`, the retired record's
-  `present_at_commit` must equal the published one, and its `superseded_by`
-  may add IDs but must keep every published one;
+  that record ID, and its `superseded_by` IDs resolve to catalogue records,
+  whether those are active or themselves retired;
+- terminal retirement, under the bootstrap exception stated above: once that
+  history publishes a record ID as `retired`, no record may return the ID to
+  `active`, the retired record's `present_at_commit` must equal the published
+  one, and its `superseded_by` may add IDs but must keep every published one;
 - fail-closed absence of a retired Lean name: beyond the declaration matcher,
   the retired record is rejected if its short name still occurs in any Lean
   source under `LatticeSystem/` delimited by `isIdRest` of the pinned Lean
@@ -598,8 +606,11 @@ library and checks:
   polytonic Greek, letterlike symbols, and script letters) and every
   `isSubScriptAlnum` range (subscript digits, subscript Latin letters, and
   subscript j), so that `foo'` and `foo` count as distinct words while brackets
-  and guillemets end a name. The schema's `lean_name` pattern is a separate and
-  looser syntactic filter on recorded names, not this scanning set;
+  and guillemets end a name. The schema's `lean_name` pattern is a separate
+  syntactic filter on recorded names, and neither it nor this scanning set
+  contains the other: the pattern admits code points up to U+FFFF that this scan
+  treats as delimiters, and rejects `!`, `?` and the script letters of
+  U+1D49C-U+1D59F that this scan treats as identifier characters;
 - active-only gates: only active records generate Lean assertions, satisfy
   representative prototype coverage, and may be named by another active record's
   axiom dependencies;
