@@ -3418,7 +3418,16 @@ end LatticeSystem
             "source_path": "LatticeSystem/FrozenFixtureChanged.lean",
             "trust_state": "documented_axiom",
         }
-        for frozen_field in FROZEN_RECORD_FIELDS:
+        # The loop below is driven by this literal mapping's keys, not by FROZEN_RECORD_FIELDS
+        # itself, so shrinking the tuple cannot shrink the loop along with it; this equality is
+        # the only place that pins the tuple's full membership against an independent list.
+        check(
+            tuple(sorted(FROZEN_RECORD_FIELDS)) == tuple(sorted(frozen_field_alternate_values)),
+            f"frozen fields: FROZEN_RECORD_FIELDS {tuple(sorted(FROZEN_RECORD_FIELDS))!r} does "
+            "not equal the fixture's independently listed six field names "
+            f"{tuple(sorted(frozen_field_alternate_values))!r}",
+        )
+        for frozen_field in frozen_field_alternate_values:
             single_field_errors = frozen_field_errors(
                 {frozen_field: frozen_field_alternate_values[frozen_field]}
             )
@@ -3515,6 +3524,365 @@ end LatticeSystem
         )
     finally:
         shutil.rmtree(no_shard_repo_root, ignore_errors=True)
+
+    # -- reject_retirement_reversal must fail closed on an unreadable durable-main shard, not
+    # only on an absent shard tree: read_main_record_index collapses both into None today, so
+    # an active follow-up record silently bypasses the terminal-retirement guard whenever any
+    # shard alongside a genuinely retired one fails to parse.
+    unreadable_shard_repo_root = Path(
+        tempfile.mkdtemp(prefix="retirement-reversal-unreadable-shard-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], unreadable_shard_repo_root)
+        (unreadable_shard_repo_root / "README.md").write_text("fixture\n", encoding="utf-8")
+        fixture_git(["add", "README.md"], unreadable_shard_repo_root)
+        fixture_git(["commit", "-q", "-m", "seed"], unreadable_shard_repo_root)
+        unreadable_shard_dir = (
+            unreadable_shard_repo_root / "formalization-status" / "v2" / "records"
+        )
+        unreadable_shard_dir.mkdir(parents=True, exist_ok=True)
+        (unreadable_shard_dir / "retired-rec-a-shard.json").write_text(
+            json.dumps(
+                {
+                    "records": [
+                        {
+                            "id": "rec-a",
+                            "lifecycle": "retired",
+                            "retirement": {
+                                "present_at_commit": "a" * 40,
+                                "reason": "fixture: rec-a retired on durable main",
+                                "superseded_by": [],
+                            },
+                        }
+                    ],
+                    "schema_version": 2,
+                    "source_id": "unreadable-shard-fixture",
+                    "source_unit": "fixture",
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        malformed_shard_name = "malformed-shard.json"
+        (unreadable_shard_dir / malformed_shard_name).write_text(
+            "{ this is not valid JSON", encoding="utf-8"
+        )
+        fixture_git(["add", "formalization-status/v2/records"], unreadable_shard_repo_root)
+        fixture_git(
+            ["commit", "-q", "-m", "publish rec-a retired alongside an unreadable shard"],
+            unreadable_shard_repo_root,
+        )
+        unreadable_shard_validation = Validation()
+        validate_retirement(
+            {"id": "rec-a", "lifecycle": "active", "retirement": None},
+            "retirement-reversal-unreadable-shard",
+            contract,
+            unreadable_shard_repo_root,
+            {},
+            unreadable_shard_validation,
+        )
+        check(
+            any(
+                "rec-a" in error and malformed_shard_name in error
+                for error in unreadable_shard_validation.errors
+            ),
+            "terminal retirement fail-closed: durable main publishes rec-a retired but one "
+            "shard alongside it is unreadable, and an active follow-up record for rec-a was "
+            "accepted instead of rejected naming the unreadable shard "
+            f"(errors: {unreadable_shard_validation.errors})",
+        )
+    finally:
+        shutil.rmtree(unreadable_shard_repo_root, ignore_errors=True)
+
+    # Positive control: when durable main publishes no record shard tree at all (bootstrap),
+    # an active record must still be accepted -- absence, not unreadability, is the only
+    # legitimate reason reject_retirement_reversal may stay silent.
+    no_shard_reversal_repo_root = Path(
+        tempfile.mkdtemp(prefix="retirement-reversal-no-shard-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], no_shard_reversal_repo_root)
+        (no_shard_reversal_repo_root / "README.md").write_text("fixture\n", encoding="utf-8")
+        fixture_git(["add", "README.md"], no_shard_reversal_repo_root)
+        fixture_git(["commit", "-q", "-m", "seed, no v2 shard tree"], no_shard_reversal_repo_root)
+        no_shard_reversal_validation = Validation()
+        validate_retirement(
+            {"id": "rec-a", "lifecycle": "active", "retirement": None},
+            "retirement-reversal-no-shard",
+            contract,
+            no_shard_reversal_repo_root,
+            {},
+            no_shard_reversal_validation,
+        )
+        check(
+            not no_shard_reversal_validation.errors,
+            "terminal retirement bootstrap positive control: durable main publishing no "
+            "formalization-status/v2/records tree at all rejected an active record "
+            f"(errors: {no_shard_reversal_validation.errors})",
+        )
+    finally:
+        shutil.rmtree(no_shard_reversal_repo_root, ignore_errors=True)
+
+    # -- a supersession target must itself be retirable: once B is retired with its own valid
+    # evidence, A's superseded_by entry naming B must not be treated as pointing to an inactive
+    # record forever, and A's own frozen-identity check for the supersession list must not
+    # report a drop when the id is merely no longer active.
+    supersession_repo_root = Path(
+        tempfile.mkdtemp(prefix="retirement-supersession-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], supersession_repo_root)
+        supersession_module = supersession_repo_root / "LatticeSystem" / "SupersessionFixture.lean"
+        supersession_module.parent.mkdir(parents=True, exist_ok=True)
+        supersession_module.write_text(
+            "namespace LatticeSystem\n\n"
+            "theorem supersessionRetiredA : True := trivial\n\n"
+            "theorem supersessionTargetB : True := trivial\n\n"
+            "end LatticeSystem\n",
+            encoding="utf-8",
+        )
+        fixture_git(["add", "LatticeSystem/SupersessionFixture.lean"], supersession_repo_root)
+        fixture_git(
+            ["commit", "-q", "-m", "add supersessionRetiredA and supersessionTargetB"],
+            supersession_repo_root,
+        )
+        supersession_present_at_commit = fixture_head(supersession_repo_root)
+        supersession_shard_dir = supersession_repo_root / "formalization-status" / "v2" / "records"
+        supersession_shard_dir.mkdir(parents=True, exist_ok=True)
+        supersession_record_a = {
+            "axiom_dependencies": [],
+            "capstone": False,
+            "declaration_kind": "theorem",
+            "id": "supersession-record-a",
+            "implementation_state": "implemented",
+            "lean_name": "LatticeSystem.supersessionRetiredA",
+            "lifecycle": "retired",
+            "module": "LatticeSystem.SupersessionFixture",
+            "origin": "project_original",
+            "proof_guide_anchor": None,
+            "retirement": {
+                "present_at_commit": supersession_present_at_commit,
+                "reason": "fixture: supersession target must itself be retirable",
+                "superseded_by": ["supersession-record-b"],
+            },
+            "source_coverage": "not_applicable",
+            "source_path": "LatticeSystem/SupersessionFixture.lean",
+            "source_relations": [],
+            "summary": "fixture: supersession source",
+            "topic_ids": [],
+            "trust_state": "axiom_free",
+        }
+        supersession_record_b_published = {
+            "axiom_dependencies": [],
+            "capstone": False,
+            "declaration_kind": "theorem",
+            "id": "supersession-record-b",
+            "implementation_state": "implemented",
+            "lean_name": "LatticeSystem.supersessionTargetB",
+            "lifecycle": "active",
+            "module": "LatticeSystem.SupersessionFixture",
+            "origin": "project_original",
+            "proof_guide_anchor": None,
+            "retirement": None,
+            "source_coverage": "complete",
+            "source_path": "LatticeSystem/SupersessionFixture.lean",
+            "source_relations": [],
+            "summary": "fixture: supersession target",
+            "topic_ids": [],
+            "trust_state": "axiom_free",
+        }
+        (supersession_shard_dir / "supersession-shard.json").write_text(
+            json.dumps(
+                {
+                    "records": [supersession_record_a, supersession_record_b_published],
+                    "schema_version": 2,
+                    "source_id": "supersession-fixture",
+                    "source_unit": "fixture",
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        fixture_git(
+            ["add", "formalization-status/v2/records/supersession-shard.json"],
+            supersession_repo_root,
+        )
+        fixture_git(
+            ["commit", "-q", "-m", "publish supersession-record-a retired, -b active"],
+            supersession_repo_root,
+        )
+
+        supersession_followup_a = dict(supersession_record_a)
+        supersession_followup_b = dict(supersession_record_b_published)
+        supersession_followup_b["lifecycle"] = "retired"
+        supersession_followup_b["capstone"] = False
+        supersession_followup_b["retirement"] = {
+            "present_at_commit": supersession_present_at_commit,
+            "reason": "fixture: supersession target retired in the same catalogue",
+            "superseded_by": [],
+        }
+        supersession_records_by_id = {
+            "supersession-record-a": supersession_followup_a,
+            "supersession-record-b": supersession_followup_b,
+        }
+
+        supersession_a_validation = Validation()
+        validate_retirement(
+            supersession_followup_a,
+            "supersession-fixture-a",
+            contract,
+            supersession_repo_root,
+            supersession_records_by_id,
+            supersession_a_validation,
+        )
+        check(
+            not any(
+                "superseded_by record is not active" in error or "no longer lists" in error
+                for error in supersession_a_validation.errors
+            ),
+            "supersession target retirable: retiring supersession-record-b while "
+            "supersession-record-a still lists it in superseded_by was rejected as an "
+            "inactive-target or dropped-supersession violation "
+            f"(errors: {supersession_a_validation.errors})",
+        )
+
+        # Negative control: an id that resolves nowhere in the follow-up catalogue must still
+        # be rejected, so the fix above must not relax resolution itself.
+        supersession_dangling_a = dict(supersession_followup_a)
+        supersession_dangling_a["retirement"] = dict(supersession_followup_a["retirement"])
+        supersession_dangling_a["retirement"]["superseded_by"] = ["supersession-record-nowhere"]
+        supersession_dangling_validation = Validation()
+        validate_retirement(
+            supersession_dangling_a,
+            "supersession-fixture-dangling",
+            contract,
+            supersession_repo_root,
+            {"supersession-record-a": supersession_dangling_a},
+            supersession_dangling_validation,
+        )
+        check(
+            any(
+                "unresolved superseded_by" in error
+                for error in supersession_dangling_validation.errors
+            ),
+            "supersession resolution: a superseded_by id that resolves nowhere in the "
+            "follow-up catalogue was accepted "
+            f"(errors: {supersession_dangling_validation.errors})",
+        )
+    finally:
+        shutil.rmtree(supersession_repo_root, ignore_errors=True)
+
+    # -- an unhashable element in durable main's published superseded_by must not crash the
+    # validator with a bare TypeError: every other read of a published main shard is
+    # isinstance-guarded, so this set construction must be too.
+    unhashable_superseded_repo_root = Path(
+        tempfile.mkdtemp(prefix="retirement-unhashable-superseded-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], unhashable_superseded_repo_root)
+        unhashable_module = (
+            unhashable_superseded_repo_root / "LatticeSystem" / "UnhashableSupersededFixture.lean"
+        )
+        unhashable_module.parent.mkdir(parents=True, exist_ok=True)
+        unhashable_module.write_text(
+            "namespace LatticeSystem\n\n"
+            "theorem unhashableSupersededFixture : True := trivial\n\n"
+            "end LatticeSystem\n",
+            encoding="utf-8",
+        )
+        fixture_git(
+            ["add", "LatticeSystem/UnhashableSupersededFixture.lean"],
+            unhashable_superseded_repo_root,
+        )
+        fixture_git(
+            ["commit", "-q", "-m", "add unhashableSupersededFixture while it still existed"],
+            unhashable_superseded_repo_root,
+        )
+        unhashable_present_at_commit = fixture_head(unhashable_superseded_repo_root)
+        unhashable_shard_dir = (
+            unhashable_superseded_repo_root / "formalization-status" / "v2" / "records"
+        )
+        unhashable_shard_dir.mkdir(parents=True, exist_ok=True)
+        # Written as raw JSON text, not through the schema, because a well-formed catalogue
+        # cannot itself publish this: the point is what a malformed durable-main shard does to
+        # the reader, not whether our own writer would ever produce one.
+        (unhashable_shard_dir / "unhashable-superseded-shard.json").write_text(
+            json.dumps(
+                {
+                    "records": [
+                        {
+                            "capstone": False,
+                            "declaration_kind": "theorem",
+                            "id": "unhashable-superseded-record",
+                            "implementation_state": "implemented",
+                            "lean_name": "LatticeSystem.unhashableSupersededFixture",
+                            "lifecycle": "retired",
+                            "module": "LatticeSystem.UnhashableSupersededFixture",
+                            "retirement": {
+                                "present_at_commit": unhashable_present_at_commit,
+                                "reason": "fixture: main publishes an unhashable superseded_by entry",
+                                "superseded_by": [["nested-list-entry"]],
+                            },
+                            "source_coverage": "not_applicable",
+                            "source_path": "LatticeSystem/UnhashableSupersededFixture.lean",
+                            "trust_state": "axiom_free",
+                        }
+                    ],
+                    "schema_version": 2,
+                    "source_id": "unhashable-superseded-fixture",
+                    "source_unit": "fixture",
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        fixture_git(
+            ["add", "formalization-status/v2/records/unhashable-superseded-shard.json"],
+            unhashable_superseded_repo_root,
+        )
+        fixture_git(
+            ["commit", "-q", "-m", "publish an unhashable superseded_by entry"],
+            unhashable_superseded_repo_root,
+        )
+        unhashable_followup = {
+            "capstone": False,
+            "declaration_kind": "theorem",
+            "id": "unhashable-superseded-record",
+            "implementation_state": "implemented",
+            "lean_name": "LatticeSystem.unhashableSupersededFixture",
+            "lifecycle": "retired",
+            "module": "LatticeSystem.UnhashableSupersededFixture",
+            "retirement": {
+                "present_at_commit": unhashable_present_at_commit,
+                "reason": "fixture: follow-up drops the unhashable entry",
+                "superseded_by": [],
+            },
+            "source_coverage": "not_applicable",
+            "source_path": "LatticeSystem/UnhashableSupersededFixture.lean",
+            "trust_state": "axiom_free",
+        }
+        unhashable_validation = Validation()
+        unhashable_crashed: TypeError | None = None
+        try:
+            validate_retirement(
+                unhashable_followup,
+                "unhashable-superseded-fixture",
+                contract,
+                unhashable_superseded_repo_root,
+                {},
+                unhashable_validation,
+            )
+        except TypeError as error:
+            unhashable_crashed = error
+        check(
+            unhashable_crashed is None and bool(unhashable_validation.errors),
+            "unhashable superseded_by: durable main publishing a non-string, unhashable "
+            "superseded_by entry either crashed the validator with a bare TypeError "
+            f"({unhashable_crashed!r}) instead of a validation error, or was accepted "
+            f"(errors: {unhashable_validation.errors})",
+        )
+    finally:
+        shutil.rmtree(unhashable_superseded_repo_root, ignore_errors=True)
 
     # -- retirement is terminal: once durable main publishes an id as retired, a follow-up
     # record for that id must not silently repoint present_at_commit, must accept a corrected
@@ -3722,6 +4090,15 @@ end LatticeSystem
             "retirement is terminal: removing a superseded_by entry that durable main already "
             f"publishes for a retired record was accepted (errors: {superseded_by_removed_errors})",
         )
+        check(
+            any(
+                "superseded_by" in error and "no longer lists" in error
+                for error in superseded_by_removed_errors
+            ),
+            "retirement is terminal: removing a superseded_by entry that durable main already "
+            "publishes for a retired record was rejected for an unrelated reason instead of "
+            f"naming the dropped entry (errors: {superseded_by_removed_errors})",
+        )
 
         # (e) retirement is terminal: flipping lifecycle back to active must be rejected even
         # though every frozen identity field still matches durable main.
@@ -3731,6 +4108,15 @@ end LatticeSystem
             "retirement is terminal: a follow-up record with lifecycle flipped back to active "
             "for an id durable main already publishes as retired was accepted with identity "
             f"fields unchanged (errors: {reactivated_errors})",
+        )
+        check(
+            any(
+                "retirement-terminal-record" in error and "terminal" in error
+                for error in reactivated_errors
+            ),
+            "retirement is terminal: flipping lifecycle back to active for an id durable main "
+            "already publishes as retired was rejected for an unrelated reason instead of "
+            f"naming the terminal-retirement rule (errors: {reactivated_errors})",
         )
 
         # (f) positive control: an unchanged retired record (the steady state after merge) must
@@ -4010,6 +4396,39 @@ end LatticeSystem
             "'present at commit' / present_at_commit",
         )
 
+    # -- the contract's set-relation claim about the schema's lean_name pattern must not
+    # overclaim a strict superset it is not: it is looser inside the BMP but stricter for `!`,
+    # `?`, and the astral letterlike block (U+1D49C-U+1D59F), so an unqualified "looser" repeats
+    # the same class of overclaim the pinned isIdRest comparison above just corrected for the
+    # scanning class itself.
+    contract_vocabulary_text = " ".join(
+        (repo_root / "docs" / "formalization-status-contract.md")
+        .read_text(encoding="utf-8")
+        .split()
+    )
+    check(
+        "separate and looser syntactic filter" not in contract_vocabulary_text,
+        "docs/formalization-status-contract.md: describes the schema's lean_name pattern as "
+        "an unqualified 'looser' filter, which is false above U+FFFF and for `!`/`?`",
+    )
+
+    # -- the contract must state the terminal-retirement guard's bootstrap exception in prose,
+    # not only in a code comment: today the contract sentence is unconditional, but
+    # reject_retirement_reversal stays silent while durable main publishes no record shard tree
+    # at all, and must fail closed (an error, not a silent skip) on any shard that exists but
+    # cannot be read.
+    check(
+        "the bootstrap exception: while durable main-branch history publishes no record "
+        "shard tree at all, active records are not compared against it; any shard that "
+        "exists but cannot be read is a validation error, not a silent skip"
+        in contract_vocabulary_text,
+        "docs/formalization-status-contract.md: does not state the terminal-retirement "
+        "guard's bootstrap exception (expected phrase: 'the bootstrap exception: while "
+        "durable main-branch history publishes no record shard tree at all, active records "
+        "are not compared against it; any shard that exists but cannot be read is a "
+        "validation error, not a silent skip')",
+    )
+
     # -- main_record_index must not re-read durable main's record shards from scratch for
     # every retired record in a catalogue: `validate_frozen_identity` calls it once per
     # retired record, so an unmemoised implementation re-runs `git ls-tree` plus one `git show`
@@ -4064,9 +4483,12 @@ end LatticeSystem
             main_record_index(memoization_repo_root, "main")
             calls_after_second_lookup = len(git_capture_call_log)
         check(
-            calls_after_second_lookup == calls_after_first_lookup,
-            "main_record_index memoization: a second lookup for the same ref and shard set "
-            f"invoked git_capture {calls_after_second_lookup - calls_after_first_lookup} more "
+            calls_after_first_lookup > 0
+            and calls_after_second_lookup == calls_after_first_lookup,
+            "main_record_index memoization: the first lookup invoked git_capture "
+            f"{calls_after_first_lookup} time(s) (must be > 0 to prove the reader actually ran), "
+            "and a second lookup for the same ref and shard set invoked git_capture "
+            f"{calls_after_second_lookup - calls_after_first_lookup} more "
             f"time(s) instead of reusing the first lookup's result "
             f"(first lookup: {calls_after_first_lookup} calls, "
             f"second lookup: {calls_after_second_lookup} calls)",
