@@ -652,12 +652,16 @@ presentation, Tasaki's attribution of Theorem 4.2 to Shastry, and the
 Tanaka--Takeda--Idogaki supporting rigorous formulation. The Nielsen--Chuang
 record has `partial` source coverage: one declaration proves one instance of the
 anti-commutation relations that exercise states, not the whole exercise. The
-staggered-susceptibility axiom behind Corollary 4.3 is `project_original` with
-`not_applicable` coverage, no bibliographic edge, and a `null` shard source: no
-examined source states that estimate, so no `formalizes` or `presents` claim is
-available for it, and Shastry 1992 is cited only where Tasaki attributes Theorem
-4.2 to it. The prototype does not claim comprehensive coverage of any non-Tasaki
-paper.
+`null`-source `project-assumptions` shard carries the prototype's two
+`project_original` records, both with `not_applicable` coverage and no primary
+bibliographic edge: the retired staggered-susceptibility axiom that Corollary
+4.3 once rested on, kept as history under `lifecycle: retired` because a
+published record ID is never deleted, and the axiom-free converse of the
+Theorem 4.2 reduction, whose only bibliographic edge is the weaker typed
+`supports` relation to the Theorem 4.2 source item. No examined source states
+either proposition, so no `formalizes` or `presents` claim is available for
+them, and Shastry 1992 is cited only where Tasaki attributes Theorem 4.2 to it.
+The prototype does not claim comprehensive coverage of any non-Tasaki paper.
 
 `--emit-aggregate PATH` writes the canonical aggregate to a repo-local scratch
 path for reproducibility checks. `--emit-lean-check PATH` writes a temporary

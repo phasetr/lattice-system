@@ -157,7 +157,7 @@ import LatticeSystem.Tests.RangeLocalDoubleCommutatorBound
 import LatticeSystem.Tests.OperatorSupport
 import LatticeSystem.Tests.ShastryEnergyGainReduction
 import LatticeSystem.Tests.NoLongRangeOrder1DPin
-import LatticeSystem.Tests.ShastrySusceptibilitySubcubicPin
+import LatticeSystem.Tests.Corollary43ContrapositionPin
 import LatticeSystem.Tests.Corollary43RingSetup
 
 /-!

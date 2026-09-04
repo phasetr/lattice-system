@@ -1994,9 +1994,8 @@ def run_staged_mutation_tests(
         ),
         (
             "axiom dependency",
-            "formalization/records/shastry-1992-staggered-susceptibility-bound.md",
-            '<dd data-field="axiom-dependency">'
-            "LatticeSystem.Quantum.shastry_staggered_susceptibility_subcubic</dd>",
+            "formalization/records/tasaki-2020-theorem-4-2-shastry-energy-gain.md",
+            '<dd data-field="axiom-dependency">LatticeSystem.Quantum.shastryEnergyGain</dd>',
             '<dd data-field="axiom-dependency">LatticeSystem.Quantum.changed</dd>',
         ),
         (

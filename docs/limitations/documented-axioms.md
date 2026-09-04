@@ -101,10 +101,23 @@ are more varied than any list here would capture.
 
 **Effect, entry by entry.** Citation-only status — "Tasaki cites this result instead of proving
 it" — no longer sustains an entry by itself. The census below is taken over all thirty-five entries
-on the eight chapter ledgers, counting an entry as invoking citation-only when its recorded ground
-states that Tasaki cites or states the result rather than proving it — including entries that name
-the rule only to record that it does not override them. **Sixteen entries invoke it.** **Six rest
-on it alone**, so the retraction leaves them without a recorded ground:
+on the eight chapter ledgers, counting an entry as invoking citation-only when the ground recorded
+for the axiom it carries states that Tasaki cites or states the result rather than proving it —
+including entries that name the rule only to record that it does not override them. The buckets
+below classify an entry by the ground the entry itself records; for most entries that is the ground
+recorded for the axiom the entry carries, but an entry can record a ground without carrying a Lean
+`axiom`, and two entries make the difference visible. The [Corollary 4.3 support
+entry](/lattice-system/limitations/documented-axioms/chapter-04/#entry-corollary-4-3-support)
+carries **no axiom of its own** and records **no ground of its own**: it stays on a ledger of
+documented axioms because the axiom its result is charged to is documented here, in the Theorem 4.2
+entry, whose ground is itself counted below, so counting the corollary entry would count that same
+ground twice and it is counted in **none** of the buckets. The [general-`S` bond-inversion parity
+entry](/lattice-system/limitations/documented-axioms/chapter-08-part-02/#entry-general-s-bond-inversion-parity)
+carries no axiom either — the two markers that named its claim were deleted rather than left as
+contentless axioms, so it has no Lean declaration at all — but it does record a ground of its own,
+and it **is** counted, among the three below that read as though they invoked citation-only and do
+not. Of the remaining thirty-four, **sixteen invoke citation-only.** **Six rest on it alone**, so
+the retraction leaves them without a recorded ground:
 
 - [Theorem 4.24](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-24) (improved Hohenberg–Mermin–Wagner) and
   [Theorem 4.25](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-25) (McBryan–Spencer, Koma–Tasaki power-law
@@ -171,7 +184,7 @@ Five of these entries — Theorems 7.2, 7.3, 8.1, 8.6 and 8.9 — say in their o
 "prove theorems Tasaki cites without proof" rule does not override them. Each of those readings
 stands on the entry's second ground, not on citation-only, and so survives unchanged.
 
-**Four entries read as though they invoked citation-only, and do not.** The
+**Three entries read as though they invoked citation-only, and do not.** The
 [general-`S` bond-inversion parity entry](/lattice-system/limitations/documented-axioms/chapter-08-part-02/#entry-general-s-bond-inversion-parity)
 records only the missing general-`S` extension of the spin-one machinery; the claim it defers is
 Tasaki's own remark that the `S = 1` argument "can be extended to general `S` in a straightforward
@@ -179,9 +192,13 @@ manner", not an external citation, and it has no Lean declaration at all.
 [Theorem 5.4](/lattice-system/limitations/documented-axioms/chapter-05/#entry-theorem-5-4) names the policy only to place itself under the
 **open-conjecture** exclusion — Tasaki's footnote says the existence of the iterated limit is
 itself unproved — "rather than being a tractable finite-dimensional cite-only case".
-[Theorem 4.2](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-2) and
-[Corollary 4.3](/lattice-system/limitations/documented-axioms/chapter-04/#entry-corollary-4-3-support) both say in so many words that they
-are **not** won't-do citations, per the 2026-07-05 override; see below.
+[Theorem 4.2](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-2) is **not** a won't-do citation, per the
+2026-07-05 override, and says so in so many words. The
+[Corollary 4.3](/lattice-system/limitations/documented-axioms/chapter-04/#entry-corollary-4-3-support) entry is not among the three, and
+not because its text is silent about the book's non-proof — it records that Tasaki does not prove
+Theorem 4.2 (footnote 3, p. 76) and derives the corollary from it (p. 77) — but because it carries
+no axiom of its own for any ground to be recorded of; its content is charged to Theorem 4.2, whose
+classification it inherits; see below.
 
 **Theorem 7.7 is left exactly where its own entry puts it, and does not invoke citation-only.**
 [That entry](/lattice-system/limitations/documented-axioms/chapter-07/#entry-theorem-7-7) records a real implementation dependency: the
@@ -195,10 +212,13 @@ obtained and transcribed, or an independent [41]-free proof of eq. (7.3.9) — g
 
 **Theorem 4.2** (Shastry; Tasaki §4.1, footnote 3, p. 76) and **Corollary 4.3** (§4.1,
 eq. (4.1.11), p. 77) are results of precisely the kind the withdrawn paragraph would have parked —
-the book cites rather than proves them. They are therefore **open, not deferred.** The axioms
-`shastryEnergyGain` and `shastry_staggered_susceptibility_subcubic` that carry them are live
-discharge targets, tracked in the [Chapter 4 entries](/lattice-system/limitations/documented-axioms/chapter-04/); a reader who finds them
-in this ledger should read them as unfinished work, not as settled policy.
+the book cites rather than proves Theorem 4.2, and derives the corollary from it, so the pair's
+whole unproved content is a result the book only cites. They are therefore **open, not deferred.**
+Both are now carried by the single axiom `shastryEnergyGain`: Corollary 4.3 is proved from
+Theorem 4.2 the way the book proves it, by contraposition, so it no longer has a susceptibility
+axiom of its own. That axiom is a live discharge target, tracked in the
+[Chapter 4 entries](/lattice-system/limitations/documented-axioms/chapter-04/); a reader who finds
+it in this ledger should read it as unfinished work, not as settled policy.
 
 **Bulk reclassification is out of scope here and is parked.** This section records the withdrawal
 and how far it reaches; it rewrites no chapter entry. Re-deriving the six citation-only-alone

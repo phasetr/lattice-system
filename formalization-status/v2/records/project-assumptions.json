@@ -9,11 +9,15 @@
       "id": "shastry-1992-staggered-susceptibility-bound",
       "implementation_state": "implemented",
       "lean_name": "LatticeSystem.Quantum.shastry_staggered_susceptibility_subcubic",
-      "lifecycle": "active",
+      "lifecycle": "retired",
       "module": "LatticeSystem.Quantum.SpinS.NoLongRangeOrder1D",
       "origin": "project_original",
       "proof_guide_anchor": null,
-      "retirement": null,
+      "retirement": {
+        "present_at_commit": "3662a3fa5b4f75b6716b9c2b1bf6326194ae00c4",
+        "reason": "Corollary 4.3 is now proved the way Tasaki proves it, by contraposition from Theorem 4.2, so the sub-cubic staggered-susceptibility assumption and the conditional reduction that consumed it were removed from the Lean tree; nothing replaces the assumption, whose content was strictly stronger than the corollary it was fed into.",
+        "superseded_by": []
+      },
       "source_coverage": "not_applicable",
       "source_path": "LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean",
       "source_relations": [],

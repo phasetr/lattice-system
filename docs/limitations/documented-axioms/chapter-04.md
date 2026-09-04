@@ -87,115 +87,52 @@ permalink: /limitations/documented-axioms/chapter-04/
   already in this repository. A math-before-code transcription of the
   Shastry / Tanaka–Takeda–Idogaki argument is an alternative route, but [63]
   has not been examined here (no copy is available).
-- **Tracking:** issue **#5413** (Theorem 4.2 close-out) is the successor
-  discharge issue and is open. The two trackers named in earlier revisions of
-  this entry, #4718 and #4777, are **closed** and historical only: #4718 was
-  the book-order master tracker, #4777 scoped the 1D-ring RP infrastructure
-  and closed 2026-07-11. Neither is to be reopened or rescoped.
+- **Tracking:** issue #5413 (Theorem 4.2 close-out), named in earlier
+  revisions of this entry as the successor discharge issue, is **closed as not
+  planned** (2026-09-02) and is not one. No issue currently open scopes the
+  discharge of this axiom: **#5416** is open, but it covers Corollary 4.3's
+  route to Theorem 4.2 and explicitly not the discharge. The other two
+  trackers named in earlier revisions, #4718 and #4777, are **closed** and
+  historical only: #4718 was the book-order master tracker, #4777 scoped the
+  1D-ring RP infrastructure and closed 2026-07-11. None of the three is to be
+  reopened or rescoped.
 
 <a id="entry-corollary-4-3-support"></a>
 
-## Corollary 4.3 support (Shastry staggered susceptibility, sub-cubic form)
+## Corollary 4.3 support (carried by the Theorem 4.2 axiom, no axiom of its own)
 
-**Tasaki §4.1, Corollary 4.3** (eq. (4.1.11), p. 77, with footnotes 3 (p. 76)
-and 9 (p. 83)) rests on one **documented axiom**,
-`shastry_staggered_susceptibility_subcubic`
-(`LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean`, declaration line 117).
+**Tasaki §4.1, Corollary 4.3** (eq. (4.1.11), p. 77) carries **no documented
+axiom of its own**. It is proved the way Tasaki proves it, by contraposition
+from Theorem 4.2 — his proof on p. 77 opens "The condition (3.4.4) for
+Theorem 3.2 (p. 70) is satisfied because of the Marshall–Lieb–Mattis theorem
+(Theorem 2.2 in p. 39). Since the conclusion (3.4.22) of Theorem 3.2 does not
+hold, the other condition (3.4.3) must be violated." — so its whole unproved
+content sits in the Theorem 4.2 entry above.
 
-- **Conditional, not discharged.** `no_long_range_order_1d`
-  (`NoLongRangeOrder1D.lean:169`) is a `theorem` in the bookkeeping sense
-  only: it is the conditional reduction
-  `no_long_range_order_1d_of_susceptibility`
-  (`NoLongRangeOrderConditional.lean:39`) fed with this axiom as its single
-  quantitative input, so `#print axioms no_long_range_order_1d` names
-  `shastry_staggered_susceptibility_subcubic`. The axiom is **strictly
-  stronger than Corollary 4.3**: the crude bounds already reach exactly
-  `O(L³)` once the gap obeys `Δ ≳ 1/L`, and via
-  `staggeredOrder_sq_le_susceptibility` the axiom holds only if
-  `⟨Ô²⟩ = o(L²)`, which is the corollary's own conclusion — see "Strength
-  relative to Corollary 4.3 itself" below. This entry therefore records where
-  the content sits; it is **not** a discharge of Corollary 4.3 and must not be
-  read as one. Only the degenerate spin-`0` case `N = 0` is unconditional
-  (the staggered order operator vanishes there). Axiom-free are the
-  surrounding pieces: the conditional reduction itself, the Falk–Bruch bound
-  `staggeredOrder_sq_le_susceptibility`, the `O(L)` oscillator-strength
-  estimate, and the ground-state bridge.
-- **What the axiom statement literally asserts:** for the zero-field
-  one-dimensional spin-`S` antiferromagnetic Heisenberg ring on an **even**
-  number `L ≥ 2` of sites, for every margin `δ > 0` there is a size threshold
-  `L₀` beyond which every normalized ground state `Φ` admits a potential `y`
-  for `ÔΦ` (i.e. `(Ĥ − E₀) y = ÔΦ`) with static staggered susceptibility
-  `Re⟨y, ÔΦ⟩ ≤ δ·L³` (physically `χ(k*) = L · f_L^{(-1)}(k*)` at the
-  antiferromagnetic wavevector `k* = π`); that is, `χ(k*) = o(L³)`.
-  Restricted to even `L` because only bipartite rings have a
-  balanced staggered sublattice (`Σ_x ε_x = 0`), which is what makes the
-  ground state an SU(2)-singlet with `⟨Φ, ÔΦ⟩ = 0` and hence `ÔΦ` orthogonal
-  to the ground space, so the resolvent potential `y` genuinely exists; odd
-  rings lie outside Tasaki's §4.1 setting.
-- **Why the `∃ L₀` threshold is part of the statement:** a bare `∀ L` would be
-  false at `N = 1`, `L = 2`, where the two-site ring is the dimer
-  `Ĥ = 2 Ŝ₀·Ŝ₁` with `χ = 1/2` against `δ·2³ = 8δ`, so every `δ < 1/16`
-  refutes it. That is a hand computation, not a Lean witness; mechanising it
-  would need a two-site spectral result this repository does not have.
-- **Why `o(L³)` and nothing stronger:** the only route from `χ` to Corollary
-  4.3 available here is `staggeredOrder_sq_le_susceptibility`, `s² ≤ 6N³Lχ`
-  with `s = ⟨Φ, Ô²Φ⟩.re`; a fixed `χ ≤ C·L³` leaves `s/L²` bounded rather than
-  vanishing. `o(L³)` follows both from a gapped chain and from the `χ ≍ L²`
-  growth small-ring exact diagonalisation indicates (numerics, no Lean
-  witness), so the statement stays neutral on the open Haldane-gap question.
-- **Strength relative to Corollary 4.3 itself:** the crude bounds already reach
-  exactly `O(L³)` — `⟨Ô²⟩ ≤ ‖Ô‖² ≤ S²L²` for normalized `Φ`, and
-  `χ ≤ ⟨Ô²⟩/Δ` for the gap `Δ` above the ground space, so any `Δ ≳ 1/L` gives
-  `χ = O(S²L³)`. So `o(L³)` is the first statement past the trivial ceiling,
-  and by `staggeredOrder_sq_le_susceptibility` it holds *only if*
-  `⟨Ô²⟩ = o(L²)`, which is exactly Corollary 4.3's own conclusion. The axiom is
-  therefore strictly stronger than the corollary it is fed into — the converse
-  would additionally need the lower bound `Δ ≳ 1/L`, which this repository does
-  not have (its only gap result, `lieb_schultz_mattis_affleck_lieb`, bounds `Δ`
-  from *above*) — but of the same order of difficulty. What separates it from
-  Corollary 4.3 is strength, not only sourcing.
-- **Axiom reason (documented):** neither source examined here states a bound
-  on `f_L^{(-1)}(k*)`; the two examined are Tasaki (pp. 81, 83) and Shastry
-  (his eq. (22), p. L252). Tanaka–Takeda–Idogaki [63] was *not* examined —
-  this repository has no copy of it — so nothing is claimed here about what
-  [63] does or does not state. Tasaki's "This is nontrivial, and requires a hard
-  analysis" (§4.1, p. 83) is about bounding `f_L^{(-1)}(k)` *inside the
-  derivation of the infrared bound* (4.1.24), which §4.1.2 uses to prove
-  Theorem 4.1; that bound is stated on p. 81 only "for any
-  `k ∈ 𝒦_L \ {k*}`", and its right-hand side is roughly
-  `(const.)/|k − k*|`, so it *diverges* as `k → k*`. Footnote 9 (p. 83) only
-  warns that `f_L^{(-1)}(k)`, though called the susceptibility, is not the
-  physically relevant magnetic susceptibility; footnote 3 (p. 76) declines to
-  prove *Theorem 4.2* and refers to Shastry (B. S. Shastry, *J. Phys. A: Math.
-  Gen.* **25**, L249, 1992) with the mathematical formulation of
-  Tanaka–Takeda–Idogaki (*J. Magn. Magn. Mater.* **272-276**, 908, 2004)
-  [63] for that, not for a bound at `k*`; and Shastry's own upper bound (his
-  eq. (22), p. L252) diverges at `q = Q` in the same way. What is recorded
-  here is therefore an assumption of this project rather than a transcription
-  of a published estimate. Per the 2026-07-05 policy override (an externally
-  cited result the book merely quotes must still be proved, not deferred as
-  external-cite-only) this is **not** a won't-do citation, and it is not
-  Theorem 5.1's "`d`-dimensional RP/IR-bound intractable" class either. Its
-  class is therefore not an infrastructure gap but an **unproved assumption
-  of this project**, carried as a discharge target: with no examined source
-  stating the estimate, there is nothing to transcribe. In particular it is
-  not classified as waiting on 1D-ring reflection-positivity /
-  Gibbs-decomposition infrastructure — such infrastructure would at most be
-  one possible foundation for a derivation of `χ(k*) = o(L³)`, never by
-  itself such a derivation, so building it would not discharge this axiom.
-  What retires the axiom is exactly the re-check condition below, neither of
-  whose two routes has been carried out here.
-- **Re-check condition:** no published susceptibility estimate to transcribe
-  is known, so the condition is not a transcription. It is met by either of two
-  independent routes. (a) A proof, in this repository, that `χ(k*) = o(L³)` for
-  the even zero-field ring — the bound *derived*, for instance from a
-  spectral-gap estimate, rather than quoted. The 1D-ring reflection-positivity
-  material already exists and is axiom-free, but the bond-square construction
-  built on it is not a foundation for this: its field parametrisation
-  annihilates the `k = π` mode, as recorded below.
-  (b) A source found to state a genuine upper bound on `f_L^{(-1)}(k*)` at the
-  antiferromagnetic wavevector itself, which could then be transcribed;
-  Tanaka–Takeda–Idogaki [63], not examined here, is the first place to check.
+- **This discharges nothing.** `no_long_range_order_1d`
+  (`LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean`) is
+  `no_long_range_order_1d_of_theorem_4_2` — the contraposition, run at a single
+  volume through eq. (3.4.16) and the per-volume eq. (3.4.21) bound — applied
+  to Theorem 4.2 (`shastry_no_symmetry_breaking_1d`), so
+  `#print axioms no_long_range_order_1d` is exactly
+  `[propext, Classical.choice, Quot.sound, shastryEnergyGain]` — the three
+  standard axioms and `shastryEnergyGain`, nothing else. Both Corollary 4.3
+  and Theorem 4.2 remain **open**: Tasaki does not prove Theorem 4.2
+  (footnote 3, p. 76) and derives Corollary 4.3 from it (p. 77), so the
+  corollary's whole unproved content is Theorem 4.2, and nothing here
+  reconstructs the argument he cites. Only the degenerate spin-`0` case
+  `N = 0` is unconditional (the staggered order operator vanishes there).
+- **The retired susceptibility axiom.** Corollary 4.3 previously rested on a
+  documented axiom of its own, asserting `χ(k*) = o(L³)` for the even
+  zero-field ring, fed into a conditional reduction from the Falk–Bruch bound
+  `staggeredOrder_sq_le_susceptibility`. That axiom was **strictly stronger
+  than the corollary** — via that same Falk–Bruch bound it holds only if
+  `⟨Ô²⟩ = o(L²)`, the corollary's own conclusion — and no examined source
+  states a bound on `f_L^{(-1)}(k*)` (Tasaki pp. 81, 83 and Shastry's eq. (22)
+  both diverge as `k → k*`; Tanaka–Takeda–Idogaki [63] is not held here). Both
+  the axiom and the reduction are deleted; what a future susceptibility route
+  would still have to overcome is recorded next.
+
 - **The `k = π` obstruction: why the bond-square reflection-positivity route
   cannot supply the bound.** Three axiom-free declarations in
   `Quantum/SpinS/RingReflectionBondSquareField.lean` fix this. Writing
@@ -223,11 +160,14 @@ and 9 (p. 83)) rests on one **documented axiom**,
   **not** in the positivity: no claim is made here about reflection positivity
   in general, and the reflection-positivity layers themselves are complete and
   axiom-free (see the Theorem 4.2 entry above).
-- **Tracking:** issue **#5413** (Theorem 4.2 close-out) is the successor
-  discharge issue and is open; it carries this axiom's `o(L³)` repair and the
-  `k = π` obstruction recorded above. The trackers named in earlier revisions
-  of this entry, #4718 and #4777, are **closed** and historical only; neither
-  is to be reopened or rescoped.
+- **Tracking:** issue **#5416** (Corollary 4.3 via Tasaki's own route) is the
+  open issue carrying this entry's current state. Issue #5413 (Theorem 4.2
+  close-out), named in earlier revisions as the successor discharge issue, is
+  **closed as not planned** (2026-09-02); discharging `shastryEnergyGain` still
+  discharges Corollary 4.3 with it, but no open issue scopes that discharge.
+  The trackers named in earlier revisions of this entry, #4718 and #4777, are
+  **closed** and historical only; none of the three is to be reopened or
+  rescoped.
 
 <a id="entry-lemma-4-15-theorem-4-11-support"></a>
 

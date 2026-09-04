@@ -9,9 +9,12 @@ import posixpath
 import re
 import subprocess
 import sys
+import tempfile
 from collections import Counter, defaultdict
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
+
+from validate_formalization_status import lean_leaf_mention
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -355,6 +358,49 @@ PRIVATE_INSTRUCTIONS_REMOVAL_COUNT = 1
 def _drop_private_instructions_ref(text: str) -> str:
     """Drop the catalogue-row pointer to the private project-instructions file."""
     return _PRIVATE_INSTRUCTIONS_REF.sub("", text)
+
+
+# Two catalogue rows record declarations this repository no longer carries: the Corollary 4.3
+# susceptibility axiom and the conditional reduction that consumed it, both deleted with the
+# susceptibility route when Corollary 4.3 moved to Tasaki's own contraposition from Theorem 4.2.
+# A row whose subject no longer exists is dropped from the published catalogue rather than
+# rewritten, so each drop is registered here by the row's Lean-name cell and two independent
+# things are enforced before the drop is applied. The premise: the name is absent from the Lean
+# tree (check_deleted_row_registry_absence), so a registry entry cannot retire the published row
+# of a declaration this repository still carries. The reach: the site count is pinned, so a
+# pattern that starts matching more (or fewer) rows than audited fails loudly instead of silently
+# editing the baseline.
+DELETED_CATALOGUE_ROW_NAMES = (
+    "no_long_range_order_1d_of_susceptibility",
+    "shastry_staggered_susceptibility_subcubic",
+)
+DELETED_CATALOGUE_ROW_COUNTS = (1, 1)
+
+
+def _drop_deleted_catalogue_rows(text: str, counts: list[int] | None = None) -> str:
+    """Drop every catalogue row whose Lean-name cell names a deleted declaration."""
+    for index, lean_name in enumerate(DELETED_CATALOGUE_ROW_NAMES):
+        pattern = re.compile(rf"^\| `{re.escape(lean_name)}` \|.*\n?", re.MULTILINE)
+        if counts is not None:
+            counts[index] += len(pattern.findall(text))
+        text = pattern.sub("", text)
+    return text
+
+
+def check_deleted_row_registry_absence() -> None:
+    """Refuse a registered row drop whose subject the Lean sources of the project still spell."""
+    # The registry's premise is that the declaration is gone, and the count pin cannot see that:
+    # counts agree for any (name, count) pair, so without this the published catalogue could lose
+    # the row of a live declaration. The scan is the one the retirement records already use, over
+    # the LatticeSystem/ tree together with the root umbrella, matching whole identifiers anywhere
+    # in a source — a name kept alive only by a comment still keeps its row.
+    for lean_name in DELETED_CATALOGUE_ROW_NAMES:
+        mention = lean_leaf_mention(ROOT, lean_name)
+        if mention is not None:
+            fail(
+                "deleted catalogue row registered for a name the Lean tree still spells: "
+                f"{lean_name} in {mention}"
+            )
 
 
 def _approved_replacements(text: str) -> str:
@@ -1077,11 +1123,69 @@ def _approved_replacements(text: str) -> str:
             "`⟨Ô²⟩ = o(L²)` — the corollary's own conclusion. The successor discharge issue is "
             "#5413.",
         )
+        # PR-2 of the same arc (#5416) replaces the susceptibility route by Tasaki's own proof of
+        # Corollary 4.3 (contraposition against Theorem 3.2, p. 77). The axiom row and the
+        # reduction row are dropped outright (DELETED_CATALOGUE_ROW_NAMES); the four entries below
+        # repair every remaining row that described that route. (Applied last: each matches text
+        # an earlier replacement inserts.)
+        .replace(
+            "**Conditional, not a discharge of Corollary 4.3** (PR #5003): for `N ≥ 1` it is the "
+            "conditional reduction `no_long_range_order_1d_of_susceptibility` fed with the "
+            "documented Shastry susceptibility axiom `shastry_staggered_susceptibility_subcubic` "
+            "(χ(k*)=o(L³)), which is **strictly stronger** than the corollary — the crude bounds "
+            "already reach exactly `O(L³)` once the gap obeys `Δ ≳ 1/L`, and via "
+            "`staggeredOrder_sq_le_susceptibility` it holds "
+            "only if `⟨Ô²⟩ = o(L²)`, the corollary's own conclusion; only the degenerate spin-0 "
+            "case `N = 0` is unconditional (the staggered order operator vanishes). "
+            "`#print axioms` = "
+            "`[propext, Classical.choice, Quot.sound, shastry_staggered_susceptibility_subcubic]`",
+            "**Conditional, and a discharge of nothing** (PR #5420): for `N ≥ 1` it is Tasaki's own "
+            "proof of the corollary, `no_long_range_order_1d_of_theorem_4_2` — contraposition "
+            "against Theorem 3.2 at a single volume (eq. (3.4.16) plus the per-volume eq. (3.4.21) "
+            "bound), with condition (3.4.4) supplied by Marshall–Lieb–Mattis — applied to "
+            "Theorem 4.2 (`shastry_no_symmetry_breaking_1d`), which is itself conditional on the "
+            "documented axiom `shastryEnergyGain`. Both Corollary 4.3 and Theorem 4.2 remain open: "
+            "Tasaki does not prove Theorem 4.2 (footnote 3, p. 76) and nothing here reconstructs "
+            "the argument he cites. Only the degenerate spin-0 case `N = 0` is unconditional (the "
+            "staggered order operator vanishes). `#print axioms` = "
+            "`[propext, Classical.choice, Quot.sound, shastryEnergyGain]`",
+        )
+        .replace(
+            "; reduces Cor 4.3 to the sub-cubic susceptibility bound `χ = o(L³)` (PR #4846)",
+            "; the sub-cubic susceptibility bound `χ = o(L³)` it would reduce Cor 4.3 to is not "
+            "carried here — Cor 4.3 follows Tasaki's own contraposition from Theorem 4.2 instead "
+            "(PR #4846)",
+        )
+        .replace(
+            "Phrased as the resolvent/susceptibility conjunct for general field `h`; "
+            "`no_long_range_order_1d_of_susceptibility` consumes a sub-cubic form of it (`≤ δ·L³` "
+            "beyond a threshold), so the staggered specialisation still has to turn `C(h)` into such "
+            "a bound — that belongs to χ3 (next stage).",
+            "Phrased as the resolvent/susceptibility conjunct for general field `h`; turning `C(h)` "
+            "into a sub-cubic staggered bound (`≤ δ·L³` beyond a threshold) belongs to χ3, a stage "
+            "this repository does not carry out — Cor 4.3 follows Tasaki's own contraposition from "
+            "Theorem 4.2 instead.",
+        )
+        .replace(
+            "and not a discharge of Cor 4.3: that "
+            "reduction consumes the documented axiom "
+            "`shastry_staggered_susceptibility_subcubic`, which is strictly stronger than the "
+            "corollary, holding via `staggeredOrder_sq_le_susceptibility` only if "
+            "`⟨Ô²⟩ = o(L²)` — the corollary's own conclusion. The successor discharge issue is "
+            "#5413.",
+            "and not a discharge of Cor 4.3: that "
+            "reduction and the documented axiom it consumed have since been deleted, Cor 4.3 now "
+            "following Tasaki's own contraposition from Thm 4.2, which leaves both open. Issue "
+            "#5413, previously named as the successor discharge issue, is closed as not planned; "
+            "#5416 is open and covers Cor 4.3's route rather than the discharge.",
+        )
     )
 
 
 def approved_changes(text: str) -> str:
-    return _drop_private_instructions_ref(_approved_replacements(text))
+    # The row drops run last, so every literal rewrite above still matches the frozen baseline
+    # exactly as audited, including the rewrites of the rows that are dropped here.
+    return _drop_deleted_catalogue_rows(_drop_private_instructions_ref(_approved_replacements(text)))
 
 
 MOVED_PROSE_LINK_REWRITES = (
@@ -1266,9 +1370,132 @@ def public_target(
     return target_page, parsed.fragment
 
 
+def deleted_row_registry_mention_semantics_self_test() -> None:
+    """A row's subject must count as present when it is only spelled inside a comment.
+
+    The guard on `DELETED_CATALOGUE_ROW_NAMES` reuses `lean_leaf_mention`'s whole-file scan
+    rather than a declaration-only parser, precisely so a name still spelled anywhere in the tree
+    (declaration or prose) blocks the drop. This pins that reused predicate's own behaviour on a
+    synthetic fixture, independent of the real tree.
+    """
+    with tempfile.TemporaryDirectory(prefix="deleted-row-mention-") as scratch:
+        fixture_root = Path(scratch)
+        fixture_lean = fixture_root / "LatticeSystem" / "Fixture.lean"
+        fixture_lean.parent.mkdir(parents=True)
+        fixture_lean.write_text(
+            "-- mentions ghostRetiredLemma only here, in a comment; nothing declares it\n"
+        )
+        if lean_leaf_mention(fixture_root, "LatticeSystem.ghostRetiredLemma") is None:
+            fail(
+                "deleted-row-registry mention self-test: a comment-only mention of "
+                "ghostRetiredLemma must count as still present, but lean_leaf_mention found none"
+            )
+
+
+def deleted_row_registry_negative_self_tests() -> None:
+    """`DELETED_CATALOGUE_ROW_NAMES` must refuse a name that is still declared in the Lean tree.
+
+    The registry drops a catalogue row on the strength of its Lean-name cell alone, so the drop
+    is sound only while the named declaration really is gone from `LatticeSystem/`. This probes
+    that boundary in a disposable clone: register a name that is genuinely still declared
+    (`oscillatorStrength_abs_le`, `LatticeSystem/Quantum/SpinS/OscillatorStrengthBound.lean`) and
+    drop its row from the live legacy page, the same edit an incautious future PR could make by
+    hand. The checker must reject this, naming the identifier it refuses.
+    """
+    with tempfile.TemporaryDirectory(prefix="deleted-row-registry-") as scratch:
+        mirror = Path(scratch) / "mirror"
+        subprocess.run(
+            ["git", "clone", "--quiet", "--shared", str(ROOT), str(mirror)], check=True
+        )
+
+        # The mirror runs this same script, so a mirror run reaching this self-test would clone a
+        # mirror of its own without end; git halts the descent only at its alternate-object
+        # nesting limit, and then reports the wrong failure. Removing the call is inert for what
+        # the fixture measures: the guard under test is applied by main(), not by this self-test.
+        script_path = mirror / "scripts" / "check_docs_hierarchy.py"
+        script_text = script_path.read_text()
+        nested_call = "    deleted_row_registry_negative_self_tests()\n"
+        if nested_call not in script_text:
+            fail(
+                "deleted-row-registry self-test could not locate its own call in the mirror's "
+                "main() to stop the mirror from cloning a mirror of its own"
+            )
+        script_text = script_text.replace(nested_call, "")
+        script_path.write_text(script_text)
+
+        baseline = subprocess.run(
+            [sys.executable, "scripts/check_docs_hierarchy.py"],
+            cwd=mirror,
+            capture_output=True,
+            text=True,
+        )
+        if baseline.returncode != 0:
+            fail(
+                "deleted-row-registry self-test setup failed: the mirror does not pass before "
+                f"its registry is mutated (exit={baseline.returncode}): {baseline.stderr}"
+            )
+
+        registered = (
+            'DELETED_CATALOGUE_ROW_NAMES = (\n'
+            '    "no_long_range_order_1d_of_susceptibility",\n'
+            '    "shastry_staggered_susceptibility_subcubic",\n'
+            ')\n'
+            'DELETED_CATALOGUE_ROW_COUNTS = (1, 1)\n'
+        )
+        mutated = (
+            'DELETED_CATALOGUE_ROW_NAMES = (\n'
+            '    "no_long_range_order_1d_of_susceptibility",\n'
+            '    "shastry_staggered_susceptibility_subcubic",\n'
+            '    "oscillatorStrength_abs_le",\n'
+            ')\n'
+            'DELETED_CATALOGUE_ROW_COUNTS = (1, 1, 1)\n'
+        )
+        if registered not in script_text:
+            fail("deleted-row-registry self-test could not locate the registry literal to mutate")
+        script_path.write_text(script_text.replace(registered, mutated))
+
+        legacy_page = (
+            mirror
+            / "docs"
+            / "formalization"
+            / "legacy"
+            / "16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-01.md"
+        )
+        legacy_text = legacy_page.read_text()
+        row_pattern = re.compile(r"^\| `oscillatorStrength_abs_le` \|.*\n", re.MULTILINE)
+        mutated_legacy, row_drops = row_pattern.subn("", legacy_text)
+        if row_drops != 1:
+            fail(
+                "deleted-row-registry self-test could not find exactly one live "
+                f"oscillatorStrength_abs_le row (found {row_drops})"
+            )
+        legacy_page.write_text(mutated_legacy)
+
+        probe = subprocess.run(
+            [sys.executable, "scripts/check_docs_hierarchy.py"],
+            cwd=mirror,
+            capture_output=True,
+            text=True,
+        )
+        if probe.returncode == 0:
+            fail(
+                "deleted-row-registry fail-open: registering a still-declared name "
+                "(oscillatorStrength_abs_le, "
+                "LatticeSystem/Quantum/SpinS/OscillatorStrengthBound.lean) and dropping its "
+                "row must be refused, but the checker exited 0"
+            )
+        if "oscillatorStrength_abs_le" not in probe.stderr:
+            fail(
+                "deleted-row-registry probe failed for the wrong reason: expected an error "
+                f"naming oscillatorStrength_abs_le, got: {probe.stderr}"
+            )
+
+
 def main() -> None:
     long_record_negative_self_tests()
     moved_prose_negative_self_tests()
+    deleted_row_registry_mention_semantics_self_test()
+    deleted_row_registry_negative_self_tests()
     generated_records = DOCS / "formalization" / "records"
     if generated_records.exists() or generated_records.is_symlink():
         fail(
@@ -1411,6 +1638,17 @@ def main() -> None:
         fail(
             "audited private project-instructions removal count differs: "
             f"expected={PRIVATE_INSTRUCTIONS_REMOVAL_COUNT}, actual={private_instructions_removals}"
+        )
+    check_deleted_row_registry_absence()
+    deleted_row_counts = [0] * len(DELETED_CATALOGUE_ROW_NAMES)
+    _drop_deleted_catalogue_rows(
+        _drop_private_instructions_ref(_approved_replacements(catalogue_baseline)),
+        deleted_row_counts,
+    )
+    if tuple(deleted_row_counts) != DELETED_CATALOGUE_ROW_COUNTS:
+        fail(
+            "audited deleted-catalogue-row counts differ: "
+            f"expected={DELETED_CATALOGUE_ROW_COUNTS}, actual={tuple(deleted_row_counts)}"
         )
     working_note_counts = [
         len(_WORKING_NOTE_CITATION.findall(catalogue_baseline)),
