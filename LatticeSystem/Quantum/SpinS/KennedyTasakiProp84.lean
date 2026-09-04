@@ -1,3 +1,4 @@
+import LatticeSystem.Quantum.SpinS.ChainWindowSupport
 import LatticeSystem.Quantum.SpinS.KennedyTasakiMonomial
 
 /-!
@@ -13,8 +14,10 @@ Two facts fix the shape of the formal statement and neither may be dropped.
 
 * **Locality must be a fixed window, not a range-existence.**  At fixed finite `L` the shape
   "`∃ r`, every term has range `r`" is vacuously true for every operator, because the chain has
-  diameter at most `L`.  `IsLocalWindowS` therefore names a concrete window `[a, b]` and, following
-  the house precedent `IsLocalRangeR`, states locality as a commutant condition.
+  diameter at most `L`.  Locality is therefore stated as support on the concrete window
+  `chainWindow L a b` (`Quantum/SpinS/ChainWindowSupport.lean`), which
+  `supportedOnS_chainWindow_iff` identifies with commuting with every single-site operator seated
+  at an index below `a` or above `b`.
 * **The window must be interior.**  The strings of (8.2.13)/(8.2.14) are half-open (`u < x` on the
   left, `v > x` on the right), so at an edge site the corresponding string is empty.  Concretely
   `Û_KT Ŝ_0^{(3)} Û_KT = Ŝ_0^{(3)}` is exactly local while `Ŝ_0^{(3)}` is *not* `Z₂ × Z₂` invariant
@@ -38,17 +41,6 @@ namespace LatticeSystem.Quantum
 open Matrix
 
 variable {L : ℕ}
-
-/-- **Commutant-form window locality** `IsLocalWindowS L N a b op`: the operator `op` acts only on
-sites inside the window `[a, b] ⊆ Fin L`, recorded as the commutant condition that `op` commutes
-with every single-site operator `onSiteS z A` placed at a site `z` outside the window.  This is the
-open-chain, explicit-window analogue of the ring-distance predicate `IsLocalRangeR`
-(`LiebSchultzMattisGeneral.lean`): unlike an `∃ r, …` range-existence form, which is vacuously
-true for every operator once `r ≥ L` (ring distance on `Fin L` is bounded by `L / 2`), a fixed
-window `[a, b]` is genuinely restrictive at fixed finite `L`. -/
-def IsLocalWindowS (L N a b : ℕ) (op : ManyBodyOpS (Fin L) N) : Prop :=
-  ∀ z : Fin L, (z.val < a ∨ b < z.val) →
-    ∀ A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ, Commute op (onSiteS z A)
 
 /-! ## The printed parenthetical -/
 
@@ -132,10 +124,11 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1
 theorem tasaki_prop_8_4_local_monomial {L : ℕ} (w : List (Fin L × Fin 3)) (a b : ℕ)
     (hw : ∀ p ∈ w, a ≤ (p.1 : Fin L).val ∧ (p.1 : Fin L).val ≤ b)
     (hleft : 0 < a) (hright : b + 1 < L) :
-    (IsLocalWindowS L 2 a b (ktUnitaryS L * spinMonomialS w * ktUnitaryS L)
+    (SupportedOnS (chainWindow L a b) (ktUnitaryS L * spinMonomialS w * ktUnitaryS L)
         ↔ IsZ2Z2Invariant (spinMonomialS w))
       ∧ (IsZ2Z2Invariant (spinMonomialS w) →
           IsZ2Z2Invariant (ktUnitaryS L * spinMonomialS w * ktUnitaryS L)) := by
+  rw [supportedOnS_chainWindow_iff]
   refine ⟨⟨fun hloc => ?_, fun hinv => ?_⟩,
     fun hinv => (ktUnitaryS_conj_isZ2Z2Invariant_iff (spinMonomialS w)).mpr hinv⟩
   · -- Necessity: an uncancelled string forces a nonzero commutator with a probe outside `[a, b]`.
