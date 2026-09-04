@@ -18,11 +18,10 @@ encoding of the same "acts only on `S`" concept, phrased in commutant form: `G` 
 when it commutes with every on-site factor located off `S`. Further encodings exist elsewhere in
 the library, e.g. `IsLocalRangeR` (`Quantum/SpinS/LiebSchultzMattisGeneral.lean`), which phrases
 the same idea for a fixed centre and radius on a ring (its commutant phrasing is deliberate: it is
-shared with the §7.1.3 Theorem 7.3 axiom hypothesis), and `IsLocalWindowS`
-(`Quantum/SpinS/KennedyTasakiProp84.lean`), the open-chain window analogue of `IsLocalRangeR`. This
-family of "acts only on a subset of sites" encodings is larger than this module and has not been
-enumerated exhaustively; new encodings should not be assumed absent just because a comment does not
-mention them. Unifying the family into one predicate is tracked work, not done here.
+shared with the §7.1.3 Theorem 7.3 axiom hypothesis). This family of "acts only on a subset of
+sites" encodings is larger than this module and has not been enumerated exhaustively; new encodings
+should not be assumed absent just because a comment does not mention them. Unifying the family into
+one predicate is tracked work, not done here.
 
 `SupportedOn` and `SupportedOnS` are a particular hazard: both have signature
 `Finset Λ → ManyBodyOpS Λ N → Prop`, both live in namespace `LatticeSystem.Quantum`, and they
@@ -36,10 +35,10 @@ whole §4.2.2 Anderson-tower stack carried by `Quantum/SpinS/AndersonTowerLocalD
 it. No import relation runs either way, even transitively, between this module and
 `Quantum/SpinS/AndersonTowerLocalDecay.lean`, so no cycle is at stake; what is written out is
 exactly what `SupportedOn S A` unfolds to, which the fixture file
-`LatticeSystem/Tests/SupportCommutantBridgePin.lean` pins. `IsLocalRangeR` and `IsLocalWindowS`
-have no such bridge: neither is formally connected to the equivalence, so a caller holding a
-hypothesis phrased in one of them still cannot invoke a capstone stated in another. Rephrasing
-existing callers through the equivalence is likewise tracked work, not done here.
+`LatticeSystem/Tests/SupportCommutantBridgePin.lean` pins. `IsLocalRangeR` has no such bridge: it
+is not formally connected to the equivalence, so a caller holding a hypothesis phrased in it still
+cannot invoke a capstone stated in another encoding. Rephrasing its callers through the equivalence
+is likewise tracked work, not done here.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §3.4, Problem 3.4.a, statement pp. 67-68.

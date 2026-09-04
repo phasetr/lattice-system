@@ -525,6 +525,34 @@ def _approved_replacements(text: str) -> str:
             "`Quantum/SpinS/KennedyTasakiMonomial.lean`; "
             "`Quantum/SpinS/KennedyTasakiProp84.lean` |",
         )
+        # (Applied after the row replacement above: what it matches is the locality sentence
+        # and file column that replacement inserts, not baseline text, so the order of those
+        # two entries is load-bearing.)
+        .replace(
+            "`IsLocalWindowS L N a b` (commutant form) replaces the deleted markers "
+            "`HasShortRangeInteraction`/`HasSomeShortRangeInteraction`. For `w` supported in an "
+            "interior window `[a,b]` with margin on both sides (`0<a`, `b+1<L`), `Û_KT O_w Û_KT` is "
+            "again local in `[a,b]` **iff** `O_w` is Z₂×Z₂ invariant — via the sign identity "
+            "`Û_π^{(α)} O_w Û_π^{(α)} = (−1)^{c_α} O_w` (`c_α = #{i∣α_i≠α}`) rather than a bare "
+            "parity biconditional (false as an iff at `O_w = 0`). Proof: half-turn "
+            "control-polynomial algebra of §8.2.2; the Hamiltonian-level (sum) statement is "
+            "deliberately out of scope | `Quantum/SpinS/SpinOneHalfTurnRegion.lean`; "
+            "`Quantum/SpinS/KennedyTasakiTransformation.lean`; "
+            "`Quantum/SpinS/KennedyTasakiTransformRules.lean`; "
+            "`Quantum/SpinS/KennedyTasakiMonomial.lean`; `Quantum/SpinS/KennedyTasakiProp84.lean` |",
+            "locality is `SupportedOnS (chainWindow L a b)`, replacing the deleted markers "
+            "`HasShortRangeInteraction`/`HasSomeShortRangeInteraction`. For `w` supported in an "
+            "interior window `[a,b]` with margin on both sides (`0<a`, `b+1<L`), `Û_KT O_w Û_KT` is "
+            "again local in `[a,b]` **iff** `O_w` is Z₂×Z₂ invariant — via the sign identity "
+            "`Û_π^{(α)} O_w Û_π^{(α)} = (−1)^{c_α} O_w` (`c_α = #{i∣α_i≠α}`) rather than a bare "
+            "parity biconditional (false as an iff at `O_w = 0`). Proof: half-turn "
+            "control-polynomial algebra of §8.2.2; the Hamiltonian-level (sum) statement is "
+            "deliberately out of scope | `Quantum/SpinS/ChainWindowSupport.lean`; "
+            "`Quantum/SpinS/SpinOneHalfTurnRegion.lean`; "
+            "`Quantum/SpinS/KennedyTasakiTransformation.lean`; "
+            "`Quantum/SpinS/KennedyTasakiTransformRules.lean`; "
+            "`Quantum/SpinS/KennedyTasakiMonomial.lean`; `Quantum/SpinS/KennedyTasakiProp84.lean` |",
+        )
         .replace(
             "| `IsTimeReversalInvariant` / `IsBondInversionInvariant` / `vbsInversionParityS` / "
             "`tasaki_spt_classification` | **§8.3.2–§8.3.3 Protecting symmetries + topological indices "
