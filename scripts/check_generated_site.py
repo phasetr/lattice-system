@@ -1768,6 +1768,29 @@ def check_workflow_invariants(repo_root: Path) -> None:
         raise ValueError("Lean CI lacks the generated exact axiom gate")
     if "  # docs:" not in lean:
         raise ValueError("the disabled doc-gen4 block was unexpectedly re-enabled")
+    # A shallow checkout still resolves origin/main, so the catalogue validator would keep
+    # running while its durable-history comparison silently degraded into measuring a commit
+    # against itself. The depth the guard needs is therefore part of the workflow contract.
+    for workflow_name, workflow in (
+        ("formalization_pages.yml", pages),
+        ("lean_action_ci.yml", lean),
+    ):
+        for invocation in re.finditer(
+            r"python3 scripts/validate_formalization_status\.py", workflow
+        ):
+            checkout = workflow.rfind("uses: actions/checkout@", 0, invocation.start())
+            if checkout < 0:
+                raise ValueError(
+                    f"{workflow_name} runs the catalogue validator with no preceding checkout "
+                    "step, so its fetch-depth cannot be proven"
+                )
+            next_step = workflow.find("\n      - ", checkout)
+            step = workflow[checkout : next_step if next_step >= 0 else invocation.start()]
+            if "fetch-depth: 0" not in step:
+                raise ValueError(
+                    f"{workflow_name}: the checkout step preceding the catalogue validator "
+                    "does not pin fetch-depth: 0"
+                )
 
 
 def run_staged_mutation_tests(
@@ -2909,11 +2932,10 @@ def run_self_tests() -> None:
         else:
             raise AssertionError("second Pages deployment owner was accepted")
 
-    # -- (currently red) the checkout step preceding every validator invocation in both
-    # workflows must pin fetch-depth: 0, because a shallow checkout resolves origin/main but
-    # not its parent, which silently switches off the durable-history comparison the validator
-    # relies on; nothing today asserts this, so the one line keeping that guard alive can be
-    # deleted with no signal at all.
+    # -- the checkout step preceding every validator invocation in both workflows must pin
+    # fetch-depth: 0, because a shallow checkout resolves origin/main but not its parent, and
+    # the durable-history comparison the validator relies on would degrade with no other signal
+    # than this one line.
     for fetch_depth_mutation_label, mutate_fetch_depth in (
         (
             "fetch-depth changed to 1",

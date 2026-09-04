@@ -71,6 +71,7 @@ FROZEN_RECORD_FIELDS = (
 )
 _MAIN_HISTORY_REF_CACHE: dict[Path, str | None] = {}
 _MAIN_RECORD_INDEX_CACHE: dict[tuple[Path, str], "MainRecordIndex"] = {}
+_PROJECT_LEAN_SOURCES_CACHE: dict[Path, list[Path]] = {}
 RELATION_RANK = {
     "formalizes": 0,
     "presents": 0,
@@ -1051,7 +1052,14 @@ def current_lean_declaration_names(repo_root: Path) -> set[str]:
     names = set(tree_lean_declaration_names(repo_root))
     umbrella = repo_root / "LatticeSystem.lean"
     if umbrella.is_file():
-        names.update(lean_declaration_inventory(umbrella.read_text(encoding="utf-8")))
+        # An unreadable source leaves the name unproven either way, so the umbrella tolerates a
+        # bad byte and degrades into "declares nothing" exactly as the mention scan half of the
+        # same absence proof does, instead of raising a traceback out of a validation run.
+        try:
+            umbrella_source = umbrella.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            umbrella_source = ""
+        names.update(lean_declaration_inventory(umbrella_source))
     return names
 
 
@@ -1061,7 +1069,13 @@ def lean_leaf_mention(repo_root: Path, lean_name: str) -> str | None:
     pattern = re.compile(
         f"(?<![{LEAN_IDENTIFIER_REST_CLASS}]){re.escape(leaf)}(?![{LEAN_IDENTIFIER_REST_CLASS}])"
     )
-    for source_path in project_lean_sources(repo_root):
+    # Every retired record asks the same question of the same checkout, and the answer is a
+    # walk of the whole library, so the listing is kept for the run instead of being rebuilt
+    # once per retired record.
+    sources_key = repo_root.resolve()
+    if sources_key not in _PROJECT_LEAN_SOURCES_CACHE:
+        _PROJECT_LEAN_SOURCES_CACHE[sources_key] = project_lean_sources(repo_root)
+    for source_path in _PROJECT_LEAN_SOURCES_CACHE[sources_key]:
         try:
             source = source_path.read_text(encoding="utf-8", errors="replace")
         except OSError:
@@ -1125,28 +1139,59 @@ def main_record_index(repo_root: Path, history_ref: str) -> MainRecordIndex:
     return _MAIN_RECORD_INDEX_CACHE[cache_key]
 
 
-def record_comparison_base(repo_root: Path, history_ref: str) -> str:
+class ComparisonBase(NamedTuple):
+    """The commit a candidate catalogue is measured against, or why none can be named."""
+
+    commit: str | None
+    error: str | None
+
+
+def record_comparison_base(repo_root: Path, history_ref: str) -> ComparisonBase:
     """Return the commit whose published records a candidate catalogue is measured against."""
     # A run whose HEAD is the resolved ref's own commit is validating what main just published:
     # measuring against the ref itself would compare that commit with itself, so a reversal or a
     # frozen-field drift landing directly on main could never be seen. The durable state is the
     # ref's first parent, which is the commit main published before this one for a squash merge
-    # and for a merge commit alike. A first commit has no such parent, and nothing precedes it
-    # that self-comparison could hide.
+    # and for a merge commit alike. That substitution only fits a run whose candidate is the
+    # commit itself: a staged or unstaged edit of the record shards is a candidate of its own and
+    # belongs measured against the commit it sits on, so the parent is taken only once the shards
+    # are proven to match that commit, and an unanswerable comparison is not such a proof.
+    # A root commit genuinely has no parent and nothing precedes it that self-comparison could
+    # hide, but a checkout that merely lacks the history is a different answer that looks the
+    # same from `rev-parse`, and a shallow clone hides the parent from `rev-list` too. The parent
+    # is therefore read from the commit object itself, which no graft rewrites, and a parent that
+    # exists but cannot be resolved fails closed instead of self-comparing.
     head = git_capture(repo_root, ["rev-parse", "--verify", "--quiet", "HEAD^{commit}"])
     resolved = git_capture(
         repo_root, ["rev-parse", "--verify", "--quiet", f"{history_ref}^{{commit}}"]
     )
     if head.returncode != 0 or resolved.returncode != 0:
-        return history_ref
+        return ComparisonBase(history_ref, None)
     if head.stdout.strip() != resolved.stdout.strip():
-        return history_ref
+        return ComparisonBase(history_ref, None)
+    shard_changes = git_capture(
+        repo_root,
+        ["--no-optional-locks", "status", "--porcelain", "--", RECORD_SHARD_DIRECTORY],
+    )
+    if shard_changes.returncode != 0 or shard_changes.stdout.strip():
+        return ComparisonBase(history_ref, None)
+    commit_object = git_capture(repo_root, ["cat-file", "commit", f"{history_ref}^{{commit}}"])
+    headers = commit_object.stdout.split("\n\n", 1)[0]
+    if commit_object.returncode == 0 and not any(
+        line.startswith("parent ") for line in headers.splitlines()
+    ):
+        return ComparisonBase(history_ref, None)
     parent = git_capture(
         repo_root, ["rev-parse", "--verify", "--quiet", f"{history_ref}^{{commit}}^"]
     )
     if parent.returncode != 0:
-        return history_ref
-    return parent.stdout.strip()
+        return ComparisonBase(
+            None,
+            f"the first parent of {history_ref} cannot be resolved in this shallow checkout, "
+            "so the full history it omits is required to read what main published before this "
+            "commit",
+        )
+    return ComparisonBase(parent.stdout.strip(), None)
 
 
 def read_main_record_index(repo_root: Path, history_ref: str) -> MainRecordIndex:
@@ -1155,7 +1200,10 @@ def read_main_record_index(repo_root: Path, history_ref: str) -> MainRecordIndex
     # different answers, and only the first is a legitimate bootstrap: an absent tree yields an
     # empty readable index, while every listing, read, or parse failure names its shard so a
     # caller can fail closed instead of mistaking an anomaly for a catalogue with no records.
-    base = record_comparison_base(repo_root, history_ref)
+    comparison = record_comparison_base(repo_root, history_ref)
+    if comparison.error is not None:
+        return MainRecordIndex({}, comparison.error)
+    base = comparison.commit
     listing = git_capture(
         repo_root, ["ls-tree", "--name-only", base, f"{RECORD_SHARD_DIRECTORY}/"]
     )
@@ -4578,13 +4626,11 @@ end LatticeSystem
             f"phrase (expected phrase: {required_contract_phrase!r})",
         )
 
-    # -- (pin, currently red) the contract must also state the two rules record_comparison_base
-    # does not yet honour: a checkout whose first parent is unresolvable only because the
-    # checkout is shallow must be named as an error rather than silently self-compared, and the
-    # first-parent base must be withheld whenever the working tree disagrees with the ref's own
-    # committed record shards. Neither sentence exists in the contract yet, so both fail today;
-    # the fix must add this prose verbatim (or the self-test must be updated to match it).
-    for required_future_contract_phrase in (
+    # -- the contract must also state the two conditions that bound the first-parent rule, for
+    # the same reason: a reader with only the contract cannot otherwise tell a shallow checkout's
+    # unresolvable parent from a root commit's absent one, nor learn that an uncommitted edit of
+    # the record shards is measured against the ref rather than against its parent.
+    for bounded_first_parent_phrase in (
         "a checkout whose first parent is unresolvable because the checkout lacks full "
         "history is a shallow-history validation error, not a fallback to comparing that "
         "commit against itself",
@@ -4593,9 +4639,9 @@ end LatticeSystem
         "ref itself",
     ):
         check(
-            required_future_contract_phrase in contract_vocabulary_text,
+            bounded_first_parent_phrase in contract_vocabulary_text,
             "docs/formalization-status-contract.md: does not state a required contract "
-            f"phrase (expected phrase: {required_future_contract_phrase!r})",
+            f"phrase (expected phrase: {bounded_first_parent_phrase!r})",
         )
 
     # -- main_record_index must not re-read durable main's record shards from scratch for
@@ -4886,10 +4932,10 @@ end LatticeSystem
         shutil.rmtree(main_frozen_reversal_repo_root, ignore_errors=True)
 
     # -- a retired record's supersession graph must not admit self-reference or cycles ----------
-    # `superseded_by` resolution only checks that the target id exists in the follow-up
-    # catalogue, so a record can currently name itself, or two retired records can name each
-    # other, and neither can ever be corrected once merged (a published supersession may never
-    # be dropped).
+    # Resolving the target id in the catalogue is not enough: a published supersession may
+    # never be dropped, so a record naming itself, or two retired records naming each other,
+    # would be uncorrectable once merged and would leave no live declaration anywhere along
+    # the chain.
     supersession_graph_repo_root = Path(
         tempfile.mkdtemp(prefix="supersession-graph-", dir=fixture_scratch_root)
     )
@@ -5035,10 +5081,10 @@ end LatticeSystem
     finally:
         shutil.rmtree(supersession_graph_repo_root, ignore_errors=True)
 
-    # -- with neither origin/main nor main resolvable, the terminal-retirement guard is silent
-    # on the active path even though it fails closed on the retired path: a checkout whose
-    # default branch has a different name (no origin remote either) must still fail closed
-    # instead of certifying a catalogue it never actually compared against history.
+    # -- with neither origin/main nor main resolvable, the terminal-retirement guard must fail
+    # closed on the active path exactly as it does on the retired path: a checkout whose default
+    # branch has a different name (no origin remote either) must not certify a catalogue it
+    # never actually compared against history.
     no_ref_repo_root = Path(
         tempfile.mkdtemp(prefix="main-history-ref-absent-", dir=fixture_scratch_root)
     )
@@ -5099,9 +5145,9 @@ end LatticeSystem
         shutil.rmtree(no_ref_repo_root, ignore_errors=True)
 
     # -- the retired-name absence proof must also scan the tracked root umbrella LatticeSystem.lean
-    # `lean_leaf_mention` and `current_lean_declaration_names` both root at repo_root/LatticeSystem,
-    # so a declaration mentioned only in the tracked, CI-built repo_root/LatticeSystem.lean is
-    # invisible to the absence proof even though it is live in the built library.
+    # A declaration mentioned only in the tracked, CI-built repo_root/LatticeSystem.lean is live
+    # in the built library, so both halves of the proof, `lean_leaf_mention` and
+    # `current_lean_declaration_names`, must reach outside repo_root/LatticeSystem to see it.
     root_umbrella_root = Path(
         tempfile.mkdtemp(prefix="lean-leaf-mention-root-umbrella-", dir=fixture_scratch_root)
     )
@@ -5137,12 +5183,11 @@ end LatticeSystem
         shutil.rmtree(root_umbrella_root, ignore_errors=True)
 
     # -- (pin) the isIdRest membership oracle must be exhaustive, not a boundary sample ----------
-    # This reimplements `isIdRest` / `isLetterLike` / `isSubScriptAlnum` / the ASCII alphanumeric
-    # test from the pinned Lean v4.29.0 toolchain source
-    # (~/.elan/toolchains/leanprover--lean4---v4.29.0/src/lean/Init/Meta/Defs.lean:98-134 and
-    # Init/Data/Char/Basic.lean:105-139) and compares it against LEAN_IDENTIFIER_REST_CLASS
-    # membership over every non-surrogate code point, so a class edit that widens or narrows the
-    # scan anywhere in the 0x110000 range is caught, not only at the boundary probes above.
+    # This reimplements `isIdRest` / `isLetterLike` / `isSubScriptAlnum` of `Init.Meta.Defs`
+    # and the ASCII alphanumeric test of `Init.Data.Char.Basic`, from the Lean toolchain this
+    # repository pins (v4.29.0), and compares it against LEAN_IDENTIFIER_REST_CLASS membership
+    # over every non-surrogate code point, so a class edit that widens or narrows the scan
+    # anywhere in the 0x110000 range is caught, not only at the boundary probes above.
     def lean_isIdRest_oracle(codepoint: int) -> bool:
         """Decide isIdRest membership for one code point from the pinned toolchain source."""
         is_ascii_alnum = (
@@ -5213,10 +5258,10 @@ end LatticeSystem
     finally:
         shutil.rmtree(main_history_ref_memo_repo_root, ignore_errors=True)
 
-    # -- (fix 1, currently red) a shallow clone's unresolvable first parent must fail closed
-    # as a named shallow-history error, not fall back to comparing HEAD against itself: a
-    # `--depth 1` clone resolves origin/main but not its parent, which is exactly the shape a
-    # root commit also produces, so the two must be told apart rather than folded together.
+    # -- a shallow clone's unresolvable first parent must fail closed as a named
+    # shallow-history error, not fall back to comparing HEAD against itself: a `--depth 1`
+    # clone resolves origin/main but not its parent, which is exactly the shape a root commit
+    # also produces, so the two must be told apart rather than folded together.
     shallow_history_source_root = Path(
         tempfile.mkdtemp(prefix="shallow-history-source-", dir=fixture_scratch_root)
     )
@@ -5376,8 +5421,8 @@ end LatticeSystem
         if root_commit_clone_root is not None:
             shutil.rmtree(root_commit_clone_root, ignore_errors=True)
 
-    # -- (fix 3, currently red) the first-parent base must be withheld when the working tree
-    # disagrees with HEAD's own committed record shards: a run validating an uncommitted edit
+    # -- the first-parent base must be withheld when the working tree disagrees with HEAD's
+    # own committed record shards: a run validating an uncommitted edit
     # on top of main's tip is not "the commit main just published", so it must be compared
     # against that tip itself, not against the tip's parent.
     dirty_tree_repo_root = Path(
@@ -5455,8 +5500,7 @@ end LatticeSystem
     finally:
         shutil.rmtree(dirty_tree_repo_root, ignore_errors=True)
 
-    # -- (fix 4, currently red) the umbrella read inside current_lean_declaration_names must
-    # tolerate non-UTF-8 bytes the same way lean_leaf_mention does, so a raw byte in the tracked
+    # -- the umbrella read inside current_lean_declaration_names must tolerate non-UTF-8 bytes the same way lean_leaf_mention does, so a raw byte in the tracked
     # root umbrella fails the retired-name absence proof closed instead of raising out of the
     # validator entirely.
     umbrella_decode_root = Path(
@@ -5486,10 +5530,9 @@ end LatticeSystem
     finally:
         shutil.rmtree(umbrella_decode_root, ignore_errors=True)
 
-    # -- (fix 5, currently red) the mention scan of the project's Lean sources must be
-    # performed once per validator run, not once per retired record: `lean_leaf_mention` is
-    # called once per retired record, and each call currently re-lists and re-reads every Lean
-    # source under project_lean_sources from scratch.
+    # -- the mention scan of the project's Lean sources must be performed once per validator
+    # run, not once per retired record: `lean_leaf_mention` answers one question per retired
+    # record, and the library walk behind it does not change between those answers.
     scan_reuse_root = Path(tempfile.mkdtemp(prefix="scan-reuse-", dir=fixture_scratch_root))
     try:
         (scan_reuse_root / "LatticeSystem").mkdir(parents=True, exist_ok=True)
@@ -5522,8 +5565,8 @@ end LatticeSystem
     finally:
         shutil.rmtree(scan_reuse_root, ignore_errors=True)
 
-    # -- (fix 6, currently red) the published legacy authority page must not describe its own
-    # records as "version 1 JSON records": the page is a version-2 record page under the v2
+    # -- the published legacy authority page must not describe its own records as
+    # "version 1 JSON records": the page is a version-2 record page under the v2
     # cutover, and the contract states that version 1's machine URLs are no longer published.
     legacy_index_path = repo_root / "docs" / "formalization" / "legacy" / "index.md"
     legacy_index_text = legacy_index_path.read_text(encoding="utf-8")

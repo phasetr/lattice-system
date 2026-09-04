@@ -20,10 +20,10 @@ live only under `.self-local/tmp/`; neither is committed.
 
 A retired record keeps its canonical detail page and its projection rows. That
 page renders the `retired` human status together with the retirement reason,
-superseding record IDs, and the commit at which the declaration was still
-present, so the published route keeps resolving after the declaration leaves
-the Lean tree. Retired records are excluded from the generated Lean assertion
-file.
+superseding record IDs, and a commit at which the declaration was present, not
+necessarily the last such commit, so the published route keeps resolving after
+the declaration leaves the Lean tree. Retired records are excluded from the
+generated Lean assertion file.
 
 Before copying documentation, the generator reserves both the machine
 publication root and `docs/formalization/records/`; committed files may own
