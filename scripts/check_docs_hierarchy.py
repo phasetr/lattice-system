@@ -1588,6 +1588,11 @@ def unrecognized_argument_self_test() -> None:
                     f"argv probe failed for the wrong reason with {argument}: expected an "
                     f"argparse rejection, got (exit={probe.returncode}): {probe.stderr}"
                 )
+            if "OK:" in probe.stdout:
+                fail(
+                    f"argv fail-open: {argument} must be refused before the hierarchy checks "
+                    "run, but the checker printed an OK: summary before exiting non-zero"
+                )
 
 
 def main() -> None:
