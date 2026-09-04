@@ -15,7 +15,6 @@ import sys
 import tempfile
 from pathlib import Path
 from typing import Any, Iterable
-from unittest.mock import patch
 
 from formalization_cutover import (
     CUTOVER_BASELINE_KEYS,
@@ -3100,6 +3099,298 @@ end LatticeSystem
     finally:
         shutil.rmtree(no_durable_main_repo_root, ignore_errors=True)
 
+    # -- retirement must freeze the active record's identity as recorded on durable main -----
+    # An active record's Lean name, module, source path, and status dimensions are the
+    # historical description of that declaration; retiring it must not be usable to
+    # silently repoint a published record ID at an unrelated declaration.
+    frozen_repo_root = Path(
+        tempfile.mkdtemp(prefix="retirement-frozen-fields-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], frozen_repo_root)
+        frozen_shard_dir = frozen_repo_root / "formalization-status" / "v2" / "records"
+        frozen_shard_dir.mkdir(parents=True, exist_ok=True)
+        frozen_shard_path = frozen_shard_dir / "frozen-fixture-shard.json"
+        frozen_shard_path.write_text(
+            json.dumps(
+                {
+                    "records": [
+                        {
+                            "axiom_dependencies": [],
+                            "capstone": False,
+                            "declaration_kind": "theorem",
+                            "id": "frozen-fixture-record",
+                            "implementation_state": "implemented",
+                            "lean_name": "LatticeSystem.kept",
+                            "lifecycle": "active",
+                            "module": "LatticeSystem.FrozenFixture",
+                            "origin": "project_original",
+                            "proof_guide_anchor": None,
+                            "retirement": None,
+                            "source_coverage": "not_applicable",
+                            "source_path": "LatticeSystem/FrozenFixture.lean",
+                            "source_relations": [],
+                            "summary": "fixture: frozen field regression",
+                            "topic_ids": [],
+                            "trust_state": "axiom_free",
+                        }
+                    ],
+                    "schema_version": 2,
+                    "source_id": "frozen-fixture",
+                    "source_unit": "fixture",
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        frozen_module = frozen_repo_root / "LatticeSystem" / "FrozenFixture.lean"
+        frozen_module.parent.mkdir(parents=True, exist_ok=True)
+        frozen_module.write_text(
+            "namespace LatticeSystem\n\ntheorem kept : True := trivial\n\nend LatticeSystem\n",
+            encoding="utf-8",
+        )
+        fixture_git(
+            [
+                "add",
+                "formalization-status/v2/records/frozen-fixture-shard.json",
+                "LatticeSystem/FrozenFixture.lean",
+            ],
+            frozen_repo_root,
+        )
+        fixture_git(["commit", "-q", "-m", "add frozen-fixture-record as active"], frozen_repo_root)
+        frozen_kept_commit = fixture_head(frozen_repo_root)
+        frozen_changed_module = frozen_repo_root / "LatticeSystem" / "FrozenFixtureChanged.lean"
+        frozen_changed_module.write_text(
+            "namespace LatticeSystem\n\ntheorem changed : True := trivial\n\nend LatticeSystem\n",
+            encoding="utf-8",
+        )
+        fixture_git(["add", "LatticeSystem/FrozenFixtureChanged.lean"], frozen_repo_root)
+        fixture_git(["commit", "-q", "-m", "add an unrelated declaration"], frozen_repo_root)
+        frozen_changed_commit = fixture_head(frozen_repo_root)
+
+        def frozen_field_errors(overrides: dict[str, Any]) -> list[str]:
+            """Retire frozen-fixture-record with the given field overrides."""
+            frozen_validation = Validation()
+            record = {
+                "capstone": False,
+                "declaration_kind": "theorem",
+                "id": "frozen-fixture-record",
+                "implementation_state": "implemented",
+                "lean_name": "LatticeSystem.kept",
+                "lifecycle": "retired",
+                "module": "LatticeSystem.FrozenFixture",
+                "source_coverage": "not_applicable",
+                "source_path": "LatticeSystem/FrozenFixture.lean",
+                "trust_state": "axiom_free",
+                "retirement": {
+                    "last_present_commit": frozen_kept_commit,
+                    "reason": "fixture: frozen field regression",
+                    "superseded_by": [],
+                },
+            }
+            record.update(overrides)
+            validate_retirement(
+                record, "frozen-fixture-repoint", contract, frozen_repo_root, {}, frozen_validation
+            )
+            return frozen_validation.errors
+
+        repoint_errors = frozen_field_errors(
+            {
+                "lean_name": "LatticeSystem.changed",
+                "module": "LatticeSystem.FrozenFixtureChanged",
+                "source_path": "LatticeSystem/FrozenFixtureChanged.lean",
+                "retirement": {
+                    "last_present_commit": frozen_changed_commit,
+                    "reason": "fixture: frozen field regression",
+                    "superseded_by": [],
+                },
+            }
+        )
+        check(
+            any(
+                "frozen-fixture-record" in error and "lean_name" in error
+                for error in repoint_errors
+            ),
+            "frozen fields: retiring frozen-fixture-record while repointing lean_name away "
+            "from the active record's identity recorded on durable main was accepted "
+            f"(errors: {repoint_errors})",
+        )
+
+        unchanged_errors = frozen_field_errors({})
+        check(
+            not any("frozen" in error.lower() for error in unchanged_errors),
+            "frozen fields positive control: retiring frozen-fixture-record with every "
+            f"frozen field unchanged from durable main was rejected (errors: {unchanged_errors})",
+        )
+
+        missing_id_validation = Validation()
+        validate_retirement(
+            {
+                "capstone": False,
+                "declaration_kind": "theorem",
+                "id": "frozen-fixture-record-with-no-main-counterpart",
+                "implementation_state": "implemented",
+                "lean_name": "LatticeSystem.changed",
+                "lifecycle": "retired",
+                "module": "LatticeSystem.FrozenFixtureChanged",
+                "source_coverage": "not_applicable",
+                "source_path": "LatticeSystem/FrozenFixtureChanged.lean",
+                "trust_state": "axiom_free",
+                "retirement": {
+                    "last_present_commit": frozen_changed_commit,
+                    "reason": "fixture: missing main counterpart",
+                    "superseded_by": [],
+                },
+            },
+            "frozen-fixture-missing-id",
+            contract,
+            frozen_repo_root,
+            {},
+            missing_id_validation,
+        )
+        check(
+            bool(missing_id_validation.errors),
+            "frozen fields fail-closed: retiring an id absent from every shard on durable "
+            f"main was accepted (errors: {missing_id_validation.errors})",
+        )
+    finally:
+        shutil.rmtree(frozen_repo_root, ignore_errors=True)
+
+    no_shard_repo_root = Path(
+        tempfile.mkdtemp(prefix="retirement-frozen-fields-no-shard-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], no_shard_repo_root)
+        no_shard_module = no_shard_repo_root / "LatticeSystem" / "FrozenFixtureChanged.lean"
+        no_shard_module.parent.mkdir(parents=True, exist_ok=True)
+        no_shard_module.write_text(
+            "namespace LatticeSystem\n\ntheorem changed : True := trivial\n\nend LatticeSystem\n",
+            encoding="utf-8",
+        )
+        fixture_git(["add", "LatticeSystem/FrozenFixtureChanged.lean"], no_shard_repo_root)
+        fixture_git(
+            ["commit", "-q", "-m", "add an unrelated declaration, no v2 shard tree"],
+            no_shard_repo_root,
+        )
+        no_shard_commit = fixture_head(no_shard_repo_root)
+        no_shard_validation = Validation()
+        validate_retirement(
+            {
+                "capstone": False,
+                "declaration_kind": "theorem",
+                "id": "frozen-fixture-record",
+                "implementation_state": "implemented",
+                "lean_name": "LatticeSystem.changed",
+                "lifecycle": "retired",
+                "module": "LatticeSystem.FrozenFixtureChanged",
+                "source_coverage": "not_applicable",
+                "source_path": "LatticeSystem/FrozenFixtureChanged.lean",
+                "trust_state": "axiom_free",
+                "retirement": {
+                    "last_present_commit": no_shard_commit,
+                    "reason": "fixture: no v2 shard tree on main",
+                    "superseded_by": [],
+                },
+            },
+            "frozen-fixture-no-shard",
+            contract,
+            no_shard_repo_root,
+            {},
+            no_shard_validation,
+        )
+        check(
+            bool(no_shard_validation.errors),
+            "frozen fields fail-closed: retiring a record when durable main has no "
+            f"formalization-status/v2/records tree at all was accepted "
+            f"(errors: {no_shard_validation.errors})",
+        )
+    finally:
+        shutil.rmtree(no_shard_repo_root, ignore_errors=True)
+
+    # -- the retirement evidence key is present_at_commit, not last_present_commit ----------
+    # A committed record naming a commit only proves the declaration was PRESENT there, not
+    # that it was the LAST commit to have it (see the ancestry checks above, which accept
+    # any ancestor whose tree still declares the name); the field name must not overclaim.
+    record_retirement_def = contract.defs.get("record_retirement", {})
+    record_retirement_properties = set(record_retirement_def.get("properties", {}))
+    record_retirement_required = set(record_retirement_def.get("required", []))
+    check(
+        "present_at_commit" in record_retirement_properties
+        and "last_present_commit" not in record_retirement_properties,
+        "schema.json: $defs.record_retirement.properties still names the retirement "
+        "evidence key last_present_commit instead of present_at_commit "
+        f"(got {sorted(record_retirement_properties)})",
+    )
+    check(
+        "present_at_commit" in record_retirement_required,
+        "schema.json: $defs.record_retirement.required does not list present_at_commit "
+        f"(got {sorted(record_retirement_required)})",
+    )
+    retirement_properties, retirement_required = contract.object_keys("record_retirement")
+    renamed_retirement_evidence = {
+        "present_at_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
+        "reason": "fixture: renamed retirement key",
+        "superseded_by": [],
+    }
+    renamed_key_validation = Validation()
+    renamed_key_validation.keys(
+        renamed_retirement_evidence,
+        retirement_properties,
+        retirement_required,
+        "renamed-retirement-key-fixture",
+    )
+    check(
+        not renamed_key_validation.errors,
+        "record_retirement schema: a retirement object using the renamed key "
+        f"present_at_commit was rejected (errors: {renamed_key_validation.errors})",
+    )
+    old_key_retirement_evidence = {
+        "last_present_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
+        "reason": "fixture: retained old retirement key",
+        "superseded_by": [],
+    }
+    old_key_validation = Validation()
+    old_key_validation.keys(
+        old_key_retirement_evidence,
+        retirement_properties,
+        retirement_required,
+        "old-retirement-key-fixture",
+    )
+    check(
+        bool(old_key_validation.errors),
+        "record_retirement schema: a retirement object still using the retired key "
+        "last_present_commit was accepted once present_at_commit is the schema key",
+    )
+
+    # -- the leaf-mention delimiter class must match Lean's own isIdRest, not every non-ASCII
+    # BMP code point: some non-ASCII code points (strict-implicit binder brackets, anonymous
+    # -constructor brackets, angle brackets) are Lean delimiters, not identifier characters.
+    idrest_probe_root = Path(
+        tempfile.mkdtemp(prefix="lean-leaf-mention-idrest-", dir=fixture_scratch_root)
+    )
+    try:
+        idrest_probe_dir = idrest_probe_root / "LatticeSystem"
+        idrest_probe_dir.mkdir(parents=True, exist_ok=True)
+        idrest_probe_file = idrest_probe_dir / "Probe.lean"
+        idrest_probe_cases = {
+            "gone⦃x": True,  # U+2983: strict-implicit binder opener, a delimiter
+            "gone₁": False,  # U+2081: subscript digit, an isIdRest continuation
+            "goneα": False,  # U+03B1 (Greek alpha): letterlike continuation
+            "gone⟩": True,  # U+27E9: anonymous-constructor closer, a delimiter
+            "«gone»": True,  # U+00AB/U+00BB: French-quote name delimiters
+        }
+        for body, expect_found in idrest_probe_cases.items():
+            idrest_probe_file.write_text(body + "\n", encoding="utf-8")
+            found = lean_leaf_mention(idrest_probe_root, "LatticeSystem.gone") is not None
+            check(
+                found == expect_found,
+                "identifier class: lean_leaf_mention(..., \"LatticeSystem.gone\") against a "
+                f"file containing {body!r} returned found={found}, expected {expect_found}",
+            )
+            idrest_probe_file.unlink()
+    finally:
+        shutil.rmtree(idrest_probe_root, ignore_errors=True)
+
     # -- schema.json must agree with the frozen cutover validators --------------------------
     # `validate_cutover_baseline` and `validate_cutover_certificate` reject any
     # `schema_version` other than 1, so the schema's const for those two $defs stays 1 even
@@ -3163,19 +3454,65 @@ end LatticeSystem
             "fixture setup: git itself did not echo the non-ASCII commit message under "
             f"LC_ALL=C (got {utf8_result.stdout!r})",
         )
-        # `git_capture` takes no `env` argument, so the only way to exercise it under a
-        # non-UTF-8 locale is to patch the *process* environment it inherits (`subprocess.run`
-        # reads `os.environ` at call time, not at import time, so a scoped `patch.dict` is
-        # sufficient and leaves the outer environment untouched).
-        with patch.dict(os.environ, {"LC_ALL": "C", "LANG": "C"}):
-            decoded = git_capture(utf8_repo_root, ["log", "-1", "--format=%s"])
+        decoded = git_capture(utf8_repo_root, ["log", "-1", "--format=%s"])
         check(
             non_ascii_message in decoded.stdout,
             "git_capture: a non-ASCII commit subject was not decoded as UTF-8 "
-            f"under LC_ALL=C (got {decoded.stdout!r})",
+            f"(got {decoded.stdout!r})",
         )
     finally:
         shutil.rmtree(utf8_repo_root, ignore_errors=True)
+
+    # A commit subject can contain bytes that are not valid UTF-8 at all (not merely a
+    # locale mismatch); `git_capture` must decode them without raising, since one
+    # unparseable subject line should not crash validation of every other record.
+    invalid_utf8_repo_root = Path(
+        tempfile.mkdtemp(prefix="git-capture-invalid-utf8-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], invalid_utf8_repo_root)
+        (invalid_utf8_repo_root / "note.txt").write_text("note\n", encoding="utf-8")
+        fixture_git(["add", "note.txt"], invalid_utf8_repo_root)
+        fixture_git(["commit", "-q", "-m", "seed commit"], invalid_utf8_repo_root)
+        seed_commit = fixture_head(invalid_utf8_repo_root)
+        tree_id = fixture_git(["write-tree"], invalid_utf8_repo_root).stdout.strip()
+        # `git commit -F` and `git commit-tree` both measurably sanitize an invalid UTF-8
+        # message into valid UTF-8 before storing it (byte 0xFF becomes the two-byte UTF-8
+        # encoding of U+00FF), so the only way to land a genuinely invalid byte in a commit
+        # object is to write the raw object with `git hash-object`, which performs no such
+        # rewrite.
+        raw_commit_path = invalid_utf8_repo_root / "invalid-utf8-commit.raw"
+        raw_commit_path.write_bytes(
+            b"tree " + tree_id.encode("ascii") + b"\n"
+            b"parent " + seed_commit.encode("ascii") + b"\n"
+            b"author formalization-status fixture <fixture@example.invalid> 1700000000 +0000\n"
+            b"committer formalization-status fixture <fixture@example.invalid> 1700000000 +0000\n"
+            b"\n"
+            b"bad \xff byte"
+        )
+        invalid_commit_id = fixture_git(
+            ["hash-object", "-t", "commit", "-w", str(raw_commit_path)],
+            invalid_utf8_repo_root,
+        ).stdout.strip()
+        try:
+            invalid_utf8_result: subprocess.CompletedProcess[str] | None = git_capture(
+                invalid_utf8_repo_root, ["log", "-1", "--format=%s", invalid_commit_id]
+            )
+        except UnicodeDecodeError as error:
+            invalid_utf8_error: UnicodeDecodeError | None = error
+            invalid_utf8_result = None
+        else:
+            invalid_utf8_error = None
+        check(
+            invalid_utf8_error is None
+            and invalid_utf8_result is not None
+            and "�" in invalid_utf8_result.stdout,
+            "git_capture: a commit subject containing an invalid UTF-8 byte either raised "
+            f"{invalid_utf8_error!r} or was not decoded with a replacement character "
+            f"(got {invalid_utf8_result.stdout if invalid_utf8_result else None!r})",
+        )
+    finally:
+        shutil.rmtree(invalid_utf8_repo_root, ignore_errors=True)
 
     return failures
 
