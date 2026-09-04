@@ -276,11 +276,12 @@ lacks full history is a shallow-history validation error, not a fallback to
 comparing that commit against itself. Because the substitution assumes the
 candidate is the commit itself, the first-parent base is used only when the
 working tree's record shards are identical to the ref's own commit; a dirty
-working tree is compared against the ref itself. Comparison against that
-history carries the bootstrap exception: while durable main-branch history
-publishes no record shard tree at all, active records are not compared against
-it; any shard that exists but cannot be read is a validation error, not a
-silent skip.
+working tree is compared against the ref itself, and a checkout in which that
+comparison cannot be made at all is a validation error too, not a silent return
+to comparing the commit against itself. Comparison against that history carries
+the bootstrap exception: while durable main-branch history publishes no record
+shard tree at all, active records are not compared against it; any shard that
+exists but cannot be read is a validation error, not a silent skip.
 A checkout in which neither `origin/main` nor `main` resolves is likewise a
 validation error for active and retired records alike. Only the `reason` stays
 editable, and `superseded_by` may gain IDs, discovered when a replacement is

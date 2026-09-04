@@ -1155,7 +1155,9 @@ def record_comparison_base(repo_root: Path, history_ref: str) -> ComparisonBase:
     # and for a merge commit alike. That substitution only fits a run whose candidate is the
     # commit itself: a staged or unstaged edit of the record shards is a candidate of its own and
     # belongs measured against the commit it sits on, so the parent is taken only once the shards
-    # are proven to match that commit, and an unanswerable comparison is not such a proof.
+    # are proven to match that commit. A comparison that cannot be made proves neither side, and
+    # falling back to the ref there would restore self-comparison on exactly the push-to-main run
+    # where HEAD is the ref, so it fails closed instead.
     # A root commit genuinely has no parent and nothing precedes it that self-comparison could
     # hide, but a checkout that merely lacks the history is a different answer that looks the
     # same from `rev-parse`, and a shallow clone hides the parent from `rev-list` too. The parent
@@ -1173,7 +1175,14 @@ def record_comparison_base(repo_root: Path, history_ref: str) -> ComparisonBase:
         repo_root,
         ["--no-optional-locks", "status", "--porcelain", "--", RECORD_SHARD_DIRECTORY],
     )
-    if shard_changes.returncode != 0 or shard_changes.stdout.strip():
+    if shard_changes.returncode != 0:
+        return ComparisonBase(
+            None,
+            f"the working-tree state of the record shards under {RECORD_SHARD_DIRECTORY} cannot "
+            f"be determined in this checkout, so neither {history_ref} nor its first parent can "
+            "be shown to be the commit this catalogue must be measured against",
+        )
+    if shard_changes.stdout.strip():
         return ComparisonBase(history_ref, None)
     commit_object = git_capture(repo_root, ["cat-file", "commit", f"{history_ref}^{{commit}}"])
     headers = commit_object.stdout.split("\n\n", 1)[0]
@@ -4637,6 +4646,8 @@ end LatticeSystem
         "the first-parent base is used only when the working tree's record shards are "
         "identical to the ref's own commit; a dirty working tree is compared against the "
         "ref itself",
+        "a checkout in which that comparison cannot be made at all is a validation error too, "
+        "not a silent return to comparing the commit against itself",
     ):
         check(
             bounded_first_parent_phrase in contract_vocabulary_text,
@@ -5499,6 +5510,104 @@ end LatticeSystem
         )
     finally:
         shutil.rmtree(dirty_tree_repo_root, ignore_errors=True)
+
+    # -- a working-tree comparison that cannot be made at all must be named rather than folded
+    # into either answer it stands between: treating it as clean would measure the run against
+    # the ref's parent, and treating it as dirty would measure the push-to-main run against the
+    # ref, which is the commit under validation itself.
+    undeterminable_tree_repo_root = Path(
+        tempfile.mkdtemp(prefix="undeterminable-working-tree-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], undeterminable_tree_repo_root)
+        undeterminable_shard_dir = (
+            undeterminable_tree_repo_root / "formalization-status" / "v2" / "records"
+        )
+        undeterminable_shard_dir.mkdir(parents=True, exist_ok=True)
+        undeterminable_shard_path = undeterminable_shard_dir / "undeterminable-shard.json"
+
+        def write_undeterminable_shard(lifecycle: str) -> None:
+            """Publish rec-opaque on the undeterminable-working-tree fixture's shard tree."""
+            record: dict[str, Any] = {"id": "rec-opaque", "lifecycle": lifecycle}
+            record["retirement"] = (
+                {
+                    "present_at_commit": "a" * 40,
+                    "reason": "fixture: rec-opaque retired on main's own tip",
+                    "superseded_by": [],
+                }
+                if lifecycle == "retired"
+                else None
+            )
+            undeterminable_shard_path.write_text(
+                json.dumps(
+                    {
+                        "records": [record],
+                        "schema_version": 2,
+                        "source_id": "undeterminable-fixture",
+                        "source_unit": "fixture",
+                    },
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+        write_undeterminable_shard("active")
+        fixture_git(
+            ["add", "formalization-status/v2/records/undeterminable-shard.json"],
+            undeterminable_tree_repo_root,
+        )
+        fixture_git(
+            ["commit", "-q", "-m", "publish rec-opaque active"],
+            undeterminable_tree_repo_root,
+        )
+        write_undeterminable_shard("retired")
+        fixture_git(
+            ["add", "formalization-status/v2/records/undeterminable-shard.json"],
+            undeterminable_tree_repo_root,
+        )
+        fixture_git(
+            ["commit", "-q", "-m", "publish rec-opaque retired, main's own tip"],
+            undeterminable_tree_repo_root,
+        )
+
+        real_git_capture_for_status = git_capture
+
+        def failing_status_git_capture(
+            root: Path, arguments: list[str]
+        ) -> subprocess.CompletedProcess[str]:
+            """Answer only the working-tree query as a failed Git command."""
+            if "status" in arguments:
+                return subprocess.CompletedProcess(
+                    ["git", *arguments], 128, "", "fixture: working-tree query unavailable"
+                )
+            return real_git_capture_for_status(root, arguments)
+
+        undeterminable_validation = Validation()
+        with memoization_patch(
+            f"{__name__}.git_capture", side_effect=failing_status_git_capture
+        ):
+            validate_retirement(
+                {"id": "rec-opaque", "lifecycle": "active", "retirement": None},
+                "undeterminable-working-tree",
+                contract,
+                undeterminable_tree_repo_root,
+                {},
+                undeterminable_validation,
+            )
+        check(
+            any(
+                "working-tree state" in error and "cannot be determined" in error
+                for error in undeterminable_validation.errors
+            )
+            and not any("terminal" in error for error in undeterminable_validation.errors),
+            "undeterminable working tree: the query deciding whether the record shards match "
+            "HEAD failed, and the run neither named that failure nor stopped: it either "
+            "accepted the candidate or rejected it as a retirement reversal, both of which "
+            "claim a comparison base this checkout could not establish "
+            f"(errors: {undeterminable_validation.errors})",
+        )
+    finally:
+        shutil.rmtree(undeterminable_tree_repo_root, ignore_errors=True)
 
     # -- the umbrella read inside current_lean_declaration_names must tolerate non-UTF-8 bytes the same way lean_leaf_mention does, so a raw byte in the tracked
     # root umbrella fails the retired-name absence proof closed instead of raising out of the
