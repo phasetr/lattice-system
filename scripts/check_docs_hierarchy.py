@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import html
 import posixpath
@@ -1585,6 +1586,11 @@ def unrecognized_argument_self_test() -> None:
 
 
 def main() -> None:
+    # This checker has no modes: every run performs the same self-tests and the same hierarchy
+    # checks, so the parser deliberately declares no options. Its only job is to refuse argv that
+    # a caller believed selected behaviour -- the sibling checkers' --self-test above all -- which
+    # would otherwise be ignored and answered with a PASS the argument had no part in.
+    argparse.ArgumentParser(description=__doc__).parse_args()
     long_record_negative_self_tests()
     moved_prose_negative_self_tests()
     deleted_row_registry_mention_semantics_self_test()
