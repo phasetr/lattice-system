@@ -260,9 +260,14 @@ necessarily the last such commit. The record's Lean name, module, source path,
 and status dimensions are frozen as the historical description of that former
 declaration: they must equal the values durable main-branch history publishes
 for the same record ID, and a record whose ID that history does not publish
-cannot be retired. A retired record keeps its stable ID, its canonical human
-route, and its projection fragments; it generates no Lean assertion; no active
-record may depend on it; and its Lean name is not available for reuse.
+cannot be retired. Retirement is terminal: once that history publishes the ID
+as `retired`, its `lifecycle` cannot return to `active`, and `present_at_commit`
+is frozen alongside the identity fields. Only the `reason` stays editable, and
+`superseded_by` may gain IDs, discovered when a replacement is written later,
+but may never drop one that history already publishes. A retired record keeps
+its stable ID, its canonical human route, and its projection fragments; it
+generates no Lean assertion; no active record may depend on it; and its Lean
+name is not available for reuse.
 Deleting a published record from the catalogue remains a breaking change, and
 deleting one instead of retiring it violates this contract even where no
 checker rejects it.
@@ -580,13 +585,21 @@ library and checks:
   `main`; neither resolving is an error) whose tree declares that name at the
   recorded path, its frozen fields equal those the same history publishes for
   that record ID, and its `superseded_by` IDs resolve to active records;
+- terminal retirement: once that history publishes a record ID as `retired`, no
+  record may return the ID to `active`, the retired record's
+  `present_at_commit` must equal the published one, and its `superseded_by`
+  may add IDs but must keep every published one;
 - fail-closed absence of a retired Lean name: beyond the declaration matcher,
   the retired record is rejected if its short name still occurs in any Lean
-  source under `LatticeSystem/` delimited by Lean's own identifier-continuation
-  set (ASCII alphanumerics, `_`, `'`, `!`, `?`, the letterlike Greek, Coptic,
-  letterlike-symbol and script ranges, and subscript alphanumerics), so that
-  `foo'` and `foo` count as distinct words while brackets and guillemets end a
-  name;
+  source under `LatticeSystem/` delimited by `isIdRest` of the pinned Lean
+  toolchain: ASCII alphanumerics, `_`, `'`, `!`, `?`, every `isLetterLike`
+  range (Latin-1 supplement letters without the multiplication and division
+  signs, Latin Extended-A, Greek without lambda, Pi and Sigma, Coptic,
+  polytonic Greek, letterlike symbols, and script letters) and every
+  `isSubScriptAlnum` range (subscript digits, subscript Latin letters, and
+  subscript j), so that `foo'` and `foo` count as distinct words while brackets
+  and guillemets end a name. The schema's `lean_name` pattern is a separate and
+  looser syntactic filter on recorded names, not this scanning set;
 - active-only gates: only active records generate Lean assertions, satisfy
   representative prototype coverage, and may be named by another active record's
   axiom dependencies;

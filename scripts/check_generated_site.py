@@ -2968,46 +2968,19 @@ def run_self_tests() -> None:
             f"lifecycle='retired' as 'retired' (got {retired_derived_label!r})"
         )
     retired_block = "\n".join(generate_record_lines(retired_record_fixture, {}, {}))
+    # The record names a commit at which the declaration was present, not necessarily the last
+    # such commit, so the human label must promise no more than the machine field name does.
     for expected_row in (
         '<dd data-field="lifecycle">retired</dd>',
         '<dd data-field="human-status">retired</dd>',
         '<dd data-field="retirement-reason">',
         '<dd data-field="retirement-superseded-by">',
         '<dd data-field="retirement-present-at-commit">',
+        "Present at commit",
     ):
         if expected_row not in retired_block:
             raise AssertionError(
                 f"record_lines does not render a v2 retirement row: {expected_row!r}"
-            )
-
-    # The retirement evidence key is present_at_commit (the record names a commit where the
-    # declaration was present, not necessarily the last such commit), so the rendered row and
-    # its human label must carry that name too, not the retired last_present_commit key.
-    present_at_commit_fixture = {
-        **retired_record_fixture,
-        "id": "fixture-retired-record-present-at-commit",
-        "retirement": {
-            "present_at_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
-            "reason": "superseded by a directly proved converse",
-            "superseded_by": [],
-        },
-    }
-    try:
-        present_at_commit_block = "\n".join(
-            generate_record_lines(present_at_commit_fixture, {}, {})
-        )
-    except KeyError as error:
-        raise AssertionError(
-            "record_lines does not render a retirement object keyed by present_at_commit "
-            f"(raised {error!r} while still reading the retired last_present_commit key)"
-        ) from error
-    for expected_row in (
-        "Present at commit",
-        '<dd data-field="retirement-present-at-commit">',
-    ):
-        if expected_row not in present_at_commit_block:
-            raise AssertionError(
-                f"record_lines does not render the renamed retirement row: {expected_row!r}"
             )
 
     sidebar_metadata = "\n".join(

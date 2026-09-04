@@ -69,6 +69,8 @@ FROZEN_RECORD_FIELDS = (
     "source_path",
     "trust_state",
 )
+_MAIN_HISTORY_REF_CACHE: dict[Path, str | None] = {}
+_MAIN_RECORD_INDEX_CACHE: dict[tuple[Path, str], dict[str, dict[str, Any]] | None] = {}
 RELATION_RANK = {
     "formalizes": 0,
     "presents": 0,
@@ -81,18 +83,27 @@ HTTPS_URL_PATTERN = (
     r"^(?![\s\S]*[\u0000-\u001F\u007F-\u009F])https://[\s\S]+$"
 )
 INLINE_TEXT_RE = re.compile(INLINE_TEXT_PATTERN)
-# Lean's own `isIdRest` set, spelled as a regular-expression character class. The retirement
-# scan must end identifiers exactly where Lean ends them: brackets such as U+2983 and U+27E9
-# and the French quotes of a guillemet name are delimiters that must not hide a mention,
-# while a trailing subscript or Greek letter continues the identifier into a different name.
+# `isIdRest` of the pinned Lean toolchain (`Init/Meta/Defs.lean`), spelled as a
+# regular-expression character class: ASCII alphanumerics, `_`, `'`, `!`, `?`, every
+# `isLetterLike` range (Latin-1 supplement letters without the multiplication and division
+# signs, Latin Extended-A, Greek without lambda, Pi and Sigma, Coptic, polytonic Greek,
+# letterlike symbols, and script letters) and every `isSubScriptAlnum` range (subscript
+# digits, subscript Latin letters, and subscript j). The retirement scan must end identifiers
+# exactly where Lean ends them: brackets such as U+2983 and U+27E9 and the French quotes of a
+# guillemet name are delimiters that must not hide a mention, while a trailing subscript,
+# Greek or accented letter continues the identifier into a different name.
 LEAN_IDENTIFIER_REST_CLASS = (
     "A-Za-z0-9_'!?"
-    "\u03b1-\u03ba\u03bc-\u03c9"
+    "\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u017f"
     "\u0391-\u039f\u03a1-\u03a2\u03a4-\u03a9"
+    "\u03b1-\u03ba\u03bc-\u03c9"
     "\u03ca-\u03fb"
+    "\u1d62-\u1d6a"
+    "\u1f00-\u1ffe"
+    "\u2080-\u2089\u2090-\u209c"
     "\u2100-\u214f"
+    "\u2c7c"
     "\U0001d49c-\U0001d59f"
-    "\u2080-\u2089\u2090-\u209c\u1d62-\u1d6a"
 )
 
 
@@ -1056,6 +1067,16 @@ def git_capture(repo_root: Path, arguments: list[str]) -> subprocess.CompletedPr
 
 def main_history_ref(repo_root: Path) -> str | None:
     """Resolve the durable main-branch ref that retirement evidence is measured against."""
+    # Every record in a catalogue resolves the same ref against the same checkout, so the
+    # answer is kept rather than re-spawned once per record.
+    resolved_root = repo_root.resolve()
+    if resolved_root not in _MAIN_HISTORY_REF_CACHE:
+        _MAIN_HISTORY_REF_CACHE[resolved_root] = read_main_history_ref(repo_root)
+    return _MAIN_HISTORY_REF_CACHE[resolved_root]
+
+
+def read_main_history_ref(repo_root: Path) -> str | None:
+    """Return the first durable main-branch ref that resolves in this checkout."""
     for ref in ("origin/main", "main"):
         resolved = git_capture(repo_root, ["rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}"])
         if resolved.returncode == 0:
@@ -1065,6 +1086,19 @@ def main_history_ref(repo_root: Path) -> str | None:
 
 def main_record_index(repo_root: Path, history_ref: str) -> dict[str, dict[str, Any]] | None:
     """Index the records durable main history publishes, or None when they are unreadable."""
+    # Every record asks the same question of the same already-merged history, and each answer
+    # costs one `git ls-tree` plus one `git show` per shard, so a catalogue with many retired
+    # records would otherwise spend several Git subprocesses per record.
+    cache_key = (repo_root.resolve(), history_ref)
+    if cache_key not in _MAIN_RECORD_INDEX_CACHE:
+        _MAIN_RECORD_INDEX_CACHE[cache_key] = read_main_record_index(repo_root, history_ref)
+    return _MAIN_RECORD_INDEX_CACHE[cache_key]
+
+
+def read_main_record_index(
+    repo_root: Path, history_ref: str
+) -> dict[str, dict[str, Any]] | None:
+    """Read every record shard durable main history publishes, or None when unreadable."""
     listing = git_capture(
         repo_root, ["ls-tree", "--name-only", history_ref, f"{RECORD_SHARD_DIRECTORY}/"]
     )
@@ -1123,12 +1157,62 @@ def validate_frozen_identity(
             f"{location}: {identifier}: frozen field {field} is {record.get(field)!r}, "
             f"not the {former.get(field)!r} published on {history_ref}",
         )
-    if former.get("lifecycle") == "retired":
-        validation.require(
-            record.get("retirement") == former.get("retirement"),
-            f"{location}: {identifier}: retirement evidence differs from the evidence "
-            f"{history_ref} already publishes for this retired record",
-        )
+    if former.get("lifecycle") != "retired":
+        return
+    # Durable main history already settled which commit is the record's proof, and nothing can
+    # re-measure it, so the pinned commit is frozen too. The prose and the supersession list
+    # stay open: a reason may be corrected, and a replacement declaration may only be written
+    # after the retirement merged, but a supersession that history already publishes must not
+    # silently disappear.
+    retirement = record.get("retirement")
+    retirement = retirement if isinstance(retirement, dict) else {}
+    former_retirement = former.get("retirement")
+    former_retirement = former_retirement if isinstance(former_retirement, dict) else {}
+    validation.require(
+        retirement.get("present_at_commit") == former_retirement.get("present_at_commit"),
+        f"{location}: {identifier}: frozen field retirement.present_at_commit is "
+        f"{retirement.get('present_at_commit')!r}, not the "
+        f"{former_retirement.get('present_at_commit')!r} published on {history_ref}",
+    )
+    superseded = retirement.get("superseded_by")
+    former_superseded = former_retirement.get("superseded_by")
+    dropped = sorted(
+        set(former_superseded if isinstance(former_superseded, list) else [])
+        - set(superseded if isinstance(superseded, list) else [])
+    )
+    validation.require(
+        not dropped,
+        f"{location}: {identifier}: retirement.superseded_by no longer lists "
+        f"{', '.join(dropped)}, which {history_ref} publishes for this retired record",
+    )
+
+
+def reject_retirement_reversal(
+    record: dict[str, Any],
+    location: str,
+    repo_root: Path,
+    validation: Validation,
+) -> None:
+    """Keep an ID durable main history publishes as retired out of the active catalogue."""
+    identifier = record.get("id")
+    if not isinstance(identifier, str):
+        return
+    # Unreadable history is fail-open here and fail-closed on the retired path: an active
+    # record is re-measured against the current Lean tree in full, while a retired one, which
+    # nothing can re-measure, has no other evidence to fall back on.
+    history_ref = main_history_ref(repo_root)
+    if history_ref is None:
+        return
+    published = main_record_index(repo_root, history_ref)
+    if published is None:
+        return
+    former = published.get(identifier)
+    if not isinstance(former, dict) or former.get("lifecycle") != "retired":
+        return
+    validation.errors.append(
+        f"{location}: {identifier} is retired on {history_ref}: retirement is terminal, "
+        "so the ID cannot return to the active catalogue"
+    )
 
 
 def validate_retirement(
@@ -1151,6 +1235,7 @@ def validate_retirement(
             retirement is None,
             f"{location}: an active record must not carry retirement evidence",
         )
+        reject_retirement_reversal(record, location, repo_root, validation)
         return
     validation.require(
         record.get("capstone") is False,
@@ -3660,46 +3745,17 @@ end LatticeSystem
     finally:
         shutil.rmtree(retired_main_repo_root, ignore_errors=True)
 
-    # -- the retirement evidence key is present_at_commit, not last_present_commit ----------
-    # A committed record naming a commit only proves the declaration was PRESENT there, not
-    # that it was the LAST commit to have it (see the ancestry checks above, which accept
-    # any ancestor whose tree still declares the name); the field name must not overclaim.
-    record_retirement_def = contract.defs.get("record_retirement", {})
-    record_retirement_properties = set(record_retirement_def.get("properties", {}))
-    record_retirement_required = set(record_retirement_def.get("required", []))
-    check(
-        "present_at_commit" in record_retirement_properties
-        and "last_present_commit" not in record_retirement_properties,
-        "schema.json: $defs.record_retirement.properties still names the retirement "
-        "evidence key last_present_commit instead of present_at_commit "
-        f"(got {sorted(record_retirement_properties)})",
-    )
-    check(
-        "present_at_commit" in record_retirement_required,
-        "schema.json: $defs.record_retirement.required does not list present_at_commit "
-        f"(got {sorted(record_retirement_required)})",
-    )
+    # -- the schema admits only the retirement evidence key that does not overclaim ---------
+    # A record naming a commit proves the declaration was PRESENT there, not that it was the
+    # LAST commit to have it (the ancestry checks above accept any ancestor whose tree still
+    # declares the name), so the key that would promise the stronger claim is rejected. Its
+    # spelling is written once, here, and reused by the published-prose scan below so the two
+    # gates cannot drift apart.
+    rejected_evidence_key = "last_present_commit"
     retirement_properties, retirement_required = contract.object_keys("record_retirement")
-    renamed_retirement_evidence = {
-        "present_at_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
-        "reason": "fixture: renamed retirement key",
-        "superseded_by": [],
-    }
-    renamed_key_validation = Validation()
-    renamed_key_validation.keys(
-        renamed_retirement_evidence,
-        retirement_properties,
-        retirement_required,
-        "renamed-retirement-key-fixture",
-    )
-    check(
-        not renamed_key_validation.errors,
-        "record_retirement schema: a retirement object using the renamed key "
-        f"present_at_commit was rejected (errors: {renamed_key_validation.errors})",
-    )
     old_key_retirement_evidence = {
-        "last_present_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
-        "reason": "fixture: retained old retirement key",
+        rejected_evidence_key: "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
+        "reason": "fixture: overclaiming retirement evidence key",
         "superseded_by": [],
     }
     old_key_validation = Validation()
@@ -3707,12 +3763,12 @@ end LatticeSystem
         old_key_retirement_evidence,
         retirement_properties,
         retirement_required,
-        "old-retirement-key-fixture",
+        "rejected-retirement-key-fixture",
     )
     check(
         bool(old_key_validation.errors),
-        "record_retirement schema: a retirement object still using the retired key "
-        "last_present_commit was accepted once present_at_commit is the schema key",
+        "record_retirement schema: a retirement object keyed by "
+        f"{rejected_evidence_key} was accepted",
     )
 
     # -- the leaf-mention delimiter class must match Lean's own isIdRest, not every non-ASCII
@@ -3935,10 +3991,11 @@ end LatticeSystem
     finally:
         shutil.rmtree(invalid_utf8_repo_root, ignore_errors=True)
 
-    # -- the publication runbook must not still promise the retired last-present-commit
-    # vocabulary: `present_at_commit` proves the declaration was present at that commit, not
-    # that it was the last commit to have it, and the runbook's own prose must not overclaim
-    # the opposite of what the schema and the validator now enforce.
+    # -- the published prose must not promise what the schema key refuses to promise: the
+    # contract and the runbook describe the same evidence field, so neither may spell the
+    # stronger claim the schema rejects above. Prose writes that claim with hyphens and a
+    # separate noun, so the scan matches the hyphenated stem rather than the exact key.
+    rejected_evidence_prose = rejected_evidence_key.replace("_", "-").removesuffix("-commit")
     for docs_vocabulary_relative_path in (
         "docs/formalization-status-contract.md",
         "docs/formalization-publication.md",
@@ -3946,11 +4003,11 @@ end LatticeSystem
         docs_vocabulary_path = repo_root / docs_vocabulary_relative_path
         docs_vocabulary_text = docs_vocabulary_path.read_text(encoding="utf-8")
         check(
-            "last-present commit" not in docs_vocabulary_text
-            and "last_present_commit" not in docs_vocabulary_text,
-            f"{docs_vocabulary_relative_path}: still uses the retired vocabulary "
-            "'last-present commit' or 'last_present_commit' instead of 'present at commit' / "
-            "present_at_commit",
+            rejected_evidence_key not in docs_vocabulary_text
+            and rejected_evidence_prose not in docs_vocabulary_text,
+            f"{docs_vocabulary_relative_path}: uses the vocabulary "
+            f"'{rejected_evidence_prose}' or '{rejected_evidence_key}' instead of "
+            "'present at commit' / present_at_commit",
         )
 
     # -- main_record_index must not re-read durable main's record shards from scratch for
