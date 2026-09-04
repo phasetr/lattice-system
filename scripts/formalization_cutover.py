@@ -750,24 +750,13 @@ def lean_declaration_inventory(source: str) -> dict[str, set[str]]:
     return inventory
 
 
-def project_lean_sources(repo_root: Path) -> list[Path]:
-    """Return every Lean source of the project library, root umbrella included."""
-    # The root umbrella LatticeSystem.lean sits outside the LatticeSystem/ directory yet is
-    # built like any other module, so a scan that skipped it would certify a name absent while
-    # the library still declares it.
-    umbrella = repo_root / "LatticeSystem.lean"
-    sources = [umbrella] if umbrella.is_file() else []
-    sources.extend(sorted((repo_root / "LatticeSystem").rglob("*.lean")))
-    return sources
-
-
 def current_lean_declaration_names(repo_root: Path) -> set[str]:
     """Return the cached exact FQ declaration inventory for current project sources."""
     resolved_root = repo_root.resolve()
     current_names = _CURRENT_DECLARATION_NAMES_CACHE.get(resolved_root)
     if current_names is None:
         current_names = set()
-        for current_path in project_lean_sources(repo_root):
+        for current_path in (repo_root / "LatticeSystem").rglob("*.lean"):
             current_names.update(
                 lean_declaration_inventory(
                     current_path.read_text(encoding="utf-8")

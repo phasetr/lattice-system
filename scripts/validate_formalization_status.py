@@ -24,10 +24,9 @@ from formalization_cutover import (
     CUTOVER_RETIRED_DECLARATION_REQUIRED_KEYS,
     LEGACY_ROW_KEYS,
     PROTOTYPE_RECORD_IDS,
-    current_lean_declaration_names,
+    current_lean_declaration_names as tree_lean_declaration_names,
     exceptional_mapping_map,
     lean_declaration_inventory,
-    project_lean_sources,
     reconstruct_legacy_rows,
     retired_declaration_map,
     self_test as cutover_self_test,
@@ -1031,6 +1030,29 @@ def source_declares(path: Path, kind: str, lean_name: str) -> bool:
     except OSError:
         return False
     return declaration_in_source(source, kind, lean_name)
+
+
+def project_lean_sources(repo_root: Path) -> list[Path]:
+    """Return every Lean source of the project library, root umbrella included."""
+    # The root umbrella LatticeSystem.lean sits outside the LatticeSystem/ directory yet is
+    # built like any other module, so a scan that skipped it would certify a name absent while
+    # the library still declares it.
+    umbrella = repo_root / "LatticeSystem.lean"
+    sources = [umbrella] if umbrella.is_file() else []
+    sources.extend(sorted((repo_root / "LatticeSystem").rglob("*.lean")))
+    return sources
+
+
+def current_lean_declaration_names(repo_root: Path) -> set[str]:
+    """Return every fully qualified declaration name the project library currently declares."""
+    # The cutover module's cached inventory covers the LatticeSystem/ tree; the root umbrella is
+    # read through the same declaration matcher rather than by a parser of its own, so both
+    # halves of the absence proof decide "still declared" the same way.
+    names = set(tree_lean_declaration_names(repo_root))
+    umbrella = repo_root / "LatticeSystem.lean"
+    if umbrella.is_file():
+        names.update(lean_declaration_inventory(umbrella.read_text(encoding="utf-8")))
+    return names
 
 
 def lean_leaf_mention(repo_root: Path, lean_name: str) -> str | None:
