@@ -4,7 +4,8 @@ import LatticeSystem.Quantum.SpinS.ShastryNoSSBReduction
 /-!
 # Signature pin: Tasaki's own route to Corollary 4.3 (contraposition, p. 77)
 
-One pin for the contraposition route (issue #5416):
+One pin for the contraposition route, the route that replaced the earlier reduction through a
+staggered-susceptibility axiom of the corollary's own:
 `no_long_range_order_1d_of_theorem_4_2` — the signature the proof of `no_long_range_order_1d`
 applies, at `N` with `hN : 1 ≤ N` (the `N = 0` case is its own unconditional branch).  Its
 hypothesis is Theorem 4.2's conclusion **applied**, via `shastry_no_symmetry_breaking_1d N`,
@@ -12,8 +13,9 @@ rather than retyped as a binder: any drift between what this pin supplies and wh
 declaration demands surfaces as an application-elaboration error against the *existing*
 declaration `shastry_no_symmetry_breaking_1d`, not as two independently-transcribed types that
 could silently diverge.  `no_long_range_order_1d` itself is pinned once, in
-`NoLongRangeOrder1DPin.lean`; the proposition it states appears here only as the result type at
-which the contraposition is applied.
+`NoLongRangeOrder1DPin.lean`; the result type appearing here is Tasaki's third sentence alone,
+his `α = 3` instance (Lean axis `2`), which the capstone extends to all three axes by SU(2)
+invariance.
 
 **Boundary conditions not pinned here, and why.**  The route additionally needs `2 ≤ L` (to invoke
 `afm_ring_ground_state_data`, whose four guards are `Even L`, `2 ≤ L`, `1 ≤ N`, and a nonempty
@@ -35,10 +37,11 @@ namespace LatticeSystem.Tests.Corollary43ContrapositionPin
 open Matrix LatticeSystem.Quantum
 
 /-- **Signature pin for the contraposition theorem.**  Applies Theorem 4.2's conclusion
-(`shastry_no_symmetry_breaking_1d N`) to `no_long_range_order_1d_of_theorem_4_2`, at the exact
-conclusion type `no_long_range_order_1d` carries for `N ≥ 1`.  The hypothesis is supplied by
-application rather than retyped, so a drift in either declaration breaks this fixture at
-elaboration instead of leaving two transcriptions to diverge silently. -/
+(`shastry_no_symmetry_breaking_1d N`) to `no_long_range_order_1d_of_theorem_4_2`, at the `α = 3`
+conclusion type Tasaki's third sentence yields — the Lean axis-`2` instance of what
+`no_long_range_order_1d` carries for `N ≥ 1`.  The hypothesis is supplied by application rather
+than retyped, so a drift in either declaration breaks this fixture at elaboration instead of
+leaving two transcriptions to diverge silently. -/
 example (N : ℕ) (hN : 1 ≤ N) :
     ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L → Even L →
       ∀ Φ : (Fin L → Fin (N + 1)) → ℂ,

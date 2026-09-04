@@ -1,4 +1,6 @@
 import LatticeSystem.Quantum.KaplanHorschVonderLindenTheorem32
+import LatticeSystem.Quantum.SpinS.AndersonTowerEnergyBoundSU2
+import LatticeSystem.Quantum.SpinS.CartesianAxis
 import LatticeSystem.Quantum.SpinS.HorschVonderLindenAfmRing
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingGroundData
 
@@ -9,8 +11,14 @@ Tasaki proves Corollary 4.3 by contraposition against Theorem 3.2; his proof (p.
 condition (3.4.4) for Theorem 3.2 (p. 70) is satisfied because of the Marshall–Lieb–Mattis theorem
 (Theorem 2.2 in p. 39).  Since the conclusion (3.4.22) of Theorem 3.2 does not hold, the other
 condition (3.4.3) must be violated."  That is the route taken here.
-`no_long_range_order_1d_of_theorem_4_2` assumes Theorem 4.2's conclusion verbatim and derives
-Corollary 4.3; `no_long_range_order_1d` is its application to `shastry_no_symmetry_breaking_1d`.
+`no_long_range_order_1d_of_theorem_4_2` assumes Theorem 4.2's conclusion verbatim and derives the
+`α = 3` instance; `no_long_range_order_1d` is its application to `shastry_no_symmetry_breaking_1d`,
+closed over the remaining axes by the sentence that ends Tasaki's proof: "The same bound holds for
+α = 1 or 2 because the unique ground state |Φ_GS⟩ is SU(2) invariant" (p. 77).  That sentence is
+`totalSpinSOpVec_mulVec_eq_zero_of_unique_ground` (the su(2) step),
+`afmRing_groundState_totalSpin_annihilate` (its ring specialisation) and
+`stagOpVec_sq_expectation_eq_axis3` (the transport of the squared expectation).  The Lean axis index
+`α : Fin 3` is Tasaki's `α` minus one, so Lean `α = 2` is his `Ô_L^{(3)}`.
 
 **This discharges nothing.**  Corollary 4.3 now rests on the documented axiom `shastryEnergyGain`,
 the scalar staggered-field energy-gain condition behind Theorem 4.2, instead of on a susceptibility
@@ -39,20 +47,174 @@ namespace LatticeSystem.Quantum
 open Matrix Module
 open scoped ComplexOrder
 
-/-- The staggered order operator is the zero operator at spin `S = 0` (`N = 0`): the single-site
-spin-`3` matrix `spinSOp3 0` is the `1 × 1` diagonal with entry `(0/2 - 0) = 0`, so each summand
-`ε_x • Ŝ_x^{(3)}` vanishes.  This makes the (squared) staggered order parameter trivially zero for
-the degenerate spin-`0` chain, discharging the `N = 0` case of Corollary 4.3 unconditionally. -/
-private theorem staggeredOrderOpS_spin_zero {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (A : Λ → Bool) :
-    staggeredOrderOpS A 0 = 0 := by
+/-- The staggered order operator is the zero operator on **every** axis at spin `S = 0` (`N = 0`):
+`spinSOp3 0` is the `1 × 1` diagonal with entry `(0/2 - 0) = 0`, and `spinSOpPlus 0`,
+`spinSOpMinus 0` have the index conditions `i + 1 = j`, `j + 1 = i`, impossible on `Fin 1`, so
+`spinSOp1 0` and `spinSOp2 0` vanish too; each summand `ε_x • Ŝ_x^{(α)}` is therefore zero.  This
+makes the squared staggered order parameter trivially zero on all three axes for the degenerate
+spin-`0` chain, discharging the `N = 0` case of Corollary 4.3 unconditionally. -/
+private theorem stagOpVec_spin_zero {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (A : Λ → Bool)
+    (α : Fin 3) : stagOpVec A 0 α = 0 := by
+  have hplus : spinSOpPlus 0 = 0 := by
+    ext i j
+    fin_cases i
+    fin_cases j
+    simp [spinSOpPlus]
+  have hminus : spinSOpMinus 0 = 0 := by
+    ext i j
+    fin_cases i
+    fin_cases j
+    simp [spinSOpMinus]
+  have h1 : spinSOp1 0 = 0 := by rw [spinSOp1, hplus, hminus, add_zero, smul_zero]
+  have h2 : spinSOp2 0 = 0 := by rw [spinSOp2, hplus, hminus, sub_zero, smul_zero]
   have h3 : spinSOp3 0 = 0 := by
     ext i j
     fin_cases i
     fin_cases j
     simp [spinSOp3]
-  rw [staggeredOrderOpS]
-  refine Finset.sum_eq_zero (fun x _ => ?_)
-  rw [spinSSiteOp3_def, h3, onSiteS_zero, smul_zero]
+  fin_cases α <;>
+    simp only [stagOpVec, Fin.reduceFinMk, Matrix.cons_val_zero, Matrix.cons_val_one,
+      Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
+  · rw [staggeredOrderOp1S]
+    exact Finset.sum_eq_zero fun x _ => by rw [spinSSiteOp1, h1, onSiteS_zero, smul_zero]
+  · rw [staggeredOrderOp2S]
+    exact Finset.sum_eq_zero fun x _ => by rw [spinSSiteOp2, h2, onSiteS_zero, smul_zero]
+  · rw [staggeredOrderOpS]
+    exact Finset.sum_eq_zero fun x _ => by rw [spinSSiteOp3_def, h3, onSiteS_zero, smul_zero]
+
+/-! ### Tasaki's fourth sentence: the unique ground state is SU(2) invariant
+
+"The same bound holds for `α = 1` or `2` because the unique ground state `|Φ_GS⟩` is SU(2)
+invariant" (p. 77).  The two lemmas below supply that sentence in operator form: the generic su(2)
+step, and its specialisation to the zero-field ring.  The Lean axis index `α : Fin 3` is Tasaki's
+`α` minus one, following `totalSpinSOpVec` and `stagOpVec`. -/
+
+/-- **A unique ground state of an SU(2)-invariant Hamiltonian is annihilated by every total-spin
+generator.**  If the `μ`-eigenspace of `H` has `finrank ≤ 1` and `H` commutes with all three
+generators `Ŝ_tot^{(1)}`, `Ŝ_tot^{(2)}`, `Ŝ_tot^{(3)}`, then every non-zero `μ`-eigenvector `Φ`
+satisfies `Ŝ_tot^{(α)} Φ = 0` for every axis `α : Fin 3` (Lean axis `α` is Tasaki's `α` minus one).
+
+Each generator preserves the at-most-one-dimensional eigenspace, so acts on `Φ` by a scalar `λ_α`
+(`exists_smul_of_commute_unique_eigenspace`).  Scalars commute, so every su(2) commutator kills
+`Φ`: `[Ŝ^{(1)}, Ŝ^{(2)}] Φ = (λ₂λ₁ − λ₁λ₂) Φ = 0`, while `[Ŝ^{(1)}, Ŝ^{(2)}] = i Ŝ^{(3)}` evaluates
+the same vector to `i λ₃ Φ`; with `Φ ≠ 0` and `i ≠ 0` this forces `λ₃ = 0`, and the two cyclic
+partners force `λ₁ = λ₂ = 0`.  No singlet datum enters as a hypothesis: a one-dimensional invariant
+subspace of su(2) carries the trivial representation.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §4.1, Corollary 4.3, p. 77 (fourth sentence of the proof). -/
+theorem totalSpinSOpVec_mulVec_eq_zero_of_unique_ground {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    {N : ℕ} (H : ManyBodyOpS Λ N) (μ : ℂ)
+    (huniq : finrank ℂ ↥(End.eigenspace (Matrix.toLin' H) μ) ≤ 1)
+    {Φ : (Λ → Fin (N + 1)) → ℂ} (hΦne : Φ ≠ 0) (hΦ : H.mulVec Φ = μ • Φ)
+    (hc1 : H * totalSpinSOp1 Λ N = totalSpinSOp1 Λ N * H)
+    (hc2 : H * totalSpinSOp2 Λ N = totalSpinSOp2 Λ N * H)
+    (hc3 : H * totalSpinSOp3 Λ N = totalSpinSOp3 Λ N * H)
+    (α : Fin 3) : (totalSpinSOpVec Λ N α).mulVec Φ = 0 := by
+  obtain ⟨l1, h1⟩ :=
+    LatticeSystem.Math.exists_smul_of_commute_unique_eigenspace H _ μ huniq hΦne hΦ hc1
+  obtain ⟨l2, h2⟩ :=
+    LatticeSystem.Math.exists_smul_of_commute_unique_eigenspace H _ μ huniq hΦne hΦ hc2
+  obtain ⟨l3, h3⟩ :=
+    LatticeSystem.Math.exists_smul_of_commute_unique_eigenspace H _ μ huniq hΦne hΦ hc3
+  -- Two operators acting on `Φ` by scalars commute there, so the third scalar of an su(2) triple
+  -- vanishes.
+  have key : ∀ (A B C : ManyBodyOpS Λ N) (a b c : ℂ), A * B - B * A = Complex.I • C →
+      A.mulVec Φ = a • Φ → B.mulVec Φ = b • Φ → C.mulVec Φ = c • Φ → c = 0 := by
+    intro A B C a b c hcomm hA hB hC
+    have hAB : (A * B).mulVec Φ = (b * a) • Φ := by
+      rw [← Matrix.mulVec_mulVec, hB, Matrix.mulVec_smul, hA, smul_smul]
+    have hBA : (B * A).mulVec Φ = (a * b) • Φ := by
+      rw [← Matrix.mulVec_mulVec, hA, Matrix.mulVec_smul, hB, smul_smul]
+    have h : (A * B - B * A).mulVec Φ = (Complex.I • C).mulVec Φ := by rw [hcomm]
+    rw [Matrix.sub_mulVec, hAB, hBA, Matrix.smul_mulVec, hC, smul_smul] at h
+    have hzero : (Complex.I * c) • Φ = 0 := by
+      rw [← h, ← sub_smul, mul_comm b a, sub_self, zero_smul]
+    exact (mul_eq_zero.mp ((smul_eq_zero.mp hzero).resolve_right hΦne)).resolve_left
+      Complex.I_ne_zero
+  have hl3 : l3 = 0 :=
+    key _ _ _ l1 l2 l3 (totalSpinSOp1_commutator_totalSpinSOp2_named Λ N) h1 h2 h3
+  have hl1 : l1 = 0 :=
+    key _ _ _ l2 l3 l1 (totalSpinSOp2_commutator_totalSpinSOp3_named Λ N) h2 h3 h1
+  have hl2 : l2 = 0 :=
+    key _ _ _ l3 l1 l2 (totalSpinSOp3_commutator_totalSpinSOp1_named Λ N) h3 h1 h2
+  rw [hl1, zero_smul] at h1
+  rw [hl2, zero_smul] at h2
+  rw [hl3, zero_smul] at h3
+  fin_cases α <;>
+    simp only [totalSpinSOpVec, Fin.reduceFinMk, Matrix.cons_val_zero, Matrix.cons_val_one,
+      Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
+  · exact h1
+  · exact h2
+  · exact h3
+
+/-- **Every ground state of the zero-field antiferromagnetic ring is SU(2) invariant.**  For an
+even ring of length `L ≥ 2` at spin `S = N/2` with `N ≥ 1`, every normalized ground state `Φ` of
+`staggeredFieldChainHamiltonianS L 0 N` is annihilated by each total-spin generator:
+`Ŝ_tot^{(α)} Φ = 0` for every axis `α : Fin 3` (Lean axis `α` is Tasaki's `α` minus one).  This is
+Tasaki's fourth sentence read at the ring.
+
+The zero-field ring is the antiferromagnetic Heisenberg ring
+(`staggeredFieldChainHamiltonianS_zero_eq_afmHeisenberg`), whose ground energy carries a
+one-dimensional eigenspace by Marshall–Lieb–Mattis (`afm_ring_ground_state_data`, the condition
+(3.4.4) input of Tasaki's first sentence) and which commutes with all three total-spin generators.
+The eigenspace datum is about the energy, not about a particular vector, so
+`groundState_mulVec_eq_hermitianMinEigenvalue` identifies the given `Φ`'s eigenvalue with that
+ground energy and `totalSpinSOpVec_mulVec_eq_zero_of_unique_ground` applies to `Φ` itself.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §4.1, Corollary 4.3, p. 77; §2.5, Theorem 2.2 (Marshall–Lieb–Mattis), p. 39. -/
+theorem afmRing_groundState_totalSpin_annihilate (L N : ℕ) (hLeven : Even L) (hL2 : 2 ≤ L)
+    (hN : 1 ≤ N) {Φ : (Fin L → Fin (N + 1)) → ℂ} (hΦnorm : star Φ ⬝ᵥ Φ = 1)
+    (hΦgs : ∃ E₀ : ℂ, (staggeredFieldChainHamiltonianS L 0 N).mulVec Φ = E₀ • Φ ∧
+      (∀ E : ℂ, ∀ Ψ : (Fin L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
+        (staggeredFieldChainHamiltonianS L 0 N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re) ∧ Φ ≠ 0)
+    (α : Fin 3) : (totalSpinSOpVec (Fin L) N α).mulVec Φ = 0 := by
+  obtain ⟨E₀c, heig, hmin, hΦne⟩ := hΦgs
+  rw [staggeredFieldChainHamiltonianS_zero_eq_afmHeisenberg] at heig hmin
+  obtain ⟨E₀, Φ_GS, hE, hΦ_GS_ne, hΦ_GS_eig, hfin, -⟩ :=
+    afm_ring_ground_state_data L N hLeven hL2 hN
+  have hHafm := afmHeisenbergChainHamiltonianS_isHermitian L N
+  have hE₀eq : hermitianMinEigenvalue hHafm = E₀ := by
+    refine le_antisymm ?_ ?_
+    · simpa using hermitianMinEigenvalue_le_re_of_eigenpair hHafm hΦ_GS_ne hΦ_GS_eig
+    · obtain ⟨w, hw, hweig⟩ := exists_nonzero_eigenvector_hermitianMinEigenvalue hHafm
+      exact hE.2 _ ⟨w, hw, hweig⟩
+  have hΦE : (afmHeisenbergChainHamiltonianS L N).mulVec Φ = (E₀ : ℂ) • Φ := by
+    rw [← hE₀eq]
+    exact groundState_mulVec_eq_hermitianMinEigenvalue hHafm hΦnorm heig hmin
+  refine totalSpinSOpVec_mulVec_eq_zero_of_unique_ground _ (E₀ : ℂ) hfin hΦne hΦE ?_ ?_ ?_ α
+  · rw [afmHeisenbergChainHamiltonianS]
+    exact (heisenbergHamiltonianS_commute_totalSpinSOp1 (ringCoupling L)).eq
+  · rw [afmHeisenbergChainHamiltonianS]
+    exact (heisenbergHamiltonianS_commute_totalSpinSOp2 (ringCoupling L)).eq
+  · rw [afmHeisenbergChainHamiltonianS]
+    exact sub_eq_zero.mp (heisenbergHamiltonianS_commutator_totalSpinSOp3 (ringCoupling L) N)
+
+/-- **The squared staggered order expectation is the same on all three axes for an SU(2)-invariant
+state.**  If `Φ` is annihilated by `Ŝ_tot^{(1)}` and `Ŝ_tot^{(3)}`, then
+`⟨Φ, (ô^{(α)})² Φ⟩ = ⟨Φ, (Ô^{(3)})² Φ⟩` for every axis `α : Fin 3`, `Ô^{(3)}` being the Lean axis
+`2` component `staggeredOrderOpS`.  Axis `1` uses the `Ŝ_tot^{(1)}`-singlet equality of axes 2 and 3
+(eq. (4.1.7)), axis `0` chains it with the `Ŝ_tot^{(3)}`-singlet equality of axes 1 and 2; this is
+why the su(2) bridge is instantiated at exactly those two generators.  Every step is an equality of
+the same complex number, so the real part, the division by `L²` and the absolute value of
+Corollary 4.3's conclusion transport unchanged.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §4.1, eq. (4.1.7) and Corollary 4.3, p. 77. -/
+private theorem stagOpVec_sq_expectation_eq_axis3 {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
+    (A : Λ → Bool) (Φ : (Λ → Fin (N + 1)) → ℂ)
+    (h1 : (totalSpinSOp1 Λ N).mulVec Φ = 0) (h3 : (totalSpinSOp3 Λ N).mulVec Φ = 0) (α : Fin 3) :
+    star Φ ⬝ᵥ (stagOpVec A N α * stagOpVec A N α).mulVec Φ
+      = star Φ ⬝ᵥ (staggeredOrderOpS A N * staggeredOrderOpS A N).mulVec Φ := by
+  fin_cases α <;>
+    simp only [stagOpVec, Fin.reduceFinMk, Matrix.cons_val_zero, Matrix.cons_val_one,
+      Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
+  -- Lean axis `2` is Tasaki's `α = 3`: the axis reduction closes it definitionally, leaving axes
+  -- `0` and `1`.
+  · exact (staggeredOrder_sq_expectation_eq_12 A Φ h3).trans
+      (staggeredOrder_sq_expectation_eq_23 A Φ h1)
+  · exact staggeredOrder_sq_expectation_eq_23 A Φ h1
 
 /-- **Tasaki Corollary 4.3 from Theorem 4.2 (his own proof, by contraposition), CONDITIONAL
 THEOREM.**  Assuming `h42` — the conclusion of Theorem 4.2 (eq. (4.1.10), p. 77) verbatim, that the
@@ -216,22 +378,29 @@ theorem no_long_range_order_1d_of_theorem_4_2 (N : ℕ) (hN : 1 ≤ N)
 THEOREM.**  For the
 zero-field one-dimensional spin-`S` antiferromagnetic Heisenberg ring
 (`heisenbergHamiltonianS (ringCoupling L) N`, i.e. `staggeredFieldChainHamiltonianS L 0 N`), the
-squared staggered order parameter per site vanishes in the thermodynamic limit (eq. (4.1.11)):
-for every `ε > 0` there is a size threshold `L₀` beyond which every normalized ground state `Φ` of
-the zero-field **even** ring `L` has `|⟨Φ, (Ô_L^{(3)})² Φ⟩.re / L²| < ε`.
+squared staggered order parameter per site vanishes in the thermodynamic limit **on every Cartesian
+axis** (eq. (4.1.11)): for every `ε > 0` there is a size threshold `L₀`, uniform in the axis, beyond
+which every normalized ground state `Φ` of the zero-field **even** ring `L` has
+`|⟨Φ, (ô_L^{(α)})² Φ⟩.re / L²| < ε` for every `α : Fin 3`.  The Lean axis index is Tasaki's `α`
+minus one, so Lean `α = 2` is his `Ô_L^{(3)}` and carries his third sentence, while Lean `α = 0, 1`
+carry his fourth: "The same bound holds for `α = 1` or `2` because the unique ground state `|Φ_GS⟩`
+is SU(2) invariant" (p. 77).  That sentence is supplied by
+`afmRing_groundState_totalSpin_annihilate` and `stagOpVec_sq_expectation_eq_axis3`, which move the
+bound between axes as an equality of the same complex number.
 
 Restricted to even rings (`Even L`), faithful to Tasaki: §3.1 defines the lattice `(Λ_L, B_L)`
 for even `L`, and §4.1.1 states the model "with even L".  Only bipartite (even) rings carry the
 balanced staggered sublattice underlying the staggered order parameter and the unique-singlet
 ground state (MLM, Thm 2.2); odd rings are non-bipartite and lie outside §4.1's setting.
 
-**Conditional, and a discharge of nothing.**  For `N ≥ 1` this is Tasaki's own contraposition
-argument `no_long_range_order_1d_of_theorem_4_2` applied to Theorem 4.2
+**Conditional, and a discharge of nothing.**  For `N ≥ 1` the axis-`2` instance is Tasaki's own
+contraposition argument `no_long_range_order_1d_of_theorem_4_2` applied to Theorem 4.2
 (`shastry_no_symmetry_breaking_1d`), which is itself conditional on the documented axiom
-`shastryEnergyGain`.  So `#print axioms` here names `shastryEnergyGain`, and both Corollary 4.3 and
+`shastryEnergyGain`; the other two axes are carried to it by SU(2) invariance, which adds no
+unproved input.  So `#print axioms` here names `shastryEnergyGain`, and both Corollary 4.3 and
 Theorem 4.2 remain open: Tasaki does not prove Theorem 4.2 (footnote 3, p. 76) and nothing here
 reconstructs the argument he cites.  Only the degenerate spin-`0` case `N = 0` is unconditional,
-the staggered order operator vanishing there (`staggeredOrderOpS_spin_zero`). -/
+the staggered order operator vanishing there on every axis (`stagOpVec_spin_zero`). -/
 theorem no_long_range_order_1d (N : ℕ) :
     ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L → Even L →
       ∀ Φ : (Fin L → Fin (N + 1)) → ℂ,
@@ -240,16 +409,29 @@ theorem no_long_range_order_1d (N : ℕ) :
           (∀ E : ℂ, ∀ Ψ : (Fin L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
             (staggeredFieldChainHamiltonianS L 0 N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re) ∧
           Φ ≠ 0) →
-        |(star Φ ⬝ᵥ ((staggeredOrderOpS (ringStaggeredSublattice L) N *
-            staggeredOrderOpS (ringStaggeredSublattice L) N).mulVec Φ)).re / ((L : ℝ) ^ 2)| < ε
+        ∀ α : Fin 3,
+          |(star Φ ⬝ᵥ ((stagOpVec (ringStaggeredSublattice L) N α *
+              stagOpVec (ringStaggeredSublattice L) N α).mulVec Φ)).re / ((L : ℝ) ^ 2)| < ε
     := by
   rcases Nat.eq_zero_or_pos N with rfl | hN
-  · -- spin-`0`: the staggered order operator vanishes, so the parameter is identically zero.
+  · -- spin-`0`: every axis operator vanishes, so the parameter is identically zero.
     intro ε hε
-    refine ⟨0, fun L _ _ Φ _ _ => ?_⟩
-    rw [staggeredOrderOpS_spin_zero]
+    refine ⟨0, fun L _ _ Φ _ _ α => ?_⟩
+    rw [stagOpVec_spin_zero]
     simpa using hε
-  · -- `N ≥ 1`: Tasaki's contraposition, fed with Theorem 4.2.
-    exact no_long_range_order_1d_of_theorem_4_2 N hN (shastry_no_symmetry_breaking_1d N)
+  · -- `N ≥ 1`: Tasaki's contraposition at axis `2`, transported to the other two axes.
+    intro ε hε
+    obtain ⟨L₀, hL₀⟩ :=
+      no_long_range_order_1d_of_theorem_4_2 N hN (shastry_no_symmetry_breaking_1d N) ε hε
+    refine ⟨max L₀ 2, fun L hL hLeven Φ hΦnorm hΦgs α => ?_⟩
+    have hL2 : 2 ≤ L := (le_max_right L₀ 2).trans hL
+    have hsu2 := afmRing_groundState_totalSpin_annihilate L N hLeven hL2 hN hΦnorm hΦgs
+    have h1 : (totalSpinSOp1 (Fin L) N).mulVec Φ = 0 := by
+      simpa only [totalSpinSOpVec, Matrix.cons_val_zero] using hsu2 0
+    have h3 : (totalSpinSOp3 (Fin L) N).mulVec Φ = 0 := by
+      simpa only [totalSpinSOpVec, Matrix.cons_val_two, Matrix.tail_cons, Matrix.head_cons]
+        using hsu2 2
+    rw [stagOpVec_sq_expectation_eq_axis3 _ Φ h1 h3 α]
+    exact hL₀ L ((le_max_left L₀ 2).trans hL) hLeven Φ hΦnorm hΦgs
 
 end LatticeSystem.Quantum
