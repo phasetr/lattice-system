@@ -4,7 +4,8 @@ import LatticeSystem.Quantum.SpinS.ShastryNoSSBReduction
 /-!
 # Signature pin: Tasaki's own route to Corollary 4.3 (contraposition, p. 77)
 
-One pin for the contraposition route (issue #5416):
+One pin for the contraposition route, the route that replaced the earlier reduction through a
+staggered-susceptibility axiom of the corollary's own:
 `no_long_range_order_1d_of_theorem_4_2` — the signature the proof of `no_long_range_order_1d`
 applies, at `N` with `hN : 1 ≤ N` (the `N = 0` case is its own unconditional branch).  Its
 hypothesis is Theorem 4.2's conclusion **applied**, via `shastry_no_symmetry_breaking_1d N`,

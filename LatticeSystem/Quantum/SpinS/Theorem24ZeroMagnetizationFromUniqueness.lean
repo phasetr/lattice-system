@@ -16,7 +16,9 @@ Proof sketch:
 1. The eigenspace `E` is invariant under both `Ŝ³_tot` (since `[H, Ŝ³_tot] = 0`)
    and the reflection `Θ` (since `[H, Θ] = 0`).
 2. From `finrank E ≤ 1` and `Φ ≠ 0`, every element of `E` is a scalar multiple
-   of `Φ`. Hence `Ŝ³_tot Φ = γ Φ` and `Θ Φ = δ Φ` for some `γ, δ ∈ ℂ`.
+   of `Φ`. Hence `Ŝ³_tot Φ = γ Φ` and `Θ Φ = δ Φ` for some `γ, δ ∈ ℂ`. Both come
+   from `exists_smul_of_commute_unique_eigenspace`, which carries steps 1 and 2
+   for an arbitrary commuting operator.
 3. `Θ² = 1` ⟹ `δ² = 1` ⟹ `δ ≠ 0`.
 4. `Θ Ŝ³_tot = -Ŝ³_tot Θ` ⟹ apply to `Φ`:
    `Θ (γΦ) = γΘΦ = γδΦ` and `-Ŝ³_tot (Θ Φ) = -Ŝ³_tot (δΦ) = -δγΦ`,
@@ -44,26 +46,16 @@ theorem anisotropicHeisenbergS_unique_groundState_has_zero_magnetization
     (hΦ_ne : Φ ≠ 0)
     (hΦ : (anisotropicHeisenbergS J lam D N).mulVec Φ = μ • Φ) :
     (totalSpinSOp3 Λ N).mulVec Φ = 0 := by
-  set H := anisotropicHeisenbergS (Λ := Λ) J lam D N with hHdef
-  set E := End.eigenspace (Matrix.toLin' H) μ with hEdef
-  -- Φ ∈ E.
-  have hΦ_in : Φ ∈ E := by
-    rw [hEdef, End.mem_eigenspace_iff, Matrix.toLin'_apply]
-    exact hΦ
-  -- Ŝ³_tot Φ ∈ E (via [H, Ŝ³_tot] = 0).
-  have hSΦ_in : (totalSpinSOp3 Λ N).mulVec Φ ∈ E := by
-    rw [hEdef, End.mem_eigenspace_iff, Matrix.toLin'_apply, hHdef]
-    rw [Matrix.mulVec_mulVec,
-        (anisotropicHeisenbergS_commute_totalSpinSOp3 J lam D N).eq,
-        ← Matrix.mulVec_mulVec, hΦ, Matrix.mulVec_smul]
   -- The reflection `Θ` acts as `δ` (`= ±1`) on the unique ground state (shared eigenspace lemma).
   obtain ⟨δ, hΘΦ_eq, hδ2_eq⟩ :=
-    LatticeSystem.Math.exists_involution_eigenvalue_of_unique_eigenspace H
-      (manyBodyReversalS Λ N) μ huniq hΦ_ne hΦ
+    LatticeSystem.Math.exists_involution_eigenvalue_of_unique_eigenspace
+      (anisotropicHeisenbergS (Λ := Λ) J lam D N) (manyBodyReversalS Λ N) μ huniq hΦ_ne hΦ
       (anisotropicHeisenbergS_mul_manyBodyReversalS J lam D) (manyBodyReversalS_mul_self Λ N)
-  -- `Ŝ³_tot Φ` is a scalar multiple `γ • Φ` (same eigenspace, uniqueness).
+  -- `Ŝ³_tot` commutes with the Hamiltonian, so the same eigenspace lemma gives `Ŝ³_tot Φ = γ • Φ`.
   obtain ⟨γ, hSΦ_eq⟩ :=
-    LatticeSystem.Math.exists_smul_of_mem_finrank_le_one huniq hΦ_in hΦ_ne hSΦ_in
+    LatticeSystem.Math.exists_smul_of_commute_unique_eigenspace
+      (anisotropicHeisenbergS (Λ := Λ) J lam D N) (totalSpinSOp3 Λ N) μ huniq hΦ_ne hΦ
+      (anisotropicHeisenbergS_commute_totalSpinSOp3 J lam D N).eq
   -- `δ ≠ 0` from `δ² = 1`.
   have hδ_ne : δ ≠ 0 := by
     intro h0
