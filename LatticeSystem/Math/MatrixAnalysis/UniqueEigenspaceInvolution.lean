@@ -12,8 +12,9 @@ first-order vanishing, issue #4777).
 
 If a matrix `H` has a `μ`-eigenspace of `finrank ≤ 1` (a unique ground state, up to scale), then a
 non-zero eigenvector `Φ` spans that eigenspace; any operator `Θ` commuting with `H` preserves the
-eigenspace, so `Θ Φ` is again a scalar multiple of `Φ`.  When `Θ` is an involution (`Θ² = 1`) that
-scalar `δ` satisfies `δ² = 1` (`Θ` acts as `±1` on the ground state).
+eigenspace, so `Θ Φ` is again a scalar multiple of `Φ`
+(`exists_smul_of_commute_unique_eigenspace`).  When `Θ` is an involution (`Θ² = 1`) that scalar `δ`
+satisfies `δ² = 1` (`Θ` acts as `±1` on the ground state).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020, §2.5
 Theorem 2.4 (p. 43–44) and §4.1 Theorem 4.2 (pp. 84–86).
@@ -42,22 +43,33 @@ theorem exists_smul_of_mem_finrank_le_one {E : Submodule ℂ (ι → ℂ)} [Modu
   have ha_ne : a ≠ 0 := fun h0 => hΦne (by rw [← ha', h0, zero_smul])
   exact ⟨b * a⁻¹, by rw [← hb', ← ha', smul_smul, mul_assoc, inv_mul_cancel₀ ha_ne, mul_one]⟩
 
-/-- **A commuting involution acts as `±1` on a unique ground state.**  If the `μ`-eigenspace of `H`
-has `finrank ≤ 1`, `Φ ≠ 0` is a `μ`-eigenvector, and `Θ` commutes with `H` (`H Θ = Θ H`) and is
-an involution (`Θ² = 1`), then `Θ Φ = δ • Φ` for a scalar `δ` with `δ² = 1`.  `Θ Φ` lies in the
-eigenspace (commutation), so is a multiple of `Φ` (uniqueness), and `Θ² Φ = Φ` forces `δ² = 1`. -/
-theorem exists_involution_eigenvalue_of_unique_eigenspace (H Θ : Matrix ι ι ℂ) (μ : ℂ)
+/-- **An operator commuting with `H` acts as a scalar on a unique ground state.**  If the
+`μ`-eigenspace of `H` has `finrank ≤ 1` and `Φ ≠ 0` is a `μ`-eigenvector, then `Φ` spans that
+eigenspace; commutation (`H Θ = Θ H`) keeps `Θ Φ` inside it, so `Θ Φ = c • Φ`.  No property of
+`Θ` beyond commuting with `H` is used, so the same statement serves an involution
+(`exists_involution_eigenvalue_of_unique_eigenspace`) and a Lie-algebra generator. -/
+theorem exists_smul_of_commute_unique_eigenspace (H Θ : Matrix ι ι ℂ) (μ : ℂ)
     (huniq : finrank ℂ ↥(End.eigenspace (Matrix.toLin' H) μ) ≤ 1)
-    {Φ : ι → ℂ} (hΦ_ne : Φ ≠ 0) (hΦ : H.mulVec Φ = μ • Φ)
-    (hcomm : H * Θ = Θ * H) (hinv : Θ * Θ = 1) :
-    ∃ δ : ℂ, Θ.mulVec Φ = δ • Φ ∧ δ ^ 2 = 1 := by
+    {Φ : ι → ℂ} (hΦ_ne : Φ ≠ 0) (hΦ : H.mulVec Φ = μ • Φ) (hcomm : H * Θ = Θ * H) :
+    ∃ c : ℂ, Θ.mulVec Φ = c • Φ := by
   set E := End.eigenspace (Matrix.toLin' H) μ with hEdef
   have hΦ_in : Φ ∈ E := by
     rw [hEdef, End.mem_eigenspace_iff, Matrix.toLin'_apply]; exact hΦ
   have hΘΦ_in : Θ.mulVec Φ ∈ E := by
     rw [hEdef, End.mem_eigenspace_iff, Matrix.toLin'_apply, Matrix.mulVec_mulVec, hcomm,
       ← Matrix.mulVec_mulVec, hΦ, Matrix.mulVec_smul]
-  obtain ⟨δ, hΘΦ_eq⟩ := exists_smul_of_mem_finrank_le_one huniq hΦ_in hΦ_ne hΘΦ_in
+  exact exists_smul_of_mem_finrank_le_one huniq hΦ_in hΦ_ne hΘΦ_in
+
+/-- **A commuting involution acts as `±1` on a unique ground state.**  If the `μ`-eigenspace of `H`
+has `finrank ≤ 1`, `Φ ≠ 0` is a `μ`-eigenvector, and `Θ` commutes with `H` (`H Θ = Θ H`) and is
+an involution (`Θ² = 1`), then `Θ Φ = δ • Φ` for a scalar `δ` with `δ² = 1`.  `Θ Φ` is a multiple of
+`Φ` by `exists_smul_of_commute_unique_eigenspace`, and `Θ² Φ = Φ` forces `δ² = 1`. -/
+theorem exists_involution_eigenvalue_of_unique_eigenspace (H Θ : Matrix ι ι ℂ) (μ : ℂ)
+    (huniq : finrank ℂ ↥(End.eigenspace (Matrix.toLin' H) μ) ≤ 1)
+    {Φ : ι → ℂ} (hΦ_ne : Φ ≠ 0) (hΦ : H.mulVec Φ = μ • Φ)
+    (hcomm : H * Θ = Θ * H) (hinv : Θ * Θ = 1) :
+    ∃ δ : ℂ, Θ.mulVec Φ = δ • Φ ∧ δ ^ 2 = 1 := by
+  obtain ⟨δ, hΘΦ_eq⟩ := exists_smul_of_commute_unique_eigenspace H Θ μ huniq hΦ_ne hΦ hcomm
   refine ⟨δ, hΘΦ_eq, ?_⟩
   -- `Θ² Φ = Φ` gives `δ² • Φ = Φ`, hence `δ² = 1` (as `Φ ≠ 0`).
   have hΘ2 : Θ.mulVec (Θ.mulVec Φ) = Φ := by
