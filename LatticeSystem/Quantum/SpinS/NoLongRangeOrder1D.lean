@@ -372,19 +372,26 @@ theorem no_long_range_order_1d_of_theorem_4_2 (N : ℕ) (hN : 1 ≤ N)
 THEOREM.**  For the
 zero-field one-dimensional spin-`S` antiferromagnetic Heisenberg ring
 (`heisenbergHamiltonianS (ringCoupling L) N`, i.e. `staggeredFieldChainHamiltonianS L 0 N`), the
-squared staggered order parameter per site vanishes in the thermodynamic limit (eq. (4.1.11)):
-for every `ε > 0` there is a size threshold `L₀` beyond which every normalized ground state `Φ` of
-the zero-field **even** ring `L` has `|⟨Φ, (Ô_L^{(3)})² Φ⟩.re / L²| < ε`.
+squared staggered order parameter per site vanishes in the thermodynamic limit **on every Cartesian
+axis** (eq. (4.1.11)): for every `ε > 0` there is a size threshold `L₀`, uniform in the axis, beyond
+which every normalized ground state `Φ` of the zero-field **even** ring `L` has
+`|⟨Φ, (ô_L^{(α)})² Φ⟩.re / L²| < ε` for every `α : Fin 3`.  The Lean axis index is Tasaki's `α`
+minus one, so Lean `α = 2` is his `Ô_L^{(3)}` and carries his third sentence, while Lean `α = 0, 1`
+carry his fourth: "The same bound holds for `α = 1` or `2` because the unique ground state `|Φ_GS⟩`
+is SU(2) invariant" (p. 77).  That sentence is supplied by
+`afmRing_groundState_totalSpin_annihilate` and `stagOpVec_sq_expectation_eq_axis3`, which move the
+bound between axes as an equality of the same complex number.
 
 Restricted to even rings (`Even L`), faithful to Tasaki: §3.1 defines the lattice `(Λ_L, B_L)`
 for even `L`, and §4.1.1 states the model "with even L".  Only bipartite (even) rings carry the
 balanced staggered sublattice underlying the staggered order parameter and the unique-singlet
 ground state (MLM, Thm 2.2); odd rings are non-bipartite and lie outside §4.1's setting.
 
-**Conditional, and a discharge of nothing.**  For `N ≥ 1` this is Tasaki's own contraposition
-argument `no_long_range_order_1d_of_theorem_4_2` applied to Theorem 4.2
+**Conditional, and a discharge of nothing.**  For `N ≥ 1` the axis-`2` instance is Tasaki's own
+contraposition argument `no_long_range_order_1d_of_theorem_4_2` applied to Theorem 4.2
 (`shastry_no_symmetry_breaking_1d`), which is itself conditional on the documented axiom
-`shastryEnergyGain`.  So `#print axioms` here names `shastryEnergyGain`, and both Corollary 4.3 and
+`shastryEnergyGain`; the other two axes are carried to it by SU(2) invariance, which adds no
+unproved input.  So `#print axioms` here names `shastryEnergyGain`, and both Corollary 4.3 and
 Theorem 4.2 remain open: Tasaki does not prove Theorem 4.2 (footnote 3, p. 76) and nothing here
 reconstructs the argument he cites.  Only the degenerate spin-`0` case `N = 0` is unconditional,
 the staggered order operator vanishing there on every axis (`stagOpVec_spin_zero`). -/
@@ -396,17 +403,29 @@ theorem no_long_range_order_1d (N : ℕ) :
           (∀ E : ℂ, ∀ Ψ : (Fin L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
             (staggeredFieldChainHamiltonianS L 0 N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re) ∧
           Φ ≠ 0) →
-        |(star Φ ⬝ᵥ ((staggeredOrderOpS (ringStaggeredSublattice L) N *
-            staggeredOrderOpS (ringStaggeredSublattice L) N).mulVec Φ)).re / ((L : ℝ) ^ 2)| < ε
+        ∀ α : Fin 3,
+          |(star Φ ⬝ᵥ ((stagOpVec (ringStaggeredSublattice L) N α *
+              stagOpVec (ringStaggeredSublattice L) N α).mulVec Φ)).re / ((L : ℝ) ^ 2)| < ε
     := by
   rcases Nat.eq_zero_or_pos N with rfl | hN
-  · -- spin-`0`: the staggered order operator vanishes, so the parameter is identically zero.
+  · -- spin-`0`: every axis operator vanishes, so the parameter is identically zero.
     intro ε hε
-    refine ⟨0, fun L _ _ Φ _ _ => ?_⟩
-    rw [show staggeredOrderOpS (ringStaggeredSublattice L) 0 = 0 from
-      stagOpVec_spin_zero (ringStaggeredSublattice L) 2]
+    refine ⟨0, fun L _ _ Φ _ _ α => ?_⟩
+    rw [stagOpVec_spin_zero]
     simpa using hε
-  · -- `N ≥ 1`: Tasaki's contraposition, fed with Theorem 4.2.
-    exact no_long_range_order_1d_of_theorem_4_2 N hN (shastry_no_symmetry_breaking_1d N)
+  · -- `N ≥ 1`: Tasaki's contraposition at axis `2`, transported to the other two axes.
+    intro ε hε
+    obtain ⟨L₀, hL₀⟩ :=
+      no_long_range_order_1d_of_theorem_4_2 N hN (shastry_no_symmetry_breaking_1d N) ε hε
+    refine ⟨max L₀ 2, fun L hL hLeven Φ hΦnorm hΦgs α => ?_⟩
+    have hL2 : 2 ≤ L := (le_max_right L₀ 2).trans hL
+    have hsu2 := afmRing_groundState_totalSpin_annihilate L N hLeven hL2 hN hΦnorm hΦgs
+    have h1 : (totalSpinSOp1 (Fin L) N).mulVec Φ = 0 := by
+      simpa only [totalSpinSOpVec, Matrix.cons_val_zero] using hsu2 0
+    have h3 : (totalSpinSOp3 (Fin L) N).mulVec Φ = 0 := by
+      simpa only [totalSpinSOpVec, Matrix.cons_val_two, Matrix.tail_cons, Matrix.head_cons]
+        using hsu2 2
+    rw [stagOpVec_sq_expectation_eq_axis3 _ Φ h1 h3 α]
+    exact hL₀ L ((le_max_left L₀ 2).trans hL) hLeven Φ hΦnorm hΦgs
 
 end LatticeSystem.Quantum
