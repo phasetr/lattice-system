@@ -43,7 +43,7 @@ variable {L : ℕ}
 sites inside the window `[a, b] ⊆ Fin L`, recorded as the commutant condition that `op` commutes
 with every single-site operator `onSiteS z A` placed at a site `z` outside the window.  This is the
 open-chain, explicit-window analogue of the ring-distance predicate `IsLocalRangeR`
-(`LiebSchultzMattisGeneral.lean:52`): unlike an `∃ r, …` range-existence form, which is vacuously
+(`LiebSchultzMattisGeneral.lean`): unlike an `∃ r, …` range-existence form, which is vacuously
 true for every operator once `r ≥ L` (ring distance on `Fin L` is bounded by `L / 2`), a fixed
 window `[a, b]` is genuinely restrictive at fixed finite `L`. -/
 def IsLocalWindowS (L N a b : ℕ) (op : ManyBodyOpS (Fin L) N) : Prop :=

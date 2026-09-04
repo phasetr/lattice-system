@@ -42,9 +42,12 @@ open Matrix
 /-- **Locality marker (commutant form)** `IsLocalRangeR L N r x op`: the operator `op` acts only on
 the sites within ring-distance `r` of `x` on `Fin L` (periodic boundary conditions), recorded as the
 commutant condition that `op` commutes with *every* single-site operator `onSiteS y A` placed at a
-site `y` strictly farther than `r` from `x`.  For a full matrix algebra this is equivalent, by the
-factor double-commutant theorem, to `support(op) ⊆ {y : ringDist L x y ≤ r}`, so it is genuine
-spatial locality (not merely "enough for Lemma 6.4").  The strong commutant form is deliberate: this
+site `y` strictly farther than `r` from `x`.  The general form of that reading is a proved theorem
+of this repository: `supportedOnS_iff_commute_onSiteS` (`Quantum/SpinS/OperatorSupport.lean`) shows
+that commuting with every on-site operator placed off a site set `S` is equivalent to being
+supported on `S` in the entrywise sense of `SupportedOnS`.  This predicate has not been connected
+to that theorem, so "`support(op) ⊆ {y : ringDist L x y ≤ r}`" records the intended meaning here and
+is not yet a lemma about `IsLocalRangeR`.  The strong commutant form is deliberate: this
 predicate is *shared* as the locality hypothesis of the intentional §7.1.3 Theorem 7.3 axiom
 (`IsAKLTPerturbation.local_range`); a weaker form would enlarge that hypothesis class and make
 `aklt_theorem_7_3` claim more, risking unsoundness.  For `y` within range the condition is vacuous,

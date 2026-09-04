@@ -298,8 +298,10 @@ PROVED, `#print axioms` = std3, PR #5077;
 eqs. (6.2.23)–(6.2.24)): Lemma 6.1 generalizes to **any** short-ranged U(1)-invariant chain `Ĥ = Σ_x
 ĥ_x`. The class `IsShortRangeU1Chain L N r h₀ h` bundles: each `ĥ_x` is **Hermitian** (so `Σ_x ĥ_x`
 is a genuine Hamiltonian), `r`-local (`IsLocalRangeR`, now the **commutant-form `def`**: `ĥ_x`
-commutes with every single-site operator farther than `r` from `x`, equivalent to `support ⊆ {y :
-ringDist x y ≤ r}` by factor double-commutant;
+commutes with every single-site operator farther than `r` from `x`; the general equivalence between
+this commutant form and `support ⊆ {y : ringDist x y ≤ r}` is a proved theorem of this repository,
+`supportedOnS_iff_commute_onSiteS` (`Quantum/SpinS/OperatorSupport.lean`), though `IsLocalRangeR`
+itself has not yet been connected to it;
 
 strong form chosen so the shared §7.1.3 Theorem 7.3 hypothesis stays faithful;
 
