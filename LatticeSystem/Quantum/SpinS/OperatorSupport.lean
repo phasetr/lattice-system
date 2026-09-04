@@ -28,13 +28,16 @@ mention them. Unifying the family into one predicate is tracked work, not done h
 `Finset Λ → ManyBodyOpS Λ N → Prop`, both live in namespace `LatticeSystem.Quantum`, and they
 differ by one character. Picking the wrong one therefore still type-checks. Being "commutes with
 every off-support on-site factor" versus "vanishes off support, depends only on support", they are
-nevertheless logically equivalent for `ManyBodyOpS`, and `supportedOnS_iff_commute_onSiteS` below
-proves that equivalence in both directions. Its right-hand side is the commutant condition written
-out rather than named, because `SupportedOn` is defined in a strictly downstream module; it is what
-`SupportedOn S A` unfolds to. `IsLocalRangeR` and `IsLocalWindowS` have no such bridge: neither is
-formally connected to the equivalence, so a caller holding a hypothesis phrased in one of them
-still cannot invoke a capstone stated in another. Rephrasing existing callers through the
-equivalence is likewise tracked work, not done here.
+nevertheless logically equivalent for `ManyBodyOpS` over a `[Fintype Λ] [DecidableEq Λ]` site type,
+and `supportedOnS_iff_commute_onSiteS` below proves that equivalence in both directions. Its
+right-hand side is the commutant condition written out rather than named, for layering: this module
+sits directly on `Quantum/SpinS/MultiSiteCore.lean`, whereas naming `SupportedOn` would pull the
+whole §4.2.2 Anderson-tower stack carried by `Quantum/SpinS/AndersonTowerLocalDecay.lean` in behind
+it. Neither module imports the other, even transitively, so no cycle is at stake; what is written
+out is exactly what `SupportedOn S A` unfolds to. `IsLocalRangeR` and `IsLocalWindowS` have no such
+bridge: neither is formally connected to the equivalence, so a caller holding a hypothesis phrased
+in one of them still cannot invoke a capstone stated in another. Rephrasing existing callers
+through the equivalence is likewise tracked work, not done here.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §3.4, Problem 3.4.a, statement pp. 67-68.
@@ -242,7 +245,7 @@ operator at `z` and the two configurations already agree at `z`, then changing t
 any `c` leaves the entry unchanged.  The hypothesis `σ z = τ z` is essential: the identity operator
 commutes with everything, yet its off-diagonal entries are `0` while its diagonal entries are
 `1`. -/
-theorem apply_update_eq_of_commute_onSiteS {z : Λ} {A : ManyBodyOpS Λ N}
+private theorem apply_update_eq_of_commute_onSiteS {z : Λ} {A : ManyBodyOpS Λ N}
     (h : ∀ B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ, Commute A (onSiteS z B))
     {σ τ : Λ → Fin (N + 1)} (hz : σ z = τ z) (c : Fin (N + 1)) :
     A (Function.update σ z c) (Function.update τ z c) = A σ τ := by
@@ -279,8 +282,10 @@ many-body space is supported on the site set `S` — in the two-clause sense of 
 i.e. it lies in `B(H_S) ⊗ I_{Λ∖S}` — exactly when it commutes with every single-site operator
 placed at a site outside `S`.  The right-hand side is the commutant reading of "acts only on `S`"
 used elsewhere in the library (`SupportedOn` of `Quantum/SpinS/AndersonTowerLocalDecay.lean`,
-`IsLocalRangeR` of `Quantum/SpinS/LiebSchultzMattisGeneral.lean`); it is spelled out here because
-those modules are strictly downstream of this one.
+`IsLocalRangeR` of `Quantum/SpinS/LiebSchultzMattisGeneral.lean`); it is spelled out here to keep
+this module on its `MultiSiteCore` base layer, since importing either would drag in the §4.2.2 and
+§6.2 stacks those predicates sit on.  No import relation runs either way between this module and
+theirs, so naming them is a layering choice rather than a cycle constraint.
 
 Mathematically this is the finite-dimensional commutation theorem for tensor products,
 `(1 ⊗ M_m)' = M_n ⊗ 1`, proved directly from matrix entries.  It is a repository-internal lemma
