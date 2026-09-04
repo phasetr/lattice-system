@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.KaplanHorschVonderLindenTheorem32
+import LatticeSystem.Quantum.SpinS.CartesianAxis
 import LatticeSystem.Quantum.SpinS.HorschVonderLindenAfmRing
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingGroundData
 
@@ -53,6 +54,72 @@ private theorem staggeredOrderOpS_spin_zero {Λ : Type*} [Fintype Λ] [Decidable
   rw [staggeredOrderOpS]
   refine Finset.sum_eq_zero (fun x _ => ?_)
   rw [spinSSiteOp3_def, h3, onSiteS_zero, smul_zero]
+
+/-! ### Tasaki's fourth sentence: the unique ground state is SU(2) invariant
+
+"The same bound holds for `α = 1` or `2` because the unique ground state `|Φ_GS⟩` is SU(2)
+invariant" (p. 77).  The two lemmas below supply that sentence in operator form: the generic su(2)
+step, and its specialisation to the zero-field ring.  The Lean axis index `α : Fin 3` is Tasaki's
+`α` minus one, following `totalSpinSOpVec` and `stagOpVec`. -/
+
+/-- **A unique ground state of an SU(2)-invariant Hamiltonian is annihilated by every total-spin
+generator.**  If the `μ`-eigenspace of `H` has `finrank ≤ 1` and `H` commutes with all three
+generators `Ŝ_tot^{(1)}`, `Ŝ_tot^{(2)}`, `Ŝ_tot^{(3)}`, then every non-zero `μ`-eigenvector `Φ`
+satisfies `Ŝ_tot^{(α)} Φ = 0` for every axis `α : Fin 3` (Lean axis `α` is Tasaki's `α` minus one).
+
+Each generator preserves the at-most-one-dimensional eigenspace, so acts on `Φ` by a scalar `λ_α`
+(`exists_smul_of_commute_unique_eigenspace`).  Scalars commute, so every su(2) commutator kills
+`Φ`: `[Ŝ^{(1)}, Ŝ^{(2)}] Φ = (λ₂λ₁ − λ₁λ₂) Φ = 0`, while `[Ŝ^{(1)}, Ŝ^{(2)}] = i Ŝ^{(3)}` evaluates
+the same vector to `i λ₃ Φ`; with `Φ ≠ 0` and `i ≠ 0` this forces `λ₃ = 0`, and the two cyclic
+partners force `λ₁ = λ₂ = 0`.  No singlet datum enters as a hypothesis: a one-dimensional invariant
+subspace of su(2) carries the trivial representation.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §4.1, Corollary 4.3, p. 77 (fourth sentence of the proof). -/
+theorem totalSpinSOpVec_mulVec_eq_zero_of_unique_ground {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    {N : ℕ} (H : ManyBodyOpS Λ N) (μ : ℂ)
+    (huniq : finrank ℂ ↥(End.eigenspace (Matrix.toLin' H) μ) ≤ 1)
+    {Φ : (Λ → Fin (N + 1)) → ℂ} (hΦne : Φ ≠ 0) (hΦ : H.mulVec Φ = μ • Φ)
+    (hc1 : H * totalSpinSOp1 Λ N = totalSpinSOp1 Λ N * H)
+    (hc2 : H * totalSpinSOp2 Λ N = totalSpinSOp2 Λ N * H)
+    (hc3 : H * totalSpinSOp3 Λ N = totalSpinSOp3 Λ N * H)
+    (α : Fin 3) : (totalSpinSOpVec Λ N α).mulVec Φ = 0 := by
+  obtain ⟨l1, h1⟩ :=
+    LatticeSystem.Math.exists_smul_of_commute_unique_eigenspace H _ μ huniq hΦne hΦ hc1
+  obtain ⟨l2, h2⟩ :=
+    LatticeSystem.Math.exists_smul_of_commute_unique_eigenspace H _ μ huniq hΦne hΦ hc2
+  obtain ⟨l3, h3⟩ :=
+    LatticeSystem.Math.exists_smul_of_commute_unique_eigenspace H _ μ huniq hΦne hΦ hc3
+  -- Two operators acting on `Φ` by scalars commute there, so the third scalar of an su(2) triple
+  -- vanishes.
+  have key : ∀ (A B C : ManyBodyOpS Λ N) (a b c : ℂ), A * B - B * A = Complex.I • C →
+      A.mulVec Φ = a • Φ → B.mulVec Φ = b • Φ → C.mulVec Φ = c • Φ → c = 0 := by
+    intro A B C a b c hcomm hA hB hC
+    have hAB : (A * B).mulVec Φ = (b * a) • Φ := by
+      rw [← Matrix.mulVec_mulVec, hB, Matrix.mulVec_smul, hA, smul_smul]
+    have hBA : (B * A).mulVec Φ = (a * b) • Φ := by
+      rw [← Matrix.mulVec_mulVec, hA, Matrix.mulVec_smul, hB, smul_smul]
+    have h : (A * B - B * A).mulVec Φ = (Complex.I • C).mulVec Φ := by rw [hcomm]
+    rw [Matrix.sub_mulVec, hAB, hBA, Matrix.smul_mulVec, hC, smul_smul] at h
+    have hzero : (Complex.I * c) • Φ = 0 := by
+      rw [← h, ← sub_smul, mul_comm b a, sub_self, zero_smul]
+    exact (mul_eq_zero.mp ((smul_eq_zero.mp hzero).resolve_right hΦne)).resolve_left
+      Complex.I_ne_zero
+  have hl3 : l3 = 0 :=
+    key _ _ _ l1 l2 l3 (totalSpinSOp1_commutator_totalSpinSOp2_named Λ N) h1 h2 h3
+  have hl1 : l1 = 0 :=
+    key _ _ _ l2 l3 l1 (totalSpinSOp2_commutator_totalSpinSOp3_named Λ N) h2 h3 h1
+  have hl2 : l2 = 0 :=
+    key _ _ _ l3 l1 l2 (totalSpinSOp3_commutator_totalSpinSOp1_named Λ N) h3 h1 h2
+  rw [hl1, zero_smul] at h1
+  rw [hl2, zero_smul] at h2
+  rw [hl3, zero_smul] at h3
+  fin_cases α <;>
+    simp only [totalSpinSOpVec, Fin.reduceFinMk, Matrix.cons_val_zero, Matrix.cons_val_one,
+      Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
+  · exact h1
+  · exact h2
+  · exact h3
 
 /-- **Tasaki Corollary 4.3 from Theorem 4.2 (his own proof, by contraposition), CONDITIONAL
 THEOREM.**  Assuming `h42` — the conclusion of Theorem 4.2 (eq. (4.1.10), p. 77) verbatim, that the
