@@ -16826,12 +16826,15 @@ $\alpha$, no matrix exponential); \texttt{IsZ2Z2Invariant}~$H$ is $(\hat U_\pi^{
 H\hat U_\pi^{(\alpha)}=H$ for all $\alpha$.  \texttt{tasaki\_prop\_8\_4\_local\_monomial} is the
 reformulated, proved statement: the printed Proposition quantifies over Hamiltonians with short-range
 interactions, but §8.2.2--§8.2.3 argue and prove only the level of a single local monomial
-$O_w=\prod_i\hat S_{x_i}^{(\alpha_i)}$ (a word \texttt{w~:~List~(Fin~L~\texttimes~Fin~3)}), so a
-fixed-window locality predicate \texttt{IsLocalWindowS}~$L\,N\,a\,b$ (commutant form, following
-\texttt{IsLocalRangeR}) replaces the range-$r$ markers \texttt{HasShortRangeInteraction} and
-\texttt{HasSomeShortRangeInteraction} (both deleted: at fixed finite $L$ a range-existence predicate
-is vacuously true once $r\ge L$, since ring/chain distance is bounded by $L$).  For $w$ supported in
-an interior window $[a,b]$ with genuine margin on both sides ($0<a$, $b+1<L$ --- not removable:
+$O_w=\prod_i\hat S_{x_i}^{(\alpha_i)}$ (a word \texttt{w~:~List~(Fin~L~\texttimes~Fin~3)}), so
+locality is stated as support on the fixed window,
+\texttt{SupportedOnS}~(\texttt{chainWindow}~$L\,a\,b$) --- the site set
+$\{z\in\mathrm{Fin}\,L\mid a\le z\le b\}$, filtered on the $\mathbb{N}$-valued index so that it
+truncates at $L-1$ rather than wrapping --- replacing the range-$r$ markers
+\texttt{HasShortRangeInteraction} and \texttt{HasSomeShortRangeInteraction} (both deleted: at fixed
+finite $L$ a range-existence predicate is vacuously true once $r\ge L$, since ring/chain distance
+is bounded by $L$).  For $w$ supported in an interior window $[a,b]$ with genuine margin on both
+sides ($0<a$, $b+1<L$ --- not removable:
 $\hat S_0^{(3)}$ has odd left parity yet $\hat U_{\mathrm{KT}}\hat S_0^{(3)}\hat
 U_{\mathrm{KT}}=\hat S_0^{(3)}$ is exactly local, because the (8.2.13)/(8.2.14) strings are half-open
 and so are empty at an edge site), the theorem shows $\hat U_{\mathrm{KT}}O_w\hat U_{\mathrm{KT}}$ is

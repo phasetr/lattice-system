@@ -23,7 +23,10 @@ taking that stack on.
 
 The first pin holds the hypothesis set and the shape of the conclusion of
 `supportedOnS_iff_commute_onSiteS` fixed against silent drift: acquiring a further hypothesis, or a
-change to either side of the equivalence, stops this fixture elaborating. Binder order is not held:
+change to either side of the equivalence, stops this fixture elaborating — with one exception, so
+that instance-implicit arguments are not held: one that instance synthesis discharges from the
+ambient `[Fintype Λ]`, `[DecidableEq Λ]` and `N` alone slips through, whereas an explicit hypothesis
+and an instance that synthesis cannot supply both break the fixture. Binder order is not held:
 `S` and `A` are implicit and unification solves them against the expected type, so permuting them
 leaves the fixture elaborating.
 
