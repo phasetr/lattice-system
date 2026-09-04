@@ -9,7 +9,7 @@ permalink: /formalization/sources/foundations/
 <!-- formalization-status-generated:start project-original -->
 <!-- formalization-status-generated:end -->
 
-> **Prototype navigation only.** The version 1 structured catalogue is not yet complete or authoritative. These pages provide the agreed source/topic layout without copying declaration status. For complete status and capstone decisions, use the [interim legacy catalogue](/lattice-system/formalization/legacy/) until #5228.
+> **Prototype navigation only.** The version 2 structured catalogue is not yet complete or authoritative. These pages provide the agreed source/topic layout without copying declaration status. For complete status and capstone decisions, use the [interim legacy catalogue](/lattice-system/formalization/legacy/) until #5228.
 
 These source-neutral links are grouped only where the former heading
 explicitly names project infrastructure or a generic mathematical area. They

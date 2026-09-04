@@ -31,7 +31,7 @@ infinite graphs remain available for the thermodynamic and continuum limits.
 The complete hand-maintained catalogue under
 [`formalization/legacy/`](/lattice-system/formalization/legacy/) is the interim
 authority for formalization status and capstone identification. The
-[version 1 data contract](/lattice-system/formalization-status-contract/) and
+[version 2 data contract](/lattice-system/formalization-status-contract/) and
 its JSON catalogue are a **non-authoritative prototype**. Issue
 [#5228](https://github.com/phasetr/lattice-system/issues/5228) alone performs
 the structured-data cutover after full migration and audit. Do not combine the

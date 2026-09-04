@@ -9,9 +9,11 @@
       "id": "shastry-1992-staggered-susceptibility-bound",
       "implementation_state": "implemented",
       "lean_name": "LatticeSystem.Quantum.shastry_staggered_susceptibility_subcubic",
+      "lifecycle": "active",
       "module": "LatticeSystem.Quantum.SpinS.NoLongRangeOrder1D",
       "origin": "project_original",
       "proof_guide_anchor": null,
+      "retirement": null,
       "source_coverage": "not_applicable",
       "source_path": "LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean",
       "source_relations": [],
@@ -29,9 +31,11 @@
       "id": "tasaki-2020-theorem-4-2-shastry-energy-gain-converse",
       "implementation_state": "implemented",
       "lean_name": "LatticeSystem.Quantum.shastryEnergyGain_of_no_symmetry_breaking_1d",
+      "lifecycle": "active",
       "module": "LatticeSystem.Quantum.SpinS.ShastryNoSSBReduction",
       "origin": "project_original",
       "proof_guide_anchor": null,
+      "retirement": null,
       "source_coverage": "not_applicable",
       "source_path": "LatticeSystem/Quantum/SpinS/ShastryNoSSBReduction.lean",
       "source_relations": [
@@ -48,7 +52,7 @@
       "trust_state": "axiom_free"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "source_id": null,
   "source_unit": "project-assumptions"
 }

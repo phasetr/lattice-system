@@ -6,14 +6,14 @@ title: Formalization status data contract
 
 # Formalization status data contract
 
-Status: accepted prototype contract for Issue #5230. The version 1 catalogue has
+Status: accepted prototype contract for Issue #5230. The version 2 catalogue has
 `catalog_state: "prototype"` and is deliberately non-authoritative until the
 governance cutover in Issue #5228.
 
 ## Decision
 
 The project will maintain formalization status as versioned, source-first JSON
-records under `formalization-status/v1/`. A dependency-free validator enforces
+records under `formalization-status/v2/`. A dependency-free validator enforces
 the contract. Human source pages, topic indexes, status summaries, and the
 published machine aggregate will eventually be generated from those records.
 
@@ -68,7 +68,7 @@ After Issue #5228 completes the cutover, authority is divided as follows:
 | Subject | Authority after cutover | Derived or explanatory surfaces |
 |---|---|---|
 | Existence, kind, statement, and namespace of a Lean declaration | Lean source | Catalogue validation and generated pages |
-| Formalization status, capstone flag, source-item association, topics, and declared axiom dependencies | Validated `formalization-status/v1/` records | Human source/topic pages and machine aggregate |
+| Formalization status, capstone flag, source-item association, topics, and declared axiom dependencies | Validated `formalization-status/v2/` records | Human source/topic pages and machine aggregate |
 | Bibliographic identity and locator | `sources.json` and `source-items.json` | Citation text in generated pages |
 | Mathematical motivation, derivation, and proof explanation | `tex/proof-guide.tex` and hand-written explanatory docs | Links from generated pages |
 | Current and future project work | Tracking GitHub Issues and their synchronized mirrors | Roadmap summaries |
@@ -83,12 +83,12 @@ Until cutover, the first row above remains true, while formalization status and
 capstone authority remain in the losslessly partitioned
 `docs/formalization/legacy/` catalogue. Neither the landing page nor the JSON
 prototype is authoritative. The manifest therefore requires `catalog_state`
-and version 1 permits only `prototype` or `authoritative`.
+and version 2 permits only `prototype` or `authoritative`.
 
 ## Directory and sharding model
 
 ```text
-formalization-status/v1/
+formalization-status/v2/
   schema.json
   manifest.json
   sources.json
@@ -145,8 +145,8 @@ page only in the staged Jekyll tree; `docs/formalization/records/` is a reserved
 generated-output root and must not contain committed placeholders. Each detail
 page renders the complete record exactly once, including every canonical field
 and every typed source relation in canonical order. The familiar human status
-label is derived from the three machine dimensions and is explicitly display
-data, not a fourth stored status field.
+label is derived from the three machine status dimensions and the lifecycle
+axis, and is explicitly display data, not a stored status field.
 
 Source, topic, project-original, and status pages are compact projections. They
 contain exact counts and ordered links to canonical record routes, but never a
@@ -179,7 +179,7 @@ inside it are invalid, while prose outside the marker remains hand-written.
 They reject an
 extra or missing output, a path or permalink collision, a wrong projection
 link, or any missing/extra/reordered projection member. These human-rendering
-rules do not alter the version 1 manifest, canonical records, or machine API.
+rules do not alter the version 2 manifest, canonical records, or machine API.
 
 ## Registry model
 
@@ -232,15 +232,68 @@ Each declaration record contains exactly these fields:
 - `axiom_dependencies`: fully qualified non-standard axioms on which the
   declaration depends, sorted and duplicate-free;
 - `proof_guide_anchor`: stable explanatory anchor or `null` while no suitable
-  anchor exists.
+  anchor exists;
+- `lifecycle`: `active` or `retired`; a retired record's catalogue entry is
+  history rather than a live claim;
+- `retirement`: retirement evidence, or `null` while the record is active.
 
 The record ID is lowercase ASCII kebab case. It should describe the result,
 usually with a source prefix, for example
 `tasaki-2020-theorem-3-1-finite-dimensional-core`. It is immutable after
 publication. A Lean rename changes `lean_name`, `module`, and `source_path` but
 not `id`. If the mathematical identity changes materially, create a new ID and
-retain an explicit supersession mapping in the next schema revision rather
-than silently recycling the old ID.
+record the supersession on the superseded record rather than silently recycling
+the old ID.
+
+A published record ID is never deleted and never reused. Machine enforcement
+covers the four pinned prototype record IDs, which `validate_prototype_pin` and
+the live-site pinned routes require to remain present; for every other published
+record ID the no-deletion rule is a contract obligation checked in review.
+Retirement is the only legal way to remove a declaration from the active
+catalogue, whether or not the ID is pinned. When a declaration leaves the Lean
+tree, its record is retired: `lifecycle` becomes `retired`, and `retirement`
+records the reason, the sorted `superseded_by` record IDs (possibly none), and
+one 40-hex `present_at_commit` that is an ancestor of durable main-branch
+history and whose tree still declares the recorded Lean name at the recorded
+path. Every `superseded_by` ID must exist in the catalogue and may be active
+or retired, because a replacement can itself be replaced later, but it must
+name a record other than the retired record itself, and following
+`superseded_by` from one retired record to the next must never lead back to a
+record already on that path. That commit is one at which the declaration was
+present, not necessarily the last such commit. The record's Lean name, module,
+source path, and status dimensions are frozen as the historical description of
+that former declaration: they must equal the values durable main-branch
+history publishes for the same record ID, and a record whose ID that history
+does not publish cannot be retired. Retirement is terminal: once that history
+publishes the ID as `retired`, its `lifecycle` cannot return to `active`, and
+`present_at_commit` is frozen alongside the identity fields. That history is
+read at the durable main ref itself, except in a checkout whose own HEAD is
+that ref's commit, where it is read at the ref's first parent, so a run
+validating the commit main just published measures it against the main that
+commit landed on rather than against itself. Only a root commit has no first
+parent; a checkout whose first parent is unresolvable because the checkout
+lacks full history is a shallow-history validation error, not a fallback to
+comparing that commit against itself. Because the substitution assumes the
+candidate is the commit itself, the first-parent base is used only when the
+working tree's record shards are identical to the ref's own commit; a dirty
+working tree is compared against the ref itself, and a checkout in which that
+comparison cannot be made at all is a validation error too, not a silent return
+to comparing the commit against itself. Comparison against that history carries
+the bootstrap exception: while durable main-branch history publishes no record
+shard tree at all, active records are not compared against it; any shard that
+exists but cannot be read is a validation error, not a silent skip.
+A checkout in which neither `origin/main` nor `main` resolves is likewise a
+validation error for active and retired records alike. Only the `reason` stays
+editable, and `superseded_by` may gain IDs, discovered when a replacement is
+written later, but may never drop one that history already publishes. A
+retired record's `axiom_dependencies` is not frozen: only the identity fields
+named above and `present_at_commit` are. A retired record keeps its stable ID,
+its canonical human route, and its projection fragments; it generates no Lean
+assertion; no active record may depend on it; and its Lean name is not
+available for reuse.
+Deleting a published record from the catalogue remains a breaking change, and
+deleting one instead of retiring it violates this contract even where no
+checker rejects it.
 
 Lean names must be fully qualified and begin with `LatticeSystem.`. Valid Lean
 identifier segments may contain Unicode letters and apostrophes. Shorthand,
@@ -267,10 +320,17 @@ its `conditional_reduction` coverage records that it formalizes the
 finite-dimensional core rather than Tasaki's separate long-range-order
 estimate. `conditional_reduction` describes source coverage, not proof trust.
 
-Human views derive familiar labels without storing an overlapping `status`:
+`lifecycle` is a fourth, orthogonal axis. It records whether the catalogue entry
+is a live claim or history, and it does not change the meaning of the three
+status dimensions above: a retired record keeps the dimensions it had, now read
+as the description of a former declaration.
+
+Human views derive familiar labels without storing an overlapping `status`. The
+retired lifecycle takes precedence over the three-dimension derivation:
 
 | Machine combination | Human label |
 |---|---|
+| retired lifecycle | retired |
 | implemented theorem/lemma + axiom-free | proved |
 | implemented theorem/lemma + documented-axiom dependencies | proved with documented axioms |
 | implemented axiom + documented-axiom trust | documented axiom |
@@ -288,7 +348,7 @@ is not represented as a declaration record.
 A capstone is a declaration that represents a review/audit endpoint for a
 source result or major project result. It is a property of the catalogue record
 and has no naming convention. A capstone must be implemented and have complete
-or conditional-reduction source coverage.
+or conditional-reduction source coverage. A retired record is never a capstone.
 
 Every project axiom dependency uses a fully qualified name. The list excludes
 Lean's standard logical foundations such as `propext`, `Classical.choice`, and
@@ -321,7 +381,7 @@ enums, Lean names, and module/path patterns already impose stricter grammars.
 
 `manifest.json` declares:
 
-- `schema_version: 1`;
+- `schema_version: 2`;
 - `catalog_state` (`prototype` until #5228, then `authoritative`);
 - the registry paths;
 - an explicit sorted `record_shards` list;
@@ -445,7 +505,9 @@ JSON Schema keeps both manifest evidence fields structurally optional because
 prototype catalogues before the freeze own neither file. Runtime semantics
 require the pair together and require both in authoritative state; schema
 conditional tests and runtime state-transition tests cover that deliberate
-division.
+division. Both documents carry `schema_version: 1` rather than the catalogue's
+version: they are cutover artefacts, not catalogue records, and the frozen
+cutover checker accepts only version 1.
 
 The post-cutover authority and theorem-PR rules are staged here for review but
 do not take effect while `catalog_state` is `prototype`:
@@ -479,9 +541,11 @@ Issue #5229 will implement, but may not silently alter, this interface:
   deployment permissions scoped to that job.
 - The stable human root is `/lattice-system/formalization/`.
 - The stable versioned machine aggregate is
-  `/lattice-system/formalization-status/v1/catalog.json`.
+  `/lattice-system/formalization-status/v2/catalog.json`.
 - The versioned schema is
-  `/lattice-system/formalization-status/v1/schema.json`.
+  `/lattice-system/formalization-status/v2/schema.json`.
+- Version 1's machine URLs are superseded by these version 2 paths at this
+  major bump and are no longer published.
 - A convenience pointer such as
   `/lattice-system/formalization-status/latest/catalog.json` may be additive,
   but versioned clients must not depend on it.
@@ -495,20 +559,20 @@ Issue #5229 will implement, but may not silently alter, this interface:
   evaluated separately from doc-gen4 and must not restore or invoke doc-gen4.
 
 The published machine path is an API contract. Removing fields, changing field
-meaning, weakening ID stability, or changing status-dimension semantics requires a new
-major directory (`v2`). Adding optional output fields may be additive, but
+meaning, weakening ID stability, or changing status-dimension semantics requires the
+next major directory. Adding optional output fields may be additive, but
 checked-in canonical input remains strict: the schema and validator must be
 updated together before a new field appears.
 
 ## Versioning and compatibility
 
-Within `v1`, these are additive changes:
+Within `v2`, these are additive changes:
 
 - adding sources, source items, topics, shards, or records;
 - adding a new optional generated-view field whose absence has defined meaning;
 - adding publication formats that do not change existing stable URLs.
 
-These are breaking changes and require `v2`:
+These are breaking changes and require the next major directory:
 
 - deleting or reusing a published stable ID;
 - changing the meaning of a status dimension, capstone, or axiom dependency;
@@ -516,6 +580,10 @@ These are breaking changes and require `v2`:
 - changing source-item identity so that a record refers to different
   mathematics;
 - removing or repurposing a stable machine URL.
+
+Retiring a record as described under “Declaration record” is not deletion: the
+stable ID, its canonical route, and its projection fragments all survive, so
+retirement is permitted within a major version.
 
 Corrections to spelling, summaries, locators, Lean names after a code rename,
 and module paths are compatible when stable identity and mathematical meaning
@@ -534,6 +602,40 @@ library and checks:
   that each imported declaration belongs to its recorded defining module;
 - source, source-item, topic, typed provenance, and source-origin integrity;
 - implementation/coverage/trust, kind, capstone, and resolved-axiom invariants;
+- retirement evidence: a retired record is not a capstone, its Lean name is
+  absent from the current tree, its `present_at_commit` is an ancestor of
+  durable main-branch history (`origin/main` if that ref resolves, otherwise
+  `main`; neither resolving is an error) whose tree declares that name at the
+  recorded path, its frozen fields equal those the same history publishes for
+  that record ID, read at the ref's first parent when HEAD is the ref's own
+  commit and the working tree's record shards match it, and its `superseded_by`
+  IDs resolve to catalogue records other than the record itself, whether those
+  are active or themselves retired, without a cycle among retired records;
+- terminal retirement, under the bootstrap exception stated above and reading the
+  same history base, and an error rather than a silent skip when neither ref
+  resolves: once that history publishes a record ID as `retired`, no record may
+  return the ID to `active`, the retired record's `present_at_commit` must equal
+  the published one, and its `superseded_by` may add IDs but must keep every
+  published one;
+- fail-closed absence of a retired Lean name: beyond the declaration matcher,
+  the retired record is rejected if its short name still occurs in any Lean
+  source of the project library, the `LatticeSystem/` tree together with the root
+  umbrella `LatticeSystem.lean`, delimited by `isIdRest` of the pinned Lean
+  toolchain: ASCII alphanumerics, `_`, `'`, `!`, `?`, every `isLetterLike`
+  range (Latin-1 supplement letters without the multiplication and division
+  signs, Latin Extended-A, Greek without lambda, Pi and Sigma, Coptic,
+  polytonic Greek, letterlike symbols, and script letters) and every
+  `isSubScriptAlnum` range (subscript digits, subscript Latin letters, and
+  subscript j), so that `foo'` and `foo` count as distinct words while brackets
+  and guillemets end a name. The schema's `lean_name` pattern is a separate
+  syntactic filter on recorded names, and neither it nor this scanning set
+  contains the other: the pattern admits code points up to U+FFFF that this scan
+  treats as delimiters, and rejects `!`, `?` and the script letters of
+  U+1D49C-U+1D59F that this scan treats as identifier characters;
+- active-only gates: only active records generate Lean assertions, satisfy
+  representative prototype coverage, and may be named by another active record's
+  axiom dependencies;
+- retention of every pinned prototype record ID;
 - representative prototype coverage across at least two Tasaki chapters and
   a typed non-Tasaki relation, with a proved capstone and a documented axiom;
 - deterministic aggregate generation and input digest.

@@ -11,12 +11,19 @@ formalization-status site. It is separate from doc-gen4, which remains disabled.
 
 ## Architecture and authority
 
-The manifest-listed JSON under `formalization-status/v1/` is validated first.
+The manifest-listed JSON under `formalization-status/v2/` is validated first.
 The generator creates one revision-independent canonical aggregate and injects
 human source, topic, overview, and status projections into a copied Jekyll
 source tree. It also creates exactly one canonical human detail page per record
 at `/formalization/records/<record-id>/`. Generated source and rendered output
 live only under `.self-local/tmp/`; neither is committed.
+
+A retired record keeps its canonical detail page and its projection rows. That
+page renders the `retired` human status together with the retirement reason,
+superseding record IDs, and a commit at which the declaration was present, not
+necessarily the last such commit, so the published route keeps resolving after
+the declaration leaves the Lean tree. Retired records are excluded from the
+generated Lean assertion file.
 
 Before copying documentation, the generator reserves both the machine
 publication root and `docs/formalization/records/`; committed files may own
@@ -73,7 +80,7 @@ catalogue state is `prototype`, the
 [complete interim legacy catalogue](/lattice-system/formalization/legacy/)
 remains authoritative until Issue #5228 performs the audited cutover.
 When the state becomes `authoritative`, the same generated metadata instead
-links to and names the validated version 1 catalogue as the current authority.
+links to and names the validated version 2 catalogue as the current authority.
 The staged and rendered checkers derive this choice from `catalog_state`; a
 state flip with stale prototype authority prose is rejected. In authoritative
 state they scan every staged Markdown page and every rendered HTML page for the
@@ -86,13 +93,13 @@ Stable publication paths are:
 - Human catalogue: `/lattice-system/formalization/`
 - Canonical human record detail:
   `/lattice-system/formalization/records/<record-id>/`
-- Version 1 machine catalogue:
-  `/lattice-system/formalization-status/v1/catalog.json`
-- Version 1 schema: `/lattice-system/formalization-status/v1/schema.json`
+- Version 2 machine catalogue:
+  `/lattice-system/formalization-status/v2/catalog.json`
+- Version 2 schema: `/lattice-system/formalization-status/v2/schema.json`
 - Build metadata sidecar:
-  `/lattice-system/formalization-status/v1/publication.json`
+  `/lattice-system/formalization-status/v2/publication.json`
 
-Within version 1 these paths and field meanings follow the compatibility policy
+Within version 2 these paths and field meanings follow the compatibility policy
 in the [data contract](/lattice-system/formalization-status-contract/).
 
 ## Reproduction
@@ -170,7 +177,7 @@ while the same-run rendered-artifact gate has already checked every detail page
 and link. This keeps the post-deploy check bounded as the catalogue grows to
 thousands of records. The standard-library checker requires HTTP 200 and the
 expected content type, exact generated metadata and catalog-derived ordered
-overview/source/topic/status projections, schema version 1,
+overview/source/topic/status projections, schema version 2,
 a supported matching catalogue state (`prototype` or `authoritative`),
 the exact closed top-level key sets and generator identity/version pairs
 (`validate_formalization_status.py` version 2 and

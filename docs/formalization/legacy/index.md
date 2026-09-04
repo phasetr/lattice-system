@@ -9,7 +9,7 @@ permalink: /formalization/legacy/
 > **Interim authority.** These pages are a lossless partition of the former
 > `docs/index.md` theorem catalogue. They remain authoritative for
 > formalization status and capstone identification until Issue #5228 performs
-> the audited structured-data cutover. The version 1 JSON records are still a
+> the audited structured-data cutover. The version 2 JSON records are still a
 > non-authoritative prototype.
 
 The partition is source-neutral where the old heading mixed Tasaki results,

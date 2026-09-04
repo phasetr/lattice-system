@@ -6,7 +6,7 @@ permalink: /formalization/sources/other-literature/
 
 # Other literature
 
-> **Prototype navigation only.** The version 1 structured catalogue is not yet complete or authoritative. These pages provide the agreed source/topic layout without copying declaration status. For complete status and capstone decisions, use the [interim legacy catalogue](/lattice-system/formalization/legacy/) until #5228.
+> **Prototype navigation only.** The version 2 structured catalogue is not yet complete or authoritative. These pages provide the agreed source/topic layout without copying declaration status. For complete status and capstone decisions, use the [interim legacy catalogue](/lattice-system/formalization/legacy/) until #5228.
 
 This route will be generated from typed source relations, so a result
 can distinguish direct formalization, presentation, attribution, support, and

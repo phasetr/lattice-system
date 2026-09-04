@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "topics": [
     {
       "description": "Low-energy spectral results and variational extraction of eigenstates.",

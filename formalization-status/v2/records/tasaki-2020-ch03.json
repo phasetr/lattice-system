@@ -7,9 +7,11 @@
       "id": "tasaki-2020-theorem-3-1-finite-dimensional-core",
       "implementation_state": "implemented",
       "lean_name": "LatticeSystem.Quantum.horsch_vonderLinden_lowLying",
+      "lifecycle": "active",
       "module": "LatticeSystem.Quantum.HorschVonderLinden",
       "origin": "literature",
       "proof_guide_anchor": null,
+      "retirement": null,
       "source_coverage": "conditional_reduction",
       "source_path": "LatticeSystem/Quantum/HorschVonderLinden.lean",
       "source_relations": [
@@ -26,7 +28,7 @@
       "trust_state": "axiom_free"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "source_id": "tasaki-2020",
   "source_unit": "chapter-03"
 }

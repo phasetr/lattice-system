@@ -40,7 +40,7 @@ def main() -> int:
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
     repo_root = Path(__file__).resolve().parents[1]
-    root = repo_root / "formalization-status" / "v1"
+    root = repo_root / "formalization-status" / "v2"
     failures = self_test(repo_root) if args.self_test else []
     manifest, _manifest_raw = read_json(root / "manifest.json")
     baseline_name = manifest.get("cutover_baseline")

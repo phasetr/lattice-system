@@ -6,7 +6,7 @@ permalink: /formalization/sources/tasaki-2020/
 
 # Tasaki (2020)
 
-> **Prototype navigation only.** The version 1 structured catalogue is not yet complete or authoritative. These pages provide the agreed source/topic layout without copying declaration status. For complete status and capstone decisions, use the [interim legacy catalogue](/lattice-system/formalization/legacy/) until #5228.
+> **Prototype navigation only.** The version 2 structured catalogue is not yet complete or authoritative. These pages provide the agreed source/topic layout without copying declaration status. For complete status and capstone decisions, use the [interim legacy catalogue](/lattice-system/formalization/legacy/) until #5228.
 
 These links are navigation over the interim legacy authority, not copied
 status records. Mixed catalogue pages remain labelled as mixed rather than
