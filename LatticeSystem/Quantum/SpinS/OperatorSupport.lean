@@ -17,9 +17,8 @@ support they depend only on the restricted configurations.
 encoding of the same "acts only on `S`" concept, phrased in commutant form: `G` is supported on `S`
 when it commutes with every on-site factor located off `S`. Further encodings exist elsewhere in
 the library, e.g. `IsLocalRangeR` (`Quantum/SpinS/LiebSchultzMattisGeneral.lean`), which phrases
-the same idea for a fixed centre and radius on a ring (its own doc comment notes it is equivalent,
-by the factor double-commutant theorem, to a support condition, and that the commutant phrasing is
-deliberate: it is shared with the §7.1.3 Theorem 7.3 axiom hypothesis), and `IsLocalWindowS`
+the same idea for a fixed centre and radius on a ring (its commutant phrasing is deliberate: it is
+shared with the §7.1.3 Theorem 7.3 axiom hypothesis), and `IsLocalWindowS`
 (`Quantum/SpinS/KennedyTasakiProp84.lean`), the open-chain window analogue of `IsLocalRangeR`. This
 family of "acts only on a subset of sites" encodings is larger than this module and has not been
 enumerated exhaustively; new encodings should not be assumed absent just because a comment does not
@@ -27,13 +26,15 @@ mention them. Unifying the family into one predicate is tracked work, not done h
 
 `SupportedOn` and `SupportedOnS` are a particular hazard: both have signature
 `Finset Λ → ManyBodyOpS Λ N → Prop`, both live in namespace `LatticeSystem.Quantum`, and they
-differ by one character. Picking the wrong one therefore still type-checks. Being both "commutes
-with every off-support on-site factor" versus "vanishes off support, depends only on support", the
-two are expected to be logically equivalent for `ManyBodyOpS`, but no bridge lemma between them (or
-between either of them and `IsLocalRangeR`) is proved in either direction anywhere in the repo, so
-this equivalence is not formalised here. A caller holding a hypothesis phrased in one of these
-predicates cannot currently invoke a capstone stated in another; closing that gap is tracked work
-alongside the unification above.
+differ by one character. Picking the wrong one therefore still type-checks. Being "commutes with
+every off-support on-site factor" versus "vanishes off support, depends only on support", they are
+nevertheless logically equivalent for `ManyBodyOpS`, and `supportedOnS_iff_commute_onSiteS` below
+proves that equivalence in both directions. Its right-hand side is the commutant condition written
+out rather than named, because `SupportedOn` is defined in a strictly downstream module; it is what
+`SupportedOn S A` unfolds to. `IsLocalRangeR` and `IsLocalWindowS` have no such bridge: neither is
+formally connected to the equivalence, so a caller holding a hypothesis phrased in one of them
+still cannot invoke a capstone stated in another. Rephrasing existing callers through the
+equivalence is likewise tracked work, not done here.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §3.4, Problem 3.4.a, statement pp. 67-68.
