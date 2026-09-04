@@ -3495,7 +3495,10 @@ end LatticeSystem
             missing_id_validation,
         )
         check(
-            bool(missing_id_validation.errors),
+            any(
+                "absent from every record shard" in error
+                for error in missing_id_validation.errors
+            ),
             "frozen fields fail-closed: retiring an id absent from every shard on durable "
             f"main was accepted (errors: {missing_id_validation.errors})",
         )
@@ -3545,7 +3548,10 @@ end LatticeSystem
             no_shard_validation,
         )
         check(
-            bool(no_shard_validation.errors),
+            any(
+                "absent from every record shard" in error
+                for error in no_shard_validation.errors
+            ),
             "frozen fields fail-closed: retiring a record when durable main has no "
             f"formalization-status/v2/records tree at all was accepted "
             f"(errors: {no_shard_validation.errors})",
@@ -3554,9 +3560,10 @@ end LatticeSystem
         shutil.rmtree(no_shard_repo_root, ignore_errors=True)
 
     # -- reject_retirement_reversal must fail closed on an unreadable durable-main shard, not
-    # only on an absent shard tree: read_main_record_index collapses both into None today, so
-    # an active follow-up record silently bypasses the terminal-retirement guard whenever any
-    # shard alongside a genuinely retired one fails to parse.
+    # only on an absent shard tree: an absent shard tree is the legitimate bootstrap case and
+    # yields a readable empty index, but a shard that exists and fails to parse must not be
+    # folded into that same empty result, since doing so would switch the terminal-retirement
+    # guard off for every record without saying so.
     unreadable_shard_repo_root = Path(
         tempfile.mkdtemp(prefix="retirement-reversal-unreadable-shard-", dir=fixture_scratch_root)
     )
@@ -4416,10 +4423,10 @@ end LatticeSystem
     )
 
     # -- the contract must state the terminal-retirement guard's bootstrap exception in prose,
-    # not only in a code comment: today the contract sentence is unconditional, but
-    # reject_retirement_reversal stays silent while durable main publishes no record shard tree
-    # at all, and must fail closed (an error, not a silent skip) on any shard that exists but
-    # cannot be read.
+    # not only in a code comment, because a reader who only has the contract cannot otherwise
+    # tell apart the two cases reject_retirement_reversal treats differently: it stays silent
+    # while durable main publishes no record shard tree at all (bootstrap), and it fails closed
+    # (an error, not a silent skip) on any shard that exists but cannot be read.
     check(
         "the bootstrap exception: while durable main-branch history publishes no record "
         "shard tree at all, active records are not compared against it; any shard that "
@@ -4498,6 +4505,570 @@ end LatticeSystem
         )
     finally:
         shutil.rmtree(memoization_repo_root, ignore_errors=True)
+
+    # -- main history must be read as durable history, not only main's own tip tree -------------
+    # A run that validates the very commit landing on main compares a candidate change against
+    # itself if the base is main's own tip: the base for that discrimination must be the commit
+    # main published immediately before the candidate, not the candidate's own published state.
+    main_reversal_repo_root = Path(
+        tempfile.mkdtemp(prefix="main-history-tip-reversal-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], main_reversal_repo_root)
+        reversal_shard_dir = main_reversal_repo_root / "formalization-status" / "v2" / "records"
+        reversal_shard_dir.mkdir(parents=True, exist_ok=True)
+        reversal_shard_path = reversal_shard_dir / "reversal-shard.json"
+
+        def write_reversal_shard(lifecycle: str) -> None:
+            """Publish rec-a on the reversal fixture's shard tree with the given lifecycle."""
+            record: dict[str, Any] = {"id": "rec-a", "lifecycle": lifecycle}
+            record["retirement"] = (
+                {
+                    "present_at_commit": "a" * 40,
+                    "reason": "fixture: rec-a retired on durable main",
+                    "superseded_by": [],
+                }
+                if lifecycle == "retired"
+                else None
+            )
+            reversal_shard_path.write_text(
+                json.dumps(
+                    {
+                        "records": [record],
+                        "schema_version": 2,
+                        "source_id": "reversal-fixture",
+                        "source_unit": "fixture",
+                    },
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+        write_reversal_shard("retired")
+        fixture_git(
+            ["add", "formalization-status/v2/records/reversal-shard.json"],
+            main_reversal_repo_root,
+        )
+        fixture_git(["commit", "-q", "-m", "publish rec-a retired"], main_reversal_repo_root)
+        write_reversal_shard("active")
+        fixture_git(
+            ["add", "formalization-status/v2/records/reversal-shard.json"],
+            main_reversal_repo_root,
+        )
+        fixture_git(
+            ["commit", "-q", "-m", "publish rec-a active again, on main's own tip"],
+            main_reversal_repo_root,
+        )
+
+        reversal_validation = Validation()
+        validate_retirement(
+            {"id": "rec-a", "lifecycle": "active", "retirement": None},
+            "main-history-tip-reversal",
+            contract,
+            main_reversal_repo_root,
+            {},
+            reversal_validation,
+        )
+        check(
+            any(
+                "retired" in error and "terminal" in error
+                for error in reversal_validation.errors
+            ),
+            "main history base: durable main's own tip commit lands rec-a active in the same "
+            "commit whose immediate parent still publishes rec-a retired (HEAD == main), and "
+            f"the reversal was accepted instead of rejected (errors: {reversal_validation.errors})",
+        )
+    finally:
+        shutil.rmtree(main_reversal_repo_root, ignore_errors=True)
+
+    # Positive control: HEAD == main and main's immediate parent also publishes rec-a active, so
+    # there is no reversal anywhere in history and the record must be accepted either way.
+    main_no_reversal_repo_root = Path(
+        tempfile.mkdtemp(prefix="main-history-tip-no-reversal-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], main_no_reversal_repo_root)
+        no_reversal_shard_dir = (
+            main_no_reversal_repo_root / "formalization-status" / "v2" / "records"
+        )
+        no_reversal_shard_dir.mkdir(parents=True, exist_ok=True)
+        no_reversal_shard_path = no_reversal_shard_dir / "no-reversal-shard.json"
+        no_reversal_shard_text = json.dumps(
+            {
+                "records": [{"id": "rec-a", "lifecycle": "active", "retirement": None}],
+                "schema_version": 2,
+                "source_id": "no-reversal-fixture",
+                "source_unit": "fixture",
+            },
+            indent=2,
+        )
+        no_reversal_shard_path.write_text(no_reversal_shard_text, encoding="utf-8")
+        fixture_git(
+            ["add", "formalization-status/v2/records/no-reversal-shard.json"],
+            main_no_reversal_repo_root,
+        )
+        fixture_git(["commit", "-q", "-m", "publish rec-a active"], main_no_reversal_repo_root)
+        fixture_git(
+            ["commit", "-q", "--allow-empty", "-m", "no change, rec-a stays active"],
+            main_no_reversal_repo_root,
+        )
+
+        no_reversal_validation = Validation()
+        validate_retirement(
+            {"id": "rec-a", "lifecycle": "active", "retirement": None},
+            "main-history-tip-no-reversal",
+            contract,
+            main_no_reversal_repo_root,
+            {},
+            no_reversal_validation,
+        )
+        check(
+            not no_reversal_validation.errors,
+            "main history base positive control: rec-a is active both at main's tip and at "
+            f"main's immediate parent, yet was rejected (errors: {no_reversal_validation.errors})",
+        )
+    finally:
+        shutil.rmtree(main_no_reversal_repo_root, ignore_errors=True)
+
+    # The same base rule must apply to validate_frozen_identity: a frozen-field change committed
+    # directly on main's own tip, in the same commit that would need to compare against its
+    # parent, must be rejected when HEAD == main.
+    main_frozen_reversal_repo_root = Path(
+        tempfile.mkdtemp(prefix="main-history-tip-frozen-drift-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], main_frozen_reversal_repo_root)
+        frozen_drift_shard_dir = (
+            main_frozen_reversal_repo_root / "formalization-status" / "v2" / "records"
+        )
+        frozen_drift_shard_dir.mkdir(parents=True, exist_ok=True)
+        frozen_drift_shard_path = frozen_drift_shard_dir / "frozen-drift-shard.json"
+
+        def write_frozen_drift_shard(lean_name: str) -> None:
+            """Publish rec-frozen-drift retired, with the given lean_name, on the shard tree."""
+            frozen_drift_shard_path.write_text(
+                json.dumps(
+                    {
+                        "records": [
+                            {
+                                "id": "rec-frozen-drift",
+                                "lifecycle": "retired",
+                                "lean_name": lean_name,
+                                "retirement": {
+                                    "present_at_commit": "a" * 40,
+                                    "reason": "fixture: frozen field drift",
+                                    "superseded_by": [],
+                                },
+                            }
+                        ],
+                        "schema_version": 2,
+                        "source_id": "frozen-drift-fixture",
+                        "source_unit": "fixture",
+                    },
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+        write_frozen_drift_shard("LatticeSystem.kept")
+        fixture_git(
+            ["add", "formalization-status/v2/records/frozen-drift-shard.json"],
+            main_frozen_reversal_repo_root,
+        )
+        fixture_git(
+            ["commit", "-q", "-m", "publish rec-frozen-drift retired"],
+            main_frozen_reversal_repo_root,
+        )
+        write_frozen_drift_shard("LatticeSystem.changed")
+        fixture_git(
+            ["add", "formalization-status/v2/records/frozen-drift-shard.json"],
+            main_frozen_reversal_repo_root,
+        )
+        fixture_git(
+            ["commit", "-q", "-m", "publish rec-frozen-drift with lean_name changed, on tip"],
+            main_frozen_reversal_repo_root,
+        )
+
+        frozen_drift_validation = Validation()
+        validate_retirement(
+            {
+                "id": "rec-frozen-drift",
+                "lifecycle": "retired",
+                "capstone": False,
+                "lean_name": "LatticeSystem.changed",
+                "retirement": {
+                    "present_at_commit": "a" * 40,
+                    "reason": "fixture: frozen field drift",
+                    "superseded_by": [],
+                },
+            },
+            "main-history-tip-frozen-drift",
+            contract,
+            main_frozen_reversal_repo_root,
+            {},
+            frozen_drift_validation,
+        )
+        check(
+            any("frozen field lean_name" in error for error in frozen_drift_validation.errors),
+            "main history base (validate_frozen_identity): a frozen-field change (lean_name) "
+            "committed on main's own tip, whose immediate parent still publishes the original "
+            f"lean_name, was accepted (errors: {frozen_drift_validation.errors})",
+        )
+    finally:
+        shutil.rmtree(main_frozen_reversal_repo_root, ignore_errors=True)
+
+    # -- a retired record's supersession graph must not admit self-reference or cycles ----------
+    # `superseded_by` resolution only checks that the target id exists in the follow-up
+    # catalogue, so a record can currently name itself, or two retired records can name each
+    # other, and neither can ever be corrected once merged (a published supersession may never
+    # be dropped).
+    supersession_graph_repo_root = Path(
+        tempfile.mkdtemp(prefix="supersession-graph-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], supersession_graph_repo_root)
+        (supersession_graph_repo_root / "README.md").write_text("fixture\n", encoding="utf-8")
+        fixture_git(["add", "README.md"], supersession_graph_repo_root)
+        fixture_git(["commit", "-q", "-m", "seed, no v2 shard tree"], supersession_graph_repo_root)
+
+        def supersession_graph_record(record_id: str, superseded_by: list[str]) -> dict[str, Any]:
+            """Build one retired supersession-graph fixture record naming superseded_by."""
+            return {
+                "id": record_id,
+                "lifecycle": "retired",
+                "capstone": False,
+                "retirement": {
+                    "present_at_commit": "a" * 40,
+                    "reason": "fixture: supersession graph",
+                    "superseded_by": superseded_by,
+                },
+            }
+
+        # (a) a retired record may not name itself as its own replacement.
+        self_named = supersession_graph_record("graph-self", ["graph-self"])
+        self_validation = Validation()
+        validate_retirement(
+            self_named,
+            "supersession-graph-self",
+            contract,
+            supersession_graph_repo_root,
+            {"graph-self": self_named},
+            self_validation,
+        )
+        check(
+            any(
+                "graph-self" in error and "superseded_by" in error
+                for error in self_validation.errors
+            ),
+            "supersession graph: a retired record naming its own id in superseded_by was "
+            f"accepted (errors: {self_validation.errors})",
+        )
+
+        # (b) a mutual cycle: A supersedes B and B supersedes A, both retired. The pair's own
+        # ids and locations must not contain "cycle" or "superseded_by" themselves, so an
+        # unrelated error naming the id (e.g. the absent-on-main-history message) cannot be
+        # mistaken for a dedicated supersession-graph rejection.
+        cycle_a = supersession_graph_record("graph-mutual-a", ["graph-mutual-b"])
+        cycle_b = supersession_graph_record("graph-mutual-b", ["graph-mutual-a"])
+        cycle_records_by_id = {"graph-mutual-a": cycle_a, "graph-mutual-b": cycle_b}
+        cycle_a_validation = Validation()
+        validate_retirement(
+            cycle_a,
+            "supersession-graph-mutual-a",
+            contract,
+            supersession_graph_repo_root,
+            cycle_records_by_id,
+            cycle_a_validation,
+        )
+        cycle_b_validation = Validation()
+        validate_retirement(
+            cycle_b,
+            "supersession-graph-mutual-b",
+            contract,
+            supersession_graph_repo_root,
+            cycle_records_by_id,
+            cycle_b_validation,
+        )
+        check(
+            any(
+                "superseded_by" in error or "cycle" in error
+                for error in cycle_a_validation.errors
+            )
+            and any(
+                "superseded_by" in error or "cycle" in error
+                for error in cycle_b_validation.errors
+            ),
+            "supersession graph: a mutual cycle (graph-mutual-a and graph-mutual-b, both "
+            "retired, naming each other) was accepted on at least one side "
+            f"(errors a: {cycle_a_validation.errors}, errors b: {cycle_b_validation.errors})",
+        )
+
+        # (c) positive control: a chain ending in an active record must be accepted.
+        chain_a = supersession_graph_record("graph-chain-a", ["graph-chain-b"])
+        chain_b = supersession_graph_record("graph-chain-b", ["graph-chain-c"])
+        chain_c = {"id": "graph-chain-c", "lifecycle": "active", "retirement": None}
+        chain_records_by_id = {
+            "graph-chain-a": chain_a,
+            "graph-chain-b": chain_b,
+            "graph-chain-c": chain_c,
+        }
+        chain_errors: list[str] = []
+        for chain_record, chain_location in (
+            (chain_a, "supersession-graph-chain-a"),
+            (chain_b, "supersession-graph-chain-b"),
+            (chain_c, "supersession-graph-chain-c"),
+        ):
+            chain_validation = Validation()
+            validate_retirement(
+                chain_record,
+                chain_location,
+                contract,
+                supersession_graph_repo_root,
+                chain_records_by_id,
+                chain_validation,
+            )
+            chain_errors.extend(
+                error
+                for error in chain_validation.errors
+                if "superseded_by" in error or "cycle" in error
+            )
+        check(
+            not chain_errors,
+            "supersession graph positive control: a chain graph-chain-a -> graph-chain-b -> "
+            f"graph-chain-c ending in an active record was rejected (errors: {chain_errors})",
+        )
+
+        # (d) a longer cycle of three retired records.
+        long_cycle_a = supersession_graph_record("graph-long-a", ["graph-long-b"])
+        long_cycle_b = supersession_graph_record("graph-long-b", ["graph-long-c"])
+        long_cycle_c = supersession_graph_record("graph-long-c", ["graph-long-a"])
+        long_cycle_records_by_id = {
+            "graph-long-a": long_cycle_a,
+            "graph-long-b": long_cycle_b,
+            "graph-long-c": long_cycle_c,
+        }
+        long_cycle_hits = 0
+        for long_record, long_location in (
+            (long_cycle_a, "supersession-graph-long-a"),
+            (long_cycle_b, "supersession-graph-long-b"),
+            (long_cycle_c, "supersession-graph-long-c"),
+        ):
+            long_validation = Validation()
+            validate_retirement(
+                long_record,
+                long_location,
+                contract,
+                supersession_graph_repo_root,
+                long_cycle_records_by_id,
+                long_validation,
+            )
+            if any("cycle" in error for error in long_validation.errors):
+                long_cycle_hits += 1
+        check(
+            long_cycle_hits > 0,
+            "supersession graph: a longer three-record cycle (graph-long-a -> graph-long-b -> "
+            "graph-long-c -> graph-long-a, all retired) was accepted on every side "
+            f"(hits: {long_cycle_hits})",
+        )
+    finally:
+        shutil.rmtree(supersession_graph_repo_root, ignore_errors=True)
+
+    # -- with neither origin/main nor main resolvable, the terminal-retirement guard is silent
+    # on the active path even though it fails closed on the retired path: a checkout whose
+    # default branch has a different name (no origin remote either) must still fail closed
+    # instead of certifying a catalogue it never actually compared against history.
+    no_ref_repo_root = Path(
+        tempfile.mkdtemp(prefix="main-history-ref-absent-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "trunk"], no_ref_repo_root)
+        no_ref_shard_dir = no_ref_repo_root / "formalization-status" / "v2" / "records"
+        no_ref_shard_dir.mkdir(parents=True, exist_ok=True)
+        (no_ref_shard_dir / "no-ref-shard.json").write_text(
+            json.dumps(
+                {
+                    "records": [
+                        {
+                            "id": "rec-no-ref",
+                            "lifecycle": "retired",
+                            "retirement": {
+                                "present_at_commit": "a" * 40,
+                                "reason": "fixture: retired with no origin/main or main ref",
+                                "superseded_by": [],
+                            },
+                        }
+                    ],
+                    "schema_version": 2,
+                    "source_id": "no-ref-fixture",
+                    "source_unit": "fixture",
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        fixture_git(
+            ["add", "formalization-status/v2/records/no-ref-shard.json"], no_ref_repo_root
+        )
+        fixture_git(
+            ["commit", "-q", "-m", "publish rec-no-ref retired, on trunk not main"],
+            no_ref_repo_root,
+        )
+
+        no_ref_validation = Validation()
+        validate_retirement(
+            {"id": "rec-no-ref", "lifecycle": "active", "retirement": None},
+            "main-history-ref-absent",
+            contract,
+            no_ref_repo_root,
+            {},
+            no_ref_validation,
+        )
+        check(
+            bool(no_ref_validation.errors),
+            "ref-absence fail-open: a checkout whose default branch is named trunk (neither "
+            "origin/main nor main resolves) accepted an active follow-up record for an id its "
+            "own repository history already publishes as retired, with no error at all "
+            f"(errors: {no_ref_validation.errors})",
+        )
+    finally:
+        shutil.rmtree(no_ref_repo_root, ignore_errors=True)
+
+    # -- the retired-name absence proof must also scan the tracked root umbrella LatticeSystem.lean
+    # `lean_leaf_mention` and `current_lean_declaration_names` both root at repo_root/LatticeSystem,
+    # so a declaration mentioned only in the tracked, CI-built repo_root/LatticeSystem.lean is
+    # invisible to the absence proof even though it is live in the built library.
+    root_umbrella_root = Path(
+        tempfile.mkdtemp(prefix="lean-leaf-mention-root-umbrella-", dir=fixture_scratch_root)
+    )
+    try:
+        (root_umbrella_root / "LatticeSystem").mkdir(parents=True, exist_ok=True)
+        root_umbrella_file = root_umbrella_root / "LatticeSystem.lean"
+        root_umbrella_file.write_text(
+            "import LatticeSystem.RootUmbrellaFixture\n\n"
+            "theorem rootUmbrellaMention : True := trivial\n",
+            encoding="utf-8",
+        )
+        root_umbrella_mention = lean_leaf_mention(
+            root_umbrella_root, "LatticeSystem.rootUmbrellaMention"
+        )
+        check(
+            root_umbrella_mention is not None,
+            "root umbrella scan: lean_leaf_mention(..., "
+            '"LatticeSystem.rootUmbrellaMention") against a declaration that exists only in '
+            "the tracked root umbrella LatticeSystem.lean returned None instead of naming that "
+            f"file (found: {root_umbrella_mention!r})",
+        )
+        root_umbrella_declared = (
+            "LatticeSystem.rootUmbrellaMention" in current_lean_declaration_names(root_umbrella_root)
+        )
+        check(
+            root_umbrella_declared,
+            "root umbrella scan: current_lean_declaration_names(...) omits a declaration that "
+            "exists only in the tracked root umbrella LatticeSystem.lean",
+        )
+    finally:
+        shutil.rmtree(root_umbrella_root, ignore_errors=True)
+
+    # -- (pin) the isIdRest membership oracle must be exhaustive, not a boundary sample ----------
+    # This reimplements `isIdRest` / `isLetterLike` / `isSubScriptAlnum` / the ASCII alphanumeric
+    # test from the pinned Lean v4.29.0 toolchain source
+    # (~/.elan/toolchains/leanprover--lean4---v4.29.0/src/lean/Init/Meta/Defs.lean:98-134 and
+    # Init/Data/Char/Basic.lean:105-139) and compares it against LEAN_IDENTIFIER_REST_CLASS
+    # membership over every non-surrogate code point, so a class edit that widens or narrows the
+    # scan anywhere in the 0x110000 range is caught, not only at the boundary probes above.
+    def lean_isIdRest_oracle(codepoint: int) -> bool:
+        """Decide isIdRest membership for one code point from the pinned toolchain source."""
+        is_ascii_alnum = (
+            0x30 <= codepoint <= 0x39 or 0x41 <= codepoint <= 0x5A or 0x61 <= codepoint <= 0x7A
+        )
+        if is_ascii_alnum or codepoint in (0x5F, 0x27, 0x21, 0x3F):
+            return True
+        is_letter_like = (
+            (0x3B1 <= codepoint <= 0x3C9 and codepoint != 0x3BB)
+            or (0x391 <= codepoint <= 0x3A9 and codepoint not in (0x3A0, 0x3A3))
+            or (0x3CA <= codepoint <= 0x3FB)
+            or (0x1F00 <= codepoint <= 0x1FFE)
+            or (0x2100 <= codepoint <= 0x214F)
+            or (0x1D49C <= codepoint <= 0x1D59F)
+            or (0xC0 <= codepoint <= 0xFF and codepoint not in (0xD7, 0xF7))
+            or (0x100 <= codepoint <= 0x17F)
+        )
+        if is_letter_like:
+            return True
+        return (
+            0x2080 <= codepoint <= 0x2089
+            or 0x2090 <= codepoint <= 0x209C
+            or 0x1D62 <= codepoint <= 0x1D6A
+            or codepoint == 0x2C7C
+        )
+
+    isidrest_class_pattern = re.compile(f"[{LEAN_IDENTIFIER_REST_CLASS}]")
+
+    def isidrest_scan_class_contains(codepoint: int) -> bool:
+        """Decide LEAN_IDENTIFIER_REST_CLASS membership for one code point."""
+        return isidrest_class_pattern.fullmatch(chr(codepoint)) is not None
+
+    isidrest_oracle_mismatches = 0
+    isidrest_first_mismatch: tuple[int, bool, bool] | None = None
+    for codepoint in range(0x110000):
+        if 0xD800 <= codepoint <= 0xDFFF:
+            continue
+        oracle_member = lean_isIdRest_oracle(codepoint)
+        scanned_member = isidrest_scan_class_contains(codepoint)
+        if oracle_member != scanned_member:
+            isidrest_oracle_mismatches += 1
+            if isidrest_first_mismatch is None:
+                isidrest_first_mismatch = (codepoint, oracle_member, scanned_member)
+    check(
+        isidrest_oracle_mismatches == 0,
+        "isIdRest exhaustive oracle: LEAN_IDENTIFIER_REST_CLASS disagrees with the pinned "
+        f"isIdRest reimplementation at {isidrest_oracle_mismatches} code point(s) out of "
+        f"1,112,064 non-surrogate code points, first at {isidrest_first_mismatch!r} "
+        "(code point, isIdRest, scan class)",
+    )
+
+    # -- (pin) main_history_ref must not re-resolve the ref from scratch on every call ----------
+    # `main_record_index` is memoized above, but nothing pinned that `main_history_ref` itself
+    # reuses its first answer instead of re-spawning git for every record in a catalogue.
+    main_history_ref_memo_repo_root = Path(
+        tempfile.mkdtemp(prefix="main-history-ref-memoization-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], main_history_ref_memo_repo_root)
+        (main_history_ref_memo_repo_root / "README.md").write_text("fixture\n", encoding="utf-8")
+        fixture_git(["add", "README.md"], main_history_ref_memo_repo_root)
+        fixture_git(["commit", "-q", "-m", "seed"], main_history_ref_memo_repo_root)
+
+        ref_call_log: list[None] = []
+        real_git_capture_for_ref = git_capture
+
+        def counting_git_capture_for_ref(
+            root: Path, arguments: list[str]
+        ) -> subprocess.CompletedProcess[str]:
+            """Wrap git_capture to count invocations without changing its behaviour."""
+            ref_call_log.append(None)
+            return real_git_capture_for_ref(root, arguments)
+
+        with memoization_patch(
+            f"{__name__}.git_capture", side_effect=counting_git_capture_for_ref
+        ):
+            main_history_ref(main_history_ref_memo_repo_root)
+            ref_calls_after_first_lookup = len(ref_call_log)
+            main_history_ref(main_history_ref_memo_repo_root)
+            ref_calls_after_second_lookup = len(ref_call_log)
+        check(
+            ref_calls_after_first_lookup > 0
+            and ref_calls_after_second_lookup == ref_calls_after_first_lookup,
+            "main_history_ref memoization: the first lookup invoked git_capture "
+            f"{ref_calls_after_first_lookup} time(s) (must be > 0 to prove the reader actually "
+            "ran), and a second lookup for the same repository invoked git_capture "
+            f"{ref_calls_after_second_lookup - ref_calls_after_first_lookup} more time(s) "
+            "instead of reusing the first lookup's result "
+            f"(first lookup: {ref_calls_after_first_lookup} calls, "
+            f"second lookup: {ref_calls_after_second_lookup} calls)",
+        )
+    finally:
+        shutil.rmtree(main_history_ref_memo_repo_root, ignore_errors=True)
 
     return failures
 
