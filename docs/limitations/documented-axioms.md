@@ -103,14 +103,21 @@ are more varied than any list here would capture.
 it" — no longer sustains an entry by itself. The census below is taken over all thirty-five entries
 on the eight chapter ledgers, counting an entry as invoking citation-only when the ground recorded
 for the axiom it carries states that Tasaki cites or states the result rather than proving it —
-including entries that name the rule only to record that it does not override them. One of the
-thirty-five, the [Corollary 4.3 support
-entry](/lattice-system/limitations/documented-axioms/chapter-04/#entry-corollary-4-3-support),
-carries **no axiom of its own**: it stays on a ledger of documented axioms because the axiom its
-result is charged to is documented here, in the Theorem 4.2 entry, and it is counted in none of the
-buckets below, which classify entries by the ground of the axiom they carry. Of the remaining
-thirty-four, **sixteen invoke citation-only.** **Six rest on it alone**, so the retraction leaves
-them without a recorded ground:
+including entries that name the rule only to record that it does not override them. The buckets
+below classify an entry by the ground the entry itself records; for most entries that is the ground
+recorded for the axiom the entry carries, but an entry can record a ground without carrying a Lean
+`axiom`, and two entries make the difference visible. The [Corollary 4.3 support
+entry](/lattice-system/limitations/documented-axioms/chapter-04/#entry-corollary-4-3-support)
+carries **no axiom of its own** and records **no ground of its own**: it stays on a ledger of
+documented axioms because the axiom its result is charged to is documented here, in the Theorem 4.2
+entry, whose ground is itself counted below, so counting the corollary entry would count that same
+ground twice and it is counted in **none** of the buckets. The [general-`S` bond-inversion parity
+entry](/lattice-system/limitations/documented-axioms/chapter-08-part-02/#entry-general-s-bond-inversion-parity)
+carries no axiom either — the two markers that named its claim were deleted rather than left as
+contentless axioms, so it has no Lean declaration at all — but it does record a ground of its own,
+and it **is** counted, among the three below that read as though they invoked citation-only and do
+not. Of the remaining thirty-four, **sixteen invoke citation-only.** **Six rest on it alone**, so
+the retraction leaves them without a recorded ground:
 
 - [Theorem 4.24](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-24) (improved Hohenberg–Mermin–Wagner) and
   [Theorem 4.25](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-25) (McBryan–Spencer, Koma–Tasaki power-law
@@ -188,9 +195,10 @@ itself unproved — "rather than being a tractable finite-dimensional cite-only 
 [Theorem 4.2](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-2) is **not** a won't-do citation, per the
 2026-07-05 override, and says so in so many words. The
 [Corollary 4.3](/lattice-system/limitations/documented-axioms/chapter-04/#entry-corollary-4-3-support) entry is not among the three, and
-not because its text is silent about the book's non-proof — it records that Tasaki proves neither
-the corollary nor Theorem 4.2 — but because it carries no axiom of its own for any ground to be
-recorded of; its content is charged to Theorem 4.2, whose classification it inherits; see below.
+not because its text is silent about the book's non-proof — it records that Tasaki does not prove
+Theorem 4.2 (footnote 3, p. 76) and derives the corollary from it (p. 77) — but because it carries
+no axiom of its own for any ground to be recorded of; its content is charged to Theorem 4.2, whose
+classification it inherits; see below.
 
 **Theorem 7.7 is left exactly where its own entry puts it, and does not invoke citation-only.**
 [That entry](/lattice-system/limitations/documented-axioms/chapter-07/#entry-theorem-7-7) records a real implementation dependency: the
@@ -204,11 +212,13 @@ obtained and transcribed, or an independent [41]-free proof of eq. (7.3.9) — g
 
 **Theorem 4.2** (Shastry; Tasaki §4.1, footnote 3, p. 76) and **Corollary 4.3** (§4.1,
 eq. (4.1.11), p. 77) are results of precisely the kind the withdrawn paragraph would have parked —
-the book cites rather than proves them. They are therefore **open, not deferred.** Both are now carried by the
-single axiom `shastryEnergyGain`: Corollary 4.3 is proved from Theorem 4.2 the way the book proves
-it, by contraposition, so it no longer has a susceptibility axiom of its own. That axiom is a live
-discharge target, tracked in the [Chapter 4 entries](/lattice-system/limitations/documented-axioms/chapter-04/); a reader who finds it
-in this ledger should read it as unfinished work, not as settled policy.
+the book cites rather than proves Theorem 4.2, and derives the corollary from it, so the pair's
+whole unproved content is a result the book only cites. They are therefore **open, not deferred.**
+Both are now carried by the single axiom `shastryEnergyGain`: Corollary 4.3 is proved from
+Theorem 4.2 the way the book proves it, by contraposition, so it no longer has a susceptibility
+axiom of its own. That axiom is a live discharge target, tracked in the
+[Chapter 4 entries](/lattice-system/limitations/documented-axioms/chapter-04/); a reader who finds
+it in this ledger should read it as unfinished work, not as settled policy.
 
 **Bulk reclassification is out of scope here and is parked.** This section records the withdrawal
 and how far it reaches; it rewrites no chapter entry. Re-deriving the six citation-only-alone

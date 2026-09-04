@@ -117,10 +117,11 @@ content sits in the Theorem 4.2 entry above.
   `#print axioms no_long_range_order_1d` is exactly
   `[propext, Classical.choice, Quot.sound, shastryEnergyGain]` — the three
   standard axioms and `shastryEnergyGain`, nothing else. Both Corollary 4.3
-  and Theorem 4.2 remain **open**: Tasaki proves neither (footnote 3, p. 76),
-  and nothing here reconstructs the argument he cites. Only the degenerate
-  spin-`0` case `N = 0` is unconditional (the staggered order operator vanishes
-  there).
+  and Theorem 4.2 remain **open**: Tasaki does not prove Theorem 4.2
+  (footnote 3, p. 76) and derives Corollary 4.3 from it (p. 77), so the
+  corollary's whole unproved content is Theorem 4.2, and nothing here
+  reconstructs the argument he cites. Only the degenerate spin-`0` case
+  `N = 0` is unconditional (the staggered order operator vanishes there).
 - **The retired susceptibility axiom.** Corollary 4.3 previously rested on a
   documented axiom of its own, asserting `χ(k*) = o(L³)` for the even
   zero-field ring, fed into a conditional reduction from the Falk–Bruch bound
