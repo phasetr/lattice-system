@@ -5,12 +5,12 @@ import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingGroundData
 /-!
 # Tasaki §4.1: absence of long-range order in one dimension (Corollary 4.3), conditional
 
-Tasaki proves Corollary 4.3 by contraposition against Theorem 3.2 (p. 77): "The condition (3.4.4)
-for Theorem 3.2 is satisfied because of the Marshall–Lieb–Mattis theorem.  Since the conclusion
-(3.4.22) of Theorem 3.2 does not hold, the other condition (3.4.3) must be violated."  That is the
-route taken here.  `no_long_range_order_1d_of_theorem_4_2` assumes Theorem 4.2's conclusion
-verbatim and derives Corollary 4.3; `no_long_range_order_1d` is its application to
-`shastry_no_symmetry_breaking_1d`.
+Tasaki proves Corollary 4.3 by contraposition against Theorem 3.2; his proof (p. 77) opens: "The
+condition (3.4.4) for Theorem 3.2 (p. 70) is satisfied because of the Marshall–Lieb–Mattis theorem
+(Theorem 2.2 in p. 39).  Since the conclusion (3.4.22) of Theorem 3.2 does not hold, the other
+condition (3.4.3) must be violated."  That is the route taken here.
+`no_long_range_order_1d_of_theorem_4_2` assumes Theorem 4.2's conclusion verbatim and derives
+Corollary 4.3; `no_long_range_order_1d` is its application to `shastry_no_symmetry_breaking_1d`.
 
 **This discharges nothing.**  Corollary 4.3 now rests on the documented axiom `shastryEnergyGain`,
 the scalar staggered-field energy-gain condition behind Theorem 4.2, instead of on a susceptibility
@@ -61,11 +61,12 @@ vanishes in the iterated limit `lim_{h↓0} lim_{L↑∞}` — the squared stagg
 site of every normalized ground state of the **zero-field even** ring vanishes in the
 thermodynamic limit (eq. (4.1.11), p. 77).
 
-This is Tasaki's proof of Corollary 4.3, p. 77, read at spin `S = N/2`: "The condition (3.4.4) for
-Theorem 3.2 is satisfied because of the Marshall–Lieb–Mattis theorem.  Since the conclusion
-(3.4.22) of Theorem 3.2 does not hold, the other condition (3.4.3) must be violated."  It transfers
-the missing mathematical content of Corollary 4.3 onto Theorem 4.2 and **discharges nothing**:
-Theorem 4.2 is itself unproved (footnote 3, p. 76), so the corollary remains open.
+This is Tasaki's proof of Corollary 4.3, p. 77, read at spin `S = N/2`; his proof opens: "The
+condition (3.4.4) for Theorem 3.2 (p. 70) is satisfied because of the Marshall–Lieb–Mattis theorem
+(Theorem 2.2 in p. 39).  Since the conclusion (3.4.22) of Theorem 3.2 does not hold, the other
+condition (3.4.3) must be violated."  It transfers the missing mathematical content of
+Corollary 4.3 onto Theorem 4.2 and **discharges nothing**: Theorem 4.2 is itself unproved
+(footnote 3, p. 76), so the corollary remains open.
 
 Proof.  Suppose the conclusion fails at some `ε > 0`.  Then for every threshold there is an even
 `L` beyond it carrying staggered long-range order at level `q₀ := ε` — condition (3.4.3), p. 65 —
@@ -74,7 +75,7 @@ fix a field `h` inside the window it returns, and take `L` beyond both the size 
 returns there and a threshold making the error term below negligible.
 
 At that single `L`: `afm_ring_ground_state_data` supplies a ground energy `E₀` whose eigenspace is
-one-dimensional (Marshall–Lieb–Mattis, the condition (3.4.4) input of Tasaki's sentence), and
+one-dimensional (Marshall–Lieb–Mattis, the condition (3.4.4) input of Tasaki's first sentence), and
 `groundState_mulVec_eq_hermitianMinEigenvalue` identifies `Φ`'s own eigenvalue with it — the
 eigenspace datum is about `E₀`, not about the particular vector, so it applies to `Φ`.  Eq.
 (3.4.16) (`tasaki_eq_3_4_16_afmRing_ssb_fromGroundState`) then produces the low-lying trial state

@@ -11,8 +11,9 @@ hypothesis is Theorem 4.2's conclusion **applied**, via `shastry_no_symmetry_bre
 rather than retyped as a binder: any drift between what this pin supplies and what the
 declaration demands surfaces as an application-elaboration error against the *existing*
 declaration `shastry_no_symmetry_breaking_1d`, not as two independently-transcribed types that
-could silently diverge.  `no_long_range_order_1d`'s own statement is pinned once, in
-`NoLongRangeOrder1DPin.lean`, and is not restated here.
+could silently diverge.  `no_long_range_order_1d` itself is pinned once, in
+`NoLongRangeOrder1DPin.lean`; the proposition it states appears here only as the result type at
+which the contraposition is applied.
 
 **Boundary conditions not pinned here, and why.**  The route additionally needs `2 ≤ L` (to invoke
 `afm_ring_ground_state_data`, whose four guards are `Even L`, `2 ≤ L`, `1 ≤ N`, and a nonempty

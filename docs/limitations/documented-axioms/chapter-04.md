@@ -103,10 +103,11 @@ permalink: /limitations/documented-axioms/chapter-04/
 
 **Tasaki §4.1, Corollary 4.3** (eq. (4.1.11), p. 77) carries **no documented
 axiom of its own**. It is proved the way Tasaki proves it, by contraposition
-from Theorem 4.2 (p. 77: "The condition (3.4.4) for Theorem 3.2 is satisfied
-because of the Marshall–Lieb–Mattis theorem. Since the conclusion (3.4.22) of
-Theorem 3.2 does not hold, the other condition (3.4.3) must be violated."), so
-its whole unproved content sits in the Theorem 4.2 entry above.
+from Theorem 4.2 — his proof on p. 77 opens "The condition (3.4.4) for
+Theorem 3.2 (p. 70) is satisfied because of the Marshall–Lieb–Mattis theorem
+(Theorem 2.2 in p. 39). Since the conclusion (3.4.22) of Theorem 3.2 does not
+hold, the other condition (3.4.3) must be violated." — so its whole unproved
+content sits in the Theorem 4.2 entry above.
 
 - **This discharges nothing.** `no_long_range_order_1d`
   (`LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean`) is

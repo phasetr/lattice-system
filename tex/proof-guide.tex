@@ -13912,10 +13912,13 @@ $\lim_{L\uparrow\infty}\langle\Phi_{\mathrm{GS}}|(\hat O_L^{(3)}/L)^2|\Phi_{\mat
 (eq.~(4.1.11)).  We record \texttt{no\_long\_range\_order\_1d} in explicit $\varepsilon$--$\delta$ form
 over the zero-field ring family with normalized ground states.
 
-\emph{Tasaki's own proof, by contraposition.}  On p.~77 the corollary is three sentences: ``The
-condition (3.4.4) for Theorem 3.2 is satisfied because of the Marshall--Lieb--Mattis theorem.  Since
-the conclusion (3.4.22) of Theorem 3.2 does not hold, the other condition (3.4.3) must be violated.''
-\texttt{no\_long\_range\_order\_1d\_of\_theorem\_4\_2} is exactly that argument, taking the conclusion
+\emph{Tasaki's own proof, by contraposition.}  His proof on p.~77 is four sentences, of which the
+first two carry the contraposition: ``The condition (3.4.4) for Theorem 3.2 (p.~70) is satisfied
+because of the Marshall--Lieb--Mattis theorem (Theorem 2.2 in p.~39).  Since the conclusion (3.4.22)
+of Theorem 3.2 does not hold, the other condition (3.4.3) must be violated.''  The third reads off
+(4.1.11) at $\alpha=3$, the instance recorded here, and the fourth extends it to $\alpha=1,2$ by
+SU(2) invariance of the unique ground state.
+\texttt{no\_long\_range\_order\_1d\_of\_theorem\_4\_2} runs that argument, taking the conclusion
 of Theorem 4.2 verbatim as its hypothesis.  Negating the conclusion produces \emph{one} even volume
 $L$ --- as large as required --- at which some normalized ground state $\Phi$ of the zero-field ring
 carries staggered long-range order at level $q_0=\varepsilon$, i.e.\ assumption~(3.4.3) p.~65.  At
@@ -13933,7 +13936,11 @@ $\sqrt{\varepsilon}/2$ at the chosen $L$, while Theorem 4.2 bounds the right-han
 $\sqrt{\varepsilon}/2$ --- a contradiction.  The single-volume form of eq.~(3.4.21) is what the
 argument needs: the Theorem 3.2 capstone
 \texttt{tasaki\_theorem\_3\_2\_kaplanHorschVonderLinden} assumes long-range order at \emph{every}
-volume, which negating an $\exists L_0,\forall L\ge L_0$ statement does not supply.
+volume, which negating an $\exists L_0,\forall L\ge L_0$ statement does not supply.  Entering at that
+single-volume bound also makes the recorded statement \emph{stronger} than a literal contraposition
+of the capstone: Tasaki's (3.4.3)/(3.4.4) are assumed only for sufficiently large $L$, so
+contraposing Theorem 3.2 yields $\liminf=0$, whereas
+\texttt{no\_long\_range\_order\_1d\_of\_theorem\_4\_2} concludes the full $\varepsilon$--$L_0$ form.
 
 \textbf{This discharges nothing.}  For $N\ge1$ the corollary is that contraposition applied to
 Theorem 4.2 (\texttt{shastry\_no\_symmetry\_breaking\_1d}), which is itself conditional on the

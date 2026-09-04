@@ -364,9 +364,12 @@ def _drop_private_instructions_ref(text: str) -> str:
 # susceptibility axiom and the conditional reduction that consumed it, both deleted with the
 # susceptibility route when Corollary 4.3 moved to Tasaki's own contraposition from Theorem 4.2.
 # A row whose subject no longer exists is dropped from the published catalogue rather than
-# rewritten, so the drop is registered here by the row's Lean-name cell and its site count is
-# pinned: a pattern that starts matching more (or fewer) rows than audited must fail loudly
-# instead of silently editing the baseline.
+# rewritten, so each drop is registered here by the row's Lean-name cell and two independent
+# things are enforced before the drop is applied. The premise: the name is absent from the Lean
+# tree (check_deleted_row_registry_absence), so a registry entry cannot retire the published row
+# of a declaration this repository still carries. The reach: the site count is pinned, so a
+# pattern that starts matching more (or fewer) rows than audited fails loudly instead of silently
+# editing the baseline.
 DELETED_CATALOGUE_ROW_NAMES = (
     "no_long_range_order_1d_of_susceptibility",
     "shastry_staggered_susceptibility_subcubic",
@@ -382,6 +385,22 @@ def _drop_deleted_catalogue_rows(text: str, counts: list[int] | None = None) -> 
             counts[index] += len(pattern.findall(text))
         text = pattern.sub("", text)
     return text
+
+
+def check_deleted_row_registry_absence() -> None:
+    """Refuse a registered row drop whose subject the Lean sources of the project still spell."""
+    # The registry's premise is that the declaration is gone, and the count pin cannot see that:
+    # counts agree for any (name, count) pair, so without this the published catalogue could lose
+    # the row of a live declaration. The scan is the one the retirement records already use, over
+    # the LatticeSystem/ tree together with the root umbrella, matching whole identifiers anywhere
+    # in a source — a name kept alive only by a comment still keeps its row.
+    for lean_name in DELETED_CATALOGUE_ROW_NAMES:
+        mention = lean_leaf_mention(ROOT, lean_name)
+        if mention is not None:
+            fail(
+                "deleted catalogue row registered for a name the Lean tree still spells: "
+                f"{lean_name} in {mention}"
+            )
 
 
 def _approved_replacements(text: str) -> str:
@@ -1354,10 +1373,10 @@ def public_target(
 def deleted_row_registry_mention_semantics_self_test() -> None:
     """A row's subject must count as present when it is only spelled inside a comment.
 
-    The eventual guard on `DELETED_CATALOGUE_ROW_NAMES` is required to reuse
-    `lean_leaf_mention`'s whole-file scan rather than a declaration-only parser, precisely so a
-    name still spelled anywhere in the tree (declaration or prose) blocks the drop. This pins
-    that reused predicate's own behaviour on a synthetic fixture, independent of the real tree.
+    The guard on `DELETED_CATALOGUE_ROW_NAMES` reuses `lean_leaf_mention`'s whole-file scan
+    rather than a declaration-only parser, precisely so a name still spelled anywhere in the tree
+    (declaration or prose) blocks the drop. This pins that reused predicate's own behaviour on a
+    synthetic fixture, independent of the real tree.
     """
     with tempfile.TemporaryDirectory(prefix="deleted-row-mention-") as scratch:
         fixture_root = Path(scratch)
@@ -1376,18 +1395,33 @@ def deleted_row_registry_mention_semantics_self_test() -> None:
 def deleted_row_registry_negative_self_tests() -> None:
     """`DELETED_CATALOGUE_ROW_NAMES` must refuse a name that is still declared in the Lean tree.
 
-    The registry drops a catalogue row on the strength of its Lean-name cell alone; nothing
-    today proves the named declaration is actually gone from `LatticeSystem/`. This reproduces
-    that fail-open in a disposable clone: register a name that is genuinely still declared
+    The registry drops a catalogue row on the strength of its Lean-name cell alone, so the drop
+    is sound only while the named declaration really is gone from `LatticeSystem/`. This probes
+    that boundary in a disposable clone: register a name that is genuinely still declared
     (`oscillatorStrength_abs_le`, `LatticeSystem/Quantum/SpinS/OscillatorStrengthBound.lean`) and
     drop its row from the live legacy page, the same edit an incautious future PR could make by
-    hand. The checker must reject this; today it does not.
+    hand. The checker must reject this, naming the identifier it refuses.
     """
     with tempfile.TemporaryDirectory(prefix="deleted-row-registry-") as scratch:
         mirror = Path(scratch) / "mirror"
         subprocess.run(
             ["git", "clone", "--quiet", "--shared", str(ROOT), str(mirror)], check=True
         )
+
+        # The mirror runs this same script, so a mirror run reaching this self-test would clone a
+        # mirror of its own without end; git halts the descent only at its alternate-object
+        # nesting limit, and then reports the wrong failure. Removing the call is inert for what
+        # the fixture measures: the guard under test is applied by main(), not by this self-test.
+        script_path = mirror / "scripts" / "check_docs_hierarchy.py"
+        script_text = script_path.read_text()
+        nested_call = "    deleted_row_registry_negative_self_tests()\n"
+        if nested_call not in script_text:
+            fail(
+                "deleted-row-registry self-test could not locate its own call in the mirror's "
+                "main() to stop the mirror from cloning a mirror of its own"
+            )
+        script_text = script_text.replace(nested_call, "")
+        script_path.write_text(script_text)
 
         baseline = subprocess.run(
             [sys.executable, "scripts/check_docs_hierarchy.py"],
@@ -1397,12 +1431,10 @@ def deleted_row_registry_negative_self_tests() -> None:
         )
         if baseline.returncode != 0:
             fail(
-                "deleted-row-registry self-test setup failed: the unmodified mirror does not "
-                f"pass (exit={baseline.returncode}): {baseline.stderr}"
+                "deleted-row-registry self-test setup failed: the mirror does not pass before "
+                f"its registry is mutated (exit={baseline.returncode}): {baseline.stderr}"
             )
 
-        script_path = mirror / "scripts" / "check_docs_hierarchy.py"
-        script_text = script_path.read_text()
         registered = (
             'DELETED_CATALOGUE_ROW_NAMES = (\n'
             '    "no_long_range_order_1d_of_susceptibility",\n'
@@ -1607,6 +1639,7 @@ def main() -> None:
             "audited private project-instructions removal count differs: "
             f"expected={PRIVATE_INSTRUCTIONS_REMOVAL_COUNT}, actual={private_instructions_removals}"
         )
+    check_deleted_row_registry_absence()
     deleted_row_counts = [0] * len(DELETED_CATALOGUE_ROW_NAMES)
     _drop_deleted_catalogue_rows(
         _drop_private_instructions_ref(_approved_replacements(catalogue_baseline)),

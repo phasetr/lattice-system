@@ -101,10 +101,16 @@ are more varied than any list here would capture.
 
 **Effect, entry by entry.** Citation-only status — "Tasaki cites this result instead of proving
 it" — no longer sustains an entry by itself. The census below is taken over all thirty-five entries
-on the eight chapter ledgers, counting an entry as invoking citation-only when its recorded ground
-states that Tasaki cites or states the result rather than proving it — including entries that name
-the rule only to record that it does not override them. **Sixteen entries invoke it.** **Six rest
-on it alone**, so the retraction leaves them without a recorded ground:
+on the eight chapter ledgers, counting an entry as invoking citation-only when the ground recorded
+for the axiom it carries states that Tasaki cites or states the result rather than proving it —
+including entries that name the rule only to record that it does not override them. One of the
+thirty-five, the [Corollary 4.3 support
+entry](/lattice-system/limitations/documented-axioms/chapter-04/#entry-corollary-4-3-support),
+carries **no axiom of its own**: it stays on a ledger of documented axioms because the axiom its
+result is charged to is documented here, in the Theorem 4.2 entry, and it is counted in none of the
+buckets below, which classify entries by the ground of the axiom they carry. Of the remaining
+thirty-four, **sixteen invoke citation-only.** **Six rest on it alone**, so the retraction leaves
+them without a recorded ground:
 
 - [Theorem 4.24](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-24) (improved Hohenberg–Mermin–Wagner) and
   [Theorem 4.25](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-25) (McBryan–Spencer, Koma–Tasaki power-law
@@ -181,9 +187,10 @@ manner", not an external citation, and it has no Lean declaration at all.
 itself unproved — "rather than being a tractable finite-dimensional cite-only case".
 [Theorem 4.2](/lattice-system/limitations/documented-axioms/chapter-04/#entry-theorem-4-2) is **not** a won't-do citation, per the
 2026-07-05 override, and says so in so many words. The
-[Corollary 4.3](/lattice-system/limitations/documented-axioms/chapter-04/#entry-corollary-4-3-support) entry is not among the three: it no
-longer names the policy at all, and — carrying no axiom of its own — inherits the classification
-from Theorem 4.2; see below.
+[Corollary 4.3](/lattice-system/limitations/documented-axioms/chapter-04/#entry-corollary-4-3-support) entry is not among the three, and
+not because its text is silent about the book's non-proof — it records that Tasaki proves neither
+the corollary nor Theorem 4.2 — but because it carries no axiom of its own for any ground to be
+recorded of; its content is charged to Theorem 4.2, whose classification it inherits; see below.
 
 **Theorem 7.7 is left exactly where its own entry puts it, and does not invoke citation-only.**
 [That entry](/lattice-system/limitations/documented-axioms/chapter-07/#entry-theorem-7-7) records a real implementation dependency: the
