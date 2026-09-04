@@ -525,6 +525,9 @@ def _approved_replacements(text: str) -> str:
             "`Quantum/SpinS/KennedyTasakiMonomial.lean`; "
             "`Quantum/SpinS/KennedyTasakiProp84.lean` |",
         )
+        # (Applied after the row replacement above: what it matches is the locality sentence
+        # and file column that replacement inserts, not baseline text, so the order of those
+        # two entries is load-bearing.)
         .replace(
             "`IsLocalWindowS L N a b` (commutant form) replaces the deleted markers "
             "`HasShortRangeInteraction`/`HasSomeShortRangeInteraction`. For `w` supported in an "

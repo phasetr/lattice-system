@@ -9,15 +9,22 @@ than through a window-specific predicate.  `chainWindow L a b` is the site set, 
 `supportedOnS_chainWindow_iff` identifies support on it with the commutant condition that the
 operator commutes with every single-site operator seated at an index below `a` or above `b`.
 
-The endpoints are plain naturals compared against `z.val : ℕ`.  Reading them instead as sites of
-`Fin L`, as `Finset.Icc (a : Fin L) (b : Fin L)`, would send them through `Nat.cast`, i.e. reduce
-them mod `L`, and denote a different set: at `L = 5`, `a = 3`, `b = 7` that is
-`Finset.Icc (3 : Fin 5) (2 : Fin 5) = ∅`, whereas the window is `{3, 4}`.  The `ℕ`-valued form
-truncates at `L - 1` instead of wrapping, which is what a window on an open chain means.
+The endpoints are plain naturals compared against `z.val : ℕ`, so the window truncates at `L - 1`
+instead of wrapping, which is what a window on an open chain means.  Reading them instead as sites
+of `Fin L` would reduce them mod `L` and denote a different set: at `L = 5`, `a = 3`, `b = 7` the
+reduced interval is `Finset.Icc (3 : Fin 5) (2 : Fin 5) = ∅`, whereas this window is `{3, 4}`.
+That reading cannot be written by accident, which is what makes the prohibition airtight rather
+than cautionary: there is no `NatCast (Fin n)` instance, so `(a : Fin L)` for a natural `a` does
+not elaborate at any `L`, and `[NeZero L]` does not supply one — it supplies numeric literals
+(`Fin.instOfNat`) and the explicit `Fin.ofNat`.  The mod-`L` interval has to be spelled out as
+`Finset.Icc (Fin.ofNat L a) (Fin.ofNat L b)`, a deliberate act.
 
 Repository-internal material with **no textbook source**: the window is a combinatorial site set
-carrying no spin content.  Its consumer is Tasaki Proposition 8.4
-(`Quantum/SpinS/KennedyTasakiProp84.lean`), whose locality hypothesis is stated with it.
+carrying no spin content.  It has two consumers: Tasaki Proposition 8.4
+(`Quantum/SpinS/KennedyTasakiProp84.lean`), whose locality hypothesis is stated with it, and the
+signature pin `LatticeSystem/Tests/ChainWindowSupportPin.lean`.
+`Quantum/SpinS/LiebSchultzMattisDiscrete.lean` names it in a doc comment without importing this
+module, so that mention is a cross-reference and not a consumer.
 -/
 
 namespace LatticeSystem.Quantum

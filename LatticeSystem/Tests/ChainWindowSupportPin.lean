@@ -11,7 +11,10 @@ it truncates at `L - 1` rather than wrapping.
 Proposition 8.4's own proof does not detect a wrong window. The locality condition is the
 left-hand side of a biconditional: the necessity direction consumes it and the sufficiency
 direction produces it, and the necessity direction only ever instantiates it at the two probe
-sites `0` and `b + 1`. A window that agrees with the intended one at those indices passes. This
+sites `0` and `b + 1`. Agreement at those two indices is not enough on its own, though: that
+proof accepts a set `W` in place of the window exactly when `W` omits both probe sites and
+contains every site with `a ≤ z.val ≤ b`. `[a + 1, b]` omits both probes, so the necessity
+direction accepts it, and it is the sufficiency direction that rejects it, at `z.val = a`. This
 pin is the guard: it writes the outside-window condition out verbatim and holds it equivalent to
 support on the window, so the equivalence is proved through a lemma that must hold of whatever
 `chainWindow` is defined to be, and the pinned disjunction determines the set.
