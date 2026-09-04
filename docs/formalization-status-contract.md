@@ -251,30 +251,38 @@ the live-site pinned routes require to remain present; for every other published
 record ID the no-deletion rule is a contract obligation checked in review.
 Retirement is the only legal way to remove a declaration from the active
 catalogue, whether or not the ID is pinned. When a declaration leaves the Lean
-tree, its record is retired: `lifecycle` becomes `retired`, and
-`retirement` records the reason, the sorted `superseded_by` record IDs (possibly
-none), and one 40-hex `present_at_commit` that is an ancestor of durable
-main-branch history and whose tree still declares the recorded Lean name at
-the recorded path. Every `superseded_by` ID must exist in the catalogue and may
-be active or retired, because a replacement can itself be replaced later. That
-commit is one at which the declaration was present, not necessarily the last
-such commit. The record's Lean name, module, source path,
-and status dimensions are frozen as the historical description of that former
-declaration: they must equal the values durable main-branch history publishes
-for the same record ID, and a record whose ID that history does not publish
-cannot be retired. Retirement is terminal: once that history publishes the ID
-as `retired`, its `lifecycle` cannot return to `active`, and `present_at_commit`
-is frozen alongside the identity fields. Comparison against that history carries
-the bootstrap exception: while durable main-branch history publishes no record
-shard tree at all, active records are not compared against it; any shard that
-exists but cannot be read is a validation error, not a silent skip. Only the
-`reason` stays editable, and `superseded_by` may gain IDs, discovered when a
-replacement is written later, but may never drop one that history already
-publishes. A retired record's `axiom_dependencies` is not frozen: only the
-identity fields named above and `present_at_commit` are. A retired record keeps
-its stable ID, its canonical human route, and its projection fragments; it
-generates no Lean assertion; no active record may depend on it; and its Lean
-name is not available for reuse.
+tree, its record is retired: `lifecycle` becomes `retired`, and `retirement`
+records the reason, the sorted `superseded_by` record IDs (possibly none), and
+one 40-hex `present_at_commit` that is an ancestor of durable main-branch
+history and whose tree still declares the recorded Lean name at the recorded
+path. Every `superseded_by` ID must exist in the catalogue and may be active
+or retired, because a replacement can itself be replaced later, but it must
+name a record other than the retired record itself, and following
+`superseded_by` from one retired record to the next must never lead back to a
+record already on that path. That commit is one at which the declaration was
+present, not necessarily the last such commit. The record's Lean name, module,
+source path, and status dimensions are frozen as the historical description of
+that former declaration: they must equal the values durable main-branch
+history publishes for the same record ID, and a record whose ID that history
+does not publish cannot be retired. Retirement is terminal: once that history
+publishes the ID as `retired`, its `lifecycle` cannot return to `active`, and
+`present_at_commit` is frozen alongside the identity fields. That history is
+read at the durable main ref itself, except in a checkout whose own HEAD is
+that ref's commit, where it is read at the ref's first parent, so a run
+validating the commit main just published measures it against the main that
+commit landed on rather than against itself. Comparison against that history
+carries the bootstrap exception: while durable main-branch history publishes
+no record shard tree at all, active records are not compared against it; any
+shard that exists but cannot be read is a validation error, not a silent skip.
+A checkout in which neither `origin/main` nor `main` resolves is likewise a
+validation error for active and retired records alike. Only the `reason` stays
+editable, and `superseded_by` may gain IDs, discovered when a replacement is
+written later, but may never drop one that history already publishes. A
+retired record's `axiom_dependencies` is not frozen: only the identity fields
+named above and `present_at_commit` are. A retired record keeps its stable ID,
+its canonical human route, and its projection fragments; it generates no Lean
+assertion; no active record may depend on it; and its Lean name is not
+available for reuse.
 Deleting a published record from the catalogue remains a breaking change, and
 deleting one instead of retiring it violates this contract even where no
 checker rejects it.
@@ -591,15 +599,20 @@ library and checks:
   durable main-branch history (`origin/main` if that ref resolves, otherwise
   `main`; neither resolving is an error) whose tree declares that name at the
   recorded path, its frozen fields equal those the same history publishes for
-  that record ID, and its `superseded_by` IDs resolve to catalogue records,
-  whether those are active or themselves retired;
-- terminal retirement, under the bootstrap exception stated above: once that
-  history publishes a record ID as `retired`, no record may return the ID to
-  `active`, the retired record's `present_at_commit` must equal the published
-  one, and its `superseded_by` may add IDs but must keep every published one;
+  that record ID, read at the ref's first parent when HEAD is the ref's own
+  commit, and its `superseded_by` IDs resolve to catalogue records other than the
+  record itself, whether those are active or themselves retired, without a cycle
+  among retired records;
+- terminal retirement, under the bootstrap exception stated above and reading the
+  same history base, and an error rather than a silent skip when neither ref
+  resolves: once that history publishes a record ID as `retired`, no record may
+  return the ID to `active`, the retired record's `present_at_commit` must equal
+  the published one, and its `superseded_by` may add IDs but must keep every
+  published one;
 - fail-closed absence of a retired Lean name: beyond the declaration matcher,
   the retired record is rejected if its short name still occurs in any Lean
-  source under `LatticeSystem/` delimited by `isIdRest` of the pinned Lean
+  source of the project library, the `LatticeSystem/` tree together with the root
+  umbrella `LatticeSystem.lean`, delimited by `isIdRest` of the pinned Lean
   toolchain: ASCII alphanumerics, `_`, `'`, `!`, `?`, every `isLetterLike`
   range (Latin-1 supplement letters without the multiplication and division
   signs, Latin Extended-A, Greek without lambda, Pi and Sigma, Coptic,

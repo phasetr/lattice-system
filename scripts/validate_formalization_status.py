@@ -27,6 +27,7 @@ from formalization_cutover import (
     current_lean_declaration_names,
     exceptional_mapping_map,
     lean_declaration_inventory,
+    project_lean_sources,
     reconstruct_legacy_rows,
     retired_declaration_map,
     self_test as cutover_self_test,
@@ -1038,7 +1039,7 @@ def lean_leaf_mention(repo_root: Path, lean_name: str) -> str | None:
     pattern = re.compile(
         f"(?<![{LEAN_IDENTIFIER_REST_CLASS}]){re.escape(leaf)}(?![{LEAN_IDENTIFIER_REST_CLASS}])"
     )
-    for source_path in sorted((repo_root / "LatticeSystem").rglob("*.lean")):
+    for source_path in project_lean_sources(repo_root):
         try:
             source = source_path.read_text(encoding="utf-8", errors="replace")
         except OSError:
@@ -1102,49 +1103,112 @@ def main_record_index(repo_root: Path, history_ref: str) -> MainRecordIndex:
     return _MAIN_RECORD_INDEX_CACHE[cache_key]
 
 
+def record_comparison_base(repo_root: Path, history_ref: str) -> str:
+    """Return the commit whose published records a candidate catalogue is measured against."""
+    # A run whose HEAD is the resolved ref's own commit is validating what main just published:
+    # measuring against the ref itself would compare that commit with itself, so a reversal or a
+    # frozen-field drift landing directly on main could never be seen. The durable state is the
+    # ref's first parent, which is the commit main published before this one for a squash merge
+    # and for a merge commit alike. A first commit has no such parent, and nothing precedes it
+    # that self-comparison could hide.
+    head = git_capture(repo_root, ["rev-parse", "--verify", "--quiet", "HEAD^{commit}"])
+    resolved = git_capture(
+        repo_root, ["rev-parse", "--verify", "--quiet", f"{history_ref}^{{commit}}"]
+    )
+    if head.returncode != 0 or resolved.returncode != 0:
+        return history_ref
+    if head.stdout.strip() != resolved.stdout.strip():
+        return history_ref
+    parent = git_capture(
+        repo_root, ["rev-parse", "--verify", "--quiet", f"{history_ref}^{{commit}}^"]
+    )
+    if parent.returncode != 0:
+        return history_ref
+    return parent.stdout.strip()
+
+
 def read_main_record_index(repo_root: Path, history_ref: str) -> MainRecordIndex:
-    """Read every record shard durable main history publishes."""
+    """Read every record shard the durable history behind this checkout publishes."""
     # History that publishes no shard tree yet and history whose shards cannot be read are
     # different answers, and only the first is a legitimate bootstrap: an absent tree yields an
     # empty readable index, while every listing, read, or parse failure names its shard so a
     # caller can fail closed instead of mistaking an anomaly for a catalogue with no records.
+    base = record_comparison_base(repo_root, history_ref)
     listing = git_capture(
-        repo_root, ["ls-tree", "--name-only", history_ref, f"{RECORD_SHARD_DIRECTORY}/"]
+        repo_root, ["ls-tree", "--name-only", base, f"{RECORD_SHARD_DIRECTORY}/"]
     )
     if listing.returncode != 0:
         return MainRecordIndex(
-            {}, f"record shards under {RECORD_SHARD_DIRECTORY} cannot be listed on {history_ref}"
+            {}, f"record shards under {RECORD_SHARD_DIRECTORY} cannot be listed on {base}"
         )
     shard_paths = sorted(
         line for line in listing.stdout.splitlines() if line.endswith(".json")
     )
     index: dict[str, dict[str, Any]] = {}
     for shard_path in shard_paths:
-        blob = git_capture(repo_root, ["show", f"{history_ref}:{shard_path}"])
+        blob = git_capture(repo_root, ["show", f"{base}:{shard_path}"])
         if blob.returncode != 0:
             return MainRecordIndex(
-                {}, f"record shard {shard_path} cannot be read on {history_ref}"
+                {}, f"record shard {shard_path} cannot be read on {base}"
             )
         try:
             shard = json.loads(blob.stdout)
         except json.JSONDecodeError:
             return MainRecordIndex(
-                {}, f"record shard {shard_path} on {history_ref} is not valid JSON"
+                {}, f"record shard {shard_path} on {base} is not valid JSON"
             )
         if not isinstance(shard, dict):
             return MainRecordIndex(
-                {}, f"record shard {shard_path} on {history_ref} is not a JSON object"
+                {}, f"record shard {shard_path} on {base} is not a JSON object"
             )
         records = shard.get("records")
         if not isinstance(records, list):
             return MainRecordIndex(
-                {}, f"record shard {shard_path} on {history_ref} has no records array"
+                {}, f"record shard {shard_path} on {base} has no records array"
             )
         for published in records:
             identifier = published.get("id") if isinstance(published, dict) else None
             if isinstance(identifier, str):
                 index[identifier] = published
     return MainRecordIndex(index, None)
+
+
+def retired_supersession_targets(record: dict[str, Any]) -> list[str]:
+    """Return the record IDs one retired record names as its replacements."""
+    if record.get("lifecycle") != "retired":
+        return []
+    retirement = record.get("retirement")
+    if not isinstance(retirement, dict):
+        return []
+    superseded = retirement.get("superseded_by")
+    if not isinstance(superseded, list):
+        return []
+    return [entry for entry in superseded if isinstance(entry, str)]
+
+
+def supersession_cycle(
+    record: dict[str, Any], identifier: str, records_by_id: dict[str, dict[str, Any]]
+) -> list[str] | None:
+    """Return the supersession path leading a retired record back to its own ID, if any."""
+    # A published supersession may never be dropped, so a cycle merged once could never be
+    # corrected: it would leave every record on it pointing at a replacement that is itself
+    # retired, with no live declaration anywhere along the chain.
+    pending = [(target, [identifier, target]) for target in retired_supersession_targets(record)]
+    visited: set[str] = set()
+    while pending:
+        current, path = pending.pop()
+        if current == identifier:
+            return path
+        if current in visited:
+            continue
+        visited.add(current)
+        following = records_by_id.get(current)
+        if not isinstance(following, dict):
+            continue
+        pending.extend(
+            (target, [*path, target]) for target in retired_supersession_targets(following)
+        )
+    return None
 
 
 def validate_frozen_identity(
@@ -1229,13 +1293,17 @@ def reject_retirement_reversal(
     identifier = record.get("id")
     if not isinstance(identifier, str):
         return
-    # History that publishes nothing to compare against leaves this guard silent, because a
-    # catalogue must be able to publish its first records before any exist on main. History
-    # whose shards exist but cannot be read is the opposite case: it would switch the guard off
-    # for every record without saying so, so it fails closed here as it does on the retired
-    # path.
+    # Readable history that publishes no record shard tree leaves this guard silent, because a
+    # catalogue must be able to publish its first records before any exist on main. Every other
+    # unanswerable case fails closed here as it does on the retired path: an unresolvable ref or
+    # an unreadable shard would otherwise switch the guard off for every record without saying
+    # so.
     history_ref = main_history_ref(repo_root)
     if history_ref is None:
+        validation.errors.append(
+            f"{location}: {identifier}: neither origin/main nor main resolves, so a retirement "
+            "that history may already publish for this ID cannot be ruled out"
+        )
         return
     published = main_record_index(repo_root, history_ref)
     if published.unreadable is not None:
@@ -1301,13 +1369,28 @@ def validate_retirement(
         )
         # A replacement may itself be retired later, and a published supersession may never be
         # dropped, so requiring the target to stay active would leave the pair unsatisfiable
-        # from that point on: the target only has to exist in the catalogue.
+        # from that point on: the target only has to exist in the catalogue, and only has to be
+        # a record other than this one, reached without returning here.
         for identifier in superseded:
             validation.require(
                 identifier in records_by_id,
                 f"{location}.retirement.superseded_by: unresolved superseded_by "
                 f"record {identifier}",
             )
+        record_identifier = record.get("id")
+        if isinstance(record_identifier, str):
+            if record_identifier in superseded:
+                validation.errors.append(
+                    f"{location}.retirement.superseded_by: a retired record cannot supersede "
+                    f"itself: {record_identifier}"
+                )
+            else:
+                cycle = supersession_cycle(record, record_identifier, records_by_id)
+                if cycle is not None:
+                    validation.errors.append(
+                        f"{location}.retirement.superseded_by: supersession cycle through "
+                        f"retired records: {' -> '.join(cycle)}"
+                    )
     # The retiring change and its evidence land together, and this repository
     # squash-merges, so the pinned commit is one whose tree still contained the declaration
     # rather than the one that deleted it. Squash merges also discard branch commits, so
@@ -3083,6 +3166,16 @@ end LatticeSystem
         """Read the current HEAD commit ID of a fixture repository."""
         return fixture_git(["rev-parse", "HEAD"], cwd).stdout.strip()
 
+    def fixture_candidate_commit(cwd: Path) -> None:
+        """Move a fixture's HEAD one commit ahead of main, as a candidate change under review."""
+        # Records are compared against main's first parent when HEAD is main's own commit, so a
+        # fixture meaning "durable main already publishes this" must not leave HEAD on the
+        # commit that published it.
+        fixture_git(["checkout", "-q", "-b", "candidate"], cwd)
+        fixture_git(
+            ["commit", "-q", "--allow-empty", "-m", "candidate catalogue under validation"], cwd
+        )
+
     # `lean_declaration_inventory` accepts a fixed modifier set only, and `nonrec theorem` is
     # a measured miss, so the whole-word scan is what keeps the "declaration is gone" guard
     # closed. The fixture commits the declaration as a plain `theorem` first (a real
@@ -3607,6 +3700,7 @@ end LatticeSystem
             ["commit", "-q", "-m", "publish rec-a retired alongside an unreadable shard"],
             unreadable_shard_repo_root,
         )
+        fixture_candidate_commit(unreadable_shard_repo_root)
         unreadable_shard_validation = Validation()
         validate_retirement(
             {"id": "rec-a", "lifecycle": "active", "retirement": None},
@@ -3746,6 +3840,7 @@ end LatticeSystem
             ["commit", "-q", "-m", "publish supersession-record-a retired, -b active"],
             supersession_repo_root,
         )
+        fixture_candidate_commit(supersession_repo_root)
 
         supersession_followup_a = dict(supersession_record_a)
         supersession_followup_b = dict(supersession_record_b_published)
@@ -3879,6 +3974,7 @@ end LatticeSystem
             ["commit", "-q", "-m", "publish an unhashable superseded_by entry"],
             unhashable_superseded_repo_root,
         )
+        fixture_candidate_commit(unhashable_superseded_repo_root)
         unhashable_followup = {
             "capstone": False,
             "declaration_kind": "theorem",
@@ -4013,6 +4109,7 @@ end LatticeSystem
             ["commit", "-q", "-m", "publish retirement-terminal-record as retired"],
             retired_main_repo_root,
         )
+        fixture_candidate_commit(retired_main_repo_root)
 
         def retirement_terminal_record(overrides: dict[str, Any]) -> dict[str, Any]:
             """Build a follow-up record for retirement-terminal-record with given overrides."""
@@ -4945,7 +5042,9 @@ end LatticeSystem
         root_umbrella_file = root_umbrella_root / "LatticeSystem.lean"
         root_umbrella_file.write_text(
             "import LatticeSystem.RootUmbrellaFixture\n\n"
-            "theorem rootUmbrellaMention : True := trivial\n",
+            "namespace LatticeSystem\n\n"
+            "theorem rootUmbrellaMention : True := trivial\n\n"
+            "end LatticeSystem\n",
             encoding="utf-8",
         )
         root_umbrella_mention = lean_leaf_mention(
