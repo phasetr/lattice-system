@@ -1536,11 +1536,60 @@ def deleted_row_registry_negative_self_tests() -> None:
             )
 
 
+def unrecognized_argument_self_test() -> None:
+    """`main()` must refuse argv it does not accept instead of running as if it were bare.
+
+    This checker takes no options, so an invocation written like its four sibling checkers'
+    `--self-test` once produced a PASS that the argument had no part in. The probe runs a copy of
+    this working-tree file inside a disposable clone with its own call removed, because a copy
+    that still ignored argv would otherwise re-enter this self-test and clone without end.
+    """
+    with tempfile.TemporaryDirectory(prefix="unrecognized-argument-") as scratch:
+        mirror = Path(scratch) / "mirror"
+        subprocess.run(
+            ["git", "clone", "--quiet", "--shared", str(ROOT), str(mirror)], check=True
+        )
+        script_text = Path(__file__).resolve().read_text()
+        own_call = "    unrecognized_argument_self_test()\n"
+        if own_call not in script_text:
+            fail(
+                "unrecognized-argument self-test could not locate its own call in main() to stop "
+                "a copy that ignores argv from re-entering this probe without end"
+            )
+        script_text = script_text.replace(own_call, "")
+        # The deleted-row self-test runs this file from a clone with its own call already
+        # stripped, so that call is absent on the nested pass and its removal is best-effort.
+        script_text = script_text.replace(
+            "    deleted_row_registry_negative_self_tests()\n", ""
+        )
+        script_path = mirror / "scripts" / "check_docs_hierarchy.py"
+        script_path.write_text(script_text)
+
+        for argument in ("--self-test", "--bogus-flag-xyz", "bogus-positional"):
+            probe = subprocess.run(
+                [sys.executable, "scripts/check_docs_hierarchy.py", argument],
+                cwd=mirror,
+                capture_output=True,
+                text=True,
+            )
+            if probe.returncode == 0:
+                fail(
+                    f"argv fail-open: {argument} must be refused, but the checker exited 0 and "
+                    "answered with a PASS the argument had no part in"
+                )
+            if "unrecognized arguments" not in probe.stderr:
+                fail(
+                    f"argv probe failed for the wrong reason with {argument}: expected an "
+                    f"argparse rejection, got (exit={probe.returncode}): {probe.stderr}"
+                )
+
+
 def main() -> None:
     long_record_negative_self_tests()
     moved_prose_negative_self_tests()
     deleted_row_registry_mention_semantics_self_test()
     deleted_row_registry_negative_self_tests()
+    unrecognized_argument_self_test()
     generated_records = DOCS / "formalization" / "records"
     if generated_records.exists() or generated_records.is_symlink():
         fail(
