@@ -2,7 +2,7 @@ import LatticeSystem.Quantum.SpinS.CartesianAxis
 import LatticeSystem.Quantum.SpinS.NoLongRangeOrder1D
 
 /-!
-# Signature pin: `no_long_range_order_1d` and its all-axes su(2) bridge (Corollary 4.3, #5426)
+# Signature pin: `no_long_range_order_1d` and its all-axes su(2) bridge (Corollary 4.3)
 
 `no_long_range_order_1d` is written out here in full, independently of the conditional route
 `no_long_range_order_1d_of_theorem_4_2` it is derived from.  The theorem's own `ε`–`δ` statement is

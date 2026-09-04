@@ -13323,7 +13323,7 @@ Thm.~4.2 itself and not a discharge of Cor.~4.3: that reduction and the document
 consumed have since been deleted, Cor.~4.3 now following Tasaki's own contraposition from
 Thm.~4.2, which leaves both open.  Issue \#5413, previously named as the successor discharge
 issue, is closed as not planned; the route now proves Cor.~4.3's conclusion for all three
-Cartesian axes, not $\alpha=3$ alone (Issue \#5426).  The first layer establishes the even-ring
+Cartesian axes, not $\alpha=3$ alone (PR \#5427).  The first layer establishes the even-ring
 \emph{bond reflection}
 $r(x) = 2n-1-x$ (\texttt{RingBondReflection.lean}: involutive, swapping the two halves, flipping the
 staggered sign) and the induced \emph{reflection map} $\theta(A)_{\sigma\tau} =
@@ -13838,13 +13838,23 @@ If a submodule $E$ has $\mathrm{finrank} \le 1$, and $\Phi \ne 0$ and $w$ both l
 (any element is a scalar multiple of any non-zero member).  This is the uniqueness engine used by the involution eigenvalue
 lemma below, shared with Theorem 2.4 (§2.5, issue \#4777).
 
+\noindent\textbf{($\chi$2a-ii$'$) Scalar action of a commuting operator on a unique eigenspace}
+(\texttt{exists\_smul\_of\_commute\_unique\_eigenspace}, \texttt{UniqueEigenspaceInvolution.lean}):
+If a matrix $H$ has a $\mu$-eigenspace of $\mathrm{finrank} \le 1$, $\Phi \ne 0$ is a $\mu$-eigenvector, and
+$\Theta$ commutes with $H$ ($H\Theta = \Theta H$), then $\exists c: \Theta \Phi = c \bullet \Phi$: commutation keeps
+$\Theta \Phi$ inside the eigenspace, so $\chi$2a-ii applies to it directly against $\Phi$.  No property of $\Theta$
+beyond commuting with $H$ is used, so the same statement serves both an involution ($\chi$2a-iii below) and a
+Lie-algebra generator (the su(2) bridge \texttt{totalSpinSOpVec\_mulVec\_eq\_zero\_of\_unique\_ground} feeding
+Corollary 4.3's all-axes strengthening, §4.1, p.~77).
+
 \noindent\textbf{($\chi$2a-iii) Involution eigenvalue on unique ground state}
 (\texttt{exists\_involution\_eigenvalue\_of\_unique\_eigenspace}, \texttt{UniqueEigenspaceInvolution.lean}):
 If a Hermitian matrix $H$ has a $\mu$-eigenspace of $\mathrm{finrank} \le 1$ (unique ground state), $\Phi$ is a
 non-zero $\mu$-eigenvector, and $\Theta$ commutes with $H$ and is an involution ($\Theta^2 = 1$), then
 $\exists \delta: \Theta \Phi = \delta \bullet \Phi \land \delta^2 = 1$ ($\Theta$ acts as $\pm 1$ on the unique eigenstate).
-The mechanism: $\Theta \Phi$ lies in the eigenspace (commutation with $H$), so equals $\delta \bullet \Phi$ (uniqueness via $\chi$2a-ii),
-and $\Theta^2 \Phi = \Phi$ forces $\delta^2 = 1$.  Used in both Theorem 2.4 (no-magnetization GS constraint, §2.5) and $\chi$2a
+The mechanism: $\Theta \Phi = \delta \bullet \Phi$ by $\chi$2a-ii$'$ (commutation with $H$ places $\Theta \Phi$ in the
+eigenspace, and uniqueness via $\chi$2a-ii extracts the scalar), and $\Theta^2 \Phi = \Phi$ forces $\delta^2 = 1$.
+Used in both Theorem 2.4 (no-magnetization GS constraint, §2.5) and $\chi$2a
 first-order vanishing here (§4.1, pp.~84--86).
 
 \noindent\textbf{($\chi$2a-iv) Vanishing under symmetric anti-involution}
@@ -13904,7 +13914,7 @@ This is the second-order perturbation gate toward Theorem 4.2 long-range order, 
 inference ($\chi$1 $\to$ $\chi$2 $\to$ Theorem 4.2).
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; \emph{conditional} theorem,
-\texttt{Quantum/SpinS/NoLongRangeOrder1D.lean}, Issue \#5426).  Absence of long-range order in one
+\texttt{Quantum/SpinS/NoLongRangeOrder1D.lean}, PR \#5427).  Absence of long-range order in one
 dimension on \textbf{even} rings: for the zero-field 1D spin-$S$ antiferromagnetic Heisenberg ring on
 \textbf{even} $L$ sites (faithful to Tasaki §3.1/§4.1.1, which define the lattice for even $L$ only;
 only bipartite rings carry a balanced staggered sublattice), the squared staggered order parameter per
@@ -13929,11 +13939,12 @@ invariant subspace of su(2) carries the trivial representation).  Its ring speci
 \texttt{afmRing\_groundState\_totalSpin\_annihilate}: every normalized ground state of the zero-field
 antiferromagnetic ring is annihilated by $\hat S^{(1)}_{\mathrm{tot}}$, $\hat S^{(2)}_{\mathrm{tot}}$
 and $\hat S^{(3)}_{\mathrm{tot}}$.  Feeding this into the $\alpha=3$ identity (which needs only
-$\hat S^{(1)}_{\mathrm{tot}}\Phi=0=\hat S^{(3)}_{\mathrm{tot}}\Phi$, via the Falk--Bruch-style
-identities \texttt{staggeredOrder\_sq\_expectation\_eq\_12}/\texttt{\_23}) transports the squared
+$\hat S^{(1)}_{\mathrm{tot}}\Phi=0=\hat S^{(3)}_{\mathrm{tot}}\Phi$, via the SU(2) transverse-component
+equalities of eq.~(4.1.7)
+\texttt{staggeredOrder\_sq\_expectation\_eq\_12}/\texttt{\_23}) transports the squared
 staggered-order expectation to every axis, so \texttt{no\_long\_range\_order\_1d} now states
 eq.~(4.1.11) for $\forall\,\alpha:\mathrm{Fin}\,3$, while
-\texttt{no\_long\_range\_order\_1d\_of\_theorem\_4\_2} runs that argument, taking the conclusion
+\texttt{no\_long\_range\_order\_1d\_of\_theorem\_4\_2} runs the contraposition, taking the conclusion
 of Theorem 4.2 verbatim as its hypothesis.  Negating the conclusion produces \emph{one} even volume
 $L$ --- as large as required --- at which some normalized ground state $\Phi$ of the zero-field ring
 carries staggered long-range order at level $q_0=\varepsilon$, i.e.\ assumption~(3.4.3) p.~65.  At
@@ -13957,11 +13968,14 @@ of the capstone: Tasaki's (3.4.3)/(3.4.4) are assumed only for sufficiently larg
 contraposing Theorem 3.2 yields $\liminf=0$, whereas
 \texttt{no\_long\_range\_order\_1d\_of\_theorem\_4\_2} concludes the full $\varepsilon$--$L_0$ form.
 
-\textbf{This discharges nothing.}  For $N\ge1$ the corollary is that contraposition applied to
-Theorem 4.2 (\texttt{shastry\_no\_symmetry\_breaking\_1d}), which is itself conditional on the
-documented axiom \texttt{shastryEnergyGain}, so \texttt{\#print axioms no\_long\_range\_order\_1d}
+\textbf{This discharges nothing.}  For $N\ge1$ the $\alpha=3$ instance is Tasaki's own contraposition
+argument applied to Theorem 4.2 (\texttt{shastry\_no\_symmetry\_breaking\_1d}), which is itself
+conditional on the documented axiom \texttt{shastryEnergyGain}; the other two axes are carried to
+it by SU(2) invariance, which adds no unproved input.  So
+\texttt{\#print axioms no\_long\_range\_order\_1d}
 $=$ \texttt{[propext, Classical.choice, Quot.sound, shastryEnergyGain]}; only the degenerate
-spin-$0$ case $N=0$ is unconditional (the staggered order operator vanishes).  Both Corollary 4.3
+spin-$0$ case $N=0$ is unconditional (the staggered order operator vanishes on every axis).  Both
+Corollary 4.3
 and Theorem 4.2 remain \textbf{open}: Tasaki does not prove Theorem 4.2 (footnote~3, p.~76) and
 nothing here reconstructs the argument he cites.  What changed is only which unproved statement the
 corollary is charged to --- the input Tasaki's own proof uses, rather than a susceptibility

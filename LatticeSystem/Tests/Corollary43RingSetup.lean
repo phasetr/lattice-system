@@ -5,7 +5,7 @@ import LatticeSystem.Quantum.HorschVonderLindenLowLyingState
 import LatticeSystem.Quantum.SpinS.HorschVonderLindenAfmRing
 
 /-!
-# Fixtures for issue #5416 PR-1 (§3.4's setting at the antiferromagnetic ring)
+# Fixtures for §3.4's setting at the antiferromagnetic ring
 
 Each fixture pins a signature or an application shape of the declarations this PR adds, so that a
 later change to a statement's conjunct order, hypothesis list or printed constants breaks
