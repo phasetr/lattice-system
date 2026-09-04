@@ -423,6 +423,15 @@ def _approved_replacements(text: str) -> str:
             "mps_theorem_7_5` (**PROVED axiom-free; Standard 3; merged in commit `8286635d`**)",
         )
         .replace(
+            "commutes with every single-site operator farther than `r` from `x`, equivalent to "
+            "`support ⊆ {y : ringDist x y ≤ r}` by factor double-commutant;",
+            "commutes with every single-site operator farther than `r` from `x`; the general "
+            "equivalence between this commutant form and `support ⊆ {y : ringDist x y ≤ r}` is a "
+            "proved theorem of this repository, `supportedOnS_iff_commute_onSiteS` "
+            "(`Quantum/SpinS/OperatorSupport.lean`), though `IsLocalRangeR` itself has not yet "
+            "been connected to it;",
+        )
+        .replace(
             "mps_theorem_7_6` is **PROVED axiom-free; Standard 3; PR pending**",
             "mps_theorem_7_6` is **PROVED axiom-free; Standard 3; merged in commit `50b30949`**",
         )

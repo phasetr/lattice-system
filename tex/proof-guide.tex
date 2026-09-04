@@ -15549,8 +15549,11 @@ eqs.~(6.2.23)--(6.2.24), pp.~162--163; PROVED, \texttt{\#print axioms} = std3, P
 class \texttt{IsShortRangeU1Chain} bundles the assumptions: each $\hat h_x$ is \emph{self-adjoint}
 (so $\sum_x\hat h_x$ is a genuine Hamiltonian), $r$-local (\texttt{IsLocalRangeR}, now the
 \emph{commutant-form} locality \texttt{def}: $\hat h_x$ commutes with every single-site operator
-farther than $r$ from $x$, equivalent to $\mathrm{supp}(\hat h_x)\subseteq\{y:\mathtt{ringDist}\,x\,y
-\le r\}$ by the factor double-commutant theorem; strong form chosen to keep the shared Theorem~7.3
+farther than $r$ from $x$; the general equivalence between this commutant form and
+$\mathrm{supp}(\hat h_x)\subseteq\{y:\mathtt{ringDist}\,x\,y\le r\}$ is a proved theorem of this
+repository, \texttt{supportedOnS\_iff\_commute\_onSiteS}
+(\texttt{Quantum/SpinS/OperatorSupport.lean}), though \texttt{IsLocalRangeR} itself has not yet been
+connected to it; strong form chosen to keep the shared Theorem~7.3
 hypothesis faithful; discharge arc COMPLETE, axiom-free, PR~\#5071--\#5077), bounded $\|\hat h_x\|\le h_0$ in the $L^2$
 operator norm
 (\texttt{manyBodyOperatorNormS}), and $U(1)$-invariant ($[\hat h_x,\hat S_{\mathrm{tot}}^{(3)}]=0$,
