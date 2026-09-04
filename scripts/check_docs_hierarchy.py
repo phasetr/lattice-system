@@ -1467,6 +1467,11 @@ def deleted_row_registry_negative_self_tests() -> None:
                 "main() to stop the mirror from cloning a mirror of its own"
             )
         script_text = script_text.replace(nested_call, "")
+        # The argv probe clones and runs a script of its own, so leaving its call in the mirror
+        # buys a second probe this fixture does not measure and reports that probe's failure as
+        # this one's setup error. Its absence would not endanger the mirror, so unlike the call
+        # above the removal is best-effort.
+        script_text = script_text.replace("    unrecognized_argument_self_test()\n", "")
         script_path.write_text(script_text)
 
         baseline = subprocess.run(
@@ -1541,9 +1546,9 @@ def unrecognized_argument_self_test() -> None:
     """`main()` must refuse argv it does not accept instead of running as if it were bare.
 
     This checker takes no options, so an invocation written like its four sibling checkers'
-    `--self-test` once produced a PASS that the argument had no part in. The probe runs a copy of
-    this working-tree file inside a disposable clone with its own call removed, because a copy
-    that still ignored argv would otherwise re-enter this self-test and clone without end.
+    `--self-test` would otherwise produce a PASS that the argument had no part in. The probe
+    runs a copy of this working-tree file inside a disposable clone with its own call removed,
+    because a copy that still ignored argv would re-enter this self-test and clone without end.
     """
     with tempfile.TemporaryDirectory(prefix="unrecognized-argument-") as scratch:
         mirror = Path(scratch) / "mirror"
