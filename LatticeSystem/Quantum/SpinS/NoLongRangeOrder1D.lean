@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.KaplanHorschVonderLindenTheorem32
+import LatticeSystem.Quantum.SpinS.AndersonTowerEnergyBoundSU2
 import LatticeSystem.Quantum.SpinS.CartesianAxis
 import LatticeSystem.Quantum.SpinS.HorschVonderLindenAfmRing
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingGroundData
@@ -183,6 +184,31 @@ theorem afmRing_groundState_totalSpin_annihilate (L N : ℕ) (hLeven : Even L) (
     exact (heisenbergHamiltonianS_commute_totalSpinSOp2 (ringCoupling L)).eq
   · rw [afmHeisenbergChainHamiltonianS]
     exact sub_eq_zero.mp (heisenbergHamiltonianS_commutator_totalSpinSOp3 (ringCoupling L) N)
+
+/-- **The squared staggered order expectation is the same on all three axes for an SU(2)-invariant
+state.**  If `Φ` is annihilated by `Ŝ_tot^{(1)}` and `Ŝ_tot^{(3)}`, then
+`⟨Φ, (ô^{(α)})² Φ⟩ = ⟨Φ, (Ô^{(3)})² Φ⟩` for every axis `α : Fin 3`, `Ô^{(3)}` being the Lean axis
+`2` component `staggeredOrderOpS`.  Axis `1` uses the `Ŝ_tot^{(1)}`-singlet equality of axes 2 and 3
+(eq. (4.1.7)), axis `0` chains it with the `Ŝ_tot^{(3)}`-singlet equality of axes 1 and 2; this is
+why the su(2) bridge is instantiated at exactly those two generators.  Every step is an equality of
+the same complex number, so the real part, the division by `L²` and the absolute value of
+Corollary 4.3's conclusion transport unchanged.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §4.1, eq. (4.1.7) and Corollary 4.3, p. 77. -/
+private theorem stagOpVec_sq_expectation_eq_axis3 {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
+    (A : Λ → Bool) (Φ : (Λ → Fin (N + 1)) → ℂ)
+    (h1 : (totalSpinSOp1 Λ N).mulVec Φ = 0) (h3 : (totalSpinSOp3 Λ N).mulVec Φ = 0) (α : Fin 3) :
+    star Φ ⬝ᵥ (stagOpVec A N α * stagOpVec A N α).mulVec Φ
+      = star Φ ⬝ᵥ (staggeredOrderOpS A N * staggeredOrderOpS A N).mulVec Φ := by
+  fin_cases α <;>
+    simp only [stagOpVec, Fin.reduceFinMk, Matrix.cons_val_zero, Matrix.cons_val_one,
+      Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
+  -- Lean axis `2` is Tasaki's `α = 3`: the axis reduction closes it definitionally, leaving axes
+  -- `0` and `1`.
+  · exact (staggeredOrder_sq_expectation_eq_12 A Φ h3).trans
+      (staggeredOrder_sq_expectation_eq_23 A Φ h1)
+  · exact staggeredOrder_sq_expectation_eq_23 A Φ h1
 
 /-- **Tasaki Corollary 4.3 from Theorem 4.2 (his own proof, by contraposition), CONDITIONAL
 THEOREM.**  Assuming `h42` — the conclusion of Theorem 4.2 (eq. (4.1.10), p. 77) verbatim, that the
