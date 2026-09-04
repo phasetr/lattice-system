@@ -877,7 +877,8 @@
     "record_retirement": {
       "additionalProperties": false,
       "properties": {
-        "last_present_commit": {
+        "present_at_commit": {
+          "description": "A 40-hex commit on durable main-branch history whose tree still declares this record's Lean name at its recorded path: a commit at which the declaration was present, not necessarily the last such commit.",
           "pattern": "^[0-9a-f]{40}$",
           "type": "string"
         },
@@ -893,7 +894,7 @@
         }
       },
       "required": [
-        "last_present_commit",
+        "present_at_commit",
         "reason",
         "superseded_by"
       ],

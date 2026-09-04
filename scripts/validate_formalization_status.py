@@ -57,6 +57,18 @@ MANIFEST_KEYS = {
 MANIFEST_REQUIRED_KEYS = MANIFEST_KEYS - {"cutover_baseline", "cutover_certificate"}
 REGISTRY_KEYS = {"source_items", "sources", "topics"}
 SHARD_KEYS = {"records", "schema_version", "source_id", "source_unit"}
+RECORD_SHARD_DIRECTORY = "formalization-status/v2/records"
+# A retired record describes a declaration that no longer exists, so nothing can re-measure
+# these fields against the Lean tree: they stay as durable main published them while the
+# record was active, and a retirement must not repoint a published ID at another declaration.
+FROZEN_RECORD_FIELDS = (
+    "implementation_state",
+    "lean_name",
+    "module",
+    "source_coverage",
+    "source_path",
+    "trust_state",
+)
 RELATION_RANK = {
     "formalizes": 0,
     "presents": 0,
@@ -69,6 +81,19 @@ HTTPS_URL_PATTERN = (
     r"^(?![\s\S]*[\u0000-\u001F\u007F-\u009F])https://[\s\S]+$"
 )
 INLINE_TEXT_RE = re.compile(INLINE_TEXT_PATTERN)
+# Lean's own `isIdRest` set, spelled as a regular-expression character class. The retirement
+# scan must end identifiers exactly where Lean ends them: brackets such as U+2983 and U+27E9
+# and the French quotes of a guillemet name are delimiters that must not hide a mention,
+# while a trailing subscript or Greek letter continues the identifier into a different name.
+LEAN_IDENTIFIER_REST_CLASS = (
+    "A-Za-z0-9_'!?"
+    "\u03b1-\u03ba\u03bc-\u03c9"
+    "\u0391-\u039f\u03a1-\u03a2\u03a4-\u03a9"
+    "\u03ca-\u03fb"
+    "\u2100-\u214f"
+    "\U0001d49c-\U0001d59f"
+    "\u2080-\u2089\u2090-\u209c\u1d62-\u1d6a"
+)
 
 
 class Validation:
@@ -216,7 +241,7 @@ class Contract:
             "source_id",
             "title",
         }
-        expected_retirement = {"last_present_commit", "reason", "superseded_by"}
+        expected_retirement = {"present_at_commit", "reason", "superseded_by"}
         expected_topic = {"description", "id", "label"}
         expected_relation = {"relation", "source_item_id"}
         expected_aggregate = {
@@ -999,10 +1024,9 @@ def source_declares(path: Path, kind: str, lean_name: str) -> bool:
 def lean_leaf_mention(repo_root: Path, lean_name: str) -> str | None:
     """Return one Lean source that still spells the declaration's short name, if any."""
     leaf = lean_name.rsplit(".", 1)[-1]
-    # A `\b` boundary cannot see a trailing `'`, which Lean identifiers and the schema's
-    # `lean_name` pattern both allow, so the delimiters spell out the identifier class.
-    identifier_chars = "A-Za-z0-9_'!?\u00c0-\uffff"
-    pattern = re.compile(f"(?<![{identifier_chars}]){re.escape(leaf)}(?![{identifier_chars}])")
+    pattern = re.compile(
+        f"(?<![{LEAN_IDENTIFIER_REST_CLASS}]){re.escape(leaf)}(?![{LEAN_IDENTIFIER_REST_CLASS}])"
+    )
     for source_path in sorted((repo_root / "LatticeSystem").rglob("*.lean")):
         try:
             source = source_path.read_text(encoding="utf-8", errors="replace")
@@ -1037,6 +1061,74 @@ def main_history_ref(repo_root: Path) -> str | None:
         if resolved.returncode == 0:
             return ref
     return None
+
+
+def main_record_index(repo_root: Path, history_ref: str) -> dict[str, dict[str, Any]] | None:
+    """Index the records durable main history publishes, or None when they are unreadable."""
+    listing = git_capture(
+        repo_root, ["ls-tree", "--name-only", history_ref, f"{RECORD_SHARD_DIRECTORY}/"]
+    )
+    if listing.returncode != 0:
+        return None
+    shard_paths = [line for line in listing.stdout.splitlines() if line.endswith(".json")]
+    if not shard_paths:
+        return None
+    index: dict[str, dict[str, Any]] = {}
+    for shard_path in shard_paths:
+        blob = git_capture(repo_root, ["show", f"{history_ref}:{shard_path}"])
+        if blob.returncode != 0:
+            return None
+        try:
+            shard = json.loads(blob.stdout)
+        except json.JSONDecodeError:
+            return None
+        if not isinstance(shard, dict):
+            return None
+        records = shard.get("records")
+        if not isinstance(records, list):
+            return None
+        for published in records:
+            identifier = published.get("id") if isinstance(published, dict) else None
+            if isinstance(identifier, str):
+                index[identifier] = published
+    return index
+
+
+def validate_frozen_identity(
+    record: dict[str, Any],
+    identifier: str,
+    location: str,
+    history_ref: str,
+    repo_root: Path,
+    validation: Validation,
+) -> None:
+    """Hold a retiring record to the identity durable main history published for its ID."""
+    published = main_record_index(repo_root, history_ref)
+    if published is None:
+        validation.errors.append(
+            f"{location}: {identifier}: {history_ref} publishes no readable record shard, "
+            "so the frozen fields of a retired record cannot be proven"
+        )
+        return
+    former = published.get(identifier)
+    if former is None:
+        validation.errors.append(
+            f"{location}: {identifier} is absent from every record shard on {history_ref}, "
+            "so the frozen fields of a retired record cannot be proven"
+        )
+        return
+    for field in FROZEN_RECORD_FIELDS:
+        validation.require(
+            record.get(field) == former.get(field),
+            f"{location}: {identifier}: frozen field {field} is {record.get(field)!r}, "
+            f"not the {former.get(field)!r} published on {history_ref}",
+        )
+    if former.get("lifecycle") == "retired":
+        validation.require(
+            record.get("retirement") == former.get("retirement"),
+            f"{location}: {identifier}: retirement evidence differs from the evidence "
+            f"{history_ref} already publishes for this retired record",
+        )
 
 
 def validate_retirement(
@@ -1097,27 +1189,33 @@ def validate_retirement(
                     f"{location}.retirement.superseded_by: superseded_by record is not "
                     f"active: {identifier}",
                 )
-    commit = retirement.get("last_present_commit")
-    if not isinstance(commit, str) or re.fullmatch(r"[0-9a-f]{40}", commit) is None:
-        validation.errors.append(
-            f"{location}.retirement.last_present_commit: expected one 40-character commit ID"
-        )
-        return
     # The retiring change and its evidence land together, and this repository
-    # squash-merges, so the pinned commit is the last one that still contained the
-    # declaration rather than the one that deleted it. Squash merges also discard branch
-    # commits, so ancestry is measured against durable main history: a commit that only the
-    # pull-request branch reaches would pass here and fail forever once merged.
+    # squash-merges, so the pinned commit is one whose tree still contained the declaration
+    # rather than the one that deleted it. Squash merges also discard branch commits, so
+    # both the ancestry of that commit and the frozen identity below are measured against
+    # durable main history: evidence that only the pull-request branch reaches would pass
+    # here and fail forever once merged.
     history_ref = main_history_ref(repo_root)
     if history_ref is None:
         validation.errors.append(
-            f"{location}.retirement.last_present_commit: neither origin/main nor main "
+            f"{location}.retirement.present_at_commit: neither origin/main nor main "
             "resolves, so ancestry cannot be proven"
+        )
+        return
+    record_id = record.get("id")
+    if isinstance(record_id, str):
+        # A malformed commit must not buy silence about the record's identity, so the
+        # frozen comparison runs before the evidence itself is inspected.
+        validate_frozen_identity(record, record_id, location, history_ref, repo_root, validation)
+    commit = retirement.get("present_at_commit")
+    if not isinstance(commit, str) or re.fullmatch(r"[0-9a-f]{40}", commit) is None:
+        validation.errors.append(
+            f"{location}.retirement.present_at_commit: expected one 40-character commit ID"
         )
         return
     if git_capture(repo_root, ["merge-base", "--is-ancestor", commit, history_ref]).returncode != 0:
         validation.errors.append(
-            f"{location}.retirement.last_present_commit: commit is not an ancestor of "
+            f"{location}.retirement.present_at_commit: commit is not an ancestor of "
             f"{history_ref}"
         )
         return
@@ -1133,7 +1231,7 @@ def validate_retirement(
     blob = git_capture(repo_root, ["show", f"{commit}:{source_path}"])
     if blob.returncode != 0 or not declaration_in_source(blob.stdout, kind, lean_name):
         validation.errors.append(
-            f"{location}.retirement.last_present_commit: tree does not declare "
+            f"{location}.retirement.present_at_commit: tree does not declare "
             f"{kind} {lean_name} at {source_path}"
         )
 
@@ -2495,7 +2593,7 @@ end LatticeSystem
     )
 
     retirement_evidence = {
-        "last_present_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
+        "present_at_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
         "reason": "superseded by a directly proved converse",
         "superseded_by": [],
     }
@@ -2601,7 +2699,7 @@ end LatticeSystem
             {
                 "lifecycle": "retired",
                 "retirement": {
-                    "last_present_commit": "0" * 40,
+                    "present_at_commit": "0" * 40,
                     "reason": "fixture: non-ancestor commit",
                     "superseded_by": [],
                 },
@@ -2611,10 +2709,10 @@ end LatticeSystem
     )
     check(
         any(
-            "last_present_commit: commit is not an ancestor of" in error
+            "present_at_commit: commit is not an ancestor of" in error
             for error in non_ancestor_errors
         ),
-        "retired record whose last_present_commit is not an ancestor of main history was "
+        "retired record whose present_at_commit is not an ancestor of main history was "
         f"not rejected for the intended reason: {non_ancestor_errors}",
     )
 
@@ -2626,7 +2724,7 @@ end LatticeSystem
                 "lifecycle": "retired",
                 "module": "LatticeSystem.Lattice.Scale",
                 "retirement": {
-                    "last_present_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
+                    "present_at_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
                     "reason": "fixture: commit tree does not declare this name",
                     "superseded_by": [],
                 },
@@ -2637,10 +2735,10 @@ end LatticeSystem
     )
     check(
         any(
-            "does not declare" in error and "last_present_commit" in error
+            "does not declare" in error and "present_at_commit" in error
             for error in wrong_content_errors
         ),
-        "retired record whose last_present_commit tree does not declare the recorded name "
+        "retired record whose present_at_commit tree does not declare the recorded name "
         f"was not rejected for the intended reason: {wrong_content_errors}",
     )
 
@@ -2853,7 +2951,7 @@ end LatticeSystem
     # `lean_declaration_inventory` accepts a fixed modifier set only, and `nonrec theorem` is
     # a measured miss, so the whole-word scan is what keeps the "declaration is gone" guard
     # closed. The fixture commits the declaration as a plain `theorem` first (a real
-    # `last_present_commit`), then adds `nonrec` while it stays live in the tree.
+    # `present_at_commit`), then adds `nonrec` while it stays live in the tree.
     hidden_decl_root = Path(
         tempfile.mkdtemp(prefix="retirement-fail-open-", dir=fixture_scratch_root)
     )
@@ -2867,7 +2965,7 @@ end LatticeSystem
         )
         fixture_git(["add", "LatticeSystem/FailOpenFixture.lean"], hidden_decl_root)
         fixture_git(["commit", "-q", "-m", "add gone as a plain theorem"], hidden_decl_root)
-        hidden_decl_last_present_commit = fixture_head(hidden_decl_root)
+        hidden_decl_present_at_commit = fixture_head(hidden_decl_root)
         hidden_decl_module.write_text(
             "namespace LatticeSystem\n\nnonrec theorem gone : True := trivial\n\n"
             "end LatticeSystem\n",
@@ -2885,7 +2983,7 @@ end LatticeSystem
                     "lifecycle": "retired",
                     "module": "LatticeSystem.FailOpenFixture",
                     "retirement": {
-                        "last_present_commit": hidden_decl_last_present_commit,
+                        "present_at_commit": hidden_decl_present_at_commit,
                         "reason": "fixture: nonrec-theorem parser miss",
                         "superseded_by": [],
                     },
@@ -2912,8 +3010,9 @@ end LatticeSystem
         shutil.rmtree(hidden_decl_root, ignore_errors=True)
 
     # The schema's `lean_name` pattern permits leaves ending in `'`, which `\b` treats as a
-    # non-word character in both directions, so the scan must delimit matches by the Lean
-    # identifier class instead: letters, digits, `_`, `'`, `!`, `?` and non-ASCII letters.
+    # non-word character in both directions, so the scan must delimit matches by Lean's own
+    # `isIdRest` set instead: ASCII alphanumerics, `_`, `'`, `!`, `?`, the letterlike Greek,
+    # Coptic, letterlike-symbol and script ranges, and subscript alphanumerics.
     primed_leaf_root = Path(
         tempfile.mkdtemp(prefix="lean-leaf-mention-apostrophe-", dir=fixture_scratch_root)
     )
@@ -2954,7 +3053,7 @@ end LatticeSystem
         )
         fixture_git(["add", "LatticeSystem/FailOpenApostropheFixture.lean"], primed_repo_root)
         fixture_git(["commit", "-q", "-m", "add gone' as a plain theorem"], primed_repo_root)
-        primed_last_present_commit = fixture_head(primed_repo_root)
+        primed_present_at_commit = fixture_head(primed_repo_root)
         primed_module.write_text(
             "namespace LatticeSystem\n\nnonrec theorem gone' : True := trivial\n\n"
             "end LatticeSystem\n",
@@ -2972,7 +3071,7 @@ end LatticeSystem
                     "lifecycle": "retired",
                     "module": "LatticeSystem.FailOpenApostropheFixture",
                     "retirement": {
-                        "last_present_commit": primed_last_present_commit,
+                        "present_at_commit": primed_present_at_commit,
                         "reason": "fixture: apostrophe-leaf boundary miss",
                         "superseded_by": [],
                     },
@@ -2998,7 +3097,7 @@ end LatticeSystem
     finally:
         shutil.rmtree(primed_repo_root, ignore_errors=True)
 
-    # `last_present_commit` ancestry must be checked against durable `main` history
+    # `present_at_commit` ancestry must be checked against durable `main` history
     # (`origin/main` if present, else `main`), never against `HEAD`. A commit that is only
     # reachable from a side branch must be rejected even though it is trivially an ancestor
     # of its own branch's HEAD.
@@ -3020,7 +3119,7 @@ end LatticeSystem
         side_records_by_id: dict[str, dict[str, Any]] = {}
 
         def ancestry_errors(commit: str) -> list[str]:
-            """Validate one retirement's last_present_commit ancestry in isolation."""
+            """Validate one retirement's present_at_commit ancestry in isolation."""
             ancestry_validation = Validation()
             validate_retirement(
                 {
@@ -3029,7 +3128,7 @@ end LatticeSystem
                     "lean_name": None,
                     "lifecycle": "retired",
                     "retirement": {
-                        "last_present_commit": commit,
+                        "present_at_commit": commit,
                         "reason": "fixture: ancestry regression",
                         "superseded_by": [],
                     },
@@ -3046,14 +3145,14 @@ end LatticeSystem
         side_only_errors = ancestry_errors(side_only_commit)
         check(
             any("ancestor" in error for error in side_only_errors),
-            "durable-history ancestry: a last_present_commit reachable only from a side branch "
+            "durable-history ancestry: a present_at_commit reachable only from a side branch "
             "(not from main) was accepted because ancestry was checked against HEAD "
             f"instead of main (errors: {side_only_errors})",
         )
         main_commit_errors = ancestry_errors(main_commit)
         check(
             not main_commit_errors,
-            "a last_present_commit that is an ancestor of main was rejected "
+            "a present_at_commit that is an ancestor of main was rejected "
             f"(positive control): {main_commit_errors}",
         )
     finally:
@@ -3078,7 +3177,7 @@ end LatticeSystem
                 "lean_name": None,
                 "lifecycle": "retired",
                 "retirement": {
-                    "last_present_commit": trunk_only_commit,
+                    "present_at_commit": trunk_only_commit,
                     "reason": "fixture: no-resolvable-main regression",
                     "superseded_by": [],
                 },
@@ -3093,7 +3192,7 @@ end LatticeSystem
         check(
             bool(no_main_validation.errors),
             "durable-history ancestry: a repository with neither `origin/main` nor `main` "
-            "accepted a last_present_commit by silently falling back to HEAD instead of "
+            "accepted a present_at_commit by silently falling back to HEAD instead of "
             f"failing closed (errors: {no_main_validation.errors})",
         )
     finally:
@@ -3183,7 +3282,7 @@ end LatticeSystem
                 "source_path": "LatticeSystem/FrozenFixture.lean",
                 "trust_state": "axiom_free",
                 "retirement": {
-                    "last_present_commit": frozen_kept_commit,
+                    "present_at_commit": frozen_kept_commit,
                     "reason": "fixture: frozen field regression",
                     "superseded_by": [],
                 },
@@ -3200,7 +3299,7 @@ end LatticeSystem
                 "module": "LatticeSystem.FrozenFixtureChanged",
                 "source_path": "LatticeSystem/FrozenFixtureChanged.lean",
                 "retirement": {
-                    "last_present_commit": frozen_changed_commit,
+                    "present_at_commit": frozen_changed_commit,
                     "reason": "fixture: frozen field regression",
                     "superseded_by": [],
                 },
@@ -3237,7 +3336,7 @@ end LatticeSystem
                 "source_path": "LatticeSystem/FrozenFixtureChanged.lean",
                 "trust_state": "axiom_free",
                 "retirement": {
-                    "last_present_commit": frozen_changed_commit,
+                    "present_at_commit": frozen_changed_commit,
                     "reason": "fixture: missing main counterpart",
                     "superseded_by": [],
                 },
@@ -3287,7 +3386,7 @@ end LatticeSystem
                 "source_path": "LatticeSystem/FrozenFixtureChanged.lean",
                 "trust_state": "axiom_free",
                 "retirement": {
-                    "last_present_commit": no_shard_commit,
+                    "present_at_commit": no_shard_commit,
                     "reason": "fixture: no v2 shard tree on main",
                     "superseded_by": [],
                 },

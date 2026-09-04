@@ -754,10 +754,10 @@ def expected_record_structure(
                     ", ".join(superseded) if superseded else "none",
                 ),
                 (
-                    "Last present commit",
-                    "retirement-last-present-commit",
+                    "Present at commit",
+                    "retirement-present-at-commit",
                     (),
-                    retirement["last_present_commit"],
+                    retirement["present_at_commit"],
                 ),
             )
         )
@@ -2928,7 +2928,7 @@ def run_self_tests() -> None:
         "origin": "project_original",
         "proof_guide_anchor": None,
         "retirement": {
-            "last_present_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
+            "present_at_commit": "7b65d59ec539b195d449bd97f94b08dbf99bf66e",
             "reason": "superseded by a directly proved converse",
             "superseded_by": [],
         },
@@ -2973,7 +2973,7 @@ def run_self_tests() -> None:
         '<dd data-field="human-status">retired</dd>',
         '<dd data-field="retirement-reason">',
         '<dd data-field="retirement-superseded-by">',
-        '<dd data-field="retirement-last-present-commit">',
+        '<dd data-field="retirement-present-at-commit">',
     ):
         if expected_row not in retired_block:
             raise AssertionError(
@@ -3071,7 +3071,7 @@ def run_self_tests() -> None:
             '<dd data-field="human-status">retired</dd>',
             '<dd data-field="retirement-reason">',
             '<dd data-field="retirement-superseded-by">',
-            '<dd data-field="retirement-last-present-commit">',
+            '<dd data-field="retirement-present-at-commit">',
         ):
             if expected_row not in retired_detail:
                 raise AssertionError(

@@ -223,9 +223,9 @@ def record_lines(
         )
         lines.extend(
             field(
-                "Last present commit",
-                "retirement-last-present-commit",
-                retirement["last_present_commit"],
+                "Present at commit",
+                "retirement-present-at-commit",
+                retirement["present_at_commit"],
             )
         )
     for topic_id in record["topic_ids"]:

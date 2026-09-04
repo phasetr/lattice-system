@@ -596,7 +596,7 @@ def fixture_responses(
                 # Live verification checks the published shape; the catalogue-side
                 # validator is what proves this commit against real history.
                 "retirement": {
-                    "last_present_commit": "0" * 40,
+                    "present_at_commit": "0" * 40,
                     "reason": "Fixture retirement evidence",
                     "superseded_by": [],
                 }
@@ -1366,7 +1366,7 @@ def run_self_tests() -> None:
     for expected_row in (
         '<dd data-field="lifecycle">retired</dd>',
         '<dd data-field="human-status">retired</dd>',
-        '<dd data-field="retirement-last-present-commit">',
+        '<dd data-field="retirement-present-at-commit">',
     ):
         if expected_row not in retired_detail:
             raise AssertionError(

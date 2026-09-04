@@ -253,16 +253,19 @@ Retirement is the only legal way to remove a declaration from the active
 catalogue, whether or not the ID is pinned. When a declaration leaves the Lean
 tree, its record is retired: `lifecycle` becomes `retired`, and
 `retirement` records the reason, the sorted `superseded_by` record IDs (possibly
-none), and one 40-hex `last_present_commit` that is an ancestor of durable
+none), and one 40-hex `present_at_commit` that is an ancestor of durable
 main-branch history and whose tree still declares the recorded Lean name at
-the recorded path. The record's Lean name, module, source path, and status
-dimensions are frozen as the historical description of that former
-declaration. A retired record keeps its stable ID, its canonical human route,
-and its projection fragments; it generates no Lean assertion; no active record
-may depend on it; and its Lean name is not available for reuse. Deleting a
-published record from the catalogue remains a breaking change, and deleting
-one instead of retiring it violates this contract even where no checker
-rejects it.
+the recorded path. That commit is one at which the declaration was present, not
+necessarily the last such commit. The record's Lean name, module, source path,
+and status dimensions are frozen as the historical description of that former
+declaration: they must equal the values durable main-branch history publishes
+for the same record ID, and a record whose ID that history does not publish
+cannot be retired. A retired record keeps its stable ID, its canonical human
+route, and its projection fragments; it generates no Lean assertion; no active
+record may depend on it; and its Lean name is not available for reuse.
+Deleting a published record from the catalogue remains a breaking change, and
+deleting one instead of retiring it violates this contract even where no
+checker rejects it.
 
 Lean names must be fully qualified and begin with `LatticeSystem.`. Valid Lean
 identifier segments may contain Unicode letters and apostrophes. Shorthand,
@@ -474,7 +477,9 @@ JSON Schema keeps both manifest evidence fields structurally optional because
 prototype catalogues before the freeze own neither file. Runtime semantics
 require the pair together and require both in authoritative state; schema
 conditional tests and runtime state-transition tests cover that deliberate
-division.
+division. Both documents carry `schema_version: 1` rather than the catalogue's
+version: they are cutover artefacts, not catalogue records, and the frozen
+cutover checker accepts only version 1.
 
 The post-cutover authority and theorem-PR rules are staged here for review but
 do not take effect while `catalog_state` is `prototype`:
@@ -570,14 +575,18 @@ library and checks:
 - source, source-item, topic, typed provenance, and source-origin integrity;
 - implementation/coverage/trust, kind, capstone, and resolved-axiom invariants;
 - retirement evidence: a retired record is not a capstone, its Lean name is
-  absent from the current tree, its `last_present_commit` is an ancestor of
+  absent from the current tree, its `present_at_commit` is an ancestor of
   durable main-branch history (`origin/main` if that ref resolves, otherwise
   `main`; neither resolving is an error) whose tree declares that name at the
-  recorded path, and its `superseded_by` IDs resolve to active records;
+  recorded path, its frozen fields equal those the same history publishes for
+  that record ID, and its `superseded_by` IDs resolve to active records;
 - fail-closed absence of a retired Lean name: beyond the declaration matcher,
   the retired record is rejected if its short name still occurs in any Lean
-  source under `LatticeSystem/` delimited by Lean identifier boundaries, so that
-  `foo'` and `foo` count as distinct words;
+  source under `LatticeSystem/` delimited by Lean's own identifier-continuation
+  set (ASCII alphanumerics, `_`, `'`, `!`, `?`, the letterlike Greek, Coptic,
+  letterlike-symbol and script ranges, and subscript alphanumerics), so that
+  `foo'` and `foo` count as distinct words while brackets and guillemets end a
+  name;
 - active-only gates: only active records generate Lean assertions, satisfy
   representative prototype coverage, and may be named by another active record's
   axiom dependencies;
