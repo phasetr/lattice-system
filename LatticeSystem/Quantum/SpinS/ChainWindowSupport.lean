@@ -10,14 +10,10 @@ than through a window-specific predicate.  `chainWindow L a b` is the site set, 
 operator commutes with every single-site operator seated at an index below `a` or above `b`.
 
 The endpoints are plain naturals compared against `z.val : ℕ`, so the window truncates at `L - 1`
-instead of wrapping, which is what a window on an open chain means.  Reading them instead as sites
-of `Fin L` would reduce them mod `L` and denote a different set: at `L = 5`, `a = 3`, `b = 7` the
-reduced interval is `Finset.Icc (3 : Fin 5) (2 : Fin 5) = ∅`, whereas this window is `{3, 4}`.
-That reading cannot be written by accident, which is what makes the prohibition airtight rather
-than cautionary: there is no `NatCast (Fin n)` instance, so `(a : Fin L)` for a natural `a` does
-not elaborate at any `L`, and `[NeZero L]` does not supply one — it supplies numeric literals
-(`Fin.instOfNat`) and the explicit `Fin.ofNat`.  The mod-`L` interval has to be spelled out as
-`Finset.Icc (Fin.ofNat L a) (Fin.ofNat L b)`, a deliberate act.
+instead of wrapping, which is what a window on an open chain means.  Reading them as sites of
+`Fin L` instead — `Finset.Icc (a : Fin L) (b : Fin L)` — does not give this truncated window: at
+`L = 5`, `a = 3`, `b = 7` the endpoint `b` comes out as `2` and that interval is empty, where this
+window is `{3, 4}`.  In the default scope that spelling does not elaborate.
 
 Repository-internal material with **no textbook source**: the window is a combinatorial site set
 carrying no spin content.  It has two consumers: Tasaki Proposition 8.4
@@ -62,7 +58,7 @@ above `b`.  This is `supportedOnS_iff_commute_onSiteS` transported along `notMem
 it holds for every `L`, `a` and `b`: no `a ≤ b`, no interior margin, and no relation between the
 endpoints and `L` is needed, and the degenerate parameters are covered — at `b < a` both sides say
 the operator is central, and at `b ≥ L` the right-hand disjunction collapses to `z.val < a`, the
-truncation that separates the window from `Finset.Icc (a : Fin L) (b : Fin L)`. -/
+truncation that separates this window from a mod-`L` reading of its endpoints (module header). -/
 theorem supportedOnS_chainWindow_iff {L a b : ℕ} {op : ManyBodyOpS (Fin L) N} :
     SupportedOnS (chainWindow L a b) op ↔
       ∀ z : Fin L, (z.val < a ∨ b < z.val) →
