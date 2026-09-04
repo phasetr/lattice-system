@@ -14,7 +14,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any, Iterable, NamedTuple
+from typing import Any, Callable, Iterable, NamedTuple
 
 from formalization_cutover import (
     CUTOVER_BASELINE_KEYS,
@@ -4558,11 +4558,84 @@ end LatticeSystem
         "validation error, not a silent skip')",
     )
 
+    # -- the contract prose must pin the four rules this round's rounds already implement, the
+    # same way the bootstrap exception above is pinned: a reader with only the contract, and no
+    # access to the source, must be able to tell each rule apart from its absence. Deleting any
+    # one of these sentences from a mirror copy of the contract must fail this same self-test.
+    for required_contract_phrase in (
+        "A checkout in which neither `origin/main` nor `main` resolves is likewise a "
+        "validation error for active and retired records alike.",
+        "but it must name a record other than the retired record itself, and following "
+        "`superseded_by` from one retired record to the next must never lead back to a "
+        "record already on that path.",
+        "That history is read at the durable main ref itself, except in a checkout whose "
+        "own HEAD is that ref's commit, where it is read at the ref's first parent",
+        "the `LatticeSystem/` tree together with the root umbrella `LatticeSystem.lean`,",
+    ):
+        check(
+            required_contract_phrase in contract_vocabulary_text,
+            "docs/formalization-status-contract.md: does not state a required contract "
+            f"phrase (expected phrase: {required_contract_phrase!r})",
+        )
+
+    # -- (pin, currently red) the contract must also state the two rules record_comparison_base
+    # does not yet honour: a checkout whose first parent is unresolvable only because the
+    # checkout is shallow must be named as an error rather than silently self-compared, and the
+    # first-parent base must be withheld whenever the working tree disagrees with the ref's own
+    # committed record shards. Neither sentence exists in the contract yet, so both fail today;
+    # the fix must add this prose verbatim (or the self-test must be updated to match it).
+    for required_future_contract_phrase in (
+        "a checkout whose first parent is unresolvable because the checkout lacks full "
+        "history is a shallow-history validation error, not a fallback to comparing that "
+        "commit against itself",
+        "the first-parent base is used only when the working tree's record shards are "
+        "identical to the ref's own commit; a dirty working tree is compared against the "
+        "ref itself",
+    ):
+        check(
+            required_future_contract_phrase in contract_vocabulary_text,
+            "docs/formalization-status-contract.md: does not state a required contract "
+            f"phrase (expected phrase: {required_future_contract_phrase!r})",
+        )
+
     # -- main_record_index must not re-read durable main's record shards from scratch for
     # every retired record in a catalogue: `validate_frozen_identity` calls it once per
     # retired record, so an unmemoised implementation re-runs `git ls-tree` plus one `git show`
     # per shard for every single retired record in the catalogue.
     from unittest.mock import patch as memoization_patch
+
+    def assert_git_capture_memoized(label: str, perform_lookup: Callable[[], None]) -> None:
+        """Prove one lookup function reuses git_capture results instead of re-querying git."""
+        # Both memoized lookups below (main_record_index, main_history_ref) are proven by the
+        # same shape: call once, count git_capture invocations, call again with the same
+        # arguments, and require the second call to add none. Duplicating that shape per lookup
+        # let the two blocks drift apart in wording without drifting apart in behaviour.
+        call_log: list[None] = []
+        real_git_capture = git_capture
+
+        def counting_git_capture(
+            root: Path, arguments: list[str]
+        ) -> subprocess.CompletedProcess[str]:
+            """Wrap git_capture to count invocations without changing its behaviour."""
+            call_log.append(None)
+            return real_git_capture(root, arguments)
+
+        with memoization_patch(f"{__name__}.git_capture", side_effect=counting_git_capture):
+            perform_lookup()
+            calls_after_first_lookup = len(call_log)
+            perform_lookup()
+            calls_after_second_lookup = len(call_log)
+        check(
+            calls_after_first_lookup > 0
+            and calls_after_second_lookup == calls_after_first_lookup,
+            f"{label} memoization: the first lookup invoked git_capture "
+            f"{calls_after_first_lookup} time(s) (must be > 0 to prove the reader actually "
+            "ran), and a second lookup for the same arguments invoked git_capture "
+            f"{calls_after_second_lookup - calls_after_first_lookup} more time(s) instead of "
+            "reusing the first lookup's result "
+            f"(first lookup: {calls_after_first_lookup} calls, "
+            f"second lookup: {calls_after_second_lookup} calls)",
+        )
 
     memoization_repo_root = Path(
         tempfile.mkdtemp(prefix="main-record-index-memoization-", dir=fixture_scratch_root)
@@ -4594,33 +4667,9 @@ end LatticeSystem
         )
         fixture_git(["commit", "-q", "-m", "publish one memoization fixture shard"], memoization_repo_root)
 
-        git_capture_call_log: list[None] = []
-        real_git_capture = git_capture
-
-        def counting_git_capture(
-            root: Path, arguments: list[str]
-        ) -> subprocess.CompletedProcess[str]:
-            """Wrap git_capture to count invocations without changing its behaviour."""
-            git_capture_call_log.append(None)
-            return real_git_capture(root, arguments)
-
-        with memoization_patch(
-            f"{__name__}.git_capture", side_effect=counting_git_capture
-        ):
-            main_record_index(memoization_repo_root, "main")
-            calls_after_first_lookup = len(git_capture_call_log)
-            main_record_index(memoization_repo_root, "main")
-            calls_after_second_lookup = len(git_capture_call_log)
-        check(
-            calls_after_first_lookup > 0
-            and calls_after_second_lookup == calls_after_first_lookup,
-            "main_record_index memoization: the first lookup invoked git_capture "
-            f"{calls_after_first_lookup} time(s) (must be > 0 to prove the reader actually ran), "
-            "and a second lookup for the same ref and shard set invoked git_capture "
-            f"{calls_after_second_lookup - calls_after_first_lookup} more "
-            f"time(s) instead of reusing the first lookup's result "
-            f"(first lookup: {calls_after_first_lookup} calls, "
-            f"second lookup: {calls_after_second_lookup} calls)",
+        assert_git_capture_memoized(
+            "main_record_index",
+            lambda: main_record_index(memoization_repo_root, "main"),
         )
     finally:
         shutil.rmtree(memoization_repo_root, ignore_errors=True)
@@ -4909,14 +4958,8 @@ end LatticeSystem
             cycle_b_validation,
         )
         check(
-            any(
-                "superseded_by" in error or "cycle" in error
-                for error in cycle_a_validation.errors
-            )
-            and any(
-                "superseded_by" in error or "cycle" in error
-                for error in cycle_b_validation.errors
-            ),
+            any("cycle" in error for error in cycle_a_validation.errors)
+            and any("cycle" in error for error in cycle_b_validation.errors),
             "supersession graph: a mutual cycle (graph-mutual-a and graph-mutual-b, both "
             "retired, naming each other) was accepted on at least one side "
             f"(errors a: {cycle_a_validation.errors}, errors b: {cycle_b_validation.errors})",
@@ -5043,7 +5086,10 @@ end LatticeSystem
             no_ref_validation,
         )
         check(
-            bool(no_ref_validation.errors),
+            any(
+                "neither origin/main nor main resolves" in error
+                for error in no_ref_validation.errors
+            ),
             "ref-absence fail-open: a checkout whose default branch is named trunk (neither "
             "origin/main nor main resolves) accepted an active follow-up record for an id its "
             "own repository history already publishes as retired, with no error at all "
@@ -5160,36 +5206,345 @@ end LatticeSystem
         fixture_git(["add", "README.md"], main_history_ref_memo_repo_root)
         fixture_git(["commit", "-q", "-m", "seed"], main_history_ref_memo_repo_root)
 
-        ref_call_log: list[None] = []
-        real_git_capture_for_ref = git_capture
-
-        def counting_git_capture_for_ref(
-            root: Path, arguments: list[str]
-        ) -> subprocess.CompletedProcess[str]:
-            """Wrap git_capture to count invocations without changing its behaviour."""
-            ref_call_log.append(None)
-            return real_git_capture_for_ref(root, arguments)
-
-        with memoization_patch(
-            f"{__name__}.git_capture", side_effect=counting_git_capture_for_ref
-        ):
-            main_history_ref(main_history_ref_memo_repo_root)
-            ref_calls_after_first_lookup = len(ref_call_log)
-            main_history_ref(main_history_ref_memo_repo_root)
-            ref_calls_after_second_lookup = len(ref_call_log)
-        check(
-            ref_calls_after_first_lookup > 0
-            and ref_calls_after_second_lookup == ref_calls_after_first_lookup,
-            "main_history_ref memoization: the first lookup invoked git_capture "
-            f"{ref_calls_after_first_lookup} time(s) (must be > 0 to prove the reader actually "
-            "ran), and a second lookup for the same repository invoked git_capture "
-            f"{ref_calls_after_second_lookup - ref_calls_after_first_lookup} more time(s) "
-            "instead of reusing the first lookup's result "
-            f"(first lookup: {ref_calls_after_first_lookup} calls, "
-            f"second lookup: {ref_calls_after_second_lookup} calls)",
+        assert_git_capture_memoized(
+            "main_history_ref",
+            lambda: main_history_ref(main_history_ref_memo_repo_root),
         )
     finally:
         shutil.rmtree(main_history_ref_memo_repo_root, ignore_errors=True)
+
+    # -- (fix 1, currently red) a shallow clone's unresolvable first parent must fail closed
+    # as a named shallow-history error, not fall back to comparing HEAD against itself: a
+    # `--depth 1` clone resolves origin/main but not its parent, which is exactly the shape a
+    # root commit also produces, so the two must be told apart rather than folded together.
+    shallow_history_source_root = Path(
+        tempfile.mkdtemp(prefix="shallow-history-source-", dir=fixture_scratch_root)
+    )
+    shallow_history_clone_root: Path | None = None
+    try:
+        fixture_git(["init", "-q", "-b", "main"], shallow_history_source_root)
+        shallow_shard_dir = shallow_history_source_root / "formalization-status" / "v2" / "records"
+        shallow_shard_dir.mkdir(parents=True, exist_ok=True)
+        shallow_shard_path = shallow_shard_dir / "shallow-shard.json"
+
+        def write_shallow_shard(lifecycle: str) -> None:
+            """Publish rec-shallow on the shallow-history fixture's shard tree."""
+            record: dict[str, Any] = {"id": "rec-shallow", "lifecycle": lifecycle}
+            record["retirement"] = (
+                {
+                    "present_at_commit": "a" * 40,
+                    "reason": "fixture: rec-shallow retired on durable main",
+                    "superseded_by": [],
+                }
+                if lifecycle == "retired"
+                else None
+            )
+            shallow_shard_path.write_text(
+                json.dumps(
+                    {
+                        "records": [record],
+                        "schema_version": 2,
+                        "source_id": "shallow-fixture",
+                        "source_unit": "fixture",
+                    },
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+        write_shallow_shard("retired")
+        fixture_git(
+            ["add", "formalization-status/v2/records/shallow-shard.json"],
+            shallow_history_source_root,
+        )
+        fixture_git(["commit", "-q", "-m", "publish rec-shallow retired"], shallow_history_source_root)
+        write_shallow_shard("active")
+        fixture_git(
+            ["add", "formalization-status/v2/records/shallow-shard.json"],
+            shallow_history_source_root,
+        )
+        fixture_git(
+            ["commit", "-q", "-m", "publish rec-shallow active again, on main's own tip"],
+            shallow_history_source_root,
+        )
+
+        shallow_history_clone_root = Path(
+            tempfile.mkdtemp(prefix="shallow-history-clone-", dir=fixture_scratch_root)
+        )
+        shutil.rmtree(shallow_history_clone_root)
+        subprocess.run(
+            [
+                "git",
+                "clone",
+                "--depth",
+                "1",
+                f"file://{shallow_history_source_root}",
+                str(shallow_history_clone_root),
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        shallow_validation = Validation()
+        validate_retirement(
+            {"id": "rec-shallow", "lifecycle": "active", "retirement": None},
+            "shallow-history-clone",
+            contract,
+            shallow_history_clone_root,
+            {},
+            shallow_validation,
+        )
+        check(
+            any(
+                "shallow" in error.lower() and "history" in error.lower()
+                for error in shallow_validation.errors
+            ),
+            "shallow-history fail-open: a --depth 1 clone whose HEAD equals origin/main, and "
+            "whose first parent is therefore unresolvable, accepted an active follow-up for "
+            "an id that full history publishes as retired, instead of reporting a named "
+            f"shallow-history validation error (errors: {shallow_validation.errors})",
+        )
+    finally:
+        shutil.rmtree(shallow_history_source_root, ignore_errors=True)
+        if shallow_history_clone_root is not None:
+            shutil.rmtree(shallow_history_clone_root, ignore_errors=True)
+
+    # -- positive control: a shallow clone of a genuine root commit must still be accepted;
+    # nothing precedes a root commit, so self-comparison there is correct, not a fallback.
+    root_commit_source_root = Path(
+        tempfile.mkdtemp(prefix="shallow-history-root-source-", dir=fixture_scratch_root)
+    )
+    root_commit_clone_root: Path | None = None
+    try:
+        fixture_git(["init", "-q", "-b", "main"], root_commit_source_root)
+        root_commit_shard_dir = root_commit_source_root / "formalization-status" / "v2" / "records"
+        root_commit_shard_dir.mkdir(parents=True, exist_ok=True)
+        (root_commit_shard_dir / "root-shard.json").write_text(
+            json.dumps(
+                {
+                    "records": [{"id": "rec-root", "lifecycle": "active", "retirement": None}],
+                    "schema_version": 2,
+                    "source_id": "root-fixture",
+                    "source_unit": "fixture",
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        fixture_git(
+            ["add", "formalization-status/v2/records/root-shard.json"], root_commit_source_root
+        )
+        fixture_git(
+            ["commit", "-q", "-m", "publish rec-root active, the only commit"],
+            root_commit_source_root,
+        )
+
+        root_commit_clone_root = Path(
+            tempfile.mkdtemp(prefix="shallow-history-root-clone-", dir=fixture_scratch_root)
+        )
+        shutil.rmtree(root_commit_clone_root)
+        subprocess.run(
+            [
+                "git",
+                "clone",
+                "--depth",
+                "1",
+                f"file://{root_commit_source_root}",
+                str(root_commit_clone_root),
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        root_commit_validation = Validation()
+        validate_retirement(
+            {"id": "rec-root", "lifecycle": "active", "retirement": None},
+            "shallow-history-root-clone",
+            contract,
+            root_commit_clone_root,
+            {},
+            root_commit_validation,
+        )
+        check(
+            not root_commit_validation.errors,
+            "shallow-history root-commit positive control: a --depth 1 clone of a single-"
+            "commit history rejected an active record with no retirement anywhere in history "
+            f"(errors: {root_commit_validation.errors})",
+        )
+    finally:
+        shutil.rmtree(root_commit_source_root, ignore_errors=True)
+        if root_commit_clone_root is not None:
+            shutil.rmtree(root_commit_clone_root, ignore_errors=True)
+
+    # -- (fix 3, currently red) the first-parent base must be withheld when the working tree
+    # disagrees with HEAD's own committed record shards: a run validating an uncommitted edit
+    # on top of main's tip is not "the commit main just published", so it must be compared
+    # against that tip itself, not against the tip's parent.
+    dirty_tree_repo_root = Path(
+        tempfile.mkdtemp(prefix="dirty-tree-base-", dir=fixture_scratch_root)
+    )
+    try:
+        fixture_git(["init", "-q", "-b", "main"], dirty_tree_repo_root)
+        dirty_tree_shard_dir = dirty_tree_repo_root / "formalization-status" / "v2" / "records"
+        dirty_tree_shard_dir.mkdir(parents=True, exist_ok=True)
+        dirty_tree_shard_path = dirty_tree_shard_dir / "dirty-tree-shard.json"
+
+        def write_dirty_tree_shard(lifecycle: str) -> None:
+            """Publish rec-dirty on the dirty-tree fixture's shard tree."""
+            record: dict[str, Any] = {"id": "rec-dirty", "lifecycle": lifecycle}
+            record["retirement"] = (
+                {
+                    "present_at_commit": "a" * 40,
+                    "reason": "fixture: rec-dirty retired on main's own tip",
+                    "superseded_by": [],
+                }
+                if lifecycle == "retired"
+                else None
+            )
+            dirty_tree_shard_path.write_text(
+                json.dumps(
+                    {
+                        "records": [record],
+                        "schema_version": 2,
+                        "source_id": "dirty-tree-fixture",
+                        "source_unit": "fixture",
+                    },
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+        write_dirty_tree_shard("active")
+        fixture_git(
+            ["add", "formalization-status/v2/records/dirty-tree-shard.json"],
+            dirty_tree_repo_root,
+        )
+        fixture_git(["commit", "-q", "-m", "publish rec-dirty active"], dirty_tree_repo_root)
+        write_dirty_tree_shard("retired")
+        fixture_git(
+            ["add", "formalization-status/v2/records/dirty-tree-shard.json"],
+            dirty_tree_repo_root,
+        )
+        fixture_git(
+            ["commit", "-q", "-m", "publish rec-dirty retired, main's own tip"],
+            dirty_tree_repo_root,
+        )
+        # Reactivate the shard on disk without committing: HEAD (and its committed tree) still
+        # publish rec-dirty retired, only the working tree disagrees.
+        write_dirty_tree_shard("active")
+
+        dirty_tree_validation = Validation()
+        validate_retirement(
+            {"id": "rec-dirty", "lifecycle": "active", "retirement": None},
+            "dirty-tree-base",
+            contract,
+            dirty_tree_repo_root,
+            {},
+            dirty_tree_validation,
+        )
+        check(
+            any(
+                "retired" in error and "terminal" in error
+                for error in dirty_tree_validation.errors
+            ),
+            "dirty-tree base: HEAD is main's own tip, which publishes rec-dirty retired, but "
+            "the working tree's shard was reactivated without a commit; the candidate active "
+            "record was accepted instead of rejected because the base was still taken as the "
+            f"tip's parent rather than the dirty tip itself (errors: {dirty_tree_validation.errors})",
+        )
+    finally:
+        shutil.rmtree(dirty_tree_repo_root, ignore_errors=True)
+
+    # -- (fix 4, currently red) the umbrella read inside current_lean_declaration_names must
+    # tolerate non-UTF-8 bytes the same way lean_leaf_mention does, so a raw byte in the tracked
+    # root umbrella fails the retired-name absence proof closed instead of raising out of the
+    # validator entirely.
+    umbrella_decode_root = Path(
+        tempfile.mkdtemp(prefix="umbrella-decode-", dir=fixture_scratch_root)
+    )
+    try:
+        (umbrella_decode_root / "LatticeSystem").mkdir(parents=True, exist_ok=True)
+        umbrella_decode_path = umbrella_decode_root / "LatticeSystem.lean"
+        umbrella_decode_path.write_bytes(
+            b"namespace LatticeSystem\n\n"
+            b"theorem badByte : True := trivial -- \xff\n\n"
+            b"end LatticeSystem\n"
+        )
+        try:
+            current_lean_declaration_names(umbrella_decode_root)
+        except UnicodeDecodeError as error:
+            umbrella_decode_error: UnicodeDecodeError | None = error
+        else:
+            umbrella_decode_error = None
+        check(
+            umbrella_decode_error is None,
+            "umbrella decode: a raw 0xff byte in the tracked root umbrella LatticeSystem.lean "
+            f"made current_lean_declaration_names raise {umbrella_decode_error!r} instead of "
+            "returning normally, the way the LatticeSystem/ tree half of the same absence "
+            "proof already tolerates a bad byte",
+        )
+    finally:
+        shutil.rmtree(umbrella_decode_root, ignore_errors=True)
+
+    # -- (fix 5, currently red) the mention scan of the project's Lean sources must be
+    # performed once per validator run, not once per retired record: `lean_leaf_mention` is
+    # called once per retired record, and each call currently re-lists and re-reads every Lean
+    # source under project_lean_sources from scratch.
+    scan_reuse_root = Path(tempfile.mkdtemp(prefix="scan-reuse-", dir=fixture_scratch_root))
+    try:
+        (scan_reuse_root / "LatticeSystem").mkdir(parents=True, exist_ok=True)
+        (scan_reuse_root / "LatticeSystem" / "ScanReuseFixture.lean").write_text(
+            "namespace LatticeSystem\n\ntheorem stillHere : True := trivial\n\n"
+            "end LatticeSystem\n",
+            encoding="utf-8",
+        )
+
+        scan_call_log: list[None] = []
+        real_project_lean_sources = project_lean_sources
+
+        def counting_project_lean_sources(root: Path) -> list[Path]:
+            """Wrap project_lean_sources to count invocations without changing behaviour."""
+            scan_call_log.append(None)
+            return real_project_lean_sources(root)
+
+        with memoization_patch(
+            f"{__name__}.project_lean_sources", side_effect=counting_project_lean_sources
+        ):
+            for retired_leaf in ("recA", "recB", "recC"):
+                lean_leaf_mention(scan_reuse_root, f"LatticeSystem.{retired_leaf}")
+        check(
+            len(scan_call_log) == 1,
+            "scan reuse: three lean_leaf_mention calls simulating three retired records in "
+            f"one validator run invoked project_lean_sources {len(scan_call_log)} time(s) "
+            "instead of exactly once; the scan must be shared across the whole run, not "
+            "repeated per retired record",
+        )
+    finally:
+        shutil.rmtree(scan_reuse_root, ignore_errors=True)
+
+    # -- (fix 6, currently red) the published legacy authority page must not describe its own
+    # records as "version 1 JSON records": the page is a version-2 record page under the v2
+    # cutover, and the contract states that version 1's machine URLs are no longer published.
+    legacy_index_path = repo_root / "docs" / "formalization" / "legacy" / "index.md"
+    legacy_index_text = legacy_index_path.read_text(encoding="utf-8")
+    check(
+        "version 1 JSON records" not in legacy_index_text,
+        "docs/formalization/legacy/index.md: describes its own records as 'version 1 JSON "
+        "records', which the contract's version-2 cutover makes false",
+    )
+    check(
+        "records are schema version 1" not in legacy_index_text,
+        "docs/formalization/legacy/index.md: describes its own records as schema version 1",
+    )
+    # Positive control: the corrected wording must not itself trip the same gate.
+    corrected_legacy_index_text = legacy_index_text.replace(
+        "version 1 JSON records", "version 2 JSON records"
+    )
+    check(
+        "version 1 JSON records" not in corrected_legacy_index_text,
+        "docs/formalization/legacy/index.md gate: the corrected 'version 2 JSON records' "
+        "wording still trips the 'version 1 JSON records' gate (positive control failed)",
+    )
 
     return failures
 

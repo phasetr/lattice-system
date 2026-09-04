@@ -2909,6 +2909,49 @@ def run_self_tests() -> None:
         else:
             raise AssertionError("second Pages deployment owner was accepted")
 
+    # -- (currently red) the checkout step preceding every validator invocation in both
+    # workflows must pin fetch-depth: 0, because a shallow checkout resolves origin/main but
+    # not its parent, which silently switches off the durable-history comparison the validator
+    # relies on; nothing today asserts this, so the one line keeping that guard alive can be
+    # deleted with no signal at all.
+    for fetch_depth_mutation_label, mutate_fetch_depth in (
+        (
+            "fetch-depth changed to 1",
+            lambda text: text.replace("fetch-depth: 0", "fetch-depth: 1"),
+        ),
+        (
+            "fetch-depth line removed",
+            lambda text: re.sub(r"[ \t]*fetch-depth: 0\n", "", text),
+        ),
+    ):
+        with tempfile.TemporaryDirectory(
+            prefix="formalization-workflow-fetch-depth-",
+            dir=REPO_ROOT / ".self-local/tmp",
+        ) as fetch_depth_temporary:
+            fetch_depth_root = Path(fetch_depth_temporary)
+            fetch_depth_workflows = fetch_depth_root / ".github/workflows"
+            fetch_depth_workflows.mkdir(parents=True)
+            for workflow_name in ("formalization_pages.yml", "lean_action_ci.yml"):
+                source_text = (REPO_ROOT / ".github/workflows" / workflow_name).read_text(
+                    encoding="utf-8"
+                )
+                (fetch_depth_workflows / workflow_name).write_text(
+                    mutate_fetch_depth(source_text), encoding="utf-8"
+                )
+            try:
+                check_workflow_invariants(fetch_depth_root)
+            except ValueError as error:
+                if "fetch-depth" not in str(error):
+                    raise AssertionError(
+                        f"fetch-depth mutation ({fetch_depth_mutation_label}) on both "
+                        f"workflows failed for an unrelated reason: {error}"
+                    ) from error
+            else:
+                raise AssertionError(
+                    f"fetch-depth mutation ({fetch_depth_mutation_label}) on both workflows "
+                    "was accepted by check_workflow_invariants instead of being rejected"
+                )
+
     # -- status schema v2: retired-record rendering regressions -----------------------------
     # These are placed last so every self-test above keeps running first; a raised
     # AssertionError below stops the function, matching this module's fail-fast idiom.
