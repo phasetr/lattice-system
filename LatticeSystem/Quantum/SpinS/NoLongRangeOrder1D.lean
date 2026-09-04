@@ -121,6 +121,49 @@ theorem totalSpinSOpVec_mulVec_eq_zero_of_unique_ground {Λ : Type*} [Fintype Λ
   · exact h2
   · exact h3
 
+/-- **Every ground state of the zero-field antiferromagnetic ring is SU(2) invariant.**  For an
+even ring of length `L ≥ 2` at spin `S = N/2` with `N ≥ 1`, every normalized ground state `Φ` of
+`staggeredFieldChainHamiltonianS L 0 N` is annihilated by each total-spin generator:
+`Ŝ_tot^{(α)} Φ = 0` for every axis `α : Fin 3` (Lean axis `α` is Tasaki's `α` minus one).  This is
+Tasaki's fourth sentence read at the ring.
+
+The zero-field ring is the antiferromagnetic Heisenberg ring
+(`staggeredFieldChainHamiltonianS_zero_eq_afmHeisenberg`), whose ground energy carries a
+one-dimensional eigenspace by Marshall–Lieb–Mattis (`afm_ring_ground_state_data`, the condition
+(3.4.4) input of Tasaki's first sentence) and which commutes with all three total-spin generators.
+The eigenspace datum is about the energy, not about a particular vector, so
+`groundState_mulVec_eq_hermitianMinEigenvalue` identifies the given `Φ`'s eigenvalue with that
+ground energy and `totalSpinSOpVec_mulVec_eq_zero_of_unique_ground` applies to `Φ` itself.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §4.1, Corollary 4.3, p. 77; §2.5, Theorem 2.2 (Marshall–Lieb–Mattis), p. 39. -/
+theorem afmRing_groundState_totalSpin_annihilate (L N : ℕ) (hLeven : Even L) (hL2 : 2 ≤ L)
+    (hN : 1 ≤ N) {Φ : (Fin L → Fin (N + 1)) → ℂ} (hΦnorm : star Φ ⬝ᵥ Φ = 1)
+    (hΦgs : ∃ E₀ : ℂ, (staggeredFieldChainHamiltonianS L 0 N).mulVec Φ = E₀ • Φ ∧
+      (∀ E : ℂ, ∀ Ψ : (Fin L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
+        (staggeredFieldChainHamiltonianS L 0 N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re) ∧ Φ ≠ 0)
+    (α : Fin 3) : (totalSpinSOpVec (Fin L) N α).mulVec Φ = 0 := by
+  obtain ⟨E₀c, heig, hmin, hΦne⟩ := hΦgs
+  rw [staggeredFieldChainHamiltonianS_zero_eq_afmHeisenberg] at heig hmin
+  obtain ⟨E₀, Φ_GS, hE, hΦ_GS_ne, hΦ_GS_eig, hfin, -⟩ :=
+    afm_ring_ground_state_data L N hLeven hL2 hN
+  have hHafm := afmHeisenbergChainHamiltonianS_isHermitian L N
+  have hE₀eq : hermitianMinEigenvalue hHafm = E₀ := by
+    refine le_antisymm ?_ ?_
+    · simpa using hermitianMinEigenvalue_le_re_of_eigenpair hHafm hΦ_GS_ne hΦ_GS_eig
+    · obtain ⟨w, hw, hweig⟩ := exists_nonzero_eigenvector_hermitianMinEigenvalue hHafm
+      exact hE.2 _ ⟨w, hw, hweig⟩
+  have hΦE : (afmHeisenbergChainHamiltonianS L N).mulVec Φ = (E₀ : ℂ) • Φ := by
+    rw [← hE₀eq]
+    exact groundState_mulVec_eq_hermitianMinEigenvalue hHafm hΦnorm heig hmin
+  refine totalSpinSOpVec_mulVec_eq_zero_of_unique_ground _ (E₀ : ℂ) hfin hΦne hΦE ?_ ?_ ?_ α
+  · rw [afmHeisenbergChainHamiltonianS]
+    exact (heisenbergHamiltonianS_commute_totalSpinSOp1 (ringCoupling L)).eq
+  · rw [afmHeisenbergChainHamiltonianS]
+    exact (heisenbergHamiltonianS_commute_totalSpinSOp2 (ringCoupling L)).eq
+  · rw [afmHeisenbergChainHamiltonianS]
+    exact sub_eq_zero.mp (heisenbergHamiltonianS_commutator_totalSpinSOp3 (ringCoupling L) N)
+
 /-- **Tasaki Corollary 4.3 from Theorem 4.2 (his own proof, by contraposition), CONDITIONAL
 THEOREM.**  Assuming `h42` — the conclusion of Theorem 4.2 (eq. (4.1.10), p. 77) verbatim, that the
 per-site staggered moment of every normalized ground state of the staggered-field ring `Ĥ_h`
