@@ -1179,6 +1179,51 @@ def _approved_replacements(text: str) -> str:
             "#5413, previously named as the successor discharge issue, is closed as not planned; "
             "#5416 is open and covers Cor 4.3's route rather than the discharge.",
         )
+        # #5426 strengthens the recorded Corollary 4.3 statement from `α = 3` alone to
+        # `∀ α : Fin 3`, reading off Tasaki's own fourth sentence on p. 77 (SU(2) invariance of the
+        # unique ground state), and closes #5416. (Applied last: matches text the pair above
+        # inserts.)
+        .replace(
+            "and not a discharge of Cor 4.3: that "
+            "reduction and the documented axiom it consumed have since been deleted, Cor 4.3 now "
+            "following Tasaki's own contraposition from Thm 4.2, which leaves both open. Issue "
+            "#5413, previously named as the successor discharge issue, is closed as not planned; "
+            "#5416 is open and covers Cor 4.3's route rather than the discharge.",
+            "and not a discharge of Cor 4.3: that "
+            "reduction and the documented axiom it consumed have since been deleted, Cor 4.3 now "
+            "following Tasaki's own contraposition from Thm 4.2 for all three Cartesian axes, "
+            "which leaves both open. Issue "
+            "#5413, previously named as the successor discharge issue, is closed as not planned.",
+        )
+        .replace(
+            "the squared staggered order parameter per site vanishes in "
+            "the thermodynamic limit `lim_{L↑∞} ⟨Φ_GS\\|(Ô_L^(3)/L)²\\|Φ_GS⟩ = 0` (ε–δ form). "
+            "**Conditional, and a discharge of nothing** (PR #5420): for `N ≥ 1` it is Tasaki's own "
+            "proof of the corollary, `no_long_range_order_1d_of_theorem_4_2`",
+            "the squared staggered order parameter per site vanishes in "
+            "the thermodynamic limit for all three Cartesian axes, "
+            "`lim_{L↑∞} ⟨Φ_GS\\|(Ô_L^(α)/L)²\\|Φ_GS⟩ = 0` for `∀ α : Fin 3` (ε–δ form; Lean's "
+            "index is Tasaki's `α` minus one). "
+            "**Conditional, and a discharge of nothing** (PR #5427): for `N ≥ 1` the `α = 3` "
+            "instance is Tasaki's own proof of the corollary, `no_long_range_order_1d_of_theorem_4_2`",
+        )
+        .replace(
+            "which is itself conditional on the "
+            "documented axiom `shastryEnergyGain`. Both Corollary 4.3 and Theorem 4.2 remain open: "
+            "Tasaki does not prove Theorem 4.2 (footnote 3, p. 76) and nothing here reconstructs "
+            "the argument he cites. Only the degenerate spin-0 case `N = 0` is unconditional (the "
+            "staggered order operator vanishes). `#print axioms` = "
+            "`[propext, Classical.choice, Quot.sound, shastryEnergyGain]`",
+            "which is itself conditional on the "
+            "documented axiom `shastryEnergyGain`; the other two axes are transported from it by "
+            "`afmRing_groundState_totalSpin_annihilate` and the generic su(2) bridge "
+            "`totalSpinSOpVec_mulVec_eq_zero_of_unique_ground`. Both Corollary 4.3 and Theorem 4.2 "
+            "remain open: "
+            "Tasaki does not prove Theorem 4.2 (footnote 3, p. 76) and nothing here reconstructs "
+            "the argument he cites. Only the degenerate spin-0 case `N = 0` is unconditional (the "
+            "staggered order operator vanishes on every axis). `#print axioms` = "
+            "`[propext, Classical.choice, Quot.sound, shastryEnergyGain]`",
+        )
     )
 
 

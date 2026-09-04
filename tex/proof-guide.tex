@@ -13322,8 +13322,9 @@ the Corollary 4.3 \emph{conditional reduction} and related RP machinery, not a r
 Thm.~4.2 itself and not a discharge of Cor.~4.3: that reduction and the documented axiom it
 consumed have since been deleted, Cor.~4.3 now following Tasaki's own contraposition from
 Thm.~4.2, which leaves both open.  Issue \#5413, previously named as the successor discharge
-issue, is closed as not planned; \#5416 is open and covers Cor.~4.3's route rather than the
-discharge.  The first layer establishes the even-ring \emph{bond reflection}
+issue, is closed as not planned; the route now proves Cor.~4.3's conclusion for all three
+Cartesian axes, not $\alpha=3$ alone (Issue \#5426).  The first layer establishes the even-ring
+\emph{bond reflection}
 $r(x) = 2n-1-x$ (\texttt{RingBondReflection.lean}: involutive, swapping the two halves, flipping the
 staggered sign) and the induced \emph{reflection map} $\theta(A)_{\sigma\tau} =
 \overline{A_{\rho\sigma,\rho\tau}}$ (\texttt{RingReflectionTheta.lean}: an antilinear
@@ -13903,21 +13904,35 @@ This is the second-order perturbation gate toward Theorem 4.2 long-range order, 
 inference ($\chi$1 $\to$ $\chi$2 $\to$ Theorem 4.2).
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; \emph{conditional} theorem,
-\texttt{Quantum/SpinS/NoLongRangeOrder1D.lean}, Issue \#5416).  Absence of long-range order in one
+\texttt{Quantum/SpinS/NoLongRangeOrder1D.lean}, Issue \#5426).  Absence of long-range order in one
 dimension on \textbf{even} rings: for the zero-field 1D spin-$S$ antiferromagnetic Heisenberg ring on
 \textbf{even} $L$ sites (faithful to Tasaki §3.1/§4.1.1, which define the lattice for even $L$ only;
 only bipartite rings carry a balanced staggered sublattice), the squared staggered order parameter per
-site vanishes in the thermodynamic limit,
-$\lim_{L\uparrow\infty}\langle\Phi_{\mathrm{GS}}|(\hat O_L^{(3)}/L)^2|\Phi_{\mathrm{GS}}\rangle=0$
-(eq.~(4.1.11)).  We record \texttt{no\_long\_range\_order\_1d} in explicit $\varepsilon$--$\delta$ form
-over the zero-field ring family with normalized ground states.
+site vanishes in the thermodynamic limit, for \textbf{every} Cartesian axis
+$\alpha\in\{1,2,3\}$,
+$\lim_{L\uparrow\infty}\langle\Phi_{\mathrm{GS}}|(\hat O_L^{(\alpha)}/L)^2|\Phi_{\mathrm{GS}}\rangle=0$
+(eq.~(4.1.11)).  We record \texttt{no\_long\_range\_order\_1d} in explicit $\varepsilon$--$\delta$ form,
+quantified over $\forall\,\alpha:\mathrm{Fin}\,3$ (Lean's index is Tasaki's $\alpha$ minus one), over
+the zero-field ring family with normalized ground states.
 
 \emph{Tasaki's own proof, by contraposition.}  His proof on p.~77 is four sentences, of which the
 first two carry the contraposition: ``The condition (3.4.4) for Theorem 3.2 (p.~70) is satisfied
 because of the Marshall--Lieb--Mattis theorem (Theorem 2.2 in p.~39).  Since the conclusion (3.4.22)
 of Theorem 3.2 does not hold, the other condition (3.4.3) must be violated.''  The third reads off
-(4.1.11) at $\alpha=3$, the instance recorded here, and the fourth extends it to $\alpha=1,2$ by
-SU(2) invariance of the unique ground state.
+(4.1.11) at $\alpha=3$, and the fourth extends it to $\alpha=1,2$ by SU(2) invariance of the unique
+ground state --- ``the same bound holds for $\alpha=1$ or $2$ because the unique ground state
+$|\Phi_{\mathrm{GS}}\rangle$ is SU(2) invariant'' (p.~77, sentence 4).  \textbf{Both steps are now
+recorded.}  The su(2) bridge is
+\texttt{totalSpinSOpVec\_mulVec\_eq\_zero\_of\_unique\_ground}: a unique ground state of an operator
+commuting with all three total-spin generators is annihilated by each of them (a one-dimensional
+invariant subspace of su(2) carries the trivial representation).  Its ring specialisation is
+\texttt{afmRing\_groundState\_totalSpin\_annihilate}: every normalized ground state of the zero-field
+antiferromagnetic ring is annihilated by $\hat S^{(1)}_{\mathrm{tot}}$, $\hat S^{(2)}_{\mathrm{tot}}$
+and $\hat S^{(3)}_{\mathrm{tot}}$.  Feeding this into the $\alpha=3$ identity (which needs only
+$\hat S^{(1)}_{\mathrm{tot}}\Phi=0=\hat S^{(3)}_{\mathrm{tot}}\Phi$, via the Falk--Bruch-style
+identities \texttt{staggeredOrder\_sq\_expectation\_eq\_12}/\texttt{\_23}) transports the squared
+staggered-order expectation to every axis, so \texttt{no\_long\_range\_order\_1d} now states
+eq.~(4.1.11) for $\forall\,\alpha:\mathrm{Fin}\,3$, while
 \texttt{no\_long\_range\_order\_1d\_of\_theorem\_4\_2} runs that argument, taking the conclusion
 of Theorem 4.2 verbatim as its hypothesis.  Negating the conclusion produces \emph{one} even volume
 $L$ --- as large as required --- at which some normalized ground state $\Phi$ of the zero-field ring

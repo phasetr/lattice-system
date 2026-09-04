@@ -87,10 +87,14 @@ order-operator inputs it records — the no-SSB condition (3.4.4) at the ring, a
 at the ring order operator — are what Tasaki's own proof of Corollary 4.3 (contraposition against
 Theorem 3.2, p. 77) consumes, and `no_long_range_order_1d` is now assembled from them and
 Theorem 4.2: it reports `shastryEnergyGain` in its axiom set, exactly as
-`shastry_no_symmetry_breaking_1d` does, and both capstone statements are unchanged. That moved the
+`shastry_no_symmetry_breaking_1d` does. `no_long_range_order_1d` was later strengthened, in the
+same axiom set, to state eq. (4.1.11) for all three Cartesian axes rather than the `α = 3` instance
+alone, reading off Tasaki's own fourth sentence on p. 77 (SU(2) invariance of the unique ground
+state); `shastry_no_symmetry_breaking_1d` is unchanged. That moved the
 corollary off a susceptibility axiom of its own, which is deleted with the reduction that consumed
 it; it discharged nothing, and both Corollary 4.3 and Theorem 4.2 remain open. The assembly is
-tracked in [#5416](https://github.com/phasetr/lattice-system/issues/5416).
+tracked in [#5416](https://github.com/phasetr/lattice-system/issues/5416), closed, and the
+all-axes strengthening in [#5426](https://github.com/phasetr/lattice-system/issues/5426).
 
 The no-SSB condition (3.4.4) at the ring is footnote 21 of p. 65 taken at `Û := Θ`, the many-body
 spin reversal: `Θ` commutes with the ring Hamiltonian and reverses the staggered order operator, so
