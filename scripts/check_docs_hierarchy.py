@@ -1563,8 +1563,10 @@ def unrecognized_argument_self_test() -> None:
                 "a copy that ignores argv from re-entering this probe without end"
             )
         script_text = script_text.replace(own_call, "")
-        # The deleted-row self-test runs this file from a clone with its own call already
-        # stripped, so that call is absent on the nested pass and its removal is best-effort.
+        # The deleted-row self-test clones and runs a script of its own, so a copy that
+        # reached its call would buy a probe this fixture does not measure and report that
+        # probe's failure as this one's. A copy without the call cannot misreport that way,
+        # so unlike the call above the removal is best-effort.
         script_text = script_text.replace(
             "    deleted_row_registry_negative_self_tests()\n", ""
         )
