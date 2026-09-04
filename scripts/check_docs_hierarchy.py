@@ -9,9 +9,12 @@ import posixpath
 import re
 import subprocess
 import sys
+import tempfile
 from collections import Counter, defaultdict
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
+
+from validate_formalization_status import lean_leaf_mention
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1348,9 +1351,119 @@ def public_target(
     return target_page, parsed.fragment
 
 
+def deleted_row_registry_mention_semantics_self_test() -> None:
+    """A row's subject must count as present when it is only spelled inside a comment.
+
+    The eventual guard on `DELETED_CATALOGUE_ROW_NAMES` is required to reuse
+    `lean_leaf_mention`'s whole-file scan rather than a declaration-only parser, precisely so a
+    name still spelled anywhere in the tree (declaration or prose) blocks the drop. This pins
+    that reused predicate's own behaviour on a synthetic fixture, independent of the real tree.
+    """
+    with tempfile.TemporaryDirectory(prefix="deleted-row-mention-") as scratch:
+        fixture_root = Path(scratch)
+        fixture_lean = fixture_root / "LatticeSystem" / "Fixture.lean"
+        fixture_lean.parent.mkdir(parents=True)
+        fixture_lean.write_text(
+            "-- mentions ghostRetiredLemma only here, in a comment; nothing declares it\n"
+        )
+        if lean_leaf_mention(fixture_root, "LatticeSystem.ghostRetiredLemma") is None:
+            fail(
+                "deleted-row-registry mention self-test: a comment-only mention of "
+                "ghostRetiredLemma must count as still present, but lean_leaf_mention found none"
+            )
+
+
+def deleted_row_registry_negative_self_tests() -> None:
+    """`DELETED_CATALOGUE_ROW_NAMES` must refuse a name that is still declared in the Lean tree.
+
+    The registry drops a catalogue row on the strength of its Lean-name cell alone; nothing
+    today proves the named declaration is actually gone from `LatticeSystem/`. This reproduces
+    that fail-open in a disposable clone: register a name that is genuinely still declared
+    (`oscillatorStrength_abs_le`, `LatticeSystem/Quantum/SpinS/OscillatorStrengthBound.lean`) and
+    drop its row from the live legacy page, the same edit an incautious future PR could make by
+    hand. The checker must reject this; today it does not.
+    """
+    with tempfile.TemporaryDirectory(prefix="deleted-row-registry-") as scratch:
+        mirror = Path(scratch) / "mirror"
+        subprocess.run(
+            ["git", "clone", "--quiet", "--shared", str(ROOT), str(mirror)], check=True
+        )
+
+        baseline = subprocess.run(
+            [sys.executable, "scripts/check_docs_hierarchy.py"],
+            cwd=mirror,
+            capture_output=True,
+            text=True,
+        )
+        if baseline.returncode != 0:
+            fail(
+                "deleted-row-registry self-test setup failed: the unmodified mirror does not "
+                f"pass (exit={baseline.returncode}): {baseline.stderr}"
+            )
+
+        script_path = mirror / "scripts" / "check_docs_hierarchy.py"
+        script_text = script_path.read_text()
+        registered = (
+            'DELETED_CATALOGUE_ROW_NAMES = (\n'
+            '    "no_long_range_order_1d_of_susceptibility",\n'
+            '    "shastry_staggered_susceptibility_subcubic",\n'
+            ')\n'
+            'DELETED_CATALOGUE_ROW_COUNTS = (1, 1)\n'
+        )
+        mutated = (
+            'DELETED_CATALOGUE_ROW_NAMES = (\n'
+            '    "no_long_range_order_1d_of_susceptibility",\n'
+            '    "shastry_staggered_susceptibility_subcubic",\n'
+            '    "oscillatorStrength_abs_le",\n'
+            ')\n'
+            'DELETED_CATALOGUE_ROW_COUNTS = (1, 1, 1)\n'
+        )
+        if registered not in script_text:
+            fail("deleted-row-registry self-test could not locate the registry literal to mutate")
+        script_path.write_text(script_text.replace(registered, mutated))
+
+        legacy_page = (
+            mirror
+            / "docs"
+            / "formalization"
+            / "legacy"
+            / "16-horsch-von-der-linden-low-lying-states-tasaki-3-4-theorem--part-01.md"
+        )
+        legacy_text = legacy_page.read_text()
+        row_pattern = re.compile(r"^\| `oscillatorStrength_abs_le` \|.*\n", re.MULTILINE)
+        mutated_legacy, row_drops = row_pattern.subn("", legacy_text)
+        if row_drops != 1:
+            fail(
+                "deleted-row-registry self-test could not find exactly one live "
+                f"oscillatorStrength_abs_le row (found {row_drops})"
+            )
+        legacy_page.write_text(mutated_legacy)
+
+        probe = subprocess.run(
+            [sys.executable, "scripts/check_docs_hierarchy.py"],
+            cwd=mirror,
+            capture_output=True,
+            text=True,
+        )
+        if probe.returncode == 0:
+            fail(
+                "deleted-row-registry fail-open: registering a still-declared name "
+                "(oscillatorStrength_abs_le, "
+                "LatticeSystem/Quantum/SpinS/OscillatorStrengthBound.lean) and dropping its "
+                "row must be refused, but the checker exited 0"
+            )
+        if "oscillatorStrength_abs_le" not in probe.stderr:
+            fail(
+                "deleted-row-registry probe failed for the wrong reason: expected an error "
+                f"naming oscillatorStrength_abs_le, got: {probe.stderr}"
+            )
+
+
 def main() -> None:
     long_record_negative_self_tests()
     moved_prose_negative_self_tests()
+    deleted_row_registry_mention_semantics_self_test()
+    deleted_row_registry_negative_self_tests()
     generated_records = DOCS / "formalization" / "records"
     if generated_records.exists() or generated_records.is_symlink():
         fail(
