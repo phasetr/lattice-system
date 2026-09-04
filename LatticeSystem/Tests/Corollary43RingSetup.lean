@@ -85,7 +85,7 @@ fixture that would look like coverage but isn't.
 
 `N = 0` is excluded from this whole route the same way, by the `1 ≤ N` guard the declarations carry
 (mirroring `afm_ring_ground_state_data`'s own `hN : 1 ≤ N`). The existing witness for why `N = 0`
-is degenerate, `staggeredOrderOpS_spin_zero`, is `private` to
+is degenerate on every axis, `stagOpVec_spin_zero`, is `private` to
 `LatticeSystem/Quantum/SpinS/NoLongRangeOrder1D.lean` and is therefore syntactically unreachable
 from this file, so it is not referenced here. `no_long_range_order_1d`'s own doc comment already
 records that the `N = 0` case is discharged unconditionally by a different, non-uniqueness route;

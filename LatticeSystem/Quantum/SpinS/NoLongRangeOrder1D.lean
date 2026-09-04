@@ -40,20 +40,40 @@ namespace LatticeSystem.Quantum
 open Matrix Module
 open scoped ComplexOrder
 
-/-- The staggered order operator is the zero operator at spin `S = 0` (`N = 0`): the single-site
-spin-`3` matrix `spinSOp3 0` is the `1 × 1` diagonal with entry `(0/2 - 0) = 0`, so each summand
-`ε_x • Ŝ_x^{(3)}` vanishes.  This makes the (squared) staggered order parameter trivially zero for
-the degenerate spin-`0` chain, discharging the `N = 0` case of Corollary 4.3 unconditionally. -/
-private theorem staggeredOrderOpS_spin_zero {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (A : Λ → Bool) :
-    staggeredOrderOpS A 0 = 0 := by
+/-- The staggered order operator is the zero operator on **every** axis at spin `S = 0` (`N = 0`):
+`spinSOp3 0` is the `1 × 1` diagonal with entry `(0/2 - 0) = 0`, and `spinSOpPlus 0`,
+`spinSOpMinus 0` have the index conditions `i + 1 = j`, `j + 1 = i`, impossible on `Fin 1`, so
+`spinSOp1 0` and `spinSOp2 0` vanish too; each summand `ε_x • Ŝ_x^{(α)}` is therefore zero.  This
+makes the squared staggered order parameter trivially zero on all three axes for the degenerate
+spin-`0` chain, discharging the `N = 0` case of Corollary 4.3 unconditionally. -/
+private theorem stagOpVec_spin_zero {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (A : Λ → Bool)
+    (α : Fin 3) : stagOpVec A 0 α = 0 := by
+  have hplus : spinSOpPlus 0 = 0 := by
+    ext i j
+    fin_cases i
+    fin_cases j
+    simp [spinSOpPlus]
+  have hminus : spinSOpMinus 0 = 0 := by
+    ext i j
+    fin_cases i
+    fin_cases j
+    simp [spinSOpMinus]
+  have h1 : spinSOp1 0 = 0 := by rw [spinSOp1, hplus, hminus, add_zero, smul_zero]
+  have h2 : spinSOp2 0 = 0 := by rw [spinSOp2, hplus, hminus, sub_zero, smul_zero]
   have h3 : spinSOp3 0 = 0 := by
     ext i j
     fin_cases i
     fin_cases j
     simp [spinSOp3]
-  rw [staggeredOrderOpS]
-  refine Finset.sum_eq_zero (fun x _ => ?_)
-  rw [spinSSiteOp3_def, h3, onSiteS_zero, smul_zero]
+  fin_cases α <;>
+    simp only [stagOpVec, Fin.reduceFinMk, Matrix.cons_val_zero, Matrix.cons_val_one,
+      Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
+  · rw [staggeredOrderOp1S]
+    exact Finset.sum_eq_zero fun x _ => by rw [spinSSiteOp1, h1, onSiteS_zero, smul_zero]
+  · rw [staggeredOrderOp2S]
+    exact Finset.sum_eq_zero fun x _ => by rw [spinSSiteOp2, h2, onSiteS_zero, smul_zero]
+  · rw [staggeredOrderOpS]
+    exact Finset.sum_eq_zero fun x _ => by rw [spinSSiteOp3_def, h3, onSiteS_zero, smul_zero]
 
 /-! ### Tasaki's fourth sentence: the unique ground state is SU(2) invariant
 
@@ -341,7 +361,7 @@ argument `no_long_range_order_1d_of_theorem_4_2` applied to Theorem 4.2
 `shastryEnergyGain`.  So `#print axioms` here names `shastryEnergyGain`, and both Corollary 4.3 and
 Theorem 4.2 remain open: Tasaki does not prove Theorem 4.2 (footnote 3, p. 76) and nothing here
 reconstructs the argument he cites.  Only the degenerate spin-`0` case `N = 0` is unconditional,
-the staggered order operator vanishing there (`staggeredOrderOpS_spin_zero`). -/
+the staggered order operator vanishing there on every axis (`stagOpVec_spin_zero`). -/
 theorem no_long_range_order_1d (N : ℕ) :
     ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L → Even L →
       ∀ Φ : (Fin L → Fin (N + 1)) → ℂ,
@@ -357,7 +377,8 @@ theorem no_long_range_order_1d (N : ℕ) :
   · -- spin-`0`: the staggered order operator vanishes, so the parameter is identically zero.
     intro ε hε
     refine ⟨0, fun L _ _ Φ _ _ => ?_⟩
-    rw [staggeredOrderOpS_spin_zero]
+    rw [show staggeredOrderOpS (ringStaggeredSublattice L) 0 = 0 from
+      stagOpVec_spin_zero (ringStaggeredSublattice L) 2]
     simpa using hε
   · -- `N ≥ 1`: Tasaki's contraposition, fed with Theorem 4.2.
     exact no_long_range_order_1d_of_theorem_4_2 N hN (shastry_no_symmetry_breaking_1d N)
