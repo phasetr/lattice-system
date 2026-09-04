@@ -11,8 +11,14 @@ Tasaki proves Corollary 4.3 by contraposition against Theorem 3.2; his proof (p.
 condition (3.4.4) for Theorem 3.2 (p. 70) is satisfied because of the Marshall–Lieb–Mattis theorem
 (Theorem 2.2 in p. 39).  Since the conclusion (3.4.22) of Theorem 3.2 does not hold, the other
 condition (3.4.3) must be violated."  That is the route taken here.
-`no_long_range_order_1d_of_theorem_4_2` assumes Theorem 4.2's conclusion verbatim and derives
-Corollary 4.3; `no_long_range_order_1d` is its application to `shastry_no_symmetry_breaking_1d`.
+`no_long_range_order_1d_of_theorem_4_2` assumes Theorem 4.2's conclusion verbatim and derives the
+`α = 3` instance; `no_long_range_order_1d` is its application to `shastry_no_symmetry_breaking_1d`,
+closed over the remaining axes by the sentence that ends Tasaki's proof: "The same bound holds for
+α = 1 or 2 because the unique ground state |Φ_GS⟩ is SU(2) invariant" (p. 77).  That sentence is
+`totalSpinSOpVec_mulVec_eq_zero_of_unique_ground` (the su(2) step),
+`afmRing_groundState_totalSpin_annihilate` (its ring specialisation) and
+`stagOpVec_sq_expectation_eq_axis3` (the transport of the squared expectation).  The Lean axis index
+`α : Fin 3` is Tasaki's `α` minus one, so Lean `α = 2` is his `Ô_L^{(3)}`.
 
 **This discharges nothing.**  Corollary 4.3 now rests on the documented axiom `shastryEnergyGain`,
 the scalar staggered-field energy-gain condition behind Theorem 4.2, instead of on a susceptibility

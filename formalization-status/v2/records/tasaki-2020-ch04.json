@@ -22,7 +22,7 @@
           "source_item_id": "tasaki-2020-corollary-4-3"
         }
       ],
-      "summary": "The squared staggered order parameter per site of the zero-field one-dimensional antiferromagnetic Heisenberg ring on an even number of sites vanishes in the thermodynamic limit; proved the way the source proves it, by contraposition from Theorem 4.2, so it discharges nothing and rests on the documented staggered-field energy-gain axiom that Theorem 4.2 itself rests on, both statements remaining open.",
+      "summary": "The squared staggered order parameter per site of the zero-field one-dimensional antiferromagnetic Heisenberg ring on an even number of sites vanishes in the thermodynamic limit on each of the three Cartesian axes, one size threshold serving all of them; proved the way the source proves it, the alpha = 3 axis by contraposition from Theorem 4.2 and the other two by the SU(2) invariance of the unique ground state, so it discharges nothing and rests on the documented staggered-field energy-gain axiom that Theorem 4.2 itself rests on, both statements remaining open.",
       "topic_ids": [
         "quantum-spin",
         "symmetry-breaking"
