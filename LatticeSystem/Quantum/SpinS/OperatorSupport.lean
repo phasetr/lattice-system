@@ -33,11 +33,13 @@ and `supportedOnS_iff_commute_onSiteS` below proves that equivalence in both dir
 right-hand side is the commutant condition written out rather than named, for layering: this module
 sits directly on `Quantum/SpinS/MultiSiteCore.lean`, whereas naming `SupportedOn` would pull the
 whole §4.2.2 Anderson-tower stack carried by `Quantum/SpinS/AndersonTowerLocalDecay.lean` in behind
-it. Neither module imports the other, even transitively, so no cycle is at stake; what is written
-out is exactly what `SupportedOn S A` unfolds to. `IsLocalRangeR` and `IsLocalWindowS` have no such
-bridge: neither is formally connected to the equivalence, so a caller holding a hypothesis phrased
-in one of them still cannot invoke a capstone stated in another. Rephrasing existing callers
-through the equivalence is likewise tracked work, not done here.
+it. No import relation runs either way, even transitively, between this module and
+`Quantum/SpinS/AndersonTowerLocalDecay.lean`, so no cycle is at stake; what is written out is
+exactly what `SupportedOn S A` unfolds to, which the fixture file
+`LatticeSystem/Tests/SupportCommutantBridgePin.lean` pins. `IsLocalRangeR` and `IsLocalWindowS`
+have no such bridge: neither is formally connected to the equivalence, so a caller holding a
+hypothesis phrased in one of them still cannot invoke a capstone stated in another. Rephrasing
+existing callers through the equivalence is likewise tracked work, not done here.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §3.4, Problem 3.4.a, statement pp. 67-68.
@@ -233,7 +235,7 @@ private theorem entry_swap_of_commute_onSiteS {z : Λ} {A : ManyBodyOpS Λ N}
 /-- **Off-support entries vanish.**  An operator commuting with every on-site operator at the site
 `z` cannot connect two configurations differing at `z`: instantiating the entry identity at
 `a = b = τ z` makes the left indicator true and the right one false. -/
-theorem apply_eq_zero_of_commute_onSiteS {z : Λ} {A : ManyBodyOpS Λ N}
+private theorem apply_eq_zero_of_commute_onSiteS {z : Λ} {A : ManyBodyOpS Λ N}
     (h : ∀ B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ, Commute A (onSiteS z B))
     {σ τ : Λ → Fin (N + 1)} (hne : σ z ≠ τ z) : A σ τ = 0 := by
   have hkey := entry_swap_of_commute_onSiteS h (τ z) (τ z) σ τ
