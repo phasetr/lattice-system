@@ -16,17 +16,17 @@ support/commutant bridge `supportedOnS_iff_commute_onSiteS`
 instantiating `dist := ringDist L` gives `ringDist L y x ≤ r` — the two predicates put `x` and `y`
 into `ringDist` in opposite orders. They still cut out the same Finset, because `ringDist_comm`
 proves `ringDist` is symmetric for every pair, not just this one, but the equality is not
-definitional: `rfl` does not close `window L r x = siteBall (ringDist L) r x` after unfolding both
-sides, only a filter-predicate rewrite through `ringDist_comm` does. That same symmetry is why this
-equality pin cannot be used to catch a transposed argument order: substituting a
-deliberately-swapped wrapper `fun a b => ringDist L b a` for `ringDist L` on the right-hand side
-still discharges the identical equality (by `simp` alone, with no appeal to `ringDist_comm` at all,
-because the wrapper's swap cancels against `siteBall`'s own built-in `dist y x` order and lands back
-on `ringDist L x y`), and evaluating both filter predicates at a concrete pair with `x ≠ y` agrees
-for the same reason. No proposition built only from `ringDist` can separate the two orders, because
-they denote the same relation at every pair; the site-set pin below is only a guard against choosing
-the wrong `L`, `r`, `x`, or distance function, not against a transposed argument order, which does
-not exist as a distinguishable defect here.
+definitional: `rfl` does not close `window L r x = siteBall (ringDist L) r x`, and
+`window_eq_siteBall` rewrites the filter predicate through `ringDist_comm` instead.
+
+The site-set pin's reach against a transposed argument order stops at the definition boundary. A
+transposition in the pin's own statement is caught: substituting the swapped wrapper
+`fun a b => ringDist L b a` for `ringDist L` on the right-hand side makes the fixture fail to
+elaborate with a type mismatch, since `window_eq_siteBall` is stated at `ringDist L` and the wrapper
+is not that up to unfolding; a wrong centre, a wrong radius, and an unrelated distance function fail
+the same way. A transposition inside the definition of `window` or of `siteBall` is not caught:
+either one makes the two filter predicates syntactically identical, so the equality becomes
+definitional — `rfl` closes it — and the pin passes unchanged.
 
 The locality pin holds `IsLocalRangeR`'s commutant condition, spelled out rather than named so the
 fixture exercises the site set independently of the predicate's own definition, equivalent to
