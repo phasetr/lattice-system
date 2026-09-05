@@ -6,10 +6,11 @@ import LatticeSystem.Math.Combinatorics.SiteBall
 # Signature pin: the ring-ball locality bridge
 
 `Quantum/SpinS/LiebSchultzMattisGeneral.lean` defines the range-`r` window `window L r x` and the
-commutant-form locality marker `IsLocalRangeR` against it, but the two have never been connected to
-the generic support/commutant bridge `supportedOnS_iff_commute_onSiteS`
-(`Quantum/SpinS/OperatorSupport.lean`) or to the generic metric ball `siteBall`
-(`Math/Combinatorics/SiteBall.lean`).
+commutant-form locality marker `IsLocalRangeR` against it.  This file pins the two lemmas that tie
+them to the generic layers: `window_eq_siteBall`, against the generic metric ball `siteBall`
+(`Math/Combinatorics/SiteBall.lean`), and `isLocalRangeR_iff_supportedOnS`, against the generic
+support/commutant bridge `supportedOnS_iff_commute_onSiteS`
+(`Quantum/SpinS/OperatorSupport.lean`).
 
 `window L r x` filters on `ringDist L x y ≤ r`; `siteBall dist r x` filters on `dist y x ≤ r`, so
 instantiating `dist := ringDist L` gives `ringDist L y x ≤ r` — the two predicates put `x` and `y`
