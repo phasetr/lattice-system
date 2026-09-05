@@ -1,5 +1,6 @@
 import LatticeSystem.Math.Combinatorics.SiteBall
 import LatticeSystem.Quantum.SpinS.ManyBodyOperatorNorm
+import LatticeSystem.Quantum.SpinS.OperatorSupport
 import LatticeSystem.Quantum.SpinS.RingDistance
 
 /-!
@@ -43,12 +44,11 @@ open Matrix LatticeSystem.Math
 /-- **Locality marker (commutant form)** `IsLocalRangeR L N r x op`: the operator `op` acts only on
 the sites within ring-distance `r` of `x` on `Fin L` (periodic boundary conditions), recorded as the
 commutant condition that `op` commutes with *every* single-site operator `onSiteS y A` placed at a
-site `y` strictly farther than `r` from `x`.  The general form of that reading is a proved theorem
-of this repository: `supportedOnS_iff_commute_onSiteS` (`Quantum/SpinS/OperatorSupport.lean`) shows
-that commuting with every on-site operator placed off a site set `S` is equivalent to being
-supported on `S` in the entrywise sense of `SupportedOnS`.  This predicate has not been connected
-to that theorem, so "`support(op) ⊆ {y : ringDist L x y ≤ r}`" records the intended meaning here and
-is not yet a lemma about `IsLocalRangeR`.  The strong commutant form is deliberate: this
+site `y` strictly farther than `r` from `x`.  That this is a support condition is a theorem here and
+not merely the intended reading: `isLocalRangeR_iff_supportedOnS` below identifies the predicate
+with support on the window `window L r x` in the entrywise sense of `SupportedOnS`, through the
+general equivalence `supportedOnS_iff_commute_onSiteS`
+(`Quantum/SpinS/OperatorSupport.lean`).  The strong commutant form is deliberate: this
 predicate is *shared* as the locality hypothesis of the intentional §7.1.3 Theorem 7.3 axiom
 (`IsAKLTPerturbation.local_range`); a weaker form would enlarge that hypothesis class and make
 `aklt_theorem_7_3` claim more, risking unsoundness.  For `y` within range the condition is vacuous,
@@ -113,6 +113,20 @@ theorem window_eq_siteBall {L r : ℕ} {x : Fin L} :
     window L r x = siteBall (ringDist L) r x := by
   unfold window siteBall
   exact Finset.filter_congr fun y _ => by rw [ringDist_comm]
+
+/-- **The range-`r` locality marker is support on the window.**  `IsLocalRangeR L N r x op` holds
+exactly when `op` is supported on `window L r x` in the entrywise sense of `SupportedOnS`
+(`Quantum/SpinS/OperatorSupport.lean`), i.e. lies in `B(H_{W_x}) ⊗ I` — so a caller holding the
+commutant form may invoke a result stated in the support form and conversely.  It is
+`supportedOnS_iff_commute_onSiteS` transported along the membership equivalence
+`y ∉ window L r x ↔ r < ringDist L x y`, which is the unfolding of the window filter, so no
+hypothesis on `L`, `N`, `r` or `x` is needed. -/
+theorem isLocalRangeR_iff_supportedOnS {L N r : ℕ} {x : Fin L} {op : ManyBodyOpS (Fin L) N} :
+    IsLocalRangeR L N r x op ↔ SupportedOnS (window L r x) op := by
+  have hmem : ∀ y : Fin L, y ∉ window L r x ↔ r < ringDist L x y := fun y => by
+    simp only [window, Finset.mem_filter, Finset.mem_univ, true_and, Nat.not_le]
+  rw [supportedOnS_iff_commute_onSiteS]
+  exact ⟨fun h z hz => h z ((hmem z).mp hz), fun h y hy => h y ((hmem y).mpr hy)⟩
 
 /-- The **centered local twist generator** `M̂_x := Σ_{y∈W_x} (2π/L)·δ(x,y) · Ŝ_y^{(3)}` (Tasaki
 §6.2, eq. (6.2.27)), summed over the range-`r` window `W_x = window L r x` with the
