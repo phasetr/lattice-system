@@ -13,26 +13,21 @@ The predicate has the same two-clause shape as the half-ring predicate `Supporte
 membership in an arbitrary `S : Finset Λ`: the entries vanish off the support, and inside the
 support they depend only on the restricted configurations.
 
-`LatticeSystem.Quantum.SupportedOn` (`Quantum/SpinS/AndersonTowerLocalDecay.lean`) is another
-encoding of the same "acts only on `S`" concept, phrased in commutant form: `G` is supported on `S`
-when it commutes with every on-site factor located off `S`. Further encodings exist elsewhere in
-the library, e.g. `IsLocalRangeR` (`Quantum/SpinS/LiebSchultzMattisGeneral.lean`), which phrases
-the same idea for a fixed centre and radius on a ring (its commutant phrasing is deliberate: it is
-shared with the §7.1.3 Theorem 7.3 axiom hypothesis). This family of "acts only on a subset of
-sites" encodings is larger than this module and has not been enumerated exhaustively; new encodings
-should not be assumed absent just because a comment does not mention them. Unifying the family into
-one predicate is tracked work, not done here.
+Other encodings of the same "acts only on `S`" concept exist elsewhere in the library, e.g.
+`IsLocalRangeR` (`Quantum/SpinS/LiebSchultzMattisGeneral.lean`), which phrases the same idea for a
+fixed centre and radius on a ring (its commutant phrasing is deliberate: it is shared with the
+§7.1.3 Theorem 7.3 axiom hypothesis). This family of "acts only on a subset of sites" encodings is
+larger than this module and has not been enumerated exhaustively; new encodings should not be
+assumed absent just because a comment does not mention them. Unifying the family into one predicate
+is tracked work, not done here.
 
-`SupportedOn` and `SupportedOnS` are a particular hazard: both have signature
-`Finset Λ → ManyBodyOpS Λ N → Prop`, both live in namespace `LatticeSystem.Quantum`, and they
-differ by one character. Picking the wrong one therefore still type-checks. Being "commutes with
-every off-support on-site factor" versus "vanishes off support, depends only on support", they are
-nevertheless logically equivalent for `ManyBodyOpS` over a `[Fintype Λ] [DecidableEq Λ]` site type,
-and `supportedOnS_iff_commute_onSiteS` below proves that equivalence in both directions. Its
-right-hand side is the commutant condition written out rather than named; that choice is explained
-once, in the theorem's own doc comment. What is written out is exactly what `SupportedOn S A`
-unfolds to, which the fixture file `LatticeSystem/Tests/SupportCommutantBridgePin.lean` pins.
-`IsLocalRangeR` reaches the equivalence through `isLocalRangeR_iff_supportedOnS`
+The commutant reading — "commutes with every off-support on-site factor" — and the two-clause
+reading — "vanishes off support, depends only on support" — are logically equivalent for
+`ManyBodyOpS` over a `[Fintype Λ] [DecidableEq Λ]` site type, and `supportedOnS_iff_commute_onSiteS`
+below proves that equivalence in both directions. Its right-hand side is the commutant condition
+written out rather than named; that choice is explained once, in the theorem's own doc comment, and
+the fixture file `LatticeSystem/Tests/SupportCommutantBridgePin.lean` pins that commutant formula
+verbatim. `IsLocalRangeR` reaches the equivalence through `isLocalRangeR_iff_supportedOnS`
 (`Quantum/SpinS/LiebSchultzMattisGeneral.lean`), which identifies it with support on the range-`r`
 ring window, so a caller holding either shape can apply a result stated in the other. Rephrasing
 that predicate's callers through the bridge is tracked work, not done here.
@@ -309,8 +304,8 @@ private theorem apply_piecewise_eq_of_commute_onSiteS {S : Finset Λ} {A : ManyB
 many-body space is supported on the site set `S` — in the two-clause sense of `SupportedOnS`,
 i.e. it lies in `B(H_S) ⊗ I_{Λ∖S}` — exactly when it commutes with every single-site operator
 placed at a site outside `S`.  The right-hand side is the commutant reading of "acts only on `S`"
-used elsewhere in the library (`SupportedOn` of `Quantum/SpinS/AndersonTowerLocalDecay.lean`,
-`IsLocalRangeR` of `Quantum/SpinS/LiebSchultzMattisGeneral.lean`); it is spelled out rather than
+used elsewhere in the library (`IsLocalRangeR` of
+`Quantum/SpinS/LiebSchultzMattisGeneral.lean`); it is spelled out rather than
 named so that this module keeps its base layer — its only repository import is
 `Quantum/SpinS/MultiSiteCore.lean` — instead of taking on the §4.2.2 and §6.2 stacks those
 predicates sit on.  This doc comment is the single place that choice is recorded; the module header

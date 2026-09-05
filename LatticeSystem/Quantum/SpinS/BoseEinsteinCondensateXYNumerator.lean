@@ -82,15 +82,11 @@ theorem zzHamiltonianS_iterOrderComm_norm_le (d L N : ℕ) [NeZero L] (hN : 1 �
   rw [hH]
   have hsupp : ∀ p : HypercubicTorus d L × HypercubicTorus d L,
       p ∈ (Finset.univ : Finset (HypercubicTorus d L × HypercubicTorus d L)) →
-      SupportedOn ({p.1, p.2} : Finset (HypercubicTorus d L))
+      SupportedOnS ({p.1, p.2} : Finset (HypercubicTorus d L))
         (onSiteS p.1 (spinSOp3 N) * onSiteS p.2 (spinSOp3 N)) := by
     intro p _
-    have h1 : ({p.1} : Finset (HypercubicTorus d L)) ⊆ {p.1, p.2} :=
-      Finset.singleton_subset_iff.mpr (Finset.mem_insert_self p.1 {p.2})
-    have h2 : ({p.2} : Finset (HypercubicTorus d L)) ⊆ {p.1, p.2} :=
-      Finset.singleton_subset_iff.mpr (Finset.mem_insert_of_mem (Finset.mem_singleton_self p.2))
-    exact ((onSiteS_supportedOn p.1 (spinSOp3 N)).mono h1).mul
-      ((onSiteS_supportedOn p.2 (spinSOp3 N)).mono h2)
+    exact (supportedOnS_onSiteS (Finset.mem_insert_self _ _) _).mul
+      (supportedOnS_onSiteS (Finset.mem_insert_of_mem (Finset.mem_singleton_self _)) _)
   have hbd := iterOrderComm_norm_le_of_localSum hN u
     (Finset.univ : Finset (HypercubicTorus d L × HypercubicTorus d L))
     (fun p => torusNNCoupling d L p.1 p.2)

@@ -4,11 +4,16 @@ Tasaki §4.2.2 Theorem 4.6 (Anderson tower), Tier 3 — discharging the local-de
 
 `IsR2LocalUpTo` encodes locality as norm-decay of iterated order-density commutators.  The decay
 factor `(2ζo₀/V)` per commutator step comes from *support*: an operator `G` supported on a finite set
-`S` (commuting with every on-site factor off `S`) satisfies `[ô^b, G] = V⁻¹ Σ_{w∈S} ε_w [Ŝ_w^b, G]`,
-so the commutator stays supported on `S` and its norm contracts by `|S|·2N/V`.  Iterating bounds the
-whole `iterOrderComm` tower, which is exactly the `IsR2LocalUpTo` hypothesis.
+`S` satisfies `[ô^b, G] = V⁻¹ Σ_{w∈S} ε_w [Ŝ_w^b, G]`, so the commutator stays supported on `S` and
+its norm contracts by `|S|·2N/V`.  Iterating bounds the whole `iterOrderComm` tower, which is
+exactly the `IsR2LocalUpTo` hypothesis.
+
+Support is `SupportedOnS` of `Quantum/SpinS/OperatorSupport.lean`; this file defines no support
+predicate of its own.  The estimates below read it in commutant form — `G` commutes with every
+on-site factor located off `S` — through that module's theorem `supportedOnS_iff_commute_onSiteS`.
 -/
 import LatticeSystem.Quantum.SpinS.AndersonTowerR2Centering
+import LatticeSystem.Quantum.SpinS.OperatorSupport
 
 namespace LatticeSystem.Quantum
 
@@ -37,11 +42,6 @@ theorem siteOrderOp_commute_onSiteS_of_ne (b : Bool) {x z : Λ} (hzx : z ≠ x)
   | true => exact (onSiteS_commute_of_ne (Ne.symm hzx) (spinSOpPlus N) B)
   | false => exact (onSiteS_commute_of_ne (Ne.symm hzx) (spinSOpMinus N) B)
 
-/-- **Operator support.**  `G` is supported on the finite set `S` if it commutes with every on-site
-factor located off `S`. -/
-def SupportedOn (S : Finset Λ) (G : ManyBodyOpS Λ N) : Prop :=
-  ∀ z ∉ S, ∀ B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ, Commute G (onSiteS z B)
-
 /-- The single-site commutator `[Ŝ_x^b, G] = Ŝ_x^b G − G Ŝ_x^b`. -/
 noncomputable def siteComm (b : Bool) (x : Λ) (G : ManyBodyOpS Λ N) : ManyBodyOpS Λ N :=
   siteOrderOp b x N * G - G * siteOrderOp b x N
@@ -59,18 +59,20 @@ theorem siteComm_norm_le (b : Bool) (x : Λ) (G : ManyBodyOpS Λ N) (hN : 1 ≤ 
   nlinarith [h1, h2]
 
 /-- If `G` is supported on `S`, then `[Ŝ_x^b, G] = 0` for any off-support site `x ∉ S`. -/
-theorem siteComm_eq_zero_of_not_mem {S : Finset Λ} {G : ManyBodyOpS Λ N} (hG : SupportedOn S G)
+theorem siteComm_eq_zero_of_not_mem {S : Finset Λ} {G : ManyBodyOpS Λ N} (hG : SupportedOnS S G)
     (b : Bool) {x : Λ} (hx : x ∉ S) : siteComm b x G = 0 := by
+  have hG' := supportedOnS_iff_commute_onSiteS.mp hG
   have hcomm : Commute G (siteOrderOp b x N) := by
     cases b with
-    | true => exact hG x hx (spinSOpPlus N)
-    | false => exact hG x hx (spinSOpMinus N)
+    | true => exact hG' x hx (spinSOpPlus N)
+    | false => exact hG' x hx (spinSOpMinus N)
   rw [siteComm, sub_eq_zero]
   exact hcomm.eq.symm
 
 /-- `[Ŝ_x^b, G]` is supported on `S ∪ {x}`; in particular on `S` when `x ∈ S`. -/
-theorem siteComm_supportedOn {S : Finset Λ} {G : ManyBodyOpS Λ N} (hG : SupportedOn S G)
-    (b : Bool) {x : Λ} (hx : x ∈ S) : SupportedOn S (siteComm b x G) := by
+theorem siteComm_supportedOnS {S : Finset Λ} {G : ManyBodyOpS Λ N} (hG : SupportedOnS S G)
+    (b : Bool) {x : Λ} (hx : x ∈ S) : SupportedOnS S (siteComm b x G) := by
+  rw [supportedOnS_iff_commute_onSiteS] at hG ⊢
   intro z hz B
   have hzx : z ≠ x := fun h => hz (h ▸ hx)
   have h1 : Commute (siteOrderOp b x N) (onSiteS z B) :=
@@ -99,48 +101,9 @@ theorem orderComm_eq_smul_sum [NeZero L] (b : Bool) (G : ManyBodyOpS (Hypercubic
   refine Finset.sum_congr rfl (fun x _ => ?_)
   rw [smul_mul_assoc, mul_smul_comm, ← smul_sub, siteComm]
 
-/-- `SupportedOn` is closed under scalar multiplication. -/
-theorem SupportedOn.smul {S : Finset Λ} {G : ManyBodyOpS Λ N} (hG : SupportedOn S G) (c : ℂ) :
-    SupportedOn S (c • G) := fun z hz B => (hG z hz B).smul_left c
-
-/-- `SupportedOn` is closed under finite sums. -/
-theorem SupportedOn.sum {ι : Type*} {S : Finset Λ} (s : Finset ι)
-    (f : ι → ManyBodyOpS Λ N) (hf : ∀ i ∈ s, SupportedOn S (f i)) :
-    SupportedOn S (∑ i ∈ s, f i) := by
-  intro z hz B
-  exact Commute.sum_left s (fun i => f i) _ (fun i hi => hf i hi z hz B)
-
-/-- The zero operator is supported on every set. -/
-theorem supportedOn_zero {S : Finset Λ} : SupportedOn S (0 : ManyBodyOpS Λ N) :=
-  fun _ _ _ => Commute.zero_left _
-
-/-- `SupportedOn` is monotone in the support set. -/
-theorem SupportedOn.mono {S T : Finset Λ} {G : ManyBodyOpS Λ N} (hG : SupportedOn S G)
-    (hST : S ⊆ T) : SupportedOn T G := fun z hz B => hG z (fun h => hz (hST h)) B
-
-/-- `SupportedOn` is closed under products. -/
-theorem SupportedOn.mul {S : Finset Λ} {G H : ManyBodyOpS Λ N} (hG : SupportedOn S G)
-    (hH : SupportedOn S H) : SupportedOn S (G * H) :=
-  fun z hz B => (hG z hz B).mul_left (hH z hz B)
-
-/-- `SupportedOn` is closed under sums. -/
-theorem SupportedOn.add {S : Finset Λ} {G H : ManyBodyOpS Λ N} (hG : SupportedOn S G)
-    (hH : SupportedOn S H) : SupportedOn S (G + H) :=
-  fun z hz B => (hG z hz B).add_left (hH z hz B)
-
-/-- `SupportedOn` is closed under differences. -/
-theorem SupportedOn.sub {S : Finset Λ} {G H : ManyBodyOpS Λ N} (hG : SupportedOn S G)
-    (hH : SupportedOn S H) : SupportedOn S (G - H) :=
-  fun z hz B => (hG z hz B).sub_left (hH z hz B)
-
-/-- An on-site operator is supported on its own site. -/
-theorem onSiteS_supportedOn (x : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
-    SupportedOn {x} (onSiteS x A) :=
-  fun _z hz B => onSiteS_commute_of_ne
-    (Ne.symm (fun h => hz (Finset.mem_singleton.mpr h))) A B
-
 /-- The bond operator `Ŝ_x·Ŝ_y` is supported on the bond `{x, y}`. -/
-theorem spinSDot_supportedOn (x y : Λ) : SupportedOn {x, y} (spinSDot x y N) := by
+theorem spinSDot_supportedOnS (x y : Λ) : SupportedOnS {x, y} (spinSDot x y N) := by
+  rw [supportedOnS_iff_commute_onSiteS]
   intro z hz B
   have hzx : z ≠ x := fun h => hz (by rw [h]; exact Finset.mem_insert_self x {y})
   have hzy : z ≠ y := fun h => hz (by
@@ -173,19 +136,15 @@ theorem spinSDot_commutator_staggeredRaisingOpS_support (A : Λ → Bool) (x y :
     rw [spinSDot_commutator_spinSSiteOpPlus_eq_zero_of_ne x y z hzx hzy, smul_zero]
 
 /-- The bond–raising commutator `[Ŝ_x·Ŝ_y, Ô_L⁺]` is supported on the bond `{x, y}`. -/
-theorem spinSDot_staggeredRaising_commutator_supportedOn (A : Λ → Bool) (x y : Λ) (hxy : x ≠ y) :
-    SupportedOn ({x, y} : Finset Λ)
+theorem spinSDot_staggeredRaising_commutator_supportedOnS (A : Λ → Bool) (x y : Λ) (hxy : x ≠ y) :
+    SupportedOnS ({x, y} : Finset Λ)
       (spinSDot x y N * staggeredRaisingOpS A N - staggeredRaisingOpS A N * spinSDot x y N) := by
   rw [spinSDot_commutator_staggeredRaisingOpS_support A x y hxy]
-  have hx : ({x} : Finset Λ) ⊆ {x, y} :=
-    Finset.singleton_subset_iff.mpr (Finset.mem_insert_self x {y})
-  have hy : ({y} : Finset Λ) ⊆ {x, y} :=
-    Finset.singleton_subset_iff.mpr (Finset.mem_insert_of_mem (Finset.mem_singleton_self y))
-  have hSx : SupportedOn ({x, y} : Finset Λ) (spinSSiteOpPlus x N) :=
-    (onSiteS_supportedOn x (spinSOpPlus N)).mono hx
-  have hSy : SupportedOn ({x, y} : Finset Λ) (spinSSiteOpPlus y N) :=
-    (onSiteS_supportedOn y (spinSOpPlus N)).mono hy
-  have hdot := spinSDot_supportedOn (N := N) x y
+  have hSx : SupportedOnS ({x, y} : Finset Λ) (spinSSiteOpPlus x N) :=
+    supportedOnS_onSiteS (Finset.mem_insert_self x {y}) (spinSOpPlus N)
+  have hSy : SupportedOnS ({x, y} : Finset Λ) (spinSSiteOpPlus y N) :=
+    supportedOnS_onSiteS (Finset.mem_insert_of_mem (Finset.mem_singleton_self y)) (spinSOpPlus N)
+  have hdot := spinSDot_supportedOnS (N := N) x y
   exact (((hdot.mul hSx).sub (hSx.mul hdot)).smul _).add
     (((hdot.mul hSy).sub (hSy.mul hdot)).smul _)
 
@@ -224,21 +183,21 @@ theorem spinSDot_commutator_staggeredRaisingOpS_norm_le (A : Λ → Bool) (x y :
 
 /-- **Support preservation.**  An order-density commutator of an `S`-supported operator stays
 supported on `S`. -/
-theorem orderComm_supportedOn [NeZero L] {S : Finset (HypercubicTorus d L)}
-    {G : ManyBodyOpS (HypercubicTorus d L) N} (hG : SupportedOn S G) (b : Bool) :
-    SupportedOn S (orderComm b G) := by
+theorem orderComm_supportedOnS [NeZero L] {S : Finset (HypercubicTorus d L)}
+    {G : ManyBodyOpS (HypercubicTorus d L) N} (hG : SupportedOnS S G) (b : Bool) :
+    SupportedOnS S (orderComm b G) := by
   rw [orderComm_eq_smul_sum]
-  refine SupportedOn.smul ?_ _
-  refine SupportedOn.sum _ _ (fun x _ => ?_)
-  refine SupportedOn.smul ?_ _
+  refine SupportedOnS.smul ?_ _
+  refine SupportedOnS.sum _ _ (fun x _ => ?_)
+  refine SupportedOnS.smul ?_ _
   by_cases hx : x ∈ S
-  · exact siteComm_supportedOn hG b hx
-  · rw [siteComm_eq_zero_of_not_mem hG b hx]; exact supportedOn_zero
+  · exact siteComm_supportedOnS hG b hx
+  · rw [siteComm_eq_zero_of_not_mem hG b hx]; exact supportedOnS_zero
 
 /-- **Per-step decay.**  An order-density commutator of an `S`-supported operator contracts the norm
 by `2·|S|·N / V`. -/
 theorem orderComm_norm_le_of_supported [NeZero L] {S : Finset (HypercubicTorus d L)}
-    {G : ManyBodyOpS (HypercubicTorus d L) N} (hG : SupportedOn S G) (hN : 1 ≤ N) (b : Bool) :
+    {G : ManyBodyOpS (HypercubicTorus d L) N} (hG : SupportedOnS S G) (hN : 1 ≤ N) (b : Bool) :
     manyBodyOperatorNormS (orderComm b G)
       ≤ 2 * (S.card : ℝ) * (N : ℝ) / (L : ℝ) ^ d * manyBodyOperatorNormS G := by
   have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by
@@ -276,7 +235,7 @@ theorem orderComm_norm_le_of_supported [NeZero L] {S : Finset (HypercubicTorus d
 contracts by `(2·|S|·N/V)^{|u|}`. -/
 theorem iterOrderComm_norm_le_of_supported [NeZero L] {S : Finset (HypercubicTorus d L)}
     (hN : 1 ≤ N) (u : List Bool) :
-    ∀ G : ManyBodyOpS (HypercubicTorus d L) N, SupportedOn S G →
+    ∀ G : ManyBodyOpS (HypercubicTorus d L) N, SupportedOnS S G →
       manyBodyOperatorNormS (iterOrderComm u G)
         ≤ (2 * (S.card : ℝ) * (N : ℝ) / (L : ℝ) ^ d) ^ u.length * manyBodyOperatorNormS G := by
   have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by
@@ -290,7 +249,7 @@ theorem iterOrderComm_norm_le_of_supported [NeZero L] {S : Finset (HypercubicTor
     calc manyBodyOperatorNormS (iterOrderComm u (orderComm b G))
         ≤ (2 * (S.card : ℝ) * (N : ℝ) / (L : ℝ) ^ d) ^ u.length
             * manyBodyOperatorNormS (orderComm b G) :=
-          ih (orderComm b G) (orderComm_supportedOn hG b)
+          ih (orderComm b G) (orderComm_supportedOnS hG b)
       _ ≤ (2 * (S.card : ℝ) * (N : ℝ) / (L : ℝ) ^ d) ^ u.length
             * (2 * (S.card : ℝ) * (N : ℝ) / (L : ℝ) ^ d * manyBodyOperatorNormS G) :=
           mul_le_mul_of_nonneg_left (orderComm_norm_le_of_supported hG hN b) (by positivity)
@@ -350,7 +309,7 @@ the ℓ¹-aggregate `∑ |c_i|‖Gᵢ‖`.  This is the structural input for
 theorem iterOrderComm_norm_le_of_localSum [NeZero L] {ι : Type*} (hN : 1 ≤ N) (u : List Bool)
     (s : Finset ι) (c : ι → ℂ) (G : ι → ManyBodyOpS (HypercubicTorus d L) N)
     (S : ι → Finset (HypercubicTorus d L)) (smax : ℕ)
-    (hsup : ∀ i ∈ s, SupportedOn (S i) (G i)) (hcard : ∀ i ∈ s, (S i).card ≤ smax) :
+    (hsup : ∀ i ∈ s, SupportedOnS (S i) (G i)) (hcard : ∀ i ∈ s, (S i).card ≤ smax) :
     manyBodyOperatorNormS (iterOrderComm u (∑ i ∈ s, c i • G i))
       ≤ (2 * (smax : ℝ) * (N : ℝ) / (L : ℝ) ^ d) ^ u.length
         * ∑ i ∈ s, ‖c i‖ * manyBodyOperatorNormS (G i) := by
@@ -380,22 +339,18 @@ theorem iterOrderComm_norm_le_of_localSum [NeZero L] {ι : Type*} (hN : 1 ≤ N)
 /-- **The per-bond double commutator is two-site supported.**  `bondDoubleComm x y` is built from
 the bond operator `Ŝ_x·Ŝ_y` and the on-bond raising/lowering operators, so it commutes with every
 on-site factor away from `{x, y}`. -/
-theorem bondDoubleComm_supportedOn [NeZero L] (x y : HypercubicTorus d L) (hxy : x ≠ y) :
-    SupportedOn ({x, y} : Finset (HypercubicTorus d L)) (bondDoubleComm d L N x y) := by
-  have hx : ({x} : Finset (HypercubicTorus d L)) ⊆ {x, y} :=
-    Finset.singleton_subset_iff.mpr (Finset.mem_insert_self x {y})
-  have hy : ({y} : Finset (HypercubicTorus d L)) ⊆ {x, y} :=
-    Finset.singleton_subset_iff.mpr (Finset.mem_insert_of_mem (Finset.mem_singleton_self y))
-  have hSx : SupportedOn ({x, y} : Finset _) (spinSSiteOpPlus x N) :=
-    (onSiteS_supportedOn x (spinSOpPlus N)).mono hx
-  have hSy : SupportedOn ({x, y} : Finset _) (spinSSiteOpPlus y N) :=
-    (onSiteS_supportedOn y (spinSOpPlus N)).mono hy
-  have hMx : SupportedOn ({x, y} : Finset _) (spinSSiteOpMinus x N) :=
-    (onSiteS_supportedOn x (spinSOpMinus N)).mono hx
-  have hMy : SupportedOn ({x, y} : Finset _) (spinSSiteOpMinus y N) :=
-    (onSiteS_supportedOn y (spinSOpMinus N)).mono hy
-  have hdot := spinSDot_supportedOn (N := N) x y
-  have hC : SupportedOn ({x, y} : Finset _)
+theorem bondDoubleComm_supportedOnS [NeZero L] (x y : HypercubicTorus d L) (hxy : x ≠ y) :
+    SupportedOnS ({x, y} : Finset (HypercubicTorus d L)) (bondDoubleComm d L N x y) := by
+  have hSx : SupportedOnS ({x, y} : Finset _) (spinSSiteOpPlus x N) :=
+    supportedOnS_onSiteS (Finset.mem_insert_self x {y}) (spinSOpPlus N)
+  have hSy : SupportedOnS ({x, y} : Finset _) (spinSSiteOpPlus y N) :=
+    supportedOnS_onSiteS (Finset.mem_insert_of_mem (Finset.mem_singleton_self y)) (spinSOpPlus N)
+  have hMx : SupportedOnS ({x, y} : Finset _) (spinSSiteOpMinus x N) :=
+    supportedOnS_onSiteS (Finset.mem_insert_self x {y}) (spinSOpMinus N)
+  have hMy : SupportedOnS ({x, y} : Finset _) (spinSSiteOpMinus y N) :=
+    supportedOnS_onSiteS (Finset.mem_insert_of_mem (Finset.mem_singleton_self y)) (spinSOpMinus N)
+  have hdot := spinSDot_supportedOnS (N := N) x y
+  have hC : SupportedOnS ({x, y} : Finset _)
       (spinSDot x y N * staggeredLoweringOpS (torusParitySublattice d L) N
         - staggeredLoweringOpS (torusParitySublattice d L) N * spinSDot x y N) := by
     rw [spinSDot_commutator_staggeredLoweringOpS_support (torusParitySublattice d L) x y hxy]
@@ -458,7 +413,7 @@ theorem isR2LocalUpTo_orderDoubleComm [NeZero L] (hL : 2 ≤ L) (hN : 1 ≤ N) (
     (fun p => ((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹ * torusNNCoupling d L p.1 p.2)
     (fun p => bondDoubleComm d L N p.1 p.2)
     (fun p => ({p.1, p.2} : Finset (HypercubicTorus d L))) 2
-    (fun p hp => bondDoubleComm_supportedOn p.1 p.2 (Finset.mem_filter.mp hp).2)
+    (fun p hp => bondDoubleComm_supportedOnS p.1 p.2 (Finset.mem_filter.mp hp).2)
     (fun p _ => (Finset.card_insert_le _ _).trans (by simp))
   simpa [orderDoubleCommAggregate] using hbd
 
@@ -548,7 +503,7 @@ theorem isR2LocalUpTo_heisenbergRaisingComm [NeZero L] (hL : 2 ≤ L) (hN : 1 �
     (fun p => spinSDot p.1 p.2 N * staggeredRaisingOpS (torusParitySublattice d L) N
       - staggeredRaisingOpS (torusParitySublattice d L) N * spinSDot p.1 p.2 N)
     (fun p => ({p.1, p.2} : Finset (HypercubicTorus d L))) 2
-    (fun p hp => spinSDot_staggeredRaising_commutator_supportedOn _ p.1 p.2
+    (fun p hp => spinSDot_staggeredRaising_commutator_supportedOnS _ p.1 p.2
       (Finset.mem_filter.mp hp).2)
     (fun p _ => (Finset.card_insert_le _ _).trans (by simp))
   simpa [heisenbergRaisingCommAggregate] using hbd
