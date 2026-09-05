@@ -304,12 +304,11 @@ private theorem apply_piecewise_eq_of_commute_onSiteS {S : Finset Λ} {A : ManyB
 many-body space is supported on the site set `S` — in the two-clause sense of `SupportedOnS`,
 i.e. it lies in `B(H_S) ⊗ I_{Λ∖S}` — exactly when it commutes with every single-site operator
 placed at a site outside `S`.  The right-hand side is the commutant reading of "acts only on `S`"
-used elsewhere in the library (`IsLocalRangeR` of
-`Quantum/SpinS/LiebSchultzMattisGeneral.lean`); it is spelled out rather than
-named so that this module keeps its base layer — its only repository import is
-`Quantum/SpinS/MultiSiteCore.lean` — instead of taking on the §4.2.2 and §6.2 stacks those
-predicates sit on.  This doc comment is the single place that choice is recorded; the module header
-and the fixture file point here.
+used elsewhere in the library (`IsLocalRangeR` of `Quantum/SpinS/LiebSchultzMattisGeneral.lean`);
+it is spelled out rather than named so that this module keeps its base layer — its only repository
+import is `Quantum/SpinS/MultiSiteCore.lean` — instead of taking on the §6.2 stack that predicate
+sits on.  This doc comment is the single place that choice is recorded; the module header and the
+fixture file point here.
 
 Mathematically this is the finite-dimensional commutation theorem for tensor products,
 `(1 ⊗ M_m)' = M_n ⊗ 1`, proved directly from matrix entries.  It is a repository-internal lemma
