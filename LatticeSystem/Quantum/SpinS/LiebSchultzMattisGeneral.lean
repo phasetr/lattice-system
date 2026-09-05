@@ -1,3 +1,4 @@
+import LatticeSystem.Math.Combinatorics.SiteBall
 import LatticeSystem.Quantum.SpinS.ManyBodyOperatorNorm
 import LatticeSystem.Quantum.SpinS.RingDistance
 
@@ -37,7 +38,7 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1
 
 namespace LatticeSystem.Quantum
 
-open Matrix
+open Matrix LatticeSystem.Math
 
 /-- **Locality marker (commutant form)** `IsLocalRangeR L N r x op`: the operator `op` acts only on
 the sites within ring-distance `r` of `x` on `Fin L` (periodic boundary conditions), recorded as the
@@ -102,6 +103,16 @@ on `Fin L` (Tasaki §6.2, eq. (6.2.26)): the local support window of `ĥ_x`.  It
 (`x ∈ W_x`, since `ringDist L x x = 0 ≤ r`) and contains at most `2r+1` sites. -/
 def window (L r : ℕ) (x : Fin L) : Finset (Fin L) :=
   Finset.univ.filter (fun y => ringDist L x y ≤ r)
+
+/-- The range-`r` window is the **ring-distance ball** of radius `r` around `x`: `window L r x` and
+`siteBall (ringDist L) r x` (`Math/Combinatorics/SiteBall.lean`) cut out the same site set.  The two
+filter predicates are `ringDist L x y ≤ r` and `ringDist L y x ≤ r`, which agree by
+`ringDist_comm`.  Both sides filter the same `Finset.univ` by pointwise equivalent predicates, so
+no hypothesis on `L`, `r` or `x` is needed. -/
+theorem window_eq_siteBall {L r : ℕ} {x : Fin L} :
+    window L r x = siteBall (ringDist L) r x := by
+  unfold window siteBall
+  exact Finset.filter_congr fun y _ => by rw [ringDist_comm]
 
 /-- The **centered local twist generator** `M̂_x := Σ_{y∈W_x} (2π/L)·δ(x,y) · Ŝ_y^{(3)}` (Tasaki
 §6.2, eq. (6.2.27)), summed over the range-`r` window `W_x = window L r x` with the
