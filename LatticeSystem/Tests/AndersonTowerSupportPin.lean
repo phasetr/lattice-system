@@ -41,8 +41,8 @@ example [NeZero L] {S : Finset (HypercubicTorus d L)} {G : ManyBodyOpS (Hypercub
 
 /-- **Signature pin (P3, cross-module interface).** The quasi-local-sum norm bound for iterated
 order-density commutators, with its per-term support hypothesis stated against `SupportedOnS`.
-This is the contract the Bose–Einstein-condensate numerator and the ring-ball locality bridge
-consume. -/
+This is the contract the Bose–Einstein-condensate numerator and the same-sign-decay module
+(`Quantum/SpinS/AndersonTowerSameSignDecay.lean`) consume. -/
 example [NeZero L] {ι : Type*} (hN : 1 ≤ N) (u : List Bool) (s : Finset ι) (c : ι → ℂ)
     (G : ι → ManyBodyOpS (HypercubicTorus d L) N) (S : ι → Finset (HypercubicTorus d L))
     (smax : ℕ) (hsup : ∀ i ∈ s, SupportedOnS (S i) (G i))
