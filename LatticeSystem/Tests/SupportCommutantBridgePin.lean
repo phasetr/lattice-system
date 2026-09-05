@@ -11,15 +11,10 @@ finite-dimensional commutation theorem for tensor products, `(1 ⊗ M_m)' = M_n 
 reading used elsewhere in the library as `SupportedOn`
 (`Quantum/SpinS/AndersonTowerLocalDecay.lean`).
 
-The first pin spells the right-hand side out because the theorem does, and the theorem does so for
-layering: `Quantum/SpinS/OperatorSupport.lean` sits directly on `Quantum/SpinS/MultiSiteCore.lean`,
-whereas naming `SupportedOn` would pull the whole §4.2.2 Anderson-tower stack carried by
-`Quantum/SpinS/AndersonTowerLocalDecay.lean` into that base module. No import relation runs either
-way, even transitively, between `Quantum/SpinS/OperatorSupport.lean` and
-`Quantum/SpinS/AndersonTowerLocalDecay.lean`, so this is a layering choice and not a cycle
-constraint. This file is downstream of both, so it can name the two predicates in one statement and
-pin their agreement directly — the second fixture below — which the base module cannot do without
-taking that stack on.
+The first pin spells the right-hand side out because the theorem does; the reason is recorded in
+that theorem's doc comment (`supportedOnS_iff_commute_onSiteS`,
+`Quantum/SpinS/OperatorSupport.lean`). This file imports the modules of both predicates, so it can
+name them in one statement and pin their agreement directly — the second fixture below.
 
 The first pin holds the hypothesis set and the shape of the conclusion of
 `supportedOnS_iff_commute_onSiteS` fixed against silent drift: acquiring a further hypothesis, or a

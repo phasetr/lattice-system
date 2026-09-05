@@ -29,16 +29,13 @@ differ by one character. Picking the wrong one therefore still type-checks. Bein
 every off-support on-site factor" versus "vanishes off support, depends only on support", they are
 nevertheless logically equivalent for `ManyBodyOpS` over a `[Fintype Λ] [DecidableEq Λ]` site type,
 and `supportedOnS_iff_commute_onSiteS` below proves that equivalence in both directions. Its
-right-hand side is the commutant condition written out rather than named, for layering: this module
-sits directly on `Quantum/SpinS/MultiSiteCore.lean`, whereas naming `SupportedOn` would pull the
-whole §4.2.2 Anderson-tower stack carried by `Quantum/SpinS/AndersonTowerLocalDecay.lean` in behind
-it. No import relation runs either way, even transitively, between this module and
-`Quantum/SpinS/AndersonTowerLocalDecay.lean`, so no cycle is at stake; what is written out is
-exactly what `SupportedOn S A` unfolds to, which the fixture file
-`LatticeSystem/Tests/SupportCommutantBridgePin.lean` pins. `IsLocalRangeR` has no such bridge: it
-is not formally connected to the equivalence, so a caller holding a hypothesis phrased in it still
-cannot invoke a capstone stated in another encoding. Rephrasing its callers through the equivalence
-is likewise tracked work, not done here.
+right-hand side is the commutant condition written out rather than named; that choice is explained
+once, in the theorem's own doc comment. What is written out is exactly what `SupportedOn S A`
+unfolds to, which the fixture file `LatticeSystem/Tests/SupportCommutantBridgePin.lean` pins.
+`IsLocalRangeR` reaches the equivalence through `isLocalRangeR_iff_supportedOnS`
+(`Quantum/SpinS/LiebSchultzMattisGeneral.lean`), which identifies it with support on the range-`r`
+ring window, so a caller holding either shape can apply a result stated in the other. Rephrasing
+that predicate's callers through the bridge is tracked work, not done here.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §3.4, Problem 3.4.a, statement pp. 67-68.
@@ -283,10 +280,11 @@ many-body space is supported on the site set `S` — in the two-clause sense of 
 i.e. it lies in `B(H_S) ⊗ I_{Λ∖S}` — exactly when it commutes with every single-site operator
 placed at a site outside `S`.  The right-hand side is the commutant reading of "acts only on `S`"
 used elsewhere in the library (`SupportedOn` of `Quantum/SpinS/AndersonTowerLocalDecay.lean`,
-`IsLocalRangeR` of `Quantum/SpinS/LiebSchultzMattisGeneral.lean`); it is spelled out here to keep
-this module on its `MultiSiteCore` base layer, since importing either would drag in the §4.2.2 and
-§6.2 stacks those predicates sit on.  No import relation runs either way between this module and
-theirs, so naming them is a layering choice rather than a cycle constraint.
+`IsLocalRangeR` of `Quantum/SpinS/LiebSchultzMattisGeneral.lean`); it is spelled out rather than
+named so that this module keeps its base layer — its only repository import is
+`Quantum/SpinS/MultiSiteCore.lean` — instead of taking on the §4.2.2 and §6.2 stacks those
+predicates sit on.  This doc comment is the single place that choice is recorded; the module header
+and the fixture file point here.
 
 Mathematically this is the finite-dimensional commutation theorem for tensor products,
 `(1 ⊗ M_m)' = M_n ⊗ 1`, proved directly from matrix entries.  It is a repository-internal lemma

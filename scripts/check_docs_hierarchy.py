@@ -428,8 +428,16 @@ def _approved_replacements(text: str) -> str:
             "commutes with every single-site operator farther than `r` from `x`; the general "
             "equivalence between this commutant form and `support ⊆ {y : ringDist x y ≤ r}` is a "
             "proved theorem of this repository, `supportedOnS_iff_commute_onSiteS` "
-            "(`Quantum/SpinS/OperatorSupport.lean`), though `IsLocalRangeR` itself has not yet "
-            "been connected to it;",
+            "(`Quantum/SpinS/OperatorSupport.lean`, fixture "
+            "`Tests/SupportCommutantBridgePin.lean`), and `IsLocalRangeR` is connected to it by "
+            "`isLocalRangeR_iff_supportedOnS`: the marker holds exactly when `ĥ_x` is "
+            "`SupportedOnS` on the window `window L r x`, which `window_eq_siteBall` identifies "
+            "with the ring-distance ball `siteBall (ringDist L) r x` "
+            "(`Math/Combinatorics/SiteBall.lean`), fixture "
+            "`Tests/RingBallLocalityBridgePin.lean`; the same general equivalence carries the "
+            "open-chain window `chainWindow L a b` (`supportedOnS_chainWindow_iff`, "
+            "`Quantum/SpinS/ChainWindowSupport.lean`, fixture "
+            "`Tests/ChainWindowSupportPin.lean`);",
         )
         .replace(
             "mps_theorem_7_6` is **PROVED axiom-free; Standard 3; PR pending**",

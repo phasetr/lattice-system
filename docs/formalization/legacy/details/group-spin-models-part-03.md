@@ -300,8 +300,14 @@ eqs. (6.2.23)–(6.2.24)): Lemma 6.1 generalizes to **any** short-ranged U(1)-in
 is a genuine Hamiltonian), `r`-local (`IsLocalRangeR`, now the **commutant-form `def`**: `ĥ_x`
 commutes with every single-site operator farther than `r` from `x`; the general equivalence between
 this commutant form and `support ⊆ {y : ringDist x y ≤ r}` is a proved theorem of this repository,
-`supportedOnS_iff_commute_onSiteS` (`Quantum/SpinS/OperatorSupport.lean`), though `IsLocalRangeR`
-itself has not yet been connected to it;
+`supportedOnS_iff_commute_onSiteS` (`Quantum/SpinS/OperatorSupport.lean`, fixture
+`Tests/SupportCommutantBridgePin.lean`), and `IsLocalRangeR` is connected to it by
+`isLocalRangeR_iff_supportedOnS`: the marker holds exactly when `ĥ_x` is `SupportedOnS` on the
+window `window L r x`, which `window_eq_siteBall` identifies with the ring-distance ball
+`siteBall (ringDist L) r x` (`Math/Combinatorics/SiteBall.lean`), fixture
+`Tests/RingBallLocalityBridgePin.lean`; the same general equivalence carries the open-chain window
+`chainWindow L a b` (`supportedOnS_chainWindow_iff`, `Quantum/SpinS/ChainWindowSupport.lean`,
+fixture `Tests/ChainWindowSupportPin.lean`);
 
 strong form chosen so the shared §7.1.3 Theorem 7.3 hypothesis stays faithful;
 

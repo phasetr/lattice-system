@@ -15552,8 +15552,16 @@ class \texttt{IsShortRangeU1Chain} bundles the assumptions: each $\hat h_x$ is \
 farther than $r$ from $x$; the general equivalence between this commutant form and
 $\mathrm{supp}(\hat h_x)\subseteq\{y:\mathtt{ringDist}\,x\,y\le r\}$ is a proved theorem of this
 repository, \texttt{supportedOnS\_iff\_commute\_onSiteS}
-(\texttt{Quantum/SpinS/OperatorSupport.lean}), though \texttt{IsLocalRangeR} itself has not yet been
-connected to it; strong form chosen to keep the shared Theorem~7.3
+(\texttt{Quantum/SpinS/OperatorSupport.lean}, fixture
+\texttt{Tests/SupportCommutantBridgePin.lean}), and \texttt{IsLocalRangeR} is connected to it by
+\texttt{isLocalRangeR\_iff\_supportedOnS}: the marker holds exactly when $\hat h_x$ is
+\texttt{SupportedOnS} on the window \texttt{window}~$L\,r\,x$, which
+\texttt{window\_eq\_siteBall} identifies with the ring-distance ball
+\texttt{siteBall}~(\texttt{ringDist}~$L$)~$r\,x$ (\texttt{Math/Combinatorics/SiteBall.lean}),
+fixture \texttt{Tests/RingBallLocalityBridgePin.lean}; the same general equivalence carries the
+open-chain window \texttt{chainWindow}~$L\,a\,b$ (\texttt{supportedOnS\_chainWindow\_iff},
+\texttt{Quantum/SpinS/ChainWindowSupport.lean}, fixture
+\texttt{Tests/ChainWindowSupportPin.lean}); strong form chosen to keep the shared Theorem~7.3
 hypothesis faithful; discharge arc COMPLETE, axiom-free, PR~\#5071--\#5077), bounded $\|\hat h_x\|\le h_0$ in the $L^2$
 operator norm
 (\texttt{manyBodyOperatorNormS}), and $U(1)$-invariant ($[\hat h_x,\hat S_{\mathrm{tot}}^{(3)}]=0$,
