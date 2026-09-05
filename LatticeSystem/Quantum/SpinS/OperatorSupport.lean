@@ -77,6 +77,36 @@ theorem SupportedOnS.add {S : Finset Λ} {A B : ManyBodyOpS Λ N}
     rw [Matrix.add_apply, Matrix.add_apply, hA.2 σ τ σ' τ' h1 h2 h3 h4,
       hB.2 σ τ σ' τ' h1 h2 h3 h4]
 
+/-- The zero operator is supported on every site set: no entry is nonzero, so the first clause is
+vacuous, and every entry equals every other. -/
+theorem supportedOnS_zero {S : Finset Λ} : SupportedOnS S (0 : ManyBodyOpS Λ N) :=
+  ⟨fun _ _ h _ _ => absurd rfl h, fun _ _ _ _ _ _ _ _ => rfl⟩
+
+/-- A scalar multiple of an operator supported on a site set is supported on that site set: the
+support subalgebra is closed under scalar multiplication. -/
+theorem SupportedOnS.smul {S : Finset Λ} {A : ManyBodyOpS Λ N} (hA : SupportedOnS S A) (c : ℂ) :
+    SupportedOnS S (c • A) := by
+  constructor
+  · intro σ τ hne k hk
+    refine hA.1 σ τ (fun h0 => hne ?_) k hk
+    rw [Matrix.smul_apply, h0, smul_zero]
+  · intro σ τ σ' τ' h1 h2 h3 h4
+    rw [Matrix.smul_apply, Matrix.smul_apply, hA.2 σ τ σ' τ' h1 h2 h3 h4]
+
+/-- A difference of operators supported on the same site set is supported on that site set: the
+support subalgebra is closed under subtraction.  Needed for commutators of local terms. -/
+theorem SupportedOnS.sub {S : Finset Λ} {A B : ManyBodyOpS Λ N}
+    (hA : SupportedOnS S A) (hB : SupportedOnS S B) : SupportedOnS S (A - B) := by
+  rw [sub_eq_add_neg, ← neg_one_smul ℂ B]
+  exact hA.add (hB.smul (-1))
+
+/-- A finite sum of operators supported on a common site set is supported on that site set: the
+support subalgebra is closed under finite sums.  Needed to assemble a local term out of a
+site-indexed family, for instance an order-density commutator out of its single-site pieces. -/
+theorem SupportedOnS.sum {ι : Type*} {S : Finset Λ} (s : Finset ι) (f : ι → ManyBodyOpS Λ N)
+    (hf : ∀ i ∈ s, SupportedOnS S (f i)) : SupportedOnS S (∑ i ∈ s, f i) :=
+  Finset.sum_induction f (SupportedOnS S) (fun _ _ => SupportedOnS.add) supportedOnS_zero hf
+
 variable [Fintype Λ] [DecidableEq Λ]
 
 /-- **Disjointly supported operators commute.**  This is the content behind Tasaki's informal
@@ -321,5 +351,16 @@ theorem supportedOnS_iff_commute_onSiteS {S : Finset Λ} {A : ManyBodyOpS Λ N} 
         · exact Finset.piecewise_eq_of_mem _ _ _ (Finset.mem_sdiff.mpr ⟨Finset.mem_univ i, hiS⟩)
       rw [hσ, hτ] at hkey
       exact hkey.symm
+
+/-- A product of operators supported on the same site set is supported on that site set: the
+support subalgebra is closed under multiplication.  Read through the commutant characterisation
+`supportedOnS_iff_commute_onSiteS`, this is the fact that a commutant is closed under products;
+unlike the additive closure lemmas it needs the site type to be a `Fintype`, since the matrix
+product sums over configurations. -/
+theorem SupportedOnS.mul {S : Finset Λ} {A B : ManyBodyOpS Λ N}
+    (hA : SupportedOnS S A) (hB : SupportedOnS S B) : SupportedOnS S (A * B) :=
+  supportedOnS_iff_commute_onSiteS.mpr fun z hz C =>
+    (supportedOnS_iff_commute_onSiteS.mp hA z hz C).mul_left
+      (supportedOnS_iff_commute_onSiteS.mp hB z hz C)
 
 end LatticeSystem.Quantum
