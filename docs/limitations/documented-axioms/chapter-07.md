@@ -166,7 +166,7 @@ by two declarations in `LatticeSystem/Quantum/SpinS/AKLTStability.lean`:
   Theorem 7.3 statement is a real definition, not an axiom:
   `perturbedAKLTHamiltonianS` (line 63), `IsAKLTPerturbation` (line 49),
   `connectedChainCorrelation` (line 71), `IsUniqueChainGroundState` (line 81),
-  `IsLocalRangeR` (`LiebSchultzMattisGeneral.lean`, line 52), `IsPositiveSpectralGap`
+  `IsLocalRangeR` (`LiebSchultzMattisGeneral.lean`, line 56), `IsPositiveSpectralGap`
   (`HaldaneConjecture.lean`, line 67), `manyBodyOperatorNormS`
   (`ManyBodyOperatorNorm.lean`, line 21) and `ringDist` (`RingDistance.lean`, line 28).
 - **What the axiom statement literally asserts:** for every range r and bound v₀
