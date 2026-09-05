@@ -19,14 +19,11 @@ proves `ringDist` is symmetric for every pair, not just this one, but the equali
 definitional: `rfl` does not close `window L r x = siteBall (ringDist L) r x`, and
 `window_eq_siteBall` rewrites the filter predicate through `ringDist_comm` instead.
 
-The site-set pin's reach against a transposed argument order stops at the definition boundary. A
-transposition in the pin's own statement is caught: substituting the swapped wrapper
-`fun a b => ringDist L b a` for `ringDist L` on the right-hand side makes the fixture fail to
-elaborate with a type mismatch, since `window_eq_siteBall` is stated at `ringDist L` and the wrapper
-is not that up to unfolding; a wrong centre, a wrong radius, and an unrelated distance function fail
-the same way. A transposition inside the definition of `window` or of `siteBall` is not caught:
-either one makes the two filter predicates syntactically identical, so the equality becomes
-definitional — `rfl` closes it — and the pin passes unchanged.
+The site-set pin catches a transposition written into its own statement: substituting the swapped
+wrapper `fun a b => ringDist L b a` for `ringDist L` on the right-hand side makes the fixture fail
+to elaborate with a type mismatch, since `window_eq_siteBall` is stated at `ringDist L` and the
+wrapper is not that up to unfolding; a wrong centre, a wrong radius, and an unrelated distance
+function fail the same way.
 
 The locality pin holds `IsLocalRangeR`'s commutant condition, spelled out rather than named so the
 fixture exercises the site set independently of the predicate's own definition, equivalent to
