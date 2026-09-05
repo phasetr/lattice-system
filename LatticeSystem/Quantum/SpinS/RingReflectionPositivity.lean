@@ -9,8 +9,15 @@ entries vanish unless the two configurations agree on every right-half site).  A
 reflection map of `RingReflectionTheta.lean`.  This file records the left-support predicate, its
 closure properties, the fact that `θ` sends left-supported operators to right-supported ones, and the
 RP functional predicate.
+
+The left-support predicate is the generic support predicate `SupportedOnS`
+(`Quantum/SpinS/OperatorSupport.lean`) at the left-half site set, an identification proved here by
+`supportedOnLeftS_iff_supportedOnS`.  It is kept in its half-ring form because its closure lemmas
+(`SupportedOnLeftS.theta_right`, `SupportedOnLeftS.mul_theta_comm`) speak about the ring reflection
+`θ` and so are specific to this layer rather than instances of a generic support API.
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionHamiltonian
+import LatticeSystem.Quantum.SpinS.OperatorSupport
 
 namespace LatticeSystem.Quantum
 
@@ -23,7 +30,10 @@ in the subalgebra `B(H_left) ⊗ I_right` — when (1) its matrix entries vanish
 configurations agree on every right-half site (it preserves the right half), and (2) the entry
 depends only on the **left**-half restrictions of the configurations, not on the common right-half
 value (it acts as the identity on the right half).  The two conditions together characterize the
-left-half subalgebra, the domain of the reflection-positivity condition. -/
+left-half subalgebra, the domain of the reflection-positivity condition.  That this is the generic
+support condition is a theorem here and not merely the intended reading:
+`supportedOnLeftS_iff_supportedOnS` below identifies the predicate with `SupportedOnS`
+(`Quantum/SpinS/OperatorSupport.lean`) at the left-half site set. -/
 def SupportedOnLeftS (n N : ℕ) (A : ManyBodyOpS (Fin (2 * n)) N) : Prop :=
   (∀ σ τ : Fin (2 * n) → Fin (N + 1), A σ τ ≠ 0 → ∀ i : Fin (2 * n), n ≤ (i : ℕ) → σ i = τ i)
     ∧ (∀ σ τ σ' τ' : Fin (2 * n) → Fin (N + 1),
@@ -31,6 +41,24 @@ def SupportedOnLeftS (n N : ℕ) (A : ManyBodyOpS (Fin (2 * n)) N) : Prop :=
         (∀ i : Fin (2 * n), n ≤ (i : ℕ) → σ' i = τ' i) →
         (∀ i : Fin (2 * n), (i : ℕ) < n → σ i = σ' i) →
         (∀ i : Fin (2 * n), (i : ℕ) < n → τ i = τ' i) → A σ τ = A σ' τ')
+
+/-- **The left-half subalgebra is support on the left-half site set.**  `SupportedOnLeftS n N A`
+holds exactly when `A` is supported, in the entrywise sense of `SupportedOnS`
+(`Quantum/SpinS/OperatorSupport.lean`), on the left half `S = {i : Fin (2n) | (i : ℕ) < n}`: both
+sides say that `A` lies in `B(H_left) ⊗ I_right`, so a caller holding either shape may invoke a
+result stated in the other.  The predicates differ only in how the right half is named — the
+half-ring condition `n ≤ (i : ℕ)` versus non-membership in the left-half filter, which `not_lt`
+identifies — so no hypothesis on `n`, `N` or `A` is needed (for `n = 0` the site type is empty and
+both sides hold vacuously).  The half-ring form is kept rather than retired in favour of the generic
+one: its `θ`-compatibility closure lemmas mention the ring reflection and have no generic
+counterpart. -/
+theorem supportedOnLeftS_iff_supportedOnS {A : ManyBodyOpS (Fin (2 * n)) N} :
+    SupportedOnLeftS n N A ↔
+      SupportedOnS (Finset.univ.filter fun i : Fin (2 * n) => (i : ℕ) < n) A := by
+  have hmem : ∀ i : Fin (2 * n),
+      i ∈ Finset.univ.filter (fun i : Fin (2 * n) => (i : ℕ) < n) ↔ (i : ℕ) < n :=
+    fun i => by simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+  simp only [SupportedOnLeftS, SupportedOnS, hmem, not_lt]
 
 /-- The zero operator is left-supported. -/
 theorem SupportedOnLeftS.zero : SupportedOnLeftS n N 0 :=

@@ -11,7 +11,12 @@ conditions assumed alongside it.
 The predicate has the same two-clause shape as the half-ring predicate `SupportedOnLeftS` of
 `Quantum/SpinS/RingReflectionPositivity.lean`, with the half-ring site condition `n ≤ i` replaced by
 membership in an arbitrary `S : Finset Λ`: the entries vanish off the support, and inside the
-support they depend only on the restricted configurations.
+support they depend only on the restricted configurations.  That the two shapes agree is a theorem
+and not merely a resemblance: `supportedOnLeftS_iff_supportedOnS` (in that module) identifies
+`SupportedOnLeftS n N A` with support on the left-half site set
+`Finset.univ.filter fun i => (i : ℕ) < n`, so a caller holding either shape may invoke a result
+stated in the other.  The half-ring predicate is kept rather than rephrased through this one: its
+closure lemmas speak about the ring reflection `θ` and have no counterpart here.
 
 Other encodings of the same "acts only on `S`" concept exist elsewhere in the library, e.g.
 `IsLocalRangeR` (`Quantum/SpinS/LiebSchultzMattisGeneral.lean`), which phrases the same idea for a
