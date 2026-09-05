@@ -32,20 +32,16 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {d L N : ℕ}
 /-! ### The single lowering commutator `[Ĥ, ô⁻]` lies in the local-decay class -/
 
 /-- The bond–order lowering commutator `[Ŝ_x·Ŝ_y, Ô_L⁻]` is supported on the bond `{x, y}` (lowering
-mirror of `spinSDot_staggeredRaising_commutator_supportedOn`). -/
-theorem spinSDot_staggeredLowering_commutator_supportedOn (A : Λ → Bool) (x y : Λ) (hxy : x ≠ y) :
-    SupportedOn ({x, y} : Finset Λ)
+mirror of `spinSDot_staggeredRaising_commutator_supportedOnS`). -/
+theorem spinSDot_staggeredLowering_commutator_supportedOnS (A : Λ → Bool) (x y : Λ) (hxy : x ≠ y) :
+    SupportedOnS ({x, y} : Finset Λ)
       (spinSDot x y N * staggeredLoweringOpS A N - staggeredLoweringOpS A N * spinSDot x y N) := by
   rw [spinSDot_commutator_staggeredLoweringOpS_support A x y hxy]
-  have hx : ({x} : Finset Λ) ⊆ {x, y} :=
-    Finset.singleton_subset_iff.mpr (Finset.mem_insert_self x {y})
-  have hy : ({y} : Finset Λ) ⊆ {x, y} :=
-    Finset.singleton_subset_iff.mpr (Finset.mem_insert_of_mem (Finset.mem_singleton_self y))
-  have hSx : SupportedOn ({x, y} : Finset Λ) (spinSSiteOpMinus x N) :=
-    (onSiteS_supportedOn x (spinSOpMinus N)).mono hx
-  have hSy : SupportedOn ({x, y} : Finset Λ) (spinSSiteOpMinus y N) :=
-    (onSiteS_supportedOn y (spinSOpMinus N)).mono hy
-  have hdot := spinSDot_supportedOn (N := N) x y
+  have hSx : SupportedOnS ({x, y} : Finset Λ) (spinSSiteOpMinus x N) :=
+    supportedOnS_onSiteS (Finset.mem_insert_self x {y}) (spinSOpMinus N)
+  have hSy : SupportedOnS ({x, y} : Finset Λ) (spinSSiteOpMinus y N) :=
+    supportedOnS_onSiteS (Finset.mem_insert_of_mem (Finset.mem_singleton_self y)) (spinSOpMinus N)
+  have hdot := spinSDot_supportedOnS (N := N) x y
   exact (((hdot.mul hSx).sub (hSx.mul hdot)).smul _).add
     (((hdot.mul hSy).sub (hSy.mul hdot)).smul _)
 
@@ -102,7 +98,7 @@ theorem isR2LocalUpTo_heisenbergLoweringComm [NeZero L] (hL : 2 ≤ L) (hN : 1 �
     (fun p => spinSDot p.1 p.2 N * staggeredLoweringOpS (torusParitySublattice d L) N
       - staggeredLoweringOpS (torusParitySublattice d L) N * spinSDot p.1 p.2 N)
     (fun p => ({p.1, p.2} : Finset (HypercubicTorus d L))) 2
-    (fun p hp => spinSDot_staggeredLowering_commutator_supportedOn _ p.1 p.2
+    (fun p hp => spinSDot_staggeredLowering_commutator_supportedOnS _ p.1 p.2
       (Finset.mem_filter.mp hp).2)
     (fun p _ => (Finset.card_insert_le _ _).trans (by simp))
   simpa [heisenbergLoweringCommAggregate] using hbd

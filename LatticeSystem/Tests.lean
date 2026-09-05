@@ -158,6 +158,7 @@ import LatticeSystem.Tests.OperatorSupport
 import LatticeSystem.Tests.SupportCommutantBridgePin
 import LatticeSystem.Tests.ChainWindowSupportPin
 import LatticeSystem.Tests.RingBallLocalityBridgePin
+import LatticeSystem.Tests.AndersonTowerSupportPin
 import LatticeSystem.Tests.ShastryEnergyGainReduction
 import LatticeSystem.Tests.NoLongRangeOrder1DPin
 import LatticeSystem.Tests.Corollary43ContrapositionPin

@@ -13,26 +13,21 @@ The predicate has the same two-clause shape as the half-ring predicate `Supporte
 membership in an arbitrary `S : Finset Λ`: the entries vanish off the support, and inside the
 support they depend only on the restricted configurations.
 
-`LatticeSystem.Quantum.SupportedOn` (`Quantum/SpinS/AndersonTowerLocalDecay.lean`) is another
-encoding of the same "acts only on `S`" concept, phrased in commutant form: `G` is supported on `S`
-when it commutes with every on-site factor located off `S`. Further encodings exist elsewhere in
-the library, e.g. `IsLocalRangeR` (`Quantum/SpinS/LiebSchultzMattisGeneral.lean`), which phrases
-the same idea for a fixed centre and radius on a ring (its commutant phrasing is deliberate: it is
-shared with the §7.1.3 Theorem 7.3 axiom hypothesis). This family of "acts only on a subset of
-sites" encodings is larger than this module and has not been enumerated exhaustively; new encodings
-should not be assumed absent just because a comment does not mention them. Unifying the family into
-one predicate is tracked work, not done here.
+Other encodings of the same "acts only on `S`" concept exist elsewhere in the library, e.g.
+`IsLocalRangeR` (`Quantum/SpinS/LiebSchultzMattisGeneral.lean`), which phrases the same idea for a
+fixed centre and radius on a ring (its commutant phrasing is deliberate: it is shared with the
+§7.1.3 Theorem 7.3 axiom hypothesis). This family of "acts only on a subset of sites" encodings is
+larger than this module and has not been enumerated exhaustively; new encodings should not be
+assumed absent just because a comment does not mention them. Unifying the family into one predicate
+is tracked work, not done here.
 
-`SupportedOn` and `SupportedOnS` are a particular hazard: both have signature
-`Finset Λ → ManyBodyOpS Λ N → Prop`, both live in namespace `LatticeSystem.Quantum`, and they
-differ by one character. Picking the wrong one therefore still type-checks. Being "commutes with
-every off-support on-site factor" versus "vanishes off support, depends only on support", they are
-nevertheless logically equivalent for `ManyBodyOpS` over a `[Fintype Λ] [DecidableEq Λ]` site type,
-and `supportedOnS_iff_commute_onSiteS` below proves that equivalence in both directions. Its
-right-hand side is the commutant condition written out rather than named; that choice is explained
-once, in the theorem's own doc comment. What is written out is exactly what `SupportedOn S A`
-unfolds to, which the fixture file `LatticeSystem/Tests/SupportCommutantBridgePin.lean` pins.
-`IsLocalRangeR` reaches the equivalence through `isLocalRangeR_iff_supportedOnS`
+The commutant reading — "commutes with every off-support on-site factor" — and the two-clause
+reading — "vanishes off support, depends only on support" — are logically equivalent for
+`ManyBodyOpS` over a `[Fintype Λ] [DecidableEq Λ]` site type, and `supportedOnS_iff_commute_onSiteS`
+below proves that equivalence in both directions. Its right-hand side is the commutant condition
+written out rather than named; that choice is explained once, in the theorem's own doc comment, and
+the fixture file `LatticeSystem/Tests/SupportCommutantBridgePin.lean` pins that commutant formula
+verbatim. `IsLocalRangeR` reaches the equivalence through `isLocalRangeR_iff_supportedOnS`
 (`Quantum/SpinS/LiebSchultzMattisGeneral.lean`), which identifies it with support on the range-`r`
 ring window, so a caller holding either shape can apply a result stated in the other. Rephrasing
 that predicate's callers through the bridge is tracked work, not done here.
@@ -76,6 +71,36 @@ theorem SupportedOnS.add {S : Finset Λ} {A B : ManyBodyOpS Λ N}
   · intro σ τ σ' τ' h1 h2 h3 h4
     rw [Matrix.add_apply, Matrix.add_apply, hA.2 σ τ σ' τ' h1 h2 h3 h4,
       hB.2 σ τ σ' τ' h1 h2 h3 h4]
+
+/-- The zero operator is supported on every site set: no entry is nonzero, so the first clause is
+vacuous, and every entry equals every other. -/
+theorem supportedOnS_zero {S : Finset Λ} : SupportedOnS S (0 : ManyBodyOpS Λ N) :=
+  ⟨fun _ _ h _ _ => absurd rfl h, fun _ _ _ _ _ _ _ _ => rfl⟩
+
+/-- A scalar multiple of an operator supported on a site set is supported on that site set: the
+support subalgebra is closed under scalar multiplication. -/
+theorem SupportedOnS.smul {S : Finset Λ} {A : ManyBodyOpS Λ N} (hA : SupportedOnS S A) (c : ℂ) :
+    SupportedOnS S (c • A) := by
+  constructor
+  · intro σ τ hne k hk
+    refine hA.1 σ τ (fun h0 => hne ?_) k hk
+    rw [Matrix.smul_apply, h0, smul_zero]
+  · intro σ τ σ' τ' h1 h2 h3 h4
+    rw [Matrix.smul_apply, Matrix.smul_apply, hA.2 σ τ σ' τ' h1 h2 h3 h4]
+
+/-- A difference of operators supported on the same site set is supported on that site set: the
+support subalgebra is closed under subtraction.  Needed for commutators of local terms. -/
+theorem SupportedOnS.sub {S : Finset Λ} {A B : ManyBodyOpS Λ N}
+    (hA : SupportedOnS S A) (hB : SupportedOnS S B) : SupportedOnS S (A - B) := by
+  rw [sub_eq_add_neg, ← neg_one_smul ℂ B]
+  exact hA.add (hB.smul (-1))
+
+/-- A finite sum of operators supported on a common site set is supported on that site set: the
+support subalgebra is closed under finite sums.  Needed to assemble a local term out of a
+site-indexed family, for instance an order-density commutator out of its single-site pieces. -/
+theorem SupportedOnS.sum {ι : Type*} {S : Finset Λ} (s : Finset ι) (f : ι → ManyBodyOpS Λ N)
+    (hf : ∀ i ∈ s, SupportedOnS S (f i)) : SupportedOnS S (∑ i ∈ s, f i) :=
+  Finset.sum_induction f (SupportedOnS S) (fun _ _ => SupportedOnS.add) supportedOnS_zero hf
 
 variable [Fintype Λ] [DecidableEq Λ]
 
@@ -279,12 +304,11 @@ private theorem apply_piecewise_eq_of_commute_onSiteS {S : Finset Λ} {A : ManyB
 many-body space is supported on the site set `S` — in the two-clause sense of `SupportedOnS`,
 i.e. it lies in `B(H_S) ⊗ I_{Λ∖S}` — exactly when it commutes with every single-site operator
 placed at a site outside `S`.  The right-hand side is the commutant reading of "acts only on `S`"
-used elsewhere in the library (`SupportedOn` of `Quantum/SpinS/AndersonTowerLocalDecay.lean`,
-`IsLocalRangeR` of `Quantum/SpinS/LiebSchultzMattisGeneral.lean`); it is spelled out rather than
-named so that this module keeps its base layer — its only repository import is
-`Quantum/SpinS/MultiSiteCore.lean` — instead of taking on the §4.2.2 and §6.2 stacks those
-predicates sit on.  This doc comment is the single place that choice is recorded; the module header
-and the fixture file point here.
+used elsewhere in the library (`IsLocalRangeR` of `Quantum/SpinS/LiebSchultzMattisGeneral.lean`);
+it is spelled out rather than named so that this module keeps its base layer — its only repository
+import is `Quantum/SpinS/MultiSiteCore.lean` — instead of taking on the §6.2 stack that predicate
+sits on.  This doc comment is the single place that choice is recorded; the module header and the
+fixture file point here.
 
 Mathematically this is the finite-dimensional commutation theorem for tensor products,
 `(1 ⊗ M_m)' = M_n ⊗ 1`, proved directly from matrix entries.  It is a repository-internal lemma
@@ -321,5 +345,16 @@ theorem supportedOnS_iff_commute_onSiteS {S : Finset Λ} {A : ManyBodyOpS Λ N} 
         · exact Finset.piecewise_eq_of_mem _ _ _ (Finset.mem_sdiff.mpr ⟨Finset.mem_univ i, hiS⟩)
       rw [hσ, hτ] at hkey
       exact hkey.symm
+
+/-- A product of operators supported on the same site set is supported on that site set: the
+support subalgebra is closed under multiplication.  Read through the commutant characterisation
+`supportedOnS_iff_commute_onSiteS`, this is the fact that a commutant is closed under products;
+unlike the additive closure lemmas it needs the site type to be a `Fintype`, since the matrix
+product sums over configurations. -/
+theorem SupportedOnS.mul {S : Finset Λ} {A B : ManyBodyOpS Λ N}
+    (hA : SupportedOnS S A) (hB : SupportedOnS S B) : SupportedOnS S (A * B) :=
+  supportedOnS_iff_commute_onSiteS.mpr fun z hz C =>
+    (supportedOnS_iff_commute_onSiteS.mp hA z hz C).mul_left
+      (supportedOnS_iff_commute_onSiteS.mp hB z hz C)
 
 end LatticeSystem.Quantum
