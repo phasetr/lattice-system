@@ -377,6 +377,76 @@ private lemma oLoc_conjTranspose (x : Fin 4) : Matrix.conjTranspose (oLoc x) = o
   have h3 : Matrix.conjTranspose (oLoc 3) = oLoc 3 := by rw [oLoc_three]; exact bOp_conjTranspose
   exact fin_four_cases (P := fun w => Matrix.conjTranspose (oLoc w) = oLoc w) h0 h1 h2 h3 x
 
+/-! ## Locality and unit norms of the model terms -/
+
+/-- **Hypothesis (a) for the stabilizers**: each stabilizer is supported on the radius-1 ring ball
+of its own site. -/
+private lemma kLoc_supportedOnS_siteBall :
+    ∀ x : Fin 4, SupportedOnS (siteBall (ringDist 4) 1 x) (kLoc x) := by
+  have h0 : SupportedOnS (siteBall (ringDist 4) 1 0) (kLoc 0) := by
+    rw [kLoc_zero]
+    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sX).mul
+      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sX)
+  have h1 : SupportedOnS (siteBall (ringDist 4) 1 1) (kLoc 1) := by
+    rw [kLoc_one]
+    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sX).mul
+      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sX)
+  have h2 : SupportedOnS (siteBall (ringDist 4) 1 2) (kLoc 2) := by
+    rw [kLoc_two]
+    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sZ).mul
+      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sZ)
+  have h3 : SupportedOnS (siteBall (ringDist 4) 1 3) (kLoc 3) := by
+    rw [kLoc_three]
+    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sZ).mul
+      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sZ)
+  exact fin_four_cases (P := fun w => SupportedOnS (siteBall (ringDist 4) 1 w) (kLoc w))
+    h0 h1 h2 h3
+
+/-- **Hypothesis (a) for `ĥ`**: each local Hamiltonian term is supported on the radius-1 ring ball
+of its own site, so the model has range `r = 1`. -/
+private lemma hLoc_supportedOnS_siteBall :
+    ∀ x : Fin 4, SupportedOnS (siteBall (ringDist 4) 1 x) (hLoc x) := by
+  intro x
+  rw [hLoc_eq_neg_kLoc, ← neg_one_smul ℂ (kLoc x)]
+  exact (kLoc_supportedOnS_siteBall x).smul (-1)
+
+/-- **Hypothesis (a) for `ô`**: each local order term is supported on the radius-1 ring ball of its
+own site, so the model has range `r = 1`. -/
+private lemma oLoc_supportedOnS_siteBall :
+    ∀ x : Fin 4, SupportedOnS (siteBall (ringDist 4) 1 x) (oLoc x) := by
+  have h0 : SupportedOnS (siteBall (ringDist 4) 1 0) (oLoc 0) := by
+    rw [oLoc_zero, aOp]
+    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sY).mul
+      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sY)
+  have h1 : SupportedOnS (siteBall (ringDist 4) 1 1) (oLoc 1) := by
+    rw [oLoc_one, aOp]
+    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sY).mul
+      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sY)
+  have h2 : SupportedOnS (siteBall (ringDist 4) 1 2) (oLoc 2) := by
+    rw [oLoc_two, bOp]
+    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sY).mul
+      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sY)
+  have h3 : SupportedOnS (siteBall (ringDist 4) 1 3) (oLoc 3) := by
+    rw [oLoc_three, bOp]
+    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sY).mul
+      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sY)
+  exact fin_four_cases (P := fun w => SupportedOnS (siteBall (ringDist 4) 1 w) (oLoc w))
+    h0 h1 h2 h3
+
+/-- **Hypothesis (b) for `ĥ`**: each local Hamiltonian term is Hermitian and an involution, hence
+unitary, so its operator norm is exactly `1` and in particular `h₀ = 1` is admissible. -/
+private lemma hLoc_manyBodyOperatorNormS_le_one :
+    ∀ x : Fin 4, manyBodyOperatorNormS (hLoc x) ≤ 1 := fun x =>
+  le_of_eq (manyBodyOperatorNormS_eq_one_of_unitary
+    (by rw [hLoc_conjTranspose, hLoc_mul_self]))
+
+/-- **Hypothesis (b) for `ô`**: each local order term is Hermitian and an involution, hence
+unitary, so its operator norm is exactly `1` and in particular `o₀ = 1` is admissible. -/
+private lemma oLoc_manyBodyOperatorNormS_le_one :
+    ∀ x : Fin 4, manyBodyOperatorNormS (oLoc x) ≤ 1 := fun x =>
+  le_of_eq (manyBodyOperatorNormS_eq_one_of_unitary
+    (by rw [oLoc_conjTranspose, oLoc_mul_self]))
+
 /-! ## The counterexample -/
 
 /-- **Counterexample to the printed constant of Tasaki eq. (3.4.13), as literally quantified.**
