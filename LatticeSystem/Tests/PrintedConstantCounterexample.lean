@@ -447,6 +447,186 @@ private lemma oLoc_manyBodyOperatorNormS_le_one :
   le_of_eq (manyBodyOperatorNormS_eq_one_of_unitary
     (by rw [oLoc_conjTranspose, oLoc_mul_self]))
 
+/-! ## The Bell-pair ground state -/
+
+/-- The unnormalized ground state: the product of the Bell pairs on `{1,2}` and on `{3,0}`, written
+as the indicator of the configurations with `σ₁ = σ₂` and `σ₃ = σ₀`. -/
+private noncomputable def gsVec : (Fin 4 → Fin 2) → ℂ :=
+  fun σ => if σ 1 = σ 2 ∧ σ 3 = σ 0 then 1 else 0
+
+/-- The normalized ground state `Φ_GS` used in the counterexample. -/
+private noncomputable def gsState : (Fin 4 → Fin 2) → ℂ := unitNormalize gsVec
+
+/-- Value of the ground-state indicator at a configuration. -/
+private lemma gsVec_apply (σ : Fin 4 → Fin 2) :
+    gsVec σ = if σ 1 = σ 2 ∧ σ 3 = σ 0 then 1 else 0 := rfl
+
+/-- A single-site `Ẑ` acts diagonally, by the sign `(−1)^{σ_i}`. -/
+private lemma onSiteS_sZ_mulVec_apply (i : Fin 4) (v : (Fin 4 → Fin 2) → ℂ)
+    (σ : Fin 4 → Fin 2) :
+    ((onSiteS i sZ : ManyBodyOpS (Fin 4) 1) *ᵥ v) σ = (-1 : ℂ) ^ (σ i : ℕ) * v σ := by
+  have hself : Function.update σ i (σ i) = σ := by simp
+  rw [onSiteS_mulVec_apply, Fin.sum_univ_two]
+  rcases fin_two_cases (σ i) with h | h <;> rw [h] at hself ⊢ <;> norm_num [sZ, hself]
+
+/-- A single-site `X̂` acts by flipping the configuration at that site. -/
+private lemma onSiteS_sX_mulVec_apply (i : Fin 4) (v : (Fin 4 → Fin 2) → ℂ)
+    (σ : Fin 4 → Fin 2) :
+    ((onSiteS i sX : ManyBodyOpS (Fin 4) 1) *ᵥ v) σ = v (Function.update σ i (σ i + 1)) := by
+  rw [onSiteS_mulVec_apply, Fin.sum_univ_two]
+  rcases fin_two_cases (σ i) with h | h
+  · rw [h, show (0 : Fin 2) + 1 = 1 from rfl]
+    norm_num [sX]
+  · rw [h, show (1 : Fin 2) + 1 = 0 from rfl]
+    norm_num [sX]
+
+/-- **`K̂₀ Φ = Φ`**: the `X̂₃X̂₀` stabilizer flips both members of the pair `{3,0}`, which leaves
+the ground-state indicator unchanged. -/
+private lemma kLoc_zero_mulVec_gsVec : kLoc 0 *ᵥ gsVec = gsVec := by
+  funext σ
+  rw [kLoc_zero, ← Matrix.mulVec_mulVec, onSiteS_sX_mulVec_apply, onSiteS_sX_mulVec_apply,
+    Function.update_of_ne (show (0 : Fin 4) ≠ 3 by decide), gsVec_apply, gsVec_apply,
+    Function.update_of_ne (show (1 : Fin 4) ≠ 0 by decide),
+    Function.update_of_ne (show (1 : Fin 4) ≠ 3 by decide),
+    Function.update_of_ne (show (2 : Fin 4) ≠ 0 by decide),
+    Function.update_of_ne (show (2 : Fin 4) ≠ 3 by decide),
+    Function.update_of_ne (show (3 : Fin 4) ≠ 0 by decide), Function.update_self,
+    Function.update_self]
+  refine if_congr (and_congr_right fun _ => ⟨fun hh => add_right_cancel hh, fun hh => ?_⟩) rfl rfl
+  rw [hh]
+
+/-- **`K̂₁ Φ = Φ`**: the `X̂₁X̂₂` stabilizer flips both members of the pair `{1,2}`. -/
+private lemma kLoc_one_mulVec_gsVec : kLoc 1 *ᵥ gsVec = gsVec := by
+  funext σ
+  rw [kLoc_one, ← Matrix.mulVec_mulVec, onSiteS_sX_mulVec_apply, onSiteS_sX_mulVec_apply,
+    Function.update_of_ne (show (2 : Fin 4) ≠ 1 by decide), gsVec_apply, gsVec_apply,
+    Function.update_of_ne (show (1 : Fin 4) ≠ 2 by decide), Function.update_self,
+    Function.update_self, Function.update_of_ne (show (3 : Fin 4) ≠ 2 by decide),
+    Function.update_of_ne (show (3 : Fin 4) ≠ 1 by decide),
+    Function.update_of_ne (show (0 : Fin 4) ≠ 2 by decide),
+    Function.update_of_ne (show (0 : Fin 4) ≠ 1 by decide)]
+  refine if_congr (and_congr (⟨fun hh => add_right_cancel hh, fun hh => ?_⟩) Iff.rfl) rfl rfl
+  rw [hh]
+
+/-- **`K̂₂ Φ = Φ`**: the `Ẑ₁Ẑ₂` stabilizer has sign `+1` exactly where `σ₁ = σ₂`, which is where the
+ground-state indicator is supported. -/
+private lemma kLoc_two_mulVec_gsVec : kLoc 2 *ᵥ gsVec = gsVec := by
+  funext σ
+  rw [kLoc_two, ← Matrix.mulVec_mulVec, onSiteS_sZ_mulVec_apply, onSiteS_sZ_mulVec_apply]
+  by_cases hp : σ 1 = σ 2 ∧ σ 3 = σ 0
+  · rw [hp.1]
+    rcases fin_two_cases (σ 2) with h | h <;> rw [h] <;> norm_num
+  · rw [gsVec_apply, if_neg hp, mul_zero, mul_zero]
+
+/-- **`K̂₃ Φ = Φ`**: the `Ẑ₃Ẑ₀` stabilizer has sign `+1` exactly where `σ₃ = σ₀`. -/
+private lemma kLoc_three_mulVec_gsVec : kLoc 3 *ᵥ gsVec = gsVec := by
+  funext σ
+  rw [kLoc_three, ← Matrix.mulVec_mulVec, onSiteS_sZ_mulVec_apply, onSiteS_sZ_mulVec_apply]
+  by_cases hp : σ 1 = σ 2 ∧ σ 3 = σ 0
+  · rw [hp.2]
+    rcases fin_two_cases (σ 0) with h | h <;> rw [h] <;> norm_num
+  · rw [gsVec_apply, if_neg hp, mul_zero, mul_zero]
+
+/-- **The stabilizer relations `K̂_x Φ = Φ`** for the two-Bell-pair ground state. -/
+private lemma kLoc_mulVec_gsVec (x : Fin 4) : kLoc x *ᵥ gsVec = gsVec :=
+  fin_four_cases (P := fun w => kLoc w *ᵥ gsVec = gsVec) kLoc_zero_mulVec_gsVec
+    kLoc_one_mulVec_gsVec kLoc_two_mulVec_gsVec kLoc_three_mulVec_gsVec x
+
+/-- The ground state is nonzero: the all-zero configuration is in its support. -/
+private lemma gsVec_ne_zero : gsVec ≠ 0 := by
+  intro h
+  have h1 : gsVec (fun _ => (0 : Fin 2)) = 1 := by simp [gsVec]
+  rw [h, Pi.zero_apply] at h1
+  exact zero_ne_one h1
+
+/-- The Hamiltonian is the negative of the sum of the stabilizers. -/
+private lemma hLoc_sum_eq_neg_kLoc_sum : ∑ x, hLoc x = -∑ x, kLoc x := by
+  rw [← Finset.sum_neg_distrib]
+  exact Finset.sum_congr rfl fun x _ => hLoc_eq_neg_kLoc x
+
+/-- The four stabilizers sum to `4` on the ground state. -/
+private lemma kLoc_sum_mulVec_gsVec : (∑ x, kLoc x) *ᵥ gsVec = (4 : ℂ) • gsVec := by
+  rw [Matrix.sum_mulVec, Fin.sum_univ_four, kLoc_mulVec_gsVec, kLoc_mulVec_gsVec,
+    kLoc_mulVec_gsVec, kLoc_mulVec_gsVec]
+  module
+
+/-- The ground state is an eigenvector of `Ĥ = Σ_x ĥ_x` at `E₀ = −4`. -/
+private lemma hLoc_sum_mulVec_gsVec : (∑ x, hLoc x) *ᵥ gsVec = (-4 : ℂ) • gsVec := by
+  rw [hLoc_sum_eq_neg_kLoc_sum, Matrix.neg_mulVec, kLoc_sum_mulVec_gsVec]
+  module
+
+/-- **A Hermitian involution has expectation at most the squared norm.**  The squared norm of
+`K̂ v − v` is `2⟨v,v⟩ − 2⟨v,K̂ v⟩ ≥ 0`. -/
+private lemma kLoc_expectation_le {K : ManyBodyOpS (Fin 4) 1}
+    (hH : Matrix.conjTranspose K = K) (hI : K * K = 1) (v : (Fin 4 → Fin 2) → ℂ) :
+    star v ⬝ᵥ (K *ᵥ v) ≤ star v ⬝ᵥ v := by
+  have hstar : star (K *ᵥ v) ⬝ᵥ v = star v ⬝ᵥ (K *ᵥ v) := by
+    rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, hH]
+  have hnorm : star (K *ᵥ v) ⬝ᵥ (K *ᵥ v) = star v ⬝ᵥ v := by
+    rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, hH, hI,
+      Matrix.one_mulVec]
+  have hterm : star (K *ᵥ v - v) ⬝ᵥ (K *ᵥ v - v)
+      = 2 * (star v ⬝ᵥ v) - 2 * (star v ⬝ᵥ (K *ᵥ v)) := by
+    rw [star_sub, sub_dotProduct, dotProduct_sub, dotProduct_sub, hnorm, hstar]
+    ring
+  have hnn : (0 : ℂ) ≤ 2 * (star v ⬝ᵥ v) - 2 * (star v ⬝ᵥ (K *ᵥ v)) := by
+    rw [← hterm]
+    exact dotProduct_star_self_nonneg _
+  exact le_of_mul_le_mul_left (sub_nonneg.mp hnn) zero_lt_two
+
+/-- **Ground-energy minimality.**  Since `Ĥ = −Σ_x K̂_x` and each Hermitian involution `K̂_x` has
+expectation at most the squared norm, no point of the real spectrum lies below `−4`. -/
+private lemma neg_four_le_of_mem_realSpectrum {E : ℝ} (hE : E ∈ realSpectrum (∑ x, hLoc x)) :
+    (-4 : ℝ) ≤ E := by
+  obtain ⟨v, hv0, hv⟩ := hE
+  have hpos : (0 : ℂ) < star v ⬝ᵥ v := Matrix.dotProduct_star_self_pos_iff.mpr hv0
+  have hsum : star v ⬝ᵥ ((∑ x, kLoc x) *ᵥ v) ≤ ((4 : ℝ) : ℂ) * (star v ⬝ᵥ v) := by
+    rw [Matrix.sum_mulVec, dotProduct_sum, Fin.sum_univ_four]
+    calc star v ⬝ᵥ (kLoc 0 *ᵥ v) + star v ⬝ᵥ (kLoc 1 *ᵥ v) + star v ⬝ᵥ (kLoc 2 *ᵥ v)
+            + star v ⬝ᵥ (kLoc 3 *ᵥ v)
+        ≤ star v ⬝ᵥ v + star v ⬝ᵥ v + star v ⬝ᵥ v + star v ⬝ᵥ v :=
+          add_le_add (add_le_add (add_le_add
+            (kLoc_expectation_le (kLoc_conjTranspose 0) (kLoc_mul_self 0) v)
+            (kLoc_expectation_le (kLoc_conjTranspose 1) (kLoc_mul_self 1) v))
+            (kLoc_expectation_le (kLoc_conjTranspose 2) (kLoc_mul_self 2) v))
+            (kLoc_expectation_le (kLoc_conjTranspose 3) (kLoc_mul_self 3) v)
+      _ = ((4 : ℝ) : ℂ) * (star v ⬝ᵥ v) := by push_cast; ring
+  have hHexp : star v ⬝ᵥ ((∑ x, hLoc x) *ᵥ v) = (E : ℂ) * (star v ⬝ᵥ v) := by
+    rw [hv, dotProduct_smul, smul_eq_mul]
+  have hkey : -(((4 : ℝ) : ℂ) * (star v ⬝ᵥ v)) ≤ (E : ℂ) * (star v ⬝ᵥ v) := by
+    rw [← hHexp, hLoc_sum_eq_neg_kLoc_sum, Matrix.neg_mulVec, dotProduct_neg]
+    exact neg_le_neg hsum
+  have hre : -(4 * (star v ⬝ᵥ v).re) ≤ E * (star v ⬝ᵥ v).re := by
+    have h := (Complex.le_def.mp hkey).1
+    rwa [Complex.neg_re, Complex.re_ofReal_mul, Complex.re_ofReal_mul] at h
+  have hcre : 0 < (star v ⬝ᵥ v).re := (Complex.lt_def.mp hpos).1
+  nlinarith [hre, hcre]
+
+/-- **Hypothesis (d), first half**: `E₀ = −4` is the ground energy of `Ĥ = Σ_x ĥ_x`. -/
+private lemma hLoc_sum_isGroundEnergy : IsGroundEnergy (∑ x, hLoc x) (-4) := by
+  refine ⟨⟨gsVec, gsVec_ne_zero, ?_⟩, fun E hE => neg_four_le_of_mem_realSpectrum hE⟩
+  rw [hLoc_sum_mulVec_gsVec]
+  norm_num
+
+/-! ## Normalization of the ground state -/
+
+/-- The ground state has positive squared norm, so it can be normalized. -/
+private lemma gsVec_vecNormSqRe_pos : 0 < vecNormSqRe gsVec := by
+  have h : (0 : ℂ) < star gsVec ⬝ᵥ gsVec := dotProduct_star_self_pos_iff.mpr gsVec_ne_zero
+  simpa [vecNormSqRe] using (Complex.lt_def.mp h).1
+
+/-- **Hypothesis (c)**: the ground state used in the counterexample is normalized. -/
+private lemma gsState_dotProduct_self_eq_one : star gsState ⬝ᵥ gsState = 1 := by
+  rw [gsState]
+  exact unitNormalize_dotProduct_self gsVec gsVec_vecNormSqRe_pos
+
+/-- **Hypothesis (d), second half**: the normalized ground state is an eigenvector of `Ĥ` at the
+ground energy `−4`. -/
+private lemma hLoc_sum_mulVec_gsState_eq_smul :
+    (∑ x, hLoc x) *ᵥ gsState = ((-4 : ℝ) : ℂ) • gsState := by
+  rw [gsState, unitNormalize, Matrix.mulVec_smul, hLoc_sum_mulVec_gsVec, smul_comm]
+  norm_num
+
 /-! ## The counterexample -/
 
 /-- **Counterexample to the printed constant of Tasaki eq. (3.4.13), as literally quantified.**
