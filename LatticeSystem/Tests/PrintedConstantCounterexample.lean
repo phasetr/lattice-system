@@ -41,6 +41,224 @@ private def sZ : Matrix (Fin 2) (Fin 2) ℂ := !![1, 0; 0, -1]
 /-- The single-site Pauli-`Y` matrix `!![0,-i;i,0]`. -/
 private noncomputable def sY : Matrix (Fin 2) (Fin 2) ℂ := !![0, -Complex.I; Complex.I, 0]
 
+/-! ## Single-site 2×2 algebra -/
+
+/-- `X² = 1`. -/
+private lemma sX_mul_sX : sX * sX = 1 := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    norm_num [sX, Matrix.mul_apply, Fin.sum_univ_two, Matrix.one_apply]
+
+/-- `Z² = 1`. -/
+private lemma sZ_mul_sZ : sZ * sZ = 1 := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    norm_num [sZ, Matrix.mul_apply, Fin.sum_univ_two, Matrix.one_apply]
+
+/-- `Y² = 1`. -/
+private lemma sY_mul_sY : sY * sY = 1 := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    norm_num [sY, Matrix.mul_apply, Fin.sum_univ_two, Matrix.one_apply, Complex.ext_iff]
+
+/-- `XY = iZ`. -/
+private lemma sX_mul_sY : sX * sY = Complex.I • sZ := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    norm_num [sX, sY, sZ, Matrix.mul_apply, Fin.sum_univ_two, Complex.ext_iff]
+
+/-- `YX = −iZ`. -/
+private lemma sY_mul_sX : sY * sX = (-Complex.I) • sZ := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    norm_num [sX, sY, sZ, Matrix.mul_apply, Fin.sum_univ_two, Complex.ext_iff]
+
+/-- `YZ = iX`. -/
+private lemma sY_mul_sZ : sY * sZ = Complex.I • sX := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    norm_num [sX, sY, sZ, Matrix.mul_apply, Fin.sum_univ_two, Complex.ext_iff]
+
+/-- `ZY = −iX`. -/
+private lemma sZ_mul_sY : sZ * sY = (-Complex.I) • sX := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    norm_num [sX, sY, sZ, Matrix.mul_apply, Fin.sum_univ_two, Complex.ext_iff]
+
+/-- `ZX = iY`. -/
+private lemma sZ_mul_sX : sZ * sX = Complex.I • sY := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    norm_num [sX, sY, sZ, Matrix.mul_apply, Fin.sum_univ_two, Complex.ext_iff]
+
+/-- `XZ = −iY`. -/
+private lemma sX_mul_sZ : sX * sZ = (-Complex.I) • sY := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    norm_num [sX, sY, sZ, Matrix.mul_apply, Fin.sum_univ_two, Complex.ext_iff]
+
+/-- `X` is Hermitian. -/
+private lemma sX_conjTranspose : Matrix.conjTranspose sX = sX := by
+  ext i j
+  fin_cases i <;> fin_cases j <;> norm_num [sX, Matrix.conjTranspose_apply]
+
+/-- `Z` is Hermitian. -/
+private lemma sZ_conjTranspose : Matrix.conjTranspose sZ = sZ := by
+  ext i j
+  fin_cases i <;> fin_cases j <;> norm_num [sZ, Matrix.conjTranspose_apply]
+
+/-- `Y` is Hermitian. -/
+private lemma sY_conjTranspose : Matrix.conjTranspose sY = sY := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    norm_num [sY, Matrix.conjTranspose_apply, Complex.ext_iff]
+
+/-- `2 Ŝ^{(3)} = Z` on the qubit: the repository's spin-`1/2` operator in Pauli letters. -/
+private lemma two_smul_spinSOp3_eq_sZ : (2 : ℂ) • spinSOp3 1 = sZ := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    norm_num [sZ, spinSOp3, Matrix.diagonal_apply, Complex.ext_iff]
+
+/-- `2 Ŝ^{(1)} = X` on the qubit: the repository's spin-`1/2` operator in Pauli letters. -/
+private lemma two_smul_spinSOp1_eq_sX : (2 : ℂ) • spinSOp1 1 = sX := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    norm_num [sX, spinSOp1, spinSOpPlus, spinSOpMinus, Matrix.add_apply, Complex.ext_iff]
+
+/-! ## Ring index arithmetic and Pauli words -/
+
+/-- Distinct offsets from a common centre land on distinct sites of the 5-ring. -/
+private lemma offsetSite_ne (x : Fin 5) {a b : Fin 5} (hab : a ≠ b) : x + a ≠ x + b :=
+  fun h => hab (add_left_cancel h)
+
+/-- Single-site operators at distinct offsets from a common centre commute. -/
+private lemma commute_offset (x : Fin 5) {a b : Fin 5} (hab : a ≠ b)
+    (A B : Matrix (Fin 2) (Fin 2) ℂ) :
+    Commute (onSiteS (x + a) A : ManyBodyOpS (Fin 5) 1) (onSiteS (x + b) B) :=
+  onSiteS_commute_of_ne (offsetSite_ne x hab) A B
+
+/-- Merging the leading letters of two right-nested words whose tails commute with the second
+leading letter. -/
+private lemma word_mul_step {a b R S : ManyBodyOpS (Fin 5) 1} (h : Commute R b) :
+    a * R * (b * S) = a * b * (R * S) := by
+  rw [mul_assoc a R (b * S), ← mul_assoc R b S, h.eq, mul_assoc b R S, ← mul_assoc a b (R * S)]
+
+/-- Moving the trailing letter of a three-letter right-nested word to the front. -/
+private lemma word_rotate3 {a b c : ManyBodyOpS (Fin 5) 1} (h0 : Commute a c) (h1 : Commute b c) :
+    a * (b * c) = c * (a * b) := by
+  rw [h1.eq, ← mul_assoc, h0.eq, mul_assoc]
+
+/-- Moving the trailing letter of a four-letter right-nested word to the front. -/
+private lemma word_rotate4 {a b c d : ManyBodyOpS (Fin 5) 1} (h0 : Commute a d)
+    (h1 : Commute b d) (h2 : Commute c d) : a * (b * (c * d)) = d * (a * (b * c)) := by
+  rw [word_rotate3 h1 h2, ← mul_assoc, h0.eq, mul_assoc]
+
+/-- Moving the trailing letter of a five-letter right-nested word to the front, when it commutes
+with each of the other four. -/
+private lemma word_rotate {a b c d e : ManyBodyOpS (Fin 5) 1} (h0 : Commute a e)
+    (h1 : Commute b e) (h2 : Commute c e) (h3 : Commute d e) :
+    a * (b * (c * (d * e))) = e * (a * (b * (c * d))) := by
+  rw [word_rotate4 h1 h2 h3, ← mul_assoc, h0.eq, mul_assoc]
+
+/-- A product of three pairwise commuting factors is unchanged by reversal. -/
+private lemma triple_reverse {P Q R : ManyBodyOpS (Fin 5) 1} (hPQ : Commute P Q)
+    (hPR : Commute P R) (hQR : Commute Q R) : R * Q * P = P * Q * R := by
+  rw [mul_assoc, hPQ.symm.eq, ← mul_assoc, hPR.symm.eq, mul_assoc, hQR.symm.eq, ← mul_assoc]
+
+/-- The **Pauli word** `c · A₀ A₁ A₂ A₃ A₄` anchored at `x`: the letter `Aₖ` sits at the site
+`x + k` of the 5-ring, and `c` is an overall phase.  Every operator of the model is such a word,
+and the whole computation is carried out in this calculus.  The anchor slot is written `x + 0`
+rather than `x` so that all five slots are uniform offsets, which is what the commutation
+bookkeeping of `pw_mul` and `pw_shift` consumes. -/
+private noncomputable def pw (c : ℂ) (x : Fin 5) (A₀ A₁ A₂ A₃ A₄ : Matrix (Fin 2) (Fin 2) ℂ) :
+    ManyBodyOpS (Fin 5) 1 :=
+  c • (onSiteS (x + 0) A₀ * (onSiteS (x + 1) A₁ * (onSiteS (x + 2) A₂ *
+    (onSiteS (x + 3) A₃ * onSiteS (x + 4) A₄))))
+
+/-- **Words multiply slotwise**: the product of two words anchored at the same site is the word of
+the slotwise products, with the phases multiplied. -/
+private lemma pw_mul (c d : ℂ) (x : Fin 5)
+    (A₀ A₁ A₂ A₃ A₄ B₀ B₁ B₂ B₃ B₄ : Matrix (Fin 2) (Fin 2) ℂ) :
+    pw c x A₀ A₁ A₂ A₃ A₄ * pw d x B₀ B₁ B₂ B₃ B₄
+      = pw (c * d) x (A₀ * B₀) (A₁ * B₁) (A₂ * B₂) (A₃ * B₃) (A₄ * B₄) := by
+  have h43 : Commute (onSiteS (x + 4) A₄ : ManyBodyOpS (Fin 5) 1) (onSiteS (x + 3) B₃) :=
+    commute_offset x (Fin.ne_of_val_ne (by norm_num)) _ _
+  have h32 : Commute (onSiteS (x + 3) A₃ : ManyBodyOpS (Fin 5) 1) (onSiteS (x + 2) B₂) :=
+    commute_offset x (Fin.ne_of_val_ne (by norm_num)) _ _
+  have h42 : Commute (onSiteS (x + 4) A₄ : ManyBodyOpS (Fin 5) 1) (onSiteS (x + 2) B₂) :=
+    commute_offset x (Fin.ne_of_val_ne (by norm_num)) _ _
+  have h21 : Commute (onSiteS (x + 2) A₂ : ManyBodyOpS (Fin 5) 1) (onSiteS (x + 1) B₁) :=
+    commute_offset x (Fin.ne_of_val_ne (by norm_num)) _ _
+  have h31 : Commute (onSiteS (x + 3) A₃ : ManyBodyOpS (Fin 5) 1) (onSiteS (x + 1) B₁) :=
+    commute_offset x (Fin.ne_of_val_ne (by norm_num)) _ _
+  have h41 : Commute (onSiteS (x + 4) A₄ : ManyBodyOpS (Fin 5) 1) (onSiteS (x + 1) B₁) :=
+    commute_offset x (Fin.ne_of_val_ne (by norm_num)) _ _
+  have h10 : Commute (onSiteS (x + 1) A₁ : ManyBodyOpS (Fin 5) 1) (onSiteS (x + 0) B₀) :=
+    commute_offset x (Fin.ne_of_val_ne (by norm_num)) _ _
+  have h20 : Commute (onSiteS (x + 2) A₂ : ManyBodyOpS (Fin 5) 1) (onSiteS (x + 0) B₀) :=
+    commute_offset x (Fin.ne_of_val_ne (by norm_num)) _ _
+  have h30 : Commute (onSiteS (x + 3) A₃ : ManyBodyOpS (Fin 5) 1) (onSiteS (x + 0) B₀) :=
+    commute_offset x (Fin.ne_of_val_ne (by norm_num)) _ _
+  have h40 : Commute (onSiteS (x + 4) A₄ : ManyBodyOpS (Fin 5) 1) (onSiteS (x + 0) B₀) :=
+    commute_offset x (Fin.ne_of_val_ne (by norm_num)) _ _
+  rw [pw, pw, pw, smul_mul_smul_comm]
+  congr 1
+  rw [word_mul_step (h10.mul_left (h20.mul_left (h30.mul_left h40))),
+    word_mul_step (h21.mul_left (h31.mul_left h41)),
+    word_mul_step (h32.mul_left h42), word_mul_step h43,
+    onSiteS_mul_onSiteS_same, onSiteS_mul_onSiteS_same, onSiteS_mul_onSiteS_same,
+    onSiteS_mul_onSiteS_same, onSiteS_mul_onSiteS_same]
+
+/-- **Re-anchoring a word**: a word anchored at `x + 1` is the cyclically rotated word anchored at
+`x`.  Iterating this lemma moves every translate of a model term to the common anchor at which the
+slotwise product `pw_mul` applies. -/
+private lemma pw_shift (c : ℂ) (x : Fin 5) (A₀ A₁ A₂ A₃ A₄ : Matrix (Fin 2) (Fin 2) ℂ) :
+    pw c (x + 1) A₀ A₁ A₂ A₃ A₄ = pw c x A₄ A₀ A₁ A₂ A₃ := by
+  have h0 : Commute (onSiteS (x + 1) A₀ : ManyBodyOpS (Fin 5) 1) (onSiteS (x + 0) A₄) :=
+    commute_offset x (Fin.ne_of_val_ne (by norm_num)) _ _
+  have h1 : Commute (onSiteS (x + 2) A₁ : ManyBodyOpS (Fin 5) 1) (onSiteS (x + 0) A₄) :=
+    commute_offset x (Fin.ne_of_val_ne (by norm_num)) _ _
+  have h2 : Commute (onSiteS (x + 3) A₂ : ManyBodyOpS (Fin 5) 1) (onSiteS (x + 0) A₄) :=
+    commute_offset x (Fin.ne_of_val_ne (by norm_num)) _ _
+  have h3 : Commute (onSiteS (x + 4) A₃ : ManyBodyOpS (Fin 5) 1) (onSiteS (x + 0) A₄) :=
+    commute_offset x (Fin.ne_of_val_ne (by norm_num)) _ _
+  rw [pw, pw, add_assoc x 1 0, add_assoc x 1 1, add_assoc x 1 2, add_assoc x 1 3, add_assoc x 1 4,
+    show (1 : Fin 5) + 0 = 1 from rfl, show (1 : Fin 5) + 1 = 2 from rfl,
+    show (1 : Fin 5) + 2 = 3 from rfl, show (1 : Fin 5) + 3 = 4 from rfl,
+    show (1 : Fin 5) + 4 = 0 from rfl]
+  congr 1
+  exact word_rotate h0 h1 h2 h3
+
+/-- A phase in the anchor slot of a word is an overall phase. -/
+private lemma pw_smul_slot0 (c e : ℂ) (x : Fin 5) (A₀ A₁ A₂ A₃ A₄ : Matrix (Fin 2) (Fin 2) ℂ) :
+    pw c x (e • A₀) A₁ A₂ A₃ A₄ = pw (c * e) x A₀ A₁ A₂ A₃ A₄ := by
+  simp only [pw, onSiteS_smul, smul_mul_assoc, smul_smul]
+
+/-- A phase in the first slot of a word is an overall phase. -/
+private lemma pw_smul_slot1 (c e : ℂ) (x : Fin 5) (A₀ A₁ A₂ A₃ A₄ : Matrix (Fin 2) (Fin 2) ℂ) :
+    pw c x A₀ (e • A₁) A₂ A₃ A₄ = pw (c * e) x A₀ A₁ A₂ A₃ A₄ := by
+  simp only [pw, onSiteS_smul, smul_mul_assoc, mul_smul_comm, smul_smul]
+
+/-- A phase in the second slot of a word is an overall phase. -/
+private lemma pw_smul_slot2 (c e : ℂ) (x : Fin 5) (A₀ A₁ A₂ A₃ A₄ : Matrix (Fin 2) (Fin 2) ℂ) :
+    pw c x A₀ A₁ (e • A₂) A₃ A₄ = pw (c * e) x A₀ A₁ A₂ A₃ A₄ := by
+  simp only [pw, onSiteS_smul, smul_mul_assoc, mul_smul_comm, smul_smul]
+
+/-- A phase in the third slot of a word is an overall phase. -/
+private lemma pw_smul_slot3 (c e : ℂ) (x : Fin 5) (A₀ A₁ A₂ A₃ A₄ : Matrix (Fin 2) (Fin 2) ℂ) :
+    pw c x A₀ A₁ A₂ (e • A₃) A₄ = pw (c * e) x A₀ A₁ A₂ A₃ A₄ := by
+  simp only [pw, onSiteS_smul, smul_mul_assoc, mul_smul_comm, smul_smul]
+
+/-- A phase in the fourth slot of a word is an overall phase. -/
+private lemma pw_smul_slot4 (c e : ℂ) (x : Fin 5) (A₀ A₁ A₂ A₃ A₄ : Matrix (Fin 2) (Fin 2) ℂ) :
+    pw c x A₀ A₁ A₂ A₃ (e • A₄) = pw (c * e) x A₀ A₁ A₂ A₃ A₄ := by
+  simp only [pw, onSiteS_smul, mul_smul_comm, smul_smul]
+
+/-- Negating a word negates its phase. -/
+private lemma pw_neg (c : ℂ) (x : Fin 5) (A₀ A₁ A₂ A₃ A₄ : Matrix (Fin 2) (Fin 2) ℂ) :
+    -pw c x A₀ A₁ A₂ A₃ A₄ = pw (-c) x A₀ A₁ A₂ A₃ A₄ := by
+  rw [pw, pw, neg_smul]
+
 /-! ## The model: the 5-cycle, its local Hamiltonian/order terms, and its cluster ground state -/
 
 /-- The 5-cycle graph on `Fin 5`, the site graph of the model.  An `abbrev` (not a plain `def`) so
