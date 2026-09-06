@@ -627,6 +627,178 @@ private lemma hLoc_sum_mulVec_gsState_eq_smul :
   rw [gsState, unitNormalize, Matrix.mulVec_smul, hLoc_sum_mulVec_gsVec, smul_comm]
   norm_num
 
+/-! ## The anticommutation table `ô_x ĥ_z = −ĥ_z ô_x` -/
+
+/-- `Â` anticommutes with every stabilizer: each shares exactly one site with `Â`, carrying a
+different Pauli letter there. -/
+private lemma aOp_kLoc_anticomm (z : Fin 4) : aOp * kLoc z = -(kLoc z * aOp) := by
+  have h0 : aOp * kLoc 0 = -(kLoc 0 * aOp) := by
+    rw [aOp_eq_pw, kLoc_zero_eq_pw, pw_mul, pw_mul, pw_neg]
+    simp only [sY_mul_sX, sX_mul_sY, one_mul, mul_one, pw_smul_slot0]
+    congr 1
+    norm_num [Complex.ext_iff]
+  have h1 : aOp * kLoc 1 = -(kLoc 1 * aOp) := by
+    rw [aOp_eq_pw, kLoc_one_eq_pw, pw_mul, pw_mul, pw_neg]
+    simp only [sY_mul_sX, sX_mul_sY, one_mul, mul_one, pw_smul_slot1]
+    congr 1
+    norm_num [Complex.ext_iff]
+  have h2 : aOp * kLoc 2 = -(kLoc 2 * aOp) := by
+    rw [aOp_eq_pw, kLoc_two_eq_pw, pw_mul, pw_mul, pw_neg]
+    simp only [sY_mul_sZ, sZ_mul_sY, one_mul, mul_one, pw_smul_slot1]
+    congr 1
+    norm_num [Complex.ext_iff]
+  have h3 : aOp * kLoc 3 = -(kLoc 3 * aOp) := by
+    rw [aOp_eq_pw, kLoc_three_eq_pw, pw_mul, pw_mul, pw_neg]
+    simp only [sY_mul_sZ, sZ_mul_sY, one_mul, mul_one, pw_smul_slot0]
+    congr 1
+    norm_num [Complex.ext_iff]
+  exact fin_four_cases (P := fun w => aOp * kLoc w = -(kLoc w * aOp)) h0 h1 h2 h3 z
+
+/-- `B̂` anticommutes with every stabilizer, by the same one-site count. -/
+private lemma bOp_kLoc_anticomm (z : Fin 4) : bOp * kLoc z = -(kLoc z * bOp) := by
+  have h0 : bOp * kLoc 0 = -(kLoc 0 * bOp) := by
+    rw [bOp_eq_pw, kLoc_zero_eq_pw, pw_mul, pw_mul, pw_neg]
+    simp only [sY_mul_sX, sX_mul_sY, one_mul, mul_one, pw_smul_slot3]
+    congr 1
+    norm_num [Complex.ext_iff]
+  have h1 : bOp * kLoc 1 = -(kLoc 1 * bOp) := by
+    rw [bOp_eq_pw, kLoc_one_eq_pw, pw_mul, pw_mul, pw_neg]
+    simp only [sY_mul_sX, sX_mul_sY, one_mul, mul_one, pw_smul_slot2]
+    congr 1
+    norm_num [Complex.ext_iff]
+  have h2 : bOp * kLoc 2 = -(kLoc 2 * bOp) := by
+    rw [bOp_eq_pw, kLoc_two_eq_pw, pw_mul, pw_mul, pw_neg]
+    simp only [sY_mul_sZ, sZ_mul_sY, one_mul, mul_one, pw_smul_slot2]
+    congr 1
+    norm_num [Complex.ext_iff]
+  have h3 : bOp * kLoc 3 = -(kLoc 3 * bOp) := by
+    rw [bOp_eq_pw, kLoc_three_eq_pw, pw_mul, pw_mul, pw_neg]
+    simp only [sY_mul_sZ, sZ_mul_sY, one_mul, mul_one, pw_smul_slot3]
+    congr 1
+    norm_num [Complex.ext_iff]
+  exact fin_four_cases (P := fun w => bOp * kLoc w = -(kLoc w * bOp)) h0 h1 h2 h3 z
+
+/-- **The full anticommutation table**: every order term anticommutes with every local Hamiltonian
+term of the model. -/
+private lemma oLoc_hLoc_anticomm (x z : Fin 4) : oLoc x * hLoc z = -(hLoc z * oLoc x) := by
+  have h0 : oLoc 0 * kLoc z = -(kLoc z * oLoc 0) := by rw [oLoc_zero]; exact aOp_kLoc_anticomm z
+  have h1 : oLoc 1 * kLoc z = -(kLoc z * oLoc 1) := by rw [oLoc_one]; exact aOp_kLoc_anticomm z
+  have h2 : oLoc 2 * kLoc z = -(kLoc z * oLoc 2) := by rw [oLoc_two]; exact bOp_kLoc_anticomm z
+  have h3 : oLoc 3 * kLoc z = -(kLoc z * oLoc 3) := by rw [oLoc_three]; exact bOp_kLoc_anticomm z
+  have hk : oLoc x * kLoc z = -(kLoc z * oLoc x) :=
+    fin_four_cases (P := fun w => oLoc w * kLoc z = -(kLoc z * oLoc w)) h0 h1 h2 h3 x
+  rw [hLoc_eq_neg_kLoc, mul_neg, neg_mul, hk]
+
+/-- `Ĥ Ô = −Ô Ĥ` for the model, by bilinearity from the anticommutation table. -/
+private lemma hLoc_sum_mul_oLoc_sum :
+    (∑ b, hLoc b) * (∑ x, oLoc x) = -((∑ x, oLoc x) * (∑ b, hLoc b)) := by
+  have h : ∀ b x : Fin 4, hLoc b * oLoc x = -(oLoc x * hLoc b) := by
+    intro b x
+    rw [oLoc_hLoc_anticomm x b]
+    exact (neg_neg _).symm
+  calc (∑ b, hLoc b) * (∑ x, oLoc x)
+      = ∑ b, ∑ x, hLoc b * oLoc x := Fintype.sum_mul_sum _ _
+    _ = ∑ b, ∑ x, -(oLoc x * hLoc b) :=
+        Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun x _ => h b x
+    _ = -∑ x, ∑ b, oLoc x * hLoc b := by
+        simp only [Finset.sum_neg_distrib]
+        rw [Finset.sum_comm]
+    _ = -((∑ x, oLoc x) * (∑ b, hLoc b)) := by rw [Fintype.sum_mul_sum]
+
+/-! ## The square of the order operator -/
+
+/-- `Â B̂ = K̂₀K̂₁K̂₂K̂₃`: the two order words multiply to the product of all four stabilizers, the
+four single-site phases `X̂Ẑ = −iŶ` cancelling. -/
+private lemma abOp_eq_kLoc_prod : aOp * bOp = kLoc 0 * kLoc 1 * (kLoc 2 * kLoc 3) := by
+  rw [aOp_eq_pw, bOp_eq_pw, kLoc_zero_eq_pw, kLoc_one_eq_pw, kLoc_two_eq_pw, kLoc_three_eq_pw]
+  simp only [pw_mul, sX_mul_sZ, one_mul, mul_one, pw_smul_slot0, pw_smul_slot1, pw_smul_slot2,
+    pw_smul_slot3]
+  congr 1
+  norm_num [Complex.ext_iff]
+
+/-- `Â B̂ Φ = Φ`: the product of the two order words is a product of stabilizers. -/
+private lemma abOp_mulVec_gsVec : (aOp * bOp) *ᵥ gsVec = gsVec := by
+  rw [abOp_eq_kLoc_prod]
+  simp only [← Matrix.mulVec_mulVec, kLoc_mulVec_gsVec]
+
+/-- `Â` and `B̂` commute: they are supported on disjoint pairs of sites. -/
+private lemma aOp_commute_bOp : Commute aOp bOp := by
+  change aOp * bOp = bOp * aOp
+  rw [aOp_eq_pw, bOp_eq_pw, pw_mul, pw_mul]
+  simp only [one_mul, mul_one]
+
+/-- `Ô = 2Â + 2B̂`. -/
+private lemma oLoc_sum_eq : ∑ x, oLoc x = (2 : ℂ) • aOp + (2 : ℂ) • bOp := by
+  rw [Fin.sum_univ_four, oLoc_zero, oLoc_one, oLoc_two, oLoc_three]
+  module
+
+/-- `Ô² = 8 + 8 Â B̂`, from `Â² = B̂² = 1` and `[Â,B̂] = 0`. -/
+private lemma oLoc_sum_sq_eq : (∑ x, oLoc x) * (∑ z, oLoc z)
+    = (8 : ℂ) • (1 : ManyBodyOpS (Fin 4) 1) + (8 : ℂ) • (aOp * bOp) := by
+  have hcomm : bOp * aOp = aOp * bOp := aOp_commute_bOp.symm.eq
+  rw [oLoc_sum_eq]
+  simp only [add_mul, mul_add, smul_mul_assoc, mul_smul_comm, aOp_mul_self, bOp_mul_self, hcomm]
+  module
+
+/-- `Ô² Φ = 16 Φ`. -/
+private lemma oLoc_sum_sq_mulVec_gsVec :
+    ((∑ x, oLoc x) * (∑ z, oLoc z)) *ᵥ gsVec = (16 : ℂ) • gsVec := by
+  rw [oLoc_sum_sq_eq, Matrix.add_mulVec, Matrix.smul_mulVec, Matrix.smul_mulVec,
+    Matrix.one_mulVec, abOp_mulVec_gsVec]
+  module
+
+/-! ## The exact value of the double-commutator expectation -/
+
+/-- The double commutator `[Ô,[Ĥ,Ô]]` of the model, written exactly as in the capstone
+`manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal`. -/
+private noncomputable def dcOp : ManyBodyOpS (Fin 4) 1 :=
+  (∑ x, oLoc x) * ((∑ b, hLoc b) * (∑ x, oLoc x) - (∑ x, oLoc x) * (∑ b, hLoc b))
+    - ((∑ b, hLoc b) * (∑ x, oLoc x) - (∑ x, oLoc x) * (∑ b, hLoc b)) * (∑ x, oLoc x)
+
+/-- **`[Ô,[Ĥ,Ô]] = −4 Ĥ Ô²`** for the model: with `Ĥ Ô = −Ô Ĥ` the inner commutator is `2 Ĥ Ô`
+and the outer one collapses, so no expansion over the `64` triples is needed. -/
+private lemma dcOp_eq : dcOp = (-4 : ℂ) • ((∑ b, hLoc b) * ((∑ x, oLoc x) * (∑ x, oLoc x))) := by
+  set H := ∑ b, hLoc b with hHdef
+  set O := ∑ x, oLoc x with hOdef
+  have h1 : O * H = -(H * O) := by rw [hLoc_sum_mul_oLoc_sum]; exact (neg_neg _).symm
+  have h2 : O * (H * O) = -(H * (O * O)) := by rw [← mul_assoc, h1, neg_mul, mul_assoc]
+  have h3 : O * (O * H) = H * (O * O) := by
+    rw [h1, mul_neg, h2]
+    exact neg_neg _
+  have h4 : H * O * O = H * (O * O) := mul_assoc H O O
+  have h5 : O * H * O = -(H * (O * O)) := by rw [h1, neg_mul, mul_assoc]
+  have expand : O * (H * O - O * H) - (H * O - O * H) * O
+      = O * (H * O) - O * (O * H) - (H * O * O - O * H * O) := by noncomm_ring
+  rw [dcOp, expand, h2, h3, h4, h5]
+  module
+
+/-- The double commutator acts on the unnormalized ground state by the scalar `256`. -/
+private lemma dcOp_mulVec_gsVec : dcOp *ᵥ gsVec = (256 : ℂ) • gsVec := by
+  rw [dcOp_eq, Matrix.smul_mulVec, ← Matrix.mulVec_mulVec, oLoc_sum_sq_mulVec_gsVec,
+    Matrix.mulVec_smul, hLoc_sum_mulVec_gsVec, smul_smul, smul_smul]
+  norm_num
+
+/-- The double commutator acts on the normalized ground state by the same scalar `256`. -/
+private lemma dcOp_mulVec_gsState : dcOp *ᵥ gsState = (256 : ℂ) • gsState := by
+  rw [gsState, unitNormalize, Matrix.mulVec_smul, dcOp_mulVec_gsVec, smul_comm]
+
+/-- **The expectation value is exactly `256`.**  This is the left-hand side of Tasaki
+eq. (3.4.13) for the model, evaluated exactly (not merely bounded). -/
+private lemma doubleCommutator_rayleighOnVec_gsState_eq_value :
+    rayleighOnVec dcOp gsState = 256 := by
+  rw [rayleighOnVec, dcOp_mulVec_gsState, dotProduct_smul, smul_eq_mul,
+    gsState_dotProduct_self_eq_one, mul_one]
+  norm_num
+
+/-- **The printed constant of eq. (3.4.13) is exceeded**: at `d = 1`, `r = 1`, `h₀ = o₀ = 1`,
+`L = 4` the printed `4 (2r+1)^d (4r+1)^d h₀ o₀² L^d` is `240`, while the model's expectation is
+`256`. -/
+private lemma doubleCommutator_rayleighOnVec_gsState_gt_printed_constant :
+    4 * (2 * (1 : ℝ) + 1) ^ 1 * (4 * (1 : ℝ) + 1) ^ 1 * 1 * 1 ^ 2 * (4 : ℝ) ^ 1
+      < rayleighOnVec dcOp gsState := by
+  rw [doubleCommutator_rayleighOnVec_gsState_eq_value]
+  norm_num
+
 /-! ## The counterexample -/
 
 /-- **Counterexample to the printed constant of Tasaki eq. (3.4.13), as literally quantified.**
