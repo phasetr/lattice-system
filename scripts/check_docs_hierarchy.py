@@ -1,5 +1,31 @@
 #!/usr/bin/env python3
-"""Validate the staged human-documentation hierarchy with the Python stdlib."""
+r"""Validate the staged human-documentation hierarchy with the Python stdlib.
+
+The published catalogue is `docs/index.md` frozen at `BASELINE_COMMIT` and put through
+`approved_changes`: a single chain of audited literal rewrites, each of whose search literals is
+verbatim baseline text. A row leaves the published catalogue only by a rewrite of its own full
+frozen row text, trailing newline included, to the empty string. There is no name-keyed
+mechanism, so the absence of a declaration from the Lean tree never by itself retires the row
+that records it -- most published rows name declarations the tree no longer spells.
+
+`APPROVED_CHANGES_SHA256` pins sha256 over
+
+    approved_changes("".join(baseline_index().splitlines(keepends=True)[216:2731]))
+
+encoded as UTF-8: the text the legacy pages are compared against. Every edit to
+`_approved_replacements` or `_drop_private_instructions_ref` moves it, so a change to either
+recomputes it in the same commit with
+
+    python3 -c 'import sys, hashlib; sys.path.insert(0, "scripts"); \
+    import check_docs_hierarchy as c; \
+    print(hashlib.sha256(c.approved_changes("".join(c.baseline_index() \
+    .splitlines(keepends=True)[216:2731])).encode("utf-8")).hexdigest())'
+
+and states which rows the new value reflects. Recomputing the pin is never on its own an
+authorization for what moved: the legacy pages still have to be edited to match, and the
+catalogue-row comparison is what proves they do. What the pin buys is that a removal is a
+legible, full-row diff plus a pin update rather than a name added to a list.
+"""
 
 from __future__ import annotations
 
@@ -20,18 +46,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 BASELINE_COMMIT = "6519099024bf156b87ac0c807c6633c513792581"
 LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
-# Pins sha256 over `approved_changes(baseline_slice).encode("utf-8")`, the published catalogue
-# text the legacy pages are compared against, where `baseline_slice` is the exact
-# `docs/index.md`@`BASELINE_COMMIT` line range `main()` feeds to `approved_changes` at the
-# whole-baseline call site. Every edit to `_approved_replacements` or
-# `_drop_private_instructions_ref` moves it; recompute with:
-#   python3 -c 'import sys, hashlib; sys.path.insert(0, "scripts"); \
-#   import check_docs_hierarchy as c; \
-#   print(hashlib.sha256(c.approved_changes("".join(c.baseline_index() \
-#   .splitlines(keepends=True)[216:2731])).encode("utf-8")).hexdigest())'
-# Recomputing this constant is never on its own an authorization for a content change: the
-# legacy pages still have to be edited to match, and the catalogue-row parity check is what
-# proves they do.
+# Pins the published catalogue text; this module's docstring records exactly what is hashed
+# and how the pin is legitimately updated.
 APPROVED_CHANGES_SHA256 = "2d57e7b3d3e02f04ee3f19c864c9f1cbfc125115d37bd13086832aa50b079da0"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
