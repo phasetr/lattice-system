@@ -40,7 +40,7 @@ interval `[−r, r]` (its magnitude is `ringDist ≤ r`), which has `2r+1` eleme
 theorem window_card_le (L r : ℕ) (x : Fin L) : (window L r x).card ≤ 2 * r + 1 := by
   have hmaps : ∀ y ∈ window L r x, signedRingDisp L x y ∈ Finset.Icc (-(r : ℤ)) (r : ℤ) := by
     intro y hy
-    have hrd : ringDist L x y ≤ r := (Finset.mem_filter.mp hy).2
+    have hrd : ringDist L x y ≤ r := mem_window.mp hy
     have habs : (signedRingDisp L x y).natAbs ≤ r := by
       rw [natAbs_signedRingDisp_eq_ringDist]; exact hrd
     rw [Finset.mem_Icc]; omega
@@ -69,7 +69,7 @@ theorem localTwistGen_manyBodyOperatorNormS_le (L N r : ℕ) (x : Fin L) (hL : 0
           ((((2 * Real.pi * (signedRingDisp L x y : ℝ)) / (L : ℝ) : ℝ) : ℂ) • spinSSiteOp3 y N)
         ≤ c := by
     intro y hy
-    have hrd : ringDist L x y ≤ r := (Finset.mem_filter.mp hy).2
+    have hrd : ringDist L x y ≤ r := mem_window.mp hy
     rw [manyBodyOperatorNormS_smul, hc]
     refine mul_le_mul ?_ ?_ (manyBodyOperatorNormS_nonneg _) (by positivity)
     · rw [Complex.norm_real, Real.norm_eq_abs, abs_div, abs_of_pos hLR, abs_mul,

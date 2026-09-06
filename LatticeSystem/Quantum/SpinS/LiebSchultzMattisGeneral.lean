@@ -99,32 +99,40 @@ across the periodic seam — and differs from the raw window sum only by a multi
 `Σ_{y∈W_x} Ŝ_y^{(3)}` (which commutes with `ĥ_x`), so the two generate the same conjugation. -/
 
 /-- The **range-`r` window** `W_x := {y : ringDist L x y ≤ r}` of consecutive ring sites around `x`
-on `Fin L` (Tasaki §6.2, eq. (6.2.26)): the local support window of `ĥ_x`.  It is nonempty
-(`x ∈ W_x`, since `ringDist L x x = 0 ≤ r`) and contains at most `2r+1` sites. -/
+on `Fin L` (Tasaki §6.2, eq. (6.2.26)): the local support window of `ĥ_x`.  It is the ring instance
+of the general site ball (`Math/Combinatorics/SiteBall.lean`), so the generic ball API applies to it
+unchanged; the ball filters on `ringDist L y x`, so membership in Tasaki's centred order is
+`mem_window` below.  The window is nonempty (`x ∈ W_x`, since `ringDist L x x = 0 ≤ r`) and contains
+at most `2r+1` sites (`window_card_le`). -/
 def window (L r : ℕ) (x : Fin L) : Finset (Fin L) :=
-  Finset.univ.filter (fun y => ringDist L x y ≤ r)
+  siteBall (ringDist L) r x
 
-/-- The range-`r` window is the **ring-distance ball** of radius `r` around `x`: `window L r x` and
-`siteBall (ringDist L) r x` (`Math/Combinatorics/SiteBall.lean`) cut out the same site set.  The two
-filter predicates are `ringDist L x y ≤ r` and `ringDist L y x ≤ r`, which agree by
-`ringDist_comm`.  Both sides filter the same `Finset.univ` by pointwise equivalent predicates, so
-no hypothesis on `L`, `r` or `x` is needed. -/
+/-- The range-`r` window is the **ring-distance ball** of radius `r` around `x`: `window L r x` is
+`siteBall (ringDist L) r x` (`Math/Combinatorics/SiteBall.lean`) by definition, so the two names cut
+out the same site set with no hypothesis on `L`, `r` or `x`.  Consumers reach the window's defining
+property through this identity and `mem_window`, not through the definition body. -/
 theorem window_eq_siteBall {L r : ℕ} {x : Fin L} :
-    window L r x = siteBall (ringDist L) r x := by
-  unfold window siteBall
-  exact Finset.filter_congr fun y _ => by rw [ringDist_comm]
+    window L r x = siteBall (ringDist L) r x := rfl
+
+/-- **Membership in the range-`r` window** is Tasaki's centred distance bound `ringDist L x y ≤ r`
+(§6.2, eq. (6.2.26)).  The ball filters on `ringDist L y x`, so the two orders are exchanged by
+`ringDist_comm`; every consumer of the window's defining property goes through this lemma, so the
+exchange is discharged once rather than at each site that would otherwise unfold the filter. -/
+theorem mem_window {L r : ℕ} {x y : Fin L} :
+    y ∈ window L r x ↔ ringDist L x y ≤ r := by
+  rw [window_eq_siteBall, mem_siteBall, ringDist_comm L y x]
 
 /-- **The range-`r` locality marker is support on the window.**  `IsLocalRangeR L N r x op` holds
 exactly when `op` is supported on `window L r x` in the entrywise sense of `SupportedOnS`
 (`Quantum/SpinS/OperatorSupport.lean`), i.e. lies in `B(H_{W_x}) ⊗ I` — so a caller holding the
 commutant form may invoke a result stated in the support form and conversely.  It is
 `supportedOnS_iff_commute_onSiteS` transported along the membership equivalence
-`y ∉ window L r x ↔ r < ringDist L x y`, which is the unfolding of the window filter, so no
-hypothesis on `L`, `N`, `r` or `x` is needed. -/
+`y ∉ window L r x ↔ r < ringDist L x y`, which is `mem_window`, so no hypothesis on `L`, `N`, `r`
+or `x` is needed. -/
 theorem isLocalRangeR_iff_supportedOnS {L N r : ℕ} {x : Fin L} {op : ManyBodyOpS (Fin L) N} :
     IsLocalRangeR L N r x op ↔ SupportedOnS (window L r x) op := by
   have hmem : ∀ y : Fin L, y ∉ window L r x ↔ r < ringDist L x y := fun y => by
-    simp only [window, Finset.mem_filter, Finset.mem_univ, true_and, Nat.not_le]
+    simp only [mem_window, Nat.not_le]
   rw [supportedOnS_iff_commute_onSiteS]
   exact ⟨fun h z hz => h z ((hmem z).mp hz), fun h y hy => h y ((hmem y).mpr hy)⟩
 

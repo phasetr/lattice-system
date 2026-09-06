@@ -167,9 +167,7 @@ theorem twistPhase_gap {L N r : ℕ} {h₀ : ℝ} {h : Fin L → ManyBodyOpS (Fi
   -- Far sites: locality forces the occupations to agree, so `E` vanishes off the window.
   have hfar : ∀ y ∈ (Finset.univ : Finset (Fin L)), y ∉ window L r x → E y = 0 := by
     intro y _ hyw
-    have hy : r < ringDist L x y := by
-      rw [window, Finset.mem_filter] at hyw
-      exact not_le.mp (fun hle => hyw ⟨Finset.mem_univ y, hle⟩)
+    have hy : r < ringDist L x y := not_le.mp fun hle => hyw (mem_window.mpr hle)
     have hσ : σ' y = σ y := by
       by_contra hc
       exact hne (isLocalRangeR_apply_eq_zero_of_far (chain.range x) hy hc)
