@@ -6,7 +6,7 @@ permalink: /formalization/legacy/28-spin-saturated-ferromagnetic-state-tasaki-2-
 
 # Legacy catalogue: Spin-`S` saturated ferromagnetic state (Tasaki §2.4 generalised) (part 2 of 2)
 
-> **Interim authority.** This lossless catalogue chunk remains authoritative for formalization status and capstone identification until Issue #5228. The version 1 JSON catalogue is still a non-authoritative prototype.
+> **Interim authority.** This lossless catalogue chunk remains authoritative for formalization status and capstone identification until Issue #5228. The version 2 JSON records are still a non-authoritative prototype.
 
 [Interim catalogue](/lattice-system/formalization/legacy/) › [Spin foundations and Tasaki Chapter 2](/lattice-system/formalization/legacy/#group-spin-foundations)
 
