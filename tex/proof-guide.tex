@@ -12993,7 +12993,8 @@ the operator-norm properties (A.2.5)/(A.2.6) p.~463; \textbf{discharged axiom-fr
 \texttt{Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean},
 \texttt{Math/Combinatorics/SiteBall.lean}, \texttt{Quantum/SpinS/TorusSupDistance.lean}, and
 \texttt{Math/Combinatorics/CoordinateBall.lean}, fixtures in
-\texttt{Tests/RangeLocalDoubleCommutatorBound.lean} and \texttt{Tests/OperatorSupport.lean}).
+\texttt{Tests/RangeLocalDoubleCommutatorBound.lean} and \texttt{Tests/OperatorSupport.lean}, and
+the counterexample fixture \texttt{Tests/PrintedConstantCounterexample.lean}).
 Here $\hat H=\sum_{x\in\Lambda_L}\hat h_x$
 and $\hat O_L=\sum_{x\in\Lambda_L}\hat o_x$ are both sums over every site of the periodic lattice
 $\Lambda_L=\mathrm{Fin}\,d\to\mathrm{Fin}\,L$ (the periodic identification of p.~52), each local
@@ -13021,15 +13022,28 @@ $|x-z|\le 2r$. Those ranges do not follow from the range-$r$ premise stated in t
 conditions the printed constant $4(2r+1)^d(4r+1)^d h_0o_0^2L^d$ is itself provable: it is the
 two-window kernel \texttt{manyBodyOperatorNormS\_doubleCommutator\_le\_of\_twoWindows} instantiated
 at $m_1=(2r+1)^d$, $m_2=(4r+1)^d$, so the discrepancy is a premise mismatch rather than an
-arithmetic slip. Whether the printed constant is nevertheless true under the range-$r$ premise
-itself is \textbf{open}: this repository neither proves nor refutes it; what is proved is the
-bound above, at the windows the premise actually yields.
+arithmetic slip. The printed constant is, however, \textbf{refuted as literally quantified}. The
+Problem (pp.~67--68) fixes no relation between $L$ and $r$, so a single admissible triple suffices:
+at $d=1$, $r=1$, $L=5$, the spin-$1/2$ ring with $\hat h_x=-\hat Z_{x-1}\hat X_x\hat Z_{x+1}$ and
+$\hat o_x=\hat X_{x-1}\hat Y_x\hat X_{x+1}$ ($h_0=o_0=1$) has the cluster state of the $5$-cycle as
+its unique ground state ($E_0=-5$, Theorem~7.8) and
+$\langle\Phi_{\mathrm{GS}}|[\hat O,[\hat H,\hat O]]|\Phi_{\mathrm{GS}}\rangle=500$, against the
+printed $4(2r+1)^d(4r+1)^dh_0o_0^2L^d=300$
+(\texttt{tasaki\_problem\_3\_4\_a\_printed\_constant\_counterexample},
+\texttt{Tests/PrintedConstantCounterexample.lean}). The bound proved above is unaffected
+($500\le900$), and in the abstract ball-counting form ($m_1=m_2=5$ on the $5$-ring) it is attained
+exactly. The mechanism is that for $L\le4r+1$ the honest outer window already covers the whole
+lattice, so the printed window undercounts by the factor $L/(4r+1)$. Whether the printed constant
+holds when $L>4r+1$ is \textbf{open}: nothing here claims it either way, and that regime is
+recorded as an open question.
 
-\emph{Corrigendum (exponent typo, distinct from the above).} The printed solution (p.~501) gives
-the intermediate $y$-count as $(2r+1)^2$ while giving the $z$-count as $(4r+1)^d$. The exponent $2$
-is a misprint: the target it claims to reach, eq.~(3.4.13) on p.~68, carries $(2r+1)^d$, and
-counting the lattice sites within distance $r$ of a given site in $d$ dimensions gives
-$(2r+1)^d$. No declaration in this repository states the $(2r+1)^2$ form.
+\emph{Corrigendum (exponent typo, distinct from the above).} The printed solution (printed p.~501,
+PDF p.~510) gives the intermediate $y$-count as $(2r+1)^2$ while giving the $z$-count as
+$(4r+1)^d$. The exponent $2$ is a misprint: the target it claims to reach, eq.~(3.4.13) on printed
+p.~68 (PDF p.~82), carries $(2r+1)^d$, and counting the lattice sites within distance $r$ of a
+given site in $d$ dimensions gives $(2r+1)^d$. Read off the rendered PDF page rather than the text
+extraction, which drops math symbols. No declaration in this repository states the $(2r+1)^2$
+form.
 
 \emph{Not assumed.} Self-adjointness of $\hat h_x$ and $\hat o_x$ appears nowhere; the expectation
 is taken on its real part. Conditions~(3.4.3) and~(3.4.4) are unused, and neither $1\le d$ nor

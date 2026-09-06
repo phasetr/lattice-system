@@ -18,8 +18,12 @@ giving
 
 Tasaki's printed solution instead counts over `|x−y| ≤ r` and `|x−z| ≤ 2r`, giving the smaller
 constant `4 (2r+1)^d (4r+1)^d h₀ o₀² L^d`.  Those index ranges do not follow from the range-`r`
-premise, and the printed constant is neither proved nor refuted here: what is proved is the bound
-above, which is what the premise yields.
+premise, and that constant is **false as literally quantified**: the explicit `d = 1`, `r = 1`,
+`L = 5` spin-1/2 ring of `LatticeSystem/Tests/PrintedConstantCounterexample.lean` satisfies every
+hypothesis of the Problem — range-1 support, `h₀ = o₀ = 1`, a normalized ground state — and has
+`⟨Φ|[Ô,[Ĥ,Ô]]|Φ⟩ = 500`, against the printed `4(2·1+1)(4·1+1)·1·1²·5 = 300`.  It satisfies the
+bound proved here (`500 ≤ 900`), and in the abstract ball-counting form it attains it exactly.
+Whether the printed constant holds in the regime `L > 4r+1` is open.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §2.1 p. 52 (periodic lattice), §3.4, Problem 3.4.a, statement pp. 67-68, printed solution
@@ -107,9 +111,12 @@ own site, and a normalized state `Φ`,
 Locality is the book's premise itself — each local term *acts only on* the sites of its `r`-ball —
 so the commutation relations the estimate uses are derived, not assumed.  Doing so fixes the
 windows at `2r` and `4r` and hence the constant; Tasaki's printed solution counts over `r` and `2r`
-instead, and the resulting smaller constant `4 (2r+1)^d (4r+1)^d h₀ o₀² L^d` is neither proved nor
-refuted here.  The distance is the torus sup-distance, matching the periodic identification of
-`Λ_L` and reading the unqualified `|x − y| ≤ r` in the sup norm, which is the weaker hypothesis.
+instead, and the resulting smaller constant `4 (2r+1)^d (4r+1)^d h₀ o₀² L^d` is **refuted as
+literally quantified** by `tasaki_problem_3_4_a_printed_constant_counterexample`
+(`LatticeSystem/Tests/PrintedConstantCounterexample.lean`), which attains `500 > 300` at `d = 1`,
+`r = 1`, `L = 5`; the regime `L > 4r+1` is open.  The distance is the torus sup-distance, matching
+the periodic identification of `Λ_L` and reading the unqualified `|x − y| ≤ r` in the sup norm,
+which is the weaker hypothesis.
 
 The windowed statements this feeds keep those relations as inline commutation hypotheses rather
 than support hypotheses; here they are derived from the range-`r` support premise through
