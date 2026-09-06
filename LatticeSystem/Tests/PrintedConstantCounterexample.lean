@@ -279,6 +279,147 @@ private noncomputable def gsVec : (Fin 5 → Fin 2) → ℂ := clusterStateVec r
 /-- The normalized ground state `Φ_GS` used in the counterexample. -/
 private noncomputable def gsState : (Fin 5 → Fin 2) → ℂ := unitNormalize gsVec
 
+/-! ## The model as Pauli words -/
+
+/-- On the 5-ring, the predecessor of a site is its shift by `4`. -/
+private lemma sub_one_eq_add_four (x : Fin 5) : x - 1 = x + 4 := by
+  rw [show (4 : Fin 5) = -1 from by rw [eq_neg_iff_add_eq_zero]; rfl, ← sub_eq_add_neg]
+
+/-- A nonzero offset moves a site of the 5-ring. -/
+private lemma site_ne_center (x : Fin 5) {a : Fin 5} (ha : a ≠ 0) : x + a ≠ x := fun h =>
+  offsetSite_ne x ha (by rw [add_zero]; exact h)
+
+/-- `ĥ_x` as a Pauli word: `−X̂` at `x`, `Ẑ` at `x+1`, `Ẑ` at `x+4 = x−1`. -/
+private lemma hLoc_eq_pw (x : Fin 5) : hLoc x = pw (-1) x sX sZ 1 1 sZ := by
+  have hRP : Commute (onSiteS (x + 4) sZ : ManyBodyOpS (Fin 5) 1) (onSiteS x sX) :=
+    onSiteS_commute_of_ne (site_ne_center x (Fin.ne_of_val_ne (by norm_num))) _ _
+  have hRQ : Commute (onSiteS (x + 4) sZ : ManyBodyOpS (Fin 5) 1) (onSiteS (x + 1) sZ) :=
+    onSiteS_commute_of_ne (offsetSite_ne x (Fin.ne_of_val_ne (by norm_num))) _ _
+  rw [hLoc, pw, add_zero, onSiteS_one, onSiteS_one, one_mul, one_mul, neg_smul, one_smul,
+    sub_one_eq_add_four]
+  congr 1
+  rw [hRP.eq, mul_assoc, hRQ.eq]
+
+/-- `ô_x` as a Pauli word: `Ŷ` at `x`, `X̂` at `x+1`, `X̂` at `x+4 = x−1`. -/
+private lemma oLoc_eq_pw (x : Fin 5) : oLoc x = pw 1 x sY sX 1 1 sX := by
+  have hRP : Commute (onSiteS (x + 4) sX : ManyBodyOpS (Fin 5) 1) (onSiteS x sY) :=
+    onSiteS_commute_of_ne (site_ne_center x (Fin.ne_of_val_ne (by norm_num))) _ _
+  have hRQ : Commute (onSiteS (x + 4) sX : ManyBodyOpS (Fin 5) 1) (onSiteS (x + 1) sX) :=
+    onSiteS_commute_of_ne (offsetSite_ne x (Fin.ne_of_val_ne (by norm_num))) _ _
+  rw [oLoc, pw, add_zero, onSiteS_one, onSiteS_one, one_mul, one_mul, one_smul,
+    sub_one_eq_add_four, hRP.eq, mul_assoc, hRQ.eq]
+
+/-- The word with trivial phase and all letters trivial is the identity operator. -/
+private lemma pw_one_all (x : Fin 5) : pw 1 x 1 1 1 1 1 = 1 := by
+  rw [pw, onSiteS_one, onSiteS_one, onSiteS_one, onSiteS_one, onSiteS_one, one_mul, one_mul,
+    one_mul, one_mul, one_smul]
+
+/-- `ĥ_x² = 1`: every local term of the model is an involution. -/
+private lemma hLoc_mul_self (x : Fin 5) : hLoc x * hLoc x = 1 := by
+  rw [hLoc_eq_pw, pw_mul, sX_mul_sX, sZ_mul_sZ, mul_one,
+    show (-1 : ℂ) * (-1) = 1 from by norm_num, pw_one_all]
+
+/-- `ô_x² = 1`: every order term of the model is an involution. -/
+private lemma oLoc_mul_self (x : Fin 5) : oLoc x * oLoc x = 1 := by
+  rw [oLoc_eq_pw, pw_mul, sX_mul_sX, sY_mul_sY, mul_one, one_mul, pw_one_all]
+
+/-- A product of three pairwise commuting Hermitian factors is Hermitian. -/
+private lemma triple_isHermitian {P Q R : ManyBodyOpS (Fin 5) 1}
+    (hP : Matrix.conjTranspose P = P) (hQ : Matrix.conjTranspose Q = Q)
+    (hR : Matrix.conjTranspose R = R) (hRP : Commute R P) (hRQ : Commute R Q)
+    (hPQ : Commute P Q) : Matrix.conjTranspose (R * P * Q) = R * P * Q := by
+  rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, hP, hQ, hR, ← mul_assoc]
+  exact triple_reverse hRP hRQ hPQ
+
+/-- `ĥ_x` is Hermitian. -/
+private lemma hLoc_conjTranspose (x : Fin 5) : Matrix.conjTranspose (hLoc x) = hLoc x := by
+  have hP : Matrix.conjTranspose (onSiteS x sX : ManyBodyOpS (Fin 5) 1) = onSiteS x sX := by
+    rw [onSiteS_conjTranspose, sX_conjTranspose]
+  have hQ : Matrix.conjTranspose (onSiteS (x + 1) sZ : ManyBodyOpS (Fin 5) 1)
+      = onSiteS (x + 1) sZ := by rw [onSiteS_conjTranspose, sZ_conjTranspose]
+  have hR : Matrix.conjTranspose (onSiteS (x - 1) sZ : ManyBodyOpS (Fin 5) 1)
+      = onSiteS (x - 1) sZ := by rw [onSiteS_conjTranspose, sZ_conjTranspose]
+  have hne1 : x - 1 ≠ x := by
+    rw [sub_one_eq_add_four]; exact site_ne_center x (Fin.ne_of_val_ne (by norm_num))
+  have hne2 : x - 1 ≠ x + 1 := by
+    rw [sub_one_eq_add_four]; exact offsetSite_ne x (Fin.ne_of_val_ne (by norm_num))
+  have hne3 : x ≠ x + 1 := (site_ne_center x (Fin.ne_of_val_ne (by norm_num))).symm
+  rw [hLoc, Matrix.conjTranspose_neg]
+  congr 1
+  exact triple_isHermitian hP hQ hR (onSiteS_commute_of_ne hne1 _ _)
+    (onSiteS_commute_of_ne hne2 _ _) (onSiteS_commute_of_ne hne3 _ _)
+
+/-- `ô_x` is Hermitian. -/
+private lemma oLoc_conjTranspose (x : Fin 5) : Matrix.conjTranspose (oLoc x) = oLoc x := by
+  have hP : Matrix.conjTranspose (onSiteS x sY : ManyBodyOpS (Fin 5) 1) = onSiteS x sY := by
+    rw [onSiteS_conjTranspose, sY_conjTranspose]
+  have hQ : Matrix.conjTranspose (onSiteS (x + 1) sX : ManyBodyOpS (Fin 5) 1)
+      = onSiteS (x + 1) sX := by rw [onSiteS_conjTranspose, sX_conjTranspose]
+  have hR : Matrix.conjTranspose (onSiteS (x - 1) sX : ManyBodyOpS (Fin 5) 1)
+      = onSiteS (x - 1) sX := by rw [onSiteS_conjTranspose, sX_conjTranspose]
+  have hne1 : x - 1 ≠ x := by
+    rw [sub_one_eq_add_four]; exact site_ne_center x (Fin.ne_of_val_ne (by norm_num))
+  have hne2 : x - 1 ≠ x + 1 := by
+    rw [sub_one_eq_add_four]; exact offsetSite_ne x (Fin.ne_of_val_ne (by norm_num))
+  have hne3 : x ≠ x + 1 := (site_ne_center x (Fin.ne_of_val_ne (by norm_num))).symm
+  rw [oLoc]
+  exact triple_isHermitian hP hQ hR (onSiteS_commute_of_ne hne1 _ _)
+    (onSiteS_commute_of_ne hne2 _ _) (onSiteS_commute_of_ne hne3 _ _)
+
+/-! ## Locality and unit norms of the model terms -/
+
+/-- A site lies in its own radius-1 ring ball. -/
+private lemma mem_siteBall_self (x : Fin 5) : x ∈ siteBall (ringDist 5) 1 x :=
+  mem_siteBall.mpr (by rw [ringDist_self]; norm_num)
+
+/-- The successor of a site lies in its radius-1 ring ball. -/
+private lemma mem_siteBall_succ (x : Fin 5) : x + 1 ∈ siteBall (ringDist 5) 1 x := by
+  refine mem_siteBall.mpr ?_
+  have hx := x.isLt
+  simp only [ringDist, Fin.val_add]
+  omega
+
+/-- The predecessor of a site lies in its radius-1 ring ball. -/
+private lemma mem_siteBall_pred (x : Fin 5) : x - 1 ∈ siteBall (ringDist 5) 1 x := by
+  refine mem_siteBall.mpr ?_
+  have hx := x.isLt
+  rw [sub_one_eq_add_four]
+  simp only [ringDist, Fin.val_add]
+  omega
+
+/-- **Hypothesis (a) for `ĥ`**: each local Hamiltonian term is supported on the radius-1 ring ball
+of its own site, so the model has range `r = 1`. -/
+private lemma hLoc_supportedOnS_siteBall :
+    ∀ x : Fin 5, SupportedOnS (siteBall (ringDist 5) 1 x) (hLoc x) := by
+  intro x
+  rw [hLoc, ← neg_one_smul ℂ (onSiteS (x - 1) sZ * onSiteS x sX * onSiteS (x + 1) sZ)]
+  exact (((supportedOnS_onSiteS (mem_siteBall_pred x) sZ).mul
+    (supportedOnS_onSiteS (mem_siteBall_self x) sX)).mul
+    (supportedOnS_onSiteS (mem_siteBall_succ x) sZ)).smul (-1)
+
+/-- **Hypothesis (a) for `ô`**: each local order term is supported on the radius-1 ring ball of its
+own site, so the model has range `r = 1`. -/
+private lemma oLoc_supportedOnS_siteBall :
+    ∀ x : Fin 5, SupportedOnS (siteBall (ringDist 5) 1 x) (oLoc x) := by
+  intro x
+  exact ((supportedOnS_onSiteS (mem_siteBall_pred x) sX).mul
+    (supportedOnS_onSiteS (mem_siteBall_self x) sY)).mul
+    (supportedOnS_onSiteS (mem_siteBall_succ x) sX)
+
+/-- **Hypothesis (b) for `ĥ`**: each local Hamiltonian term is Hermitian and an involution, hence
+unitary, so its operator norm is exactly `1` and in particular `h₀ = 1` is admissible. -/
+private lemma hLoc_manyBodyOperatorNormS_le_one :
+    ∀ x : Fin 5, manyBodyOperatorNormS (hLoc x) ≤ 1 := fun x =>
+  le_of_eq (manyBodyOperatorNormS_eq_one_of_unitary
+    (by rw [hLoc_conjTranspose, hLoc_mul_self]))
+
+/-- **Hypothesis (b) for `ô`**: each local order term is Hermitian and an involution, hence
+unitary, so its operator norm is exactly `1` and in particular `o₀ = 1` is admissible. -/
+private lemma oLoc_manyBodyOperatorNormS_le_one :
+    ∀ x : Fin 5, manyBodyOperatorNormS (oLoc x) ≤ 1 := fun x =>
+  le_of_eq (manyBodyOperatorNormS_eq_one_of_unitary
+    (by rw [oLoc_conjTranspose, oLoc_mul_self]))
+
 /-! ## The counterexample -/
 
 /-- **Counterexample to the printed constant of Tasaki eq. (3.4.13), as literally quantified.**
