@@ -19,11 +19,16 @@ giving
 Tasaki's printed solution instead counts over `|x−y| ≤ r` and `|x−z| ≤ 2r`, giving the smaller
 constant `4 (2r+1)^d (4r+1)^d h₀ o₀² L^d`.  Those index ranges do not follow from the range-`r`
 premise, and that constant is **false as literally quantified**: the explicit `d = 1`, `r = 1`,
-`L = 5` spin-1/2 ring of `LatticeSystem/Tests/PrintedConstantCounterexample.lean` satisfies every
-hypothesis of the Problem — range-1 support, `h₀ = o₀ = 1`, a normalized ground state — and has
-`⟨Φ|[Ô,[Ĥ,Ô]]|Φ⟩ = 500`, against the printed `4(2·1+1)(4·1+1)·1·1²·5 = 300`.  It satisfies the
-bound proved here (`500 ≤ 900`), and in the abstract ball-counting form it attains it exactly.
-Whether the printed constant holds in the regime `L > 4r+1` is open.
+`L = 4` spin-1/2 ring of `LatticeSystem/Tests/PrintedConstantCounterexample.lean` — an admissible
+instance, since `Λ_L` of eq. (3.1.2) (p. 51) is defined for even `L` — satisfies every hypothesis
+of the Problem (range-1 support, `h₀ = o₀ = 1`, a normalized ground state) and has
+`⟨Φ|[Ô,[Ĥ,Ô]]|Φ⟩ = 256`, against the printed `4(2·1+1)(4·1+1)·1·1²·4 = 240`.  It satisfies the
+bound proved here (`256 ≤ 720`), and in the abstract ball-counting form (`m₁ = m₂ = 4` on the
+4-ring) it attains `4 m₁ m₂ h₀ o₀² |Λ| = 256` exactly.  The mechanism: once both windows already
+cover the whole lattice (`L ≤ 4r+1`), the honest ball-counting constant collapses to
+`4 L^{3d} h₀ o₀²`, which exceeds the printed constant exactly when `L² > (2r+1)(4r+1)`; at `r = 1`
+the smallest even `L` clearing `L² > 15` is `L = 4`, and that model attains the collapsed value.
+Whether the printed constant holds for even `L ≥ 4r+2` is open.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §2.1 p. 52 (periodic lattice), §3.4, Problem 3.4.a, statement pp. 67-68, printed solution
@@ -113,8 +118,9 @@ so the commutation relations the estimate uses are derived, not assumed.  Doing 
 windows at `2r` and `4r` and hence the constant; Tasaki's printed solution counts over `r` and `2r`
 instead, and the resulting smaller constant `4 (2r+1)^d (4r+1)^d h₀ o₀² L^d` is **refuted as
 literally quantified** by `tasaki_problem_3_4_a_printed_constant_counterexample`
-(`LatticeSystem/Tests/PrintedConstantCounterexample.lean`), which attains `500 > 300` at `d = 1`,
-`r = 1`, `L = 5`; the regime `L > 4r+1` is open.  The distance is the torus sup-distance, matching
+(`LatticeSystem/Tests/PrintedConstantCounterexample.lean`), which attains `256 > 240` at `d = 1`,
+`r = 1` and the admissible even `L = 4` (`Λ_L` of eq. (3.1.2), p. 51, is defined for even `L`); the
+regime of even `L ≥ 4r+2` is open.  The distance is the torus sup-distance, matching
 the periodic identification of `Λ_L` and reading the unqualified `|x − y| ≤ r` in the sup norm,
 which is the weaker hypothesis.
 

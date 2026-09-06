@@ -325,15 +325,20 @@ solution's own conditions the printed constant `4 (2r+1)^d (4r+1)^d h₀ o₀² 
 provable: it is the two-window kernel `manyBodyOperatorNormS_doubleCommutator_le_of_twoWindows`
 instantiated at `m₁ = (2r+1)^d`, `m₂ = (4r+1)^d`, so the discrepancy is a premise mismatch, not an
 arithmetic slip. The printed constant is, however, **refuted as literally quantified**. The Problem
-(pp. 67-68) fixes no relation between `L` and `r`, so a single admissible triple suffices: at
-`d = 1`, `r = 1`, `L = 5`, the spin-1/2 ring with `ĥ_x = −Ẑ_{x−1}X̂_xẐ_{x+1}` and
-`ô_x = X̂_{x−1}Ŷ_xX̂_{x+1}` (`h₀ = o₀ = 1`) has the cluster state of the 5-cycle as its unique
-ground state (`E₀ = −5`, Theorem 7.8) and `⟨Φ_GS|[Ô,[Ĥ,Ô]]|Φ_GS⟩ = 500`, against the printed
-`4(2r+1)^d(4r+1)^d h₀o₀²L^d = 300`. The bound proved above is unaffected (`500 ≤ 900`), and in the
-abstract ball-counting form (`m₁ = m₂ = 5` on the 5-ring) it is attained exactly. The mechanism is
-that for `L ≤ 4r+1` the honest outer window already covers the whole lattice, so the printed window
-undercounts by the factor `L/(4r+1)`. Whether the printed constant holds when `L > 4r+1` is
-**open**: nothing here claims it either way; that regime is tracked as Issue #5440.
+(pp. 67-68) fixes no relation between `L` and `r`, and `Λ_L` of eq. (3.1.2) (p. 51) is defined for
+even `L`, so a single admissible triple suffices: at `d = 1`, `r = 1`, `L = 4`, the spin-1/2 ring
+carrying a Bell pair on each of the site pairs `{1,2}` and `{3,0}` — stabilizers `X̂₃X̂₀`, `X̂₁X̂₂`,
+`Ẑ₁Ẑ₂`, `Ẑ₃Ẑ₀`, local terms `ĥ_x` their negatives, order terms `ô₀ = ô₁ = Ŷ₀Ŷ₁`,
+`ô₂ = ô₃ = Ŷ₂Ŷ₃` (`h₀ = o₀ = 1`) — has the joint `+1` eigenvector of the four stabilizers as its
+ground state (`E₀ = −4`) and `⟨Φ_GS|[Ô,[Ĥ,Ô]]|Φ_GS⟩ = 256`, against the printed
+`4(2r+1)^d(4r+1)^d h₀o₀²L^d = 240`. The bound proved above is unaffected (`256 ≤ 720`), and in the
+abstract ball-counting form (`m₁ = m₂ = 4` on the 4-ring) the value `4 m₁ m₂ h₀o₀²|Λ| = 256` is
+attained exactly. The mechanism is that once both windows already cover the whole lattice
+(`L ≤ 4r+1`), the honest ball-counting constant collapses to `4 L^{3d} h₀o₀²`, which exceeds the
+printed `4(2r+1)^d(4r+1)^d h₀o₀²L^d` exactly when `L² > (2r+1)(4r+1)`; at `r = 1` the smallest even
+`L` clearing `L² > 15` is `L = 4`, and the model above attains that collapsed value. Whether the
+printed constant holds for even `L ≥ 4r+2` is **open**: nothing here claims it either way; that
+regime is tracked as Issue #5440.
 
 **Corrigendum (exponent typo, a separate defect).** The printed solution (printed p. 501, PDF
 p. 510) gives the intermediate `y`-count as `(2r+1)²` while giving the `z`-count as `(4r+1)^d`. The
@@ -375,7 +380,7 @@ All declarations below are **PROVED**; `#print axioms` on each yields only `prop
 | `card_siteBall_torusSupDist_le` | `\|B_r(x)\| ≤ (2r+1)^d` for the torus sup-distance ball | `Quantum/SpinS/TorusSupDistance.lean` |
 | `manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal` | `‖[Ô,[Ĥ,Ô]]‖ ≤ 4 m₁ m₂ h₀ o₀² \|Λ\|` for `SupportedOnS`-local terms over an abstract distance, `m₁`/`m₂` the `2r`-/`4r`-ball counts | `Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean` |
 | `tasaki_problem_3_4_a_doubleCommutator_expectation_le` | Problem 3.4.a, with the constant the range-`r` premise yields (not eq. (3.4.13) as printed): `⟨Φ\|[Ô,[Ĥ,Ô]]\|Φ⟩ ≤ 4 (4r+1)^d (8r+1)^d h₀ o₀² L^d` for a normalised `Φ` and range-`r` `SupportedOnS` site-local terms on `Λ_L` | `Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean` |
-| `tasaki_problem_3_4_a_printed_constant_counterexample` | an explicit `d = 1`, `r = 1`, `L = 5` spin-1/2 ring satisfying every hypothesis of Problem 3.4.a with `⟨Φ_GS\|[Ô,[Ĥ,Ô]]\|Φ_GS⟩ = 500 > 300`, refuting the printed constant of eq. (3.4.13) as literally quantified | `Tests/PrintedConstantCounterexample.lean` |
+| `tasaki_problem_3_4_a_printed_constant_counterexample` | an explicit `d = 1`, `r = 1`, admissible even `L = 4` spin-1/2 ring (the even-`L` conjunct is discharged in the statement) satisfying every hypothesis of Problem 3.4.a with `⟨Φ_GS\|[Ô,[Ĥ,Ô]]\|Φ_GS⟩ = 256 > 240`, refuting the printed constant of eq. (3.4.13) as literally quantified | `Tests/PrintedConstantCounterexample.lean` |
 
 Regression fixtures live in `LatticeSystem/Tests/OperatorSupport.lean` (signature pins on
 `SupportedOnS` and its three lemmas) and `LatticeSystem/Tests/RangeLocalDoubleCommutatorBound.lean`

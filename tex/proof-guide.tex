@@ -13023,19 +13023,25 @@ conditions the printed constant $4(2r+1)^d(4r+1)^d h_0o_0^2L^d$ is itself provab
 two-window kernel \texttt{manyBodyOperatorNormS\_doubleCommutator\_le\_of\_twoWindows} instantiated
 at $m_1=(2r+1)^d$, $m_2=(4r+1)^d$, so the discrepancy is a premise mismatch rather than an
 arithmetic slip. The printed constant is, however, \textbf{refuted as literally quantified}. The
-Problem (pp.~67--68) fixes no relation between $L$ and $r$, so a single admissible triple suffices:
-at $d=1$, $r=1$, $L=5$, the spin-$1/2$ ring with $\hat h_x=-\hat Z_{x-1}\hat X_x\hat Z_{x+1}$ and
-$\hat o_x=\hat X_{x-1}\hat Y_x\hat X_{x+1}$ ($h_0=o_0=1$) has the cluster state of the $5$-cycle as
-its unique ground state ($E_0=-5$, Theorem~7.8) and
-$\langle\Phi_{\mathrm{GS}}|[\hat O,[\hat H,\hat O]]|\Phi_{\mathrm{GS}}\rangle=500$, against the
-printed $4(2r+1)^d(4r+1)^dh_0o_0^2L^d=300$
+Problem (pp.~67--68) fixes no relation between $L$ and $r$, and $\Lambda_L$ of eq.~(3.1.2) (p.~51)
+is defined for even $L$, so a single admissible triple suffices: at $d=1$, $r=1$, $L=4$, the
+spin-$1/2$ ring carrying a Bell pair on each of the site pairs $\{1,2\}$ and $\{3,0\}$, with
+$\hat h_0=-\hat X_3\hat X_0$, $\hat h_1=-\hat X_1\hat X_2$, $\hat h_2=-\hat Z_1\hat Z_2$,
+$\hat h_3=-\hat Z_3\hat Z_0$ and $\hat o_0=\hat o_1=\hat Y_0\hat Y_1$,
+$\hat o_2=\hat o_3=\hat Y_2\hat Y_3$ ($h_0=o_0=1$), has the joint $+1$ eigenvector of the four
+stabilizers as its ground state ($E_0=-4$) and
+$\langle\Phi_{\mathrm{GS}}|[\hat O,[\hat H,\hat O]]|\Phi_{\mathrm{GS}}\rangle=256$, against the
+printed $4(2r+1)^d(4r+1)^dh_0o_0^2L^d=240$
 (\texttt{tasaki\_problem\_3\_4\_a\_printed\_constant\_counterexample},
 \texttt{Tests/PrintedConstantCounterexample.lean}). The bound proved above is unaffected
-($500\le900$), and in the abstract ball-counting form ($m_1=m_2=5$ on the $5$-ring) it is attained
-exactly. The mechanism is that for $L\le4r+1$ the honest outer window already covers the whole
-lattice, so the printed window undercounts by the factor $L/(4r+1)$. Whether the printed constant
-holds when $L>4r+1$ is \textbf{open}: nothing here claims it either way, and that regime is
-recorded as an open question.
+($256\le720$), and in the abstract ball-counting form ($m_1=m_2=4$ on the $4$-ring) the value
+$4m_1m_2h_0o_0^2|\Lambda|=256$ is attained exactly. The mechanism is that once both windows already
+cover the whole lattice ($L\le4r+1$), the honest ball-counting constant collapses to
+$4L^{3d}h_0o_0^2$, which exceeds the printed $4(2r+1)^d(4r+1)^dh_0o_0^2L^d$ exactly when
+$L^2>(2r+1)(4r+1)$; at $r=1$ the smallest even $L$ clearing $L^2>15$ is $L=4$, and the model above
+attains that collapsed value. Whether the printed constant holds for even $L\ge4r+2$ is
+\textbf{open}: nothing here claims it either way, and that regime is recorded as an open
+question.
 
 \emph{Corrigendum (exponent typo, distinct from the above).} The printed solution (printed p.~501,
 PDF p.~510) gives the intermediate $y$-count as $(2r+1)^2$ while giving the $z$-count as
