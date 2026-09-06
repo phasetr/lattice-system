@@ -30,6 +30,8 @@ namespace LatticeSystem.Tests.PrintedConstantCounterexample
 
 open LatticeSystem.Quantum LatticeSystem.Math Matrix
 
+open scoped ComplexOrder
+
 /-! ## Single-site 2×2 letters -/
 
 /-- The single-site Pauli-`X` matrix `!![0,1;1,0]`. -/
@@ -419,6 +421,155 @@ private lemma oLoc_manyBodyOperatorNormS_le_one :
     ∀ x : Fin 5, manyBodyOperatorNormS (oLoc x) ≤ 1 := fun x =>
   le_of_eq (manyBodyOperatorNormS_eq_one_of_unitary
     (by rw [oLoc_conjTranspose, oLoc_mul_self]))
+
+/-! ## The cluster state as the ground state of the model -/
+
+/-- The Briegel–Raussendorf stabilizer `K̂_x = Ẑ_{x−1}X̂_xẐ_{x+1} = −ĥ_x` at site `x`. -/
+private noncomputable def kLoc (x : Fin 5) : ManyBodyOpS (Fin 5) 1 := -hLoc x
+
+/-- The stabilizer written out as a product of single-site Pauli letters. -/
+private lemma kLoc_eq (x : Fin 5) :
+    kLoc x = onSiteS (x - 1) sZ * onSiteS x sX * onSiteS (x + 1) sZ := by
+  rw [kLoc, hLoc]
+  exact neg_neg _
+
+/-- `K̂_x` is Hermitian. -/
+private lemma kLoc_conjTranspose (x : Fin 5) : Matrix.conjTranspose (kLoc x) = kLoc x := by
+  rw [kLoc, Matrix.conjTranspose_neg, hLoc_conjTranspose]
+
+/-- `K̂_x² = 1`. -/
+private lemma kLoc_mul_self (x : Fin 5) : kLoc x * kLoc x = 1 := by
+  rw [kLoc, neg_mul_neg, hLoc_mul_self]
+
+/-- The single-site `Ẑ` letter is the repository's `pauliZS`. -/
+private lemma onSiteS_sZ_eq_pauliZS (i : Fin 5) :
+    (onSiteS i sZ : ManyBodyOpS (Fin 5) 1) = pauliZS i := by
+  rw [pauliZS, spinSSiteOp3_def, ← onSiteS_smul, two_smul_spinSOp3_eq_sZ]
+
+/-- The single-site `X̂` letter is the repository's `pauliXS`. -/
+private lemma onSiteS_sX_eq_pauliXS (i : Fin 5) :
+    (onSiteS i sX : ManyBodyOpS (Fin 5) 1) = pauliXS i := by
+  rw [pauliXS, spinSSiteOp1, ← onSiteS_smul, two_smul_spinSOp1_eq_sX]
+
+/-- On the 5-cycle the neighbour-`Ẑ` product of a vertex is the pair of `Ẑ` letters at its two ring
+neighbours. -/
+private lemma neighborZProduct_ringG (x : Fin 5) :
+    neighborZProduct ringG x = onSiteS (x - 1) sZ * onSiteS (x + 1) sZ := by
+  have hne : x - 1 ≠ x + 1 := by
+    rw [sub_one_eq_add_four]; exact offsetSite_ne x (Fin.ne_of_val_ne (by norm_num))
+  rw [onSiteS_sZ_eq_pauliZS, onSiteS_sZ_eq_pauliZS, pauliZS_eq_diagonal, pauliZS_eq_diagonal,
+    Matrix.diagonal_mul_diagonal, neighborZProduct]
+  congr 1
+  funext cfg
+  rw [← SimpleGraph.neighborFinset_eq_filter, SimpleGraph.cycleGraph_neighborFinset,
+    Finset.prod_pair hne]
+
+/-- The model's local terms are exactly the Briegel–Raussendorf stabilizers of the 5-cycle. -/
+private lemma brStabilizer_ringG_eq_kLoc (x : Fin 5) : brStabilizer ringG x = kLoc x := by
+  have hPR : Commute (onSiteS x sX : ManyBodyOpS (Fin 5) 1) (onSiteS (x - 1) sZ) := by
+    refine onSiteS_commute_of_ne ?_ _ _
+    rw [sub_one_eq_add_four]
+    exact (site_ne_center x (Fin.ne_of_val_ne (by norm_num))).symm
+  rw [brStabilizer, neighborZProduct_ringG, kLoc_eq, ← onSiteS_sX_eq_pauliXS, ← mul_assoc, hPR.eq]
+
+/-- The model Hamiltonian is the graph-state Hamiltonian of the 5-cycle, on the nose: no shift and
+no rescaling are needed, since the repository's cluster Hamiltonian is `−Σ_x K̂_x`. -/
+private lemma hLoc_sum_eq_graphStateHamiltonianS :
+    ∑ x, hLoc x = graphStateHamiltonianS ringG := by
+  rw [graphStateHamiltonianS, Finset.smul_sum]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  rw [brStabilizer_ringG_eq_kLoc, kLoc, neg_one_smul]
+  exact (neg_neg _).symm
+
+/-- **Hypothesis (d), first half**: `E₀ = −5` is the ground energy of `Ĥ = Σ_x ĥ_x`, by Tasaki
+Theorem 7.8 applied to the 5-cycle. -/
+private lemma hLoc_sum_isGroundEnergy : IsGroundEnergy (∑ x, hLoc x) (-5) := by
+  have h := tasaki_theorem_7_8 ringG (by norm_num) gsVec rfl
+  rw [Fintype.card_fin] at h
+  simp only [Nat.cast_ofNat] at h
+  rw [hLoc_sum_eq_graphStateHamiltonianS]
+  exact h.1
+
+/-- The unnormalized cluster state is a ground eigenvector of the model Hamiltonian: the ground
+eigenspace of Theorem 7.8 is one-dimensional and spanned by it, so the eigenvalue equation follows
+from the spectral statement. -/
+private lemma hLoc_sum_mulVec_gsVec : (∑ x, hLoc x) *ᵥ gsVec = (-5 : ℂ) • gsVec := by
+  obtain ⟨⟨hmem, _⟩, _, _, huniq⟩ := tasaki_theorem_7_8 ringG (by norm_num) gsVec rfl
+  rw [Fintype.card_fin] at hmem huniq
+  obtain ⟨Ψ, hΨ0, hΨ⟩ := hmem
+  push_cast at hΨ huniq
+  obtain ⟨c, rfl⟩ := huniq Ψ hΨ0 hΨ
+  have hc : c ≠ 0 := by
+    intro h; rw [h, zero_smul] at hΨ0; exact hΨ0 rfl
+  rw [Matrix.mulVec_smul, smul_comm] at hΨ
+  rw [hLoc_sum_eq_graphStateHamiltonianS]
+  exact smul_right_injective _ hc hΨ
+
+/-- The five stabilizers sum to `5` on the cluster state. -/
+private lemma kLoc_sum_mulVec_gsVec : ∑ w, (kLoc w *ᵥ gsVec) = (5 : ℂ) • gsVec := by
+  have h := hLoc_sum_mulVec_gsVec
+  rw [show (∑ x, hLoc x) = -∑ x, kLoc x from by
+      rw [← Finset.sum_neg_distrib]
+      exact Finset.sum_congr rfl fun x _ => by rw [kLoc]; exact (neg_neg _).symm,
+    Matrix.neg_mulVec, Matrix.sum_mulVec, neg_eq_iff_eq_neg] at h
+  rw [h, ← neg_smul]
+  norm_num
+
+/-- **Stabilizer relations from the ground-state energy.**  Five Hermitian involutions that sum, on
+a vector `v`, to `5 v` each fix `v`: the difference `K̂_w v − v` has squared norm
+`2⟨v,v⟩ − 2⟨v,K̂_w v⟩`, the five squared norms sum to zero, and each is nonnegative. -/
+private lemma mulVec_eq_of_sum_mulVec (K : Fin 5 → ManyBodyOpS (Fin 5) 1)
+    (hH : ∀ w, Matrix.conjTranspose (K w) = K w) (hI : ∀ w, K w * K w = 1)
+    (v : (Fin 5 → Fin 2) → ℂ) (hsum : ∑ w, (K w *ᵥ v) = (5 : ℂ) • v) (w : Fin 5) :
+    K w *ᵥ v = v := by
+  have hstar : ∀ z, star (K z *ᵥ v) ⬝ᵥ v = star v ⬝ᵥ (K z *ᵥ v) := by
+    intro z; rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, hH]
+  have hnorm : ∀ z, star (K z *ᵥ v) ⬝ᵥ (K z *ᵥ v) = star v ⬝ᵥ v := by
+    intro z
+    rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, hH, hI,
+      Matrix.one_mulVec]
+  have hterm : ∀ z, star (K z *ᵥ v - v) ⬝ᵥ (K z *ᵥ v - v)
+      = 2 * (star v ⬝ᵥ v) - 2 * (star v ⬝ᵥ (K z *ᵥ v)) := by
+    intro z
+    rw [star_sub, sub_dotProduct, dotProduct_sub, dotProduct_sub, hnorm, hstar]
+    ring
+  have hzero : ∑ z, star (K z *ᵥ v - v) ⬝ᵥ (K z *ᵥ v - v) = 0 := by
+    simp only [hterm]
+    rw [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
+      ← Finset.mul_sum, ← dotProduct_sum, hsum, dotProduct_smul, smul_eq_mul, nsmul_eq_mul]
+    push_cast
+    ring
+  have hnn : ∀ z ∈ (Finset.univ : Finset (Fin 5)),
+      (0 : ℂ) ≤ star (K z *ᵥ v - v) ⬝ᵥ (K z *ᵥ v - v) := fun z _ => dotProduct_star_self_nonneg _
+  have hz := (Finset.sum_eq_zero_iff_of_nonneg hnn).mp hzero w (Finset.mem_univ w)
+  exact sub_eq_zero.mp (dotProduct_star_self_eq_zero.mp hz)
+
+/-- **The stabilizer relations `K̂_x Φ_C = Φ_C`** (Tasaki eqs. (7.3.29)-(7.3.30)) for the 5-ring
+cluster state. -/
+private lemma kLoc_mulVec_gsVec (w : Fin 5) : kLoc w *ᵥ gsVec = gsVec :=
+  mulVec_eq_of_sum_mulVec kLoc kLoc_conjTranspose kLoc_mul_self gsVec kLoc_sum_mulVec_gsVec w
+
+/-! ## Normalization of the ground state -/
+
+/-- The cluster state is nonzero. -/
+private lemma gsVec_ne_zero : gsVec ≠ 0 := clusterStateVec_ne_zero ringG
+
+/-- The cluster state has positive squared norm, so it can be normalized. -/
+private lemma gsVec_vecNormSqRe_pos : 0 < vecNormSqRe gsVec := by
+  have h : (0 : ℂ) < star gsVec ⬝ᵥ gsVec := dotProduct_star_self_pos_iff.mpr gsVec_ne_zero
+  simpa [vecNormSqRe] using (Complex.lt_def.mp h).1
+
+/-- **Hypothesis (c)**: the ground state used in the counterexample is normalized. -/
+private lemma gsState_dotProduct_self_eq_one : star gsState ⬝ᵥ gsState = 1 := by
+  rw [gsState]
+  exact unitNormalize_dotProduct_self gsVec gsVec_vecNormSqRe_pos
+
+/-- **Hypothesis (d), second half**: the normalized cluster state is an eigenvector of `Ĥ` at the
+ground energy `−5`. -/
+private lemma hLoc_sum_mulVec_gsState_eq_smul :
+    (∑ x, hLoc x) *ᵥ gsState = ((-5 : ℝ) : ℂ) • gsState := by
+  rw [gsState, unitNormalize, Matrix.mulVec_smul, hLoc_sum_mulVec_gsVec, smul_comm]
+  norm_num
 
 /-! ## The counterexample -/
 
