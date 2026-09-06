@@ -19,13 +19,14 @@ These window hypotheses are commutation hypotheses, not support hypotheses, and 
 kept so.  `hW` asks that `ĥ_b` commute with the one operator `ô_z` at each site outside its window,
 whereas `SupportedOnS (W b) (ĥ_b)` (`Quantum/SpinS/OperatorSupport.lean`) asks it to commute with
 *every* on-site operator seated outside `W b` (`supportedOnS_iff_commute_onSiteS`).  For an order
-family whose terms are on-site, `hW` is therefore the strictly weaker hypothesis: support implies
-it through that equivalence, and the converse fails already at `ô ≡ 0`.  The family `ô` here is
-arbitrary — its terms need be neither on-site nor supported on any particular set — so folding the
-hypothesis into the support predicate would narrow what these statements cover.  A caller holding
-support data derives `hW` instead of assuming it, through `commute_of_supportedOnS_disjoint`; that
-is how the range-`r` bound of Problem 3.4.a (`RangeLocalDoubleCommutatorBound.lean`) fixes its `2r`
-and `4r` windows.
+family on-site at its own site — `ô_z = onSiteS z A` for the same `z` — that support implies `hW`
+through the equivalence; a family with `ô_z = onSiteS w A` for some other `w ∈ W b` is already a
+counterexample to the implication, and the converse (support from `hW`) fails already at `ô ≡ 0`.
+The family `ô` here is arbitrary — its terms need be neither on-site nor supported on any
+particular set — so folding the hypothesis into the support predicate would narrow what these
+statements cover.  A caller holding support data for both families on disjoint sets derives the
+commutation through `commute_of_supportedOnS_disjoint`, as
+`RangeLocalDoubleCommutatorBound.lean` does to fix its `2r` and `4r` windows.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §3.4, eqs. (3.4.9)-(3.4.11), pp. 66-67; Problem 3.4.a, pp. 67-68, whose solution (p. 501) is

@@ -86,9 +86,14 @@ is the abstract bound above at `Ld = L^d`, fed by eq. (3.4.11), p. 67.  The no-S
 (3.4.4), p. 65, is not used in this derivation; the only declarations that take it as a named
 hypothesis are the odd-moment hypotheses of `HorschVonderLindenProblem34b.lean`.
 
-The locality hypotheses `hW` and `hoo` are those of eq. (3.4.11) — commutation against the given
-order family, a weaker condition than support of `ĥ_b` on `W b`; why they are stated that way
-rather than through `SupportedOnS` is recorded in `Quantum/SpinS/LocalDoubleCommutatorBound.lean`.
+The locality hypotheses `hW` and `hoo` are those of eq. (3.4.11).  `hW` asks that `ĥ_b` commute
+with the one operator `ô_z` at each `z ∉ W b`; for an arbitrary order family this is incomparable
+with `SupportedOnS (W b) (ĥ_b)`, and it follows from that support exactly when each `ô_z` is
+on-site at its own site `z` (via `supportedOnS_iff_commute_onSiteS`).  `hoo` is a separate
+condition on the order family itself — pairwise commutation of `ô_x`, `ô_z` for `x ≠ z` — and is
+not compared with support.  Why the hypotheses are stated this way rather than through
+`SupportedOnS` is recorded in the module doc of
+`Quantum/SpinS/LocalDoubleCommutatorBound.lean`.
 -/
 theorem tasaki_eq_3_4_12_trialState_energy_bound {ι : Type*} (B : Finset ι)
     (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N) (W : ι → Finset Λ)
