@@ -16,8 +16,8 @@ and not merely a resemblance: `supportedOnLeftS_iff_supportedOnS` (in that modul
 `SupportedOnLeftS n N A` with support on the left-half site set
 `Finset.univ.filter fun i => (i : ℕ) < n`, so a caller holding either shape may invoke a result
 stated in the other.  The half-ring predicate is kept rather than rephrased through this one: its
-`θ`-compatibility closure lemmas (`SupportedOnLeftS.theta_right`, `.mul_theta_comm`) speak about
-the ring reflection `θ` and have no counterpart here.
+`θ`-compatibility closure lemmas (such as `SupportedOnLeftS.theta_right`, `.mul_theta_comm`, and
+`.theta_apply_eq_zero_of_fst_ne`) speak about the ring reflection `θ` and have no counterpart here.
 
 Other encodings of the same "acts only on `S`" concept exist elsewhere in the library, e.g.
 `IsLocalRangeR` (`Quantum/SpinS/LiebSchultzMattisGeneral.lean`), which phrases the same idea for a
