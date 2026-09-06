@@ -12872,10 +12872,13 @@ eq.~(3.4.2).
 These are commutation hypotheses, not support hypotheses: support on $W_b$ is commutation with
 \emph{every} on-site operator seated outside $W_b$ (\texttt{supportedOnS\_iff\_commute\_onSiteS}).
 For an order family on-site at its own site --- $\hat o_z=\mathrm{onSiteS}\,z\,A$ for the same $z$
---- that support implies the hypothesis used here through the equivalence; a family with
-$\hat o_z=\mathrm{onSiteS}\,w\,A$ for some other $w\in W_b$ is already a counterexample to the
-implication, and the converse fails already at $\hat o\equiv 0$.  The family $\hat o$ is arbitrary
-in these statements, so the hypothesis is kept inline rather than folded into the predicate; a
+--- that support implies the hypothesis used here through the equivalence; taking some
+$z\notin W_b$ with $\hat o_z=\mathrm{onSiteS}\,w\,A$ for a $w\in W_b$ and choosing $\hat h_b$
+supported on $W_b$ and $A$ with $[\hat h_b,\mathrm{onSiteS}\,w\,A]\neq 0$ (possible once the site
+dimension exceeds one) gives a family where support holds but the hypothesis used here fails,
+already a counterexample to the implication, and the converse fails already at $\hat o\equiv 0$.
+The family $\hat o$ is arbitrary in these statements, so the hypothesis is kept inline rather
+than folded into the predicate; a
 caller holding support data for both families on disjoint sets derives the commutation through
 \texttt{commute\_of\_supportedOnS\_disjoint}, as the range-$r$ bound of Problem~3.4.a
 (\texttt{Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean}, below) does to fix its $2r$ and $4r$

@@ -20,8 +20,10 @@ kept so.  `hW` asks that `ĥ_b` commute with the one operator `ô_z` at each sit
 whereas `SupportedOnS (W b) (ĥ_b)` (`Quantum/SpinS/OperatorSupport.lean`) asks it to commute with
 *every* on-site operator seated outside `W b` (`supportedOnS_iff_commute_onSiteS`).  For an order
 family on-site at its own site — `ô_z = onSiteS z A` for the same `z` — that support implies `hW`
-through the equivalence; a family with `ô_z = onSiteS w A` for some other `w ∈ W b` is already a
-counterexample to the implication, and the converse (support from `hW`) fails already at `ô ≡ 0`.
+through the equivalence; taking some `z ∉ W b` with `ô_z = onSiteS w A` for a `w ∈ W b` and
+choosing `ĥ_b` supported on `W b` and `A` with `[ĥ_b, onSiteS w A] ≠ 0` (possible once the site
+dimension exceeds one) gives a family where support holds but `hW` fails, already a counterexample
+to the implication, and the converse (support from `hW`) fails already at `ô ≡ 0`.
 The family `ô` here is arbitrary — its terms need be neither on-site nor supported on any
 particular set — so folding the hypothesis into the support predicate would narrow what these
 statements cover.  A caller holding support data for both families on disjoint sets derives the

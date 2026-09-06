@@ -166,12 +166,14 @@ hypothesis because an empty site type makes it underivable from the per-site bou
 Those hypotheses are commutation hypotheses, not support hypotheses. `SupportedOnS (W b) (ĥ_b)`
 (`Quantum/SpinS/OperatorSupport.lean`) demands commutation with *every* on-site operator seated
 outside `W b` (`supportedOnS_iff_commute_onSiteS`). For an order family on-site at its own site
-— `ô_z = onSiteS z A` for the same `z` — that support implies `hW` through the equivalence; a
-family with `ô_z = onSiteS w A` for some other `w ∈ W b` is already a counterexample to the
-implication, and the converse fails already at `ô ≡ 0`. The family is arbitrary in these
-statements, so folding the hypothesis into the predicate would narrow what they cover; a caller
-holding support data for both families on disjoint sets derives the commutation through
-`commute_of_supportedOnS_disjoint`, as the range-`r` Problem 3.4.a bound
+— `ô_z = onSiteS z A` for the same `z` — that support implies the inline commutation hypothesis
+(`hW` in the Lean source) through the equivalence; taking some `z ∉ W b` with `ô_z = onSiteS w A`
+for a `w ∈ W b` and choosing `ĥ_b` supported on `W b` and `A` with `[ĥ_b, onSiteS w A] ≠ 0`
+(possible once the site dimension exceeds one) gives a family where support holds but `hW` fails,
+already a counterexample to the implication, and the converse fails already at `ô ≡ 0`. The
+family is arbitrary in these statements, so folding the hypothesis into the predicate would
+narrow what they cover; a caller holding support data for both families on disjoint sets derives
+the commutation through `commute_of_supportedOnS_disjoint`, as the range-`r` Problem 3.4.a bound
 (`Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean`) does to fix its `2r` and `4r` windows.
 
 The commutator norm inequality `‖[Â, B̂]‖ ≤ 2‖Â‖‖B̂‖` used twice per term is
