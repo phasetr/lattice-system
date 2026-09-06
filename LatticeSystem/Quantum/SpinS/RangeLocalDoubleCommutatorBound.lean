@@ -111,6 +111,9 @@ instead, and the resulting smaller constant `4 (2r+1)^d (4r+1)^d h₀ o₀² L^d
 refuted here.  The distance is the torus sup-distance, matching the periodic identification of
 `Λ_L` and reading the unqualified `|x − y| ≤ r` in the sup norm, which is the weaker hypothesis.
 
+The windowed statements this feeds keep those relations as inline commutation hypotheses, a weaker
+condition than support, documented as such in `LocalDoubleCommutatorBound.lean`.
+
 No self-adjointness is assumed, so the expectation is taken on its real part; conditions (3.4.3)
 and (3.4.4) are unused; `0 ≤ h₀`, `1 ≤ d` and `1 ≤ L` are not needed, and `|Λ_L| = L^d` is an
 identity here rather than a hypothesis. -/

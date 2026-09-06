@@ -101,7 +101,8 @@ across the periodic seam — and differs from the raw window sum only by a multi
 /-- The **range-`r` window** `W_x := {y : ringDist L x y ≤ r}` of consecutive ring sites around `x`
 on `Fin L` (Tasaki §6.2, eq. (6.2.26)): the local support window of `ĥ_x`.  It is the ring instance
 of the general site ball (`Math/Combinatorics/SiteBall.lean`), so the generic ball API applies to it
-unchanged; the ball filters on `ringDist L y x`, so membership in Tasaki's centred order is
+along definitional paths, and after `rw [window_eq_siteBall]` elsewhere; the ball filters on
+`ringDist L y x`, so membership in Tasaki's centred order is
 `mem_window` below.  The window is nonempty (`x ∈ W_x`, since `ringDist L x x = 0 ≤ r`) and contains
 at most `2r+1` sites (`window_card_le`). -/
 def window (L r : ℕ) (x : Fin L) : Finset (Fin L) :=

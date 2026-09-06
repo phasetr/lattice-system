@@ -13,8 +13,9 @@ generic support/commutant bridge `supportedOnS_iff_commute_onSiteS`
 (`Quantum/SpinS/OperatorSupport.lean`).
 
 `window L r x` *is* `siteBall (ringDist L) r x`, so the site-set identity is definitional and `rfl`
-closes it: one filter defines the site set, and a second one cannot be reintroduced without
-breaking a pin here.  The ball filters on `dist y x ≤ r`, hence on `ringDist L y x ≤ r`, whereas
+closes it: the pins below measure definitional agreement with the ball, and a filter with a
+different orientation or predicate breaks a pin here.  The ball filters on `dist y x ≤ r`, hence on
+`ringDist L y x ≤ r`, whereas
 Tasaki writes the window centred at `x`, `ringDist L x y ≤ r`; the two orders are exchanged by
 `ringDist_comm` in `mem_window`, which is the single membership lemma every consumer uses.
 

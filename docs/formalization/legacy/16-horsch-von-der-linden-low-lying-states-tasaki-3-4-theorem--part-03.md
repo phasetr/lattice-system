@@ -151,16 +151,27 @@ Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §3.4
 
 `Quantum/SpinS/LocalDoubleCommutatorBound.lean` turns the locality of `Ĥ = Σ_{b∈B} ĥ_b` and `Ô =
 Σ_{x∈Λ} ô_x` into the numerator estimate that eq. (3.4.8) consumes. Locality is expressed by
-plain commutation hypotheses rather than a support predicate: `ĥ_b` commutes with every `ô_z`
-seated outside a window `W b` (the Lean content of eq. (3.4.1)'s "acts nontrivially only on the
-spins at `x` and `y`"), and distinct sites carry commuting order operators (eq. (3.4.2)). The
-collapse carries **two** windows, an inner `W₁ b` off which `ĥ_b` commutes with the order terms
-and an outer `W₂ b` off which the order terms commute with the inner commutators, with
-independent cardinality bounds `m₁` and `m₂` and kernel constant `4 m₁ m₂ h₀ o₀² |B|`. The
+plain commutation hypotheses rather than the support predicate `SupportedOnS`: `ĥ_b` commutes
+with every `ô_z` seated outside a window `W b` (the Lean content of eq. (3.4.1)'s "acts
+nontrivially only on the spins at `x` and `y`"), and distinct sites carry commuting order
+operators (eq. (3.4.2)). The collapse carries **two** windows, an inner `W₁ b` off which `ĥ_b`
+commutes with the order terms and an outer `W₂ b` off which the order terms commute with the
+inner commutators, with independent cardinality bounds `m₁` and `m₂` and kernel constant
+`4 m₁ m₂ h₀ o₀² |B|`. The
 one-window statements are the instance `W₁ = W₂`, `m₁ = m₂ = mW`, and the bond case is `mW = 2`,
 `4 · 2² = 16`; the counting that produces the book's constant is therefore proved in general.
 Norm hypotheses are stated as `≤` rather than the book's `=`, and `0 ≤ o₀` is an explicit
 hypothesis because an empty site type makes it underivable from the per-site bounds.
+
+Those hypotheses are the **weaker** condition, not a restatement of support. `SupportedOnS (W b)
+(ĥ_b)` (`Quantum/SpinS/OperatorSupport.lean`) demands commutation with *every* on-site operator
+seated outside `W b` (`supportedOnS_iff_commute_onSiteS`), while `hW` demands it only against the
+one `ô_z` of the given order family; for an on-site family support implies `hW` through that
+equivalence, and the converse fails already at `ô ≡ 0`. The family is arbitrary in these
+statements, so folding the hypothesis into the predicate would narrow what they cover; a caller who
+does hold support data derives the commutation relations instead, by
+`commute_of_supportedOnS_disjoint`, which is what the range-`r` Problem 3.4.a bound
+(`Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean`) does to fix its `2r` and `4r` windows.
 
 The commutator norm inequality `‖[Â, B̂]‖ ≤ 2‖Â‖‖B̂‖` used twice per term is
 `manyBodyOperatorNormS_comm_le`, which lives in `Quantum/SpinS/ManyBodyOperatorNorm.lean` next to

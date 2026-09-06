@@ -15,6 +15,18 @@ the inner commutators. The one-window form used by the bond-local eq. (3.4.11) i
 `W₁ = W₂`, and the general range-`r` estimate of Problem 3.4.a needs the two windows genuinely
 unequal, since there the inner and outer ranges differ (`2r` and `4r`).
 
+These window hypotheses are commutation hypotheses, not support hypotheses, and are deliberately
+kept so.  `hW` asks that `ĥ_b` commute with the one operator `ô_z` at each site outside its window,
+whereas `SupportedOnS (W b) (ĥ_b)` (`Quantum/SpinS/OperatorSupport.lean`) asks it to commute with
+*every* on-site operator seated outside `W b` (`supportedOnS_iff_commute_onSiteS`).  For an order
+family whose terms are on-site, `hW` is therefore the strictly weaker hypothesis: support implies
+it through that equivalence, and the converse fails already at `ô ≡ 0`.  The family `ô` here is
+arbitrary — its terms need be neither on-site nor supported on any particular set — so folding the
+hypothesis into the support predicate would narrow what these statements cover.  A caller holding
+support data derives `hW` instead of assuming it, through `commute_of_supportedOnS_disjoint`; that
+is how the range-`r` bound of Problem 3.4.a (`RangeLocalDoubleCommutatorBound.lean`) fixes its `2r`
+and `4r` windows.
+
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §3.4, eqs. (3.4.9)-(3.4.11), pp. 66-67; Problem 3.4.a, pp. 67-68, whose solution (p. 501) is
 the source of the two-window form; operator-norm properties (A.2.5)/(A.2.6), p. 463.

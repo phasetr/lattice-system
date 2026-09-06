@@ -84,7 +84,12 @@ p. 65) gives the printed two-sided bound
 The left half is the variational hypothesis `hmin` applied to the unit vector `Γ`; the right half
 is the abstract bound above at `Ld = L^d`, fed by eq. (3.4.11), p. 67.  The no-SSB condition
 (3.4.4), p. 65, is not used in this derivation; the only declarations that take it as a named
-hypothesis are the odd-moment hypotheses of `HorschVonderLindenProblem34b.lean`. -/
+hypothesis are the odd-moment hypotheses of `HorschVonderLindenProblem34b.lean`.
+
+The locality hypotheses `hW` and `hoo` are those of eq. (3.4.11) — commutation against the given
+order family, a weaker condition than support of `ĥ_b` on `W b`; why they are stated that way
+rather than through `SupportedOnS` is recorded in `Quantum/SpinS/LocalDoubleCommutatorBound.lean`.
+-/
 theorem tasaki_eq_3_4_12_trialState_energy_bound {ι : Type*} (B : Finset ι)
     (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N) (W : ι → Finset Λ)
     (d L : ℕ) (q₀ h₀ o₀ : ℝ) {Φ : (Λ → Fin (N + 1)) → ℂ} {E₀ : ℝ}
