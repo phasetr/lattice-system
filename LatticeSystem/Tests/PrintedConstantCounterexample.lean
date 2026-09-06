@@ -196,6 +196,187 @@ private lemma pw_neg (c : ℂ) (A₀ A₁ A₂ A₃ : Matrix (Fin 2) (Fin 2) ℂ
 private lemma pw_one_all : pw 1 1 1 1 1 = 1 := by
   simp only [pw, onSiteS_one, one_mul, one_smul]
 
+/-! ## The model: two Bell pairs on the 4-ring -/
+
+/-- The four **stabilizers** of the model: `X̂₃X̂₀`, `X̂₁X̂₂`, `Ẑ₁Ẑ₂`, `Ẑ₃Ẑ₀`, one for each site.
+Each pair `{1,2}`, `{3,0}` carries the two-element stabilizer group of a Bell pair. -/
+private noncomputable def kLoc : Fin 4 → ManyBodyOpS (Fin 4) 1 :=
+  ![onSiteS 3 sX * onSiteS 0 sX, onSiteS 1 sX * onSiteS 2 sX,
+    onSiteS 1 sZ * onSiteS 2 sZ, onSiteS 3 sZ * onSiteS 0 sZ]
+
+/-- The local Hamiltonian term `ĥ_x = −K̂_x` at site `x`. -/
+private noncomputable def hLoc (x : Fin 4) : ManyBodyOpS (Fin 4) 1 := -kLoc x
+
+/-- The order word `Â = Ŷ₀Ŷ₁` of the Bell pair `{0,1}`. -/
+private noncomputable def aOp : ManyBodyOpS (Fin 4) 1 := onSiteS 0 sY * onSiteS 1 sY
+
+/-- The order word `B̂ = Ŷ₂Ŷ₃` of the Bell pair `{2,3}`. -/
+private noncomputable def bOp : ManyBodyOpS (Fin 4) 1 := onSiteS 2 sY * onSiteS 3 sY
+
+/-- The local order-operator terms `ô₀ = ô₁ = Â`, `ô₂ = ô₃ = B̂`. -/
+private noncomputable def oLoc : Fin 4 → ManyBodyOpS (Fin 4) 1 := ![aOp, aOp, bOp, bOp]
+
+/-- The stabilizer at site `0`. -/
+private lemma kLoc_zero : kLoc 0 = onSiteS 3 sX * onSiteS 0 sX := rfl
+
+/-- The stabilizer at site `1`. -/
+private lemma kLoc_one : kLoc 1 = onSiteS 1 sX * onSiteS 2 sX := rfl
+
+/-- The stabilizer at site `2`. -/
+private lemma kLoc_two : kLoc 2 = onSiteS 1 sZ * onSiteS 2 sZ := rfl
+
+/-- The stabilizer at site `3`. -/
+private lemma kLoc_three : kLoc 3 = onSiteS 3 sZ * onSiteS 0 sZ := rfl
+
+/-- The order term at site `0`. -/
+private lemma oLoc_zero : oLoc 0 = aOp := rfl
+
+/-- The order term at site `1`. -/
+private lemma oLoc_one : oLoc 1 = aOp := rfl
+
+/-- The order term at site `2`. -/
+private lemma oLoc_two : oLoc 2 = bOp := rfl
+
+/-- The order term at site `3`. -/
+private lemma oLoc_three : oLoc 3 = bOp := rfl
+
+/-- The local Hamiltonian term is the negative of the stabilizer at the same site. -/
+private lemma hLoc_eq_neg_kLoc (x : Fin 4) : hLoc x = -kLoc x := rfl
+
+/-! ## The model as Pauli words -/
+
+/-- `K̂₀ = X̂₃X̂₀` as a Pauli word. -/
+private lemma kLoc_zero_eq_pw : kLoc 0 = pw 1 sX 1 1 sX := by
+  have h : Commute (onSiteS (3 : Fin 4) sX : ManyBodyOpS (Fin 4) 1) (onSiteS 0 sX) :=
+    onSiteS_commute_of_ne (by decide) _ _
+  rw [kLoc_zero, h.eq, pw]
+  simp only [onSiteS_one, one_mul, one_smul]
+
+/-- `K̂₁ = X̂₁X̂₂` as a Pauli word. -/
+private lemma kLoc_one_eq_pw : kLoc 1 = pw 1 1 sX sX 1 := by
+  rw [kLoc_one, pw]
+  simp only [onSiteS_one, one_mul, mul_one, one_smul]
+
+/-- `K̂₂ = Ẑ₁Ẑ₂` as a Pauli word. -/
+private lemma kLoc_two_eq_pw : kLoc 2 = pw 1 1 sZ sZ 1 := by
+  rw [kLoc_two, pw]
+  simp only [onSiteS_one, one_mul, mul_one, one_smul]
+
+/-- `K̂₃ = Ẑ₃Ẑ₀` as a Pauli word. -/
+private lemma kLoc_three_eq_pw : kLoc 3 = pw 1 sZ 1 1 sZ := by
+  have h : Commute (onSiteS (3 : Fin 4) sZ : ManyBodyOpS (Fin 4) 1) (onSiteS 0 sZ) :=
+    onSiteS_commute_of_ne (by decide) _ _
+  rw [kLoc_three, h.eq, pw]
+  simp only [onSiteS_one, one_mul, one_smul]
+
+/-- `Â = Ŷ₀Ŷ₁` as a Pauli word. -/
+private lemma aOp_eq_pw : aOp = pw 1 sY sY 1 1 := by
+  rw [aOp, pw]
+  simp only [onSiteS_one, mul_one, one_smul]
+
+/-- `B̂ = Ŷ₂Ŷ₃` as a Pauli word. -/
+private lemma bOp_eq_pw : bOp = pw 1 1 1 sY sY := by
+  rw [bOp, pw]
+  simp only [onSiteS_one, one_mul, one_smul]
+
+/-! ## Involutions and Hermiticity -/
+
+/-- A product of two commuting Hermitian factors is Hermitian. -/
+private lemma pair_isHermitian {P Q : ManyBodyOpS (Fin 4) 1}
+    (hP : Matrix.conjTranspose P = P) (hQ : Matrix.conjTranspose Q = Q) (hPQ : Commute P Q) :
+    Matrix.conjTranspose (P * Q) = P * Q := by
+  rw [Matrix.conjTranspose_mul, hP, hQ, hPQ.symm.eq]
+
+/-- `K̂_x² = 1`: every stabilizer of the model is an involution. -/
+private lemma kLoc_mul_self (x : Fin 4) : kLoc x * kLoc x = 1 := by
+  have h0 : kLoc 0 * kLoc 0 = 1 := by
+    rw [kLoc_zero_eq_pw, pw_mul]
+    simp only [sX_mul_sX, one_mul]
+    exact pw_one_all
+  have h1 : kLoc 1 * kLoc 1 = 1 := by
+    rw [kLoc_one_eq_pw, pw_mul]
+    simp only [sX_mul_sX, one_mul]
+    exact pw_one_all
+  have h2 : kLoc 2 * kLoc 2 = 1 := by
+    rw [kLoc_two_eq_pw, pw_mul]
+    simp only [sZ_mul_sZ, one_mul]
+    exact pw_one_all
+  have h3 : kLoc 3 * kLoc 3 = 1 := by
+    rw [kLoc_three_eq_pw, pw_mul]
+    simp only [sZ_mul_sZ, one_mul]
+    exact pw_one_all
+  exact fin_four_cases (P := fun w => kLoc w * kLoc w = 1) h0 h1 h2 h3 x
+
+/-- `K̂_x` is Hermitian. -/
+private lemma kLoc_conjTranspose (x : Fin 4) : Matrix.conjTranspose (kLoc x) = kLoc x := by
+  have hX : ∀ i : Fin 4,
+      Matrix.conjTranspose (onSiteS i sX : ManyBodyOpS (Fin 4) 1) = onSiteS i sX := fun i => by
+    rw [onSiteS_conjTranspose, sX_conjTranspose]
+  have hZ : ∀ i : Fin 4,
+      Matrix.conjTranspose (onSiteS i sZ : ManyBodyOpS (Fin 4) 1) = onSiteS i sZ := fun i => by
+    rw [onSiteS_conjTranspose, sZ_conjTranspose]
+  have h0 : Matrix.conjTranspose (kLoc 0) = kLoc 0 := by
+    rw [kLoc_zero]; exact pair_isHermitian (hX 3) (hX 0) (onSiteS_commute_of_ne (by decide) _ _)
+  have h1 : Matrix.conjTranspose (kLoc 1) = kLoc 1 := by
+    rw [kLoc_one]; exact pair_isHermitian (hX 1) (hX 2) (onSiteS_commute_of_ne (by decide) _ _)
+  have h2 : Matrix.conjTranspose (kLoc 2) = kLoc 2 := by
+    rw [kLoc_two]; exact pair_isHermitian (hZ 1) (hZ 2) (onSiteS_commute_of_ne (by decide) _ _)
+  have h3 : Matrix.conjTranspose (kLoc 3) = kLoc 3 := by
+    rw [kLoc_three]; exact pair_isHermitian (hZ 3) (hZ 0) (onSiteS_commute_of_ne (by decide) _ _)
+  exact fin_four_cases (P := fun w => Matrix.conjTranspose (kLoc w) = kLoc w) h0 h1 h2 h3 x
+
+/-- `ĥ_x² = 1`: every local Hamiltonian term of the model is an involution. -/
+private lemma hLoc_mul_self (x : Fin 4) : hLoc x * hLoc x = 1 := by
+  rw [hLoc_eq_neg_kLoc, neg_mul_neg, kLoc_mul_self]
+
+/-- `ĥ_x` is Hermitian. -/
+private lemma hLoc_conjTranspose (x : Fin 4) : Matrix.conjTranspose (hLoc x) = hLoc x := by
+  rw [hLoc_eq_neg_kLoc, Matrix.conjTranspose_neg, kLoc_conjTranspose]
+
+/-- `Â² = 1`. -/
+private lemma aOp_mul_self : aOp * aOp = 1 := by
+  rw [aOp_eq_pw, pw_mul]
+  simp only [sY_mul_sY, one_mul]
+  exact pw_one_all
+
+/-- `B̂² = 1`. -/
+private lemma bOp_mul_self : bOp * bOp = 1 := by
+  rw [bOp_eq_pw, pw_mul]
+  simp only [sY_mul_sY, one_mul]
+  exact pw_one_all
+
+/-- `Â` is Hermitian. -/
+private lemma aOp_conjTranspose : Matrix.conjTranspose aOp = aOp := by
+  have hY : ∀ i : Fin 4,
+      Matrix.conjTranspose (onSiteS i sY : ManyBodyOpS (Fin 4) 1) = onSiteS i sY := fun i => by
+    rw [onSiteS_conjTranspose, sY_conjTranspose]
+  rw [aOp]
+  exact pair_isHermitian (hY 0) (hY 1) (onSiteS_commute_of_ne (by decide) _ _)
+
+/-- `B̂` is Hermitian. -/
+private lemma bOp_conjTranspose : Matrix.conjTranspose bOp = bOp := by
+  have hY : ∀ i : Fin 4,
+      Matrix.conjTranspose (onSiteS i sY : ManyBodyOpS (Fin 4) 1) = onSiteS i sY := fun i => by
+    rw [onSiteS_conjTranspose, sY_conjTranspose]
+  rw [bOp]
+  exact pair_isHermitian (hY 2) (hY 3) (onSiteS_commute_of_ne (by decide) _ _)
+
+/-- `ô_x² = 1`: every order term of the model is an involution. -/
+private lemma oLoc_mul_self (x : Fin 4) : oLoc x * oLoc x = 1 := by
+  have h0 : oLoc 0 * oLoc 0 = 1 := by rw [oLoc_zero]; exact aOp_mul_self
+  have h1 : oLoc 1 * oLoc 1 = 1 := by rw [oLoc_one]; exact aOp_mul_self
+  have h2 : oLoc 2 * oLoc 2 = 1 := by rw [oLoc_two]; exact bOp_mul_self
+  have h3 : oLoc 3 * oLoc 3 = 1 := by rw [oLoc_three]; exact bOp_mul_self
+  exact fin_four_cases (P := fun w => oLoc w * oLoc w = 1) h0 h1 h2 h3 x
+
+/-- `ô_x` is Hermitian. -/
+private lemma oLoc_conjTranspose (x : Fin 4) : Matrix.conjTranspose (oLoc x) = oLoc x := by
+  have h0 : Matrix.conjTranspose (oLoc 0) = oLoc 0 := by rw [oLoc_zero]; exact aOp_conjTranspose
+  have h1 : Matrix.conjTranspose (oLoc 1) = oLoc 1 := by rw [oLoc_one]; exact aOp_conjTranspose
+  have h2 : Matrix.conjTranspose (oLoc 2) = oLoc 2 := by rw [oLoc_two]; exact bOp_conjTranspose
+  have h3 : Matrix.conjTranspose (oLoc 3) = oLoc 3 := by rw [oLoc_three]; exact bOp_conjTranspose
+  exact fin_four_cases (P := fun w => Matrix.conjTranspose (oLoc w) = oLoc w) h0 h1 h2 h3 x
+
 /-! ## The counterexample -/
 
 /-- **Counterexample to the printed constant of Tasaki eq. (3.4.13), as literally quantified.**
