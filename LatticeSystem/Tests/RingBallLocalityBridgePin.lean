@@ -57,4 +57,22 @@ example {L N r : ℕ} {x : Fin L} {op : ManyBodyOpS (Fin L) N} :
       ↔ SupportedOnS (window L r x) op :=
   isLocalRangeR_iff_supportedOnS
 
+/-! ## Red pins for the `window`/`siteBall` migration (PR-6 of 6, #5405 arc) -/
+
+/-- **Definitional pin (Red).** After the migration `window L r x` is *defined as*
+`siteBall (ringDist L) r x`, so the identity closes by `rfl`; before the migration `window` is a
+separately-filtered `Finset` and the two sides are not defeq, so this pin is expected to fail on
+the current definition (not on an import or a missing identifier). -/
+example {L r : ℕ} {x : Fin L} :
+    window L r x = siteBall (ringDist L) r x :=
+  rfl
+
+/-- **Membership-order pin (Red).** After the migration, membership in the window is Tasaki's
+centred distance bound `ringDist L x y ≤ r` (§6.2, eq. (6.2.26)), proved by the new lemma
+`mem_window`. Before the migration `mem_window` does not exist, so this pin is expected to fail
+with `unknown identifier 'mem_window'`. -/
+example {L r : ℕ} {x y : Fin L} :
+    y ∈ window L r x ↔ ringDist L x y ≤ r :=
+  mem_window
+
 end LatticeSystem.Tests.RingBallLocalityBridgePin
