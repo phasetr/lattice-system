@@ -336,8 +336,8 @@ Problem 3.4.a — even `L`, the periodic ring whose radius-1 balls are the prope
 `{x−1, x, x+1}`, radius-1 support of every local term, the two norm bounds, self-adjointness of
 every local term, and a normalised ground state — and formally it is an instance of
 `manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal` with the `d = 1` torus distance
-`ringDist 4`, at `m₁ = m₂ = |Λ| = 4`, whose value `4 m₁ m₂ h₀o₀²|Λ| = 256` it attains exactly, so
-that ball-counting constant is sharp in the wrapping regime. The torus-typed
+`ringDist 4`: the abstract ball-counting bound `4 m₁ m₂ h₀o₀²|Λ|` is attained exactly by this
+witness at `(d, r, L) = (1, 1, 4)` with `m₁ = m₂ = 4`, giving `256`. The torus-typed
 `tasaki_problem_3_4_a_doubleCommutator_expectation_le` is stated on `Fin d → Fin L` and is not
 instantiated by the fixture; its value `720` is satisfied a fortiori (`256 ≤ 720`). The mechanism is that once both windows already cover the whole lattice
 (`L ≤ 4r+1`), the honest ball-counting constant collapses to `4 L^{3d} h₀o₀²`, which exceeds the

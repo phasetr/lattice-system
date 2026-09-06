@@ -18,9 +18,9 @@ and formally it is an instance of the repository's generic range-local bound
 `manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal` with the `d = 1` torus distance
 `ringDist 4`, while the torus-typed capstone
 `tasaki_problem_3_4_a_doubleCommutator_expectation_le` is stated on the site type `Fin d → Fin L`
-and is not instantiated here.  Through that generic bound the model satisfies
-`4 m₁ m₂ h₀ o₀² |Λ| = 256` with `m₁ = m₂ = |Λ| = 4` and attains it exactly, so the repository's
-ball-counting constant is sharp in the wrapping regime; the specialisation
+and is not instantiated here.  The abstract ball-counting bound `4 m₁ m₂ h₀ o₀² |Λ|` of that
+generic lemma is attained exactly by this witness at `(d, r, L) = (1, 1, 4)` with `m₁ = m₂ = 4`,
+giving `256`; the specialisation
 `4 (4r+1)^d (8r+1)^d h₀ o₀² L^d = 720` (`RangeLocalDoubleCommutatorBound.lean`) is satisfied a
 fortiori, so nothing proved elsewhere in the repository is affected and only the printed
 constant's literal quantification is refuted.  Whether the printed constant holds for even
@@ -737,8 +737,8 @@ private lemma doubleCommutator_rayleighOnVec_gsState_gt_printed_constant :
 exactly.**  Instantiating `manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal` on the 4-ring
 with the `d = 1` torus distance `ringDist 4`, at `r = 1`, `h₀ = o₀ = 1` and `m₁ = m₂ = 4` (every
 ball is contained in the 4-site lattice) gives
-`⟨Φ_GS|[Ô,[Ĥ,Ô]]|Φ_GS⟩ ≤ 4 m₁ m₂ h₀ o₀² |Λ| = 256`; the model's value is `256`, so that general
-bound is sharp in the wrapping regime `L ≤ 4r+1`. -/
+`⟨Φ_GS|[Ô,[Ĥ,Ô]]|Φ_GS⟩ ≤ 4 m₁ m₂ h₀ o₀² |Λ|`; the abstract ball-counting bound is attained
+exactly by this witness at `(d, r, L) = (1, 1, 4)` with `m₁ = m₂ = 4`, giving `256`. -/
 private lemma doubleCommutator_rayleighOnVec_gsState_le_ballCounting :
     rayleighOnVec dcOp gsState ≤ 4 * (4 : ℝ) * 4 * 1 * 1 ^ 2 * (4 : ℝ) := by
   have hcard : ∀ (k : ℕ) (b : Fin 4), (siteBall (ringDist 4) k b).card ≤ 4 := by

@@ -24,11 +24,11 @@ hypothesis of the printed Problem — even `L` (`Λ_L` of eq. (3.1.2), p. 51, is
 `L`), the periodic ring with proper radius-1 balls, radius-1 support of every local term,
 `h₀ = o₀ = 1`, self-adjoint local terms, and a normalized ground state — and has
 `⟨Φ|[Ô,[Ĥ,Ô]]|Φ⟩ = 256`, against the printed `4(2·1+1)(4·1+1)·1·1²·4 = 240`.  Formally that
-witness instantiates the abstract bound above with the `d = 1` torus distance `ringDist 4`, at
-`m₁ = m₂ = |Λ| = 4`, and attains `4 m₁ m₂ h₀ o₀² |Λ| = 256` exactly, so the ball-counting constant
-proved here is sharp in the wrapping regime; the torus-typed specialisation below is stated on
-`Fin d → Fin L` and is not instantiated by that fixture, whose value `720` it satisfies a fortiori
-(`256 ≤ 720`).  The mechanism: once both windows already
+witness instantiates the abstract bound above with the `d = 1` torus distance `ringDist 4`: the
+abstract ball-counting bound `4 m₁ m₂ h₀ o₀² |Λ|` is attained exactly by this witness at
+`(d, r, L) = (1, 1, 4)` with `m₁ = m₂ = 4`, giving `256`.  The torus-typed specialisation below is
+stated on `Fin d → Fin L` and is not instantiated by that fixture, whose value `720` it satisfies
+a fortiori (`256 ≤ 720`).  The mechanism: once both windows already
 cover the whole lattice (`L ≤ 4r+1`), the honest ball-counting constant collapses to
 `4 L^{3d} h₀ o₀²`, which exceeds the printed constant exactly when `L² > (2r+1)(4r+1)`; at `r = 1`
 the smallest even `L` clearing `L² > 15` is `L = 4`, and that model attains the collapsed value.

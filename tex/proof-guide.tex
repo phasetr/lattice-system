@@ -317,9 +317,11 @@ for $\alpha \neq \beta$.
 \end{lemma}
 
 \paragraph{Proof technique.}
-All four families are proved by \texttt{ext} on the matrix entries
-followed by \texttt{fin\_cases} on each row/column index and
-\texttt{simp} with the definitions.
+The Hermiticity, square, cyclic-product and anticommutation families
+are proved by \texttt{ext} on the matrix entries followed by
+\texttt{fin\_cases} on each row/column index and \texttt{simp} with the
+definitions; the reversed products are derived from the anticommutator
+identities together with the cyclic products.
 
 \paragraph{References.}
 Tasaki~\cite{Tasaki:QMB}, §2.1, eq.~(2.1.8), p.~15, defines the Pauli
@@ -13048,9 +13050,9 @@ printed Problem 3.4.a --- even $L$, the periodic ring whose radius-$1$ balls are
 three-site windows $\{x-1,x,x+1\}$, radius-$1$ support of every local term, the two norm bounds,
 self-adjointness of every local term, and a normalised ground state --- and formally it is an
 instance of \texttt{manyBodyOperatorNormS\_doubleCommutator\_le\_of\_rangeLocal} with the $d=1$
-torus distance \texttt{ringDist 4}, at $m_1=m_2=|\Lambda|=4$, whose value
-$4m_1m_2h_0o_0^2|\Lambda|=256$ it attains exactly, so that ball-counting constant is sharp in the
-wrapping regime. The torus-typed
+torus distance \texttt{ringDist 4}: the abstract ball-counting bound
+$4m_1m_2h_0o_0^2|\Lambda|$ is attained exactly by this witness at $(d,r,L)=(1,1,4)$ with
+$m_1=m_2=4$, giving $256$. The torus-typed
 \texttt{tasaki\_problem\_3\_4\_a\_doubleCommutator\_expectation\_le} is stated on
 $\mathrm{Fin}\,d\to\mathrm{Fin}\,L$ and is not instantiated by the fixture; its value $720$ is
 satisfied a fortiori ($256\le720$). The mechanism is that once both windows already
