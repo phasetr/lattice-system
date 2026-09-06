@@ -571,6 +571,221 @@ private lemma hLoc_sum_mulVec_gsState_eq_smul :
   rw [gsState, unitNormalize, Matrix.mulVec_smul, hLoc_sum_mulVec_gsVec, smul_comm]
   norm_num
 
+/-! ## Translates of the model terms, re-anchored at a common site -/
+
+/-- Re-anchoring a word by two sites. -/
+private lemma pw_shift2 (c : ℂ) (x : Fin 5) (A₀ A₁ A₂ A₃ A₄ : Matrix (Fin 2) (Fin 2) ℂ) :
+    pw c (x + 2) A₀ A₁ A₂ A₃ A₄ = pw c x A₃ A₄ A₀ A₁ A₂ := by
+  rw [show x + 2 = x + 1 + 1 from by rw [add_assoc, show (1 : Fin 5) + 1 = 2 from rfl],
+    pw_shift, pw_shift]
+
+/-- Re-anchoring a word by three sites. -/
+private lemma pw_shift3 (c : ℂ) (x : Fin 5) (A₀ A₁ A₂ A₃ A₄ : Matrix (Fin 2) (Fin 2) ℂ) :
+    pw c (x + 3) A₀ A₁ A₂ A₃ A₄ = pw c x A₂ A₃ A₄ A₀ A₁ := by
+  rw [show x + 3 = x + 2 + 1 from by rw [add_assoc, show (2 : Fin 5) + 1 = 3 from rfl],
+    pw_shift, pw_shift2]
+
+/-- Re-anchoring a word by four sites. -/
+private lemma pw_shift4 (c : ℂ) (x : Fin 5) (A₀ A₁ A₂ A₃ A₄ : Matrix (Fin 2) (Fin 2) ℂ) :
+    pw c (x + 4) A₀ A₁ A₂ A₃ A₄ = pw c x A₁ A₂ A₃ A₄ A₀ := by
+  rw [show x + 4 = x + 3 + 1 from by rw [add_assoc, show (3 : Fin 5) + 1 = 4 from rfl],
+    pw_shift, pw_shift3]
+
+/-- `ĥ_{x+1}` as a word anchored at `x`. -/
+private lemma hLoc_shift1 (x : Fin 5) : hLoc (x + 1) = pw (-1) x sZ sX sZ 1 1 := by
+  rw [hLoc_eq_pw, pw_shift]
+
+/-- `ĥ_{x+2}` as a word anchored at `x`. -/
+private lemma hLoc_shift2 (x : Fin 5) : hLoc (x + 2) = pw (-1) x 1 sZ sX sZ 1 := by
+  rw [hLoc_eq_pw, pw_shift2]
+
+/-- `ĥ_{x+3}` as a word anchored at `x`. -/
+private lemma hLoc_shift3 (x : Fin 5) : hLoc (x + 3) = pw (-1) x 1 1 sZ sX sZ := by
+  rw [hLoc_eq_pw, pw_shift3]
+
+/-- `ĥ_{x+4}` as a word anchored at `x`. -/
+private lemma hLoc_shift4 (x : Fin 5) : hLoc (x + 4) = pw (-1) x sZ 1 1 sZ sX := by
+  rw [hLoc_eq_pw, pw_shift4]
+
+/-- `ô_{x+1}` as a word anchored at `x`. -/
+private lemma oLoc_shift1 (x : Fin 5) : oLoc (x + 1) = pw 1 x sX sY sX 1 1 := by
+  rw [oLoc_eq_pw, pw_shift]
+
+/-- `ô_{x+2}` as a word anchored at `x`. -/
+private lemma oLoc_shift2 (x : Fin 5) : oLoc (x + 2) = pw 1 x 1 sX sY sX 1 := by
+  rw [oLoc_eq_pw, pw_shift2]
+
+/-- `ô_{x+3}` as a word anchored at `x`. -/
+private lemma oLoc_shift3 (x : Fin 5) : oLoc (x + 3) = pw 1 x 1 1 sX sY sX := by
+  rw [oLoc_eq_pw, pw_shift3]
+
+/-- `ô_{x+4}` as a word anchored at `x`. -/
+private lemma oLoc_shift4 (x : Fin 5) : oLoc (x + 4) = pw 1 x sX 1 1 sX sY := by
+  rw [oLoc_eq_pw, pw_shift4]
+
+/-- `K̂_x` as a Pauli word. -/
+private lemma kLoc_eq_pw (x : Fin 5) : kLoc x = pw 1 x sX sZ 1 1 sZ := by
+  rw [kLoc, hLoc_eq_pw, pw_neg]
+  norm_num
+
+/-- `K̂_{x+1}` as a word anchored at `x`. -/
+private lemma kLoc_shift1 (x : Fin 5) : kLoc (x + 1) = pw 1 x sZ sX sZ 1 1 := by
+  rw [kLoc_eq_pw, pw_shift]
+
+/-- `K̂_{x+2}` as a word anchored at `x`. -/
+private lemma kLoc_shift2 (x : Fin 5) : kLoc (x + 2) = pw 1 x 1 sZ sX sZ 1 := by
+  rw [kLoc_eq_pw, pw_shift2]
+
+/-- `K̂_{x+3}` as a word anchored at `x`. -/
+private lemma kLoc_shift3 (x : Fin 5) : kLoc (x + 3) = pw 1 x 1 1 sZ sX sZ := by
+  rw [kLoc_eq_pw, pw_shift3]
+
+/-- `K̂_{x+4}` as a word anchored at `x`. -/
+private lemma kLoc_shift4 (x : Fin 5) : kLoc (x + 4) = pw 1 x sZ 1 1 sZ sX := by
+  rw [kLoc_eq_pw, pw_shift4]
+
+/-! ## The anticommutation table `ô_x ĥ_z = −ĥ_z ô_x` -/
+
+/-- Anticommutation at offset `0`: the two words differ in three slots. -/
+private lemma oLoc_hLoc_anticomm0 (x : Fin 5) :
+    oLoc x * hLoc (x + 0) = -(hLoc (x + 0) * oLoc x) := by
+  rw [add_zero, oLoc_eq_pw, hLoc_eq_pw, pw_mul, pw_mul, pw_neg]
+  simp only [sY_mul_sX, sX_mul_sZ, sX_mul_sY, sZ_mul_sX, one_mul, mul_one, pw_smul_slot0,
+    pw_smul_slot1, pw_smul_slot4]
+  congr 1
+  norm_num [Complex.ext_iff]
+
+/-- Anticommutation at offset `1`: the two words differ in one slot. -/
+private lemma oLoc_hLoc_anticomm1 (x : Fin 5) :
+    oLoc x * hLoc (x + 1) = -(hLoc (x + 1) * oLoc x) := by
+  rw [oLoc_eq_pw, hLoc_shift1, pw_mul, pw_mul, pw_neg]
+  simp only [sY_mul_sZ, sZ_mul_sY, sX_mul_sX, one_mul, mul_one, pw_smul_slot0]
+  congr 1
+  norm_num [Complex.ext_iff]
+
+/-- Anticommutation at offset `2`: the two words differ in one slot. -/
+private lemma oLoc_hLoc_anticomm2 (x : Fin 5) :
+    oLoc x * hLoc (x + 2) = -(hLoc (x + 2) * oLoc x) := by
+  rw [oLoc_eq_pw, hLoc_shift2, pw_mul, pw_mul, pw_neg]
+  simp only [sX_mul_sZ, sZ_mul_sX, one_mul, mul_one, pw_smul_slot1]
+  congr 1
+  norm_num [Complex.ext_iff]
+
+/-- Anticommutation at offset `3`: the two words differ in one slot. -/
+private lemma oLoc_hLoc_anticomm3 (x : Fin 5) :
+    oLoc x * hLoc (x + 3) = -(hLoc (x + 3) * oLoc x) := by
+  rw [oLoc_eq_pw, hLoc_shift3, pw_mul, pw_mul, pw_neg]
+  simp only [sX_mul_sZ, sZ_mul_sX, one_mul, mul_one, pw_smul_slot4]
+  congr 1
+  norm_num [Complex.ext_iff]
+
+/-- Anticommutation at offset `4`: the two words differ in one slot. -/
+private lemma oLoc_hLoc_anticomm4 (x : Fin 5) :
+    oLoc x * hLoc (x + 4) = -(hLoc (x + 4) * oLoc x) := by
+  rw [oLoc_eq_pw, hLoc_shift4, pw_mul, pw_mul, pw_neg]
+  simp only [sY_mul_sZ, sZ_mul_sY, sX_mul_sX, one_mul, mul_one, pw_smul_slot0]
+  congr 1
+  norm_num [Complex.ext_iff]
+
+/-- Case analysis on the ring offset: a property of an arbitrary site follows from its five
+instances at the offsets `0, 1, 2, 3, 4` from any fixed site. -/
+private lemma fin5_offset_cases {P : Fin 5 → Prop} (x : Fin 5) (h0 : P (x + 0)) (h1 : P (x + 1))
+    (h2 : P (x + 2)) (h3 : P (x + 3)) (h4 : P (x + 4)) (z : Fin 5) : P z := by
+  obtain ⟨δ, rfl⟩ : ∃ δ, z = x + δ := ⟨z - x, (add_sub_cancel x z).symm⟩
+  fin_cases δ
+  · exact h0
+  · exact h1
+  · exact h2
+  · exact h3
+  · exact h4
+
+/-- **The full anticommutation table**: every order term anticommutes with every local
+Hamiltonian term of the model, at every relative offset on the ring. -/
+private lemma oLoc_hLoc_anticomm (x z : Fin 5) : oLoc x * hLoc z = -(hLoc z * oLoc x) :=
+  fin5_offset_cases (P := fun w => oLoc x * hLoc w = -(hLoc w * oLoc x)) x
+    (oLoc_hLoc_anticomm0 x) (oLoc_hLoc_anticomm1 x) (oLoc_hLoc_anticomm2 x)
+    (oLoc_hLoc_anticomm3 x) (oLoc_hLoc_anticomm4 x) z
+
+/-- `Ĥ Ô = −Ô Ĥ` for the model, by bilinearity from the anticommutation table. -/
+private lemma hLoc_sum_mul_oLoc_sum :
+    (∑ b, hLoc b) * (∑ x, oLoc x) = -((∑ x, oLoc x) * (∑ b, hLoc b)) := by
+  have h : ∀ b x : Fin 5, hLoc b * oLoc x = -(oLoc x * hLoc b) := by
+    intro b x
+    rw [oLoc_hLoc_anticomm x b]
+    exact (neg_neg _).symm
+  calc (∑ b, hLoc b) * (∑ x, oLoc x)
+      = ∑ b, ∑ x, hLoc b * oLoc x := Fintype.sum_mul_sum _ _
+    _ = ∑ b, ∑ x, -(oLoc x * hLoc b) :=
+        Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun x _ => h b x
+    _ = -∑ x, ∑ b, oLoc x * hLoc b := by
+        simp only [Finset.sum_neg_distrib]
+        rw [Finset.sum_comm]
+    _ = -((∑ x, oLoc x) * (∑ b, hLoc b)) := by rw [Fintype.sum_mul_sum]
+
+/-! ## Products of two order terms are products of stabilizers -/
+
+/-- At offset `0` the product of two order terms is the identity. -/
+private lemma oLoc_pair0 (x : Fin 5) : oLoc (x + 0) * oLoc x = 1 := by
+  rw [add_zero]; exact oLoc_mul_self x
+
+/-- At offset `1` the product of two order terms is `K̂_{x+2} K̂_{x+4}`. -/
+private lemma oLoc_pair1 (x : Fin 5) :
+    oLoc (x + 1) * oLoc x = kLoc (x + 2) * kLoc (x + 4) := by
+  rw [oLoc_shift1, oLoc_eq_pw, kLoc_shift2, kLoc_shift4, pw_mul, pw_mul]
+  simp only [sX_mul_sY, sY_mul_sX, sZ_mul_sZ, one_mul, mul_one, pw_smul_slot0, pw_smul_slot1]
+  congr 1
+  norm_num [Complex.ext_iff]
+
+/-- At offset `2` the product of two order terms is `K̂_x K̂_{x+2} K̂_{x+3} K̂_{x+4}`. -/
+private lemma oLoc_pair2 (x : Fin 5) :
+    oLoc (x + 2) * oLoc x = kLoc x * kLoc (x + 2) * kLoc (x + 3) * kLoc (x + 4) := by
+  rw [oLoc_shift2, oLoc_eq_pw, kLoc_eq_pw, kLoc_shift2, kLoc_shift3, kLoc_shift4]
+  simp only [pw_mul, sX_mul_sX, sZ_mul_sZ, sX_mul_sZ, sZ_mul_sX, sY_mul_sZ, one_mul, mul_one,
+    pw_smul_slot0, pw_smul_slot2, pw_smul_slot3]
+  congr 1
+  norm_num [Complex.ext_iff]
+
+/-- At offset `3` the product of two order terms is `K̂_x K̂_{x+1} K̂_{x+2} K̂_{x+3}`. -/
+private lemma oLoc_pair3 (x : Fin 5) :
+    oLoc (x + 3) * oLoc x = kLoc x * kLoc (x + 1) * kLoc (x + 2) * kLoc (x + 3) := by
+  rw [oLoc_shift3, oLoc_eq_pw, kLoc_eq_pw, kLoc_shift1, kLoc_shift2, kLoc_shift3]
+  simp only [pw_mul, sX_mul_sX, sZ_mul_sZ, sX_mul_sZ, sZ_mul_sX, sY_mul_sZ, one_mul, mul_one,
+    pw_smul_slot0, pw_smul_slot1, pw_smul_slot2, pw_smul_slot3]
+  congr 1
+  norm_num [Complex.ext_iff]
+
+/-- At offset `4` the product of two order terms is `K̂_{x+1} K̂_{x+3}`. -/
+private lemma oLoc_pair4 (x : Fin 5) :
+    oLoc (x + 4) * oLoc x = kLoc (x + 1) * kLoc (x + 3) := by
+  rw [oLoc_shift4, oLoc_eq_pw, kLoc_shift1, kLoc_shift3, pw_mul, pw_mul]
+  simp only [sX_mul_sY, sY_mul_sX, sZ_mul_sZ, one_mul, mul_one, pw_smul_slot0, pw_smul_slot4]
+  congr 1
+  norm_num [Complex.ext_iff]
+
+/-- **Every product of two order terms fixes the cluster state**: each is a product of
+stabilizers, and each stabilizer fixes it. -/
+private lemma oLoc_pair_mulVec_gsVec (z x : Fin 5) : (oLoc z * oLoc x) *ᵥ gsVec = gsVec := by
+  have h0 : (oLoc (x + 0) * oLoc x) *ᵥ gsVec = gsVec := by rw [oLoc_pair0, Matrix.one_mulVec]
+  have h1 : (oLoc (x + 1) * oLoc x) *ᵥ gsVec = gsVec := by
+    rw [oLoc_pair1]; simp only [← Matrix.mulVec_mulVec, kLoc_mulVec_gsVec]
+  have h2 : (oLoc (x + 2) * oLoc x) *ᵥ gsVec = gsVec := by
+    rw [oLoc_pair2]; simp only [← Matrix.mulVec_mulVec, kLoc_mulVec_gsVec]
+  have h3 : (oLoc (x + 3) * oLoc x) *ᵥ gsVec = gsVec := by
+    rw [oLoc_pair3]; simp only [← Matrix.mulVec_mulVec, kLoc_mulVec_gsVec]
+  have h4 : (oLoc (x + 4) * oLoc x) *ᵥ gsVec = gsVec := by
+    rw [oLoc_pair4]; simp only [← Matrix.mulVec_mulVec, kLoc_mulVec_gsVec]
+  exact fin5_offset_cases (P := fun w => (oLoc w * oLoc x) *ᵥ gsVec = gsVec) x h0 h1 h2 h3 h4 z
+
+/-- `Ô² Φ_C = 25 Φ_C`: all twenty-five products of two order terms fix the cluster state. -/
+private lemma oLoc_sum_sq_mulVec_gsVec :
+    ((∑ x, oLoc x) * (∑ z, oLoc z)) *ᵥ gsVec = (25 : ℂ) • gsVec := by
+  rw [Fintype.sum_mul_sum]
+  simp only [Matrix.sum_mulVec, oLoc_pair_mulVec_gsVec, Finset.sum_const, Finset.card_univ,
+    Fintype.card_fin, smul_smul]
+  rw [← Nat.cast_smul_eq_nsmul ℂ]
+  norm_num
+
+
 /-! ## The counterexample -/
 
 /-- **Counterexample to the printed constant of Tasaki eq. (3.4.13), as literally quantified.**
