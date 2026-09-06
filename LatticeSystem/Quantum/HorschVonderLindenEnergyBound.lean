@@ -88,8 +88,9 @@ hypothesis are the odd-moment hypotheses of `HorschVonderLindenProblem34b.lean`.
 
 The locality hypotheses `hW` and `hoo` are those of eq. (3.4.11).  `hW` asks that `ĥ_b` commute
 with the one operator `ô_z` at each `z ∉ W b`; for an arbitrary order family this is incomparable
-with `SupportedOnS (W b) (ĥ_b)`, and it follows from that support exactly when each `ô_z` is
-on-site at its own site `z` (via `supportedOnS_iff_commute_onSiteS`).  `hoo` is a separate
+with `SupportedOnS (W b) (ĥ_b)`, and it follows from that support whenever each `ô_z` is
+supported off `W b` — in particular when it is on-site at its own site `z`
+(via `supportedOnS_iff_commute_onSiteS`).  `hoo` is a separate
 condition on the order family itself — pairwise commutation of `ô_x`, `ô_z` for `x ≠ z` — and is
 not compared with support.  Why the hypotheses are stated this way rather than through
 `SupportedOnS` is recorded in the module doc of
