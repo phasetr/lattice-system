@@ -84,7 +84,19 @@ p. 65) gives the printed two-sided bound
 The left half is the variational hypothesis `hmin` applied to the unit vector `Γ`; the right half
 is the abstract bound above at `Ld = L^d`, fed by eq. (3.4.11), p. 67.  The no-SSB condition
 (3.4.4), p. 65, is not used in this derivation; the only declarations that take it as a named
-hypothesis are the odd-moment hypotheses of `HorschVonderLindenProblem34b.lean`. -/
+hypothesis are the odd-moment hypotheses of `HorschVonderLindenProblem34b.lean`.
+
+The locality hypotheses `hW` and `hoo` are those of eqs. (3.4.1)–(3.4.2), p. 65, which the eq.
+(3.4.11) bound consumes.  `hW` asks that `ĥ_b` commute with the one operator `ô_z` at each
+`z ∉ W b`; for an arbitrary order family this is incomparable with `SupportedOnS (W b) (ĥ_b)`,
+and it follows from that support whenever each `ô_z` is supported off `W b` (through
+`commute_of_supportedOnS_disjoint`), in particular when it is on-site at its own site `z`
+(through `supportedOnS_iff_commute_onSiteS`).  `hoo` is a separate
+condition on the order family itself — pairwise commutation of `ô_x`, `ô_z` for `x ≠ z` — and is
+not compared with support.  Why the hypotheses are stated this way rather than through
+`SupportedOnS` is recorded in the module doc of
+`Quantum/SpinS/LocalDoubleCommutatorBound.lean`.
+-/
 theorem tasaki_eq_3_4_12_trialState_energy_bound {ι : Type*} (B : Finset ι)
     (hb : ι → ManyBodyOpS Λ N) (o : Λ → ManyBodyOpS Λ N) (W : ι → Finset Λ)
     (d L : ℕ) (q₀ h₀ o₀ : ℝ) {Φ : (Λ → Fin (N + 1)) → ℂ} {E₀ : ℝ}

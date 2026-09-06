@@ -13,8 +13,9 @@ generic support/commutant bridge `supportedOnS_iff_commute_onSiteS`
 (`Quantum/SpinS/OperatorSupport.lean`).
 
 `window L r x` *is* `siteBall (ringDist L) r x`, so the site-set identity is definitional and `rfl`
-closes it: one filter defines the site set, and a second one cannot be reintroduced without
-breaking a pin here.  The ball filters on `dist y x ≤ r`, hence on `ringDist L y x ≤ r`, whereas
+closes it: the pins below measure definitional agreement with the ball, and a filter with a
+different orientation breaks a pin here.  The ball filters on `dist y x ≤ r`, hence on
+`ringDist L y x ≤ r`, whereas
 Tasaki writes the window centred at `x`, `ringDist L x y ≤ r`; the two orders are exchanged by
 `ringDist_comm` in `mem_window`, which is the single membership lemma every consumer uses.
 
@@ -61,8 +62,10 @@ example {L N r : ℕ} {x : Fin L} {op : ManyBodyOpS (Fin L) N} :
 /-! ## Definitional pin and membership order -/
 
 /-- **Definitional pin.** `window L r x` is *defined as* `siteBall (ringDist L) r x`, not merely
-equal to it up to a proved identity, so `rfl` closes the site-set equation and no consumer can
-reintroduce a second filter for the same site set. -/
+equal to it up to a proved identity, so `rfl` closes the site-set equation: the pin measures
+definitional agreement with `siteBall (ringDist L) r x`, and a definition with the opposite
+orientation of the ring distance fails it, though it does not detect an equivalent filter written
+elsewhere. -/
 example {L r : ℕ} {x : Fin L} :
     window L r x = siteBall (ringDist L) r x :=
   rfl

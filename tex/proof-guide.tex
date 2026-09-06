@@ -12863,10 +12863,28 @@ eqs.~(3.4.10)--(3.4.11) p.~67, with the operator-norm properties (A.2.5)/(A.2.6)
 \textbf{discharged axiom-free}, \texttt{Quantum/SpinS/LocalDoubleCommutatorBound.lean}, fixtures in
 \texttt{Tests/LocalDoubleCommutatorBound.lean}).  For a Hamiltonian $\hat H=\sum_{b\in B}\hat h_b$
 and an order operator $\hat O=\sum_{x\in\Lambda}\hat o_x$, locality is formalized by plain
-commutation hypotheses instead of a support predicate: $\hat h_b$ commutes with every $\hat o_z$
+commutation hypotheses rather than the support predicate \texttt{SupportedOnS}
+(\texttt{Quantum/SpinS/OperatorSupport.lean}): $\hat h_b$ commutes with every $\hat o_z$
 seated outside a window $W_b$ --- the content of eq.~(3.4.1)'s ``acts nontrivially only on the
 spins at $x$ and $y$'' --- and $\hat o_x$, $\hat o_z$ commute for $x\neq z$, the content of
-eq.~(3.4.2).  \texttt{commutator\_orderSum\_eq\_windowSum} is eq.~(3.4.9),
+eq.~(3.4.2).
+
+These are commutation hypotheses, not support hypotheses: support on $W_b$ is commutation with
+\emph{every} on-site operator seated outside $W_b$ (\texttt{supportedOnS\_iff\_commute\_onSiteS}).
+For an order family on-site at its own site --- $\hat o_z=\mathrm{onSiteS}\,z\,A$ for the same $z$
+--- that support implies the hypothesis used here through the equivalence; taking some
+$z\notin W_b$ with $\hat o_z=\mathrm{onSiteS}\,w\,A$ for a $w\in W_b$ and choosing $\hat h_b$
+supported on $W_b$ and $A$ with $[\hat h_b,\mathrm{onSiteS}\,w\,A]\neq 0$ (possible once the site
+dimension exceeds one) gives a family where support holds but the hypothesis used here fails,
+already a counterexample to the implication, and the converse fails already at $\hat o\equiv 0$.
+The family $\hat o$ is arbitrary in these statements, so the hypothesis is kept inline rather
+than folded into the predicate; a
+caller holding support data for both families on disjoint sets derives the commutation through
+\texttt{commute\_of\_supportedOnS\_disjoint}, as the range-$r$ bound of Problem~3.4.a
+(\texttt{Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean}, below) does to fix its $2r$ and $4r$
+windows.
+
+\texttt{commutator\_orderSum\_eq\_windowSum} is eq.~(3.4.9),
 \[[\hat H,\hat O]=\sum_{b\in B}\sum_{z\in W_b}[\hat h_b,\hat o_z],\]
 obtained by distributing the commutator over both sums (\texttt{Math/CommutatorSum.lean}) and
 collapsing the site sum onto $W_b$, the off-window summands vanishing by the first hypothesis.
