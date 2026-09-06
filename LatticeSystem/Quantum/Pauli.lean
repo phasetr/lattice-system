@@ -13,7 +13,8 @@ spin-1/2 Hilbert space `ℂ^2`, and proves the basic algebraic relations:
 * involutivity `σ^α * σ^α = 1`,
 * unitarity, membership in `Matrix.unitaryGroup (Fin 2) ℂ`,
 * anticommutation `σ^α σ^β + σ^β σ^α = 0` for `α ≠ β`,
-* the cyclic products `σ^x σ^y = i σ^z`, `σ^y σ^z = i σ^x`, `σ^z σ^x = i σ^y`.
+* the cyclic products `σ^x σ^y = i σ^z`, `σ^y σ^z = i σ^x`, `σ^z σ^x = i σ^y`,
+* their reversed forms `σ^y σ^x = -i σ^z`, `σ^z σ^y = -i σ^x`, `σ^x σ^z = -i σ^y`.
 
 These are the algebraic building blocks from which finite-chain quantum
 Ising / Heisenberg Hamiltonians will be assembled in later modules.
@@ -118,5 +119,28 @@ theorem pauliY_anticomm_pauliZ : pauliY * pauliZ + pauliZ * pauliY = 0 := by
 theorem pauliZ_anticomm_pauliX : pauliZ * pauliX + pauliX * pauliZ = 0 := by
   ext i j
   fin_cases i <;> fin_cases j <;> simp [pauliX, pauliZ]
+
+/-! ## Reversed products (`σ^β σ^α = -i σ^γ` for `(α,β,γ)` a cyclic permutation) -/
+
+/-- `σ^y * σ^x = -i • σ^z`, the reversed form of `pauliX_mul_pauliY`. -/
+theorem pauliY_mul_pauliX : pauliY * pauliX = (-I) • pauliZ := by
+  have h : pauliY * pauliX = -(pauliX * pauliY) := by
+    rw [eq_neg_iff_add_eq_zero, add_comm]
+    exact pauliX_anticomm_pauliY
+  rw [h, pauliX_mul_pauliY, neg_smul]
+
+/-- `σ^z * σ^y = -i • σ^x`, the reversed form of `pauliY_mul_pauliZ`. -/
+theorem pauliZ_mul_pauliY : pauliZ * pauliY = (-I) • pauliX := by
+  have h : pauliZ * pauliY = -(pauliY * pauliZ) := by
+    rw [eq_neg_iff_add_eq_zero, add_comm]
+    exact pauliY_anticomm_pauliZ
+  rw [h, pauliY_mul_pauliZ, neg_smul]
+
+/-- `σ^x * σ^z = -i • σ^y`, the reversed form of `pauliZ_mul_pauliX`. -/
+theorem pauliX_mul_pauliZ : pauliX * pauliZ = (-I) • pauliY := by
+  have h : pauliX * pauliZ = -(pauliZ * pauliX) := by
+    rw [eq_neg_iff_add_eq_zero, add_comm]
+    exact pauliZ_anticomm_pauliX
+  rw [h, pauliZ_mul_pauliX, neg_smul]
 
 end LatticeSystem.Quantum
