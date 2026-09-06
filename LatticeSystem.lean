@@ -2,43 +2,17 @@ import LatticeSystem.Math.GramEigenspaceCorrespondence
 import LatticeSystem.Math.RayleighAtEigenvector
 import LatticeSystem.Math.RealEigenvalueLePF
 import LatticeSystem.Math.EffectiveLimit
-import LatticeSystem.Math.MonotoneEnumeration
-import LatticeSystem.Math.Analysis.FiniteExponentialWeightIntegral
-import LatticeSystem.Math.Analysis.RpowSublinearThreshold
 import LatticeSystem.Math.MatrixAnalysis.Decomposition
-import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationReducedResolvent
-import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationFeshbach
-import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationGroundEnergy
-import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationUniqueness
-import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbationConvergence
-import LatticeSystem.Math.MatrixAnalysis.MinEnergyOnSubspace
-import LatticeSystem.Math.MatrixAnalysis.BlockTransport
-import LatticeSystem.Math.MatrixAnalysis.SubmatrixGroundState
-import LatticeSystem.Math.MatrixAnalysis.PiEuclideanEigenBridge
-import LatticeSystem.Math.MatrixAnalysis.PiDiagonalEigenspace
-import LatticeSystem.Math.MatrixAnalysis.PermInvariantUniformEigenvector
-import LatticeSystem.Math.MatrixAnalysis.RowSumEigenvalueBound
 import LatticeSystem.Math.WignerTheorem
-import LatticeSystem.Math.ProjectiveRepresentation
 import LatticeSystem.Math.CStarAlgebra.GNS
-import LatticeSystem.Math.MvPolynomial.WeightedHomogeneousLayer
-import LatticeSystem.Math.MvPolynomial.BondFactorDerivation
 import LatticeSystem.Quantum.HorschVonderLinden
-import LatticeSystem.Quantum.KaplanHorschVonderLinden
-import LatticeSystem.Quantum.HorschVonderLindenEnergyBound
-import LatticeSystem.Quantum.HorschVonderLindenProblem34b
-import LatticeSystem.Quantum.KaplanHorschVonderLindenTheorem32
 import LatticeSystem.Quantum.SpinS.FalkBruchInfra
 import LatticeSystem.Quantum.SpinS.NoLongRangeOrder1D
 import LatticeSystem.Quantum.SpinS.MPSTheorem75
-import LatticeSystem.Quantum.SpinS.AKLTMatrixProduct
 import LatticeSystem.Quantum.SpinS.AKLTInfiniteChain
 import LatticeSystem.Quantum.SpinS.AKLTStringOrder
 import LatticeSystem.Quantum.SpinS.AKLTTheorem71
 import LatticeSystem.Quantum.SpinS.AKLTOpenChainCompleteness
-import LatticeSystem.Quantum.SpinS.GeneralSOpenChainBondTerm
-import LatticeSystem.Math.PosSemidef.AnnihilatingPolynomial
-import LatticeSystem.Quantum.SpinS.GeneralSCasimirSpectrum
 import LatticeSystem.Quantum.SpinS.GeneralSOpenChainGroundSpace
 import LatticeSystem.Quantum.SpinS.ClusterState
 import LatticeSystem.Quantum.SpinS.HoneycombAKLTZeroEnergy
@@ -99,15 +73,12 @@ import LatticeSystem.Quantum.SpinS.JointCasimirEigenspaceLadderInvariant
 import LatticeSystem.Quantum.SpinS.JointCasimirEigenspaceMagInvariant
 import LatticeSystem.Quantum.SpinS.SublatticeMaxCasimirEigenspaceComplementNeBot
 import LatticeSystem.Quantum.SpinS.Theorem23PFBaseCasimir
-import LatticeSystem.Quantum.SpinS.KennedyTasakiTransformation
 import LatticeSystem.Quantum.SpinS.KennedyTasakiProp84
 import LatticeSystem.Quantum.SpinS.LambdaDModel
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisDiscrete
-import LatticeSystem.Quantum.SpinS.MPSInvarianceGauge
 import LatticeSystem.Quantum.SpinS.SPTMatrixProductIndex
 import LatticeSystem.Quantum.SpinS.SPTPhase
 import LatticeSystem.Quantum.SpinS.SPTPhaseTransition
-import LatticeSystem.Quantum.SpinS.SPTSymmetryTransportedMPS
 import LatticeSystem.Quantum.SpinS.SPTTopologicalIndex
 import LatticeSystem.Quantum.SpinS.VBSInversionParity
 import LatticeSystem.Quantum.SpinS.ToricCode
@@ -123,14 +94,9 @@ import LatticeSystem.Quantum.SpinS.SublatticeMaxCasimirFinrankGeComplement
 import LatticeSystem.Quantum.SpinS.Problem25dGroundStatePhaseWrapper
 import LatticeSystem.Quantum.SpinS.Problem25dBalancedPFCrossSign
 import LatticeSystem.Quantum.SpinS.SpinHalfSpecializationMultiSite
-import LatticeSystem.Quantum.SpinS.GeneralSWeylLadder
-import LatticeSystem.Quantum.SpinS.GeneralSWeylCasimir
-import LatticeSystem.Quantum.SpinS.GeneralSCasimirDescent
 import LatticeSystem.Quantum.SpinS.SaturatedCoherentExpansion
-import LatticeSystem.Quantum.SpinS.LocalDoubleCommutatorBound
 import LatticeSystem.Quantum.IsingLowEnergyProblem33aCapstone
 import LatticeSystem.Quantum.SpinS.RangeLocalDoubleCommutatorBound
-import LatticeSystem.Quantum.SpinS.HorschVonderLindenAfmRing
 
 /-!
 # `lattice-system` library root
@@ -140,13 +106,20 @@ library. Importing this file pulls in every public source module
 (but not the `Tests/` regression-test modules — those live in
 `LatticeSystem.Tests`, imported separately by the build).
 
-The list above enumerates only the tips of the library's
-non-Tests import DAG — the modules that no other module in the
-non-Tests library imports, because everything else is reached
-transitively; a module needs a line here exactly when nothing
-else in the (non-Tests) library imports it. (A tip still counts
-as such even when a `Tests` module also imports it, since
-`Tests` is not part of the root's own transitive closure.)
+The list above is exactly the set of tips of the library's
+import DAG, where the library is every module under
+`LatticeSystem/` other than `LatticeSystem/Tests.lean` and the
+`LatticeSystem/Tests/` tree: a library module is listed here
+exactly when no other library module imports it (this root
+file itself lies outside `LatticeSystem/`, so it is not a
+library member). The transitive closure of those lines is the
+whole library. Both directions are part of the invariant: a
+missing tip would drop a module out of this root's transitive
+closure, and a line for a module that another library module
+already imports is redundant. (A module still counts as a tip
+when only `LatticeSystem.Tests` or a module under
+`LatticeSystem/Tests/` imports it, since neither is part of the
+library.) The invariant is re-measured in refactoring audits.
 
 The library's design philosophy is **graph-centric**: the
 underlying combinatorial datum of every many-body system is a
