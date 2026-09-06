@@ -786,6 +786,58 @@ private lemma oLoc_sum_sq_mulVec_gsVec :
   norm_num
 
 
+/-! ## The exact value of the double-commutator expectation -/
+
+/-- The double commutator `[Ô,[Ĥ,Ô]]` of the model, written exactly as in the capstone
+`manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal`. -/
+private noncomputable def dcOp : ManyBodyOpS (Fin 5) 1 :=
+  (∑ x, oLoc x) * ((∑ b, hLoc b) * (∑ x, oLoc x) - (∑ x, oLoc x) * (∑ b, hLoc b))
+    - ((∑ b, hLoc b) * (∑ x, oLoc x) - (∑ x, oLoc x) * (∑ b, hLoc b)) * (∑ x, oLoc x)
+
+/-- **`[Ô,[Ĥ,Ô]] = −4 Ĥ Ô²`** for the model: with `Ĥ Ô = −Ô Ĥ` the inner commutator is `2 Ĥ Ô`
+and the outer one collapses, so no expansion over the `125` triples is needed. -/
+private lemma dcOp_eq : dcOp = (-4 : ℂ) • ((∑ b, hLoc b) * ((∑ x, oLoc x) * (∑ x, oLoc x))) := by
+  set H := ∑ b, hLoc b with hHdef
+  set O := ∑ x, oLoc x with hOdef
+  have h1 : O * H = -(H * O) := by rw [hLoc_sum_mul_oLoc_sum]; exact (neg_neg _).symm
+  have h2 : O * (H * O) = -(H * (O * O)) := by rw [← mul_assoc, h1, neg_mul, mul_assoc]
+  have h3 : O * (O * H) = H * (O * O) := by
+    rw [h1, mul_neg, h2]
+    exact neg_neg _
+  have h4 : H * O * O = H * (O * O) := mul_assoc H O O
+  have h5 : O * H * O = -(H * (O * O)) := by rw [h1, neg_mul, mul_assoc]
+  have expand : O * (H * O - O * H) - (H * O - O * H) * O
+      = O * (H * O) - O * (O * H) - (H * O * O - O * H * O) := by noncomm_ring
+  rw [dcOp, expand, h2, h3, h4, h5]
+  module
+
+/-- The double commutator acts on the unnormalized cluster state by the scalar `500`. -/
+private lemma dcOp_mulVec_gsVec : dcOp *ᵥ gsVec = (500 : ℂ) • gsVec := by
+  rw [dcOp_eq, Matrix.smul_mulVec, ← Matrix.mulVec_mulVec, oLoc_sum_sq_mulVec_gsVec,
+    Matrix.mulVec_smul, hLoc_sum_mulVec_gsVec, smul_smul, smul_smul]
+  norm_num
+
+/-- The double commutator acts on the normalized ground state by the same scalar `500`. -/
+private lemma dcOp_mulVec_gsState : dcOp *ᵥ gsState = (500 : ℂ) • gsState := by
+  rw [gsState, unitNormalize, Matrix.mulVec_smul, dcOp_mulVec_gsVec, smul_comm]
+
+/-- **The expectation value is exactly `500`.**  This is the left-hand side of Tasaki
+eq. (3.4.13) for the model, evaluated exactly (not merely bounded). -/
+private lemma doubleCommutator_rayleighOnVec_gsState_eq_five_hundred :
+    rayleighOnVec dcOp gsState = 500 := by
+  rw [rayleighOnVec, dcOp_mulVec_gsState, dotProduct_smul, smul_eq_mul,
+    gsState_dotProduct_self_eq_one, mul_one]
+  norm_num
+
+/-- **The printed constant of eq. (3.4.13) is exceeded**: at `d = 1`, `r = 1`, `h₀ = o₀ = 1`,
+`L = 5` the printed `4 (2r+1)^d (4r+1)^d h₀ o₀² L^d` is `300`, while the model's expectation is
+`500`. -/
+private lemma doubleCommutator_rayleighOnVec_gsState_gt_printed_constant :
+    4 * (2 * (1 : ℝ) + 1) ^ 1 * (4 * (1 : ℝ) + 1) ^ 1 * 1 * 1 ^ 2 * (5 : ℝ) ^ 1
+      < rayleighOnVec dcOp gsState := by
+  rw [doubleCommutator_rayleighOnVec_gsState_eq_five_hundred]
+  norm_num
+
 /-! ## The counterexample -/
 
 /-- **Counterexample to the printed constant of Tasaki eq. (3.4.13), as literally quantified.**
@@ -822,18 +874,5 @@ theorem tasaki_problem_3_4_a_printed_constant_counterexample :
   · exact hLoc_sum_mulVec_gsState_eq_smul
   · exact doubleCommutator_rayleighOnVec_gsState_eq_five_hundred
   · exact doubleCommutator_rayleighOnVec_gsState_gt_printed_constant
-
-/-
-Positive control (to be added and run after Green, then reverted — §3.3 of the design):
-
-example : (500 : ℝ) ≠ 4 * (4 * (1 : ℝ) + 1) ^ 1 * (4 * (1 : ℝ) + 1) ^ 1 * 1 * 1 ^ 2 * (5 : ℝ) ^ 1 :=
-  by norm_num
-
-replacing the printed-constant literal `4*(2r+1)^1*(4r+1)^1*...` by the honest-bound literal
-`4*(4r+1)^1*(4r+1)^1*...` (both equal 500) must turn the strict `<` conjunct into `500 < 500`,
-which must fail to build; likewise substituting `499` for the exact value `500` in the eighth
-conjunct must fail to build; likewise dropping the sign in any one anticommutation δ-lemma used by
-the (future) proof of the eighth/ninth conjuncts must fail to build.
--/
 
 end LatticeSystem.Tests.PrintedConstantCounterexample
