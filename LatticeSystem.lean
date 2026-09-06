@@ -107,15 +107,19 @@ library. Importing this file pulls in every public source module
 `LatticeSystem.Tests`, imported separately by the build).
 
 The list above is exactly the set of tips of the library's
-non-Tests import DAG: a module is listed there exactly when no
-other module outside `LatticeSystem/Tests/` imports it, and the
-transitive closure of those lines is the whole non-Tests library.
-Both directions are part of the invariant: a missing tip would
-drop a module out of the default build, and a line for a module
-that another non-Tests module already imports is redundant.
-(A module still counts as a tip when only a `Tests` module
-imports it, since `Tests` is not part of this root's transitive
-closure.) The invariant is re-measured in refactoring audits.
+import DAG, where the library is every module under
+`LatticeSystem/` other than `LatticeSystem/Tests.lean` and the
+`LatticeSystem/Tests/` tree: a library module is listed here
+exactly when no other library module imports it (this root
+file itself lies outside `LatticeSystem/`, so it is not a
+library member). The transitive closure of those lines is the
+whole library. Both directions are part of the invariant: a
+missing tip would drop a module out of this root's transitive
+closure, and a line for a module that another library module
+already imports is redundant. (A module still counts as a tip
+when only `LatticeSystem.Tests` or a module under
+`LatticeSystem/Tests/` imports it, since neither is part of the
+library.) The invariant is re-measured in refactoring audits.
 
 The library's design philosophy is **graph-centric**: the
 underlying combinatorial datum of every many-body system is a
