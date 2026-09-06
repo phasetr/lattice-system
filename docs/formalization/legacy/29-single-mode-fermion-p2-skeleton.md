@@ -6,7 +6,7 @@ permalink: /formalization/legacy/29-single-mode-fermion-p2-skeleton/
 
 # Legacy catalogue: Single-mode fermion (P2 skeleton)
 
-> **Interim authority.** This lossless catalogue chunk remains authoritative for formalization status and capstone identification until Issue #5228. The version 1 JSON catalogue is still a non-authoritative prototype.
+> **Interim authority.** This lossless catalogue chunk remains authoritative for formalization status and capstone identification until Issue #5228. The version 2 JSON records are still a non-authoritative prototype.
 
 [Interim catalogue](/lattice-system/formalization/legacy/) › [Fermions and Hubbard models](/lattice-system/formalization/legacy/#group-fermions-hubbard)
 

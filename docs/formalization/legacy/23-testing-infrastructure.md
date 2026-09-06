@@ -6,7 +6,7 @@ permalink: /formalization/legacy/23-testing-infrastructure/
 
 # Legacy catalogue: Testing infrastructure
 
-> **Interim authority.** This lossless catalogue chunk remains authoritative for formalization status and capstone identification until Issue #5228. The version 1 JSON catalogue is still a non-authoritative prototype.
+> **Interim authority.** This lossless catalogue chunk remains authoritative for formalization status and capstone identification until Issue #5228. The version 2 JSON records are still a non-authoritative prototype.
 
 [Interim catalogue](/lattice-system/formalization/legacy/) › [Project infrastructure](/lattice-system/formalization/legacy/#group-project-infrastructure)
 
