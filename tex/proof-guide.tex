@@ -13348,7 +13348,8 @@ of the Dyson--Lieb--Simon / Shastry argument.  The left-half predicate is the ge
 predicate \texttt{SupportedOnS} (\texttt{OperatorSupport.lean}) at the left-half site set,
 identified with it by \texttt{supportedOnLeftS\_iff\_supportedOnS} (fixture
 \texttt{Tests/LeftHalfSupportPin.lean}) and kept in its half-ring form rather than retired, its
-closure lemmas below being specific to the reflection $\theta$.  The fourth layer
+$\theta$-compatibility closure lemmas below (such as \texttt{SupportedOnLeftS.mul\_theta\_comm})
+having no generic counterpart.  The fourth layer
 (\texttt{RingReflectionTraceCone.lean}) establishes the $\beta = 0$ base case via the \emph{bilinear
 reflection base identity} \texttt{trace\_theta\_mul\_eq\_refLeftSum\_mul}: for left-supported
 operators, $\operatorname{Tr}(\theta(A)\,B) = \overline{S_A}\,S_B$ where $S_X = \texttt{refLeftSum}\,X =

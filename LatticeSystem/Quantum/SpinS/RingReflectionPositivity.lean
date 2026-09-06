@@ -12,9 +12,11 @@ RP functional predicate.
 
 The left-support predicate is the generic support predicate `SupportedOnS`
 (`Quantum/SpinS/OperatorSupport.lean`) at the left-half site set, an identification proved here by
-`supportedOnLeftS_iff_supportedOnS`.  It is kept in its half-ring form because its closure lemmas
-(`SupportedOnLeftS.theta_right`, `SupportedOnLeftS.mul_theta_comm`) speak about the ring reflection
-`θ` and so are specific to this layer rather than instances of a generic support API.
+`supportedOnLeftS_iff_supportedOnS`.  It is kept in its half-ring form because its
+θ-compatibility closure lemma `SupportedOnLeftS.theta_right` (below) and
+`SupportedOnLeftS.mul_theta_comm` (`Quantum/SpinS/RingReflectionWeightedCone.lean`) speak about
+the ring reflection `θ` and so are specific to this layer rather than instances of a generic
+support API.
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionHamiltonian
 import LatticeSystem.Quantum.SpinS.OperatorSupport
@@ -48,8 +50,9 @@ holds exactly when `A` is supported, in the entrywise sense of `SupportedOnS`
 sides say that `A` lies in `B(H_left) ⊗ I_right`, so a caller holding either shape may invoke a
 result stated in the other.  The predicates differ only in how the right half is named — the
 half-ring condition `n ≤ (i : ℕ)` versus non-membership in the left-half filter, which `not_lt`
-identifies — so no hypothesis on `n`, `N` or `A` is needed (for `n = 0` the site type is empty and
-both sides hold vacuously).  The half-ring form is kept rather than retired in favour of the generic
+identifies — so no hypothesis on `n`, `N` or `A` is needed (for `n = 0` the site type `Fin (2 * n)`
+is empty: the first clause holds vacuously and the second holds because `Fin 0 → Fin (N + 1)` is a
+subsingleton, forcing `σ = σ'` and `τ = τ'`).  The half-ring form is kept over the generic
 one: its `θ`-compatibility closure lemmas mention the ring reflection and have no generic
 counterpart. -/
 theorem supportedOnLeftS_iff_supportedOnS {A : ManyBodyOpS (Fin (2 * n)) N} :
