@@ -22,6 +22,19 @@ ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 BASELINE_COMMIT = "6519099024bf156b87ac0c807c6633c513792581"
 LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
+# Pins sha256 over `approved_changes(baseline_slice).encode("utf-8")`, the published catalogue
+# text the legacy pages are compared against, where `baseline_slice` is the exact
+# `docs/index.md`@`BASELINE_COMMIT` line range `main()` feeds to `approved_changes` at the
+# whole-baseline call site. Every edit to `_approved_replacements` or
+# `_drop_private_instructions_ref` moves it; recompute with:
+#   python3 -c 'import sys, hashlib; sys.path.insert(0, "scripts"); \
+#   import check_docs_hierarchy as c; \
+#   print(hashlib.sha256(c.approved_changes("".join(c.baseline_index() \
+#   .splitlines(keepends=True)[216:2731])).encode("utf-8")).hexdigest())'
+# Recomputing this constant is never on its own an authorization for a content change: the
+# legacy pages still have to be edited to match, and the catalogue-row parity check is what
+# proves they do.
+APPROVED_CHANGES_SHA256 = "2d57e7b3d3e02f04ee3f19c864c9f1cbfc125115d37bd13086832aa50b079da0"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -1279,6 +1292,27 @@ def approved_changes(text: str) -> str:
     return _drop_deleted_catalogue_rows(_drop_private_instructions_ref(_approved_replacements(text)))
 
 
+def approved_changes_byte_parity_self_test() -> None:
+    """`APPROVED_CHANGES_SHA256` must still hash the published catalogue text exactly.
+
+    A transformation that moved is reported once, as a pin mismatch naming both hashes, rather
+    than as the thousands of row differences the page comparison reports much later in the run.
+    The name-keyed row drop that still runs after the audited rewrite chain is what keeps this
+    from being the whole account of the published text, so it is not yet called from `main()`.
+    """
+    baseline_slice = "".join(baseline_index().splitlines(keepends=True)[216:2731])
+    actual = hashlib.sha256(approved_changes(baseline_slice).encode("utf-8")).hexdigest()
+    if actual != APPROVED_CHANGES_SHA256:
+        fail(
+            "approved-changes byte-parity pin mismatch: expected "
+            f"{APPROVED_CHANGES_SHA256}, got {actual}. Recompute with: python3 -c 'import sys, "
+            "hashlib; sys.path.insert(0, \"scripts\"); import check_docs_hierarchy as c; "
+            "print(hashlib.sha256(c.approved_changes(\"\".join(c.baseline_index()."
+            "splitlines(keepends=True)[216:2731])).encode(\"utf-8\")).hexdigest())' -- a passing "
+            "pin recompute is never on its own an authorization for the content change."
+        )
+
+
 MOVED_PROSE_LINK_REWRITES = (
     ("(refactoring-conventions.html)", "(/lattice-system/refactoring-conventions/)"),
     (
@@ -1512,11 +1546,14 @@ def deleted_row_registry_negative_self_tests() -> None:
                 "main() to stop the mirror from cloning a mirror of its own"
             )
         script_text = script_text.replace(nested_call, "")
-        # The argv probe clones and runs a script of its own, so leaving its call in the mirror
-        # buys a second probe this fixture does not measure and reports that probe's failure as
-        # this one's setup error. Its absence would not endanger the mirror, so unlike the call
-        # above the removal is best-effort.
+        # The other two clone-based probes clone and run a script of their own, so leaving
+        # either call in the mirror buys a probe this fixture does not measure and reports that
+        # probe's failure as this one's setup error. Their absence would not endanger the
+        # mirror, so unlike the call above the removal is best-effort.
         script_text = script_text.replace("    unrecognized_argument_self_test()\n", "")
+        script_text = script_text.replace(
+            "    absent_name_row_drop_negative_self_test()\n", ""
+        )
         script_path.write_text(script_text)
 
         baseline = subprocess.run(
@@ -1587,6 +1624,122 @@ def deleted_row_registry_negative_self_tests() -> None:
             )
 
 
+def absent_name_row_drop_negative_self_test() -> None:
+    """A row must never be droppable merely because its Lean-name cell is already absent.
+
+    148 already-published catalogue rows name a declaration absent from the Lean tree, measured
+    by `.self-local/reports/measure-5403-class7.py` at the tracked revision, yet only two of
+    those absences are ever registered for deletion. Merely choosing one of the many already-
+    absent names cannot on its own authorize dropping the row: this probes that exact boundary
+    in a disposable clone by registering an arbitrary already-absent name
+    (`pauli_decomposition`, confirmed absent by `lean_leaf_mention` below) for the same kind of
+    name-keyed drop the registry performs, hand-dropping its row from the live legacy page, and
+    asserting the checker refuses.
+    """
+    with tempfile.TemporaryDirectory(prefix="absent-name-row-drop-") as scratch:
+        mirror = Path(scratch) / "mirror"
+        subprocess.run(
+            ["git", "clone", "--quiet", "--shared", str(ROOT), str(mirror)], check=True
+        )
+
+        # Cloning a mirror that still ran this self-test (or the other two clone-based probes)
+        # would clone a mirror of its own without end; strip all three calls the same way the
+        # existing clone-based probes strip each other's, so no probe's mirror ever re-enters a
+        # probe this fixture does not measure.
+        script_path = mirror / "scripts" / "check_docs_hierarchy.py"
+        script_text = script_path.read_text()
+        nested_call = "    absent_name_row_drop_negative_self_test()\n"
+        if nested_call not in script_text:
+            fail(
+                "absent-name row drop self-test could not locate its own call in the mirror's "
+                "main() to stop the mirror from cloning a mirror of its own"
+            )
+        script_text = script_text.replace(nested_call, "")
+        script_text = script_text.replace(
+            "    deleted_row_registry_negative_self_tests()\n", ""
+        )
+        script_text = script_text.replace("    unrecognized_argument_self_test()\n", "")
+        script_path.write_text(script_text)
+
+        baseline = subprocess.run(
+            [sys.executable, "scripts/check_docs_hierarchy.py"],
+            cwd=mirror,
+            capture_output=True,
+            text=True,
+        )
+        if baseline.returncode != 0:
+            fail(
+                "absent-name row drop self-test setup failed: the mirror does not pass before "
+                f"its registry is mutated (exit={baseline.returncode}): {baseline.stderr}"
+            )
+
+        if lean_leaf_mention(ROOT, "pauli_decomposition") is not None:
+            fail(
+                "absent-name row drop self-test subject pauli_decomposition is no longer "
+                "absent from the Lean tree; choose a different already-absent name"
+            )
+
+        registered = (
+            'DELETED_CATALOGUE_ROW_NAMES = (\n'
+            '    "no_long_range_order_1d_of_susceptibility",\n'
+            '    "shastry_staggered_susceptibility_subcubic",\n'
+            ')\n'
+            'DELETED_CATALOGUE_ROW_COUNTS = (1, 1)\n'
+        )
+        mutated = (
+            'DELETED_CATALOGUE_ROW_NAMES = (\n'
+            '    "no_long_range_order_1d_of_susceptibility",\n'
+            '    "shastry_staggered_susceptibility_subcubic",\n'
+            '    "pauli_decomposition",\n'
+            ')\n'
+            'DELETED_CATALOGUE_ROW_COUNTS = (1, 1, 1)\n'
+        )
+        if registered not in script_text:
+            fail(
+                "absent-name row drop self-test could not locate the registry literal to mutate"
+            )
+        script_path.write_text(script_text.replace(registered, mutated))
+
+        legacy_page = (
+            mirror
+            / "docs"
+            / "formalization"
+            / "legacy"
+            / "07-pauli-basis-decomposition-tasaki-2-1-problem-2-1-a-s-1-2.md"
+        )
+        legacy_text = legacy_page.read_text()
+        row_pattern = re.compile(r"^\| `pauli_decomposition` \|.*\n", re.MULTILINE)
+        mutated_legacy, row_drops = row_pattern.subn("", legacy_text)
+        if row_drops != 1:
+            fail(
+                "absent-name row drop self-test could not find exactly one live "
+                f"pauli_decomposition row (found {row_drops})"
+            )
+        legacy_page.write_text(mutated_legacy)
+
+        probe = subprocess.run(
+            [sys.executable, "scripts/check_docs_hierarchy.py"],
+            cwd=mirror,
+            capture_output=True,
+            text=True,
+        )
+        if probe.returncode == 0:
+            if "2049 catalogue rows" not in probe.stdout:
+                fail(
+                    "absent-name row drop self-test observed an unexpected pass shape: expected "
+                    f"'2049 catalogue rows' in stdout, got: {probe.stdout!r}"
+                )
+            fail(
+                "absent-name row drop fail-open: pauli_decomposition is absent from the Lean "
+                "tree, but a name-keyed drop of its catalogue row was accepted (mirror exited 0)"
+            )
+        if "pauli_decomposition" not in probe.stderr:
+            fail(
+                "absent-name row drop probe failed for the wrong reason: expected an error "
+                f"naming pauli_decomposition, got: {probe.stderr}"
+            )
+
+
 def unrecognized_argument_self_test() -> None:
     """`main()` must refuse argv it does not accept instead of running as if it were bare.
 
@@ -1608,12 +1761,15 @@ def unrecognized_argument_self_test() -> None:
                 "a copy that ignores argv from re-entering this probe without end"
             )
         script_text = script_text.replace(own_call, "")
-        # The deleted-row self-test clones and runs a script of its own, so a copy that
-        # reached its call would buy a probe this fixture does not measure and report that
-        # probe's failure as this one's. A copy without the call cannot misreport that way,
+        # The other two clone-based self-tests clone and run a script of their own, so a copy
+        # that reached either call would buy a probe this fixture does not measure and report
+        # that probe's failure as this one's. A copy without the call cannot misreport that way,
         # so unlike the call above the removal is best-effort.
         script_text = script_text.replace(
             "    deleted_row_registry_negative_self_tests()\n", ""
+        )
+        script_text = script_text.replace(
+            "    absent_name_row_drop_negative_self_test()\n", ""
         )
         script_path = mirror / "scripts" / "check_docs_hierarchy.py"
         script_path.write_text(script_text)
@@ -1653,6 +1809,7 @@ def main() -> None:
     moved_prose_negative_self_tests()
     deleted_row_registry_mention_semantics_self_test()
     deleted_row_registry_negative_self_tests()
+    absent_name_row_drop_negative_self_test()
     unrecognized_argument_self_test()
     generated_records = DOCS / "formalization" / "records"
     if generated_records.exists() or generated_records.is_symlink():
