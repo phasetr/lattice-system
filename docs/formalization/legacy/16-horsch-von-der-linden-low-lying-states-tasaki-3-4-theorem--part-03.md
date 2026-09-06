@@ -329,11 +329,17 @@ arithmetic slip. The printed constant is, however, **refuted as literally quanti
 even `L`, so a single admissible triple suffices: at `d = 1`, `r = 1`, `L = 4`, the spin-1/2 ring
 carrying a Bell pair on each of the site pairs `{1,2}` and `{3,0}` — stabilizers `X̂₃X̂₀`, `X̂₁X̂₂`,
 `Ẑ₁Ẑ₂`, `Ẑ₃Ẑ₀`, local terms `ĥ_x` their negatives, order terms `ô₀ = ô₁ = Ŷ₀Ŷ₁`,
-`ô₂ = ô₃ = Ŷ₂Ŷ₃` (`h₀ = o₀ = 1`) — has the joint `+1` eigenvector of the four stabilizers as its
-ground state (`E₀ = −4`) and `⟨Φ_GS|[Ô,[Ĥ,Ô]]|Φ_GS⟩ = 256`, against the printed
-`4(2r+1)^d(4r+1)^d h₀o₀²L^d = 240`. The bound proved above is unaffected (`256 ≤ 720`), and in the
-abstract ball-counting form (`m₁ = m₂ = 4` on the 4-ring) the value `4 m₁ m₂ h₀o₀²|Λ| = 256` is
-attained exactly. The mechanism is that once both windows already cover the whole lattice
+`ô₂ = ô₃ = Ŷ₂Ŷ₃` (`h₀ = o₀ = 1`, all local terms self-adjoint) — has the joint `+1` eigenvector of
+the four stabilizers as its ground state (`E₀ = −4`) and `⟨Φ_GS|[Ô,[Ĥ,Ô]]|Φ_GS⟩ = 256`, against the
+printed `4(2r+1)^d(4r+1)^d h₀o₀²L^d = 240`. The witness satisfies every hypothesis of the printed
+Problem 3.4.a — even `L`, the periodic ring whose radius-1 balls are the proper three-site windows
+`{x−1, x, x+1}`, radius-1 support of every local term, the two norm bounds, self-adjointness of
+every local term, and a normalised ground state — and formally it is an instance of
+`manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal` with the `d = 1` torus distance
+`ringDist 4`, at `m₁ = m₂ = |Λ| = 4`, whose value `4 m₁ m₂ h₀o₀²|Λ| = 256` it attains exactly, so
+that ball-counting constant is sharp in the wrapping regime. The torus-typed
+`tasaki_problem_3_4_a_doubleCommutator_expectation_le` is stated on `Fin d → Fin L` and is not
+instantiated by the fixture; its value `720` is satisfied a fortiori (`256 ≤ 720`). The mechanism is that once both windows already cover the whole lattice
 (`L ≤ 4r+1`), the honest ball-counting constant collapses to `4 L^{3d} h₀o₀²`, which exceeds the
 printed `4(2r+1)^d(4r+1)^d h₀o₀²L^d` exactly when `L² > (2r+1)(4r+1)`; at `r = 1` the smallest even
 `L` clearing `L² > 15` is `L = 4`, and the model above attains that collapsed value. Whether the
@@ -347,7 +353,8 @@ p. 82), carries `(2r+1)^d`, and counting the lattice points within distance `r` 
 dimensions gives `(2r+1)^d`. Read off the rendered PDF page, not the text extraction, which drops
 math symbols. No declaration in this repository states the `(2r+1)²` form.
 
-**What these declarations do not assert.** Self-adjointness of `ĥ_x` and `ô_x` is not assumed; the
+**What these declarations do not assert.** Self-adjointness of `ĥ_x` and `ô_x` is not assumed by
+the bounds above (the counterexample model does have self-adjoint local terms, and says so); the
 expectation is taken on its real part. The long-range order condition (3.4.3) and the no-SSB
 condition (3.4.4) are unused. No `1 ≤ d` and no `1 ≤ L` is required. The Problem's closing remark —
 that Theorem 3.1 extends to this class given (3.4.3) and `⟨Φ_GS|Ô_L|Φ_GS⟩ = 0` — is not formalized
@@ -380,7 +387,7 @@ All declarations below are **PROVED**; `#print axioms` on each yields only `prop
 | `card_siteBall_torusSupDist_le` | `\|B_r(x)\| ≤ (2r+1)^d` for the torus sup-distance ball | `Quantum/SpinS/TorusSupDistance.lean` |
 | `manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal` | `‖[Ô,[Ĥ,Ô]]‖ ≤ 4 m₁ m₂ h₀ o₀² \|Λ\|` for `SupportedOnS`-local terms over an abstract distance, `m₁`/`m₂` the `2r`-/`4r`-ball counts | `Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean` |
 | `tasaki_problem_3_4_a_doubleCommutator_expectation_le` | Problem 3.4.a, with the constant the range-`r` premise yields (not eq. (3.4.13) as printed): `⟨Φ\|[Ô,[Ĥ,Ô]]\|Φ⟩ ≤ 4 (4r+1)^d (8r+1)^d h₀ o₀² L^d` for a normalised `Φ` and range-`r` `SupportedOnS` site-local terms on `Λ_L` | `Quantum/SpinS/RangeLocalDoubleCommutatorBound.lean` |
-| `tasaki_problem_3_4_a_printed_constant_counterexample` | an explicit `d = 1`, `r = 1`, admissible even `L = 4` spin-1/2 ring (the even-`L` conjunct is discharged in the statement) satisfying every hypothesis of Problem 3.4.a with `⟨Φ_GS\|[Ô,[Ĥ,Ô]]\|Φ_GS⟩ = 256 > 240`, refuting the printed constant of eq. (3.4.13) as literally quantified | `Tests/PrintedConstantCounterexample.lean` |
+| `tasaki_problem_3_4_a_printed_constant_counterexample` | an explicit `d = 1`, `r = 1`, admissible even `L = 4` spin-1/2 ring satisfying every hypothesis of the printed Problem 3.4.a — even `L`, proper radius-1 ring balls, radius-1 support, unit norm bounds, self-adjoint local terms, normalised ground state, all discharged as conjuncts — with `⟨Φ_GS\|[Ô,[Ĥ,Ô]]\|Φ_GS⟩ = 256 > 240`, refuting the printed constant of eq. (3.4.13) as literally quantified; a further conjunct instantiates `manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal` with `ringDist 4` and `m₁ = m₂ = \|Λ\| = 4`, attaining `4 m₁ m₂ h₀o₀²\|Λ\| = 256` exactly (the torus-typed `tasaki_problem_3_4_a_doubleCommutator_expectation_le`, on `Fin d → Fin L`, is not instantiated here) | `Tests/PrintedConstantCounterexample.lean` |
 
 Regression fixtures live in `LatticeSystem/Tests/OperatorSupport.lean` (signature pins on
 `SupportedOnS` and its three lemmas) and `LatticeSystem/Tests/RangeLocalDoubleCommutatorBound.lean`

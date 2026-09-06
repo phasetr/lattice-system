@@ -10,12 +10,21 @@ supported on the radius-`r` ball of its own site with `manyBodyOperatorNormS ĥ_
 The lattice `Λ_L` of eq. (3.1.2) (p. 51) is defined only for **even** `L`, so an admissible
 instance of the Problem has `L` even; the counterexample below carries that admissibility as an
 explicit conjunct of its statement.  The module exhibits an explicit `d = 1`, `r = 1`, `L = 4`
-spin-1/2 ring satisfying every hypothesis of the Problem for which the printed constant is
-**false**: the model attains `256`, exceeding the printed `4·3·5·1·1·4 = 240`.  It does satisfy the
-repository's own honest bound `4 (4r+1)^d (8r+1)^d h₀ o₀² L^d = 720`
-(`RangeLocalDoubleCommutatorBound.lean`), so nothing proved elsewhere in the repository is
-affected; only the printed constant's literal quantification is refuted.  Whether the printed
-constant holds for even `L > 4r+1` is left open.
+spin-1/2 ring for which the printed constant is **false**: the model attains `256`, exceeding the
+printed `4·3·5·1·1·4 = 240`.  The witness satisfies every hypothesis of the printed
+Problem 3.4.a — even `L`, the periodic ring with proper radius-1 balls, radius-1 support of every
+local term, `‖ĥ_x‖ ≤ 1` and `‖ô_x‖ ≤ 1`, self-adjoint local terms, and a normalized ground state —
+and formally it is an instance of the repository's generic range-local bound
+`manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal` with the `d = 1` torus distance
+`ringDist 4`, while the torus-typed capstone
+`tasaki_problem_3_4_a_doubleCommutator_expectation_le` is stated on the site type `Fin d → Fin L`
+and is not instantiated here.  Through that generic bound the model satisfies
+`4 m₁ m₂ h₀ o₀² |Λ| = 256` with `m₁ = m₂ = |Λ| = 4` and attains it exactly, so the repository's
+ball-counting constant is sharp in the wrapping regime; the specialisation
+`4 (4r+1)^d (8r+1)^d h₀ o₀² L^d = 720` (`RangeLocalDoubleCommutatorBound.lean`) is satisfied a
+fortiori, so nothing proved elsewhere in the repository is affected and only the printed
+constant's literal quantification is refuted.  Whether the printed constant holds for even
+`L > 4r+1` is left open.
 
 The model: the 4-site ring `Λ = Fin 4` with `ringDist 4`, carrying a Bell pair on each of the site
 pairs `{1,2}` and `{3,0}`.  Its four stabilizers `X̂₃X̂₀`, `X̂₁X̂₂`, `Ẑ₁Ẑ₂`, `Ẑ₃Ẑ₀` are commuting
@@ -27,6 +36,7 @@ Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1s
 2020, Problem 3.4.a, statement pp. 67-68, printed solution p. 501; the lattice `Λ_L` of
 eq. (3.1.2), §3.1 p. 51, is defined for even `L`.
 -/
+import LatticeSystem.Quantum.Pauli
 import LatticeSystem.Quantum.SpinS.HaldaneConjecture
 import LatticeSystem.Quantum.SpinS.RangeLocalDoubleCommutatorBound
 import LatticeSystem.Quantum.SpinS.ExpectationNormBound
@@ -36,83 +46,6 @@ namespace LatticeSystem.Tests.PrintedConstantCounterexample
 open LatticeSystem.Quantum LatticeSystem.Math Matrix
 
 open scoped ComplexOrder
-
-/-! ## Single-site 2×2 letters -/
-
-/-- The single-site Pauli-`X` matrix `!![0,1;1,0]`. -/
-private def sX : Matrix (Fin 2) (Fin 2) ℂ := !![0, 1; 1, 0]
-
-/-- The single-site Pauli-`Z` matrix `!![1,0;0,-1]`. -/
-private def sZ : Matrix (Fin 2) (Fin 2) ℂ := !![1, 0; 0, -1]
-
-/-- The single-site Pauli-`Y` matrix `!![0,-i;i,0]`. -/
-private noncomputable def sY : Matrix (Fin 2) (Fin 2) ℂ := !![0, -Complex.I; Complex.I, 0]
-
-/-! ## Single-site 2×2 algebra -/
-
-/-- `X² = 1`. -/
-private lemma sX_mul_sX : sX * sX = 1 := by
-  ext i j
-  fin_cases i <;> fin_cases j <;>
-    norm_num [sX, Matrix.mul_apply, Fin.sum_univ_two, Matrix.one_apply]
-
-/-- `Z² = 1`. -/
-private lemma sZ_mul_sZ : sZ * sZ = 1 := by
-  ext i j
-  fin_cases i <;> fin_cases j <;>
-    norm_num [sZ, Matrix.mul_apply, Fin.sum_univ_two, Matrix.one_apply]
-
-/-- `Y² = 1`. -/
-private lemma sY_mul_sY : sY * sY = 1 := by
-  ext i j
-  fin_cases i <;> fin_cases j <;>
-    norm_num [sY, Matrix.mul_apply, Fin.sum_univ_two, Matrix.one_apply, Complex.ext_iff]
-
-/-- `XY = iZ`. -/
-private lemma sX_mul_sY : sX * sY = Complex.I • sZ := by
-  ext i j
-  fin_cases i <;> fin_cases j <;>
-    norm_num [sX, sY, sZ, Matrix.mul_apply, Fin.sum_univ_two, Complex.ext_iff]
-
-/-- `YX = −iZ`. -/
-private lemma sY_mul_sX : sY * sX = (-Complex.I) • sZ := by
-  ext i j
-  fin_cases i <;> fin_cases j <;>
-    norm_num [sX, sY, sZ, Matrix.mul_apply, Fin.sum_univ_two, Complex.ext_iff]
-
-/-- `YZ = iX`. -/
-private lemma sY_mul_sZ : sY * sZ = Complex.I • sX := by
-  ext i j
-  fin_cases i <;> fin_cases j <;>
-    norm_num [sX, sY, sZ, Matrix.mul_apply, Fin.sum_univ_two, Complex.ext_iff]
-
-/-- `ZY = −iX`. -/
-private lemma sZ_mul_sY : sZ * sY = (-Complex.I) • sX := by
-  ext i j
-  fin_cases i <;> fin_cases j <;>
-    norm_num [sX, sY, sZ, Matrix.mul_apply, Fin.sum_univ_two, Complex.ext_iff]
-
-/-- `XZ = −iY`. -/
-private lemma sX_mul_sZ : sX * sZ = (-Complex.I) • sY := by
-  ext i j
-  fin_cases i <;> fin_cases j <;>
-    norm_num [sX, sY, sZ, Matrix.mul_apply, Fin.sum_univ_two, Complex.ext_iff]
-
-/-- `X` is Hermitian. -/
-private lemma sX_conjTranspose : Matrix.conjTranspose sX = sX := by
-  ext i j
-  fin_cases i <;> fin_cases j <;> norm_num [sX, Matrix.conjTranspose_apply]
-
-/-- `Z` is Hermitian. -/
-private lemma sZ_conjTranspose : Matrix.conjTranspose sZ = sZ := by
-  ext i j
-  fin_cases i <;> fin_cases j <;> norm_num [sZ, Matrix.conjTranspose_apply]
-
-/-- `Y` is Hermitian. -/
-private lemma sY_conjTranspose : Matrix.conjTranspose sY = sY := by
-  ext i j
-  fin_cases i <;> fin_cases j <;>
-    norm_num [sY, Matrix.conjTranspose_apply, Complex.ext_iff]
 
 /-! ## Four-slot Pauli words on the 4-ring -/
 
@@ -130,12 +63,6 @@ private lemma fin_two_cases (a : Fin 2) : a = 0 ∨ a = 1 := by
   fin_cases a
   · exact Or.inl rfl
   · exact Or.inr rfl
-
-/-- Merging the leading letters of two right-nested words whose tails commute with the second
-leading letter. -/
-private lemma word_mul_step {a b R S : ManyBodyOpS (Fin 4) 1} (h : Commute R b) :
-    a * R * (b * S) = a * b * (R * S) := by
-  rw [mul_assoc a R (b * S), ← mul_assoc R b S, h.eq, mul_assoc b R S, ← mul_assoc a b (R * S)]
 
 /-- The **Pauli word** `c · A₀ A₁ A₂ A₃`: the letter `Aₖ` sits at the site `k` of the 4-ring and
 `c` is an overall phase.  Every operator of the model is such a word, and the whole operator
@@ -163,8 +90,9 @@ private lemma pw_mul (c d : ℂ) (A₀ A₁ A₂ A₃ B₀ B₁ B₂ B₃ : Matr
     onSiteS_commute_of_ne (by decide) _ _
   rw [pw, pw, pw, smul_mul_smul_comm]
   congr 1
-  rw [word_mul_step (h10.mul_left (h20.mul_left h30)), word_mul_step (h21.mul_left h31),
-    word_mul_step h32, onSiteS_mul_onSiteS_same, onSiteS_mul_onSiteS_same,
+  rw [Commute.mul_mul_mul_comm (h10.mul_left (h20.mul_left h30)),
+    Commute.mul_mul_mul_comm (h21.mul_left h31), Commute.mul_mul_mul_comm h32,
+    onSiteS_mul_onSiteS_same, onSiteS_mul_onSiteS_same,
     onSiteS_mul_onSiteS_same, onSiteS_mul_onSiteS_same]
 
 /-- A phase in the zeroth slot of a word is an overall phase. -/
@@ -199,34 +127,38 @@ private lemma pw_one_all : pw 1 1 1 1 1 = 1 := by
 /-! ## The model: two Bell pairs on the 4-ring -/
 
 /-- The four **stabilizers** of the model: `X̂₃X̂₀`, `X̂₁X̂₂`, `Ẑ₁Ẑ₂`, `Ẑ₃Ẑ₀`, one for each site.
-Each pair `{1,2}`, `{3,0}` carries the two-element stabilizer group of a Bell pair. -/
+The two of them supported on a pair `{1,2}`, `{3,0}` are the two generators of the stabilizer group
+`{1, X̂X̂, ẐẐ, −ŶŶ}` of a Bell pair. -/
 private noncomputable def kLoc : Fin 4 → ManyBodyOpS (Fin 4) 1 :=
-  ![onSiteS 3 sX * onSiteS 0 sX, onSiteS 1 sX * onSiteS 2 sX,
-    onSiteS 1 sZ * onSiteS 2 sZ, onSiteS 3 sZ * onSiteS 0 sZ]
+  ![onSiteS 3 pauliX * onSiteS 0 pauliX, onSiteS 1 pauliX * onSiteS 2 pauliX,
+    onSiteS 1 pauliZ * onSiteS 2 pauliZ, onSiteS 3 pauliZ * onSiteS 0 pauliZ]
 
 /-- The local Hamiltonian term `ĥ_x = −K̂_x` at site `x`. -/
 private noncomputable def hLoc (x : Fin 4) : ManyBodyOpS (Fin 4) 1 := -kLoc x
 
-/-- The order word `Â = Ŷ₀Ŷ₁` of the Bell pair `{0,1}`. -/
-private noncomputable def aOp : ManyBodyOpS (Fin 4) 1 := onSiteS 0 sY * onSiteS 1 sY
+/-- The order word `Â = Ŷ₀Ŷ₁`, supported on the site pair `{0,1}`.  That pair is not a Bell pair
+of the model: it straddles the Bell pairs `{3,0}` and `{1,2}`, meeting each in one site, which is
+why `Â` anticommutes with every stabilizer. -/
+private noncomputable def aOp : ManyBodyOpS (Fin 4) 1 := onSiteS 0 pauliY * onSiteS 1 pauliY
 
-/-- The order word `B̂ = Ŷ₂Ŷ₃` of the Bell pair `{2,3}`. -/
-private noncomputable def bOp : ManyBodyOpS (Fin 4) 1 := onSiteS 2 sY * onSiteS 3 sY
+/-- The order word `B̂ = Ŷ₂Ŷ₃`, supported on the site pair `{2,3}`, which straddles the Bell pairs
+`{1,2}` and `{3,0}` in the same way. -/
+private noncomputable def bOp : ManyBodyOpS (Fin 4) 1 := onSiteS 2 pauliY * onSiteS 3 pauliY
 
 /-- The local order-operator terms `ô₀ = ô₁ = Â`, `ô₂ = ô₃ = B̂`. -/
 private noncomputable def oLoc : Fin 4 → ManyBodyOpS (Fin 4) 1 := ![aOp, aOp, bOp, bOp]
 
 /-- The stabilizer at site `0`. -/
-private lemma kLoc_zero : kLoc 0 = onSiteS 3 sX * onSiteS 0 sX := rfl
+private lemma kLoc_zero : kLoc 0 = onSiteS 3 pauliX * onSiteS 0 pauliX := rfl
 
 /-- The stabilizer at site `1`. -/
-private lemma kLoc_one : kLoc 1 = onSiteS 1 sX * onSiteS 2 sX := rfl
+private lemma kLoc_one : kLoc 1 = onSiteS 1 pauliX * onSiteS 2 pauliX := rfl
 
 /-- The stabilizer at site `2`. -/
-private lemma kLoc_two : kLoc 2 = onSiteS 1 sZ * onSiteS 2 sZ := rfl
+private lemma kLoc_two : kLoc 2 = onSiteS 1 pauliZ * onSiteS 2 pauliZ := rfl
 
 /-- The stabilizer at site `3`. -/
-private lemma kLoc_three : kLoc 3 = onSiteS 3 sZ * onSiteS 0 sZ := rfl
+private lemma kLoc_three : kLoc 3 = onSiteS 3 pauliZ * onSiteS 0 pauliZ := rfl
 
 /-- The order term at site `0`. -/
 private lemma oLoc_zero : oLoc 0 = aOp := rfl
@@ -246,83 +178,79 @@ private lemma hLoc_eq_neg_kLoc (x : Fin 4) : hLoc x = -kLoc x := rfl
 /-! ## The model as Pauli words -/
 
 /-- `K̂₀ = X̂₃X̂₀` as a Pauli word. -/
-private lemma kLoc_zero_eq_pw : kLoc 0 = pw 1 sX 1 1 sX := by
-  have h : Commute (onSiteS (3 : Fin 4) sX : ManyBodyOpS (Fin 4) 1) (onSiteS 0 sX) :=
+private lemma kLoc_zero_eq_pw : kLoc 0 = pw 1 pauliX 1 1 pauliX := by
+  have h : Commute (onSiteS (3 : Fin 4) pauliX : ManyBodyOpS (Fin 4) 1) (onSiteS 0 pauliX) :=
     onSiteS_commute_of_ne (by decide) _ _
   rw [kLoc_zero, h.eq, pw]
   simp only [onSiteS_one, one_mul, one_smul]
 
 /-- `K̂₁ = X̂₁X̂₂` as a Pauli word. -/
-private lemma kLoc_one_eq_pw : kLoc 1 = pw 1 1 sX sX 1 := by
+private lemma kLoc_one_eq_pw : kLoc 1 = pw 1 1 pauliX pauliX 1 := by
   rw [kLoc_one, pw]
   simp only [onSiteS_one, one_mul, mul_one, one_smul]
 
 /-- `K̂₂ = Ẑ₁Ẑ₂` as a Pauli word. -/
-private lemma kLoc_two_eq_pw : kLoc 2 = pw 1 1 sZ sZ 1 := by
+private lemma kLoc_two_eq_pw : kLoc 2 = pw 1 1 pauliZ pauliZ 1 := by
   rw [kLoc_two, pw]
   simp only [onSiteS_one, one_mul, mul_one, one_smul]
 
 /-- `K̂₃ = Ẑ₃Ẑ₀` as a Pauli word. -/
-private lemma kLoc_three_eq_pw : kLoc 3 = pw 1 sZ 1 1 sZ := by
-  have h : Commute (onSiteS (3 : Fin 4) sZ : ManyBodyOpS (Fin 4) 1) (onSiteS 0 sZ) :=
+private lemma kLoc_three_eq_pw : kLoc 3 = pw 1 pauliZ 1 1 pauliZ := by
+  have h : Commute (onSiteS (3 : Fin 4) pauliZ : ManyBodyOpS (Fin 4) 1) (onSiteS 0 pauliZ) :=
     onSiteS_commute_of_ne (by decide) _ _
   rw [kLoc_three, h.eq, pw]
   simp only [onSiteS_one, one_mul, one_smul]
 
 /-- `Â = Ŷ₀Ŷ₁` as a Pauli word. -/
-private lemma aOp_eq_pw : aOp = pw 1 sY sY 1 1 := by
+private lemma aOp_eq_pw : aOp = pw 1 pauliY pauliY 1 1 := by
   rw [aOp, pw]
   simp only [onSiteS_one, mul_one, one_smul]
 
 /-- `B̂ = Ŷ₂Ŷ₃` as a Pauli word. -/
-private lemma bOp_eq_pw : bOp = pw 1 1 1 sY sY := by
+private lemma bOp_eq_pw : bOp = pw 1 1 1 pauliY pauliY := by
   rw [bOp, pw]
   simp only [onSiteS_one, one_mul, one_smul]
 
 /-! ## Involutions and Hermiticity -/
 
-/-- A product of two commuting Hermitian factors is Hermitian. -/
-private lemma pair_isHermitian {P Q : ManyBodyOpS (Fin 4) 1}
-    (hP : Matrix.conjTranspose P = P) (hQ : Matrix.conjTranspose Q = Q) (hPQ : Commute P Q) :
-    Matrix.conjTranspose (P * Q) = P * Q := by
-  rw [Matrix.conjTranspose_mul, hP, hQ, hPQ.symm.eq]
-
 /-- `K̂_x² = 1`: every stabilizer of the model is an involution. -/
 private lemma kLoc_mul_self (x : Fin 4) : kLoc x * kLoc x = 1 := by
   have h0 : kLoc 0 * kLoc 0 = 1 := by
     rw [kLoc_zero_eq_pw, pw_mul]
-    simp only [sX_mul_sX, one_mul]
+    simp only [pauliX_mul_self, one_mul]
     exact pw_one_all
   have h1 : kLoc 1 * kLoc 1 = 1 := by
     rw [kLoc_one_eq_pw, pw_mul]
-    simp only [sX_mul_sX, one_mul]
+    simp only [pauliX_mul_self, one_mul]
     exact pw_one_all
   have h2 : kLoc 2 * kLoc 2 = 1 := by
     rw [kLoc_two_eq_pw, pw_mul]
-    simp only [sZ_mul_sZ, one_mul]
+    simp only [pauliZ_mul_self, one_mul]
     exact pw_one_all
   have h3 : kLoc 3 * kLoc 3 = 1 := by
     rw [kLoc_three_eq_pw, pw_mul]
-    simp only [sZ_mul_sZ, one_mul]
+    simp only [pauliZ_mul_self, one_mul]
     exact pw_one_all
   exact fin_four_cases (P := fun w => kLoc w * kLoc w = 1) h0 h1 h2 h3 x
 
 /-- `K̂_x` is Hermitian. -/
 private lemma kLoc_conjTranspose (x : Fin 4) : Matrix.conjTranspose (kLoc x) = kLoc x := by
-  have hX : ∀ i : Fin 4,
-      Matrix.conjTranspose (onSiteS i sX : ManyBodyOpS (Fin 4) 1) = onSiteS i sX := fun i => by
-    rw [onSiteS_conjTranspose, sX_conjTranspose]
-  have hZ : ∀ i : Fin 4,
-      Matrix.conjTranspose (onSiteS i sZ : ManyBodyOpS (Fin 4) 1) = onSiteS i sZ := fun i => by
-    rw [onSiteS_conjTranspose, sZ_conjTranspose]
+  have hX : ∀ i : Fin 4, (onSiteS i pauliX : ManyBodyOpS (Fin 4) 1).IsHermitian :=
+    fun i => onSiteS_isHermitian i pauliX_isHermitian
+  have hZ : ∀ i : Fin 4, (onSiteS i pauliZ : ManyBodyOpS (Fin 4) 1).IsHermitian :=
+    fun i => onSiteS_isHermitian i pauliZ_isHermitian
   have h0 : Matrix.conjTranspose (kLoc 0) = kLoc 0 := by
-    rw [kLoc_zero]; exact pair_isHermitian (hX 3) (hX 0) (onSiteS_commute_of_ne (by decide) _ _)
+    rw [kLoc_zero]
+    exact ((hX 3).mul_of_commute (hX 0) (onSiteS_commute_of_ne (by decide) _ _).eq).eq
   have h1 : Matrix.conjTranspose (kLoc 1) = kLoc 1 := by
-    rw [kLoc_one]; exact pair_isHermitian (hX 1) (hX 2) (onSiteS_commute_of_ne (by decide) _ _)
+    rw [kLoc_one]
+    exact ((hX 1).mul_of_commute (hX 2) (onSiteS_commute_of_ne (by decide) _ _).eq).eq
   have h2 : Matrix.conjTranspose (kLoc 2) = kLoc 2 := by
-    rw [kLoc_two]; exact pair_isHermitian (hZ 1) (hZ 2) (onSiteS_commute_of_ne (by decide) _ _)
+    rw [kLoc_two]
+    exact ((hZ 1).mul_of_commute (hZ 2) (onSiteS_commute_of_ne (by decide) _ _).eq).eq
   have h3 : Matrix.conjTranspose (kLoc 3) = kLoc 3 := by
-    rw [kLoc_three]; exact pair_isHermitian (hZ 3) (hZ 0) (onSiteS_commute_of_ne (by decide) _ _)
+    rw [kLoc_three]
+    exact ((hZ 3).mul_of_commute (hZ 0) (onSiteS_commute_of_ne (by decide) _ _).eq).eq
   exact fin_four_cases (P := fun w => Matrix.conjTranspose (kLoc w) = kLoc w) h0 h1 h2 h3 x
 
 /-- `ĥ_x² = 1`: every local Hamiltonian term of the model is an involution. -/
@@ -336,30 +264,28 @@ private lemma hLoc_conjTranspose (x : Fin 4) : Matrix.conjTranspose (hLoc x) = h
 /-- `Â² = 1`. -/
 private lemma aOp_mul_self : aOp * aOp = 1 := by
   rw [aOp_eq_pw, pw_mul]
-  simp only [sY_mul_sY, one_mul]
+  simp only [pauliY_mul_self, one_mul]
   exact pw_one_all
 
 /-- `B̂² = 1`. -/
 private lemma bOp_mul_self : bOp * bOp = 1 := by
   rw [bOp_eq_pw, pw_mul]
-  simp only [sY_mul_sY, one_mul]
+  simp only [pauliY_mul_self, one_mul]
   exact pw_one_all
 
 /-- `Â` is Hermitian. -/
 private lemma aOp_conjTranspose : Matrix.conjTranspose aOp = aOp := by
-  have hY : ∀ i : Fin 4,
-      Matrix.conjTranspose (onSiteS i sY : ManyBodyOpS (Fin 4) 1) = onSiteS i sY := fun i => by
-    rw [onSiteS_conjTranspose, sY_conjTranspose]
+  have hY : ∀ i : Fin 4, (onSiteS i pauliY : ManyBodyOpS (Fin 4) 1).IsHermitian :=
+    fun i => onSiteS_isHermitian i pauliY_isHermitian
   rw [aOp]
-  exact pair_isHermitian (hY 0) (hY 1) (onSiteS_commute_of_ne (by decide) _ _)
+  exact ((hY 0).mul_of_commute (hY 1) (onSiteS_commute_of_ne (by decide) _ _).eq).eq
 
 /-- `B̂` is Hermitian. -/
 private lemma bOp_conjTranspose : Matrix.conjTranspose bOp = bOp := by
-  have hY : ∀ i : Fin 4,
-      Matrix.conjTranspose (onSiteS i sY : ManyBodyOpS (Fin 4) 1) = onSiteS i sY := fun i => by
-    rw [onSiteS_conjTranspose, sY_conjTranspose]
+  have hY : ∀ i : Fin 4, (onSiteS i pauliY : ManyBodyOpS (Fin 4) 1).IsHermitian :=
+    fun i => onSiteS_isHermitian i pauliY_isHermitian
   rw [bOp]
-  exact pair_isHermitian (hY 2) (hY 3) (onSiteS_commute_of_ne (by decide) _ _)
+  exact ((hY 2).mul_of_commute (hY 3) (onSiteS_commute_of_ne (by decide) _ _).eq).eq
 
 /-- `ô_x² = 1`: every order term of the model is an involution. -/
 private lemma oLoc_mul_self (x : Fin 4) : oLoc x * oLoc x = 1 := by
@@ -385,20 +311,20 @@ private lemma kLoc_supportedOnS_siteBall :
     ∀ x : Fin 4, SupportedOnS (siteBall (ringDist 4) 1 x) (kLoc x) := by
   have h0 : SupportedOnS (siteBall (ringDist 4) 1 0) (kLoc 0) := by
     rw [kLoc_zero]
-    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sX).mul
-      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sX)
+    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) pauliX).mul
+      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) pauliX)
   have h1 : SupportedOnS (siteBall (ringDist 4) 1 1) (kLoc 1) := by
     rw [kLoc_one]
-    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sX).mul
-      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sX)
+    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) pauliX).mul
+      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) pauliX)
   have h2 : SupportedOnS (siteBall (ringDist 4) 1 2) (kLoc 2) := by
     rw [kLoc_two]
-    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sZ).mul
-      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sZ)
+    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) pauliZ).mul
+      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) pauliZ)
   have h3 : SupportedOnS (siteBall (ringDist 4) 1 3) (kLoc 3) := by
     rw [kLoc_three]
-    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sZ).mul
-      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sZ)
+    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) pauliZ).mul
+      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) pauliZ)
   exact fin_four_cases (P := fun w => SupportedOnS (siteBall (ringDist 4) 1 w) (kLoc w))
     h0 h1 h2 h3
 
@@ -416,22 +342,28 @@ private lemma oLoc_supportedOnS_siteBall :
     ∀ x : Fin 4, SupportedOnS (siteBall (ringDist 4) 1 x) (oLoc x) := by
   have h0 : SupportedOnS (siteBall (ringDist 4) 1 0) (oLoc 0) := by
     rw [oLoc_zero, aOp]
-    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sY).mul
-      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sY)
+    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) pauliY).mul
+      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) pauliY)
   have h1 : SupportedOnS (siteBall (ringDist 4) 1 1) (oLoc 1) := by
     rw [oLoc_one, aOp]
-    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sY).mul
-      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sY)
+    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) pauliY).mul
+      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) pauliY)
   have h2 : SupportedOnS (siteBall (ringDist 4) 1 2) (oLoc 2) := by
     rw [oLoc_two, bOp]
-    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sY).mul
-      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sY)
+    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) pauliY).mul
+      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) pauliY)
   have h3 : SupportedOnS (siteBall (ringDist 4) 1 3) (oLoc 3) := by
     rw [oLoc_three, bOp]
-    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sY).mul
-      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) sY)
+    exact (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) pauliY).mul
+      (supportedOnS_onSiteS (mem_siteBall.mpr (by decide)) pauliY)
   exact fin_four_cases (P := fun w => SupportedOnS (siteBall (ringDist 4) 1 w) (oLoc w))
     h0 h1 h2 h3
+
+/-- **The radius-1 ring ball is the exact three-site window** `{x−1, x, x+1}`.  Range `r = 1` is a
+genuine restriction on the model only because the ball is proper: under a degenerate distance every
+ball would be the whole lattice and the support hypotheses above would hold vacuously. -/
+private lemma siteBall_ringDist_four_one :
+    ∀ x : Fin 4, siteBall (ringDist 4) 1 x = {x - 1, x, x + 1} := by decide
 
 /-- **Hypothesis (b) for `ĥ`**: each local Hamiltonian term is Hermitian and an involution, hence
 unitary, so its operator norm is exactly `1` and in particular `h₀ = 1` is admissible. -/
@@ -462,29 +394,29 @@ private lemma gsVec_apply (σ : Fin 4 → Fin 2) :
     gsVec σ = if σ 1 = σ 2 ∧ σ 3 = σ 0 then 1 else 0 := rfl
 
 /-- A single-site `Ẑ` acts diagonally, by the sign `(−1)^{σ_i}`. -/
-private lemma onSiteS_sZ_mulVec_apply (i : Fin 4) (v : (Fin 4 → Fin 2) → ℂ)
+private lemma onSiteS_pauliZ_mulVec_apply (i : Fin 4) (v : (Fin 4 → Fin 2) → ℂ)
     (σ : Fin 4 → Fin 2) :
-    ((onSiteS i sZ : ManyBodyOpS (Fin 4) 1) *ᵥ v) σ = (-1 : ℂ) ^ (σ i : ℕ) * v σ := by
+    ((onSiteS i pauliZ : ManyBodyOpS (Fin 4) 1) *ᵥ v) σ = (-1 : ℂ) ^ (σ i : ℕ) * v σ := by
   have hself : Function.update σ i (σ i) = σ := by simp
   rw [onSiteS_mulVec_apply, Fin.sum_univ_two]
-  rcases fin_two_cases (σ i) with h | h <;> rw [h] at hself ⊢ <;> norm_num [sZ, hself]
+  rcases fin_two_cases (σ i) with h | h <;> rw [h] at hself ⊢ <;> norm_num [pauliZ, hself]
 
 /-- A single-site `X̂` acts by flipping the configuration at that site. -/
-private lemma onSiteS_sX_mulVec_apply (i : Fin 4) (v : (Fin 4 → Fin 2) → ℂ)
+private lemma onSiteS_pauliX_mulVec_apply (i : Fin 4) (v : (Fin 4 → Fin 2) → ℂ)
     (σ : Fin 4 → Fin 2) :
-    ((onSiteS i sX : ManyBodyOpS (Fin 4) 1) *ᵥ v) σ = v (Function.update σ i (σ i + 1)) := by
+    ((onSiteS i pauliX : ManyBodyOpS (Fin 4) 1) *ᵥ v) σ = v (Function.update σ i (σ i + 1)) := by
   rw [onSiteS_mulVec_apply, Fin.sum_univ_two]
   rcases fin_two_cases (σ i) with h | h
   · rw [h, show (0 : Fin 2) + 1 = 1 from rfl]
-    norm_num [sX]
+    norm_num [pauliX]
   · rw [h, show (1 : Fin 2) + 1 = 0 from rfl]
-    norm_num [sX]
+    norm_num [pauliX]
 
 /-- **`K̂₀ Φ = Φ`**: the `X̂₃X̂₀` stabilizer flips both members of the pair `{3,0}`, which leaves
 the ground-state indicator unchanged. -/
 private lemma kLoc_zero_mulVec_gsVec : kLoc 0 *ᵥ gsVec = gsVec := by
   funext σ
-  rw [kLoc_zero, ← Matrix.mulVec_mulVec, onSiteS_sX_mulVec_apply, onSiteS_sX_mulVec_apply,
+  rw [kLoc_zero, ← Matrix.mulVec_mulVec, onSiteS_pauliX_mulVec_apply, onSiteS_pauliX_mulVec_apply,
     Function.update_of_ne (show (0 : Fin 4) ≠ 3 by decide), gsVec_apply, gsVec_apply,
     Function.update_of_ne (show (1 : Fin 4) ≠ 0 by decide),
     Function.update_of_ne (show (1 : Fin 4) ≠ 3 by decide),
@@ -498,7 +430,7 @@ private lemma kLoc_zero_mulVec_gsVec : kLoc 0 *ᵥ gsVec = gsVec := by
 /-- **`K̂₁ Φ = Φ`**: the `X̂₁X̂₂` stabilizer flips both members of the pair `{1,2}`. -/
 private lemma kLoc_one_mulVec_gsVec : kLoc 1 *ᵥ gsVec = gsVec := by
   funext σ
-  rw [kLoc_one, ← Matrix.mulVec_mulVec, onSiteS_sX_mulVec_apply, onSiteS_sX_mulVec_apply,
+  rw [kLoc_one, ← Matrix.mulVec_mulVec, onSiteS_pauliX_mulVec_apply, onSiteS_pauliX_mulVec_apply,
     Function.update_of_ne (show (2 : Fin 4) ≠ 1 by decide), gsVec_apply, gsVec_apply,
     Function.update_of_ne (show (1 : Fin 4) ≠ 2 by decide), Function.update_self,
     Function.update_self, Function.update_of_ne (show (3 : Fin 4) ≠ 2 by decide),
@@ -512,7 +444,7 @@ private lemma kLoc_one_mulVec_gsVec : kLoc 1 *ᵥ gsVec = gsVec := by
 ground-state indicator is supported. -/
 private lemma kLoc_two_mulVec_gsVec : kLoc 2 *ᵥ gsVec = gsVec := by
   funext σ
-  rw [kLoc_two, ← Matrix.mulVec_mulVec, onSiteS_sZ_mulVec_apply, onSiteS_sZ_mulVec_apply]
+  rw [kLoc_two, ← Matrix.mulVec_mulVec, onSiteS_pauliZ_mulVec_apply, onSiteS_pauliZ_mulVec_apply]
   by_cases hp : σ 1 = σ 2 ∧ σ 3 = σ 0
   · rw [hp.1]
     rcases fin_two_cases (σ 2) with h | h <;> rw [h] <;> norm_num
@@ -521,7 +453,7 @@ private lemma kLoc_two_mulVec_gsVec : kLoc 2 *ᵥ gsVec = gsVec := by
 /-- **`K̂₃ Φ = Φ`**: the `Ẑ₃Ẑ₀` stabilizer has sign `+1` exactly where `σ₃ = σ₀`. -/
 private lemma kLoc_three_mulVec_gsVec : kLoc 3 *ᵥ gsVec = gsVec := by
   funext σ
-  rw [kLoc_three, ← Matrix.mulVec_mulVec, onSiteS_sZ_mulVec_apply, onSiteS_sZ_mulVec_apply]
+  rw [kLoc_three, ← Matrix.mulVec_mulVec, onSiteS_pauliZ_mulVec_apply, onSiteS_pauliZ_mulVec_apply]
   by_cases hp : σ 1 = σ 2 ∧ σ 3 = σ 0
   · rw [hp.2]
     rcases fin_two_cases (σ 0) with h | h <;> rw [h] <;> norm_num
@@ -634,22 +566,22 @@ different Pauli letter there. -/
 private lemma aOp_kLoc_anticomm (z : Fin 4) : aOp * kLoc z = -(kLoc z * aOp) := by
   have h0 : aOp * kLoc 0 = -(kLoc 0 * aOp) := by
     rw [aOp_eq_pw, kLoc_zero_eq_pw, pw_mul, pw_mul, pw_neg]
-    simp only [sY_mul_sX, sX_mul_sY, one_mul, mul_one, pw_smul_slot0]
+    simp only [pauliY_mul_pauliX, pauliX_mul_pauliY, one_mul, mul_one, pw_smul_slot0]
     congr 1
     norm_num [Complex.ext_iff]
   have h1 : aOp * kLoc 1 = -(kLoc 1 * aOp) := by
     rw [aOp_eq_pw, kLoc_one_eq_pw, pw_mul, pw_mul, pw_neg]
-    simp only [sY_mul_sX, sX_mul_sY, one_mul, mul_one, pw_smul_slot1]
+    simp only [pauliY_mul_pauliX, pauliX_mul_pauliY, one_mul, mul_one, pw_smul_slot1]
     congr 1
     norm_num [Complex.ext_iff]
   have h2 : aOp * kLoc 2 = -(kLoc 2 * aOp) := by
     rw [aOp_eq_pw, kLoc_two_eq_pw, pw_mul, pw_mul, pw_neg]
-    simp only [sY_mul_sZ, sZ_mul_sY, one_mul, mul_one, pw_smul_slot1]
+    simp only [pauliY_mul_pauliZ, pauliZ_mul_pauliY, one_mul, mul_one, pw_smul_slot1]
     congr 1
     norm_num [Complex.ext_iff]
   have h3 : aOp * kLoc 3 = -(kLoc 3 * aOp) := by
     rw [aOp_eq_pw, kLoc_three_eq_pw, pw_mul, pw_mul, pw_neg]
-    simp only [sY_mul_sZ, sZ_mul_sY, one_mul, mul_one, pw_smul_slot0]
+    simp only [pauliY_mul_pauliZ, pauliZ_mul_pauliY, one_mul, mul_one, pw_smul_slot0]
     congr 1
     norm_num [Complex.ext_iff]
   exact fin_four_cases (P := fun w => aOp * kLoc w = -(kLoc w * aOp)) h0 h1 h2 h3 z
@@ -658,22 +590,22 @@ private lemma aOp_kLoc_anticomm (z : Fin 4) : aOp * kLoc z = -(kLoc z * aOp) := 
 private lemma bOp_kLoc_anticomm (z : Fin 4) : bOp * kLoc z = -(kLoc z * bOp) := by
   have h0 : bOp * kLoc 0 = -(kLoc 0 * bOp) := by
     rw [bOp_eq_pw, kLoc_zero_eq_pw, pw_mul, pw_mul, pw_neg]
-    simp only [sY_mul_sX, sX_mul_sY, one_mul, mul_one, pw_smul_slot3]
+    simp only [pauliY_mul_pauliX, pauliX_mul_pauliY, one_mul, mul_one, pw_smul_slot3]
     congr 1
     norm_num [Complex.ext_iff]
   have h1 : bOp * kLoc 1 = -(kLoc 1 * bOp) := by
     rw [bOp_eq_pw, kLoc_one_eq_pw, pw_mul, pw_mul, pw_neg]
-    simp only [sY_mul_sX, sX_mul_sY, one_mul, mul_one, pw_smul_slot2]
+    simp only [pauliY_mul_pauliX, pauliX_mul_pauliY, one_mul, mul_one, pw_smul_slot2]
     congr 1
     norm_num [Complex.ext_iff]
   have h2 : bOp * kLoc 2 = -(kLoc 2 * bOp) := by
     rw [bOp_eq_pw, kLoc_two_eq_pw, pw_mul, pw_mul, pw_neg]
-    simp only [sY_mul_sZ, sZ_mul_sY, one_mul, mul_one, pw_smul_slot2]
+    simp only [pauliY_mul_pauliZ, pauliZ_mul_pauliY, one_mul, mul_one, pw_smul_slot2]
     congr 1
     norm_num [Complex.ext_iff]
   have h3 : bOp * kLoc 3 = -(kLoc 3 * bOp) := by
     rw [bOp_eq_pw, kLoc_three_eq_pw, pw_mul, pw_mul, pw_neg]
-    simp only [sY_mul_sZ, sZ_mul_sY, one_mul, mul_one, pw_smul_slot3]
+    simp only [pauliY_mul_pauliZ, pauliZ_mul_pauliY, one_mul, mul_one, pw_smul_slot3]
     congr 1
     norm_num [Complex.ext_iff]
   exact fin_four_cases (P := fun w => bOp * kLoc w = -(kLoc w * bOp)) h0 h1 h2 h3 z
@@ -711,8 +643,8 @@ private lemma hLoc_sum_mul_oLoc_sum :
 four single-site phases `X̂Ẑ = −iŶ` cancelling. -/
 private lemma abOp_eq_kLoc_prod : aOp * bOp = kLoc 0 * kLoc 1 * (kLoc 2 * kLoc 3) := by
   rw [aOp_eq_pw, bOp_eq_pw, kLoc_zero_eq_pw, kLoc_one_eq_pw, kLoc_two_eq_pw, kLoc_three_eq_pw]
-  simp only [pw_mul, sX_mul_sZ, one_mul, mul_one, pw_smul_slot0, pw_smul_slot1, pw_smul_slot2,
-    pw_smul_slot3]
+  simp only [pw_mul, pauliX_mul_pauliZ, one_mul, mul_one, pw_smul_slot0, pw_smul_slot1,
+    pw_smul_slot2, pw_smul_slot3]
   congr 1
   norm_num [Complex.ext_iff]
 
@@ -799,23 +731,61 @@ private lemma doubleCommutator_rayleighOnVec_gsState_gt_printed_constant :
   rw [doubleCommutator_rayleighOnVec_gsState_eq_value]
   norm_num
 
+/-! ## The repository's abstract bound, attained exactly -/
+
+/-- **The witness is an instance of the repository's generic range-local bound, and attains it
+exactly.**  Instantiating `manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal` on the 4-ring
+with the `d = 1` torus distance `ringDist 4`, at `r = 1`, `h₀ = o₀ = 1` and `m₁ = m₂ = 4` (every
+ball is contained in the 4-site lattice) gives
+`⟨Φ_GS|[Ô,[Ĥ,Ô]]|Φ_GS⟩ ≤ 4 m₁ m₂ h₀ o₀² |Λ| = 256`; the model's value is `256`, so that general
+bound is sharp in the wrapping regime `L ≤ 4r+1`. -/
+private lemma doubleCommutator_rayleighOnVec_gsState_le_ballCounting :
+    rayleighOnVec dcOp gsState ≤ 4 * (4 : ℝ) * 4 * 1 * 1 ^ 2 * (4 : ℝ) := by
+  have hcard : ∀ (k : ℕ) (b : Fin 4), (siteBall (ringDist 4) k b).card ≤ 4 := by
+    intro k b
+    calc (siteBall (ringDist 4) k b).card
+        ≤ (Finset.univ : Finset (Fin 4)).card := Finset.card_le_univ _
+      _ = 4 := by simp
+  have hker := manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal
+    (ringDist 4) (ringDist_comm 4) (ringDist_triangle 4) hLoc oLoc 1 1 1 4 4
+    hLoc_supportedOnS_siteBall oLoc_supportedOnS_siteBall
+    hLoc_manyBodyOperatorNormS_le_one oLoc_manyBodyOperatorNormS_le_one zero_le_one
+    (hcard (2 * 1)) (hcard (4 * 1))
+  rw [dcOp]
+  refine le_trans (le_trans (le_abs_self _)
+    (expectation_abs_le_manyBodyOperatorNormS _ gsState_dotProduct_self_eq_one)) ?_
+  refine le_trans hker (le_of_eq ?_)
+  norm_num
+
 /-! ## The counterexample -/
 
 /-- **Counterexample to the printed constant of Tasaki eq. (3.4.13), as literally quantified.**
 The explicit `d = 1`, `r = 1`, `L = 4` spin-1/2 ring model of this file (`hLoc`, `oLoc`, `gsState`)
-lives on an admissible lattice — `Λ_L` of eq. (3.1.2) (p. 51) requires `L` even, discharged here as
-the conjunct `Even 4` — and satisfies every hypothesis of Problem 3.4.a (range-1 support, unit
-local-term norms, normalized ground state at `E₀ = −4`), yet has
+satisfies every hypothesis of the printed Problem 3.4.a — the lattice is admissible (`Λ_L` of
+eq. (3.1.2), p. 51, requires `L` even, discharged here as the conjunct `Even 4`), the sites form a
+periodic ring whose radius-1 balls are the proper three-site windows `{x−1, x, x+1}`, each local
+term is supported on the ball of its own site, `‖ĥ_x‖ ≤ 1` and `‖ô_x‖ ≤ 1`, every local term is
+self-adjoint, and `Φ_GS` is a normalized ground state at `E₀ = −4` — yet has
 `⟨Φ_GS|[Ô,[Ĥ,Ô]]|Φ_GS⟩ = 256`, exceeding the printed constant
-`4(2·1+1)^1(4·1+1)^1·1·1²·4^1 = 240` of eq. (3.4.13) as literally quantified.  The repository's own
-proved bound `4(4·1+1)^1(8·1+1)^1·1·1²·4^1 = 720` (`RangeLocalDoubleCommutatorBound.lean`) is
-satisfied and unaffected.  Whether the printed constant holds for even `L > 4r+1` is open. -/
+`4(2·1+1)^1(4·1+1)^1·1·1²·4^1 = 240` of eq. (3.4.13) as literally quantified.
+
+Formally the witness is an instance of the repository's generic range-local bound
+`manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal` with the `d = 1` torus distance
+`ringDist 4`: the last conjunct is that instance, `⟨Φ_GS|[Ô,[Ĥ,Ô]]|Φ_GS⟩ ≤ 4 m₁ m₂ h₀ o₀² |Λ|`
+with `m₁ = m₂ = |Λ| = 4`, whose right-hand side is `256` and is therefore attained exactly.  The
+torus-typed capstone `tasaki_problem_3_4_a_doubleCommutator_expectation_le` is stated on the site
+type `Fin d → Fin L` and is not instantiated here; its specialisation
+`4(4·1+1)^1(8·1+1)^1·1·1²·4^1 = 720` is satisfied a fortiori and unaffected.  Whether the printed
+constant holds for even `L > 4r+1` is open. -/
 theorem tasaki_problem_3_4_a_printed_constant_counterexample :
     Even (4 : ℕ) ∧
+      (∀ x : Fin 4, siteBall (ringDist 4) 1 x = {x - 1, x, x + 1}) ∧
       (∀ x : Fin 4, SupportedOnS (siteBall (ringDist 4) 1 x) (hLoc x)) ∧
       (∀ x : Fin 4, SupportedOnS (siteBall (ringDist 4) 1 x) (oLoc x)) ∧
       (∀ x : Fin 4, manyBodyOperatorNormS (hLoc x) ≤ 1) ∧
       (∀ x : Fin 4, manyBodyOperatorNormS (oLoc x) ≤ 1) ∧
+      (∀ x : Fin 4, Matrix.conjTranspose (hLoc x) = hLoc x) ∧
+      (∀ x : Fin 4, Matrix.conjTranspose (oLoc x) = oLoc x) ∧
       star gsState ⬝ᵥ gsState = 1 ∧
       IsGroundEnergy (∑ x, hLoc x) (-4) ∧
       (∑ x, hLoc x) *ᵥ gsState = ((-4 : ℝ) : ℂ) • gsState ∧
@@ -827,16 +797,24 @@ theorem tasaki_problem_3_4_a_printed_constant_counterexample :
         < rayleighOnVec
             ((∑ x, oLoc x) * ((∑ b, hLoc b) * (∑ x, oLoc x) - (∑ x, oLoc x) * (∑ b, hLoc b))
               - ((∑ b, hLoc b) * (∑ x, oLoc x) - (∑ x, oLoc x) * (∑ b, hLoc b)) * (∑ x, oLoc x))
-            gsState := by
-  refine ⟨⟨2, rfl⟩, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+            gsState ∧
+      rayleighOnVec
+          ((∑ x, oLoc x) * ((∑ b, hLoc b) * (∑ x, oLoc x) - (∑ x, oLoc x) * (∑ b, hLoc b))
+            - ((∑ b, hLoc b) * (∑ x, oLoc x) - (∑ x, oLoc x) * (∑ b, hLoc b)) * (∑ x, oLoc x))
+          gsState ≤ 4 * (4 : ℝ) * 4 * 1 * 1 ^ 2 * (4 : ℝ) := by
+  refine ⟨⟨2, rfl⟩, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · exact siteBall_ringDist_four_one
   · exact hLoc_supportedOnS_siteBall
   · exact oLoc_supportedOnS_siteBall
   · exact hLoc_manyBodyOperatorNormS_le_one
   · exact oLoc_manyBodyOperatorNormS_le_one
+  · exact hLoc_conjTranspose
+  · exact oLoc_conjTranspose
   · exact gsState_dotProduct_self_eq_one
   · exact hLoc_sum_isGroundEnergy
   · exact hLoc_sum_mulVec_gsState_eq_smul
   · exact doubleCommutator_rayleighOnVec_gsState_eq_value
   · exact doubleCommutator_rayleighOnVec_gsState_gt_printed_constant
+  · exact doubleCommutator_rayleighOnVec_gsState_le_ballCounting
 
 end LatticeSystem.Tests.PrintedConstantCounterexample

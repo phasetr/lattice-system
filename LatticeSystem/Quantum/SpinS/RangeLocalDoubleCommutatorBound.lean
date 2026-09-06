@@ -19,12 +19,16 @@ giving
 Tasaki's printed solution instead counts over `|x−y| ≤ r` and `|x−z| ≤ 2r`, giving the smaller
 constant `4 (2r+1)^d (4r+1)^d h₀ o₀² L^d`.  Those index ranges do not follow from the range-`r`
 premise, and that constant is **false as literally quantified**: the explicit `d = 1`, `r = 1`,
-`L = 4` spin-1/2 ring of `LatticeSystem/Tests/PrintedConstantCounterexample.lean` — an admissible
-instance, since `Λ_L` of eq. (3.1.2) (p. 51) is defined for even `L` — satisfies every hypothesis
-of the Problem (range-1 support, `h₀ = o₀ = 1`, a normalized ground state) and has
-`⟨Φ|[Ô,[Ĥ,Ô]]|Φ⟩ = 256`, against the printed `4(2·1+1)(4·1+1)·1·1²·4 = 240`.  It satisfies the
-bound proved here (`256 ≤ 720`), and in the abstract ball-counting form (`m₁ = m₂ = 4` on the
-4-ring) it attains `4 m₁ m₂ h₀ o₀² |Λ| = 256` exactly.  The mechanism: once both windows already
+`L = 4` spin-1/2 ring of `LatticeSystem/Tests/PrintedConstantCounterexample.lean` satisfies every
+hypothesis of the printed Problem — even `L` (`Λ_L` of eq. (3.1.2), p. 51, is defined for even
+`L`), the periodic ring with proper radius-1 balls, radius-1 support of every local term,
+`h₀ = o₀ = 1`, self-adjoint local terms, and a normalized ground state — and has
+`⟨Φ|[Ô,[Ĥ,Ô]]|Φ⟩ = 256`, against the printed `4(2·1+1)(4·1+1)·1·1²·4 = 240`.  Formally that
+witness instantiates the abstract bound above with the `d = 1` torus distance `ringDist 4`, at
+`m₁ = m₂ = |Λ| = 4`, and attains `4 m₁ m₂ h₀ o₀² |Λ| = 256` exactly, so the ball-counting constant
+proved here is sharp in the wrapping regime; the torus-typed specialisation below is stated on
+`Fin d → Fin L` and is not instantiated by that fixture, whose value `720` it satisfies a fortiori
+(`256 ≤ 720`).  The mechanism: once both windows already
 cover the whole lattice (`L ≤ 4r+1`), the honest ball-counting constant collapses to
 `4 L^{3d} h₀ o₀²`, which exceeds the printed constant exactly when `L² > (2r+1)(4r+1)`; at `r = 1`
 the smallest even `L` clearing `L² > 15` is `L = 4`, and that model attains the collapsed value.
@@ -119,7 +123,11 @@ windows at `2r` and `4r` and hence the constant; Tasaki's printed solution count
 instead, and the resulting smaller constant `4 (2r+1)^d (4r+1)^d h₀ o₀² L^d` is **refuted as
 literally quantified** by `tasaki_problem_3_4_a_printed_constant_counterexample`
 (`LatticeSystem/Tests/PrintedConstantCounterexample.lean`), which attains `256 > 240` at `d = 1`,
-`r = 1` and the admissible even `L = 4` (`Λ_L` of eq. (3.1.2), p. 51, is defined for even `L`); the
+`r = 1` and the admissible even `L = 4` (`Λ_L` of eq. (3.1.2), p. 51, is defined for even `L`).
+That witness satisfies every hypothesis of the printed Problem, self-adjointness of the local terms
+included, and instantiates `manyBodyOperatorNormS_doubleCommutator_le_of_rangeLocal` with the
+`d = 1` torus distance `ringDist 4`, attaining `4 m₁ m₂ h₀ o₀² |Λ| = 256` exactly; it is not an
+instance of the present statement, which is typed on `Fin d → Fin L`.  The
 regime of even `L ≥ 4r+2` is open.  The distance is the torus sup-distance, matching
 the periodic identification of `Λ_L` and reading the unqualified `|x − y| ≤ r` in the sup norm,
 which is the weaker hypothesis.
@@ -128,9 +136,9 @@ The windowed statements this feeds keep those relations as inline commutation hy
 than support hypotheses; here they are derived from the range-`r` support premise through
 `commute_of_supportedOnS_disjoint`, as documented in `LocalDoubleCommutatorBound.lean`.
 
-No self-adjointness is assumed, so the expectation is taken on its real part; conditions (3.4.3)
-and (3.4.4) are unused; `0 ≤ h₀`, `1 ≤ d` and `1 ≤ L` are not needed, and `|Λ_L| = L^d` is an
-identity here rather than a hypothesis. -/
+No self-adjointness is assumed here, so the expectation is taken on its real part; conditions
+(3.4.3) and (3.4.4) are unused; `0 ≤ h₀`, `1 ≤ d` and `1 ≤ L` are not needed, and `|Λ_L| = L^d` is
+an identity here rather than a hypothesis. -/
 theorem tasaki_problem_3_4_a_doubleCommutator_expectation_le (d L N r : ℕ)
     (h o : (Fin d → Fin L) → ManyBodyOpS (Fin d → Fin L) N) (h₀ o₀ : ℝ)
     {Φ : ((Fin d → Fin L) → Fin (N + 1)) → ℂ}

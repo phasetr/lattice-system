@@ -299,6 +299,16 @@ The cyclic Pauli products hold:
 \]
 \end{lemma}
 
+\begin{lemma}[\texttt{pauliY\_mul\_pauliX}, \texttt{pauliZ\_mul\_pauliY},
+\texttt{pauliX\_mul\_pauliZ}]
+The reversed products follow from the anticommutators:
+\[
+  \sigma^y \sigma^x = -i \sigma^z,\quad
+  \sigma^z \sigma^y = -i \sigma^x,\quad
+  \sigma^x \sigma^z = -i \sigma^y.
+\]
+\end{lemma}
+
 \begin{lemma}[\texttt{pauliX\_anticomm\_pauliY},
 \texttt{pauliY\_anticomm\_pauliZ}, \texttt{pauliZ\_anticomm\_pauliX}]
 Distinct Pauli matrices anticommute:
@@ -13028,14 +13038,22 @@ is defined for even $L$, so a single admissible triple suffices: at $d=1$, $r=1$
 spin-$1/2$ ring carrying a Bell pair on each of the site pairs $\{1,2\}$ and $\{3,0\}$, with
 $\hat h_0=-\hat X_3\hat X_0$, $\hat h_1=-\hat X_1\hat X_2$, $\hat h_2=-\hat Z_1\hat Z_2$,
 $\hat h_3=-\hat Z_3\hat Z_0$ and $\hat o_0=\hat o_1=\hat Y_0\hat Y_1$,
-$\hat o_2=\hat o_3=\hat Y_2\hat Y_3$ ($h_0=o_0=1$), has the joint $+1$ eigenvector of the four
-stabilizers as its ground state ($E_0=-4$) and
+$\hat o_2=\hat o_3=\hat Y_2\hat Y_3$ ($h_0=o_0=1$, every local term self-adjoint), has the joint
+$+1$ eigenvector of the four stabilizers as its ground state ($E_0=-4$) and
 $\langle\Phi_{\mathrm{GS}}|[\hat O,[\hat H,\hat O]]|\Phi_{\mathrm{GS}}\rangle=256$, against the
 printed $4(2r+1)^d(4r+1)^dh_0o_0^2L^d=240$
 (\texttt{tasaki\_problem\_3\_4\_a\_printed\_constant\_counterexample},
-\texttt{Tests/PrintedConstantCounterexample.lean}). The bound proved above is unaffected
-($256\le720$), and in the abstract ball-counting form ($m_1=m_2=4$ on the $4$-ring) the value
-$4m_1m_2h_0o_0^2|\Lambda|=256$ is attained exactly. The mechanism is that once both windows already
+\texttt{Tests/PrintedConstantCounterexample.lean}). That witness satisfies every hypothesis of the
+printed Problem 3.4.a --- even $L$, the periodic ring whose radius-$1$ balls are the proper
+three-site windows $\{x-1,x,x+1\}$, radius-$1$ support of every local term, the two norm bounds,
+self-adjointness of every local term, and a normalised ground state --- and formally it is an
+instance of \texttt{manyBodyOperatorNormS\_doubleCommutator\_le\_of\_rangeLocal} with the $d=1$
+torus distance \texttt{ringDist 4}, at $m_1=m_2=|\Lambda|=4$, whose value
+$4m_1m_2h_0o_0^2|\Lambda|=256$ it attains exactly, so that ball-counting constant is sharp in the
+wrapping regime. The torus-typed
+\texttt{tasaki\_problem\_3\_4\_a\_doubleCommutator\_expectation\_le} is stated on
+$\mathrm{Fin}\,d\to\mathrm{Fin}\,L$ and is not instantiated by the fixture; its value $720$ is
+satisfied a fortiori ($256\le720$). The mechanism is that once both windows already
 cover the whole lattice ($L\le4r+1$), the honest ball-counting constant collapses to
 $4L^{3d}h_0o_0^2$, which exceeds the printed $4(2r+1)^d(4r+1)^dh_0o_0^2L^d$ exactly when
 $L^2>(2r+1)(4r+1)$; at $r=1$ the smallest even $L$ clearing $L^2>15$ is $L=4$, and the model above
@@ -13051,7 +13069,8 @@ given site in $d$ dimensions gives $(2r+1)^d$. Read off the rendered PDF page ra
 extraction, which drops math symbols. No declaration in this repository states the $(2r+1)^2$
 form.
 
-\emph{Not assumed.} Self-adjointness of $\hat h_x$ and $\hat o_x$ appears nowhere; the expectation
+\emph{Not assumed.} Self-adjointness of $\hat h_x$ and $\hat o_x$ is nowhere assumed by the bounds
+above (the counterexample model does have self-adjoint local terms, and states so); the expectation
 is taken on its real part. Conditions~(3.4.3) and~(3.4.4) are unused, and neither $1\le d$ nor
 $1\le L$ is required. The Problem's closing remark, that Theorem~3.1 extends to this class
 given~(3.4.3) and $\langle\Phi_{\mathrm{GS}}|\hat O_L|\Phi_{\mathrm{GS}}\rangle=0$, is not
