@@ -15,8 +15,6 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
-from validate_formalization_status import lean_leaf_mention
-
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
@@ -372,49 +370,6 @@ PRIVATE_INSTRUCTIONS_REMOVAL_COUNT = 1
 def _drop_private_instructions_ref(text: str) -> str:
     """Drop the catalogue-row pointer to the private project-instructions file."""
     return _PRIVATE_INSTRUCTIONS_REF.sub("", text)
-
-
-# Two catalogue rows record declarations this repository no longer carries: the Corollary 4.3
-# susceptibility axiom and the conditional reduction that consumed it, both deleted with the
-# susceptibility route when Corollary 4.3 moved to Tasaki's own contraposition from Theorem 4.2.
-# A row whose subject no longer exists is dropped from the published catalogue rather than
-# rewritten, so each drop is registered here by the row's Lean-name cell and two independent
-# things are enforced before the drop is applied. The premise: the name is absent from the Lean
-# tree (check_deleted_row_registry_absence), so a registry entry cannot retire the published row
-# of a declaration this repository still carries. The reach: the site count is pinned, so a
-# pattern that starts matching more (or fewer) rows than audited fails loudly instead of silently
-# editing the baseline.
-DELETED_CATALOGUE_ROW_NAMES = (
-    "no_long_range_order_1d_of_susceptibility",
-    "shastry_staggered_susceptibility_subcubic",
-)
-DELETED_CATALOGUE_ROW_COUNTS = (1, 1)
-
-
-def _drop_deleted_catalogue_rows(text: str, counts: list[int] | None = None) -> str:
-    """Drop every catalogue row whose Lean-name cell names a deleted declaration."""
-    for index, lean_name in enumerate(DELETED_CATALOGUE_ROW_NAMES):
-        pattern = re.compile(rf"^\| `{re.escape(lean_name)}` \|.*\n?", re.MULTILINE)
-        if counts is not None:
-            counts[index] += len(pattern.findall(text))
-        text = pattern.sub("", text)
-    return text
-
-
-def check_deleted_row_registry_absence() -> None:
-    """Refuse a registered row drop whose subject the Lean sources of the project still spell."""
-    # The registry's premise is that the declaration is gone, and the count pin cannot see that:
-    # counts agree for any (name, count) pair, so without this the published catalogue could lose
-    # the row of a live declaration. The scan is the one the retirement records already use, over
-    # the LatticeSystem/ tree together with the root umbrella, matching whole identifiers anywhere
-    # in a source — a name kept alive only by a comment still keeps its row.
-    for lean_name in DELETED_CATALOGUE_ROW_NAMES:
-        mention = lean_leaf_mention(ROOT, lean_name)
-        if mention is not None:
-            fail(
-                "deleted catalogue row registered for a name the Lean tree still spells: "
-                f"{lean_name} in {mention}"
-            )
 
 
 def _approved_replacements(text: str) -> str:
@@ -982,11 +937,16 @@ def _approved_replacements(text: str) -> str:
             "10.3's strict positivity. | `Fermion/JordanWigner/Hubbard/LiebShenQiu.lean`; "
             "`Fermion/JordanWigner/Hubbard/LiebShenQiuDischarge.lean` |",
         )
-        # PR-1 of the Theorem 4.2 close-out arc (#5413) repairs the Corollary 4.3 susceptibility
-        # axiom: `shastry_staggered_susceptibility_bound` (`∃ C ≥ 0, χ ≤ C·L`, false at `N = 1`
-        # and mis-cited) becomes `shastry_staggered_susceptibility_subcubic`
-        # (`∀ δ > 0, ∃ L₀, ∀ L ≥ L₀, χ ≤ δ·L³`). The axiom row, the consumer row and the
-        # Corollary 4.3 row (including its `#print axioms` output) are updated together.
+        # Corollary 4.3 no longer runs through a susceptibility bound (#5416 replaced that route
+        # by Tasaki's own contraposition against Theorem 3.2, p. 77), so neither the conditional
+        # reduction `no_long_range_order_1d_of_susceptibility` nor the Shastry susceptibility
+        # axiom it consumed is a declaration this repository has. The catalogue rows of the two
+        # are removed rather than repaired, and a removal is spelt the only way one can be: the
+        # row's exact frozen text, trailing newline included, rewritten to the empty string, so
+        # that what leaves the published catalogue is legible in this diff and pinned by
+        # APPROVED_CHANGES_SHA256. The Corollary 4.3 row between them survives; it is repaired
+        # here and again below, `#print axioms` output included, for the route that replaced this
+        # one.
         .replace(
             "| `no_long_range_order_1d_of_susceptibility` | **Cor 4.3 / conditional reduction** "
             "(`NoLongRangeOrderConditional.lean`, Tasaki §4.1, toward Corollary 4.3): the exact "
@@ -998,19 +958,8 @@ def _approved_replacements(text: str) -> str:
             "Archimedean `ε`–`δ`). This isolates the unconditional Cor 4.3 to the susceptibility "
             "bound `Re⟨y,ÔΦ⟩ ≤ C·L`; that bound is now supplied by the documented Shastry axiom "
             "`shastry_staggered_susceptibility_bound`, discharging `no_long_range_order_1d` into a "
-            "theorem (PR #5003) | `Quantum/SpinS/NoLongRangeOrderConditional.lean` |",
-            "| `no_long_range_order_1d_of_susceptibility` | **Cor 4.3 / conditional reduction** "
-            "(`NoLongRangeOrderConditional.lean`, Tasaki §4.1, toward Corollary 4.3): the exact "
-            "`ε`–`δ` statement of Corollary 4.3 *modulo the sub-cubic susceptibility bound* — if for "
-            "every margin `δ > 0` there is a threshold `L₀` such that every normalized ground state "
-            "of an even zero-field ring (`L₀≤L`, `2≤L`, `Even L`) has a potential `y` for `ÔΦ` with "
-            "`Re⟨y,ÔΦ⟩ ≤ δ·L³`, then for every `ε > 0` there is `L₀` beyond which every normalized "
-            "ground state has `\\|⟨Φ,Ô²Φ⟩.re/L²\\| < ε` (assembling the `O(L)` oscillator bound + "
-            "susceptibility reduction + ground-state bridge at the margin `δ = ε²/(24N³)`). This "
-            "isolates the unconditional Cor 4.3 to the sub-cubic susceptibility bound `Re⟨y,ÔΦ⟩ ≤ "
-            "δ·L³`; that bound is supplied by the documented Shastry axiom "
-            "`shastry_staggered_susceptibility_subcubic`, discharging `no_long_range_order_1d` into "
-            "a theorem (PR #5003) | `Quantum/SpinS/NoLongRangeOrderConditional.lean` |",
+            "theorem (PR #5003) | `Quantum/SpinS/NoLongRangeOrderConditional.lean` |\n",
+            "",
         )
         .replace(
             "| `no_long_range_order_1d` | **Corollary 4.3** (§4.1, THEOREM; eq. (4.1.11)): absence "
@@ -1049,22 +998,8 @@ def _approved_replacements(text: str) -> str:
             "genuinely external hard-analysis estimate (massive-Green / inverse-Fourier `k*=π` "
             "control) based on Shastry J.Phys.A 25 L249 (1992) [58] and Tanaka–Takeda–Idogaki JMMM "
             "272–276 908 (2004) [63] is a documented axiom; it discharges `no_long_range_order_1d` "
-            "(PR #5003) | `Quantum/SpinS/NoLongRangeOrder1D.lean` |",
-            "| `shastry_staggered_susceptibility_subcubic` | **Shastry staggered susceptibility, "
-            "sub-cubic χ(k*)=o(L³)** (§4.1, DOCUMENTED AXIOM; toward Corollary 4.3): for the "
-            "zero-field 1D AFM Heisenberg ring on **even** `L ≥ 2` sites (`Even L`, bipartite), for "
-            "every margin `δ > 0` there is a threshold `L₀` beyond which every normalized ground "
-            "state admits a potential `y` for `ÔΦ` (`(Ĥ−E₀)y=ÔΦ`) whose static staggered "
-            "susceptibility obeys `Re⟨y,ÔΦ⟩ ≤ δ·L³` (physically `χ(k*)=L·f_L^(-1)(k*)`). No "
-            "published source states a bound on `f_L^(-1)(k*)`: Tasaki's \"This is nontrivial, and "
-            "requires a hard analysis\" (p. 83) concerns the infrared bound (4.1.24) used for Theorem "
-            "4.1, which p. 81 states for `k ≠ k*` only and whose right-hand side diverges as `k → "
-            "k*`. The earlier `≤ C·L` form was false for odd `N`: the `g(r)` asymptotic Shastry "
-            "introduces as what \"numerical and approximate analytical work … suggests\" (p. L252) "
-            "forces `χ ≳ L(log L)³`. The `∃ L₀` threshold is required because a bare `∀ L` fails at "
-            "`N = 1, L = 2`. An assumption of this project, not a transcription of a published "
-            "estimate; it discharges `no_long_range_order_1d` (PR #5003) | "
-            "`Quantum/SpinS/NoLongRangeOrder1D.lean` |",
+            "(PR #5003) | `Quantum/SpinS/NoLongRangeOrder1D.lean` |\n",
+            "",
         )
         # The same repair updates the two neighbouring rows that quote the retired `χ ≤ C·L`
         # target: the Falk-Bruch reduction row and the χ2b sum-rule row (whose `hsusc` wording
@@ -1184,9 +1119,9 @@ def _approved_replacements(text: str) -> str:
         )
         # PR-2 of the same arc (#5416) replaces the susceptibility route by Tasaki's own proof of
         # Corollary 4.3 (contraposition against Theorem 3.2, p. 77). The axiom row and the
-        # reduction row are dropped outright (DELETED_CATALOGUE_ROW_NAMES); the four entries below
-        # repair every remaining row that described that route. (Applied last: each matches text
-        # an earlier replacement inserts.)
+        # reduction row are removed outright by the two literal rewrites above; the four entries
+        # below repair every remaining row that described that route. (Applied last: each matches
+        # text an earlier replacement inserts.)
         .replace(
             "**Conditional, not a discharge of Corollary 4.3** (PR #5003): for `N ≥ 1` it is the "
             "conditional reduction `no_long_range_order_1d_of_susceptibility` fed with the "
@@ -1287,18 +1222,18 @@ def _approved_replacements(text: str) -> str:
 
 
 def approved_changes(text: str) -> str:
-    # The row drops run last, so every literal rewrite above still matches the frozen baseline
-    # exactly as audited, including the rewrites of the rows that are dropped here.
-    return _drop_deleted_catalogue_rows(_drop_private_instructions_ref(_approved_replacements(text)))
+    # Removals are entries of the audited rewrite chain like any other, each at its own row's
+    # site, so there is no pass ordering to reason about; `APPROVED_CHANGES_SHA256` is what
+    # proves no later entry depended on text an earlier entry had already removed.
+    return _drop_private_instructions_ref(_approved_replacements(text))
 
 
 def approved_changes_byte_parity_self_test() -> None:
     """`APPROVED_CHANGES_SHA256` must still hash the published catalogue text exactly.
 
-    A transformation that moved is reported once, as a pin mismatch naming both hashes, rather
-    than as the thousands of row differences the page comparison reports much later in the run.
-    The name-keyed row drop that still runs after the audited rewrite chain is what keeps this
-    from being the whole account of the published text, so it is not yet called from `main()`.
+    Called first among the self-tests, so a transformation that moved is reported once, as a pin
+    mismatch naming both hashes, rather than as the thousands of row differences the page
+    comparison reports much later in the run.
     """
     baseline_slice = "".join(baseline_index().splitlines(keepends=True)[216:2731])
     actual = hashlib.sha256(approved_changes(baseline_slice).encode("utf-8")).hexdigest()
@@ -1495,66 +1430,55 @@ def public_target(
     return target_page, parsed.fragment
 
 
-def deleted_row_registry_mention_semantics_self_test() -> None:
-    """A row's subject must count as present when it is only spelled inside a comment.
+CLONE_BASED_SELF_TEST_CALLS = (
+    "    frozen_row_drop_negative_self_test()\n",
+    "    absent_name_row_drop_negative_self_test()\n",
+    "    unrecognized_argument_self_test()\n",
+)
 
-    The guard on `DELETED_CATALOGUE_ROW_NAMES` reuses `lean_leaf_mention`'s whole-file scan
-    rather than a declaration-only parser, precisely so a name still spelled anywhere in the tree
-    (declaration or prose) blocks the drop. This pins that reused predicate's own behaviour on a
-    synthetic fixture, independent of the real tree.
+
+def _without_clone_based_self_tests(script_text: str, probe: str) -> str:
+    """Return this script's text with every clone-based self-test call removed from `main()`.
+
+    Each of those self-tests runs a copy of this script inside a disposable clone, so a copy
+    that still reached one of their calls would clone a mirror of its own; git halts the descent
+    only at its alternate-object nesting limit, and a nested probe's failure would be reported as
+    the outer fixture's setup error. Every call is required to be found rather than removed where
+    present, because a rename that silently stopped being stripped is precisely the way this
+    protection would be lost without any test failing.
     """
-    with tempfile.TemporaryDirectory(prefix="deleted-row-mention-") as scratch:
-        fixture_root = Path(scratch)
-        fixture_lean = fixture_root / "LatticeSystem" / "Fixture.lean"
-        fixture_lean.parent.mkdir(parents=True)
-        fixture_lean.write_text(
-            "-- mentions ghostRetiredLemma only here, in a comment; nothing declares it\n"
-        )
-        if lean_leaf_mention(fixture_root, "LatticeSystem.ghostRetiredLemma") is None:
+    for call in CLONE_BASED_SELF_TEST_CALLS:
+        if call not in script_text:
             fail(
-                "deleted-row-registry mention self-test: a comment-only mention of "
-                "ghostRetiredLemma must count as still present, but lean_leaf_mention found none"
+                f"{probe} could not locate {call.strip()} in main(): a mirror must have every "
+                "clone-based self-test call removed before it is run"
             )
+        script_text = script_text.replace(call, "")
+    return script_text
 
 
-def deleted_row_registry_negative_self_tests() -> None:
-    """`DELETED_CATALOGUE_ROW_NAMES` must refuse a name that is still declared in the Lean tree.
+def frozen_row_drop_negative_self_test() -> None:
+    """A published catalogue row must not vanish from a legacy page without a refusal.
 
-    The registry drops a catalogue row on the strength of its Lean-name cell alone, so the drop
-    is sound only while the named declaration really is gone from `LatticeSystem/`. This probes
-    that boundary in a disposable clone: register a name that is genuinely still declared
-    (`oscillatorStrength_abs_le`, `LatticeSystem/Quantum/SpinS/OscillatorStrengthBound.lean`) and
-    drop its row from the live legacy page, the same edit an incautious future PR could make by
-    hand. The checker must reject this, naming the identifier it refuses.
+    A row leaves the published catalogue only when `_approved_replacements` rewrites that row's
+    exact frozen baseline text away, so a page that quietly stops carrying a row is the edit the
+    comparison against the transformed baseline exists to catch. This probes that boundary in a
+    disposable clone using the row of a declaration the tree still carries
+    (`oscillatorStrength_abs_le`, `LatticeSystem/Quantum/SpinS/OscillatorStrengthBound.lean`),
+    the same edit an incautious future PR could make by hand, and requires the refusal to account
+    for exactly the one row that went missing.
     """
-    with tempfile.TemporaryDirectory(prefix="deleted-row-registry-") as scratch:
+    with tempfile.TemporaryDirectory(prefix="frozen-row-drop-") as scratch:
         mirror = Path(scratch) / "mirror"
         subprocess.run(
             ["git", "clone", "--quiet", "--shared", str(ROOT), str(mirror)], check=True
         )
-
-        # The mirror runs this same script, so a mirror run reaching this self-test would clone a
-        # mirror of its own without end; git halts the descent only at its alternate-object
-        # nesting limit, and then reports the wrong failure. Removing the call is inert for what
-        # the fixture measures: the guard under test is applied by main(), not by this self-test.
         script_path = mirror / "scripts" / "check_docs_hierarchy.py"
-        script_text = script_path.read_text()
-        nested_call = "    deleted_row_registry_negative_self_tests()\n"
-        if nested_call not in script_text:
-            fail(
-                "deleted-row-registry self-test could not locate its own call in the mirror's "
-                "main() to stop the mirror from cloning a mirror of its own"
+        script_path.write_text(
+            _without_clone_based_self_tests(
+                script_path.read_text(), "frozen-row-drop self-test"
             )
-        script_text = script_text.replace(nested_call, "")
-        # The other two clone-based probes clone and run a script of their own, so leaving
-        # either call in the mirror buys a probe this fixture does not measure and reports that
-        # probe's failure as this one's setup error. Their absence would not endanger the
-        # mirror, so unlike the call above the removal is best-effort.
-        script_text = script_text.replace("    unrecognized_argument_self_test()\n", "")
-        script_text = script_text.replace(
-            "    absent_name_row_drop_negative_self_test()\n", ""
         )
-        script_path.write_text(script_text)
 
         baseline = subprocess.run(
             [sys.executable, "scripts/check_docs_hierarchy.py"],
@@ -1564,28 +1488,9 @@ def deleted_row_registry_negative_self_tests() -> None:
         )
         if baseline.returncode != 0:
             fail(
-                "deleted-row-registry self-test setup failed: the mirror does not pass before "
-                f"its registry is mutated (exit={baseline.returncode}): {baseline.stderr}"
+                "frozen-row-drop self-test setup failed: the mirror does not pass before its "
+                f"legacy page is edited (exit={baseline.returncode}): {baseline.stderr}"
             )
-
-        registered = (
-            'DELETED_CATALOGUE_ROW_NAMES = (\n'
-            '    "no_long_range_order_1d_of_susceptibility",\n'
-            '    "shastry_staggered_susceptibility_subcubic",\n'
-            ')\n'
-            'DELETED_CATALOGUE_ROW_COUNTS = (1, 1)\n'
-        )
-        mutated = (
-            'DELETED_CATALOGUE_ROW_NAMES = (\n'
-            '    "no_long_range_order_1d_of_susceptibility",\n'
-            '    "shastry_staggered_susceptibility_subcubic",\n'
-            '    "oscillatorStrength_abs_le",\n'
-            ')\n'
-            'DELETED_CATALOGUE_ROW_COUNTS = (1, 1, 1)\n'
-        )
-        if registered not in script_text:
-            fail("deleted-row-registry self-test could not locate the registry literal to mutate")
-        script_path.write_text(script_text.replace(registered, mutated))
 
         legacy_page = (
             mirror
@@ -1599,7 +1504,7 @@ def deleted_row_registry_negative_self_tests() -> None:
         mutated_legacy, row_drops = row_pattern.subn("", legacy_text)
         if row_drops != 1:
             fail(
-                "deleted-row-registry self-test could not find exactly one live "
+                "frozen-row-drop self-test could not find exactly one live "
                 f"oscillatorStrength_abs_le row (found {row_drops})"
             )
         legacy_page.write_text(mutated_legacy)
@@ -1612,53 +1517,51 @@ def deleted_row_registry_negative_self_tests() -> None:
         )
         if probe.returncode == 0:
             fail(
-                "deleted-row-registry fail-open: registering a still-declared name "
-                "(oscillatorStrength_abs_le, "
-                "LatticeSystem/Quantum/SpinS/OscillatorStrengthBound.lean) and dropping its "
-                "row must be refused, but the checker exited 0"
+                "frozen-row-drop fail-open: dropping the published row of a still-declared "
+                "name (oscillatorStrength_abs_le, "
+                "LatticeSystem/Quantum/SpinS/OscillatorStrengthBound.lean) from its legacy page "
+                "must be refused, but the checker exited 0"
             )
-        if "oscillatorStrength_abs_le" not in probe.stderr:
+        difference = re.search(
+            r"legacy catalogue row order/content differs: expected=(\d+), actual=(\d+)",
+            probe.stderr,
+        )
+        if difference is None:
             fail(
-                "deleted-row-registry probe failed for the wrong reason: expected an error "
-                f"naming oscillatorStrength_abs_le, got: {probe.stderr}"
+                "frozen-row-drop probe failed for the wrong reason: expected the legacy "
+                f"catalogue row comparison to refuse the edit, got: {probe.stderr}"
             )
+        else:
+            missing = int(difference.group(1)) - int(difference.group(2))
+            if missing != 1:
+                fail(
+                    "frozen-row-drop probe refused the edit over a different quantity than the "
+                    f"single row removed: expected one row missing, got {missing}"
+                )
 
 
 def absent_name_row_drop_negative_self_test() -> None:
     """A row must never be droppable merely because its Lean-name cell is already absent.
 
-    148 already-published catalogue rows name a declaration absent from the Lean tree, measured
-    by `.self-local/reports/measure-5403-class7.py` at the tracked revision, yet only two of
-    those absences are ever registered for deletion. Merely choosing one of the many already-
-    absent names cannot on its own authorize dropping the row: this probes that exact boundary
-    in a disposable clone by registering an arbitrary already-absent name
-    (`pauli_decomposition`, confirmed absent by `lean_leaf_mention` below) for the same kind of
-    name-keyed drop the registry performs, hand-dropping its row from the live legacy page, and
-    asserting the checker refuses.
+    Most published catalogue rows name a declaration the Lean tree no longer spells -- 148 of
+    them at the revision this was measured, against the two rows the catalogue actually retires
+    -- so absence is the ordinary condition of a historical catalogue, not evidence that a row
+    may go. This probes that boundary in a disposable clone by re-creating the shape that would
+    make absence sufficient, a name-keyed drop wired into `approved_changes` for an arbitrary
+    already-absent name (`pauli_decomposition`), and hand-dropping that row from the live legacy
+    page so that both halves of the fail-open are present at once. The checker must refuse, and
+    the byte-parity pin is what refuses: a name-keyed drop is not a rewrite of the row's frozen
+    text, so the transformed catalogue stops hashing to the audited value.
     """
     with tempfile.TemporaryDirectory(prefix="absent-name-row-drop-") as scratch:
         mirror = Path(scratch) / "mirror"
         subprocess.run(
             ["git", "clone", "--quiet", "--shared", str(ROOT), str(mirror)], check=True
         )
-
-        # Cloning a mirror that still ran this self-test (or the other two clone-based probes)
-        # would clone a mirror of its own without end; strip all three calls the same way the
-        # existing clone-based probes strip each other's, so no probe's mirror ever re-enters a
-        # probe this fixture does not measure.
         script_path = mirror / "scripts" / "check_docs_hierarchy.py"
-        script_text = script_path.read_text()
-        nested_call = "    absent_name_row_drop_negative_self_test()\n"
-        if nested_call not in script_text:
-            fail(
-                "absent-name row drop self-test could not locate its own call in the mirror's "
-                "main() to stop the mirror from cloning a mirror of its own"
-            )
-        script_text = script_text.replace(nested_call, "")
-        script_text = script_text.replace(
-            "    deleted_row_registry_negative_self_tests()\n", ""
+        script_text = _without_clone_based_self_tests(
+            script_path.read_text(), "absent-name row drop self-test"
         )
-        script_text = script_text.replace("    unrecognized_argument_self_test()\n", "")
         script_path.write_text(script_text)
 
         baseline = subprocess.run(
@@ -1670,35 +1573,8 @@ def absent_name_row_drop_negative_self_test() -> None:
         if baseline.returncode != 0:
             fail(
                 "absent-name row drop self-test setup failed: the mirror does not pass before "
-                f"its registry is mutated (exit={baseline.returncode}): {baseline.stderr}"
+                f"it is mutated (exit={baseline.returncode}): {baseline.stderr}"
             )
-
-        if lean_leaf_mention(ROOT, "pauli_decomposition") is not None:
-            fail(
-                "absent-name row drop self-test subject pauli_decomposition is no longer "
-                "absent from the Lean tree; choose a different already-absent name"
-            )
-
-        registered = (
-            'DELETED_CATALOGUE_ROW_NAMES = (\n'
-            '    "no_long_range_order_1d_of_susceptibility",\n'
-            '    "shastry_staggered_susceptibility_subcubic",\n'
-            ')\n'
-            'DELETED_CATALOGUE_ROW_COUNTS = (1, 1)\n'
-        )
-        mutated = (
-            'DELETED_CATALOGUE_ROW_NAMES = (\n'
-            '    "no_long_range_order_1d_of_susceptibility",\n'
-            '    "shastry_staggered_susceptibility_subcubic",\n'
-            '    "pauli_decomposition",\n'
-            ')\n'
-            'DELETED_CATALOGUE_ROW_COUNTS = (1, 1, 1)\n'
-        )
-        if registered not in script_text:
-            fail(
-                "absent-name row drop self-test could not locate the registry literal to mutate"
-            )
-        script_path.write_text(script_text.replace(registered, mutated))
 
         legacy_page = (
             mirror
@@ -1717,6 +1593,25 @@ def absent_name_row_drop_negative_self_test() -> None:
             )
         legacy_page.write_text(mutated_legacy)
 
+        # Dropping the row from the page alone is already refused, so the fixture must also give
+        # the mirror the authorization it is being probed for: a drop keyed on the name rather
+        # than on the row's frozen text, which is what makes absence look sufficient.
+        anchor = "    return _drop_private_instructions_ref(_approved_replacements(text))\n"
+        if anchor not in script_text:
+            fail(
+                "absent-name row drop self-test could not locate approved_changes' return "
+                "statement, so it cannot wire the name-keyed drop it exists to refuse"
+            )
+        name_keyed_drop = (
+            "    return re.sub(\n"
+            '        r"^\\| `pauli_decomposition` \\|.*\\n?",\n'
+            '        "",\n'
+            "        _drop_private_instructions_ref(_approved_replacements(text)),\n"
+            "        flags=re.MULTILINE,\n"
+            "    )\n"
+        )
+        script_path.write_text(script_text.replace(anchor, name_keyed_drop))
+
         probe = subprocess.run(
             [sys.executable, "scripts/check_docs_hierarchy.py"],
             cwd=mirror,
@@ -1724,19 +1619,15 @@ def absent_name_row_drop_negative_self_test() -> None:
             text=True,
         )
         if probe.returncode == 0:
-            if "2049 catalogue rows" not in probe.stdout:
-                fail(
-                    "absent-name row drop self-test observed an unexpected pass shape: expected "
-                    f"'2049 catalogue rows' in stdout, got: {probe.stdout!r}"
-                )
             fail(
                 "absent-name row drop fail-open: pauli_decomposition is absent from the Lean "
                 "tree, but a name-keyed drop of its catalogue row was accepted (mirror exited 0)"
             )
-        if "pauli_decomposition" not in probe.stderr:
+        if "byte-parity pin mismatch" not in probe.stderr:
             fail(
-                "absent-name row drop probe failed for the wrong reason: expected an error "
-                f"naming pauli_decomposition, got: {probe.stderr}"
+                "absent-name row drop probe failed for the wrong reason: expected the "
+                "approved-changes byte-parity pin to refuse the name-keyed drop, got: "
+                f"{probe.stderr}"
             )
 
 
@@ -1753,26 +1644,12 @@ def unrecognized_argument_self_test() -> None:
         subprocess.run(
             ["git", "clone", "--quiet", "--shared", str(ROOT), str(mirror)], check=True
         )
-        script_text = Path(__file__).resolve().read_text()
-        own_call = "    unrecognized_argument_self_test()\n"
-        if own_call not in script_text:
-            fail(
-                "unrecognized-argument self-test could not locate its own call in main() to stop "
-                "a copy that ignores argv from re-entering this probe without end"
-            )
-        script_text = script_text.replace(own_call, "")
-        # The other two clone-based self-tests clone and run a script of their own, so a copy
-        # that reached either call would buy a probe this fixture does not measure and report
-        # that probe's failure as this one's. A copy without the call cannot misreport that way,
-        # so unlike the call above the removal is best-effort.
-        script_text = script_text.replace(
-            "    deleted_row_registry_negative_self_tests()\n", ""
-        )
-        script_text = script_text.replace(
-            "    absent_name_row_drop_negative_self_test()\n", ""
-        )
         script_path = mirror / "scripts" / "check_docs_hierarchy.py"
-        script_path.write_text(script_text)
+        script_path.write_text(
+            _without_clone_based_self_tests(
+                Path(__file__).resolve().read_text(), "unrecognized-argument self-test"
+            )
+        )
 
         for argument in ("--self-test", "--bogus-flag-xyz", "bogus-positional"):
             probe = subprocess.run(
@@ -1805,10 +1682,10 @@ def main() -> None:
     # a caller believed selected behaviour -- the sibling checkers' --self-test above all -- which
     # would otherwise be ignored and answered with a PASS the argument had no part in.
     argparse.ArgumentParser(description=__doc__).parse_args()
+    approved_changes_byte_parity_self_test()
     long_record_negative_self_tests()
     moved_prose_negative_self_tests()
-    deleted_row_registry_mention_semantics_self_test()
-    deleted_row_registry_negative_self_tests()
+    frozen_row_drop_negative_self_test()
     absent_name_row_drop_negative_self_test()
     unrecognized_argument_self_test()
     generated_records = DOCS / "formalization" / "records"
@@ -1953,17 +1830,6 @@ def main() -> None:
         fail(
             "audited private project-instructions removal count differs: "
             f"expected={PRIVATE_INSTRUCTIONS_REMOVAL_COUNT}, actual={private_instructions_removals}"
-        )
-    check_deleted_row_registry_absence()
-    deleted_row_counts = [0] * len(DELETED_CATALOGUE_ROW_NAMES)
-    _drop_deleted_catalogue_rows(
-        _drop_private_instructions_ref(_approved_replacements(catalogue_baseline)),
-        deleted_row_counts,
-    )
-    if tuple(deleted_row_counts) != DELETED_CATALOGUE_ROW_COUNTS:
-        fail(
-            "audited deleted-catalogue-row counts differ: "
-            f"expected={DELETED_CATALOGUE_ROW_COUNTS}, actual={tuple(deleted_row_counts)}"
         )
     working_note_counts = [
         len(_WORKING_NOTE_CITATION.findall(catalogue_baseline)),
