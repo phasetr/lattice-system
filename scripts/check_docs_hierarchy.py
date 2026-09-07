@@ -5,31 +5,43 @@ The published catalogue is `docs/index.md` frozen at `BASELINE_COMMIT` and put t
 `approved_changes`: a single chain of audited literal rewrites. The removal entries search
 verbatim baseline text -- a row leaves the published catalogue only by a rewrite of its own full
 frozen row text, trailing newline included, to the empty string -- while some correction entries
-search text an earlier entry in the chain inserts, as their own comments record. There is no
-name-keyed mechanism, so the absence of a declaration from the Lean tree never by itself retires
-the row that records it: at the revision this was measured, 91 of the 2217 published rows (4.1%)
-name at least one identifier the Lean tree no longer spells, over 148 distinct absent identifier
-tokens.
+search text an earlier entry in the chain inserts, as their own comments record. No entry
+retires a row by keying on a Lean name, and `name_keyed_row_drop_absence_self_test` refuses that
+shape semantically rather than by spelling, so the absence of a declaration from the Lean tree
+never by itself retires the row that records it: at the revision this was measured, 91 of the
+2050 published catalogue rows (4.4%) name at least one identifier the Lean tree no longer spells
+-- 64 of them name nothing else -- across 148 distinct absent identifier tokens.
 
-`APPROVED_CHANGES_SHA256` pins sha256 over
+Two pins cover the transform. `APPROVED_CHANGES_SHA256` pins sha256 over
 
     approved_changes(catalogue_baseline_text())
 
-encoded as UTF-8. `catalogue_baseline_text()` is the single spelling of the compared slice, so the
-pinned bytes are exactly the bytes `main()` compares the legacy pages against; narrowing that
-slice moves the pin instead of quietly unpublishing the rows it drops. Every edit to
+and `PUBLISHED_ROWS_SHA256` pins sha256 over
+
+    "\n".join(published_catalogue_rows())
+
+both encoded as UTF-8. `catalogue_baseline_text()` is the single spelling of the compared slice
+and `published_catalogue_rows()` the single spelling of the row sequence `main()` compares the
+legacy pages against, so narrowing the slice moves the first pin and skipping a row in the
+extractor moves the second, instead of quietly unpublishing the rows they drop. Every edit to
 `_approved_replacements` or `_drop_private_instructions_ref` that changes the transformed bytes
-moves the pin; output-neutral edits, such as dropping a rewrite that no longer matches anything,
-do not. An edit that does move it recomputes it in the same commit with
+moves the first pin, and moves the second as well whenever the change reaches a table row;
+output-neutral edits, such as dropping a rewrite that no longer matches anything, move neither.
+An edit that does move a pin recomputes it in the same commit with
 
     python3 -c 'import sys, hashlib; sys.path.insert(0, "scripts"); \
     import check_docs_hierarchy as c; \
     print(hashlib.sha256(c.approved_changes(c.catalogue_baseline_text()) \
     .encode("utf-8")).hexdigest())'
 
-and states which rows the new value reflects. Recomputing the pin is never on its own an
+    python3 -c 'import sys, hashlib; sys.path.insert(0, "scripts"); \
+    import check_docs_hierarchy as c; \
+    print(hashlib.sha256("\n".join(c.published_catalogue_rows()) \
+    .encode("utf-8")).hexdigest())'
+
+and states which rows the new values reflect. Recomputing a pin is never on its own an
 authorization for what moved: the legacy pages still have to be edited to match, and the
-catalogue-row comparison is what proves they do. What the pin buys is that a removal is a
+catalogue-row comparison is what proves they do. What the pins buy is that a removal is a
 legible, full-row diff plus a pin update rather than a name added to a list.
 """
 
@@ -59,6 +71,11 @@ CATALOGUE_BASELINE_SLICE = slice(216, 2731)
 # Pins the published catalogue text; this module's docstring records exactly what is hashed
 # and how the pin is legitimately updated.
 APPROVED_CHANGES_SHA256 = "2d57e7b3d3e02f04ee3f19c864c9f1cbfc125115d37bd13086832aa50b079da0"
+# Pins the row sequence `main()` actually compares the legacy pages against. The text pin above
+# does not reach it: the rows are derived from the transformed text by `table_data_rows`, which
+# is outside the pinned text, so without this pin a row skipped there would go unpublished with
+# the text pin undisturbed.
+PUBLISHED_ROWS_SHA256 = "4af128f2c5f915e46c4df1aad461c5869ace8ac257525a0c31112ec95a102fdf"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -283,9 +300,10 @@ def baseline_index() -> str:
 def catalogue_baseline_text() -> str:
     """The frozen catalogue region of the baseline index, before any audited rewrite.
 
-    `main()` compares the legacy pages against `approved_changes` of this text and
-    `approved_changes_byte_parity_self_test` pins sha256 of exactly the same object, so the
-    pinned quantity and the compared quantity cannot drift apart.
+    `main()` compares the legacy pages against the rows of `approved_changes` of this text,
+    and `approved_changes_byte_parity_self_test` pins sha256 of that transformed text and of that
+    row sequence, both reached through the same two helpers `main()` calls, so neither the pinned
+    text nor the pinned rows can drift from the compared ones.
     """
     return "".join(baseline_index().splitlines(keepends=True)[CATALOGUE_BASELINE_SLICE])
 
@@ -1055,7 +1073,8 @@ def _approved_replacements(text: str) -> str:
         )
         # Two catalogue rows presented Corollary 4.3 as discharged. It is a conditional reduction:
         # the axiom fed into it is strictly stronger than the corollary, so the row must not read
-        # as a completed result.
+        # as a completed result. (The second entry is applied after the row rewrite above that
+        # inserts the sentence it matches, so its position in the chain is load-bearing.)
         .replace(
             "**Corollary 4.3** (§4.1, THEOREM; eq. (4.1.11)): absence of LRO in 1D on **even** "
             "rings.",
@@ -1203,12 +1222,24 @@ def approved_changes(text: str) -> str:
     return _drop_private_instructions_ref(_approved_replacements(text))
 
 
+def published_catalogue_rows() -> list[str]:
+    """The published catalogue rows, in order, exactly as `main()` compares the pages against.
+
+    Spelled once for the same reason as `CATALOGUE_BASELINE_SLICE`: `PUBLISHED_ROWS_SHA256` pins
+    this list and `main()` consumes it, so the row extractor cannot be narrowed for the
+    comparison while the pin keeps hashing the wider one.
+    """
+    return table_data_rows(approved_changes(catalogue_baseline_text()).splitlines())
+
+
 def approved_changes_byte_parity_self_test() -> None:
-    """`APPROVED_CHANGES_SHA256` must still hash the published catalogue text exactly.
+    """Both pins must still hash the published catalogue exactly.
 
     Called first among the self-tests, so a transformation that moved is reported once, as a pin
     mismatch naming both hashes, rather than as the thousands of row differences the page
-    comparison reports much later in the run.
+    comparison reports much later in the run. `APPROVED_CHANGES_SHA256` covers the transformed
+    text and `PUBLISHED_ROWS_SHA256` the row sequence derived from it, because the comparison
+    consumes the rows and the text pin alone leaves the extractor between them unguarded.
     """
     published = approved_changes(catalogue_baseline_text())
     actual = hashlib.sha256(published.encode("utf-8")).hexdigest()
@@ -1220,6 +1251,86 @@ def approved_changes_byte_parity_self_test() -> None:
             "print(hashlib.sha256(c.approved_changes(c.catalogue_baseline_text())."
             "encode(\"utf-8\")).hexdigest())' -- a passing pin recompute is never on its own an "
             "authorization for the content change."
+        )
+    rows_actual = hashlib.sha256(
+        "\n".join(published_catalogue_rows()).encode("utf-8")
+    ).hexdigest()
+    if rows_actual != PUBLISHED_ROWS_SHA256:
+        fail(
+            "published-rows byte-parity pin mismatch: expected "
+            f"{PUBLISHED_ROWS_SHA256}, got {rows_actual}. Recompute with: python3 -c 'import sys, "
+            "hashlib; sys.path.insert(0, \"scripts\"); import check_docs_hierarchy as c; "
+            "print(hashlib.sha256(\"\\n\".join(c.published_catalogue_rows())."
+            "encode(\"utf-8\")).hexdigest())' -- a passing pin recompute is never on its own an "
+            "authorization for the content change."
+        )
+
+
+def name_keyed_row_drop_absence_self_test() -> None:
+    """The transform must key on frozen row text only, at every spelling and every depth.
+
+    The fail-open shape this catalogue has to stay clear of is a rewrite keyed on a Lean name
+    rather than on a row's frozen text: it unpublishes every row naming that identifier, and
+    re-expressed so that it reproduces the sanctioned removals exactly it leaves both pins and
+    every page comparison undisturbed. Spelling-level fixtures cannot exclude it, so this probes
+    for it semantically. A scratch copy of the baseline text carries one synthetic row per
+    catalogue row -- that row's own first cell verbatim, so every identifier the catalogue names
+    is covered including the ones it retires, with a body no audited literal contains -- and
+    `approved_changes`, the same entry point `main()` uses, must return the baseline part
+    exactly as it transforms that part alone, and every synthetic row byte for byte. A full-row
+    literal cannot match a synthetic row; anything keyed on the name deletes it.
+    """
+    body = "synthetic name-keyed-drop probe row; carries no published body"
+    baseline = catalogue_baseline_text()
+    probe_cells = [
+        row.removeprefix("| ").split(" | ")[0]
+        for row in table_data_rows(baseline.splitlines())
+    ]
+    if not probe_cells:
+        fail(
+            "name-keyed row drop self-test found no catalogue rows to build synthetic rows "
+            "from, so its identity requirement below would hold vacuously"
+        )
+    probe_rows = "".join(f"| {cell} | {body} |\n" for cell in probe_cells)
+
+    # Positive control: the requirement below is only informative where a name-keyed drop would
+    # actually change the corpus, and the cells at risk are the ones the transform stops
+    # publishing. Each of them must key a drop that removes a synthetic row.
+    published_cells = {
+        row.removeprefix("| ").split(" | ")[0] for row in published_catalogue_rows()
+    }
+    unpublished_cells = [cell for cell in probe_cells if cell not in published_cells]
+    if not unpublished_cells:
+        fail(
+            "name-keyed row drop self-test has no control to fire: the transform no longer "
+            "changes any row's first cell, so nothing in the corpus stands for the rows a "
+            "name-keyed drop would target"
+        )
+    for cell in unpublished_cells:
+        _, control_drops = re.subn(
+            rf"^\| {re.escape(cell)} \|.*\n", "", probe_rows, flags=re.MULTILINE
+        )
+        if control_drops == 0:
+            fail(
+                "name-keyed row drop self-test control did not fire: a drop keyed on "
+                f"{cell} removes no synthetic row, so the requirement below cannot detect that "
+                "shape for a first cell the published catalogue no longer carries"
+            )
+
+    transformed = approved_changes(baseline + probe_rows)
+    expected = approved_changes(baseline) + probe_rows
+    if transformed != expected:
+        expected_lines = expected.splitlines()
+        actual_lines = transformed.splitlines()
+        first = next(
+            (i for i, pair in enumerate(zip(expected_lines, actual_lines)) if pair[0] != pair[1]),
+            min(len(expected_lines), len(actual_lines)),
+        )
+        fail(
+            "name-keyed row drop fail-open: a row carrying only a catalogue first cell and a "
+            "body no audited rewrite contains was still transformed, so some entry keys on the "
+            "Lean name instead of on the row's frozen text (expected_lines="
+            f"{len(expected_lines)}, actual_lines={len(actual_lines)}, first_difference={first})"
         )
 
 
@@ -1519,15 +1630,18 @@ def absent_name_row_drop_negative_self_test() -> None:
     """A row must never be droppable merely because its Lean-name cell is already absent.
 
     Published catalogue rows routinely name declarations the Lean tree no longer spells: at the
-    revision this was measured, 91 of the 2217 published rows (4.1%) name at least one such
-    identifier, over 148 distinct absent identifier tokens, against the two rows the catalogue
-    actually retires. Absence is the ordinary condition of a historical catalogue, not evidence
-    that a row may go. This probes that boundary in a disposable clone by re-creating the shape
-    that would make absence sufficient -- a name-keyed drop wired into `approved_changes` for an
-    arbitrary already-absent name (`pauli_decomposition`) -- and hand-dropping that row from the
-    live legacy page so that both halves of the fail-open are present at once. The checker must
-    refuse, and the byte-parity pin is what refuses: a name-keyed drop is not a rewrite of the
-    row's frozen text, so the transformed catalogue stops hashing to the audited value.
+    revision this was measured, 91 of the 2050 published catalogue rows (4.4%) name at least one
+    such identifier -- 64 of them name nothing else -- across 148 distinct absent identifier
+    tokens, against the two rows the catalogue actually retires. Absence is the ordinary
+    condition of a historical catalogue, not evidence that a row may go. This probes that
+    boundary end to end in a disposable clone by re-creating the shape that would make absence
+    sufficient -- a name-keyed drop wired into `approved_changes` for an arbitrary already-absent
+    name (`pauli_decomposition`) -- and hand-dropping that row from the live legacy page so that
+    both halves of the fail-open are present at once. The checker must refuse, and the
+    byte-parity pin is what refuses: a name-keyed drop is not a rewrite of the row's frozen text,
+    so the transformed catalogue stops hashing to the audited value. What forbids the shape at
+    any spelling and any depth in the chain is `name_keyed_row_drop_absence_self_test`; the
+    anchor this fixture matches below is only its own wiring.
     """
     with tempfile.TemporaryDirectory(prefix="absent-name-row-drop-") as scratch:
         mirror = Path(scratch) / "mirror"
@@ -1571,7 +1685,9 @@ def absent_name_row_drop_negative_self_test() -> None:
 
         # Dropping the row from the page alone is already refused, so the fixture must also give
         # the mirror the authorization it is being probed for: a drop keyed on the name rather
-        # than on the row's frozen text, which is what makes absence look sufficient.
+        # than on the row's frozen text, which is what makes absence look sufficient. Only this
+        # fixture's own wiring depends on the exact spelling below; the shape itself is refused
+        # at any spelling by `name_keyed_row_drop_absence_self_test`.
         anchor = "    return _drop_private_instructions_ref(_approved_replacements(text))\n"
         if anchor not in script_text:
             fail(
@@ -1659,6 +1775,7 @@ def main() -> None:
     # would otherwise be ignored and answered with a PASS the argument had no part in.
     argparse.ArgumentParser(description=__doc__).parse_args()
     approved_changes_byte_parity_self_test()
+    name_keyed_row_drop_absence_self_test()
     long_record_negative_self_tests()
     moved_prose_negative_self_tests()
     frozen_row_drop_negative_self_test()
@@ -1812,7 +1929,7 @@ def main() -> None:
         len(_WORKING_NOTE_SECTION_REF.findall(catalogue_baseline)),
         0,
     ]
-    expected_rows = table_data_rows(approved_changes(catalogue_baseline).splitlines())
+    expected_rows = published_catalogue_rows()
     expected_by_line: dict[int, str] = {}
     expected_long_lines: set[int] = set()
     catalogue_lines = range(CATALOGUE_BASELINE_SLICE.start + 1, CATALOGUE_BASELINE_SLICE.stop + 1)
