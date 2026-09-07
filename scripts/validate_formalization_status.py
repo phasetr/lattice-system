@@ -5679,36 +5679,41 @@ end LatticeSystem
     # cutover, and the contract states that version 1's machine URLs are no longer published.
     legacy_index_path = repo_root / "docs" / "formalization" / "legacy" / "index.md"
     legacy_index_text = legacy_index_path.read_text(encoding="utf-8")
+    stale_version_claims = ("version 1 JSON records", "records are schema version 1")
+
+    def stale_version_claims_in(text: str) -> list[str]:
+        """Return every version-1 self-description the legacy authority page must not make."""
+        return [claim for claim in stale_version_claims if claim in text]
+
+    live_stale_claims = stale_version_claims_in(legacy_index_text)
     check(
-        "version 1 JSON records" not in legacy_index_text,
-        "docs/formalization/legacy/index.md: describes its own records as 'version 1 JSON "
-        "records', which the contract's version-2 cutover makes false",
+        not live_stale_claims,
+        "docs/formalization/legacy/index.md: describes its own records with a version-1 "
+        f"claim ({live_stale_claims}), which the contract's version-2 cutover makes false",
+    )
+    # Positive control: the same predicate, over the same page text, must fire on injected
+    # drift. The previous control mutated the stale wording into the corrected wording, a
+    # string the page never contained, so `.replace()` was a no-op and the control merely
+    # re-asserted the check above -- it would have passed with the gate deleted. Mutate in
+    # the direction of the defect instead, and refuse to pass when the anchor it bites on is
+    # missing, because a mutation that changes nothing tests nothing.
+    downgraded = legacy_index_text.replace("version 2 JSON records", "version 1 JSON records")
+    check(
+        downgraded != legacy_index_text,
+        "docs/formalization/legacy/index.md gate positive control is vacuous: the anchor "
+        "'version 2 JSON records' is absent from the page, so the downgrade mutation changed "
+        "nothing and the control below can never fail",
     )
     check(
-        "records are schema version 1" not in legacy_index_text,
-        "docs/formalization/legacy/index.md: describes its own records as schema version 1",
+        stale_version_claims_in(downgraded) == ["version 1 JSON records"],
+        "docs/formalization/legacy/index.md gate failed to detect an injected version-1 "
+        "downgrade of the banner; the gate does not react to the drift it exists to catch",
     )
-    # Positive control: the corrected wording must not itself trip the same gate.
-    corrected_legacy_index_text = legacy_index_text.replace(
-        "version 1 JSON records", "version 2 JSON records"
-    )
+    schema_downgraded = f"{legacy_index_text}\nThese records are schema version 1.\n"
     check(
-        "version 1 JSON records" not in corrected_legacy_index_text,
-        "docs/formalization/legacy/index.md gate: the corrected 'version 2 JSON records' "
-        "wording still trips the 'version 1 JSON records' gate (positive control failed)",
-    )
-    # Anti-vacuity guard (#5403 class 9 test-first RED): the positive control above is a
-    # `.replace(target, replacement)` on `legacy_index_text`. That control can only exercise
-    # the gate it guards if `target` actually occurs in the live source text -- otherwise
-    # `.replace()` is a silent no-op and `corrected_legacy_index_text is legacy_index_text`
-    # in substance, so the control passes unconditionally regardless of whether the gate
-    # above still works. This guard checks the replace() target is a real anchor in the
-    # current source text; it is independent of, and does not fix, the vacuous control above.
-    check(
-        "version 1 JSON records" in legacy_index_text,
-        "docs/formalization/legacy/index.md gate positive control is vacuous: anchor "
-        "'version 1 JSON records' not found in the source text, so the replace() above is a "
-        "no-op and the positive control that follows it can never fail",
+        stale_version_claims_in(schema_downgraded) == ["records are schema version 1"],
+        "docs/formalization/legacy/index.md gate failed to detect an injected 'records are "
+        "schema version 1' claim",
     )
 
     return failures
