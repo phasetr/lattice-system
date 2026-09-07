@@ -25,14 +25,14 @@ identifiers.
 **Measurement.** Four digits or more, which excludes the book's equation and problem numbers:
 
 ```
-git grep -o -E '#[0-9]{4,}' a70632ea -- 'LatticeSystem/**/*.lean' | wc -l
-git grep -n -E '#[0-9]{4,}' a70632ea -- 'LatticeSystem/**/*.lean' | wc -l
-git grep -l -E '#[0-9]{4,}' a70632ea -- 'LatticeSystem/**/*.lean' | wc -l
+git grep -o -E '#[0-9]{4,}' 080ebac2 -- 'LatticeSystem/**/*.lean' | wc -l
+git grep -n -E '#[0-9]{4,}' 080ebac2 -- 'LatticeSystem/**/*.lean' | wc -l
+git grep -l -E '#[0-9]{4,}' 080ebac2 -- 'LatticeSystem/**/*.lean' | wc -l
 ```
 
-At revision `a70632ea`: 1252 occurrences on 1130 lines across 531 files.
+At revision `080ebac2`: 1250 occurrences on 1128 lines across 530 files.
 
-**Reason.** A single sweep edits 531 modules at once, so every one of them and every downstream
+**Reason.** A single sweep edits 530 modules at once, so every one of them and every downstream
 importer is rebuilt. The rebuild is the dominant cost and it buys no change to any statement,
 proof, or published claim, which puts the sweep off the critical path of the book-order
 formalization. The population is also not uniformly mechanical: some four-digit references are
@@ -59,10 +59,10 @@ documentation, published pages, and the proof guide.
 the hyphen; a hyphen-only pattern reports a small spelling-dependent subset instead of the family:
 
 ```
-git grep -noiE '(ladder|sublattice|perron[-–]+frobenius|PF|MLM|saturated[- ]ladder|N[ée]el)[- ]route' 88fdbe7c -- '*.lean' '*.md' '*.tex' | wc -l
+git grep -noiE '(ladder|sublattice|perron[-–]+frobenius|PF|MLM|saturated[- ]ladder|N[ée]el)[- ]route' 080ebac2 -- '*.lean' '*.md' '*.tex' | wc -l
 ```
 
-At revision `88fdbe7c`: 44 phrases.
+At revision `080ebac2`: 44 phrases.
 
 **Reason.** These phrases name the mathematical strategy a declaration follows — the `sl₂` ladder,
 the Perron–Frobenius argument, the sublattice decomposition — and in one case the boundary of a
@@ -82,13 +82,13 @@ unchanged rather than re-derive the classification.
 **Measurement.** The live checker, then the retired tooling:
 
 ```
-git grep -niE 'check_docs_hierarchy\.py' a70632ea -- '*.lean' '*.md' '*.tex' | wc -l
-git grep -niE 'audit_gate|audit-helpers|capstones\.txt|docs_names\.py|pre-push' a70632ea -- '*.lean' '*.md' '*.tex' | wc -l
+git grep -niE 'check_docs_hierarchy\.py' 080ebac2 -- '*.lean' '*.md' '*.tex' | wc -l
+git grep -niE 'audit_gate|audit-helpers|capstones\.txt|docs_names\.py|pre-push' 080ebac2 -- '*.lean' '*.md' '*.tex' | wc -l
 ```
 
-At revision `a70632ea`: 22 and 0.
+At revision `080ebac2`: 23 and 0.
 
-**Reason.** All 22 name `scripts/check_docs_hierarchy.py`, which exists and enforces exactly the
+**Reason.** All 23 name `scripts/check_docs_hierarchy.py`, which exists and enforces exactly the
 constraint the surrounding sentence describes. Naming the mechanism that governs a page is current
 documentation of that page, not narration of an internal process. The retired tooling has no
 surviving mention, so that half of the class is empty.
@@ -108,12 +108,12 @@ inside the `legacy-source:217:228` block of `docs/formalization/legacy/index.md`
 **Measurement.** List the frozen spans on a page and compare a candidate line number against them:
 
 ```
-git grep -n 'legacy-source:start' 88fdbe7c -- docs
-git grep -n 'legacy-detail:start' 88fdbe7c -- docs
+git grep -n 'legacy-source:start' 080ebac2 -- docs
+git grep -n 'legacy-detail:start' 080ebac2 -- docs
 ```
 
-At revision `88fdbe7c` this places 7 proof-route lines (the route-name command above, restricted to
-`docs`) and 5 review-narration lines (`git grep -niE 'codex' 88fdbe7c -- docs`) inside frozen
+At revision `080ebac2` this places 7 proof-route lines (the route-name command above, restricted to
+`docs`) and 5 review-narration lines (`git grep -niE 'codex' 080ebac2 -- docs`) inside frozen
 regions: the proof-route lines and 4 of the narration lines inside `legacy-source` blocks, the
 remaining narration line inside the `legacy-detail` long record of
 `docs/formalization/legacy/details/group-spin-models-part-04.md`, along with the two
@@ -146,11 +146,11 @@ form left over after citations of Lean source by file and line were converted to
 ERE spelling of this command reports an empty population instead of failing.
 
 ```
-git grep -P -n -I '\blines? [0-9]+' 88fdbe7c -- docs tex | wc -l
-git grep -P -o -I '\blines? [0-9]+' 88fdbe7c -- docs tex | wc -l
+git grep -P -n -I '\blines? [0-9]+' 080ebac2 -- docs tex | wc -l
+git grep -P -o -I '\blines? [0-9]+' 080ebac2 -- docs tex | wc -l
 ```
 
-At revision `88fdbe7c`: 37 occurrences on 37 lines. Thirty are `## Record from former line N`
+At revision `080ebac2`: 37 occurrences on 37 lines. Thirty are `## Record from former line N`
 headings on the detail pages under `docs/formalization/legacy/details/`. Five sit in machine-frozen
 regions: three inside `legacy-source` blocks held at byte parity, two of them on the Horsch–von der
 Linden pages and one on the Jordan–Wigner backbone page, and two inside a `legacy-detail` long
@@ -177,37 +177,58 @@ former line number, in which case the headings are re-keyed and the two referenc
 **Cadence.** Re-measure with the commands above at every twenty-pull-request refactor cycle and
 replace the figures here with the new ones.
 
-## Issue identifiers in the formalization-status contract
+## Closed-issue identifiers in the formalization-status surface
 
-**Target.** Lines of `docs/formalization-status-contract.md` whose key is a governance issue
-identifier: the cross-reference sentence in the machine-artifact section, the rows of the migration
-map, and the staged-migration sentences beneath it. Every issue those lines name is closed.
+**Target.** Surviving references to the governance issues that staged the formalization-status
+migration, wherever they occur on tracked paths: the issue-keyed lines of
+`docs/formalization-status-contract.md`, the two provenance pointers kept outside the contract on
+`docs/index.md` and `docs/formalization-publication.md`, and the retired-banner entry in the
+forbidden-phrase list of `scripts/check_generated_site.py`. Every issue these lines name is closed.
 
-**Measurement.** The issue-keyed surface of the contract, then the lines naming the cutover issue:
+**Measurement.** One command covers the whole surface, documentation and scripts together:
 
 ```
-git grep -n -P '#5228|#5229|#5227' 08d11e0f -- docs/formalization-status-contract.md
-git grep -n -P '#5228' 08d11e0f -- docs/formalization-status-contract.md
+git grep -n -P '#(5227|5228|5229)' 080ebac2 -- docs scripts
 ```
 
-At revision `08d11e0f`: 18 and 8 lines. Three of the eight are the structural ones parked here —
-the cross-reference sentence in the machine-artifact section, the migration-map row whose first
-cell is the identifier, and the staged-migration sentence beneath the map. The other five are
-ordinary prose that the hygiene pass on that page rewrites, so the two counts become thirteen and
-three once that pass lands.
+At revision `080ebac2`: 17 lines in total. Thirteen are in
+`docs/formalization-status-contract.md` — the three rows of the migration map, and ten sentences
+that attribute ownership, obligation, or delivery to the same keys, among them the
+publication-contract section heading, the cross-reference in the machine-artifact section, and the
+staged-migration sentences beneath the map. Two are the provenance pointers, one on
+`docs/index.md` and one on `docs/formalization-publication.md`. One is the forbidden-phrase entry
+in `scripts/check_generated_site.py`. The seventeenth sits in the `legacy-source:217:228` block of
+`docs/formalization/legacy/index.md`, which the entry on frozen historical text above already
+records; it is not parked twice.
 
-**Reason.** The migration map is keyed by these identifiers: each row states what one identifier
-owns, what it delivers, and the condition under which its output becomes authoritative, and the
-sentences around the map read the same keys. Removing them means choosing another index for the map
-and restating every ownership and acceptance condition in the new terms, which rewrites an accepted
-contract instead of correcting how that contract is documented. Documentation hygiene changes the
-wording of a claim and not what a contract accepts, so this population lies outside it.
+**Reason.** The hygiene pass over these pages corrected the sentences whose truth depended on an
+issue still being open and kept the pointers that record where a decision or its evidence lives.
+Each of the three surviving groups is kept for a reason of its own.
+
+The migration map is keyed by these identifiers: each row states what one identifier owns, what it
+delivers, and the condition under which its output becomes authoritative, and the sentences around
+the map read the same keys. Removing them means choosing another index for the map and restating
+every ownership and acceptance condition in the new terms, which rewrites an accepted contract
+instead of correcting how that contract is documented. Documentation hygiene changes the wording of
+a claim and not what a contract accepts, so this population lies outside it.
+
+The two lines outside the contract are provenance rather than obligation: one names the separate
+project under which formalization-status publication is tracked, the other names where the accepted
+publication run's cost evidence and permission audit are recorded. Neither becomes false when its
+issue closes, and deleting either leaves a claim on the page whose source can no longer be reached.
+
+The forbidden-phrase entry is a rejection rule and not a claim: it makes the retired
+interim-authority banner fail publication if it reappears on a generated page. Dead prose is a
+reason to stop writing a phrase, not a reason to stop rejecting it, so the entry stays for as long
+as that banner could be republished, and the identifier inside it is a fragment of the rejected
+string rather than a reference this repository makes.
 
 **Reopen condition.** The migration map is rewritten onto a different key, or it is retired because
-the migration it stages is finished. In either case the cross-reference and staged-migration
-sentences are re-keyed in the same change.
+the migration it stages is finished; in either case the cross-reference and staged-migration
+sentences are re-keyed in the same change. Independently, a documented decision removes the
+provenance pointers, in which case whatever they point at is relocated in the same change.
 
-**Cadence.** Re-measure with the commands above at every twenty-pull-request refactor cycle and
+**Cadence.** Re-measure with the command above at every twenty-pull-request refactor cycle and
 replace the figures here with the new ones.
 
 ## The printed constant of the double-commutator bound
@@ -219,10 +240,10 @@ Springer 2020, Problem 3.4.a, statement pp. 67-68, printed solution p. 501).
 **Measurement.** The places that record the regime as open:
 
 ```
-git grep -n -F '4r+2' a70632ea -- LatticeSystem docs tex
+git grep -n -F '4r+2' 080ebac2 -- LatticeSystem docs tex
 ```
 
-At revision `a70632ea`: 4 lines across 3 files.
+At revision `080ebac2`: 4 lines across 3 files.
 
 **Reason.** This repository has neither a proof of the printed constant in that regime nor a
 counterexample to it. What is settled is the constant as literally quantified, refuted by a witness
