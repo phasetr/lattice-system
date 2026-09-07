@@ -59,10 +59,10 @@ documentation, published pages, and the proof guide.
 the hyphen; a hyphen-only pattern reports a small spelling-dependent subset instead of the family:
 
 ```
-git grep -noiE '(ladder|sublattice|perron[-–]+frobenius|PF|MLM|saturated[- ]ladder|N[ée]el)[- ]route' a70632ea -- '*.lean' '*.md' '*.tex' | wc -l
+git grep -noiE '(ladder|sublattice|perron[-–]+frobenius|PF|MLM|saturated[- ]ladder|N[ée]el)[- ]route' 88fdbe7c -- '*.lean' '*.md' '*.tex' | wc -l
 ```
 
-At revision `a70632ea`: 46 phrases.
+At revision `88fdbe7c`: 44 phrases.
 
 **Reason.** These phrases name the mathematical strategy a declaration follows — the `sl₂` ladder,
 the Perron–Frobenius argument, the sublattice decomposition — and in one case the boundary of a
@@ -101,34 +101,81 @@ the references are updated with it in the same change.
 
 ## Frozen historical text in migrated pages
 
-**Target.** Sentences held inside `legacy-source` blocks on migrated pages, together with the
-version-1 wording and the interim-authority anchor on lines 28 and 30 of
-`docs/formalization/legacy/index.md`.
+**Target.** Sentences held inside `legacy-source` blocks or inside a `legacy-detail` long record
+on migrated pages, together with the version-1 catalogue wording and the interim-authority anchor
+inside the `legacy-source:217:228` block of `docs/formalization/legacy/index.md`.
 
-**Measurement.** List the block spans on a page and compare a candidate line number against them:
+**Measurement.** List the frozen spans on a page and compare a candidate line number against them:
 
 ```
-git grep -n 'legacy-source:start' a70632ea -- docs
+git grep -n 'legacy-source:start' 88fdbe7c -- docs
+git grep -n 'legacy-detail:start' 88fdbe7c -- docs
 ```
 
-At revision `a70632ea` this places 7 proof-route lines (the route-name command above, restricted to
-`docs`) and 4 review-narration lines (`git grep -niE 'codex' a70632ea -- docs`) inside such blocks,
-along with the two lines of `docs/formalization/legacy/index.md` named above.
+At revision `88fdbe7c` this places 7 proof-route lines (the route-name command above, restricted to
+`docs`) and 5 review-narration lines (`git grep -niE 'codex' 88fdbe7c -- docs`) inside frozen
+regions: the proof-route lines and 4 of the narration lines inside `legacy-source` blocks, the
+remaining narration line inside the `legacy-detail` long record of
+`docs/formalization/legacy/details/group-spin-models-part-04.md`, along with the two
+`docs/formalization/legacy/index.md` items named above.
 
 **Reason.** The text inside a `legacy-source` block is a verbatim snapshot of the page it was
 migrated from, held at byte parity against a fixed baseline revision by
-`scripts/check_docs_hierarchy.py`. Rewording it means amending that comparison and recomputing its
-pinned digests, which weakens an audited check in order to edit preserved text. The block records
-what its source said; it is not a current claim of this project.
+`scripts/check_docs_hierarchy.py`; a `legacy-detail` long record is a snapshot of the same kind,
+held by the same checker at whitespace-normalized exact parity. Rewording either one means
+amending that comparison and recomputing its pinned digests, which weakens an audited check in
+order to edit preserved text. The block records what its source said; it is not a current claim of
+this project.
 
-**Rule.** A frozen block is a historical snapshot, and a correction to it is written outside the
-block on the same page. The current claims of `docs/formalization/legacy/index.md` are in its
-banner above the block, not in the block.
+**Rule.** A frozen block or long record is a historical snapshot, and a correction to it is
+written outside it on the same page. The current claims of `docs/formalization/legacy/index.md`
+are in its banner above the block, not in the block.
 
 **Reopen condition.** The migrated catalogue stops being the authority for formalization status, at
-which point these blocks are no longer pinned and the pages are freely editable or removable.
+which point these blocks and records are no longer pinned and the pages are freely editable or
+removable.
 
 **Cadence.** None.
+
+## Prose line references in archival text and record keys
+
+**Target.** References of the form `line N` or `lines A-B` in prose under `docs/` and `tex/`, the
+form left over after citations of Lean source by file and line were converted to declaration names.
+
+**Measurement.** The pattern needs PCRE: `git grep -E` accepts `\b` and then matches nothing, so an
+ERE spelling of this command reports an empty population instead of failing.
+
+```
+git grep -P -n -I '\blines? [0-9]+' 88fdbe7c -- docs tex | wc -l
+git grep -P -o -I '\blines? [0-9]+' 88fdbe7c -- docs tex | wc -l
+```
+
+At revision `88fdbe7c`: 37 occurrences on 37 lines. Thirty are `## Record from former line N`
+headings on the detail pages under `docs/formalization/legacy/details/`. Five sit in machine-frozen
+regions: three inside `legacy-source` blocks held at byte parity, two of them on the Horsch–von der
+Linden pages and one on the Jordan–Wigner backbone page, and two inside a `legacy-detail` long
+record held at whitespace-normalized exact parity on
+`docs/formalization/legacy/details/group-spin-models-part-05.md`. One is a prose reference to a
+record key on `docs/formalization/legacy/details/group-spin-models-part-03.md`, and one is a
+labelled quotation of a frozen record in `docs/limitations/documented-axioms/chapter-07.md`.
+
+**Reason.** Frozen archival text and index keys are historical, so none of the thirty-seven is a
+citation this repository can rewrite. A record heading is the identifier of its record: the same
+number spells the record's `legacy-detail` marker, its `#record-N` anchor, and the catalogue row
+that points at it, so it keys the record rather than pointing into a file, and re-keying it breaks
+those links. The five frozen references sit in regions `scripts/check_docs_hierarchy.py` compares
+against the tracked baseline, so editing them fails that check; only one of the five refers to Lean
+source at all, the others being a range of printed proof lines, a line of a displayed equation, and
+two occurrences of a record's own superseded pointer. The last two reference frozen text rather
+than source: one names a record by its key, and the quotation states in the same sentence that the
+quoted number is superseded and gives the live file and declaration.
+
+**Reopen condition.** The parity mechanism changes so that archival rows may be rewritten, in which
+case the frozen references are rewritten with them; or the detail records stop being keyed by their
+former line number, in which case the headings are re-keyed and the two references to a key follow.
+
+**Cadence.** Re-measure with the commands above at every twenty-pull-request refactor cycle and
+replace the figures here with the new ones.
 
 ## The printed constant of the double-commutator bound
 
