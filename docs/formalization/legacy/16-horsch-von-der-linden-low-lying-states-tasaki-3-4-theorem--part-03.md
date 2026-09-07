@@ -344,7 +344,7 @@ instantiated by the fixture; its value `720` is satisfied a fortiori (`256 ≤ 7
 printed `4(2r+1)^d(4r+1)^d h₀o₀²L^d` exactly when `L² > (2r+1)(4r+1)`; at `r = 1` the smallest even
 `L` clearing `L² > 15` is `L = 4`, and the model above attains that collapsed value. Whether the
 printed constant holds for even `L ≥ 4r+2` is **open**: nothing here claims it either way; that
-regime is tracked as Issue #5440.
+regime is recorded as parked in `docs/limitations/documentation-hygiene-parked.md`.
 
 **Corrigendum (exponent typo, a separate defect).** The printed solution (printed p. 501, PDF
 p. 510) gives the intermediate `y`-count as `(2r+1)²` while giving the `z`-count as `(4r+1)^d`. The

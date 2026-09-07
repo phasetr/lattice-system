@@ -14,6 +14,7 @@ complete declaration register.
 - [Documented-axiom status and axiomatization policy](/lattice-system/limitations/documented-axioms/)
 - [Complete interim declaration catalogue](/lattice-system/formalization/legacy/)
 - [Formalization-status contract](/lattice-system/formalization-status-contract/)
+- [Parked documentation-hygiene decisions](/lattice-system/limitations/documentation-hygiene-parked/)
 
 The JSON catalogue is incomplete. The interim legacy catalogue pages carry the
 complete current declaration-level axiom occurrences, status, and capstone
