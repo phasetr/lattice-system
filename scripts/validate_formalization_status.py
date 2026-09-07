@@ -5716,8 +5716,8 @@ end LatticeSystem
     prototype_catalogue = catalogue_state == "prototype"
     html_comment_span = re.compile(r"<!--.*?(?:-->|\Z)", re.DOTALL)
     line_ending = re.compile(r"\r\n|\r")
-    code_fence_opener = re.compile(r"^ {0,3}(?:> ?)*(`{3,}|~{3,})")
-    code_fence_closer = re.compile(r"^ {0,3}(?:> ?)*(`{3,}|~{3,})[ \t]*$")
+    code_fence_opener = re.compile(r"^ {0,3}((?:> ?)*)(`{3,}|~{3,})")
+    code_fence_closer = re.compile(r"^ {0,3}((?:> ?)*)(`{3,}|~{3,})[ \t]*$")
 
     def source_lines(text: str) -> list[str]:
         """Split Markdown source on the line endings CommonMark recognises, and on those only."""
@@ -5727,27 +5727,40 @@ end LatticeSystem
         """Blank the lines a Markdown reader hides, keeping every line at its own index.
 
         The indices hold because the comment substitution puts back one newline for every newline
-        it swallows and both this function and source_lines break lines only where CommonMark
-        does, unlike str.splitlines(), which also breaks on form feeds and other Unicode
-        separators that a Markdown reader keeps inside the line.
+        it swallows and the lines are broken only where CommonMark breaks them, unlike
+        str.splitlines(), which also breaks on form feeds and other Unicode separators that a
+        Markdown reader keeps inside the line: source_lines normalises the endings once, and the
+        split below runs on text carrying no other ending.
+
+        A fence closes only on a closer standing at the blockquote depth of its opener, counted in
+        `>` markers so that `>` and `> ` are one level, because CommonMark reads a deeper prefix as
+        content of the open block and ends the container at a shallower one. The container's end
+        is taken as leaving the fence open to the end of the text, which is the direction that
+        reports a banner behind it as hidden rather than as published prose.
         """
-        normalized = line_ending.sub("\n", text)
         uncommented = html_comment_span.sub(
-            lambda span: "\n" * span.group(0).count("\n"), normalized
+            lambda span: "\n" * span.group(0).count("\n"), "\n".join(source_lines(text))
         )
         fence: str | None = None
+        fence_depth = 0
         lines: list[str] = []
-        for line in source_lines(uncommented):
+        for line in uncommented.split("\n"):
             if fence is None:
                 opener = code_fence_opener.match(line)
-                marker = opener.group(1) if opener is not None else None
-                lines.append("" if marker is not None else line)
-                fence = marker
+                lines.append(line if opener is None else "")
+                if opener is not None:
+                    fence, fence_depth = opener.group(2), opener.group(1).count(">")
                 continue
             lines.append("")
             closer = code_fence_closer.match(line)
-            marker = closer.group(1) if closer is not None else None
-            if marker is not None and marker[0] == fence[0] and len(marker) >= len(fence):
+            if closer is None:
+                continue
+            marker = closer.group(2)
+            if (
+                closer.group(1).count(">") == fence_depth
+                and marker[0] == fence[0]
+                and len(marker) >= len(fence)
+            ):
                 fence = None
         return lines
 
@@ -5808,43 +5821,44 @@ end LatticeSystem
     # `**Interim authority.**` opener the runs key on, teach `interim_authority_runs` the new one
     # in the same change) rather than only flip the manifest. A catalogue state this gate cannot
     # read takes that forbidding direction too, so a missing or unparsable manifest fails here
-    # instead of switching the controls off. The quotes are unwrapped first, so reflowing a
-    # banner is not treated as drift. HTML-comment spans and fenced code regions are blanked,
-    # line numbering preserved, before the banners are located, so a banner that survives only
-    # inside one of them is read as missing rather than as published prose. A fence's two ends
-    # are matched by separate patterns because CommonMark lets only an opening fence carry an
-    # info string: `code_fence_closer` demands whitespace to the end of the line after a run of
-    # the opener's own fence character at least as long as it, so neither an info-string line
-    # (```md inside a ```text block) nor a shorter run reopens the page to the gate while the
-    # rendered block stays open. Both ends split lines through `source_lines`, which breaks only
-    # on CommonMark's line endings, so the blanked text and `legacy_index_lines` stay aligned
-    # index for index even on a page carrying a form feed or another separator that
-    # str.splitlines() would break on but a Markdown reader keeps inside the line.
+    # instead of switching the controls off.
+    # Scanner scope: this gate reads source Markdown with a CommonMark-approximating scanner, not
+    # the rendered page. Handled, each measured: HTML comments; fenced code, blanked in place with
+    # line numbering preserved (backtick and tilde markers; a closer at least as long as its
+    # opener, since a shorter run leaves the rendered block open; the opener's own container
+    # prefix, because CommonMark closes a fence only inside the container it opened in, so a
+    # blockquoted line cannot close an unquoted fence nor an unquoted line a blockquoted one, and
+    # a fence whose closer never arrives at the opener's blockquote depth stays open to the end of
+    # the page, which is the fail-closed direction; and whitespace-only closers, since only an
+    # opening fence may carry an info string, so a ```md line inside a ```text block is content);
+    # indented code, through `interim_authority_runs` requiring the blockquote marker in column 0,
+    # which also catches a reference-style `[//]: # (...)` comment; and wrapped lines, since the
+    # quotes are unwrapped before the sentence pins run, so reflowing a banner is not treated as
+    # drift. A banner surviving only inside a handled hidden region is therefore read as missing
+    # rather than as published prose, and the blanked text stays aligned index for index with
+    # `legacy_index_lines` because both split through `source_lines`, which breaks only on
+    # CommonMark's line endings and not on a form feed or another separator str.splitlines()
+    # breaks on but a Markdown reader keeps inside the line. Not handled, documented: raw HTML
+    # containers (`<div hidden>`, `<details>`, `<span>`, `<script>`), CSS (`style="display:none"`
+    # on such a wrapper, or a stylesheet rule), Liquid tags (`{% comment %}`, which Jekyll strips
+    # before Markdown runs at all), and any other construct — a banner hidden by one of those
+    # still counts here as published prose. The rendered page, not this scan, is authoritative,
+    # and it is checked only by check_generated_site.AUTHORITATIVE_FORBIDDEN_PHRASES, a denylist
+    # inert while `catalog_state` is `prototype` and therefore biting only at the cutover.
     # A page whose bytes cannot be read as UTF-8 text (undecodable bytes, or a directory or an
     # unreadable mode behind a `*.md` name) is reported as a failure naming the error rather than
     # aborting the run with a traceback; the live gate above reads the index page before this loop,
-    # so a bad byte there still aborts. Documented limitations: the controls read the
-    # interim-authority blockquotes alone, so the retired authority condition restated as prose
-    # elsewhere on a gated page passes; both pins are literal, so a banner keeping the literals
-    # while negating them ("no longer still a non-authoritative prototype") passes; the blanking
-    # approximates two hiding shapes instead of parsing Markdown, so every other way of hiding a
-    # banner still counts as published prose and only reading the rendered page would close that
-    # class. The shapes measured as not covered, each of which keeps this gate at exit 0 while the
-    # rendered page shows no banner: a raw HTML container (`<div hidden>`, or a `<details>` the
-    # reader has to expand), a CSS one (`style="display:none"` on such a wrapper, or a stylesheet
-    # rule hiding it), and a Liquid `{% comment %}`, which Jekyll strips before Markdown runs at
-    # all. Two neighbouring shapes are covered, though by `interim_authority_runs` rather than by
-    # the blanking, because the run detector requires the blockquote marker in column 0 and both
-    # have to move it: a 4-space-indented code block and a reference-style `[//]: # (...)` comment
-    # are each reported as a missing banner (measured). Continuing the limitations: the index page
-    # publishes exactly that condition further down, inside a `legacy-source` span whose text
-    # check_docs_hierarchy pins against the historical docs/index.md prose, so it is a known frozen
-    # residual that only an audited moved-prose rewrite can change; and the same clause also
+    # so a bad byte there still aborts. Documented limitations of the pins themselves: the controls
+    # read the interim-authority blockquotes alone, so the retired authority condition restated as
+    # prose elsewhere on a gated page passes; and both pins are literal, so a banner keeping the
+    # literals while negating them ("no longer still a non-authoritative prototype") passes. The
+    # index page publishes exactly that condition further down, inside a `legacy-source` span whose
+    # text check_docs_hierarchy pins against the historical docs/index.md prose, so it is a known
+    # frozen residual that only an audited moved-prose rewrite can change; and the same clause also
     # appears on 24 prototype-navigation pages under docs/formalization/ outside legacy/ and at 4
     # wrapped prose sites elsewhere under docs/, none of which this gate reads (the `details/`
-    # banner claims no authority and is outside the glob for the same reason). Those sites are
-    # covered only by check_generated_site.AUTHORITATIVE_FORBIDDEN_PHRASES, which is inert while
-    # `catalog_state` is `prototype` and therefore bites only at the cutover. The mutants below run
+    # banner claims no authority and is outside the glob for the same reason), all of them covered
+    # only by that same denylist. The mutants below run
     # through the same gate against a scratch tree with a sink of their own that has to come back
     # filled, so neutering the gate or dropping the sink extension fails here, and unwiring it from
     # the live tree fails at the ledger check below, instead of passing silently; the ledger pins
