@@ -177,6 +177,39 @@ former line number, in which case the headings are re-keyed and the two referenc
 **Cadence.** Re-measure with the commands above at every twenty-pull-request refactor cycle and
 replace the figures here with the new ones.
 
+## Issue identifiers in the formalization-status contract
+
+**Target.** Lines of `docs/formalization-status-contract.md` whose key is a governance issue
+identifier: the cross-reference sentence in the machine-artifact section, the rows of the migration
+map, and the staged-migration sentences beneath it. Every issue those lines name is closed.
+
+**Measurement.** The issue-keyed surface of the contract, then the lines naming the cutover issue:
+
+```
+git grep -n -P '#5228|#5229|#5227' 08d11e0f -- docs/formalization-status-contract.md
+git grep -n -P '#5228' 08d11e0f -- docs/formalization-status-contract.md
+```
+
+At revision `08d11e0f`: 18 and 8 lines. Three of the eight are the structural ones parked here —
+the cross-reference sentence in the machine-artifact section, the migration-map row whose first
+cell is the identifier, and the staged-migration sentence beneath the map. The other five are
+ordinary prose that the hygiene pass on that page rewrites, so the two counts become thirteen and
+three once that pass lands.
+
+**Reason.** The migration map is keyed by these identifiers: each row states what one identifier
+owns, what it delivers, and the condition under which its output becomes authoritative, and the
+sentences around the map read the same keys. Removing them means choosing another index for the map
+and restating every ownership and acceptance condition in the new terms, which rewrites an accepted
+contract instead of correcting how that contract is documented. Documentation hygiene changes the
+wording of a claim and not what a contract accepts, so this population lies outside it.
+
+**Reopen condition.** The migration map is rewritten onto a different key, or it is retired because
+the migration it stages is finished. In either case the cross-reference and staged-migration
+sentences are re-keyed in the same change.
+
+**Cadence.** Re-measure with the commands above at every twenty-pull-request refactor cycle and
+replace the figures here with the new ones.
+
 ## The printed constant of the double-commutator bound
 
 **Target.** Whether the printed constant `4 (2r+1)^d (4r+1)^d h₀ o₀² L^d` of eq. (3.4.13) holds for
