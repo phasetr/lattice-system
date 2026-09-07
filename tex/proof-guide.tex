@@ -8765,7 +8765,7 @@ conjuncts for \texttt{symmetricRepulsiveHubbardHamiltonian}, for
 symmetric-form statement at a constant $U$ to the uniform-interaction
 Hamiltonian \texttt{repulsiveHubbardHamiltonian}, via
 \texttt{symmetricRepulsiveHubbardHamiltonian\_groundSubmodule\_eq\_uniform}
-(\texttt{LiebRepulsiveBalancedGround.lean:328}, an energy shift).
+(\texttt{LiebRepulsiveBalancedGround.lean}, an energy shift).
 \textbf{Debt (new, both reference~0 within this PR, staged for PR-15c's
 capstone):} \texttt{liebRepulsive\_symmetric\_halfFilling} and
 \texttt{liebRepulsive\_uniform\_of\_symmetric} are not yet consumed; PR-15c
@@ -9370,7 +9370,7 @@ inline adjoint block and supply this file's own expectation-distribution step;
 tower-exponent bound; all three consumed immediately, so none is new debt.
 \textbf{Debt discharged (by PR-5).} \texttt{fermionTotalSpinPlusMinus\_eq\_sum} is
 consumed in-file by \texttt{shiba\_spinPlusMinus\_expectation\_eq\_signed\_sum}
-(\texttt{LiebShenQiuPairAlgebra.lean}:106); the remaining six declarations
+(\texttt{Hubbard/LiebShenQiuPairAlgebra.lean}); the remaining six declarations
 (\texttt{totalPairCreationOperator\_eq\_conjTranspose},
 \texttt{totalPairCorrelationOperator\_eq\_sum},
 \texttt{shiba\_spinPlusMinus\_expectation\_eq\_signed\_sum},
@@ -15901,7 +15901,7 @@ $H=\mathtt{ringCouplingSym}\cdot\hat S_x\!\cdot\!\hat S_y$ gives
 $|M_{\sigma\tau}|\le(\mathtt{ringCouplingSym}\,x\,y).\mathrm{re}$ (which is $1$ for $L\ge 3$ and $2$
 for $L=2$), so a single-$\pm$ row's off-diagonal sum is at most $2$.
 
-A structural observation (from the Codex cross-check) sharpens the sector analysis: the cyclic
+A structural observation sharpens the sector analysis: the cyclic
 complete-hidden-AFM constraint (consecutive $\pm$ spins alternate sign around the ring)
 \emph{forbids} an odd number of $\pm$ spins greater than one, since an odd cycle cannot carry a
 consistent alternating $+,-,+,\dots$ labelling. Hence the only sectors of $H_{\mathrm{HAF}}$ are the
@@ -17453,8 +17453,8 @@ continuum limit and lattice-QCD-style formalisations, both of which
 are defined as limits $a \to 0$ of families of finite-spacing lattice
 systems. The gap between the current finite-volume matrix framework
 and what the continuum limit actually requires was surveyed during
-Phase A scoping (consulted codex twice on scope and design choices)
-and proposes the following four phases (mirrored on the project
+Phase A scoping, which proposes the following four phases
+(mirrored on the project
 page \href{https://phasetr.github.io/lattice-system/\#continuum-limit-roadmap}%
 {\textsl{Continuum-limit roadmap}}):
 
@@ -17474,8 +17474,7 @@ $a_n \to 0$, rescaling of coupling constants
 $J_n = \hat h \cdot a_n^{-2+d}$, and lattice-point embeddings in
 $\mathbb{R}^d$.
 \item[Phase C (deferred).] Operator-valued distribution / GNS /
-Hilbert-space infrastructure. Per codex consultation (2026-04-22),
-we do \emph{not} generalise
+Hilbert-space infrastructure. We do \emph{not} generalise
 $\texttt{ManyBodyOp}\,\Lambda = \texttt{Matrix}\,\_\,\_\,\mathbb{C}$
 to a type class preemptively: existing proofs depend on
 Matrix-specific API (\texttt{conjTranspose}, \texttt{exp},
@@ -18125,11 +18124,10 @@ the chronicle was removed.
                 coupling (sound Perron--Frobenius route, option (a))}
 \label{subsec:tasaki-2-5-theorem-2-3-toy-done}
 
-After the earlier saturated-ladder route was found unsound and removed,
-the final statement \texttt{tasaki\_2\_5\_theorem\_2\_3} was closed for
+The statement \texttt{tasaki\_2\_5\_theorem\_2\_3} is proved for
 the standard bipartite antiferromagnetic coupling
 \(J=\texttt{bipartiteCoupling}\,A\) (canonical orientation
-\(|\bar A|\le|A|\)) along the sound Perron--Frobenius route.  The proof
+\(|\bar A|\le|A|\)) by the Perron--Frobenius argument.  The proof
 \texttt{tasaki\_2\_5\_theorem\_2\_3\_bipartiteToy} is sorry-free
 (\texttt{\#print axioms} reports only \texttt{propext},
 \texttt{Classical.choice}, \texttt{Quot.sound}).  Its four tiers are:
@@ -18182,8 +18180,8 @@ monotonicity \texttt{hOutside} for an arbitrary bipartite \(J\) --- the
 single remaining hypothesis of the minimality engine.  The symmetric
 orientation \(|A|<|\bar A|\) is the mirror image.
 
-\textbf{General-\(J\) \texttt{hOutside} route (in progress).} Codex-validated,
-this needs only the SU(2) \emph{inward ladder}, not reflection positivity:
+\textbf{General-\(J\) \texttt{hOutside} route (in progress).}
+This needs only the SU(2) \emph{inward ladder}, not reflection positivity:
 an eigenvector in a non-admissible sector is moved to the admissible band
 edge by \(\hat S^\mp_{\mathrm{tot}}\) (which commutes with \(H\), so the
 energy is preserved), where the Collatz--Wielandt band-edge bound gives

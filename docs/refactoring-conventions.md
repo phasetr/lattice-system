@@ -300,11 +300,38 @@ For every PR adding `def` / `theorem` / `lemma`, the same PR must:
 
 This is enforced by review and not by CI.
 
+Prose in `docs/` and `tex/proof-guide.tex` cites Lean source by declaration, never by line
+number: `` `Path/To/File.lean` (`declName`) ``. The path is repo-relative, and the rule on it is a
+lower bound: it must include at least the shortest suffix that is unique among tracked files, and
+one further segment when that shortest suffix would be a bare generic basename such as
+`Hamiltonian.lean`. Any longer path also complies, including the full `LatticeSystem/`-prefixed
+one; the file alone suffices when the declaration name already stands beside the citation.
+A target with no declaration name — a `/-! ## … -/` section, an anonymous `example`, or a doc
+comment — is named by its section title, its pin label, or the declaration whose doc comment it
+is; where the module itself is the subject, the file's own module doc comment is the target and
+the file name alone names it. In TeX the same form is `\texttt{File.lean}
+(\texttt{decl\_name})`, with underscores escaped as `\_`.
+
+Line references inside machine-frozen archival material are historical snapshots and are exempt:
+the `<!-- legacy-source:start:… -->` blocks of `docs/formalization/legacy/` are held by
+`scripts/check_docs_hierarchy.py` at exact row parity with the audited catalogue transform
+`approved_changes(catalogue_baseline_text())` of the baseline `docs/index.md`, and the
+`<!-- legacy-detail:start:… -->` records under `docs/formalization/legacy/details/`, reached from
+the `record-<n>` headings keyed by their former baseline line number, are held at
+whitespace-normalized parity with the same rows; a citation frozen there records the tree as it
+stood at the migration baseline, so rewriting it is an edit to a frozen record and not a citation
+fix.
+
 ### Review check — public doc sync
 
 - [ ] The authoritative legacy catalogue page is updated (or the PR explicitly notes "no
   user-visible API").
 - [ ] References to Tasaki / mathlib added where applicable.
+- [ ] Every Lean citation the PR writes or edits names a declaration (or the section title
+  / pin label / owning declaration / module doc comment where there is none) rather than a
+  line number, and its path includes at least the suffix that makes it unique among tracked
+  files, plus one further segment where that suffix would be a bare generic basename; a
+  longer path, up to the full `LatticeSystem/`-prefixed one, also passes.
 
 ## 6b. Verifying push before merge (incident-driven)
 

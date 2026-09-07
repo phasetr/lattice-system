@@ -14,8 +14,7 @@ permalink: /limitations/documented-axioms/chapter-11/
 
 **Tasaki §11.2.2, Theorem 11.8** (p. 387) is a **documented axiom**,
 `nagaoka_theorem_11_8`
-(`LatticeSystem/Fermion/JordanWigner/Hubbard/NagaokaConnectivityClassification.lean`,
-declaration line 60).
+(`LatticeSystem/Fermion/JordanWigner/Hubbard/NagaokaConnectivityClassification.lean`).
 
 - **Proved (axiom-free):** Theorem 11.7 (`nagaoka_theorem_11_7`,
   `NagaokaConnectivity.lean`) is `sorry`-free and does not depend on this
@@ -46,8 +45,7 @@ declaration line 60).
 
 **Tasaki §11.3.2, Theorem 11.13** is a **documented axiom**,
 `mielke_theorem_11_13`
-(`LatticeSystem/Fermion/JordanWigner/Hubbard/MielkeTheorems.lean`,
-declaration line 104).
+(`LatticeSystem/Fermion/JordanWigner/Hubbard/MielkeTheorems.lean`).
 
 - **Proved (axiom-free):** Theorem 11.12 (the flat-band dimension count),
   which Tasaki likewise defers to §11.3.3, is now proved in
@@ -78,8 +76,7 @@ declaration line 104).
 
 **Tasaki §11.4.2, Theorem 11.18** (eqs. (11.4.27)-(11.4.29), pp. 422-423) is a
 **documented axiom**, `nonsingular_theorem_11_18`
-(`LatticeSystem/Fermion/JordanWigner/Hubbard/NonsingularLocalStability.lean`,
-declaration line 49).
+(`LatticeSystem/Fermion/JordanWigner/Hubbard/NonsingularLocalStability.lean`).
 
 - **Proved (axiom-free):** the non-singular hopping regularity predicate
   `IsNonsingularHopping` and the Hamiltonian `nonsingularHubbardHamiltonian`
@@ -110,8 +107,7 @@ declaration line 49).
 
 **Tasaki §11.4.2, Theorem 11.19** (eqs. (11.4.31)-(11.4.35), p. 424) is
 a **documented axiom**, `nonsingular_theorem_11_19`
-(`LatticeSystem/Fermion/JordanWigner/Hubbard/SpinWaveExcitation.lean`,
-declaration line 64).
+(`LatticeSystem/Fermion/JordanWigner/Hubbard/SpinWaveExcitation.lean`).
 
 - **Proved (axiom-free):** the spin-wave excitation energy `spinWaveEnergy`
   and the crystal-momentum phase `momentumPhase` it quantifies over are real
@@ -141,8 +137,7 @@ declaration line 64).
 **Tasaki §11.4.3, Lemma 11.22 and Lemma 11.23** (eqs. (11.4.46)-(11.4.50),
 pp. 429-435) are two **documented axioms** in
 `LatticeSystem/Fermion/JordanWigner/Hubbard/NonsingularLocalHamiltonian.lean`:
-`nonsingular_lemma_11_22` (declaration line 129) and
-`nonsingular_lemma_11_23` (declaration line 141).
+`nonsingular_lemma_11_22` and `nonsingular_lemma_11_23`.
 
 - **Proved (axiom-free):** the local Hamiltonian `nonsingularLocalHamiltonian`
   (eq. (11.4.48)) is a real definition, and the fact that it annihilates the
@@ -184,9 +179,9 @@ pp. 429-435) are two **documented axioms** in
 
 ## Lemma 11.25 (Hubbard–t-J equivalence in the strong-coupling limit)
 
-**Tasaki §11.5.2 ("Rigorous Results"), Lemma 11.25** (p. 448) is a **documented axiom**, `lemma_11_25`
-(`LatticeSystem/Fermion/JordanWigner/Hubbard/MetallicFerroModel.lean`,
-declaration line 151).
+**Tasaki §11.5.2 ("Rigorous Results"), Lemma 11.25** (p. 448) is a
+**documented axiom**, `lemma_11_25`
+(`LatticeSystem/Fermion/JordanWigner/Hubbard/MetallicFerroModel.lean`).
 
 - **Proved (axiom-free):** the `d = 1` decorated Hubbard model
   `decHubbardHamiltonian` (eqs. (11.5.13)-(11.5.14)) and the ferromagnetic
@@ -220,10 +215,9 @@ declaration line 151).
 ## Theorem 11.27 (Tanaka–Tasaki metallic ferromagnetism)
 
 **Tasaki §11.5.2 ("Rigorous Results"), Theorem 11.27** (statement p. 451; eqs.
-(11.5.19)-(11.5.24) span pp. 450-451) is a
-**documented axiom**, `theorem_11_27`
-(`LatticeSystem/Fermion/JordanWigner/Hubbard/TanakaTasakiModel.lean`,
-declaration line 194).
+(11.5.19)-(11.5.24) span pp. 450-451) is a **documented axiom**,
+`theorem_11_27`
+(`LatticeSystem/Fermion/JordanWigner/Hubbard/TanakaTasakiModel.lean`).
 
 - **Proved (axiom-free):** the `d = 1` Tanaka–Tasaki model's special
   single-particle states (`â_p`, `b̂_p`, `d̂_p`, `d̂_{(u,ζ)}`, eqs.

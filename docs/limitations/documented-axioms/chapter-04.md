@@ -14,19 +14,19 @@ permalink: /limitations/documented-axioms/chapter-04/
 
 **Tasaki §4.1, Theorem 4.2** (eqs. (4.1.9)-(4.1.10), pp. 76-77) rests on one
 **documented axiom**, `shastryEnergyGain`
-(`LatticeSystem/Quantum/SpinS/ShastryNoSSBReduction.lean`, declaration line 172).
+(`LatticeSystem/Quantum/SpinS/ShastryNoSSBReduction.lean`).
 
-- **Proved (axiom-free):** the whole reduction chain that consumes it. For
-  Tasaki's field family `Ĥ_h = Ĥ − h Ô_L` (eq. (3.4.19), p. 69) the abstract
-  ground energy `chainGroundEnergy` is even (`chainGroundEnergy_neg`), concave
+- **Proved (axiom-free):** the whole reduction chain that consumes it. For Tasaki's
+  field family `Ĥ_h = Ĥ − h Ô_L` (eq. (3.4.19), p. 69) the abstract ground energy
+  `chainGroundEnergy` is even (`chainGroundEnergy_neg`), concave
   (`chainGroundEnergy_concave`), maximised at `h = 0`
   (`chainGroundEnergy_le_zero_field`) and obeys the sandwich
   `0 ≤ E(0) − E(h) ≤ h⟨Ô⟩_h ≤ E(0) − E(2h)` (`chainGroundState_order_mean_sandwich`)
   — all in `ReversalSymmetricGroundEnergy.lean`. The ring instance adds
   `staggeredFieldChainHamiltonianS_isHermitian` and `Θ Ĥ_h Θ = Ĥ_{−h}`
-  (`staggeredFieldChainHamiltonianS_conj_manyBodyReversalS`). Feeding the axiom
-  into `shastry_no_symmetry_breaking_1d_of_energy_gain` (`ShastryNoSSBReduction.lean`, line
-  196) makes `shastry_no_symmetry_breaking_1d` (same file, line 381) a `theorem`, statement
+  (`staggeredFieldChainHamiltonianS_conj_manyBodyReversalS`). Feeding the axiom into
+  `shastry_no_symmetry_breaking_1d_of_energy_gain` (`ShastryNoSSBReduction.lean`)
+  makes `shastry_no_symmetry_breaking_1d` (same file) a `theorem`, statement
   unchanged.
 - **This records where the axiom now sits; it is not a discharge and not a policy change.**
   `#print axioms shastry_no_symmetry_breaking_1d` names `shastryEnergyGain`, which is
@@ -191,13 +191,14 @@ concentration mechanism underlying Tasaki §4.2.2 Lemma 4.15 (eq. (4.2.38)) and
 the still-open Conjecture 4.12 that Theorem 4.11 (eq. (4.2.23)) would need for
 an unconditional equality:
 
-- `mStar_eq_phat_ratio_limit` (`LatticeSystem/Quantum/SpinS/OrderOperatorAlgebra.lean`,
-  declaration line 812) — the `p̂`/`U(1)` mirror.
-- `orderSqMoment_ratio_le_mStarSq` (`LatticeSystem/Quantum/SpinS/AndersonTowerOrderSqConcentration.lean`,
-  declaration line 56) — the `ô²`/`SU(2)` mirror, conditional on the explicit
-  hypothesis `IsConjecture412Equality` (never asserted true).
-- `orderSqMoment_ratio_le_mStarSq_family` (same file, declaration line 111) —
-  the `n = 0` instance of the same mirror, `hFamily`-pinned and
+- `mStar_eq_phat_ratio_limit`
+  (`LatticeSystem/Quantum/SpinS/OrderOperatorAlgebra.lean`) — the `p̂`/`U(1)` mirror.
+- `orderSqMoment_ratio_le_mStarSq`
+  (`LatticeSystem/Quantum/SpinS/AndersonTowerOrderSqConcentration.lean`) —
+  the `ô²`/`SU(2)` mirror, conditional on the explicit hypothesis
+  `IsConjecture412Equality` (never asserted true).
+- `orderSqMoment_ratio_le_mStarSq_family` (same file) — the `n = 0`
+  instance of the same mirror, `hFamily`-pinned and
   `Conjecture 4.12`-independent (this is the axiom Theorem 4.11's proved
   "easy half" consumes).
 
@@ -250,8 +251,7 @@ an unconditional equality:
 **Tasaki §4.3, Theorem 4.20** (eqs. (4.3.7)-(4.3.10), around p. 115) is carried
 by two **documented axioms** in
 `LatticeSystem/Quantum/SpinS/InfiniteVolumeGroundState.lean`:
-`theorem_4_20_omega0` (declaration line 210) and `theorem_4_20_omegaN`
-(declaration line 223).
+`theorem_4_20_omega0` and `theorem_4_20_omegaN`.
 
 - **Proved (axiom-free):** the finite-volume ground-state machinery these
   states are the `L↑∞` limit of, and the surrounding
@@ -260,7 +260,7 @@ by two **documented axioms** in
 - **What the axiom statements literally assert:** `theorem_4_20_omega0`
   states — conditional on `εGS` being the genuine ground-state energy
   density of the model (`IsGroundStateEnergyDensity`,
-  `InfiniteVolumeGroundState.lean:188`, itself an uninterpreted documented
+  `InfiniteVolumeGroundState.lean`, itself an uninterpreted documented
   predicate) — that there exists a state `ω₀`
   (`WeakDual ℂ A`) that is an infinite-volume ground state at energy density
   `εGS` (`IsInfiniteVolumeGroundState`) with vanishing single-site
@@ -270,7 +270,7 @@ by two **documented axioms** in
   construction informally, but only the existence and the two stated
   properties are part of the formal statement. `theorem_4_20_omegaN` states
   that, additionally assuming staggered long-range order with parameter
-  `mStar > 0` (`HasStaggeredLRO`, `InfiniteVolumeGroundState.lean:198`, also
+  `mStar > 0` (`HasStaggeredLRO`, `InfiniteVolumeGroundState.lean`, also
   an uninterpreted documented predicate), for every unit direction `n` there
   exists a state `ω_n`,
   likewise an infinite-volume ground state at energy density `εGS`, with
@@ -303,15 +303,16 @@ concrete finite-volume antiferromagnetic Heisenberg model on the hypercubic
 boxes `Λ_n ⊂ ℤᵈ` to the abstract §4.3 infinite-volume system:
 
 - `boxGroundEnergyDensityS_tendsto`
-  (`LatticeSystem/Quantum/SpinS/HypercubicBoxModel.lean`, declaration
-  line 151) — existence of the `n → ∞` limit of the box ground-state energy
-  density (Tasaki eq. (4.3.4)).
-- `IsAFMThermodynamicLimit` (`LatticeSystem/Quantum/SpinS/HypercubicBoxThermodynamicLimit.lean`,
-  declaration line 66) — the uninterpreted predicate "`S` is the `L↑∞` limit
-  of the box AFM model", kept conditional rather than a construction.
-- `afmThermodynamicLimit_energyDensity` (same file, declaration line 76) —
-  under `IsAFMThermodynamicLimit`, the abstract ground-state energy density
-  of `S` equals the concrete finite-box limit (Tasaki eq. (4.3.4)).
+  (`LatticeSystem/Quantum/SpinS/HypercubicBoxModel.lean`) — existence of
+  the `n → ∞` limit of the box ground-state energy density (Tasaki eq.
+  (4.3.4)).
+- `IsAFMThermodynamicLimit`
+  (`LatticeSystem/Quantum/SpinS/HypercubicBoxThermodynamicLimit.lean`) —
+  the uninterpreted predicate "`S` is the `L↑∞` limit of the box AFM
+  model", kept conditional rather than a construction.
+- `afmThermodynamicLimit_energyDensity` (same file) — under
+  `IsAFMThermodynamicLimit`, the abstract ground-state energy density of
+  `S` equals the concrete finite-box limit (Tasaki eq. (4.3.4)).
 
 - **Proved (axiom-free):** the box AFM Hamiltonian
   `boxAFMHeisenbergHamiltonianS` and the box ground-energy-density observable
@@ -356,8 +357,8 @@ boxes `Λ_n ⊂ ℤᵈ` to the abstract §4.3 infinite-volume system:
 **Tasaki §4.4, Theorem 4.22** (eqs. (4.4.5)-(4.4.6), around p. 119, with
 footnote 41) is carried by two **documented axioms** in
 `LatticeSystem/Quantum/SpinS/HeisenbergEquilibrium.lean`:
-`tasaki_4_22_magnetization_vanishes` (declaration line 152) and
-`tasaki_4_22_exponential_clustering` (declaration line 168).
+`tasaki_4_22_magnetization_vanishes` and
+`tasaki_4_22_exponential_clustering`.
 
 - **Proved (axiom-free):** the finite- and infinite-volume magnetization and
   two-spin correlation observables (`finiteVolMagnetizationS`,
@@ -397,8 +398,7 @@ footnote 41) is carried by two **documented axioms** in
 
 **Tasaki §4.4, Theorem 4.23** (eqs. (4.4.7)-(4.4.8), around pp. 119-120) is a
 **documented axiom**, `tasaki_4_23_high_temperature_disorder`
-(`LatticeSystem/Quantum/SpinS/HeisenbergEquilibrium.lean`, declaration
-line 192).
+(`LatticeSystem/Quantum/SpinS/HeisenbergEquilibrium.lean`).
 
 - **Proved (axiom-free):** as with Theorem 4.22, the finite-volume
   magnetization and infinite-volume correlation observables the statement
@@ -430,8 +430,7 @@ line 192).
 
 **Tasaki §4.4, Theorem 4.24** (eq. (4.4.22), around p. 124, with footnote 48)
 is a **documented axiom**, `improved_hohenberg_mermin_wagner`
-(`LatticeSystem/Quantum/SpinS/HeisenbergEquilibrium.lean`, declaration
-line 238).
+(`LatticeSystem/Quantum/SpinS/HeisenbergEquilibrium.lean`).
 
 - **Proved (axiom-free):** the generalized field Hamiltonian
   `generalizedFieldHamiltonianS` (eq. (4.4.21)) and the finite-volume
@@ -462,8 +461,7 @@ line 238).
 
 **Tasaki §4.4, Theorem 4.25** (eqs. (4.4.23)-(4.4.24), around p. 125) is a
 **documented axiom**, `mcbryan_spencer_koma_tasaki`
-(`LatticeSystem/Quantum/SpinS/HeisenbergEquilibrium.lean`, declaration
-line 262).
+(`LatticeSystem/Quantum/SpinS/HeisenbergEquilibrium.lean`).
 
 - **Proved (axiom-free):** the finite-volume spin correlation observable
   `finiteVolSpinCorrS` it quantifies over is a real definition.
@@ -490,8 +488,7 @@ line 262).
 
 **Tasaki §4.4, Theorem 4.26** (eq. (4.4.52), around p. 130) is a
 **documented axiom**, `theorem_4_26_staggered_lro`
-(`LatticeSystem/Quantum/SpinS/HeisenbergEquilibrium.lean`, declaration
-line 296).
+(`LatticeSystem/Quantum/SpinS/HeisenbergEquilibrium.lean`).
 
 - **Proved (axiom-free):** the per-axis staggered order operator
   `staggeredOrderOpAxisS` it quantifies over is a real definition.
@@ -522,8 +519,7 @@ line 296).
 
 **Tasaki §4.4, Theorem 4.27** (eq. (4.4.53), around p. 131) is a
 **documented axiom**, `theorem_4_27_griffiths_koma_tasaki_ssb`
-(`LatticeSystem/Quantum/SpinS/HeisenbergEquilibrium.lean`, declaration
-line 319).
+(`LatticeSystem/Quantum/SpinS/HeisenbergEquilibrium.lean`).
 
 - **Proved (axiom-free):** as with Theorem 4.26, the staggered order and
   field-dependent thermal-average observables it quantifies over are real

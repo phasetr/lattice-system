@@ -3,9 +3,8 @@ import LatticeSystem.Fermion.JordanWigner.CAR.StringFactorizationCore
 /-!
 # CAR algebra — JW string factorisation, commutativity, and zero-site general CAR
 
-Extracted from `JordanWigner/CAR.lean` (codex audit Item 10). This sub-file
-contains the general JW string machinery needed to prove cross-site CAR for
-arbitrary site pairs:
+This sub-file contains the general JW string machinery needed to prove
+cross-site CAR for arbitrary site pairs:
 
 1. **JW string factorisation** — extracting an interior `σ^z_i` factor from
    `jwString N j` when `i.val < j.val`, via the private `jwStringExceptAt`
@@ -18,8 +17,6 @@ arbitrary site pairs:
 
 The fully general `i < j` cross-site CAR built on top of this lives in the
 sibling sub-file `CrossSite.lean`.
-
-(Codex audit Item 10, split of `JordanWigner/CAR.lean`, tracked in #390.)
 -/
 
 namespace LatticeSystem.Fermion

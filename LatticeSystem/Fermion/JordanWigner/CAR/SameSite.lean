@@ -4,8 +4,7 @@ import LatticeSystem.Fermion.JordanWigner.CAR.SameSiteCore
 /-!
 # CAR algebra — number operators, same-site relations, and small-N cross-site cases
 
-Extracted from `JordanWigner/CAR.lean` (codex audit Item 10). This sub-file
-contains the three lowest-level layers of the full CAR algebra:
+This sub-file contains the three lowest-level layers of the full CAR algebra:
 
 1. **Number operators** — pairwise commutativity, total `N̂`, Hermiticity.
 2. **Same-site CAR** — `{c_i, c_i†} = 1` (and the auxiliary `{σ^+, σ^-} = 1`).
@@ -15,8 +14,6 @@ contains the three lowest-level layers of the full CAR algebra:
 
 The general JW string factorisation and the fully general `i < j` CAR live in the
 sibling sub-files `StringFactorization.lean` and `CrossSite.lean`.
-
-(Codex audit Item 10, split of `JordanWigner/CAR.lean`, tracked in #390.)
 -/
 
 namespace LatticeSystem.Fermion
@@ -24,7 +21,8 @@ namespace LatticeSystem.Fermion
 open Matrix LatticeSystem.Quantum
 
 /-- Mixed cross-site CAR `{c_0, c_2†} = 0` on `Fin 3`. Same template
-as PR #116 with `σ^+_2` replaced by `σ^-_2`. -/
+as `fermionMultiAnnihilation_anticomm_zero_two_fin_three` with
+`σ^+_2` replaced by `σ^-_2`. -/
 theorem fermionMultiAnnihilation_creation_anticomm_zero_two_fin_three :
     fermionMultiAnnihilation 2 (0 : Fin 3) *
         fermionMultiCreation 2 2 +
@@ -107,8 +105,9 @@ theorem fermionMultiAnnihilation_creation_anticomm_zero_two_fin_three :
   rw [hfirst, hsecond, neg_add_cancel]
 
 /-- Cross-site CAR `{c_0, c_2} = 0` for any chain length `N ≥ 2`.
-Generalises PR #116 (Fin 3) to arbitrary `Fin (N+1)` using the same
-`jwString_succ_eq` factorisation. -/
+Generalises `fermionMultiAnnihilation_anticomm_zero_two_fin_three`
+to arbitrary `Fin (N+1)` using the same `jwString_succ_eq`
+factorisation. -/
 theorem fermionMultiAnnihilation_anticomm_zero_two_general
     (N : ℕ) (hN : 2 ≤ N) :
     fermionMultiAnnihilation N (0 : Fin (N + 1)) *
@@ -144,7 +143,7 @@ theorem fermionMultiAnnihilation_anticomm_zero_two_general
     exact absurd (congrArg Fin.val h) (by
       change (0 : Fin (N + 1)).val ≠ (⟨2, _⟩ : Fin (N + 1)).val
       simp)
-  -- Same as PR #116 structure
+  -- Same structure as the `Fin 3` case
   have hfirst : onSite (0 : Fin (N + 1)) spinHalfOpPlus *
       (onSite (0 : Fin (N + 1)) pauliZ *
         onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ *
@@ -221,7 +220,8 @@ theorem fermionMultiAnnihilation_anticomm_zero_two_general
                 rw [pauliZ_mul_spinHalfOpPlus]
   rw [hfirst, hsecond, neg_add_cancel]
 
-/-- Dual `{c_0†, c_2†} = 0` for any `N ≥ 2` via adjoint of PR #123. -/
+/-- Dual `{c_0†, c_2†} = 0` for any `N ≥ 2` via adjoint of
+`fermionMultiAnnihilation_anticomm_zero_two_general`. -/
 theorem fermionMultiCreation_anticomm_zero_two_general
     (N : ℕ) (hN : 2 ≤ N) :
     fermionMultiCreation N (0 : Fin (N + 1)) *
@@ -242,8 +242,9 @@ theorem fermionMultiCreation_anticomm_zero_two_general
         fermionMultiCreation N ⟨2, by omega⟩ from add_comm _ _]
   exact h2
 
-/-- Mixed `{c_0, c_2†} = 0` for any `N ≥ 2`. Same template as PR #123
-with `σ^+_2` replaced by `σ^-_2`. -/
+/-- Mixed `{c_0, c_2†} = 0` for any `N ≥ 2`. Same template as
+`fermionMultiAnnihilation_anticomm_zero_two_general` with `σ^+_2`
+replaced by `σ^-_2`. -/
 theorem fermionMultiAnnihilation_creation_anticomm_zero_two_general
     (N : ℕ) (hN : 2 ≤ N) :
     fermionMultiAnnihilation N (0 : Fin (N + 1)) *
@@ -377,7 +378,7 @@ theorem fermionMultiCreation_annihilation_anticomm_zero_two_general
   exact h2
 
 /-- Mixed cross-site CAR `{c_0†, c_2} = 0` on `Fin 3` via adjoint of
-PR #119. -/
+`fermionMultiAnnihilation_creation_anticomm_zero_two_fin_three`. -/
 theorem fermionMultiCreation_annihilation_anticomm_zero_two_fin_three :
     fermionMultiCreation 2 (0 : Fin 3) *
         fermionMultiAnnihilation 2 2 +
@@ -399,7 +400,8 @@ theorem fermionMultiCreation_annihilation_anticomm_zero_two_fin_three :
   exact h2
 
 /-- Cross-site CAR `{c_0†, c_2†} = 0` on `Fin 3`. Direct consequence
-of PR #116 via `conjTranspose`. -/
+of `fermionMultiAnnihilation_anticomm_zero_two_fin_three` via
+`conjTranspose`. -/
 theorem fermionMultiCreation_anticomm_zero_two_fin_three :
     fermionMultiCreation 2 (0 : Fin 3) *
         fermionMultiCreation 2 2 +
@@ -420,7 +422,8 @@ theorem fermionMultiCreation_anticomm_zero_two_fin_three :
   exact h2
 
 /-- Fourth off-diagonal CAR on `Fin 2`: `c_0† · c_1 + c_1 · c_0† = 0`.
-Obtained from PR #110's mixed annihilation/creation version by taking
+Obtained from the mixed annihilation/creation version
+`fermionMultiAnnihilation_creation_anticomm_two_site_cross` by taking
 `conjTranspose`. Completes the 2-site off-diagonal CAR relations. -/
 theorem fermionMultiCreation_annihilation_anticomm_two_site_cross :
     fermionMultiCreation 1 (0 : Fin 2) *

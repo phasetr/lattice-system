@@ -28,10 +28,9 @@ is defined here. Those are phases B-D of the
 and will be introduced only when a concrete
 theorem needs them.
 
-The separation follows the codex consultation (2026-04-22): add
-spacing as *metadata* now, keep geometry separate, and do **not**
-generalise `ManyBodyOp Λ = Matrix ...` to a type class until a
-second concrete backend is needed.
+The separation keeps spacing as *metadata* and geometry
+separate, and does **not** generalise `ManyBodyOp Λ = Matrix ...`
+to a type class until a second concrete backend is needed.
 -/
 
 namespace LatticeSystem.Lattice

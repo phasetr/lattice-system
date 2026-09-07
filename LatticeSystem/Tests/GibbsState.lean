@@ -7,7 +7,7 @@ import LatticeSystem.Quantum.GibbsState.Covariance
 A+C+G+D coverage for the generic finite-dimensional Gibbs state
 machinery `gibbsState β H`, `partitionFn`, `gibbsExpectation`, and
 the β = 0 / Hermiticity / commute properties (refactor plan v4 §9
-mapping table; refactor Phase 1 PR 7, #281).
+mapping table; refactor Phase 1 PR 7).
 -/
 
 namespace LatticeSystem.Tests.GibbsState
@@ -70,11 +70,11 @@ example (H : ManyBodyOp (Fin 3)) :
 
 /-! ## D. Covariance extension (`GibbsState/Covariance.lean`)
 
-Codex audit Item 6: pin representative results from the
-extension sub-file so the generic covariance / variance / im-
-of-Hermitian / anticommutator-im / commutator-re companion
-family is directly exercised at the generic layer (was previously
-only indirectly covered through Heisenberg / Ising wrappers). -/
+Pin representative results from the extension sub-file so the
+generic covariance / variance / im-of-Hermitian /
+anticommutator-im / commutator-re companion family is directly
+exercised at the generic layer (was previously only indirectly
+covered through Heisenberg / Ising wrappers). -/
 
 /-- Generic squared-observable expectation is real for Hermitian
 `H, O`. -/

@@ -14,8 +14,7 @@ permalink: /limitations/documented-axioms/chapter-05/
 
 **Tasaki §5.1-§5.2, Theorem 5.1** (eq. (5.2.5), pp. 135-139) is a
 **documented axiom**, `tasaki_5_1_xy_odlro_half_filling`
-(`LatticeSystem/Quantum/SpinS/BoseEinsteinCondensate.lean`, declaration
-line 81).
+(`LatticeSystem/Quantum/SpinS/BoseEinsteinCondensate.lean`).
 
 - **Proved (axiom-free):** the spin-`1/2` XY Hamiltonian `xyHamiltonianS`
   (eq. (5.1.5), realized as the XXZ Hamiltonian at anisotropy `λ = 0` and
@@ -49,8 +48,7 @@ line 81).
 
 **Tasaki §5.3, Theorem 5.2** (eq. (5.3.4), around p. 141) is a
 **documented axiom**, `tasaki_5_2_bec_tower`
-(`LatticeSystem/Quantum/SpinS/BoseEinsteinCondensate.lean`, declaration
-line 193).
+(`LatticeSystem/Quantum/SpinS/BoseEinsteinCondensate.lean`).
 
 - **Proved (axiom-free):** the **half-filling** (`μ = 0`) kernel is proved
   axiom-free as the theorem `tasaki_5_2_bec_tower_half_filling`
@@ -88,9 +86,8 @@ line 193).
 by two **documented axioms** in
 `LatticeSystem/Quantum/SpinS/BoseEinsteinCondensate.lean` and
 `.../BoseEinsteinCondensateCoherentConcentration.lean`:
-`tasaki_5_3_bec_u1_ssb` (`BoseEinsteinCondensate.lean`, declaration line 421)
-and `becMStar_ge_sqrt_twoQ`
-(`BoseEinsteinCondensateCoherentConcentration.lean`, declaration line 112).
+`tasaki_5_3_bec_u1_ssb` (`BoseEinsteinCondensate.lean`) and
+`becMStar_ge_sqrt_twoQ` (`BoseEinsteinCondensateCoherentConcentration.lean`).
 
 - **Proved (axiom-free):** the **half-filling** (`μ = 0`) kernel is
   discharged *conditionally* as the theorem `tasaki_5_3_bec_u1_ssb_half_filling`
@@ -138,8 +135,7 @@ and `becMStar_ge_sqrt_twoQ`
 
 **Tasaki §5.5, Theorem 5.4** (eqs. (5.5.5)-(5.5.6), around p. 147) is a
 **documented axiom**, `tasaki_5_4_coupled_bec_ssb`
-(`LatticeSystem/Quantum/SpinS/BoseEinsteinCondensate.lean`, declaration
-line 496).
+(`LatticeSystem/Quantum/SpinS/BoseEinsteinCondensate.lean`).
 
 - **Proved (axiom-free):** the two-species coupled lattice `CoupledSite` and
   the inter-condensate correlation operators `coupledCrossCorrelation` /
