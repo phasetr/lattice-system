@@ -75,29 +75,40 @@ than a mathematical argument. That is a defect and is rewritten when found rathe
 **Cadence.** None. The command is kept so that a later diagnosis can confirm the family is
 unchanged rather than re-derive the classification.
 
-## References to the documentation checker
+## References to retired audit tooling
 
-**Target.** Prose that names the repository's documentation-checking tooling.
+**Target.** Prose under `LatticeSystem/`, `docs/` and `tex/` that names the audit-gate tooling
+retired when the hard-check infrastructure was abolished: `audit_gate.py`, `audit-helpers.sh`, the
+`capstones.txt` allowlist, the `docs_names.py` registry that backed the dead-declaration sweep, and
+the pre-push hook that ran them. A sentence naming a mechanism that no longer exists cannot be
+current documentation of anything, so a surviving mention would be a defect rather than a
+population to weigh.
 
-**Measurement.** The live checker, then the retired tooling:
+**Measurement.** One pattern covers every retired name:
 
 ```
-git grep -niE 'check_docs_hierarchy\.py' 080ebac2 -- '*.lean' '*.md' '*.tex' | wc -l
 git grep -niE 'audit_gate|audit-helpers|capstones\.txt|docs_names\.py|pre-push' 080ebac2 -- '*.lean' '*.md' '*.tex' | wc -l
 ```
 
-At revision `080ebac2`: 23 and 0.
+At revision `080ebac2`: 0.
 
-**Reason.** All 23 name `scripts/check_docs_hierarchy.py`, which exists and enforces exactly the
-constraint the surrounding sentence describes. Naming the mechanism that governs a page is current
-documentation of that page, not narration of an internal process. The retired tooling has no
-surviving mention, so that half of the class is empty.
+**Disposition.** Resolved by measurement. The population is empty, so nothing is parked here, and a
+reopen condition would have nothing to reopen. The entry is kept because what settles the question
+is the measurement rather than an argument: a later diagnosis re-runs the command instead of
+re-deriving the classification. A mention that appears afterwards is a defect and is removed when
+found rather than parked.
 
-**Reopen condition.** The second command returns a non-zero count, that is, prose names tooling
-that no longer exists; or `scripts/check_docs_hierarchy.py` is retired or renamed, in which case
-the references are updated with it in the same change.
+**Not tracked here.** The same revision carries 23 references to the live checker:
 
-**Cadence.** Re-measure both commands at every twenty-pull-request refactor cycle.
+```
+git grep -niE 'check_docs_hierarchy\.py' 080ebac2 -- '*.lean' '*.md' '*.tex' | wc -l
+```
+
+That script exists and enforces exactly the constraint each surrounding sentence describes, so
+naming it is current documentation of the page it governs. Those 23 lines are neither a defect nor
+a parked population, and this page does not track them.
+
+**Cadence.** Re-measure the first command at every twenty-pull-request refactor cycle.
 
 ## Frozen historical text in migrated pages
 
