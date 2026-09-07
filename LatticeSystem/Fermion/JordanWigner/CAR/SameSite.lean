@@ -4,7 +4,7 @@ import LatticeSystem.Fermion.JordanWigner.CAR.SameSiteCore
 /-!
 # CAR algebra — number operators, same-site relations, and small-N cross-site cases
 
-Extracted from `JordanWigner/CAR.lean` (codex audit Item 10). This sub-file
+This sub-file
 contains the three lowest-level layers of the full CAR algebra:
 
 1. **Number operators** — pairwise commutativity, total `N̂`, Hermiticity.
@@ -15,8 +15,6 @@ contains the three lowest-level layers of the full CAR algebra:
 
 The general JW string factorisation and the fully general `i < j` CAR live in the
 sibling sub-files `StringFactorization.lean` and `CrossSite.lean`.
-
-(Codex audit Item 10, split of `JordanWigner/CAR.lean`, tracked in #390.)
 -/
 
 namespace LatticeSystem.Fermion

@@ -4,7 +4,7 @@ import Mathlib.Tactic.NoncommRing
 /-!
 # CAR algebra — fully general cross-site relations for arbitrary `i < j`
 
-Extracted from `JordanWigner/CAR.lean` (codex audit Item 10). This sub-file
+This sub-file
 contains the four fully general cross-site CAR relations for arbitrary pairs
 `i j : Fin (N + 1)` with `i.val < j.val`:
 
@@ -15,8 +15,6 @@ contains the four fully general cross-site CAR relations for arbitrary pairs
 
 The proofs use `jwString_anticomm_onSite_pos_spinHalfOpPlus{,Minus}` and
 `jwString_commute_jwString` from the sibling `StringFactorization.lean`.
-
-(Codex audit Item 10, split of `JordanWigner/CAR.lean`, tracked in #390.)
 -/
 
 namespace LatticeSystem.Fermion

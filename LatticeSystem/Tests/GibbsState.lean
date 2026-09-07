@@ -70,7 +70,7 @@ example (H : ManyBodyOp (Fin 3)) :
 
 /-! ## D. Covariance extension (`GibbsState/Covariance.lean`)
 
-Codex audit Item 6: pin representative results from the
+Pin representative results from the
 extension sub-file so the generic covariance / variance / im-
 of-Hermitian / anticommutator-im / commutator-re companion
 family is directly exercised at the generic layer (was previously

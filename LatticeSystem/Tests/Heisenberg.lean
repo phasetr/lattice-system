@@ -321,7 +321,7 @@ example (J : ℝ) :
   intro x y
   rfl
 
-/-! ## D. HeisenbergChain extension coverage (codex audit Item 7)
+/-! ## D. HeisenbergChain extension coverage
 
 Direct spot-checks for `HeisenbergChain/Eigenvalues.lean` and
 `HeisenbergChain/Gibbs.lean`. Was previously covered only

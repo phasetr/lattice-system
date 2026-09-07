@@ -7,8 +7,7 @@ import LatticeSystem.Quantum.SpinHalfRotation.Conjugation
 A+C+G+D coverage for the spin-1/2 rotation operators
 `spinHalfRot{1,2,3}`, group law, π / 2π values, exp-form,
 coherent state, Hadamard, and y-axis diagonalizer (refactor plan
-v4 §9 mapping table; refactor Phase 1 PR 7 #281; codex audit
-follow-up Item 5 added the extension-module coverage).
+v4 §9 mapping table; refactor Phase 1 PR 7 #281).
 -/
 
 namespace LatticeSystem.Tests.SpinHalfRotation
@@ -77,7 +76,7 @@ example : spinHalfRot3 Real.pi = (-(2 * Complex.I)) • spinHalfOp3 :=
 
 /-! ## D. Conjugation extension (`SpinHalfRotation/Conjugation.lean`)
 
-Codex audit Item 5: pin representative results from the
+Pin representative results from the
 extension sub-file so the test file actually exercises the
 content it imports. -/
 

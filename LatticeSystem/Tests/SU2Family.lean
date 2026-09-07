@@ -42,7 +42,7 @@ example : ∫ θ in (0 : ℝ)..(2 * Real.pi), Real.sin θ = 0 :=
 example : ∫ θ in (0 : ℝ)..Real.pi, Real.sin θ = 2 :=
   integral_sin_zero_pi
 
-/-! ## D. Half-angle / complex-exp helper integrals (codex audit Item 8)
+/-! ## D. Half-angle / complex-exp helper integrals
 
 These power the SU(2)-averaged singlet computation
 (`problem_2_2_c`); previously only the three easiest base
