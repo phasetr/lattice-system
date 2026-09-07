@@ -5699,6 +5699,9 @@ end LatticeSystem
     legacy_index_text = (repo_root / legacy_index_relative).read_text(encoding="utf-8")
     interim_anchor = "version 2 JSON records"
     interim_authority_claim = "still a non-authoritative prototype"
+    interim_retirement_clause = (
+        "for as long as the version 2 catalogue is published as a non-authoritative prototype"
+    )
 
     def interim_authority_runs(lines: list[str]) -> list[tuple[int, int]]:
         """Return the line span of every blockquote opening the interim-authority claim."""
@@ -5729,12 +5732,18 @@ end LatticeSystem
         ]
 
     # Positive controls: the gate above must fire on drift injected into the live authority
-    # claim, which is the only text it protects. Every sentence asserting that claim must carry
-    # the anchor itself, so neither a decoy banner nor an aside inside the same blockquote can
-    # supply it on behalf of an unanchored live sentence; the quotes are unwrapped first, so
-    # reflowing the banner is not treated as drift; and the mutants run through the same gate
-    # with a throwaway sink against a scratch tree, so neutering the gate, unwiring it from the
-    # live tree, or dropping its findings on the floor fails here instead of passing silently.
+    # claim, which is the only text it protects. Every sentence containing
+    # `interim_authority_claim` must carry the anchor itself, so a decoy banner, or an aside
+    # that a period plus whitespace separates from the claim, cannot supply the anchor on
+    # behalf of an unanchored live sentence; an aside glued on by any other separator is still
+    # read as part of the claim sentence. `interim_retirement_clause` does not contain
+    # `interim_authority_claim`, so the self-retiring condition is pinned as its own literal
+    # rather than by the anchor rule. The quotes are unwrapped first, so reflowing the banner
+    # is not treated as drift. The mutants run through the same gate against a scratch tree
+    # with a sink of their own that has to come back filled, so neutering the gate, unwiring it
+    # from the live tree, or dropping the sink extension fails here instead of passing
+    # silently; the ledger below pins the list object the live call is handed, not the survival
+    # of what that call collects into it.
     legacy_index_lines = legacy_index_text.splitlines()
     interim_runs = interim_authority_runs(legacy_index_lines)
     interim_quotes = [
@@ -5752,6 +5761,17 @@ end LatticeSystem
         f"lack the anchor {interim_anchor!r} (the claim is absent, reworded, or a decoy banner "
         "or a neighbouring aside carries the anchor for an unanchored live sentence), so the "
         "downgrade mutation below leaves the claim intact and the control can never fail",
+    )
+    clauseless_quotes = [
+        quote for quote in interim_quotes if interim_retirement_clause not in quote
+    ]
+    check(
+        bool(interim_quotes) and not clauseless_quotes,
+        f"docs/formalization/legacy/index.md: {len(clauseless_quotes)} of "
+        f"{len(interim_quotes)} interim-authority blockquote(s) lack the literal "
+        f"{interim_retirement_clause!r}, so the pages claim interim authority without the "
+        "condition that retires it; nothing else pins that clause, so reverting it to a "
+        "closed issue reference or deleting it would otherwise pass every gate",
     )
     downgraded_lines = list(legacy_index_lines)
     for start, stop in reversed(interim_runs):
@@ -5778,11 +5798,13 @@ end LatticeSystem
             ),
         ):
             mutant_page.write_text(mutated_page, encoding="utf-8")
+            mutant_sink: list[str] = []
             check(
-                bool(legacy_authority_gate(legacy_gate_root, [])),
+                bool(legacy_authority_gate(legacy_gate_root, mutant_sink)) and bool(mutant_sink),
                 f"docs/formalization/legacy/index.md: a scratch copy carrying {label} passed "
-                "the gate, so either the gate no longer reacts to the drift it exists to catch "
-                "or the mutation injected nothing (the anchor control above says which)",
+                "the gate, so either the gate no longer reacts to the drift it exists to catch, "
+                "it no longer collects what it finds into the sink it is handed, or the "
+                "mutation injected nothing (the anchor control above says which)",
             )
     finally:
         shutil.rmtree(legacy_gate_root, ignore_errors=True)
