@@ -7,7 +7,7 @@ import LatticeSystem.Quantum.GibbsState.Covariance
 A+C+G+D coverage for the generic finite-dimensional Gibbs state
 machinery `gibbsState β H`, `partitionFn`, `gibbsExpectation`, and
 the β = 0 / Hermiticity / commute properties (refactor plan v4 §9
-mapping table; refactor Phase 1 PR 7, #281).
+mapping table; refactor Phase 1 PR 7).
 -/
 
 namespace LatticeSystem.Tests.GibbsState

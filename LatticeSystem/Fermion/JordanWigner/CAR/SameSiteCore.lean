@@ -161,8 +161,10 @@ theorem fermionMultiCreation_anticomm_two_site_cross :
   exact h2
 
 /-- Mixed cross-site CAR on `Fin 2`: `c_0 · c_1† + c_1† · c_0 = 0`.
-Same proof structure as PR #108 with `σ^+_1` replaced by `σ^-_1` at
-site 1 (the site-0 Pauli identities are unchanged). -/
+Same proof structure as
+`fermionMultiAnnihilation_anticomm_two_site_cross` with `σ^+_1`
+replaced by `σ^-_1` at site 1 (the site-0 Pauli identities are
+unchanged). -/
 theorem fermionMultiAnnihilation_creation_anticomm_two_site_cross :
     fermionMultiAnnihilation 1 (0 : Fin 2) *
         fermionMultiCreation 1 1 +
@@ -255,7 +257,8 @@ theorem fermionMultiAnnihilation_anticomm_zero_one
   rw [hfirst, hsecond, neg_add_cancel]
 
 /-- Dual cross-site CAR for creation operators on `Fin (N+1)`, `N ≥ 1`:
-`c_0† · c_1† + c_1† · c_0† = 0`. Obtained from PR #112 by taking
+`c_0† · c_1† + c_1† · c_0† = 0`. Obtained from
+`fermionMultiAnnihilation_anticomm_zero_one` by taking
 `conjTranspose`. -/
 theorem fermionMultiCreation_anticomm_zero_one (N : ℕ) (hN : 1 ≤ N) :
     fermionMultiCreation N (0 : Fin (N + 1)) *
@@ -277,8 +280,9 @@ theorem fermionMultiCreation_anticomm_zero_one (N : ℕ) (hN : 1 ≤ N) :
   exact h2
 
 /-- Mixed cross-site CAR on `Fin (N+1)`, `N ≥ 1`:
-`c_0 · c_1† + c_1† · c_0 = 0`. Same template as PR #112 with
-`σ^+_1` replaced by `σ^-_1` at site 1. -/
+`c_0 · c_1† + c_1† · c_0 = 0`. Same template as
+`fermionMultiAnnihilation_anticomm_zero_one` with `σ^+_1` replaced
+by `σ^-_1` at site 1. -/
 theorem fermionMultiAnnihilation_creation_anticomm_zero_one
     (N : ℕ) (hN : 1 ≤ N) :
     fermionMultiAnnihilation N (0 : Fin (N + 1)) *

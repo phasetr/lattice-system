@@ -5,8 +5,7 @@ import LatticeSystem.Quantum.SU2Integral
 # Test coverage for the SU2 cluster
 
 D coverage for `Quantum/SU2.lean` and `Quantum/SU2Integral.lean`
-(per refactor plan v4 §9 mapping table; refactor Phase 1 PR 12,
-#281).
+(per refactor plan v4 §9 mapping table; refactor Phase 1 PR 12).
 
 The `totalSpinHalfRot*` pins below are base-green characterization pins recorded before the
 `Quantum/TotalSpin/Rotation.lean` core factoring, not Red tests.

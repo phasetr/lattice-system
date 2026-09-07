@@ -21,14 +21,16 @@ namespace LatticeSystem.Fermion
 
 open Matrix LatticeSystem.Quantum
 
-/-! ## Fully general cross-site CAR for arbitrary `i < j` (#210)
+/-! ## Fully general cross-site CAR for arbitrary `i < j`
 
 For every `i j : Fin (N + 1)` with `i.val < j.val`,
 
   `c_i · c_j + c_j · c_i = 0`   (and the three dual / mixed forms).
 
-The (0, k) special case was #208, #211. This section closes the
-general case via the interior-site JW string anticommutator
+The (0, k) special case is `fermionMultiAnnihilation_anticomm_zero_pos`
+and its three dual / mixed companions in
+`CAR/StringFactorization.lean`. This section closes the general case
+via the interior-site JW string anticommutator
 (`jwString_anticomm_onSite_pos_spinHalfOpPlus{,Minus}`) together
 with the JW string commutativity lemma
 (`jwString_commute_jwString`). -/

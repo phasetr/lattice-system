@@ -7,8 +7,8 @@ import LatticeSystem.Fermion.JordanWigner.CAR.CrossSiteOfNe
 # Jordan–Wigner canonical anticommutation relations — façade
 
 **Façade module** re-exporting the full CAR algebra split into
-sub-files (tracked in #390; extended with
-`CrossSiteOfNe` during the 2026-05-04 fermion-algebra expansion):
+sub-files (extended with `CrossSiteOfNe` during the 2026-05-04
+fermion-algebra expansion):
 
 | sub-file | content |
 |---|---|

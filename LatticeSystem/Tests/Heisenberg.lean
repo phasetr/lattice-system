@@ -7,15 +7,15 @@ import LatticeSystem.Quantum.HeisenbergLattice.Companions
 /-!
 # Test coverage for Heisenberg-on-graph infrastructure
 
-Backfill regression tests for PRs #138, #140, #141, #145, #146,
-#149, #150 (Heisenberg-on-graph framework + concrete instances).
+Backfill regression tests for the Heisenberg-on-graph framework and
+its concrete chain / lattice instances.
 -/
 
 namespace LatticeSystem.Tests.Heisenberg
 
 open LatticeSystem.Lattice LatticeSystem.Quantum SimpleGraph
 
-/-! ## Heisenberg-on-graph Hermiticity (PR #140) -/
+/-! ## Heisenberg-on-graph Hermiticity -/
 
 /-- Hermiticity on `pathGraph 3` for real edge weight. -/
 example (J : ℝ) :
@@ -36,7 +36,7 @@ example (J : ℝ) :
           (-(J : ℂ)))).IsHermitian :=
   heisenbergHamiltonian_couplingOf_isHermitian _ (by simp)
 
-/-! ## SU(2) invariance corollaries (PR #145) -/
+/-! ## SU(2) invariance corollaries -/
 
 /-- Commute with `Ŝ_tot^{(1)}` on `pathGraph 3`. -/
 example (J : ℂ) :
@@ -66,7 +66,7 @@ example (J : ℂ) :
       (totalSpinHalfSquared (Fin 3)) :=
   heisenbergHamiltonian_couplingOf_commute_totalSpinHalfSquared _ J
 
-/-! ## Heisenberg-on-graph Gibbs state (PR #146) -/
+/-! ## Heisenberg-on-graph Gibbs state -/
 
 /-- The 3-site Heisenberg-on-graph Gibbs state on `pathGraph 3` is
 Hermitian for real edge weight. -/
@@ -82,7 +82,7 @@ example (β : ℝ) (J : ℂ) :
         (couplingOf (pathGraph 3) J)) :=
   heisenbergGibbsStateOnGraph_commute_hamiltonian β _ J
 
-/-! ## Concrete chain / lattice Hermiticity instances (PRs #141, #149, #150) -/
+/-! ## Concrete chain / lattice Hermiticity instances -/
 
 /-- 2-site open Heisenberg chain Hermiticity. -/
 example (J : ℝ) :
@@ -94,7 +94,7 @@ example (J : ℝ) :
     (heisenbergHamiltonian (periodicChainCoupling 1 J)).IsHermitian :=
   periodicChainHeisenberg_isHermitian 1 J
 
-/-- 2D 2×2 open square lattice Heisenberg Hermiticity (PR #141). -/
+/-- 2D 2×2 open square lattice Heisenberg Hermiticity. -/
 example (J : ℝ) :
     (heisenbergHamiltonian (squareLatticeCoupling 1 J)).IsHermitian :=
   squareLatticeHeisenberg_isHermitian 1 J
@@ -104,17 +104,17 @@ example (J : ℝ) :
     (heisenbergHamiltonian (squareLatticeCoupling 2 J)).IsHermitian :=
   squareLatticeHeisenberg_isHermitian 2 J
 
-/-- 2D 3×3 periodic torus Heisenberg Hermiticity (PR #149). -/
+/-- 2D 3×3 periodic torus Heisenberg Hermiticity. -/
 example (J : ℝ) :
     (heisenbergHamiltonian (squareTorusCoupling 1 J)).IsHermitian :=
   squareTorusHeisenberg_isHermitian 1 J
 
-/-- 3D 2×2×2 open cubic lattice Heisenberg Hermiticity (PR #150). -/
+/-- 3D 2×2×2 open cubic lattice Heisenberg Hermiticity. -/
 example (J : ℝ) :
     (heisenbergHamiltonian (cubicLatticeCoupling 1 J)).IsHermitian :=
   cubicLatticeHeisenberg_isHermitian 1 J
 
-/-! ## Heisenberg-on-graph named wrapper (PR #189) -/
+/-! ## Heisenberg-on-graph named wrapper -/
 
 /-- Hermiticity stated for the named wrapper `heisenbergHamiltonianOnGraph`
 is discharged by the `couplingOf` theorem through the definitional

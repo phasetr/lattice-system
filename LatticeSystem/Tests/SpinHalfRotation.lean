@@ -7,7 +7,7 @@ import LatticeSystem.Quantum.SpinHalfRotation.Conjugation
 A+C+G+D coverage for the spin-1/2 rotation operators
 `spinHalfRot{1,2,3}`, group law, π / 2π values, exp-form,
 coherent state, Hadamard, and y-axis diagonalizer (refactor plan
-v4 §9 mapping table; refactor Phase 1 PR 7 #281).
+v4 §9 mapping table; refactor Phase 1 PR 7).
 -/
 
 namespace LatticeSystem.Tests.SpinHalfRotation
@@ -111,13 +111,12 @@ example :
 /-! ## D. Characterization pins for the π layer
 
 Twelve pins, one per public theorem targeted by the R1b spin-half
-π-layer core refactor (issue #5241): `_pi_sq` ×3, `_pi_anticomm_`
-×3, `_pi_mul_` ×3, same-axis `_pi_conj_` ×3. Each `example` restates
+π-layer core refactor: `_pi_sq` ×3, `_pi_anticomm_` ×3,
+`_pi_mul_` ×3, same-axis `_pi_conj_` ×3. Each `example` restates
 the public statement verbatim and is closed by the public name, so a
 future body-only change (e.g. the private-core migration itself)
 cannot silently alter these signatures. These are **surface** pins:
-they detect statement/name drift, not proof-content drift (the M1/M2
-limitation recorded for #5243 recurs verbatim here). -/
+they detect statement/name drift, not proof-content drift. -/
 
 /-- `(Û^(1)_π)² = -1`. -/
 example :
