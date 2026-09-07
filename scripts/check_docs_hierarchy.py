@@ -2,24 +2,30 @@
 r"""Validate the staged human-documentation hierarchy with the Python stdlib.
 
 The published catalogue is `docs/index.md` frozen at `BASELINE_COMMIT` and put through
-`approved_changes`: a single chain of audited literal rewrites, each of whose search literals is
-verbatim baseline text. A row leaves the published catalogue only by a rewrite of its own full
-frozen row text, trailing newline included, to the empty string. There is no name-keyed
-mechanism, so the absence of a declaration from the Lean tree never by itself retires the row
-that records it -- most published rows name declarations the tree no longer spells.
+`approved_changes`: a single chain of audited literal rewrites. The removal entries search
+verbatim baseline text -- a row leaves the published catalogue only by a rewrite of its own full
+frozen row text, trailing newline included, to the empty string -- while some correction entries
+search text an earlier entry in the chain inserts, as their own comments record. There is no
+name-keyed mechanism, so the absence of a declaration from the Lean tree never by itself retires
+the row that records it: at the revision this was measured, 91 of the 2217 published rows (4.1%)
+name at least one identifier the Lean tree no longer spells, over 148 distinct absent identifier
+tokens.
 
 `APPROVED_CHANGES_SHA256` pins sha256 over
 
-    approved_changes("".join(baseline_index().splitlines(keepends=True)[216:2731]))
+    approved_changes(catalogue_baseline_text())
 
-encoded as UTF-8: the text the legacy pages are compared against. Every edit to
-`_approved_replacements` or `_drop_private_instructions_ref` moves it, so a change to either
-recomputes it in the same commit with
+encoded as UTF-8. `catalogue_baseline_text()` is the single spelling of the compared slice, so the
+pinned bytes are exactly the bytes `main()` compares the legacy pages against; narrowing that
+slice moves the pin instead of quietly unpublishing the rows it drops. Every edit to
+`_approved_replacements` or `_drop_private_instructions_ref` that changes the transformed bytes
+moves the pin; output-neutral edits, such as dropping a rewrite that no longer matches anything,
+do not. An edit that does move it recomputes it in the same commit with
 
     python3 -c 'import sys, hashlib; sys.path.insert(0, "scripts"); \
     import check_docs_hierarchy as c; \
-    print(hashlib.sha256(c.approved_changes("".join(c.baseline_index() \
-    .splitlines(keepends=True)[216:2731])).encode("utf-8")).hexdigest())'
+    print(hashlib.sha256(c.approved_changes(c.catalogue_baseline_text()) \
+    .encode("utf-8")).hexdigest())'
 
 and states which rows the new value reflects. Recomputing the pin is never on its own an
 authorization for what moved: the legacy pages still have to be edited to match, and the
@@ -46,6 +52,10 @@ ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 BASELINE_COMMIT = "6519099024bf156b87ac0c807c6633c513792581"
 LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
+# The published catalogue is this half-open line range of the frozen index. Spelled once, so
+# that the pin below hashes the same object the page comparison uses instead of a re-spelled
+# copy of it that could be narrowed on its own.
+CATALOGUE_BASELINE_SLICE = slice(216, 2731)
 # Pins the published catalogue text; this module's docstring records exactly what is hashed
 # and how the pin is legitimately updated.
 APPROVED_CHANGES_SHA256 = "2d57e7b3d3e02f04ee3f19c864c9f1cbfc125115d37bd13086832aa50b079da0"
@@ -268,6 +278,16 @@ def baseline_index() -> str:
         capture_output=True,
         text=True,
     ).stdout
+
+
+def catalogue_baseline_text() -> str:
+    """The frozen catalogue region of the baseline index, before any audited rewrite.
+
+    `main()` compares the legacy pages against `approved_changes` of this text and
+    `approved_changes_byte_parity_self_test` pins sha256 of exactly the same object, so the
+    pinned quantity and the compared quantity cannot drift apart.
+    """
+    return "".join(baseline_index().splitlines(keepends=True)[CATALOGUE_BASELINE_SLICE])
 
 
 def baseline_ledger() -> str:
@@ -1033,55 +1053,9 @@ def _approved_replacements(text: str) -> str:
             "beyond a threshold), so the staggered specialisation still has to turn `C(h)` into such "
             "a bound — that belongs to χ3 (next stage).",
         )
-        # The axiom row's evidence sentence claimed more than was checked. Only Tasaki (pp. 81,
-        # 83) and Shastry (his eq. (22)) were read; Tanaka-Takeda-Idogaki [63] is not held here,
-        # so the row now scopes the negative claim to those two sources. The same sentence's
-        # refutation of the retired `≤ C·L` form is likewise scoped to `N = 1`, the spin-1/2
-        # chain the quoted asymptotic is about, which alone refutes the `∀ N ≥ 1` form.
-        # (Applied last, so what it matches is the evidence sentence the axiom-row replacement
-        # above inserts, not baseline text; the order of those two entries is load-bearing.)
-        .replace(
-            "No published source states a bound on `f_L^(-1)(k*)`: Tasaki's \"This is nontrivial, "
-            "and requires a hard analysis\" (p. 83) concerns the infrared bound (4.1.24) used for "
-            "Theorem 4.1, which p. 81 states for `k ≠ k*` only and whose right-hand side diverges "
-            "as `k → k*`. The earlier `≤ C·L` form was false for odd `N`: the `g(r)` asymptotic "
-            "Shastry introduces as what \"numerical and approximate analytical work … suggests\" "
-            "(p. L252) forces `χ ≳ L(log L)³`.",
-            "Neither source examined here states a bound on `f_L^(-1)(k*)`; the two examined are "
-            "Tasaki (pp. 81, 83) and Shastry (his eq. (22)), and Tanaka–Takeda–Idogaki [63] was "
-            "not examined. Tasaki's \"This is nontrivial, and requires a hard analysis\" (p. 83) "
-            "concerns the infrared bound (4.1.24) used for Theorem 4.1, which p. 81 states for "
-            "`k ≠ k*` only and whose right-hand side diverges as `k → k*`. The earlier `≤ C·L` "
-            "form was false at `N = 1`: the `g(r)` asymptotic Shastry introduces as what "
-            "\"numerical and approximate analytical work … suggests\" (p. L252) forces "
-            "`χ ≳ L(log L)³`.",
-        )
-        # The axiom's doc comment, the chapter-04 ledger and both signature-pin fixtures all
-        # record the two-site refutation as a hand computation with no Lean witness; the row
-        # stated it flatly. (Applied last, for the same reason as the entry above: what it
-        # matches is text the axiom-row replacement inserts.)
-        .replace(
-            "The `∃ L₀` threshold is required because a bare `∀ L` fails at `N = 1, L = 2`.",
-            "The `∃ L₀` threshold is required because a bare `∀ L` fails at `N = 1, L = 2` — a "
-            "hand computation with no Lean witness.",
-        )
         # Two catalogue rows presented Corollary 4.3 as discharged. It is a conditional reduction:
         # the axiom fed into it is strictly stronger than the corollary, so the row must not read
-        # as a completed result. (Applied last: the first pair matches text an earlier replacement
-        # above inserts.)
-        .replace(
-            "; that bound is supplied by the documented Shastry axiom "
-            "`shastry_staggered_susceptibility_subcubic`, discharging `no_long_range_order_1d` "
-            "into a theorem (PR #5003)",
-            "; that bound is supplied by the documented Shastry axiom "
-            "`shastry_staggered_susceptibility_subcubic`, which makes `no_long_range_order_1d` a "
-            "theorem **conditionally on that axiom** (PR #5003) and **not** a discharge of "
-            "Corollary 4.3 — the axiom is strictly stronger than the corollary, since the crude "
-            "bounds already reach exactly `O(L³)` once the gap obeys `Δ ≳ 1/L` and, through this "
-            "very lemma's Falk–Bruch input "
-            "`staggeredOrder_sq_le_susceptibility`, it holds only if `⟨Ô²⟩ = o(L²)`, the "
-            "corollary's own conclusion",
-        )
+        # as a completed result.
         .replace(
             "**Corollary 4.3** (§4.1, THEOREM; eq. (4.1.11)): absence of LRO in 1D on **even** "
             "rings.",
@@ -1101,21 +1075,6 @@ def _approved_replacements(text: str) -> str:
             "`staggeredOrder_sq_le_susceptibility` it holds "
             "only if `⟨Ô²⟩ = o(L²)`, the corollary's own conclusion; only the degenerate spin-0 "
             "case `N = 0` is unconditional (the staggered order operator vanishes).",
-        )
-        # A third row on the same catalogue page, the axiom row itself, closed by saying the axiom
-        # discharges Corollary 4.3.  It does not: the corollary is only reduced to it, and the
-        # axiom is the strictly stronger statement.  (Applied last: what it matches is the closing
-        # sentence the axiom-row replacement above inserts, not baseline text.)
-        .replace(
-            "An assumption of this project, not a transcription of a published estimate; it "
-            "discharges `no_long_range_order_1d` (PR #5003)",
-            "An assumption of this project, not a transcription of a published estimate; feeding "
-            "it into the conditional reduction makes `no_long_range_order_1d` a theorem "
-            "**conditionally on this axiom** (PR #5003), which is **not** a discharge of Corollary "
-            "4.3 — the axiom is strictly stronger than the corollary, since the crude bounds "
-            "already reach exactly `O(L³)` once the gap obeys `Δ ≳ 1/L` and, via "
-            "`staggeredOrder_sq_le_susceptibility`, it "
-            "holds only if `⟨Ô²⟩ = o(L²)`, the corollary's own conclusion",
         )
         # The Theorem 4.2 grouped detail record (former line 560) carried the same claim in prose,
         # and additionally described the closed issue #4777 in the present tense.
@@ -1251,16 +1210,16 @@ def approved_changes_byte_parity_self_test() -> None:
     mismatch naming both hashes, rather than as the thousands of row differences the page
     comparison reports much later in the run.
     """
-    baseline_slice = "".join(baseline_index().splitlines(keepends=True)[216:2731])
-    actual = hashlib.sha256(approved_changes(baseline_slice).encode("utf-8")).hexdigest()
+    published = approved_changes(catalogue_baseline_text())
+    actual = hashlib.sha256(published.encode("utf-8")).hexdigest()
     if actual != APPROVED_CHANGES_SHA256:
         fail(
             "approved-changes byte-parity pin mismatch: expected "
             f"{APPROVED_CHANGES_SHA256}, got {actual}. Recompute with: python3 -c 'import sys, "
             "hashlib; sys.path.insert(0, \"scripts\"); import check_docs_hierarchy as c; "
-            "print(hashlib.sha256(c.approved_changes(\"\".join(c.baseline_index()."
-            "splitlines(keepends=True)[216:2731])).encode(\"utf-8\")).hexdigest())' -- a passing "
-            "pin recompute is never on its own an authorization for the content change."
+            "print(hashlib.sha256(c.approved_changes(c.catalogue_baseline_text())."
+            "encode(\"utf-8\")).hexdigest())' -- a passing pin recompute is never on its own an "
+            "authorization for the content change."
         )
 
 
@@ -1559,15 +1518,16 @@ def frozen_row_drop_negative_self_test() -> None:
 def absent_name_row_drop_negative_self_test() -> None:
     """A row must never be droppable merely because its Lean-name cell is already absent.
 
-    Most published catalogue rows name a declaration the Lean tree no longer spells -- 148 of
-    them at the revision this was measured, against the two rows the catalogue actually retires
-    -- so absence is the ordinary condition of a historical catalogue, not evidence that a row
-    may go. This probes that boundary in a disposable clone by re-creating the shape that would
-    make absence sufficient, a name-keyed drop wired into `approved_changes` for an arbitrary
-    already-absent name (`pauli_decomposition`), and hand-dropping that row from the live legacy
-    page so that both halves of the fail-open are present at once. The checker must refuse, and
-    the byte-parity pin is what refuses: a name-keyed drop is not a rewrite of the row's frozen
-    text, so the transformed catalogue stops hashing to the audited value.
+    Published catalogue rows routinely name declarations the Lean tree no longer spells: at the
+    revision this was measured, 91 of the 2217 published rows (4.1%) name at least one such
+    identifier, over 148 distinct absent identifier tokens, against the two rows the catalogue
+    actually retires. Absence is the ordinary condition of a historical catalogue, not evidence
+    that a row may go. This probes that boundary in a disposable clone by re-creating the shape
+    that would make absence sufficient -- a name-keyed drop wired into `approved_changes` for an
+    arbitrary already-absent name (`pauli_decomposition`) -- and hand-dropping that row from the
+    live legacy page so that both halves of the fail-open are present at once. The checker must
+    refuse, and the byte-parity pin is what refuses: a name-keyed drop is not a rewrite of the
+    row's frozen text, so the transformed catalogue stops hashing to the audited value.
     """
     with tempfile.TemporaryDirectory(prefix="absent-name-row-drop-") as scratch:
         mirror = Path(scratch) / "mirror"
@@ -1838,7 +1798,7 @@ def main() -> None:
 
     # Catalogue rows must retain exact global order after the two evidenced status corrections.
     # Long cells are reconstructed from one compact table reference and one grouped detail record.
-    catalogue_baseline = "".join(old_lines[216:2731])
+    catalogue_baseline = catalogue_baseline_text()
     private_instructions_removals = len(
         _PRIVATE_INSTRUCTIONS_REF.findall(_approved_replacements(catalogue_baseline))
     )
@@ -1855,7 +1815,8 @@ def main() -> None:
     expected_rows = table_data_rows(approved_changes(catalogue_baseline).splitlines())
     expected_by_line: dict[int, str] = {}
     expected_long_lines: set[int] = set()
-    for line_number in range(217, 2732):
+    catalogue_lines = range(CATALOGUE_BASELINE_SLICE.start + 1, CATALOGUE_BASELINE_SLICE.stop + 1)
+    for line_number in catalogue_lines:
         line = approved_changes(old_lines[line_number - 1]).rstrip("\n")
         if not line.startswith("|") or is_separator(line):
             continue
