@@ -5714,55 +5714,16 @@ end LatticeSystem
         live_manifest.get("catalog_state") if isinstance(live_manifest, dict) else None
     )
     prototype_catalogue = catalogue_state == "prototype"
-    html_comment_span = re.compile(r"<!--.*?(?:-->|\Z)", re.DOTALL)
     line_ending = re.compile(r"\r\n|\r")
-    code_fence_opener = re.compile(r"^ {0,3}((?:> ?)*)(`{3,}|~{3,})")
-    code_fence_closer = re.compile(r"^ {0,3}((?:> ?)*)(`{3,}|~{3,})[ \t]*$")
 
     def source_lines(text: str) -> list[str]:
-        """Split Markdown source on the line endings CommonMark recognises, and on those only."""
-        return line_ending.sub("\n", text).split("\n")
+        """Split Markdown source on the line endings CommonMark recognises, and on those only.
 
-    def published_lines(text: str) -> list[str]:
-        """Blank the lines a Markdown reader hides, keeping every line at its own index.
-
-        The indices hold because the comment substitution puts back one newline for every newline
-        it swallows and the lines are broken only where CommonMark breaks them, unlike
-        str.splitlines(), which also breaks on form feeds and other Unicode separators that a
-        Markdown reader keeps inside the line: source_lines normalises the endings once, and the
-        split below runs on text carrying no other ending.
-
-        A fence closes only on a closer standing at the blockquote depth of its opener, counted in
-        `>` markers so that `>` and `> ` are one level, because CommonMark reads a deeper prefix as
-        content of the open block and ends the container at a shallower one. The container's end
-        is taken as leaving the fence open to the end of the text, which is the direction that
-        reports a banner behind it as hidden rather than as published prose.
+        str.splitlines() also breaks on a form feed and on other Unicode separators that a Markdown
+        reader keeps inside the line, which would cut a wrapped banner line in two and drop the
+        rest of that sentence from the joined quote the pins below read.
         """
-        uncommented = html_comment_span.sub(
-            lambda span: "\n" * span.group(0).count("\n"), "\n".join(source_lines(text))
-        )
-        fence: str | None = None
-        fence_depth = 0
-        lines: list[str] = []
-        for line in uncommented.split("\n"):
-            if fence is None:
-                opener = code_fence_opener.match(line)
-                lines.append(line if opener is None else "")
-                if opener is not None:
-                    fence, fence_depth = opener.group(2), opener.group(1).count(">")
-                continue
-            lines.append("")
-            closer = code_fence_closer.match(line)
-            if closer is None:
-                continue
-            marker = closer.group(2)
-            if (
-                closer.group(1).count(">") == fence_depth
-                and marker[0] == fence[0]
-                and len(marker) >= len(fence)
-            ):
-                fence = None
-        return lines
+        return line_ending.sub("\n", text).split("\n")
 
     def interim_authority_runs(lines: list[str]) -> list[tuple[int, int]]:
         """Return the line span of every blockquote opening the interim-authority claim."""
@@ -5822,56 +5783,31 @@ end LatticeSystem
     # in the same change) rather than only flip the manifest. A catalogue state this gate cannot
     # read takes that forbidding direction too, so a missing or unparsable manifest fails here
     # instead of switching the controls off.
-    # Scanner scope: this gate reads source Markdown with a CommonMark-approximating scanner, not
-    # the rendered page. Handled, each measured: HTML comments; fenced code, blanked in place with
-    # line numbering preserved (backtick and tilde markers; a closer at least as long as its
-    # opener, since a shorter run leaves the rendered block open; the opener's own container
-    # prefix, because CommonMark closes a fence only inside the container it opened in, so a
-    # blockquoted line cannot close an unquoted fence nor an unquoted line a blockquoted one, and
-    # a fence whose closer never arrives at the opener's blockquote depth stays open to the end of
-    # the page, which is the fail-closed direction; and whitespace-only closers, since only an
-    # opening fence may carry an info string, so a ```md line inside a ```text block is content);
-    # indented code, through `interim_authority_runs` requiring the blockquote marker in column 0,
-    # which also catches a reference-style `[//]: # (...)` comment; and wrapped lines, since the
-    # quotes are unwrapped before the sentence pins run, so reflowing a banner is not treated as
-    # drift. A banner surviving only inside a handled hidden region is therefore read as missing
-    # rather than as published prose, and the blanked text stays aligned index for index with
-    # `legacy_index_lines` because both split through `source_lines`, which breaks only on
-    # CommonMark's line endings and not on a form feed or another separator str.splitlines()
-    # breaks on but a Markdown reader keeps inside the line. Not handled, documented: raw HTML
-    # containers (`<div hidden>`, `<details>`, `<span>`, `<script>`), CSS (`style="display:none"`
-    # on such a wrapper, or a stylesheet rule), Liquid tags (`{% comment %}`, which Jekyll strips
-    # before Markdown runs at all), and any other construct — a banner hidden by one of those
-    # still counts here as published prose. The rendered page, not this scan, is authoritative,
-    # and it is checked only by check_generated_site.AUTHORITATIVE_FORBIDDEN_PHRASES, a denylist
-    # inert while `catalog_state` is `prototype` and therefore biting only at the cutover.
     # A page whose bytes cannot be read as UTF-8 text (undecodable bytes, or a directory or an
     # unreadable mode behind a `*.md` name) is reported as a failure naming the error rather than
-    # aborting the run with a traceback; the live gate above reads the index page before this loop,
-    # so a bad byte there still aborts. Documented limitations of the pins themselves: the controls
-    # read the interim-authority blockquotes alone, so the retired authority condition restated as
-    # prose elsewhere on a gated page passes; and both pins are literal, so a banner keeping the
-    # literals while negating them ("no longer still a non-authoritative prototype") passes. The
-    # index page publishes exactly that condition further down, inside a `legacy-source` span whose
-    # text check_docs_hierarchy pins against the historical docs/index.md prose, so it is a known
-    # frozen residual that only an audited moved-prose rewrite can change; and the same clause also
-    # appears on 24 prototype-navigation pages under docs/formalization/ outside legacy/ and at 4
-    # wrapped prose sites elsewhere under docs/, none of which this gate reads (the `details/`
-    # banner claims no authority and is outside the glob for the same reason), all of them covered
-    # only by that same denylist. The mutants below run
-    # through the same gate against a scratch tree with a sink of their own that has to come back
-    # filled, so neutering the gate or dropping the sink extension fails here, and unwiring it from
-    # the live tree fails at the ledger check below, instead of passing silently; the ledger pins
-    # the list object the live call is handed, not the survival of what that call collects.
+    # aborting the run with a traceback that hides every later self-test.
+    # The control reads the Markdown source literally; a banner hidden by Markdown or HTML
+    # constructs (comments, fences, raw HTML containers, CSS, Liquid) still counts as present here
+    # — the rendered page is checked only by the site checker's denylist at cutover; further
+    # documented limitations: downstream `failures` rebinding; sentence split on `.`+whitespace;
+    # navigation/wrapped sites outside this gate; literal pins vs negated banners; the frozen index
+    # prose; old-anchor prose outside the blockquote; a bad byte in `legacy/index.md` itself; the
+    # mechanisms (unreadable-page branch, state conditioning, line splitter) have no self-test of
+    # their own.
+    # The mutants below run through the same gate against a scratch tree with a sink of their own
+    # that has to come back filled, so neutering the gate or dropping the sink extension fails
+    # here, and unwiring it from the live tree fails at the ledger check below, instead of passing
+    # silently; the ledger pins the list object the live call is handed, not the survival of what
+    # that call collects.
     legacy_index_lines = source_lines(legacy_index_text)
-    index_runs = interim_authority_runs(published_lines(legacy_index_text))
+    index_runs = interim_authority_runs(legacy_index_lines)
     interim_quotes: list[tuple[str, str]] = []
     bannerless_pages: list[str] = []
     unreadable_pages: list[str] = []
     for page in legacy_catalogue_pages:
         page_name = page.relative_to(repo_root).as_posix()
         try:
-            page_lines = published_lines(page.read_text(encoding="utf-8"))
+            page_lines = source_lines(page.read_text(encoding="utf-8"))
         except (OSError, UnicodeDecodeError) as error:
             unreadable_pages.append(f"{page_name} ({type(error).__name__})")
             continue
