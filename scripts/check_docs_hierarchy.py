@@ -47,9 +47,10 @@ published catalogue is a legible diff and a moved hash rather than a silent edit
 the two pins and `name_keyed_row_drop_absence_self_test` are the whole of the mechanical
 enforcement, and two residuals stay with review. First, editing the pages and recomputing both
 pins honestly passes every check here, because a recompute restates what the chain now produces
-and judges nothing about it. Second, a rewrite keyed on a Lean name together with a fragment of
-that row's body is indistinguishable, in every output this file compares, from the sanctioned
-full-row literal it imitates.
+and judges nothing about it. Second, a rewrite keyed on a Lean name and narrowed by anything the
+synthetic probe rows do not satisfy -- a fragment of that row's body, or a position anchor the
+surrounding corpus carries, are two such narrowings -- is indistinguishable, in every output this
+file compares, from the sanctioned full-row literal it imitates.
 """
 
 from __future__ import annotations
@@ -1330,10 +1331,13 @@ def name_keyed_row_drop_absence_self_test() -> None:
 
     That refuses a drop whose match set is bounded by nothing but the name, wherever in the
     chain it sits and whether it drops every match or only the first. It does not refuse a match
-    narrowed by the row's body as well: a name plus, say, a directory fragment of the file cell
-    never touches a synthetic row, and on the real corpus it produces the same bytes as the
-    sanctioned full-row literal it imitates, so no probe reading this transform's output can
-    separate the two. That residual stays with review, as the module docstring records.
+    narrowed by anything the synthetic rows fail to satisfy: a name plus, say, a directory
+    fragment of the file cell never touches a synthetic row, and neither does a name sought only
+    at or after a position anchor of the surrounding corpus, since such an anchor sits in the
+    baseline part under both placements. Every narrowing of that class produces, on the real
+    corpus, the same bytes as the sanctioned full-row literal it imitates, so no probe reading
+    this transform's output can separate the two. That residual stays with review, as the module
+    docstring records.
     """
     body = "synthetic name-keyed-drop probe row; carries no published body"
     baseline = catalogue_baseline_text()
@@ -1364,12 +1368,15 @@ def name_keyed_row_drop_absence_self_test() -> None:
         )
 
     # Positive control: a name-keyed first-match drop, wired into a local copy of the transform
-    # so that it reproduces a sanctioned removal exactly, must be refused. Keying it on a cell
-    # the transform stops publishing is that mutant precisely, since dropping such a row by name
-    # leaves the published catalogue unchanged and moves neither pin. A future catalogue that
-    # retires nothing offers no such cell; the control then keys on the first catalogue cell,
-    # which is still a genuine name-keyed drop and is still refused, so an empty corpus of
-    # retired cells costs the control its realism rather than its ability to fire.
+    # so that it reproduces a sanctioned removal exactly, must be refused. The selection below
+    # takes the first baseline cell the transform stops publishing; at this corpus that cell
+    # sits on a row the chain retires whole, so dropping it by name leaves the published
+    # catalogue unchanged and moves neither pin -- that mutant precisely. Being unpublished does
+    # not by itself mean retired: some such cells sit on rows whose first cell the chain
+    # rewrites, and dropping one of those by name does change the catalogue and move both pins,
+    # as does the `probe_cells[0]` fallback a catalogue that retires nothing would leave. Each
+    # is still a genuine name-keyed drop and is still refused, so a pick of that kind costs the
+    # control its realism rather than its ability to fire.
     published_cells = {row.removeprefix("| ").split(" | ")[0] for row in published_rows}
     control_cell = next(
         (cell for cell in probe_cells if cell not in published_cells), probe_cells[0]
