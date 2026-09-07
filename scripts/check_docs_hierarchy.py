@@ -5,12 +5,13 @@ The published catalogue is `docs/index.md` frozen at `BASELINE_COMMIT` and put t
 `approved_changes`: a single chain of audited literal rewrites. The removal entries search
 verbatim baseline text -- a row leaves the published catalogue only by a rewrite of its own full
 frozen row text, trailing newline included, to the empty string -- while some correction entries
-search text an earlier entry in the chain inserts, as their own comments record. No entry
-retires a row by keying on a Lean name, and `name_keyed_row_drop_absence_self_test` refuses that
-shape semantically rather than by spelling, so the absence of a declaration from the Lean tree
-never by itself retires the row that records it: at the revision this was measured, 91 of the
-2050 published catalogue rows (4.4%) name at least one identifier the Lean tree no longer spells
--- 64 of them name nothing else -- across 148 distinct absent identifier tokens.
+search text an earlier entry in the chain inserts, as their own comments record. That no entry
+retires a row by keying on a Lean name is a convention of this file, kept by review of the chain;
+`name_keyed_row_drop_absence_self_test` enforces it in part, refusing a drop whose match set is
+bounded by nothing but the name. The absence of a declaration from the Lean tree is in any case
+never on its own a reason to retire the row that records it: at the revision this was measured,
+91 of the 2050 published catalogue rows (4.4%) name at least one identifier the Lean tree no
+longer spells -- 64 of them name nothing else -- across 148 distinct absent identifier tokens.
 
 Two pins cover the transform. `APPROVED_CHANGES_SHA256` pins sha256 over
 
@@ -41,8 +42,14 @@ An edit that does move a pin recomputes it in the same commit with
 
 and states which rows the new values reflect. Recomputing a pin is never on its own an
 authorization for what moved: the legacy pages still have to be edited to match, and the
-catalogue-row comparison is what proves they do. What the pins buy is that a removal is a
-legible, full-row diff plus a pin update rather than a name added to a list.
+catalogue-row comparison is what proves they do. What the pins buy is that a change to the
+published catalogue is a legible diff and a moved hash rather than a silent edit. The row count,
+the two pins and `name_keyed_row_drop_absence_self_test` are the whole of the mechanical
+enforcement, and two residuals stay with review. First, editing the pages and recomputing both
+pins honestly passes every check here, because a recompute restates what the chain now produces
+and judges nothing about it. Second, a rewrite keyed on a Lean name together with a fragment of
+that row's body is indistinguishable, in every output this file compares, from the sanctioned
+full-row literal it imitates.
 """
 
 from __future__ import annotations
@@ -56,6 +63,7 @@ import subprocess
 import sys
 import tempfile
 from collections import Counter, defaultdict
+from collections.abc import Callable
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
@@ -1266,8 +1274,49 @@ def approved_changes_byte_parity_self_test() -> None:
         )
 
 
+def _name_keyed_drop_violation(
+    transform: Callable[[str], str],
+    baseline: str,
+    transformed_baseline: str,
+    probe_rows: str,
+    row_suffix: str,
+) -> str | None:
+    """Describe how `transform` fails to carry every synthetic probe row through, or None.
+
+    `probe_rows` is placed both after and before `baseline`, because placement is exactly what a
+    match-bounded rewrite is sensitive to: a first-match drop keyed on a Lean name reaches the
+    real row when the synthetic rows follow it and a synthetic row when they precede it, so only
+    running both halves refuses that spelling. In each half the baseline part must transform
+    exactly as `transform` transforms it alone, and the synthetic part must keep every row --
+    same count, each still carrying the sentinel body. A rewrite of a synthetic row's first cell
+    is tolerated: it renames a row rather than retiring one, it moves both pins, and the legacy
+    pages have to be edited to match it like any other change.
+    """
+    expected_rows = probe_rows.count("\n")
+    for placement, combined in (
+        ("appended", baseline + probe_rows),
+        ("prepended", probe_rows + baseline),
+    ):
+        transformed = transform(combined)
+        if placement == "appended":
+            if not transformed.startswith(transformed_baseline):
+                return f"{placement}: the baseline part transformed differently"
+            probe_part = transformed[len(transformed_baseline):]
+        else:
+            if not transformed.endswith(transformed_baseline):
+                return f"{placement}: the baseline part transformed differently"
+            probe_part = transformed[: len(transformed) - len(transformed_baseline)]
+        probe_lines = probe_part.splitlines()
+        if len(probe_lines) != expected_rows:
+            return f"{placement}: {len(probe_lines)} synthetic rows survived of {expected_rows}"
+        rewritten = [line for line in probe_lines if not line.endswith(row_suffix)]
+        if rewritten:
+            return f"{placement}: {len(rewritten)} synthetic rows lost their sentinel body"
+    return None
+
+
 def name_keyed_row_drop_absence_self_test() -> None:
-    """The transform must key on frozen row text only, at every spelling and every depth.
+    """Refuse a row drop keyed on a Lean name and bounded by nothing else.
 
     The fail-open shape this catalogue has to stay clear of is a rewrite keyed on a Lean name
     rather than on a row's frozen text: it unpublishes every row naming that identifier, and
@@ -1276,9 +1325,15 @@ def name_keyed_row_drop_absence_self_test() -> None:
     for it semantically. A scratch copy of the baseline text carries one synthetic row per
     catalogue row -- that row's own first cell verbatim, so every identifier the catalogue names
     is covered including the ones it retires, with a body no audited literal contains -- and
-    `approved_changes`, the same entry point `main()` uses, must return the baseline part
-    exactly as it transforms that part alone, and every synthetic row byte for byte. A full-row
-    literal cannot match a synthetic row; anything keyed on the name deletes it.
+    `approved_changes`, the same entry point `main()` uses, must carry all of them through both
+    placements `_name_keyed_drop_violation` tries.
+
+    That refuses a drop whose match set is bounded by nothing but the name, wherever in the
+    chain it sits and whether it drops every match or only the first. It does not refuse a match
+    narrowed by the row's body as well: a name plus, say, a directory fragment of the file cell
+    never touches a synthetic row, and on the real corpus it produces the same bytes as the
+    sanctioned full-row literal it imitates, so no probe reading this transform's output can
+    separate the two. That residual stays with review, as the module docstring records.
     """
     body = "synthetic name-keyed-drop probe row; carries no published body"
     baseline = catalogue_baseline_text()
@@ -1289,48 +1344,61 @@ def name_keyed_row_drop_absence_self_test() -> None:
     if not probe_cells:
         fail(
             "name-keyed row drop self-test found no catalogue rows to build synthetic rows "
-            "from, so its identity requirement below would hold vacuously"
+            "from, so its requirement below would hold vacuously"
         )
     probe_rows = "".join(f"| {cell} | {body} |\n" for cell in probe_cells)
+    row_suffix = f"| {body} |"
+    transformed_baseline = approved_changes(baseline)
 
-    # Positive control: the requirement below is only informative where a name-keyed drop would
-    # actually change the corpus, and the cells at risk are the ones the transform stops
-    # publishing. Each of them must key a drop that removes a synthetic row.
-    published_cells = {
-        row.removeprefix("| ").split(" | ")[0] for row in published_catalogue_rows()
-    }
-    unpublished_cells = [cell for cell in probe_cells if cell not in published_cells]
-    if not unpublished_cells:
+    # This test reasons about the rows `approved_changes` produces, while `main()` compares the
+    # legacy pages against `published_catalogue_rows()`. Require the two to be the same sequence
+    # rather than assume it: a `published_catalogue_rows` narrowed or re-pointed elsewhere would
+    # leave this probing rows the run never uses.
+    published_rows = published_catalogue_rows()
+    transformed_rows = table_data_rows(transformed_baseline.splitlines())
+    if published_rows != transformed_rows:
         fail(
-            "name-keyed row drop self-test has no control to fire: the transform no longer "
-            "changes any row's first cell, so nothing in the corpus stands for the rows a "
-            "name-keyed drop would target"
+            "name-keyed row drop self-test would probe rows main() does not compare: "
+            f"published_catalogue_rows() returned {len(published_rows)} rows, which are not the "
+            f"{len(transformed_rows)} rows approved_changes produces from the baseline slice"
         )
-    for cell in unpublished_cells:
-        _, control_drops = re.subn(
-            rf"^\| {re.escape(cell)} \|.*\n", "", probe_rows, flags=re.MULTILINE
-        )
-        if control_drops == 0:
-            fail(
-                "name-keyed row drop self-test control did not fire: a drop keyed on "
-                f"{cell} removes no synthetic row, so the requirement below cannot detect that "
-                "shape for a first cell the published catalogue no longer carries"
-            )
 
-    transformed = approved_changes(baseline + probe_rows)
-    expected = approved_changes(baseline) + probe_rows
-    if transformed != expected:
-        expected_lines = expected.splitlines()
-        actual_lines = transformed.splitlines()
-        first = next(
-            (i for i, pair in enumerate(zip(expected_lines, actual_lines)) if pair[0] != pair[1]),
-            min(len(expected_lines), len(actual_lines)),
-        )
+    # Positive control: a name-keyed first-match drop, wired into a local copy of the transform
+    # so that it reproduces a sanctioned removal exactly, must be refused. Keying it on a cell
+    # the transform stops publishing is that mutant precisely, since dropping such a row by name
+    # leaves the published catalogue unchanged and moves neither pin. A future catalogue that
+    # retires nothing offers no such cell; the control then keys on the first catalogue cell,
+    # which is still a genuine name-keyed drop and is still refused, so an empty corpus of
+    # retired cells costs the control its realism rather than its ability to fire.
+    published_cells = {row.removeprefix("| ").split(" | ")[0] for row in published_rows}
+    control_cell = next(
+        (cell for cell in probe_cells if cell not in published_cells), probe_cells[0]
+    )
+    control_pattern = re.compile(rf"^\| {re.escape(control_cell)} \|.*\n", re.MULTILINE)
+
+    def name_keyed_drop(text: str) -> str:
+        """`approved_changes` with the control cell's row dropped by name, first match only."""
+        return approved_changes(control_pattern.sub("", text, count=1))
+
+    control_violation = _name_keyed_drop_violation(
+        name_keyed_drop, baseline, name_keyed_drop(baseline), probe_rows, row_suffix
+    )
+    if control_violation is None:
         fail(
-            "name-keyed row drop fail-open: a row carrying only a catalogue first cell and a "
-            "body no audited rewrite contains was still transformed, so some entry keys on the "
-            "Lean name instead of on the row's frozen text (expected_lines="
-            f"{len(expected_lines)}, actual_lines={len(actual_lines)}, first_difference={first})"
+            "name-keyed row drop self-test control did not fire: a first-match drop keyed on "
+            f"{control_cell} passed the requirement below, so the requirement cannot detect the "
+            "shape it exists to refuse"
+        )
+
+    violation = _name_keyed_drop_violation(
+        approved_changes, baseline, transformed_baseline, probe_rows, row_suffix
+    )
+    if violation is not None:
+        fail(
+            "name-keyed row drop fail-open: synthetic rows carrying only a catalogue first cell "
+            "and a body no audited rewrite contains were dropped or had their body rewritten, "
+            "so some entry keys on the Lean name instead of on the row's frozen text "
+            f"({violation})"
         )
 
 
@@ -1639,9 +1707,10 @@ def absent_name_row_drop_negative_self_test() -> None:
     name (`pauli_decomposition`) -- and hand-dropping that row from the live legacy page so that
     both halves of the fail-open are present at once. The checker must refuse, and the
     byte-parity pin is what refuses: a name-keyed drop is not a rewrite of the row's frozen text,
-    so the transformed catalogue stops hashing to the audited value. What forbids the shape at
-    any spelling and any depth in the chain is `name_keyed_row_drop_absence_self_test`; the
-    anchor this fixture matches below is only its own wiring.
+    so the transformed catalogue stops hashing to the audited value. The shape itself, wherever
+    in the chain it sits, is what `name_keyed_row_drop_absence_self_test` refuses so long as the
+    match is bounded by nothing but the name; the anchor this fixture matches below is only its
+    own wiring.
     """
     with tempfile.TemporaryDirectory(prefix="absent-name-row-drop-") as scratch:
         mirror = Path(scratch) / "mirror"
@@ -1686,8 +1755,8 @@ def absent_name_row_drop_negative_self_test() -> None:
         # Dropping the row from the page alone is already refused, so the fixture must also give
         # the mirror the authorization it is being probed for: a drop keyed on the name rather
         # than on the row's frozen text, which is what makes absence look sufficient. Only this
-        # fixture's own wiring depends on the exact spelling below; the shape itself is refused
-        # at any spelling by `name_keyed_row_drop_absence_self_test`.
+        # fixture's own wiring depends on the exact spelling below; the unbounded shape
+        # itself is refused by `name_keyed_row_drop_absence_self_test`.
         anchor = "    return _drop_private_instructions_ref(_approved_replacements(text))\n"
         if anchor not in script_text:
             fail(
