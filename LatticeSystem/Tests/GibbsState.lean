@@ -70,11 +70,11 @@ example (H : ManyBodyOp (Fin 3)) :
 
 /-! ## D. Covariance extension (`GibbsState/Covariance.lean`)
 
-Pin representative results from the
-extension sub-file so the generic covariance / variance / im-
-of-Hermitian / anticommutator-im / commutator-re companion
-family is directly exercised at the generic layer (was previously
-only indirectly covered through Heisenberg / Ising wrappers). -/
+Pin representative results from the extension sub-file so the
+generic covariance / variance / im-of-Hermitian /
+anticommutator-im / commutator-re companion family is directly
+exercised at the generic layer (was previously only indirectly
+covered through Heisenberg / Ising wrappers). -/
 
 /-- Generic squared-observable expectation is real for Hermitian
 `H, O`. -/

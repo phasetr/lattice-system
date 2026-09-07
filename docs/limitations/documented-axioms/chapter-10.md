@@ -14,8 +14,7 @@ permalink: /limitations/documented-axioms/chapter-10/
 
 **Tasaki §10.2.5, Theorem 10.11** (eqs. (10.2.52)-(10.2.56), p. 368) is a
 **documented axiom**, `theorem_10_11_kubo_kishi_susceptibility_bound`
-(`LatticeSystem/Fermion/JordanWigner/Hubbard/LiebKuboKishi.lean`, declaration
-line 139).
+(`LatticeSystem/Fermion/JordanWigner/Hubbard/LiebKuboKishi.lean`).
 
 - **Proved (axiom-free):** the surrounding finite-volume machinery — the
   Duhamel static susceptibility, the charge and pairing Fourier-mode

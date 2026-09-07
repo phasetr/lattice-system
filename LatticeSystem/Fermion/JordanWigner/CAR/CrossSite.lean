@@ -4,9 +4,8 @@ import Mathlib.Tactic.NoncommRing
 /-!
 # CAR algebra — fully general cross-site relations for arbitrary `i < j`
 
-This sub-file
-contains the four fully general cross-site CAR relations for arbitrary pairs
-`i j : Fin (N + 1)` with `i.val < j.val`:
+This sub-file contains the four fully general cross-site CAR relations for
+arbitrary pairs `i j : Fin (N + 1)` with `i.val < j.val`:
 
 - `{c_i, c_j} = 0` (`fermionMultiAnnihilation_anticomm_lt`)
 - `{c_i†, c_j†} = 0` (`fermionMultiCreation_anticomm_lt`)

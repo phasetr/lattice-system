@@ -3,9 +3,8 @@ import LatticeSystem.Fermion.JordanWigner.CAR.StringFactorizationCore
 /-!
 # CAR algebra — JW string factorisation, commutativity, and zero-site general CAR
 
-This sub-file
-contains the general JW string machinery needed to prove cross-site CAR for
-arbitrary site pairs:
+This sub-file contains the general JW string machinery needed to prove
+cross-site CAR for arbitrary site pairs:
 
 1. **JW string factorisation** — extracting an interior `σ^z_i` factor from
    `jwString N j` when `i.val < j.val`, via the private `jwStringExceptAt`

@@ -76,9 +76,8 @@ example : spinHalfRot3 Real.pi = (-(2 * Complex.I)) • spinHalfOp3 :=
 
 /-! ## D. Conjugation extension (`SpinHalfRotation/Conjugation.lean`)
 
-Pin representative results from the
-extension sub-file so the test file actually exercises the
-content it imports. -/
+Pin representative results from the extension sub-file so the
+test file actually exercises the content it imports. -/
 
 /-- General-θ conjugation for axis 3 over axis 1 (Tasaki eq.
 (2.1.16)). -/

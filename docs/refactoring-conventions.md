@@ -314,6 +314,9 @@ declaration whose doc comment it is. In TeX the same form is
 - [ ] The authoritative legacy catalogue page is updated (or the PR explicitly notes "no
   user-visible API").
 - [ ] References to Tasaki / mathlib added where applicable.
+- [ ] Every Lean citation the PR writes or edits names a declaration (or the section title
+  / pin label / owning declaration where there is none) rather than a line number, and its
+  path is no longer than the suffix that separates it from equal basenames.
 
 ## 6b. Verifying push before merge (incident-driven)
 

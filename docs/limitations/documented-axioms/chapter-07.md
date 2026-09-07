@@ -12,9 +12,9 @@ permalink: /limitations/documented-axioms/chapter-07/
 
 ## Theorem 7.7 (hexagonal AKLT correlation decay and infinite-volume uniqueness)
 
-**Tasaki §7.3.2, Theorem 7.7** (eqs. (7.3.6)–(7.3.9), pp. 210–212) is a **documented
-axiom**, `tasaki_theorem_7_7` (`LatticeSystem/Quantum/SpinS/GeneralAKLT.lean`, doc
-comment lines 130–174, declaration lines 175–183). This section records this
+**Tasaki §7.3.2, Theorem 7.7** (eqs. (7.3.6)–(7.3.9), pp. 210–212) is a
+**documented axiom**, `tasaki_theorem_7_7`
+(`LatticeSystem/Quantum/SpinS/GeneralAKLT.lean`). This section records this
 non-Appendix documented axiom alongside the Appendix A entries of the
 [documented-axiom policy](/lattice-system/limitations/documented-axioms/).
 
@@ -96,12 +96,11 @@ non-Appendix documented axiom alongside the Appendix A entries of the
 
 **Tasaki §7.1.3, Theorem 7.2** (p. 179) is a **documented axiom** carried by two
 declarations in `LatticeSystem/Quantum/SpinS/AKLTInfiniteChain.lean`:
-`IsAKLTChainDynamics` (doc comment lines 43–48, declaration line 49) and
-`aklt_theorem_7_2` (doc comment lines 51–61, declaration lines 62–65).
+`IsAKLTChainDynamics` and `aklt_theorem_7_2`.
 
 - **Proved (axiom-free):** the finite-volume counterpart, Tasaki Theorem 7.1, is a
-  theorem — `aklt_theorem_7_1` (`LatticeSystem/Quantum/SpinS/AKLTTheorem71.lean`, line
-  49), recorded in the catalogue with the standard three axioms (`propext`,
+  theorem — `aklt_theorem_7_1` (`LatticeSystem/Quantum/SpinS/AKLTTheorem71.lean`),
+  recorded in the catalogue with the standard three axioms (`propext`,
   `Classical.choice`, `Quot.sound`). Only the passage to the infinite chain is
   axiomatized.
 - **What the axiom statement literally asserts:** for a one-dimensional
@@ -114,7 +113,7 @@ declarations in `LatticeSystem/Quantum/SpinS/AKLTInfiniteChain.lean`:
   the state with the `L↑∞` limit of the VBS state (7.1.12).
 - **The dynamics marker has no mathematical content:** `IsAKLTChainDynamics S δ` is an
   uninterpreted Prop-valued axiom, following the same idiom as `IsLocalHamiltonianData`
-  (`LatticeSystem/Math/CStarAlgebra/GroundState.lean`, line 52). It cannot be
+  (`LatticeSystem/Math/CStarAlgebra/GroundState.lean`). It cannot be
   established for any concrete data, so the theorem is only usable under an assumed
   hypothesis; since the marker admits the interpretation "always false", the pair adds
   no inconsistency. There are currently zero consumers of either declaration in the
@@ -155,20 +154,19 @@ declarations in `LatticeSystem/Quantum/SpinS/AKLTInfiniteChain.lean`:
 
 **Tasaki §7.1.1, Theorem 7.3** (eq. (7.1.4), p. 180) is a **documented axiom** carried
 by two declarations in `LatticeSystem/Quantum/SpinS/AKLTStability.lean`:
-`IsTranslationCovariant` (doc comment lines 38-42, declaration line 43) and
-`aklt_theorem_7_3` (doc comment lines 86-102, declaration lines 103-111).
+`IsTranslationCovariant` and `aklt_theorem_7_3`.
 
-- **Proved (axiom-free):** the unperturbed finite-volume model is a theorem —
-  Theorem 7.1, `aklt_theorem_7_1` (`LatticeSystem/Quantum/SpinS/AKLTTheorem71.lean`,
-  line 49), recorded in the catalogue with the standard three axioms (`propext`,
+- **Proved (axiom-free):** the unperturbed finite-volume model is a theorem — Theorem
+  7.1, `aklt_theorem_7_1` (`LatticeSystem/Quantum/SpinS/AKLTTheorem71.lean`),
+  recorded in the catalogue with the standard three axioms (`propext`,
   `Classical.choice`, `Quot.sound`). Only the stability of that picture under an
   arbitrary small local perturbation is axiomatized. Every other ingredient of the
   Theorem 7.3 statement is a real definition, not an axiom:
-  `perturbedAKLTHamiltonianS` (line 63), `IsAKLTPerturbation` (line 49),
-  `connectedChainCorrelation` (line 71), `IsUniqueChainGroundState` (line 81),
-  `IsLocalRangeR` (`LiebSchultzMattisGeneral.lean`, line 56), `IsPositiveSpectralGap`
-  (`HaldaneConjecture.lean`, line 70), `manyBodyOperatorNormS`
-  (`ManyBodyOperatorNorm.lean`, line 21) and `ringDist` (`RingDistance.lean`, line 28).
+  `perturbedAKLTHamiltonianS`, `IsAKLTPerturbation`, `connectedChainCorrelation` and
+  `IsUniqueChainGroundState` (all four in the same `AKLTStability.lean`),
+  `IsLocalRangeR` (`LiebSchultzMattisGeneral.lean`), `IsPositiveSpectralGap`
+  (`HaldaneConjecture.lean`), `manyBodyOperatorNormS` (`ManyBodyOperatorNorm.lean`)
+  and `ringDist` (`RingDistance.lean`).
 - **What the axiom statement literally asserts:** for every range r and bound v₀
   there is ε₀ > 0 such that for every |ε| < ε₀ there are ΔE, C, ξ > 0 — quantified
   outside ∀L and hence genuinely L-independent — such that for every L ≥ 3 and every
