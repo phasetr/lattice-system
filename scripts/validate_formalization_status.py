@@ -5705,6 +5705,34 @@ end LatticeSystem
     interim_retirement_clause = (
         "for as long as the version 2 catalogue is published as a non-authoritative prototype"
     )
+    manifest_relative = Path("formalization-status") / "v2" / "manifest.json"
+    try:
+        live_manifest = json.loads((repo_root / manifest_relative).read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        live_manifest = None
+    catalogue_state = (
+        live_manifest.get("catalog_state") if isinstance(live_manifest, dict) else None
+    )
+    prototype_catalogue = catalogue_state == "prototype"
+    html_comment_span = re.compile(r"<!--.*?(?:-->|\Z)", re.DOTALL)
+    code_fence_marker = re.compile(r"^ {0,3}(?:> ?)*(`{3,}|~{3,})")
+
+    def published_lines(text: str) -> list[str]:
+        """Blank the lines a Markdown reader hides, keeping every line at its own index."""
+        uncommented = html_comment_span.sub(lambda span: "\n" * span.group(0).count("\n"), text)
+        fence: str | None = None
+        lines: list[str] = []
+        for line in uncommented.splitlines():
+            opener = code_fence_marker.match(line)
+            marker = opener.group(1) if opener is not None else None
+            if fence is None:
+                lines.append("" if marker is not None else line)
+                fence = marker
+                continue
+            lines.append("")
+            if marker is not None and marker[0] == fence[0] and len(marker) >= len(fence):
+                fence = None
+        return lines
 
     def interim_authority_runs(lines: list[str]) -> list[tuple[int, int]]:
         """Return the line span of every blockquote opening the interim-authority claim."""
@@ -5745,21 +5773,38 @@ end LatticeSystem
     # Positive controls over every published legacy catalogue page, not the index alone: the
     # same banner sits on all of them, so reverting the self-retiring clause on a sibling chunk
     # page fails here exactly as it does on the index. Each page must carry an interim-authority
-    # blockquote; each such blockquote must assert `interim_authority_claim` in a sentence that
-    # carries the anchor itself, and must assert the authority in a sentence that carries
-    # `interim_retirement_clause` itself, so a decoy banner, a decoy paragraph of the same
-    # blockquote, or an aside that a period plus whitespace separates from the sentence cannot
-    # supply either literal on behalf of a reverted sentence; an aside glued on by any other
-    # separator is still read as part of that sentence. Both non-vacuity tests name the pages
-    # that carry no such sentence at all, so deleting either sentence on a single page fails
-    # here instead of being vouched for by the 50 intact siblings. The clause is pinned as its
-    # own literal because it names the version 2 catalogue rather than `interim_anchor`. The
-    # quotes are unwrapped first, so reflowing a banner is not treated as drift. A page whose
-    # bytes are not valid UTF-8 is reported as a failure rather than aborting the run with a
-    # decoding traceback; the live gate above reads the index page before this loop, so a bad
+    # blockquote, and what that blockquote has to say follows the manifest's `catalog_state`:
+    # the two states are checked in opposite directions, so neither can be satisfied by prose the
+    # other forbids. While the catalogue is a `prototype`, each such blockquote must assert
+    # `interim_authority_claim` in a sentence that carries the anchor itself, and must assert the
+    # authority in a sentence that carries `interim_retirement_clause` itself, so a decoy banner,
+    # a decoy paragraph of the same blockquote, or an aside that a period plus whitespace
+    # separates from the sentence cannot supply either literal on behalf of a reverted sentence;
+    # an aside glued on by any other separator is still read as part of that sentence. Both
+    # non-vacuity tests name the pages that carry no such sentence at all, so deleting either
+    # sentence on a single page fails here instead of being vouched for by the 50 intact
+    # siblings. The clause is pinned as its own literal because it names the version 2 catalogue
+    # rather than `interim_anchor`. In every other state no blockquote may keep either literal or
+    # claim the authority at all, because check_generated_site rejects an authoritative
+    # publication carrying the forbidden phrase inside `interim_retirement_clause`: the cutover
+    # therefore has to rewrite the banner on every gated page (and, if it drops the
+    # `**Interim authority.**` opener the runs key on, teach `interim_authority_runs` the new one
+    # in the same change) rather than only flip the manifest. A catalogue state this gate cannot
+    # read takes that forbidding direction too, so a missing or unparsable manifest fails here
+    # instead of switching the controls off. The quotes are unwrapped first, so reflowing a
+    # banner is not treated as drift. HTML-comment spans and fenced code regions are blanked,
+    # line numbering preserved, before the banners are located, so a banner that survives only
+    # inside one of them is read as missing rather than as published prose. A page whose bytes
+    # cannot be read as UTF-8 text (undecodable bytes, or a directory or an unreadable mode
+    # behind a `*.md` name) is reported as a failure naming the error rather than aborting the
+    # run with a traceback; the live gate above reads the index page before this loop, so a bad
     # byte there still aborts. Documented limitations: the controls read the interim-authority
     # blockquotes alone, so the retired authority condition restated as prose elsewhere on a
-    # gated page passes; the index page publishes exactly that condition further down, inside a
+    # gated page passes; both pins are literal, so a banner keeping the literals while negating
+    # them ("no longer still a non-authoritative prototype") passes; the blanking approximates
+    # two hiding shapes instead of parsing Markdown, so a banner hidden by any other means (a raw
+    # HTML wrapper, CSS) still counts as published and only reading the rendered page would close
+    # that class; the index page publishes exactly that condition further down, inside a
     # `legacy-source` span whose text check_docs_hierarchy pins against the historical
     # docs/index.md prose, so it is a known frozen residual that only an audited moved-prose
     # rewrite can change; and the same clause also appears on 24 prototype-navigation pages
@@ -5773,16 +5818,16 @@ end LatticeSystem
     # live tree fails at the ledger check below, instead of passing silently; the ledger pins
     # the list object the live call is handed, not the survival of what that call collects.
     legacy_index_lines = legacy_index_text.splitlines()
-    index_runs = interim_authority_runs(legacy_index_lines)
+    index_runs = interim_authority_runs(published_lines(legacy_index_text))
     interim_quotes: list[tuple[str, str]] = []
     bannerless_pages: list[str] = []
-    undecodable_pages: list[str] = []
+    unreadable_pages: list[str] = []
     for page in legacy_catalogue_pages:
         page_name = page.relative_to(repo_root).as_posix()
         try:
-            page_lines = page.read_text(encoding="utf-8").splitlines()
-        except UnicodeDecodeError:
-            undecodable_pages.append(page_name)
+            page_lines = published_lines(page.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError) as error:
+            unreadable_pages.append(f"{page_name} ({type(error).__name__})")
             continue
         page_runs = interim_authority_runs(page_lines)
         if not page_runs:
@@ -5791,12 +5836,13 @@ end LatticeSystem
             (page_name, unwrapped_quote(page_lines[start:stop])) for start, stop in page_runs
         )
     check(
-        not undecodable_pages,
-        f"{legacy_catalogue_dir.as_posix()}: {len(undecodable_pages)} of "
+        not unreadable_pages,
+        f"{legacy_catalogue_dir.as_posix()}: {len(unreadable_pages)} of "
         f"{len(legacy_catalogue_pages)} published catalogue page(s) "
-        f"({', '.join(undecodable_pages) or 'none'}) are not valid UTF-8, so the controls below "
-        "never read their banner; a page the gate cannot decode is reported here instead of "
-        "aborting the whole run with a decoding traceback that hides every later self-test",
+        f"({', '.join(unreadable_pages) or 'none'}) could not be read as UTF-8 text, so the "
+        "controls below never read their banner; a page the gate cannot read is reported here "
+        "with the error that stopped it instead of aborting the whole run with a traceback that "
+        "hides every later self-test",
     )
     check(
         bool(legacy_catalogue_pages) and not bannerless_pages,
@@ -5816,8 +5862,9 @@ end LatticeSystem
         | {page_name for page_name, quote in interim_quotes if not authority_claim_sentences(quote)}
     )
     check(
-        bool(claim_sentences) and not unanchored_pages,
-        f"{legacy_catalogue_dir.as_posix()}: the gate positive control is vacuous on "
+        not prototype_catalogue or (bool(claim_sentences) and not unanchored_pages),
+        f"{legacy_catalogue_dir.as_posix()}: while the catalogue is a prototype, the gate "
+        "positive control is vacuous on "
         f"{len(unanchored_pages)} of {len(legacy_catalogue_pages)} published page(s) "
         f"({', '.join(unanchored_pages) or 'none'}), which either assert "
         f"{interim_authority_claim!r} without the anchor {interim_anchor!r} in the asserting "
@@ -5846,14 +5893,34 @@ end LatticeSystem
         }
     )
     check(
-        bool(assertion_sentences) and not clauseless_pages,
-        f"{legacy_catalogue_dir.as_posix()}: {len(clauseless_pages)} of "
+        not prototype_catalogue or (bool(assertion_sentences) and not clauseless_pages),
+        f"{legacy_catalogue_dir.as_posix()}: while the catalogue is a prototype, "
+        f"{len(clauseless_pages)} of "
         f"{len(legacy_catalogue_pages)} published page(s) ({', '.join(clauseless_pages) or 'none'}"
         f") claim interim authority without the literal {interim_retirement_clause!r} in the "
         f"claiming sentence itself, out of {len(assertion_sentences)} such sentence(s) in "
         f"{len(interim_quotes)} interim-authority blockquote(s); nothing else pins that clause, "
         "so reverting it to a closed issue reference, deleting it, or letting a neighbouring "
         "sentence of the same blockquote carry it would otherwise pass every gate",
+    )
+    interim_claiming_pages = sorted(
+        {
+            page_name
+            for page_name, quote in interim_quotes
+            if interim_authority_claim in quote
+            or interim_retirement_clause in quote
+            or interim_authority_assertion.search(quote)
+        }
+    )
+    check(
+        prototype_catalogue or not interim_claiming_pages,
+        f"{legacy_catalogue_dir.as_posix()}: {len(interim_claiming_pages)} of "
+        f"{len(legacy_catalogue_pages)} published page(s) "
+        f"({', '.join(interim_claiming_pages) or 'none'}) still claim interim authority while "
+        f"manifest.json declares catalog_state {catalogue_state!r} rather than 'prototype', so "
+        "the banners contradict the catalogue they front and check_generated_site rejects the "
+        f"staged tree over the forbidden phrase inside {interim_retirement_clause!r}; the "
+        "cutover has to rewrite every banner, not only flip the manifest",
     )
     downgraded_lines = list(legacy_index_lines)
     for start, stop in reversed(index_runs):
