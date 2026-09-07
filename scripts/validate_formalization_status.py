@@ -5679,23 +5679,26 @@ end LatticeSystem
     # cutover, and the contract states that version 1's machine URLs are no longer published.
     legacy_index_relative = Path("docs") / "formalization" / "legacy" / "index.md"
     stale_version_claims = ("version 1 JSON records", "records are schema version 1")
-    gated_legacy_roots: list[Path] = []
+    gated_legacy_roots: list[tuple[Path, bool]] = []
 
-    def legacy_authority_gate(root: Path) -> list[str]:
-        """Return every version-1 self-description the legacy authority page of `root` makes."""
-        gated_legacy_roots.append(root)
+    def legacy_authority_gate(root: Path, sink: list[str]) -> list[str]:
+        """Add every version-1 self-description of `root`'s legacy authority page to `sink`."""
+        gated_legacy_roots.append((root, sink is failures))
         text = (root / legacy_index_relative).read_text(encoding="utf-8")
-        return [
+        messages = [
             f"{legacy_index_relative.as_posix()}: describes its own records with a version-1 "
             f"claim ({claim!r}), which the contract's version-2 cutover makes false"
             for claim in stale_version_claims
             if claim in text
         ]
+        sink.extend(messages)
+        return messages
 
-    failures.extend(legacy_authority_gate(repo_root))
+    legacy_authority_gate(repo_root, failures)
 
     legacy_index_text = (repo_root / legacy_index_relative).read_text(encoding="utf-8")
     interim_anchor = "version 2 JSON records"
+    interim_authority_claim = "still a non-authoritative prototype"
 
     def interim_authority_runs(lines: list[str]) -> list[tuple[int, int]]:
         """Return the line span of every blockquote opening the interim-authority claim."""
@@ -5717,25 +5720,38 @@ end LatticeSystem
         """Join one blockquote into a single line, dropping its markers and source wrapping."""
         return " ".join(" ".join(line[1:] for line in lines).split())
 
+    def authority_claim_sentences(quote: str) -> list[str]:
+        """Return the sentences of one unwrapped blockquote that assert the interim authority."""
+        return [
+            sentence
+            for sentence in re.split(r"(?<=\.)\s+", quote)
+            if interim_authority_claim in sentence
+        ]
+
     # Positive controls: the gate above must fire on drift injected into the live authority
-    # claim, which is the only text it protects. Every interim-authority blockquote must carry
-    # the anchor, so a decoy banner cannot supply it on behalf of an unanchored live one; the
-    # quotes are unwrapped first, so reflowing the banner is not treated as drift; and the
-    # mutants run through the same gate against a scratch tree, so neutering the gate or
-    # unwiring it from the live tree fails here instead of passing silently.
+    # claim, which is the only text it protects. Every sentence asserting that claim must carry
+    # the anchor itself, so neither a decoy banner nor an aside inside the same blockquote can
+    # supply it on behalf of an unanchored live sentence; the quotes are unwrapped first, so
+    # reflowing the banner is not treated as drift; and the mutants run through the same gate
+    # with a throwaway sink against a scratch tree, so neutering the gate, unwiring it from the
+    # live tree, or dropping its findings on the floor fails here instead of passing silently.
     legacy_index_lines = legacy_index_text.splitlines()
     interim_runs = interim_authority_runs(legacy_index_lines)
     interim_quotes = [
         unwrapped_quote(legacy_index_lines[start:stop]) for start, stop in interim_runs
     ]
-    unanchored = [quote for quote in interim_quotes if interim_anchor not in quote]
+    claim_sentences = [
+        sentence for quote in interim_quotes for sentence in authority_claim_sentences(quote)
+    ]
+    unanchored = [sentence for sentence in claim_sentences if interim_anchor not in sentence]
     check(
-        bool(interim_quotes) and not unanchored,
+        bool(claim_sentences) and not unanchored,
         "docs/formalization/legacy/index.md gate positive control is vacuous: "
-        f"{len(unanchored)} of {len(interim_quotes)} interim-authority blockquote(s) lack the "
-        f"anchor {interim_anchor!r} (the blockquote is absent, reworded, or a decoy banner "
-        "carries the anchor for an unanchored live one), so the downgrade mutation below "
-        "changes nothing there and the control can never fail",
+        f"{len(unanchored)} of {len(claim_sentences)} sentence(s) asserting "
+        f"{interim_authority_claim!r} in {len(interim_quotes)} interim-authority blockquote(s) "
+        f"lack the anchor {interim_anchor!r} (the claim is absent, reworded, or a decoy banner "
+        "or a neighbouring aside carries the anchor for an unanchored live sentence), so the "
+        "downgrade mutation below leaves the claim intact and the control can never fail",
     )
     downgraded_lines = list(legacy_index_lines)
     for start, stop in reversed(interim_runs):
@@ -5763,7 +5779,7 @@ end LatticeSystem
         ):
             mutant_page.write_text(mutated_page, encoding="utf-8")
             check(
-                bool(legacy_authority_gate(legacy_gate_root)),
+                bool(legacy_authority_gate(legacy_gate_root, [])),
                 f"docs/formalization/legacy/index.md: a scratch copy carrying {label} passed "
                 "the gate, so either the gate no longer reacts to the drift it exists to catch "
                 "or the mutation injected nothing (the anchor control above says which)",
@@ -5771,9 +5787,10 @@ end LatticeSystem
     finally:
         shutil.rmtree(legacy_gate_root, ignore_errors=True)
     check(
-        repo_root in gated_legacy_roots,
+        (repo_root, True) in gated_legacy_roots,
         "docs/formalization/legacy/index.md: the live tree was never routed through the gate "
-        "the controls above exercise, so the published page is no longer gated at all",
+        "the controls above exercise with the failure list this run reports, so whatever the "
+        "gate finds on the published page cannot reach the reported failures",
     )
 
     return failures
