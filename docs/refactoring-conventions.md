@@ -294,7 +294,8 @@ For every PR adding `def` / `theorem` / `lemma`, the same PR must:
 1. Update the authoritative page in
    [`docs/formalization/legacy/`](/lattice-system/formalization/legacy/)
    (Lean name + statement + file + citation). This is the interim update path
-   until the audited structured-data cutover.
+   for as long as the version 2 catalogue is published as a non-authoritative
+   prototype.
 2. Update the tracking Issue or roadmap page if applicable.
 3. Update `tex/proof-guide.tex` if relevant.
 

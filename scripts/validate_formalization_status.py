@@ -5691,27 +5691,41 @@ end LatticeSystem
         "docs/formalization/legacy/index.md: describes its own records with a version-1 "
         f"claim ({live_stale_claims}), which the contract's version-2 cutover makes false",
     )
-    # Positive control: the same predicate, over the same page text, must fire on injected
-    # drift. The previous control mutated the stale wording into the corrected wording, a
-    # string the page never contained, so `.replace()` was a no-op and the control merely
-    # re-asserted the check above -- it would have passed with the gate deleted. Mutate in
-    # the direction of the defect instead, and refuse to pass when the anchor it bites on is
-    # missing, because a mutation that changes nothing tests nothing.
-    downgraded = legacy_index_text.replace("version 2 JSON records", "version 1 JSON records")
+
+    def interim_authority_blockquote(text: str) -> str:
+        """Return the contiguous blockquote that opens the page's interim-authority claim."""
+        quoted: list[str] = []
+        for line in text.splitlines():
+            if quoted:
+                if not line.startswith(">"):
+                    break
+                quoted.append(line)
+            elif line.startswith("> **Interim authority.**"):
+                quoted.append(line)
+        return "\n".join(quoted)
+
+    # Positive control: the same predicate must fire on drift injected into the live authority
+    # claim, which is the only text this gate protects. The mutation is scoped to that
+    # blockquote so an anchor occurrence elsewhere on the page cannot stand in for it, and a
+    # mutation that changes nothing tests nothing, so a missing anchor must fail here rather
+    # than silently disarm the control below.
+    interim_authority = interim_authority_blockquote(legacy_index_text)
+    downgraded = interim_authority.replace("version 2 JSON records", "version 1 JSON records")
     check(
-        downgraded != legacy_index_text,
-        "docs/formalization/legacy/index.md gate positive control is vacuous: the anchor "
-        "'version 2 JSON records' is absent from the page, so the downgrade mutation changed "
-        "nothing and the control below can never fail",
+        downgraded != interim_authority,
+        "docs/formalization/legacy/index.md gate positive control is vacuous: the "
+        "interim-authority blockquote does not carry the anchor 'version 2 JSON records' "
+        "(the blockquote is absent or reworded), so the downgrade mutation changed nothing "
+        "and the control below can never fail",
     )
     check(
-        stale_version_claims_in(downgraded) == ["version 1 JSON records"],
+        "version 1 JSON records" in stale_version_claims_in(downgraded),
         "docs/formalization/legacy/index.md gate failed to detect an injected version-1 "
         "downgrade of the banner; the gate does not react to the drift it exists to catch",
     )
     schema_downgraded = f"{legacy_index_text}\nThese records are schema version 1.\n"
     check(
-        stale_version_claims_in(schema_downgraded) == ["records are schema version 1"],
+        "records are schema version 1" in stale_version_claims_in(schema_downgraded),
         "docs/formalization/legacy/index.md gate failed to detect an injected 'records are "
         "schema version 1' claim",
     )

@@ -16,9 +16,9 @@ Browse the intended human information architecture:
 - [Version 2 data contract](/lattice-system/formalization-status-contract/)
 - [Publication and local-reproduction runbook](/lattice-system/formalization-publication/)
 
-Issue #5229 will generate and publish source and topic views from one catalogue.
-The complete structured records will be populated and audited before they
-become authoritative.
+The source and topic views are generated from one catalogue and published as a
+non-authoritative prototype. The complete structured records will be populated
+and audited before they become authoritative.
 
 <!-- formalization-status-generated:start overview -->
 <!-- formalization-status-generated:end -->
