@@ -5715,21 +5715,38 @@ end LatticeSystem
     )
     prototype_catalogue = catalogue_state == "prototype"
     html_comment_span = re.compile(r"<!--.*?(?:-->|\Z)", re.DOTALL)
-    code_fence_marker = re.compile(r"^ {0,3}(?:> ?)*(`{3,}|~{3,})")
+    line_ending = re.compile(r"\r\n|\r")
+    code_fence_opener = re.compile(r"^ {0,3}(?:> ?)*(`{3,}|~{3,})")
+    code_fence_closer = re.compile(r"^ {0,3}(?:> ?)*(`{3,}|~{3,})[ \t]*$")
+
+    def source_lines(text: str) -> list[str]:
+        """Split Markdown source on the line endings CommonMark recognises, and on those only."""
+        return line_ending.sub("\n", text).split("\n")
 
     def published_lines(text: str) -> list[str]:
-        """Blank the lines a Markdown reader hides, keeping every line at its own index."""
-        uncommented = html_comment_span.sub(lambda span: "\n" * span.group(0).count("\n"), text)
+        """Blank the lines a Markdown reader hides, keeping every line at its own index.
+
+        The indices hold because the comment substitution puts back one newline for every newline
+        it swallows and both this function and source_lines break lines only where CommonMark
+        does, unlike str.splitlines(), which also breaks on form feeds and other Unicode
+        separators that a Markdown reader keeps inside the line.
+        """
+        normalized = line_ending.sub("\n", text)
+        uncommented = html_comment_span.sub(
+            lambda span: "\n" * span.group(0).count("\n"), normalized
+        )
         fence: str | None = None
         lines: list[str] = []
-        for line in uncommented.splitlines():
-            opener = code_fence_marker.match(line)
-            marker = opener.group(1) if opener is not None else None
+        for line in source_lines(uncommented):
             if fence is None:
+                opener = code_fence_opener.match(line)
+                marker = opener.group(1) if opener is not None else None
                 lines.append("" if marker is not None else line)
                 fence = marker
                 continue
             lines.append("")
+            closer = code_fence_closer.match(line)
+            marker = closer.group(1) if closer is not None else None
             if marker is not None and marker[0] == fence[0] and len(marker) >= len(fence):
                 fence = None
         return lines
@@ -5794,30 +5811,45 @@ end LatticeSystem
     # instead of switching the controls off. The quotes are unwrapped first, so reflowing a
     # banner is not treated as drift. HTML-comment spans and fenced code regions are blanked,
     # line numbering preserved, before the banners are located, so a banner that survives only
-    # inside one of them is read as missing rather than as published prose. A page whose bytes
-    # cannot be read as UTF-8 text (undecodable bytes, or a directory or an unreadable mode
-    # behind a `*.md` name) is reported as a failure naming the error rather than aborting the
-    # run with a traceback; the live gate above reads the index page before this loop, so a bad
-    # byte there still aborts. Documented limitations: the controls read the interim-authority
-    # blockquotes alone, so the retired authority condition restated as prose elsewhere on a
-    # gated page passes; both pins are literal, so a banner keeping the literals while negating
-    # them ("no longer still a non-authoritative prototype") passes; the blanking approximates
-    # two hiding shapes instead of parsing Markdown, so a banner hidden by any other means (a raw
-    # HTML wrapper, CSS) still counts as published and only reading the rendered page would close
-    # that class; the index page publishes exactly that condition further down, inside a
-    # `legacy-source` span whose text check_docs_hierarchy pins against the historical
-    # docs/index.md prose, so it is a known frozen residual that only an audited moved-prose
-    # rewrite can change; and the same clause also appears on 24 prototype-navigation pages
-    # under docs/formalization/ outside legacy/ and at 4 wrapped prose sites elsewhere under
-    # docs/, none of which this gate reads (the `details/` banner claims no authority and is
-    # outside the glob for the same reason). Those sites are covered only by
-    # check_generated_site.AUTHORITATIVE_FORBIDDEN_PHRASES, which is inert while `catalog_state`
-    # is `prototype` and therefore bites only at the cutover. The mutants below run through the
-    # same gate against a scratch tree with a sink of their own that has to come back filled, so
-    # neutering the gate or dropping the sink extension fails here, and unwiring it from the
-    # live tree fails at the ledger check below, instead of passing silently; the ledger pins
+    # inside one of them is read as missing rather than as published prose. A fence's two ends
+    # are matched by separate patterns because CommonMark lets only an opening fence carry an
+    # info string: `code_fence_closer` demands whitespace to the end of the line after a run of
+    # the opener's own fence character at least as long as it, so neither an info-string line
+    # (```md inside a ```text block) nor a shorter run reopens the page to the gate while the
+    # rendered block stays open. Both ends split lines through `source_lines`, which breaks only
+    # on CommonMark's line endings, so the blanked text and `legacy_index_lines` stay aligned
+    # index for index even on a page carrying a form feed or another separator that
+    # str.splitlines() would break on but a Markdown reader keeps inside the line.
+    # A page whose bytes cannot be read as UTF-8 text (undecodable bytes, or a directory or an
+    # unreadable mode behind a `*.md` name) is reported as a failure naming the error rather than
+    # aborting the run with a traceback; the live gate above reads the index page before this loop,
+    # so a bad byte there still aborts. Documented limitations: the controls read the
+    # interim-authority blockquotes alone, so the retired authority condition restated as prose
+    # elsewhere on a gated page passes; both pins are literal, so a banner keeping the literals
+    # while negating them ("no longer still a non-authoritative prototype") passes; the blanking
+    # approximates two hiding shapes instead of parsing Markdown, so every other way of hiding a
+    # banner still counts as published prose and only reading the rendered page would close that
+    # class. The shapes measured as not covered, each of which keeps this gate at exit 0 while the
+    # rendered page shows no banner: a raw HTML container (`<div hidden>`, or a `<details>` the
+    # reader has to expand), a CSS one (`style="display:none"` on such a wrapper, or a stylesheet
+    # rule hiding it), and a Liquid `{% comment %}`, which Jekyll strips before Markdown runs at
+    # all. Two neighbouring shapes are covered, though by `interim_authority_runs` rather than by
+    # the blanking, because the run detector requires the blockquote marker in column 0 and both
+    # have to move it: a 4-space-indented code block and a reference-style `[//]: # (...)` comment
+    # are each reported as a missing banner (measured). Continuing the limitations: the index page
+    # publishes exactly that condition further down, inside a `legacy-source` span whose text
+    # check_docs_hierarchy pins against the historical docs/index.md prose, so it is a known frozen
+    # residual that only an audited moved-prose rewrite can change; and the same clause also
+    # appears on 24 prototype-navigation pages under docs/formalization/ outside legacy/ and at 4
+    # wrapped prose sites elsewhere under docs/, none of which this gate reads (the `details/`
+    # banner claims no authority and is outside the glob for the same reason). Those sites are
+    # covered only by check_generated_site.AUTHORITATIVE_FORBIDDEN_PHRASES, which is inert while
+    # `catalog_state` is `prototype` and therefore bites only at the cutover. The mutants below run
+    # through the same gate against a scratch tree with a sink of their own that has to come back
+    # filled, so neutering the gate or dropping the sink extension fails here, and unwiring it from
+    # the live tree fails at the ledger check below, instead of passing silently; the ledger pins
     # the list object the live call is handed, not the survival of what that call collects.
-    legacy_index_lines = legacy_index_text.splitlines()
+    legacy_index_lines = source_lines(legacy_index_text)
     index_runs = interim_authority_runs(published_lines(legacy_index_text))
     interim_quotes: list[tuple[str, str]] = []
     bannerless_pages: list[str] = []
@@ -5939,7 +5971,7 @@ end LatticeSystem
         for label, mutated_page in (
             (
                 "a version-1 downgrade of the interim-authority banner",
-                "\n".join(downgraded_lines) + "\n",
+                "\n".join(downgraded_lines),
             ),
             (
                 "an appended 'records are schema version 1' claim",
