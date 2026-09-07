@@ -7,7 +7,7 @@ permalink: /formalization/legacy/16-horsch-von-der-linden-low-lying-states-tasak
 <a id="legacy-catalogue-horschvon-der-linden-low-lying-states-tasaki-34-theorem-31-part-2-of-2"></a>
 # Legacy catalogue: Horsch–von der Linden low-lying states (Tasaki §3.4, Theorem 3.1) (part 2 of 4)
 
-> **Interim authority.** This lossless catalogue chunk remains authoritative for formalization status and capstone identification until Issue #5228. The version 2 JSON records are still a non-authoritative prototype.
+> **Interim authority.** This lossless catalogue chunk remains authoritative for formalization status and capstone identification for as long as the version 2 catalogue is published as a non-authoritative prototype. The version 2 JSON records are still a non-authoritative prototype.
 
 [Interim catalogue](/lattice-system/formalization/legacy/) › [Spin models, Chapters 3–7, and spectral tools](/lattice-system/formalization/legacy/#group-spin-models)
 

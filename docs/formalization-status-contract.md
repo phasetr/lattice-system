@@ -8,7 +8,7 @@ title: Formalization status data contract
 
 Status: accepted prototype contract for Issue #5230. The version 2 catalogue has
 `catalog_state: "prototype"` and is deliberately non-authoritative until the
-governance cutover in Issue #5228.
+governance cutover.
 
 ## Decision
 
@@ -21,9 +21,9 @@ During the prototype and catalogue-migration stages, the complete legacy
 catalogue tree under `docs/formalization/legacy/` remains the authority named by
 current project governance. The concise `docs/index.md` landing page is not a
 status ledger. The prototype is evidence that the contract can represent
-existing content; it is not a second status ledger. Issue #5228 must explicitly
-change the authority chain after the catalogue is complete, publication is
-deployed, and an audit finds no material discrepancy.
+existing content; it is not a second status ledger. The audited cutover must
+explicitly change the authority chain after the catalogue is complete,
+publication is deployed, and an audit finds no material discrepancy.
 
 ## Existing roles and consumers
 
@@ -52,8 +52,8 @@ Other status-bearing surfaces are intentionally not replaced wholesale:
   published project page. It is not a theorem-status database.
 - `docs/refactoring-conventions.md` and agent instructions
   currently require the complete legacy catalogue tree to be consulted for
-  documentation and capstone checks. Issue #5228 owns changing those consumers
-  to validated structured records.
+  documentation and capstone checks. The audited cutover owns changing those
+  consumers to validated structured records.
 - `.github/workflows/lean_action_ci.yml` currently owns the Lean CI and records
   that doc-gen4 is disabled. Issue #5229 owns status-site generation and Pages
   publication; this contract does not edit workflows.
@@ -63,7 +63,7 @@ Other status-bearing surfaces are intentionally not replaced wholesale:
 
 ## Authority boundary
 
-After Issue #5228 completes the cutover, authority is divided as follows:
+After the audited cutover completes, authority is divided as follows:
 
 | Subject | Authority after cutover | Derived or explanatory surfaces |
 |---|---|---|
@@ -382,7 +382,8 @@ enums, Lean names, and module/path patterns already impose stricter grammars.
 `manifest.json` declares:
 
 - `schema_version: 2`;
-- `catalog_state` (`prototype` until #5228, then `authoritative`);
+- `catalog_state` (`prototype`, becoming `authoritative` only at the audited
+  cutover);
 - the registry paths;
 - an explicit sorted `record_shards` list;
 - optional paired fixed `cutover_baseline` and `cutover_certificate` paths,

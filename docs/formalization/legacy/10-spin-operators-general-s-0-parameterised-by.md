@@ -6,7 +6,7 @@ permalink: /formalization/legacy/10-spin-operators-general-s-0-parameterised-by/
 
 # Legacy catalogue: Spin-`S` operators (general S ≥ 0, parameterised by `N = 2S : ℕ`)
 
-> **Interim authority.** This lossless catalogue chunk remains authoritative for formalization status and capstone identification until Issue #5228. The version 2 JSON records are still a non-authoritative prototype.
+> **Interim authority.** This lossless catalogue chunk remains authoritative for formalization status and capstone identification for as long as the version 2 catalogue is published as a non-authoritative prototype. The version 2 JSON records are still a non-authoritative prototype.
 
 [Interim catalogue](/lattice-system/formalization/legacy/) › [Spin foundations and Tasaki Chapter 2](/lattice-system/formalization/legacy/#group-spin-foundations)
 

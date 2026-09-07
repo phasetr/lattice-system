@@ -6,7 +6,7 @@ permalink: /formalization/
 
 # Formalization catalogue
 
-> **Prototype navigation only.** The version 2 structured catalogue is not yet complete or authoritative. These pages provide the agreed source/topic layout without copying declaration status. For complete status and capstone decisions, use the [interim legacy catalogue](/lattice-system/formalization/legacy/) until #5228.
+> **Prototype navigation only.** The version 2 structured catalogue is not yet complete or authoritative. These pages provide the agreed source/topic layout without copying declaration status. For complete status and capstone decisions, use the [interim legacy catalogue](/lattice-system/formalization/legacy/) for as long as the version 2 catalogue is published as a non-authoritative prototype.
 
 Browse the intended human information architecture:
 
@@ -17,7 +17,7 @@ Browse the intended human information architecture:
 - [Publication and local-reproduction runbook](/lattice-system/formalization-publication/)
 
 Issue #5229 will generate and publish source and topic views from one catalogue.
-Issue #5228 will populate and audit the complete structured records before they
+The complete structured records will be populated and audited before they
 become authoritative.
 
 <!-- formalization-status-generated:start overview -->

@@ -32,9 +32,8 @@ The complete hand-maintained catalogue under
 [`formalization/legacy/`](/lattice-system/formalization/legacy/) is the interim
 authority for formalization status and capstone identification. The
 [version 2 data contract](/lattice-system/formalization-status-contract/) and
-its JSON catalogue are a **non-authoritative prototype**. Issue
-[#5228](https://github.com/phasetr/lattice-system/issues/5228) alone performs
-the structured-data cutover after full migration and audit. Do not combine the
+its JSON catalogue are a **non-authoritative prototype**. The structured-data
+cutover happens only after full migration and audit. Do not combine the
 prototype and legacy pages into competing ledgers.
 
 ## Present coverage
@@ -45,7 +44,8 @@ matrix-analysis foundations. Infinite-volume, thermodynamic-limit, and
 continuum-limit work remains a central long-term goal rather than an excluded
 topic. The limitations page explains the policy for documented axioms; complete
 declaration-level axiom occurrences remain in the interim legacy catalogue
-until #5228.
+for as long as the version 2 catalogue is published as a non-authoritative
+prototype.
 
 API documentation generation with doc-gen4 remains disabled because its former
 CI job was prohibitively slow. Formalization-status publication is a separate

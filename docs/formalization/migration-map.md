@@ -34,7 +34,8 @@ headings.
   characters other than ASCII letters, digits, spaces, and hyphens, replace
   spaces with hyphens, and lowercase.
 - The complete interim authority is the legacy catalogue tree, not the landing
-  page and not the prototype JSON. Issue #5228 owns the only authority cutover.
+  page and not the prototype JSON. The audited structured-data cutover is the
+  only authority change.
 
 ## Section destinations
 
