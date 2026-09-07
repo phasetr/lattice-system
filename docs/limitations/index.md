@@ -15,6 +15,7 @@ complete declaration register.
 - [Complete interim declaration catalogue](/lattice-system/formalization/legacy/)
 - [Formalization-status contract](/lattice-system/formalization-status-contract/)
 
-The JSON catalogue remains incomplete and non-authoritative until #5228. Until
-then, complete current declaration-level axiom occurrences, status, and
-capstone decisions remain in the interim legacy catalogue pages.
+The JSON catalogue is incomplete. The interim legacy catalogue pages carry the
+complete current declaration-level axiom occurrences, status, and capstone
+decisions for as long as the version 2 catalogue is published as a
+non-authoritative prototype.

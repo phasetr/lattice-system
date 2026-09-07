@@ -6,7 +6,7 @@ permalink: /formalization/legacy/17-bose-einstein-condensation-of-hard-core-boso
 
 # Legacy catalogue: Bose–Einstein condensation of hard-core bosons (Tasaki §5.1–§5.2)
 
-> **Interim authority.** This lossless catalogue chunk remains authoritative for formalization status and capstone identification until Issue #5228. The version 2 JSON records are still a non-authoritative prototype.
+> **Interim authority.** This lossless catalogue chunk remains authoritative for formalization status and capstone identification for as long as the version 2 catalogue is published as a non-authoritative prototype. The version 2 JSON records are still a non-authoritative prototype.
 
 [Interim catalogue](/lattice-system/formalization/legacy/) › [Spin models, Chapters 3–7, and spectral tools](/lattice-system/formalization/legacy/#group-spin-models)
 

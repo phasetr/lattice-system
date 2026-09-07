@@ -78,7 +78,8 @@ canonical record-route topology; `generation.json` records its exact record
 page count and a framed digest of every record ID/route pair. While the
 catalogue state is `prototype`, the
 [complete interim legacy catalogue](/lattice-system/formalization/legacy/)
-remains authoritative until Issue #5228 performs the audited cutover.
+remains authoritative for as long as the version 2 catalogue is published as a
+non-authoritative prototype.
 When the state becomes `authoritative`, the same generated metadata instead
 links to and names the validated version 2 catalogue as the current authority.
 The staged and rendered checkers derive this choice from `catalog_state`; a

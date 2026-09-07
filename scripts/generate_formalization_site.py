@@ -142,7 +142,10 @@ def metadata(aggregate: dict[str, Any], revision: str) -> list[str]:
     authority_notice = (
         "The validated version 2 catalogue is authoritative for formalization status."
         if authoritative
-        else "The interim legacy catalogue remains authoritative until Issue #5228."
+        else (
+            "The interim legacy catalogue remains authoritative for as long as the "
+            "version 2 catalogue is published as a non-authoritative prototype."
+        )
     )
     authority_href = (
         "/lattice-system/formalization-status/v2/catalog.json"

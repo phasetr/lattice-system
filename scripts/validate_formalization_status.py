@@ -5677,25 +5677,273 @@ end LatticeSystem
     # -- the published legacy authority page must not describe its own records as
     # "version 1 JSON records": the page is a version-2 record page under the v2
     # cutover, and the contract states that version 1's machine URLs are no longer published.
-    legacy_index_path = repo_root / "docs" / "formalization" / "legacy" / "index.md"
-    legacy_index_text = legacy_index_path.read_text(encoding="utf-8")
+    legacy_index_relative = Path("docs") / "formalization" / "legacy" / "index.md"
+    stale_version_claims = ("version 1 JSON records", "records are schema version 1")
+    gated_legacy_roots: list[tuple[Path, bool]] = []
+
+    def legacy_authority_gate(root: Path, sink: list[str]) -> list[str]:
+        """Add every version-1 self-description of `root`'s legacy authority page to `sink`."""
+        gated_legacy_roots.append((root, sink is failures))
+        text = (root / legacy_index_relative).read_text(encoding="utf-8")
+        messages = [
+            f"{legacy_index_relative.as_posix()}: describes its own records with a version-1 "
+            f"claim ({claim!r}), which the contract's version-2 cutover makes false"
+            for claim in stale_version_claims
+            if claim in text
+        ]
+        sink.extend(messages)
+        return messages
+
+    legacy_authority_gate(repo_root, failures)
+
+    legacy_index_text = (repo_root / legacy_index_relative).read_text(encoding="utf-8")
+    legacy_catalogue_dir = legacy_index_relative.parent
+    legacy_catalogue_pages = sorted((repo_root / legacy_catalogue_dir).glob("*.md"))
+    interim_anchor = "version 2 JSON records"
+    interim_authority_claim = "still a non-authoritative prototype"
+    interim_authority_assertion = re.compile(r"remains? authoritative")
+    interim_retirement_clause = (
+        "for as long as the version 2 catalogue is published as a non-authoritative prototype"
+    )
+    manifest_relative = Path("formalization-status") / "v2" / "manifest.json"
+    try:
+        live_manifest = json.loads((repo_root / manifest_relative).read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        live_manifest = None
+    catalogue_state = (
+        live_manifest.get("catalog_state") if isinstance(live_manifest, dict) else None
+    )
+    prototype_catalogue = catalogue_state == "prototype"
+    line_ending = re.compile(r"\r\n|\r")
+
+    def source_lines(text: str) -> list[str]:
+        """Split Markdown source on the line endings CommonMark recognises, and on those only.
+
+        str.splitlines() also breaks on a form feed and on other Unicode separators that a Markdown
+        reader keeps inside the line, which would cut a wrapped banner line in two and drop the
+        rest of that sentence from the joined quote the pins below read.
+        """
+        return line_ending.sub("\n", text).split("\n")
+
+    def interim_authority_runs(lines: list[str]) -> list[tuple[int, int]]:
+        """Return the line span of every blockquote opening the interim-authority claim."""
+        runs: list[tuple[int, int]] = []
+        start: int | None = None
+        for index, line in enumerate(lines):
+            if start is not None:
+                if line.startswith(">"):
+                    continue
+                runs.append((start, index))
+                start = None
+            if line.startswith("> **Interim authority.**"):
+                start = index
+        if start is not None:
+            runs.append((start, len(lines)))
+        return runs
+
+    def unwrapped_quote(lines: list[str]) -> str:
+        """Join one blockquote into a single line, dropping its markers and source wrapping."""
+        return " ".join(" ".join(line[1:] for line in lines).split())
+
+    def authority_claim_sentences(quote: str) -> list[str]:
+        """Return the sentences of one unwrapped blockquote that assert the interim authority."""
+        return [
+            sentence
+            for sentence in re.split(r"(?<=\.)\s+", quote)
+            if interim_authority_claim in sentence
+        ]
+
+    def authority_assertion_sentences(quote: str) -> list[str]:
+        """Return the sentences of one unwrapped blockquote that claim the authority itself."""
+        return [
+            sentence
+            for sentence in re.split(r"(?<=\.)\s+", quote)
+            if interim_authority_assertion.search(sentence)
+        ]
+
+    # Positive controls over every published legacy catalogue page, not the index alone: the
+    # same banner sits on all of them, so reverting the self-retiring clause on a sibling chunk
+    # page fails here exactly as it does on the index. Each page must carry an interim-authority
+    # blockquote, and what that blockquote has to say follows the manifest's `catalog_state`:
+    # the two states are checked in opposite directions, so neither can be satisfied by prose the
+    # other forbids. While the catalogue is a `prototype`, each such blockquote must assert
+    # `interim_authority_claim` in a sentence that carries the anchor itself, and must assert the
+    # authority in a sentence that carries `interim_retirement_clause` itself, so a decoy banner,
+    # a decoy paragraph of the same blockquote, or an aside that a period plus whitespace
+    # separates from the sentence cannot supply either literal on behalf of a reverted sentence;
+    # an aside glued on by any other separator is still read as part of that sentence. Both
+    # non-vacuity tests name the pages that carry no such sentence at all, so deleting either
+    # sentence on a single page fails here instead of being vouched for by the 50 intact
+    # siblings. The clause is pinned as its own literal because it names the version 2 catalogue
+    # rather than `interim_anchor`. In every other state no blockquote may keep either literal or
+    # claim the authority at all, because check_generated_site rejects an authoritative
+    # publication carrying the forbidden phrase inside `interim_retirement_clause`: the cutover
+    # therefore has to rewrite the banner on every gated page (and, if it drops the
+    # `**Interim authority.**` opener the runs key on, teach `interim_authority_runs` the new one
+    # in the same change) rather than only flip the manifest. A catalogue state this gate cannot
+    # read takes that forbidding direction too, so a missing or unparsable manifest fails here
+    # instead of switching the controls off.
+    # A page whose bytes cannot be read as UTF-8 text (undecodable bytes, or a directory or an
+    # unreadable mode behind a `*.md` name) is reported as a failure naming the error rather than
+    # aborting the run with a traceback that hides every later self-test.
+    # The control reads the Markdown source literally; a banner hidden by Markdown or HTML
+    # constructs (comments, fences, raw HTML containers, CSS, Liquid) still counts as present here
+    # — the rendered page is checked only by the site checker's denylist at cutover; further
+    # documented limitations: downstream `failures` rebinding; sentence split on `.`+whitespace;
+    # navigation/wrapped sites outside this gate; literal pins vs negated banners; the frozen index
+    # prose; old-anchor prose outside the blockquote; a bad byte in `legacy/index.md` itself; the
+    # mechanisms (unreadable-page branch, state conditioning, line splitter) have no self-test of
+    # their own.
+    # The mutants below run through the same gate against a scratch tree with a sink of their own
+    # that has to come back filled, so neutering the gate or dropping the sink extension fails
+    # here, and unwiring it from the live tree fails at the ledger check below, instead of passing
+    # silently; the ledger pins the list object the live call is handed, not the survival of what
+    # that call collects.
+    legacy_index_lines = source_lines(legacy_index_text)
+    index_runs = interim_authority_runs(legacy_index_lines)
+    interim_quotes: list[tuple[str, str]] = []
+    bannerless_pages: list[str] = []
+    unreadable_pages: list[str] = []
+    for page in legacy_catalogue_pages:
+        page_name = page.relative_to(repo_root).as_posix()
+        try:
+            page_lines = source_lines(page.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError) as error:
+            unreadable_pages.append(f"{page_name} ({type(error).__name__})")
+            continue
+        page_runs = interim_authority_runs(page_lines)
+        if not page_runs:
+            bannerless_pages.append(page_name)
+        interim_quotes.extend(
+            (page_name, unwrapped_quote(page_lines[start:stop])) for start, stop in page_runs
+        )
     check(
-        "version 1 JSON records" not in legacy_index_text,
-        "docs/formalization/legacy/index.md: describes its own records as 'version 1 JSON "
-        "records', which the contract's version-2 cutover makes false",
+        not unreadable_pages,
+        f"{legacy_catalogue_dir.as_posix()}: {len(unreadable_pages)} of "
+        f"{len(legacy_catalogue_pages)} published catalogue page(s) "
+        f"({', '.join(unreadable_pages) or 'none'}) could not be read as UTF-8 text, so the "
+        "controls below never read their banner; a page the gate cannot read is reported here "
+        "with the error that stopped it instead of aborting the whole run with a traceback that "
+        "hides every later self-test",
     )
     check(
-        "records are schema version 1" not in legacy_index_text,
-        "docs/formalization/legacy/index.md: describes its own records as schema version 1",
+        bool(legacy_catalogue_pages) and not bannerless_pages,
+        f"{legacy_catalogue_dir.as_posix()}: {len(bannerless_pages)} of "
+        f"{len(legacy_catalogue_pages)} published catalogue page(s) carry no interim-authority "
+        f"blockquote ({', '.join(bannerless_pages) or 'none'}), so the two controls below "
+        "measure fewer pages than the catalogue publishes and a banner deleted on one of them "
+        "could not fail them",
     )
-    # Positive control: the corrected wording must not itself trip the same gate.
-    corrected_legacy_index_text = legacy_index_text.replace(
-        "version 1 JSON records", "version 2 JSON records"
+    claim_sentences = [
+        (page_name, sentence)
+        for page_name, quote in interim_quotes
+        for sentence in authority_claim_sentences(quote)
+    ]
+    unanchored_pages = sorted(
+        {page_name for page_name, sentence in claim_sentences if interim_anchor not in sentence}
+        | {page_name for page_name, quote in interim_quotes if not authority_claim_sentences(quote)}
     )
     check(
-        "version 1 JSON records" not in corrected_legacy_index_text,
-        "docs/formalization/legacy/index.md gate: the corrected 'version 2 JSON records' "
-        "wording still trips the 'version 1 JSON records' gate (positive control failed)",
+        not prototype_catalogue or (bool(claim_sentences) and not unanchored_pages),
+        f"{legacy_catalogue_dir.as_posix()}: while the catalogue is a prototype, the gate "
+        "positive control is vacuous on "
+        f"{len(unanchored_pages)} of {len(legacy_catalogue_pages)} published page(s) "
+        f"({', '.join(unanchored_pages) or 'none'}), which either assert "
+        f"{interim_authority_claim!r} without the anchor {interim_anchor!r} in the asserting "
+        "sentence or carry no such sentence at all, out of "
+        f"{len(claim_sentences)} such sentence(s) in {len(interim_quotes)} interim-authority "
+        f"blockquote(s) across {len(legacy_catalogue_pages)} published page(s) (a missing "
+        "sentence means the claim was deleted or reworded on that page; an unanchored one means "
+        "a decoy banner or a neighbouring aside carries the anchor on its behalf), so the "
+        "downgrade mutation below leaves the claim intact and the control can never fail",
+    )
+    assertion_sentences = [
+        (page_name, sentence)
+        for page_name, quote in interim_quotes
+        for sentence in authority_assertion_sentences(quote)
+    ]
+    clauseless_pages = sorted(
+        {
+            page_name
+            for page_name, sentence in assertion_sentences
+            if interim_retirement_clause not in sentence
+        }
+        | {
+            page_name
+            for page_name, quote in interim_quotes
+            if not authority_assertion_sentences(quote)
+        }
+    )
+    check(
+        not prototype_catalogue or (bool(assertion_sentences) and not clauseless_pages),
+        f"{legacy_catalogue_dir.as_posix()}: while the catalogue is a prototype, "
+        f"{len(clauseless_pages)} of "
+        f"{len(legacy_catalogue_pages)} published page(s) ({', '.join(clauseless_pages) or 'none'}"
+        f") claim interim authority without the literal {interim_retirement_clause!r} in the "
+        f"claiming sentence itself, out of {len(assertion_sentences)} such sentence(s) in "
+        f"{len(interim_quotes)} interim-authority blockquote(s); nothing else pins that clause, "
+        "so reverting it to a closed issue reference, deleting it, or letting a neighbouring "
+        "sentence of the same blockquote carry it would otherwise pass every gate",
+    )
+    interim_claiming_pages = sorted(
+        {
+            page_name
+            for page_name, quote in interim_quotes
+            if interim_authority_claim in quote
+            or interim_retirement_clause in quote
+            or interim_authority_assertion.search(quote)
+        }
+    )
+    check(
+        prototype_catalogue or not interim_claiming_pages,
+        f"{legacy_catalogue_dir.as_posix()}: {len(interim_claiming_pages)} of "
+        f"{len(legacy_catalogue_pages)} published page(s) "
+        f"({', '.join(interim_claiming_pages) or 'none'}) still claim interim authority while "
+        f"manifest.json declares catalog_state {catalogue_state!r} rather than 'prototype', so "
+        "the banners contradict the catalogue they front and check_generated_site rejects the "
+        f"staged tree over the forbidden phrase inside {interim_retirement_clause!r}; the "
+        "cutover has to rewrite every banner, not only flip the manifest",
+    )
+    downgraded_lines = list(legacy_index_lines)
+    for start, stop in reversed(index_runs):
+        downgraded_lines[start:stop] = [
+            "> "
+            + unwrapped_quote(legacy_index_lines[start:stop]).replace(
+                interim_anchor, "version 1 JSON records"
+            )
+        ]
+    legacy_gate_root = Path(
+        tempfile.mkdtemp(prefix="legacy-authority-gate-", dir=fixture_scratch_root)
+    )
+    try:
+        mutant_page = legacy_gate_root / legacy_index_relative
+        mutant_page.parent.mkdir(parents=True, exist_ok=True)
+        for label, mutated_page in (
+            (
+                "a version-1 downgrade of the interim-authority banner",
+                "\n".join(downgraded_lines),
+            ),
+            (
+                "an appended 'records are schema version 1' claim",
+                f"{legacy_index_text}\nThese records are schema version 1.\n",
+            ),
+        ):
+            mutant_page.write_text(mutated_page, encoding="utf-8")
+            mutant_sink: list[str] = []
+            check(
+                bool(legacy_authority_gate(legacy_gate_root, mutant_sink)) and bool(mutant_sink),
+                f"docs/formalization/legacy/index.md: a scratch copy carrying {label} passed "
+                "the gate, so either the gate no longer reacts to the drift it exists to catch, "
+                "it no longer collects what it finds into the sink it is handed, or the "
+                "mutation injected nothing (the anchor control above says which)",
+            )
+    finally:
+        shutil.rmtree(legacy_gate_root, ignore_errors=True)
+    check(
+        (repo_root, True) in gated_legacy_roots,
+        "docs/formalization/legacy/index.md: the live tree was never routed through the gate "
+        "the controls above exercise with the failure list this run reports, so whatever the "
+        "gate finds on the published page cannot reach the reported failures",
     )
 
     return failures
