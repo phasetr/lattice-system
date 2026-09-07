@@ -5677,57 +5677,103 @@ end LatticeSystem
     # -- the published legacy authority page must not describe its own records as
     # "version 1 JSON records": the page is a version-2 record page under the v2
     # cutover, and the contract states that version 1's machine URLs are no longer published.
-    legacy_index_path = repo_root / "docs" / "formalization" / "legacy" / "index.md"
-    legacy_index_text = legacy_index_path.read_text(encoding="utf-8")
+    legacy_index_relative = Path("docs") / "formalization" / "legacy" / "index.md"
     stale_version_claims = ("version 1 JSON records", "records are schema version 1")
+    gated_legacy_roots: list[Path] = []
 
-    def stale_version_claims_in(text: str) -> list[str]:
-        """Return every version-1 self-description the legacy authority page must not make."""
-        return [claim for claim in stale_version_claims if claim in text]
+    def legacy_authority_gate(root: Path) -> list[str]:
+        """Return every version-1 self-description the legacy authority page of `root` makes."""
+        gated_legacy_roots.append(root)
+        text = (root / legacy_index_relative).read_text(encoding="utf-8")
+        return [
+            f"{legacy_index_relative.as_posix()}: describes its own records with a version-1 "
+            f"claim ({claim!r}), which the contract's version-2 cutover makes false"
+            for claim in stale_version_claims
+            if claim in text
+        ]
 
-    live_stale_claims = stale_version_claims_in(legacy_index_text)
+    failures.extend(legacy_authority_gate(repo_root))
+
+    legacy_index_text = (repo_root / legacy_index_relative).read_text(encoding="utf-8")
+    interim_anchor = "version 2 JSON records"
+
+    def interim_authority_runs(lines: list[str]) -> list[tuple[int, int]]:
+        """Return the line span of every blockquote opening the interim-authority claim."""
+        runs: list[tuple[int, int]] = []
+        start: int | None = None
+        for index, line in enumerate(lines):
+            if start is not None:
+                if line.startswith(">"):
+                    continue
+                runs.append((start, index))
+                start = None
+            if line.startswith("> **Interim authority.**"):
+                start = index
+        if start is not None:
+            runs.append((start, len(lines)))
+        return runs
+
+    def unwrapped_quote(lines: list[str]) -> str:
+        """Join one blockquote into a single line, dropping its markers and source wrapping."""
+        return " ".join(" ".join(line[1:] for line in lines).split())
+
+    # Positive controls: the gate above must fire on drift injected into the live authority
+    # claim, which is the only text it protects. Every interim-authority blockquote must carry
+    # the anchor, so a decoy banner cannot supply it on behalf of an unanchored live one; the
+    # quotes are unwrapped first, so reflowing the banner is not treated as drift; and the
+    # mutants run through the same gate against a scratch tree, so neutering the gate or
+    # unwiring it from the live tree fails here instead of passing silently.
+    legacy_index_lines = legacy_index_text.splitlines()
+    interim_runs = interim_authority_runs(legacy_index_lines)
+    interim_quotes = [
+        unwrapped_quote(legacy_index_lines[start:stop]) for start, stop in interim_runs
+    ]
+    unanchored = [quote for quote in interim_quotes if interim_anchor not in quote]
     check(
-        not live_stale_claims,
-        "docs/formalization/legacy/index.md: describes its own records with a version-1 "
-        f"claim ({live_stale_claims}), which the contract's version-2 cutover makes false",
+        bool(interim_quotes) and not unanchored,
+        "docs/formalization/legacy/index.md gate positive control is vacuous: "
+        f"{len(unanchored)} of {len(interim_quotes)} interim-authority blockquote(s) lack the "
+        f"anchor {interim_anchor!r} (the blockquote is absent, reworded, or a decoy banner "
+        "carries the anchor for an unanchored live one), so the downgrade mutation below "
+        "changes nothing there and the control can never fail",
     )
-
-    def interim_authority_blockquote(text: str) -> str:
-        """Return the contiguous blockquote that opens the page's interim-authority claim."""
-        quoted: list[str] = []
-        for line in text.splitlines():
-            if quoted:
-                if not line.startswith(">"):
-                    break
-                quoted.append(line)
-            elif line.startswith("> **Interim authority.**"):
-                quoted.append(line)
-        return "\n".join(quoted)
-
-    # Positive control: the same predicate must fire on drift injected into the live authority
-    # claim, which is the only text this gate protects. The mutation is scoped to that
-    # blockquote so an anchor occurrence elsewhere on the page cannot stand in for it, and a
-    # mutation that changes nothing tests nothing, so a missing anchor must fail here rather
-    # than silently disarm the control below.
-    interim_authority = interim_authority_blockquote(legacy_index_text)
-    downgraded = interim_authority.replace("version 2 JSON records", "version 1 JSON records")
-    check(
-        downgraded != interim_authority,
-        "docs/formalization/legacy/index.md gate positive control is vacuous: the "
-        "interim-authority blockquote does not carry the anchor 'version 2 JSON records' "
-        "(the blockquote is absent or reworded), so the downgrade mutation changed nothing "
-        "and the control below can never fail",
+    downgraded_lines = list(legacy_index_lines)
+    for start, stop in reversed(interim_runs):
+        downgraded_lines[start:stop] = [
+            "> "
+            + unwrapped_quote(legacy_index_lines[start:stop]).replace(
+                interim_anchor, "version 1 JSON records"
+            )
+        ]
+    legacy_gate_root = Path(
+        tempfile.mkdtemp(prefix="legacy-authority-gate-", dir=fixture_scratch_root)
     )
+    try:
+        mutant_page = legacy_gate_root / legacy_index_relative
+        mutant_page.parent.mkdir(parents=True, exist_ok=True)
+        for label, mutated_page in (
+            (
+                "a version-1 downgrade of the interim-authority banner",
+                "\n".join(downgraded_lines) + "\n",
+            ),
+            (
+                "an appended 'records are schema version 1' claim",
+                f"{legacy_index_text}\nThese records are schema version 1.\n",
+            ),
+        ):
+            mutant_page.write_text(mutated_page, encoding="utf-8")
+            check(
+                bool(legacy_authority_gate(legacy_gate_root)),
+                f"docs/formalization/legacy/index.md: a scratch copy carrying {label} passed "
+                "the gate, so either the gate no longer reacts to the drift it exists to catch "
+                "or the mutation injected nothing (the anchor control above says which)",
+            )
+    finally:
+        shutil.rmtree(legacy_gate_root, ignore_errors=True)
     check(
-        "version 1 JSON records" in stale_version_claims_in(downgraded),
-        "docs/formalization/legacy/index.md gate failed to detect an injected version-1 "
-        "downgrade of the banner; the gate does not react to the drift it exists to catch",
-    )
-    schema_downgraded = f"{legacy_index_text}\nThese records are schema version 1.\n"
-    check(
-        "records are schema version 1" in stale_version_claims_in(schema_downgraded),
-        "docs/formalization/legacy/index.md gate failed to detect an injected 'records are "
-        "schema version 1' claim",
+        repo_root in gated_legacy_roots,
+        "docs/formalization/legacy/index.md: the live tree was never routed through the gate "
+        "the controls above exercise, so the published page is no longer gated at all",
     )
 
     return failures

@@ -30,6 +30,7 @@ AUTHORITATIVE_FORBIDDEN_PHRASES = (
     "remains incomplete and non-authoritative until the governance cutover",
     "this remains prototype-only status data",
     "published as a non-authoritative prototype",
+    "until issue #5228",
     "version 2 structured catalogue is not yet complete or authoritative",
 )
 
