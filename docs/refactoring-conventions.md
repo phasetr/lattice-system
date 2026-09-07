@@ -302,11 +302,12 @@ This is enforced by review and not by CI.
 
 Prose in `docs/` and `tex/proof-guide.tex` cites Lean source by declaration, never by line
 number: `` `Path/To/File.lean` (`declName`) ``, where the path is repo-relative with the
-`LatticeSystem/` prefix dropped and lengthened only as far as needed to separate equal
-basenames; the file alone suffices when the declaration name already stands beside the
-citation. A target with no declaration name — a `/-! ## … -/` section, an anonymous
-`example`, or a doc comment — is named by its section title, its pin label, or the
-declaration whose doc comment it is. In TeX the same form is
+`LatticeSystem/` prefix dropped and lengthened at least as far as needed to be unique
+among tracked files, and by one further segment when that minimal suffix would be a bare
+generic basename such as `Hamiltonian.lean`; the file alone suffices when the declaration
+name already stands beside the citation. A target with no declaration name — a
+`/-! ## … -/` section, an anonymous `example`, or a doc comment — is named by its section
+title, its pin label, or the declaration whose doc comment it is. In TeX the same form is
 `\texttt{File.lean} (\texttt{decl\_name})`, with underscores escaped as `\_`.
 
 ### Review check — public doc sync
@@ -316,7 +317,8 @@ declaration whose doc comment it is. In TeX the same form is
 - [ ] References to Tasaki / mathlib added where applicable.
 - [ ] Every Lean citation the PR writes or edits names a declaration (or the section title
   / pin label / owning declaration where there is none) rather than a line number, and its
-  path is no longer than the suffix that separates it from equal basenames.
+  path includes at least the suffix that makes it unique among tracked files, plus one
+  further segment where that suffix would be a bare generic basename.
 
 ## 6b. Verifying push before merge (incident-driven)
 
