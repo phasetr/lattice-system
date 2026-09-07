@@ -5745,17 +5745,27 @@ end LatticeSystem
     # Positive controls over every published legacy catalogue page, not the index alone: the
     # same banner sits on all of them, so reverting the self-retiring clause on a sibling chunk
     # page fails here exactly as it does on the index. Each page must carry an interim-authority
-    # blockquote; every sentence containing `interim_authority_claim` must carry the anchor
-    # itself, and every sentence asserting the authority must carry `interim_retirement_clause`
-    # itself, so a decoy banner, a decoy paragraph of the same blockquote, or an aside that a
-    # period plus whitespace separates from the sentence cannot supply either literal on behalf
-    # of a reverted sentence; an aside glued on by any other separator is still read as part of
-    # that sentence. The clause is pinned as its own literal because it names the version 2
-    # catalogue rather than `interim_anchor`. The quotes are unwrapped first, so reflowing a
-    # banner is not treated as drift. Documented limitation: the same clause also appears on 23
-    # prototype-navigation pages under docs/formalization/ and at 5 wrapped prose sites
-    # elsewhere under docs/, and this gate reads none of them (the `details/` banner claims no
-    # authority and is outside the glob for the same reason); those sites are covered only by
+    # blockquote; each such blockquote must assert `interim_authority_claim` in a sentence that
+    # carries the anchor itself, and must assert the authority in a sentence that carries
+    # `interim_retirement_clause` itself, so a decoy banner, a decoy paragraph of the same
+    # blockquote, or an aside that a period plus whitespace separates from the sentence cannot
+    # supply either literal on behalf of a reverted sentence; an aside glued on by any other
+    # separator is still read as part of that sentence. Both non-vacuity tests name the pages
+    # that carry no such sentence at all, so deleting either sentence on a single page fails
+    # here instead of being vouched for by the 50 intact siblings. The clause is pinned as its
+    # own literal because it names the version 2 catalogue rather than `interim_anchor`. The
+    # quotes are unwrapped first, so reflowing a banner is not treated as drift. A page whose
+    # bytes are not valid UTF-8 is reported as a failure rather than aborting the run with a
+    # decoding traceback; the live gate above reads the index page before this loop, so a bad
+    # byte there still aborts. Documented limitations: the controls read the interim-authority
+    # blockquotes alone, so the retired authority condition restated as prose elsewhere on a
+    # gated page passes; the index page publishes exactly that condition further down, inside a
+    # `legacy-source` span whose text check_docs_hierarchy pins against the historical
+    # docs/index.md prose, so it is a known frozen residual that only an audited moved-prose
+    # rewrite can change; and the same clause also appears on 24 prototype-navigation pages
+    # under docs/formalization/ outside legacy/ and at 4 wrapped prose sites elsewhere under
+    # docs/, none of which this gate reads (the `details/` banner claims no authority and is
+    # outside the glob for the same reason). Those sites are covered only by
     # check_generated_site.AUTHORITATIVE_FORBIDDEN_PHRASES, which is inert while `catalog_state`
     # is `prototype` and therefore bites only at the cutover. The mutants below run through the
     # same gate against a scratch tree with a sink of their own that has to come back filled, so
@@ -5766,15 +5776,28 @@ end LatticeSystem
     index_runs = interim_authority_runs(legacy_index_lines)
     interim_quotes: list[tuple[str, str]] = []
     bannerless_pages: list[str] = []
+    undecodable_pages: list[str] = []
     for page in legacy_catalogue_pages:
         page_name = page.relative_to(repo_root).as_posix()
-        page_lines = page.read_text(encoding="utf-8").splitlines()
+        try:
+            page_lines = page.read_text(encoding="utf-8").splitlines()
+        except UnicodeDecodeError:
+            undecodable_pages.append(page_name)
+            continue
         page_runs = interim_authority_runs(page_lines)
         if not page_runs:
             bannerless_pages.append(page_name)
         interim_quotes.extend(
             (page_name, unwrapped_quote(page_lines[start:stop])) for start, stop in page_runs
         )
+    check(
+        not undecodable_pages,
+        f"{legacy_catalogue_dir.as_posix()}: {len(undecodable_pages)} of "
+        f"{len(legacy_catalogue_pages)} published catalogue page(s) "
+        f"({', '.join(undecodable_pages) or 'none'}) are not valid UTF-8, so the controls below "
+        "never read their banner; a page the gate cannot decode is reported here instead of "
+        "aborting the whole run with a decoding traceback that hides every later self-test",
+    )
     check(
         bool(legacy_catalogue_pages) and not bannerless_pages,
         f"{legacy_catalogue_dir.as_posix()}: {len(bannerless_pages)} of "
@@ -5790,15 +5813,18 @@ end LatticeSystem
     ]
     unanchored_pages = sorted(
         {page_name for page_name, sentence in claim_sentences if interim_anchor not in sentence}
+        | {page_name for page_name, quote in interim_quotes if not authority_claim_sentences(quote)}
     )
     check(
         bool(claim_sentences) and not unanchored_pages,
-        f"{legacy_catalogue_dir.as_posix()}: the gate positive control is vacuous: "
-        f"{len(unanchored_pages)} page(s) ({', '.join(unanchored_pages) or 'none'}) assert "
+        f"{legacy_catalogue_dir.as_posix()}: the gate positive control is vacuous on "
+        f"{len(unanchored_pages)} of {len(legacy_catalogue_pages)} published page(s) "
+        f"({', '.join(unanchored_pages) or 'none'}), which either assert "
         f"{interim_authority_claim!r} without the anchor {interim_anchor!r} in the asserting "
-        f"sentence, out of {len(claim_sentences)} such sentence(s) in {len(interim_quotes)} "
-        f"interim-authority blockquote(s) across {len(legacy_catalogue_pages)} published page(s) "
-        "(no such sentence at all means the claim is absent or reworded; an unanchored one means "
+        "sentence or carry no such sentence at all, out of "
+        f"{len(claim_sentences)} such sentence(s) in {len(interim_quotes)} interim-authority "
+        f"blockquote(s) across {len(legacy_catalogue_pages)} published page(s) (a missing "
+        "sentence means the claim was deleted or reworded on that page; an unanchored one means "
         "a decoy banner or a neighbouring aside carries the anchor on its behalf), so the "
         "downgrade mutation below leaves the claim intact and the control can never fail",
     )
