@@ -283,11 +283,11 @@ evaluated on that separate ground instead, and are kept when removing them would
 equation without any statement referencing it. `spinHalfOp_onSite_comm_of_ne` does not qualify on
 that ground: retiring it leaves eq. (2.2.6) at `x ≠ y` stated by `onSite_mul_onSite_of_ne`, which
 carries the `x ≠ y` hypothesis itself, and cited in prose by the `Quantum/TotalSpin.lean` module
-header and `Quantum/ManyBody.lean:261-266`. This ground does *not* apply to
+header and `Quantum/ManyBody.lean` (the "Same-site multiplication" section). This ground does *not* apply to
 `totalSpinHalfOp{Minus,Plus}_mulVec_basisVec_all_{down,up}` either: eq. (2.4.9) itself
 (the ferromagnetic ground-state ladder `|Φ_M⟩ ∝ (Ŝtot^∓)^{Smax∓M} |Φ↑/↓⟩`) is stated independently, and with more
-content, in `Quantum/TotalSpin/Casimir.lean:201-255`,
-`Quantum/MagnetizationSubspace.lean:44-59` and `Quantum/SpinDot/Hamiltonian.lean:183-236`. The two
+content, in `Quantum/TotalSpin/Casimir.lean` (the "Magnetic-quantum-number ladder on the all-up state" section),
+`Quantum/MagnetizationSubspace.lean` (the "Membership of the ferromagnetic ground-state ladder iterates" section) and `Quantum/SpinDot/Hamiltonian.lean` (the "Eigenvalue propagation under Ŝ_tot^±" section). The two
 `_all_{down,up}` lemmas instead record the `k`-boundary annihilation
 (`Ŝtot^∓ · |Φ↑/↓⟩ = 0`) that the ladder's induction step needs; they are untouched not because they
 are a sole book-equation witness, but because they are not one-line specialisations of any
@@ -297,7 +297,7 @@ that base case).
 
 The three same-site commutator specialisations that *were* retired above are a different case from
 the `_all_{down,up}` pair: the fact they proved (the diagonal `x = y` case of eq. (2.2.6)) is
-independently and fully carried by the doc-comment prose at `Quantum/ManyBody.lean:261-266`
+independently and fully carried by the doc-comment prose at `Quantum/ManyBody.lean` (the "Same-site multiplication" section)
 (`## Same-site multiplication (Tasaki eq (2.2.6), x = y case)`), so the "sole Lean rendering of a
 numbered equation" ground did not apply to them either; they were removed purely under the
 reachability criterion above.

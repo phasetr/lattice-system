@@ -300,6 +300,15 @@ For every PR adding `def` / `theorem` / `lemma`, the same PR must:
 
 This is enforced by review and not by CI.
 
+Prose in `docs/` and `tex/proof-guide.tex` cites Lean source by declaration, never by line
+number: `` `Path/To/File.lean` (`declName`) ``, where the path is repo-relative with the
+`LatticeSystem/` prefix dropped and lengthened only as far as needed to separate equal
+basenames; the file alone suffices when the declaration name already stands beside the
+citation. A target with no declaration name — a `/-! ## … -/` section, an anonymous
+`example`, or a doc comment — is named by its section title, its pin label, or the
+declaration whose doc comment it is. In TeX the same form is
+`\texttt{File.lean} (\texttt{decl\_name})`, with underscores escaped as `\_`.
+
 ### Review check — public doc sync
 
 - [ ] The authoritative legacy catalogue page is updated (or the PR explicitly notes "no

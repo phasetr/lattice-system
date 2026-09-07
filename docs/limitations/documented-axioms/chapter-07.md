@@ -32,7 +32,7 @@ non-Appendix documented axiom alongside the Appendix A entries of the
      not a universal `∀ Φ`, is what is axiomatized (see below).
   2. `HasUniqueInfiniteVolumeVBSGroundState G 3` holds. This is itself a **separate
      uninterpreted marker axiom** (`axiom HasUniqueInfiniteVolumeVBSGroundState (G :
-     SimpleGraph Λ) (N : ℕ) : Prop`, `GeneralAKLT.lean:128`) with no mathematical
+     SimpleGraph Λ) (N : ℕ) : Prop`, `GeneralAKLT.lean`) with no mathematical
      content of its own — it is an opaque `Prop`-valued declaration, not a proved
      predicate. There are currently zero consumers of `tasaki_theorem_7_7` in the
      repository; `#print axioms` on a hypothetical consumer would show the standard
@@ -194,7 +194,7 @@ by two declarations in `LatticeSystem/Quantum/SpinS/AKLTStability.lean`:
   `IsTranslationCovariant L v` is an uninterpreted Prop-valued axiom, the same idiom
   as `IsAKLTChainDynamics` (Theorem 7.2, above). It stands for v̂_x = T̂^x v̂_o (T̂†)^x;
   the repository does define a chain translation operator, `chainTranslationOp`
-  (`LiebSchultzMattisOrthogonality.lean:40`, instantiated at `N := 2` it has exactly
+  (`LiebSchultzMattisOrthogonality.lean`, instantiated at `N := 2` it has exactly
   the type `ManyBodyOpS (Fin L) 2`), with supporting API
   (`chainTranslationOp_unitary`/`'`, `chainTranslation_conj_onSiteS`/`_mul`/`_spinSDot`,
   `chainTranslation_commute_hamiltonian`), but `AKLTStability.lean` does not import

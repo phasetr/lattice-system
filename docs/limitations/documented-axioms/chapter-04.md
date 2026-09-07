@@ -260,7 +260,7 @@ by two **documented axioms** in
 - **What the axiom statements literally assert:** `theorem_4_20_omega0`
   states — conditional on `εGS` being the genuine ground-state energy
   density of the model (`IsGroundStateEnergyDensity`,
-  `InfiniteVolumeGroundState.lean:188`, itself an uninterpreted documented
+  `InfiniteVolumeGroundState.lean`, itself an uninterpreted documented
   predicate) — that there exists a state `ω₀`
   (`WeakDual ℂ A`) that is an infinite-volume ground state at energy density
   `εGS` (`IsInfiniteVolumeGroundState`) with vanishing single-site
@@ -270,7 +270,7 @@ by two **documented axioms** in
   construction informally, but only the existence and the two stated
   properties are part of the formal statement. `theorem_4_20_omegaN` states
   that, additionally assuming staggered long-range order with parameter
-  `mStar > 0` (`HasStaggeredLRO`, `InfiniteVolumeGroundState.lean:198`, also
+  `mStar > 0` (`HasStaggeredLRO`, `InfiniteVolumeGroundState.lean`, also
   an uninterpreted documented predicate), for every unit direction `n` there
   exists a state `ω_n`,
   likewise an infinite-volume ground state at energy density `εGS`, with
