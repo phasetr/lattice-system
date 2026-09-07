@@ -5697,6 +5697,19 @@ end LatticeSystem
         "docs/formalization/legacy/index.md gate: the corrected 'version 2 JSON records' "
         "wording still trips the 'version 1 JSON records' gate (positive control failed)",
     )
+    # Anti-vacuity guard (#5403 class 9 test-first RED): the positive control above is a
+    # `.replace(target, replacement)` on `legacy_index_text`. That control can only exercise
+    # the gate it guards if `target` actually occurs in the live source text -- otherwise
+    # `.replace()` is a silent no-op and `corrected_legacy_index_text is legacy_index_text`
+    # in substance, so the control passes unconditionally regardless of whether the gate
+    # above still works. This guard checks the replace() target is a real anchor in the
+    # current source text; it is independent of, and does not fix, the vacuous control above.
+    check(
+        "version 1 JSON records" in legacy_index_text,
+        "docs/formalization/legacy/index.md gate positive control is vacuous: anchor "
+        "'version 1 JSON records' not found in the source text, so the replace() above is a "
+        "no-op and the positive control that follows it can never fail",
+    )
 
     return failures
 
