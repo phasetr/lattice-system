@@ -1276,27 +1276,26 @@ def approved_changes_byte_parity_self_test() -> None:
         )
 
 
-# Part A (row conservation, design `.self-local/reports/
-# design-5403-approved-replacements-shape-check.md`): the row count of the frozen baseline
-# catalogue slice at BASELINE_COMMIT, before any audited rewrite. Never moves for a content edit --
-# only a narrowing of CATALOGUE_BASELINE_SLICE or a change of BASELINE_COMMIT itself moves it -- so
+# The row count of the frozen baseline catalogue slice at BASELINE_COMMIT, before any audited
+# rewrite. Never moves for a content edit -- only a narrowing of CATALOGUE_BASELINE_SLICE or a
+# change of BASELINE_COMMIT itself moves it -- so
 # `BASELINE_CATALOGUE_ROW_COUNT - (rows the audited chain drops) == len(published_catalogue_rows())`
-# is an identity no pin recompute can satisfy. RED PLACEHOLDER: this value is deliberately wrong
-# (the measured value at a70632ea is 2052; design §1); Green replaces it with the measured value.
-BASELINE_CATALOGUE_ROW_COUNT = 0
+# is an identity no pin recompute can satisfy.
+BASELINE_CATALOGUE_ROW_COUNT = 2052
 
-# Part C (design, same report): sha256 over `ast.dump` (docstrings stripped) of the row-derivation
-# machinery named in `_ROW_PATH_AST_NAMES`, deliberately excluding `_approved_replacements` (its
-# shape is Part B's job). Machinery, not content: no legitimate catalogue content edit moves this
-# pin. RED PLACEHOLDER: recomputed at Green.
-ROW_PATH_AST_SHA256 = "RED-PLACEHOLDER-ROW-PATH-AST-SHA256"
+# sha256 over `ast.dump` (docstrings stripped) of the row-derivation machinery named in
+# `_ROW_PATH_AST_NAMES`, deliberately excluding `_approved_replacements`, whose shape the chain
+# rule pins more precisely than a hash would and whose literals a sanctioned removal is supposed
+# to move. Machinery rather than content: no legitimate catalogue edit moves this pin.
+ROW_PATH_AST_SHA256 = "639883e0e0eb524c467807fb3851d576e5ffcb936729424cf1fbc008241d1c57"
 
-# Part C: sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, i.e. the
-# task's candidate (2) ("authorization = the reviewed literal list changed"). RED PLACEHOLDER:
-# recomputed at Green.
-APPROVED_ENTRIES_SHA256 = "RED-PLACEHOLDER-APPROVED-ENTRIES-SHA256"
+# sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
+# surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
+# entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
+APPROVED_ENTRIES_SHA256 = "e461572446b5a2554d191c3db7212c8efa6c7128d4273e157fd3f69e72097ad0"
 
-# Names Part C's `ROW_PATH_AST_SHA256` hashes, in the order design §Part C lists them.
+# The nodes `ROW_PATH_AST_SHA256` hashes: everything the published rows are derived through,
+# from the frozen blob to the row sequence `main()` compares the legacy pages against.
 _ROW_PATH_AST_NAMES = (
     "CATALOGUE_BASELINE_SLICE",
     "BASELINE_COMMIT",
@@ -1314,24 +1313,28 @@ _ROW_PATH_AST_NAMES = (
 )
 
 
-def _approved_replacements_function_node() -> ast.FunctionDef:
-    """This file's own `_approved_replacements` `FunctionDef`, parsed from its own source text."""
-    tree = ast.parse(Path(__file__).read_text())
-    for node in ast.walk(tree):
+def _own_source() -> str:
+    """This file's own source text: what the chain rule parses and the machinery pin hashes."""
+    return Path(__file__).read_text()
+
+
+def _approved_replacements_function_node(source: str) -> ast.FunctionDef:
+    """The `_approved_replacements` `FunctionDef` of `source`, this file's own text or a copy."""
+    for node in ast.walk(ast.parse(source)):
         if isinstance(node, ast.FunctionDef) and node.name == "_approved_replacements":
             return node
-    fail("_approved_replacements: not found in this file's own AST")
+    fail("_approved_replacements: not found in the parsed source")
 
 
-def _approved_replacements_chain() -> tuple[list[tuple[str, str]], list[str]]:
-    """Part B: the ordered `(a, b)` literal pairs of `_approved_replacements`'s `.replace` chain.
+def _approved_replacements_chain(source: str) -> tuple[list[tuple[str, str]], list[str]]:
+    """The ordered `(a, b)` literal pairs of `_approved_replacements`'s `.replace` chain.
 
     Returns `(chain, violations)`. `violations` is non-empty, and `chain` a possibly-partial
     prefix, whenever the function is not exactly: a single `return`, wrapped in exactly
     `_drop_working_note_citations(...)`, of a left-nested chain of two-positional-argument
     `.replace` calls rooted at the parameter `text`, every argument an `ast.Constant` string.
     """
-    func = _approved_replacements_function_node()
+    func = _approved_replacements_function_node(source)
     violations: list[str] = []
     body = func.body
     if (
@@ -1348,12 +1351,12 @@ def _approved_replacements_chain() -> tuple[list[tuple[str, str]], list[str]]:
         ]
     value = body[0].value
     wrapper_names: list[str] = []
-    if isinstance(value, ast.Call) and isinstance(value.func, ast.Name):
+    while isinstance(value, ast.Call) and isinstance(value.func, ast.Name):
         wrapper_names.append(value.func.id)
         if len(value.args) != 1 or value.keywords:
             violations.append(f"{value.func.id}(...) call is not single-argument")
-        else:
-            value = value.args[0]
+            return [], violations
+        value = value.args[0]
     if wrapper_names != ["_drop_working_note_citations"]:
         violations.append(f"unpinned wrapper chain {tuple(wrapper_names)}")
         return [], violations
@@ -1374,7 +1377,10 @@ def _approved_replacements_chain() -> tuple[list[tuple[str, str]], list[str]]:
             and isinstance(b_node, ast.Constant)
             and isinstance(b_node.value, str)
         ):
-            violations.append(f"non-literal replace() argument: {ast.dump(a_node)[:60]}")
+            violations.append(
+                f"non-literal replace() argument: {type(a_node).__name__}, "
+                f"{type(b_node).__name__}"
+            )
             return chain, violations
         chain.append((a_node.value, b_node.value))
         value = value.func.value
@@ -1400,11 +1406,10 @@ def _strip_docstring(node: ast.AST) -> ast.AST:
 
 
 def _row_path_ast_sha256() -> str:
-    """Part C: sha256 over `ast.dump` of each `_ROW_PATH_AST_NAMES` top-level node, docstring-
-    stripped, in `_ROW_PATH_AST_NAMES` order. `_approved_replacements` is excluded (Part B covers
-    its shape more precisely than a hash would, and a sanctioned row removal must not move this
-    pin)."""
-    tree = ast.parse(Path(__file__).read_text())
+    """sha256 over `ast.dump` of each `_ROW_PATH_AST_NAMES` top-level node, docstring-
+    stripped, in `_ROW_PATH_AST_NAMES` order. Docstrings and comments sit outside the hash, so
+    prose about this machinery stays free to change; what the machinery does does not."""
+    tree = ast.parse(_own_source())
     top_level: dict[str, ast.AST] = {}
     for node in tree.body:
         if isinstance(node, ast.FunctionDef):
@@ -1423,97 +1428,235 @@ def _row_path_ast_sha256() -> str:
 
 
 def _approved_entries_sha256(chain: list[tuple[str, str]]) -> str:
-    """Part C: sha256 over the ordered `(a, b)` literal pairs of the audited `.replace` chain."""
+    """sha256 over the ordered `(a, b)` literal pairs of the audited `.replace` chain."""
     pieces = [f"{a!r}=>{b!r}" for a, b in chain]
     return hashlib.sha256("\n".join(pieces).encode("utf-8")).hexdigest()
 
 
-def approved_replacements_shape_and_row_identity_self_test() -> None:
-    """Refuse any row loss that is not a full-row literal in the audited `.replace` chain.
+def _is_full_row_removal(text: str, a: str, b: str, delta: int) -> bool:
+    """Whether a row-count-changing chain entry has the one sanctioned shape: a whole row out.
 
-    Three parts (design `.self-local/reports/design-5403-approved-replacements-shape-check.md`).
-    Part A: `BASELINE_CATALOGUE_ROW_COUNT - (rows the chain drops) ==
-    len(published_catalogue_rows())` is an identity, checked by replaying
-    `_approved_replacements`'s own literal chain entry by
-    entry against `catalogue_baseline_text()`; every entry that changes the row count must be a
-    well-shaped full-row removal (`b == ""`, `a` ends with `"\n"`, `a[:-1]` contains no further
-    newline, delta exactly `-1`), and the two structural regex passes
-    (`_drop_working_note_citations`, `_drop_private_instructions_ref`) must drop zero rows. A pin
-    recompute cannot satisfy this identity, unlike `approved_changes_byte_parity_self_test`'s two
-    pins. Part B: `_approved_replacements` must stay the shape `_approved_replacements_chain`
-    parses (single return, one wrapper, left-nested two-literal-argument `.replace` chain rooted
-    at `text`) -- this is what makes Part A's attribution a legible diff instead of a runtime
-    accident. Part C: `ROW_PATH_AST_SHA256` (the row-derivation machinery, docstrings stripped,
-    `_approved_replacements` itself excluded) and `APPROVED_ENTRIES_SHA256` (the chain's literal
-    pairs) are two pins that never move for a content edit; a commit that moves either is
-    machinery surgery and must be reviewed as such, not accepted on a pin recompute.
+    `b` empty, `a` a complete line of `text` -- the chain-intermediate text this entry runs
+    against -- carried with its trailing newline and no other, and exactly one row fewer
+    afterwards. The complete-line requirement is what separates a sanctioned removal from a
+    rewrite keyed on a fragment of the row's own body, which ends at the same newline and also
+    costs one row, by merging what precedes it into the following line.
+
+    An entry that adds a row (`delta < 0`) is refused here too, fail-closed: the identity this
+    feeds subtracts drops and carries no term for an addition, so admitting one takes a reviewed
+    generalization of the identity rather than a passing run.
     """
-    text0 = catalogue_baseline_text()
-    baseline_rows = len(table_data_rows(text0.splitlines()))
-    if baseline_rows != BASELINE_CATALOGUE_ROW_COUNT:
-        fail(
-            "row-count identity: BASELINE_CATALOGUE_ROW_COUNT is stale or a placeholder -- "
-            f"expected {BASELINE_CATALOGUE_ROW_COUNT}, the frozen baseline slice currently has "
-            f"{baseline_rows} rows. Recompute with: python3 -c 'import sys; "
-            "sys.path.insert(0, \"scripts\"); import check_docs_hierarchy as c; "
-            "print(len(c.table_data_rows(c.catalogue_baseline_text().splitlines())))'"
-        )
-    chain, violations = _approved_replacements_chain()
-    if violations:
-        fail("_approved_replacements shape violation: " + "; ".join(violations))
-    text = text0
-    total_dropped = 0
+    return (
+        b == ""
+        and delta == 1
+        and a.endswith("\n")
+        and "\n" not in a[:-1]
+        and a[:-1] in text.splitlines()
+    )
+
+
+def _chain_row_drops(text: str, chain: list[tuple[str, str]]) -> tuple[str, int, list[str]]:
+    """Replay `chain` over `text`; return the transformed text, rows dropped, ill-shaped entries.
+
+    Rows are counted only around an entry whose two literals carry different numbers of newlines,
+    since that is the only way `str.replace` can change the line count (measured: 2 of the 50
+    entries, against 2.3 s for counting rows around all of them). The screen exonerates nothing:
+    an entry it skips could still cost a row with no line delta, by rewriting a row into a
+    separator, say. Such a loss is attributed to no entry and left to the global identity, which
+    subtracts attributed drops only and so fails.
+    """
+    dropped = 0
     ill_shaped: list[str] = []
     for a, b in chain:
-        rows_before = len(table_data_rows(text.splitlines()))
-        text = text.replace(a, b)
-        rows_after = len(table_data_rows(text.splitlines()))
-        delta = rows_before - rows_after
-        if delta == 0:
+        if a.count("\n") == b.count("\n"):
+            text = text.replace(a, b)
             continue
-        well_shaped = b == "" and a.endswith("\n") and "\n" not in a[:-1] and delta == 1
-        if well_shaped:
-            total_dropped += delta
-        else:
-            ill_shaped.append(f"{a!r} -> {b!r} (delta={delta})")
+        rows_before = len(table_data_rows(text.splitlines()))
+        replaced = text.replace(a, b)
+        delta = rows_before - len(table_data_rows(replaced.splitlines()))
+        if delta and not _is_full_row_removal(text, a, b, delta):
+            ill_shaped.append(f"{a[:80]!r} -> {b[:40]!r} (delta={delta})")
+        dropped += delta
+        text = replaced
+    return text, dropped, ill_shaped
+
+
+def _row_conservation_violations(
+    source: str, published_rows: Callable[[], list[str]]
+) -> list[str]:
+    """Parts B and A against `source`'s literal chain and `published_rows`' row sequence.
+
+    Both are parameters only so that the positive controls below can drive this with a mutated
+    copy of this file's own `_approved_replacements`, and with a row sequence a rewrite outside
+    the chain has thinned, which is the defect class the identity exists to refuse.
+    """
+    chain, violations = _approved_replacements_chain(source)
+    if violations:
+        return ["_approved_replacements shape violation: " + "; ".join(violations)]
+    baseline_text = catalogue_baseline_text()
+    baseline_rows = len(table_data_rows(baseline_text.splitlines()))
+    if baseline_rows != BASELINE_CATALOGUE_ROW_COUNT:
+        return [
+            "BASELINE_CATALOGUE_ROW_COUNT is stale: expected "
+            f"{BASELINE_CATALOGUE_ROW_COUNT}, the frozen baseline slice has {baseline_rows} "
+            "rows. Recompute with: python3 -c 'import sys; sys.path.insert(0, \"scripts\"); "
+            "import check_docs_hierarchy as c; "
+            "print(len(c.table_data_rows(c.catalogue_baseline_text().splitlines())))'"
+        ]
+    after_chain, dropped, ill_shaped = _chain_row_drops(baseline_text, chain)
     if ill_shaped:
-        fail(
-            "row-count-changing chain entry is not a well-shaped full-row removal: "
-            + "; ".join(ill_shaped)
+        violations.append(
+            "row-count-changing chain entry is not a full-row removal: " + "; ".join(ill_shaped)
         )
-    text_after_chain = text
-    text_after_wrapper = _drop_working_note_citations(text_after_chain)
-    wrapper_delta = len(table_data_rows(text_after_chain.splitlines())) - len(
-        table_data_rows(text_after_wrapper.splitlines())
-    )
-    text_after_private = _drop_private_instructions_ref(text_after_wrapper)
-    private_delta = len(table_data_rows(text_after_wrapper.splitlines())) - len(
-        table_data_rows(text_after_private.splitlines())
-    )
-    if wrapper_delta != 0 or private_delta != 0:
-        fail(
-            "structural pass dropped a row: _drop_working_note_citations delta="
-            f"{wrapper_delta}, _drop_private_instructions_ref delta={private_delta} -- both "
-            "must be 0"
+    after_citations = _drop_working_note_citations(after_chain)
+    after_private = _drop_private_instructions_ref(after_citations)
+    rows_after_chain = len(table_data_rows(after_chain.splitlines()))
+    rows_after_citations = len(table_data_rows(after_citations.splitlines()))
+    rows_after_private = len(table_data_rows(after_private.splitlines()))
+    if rows_after_chain != rows_after_citations or rows_after_citations != rows_after_private:
+        violations.append(
+            "structural pass dropped a row: _drop_working_note_citations left "
+            f"{rows_after_citations} rows of {rows_after_chain} and "
+            f"_drop_private_instructions_ref {rows_after_private} of {rows_after_citations}, "
+            "where a row leaves only by a literal of the audited chain"
         )
-    published = len(published_catalogue_rows())
-    if BASELINE_CATALOGUE_ROW_COUNT - total_dropped != published:
-        fail(
+    published = len(published_rows())
+    if BASELINE_CATALOGUE_ROW_COUNT - dropped != published:
+        violations.append(
             "row conservation identity failed: BASELINE_CATALOGUE_ROW_COUNT "
-            f"({BASELINE_CATALOGUE_ROW_COUNT}) - chain drops ({total_dropped}) != "
-            f"len(published_catalogue_rows()) ({published})"
+            f"({BASELINE_CATALOGUE_ROW_COUNT}) - rows the audited chain drops ({dropped}) != "
+            f"published rows ({published}), so a row left the catalogue somewhere other than a "
+            "full-row literal of that chain"
         )
+    return violations
+
+
+def approved_replacements_shape_and_row_identity_self_test() -> None:
+    """Refuse any row loss that is not a full-row literal of the audited `.replace` chain.
+
+    The row-conservation identity replays that chain entry by entry over the frozen baseline
+    slice and requires `BASELINE_CATALOGUE_ROW_COUNT - (rows the chain drops) ==
+    len(published_catalogue_rows())`, with every row-count-changing entry a full-row removal in
+    the sense of `_is_full_row_removal` and with the two structural passes
+    (`_drop_working_note_citations`, `_drop_private_instructions_ref`) dropping no row at all.
+    Unlike the two pins of `approved_changes_byte_parity_self_test`, an identity between three
+    quantities is not satisfiable by recomputing anything: a rewrite keyed on a Lean name, at any
+    narrowing and at any depth, leaves the published catalogue short of what the chain accounts
+    for.
+
+    The shape rule requires `_approved_replacements` to keep the form
+    `_approved_replacements_chain` parses, which is what makes that attribution a legible diff
+    rather than a runtime accident. The last two pins cover machinery rather than content:
+    `ROW_PATH_AST_SHA256` the row-derivation nodes, `APPROVED_ENTRIES_SHA256` the reviewed
+    literal list. No content edit moves either, so a commit that moves one is machinery surgery
+    and has to be reviewed as such rather than accepted on a recompute.
+    """
+    source = _own_source()
+
+    # Positive controls: a check whose subject is an absence has to be shown firing on the defect
+    # it exists to refuse. Each control injects one defect into the same functions the real check
+    # below drives -- a mutated copy of this file's own `_approved_replacements`, a row sequence
+    # thinned outside the chain, the attribution predicate itself. The two AST mutations are
+    # re-spelled from the parsed function, so they stay exact under any later edit of the chain.
+    def mutated_chain_source(mutate: Callable[[ast.FunctionDef], None]) -> str:
+        """`_approved_replacements` alone, re-spelled from its own AST after `mutate` edits it."""
+        node = _approved_replacements_function_node(source)
+        mutate(node)
+        return ast.unparse(node)
+
+    def key_one_entry_on_a_call(node: ast.FunctionDef) -> None:
+        """Re-key one rewrite on a call instead of a literal: a name-keyed drop, spelled inside
+        the chain."""
+        for call in ast.walk(node):
+            if (
+                isinstance(call, ast.Call)
+                and isinstance(call.func, ast.Attribute)
+                and call.func.attr == "replace"
+            ):
+                call.args[0] = ast.Call(
+                    func=ast.Name(id="_row_for", ctx=ast.Load()),
+                    args=[ast.Constant(value="x"), ast.Name(id="text", ctx=ast.Load())],
+                    keywords=[],
+                )
+                return
+        fail("shape/row-identity control setup: no .replace call to re-key on a call")
+
+    def wrap_chain_in_extra_pass(node: ast.FunctionDef) -> None:
+        """Wrap the audited chain in a pass outside it, where an unaudited rewrite could sit."""
+        node.body[-1].value = ast.Call(
+            func=ast.Name(id="_extra_pass", ctx=ast.Load()),
+            args=[node.body[-1].value],
+            keywords=[],
+        )
+
+    for label, mutate, expected in (
+        ("a rewrite keyed on a call", key_one_entry_on_a_call, "non-literal replace() argument"),
+        ("an extra pass around the chain", wrap_chain_in_extra_pass, "unpinned wrapper chain"),
+    ):
+        refusals = _row_conservation_violations(
+            mutated_chain_source(mutate), published_catalogue_rows
+        )
+        if not any(expected in refusal for refusal in refusals):
+            fail(
+                f"shape/row-identity control did not fire: {label} was accepted, so the shape "
+                f"rule cannot detect what it exists to refuse (got {refusals})"
+            )
+
+    published = published_catalogue_rows()
+    if not published:
+        fail(
+            "shape/row-identity self-test found no published catalogue rows, so the identity "
+            "below would hold vacuously"
+        )
+    control_cell = published[0].removeprefix("| ").split(" | ")[0]
+    thinned = [row for row in published if not row.startswith(f"| {control_cell} |")]
+    if len(thinned) == len(published):
+        fail(
+            "shape/row-identity control setup: the name-keyed shim dropped no row, so its "
+            f"control below would be probing the published sequence itself ({control_cell})"
+        )
+    refusals = _row_conservation_violations(source, lambda: thinned)
+    if not any("row conservation identity failed" in refusal for refusal in refusals):
+        fail(
+            "shape/row-identity control did not fire: a row dropped by name outside the audited "
+            f"chain ({control_cell}) was accepted, so the identity cannot detect the defect "
+            f"class it exists to refuse (got {refusals})"
+        )
+
+    body_fragment = published[0].split(" | ", 1)[-1] + "\n"
+    if body_fragment == published[0] + "\n":
+        fail(
+            "shape/row-identity control setup: the first published row carries no body cell to "
+            "key a fragment removal on"
+        )
+    if _is_full_row_removal(catalogue_baseline_text(), body_fragment, "", 1):
+        fail(
+            "shape/row-identity control did not fire: a removal keyed on a fragment of a row's "
+            "body was attributed as a full-row removal, so the identity's attribution admits "
+            "the rewrite it exists to refuse"
+        )
+
+    violations = _row_conservation_violations(source, published_catalogue_rows)
+    if violations:
+        fail("; ".join(violations))
     ast_actual = _row_path_ast_sha256()
     if ast_actual != ROW_PATH_AST_SHA256:
         fail(
-            "row-path AST pin mismatch (machinery surgery, not a content edit): expected "
-            f"{ROW_PATH_AST_SHA256}, got {ast_actual}"
+            "row-path AST pin mismatch, which is machinery surgery rather than a content edit: "
+            f"expected {ROW_PATH_AST_SHA256}, got {ast_actual}. Recompute with: python3 -c "
+            "'import sys; sys.path.insert(0, \"scripts\"); import check_docs_hierarchy as c; "
+            "print(c._row_path_ast_sha256())' -- a passing pin recompute is never on its own an "
+            "authorization for what moved."
         )
-    entries_actual = _approved_entries_sha256(chain)
+    entries_actual = _approved_entries_sha256(_approved_replacements_chain(source)[0])
     if entries_actual != APPROVED_ENTRIES_SHA256:
         fail(
             f"approved-entries pin mismatch: expected {APPROVED_ENTRIES_SHA256}, got "
-            f"{entries_actual}"
+            f"{entries_actual}. Recompute with: python3 -c 'import sys; "
+            "sys.path.insert(0, \"scripts\"); import check_docs_hierarchy as c; "
+            "print(c._approved_entries_sha256(c._approved_replacements_chain(c._own_source())"
+            "[0]))' -- a passing pin recompute is never on its own an authorization for what "
+            "moved."
         )
 
 
@@ -2092,8 +2235,8 @@ def main() -> None:
     # a caller believed selected behaviour -- the sibling checkers' --self-test above all -- which
     # would otherwise be ignored and answered with a PASS the argument had no part in.
     argparse.ArgumentParser(description=__doc__).parse_args()
-    approved_replacements_shape_and_row_identity_self_test()
     approved_changes_byte_parity_self_test()
+    approved_replacements_shape_and_row_identity_self_test()
     name_keyed_row_drop_absence_self_test()
     long_record_negative_self_tests()
     moved_prose_negative_self_tests()
