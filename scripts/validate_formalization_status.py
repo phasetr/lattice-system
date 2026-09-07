@@ -5697,8 +5697,11 @@ end LatticeSystem
     legacy_authority_gate(repo_root, failures)
 
     legacy_index_text = (repo_root / legacy_index_relative).read_text(encoding="utf-8")
+    legacy_catalogue_dir = legacy_index_relative.parent
+    legacy_catalogue_pages = sorted((repo_root / legacy_catalogue_dir).glob("*.md"))
     interim_anchor = "version 2 JSON records"
     interim_authority_claim = "still a non-authoritative prototype"
+    interim_authority_assertion = re.compile(r"remains? authoritative")
     interim_retirement_clause = (
         "for as long as the version 2 catalogue is published as a non-authoritative prototype"
     )
@@ -5731,50 +5734,103 @@ end LatticeSystem
             if interim_authority_claim in sentence
         ]
 
-    # Positive controls: the gate above must fire on drift injected into the live authority
-    # claim, which is the only text it protects. Every sentence containing
-    # `interim_authority_claim` must carry the anchor itself, so a decoy banner, or an aside
-    # that a period plus whitespace separates from the claim, cannot supply the anchor on
-    # behalf of an unanchored live sentence; an aside glued on by any other separator is still
-    # read as part of the claim sentence. `interim_retirement_clause` does not contain
-    # `interim_authority_claim`, so the self-retiring condition is pinned as its own literal
-    # rather than by the anchor rule. The quotes are unwrapped first, so reflowing the banner
-    # is not treated as drift. The mutants run through the same gate against a scratch tree
-    # with a sink of their own that has to come back filled, so neutering the gate, unwiring it
-    # from the live tree, or dropping the sink extension fails here instead of passing
-    # silently; the ledger below pins the list object the live call is handed, not the survival
-    # of what that call collects into it.
+    def authority_assertion_sentences(quote: str) -> list[str]:
+        """Return the sentences of one unwrapped blockquote that claim the authority itself."""
+        return [
+            sentence
+            for sentence in re.split(r"(?<=\.)\s+", quote)
+            if interim_authority_assertion.search(sentence)
+        ]
+
+    # Positive controls over every published legacy catalogue page, not the index alone: the
+    # same banner sits on all of them, so reverting the self-retiring clause on a sibling chunk
+    # page fails here exactly as it does on the index. Each page must carry an interim-authority
+    # blockquote; every sentence containing `interim_authority_claim` must carry the anchor
+    # itself, and every sentence asserting the authority must carry `interim_retirement_clause`
+    # itself, so a decoy banner, a decoy paragraph of the same blockquote, or an aside that a
+    # period plus whitespace separates from the sentence cannot supply either literal on behalf
+    # of a reverted sentence; an aside glued on by any other separator is still read as part of
+    # that sentence. The clause is pinned as its own literal because it names the version 2
+    # catalogue rather than `interim_anchor`. The quotes are unwrapped first, so reflowing a
+    # banner is not treated as drift. Documented limitation: the same clause also appears on 23
+    # prototype-navigation pages under docs/formalization/ and at 5 wrapped prose sites
+    # elsewhere under docs/, and this gate reads none of them (the `details/` banner claims no
+    # authority and is outside the glob for the same reason); those sites are covered only by
+    # check_generated_site.AUTHORITATIVE_FORBIDDEN_PHRASES, which is inert while `catalog_state`
+    # is `prototype` and therefore bites only at the cutover. The mutants below run through the
+    # same gate against a scratch tree with a sink of their own that has to come back filled, so
+    # neutering the gate or dropping the sink extension fails here, and unwiring it from the
+    # live tree fails at the ledger check below, instead of passing silently; the ledger pins
+    # the list object the live call is handed, not the survival of what that call collects.
     legacy_index_lines = legacy_index_text.splitlines()
-    interim_runs = interim_authority_runs(legacy_index_lines)
-    interim_quotes = [
-        unwrapped_quote(legacy_index_lines[start:stop]) for start, stop in interim_runs
-    ]
-    claim_sentences = [
-        sentence for quote in interim_quotes for sentence in authority_claim_sentences(quote)
-    ]
-    unanchored = [sentence for sentence in claim_sentences if interim_anchor not in sentence]
+    index_runs = interim_authority_runs(legacy_index_lines)
+    interim_quotes: list[tuple[str, str]] = []
+    bannerless_pages: list[str] = []
+    for page in legacy_catalogue_pages:
+        page_name = page.relative_to(repo_root).as_posix()
+        page_lines = page.read_text(encoding="utf-8").splitlines()
+        page_runs = interim_authority_runs(page_lines)
+        if not page_runs:
+            bannerless_pages.append(page_name)
+        interim_quotes.extend(
+            (page_name, unwrapped_quote(page_lines[start:stop])) for start, stop in page_runs
+        )
     check(
-        bool(claim_sentences) and not unanchored,
-        "docs/formalization/legacy/index.md gate positive control is vacuous: "
-        f"{len(unanchored)} of {len(claim_sentences)} sentence(s) asserting "
-        f"{interim_authority_claim!r} in {len(interim_quotes)} interim-authority blockquote(s) "
-        f"lack the anchor {interim_anchor!r} (the claim is absent, reworded, or a decoy banner "
-        "or a neighbouring aside carries the anchor for an unanchored live sentence), so the "
+        bool(legacy_catalogue_pages) and not bannerless_pages,
+        f"{legacy_catalogue_dir.as_posix()}: {len(bannerless_pages)} of "
+        f"{len(legacy_catalogue_pages)} published catalogue page(s) carry no interim-authority "
+        f"blockquote ({', '.join(bannerless_pages) or 'none'}), so the two controls below "
+        "measure fewer pages than the catalogue publishes and a banner deleted on one of them "
+        "could not fail them",
+    )
+    claim_sentences = [
+        (page_name, sentence)
+        for page_name, quote in interim_quotes
+        for sentence in authority_claim_sentences(quote)
+    ]
+    unanchored_pages = sorted(
+        {page_name for page_name, sentence in claim_sentences if interim_anchor not in sentence}
+    )
+    check(
+        bool(claim_sentences) and not unanchored_pages,
+        f"{legacy_catalogue_dir.as_posix()}: the gate positive control is vacuous: "
+        f"{len(unanchored_pages)} page(s) ({', '.join(unanchored_pages) or 'none'}) assert "
+        f"{interim_authority_claim!r} without the anchor {interim_anchor!r} in the asserting "
+        f"sentence, out of {len(claim_sentences)} such sentence(s) in {len(interim_quotes)} "
+        f"interim-authority blockquote(s) across {len(legacy_catalogue_pages)} published page(s) "
+        "(no such sentence at all means the claim is absent or reworded; an unanchored one means "
+        "a decoy banner or a neighbouring aside carries the anchor on its behalf), so the "
         "downgrade mutation below leaves the claim intact and the control can never fail",
     )
-    clauseless_quotes = [
-        quote for quote in interim_quotes if interim_retirement_clause not in quote
+    assertion_sentences = [
+        (page_name, sentence)
+        for page_name, quote in interim_quotes
+        for sentence in authority_assertion_sentences(quote)
     ]
+    clauseless_pages = sorted(
+        {
+            page_name
+            for page_name, sentence in assertion_sentences
+            if interim_retirement_clause not in sentence
+        }
+        | {
+            page_name
+            for page_name, quote in interim_quotes
+            if not authority_assertion_sentences(quote)
+        }
+    )
     check(
-        bool(interim_quotes) and not clauseless_quotes,
-        f"docs/formalization/legacy/index.md: {len(clauseless_quotes)} of "
-        f"{len(interim_quotes)} interim-authority blockquote(s) lack the literal "
-        f"{interim_retirement_clause!r}, so the pages claim interim authority without the "
-        "condition that retires it; nothing else pins that clause, so reverting it to a "
-        "closed issue reference or deleting it would otherwise pass every gate",
+        bool(assertion_sentences) and not clauseless_pages,
+        f"{legacy_catalogue_dir.as_posix()}: {len(clauseless_pages)} of "
+        f"{len(legacy_catalogue_pages)} published page(s) ({', '.join(clauseless_pages) or 'none'}"
+        f") claim interim authority without the literal {interim_retirement_clause!r} in the "
+        f"claiming sentence itself, out of {len(assertion_sentences)} such sentence(s) in "
+        f"{len(interim_quotes)} interim-authority blockquote(s); nothing else pins that clause, "
+        "so reverting it to a closed issue reference, deleting it, or letting a neighbouring "
+        "sentence of the same blockquote carry it would otherwise pass every gate",
     )
     downgraded_lines = list(legacy_index_lines)
-    for start, stop in reversed(interim_runs):
+    for start, stop in reversed(index_runs):
         downgraded_lines[start:stop] = [
             "> "
             + unwrapped_quote(legacy_index_lines[start:stop]).replace(
