@@ -310,6 +310,15 @@ name already stands beside the citation. A target with no declaration name — a
 title, its pin label, or the declaration whose doc comment it is. In TeX the same form is
 `\texttt{File.lean} (\texttt{decl\_name})`, with underscores escaped as `\_`.
 
+Line references inside machine-frozen archival material are historical snapshots and are exempt:
+the `<!-- legacy-source:start:… -->` blocks of `docs/formalization/legacy/` are held by
+`scripts/check_docs_hierarchy.py` at exact row parity with the baseline `docs/index.md`, and the
+`<!-- legacy-detail:start:… -->` records under `docs/formalization/legacy/details/`, reached from
+the `record-<n>` headings keyed by their former baseline line number, are held at
+whitespace-normalized parity with the same rows; a citation frozen there records the tree as it
+stood at the migration baseline, so rewriting it is an edit to a frozen record and not a citation
+fix.
+
 ### Review check — public doc sync
 
 - [ ] The authoritative legacy catalogue page is updated (or the PR explicitly notes "no
