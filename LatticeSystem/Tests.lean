@@ -168,6 +168,7 @@ import LatticeSystem.Tests.PrintedConstantCounterexample
 import LatticeSystem.Tests.SaturatedFerromagnetGroundEnergy
 import LatticeSystem.Tests.SaturatedFerromagnetSectorIrreducible
 import LatticeSystem.Tests.HeisenbergCoreBondSumPin
+import LatticeSystem.Tests.FiniteStrictUpperBoundPin
 
 /-!
 # Test aggregator for the `lattice-system` library
