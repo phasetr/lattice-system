@@ -53,4 +53,37 @@ theorem ladderIterateUp_restriction_re_pos (k : Fin (Fintype.card V * N + 1))
     exact_mod_cast Nat.choose_pos (Nat.lt_succ_iff.mp (σ.1 x).isLt)
   exact mul_pos hfac hprod
 
+/-- The saturated-ferromagnet eigenvalue is its own real part, for real coupling.  Packaging of
+`saturatedFerromagnetEigenvalueS_exists_real` in the rewrite form used to feed the real-eigenvalue
+interfaces of the sector matrices. -/
+private theorem saturatedFerromagnetEigenvalueS_ofReal_re {J : V → V → ℂ}
+    (hJ_real : ∀ x y, (J x y).im = 0) :
+    (((saturatedFerromagnetEigenvalueS (V := V) J N).re : ℝ) : ℂ) =
+      saturatedFerromagnetEigenvalueS (V := V) J N := by
+  obtain ⟨μ, hμ⟩ := saturatedFerromagnetEigenvalueS_exists_real (V := V) (N := N) J hJ_real
+  rw [← hμ, Complex.ofReal_re]
+
+/-- **The restricted ladder state is a real sector eigenvector at the ground-state energy**
+(Tasaki §2.4, p. 34; solution of Problem 2.4.a, p. 496).
+
+`Φ_M` is an eigenvector of the full Hamiltonian at `saturatedFerromagnetEigenvalueS J N`, which is
+real for real coupling; since `Ĥ` conserves the magnetization, restricting to the sector keeps the
+eigenvector equation, and taking real parts moves it to the real-form sector matrix -- the shape
+Theorem A.18 (p. 475) consumes. -/
+theorem heisenbergHamiltonianSReMatrixOnMagSector_mulVec_ladder_restriction
+    (J : V → V → ℂ) (hJ_real : ∀ x y, (J x y).im = 0)
+    (k : Fin (Fintype.card V * N + 1)) :
+    (heisenbergHamiltonianSReMatrixOnMagSector J N k.val).mulVec
+        (fun σ => (magSectorRestriction (M := k.val) (ladderIterateUp V N k) σ).re) =
+      (saturatedFerromagnetEigenvalueS (V := V) J N).re •
+        (fun σ => (magSectorRestriction (M := k.val) (ladderIterateUp V N k) σ).re) := by
+  have hfull : (heisenbergHamiltonianS J N).mulVec (ladderIterateUp V N k) =
+      (((saturatedFerromagnetEigenvalueS (V := V) J N).re : ℝ) : ℂ) • ladderIterateUp V N k := by
+    rw [saturatedFerromagnetEigenvalueS_ofReal_re hJ_real]
+    have h := ladderIterateUp_mem_heisenbergHamiltonianS_eigenspace J k
+    rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at h
+    exact h
+  exact heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec N hJ_real
+    (heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen J hfull)
+
 end LatticeSystem.Quantum
