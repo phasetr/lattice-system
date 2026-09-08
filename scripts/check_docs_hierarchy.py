@@ -52,11 +52,12 @@ catalogue-row comparison is what proves they do. What the pins buy is that a cha
 published catalogue is a legible diff and a moved hash rather than a silent edit.
 
 Two further pins cover this script rather than the content. `SCRIPT_SOURCE_SHA256` pins
-sha256 over this file's whole source text, with only the four pin constants themselves masked
-out, and `APPROVED_ENTRIES_SHA256` pins sha256 over the ordered literal pairs of the audited
-chain, so that surgery which leaves the published bytes alone is a moved pin rather than a
-silent edit. Both hash text this file already carries, never a serialization of the parsed tree
-or of a literal, so their values are the same on every interpreter that can parse this file.
+sha256 over this file's whole source text, with only the four pin values themselves masked out --
+their digits alone, on lines each pin has to occupy by itself -- and `APPROVED_ENTRIES_SHA256`
+pins sha256 over the ordered literal pairs of the audited chain, so that surgery which leaves the
+published bytes alone is a moved pin rather than a silent edit. Both hash text this file already
+carries, never a serialization of the parsed tree or of a literal, so their values are the same on
+every interpreter that can parse this file.
 They are recomputed with
 
     python3 -c 'import sys; sys.path.insert(0, "scripts"); \
@@ -74,7 +75,8 @@ sanctioned removals spelled in `_approved_replacements` among them. What it buys
 of this script can change without a recompute in the same reviewed commit, so surgery that
 leaves the published bytes and the row identity intact -- a decorator on `_approved_replacements`
 that rewrites what the audited chain returns, a rebinding of `table_data_rows` nested in a
-compound statement -- cannot be exonerated by a pin that stood still.
+compound statement or spelled beside a pin on the pin's own line -- cannot be exonerated by a pin
+that stood still.
 
 One residual stays with review. Editing the row-derivation machinery and recomputing its pins
 passes every check here, as does editing the pages and recomputing the two byte-parity pins,
@@ -417,6 +419,20 @@ def table_data_rows(lines: list[str]) -> list[str]:
             continue
         result.append(line)
     return result
+
+
+def _table_row_lines(text: str) -> list[str]:
+    """The lines of `text` that are table rows by shape alone: pipe-led and not a separator.
+
+    `table_data_rows` additionally drops a row whose next line is a separator, reading it as a
+    header. That is what a whole document needs and what a replacement literal measured on its
+    own must not use: a replacement ending in a row followed by `| --- |` would hide that row
+    from its own count, while the document, where that trailing separator meets the following
+    text, counts it. So the screen on how many rows a chain entry writes counts by shape.
+    """
+    return [
+        line for line in text.splitlines() if line.startswith("|") and not is_separator(line)
+    ]
 
 
 # Baseline catalogue rows carry two kinds of pointer to a working note that is not part of this
@@ -1314,26 +1330,64 @@ def approved_changes_byte_parity_self_test() -> None:
 # len(published_catalogue_rows())` is an identity no pin recompute can satisfy.
 BASELINE_CATALOGUE_ROW_COUNT = 2052
 
-# sha256 over this whole file's source text, the pin constants of `_MASKED_PIN_NAMES` aside.
+# sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "25f5fa5f971b24ab4c285c3c135459c0c0e2a9ae7828c5594edad4354b401e6f"
+SCRIPT_SOURCE_SHA256 = "69d9980926a8482aabb06c52021d37cedac464263d36dcb9c9ad663fb243d2d2"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
 APPROVED_ENTRIES_SHA256 = "f2ff5401993d12ccf7cbdf3b837910f89eb928feb0cd10f12cd04311858c92c8"
 
-# The only lines `SCRIPT_SOURCE_SHA256` does not hash: the pin constants themselves. Each is
+# The only text `SCRIPT_SOURCE_SHA256` does not hash: the digits these four pins carry. Each is
 # restated by the very edit it pins, and a digest over its own value would have no fixed point.
 # The masking is by name and applies only to a plain string-constant assignment, so a pin whose
-# value became an expression is hashed like any other code.
+# value became an expression, or whose line carries anything besides the assignment, is refused
+# rather than masked.
 _MASKED_PIN_NAMES = (
     "APPROVED_CHANGES_SHA256",
     "PUBLISHED_ROWS_SHA256",
     "SCRIPT_SOURCE_SHA256",
     "APPROVED_ENTRIES_SHA256",
 )
+
+# A pin's value: the 64 lowercase hex digits of a sha256 digest and nothing else.
+_PIN_VALUE = re.compile(r"[0-9a-f]{64}")
+
+
+def _masked_pin_span(name: str, line: str, node: ast.Assign) -> tuple[int, int]:
+    """The column span of pin `name`'s literal on `line`, refusing any line that carries more.
+
+    The span is what `_script_source_sha256` masks and what `_with_recomputed_script_source_pin`
+    overwrites. Both have to be columns rather than the whole line: a line-wide mask would drop
+    whatever else the line held -- `PIN = "..." ; table_data_rows = <a wrapper>` -- out of the
+    digest, which is the one thing this pin exists to make impossible, and a line-wide rewrite
+    would launder the same statement out of a mirror. Masking columns is sound only on a line
+    that carries nothing else, so anything but `NAME = "<64 hex digits>"` occupying the whole
+    physical line is refused here, fail-closed. That spelling is also pure ASCII, which is what
+    makes the UTF-8 byte offsets `ast` reports usable as string indices.
+
+    The refusal raises rather than only calling `fail`, which is not redundant: the statement it
+    refuses can be a rebinding of `fail` itself, and a refusal that reports through the name it
+    is refusing reports nothing.
+    """
+    value = node.value
+    if (
+        node.lineno != node.end_lineno
+        or not isinstance(value, ast.Constant)
+        or not isinstance(value.value, str)
+        or _PIN_VALUE.fullmatch(value.value) is None
+        or line != f'{name} = "{value.value}"'
+    ):
+        message = (
+            f"script source pin: {name} has to occupy its whole line as "
+            f'`{name} = "<64 hex digits>"`, so that masking its value hides nothing else, '
+            f"found: {line!r}"
+        )
+        fail(message)
+        raise SystemExit(message)
+    return value.col_offset, value.end_col_offset
 
 
 def _own_source() -> str:
@@ -1417,16 +1471,21 @@ def _approved_replacements_chain(source: str) -> tuple[list[tuple[str, str]], li
 
 
 def _script_source_sha256(source: str | None = None) -> str:
-    """sha256 over `source` (this file's own text by default), every line of it, with each
-    `_MASKED_PIN_NAMES` assignment replaced by a marker naming it and trailing whitespace
+    """sha256 over `source` (this file's own text by default), every line of it, with only the
+    digits of each `_MASKED_PIN_NAMES` assignment replaced by a marker and trailing whitespace
     stripped.
+
+    The masked unit is the literal's own column span, not its physical line, and
+    `_masked_pin_span` refuses any pin line that carries anything besides the assignment. A
+    line-wide mask leaves a `;`-separated sibling statement unhashed, so machinery surgery
+    spelled beside a pin would land with all four pins standing still.
 
     The subject is the text rather than the parsed tree because `ast.dump` renders one tree
     differently on different interpreters -- measured, three distinct digests over this file
     across 3.9, 3.12 and 3.13 -- which makes a pin taken over it a report of which Python ran
     rather than of what the script is, red on any runner whose version differs from the one that
-    recomputed it. The parser is used only to locate the masked assignments, and line numbers and
-    source text are the same everywhere.
+    recomputed it. The parser is used only to locate the masked literals, and line numbers, column
+    offsets and source text are the same everywhere.
 
     The subject is the whole file rather than a list of names because a name list pins what it
     lists and exonerates everything else: a decorator on an audited function, or a rebinding of
@@ -1438,7 +1497,7 @@ def _script_source_sha256(source: str | None = None) -> str:
     if source is None:
         source = _own_source()
     lines = source.splitlines()
-    masked: dict[int, tuple[int, str]] = {}
+    pins: dict[int, ast.Assign] = {}
     for node in ast.parse(source).body:
         if (
             isinstance(node, ast.Assign)
@@ -1448,23 +1507,21 @@ def _script_source_sha256(source: str | None = None) -> str:
             and isinstance(node.value, ast.Constant)
             and isinstance(node.value.value, str)
         ):
-            masked[node.lineno] = (node.end_lineno, node.targets[0].id)
-    if {name for _, name in masked.values()} != set(_MASKED_PIN_NAMES):
+            pins[node.lineno] = node
+    found = sorted(node.targets[0].id for node in pins.values())
+    if set(found) != set(_MASKED_PIN_NAMES):
         fail(
             "script source pin: every name of _MASKED_PIN_NAMES has to be a module-top-level "
-            f"assignment of a string constant, found {sorted(n for _, n in masked.values())}"
+            f"assignment of a string constant, found {found}"
         )
     pieces: list[str] = []
-    index = 0
-    while index < len(lines):
-        span = masked.get(index + 1)
-        if span is None:
-            pieces.append(lines[index].rstrip())
-            index += 1
-        else:
-            end, name = span
-            pieces.append(f"# masked pin constant {name}")
-            index = end
+    for index, line in enumerate(lines):
+        node = pins.get(index + 1)
+        if node is None:
+            pieces.append(line.rstrip())
+            continue
+        start, end = _masked_pin_span(node.targets[0].id, line, node)
+        pieces.append(f"{line[:start]}<masked pin value>{line[end:]}")
     return hashlib.sha256("\n".join(pieces).encode("utf-8")).hexdigest()
 
 
@@ -1473,7 +1530,9 @@ def _with_recomputed_script_source_pin(script_text: str) -> str:
 
     The disposable-clone fixtures below run an edited copy of this file, which would otherwise
     carry the pin of a text it is no longer. Restating it is exact rather than a fixed-point
-    search, because the pin line is the one line the digest does not hash.
+    search, because the digits it overwrites are the one span the digest does not hash. Only
+    those digits are overwritten, so a mirror keeps whatever else its pin line holds -- which
+    `_masked_pin_span` has already refused, but the rewrite does not depend on that.
     """
     digest = _script_source_sha256(script_text)
     lines = script_text.splitlines(keepends=True)
@@ -1483,10 +1542,13 @@ def _with_recomputed_script_source_pin(script_text: str) -> str:
             and len(node.targets) == 1
             and isinstance(node.targets[0], ast.Name)
             and node.targets[0].id == "SCRIPT_SOURCE_SHA256"
+            and isinstance(node.value, ast.Constant)
+            and isinstance(node.value.value, str)
         ):
-            lines[node.lineno - 1 : node.end_lineno] = [
-                f'SCRIPT_SOURCE_SHA256 = "{digest}"\n'
-            ]
+            raw = lines[node.lineno - 1]
+            line = raw.rstrip("\r\n")
+            start, end = _masked_pin_span("SCRIPT_SOURCE_SHA256", line, node)
+            lines[node.lineno - 1] = f'{line[:start]}"{digest}"{line[end:]}{raw[len(line):]}'
             return "".join(lines)
     message = "script source pin: SCRIPT_SOURCE_SHA256 not found in the text to re-pin"
     fail(message)
@@ -1513,11 +1575,15 @@ def _approved_entries_sha256(chain: list[tuple[str, str]]) -> str:
 def _is_full_row_removal(text: str, a: str, b: str, delta: int) -> bool:
     """Whether a row-count-changing chain entry has the one sanctioned shape: a whole row out.
 
-    `b` empty, `a` a complete line of `text` -- the chain-intermediate text this entry runs
-    against -- carried with its trailing newline and no other, and exactly one row fewer
+    `b` empty, `a` a complete counted row of `text` -- the chain-intermediate text this entry
+    runs against -- carried with its trailing newline and no other, and exactly one row fewer
     afterwards. The complete-line requirement is what separates a sanctioned removal from a
     rewrite keyed on a fragment of the row's own body, which ends at the same newline and also
-    costs one row, by merging what precedes it into the following line.
+    costs one row, by merging what precedes it into the following line. Being a complete line is
+    not enough on its own: a non-row line sitting between a counted row and a separator also
+    costs exactly one row when it goes, because the row above it then reads as a header, and the
+    row that actually left is named nowhere in the diff. So the line removed has to be one the
+    count was carrying, which is what membership in `table_data_rows(text)` says.
 
     An entry that adds a row (`delta < 0`) is refused here too, fail-closed: the identity this
     feeds subtracts drops and carries no term for an addition, so admitting one takes a reviewed
@@ -1528,7 +1594,7 @@ def _is_full_row_removal(text: str, a: str, b: str, delta: int) -> bool:
         and delta == 1
         and a.endswith("\n")
         and "\n" not in a[:-1]
-        and a[:-1] in text.splitlines()
+        and a[:-1] in table_data_rows(text.splitlines())
     )
 
 
@@ -1543,13 +1609,16 @@ def _chain_row_drops(text: str, chain: list[tuple[str, str]]) -> tuple[str, int,
     keep the total and never be looked at. An entry is refused unless its replacement carries no
     more table rows than its search literal and it either leaves the row count alone or is a
     full-row removal in the sense of `_is_full_row_removal`, which admits exactly one row out.
+    The two literals are counted by `_table_row_lines`, by row shape, because each is measured
+    outside the document it runs against; that screen is a screen and not a bound, and what
+    refuses a minted row is the row-count delta over the whole intermediate text.
     """
     removals = 0
     ill_shaped: list[str] = []
     rows_now = len(table_data_rows(text.splitlines()))
     for a, b in chain:
-        rows_sought = len(table_data_rows(a.splitlines()))
-        rows_written = len(table_data_rows(b.splitlines()))
+        rows_sought = len(_table_row_lines(a))
+        rows_written = len(_table_row_lines(b))
         if rows_written > rows_sought:
             ill_shaped.append(
                 f"{a[:80]!r} -> {b[:40]!r} (writes {rows_written} table rows where it seeks "
@@ -1640,7 +1709,7 @@ def approved_replacements_shape_and_row_identity_self_test() -> None:
     The shape rule requires `_approved_replacements` to keep the form
     `_approved_replacements_chain` parses, which is what makes that attribution a legible diff
     rather than a runtime accident. The last two pins cover this script rather than the
-    content. `SCRIPT_SOURCE_SHA256` hashes the whole file, the pin constants aside, so an edit to
+    content. `SCRIPT_SOURCE_SHA256` hashes the whole file, the pin values aside, so an edit to
     this script that the published bytes and the row identity do not register -- a decorator on
     `_approved_replacements`, a rebinding of `table_data_rows` -- is still a moved pin that has
     to be reviewed rather than accepted on a recompute. `APPROVED_ENTRIES_SHA256` hashes the
