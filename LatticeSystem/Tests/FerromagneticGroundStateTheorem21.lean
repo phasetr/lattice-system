@@ -1,7 +1,4 @@
-import LatticeSystem.Quantum.SpinS.FerromagneticSectorSpan
-import LatticeSystem.Quantum.SpinS.SaturatedLadderJointEigenspace
-import LatticeSystem.Quantum.SpinS.SaturatedFerromagnetGroundEnergy
-import LatticeSystem.Lattice.Graph
+import LatticeSystem.Quantum.SpinS.FerromagneticGroundStateTheorem21
 
 /-!
 # Signature pin: Tasaki §2.4 Theorem 2.1, the `Ĥ`-eigenspace capstone (p. 34)
@@ -163,7 +160,7 @@ example :
     (fun x y => by unfold couplingOf; by_cases h : (cycleGraph 3).Adj x y <;> simp [h])
     (couplingOf_symm (cycleGraph 3) (-(1/2) : ℂ))
     (fun x y h => by simp [couplingOf, h])
-    (fun x y h => by simp [couplingOf, h]; norm_num)
+    (fun x y h => by simp [couplingOf, h])
     (le_refl 1)
 
 /-- **Positive control (C2).** On the ferromagnetic triangle, the ground eigenspace has
@@ -181,7 +178,7 @@ example :
     (fun x y => by unfold couplingOf; by_cases h : (cycleGraph 3).Adj x y <;> simp [h])
     (couplingOf_symm (cycleGraph 3) (-(1/2) : ℂ))
     (fun x y h => by simp [couplingOf, h])
-    (fun x y h => by simp [couplingOf, h]; norm_num)
+    (fun x y h => by simp [couplingOf, h])
     (le_refl 1)
 
 end LatticeSystem.Quantum

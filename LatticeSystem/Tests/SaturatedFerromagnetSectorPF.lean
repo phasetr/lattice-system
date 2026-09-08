@@ -59,7 +59,7 @@ example {G : SimpleGraph V} {J : V → V → ℂ}
   heisenbergHamiltonianSMatrixOnMagSector_finrank_le_one_of_connected_ferro
     hGconn hJ_real hJ_sym hJ_supp hJ_ferro hN k
 
-/-- **P5 pin.** Every sector ground state (the joint `H`-eigenspace at
+/-- **P5 pin.** Every sector ground state (the `H`-eigenspace at
 `saturatedFerromagnetEigenvalueS J N`, intersected with the magnetization-sector subspace) is
 exactly `span ℂ {ladderIterateUp V N k}` — the per-sector uniqueness statement P5 must establish
 as an equality of `Submodule`s, not merely a `finrank` bound.  No `[Nonempty V]` instance may be
