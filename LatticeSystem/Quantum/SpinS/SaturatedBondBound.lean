@@ -61,4 +61,19 @@ theorem spinSDot_maxSpin_sub_posSemidef_two (hN : 1 ≤ N) :
     have hJ0 : (0 : ℝ) ≤ ((J : ℕ) : ℝ) := Nat.cast_nonneg _
     nlinarith
 
+/-- **Bond bound on a general vertex set** (Tasaki §2.4, eq. (2.4.5) and the text below it,
+p. 32).  For distinct sites `x ≠ y` of `Λ`, `S² · 1 − Ŝ_x · Ŝ_y` is positive semidefinite when
+`1 ≤ N`.  The bond operator is the two-site block embedding `onEmbS ![x, y]`
+(`spinSDot_eq_onEmbS`), and `onEmbS` preserves the identity, scalar multiples, differences and
+positive semidefiniteness, so the two-site bound transports verbatim. -/
+theorem spinSDot_maxSpin_sub_posSemidef (hN : 1 ≤ N) {x y : Λ} (hxy : x ≠ y) :
+    ((((N : ℂ) / 2) * ((N : ℂ) / 2)) • (1 : ManyBodyOpS Λ N) - spinSDot x y N).PosSemidef := by
+  have hemb : ((((N : ℂ) / 2) * ((N : ℂ) / 2)) • (1 : ManyBodyOpS Λ N) - spinSDot x y N)
+      = onEmbS ![x, y] ((((N : ℂ) / 2) * ((N : ℂ) / 2)) • (1 : ManyBodyOpS (Fin 2) N)
+        - spinSDot (0 : Fin 2) 1 N) := by
+    simp only [sub_eq_add_neg, onEmbS_add, onEmbS_neg, onEmbS_smul, onEmbS_one,
+      spinSDot_eq_onEmbS hxy N]
+  rw [hemb]
+  exact onEmbS_posSemidef (injective_bondEmb hxy) (spinSDot_maxSpin_sub_posSemidef_two hN)
+
 end LatticeSystem.Quantum
