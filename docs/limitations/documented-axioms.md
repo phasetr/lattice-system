@@ -238,12 +238,14 @@ policy text only.
 - [Tasaki Chapter 5](/lattice-system/limitations/documented-axioms/chapter-05/) — [Theorem 5.1](/lattice-system/limitations/documented-axioms/chapter-05/#entry-theorem-5-1), [Theorem 5.2](/lattice-system/limitations/documented-axioms/chapter-05/#entry-theorem-5-2), [Theorem 5.3](/lattice-system/limitations/documented-axioms/chapter-05/#entry-theorem-5-3), [Theorem 5.4](/lattice-system/limitations/documented-axioms/chapter-05/#entry-theorem-5-4)
 - [Tasaki Chapter 10](/lattice-system/limitations/documented-axioms/chapter-10/) — [Theorem 10.11](/lattice-system/limitations/documented-axioms/chapter-10/#entry-theorem-10-11)
 - [Tasaki Chapter 11](/lattice-system/limitations/documented-axioms/chapter-11/) — [Theorem 11.8](/lattice-system/limitations/documented-axioms/chapter-11/#entry-theorem-11-8), [Theorem 11.13](/lattice-system/limitations/documented-axioms/chapter-11/#entry-theorem-11-13), [Theorem 11.18](/lattice-system/limitations/documented-axioms/chapter-11/#entry-theorem-11-18), [Theorem 11.19](/lattice-system/limitations/documented-axioms/chapter-11/#entry-theorem-11-19), [Lemma 11.22/11.23](/lattice-system/limitations/documented-axioms/chapter-11/#entry-lemma-11-22-11-23), [Lemma 11.25](/lattice-system/limitations/documented-axioms/chapter-11/#entry-lemma-11-25), [Theorem 11.27](/lattice-system/limitations/documented-axioms/chapter-11/#entry-theorem-11-27)
+- [Tasaki Appendix A](/lattice-system/limitations/documented-axioms/appendix-a/) — [Theorems A.21–A.22](/lattice-system/limitations/documented-axioms/appendix-a/#entry-wigner-theorems-a-21-a-22), [Theorem A.24](/lattice-system/limitations/documented-axioms/appendix-a/#entry-theorem-a-24-banach-alaoglu), [Theorem A.26](/lattice-system/limitations/documented-axioms/appendix-a/#entry-theorem-a-26-ground-state-variational-characterization), [Theorem A.28](/lattice-system/limitations/documented-axioms/appendix-a/#entry-theorem-a-28-gns-construction)
 
 Each `<a id="…">` above is the id Kramdown generated for that entry's heading while this page
 still carried the entries, so links published against the former single-page ledger keep
 resolving. Entries written after the split were never addressable here and get no such id.
 
 A new entry is written on the page of its Tasaki chapter (`chapter-NN.md`, created on first
-use and added to this list). When a page would exceed 48 KiB, start the next `-part-NN` page
-so that the 64 KiB soft page-size threshold of `scripts/check_docs_hierarchy.py` stays an
-early warning rather than the first signal of the 128 KiB hard failure.
+use and added to this list), or on `appendix-a.md` for Appendix A entries. When a page would
+exceed 48 KiB, start the next `-part-NN` page so that the 64 KiB soft page-size threshold of
+`scripts/check_docs_hierarchy.py` stays an early warning rather than the first signal of the
+128 KiB hard failure.

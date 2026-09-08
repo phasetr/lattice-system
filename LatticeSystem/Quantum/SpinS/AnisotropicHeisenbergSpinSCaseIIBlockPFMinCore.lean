@@ -4,6 +4,7 @@ import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinSCaseIIParityBlockPF
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergAxisSwapMinEigenvalue
 import LatticeSystem.Quantum.SpinS.AxisSwappedBlockMinEq
 import LatticeSystem.Quantum.SpinS.BareSubmatrixBoundAtMin
+import LatticeSystem.Math.FiniteStrictUpperBound
 /-!
 # Case (ii): parity-block simplicity from PF/min path data — core lemmas
 
@@ -103,18 +104,11 @@ abbrev axisSwappedParityBlockDZeroRawSupportPath
 function. -/
 lemma exists_parityBlock_dressed_diag_strict_upper_bound
     (A : Λ → Bool) (J : Λ → Λ → ℂ) (lam D : ℂ)
-    (p : ℕ) [Nonempty (parityConfigS Λ N p)] :
+    (p : ℕ) :
     ∃ c : ℝ, ∀ σ : parityConfigS Λ N p,
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ.1 σ.1 < c := by
-  classical
-  let f : parityConfigS Λ N p → ℝ :=
-    fun σ => dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ.1 σ.1
-  obtain ⟨σ₀, _hσ₀, hσ₀_max⟩ :=
-    Finset.exists_max_image (Finset.univ : Finset (parityConfigS Λ N p)) f
-      Finset.univ_nonempty
-  refine ⟨f σ₀ + 1, fun σ => ?_⟩
-  have hle : f σ ≤ f σ₀ := hσ₀_max σ (Finset.mem_univ σ)
-  linarith
+      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ.1 σ.1 < c :=
+  LatticeSystem.Math.exists_gt_of_finite fun σ : parityConfigS Λ N p =>
+    dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ.1 σ.1
 
 /-- Strict-interior raw-support path data from strict block reachability
 totality. -/

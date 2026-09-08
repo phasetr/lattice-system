@@ -3,6 +3,7 @@ import LatticeSystem.Quantum.SpinS.StaggeredCasimirSU2Invariance
 import LatticeSystem.Quantum.SpinS.WeightPreservingExpectationSum
 import LatticeSystem.Quantum.SpinS.AnisotropicSectorProjectionEigenvector
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergReduction
+import LatticeSystem.Math.FiniteStrictUpperBound
 
 /-!
 # Tasaki §4.1 Theorem 4.4 (Shen–Qiu–Tian): universal-form assembly infrastructure
@@ -55,21 +56,12 @@ open Matrix
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-/-- **Strict diagonal bound exists.** Over the finite, nonempty configuration type
-`Λ → Fin (N + 1)`, the diagonal of `dressedHeisenbergSReMatrix A J N` is bounded
-strictly above by `c := (univ.sup' diag) + 1`. -/
+/-- **Strict diagonal bound exists.** Over the finite configuration type `Λ → Fin (N + 1)`,
+the diagonal of `dressedHeisenbergSReMatrix A J N` is bounded strictly above. -/
 theorem exists_strict_diag_bound_dressedHeisenbergSReMatrix
-    [Nonempty Λ] (A : Λ → Bool) (J : Λ → Λ → ℂ) (N : ℕ) :
-    ∃ c : ℝ, ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c := by
-  classical
-  haveI : Nonempty (Λ → Fin (N + 1)) := inferInstance
-  refine ⟨(Finset.univ.sup' Finset.univ_nonempty
-      (fun σ => dressedHeisenbergSReMatrix A J N σ σ)) + 1, fun σ => ?_⟩
-  have hle : dressedHeisenbergSReMatrix A J N σ σ ≤
-      Finset.univ.sup' Finset.univ_nonempty
-        (fun σ => dressedHeisenbergSReMatrix A J N σ σ) :=
-    Finset.le_sup' (f := fun σ => dressedHeisenbergSReMatrix A J N σ σ) (Finset.mem_univ σ)
-  linarith
+    (A : Λ → Bool) (J : Λ → Λ → ℂ) (N : ℕ) :
+    ∃ c : ℝ, ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c :=
+  LatticeSystem.Math.exists_gt_of_finite fun σ => dressedHeisenbergSReMatrix A J N σ σ
 
 /-- **Global sign flip leaves the staggered Casimir operator unchanged.** Flipping the
 sublattice assignment `A ↦ ¬A` negates both `ε`-factors, so their product — and hence

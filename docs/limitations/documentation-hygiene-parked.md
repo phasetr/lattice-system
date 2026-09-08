@@ -34,12 +34,12 @@ equation and problem numbers out of the count. Shorter tracker identifiers are l
 and lie outside this entry rather than being measured by it:
 
 ```
-git grep -o -E '#[0-9]{4,}' 080ebac2 -- 'LatticeSystem/**/*.lean' | wc -l
-git grep -n -E '#[0-9]{4,}' 080ebac2 -- 'LatticeSystem/**/*.lean' | wc -l
-git grep -l -E '#[0-9]{4,}' 080ebac2 -- 'LatticeSystem/**/*.lean' | wc -l
+git grep -o -E '#[0-9]{4,}' 0fcd9ba7 -- 'LatticeSystem/**/*.lean' | wc -l
+git grep -n -E '#[0-9]{4,}' 0fcd9ba7 -- 'LatticeSystem/**/*.lean' | wc -l
+git grep -l -E '#[0-9]{4,}' 0fcd9ba7 -- 'LatticeSystem/**/*.lean' | wc -l
 ```
 
-At revision `080ebac2`: 1250 occurrences on 1128 lines across 530 files.
+At revision `0fcd9ba7`: 1250 occurrences on 1128 lines across 530 files.
 
 **Reason.** A single sweep edits 530 modules at once, so every one of them and every downstream
 importer is rebuilt. The rebuild is the dominant cost and it buys no change to any statement,
@@ -99,10 +99,10 @@ population to weigh.
 **Measurement.** One pattern covers every retired name:
 
 ```
-git grep -niE 'audit_gate|audit-helpers|capstones\.txt|docs_names\.py|pre-push' 080ebac2 -- '*.lean' '*.md' '*.tex' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
+git grep -niE 'audit_gate|audit-helpers|capstones\.txt|docs_names\.py|pre-push' 0fcd9ba7 -- '*.lean' '*.md' '*.tex' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
 ```
 
-At revision `080ebac2`: 0.
+At revision `0fcd9ba7`: 0.
 
 **Disposition.** Resolved by measurement, so a reopen condition would have nothing to reopen. The
 entry is kept because what settles the question is the measurement rather than an argument: a later
@@ -112,7 +112,7 @@ afterwards is a defect and is removed when found rather than parked.
 **Not tracked here.** The same revision carries 23 references to the live checker:
 
 ```
-git grep -niE 'check_docs_hierarchy\.py' 080ebac2 -- '*.lean' '*.md' '*.tex' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
+git grep -niE 'check_docs_hierarchy\.py' 0fcd9ba7 -- '*.lean' '*.md' '*.tex' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
 ```
 
 That script exists and enforces exactly the constraint each surrounding sentence describes, so
@@ -174,11 +174,11 @@ form left over after citations of Lean source by file and line were converted to
 ERE spelling of this command reports an empty population instead of failing.
 
 ```
-git grep -P -n -I '\blines? [0-9]+' 080ebac2 -- docs tex ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
-git grep -P -o -I '\blines? [0-9]+' 080ebac2 -- docs tex ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
+git grep -P -n -I '\blines? [0-9]+' 0fcd9ba7 -- docs tex ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
+git grep -P -o -I '\blines? [0-9]+' 0fcd9ba7 -- docs tex ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
 ```
 
-At revision `080ebac2`: 37 occurrences on 37 lines. Thirty are `## Record from former line N`
+At revision `0fcd9ba7`: 37 occurrences on 37 lines. Thirty are `## Record from former line N`
 headings on the detail pages under `docs/formalization/legacy/details/`. Five sit in machine-frozen
 regions: three inside `legacy-source` blocks held at byte parity, two of them on the Horsch–von der
 Linden pages and one on the Jordan–Wigner backbone page, and two inside a `legacy-detail` long
@@ -216,10 +216,10 @@ forbidden-phrase list of `scripts/check_generated_site.py`. Every issue these li
 **Measurement.** One command covers the whole surface, documentation and scripts together:
 
 ```
-git grep -n -P '#(5227|5228|5229)' 080ebac2 -- docs scripts ':!docs/limitations/documentation-hygiene-parked.md'
+git grep -n -P '#(5227|5228|5229)' 0fcd9ba7 -- docs scripts ':!docs/limitations/documentation-hygiene-parked.md'
 ```
 
-At revision `080ebac2`: 17 lines in total. Thirteen are in
+At revision `0fcd9ba7`: 17 lines in total. Thirteen are in
 `docs/formalization-status-contract.md` — the three rows of the migration map, and ten sentences
 that attribute ownership, obligation, or delivery to the same keys, among them the
 publication-contract section heading, the cross-reference in the machine-artifact section, and the
@@ -276,11 +276,11 @@ other string tuples of the same file; the generator sentence is matched on a fra
 is not one of the forbidden phrases:
 
 ```
-git show 080ebac2:scripts/check_generated_site.py | sed -n '/^AUTHORITATIVE_FORBIDDEN_PHRASES = (/,/^)/p' | grep -c '^    "'
-git grep -F 'remains authoritative for as long as' 080ebac2 -- scripts/generate_formalization_site.py | wc -l
+git show 0fcd9ba7:scripts/check_generated_site.py | sed -n '/^AUTHORITATIVE_FORBIDDEN_PHRASES = (/,/^)/p' | grep -c '^    "'
+git grep -F 'remains authoritative for as long as' 0fcd9ba7 -- scripts/generate_formalization_site.py | wc -l
 ```
 
-At revision `080ebac2`: 11 tuple entries and 1 generator sentence.
+At revision `0fcd9ba7`: 11 tuple entries and 1 generator sentence.
 
 **Observed property.** The self-test iterates over whatever the tuple contains and requires each
 phrase found there to be rejected in the authoritative state, so a tuple with an entry removed is a

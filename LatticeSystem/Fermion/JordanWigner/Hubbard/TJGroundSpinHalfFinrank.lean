@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJGroundEnergyGe
 import LatticeSystem.Quantum.SpinS.RealComplexEigenspaceBridge
+import LatticeSystem.Math.FiniteStrictUpperBound
 
 /-!
 # Tasaki 11.5: the `Ŝ³=½` ground block is at most one-dimensional (Prop 11.24 PR-E3a)
@@ -84,11 +85,8 @@ theorem tJ_groundSubmodule_spinHalf_finrank_le_one (hpos : 0 < N) (Ne : ℕ) (hN
   haveI : Fact (Odd Ne) := ⟨hodd⟩
   obtain ⟨c0, hc0⟩ : ∃ c : ℝ, ∀ q : TJSpinHalfFillingSector N Ne,
       tJEffReMatrixOnSector N Ne (cycleGraph (N + 1)) τ J q q < c :=
-    ⟨(Finset.univ.sup' Finset.univ_nonempty
-        (fun q => tJEffReMatrixOnSector N Ne (cycleGraph (N + 1)) τ J q q)) + 1,
-      fun q => lt_of_le_of_lt
-        (Finset.le_sup' (fun q => tJEffReMatrixOnSector N Ne (cycleGraph (N + 1)) τ J q q)
-          (Finset.mem_univ q)) (lt_add_one _)⟩
+    LatticeSystem.Math.exists_gt_of_finite
+      fun q => tJEffReMatrixOnSector N Ne (cycleGraph (N + 1)) τ J q q
   obtain ⟨μ, v, hvpos, hveig, hmin, hfinrankR⟩ :=
     tJEffReMatrixOnSector_perronFrobenius hpos Ne hNeLt hodd τ J hτ hJ c0 hc0
   have hv0 : v ≠ 0 := fun h => by

@@ -40,6 +40,21 @@ theorem heisenbergHamiltonianS_def (J : Λ → Λ → ℂ) (N : ℕ) :
     heisenbergHamiltonianS (Λ := Λ) J N =
       ∑ x : Λ, ∑ y : Λ, J x y • spinSDot x y N := rfl
 
+/-- **Ordered-pair form of the Heisenberg Hamiltonian.** The weighted double sum
+`Σ_{x, y ∈ Λ} J(x, y) Ŝ_x · Ŝ_y` defining `heisenbergHamiltonianS`, reindexed along
+`Fintype.sum_prod_type` as a single sum over ordered pairs `Λ × Λ`.  Tasaki's ferromagnetic
+Heisenberg Hamiltonian `Ĥ = − Σ_{{x, y} ∈ B} Ŝ_x · Ŝ_y` (eq. (2.4.1)) runs over *unordered* bonds
+with a fixed coefficient and is the specialization at a coupling of the form `couplingOf G (−1/2)`,
+each bond contributing once in each order.  Kept as its own lemma so that the `Λ × Λ` index
+conversion is discharged in a goal of its own, away from the callers' assemblies (`maxRecDepth` is
+per goal).
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §2.4, eq. (2.4.1), p. 32. -/
+theorem sum_prod_smul_spinSDot (J : Λ → Λ → ℂ) (N : ℕ) :
+    ∑ p : Λ × Λ, J p.1 p.2 • spinSDot p.1 p.2 N = heisenbergHamiltonianS (Λ := Λ) J N := by
+  rw [heisenbergHamiltonianS_def, Fintype.sum_prod_type]
+
 /-- A spin-`S` Heisenberg Hamiltonian with **real** coupling
 (`star (J x y) = J x y`) is Hermitian. No symmetry of `J` is needed,
 since `Ŝ_x · Ŝ_y` is always Hermitian (β-3g) — symmetry of the

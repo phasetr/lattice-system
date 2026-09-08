@@ -429,8 +429,8 @@ theorem heisenbergRaisingComm_eq_offDiag_sum [NeZero L] (hL : 2 ≤ L) :
               - staggeredRaisingOpS (torusParitySublattice d L) N * spinSDot p.1 p.2 N) := by
   have hH : heisenbergHamiltonianS (torusNNCoupling d L) N
       = ∑ p : HypercubicTorus d L × HypercubicTorus d L,
-          torusNNCoupling d L p.1 p.2 • spinSDot p.1 p.2 N := by
-    rw [heisenbergHamiltonianS_def, ← Finset.sum_product', Finset.univ_product_univ]
+          torusNNCoupling d L p.1 p.2 • spinSDot p.1 p.2 N :=
+    (sum_prod_smul_spinSDot (torusNNCoupling d L) N).symm
   rw [show staggeredOrderDensityOpS d L N true
       = ((L : ℂ) ^ d)⁻¹ • staggeredRaisingOpS (torusParitySublattice d L) N from rfl,
     mul_smul_comm, smul_mul_assoc, ← smul_sub, hH, commutator_sum_smul_left, Finset.smul_sum,

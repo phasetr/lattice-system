@@ -351,8 +351,8 @@ theorem heisenberg_orderDouble_commutator_eq (d L N : ℕ) [NeZero L] :
           torusNNCoupling d L p.1 p.2 • bondDoubleComm d L N p.1 p.2 := by
   have hH : heisenbergHamiltonianS (torusNNCoupling d L) N
       = ∑ p : HypercubicTorus d L × HypercubicTorus d L,
-          torusNNCoupling d L p.1 p.2 • spinSDot p.1 p.2 N := by
-    rw [heisenbergHamiltonianS_def, ← Finset.sum_product', Finset.univ_product_univ]
+          torusNNCoupling d L p.1 p.2 • spinSDot p.1 p.2 N :=
+    (sum_prod_smul_spinSDot (torusNNCoupling d L) N).symm
   rw [hH]
   simp only [commutator_sum_smul_left, commutator_sum_smul_right]
   rfl

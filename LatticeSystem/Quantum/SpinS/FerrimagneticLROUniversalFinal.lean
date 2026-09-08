@@ -79,7 +79,6 @@ private theorem ferrimagnetic_lro_oriented
     tasaki23PredictedTotalSpin (V := Λ) A N ^ 2 ≤
       (star Φ ⬝ᵥ (staggeredCasimirOpS A N).mulVec Φ).re := by
   classical
-  haveI : Nonempty Λ := ⟨(Finset.card_pos.mp hcardA).choose⟩
   obtain ⟨c, hc_strict⟩ := exists_strict_diag_bound_dressedHeisenbergSReMatrix A J N
   obtain ⟨c_toy, hc_strict_toy⟩ :=
     exists_strict_diag_bound_dressedHeisenbergSReMatrix A (bipartiteCoupling A) N

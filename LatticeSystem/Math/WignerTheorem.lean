@@ -23,7 +23,7 @@ operator-algebraic appendix, they are recorded as documented axioms (the antilin
 is encoded via entrywise conjugation `Â.map conj`, avoiding a separate antiunitary primitive).
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
-(1st ed.), Appendix A.6, Theorems A.21–A.22, eqs. (A.6.1)–(A.6.10), pp. 482–484.
+(1st ed.), Appendix A.6, Theorems A.21–A.22, eqs. (A.6.1)–(A.6.10), pp. 482–485.
 -/
 
 namespace LatticeSystem.Math
