@@ -8,15 +8,16 @@ frozen row text, trailing newline included, to the empty string -- while some co
 search text an earlier entry in the chain inserts, as their own comments record. That no entry
 retires a row by keying on a Lean name is enforced by
 `approved_replacements_shape_and_row_identity_self_test`: `_approved_replacements` has to stay a
-chain of two-string-literal `.replace` calls, and `BASELINE_CATALOGUE_ROW_COUNT - (rows that
-chain drops) == len(published_catalogue_rows())` has to hold with every row-count-changing entry
-spelled as one whole frozen line, so a rewrite keyed on a name, at any narrowing and at any
-depth, leaves the catalogue short of what the chain accounts for. An entry that adds a row is
-refused there too, until a reviewed diff generalizes the identity to carry a term for one. The
-absence of a declaration from the Lean tree is in any case never on its own a reason to retire
-the row that records it: at the revision this was measured, 91 of the 2050 published catalogue
-rows (4.4%) name at least one identifier the Lean tree no longer spells -- 64 of them name
-nothing else -- across 148 distinct absent identifier tokens.
+chain of two-string-literal `.replace` calls, and `BASELINE_CATALOGUE_ROW_COUNT - (the full-row
+removal entries of that chain) == len(published_catalogue_rows())` has to hold with every entry
+that changes the row count spelled as one whole frozen line, so a rewrite keyed on a name, at any
+narrowing and at any depth, leaves the catalogue short of what the chain accounts for. Every
+entry is measured, not only the ones whose literals differ in newline count, and an entry that
+mints a row is refused as well, until a reviewed diff generalizes the identity to carry a term
+for one. The absence of a declaration from the Lean tree is in any case never on its own a
+reason to retire the row that records it: at the revision this was measured, 91 of the 2050
+published catalogue rows (4.4%) name at least one identifier the Lean tree no longer spells --
+64 of them name nothing else -- across 148 distinct absent identifier tokens.
 
 Two pins cover the transform. `APPROVED_CHANGES_SHA256` pins sha256 over
 
@@ -50,26 +51,30 @@ authorization for what moved: the legacy pages still have to be edited to match,
 catalogue-row comparison is what proves they do. What the pins buy is that a change to the
 published catalogue is a legible diff and a moved hash rather than a silent edit.
 
-Two further pins cover the machinery rather than the content. `ROW_PATH_SOURCE_SHA256` pins
-sha256 over the source text of the row-derivation nodes `_ROW_PATH_SOURCE_NAMES` lists, and
-`APPROVED_ENTRIES_SHA256` pins sha256 over the ordered literal pairs of the audited chain, so
-that surgery which leaves the published bytes alone is a moved pin rather than a silent edit.
-Both hash text this file already carries, never a serialization of the parsed tree or of a
-literal, so their values are the same on every interpreter that can parse this file. They are
-recomputed with
+Two further pins cover this script rather than the content. `SCRIPT_SOURCE_SHA256` pins
+sha256 over this file's whole source text, with only the four pin constants themselves masked
+out, and `APPROVED_ENTRIES_SHA256` pins sha256 over the ordered literal pairs of the audited
+chain, so that surgery which leaves the published bytes alone is a moved pin rather than a
+silent edit. Both hash text this file already carries, never a serialization of the parsed tree
+or of a literal, so their values are the same on every interpreter that can parse this file.
+They are recomputed with
 
     python3 -c 'import sys; sys.path.insert(0, "scripts"); \
-    import check_docs_hierarchy as c; print(c._row_path_source_sha256())'
+    import check_docs_hierarchy as c; print(c._script_source_sha256())'
 
     python3 -c 'import sys; sys.path.insert(0, "scripts"); \
     import check_docs_hierarchy as c; \
     print(c._approved_entries_sha256(c._approved_replacements_chain(c._own_source())[0]))'
 
 under the same clause: a recompute is never on its own an authorization for what moved.
-`BASELINE_CATALOGUE_ROW_COUNT` describes a blob frozen at `BASELINE_COMMIT` and
-`ROW_PATH_SOURCE_SHA256` the machinery that derives rows from it, so no catalogue content edit
-moves either; a commit that moves one is machinery surgery, and that is the signature review
-looks for.
+`BASELINE_CATALOGUE_ROW_COUNT` describes a blob frozen at `BASELINE_COMMIT`, so neither a
+catalogue content edit nor an edit to this file moves it. `SCRIPT_SOURCE_SHA256` is the opposite
+kind of tripwire: a page edit leaves it alone and every edit to this file moves it, the
+sanctioned removals spelled in `_approved_replacements` among them. What it buys is that no line
+of this script can change without a recompute in the same reviewed commit, so surgery that
+leaves the published bytes and the row identity intact -- a decorator on `_approved_replacements`
+that rewrites what the audited chain returns, a rebinding of `table_data_rows` nested in a
+compound statement -- cannot be exonerated by a pin that stood still.
 
 One residual stays with review. Editing the row-derivation machinery and recomputing its pins
 passes every check here, as does editing the pages and recomputing the two byte-parity pins,
@@ -1305,37 +1310,29 @@ def approved_changes_byte_parity_self_test() -> None:
 # The row count of the frozen baseline catalogue slice at BASELINE_COMMIT, before any audited
 # rewrite. Never moves for a content edit -- only a narrowing of CATALOGUE_BASELINE_SLICE or a
 # change of BASELINE_COMMIT itself moves it -- so
-# `BASELINE_CATALOGUE_ROW_COUNT - (rows the audited chain drops) == len(published_catalogue_rows())`
-# is an identity no pin recompute can satisfy.
+# `BASELINE_CATALOGUE_ROW_COUNT - (the audited chain's full-row removal entries) ==
+# len(published_catalogue_rows())` is an identity no pin recompute can satisfy.
 BASELINE_CATALOGUE_ROW_COUNT = 2052
 
-# sha256 over the source text of the row-derivation machinery named in
-# `_ROW_PATH_SOURCE_NAMES`, deliberately excluding `_approved_replacements`, whose shape the
-# chain rule pins more precisely than a hash would and whose literals a sanctioned removal is
-# supposed to move. Machinery rather than content: no legitimate catalogue edit moves this pin.
-ROW_PATH_SOURCE_SHA256 = "9f787c0a1575ee1854704418927ec0d3c5a72a5bbcaaf05754048c35268ad3f2"
+# sha256 over this whole file's source text, the pin constants of `_MASKED_PIN_NAMES` aside.
+# Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
+# commit; a catalogue page edit does not move it.
+SCRIPT_SOURCE_SHA256 = "25f5fa5f971b24ab4c285c3c135459c0c0e2a9ae7828c5594edad4354b401e6f"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
 APPROVED_ENTRIES_SHA256 = "f2ff5401993d12ccf7cbdf3b837910f89eb928feb0cd10f12cd04311858c92c8"
 
-# The nodes `ROW_PATH_SOURCE_SHA256` hashes: everything the published rows are derived through,
-# from the frozen blob to the row sequence `main()` compares the legacy pages against.
-_ROW_PATH_SOURCE_NAMES = (
-    "CATALOGUE_BASELINE_SLICE",
-    "BASELINE_COMMIT",
-    "_WORKING_NOTE_CITATION",
-    "_WORKING_NOTE_SECTION_REF",
-    "_PRIVATE_INSTRUCTIONS_REF",
-    "baseline_index",
-    "catalogue_baseline_text",
-    "is_separator",
-    "table_data_rows",
-    "approved_changes",
-    "published_catalogue_rows",
-    "_drop_working_note_citations",
-    "_drop_private_instructions_ref",
+# The only lines `SCRIPT_SOURCE_SHA256` does not hash: the pin constants themselves. Each is
+# restated by the very edit it pins, and a digest over its own value would have no fixed point.
+# The masking is by name and applies only to a plain string-constant assignment, so a pin whose
+# value became an expression is hashed like any other code.
+_MASKED_PIN_NAMES = (
+    "APPROVED_CHANGES_SHA256",
+    "PUBLISHED_ROWS_SHA256",
+    "SCRIPT_SOURCE_SHA256",
+    "APPROVED_ENTRIES_SHA256",
 )
 
 
@@ -1349,7 +1346,9 @@ def _approved_replacements_function_node(source: str) -> ast.FunctionDef:
     for node in ast.walk(ast.parse(source)):
         if isinstance(node, ast.FunctionDef) and node.name == "_approved_replacements":
             return node
-    fail("_approved_replacements: not found in the parsed source")
+    message = "_approved_replacements: not found in the parsed source"
+    fail(message)
+    raise SystemExit(message)
 
 
 def _approved_replacements_chain(source: str) -> tuple[list[tuple[str, str]], list[str]]:
@@ -1417,52 +1416,88 @@ def _approved_replacements_chain(source: str) -> tuple[list[tuple[str, str]], li
     return chain, violations
 
 
-def _row_path_source_sha256() -> str:
-    """sha256 over the source text of each `_ROW_PATH_SOURCE_NAMES` top-level node of this file,
-    in `_ROW_PATH_SOURCE_NAMES` order.
+def _script_source_sha256(source: str | None = None) -> str:
+    """sha256 over `source` (this file's own text by default), every line of it, with each
+    `_MASKED_PIN_NAMES` assignment replaced by a marker naming it and trailing whitespace
+    stripped.
 
-    A node contributes the lines it spans, its first decorator line through `end_lineno`, with
-    trailing whitespace stripped and its byte length framed in ahead of it under its own name,
-    so that no two spellings of the machinery share a digest. The parser locates those line
-    ranges and nothing else: `ast.dump` renders one tree differently on different interpreters
-    -- measured, three distinct digests over this file across 3.9, 3.12 and 3.13 -- which makes
-    a pin taken over it a report of which Python ran rather than of what the machinery is, red
-    on any runner whose version differs from the one that recomputed it. Line numbers and source
-    text are the same everywhere.
+    The subject is the text rather than the parsed tree because `ast.dump` renders one tree
+    differently on different interpreters -- measured, three distinct digests over this file
+    across 3.9, 3.12 and 3.13 -- which makes a pin taken over it a report of which Python ran
+    rather than of what the script is, red on any runner whose version differs from the one that
+    recomputed it. The parser is used only to locate the masked assignments, and line numbers and
+    source text are the same everywhere.
 
-    The nodes are covered verbatim, their docstrings and inline comments included; prose outside
-    them, this module's own docstring among it, stays free to change.
+    The subject is the whole file rather than a list of names because a name list pins what it
+    lists and exonerates everything else: a decorator on an audited function, or a rebinding of
+    an audited name nested in a compound statement, is machinery surgery that no listed node
+    records. The price is that prose, comments and the sanctioned removals spelled in
+    `_approved_replacements` move this pin too; the recompute is documented and cheap, and a
+    reviewed commit is exactly the place to pay it.
     """
-    source = _own_source()
+    if source is None:
+        source = _own_source()
     lines = source.splitlines()
-    top_level: dict[str, ast.AST] = {}
+    masked: dict[int, tuple[int, str]] = {}
     for node in ast.parse(source).body:
-        if isinstance(node, ast.FunctionDef):
-            top_level[node.name] = node
-        elif isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(
-            node.targets[0], ast.Name
+        if (
+            isinstance(node, ast.Assign)
+            and len(node.targets) == 1
+            and isinstance(node.targets[0], ast.Name)
+            and node.targets[0].id in _MASKED_PIN_NAMES
+            and isinstance(node.value, ast.Constant)
+            and isinstance(node.value.value, str)
         ):
-            top_level[node.targets[0].id] = node
-    digest = hashlib.sha256()
-    for name in _ROW_PATH_SOURCE_NAMES:
-        node = top_level.get(name)
-        if node is None:
-            fail(f"row-path source pin: {name} not found at this file's own module top level")
-        start = node.lineno
-        for decorator in getattr(node, "decorator_list", []):
-            start = min(start, decorator.lineno)
-        segment = "\n".join(line.rstrip() for line in lines[start - 1 : node.end_lineno])
-        encoded = segment.encode("utf-8")
-        digest.update(f"{name} {len(encoded)}\n".encode("utf-8"))
-        digest.update(encoded)
-    return digest.hexdigest()
+            masked[node.lineno] = (node.end_lineno, node.targets[0].id)
+    if {name for _, name in masked.values()} != set(_MASKED_PIN_NAMES):
+        fail(
+            "script source pin: every name of _MASKED_PIN_NAMES has to be a module-top-level "
+            f"assignment of a string constant, found {sorted(n for _, n in masked.values())}"
+        )
+    pieces: list[str] = []
+    index = 0
+    while index < len(lines):
+        span = masked.get(index + 1)
+        if span is None:
+            pieces.append(lines[index].rstrip())
+            index += 1
+        else:
+            end, name = span
+            pieces.append(f"# masked pin constant {name}")
+            index = end
+    return hashlib.sha256("\n".join(pieces).encode("utf-8")).hexdigest()
+
+
+def _with_recomputed_script_source_pin(script_text: str) -> str:
+    """`script_text` with its own `SCRIPT_SOURCE_SHA256` restated for the text it now is.
+
+    The disposable-clone fixtures below run an edited copy of this file, which would otherwise
+    carry the pin of a text it is no longer. Restating it is exact rather than a fixed-point
+    search, because the pin line is the one line the digest does not hash.
+    """
+    digest = _script_source_sha256(script_text)
+    lines = script_text.splitlines(keepends=True)
+    for node in ast.parse(script_text).body:
+        if (
+            isinstance(node, ast.Assign)
+            and len(node.targets) == 1
+            and isinstance(node.targets[0], ast.Name)
+            and node.targets[0].id == "SCRIPT_SOURCE_SHA256"
+        ):
+            lines[node.lineno - 1 : node.end_lineno] = [
+                f'SCRIPT_SOURCE_SHA256 = "{digest}"\n'
+            ]
+            return "".join(lines)
+    message = "script source pin: SCRIPT_SOURCE_SHA256 not found in the text to re-pin"
+    fail(message)
+    raise SystemExit(message)
 
 
 def _approved_entries_sha256(chain: list[tuple[str, str]]) -> str:
     """sha256 over the ordered `(a, b)` literal pairs of the audited `.replace` chain.
 
     Each literal is hashed as its own UTF-8 bytes behind their byte length rather than through
-    `repr`, for the same reason `_row_path_source_sha256` stays off `ast.dump`: many of these
+    `repr`, for the same reason `_script_source_sha256` stays off `ast.dump`: many of these
     literals carry non-ASCII text, and how `repr` escapes it follows the Unicode database the
     running interpreter was built with.
     """
@@ -1498,29 +1533,44 @@ def _is_full_row_removal(text: str, a: str, b: str, delta: int) -> bool:
 
 
 def _chain_row_drops(text: str, chain: list[tuple[str, str]]) -> tuple[str, int, list[str]]:
-    """Replay `chain` over `text`; return the transformed text, rows dropped, ill-shaped entries.
+    """Replay `chain` over `text`; return the transformed text, its full-row removal entries,
+    and the entries that are neither that nor row-neutral.
 
-    Rows are counted only around an entry whose two literals carry different numbers of newlines,
-    since that is the only way `str.replace` can change the line count (measured: 2 of the 50
-    entries, against 2.3 s for counting rows around all of them). The screen exonerates nothing:
-    an entry it skips could still cost a row with no line delta, by rewriting a row into a
-    separator, say. Such a loss is attributed to no entry and left to the global identity, which
-    subtracts attributed drops only and so fails.
+    Every entry is measured against the row count of the whole chain-intermediate text. A screen
+    on the two literals' newline counts would examine only the entries that change the line
+    count, and a row can go with the line count intact -- a row rewritten into an empty line or
+    into a separator -- so a pair of entries, one such loss and one row minted elsewhere, would
+    keep the total and never be looked at. An entry is refused unless its replacement carries no
+    more table rows than its search literal and it either leaves the row count alone or is a
+    full-row removal in the sense of `_is_full_row_removal`, which admits exactly one row out.
     """
-    dropped = 0
+    removals = 0
     ill_shaped: list[str] = []
+    rows_now = len(table_data_rows(text.splitlines()))
     for a, b in chain:
-        if a.count("\n") == b.count("\n"):
-            text = text.replace(a, b)
-            continue
-        rows_before = len(table_data_rows(text.splitlines()))
+        rows_sought = len(table_data_rows(a.splitlines()))
+        rows_written = len(table_data_rows(b.splitlines()))
+        if rows_written > rows_sought:
+            ill_shaped.append(
+                f"{a[:80]!r} -> {b[:40]!r} (writes {rows_written} table rows where it seeks "
+                f"{rows_sought})"
+            )
         replaced = text.replace(a, b)
-        delta = rows_before - len(table_data_rows(replaced.splitlines()))
-        if delta and not _is_full_row_removal(text, a, b, delta):
-            ill_shaped.append(f"{a[:80]!r} -> {b[:40]!r} (delta={delta})")
-        dropped += delta
+        if replaced == text:
+            continue
+        rows_after = len(table_data_rows(replaced.splitlines()))
+        delta = rows_now - rows_after
+        if delta:
+            if _is_full_row_removal(text, a, b, delta):
+                removals += 1
+            else:
+                ill_shaped.append(
+                    f"{a[:80]!r} -> {b[:40]!r} (changes the row count by {delta} without being "
+                    "a full-row removal)"
+                )
         text = replaced
-    return text, dropped, ill_shaped
+        rows_now = rows_after
+    return text, removals, ill_shaped
 
 
 def _row_conservation_violations(
@@ -1545,10 +1595,10 @@ def _row_conservation_violations(
             "import check_docs_hierarchy as c; "
             "print(len(c.table_data_rows(c.catalogue_baseline_text().splitlines())))'"
         ]
-    after_chain, dropped, ill_shaped = _chain_row_drops(baseline_text, chain)
+    after_chain, removals, ill_shaped = _chain_row_drops(baseline_text, chain)
     if ill_shaped:
         violations.append(
-            "row-count-changing chain entry is not a full-row removal: " + "; ".join(ill_shaped)
+            "audited chain entry is not a sanctioned rewrite: " + "; ".join(ill_shaped)
         )
     after_citations = _drop_working_note_citations(after_chain)
     after_private = _drop_private_instructions_ref(after_citations)
@@ -1563,12 +1613,12 @@ def _row_conservation_violations(
             "where a row leaves only by a literal of the audited chain"
         )
     published = len(published_rows())
-    if BASELINE_CATALOGUE_ROW_COUNT - dropped != published:
+    if BASELINE_CATALOGUE_ROW_COUNT - removals != published:
         violations.append(
             "row conservation identity failed: BASELINE_CATALOGUE_ROW_COUNT "
-            f"({BASELINE_CATALOGUE_ROW_COUNT}) - rows the audited chain drops ({dropped}) != "
-            f"published rows ({published}), so a row left the catalogue somewhere other than a "
-            "full-row literal of that chain"
+            f"({BASELINE_CATALOGUE_ROW_COUNT}) - full-row removal entries of the audited chain "
+            f"({removals}) != published rows ({published}), so a row left the catalogue "
+            "somewhere other than a full-row literal of that chain"
         )
     return violations
 
@@ -1577,9 +1627,10 @@ def approved_replacements_shape_and_row_identity_self_test() -> None:
     """Refuse any row loss that is not a full-row literal of the audited `.replace` chain.
 
     The row-conservation identity replays that chain entry by entry over the frozen baseline
-    slice and requires `BASELINE_CATALOGUE_ROW_COUNT - (rows the chain drops) ==
-    len(published_catalogue_rows())`, with every row-count-changing entry a full-row removal in
-    the sense of `_is_full_row_removal` and with the two structural passes
+    slice and requires `BASELINE_CATALOGUE_ROW_COUNT - (its full-row removal entries) ==
+    len(published_catalogue_rows())`, with every entry measured, every entry that changes the row
+    count a full-row removal in the sense of `_is_full_row_removal`, no entry writing more table
+    rows than it seeks, and with the two structural passes
     (`_drop_working_note_citations`, `_drop_private_instructions_ref`) dropping no row at all.
     Unlike the two pins of `approved_changes_byte_parity_self_test`, an identity between three
     quantities is not satisfiable by recomputing anything: a rewrite keyed on a Lean name, at any
@@ -1588,12 +1639,13 @@ def approved_replacements_shape_and_row_identity_self_test() -> None:
 
     The shape rule requires `_approved_replacements` to keep the form
     `_approved_replacements_chain` parses, which is what makes that attribution a legible diff
-    rather than a runtime accident. The last two pins cover machinery rather than content.
-    `ROW_PATH_SOURCE_SHA256` hashes the row-derivation nodes, which no catalogue content edit
-    touches, so a commit that moves it is machinery surgery and has to be reviewed as such
-    rather than accepted on a recompute. `APPROVED_ENTRIES_SHA256` hashes the reviewed literal
-    list, which a sanctioned removal is supposed to move; what it catches is surgery inside that
-    list which leaves the published bytes alone.
+    rather than a runtime accident. The last two pins cover this script rather than the
+    content. `SCRIPT_SOURCE_SHA256` hashes the whole file, the pin constants aside, so an edit to
+    this script that the published bytes and the row identity do not register -- a decorator on
+    `_approved_replacements`, a rebinding of `table_data_rows` -- is still a moved pin that has
+    to be reviewed rather than accepted on a recompute. `APPROVED_ENTRIES_SHA256` hashes the
+    reviewed literal list; what it catches on top of that is surgery inside that list which
+    leaves the published bytes alone.
     """
     source = _own_source()
 
@@ -1683,14 +1735,14 @@ def approved_replacements_shape_and_row_identity_self_test() -> None:
     violations = _row_conservation_violations(source, published_catalogue_rows)
     if violations:
         fail("; ".join(violations))
-    source_actual = _row_path_source_sha256()
-    if source_actual != ROW_PATH_SOURCE_SHA256:
+    source_actual = _script_source_sha256()
+    if source_actual != SCRIPT_SOURCE_SHA256:
         fail(
-            "row-path source pin mismatch, which is machinery surgery rather than a content "
-            f"edit: expected {ROW_PATH_SOURCE_SHA256}, got {source_actual}. Recompute with: "
-            "python3 -c 'import sys; sys.path.insert(0, \"scripts\"); "
-            "import check_docs_hierarchy as c; print(c._row_path_source_sha256())' -- a passing "
-            "pin recompute is never on its own an authorization for what moved."
+            "script source pin mismatch, so this script was edited: expected "
+            f"{SCRIPT_SOURCE_SHA256}, got {source_actual}. Recompute with: python3 -c "
+            "'import sys; sys.path.insert(0, \"scripts\"); import check_docs_hierarchy as c; "
+            "print(c._script_source_sha256())' -- a passing pin recompute is never on its own an "
+            "authorization for what moved."
         )
     entries_actual = _approved_entries_sha256(_approved_replacements_chain(source)[0])
     if entries_actual != APPROVED_ENTRIES_SHA256:
@@ -1901,7 +1953,9 @@ def _without_clone_based_self_tests(script_text: str, probe: str) -> str:
     only at its alternate-object nesting limit, and a nested probe's failure would be reported as
     the outer fixture's setup error. Every call is required to be found rather than removed where
     present, because a rename that silently stopped being stripped is precisely the way this
-    protection would be lost without any test failing.
+    protection would be lost without any test failing. Removing them edits the copy, so it is
+    re-pinned: the fixtures probe the catalogue, and a copy carrying the pin of a text it is no
+    longer would refuse over its own preparation instead.
     """
     for call in CLONE_BASED_SELF_TEST_CALLS:
         if call not in script_text:
@@ -1910,7 +1964,7 @@ def _without_clone_based_self_tests(script_text: str, probe: str) -> str:
                 "clone-based self-test call removed before it is run"
             )
         script_text = script_text.replace(call, "")
-    return script_text
+    return _with_recomputed_script_source_pin(script_text)
 
 
 def frozen_row_drop_negative_self_test() -> None:
