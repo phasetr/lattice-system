@@ -70,8 +70,7 @@ example {G : SimpleGraph V} {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     (hJ_ferro : ∀ x y, G.Adj x y → (J x y).re < 0)
     (hJ_real : ∀ x y, (J x y).im = 0)
     (hJ_sym : ∀ x y, J x y = J y x)
-    (hc_strict : ∀ σ, heisenbergHamiltonianSReMatrix J N σ σ < c)
-    [Nonempty (magConfigS V N M)] :
+    (hc_strict : ∀ σ, heisenbergHamiltonianSReMatrix J N σ σ < c) :
     (c • (1 : Matrix (magConfigS V N M) (magConfigS V N M) ℝ)
         - heisenbergHamiltonianSReMatrixOnMagSector J N M).IsIrreducible :=
   isIrreducible_shiftedHeisenbergSReMatrixOnMagSector_connected_ferro
