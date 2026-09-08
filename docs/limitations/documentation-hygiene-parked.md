@@ -12,17 +12,24 @@ pinned revision, why it is not being fixed, the condition that reopens it, and h
 measurement is retaken. A state diagnosis that encounters one of these populations reads the entry
 first and does not record it as an unresolved defect.
 
+A command whose paths reach this page excludes it from its own pathspec. The page quotes the
+phrases it measures, so without that exclusion a command would count this record of a population as
+part of the population.
+
 An entry records a decision, not a claim that the population is harmless in general. Reopening one
 requires its stated condition to hold; observing that the population still exists is not itself a
 reason to reopen.
 
 ## Issue and pull-request identifiers in Lean doc comments
 
-**Target.** Tracker identifiers embedded in module and declaration doc comments under
-`LatticeSystem/`, against the convention that comments carry only non-obvious reasons and no task
+**Target.** Identifiers of four digits or more in `.lean` files under `LatticeSystem/`, wherever a
+comment carries them — module documentation, declaration doc comments and line comments are all
+counted — against the convention that comments carry only non-obvious reasons and no task
 identifiers.
 
-**Measurement.** Four digits or more, which excludes the book's equation and problem numbers:
+**Measurement.** The four-digit threshold is the one the decision fixed, and it keeps the book's
+equation and problem numbers out of the count. Shorter tracker identifiers are left uncounted by it
+and lie outside this entry rather than being measured by it:
 
 ```
 git grep -o -E '#[0-9]{4,}' 080ebac2 -- 'LatticeSystem/**/*.lean' | wc -l
@@ -42,12 +49,12 @@ meaning.
 **Fix on touch.** A change that touches a module's doc comments for any other reason removes the
 identifiers in that module, in the same commit. No separate sweep is opened for the remainder.
 
-**Reopen condition.** Fix-on-touch brings the occurrence count below roughly one hundred, so that
+**Reopen condition.** Fix-on-touch brings the measured count below roughly one hundred, so that
 one closing sweep is reviewable as a single diff; or a linter that rejects the pattern is adopted,
 which makes the convention enforceable rather than aspirational.
 
-**Cadence.** Re-measure with the commands above at every twenty-pull-request refactor cycle and
-replace the figures here with the new ones.
+**Cadence.** Re-measure with the commands above at every 20-PR refactor cycle and replace the
+figures here with the new ones.
 
 ## Proof-route names in the Marshall–Lieb–Mattis proof tree
 
@@ -59,7 +66,7 @@ documentation, published pages, and the proof guide.
 the hyphen; a hyphen-only pattern reports a small spelling-dependent subset instead of the family:
 
 ```
-git grep -noiE '(ladder|sublattice|perron[-–]+frobenius|PF|MLM|saturated[- ]ladder|N[ée]el)[- ]route' 080ebac2 -- '*.lean' '*.md' '*.tex' | wc -l
+git grep -noiE '(ladder|sublattice|perron[-–]+frobenius|PF|MLM|saturated[- ]ladder|N[ée]el)[- ]route' 080ebac2 -- '*.lean' '*.md' '*.tex' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
 ```
 
 At revision `080ebac2`: 44 phrases.
@@ -77,6 +84,9 @@ unchanged rather than re-derive the classification.
 
 ## References to retired audit tooling
 
+This entry parks nothing. The population below is empty at the pinned revision, so what is recorded
+here is a measurement and not a decision to leave something unfixed.
+
 **Target.** Prose under `LatticeSystem/`, `docs/` and `tex/` that names the audit-gate tooling
 retired when the hard-check infrastructure was abolished: `audit_gate.py`, `audit-helpers.sh`, the
 `capstones.txt` allowlist, the `docs_names.py` registry that backed the dead-declaration sweep, and
@@ -87,28 +97,27 @@ population to weigh.
 **Measurement.** One pattern covers every retired name:
 
 ```
-git grep -niE 'audit_gate|audit-helpers|capstones\.txt|docs_names\.py|pre-push' 080ebac2 -- '*.lean' '*.md' '*.tex' | wc -l
+git grep -niE 'audit_gate|audit-helpers|capstones\.txt|docs_names\.py|pre-push' 080ebac2 -- '*.lean' '*.md' '*.tex' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
 ```
 
 At revision `080ebac2`: 0.
 
-**Disposition.** Resolved by measurement. The population is empty, so nothing is parked here, and a
-reopen condition would have nothing to reopen. The entry is kept because what settles the question
-is the measurement rather than an argument: a later diagnosis re-runs the command instead of
-re-deriving the classification. A mention that appears afterwards is a defect and is removed when
-found rather than parked.
+**Disposition.** Resolved by measurement, so a reopen condition would have nothing to reopen. The
+entry is kept because what settles the question is the measurement rather than an argument: a later
+diagnosis re-runs the command instead of re-deriving the classification. A mention that appears
+afterwards is a defect and is removed when found rather than parked.
 
 **Not tracked here.** The same revision carries 23 references to the live checker:
 
 ```
-git grep -niE 'check_docs_hierarchy\.py' 080ebac2 -- '*.lean' '*.md' '*.tex' | wc -l
+git grep -niE 'check_docs_hierarchy\.py' 080ebac2 -- '*.lean' '*.md' '*.tex' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
 ```
 
 That script exists and enforces exactly the constraint each surrounding sentence describes, so
 naming it is current documentation of the page it governs. Those 23 lines are neither a defect nor
 a parked population, and this page does not track them.
 
-**Cadence.** Re-measure the first command at every twenty-pull-request refactor cycle.
+**Cadence.** Re-measure the first command at every 20-PR refactor cycle.
 
 ## Frozen historical text in migrated pages
 
@@ -119,16 +128,22 @@ inside the `legacy-source:217:228` block of `docs/formalization/legacy/index.md`
 **Measurement.** List the frozen spans on a page and compare a candidate line number against them:
 
 ```
-git grep -n 'legacy-source:start' 080ebac2 -- docs
-git grep -n 'legacy-detail:start' 080ebac2 -- docs
+git grep -n 'legacy-source:start' 080ebac2 -- docs ':!docs/limitations/documentation-hygiene-parked.md'
+git grep -n 'legacy-detail:start' 080ebac2 -- docs ':!docs/limitations/documentation-hygiene-parked.md'
 ```
 
 At revision `080ebac2` this places 7 proof-route lines (the route-name command above, restricted to
-`docs`) and 5 review-narration lines (`git grep -niE 'codex' 080ebac2 -- docs`) inside frozen
-regions: the proof-route lines and 4 of the narration lines inside `legacy-source` blocks, the
-remaining narration line inside the `legacy-detail` long record of
-`docs/formalization/legacy/details/group-spin-models-part-04.md`, along with the two
+`docs`) and 5 review-narration lines inside frozen regions: the proof-route lines and 4 of the
+narration lines inside `legacy-source` blocks, the remaining narration line inside the
+`legacy-detail` long record of `docs/formalization/legacy/details/group-spin-models-part-04.md`,
+along with the two
 `docs/formalization/legacy/index.md` items named above.
+
+The narration population is the mentions, in migrated prose, of the external review tool consulted
+while the recorded work was done. Its pattern is that tool's name, which is not printed here: doing
+so would put back on a current page the wording the hygiene pass removed from live prose. A
+case-insensitive search for the name over `docs`, excluding this page, returns the 5 lines counted
+above.
 
 **Reason.** The text inside a `legacy-source` block is a verbatim snapshot of the page it was
 migrated from, held at byte parity against a fixed baseline revision by
@@ -157,8 +172,8 @@ form left over after citations of Lean source by file and line were converted to
 ERE spelling of this command reports an empty population instead of failing.
 
 ```
-git grep -P -n -I '\blines? [0-9]+' 080ebac2 -- docs tex | wc -l
-git grep -P -o -I '\blines? [0-9]+' 080ebac2 -- docs tex | wc -l
+git grep -P -n -I '\blines? [0-9]+' 080ebac2 -- docs tex ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
+git grep -P -o -I '\blines? [0-9]+' 080ebac2 -- docs tex ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
 ```
 
 At revision `080ebac2`: 37 occurrences on 37 lines. Thirty are `## Record from former line N`
@@ -185,8 +200,8 @@ quoted number is superseded and gives the live file and declaration.
 case the frozen references are rewritten with them; or the detail records stop being keyed by their
 former line number, in which case the headings are re-keyed and the two references to a key follow.
 
-**Cadence.** Re-measure with the commands above at every twenty-pull-request refactor cycle and
-replace the figures here with the new ones.
+**Cadence.** Re-measure with the commands above at every 20-PR refactor cycle and replace the
+figures here with the new ones.
 
 ## Closed-issue identifiers in the formalization-status surface
 
@@ -199,7 +214,7 @@ forbidden-phrase list of `scripts/check_generated_site.py`. Every issue these li
 **Measurement.** One command covers the whole surface, documentation and scripts together:
 
 ```
-git grep -n -P '#(5227|5228|5229)' 080ebac2 -- docs scripts
+git grep -n -P '#(5227|5228|5229)' 080ebac2 -- docs scripts ':!docs/limitations/documentation-hygiene-parked.md'
 ```
 
 At revision `080ebac2`: 17 lines in total. Thirteen are in
@@ -239,8 +254,48 @@ the migration it stages is finished; in either case the cross-reference and stag
 sentences are re-keyed in the same change. Independently, a documented decision removes the
 provenance pointers, in which case whatever they point at is relocated in the same change.
 
-**Cadence.** Re-measure with the command above at every twenty-pull-request refactor cycle and
-replace the figures here with the new ones.
+**Cadence.** Re-measure with the command above at every 20-PR refactor cycle and replace the
+figures here with the new ones.
+
+## Pinned phrases without a self-test of their own
+
+**Target.** Two published strings that no self-test asserts to occur in the sources they guard: the
+entries of the forbidden-phrase tuple in `scripts/check_generated_site.py`, and the
+interim-authority sentence that `scripts/generate_formalization_site.py` writes into the provenance
+header of every generated view. Deleting an entry from the tuple, or reverting the generator
+sentence to an anchor that no longer exists, leaves every gate green for as long as the catalogue is
+published in the prototype state.
+
+**Measurement.** The tuple is read as a range, because the quoted shape of its entries recurs in
+other string tuples of the same file; the generator sentence is matched on a fragment of itself that
+is not one of the forbidden phrases:
+
+```
+git show 080ebac2:scripts/check_generated_site.py | sed -n '/^AUTHORITATIVE_FORBIDDEN_PHRASES = (/,/^)/p' | grep -c '^    "'
+git grep -F 'remains authoritative for as long as' 080ebac2 -- scripts/generate_formalization_site.py | wc -l
+```
+
+At revision `080ebac2`: 11 tuple entries and 1 generator sentence.
+
+**Observed property.** The self-test iterates over whatever the tuple contains and requires each
+phrase found there to be rejected in the authoritative state, so a tuple with an entry removed is a
+shorter loop that still passes. The rejection is skipped outside the authoritative state, which
+leaves the generator's sentence unconstrained while the catalogue is a prototype: replacing it with
+a dead anchor rewrites the provenance header of every generated view, and each check over the
+generated source still passes.
+
+**Reason.** Closing this means strengthening the self-test until it asserts that these phrases are
+present in the sources they guard, which is a change to the checker beyond the scope approved for
+the documentation-hygiene pass. The exposure is bounded meanwhile, because the phrases guard a
+publication state this repository has not entered.
+
+**Reopen condition.** The catalogue cutover, at which point the rejection becomes live and the
+phrases begin guarding the published state; or the next approved change to
+`scripts/check_generated_site.py`, which is the occasion on which the self-test can be strengthened
+in the same change.
+
+**Cadence.** Re-measure with the commands above at every 20-PR refactor cycle and replace the
+figures here with the new ones.
 
 ## The printed constant of the double-commutator bound
 
@@ -251,17 +306,17 @@ Springer 2020, Problem 3.4.a, statement pp. 67-68, printed solution p. 501).
 **Measurement.** The places that record the regime as open:
 
 ```
-git grep -n -F '4r+2' 080ebac2 -- LatticeSystem docs tex
+git grep -n -F '4r+2' 080ebac2 -- LatticeSystem docs tex ':!docs/limitations/documentation-hygiene-parked.md'
 ```
 
 At revision `080ebac2`: 4 lines across 3 files.
 
 **Reason.** This repository has neither a proof of the printed constant in that regime nor a
 counterexample to it. What is settled is the constant as literally quantified, refuted by a witness
-at `L ≤ 4r+1`, where both counting windows already cover the whole lattice; that mechanism does not
-reach the complementary regime and the witness says nothing about it. The bound this repository
-proves in place of the printed one is larger and carries the same shape, so nothing downstream
-waits on the open regime.
+at `L ≤ 4r+1`, where the radius-`2r` and radius-`4r` balls each cover the ring, so the
+ball-counting constant collapses; that mechanism does not reach the complementary regime and the
+witness says nothing about it. The bound this repository proves in place of the printed one is
+larger and carries the same shape, so nothing downstream waits on the open regime.
 
 **Reopen condition.** A proof or a counterexample candidate for even `L ≥ 4r+2` is obtained, or the
 constant proved here is tightened to the printed one.
