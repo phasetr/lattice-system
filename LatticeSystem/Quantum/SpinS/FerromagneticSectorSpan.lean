@@ -32,9 +32,14 @@ ground-state eigenspace of `Ĥ` intersected with the magnetization subspace of `
 `m_max - k` is exactly the line spanned by the ladder state `Φ_M = (Ŝ⁻_tot)^k Φ↑`.
 
 Perron-Frobenius (Theorem A.18, p. 475) bounds that intersection by one dimension and the ladder
-state is a non-zero member of it. -/
+state is a non-zero member of it.  Non-emptiness of `V` is not a hypothesis: `G.Connected` carries
+it.
+
+The spin hypothesis `1 ≤ N` is not used by the Perron-Frobenius step; it is carried because it is
+the standing assumption `S ≥ 1/2` of §2.4, and it is what makes `saturatedFerromagnetEigenvalueS`
+the ground energy, via `heisenbergHamiltonianS_sub_saturatedFerromagnetEigenvalueS_posSemidef`. -/
 theorem heisenbergHamiltonianS_eigenspace_inf_magSubspaceS_eq_span_ladderIterateUp
-    [Nonempty V] {G : SimpleGraph V} {J : V → V → ℂ}
+    {G : SimpleGraph V} {J : V → V → ℂ}
     (hGconn : G.Connected)
     (hJ_real : ∀ x y, (J x y).im = 0)
     (hJ_sym : ∀ x y, J x y = J y x)
@@ -45,6 +50,7 @@ theorem heisenbergHamiltonianS_eigenspace_inf_magSubspaceS_eq_span_ladderIterate
         (saturatedFerromagnetEigenvalueS (V := V) J N)
       ⊓ magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (k.val : ℂ)) =
     Submodule.span ℂ {ladderIterateUp V N k} := by
+  haveI : Nonempty V := hGconn.nonempty
   have hmem : ladderIterateUp V N k ∈
       Module.End.eigenspace ((heisenbergHamiltonianS J N).mulVecLin)
           (saturatedFerromagnetEigenvalueS (V := V) J N)

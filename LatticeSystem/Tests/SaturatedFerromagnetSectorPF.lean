@@ -1,4 +1,3 @@
-import LatticeSystem.Quantum.SpinS.FerromagneticSectorPF
 import LatticeSystem.Quantum.SpinS.FerromagneticSectorSpan
 
 /-!
@@ -12,8 +11,9 @@ sector-restricted Hamiltonian is `ladderIterateUp V N k` up to a scalar (solutio
 ladder state, its real-form sector eigenvector equation, the sector `finrank ≤ 1` bound and the
 resulting span equality.  The four names live in
 `LatticeSystem/Quantum/SpinS/FerromagneticSectorPF.lean` and
-`LatticeSystem/Quantum/SpinS/FerromagneticSectorSpan.lean`; any rename, reordering of arguments
-or weakening of the hypotheses there breaks this module.
+`LatticeSystem/Quantum/SpinS/FerromagneticSectorSpan.lean`, the second importing the first, so the
+single import above reaches all four; any rename, reordering of arguments or weakening of the
+hypotheses there breaks this module.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §2.4 Theorem 2.1, p. 34; solution of Problem 2.4.a, p. 496; Theorem A.18, p. 475.
@@ -42,7 +42,9 @@ example (J : V → V → ℂ) (hJ_real : ∀ x y, (J x y).im = 0)
 /-- **P4 pin.** On a connected graph with real, symmetric, edge-supported, strictly ferromagnetic
 coupling, the complex sector matrix's ground eigenspace has `finrank ≤ 1`. The diagonal shift
 witness is discharged internally via `LatticeSystem.Math.exists_gt_of_finite`, so this statement —
-like the sector-irreducibility hypotheses reused from it — carries only book hypotheses. -/
+like the sector-irreducibility hypotheses reused from it — carries only book hypotheses.  `hN` is
+pinned although the Perron-Frobenius step does not use it: it is the standing assumption `S ≥ 1/2`
+of §2.4, which is what makes `saturatedFerromagnetEigenvalueS` the ground energy. -/
 example {G : SimpleGraph V} {J : V → V → ℂ}
     (hGconn : G.Connected)
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -60,8 +62,9 @@ example {G : SimpleGraph V} {J : V → V → ℂ}
 /-- **P5 pin.** Every sector ground state (the joint `H`-eigenspace at
 `saturatedFerromagnetEigenvalueS J N`, intersected with the magnetization-sector subspace) is
 exactly `span ℂ {ladderIterateUp V N k}` — the per-sector uniqueness statement P5 must establish
-as an equality of `Submodule`s, not merely a `finrank` bound. -/
-example [Nonempty V] {G : SimpleGraph V} {J : V → V → ℂ}
+as an equality of `Submodule`s, not merely a `finrank` bound.  No `[Nonempty V]` instance may be
+required: `G.Connected` carries it.  `hN` is pinned for the same reason as in P4. -/
+example {G : SimpleGraph V} {J : V → V → ℂ}
     (hGconn : G.Connected)
     (hJ_real : ∀ x y, (J x y).im = 0)
     (hJ_sym : ∀ x y, J x y = J y x)

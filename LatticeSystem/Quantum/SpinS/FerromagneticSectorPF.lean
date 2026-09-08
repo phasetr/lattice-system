@@ -39,7 +39,9 @@ p. 33; solution of Problem 2.4.a, p. 496).
 
 On the sector `magSumS σ = k` the closed component form of `(Ŝ⁻_tot)^k Φ↑` is the real number
 `k! · ∏_x √(binom N σ_x)`, whose factors are all positive.  This is the strictly positive
-Perron-Frobenius eigenvector candidate of Theorem A.18 (p. 475). -/
+Perron-Frobenius eigenvector candidate of Theorem A.18 (p. 475).  The book's `Φ_M` of eq. (2.4.9)
+is this iterate normalized; `ladderIterateUp` is the unnormalized one, which spans the same line
+and is positive on the same sector. -/
 theorem ladderIterateUp_restriction_re_pos (k : Fin (Fintype.card V * N + 1))
     (σ : magConfigS V N k.val) :
     0 < (ladderIterateUp V N k σ.1).re := by
@@ -66,10 +68,12 @@ private theorem saturatedFerromagnetEigenvalueS_ofReal_re {J : V → V → ℂ}
 /-- **The restricted ladder state is a real sector eigenvector at the ground-state energy**
 (Tasaki §2.4, p. 34; solution of Problem 2.4.a, p. 496).
 
-`Φ_M` is an eigenvector of the full Hamiltonian at `saturatedFerromagnetEigenvalueS J N`, which is
-real for real coupling; since `Ĥ` conserves the magnetization, restricting to the sector keeps the
-eigenvector equation, and taking real parts moves it to the real-form sector matrix -- the shape
-Theorem A.18 (p. 475) consumes. -/
+`Φ_M` -- here the unnormalized `(Ŝ⁻_tot)^k Φ↑`, the book's eq. (2.4.9), p. 33, being its
+normalization, which changes neither the eigenvector equation nor the span -- is an eigenvector of
+the full Hamiltonian at `saturatedFerromagnetEigenvalueS J N`, which is real for real coupling;
+since `Ĥ` conserves the magnetization, restricting to the sector keeps the eigenvector equation,
+and taking real parts moves it to the real-form sector matrix -- the shape Theorem A.18 (p. 475)
+consumes. -/
 theorem heisenbergHamiltonianSReMatrixOnMagSector_mulVec_ladder_restriction
     (J : V → V → ℂ) (hJ_real : ∀ x y, (J x y).im = 0)
     (k : Fin (Fintype.card V * N + 1)) :
