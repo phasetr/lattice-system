@@ -50,14 +50,16 @@ authorization for what moved: the legacy pages still have to be edited to match,
 catalogue-row comparison is what proves they do. What the pins buy is that a change to the
 published catalogue is a legible diff and a moved hash rather than a silent edit.
 
-Two further pins cover the machinery rather than the content. `ROW_PATH_AST_SHA256` pins sha256
-over `ast.dump` of the row-derivation nodes `_ROW_PATH_AST_NAMES` lists, docstrings stripped, and
+Two further pins cover the machinery rather than the content. `ROW_PATH_SOURCE_SHA256` pins
+sha256 over the source text of the row-derivation nodes `_ROW_PATH_SOURCE_NAMES` lists, and
 `APPROVED_ENTRIES_SHA256` pins sha256 over the ordered literal pairs of the audited chain, so
 that surgery which leaves the published bytes alone is a moved pin rather than a silent edit.
-They are recomputed with
+Both hash text this file already carries, never a serialization of the parsed tree or of a
+literal, so their values are the same on every interpreter that can parse this file. They are
+recomputed with
 
     python3 -c 'import sys; sys.path.insert(0, "scripts"); \
-    import check_docs_hierarchy as c; print(c._row_path_ast_sha256())'
+    import check_docs_hierarchy as c; print(c._row_path_source_sha256())'
 
     python3 -c 'import sys; sys.path.insert(0, "scripts"); \
     import check_docs_hierarchy as c; \
@@ -65,8 +67,9 @@ They are recomputed with
 
 under the same clause: a recompute is never on its own an authorization for what moved.
 `BASELINE_CATALOGUE_ROW_COUNT` describes a blob frozen at `BASELINE_COMMIT` and
-`ROW_PATH_AST_SHA256` the machinery that derives rows from it, so no catalogue content edit moves
-either; a commit that moves one is machinery surgery, and that is the signature review looks for.
+`ROW_PATH_SOURCE_SHA256` the machinery that derives rows from it, so no catalogue content edit
+moves either; a commit that moves one is machinery surgery, and that is the signature review
+looks for.
 
 One residual stays with review. Editing the row-derivation machinery and recomputing its pins
 passes every check here, as does editing the pages and recomputing the two byte-parity pins,
@@ -1306,20 +1309,20 @@ def approved_changes_byte_parity_self_test() -> None:
 # is an identity no pin recompute can satisfy.
 BASELINE_CATALOGUE_ROW_COUNT = 2052
 
-# sha256 over `ast.dump` (docstrings stripped) of the row-derivation machinery named in
-# `_ROW_PATH_AST_NAMES`, deliberately excluding `_approved_replacements`, whose shape the chain
-# rule pins more precisely than a hash would and whose literals a sanctioned removal is supposed
-# to move. Machinery rather than content: no legitimate catalogue edit moves this pin.
-ROW_PATH_AST_SHA256 = "639883e0e0eb524c467807fb3851d576e5ffcb936729424cf1fbc008241d1c57"
+# sha256 over the source text of the row-derivation machinery named in
+# `_ROW_PATH_SOURCE_NAMES`, deliberately excluding `_approved_replacements`, whose shape the
+# chain rule pins more precisely than a hash would and whose literals a sanctioned removal is
+# supposed to move. Machinery rather than content: no legitimate catalogue edit moves this pin.
+ROW_PATH_SOURCE_SHA256 = "9f787c0a1575ee1854704418927ec0d3c5a72a5bbcaaf05754048c35268ad3f2"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
-APPROVED_ENTRIES_SHA256 = "e461572446b5a2554d191c3db7212c8efa6c7128d4273e157fd3f69e72097ad0"
+APPROVED_ENTRIES_SHA256 = "f2ff5401993d12ccf7cbdf3b837910f89eb928feb0cd10f12cd04311858c92c8"
 
-# The nodes `ROW_PATH_AST_SHA256` hashes: everything the published rows are derived through,
+# The nodes `ROW_PATH_SOURCE_SHA256` hashes: everything the published rows are derived through,
 # from the frozen blob to the row sequence `main()` compares the legacy pages against.
-_ROW_PATH_AST_NAMES = (
+_ROW_PATH_SOURCE_NAMES = (
     "CATALOGUE_BASELINE_SLICE",
     "BASELINE_COMMIT",
     "_WORKING_NOTE_CITATION",
@@ -1414,46 +1417,62 @@ def _approved_replacements_chain(source: str) -> tuple[list[tuple[str, str]], li
     return chain, violations
 
 
-def _strip_docstring(node: ast.AST) -> ast.AST:
-    """Return `node` with its own leading docstring `Expr` statement removed, if it has a body."""
-    body = getattr(node, "body", None)
-    if (
-        isinstance(body, list)
-        and body
-        and isinstance(body[0], ast.Expr)
-        and isinstance(body[0].value, ast.Constant)
-        and isinstance(body[0].value.value, str)
-    ):
-        node.body = body[1:] or [ast.Pass()]
-    return node
+def _row_path_source_sha256() -> str:
+    """sha256 over the source text of each `_ROW_PATH_SOURCE_NAMES` top-level node of this file,
+    in `_ROW_PATH_SOURCE_NAMES` order.
 
+    A node contributes the lines it spans, its first decorator line through `end_lineno`, with
+    trailing whitespace stripped and its byte length framed in ahead of it under its own name,
+    so that no two spellings of the machinery share a digest. The parser locates those line
+    ranges and nothing else: `ast.dump` renders one tree differently on different interpreters
+    -- measured, three distinct digests over this file across 3.9, 3.12 and 3.13 -- which makes
+    a pin taken over it a report of which Python ran rather than of what the machinery is, red
+    on any runner whose version differs from the one that recomputed it. Line numbers and source
+    text are the same everywhere.
 
-def _row_path_ast_sha256() -> str:
-    """sha256 over `ast.dump` of each `_ROW_PATH_AST_NAMES` top-level node, docstring-
-    stripped, in `_ROW_PATH_AST_NAMES` order. Docstrings and comments sit outside the hash, so
-    prose about this machinery stays free to change; what the machinery does does not."""
-    tree = ast.parse(_own_source())
+    The nodes are covered verbatim, their docstrings and inline comments included; prose outside
+    them, this module's own docstring among it, stays free to change.
+    """
+    source = _own_source()
+    lines = source.splitlines()
     top_level: dict[str, ast.AST] = {}
-    for node in tree.body:
+    for node in ast.parse(source).body:
         if isinstance(node, ast.FunctionDef):
             top_level[node.name] = node
         elif isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(
             node.targets[0], ast.Name
         ):
             top_level[node.targets[0].id] = node
-    pieces: list[str] = []
-    for name in _ROW_PATH_AST_NAMES:
+    digest = hashlib.sha256()
+    for name in _ROW_PATH_SOURCE_NAMES:
         node = top_level.get(name)
         if node is None:
-            fail(f"row-path AST pin: {name} not found at this file's own module top level")
-        pieces.append(ast.dump(_strip_docstring(node)))
-    return hashlib.sha256("\n".join(pieces).encode("utf-8")).hexdigest()
+            fail(f"row-path source pin: {name} not found at this file's own module top level")
+        start = node.lineno
+        for decorator in getattr(node, "decorator_list", []):
+            start = min(start, decorator.lineno)
+        segment = "\n".join(line.rstrip() for line in lines[start - 1 : node.end_lineno])
+        encoded = segment.encode("utf-8")
+        digest.update(f"{name} {len(encoded)}\n".encode("utf-8"))
+        digest.update(encoded)
+    return digest.hexdigest()
 
 
 def _approved_entries_sha256(chain: list[tuple[str, str]]) -> str:
-    """sha256 over the ordered `(a, b)` literal pairs of the audited `.replace` chain."""
-    pieces = [f"{a!r}=>{b!r}" for a, b in chain]
-    return hashlib.sha256("\n".join(pieces).encode("utf-8")).hexdigest()
+    """sha256 over the ordered `(a, b)` literal pairs of the audited `.replace` chain.
+
+    Each literal is hashed as its own UTF-8 bytes behind their byte length rather than through
+    `repr`, for the same reason `_row_path_source_sha256` stays off `ast.dump`: many of these
+    literals carry non-ASCII text, and how `repr` escapes it follows the Unicode database the
+    running interpreter was built with.
+    """
+    digest = hashlib.sha256()
+    for a, b in chain:
+        for literal in (a, b):
+            encoded = literal.encode("utf-8")
+            digest.update(f"{len(encoded)}\n".encode("utf-8"))
+            digest.update(encoded)
+    return digest.hexdigest()
 
 
 def _is_full_row_removal(text: str, a: str, b: str, delta: int) -> bool:
@@ -1569,10 +1588,12 @@ def approved_replacements_shape_and_row_identity_self_test() -> None:
 
     The shape rule requires `_approved_replacements` to keep the form
     `_approved_replacements_chain` parses, which is what makes that attribution a legible diff
-    rather than a runtime accident. The last two pins cover machinery rather than content:
-    `ROW_PATH_AST_SHA256` the row-derivation nodes, `APPROVED_ENTRIES_SHA256` the reviewed
-    literal list. No content edit moves either, so a commit that moves one is machinery surgery
-    and has to be reviewed as such rather than accepted on a recompute.
+    rather than a runtime accident. The last two pins cover machinery rather than content.
+    `ROW_PATH_SOURCE_SHA256` hashes the row-derivation nodes, which no catalogue content edit
+    touches, so a commit that moves it is machinery surgery and has to be reviewed as such
+    rather than accepted on a recompute. `APPROVED_ENTRIES_SHA256` hashes the reviewed literal
+    list, which a sanctioned removal is supposed to move; what it catches is surgery inside that
+    list which leaves the published bytes alone.
     """
     source = _own_source()
 
@@ -1662,14 +1683,14 @@ def approved_replacements_shape_and_row_identity_self_test() -> None:
     violations = _row_conservation_violations(source, published_catalogue_rows)
     if violations:
         fail("; ".join(violations))
-    ast_actual = _row_path_ast_sha256()
-    if ast_actual != ROW_PATH_AST_SHA256:
+    source_actual = _row_path_source_sha256()
+    if source_actual != ROW_PATH_SOURCE_SHA256:
         fail(
-            "row-path AST pin mismatch, which is machinery surgery rather than a content edit: "
-            f"expected {ROW_PATH_AST_SHA256}, got {ast_actual}. Recompute with: python3 -c "
-            "'import sys; sys.path.insert(0, \"scripts\"); import check_docs_hierarchy as c; "
-            "print(c._row_path_ast_sha256())' -- a passing pin recompute is never on its own an "
-            "authorization for what moved."
+            "row-path source pin mismatch, which is machinery surgery rather than a content "
+            f"edit: expected {ROW_PATH_SOURCE_SHA256}, got {source_actual}. Recompute with: "
+            "python3 -c 'import sys; sys.path.insert(0, \"scripts\"); "
+            "import check_docs_hierarchy as c; print(c._row_path_source_sha256())' -- a passing "
+            "pin recompute is never on its own an authorization for what moved."
         )
     entries_actual = _approved_entries_sha256(_approved_replacements_chain(source)[0])
     if entries_actual != APPROVED_ENTRIES_SHA256:
@@ -1681,8 +1702,6 @@ def approved_replacements_shape_and_row_identity_self_test() -> None:
             "[0]))' -- a passing pin recompute is never on its own an authorization for what "
             "moved."
         )
-
-
 
 
 MOVED_PROSE_LINK_REWRITES = (
