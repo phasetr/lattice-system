@@ -98,6 +98,7 @@ import LatticeSystem.Quantum.SpinS.SaturatedCoherentExpansion
 import LatticeSystem.Quantum.IsingLowEnergyProblem33aCapstone
 import LatticeSystem.Quantum.SpinS.RangeLocalDoubleCommutatorBound
 import LatticeSystem.Quantum.SpinS.SaturatedFerromagnetGroundEnergy
+import LatticeSystem.Quantum.SpinS.FerromagneticHeisenbergSign
 
 /-!
 # `lattice-system` library root
