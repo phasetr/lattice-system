@@ -70,8 +70,11 @@ the seven Appendix A.21–A.28 declarations.
   `WeakDual ℂ A`. Only the compactness of that set is axiomatized.
 - **What the axiom statement literally asserts:** for a unital complex C*-algebra `A`
   (`[CStarAlgebra A] [NormedSpace ℂ A] [StarModule ℂ A]`), `IsCompact (stateSpace A)` in the
-  weak-∗ topology — equivalently (Tasaki's elementary reading, eq. (A.7.3)) every sequence of
-  states has a weak-∗-convergent subsequence with limit again a state.
+  weak-∗ topology. Tasaki's elementary reading (eq. (A.7.3)) — every sequence of states has a
+  weak-∗-convergent subsequence with limit again a state — is stated in the book only for quantum
+  spin systems (p. 488), and that qualification is needed: for the separable quasi-local algebra of
+  such a system the weak-∗ topology on the state space is metrizable, so compactness gives the
+  sequential form, whereas for a general unital C*-algebra it does not.
 - **Axiom reason (documented):** Banach–Alaoglu compactness of the state space is a genuine
   functional-analytic/operator-algebraic input — it is the fact that makes infinite-volume limits
   of states available (Tasaki cites eq. (4.3.7) as its use) — and belongs to the operator-algebra
@@ -150,7 +153,11 @@ carried by two declarations in `LatticeSystem/Math/CStarAlgebra/GroundState.lean
   `CompleteSpace`), a `∗`-representation `π : A →⋆ₐ[ℂ] (H →L[ℂ] H)`, and a vector `Ω : H` such
   that `ρ a = ⟪Ω, π a Ω⟫_ℂ` for every `a` (eq. (A.7.11)) and `{π a Ω | a ∈ A}` is dense in `H`
   (cyclicity) — i.e. `(H, π, Ω)` is a GNS triple for `ρ`, and every state is a vector state in its
-  GNS space.
+  GNS space. Tasaki's Theorem A.28 additionally asserts that `H_ρ` is *separable*, which the Lean
+  axiom omits — it concludes `∃ (H : Type) …` with no separability, at the fixed universe `Type 0`
+  rather than the universe of `A` — so, exactly as with the phase-uniqueness clause noted in the
+  Wigner entry above, that part of the book statement is recorded only in prose, not in the Lean
+  statement.
 - **Axiom reason (documented):** `mathlib` already contains GNS machinery
   (`Mathlib/Analysis/CStarAlgebra/GelfandNaimarkSegal.lean`: `f.GNS`, `gnsStarAlgHom`); the module
   doc records that this axiom is "dischargeable from that machinery" but the precise Tasaki
