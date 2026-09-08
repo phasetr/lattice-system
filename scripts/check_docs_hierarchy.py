@@ -3,15 +3,27 @@ r"""Validate the staged human-documentation hierarchy with the Python stdlib.
 
 The published catalogue is `docs/index.md` frozen at `BASELINE_COMMIT` and put through
 `approved_changes`: a single chain of audited literal rewrites. The removal entries search
-verbatim baseline text -- a row leaves the published catalogue only by a rewrite of its own full
-frozen row text, trailing newline included, to the empty string -- while some correction entries
-search text an earlier entry in the chain inserts, as their own comments record. That no entry
-retires a row by keying on a Lean name is a convention of this file, kept by review of the chain;
-`name_keyed_row_drop_absence_self_test` enforces it in part, refusing a drop whose match set is
-bounded by nothing but the name. The absence of a declaration from the Lean tree is in any case
-never on its own a reason to retire the row that records it: at the revision this was measured,
-91 of the 2050 published catalogue rows (4.4%) name at least one identifier the Lean tree no
-longer spells -- 64 of them name nothing else -- across 148 distinct absent identifier tokens.
+verbatim baseline text -- an entry is credited with retiring a row only when what it deletes is
+one whole line, trailing newline included, that is still, character for character, the frozen
+baseline row it spells -- while some correction entries search text an earlier entry in the chain
+inserts, as their own comments record. That no entry retires a row by keying on a Lean name is
+enforced by `approved_replacements_shape_and_row_identity_self_test`: `_approved_replacements`
+has to stay a chain of two-string-literal `.replace` calls, and the rows that left the catalogue
+have to be the rows those entries name. The replay carries the origin of every character through
+the whole transform, so each published row is traced back to the baseline line it was cut from,
+and the rows are then matched rather than counted: the baseline rows no published row descends
+from have to be, as a multiset, the rows the credited entries retire, each entry crediting at
+most one row and each row credited at most once, no published row may descend from no baseline
+line or from two, and `len(published_catalogue_rows()) == BASELINE_CATALOGUE_ROW_COUNT - (the
+rows that left)`. Matching is what a row-neutral rewrite cannot launder: reshaping one row into
+the text of another leaves the reshaped row uncredited, because what a later entry then deletes
+is no longer the frozen row whose text it spells. Every entry is measured, not only the ones
+whose literals differ in newline count, and an entry that mints a row is refused as well, until a
+reviewed diff generalizes the identity to carry a term for one. The absence of a declaration
+from the Lean tree is in any case never on its own a reason to retire the row that records it: at
+the revision this was measured, 91 of the 2050 published catalogue rows (4.4%) name at least one
+identifier the Lean tree no longer spells -- 64 of them name nothing else -- across 148 distinct
+absent identifier tokens.
 
 Two pins cover the transform. `APPROVED_CHANGES_SHA256` pins sha256 over
 
@@ -43,19 +55,77 @@ An edit that does move a pin recomputes it in the same commit with
 and states which rows the new values reflect. Recomputing a pin is never on its own an
 authorization for what moved: the legacy pages still have to be edited to match, and the
 catalogue-row comparison is what proves they do. What the pins buy is that a change to the
-published catalogue is a legible diff and a moved hash rather than a silent edit. The row count,
-the two pins and `name_keyed_row_drop_absence_self_test` are the whole of the mechanical
-enforcement, and two residuals stay with review. First, editing the pages and recomputing both
-pins honestly passes every check here, because a recompute restates what the chain now produces
-and judges nothing about it. Second, a rewrite keyed on a Lean name and narrowed by anything the
-synthetic probe rows do not satisfy -- a fragment of that row's body, or a position anchor the
-surrounding corpus carries, are two such narrowings -- is indistinguishable, in every output this
-file compares, from the sanctioned full-row literal it imitates.
+published catalogue is a legible diff and a moved hash rather than a silent edit.
+
+Two further pins cover this script rather than the content. `SCRIPT_SOURCE_SHA256` pins
+sha256 over this file's whole source text, with only the four pin values themselves masked out --
+their digits alone, on lines each pin has to occupy by itself -- and `APPROVED_ENTRIES_SHA256`
+pins sha256 over the ordered literal pairs of the audited chain, so that surgery which leaves the
+published bytes alone is a moved pin rather than a silent edit. Both hash text this file already
+carries, never a serialization of the parsed tree or of a literal, so their values are the same on
+every interpreter that can parse this file.
+They are recomputed with
+
+    python3 -c 'import sys; sys.path.insert(0, "scripts"); \
+    import check_docs_hierarchy as c; print(c._script_source_sha256())'
+
+    python3 -c 'import sys; sys.path.insert(0, "scripts"); \
+    import check_docs_hierarchy as c; \
+    print(c._approved_entries_sha256(c._approved_replacements_chain(c._own_source())[0]))'
+
+under the same clause: a recompute is never on its own an authorization for what moved.
+`BASELINE_CATALOGUE_ROW_COUNT` describes a blob frozen at `BASELINE_COMMIT`, so neither a
+catalogue content edit nor an edit to this file moves it. `SCRIPT_SOURCE_SHA256` is the opposite
+kind of tripwire: a page edit leaves it alone and every edit to this file moves it, the
+sanctioned removals spelled in `_approved_replacements` among them. What it buys is that no line
+of this script can change without a recompute in the same reviewed commit, so surgery that
+leaves the published bytes and the row identity intact -- a decorator on `_approved_replacements`
+that rewrites what the audited chain returns, a rebinding of `table_data_rows` nested in a
+compound statement or spelled beside a pin on the pin's own line -- cannot be exonerated by a pin
+that stood still.
+
+Four residuals stay with review, and none of them is closed by anything here.
+
+Editing the row-derivation machinery and recomputing its pins passes every check here, as does
+editing the pages and recomputing the two byte-parity pins, because a recompute restates what the
+machinery now produces and judges nothing about it. What the identity buys against that is a
+narrow channel: an entry of the reviewed chain is credited with retiring a row only when what it
+deletes is one whole frozen row still intact, and every other route moves a constant no content
+edit touches. A moved constant is reported through `fail`, so an edit whose
+payload is a rebinding of `fail`, or an exit before the self-tests run, leaves a stale pin and a
+green run. Such an edit is itself an edit to this file and so is the same machinery channel, with
+the same sanctioned path: a reviewed commit that recomputes every pin. `_masked_pin_span` is the
+one refusal that does not go through `fail`, because the statement it refuses can be that
+rebinding spelled on a pin's own line.
+
+The identity matches which rows left, not what the surviving ones say. An entry of the reviewed
+chain may rewrite a published row's whole body and the row still descends from the baseline line
+it was cut from, so what a row says is covered by the literal list being reviewed and pinned,
+not by this check.
+
+Which page publishes a row is enforced by nothing. `main()` compares the rows of every legacy
+page, concatenated in page order, against one expected sequence, and the per-marker prose parity
+excludes pipe-led lines by design, leaving them to that comparison, so moving a row from one
+page's `legacy-source` marker into another's, at a position that preserves the global order,
+passes -- and takes the row's permalink and anchor with it. This predates the identity and is
+outside its subject: closing it means comparing rows per source marker against the baseline lines
+that marker declares, which is a different check with a baseline of its own.
+
+That hand-off does not reach every pipe-led line, so the exclusion above is not the closure it
+would be if it did. `_data_row_indices` reads a pipe-led line whose next line is a separator as a
+header, so a page that inserts a fabricated row and a `| --- |` line after it puts that row in
+header position: the row comparison never counts it and the prose parity skips it for being
+pipe-led, and nothing else compares it against the frozen baseline. Measured, such a page-only
+insertion passes, while the separator line alone -- which hides the real row above it the same
+way -- is refused as a short row sequence. This too predates the identity, which is about rows
+that leave; closing it means counting pipe-led non-separator lines on the pages and requiring
+that total to equal the published row count, so that a row in header position is a mismatch.
 """
 
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import html
 import posixpath
@@ -376,15 +446,39 @@ def validate_pipe_blocks(path: Path, body: str) -> None:
             fail(f"pipe block lacks header/separator: {path.relative_to(ROOT)}:{index + 1}")
 
 
-def table_data_rows(lines: list[str]) -> list[str]:
-    result: list[str] = []
+def _data_row_indices(lines: list[str]) -> list[int]:
+    """The positions in `lines` that count as table data rows: pipe-led, not a separator, and
+    not a header, which is a row whose next line is one.
+
+    Spelled once and read by both `table_data_rows` and the origin tracking below, so the rows
+    the count is taken over and the rows an origin is traced for cannot become two sets.
+    """
+    result: list[int] = []
     for index, line in enumerate(lines):
         if not line.startswith("|") or is_separator(line):
             continue
         if index + 1 < len(lines) and is_separator(lines[index + 1]):
             continue
-        result.append(line)
+        result.append(index)
     return result
+
+
+def table_data_rows(lines: list[str]) -> list[str]:
+    return [lines[index] for index in _data_row_indices(lines)]
+
+
+def _table_row_lines(text: str) -> list[str]:
+    """The lines of `text` that are table rows by shape alone: pipe-led and not a separator.
+
+    `table_data_rows` additionally drops a row whose next line is a separator, reading it as a
+    header. That is what a whole document needs and what a replacement literal measured on its
+    own must not use: a replacement ending in a row followed by `| --- |` would hide that row
+    from its own count, while the document, where that trailing separator meets the following
+    text, counts it. So the screen on how many rows a chain entry writes counts by shape.
+    """
+    return [
+        line for line in text.splitlines() if line.startswith("|") and not is_separator(line)
+    ]
 
 
 # Baseline catalogue rows carry two kinds of pointer to a working note that is not part of this
@@ -405,10 +499,20 @@ _WORKING_NOTE_PROSE_CITATION = re.compile(r"See > `[^`]+` and Issue #3542\.")
 WORKING_NOTE_REMOVAL_COUNTS = (2, 1, 1)
 
 
+# The two removals above as one ordered table. The row-conservation check replays them carrying
+# every character's origin, and reads the same table, so a second spelling of a pattern, of a
+# replacement or of the order cannot make the replayed transform a different one from this.
+_WORKING_NOTE_CITATION_REWRITES = (
+    (_WORKING_NOTE_CITATION, " (Issue #3542)."),
+    (_WORKING_NOTE_SECTION_REF, ""),
+)
+
+
 def _drop_working_note_citations(text: str) -> str:
     """Drop both catalogue-row pointers to the working note outside this repository."""
-    text = _WORKING_NOTE_CITATION.sub(" (Issue #3542).", text)
-    return _WORKING_NOTE_SECTION_REF.sub("", text)
+    for pattern, replacement in _WORKING_NOTE_CITATION_REWRITES:
+        text = pattern.sub(replacement, text)
+    return text
 
 
 def _drop_working_note_prose_citation(text: str) -> str:
@@ -430,9 +534,15 @@ _PRIVATE_INSTRUCTIONS_REF = re.compile(r" \(\w+\.\w+\.md\)")
 PRIVATE_INSTRUCTIONS_REMOVAL_COUNT = 1
 
 
+# The removal above as a table, read by the same replay, for the same reason.
+_PRIVATE_INSTRUCTIONS_REWRITES = ((_PRIVATE_INSTRUCTIONS_REF, ""),)
+
+
 def _drop_private_instructions_ref(text: str) -> str:
     """Drop the catalogue-row pointer to the private project-instructions file."""
-    return _PRIVATE_INSTRUCTIONS_REF.sub("", text)
+    for pattern, replacement in _PRIVATE_INSTRUCTIONS_REWRITES:
+        text = pattern.sub(replacement, text)
+    return text
 
 
 def _approved_replacements(text: str) -> str:
@@ -1275,137 +1385,820 @@ def approved_changes_byte_parity_self_test() -> None:
         )
 
 
-def _name_keyed_drop_violation(
-    transform: Callable[[str], str],
-    baseline: str,
-    transformed_baseline: str,
-    probe_rows: str,
-    row_suffix: str,
-) -> str | None:
-    """Describe how `transform` fails to carry every synthetic probe row through, or None.
+# The row count of the frozen baseline catalogue slice at BASELINE_COMMIT, before any audited
+# rewrite. Never moves for a content edit -- only a narrowing of CATALOGUE_BASELINE_SLICE or a
+# change of BASELINE_COMMIT itself moves it -- so
+# `BASELINE_CATALOGUE_ROW_COUNT - (the baseline rows no published row descends from) ==
+# len(published_catalogue_rows())` is an identity no pin recompute can satisfy.
+BASELINE_CATALOGUE_ROW_COUNT = 2052
 
-    `probe_rows` is placed both after and before `baseline`, because placement is exactly what a
-    match-bounded rewrite is sensitive to: a first-match drop keyed on a Lean name reaches the
-    real row when the synthetic rows follow it and a synthetic row when they precede it, so only
-    running both halves refuses that spelling. In each half the baseline part must transform
-    exactly as `transform` transforms it alone, and the synthetic part must keep every row --
-    same count, each still carrying the sentinel body. A rewrite of a synthetic row's first cell
-    is tolerated: it renames a row rather than retiring one, it moves both pins, and the legacy
-    pages have to be edited to match it like any other change.
+# sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
+# Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
+# commit; a catalogue page edit does not move it.
+SCRIPT_SOURCE_SHA256 = "fb0905ec380d53e89d67a30da64eca667530da743b92185bf4e672d9b27da78f"
+
+# sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
+# surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
+# entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
+APPROVED_ENTRIES_SHA256 = "f2ff5401993d12ccf7cbdf3b837910f89eb928feb0cd10f12cd04311858c92c8"
+
+# The only text `SCRIPT_SOURCE_SHA256` does not hash: the digits these four pins carry. Each is
+# restated by the very edit it pins, and a digest over its own value would have no fixed point.
+# The masking is by name and applies only to a plain string-constant assignment, so a pin whose
+# value became an expression, or whose line carries anything besides the assignment, is refused
+# rather than masked.
+_MASKED_PIN_NAMES = (
+    "APPROVED_CHANGES_SHA256",
+    "PUBLISHED_ROWS_SHA256",
+    "SCRIPT_SOURCE_SHA256",
+    "APPROVED_ENTRIES_SHA256",
+)
+
+# A pin's value: the 64 lowercase hex digits of a sha256 digest and nothing else.
+_PIN_VALUE = re.compile(r"[0-9a-f]{64}")
+
+
+def _masked_pin_span(name: str, line: str, node: ast.Assign) -> tuple[int, int]:
+    """The column span of pin `name`'s literal on `line`, refusing any line that carries more.
+
+    The span is what `_script_source_sha256` masks and what `_with_recomputed_script_source_pin`
+    overwrites. Both have to be columns rather than the whole line: a line-wide mask would drop
+    whatever else the line held -- `PIN = "..." ; table_data_rows = <a wrapper>` -- out of the
+    digest, which is the one thing this pin exists to make impossible, and a line-wide rewrite
+    would launder the same statement out of a mirror. Masking columns is sound only on a line
+    that carries nothing else, so anything but `NAME = "<64 hex digits>"` filling `line` is
+    refused here, fail-closed. `line` is what the callers cut on the line feed alone, which is the
+    unit the parser reporting `node.lineno` counts in: `str.splitlines()` would end a line at
+    U+000B, U+000C, U+001C-U+001E, U+0085, U+2028 or U+2029 as well. Of those only U+000C is
+    whitespace to the tokenizer; the other seven are a `SyntaxError` outside a string literal and
+    reach this only from inside one, where they shift a `splitlines()` index without ending a
+    line for the parser. A pin followed by U+000C and a second statement would reach this rule as
+    the bare assignment it is not. That spelling is also pure ASCII, which is what makes the UTF-8
+    byte offsets `ast` reports usable as string indices.
+
+    The refusal raises rather than only calling `fail`, which is not redundant: the statement it
+    refuses can be a rebinding of `fail` itself, and a refusal that reports through the name it
+    is refusing reports nothing.
     """
-    expected_rows = probe_rows.count("\n")
-    for placement, combined in (
-        ("appended", baseline + probe_rows),
-        ("prepended", probe_rows + baseline),
+    value = node.value
+    if (
+        node.lineno != node.end_lineno
+        or not isinstance(value, ast.Constant)
+        or not isinstance(value.value, str)
+        or _PIN_VALUE.fullmatch(value.value) is None
+        or line != f'{name} = "{value.value}"'
     ):
-        transformed = transform(combined)
-        if placement == "appended":
-            if not transformed.startswith(transformed_baseline):
-                return f"{placement}: the baseline part transformed differently"
-            probe_part = transformed[len(transformed_baseline):]
-        else:
-            if not transformed.endswith(transformed_baseline):
-                return f"{placement}: the baseline part transformed differently"
-            probe_part = transformed[: len(transformed) - len(transformed_baseline)]
-        probe_lines = probe_part.splitlines()
-        if len(probe_lines) != expected_rows:
-            return f"{placement}: {len(probe_lines)} synthetic rows survived of {expected_rows}"
-        rewritten = [line for line in probe_lines if not line.endswith(row_suffix)]
-        if rewritten:
-            return f"{placement}: {len(rewritten)} synthetic rows lost their sentinel body"
-    return None
+        message = (
+            f"script source pin: {name} has to occupy its whole line as "
+            f'`{name} = "<64 hex digits>"`, so that masking its value hides nothing else, '
+            f"found: {line!r}"
+        )
+        fail(message)
+        raise SystemExit(message)
+    return value.col_offset, value.end_col_offset
 
 
-def name_keyed_row_drop_absence_self_test() -> None:
-    """Refuse a row drop keyed on a Lean name and bounded by nothing else.
+def _own_source() -> str:
+    """This file's own source text: what the chain rule parses and the machinery pin hashes."""
+    return Path(__file__).read_text()
 
-    The fail-open shape this catalogue has to stay clear of is a rewrite keyed on a Lean name
-    rather than on a row's frozen text: it unpublishes every row naming that identifier, and
-    re-expressed so that it reproduces the sanctioned removals exactly it leaves both pins and
-    every page comparison undisturbed. Spelling-level fixtures cannot exclude it, so this probes
-    for it semantically. A scratch copy of the baseline text carries one synthetic row per
-    catalogue row -- that row's own first cell verbatim, so every identifier the catalogue names
-    is covered including the ones it retires, with a body no audited literal contains -- and
-    `approved_changes`, the same entry point `main()` uses, must carry all of them through both
-    placements `_name_keyed_drop_violation` tries.
 
-    That refuses a drop whose match set is bounded by nothing but the name, wherever in the
-    chain it sits and whether it drops every match or only the first. It does not refuse a match
-    narrowed by anything the synthetic rows fail to satisfy: a name plus, say, a directory
-    fragment of the file cell never touches a synthetic row, and neither does a name sought only
-    at or after a position anchor of the surrounding corpus, since such an anchor sits in the
-    baseline part under both placements. Every narrowing of that class produces, on the real
-    corpus, the same bytes as the sanctioned full-row literal it imitates, so no probe reading
-    this transform's output can separate the two. That residual stays with review, as the module
-    docstring records.
+def _approved_replacements_function_node(source: str) -> ast.FunctionDef:
+    """The `_approved_replacements` `FunctionDef` of `source`, this file's own text or a copy."""
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.FunctionDef) and node.name == "_approved_replacements":
+            return node
+    message = "_approved_replacements: not found in the parsed source"
+    fail(message)
+    raise SystemExit(message)
+
+
+def _approved_replacements_chain(source: str) -> tuple[list[tuple[str, str]], list[str]]:
+    """The ordered `(a, b)` literal pairs of `_approved_replacements`'s `.replace` chain.
+
+    Returns `(chain, violations)`. `violations` is non-empty, and `chain` a possibly-partial
+    prefix, whenever the function is not exactly: a single `return`, wrapped in exactly
+    `_drop_working_note_citations(...)`, of a left-nested chain of two-positional-argument
+    `.replace` calls rooted at the parameter `text`, every argument an `ast.Constant` string.
     """
-    body = "synthetic name-keyed-drop probe row; carries no published body"
-    baseline = catalogue_baseline_text()
-    probe_cells = [
-        row.removeprefix("| ").split(" | ")[0]
-        for row in table_data_rows(baseline.splitlines())
+    func = _approved_replacements_function_node(source)
+    violations: list[str] = []
+    body = func.body
+    if (
+        body
+        and isinstance(body[0], ast.Expr)
+        and isinstance(body[0].value, ast.Constant)
+        and isinstance(body[0].value.value, str)
+    ):
+        body = body[1:]
+    if len(body) != 1 or not isinstance(body[0], ast.Return):
+        return [], [
+            "_approved_replacements body is not a docstring plus single return "
+            f"({len(func.body)} statements)"
+        ]
+    value = body[0].value
+    wrapper_names: list[str] = []
+    while isinstance(value, ast.Call) and isinstance(value.func, ast.Name):
+        wrapper_names.append(value.func.id)
+        if len(value.args) != 1 or value.keywords:
+            violations.append(f"{value.func.id}(...) call is not single-argument")
+            return [], violations
+        value = value.args[0]
+    if wrapper_names != ["_drop_working_note_citations"]:
+        violations.append(f"unpinned wrapper chain {tuple(wrapper_names)}")
+        return [], violations
+    chain: list[tuple[str, str]] = []
+    while isinstance(value, ast.Call):
+        if (
+            not isinstance(value.func, ast.Attribute)
+            or value.func.attr != "replace"
+            or value.keywords
+            or len(value.args) != 2
+        ):
+            violations.append("chain entry is not a two-positional-argument .replace call")
+            return chain, violations
+        a_node, b_node = value.args
+        if not (
+            isinstance(a_node, ast.Constant)
+            and isinstance(a_node.value, str)
+            and isinstance(b_node, ast.Constant)
+            and isinstance(b_node.value, str)
+        ):
+            violations.append(
+                f"non-literal replace() argument: {type(a_node).__name__}, "
+                f"{type(b_node).__name__}"
+            )
+            return chain, violations
+        chain.append((a_node.value, b_node.value))
+        value = value.func.value
+    if not (isinstance(value, ast.Name) and value.id == "text"):
+        violations.append("chain is not rooted at the parameter `text`")
+        return chain, violations
+    chain.reverse()
+    return chain, violations
+
+
+def _script_source_sha256(source: str | None = None) -> str:
+    """sha256 over `source` (this file's own text by default), every line of it, with only the
+    digits of each `_MASKED_PIN_NAMES` assignment replaced by a marker and trailing whitespace
+    stripped.
+
+    The masked unit is the literal's own column span, not its physical line, and
+    `_masked_pin_span` refuses any pin line that carries anything besides the assignment. A
+    line-wide mask leaves a `;`-separated sibling statement unhashed, so machinery surgery
+    spelled beside a pin would land with all four pins standing still. The lines are cut on the
+    line feed alone, the unit the parser this indexes with counts in, rather than by
+    `str.splitlines()`, which also cuts at eight characters the parser does not end a line at --
+    U+000C, which is whitespace between tokens, and seven more that are a `SyntaxError` outside a
+    string literal and can only shift the index from inside one -- and would therefore both shift
+    the index a pin is looked up by and hand that refusal a fragment of a line to approve.
+
+    The subject is the text rather than the parsed tree because `ast.dump` renders one tree
+    differently on different interpreters -- measured, three distinct digests over this file
+    across 3.9, 3.12 and 3.13 -- which makes a pin taken over it a report of which Python ran
+    rather than of what the script is, red on any runner whose version differs from the one that
+    recomputed it. The parser is used only to locate the masked literals, and line numbers, column
+    offsets and source text are the same everywhere.
+
+    The subject is the whole file rather than a list of names because a name list pins what it
+    lists and exonerates everything else: a decorator on an audited function, or a rebinding of
+    an audited name nested in a compound statement, is machinery surgery that no listed node
+    records. The price is that prose, comments and the sanctioned removals spelled in
+    `_approved_replacements` move this pin too; the recompute is documented and cheap, and a
+    reviewed commit is exactly the place to pay it.
+    """
+    if source is None:
+        source = _own_source()
+    lines = source.split("\n")
+    pins: dict[int, ast.Assign] = {}
+    for node in ast.parse(source).body:
+        if (
+            isinstance(node, ast.Assign)
+            and len(node.targets) == 1
+            and isinstance(node.targets[0], ast.Name)
+            and node.targets[0].id in _MASKED_PIN_NAMES
+            and isinstance(node.value, ast.Constant)
+            and isinstance(node.value.value, str)
+        ):
+            pins[node.lineno] = node
+    found = sorted(node.targets[0].id for node in pins.values())
+    if set(found) != set(_MASKED_PIN_NAMES):
+        fail(
+            "script source pin: every name of _MASKED_PIN_NAMES has to be a module-top-level "
+            f"assignment of a string constant, found {found}"
+        )
+    pieces: list[str] = []
+    for index, line in enumerate(lines):
+        node = pins.get(index + 1)
+        if node is None:
+            pieces.append(line.rstrip())
+            continue
+        start, end = _masked_pin_span(node.targets[0].id, line, node)
+        pieces.append(f"{line[:start]}<masked pin value>{line[end:]}")
+    return hashlib.sha256("\n".join(pieces).encode("utf-8")).hexdigest()
+
+
+def _with_recomputed_script_source_pin(script_text: str) -> str:
+    """`script_text` with its own `SCRIPT_SOURCE_SHA256` restated for the text it now is.
+
+    The disposable-clone fixtures below run an edited copy of this file, which would otherwise
+    carry the pin of a text it is no longer. Restating it is exact rather than a fixed-point
+    search, because the digits it overwrites are the one span the digest does not hash. Only
+    those digits are overwritten, so a mirror keeps whatever else its pin line holds -- which
+    `_masked_pin_span` has already refused, but the rewrite does not depend on that. The text is
+    cut and rejoined on the line feed alone, the unit the digest and `_masked_pin_span` use, so
+    every byte outside those digits, line endings included, comes back unchanged and the rewrite
+    cannot disagree with the digest about where the pin's line ends.
+    """
+    digest = _script_source_sha256(script_text)
+    lines = script_text.split("\n")
+    for node in ast.parse(script_text).body:
+        if (
+            isinstance(node, ast.Assign)
+            and len(node.targets) == 1
+            and isinstance(node.targets[0], ast.Name)
+            and node.targets[0].id == "SCRIPT_SOURCE_SHA256"
+            and isinstance(node.value, ast.Constant)
+            and isinstance(node.value.value, str)
+        ):
+            line = lines[node.lineno - 1]
+            start, end = _masked_pin_span("SCRIPT_SOURCE_SHA256", line, node)
+            lines[node.lineno - 1] = f'{line[:start]}"{digest}"{line[end:]}'
+            return "\n".join(lines)
+    message = "script source pin: SCRIPT_SOURCE_SHA256 not found in the text to re-pin"
+    fail(message)
+    raise SystemExit(message)
+
+
+def _approved_entries_sha256(chain: list[tuple[str, str]]) -> str:
+    """sha256 over the ordered `(a, b)` literal pairs of the audited `.replace` chain.
+
+    Each literal is hashed as its own UTF-8 bytes behind their byte length rather than through
+    `repr`, for the same reason `_script_source_sha256` stays off `ast.dump`: many of these
+    literals carry non-ASCII text, and how `repr` escapes it follows the Unicode database the
+    running interpreter was built with.
+    """
+    digest = hashlib.sha256()
+    for a, b in chain:
+        for literal in (a, b):
+            encoded = literal.encode("utf-8")
+            digest.update(f"{len(encoded)}\n".encode("utf-8"))
+            digest.update(encoded)
+    return digest.hexdigest()
+
+
+# The origin of a character the transform wrote rather than cut from the frozen baseline slice.
+_CHAIN_WRITTEN = -1
+
+
+def _baseline_line_origins(text: str) -> list[int]:
+    """One entry per character of `text`: the index of the line of `text` that character sits in.
+
+    This is the state the replay carries. A surviving character keeps its entry wherever the
+    transform moves it and is never duplicated, and every character the transform writes gets
+    `_CHAIN_WRITTEN`, so a published row can be asked which baseline line it was cut from
+    instead of only whether some baseline row happens to spell the same text.
+    """
+    origins: list[int] = []
+    for index, line in enumerate(text.splitlines(keepends=True)):
+        origins += [index] * len(line)
+    return origins
+
+
+def _splice_origins(
+    text: str, origins: list[int], edits: list[tuple[int, int, str]]
+) -> tuple[str, list[int]]:
+    """`text` with every `(start, end, replacement)` of `edits` applied, carrying `origins`.
+
+    The edits have to arrive sorted and non-overlapping, which is what both `str.replace` and
+    `re.sub` rewrite. Everything outside them is copied once, with the origin it arrived with.
+    """
+    pieces: list[str] = []
+    spliced: list[int] = []
+    position = 0
+    for start, end, replacement in edits:
+        pieces.append(text[position:start])
+        spliced += origins[position:start]
+        pieces.append(replacement)
+        spliced += [_CHAIN_WRITTEN] * len(replacement)
+        position = end
+    pieces.append(text[position:])
+    spliced += origins[position:]
+    return "".join(pieces), spliced
+
+
+def _literal_spans(text: str, literal: str) -> list[tuple[int, int]]:
+    """Every span `text.replace(literal, ...)` rewrites: leftmost, non-overlapping occurrences."""
+    spans: list[tuple[int, int]] = []
+    start = text.find(literal)
+    while start != -1:
+        spans.append((start, start + len(literal)))
+        start = text.find(literal, start + len(literal))
+    return spans
+
+
+def _sub_with_origins(
+    text: str, origins: list[int], pattern: re.Pattern[str], replacement: str
+) -> tuple[str, list[int]]:
+    """`pattern.sub(replacement, text)` with the origins of the surviving characters carried.
+
+    `re.sub` expands `\\1` and `\\g<name>` in a replacement; the replacements this is used with
+    are the plain strings of the two rewrite tables, and what refuses one whose expansion would
+    make this a different transform is the byte-parity check against `approved_changes`.
+    """
+    edits = [(match.start(), match.end(), replacement) for match in pattern.finditer(text)]
+    return _splice_origins(text, origins, edits)
+
+
+def _published_row_origins(text: str, origins: list[int]) -> list[frozenset[int]]:
+    """For every data row of `text`, the baseline lines its characters were cut from.
+
+    A row is taken with its line terminator, because an entry may rewrite a row's whole body
+    without spelling the newline after it, and that newline is then the row's remaining evidence
+    of where it came from. An empty set means no baseline line contributed a character at all:
+    the row is one the transform minted.
+    """
+    kept = text.splitlines(keepends=True)
+    starts: list[int] = []
+    offset = 0
+    for line in kept:
+        starts.append(offset)
+        offset += len(line)
+    return [
+        frozenset(
+            origin
+            for origin in origins[starts[index] : starts[index] + len(kept[index])]
+            if origin != _CHAIN_WRITTEN
+        )
+        for index in _data_row_indices(text.splitlines())
     ]
-    if not probe_cells:
-        fail(
-            "name-keyed row drop self-test found no catalogue rows to build synthetic rows "
-            "from, so its requirement below would hold vacuously"
-        )
-    probe_rows = "".join(f"| {cell} | {body} |\n" for cell in probe_cells)
-    row_suffix = f"| {body} |"
-    transformed_baseline = approved_changes(baseline)
 
-    # This test reasons about the rows `approved_changes` produces, while `main()` compares the
-    # legacy pages against `published_catalogue_rows()`. Require the two to be the same sequence
-    # rather than assume it: a `published_catalogue_rows` narrowed or re-pointed elsewhere would
-    # leave this probing rows the run never uses.
-    published_rows = published_catalogue_rows()
-    transformed_rows = table_data_rows(transformed_baseline.splitlines())
-    if published_rows != transformed_rows:
-        fail(
-            "name-keyed row drop self-test would probe rows main() does not compare: "
-            f"published_catalogue_rows() returned {len(published_rows)} rows, which are not the "
-            f"{len(transformed_rows)} rows approved_changes produces from the baseline slice"
-        )
 
-    # Positive control: a name-keyed first-match drop, wired into a local copy of the transform
-    # so that it reproduces a sanctioned removal exactly, must be refused. The selection below
-    # takes the first baseline cell the transform stops publishing; at this corpus that cell
-    # sits on a row the chain retires whole, so dropping it by name leaves the published
-    # catalogue unchanged and moves neither pin -- that mutant precisely. Being unpublished does
-    # not by itself mean retired: some such cells sit on rows whose first cell the chain
-    # rewrites, and dropping one of those by name does change the catalogue and move both pins,
-    # as does the `probe_cells[0]` fallback a catalogue that retires nothing would leave. Each
-    # is still a genuine name-keyed drop and is still refused, so a pick of that kind costs the
-    # control its realism rather than its ability to fire.
-    published_cells = {row.removeprefix("| ").split(" | ")[0] for row in published_rows}
-    control_cell = next(
-        (cell for cell in probe_cells if cell not in published_cells), probe_cells[0]
+def _is_full_row_removal(text: str, a: str, b: str, delta: int) -> bool:
+    """Whether a row-count-changing chain entry has the one sanctioned shape: a whole row out.
+
+    `b` empty, `a` a complete counted row of `text` -- the chain-intermediate text this entry
+    runs against -- carried with its trailing newline and no other, and exactly one row fewer
+    afterwards. The complete-line requirement is what separates a sanctioned removal from a
+    rewrite keyed on a fragment of the row's own body, which ends at the same newline and also
+    costs one row, by merging what precedes it into the following line. Being a complete line is
+    not enough on its own: a non-row line sitting between a counted row and a separator also
+    costs exactly one row when it goes, because the row above it then reads as a header, and the
+    row that actually left is named nowhere in the diff. So the line removed has to be one the
+    count was carrying, which is what membership in `table_data_rows(text)` says.
+
+    This is shape alone, and shape is where a text-level test stops: whether the line taken out
+    is the frozen row it spells, or a line an earlier entry reshaped into that text, is
+    `_retired_baseline_row`'s question, and that is what credits an entry with a row.
+
+    An entry that adds a row (`delta < 0`) is refused here too, fail-closed: the identity this
+    feeds subtracts drops and carries no term for an addition, so admitting one takes a reviewed
+    generalization of the identity rather than a passing run.
+    """
+    return (
+        b == ""
+        and delta == 1
+        and a.endswith("\n")
+        and "\n" not in a[:-1]
+        and a[:-1] in table_data_rows(text.splitlines())
     )
-    control_pattern = re.compile(rf"^\| {re.escape(control_cell)} \|.*\n", re.MULTILINE)
 
-    def name_keyed_drop(text: str) -> str:
-        """`approved_changes` with the control cell's row dropped by name, first match only."""
-        return approved_changes(control_pattern.sub("", text, count=1))
 
-    control_violation = _name_keyed_drop_violation(
-        name_keyed_drop, baseline, name_keyed_drop(baseline), probe_rows, row_suffix
-    )
-    if control_violation is None:
-        fail(
-            "name-keyed row drop self-test control did not fire: a first-match drop keyed on "
-            f"{control_cell} passed the requirement below, so the requirement cannot detect the "
-            "shape it exists to refuse"
+def _retired_baseline_row(
+    text: str,
+    origins: list[int],
+    baseline_lines: list[str],
+    baseline_rows: frozenset[int],
+    spans: list[tuple[int, int]],
+    a: str,
+    b: str,
+    delta: int,
+) -> int | None:
+    """The baseline data row a chain entry retires, or `None` if it retires nothing sanctioned.
+
+    An entry is credited with a row only when what it deletes is that row still intact: one
+    occurrence, every character of it cut from the same baseline line, and as many characters as
+    that line has, so that the deleted span is the whole frozen row with no part of it rewritten.
+    Asking instead whether the deleted text is *a* frozen row -- which is what a set membership
+    answers -- says nothing about the occurrence being deleted, and a row-neutral entry may put
+    the text of a frozen row wherever it likes. What it cannot do is give the characters it
+    writes an origin.
+    """
+    if not _is_full_row_removal(text, a, b, delta):
+        return None
+    if len(spans) != 1:
+        return None
+    start, end = spans[0]
+    cut = set(origins[start:end])
+    if len(cut) != 1:
+        return None
+    (index,) = tuple(cut)
+    if index not in baseline_rows or baseline_lines[index] != a:
+        return None
+    return index
+
+
+def _chain_row_drops(
+    text: str, chain: list[tuple[str, str]]
+) -> tuple[str, list[int], list[int], list[str]]:
+    """Replay `chain` over `text`; return the transformed text, the origin of each of its
+    characters, the baseline rows its entries are credited with retiring, and the entries that
+    are neither a sanctioned removal nor row-neutral.
+
+    Every entry is measured against the row count of the whole chain-intermediate text. A screen
+    on the two literals' newline counts would examine only the entries that change the line
+    count, and a row can go with the line count intact -- a row rewritten into an empty line or
+    into a separator -- so a pair of entries, one such loss and one row minted elsewhere, would
+    keep the total and never be looked at. An entry is refused unless its replacement carries no
+    more table rows than its search literal and it either leaves the row count alone or retires
+    one whole baseline row in the sense of `_retired_baseline_row`.
+    The two literals are counted by `_table_row_lines`, by row shape, because each is measured
+    outside the document it runs against; that screen is a screen and not a bound, and what
+    refuses a minted row is the row-count delta over the whole intermediate text.
+
+    A credit is a baseline line index, not a text. So an entry cannot be credited with a row
+    another entry has already taken out, however the running text has come to spell that row
+    again, and the caller can ask which rows are missing rather than only how many.
+    """
+    credited: list[int] = []
+    ill_shaped: list[str] = []
+    origins = _baseline_line_origins(text)
+    baseline_lines = text.splitlines(keepends=True)
+    baseline_rows = frozenset(_data_row_indices(text.splitlines()))
+    rows_now = len(baseline_rows)
+    for a, b in chain:
+        rows_sought = len(_table_row_lines(a))
+        rows_written = len(_table_row_lines(b))
+        if rows_written > rows_sought:
+            ill_shaped.append(
+                f"{a[:80]!r} -> {b[:40]!r} (writes {rows_written} table rows where it seeks "
+                f"{rows_sought})"
+            )
+        if not a:
+            # `str.replace` would write `b` between every pair of characters; refused rather
+            # than replayed, and the parity check below would refuse the divergence anyway.
+            ill_shaped.append(f"'' -> {b[:40]!r} (empty search literal)")
+            continue
+        spans = _literal_spans(text, a)
+        if not spans:
+            continue
+        replaced, replaced_origins = _splice_origins(
+            text, origins, [(start, end, b) for start, end in spans]
+        )
+        if replaced == text:
+            continue
+        rows_after = len(table_data_rows(replaced.splitlines()))
+        delta = rows_now - rows_after
+        if delta:
+            retired = _retired_baseline_row(
+                text, origins, baseline_lines, baseline_rows, spans, a, b, delta
+            )
+            if retired is None or retired in credited:
+                ill_shaped.append(
+                    f"{a[:80]!r} -> {b[:40]!r} (changes the row count by {delta} without "
+                    "deleting one whole baseline row intact)"
+                )
+            else:
+                credited.append(retired)
+        text, origins = replaced, replaced_origins
+        rows_now = rows_after
+    return text, origins, credited, ill_shaped
+
+
+def _row_conservation_violations(
+    source: str, published_rows: Callable[[], list[str]]
+) -> list[str]:
+    """Parts B and A against `source`'s literal chain and `published_rows`' row sequence.
+
+    Both are parameters only so that the positive controls below can drive this with a mutated
+    copy of this file's own `_approved_replacements`, and with a row sequence a rewrite outside
+    the chain has thinned, which is the defect class the identity exists to refuse.
+
+    The rows that left are matched, not counted: the replay carries every character's origin, so
+    the baseline rows no published row descends from can be compared, as a multiset, against the
+    rows the credited entries name. Counting instead lets a row-neutral entry reshape one row
+    into the text of another and hand a later entry a credit the chain has already spent.
+
+    The parity that guards that replay compares `tracked` against `after_private`, the chain
+    output the structural passes produce here, not against `approved_changes(
+    catalogue_baseline_text())`. Both sides descend from the same `after_chain`, so what the gate
+    ties down is the two structural passes against the rewrite tables they are replayed from; the
+    chain replay itself is held to what `_approved_replacements` executes by `_literal_spans`
+    reproducing `str.replace`, and an edit that broke that would be an edit to this file.
+    """
+    chain, violations = _approved_replacements_chain(source)
+    if violations:
+        return ["_approved_replacements shape violation: " + "; ".join(violations)]
+    baseline_text = catalogue_baseline_text()
+    baseline_lines = baseline_text.splitlines()
+    baseline_rows = _data_row_indices(baseline_lines)
+    if len(baseline_rows) != BASELINE_CATALOGUE_ROW_COUNT:
+        return [
+            "BASELINE_CATALOGUE_ROW_COUNT is stale: expected "
+            f"{BASELINE_CATALOGUE_ROW_COUNT}, the frozen baseline slice has {len(baseline_rows)} "
+            "rows. Recompute with: python3 -c 'import sys; sys.path.insert(0, \"scripts\"); "
+            "import check_docs_hierarchy as c; "
+            "print(len(c.table_data_rows(c.catalogue_baseline_text().splitlines())))'"
+        ]
+    after_chain, origins, credited, ill_shaped = _chain_row_drops(baseline_text, chain)
+    if ill_shaped:
+        violations.append(
+            "audited chain entry is not a sanctioned rewrite: " + "; ".join(ill_shaped)
+        )
+    after_citations = _drop_working_note_citations(after_chain)
+    after_private = _drop_private_instructions_ref(after_citations)
+    rows_after_chain = len(table_data_rows(after_chain.splitlines()))
+    rows_after_citations = len(table_data_rows(after_citations.splitlines()))
+    rows_after_private = len(table_data_rows(after_private.splitlines()))
+    if rows_after_chain != rows_after_citations or rows_after_citations != rows_after_private:
+        violations.append(
+            "structural pass dropped a row: _drop_working_note_citations left "
+            f"{rows_after_citations} rows of {rows_after_chain} and "
+            f"_drop_private_instructions_ref {rows_after_private} of {rows_after_citations}, "
+            "where a row leaves only by a literal of the audited chain"
+        )
+    tracked = after_chain
+    for pattern, replacement in _WORKING_NOTE_CITATION_REWRITES + _PRIVATE_INSTRUCTIONS_REWRITES:
+        tracked, origins = _sub_with_origins(tracked, origins, pattern, replacement)
+    if tracked != after_private:
+        violations.append(
+            "the replay that carries origins does not reproduce the published text, so the rows "
+            "it traces are not the published rows: the structural passes and the rewrite tables "
+            "they are replayed from have to stay one transform"
+        )
+        return violations
+    row_origins = _published_row_origins(tracked, origins)
+    minted = sum(1 for origin in row_origins if not origin)
+    merged = sum(1 for origin in row_origins if len(origin) > 1)
+    if minted or merged:
+        violations.append(
+            f"published rows do not descend from the baseline one for one: {minted} descend "
+            f"from no baseline line and {merged} from more than one, where every published row "
+            "is one baseline line the chain rewrote in place"
+        )
+    descended = [next(iter(origin)) for origin in row_origins if len(origin) == 1]
+    if len(set(descended)) != len(descended):
+        violations.append(
+            f"{len(descended) - len(set(descended))} baseline row(s) descend into more than one "
+            "published row, so a row the catalogue no longer carries could be standing behind a "
+            "copy of another"
+        )
+    removed = sorted(set(baseline_rows) - set(descended))
+    if removed != sorted(credited):
+        violations.append(
+            "the rows that left the catalogue are not the rows the audited chain retires: left "
+            f"{[baseline_lines[index][:60] for index in removed]}, retired by an entry "
+            f"{[baseline_lines[index][:60] for index in sorted(credited)]}"
+        )
+    published = len(published_rows())
+    if BASELINE_CATALOGUE_ROW_COUNT - len(removed) != published:
+        violations.append(
+            "row conservation identity failed: BASELINE_CATALOGUE_ROW_COUNT "
+            f"({BASELINE_CATALOGUE_ROW_COUNT}) - the rows that left the frozen slice "
+            f"({len(removed)}) != published rows ({published}), so a row left the catalogue "
+            "somewhere other than a full-row literal of that chain"
+        )
+    return violations
+
+
+def approved_replacements_shape_and_row_identity_self_test() -> None:
+    """Refuse any row loss that is not a full-row literal of the audited `.replace` chain.
+
+    The row-conservation check replays that chain entry by entry over the frozen baseline slice,
+    carrying the origin of every character, and requires the rows that left to be the rows the
+    entries name: the baseline rows no published row descends from have to equal, as a multiset,
+    the rows the credited entries retire, no published row may descend from no baseline line or
+    from two, no baseline row may descend into two published rows, and
+    `len(published_catalogue_rows()) == BASELINE_CATALOGUE_ROW_COUNT - (the rows that left)`.
+    Every entry is measured, no entry may write more table rows than it seeks, and the two
+    structural passes (`_drop_working_note_citations`, `_drop_private_instructions_ref`) may drop
+    no row at all. Unlike the two pins of `approved_changes_byte_parity_self_test`, none of this
+    is satisfiable by recomputing anything: an entry is credited only when what it deletes is a
+    frozen row still intact, so a rewrite keyed on a Lean name -- at any narrowing, at any depth
+    -- leaves the published catalogue short of what the chain accounts for, and reshaping one row
+    into the text of another buys nothing, because the credit for that text has an origin and the
+    reshaped row does not carry it. What is not matched is what a surviving row says: an entry of
+    the reviewed chain may rewrite a published row's whole body, and the row still descends from
+    the baseline line it was cut from.
+
+    The shape rule requires `_approved_replacements` to keep the form
+    `_approved_replacements_chain` parses, which is what makes that attribution a legible diff
+    rather than a runtime accident. The last two pins cover this script rather than the
+    content. `SCRIPT_SOURCE_SHA256` hashes the whole file, the pin values aside, so an edit to
+    this script that the published bytes and the row identity do not register -- a decorator on
+    `_approved_replacements`, a rebinding of `table_data_rows` -- is still a moved pin that has
+    to be reviewed rather than accepted on a recompute. `APPROVED_ENTRIES_SHA256` hashes the
+    reviewed literal list; what it catches on top of that is surgery inside that list which
+    leaves the published bytes alone.
+    """
+    source = _own_source()
+
+    # Positive controls: a check whose subject is an absence has to be shown firing on the defect
+    # it exists to refuse. Each control injects one defect into the same functions the real check
+    # below drives -- a mutated copy of this file's own `_approved_replacements`, a row sequence
+    # thinned outside the chain, the attribution predicate itself. The two AST mutations are
+    # re-spelled from the parsed function, so they stay exact under any later edit of the chain.
+    def mutated_chain_source(mutate: Callable[[ast.FunctionDef], None]) -> str:
+        """`_approved_replacements` alone, re-spelled from its own AST after `mutate` edits it."""
+        node = _approved_replacements_function_node(source)
+        mutate(node)
+        return ast.unparse(node)
+
+    def key_one_entry_on_a_call(node: ast.FunctionDef) -> None:
+        """Re-key one rewrite on a call instead of a literal: a name-keyed drop, spelled inside
+        the chain."""
+        for call in ast.walk(node):
+            if (
+                isinstance(call, ast.Call)
+                and isinstance(call.func, ast.Attribute)
+                and call.func.attr == "replace"
+            ):
+                call.args[0] = ast.Call(
+                    func=ast.Name(id="_row_for", ctx=ast.Load()),
+                    args=[ast.Constant(value="x"), ast.Name(id="text", ctx=ast.Load())],
+                    keywords=[],
+                )
+                return
+        fail("shape/row-identity control setup: no .replace call to re-key on a call")
+
+    def wrap_chain_in_extra_pass(node: ast.FunctionDef) -> None:
+        """Wrap the audited chain in a pass outside it, where an unaudited rewrite could sit."""
+        node.body[-1].value = ast.Call(
+            func=ast.Name(id="_extra_pass", ctx=ast.Load()),
+            args=[node.body[-1].value],
+            keywords=[],
         )
 
-    violation = _name_keyed_drop_violation(
-        approved_changes, baseline, transformed_baseline, probe_rows, row_suffix
-    )
-    if violation is not None:
+    for label, mutate, expected in (
+        ("a rewrite keyed on a call", key_one_entry_on_a_call, "non-literal replace() argument"),
+        ("an extra pass around the chain", wrap_chain_in_extra_pass, "unpinned wrapper chain"),
+    ):
+        refusals = _row_conservation_violations(
+            mutated_chain_source(mutate), published_catalogue_rows
+        )
+        if not any(expected in refusal for refusal in refusals):
+            fail(
+                f"shape/row-identity control did not fire: {label} was accepted, so the shape "
+                f"rule cannot detect what it exists to refuse (got {refusals})"
+            )
+
+    published = published_catalogue_rows()
+    if not published:
         fail(
-            "name-keyed row drop fail-open: synthetic rows carrying only a catalogue first cell "
-            "and a body no audited rewrite contains were dropped or had their body rewritten, "
-            "so some entry keys on the Lean name instead of on the row's frozen text "
-            f"({violation})"
+            "shape/row-identity self-test found no published catalogue rows, so the identity "
+            "below would hold vacuously"
+        )
+    control_cell = published[0].removeprefix("| ").split(" | ")[0]
+    thinned = [row for row in published if not row.startswith(f"| {control_cell} |")]
+    if len(thinned) == len(published):
+        fail(
+            "shape/row-identity control setup: the name-keyed shim dropped no row, so its "
+            f"control below would be probing the published sequence itself ({control_cell})"
+        )
+    # The verdict on the real chain comes before the two controls that drive the same function
+    # with an injected defect. A source that is already refused has lost rows of its own, and the
+    # identity can then hold for an injected sequence by arithmetic; reporting that a control was
+    # silent would name the control where the defect is the source. Every control below is still
+    # reached on a run that would otherwise be green, because green means this list is empty.
+    violations = _row_conservation_violations(source, published_catalogue_rows)
+    if violations:
+        fail("; ".join(violations))
+
+    refusals = _row_conservation_violations(source, lambda: thinned)
+    if not any("row conservation identity failed" in refusal for refusal in refusals):
+        fail(
+            "shape/row-identity control did not fire: a row dropped by name outside the audited "
+            f"chain ({control_cell}) was accepted, so the identity cannot detect the defect "
+            f"class it exists to refuse (got {refusals})"
+        )
+
+    baseline_text = catalogue_baseline_text()
+    baseline_lines = baseline_text.splitlines(keepends=True)
+    baseline_rows = frozenset(_data_row_indices(baseline_text.splitlines()))
+    baseline_origins = _baseline_line_origins(baseline_text)
+    frozen_rows = frozenset(table_data_rows(baseline_text.splitlines()))
+    if not baseline_rows:
+        fail(
+            "shape/row-identity control setup: the frozen baseline slice carries no counted row, "
+            "so the attribution controls below would be probing an empty set"
+        )
+    body_fragment = published[0].split(" | ", 1)[-1] + "\n"
+    if body_fragment == published[0] + "\n":
+        fail(
+            "shape/row-identity control setup: the first published row carries no body cell to "
+            "key a fragment removal on"
+        )
+    if _is_full_row_removal(baseline_text, body_fragment, "", 1):
+        fail(
+            "shape/row-identity control did not fire: a removal keyed on a fragment of a row's "
+            "body has the shape of a full-row removal, so the screen the attribution rests on "
+            "admits the rewrite it exists to refuse"
+        )
+
+    first_row = min(baseline_rows)
+    first_row_spans = _literal_spans(baseline_text, baseline_lines[first_row])
+    if len(first_row_spans) != 1:
+        fail(
+            "shape/row-identity control setup: the first frozen baseline row is not a unique "
+            "occurrence of its text, so the attribution control below would be measuring a span "
+            "the chain would not delete"
+        )
+    if (
+        _retired_baseline_row(
+            baseline_text,
+            baseline_origins,
+            baseline_lines,
+            baseline_rows,
+            first_row_spans,
+            baseline_lines[first_row],
+            "",
+            1,
+        )
+        != first_row
+    ):
+        fail(
+            "shape/row-identity control setup: the attribution refuses a removal of a row of the "
+            "frozen slice, so it would refuse the sanctioned removals of the audited chain too "
+            "and the identity below would hold for the wrong reason"
+        )
+
+    minted_text = baseline_text + baseline_lines[first_row]
+    minted_origins = baseline_origins + [_CHAIN_WRITTEN] * len(baseline_lines[first_row])
+    if (
+        _retired_baseline_row(
+            minted_text,
+            minted_origins,
+            baseline_lines,
+            baseline_rows,
+            [(len(baseline_text), len(minted_text))],
+            baseline_lines[first_row],
+            "",
+            1,
+        )
+        is not None
+    ):
+        fail(
+            "shape/row-identity control did not fire: deleting a line the transform itself "
+            "wrote was credited with the frozen row whose text it spells, so an occurrence a "
+            "row-neutral rewrite manufactured still passes as the row it names"
+        )
+
+    unique_rows = [
+        row for row in published if row in frozen_rows and baseline_text.count(row + "\n") == 1
+    ]
+    if len(unique_rows) < 2:
+        fail(
+            "shape/row-identity control setup: fewer than two published rows are a frozen row "
+            "spelled once, so the staged pair below could not be built"
+        )
+
+    def spend_one_credit_twice(node: ast.FunctionDef) -> None:
+        """Retire one row, reshape a second into the text of the first, and delete that text
+        again: two rows leave against one entry that names a frozen row, which is what a credit
+        counted per entry cannot tell from two sanctioned removals."""
+        retired, live = unique_rows[0], unique_rows[1]
+        expression = node.body[-1].value.args[0]
+        for search, written in (
+            (retired + "\n", ""),
+            (live, retired),
+            (retired + "\n", ""),
+        ):
+            expression = ast.Call(
+                func=ast.Attribute(value=expression, attr="replace", ctx=ast.Load()),
+                args=[ast.Constant(value=search), ast.Constant(value=written)],
+                keywords=[],
+            )
+        node.body[-1].value.args[0] = expression
+
+    refusals = _row_conservation_violations(
+        mutated_chain_source(spend_one_credit_twice), published_catalogue_rows
+    )
+    if not any("are not the rows the audited chain retires" in refusal for refusal in refusals):
+        fail(
+            "shape/row-identity control did not fire: a row reshaped into the text of a row the "
+            "chain had already retired, and then deleted, left the catalogue while the credit "
+            "for the row it names had already been spent, so the check is counting rows instead "
+            f"of matching them (got {refusals})"
+        )
+
+    source_actual = _script_source_sha256()
+    if source_actual != SCRIPT_SOURCE_SHA256:
+        fail(
+            "script source pin mismatch, so this script was edited: expected "
+            f"{SCRIPT_SOURCE_SHA256}, got {source_actual}. Recompute with: python3 -c "
+            "'import sys; sys.path.insert(0, \"scripts\"); import check_docs_hierarchy as c; "
+            "print(c._script_source_sha256())' -- a passing pin recompute is never on its own an "
+            "authorization for what moved."
+        )
+    entries_actual = _approved_entries_sha256(_approved_replacements_chain(source)[0])
+    if entries_actual != APPROVED_ENTRIES_SHA256:
+        fail(
+            f"approved-entries pin mismatch: expected {APPROVED_ENTRIES_SHA256}, got "
+            f"{entries_actual}. Recompute with: python3 -c 'import sys; "
+            "sys.path.insert(0, \"scripts\"); import check_docs_hierarchy as c; "
+            "print(c._approved_entries_sha256(c._approved_replacements_chain(c._own_source())"
+            "[0]))' -- a passing pin recompute is never on its own an authorization for what "
+            "moved."
         )
 
 
@@ -1606,7 +2399,9 @@ def _without_clone_based_self_tests(script_text: str, probe: str) -> str:
     only at its alternate-object nesting limit, and a nested probe's failure would be reported as
     the outer fixture's setup error. Every call is required to be found rather than removed where
     present, because a rename that silently stopped being stripped is precisely the way this
-    protection would be lost without any test failing.
+    protection would be lost without any test failing. Removing them edits the copy, so it is
+    re-pinned: the fixtures probe the catalogue, and a copy carrying the pin of a text it is no
+    longer would refuse over its own preparation instead.
     """
     for call in CLONE_BASED_SELF_TEST_CALLS:
         if call not in script_text:
@@ -1615,7 +2410,7 @@ def _without_clone_based_self_tests(script_text: str, probe: str) -> str:
                 "clone-based self-test call removed before it is run"
             )
         script_text = script_text.replace(call, "")
-    return script_text
+    return _with_recomputed_script_source_pin(script_text)
 
 
 def frozen_row_drop_negative_self_test() -> None:
@@ -1715,9 +2510,10 @@ def absent_name_row_drop_negative_self_test() -> None:
     both halves of the fail-open are present at once. The checker must refuse, and the
     byte-parity pin is what refuses: a name-keyed drop is not a rewrite of the row's frozen text,
     so the transformed catalogue stops hashing to the audited value. The shape itself, wherever
-    in the chain it sits, is what `name_keyed_row_drop_absence_self_test` refuses so long as the
-    match is bounded by nothing but the name; the anchor this fixture matches below is only its
-    own wiring.
+    it sits and however narrowly it is bounded, is what
+    `approved_replacements_shape_and_row_identity_self_test` refuses, by the row that goes
+    missing from the identity rather than by any spelling; the anchor this fixture matches below
+    is only its own wiring.
     """
     with tempfile.TemporaryDirectory(prefix="absent-name-row-drop-") as scratch:
         mirror = Path(scratch) / "mirror"
@@ -1762,8 +2558,8 @@ def absent_name_row_drop_negative_self_test() -> None:
         # Dropping the row from the page alone is already refused, so the fixture must also give
         # the mirror the authorization it is being probed for: a drop keyed on the name rather
         # than on the row's frozen text, which is what makes absence look sufficient. Only this
-        # fixture's own wiring depends on the exact spelling below; the unbounded shape
-        # itself is refused by `name_keyed_row_drop_absence_self_test`.
+        # fixture's own wiring depends on the exact spelling below; the shape itself is refused
+        # by `approved_replacements_shape_and_row_identity_self_test`.
         anchor = "    return _drop_private_instructions_ref(_approved_replacements(text))\n"
         if anchor not in script_text:
             fail(
@@ -1851,7 +2647,7 @@ def main() -> None:
     # would otherwise be ignored and answered with a PASS the argument had no part in.
     argparse.ArgumentParser(description=__doc__).parse_args()
     approved_changes_byte_parity_self_test()
-    name_keyed_row_drop_absence_self_test()
+    approved_replacements_shape_and_row_identity_self_test()
     long_record_negative_self_tests()
     moved_prose_negative_self_tests()
     frozen_row_drop_negative_self_test()
