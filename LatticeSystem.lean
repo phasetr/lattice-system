@@ -97,7 +97,7 @@ import LatticeSystem.Quantum.SpinS.SpinHalfSpecializationMultiSite
 import LatticeSystem.Quantum.SpinS.SaturatedCoherentExpansion
 import LatticeSystem.Quantum.IsingLowEnergyProblem33aCapstone
 import LatticeSystem.Quantum.SpinS.RangeLocalDoubleCommutatorBound
-import LatticeSystem.Quantum.SpinS.SaturatedBondBound
+import LatticeSystem.Quantum.SpinS.SaturatedFerromagnetGroundEnergy
 
 /-!
 # `lattice-system` library root
