@@ -33,13 +33,6 @@ namespace LatticeSystem.Quantum
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
-/-- The bond terms indexed by ordered pairs sum to the Heisenberg Hamiltonian.  Kept as its own
-lemma so that the `V × V` index conversion is discharged in a goal of its own, away from the
-frustration-free assembly (`maxRecDepth` is per goal). -/
-private theorem sum_prod_smul_spinSDot (J : V → V → ℂ) (N : ℕ) :
-    ∑ p : V × V, J p.1 p.2 • spinSDot p.1 p.2 N = heisenbergHamiltonianS (Λ := V) J N := by
-  rw [heisenbergHamiltonianS_def, Fintype.sum_prod_type]
-
 /-- For a real coupling vanishing on the diagonal, the saturated-ferromagnet eigenvalue is the
 real number `∑_{x,y} (J x y).re · S²` — Tasaki's `E_GS = −|B| S²` (p. 32) in the weighted,
 ordered-pair accounting.  The diagonal `N(N+2)/4` branch of

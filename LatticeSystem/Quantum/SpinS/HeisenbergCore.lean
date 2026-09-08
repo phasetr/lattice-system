@@ -40,6 +40,17 @@ theorem heisenbergHamiltonianS_def (J : Λ → Λ → ℂ) (N : ℕ) :
     heisenbergHamiltonianS (Λ := Λ) J N =
       ∑ x : Λ, ∑ y : Λ, J x y • spinSDot x y N := rfl
 
+/-- The bond terms indexed by ordered pairs sum to the Heisenberg Hamiltonian: Tasaki's ordered
+double sum of eq. (2.4.1) read as a single sum over `Λ × Λ`.  Kept as its own lemma so that the
+`Λ × Λ` index conversion is discharged in a goal of its own, away from the callers' assemblies
+(`maxRecDepth` is per goal).
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §2.4, eq. (2.4.1), p. 32. -/
+theorem sum_prod_smul_spinSDot (J : Λ → Λ → ℂ) (N : ℕ) :
+    ∑ p : Λ × Λ, J p.1 p.2 • spinSDot p.1 p.2 N = heisenbergHamiltonianS (Λ := Λ) J N := by
+  rw [heisenbergHamiltonianS_def, Fintype.sum_prod_type]
+
 /-- A spin-`S` Heisenberg Hamiltonian with **real** coupling
 (`star (J x y) = J x y`) is Hermitian. No symmetry of `J` is needed,
 since `Ŝ_x · Ŝ_y` is always Hermitian (β-3g) — symmetry of the
