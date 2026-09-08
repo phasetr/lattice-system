@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.SaturatedBondBound
 import LatticeSystem.Quantum.SpinS.SaturatedEigenvalueExplicit
 import LatticeSystem.Math.FrustrationFree
+import LatticeSystem.Math.CommutingHermitianEigenvector
 
 /-!
 # Tasaki §2.4, p. 32: the saturated-ferromagnet energy is the ground-state energy
@@ -120,5 +121,28 @@ theorem heisenbergHamiltonianS_sub_saturatedFerromagnetEigenvalueS_posSemidef {J
     (fun p => J p.1 p.2 • spinSDot p.1 p.2 N)
     (fun p => (J p.1 p.2).re * ((N : ℝ) / 2 * ((N : ℝ) / 2)))
     (allAlignedStateS V N (0 : Fin (N + 1))) hlb heig).1
+
+/-- **The saturated-ferromagnet energy is the minimum eigenvalue** (Tasaki §2.4, p. 32, the
+`E_GS = −|B| S²` claim below eq. (2.4.5)).  Every eigenvalue `μ` of `Ĥ` witnessed by a nonzero
+eigenvector satisfies `E_GS ≤ μ`: the shifted Hamiltonian is positive semidefinite, and `Ψ` is
+its eigenvector at `μ − E_GS`, so `Matrix.posSemidef_mulVec_eigenvalue_nonneg` gives
+`0 ≤ μ − E_GS`.  Attainment is the complementary half, already available as
+`ladderIterateUp_mem_heisenbergHamiltonianS_eigenspace`. -/
+theorem saturatedFerromagnetEigenvalueS_re_le_of_eigenvector {J : V → V → ℂ}
+    (hJ_real : ∀ x y, (J x y).im = 0) (hJ_nonpos : ∀ x y, (J x y).re ≤ 0)
+    (hJ_diag : ∀ x, J x x = 0) (hN : 1 ≤ N) {μ : ℝ} {Ψ : (V → Fin (N + 1)) → ℂ} (hΨ : Ψ ≠ 0)
+    (heig : (heisenbergHamiltonianS (Λ := V) J N).mulVec Ψ = (μ : ℂ) • Ψ) :
+    (saturatedFerromagnetEigenvalueS (V := V) J N).re ≤ μ := by
+  have hshift : (heisenbergHamiltonianS (Λ := V) J N
+        - ((saturatedFerromagnetEigenvalueS (V := V) J N).re : ℂ) • 1).mulVec Ψ
+      = ((μ - (saturatedFerromagnetEigenvalueS (V := V) J N).re : ℝ) : ℂ) • Ψ := by
+    rw [Matrix.sub_mulVec, heig, Matrix.smul_mulVec, Matrix.one_mulVec, ← sub_smul]
+    congr 1
+    push_cast
+    ring
+  have hnn := LatticeSystem.Math.Matrix.posSemidef_mulVec_eigenvalue_nonneg
+    (heisenbergHamiltonianS_sub_saturatedFerromagnetEigenvalueS_posSemidef hJ_real hJ_nonpos
+      hJ_diag hN) hΨ hshift
+  linarith
 
 end LatticeSystem.Quantum

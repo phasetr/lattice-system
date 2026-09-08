@@ -1,5 +1,4 @@
-import LatticeSystem.Quantum.SpinS.HeisenbergCore
-import LatticeSystem.Quantum.SpinS.SaturatedLadderHEigenspace
+import LatticeSystem.Quantum.SpinS.SaturatedFerromagnetGroundEnergy
 import Mathlib.Analysis.Matrix.Order
 
 /-!
@@ -10,9 +9,9 @@ four PR-1 declarations of the Tasaki §2.4 Theorem 2.1 delta arc (design authori
 `.self-local/reports/design-theorem-2-1-delta-2026-09-08.md`, "PR-1" section): the per-bond
 Casimir lower bound (F1a on `Fin 2`, F1b on a general `Λ`) and the ferromagnetic ground-energy
 minimality pair (F2 frustration-free `PosSemidef` certificate, F3 the eigenvalue-minimality
-corollary). At this commit none of `SaturatedBondBound.lean` /
-`SaturatedFerromagnetGroundEnergy.lean` exist yet, so every `example` below must fail with
-`Unknown identifier` on the pinned name.
+corollary). The four names live in `LatticeSystem/Quantum/SpinS/SaturatedBondBound.lean` and
+`LatticeSystem/Quantum/SpinS/SaturatedFerromagnetGroundEnergy.lean`; any rename, reordering of
+arguments or weakening of the hypotheses there breaks this module.
 
 Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer 2020),
 §2.4, p. 34, eq. (2.4.5); Lemma A.9, p. 469.
