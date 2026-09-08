@@ -84,7 +84,7 @@ that rewrites what the audited chain returns, a rebinding of `table_data_rows` n
 compound statement or spelled beside a pin on the pin's own line -- cannot be exonerated by a pin
 that stood still.
 
-Three residuals stay with review, and none of them is closed by anything here.
+Four residuals stay with review, and none of them is closed by anything here.
 
 Editing the row-derivation machinery and recomputing its pins passes every check here, as does
 editing the pages and recomputing the two byte-parity pins, because a recompute restates what the
@@ -105,11 +105,21 @@ not by this check.
 
 Which page publishes a row is enforced by nothing. `main()` compares the rows of every legacy
 page, concatenated in page order, against one expected sequence, and the per-marker prose parity
-excludes pipe-led lines by design because the rows have that stronger check, so moving a row from
-one page's `legacy-source` marker into another's, at a position that preserves the global order,
+excludes pipe-led lines by design, leaving them to that comparison, so moving a row from one
+page's `legacy-source` marker into another's, at a position that preserves the global order,
 passes -- and takes the row's permalink and anchor with it. This predates the identity and is
 outside its subject: closing it means comparing rows per source marker against the baseline lines
 that marker declares, which is a different check with a baseline of its own.
+
+That hand-off does not reach every pipe-led line, so the exclusion above is not the closure it
+would be if it did. `_data_row_indices` reads a pipe-led line whose next line is a separator as a
+header, so a page that inserts a fabricated row and a `| --- |` line after it puts that row in
+header position: the row comparison never counts it and the prose parity skips it for being
+pipe-led, and nothing else compares it against the frozen baseline. Measured, such a page-only
+insertion passes, while the separator line alone -- which hides the real row above it the same
+way -- is refused as a short row sequence. This too predates the identity, which is about rows
+that leave; closing it means counting pipe-led non-separator lines on the pages and requiring
+that total to equal the published row count, so that a row in header position is a mismatch.
 """
 
 from __future__ import annotations
@@ -1385,7 +1395,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "6602ad3ba681ea0134f6d8533c9569fd176a1fce3d20bbf0aa52067c12e33308"
+SCRIPT_SOURCE_SHA256 = "fb0905ec380d53e89d67a30da64eca667530da743b92185bf4e672d9b27da78f"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -1868,6 +1878,13 @@ def _row_conservation_violations(
     the baseline rows no published row descends from can be compared, as a multiset, against the
     rows the credited entries name. Counting instead lets a row-neutral entry reshape one row
     into the text of another and hand a later entry a credit the chain has already spent.
+
+    The parity that guards that replay compares `tracked` against `after_private`, the chain
+    output the structural passes produce here, not against `approved_changes(
+    catalogue_baseline_text())`. Both sides descend from the same `after_chain`, so what the gate
+    ties down is the two structural passes against the rewrite tables they are replayed from; the
+    chain replay itself is held to what `_approved_replacements` executes by `_literal_spans`
+    reproducing `str.replace`, and an edit that broke that would be an edit to this file.
     """
     chain, violations = _approved_replacements_chain(source)
     if violations:
