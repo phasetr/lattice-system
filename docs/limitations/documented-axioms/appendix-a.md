@@ -17,7 +17,7 @@ the seven Appendix A.21–A.28 declarations.
 
 ## Theorems A.21–A.22 (Wigner's theorem)
 
-**Tasaki §A.6, Theorems A.21–A.22** (eqs. (A.6.1)–(A.6.10), pp. 482–484) are three
+**Tasaki §A.6, Theorems A.21–A.22** (eqs. (A.6.1)–(A.6.10), pp. 482–485) are three
 **documented axioms** in `LatticeSystem/Math/WignerTheorem.lean`: `wignerAutomorphism_unitary`,
 `wignerAutomorphism_antiunitary`, and `wignerProjection`.
 
@@ -46,9 +46,12 @@ the seven Appendix A.21–A.28 declarations.
   `Fintype` and `Matrix D D ℂ` is finite-dimensional — but the proof method (rays, projective
   Hilbert space geometry) is the deep part being deferred, not a missing finite-dimensional
   framework.)
-- **Consumers:** none. There are currently zero references to `wignerAutomorphism_unitary`,
-  `wignerAutomorphism_antiunitary`, or `wignerProjection` anywhere else in the repository; no
-  proved result depends on them.
+- **Consumers:** none. `wignerAutomorphism_unitary`, `wignerAutomorphism_antiunitary`, and
+  `wignerProjection` have no Lean consumer in `LatticeSystem/`: each occurs there only at its own
+  `axiom` declaration in `LatticeSystem/Math/WignerTheorem.lean`, and no proved result depends on
+  any of them. The remaining mentions in the corpus are documentation references — the roadmap
+  history page lists all three, and the proof guide cites `wignerProjection` — and neither consumes
+  them.
 - **Re-check condition:** the disposition would change when a math-before-code transcription of
   Wigner's/Bargmann's proof (the rank-one-projection argument sketched in Tasaki §A.6.1) is
   completed for the finite-dimensional case, or when an equivalent result becomes available from
@@ -75,8 +78,10 @@ the seven Appendix A.21–A.28 declarations.
   class of the [documented-axiom policy](/lattice-system/limitations/documented-axioms/): a
   dedicated operator-algebra/functional-analysis development, whose natural home may be `mathlib`
   itself.
-- **Consumers:** none. There are currently zero references to `stateSpace_isCompact` anywhere else
-  in the repository; no proved result depends on it.
+- **Consumers:** none. `stateSpace_isCompact` has no Lean consumer in `LatticeSystem/`: it occurs
+  there only at its own `axiom` declaration in `LatticeSystem/Math/CStarAlgebra/State.lean`, and no
+  proved result depends on it. The sole other mention in the corpus, on the roadmap history page,
+  is a documentation reference and does not consume it.
 - **Re-check condition:** the disposition would change when `mathlib` (or a project-local
   development) supplies weak-∗ compactness of the state space of a general unital C*-algebra, or
   the specific instance needed here.
@@ -85,8 +90,8 @@ the seven Appendix A.21–A.28 declarations.
 
 ## Theorem A.26 (variational characterization of ground states)
 
-**Tasaki §A.7, Definitions A.25/A.27 and Theorem A.26** (eqs. (A.7.4)–(A.7.7), p. 489) are carried
-by two declarations in `LatticeSystem/Math/CStarAlgebra/GroundState.lean`:
+**Tasaki §A.7, Definitions A.25/A.27 and Theorem A.26** (eqs. (A.7.4)–(A.7.7), pp. 488–489) are
+carried by two declarations in `LatticeSystem/Math/CStarAlgebra/GroundState.lean`:
 `IsLocalHamiltonianData` (a marker axiom) and `groundState_variational` (the theorem axiom).
 
 - **Proved (axiom-free):** Definitions A.25 and A.27 are genuine `def`s in the same file —
@@ -118,11 +123,14 @@ by two declarations in `LatticeSystem/Math/CStarAlgebra/GroundState.lean`:
   system, parametrized by the partial-Hamiltonian family `Ĥ_L` and the constraint sets `C_L`; it
   belongs to the operator-algebra class of the [documented-axiom
   policy](/lattice-system/limitations/documented-axioms/) and is not an active proof target.
-- **Consumers:** none. There are currently zero references to `groundState_variational` anywhere
-  in the repository, and `IsLocalHamiltonianData` occurs only as the gating hypothesis of
-  `groundState_variational` itself; no proved result depends on either declaration. (The sole
-  other mention of `IsLocalHamiltonianData` in the corpus, on the Chapter 7 Theorem 7.2 entry,
-  names it only as an analogy for a different marker's idiom and does not consume it.)
+- **Consumers:** none. `groundState_variational` has no Lean consumer in `LatticeSystem/`: it
+  occurs there only at its own `axiom` declaration in
+  `LatticeSystem/Math/CStarAlgebra/GroundState.lean`, where `IsLocalHamiltonianData`, besides its
+  own `axiom` declaration, occurs only as that theorem's gating hypothesis; no proved result
+  depends on either declaration. The remaining mentions in the corpus are documentation
+  references — the roadmap history page names `groundState_variational`, and the Chapter 7
+  Theorem 7.2 entry names `IsLocalHamiltonianData` only as an analogy for a different marker's
+  idiom — and neither consumes them.
 - **Re-check condition:** the disposition would change when (a) a concrete construction of the
   quasi-local C*-algebra of a quantum spin system on `ℤᵈ`, together with the local Hamiltonians
   `ĥ_x` and the partial Hamiltonians `Ĥ_L`, replaces `IsLocalHamiltonianData` with a real
@@ -152,8 +160,10 @@ by two declarations in `LatticeSystem/Math/CStarAlgebra/GroundState.lean`:
   operator-algebra class and is recorded as a faithful documented axiom rather than an active proof
   target — but unlike the other six axioms recorded here, the module doc itself flags this one as
   the most directly dischargeable, since the needed `mathlib` machinery already exists.
-- **Consumers:** none. There are currently zero references to `gns_construction` anywhere else in
-  the repository; no proved result depends on it.
+- **Consumers:** none. `gns_construction` has no Lean consumer in `LatticeSystem/`: it occurs
+  there only at its own `axiom` declaration in `LatticeSystem/Math/CStarAlgebra/GNS.lean`, and no
+  proved result depends on it. The sole other mention in the corpus, on the roadmap history page,
+  is a documentation reference and does not consume it.
 - **Re-check condition:** the disposition would change when a math-before-code comparison of
   `mathlib`'s `GelfandNaimarkSegal.lean` API against the exact statement above (existence of the
   cyclic vector, eq. (A.7.11), and density) confirms the packaging goes through, and the axiom is

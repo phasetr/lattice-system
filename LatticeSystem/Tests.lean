@@ -167,6 +167,7 @@ import LatticeSystem.Tests.Corollary43RingSetup
 import LatticeSystem.Tests.PrintedConstantCounterexample
 import LatticeSystem.Tests.SaturatedFerromagnetGroundEnergy
 import LatticeSystem.Tests.SaturatedFerromagnetSectorIrreducible
+import LatticeSystem.Tests.HeisenbergCoreBondSumGeneralPin
 import LatticeSystem.Tests.HeisenbergCoreBondSumPin
 import LatticeSystem.Tests.FiniteStrictUpperBoundPin
 
