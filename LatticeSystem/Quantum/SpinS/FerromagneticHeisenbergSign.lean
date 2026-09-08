@@ -95,4 +95,35 @@ theorem heisenbergHamiltonianS_apply_re_nonpos_of_ne
     simp
   · exact mul_nonpos_iff.mpr (Or.inr ⟨hJ_nonpos x y, spinSDot_apply_re_nonneg_of_ne hxy hne⟩)
 
+/-- **Strict negativity on a ladder step** (Tasaki, Proof of Theorem 2.2 property (ii), pp. 40-41;
+hypothesis (ii) of Theorem A.18, p. 475).  If `σ'` arises from `σ` by one `Ŝ⁺_x Ŝ⁻_y` (or
+`Ŝ⁻_x Ŝ⁺_y`) move along a `G`-edge `(x, y)` carrying a real, symmetric, strictly ferromagnetic
+coupling, then `Re ⟨Ψ^{σ'}|Ĥ|Ψ^σ⟩ < 0`; in particular the entry does not vanish, which is what
+connects the configurations of a magnetization sector.
+
+The two-site collapse `H σ' σ = (J x y + J y x) · (Ŝ_x·Ŝ_y) σ' σ` turns the claim into the
+product of the strictly negative weight `2 (J x y).re` with the strictly positive bond entry
+`spinSDot_apply_re_pos_of_raiseLowerStepS_witness`. -/
+theorem heisenbergHamiltonianS_apply_re_neg_of_raiseLowerStepS_witness
+    {J : V → V → ℂ} (N : ℕ)
+    {G : SimpleGraph V} {σ σ' : V → Fin (N + 1)}
+    {x y : V} (hadj : G.Adj x y)
+    (hJ_real : (J x y).im = 0) (hJ_neg : (J x y).re < 0)
+    (hJ_sym : J x y = J y x)
+    (hsh : ((σ x).val + 1 = (σ' x).val ∧ (σ' y).val + 1 = (σ y).val) ∨
+      ((σ' x).val + 1 = (σ x).val ∧ (σ y).val + 1 = (σ' y).val))
+    (hagree : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    ((heisenbergHamiltonianS J N) σ' σ).re < 0 := by
+  rw [heisenbergHamiltonianS_apply_of_raiseLowerStepS_witness J N hadj hsh hagree]
+  rw [show J x y + J y x = 2 * J x y from by rw [← hJ_sym]; ring]
+  rw [show (2 : ℂ) * J x y = ((2 * (J x y).re : ℝ) : ℂ) from by
+    apply Complex.ext
+    · simp
+    · simp [hJ_real]]
+  rw [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, zero_mul, sub_zero]
+  have hspin_pos : 0 < ((spinSDot x y N : ManyBodyOpS V N) σ' σ).re :=
+    spinSDot_apply_re_pos_of_raiseLowerStepS_witness hadj hsh hagree
+  have hJ2 : 2 * (J x y).re < 0 := by linarith
+  exact mul_neg_of_neg_of_pos hJ2 hspin_pos
+
 end LatticeSystem.Quantum
