@@ -25,24 +25,13 @@ namespace LatticeSystem.Quantum
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
-/-- **A strict upper bound for the diagonal.**  The Perron-Frobenius argument is run on the
-shifted matrix `c·1 - Ĥ` (Tasaki Theorem A.18, p. 475, applied to `-Ĥ` up to a shift), which
-needs a `c` strictly above every diagonal entry so that the shifted diagonal is strictly
-positive.  The configuration space is finite, so a bound exists and adding one makes it
-strict. -/
-theorem exists_gt_heisenbergHamiltonianSReMatrix_diag (J : V → V → ℂ) (N : ℕ) :
-    ∃ c : ℝ, ∀ σ : V → Fin (N + 1), heisenbergHamiltonianSReMatrix J N σ σ < c := by
-  obtain ⟨b, hb⟩ :=
-    Finite.exists_le (fun σ : V → Fin (N + 1) => heisenbergHamiltonianSReMatrix J N σ σ)
-  exact ⟨b + 1, fun σ => lt_of_le_of_lt (hb σ) (lt_add_one b)⟩
-
 /-- **Connected-graph sector irreducibility of the ferromagnetic Heisenberg matrix**
 (Tasaki §2.4, p. 34; Proof of Theorem 2.2, property (iii), pp. 41-42; Theorem A.18, p. 475).
 
 On a connected graph `G` with a real, symmetric coupling supported on the edges of `G`
 (`hJ_supp`) and strictly ferromagnetic there (`hJ_ferro`), the shifted matrix `c·1 - Ĥ`
 restricted to the magnetization-`M` sector is Perron-Frobenius irreducible, for any `c` strictly
-above the diagonal (`exists_gt_heisenbergHamiltonianSReMatrix_diag`).
+above the diagonal.
 
 Non-negativity of the shifted matrix is the off-diagonal sign structure
 (`heisenbergHamiltonianS_apply_re_nonpos_of_ne`) together with the strict diagonal bound; strong

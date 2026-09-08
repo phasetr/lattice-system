@@ -25,7 +25,7 @@ namespace LatticeSystem.Quantum
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
-/-- **Sign-free off-diagonal bond bound** (Tasaki §2.4, p. 34; the `Ŝ_x·Ŝ_y` half of property (i)
+/-- **Sign-free off-diagonal bond bound** (Tasaki §2.4, p. 34; the `Ŝ_x·Ŝ_y` half of property (ii)
 in the Proof of Theorem 2.2, p. 40).  For `x ≠ y` and `σ' ≠ σ`, the matrix element of the bare
 bond operator `Ŝ_x·Ŝ_y` has non-negative real part.
 
@@ -70,7 +70,7 @@ theorem spinSDot_apply_re_nonneg_of_ne
           simp
 
 /-- **Off-diagonal non-positivity of the ferromagnetic Heisenberg matrix** (Tasaki, Proof of
-Theorem 2.2 property (i), p. 40, read in the ferromagnetic sign convention; hypothesis (i) of
+Theorem 2.2 property (ii), p. 40, read in the ferromagnetic sign convention; hypothesis (i) of
 Theorem A.18, p. 475).  For a real coupling with `(J x y).re ≤ 0`, every off-diagonal entry
 `⟨Ψ^{σ'}|Ĥ|Ψ^σ⟩` has non-positive real part.
 
@@ -95,15 +95,15 @@ theorem heisenbergHamiltonianS_apply_re_nonpos_of_ne
     simp
   · exact mul_nonpos_iff.mpr (Or.inr ⟨hJ_nonpos x y, spinSDot_apply_re_nonneg_of_ne hxy hne⟩)
 
-/-- **Strict negativity on a ladder step** (Tasaki, Proof of Theorem 2.2 property (ii), pp. 40-41;
+/-- **Strict negativity on a ladder step** (Tasaki, Proof of Theorem 2.2 property (iii), pp. 40-42;
 hypothesis (ii) of Theorem A.18, p. 475).  If `σ'` arises from `σ` by one `Ŝ⁺_x Ŝ⁻_y` (or
 `Ŝ⁻_x Ŝ⁺_y`) move along a `G`-edge `(x, y)` carrying a real, symmetric, strictly ferromagnetic
 coupling, then `Re ⟨Ψ^{σ'}|Ĥ|Ψ^σ⟩ < 0`; in particular the entry does not vanish, which is what
 connects the configurations of a magnetization sector.
 
-The two-site collapse `H σ' σ = (J x y + J y x) · (Ŝ_x·Ŝ_y) σ' σ` turns the claim into the
-product of the strictly negative weight `2 (J x y).re` with the strictly positive bond entry
-`spinSDot_apply_re_pos_of_raiseLowerStepS_witness`. -/
+The real collapse `heisenbergHamiltonianS_apply_re_eq_of_raiseLowerStepS_witness` turns the claim
+into the product of the strictly negative weight `2 (J x y).re` with the strictly positive bond
+entry `spinSDot_apply_re_pos_of_raiseLowerStepS_witness`. -/
 theorem heisenbergHamiltonianS_apply_re_neg_of_raiseLowerStepS_witness
     {J : V → V → ℂ} (N : ℕ)
     {G : SimpleGraph V} {σ σ' : V → Fin (N + 1)}
@@ -114,13 +114,8 @@ theorem heisenbergHamiltonianS_apply_re_neg_of_raiseLowerStepS_witness
       ((σ' x).val + 1 = (σ x).val ∧ (σ y).val + 1 = (σ' y).val))
     (hagree : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
     ((heisenbergHamiltonianS J N) σ' σ).re < 0 := by
-  rw [heisenbergHamiltonianS_apply_of_raiseLowerStepS_witness J N hadj hsh hagree]
-  rw [show J x y + J y x = 2 * J x y from by rw [← hJ_sym]; ring]
-  rw [show (2 : ℂ) * J x y = ((2 * (J x y).re : ℝ) : ℂ) from by
-    apply Complex.ext
-    · simp
-    · simp [hJ_real]]
-  rw [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, zero_mul, sub_zero]
+  rw [heisenbergHamiltonianS_apply_re_eq_of_raiseLowerStepS_witness N hadj hJ_real hJ_sym hsh
+    hagree]
   have hspin_pos : 0 < ((spinSDot x y N : ManyBodyOpS V N) σ' σ).re :=
     spinSDot_apply_re_pos_of_raiseLowerStepS_witness hadj hsh hagree
   have hJ2 : 2 * (J x y).re < 0 := by linarith

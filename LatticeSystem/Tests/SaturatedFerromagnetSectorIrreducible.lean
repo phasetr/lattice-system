@@ -1,16 +1,15 @@
-import LatticeSystem.Quantum.SpinS.FerromagneticHeisenbergSign
 import LatticeSystem.Quantum.SpinS.FerromagneticSectorIrreducible
 
 /-!
 # Signature pin: off-diagonal signs and connected-sector irreducibility (Tasaki §2.4)
 
-Repository-internal regression guard for the five declarations behind the ferromagnetic
+Repository-internal regression guard for the four declarations behind the ferromagnetic
 Heisenberg matrix's off-diagonal sign structure and its connected-graph, per-magnetization-sector
 Perron–Frobenius irreducibility, the crux input to Tasaki's Theorem 2.1 (p. 34) uniqueness
 argument: the sign-free bare bond-term nonnegativity (S1), its Hamiltonian-level ferromagnetic
-non-positivity (S2), the strict raise/lower-step negativity (S3), a strict diagonal upper bound
-(S4), and the connected-graph sector irreducibility of the shifted matrix (P1). The five names
-live in `LatticeSystem/Quantum/SpinS/FerromagneticHeisenbergSign.lean` and
+non-positivity (S2), the strict raise/lower-step negativity (S3), and the connected-graph sector
+irreducibility of the shifted matrix (P1). The four names live in
+`LatticeSystem/Quantum/SpinS/FerromagneticHeisenbergSign.lean` and
 `LatticeSystem/Quantum/SpinS/FerromagneticSectorIrreducible.lean`; any rename, reordering of
 arguments or weakening of the hypotheses there breaks this module.
 
@@ -53,17 +52,10 @@ example {J : V → V → ℂ} (N : ℕ)
   heisenbergHamiltonianS_apply_re_neg_of_raiseLowerStepS_witness N hadj hJ_real hJ_neg hJ_sym
     hsh hagree
 
-/-- **Signature pin (S4).** The real-form Heisenberg matrix's diagonal entries admit a common
-strict upper bound `c`, discharging the repo-idiomatic `hc_strict` premise used by the sector
-irreducibility argument (P1). -/
-example (J : V → V → ℂ) (N : ℕ) :
-    ∃ c : ℝ, ∀ σ : V → Fin (N + 1), heisenbergHamiltonianSReMatrix J N σ σ < c :=
-  exists_gt_heisenbergHamiltonianSReMatrix_diag J N
-
 /-- **Signature pin (P1).** On a connected graph `G` with real, symmetric coupling `J` supported
 on `G`'s edges (`hJ_supp`) and strictly ferromagnetic there (`hJ_ferro`), the shifted real-form
 Heisenberg matrix restricted to the magnetization-`M` sector is Perron–Frobenius irreducible,
-given a strict diagonal upper bound `c` (S4). -/
+given a strict diagonal upper bound `c`. -/
 example {G : SimpleGraph V} {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     (hGconn : G.Connected)
     (hJ_supp : ∀ x y, ¬ G.Adj x y → J x y = 0)
