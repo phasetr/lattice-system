@@ -3,24 +3,27 @@ r"""Validate the staged human-documentation hierarchy with the Python stdlib.
 
 The published catalogue is `docs/index.md` frozen at `BASELINE_COMMIT` and put through
 `approved_changes`: a single chain of audited literal rewrites. The removal entries search
-verbatim baseline text -- an entry is credited with retiring a row only when it rewrites to the
-empty string one whole line, trailing newline included, that the frozen baseline slice itself
-carries as a counted row -- while some correction entries search text an earlier entry in the
-chain inserts, as their own comments record. That no entry retires a row by keying on a Lean name
-is enforced by `approved_replacements_shape_and_row_identity_self_test`: `_approved_replacements`
-has to stay a chain of two-string-literal `.replace` calls, and `BASELINE_CATALOGUE_ROW_COUNT -
-(the full-row removal entries of that chain) == len(published_catalogue_rows())` has to hold with
-every entry that changes the row count spelled as one whole row of the frozen slice. Membership is
-measured against that frozen slice and not against the text the earlier entries have already
-produced, so a row-neutral rewrite cannot reshape a row into a line a later entry is then credited
-with retiring: a rewrite keyed on a name, at any narrowing and at any depth, leaves the catalogue
-short of what the chain accounts for. Every entry is measured, not only the ones whose literals
-differ in newline count, and an entry that mints a row is refused as well, until a reviewed diff
-generalizes the identity to carry a term for one. The absence of a declaration from the Lean tree
-is in any case never on its own a reason to retire the row that records it: at the revision this
-was measured, 91 of the 2050 published catalogue rows (4.4%) name at least one identifier the Lean
-tree no longer spells -- 64 of them name nothing else -- across 148 distinct absent identifier
-tokens.
+verbatim baseline text -- an entry is credited with retiring a row only when what it deletes is
+one whole line, trailing newline included, that is still, character for character, the frozen
+baseline row it spells -- while some correction entries search text an earlier entry in the chain
+inserts, as their own comments record. That no entry retires a row by keying on a Lean name is
+enforced by `approved_replacements_shape_and_row_identity_self_test`: `_approved_replacements`
+has to stay a chain of two-string-literal `.replace` calls, and the rows that left the catalogue
+have to be the rows those entries name. The replay carries the origin of every character through
+the whole transform, so each published row is traced back to the baseline line it was cut from,
+and the rows are then matched rather than counted: the baseline rows no published row descends
+from have to be, as a multiset, the rows the credited entries retire, each entry crediting at
+most one row and each row credited at most once, no published row may descend from no baseline
+line or from two, and `len(published_catalogue_rows()) == BASELINE_CATALOGUE_ROW_COUNT - (the
+rows that left)`. Matching is what a row-neutral rewrite cannot launder: reshaping one row into
+the text of another leaves the reshaped row uncredited, because what a later entry then deletes
+is no longer the frozen row whose text it spells. Every entry is measured, not only the ones
+whose literals differ in newline count, and an entry that mints a row is refused as well, until a
+reviewed diff generalizes the identity to carry a term for one. The absence of a declaration
+from the Lean tree is in any case never on its own a reason to retire the row that records it: at
+the revision this was measured, 91 of the 2050 published catalogue rows (4.4%) name at least one
+identifier the Lean tree no longer spells -- 64 of them name nothing else -- across 148 distinct
+absent identifier tokens.
 
 Two pins cover the transform. `APPROVED_CHANGES_SHA256` pins sha256 over
 
@@ -86,17 +89,19 @@ Three residuals stay with review, and none of them is closed by anything here.
 Editing the row-derivation machinery and recomputing its pins passes every check here, as does
 editing the pages and recomputing the two byte-parity pins, because a recompute restates what the
 machinery now produces and judges nothing about it. What the identity buys against that is a
-narrow channel: an entry of the reviewed chain is credited with retiring a row only when its
-search literal is one whole counted row of the frozen slice, and every other route moves a
-constant no content edit touches. A moved constant is reported through `fail`, so an edit whose
+narrow channel: an entry of the reviewed chain is credited with retiring a row only when what it
+deletes is one whole frozen row still intact, and every other route moves a constant no content
+edit touches. A moved constant is reported through `fail`, so an edit whose
 payload is a rebinding of `fail`, or an exit before the self-tests run, leaves a stale pin and a
 green run. Such an edit is itself an edit to this file and so is the same machinery channel, with
 the same sanctioned path: a reviewed commit that recomputes every pin. `_masked_pin_span` is the
 one refusal that does not go through `fail`, because the statement it refuses can be that
 rebinding spelled on a pin's own line.
 
-The identity counts rows and does not match them: that the row missing from the published
-catalogue is the row the credited literal names is checked nowhere.
+The identity matches which rows left, not what the surviving ones say. An entry of the reviewed
+chain may rewrite a published row's whole body and the row still descends from the baseline line
+it was cut from, so what a row says is covered by the literal list being reviewed and pinned,
+not by this check.
 
 Which page publishes a row is enforced by nothing. `main()` compares the rows of every legacy
 page, concatenated in page order, against one expected sequence, and the per-marker prose parity
@@ -431,15 +436,25 @@ def validate_pipe_blocks(path: Path, body: str) -> None:
             fail(f"pipe block lacks header/separator: {path.relative_to(ROOT)}:{index + 1}")
 
 
-def table_data_rows(lines: list[str]) -> list[str]:
-    result: list[str] = []
+def _data_row_indices(lines: list[str]) -> list[int]:
+    """The positions in `lines` that count as table data rows: pipe-led, not a separator, and
+    not a header, which is a row whose next line is one.
+
+    Spelled once and read by both `table_data_rows` and the origin tracking below, so the rows
+    the count is taken over and the rows an origin is traced for cannot become two sets.
+    """
+    result: list[int] = []
     for index, line in enumerate(lines):
         if not line.startswith("|") or is_separator(line):
             continue
         if index + 1 < len(lines) and is_separator(lines[index + 1]):
             continue
-        result.append(line)
+        result.append(index)
     return result
+
+
+def table_data_rows(lines: list[str]) -> list[str]:
+    return [lines[index] for index in _data_row_indices(lines)]
 
 
 def _table_row_lines(text: str) -> list[str]:
@@ -474,10 +489,20 @@ _WORKING_NOTE_PROSE_CITATION = re.compile(r"See > `[^`]+` and Issue #3542\.")
 WORKING_NOTE_REMOVAL_COUNTS = (2, 1, 1)
 
 
+# The two removals above as one ordered table. The row-conservation check replays them carrying
+# every character's origin, and reads the same table, so a second spelling of a pattern, of a
+# replacement or of the order cannot make the replayed transform a different one from this.
+_WORKING_NOTE_CITATION_REWRITES = (
+    (_WORKING_NOTE_CITATION, " (Issue #3542)."),
+    (_WORKING_NOTE_SECTION_REF, ""),
+)
+
+
 def _drop_working_note_citations(text: str) -> str:
     """Drop both catalogue-row pointers to the working note outside this repository."""
-    text = _WORKING_NOTE_CITATION.sub(" (Issue #3542).", text)
-    return _WORKING_NOTE_SECTION_REF.sub("", text)
+    for pattern, replacement in _WORKING_NOTE_CITATION_REWRITES:
+        text = pattern.sub(replacement, text)
+    return text
 
 
 def _drop_working_note_prose_citation(text: str) -> str:
@@ -499,9 +524,15 @@ _PRIVATE_INSTRUCTIONS_REF = re.compile(r" \(\w+\.\w+\.md\)")
 PRIVATE_INSTRUCTIONS_REMOVAL_COUNT = 1
 
 
+# The removal above as a table, read by the same replay, for the same reason.
+_PRIVATE_INSTRUCTIONS_REWRITES = ((_PRIVATE_INSTRUCTIONS_REF, ""),)
+
+
 def _drop_private_instructions_ref(text: str) -> str:
     """Drop the catalogue-row pointer to the private project-instructions file."""
-    return _PRIVATE_INSTRUCTIONS_REF.sub("", text)
+    for pattern, replacement in _PRIVATE_INSTRUCTIONS_REWRITES:
+        text = pattern.sub(replacement, text)
+    return text
 
 
 def _approved_replacements(text: str) -> str:
@@ -1347,14 +1378,14 @@ def approved_changes_byte_parity_self_test() -> None:
 # The row count of the frozen baseline catalogue slice at BASELINE_COMMIT, before any audited
 # rewrite. Never moves for a content edit -- only a narrowing of CATALOGUE_BASELINE_SLICE or a
 # change of BASELINE_COMMIT itself moves it -- so
-# `BASELINE_CATALOGUE_ROW_COUNT - (the audited chain's full-row removal entries) ==
+# `BASELINE_CATALOGUE_ROW_COUNT - (the baseline rows no published row descends from) ==
 # len(published_catalogue_rows())` is an identity no pin recompute can satisfy.
 BASELINE_CATALOGUE_ROW_COUNT = 2052
 
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "08eb74ef724c128873d7781201413a8b6583bd5d6b6c3c2b8487f659c74f0dff"
+SCRIPT_SOURCE_SHA256 = "6602ad3ba681ea0134f6d8533c9569fd176a1fce3d20bbf0aa52067c12e33308"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -1388,8 +1419,10 @@ def _masked_pin_span(name: str, line: str, node: ast.Assign) -> tuple[int, int]:
     that carries nothing else, so anything but `NAME = "<64 hex digits>"` filling `line` is
     refused here, fail-closed. `line` is what the callers cut on the line feed alone, which is the
     unit the parser reporting `node.lineno` counts in: `str.splitlines()` would end a line at
-    U+000B, U+000C, U+001C-U+001E, U+0085, U+2028 or U+2029 as well, all of them mere whitespace
-    to Python, and a pin followed by one of them and a second statement would reach this rule as
+    U+000B, U+000C, U+001C-U+001E, U+0085, U+2028 or U+2029 as well. Of those only U+000C is
+    whitespace to the tokenizer; the other seven are a `SyntaxError` outside a string literal and
+    reach this only from inside one, where they shift a `splitlines()` index without ending a
+    line for the parser. A pin followed by U+000C and a second statement would reach this rule as
     the bare assignment it is not. That spelling is also pure ASCII, which is what makes the UTF-8
     byte offsets `ast` reports usable as string indices.
 
@@ -1505,9 +1538,10 @@ def _script_source_sha256(source: str | None = None) -> str:
     line-wide mask leaves a `;`-separated sibling statement unhashed, so machinery surgery
     spelled beside a pin would land with all four pins standing still. The lines are cut on the
     line feed alone, the unit the parser this indexes with counts in, rather than by
-    `str.splitlines()`, which also cuts at six characters Python treats as ordinary whitespace and
-    would therefore both shift the index a pin is looked up by and hand that refusal a fragment of
-    a line to approve.
+    `str.splitlines()`, which also cuts at eight characters the parser does not end a line at --
+    U+000C, which is whitespace between tokens, and seven more that are a `SyntaxError` outside a
+    string literal and can only shift the index from inside one -- and would therefore both shift
+    the index a pin is looked up by and hand that refusal a fragment of a line to approve.
 
     The subject is the text rather than the parsed tree because `ast.dump` renders one tree
     differently on different interpreters -- measured, three distinct digests over this file
@@ -1603,30 +1637,109 @@ def _approved_entries_sha256(chain: list[tuple[str, str]]) -> str:
     return digest.hexdigest()
 
 
-def _is_full_row_removal(
-    text: str, frozen_rows: frozenset[str], a: str, b: str, delta: int
-) -> bool:
+# The origin of a character the transform wrote rather than cut from the frozen baseline slice.
+_CHAIN_WRITTEN = -1
+
+
+def _baseline_line_origins(text: str) -> list[int]:
+    """One entry per character of `text`: the index of the line of `text` that character sits in.
+
+    This is the state the replay carries. A surviving character keeps its entry wherever the
+    transform moves it and is never duplicated, and every character the transform writes gets
+    `_CHAIN_WRITTEN`, so a published row can be asked which baseline line it was cut from
+    instead of only whether some baseline row happens to spell the same text.
+    """
+    origins: list[int] = []
+    for index, line in enumerate(text.splitlines(keepends=True)):
+        origins += [index] * len(line)
+    return origins
+
+
+def _splice_origins(
+    text: str, origins: list[int], edits: list[tuple[int, int, str]]
+) -> tuple[str, list[int]]:
+    """`text` with every `(start, end, replacement)` of `edits` applied, carrying `origins`.
+
+    The edits have to arrive sorted and non-overlapping, which is what both `str.replace` and
+    `re.sub` rewrite. Everything outside them is copied once, with the origin it arrived with.
+    """
+    pieces: list[str] = []
+    spliced: list[int] = []
+    position = 0
+    for start, end, replacement in edits:
+        pieces.append(text[position:start])
+        spliced += origins[position:start]
+        pieces.append(replacement)
+        spliced += [_CHAIN_WRITTEN] * len(replacement)
+        position = end
+    pieces.append(text[position:])
+    spliced += origins[position:]
+    return "".join(pieces), spliced
+
+
+def _literal_spans(text: str, literal: str) -> list[tuple[int, int]]:
+    """Every span `text.replace(literal, ...)` rewrites: leftmost, non-overlapping occurrences."""
+    spans: list[tuple[int, int]] = []
+    start = text.find(literal)
+    while start != -1:
+        spans.append((start, start + len(literal)))
+        start = text.find(literal, start + len(literal))
+    return spans
+
+
+def _sub_with_origins(
+    text: str, origins: list[int], pattern: re.Pattern[str], replacement: str
+) -> tuple[str, list[int]]:
+    """`pattern.sub(replacement, text)` with the origins of the surviving characters carried.
+
+    `re.sub` expands `\\1` and `\\g<name>` in a replacement; the replacements this is used with
+    are the plain strings of the two rewrite tables, and what refuses one whose expansion would
+    make this a different transform is the byte-parity check against `approved_changes`.
+    """
+    edits = [(match.start(), match.end(), replacement) for match in pattern.finditer(text)]
+    return _splice_origins(text, origins, edits)
+
+
+def _published_row_origins(text: str, origins: list[int]) -> list[frozenset[int]]:
+    """For every data row of `text`, the baseline lines its characters were cut from.
+
+    A row is taken with its line terminator, because an entry may rewrite a row's whole body
+    without spelling the newline after it, and that newline is then the row's remaining evidence
+    of where it came from. An empty set means no baseline line contributed a character at all:
+    the row is one the transform minted.
+    """
+    kept = text.splitlines(keepends=True)
+    starts: list[int] = []
+    offset = 0
+    for line in kept:
+        starts.append(offset)
+        offset += len(line)
+    return [
+        frozenset(
+            origin
+            for origin in origins[starts[index] : starts[index] + len(kept[index])]
+            if origin != _CHAIN_WRITTEN
+        )
+        for index in _data_row_indices(text.splitlines())
+    ]
+
+
+def _is_full_row_removal(text: str, a: str, b: str, delta: int) -> bool:
     """Whether a row-count-changing chain entry has the one sanctioned shape: a whole row out.
 
     `b` empty, `a` a complete counted row of `text` -- the chain-intermediate text this entry
-    runs against -- carried with its trailing newline and no other, exactly one row fewer
-    afterwards, and the line it removes a member of `frozen_rows`: the counted rows the text
-    carried before the first entry of the chain ran. The complete-line requirement is what
-    separates a sanctioned removal from a rewrite keyed on a fragment of the row's own body,
-    which ends at the same newline and also costs one row, by merging what precedes it into the
-    following line. Being a complete line is not enough on its own: a non-row line sitting
-    between a counted row and a separator also costs exactly one row when it goes, because the
-    row above it then reads as a header, and the row that actually left is named nowhere in the
-    diff. So the line removed has to be one the count was carrying, which is what membership in
-    `table_data_rows(text)` says.
+    runs against -- carried with its trailing newline and no other, and exactly one row fewer
+    afterwards. The complete-line requirement is what separates a sanctioned removal from a
+    rewrite keyed on a fragment of the row's own body, which ends at the same newline and also
+    costs one row, by merging what precedes it into the following line. Being a complete line is
+    not enough on its own: a non-row line sitting between a counted row and a separator also
+    costs exactly one row when it goes, because the row above it then reads as a header, and the
+    row that actually left is named nowhere in the diff. So the line removed has to be one the
+    count was carrying, which is what membership in `table_data_rows(text)` says.
 
-    Being a counted row of that intermediate text is in turn not enough, because the chain
-    produces it. An earlier entry that changes no row count can rewrite a row down to its first
-    cell, and a later entry keyed on that cell then spells a whole counted line, so the pair
-    retires a row by name while each half looks sanctioned. Requiring the removed line to be a
-    frozen row as well is what keeps a credited literal text the catalogue itself carried. What
-    stays unchecked is that the row which left is the row that line names: this counts rows, it
-    does not match them.
+    This is shape alone, and shape is where a text-level test stops: whether the line taken out
+    is the frozen row it spells, or a line an earlier entry reshaped into that text, is
+    `_retired_baseline_row`'s question, and that is what credits an entry with a row.
 
     An entry that adds a row (`delta < 0`) is refused here too, fail-closed: the identity this
     feeds subtracts drops and carries no term for an addition, so admitting one takes a reviewed
@@ -1637,37 +1750,72 @@ def _is_full_row_removal(
         and delta == 1
         and a.endswith("\n")
         and "\n" not in a[:-1]
-        and a[:-1] in frozen_rows
         and a[:-1] in table_data_rows(text.splitlines())
     )
 
 
-def _chain_row_drops(text: str, chain: list[tuple[str, str]]) -> tuple[str, int, list[str]]:
-    """Replay `chain` over `text`; return the transformed text, its full-row removal entries,
-    and the entries that are neither that nor row-neutral.
+def _retired_baseline_row(
+    text: str,
+    origins: list[int],
+    baseline_lines: list[str],
+    baseline_rows: frozenset[int],
+    spans: list[tuple[int, int]],
+    a: str,
+    b: str,
+    delta: int,
+) -> int | None:
+    """The baseline data row a chain entry retires, or `None` if it retires nothing sanctioned.
+
+    An entry is credited with a row only when what it deletes is that row still intact: one
+    occurrence, every character of it cut from the same baseline line, and as many characters as
+    that line has, so that the deleted span is the whole frozen row with no part of it rewritten.
+    Asking instead whether the deleted text is *a* frozen row -- which is what a set membership
+    answers -- says nothing about the occurrence being deleted, and a row-neutral entry may put
+    the text of a frozen row wherever it likes. What it cannot do is give the characters it
+    writes an origin.
+    """
+    if not _is_full_row_removal(text, a, b, delta):
+        return None
+    if len(spans) != 1:
+        return None
+    start, end = spans[0]
+    cut = set(origins[start:end])
+    if len(cut) != 1:
+        return None
+    (index,) = tuple(cut)
+    if index not in baseline_rows or baseline_lines[index] != a:
+        return None
+    return index
+
+
+def _chain_row_drops(
+    text: str, chain: list[tuple[str, str]]
+) -> tuple[str, list[int], list[int], list[str]]:
+    """Replay `chain` over `text`; return the transformed text, the origin of each of its
+    characters, the baseline rows its entries are credited with retiring, and the entries that
+    are neither a sanctioned removal nor row-neutral.
 
     Every entry is measured against the row count of the whole chain-intermediate text. A screen
     on the two literals' newline counts would examine only the entries that change the line
     count, and a row can go with the line count intact -- a row rewritten into an empty line or
     into a separator -- so a pair of entries, one such loss and one row minted elsewhere, would
     keep the total and never be looked at. An entry is refused unless its replacement carries no
-    more table rows than its search literal and it either leaves the row count alone or is a
-    full-row removal in the sense of `_is_full_row_removal`, which admits exactly one row out.
+    more table rows than its search literal and it either leaves the row count alone or retires
+    one whole baseline row in the sense of `_retired_baseline_row`.
     The two literals are counted by `_table_row_lines`, by row shape, because each is measured
     outside the document it runs against; that screen is a screen and not a bound, and what
     refuses a minted row is the row-count delta over the whole intermediate text.
 
-    The rows of `text` as it arrives -- the frozen baseline slice, at the one call site that
-    matters -- are captured before the first entry runs, and are what a credited removal has to
-    name. Measuring that membership against the running text instead would let the chain
-    manufacture its own sanction: a row-neutral entry reshapes a row, a later entry removes what
-    it wrote, and the row leaves without its frozen text ever appearing as a search literal.
+    A credit is a baseline line index, not a text. So an entry cannot be credited with a row
+    another entry has already taken out, however the running text has come to spell that row
+    again, and the caller can ask which rows are missing rather than only how many.
     """
-    removals = 0
+    credited: list[int] = []
     ill_shaped: list[str] = []
-    frozen_row_lines = table_data_rows(text.splitlines())
-    frozen_rows = frozenset(frozen_row_lines)
-    rows_now = len(frozen_row_lines)
+    origins = _baseline_line_origins(text)
+    baseline_lines = text.splitlines(keepends=True)
+    baseline_rows = frozenset(_data_row_indices(text.splitlines()))
+    rows_now = len(baseline_rows)
     for a, b in chain:
         rows_sought = len(_table_row_lines(a))
         rows_written = len(_table_row_lines(b))
@@ -1676,22 +1824,35 @@ def _chain_row_drops(text: str, chain: list[tuple[str, str]]) -> tuple[str, int,
                 f"{a[:80]!r} -> {b[:40]!r} (writes {rows_written} table rows where it seeks "
                 f"{rows_sought})"
             )
-        replaced = text.replace(a, b)
+        if not a:
+            # `str.replace` would write `b` between every pair of characters; refused rather
+            # than replayed, and the parity check below would refuse the divergence anyway.
+            ill_shaped.append(f"'' -> {b[:40]!r} (empty search literal)")
+            continue
+        spans = _literal_spans(text, a)
+        if not spans:
+            continue
+        replaced, replaced_origins = _splice_origins(
+            text, origins, [(start, end, b) for start, end in spans]
+        )
         if replaced == text:
             continue
         rows_after = len(table_data_rows(replaced.splitlines()))
         delta = rows_now - rows_after
         if delta:
-            if _is_full_row_removal(text, frozen_rows, a, b, delta):
-                removals += 1
-            else:
+            retired = _retired_baseline_row(
+                text, origins, baseline_lines, baseline_rows, spans, a, b, delta
+            )
+            if retired is None or retired in credited:
                 ill_shaped.append(
-                    f"{a[:80]!r} -> {b[:40]!r} (changes the row count by {delta} without being "
-                    "a full-row removal)"
+                    f"{a[:80]!r} -> {b[:40]!r} (changes the row count by {delta} without "
+                    "deleting one whole baseline row intact)"
                 )
-        text = replaced
+            else:
+                credited.append(retired)
+        text, origins = replaced, replaced_origins
         rows_now = rows_after
-    return text, removals, ill_shaped
+    return text, origins, credited, ill_shaped
 
 
 def _row_conservation_violations(
@@ -1702,21 +1863,27 @@ def _row_conservation_violations(
     Both are parameters only so that the positive controls below can drive this with a mutated
     copy of this file's own `_approved_replacements`, and with a row sequence a rewrite outside
     the chain has thinned, which is the defect class the identity exists to refuse.
+
+    The rows that left are matched, not counted: the replay carries every character's origin, so
+    the baseline rows no published row descends from can be compared, as a multiset, against the
+    rows the credited entries name. Counting instead lets a row-neutral entry reshape one row
+    into the text of another and hand a later entry a credit the chain has already spent.
     """
     chain, violations = _approved_replacements_chain(source)
     if violations:
         return ["_approved_replacements shape violation: " + "; ".join(violations)]
     baseline_text = catalogue_baseline_text()
-    baseline_rows = len(table_data_rows(baseline_text.splitlines()))
-    if baseline_rows != BASELINE_CATALOGUE_ROW_COUNT:
+    baseline_lines = baseline_text.splitlines()
+    baseline_rows = _data_row_indices(baseline_lines)
+    if len(baseline_rows) != BASELINE_CATALOGUE_ROW_COUNT:
         return [
             "BASELINE_CATALOGUE_ROW_COUNT is stale: expected "
-            f"{BASELINE_CATALOGUE_ROW_COUNT}, the frozen baseline slice has {baseline_rows} "
+            f"{BASELINE_CATALOGUE_ROW_COUNT}, the frozen baseline slice has {len(baseline_rows)} "
             "rows. Recompute with: python3 -c 'import sys; sys.path.insert(0, \"scripts\"); "
             "import check_docs_hierarchy as c; "
             "print(len(c.table_data_rows(c.catalogue_baseline_text().splitlines())))'"
         ]
-    after_chain, removals, ill_shaped = _chain_row_drops(baseline_text, chain)
+    after_chain, origins, credited, ill_shaped = _chain_row_drops(baseline_text, chain)
     if ill_shaped:
         violations.append(
             "audited chain entry is not a sanctioned rewrite: " + "; ".join(ill_shaped)
@@ -1733,12 +1900,45 @@ def _row_conservation_violations(
             f"_drop_private_instructions_ref {rows_after_private} of {rows_after_citations}, "
             "where a row leaves only by a literal of the audited chain"
         )
+    tracked = after_chain
+    for pattern, replacement in _WORKING_NOTE_CITATION_REWRITES + _PRIVATE_INSTRUCTIONS_REWRITES:
+        tracked, origins = _sub_with_origins(tracked, origins, pattern, replacement)
+    if tracked != after_private:
+        violations.append(
+            "the replay that carries origins does not reproduce the published text, so the rows "
+            "it traces are not the published rows: the structural passes and the rewrite tables "
+            "they are replayed from have to stay one transform"
+        )
+        return violations
+    row_origins = _published_row_origins(tracked, origins)
+    minted = sum(1 for origin in row_origins if not origin)
+    merged = sum(1 for origin in row_origins if len(origin) > 1)
+    if minted or merged:
+        violations.append(
+            f"published rows do not descend from the baseline one for one: {minted} descend "
+            f"from no baseline line and {merged} from more than one, where every published row "
+            "is one baseline line the chain rewrote in place"
+        )
+    descended = [next(iter(origin)) for origin in row_origins if len(origin) == 1]
+    if len(set(descended)) != len(descended):
+        violations.append(
+            f"{len(descended) - len(set(descended))} baseline row(s) descend into more than one "
+            "published row, so a row the catalogue no longer carries could be standing behind a "
+            "copy of another"
+        )
+    removed = sorted(set(baseline_rows) - set(descended))
+    if removed != sorted(credited):
+        violations.append(
+            "the rows that left the catalogue are not the rows the audited chain retires: left "
+            f"{[baseline_lines[index][:60] for index in removed]}, retired by an entry "
+            f"{[baseline_lines[index][:60] for index in sorted(credited)]}"
+        )
     published = len(published_rows())
-    if BASELINE_CATALOGUE_ROW_COUNT - removals != published:
+    if BASELINE_CATALOGUE_ROW_COUNT - len(removed) != published:
         violations.append(
             "row conservation identity failed: BASELINE_CATALOGUE_ROW_COUNT "
-            f"({BASELINE_CATALOGUE_ROW_COUNT}) - full-row removal entries of the audited chain "
-            f"({removals}) != published rows ({published}), so a row left the catalogue "
+            f"({BASELINE_CATALOGUE_ROW_COUNT}) - the rows that left the frozen slice "
+            f"({len(removed)}) != published rows ({published}), so a row left the catalogue "
             "somewhere other than a full-row literal of that chain"
         )
     return violations
@@ -1747,19 +1947,22 @@ def _row_conservation_violations(
 def approved_replacements_shape_and_row_identity_self_test() -> None:
     """Refuse any row loss that is not a full-row literal of the audited `.replace` chain.
 
-    The row-conservation identity replays that chain entry by entry over the frozen baseline
-    slice and requires `BASELINE_CATALOGUE_ROW_COUNT - (its full-row removal entries) ==
-    len(published_catalogue_rows())`, with every entry measured, every entry that changes the row
-    count a full-row removal in the sense of `_is_full_row_removal`, no entry writing more table
-    rows than it seeks, and with the two structural passes
-    (`_drop_working_note_citations`, `_drop_private_instructions_ref`) dropping no row at all.
-    Unlike the two pins of `approved_changes_byte_parity_self_test`, an identity between three
-    quantities is not satisfiable by recomputing anything: an entry is credited only for a search
-    literal that is one whole counted row of the frozen slice, so a rewrite keyed on a Lean name
-    -- at any narrowing, at any depth, and whether or not an earlier row-neutral entry has already
-    reshaped the row it takes out -- leaves the published catalogue short of what the chain
-    accounts for. What the identity does not do is match rows: that the row which left is the row
-    the credited literal names is checked nowhere.
+    The row-conservation check replays that chain entry by entry over the frozen baseline slice,
+    carrying the origin of every character, and requires the rows that left to be the rows the
+    entries name: the baseline rows no published row descends from have to equal, as a multiset,
+    the rows the credited entries retire, no published row may descend from no baseline line or
+    from two, no baseline row may descend into two published rows, and
+    `len(published_catalogue_rows()) == BASELINE_CATALOGUE_ROW_COUNT - (the rows that left)`.
+    Every entry is measured, no entry may write more table rows than it seeks, and the two
+    structural passes (`_drop_working_note_citations`, `_drop_private_instructions_ref`) may drop
+    no row at all. Unlike the two pins of `approved_changes_byte_parity_self_test`, none of this
+    is satisfiable by recomputing anything: an entry is credited only when what it deletes is a
+    frozen row still intact, so a rewrite keyed on a Lean name -- at any narrowing, at any depth
+    -- leaves the published catalogue short of what the chain accounts for, and reshaping one row
+    into the text of another buys nothing, because the credit for that text has an origin and the
+    reshaped row does not carry it. What is not matched is what a surviving row says: an entry of
+    the reviewed chain may rewrite a published row's whole body, and the row still descends from
+    the baseline line it was cut from.
 
     The shape rule requires `_approved_replacements` to keep the form
     `_approved_replacements_chain` parses, which is what makes that attribution a legible diff
@@ -1835,6 +2038,15 @@ def approved_replacements_shape_and_row_identity_self_test() -> None:
             "shape/row-identity control setup: the name-keyed shim dropped no row, so its "
             f"control below would be probing the published sequence itself ({control_cell})"
         )
+    # The verdict on the real chain comes before the two controls that drive the same function
+    # with an injected defect. A source that is already refused has lost rows of its own, and the
+    # identity can then hold for an injected sequence by arithmetic; reporting that a control was
+    # silent would name the control where the defect is the source. Every control below is still
+    # reached on a run that would otherwise be green, because green means this list is empty.
+    violations = _row_conservation_violations(source, published_catalogue_rows)
+    if violations:
+        fail("; ".join(violations))
+
     refusals = _row_conservation_violations(source, lambda: thinned)
     if not any("row conservation identity failed" in refusal for refusal in refusals):
         fail(
@@ -1844,9 +2056,11 @@ def approved_replacements_shape_and_row_identity_self_test() -> None:
         )
 
     baseline_text = catalogue_baseline_text()
-    frozen_row_lines = table_data_rows(baseline_text.splitlines())
-    frozen_rows = frozenset(frozen_row_lines)
-    if not frozen_row_lines:
+    baseline_lines = baseline_text.splitlines(keepends=True)
+    baseline_rows = frozenset(_data_row_indices(baseline_text.splitlines()))
+    baseline_origins = _baseline_line_origins(baseline_text)
+    frozen_rows = frozenset(table_data_rows(baseline_text.splitlines()))
+    if not baseline_rows:
         fail(
             "shape/row-identity control setup: the frozen baseline slice carries no counted row, "
             "so the attribution controls below would be probing an empty set"
@@ -1857,37 +2071,99 @@ def approved_replacements_shape_and_row_identity_self_test() -> None:
             "shape/row-identity control setup: the first published row carries no body cell to "
             "key a fragment removal on"
         )
-    if _is_full_row_removal(baseline_text, frozen_rows, body_fragment, "", 1):
+    if _is_full_row_removal(baseline_text, body_fragment, "", 1):
         fail(
             "shape/row-identity control did not fire: a removal keyed on a fragment of a row's "
-            "body was attributed as a full-row removal, so the identity's attribution admits "
-            "the rewrite it exists to refuse"
+            "body has the shape of a full-row removal, so the screen the attribution rests on "
+            "admits the rewrite it exists to refuse"
         )
 
-    minted_row = "| `_row_an_earlier_entry_wrote` | not a row of the frozen slice |"
-    minted_text = baseline_text + minted_row + "\n"
-    if minted_row not in table_data_rows(minted_text.splitlines()):
+    first_row = min(baseline_rows)
+    first_row_spans = _literal_spans(baseline_text, baseline_lines[first_row])
+    if len(first_row_spans) != 1:
         fail(
-            "shape/row-identity control setup: the line standing in for what an earlier entry "
-            "wrote is not a counted row of the intermediate text, so its control below would "
-            "hold for the wrong reason"
+            "shape/row-identity control setup: the first frozen baseline row is not a unique "
+            "occurrence of its text, so the attribution control below would be measuring a span "
+            "the chain would not delete"
         )
-    if _is_full_row_removal(minted_text, frozen_rows, minted_row + "\n", "", 1):
-        fail(
-            "shape/row-identity control did not fire: a removal of a whole line the chain itself "
-            "had written was attributed as a full-row removal, so a row-neutral rewrite followed "
-            "by a removal of what it wrote still counts as sanctioned"
+    if (
+        _retired_baseline_row(
+            baseline_text,
+            baseline_origins,
+            baseline_lines,
+            baseline_rows,
+            first_row_spans,
+            baseline_lines[first_row],
+            "",
+            1,
         )
-    if not _is_full_row_removal(baseline_text, frozen_rows, frozen_row_lines[0] + "\n", "", 1):
+        != first_row
+    ):
         fail(
             "shape/row-identity control setup: the attribution refuses a removal of a row of the "
             "frozen slice, so it would refuse the sanctioned removals of the audited chain too "
             "and the identity below would hold for the wrong reason"
         )
 
-    violations = _row_conservation_violations(source, published_catalogue_rows)
-    if violations:
-        fail("; ".join(violations))
+    minted_text = baseline_text + baseline_lines[first_row]
+    minted_origins = baseline_origins + [_CHAIN_WRITTEN] * len(baseline_lines[first_row])
+    if (
+        _retired_baseline_row(
+            minted_text,
+            minted_origins,
+            baseline_lines,
+            baseline_rows,
+            [(len(baseline_text), len(minted_text))],
+            baseline_lines[first_row],
+            "",
+            1,
+        )
+        is not None
+    ):
+        fail(
+            "shape/row-identity control did not fire: deleting a line the transform itself "
+            "wrote was credited with the frozen row whose text it spells, so an occurrence a "
+            "row-neutral rewrite manufactured still passes as the row it names"
+        )
+
+    unique_rows = [
+        row for row in published if row in frozen_rows and baseline_text.count(row + "\n") == 1
+    ]
+    if len(unique_rows) < 2:
+        fail(
+            "shape/row-identity control setup: fewer than two published rows are a frozen row "
+            "spelled once, so the staged pair below could not be built"
+        )
+
+    def spend_one_credit_twice(node: ast.FunctionDef) -> None:
+        """Retire one row, reshape a second into the text of the first, and delete that text
+        again: two rows leave against one entry that names a frozen row, which is what a credit
+        counted per entry cannot tell from two sanctioned removals."""
+        retired, live = unique_rows[0], unique_rows[1]
+        expression = node.body[-1].value.args[0]
+        for search, written in (
+            (retired + "\n", ""),
+            (live, retired),
+            (retired + "\n", ""),
+        ):
+            expression = ast.Call(
+                func=ast.Attribute(value=expression, attr="replace", ctx=ast.Load()),
+                args=[ast.Constant(value=search), ast.Constant(value=written)],
+                keywords=[],
+            )
+        node.body[-1].value.args[0] = expression
+
+    refusals = _row_conservation_violations(
+        mutated_chain_source(spend_one_credit_twice), published_catalogue_rows
+    )
+    if not any("are not the rows the audited chain retires" in refusal for refusal in refusals):
+        fail(
+            "shape/row-identity control did not fire: a row reshaped into the text of a row the "
+            "chain had already retired, and then deleted, left the catalogue while the credit "
+            "for the row it names had already been spent, so the check is counting rows instead "
+            f"of matching them (got {refusals})"
+        )
+
     source_actual = _script_source_sha256()
     if source_actual != SCRIPT_SOURCE_SHA256:
         fail(
