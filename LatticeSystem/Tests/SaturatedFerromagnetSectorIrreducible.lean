@@ -1,7 +1,5 @@
-import LatticeSystem.Quantum.SpinS.MultiSiteDotOffDiag
-import LatticeSystem.Quantum.SpinS.HeisenbergRaiseLower
-import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorMarshallCore
-import LatticeSystem.Quantum.SpinS.ConnectedDressedPF
+import LatticeSystem.Quantum.SpinS.FerromagneticHeisenbergSign
+import LatticeSystem.Quantum.SpinS.FerromagneticSectorIrreducible
 
 /-!
 # Signature pin: off-diagonal signs and connected-sector irreducibility (Tasaki §2.4)
