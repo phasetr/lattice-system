@@ -86,4 +86,55 @@ theorem heisenbergHamiltonianSReMatrixOnMagSector_mulVec_ladder_restriction
   exact heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec N hJ_real
     (heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen J hfull)
 
+/-- **Perron-Frobenius simplicity of the sector ground state** (Tasaki §2.4 Theorem 2.1, p. 34;
+solution of Problem 2.4.a, p. 496; Theorem A.18, p. 475).
+
+On a connected graph with a real, symmetric, edge-supported and strictly ferromagnetic coupling,
+the eigenspace of the complex magnetization-sector matrix at the saturated-ferromagnet eigenvalue
+is at most one-dimensional.  Theorem A.18 is applied to `c·1 - Ĥ|_sector`, which is non-negative
+and irreducible and carries the strictly positive eigenvector supplied by the ladder state; the
+diagonal shift `c` is produced here rather than assumed, so the hypotheses are the book's.
+
+The spin hypothesis `1 ≤ N` is not used by this Perron-Frobenius step; it is carried because it is
+the standing assumption `S ≥ 1/2` of §2.4 and of the Theorem 2.1 capstone this feeds. -/
+theorem heisenbergHamiltonianSMatrixOnMagSector_finrank_le_one_of_connected_ferro
+    {G : SimpleGraph V} {J : V → V → ℂ}
+    (hGconn : G.Connected)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_supp : ∀ x y, ¬ G.Adj x y → J x y = 0)
+    (hJ_ferro : ∀ x y, G.Adj x y → (J x y).re < 0)
+    (_hN : 1 ≤ N) (k : Fin (Fintype.card V * N + 1)) :
+    Module.finrank ℂ
+        (Module.End.eigenspace
+          (Matrix.toLin' (heisenbergHamiltonianSMatrixOnMagSector J N k.val))
+          (saturatedFerromagnetEigenvalueS (V := V) J N)) ≤ 1 := by
+  classical
+  haveI : Nonempty (magConfigS V N k.val) :=
+    magConfigS_nonempty_of_le_card_mul (Nat.lt_succ_iff.mp k.isLt)
+  obtain ⟨c, hc⟩ := LatticeSystem.Math.exists_gt_of_finite
+    (fun σ : V → Fin (N + 1) => heisenbergHamiltonianSReMatrix J N σ σ)
+  have hshift :
+      (c • (1 : Matrix (magConfigS V N k.val) (magConfigS V N k.val) ℝ)
+            - heisenbergHamiltonianSReMatrixOnMagSector J N k.val).mulVec
+          (fun σ => (magSectorRestriction (M := k.val) (ladderIterateUp V N k) σ).re) =
+        (c - (saturatedFerromagnetEigenvalueS (V := V) J N).re) •
+          fun σ => (magSectorRestriction (M := k.val) (ladderIterateUp V N k) σ).re := by
+    rw [Matrix.sub_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec,
+      heisenbergHamiltonianSReMatrixOnMagSector_mulVec_ladder_restriction J hJ_real k, sub_smul]
+  have hre := LatticeSystem.Math.PerronFrobenius.eigenspace_finrank_le_one_of_pos_eigenvec
+    (isIrreducible_shiftedHeisenbergSReMatrixOnMagSector_connected_ferro
+      (N := N) (M := k.val) hGconn hJ_supp hJ_ferro hJ_real hJ_sym hc)
+    hshift fun σ => ladderIterateUp_restriction_re_pos k σ
+  rw [eigenspace_smul_one_sub_finrank_eq, sub_sub_cancel] at hre
+  have hcplx := matrix_complex_eigenspace_finrank_le_one_of_real
+    (heisenbergHamiltonianSReMatrixOnMagSector J N k.val)
+    (saturatedFerromagnetEigenvalueS (V := V) J N).re hre
+  have hmap : (heisenbergHamiltonianSReMatrixOnMagSector J N k.val).map ((↑) : ℝ → ℂ) =
+      heisenbergHamiltonianSMatrixOnMagSector J N k.val := by
+    ext σ τ
+    rw [Matrix.map_apply]
+    exact (heisenbergHamiltonianSMatrixOnMagSector_apply_eq_ofReal N k.val hJ_real σ τ).symm
+  rwa [hmap, saturatedFerromagnetEigenvalueS_ofReal_re hJ_real] at hcplx
+
 end LatticeSystem.Quantum
