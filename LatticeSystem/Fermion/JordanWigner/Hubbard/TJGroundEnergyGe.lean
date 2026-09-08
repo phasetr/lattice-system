@@ -5,6 +5,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorGroundState
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJHermitian
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 import LatticeSystem.Math.AngularMomentum.SpinHalfSector
+import LatticeSystem.Math.FiniteStrictUpperBound
 
 /-!
 # Tasaki 11.5: the Perron–Frobenius minimum bounds the ground energy (Prop 11.24 PR-E2 ≥)
@@ -151,11 +152,8 @@ theorem tJHamiltonian_groundEnergyAtFilling_eq_perronFrobeniusMin (hpos : 0 < N)
   haveI : Fact (Odd Ne) := ⟨hodd⟩
   obtain ⟨c, hc⟩ : ∃ c : ℝ, ∀ q : TJSpinHalfFillingSector N Ne,
       tJEffReMatrixOnSector N Ne (cycleGraph (N + 1)) τ J q q < c :=
-    ⟨(Finset.univ.sup' Finset.univ_nonempty
-        (fun q => tJEffReMatrixOnSector N Ne (cycleGraph (N + 1)) τ J q q)) + 1,
-      fun q => lt_of_le_of_lt
-        (Finset.le_sup' (fun q => tJEffReMatrixOnSector N Ne (cycleGraph (N + 1)) τ J q q)
-          (Finset.mem_univ q)) (lt_add_one _)⟩
+    LatticeSystem.Math.exists_gt_of_finite
+      fun q => tJEffReMatrixOnSector N Ne (cycleGraph (N + 1)) τ J q q
   obtain ⟨μ, v, hvpos, hveig, hmin, _⟩ :=
     tJEffReMatrixOnSector_perronFrobenius hpos Ne hNeLt hodd τ J hτ hJ c hc
   have hv0 : v ≠ 0 := by

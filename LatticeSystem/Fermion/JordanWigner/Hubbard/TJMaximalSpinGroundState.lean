@@ -2,6 +2,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJRaisePositivity
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJHighestWeight
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJExpansionSpinEigen
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJGroundEnergyGe
+import LatticeSystem.Math.FiniteStrictUpperBound
 
 /-!
 # Tasaki 11.5: a maximal-spin highest-weight ground state (Prop 11.24 E3b/E4 PR6a)
@@ -47,11 +48,8 @@ theorem tJ_exists_maximalSpin_highestWeight_groundState (hpos : 0 < N) (Ne : ℕ
   -- Perron–Frobenius eigenvector
   obtain ⟨c0, hc0⟩ : ∃ c : ℝ, ∀ q : TJSpinHalfFillingSector N Ne,
       tJEffReMatrixOnSector N Ne (cycleGraph (N + 1)) τ J q q < c :=
-    ⟨(Finset.univ.sup' Finset.univ_nonempty
-        (fun q => tJEffReMatrixOnSector N Ne (cycleGraph (N + 1)) τ J q q)) + 1,
-      fun q => lt_of_le_of_lt
-        (Finset.le_sup' (fun q => tJEffReMatrixOnSector N Ne (cycleGraph (N + 1)) τ J q q)
-          (Finset.mem_univ q)) (lt_add_one _)⟩
+    LatticeSystem.Math.exists_gt_of_finite
+      fun q => tJEffReMatrixOnSector N Ne (cycleGraph (N + 1)) τ J q q
   obtain ⟨μ, v, hvpos, hveig, hmin, _⟩ :=
     tJEffReMatrixOnSector_perronFrobenius hpos Ne hNeLt hodd τ J hτ hJ c0 hc0
   have hv0 : v ≠ 0 := fun h => by
