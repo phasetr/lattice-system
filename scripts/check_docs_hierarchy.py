@@ -3,21 +3,24 @@ r"""Validate the staged human-documentation hierarchy with the Python stdlib.
 
 The published catalogue is `docs/index.md` frozen at `BASELINE_COMMIT` and put through
 `approved_changes`: a single chain of audited literal rewrites. The removal entries search
-verbatim baseline text -- a row leaves the published catalogue only by a rewrite of its own full
-frozen row text, trailing newline included, to the empty string -- while some correction entries
-search text an earlier entry in the chain inserts, as their own comments record. That no entry
-retires a row by keying on a Lean name is enforced by
-`approved_replacements_shape_and_row_identity_self_test`: `_approved_replacements` has to stay a
-chain of two-string-literal `.replace` calls, and `BASELINE_CATALOGUE_ROW_COUNT - (the full-row
-removal entries of that chain) == len(published_catalogue_rows())` has to hold with every entry
-that changes the row count spelled as one whole frozen line, so a rewrite keyed on a name, at any
-narrowing and at any depth, leaves the catalogue short of what the chain accounts for. Every
-entry is measured, not only the ones whose literals differ in newline count, and an entry that
-mints a row is refused as well, until a reviewed diff generalizes the identity to carry a term
-for one. The absence of a declaration from the Lean tree is in any case never on its own a
-reason to retire the row that records it: at the revision this was measured, 91 of the 2050
-published catalogue rows (4.4%) name at least one identifier the Lean tree no longer spells --
-64 of them name nothing else -- across 148 distinct absent identifier tokens.
+verbatim baseline text -- an entry is credited with retiring a row only when it rewrites to the
+empty string one whole line, trailing newline included, that the frozen baseline slice itself
+carries as a counted row -- while some correction entries search text an earlier entry in the
+chain inserts, as their own comments record. That no entry retires a row by keying on a Lean name
+is enforced by `approved_replacements_shape_and_row_identity_self_test`: `_approved_replacements`
+has to stay a chain of two-string-literal `.replace` calls, and `BASELINE_CATALOGUE_ROW_COUNT -
+(the full-row removal entries of that chain) == len(published_catalogue_rows())` has to hold with
+every entry that changes the row count spelled as one whole row of the frozen slice. Membership is
+measured against that frozen slice and not against the text the earlier entries have already
+produced, so a row-neutral rewrite cannot reshape a row into a line a later entry is then credited
+with retiring: a rewrite keyed on a name, at any narrowing and at any depth, leaves the catalogue
+short of what the chain accounts for. Every entry is measured, not only the ones whose literals
+differ in newline count, and an entry that mints a row is refused as well, until a reviewed diff
+generalizes the identity to carry a term for one. The absence of a declaration from the Lean tree
+is in any case never on its own a reason to retire the row that records it: at the revision this
+was measured, 91 of the 2050 published catalogue rows (4.4%) name at least one identifier the Lean
+tree no longer spells -- 64 of them name nothing else -- across 148 distinct absent identifier
+tokens.
 
 Two pins cover the transform. `APPROVED_CHANGES_SHA256` pins sha256 over
 
@@ -78,12 +81,30 @@ that rewrites what the audited chain returns, a rebinding of `table_data_rows` n
 compound statement or spelled beside a pin on the pin's own line -- cannot be exonerated by a pin
 that stood still.
 
-One residual stays with review. Editing the row-derivation machinery and recomputing its pins
-passes every check here, as does editing the pages and recomputing the two byte-parity pins,
-because a recompute restates what the machinery now produces and judges nothing about it. What
-the identity buys against that is a single channel: a row can leave the published catalogue only
-through one full-row literal of one reviewed list, and every other route now moves a constant no
-content edit touches.
+Three residuals stay with review, and none of them is closed by anything here.
+
+Editing the row-derivation machinery and recomputing its pins passes every check here, as does
+editing the pages and recomputing the two byte-parity pins, because a recompute restates what the
+machinery now produces and judges nothing about it. What the identity buys against that is a
+narrow channel: an entry of the reviewed chain is credited with retiring a row only when its
+search literal is one whole counted row of the frozen slice, and every other route moves a
+constant no content edit touches. A moved constant is reported through `fail`, so an edit whose
+payload is a rebinding of `fail`, or an exit before the self-tests run, leaves a stale pin and a
+green run. Such an edit is itself an edit to this file and so is the same machinery channel, with
+the same sanctioned path: a reviewed commit that recomputes every pin. `_masked_pin_span` is the
+one refusal that does not go through `fail`, because the statement it refuses can be that
+rebinding spelled on a pin's own line.
+
+The identity counts rows and does not match them: that the row missing from the published
+catalogue is the row the credited literal names is checked nowhere.
+
+Which page publishes a row is enforced by nothing. `main()` compares the rows of every legacy
+page, concatenated in page order, against one expected sequence, and the per-marker prose parity
+excludes pipe-led lines by design because the rows have that stronger check, so moving a row from
+one page's `legacy-source` marker into another's, at a position that preserves the global order,
+passes -- and takes the row's permalink and anchor with it. This predates the identity and is
+outside its subject: closing it means comparing rows per source marker against the baseline lines
+that marker declares, which is a different check with a baseline of its own.
 """
 
 from __future__ import annotations
@@ -1333,7 +1354,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "69d9980926a8482aabb06c52021d37cedac464263d36dcb9c9ad663fb243d2d2"
+SCRIPT_SOURCE_SHA256 = "08eb74ef724c128873d7781201413a8b6583bd5d6b6c3c2b8487f659c74f0dff"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -1364,9 +1385,13 @@ def _masked_pin_span(name: str, line: str, node: ast.Assign) -> tuple[int, int]:
     whatever else the line held -- `PIN = "..." ; table_data_rows = <a wrapper>` -- out of the
     digest, which is the one thing this pin exists to make impossible, and a line-wide rewrite
     would launder the same statement out of a mirror. Masking columns is sound only on a line
-    that carries nothing else, so anything but `NAME = "<64 hex digits>"` occupying the whole
-    physical line is refused here, fail-closed. That spelling is also pure ASCII, which is what
-    makes the UTF-8 byte offsets `ast` reports usable as string indices.
+    that carries nothing else, so anything but `NAME = "<64 hex digits>"` filling `line` is
+    refused here, fail-closed. `line` is what the callers cut on the line feed alone, which is the
+    unit the parser reporting `node.lineno` counts in: `str.splitlines()` would end a line at
+    U+000B, U+000C, U+001C-U+001E, U+0085, U+2028 or U+2029 as well, all of them mere whitespace
+    to Python, and a pin followed by one of them and a second statement would reach this rule as
+    the bare assignment it is not. That spelling is also pure ASCII, which is what makes the UTF-8
+    byte offsets `ast` reports usable as string indices.
 
     The refusal raises rather than only calling `fail`, which is not redundant: the statement it
     refuses can be a rebinding of `fail` itself, and a refusal that reports through the name it
@@ -1478,7 +1503,11 @@ def _script_source_sha256(source: str | None = None) -> str:
     The masked unit is the literal's own column span, not its physical line, and
     `_masked_pin_span` refuses any pin line that carries anything besides the assignment. A
     line-wide mask leaves a `;`-separated sibling statement unhashed, so machinery surgery
-    spelled beside a pin would land with all four pins standing still.
+    spelled beside a pin would land with all four pins standing still. The lines are cut on the
+    line feed alone, the unit the parser this indexes with counts in, rather than by
+    `str.splitlines()`, which also cuts at six characters Python treats as ordinary whitespace and
+    would therefore both shift the index a pin is looked up by and hand that refusal a fragment of
+    a line to approve.
 
     The subject is the text rather than the parsed tree because `ast.dump` renders one tree
     differently on different interpreters -- measured, three distinct digests over this file
@@ -1496,7 +1525,7 @@ def _script_source_sha256(source: str | None = None) -> str:
     """
     if source is None:
         source = _own_source()
-    lines = source.splitlines()
+    lines = source.split("\n")
     pins: dict[int, ast.Assign] = {}
     for node in ast.parse(source).body:
         if (
@@ -1532,10 +1561,13 @@ def _with_recomputed_script_source_pin(script_text: str) -> str:
     carry the pin of a text it is no longer. Restating it is exact rather than a fixed-point
     search, because the digits it overwrites are the one span the digest does not hash. Only
     those digits are overwritten, so a mirror keeps whatever else its pin line holds -- which
-    `_masked_pin_span` has already refused, but the rewrite does not depend on that.
+    `_masked_pin_span` has already refused, but the rewrite does not depend on that. The text is
+    cut and rejoined on the line feed alone, the unit the digest and `_masked_pin_span` use, so
+    every byte outside those digits, line endings included, comes back unchanged and the rewrite
+    cannot disagree with the digest about where the pin's line ends.
     """
     digest = _script_source_sha256(script_text)
-    lines = script_text.splitlines(keepends=True)
+    lines = script_text.split("\n")
     for node in ast.parse(script_text).body:
         if (
             isinstance(node, ast.Assign)
@@ -1545,11 +1577,10 @@ def _with_recomputed_script_source_pin(script_text: str) -> str:
             and isinstance(node.value, ast.Constant)
             and isinstance(node.value.value, str)
         ):
-            raw = lines[node.lineno - 1]
-            line = raw.rstrip("\r\n")
+            line = lines[node.lineno - 1]
             start, end = _masked_pin_span("SCRIPT_SOURCE_SHA256", line, node)
-            lines[node.lineno - 1] = f'{line[:start]}"{digest}"{line[end:]}{raw[len(line):]}'
-            return "".join(lines)
+            lines[node.lineno - 1] = f'{line[:start]}"{digest}"{line[end:]}'
+            return "\n".join(lines)
     message = "script source pin: SCRIPT_SOURCE_SHA256 not found in the text to re-pin"
     fail(message)
     raise SystemExit(message)
@@ -1572,18 +1603,30 @@ def _approved_entries_sha256(chain: list[tuple[str, str]]) -> str:
     return digest.hexdigest()
 
 
-def _is_full_row_removal(text: str, a: str, b: str, delta: int) -> bool:
+def _is_full_row_removal(
+    text: str, frozen_rows: frozenset[str], a: str, b: str, delta: int
+) -> bool:
     """Whether a row-count-changing chain entry has the one sanctioned shape: a whole row out.
 
     `b` empty, `a` a complete counted row of `text` -- the chain-intermediate text this entry
-    runs against -- carried with its trailing newline and no other, and exactly one row fewer
-    afterwards. The complete-line requirement is what separates a sanctioned removal from a
-    rewrite keyed on a fragment of the row's own body, which ends at the same newline and also
-    costs one row, by merging what precedes it into the following line. Being a complete line is
-    not enough on its own: a non-row line sitting between a counted row and a separator also
-    costs exactly one row when it goes, because the row above it then reads as a header, and the
-    row that actually left is named nowhere in the diff. So the line removed has to be one the
-    count was carrying, which is what membership in `table_data_rows(text)` says.
+    runs against -- carried with its trailing newline and no other, exactly one row fewer
+    afterwards, and the line it removes a member of `frozen_rows`: the counted rows the text
+    carried before the first entry of the chain ran. The complete-line requirement is what
+    separates a sanctioned removal from a rewrite keyed on a fragment of the row's own body,
+    which ends at the same newline and also costs one row, by merging what precedes it into the
+    following line. Being a complete line is not enough on its own: a non-row line sitting
+    between a counted row and a separator also costs exactly one row when it goes, because the
+    row above it then reads as a header, and the row that actually left is named nowhere in the
+    diff. So the line removed has to be one the count was carrying, which is what membership in
+    `table_data_rows(text)` says.
+
+    Being a counted row of that intermediate text is in turn not enough, because the chain
+    produces it. An earlier entry that changes no row count can rewrite a row down to its first
+    cell, and a later entry keyed on that cell then spells a whole counted line, so the pair
+    retires a row by name while each half looks sanctioned. Requiring the removed line to be a
+    frozen row as well is what keeps a credited literal text the catalogue itself carried. What
+    stays unchecked is that the row which left is the row that line names: this counts rows, it
+    does not match them.
 
     An entry that adds a row (`delta < 0`) is refused here too, fail-closed: the identity this
     feeds subtracts drops and carries no term for an addition, so admitting one takes a reviewed
@@ -1594,6 +1637,7 @@ def _is_full_row_removal(text: str, a: str, b: str, delta: int) -> bool:
         and delta == 1
         and a.endswith("\n")
         and "\n" not in a[:-1]
+        and a[:-1] in frozen_rows
         and a[:-1] in table_data_rows(text.splitlines())
     )
 
@@ -1612,10 +1656,18 @@ def _chain_row_drops(text: str, chain: list[tuple[str, str]]) -> tuple[str, int,
     The two literals are counted by `_table_row_lines`, by row shape, because each is measured
     outside the document it runs against; that screen is a screen and not a bound, and what
     refuses a minted row is the row-count delta over the whole intermediate text.
+
+    The rows of `text` as it arrives -- the frozen baseline slice, at the one call site that
+    matters -- are captured before the first entry runs, and are what a credited removal has to
+    name. Measuring that membership against the running text instead would let the chain
+    manufacture its own sanction: a row-neutral entry reshapes a row, a later entry removes what
+    it wrote, and the row leaves without its frozen text ever appearing as a search literal.
     """
     removals = 0
     ill_shaped: list[str] = []
-    rows_now = len(table_data_rows(text.splitlines()))
+    frozen_row_lines = table_data_rows(text.splitlines())
+    frozen_rows = frozenset(frozen_row_lines)
+    rows_now = len(frozen_row_lines)
     for a, b in chain:
         rows_sought = len(_table_row_lines(a))
         rows_written = len(_table_row_lines(b))
@@ -1630,7 +1682,7 @@ def _chain_row_drops(text: str, chain: list[tuple[str, str]]) -> tuple[str, int,
         rows_after = len(table_data_rows(replaced.splitlines()))
         delta = rows_now - rows_after
         if delta:
-            if _is_full_row_removal(text, a, b, delta):
+            if _is_full_row_removal(text, frozen_rows, a, b, delta):
                 removals += 1
             else:
                 ill_shaped.append(
@@ -1702,9 +1754,12 @@ def approved_replacements_shape_and_row_identity_self_test() -> None:
     rows than it seeks, and with the two structural passes
     (`_drop_working_note_citations`, `_drop_private_instructions_ref`) dropping no row at all.
     Unlike the two pins of `approved_changes_byte_parity_self_test`, an identity between three
-    quantities is not satisfiable by recomputing anything: a rewrite keyed on a Lean name, at any
-    narrowing and at any depth, leaves the published catalogue short of what the chain accounts
-    for.
+    quantities is not satisfiable by recomputing anything: an entry is credited only for a search
+    literal that is one whole counted row of the frozen slice, so a rewrite keyed on a Lean name
+    -- at any narrowing, at any depth, and whether or not an earlier row-neutral entry has already
+    reshaped the row it takes out -- leaves the published catalogue short of what the chain
+    accounts for. What the identity does not do is match rows: that the row which left is the row
+    the credited literal names is checked nowhere.
 
     The shape rule requires `_approved_replacements` to keep the form
     `_approved_replacements_chain` parses, which is what makes that attribution a legible diff
@@ -1788,17 +1843,46 @@ def approved_replacements_shape_and_row_identity_self_test() -> None:
             f"class it exists to refuse (got {refusals})"
         )
 
+    baseline_text = catalogue_baseline_text()
+    frozen_row_lines = table_data_rows(baseline_text.splitlines())
+    frozen_rows = frozenset(frozen_row_lines)
+    if not frozen_row_lines:
+        fail(
+            "shape/row-identity control setup: the frozen baseline slice carries no counted row, "
+            "so the attribution controls below would be probing an empty set"
+        )
     body_fragment = published[0].split(" | ", 1)[-1] + "\n"
     if body_fragment == published[0] + "\n":
         fail(
             "shape/row-identity control setup: the first published row carries no body cell to "
             "key a fragment removal on"
         )
-    if _is_full_row_removal(catalogue_baseline_text(), body_fragment, "", 1):
+    if _is_full_row_removal(baseline_text, frozen_rows, body_fragment, "", 1):
         fail(
             "shape/row-identity control did not fire: a removal keyed on a fragment of a row's "
             "body was attributed as a full-row removal, so the identity's attribution admits "
             "the rewrite it exists to refuse"
+        )
+
+    minted_row = "| `_row_an_earlier_entry_wrote` | not a row of the frozen slice |"
+    minted_text = baseline_text + minted_row + "\n"
+    if minted_row not in table_data_rows(minted_text.splitlines()):
+        fail(
+            "shape/row-identity control setup: the line standing in for what an earlier entry "
+            "wrote is not a counted row of the intermediate text, so its control below would "
+            "hold for the wrong reason"
+        )
+    if _is_full_row_removal(minted_text, frozen_rows, minted_row + "\n", "", 1):
+        fail(
+            "shape/row-identity control did not fire: a removal of a whole line the chain itself "
+            "had written was attributed as a full-row removal, so a row-neutral rewrite followed "
+            "by a removal of what it wrote still counts as sanctioned"
+        )
+    if not _is_full_row_removal(baseline_text, frozen_rows, frozen_row_lines[0] + "\n", "", 1):
+        fail(
+            "shape/row-identity control setup: the attribution refuses a removal of a row of the "
+            "frozen slice, so it would refuse the sanctioned removals of the audited chain too "
+            "and the identity below would hold for the wrong reason"
         )
 
     violations = _row_conservation_violations(source, published_catalogue_rows)
