@@ -245,6 +245,7 @@ still carried the entries, so links published against the former single-page led
 resolving. Entries written after the split were never addressable here and get no such id.
 
 A new entry is written on the page of its Tasaki chapter (`chapter-NN.md`, created on first
-use and added to this list). When a page would exceed 48 KiB, start the next `-part-NN` page
+use and added to this list), or on `appendix-a.md` for Appendix A entries. When a page would
+exceed 48 KiB, start the next `-part-NN` page
 so that the 64 KiB soft page-size threshold of `scripts/check_docs_hierarchy.py` stays an
 early warning rather than the first signal of the 128 KiB hard failure.
