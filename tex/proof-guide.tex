@@ -3901,8 +3901,14 @@ the constant configuration is an eigenvector of every Heisenberg-type
 Hamiltonian.  Whether the eigenvalue equals the ground-state energy
 depends on the sign and structure of $J$ and is not asserted here.
 Tasaki's argument that $|\Phi^{\uparrow}\rangle$ \emph{minimises} the
-ferromagnetic energy uses Lemma~A.9 (frustration-free Hamiltonians);
-that step is not yet formalised.
+ferromagnetic energy uses Lemma~A.9 (frustration-free Hamiltonians,
+p.~469); that step is formalised as
+\texttt{heisenbergHamiltonianS\_sub\_saturatedFerromagnetEigenvalueS\_posSemidef}
+in \texttt{SaturatedFerromagnetGroundEnergy.lean}, which combines the
+per-bond upper bound of Tasaki §2.4, p.~32, eq.~(2.4.5), namely
+\texttt{spinSDot\_maxSpin\_sub\_posSemidef} of
+\texttt{SaturatedBondBound.lean}, with the repository's form of
+Lemma~A.9, \texttt{frustration\_free\_isGroundState}.
 \end{remark}
 
 \begin{remark}[Relation to Tasaki (2.4.5)]
