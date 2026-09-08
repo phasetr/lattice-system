@@ -7,18 +7,20 @@ permalink: /limitations/documentation-hygiene-parked/
 # Parked documentation-hygiene decisions
 
 This page is the record of documentation-hygiene populations this repository has decided not to
-act on. Each entry states what is parked, the command that measures it on tracked paths at a
-pinned revision, why it is not being fixed, the condition that reopens it, and how often the
-measurement is retaken. A state diagnosis that encounters one of these populations reads the entry
-first and does not record it as an unresolved defect.
+act on, together with the measurements that settled such a population instead of parking it. Each
+entry states what it covers, the command that measures it on tracked paths at a pinned revision,
+and how often the measurement is retaken. A parked entry adds why it is not being fixed and the
+condition that reopens it; an entry whose population is measured empty states its disposition
+instead, because there is nothing left to reopen. A state diagnosis that encounters one of these
+populations reads the entry first and does not record it as an unresolved defect.
 
 A command whose paths reach this page excludes it from its own pathspec. The page quotes the
 phrases it measures, so without that exclusion a command would count this record of a population as
 part of the population.
 
-An entry records a decision, not a claim that the population is harmless in general. Reopening one
-requires its stated condition to hold; observing that the population still exists is not itself a
-reason to reopen.
+A parked entry records a decision, not a claim that the population is harmless in general.
+Reopening one requires its stated condition to hold; observing that the population still exists is
+not itself a reason to reopen.
 
 ## Issue and pull-request identifiers in Lean doc comments
 
@@ -244,10 +246,12 @@ publication run's cost evidence and permission audit are recorded. Neither becom
 issue closes, and deleting either leaves a claim on the page whose source can no longer be reached.
 
 The forbidden-phrase entry is a rejection rule and not a claim: it makes the retired
-interim-authority banner fail publication if it reappears on a generated page. Dead prose is a
-reason to stop writing a phrase, not a reason to stop rejecting it, so the entry stays for as long
-as that banner could be republished, and the identifier inside it is a fragment of the rejected
-string rather than a reference this repository makes.
+interim-authority banner fail publication once the catalogue is in the authoritative state, if it
+reappears on a generated page. Until then the rule is staged rather than live, as the entry on
+pinned phrases below records. Dead prose is a reason to stop writing a phrase, not a reason to stop
+rejecting it, so the entry stays for as long as that banner could be republished, and the
+identifier inside it is a fragment of the rejected string rather than a reference this repository
+makes.
 
 **Reopen condition.** The migration map is rewritten onto a different key, or it is retired because
 the migration it stages is finished; in either case the cross-reference and staged-migration
@@ -259,12 +263,13 @@ figures here with the new ones.
 
 ## Pinned phrases without a self-test of their own
 
-**Target.** Two published strings that no self-test asserts to occur in the sources they guard: the
-entries of the forbidden-phrase tuple in `scripts/check_generated_site.py`, and the
-interim-authority sentence that `scripts/generate_formalization_site.py` writes into the provenance
-header of every generated view. Deleting an entry from the tuple, or reverting the generator
-sentence to an anchor that no longer exists, leaves every gate green for as long as the catalogue is
-published in the prototype state.
+**Target.** Two kinds of pinned string that no self-test asserts to occur in the sources they
+guard: the entries of the forbidden-phrase tuple in `scripts/check_generated_site.py`, which are
+rejection rules held inside that script rather than published text, and the interim-authority
+sentence that `scripts/generate_formalization_site.py` writes into the provenance header of every
+generated view. Deleting an entry from the tuple, or reverting the generator sentence to an anchor
+that no longer exists, leaves every gate green for as long as the catalogue is published in the
+prototype state.
 
 **Measurement.** The tuple is read as a range, because the quoted shape of its entries recurs in
 other string tuples of the same file; the generator sentence is matched on a fragment of itself that
@@ -303,13 +308,16 @@ figures here with the new ones.
 even `L ≥ 4r+2` (H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed.,
 Springer 2020, Problem 3.4.a, statement pp. 67-68, printed solution p. 501).
 
-**Measurement.** The places that record the regime as open:
+**Measurement.** The places that record the regime as open. The same condition is written both as
+`L ≥ 4r+2` and as `L > 4r+1`, and the TeX spelling carries no space around its relation, so the
+pattern accepts both forms; a fixed-string scan for one of them reports a spelling-dependent subset
+of the population instead of all of it:
 
 ```
-git grep -n -F '4r+2' 080ebac2 -- LatticeSystem docs tex ':!docs/limitations/documentation-hygiene-parked.md'
+git grep -n -E '4r\+2|L ?[>≥] ?4r\+1' 080ebac2 -- LatticeSystem docs tex ':!docs/limitations/documentation-hygiene-parked.md'
 ```
 
-At revision `080ebac2`: 4 lines across 3 files.
+At revision `080ebac2`: 6 lines across 4 files.
 
 **Reason.** This repository has neither a proof of the printed constant in that regime nor a
 counterexample to it. What is settled is the constant as literally quantified, refuted by a witness
