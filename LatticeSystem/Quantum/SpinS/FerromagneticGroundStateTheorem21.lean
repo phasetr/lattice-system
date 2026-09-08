@@ -7,7 +7,10 @@ import LatticeSystem.Quantum.SpinS.SaturatedLadderJointEigenspace
 Closes Tasaki's Theorem 2.1 (p. 34) for the spin-`S` Heisenberg model on a connected graph
 carrying a real, symmetric, edge-supported, strictly ferromagnetic coupling: the eigenspace of
 `Ĥ` *alone* at the saturated-ferromagnet energy is the span of the ladder family
-`Φ_M = (Ŝ⁻_tot)^k Φ↑` of eq. (2.4.9), p. 33 -- which is eq. (2.4.10), p. 34.
+`Φ_M = (Ŝ⁻_tot)^k Φ↑` of eq. (2.4.9), p. 33 -- which is eq. (2.4.10), p. 34 -- its dimension
+is the `2 S_max + 1` degeneracy `|V|·N + 1`, and it coincides with the joint `(Ĥ, (Ŝ_tot)²)`
+eigenspace, the book's remark after eq. (2.4.10) that every ground state carries maximal total
+spin.
 
 The analytic input is the per-sector Perron-Frobenius uniqueness of `FerromagneticSectorSpan`
 (solution of Problem 2.4.a, p. 496); the assembly across sectors is the pointwise magnetization
@@ -88,5 +91,56 @@ theorem heisenbergHamiltonianS_eigenspace_eq_span_ladderIterateUp_of_connected_f
     exact ladderIterateUp_singleton_span_le_span_range (V := V) N k hmem
   · rw [Submodule.span_le, Set.range_subset_iff]
     exact fun k => ladderIterateUp_mem_heisenbergHamiltonianS_eigenspace J k
+
+/-- **The `2 S_max + 1` ground-state degeneracy** (Tasaki §2.4 Theorem 2.1, p. 34).  Under the
+hypotheses of eq. (2.4.10) the ground-state eigenspace has dimension `|V|·N + 1`, which is
+`2 S_max + 1` for `S_max = |V|·N/2` -- the dimension of the spin-`S_max` irreducible
+representation of `SU(2)`.
+
+The eigenspace is the span of the ladder family by
+`heisenbergHamiltonianS_eigenspace_eq_span_ladderIterateUp_of_connected_ferro`, and that family is
+linearly independent (its members are `Ŝ³_tot`-eigenvectors at pairwise distinct eigenvalues), so
+`finrank_span_eq_card` counts the index type `Fin (|V|·N + 1)`. -/
+theorem heisenbergHamiltonianS_eigenspace_finrank_eq_of_connected_ferro
+    {G : SimpleGraph V} {J : V → V → ℂ}
+    (hGconn : G.Connected)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_supp : ∀ x y, ¬ G.Adj x y → J x y = 0)
+    (hJ_ferro : ∀ x y, G.Adj x y → (J x y).re < 0)
+    (hN : 1 ≤ N) :
+    Module.finrank ℂ
+        (Module.End.eigenspace ((heisenbergHamiltonianS J N).mulVecLin)
+          (saturatedFerromagnetEigenvalueS (V := V) J N))
+      = Fintype.card V * N + 1 := by
+  haveI : Nonempty V := hGconn.nonempty
+  rw [heisenbergHamiltonianS_eigenspace_eq_span_ladderIterateUp_of_connected_ferro
+      hGconn hJ_real hJ_sym hJ_supp hJ_ferro hN,
+    finrank_span_eq_card (ladderIterateUp_linearIndependent (V := V) (N := N)),
+    Fintype.card_fin]
+
+/-- **Every ferromagnetic ground state carries maximal total spin** -- the remark following
+eq. (2.4.10), p. 34.
+
+The `Ĥ`-eigenspace at the saturated-ferromagnet energy coincides with the joint
+`(Ĥ, (Ŝ_tot)²)`-eigenspace at the saturated values, so the maximal-Casimir condition, which
+`saturatedFerromagnetJointEigenspace` imposes as an extra constraint, is automatic for a
+connected ferromagnet.  Both sides are the span of the ladder family, by eq. (2.4.10) and by
+`saturatedFerromagnetJointEigenspace_eq_span_ladderIterateUp`. -/
+theorem heisenbergHamiltonianS_eigenspace_eq_satFerroJointEigenspace_of_connected_ferro
+    {G : SimpleGraph V} {J : V → V → ℂ}
+    (hGconn : G.Connected)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_supp : ∀ x y, ¬ G.Adj x y → J x y = 0)
+    (hJ_ferro : ∀ x y, G.Adj x y → (J x y).re < 0)
+    (hN : 1 ≤ N) :
+    Module.End.eigenspace ((heisenbergHamiltonianS J N).mulVecLin)
+        (saturatedFerromagnetEigenvalueS (V := V) J N)
+      = saturatedFerromagnetJointEigenspace (V := V) J N := by
+  haveI : Nonempty V := hGconn.nonempty
+  exact (heisenbergHamiltonianS_eigenspace_eq_span_ladderIterateUp_of_connected_ferro
+      hGconn hJ_real hJ_sym hJ_supp hJ_ferro hN).trans
+    (saturatedFerromagnetJointEigenspace_eq_span_ladderIterateUp J).symm
 
 end LatticeSystem.Quantum

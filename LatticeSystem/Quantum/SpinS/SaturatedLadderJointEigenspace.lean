@@ -373,14 +373,20 @@ theorem saturatedFerromagnetJointEigenspace_le_span_ladderIterateUp
   -- Embed into the larger `span (Set.range (ladderIterateUp V N))`.
   exact (ladderIterateUp_singleton_span_le_span_range (V := V) N k) h_in_inter
 
-/-- **Tasaki §2.4 Theorem 2.1**:
+/-- **The joint `(Ĥ, (Ŝ_tot)²)` eigenspace identification used by
+Tasaki §2.4 Theorem 2.1**:
 `saturatedFerromagnetJointEigenspace J N = span (Set.range (ladderIterateUp V N))`.
 
 The joint `(H, (Ŝ_tot)²)`-eigenspace at the saturated-ferromagnet
 eigenvalues coincides with the `(2m_max + 1)`-dimensional linear
 span of the ladder iterates. Combined with the linear independence
 (PR #896) and dimension (PR #904), this identifies the joint
-eigenspace as the `J_tot = m_max` irreducible SU(2) representation. -/
+eigenspace as the `J_tot = m_max` irreducible SU(2) representation.
+
+This is not Theorem 2.1 itself: it constrains the total spin as well
+as the energy, and assumes nothing about the graph or the coupling.
+The `Ĥ`-only statement, which is Theorem 2.1 (p. 34), is
+`heisenbergHamiltonianS_eigenspace_eq_span_ladderIterateUp_of_connected_ferro`. -/
 theorem saturatedFerromagnetJointEigenspace_eq_span_ladderIterateUp
     [Nonempty V] (J : V → V → ℂ) :
     saturatedFerromagnetJointEigenspace (V := V) J N =
