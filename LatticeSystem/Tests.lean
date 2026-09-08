@@ -171,6 +171,7 @@ import LatticeSystem.Tests.HeisenbergCoreBondSumGeneralPin
 import LatticeSystem.Tests.HeisenbergCoreBondSumPin
 import LatticeSystem.Tests.FiniteStrictUpperBoundPin
 import LatticeSystem.Tests.SaturatedFerromagnetSectorPF
+import LatticeSystem.Tests.FerromagneticGroundStateTheorem21
 
 /-!
 # Test aggregator for the `lattice-system` library
