@@ -12,8 +12,11 @@ unital C*-algebra).
 * **Definition A.23** — a *state* `ρ(·)` is a (continuous) linear functional on `A` with `ρ(1̂) = 1`
   and `ρ(Â† Â) ≥ 0` for every `Â ∈ A` (positivity).  It follows that `|ρ(Â)| ≤ ‖Â‖`.
 * **Theorem A.24 (Banach–Alaoglu)** — the set of all states on `A` is compact in the weak-∗
-  topology.  Concretely: any sequence of states has a weak-∗ convergent subsequence (eq. (A.7.3)),
-  which is what makes infinite-volume limits of states available.
+  topology, which is what makes infinite-volume limits of states available.  Tasaki's elementary
+  reading (eq. (A.7.3)) — any sequence of states has a weak-∗ convergent subsequence — is stated
+  for quantum spin systems: for their separable quasi-local algebra the weak-∗ topology on the
+  state space is metrizable, so compactness gives the sequential form, whereas for a general
+  unital C*-algebra it does not.
 
 We work over an abstract unital complex C*-algebra `A` (mathlib's `CStarAlgebra` typeclass), with
 the weak-∗ topology supplied by `WeakDual ℂ A`.  Definition A.23 is a genuine `def`; the
@@ -43,9 +46,11 @@ def stateSpace (A : Type*) [CStarAlgebra A] [NormedSpace ℂ A] [StarModule ℂ 
   {φ | IsState φ}
 
 /-- **Tasaki Theorem A.24 (Banach–Alaoglu for states), AXIOM.**  The set of all states on a unital
-complex C*-algebra `A` is compact in the weak-∗ topology (eq. (A.7.3): every sequence of states has
-a weak-∗ convergent subsequence, with limit again a state).  This is the operator-algebraic input
-that makes infinite-volume limits of states available; recorded as a documented axiom. -/
+complex C*-algebra `A` is compact in the weak-∗ topology.  This is the operator-algebraic input
+that makes infinite-volume limits of states available; recorded as a documented axiom.  The
+sequential form (eq. (A.7.3): every sequence of states has a weak-∗ convergent subsequence, with
+limit again a state) follows for the separable quasi-local algebras of quantum spin systems, where
+the state space is weak-∗ metrizable, but not for a general unital C*-algebra. -/
 axiom stateSpace_isCompact (A : Type*) [CStarAlgebra A] [NormedSpace ℂ A] [StarModule ℂ A] :
     IsCompact (stateSpace A)
 
