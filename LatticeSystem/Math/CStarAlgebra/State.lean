@@ -24,7 +24,7 @@ compactness Theorem A.24 (Banach–Alaoglu, a deep functional-analytic result) i
 documented axiom, consistent with the axiomatize-first treatment of this appendix.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
-(1st ed.), Appendix A.7, Definition A.23 and Theorem A.24, eqs. (A.7.2)–(A.7.3), pp. 488–489.
+(1st ed.), Appendix A.7, Definition A.23 and Theorem A.24, eqs. (A.7.2)–(A.7.3), pp. 487–488.
 -/
 
 namespace LatticeSystem.Math

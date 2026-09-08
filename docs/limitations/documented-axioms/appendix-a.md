@@ -61,7 +61,7 @@ the seven Appendix A.21–A.28 declarations.
 
 ## Theorem A.24 (Banach–Alaoglu for states)
 
-**Tasaki §A.7, Theorem A.24** (eq. (A.7.3), pp. 488–489) is a **documented axiom**,
+**Tasaki §A.7, Theorem A.24** (eq. (A.7.3), p. 488) is a **documented axiom**,
 `stateSpace_isCompact` (`LatticeSystem/Math/CStarAlgebra/State.lean`).
 
 - **Proved (axiom-free):** Definition A.23 (state on a C*-algebra) is a genuine `def`, `IsState`

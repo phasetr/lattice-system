@@ -21,7 +21,7 @@ Definitions A.25 and A.27 are genuine `def`s; Theorem A.26 (a deep operator-alge
 `C_L` and recorded as a documented axiom.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
-(1st ed.), Appendix A.7, Definitions A.25/A.27 and Theorem A.26, eqs. (A.7.5)–(A.7.7), pp. 489.
+(1st ed.), Appendix A.7, Definitions A.25/A.27 and Theorem A.26, eqs. (A.7.4)–(A.7.7), pp. 488–489.
 -/
 
 namespace LatticeSystem.Math
