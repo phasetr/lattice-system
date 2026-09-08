@@ -8,17 +8,18 @@ import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorMarshallCore
 The graph-theoretic half of the Theorem 2.1 uniqueness argument.  Tasaki's Theorem A.18 (p. 475)
 applies to a real symmetric matrix whose off-diagonal entries are non-positive and whose indices
 are all connected through non-vanishing entries.  The first condition is the ferromagnetic sign
-structure; the second is property (iii) of the Proof of Theorem 2.2 (pp. 41-42): on a connected
-graph any two configurations of equal magnetization are joined by a finite chain of `Ŝ⁺_x Ŝ⁻_y`
-moves along edges.
+structure; the second is property (iii) of the Proof of Theorem 2.2 (stated p. 40, proved
+pp. 41-42): on a connected graph any two configurations of equal magnetization are joined by a
+finite chain of `Ŝ⁺_x Ŝ⁻_y` moves along edges.
 
-This module supplies the shift `c` that turns `Ĥ` into a non-negative matrix and assembles the
-two conditions into `Matrix.IsIrreducible` for `c·1 - Ĥ` restricted to a magnetization sector,
-the form in which the repo's Perron-Frobenius machinery consumes them.
+The shift `c` is not constructed here: it enters as the hypothesis that `c` lies strictly above
+every diagonal entry, and the caller supplies it.  This module assembles the sign lemmas and the
+raise/lower reachability into `Matrix.IsIrreducible` for `c·1 - Ĥ` restricted to a magnetization
+sector, the form in which the repo's Perron-Frobenius machinery consumes them.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §2.4 Theorem 2.1, p. 34; Proof of Theorem 2.2, property (iii), pp. 41-42; solution of
-Problem 2.4.a, p. 496; Theorem A.18, p. 475.
+2020), §2.4 Theorem 2.1, p. 34; Proof of Theorem 2.2, property (iii), stated p. 40, proved
+pp. 41-42; solution of Problem 2.4.a, p. 496; Theorem A.18, p. 475.
 -/
 
 namespace LatticeSystem.Quantum
@@ -26,7 +27,8 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-- **Connected-graph sector irreducibility of the ferromagnetic Heisenberg matrix**
-(Tasaki §2.4, p. 34; Proof of Theorem 2.2, property (iii), pp. 41-42; Theorem A.18, p. 475).
+(Tasaki §2.4, p. 34; Proof of Theorem 2.2, property (iii), stated p. 40, proved pp. 41-42;
+Theorem A.18, p. 475).
 
 On a connected graph `G` with a real, symmetric coupling supported on the edges of `G`
 (`hJ_supp`) and strictly ferromagnetic there (`hJ_ferro`), the shifted matrix `c·1 - Ĥ`

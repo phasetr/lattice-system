@@ -95,11 +95,11 @@ theorem heisenbergHamiltonianS_apply_re_nonpos_of_ne
     simp
   · exact mul_nonpos_iff.mpr (Or.inr ⟨hJ_nonpos x y, spinSDot_apply_re_nonneg_of_ne hxy hne⟩)
 
-/-- **Strict negativity on a ladder step** (Tasaki, Proof of Theorem 2.2 property (iii), pp. 40-42;
-hypothesis (ii) of Theorem A.18, p. 475).  If `σ'` arises from `σ` by one `Ŝ⁺_x Ŝ⁻_y` (or
-`Ŝ⁻_x Ŝ⁺_y`) move along a `G`-edge `(x, y)` carrying a real, symmetric, strictly ferromagnetic
-coupling, then `Re ⟨Ψ^{σ'}|Ĥ|Ψ^σ⟩ < 0`; in particular the entry does not vanish, which is what
-connects the configurations of a magnetization sector.
+/-- **Strict negativity on a ladder step** (Tasaki, Proof of Theorem 2.2 property (iii), stated
+p. 40, proved pp. 41-42; hypothesis (ii) of Theorem A.18, p. 475).  If `σ'` arises from `σ` by one
+`Ŝ⁺_x Ŝ⁻_y` (or `Ŝ⁻_x Ŝ⁺_y`) move along a `G`-edge `(x, y)` carrying a real, symmetric, strictly
+ferromagnetic coupling, then `Re ⟨Ψ^{σ'}|Ĥ|Ψ^σ⟩ < 0`; in particular the entry does not vanish,
+which is what connects the configurations of a magnetization sector.
 
 The real collapse `heisenbergHamiltonianS_apply_re_eq_of_raiseLowerStepS_witness` turns the claim
 into the product of the strictly negative weight `2 (J x y).re` with the strictly positive bond
