@@ -165,6 +165,7 @@ import LatticeSystem.Tests.NoLongRangeOrder1DPin
 import LatticeSystem.Tests.Corollary43ContrapositionPin
 import LatticeSystem.Tests.Corollary43RingSetup
 import LatticeSystem.Tests.PrintedConstantCounterexample
+import LatticeSystem.Tests.SaturatedFerromagnetGroundEnergy
 
 /-!
 # Test aggregator for the `lattice-system` library
