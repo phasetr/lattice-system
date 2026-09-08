@@ -8,7 +8,8 @@ import LatticeSystem.Quantum.SpinS.MagnetizationDirectSum
 Turns the Perron-Frobenius dimension bound of `FerromagneticSectorPF` into the identification the
 solution of Problem 2.4.a (p. 496) states: in each magnetization sector `H_M` the ground state of
 the ferromagnetic spin-`S` Heisenberg model on a connected graph is unique up to a scalar, and is
-the ladder state `Φ_M = (Ŝ⁻_tot)^k Φ↑` of eq. (2.4.9), p. 33.
+the ladder state `Φ_M = (Ŝ⁻_tot)^k Φ↑` of eq. (2.4.9), p. 33 -- the book's (2.4.9) being the
+normalized state and `ladderIterateUp` the unnormalized iterate, which spans the same line.
 
 The bound is transferred from the sector matrix to the full Hilbert space intersected with the
 magnetization subspace, where the ladder state is a non-zero member; a one-dimensional subspace
