@@ -1,25 +1,19 @@
-import LatticeSystem.Quantum.SpinS.MagConfig
-import LatticeSystem.Quantum.SpinS.MagSectorEmbeddingCore
-import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorMarshallCore
-import LatticeSystem.Quantum.SpinS.SaturatedFullLadderLI
-import LatticeSystem.Quantum.SpinS.SaturatedLadderHEigenspace
-import LatticeSystem.Quantum.SpinS.Magnetization
-import LatticeSystem.Quantum.SpinS.EigenspaceFinrankLeOneTransfer
-import LatticeSystem.Math.PerronFrobeniusFinrank
-import LatticeSystem.Quantum.SpinS.FerromagneticSectorIrreducible
-import LatticeSystem.Math.FiniteStrictUpperBound
+import LatticeSystem.Quantum.SpinS.FerromagneticSectorPF
+import LatticeSystem.Quantum.SpinS.FerromagneticSectorSpan
 
 /-!
-# Red fixture: Tasaki §2.4 Theorem 2.1 (p. 34), sector Perron–Frobenius uniqueness (PR-3)
+# Signature pin: sector Perron–Frobenius uniqueness (Tasaki §2.4 Theorem 2.1, p. 34)
 
-Pins the four public declarations PR-3 must introduce toward the per-sector
-Perron–Frobenius uniqueness half of Tasaki's Theorem 2.1: for each magnetization sector `M`
-of the ferromagnetic spin-`S` Heisenberg model on a connected graph, the ground state of the
-sector-restricted Hamiltonian is `ladderIterateUp V N k` up to scalar (Problem 2.4.a solution,
-p. 496, via Theorem A.18, p. 475).
-
-Every `example` below must fail elaboration with `unknown identifier` for the pinned name — this
-file has not yet type-checked any of the four statements; the identifiers do not exist on `main`.
+Repository-internal regression guard for the four declarations behind the per-sector
+Perron–Frobenius uniqueness half of Tasaki's Theorem 2.1: for each magnetization sector `M` of
+the ferromagnetic spin-`S` Heisenberg model on a connected graph, the ground state of the
+sector-restricted Hamiltonian is `ladderIterateUp V N k` up to a scalar (solution of Problem
+2.4.a, p. 496, via Theorem A.18, p. 475).  Pinned are the strict positivity of the restricted
+ladder state, its real-form sector eigenvector equation, the sector `finrank ≤ 1` bound and the
+resulting span equality.  The four names live in
+`LatticeSystem/Quantum/SpinS/FerromagneticSectorPF.lean` and
+`LatticeSystem/Quantum/SpinS/FerromagneticSectorSpan.lean`; any rename, reordering of arguments
+or weakening of the hypotheses there breaks this module.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §2.4 Theorem 2.1, p. 34; solution of Problem 2.4.a, p. 496; Theorem A.18, p. 475.
