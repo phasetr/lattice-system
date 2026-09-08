@@ -63,7 +63,7 @@ example (J : V → V → ℂ) (N : ℕ) :
 /-- **Signature pin (P1).** On a connected graph `G` with real, symmetric coupling `J` supported
 on `G`'s edges (`hJ_supp`) and strictly ferromagnetic there (`hJ_ferro`), the shifted real-form
 Heisenberg matrix restricted to the magnetization-`M` sector is Perron–Frobenius irreducible,
-given a strict diagonal upper bound `c` (S4) and a nonempty sector. -/
+given a strict diagonal upper bound `c` (S4). -/
 example {G : SimpleGraph V} {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     (hGconn : G.Connected)
     (hJ_supp : ∀ x y, ¬ G.Adj x y → J x y = 0)
