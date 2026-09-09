@@ -50,7 +50,7 @@ case (`σ ∈ {-1, 0, +1}`).
 | `integral_cexp_neg_I_mul_zero_two_pi` | `∫ φ in 0..2π, e^{-iφ} dφ = 0` (conjugate of the above) | `Quantum/SU2Integral.lean` |
 | `totalRot32_two_site` | for `Λ = Fin 2`, the Euler-angle rotation `Û^(3)_φ Û^(2)_θ` of the two-site system factors as `onSite 0 (Û^(3)_φ Û^(2)_θ) * onSite 1 (Û^(3)_φ Û^(2)_θ)` (Problem 2.2.c auxiliary) | `Quantum/SU2Integral.lean` |
 | `onSite_zero_mul_one_mulVec_basisVec` | explicit tensor-product action `(onSite 0 A * onSite 1 B) |σ⟩ = (A (σ 0)) ⊗ (B (σ 1))` on a two-site basis vector (Problem 2.2.c auxiliary) | `Quantum/SU2Integral.lean` |
-| `problem_2_2_c` | **Main theorem** (Tasaki §2.2 eq. (2.2.15)): `(1/4π) ∫₀^{2π} dφ ∫₀^π dθ sin θ · Û^(3)_φ Û^(2)_θ ρ (Û^(3)_φ Û^(2)_θ)† = (1/2) P_singlet` where `ρ = \|↑₁↓₂⟩⟨↑₁↓₂\|`. The SU(2)-averaged two-site state equals one-half times the singlet projector. | `Quantum/SU2Integral.lean` |
+| `problem_2_2_c` | **Main theorem** (Tasaki §2.2, eq. (2.2.14), p. 23 — the first display of Problem 2.2.b; the declaration name is a mislabel): `(1/4π) ∫₀^{2π} dφ ∫₀^π dθ sin θ · (Û^(3)_φ Û^(2)_θ \|↑₁↓₂⟩)_τ = (1/2) (\|↑₁↓₂⟩ − \|↓₁↑₂⟩)_τ`, stated component-wise for each configuration `τ`. The SU(2)-averaged two-site state is the spin singlet. Neither eq. (2.2.15) nor Problem 2.2.c is formalized. | `Quantum/SU2Integral.lean` |
 | `spinOnePiRot{1,2,3}_mulVec_spinOne{Plus,Zero,Minus}` | π-rotation matrix elements on the basis `|ψ^{+1,0,-1}⟩` (Tasaki eq. (2.1.34) / Problem 2.1.g for S = 1) | `Quantum/SpinOneBasis.lean` |
 
 <!-- legacy-source:end:425:466 -->

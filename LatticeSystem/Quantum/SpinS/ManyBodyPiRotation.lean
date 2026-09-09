@@ -1,6 +1,5 @@
-import LatticeSystem.Quantum.SpinS.MultiSiteCore
+import LatticeSystem.Quantum.SpinS.ManyBodyTensorS
 import LatticeSystem.Quantum.SpinS.SpinSPiRotation
-import LatticeSystem.Math.MatrixAnalysis.NoncommProd
 import LatticeSystem.Math.MatrixAnalysis.AnticommutingEigenvectorOrthogonality
 
 /-!
@@ -11,8 +10,23 @@ The global rotation operator of Tasaki eq. (2.2.11), p. 22,
   `Û_θ^{(α)} := exp[−iθ Ŝ_tot^{(α)}] = ∏_{x ∈ Λ} exp[−iθ Ŝ_x^{(α)}]`,
 
 specialised to `θ = π`, where each factor is the closed-form single-site `π` rotation `û_α` of
-`Quantum/SpinS/SpinSPiRotation.lean` (eq. (2.1.29), p. 19).  The site factors commute, so the
-lattice product is a `Finset.noncommProd`.
+`Quantum/SpinS/SpinSPiRotation.lean` (eq. (2.1.29), p. 19).  The site factors act on disjoint
+tensor slots, so the lattice product is the many-body tensor `⊗_{x ∈ Λ} û_α` of
+`Quantum/SpinS/ManyBodyTensorS.lean`.
+
+**What is formalised, and what is not.**  As in `Quantum/SpinS/SpinSPiRotation.lean`, the
+rotations are *defined* by their closed-form matrices — the eq. (2.1.24)/(2.1.25)-level algebra of
+a phase `(−i)^{2S}` times a real involution — and the identification of those matrices with
+`exp(−iπ Ŝ^{(α)})` at general `S` is **not** formalised: no declaration in this chain mentions
+`Matrix.exp` or `NormedSpace.exp`.  The only proved exponential bridge in the repository is at
+spin-`1/2` (`totalSpinHalfRot{1,2,3}_eq_exp` of `Quantum/TotalSpin/Rotation.lean`), and nothing
+links it to these general-`S` closed forms.  The exponentials written above and below are the
+book's notation for the closed-form matrices, not a proved equality.
+
+At `S = 1` (`N = 2`) the same operator is also built as the whole-chain `piRotationS` of
+`Quantum/SpinS/KennedyTasakiTransformation.lean`, from the real involution `1 − 2(Ŝ^{(α)})²`.
+The two constructions are provably equal, but no bridge lemma is proved: nothing on the critical
+path of Problem 2.2.a needs one.
 
 **Tasaki Problem 2.2.a, p. 23 (`[solution → p. 496]`).**  For `α ≠ β` the two global rotations
 commute when `|Λ|S` is an integer and anticommute when it is a half-odd integer; in the latter
@@ -22,9 +36,9 @@ dichotomy `|Λ|S ∈ ℤ` versus `|Λ|S ∈ ℤ + 1/2` is the parity of `|Λ| ·
 Both parities descend from one master identity, `Û^{(β)}Û^{(α)} = (−1)^{|Λ|N} Û^{(α)}Û^{(β)}`,
 which lifts the single-site sign of eq. (2.1.25), p. 18, through the `|Λ|`-fold product.
 
-Only `[Fintype Λ]` and `[DecidableEq Λ]` are assumed (both forced by `Finset.univ` and by
-`onSiteS`); `Λ` may be empty, in which case `|Λ| · N = 0` is even and the anticommuting statements
-are vacuous by their own hypotheses.
+Only `[Fintype Λ]` and `[DecidableEq Λ]` are assumed (both forced by `Finset.univ` and by the
+many-body operator type); `Λ` may be empty, in which case `|Λ| · N = 0` is even and the
+anticommuting statements are vacuous by their own hypotheses.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §2.2, Problem 2.2.a, p. 23, `[solution → p. 496]`; eq. (2.2.11), p. 22; §2.1,
@@ -39,54 +53,26 @@ variable (Λ : Type*) [Fintype Λ] [DecidableEq Λ] (N : ℕ)
 
 /-! ## The lattice product of a single-site operator -/
 
-/-- The site-wise product `∏_{x ∈ Λ} onSiteS x U` of a single-site matrix `U`, formed as a
-`Finset.noncommProd` because distinct-site embeddings commute (`onSiteS_mul_onSiteS_of_ne`).  This
-is the general-spin analogue of the private `totalSpinHalfRotOf` of
-`Quantum/TotalSpin/Rotation.lean`, which lives on the spin-`1/2` configuration type and cannot be
-shared. -/
-private noncomputable def manyBodySPiRotationOf (U : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
-    ManyBodyOpS Λ N :=
-  (Finset.univ : Finset Λ).noncommProd (fun x => onSiteS x U)
-    (fun _ _ _ _ hxy => onSiteS_mul_onSiteS_of_ne hxy _ _)
-
-/-- Lattice products multiply site-wise: the product of the lattice products of `U` and `V` is the
-lattice product of `U * V`. -/
-private theorem manyBodySPiRotationOf_mul (U V : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
-    manyBodySPiRotationOf Λ N U * manyBodySPiRotationOf Λ N V
-      = manyBodySPiRotationOf Λ N (U * V) := by
-  unfold manyBodySPiRotationOf
-  rw [← Finset.noncommProd_mul_distrib
-    (s := (Finset.univ : Finset Λ))
-    (f := fun x : Λ => onSiteS x U)
-    (g := fun x : Λ => onSiteS x V)
-    (comm_ff := fun _ _ _ _ hxy => onSiteS_mul_onSiteS_of_ne hxy _ _)
-    (comm_gg := fun _ _ _ _ hxy => onSiteS_mul_onSiteS_of_ne hxy _ _)
-    (comm_gf := fun _ _ _ _ hxy => onSiteS_mul_onSiteS_of_ne hxy _ _)]
-  refine Finset.noncommProd_congr rfl ?_ _
-  intro x _
-  exact onSiteS_mul_onSiteS_same x U V
-
-/-- A scalar on the single-site factor is raised to the number of sites: this is the step that
-turns the single-site sign of eq. (2.1.25), p. 18, into the `|Λ|`-fold sign of Problem 2.2.a. -/
-private theorem manyBodySPiRotationOf_smul (c : ℂ)
+omit [DecidableEq Λ] in
+/-- A scalar on the single-site factor of a uniform lattice tensor is raised to the number of
+sites: this is the step that turns the single-site sign of eq. (2.1.25), p. 18, into the
+`|Λ|`-fold sign of Problem 2.2.a. -/
+private theorem manyBodyTensorS_const_smul (c : ℂ)
     (U : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
-    manyBodySPiRotationOf Λ N (c • U)
-      = (c ^ Fintype.card Λ) • manyBodySPiRotationOf Λ N U := by
-  have hone : manyBodySPiRotationOf Λ N (c • (1 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ))
-      = (c ^ Fintype.card Λ) • (1 : ManyBodyOpS Λ N) := by
-    unfold manyBodySPiRotationOf
-    rw [Finset.noncommProd_eq_pow_card _ _ _ (c • (1 : ManyBodyOpS Λ N))
-      (fun x _ => by rw [onSiteS_smul, onSiteS_one]), smul_pow, one_pow, Finset.card_univ]
-  have hsplit : c • U = (c • (1 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)) * U := by
-    rw [smul_mul_assoc, Matrix.one_mul]
-  rw [hsplit, ← manyBodySPiRotationOf_mul, hone, Matrix.smul_mul, Matrix.one_mul]
+    manyBodyTensorS (fun _ : Λ => c • U)
+      = (c ^ Fintype.card Λ) • manyBodyTensorS (fun _ : Λ => U) := by
+  ext σ' σ
+  simp only [manyBodyTensorS_apply, Matrix.smul_apply, smul_eq_mul, Finset.prod_mul_distrib,
+    Finset.prod_const, Finset.card_univ]
 
 /-! ## The global `π` rotations of eq. (2.2.11) -/
 
-/-- **Tasaki eq. (2.2.11), p. 22, at `θ = π`**: the global `π` rotation
-`Û_π^{(α)} = ∏_{x ∈ Λ} exp(−iπ Ŝ_x^{(α)})` about the axis selected by `α : Fin 3`. -/
+/-- **Tasaki eq. (2.2.11), p. 22, at `θ = π`**: the global `π` rotation `Û_π^{(α)}` about the axis
+selected by `α : Fin 3`, as the uniform lattice tensor `⊗_{x ∈ Λ} û_α` of the closed-form
+single-site factor.  The book writes it `∏_{x ∈ Λ} exp(−iπ Ŝ_x^{(α)})`; the exponential
+identification is notation here, not a formalised equality (see the module header). -/
 noncomputable def manyBodySPiRotation (α : Fin 3) : ManyBodyOpS Λ N :=
-  manyBodySPiRotationOf Λ N (spinSPiRotationAxis N α)
+  manyBodyTensorS (fun _ : Λ => spinSPiRotationAxis N α)
 
 /-- **The master sign identity of Tasaki Problem 2.2.a, p. 23**: for distinct axes, swapping the
 two global `π` rotations costs `(−1)^{|Λ|·2S}`.  Each of the `|Λ|` site factors contributes the
@@ -95,9 +81,15 @@ theorem manyBodySPiRotation_swap_mul_of_ne {α β : Fin 3} (h : α ≠ β) :
     manyBodySPiRotation Λ N β * manyBodySPiRotation Λ N α
       = ((-1 : ℂ) ^ (Fintype.card Λ * N)) •
           (manyBodySPiRotation Λ N α * manyBodySPiRotation Λ N β) := by
-  simp only [manyBodySPiRotation]
-  rw [manyBodySPiRotationOf_mul, manyBodySPiRotationOf_mul,
-    spinSPiRotationAxis_swap_mul_of_ne h, manyBodySPiRotationOf_smul, ← pow_mul,
+  have hβα : manyBodySPiRotation Λ N β * manyBodySPiRotation Λ N α
+      = manyBodyTensorS
+          (fun _ : Λ => spinSPiRotationAxis N β * spinSPiRotationAxis N α) :=
+    manyBodyTensorS_mul _ _
+  have hαβ : manyBodySPiRotation Λ N α * manyBodySPiRotation Λ N β
+      = manyBodyTensorS
+          (fun _ : Λ => spinSPiRotationAxis N α * spinSPiRotationAxis N β) :=
+    manyBodyTensorS_mul _ _
+  rw [hβα, hαβ, spinSPiRotationAxis_swap_mul_of_ne h, manyBodyTensorS_const_smul, ← pow_mul,
     Nat.mul_comm N (Fintype.card Λ)]
 
 /-- **Tasaki Problem 2.2.a (a), p. 23.**  When `|Λ|S` is an integer — equivalently `|Λ|·2S` is
@@ -116,21 +108,17 @@ theorem manyBodySPiRotation_anticommute_of_odd (hc : Odd (Fintype.card Λ * N))
       = -(manyBodySPiRotation Λ N β * manyBodySPiRotation Λ N α) := by
   rw [manyBodySPiRotation_swap_mul_of_ne Λ N h.symm, hc.neg_one_pow, neg_one_smul]
 
-/-- Each global `π` rotation is unitary: every site factor is, the factors commute, and
-`Matrix.unitaryGroup` is a submonoid (`Submonoid.noncommProd_mem`). -/
+/-- Each global `π` rotation is unitary: the adjoint of a lattice tensor is the tensor of the
+site-wise adjoints, and each site factor is unitary. -/
 theorem manyBodySPiRotation_conjTranspose_mul_self (α : Fin 3) :
     (manyBodySPiRotation Λ N α).conjTranspose * manyBodySPiRotation Λ N α = 1 := by
   have hu : (spinSPiRotationAxis N α).conjTranspose * spinSPiRotationAxis N α = 1 := by
     have hmem := spinSPiRotationAxis_mem_unitaryGroup N α
     rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose] at hmem
     exact hmem
-  have hmem : manyBodySPiRotation Λ N α ∈ Matrix.unitaryGroup (Λ → Fin (N + 1)) ℂ := by
-    unfold manyBodySPiRotation manyBodySPiRotationOf
-    refine Submonoid.noncommProd_mem _ _ _ _ (fun x _ => ?_)
-    rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose, onSiteS_conjTranspose,
-      onSiteS_mul_onSiteS_same, hu, onSiteS_one]
-  rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose] at hmem
-  exact hmem
+  rw [manyBodySPiRotation, manyBodyTensorS_conjTranspose, manyBodyTensorS_mul]
+  simp only [hu]
+  exact manyBodyTensorS_one
 
 /-- **Tasaki Problem 2.2.a (c), p. 23 (`[solution → p. 496]`).**  For half-odd-integer `|Λ|S` and
 distinct axes, every eigenvector `Φ ≠ 0` of `Û_π^{(α)}` is orthogonal to `Û_π^{(β)}Φ`.  The two

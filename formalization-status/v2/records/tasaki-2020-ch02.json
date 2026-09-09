@@ -20,7 +20,7 @@
           "source_item_id": "tasaki-2020-problem-2-2-a"
         }
       ],
-      "summary": "Tasaki Problem 2.2.a (b): for alpha and beta distinct, the global pi-rotations U_pi^{(alpha)} and U_pi^{(beta)} anticommute whenever |Lambda|*N is odd, i.e. |Lambda|*S is a half-odd integer.",
+      "summary": "Tasaki Problem 2.2.a (b): for alpha and beta distinct, the global pi-rotations U_pi^{(alpha)} and U_pi^{(beta)} anticommute whenever |Lambda|*N is odd, i.e. |Lambda|*S is a half-odd integer. The rotations are defined by their closed-form matrices; the identification with exp(-i*pi*S^{(alpha)}) at general S is not formalised (the only proved exponential bridge is the spin-1/2 totalSpinHalfRot{1,2,3}_eq_exp).",
       "topic_ids": [
         "quantum-spin"
       ],
@@ -46,7 +46,7 @@
           "source_item_id": "tasaki-2020-problem-2-2-a"
         }
       ],
-      "summary": "Tasaki Problem 2.2.a (a): for alpha and beta distinct, the global pi-rotations U_pi^{(alpha)} and U_pi^{(beta)} commute whenever |Lambda|*N is even, i.e. |Lambda|*S is an integer.",
+      "summary": "Tasaki Problem 2.2.a (a): for alpha and beta distinct, the global pi-rotations U_pi^{(alpha)} and U_pi^{(beta)} commute whenever |Lambda|*N is even, i.e. |Lambda|*S is an integer. The rotations are defined by their closed-form matrices; the identification with exp(-i*pi*S^{(alpha)}) at general S is not formalised (the only proved exponential bridge is the spin-1/2 totalSpinHalfRot{1,2,3}_eq_exp).",
       "topic_ids": [
         "quantum-spin"
       ],
@@ -72,7 +72,7 @@
           "source_item_id": "tasaki-2020-problem-2-2-a"
         }
       ],
-      "summary": "Tasaki Problem 2.2.a (c) (capstone): when |Lambda|*N is odd, every nonzero eigenvector of the global pi-rotation U_pi^{(alpha)} is orthogonal to its image under the anticommuting global pi-rotation U_pi^{(beta)}, alpha and beta distinct.",
+      "summary": "Tasaki Problem 2.2.a (c) (capstone): when |Lambda|*N is odd, every nonzero eigenvector of the global pi-rotation U_pi^{(alpha)} is orthogonal to its image under the anticommuting global pi-rotation U_pi^{(beta)}, alpha and beta distinct. The rotations are defined by their closed-form matrices; the identification with exp(-i*pi*S^{(alpha)}) at general S is not formalised (the only proved exponential bridge is the spin-1/2 totalSpinHalfRot{1,2,3}_eq_exp).",
       "topic_ids": [
         "quantum-spin"
       ],

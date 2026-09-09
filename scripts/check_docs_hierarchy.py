@@ -66,6 +66,25 @@ that Tasaki §2.4 Theorem 2.1 itself, the printed `Ĥ`-only ground-state eigensp
 separately by `heisenbergHamiltonianS_eigenspace_eq_span_ladderIterateUp_of_connected_ferro` and
 bundled as printed by `tasaki_theorem_2_1_ferromagnetic_ground_states`, both of which the
 headline row now names.)
+(Applied again for the four §2.1/§2.2 attribution entries of the Problem 2.2.a work: the
+`totalSpinHalfRot{1,2,3}Pi_mul_totalSpinHalfRot{2,3,1}Pi` and
+`totalSpinHalfRot{1,2,3}Pi_two_site` rows of
+`docs/formalization/legacy/20-total-spin-operator-tasaki-2-2-eq-2-2-7-2-2-8-part-01.md`, which
+attributed the cyclic product and the two-site factorisation to Problems 2.2.a/2.2.b instead of
+eq. (2.1.29) lifted site-wise and the `Λ = Fin 2` case of eq. (2.2.11) -- the second of the two
+now also recording the Problem 2.2.a capstone
+`tasaki_problem_2_2_a_eigenvector_orthogonal` and the two modules that carry it; the `û₁` closed
+form on
+`docs/formalization/legacy/27-spin-marshall-lieb-mattis-on-the-magnetization-sector-tasa-part-02.md`,
+whose phase is `(−i)^{2S}` under the book's sign convention; and the `problem_2_2_c` row of
+`docs/formalization/legacy/12-basis-states-and-raising-lowering-for-s-1-tasaki-2-1.md`, which
+cited eq. (2.2.15) and a density-matrix statement for a theorem that proves the component-wise
+eq. (2.2.14).)
+(Applied once more for the `manyBodyTensorS_conjTranspose` row of
+`docs/formalization/legacy/28-spin-saturated-ferromagnetic-state-tasaki-2-4-generalised-part-01.md`,
+whose file attribution now names both the axis-swap module and
+`Quantum/SpinS/ManyBodyTensorS.lean`, where the generic tensor adjoint is stated with the rest of
+that API.)
 Recomputing a pin is never on its own an
 authorization for what moved: the legacy pages still have to be edited to match, and the
 catalogue-row comparison is what proves they do. What the pins buy is that a change to the
@@ -163,12 +182,12 @@ LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
 CATALOGUE_BASELINE_SLICE = slice(216, 2731)
 # Pins the published catalogue text; this module's docstring records exactly what is hashed
 # and how the pin is legitimately updated.
-APPROVED_CHANGES_SHA256 = "6b6c23b805f4d04af06b89754ac06b12b13e15ac52097c55f473716041812f18"
+APPROVED_CHANGES_SHA256 = "fa1df04c1a90fcd1cfdaa1918eb325d2564d8697f59f77a1c7dc916bc1b466ce"
 # Pins the row sequence `main()` actually compares the legacy pages against. The text pin above
 # does not reach it: the rows are derived from the transformed text by `table_data_rows`, which
 # is outside the pinned text, so without this pin a row skipped there would go unpublished with
 # the text pin undisturbed.
-PUBLISHED_ROWS_SHA256 = "2af6d7f15de06e7fbdb035bbf28905e055d1573628cd55d220de6de2cc2aaaac"
+PUBLISHED_ROWS_SHA256 = "d23c0458101130f675770dc478a3e650023fa3360f03411c475d2fa975469e5c"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -1414,6 +1433,53 @@ def _approved_replacements(text: str) -> str:
             "real involution behind the closed-form `π` rotation `û₁ = i^{2S}F` of ",
             "real involution behind the closed-form `π` rotation `û₁ = (−i)^{2S}F` of ",
         )
+        # The two-site factorisation is the `Λ = Fin 2` case of the global product of
+        # eq. (2.2.11), p. 22, not Problem 2.2.b, whose content is the solid-angle averages
+        # of eqs. (2.2.14)/(2.2.15), p. 23; the corrected row also registers the Problem
+        # 2.2.a capstone and the two modules that carry it.
+        .replace(
+            "| `totalSpinHalfRot{1,2,3}Pi_two_site` | for `Λ = Fin 2`, the global π-rotation "
+            "factors as `onSite 0 (Û^(α)_π) * onSite 1 (Û^(α)_π)` (Tasaki Problem 2.2.b) | "
+            "`Quantum/TotalSpin/Rotation.lean` |",
+            "| `totalSpinHalfRot{1,2,3}Pi_two_site` | for `Λ = Fin 2`, the global π-rotation "
+            "factors as `onSite 0 (Û^(α)_π) * onSite 1 (Û^(α)_π)` — the two-site specialisation "
+            "of the global product, Tasaki eq. (2.2.11), p. 22, **not** Problem 2.2.b (whose "
+            "content is the solid-angle averages of eqs. (2.2.14)/(2.2.15), p. 23). The "
+            "general-spin many-body π-rotations and Tasaki Problem 2.2.a, p. 23 — "
+            "`manyBodySPiRotation`, the commuting/anticommuting dichotomy by the parity of "
+            "`Fintype.card Λ * N` (`manyBodySPiRotation_commute_of_even` / "
+            "`manyBodySPiRotation_anticommute_of_odd`), and the eigenvector-orthogonality "
+            "capstone `tasaki_problem_2_2_a_eigenvector_orthogonal` — live in "
+            "`Quantum/SpinS/ManyBodyPiRotation.lean`, over the generic core "
+            "`Matrix.dotProduct_mulVec_eq_zero_of_anticommute_eigenvector` of "
+            "`Math/MatrixAnalysis/AnticommutingEigenvectorOrthogonality.lean` | "
+            "`Quantum/TotalSpin/Rotation.lean` |",
+        )
+        # `problem_2_2_c` proves eq. (2.2.14), the first display of Problem 2.2.b, stated
+        # component-wise on vectors; the row claimed eq. (2.2.15) and a density-matrix form.
+        .replace(
+            "| `problem_2_2_c` | **Main theorem** (Tasaki §2.2 eq. (2.2.15)): `(1/4π) ∫₀^{2π} dφ "
+            "∫₀^π dθ sin θ · Û^(3)_φ Û^(2)_θ ρ (Û^(3)_φ Û^(2)_θ)† = (1/2) P_singlet` where `ρ = "
+            "\\|↑₁↓₂⟩⟨↑₁↓₂\\|`. The SU(2)-averaged two-site state equals one-half times the "
+            "singlet projector. | `Quantum/SU2Integral.lean` |",
+            "| `problem_2_2_c` | **Main theorem** (Tasaki §2.2, eq. (2.2.14), p. 23 — the first "
+            "display of Problem 2.2.b; the declaration name is a mislabel): `(1/4π) ∫₀^{2π} dφ "
+            "∫₀^π dθ sin θ · (Û^(3)_φ Û^(2)_θ \\|↑₁↓₂⟩)_τ = (1/2) (\\|↑₁↓₂⟩ − \\|↓₁↑₂⟩)_τ`, "
+            "stated component-wise for each configuration `τ`. The SU(2)-averaged two-site state "
+            "is the spin singlet. Neither eq. (2.2.15) nor Problem 2.2.c is formalized. | "
+            "`Quantum/SU2Integral.lean` |",
+        )
+        # `manyBodyTensorS_conjTranspose` is a property of the tensor itself and is stated with
+        # the rest of that API; the axis-swap module keeps only its specialisations.
+        .replace(
+            "Tasaki, Springer 2020, Problem 2.5.c, p. 43 and Theorem 2.4 context, pp. 43-44 "
+            "(PR #4058, file `Quantum/SpinS/Problem25cAxisSwapAdjointInput.lean`) |",
+            "Tasaki, Springer 2020, Problem 2.5.c, p. 43 and Theorem 2.4 context, pp. 43-44 "
+            "(PR #4058, files `Quantum/SpinS/Problem25cAxisSwapAdjointInput.lean` for the "
+            "axis-swap specialisations and `Quantum/SpinS/ManyBodyTensorS.lean` for the generic "
+            "adjoint `manyBodyTensorS_conjTranspose`, which the rest of the tensor API also "
+            "uses) |",
+        )
     )
 
 
@@ -1478,12 +1544,12 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "8f71d0ee8948c880d6278252ad3279ec74957ec749245fe43d5f6e35fd4ce87b"
+SCRIPT_SOURCE_SHA256 = "2f85ac6345285372f42ccbff8c748d038f9c244b262401bb29eed9539cbf5728"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
-APPROVED_ENTRIES_SHA256 = "6a620bf6660d8d4910c2aa3c71512b0c8e158fdc7cff4db0c859b77faa47e5d8"
+APPROVED_ENTRIES_SHA256 = "a83eeb88c2aba4a8d5ee3f005dceccd2e55d9001d57937ad5367bf112c2793fe"
 
 # The only text `SCRIPT_SOURCE_SHA256` does not hash: the digits these four pins carry. Each is
 # restated by the very edit it pins, and a digest over its own value would have no fixed point.

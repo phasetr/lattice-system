@@ -6,16 +6,18 @@ import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 
 /-!
-# Trig-integral helpers for Tasaki §2.2 Problem 2.2.c
+# Trig-integral helpers for the SU(2)-averaged two-site state
 
 Concrete trig-integral evaluations needed for the SU(2)-averaged-state
-computation (Tasaki §2.2, Problem 2.2.c, eq. (2.2.15)). These are
-proved using mathlib's `intervalIntegral` and
-`SpecialFunctions.Integrals`. Each is a thin wrapper around mathlib's
-`integral_sin`, `integral_cos`, or `integral_sin_sq`/`integral_cos_sq`.
+computation (Tasaki §2.2, eq. (2.2.14), p. 23 — the first display of
+Problem 2.2.b). These are proved using mathlib's `intervalIntegral`
+and `SpecialFunctions.Integrals`. Each is a thin wrapper around
+mathlib's `integral_sin`, `integral_cos`, or
+`integral_sin_sq`/`integral_cos_sq`.
 
-The full integral statement (Problem 2.2.c itself) will be assembled
-from these helpers in a follow-up work item (B-3c).
+The full integral statement assembled from these helpers is
+`problem_2_2_c` below. That name is a mislabel: what it proves is
+eq. (2.2.14). Neither eq. (2.2.15) nor Problem 2.2.c is formalised.
 -/
 
 namespace LatticeSystem.Quantum
@@ -53,7 +55,7 @@ theorem integral_sin_two_pi_pi :
   rw [intervalIntegral.integral_const]
   simp [smul_eq_mul]; ring
 
-/-! ## Half-angle integrals for the θ component of Problem 2.2.c
+/-! ## Half-angle integrals for the θ component of eq. (2.2.14)
 
 `sin θ cos²(θ/2) = (sin θ + sin θ cos θ) / 2 = (sin θ) / 2 + (sin 2θ) / 4`
 and similarly for `sin²(θ/2)`. Integrated over `[0, π]`, the `sin 2θ`
@@ -121,7 +123,7 @@ theorem integral_sin_mul_sin_sq_half_zero_pi :
       integral_sin_zero_pi, integral_sin_mul_cos_zero_pi]
   ring
 
-/-! ## Complex exponential integrals for the φ component of Problem 2.2.c
+/-! ## Complex exponential integrals for the φ component of eq. (2.2.14)
 
 `∫₀²π e^{±iφ} dφ = 0` follows from `e^{iφ} = cos φ + i sin φ` and the
 vanishing of `∫ cos` and `∫ sin` over one full period. -/
@@ -268,12 +270,12 @@ private lemma matrix_col1_eq_mulVec_down (M : Matrix (Fin 2) (Fin 2) ℂ) (k : F
     M k 1 = (M.mulVec spinHalfDown) k := by
   simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two, spinHalfDown]
 
-/-! ## Tasaki Problem 2.2.c: SU(2)-averaged state is the singlet
+/-! ## The SU(2)-averaged state is the singlet (eq. (2.2.14))
 
 The SU(2)-averaged state `(1/4π) ∫₀²π dφ ∫₀π dθ sin θ · Û(φ,θ)|↑↓⟩`
 equals `(1/2)(|↑↓⟩ - |↓↑⟩)`, the spin singlet. This is Tasaki
 *Physics and Mathematics of Quantum Many-Body Systems*, §2.2,
-Problem 2.2.c, eq. (2.2.15). -/
+eq. (2.2.14), p. 23, the first display of Problem 2.2.b. -/
 
 /-- Expand the integrand: the component of the rotated state at configuration `τ`
 is a product of single-site rotation entries. -/
@@ -299,10 +301,11 @@ private theorem totalRot_mulVec_upDown_component (θ φ : ℝ) (τ : Fin 2 → F
 set_option maxHeartbeats 1600000 in
 -- The 16-case row-by-column analysis on `Fin 2 → Fin 2` together with
 -- the Euler-angle integrals exceeds the default 200k budget.
-/-- Tasaki Problem 2.2.c: the SU(2)-averaged two-site state is the singlet.
-Stated component-wise for each configuration `τ : Fin 2 → Fin 2`.
-Tasaki *Physics and Mathematics of Quantum Many-Body Systems*,
-§2.2 eq. (2.2.15). -/
+/-- The SU(2)-averaged two-site state is the singlet, stated component-wise
+for each configuration `τ : Fin 2 → Fin 2`: Tasaki *Physics and Mathematics
+of Quantum Many-Body Systems*, §2.2, eq. (2.2.14), p. 23, the first display
+of Problem 2.2.b. The declaration name is a mislabel — neither eq. (2.2.15)
+nor Problem 2.2.c is formalised. -/
 theorem problem_2_2_c (τ : Fin 2 → Fin 2) :
     (1 / (4 * (Real.pi : ℂ))) *
       ∫ φ in (0 : ℝ)..(2 * Real.pi),

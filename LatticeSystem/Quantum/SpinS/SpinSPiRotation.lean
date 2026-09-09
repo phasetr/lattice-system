@@ -3,7 +3,7 @@ import Mathlib.LinearAlgebra.UnitaryGroup
 import LatticeSystem.Quantum.SpinS.SpinSReversal
 
 /-!
-# The spin-`S` `π` rotations `û_α = exp(−iπ Ŝ^{(α)})` in closed form
+# The spin-`S` `π` rotations `û_α` in closed form
 
 Tasaki's `{1̂, û₁, û₂, û₃}` of eq. (2.1.29), p. 19: the `π` rotations about the three axes, which
 for half-odd-integer spin square to `−1̂` (eq. (2.1.31), p. 20) and anticommute (eq. (2.1.25),
@@ -25,9 +25,13 @@ diagonal resp. antidiagonal:
   pinned in `LatticeSystem/Tests/SPTMatrixProductIndex.lean`).
 
 Both are therefore a fixed phase `(−i)^N` times a real involution, and that is how they are
-defined: as in `Quantum/SpinS/SpinOneHalfTurn.lean` (`S = 1`) no Lean bridge to `NormedSpace.exp`
-is attempted — it is off the critical path, and the repository already lets a concrete matrix and
-its `exp` form coexist without a proved bridge.
+**defined** here — by the eq. (2.1.24)/(2.1.25)-level algebra of those closed forms, as in
+`Quantum/SpinS/SpinOneHalfTurn.lean` (`S = 1`).  **The identification with `exp(−iπ Ŝ^{(α)})` at
+general `S` is not formalised**: no declaration in this file mentions `Matrix.exp` or
+`NormedSpace.exp`, and the only proved exponential bridge in the repository is at spin-`1/2`
+(`totalSpinHalfRot{1,2,3}_eq_exp` of `Quantum/TotalSpin/Rotation.lean`), which is not linked to
+these general-`S` closed forms.  Every `exp(−iπ Ŝ^{(α)})` written here is the book's notation for
+the closed-form matrix, not a proved equality.
 
 Since the two phases `(−i)^{2S}` multiply to the real sign `(−1)^{2S}`, the product `û₁û₃` is a
 real matrix: entrywise conjugation — the operation `C_g` of eq. (8.3.40) at the antiunitary sign —
@@ -114,13 +118,15 @@ theorem spinSAlternating_mul_spinReversalS (N : ℕ) :
 
 /-! ## The `π` rotations -/
 
-/-- **The spin-`S` `π` rotation about the `1` axis**, `û₁ = exp(−iπ Ŝ^{(1)})` (p. 19), in the
-closed form `(−i)^{2S}` times the basis reversal. -/
+/-- **The spin-`S` `π` rotation about the `1` axis**, the book's `û₁ = exp(−iπ Ŝ^{(1)})` (p. 19),
+*defined* by its closed form `(−i)^{2S}` times the basis reversal; the exponential identification
+is not formalised (see the module header). -/
 noncomputable def spinSPiRotation1 (N : ℕ) : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ :=
   ((-Complex.I) ^ N) • spinReversalS N
 
-/-- **The spin-`S` `π` rotation about the `3` axis**, `û₃ = exp(−iπ Ŝ^{(3)})` (p. 19), in the
-closed form `(−i)^{2S}` times the alternating diagonal: `e^{−iπ(N/2 − k)} = (−i)^N (−1)^k`. -/
+/-- **The spin-`S` `π` rotation about the `3` axis**, the book's `û₃ = exp(−iπ Ŝ^{(3)})` (p. 19),
+*defined* by its closed form `(−i)^{2S}` times the alternating diagonal
+(`e^{−iπ(N/2 − k)} = (−i)^N (−1)^k`); the exponential identification is not formalised. -/
 noncomputable def spinSPiRotation3 (N : ℕ) : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ :=
   ((-Complex.I) ^ N) • spinSAlternating N
 

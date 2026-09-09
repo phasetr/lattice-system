@@ -193,7 +193,12 @@ theorem onSite_pow (x : Λ) (A : Matrix (Fin 2) (Fin 2) ℂ) (k : ℕ) :
   | zero => rw [pow_zero, pow_zero, onSite_one]
   | succ k ih => rw [pow_succ, pow_succ, ih, onSite_mul_onSite_same]
 
-/-! ## Two-spin explicit total π-rotation (Tasaki Problem 2.2.b) -/
+/-! ## Two-spin explicit total π-rotation
+
+The `|Λ| = 2` specialisation of the global product of Tasaki eq. (2.2.11), p. 22.  This is not
+Problem 2.2.b, p. 23, whose content is the two solid-angle averages of eqs. (2.2.14)/(2.2.15):
+the first of those is `problem_2_2_c` of `Quantum/SU2Integral.lean` (whose name is a mislabel),
+and eq. (2.2.15) is not formalised. -/
 
 /-- For two sites, the total π-rotation about axis 1 factors as the
 product over site 0 and site 1. -/
