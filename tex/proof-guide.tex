@@ -1002,7 +1002,7 @@ Lean name: \texttt{spinSPiRotation2\_eq\_exp\_spinSOp2}.
 The quarter turn $\texttt{spinSRot3}\,N\,(-\tfrac\pi2)$ intertwines the
 generators, $\hat S^{(1)} \cdot \texttt{spinSRot3}\,N\,(-\tfrac\pi2) =
 \texttt{spinSRot3}\,N\,(-\tfrac\pi2) \cdot \hat S^{(2)}$, the quarter-turn
-case of eq.~(2.1.25), p.~18
+case of eq.~(2.1.22), p.~17
 (\texttt{spinSOp1\_mul\_spinSRot3\_neg\_pi\_half}, read off from
 $\texttt{spinSRot3\_neg\_pi\_half\_conj\_spinSOp2}$); propagated to every
 power of the generator and fed through the generic bridge
@@ -1042,12 +1042,21 @@ e^{-i\pi \hat S^{(\alpha)}}$ for every $\alpha \in \{1,2,3\}$
 many-body lift of eq.~(2.2.11), p.~22 (Problem 2.2.a,
 \S\ref{sec:problem22a}), multiplies over the lattice.
 
+The printed entry form of the same relation,
+$\langle \psi_\sigma | \hat u^{(2)} | \psi_\tau \rangle =
+(-1)^{S+\sigma} \delta_{\sigma,-\tau}$ (eq.~(2.1.34), second relation,
+p.~20), is \texttt{spinSPiRotation2\_apply}: in the integer basis index
+$k$ of $\texttt{Fin}\,(N+1)$, row $k$ carries its single nonzero entry
+$(-1)^{N+k}$ in the column $N-k$, and the printed phase agrees because
+$S+\sigma = N-k$ has the parity of $N+k$.
+
 The orientation of the quarter turn is sign-critical throughout: the
 opposite quarter turn sends $\hat S^{(2)}$ to $-\hat S^{(1)}$ and produces
 $e^{+i\pi \hat S^{(1)}}$, and the opposite printed order $\hat u^{(1)}
 \hat u^{(3)}$ differs from $\hat u^{(2)} = \hat u^{(3)}\hat u^{(1)}$ by
-$(-1)^{2S}$ --- it is the matrix part of the time reversal $\hat\Theta$,
-p.~278, not the axis-$2$ rotation.
+$(-1)^{2S}$. It is the printed order $\hat u^{(2)} = \hat u^{(3)}\hat
+u^{(1)}$ that is the matrix part of the time reversal $\hat\Theta =
+\hat u^{(2)} \hat K$, p.~278.
 
 \paragraph{Not yet formalized.} The lift of the three single-site
 identifications to the many-body global rotation of eq.~(2.2.11)

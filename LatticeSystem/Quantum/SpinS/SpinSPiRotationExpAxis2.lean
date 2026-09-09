@@ -7,11 +7,13 @@ import LatticeSystem.Quantum.SpinS.SpinSPiRotationExpAxis3
 The closed-form `π` rotation `û₂` of `Quantum/SpinS/SpinSPiRotation.lean` is the exponential
 `Û_π^{(2)} = exp(−iπ Ŝ^{(2)})` of the definition on p. 15, at general spin `S = N/2`: this is the
 second relation of the closed form (2.1.34), p. 20, whose general-`S` derivation is left to the
-reader as Problem 2.1.g, p. 20 (solution p. 495).  Together with the axis-1 and axis-3 modules it
-completes the single-site family `û_α = exp(−iπ Ŝ^{(α)})`.
+reader as Problem 2.1.g, p. 20 (solution p. 495).  The printed entries
+`⟨ψ_σ|û₂|ψ_τ⟩ = (−1)^{S+σ}δ_{σ,−τ}` of that relation are `spinSPiRotation2_apply`, written in the
+integer basis index.  Together with the axis-1 and axis-3 modules this completes the single-site
+family `û_α = exp(−iπ Ŝ^{(α)})`.
 
 The route is conjugation by a quarter turn about axis 3.  The rotation `spinSRot3 N (−π/2)`
-carries `Ŝ^{(2)}` to `Ŝ^{(1)}` (the `π/2` case of (2.1.25), p. 18), so the intertwining bridge
+carries `Ŝ^{(2)}` to `Ŝ^{(1)}` (the `π/2` case of (2.1.22), p. 17), so the intertwining bridge
 `matrix_exp_intertwine_of_pow_intertwine` — no inverse, no unit packaging — turns the axis-1
 exponential into the axis-2 one.  The matching closed-form half is the *angle flip*
 `F · spinSRot3 N θ = spinSRot3 N (−θ) · F`: it collapses the two quarter turns flanking the
@@ -20,14 +22,15 @@ so reproduces the printed product `û₂ = û₃û₁` of eq. (2.1.29), p. 19.
 
 Only the orientation `spinSRot3 N (−π/2) · Ŝ^{(2)} · spinSRot3 N (π/2) = Ŝ^{(1)}` gives the
 axis-2 exponential; the opposite quarter turn produces `exp(+iπ Ŝ^{(1)})`, which differs by
-`(−1)^{2S}`.  The same sign separates the printed order `û₃û₁` from `û₁û₃`, the matrix part of the
-time reversal `Θ̂` of p. 278.  Statements therefore keep the angles written out and use the
-integer basis index `k` of `Fin (N + 1)` rather than the magnetic quantum number `σ = N/2 − k`.
+`(−1)^{2S}`.  The same sign separates the printed order `û₃û₁` — which is the matrix part of the
+time reversal `Θ̂ = û₂K̂` of p. 278 — from the reversed product `û₁û₃ = (−1)^{2S}û₂`.  Statements
+therefore keep the angles written out and use the integer basis index `k` of `Fin (N + 1)` rather
+than the magnetic quantum number `σ = N/2 − k`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §2.1: the rotation `Û_θ^{(α)} = exp(−iθ Ŝ^{(α)})`, p. 15; the `π`-rotation relation
-(2.1.25), p. 18; the cyclic relation (2.1.29), p. 19; the closed form (2.1.34) and Problem 2.1.g,
-p. 20 (solution p. 495).
+2020), §2.1: the rotation `Û_θ^{(α)} = exp(−iθ Ŝ^{(α)})`, p. 15; the conjugation relations
+(2.1.21) (`π` rotation) and (2.1.22) (quarter turn), p. 17; the cyclic relation (2.1.29), p. 19;
+the closed form (2.1.34) and Problem 2.1.g, p. 20 (solution p. 495).
 -/
 
 namespace LatticeSystem.Quantum
@@ -51,7 +54,7 @@ private lemma spinSOp3Eigen_rev (N : ℕ) (k : Fin (N + 1)) :
 /-- **The angle flip**: moving the basis reversal `F` past a rotation about axis 3 reverses the
 angle, `F · exp(−iθ Ŝ^{(3)}) = exp(+iθ Ŝ^{(3)}) · F`.  The rotation is diagonal, `F` permutes the
 basis by `k ↦ N − k`, and the eigenvalue `m_k` changes sign under that permutation.  It is the
-matrix form of the axis-1 `π` rotation reversing axis 3 (Tasaki (2.1.25), p. 18). -/
+matrix form of the axis-1 `π` rotation reversing axis 3 (Tasaki (2.1.21), p. 17). -/
 theorem spinReversalS_mul_spinSRot3 (N : ℕ) (θ : ℝ) :
     spinReversalS N * spinSRot3 N θ = spinSRot3 N (-θ) * spinReversalS N := by
   rw [spinSRot3_eq_diagonal, spinSRot3_eq_diagonal]
@@ -94,7 +97,7 @@ theorem spinSRot3_pi_half_conj_spinSPiRotation1 (N : ℕ) :
 /-! ## The quarter turn as an axis swap on the generators -/
 
 /-- **The axis swap in commutation form**: `Ŝ^{(1)} · spinSRot3 N (−π/2) =
-spinSRot3 N (−π/2) · Ŝ^{(2)}`, the quarter-turn case of Tasaki (2.1.25), p. 18, obtained from
+spinSRot3 N (−π/2) · Ŝ^{(2)}`, the quarter-turn case of Tasaki (2.1.22), p. 17, obtained from
 `spinSRot3_neg_pi_half_conj_spinSOp2` by cancelling the trailing rotation.  The orientation is
 sign-critical: the opposite quarter turn sends `Ŝ^{(2)}` to `−Ŝ^{(1)}`. -/
 theorem spinSOp1_mul_spinSRot3_neg_pi_half (N : ℕ) :
@@ -158,11 +161,27 @@ theorem spinSPiRotation2_eq_exp_spinSOp2 (N : ℕ) :
   rw [← spinSRot3_pi_half_conj_spinSPiRotation1, spinSPiRotation1_eq_spinSRot1_pi,
     exp_neg_pi_mul_I_spinSOp2_eq_spinSRot3_conj]
 
+/-! ## The printed entry form -/
+
+/-- **The printed entries of `û₂`**: `⟨ψ_σ|û₂|ψ_τ⟩ = (−1)^{S+σ}δ_{σ,−τ}`, the second relation of
+Tasaki (2.1.34), p. 20, in the integer basis index `k` of `Fin (N + 1)`.  Row `i` carries its
+single nonzero entry in the column `rev i` (the printed `τ = −σ`) with the phase `(−1)^{N+i}`,
+which is the printed `(−1)^{S+σ}` because `S + σ = N − i` has the parity of `N + i`. -/
+theorem spinSPiRotation2_apply (N : ℕ) (i j : Fin (N + 1)) :
+    spinSPiRotation2 N i j = if j = Fin.rev i then (-1 : ℂ) ^ (N + (i : ℕ)) else 0 := by
+  have hsq : (-Complex.I) ^ N * (-Complex.I) ^ N = (-1 : ℂ) ^ N := by
+    rw [← mul_pow, neg_mul_neg, Complex.I_mul_I]
+  rw [spinSPiRotation2, spinSPiRotation3, spinSPiRotation1, Matrix.smul_mul, Matrix.mul_smul,
+    smul_smul, hsq, Matrix.smul_apply, spinSAlternating, Matrix.diagonal_mul, smul_eq_mul,
+    spinReversalS_apply, pow_add]
+  split <;> ring
+
 /-- **The printed cyclic relation (2.1.29), p. 19, purely in exponentials**:
 `exp(−iπ Ŝ^{(2)}) = exp(−iπ Ŝ^{(3)}) · exp(−iπ Ŝ^{(1)})`.  In the repository the relation `û₂ =
 û₃û₁` is the *definition* of the axis-2 closed form; here it becomes a theorem about the rotations
-of p. 15, which is what the book asserts.  The order matters: `û₁û₃` differs by `(−1)^{2S}` and is
-the matrix part of the time reversal `Θ̂`, p. 278. -/
+of p. 15, which is what the book asserts.  The order matters: the printed `û₂ = û₃û₁` is the
+matrix part of the time reversal `Θ̂ = û₂K̂`, p. 278, while the reversed product `û₁û₃` differs
+from it by `(−1)^{2S}`. -/
 theorem exp_neg_pi_mul_I_spinSOp2_eq_spinSRot3_pi_mul_spinSRot1_pi (N : ℕ) :
     NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp2 N) =
       spinSRot3 N Real.pi * spinSRot1 N Real.pi := by
