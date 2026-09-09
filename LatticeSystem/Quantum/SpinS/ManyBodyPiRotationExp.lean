@@ -105,4 +105,48 @@ theorem manyBodyTensorS_eq_noncommProd (W : Λ → Matrix (Fin (N + 1)) (Fin (N 
   conv_lhs => rw [← hW]
   exact manyBodyTensorS_piecewise_eq_noncommProd W Finset.univ comm
 
+/-! ## The many-body lift of eq. (2.2.11), p. 22 -/
+
+/-- **The crux of eq. (2.2.11), p. 22**: the uniform tensor of a single-site exponential is the
+exponential of the total (site-summed) operator, `⊗_{x ∈ Λ} exp(A) = exp(Σ_{x ∈ Λ} ι_x(A))`.  The
+site embeddings commute across distinct sites, so the exponential of their sum factors into the
+noncommutative product of the site exponentials, and each factor is a site embedding of `exp A` by
+`onSiteS_exp`.  No property of `A` is used. -/
+theorem manyBodyTensorS_const_exp (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    manyBodyTensorS (fun _ : Λ => NormedSpace.exp A)
+      = NormedSpace.exp (∑ x : Λ, onSiteS x A : ManyBodyOpS Λ N) := by
+  rw [Matrix.exp_sum_of_commute (Finset.univ : Finset Λ)
+      (fun x => (onSiteS x A : ManyBodyOpS Λ N))
+      (fun _ _ _ _ hxy => onSiteS_commute_of_ne hxy A A),
+    manyBodyTensorS_eq_noncommProd (fun _ : Λ => NormedSpace.exp A)
+      (fun _ _ _ _ hxy => onSiteS_commute_of_ne hxy _ _)]
+  exact Finset.noncommProd_congr rfl (fun x _ => onSiteS_exp x A) _
+
+/-- Scalars pull out of a sum of site embeddings.  This is the step identifying
+`Σ_{x ∈ Λ} ι_x(−iπ Ŝ^{(α)})` with `−iπ Ŝ_tot^{(α)}` for the total spin operator of
+eq. (2.2.7), p. 22. -/
+theorem sum_onSiteS_smul (c : ℂ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (∑ x : Λ, onSiteS x (c • A) : ManyBodyOpS Λ N) = c • ∑ x : Λ, onSiteS x A := by
+  simp only [onSiteS_smul, Finset.smul_sum]
+
+/-- **Tasaki eq. (2.2.11), p. 22, at `θ = π`**: the global `π` rotation about the axis `α : Fin 3`,
+defined in `Quantum/SpinS/ManyBodyPiRotation.lean` as the lattice tensor of the closed-form
+single-site rotations of eq. (2.1.34), p. 20, is the operator exponential
+`Û_π^{(α)} = exp(−iπ Ŝ_tot^{(α)})` of the total spin operator of eq. (2.2.7), p. 22.
+
+The right-hand side selects the axis with the inline vector `![totalSpinSOp1 Λ N,
+totalSpinSOp2 Λ N, totalSpinSOp3 Λ N] α`, which is by definition `totalSpinSOpVec Λ N α` of
+`Quantum/SpinS/CartesianAxis.lean`, so a consumer holding the latter bridges by `rfl`. -/
+theorem manyBodySPiRotation_eq_exp (Λ : Type*) [Fintype Λ] [DecidableEq Λ] (N : ℕ) (α : Fin 3) :
+    manyBodySPiRotation Λ N α =
+      NormedSpace.exp
+        (-(((Real.pi : ℂ) * Complex.I)) •
+          (![totalSpinSOp1 Λ N, totalSpinSOp2 Λ N, totalSpinSOp3 Λ N] α)) := by
+  rw [manyBodySPiRotation]
+  simp only [spinSPiRotationAxis_eq_exp]
+  rw [manyBodyTensorS_const_exp, sum_onSiteS_smul]
+  congr 1
+  congr 1
+  fin_cases α <;> rfl
+
 end LatticeSystem.Quantum
