@@ -1,4 +1,6 @@
+import LatticeSystem.Math.Combinatorics.SqrtChooseLadder
 import LatticeSystem.Quantum.SpinS.AxisSwapUnitarySSpinSCore
+import LatticeSystem.Quantum.SpinS.SpinSPiRotation
 
 /-!
 # The axis-1 `π` rotation as an exponential
@@ -82,5 +84,113 @@ theorem matrix_exp_mulVec_of_mulVec_eq_smul {n : Type*} [Fintype n] [DecidableEq
       (X * (Complex.exp l • (1 : Matrix n n ℂ))) i j₀ := by rw [hint]
   rw [hXcol, hXrow] at hentry
   rw [hentry, Pi.smul_apply, smul_eq_mul]
+
+/-! ## The `x`-polarised highest-weight vector `u₀` -/
+
+/-- **The `x`-polarised highest-weight vector** `u₀ = (√binom(N,k))_k` in the `Ŝ^{(3)}` basis of
+the spin-`S` space (`N = 2S`).  It is the `Ŝ^{(1)}`-eigenvector of maximal eigenvalue `S = N/2`,
+i.e. the state Tasaki writes `|ψ^S⟩` after the axis relabelling `3 ↦ 1`; the binomial weights are
+the ones the `2S`-fold spin-`1/2` decomposition of Problem 2.1.g, p. 20 (solution p. 495, (S.12))
+produces.  Its two properties used here are `spinSOp1_mulVec_spinSTopVector` and the binomial
+symmetry `spinReversalS_mulVec_spinSTopVector`. -/
+noncomputable def spinSTopVector (N : ℕ) (k : Fin (N + 1)) : ℂ :=
+  (Real.sqrt (N.choose (k : ℕ)) : ℂ)
+
+/-- Action of `Ŝ^+` on `u₀`: the single surviving raising step contributes the weight `N − i`
+times the entry at `i`, by the `√binom` ladder identity `Math.sqrt_lower_coeff`.  At the top index
+`i = N` there is no raising step and the coefficient `N − i` vanishes as well. -/
+private lemma spinSOpPlus_mulVec_spinSTopVector (N : ℕ) (i : Fin (N + 1)) :
+    Matrix.mulVec (spinSOpPlus N) (spinSTopVector N) i
+      = (((N - (i : ℕ) : ℕ) : ℝ) : ℂ) * spinSTopVector N i := by
+  simp only [Matrix.mulVec, dotProduct]
+  rcases Nat.lt_or_ge (i : ℕ) N with hlt | hge
+  · have hsucc : (i : ℕ) + 1 < N + 1 := by omega
+    rw [Finset.sum_eq_single (⟨(i : ℕ) + 1, hsucc⟩ : Fin (N + 1))]
+    · rw [spinSOpPlus_apply_raise N (i := i) (j := ⟨(i : ℕ) + 1, hsucc⟩) rfl]
+      have hk : Real.sqrt ((((i : ℕ) + 1 : ℕ) : ℝ) * ((N : ℝ) - (((i : ℕ) + 1 : ℕ) : ℝ) + 1)) *
+            Real.sqrt ((N.choose ((i : ℕ) + 1) : ℕ) : ℝ)
+          = ((N - (i : ℕ) : ℕ) : ℝ) * Real.sqrt ((N.choose (i : ℕ) : ℕ) : ℝ) := by
+        rw [show ((((i : ℕ) + 1 : ℕ) : ℝ) * ((N : ℝ) - (((i : ℕ) + 1 : ℕ) : ℝ) + 1))
+              = ((N : ℝ) - ((i : ℕ) : ℝ)) * (((i : ℕ) : ℝ) + 1) from by push_cast; ring,
+          Math.sqrt_lower_coeff hlt]
+        ring
+      unfold spinSTopVector
+      exact_mod_cast congrArg (fun r : ℝ => (r : ℂ)) hk
+    · intro b _ hb
+      rw [spinSOpPlus_apply_other N (fun hval => hb (Fin.ext hval.symm)), zero_mul]
+    · intro h; exact absurd (Finset.mem_univ _) h
+  · have hiEq : (i : ℕ) = N := by omega
+    rw [Finset.sum_eq_zero]
+    · rw [hiEq]; simp
+    · intro b _
+      have hb := b.isLt
+      rw [spinSOpPlus_apply_other N (by omega), zero_mul]
+
+/-- Action of `Ŝ^-` on `u₀`: the single surviving lowering step contributes the weight `i` times
+the entry at `i`, by the `√binom` ladder identity `Math.sqrt_raise_coeff`.  At the bottom index
+`i = 0` there is no lowering step and the coefficient `i` vanishes as well. -/
+private lemma spinSOpMinus_mulVec_spinSTopVector (N : ℕ) (i : Fin (N + 1)) :
+    Matrix.mulVec (spinSOpMinus N) (spinSTopVector N) i
+      = (((i : ℕ) : ℝ) : ℂ) * spinSTopVector N i := by
+  simp only [Matrix.mulVec, dotProduct]
+  rcases Nat.eq_zero_or_pos (i : ℕ) with hzero | hpos
+  · rw [Finset.sum_eq_zero]
+    · rw [hzero]; simp
+    · intro b _
+      rw [spinSOpMinus_apply_other N (by omega), zero_mul]
+  · obtain ⟨k, hk0⟩ : ∃ k, (i : ℕ) = k + 1 := ⟨(i : ℕ) - 1, by omega⟩
+    have hklt : k < N + 1 := by omega
+    have hkle : k + 1 ≤ N := by have := i.isLt; omega
+    rw [Finset.sum_eq_single (⟨k, hklt⟩ : Fin (N + 1))]
+    · rw [spinSOpMinus_apply_lower N (i := i) (j := ⟨k, hklt⟩) (by simp [hk0])]
+      have hk : Real.sqrt (((N : ℝ) - ((k : ℕ) : ℝ)) * (((k : ℕ) : ℝ) + 1)) *
+            Real.sqrt ((N.choose k : ℕ) : ℝ)
+          = (((k + 1 : ℕ) : ℝ)) * Real.sqrt ((N.choose (k + 1) : ℕ) : ℝ) := by
+        rw [show (((N : ℝ) - ((k : ℕ) : ℝ)) * (((k : ℕ) : ℝ) + 1))
+              = (((k : ℕ) : ℝ) + 1) * ((N : ℝ) - (((k : ℕ) : ℝ) + 1) + 1) from by ring,
+          Math.sqrt_raise_coeff hkle]
+        push_cast
+        ring
+      unfold spinSTopVector
+      rw [hk0]
+      exact_mod_cast congrArg (fun r : ℝ => (r : ℂ)) hk
+    · intro b _ hb
+      refine mul_eq_zero_of_left (spinSOpMinus_apply_other N ?_) _
+      intro hval
+      exact hb (Fin.ext (show (b : ℕ) = k by omega))
+    · intro h; exact absurd (Finset.mem_univ _) h
+
+/-- **`u₀` is the top `Ŝ^{(1)}` eigenvector**: `Ŝ^{(1)} u₀ = (N/2) u₀`, i.e. `Ŝ^{(1)} u₀ = S u₀`.
+The two ladder halves of `Ŝ^{(1)} = (Ŝ^+ + Ŝ^-)/2` contribute the complementary weights `N − i`
+and `i` at every index, whose half-sum is the constant `N/2`.  This is the computation that makes
+the `x`-polarised state the highest-weight state of the axis-1 chain of Tasaki (2.1.34), p. 20
+(Problem 2.1.g, p. 20). -/
+theorem spinSOp1_mulVec_spinSTopVector (N : ℕ) :
+    Matrix.mulVec (spinSOp1 N) (spinSTopVector N) = ((N : ℂ) / 2) • spinSTopVector N := by
+  funext i
+  have hi : (i : ℕ) ≤ N := Nat.lt_succ_iff.mp i.isLt
+  rw [spinSOp1, Matrix.smul_mulVec, Matrix.add_mulVec]
+  simp only [Pi.smul_apply, Pi.add_apply, smul_eq_mul]
+  rw [spinSOpPlus_mulVec_spinSTopVector, spinSOpMinus_mulVec_spinSTopVector]
+  rw [show (((N - (i : ℕ) : ℕ) : ℝ) : ℂ) = (N : ℂ) - ((i : ℕ) : ℂ) from by
+    rw [Nat.cast_sub hi]; push_cast; ring]
+  push_cast
+  ring
+
+/-- **`u₀` is invariant under the basis reversal `F`**: `F u₀ = u₀`, the binomial symmetry
+`binom(N,k) = binom(N,N−k)`.  This is the *only* anchor fixing the global sign of the axis-1
+identification: for half-odd-integer spin the two candidate signs are indistinguishable by any
+scalar invariant. -/
+theorem spinReversalS_mulVec_spinSTopVector (N : ℕ) :
+    Matrix.mulVec (spinReversalS N) (spinSTopVector N) = spinSTopVector N := by
+  funext i
+  have hi : (i : ℕ) ≤ N := Nat.lt_succ_iff.mp i.isLt
+  simp only [Matrix.mulVec, dotProduct]
+  rw [Finset.sum_eq_single (Fin.rev i)]
+  · rw [spinReversalS_apply, if_pos rfl, one_mul, spinSTopVector, spinSTopVector, Fin.val_rev,
+      Nat.add_sub_add_right, Nat.choose_symm hi]
+  · intro b _ hb
+    rw [spinReversalS_apply, if_neg hb, zero_mul]
+  · intro h; exact absurd (Finset.mem_univ _) h
 
 end LatticeSystem.Quantum
