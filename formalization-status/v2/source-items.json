@@ -45,6 +45,18 @@
     },
     {
       "equations": [
+        "2.1.34"
+      ],
+      "id": "tasaki-2020-problem-2-1-g",
+      "item_kind": "exercise",
+      "item_number": "2.1.g",
+      "pages": "20",
+      "section": "2.1",
+      "source_id": "tasaki-2020",
+      "title": "General-spin closed form for the single-spin pi-rotation operators"
+    },
+    {
+      "equations": [
         "2.2.11",
         "2.1.25"
       ],

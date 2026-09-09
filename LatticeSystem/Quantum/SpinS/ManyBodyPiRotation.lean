@@ -16,10 +16,13 @@ tensor slots, so the lattice product is the many-body tensor `⊗_{x ∈ Λ} û_
 
 **What is formalised, and what is not.**  As in `Quantum/SpinS/SpinSPiRotation.lean`, the
 rotations are *defined* by their closed-form matrices — the eq. (2.1.24)/(2.1.25)-level algebra of
-a phase `(−i)^{2S}` times a real involution — and the identification of those matrices with
-`exp(−iπ Ŝ^{(α)})` at general `S` is **not** formalised: no declaration in this chain mentions
-`Matrix.exp` or `NormedSpace.exp`.  Exponential rotations and bridges do exist elsewhere in the
-repository — `spinSRot3 N θ = exp(−iθ Ŝ^{(3)})` of
+a phase `(−i)^{2S}` times a real involution.  The identification of the axis-`3` closed form
+`spinSPiRotation3` with `exp(−iπ Ŝ^{(3)})` at general `S` is now proved,
+`spinSPiRotation3_eq_spinSRot3_pi` of `Quantum/SpinS/SpinSPiRotationExpAxis3.lean` (Tasaki
+eq. (2.1.34) / Problem 2.1.g, p. 20); the identification for axes `1` and `2`, and its lift through
+`manyBodyTensorS` to the many-body `Û_π^{(α)}` of this file, remain **not** formalised — no
+declaration in this chain mentions `Matrix.exp` or `NormedSpace.exp`.  Exponential rotations and
+bridges do exist elsewhere in the repository — `spinSRot3 N θ = exp(−iθ Ŝ^{(3)})` of
 `Quantum/SpinS/Problem25cZAxisRotationInput.lean`, whose closed form `spinSRot3_eq_diagonal` and
 general-`S` many-body bridge `manyBodyTensorS_spinSRot3_eq_exp_totalSpinSOp3` are proved in
 `Quantum/SpinS/Problem25cZAxisRotationCommutation.lean`, and `spinSRot1 N θ = exp(−iθ Ŝ^{(1)})`
@@ -27,9 +30,11 @@ of `Quantum/SpinS/SpinSRotation1.lean`, which carries no closed form; the genera
 exponentials `saturatedGlobalRot2` / `saturatedGlobalRot3` about the axes `2` and `3` of
 `Quantum/SpinS/SaturatedCoherentAmplitude.lean`; the general-`S` twist bridge
 `lsmTwistOperator_eq_diagonal` of `Quantum/SpinS/LiebSchultzMattisProof.lean`; and the spin-`1/2`
-`totalSpinHalfRot{1,2,3}_eq_exp` of `Quantum/TotalSpin/Rotation.lean` — but none of them is
-related to the closed forms `spinSPiRotationAxis` / `manyBodySPiRotation` used here.  The
-exponentials written above and below are the book's notation for the closed-form matrices, not a
+`totalSpinHalfRot{1,2,3}_eq_exp` of `Quantum/TotalSpin/Rotation.lean` — of these only
+`spinSRot3` is related to the closed forms used here, through the axis-`3` identification of the
+single-site factor `spinSPiRotationAxis` above; the axes `1`, `2` and the many-body
+`manyBodySPiRotation` lift stay unrelated.  The exponentials written above and below are the
+book's notation for the closed-form matrices, not (outside axis `3` at the single-site level) a
 proved equality.
 
 At `S = 1` (`N = 2`) the same operator is also built as the whole-chain `piRotationS` of

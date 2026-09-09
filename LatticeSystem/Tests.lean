@@ -173,6 +173,7 @@ import LatticeSystem.Tests.FiniteStrictUpperBoundPin
 import LatticeSystem.Tests.SaturatedFerromagnetSectorPF
 import LatticeSystem.Tests.FerromagneticGroundStateTheorem21
 import LatticeSystem.Tests.ManyBodyPiRotationProblem22a
+import LatticeSystem.Tests.SpinSPiRotationExpBridge
 
 /-!
 # Test aggregator for the `lattice-system` library

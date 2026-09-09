@@ -87,6 +87,13 @@ eq. (2.2.14).)
 whose file attribution now names both the axis-swap module and
 `Quantum/SpinS/ManyBodyTensorS.lean`, where the generic tensor adjoint is stated with the rest of
 that API.)
+(Applied once more for the `totalSpinHalfRot{1,2,3}Pi_two_site` row of
+`docs/formalization/legacy/20-total-spin-operator-tasaki-2-2-eq-2-2-7-2-2-8-part-01.md`, narrowing
+its disclosure of the unformalised identification with the book's exponentials: the axis-3
+exponential identification of the general-spin π-rotation is now proved (Tasaki eq. (2.1.34) /
+Problem 2.1.g, p. 20, `spinSPiRotation3_eq_spinSRot3_pi`,
+`Quantum/SpinS/SpinSPiRotationExpAxis3.lean`), so the row now names only axes 1 and 2 and the
+many-body lift as still open.)
 Recomputing a pin is never on its own an
 authorization for what moved: the legacy pages still have to be edited to match, and the
 catalogue-row comparison is what proves they do. What the pins buy is that a change to the
@@ -184,12 +191,12 @@ LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
 CATALOGUE_BASELINE_SLICE = slice(216, 2731)
 # Pins the published catalogue text; this module's docstring records exactly what is hashed
 # and how the pin is legitimately updated.
-APPROVED_CHANGES_SHA256 = "3922e2c306201cdc1f90d58ffe20c7d7a732f1496d97b2f98ff4a4979a3d223d"
+APPROVED_CHANGES_SHA256 = "0991eaaad07bb40f2eabf03923d8f39cee9b6bec349f831d72786e463ff1f443"
 # Pins the row sequence `main()` actually compares the legacy pages against. The text pin above
 # does not reach it: the rows are derived from the transformed text by `table_data_rows`, which
 # is outside the pinned text, so without this pin a row skipped there would go unpublished with
 # the text pin undisturbed.
-PUBLISHED_ROWS_SHA256 = "fc9260e6d505f1a0d6d030d978dbac3ba86dc324e22e1baafff89f68d21dea37"
+PUBLISHED_ROWS_SHA256 = "60ab5d04a6648a1ad23c6e438e669980e7633270a78987a41716bb3c19aba6e8"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -1530,6 +1537,20 @@ def _approved_replacements(text: str) -> str:
             "forms with `exp(−iπ Ŝ^{(α)})` at general `S` is not formalised, so the coverage of "
             "Problem 2.2.a is partial |",
         )
+        # The axis-3 closed form is now identified with the book's exponential (Tasaki
+        # eq. (2.1.34) / Problem 2.1.g, p. 20); axes 1, 2 and the many-body lift are still
+        # open, so Problem 2.2.a's coverage stays partial.
+        .replace(
+            "the identification of those closed "
+            "forms with `exp(−iπ Ŝ^{(α)})` at general `S` is not formalised, so the coverage of "
+            "Problem 2.2.a is partial |",
+            "the identification of the axis-3 closed form with `exp(−iπ Ŝ^{(3)})` at general `S` "
+            "is now proved (Tasaki eq. (2.1.34) / Problem 2.1.g, p. 20, "
+            "`spinSPiRotation3_eq_spinSRot3_pi`, "
+            "`Quantum/SpinS/SpinSPiRotationExpAxis3.lean`); axes 1 and 2, and the many-body "
+            "lift, remain unidentified with the exponentials, so the coverage of Problem 2.2.a "
+            "stays partial |",
+        )
     )
 
 
@@ -1594,12 +1615,12 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "15d061fa418b9b1ce4740b7e5a67c7fa2801bfa1bed9738be8063c7c7fd037d7"
+SCRIPT_SOURCE_SHA256 = "75cad15200fa0bf5803bf1b662d878f5874557963e66247e61e24c3787d9d81e"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
-APPROVED_ENTRIES_SHA256 = "226d631aa681511fabe2b356e6704275ef9aeb9b923c4b04beda52f449ac8684"
+APPROVED_ENTRIES_SHA256 = "25eaa8cc8b5400aa3544e468c07b1b9426caad109f8b7dd1bbcc50315717cd1a"
 
 # The only text `SCRIPT_SOURCE_SHA256` does not hash: the digits these four pins carry. Each is
 # restated by the very edit it pins, and a digest over its own value would have no fixed point.
