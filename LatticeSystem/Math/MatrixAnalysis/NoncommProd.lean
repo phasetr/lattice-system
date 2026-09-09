@@ -20,8 +20,6 @@ fermion / Jordan–Wigner files:
   idempotent.  Previously in `Fermion/JordanWigner/Hubbard/HardcoreProjection.lean`.
 * `Matrix.noncommProd_mulVec_eq_self` — a product of matrices each fixing a vector `ψ` also fixes
   `ψ`.  Previously in `Fermion/JordanWigner/Hubbard/HardcoreProjection.lean`.
-* `Matrix.noncommProd_conjTranspose_mul_self` — a product of pairwise-commuting isometries is an
-  isometry.
 
 None of these depend on any fermion-specific structure, so they belong in the generic
 matrix-analysis layer.  Hosting them upstream of the Jordan–Wigner files also removes the import
@@ -113,28 +111,6 @@ theorem noncommProd_mul_self_of_idempotent
           ← Matrix.mul_assoc (t.noncommProd f hcomm_t) (f a),
           ← hcomm_a.eq, Matrix.mul_assoc, Matrix.mul_assoc]]
     rw [hId a (Finset.mem_insert_self a t), ih hcomm_t hId_t]
-
-/-- A non-commutative product of pairwise-commuting matrices, each of which is an isometry
-(`Aᴴ A = 1`), is itself an isometry. -/
-theorem noncommProd_conjTranspose_mul_self
-    (s : Finset ι) (f : ι → Matrix n n ℂ)
-    (hcomm : (s : Set ι).Pairwise (fun a b => Commute (f a) (f b)))
-    (hU : ∀ a ∈ s, (f a).conjTranspose * f a = 1) :
-    (s.noncommProd f hcomm).conjTranspose * s.noncommProd f hcomm = 1 := by
-  classical
-  induction s using Finset.induction_on with
-  | empty =>
-    simp only [Finset.noncommProd_empty]
-    rw [Matrix.conjTranspose_one, Matrix.one_mul]
-  | @insert a t hat ih =>
-    rw [Finset.noncommProd_insert_of_notMem _ _ _ _ hat]
-    have hcomm_t : (t : Set ι).Pairwise (fun a b => Commute (f a) (f b)) :=
-      hcomm.mono fun x hx => Finset.mem_insert_of_mem hx
-    have hU_t : ∀ b ∈ t, (f b).conjTranspose * f b = 1 :=
-      fun b hb => hU b (Finset.mem_insert_of_mem hb)
-    rw [Matrix.conjTranspose_mul, Matrix.mul_assoc,
-      ← Matrix.mul_assoc (f a).conjTranspose (f a) (t.noncommProd f hcomm_t),
-      hU a (Finset.mem_insert_self a t), Matrix.one_mul, ih hcomm_t hU_t]
 
 /-- A non-commutative product of matrices, each of which fixes a vector `ψ` under `mulVec`, also
 fixes `ψ`. -/

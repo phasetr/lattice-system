@@ -868,6 +868,13 @@ $\hat S_x \cdot \hat S_y$.
     eigenvalues (eqs.~(2.2.17)-(2.2.19)).
   \item Magnetization eigenspace decomposition
     $\mathcal H = \bigoplus_M \mathcal H_M$ (eqs.~(2.2.9)-(2.2.10)).
+  \item Problem 2.2.b, eq.~(2.2.15), p.~23: the solid-angle average of
+    $|\uparrow\rangle_1|\uparrow\rangle_2$, the non-SU(2)-invariant
+    triplet component (its companion eq.~(2.2.14), the singlet average,
+    is already formalized).
+  \item Problem 2.2.c, pp.~23--24: the rotated state
+    $\hat U|\uparrow\rangle_1|\downarrow\rangle_2$ depends only on
+    the axis $n$, not on the choice of $\hat U$.
 \end{itemize}
 
 \subsection{Problem 2.2.a: global \texorpdfstring{$\pi$}{pi}-rotations
@@ -893,8 +900,8 @@ for $\alpha \neq \beta$
 site-wise through the $|\Lambda|$-fold product to the master identity
 $\hat U^{(\beta)}_\pi \hat U^{(\alpha)}_\pi
   = (-1)^{|\Lambda| N} \hat U^{(\alpha)}_\pi \hat U^{(\beta)}_\pi$
-(\texttt{manyBodySPiRotation\_swap\_mul\_of\_ne}), matching eq.~(2.1.29),
-p.~19, at the single-site level and Problem 2.2.a at the many-body
+(\texttt{manyBodySPiRotation\_swap\_mul\_of\_ne}), matching eq.~(2.1.25),
+p.~18, at the single-site level and Problem 2.2.a at the many-body
 level.
 
 \begin{theorem}[Tasaki Problem 2.2.a (a)]
@@ -919,9 +926,10 @@ to $\hat U^{(\beta)}_\pi |\Phi\rangle$. Lean name:
 
 \begin{proof}
 $\hat U^{(\alpha)}_\pi$ is unitary
-(\texttt{manyBodySPiRotation\_conjTranspose\_mul\_self}, built from the
-generic noncommutative-product isometry lemma
-\texttt{Matrix.noncommProd\_conjTranspose\_mul\_self}). The generic
+(\texttt{manyBodySPiRotation\_conjTranspose\_mul\_self}: each site
+factor lies in \texttt{Matrix.unitaryGroup}, which is a submonoid, so
+mathlib's \texttt{Submonoid.noncommProd\_mem} carries the membership to
+the $|\Lambda|$-fold product). The generic
 linear-algebra core
 \texttt{Matrix.dotProduct\_mulVec\_eq\_zero\_of\_anticommute\_eigenvector}
 (\texttt{Math/MatrixAnalysis/AnticommutingEigenvectorOrthogonality.lean})
@@ -17155,8 +17163,8 @@ Corollary~8.5 is \emph{disjunctive} --- no injective matrix product state that i
 $\mathbb{Z}_2\times\mathbb{Z}_2$ invariant \emph{or} time-reversally invariant --- and
 \textbf{both} halves are proved axiom-free and unconditionally, following the two instances the
 book runs through on p.~278.  The common input is the pair of $\pi$ rotations of eq.~(2.1.29),
-$\hat u_1=\exp(i\pi\hat S^{(1)})=i^{2S}F$ with $F$ the basis reversal
-$|S,m\rangle\mapsto|S,-m\rangle$ --- the \texttt{spinReversalS} of §2.5 ---, and $\hat u_3=\exp(i\pi\hat S^{(3)})=i^{2S}\,\mathrm{diag}
+$\hat u_1=\exp(-i\pi\hat S^{(1)})=(-i)^{2S}F$ with $F$ the basis reversal
+$|S,m\rangle\mapsto|S,-m\rangle$ --- the \texttt{spinReversalS} of §2.5 ---, and $\hat u_3=\exp(-i\pi\hat S^{(3)})=(-i)^{2S}\,\mathrm{diag}
 ((-1)^k)$, both written in closed form as for $S=1$ in
 \texttt{Quantum/SpinS/SpinOneHalfTurn.lean} and with no Lean bridge to \texttt{NormedSpace.exp}
 (at $S=1$ they are literally \texttt{spinOneHalfTurnS 0} and \texttt{spinOneHalfTurnS 2}, and
@@ -17172,7 +17180,7 @@ instance, $G=\mathbb{Z}_2=\{e,a\}$ with $s(a)=-1$ and $\hat v(a)=\hat\Theta=X\ha
 is realised as the units $\mathbb{Z}^\times=\{1,-1\}$, which makes $s$ the identity homomorphism,
 and the matrix part is $X=\hat u_1\hat u_3$ in place of the book's $\hat u_2$.  Only
 $\hat\Theta^2=-\hat 1$ enters, which in the encoding of (8.3.40) is the matrix identity
-$X\,C[X]=-\hat 1$: entrywise conjugation fixes $X$, because the two phases $i^{2S}$ multiply to the
+$X\,C[X]=-\hat 1$: entrywise conjugation fixes $X$, because the two phases $(-i)^{2S}$ multiply to the
 real sign $(-1)^{2S}$, so $X\,C[X]=(\hat u_1\hat u_3)^2=-\hat 1$ for odd $N$.  Nontriviality is
 again one line: a trivial representation would give $\hat\Theta^2=\hat v_0(a)C[\hat v_0(a)]=\hat
 1$, the phase cancelling against its own conjugate.

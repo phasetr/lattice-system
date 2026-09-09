@@ -12,7 +12,7 @@ linear unitary it is the π-rotation about axis 1: it conjugates `Ŝ³ ↦ −Ŝ
 Mattis–Nishimori uniqueness argument (Theorem 2.4).
 
 Being the axis-1 π rotation up to a phase, `F` is also the real involution underlying the closed
-form of `û₁ = exp(iπ Ŝ^{(1)})` in `Quantum/SpinS/SpinSPiRotation.lean`.
+form of `û₁ = exp(−iπ Ŝ^{(1)})` (p. 19) in `Quantum/SpinS/SpinSPiRotation.lean`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.4, p. 43–44.

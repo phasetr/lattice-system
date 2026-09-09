@@ -163,12 +163,12 @@ LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
 CATALOGUE_BASELINE_SLICE = slice(216, 2731)
 # Pins the published catalogue text; this module's docstring records exactly what is hashed
 # and how the pin is legitimately updated.
-APPROVED_CHANGES_SHA256 = "4d638a2fcc39f32905d23a0a537fa17def685cd96de2659281c61c49bf91afd4"
+APPROVED_CHANGES_SHA256 = "6b6c23b805f4d04af06b89754ac06b12b13e15ac52097c55f473716041812f18"
 # Pins the row sequence `main()` actually compares the legacy pages against. The text pin above
 # does not reach it: the rows are derived from the transformed text by `table_data_rows`, which
 # is outside the pinned text, so without this pin a row skipped there would go unpublished with
 # the text pin undisturbed.
-PUBLISHED_ROWS_SHA256 = "cb0edc2f4a65c822df07f0f4233b957381a1103df4f86e470a50cab72b81ba81"
+PUBLISHED_ROWS_SHA256 = "2af6d7f15de06e7fbdb035bbf28905e055d1573628cd55d220de6de2cc2aaaac"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -1407,6 +1407,13 @@ def _approved_replacements(text: str) -> str:
             "`Û^(α)_π_tot · Û^(β)_π_tot = Û^(γ)_π_tot` (cyclic; Tasaki eq. (2.1.29), p. 19, "
             "lifted site-wise through eq. (2.2.11)) | `Quantum/TotalSpin/Rotation.lean` |",
         )
+        # Keys on text the `spinReversalS` entry above inserts, not on baseline text: the closed
+        # form of `û₁` carries the book's sign convention `û_α = exp(−iπ Ŝ^{(α)})` (eq. (2.2.11),
+        # p. 22; p. 19), so the phase is `(−i)^{2S}`.
+        .replace(
+            "real involution behind the closed-form `π` rotation `û₁ = i^{2S}F` of ",
+            "real involution behind the closed-form `π` rotation `û₁ = (−i)^{2S}F` of ",
+        )
     )
 
 
@@ -1471,12 +1478,12 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "b82d196235648229243224931e6a735d92763b90916bda351eb1e0c7a1ef66bc"
+SCRIPT_SOURCE_SHA256 = "8f71d0ee8948c880d6278252ad3279ec74957ec749245fe43d5f6e35fd4ce87b"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
-APPROVED_ENTRIES_SHA256 = "53ffbd641d43af19bf1db74b56025ff6dd41f292d1496ca8479e77f82ddf28a5"
+APPROVED_ENTRIES_SHA256 = "6a620bf6660d8d4910c2aa3c71512b0c8e158fdc7cff4db0c859b77faa47e5d8"
 
 # The only text `SCRIPT_SOURCE_SHA256` does not hash: the digits these four pins carry. Each is
 # restated by the very edit it pins, and a digest over its own value would have no fixed point.

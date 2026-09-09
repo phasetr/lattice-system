@@ -47,7 +47,7 @@ private lemma r0_spinSPiRotation2_spin_half :
     simp [spinSPiRotation2, spinSPiRotation1, spinSPiRotation3, spinReversalS, spinSAlternating,
       pauliY, Matrix.mul_apply, Fin.sum_univ_succ, Fin.rev]
 
-/-! ## R1: master sign identity, Tasaki eq. (2.2.11) lifted through eq. (2.1.25)/(2.1.29) -/
+/-! ## R1: master sign identity, Tasaki eq. (2.1.25), p. 18, lifted through eq. (2.2.11), p. 22 -/
 
 /-- R1: locks the exact name/signature of the master sign identity
 `Û^{(β)}Û^{(α)} = (−1)^{|Λ|N} Û^{(α)}Û^{(β)}` for `α ≠ β`. -/

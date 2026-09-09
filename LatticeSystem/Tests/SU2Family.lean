@@ -139,17 +139,20 @@ example (Λ : Type*) [Fintype Λ] [DecidableEq Λ] :
     totalSpinHalfRot3Pi Λ = totalSpinHalfRot3 Λ Real.pi :=
   totalSpinHalfRot3Pi_eq Λ
 
-/-- Pin (Tasaki Problem 2.2.a): `Û^(1)_π_tot · Û^(2)_π_tot = Û^(3)_π_tot`. -/
+/-- Pin (Tasaki eq. (2.1.29), p. 19, lifted site-wise):
+`Û^(1)_π_tot · Û^(2)_π_tot = Û^(3)_π_tot`. -/
 example (Λ : Type*) [Fintype Λ] [DecidableEq Λ] :
     totalSpinHalfRot1Pi Λ * totalSpinHalfRot2Pi Λ = totalSpinHalfRot3Pi Λ :=
   totalSpinHalfRot1Pi_mul_totalSpinHalfRot2Pi Λ
 
-/-- Pin (Tasaki Problem 2.2.a): `Û^(2)_π_tot · Û^(3)_π_tot = Û^(1)_π_tot`. -/
+/-- Pin (Tasaki eq. (2.1.29), p. 19, lifted site-wise):
+`Û^(2)_π_tot · Û^(3)_π_tot = Û^(1)_π_tot`. -/
 example (Λ : Type*) [Fintype Λ] [DecidableEq Λ] :
     totalSpinHalfRot2Pi Λ * totalSpinHalfRot3Pi Λ = totalSpinHalfRot1Pi Λ :=
   totalSpinHalfRot2Pi_mul_totalSpinHalfRot3Pi Λ
 
-/-- Pin (Tasaki Problem 2.2.a): `Û^(3)_π_tot · Û^(1)_π_tot = Û^(2)_π_tot`. -/
+/-- Pin (Tasaki eq. (2.1.29), p. 19, lifted site-wise):
+`Û^(3)_π_tot · Û^(1)_π_tot = Û^(2)_π_tot`. -/
 example (Λ : Type*) [Fintype Λ] [DecidableEq Λ] :
     totalSpinHalfRot3Pi Λ * totalSpinHalfRot1Pi Λ = totalSpinHalfRot2Pi Λ :=
   totalSpinHalfRot3Pi_mul_totalSpinHalfRot1Pi Λ

@@ -9,7 +9,7 @@ The global rotation operator
 `Û^(α)_θ_tot = exp(-iθ Ŝ_tot^(α))` and its specialisations:
 - π-rotation,
 - general-θ rotation,
-- Tasaki Problems 2.2.a / 2.2.b (cyclic axes, two-spin),
+- cyclic-axis products (Tasaki eq. (2.1.29), p. 19, lifted site-wise),
 - two-spin explicit forms,
 - matrix exponential identification (`_eq_exp`),
 - generic operator-level SU(2) invariance (#2.2.12 → #2.2.13),
@@ -111,25 +111,32 @@ theorem totalSpinHalfRot2Pi_eq : totalSpinHalfRot2Pi Λ = totalSpinHalfRot2 Λ R
 /-- `Û^(3)_π_tot` is a special case of `Û^(3)_θ_tot` at `θ = π`. -/
 theorem totalSpinHalfRot3Pi_eq : totalSpinHalfRot3Pi Λ = totalSpinHalfRot3 Λ Real.pi := rfl
 
-/-! ## Tasaki Problem 2.2.a: total π-rotation product (in cyclic axes) -/
+/-! ## Total π-rotation products in cyclic axes
 
-/-- Tasaki Problem 2.2.a, axes (1,2)→3:
+The cyclic single-site products `û^{(α)}û^{(β)} = û^{(γ)}` of Tasaki eq. (2.1.29), p. 19, lifted
+site-wise through the global product of eq. (2.2.11), p. 22.  The dichotomy of Tasaki
+Problem 2.2.a, p. 23 — commutation versus anticommutation of `Û_π^{(α)}` and `Û_π^{(β)}` for
+`α ≠ β`, and the eigenvector orthogonality it yields — is
+`tasaki_problem_2_2_a_eigenvector_orthogonal` and its companions in
+`Quantum/SpinS/ManyBodyPiRotation.lean`. -/
+
+/-- Tasaki eq. (2.1.29), p. 19, at the many-body level, axes (1,2)→3:
 `Û^(1)_π_tot · Û^(2)_π_tot = Û^(3)_π_tot`. Derived from
-the single-site relation `Û^(1)_π · Û^(2)_π = Û^(3)_π` (Tasaki eq.
-(2.1.29)) lifted by `Finset.noncommProd_mul_distrib`. -/
+the single-site relation `Û^(1)_π · Û^(2)_π = Û^(3)_π` lifted
+site-wise by `Finset.noncommProd_mul_distrib`. -/
 theorem totalSpinHalfRot1Pi_mul_totalSpinHalfRot2Pi :
     totalSpinHalfRot1Pi Λ * totalSpinHalfRot2Pi Λ = totalSpinHalfRot3Pi Λ := by
   unfold totalSpinHalfRot1Pi totalSpinHalfRot2Pi totalSpinHalfRot3Pi
   rw [totalSpinHalfRotOf_mul, spinHalfRot1_pi_mul_spinHalfRot2_pi]
 
-/-- Tasaki Problem 2.2.a, axes (2,3)→1:
+/-- Tasaki eq. (2.1.29), p. 19, at the many-body level, axes (2,3)→1:
 `Û^(2)_π_tot · Û^(3)_π_tot = Û^(1)_π_tot`. -/
 theorem totalSpinHalfRot2Pi_mul_totalSpinHalfRot3Pi :
     totalSpinHalfRot2Pi Λ * totalSpinHalfRot3Pi Λ = totalSpinHalfRot1Pi Λ := by
   unfold totalSpinHalfRot1Pi totalSpinHalfRot2Pi totalSpinHalfRot3Pi
   rw [totalSpinHalfRotOf_mul, spinHalfRot2_pi_mul_spinHalfRot3_pi]
 
-/-- Tasaki Problem 2.2.a, axes (3,1)→2:
+/-- Tasaki eq. (2.1.29), p. 19, at the many-body level, axes (3,1)→2:
 `Û^(3)_π_tot · Û^(1)_π_tot = Û^(2)_π_tot`. -/
 theorem totalSpinHalfRot3Pi_mul_totalSpinHalfRot1Pi :
     totalSpinHalfRot3Pi Λ * totalSpinHalfRot1Pi Λ = totalSpinHalfRot2Pi Λ := by

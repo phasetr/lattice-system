@@ -185,8 +185,8 @@ theorem spinSPiRotation3_mul_spinSPiRotation1 (N : ℕ) :
 
 /-! ## The product `û₁û₃`: the matrix part of the time reversal (p. 278) -/
 
-/-- **The product of the two `π` rotations is real**: the two phases `i^{2S}` multiply to the sign
-`(−1)^{2S}`, leaving the real matrix `F·D`. -/
+/-- **The product of the two `π` rotations is real**: the two phases `(−i)^{2S}` multiply to the
+sign `(−1)^{2S}`, leaving the real matrix `F·D`. -/
 theorem spinSPiRotation1_mul_spinSPiRotation3 (N : ℕ) :
     spinSPiRotation1 N * spinSPiRotation3 N =
       ((-1 : ℂ) ^ N) • (spinReversalS N * spinSAlternating N) := by

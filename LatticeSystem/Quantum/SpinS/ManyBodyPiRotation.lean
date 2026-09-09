@@ -116,16 +116,21 @@ theorem manyBodySPiRotation_anticommute_of_odd (hc : Odd (Fintype.card Λ * N))
       = -(manyBodySPiRotation Λ N β * manyBodySPiRotation Λ N α) := by
   rw [manyBodySPiRotation_swap_mul_of_ne Λ N h.symm, hc.neg_one_pow, neg_one_smul]
 
-/-- Each global `π` rotation is an isometry: every site factor is, and the factors commute. -/
+/-- Each global `π` rotation is unitary: every site factor is, the factors commute, and
+`Matrix.unitaryGroup` is a submonoid (`Submonoid.noncommProd_mem`). -/
 theorem manyBodySPiRotation_conjTranspose_mul_self (α : Fin 3) :
     (manyBodySPiRotation Λ N α).conjTranspose * manyBodySPiRotation Λ N α = 1 := by
   have hu : (spinSPiRotationAxis N α).conjTranspose * spinSPiRotationAxis N α = 1 := by
     have hmem := spinSPiRotationAxis_mem_unitaryGroup N α
     rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose] at hmem
     exact hmem
-  unfold manyBodySPiRotation manyBodySPiRotationOf
-  refine Matrix.noncommProd_conjTranspose_mul_self _ _ _ (fun x _ => ?_)
-  rw [onSiteS_conjTranspose, onSiteS_mul_onSiteS_same, hu, onSiteS_one]
+  have hmem : manyBodySPiRotation Λ N α ∈ Matrix.unitaryGroup (Λ → Fin (N + 1)) ℂ := by
+    unfold manyBodySPiRotation manyBodySPiRotationOf
+    refine Submonoid.noncommProd_mem _ _ _ _ (fun x _ => ?_)
+    rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose, onSiteS_conjTranspose,
+      onSiteS_mul_onSiteS_same, hu, onSiteS_one]
+  rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose] at hmem
+  exact hmem
 
 /-- **Tasaki Problem 2.2.a (c), p. 23 (`[solution → p. 496]`).**  For half-odd-integer `|Λ|S` and
 distinct axes, every eigenvector `Φ ≠ 0` of `Û_π^{(α)}` is orthogonal to `Û_π^{(β)}Φ`.  The two
