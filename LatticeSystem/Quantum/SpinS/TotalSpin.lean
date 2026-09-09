@@ -88,20 +88,6 @@ theorem totalSpinSOpMinus_eq_sub :
 
 /-! ## Adjoint relations -/
 
-/-- The conjugate transpose of `onSiteS i A` equals `onSiteS i Aᴴ`. -/
-theorem onSiteS_conjTranspose (i : Λ)
-    (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
-    (onSiteS i A : ManyBodyOpS Λ N).conjTranspose =
-      (onSiteS i A.conjTranspose : ManyBodyOpS Λ N) := by
-  ext σ' σ
-  simp only [Matrix.conjTranspose_apply, onSiteS_apply]
-  by_cases h : ∀ k, k ≠ i → σ' k = σ k
-  · have h' : ∀ k, k ≠ i → σ k = σ' k := fun k hk => (h k hk).symm
-    rw [if_pos h, if_pos h']
-  · have h' : ¬ ∀ k, k ≠ i → σ k = σ' k := fun hp =>
-      h (fun k hk => (hp k hk).symm)
-    rw [if_neg h, if_neg h', star_zero]
-
 /-- `(Ŝ_tot^+)† = Ŝ_tot^-`. -/
 theorem totalSpinSOpPlus_conjTranspose :
     (totalSpinSOpPlus Λ N).conjTranspose = totalSpinSOpMinus Λ N := by
