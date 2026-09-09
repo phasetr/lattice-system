@@ -82,9 +82,11 @@ vector is a scalar multiple of `|σ_⊤⟩` (by
 the intersection equals `Submodule.span ℂ {|σ_⊤⟩}`.
 
 This is the first concrete sector contribution to the upper bound
-`finrank(joint) ≤ 2m_max + 1` that closes Tasaki §2.4 Theorem 2.1
-(saturated-ferromagnet ground-state subspace is the
-`(2m_max + 1)`-dimensional irreducible SU(2) representation). -/
+`finrank(joint) ≤ 2m_max + 1` that closes the saturated-ferromagnet joint
+`(Ĥ, (Ŝ_tot)²)`-eigenspace (the `(2m_max + 1)`-dimensional irreducible SU(2)
+representation).  The printed Tasaki §2.4 Theorem 2.1 (p. 34) is the `Ĥ`-only
+statement, closed separately by
+`tasaki_theorem_2_1_ferromagnetic_ground_states`. -/
 theorem magSubspaceS_mMax_inf_saturatedFerromagnetJointEigenspace
     [Nonempty V] (J : V → V → ℂ) :
     magSubspaceS V N ((Fintype.card V : ℂ) * (N : ℂ) / 2)
@@ -349,7 +351,7 @@ the integer offset `k` from the highest-weight magnetisation
 This is the iterated form of the chain. Summing over the
 `2m_max + 1` values of `k ∈ {0, 1, ..., 2m_max}` corresponding to
 the spectrum of `Ŝ^z_tot` yields `dim(joint) ≤ 2m_max + 1`, the
-final ingredient for Tasaki §2.4 Theorem 2.1. -/
+final ingredient for the joint `(Ĥ, (Ŝ_tot)²)`-eigenspace closure. -/
 theorem saturatedFerromagnetJointEigenspace_inf_magSubspaceS_finrank_le_one
     [Nonempty V] (J : V → V → ℂ) (k : ℕ) :
     Module.finrank ℂ
@@ -399,8 +401,8 @@ the singleton-span and the subspace coincide.
 
 The 2m_max + 1 spectrum values `k ∈ {0, ..., 2m_max}` together with
 the magnetization direct-sum decomposition (PR #889) will identify
-`joint = span(ladderIterateUp)` (subsequent PR) and complete
-Tasaki §2.4 Theorem 2.1. -/
+`joint = span(ladderIterateUp)` (subsequent PR) and complete the joint
+`(Ĥ, (Ŝ_tot)²)`-eigenspace closure. -/
 theorem saturatedFerromagnetJointEigenspace_inf_magSubspaceS_eq_span_ladderIterateUp
     [Nonempty V] (J : V → V → ℂ) (k : Fin (Fintype.card V * N + 1)) :
     saturatedFerromagnetJointEigenspace (V := V) J N

@@ -16,8 +16,9 @@ Tasaki's solution of Problem 2.4.a (p. 496) instructs one to apply the Perron-Fr
 (Theorem A.18, p. 475) to the matrix representation of `Ĥ` in each sector `H_M`.  The repo's
 Perron-Frobenius packaging concludes simplicity from an explicit strictly positive eigenvector
 rather than from a variational identification of the sectorwise minimum, and the ladder state
-`Φ_M = (Ŝ⁻_tot)^k Φ↑` supplies that eigenvector: its closed form (eq. (2.4.9), p. 33) is a
-positive real multiple of a product of Clebsch-Gordan weights on its own sector.
+`Φ_M = (Ŝ⁻_tot)^k Φ↑` supplies that eigenvector: the closed form of the normalized state of
+eq. (2.4.9), p. 33 -- `ladderIterateUp` is the unnormalized iterate spanning the same line -- is
+a positive real multiple of a product of Clebsch-Gordan weights on its own sector.
 
 The three steps here are: strict positivity of the restricted ladder state, its eigenvector
 equation for the real-form sector matrix, and the resulting `finrank ≤ 1` for the complex sector
