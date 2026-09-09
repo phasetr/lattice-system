@@ -9,8 +9,9 @@ Tasaki's `{1̂, û₁, û₂, û₃}` of eq. (2.1.29), p. 19: the `π` rotations
 for half-odd-integer spin square to `−1̂` (eq. (2.1.31), p. 20) and anticommute (eq. (2.1.25),
 p. 18).  The rotations about axes `1` and `3` are built first, the remaining one as the printed
 product `û₂ = û₃û₁`, and the three are collected into the axis-indexed family
-`spinSPiRotationAxis`.  The product `û₁û₃` supplies the matrix part of the time reversal `Θ̂` of
-p. 278.
+`spinSPiRotationAxis`.  That printed product is the matrix part of the time reversal
+`Θ̂ = û₂K̂` of p. 278; the reversed product `û₁û₃ = (−1)^{2S}û₂`, built here as well, has the same
+square and so carries the identity `Θ̂² = −1̂`.
 
 The sign convention is the book's, `û_α := Û_π^{(α)} = exp(−iπ Ŝ^{(α)})` (p. 19), so that the
 many-body products of eq. (2.2.11), p. 22, are the printed ones.
@@ -27,11 +28,12 @@ diagonal resp. antidiagonal:
 Both are therefore a fixed phase `(−i)^N` times a real involution, and that is how they are
 **defined** here — by the eq. (2.1.24)/(2.1.25)-level algebra of those closed forms, as in
 `Quantum/SpinS/SpinOneHalfTurn.lean` (`S = 1`).  **The identification with `exp(−iπ Ŝ^{(α)})` at
-general `S` is proved for the axes `1` and `3`**, by `spinSPiRotation1_eq_spinSRot1_pi` of
-`Quantum/SpinS/SpinSPiRotationExpAxis1.lean` and `spinSPiRotation3_eq_spinSRot3_pi` of
-`Quantum/SpinS/SpinSPiRotationExpAxis3.lean`; for the axis `2` it is not formalised.  No
-declaration in this file mentions `Matrix.exp` or `NormedSpace.exp`.  Exponential rotations and
-bridges do exist elsewhere in the repository —
+general `S` is proved for all three axes**, by `spinSPiRotation1_eq_spinSRot1_pi` of
+`Quantum/SpinS/SpinSPiRotationExpAxis1.lean`, `spinSPiRotation3_eq_spinSRot3_pi` of
+`Quantum/SpinS/SpinSPiRotationExpAxis3.lean` and `spinSPiRotation2_eq_exp_spinSOp2` of
+`Quantum/SpinS/SpinSPiRotationExpAxis2.lean`, uniformly `spinSPiRotationAxis_eq_exp` of the last
+file.  No declaration in this file mentions `Matrix.exp` or `NormedSpace.exp`.  Exponential
+rotations and bridges do exist elsewhere in the repository —
 `spinSRot3 N θ = exp(−iθ Ŝ^{(3)})` of `Quantum/SpinS/Problem25cZAxisRotationInput.lean`, whose
 closed form `spinSRot3_eq_diagonal` and general-`S` many-body bridge
 `manyBodyTensorS_spinSRot3_eq_exp_totalSpinSOp3` are proved in
@@ -40,10 +42,10 @@ of `Quantum/SpinS/SpinSRotation1.lean`, whose only closed form is the one at `θ
 general-`S` global exponentials `saturatedGlobalRot2` / `saturatedGlobalRot3` about the axes `2`
 and `3` of `Quantum/SpinS/SaturatedCoherentAmplitude.lean`; the general-`S` twist bridge
 `lsmTwistOperator_eq_diagonal` of `Quantum/SpinS/LiebSchultzMattisProof.lean`; and the spin-`1/2`
-`totalSpinHalfRot{1,2,3}_eq_exp` of `Quantum/TotalSpin/Rotation.lean` — of these only `spinSRot1`
-and `spinSRot3` are related to the closed forms `spinSPiRotationAxis` built here, through the
-axis-`1` and axis-`3` identifications above.  Every `exp(−iπ Ŝ^{(2)})` written in this file is
-the book's notation for the closed-form matrix, not a proved equality.
+`totalSpinHalfRot{1,2,3}_eq_exp` of `Quantum/TotalSpin/Rotation.lean` — of these `spinSRot1` and
+`spinSRot3` are related to the closed forms `spinSPiRotationAxis` built here, through the three
+axis identifications above.  Every `exp(−iπ Ŝ^{(α)})` written in this file is now a proved
+equality, not merely the book's notation for the closed-form matrix.
 
 Since the two phases `(−i)^{2S}` multiply to the real sign `(−1)^{2S}`, the product `û₁û₃` is a
 real matrix: entrywise conjugation — the operation `C_g` of eq. (8.3.40) at the antiunitary sign —
@@ -202,7 +204,7 @@ theorem spinSPiRotation3_mul_spinSPiRotation1 (N : ℕ) :
   congr 1
   ring
 
-/-! ## The product `û₁û₃`: the matrix part of the time reversal (p. 278) -/
+/-! ## The reversed product `û₁û₃`: the square of the time reversal (p. 278) -/
 
 /-- **The product of the two `π` rotations is real**: the two phases `(−i)^{2S}` multiply to the
 sign `(−1)^{2S}`, leaving the real matrix `F·D`. -/
@@ -212,7 +214,8 @@ theorem spinSPiRotation1_mul_spinSPiRotation3 (N : ℕ) :
   rw [spinSPiRotation1, spinSPiRotation3, Matrix.smul_mul, Matrix.mul_smul, smul_smul, neg_I_pow_sq]
 
 /-- **`(û₁û₃)² = −1̂` for half-odd-integer spin**, the identity `Θ̂² = −1̂` of Tasaki p. 278 for
-the time reversal `Θ̂ = û₁û₃ K̂`: the two rotations anticommute (eq. (2.1.25), p. 18) and each
+the time reversal `Θ̂ = û₂K̂`: the reversed product is `û₁û₃ = (−1)^{2S}û₂`, so it has the same
+square as the matrix part `û₂`.  The two rotations anticommute (eq. (2.1.25), p. 18) and each
 squares to `−1̂` (eq. (2.1.31), p. 20), so the three signs combine to one. -/
 theorem spinSPiRotation1_mul_spinSPiRotation3_mul_self_of_odd {N : ℕ} (hN : Odd N) :
     (spinSPiRotation1 N * spinSPiRotation3 N) * (spinSPiRotation1 N * spinSPiRotation3 N) =

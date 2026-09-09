@@ -2,6 +2,7 @@ import LatticeSystem.Quantum.SpinS.SpinSPiRotation
 import LatticeSystem.Quantum.SpinS.Problem25cZAxisRotationCommutation
 import LatticeSystem.Quantum.SpinS.SpinSPiRotationExpAxis3
 import LatticeSystem.Quantum.SpinS.SpinSPiRotationExpAxis1
+import LatticeSystem.Quantum.SpinS.SpinSPiRotationExpAxis2
 import LatticeSystem.Quantum.SpinHalfRotation.Conjugation
 
 /-!
@@ -363,5 +364,186 @@ example : spinSRot1 1 Real.pi = !![(0 : ℂ), -Complex.I; -Complex.I, 0] := by
   rw [hrot, spinHalfRot1, rotOf, Real.cos_pi_div_two, Real.sin_pi_div_two]
   ext i j
   fin_cases i <;> fin_cases j <;> simp [spinHalfOp1, pauliX] <;> ring_nf
+
+/-!
+# Signature pin: PR-C of the Problem 2.1.g exponential-identification arc, axis 2
+
+PR-C closes the axis-2 case, the second relation of Tasaki (2.1.34), p. 20:
+`spinSPiRotation2 N = exp(−iπ Ŝ^{(2)})`, via the *R-conj* route: conjugating PR-B's axis-1
+capstone by `spinSRot3 N (Real.pi / 2)` and its inverse, using the repository's inverse-free
+intertwining bridge `matrix_exp_intertwine_of_pow_intertwine` rather than mathlib's
+`Matrix.exp_conj` (which would need unit/inverse packaging for `spinSRot3` that the repository
+does not have). The chain rests on the reversal `F` anti-commuting with a `z`-rotation's angle
+(`F · spinSRot3 N θ = spinSRot3 N (-θ) · F`), which collapses the two half-angle conjugating
+factors of the printed order `û₂ = û₃û₁` (eq. (2.1.29), p. 19) into `spinSRot3 N Real.pi` and
+PR-A's capstone.
+
+Pinned:
+* `spinReversalS_mul_spinSRot3` — the angle-flip commutation of the reversal `F` past a
+  `z`-rotation of any angle `θ`.
+* `spinSOp1_mul_spinSRot3_neg_pi_half` — the sign-critical axis-swap commutation
+  `Ŝ¹ · spinSRot3 N (-(π/2)) = spinSRot3 N (-(π/2)) · Ŝ²`, obtained from the existing
+  `spinSRot3_neg_pi_half_conj_spinSOp2` (Tasaki-independent conjugation fact already in the
+  repository) by right-multiplying and cancelling with `spinSRot3_mul_neg`.
+* `exp_neg_pi_mul_I_spinSOp2_eq_spinSRot3_conj` — the exponential of `Ŝ²` written as the
+  conjugate `spinSRot3 N (π/2) · spinSRot1 N π · spinSRot3 N (-(π/2))`, obtained from the
+  axis-swap commutation above by `matrix_exp_intertwine_of_pow_intertwine`.
+* A definitional guard that the closed-form side is the printed product `û₂ = û₃û₁`; the
+  exponential side needs none, being written with `NormedSpace.exp` directly.
+* **`spinSPiRotation2_eq_exp_spinSOp2`** — the axis-2 identification (capstone), Tasaki
+  (2.1.34), second relation, p. 20 (Problem 2.1.g, p. 20).
+* `exp_neg_pi_mul_I_spinSOp2_eq_spinSRot3_pi_mul_spinSRot1_pi` — the printed cyclic relation
+  `û₂ = û₃û₁` (eq. (2.1.29), p. 19) restated purely in terms of the operator exponentials.
+* `spinSPiRotation2_apply` — the printed entry form `⟨ψ_σ|û₂|ψ_τ⟩ = (−1)^{S+σ}δ_{σ,−τ}`
+  (eq. (2.1.34), second relation, p. 20) in the integer basis index.
+* `spinSPiRotationAxis_eq_exp` — the uniform statement of the closed-form family
+  `spinSPiRotationAxis N α` against `exp(−iπ Ŝ^{(α)})` for all three axes `α : Fin 3`
+  simultaneously (Tasaki (2.1.34), p. 20).
+* Zero-hypothesis positive controls at `N = 1, 2, 3`, and a negative control separating the
+  printed order `û₂ = û₃û₁` — the matrix part of the time reversal `Θ̂ = û₂K̂`, p. 278 — from
+  the reversed product `û₁û₃`, which differs from it by `(−1)^{2S}`.
+
+Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed.,
+Springer, 2020), the conjugation relations (2.1.21)/(2.1.22) p. 17, eq. (2.1.29) p. 19,
+eq. (2.1.34) p. 20, Problem 2.1.g p. 20 (solution p. 495).
+Refs #5455.
+-/
+
+/-! ## R2-rev: the angle-flip commutation of the reversal past a `z`-rotation -/
+
+/-- R2-rev pin: locks the exact name/signature of the angle-flip commutation
+`F · spinSRot3 N θ = spinSRot3 N (-θ) · F`, generic in `θ`. -/
+example (N : ℕ) (θ : ℝ) :
+    spinReversalS N * spinSRot3 N θ = spinSRot3 N (-θ) * spinReversalS N :=
+  spinReversalS_mul_spinSRot3 N θ
+
+/-! ## R2-swap: the sign-critical axis-swap commutation -/
+
+/-- R2-swap pin: locks the exact name/signature of the axis-swap commutation
+`Ŝ¹ · spinSRot3 N (-(π/2)) = spinSRot3 N (-(π/2)) · Ŝ²`, the sign-critical orientation on which
+the whole conjugation chain depends. -/
+example (N : ℕ) :
+    spinSOp1 N * spinSRot3 N (-(Real.pi / 2)) = spinSRot3 N (-(Real.pi / 2)) * spinSOp2 N :=
+  spinSOp1_mul_spinSRot3_neg_pi_half N
+
+/-! ## R2-conj: the exponential of `Ŝ²` as a conjugate -/
+
+/-- R2-conj pin: locks the exact name/signature of the exponential of `Ŝ²` written as the
+conjugate of `spinSRot1 N Real.pi` by `spinSRot3 N (π/2)`. -/
+example (N : ℕ) :
+    NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp2 N) =
+      spinSRot3 N (Real.pi / 2) * spinSRot1 N Real.pi * spinSRot3 N (-(Real.pi / 2)) :=
+  exp_neg_pi_mul_I_spinSOp2_eq_spinSRot3_conj N
+
+/-! ## Definitional guard: the axis-2 closed form is the printed product `û₃û₁` -/
+
+/-- Guards the closed-form side of the axis-2 identification: `spinSPiRotation2` unfolds to the
+printed product `û₂ = û₃û₁` of eq. (2.1.29), p. 19, so the statement below is about that product
+and not about a separately posited matrix.  The exponential side needs no companion guard — it is
+written with `NormedSpace.exp` directly, so no closed-form alias can hide in it (this is where the
+axis-1 and axis-3 guards above are needed instead, their `spinSRot1`/`spinSRot3` being named
+wrappers). -/
+example (N : ℕ) :
+    spinSPiRotation2 N = spinSPiRotation3 N * spinSPiRotation1 N := rfl
+
+/-! ## R2: the axis-2 exponential identification, capstone -/
+
+/-- R2 pin: locks the exact name/signature of the axis-2 identification, Tasaki (2.1.34), second
+relation, p. 20 (Problem 2.1.g, p. 20; solution p. 495). -/
+example (N : ℕ) :
+    spinSPiRotation2 N = NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp2 N) :=
+  spinSPiRotation2_eq_exp_spinSOp2 N
+
+/-! ## R2-entry: the printed entry form of (2.1.34), second relation -/
+
+/-- R2-entry pin: locks the exact name/signature of the printed entry form
+`⟨ψ_σ|û₂|ψ_τ⟩ = (−1)^{S+σ}δ_{σ,−τ}` (eq. (2.1.34), second relation, p. 20) in the integer basis
+index `k`, the form in which the general-`S` phase `(−1)^{S+σ}` is actually stated. -/
+example (N : ℕ) (i j : Fin (N + 1)) :
+    spinSPiRotation2 N i j = if j = Fin.rev i then (-1 : ℂ) ^ (N + (i : ℕ)) else 0 :=
+  spinSPiRotation2_apply N i j
+
+/-! ## R2-129: the printed cyclic relation, purely in exponentials -/
+
+/-- R2-129 pin: locks the exact name/signature of the printed cyclic relation `û₂ = û₃û₁`
+(eq. (2.1.29), p. 19), restated purely in terms of the operator exponentials of `Ŝ²`, `Ŝ³`,
+`Ŝ¹`. -/
+example (N : ℕ) :
+    NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp2 N) =
+      spinSRot3 N Real.pi * spinSRot1 N Real.pi :=
+  exp_neg_pi_mul_I_spinSOp2_eq_spinSRot3_pi_mul_spinSRot1_pi N
+
+/-! ## Positive controls, zero hypotheses -/
+
+/-- Positive control at `N = 1` (`S = 1/2`): agrees by value with the independent spin-`1/2`
+bridge `spinHalfRot2_eq_exp`, since `Fin 2` and `Fin (1 + 1)` are definitionally equal. -/
+example :
+    spinSPiRotation2 1 = NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp2 1) ∧
+      spinSPiRotation2 1 = !![(0 : ℂ), -1; 1, 0] := by
+  refine ⟨spinSPiRotation2_eq_exp_spinSOp2 1, ?_⟩
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [spinSPiRotation2, spinSPiRotation3, spinSPiRotation1, spinSAlternating, spinReversalS,
+      Matrix.diagonal_apply_eq, Matrix.diagonal_apply_ne, Matrix.mul_apply, Fin.sum_univ_succ]
+
+/-- Positive control at `N = 2` (`S = 1`, even): `spinSPiRotation2 2 =
+!![0,0,1; 0,-1,0; 1,0,0]`. -/
+example :
+    spinSPiRotation2 2 = NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp2 2) ∧
+      spinSPiRotation2 2 = !![(0 : ℂ), 0, 1; 0, -1, 0; 1, 0, 0] := by
+  refine ⟨spinSPiRotation2_eq_exp_spinSOp2 2, ?_⟩
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [spinSPiRotation2, spinSPiRotation3, spinSPiRotation1, spinSAlternating, spinReversalS,
+      Matrix.diagonal_apply_eq, Matrix.diagonal_apply_ne, Matrix.mul_apply, Fin.sum_univ_succ]
+
+/-- Positive control at `N = 3` (`S = 3/2`, odd, the sign-sensitive case):
+`spinSPiRotation2 3 = !![0,0,0,-1; 0,0,1,0; 0,-1,0,0; 1,0,0,0]`. -/
+example :
+    spinSPiRotation2 3 = NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp2 3) ∧
+      spinSPiRotation2 3 =
+        !![(0 : ℂ), 0, 0, -1; 0, 0, 1, 0; 0, -1, 0, 0; 1, 0, 0, 0] := by
+  refine ⟨spinSPiRotation2_eq_exp_spinSOp2 3, ?_⟩
+  have hI3 : (-Complex.I : ℂ) ^ 3 = Complex.I := by
+    have h2 : (-Complex.I : ℂ) ^ 2 = -1 := by
+      rw [sq, neg_mul_neg, Complex.I_mul_I]
+    rw [pow_succ, h2, neg_one_mul, neg_neg]
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [spinSPiRotation2, spinSPiRotation3, spinSPiRotation1, spinSAlternating, spinReversalS,
+      Matrix.diagonal_apply_eq, Matrix.diagonal_apply_ne, Matrix.mul_apply, Fin.sum_univ_succ,
+      hI3, Complex.I_mul_I]
+  norm_num [Complex.I_sq]
+
+/-! ## R2-order: negative control on the printed order `û₂ = û₃û₁` vs `û₁û₃` -/
+
+/-- R2-order pin: at `N = 1` the reversed product `û₁û₃` is `−exp(−iπ Ŝ^{(2)})`, differing by
+`(−1)^{2S}` from the printed `û₂ = û₃û₁` that this PR identifies with that exponential (`û₂` is
+the matrix part of the time reversal `Θ̂ = û₂K̂`, p. 278).  A route silently identifying `û₁û₃`
+with the axis-2 exponential would make this control false; it reaches the exponential through
+this PR's capstone, so it observes the route rather than the definition alone. -/
+example :
+    spinSPiRotation1 1 * spinSPiRotation3 1 =
+      -(NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp2 1)) := by
+  rw [← spinSPiRotation2_eq_exp_spinSOp2 1]
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [spinSPiRotation2, spinSPiRotation3, spinSPiRotation1, spinSAlternating, spinReversalS,
+      Matrix.diagonal_apply_eq, Matrix.diagonal_apply_ne, Matrix.mul_apply, Fin.sum_univ_succ]
+
+/-! ## R4: the uniform axis family, at `N = 1` for all three axes -/
+
+/-- R4 pin: locks the exact name/signature of the uniform closed-form-vs-exponential statement
+`spinSPiRotationAxis N α = exp(−iπ Ŝ^{(α)})`, instantiated at `N = 1` for all three axes
+`α : Fin 3` — the slot none of the sign-symmetric axis-specific statements above can observe. -/
+example :
+    spinSPiRotationAxis 1 0 =
+        NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • (![spinSOp1 1, spinSOp2 1, spinSOp3 1] 0))
+      ∧ spinSPiRotationAxis 1 1 =
+        NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • (![spinSOp1 1, spinSOp2 1, spinSOp3 1] 1))
+      ∧ spinSPiRotationAxis 1 2 =
+        NormedSpace.exp
+          (-(((Real.pi : ℂ) * Complex.I)) • (![spinSOp1 1, spinSOp2 1, spinSOp3 1] 2)) :=
+  ⟨spinSPiRotationAxis_eq_exp 1 0, spinSPiRotationAxis_eq_exp 1 1, spinSPiRotationAxis_eq_exp 1 2⟩
 
 end LatticeSystem.Quantum

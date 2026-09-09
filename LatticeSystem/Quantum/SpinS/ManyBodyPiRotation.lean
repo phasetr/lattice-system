@@ -16,14 +16,16 @@ tensor slots, so the lattice product is the many-body tensor `⊗_{x ∈ Λ} û_
 
 **What is formalised, and what is not.**  As in `Quantum/SpinS/SpinSPiRotation.lean`, the
 rotations are *defined* by their closed-form matrices — the eq. (2.1.24)/(2.1.25)-level algebra of
-a phase `(−i)^{2S}` times a real involution.  The identification of the axis-`3` and axis-`1`
-closed forms `spinSPiRotation3`/`spinSPiRotation1` with `exp(−iπ Ŝ^{(3)})`/`exp(−iπ Ŝ^{(1)})` at
-general `S` is now proved, `spinSPiRotation3_eq_spinSRot3_pi` of
-`Quantum/SpinS/SpinSPiRotationExpAxis3.lean` and `spinSPiRotation1_eq_spinSRot1_pi` of
-`Quantum/SpinS/SpinSPiRotationExpAxis1.lean` (Tasaki eq. (2.1.34) / Problem 2.1.g, p. 20); the
-identification for axis `2`, and its lift through `manyBodyTensorS` to the many-body `Û_π^{(α)}`
-of this file, remain **not** formalised — no declaration in this chain mentions `Matrix.exp` or
-`NormedSpace.exp`.  Exponential rotations and bridges do exist elsewhere in the repository —
+a phase `(−i)^{2S}` times a real involution.  The identification of all three single-site closed
+forms `spinSPiRotation3`/`spinSPiRotation1`/`spinSPiRotation2` with
+`exp(−iπ Ŝ^{(3)})`/`exp(−iπ Ŝ^{(1)})`/`exp(−iπ Ŝ^{(2)})` at general `S` is now proved,
+`spinSPiRotation3_eq_spinSRot3_pi` of `Quantum/SpinS/SpinSPiRotationExpAxis3.lean`,
+`spinSPiRotation1_eq_spinSRot1_pi` of `Quantum/SpinS/SpinSPiRotationExpAxis1.lean` and
+`spinSPiRotation2_eq_exp_spinSOp2` of `Quantum/SpinS/SpinSPiRotationExpAxis2.lean`, uniformly
+`spinSPiRotationAxis_eq_exp` of the last file (Tasaki eq. (2.1.34) / Problem 2.1.g, p. 20); only
+the lift through `manyBodyTensorS` to the many-body `Û_π^{(α)}` of this file remains **not**
+formalised — no declaration in this chain mentions `Matrix.exp` or `NormedSpace.exp`.  Exponential
+rotations and bridges do exist elsewhere in the repository —
 `spinSRot3 N θ = exp(−iθ Ŝ^{(3)})` of `Quantum/SpinS/Problem25cZAxisRotationInput.lean`, whose
 closed form `spinSRot3_eq_diagonal` and general-`S` many-body bridge
 `manyBodyTensorS_spinSRot3_eq_exp_totalSpinSOp3` are proved in
@@ -34,10 +36,10 @@ of `Quantum/SpinS/SpinSRotation1.lean`, whose closed form at `θ = π` is now id
 the general-`S` twist bridge `lsmTwistOperator_eq_diagonal` of
 `Quantum/SpinS/LiebSchultzMattisProof.lean`; and the spin-`1/2` `totalSpinHalfRot{1,2,3}_eq_exp`
 of `Quantum/TotalSpin/Rotation.lean` — of these `spinSRot3` and `spinSRot1` are related to the
-closed forms used here, through the axis-`3` and axis-`1` identifications of the single-site
-factor `spinSPiRotationAxis` above; axis `2` and the many-body `manyBodySPiRotation` lift stay
-unrelated.  The exponentials written above and below are the book's notation for the closed-form
-matrices, not (outside axes `3` and `1` at the single-site level) a proved equality.
+closed forms used here, through the three axis identifications of the single-site factor
+`spinSPiRotationAxis` above; the many-body `manyBodySPiRotation` lift stays unrelated.  The
+exponentials written above and below are the book's notation for the closed-form matrices at the
+many-body level, proved equalities now at the single-site level for every axis.
 
 At `S = 1` (`N = 2`) the same operator is also built as the whole-chain `piRotationS` of
 `Quantum/SpinS/KennedyTasakiTransformation.lean`, from the real involution `1 − 2(Ŝ^{(α)})²`.
@@ -85,8 +87,9 @@ private theorem manyBodyTensorS_const_smul (c : ℂ)
 
 /-- **Tasaki eq. (2.2.11), p. 22, at `θ = π`**: the global `π` rotation `Û_π^{(α)}` about the axis
 selected by `α : Fin 3`, as the uniform lattice tensor `⊗_{x ∈ Λ} û_α` of the closed-form
-single-site factor.  The book writes it `∏_{x ∈ Λ} exp(−iπ Ŝ_x^{(α)})`; the exponential
-identification is notation here, not a formalised equality (see the module header). -/
+single-site factor.  The book writes it `∏_{x ∈ Λ} exp(−iπ Ŝ_x^{(α)})`; each single-site factor is
+now identified with its exponential (`spinSPiRotationAxis_eq_exp`), but the lift of that
+identification to this lattice product is not formalised (see the module header). -/
 noncomputable def manyBodySPiRotation (α : Fin 3) : ManyBodyOpS Λ N :=
   manyBodyTensorS (fun _ : Λ => spinSPiRotationAxis N α)
 
