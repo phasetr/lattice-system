@@ -20,7 +20,10 @@ every `N`.
 The axes `1` and `2` are not treated here.  The axis-1 identification is
 `spinSPiRotation1_eq_spinSRot1_pi` of `Quantum/SpinS/SpinSPiRotationExpAxis1.lean`, by a different
 route (a commutant argument, no entrywise closed form of `exp(−iπ Ŝ^{(1)})` being available); the
-closed form `spinSPiRotation2` carries no exponential identification.
+axis-2 identification is `spinSPiRotation2_eq_exp_spinSOp2` of
+`Quantum/SpinS/SpinSPiRotationExpAxis2.lean`, by a quarter-turn conjugation of the axis-1 one.
+All three single-site axes are now identified; only the many-body lift of Problem 2.2.a,
+p. 23, remains.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §2.1: the rotation `Û_θ^{(α)} = exp(−iθ Ŝ^{(α)})`, p. 15; the closed form (2.1.34) and

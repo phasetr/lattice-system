@@ -891,14 +891,15 @@ $\hat S_x \cdot \hat S_y$.
 \end{itemize}
 
 \subsection{Problem 2.1.g: general-spin closed form for the
-  \texorpdfstring{$\pi$}{pi}-rotation, axes 1 and 3
+  \texorpdfstring{$\pi$}{pi}-rotation, axes 1, 2 and 3
   (Tasaki \S2.1, eq.~(2.1.34), p.~20; Problem 2.1.g, p.~20, solution
   p.~495)}
 \label{sec:problem21g}
 
 \emph{Source files:}
 \texttt{LatticeSystem/Quantum/SpinS/SpinSPiRotationExpAxis3.lean},
-\texttt{LatticeSystem/Quantum/SpinS/SpinSPiRotationExpAxis1.lean}.
+\texttt{LatticeSystem/Quantum/SpinS/SpinSPiRotationExpAxis1.lean},
+\texttt{LatticeSystem/Quantum/SpinS/SpinSPiRotationExpAxis2.lean}.
 
 Tasaki defines the general-spin rotation operator
 $\hat U^{(\alpha)}_\theta := e^{-i\theta \hat S^{(\alpha)}}$ on p.~15 and
@@ -981,9 +982,76 @@ $W \bullet v = (-i)^N v = V \bullet v$ on this vector, so $Z \bullet v = v$
 and $c = 1$.
 \end{proof}
 
-\paragraph{Not yet formalized.} The identification for axis $2$, and its
-lift to the many-body global rotation of eq.~(2.2.11)
-(Problem 2.2.a, \S\ref{sec:problem22a}), remain open; see the inventory
+For axis $2$, the closed-form matrix $\texttt{spinSPiRotation2}\,N :=
+\texttt{spinSPiRotation3}\,N \cdot \texttt{spinSPiRotation1}\,N$ (the
+printed cyclic relation eq.~(2.1.29), p.~19, taken here as the
+\emph{definition} of the axis-$2$ closed form) is identified with the
+exponential by conjugating the axis-$1$ exponential with the quarter turn
+about axis $3$, not by a fresh commutant argument:
+
+\begin{theorem}[Tasaki eq.~(2.1.34) / Problem 2.1.g, axis 2]
+\[
+  \texttt{spinSPiRotation2}\,N = \texttt{spinSRot3}\,N\,\tfrac\pi2 \cdot
+  \texttt{spinSRot1}\,N\,\pi \cdot \texttt{spinSRot3}\,N\,(-\tfrac\pi2)
+  = e^{-i\pi \hat S^{(2)}}.
+\]
+Lean name: \texttt{spinSPiRotation2\_eq\_exp\_spinSOp2}.
+\end{theorem}
+
+\begin{proof}
+The quarter turn $\texttt{spinSRot3}\,N\,(-\tfrac\pi2)$ intertwines the
+generators, $\hat S^{(1)} \cdot \texttt{spinSRot3}\,N\,(-\tfrac\pi2) =
+\texttt{spinSRot3}\,N\,(-\tfrac\pi2) \cdot \hat S^{(2)}$, the quarter-turn
+case of eq.~(2.1.25), p.~18
+(\texttt{spinSOp1\_mul\_spinSRot3\_neg\_pi\_half}, read off from
+$\texttt{spinSRot3\_neg\_pi\_half\_conj\_spinSOp2}$); propagated to every
+power of the generator and fed through the generic bridge
+\texttt{matrix\_exp\_intertwine\_of\_pow\_intertwine}, the same relation
+holds for the exponentials,
+$e^{-i\pi \hat S^{(1)}} \cdot \texttt{spinSRot3}\,N\,(-\tfrac\pi2) =
+\texttt{spinSRot3}\,N\,(-\tfrac\pi2) \cdot e^{-i\pi \hat S^{(2)}}$
+(\texttt{exp\_neg\_pi\_mul\_I\_spinSOp2\_eq\_spinSRot3\_conj}), which
+rearranges to the displayed identity.
+
+On the closed-form side, the \emph{angle flip}
+$F \cdot \texttt{spinSRot3}\,N\,\theta = \texttt{spinSRot3}\,N\,(-\theta)
+\cdot F$ (\texttt{spinReversalS\_mul\_spinSRot3}, since the reversal
+$F$ negates the diagonal eigenvalue $m_k = N/2 - k$ under
+$k \mapsto N - k$) moves the quarter turn trailing
+$\texttt{spinSPiRotation1}\,N = (-i)^N F$ to a leading one, and the two
+quarter turns combine into the half turn $\texttt{spinSRot3}\,N\,\pi =
+\texttt{spinSPiRotation3}\,N$
+(\texttt{spinSPiRotation3\_eq\_spinSRot3\_pi} above), giving
+$\texttt{spinSRot3}\,N\,\tfrac\pi2 \cdot \texttt{spinSPiRotation1}\,N \cdot
+\texttt{spinSRot3}\,N\,(-\tfrac\pi2) = \texttt{spinSPiRotation2}\,N$
+(\texttt{spinSRot3\_pi\_half\_conj\_spinSPiRotation1}). Combining the two
+sides with $\texttt{spinSPiRotation1}\,N = e^{-i\pi \hat S^{(1)}}$
+(\texttt{spinSPiRotation1\_eq\_spinSRot1\_pi} above) gives the theorem.
+\end{proof}
+
+As a corollary, the printed cyclic relation eq.~(2.1.29), p.~19, which the
+repository takes as the \emph{definition} of the axis-$2$ closed form, is
+now also a \emph{theorem} about the exponentials:
+\[
+  e^{-i\pi \hat S^{(2)}} = e^{-i\pi \hat S^{(3)}} \cdot e^{-i\pi \hat S^{(1)}}
+\]
+(\texttt{exp\_neg\_pi\_mul\_I\_spinSOp2\_eq\_spinSRot3\_pi\_mul\_spinSRot1\_pi}),
+and the whole axis family is exponential, $\hat u^{(\alpha)} =
+e^{-i\pi \hat S^{(\alpha)}}$ for every $\alpha \in \{1,2,3\}$
+(\texttt{spinSPiRotationAxis\_eq\_exp}), the uniform statement the
+many-body lift of eq.~(2.2.11), p.~22 (Problem 2.2.a,
+\S\ref{sec:problem22a}), multiplies over the lattice.
+
+The orientation of the quarter turn is sign-critical throughout: the
+opposite quarter turn sends $\hat S^{(2)}$ to $-\hat S^{(1)}$ and produces
+$e^{+i\pi \hat S^{(1)}}$, and the opposite printed order $\hat u^{(1)}
+\hat u^{(3)}$ differs from $\hat u^{(2)} = \hat u^{(3)}\hat u^{(1)}$ by
+$(-1)^{2S}$ --- it is the matrix part of the time reversal $\hat\Theta$,
+p.~278, not the axis-$2$ rotation.
+
+\paragraph{Not yet formalized.} The lift of the three single-site
+identifications to the many-body global rotation of eq.~(2.2.11)
+(Problem 2.2.a, \S\ref{sec:problem22a}) remains open; see the inventory
 there.
 
 \subsection{Problem 2.2.a: global \texorpdfstring{$\pi$}{pi}-rotations
@@ -1008,16 +1076,19 @@ factor \texttt{spinSPiRotationAxis} of
 \emph{What is and is not formalized.} The single-site $\pi$ rotations are
 \emph{defined} by their closed-form matrices --- a phase $(-i)^{2S}$ times a
 real involution, the eq.~(2.1.24)/(2.1.25)-level algebra. The
-identification of the axis-$3$ and axis-$1$ matrices
-\texttt{spinSPiRotation3}/\texttt{spinSPiRotation1} with
-$e^{-i\pi\hat S^{(3)}}$/$e^{-i\pi\hat S^{(1)}}$ at general $S$ is now
-proved, \texttt{spinSPiRotation3\_eq\_spinSRot3\_pi} and
-\texttt{spinSPiRotation1\_eq\_spinSRot1\_pi}
-(\S\ref{sec:problem21g}, Tasaki eq.~(2.1.34) / Problem 2.1.g, p.~20); the
-identification for axis $2$, and its lift through
-\texttt{manyBodyTensorS} to the many-body $\hat U^{(\alpha)}_\pi$ built
-here, remain \textbf{not} formalized. Exponential rotations and
-bridges do exist elsewhere in the repository: the single-site
+identification of all three single-site matrices
+\texttt{spinSPiRotation3}/\texttt{spinSPiRotation1}/\texttt{spinSPiRotation2}
+with $e^{-i\pi\hat S^{(3)}}$/$e^{-i\pi\hat S^{(1)}}$/$e^{-i\pi\hat S^{(2)}}$
+at general $S$ is now proved,
+\texttt{spinSPiRotation3\_eq\_spinSRot3\_pi},
+\texttt{spinSPiRotation1\_eq\_spinSRot1\_pi} and
+\texttt{spinSPiRotation2\_eq\_exp\_spinSOp2}, uniformly
+\texttt{spinSPiRotationAxis\_eq\_exp}
+(\S\ref{sec:problem21g}, Tasaki eq.~(2.1.34) / Problem 2.1.g, p.~20); only
+its lift through \texttt{manyBodyTensorS} to the many-body
+$\hat U^{(\alpha)}_\pi$ built here remains \textbf{not} formalized.
+Exponential rotations and bridges do exist elsewhere in the repository:
+the single-site
 $\texttt{spinSRot3}\,N\,\theta = e^{-i\theta \hat S^{(3)}}$, whose closed
 form \texttt{spinSRot3\_eq\_diagonal} is proved, and
 $\texttt{spinSRot1}\,N\,\theta = e^{-i\theta \hat S^{(1)}}$, whose closed
@@ -1029,12 +1100,12 @@ axes $2$ and $3$; the general-$S$ many-body bridge
 twist bridge \texttt{lsmTwistOperator\_eq\_diagonal}; and the spin-$1/2$
 \texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp}. Of these, \texttt{spinSRot3}
 and \texttt{spinSRot1} are related to the closed forms built here, through
-the axis-$3$ and axis-$1$ identifications of the single-site factor
-\texttt{spinSPiRotationAxis} above (\S\ref{sec:problem21g}); axis $2$ and
-the many-body \texttt{manyBodySPiRotation} lift stay unrelated. The
-exponentials written in this subsection are the book's notation for those
-matrices, not (outside axes $3$ and $1$ at the single-site level) proved
-equalities.
+the three single-site identifications of the closed-form factor
+\texttt{spinSPiRotationAxis} above (\S\ref{sec:problem21g}); the many-body
+\texttt{manyBodySPiRotation} lift stays unrelated. The exponentials
+written in this subsection are the book's notation for those matrices,
+proved equalities now at the single-site level for every axis, but not
+yet for the many-body product.
 
 The single-site factors
 obey the sign identity of eq.~(2.1.25), p.~18,
@@ -1151,13 +1222,12 @@ and the corresponding actions of $\hat S^{-}$. Lean names:
     $\hat S^{\pm} = \hat S^{(1)} \pm i\hat S^{(2)}$ for $S = 1$
     (follows from the definitions~(2.1.9)).
   \item Problem 2.1.c: $S = 1$ analogue of the closed form~(2.1.26).
-  \item Problem 2.1.g: the identification of the closed-form
-    $\pi$-rotation matrices~(2.1.33)/(2.1.34) with
-    $e^{-i\pi\hat S^{(\alpha)}}$ on axis $2$, and the
-    many-body lift of eq.~(2.2.11) on any axis. Axes $3$ and $1$ are
-    proved at general $S$, hence at $S = 1$:
-    \texttt{spinSPiRotation3\_eq\_spinSRot3\_pi},
-    \texttt{spinSPiRotation1\_eq\_spinSRot1\_pi}
+  \item Problem 2.1.g: the many-body lift of eq.~(2.2.11) to
+    $e^{-i\pi\hat S^{(\alpha)}}$ on any axis. All three axes' closed-form
+    $\pi$-rotation matrices~(2.1.33)/(2.1.34) are proved at general $S$,
+    hence at $S = 1$: \texttt{spinSPiRotation3\_eq\_spinSRot3\_pi},
+    \texttt{spinSPiRotation1\_eq\_spinSRot1\_pi},
+    \texttt{spinSPiRotation2\_eq\_exp\_spinSOp2}
     (\S\ref{sec:problem21g}).
 \end{itemize}
 

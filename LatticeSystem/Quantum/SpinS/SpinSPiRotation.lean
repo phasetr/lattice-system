@@ -27,11 +27,12 @@ diagonal resp. antidiagonal:
 Both are therefore a fixed phase `(−i)^N` times a real involution, and that is how they are
 **defined** here — by the eq. (2.1.24)/(2.1.25)-level algebra of those closed forms, as in
 `Quantum/SpinS/SpinOneHalfTurn.lean` (`S = 1`).  **The identification with `exp(−iπ Ŝ^{(α)})` at
-general `S` is proved for the axes `1` and `3`**, by `spinSPiRotation1_eq_spinSRot1_pi` of
-`Quantum/SpinS/SpinSPiRotationExpAxis1.lean` and `spinSPiRotation3_eq_spinSRot3_pi` of
-`Quantum/SpinS/SpinSPiRotationExpAxis3.lean`; for the axis `2` it is not formalised.  No
-declaration in this file mentions `Matrix.exp` or `NormedSpace.exp`.  Exponential rotations and
-bridges do exist elsewhere in the repository —
+general `S` is proved for all three axes**, by `spinSPiRotation1_eq_spinSRot1_pi` of
+`Quantum/SpinS/SpinSPiRotationExpAxis1.lean`, `spinSPiRotation3_eq_spinSRot3_pi` of
+`Quantum/SpinS/SpinSPiRotationExpAxis3.lean` and `spinSPiRotation2_eq_exp_spinSOp2` of
+`Quantum/SpinS/SpinSPiRotationExpAxis2.lean`, uniformly `spinSPiRotationAxis_eq_exp` of the last
+file.  No declaration in this file mentions `Matrix.exp` or `NormedSpace.exp`.  Exponential
+rotations and bridges do exist elsewhere in the repository —
 `spinSRot3 N θ = exp(−iθ Ŝ^{(3)})` of `Quantum/SpinS/Problem25cZAxisRotationInput.lean`, whose
 closed form `spinSRot3_eq_diagonal` and general-`S` many-body bridge
 `manyBodyTensorS_spinSRot3_eq_exp_totalSpinSOp3` are proved in
@@ -40,10 +41,10 @@ of `Quantum/SpinS/SpinSRotation1.lean`, whose only closed form is the one at `θ
 general-`S` global exponentials `saturatedGlobalRot2` / `saturatedGlobalRot3` about the axes `2`
 and `3` of `Quantum/SpinS/SaturatedCoherentAmplitude.lean`; the general-`S` twist bridge
 `lsmTwistOperator_eq_diagonal` of `Quantum/SpinS/LiebSchultzMattisProof.lean`; and the spin-`1/2`
-`totalSpinHalfRot{1,2,3}_eq_exp` of `Quantum/TotalSpin/Rotation.lean` — of these only `spinSRot1`
-and `spinSRot3` are related to the closed forms `spinSPiRotationAxis` built here, through the
-axis-`1` and axis-`3` identifications above.  Every `exp(−iπ Ŝ^{(2)})` written in this file is
-the book's notation for the closed-form matrix, not a proved equality.
+`totalSpinHalfRot{1,2,3}_eq_exp` of `Quantum/TotalSpin/Rotation.lean` — of these `spinSRot1` and
+`spinSRot3` are related to the closed forms `spinSPiRotationAxis` built here, through the three
+axis identifications above.  Every `exp(−iπ Ŝ^{(α)})` written in this file is now a proved
+equality, not merely the book's notation for the closed-form matrix.
 
 Since the two phases `(−i)^{2S}` multiply to the real sign `(−1)^{2S}`, the product `û₁û₃` is a
 real matrix: entrywise conjugation — the operation `C_g` of eq. (8.3.40) at the antiunitary sign —

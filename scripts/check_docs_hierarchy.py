@@ -191,12 +191,12 @@ LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
 CATALOGUE_BASELINE_SLICE = slice(216, 2731)
 # Pins the published catalogue text; this module's docstring records exactly what is hashed
 # and how the pin is legitimately updated.
-APPROVED_CHANGES_SHA256 = "5f1b05926bab58e5c6c8a5805d33ced79d2472799bd434159b3e62f03b35063c"
+APPROVED_CHANGES_SHA256 = "a162b9b26f652a0e810e0cedd94a4d69a641de3342fbcc785fb0f35d7092e8f9"
 # Pins the row sequence `main()` actually compares the legacy pages against. The text pin above
 # does not reach it: the rows are derived from the transformed text by `table_data_rows`, which
 # is outside the pinned text, so without this pin a row skipped there would go unpublished with
 # the text pin undisturbed.
-PUBLISHED_ROWS_SHA256 = "3d922425b9f6c09b0920426d87923a9f8b2583091383db9399762a2a9b313efa"
+PUBLISHED_ROWS_SHA256 = "72329640af6b1f910a38d0b803e4db65653c8f8360a516cd046a98825c9928a9"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -1569,6 +1569,28 @@ def _approved_replacements(text: str) -> str:
             "remain unidentified with the exponentials, so the coverage of Problem 2.2.a "
             "stays partial |",
         )
+        # Axis 2 is now identified too (quarter-turn conjugation of the axis-1 exponential,
+        # Tasaki eq. (2.1.29), p. 19), so only the many-body lift remains.
+        .replace(
+            "the identification of the axis-3 and axis-1 closed forms with "
+            "`exp(−iπ Ŝ^{(3)})` / `exp(−iπ Ŝ^{(1)})` at general `S` is now proved (Tasaki "
+            "eq. (2.1.34) / Problem 2.1.g, p. 20, `spinSPiRotation3_eq_spinSRot3_pi`, "
+            "`Quantum/SpinS/SpinSPiRotationExpAxis3.lean`; "
+            "`spinSPiRotation1_eq_spinSRot1_pi`, "
+            "`Quantum/SpinS/SpinSPiRotationExpAxis1.lean`); axis 2 and the many-body lift "
+            "remain unidentified with the exponentials, so the coverage of Problem 2.2.a "
+            "stays partial |",
+            "the identification of all three single-site closed forms with "
+            "`exp(−iπ Ŝ^{(α)})` at general `S` is now proved (Tasaki eq. (2.1.34) / "
+            "Problem 2.1.g, p. 20, `spinSPiRotation3_eq_spinSRot3_pi`, "
+            "`Quantum/SpinS/SpinSPiRotationExpAxis3.lean`; "
+            "`spinSPiRotation1_eq_spinSRot1_pi`, "
+            "`Quantum/SpinS/SpinSPiRotationExpAxis1.lean`; "
+            "`spinSPiRotation2_eq_exp_spinSOp2`, "
+            "`Quantum/SpinS/SpinSPiRotationExpAxis2.lean`); only the many-body lift "
+            "(Tasaki eq. (2.2.11), p. 22) remains unidentified with the exponentials, so "
+            "the coverage of Problem 2.2.a stays partial |",
+        )
     )
 
 
@@ -1633,12 +1655,12 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "d6591840ac1b4a0316fd5afa60f0ee03b14cf8d9996481be73012590fe5ce260"
+SCRIPT_SOURCE_SHA256 = "da57ebe5b7efc5004b7c728720d1b261e52a2026eed7b805103437b4529ad17e"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
-APPROVED_ENTRIES_SHA256 = "4228610678cd9ca6d9146231d9c60717123022510881e9986806af99a0a6d207"
+APPROVED_ENTRIES_SHA256 = "81562d17a0c5888e953711fe2f21a4658e234a1b05b1a637b63e33ef3ab97e7f"
 
 # The only text `SCRIPT_SOURCE_SHA256` does not hash: the digits these four pins carry. Each is
 # restated by the very edit it pins, and a digest over its own value would have no fixed point.
