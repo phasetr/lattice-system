@@ -971,11 +971,14 @@ none; the general-$S$ global exponentials \texttt{saturatedGlobalRot2} and
 many-body bridge
 \texttt{manyBodyTensorS\_spinSRot3\_eq\_exp\_totalSpinSOp3}; the general-$S$
 twist bridge \texttt{lsmTwistOperator\_eq\_diagonal}; and the spin-$1/2$
-\texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp}. None of them is related to the
-many-body closed forms \texttt{spinSPiRotationAxis} and
-\texttt{manyBodySPiRotation} built here. The exponentials written in this
-subsection are the book's notation for those matrices, not (outside axis
-$3$ at the single-site level) proved equalities.
+\texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp}. Of these only
+\texttt{spinSRot3} is related to the closed forms built here, through the
+axis-$3$ identification of the single-site factor
+\texttt{spinSPiRotationAxis} above (\S\ref{sec:problem21g}); the axes
+$1$, $2$ and the many-body \texttt{manyBodySPiRotation} lift stay
+unrelated. The exponentials written in this subsection are the book's
+notation for those matrices, not (outside axis $3$ at the single-site
+level) proved equalities.
 
 The single-site factors
 obey the sign identity of eq.~(2.1.25), p.~18,
@@ -1092,8 +1095,13 @@ and the corresponding actions of $\hat S^{-}$. Lean names:
     $\hat S^{\pm} = \hat S^{(1)} \pm i\hat S^{(2)}$ for $S = 1$
     (follows from the definitions~(2.1.9)).
   \item Problem 2.1.c: $S = 1$ analogue of the closed form~(2.1.26).
-  \item Problem 2.1.g: derivation of the explicit $\pi$-rotation
-    matrices~(2.1.33)/(2.1.34) for $S = 1$.
+  \item Problem 2.1.g: the identification of the closed-form
+    $\pi$-rotation matrices~(2.1.33)/(2.1.34) with
+    $e^{-i\pi\hat S^{(\alpha)}}$ on the axes $1$ and $2$, and the
+    many-body lift of eq.~(2.2.11) on any axis. Axis $3$ is proved at
+    general $S$, hence at $S = 1$:
+    \texttt{spinSPiRotation3\_eq\_spinSRot3\_pi}
+    (\S\ref{sec:problem21g}).
 \end{itemize}
 
 %======================================================================

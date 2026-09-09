@@ -10,19 +10,20 @@ spin-`S` `π`-rotations `spinSPiRotationAxis` with the book's `exp(−iπ Ŝ^{(�
 *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer, 2020,
 **eq. (2.1.34), p. 20**, the general-`S` closed form left to the reader as **Problem 2.1.g,
 p. 20**, solution p. 495; the many-body definition **eq. (2.2.11), p. 22**). PR-A closes only
-the axis-3 (diagonal) case, the third line of (2.1.34):
+the axis-3 (diagonal) case, the third relation of (2.1.34):
 `⟨ψ^σ|û₃|ψ^τ⟩ = e^{−iπσ}δ_{σ,τ}`, phrased in the integer basis index `k = S − σ` rather
 than the magnetic quantum number `σ`, since `S − σ` is not an integer for half-odd-integer
 `S`.
 
 Pinned:
 * R0-scalar `spinSOp3Eigen_exp_neg_pi_mul_I_eq` — the scalar phase identity
-  `exp(−iπ(N/2 − k)) = (−i)^N (−1)^k` (math-before-code note
-  `.self-local/docs/math/pi-rotation-exponential-bridge-general-spin.tex`, Lemma "scalar phase
-  identity", §Axis 3).
+  `exp(−iπ(N/2 − k)) = (−i)^N (−1)^k` carried by each diagonal entry of Tasaki (2.1.34),
+  third relation, p. 20.
 * R0 `spinSPiRotation3_eq_spinSRot3_pi` — the axis-3 identification
-  `spinSPiRotation3 N = spinSRot3 N Real.pi` (Tasaki (2.1.34), third line, p. 20; Problem 2.1.g,
-  p. 20).
+  `spinSPiRotation3 N = spinSRot3 N Real.pi` (Tasaki (2.1.34), third relation, p. 20;
+  Problem 2.1.g, p. 20).
+* A definitional guard that the exponential side `spinSRot3` is the genuine `NormedSpace.exp`
+  of `Ŝ^{(3)}`, not a closed-form alias.
 * Zero-hypothesis positive controls at `N = 1, 2, 3`, cross-checked against the existing
   `spinSRot3_eq_diagonal` closed form and the concrete diagonal entries, including the
   sign-sensitive odd case `N = 3`.
@@ -50,9 +51,18 @@ example (N : ℕ) (k : Fin (N + 1)) :
 /-! ## R0: the axis-3 exponential identification -/
 
 /-- R0 pin: locks the exact name/signature of the axis-3 identification, Tasaki (2.1.34), third
-line, p. 20 (Problem 2.1.g, p. 20). -/
+relation, p. 20 (Problem 2.1.g, p. 20). -/
 example (N : ℕ) : spinSPiRotation3 N = spinSRot3 N Real.pi :=
   spinSPiRotation3_eq_spinSRot3_pi N
+
+/-! ## Definitional guard: the exponential side is a genuine `exp` -/
+
+/-- Guards that the exponential object of the identification is the genuine `NormedSpace.exp` of
+`Ŝ^{(3)}`: if `spinSRot3` were redefined as its own diagonal closed form, every statement below
+would still hold while the content of (2.1.34) — closed form *equals* operator exponential — had
+evaporated. -/
+example (N : ℕ) (θ : ℝ) :
+    spinSRot3 N θ = NormedSpace.exp (-(((θ : ℂ) * Complex.I)) • spinSOp3 N) := rfl
 
 /-! ## Positive controls, zero hypotheses -/
 

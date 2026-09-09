@@ -89,10 +89,11 @@ whose file attribution now names both the axis-swap module and
 that API.)
 (Applied once more for the `totalSpinHalfRot{1,2,3}Pi_two_site` row of
 `docs/formalization/legacy/20-total-spin-operator-tasaki-2-2-eq-2-2-7-2-2-8-part-01.md`, narrowing
-its disclosure of the unformalised identification with the book's exponentials: TSK-071 PR-A
-proves it for axis 3 (Tasaki eq. (2.1.34) / Problem 2.1.g, p. 20,
-`spinSPiRotation3_eq_spinSRot3_pi`, `Quantum/SpinS/SpinSPiRotationExpAxis3.lean`), so the row now
-names only axes 1 and 2 and the many-body lift as still open.)
+its disclosure of the unformalised identification with the book's exponentials: the axis-3
+exponential identification of the general-spin π-rotation is now proved (Tasaki eq. (2.1.34) /
+Problem 2.1.g, p. 20, `spinSPiRotation3_eq_spinSRot3_pi`,
+`Quantum/SpinS/SpinSPiRotationExpAxis3.lean`), so the row now names only axes 1 and 2 and the
+many-body lift as still open.)
 Recomputing a pin is never on its own an
 authorization for what moved: the legacy pages still have to be edited to match, and the
 catalogue-row comparison is what proves they do. What the pins buy is that a change to the
@@ -1536,9 +1537,9 @@ def _approved_replacements(text: str) -> str:
             "forms with `exp(−iπ Ŝ^{(α)})` at general `S` is not formalised, so the coverage of "
             "Problem 2.2.a is partial |",
         )
-        # TSK-071 PR-A: the axis-3 closed form is now identified with the book's exponential
-        # (Tasaki eq. (2.1.34) / Problem 2.1.g, p. 20); axes 1, 2 and the many-body lift are
-        # still open, so Problem 2.2.a's coverage stays partial.
+        # The axis-3 closed form is now identified with the book's exponential (Tasaki
+        # eq. (2.1.34) / Problem 2.1.g, p. 20); axes 1, 2 and the many-body lift are still
+        # open, so Problem 2.2.a's coverage stays partial.
         .replace(
             "the identification of those closed "
             "forms with `exp(−iπ Ŝ^{(α)})` at general `S` is not formalised, so the coverage of "
@@ -1614,7 +1615,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "c739d071680f09ffc543531b1996b443c55b2e8c3fe8df2504fdb93952fb655d"
+SCRIPT_SOURCE_SHA256 = "75cad15200fa0bf5803bf1b662d878f5874557963e66247e61e24c3787d9d81e"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an

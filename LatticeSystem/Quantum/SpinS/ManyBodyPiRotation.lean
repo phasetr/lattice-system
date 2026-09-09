@@ -30,10 +30,12 @@ of `Quantum/SpinS/SpinSRotation1.lean`, which carries no closed form; the genera
 exponentials `saturatedGlobalRot2` / `saturatedGlobalRot3` about the axes `2` and `3` of
 `Quantum/SpinS/SaturatedCoherentAmplitude.lean`; the general-`S` twist bridge
 `lsmTwistOperator_eq_diagonal` of `Quantum/SpinS/LiebSchultzMattisProof.lean`; and the spin-`1/2`
-`totalSpinHalfRot{1,2,3}_eq_exp` of `Quantum/TotalSpin/Rotation.lean` — but none of them is
-related to the many-body closed forms `spinSPiRotationAxis` / `manyBodySPiRotation` used here.  The
-exponentials written above and below are the book's notation for the closed-form matrices, not
-(outside axis `3` at the single-site level) a proved equality.
+`totalSpinHalfRot{1,2,3}_eq_exp` of `Quantum/TotalSpin/Rotation.lean` — of these only
+`spinSRot3` is related to the closed forms used here, through the axis-`3` identification of the
+single-site factor `spinSPiRotationAxis` above; the axes `1`, `2` and the many-body
+`manyBodySPiRotation` lift stay unrelated.  The exponentials written above and below are the
+book's notation for the closed-form matrices, not (outside axis `3` at the single-site level) a
+proved equality.
 
 At `S = 1` (`N = 2`) the same operator is also built as the whole-chain `piRotationS` of
 `Quantum/SpinS/KennedyTasakiTransformation.lean`, from the real involution `1 − 2(Ŝ^{(α)})²`.
