@@ -146,4 +146,46 @@ theorem exp_neg_pi_mul_I_spinSOp2_eq_spinSRot3_conj (N : ℕ) :
     _ = spinSRot3 N (Real.pi / 2) * spinSRot1 N Real.pi * spinSRot3 N (-(Real.pi / 2)) := by
         rw [hrot, Matrix.mul_assoc]
 
+/-- **The axis-2 `π` rotation is the exponential `exp(−iπ Ŝ^{(2)})`** at every spin `S = N/2`: the
+closed form `û₂ = û₃û₁` of `spinSPiRotation2` agrees with the rotation of the definition on p. 15.
+This is the second relation of Tasaki (2.1.34), p. 20, left to the reader as Problem 2.1.g, p. 20
+(solution p. 495).  Both sides are the same quarter-turn conjugate of the axis-1 `π` rotation: the
+closed forms by `spinSRot3_pi_half_conj_spinSPiRotation1`, the exponentials by
+`exp_neg_pi_mul_I_spinSOp2_eq_spinSRot3_conj`, and the two axis-1 descriptions agree by
+`spinSPiRotation1_eq_spinSRot1_pi`. -/
+theorem spinSPiRotation2_eq_exp_spinSOp2 (N : ℕ) :
+    spinSPiRotation2 N = NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp2 N) := by
+  rw [← spinSRot3_pi_half_conj_spinSPiRotation1, spinSPiRotation1_eq_spinSRot1_pi,
+    exp_neg_pi_mul_I_spinSOp2_eq_spinSRot3_conj]
+
+/-- **The printed cyclic relation (2.1.29), p. 19, purely in exponentials**:
+`exp(−iπ Ŝ^{(2)}) = exp(−iπ Ŝ^{(3)}) · exp(−iπ Ŝ^{(1)})`.  In the repository the relation `û₂ =
+û₃û₁` is the *definition* of the axis-2 closed form; here it becomes a theorem about the rotations
+of p. 15, which is what the book asserts.  The order matters: `û₁û₃` differs by `(−1)^{2S}` and is
+the matrix part of the time reversal `Θ̂`, p. 278. -/
+theorem exp_neg_pi_mul_I_spinSOp2_eq_spinSRot3_pi_mul_spinSRot1_pi (N : ℕ) :
+    NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp2 N) =
+      spinSRot3 N Real.pi * spinSRot1 N Real.pi := by
+  rw [← spinSPiRotation2_eq_exp_spinSOp2, spinSPiRotation2, spinSPiRotation3_eq_spinSRot3_pi,
+    spinSPiRotation1_eq_spinSRot1_pi]
+
+/-- **The whole axis family is exponential**: `û_α = exp(−iπ Ŝ^{(α)})` for every axis `α : Fin 3`,
+the closed form (2.1.34), p. 20, in the uniform form of eq. (2.1.29), p. 19.  This is the
+statement the many-body lift of eq. (2.2.11), p. 22, multiplies over the lattice. -/
+theorem spinSPiRotationAxis_eq_exp (N : ℕ) (α : Fin 3) :
+    spinSPiRotationAxis N α =
+      NormedSpace.exp
+        (-(((Real.pi : ℂ) * Complex.I)) • (![spinSOp1 N, spinSOp2 N, spinSOp3 N] α)) := by
+  have h1 : spinSRot1 N Real.pi
+      = NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp1 N) := rfl
+  have h3 : spinSRot3 N Real.pi
+      = NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp3 N) := rfl
+  fin_cases α
+  · simpa only [spinSPiRotationAxis, Matrix.cons_val_zero] using
+      (spinSPiRotation1_eq_spinSRot1_pi N).trans h1
+  · simpa only [spinSPiRotationAxis, Matrix.cons_val_one, Matrix.head_cons] using
+      spinSPiRotation2_eq_exp_spinSOp2 N
+  · simpa only [spinSPiRotationAxis, Matrix.cons_val_two, Matrix.tail_cons, Matrix.head_cons]
+      using (spinSPiRotation3_eq_spinSRot3_pi N).trans h3
+
 end LatticeSystem.Quantum

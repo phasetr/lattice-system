@@ -2,6 +2,7 @@ import LatticeSystem.Quantum.SpinS.SpinSPiRotation
 import LatticeSystem.Quantum.SpinS.Problem25cZAxisRotationCommutation
 import LatticeSystem.Quantum.SpinS.SpinSPiRotationExpAxis3
 import LatticeSystem.Quantum.SpinS.SpinSPiRotationExpAxis1
+import LatticeSystem.Quantum.SpinS.SpinSPiRotationExpAxis2
 import LatticeSystem.Quantum.SpinHalfRotation.Conjugation
 
 /-!
@@ -498,8 +499,8 @@ example :
   fin_cases i <;> fin_cases j <;>
     simp [spinSPiRotation2, spinSPiRotation3, spinSPiRotation1, spinSAlternating, spinReversalS,
       Matrix.diagonal_apply_eq, Matrix.diagonal_apply_ne, Matrix.mul_apply, Fin.sum_univ_succ,
-      hI3, Complex.I_mul_I] <;>
-    norm_num [Complex.I_sq]
+      hI3, Complex.I_mul_I]
+  norm_num [Complex.I_sq]
 
 /-! ## R2-order: negative control on the printed order `û₂ = û₃û₁` vs `û₁û₃` -/
 
