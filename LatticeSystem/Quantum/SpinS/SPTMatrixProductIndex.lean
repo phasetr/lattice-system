@@ -293,17 +293,19 @@ matrix product state.
 
 This is the contrapositive of Theorem 8.7: a symmetric injective MPS would force the on-site
 `Z₂ × Z₂` projective representation to be trivial, whereas at odd `N` the `π` rotations anticommute
-(eq. (2.1.31)) while a trivial representation of a commutative group has commuting images. -/
+(eq. (2.1.25)) while a trivial representation of a commutative group has commuting images. -/
 theorem tasaki_corollary_8_5_z2z2 (N : ℕ) (hN : Odd N) :
     ¬ SymmetricInjectiveMPSExists (z2z2SpinRep N)
       (1 : Multiplicative (ZMod 2 × ZMod 2) →* ℤˣ) := by
+  have hanti : spinSPiRotation3 N * spinSPiRotation1 N =
+      -(spinSPiRotation1 N * spinSPiRotation3 N) := by
+    rw [spinSPiRotation3_mul_spinSPiRotation1, hN.neg_one_pow, neg_one_smul]
   obtain ⟨φ, hrep⟩ := exists_isProjectiveRep_anticommPairRep
     (spinSPiRotation1_mem_unitaryGroup N) (spinSPiRotation3_mem_unitaryGroup N)
-    (spinSPiRotation1_mul_self_of_odd hN) (spinSPiRotation3_mul_self_of_odd hN)
-    (spinSPiRotation3_mul_spinSPiRotation1_of_odd hN)
+    (spinSPiRotation1_mul_self_of_odd hN) (spinSPiRotation3_mul_self_of_odd hN) hanti
   exact fun hMPS => not_isTrivialProjectiveRep_anticommPairRep
-    (spinSPiRotation1_mem_unitaryGroup N) (spinSPiRotation3_mem_unitaryGroup N)
-    (spinSPiRotation3_mul_spinSPiRotation1_of_odd hN) (tasaki_theorem_8_7 hrep hMPS)
+    (spinSPiRotation1_mem_unitaryGroup N) (spinSPiRotation3_mem_unitaryGroup N) hanti
+    (tasaki_theorem_8_7 hrep hMPS)
 
 /-- **The on-site time-reversal representation of p. 278** for spin `S = N/2`: the group
 `Z₂ = {e, a}`, realised as `ℤˣ`, acts antiunitarily by `v̂(a) = Θ̂ = X K̂` with `X = û₁û₃`. -/

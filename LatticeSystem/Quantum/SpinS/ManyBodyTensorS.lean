@@ -12,7 +12,8 @@ manyBodyTensorS (fun x => W x * W' x)` (a product of sums is a sum of products,
 `Finset.prod_sum`) — so a single-site operator `onSiteS z A` (the tensor with `A` at `z` and
 `1` elsewhere) is conjugated by `Θ_U = ⊗_x U` to `onSiteS z (U A U⁻¹)`.  This is the general
 single-site-unitary lift used for the axis-swap gauge of Theorem 2.4 (where `U` is the
-`π/2` rotation about axis 1, a Wigner `d`-matrix, not a permutation).
+`π/2` rotation about axis 1, a Wigner `d`-matrix, not a permutation).  The adjoint is likewise
+site-wise, `(⊗_x W x)† = ⊗_x (W x)†`, which is what makes a tensor of unitaries unitary.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.4, p. 43–44.
@@ -58,5 +59,14 @@ theorem manyBodyTensorS_mul (W W' : Λ → Matrix (Fin (N + 1)) (Fin (N + 1)) �
   rw [hps]
   refine Finset.sum_congr rfl (fun τ _ => ?_)
   rw [Finset.prod_mul_distrib]
+
+omit [DecidableEq Λ] in
+/-- **Adjoint**: the adjoint of a many-body tensor is the many-body tensor of the single-site
+adjoints. -/
+theorem manyBodyTensorS_conjTranspose (W : Λ → Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (manyBodyTensorS W).conjTranspose =
+      manyBodyTensorS (fun x => (W x).conjTranspose) := by
+  ext σ' σ
+  simp [manyBodyTensorS_apply, Matrix.conjTranspose_apply]
 
 end LatticeSystem.Quantum

@@ -30,7 +30,7 @@ theorem manyBodySpinSRot3_conjTranspose (θ : ℝ) :
     (manyBodyTensorS (fun _ : V => spinSRot3 N θ)).conjTranspose =
       manyBodyTensorS (fun _ : V => spinSRot3 N (-θ)) := by
   simpa [spinSRot3_adjoint] using
-    (manyBodyTensorS_conjTranspose (V := V) (N := N)
+    (manyBodyTensorS_conjTranspose (Λ := V) (N := N)
       (fun _ : V => spinSRot3 N θ))
 
 /-- The lifted z-axis rotation is unitary in the form `Uᴴ * U = 1`. -/

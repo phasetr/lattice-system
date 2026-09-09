@@ -2511,8 +2511,14 @@ end LatticeSystem
     )["records"]
     check(bool(ch02_records), "tasaki-2020-ch02.json holds no record to build fixtures from")
     # An emptied shard must still reach the pinned-record check in the main validation rather
-    # than abort the run here.
-    record_fixture = ch02_records[0] if ch02_records else {"source_relations": []}
+    # than abort the run here. The fixture must be the real Pauli-involution record specifically
+    # (it is the only ch02 record with two source_relations, which the reversed-order self-test
+    # below needs); look it up by id rather than by list position, since the file is sorted by
+    # id and unrelated insertions can move which record sorts first.
+    record_fixture = next(
+        (r for r in ch02_records if r.get("id") == "tasaki-2020-section-2-1-pauli-x-involutive"),
+        ch02_records[0] if ch02_records else {"source_relations": []},
+    )
     collision_record = copy.deepcopy(record_fixture)
     collision_record.update(
         {

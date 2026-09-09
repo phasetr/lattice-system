@@ -334,7 +334,7 @@ theorem manyBodySpinSRot3_neg_pi_half_conjTranspose
     (manyBodyTensorS (fun _ : V => spinSRot3 N (-(Real.pi / 2)))).conjTranspose =
       manyBodyTensorS (fun _ : V => spinSRot3 N (Real.pi / 2)) := by
   simpa [spinSRot3_adjoint] using
-    (manyBodyTensorS_conjTranspose (V := V) (N := N)
+    (manyBodyTensorS_conjTranspose (Λ := V) (N := N)
       (fun _ : V => spinSRot3 N (-(Real.pi / 2))))
 
 /-- If a normalized state is fixed by both the lifted axis-swap inverse and the

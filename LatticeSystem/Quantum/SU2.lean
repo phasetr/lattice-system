@@ -2,15 +2,18 @@ import LatticeSystem.Quantum.SpinHalfRotation
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 
 /-!
-# `SU(2)` parametrization (Tasaki §2.2 Problem 2.2.c preparation)
+# `SU(2)` parametrization (Tasaki §2.2 solid-angle average preparation)
 
 Bundles the **special unitary group** `SU(2)` of `2 × 2` complex
 matrices, verifies that the spin-1/2 single-axis rotations
 `spinHalfRot{1,2,3} θ` (Tasaki eq. (2.1.26)) lie in `SU(2)`, and
 provides the forward Euler-angle parametrization
-`(φ, θ, ψ) ↦ Û^(3)_φ · Û^(2)_θ · Û^(3)_ψ ∈ SU(2)` needed downstream
-for the SU(2)-averaged-state characterization in Tasaki §2.2
-Problem 2.2.c (eq. (2.2.15)).
+`(φ, θ, ψ) ↦ Û^(3)_φ · Û^(2)_θ · Û^(3)_ψ ∈ SU(2)`, the generic Z-Y-Z
+form of an `SU(2)` element, as preparation for the solid-angle
+averages of Tasaki §2.2, p. 23.  Those averages themselves use the
+two-angle `Û^(3)_φ Û^(2)_θ` of eq. (2.2.14), not this three-angle
+product, which is used only by the membership pins in
+`LatticeSystem/Tests/SU2Family.lean`.
 
 `SU(2)` is bundled as a `Submonoid` of `Matrix (Fin 2) (Fin 2) ℂ`,
 intersection of `unitary` (`star U * U = 1 ∧ U * star U = 1`) with the
@@ -95,8 +98,9 @@ theorem spinHalfRot3_mem_SU2 (θ : ℝ) : spinHalfRot3 θ ∈ SU2 :=
 
 /-- The SU(2) element built from three Euler angles `(φ, θ, ψ)` via
 the standard Z-Y-Z decomposition: `Û^(3)_φ · Û^(2)_θ · Û^(3)_ψ`.
-This is the parametrization used in Tasaki §2.2 Problem 2.2.c
-(eq. (2.2.15)). -/
+This is the generic Euler parametrization of `SU(2)`, not the
+two-angle rotation `Û^(3)_φ Û^(2)_θ` of Tasaki §2.2, eq. (2.2.14),
+p. 23. -/
 noncomputable def spinHalfEulerProduct (φ θ ψ : ℝ) :
     Matrix (Fin 2) (Fin 2) ℂ :=
   spinHalfRot3 φ * spinHalfRot2 θ * spinHalfRot3 ψ

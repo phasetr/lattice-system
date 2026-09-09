@@ -68,7 +68,9 @@ example :
       Complex.exp (-(Complex.I * (φ : ℂ))) = 0 :=
   integral_cexp_neg_I_mul_zero_two_pi
 
-/-! ## D. Tasaki Problem 2.2.c — full SU(2)-averaged singlet identity -/
+/-! ## D. The SU(2)-averaged singlet identity, Tasaki eq. (2.2.14), p. 23
+
+The first display of Problem 2.2.b; the Lean name `problem_2_2_c` is a mislabel. -/
 
 example (τ : Fin 2 → Fin 2) :
     (1 / (4 * (Real.pi : ℂ))) *
@@ -139,17 +141,20 @@ example (Λ : Type*) [Fintype Λ] [DecidableEq Λ] :
     totalSpinHalfRot3Pi Λ = totalSpinHalfRot3 Λ Real.pi :=
   totalSpinHalfRot3Pi_eq Λ
 
-/-- Pin (Tasaki Problem 2.2.a): `Û^(1)_π_tot · Û^(2)_π_tot = Û^(3)_π_tot`. -/
+/-- Pin (Tasaki eq. (2.1.29), p. 19, lifted site-wise):
+`Û^(1)_π_tot · Û^(2)_π_tot = Û^(3)_π_tot`. -/
 example (Λ : Type*) [Fintype Λ] [DecidableEq Λ] :
     totalSpinHalfRot1Pi Λ * totalSpinHalfRot2Pi Λ = totalSpinHalfRot3Pi Λ :=
   totalSpinHalfRot1Pi_mul_totalSpinHalfRot2Pi Λ
 
-/-- Pin (Tasaki Problem 2.2.a): `Û^(2)_π_tot · Û^(3)_π_tot = Û^(1)_π_tot`. -/
+/-- Pin (Tasaki eq. (2.1.29), p. 19, lifted site-wise):
+`Û^(2)_π_tot · Û^(3)_π_tot = Û^(1)_π_tot`. -/
 example (Λ : Type*) [Fintype Λ] [DecidableEq Λ] :
     totalSpinHalfRot2Pi Λ * totalSpinHalfRot3Pi Λ = totalSpinHalfRot1Pi Λ :=
   totalSpinHalfRot2Pi_mul_totalSpinHalfRot3Pi Λ
 
-/-- Pin (Tasaki Problem 2.2.a): `Û^(3)_π_tot · Û^(1)_π_tot = Û^(2)_π_tot`. -/
+/-- Pin (Tasaki eq. (2.1.29), p. 19, lifted site-wise):
+`Û^(3)_π_tot · Û^(1)_π_tot = Û^(2)_π_tot`. -/
 example (Λ : Type*) [Fintype Λ] [DecidableEq Λ] :
     totalSpinHalfRot3Pi Λ * totalSpinHalfRot1Pi Λ = totalSpinHalfRot2Pi Λ :=
   totalSpinHalfRot3Pi_mul_totalSpinHalfRot1Pi Λ
@@ -166,21 +171,24 @@ example (Λ : Type*) [Fintype Λ] [DecidableEq Λ] : totalSpinHalfRot2 Λ 0 = 1 
 example (Λ : Type*) [Fintype Λ] [DecidableEq Λ] : totalSpinHalfRot3 Λ 0 = 1 :=
   totalSpinHalfRot3_zero Λ
 
-/-- Pin (Tasaki Problem 2.2.b): the two-site factorisation of `Û^(1)_π_tot`. -/
+/-- Pin (the `|Λ| = 2` case of Tasaki eq. (2.2.11), p. 22, not Problem 2.2.b): the two-site
+factorisation of `Û^(1)_π_tot`. -/
 example :
     totalSpinHalfRot1Pi (Fin 2) =
       onSite (0 : Fin 2) (spinHalfRot1 Real.pi) *
         onSite (1 : Fin 2) (spinHalfRot1 Real.pi) :=
   totalSpinHalfRot1Pi_two_site
 
-/-- Pin (Tasaki Problem 2.2.b): the two-site factorisation of `Û^(2)_π_tot`. -/
+/-- Pin (the `|Λ| = 2` case of Tasaki eq. (2.2.11), p. 22, not Problem 2.2.b): the two-site
+factorisation of `Û^(2)_π_tot`. -/
 example :
     totalSpinHalfRot2Pi (Fin 2) =
       onSite (0 : Fin 2) (spinHalfRot2 Real.pi) *
         onSite (1 : Fin 2) (spinHalfRot2 Real.pi) :=
   totalSpinHalfRot2Pi_two_site
 
-/-- Pin (Tasaki Problem 2.2.b): the two-site factorisation of `Û^(3)_π_tot`. -/
+/-- Pin (the `|Λ| = 2` case of Tasaki eq. (2.2.11), p. 22, not Problem 2.2.b): the two-site
+factorisation of `Û^(3)_π_tot`. -/
 example :
     totalSpinHalfRot3Pi (Fin 2) =
       onSite (0 : Fin 2) (spinHalfRot3 Real.pi) *

@@ -309,18 +309,18 @@ private lemma t9b_tasaki_theorem_8_7_nonvacuous :
 
 /-! ## T10: the closed-form `π` rotations and Corollary 8.5, `Z₂ × Z₂` half -/
 
-/-- T10a: at `S = 1/2` (`N = 1`) the closed form of `û₁ = exp(iπŜ^{(1)}) = exp(iπσ^x/2)` is
-`iσ^x`, the textbook value — a concrete check that the `i^{2S}` normalisation of
+/-- T10a: at `S = 1/2` (`N = 1`) the closed form of `û₁ = exp(−iπŜ^{(1)}) = exp(−iπσ^x/2)` is
+`−iσ^x`, the textbook value — a concrete check that the `(−i)^{2S}` normalisation of
 `spinSPiRotation1` is the right one. -/
 private lemma t10a_spinSPiRotation1_spin_half :
-    spinSPiRotation1 1 = Complex.I • pauliX := by
+    spinSPiRotation1 1 = (-Complex.I) • pauliX := by
   ext i j
   fin_cases i <;> fin_cases j <;>
     simp [spinSPiRotation1, spinReversalS, pauliX, Fin.rev]
 
-/-- T10b: at `S = 1/2` the closed form of `û₃ = exp(iπŜ^{(3)}) = exp(iπσ^z/2)` is `iσ^z`. -/
+/-- T10b: at `S = 1/2` the closed form of `û₃ = exp(−iπŜ^{(3)}) = exp(−iπσ^z/2)` is `−iσ^z`. -/
 private lemma t10b_spinSPiRotation3_spin_half :
-    spinSPiRotation3 1 = Complex.I • pauliZ := by
+    spinSPiRotation3 1 = (-Complex.I) • pauliZ := by
   ext i j
   fin_cases i <;> fin_cases j <;>
     simp [spinSPiRotation3, spinSAlternating, pauliZ, Matrix.diagonal]
@@ -328,8 +328,8 @@ private lemma t10b_spinSPiRotation3_spin_half :
 /-- T10c: the `π` rotations genuinely anticommute at `S = 1/2`, so the `Z₂ × Z₂` hypothesis of
 Corollary 8.5 is not vacuous. -/
 private lemma t10c_spin_half_anticommute :
-    spinSPiRotation3 1 * spinSPiRotation1 1 = -(spinSPiRotation1 1 * spinSPiRotation3 1) :=
-  spinSPiRotation3_mul_spinSPiRotation1_of_odd odd_one
+    spinSPiRotation3 1 * spinSPiRotation1 1 = -(spinSPiRotation1 1 * spinSPiRotation3 1) := by
+  rw [spinSPiRotation3_mul_spinSPiRotation1, odd_one.neg_one_pow, neg_one_smul]
 
 /-- T10d: the capstone `tasaki_corollary_8_5_z2z2`, now an unconditional theorem, applies at
 `S = 1/2`: no `Z₂ × Z₂`-invariant injective matrix product state of spin-`1/2` chains exists. -/
@@ -342,7 +342,7 @@ private lemma t10d_tasaki_corollary_8_5_z2z2_spin_half :
 
 /-- T11a: at `S = 1` (`N = 2`) the closed form of `û₁` is the spin-one half turn
 `spinOneHalfTurnS 0 = 1̂ - 2(Ŝ^{(1)})²`, the identification claimed by the module docstring of
-`Quantum/SpinS/SpinSPiRotation.lean` (`i^{2S} = -1` times the basis reversal). -/
+`Quantum/SpinS/SpinSPiRotation.lean` (`(-i)^{2S} = -1` times the basis reversal). -/
 private lemma t11a_spinSPiRotation1_spin_one :
     spinSPiRotation1 2 = spinOneHalfTurnS 0 := by
   ext i j

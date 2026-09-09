@@ -6,8 +6,9 @@ import LatticeSystem.Quantum.SpinS.AxisSwapUnitarySSpinS
 
 This module instantiates the unitary-invariance bridge from
 `Problem25cUnitaryAxisInput.lean` for the lifted axis-swap unitary already built
-for Tasaki §2.5 Theorem 2.4.  The main auxiliary input is that the adjoint of a
-many-body tensor is the tensor of the single-site adjoints.
+for Tasaki §2.5 Theorem 2.4.  The main auxiliary input is the adjoint of a
+many-body tensor, `manyBodyTensorS_conjTranspose` of
+`Quantum/SpinS/ManyBodyTensorS.lean`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, Problem 2.5.c, p. 43, and the SU(2)-symmetry context around
@@ -20,18 +21,6 @@ open Matrix
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
-/-! ## Tensor adjoints -/
-
-omit [DecidableEq V] in
-/-- The adjoint of a many-body tensor is the many-body tensor of the single-site
-adjoints. -/
-theorem manyBodyTensorS_conjTranspose
-    (W : V → Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
-    (manyBodyTensorS W).conjTranspose =
-      manyBodyTensorS (fun x => (W x).conjTranspose) := by
-  ext σ' σ
-  simp [manyBodyTensorS_apply, Matrix.conjTranspose_apply]
-
 namespace AxisSwapUnitaryS
 
 variable (G : AxisSwapUnitaryS N)
@@ -42,7 +31,7 @@ theorem tensor_conjTranspose {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
     (hUadj : G.U.conjTranspose = G.Uinv) :
     (G.tensor Λ).conjTranspose = G.tensorInv Λ := by
   simpa [tensor, tensorInv, hUadj] using
-    (manyBodyTensorS_conjTranspose (V := Λ) (N := N) (fun _ : Λ => G.U))
+    (manyBodyTensorS_conjTranspose (Λ := Λ) (N := N) (fun _ : Λ => G.U))
 
 end AxisSwapUnitaryS
 

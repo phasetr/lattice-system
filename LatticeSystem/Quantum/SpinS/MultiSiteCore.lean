@@ -100,20 +100,25 @@ theorem onSiteS_spinSOp3_apply_im_zero (i : Λ) (σ' σ : Λ → Fin (N + 1)) :
   onSiteS_apply_im_zero i (spinSOp3_apply_im_zero N) σ' σ
 
 
-/-- If `A` is Hermitian, so is its site embedding `onSiteS i A`. -/
-theorem onSiteS_isHermitian (i : Λ)
-    {A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ} (hA : A.IsHermitian) :
-    (onSiteS (Λ := Λ) (N := N) i A).IsHermitian := by
+/-- The site embedding commutes with the adjoint: `(onSiteS i A)ᴴ = onSiteS i Aᴴ`.  Off-diagonal
+blocks vanish on both sides, and on the surviving block the adjoint acts entrywise. -/
+theorem onSiteS_conjTranspose (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS (Λ := Λ) (N := N) i A).conjTranspose = onSiteS i A.conjTranspose := by
   ext σ σ'
   simp only [Matrix.conjTranspose_apply, onSiteS_apply]
   by_cases h : ∀ k, k ≠ i → σ k = σ' k
   · have h' : ∀ k, k ≠ i → σ' k = σ k := fun k hki => (h k hki).symm
     rw [if_pos h', if_pos h]
-    exact hA.apply (σ i) (σ' i)
   · have h' : ¬ (∀ k, k ≠ i → σ' k = σ k) := by
       intro hp
       exact h (fun k hki => (hp k hki).symm)
     rw [if_neg h', if_neg h, star_zero]
+
+/-- The site embedding of a Hermitian single-site operator is Hermitian. -/
+theorem onSiteS_isHermitian (i : Λ)
+    {A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ} (hA : A.IsHermitian) :
+    (onSiteS (Λ := Λ) (N := N) i A).IsHermitian :=
+  (onSiteS_conjTranspose i A).trans (congrArg (onSiteS i) hA.eq)
 
 /-! ## Commutativity at distinct sites -/
 
