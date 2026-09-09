@@ -191,12 +191,12 @@ LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
 CATALOGUE_BASELINE_SLICE = slice(216, 2731)
 # Pins the published catalogue text; this module's docstring records exactly what is hashed
 # and how the pin is legitimately updated.
-APPROVED_CHANGES_SHA256 = "a162b9b26f652a0e810e0cedd94a4d69a641de3342fbcc785fb0f35d7092e8f9"
+APPROVED_CHANGES_SHA256 = "0f8a449a91500802204619fd5fa2b1149756d0167e668ceb0efecd5cec0a8ef8"
 # Pins the row sequence `main()` actually compares the legacy pages against. The text pin above
 # does not reach it: the rows are derived from the transformed text by `table_data_rows`, which
 # is outside the pinned text, so without this pin a row skipped there would go unpublished with
 # the text pin undisturbed.
-PUBLISHED_ROWS_SHA256 = "72329640af6b1f910a38d0b803e4db65653c8f8360a516cd046a98825c9928a9"
+PUBLISHED_ROWS_SHA256 = "9883d75e0fe7c060b211b5a40be7f73d16174613669e921bcf45679dbd6ae35b"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -1591,6 +1591,32 @@ def _approved_replacements(text: str) -> str:
             "(Tasaki eq. (2.2.11), p. 22) remains unidentified with the exponentials, so "
             "the coverage of Problem 2.2.a stays partial |",
         )
+        # The many-body lift is now proved too (`manyBodySPiRotation_eq_exp`), so the
+        # arc's coverage is complete and the row's `stays partial` clause is stale.
+        .replace(
+            "the identification of all three single-site closed forms with "
+            "`exp(−iπ Ŝ^{(α)})` at general `S` is now proved (Tasaki eq. (2.1.34) / "
+            "Problem 2.1.g, p. 20, `spinSPiRotation3_eq_spinSRot3_pi`, "
+            "`Quantum/SpinS/SpinSPiRotationExpAxis3.lean`; "
+            "`spinSPiRotation1_eq_spinSRot1_pi`, "
+            "`Quantum/SpinS/SpinSPiRotationExpAxis1.lean`; "
+            "`spinSPiRotation2_eq_exp_spinSOp2`, "
+            "`Quantum/SpinS/SpinSPiRotationExpAxis2.lean`); only the many-body lift "
+            "(Tasaki eq. (2.2.11), p. 22) remains unidentified with the exponentials, so "
+            "the coverage of Problem 2.2.a stays partial |",
+            "the identification of all three single-site closed forms with "
+            "`exp(−iπ Ŝ^{(α)})` at general `S` is proved (Tasaki eq. (2.1.34) / "
+            "Problem 2.1.g, p. 20, `spinSPiRotation3_eq_spinSRot3_pi`, "
+            "`Quantum/SpinS/SpinSPiRotationExpAxis3.lean`; "
+            "`spinSPiRotation1_eq_spinSRot1_pi`, "
+            "`Quantum/SpinS/SpinSPiRotationExpAxis1.lean`; "
+            "`spinSPiRotation2_eq_exp_spinSOp2`, "
+            "`Quantum/SpinS/SpinSPiRotationExpAxis2.lean`), and the many-body lift "
+            "(Tasaki eq. (2.2.11), p. 22) through the tensor `manyBodySPiRotation` is also "
+            "proved, `manyBodySPiRotation_eq_exp` "
+            "(`Quantum/SpinS/ManyBodyPiRotationExp.lean`), so the coverage of Problem 2.2.a "
+            "is complete |",
+        )
     )
 
 
@@ -1655,12 +1681,12 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "da57ebe5b7efc5004b7c728720d1b261e52a2026eed7b805103437b4529ad17e"
+SCRIPT_SOURCE_SHA256 = "aa77453ca1fef0f7781d6b46c5c1c015065fa9e938eab636303a46262cfeb21a"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
-APPROVED_ENTRIES_SHA256 = "81562d17a0c5888e953711fe2f21a4658e234a1b05b1a637b63e33ef3ab97e7f"
+APPROVED_ENTRIES_SHA256 = "da13c39b407907bcbfc3133c877997d0070157483bf16d437f08b04c0b4c0f31"
 
 # The only text `SCRIPT_SOURCE_SHA256` does not hash: the digits these four pins carry. Each is
 # restated by the very edit it pins, and a digest over its own value would have no fixed point.
