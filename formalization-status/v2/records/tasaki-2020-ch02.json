@@ -4,6 +4,32 @@
       "axiom_dependencies": [],
       "capstone": false,
       "declaration_kind": "theorem",
+      "id": "tasaki-2020-problem-2-1-g-axis1",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.spinSPiRotation1_eq_spinSRot1_pi",
+      "lifecycle": "active",
+      "module": "LatticeSystem.Quantum.SpinS.SpinSPiRotationExpAxis1",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "retirement": null,
+      "source_coverage": "partial",
+      "source_path": "LatticeSystem/Quantum/SpinS/SpinSPiRotationExpAxis1.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-problem-2-1-g"
+        }
+      ],
+      "summary": "Tasaki Problem 2.1.g / eq. (2.1.34), p. 20: the general-spin closed form of the pi-rotation about axis 1, spinSPiRotation1 N, equals the exponential exp(-i*pi*S^{(1)}) via spinSRot1 N Real.pi. Identified by the commutant argument: the pi-conjugations of the axis-1 rotation and of the spin-reversal operator agree on the generators Ŝ^{1,2,3}, hence their ratio is central (Problem 2.1.a, p. 15, spanning) and therefore scalar; the scalar is pinned to 1 by evaluating both sides on the explicit binomial top vector spinSTopVector. Proved for axis 3 and axis 1; the identification for axis 2, and the many-body lift (Tasaki Problem 2.2.a), remain unformalised, so the coverage of the source item is partial.",
+      "topic_ids": [
+        "quantum-spin"
+      ],
+      "trust_state": "axiom_free"
+    },
+    {
+      "axiom_dependencies": [],
+      "capstone": false,
+      "declaration_kind": "theorem",
       "id": "tasaki-2020-problem-2-1-g-axis3",
       "implementation_state": "implemented",
       "lean_name": "LatticeSystem.Quantum.spinSPiRotation3_eq_spinSRot3_pi",
@@ -20,7 +46,7 @@
           "source_item_id": "tasaki-2020-problem-2-1-g"
         }
       ],
-      "summary": "Tasaki Problem 2.1.g / eq. (2.1.34), p. 20: the general-spin closed form of the pi-rotation about axis 3, spinSPiRotation3 N, equals the exponential exp(-i*pi*S^{(3)}) via spinSRot3 N Real.pi. Proved for axis 3 only; the identification for axes 1 and 2, and its many-body lift (Tasaki Problem 2.2.a), remain unformalised, so the coverage of the source item is partial.",
+      "summary": "Tasaki Problem 2.1.g / eq. (2.1.34), p. 20: the general-spin closed form of the pi-rotation about axis 3, spinSPiRotation3 N, equals the exponential exp(-i*pi*S^{(3)}) via spinSRot3 N Real.pi. Proved for axis 3 only; the identification for axis 2, and its many-body lift (Tasaki Problem 2.2.a), remain unformalised, so the coverage of the source item is partial.",
       "topic_ids": [
         "quantum-spin"
       ],
