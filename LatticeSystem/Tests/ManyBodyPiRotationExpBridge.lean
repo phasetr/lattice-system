@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.ManyBodyPiRotation
+import LatticeSystem.Quantum.SpinS.ManyBodyPiRotationExp
 import LatticeSystem.Quantum.SpinS.TotalSpin
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 

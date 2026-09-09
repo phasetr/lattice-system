@@ -149,4 +149,65 @@ theorem manyBodySPiRotation_eq_exp (Λ : Type*) [Fintype Λ] [DecidableEq Λ] (N
   congr 1
   fin_cases α <;> rfl
 
+/-! ## Tasaki Problem 2.2.a, p. 23, on the exponential objects -/
+
+/-- **Tasaki Problem 2.2.a (a), p. 23** in the book's own notation: when `|Λ|S` is an integer —
+equivalently `|Λ|·2S` even — the global rotations `exp(−iπ Ŝ_tot^{(α)})` about distinct axes
+commute.  The content is the closed-form statement of `Quantum/SpinS/ManyBodyPiRotation.lean`,
+transported along eq. (2.2.11), p. 22. -/
+theorem manyBodySPiRotationExp_commute_of_even (Λ : Type*) [Fintype Λ] [DecidableEq Λ] (N : ℕ)
+    (hc : Even (Fintype.card Λ * N)) {α β : Fin 3} (h : α ≠ β) :
+    NormedSpace.exp
+        (-(((Real.pi : ℂ) * Complex.I)) •
+          (![totalSpinSOp1 Λ N, totalSpinSOp2 Λ N, totalSpinSOp3 Λ N] α)) *
+        NormedSpace.exp
+          (-(((Real.pi : ℂ) * Complex.I)) •
+            (![totalSpinSOp1 Λ N, totalSpinSOp2 Λ N, totalSpinSOp3 Λ N] β)) =
+      NormedSpace.exp
+          (-(((Real.pi : ℂ) * Complex.I)) •
+            (![totalSpinSOp1 Λ N, totalSpinSOp2 Λ N, totalSpinSOp3 Λ N] β)) *
+        NormedSpace.exp
+          (-(((Real.pi : ℂ) * Complex.I)) •
+            (![totalSpinSOp1 Λ N, totalSpinSOp2 Λ N, totalSpinSOp3 Λ N] α)) := by
+  simp only [← manyBodySPiRotation_eq_exp]
+  exact manyBodySPiRotation_commute_of_even Λ N hc h
+
+/-- **Tasaki Problem 2.2.a (b), p. 23** in the book's own notation: when `|Λ|S` is a half-odd
+integer — equivalently `|Λ|·2S` odd — the global rotations `exp(−iπ Ŝ_tot^{(α)})` about distinct
+axes anticommute. -/
+theorem manyBodySPiRotationExp_anticommute_of_odd (Λ : Type*) [Fintype Λ] [DecidableEq Λ] (N : ℕ)
+    (hc : Odd (Fintype.card Λ * N)) {α β : Fin 3} (h : α ≠ β) :
+    NormedSpace.exp
+        (-(((Real.pi : ℂ) * Complex.I)) •
+          (![totalSpinSOp1 Λ N, totalSpinSOp2 Λ N, totalSpinSOp3 Λ N] α)) *
+        NormedSpace.exp
+          (-(((Real.pi : ℂ) * Complex.I)) •
+            (![totalSpinSOp1 Λ N, totalSpinSOp2 Λ N, totalSpinSOp3 Λ N] β)) =
+      -(NormedSpace.exp
+            (-(((Real.pi : ℂ) * Complex.I)) •
+              (![totalSpinSOp1 Λ N, totalSpinSOp2 Λ N, totalSpinSOp3 Λ N] β)) *
+          NormedSpace.exp
+            (-(((Real.pi : ℂ) * Complex.I)) •
+              (![totalSpinSOp1 Λ N, totalSpinSOp2 Λ N, totalSpinSOp3 Λ N] α))) := by
+  simp only [← manyBodySPiRotation_eq_exp]
+  exact manyBodySPiRotation_anticommute_of_odd Λ N hc h
+
+/-- **Tasaki Problem 2.2.a (c), p. 23 (`[solution → p. 496]`)** in the book's own notation: for
+half-odd-integer `|Λ|S` and distinct axes, every eigenvector `Φ ≠ 0` of `exp(−iπ Ŝ_tot^{(α)})` is
+orthogonal to `exp(−iπ Ŝ_tot^{(β)})Φ`. -/
+theorem tasaki_problem_2_2_a_exp_eigenvector_orthogonal (Λ : Type*) [Fintype Λ] [DecidableEq Λ]
+    (N : ℕ) (hc : Odd (Fintype.card Λ * N)) {α β : Fin 3} (h : α ≠ β)
+    {Φ : (Λ → Fin (N + 1)) → ℂ} (hΦ : Φ ≠ 0) {lam : ℂ}
+    (heig : Matrix.mulVec
+      (NormedSpace.exp
+        (-(((Real.pi : ℂ) * Complex.I)) •
+          (![totalSpinSOp1 Λ N, totalSpinSOp2 Λ N, totalSpinSOp3 Λ N] α))) Φ = lam • Φ) :
+    star Φ ⬝ᵥ
+        Matrix.mulVec
+          (NormedSpace.exp
+            (-(((Real.pi : ℂ) * Complex.I)) •
+              (![totalSpinSOp1 Λ N, totalSpinSOp2 Λ N, totalSpinSOp3 Λ N] β))) Φ = 0 := by
+  simp only [← manyBodySPiRotation_eq_exp] at heig ⊢
+  exact tasaki_problem_2_2_a_eigenvector_orthogonal Λ N hc h hΦ heig
+
 end LatticeSystem.Quantum
