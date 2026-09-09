@@ -338,22 +338,18 @@ example :
 /-! ## Independent evaluation of the exponential side at `N = 1`
 
 The positive controls above evaluate the *closed-form* side; each discharges the identification
-conjunct by the general theorem, so none of them observes `NormedSpace.exp`. The two pins below
-close that gap at `N = 1`, where the spin-`S` operator coincides with the spin-`1/2` one and the
+conjunct by the general theorem, so none of them observes `NormedSpace.exp`. The pin below closes
+that gap at `N = 1`, where the spin-`S` operator coincides with the spin-`1/2` one and the
 already-proved bridge `spinHalfRot1_eq_exp` (Tasaki Problem 2.1.b) evaluates the exponential
 without using the axis-1 identification. -/
-
-/-- The spin-`1/2` generator is the `N = 1` spin-`S` generator, `Ŝ^{(1)} = σ^x/2`
-(Tasaki eq. (2.1.7), p. 15); the `Fin 2` and `Fin (1 + 1)` index types agree definitionally. -/
-example : spinHalfOp1 = spinSOp1 1 := by
-  ext i j
-  fin_cases i <;> fin_cases j <;>
-    norm_num [spinHalfOp1, spinSOp1, spinSOpPlus, spinSOpMinus, pauliX]
 
 /-- The exponential side itself at `N = 1`, `θ = π`: `exp(−iπ Ŝ^{(1)}) = −i σ^x`, evaluated
 through the spin-`1/2` bridge `spinHalfRot1_eq_exp` and the closed form `cos(θ/2)·1 −
 2i sin(θ/2)·Ŝ^{(1)}` — independent of `spinSPiRotation1_eq_spinSRot1_pi`, and agreeing with the
-value that theorem predicts. -/
+value that theorem predicts.  The step `hop` is the pin that the spin-`1/2` generator is the
+`N = 1` spin-`S` generator, `Ŝ^{(1)} = σ^x/2` (Tasaki eq. (2.1.7), p. 15), the `Fin 2` and
+`Fin (1 + 1)` index types agreeing definitionally; it is stated here rather than as its own
+`example` so that the identification is proved once. -/
 example : spinSRot1 1 Real.pi = !![(0 : ℂ), -Complex.I; -Complex.I, 0] := by
   have hop : spinHalfOp1 = spinSOp1 1 := by
     ext i j

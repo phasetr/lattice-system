@@ -72,7 +72,7 @@
           "source_item_id": "tasaki-2020-problem-2-2-a"
         }
       ],
-      "summary": "Tasaki Problem 2.2.a (b): for alpha and beta distinct, the global pi-rotations U_pi^{(alpha)} and U_pi^{(beta)} anticommute whenever |Lambda|*N is odd, i.e. |Lambda|*S is a half-odd integer. Proved for the closed-form pi-rotation matrices spinSPiRotationAxis and their uniform lattice tensor manyBodySPiRotation; the identification of those closed forms with the book's exp(-i*pi*S^{(alpha)}) at general S is not formalised, so the coverage of the source item is partial.",
+      "summary": "Tasaki Problem 2.2.a (b): for alpha and beta distinct, the global pi-rotations U_pi^{(alpha)} and U_pi^{(beta)} anticommute whenever |Lambda|*N is odd, i.e. |Lambda|*S is a half-odd integer. Proved for the closed-form pi-rotation matrices spinSPiRotationAxis and their uniform lattice tensor manyBodySPiRotation; the identification of the axis-3 and axis-1 closed forms with exp(-i*pi*S^{(3)}) / exp(-i*pi*S^{(1)}) at general S is now proved (spinSPiRotation3_eq_spinSRot3_pi, spinSPiRotation1_eq_spinSRot1_pi), while axis 2 and the many-body lift remain unidentified with the exponentials, so the coverage of the source item is partial.",
       "topic_ids": [
         "quantum-spin"
       ],
@@ -98,7 +98,7 @@
           "source_item_id": "tasaki-2020-problem-2-2-a"
         }
       ],
-      "summary": "Tasaki Problem 2.2.a (a): for alpha and beta distinct, the global pi-rotations U_pi^{(alpha)} and U_pi^{(beta)} commute whenever |Lambda|*N is even, i.e. |Lambda|*S is an integer. Proved for the closed-form pi-rotation matrices spinSPiRotationAxis and their uniform lattice tensor manyBodySPiRotation; the identification of those closed forms with the book's exp(-i*pi*S^{(alpha)}) at general S is not formalised, so the coverage of the source item is partial.",
+      "summary": "Tasaki Problem 2.2.a (a): for alpha and beta distinct, the global pi-rotations U_pi^{(alpha)} and U_pi^{(beta)} commute whenever |Lambda|*N is even, i.e. |Lambda|*S is an integer. Proved for the closed-form pi-rotation matrices spinSPiRotationAxis and their uniform lattice tensor manyBodySPiRotation; the identification of the axis-3 and axis-1 closed forms with exp(-i*pi*S^{(3)}) / exp(-i*pi*S^{(1)}) at general S is now proved (spinSPiRotation3_eq_spinSRot3_pi, spinSPiRotation1_eq_spinSRot1_pi), while axis 2 and the many-body lift remain unidentified with the exponentials, so the coverage of the source item is partial.",
       "topic_ids": [
         "quantum-spin"
       ],
@@ -124,7 +124,7 @@
           "source_item_id": "tasaki-2020-problem-2-2-a"
         }
       ],
-      "summary": "Tasaki Problem 2.2.a (c): when |Lambda|*N is odd, every nonzero eigenvector of the global pi-rotation U_pi^{(alpha)} is orthogonal to its image under the anticommuting global pi-rotation U_pi^{(beta)}, alpha and beta distinct. Proved for the closed-form pi-rotation matrices spinSPiRotationAxis and their uniform lattice tensor manyBodySPiRotation; the identification of those closed forms with the book's exp(-i*pi*S^{(alpha)}) at general S is not formalised, so the coverage of the source item is partial.",
+      "summary": "Tasaki Problem 2.2.a (c): when |Lambda|*N is odd, every nonzero eigenvector of the global pi-rotation U_pi^{(alpha)} is orthogonal to its image under the anticommuting global pi-rotation U_pi^{(beta)}, alpha and beta distinct. Proved for the closed-form pi-rotation matrices spinSPiRotationAxis and their uniform lattice tensor manyBodySPiRotation; the identification of the axis-3 and axis-1 closed forms with exp(-i*pi*S^{(3)}) / exp(-i*pi*S^{(1)}) at general S is now proved (spinSPiRotation3_eq_spinSRot3_pi, spinSPiRotation1_eq_spinSRot1_pi), while axis 2 and the many-body lift remain unidentified with the exponentials, so the coverage of the source item is partial.",
       "topic_ids": [
         "quantum-spin"
       ],

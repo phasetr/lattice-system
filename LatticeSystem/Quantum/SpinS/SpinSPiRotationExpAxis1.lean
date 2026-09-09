@@ -96,7 +96,12 @@ the spin-`S` space (`N = 2S`).  It is the `Ŝ^{(1)}`-eigenvector of maximal eige
 i.e. the state Tasaki writes `|ψ^S⟩` after the axis relabelling `3 ↦ 1`; the binomial weights are
 the ones the `2S`-fold spin-`1/2` decomposition of Problem 2.1.g, p. 20 (solution p. 495, (S.12))
 produces.  Entrywise it is the Clebsch–Gordan site weight `Math.cgSite`, the repository's single
-definition of the `√binom` scalar.  Its two properties used here are
+definition of the `√binom` scalar; this is a name for that weight read as a vector, not a second
+definition of it.  The two names are kept apart because they are used at different arities:
+`Math.cgSite` is the scalar weight with `N` implicit, shared with the Weyl transport of `Ŝ^±`,
+whereas the capstone needs the whole `Fin (N + 1) → ℂ` witness with `N` explicit at every
+`Matrix.mulVec`, and it is under this name that the proof guide cites it.  The cost is that proofs
+about the entries unfold both names.  Its two properties used here are
 `spinSOp1_mulVec_spinSTopVector` and the binomial symmetry
 `spinReversalS_mulVec_spinSTopVector`. -/
 noncomputable def spinSTopVector (N : ℕ) (k : Fin (N + 1)) : ℂ :=
