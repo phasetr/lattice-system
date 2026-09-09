@@ -100,4 +100,31 @@ theorem manyBodySPiRotation_swap_mul_of_ne {α β : Fin 3} (h : α ≠ β) :
     spinSPiRotationAxis_swap_mul_of_ne h, manyBodySPiRotationOf_smul, ← pow_mul,
     Nat.mul_comm N (Fintype.card Λ)]
 
+/-- **Tasaki Problem 2.2.a (a), p. 23.**  When `|Λ|S` is an integer — equivalently `|Λ|·2S` is
+even — the global `π` rotations about distinct axes commute. -/
+theorem manyBodySPiRotation_commute_of_even (hc : Even (Fintype.card Λ * N))
+    {α β : Fin 3} (h : α ≠ β) :
+    manyBodySPiRotation Λ N α * manyBodySPiRotation Λ N β
+      = manyBodySPiRotation Λ N β * manyBodySPiRotation Λ N α := by
+  rw [manyBodySPiRotation_swap_mul_of_ne Λ N h.symm, hc.neg_one_pow, one_smul]
+
+/-- **Tasaki Problem 2.2.a (b), p. 23.**  When `|Λ|S` is a half-odd integer — equivalently
+`|Λ|·2S` is odd — the global `π` rotations about distinct axes anticommute. -/
+theorem manyBodySPiRotation_anticommute_of_odd (hc : Odd (Fintype.card Λ * N))
+    {α β : Fin 3} (h : α ≠ β) :
+    manyBodySPiRotation Λ N α * manyBodySPiRotation Λ N β
+      = -(manyBodySPiRotation Λ N β * manyBodySPiRotation Λ N α) := by
+  rw [manyBodySPiRotation_swap_mul_of_ne Λ N h.symm, hc.neg_one_pow, neg_one_smul]
+
+/-- Each global `π` rotation is an isometry: every site factor is, and the factors commute. -/
+theorem manyBodySPiRotation_conjTranspose_mul_self (α : Fin 3) :
+    (manyBodySPiRotation Λ N α).conjTranspose * manyBodySPiRotation Λ N α = 1 := by
+  have hu : (spinSPiRotationAxis N α).conjTranspose * spinSPiRotationAxis N α = 1 := by
+    have hmem := spinSPiRotationAxis_mem_unitaryGroup N α
+    rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose] at hmem
+    exact hmem
+  unfold manyBodySPiRotation manyBodySPiRotationOf
+  refine Matrix.noncommProd_conjTranspose_mul_self _ _ _ (fun x _ => ?_)
+  rw [onSiteS_conjTranspose, onSiteS_mul_onSiteS_same, hu, onSiteS_one]
+
 end LatticeSystem.Quantum
