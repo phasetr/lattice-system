@@ -46,4 +46,15 @@ theorem spinSOp3Eigen_exp_neg_pi_mul_I_eq (N : ℕ) (k : Fin (N + 1)) :
   rw [hsplit, Complex.exp_add, Complex.exp_nat_mul, Complex.exp_nat_mul, hhalf,
     Complex.exp_pi_mul_I]
 
+/-- **The axis-3 `π` rotation is the exponential `exp(−iπ Ŝ^{(3)})`** at every spin `S = N/2`:
+the closed form `û₃ = (−i)^{2S}·diag((−1)^k)` of `spinSPiRotation3` agrees with the rotation
+`spinSRot3 N π` of the definition on p. 15.  Tasaki (2.1.34), third line, p. 20 (Problem 2.1.g,
+p. 20). -/
+theorem spinSPiRotation3_eq_spinSRot3_pi (N : ℕ) :
+    spinSPiRotation3 N = spinSRot3 N Real.pi := by
+  rw [spinSRot3_eq_diagonal, spinSPiRotation3, spinSAlternating, ← Matrix.diagonal_smul]
+  congr 1
+  funext k
+  rw [Pi.smul_apply, smul_eq_mul, ← Complex.exp_eq_exp_ℂ, spinSOp3Eigen_exp_neg_pi_mul_I_eq]
+
 end LatticeSystem.Quantum

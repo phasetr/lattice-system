@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.SpinSPiRotation
 import LatticeSystem.Quantum.SpinS.Problem25cZAxisRotationCommutation
+import LatticeSystem.Quantum.SpinS.SpinSPiRotationExpAxis3
 
 /-!
 # Signature pin: PR-A of the Problem 2.1.g exponential-identification arc, axis 3
@@ -93,7 +94,7 @@ example :
   ext i j
   fin_cases i <;> fin_cases j <;>
     simp [spinSPiRotation3, spinSAlternating, Matrix.diagonal_apply_eq, Matrix.diagonal_apply_ne,
-      hI3] <;>
-    ring
+      hI3]
+  ring
 
 end LatticeSystem.Quantum
