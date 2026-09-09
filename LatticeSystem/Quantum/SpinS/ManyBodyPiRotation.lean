@@ -20,11 +20,12 @@ a phase `(−i)^{2S}` times a real involution — and the identification of thos
 `exp(−iπ Ŝ^{(α)})` at general `S` is **not** formalised: no declaration in this chain mentions
 `Matrix.exp` or `NormedSpace.exp`.  Exponential rotations and bridges do exist elsewhere in the
 repository — `spinSRot3 N θ = exp(−iθ Ŝ^{(3)})` of
-`Quantum/SpinS/Problem25cZAxisRotationInput.lean`, whose closed form `spinSRot3_eq_diagonal` is
-proved, and `spinSRot1 N θ = exp(−iθ Ŝ^{(1)})` of `Quantum/SpinS/SpinSRotation1.lean`, which
-carries no closed form; the general-`S` many-body bridge
-`manyBodyTensorS_spinSRot3_eq_exp_totalSpinSOp3` of
-`Quantum/SpinS/Problem25cZAxisRotationCommutation.lean`; the general-`S` twist bridge
+`Quantum/SpinS/Problem25cZAxisRotationInput.lean`, whose closed form `spinSRot3_eq_diagonal` and
+general-`S` many-body bridge `manyBodyTensorS_spinSRot3_eq_exp_totalSpinSOp3` are proved in
+`Quantum/SpinS/Problem25cZAxisRotationCommutation.lean`, and `spinSRot1 N θ = exp(−iθ Ŝ^{(1)})`
+of `Quantum/SpinS/SpinSRotation1.lean`, which carries no closed form; the general-`S` global
+exponentials `saturatedGlobalRot2` / `saturatedGlobalRot3` about the axes `2` and `3` of
+`Quantum/SpinS/SaturatedCoherentAmplitude.lean`; the general-`S` twist bridge
 `lsmTwistOperator_eq_diagonal` of `Quantum/SpinS/LiebSchultzMattisProof.lean`; and the spin-`1/2`
 `totalSpinHalfRot{1,2,3}_eq_exp` of `Quantum/TotalSpin/Rotation.lean` — but none of them is
 related to the closed forms `spinSPiRotationAxis` / `manyBodySPiRotation` used here.  The

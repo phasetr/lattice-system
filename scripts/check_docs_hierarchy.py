@@ -72,8 +72,10 @@ headline row now names.)
 `docs/formalization/legacy/20-total-spin-operator-tasaki-2-2-eq-2-2-7-2-2-8-part-01.md`, which
 attributed the cyclic product and the two-site factorisation to Problems 2.2.a/2.2.b instead of
 eq. (2.1.29) lifted site-wise and the `Λ = Fin 2` case of eq. (2.2.11) -- the second of the two
-now also recording the Problem 2.2.a capstone
-`tasaki_problem_2_2_a_eigenvector_orthogonal` and the two modules that carry it; the `û₁` closed
+now also recording the terminal theorem of the Problem 2.2.a chain
+`tasaki_problem_2_2_a_eigenvector_orthogonal`, the two modules that carry it, and the partial
+coverage the version 2 records carry as `source_coverage: "partial"`: the three declarations are
+proved for the closed-form π-rotation matrices, not for the book's exponentials; the `û₁` closed
 form on
 `docs/formalization/legacy/27-spin-marshall-lieb-mattis-on-the-magnetization-sector-tasa-part-02.md`,
 whose phase is `(−i)^{2S}` under the book's sign convention; and the `problem_2_2_c` row of
@@ -182,12 +184,12 @@ LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
 CATALOGUE_BASELINE_SLICE = slice(216, 2731)
 # Pins the published catalogue text; this module's docstring records exactly what is hashed
 # and how the pin is legitimately updated.
-APPROVED_CHANGES_SHA256 = "544bb1bb8a389a3e83cdcd90282fdc857488e9563f32a9a04f7b0c5b0ae7eb91"
+APPROVED_CHANGES_SHA256 = "3922e2c306201cdc1f90d58ffe20c7d7a732f1496d97b2f98ff4a4979a3d223d"
 # Pins the row sequence `main()` actually compares the legacy pages against. The text pin above
 # does not reach it: the rows are derived from the transformed text by `table_data_rows`, which
 # is outside the pinned text, so without this pin a row skipped there would go unpublished with
 # the text pin undisturbed.
-PUBLISHED_ROWS_SHA256 = "2a34655a371b7da1d7cf40b84770e186e7a8110044941ef9f441291790790efa"
+PUBLISHED_ROWS_SHA256 = "fc9260e6d505f1a0d6d030d978dbac3ba86dc324e22e1baafff89f68d21dea37"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -1507,6 +1509,27 @@ def _approved_replacements(text: str) -> str:
             "(rotation of spin-down, Problem 2.2.c auxiliary)",
             "(rotation of spin-down, eq. (2.2.14) auxiliary; Problem 2.2.b, first display)",
         )
+        # Keys on text the Problem 2.2.a entry above inserts. The three declarations are proved
+        # for the closed-form π-rotation matrices, and their identification with the book's
+        # exponentials is not formalised, so the row must disclose the partial coverage that the
+        # version 2 records carry as `source_coverage: "partial"`; and since those records also
+        # carry `capstone: false`, the row no longer calls the last of them a capstone.
+        .replace(
+            "and the eigenvector-orthogonality capstone "
+            "`tasaki_problem_2_2_a_eigenvector_orthogonal` — live in "
+            "`Quantum/SpinS/ManyBodyPiRotation.lean`, over the generic core "
+            "`Matrix.dotProduct_mulVec_eq_zero_of_anticommute_eigenvector` of "
+            "`Math/MatrixAnalysis/AnticommutingEigenvectorOrthogonality.lean` |",
+            "and the eigenvector-orthogonality terminal theorem of the Problem 2.2.a chain "
+            "`tasaki_problem_2_2_a_eigenvector_orthogonal` — live in "
+            "`Quantum/SpinS/ManyBodyPiRotation.lean`, over the generic core "
+            "`Matrix.dotProduct_mulVec_eq_zero_of_anticommute_eigenvector` of "
+            "`Math/MatrixAnalysis/AnticommutingEigenvectorOrthogonality.lean`. All three are "
+            "proved for the closed-form π-rotation matrices `spinSPiRotationAxis` and their "
+            "uniform lattice tensor `manyBodySPiRotation`; the identification of those closed "
+            "forms with `exp(−iπ Ŝ^{(α)})` at general `S` is not formalised, so the coverage of "
+            "Problem 2.2.a is partial |",
+        )
     )
 
 
@@ -1571,12 +1594,12 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "f578d4de47800bf68bf02d1c3292770f3db484b56288d57971e89b004daf81c0"
+SCRIPT_SOURCE_SHA256 = "15d061fa418b9b1ce4740b7e5a67c7fa2801bfa1bed9738be8063c7c7fd037d7"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
-APPROVED_ENTRIES_SHA256 = "b988223cc6588768ae2b74256a02b05f87f8e5d1b9384c0b351e1f5f76a9538a"
+APPROVED_ENTRIES_SHA256 = "226d631aa681511fabe2b356e6704275ef9aeb9b923c4b04beda52f449ac8684"
 
 # The only text `SCRIPT_SOURCE_SHA256` does not hash: the digits these four pins carry. Each is
 # restated by the very edit it pins, and a digest over its own value would have no fixed point.

@@ -861,11 +861,14 @@ $\hat S_x \cdot \hat S_y$.
 \begin{itemize}
   \item Global rotation operator
     $\hat U^{(\alpha)}_\theta = \exp(-i\theta \hat S_{\mathrm{tot}}^{(\alpha)})$
-    (eq.~(2.2.11)) at general $S$ about the axes $1$ and $2$, and the
-    identification of the closed-form $\theta = \pi$ rotations with those
-    exponentials. All three axes at spin-$1/2$ are proved as
+    (eq.~(2.2.11)) at general $S$ about the axis $1$, and the identification
+    of the closed-form $\theta = \pi$ rotations
+    (\texttt{spinSPiRotationAxis}, \texttt{manyBodySPiRotation}) with the
+    exponentials on any of the three axes. The general-$S$ exponentials about
+    the axes $2$ and $3$ do exist, as \texttt{saturatedGlobalRot2} and
+    \texttt{saturatedGlobalRot3}; all three axes at spin-$1/2$ are proved as
     \texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp}, and the general-$S$
-    axis-$3$ case as
+    axis-$3$ many-body bridge as
     \texttt{manyBodyTensorS\_spinSRot3\_eq\_exp\_totalSpinSOp3}.
   \item SU(2) / U(1) invariance of operators commuting with
     $\hat S_{\mathrm{tot}}^{(\alpha)}$ (eqs.~(2.2.12)-(2.2.13)).
@@ -912,7 +915,9 @@ bridges do exist elsewhere in the repository: the single-site
 $\texttt{spinSRot3}\,N\,\theta = e^{-i\theta \hat S^{(3)}}$, whose closed
 form \texttt{spinSRot3\_eq\_diagonal} is proved, and
 $\texttt{spinSRot1}\,N\,\theta = e^{-i\theta \hat S^{(1)}}$, which carries
-none; the general-$S$ many-body bridge
+none; the general-$S$ global exponentials \texttt{saturatedGlobalRot2} and
+\texttt{saturatedGlobalRot3} about the axes $2$ and $3$; the general-$S$
+many-body bridge
 \texttt{manyBodyTensorS\_spinSRot3\_eq\_exp\_totalSpinSOp3}; the general-$S$
 twist bridge \texttt{lsmTwistOperator\_eq\_diagonal}; and the spin-$1/2$
 \texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp}. None of them is related to the
@@ -945,7 +950,8 @@ $\hat U^{(\beta)}_\pi$ anticommute.
 Lean name: \texttt{manyBodySPiRotation\_anticommute\_of\_odd}.
 \end{theorem}
 
-\begin{theorem}[Tasaki Problem 2.2.a (c), capstone]
+\begin{theorem}[Tasaki Problem 2.2.a (c), the terminal theorem of the
+  Problem 2.2.a chain]
 In the anticommuting case ($|\Lambda| N$ odd, $\alpha \neq \beta$), every
 nonzero eigenvector $|\Phi\rangle$ of $\hat U^{(\alpha)}_\pi$ is orthogonal
 to $\hat U^{(\beta)}_\pi |\Phi\rangle$. Lean name:
