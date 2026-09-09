@@ -90,4 +90,60 @@ theorem spinSRot3_pi_half_conj_spinSPiRotation1 (N : ℕ) :
         rw [← Matrix.mul_assoc, hhalf, Matrix.mul_smul]
     _ = spinSPiRotation2 N := by
         rw [spinSPiRotation2, spinSPiRotation3_eq_spinSRot3_pi, spinSPiRotation1]
+
+/-! ## The quarter turn as an axis swap on the generators -/
+
+/-- **The axis swap in commutation form**: `Ŝ^{(1)} · spinSRot3 N (−π/2) =
+spinSRot3 N (−π/2) · Ŝ^{(2)}`, the quarter-turn case of Tasaki (2.1.25), p. 18, obtained from
+`spinSRot3_neg_pi_half_conj_spinSOp2` by cancelling the trailing rotation.  The orientation is
+sign-critical: the opposite quarter turn sends `Ŝ^{(2)}` to `−Ŝ^{(1)}`. -/
+theorem spinSOp1_mul_spinSRot3_neg_pi_half (N : ℕ) :
+    spinSOp1 N * spinSRot3 N (-(Real.pi / 2)) = spinSRot3 N (-(Real.pi / 2)) * spinSOp2 N := by
+  have h := congrArg (fun M => M * spinSRot3 N (-(Real.pi / 2)))
+    (spinSRot3_neg_pi_half_conj_spinSOp2 N)
+  simp only [Matrix.mul_assoc] at h
+  rw [spinSRot3_mul_neg, Matrix.mul_one] at h
+  exact h.symm
+
+/-- The axis swap propagated to all powers, the hypothesis shape the intertwining bridge
+`matrix_exp_intertwine_of_pow_intertwine` consumes. -/
+private lemma spinSOp1_pow_mul_spinSRot3_neg_pi_half (N n : ℕ) :
+    spinSOp1 N ^ n * spinSRot3 N (-(Real.pi / 2)) =
+      spinSRot3 N (-(Real.pi / 2)) * spinSOp2 N ^ n := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    rw [pow_succ, Matrix.mul_assoc, spinSOp1_mul_spinSRot3_neg_pi_half, ← Matrix.mul_assoc, ih,
+      Matrix.mul_assoc, ← pow_succ]
+
+/-! ## The axis-2 identification -/
+
+/-- **The axis-2 exponential is a quarter-turn conjugate of the axis-1 one**:
+`exp(−iπ Ŝ^{(2)}) = spinSRot3 N (π/2) · exp(−iπ Ŝ^{(1)}) · spinSRot3 N (−π/2)`.  The powers of the
+generators intertwine through the quarter turn (`spinSOp1_pow_mul_spinSRot3_neg_pi_half`), so the
+exponentials do as well by `matrix_exp_intertwine_of_pow_intertwine`; no inverse of the quarter
+turn is needed, only the cancellation `spinSRot3_mul_neg`. -/
+theorem exp_neg_pi_mul_I_spinSOp2_eq_spinSRot3_conj (N : ℕ) :
+    NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp2 N) =
+      spinSRot3 N (Real.pi / 2) * spinSRot1 N Real.pi * spinSRot3 N (-(Real.pi / 2)) := by
+  have hint : NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp1 N) *
+        spinSRot3 N (-(Real.pi / 2)) =
+      spinSRot3 N (-(Real.pi / 2)) *
+        NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp2 N) :=
+    matrix_exp_intertwine_of_pow_intertwine
+      (pow_smul_mul_of_pow_mul _ (spinSOp1_pow_mul_spinSRot3_neg_pi_half N))
+  have hrot : spinSRot1 N Real.pi
+      = NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp1 N) := rfl
+  calc NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp2 N)
+      = spinSRot3 N (Real.pi / 2) * spinSRot3 N (-(Real.pi / 2)) *
+          NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp2 N) := by
+        rw [spinSRot3_mul_neg, Matrix.one_mul]
+    _ = spinSRot3 N (Real.pi / 2) * (spinSRot3 N (-(Real.pi / 2)) *
+          NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp2 N)) := Matrix.mul_assoc _ _ _
+    _ = spinSRot3 N (Real.pi / 2) *
+          (NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • spinSOp1 N) *
+            spinSRot3 N (-(Real.pi / 2))) := by rw [hint]
+    _ = spinSRot3 N (Real.pi / 2) * spinSRot1 N Real.pi * spinSRot3 N (-(Real.pi / 2)) := by
+        rw [hrot, Matrix.mul_assoc]
+
 end LatticeSystem.Quantum
