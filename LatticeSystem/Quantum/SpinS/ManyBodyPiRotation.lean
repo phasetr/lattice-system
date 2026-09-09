@@ -127,4 +127,16 @@ theorem manyBodySPiRotation_conjTranspose_mul_self (α : Fin 3) :
   refine Matrix.noncommProd_conjTranspose_mul_self _ _ _ (fun x _ => ?_)
   rw [onSiteS_conjTranspose, onSiteS_mul_onSiteS_same, hu, onSiteS_one]
 
+/-- **Tasaki Problem 2.2.a (c), p. 23 (`[solution → p. 496]`).**  For half-odd-integer `|Λ|S` and
+distinct axes, every eigenvector `Φ ≠ 0` of `Û_π^{(α)}` is orthogonal to `Û_π^{(β)}Φ`.  The two
+rotations anticommute by (b) and each is an isometry, so the generic `|λ| = 1` argument of
+`Math/MatrixAnalysis/AnticommutingEigenvectorOrthogonality.lean` applies. -/
+theorem tasaki_problem_2_2_a_eigenvector_orthogonal (hc : Odd (Fintype.card Λ * N))
+    {α β : Fin 3} (h : α ≠ β) {Φ : (Λ → Fin (N + 1)) → ℂ} (hΦ : Φ ≠ 0) {lam : ℂ}
+    (heig : (manyBodySPiRotation Λ N α).mulVec Φ = lam • Φ) :
+    star Φ ⬝ᵥ (manyBodySPiRotation Λ N β).mulVec Φ = 0 :=
+  Matrix.dotProduct_mulVec_eq_zero_of_anticommute_eigenvector
+    (manyBodySPiRotation_conjTranspose_mul_self Λ N α)
+    (manyBodySPiRotation_anticommute_of_odd Λ N hc h.symm) hΦ heig
+
 end LatticeSystem.Quantum
