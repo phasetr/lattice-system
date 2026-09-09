@@ -9,8 +9,9 @@ Springer, 2020, §2.4, p. 34): on a connected, real, symmetric, edge-supported, 
 ferromagnetic spin-`S` Heisenberg lattice (eq. (2.4.1), p. 32; standing assumption `S ≥ 1/2`,
 i.e. `1 ≤ N`), the ground-state eigenspace of the Hamiltonian itself is the span of the ladder
 family `ladderIterateUp`, coincides with the joint `(Ĥ, (Ŝ_tot)²)`-eigenspace, has dimension
-`|V|·N + 1`, and (specialised to the printed uniform coupling `J = couplingOf G (−1/2)`, eq.
-(2.4.4)/(2.4.5)) the printed ground energy is `E_GS = −|B|·S²` (eq. (2.4.9)/(2.4.10)).
+`|V|·N + 1`, and (specialised to the printed uniform coupling `J = couplingOf G (−1/2)` of
+eq. (2.4.1), p. 32) the printed ground energy is `E_GS = −|B|·S²`, which the book states in the
+prose immediately below eq. (2.4.5), p. 32.
 
 Pinned:
 * C1 `heisenbergHamiltonianS_eigenspace_eq_span_ladderIterateUp_of_connected_ferro` — the
@@ -20,11 +21,14 @@ Pinned:
 * C2 `heisenbergHamiltonianS_eigenspace_finrank_eq_of_connected_ferro` — its dimension is
   `Fintype.card V * N + 1` (the `2S_max + 1` degeneracy count).
 * C3 `heisenbergHamiltonianS_eigenspace_eq_satFerroJointEigenspace_of_connected_ferro` — the
-  remark after eq. (2.4.10): the `Ĥ`-ground eigenspace coincides with the joint
-  `(Ĥ, (Ŝ_tot)²)`-eigenspace, i.e. every ground state carries maximal total spin.
+  ground-state half of the remark after eq. (2.4.10), p. 34: the `Ĥ`-ground eigenspace coincides
+  with the joint `(Ĥ, (Ŝ_tot)²)`-eigenspace, i.e. every ground state carries maximal total spin.
+  The converse the book prints — that these are the *only* maximal-total-spin states — is not
+  proved upstream and is not pinned here.
 * C5a `saturatedFerromagnetEigenvalueS_couplingOf_neg_half` — the printed ground energy formula
-  `E_GS = −|B|·S²` for the uniform coupling `J = couplingOf G (−1/2)` (eq. (2.4.4)/(2.4.9); no
-  hypotheses at all — it is an unconditional rewrite of `saturatedFerromagnetEigenvalueS`).
+  `E_GS = −|B|·S²` (p. 32, below eq. (2.4.5)) for the uniform coupling `J = couplingOf G (−1/2)`
+  of eq. (2.4.1), p. 32; no hypotheses at all — it is an unconditional rewrite of
+  `saturatedFerromagnetEigenvalueS`.
 * C5b `tasaki_theorem_2_1_ferromagnetic_ground_states` — the printed theorem exactly, as a single
   three-conjunct statement: `Ĥ − E_GS` is `PosSemidef` (energy minimality), the `Ĥ`-eigenspace at
   `E_GS` is `span ℂ (Set.range (ladderIterateUp V N))`, and its dimension is
@@ -96,9 +100,9 @@ example {G : SimpleGraph V} {J : V → V → ℂ}
   heisenbergHamiltonianS_eigenspace_eq_satFerroJointEigenspace_of_connected_ferro
     hGconn hJ_real hJ_sym hJ_supp hJ_ferro hN
 
-/-- **C5a pin.** The printed ground energy `E_GS = −|B|·S²` for the uniform coupling
-`J = couplingOf G (−1/2)` (eq. (2.4.4)/(2.4.9), p. 32/34). Unconditional: no hypotheses on `G` or
-`N` at all. -/
+/-- **C5a pin.** The printed ground energy `E_GS = −|B|·S²` (p. 32, below eq. (2.4.5)) for the
+uniform coupling `J = couplingOf G (−1/2)` of eq. (2.4.1), p. 32. Unconditional: no hypotheses on
+`G` or `N` at all. -/
 example (G : SimpleGraph V) [DecidableRel G.Adj] (N : ℕ) :
     saturatedFerromagnetEigenvalueS (V := V) (couplingOf G (-(1/2) : ℂ)) N
       = -(G.edgeFinset.card : ℂ) * ((N : ℂ) / 2) ^ 2 :=
@@ -129,6 +133,7 @@ example (G : SimpleGraph V) [DecidableRel G.Adj] (hGconn : G.Connected) (hN : 1 
 `SimpleGraph.sum_degrees_eq_twice_card_edges`, giving `G.edgeFinset.card = 3`. Ground energy
 `−3 * (1/2)² = −3/4`; ground-space dimension `3 * 1 + 1 = 4` (the `S = 3/2` quadruplet). -/
 
+/-- The triangle `cycleGraph 3` on `Fin 3` has three edges, from `3 * 2 = 2 * |B|`. -/
 private theorem cycleGraph_three_edgeFinset_card :
     (cycleGraph 3 : SimpleGraph (Fin 3)).edgeFinset.card = 3 := by
   have hdeg : ∀ v : Fin 3, (cycleGraph 3 : SimpleGraph (Fin 3)).degree v = 2 :=

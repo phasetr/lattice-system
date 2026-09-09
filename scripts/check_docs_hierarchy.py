@@ -52,13 +52,20 @@ An edit that does move a pin recomputes it in the same commit with
     print(hashlib.sha256("\n".join(c.published_catalogue_rows()) \
     .encode("utf-8")).hexdigest())'
 
-and states which rows the new values reflect. (Applied for the fragment rewrites on the
-`sum_magProjFn_eq`, `saturatedFerromagnetJointEigenspace_finrank_eq`, and `magProjFn` rows of
-`docs/formalization/legacy/28-spin-saturated-ferromagnetic-state-tasaki-2-4-generalised-part-01.md`,
-renaming the mislabelled `Tasaki §2.4 Theorem 2.1 closure` headline (and its two cross-references)
-to `Saturated-ferromagnet joint eigenspace closure` -- what the closed theorem actually is -- now
+and states which rows the new values reflect. (Applied for the fragment rewrites on seven rows of
+`docs/formalization/legacy/28-spin-saturated-ferromagnetic-state-tasaki-2-4-generalised-part-01.md`
+-- the `sum_magProjFn_eq`, `saturatedFerromagnetJointEigenspace_finrank_eq`, `magProjFn`,
+`magSubspaceS_mMax_inf_saturatedFerromagnetJointEigenspace`,
+`totSpinSOpPlus_mulVecZero_imp_eq_zero_of_mem_satFerroJE_inf_magSubS`,
+`totalSpinSOpPlusJointMagShift`, and
+`saturatedFerromagnetJointEigenspace_inf_magSubspaceS_finrank_le_one` rows -- renaming the
+mislabelled `Tasaki §2.4 Theorem 2.1 closure` headline and correcting every row of that table
+which attributed the joint-eigenspace work to the printed theorem, to
+`Saturated-ferromagnet joint eigenspace closure` -- what the closed theorem actually is -- now
 that Tasaki §2.4 Theorem 2.1 itself, the printed `Ĥ`-only ground-state eigenspace, is closed
-separately by `heisenbergHamiltonianS_eigenspace_eq_span_ladderIterateUp_of_connected_ferro`.)
+separately by `heisenbergHamiltonianS_eigenspace_eq_span_ladderIterateUp_of_connected_ferro` and
+bundled as printed by `tasaki_theorem_2_1_ferromagnetic_ground_states`, both of which the
+headline row now names.)
 Recomputing a pin is never on its own an
 authorization for what moved: the legacy pages still have to be edited to match, and the
 catalogue-row comparison is what proves they do. What the pins buy is that a change to the
@@ -156,12 +163,12 @@ LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
 CATALOGUE_BASELINE_SLICE = slice(216, 2731)
 # Pins the published catalogue text; this module's docstring records exactly what is hashed
 # and how the pin is legitimately updated.
-APPROVED_CHANGES_SHA256 = "ef3c9237326060a8022087619ebe685c9a5f854fbef7f08ac5f4a609f26dc0d0"
+APPROVED_CHANGES_SHA256 = "a4a10dd4a0893fb7a922a0e82513cfa57f4db8bc797479ef0f0dad31cde9b38e"
 # Pins the row sequence `main()` actually compares the legacy pages against. The text pin above
 # does not reach it: the rows are derived from the transformed text by `table_data_rows`, which
 # is outside the pinned text, so without this pin a row skipped there would go unpublished with
 # the text pin undisturbed.
-PUBLISHED_ROWS_SHA256 = "ff10b883f01bb3811ab0a7e7a8c858e3d49ba000232b2d7765870aeaa9d0ac97"
+PUBLISHED_ROWS_SHA256 = "a6e3de328d4859407a8ae2c0e77c047a2b90a4d105d4fad89f343fd7da3ee6b0"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -1346,7 +1353,10 @@ def _approved_replacements(text: str) -> str:
             "`(Ĥ, (Ŝ_tot)²)`-eigenspace at the saturated values; the printed Tasaki §2.4 "
             "Theorem 2.1 (p. 34) characterises the `Ĥ`-eigenspace alone on a connected "
             "ferromagnetic lattice and is closed separately by "
-            "`heisenbergHamiltonianS_eigenspace_eq_span_ladderIterateUp_of_connected_ferro`.",
+            "`heisenbergHamiltonianS_eigenspace_eq_span_ladderIterateUp_of_connected_ferro`, "
+            "which `tasaki_theorem_2_1_ferromagnetic_ground_states` bundles with the printed "
+            "ground energy `E_GS = -|B| S²` and the degeneracy count into Theorem 2.1 as "
+            "printed (`Quantum/SpinS/FerromagneticGroundStateTheorem21.lean`).",
         )
         .replace(
             "Direct corollary of the Theorem 2.1 closure (PR #2768)",
@@ -1356,6 +1366,38 @@ def _approved_replacements(text: str) -> str:
             "into per-sector components for the final Tasaki §2.4 Theorem 2.1 closure (PR #2765)",
             "into per-sector components for the final joint-eigenspace closure toward Tasaki §2.4 "
             "(PR #2765)",
+        )
+        # The four sibling rows of the same table that attribute the joint-eigenspace work to
+        # Tasaki §2.4 Theorem 2.1 itself, corrected the same way as the headline above: what
+        # those PRs close is the joint `(Ĥ, (Ŝ_tot)²)`-eigenspace, and the printed theorem is the
+        # separately closed `Ĥ`-only statement.
+        .replace(
+            "First two concrete sector contributions toward the upper bound "
+            "`finrank(joint) ≤ 2m_max+1` that closes Tasaki §2.4 Theorem 2.1.",
+            "First two concrete sector contributions toward the upper bound "
+            "`finrank(joint) ≤ 2m_max+1` that closes the saturated-ferromagnet joint "
+            "`(Ĥ, (Ŝ_tot)²)`-eigenspace; the printed Tasaki §2.4 Theorem 2.1 (p. 34) is the "
+            "`Ĥ`-only statement, closed separately by "
+            "`tasaki_theorem_2_1_ferromagnetic_ground_states`.",
+        )
+        .replace(
+            "gives the kernel-trivial inductive step toward Tasaki §2.4 Theorem 2.1 (PR #2761)",
+            "gives the kernel-trivial inductive step toward the joint-eigenspace closure "
+            "(PR #2761)",
+        )
+        .replace(
+            "PR #2768 completes the final summation step via magProjFn to give "
+            "`joint = span(ladderIterateUp)` and hence Tasaki §2.4 Theorem 2.1 (PR #2762)",
+            "PR #2768 completes the final summation step via magProjFn to give "
+            "`joint = span(ladderIterateUp)`, the joint `(Ĥ, (Ŝ_tot)²)`-eigenspace closure; the "
+            "printed Tasaki §2.4 Theorem 2.1 (p. 34) is the `Ĥ`-only statement, closed "
+            "separately by `tasaki_theorem_2_1_ferromagnetic_ground_states` (PR #2762)",
+        )
+        .replace(
+            "to give `joint = span(ladderIterateUp)`, completing Tasaki §2.4 Theorem 2.1 "
+            "(PR #2763)",
+            "to give `joint = span(ladderIterateUp)`, completing the joint-eigenspace closure "
+            "(PR #2763)",
         )
     )
 
@@ -1421,12 +1463,12 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "fe6aaf34cc31267fb39ff2dcd0a62fd45dcb5acfdd1647db0019a0d654f71d06"
+SCRIPT_SOURCE_SHA256 = "1032d850b522cf37a9142e76760998bde78e230bd1a0f792ac88d91c71ceac96"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
-APPROVED_ENTRIES_SHA256 = "c4c05d1184a0563af3b07e9cd12157f2dd86e1fc139ed8539efd1c1a7a7b1b53"
+APPROVED_ENTRIES_SHA256 = "de1f270632e9c984debb0de70919d22213f5721f9261ec70f9087b3b5cf8ec49"
 
 # The only text `SCRIPT_SOURCE_SHA256` does not hash: the digits these four pins carry. Each is
 # restated by the very edit it pins, and a digest over its own value would have no fixed point.

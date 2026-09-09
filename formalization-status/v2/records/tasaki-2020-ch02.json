@@ -81,6 +81,32 @@
         "quantum-spin"
       ],
       "trust_state": "axiom_free"
+    },
+    {
+      "axiom_dependencies": [],
+      "capstone": false,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-theorem-2-1-maximal-total-spin",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.heisenbergHamiltonianS_eigenspace_eq_satFerroJointEigenspace_of_connected_ferro",
+      "lifecycle": "active",
+      "module": "LatticeSystem.Quantum.SpinS.FerromagneticGroundStateTheorem21",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "retirement": null,
+      "source_coverage": "partial",
+      "source_path": "LatticeSystem/Quantum/SpinS/FerromagneticGroundStateTheorem21.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-theorem-2-1"
+        }
+      ],
+      "summary": "On a connected graph with a real, symmetric, edge-supported, strictly ferromagnetic spin-S coupling, the eigenspace of the Heisenberg Hamiltonian alone at the saturated-ferromagnet energy equals the joint eigenspace of that Hamiltonian and the total-spin Casimir at the saturated values; this is the ground-state half of Tasaki's remark after eq. (2.4.10), that every ferromagnetic ground state carries maximal total spin, and not the converse inclusion the remark also asserts.",
+      "topic_ids": [
+        "quantum-spin"
+      ],
+      "trust_state": "axiom_free"
     }
   ],
   "schema_version": 2,

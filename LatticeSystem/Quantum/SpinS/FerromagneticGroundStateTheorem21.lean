@@ -11,8 +11,9 @@ carrying a real, symmetric, edge-supported, strictly ferromagnetic coupling: the
 `Ĥ` *alone* at the saturated-ferromagnet energy is the span of the ladder family
 `Φ_M = (Ŝ⁻_tot)^k Φ↑` of eq. (2.4.9), p. 33 -- which is eq. (2.4.10), p. 34 -- its dimension
 is the `2 S_max + 1` degeneracy `|V|·N + 1`, and it coincides with the joint `(Ĥ, (Ŝ_tot)²)`
-eigenspace, the book's remark after eq. (2.4.10) that every ground state carries maximal total
-spin.
+eigenspace -- the ground-state half of the book's remark after eq. (2.4.10), p. 34: every
+ground state carries maximal total spin.  The printed remark is the converse, that the states
+of eq. (2.4.10) are the *only* states of maximal total spin; that direction is not proved here.
 
 Specialised to the printed uniform coupling `couplingOf G (-1/2)` of eq. (2.4.1), p. 32, the
 saturated-ferromagnet energy is the printed `E_GS = -|B| S²`, and the three statements combine
@@ -28,8 +29,10 @@ a *ground*-state space is the frustration-free bound of `SaturatedFerromagnetGro
 Two remarks on the hypotheses.  `hJ_sym` is not an assumption beyond the book: eq. (2.4.1),
 p. 32, sums over *unordered* bonds, so one weight per unordered bond is the printed model, and
 the repo's ordered double sum encodes exactly that when the weight function is symmetric.  And
-`1 ≤ N` is the standing assumption `S ≥ 1/2` of §2.4; it is what makes
-`saturatedFerromagnetEigenvalueS` the ground energy rather than merely an eigenvalue.
+`1 ≤ N` is the standing assumption `S ≥ 1/2` of §2.4, and it is inherited unchanged from the
+two upstream lemmas this module composes, both of which assume it:
+`heisenbergHamiltonianS_eigenspace_inf_magSubspaceS_eq_span_ladderIterateUp` and
+`heisenbergHamiltonianS_sub_saturatedFerromagnetEigenvalueS_posSemidef`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §2.4 Theorem 2.1, p. 34; eq. (2.4.1), p. 32; eq. (2.4.9), p. 33; eq. (2.4.10), p. 34;
@@ -130,14 +133,18 @@ theorem heisenbergHamiltonianS_eigenspace_finrank_eq_of_connected_ferro
     finrank_span_eq_card (ladderIterateUp_linearIndependent (V := V) (N := N)),
     Fintype.card_fin]
 
-/-- **Every ferromagnetic ground state carries maximal total spin** -- the remark following
-eq. (2.4.10), p. 34.
+/-- **Every ferromagnetic ground state carries maximal total spin** -- the ground-state half of
+the remark following eq. (2.4.10), p. 34.
 
 The `Ĥ`-eigenspace at the saturated-ferromagnet energy coincides with the joint
 `(Ĥ, (Ŝ_tot)²)`-eigenspace at the saturated values, so the maximal-Casimir condition, which
 `saturatedFerromagnetJointEigenspace` imposes as an extra constraint, is automatic for a
 connected ferromagnet.  Both sides are the span of the ladder family, by eq. (2.4.10) and by
-`saturatedFerromagnetJointEigenspace_eq_span_ladderIterateUp`. -/
+`saturatedFerromagnetJointEigenspace_eq_span_ladderIterateUp`.
+
+What the book prints is the converse: that the states of eq. (2.4.10) are the *only* states
+with maximal total spin `S_max = |Λ| S`.  That inclusion would need an upper bound on the
+`(Ŝ_tot)²`-eigenspace, which this module does not establish, and is not proved here. -/
 theorem heisenbergHamiltonianS_eigenspace_eq_satFerroJointEigenspace_of_connected_ferro
     {G : SimpleGraph V} {J : V → V → ℂ}
     (hGconn : G.Connected)
@@ -154,8 +161,8 @@ theorem heisenbergHamiltonianS_eigenspace_eq_satFerroJointEigenspace_of_connecte
       hGconn hJ_real hJ_sym hJ_supp hJ_ferro hN).trans
     (saturatedFerromagnetJointEigenspace_eq_span_ladderIterateUp J).symm
 
-/-- **The printed ground-state energy `E_GS = -|B| S²`** (Tasaki §2.4, p. 32, below eq. (2.4.5);
-eq. (2.4.9), p. 33).
+/-- **The printed ground-state energy `E_GS = -|B| S²`** (Tasaki §2.4, p. 32, stated in the
+prose immediately below eq. (2.4.5)).
 
 For the printed uniform coupling of eq. (2.4.1) -- weight `-1/2` on every bond of `G`, which is
 `Ĥ = -∑_{{x,y} ∈ B} Ŝ_x · Ŝ_y` in the repo's ordered double-sum encoding -- the
