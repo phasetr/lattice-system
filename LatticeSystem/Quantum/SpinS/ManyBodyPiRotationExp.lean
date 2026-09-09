@@ -64,4 +64,45 @@ theorem onSiteS_exp (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
     NormedSpace.map_exp (onSiteSRingHom i)
       (LinearMap.continuous_of_finiteDimensional (onSiteSLinearMap i)) A
 
+/-! ## A many-body tensor as a product of site embeddings -/
+
+/-- A tensor whose factors outside a finite set `s` are the identity is the noncommutative product
+over `s` of the site embeddings of the remaining factors.  The induction on `s` is the general form
+of the printed remark that operators at different sites commute (below eq. (2.2.5), p. 21): each
+step peels off one site with `manyBodyTensorS_mul`, the base case being the all-identity tensor. -/
+private theorem manyBodyTensorS_piecewise_eq_noncommProd
+    (W : Λ → Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) (s : Finset Λ)
+    (comm : (↑s : Set Λ).Pairwise
+      (fun x y => Commute (onSiteS x (W x) : ManyBodyOpS Λ N) (onSiteS y (W y)))) :
+    manyBodyTensorS (s.piecewise W (fun _ => 1))
+      = s.noncommProd (fun x => onSiteS x (W x)) comm := by
+  induction s using Finset.induction_on with
+  | empty =>
+      rw [Finset.noncommProd_empty]
+      simpa using manyBodyTensorS_one (Λ := Λ) (N := N)
+  | insert a s ha ih =>
+      rw [Finset.noncommProd_insert_of_notMem _ _ _ _ ha, ← ih, Finset.piecewise_insert,
+        onSiteS_eq_manyBodyTensorS, manyBodyTensorS_mul]
+      congr 1
+      funext x
+      by_cases hx : x = a
+      · subst hx
+        rw [Function.update_self, Function.update_self, Finset.piecewise_eq_of_notMem _ _ _ ha,
+          mul_one]
+      · rw [Function.update_of_ne hx, Function.update_of_ne hx, one_mul]
+
+/-- **A many-body tensor is the product of the site embeddings of its factors**,
+`⊗_{x ∈ Λ} W_x = ∏_{x ∈ Λ} ι_x(W_x)`, the product being taken as `Finset.noncommProd` since `Λ`
+carries no order and the many-body operators need not commute; the factors here do commute
+pairwise because they act on distinct sites. -/
+theorem manyBodyTensorS_eq_noncommProd (W : Λ → Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
+    (comm : (↑(Finset.univ : Finset Λ) : Set Λ).Pairwise
+      (fun x y => Commute (onSiteS x (W x) : ManyBodyOpS Λ N) (onSiteS y (W y)))) :
+    manyBodyTensorS W = Finset.univ.noncommProd (fun x => onSiteS x (W x)) comm := by
+  have hW : (Finset.univ : Finset Λ).piecewise W (fun _ => 1) = W := by
+    funext x
+    exact Finset.piecewise_eq_of_mem _ _ _ (Finset.mem_univ x)
+  conv_lhs => rw [← hW]
+  exact manyBodyTensorS_piecewise_eq_noncommProd W Finset.univ comm
+
 end LatticeSystem.Quantum
