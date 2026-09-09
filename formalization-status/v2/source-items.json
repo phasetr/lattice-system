@@ -45,6 +45,19 @@
     },
     {
       "equations": [
+        "2.2.11",
+        "2.1.25"
+      ],
+      "id": "tasaki-2020-problem-2-2-a",
+      "item_kind": "exercise",
+      "item_number": "2.2.a",
+      "pages": "23",
+      "section": "2.2",
+      "source_id": "tasaki-2020",
+      "title": "Commutation of global pi-rotations and eigenvector orthogonality"
+    },
+    {
+      "equations": [
         "2.1.8"
       ],
       "id": "tasaki-2020-section-2-1-pauli",

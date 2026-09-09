@@ -868,8 +868,81 @@ $\hat S_x \cdot \hat S_y$.
     eigenvalues (eqs.~(2.2.17)-(2.2.19)).
   \item Magnetization eigenspace decomposition
     $\mathcal H = \bigoplus_M \mathcal H_M$ (eqs.~(2.2.9)-(2.2.10)).
-  \item Problem 2.2.a-c.
 \end{itemize}
+
+\subsection{Problem 2.2.a: global \texorpdfstring{$\pi$}{pi}-rotations
+  (Tasaki \S2.2, Problem 2.2.a, p.~23, solution p.~496)}
+\label{sec:problem22a}
+
+\emph{Source file:}
+\texttt{LatticeSystem/Quantum/SpinS/ManyBodyPiRotation.lean}.
+
+For general spin $S$ (with $N = 2S$), the global $\pi$-rotation of
+eq.~(2.2.11), p.~22, specialised to $\theta = \pi$,
+\[
+  \hat U^{(\alpha)}_\pi = \prod_{x \in \Lambda} \hat u_x^{(\alpha)},
+  \qquad \hat u^{(\alpha)} = e^{-i\pi \hat S^{(\alpha)}},
+\]
+is built as a \texttt{Finset.noncommProd} of the closed-form single-site
+factor \texttt{spinSPiRotationAxis} of
+\texttt{Quantum/SpinS/SpinSPiRotation.lean}. The single-site factors
+obey the sign identity of eq.~(2.1.25), p.~18,
+$\hat u^{(\beta)}\hat u^{(\alpha)} = (-1)^N \hat u^{(\alpha)}\hat u^{(\beta)}$
+for $\alpha \neq \beta$
+(\texttt{spinSPiRotationAxis\_swap\_mul\_of\_ne}), which lifts
+site-wise through the $|\Lambda|$-fold product to the master identity
+$\hat U^{(\beta)}_\pi \hat U^{(\alpha)}_\pi
+  = (-1)^{|\Lambda| N} \hat U^{(\alpha)}_\pi \hat U^{(\beta)}_\pi$
+(\texttt{manyBodySPiRotation\_swap\_mul\_of\_ne}), matching eq.~(2.1.29),
+p.~19, at the single-site level and Problem 2.2.a at the many-body
+level.
+
+\begin{theorem}[Tasaki Problem 2.2.a (a)]
+For $\alpha \neq \beta$ and $|\Lambda| N$ even (i.e. $|\Lambda| S \in
+\mathbb Z$), $\hat U^{(\alpha)}_\pi$ and $\hat U^{(\beta)}_\pi$ commute.
+Lean name: \texttt{manyBodySPiRotation\_commute\_of\_even}.
+\end{theorem}
+
+\begin{theorem}[Tasaki Problem 2.2.a (b)]
+For $\alpha \neq \beta$ and $|\Lambda| N$ odd (i.e. $|\Lambda| S \in
+\mathbb Z + \tfrac12$), $\hat U^{(\alpha)}_\pi$ and
+$\hat U^{(\beta)}_\pi$ anticommute.
+Lean name: \texttt{manyBodySPiRotation\_anticommute\_of\_odd}.
+\end{theorem}
+
+\begin{theorem}[Tasaki Problem 2.2.a (c), capstone]
+In the anticommuting case ($|\Lambda| N$ odd, $\alpha \neq \beta$), every
+nonzero eigenvector $|\Phi\rangle$ of $\hat U^{(\alpha)}_\pi$ is orthogonal
+to $\hat U^{(\beta)}_\pi |\Phi\rangle$. Lean name:
+\texttt{tasaki\_problem\_2\_2\_a\_eigenvector\_orthogonal}.
+\end{theorem}
+
+\begin{proof}
+$\hat U^{(\alpha)}_\pi$ is unitary
+(\texttt{manyBodySPiRotation\_conjTranspose\_mul\_self}, built from the
+generic noncommutative-product isometry lemma
+\texttt{Matrix.noncommProd\_conjTranspose\_mul\_self}). The generic
+linear-algebra core
+\texttt{Matrix.dotProduct\_mulVec\_eq\_zero\_of\_anticommute\_eigenvector}
+(\texttt{Math/MatrixAnalysis/AnticommutingEigenvectorOrthogonality.lean})
+shows that for unitary $U$, $VU = -UV$, and $U\Phi = \lambda \Phi$ with
+$\Phi \neq 0$, necessarily $\langle \Phi, V\Phi\rangle = 0$: inserting
+$1 = U^\dagger U$ and using $|\lambda|^2 = 1$ gives
+$\langle \Phi, V\Phi \rangle = \langle U\Phi, VU\Phi\rangle
+  = \langle U\Phi, -UV\Phi\rangle
+  = -\langle \Phi, V\Phi\rangle$, forcing the quantity to vanish.
+Part (c) instantiates this with $U = \hat U^{(\alpha)}_\pi$,
+$V = \hat U^{(\beta)}_\pi$, and the anticommutation of part (b).
+\end{proof}
+
+\emph{Sign convention.} The book's $\hat u^{(\alpha)} =
+e^{-i\pi \hat S^{(\alpha)}}$ is realised by retargeting the existing
+single-site closed forms \texttt{spinSPiRotation1}/\texttt{3} of
+\texttt{Quantum/SpinS/SpinSPiRotation.lean} from
+$(i)^N \bullet(\cdot)$ to $(-i)^N \bullet(\cdot)$; every
+pre-existing theorem statement in that file is quadratic in the phase
+or phase-cancelling, hence stays literally unchanged under this
+retargeting.
 
 %======================================================================
 \section{S = 1 basis states and raising/lowering
@@ -2207,7 +2280,8 @@ formalization of Tasaki \S2.1 and \S2.2.
 \item \texttt{totalSpinHalfRot\{1,2,3\}Pi\_mul\_totalSpinHalfRot\{2,3,1\}Pi}:
   $\hat U^{(\alpha)}_{\pi,{\rm tot}} \cdot
    \hat U^{(\beta)}_{\pi,{\rm tot}}
-   = \hat U^{(\gamma)}_{\pi,{\rm tot}}$ (Tasaki Problem 2.2.a).
+   = \hat U^{(\gamma)}_{\pi,{\rm tot}}$ (cyclic; Tasaki eq.~(2.1.29),
+  p.~19, lifted site-wise through eq.~(2.2.11)).
 \item \texttt{onSiteRingHom}, \texttt{onSiteLinearMap},
   \texttt{continuous\_onSite}, \texttt{onSite\_pow}: site embedding
   packaged as a ring/linear/continuous map and lifted to powers.
