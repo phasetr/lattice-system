@@ -12,8 +12,9 @@ spin-`S` `π`-rotations `spinSPiRotationAxis` with the book's `exp(−iπ Ŝ^{(�
 p. 20**, solution p. 495; the many-body definition **eq. (2.2.11), p. 22**). PR-A closes only
 the axis-3 (diagonal) case, the third relation of (2.1.34):
 `⟨ψ^σ|û₃|ψ^τ⟩ = e^{−iπσ}δ_{σ,τ}`, phrased in the integer basis index `k = S − σ` rather
-than the magnetic quantum number `σ`, since `S − σ` is not an integer for half-odd-integer
-`S`.
+than the magnetic quantum number `σ`, since `σ` itself is not an integer for
+half-odd-integer `S`, so the printed exponent `e^{−iπσ}` is not a power of `−1`; this is why the
+closed form carries `(−i)^N`.
 
 Pinned:
 * R0-scalar `spinSOp3Eigen_exp_neg_pi_mul_I_eq` — the scalar phase identity
