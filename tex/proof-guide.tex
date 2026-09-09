@@ -3977,9 +3977,9 @@ $\hat H \cdot (\hat S_{\mathrm{tot}}^{-})^{k}\,|\Phi^{\uparrow}\rangle
 for every $k \geq 0$, which is the unnormalised version of Tasaki
 eq.~(2.4.9): all $|\Phi_{M}\rangle$ share the eigenvalue of
 $|\Phi^{\uparrow}\rangle$ under any Heisenberg Hamiltonian.  The
-normalisation factor of (2.4.9) and the corresponding
+normalisation factor of (2.4.9) is not yet formalised.  The
 \emph{completeness} of $\{|\Phi_{M}\rangle\}_{M}$ as the ferromagnetic
-ground-state space (Tasaki Theorem~2.1) are not yet formalised.
+ground-state space, Tasaki Theorem~2.1 (p.~34), is proved below.
 \end{remark}
 
 \begin{theorem}[\texttt{heisenbergHamiltonian\_mulVec\_totalSpinHalfOpMinus\_pow\_basisVec\_const}]
@@ -20440,7 +20440,8 @@ eigenvalue identical at the two extremal configurations by SU(2)
 symmetry). These are the first two concrete sector contributions
 to the upper bound $\dim_\mathbb{C}\,\texttt{joint} \le 2m_{\max}+1$
 that, combined with the lower bound of \#903 and the span-equals-joint
-argument of \#904, closes Tasaki §2.4 Theorem 2.1 (saturated-
+argument of \#904, closes the joint $(\hat H, (\hat S_{\rm tot})^2)$-eigenspace
+toward Tasaki §2.4 (saturated-
 ferromagnet ground-state subspace = $(2m_{\max}+1)$-dim irreducible
 SU(2) representation). The intermediate sectors $M$ with
 $-m_{\max} < M < m_{\max}$ are handled by the $\hat S^\mp_{\rm tot}$
@@ -20552,7 +20553,7 @@ by combining the two commutations with \texttt{magProjFn\_smul} —
 the H- and Casimir-eigenvalues factor through the projector since
 $\texttt{magProjFn M}(c \cdot v) = c \cdot \texttt{magProjFn M v}$.
 
-\textbf{Tasaki §2.4 Theorem 2.1 closure (PR~\#2768)}:
+\textbf{Saturated-ferromagnet joint eigenspace closure (PR~\#2768)}:
 the closure combines three theorems.
 (i) \texttt{sum\_magProjFn\_eq}: every $v$ decomposes as
 $v = \sum_{k : \mathrm{Fin}(|V|\cdot N + 1)}
@@ -20579,7 +20580,7 @@ $\hat S^-_{\rm tot}$ from the highest-weight state
 $|\sigma_\top\rangle$. Combined with PRs \#896 (linear independence),
 \#898 (orthogonality), \#903 (lower bound), and \#904
 ($\dim_\mathbb{C} = 2m_{\max}+1$), this is the operator-level form
-of Tasaki §2.4 Theorem 2.1.
+of the joint-eigenspace closure toward Tasaki §2.4.
 
 \textbf{Per-sector identification (PR~\#2764)}: the theorem
 \texttt{saturatedFerromagnetJointEigenspace\_inf\_magSubspaceS\_eq\_span\_ladderIterateUp}
@@ -20600,7 +20601,7 @@ $2m_{\max}+1$ values of $k$ in PR~\#2768 via the magnetisation
 projector decomposition (\texttt{sum\_magProjFn\_eq}) and joint
 preservation to identify
 $\texttt{joint} = \texttt{span}(\texttt{ladderIterateUp})$ and
-complete Tasaki §2.4 Theorem 2.1.
+complete the joint-eigenspace closure toward Tasaki §2.4.
 
 \textbf{Per-sector $\dim \le 1$ (PR~\#2763)}: the theorem
 \texttt{saturatedFerromagnetJointEigenspace\_inf\_magSubspaceS\_finrank\_le\_one}
@@ -20620,7 +20621,7 @@ decomposition (\texttt{sum\_magProjFn\_eq}) together with the
 joint-preservation (\#2767) to conclude
 $\texttt{joint} = \texttt{span}(\texttt{ladderIterateUp})$ and hence
 $\dim_\mathbb{C}(\texttt{joint}) = 2m_{\max} + 1$, completing
-Tasaki §2.4 Theorem 2.1.
+the joint-eigenspace closure toward Tasaki §2.4.
 
 \textbf{Boundary annihilation (PR~\#905)}: the new file
 \texttt{Quantum/SpinS/LadderBoundaryAnnihilation.lean} caps the
@@ -22288,12 +22289,67 @@ the theorem.  Those citations are to the historical pull request, which did the
 work described; only its module and its own entry here are gone.  The span
 identification it supplied is carried today by the theorem
 \texttt{saturatedFerromagnetJointEigenspace\_eq\_span\_ladderIterateUp} that the
-surviving \emph{Tasaki §2.4 Theorem 2.1 closure (PR~\#2768)} entry already
+surviving \emph{Saturated-ferromagnet joint eigenspace closure (PR~\#2768)} entry already
 names; the dimension equality that PR~\#2769 packaged went with its module, and
 what the sources state today is the lower bound
 \texttt{saturatedFerromagnetJointEigenspace\_finrank\_ge\_succ\_card\_mul\_N}.
-The theorem being closed is H.~Tasaki, \emph{Physics and Mathematics of Quantum
-Many-Body Systems}, Springer 2020, §2.4 Theorem~2.1, p.~34.
+What PR~\#2768 closed is the joint $(\hat H, (\hat S_{\rm tot})^2)$-eigenspace;
+Tasaki §2.4 Theorem~2.1 itself (H.~Tasaki, \emph{Physics and Mathematics of
+Quantum Many-Body Systems}, Springer 2020, §2.4, p.~34) is closed separately,
+below.
+
+\textbf{Tasaki §2.4 Theorem 2.1 itself: the $\hat H$-only ground-state
+eigenspace}: the closures above establish that the joint
+$(\hat H, (\hat S_{\rm tot})^2)$-eigenspace at the saturated values equals
+$\texttt{span}(\texttt{ladderIterateUp})$, conditioned on that eigenspace
+already carrying maximal total spin. Tasaki §2.4 Theorem~2.1 (p.~34) is
+stronger: for a connected lattice $(\Lambda, B)$ (footnote~28,
+p.~33) it says that \emph{every} eigenstate of $\hat H$ alone at the ground
+energy $E_{\rm GS}$ --- with no assumption on its total spin --- is a linear
+combination of the $|\Phi_M\rangle$ of eq.~(2.4.9) (p.~33), eq.~(2.4.10)
+(p.~34); equivalently every $\hat H$-ground state already has maximal total
+spin $S_{\max}(S_{\max}+1)$, the remark immediately following eq.~(2.4.10).
+
+\begingroup\raggedright
+The theorem
+\texttt{heisenbergHamiltonianS\_eigenspace\_eq\_span\_ladderIterateUp\_of\_connected\_ferro}
+(\texttt{Quantum/SpinS/FerromagneticGroundStateTheorem21.lean}) proves exactly
+this $\hat H$-only statement, for a weighted generalisation of eq.~(2.4.1)
+(p.~32): a connected graph $G$ on $V$ with a real, symmetric, edge-supported,
+strictly ferromagnetic coupling $J$ (i.e.\ $(Jxy).\mathrm{im} = 0$,
+$Jxy = Jyx$, $Jxy = 0$ off edges, $(Jxy).\mathrm{re} < 0$ on edges) and spin
+$S = N/2$, $N \ge 1$. The companion theorem
+\texttt{heisenbergHamiltonianS\_eigenspace\_finrank\_eq\_of\_connected\_ferro}
+gives the degeneracy $|V| \cdot N + 1 = 2S_{\max} + 1$, and
+\texttt{heisenbergHamiltonianS\_eigenspace\_eq\_satFerroJointEigenspace\_of\_connected\_ferro}
+identifies this eigenspace with the joint eigenspace above, proving the
+remark after eq.~(2.4.10): every $\hat H$-ground state of a connected
+ferromagnetic lattice automatically has maximal total spin. Specialised to
+the printed uniform coupling $J = \texttt{couplingOf}\,G\,(-1/2)$, the
+theorem \texttt{saturatedFerromagnetEigenvalueS\_couplingOf\_neg\_half}
+recovers the printed ground energy $E_{\rm GS} = -|B| S^2$
+(eq.~(2.4.1)/(2.4.5), p.~32), and
+\texttt{tasaki\_theorem\_2\_1\_ferromagnetic\_ground\_states} bundles
+positive-semidefiniteness of $\hat H - E_{\rm GS}$, the eigenspace identity,
+and the degeneracy count into the single statement printed as Theorem~2.1.
+\par\endgroup
+
+Proof route (Problem 2.4.a, solution p.~496: ``It suffices to show the
+uniqueness of ground state in each $H_M$ \ldots\ by applying the
+Perron--Frobenius theorem''): decompose an arbitrary $\hat H$-ground state
+into its magnetisation-sector components (\texttt{sum\_magProjFn\_eq}, which
+commutes with $\hat H$ by
+\texttt{heisenbergHamiltonianS\_mulVec\_magProjFn\_eq}); apply the
+sign-based Perron--Frobenius theorem (Theorem~A.18, p.~475) to the real
+symmetric sector matrix, whose off-diagonal entries are $\le 0$ by the
+ferromagnetic sign hypothesis and whose irreducibility uses connectedness,
+to show each sector's ground eigenspace is at most one-dimensional; and
+identify the nonzero ladder iterate as an explicit member of that
+eigenspace, so each sector contributes exactly the span of one
+$|\Phi_M\rangle$. Summing over sectors gives the printed eq.~(2.4.10). The
+energy value $E_{\rm GS} = -|B| S^2$ used throughout is the
+bond-wise frustration-free bound of Lemma~A.9 (p.~469), already proved
+without connectedness.
 
 \textbf{Problem 2.4.c eq.~(S.18) product form (foundation for Problem 2.4.b).} The new file
 \texttt{Quantum/SpinS/SaturatedCoherentAmplitude.lean} defines the generic-spin

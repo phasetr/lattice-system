@@ -52,7 +52,14 @@ An edit that does move a pin recomputes it in the same commit with
     print(hashlib.sha256("\n".join(c.published_catalogue_rows()) \
     .encode("utf-8")).hexdigest())'
 
-and states which rows the new values reflect. Recomputing a pin is never on its own an
+and states which rows the new values reflect. (Applied for the fragment rewrites on the
+`sum_magProjFn_eq`, `saturatedFerromagnetJointEigenspace_finrank_eq`, and `magProjFn` rows of
+`docs/formalization/legacy/28-spin-saturated-ferromagnetic-state-tasaki-2-4-generalised-part-01.md`,
+renaming the mislabelled `Tasaki §2.4 Theorem 2.1 closure` headline (and its two cross-references)
+to `Saturated-ferromagnet joint eigenspace closure` -- what the closed theorem actually is -- now
+that Tasaki §2.4 Theorem 2.1 itself, the printed `Ĥ`-only ground-state eigenspace, is closed
+separately by `heisenbergHamiltonianS_eigenspace_eq_span_ladderIterateUp_of_connected_ferro`.)
+Recomputing a pin is never on its own an
 authorization for what moved: the legacy pages still have to be edited to match, and the
 catalogue-row comparison is what proves they do. What the pins buy is that a change to the
 published catalogue is a legible diff and a moved hash rather than a silent edit.
@@ -149,12 +156,12 @@ LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
 CATALOGUE_BASELINE_SLICE = slice(216, 2731)
 # Pins the published catalogue text; this module's docstring records exactly what is hashed
 # and how the pin is legitimately updated.
-APPROVED_CHANGES_SHA256 = "2d57e7b3d3e02f04ee3f19c864c9f1cbfc125115d37bd13086832aa50b079da0"
+APPROVED_CHANGES_SHA256 = "ef3c9237326060a8022087619ebe685c9a5f854fbef7f08ac5f4a609f26dc0d0"
 # Pins the row sequence `main()` actually compares the legacy pages against. The text pin above
 # does not reach it: the rows are derived from the transformed text by `table_data_rows`, which
 # is outside the pinned text, so without this pin a row skipped there would go unpublished with
 # the text pin undisturbed.
-PUBLISHED_ROWS_SHA256 = "4af128f2c5f915e46c4df1aad461c5869ace8ac257525a0c31112ec95a102fdf"
+PUBLISHED_ROWS_SHA256 = "ff10b883f01bb3811ab0a7e7a8c858e3d49ba000232b2d7765870aeaa9d0ac97"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -1331,6 +1338,25 @@ def _approved_replacements(text: str) -> str:
             "staggered order operator vanishes on every axis). `#print axioms` = "
             "`[propext, Classical.choice, Quot.sound, shastryEnergyGain]`",
         )
+        .replace(
+            "**🎯 Tasaki §2.4 Theorem 2.1 closure**: "
+            "`joint = span (Set.range (ladderIterateUp V N))`.",
+            "**🎯 Saturated-ferromagnet joint eigenspace closure**: "
+            "`joint = span (Set.range (ladderIterateUp V N))`. This closes the joint "
+            "`(Ĥ, (Ŝ_tot)²)`-eigenspace at the saturated values; the printed Tasaki §2.4 "
+            "Theorem 2.1 (p. 34) characterises the `Ĥ`-eigenspace alone on a connected "
+            "ferromagnetic lattice and is closed separately by "
+            "`heisenbergHamiltonianS_eigenspace_eq_span_ladderIterateUp_of_connected_ferro`.",
+        )
+        .replace(
+            "Direct corollary of the Theorem 2.1 closure (PR #2768)",
+            "Direct corollary of the joint-eigenspace closure (PR #2768)",
+        )
+        .replace(
+            "into per-sector components for the final Tasaki §2.4 Theorem 2.1 closure (PR #2765)",
+            "into per-sector components for the final joint-eigenspace closure toward Tasaki §2.4 "
+            "(PR #2765)",
+        )
     )
 
 
@@ -1395,12 +1421,12 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "fb0905ec380d53e89d67a30da64eca667530da743b92185bf4e672d9b27da78f"
+SCRIPT_SOURCE_SHA256 = "fe6aaf34cc31267fb39ff2dcd0a62fd45dcb5acfdd1647db0019a0d654f71d06"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
-APPROVED_ENTRIES_SHA256 = "f2ff5401993d12ccf7cbdf3b837910f89eb928feb0cd10f12cd04311858c92c8"
+APPROVED_ENTRIES_SHA256 = "c4c05d1184a0563af3b07e9cd12157f2dd86e1fc139ed8539efd1c1a7a7b1b53"
 
 # The only text `SCRIPT_SOURCE_SHA256` does not hash: the digits these four pins carry. Each is
 # restated by the very edit it pins, and a digest over its own value would have no fixed point.

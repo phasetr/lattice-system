@@ -57,6 +57,22 @@
     },
     {
       "equations": [
+        "2.4.1",
+        "2.4.4",
+        "2.4.5",
+        "2.4.9",
+        "2.4.10"
+      ],
+      "id": "tasaki-2020-theorem-2-1",
+      "item_kind": "theorem",
+      "item_number": "2.1",
+      "pages": "32-34",
+      "section": "2.4",
+      "source_id": "tasaki-2020",
+      "title": "Ground states of the ferromagnetic Heisenberg model"
+    },
+    {
+      "equations": [
         "3.4.7-3.4.12"
       ],
       "id": "tasaki-2020-theorem-3-1",

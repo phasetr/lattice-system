@@ -29,6 +29,58 @@
         "quantum-spin"
       ],
       "trust_state": "axiom_free"
+    },
+    {
+      "axiom_dependencies": [],
+      "capstone": true,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-theorem-2-1-eigenspace",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.heisenbergHamiltonianS_eigenspace_eq_span_ladderIterateUp_of_connected_ferro",
+      "lifecycle": "active",
+      "module": "LatticeSystem.Quantum.SpinS.FerromagneticGroundStateTheorem21",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "retirement": null,
+      "source_coverage": "complete",
+      "source_path": "LatticeSystem/Quantum/SpinS/FerromagneticGroundStateTheorem21.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-theorem-2-1"
+        }
+      ],
+      "summary": "On a connected graph with a real, symmetric, edge-supported, strictly ferromagnetic spin-S coupling, the eigenspace of the Heisenberg Hamiltonian alone at the saturated-ferromagnet energy equals the linear span of the ladder family generated from the all-up state; this is the H-only ground-state eigenspace identity of Tasaki's Theorem 2.1, for a weighted generalisation of the printed uniform coupling.",
+      "topic_ids": [
+        "quantum-spin"
+      ],
+      "trust_state": "axiom_free"
+    },
+    {
+      "axiom_dependencies": [],
+      "capstone": true,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-theorem-2-1-ferromagnetic-ground-states",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.tasaki_theorem_2_1_ferromagnetic_ground_states",
+      "lifecycle": "active",
+      "module": "LatticeSystem.Quantum.SpinS.FerromagneticGroundStateTheorem21",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "retirement": null,
+      "source_coverage": "complete",
+      "source_path": "LatticeSystem/Quantum/SpinS/FerromagneticGroundStateTheorem21.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-theorem-2-1"
+        }
+      ],
+      "summary": "On a connected graph with a real, symmetric, edge-supported, strictly ferromagnetic spin-S coupling at the printed uniform strength, the Heisenberg Hamiltonian minus its ground energy is positive semidefinite, its ground eigenspace equals the linear span of the ladder family generated from the all-up state, and that eigenspace has dimension |V|*N + 1, i.e. the (2*S_max + 1)-dimensional space of states of maximal total spin.",
+      "topic_ids": [
+        "quantum-spin"
+      ],
+      "trust_state": "axiom_free"
     }
   ],
   "schema_version": 2,
