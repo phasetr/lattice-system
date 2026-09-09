@@ -3,10 +3,11 @@ Square-root binomial weights of a spin ladder step.
 
 A spin ladder operator carries the matrix element `√((t+1)(n−t))` between the two basis states
 indexed by `t` and `t+1`, while the states themselves carry the Clebsch–Gordan weights
-`√(binom n ·)` (`cgSite`, defined here so that the two consumers needing that weight as a
-standalone scalar — the Weyl transport of `Ŝ^±` and the `x`-polarised top vector of the axis-1 `π`
-rotation — share one definition; the coherent-state amplitudes below build the same `√` inline,
-inside a product over sites, and do not go through `cgSite`).
+`√(binom n ·)` (`cgSite`, defined here as the repository's single definition of that scalar: it is
+the coefficient of the Weyl monomials `weylSiteMono`/`weylMono`, entering through them the chain
+normalization `cgNorm σ = ∏ x, cgSite (σ x)` that the AKLT bond-divisibility argument factors; it
+is the weight the Weyl transport lemmas for `Ŝ^±` move between neighbouring basis states; and read
+as a vector it is the `x`-polarised top vector of the axis-1 `π` rotation).
 This file proves the two ways of absorbing such a matrix element into a neighbouring weight —
 attaching it to `√(binom n t)` (`sqrt_raise_coeff`) or to `√(binom n (t+1))`
 (`sqrt_lower_coeff`) — together with the arithmetic core they share, `sqrt_choose_step`, the
