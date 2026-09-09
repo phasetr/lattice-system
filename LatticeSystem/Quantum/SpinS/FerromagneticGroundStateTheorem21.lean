@@ -11,9 +11,10 @@ carrying a real, symmetric, edge-supported, strictly ferromagnetic coupling: the
 `Ĥ` *alone* at the saturated-ferromagnet energy is the span of the ladder family
 `Φ_M = (Ŝ⁻_tot)^k Φ↑` of eq. (2.4.9), p. 33 -- which is eq. (2.4.10), p. 34 -- its dimension
 is the `2 S_max + 1` degeneracy `|V|·N + 1`, and it coincides with the joint `(Ĥ, (Ŝ_tot)²)`
-eigenspace -- the ground-state half of the book's remark after eq. (2.4.10), p. 34: every
-ground state carries maximal total spin.  The printed remark is the converse, that the states
-of eq. (2.4.10) are the *only* states of maximal total spin; that direction is not proved here.
+eigenspace, i.e. every ground state carries maximal total spin.  The remark printed after
+eq. (2.4.10), p. 34, asserts that the states of eq. (2.4.10) are the *only* states of maximal
+total spin; what is proved here is the ground state ⇒ maximal total spin direction alone, not
+that converse.
 
 Specialised to the printed uniform coupling `couplingOf G (-1/2)` of eq. (2.4.1), p. 32, the
 saturated-ferromagnet energy is the printed `E_GS = -|B| S²`, and the three statements combine

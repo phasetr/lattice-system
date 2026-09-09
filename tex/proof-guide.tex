@@ -3977,7 +3977,11 @@ $\hat H \cdot (\hat S_{\mathrm{tot}}^{-})^{k}\,|\Phi^{\uparrow}\rangle
 for every $k \geq 0$, which is the unnormalised version of Tasaki
 eq.~(2.4.9): all $|\Phi_{M}\rangle$ share the eigenvalue of
 $|\Phi^{\uparrow}\rangle$ under any Heisenberg Hamiltonian.  The
-normalisation factor of (2.4.9) is not yet formalised.  The
+normalisation factor of (2.4.9) is formalised in
+\texttt{Quantum/SpinS/SaturatedCoherentWeight.lean} as
+\texttt{saturatedLadderNorm}, the $\ell^{2}$ norm of the ladder iterate,
+with the normalised state $|\Phi_{M}\rangle$ itself given by
+\texttt{saturatedWeightVector}.  The
 \emph{completeness} of $\{|\Phi_{M}\rangle\}_{M}$ as the ferromagnetic
 ground-state space, Tasaki Theorem~2.1 (p.~34), is proved below.
 \end{remark}

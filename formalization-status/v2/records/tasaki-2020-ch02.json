@@ -76,7 +76,7 @@
           "source_item_id": "tasaki-2020-theorem-2-1"
         }
       ],
-      "summary": "On a connected graph with a real, symmetric, edge-supported, strictly ferromagnetic spin-S coupling at the printed uniform strength, the Heisenberg Hamiltonian minus its ground energy is positive semidefinite, its ground eigenspace equals the linear span of the ladder family generated from the all-up state, and that eigenspace has dimension |V|*N + 1, i.e. the (2*S_max + 1)-dimensional space of states of maximal total spin.",
+      "summary": "On a connected graph with a real, symmetric, edge-supported, strictly ferromagnetic spin-S coupling at the printed uniform strength, the Heisenberg Hamiltonian minus its ground energy is positive semidefinite, its ground eigenspace equals the linear span of the ladder family generated from the all-up state, i.e. the states of eq. (2.4.10), and that eigenspace has dimension |V|*N + 1 = 2*S_max + 1. The companion joint-eigenspace result in the same module adds that every ground state has maximal total spin; the printed converse, that these are the only states of maximal total spin, is not proved.",
       "topic_ids": [
         "quantum-spin"
       ],
