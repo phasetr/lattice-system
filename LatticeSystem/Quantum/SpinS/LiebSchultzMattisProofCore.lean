@@ -35,22 +35,6 @@ theorem cexp_mul_cexp (a b : ℂ) :
     NormedSpace.exp a * NormedSpace.exp b = NormedSpace.exp (a + b) :=
   (NormedSpace.exp_add_of_commute (Commute.all a b)).symm
 
-/-- `onSiteS i` as a ring homomorphism. -/
-noncomputable def onSiteSRingHom {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ} (i : Λ) :
-    Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ →+* ManyBodyOpS Λ N where
-  toFun := fun A => onSiteS i A
-  map_one' := onSiteS_one i
-  map_mul' := fun A B => (onSiteS_mul_onSiteS_same i A B).symm
-  map_zero' := onSiteS_zero i
-  map_add' := fun A B => onSiteS_add i A B
-
-/-- `onSiteS i` as a `ℂ`-linear map. -/
-noncomputable def onSiteSLinearMap {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ} (i : Λ) :
-    Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ →ₗ[ℂ] ManyBodyOpS Λ N where
-  toFun := fun A => onSiteS i A
-  map_add' := fun A B => onSiteS_add i A B
-  map_smul' := fun c A => onSiteS_smul i c A
-
 /-- **Generic PSD expectation bound**: if `b•1 − A` is positive semidefinite then the real
 Rayleigh form of `A` is bounded by `b ‖ψ‖²`. -/
 theorem dotProduct_mulVec_re_le_of_posSemidef {ι : Type*} [Fintype ι] [DecidableEq ι]
