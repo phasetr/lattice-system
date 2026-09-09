@@ -193,4 +193,92 @@ theorem spinReversalS_mulVec_spinSTopVector (N : ℕ) :
     rw [spinReversalS_apply, if_neg hb, zero_mul]
   · intro h; exact absurd (Finset.mem_univ _) h
 
+/-! ## Conjugation of the generators at `θ = π`
+
+Both `W := spinSRot1 N π` and `V := spinSPiRotation1 N` implement the same `π` rotation about
+axis 1 on the generators — Tasaki (2.1.25), p. 18: axis `1` is fixed, axes `2` and `3` are
+reversed.  For `W` this is the `θ = π` case of the ladder conjugation
+`spinSRot1_conj_spinSLadder1Plus/Minus`; for `V` it is the basis-reversal conjugation
+`spinReversalS_conj_spinSOp1/2/3`, the phase `(−i)^{2S}` cancelling against its inverse `i^{2S}`.
+-/
+
+/-- Conjugation of `Ŝ^{(1)}` by `W = exp(−iπ Ŝ^{(1)})` is trivial: the rotation commutes with its
+own generator. -/
+theorem spinSRot1_pi_conj_spinSOp1 (N : ℕ) :
+    spinSRot1 N Real.pi * spinSOp1 N * spinSRot1 N (-Real.pi) = spinSOp1 N := by
+  have hcomm := spinSRot1_commute_spinSOp1 N Real.pi
+  rw [show spinSRot1 N Real.pi * spinSOp1 N = spinSOp1 N * spinSRot1 N Real.pi from hcomm,
+    Matrix.mul_assoc, spinSRot1_mul_neg, Matrix.mul_one]
+
+/-- **Conjugation of `Ŝ^{(2)}` by `W = exp(−iπ Ŝ^{(1)})` reverses it** — the transverse axis 2 of
+Tasaki (2.1.25), p. 18.  The two axis-1 ladder operators `L^± = Ŝ^{(2)} ± i Ŝ^{(3)}` are each
+scaled by `e^{∓iπ} = −1`, and their sum is `2 Ŝ^{(2)}`. -/
+theorem spinSRot1_pi_conj_spinSOp2 (N : ℕ) :
+    spinSRot1 N Real.pi * spinSOp2 N * spinSRot1 N (-Real.pi) = -spinSOp2 N := by
+  have hneg : Complex.exp (-(((Real.pi : ℝ) : ℂ) * Complex.I)) = -1 := by
+    rw [Complex.exp_neg, Complex.exp_pi_mul_I]
+    norm_num
+  have h2 : (2 : ℂ) • spinSOp2 N = spinSLadder1Plus N + spinSLadder1Minus N :=
+    (spinSLadder1Plus_add_Minus N).symm
+  have hL : spinSRot1 N Real.pi * (spinSLadder1Plus N + spinSLadder1Minus N) *
+      spinSRot1 N (-Real.pi) = (2 : ℂ) • (-spinSOp2 N) := by
+    rw [Matrix.mul_add, Matrix.add_mul, spinSRot1_conj_spinSLadder1Plus,
+      spinSRot1_conj_spinSLadder1Minus, hneg, Complex.exp_pi_mul_I, neg_one_smul, neg_one_smul,
+      ← neg_add, spinSLadder1Plus_add_Minus, smul_neg]
+  have hcancel : (2 : ℂ) • (spinSRot1 N Real.pi * spinSOp2 N * spinSRot1 N (-Real.pi)) =
+      (2 : ℂ) • (-spinSOp2 N) := by
+    rw [← hL, ← h2, Matrix.mul_smul, Matrix.smul_mul]
+  exact smul_right_injective _ (by norm_num) hcancel
+
+/-- **Conjugation of `Ŝ^{(3)}` by `W = exp(−iπ Ŝ^{(1)})` reverses it** — the transverse axis 3 of
+Tasaki (2.1.25), p. 18.  Same computation as for `Ŝ^{(2)}`, read off the difference
+`L^+ − L^- = 2i Ŝ^{(3)}` instead of the sum. -/
+theorem spinSRot1_pi_conj_spinSOp3 (N : ℕ) :
+    spinSRot1 N Real.pi * spinSOp3 N * spinSRot1 N (-Real.pi) = -spinSOp3 N := by
+  have hneg : Complex.exp (-(((Real.pi : ℝ) : ℂ) * Complex.I)) = -1 := by
+    rw [Complex.exp_neg, Complex.exp_pi_mul_I]
+    norm_num
+  have h2I : (2 * Complex.I) • spinSOp3 N = spinSLadder1Plus N - spinSLadder1Minus N :=
+    (spinSLadder1Plus_sub_Minus N).symm
+  have hL : spinSRot1 N Real.pi * (spinSLadder1Plus N - spinSLadder1Minus N) *
+      spinSRot1 N (-Real.pi) = (2 * Complex.I) • (-spinSOp3 N) := by
+    rw [Matrix.mul_sub, Matrix.sub_mul, spinSRot1_conj_spinSLadder1Plus,
+      spinSRot1_conj_spinSLadder1Minus, hneg, Complex.exp_pi_mul_I, neg_one_smul, neg_one_smul,
+      neg_sub_neg, ← neg_sub, spinSLadder1Plus_sub_Minus, smul_neg]
+  have hcancel : (2 * Complex.I) • (spinSRot1 N Real.pi * spinSOp3 N * spinSRot1 N (-Real.pi)) =
+      (2 * Complex.I) • (-spinSOp3 N) := by
+    rw [← hL, ← h2I, Matrix.mul_smul, Matrix.smul_mul]
+  exact smul_right_injective _ (by simp [Complex.I_ne_zero]) hcancel
+
+/-- Conjugation by `V = (−i)^{2S} F` is conjugation by the basis reversal `F`: the phase cancels
+against the phase `i^{2S}` of `V⁻¹ = i^{2S} F`. -/
+private theorem spinSPiRotation1_conj_eq_spinReversalS_conj (N : ℕ)
+    (M : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    spinSPiRotation1 N * M * ((Complex.I ^ N) • spinReversalS N)
+      = spinReversalS N * M * spinReversalS N := by
+  have hab : ((-Complex.I) ^ N) * (Complex.I ^ N) = 1 := by
+    rw [← mul_pow, neg_mul, Complex.I_mul_I, neg_neg, one_pow]
+  rw [spinSPiRotation1, Matrix.smul_mul, Matrix.smul_mul, Matrix.mul_smul, smul_smul, hab,
+    one_smul]
+
+/-- Conjugation by `V⁻¹ = i^{2S} F` is likewise conjugation by `F`. -/
+private theorem spinSPiRotation1_inv_conj_eq_spinReversalS_conj (N : ℕ)
+    (M : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    ((Complex.I ^ N) • spinReversalS N) * M * spinSPiRotation1 N
+      = spinReversalS N * M * spinReversalS N := by
+  have hab : (Complex.I ^ N) * ((-Complex.I) ^ N) = 1 := by
+    rw [← mul_pow, mul_neg, Complex.I_mul_I, neg_neg, one_pow]
+  rw [spinSPiRotation1, Matrix.smul_mul, Matrix.smul_mul, Matrix.mul_smul, smul_smul, hab,
+    one_smul]
+
+/-- **`V = û₁` fixes `Ŝ^{(1)}`** — the axis of the rotation, Tasaki (2.1.25), p. 18. -/
+theorem spinSPiRotation1_conj_spinSOp1 (N : ℕ) :
+    spinSPiRotation1 N * spinSOp1 N * ((Complex.I ^ N) • spinReversalS N) = spinSOp1 N := by
+  rw [spinSPiRotation1_conj_eq_spinReversalS_conj, spinReversalS_conj_spinSOp1]
+
+/-- **`V = û₁` reverses `Ŝ^{(2)}`** — a transverse axis, Tasaki (2.1.25), p. 18. -/
+theorem spinSPiRotation1_conj_spinSOp2 (N : ℕ) :
+    spinSPiRotation1 N * spinSOp2 N * ((Complex.I ^ N) • spinReversalS N) = -spinSOp2 N := by
+  rw [spinSPiRotation1_conj_eq_spinReversalS_conj, spinReversalS_conj_spinSOp2]
+
 end LatticeSystem.Quantum
