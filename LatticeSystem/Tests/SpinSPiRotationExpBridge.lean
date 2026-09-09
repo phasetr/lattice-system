@@ -2,6 +2,7 @@ import LatticeSystem.Quantum.SpinS.SpinSPiRotation
 import LatticeSystem.Quantum.SpinS.Problem25cZAxisRotationCommutation
 import LatticeSystem.Quantum.SpinS.SpinSPiRotationExpAxis3
 import LatticeSystem.Quantum.SpinS.SpinSPiRotationExpAxis1
+import LatticeSystem.Quantum.SpinHalfRotation.Conjugation
 
 /-!
 # Signature pin: PR-A of the Problem 2.1.g exponential-identification arc, axis 3
@@ -113,21 +114,21 @@ example :
 # Signature pin: PR-B of the Problem 2.1.g exponential-identification arc, axis 1
 
 PR-B closes the axis-1 (crux) case, the first relation of Tasaki (2.1.34), p. 20:
-`⟨ψ^σ|û₁|ψ^τ⟩ = (−i)^{2S}δ_{σ,−τ}`, i.e. `spinSPiRotation1 N = spinSRot1 N Real.pi`, via the
-Schur/commutant route of the design (`.self-local/reports/design-tsk071-exp-bridge-2026-09-09.md`
-§2 Axis 1, decision recorded in
-`.self-local/docs/math/pi-rotation-exponential-bridge-general-spin.tex` §"Implementation decision
-of 2026-09-09"). The route conjugates the generators `Ŝ¹, Ŝ², Ŝ³` by `W := spinSRot1 N Real.pi`
-at `θ = π` (Tasaki (2.1.21)/(2.1.25) p. 17–18, the `±` commutation of two `π`-rotations already
-proved for arbitrary `θ` by `spinSRot1_conj_spinSLadder1Plus/Minus`) and by
-`V := spinSPiRotation1 N` (via `spinReversalS_conj_spinSOp1/2/3`), concludes their quotient `Z` is
-scalar by the commutant/Schur argument (`spinS_adjoin_eq_top`), and pins the scalar to `1` on the
-explicit binomial highest-weight vector `u₀ = (√C(N,k))_k` (Tasaki (2.1.34) p. 20, Problem 2.1.g
-p. 20, solution p. 495 — the direct route this design avoids; the top-vector pin instead).
+`⟨ψ^σ|û₁|ψ^τ⟩ = (−i)^{2S}δ_{σ,−τ}`, i.e. `spinSPiRotation1 N = spinSRot1 N Real.pi`, by a
+Schur/commutant route rather than the entrywise computation that settles axis 3. The route
+conjugates the generators `Ŝ¹, Ŝ², Ŝ³` by `W := spinSRot1 N Real.pi` at `θ = π` (the `π`-rotation
+relation (2.1.25), p. 18, read off the `±` commutation proved for arbitrary `θ` by
+`spinSRot1_conj_spinSLadder1Plus/Minus`) and by `V := spinSPiRotation1 N` (via
+`spinReversalS_conj_spinSOp1/2/3`), concludes their quotient `Z` is scalar by the commutant/Schur
+argument (`spinS_adjoin_eq_top`), and pins the scalar to `1` on the explicit binomial
+highest-weight vector `u₀ = (√C(N,k))_k` of the first relation of (2.1.34), p. 20
+(Problem 2.1.g, p. 20, solution p. 495).
 
-Pinned (all new PR-B names; none exist yet):
+Pinned:
 * `spinSRot1_pi_conj_spinSOp1/2/3` — the `θ = π` conjugation of the three generators by `W`.
-* `spinSPiRotation1_conj_spinSOp1/2` — the conjugation of the generators by `V`.
+* A definitional guard that the exponential side `spinSRot1` is the genuine `NormedSpace.exp` of
+  `Ŝ^{(1)}`, plus one concrete evaluation of that exponential at `N = 1`, `θ = π` obtained from
+  the independent spin-`1/2` bridge `spinHalfRot1_eq_exp`.
 * `spinS_scalar_of_commute_generators` — the scalar-commutant (Schur) lemma: a matrix commuting
   with `Ŝ¹, Ŝ², Ŝ³` is a scalar multiple of `1`.
 * `matrix_exp_mulVec_of_mulVec_eq_smul` — the eigenvector-exponential lemma
@@ -155,6 +156,15 @@ example :
   ext i j
   fin_cases i <;> fin_cases j <;> simp [spinSPiRotation1, spinReversalS]
 
+/-! ## Definitional guard: the axis-1 exponential side is a genuine `exp` -/
+
+/-- Guards that the exponential object of the axis-1 identification is the genuine
+`NormedSpace.exp` of `Ŝ^{(1)}`: if `spinSRot1` were redefined as its own closed form, every
+statement below would still hold while the content of the first relation of (2.1.34) — closed
+form *equals* operator exponential — had evaporated. Companion of the axis-3 guard above. -/
+example (N : ℕ) (θ : ℝ) :
+    spinSRot1 N θ = NormedSpace.exp (-(((θ : ℂ) * Complex.I)) • spinSOp1 N) := rfl
+
 /-! ## R1-W: `θ = π` conjugation of the three generators by `W := spinSRot1 N Real.pi` -/
 
 /-- R1-W pin (`Ŝ¹`): `W` commutes with `Ŝ¹` (Tasaki (2.1.25) p. 18 specialised, `α = 1`). -/
@@ -171,18 +181,6 @@ example (N : ℕ) :
 example (N : ℕ) :
     spinSRot1 N Real.pi * spinSOp3 N * spinSRot1 N (-Real.pi) = -spinSOp3 N :=
   spinSRot1_pi_conj_spinSOp3 N
-
-/-! ## R1-V: conjugation of the generators by `V := spinSPiRotation1 N` -/
-
-/-- R1-V pin (`Ŝ¹`): `V` fixes `Ŝ¹` (`V⁻¹ = i^N • spinReversalS N` since `F² = 1`). -/
-example (N : ℕ) :
-    spinSPiRotation1 N * spinSOp1 N * ((Complex.I ^ N) • spinReversalS N) = spinSOp1 N :=
-  spinSPiRotation1_conj_spinSOp1 N
-
-/-- R1-V pin (`Ŝ²`): `V Ŝ² V⁻¹ = -Ŝ²`. -/
-example (N : ℕ) :
-    spinSPiRotation1 N * spinSOp2 N * ((Complex.I ^ N) • spinReversalS N) = -spinSOp2 N :=
-  spinSPiRotation1_conj_spinSOp2 N
 
 /-! ## R1-Schur: the scalar-commutant lemma -/
 
@@ -219,28 +217,57 @@ example (N : ℕ) (k : Fin (N + 1)) :
 /-- R3 pin, concrete `N = 2` (`S = 1`, even): `u₀ = (1, √2, 1)`. -/
 example : (spinSTopVector 2 : Fin 3 → ℂ) = ![1, (Real.sqrt 2 : ℂ), 1] := by
   funext k
-  fin_cases k <;> norm_num [spinSTopVector]
+  fin_cases k <;> norm_num [spinSTopVector, Math.cgSite]
 
 /-- R3 pin, concrete `N = 3` (`S = 3/2`, odd, the sign-sensitive case): `u₀ = (1, √3, √3, 1)`. -/
 example : (spinSTopVector 3 : Fin 4 → ℂ) = ![1, (Real.sqrt 3 : ℂ), (Real.sqrt 3 : ℂ), 1] := by
   funext k
-  fin_cases k <;> norm_num [spinSTopVector]
+  fin_cases k <;> norm_num [spinSTopVector, Math.cgSite]
 
-/-- R3 pin: `Ŝ¹ u₀ = (N/2) • u₀`, the crux computation of the whole arc (`sqrt_choose_step`,
-`sqrt_raise_coeff`). -/
+/-- R3 pin: `Ŝ¹ u₀ = (N/2) • u₀`, the crux computation of the whole arc (the two ladder-step
+identities `Math.sqrt_lower_coeff` for the `Ŝ^+` half and `Math.sqrt_raise_coeff` for the `Ŝ^-`
+half). -/
 example (N : ℕ) :
     Matrix.mulVec (spinSOp1 N) (spinSTopVector N) = ((N : ℂ) / 2) • spinSTopVector N :=
   spinSOp1_mulVec_spinSTopVector N
 
-/-- R3 pin, concrete `N = 2`: `Ŝ¹ u₀ = 1 • u₀` (eigenvalue `S = 1`). -/
-example : Matrix.mulVec (spinSOp1 2) (spinSTopVector 2) = (1 : ℂ) • spinSTopVector 2 := by
-  have h := spinSOp1_mulVec_spinSTopVector 2
-  rwa [show ((2 : ℕ) : ℂ) / 2 = 1 from by norm_num] at h
+/-- Independent control at `N = 2`: `Ŝ¹ (1, √2, 1) = 1 • (1, √2, 1)` (eigenvalue `S = 1`),
+computed entrywise from the matrix entries of `Ŝ^±` rather than by instantiating
+`spinSOp1_mulVec_spinSTopVector`, so it would disagree with that lemma if the lemma were wrong. -/
+example : Matrix.mulVec (spinSOp1 2) (![1, (Real.sqrt 2 : ℂ), 1] : Fin 3 → ℂ)
+    = (1 : ℂ) • (![1, (Real.sqrt 2 : ℂ), 1] : Fin 3 → ℂ) := by
+  have h2 : ((Real.sqrt 2 : ℝ) : ℂ) ^ 2 = 2 := by
+    norm_cast
+    exact_mod_cast Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 2)
+  funext k
+  fin_cases k <;>
+    norm_num [Matrix.mulVec, dotProduct, spinSOp1, spinSOpPlus, spinSOpMinus,
+      Fin.sum_univ_succ] <;>
+    ring_nf <;>
+    rw [h2] <;>
+    norm_num
 
-/-- R3 pin, concrete `N = 3`: `Ŝ¹ u₀ = (3/2) • u₀` (eigenvalue `S = 3/2`, odd `N`). -/
-example : Matrix.mulVec (spinSOp1 3) (spinSTopVector 3) = ((3 : ℂ) / 2) • spinSTopVector 3 := by
-  have h := spinSOp1_mulVec_spinSTopVector 3
-  rwa [show ((3 : ℕ) : ℂ) = (3 : ℂ) from by norm_num] at h
+/-- Independent control at the sign-sensitive odd `N = 3`: `Ŝ¹ (1, √3, √3, 1) =
+(3/2) • (1, √3, √3, 1)` (eigenvalue `S = 3/2`), again computed entrywise. -/
+example : Matrix.mulVec (spinSOp1 3)
+      (![1, (Real.sqrt 3 : ℂ), (Real.sqrt 3 : ℂ), 1] : Fin 4 → ℂ)
+    = ((3 : ℂ) / 2) • (![1, (Real.sqrt 3 : ℂ), (Real.sqrt 3 : ℂ), 1] : Fin 4 → ℂ) := by
+  have h2 : ((Real.sqrt 2 : ℝ) : ℂ) ^ 2 = 2 := by
+    norm_cast
+    exact_mod_cast Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 2)
+  have h3 : ((Real.sqrt 3 : ℝ) : ℂ) ^ 2 = 3 := by
+    norm_cast
+    exact_mod_cast Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 3)
+  have h4 : Real.sqrt 4 = 2 := by
+    rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.sqrt_sq (by norm_num : (0 : ℝ) ≤ 2)]
+  funext k
+  fin_cases k <;>
+    norm_num [Matrix.mulVec, dotProduct, spinSOp1, spinSOpPlus, spinSOpMinus,
+      Fin.sum_univ_succ] <;>
+    ring_nf <;>
+    simp only [h2, h3, h4] <;>
+    push_cast <;>
+    ring
 
 /-- R3 pin: `F u₀ = u₀`, the *only* anchor fixing the global sign for odd `N`
 (`C(N,k) = C(N,N−k)`). -/
@@ -248,18 +275,24 @@ example (N : ℕ) :
     Matrix.mulVec (spinReversalS N) (spinSTopVector N) = spinSTopVector N :=
   spinReversalS_mulVec_spinSTopVector N
 
-/-- R3 negative-control-style sign pin at the sign-sensitive odd `N = 3`: `F u₀ = u₀` on the
-concrete vector `(1, √3, √3, 1)`, ruling out the `F u₀ = -u₀` alternative that would flip the
-global sign of the axis-1 identification for every odd `N`. -/
+/-- Independent sign control at the sign-sensitive odd `N = 3`: `F (1, √3, √3, 1) =
+(1, √3, √3, 1)`, computed entrywise from the entries of `F` rather than by instantiating
+`spinReversalS_mulVec_spinSTopVector`. -/
 example :
     Matrix.mulVec (spinReversalS 3) (![1, (Real.sqrt 3 : ℂ), (Real.sqrt 3 : ℂ), 1] : Fin 4 → ℂ) =
       (![1, (Real.sqrt 3 : ℂ), (Real.sqrt 3 : ℂ), 1] : Fin 4 → ℂ) := by
-  have hv : (spinSTopVector 3 : Fin 4 → ℂ) =
-      (![1, (Real.sqrt 3 : ℂ), (Real.sqrt 3 : ℂ), 1] : Fin 4 → ℂ) := by
-    funext k
-    fin_cases k <;> norm_num [spinSTopVector]
-  have h' := spinReversalS_mulVec_spinSTopVector 3
-  rwa [hv] at h'
+  funext k
+  fin_cases k <;> simp [Matrix.mulVec, dotProduct, spinReversalS]
+
+/-- Negative control on the same vector: `F u₀ ≠ -u₀`, the alternative that would flip the global
+sign of the axis-1 identification for every odd `N`. Refuted at the first entry, again without
+appealing to `spinReversalS_mulVec_spinSTopVector`. -/
+example :
+    Matrix.mulVec (spinReversalS 3) (![1, (Real.sqrt 3 : ℂ), (Real.sqrt 3 : ℂ), 1] : Fin 4 → ℂ) ≠
+      -(![1, (Real.sqrt 3 : ℂ), (Real.sqrt 3 : ℂ), 1] : Fin 4 → ℂ) := by
+  intro h
+  have h0 := congrFun h 0
+  norm_num [Matrix.mulVec, dotProduct, spinReversalS, Fin.sum_univ_succ, Fin.last] at h0
 
 /-! ## R1: the axis-1 exponential identification, capstone of the crux -/
 
@@ -269,9 +302,8 @@ example (N : ℕ) : spinSPiRotation1 N = spinSRot1 N Real.pi :=
   spinSPiRotation1_eq_spinSRot1_pi N
 
 /-- Positive control at `N = 1` (`S = 1/2`): cross-checked against the concrete `2 × 2`
-`(−i)^1 • [[0,1],[1,0]] = [[0,-i],[-i,0]]`, i.e. `−iσ^x` — agrees by value with the existing
-spin-`1/2` bridge `spinHalfRot1_eq_exp` (`Quantum/SpinHalfRotation/Conjugation.lean:419`); the
-`Fin 2`/`Fin (1 + 1)` index types agree definitionally, so no cast is needed to compare values. -/
+`(−i)^1 • [[0,1],[1,0]] = [[0,-i],[-i,0]]`, i.e. `−iσ^x`. The exponential side of this instance is
+evaluated independently below. -/
 example :
     spinSPiRotation1 1 = spinSRot1 1 Real.pi ∧
       spinSPiRotation1 1 = !![(0 : ℂ), -Complex.I; -Complex.I, 0] := by
@@ -302,5 +334,38 @@ example :
     rw [pow_succ, h2, neg_one_mul, neg_neg]
   ext i j
   fin_cases i <;> fin_cases j <;> simp [spinSPiRotation1, spinReversalS, hI3]
+
+/-! ## Independent evaluation of the exponential side at `N = 1`
+
+The positive controls above evaluate the *closed-form* side; each discharges the identification
+conjunct by the general theorem, so none of them observes `NormedSpace.exp`. The two pins below
+close that gap at `N = 1`, where the spin-`S` operator coincides with the spin-`1/2` one and the
+already-proved bridge `spinHalfRot1_eq_exp` (Tasaki Problem 2.1.b) evaluates the exponential
+without using the axis-1 identification. -/
+
+/-- The spin-`1/2` generator is the `N = 1` spin-`S` generator, `Ŝ^{(1)} = σ^x/2`
+(Tasaki eq. (2.1.7), p. 15); the `Fin 2` and `Fin (1 + 1)` index types agree definitionally. -/
+example : spinHalfOp1 = spinSOp1 1 := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    norm_num [spinHalfOp1, spinSOp1, spinSOpPlus, spinSOpMinus, pauliX]
+
+/-- The exponential side itself at `N = 1`, `θ = π`: `exp(−iπ Ŝ^{(1)}) = −i σ^x`, evaluated
+through the spin-`1/2` bridge `spinHalfRot1_eq_exp` and the closed form `cos(θ/2)·1 −
+2i sin(θ/2)·Ŝ^{(1)}` — independent of `spinSPiRotation1_eq_spinSRot1_pi`, and agreeing with the
+value that theorem predicts. -/
+example : spinSRot1 1 Real.pi = !![(0 : ℂ), -Complex.I; -Complex.I, 0] := by
+  have hop : spinHalfOp1 = spinSOp1 1 := by
+    ext i j
+    fin_cases i <;> fin_cases j <;>
+      norm_num [spinHalfOp1, spinSOp1, spinSOpPlus, spinSOpMinus, pauliX]
+  have harg : (-(Complex.I * ((Real.pi : ℝ) : ℂ))) • spinHalfOp1
+      = (-((((Real.pi : ℝ) : ℂ)) * Complex.I)) • spinSOp1 1 := by
+    rw [hop, mul_comm]
+  have hrot : spinSRot1 1 Real.pi = spinHalfRot1 Real.pi := by
+    rw [spinSRot1, spinHalfRot1_eq_exp, harg]
+  rw [hrot, spinHalfRot1, rotOf, Real.cos_pi_div_two, Real.sin_pi_div_two]
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp [spinHalfOp1, pauliX] <;> ring_nf
 
 end LatticeSystem.Quantum

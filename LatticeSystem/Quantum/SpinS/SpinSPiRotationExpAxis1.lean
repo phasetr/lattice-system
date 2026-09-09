@@ -23,7 +23,10 @@ only sees the `(N+1)`-st power of the scalar, so no scalar invariant separates t
 
 The generic ingredient is the eigenvector formula for the matrix exponential,
 `A v = λ v → (exp A) v = e^λ v`, obtained from the intertwining bridge
-`matrix_exp_intertwine_of_pow_intertwine` applied to the matrix whose columns are all `v`.
+`matrix_exp_intertwine_of_pow_intertwine` applied to the matrix whose columns are all `v`.  It
+carries no spin content; it is placed next to that ingredient, which itself sits in
+`Quantum/SpinS/AxisSwapUnitarySSpinSCore.lean`, so that the two generic matrix-exponential facts
+move to `Math/MatrixAnalysis/` together rather than one at a time.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §2.1: the rotation `Û_θ^{(α)} = exp(−iθ Ŝ^{(α)})`, p. 15; the `π`-rotation relation
@@ -92,10 +95,12 @@ theorem matrix_exp_mulVec_of_mulVec_eq_smul {n : Type*} [Fintype n] [DecidableEq
 the spin-`S` space (`N = 2S`).  It is the `Ŝ^{(1)}`-eigenvector of maximal eigenvalue `S = N/2`,
 i.e. the state Tasaki writes `|ψ^S⟩` after the axis relabelling `3 ↦ 1`; the binomial weights are
 the ones the `2S`-fold spin-`1/2` decomposition of Problem 2.1.g, p. 20 (solution p. 495, (S.12))
-produces.  Its two properties used here are `spinSOp1_mulVec_spinSTopVector` and the binomial
-symmetry `spinReversalS_mulVec_spinSTopVector`. -/
+produces.  Entrywise it is the Clebsch–Gordan site weight `Math.cgSite`, the repository's single
+definition of the `√binom` scalar.  Its two properties used here are
+`spinSOp1_mulVec_spinSTopVector` and the binomial symmetry
+`spinReversalS_mulVec_spinSTopVector`. -/
 noncomputable def spinSTopVector (N : ℕ) (k : Fin (N + 1)) : ℂ :=
-  (Real.sqrt (N.choose (k : ℕ)) : ℂ)
+  Math.cgSite k
 
 /-- Action of `Ŝ^+` on `u₀`: the single surviving raising step contributes the weight `N − i`
 times the entry at `i`, by the `√binom` ladder identity `Math.sqrt_lower_coeff`.  At the top index
@@ -115,7 +120,7 @@ private lemma spinSOpPlus_mulVec_spinSTopVector (N : ℕ) (i : Fin (N + 1)) :
               = ((N : ℝ) - ((i : ℕ) : ℝ)) * (((i : ℕ) : ℝ) + 1) from by push_cast; ring,
           Math.sqrt_lower_coeff hlt]
         ring
-      unfold spinSTopVector
+      unfold spinSTopVector Math.cgSite
       exact_mod_cast congrArg (fun r : ℝ => (r : ℂ)) hk
     · intro b _ hb
       rw [spinSOpPlus_apply_other N (fun hval => hb (Fin.ext hval.symm)), zero_mul]
@@ -152,7 +157,7 @@ private lemma spinSOpMinus_mulVec_spinSTopVector (N : ℕ) (i : Fin (N + 1)) :
           Math.sqrt_raise_coeff hkle]
         push_cast
         ring
-      unfold spinSTopVector
+      unfold spinSTopVector Math.cgSite
       rw [hk0]
       exact_mod_cast congrArg (fun r : ℝ => (r : ℂ)) hk
     · intro b _ hb
@@ -188,8 +193,8 @@ theorem spinReversalS_mulVec_spinSTopVector (N : ℕ) :
   have hi : (i : ℕ) ≤ N := Nat.lt_succ_iff.mp i.isLt
   simp only [Matrix.mulVec, dotProduct]
   rw [Finset.sum_eq_single (Fin.rev i)]
-  · rw [spinReversalS_apply, if_pos rfl, one_mul, spinSTopVector, spinSTopVector, Fin.val_rev,
-      Nat.add_sub_add_right, Nat.choose_symm hi]
+  · rw [spinReversalS_apply, if_pos rfl, one_mul, spinSTopVector, spinSTopVector, Math.cgSite,
+      Math.cgSite, Fin.val_rev, Nat.add_sub_add_right, Nat.choose_symm hi]
   · intro b _ hb
     rw [spinReversalS_apply, if_neg hb, zero_mul]
   · intro h; exact absurd (Finset.mem_univ _) h
@@ -199,8 +204,10 @@ theorem spinReversalS_mulVec_spinSTopVector (N : ℕ) :
 Both `W := spinSRot1 N π` and `V := spinSPiRotation1 N` implement the same `π` rotation about
 axis 1 on the generators — Tasaki (2.1.25), p. 18: axis `1` is fixed, axes `2` and `3` are
 reversed.  For `W` this is the `θ = π` case of the ladder conjugation
-`spinSRot1_conj_spinSLadder1Plus/Minus`; for `V` it is the basis-reversal conjugation
-`spinReversalS_conj_spinSOp1/2/3`, the phase `(−i)^{2S}` cancelling against its inverse `i^{2S}`.
+`spinSRot1_conj_spinSLadder1Plus/Minus`, proved here for each generator; for `V` the existing
+basis-reversal conjugations `spinReversalS_conj_spinSOp1/2/3` are used directly by the capstone,
+the phase `(−i)^{2S}` cancelling against its inverse `i^{2S}` via
+`spinSPiRotation1_inv_conj_eq_spinReversalS_conj`.
 -/
 
 /-- Conjugation of `Ŝ^{(1)}` by `W = exp(−iπ Ŝ^{(1)})` is trivial: the rotation commutes with its
@@ -251,18 +258,8 @@ theorem spinSRot1_pi_conj_spinSOp3 (N : ℕ) :
     rw [← hL, ← h2I, Matrix.mul_smul, Matrix.smul_mul]
   exact smul_right_injective _ (by simp [Complex.I_ne_zero]) hcancel
 
-/-- Conjugation by `V = (−i)^{2S} F` is conjugation by the basis reversal `F`: the phase cancels
-against the phase `i^{2S}` of `V⁻¹ = i^{2S} F`. -/
-private theorem spinSPiRotation1_conj_eq_spinReversalS_conj (N : ℕ)
-    (M : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
-    spinSPiRotation1 N * M * ((Complex.I ^ N) • spinReversalS N)
-      = spinReversalS N * M * spinReversalS N := by
-  have hab : ((-Complex.I) ^ N) * (Complex.I ^ N) = 1 := by
-    rw [← mul_pow, neg_mul, Complex.I_mul_I, neg_neg, one_pow]
-  rw [spinSPiRotation1, Matrix.smul_mul, Matrix.smul_mul, Matrix.mul_smul, smul_smul, hab,
-    one_smul]
-
-/-- Conjugation by `V⁻¹ = i^{2S} F` is likewise conjugation by `F`. -/
+/-- Conjugation by `V⁻¹ = i^{2S} F` is conjugation by the basis reversal `F`: the phase cancels
+against the phase `(−i)^{2S}` of `V = (−i)^{2S} F`. -/
 private theorem spinSPiRotation1_inv_conj_eq_spinReversalS_conj (N : ℕ)
     (M : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
     ((Complex.I ^ N) • spinReversalS N) * M * spinSPiRotation1 N
@@ -271,16 +268,6 @@ private theorem spinSPiRotation1_inv_conj_eq_spinReversalS_conj (N : ℕ)
     rw [← mul_pow, mul_neg, Complex.I_mul_I, neg_neg, one_pow]
   rw [spinSPiRotation1, Matrix.smul_mul, Matrix.smul_mul, Matrix.mul_smul, smul_smul, hab,
     one_smul]
-
-/-- **`V = û₁` fixes `Ŝ^{(1)}`** — the axis of the rotation, Tasaki (2.1.25), p. 18. -/
-theorem spinSPiRotation1_conj_spinSOp1 (N : ℕ) :
-    spinSPiRotation1 N * spinSOp1 N * ((Complex.I ^ N) • spinReversalS N) = spinSOp1 N := by
-  rw [spinSPiRotation1_conj_eq_spinReversalS_conj, spinReversalS_conj_spinSOp1]
-
-/-- **`V = û₁` reverses `Ŝ^{(2)}`** — a transverse axis, Tasaki (2.1.25), p. 18. -/
-theorem spinSPiRotation1_conj_spinSOp2 (N : ℕ) :
-    spinSPiRotation1 N * spinSOp2 N * ((Complex.I ^ N) • spinReversalS N) = -spinSOp2 N := by
-  rw [spinSPiRotation1_conj_eq_spinReversalS_conj, spinReversalS_conj_spinSOp2]
 
 /-! ## From the commutant to the axis-1 identification -/
 
@@ -402,7 +389,7 @@ theorem spinSPiRotation1_eq_spinSRot1_pi (N : ℕ) :
     rw [← Matrix.mulVec_mulVec, hWu, Matrix.mulVec_smul, Matrix.smul_mulVec,
       spinReversalS_mulVec_spinSTopVector, smul_smul, hab, one_smul]
   have hu0 : spinSTopVector N 0 = 1 := by
-    rw [spinSTopVector]
+    rw [spinSTopVector, Math.cgSite]
     simp
   have hc1 : c = 1 := by
     rw [hc, Matrix.smul_mulVec, Matrix.one_mulVec] at hZu

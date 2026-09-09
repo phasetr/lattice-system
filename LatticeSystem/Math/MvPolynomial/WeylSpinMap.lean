@@ -33,6 +33,7 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (S
 §7.1.3 "The Uniqueness of the Ground State", pp. 186–188, eqs. (7.1.22)–(7.1.25); polynomial
 representation due to Arovas–Auerbach–Haldane [10]; proof due to Kennedy–Lieb–Tasaki [41].
 -/
+import LatticeSystem.Math.Combinatorics.SqrtChooseLadder
 import Mathlib.Data.Complex.Basic
 import Mathlib.Analysis.SpecialFunctions.Sqrt
 import Mathlib.Data.Nat.Choose.Basic
@@ -136,14 +137,6 @@ theorem exists_md_eq {d : (Fin L × Fin 2) →₀ ℕ} (hd : ∀ y : Fin L, d (y
     omega
   · change (md _) (y, 1) = d (y, 1)
     rw [md_apply_snd]
-
-/-- The single-site Clebsch–Gordan normalization constant `c(k) = √(binom(N,k))` from the
-isomorphism `Symᴺ(ℂ²) ≅ (spin S)`, `N = 2S`.  At `N = 2` it is `c(0) = 1` (`m = +1`, `u_x²`),
-`c(1) = √2` (`m = 0`, `u_x v_x`), `c(2) = 1` (`m = −1`, `v_x²`); the middle `√2` is the genuine
-`m = 0` weight, and the identity `2·c(0)·c(2) = c(1)² = 2` is what makes a bond singlet divisible
-by the bond factor `u_x v_{x+1} − v_x u_{x+1}`. -/
-noncomputable def cgSite (k : Fin (N + 1)) : ℂ :=
-  (Real.sqrt (N.choose (k : ℕ)) : ℂ)
 
 /-- Each single-site Clebsch–Gordan constant is nonzero (`binom(N,k) > 0` for `k ≤ N`), so the
 Weyl map stays injective after normalization. -/

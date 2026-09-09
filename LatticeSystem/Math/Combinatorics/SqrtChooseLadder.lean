@@ -3,10 +3,12 @@ Square-root binomial weights of a spin ladder step.
 
 A spin ladder operator carries the matrix element `√((t+1)(n−t))` between the two basis states
 indexed by `t` and `t+1`, while the states themselves carry the Clebsch–Gordan weights
-`√(binom n ·)`.  This file proves the two ways of absorbing such a matrix element into a
-neighbouring weight — attaching it to `√(binom n t)` (`sqrt_raise_coeff`) or to
-`√(binom n (t+1))` (`sqrt_lower_coeff`) — together with the arithmetic core they share,
-`sqrt_choose_step`, the `√`-form of `Nat.choose_succ_right_eq`.
+`√(binom n ·)` (`cgSite`, defined here so that every consumer of the weight — the Weyl transport
+of `Ŝ^±` and the `x`-polarised top vector of the axis-1 `π` rotation — shares one definition).
+This file proves the two ways of absorbing such a matrix element into a neighbouring weight —
+attaching it to `√(binom n t)` (`sqrt_raise_coeff`) or to `√(binom n (t+1))`
+(`sqrt_lower_coeff`) — together with the arithmetic core they share, `sqrt_choose_step`, the
+`√`-form of `Nat.choose_succ_right_eq`.
 
 Which of the two a given ladder step needs is fixed by whether the state being acted on is
 indexed by `t` or by `t+1`, not by the direction of the step, so consumers that index basis
@@ -15,6 +17,7 @@ saturated-ferromagnet coherent state) exchange the roles of the two identities.
 -/
 import Mathlib.Data.Nat.Choose.Basic
 import Mathlib.Data.Real.Sqrt
+import Mathlib.Data.Complex.Basic
 
 namespace LatticeSystem.Math
 
@@ -66,5 +69,18 @@ theorem sqrt_lower_coeff {n t : ℕ} (ht : t < n) :
     _ = Real.sqrt (n.choose t) * Real.sqrt ((n - t : ℕ) : ℝ)
           * Real.sqrt ((n - t : ℕ) : ℝ) := by rw [sqrt_choose_step]
     _ = Real.sqrt (n.choose t) * ((n - t : ℕ) : ℝ) := by rw [mul_assoc, hsq]
+
+/-! ## The Clebsch–Gordan site weight -/
+
+variable {N : ℕ}
+
+/-- The single-site Clebsch–Gordan normalization constant `c(k) = √(binom(N,k))` from the
+isomorphism `Symᴺ(ℂ²) ≅ (spin S)`, `N = 2S`: the weight the ladder identities above move between
+neighbouring basis states.  At `N = 2` it is `c(0) = 1` (`m = +1`, `u_x²`), `c(1) = √2` (`m = 0`,
+`u_x v_x`), `c(2) = 1` (`m = −1`, `v_x²`); the middle `√2` is the genuine `m = 0` weight, and the
+identity `2·c(0)·c(2) = c(1)² = 2` is what makes a bond singlet divisible by the bond factor
+`u_x v_{x+1} − v_x u_{x+1}` in the Weyl representation. -/
+noncomputable def cgSite (k : Fin (N + 1)) : ℂ :=
+  (Real.sqrt (N.choose (k : ℕ)) : ℂ)
 
 end LatticeSystem.Math

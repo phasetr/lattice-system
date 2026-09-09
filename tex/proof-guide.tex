@@ -949,8 +949,9 @@ $V := \texttt{spinSPiRotation1}\,N = (-i)^N F$. Conjugation by $W$ at
 $\theta = \pi$ fixes $\hat S^{(1)}$ and negates $\hat S^{(2)}, \hat S^{(3)}$
 (\texttt{spinSRot1\_pi\_conj\_spinSOp1/2/3}); conjugation by $V$ has the
 same effect, since $F$ fixes $\hat S^{(1)}$ and negates
-$\hat S^{(2)}, \hat S^{(3)}$ and the scalar phase $(-i)^N$ cancels in a
-conjugation (\texttt{spinSPiRotation1\_conj\_spinSOp1/2}). Hence
+$\hat S^{(2)}, \hat S^{(3)}$
+(\texttt{spinReversalS\_conj\_spinSOp1/2/3}) and the scalar phase
+$(-i)^N$ cancels in a conjugation. Hence
 $Z := V^{-1}W$ commutes with $\hat S^{(1)}, \hat S^{(2)}, \hat S^{(3)}$,
 which generate the full matrix algebra by the spanning theorem of
 Problem 2.1.a, p.~15 (\texttt{spinS\_adjoin\_eq\_top}); so $Z$ lies in
@@ -967,7 +968,8 @@ $x$-polarised top vector $\texttt{spinSTopVector}\,N :=
 (\texttt{spinSTopVector}): it is an eigenvector of $\hat S^{(1)}$ with
 eigenvalue $N/2$ (\texttt{spinSOp1\_mulVec\_spinSTopVector}, an entrywise
 tridiagonal computation reducing to the ladder-step identities
-\texttt{sqrt\_choose\_step}/\texttt{sqrt\_raise\_coeff}), it is fixed by
+\texttt{sqrt\_lower\_coeff} for the $\hat S^+$ half and
+\texttt{sqrt\_raise\_coeff} for the $\hat S^-$ half), it is fixed by
 $F$ via the binomial symmetry $\binom Nk = \binom N{N-k}$
 (\texttt{spinReversalS\_mulVec\_spinSTopVector} --- the \emph{only} anchor
 fixing the global sign, since for odd $N$ neither the trace nor the
