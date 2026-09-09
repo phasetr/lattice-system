@@ -18,15 +18,23 @@ tensor slots, so the lattice product is the many-body tensor `⊗_{x ∈ Λ} û_
 rotations are *defined* by their closed-form matrices — the eq. (2.1.24)/(2.1.25)-level algebra of
 a phase `(−i)^{2S}` times a real involution — and the identification of those matrices with
 `exp(−iπ Ŝ^{(α)})` at general `S` is **not** formalised: no declaration in this chain mentions
-`Matrix.exp` or `NormedSpace.exp`.  The only proved exponential bridge in the repository is at
-spin-`1/2` (`totalSpinHalfRot{1,2,3}_eq_exp` of `Quantum/TotalSpin/Rotation.lean`), and nothing
-links it to these general-`S` closed forms.  The exponentials written above and below are the
-book's notation for the closed-form matrices, not a proved equality.
+`Matrix.exp` or `NormedSpace.exp`.  Exponential rotations and bridges do exist elsewhere in the
+repository — `spinSRot3 N θ = exp(−iθ Ŝ^{(3)})` of
+`Quantum/SpinS/Problem25cZAxisRotationInput.lean`, whose closed form `spinSRot3_eq_diagonal` is
+proved, and `spinSRot1 N θ = exp(−iθ Ŝ^{(1)})` of `Quantum/SpinS/SpinSRotation1.lean`, which
+carries no closed form; the general-`S` many-body bridge
+`manyBodyTensorS_spinSRot3_eq_exp_totalSpinSOp3` of
+`Quantum/SpinS/Problem25cZAxisRotationCommutation.lean`; the general-`S` twist bridge
+`lsmTwistOperator_eq_diagonal` of `Quantum/SpinS/LiebSchultzMattisProof.lean`; and the spin-`1/2`
+`totalSpinHalfRot{1,2,3}_eq_exp` of `Quantum/TotalSpin/Rotation.lean` — but none of them is
+related to the closed forms `spinSPiRotationAxis` / `manyBodySPiRotation` used here.  The
+exponentials written above and below are the book's notation for the closed-form matrices, not a
+proved equality.
 
 At `S = 1` (`N = 2`) the same operator is also built as the whole-chain `piRotationS` of
 `Quantum/SpinS/KennedyTasakiTransformation.lean`, from the real involution `1 − 2(Ŝ^{(α)})²`.
-The two constructions are provably equal, but no bridge lemma is proved: nothing on the critical
-path of Problem 2.2.a needs one.
+That construction is the same operator, but the equality is not proved here: nothing on the
+critical path of Problem 2.2.a needs it.
 
 **Tasaki Problem 2.2.a, p. 23 (`[solution → p. 496]`).**  For `α ≠ β` the two global rotations
 commute when `|Λ|S` is an integer and anticommute when it is a half-odd integer; in the latter

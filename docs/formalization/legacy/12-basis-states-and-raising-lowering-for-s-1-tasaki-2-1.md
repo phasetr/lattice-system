@@ -39,17 +39,17 @@ case (`σ ∈ {-1, 0, +1}`).
 | `spinHalfRot{1,2,3}_mem_SU2` | each axis rotation `Û^(α)_θ` lies in `SU(2)` | `Quantum/SU2.lean` |
 | `spinHalfEulerProduct φ θ ψ` | `Û^(3)_φ · Û^(2)_θ · Û^(3)_ψ` — the forward Euler-angle parametrization | `Quantum/SU2.lean` |
 | `spinHalfEulerProduct_mem_SU2` | the Euler-angle product lies in `SU(2)` | `Quantum/SU2.lean` |
-| `integral_cos_zero_two_pi` | `∫ φ in 0..2π, cos φ = 0` (trig integral for Problem 2.2.c) | `Quantum/SU2Integral.lean` |
+| `integral_cos_zero_two_pi` | `∫ φ in 0..2π, cos φ = 0` (trig integral for eq. (2.2.14), the first display of Problem 2.2.b) | `Quantum/SU2Integral.lean` |
 | `integral_sin_zero_two_pi` | `∫ φ in 0..2π, sin φ = 0` | `Quantum/SU2Integral.lean` |
 | `integral_sin_zero_pi` | `∫ θ in 0..π, sin θ = 2` | `Quantum/SU2Integral.lean` |
 | `integral_sin_two_pi_pi` | `∫ φ in 0..2π, ∫ θ in 0..π, sin θ = 4π` (SU(2) volume in Euler coordinates) | `Quantum/SU2Integral.lean` |
 | `integral_sin_mul_cos_zero_pi` | `∫ θ in 0..π, sin θ · cos θ = 0` (antiderivative `sin²/2` via FTC) | `Quantum/SU2Integral.lean` |
 | `integral_sin_mul_cos_sq_half_zero_pi` | `∫ θ in 0..π, sin θ · cos²(θ/2) = 1` (half-angle identity → `integral_sin` + `integral_sin_mul_cos`) | `Quantum/SU2Integral.lean` |
 | `integral_sin_mul_sin_sq_half_zero_pi` | `∫ θ in 0..π, sin θ · sin²(θ/2) = 1` (same technique) | `Quantum/SU2Integral.lean` |
-| `integral_cexp_I_mul_zero_two_pi` | `∫ φ in 0..2π, e^{iφ} dφ = 0` (complex trig integral for Problem 2.2.c) | `Quantum/SU2Integral.lean` |
+| `integral_cexp_I_mul_zero_two_pi` | `∫ φ in 0..2π, e^{iφ} dφ = 0` (complex trig integral for eq. (2.2.14), the first display of Problem 2.2.b) | `Quantum/SU2Integral.lean` |
 | `integral_cexp_neg_I_mul_zero_two_pi` | `∫ φ in 0..2π, e^{-iφ} dφ = 0` (conjugate of the above) | `Quantum/SU2Integral.lean` |
-| `totalRot32_two_site` | for `Λ = Fin 2`, the Euler-angle rotation `Û^(3)_φ Û^(2)_θ` of the two-site system factors as `onSite 0 (Û^(3)_φ Û^(2)_θ) * onSite 1 (Û^(3)_φ Û^(2)_θ)` (Problem 2.2.c auxiliary) | `Quantum/SU2Integral.lean` |
-| `onSite_zero_mul_one_mulVec_basisVec` | explicit tensor-product action `(onSite 0 A * onSite 1 B) |σ⟩ = (A (σ 0)) ⊗ (B (σ 1))` on a two-site basis vector (Problem 2.2.c auxiliary) | `Quantum/SU2Integral.lean` |
+| `totalRot32_two_site` | for `Λ = Fin 2`, the Euler-angle rotation `Û^(3)_φ Û^(2)_θ` of the two-site system factors as `onSite 0 (Û^(3)_φ Û^(2)_θ) * onSite 1 (Û^(3)_φ Û^(2)_θ)` (eq. (2.2.14) auxiliary; Problem 2.2.b, first display) | `Quantum/SU2Integral.lean` |
+| `onSite_zero_mul_one_mulVec_basisVec` | explicit tensor-product action `(onSite 0 A * onSite 1 B) |σ⟩ = (A (σ 0)) ⊗ (B (σ 1))` on a two-site basis vector (eq. (2.2.14) auxiliary; Problem 2.2.b, first display) | `Quantum/SU2Integral.lean` |
 | `problem_2_2_c` | **Main theorem** (Tasaki §2.2, eq. (2.2.14), p. 23 — the first display of Problem 2.2.b; the declaration name is a mislabel): `(1/4π) ∫₀^{2π} dφ ∫₀^π dθ sin θ · (Û^(3)_φ Û^(2)_θ \|↑₁↓₂⟩)_τ = (1/2) (\|↑₁↓₂⟩ − \|↓₁↑₂⟩)_τ`, stated component-wise for each configuration `τ`. The SU(2)-averaged two-site state is the spin singlet. Neither eq. (2.2.15) nor Problem 2.2.c is formalized. | `Quantum/SU2Integral.lean` |
 | `spinOnePiRot{1,2,3}_mulVec_spinOne{Plus,Zero,Minus}` | π-rotation matrix elements on the basis `|ψ^{+1,0,-1}⟩` (Tasaki eq. (2.1.34) / Problem 2.1.g for S = 1) | `Quantum/SpinOneBasis.lean` |
 

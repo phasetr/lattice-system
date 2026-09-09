@@ -182,12 +182,12 @@ LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
 CATALOGUE_BASELINE_SLICE = slice(216, 2731)
 # Pins the published catalogue text; this module's docstring records exactly what is hashed
 # and how the pin is legitimately updated.
-APPROVED_CHANGES_SHA256 = "fa1df04c1a90fcd1cfdaa1918eb325d2564d8697f59f77a1c7dc916bc1b466ce"
+APPROVED_CHANGES_SHA256 = "544bb1bb8a389a3e83cdcd90282fdc857488e9563f32a9a04f7b0c5b0ae7eb91"
 # Pins the row sequence `main()` actually compares the legacy pages against. The text pin above
 # does not reach it: the rows are derived from the transformed text by `table_data_rows`, which
 # is outside the pinned text, so without this pin a row skipped there would go unpublished with
 # the text pin undisturbed.
-PUBLISHED_ROWS_SHA256 = "d23c0458101130f675770dc478a3e650023fa3360f03411c475d2fa975469e5c"
+PUBLISHED_ROWS_SHA256 = "2a34655a371b7da1d7cf40b84770e186e7a8110044941ef9f441291790790efa"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -1480,6 +1480,33 @@ def _approved_replacements(text: str) -> str:
             "adjoint `manyBodyTensorS_conjTranspose`, which the rest of the tensor API also "
             "uses) |",
         )
+        # The general-θ two-site factorisation is the twin of the θ = π row corrected above: it
+        # is the `Λ = Fin 2` case of the global product of eq. (2.2.11), p. 22, and Problem 2.2.b
+        # is the solid-angle averages of eqs. (2.2.14)/(2.2.15), p. 23.
+        .replace(
+            "(general-θ extension of Problem 2.2.b)",
+            "(general-θ case of the global product, Tasaki eq. (2.2.11), p. 22)",
+        )
+        # The helper rows of `problem_2_2_c` follow that theorem's own corrected attribution:
+        # they serve eq. (2.2.14), the first display of Problem 2.2.b, and Problem 2.2.c
+        # (pp. 23-24) is not formalized.
+        .replace(
+            "(trig integral for Problem 2.2.c)",
+            "(trig integral for eq. (2.2.14), the first display of Problem 2.2.b)",
+        )
+        .replace(
+            "(complex trig integral for Problem 2.2.c)",
+            "(complex trig integral for eq. (2.2.14), the first display of Problem 2.2.b)",
+        )
+        # Both rows carrying this cell are helpers of `problem_2_2_c`, so both move together.
+        .replace(
+            "(Problem 2.2.c auxiliary)",
+            "(eq. (2.2.14) auxiliary; Problem 2.2.b, first display)",
+        )
+        .replace(
+            "(rotation of spin-down, Problem 2.2.c auxiliary)",
+            "(rotation of spin-down, eq. (2.2.14) auxiliary; Problem 2.2.b, first display)",
+        )
     )
 
 
@@ -1544,12 +1571,12 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "2f85ac6345285372f42ccbff8c748d038f9c244b262401bb29eed9539cbf5728"
+SCRIPT_SOURCE_SHA256 = "f578d4de47800bf68bf02d1c3292770f3db484b56288d57971e89b004daf81c0"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
-APPROVED_ENTRIES_SHA256 = "a83eeb88c2aba4a8d5ee3f005dceccd2e55d9001d57937ad5367bf112c2793fe"
+APPROVED_ENTRIES_SHA256 = "b988223cc6588768ae2b74256a02b05f87f8e5d1b9384c0b351e1f5f76a9538a"
 
 # The only text `SCRIPT_SOURCE_SHA256` does not hash: the digits these four pins carry. Each is
 # restated by the very edit it pins, and a digest over its own value would have no fixed point.

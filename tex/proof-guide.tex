@@ -861,7 +861,12 @@ $\hat S_x \cdot \hat S_y$.
 \begin{itemize}
   \item Global rotation operator
     $\hat U^{(\alpha)}_\theta = \exp(-i\theta \hat S_{\mathrm{tot}}^{(\alpha)})$
-    (eq.~(2.2.11)).
+    (eq.~(2.2.11)) at general $S$ about the axes $1$ and $2$, and the
+    identification of the closed-form $\theta = \pi$ rotations with those
+    exponentials. All three axes at spin-$1/2$ are proved as
+    \texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp}, and the general-$S$
+    axis-$3$ case as
+    \texttt{manyBodyTensorS\_spinSRot3\_eq\_exp\_totalSpinSOp3}.
   \item SU(2) / U(1) invariance of operators commuting with
     $\hat S_{\mathrm{tot}}^{(\alpha)}$ (eqs.~(2.2.12)-(2.2.13)).
   \item SU(2) invariance of $\hat S_x \cdot \hat S_y$ and its
@@ -902,12 +907,18 @@ factor \texttt{spinSPiRotationAxis} of
 real involution, the eq.~(2.1.24)/(2.1.25)-level algebra --- and the
 identification of those matrices with $e^{-i\pi\hat S^{(\alpha)}}$ at general
 $S$ is \textbf{not} formalized: nothing in this chain mentions
-\texttt{Matrix.exp} or \texttt{NormedSpace.exp}. The only proved exponential
-bridge in the repository is at spin-$1/2$
-(\texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp} of
-\texttt{Quantum/TotalSpin/Rotation.lean}), and nothing links it to the
-general-$S$ closed forms. The exponentials written in this subsection are the
-book's notation for those matrices, not proved equalities.
+\texttt{Matrix.exp} or \texttt{NormedSpace.exp}. Exponential rotations and
+bridges do exist elsewhere in the repository: the single-site
+$\texttt{spinSRot3}\,N\,\theta = e^{-i\theta \hat S^{(3)}}$, whose closed
+form \texttt{spinSRot3\_eq\_diagonal} is proved, and
+$\texttt{spinSRot1}\,N\,\theta = e^{-i\theta \hat S^{(1)}}$, which carries
+none; the general-$S$ many-body bridge
+\texttt{manyBodyTensorS\_spinSRot3\_eq\_exp\_totalSpinSOp3}; the general-$S$
+twist bridge \texttt{lsmTwistOperator\_eq\_diagonal}; and the spin-$1/2$
+\texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp}. None of them is related to the
+closed forms \texttt{spinSPiRotationAxis} and \texttt{manyBodySPiRotation}
+built here. The exponentials written in this subsection are the book's notation
+for those matrices, not proved equalities.
 
 The single-site factors
 obey the sign identity of eq.~(2.1.25), p.~18,
