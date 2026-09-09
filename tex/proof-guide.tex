@@ -864,7 +864,10 @@ $\hat S_x \cdot \hat S_y$.
     (eq.~(2.2.11)) at general $S$ about the axis $1$, and the identification
     of the closed-form $\theta = \pi$ rotations
     (\texttt{spinSPiRotationAxis}, \texttt{manyBodySPiRotation}) with the
-    exponentials on any of the three axes. The general-$S$ exponentials about
+    exponentials on axes $1$ and $2$, and the many-body lift on any axis
+    (axis $3$ at the single-site level is now proved,
+    \texttt{spinSPiRotation3\_eq\_spinSRot3\_pi},
+    \S\ref{sec:problem21g}). The general-$S$ exponentials about
     the axes $2$ and $3$ do exist, as \texttt{saturatedGlobalRot2} and
     \texttt{saturatedGlobalRot3}; all three axes at spin-$1/2$ are proved as
     \texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp}, and the general-$S$
@@ -885,6 +888,50 @@ $\hat S_x \cdot \hat S_y$.
     $\hat U|\uparrow\rangle_1|\downarrow\rangle_2$ depends only on
     the axis $n$, not on the choice of $\hat U$.
 \end{itemize}
+
+\subsection{Problem 2.1.g: general-spin closed form for the
+  \texorpdfstring{$\pi$}{pi}-rotation, axis 3
+  (Tasaki \S2.1, eq.~(2.1.34), p.~20; Problem 2.1.g, p.~20, solution
+  p.~495)}
+\label{sec:problem21g}
+
+\emph{Source file:}
+\texttt{LatticeSystem/Quantum/SpinS/SpinSPiRotationExpAxis3.lean}.
+
+Tasaki defines the general-spin rotation operator
+$\hat U^{(\alpha)}_\theta := e^{-i\theta \hat S^{(\alpha)}}$ on p.~15 and
+states the closed form of $\hat U^{(\alpha)}_\pi =: \hat u^{(\alpha)}$ on
+the $\sigma$-basis in eq.~(2.1.34), p.~20, leaving its derivation to
+Problem 2.1.g (``a direct derivation seems to be not easy''; the printed
+solution, p.~495, goes via the $2S$-fold spin-$1/2$ decomposition). For
+axis $3$, the closed-form single-site matrix
+$\texttt{spinSPiRotation3}\,N$ of
+\texttt{Quantum/SpinS/SpinSPiRotation.lean} (the $(-i)^N$-phased
+alternating-sign diagonal) is identified with the exponential directly:
+
+\begin{theorem}[Tasaki eq.~(2.1.34) / Problem 2.1.g, axis 3]
+\[
+  \texttt{spinSPiRotation3}\,N = \texttt{spinSRot3}\,N\,\pi,
+  \qquad \texttt{spinSRot3}\,N\,\theta := e^{-i\theta \hat S^{(3)}}.
+\]
+Lean name: \texttt{spinSPiRotation3\_eq\_spinSRot3\_pi}.
+\end{theorem}
+
+\begin{proof}
+$\texttt{spinSRot3}\,N\,\pi$ is diagonal
+(\texttt{spinSRot3\_eq\_diagonal}) with $k$-th entry
+$\exp(-i\pi(\tfrac N2 - k))$, $k \in \mathrm{Fin}\,(N+1)$; splitting the
+exponent as $N \cdot (-\tfrac{i\pi}{2}) + k \cdot (i\pi)$ and applying
+$e^{-i\pi/2} = -i$, $e^{i\pi} = -1$ gives
+$\exp(-i\pi(\tfrac N2 - k)) = (-i)^N(-1)^k$, exactly the $k$-th diagonal
+entry of $(-i)^N \bullet \texttt{spinSAlternating}\,N =
+\texttt{spinSPiRotation3}\,N$.
+\end{proof}
+
+\paragraph{Not yet formalized.} The identification for axes $1$ and $2$,
+and its lift to the many-body global rotation of eq.~(2.2.11)
+(Problem 2.2.a, \S\ref{sec:problem22a}), remain open; see the inventory
+there.
 
 \subsection{Problem 2.2.a: global \texorpdfstring{$\pi$}{pi}-rotations
   (Tasaki \S2.2, Problem 2.2.a, p.~23, solution p.~496)}
@@ -907,10 +954,14 @@ factor \texttt{spinSPiRotationAxis} of
 
 \emph{What is and is not formalized.} The single-site $\pi$ rotations are
 \emph{defined} by their closed-form matrices --- a phase $(-i)^{2S}$ times a
-real involution, the eq.~(2.1.24)/(2.1.25)-level algebra --- and the
-identification of those matrices with $e^{-i\pi\hat S^{(\alpha)}}$ at general
-$S$ is \textbf{not} formalized: nothing in this chain mentions
-\texttt{Matrix.exp} or \texttt{NormedSpace.exp}. Exponential rotations and
+real involution, the eq.~(2.1.24)/(2.1.25)-level algebra. The
+identification of the axis-$3$ matrix
+\texttt{spinSPiRotation3} with $e^{-i\pi\hat S^{(3)}}$ at general $S$ is
+now proved, \texttt{spinSPiRotation3\_eq\_spinSRot3\_pi}
+(\S\ref{sec:problem21g}, Tasaki eq.~(2.1.34) / Problem 2.1.g, p.~20); the
+identification for axes $1$ and $2$, and its lift through
+\texttt{manyBodyTensorS} to the many-body $\hat U^{(\alpha)}_\pi$ built
+here, remain \textbf{not} formalized. Exponential rotations and
 bridges do exist elsewhere in the repository: the single-site
 $\texttt{spinSRot3}\,N\,\theta = e^{-i\theta \hat S^{(3)}}$, whose closed
 form \texttt{spinSRot3\_eq\_diagonal} is proved, and
@@ -921,9 +972,10 @@ many-body bridge
 \texttt{manyBodyTensorS\_spinSRot3\_eq\_exp\_totalSpinSOp3}; the general-$S$
 twist bridge \texttt{lsmTwistOperator\_eq\_diagonal}; and the spin-$1/2$
 \texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp}. None of them is related to the
-closed forms \texttt{spinSPiRotationAxis} and \texttt{manyBodySPiRotation}
-built here. The exponentials written in this subsection are the book's notation
-for those matrices, not proved equalities.
+many-body closed forms \texttt{spinSPiRotationAxis} and
+\texttt{manyBodySPiRotation} built here. The exponentials written in this
+subsection are the book's notation for those matrices, not (outside axis
+$3$ at the single-site level) proved equalities.
 
 The single-site factors
 obey the sign identity of eq.~(2.1.25), p.~18,
