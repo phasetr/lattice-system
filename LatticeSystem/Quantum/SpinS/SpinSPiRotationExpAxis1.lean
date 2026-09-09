@@ -1,6 +1,7 @@
 import LatticeSystem.Math.Combinatorics.SqrtChooseLadder
 import LatticeSystem.Quantum.SpinS.AxisSwapUnitarySSpinSCore
 import LatticeSystem.Quantum.SpinS.SpinSPiRotation
+import LatticeSystem.Quantum.SpinS.SpanningTheorem
 
 /-!
 # The axis-1 `π` rotation as an exponential
@@ -280,5 +281,142 @@ theorem spinSPiRotation1_conj_spinSOp1 (N : ℕ) :
 theorem spinSPiRotation1_conj_spinSOp2 (N : ℕ) :
     spinSPiRotation1 N * spinSOp2 N * ((Complex.I ^ N) • spinReversalS N) = -spinSOp2 N := by
   rw [spinSPiRotation1_conj_eq_spinReversalS_conj, spinReversalS_conj_spinSOp2]
+
+/-! ## From the commutant to the axis-1 identification -/
+
+/-- **Schur's lemma for the spin-`S` generators**: a matrix commuting with `Ŝ^{(1)}`, `Ŝ^{(2)}`
+and `Ŝ^{(3)}` is a scalar multiple of the identity.  The generators adjoin to the whole matrix
+algebra (`spinS_adjoin_eq_top`, Tasaki Problem 2.1.a, p. 15), so such a matrix lies in the
+centralizer of everything, hence in the centre, which for matrices over a field is the range of
+`Matrix.scalar`. -/
+theorem spinS_scalar_of_commute_generators (N : ℕ)
+    (Z : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
+    (h1 : Commute Z (spinSOp1 N)) (h2 : Commute Z (spinSOp2 N)) (h3 : Commute Z (spinSOp3 N)) :
+    ∃ c : ℂ, Z = c • (1 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) := by
+  have hcent : ∀ M : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ, Commute M Z := by
+    intro M
+    have hgen : ({spinSOp1 N, spinSOp2 N, spinSOp3 N} :
+        Set (Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)) ⊆
+        (Subalgebra.centralizer ℂ ({Z} : Set (Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)) :
+          Set (Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)) := by
+      intro x hx
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
+      rw [SetLike.mem_coe, Subalgebra.mem_centralizer_iff]
+      rintro g rfl
+      rcases hx with rfl | rfl | rfl
+      exacts [h1, h2, h3]
+    have htop := Algebra.adjoin_le hgen
+    rw [spinS_adjoin_eq_top] at htop
+    have hM : M ∈ Subalgebra.centralizer ℂ
+        ({Z} : Set (Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)) := htop Algebra.mem_top
+    rw [Subalgebra.mem_centralizer_iff] at hM
+    exact (hM Z rfl).symm
+  obtain ⟨c, hc⟩ :=
+    Matrix.mem_range_scalar_iff_commute_single'.mpr fun i j => hcent (Matrix.single i j 1)
+  refine ⟨c, ?_⟩
+  rw [← hc, Matrix.scalar_apply]
+  ext i j
+  by_cases hij : i = j <;> simp [hij]
+
+/-- **The axis-1 `π` rotation is the exponential `exp(−iπ Ŝ^{(1)})`** at every spin `S = N/2`:
+the closed form `û₁ = (−i)^{2S}F` of `spinSPiRotation1` agrees with the rotation `spinSRot1 N π`
+of the definition on p. 15.  This is the first relation of Tasaki (2.1.34), p. 20
+(`⟨ψ^σ|û₁|ψ^τ⟩ = (−i)^{2S}δ_{σ,−τ}`), left to the reader as Problem 2.1.g, p. 20 (solution
+p. 495).
+
+Both matrices conjugate the three generators identically (Tasaki (2.1.25), p. 18), so
+`Z = û₁⁻¹ exp(−iπ Ŝ^{(1)})` commutes with all of them and is therefore a scalar
+(`spinS_scalar_of_commute_generators`).  The scalar is `1` because both matrices multiply the
+`x`-polarised top vector `u₀` by the same phase `(−i)^{2S}`: for `exp(−iπ Ŝ^{(1)})` because `u₀` is
+its eigenvector of eigenvalue `S = N/2`, for `û₁` because `F u₀ = u₀`. -/
+theorem spinSPiRotation1_eq_spinSRot1_pi (N : ℕ) :
+    spinSPiRotation1 N = spinSRot1 N Real.pi := by
+  have hab : ((-Complex.I) ^ N) * (Complex.I ^ N) = 1 := by
+    rw [← mul_pow, neg_mul, Complex.I_mul_I, neg_neg, one_pow]
+  have hVF : spinSPiRotation1 N * ((Complex.I ^ N) • spinReversalS N) = 1 := by
+    rw [spinSPiRotation1, Matrix.smul_mul, Matrix.mul_smul, smul_smul, hab, one_smul,
+      spinReversalS_mul_self]
+  -- `Z = V⁻¹W` commutes with any generator conjugated the same way by `W` and by `F`.
+  have key : ∀ (M : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) (e : ℂ),
+      spinSRot1 N Real.pi * M * spinSRot1 N (-Real.pi) = e • M →
+      spinReversalS N * M * spinReversalS N = e • M → e * e = 1 →
+      Commute (((Complex.I ^ N) • spinReversalS N) * spinSRot1 N Real.pi) M := by
+    intro M e hW hF he
+    have hZinvZ : (spinSRot1 N (-Real.pi) * spinSPiRotation1 N) *
+        (((Complex.I ^ N) • spinReversalS N) * spinSRot1 N Real.pi) = 1 := by
+      calc (spinSRot1 N (-Real.pi) * spinSPiRotation1 N) *
+            (((Complex.I ^ N) • spinReversalS N) * spinSRot1 N Real.pi)
+          = spinSRot1 N (-Real.pi) * (spinSPiRotation1 N *
+              ((Complex.I ^ N) • spinReversalS N)) * spinSRot1 N Real.pi := by
+            simp only [Matrix.mul_assoc]
+        _ = 1 := by rw [hVF, Matrix.mul_one, spinSRot1_neg_mul]
+    have hZM : ((Complex.I ^ N) • spinReversalS N) * spinSRot1 N Real.pi * M *
+        (spinSRot1 N (-Real.pi) * spinSPiRotation1 N) = M := by
+      calc ((Complex.I ^ N) • spinReversalS N) * spinSRot1 N Real.pi * M *
+            (spinSRot1 N (-Real.pi) * spinSPiRotation1 N)
+          = ((Complex.I ^ N) • spinReversalS N) *
+              (spinSRot1 N Real.pi * M * spinSRot1 N (-Real.pi)) * spinSPiRotation1 N := by
+            simp only [Matrix.mul_assoc]
+        _ = ((Complex.I ^ N) • spinReversalS N) * (e • M) * spinSPiRotation1 N := by rw [hW]
+        _ = e • (((Complex.I ^ N) • spinReversalS N) * M * spinSPiRotation1 N) := by
+            rw [Matrix.mul_smul, Matrix.smul_mul]
+        _ = e • (spinReversalS N * M * spinReversalS N) := by
+            rw [spinSPiRotation1_inv_conj_eq_spinReversalS_conj]
+        _ = M := by rw [hF, smul_smul, he, one_smul]
+    have hmul := congrArg (fun X => X * (((Complex.I ^ N) • spinReversalS N) *
+      spinSRot1 N Real.pi)) hZM
+    simp only [Matrix.mul_assoc] at hmul
+    rw [← Matrix.mul_assoc (spinSRot1 N (-Real.pi)), hZinvZ, Matrix.mul_one] at hmul
+    have hgoal : ((Complex.I ^ N) • spinReversalS N) * spinSRot1 N Real.pi * M =
+        M * (((Complex.I ^ N) • spinReversalS N) * spinSRot1 N Real.pi) := by
+      rw [Matrix.mul_assoc]
+      exact hmul
+    exact hgoal
+  have hcomm1 := key (spinSOp1 N) 1
+    (by rw [one_smul]; exact spinSRot1_pi_conj_spinSOp1 N)
+    (by rw [one_smul]; exact spinReversalS_conj_spinSOp1 N) (by norm_num)
+  have hcomm2 := key (spinSOp2 N) (-1)
+    (by rw [neg_one_smul]; exact spinSRot1_pi_conj_spinSOp2 N)
+    (by rw [neg_one_smul]; exact spinReversalS_conj_spinSOp2 N) (by norm_num)
+  have hcomm3 := key (spinSOp3 N) (-1)
+    (by rw [neg_one_smul]; exact spinSRot1_pi_conj_spinSOp3 N)
+    (by rw [neg_one_smul]; exact spinReversalS_conj_spinSOp3 N) (by norm_num)
+  obtain ⟨c, hc⟩ := spinS_scalar_of_commute_generators N _ hcomm1 hcomm2 hcomm3
+  -- The top vector pins the scalar to `1`.
+  have hWu : Matrix.mulVec (spinSRot1 N Real.pi) (spinSTopVector N)
+      = ((-Complex.I) ^ N) • spinSTopVector N := by
+    have hA : Matrix.mulVec (-(((Real.pi : ℝ) : ℂ) * Complex.I) • spinSOp1 N)
+        (spinSTopVector N)
+        = (-(((Real.pi : ℝ) : ℂ) * Complex.I) * ((N : ℂ) / 2)) • spinSTopVector N := by
+      rw [Matrix.smul_mulVec, spinSOp1_mulVec_spinSTopVector, smul_smul]
+    have hphase : Complex.exp (-(((Real.pi : ℝ) : ℂ) * Complex.I) * ((N : ℂ) / 2))
+        = (-Complex.I) ^ N := by
+      have hhalf : Complex.exp (-(((Real.pi : ℝ) : ℂ) / 2 * Complex.I)) = -Complex.I := by
+        simpa using cexp_neg_pi_half_mul_I
+      rw [show -(((Real.pi : ℝ) : ℂ) * Complex.I) * ((N : ℂ) / 2)
+            = (N : ℂ) * (-(((Real.pi : ℝ) : ℂ) / 2 * Complex.I)) from by ring,
+        Complex.exp_nat_mul, hhalf]
+    rw [spinSRot1, matrix_exp_mulVec_of_mulVec_eq_smul _ _ _ hA, hphase]
+  have hZu : Matrix.mulVec (((Complex.I ^ N) • spinReversalS N) * spinSRot1 N Real.pi)
+      (spinSTopVector N) = spinSTopVector N := by
+    rw [← Matrix.mulVec_mulVec, hWu, Matrix.mulVec_smul, Matrix.smul_mulVec,
+      spinReversalS_mulVec_spinSTopVector, smul_smul, hab, one_smul]
+  have hu0 : spinSTopVector N 0 = 1 := by
+    rw [spinSTopVector]
+    simp
+  have hc1 : c = 1 := by
+    rw [hc, Matrix.smul_mulVec, Matrix.one_mulVec] at hZu
+    have h0 := congrFun hZu 0
+    rw [Pi.smul_apply, smul_eq_mul, hu0, mul_one] at h0
+    exact h0
+  have hZ1 : ((Complex.I ^ N) • spinReversalS N) * spinSRot1 N Real.pi = 1 := by
+    rw [hc, hc1, one_smul]
+  calc spinSPiRotation1 N
+      = spinSPiRotation1 N *
+          (((Complex.I ^ N) • spinReversalS N) * spinSRot1 N Real.pi) := by
+        rw [hZ1, Matrix.mul_one]
+    _ = (spinSPiRotation1 N * ((Complex.I ^ N) • spinReversalS N)) * spinSRot1 N Real.pi := by
+        rw [Matrix.mul_assoc]
+    _ = spinSRot1 N Real.pi := by rw [hVF, Matrix.one_mul]
 
 end LatticeSystem.Quantum

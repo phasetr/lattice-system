@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.SpinSPiRotation
 import LatticeSystem.Quantum.SpinS.Problem25cZAxisRotationCommutation
 import LatticeSystem.Quantum.SpinS.SpinSPiRotationExpAxis3
+import LatticeSystem.Quantum.SpinS.SpinSPiRotationExpAxis1
 
 /-!
 # Signature pin: PR-A of the Problem 2.1.g exponential-identification arc, axis 3
@@ -207,71 +208,58 @@ example {n : Type*} [Fintype n] [DecidableEq n] (A : Matrix n n ℂ) (v : n → 
 
 /-! ## R3: the binomial highest-weight vector `u₀`
 
-The pins below wrap every reference to the not-yet-existing `spinSTopVector` inside a tactic-block
-`have` (goal `True`), rather than in the `example`'s own statement: a genuinely new *value-level*
-declaration mentioned directly in an `example`'s statement triggers Lean's `autoImplicit`
-fallback (`Function expected …`) instead of a clean `unknown identifier` error, whereas the same
-reference inside a `have` inside a tactic proof is ordinary term elaboration and fails cleanly.
-The `*ᵥ` notation itself is likewise avoided in favour of plain `Matrix.mulVec` application, since
-`*ᵥ` on an operand that fails to elaborate reports a generic notation-macro error rather than a
-clean `unknown identifier`; every inner discharge is `sorry` (the whole example already fails on
-the unknown identifiers before this file is a candidate for `lake build`) to avoid an unrelated
-cascade of `unsolved goals` from tactics operating on an already-ill-typed goal. -/
+Every pin below uses plain `Matrix.mulVec` rather than the `*ᵥ` notation, which does not
+elaborate inside `namespace LatticeSystem.Quantum` in this file. -/
 
 /-- R3 pin: locks the exact name/definition of the binomial top vector
 `u₀ := (√C(N,k))_k` (Tasaki (2.1.34) p. 20, Problem 2.1.g p. 20, solution p. 495, (S.12)). -/
-example (N : ℕ) (k : Fin (N + 1)) : True := by
-  have h : spinSTopVector N k = (Real.sqrt (N.choose (k : ℕ)) : ℂ) := rfl
-  trivial
+example (N : ℕ) (k : Fin (N + 1)) :
+    spinSTopVector N k = (Real.sqrt (N.choose (k : ℕ)) : ℂ) := rfl
 
 /-- R3 pin, concrete `N = 2` (`S = 1`, even): `u₀ = (1, √2, 1)`. -/
-example : True := by
-  have h : (spinSTopVector 2 : Fin 3 → ℂ) = ![1, (Real.sqrt 2 : ℂ), 1] := sorry
-  trivial
+example : (spinSTopVector 2 : Fin 3 → ℂ) = ![1, (Real.sqrt 2 : ℂ), 1] := by
+  funext k
+  fin_cases k <;> norm_num [spinSTopVector]
 
 /-- R3 pin, concrete `N = 3` (`S = 3/2`, odd, the sign-sensitive case): `u₀ = (1, √3, √3, 1)`. -/
-example : True := by
-  have h : (spinSTopVector 3 : Fin 4 → ℂ) = ![1, (Real.sqrt 3 : ℂ), (Real.sqrt 3 : ℂ), 1] := sorry
-  trivial
+example : (spinSTopVector 3 : Fin 4 → ℂ) = ![1, (Real.sqrt 3 : ℂ), (Real.sqrt 3 : ℂ), 1] := by
+  funext k
+  fin_cases k <;> norm_num [spinSTopVector]
 
 /-- R3 pin: `Ŝ¹ u₀ = (N/2) • u₀`, the crux computation of the whole arc (`sqrt_choose_step`,
 `sqrt_raise_coeff`). -/
-example (N : ℕ) : True := by
-  have h : Matrix.mulVec (spinSOp1 N) (spinSTopVector N) = ((N : ℂ) / 2) • spinSTopVector N :=
-    spinSOp1_mulVec_spinSTopVector N
-  trivial
+example (N : ℕ) :
+    Matrix.mulVec (spinSOp1 N) (spinSTopVector N) = ((N : ℂ) / 2) • spinSTopVector N :=
+  spinSOp1_mulVec_spinSTopVector N
 
 /-- R3 pin, concrete `N = 2`: `Ŝ¹ u₀ = 1 • u₀` (eigenvalue `S = 1`). -/
-example : True := by
-  have h : Matrix.mulVec (spinSOp1 2) (spinSTopVector 2) = (1 : ℂ) • spinSTopVector 2 :=
-    spinSOp1_mulVec_spinSTopVector 2
-  trivial
+example : Matrix.mulVec (spinSOp1 2) (spinSTopVector 2) = (1 : ℂ) • spinSTopVector 2 := by
+  have h := spinSOp1_mulVec_spinSTopVector 2
+  rwa [show ((2 : ℕ) : ℂ) / 2 = 1 from by norm_num] at h
 
 /-- R3 pin, concrete `N = 3`: `Ŝ¹ u₀ = (3/2) • u₀` (eigenvalue `S = 3/2`, odd `N`). -/
-example : True := by
-  have h : Matrix.mulVec (spinSOp1 3) (spinSTopVector 3) = ((3 : ℂ) / 2) • spinSTopVector 3 :=
-    spinSOp1_mulVec_spinSTopVector 3
-  trivial
+example : Matrix.mulVec (spinSOp1 3) (spinSTopVector 3) = ((3 : ℂ) / 2) • spinSTopVector 3 := by
+  have h := spinSOp1_mulVec_spinSTopVector 3
+  rwa [show ((3 : ℕ) : ℂ) = (3 : ℂ) from by norm_num] at h
 
 /-- R3 pin: `F u₀ = u₀`, the *only* anchor fixing the global sign for odd `N`
 (`C(N,k) = C(N,N−k)`). -/
-example (N : ℕ) : True := by
-  have h : Matrix.mulVec (spinReversalS N) (spinSTopVector N) = spinSTopVector N :=
-    spinReversalS_mulVec_spinSTopVector N
-  trivial
+example (N : ℕ) :
+    Matrix.mulVec (spinReversalS N) (spinSTopVector N) = spinSTopVector N :=
+  spinReversalS_mulVec_spinSTopVector N
 
 /-- R3 negative-control-style sign pin at the sign-sensitive odd `N = 3`: `F u₀ = u₀` on the
 concrete vector `(1, √3, √3, 1)`, ruling out the `F u₀ = -u₀` alternative that would flip the
 global sign of the axis-1 identification for every odd `N`. -/
-example : True := by
-  have h : Matrix.mulVec (spinReversalS 3)
-      (![1, (Real.sqrt 3 : ℂ), (Real.sqrt 3 : ℂ), 1] : Fin 4 → ℂ) =
+example :
+    Matrix.mulVec (spinReversalS 3) (![1, (Real.sqrt 3 : ℂ), (Real.sqrt 3 : ℂ), 1] : Fin 4 → ℂ) =
       (![1, (Real.sqrt 3 : ℂ), (Real.sqrt 3 : ℂ), 1] : Fin 4 → ℂ) := by
-    have h' := spinReversalS_mulVec_spinSTopVector 3
-    have hv : (spinSTopVector 3 : Fin 4 → ℂ) =
-        (![1, (Real.sqrt 3 : ℂ), (Real.sqrt 3 : ℂ), 1] : Fin 4 → ℂ) := sorry
-    rwa [hv] at h'
-  trivial
+  have hv : (spinSTopVector 3 : Fin 4 → ℂ) =
+      (![1, (Real.sqrt 3 : ℂ), (Real.sqrt 3 : ℂ), 1] : Fin 4 → ℂ) := by
+    funext k
+    fin_cases k <;> norm_num [spinSTopVector]
+  have h' := spinReversalS_mulVec_spinSTopVector 3
+  rwa [hv] at h'
 
 /-! ## R1: the axis-1 exponential identification, capstone of the crux -/
 
