@@ -68,19 +68,137 @@ example :
       Complex.exp (-(Complex.I * (φ : ℂ))) = 0 :=
   integral_cexp_neg_I_mul_zero_two_pi
 
-/-! ## D. The SU(2)-averaged singlet identity, Tasaki eq. (2.2.14), p. 23
+/-! ## R. Red pins for TSK-065 Problem 2.2.b, eqs. (2.2.14)/(2.2.15), p. 23
 
-The first display of Problem 2.2.b; the Lean name `problem_2_2_c` is a mislabel. -/
+`problem_2_2_c` is renamed (no alias kept) to `tasaki_problem_2_2_b_upDown_average` and restated
+as a two-conjunct chain (component form, then the singlet identification via
+`twoSiteSinglet`, App. A.3.3 eq. (A.3.23)). `tasaki_problem_2_2_b_upUp_average` is new: a
+three-conjunct chain for eq. (2.2.15) ending in the non-SU(2)-invariance of `twoSiteTripletZero`
+(App. A.3.3 eq. (A.3.22)). All of `twoSiteSinglet`, `twoSiteTripletZero`,
+`tasaki_problem_2_2_b_upDown_average`, `tasaki_problem_2_2_b_upUp_average`, and the θ-integral
+helper `integral_sin_mul_cos_half_mul_sin_half_zero_pi` are unimplemented at this commit: every
+pin below must fail with `unknown identifier` (or `unknown constant`), never with an import or
+elaboration error of any other kind. -/
 
-example (τ : Fin 2 → Fin 2) :
-    (1 / (4 * (Real.pi : ℂ))) *
-      ∫ φ in (0 : ℝ)..(2 * Real.pi),
-        ∫ θ in (0 : ℝ)..Real.pi,
-          ((Real.sin θ : ℂ) *
-            ((totalSpinHalfRot3 (Fin 2) φ * totalSpinHalfRot2 (Fin 2) θ).mulVec
-              (basisVec upDown)) τ) =
-    (1 / 2 : ℂ) * (basisVec upDown τ - basisVec (basisSwap upDown (0 : Fin 2) 1) τ) :=
-  problem_2_2_c τ
+/-- Red pin: `twoSiteSinglet` on the `upDown` configuration equals `(√2)⁻¹` (Tasaki App. A.3.3,
+eq. (A.3.23), p. 474). Distinguishes the `(√2)⁻¹` normalisation from `1/2` (mutation M11). -/
+example : twoSiteSinglet upDown = ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ := sorry
+
+/-- Red pin: `twoSiteSinglet` on the swapped configuration equals `-(√2)⁻¹` (the singlet's
+antisymmetric sign; distinguishes from the triplet's `+(√2)⁻¹` pin below, mutation M10). -/
+example : twoSiteSinglet (basisSwap upDown (0 : Fin 2) 1) = -(((Real.sqrt 2 : ℝ) : ℂ)⁻¹) := sorry
+
+/-- Red pin: `twoSiteSinglet` vanishes on the all-up configuration (non-vacuity control:
+the singlet has no support on `|↑↑⟩`). -/
+example : twoSiteSinglet (fun _ : Fin 2 => (0 : Fin 2)) = 0 := sorry
+
+/-- Red pin: `twoSiteTripletZero` on `upDown` equals `(√2)⁻¹` (Tasaki App. A.3.3, eq. (A.3.22),
+p. 474). -/
+example : twoSiteTripletZero upDown = ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ := sorry
+
+/-- Red pin: `twoSiteTripletZero` on the swapped configuration equals `+(√2)⁻¹` (the triplet's
+symmetric sign, distinguishing it from `twoSiteSinglet` at the same configuration). -/
+example : twoSiteTripletZero (basisSwap upDown (0 : Fin 2) 1) = ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ := sorry
+
+/-- Red pin: `twoSiteTripletZero` is non-zero on `upDown` (non-vacuity control: the definition
+is not the zero function). -/
+example : twoSiteTripletZero upDown ≠ 0 := sorry
+
+/-- Red pin (θ-integral helper for eq. (2.2.15)): `∫ θ in 0..π, sin θ · cos(θ/2) · sin(θ/2) = π/4`.
+Distinguishes `π/4` from `π/8` (mutation M1) via `Real.sin_two_mul` and `integral_sin_sq`. -/
+example :
+    ∫ θ in (0 : ℝ)..Real.pi, Real.sin θ * (Real.cos (θ / 2) * Real.sin (θ / 2)) = Real.pi / 4 :=
+  integral_sin_mul_cos_half_mul_sin_half_zero_pi
+
+/-- Red pin: full signature of eq. (2.2.14) restated on the renamed declaration, as the printed
+chain of equalities — the SU(2)-averaged `|↑↓⟩` state (component form, stated on the exponential
+rotations rather than the closed `totalSpinHalfRot*` form) equals the unnormalised singlet
+combination, which in turn equals `(√2)⁻¹ • twoSiteSinglet` (Tasaki §2.2, eq. (2.2.14), p. 23,
+first display of Problem 2.2.b; App. A.3.3, eq. (A.3.23), p. 474). Distinguishes the prefactor
+`1/(4π)` from `1/(2π)` (mutation M3) and the `-` combination from `+` (mutation M2). -/
+example :
+    (∀ τ : Fin 2 → Fin 2,
+      (1 / (4 * (Real.pi : ℂ))) * ∫ φ in (0 : ℝ)..(2 * Real.pi), ∫ θ in (0 : ℝ)..Real.pi,
+        ((Real.sin θ : ℂ) *
+          ((NormedSpace.exp ((-(Complex.I * (φ : ℂ))) • totalSpinHalfOp3 (Fin 2)) *
+              NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp2 (Fin 2))).mulVec
+            (basisVec upDown)) τ) =
+        ((1 / 2 : ℂ) • (basisVec upDown - basisVec (basisSwap upDown (0 : Fin 2) 1))) τ) ∧
+    (1 / 2 : ℂ) • (basisVec upDown - basisVec (basisSwap upDown (0 : Fin 2) 1)) =
+      ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ • twoSiteSinglet :=
+  tasaki_problem_2_2_b_upDown_average
+
+/-- Red pin: positive control instantiating the eq. (2.2.14) component chain at
+`τ = basisSwap upDown 0 1`, i.e. `|↓↑⟩`: the averaged coefficient is `-1/2` (distinguishes the
+sign, mutation M2, and the value from the `+π/8` value of the eq. (2.2.15) analogue below). -/
+example :
+    (1 / (4 * (Real.pi : ℂ))) * ∫ φ in (0 : ℝ)..(2 * Real.pi), ∫ θ in (0 : ℝ)..Real.pi,
+      ((Real.sin θ : ℂ) *
+        ((NormedSpace.exp ((-(Complex.I * (φ : ℂ))) • totalSpinHalfOp3 (Fin 2)) *
+            NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp2 (Fin 2))).mulVec
+          (basisVec upDown)) (basisSwap upDown (0 : Fin 2) 1)) =
+    (-(1 / 2) : ℂ) :=
+  (tasaki_problem_2_2_b_upDown_average.1 (basisSwap upDown (0 : Fin 2) 1)).trans (by
+    simp [upDown, basisSwap])
+
+/-- Red pin: full signature of eq. (2.2.15) — the SU(2)-averaged `|↑↑⟩` state equals the
+unnormalised `Φ_{1,0}` combination times `π/8`, which in turn equals a `twoSiteTripletZero`
+multiple, and `twoSiteTripletZero` is not SU(2)-invariant (Tasaki §2.2, eq. (2.2.15), p. 23,
+second display of Problem 2.2.b; App. A.3.3, eq. (A.3.22), p. 474; invariance witness at axis 2,
+θ = π). Distinguishes `π/8` from `π/4` (mutation M1) and the non-invariance predicate's negation
+from an unnegated (false) universal claim (mutation M14). -/
+example :
+    (∀ τ : Fin 2 → Fin 2, (1 / (4 * (Real.pi : ℂ))) *
+      ∫ φ in (0 : ℝ)..(2 * Real.pi), ∫ θ in (0 : ℝ)..Real.pi,
+        ((Real.sin θ : ℂ) *
+          ((NormedSpace.exp ((-(Complex.I * (φ : ℂ))) • totalSpinHalfOp3 (Fin 2)) *
+              NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp2 (Fin 2))).mulVec
+            (basisVec (fun _ : Fin 2 => (0 : Fin 2)))) τ) =
+        (((Real.pi : ℂ) / 8) • (basisVec upDown + basisVec (basisSwap upDown (0 : Fin 2) 1))) τ) ∧
+    ((Real.pi : ℂ) / 8) • (basisVec upDown + basisVec (basisSwap upDown (0 : Fin 2) 1)) =
+      ((Real.pi : ℂ) / (4 * ((Real.sqrt 2 : ℝ) : ℂ))) • twoSiteTripletZero ∧
+    ¬ ∀ (α : Fin 3) (θ : ℝ),
+      (NormedSpace.exp ((-(Complex.I * (θ : ℂ))) •
+          ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] α)).mulVec
+        twoSiteTripletZero = twoSiteTripletZero :=
+  tasaki_problem_2_2_b_upUp_average
+
+/-- Red pin: positive control instantiating the eq. (2.2.15) component chain at `τ = upDown`:
+the averaged coefficient is `+π/8` (distinguishes from `0`, the value at `τ = fun _ => 0` below,
+and from the `-1/2` value of eq. (2.2.14) at the swapped configuration above). -/
+example :
+    (1 / (4 * (Real.pi : ℂ))) * ∫ φ in (0 : ℝ)..(2 * Real.pi), ∫ θ in (0 : ℝ)..Real.pi,
+      ((Real.sin θ : ℂ) *
+        ((NormedSpace.exp ((-(Complex.I * (φ : ℂ))) • totalSpinHalfOp3 (Fin 2)) *
+            NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp2 (Fin 2))).mulVec
+          (basisVec (fun _ : Fin 2 => (0 : Fin 2)))) upDown) =
+    ((Real.pi : ℂ) / 8) :=
+  (tasaki_problem_2_2_b_upUp_average.1 upDown).trans (by simp [upDown, basisSwap])
+
+/-- Red pin: positive control instantiating the eq. (2.2.15) component chain at
+`τ = fun _ => 0`, i.e. `|↑↑⟩` itself: the averaged coefficient is `0` (distinguishes the vanishing
+diagonal component from the off-diagonal `π/8` value pinned above, mutation M9). -/
+example :
+    (1 / (4 * (Real.pi : ℂ))) * ∫ φ in (0 : ℝ)..(2 * Real.pi), ∫ θ in (0 : ℝ)..Real.pi,
+      ((Real.sin θ : ℂ) *
+        ((NormedSpace.exp ((-(Complex.I * (φ : ℂ))) • totalSpinHalfOp3 (Fin 2)) *
+            NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp2 (Fin 2))).mulVec
+          (basisVec (fun _ : Fin 2 => (0 : Fin 2)))) (fun _ : Fin 2 => (0 : Fin 2))) =
+    (0 : ℂ) :=
+  (tasaki_problem_2_2_b_upUp_average.1 (fun _ : Fin 2 => (0 : Fin 2))).trans (by
+    simp [upDown, basisSwap])
+
+/-- Red pin (θ = 0 control on the non-invariance predicate, all three axes): at `θ = 0` every
+axis rotation acts as the identity on `twoSiteTripletZero`, so the negated claim
+`¬ ∀ α θ, …` would be vacuously refuted if the predicate's `∀ θ` quantifier were narrowed to
+exclude `θ = 0`, or if `NormedSpace.exp` at the zero exponent failed to reduce to `1`. This
+positive control shows the θ = 0 instance holds unconditionally, so the theorem's non-invariance
+must come from a genuine non-identity instance (mutation M15/M16 guard). -/
+example (α : Fin 3) :
+    (NormedSpace.exp ((-(Complex.I * ((0 : ℝ) : ℂ))) •
+        ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] α)).mulVec
+      twoSiteTripletZero = twoSiteTripletZero := by
+  simp
 
 /-! ## D. Characterization pins for the global spin-1/2 rotation family
 
