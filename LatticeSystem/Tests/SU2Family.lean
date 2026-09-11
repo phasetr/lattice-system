@@ -80,29 +80,35 @@ helper `integral_sin_mul_cos_half_mul_sin_half_zero_pi` are unimplemented at thi
 pin below must fail with `unknown identifier` (or `unknown constant`), never with an import or
 elaboration error of any other kind. -/
 
-/-- Red pin: `twoSiteSinglet` on the `upDown` configuration equals `(√2)⁻¹` (Tasaki App. A.3.3,
+/-- Pin: `twoSiteSinglet` on the `upDown` configuration equals `(√2)⁻¹` (Tasaki App. A.3.3,
 eq. (A.3.23), p. 474). Distinguishes the `(√2)⁻¹` normalisation from `1/2` (mutation M11). -/
-example : twoSiteSinglet upDown = ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ := sorry
+example : twoSiteSinglet upDown = ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ := by
+  simp [twoSiteSinglet, basisVec, basisSwap_upDown, funext_iff, Fin.forall_fin_two, upDown]
 
-/-- Red pin: `twoSiteSinglet` on the swapped configuration equals `-(√2)⁻¹` (the singlet's
+/-- Pin: `twoSiteSinglet` on the swapped configuration equals `-(√2)⁻¹` (the singlet's
 antisymmetric sign; distinguishes from the triplet's `+(√2)⁻¹` pin below, mutation M10). -/
-example : twoSiteSinglet (basisSwap upDown (0 : Fin 2) 1) = -(((Real.sqrt 2 : ℝ) : ℂ)⁻¹) := sorry
+example : twoSiteSinglet (basisSwap upDown (0 : Fin 2) 1) = -(((Real.sqrt 2 : ℝ) : ℂ)⁻¹) := by
+  simp [twoSiteSinglet, basisVec, basisSwap_upDown, funext_iff, Fin.forall_fin_two, upDown]
 
-/-- Red pin: `twoSiteSinglet` vanishes on the all-up configuration (non-vacuity control:
+/-- Pin: `twoSiteSinglet` vanishes on the all-up configuration (non-vacuity control:
 the singlet has no support on `|↑↑⟩`). -/
-example : twoSiteSinglet (fun _ : Fin 2 => (0 : Fin 2)) = 0 := sorry
+example : twoSiteSinglet (fun _ : Fin 2 => (0 : Fin 2)) = 0 := by
+  simp [twoSiteSinglet, basisVec, basisSwap_upDown, funext_iff, Fin.forall_fin_two, upDown]
 
-/-- Red pin: `twoSiteTripletZero` on `upDown` equals `(√2)⁻¹` (Tasaki App. A.3.3, eq. (A.3.22),
+/-- Pin: `twoSiteTripletZero` on `upDown` equals `(√2)⁻¹` (Tasaki App. A.3.3, eq. (A.3.22),
 p. 474). -/
-example : twoSiteTripletZero upDown = ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ := sorry
+example : twoSiteTripletZero upDown = ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ := by
+  simp [twoSiteTripletZero, basisVec, basisSwap_upDown, funext_iff, Fin.forall_fin_two, upDown]
 
-/-- Red pin: `twoSiteTripletZero` on the swapped configuration equals `+(√2)⁻¹` (the triplet's
+/-- Pin: `twoSiteTripletZero` on the swapped configuration equals `+(√2)⁻¹` (the triplet's
 symmetric sign, distinguishing it from `twoSiteSinglet` at the same configuration). -/
-example : twoSiteTripletZero (basisSwap upDown (0 : Fin 2) 1) = ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ := sorry
+example : twoSiteTripletZero (basisSwap upDown (0 : Fin 2) 1) = ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ := by
+  simp [twoSiteTripletZero, basisVec, basisSwap_upDown, funext_iff, Fin.forall_fin_two, upDown]
 
-/-- Red pin: `twoSiteTripletZero` is non-zero on `upDown` (non-vacuity control: the definition
+/-- Pin: `twoSiteTripletZero` is non-zero on `upDown` (non-vacuity control: the definition
 is not the zero function). -/
-example : twoSiteTripletZero upDown ≠ 0 := sorry
+example : twoSiteTripletZero upDown ≠ 0 := by
+  simp [twoSiteTripletZero, basisVec, basisSwap_upDown, funext_iff, Fin.forall_fin_two, upDown]
 
 /-- Red pin (θ-integral helper for eq. (2.2.15)): `∫ θ in 0..π, sin θ · cos(θ/2) · sin(θ/2) = π/4`.
 Distinguishes `π/4` from `π/8` (mutation M1) via `Real.sin_two_mul` and `integral_sin_sq`. -/

@@ -2,6 +2,7 @@ import LatticeSystem.Quantum.SU2
 import LatticeSystem.Quantum.ManyBody
 import LatticeSystem.Quantum.TotalSpin
 import LatticeSystem.Quantum.SpinDot
+import LatticeSystem.Quantum.SpinDot.TwoSpinStates
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 
