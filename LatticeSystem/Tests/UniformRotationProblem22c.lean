@@ -13,18 +13,29 @@ capstone shim, until the module is implemented.
   existing) capstone name, pinning every hypothesis/conclusion shape — the admissible class as a
   `Submonoid.closure` of the exponential global rotations, the same-`n` hypothesis at both sites,
   the pairwise conclusion.
-* **PC1a/PC1b** non-vacuity: two distinct class members with the same `n = e₃` (`U = 1`,
-  `V = exp(−iπ Ŝ_tot^{(3)})`) belong to the admissible class, so the capstone's conclusion is not
-  vacuously true of an empty relation.
+* **PC1a/PC1b** class membership only: `U = 1` and `V = exp(−iπ Ŝ_tot^{(3)})` are two distinct
+  members of the footnote-16 admissible class for `n = e₃`. Neither control proves that its member
+  satisfies the capstone's same-`n` conjugation hypothesis, so PC1a/PC1b alone do not exercise the
+  capstone's premises on a distinct pair.
 * **PC2** the value `V.mulVec |↑↓⟩ = |↑↓⟩`, computed independently of the capstone from the
-  two-site `π`-rotation entries directly, confirming the value the capstone must reproduce.
+  two-site `π`-rotation entries directly, so the value is available if `V` is ever paired with an
+  admissible `U` shown to satisfy the same conjugation hypothesis.
 * **NC1** widening the target vector to `|↑↑⟩` (`M_tot ≠ 0`) makes the analogous statement false:
   `V = exp(−iπ Ŝ_tot^{(3)})` sends `|↑↑⟩` to `−|↑↑⟩`, so the same-`n` rotation class does *not*
   fix every vector — the target `|↑↓⟩` (`M_tot = 0`) is load-bearing.
 * **NC2** widening the admissible class from the footnote-16 closure to all of
   `unitary (ManyBodyOp (Fin 2))` makes the statement false: `U = 1` and `V = −1` are both unitary,
   both act as scalars (hence commute with every `Ŝ_x^{(3)}`, satisfying the conjugation hypothesis
-  vacuously with `n = e₃`), yet `V` sends `|↑↓⟩` to `−|↑↓⟩ ≠ |↑↓⟩`.
+  vacuously with `n = e₃`), yet `V` sends `|↑↓⟩` to `−|↑↓⟩ ≠ |↑↓⟩`. NC2's internal witness for `U`
+  is the only place in this file where the conjugation hypothesis itself (not just class
+  membership) is checked, and it is checked for the scalar `U = 1` under the widened class, not for
+  a nontrivial rotation inside the footnote-16 closure.
+
+The only instance of the capstone's premises exercised anywhere in this file — class membership
+plus the conjugation hypothesis, both checked, for a matching `U, V` pair — is the trivial diagonal
+pair `U = V = 1` (membership from PC1a, hypothesis from a proof of the same shape as NC2's `hUhyp`).
+No control here joins the conjugation hypothesis to a *distinct* class member such as PC1b's `V`;
+that two-distinct-rotation case rests on the capstone's own proof, not on a pinned control.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §2.2, Problem 2.2.c, pp. 23-24 (footnote 16, p. 23; footnote 17, p. 24; solution p. 496,
@@ -64,8 +75,10 @@ example : (1 : ManyBodyOp (Fin 2)) ∈ Submonoid.closure (Set.range fun p : Fin 
         ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] p.1)) :=
   one_mem _
 
-/-- PC1b: `V = exp(−iπ Ŝ_tot^{(3)})` is an admissible rotation for the same `n = ![0, 0, 1]`
-(a generator of the footnote-16 class, axis `α = 2` i.e. the book's axis `3`, angle `θ = π`). -/
+/-- PC1b: `V = exp(−iπ Ŝ_tot^{(3)})` is a member of the footnote-16 admissible class for
+`n = ![0, 0, 1]` (a generator of the class, axis `α = 2` i.e. the book's axis `3`, angle `θ = π`).
+This proves only class membership, not that `V` satisfies the capstone's same-`n` conjugation
+hypothesis. -/
 example : NormedSpace.exp ((-(Complex.I * ((Real.pi : ℝ) : ℂ))) •
       ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] (2 : Fin 3))
     ∈ Submonoid.closure (Set.range fun p : Fin 3 × ℝ =>
@@ -73,8 +86,10 @@ example : NormedSpace.exp ((-(Complex.I * ((Real.pi : ℝ) : ℂ))) •
         ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] p.1)) :=
   Submonoid.subset_closure ⟨(2, Real.pi), rfl⟩
 
-/-- PC2: the value the capstone must reproduce at `n = e₃`, computed independently of the
-capstone, from the two-site `π`-rotation entries directly: `V.mulVec |↑↓⟩ = |↑↓⟩`. -/
+/-- PC2: the value `V = exp(−iπ Ŝ_tot^{(3)})` gives on `|↑↓⟩`, computed independently of the
+capstone from the two-site `π`-rotation entries directly: `V.mulVec |↑↓⟩ = |↑↓⟩`. This value is the
+one the capstone would have to reproduce for `V` if `V` were paired with an admissible `U`
+satisfying the same conjugation hypothesis; that pairing is not checked here (see PC1b). -/
 example : NormedSpace.exp ((-(Complex.I * ((Real.pi : ℝ) : ℂ))) •
       totalSpinHalfOp3 (Fin 2)) *ᵥ basisVec upDown = basisVec upDown := by
   rw [← totalSpinHalfRot3_eq_exp, totalSpinHalfRot3_two_site]
