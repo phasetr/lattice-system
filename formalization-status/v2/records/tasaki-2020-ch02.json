@@ -184,6 +184,58 @@
     },
     {
       "axiom_dependencies": [],
+      "capstone": true,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-problem-2-2-b-updown-average",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.tasaki_problem_2_2_b_upDown_average",
+      "lifecycle": "active",
+      "module": "LatticeSystem.Quantum.SU2Integral",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "retirement": null,
+      "source_coverage": "complete",
+      "source_path": "LatticeSystem/Quantum/SU2Integral.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-problem-2-2-b"
+        }
+      ],
+      "summary": "Tasaki Problem 2.2.b, eq. (2.2.14), p. 23, the first display: the SU(2)-averaged two-site state (1/4*pi) * integral over phi in [0,2*pi], theta in [0,pi] of sin(theta) * (U^(3)_phi U^(2)_theta) applied to |up_1 down_2> equals (1/2)(|up_1 down_2> - |down_1 up_2>), stated component-wise at every configuration tau, where U^(alpha)_theta = exp(-i*theta*S_tot^(alpha)) as in eq. (2.2.11), p. 22; the second conjunct identifies this result with (1/sqrt(2))|Phi_{0,0}>, the two-site singlet twoSiteSinglet of Appendix A.3.3, eq. (A.3.23), p. 474. The coverage of the source item is complete for this display.",
+      "topic_ids": [
+        "quantum-spin"
+      ],
+      "trust_state": "axiom_free"
+    },
+    {
+      "axiom_dependencies": [],
+      "capstone": true,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-problem-2-2-b-upup-average",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.tasaki_problem_2_2_b_upUp_average",
+      "lifecycle": "active",
+      "module": "LatticeSystem.Quantum.SU2Integral",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "retirement": null,
+      "source_coverage": "complete",
+      "source_path": "LatticeSystem/Quantum/SU2Integral.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-problem-2-2-b"
+        }
+      ],
+      "summary": "Tasaki Problem 2.2.b, eq. (2.2.15), p. 23, the second display: the SU(2)-averaged two-site state (1/4*pi) * integral over phi in [0,2*pi], theta in [0,pi] of sin(theta) * (U^(3)_phi U^(2)_theta) applied to |up_1 up_2> equals (pi/8)(|up_1 down_2> + |down_1 up_2>), stated component-wise at every configuration tau, where U^(alpha)_theta = exp(-i*theta*S_tot^(alpha)) as in eq. (2.2.11), p. 22; the second conjunct identifies this result with (pi/(4*sqrt(2)))|Phi_{1,0}>, the two-site triplet-zero state twoSiteTripletZero of Appendix A.3.3, eq. (A.3.22), p. 474; the third conjunct proves that |Phi_{1,0}> is not fixed by every rotation exp(-i*theta*S_tot^(alpha)), witnessed at axis 2, theta = pi. The coverage of the source item is complete for this display.",
+      "topic_ids": [
+        "quantum-spin"
+      ],
+      "trust_state": "axiom_free"
+    },
+    {
+      "axiom_dependencies": [],
       "capstone": false,
       "declaration_kind": "theorem",
       "id": "tasaki-2020-section-2-1-pauli-x-involutive",

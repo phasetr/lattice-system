@@ -95,6 +95,12 @@ single-site closed forms of Tasaki eq. (2.1.34) / Problem 2.1.g, p. 20
 `spinSPiRotation2_eq_exp_spinSOp2`) and the many-body lift of eq. (2.2.11), p. 22
 (`manyBodySPiRotation_eq_exp`, `Quantum/SpinS/ManyBodyPiRotationExp.lean`), and so reports the
 coverage of Problem 2.2.a as complete.)
+(Applied once more for the `problem_2_2_c` row of
+`docs/formalization/legacy/12-basis-states-and-raising-lowering-for-s-1-tasaki-2-1.md`, renamed to
+`tasaki_problem_2_2_b_upDown_average` now that the theorem's own name matches what it proves, and
+whose closing sentence now names the sibling theorem `tasaki_problem_2_2_b_upUp_average` of the
+same file, which formalizes eq. (2.2.15), the second display of Problem 2.2.b, so the earlier
+"Neither eq. (2.2.15) nor Problem 2.2.c is formalized" no longer holds.)
 Recomputing a pin is never on its own an
 authorization for what moved: the legacy pages still have to be edited to match, and the
 catalogue-row comparison is what proves they do. What the pins buy is that a change to the
@@ -192,12 +198,12 @@ LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
 CATALOGUE_BASELINE_SLICE = slice(216, 2731)
 # Pins the published catalogue text; this module's docstring records exactly what is hashed
 # and how the pin is legitimately updated.
-APPROVED_CHANGES_SHA256 = "0f8a449a91500802204619fd5fa2b1149756d0167e668ceb0efecd5cec0a8ef8"
+APPROVED_CHANGES_SHA256 = "9ca69850a3453dd19c5fbee4a1f52438444d195856c9f42fcea8256b5c6d5b9a"
 # Pins the row sequence `main()` actually compares the legacy pages against. The text pin above
 # does not reach it: the rows are derived from the transformed text by `table_data_rows`, which
 # is outside the pinned text, so without this pin a row skipped there would go unpublished with
 # the text pin undisturbed.
-PUBLISHED_ROWS_SHA256 = "9883d75e0fe7c060b211b5a40be7f73d16174613669e921bcf45679dbd6ae35b"
+PUBLISHED_ROWS_SHA256 = "fc8e4f473cf5331672e5dd6705d7f0b8fcdca2b7f0744898c371249136e8f12e"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -1618,6 +1624,26 @@ def _approved_replacements(text: str) -> str:
             "(`Quantum/SpinS/ManyBodyPiRotationExp.lean`), so the coverage of Problem 2.2.a "
             "is complete |",
         )
+        # `problem_2_2_c` is renamed to `tasaki_problem_2_2_b_upDown_average`, so the row's own
+        # "declaration name is a mislabel" clause no longer applies; and eq. (2.2.15), the second
+        # display of Problem 2.2.b, is now also formalized, as the sibling theorem
+        # `tasaki_problem_2_2_b_upUp_average` of the same file, so the row's closing sentence is
+        # updated in place of the earlier "Neither eq. (2.2.15) nor Problem 2.2.c is formalized".
+        .replace(
+            "| `problem_2_2_c` | **Main theorem** (Tasaki §2.2, eq. (2.2.14), p. 23 — the first "
+            "display of Problem 2.2.b; the declaration name is a mislabel): `(1/4π) ∫₀^{2π} dφ "
+            "∫₀^π dθ sin θ · (Û^(3)_φ Û^(2)_θ \\|↑₁↓₂⟩)_τ = (1/2) (\\|↑₁↓₂⟩ − \\|↓₁↑₂⟩)_τ`, "
+            "stated component-wise for each configuration `τ`. The SU(2)-averaged two-site state "
+            "is the spin singlet. Neither eq. (2.2.15) nor Problem 2.2.c is formalized. | "
+            "`Quantum/SU2Integral.lean` |",
+            "| `tasaki_problem_2_2_b_upDown_average` | **Main theorem** (Tasaki §2.2, eq. "
+            "(2.2.14), p. 23 — the first display of Problem 2.2.b): `(1/4π) ∫₀^{2π} dφ "
+            "∫₀^π dθ sin θ · (Û^(3)_φ Û^(2)_θ \\|↑₁↓₂⟩)_τ = (1/2) (\\|↑₁↓₂⟩ − \\|↓₁↑₂⟩)_τ`, "
+            "stated component-wise for each configuration `τ`. The SU(2)-averaged two-site state "
+            "is the spin singlet, `(1/√2)|Φ_{0,0}⟩`. eq. (2.2.15) is the sibling theorem "
+            "`tasaki_problem_2_2_b_upUp_average` in the same file; Problem 2.2.c is not "
+            "formalized. | `Quantum/SU2Integral.lean` |",
+        )
     )
 
 
@@ -1682,12 +1708,12 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "a5f45afdd648a3ee1eb00f60ca93ce393999e11118b90ed3bf9a4a7ff861094c"
+SCRIPT_SOURCE_SHA256 = "05040c18f38d6dfd89df6cb32fa8e14f10f7de3ec049d32eacbe191fd5c6a302"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
-APPROVED_ENTRIES_SHA256 = "da13c39b407907bcbfc3133c877997d0070157483bf16d437f08b04c0b4c0f31"
+APPROVED_ENTRIES_SHA256 = "0c7cf5ceefa47e7382d3db3f0f605b2952ebfa6737a03b0d57a1db048375454b"
 
 # The only text `SCRIPT_SOURCE_SHA256` does not hash: the digits these four pins carry. Each is
 # restated by the very edit it pins, and a digest over its own value would have no fixed point.

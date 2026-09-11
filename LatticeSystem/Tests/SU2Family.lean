@@ -77,12 +77,12 @@ non-SU(2)-invariance of `twoSiteTripletZero` (App. A.3.3 eq. (A.3.22)). The θ-i
 alongside. -/
 
 /-- Pin: `twoSiteSinglet` on the `upDown` configuration equals `(√2)⁻¹` (Tasaki App. A.3.3,
-eq. (A.3.23), p. 474). Distinguishes the `(√2)⁻¹` normalisation from `1/2` (mutation M11). -/
+eq. (A.3.23), p. 474). Distinguishes the `(√2)⁻¹` normalisation from `1/2`. -/
 example : twoSiteSinglet upDown = ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ := by
   simp [twoSiteSinglet, basisVec, basisSwap_upDown, funext_iff, Fin.forall_fin_two, upDown]
 
 /-- Pin: `twoSiteSinglet` on the swapped configuration equals `-(√2)⁻¹` (the singlet's
-antisymmetric sign; distinguishes from the triplet's `+(√2)⁻¹` pin below, mutation M10). -/
+antisymmetric sign; distinguishes from the triplet's `+(√2)⁻¹` pin below). -/
 example : twoSiteSinglet (basisSwap upDown (0 : Fin 2) 1) = -(((Real.sqrt 2 : ℝ) : ℂ)⁻¹) := by
   simp [twoSiteSinglet, basisVec, basisSwap_upDown, funext_iff, Fin.forall_fin_two, upDown]
 
@@ -107,7 +107,7 @@ example : twoSiteTripletZero upDown ≠ 0 := by
   simp [twoSiteTripletZero, basisVec, basisSwap_upDown, funext_iff, Fin.forall_fin_two, upDown]
 
 /-- Pin (θ-integral helper for eq. (2.2.15)): `∫ θ in 0..π, sin θ · cos(θ/2) · sin(θ/2) = π/4`.
-Distinguishes `π/4` from `π/8` (mutation M1) via `Real.sin_two_mul` and `integral_sin_sq`. -/
+Distinguishes `π/4` from `π/8` via `Real.sin_two_mul` and `integral_sin_sq`. -/
 example :
     ∫ θ in (0 : ℝ)..Real.pi, Real.sin θ * (Real.cos (θ / 2) * Real.sin (θ / 2)) = Real.pi / 4 :=
   integral_sin_mul_cos_half_mul_sin_half_zero_pi
@@ -117,7 +117,7 @@ chain of equalities — the SU(2)-averaged `|↑↓⟩` state (component form, s
 rotations rather than the closed `totalSpinHalfRot*` form) equals the unnormalised singlet
 combination, which in turn equals `(√2)⁻¹ • twoSiteSinglet` (Tasaki §2.2, eq. (2.2.14), p. 23,
 first display of Problem 2.2.b; App. A.3.3, eq. (A.3.23), p. 474). Distinguishes the prefactor
-`1/(4π)` from `1/(2π)` (mutation M3) and the `-` combination from `+` (mutation M2). -/
+`1/(4π)` from `1/(2π)` and the `-` combination from `+`. -/
 example :
     (∀ τ : Fin 2 → Fin 2,
       (1 / (4 * (Real.pi : ℂ))) * ∫ φ in (0 : ℝ)..(2 * Real.pi), ∫ θ in (0 : ℝ)..Real.pi,
@@ -132,7 +132,7 @@ example :
 
 /-- Pin: positive control instantiating the eq. (2.2.14) component chain at
 `τ = basisSwap upDown 0 1`, i.e. `|↓↑⟩`: the averaged coefficient is `-1/2` (distinguishes the
-sign, mutation M2, and the value from the `+π/8` value of the eq. (2.2.15) analogue below). -/
+sign and the value from the `+π/8` value of the eq. (2.2.15) analogue below). -/
 example :
     (1 / (4 * (Real.pi : ℂ))) * ∫ φ in (0 : ℝ)..(2 * Real.pi), ∫ θ in (0 : ℝ)..Real.pi,
       ((Real.sin θ : ℂ) *
@@ -147,8 +147,8 @@ example :
 unnormalised `Φ_{1,0}` combination times `π/8`, which in turn equals a `twoSiteTripletZero`
 multiple, and `twoSiteTripletZero` is not SU(2)-invariant (Tasaki §2.2, eq. (2.2.15), p. 23,
 second display of Problem 2.2.b; App. A.3.3, eq. (A.3.22), p. 474; invariance witness at axis 2,
-θ = π). Distinguishes `π/8` from `π/4` (mutation M1) and the non-invariance predicate's negation
-from an unnegated (false) universal claim (mutation M14). -/
+θ = π). Distinguishes `π/8` from `π/4` and the non-invariance predicate's negation
+from an unnegated (false) universal claim. -/
 example :
     (∀ τ : Fin 2 → Fin 2, (1 / (4 * (Real.pi : ℂ))) *
       ∫ φ in (0 : ℝ)..(2 * Real.pi), ∫ θ in (0 : ℝ)..Real.pi,
@@ -180,7 +180,7 @@ example :
 
 /-- Pin: positive control instantiating the eq. (2.2.15) component chain at
 `τ = fun _ => 0`, i.e. `|↑↑⟩` itself: the averaged coefficient is `0` (distinguishes the vanishing
-diagonal component from the off-diagonal `π/8` value pinned above, mutation M9). -/
+diagonal component from the off-diagonal `π/8` value pinned above). -/
 example :
     (1 / (4 * (Real.pi : ℂ))) * ∫ φ in (0 : ℝ)..(2 * Real.pi), ∫ θ in (0 : ℝ)..Real.pi,
       ((Real.sin θ : ℂ) *
@@ -196,7 +196,7 @@ axis rotation acts as the identity on `twoSiteTripletZero`, so the negated claim
 `¬ ∀ α θ, …` would be vacuously refuted if the predicate's `∀ θ` quantifier were narrowed to
 exclude `θ = 0`, or if `NormedSpace.exp` at the zero exponent failed to reduce to `1`. This
 positive control shows the θ = 0 instance holds unconditionally, so the theorem's non-invariance
-must come from a genuine non-identity instance (mutation M15/M16 guard). -/
+must come from a genuine non-identity instance. -/
 example (α : Fin 3) :
     (NormedSpace.exp ((-(Complex.I * ((0 : ℝ) : ℂ))) •
         ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] α)).mulVec
