@@ -192,11 +192,10 @@ example :
     simp [basisVec, basisSwap_upDown, funext_iff, Fin.forall_fin_two, upDown])
 
 /-- Pin (θ = 0 control on the non-invariance predicate, all three axes): at `θ = 0` every
-axis rotation acts as the identity on `twoSiteTripletZero`. This is what the non-invariance
-conjunct guards against: it must not be trivially true because `NormedSpace.exp` at the zero
-exponent fails to reduce to `1`. This positive control shows the θ = 0 instance holds
-unconditionally for every axis, so the theorem's non-invariance must come from a genuine
-non-identity instance. -/
+axis rotation fixes `twoSiteTripletZero`. Since the non-invariance conjunct is a `¬∀θ, ...`
+statement, this control guards against it being trivially true for a spurious reason: it
+confirms that any witness `θ` establishing non-invariance must be nonzero, because `θ = 0`
+already yields the identity action on `twoSiteTripletZero` for every axis. -/
 example (α : Fin 3) :
     (NormedSpace.exp ((-(Complex.I * ((0 : ℝ) : ℂ))) •
         ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] α)).mulVec
