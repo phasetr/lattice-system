@@ -475,4 +475,27 @@ theorem tasaki_problem_2_2_b_upDown_average :
       intervalIntegral.integral_const_mul _ _
     rw [this, integral_cexp_I_mul_zero_two_pi, mul_zero]
 
+/-! ## The SU(2)-averaged `|↑↑⟩` state (eq. (2.2.15))
+
+The SU(2)-averaged state `(1/4π) ∫₀²π dφ ∫₀π dθ sin θ · Û(φ,θ)|↑↑⟩` equals
+`(π/8)(|↑↓⟩ + |↓↑⟩) = (π/(4√2))|Φ_{1,0}⟩`, and `|Φ_{1,0}⟩` is not SU(2) invariant. This is
+Tasaki *Physics and Mathematics of Quantum Many-Body Systems*, §2.2, eq. (2.2.15), p. 23, the
+second display of Problem 2.2.b. -/
+
+/-- Expand the integrand of eq. (2.2.15): the component of the rotated all-up state at the
+configuration `τ` is the product of the entries of `Û^(3)_φ Û^(2)_θ |↑⟩` (Tasaki, *Physics and
+Mathematics of Quantum Many-Body Systems*, Problem 2.1.d, p. 18, and solution (S.5), p. 494) at
+`τ 0` and at `τ 1`. -/
+private theorem totalRot_mulVec_upUp_component (θ φ : ℝ) (τ : Fin 2 → Fin 2) :
+    ((totalSpinHalfRot3 (Fin 2) φ * totalSpinHalfRot2 (Fin 2) θ).mulVec
+      (basisVec (fun _ : Fin 2 => (0 : Fin 2)))) τ =
+    (![Complex.exp (-(Complex.I * (φ : ℂ) / 2)) * (Real.cos (θ / 2) : ℂ),
+       Complex.exp (Complex.I * (φ : ℂ) / 2) * (Real.sin (θ / 2) : ℂ)] (τ 0)) *
+    (![Complex.exp (-(Complex.I * (φ : ℂ) / 2)) * (Real.cos (θ / 2) : ℂ),
+       Complex.exp (Complex.I * (φ : ℂ) / 2) * (Real.sin (θ / 2) : ℂ)] (τ 1)) := by
+  rw [totalRot32_two_site, onSite_zero_mul_one_mulVec_basisVec,
+    matrix_col0_eq_mulVec_up (spinHalfRot3 φ * spinHalfRot2 θ) (τ 0),
+    matrix_col0_eq_mulVec_up (spinHalfRot3 φ * spinHalfRot2 θ) (τ 1),
+    spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp]
+
 end LatticeSystem.Quantum
