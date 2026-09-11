@@ -2,6 +2,7 @@ import LatticeSystem.Quantum.SU2
 import LatticeSystem.Quantum.ManyBody
 import LatticeSystem.Quantum.TotalSpin
 import LatticeSystem.Quantum.SpinDot
+import LatticeSystem.Quantum.SpinDot.TwoSpinStates
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 
@@ -9,15 +10,18 @@ import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 # Trig-integral helpers for the SU(2)-averaged two-site state
 
 Concrete trig-integral evaluations needed for the SU(2)-averaged-state
-computation (Tasaki §2.2, eq. (2.2.14), p. 23 — the first display of
-Problem 2.2.b). These are proved using mathlib's `intervalIntegral`
+computations (Tasaki §2.2, eqs. (2.2.14) and (2.2.15), p. 23 — the two
+displays of Problem 2.2.b). These are proved using mathlib's `intervalIntegral`
 and `SpecialFunctions.Integrals`. Each is a thin wrapper around
 mathlib's `integral_sin`, `integral_cos`, or
 `integral_sin_sq`/`integral_cos_sq`.
 
-The full integral statement assembled from these helpers is
-`problem_2_2_c` below. That name is a mislabel: what it proves is
-eq. (2.2.14). Neither eq. (2.2.15) nor Problem 2.2.c is formalised.
+The full integral statements assembled from these helpers are
+`tasaki_problem_2_2_b_upDown_average` (eq. (2.2.14)) and
+`tasaki_problem_2_2_b_upUp_average` (eq. (2.2.15)) below, stated on the exponential
+rotations of eq. (2.2.11), p. 22, together with the identification of the averages
+with `(1/√2)|Φ_{0,0}⟩` and `(π/(4√2))|Φ_{1,0}⟩` (`twoSiteSinglet`, `twoSiteTripletZero`,
+App. A.3.3, eqs. (A.3.23)/(A.3.22), p. 474) and the non-SU(2)-invariance of `|Φ_{1,0}⟩`.
 -/
 
 namespace LatticeSystem.Quantum
@@ -55,11 +59,12 @@ theorem integral_sin_two_pi_pi :
   rw [intervalIntegral.integral_const]
   simp [smul_eq_mul]; ring
 
-/-! ## Half-angle integrals for the θ component of eq. (2.2.14)
+/-! ## Half-angle integrals for the θ components of eqs. (2.2.14)/(2.2.15)
 
 `sin θ cos²(θ/2) = (sin θ + sin θ cos θ) / 2 = (sin θ) / 2 + (sin 2θ) / 4`
 and similarly for `sin²(θ/2)`. Integrated over `[0, π]`, the `sin 2θ`
-term vanishes and the `sin θ` term gives 1 for each. -/
+term vanishes and the `sin θ` term gives 1 for each. The mixed product
+`sin θ cos(θ/2) sin(θ/2) = (sin² θ) / 2` integrates to `π/4`. -/
 
 /-- `∫ θ in 0..π, sin θ · cos θ = 0`. Antiderivative: `sin²(θ)/2`. -/
 theorem integral_sin_mul_cos_zero_pi :
@@ -123,7 +128,25 @@ theorem integral_sin_mul_sin_sq_half_zero_pi :
       integral_sin_zero_pi, integral_sin_mul_cos_zero_pi]
   ring
 
-/-! ## Complex exponential integrals for the φ component of eq. (2.2.14)
+/-- `∫ θ in 0..π, sin θ · (cos(θ/2) · sin(θ/2)) = π/4`, the θ-integral of the `|↑↓⟩` and
+`|↓↑⟩` components in Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §2.2,
+Problem 2.2.b, eq. (2.2.15), p. 23. Pointwise the integrand is `(1/2) sin² θ` by the
+double-angle formula, and `∫₀^π sin² θ dθ = π/2`. -/
+theorem integral_sin_mul_cos_half_mul_sin_half_zero_pi :
+    ∫ θ in (0 : ℝ)..Real.pi, Real.sin θ * (Real.cos (θ / 2) * Real.sin (θ / 2)) =
+      Real.pi / 4 := by
+  have hid : ∀ θ : ℝ, Real.sin θ * (Real.cos (θ / 2) * Real.sin (θ / 2)) =
+      (1 / 2) * Real.sin θ ^ 2 := by
+    intro θ
+    have hsin : Real.sin θ = 2 * Real.sin (θ / 2) * Real.cos (θ / 2) := by
+      have h := Real.sin_two_mul (θ / 2)
+      rwa [show 2 * (θ / 2) = θ from by ring] at h
+    linear_combination -(1 / 2) * Real.sin θ * hsin
+  conv_lhs => arg 1; ext θ; rw [hid θ]
+  rw [intervalIntegral.integral_const_mul, integral_sin_sq, Real.sin_zero, Real.sin_pi]
+  ring
+
+/-! ## Complex exponential integrals for the φ components of eqs. (2.2.14)/(2.2.15)
 
 `∫₀²π e^{±iφ} dφ = 0` follows from `e^{iφ} = cos φ + i sin φ` and the
 vanishing of `∫ cos` and `∫ sin` over one full period. -/
@@ -273,7 +296,7 @@ private lemma matrix_col1_eq_mulVec_down (M : Matrix (Fin 2) (Fin 2) ℂ) (k : F
 /-! ## The SU(2)-averaged state is the singlet (eq. (2.2.14))
 
 The SU(2)-averaged state `(1/4π) ∫₀²π dφ ∫₀π dθ sin θ · Û(φ,θ)|↑↓⟩`
-equals `(1/2)(|↑↓⟩ - |↓↑⟩)`, the spin singlet. This is Tasaki
+equals `(1/2)(|↑↓⟩ - |↓↑⟩) = (1/√2)|Φ_{0,0}⟩`, the spin singlet. This is Tasaki
 *Physics and Mathematics of Quantum Many-Body Systems*, §2.2,
 eq. (2.2.14), p. 23, the first display of Problem 2.2.b. -/
 
@@ -301,19 +324,26 @@ private theorem totalRot_mulVec_upDown_component (θ φ : ℝ) (τ : Fin 2 → F
 set_option maxHeartbeats 1600000 in
 -- The 16-case row-by-column analysis on `Fin 2 → Fin 2` together with
 -- the Euler-angle integrals exceeds the default 200k budget.
-/-- The SU(2)-averaged two-site state is the singlet, stated component-wise
-for each configuration `τ : Fin 2 → Fin 2`: Tasaki *Physics and Mathematics
-of Quantum Many-Body Systems*, §2.2, eq. (2.2.14), p. 23, the first display
-of Problem 2.2.b. The declaration name is a mislabel — neither eq. (2.2.15)
-nor Problem 2.2.c is formalised. -/
-theorem problem_2_2_c (τ : Fin 2 → Fin 2) :
-    (1 / (4 * (Real.pi : ℂ))) *
-      ∫ φ in (0 : ℝ)..(2 * Real.pi),
-        ∫ θ in (0 : ℝ)..Real.pi,
-          ((Real.sin θ : ℂ) *
-            ((totalSpinHalfRot3 (Fin 2) φ * totalSpinHalfRot2 (Fin 2) θ).mulVec
-              (basisVec upDown)) τ) =
-    (1 / 2 : ℂ) * (basisVec upDown τ - basisVec (basisSwap upDown (0 : Fin 2) 1) τ) := by
+/-- Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §2.2, Problem 2.2.b,
+eq. (2.2.14), p. 23: the solid-angle average of `|↑⟩₁|↓⟩₂` under the rotations
+`Û^(3)_φ Û^(2)_θ = exp(-iφŜ_tot^(3)) exp(-iθŜ_tot^(2))` of eq. (2.2.11), p. 22, is
+`(1/2)(|↑⟩₁|↓⟩₂ − |↓⟩₁|↑⟩₂) = (1/√2)|Φ_{0,0}⟩`. The first conjunct is the average stated
+component-wise at every configuration `τ`; the second identifies the result with the singlet
+`twoSiteSinglet` of App. A.3.3, eq. (A.3.23), p. 474. -/
+theorem tasaki_problem_2_2_b_upDown_average :
+    (∀ τ : Fin 2 → Fin 2,
+      (1 / (4 * (Real.pi : ℂ))) * ∫ φ in (0 : ℝ)..(2 * Real.pi), ∫ θ in (0 : ℝ)..Real.pi,
+        ((Real.sin θ : ℂ) *
+          ((NormedSpace.exp ((-(Complex.I * (φ : ℂ))) • totalSpinHalfOp3 (Fin 2)) *
+              NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp2 (Fin 2))).mulVec
+            (basisVec upDown)) τ) =
+        ((1 / 2 : ℂ) • (basisVec upDown - basisVec (basisSwap upDown (0 : Fin 2) 1))) τ) ∧
+    (1 / 2 : ℂ) • (basisVec upDown - basisVec (basisSwap upDown (0 : Fin 2) 1)) =
+      ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ • twoSiteSinglet := by
+  refine ⟨fun τ => ?_, by unfold twoSiteSinglet; rw [smul_smul, sqrt2_inv_mul_sqrt2_inv]⟩
+  -- The integrand sits under both binders, so the exponential bridges go through `simp only`.
+  simp only [← totalSpinHalfRot3_eq_exp, ← totalSpinHalfRot2_eq_exp, Pi.smul_apply,
+    Pi.sub_apply, smul_eq_mul]
   -- Expand integrand to explicit trig/exp products
   conv_lhs => arg 2; arg 1; ext φ; arg 1; ext θ; rw [totalRot_mulVec_upDown_component]
   -- Simplify RHS
@@ -446,5 +476,150 @@ theorem problem_2_2_c (τ : Fin 2 → Fin 2) :
         C * ∫ φ in (0 : ℝ)..(2 * Real.pi), Complex.exp (Complex.I * (φ : ℂ)) :=
       intervalIntegral.integral_const_mul _ _
     rw [this, integral_cexp_I_mul_zero_two_pi, mul_zero]
+
+/-! ## The SU(2)-averaged `|↑↑⟩` state (eq. (2.2.15))
+
+The SU(2)-averaged state `(1/4π) ∫₀²π dφ ∫₀π dθ sin θ · Û(φ,θ)|↑↑⟩` equals
+`(π/8)(|↑↓⟩ + |↓↑⟩) = (π/(4√2))|Φ_{1,0}⟩`, and `|Φ_{1,0}⟩` is not SU(2) invariant. This is
+Tasaki *Physics and Mathematics of Quantum Many-Body Systems*, §2.2, eq. (2.2.15), p. 23, the
+second display of Problem 2.2.b. -/
+
+/-- Expand the integrand of eq. (2.2.15): the component of the rotated all-up state at the
+configuration `τ` is the product of the entries of `Û^(3)_φ Û^(2)_θ |↑⟩` (Tasaki, *Physics and
+Mathematics of Quantum Many-Body Systems*, Problem 2.1.d, p. 18, and solution (S.5), p. 494) at
+`τ 0` and at `τ 1`. -/
+private theorem totalRot_mulVec_upUp_component (θ φ : ℝ) (τ : Fin 2 → Fin 2) :
+    ((totalSpinHalfRot3 (Fin 2) φ * totalSpinHalfRot2 (Fin 2) θ).mulVec
+      (basisVec (fun _ : Fin 2 => (0 : Fin 2)))) τ =
+    (![Complex.exp (-(Complex.I * (φ : ℂ) / 2)) * (Real.cos (θ / 2) : ℂ),
+       Complex.exp (Complex.I * (φ : ℂ) / 2) * (Real.sin (θ / 2) : ℂ)] (τ 0)) *
+    (![Complex.exp (-(Complex.I * (φ : ℂ) / 2)) * (Real.cos (θ / 2) : ℂ),
+       Complex.exp (Complex.I * (φ : ℂ) / 2) * (Real.sin (θ / 2) : ℂ)] (τ 1)) := by
+  rw [totalRot32_two_site, onSite_zero_mul_one_mulVec_basisVec,
+    matrix_col0_eq_mulVec_up (spinHalfRot3 φ * spinHalfRot2 θ) (τ 0),
+    matrix_col0_eq_mulVec_up (spinHalfRot3 φ * spinHalfRot2 θ) (τ 1),
+    spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp]
+
+/-- `|Φ_{1,0}⟩ = twoSiteTripletZero` is not SU(2) invariant in the sense of Tasaki, *Physics and
+Mathematics of Quantum Many-Body Systems*, §2.2, Problem 2.2.b, p. 23: it is not the case that
+`exp(-iθŜ_tot^(α)) |Φ_{1,0}⟩ = |Φ_{1,0}⟩` for every axis `α` and angle `θ` (eq. (2.2.11), p. 22).
+The witness is axis 2 (`(1 : Fin 3)`) at `θ = π`, read at the component `|↑↓⟩`: there
+`Û^(2)_π = -2iŜ^(2)` on each site sends `|↑⟩₁|↓⟩₂ + |↓⟩₁|↑⟩₂` to its negative. -/
+private theorem twoSiteTripletZero_not_su2_invariant :
+    ¬ ∀ (α : Fin 3) (θ : ℝ),
+      (NormedSpace.exp ((-(Complex.I * (θ : ℂ))) •
+          ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] α)).mulVec
+        twoSiteTripletZero = twoSiteTripletZero := by
+  intro h
+  have h1 := congrFun (h 1 Real.pi) upDown
+  simp only [Matrix.cons_val_one, Matrix.cons_val_zero] at h1
+  rw [← totalSpinHalfRot2_eq_exp, totalSpinHalfRot2_two_site] at h1
+  simp only [twoSiteTripletZero, Matrix.mulVec_smul, Matrix.mulVec_add, Pi.smul_apply,
+    Pi.add_apply, onSite_zero_mul_one_mulVec_basisVec, smul_eq_mul] at h1
+  simp [spinHalfRot2_pi, spinHalfOp2, pauliY, basisVec, basisSwap_upDown, funext_iff,
+    Fin.forall_fin_two, upDown] at h1
+  ring_nf at h1
+  simp only [Complex.I_pow_four, mul_one] at h1
+  have hc : ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ ≠ 0 :=
+    inv_ne_zero (Complex.ofReal_ne_zero.mpr (Real.sqrt_ne_zero'.mpr (by norm_num)))
+  exact hc (by linear_combination (-(1 / 2) : ℂ) * h1)
+
+/-- Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §2.2, Problem 2.2.b,
+eq. (2.2.15), p. 23: the solid-angle average of `|↑⟩₁|↑⟩₂` under the rotations
+`Û^(3)_φ Û^(2)_θ = exp(-iφŜ_tot^(3)) exp(-iθŜ_tot^(2))` of eq. (2.2.11), p. 22, is
+`(π/8)(|↑⟩₁|↓⟩₂ + |↓⟩₁|↑⟩₂) = (π/(4√2))|Φ_{1,0}⟩`, and `|Φ_{1,0}⟩` is not SU(2) invariant.
+The first conjunct is the average stated component-wise at every configuration `τ`; the second
+identifies the result with the triplet `twoSiteTripletZero` of App. A.3.3, eq. (A.3.22), p. 474;
+the third says that not every rotation `exp(-iθŜ_tot^(α))` fixes `|Φ_{1,0}⟩`. -/
+theorem tasaki_problem_2_2_b_upUp_average :
+    (∀ τ : Fin 2 → Fin 2, (1 / (4 * (Real.pi : ℂ))) *
+      ∫ φ in (0 : ℝ)..(2 * Real.pi), ∫ θ in (0 : ℝ)..Real.pi,
+        ((Real.sin θ : ℂ) *
+          ((NormedSpace.exp ((-(Complex.I * (φ : ℂ))) • totalSpinHalfOp3 (Fin 2)) *
+              NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp2 (Fin 2))).mulVec
+            (basisVec (fun _ : Fin 2 => (0 : Fin 2)))) τ) =
+        (((Real.pi : ℂ) / 8) • (basisVec upDown + basisVec (basisSwap upDown (0 : Fin 2) 1))) τ) ∧
+    ((Real.pi : ℂ) / 8) • (basisVec upDown + basisVec (basisSwap upDown (0 : Fin 2) 1)) =
+      ((Real.pi : ℂ) / (4 * ((Real.sqrt 2 : ℝ) : ℂ))) • twoSiteTripletZero ∧
+    ¬ ∀ (α : Fin 3) (θ : ℝ),
+      (NormedSpace.exp ((-(Complex.I * (θ : ℂ))) •
+          ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] α)).mulVec
+        twoSiteTripletZero = twoSiteTripletZero := by
+  refine ⟨fun τ => ?_, ?_, twoSiteTripletZero_not_su2_invariant⟩
+  swap
+  · unfold twoSiteTripletZero
+    rw [smul_smul]
+    congr 1
+    linear_combination (-(Real.pi : ℂ) / 4) * sqrt2_inv_mul_sqrt2_inv
+  simp only [← totalSpinHalfRot3_eq_exp, ← totalSpinHalfRot2_eq_exp, Pi.smul_apply,
+    Pi.add_apply, smul_eq_mul]
+  conv_lhs => arg 2; arg 1; ext φ; arg 1; ext θ; rw [totalRot_mulVec_upUp_component]
+  have ht0 : τ 0 = 0 ∨ τ 0 = 1 := by rcases τ 0 with ⟨v, hv⟩; omega
+  have ht1 : τ 1 = 0 ∨ τ 1 = 1 := by rcases τ 1 with ⟨v, hv⟩; omega
+  rcases ht0 with h0 | h0 <;> rcases ht1 with h1 | h1 <;>
+    simp only [h0, h1, Matrix.cons_val_zero, Matrix.cons_val_one, basisVec, basisSwap_upDown,
+      upDown, fin2_eq_iff]
+  · have hexp : ∀ φ : ℝ, Complex.exp (-(Complex.I * (φ : ℂ) / 2)) *
+        Complex.exp (-(Complex.I * (φ : ℂ) / 2)) = Complex.exp (-(Complex.I * (φ : ℂ))) := by
+      intro φ; rw [← Complex.exp_add]; congr 1; ring
+    -- `rw`/`simp` with `intervalIntegral.integral_const_mul`/`integral_mul_const` find no match
+    -- in these ℂ-valued integrals, so both are applied as terms.
+    have hin : ∀ φ : ℝ, ∫ θ in (0 : ℝ)..Real.pi,
+        (Real.sin θ : ℂ) * (Complex.exp (-(Complex.I * (φ : ℂ) / 2)) * (Real.cos (θ / 2) : ℂ) *
+          (Complex.exp (-(Complex.I * (φ : ℂ) / 2)) * (Real.cos (θ / 2) : ℂ))) =
+        Complex.exp (-(Complex.I * (φ : ℂ))) * ∫ θ in (0 : ℝ)..Real.pi,
+          (Real.sin θ : ℂ) * ((Real.cos (θ / 2) : ℂ) * (Real.cos (θ / 2) : ℂ)) := fun φ =>
+      (intervalIntegral.integral_congr fun θ _ => by rw [← hexp φ]; ring).trans
+        (intervalIntegral.integral_const_mul _ _)
+    simp_rw [hin]
+    rw [show ∫ φ in (0 : ℝ)..(2 * Real.pi), Complex.exp (-(Complex.I * (φ : ℂ))) * _ =
+        (∫ φ in (0 : ℝ)..(2 * Real.pi), Complex.exp (-(Complex.I * (φ : ℂ)))) * _ from
+      intervalIntegral.integral_mul_const _ _, integral_cexp_neg_I_mul_zero_two_pi]
+    simp
+  · have hpt : ∀ φ θ : ℝ,
+        (Real.sin θ : ℂ) * (Complex.exp (-(Complex.I * (φ : ℂ) / 2)) * (Real.cos (θ / 2) : ℂ) *
+          (Complex.exp (Complex.I * (φ : ℂ) / 2) * (Real.sin (θ / 2) : ℂ))) =
+        ((Real.sin θ * (Real.cos (θ / 2) * Real.sin (θ / 2)) : ℝ) : ℂ) := by
+      intro φ θ
+      have hexp : Complex.exp (-(Complex.I * (φ : ℂ) / 2)) *
+          Complex.exp (Complex.I * (φ : ℂ) / 2) = 1 := by
+        rw [← Complex.exp_add, neg_add_cancel, Complex.exp_zero]
+      rw [Complex.ofReal_mul, Complex.ofReal_mul]
+      linear_combination (Real.sin θ : ℂ) * (Real.cos (θ / 2) : ℂ) * (Real.sin (θ / 2) : ℂ) * hexp
+    simp_rw [hpt, intervalIntegral.integral_ofReal, integral_sin_mul_cos_half_mul_sin_half_zero_pi,
+      intervalIntegral.integral_const]
+    simp
+    field_simp
+    ring
+  · have hpt : ∀ φ θ : ℝ,
+        (Real.sin θ : ℂ) * (Complex.exp (Complex.I * (φ : ℂ) / 2) * (Real.sin (θ / 2) : ℂ) *
+          (Complex.exp (-(Complex.I * (φ : ℂ) / 2)) * (Real.cos (θ / 2) : ℂ))) =
+        ((Real.sin θ * (Real.cos (θ / 2) * Real.sin (θ / 2)) : ℝ) : ℂ) := by
+      intro φ θ
+      have hexp : Complex.exp (Complex.I * (φ : ℂ) / 2) *
+          Complex.exp (-(Complex.I * (φ : ℂ) / 2)) = 1 := by
+        rw [← Complex.exp_add, add_neg_cancel, Complex.exp_zero]
+      rw [Complex.ofReal_mul, Complex.ofReal_mul]
+      linear_combination (Real.sin θ : ℂ) * (Real.cos (θ / 2) : ℂ) * (Real.sin (θ / 2) : ℂ) * hexp
+    simp_rw [hpt, intervalIntegral.integral_ofReal, integral_sin_mul_cos_half_mul_sin_half_zero_pi,
+      intervalIntegral.integral_const]
+    simp
+    field_simp
+    ring
+  · have hexp : ∀ φ : ℝ, Complex.exp (Complex.I * (φ : ℂ) / 2) *
+        Complex.exp (Complex.I * (φ : ℂ) / 2) = Complex.exp (Complex.I * (φ : ℂ)) := by
+      intro φ; rw [← Complex.exp_add]; congr 1; ring
+    have hin : ∀ φ : ℝ, ∫ θ in (0 : ℝ)..Real.pi,
+        (Real.sin θ : ℂ) * (Complex.exp (Complex.I * (φ : ℂ) / 2) * (Real.sin (θ / 2) : ℂ) *
+          (Complex.exp (Complex.I * (φ : ℂ) / 2) * (Real.sin (θ / 2) : ℂ))) =
+        Complex.exp (Complex.I * (φ : ℂ)) * ∫ θ in (0 : ℝ)..Real.pi,
+          (Real.sin θ : ℂ) * ((Real.sin (θ / 2) : ℂ) * (Real.sin (θ / 2) : ℂ)) := fun φ =>
+      (intervalIntegral.integral_congr fun θ _ => by rw [← hexp φ]; ring).trans
+        (intervalIntegral.integral_const_mul _ _)
+    simp_rw [hin]
+    rw [show ∫ φ in (0 : ℝ)..(2 * Real.pi), Complex.exp (Complex.I * (φ : ℂ)) * _ =
+        (∫ φ in (0 : ℝ)..(2 * Real.pi), Complex.exp (Complex.I * (φ : ℂ))) * _ from
+      intervalIntegral.integral_mul_const _ _, integral_cexp_I_mul_zero_two_pi]
+    simp
 
 end LatticeSystem.Quantum

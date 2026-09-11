@@ -197,8 +197,8 @@ theorem onSite_pow (x : Λ) (A : Matrix (Fin 2) (Fin 2) ℂ) (k : ℕ) :
 
 The `|Λ| = 2` specialisation of the global product of Tasaki eq. (2.2.11), p. 22.  This is not
 Problem 2.2.b, p. 23, whose content is the two solid-angle averages of eqs. (2.2.14)/(2.2.15):
-the first of those is `problem_2_2_c` of `Quantum/SU2Integral.lean` (whose name is a mislabel),
-and eq. (2.2.15) is not formalised. -/
+those are `tasaki_problem_2_2_b_upDown_average` and `tasaki_problem_2_2_b_upUp_average` of
+`Quantum/SU2Integral.lean`. -/
 
 /-- For two sites, the total π-rotation about axis 1 factors as the
 product over site 0 and site 1. -/

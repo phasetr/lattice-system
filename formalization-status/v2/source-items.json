@@ -70,6 +70,21 @@
     },
     {
       "equations": [
+        "2.2.14",
+        "2.2.15",
+        "A.3.22",
+        "A.3.23"
+      ],
+      "id": "tasaki-2020-problem-2-2-b",
+      "item_kind": "exercise",
+      "item_number": "2.2.b",
+      "pages": "23",
+      "section": "2.2",
+      "source_id": "tasaki-2020",
+      "title": "SU(2)-averaged two-site state and non-invariance of the triplet component"
+    },
+    {
+      "equations": [
         "2.1.8"
       ],
       "id": "tasaki-2020-section-2-1-pauli",
