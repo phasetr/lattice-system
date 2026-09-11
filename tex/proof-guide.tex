@@ -859,6 +859,17 @@ $\hat S_x \cdot \hat S_y$.
 
 \paragraph{Not yet formalized.}
 \begin{itemize}
+  \item Global rotation operator
+    $\hat U^{(\alpha)}_\theta = \exp(-i\theta \hat S_{\mathrm{tot}}^{(\alpha)})$
+    (eq.~(2.2.11)) at general $S$ and general $\theta$ about the axis $1$;
+    the case $\theta = \pi$ is covered by
+    \texttt{manyBodySPiRotation\_eq\_exp} (\S\ref{sec:problem22a}). The
+    general-$S$ exponentials about the axes $2$ and $3$ exist, as
+    \texttt{saturatedGlobalRot2} and \texttt{saturatedGlobalRot3}; all three
+    axes at spin-$1/2$ are proved as
+    \texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp}, and the general-$S$
+    axis-$3$ many-body bridge as
+    \texttt{manyBodyTensorS\_spinSRot3\_eq\_exp\_totalSpinSOp3}.
   \item SU(2) / U(1) invariance of operators commuting with
     $\hat S_{\mathrm{tot}}^{(\alpha)}$ (eqs.~(2.2.12)-(2.2.13)).
   \item SU(2) invariance of $\hat S_x \cdot \hat S_y$ and its
@@ -1063,8 +1074,8 @@ equality of eq.~(2.2.11) at $\theta = \pi$; (5) the single-site input
 $\exp[-i\pi\hat S^{(\alpha)}] = \hat u^{(\alpha)}$
 (\texttt{spinSPiRotationAxis\_eq\_exp}, \S\ref{sec:problem21g}) then
 identifies the right-hand side with \texttt{manyBodySPiRotation}, giving
-the capstone \texttt{manyBodySPiRotation\_eq\_exp}; see
-\S\ref{sec:problem22a}.
+the many-body exponential identification
+\texttt{manyBodySPiRotation\_eq\_exp}; see \S\ref{sec:problem22a}.
 
 \subsection{Problem 2.2.a: global \texorpdfstring{$\pi$}{pi}-rotations
   (Tasaki \S2.2, Problem 2.2.a, p.~23, solution p.~496)}

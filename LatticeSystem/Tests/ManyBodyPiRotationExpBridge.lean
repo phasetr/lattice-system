@@ -211,7 +211,7 @@ example :
 
 /-- The concrete one-site configuration-space vector `|0⟩`, used below as an explicit nonzero
 eigenvector of the axis-`3` (diagonal) exponential rotation, so the eigenvector-orthogonality
-capstone below is exercised non-vacuously. -/
+statement on the exponential objects below is exercised non-vacuously. -/
 private noncomputable def expBridgeOneSitePhi : (Fin 1 → Fin 2) → ℂ :=
   fun σ => if σ = (fun _ => (0 : Fin 2)) then 1 else 0
 
@@ -223,7 +223,8 @@ private lemma expBridgeOneSitePhi_ne_zero : expBridgeOneSitePhi ≠ 0 := by
 
 /-- `expBridgeOneSitePhi` is an eigenvector, eigenvalue `−i`, of the axis-`3` global rotation in
 its closed form; combined below with `manyBodySPiRotation_eq_exp` to instantiate the
-exponential-side eigenvector hypothesis of the capstone. -/
+exponential-side eigenvector hypothesis of the eigenvector-orthogonality statement on the
+exponential objects. -/
 private lemma expBridgeOneSitePhi_eigenvector_closedForm :
     Matrix.mulVec (manyBodySPiRotation (Fin 1) 1 2) expBridgeOneSitePhi
       = (-Complex.I) • expBridgeOneSitePhi := by

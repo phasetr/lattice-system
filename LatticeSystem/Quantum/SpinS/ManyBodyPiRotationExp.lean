@@ -27,13 +27,13 @@ which commute pairwise across distinct sites, is that product (`manyBodyTensorS_
 The products are `Finset.noncommProd` because the many-body operators do not commute in general
 and `Λ` carries no order.
 
-The capstone `manyBodySPiRotation_eq_exp` is uniform in the axis `α : Fin 3`, its right-hand
-side being written with the inline vector `![totalSpinSOp1 Λ N, totalSpinSOp2 Λ N,
-totalSpinSOp3 Λ N] α`, which is by definition `totalSpinSOpVec Λ N α` of
+The many-body exponential identification `manyBodySPiRotation_eq_exp` is uniform in the axis
+`α : Fin 3`, its right-hand side being written with the inline vector `![totalSpinSOp1 Λ N,
+totalSpinSOp2 Λ N, totalSpinSOp3 Λ N] α`, which is by definition `totalSpinSOpVec Λ N α` of
 `Quantum/SpinS/CartesianAxis.lean`.
 
 Only `[Fintype Λ]` and `[DecidableEq Λ]` are assumed; `Λ` may be empty, in which case both sides
-of the capstone are the identity and the odd-parity statements are vacuous.
+of that identification are the identity and the odd-parity statements are vacuous.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §2.2, eq. (2.2.11), p. 22, and Problem 2.2.a, p. 23, `[solution → p. 496]`; §2.1,
