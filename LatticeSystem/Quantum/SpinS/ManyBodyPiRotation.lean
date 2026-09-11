@@ -37,10 +37,10 @@ the general-`S` twist bridge `lsmTwistOperator_eq_diagonal` of
 `Quantum/SpinS/LiebSchultzMattisProof.lean`; and the spin-`1/2` `totalSpinHalfRot{1,2,3}_eq_exp`
 of `Quantum/TotalSpin/Rotation.lean` — of these `spinSRot3` and `spinSRot1` are related to the
 closed forms used here, through the three axis identifications of the single-site factor
-`spinSPiRotationAxis` above; the many-body `manyBodySPiRotation` lift is now
+`spinSPiRotationAxis` above; the many-body `manyBodySPiRotation` lift is
 `manyBodySPiRotation_eq_exp` of `Quantum/SpinS/ManyBodyPiRotationExp.lean`.  The exponentials
 written above and below are the book's notation for the closed-form matrices at the many-body
-level, and every one written here is now a proved equality, at both the single-site and the
+level, and every one written here is a proved equality, at both the single-site and the
 many-body level.
 
 At `S = 1` (`N = 2`) the same operator is also built as the whole-chain `piRotationS` of
@@ -90,7 +90,7 @@ private theorem manyBodyTensorS_const_smul (c : ℂ)
 /-- **Tasaki eq. (2.2.11), p. 22, at `θ = π`**: the global `π` rotation `Û_π^{(α)}` about the axis
 selected by `α : Fin 3`, as the uniform lattice tensor `⊗_{x ∈ Λ} û_α` of the closed-form
 single-site factor.  The book writes it `∏_{x ∈ Λ} exp(−iπ Ŝ_x^{(α)})`; each single-site factor is
-now identified with its exponential (`spinSPiRotationAxis_eq_exp`), and the lift of that
+identified with its exponential (`spinSPiRotationAxis_eq_exp`), and the lift of that
 identification to this lattice product is proved, `manyBodySPiRotation_eq_exp` of
 `Quantum/SpinS/ManyBodyPiRotationExp.lean`. -/
 noncomputable def manyBodySPiRotation (α : Fin 3) : ManyBodyOpS Λ N :=

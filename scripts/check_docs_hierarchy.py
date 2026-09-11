@@ -1592,8 +1592,8 @@ def _approved_replacements(text: str) -> str:
             "(Tasaki eq. (2.2.11), p. 22) remains unidentified with the exponentials, so "
             "the coverage of Problem 2.2.a stays partial |",
         )
-        # The many-body lift is now proved too (`manyBodySPiRotation_eq_exp`), so the
-        # arc's coverage is complete and the row's `stays partial` clause is stale.
+        # With the many-body lift proved (`manyBodySPiRotation_eq_exp`), the coverage of
+        # Problem 2.2.a is complete, so the row's `stays partial` clause is replaced.
         .replace(
             "the identification of all three single-site closed forms with "
             "`exp(−iπ Ŝ^{(α)})` at general `S` is now proved (Tasaki eq. (2.1.34) / "
@@ -1682,7 +1682,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "b1f267e3b74d31db3714b3cafea5c4473b55d8ad1aae1cd758cc415fdc5ead03"
+SCRIPT_SOURCE_SHA256 = "a5f45afdd648a3ee1eb00f60ca93ce393999e11118b90ed3bf9a4a7ff861094c"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an

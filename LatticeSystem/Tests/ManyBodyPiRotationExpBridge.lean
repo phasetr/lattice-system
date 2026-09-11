@@ -3,17 +3,17 @@ import LatticeSystem.Quantum.SpinS.TotalSpin
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 
 /-!
-# Signature pin: PR-D of the Problem 2.1.g exponential-identification arc, many-body lift
+# Signature pin: the many-body exponential identification of eq. (2.2.11) and Problem 2.2.a
 
-Repository-internal regression guard for PR-D, the many-body lift of Tasaki
+Repository-internal regression guard for the many-body lift of Tasaki
 **eq. (2.2.11), p. 22** (`Û_θ^{(α)} := exp[−iθ Ŝ_tot^{(α)}] = ∏_{x∈Λ} exp[−iθ Ŝ_x^{(α)}]`),
 which completes the identification of the closed-form global `π` rotation
 `manyBodySPiRotation` (`Quantum/SpinS/ManyBodyPiRotation.lean`) with the book's operator
 exponential, and restates **Tasaki Problem 2.2.a, p. 23** (`[solution → p. 496]`) in that
-exponential notation. PR-D rests on the single-site identification of every axis already proved
-on `main` (`spinSPiRotationAxis_eq_exp`, Tasaki **eq. (2.1.34), p. 20**, Problem 2.1.g p. 20).
+exponential notation. The lift rests on the single-site identification of every axis
+(`spinSPiRotationAxis_eq_exp`, Tasaki **eq. (2.1.34), p. 20**, Problem 2.1.g p. 20).
 
-Pinned (all new PR-D identifiers):
+Pinned (all declared in `Quantum/SpinS/ManyBodyPiRotationExp.lean`):
 * `onSiteS_exp` — the site embedding commutes with the matrix exponential,
   `onSiteS i (exp A) = exp (onSiteS i A)`.
 * `manyBodyTensorS_eq_noncommProd` — a many-body tensor of site operators is the (noncommutative)
@@ -21,28 +21,28 @@ Pinned (all new PR-D identifiers):
 * `manyBodyTensorS_const_exp` — the many-body tensor of a uniform exponential is the exponential
   of the sum of site embeddings, `⊗_x exp(A) = exp(Σ_x onSiteS x A)` (the crux of eq. (2.2.11)).
 * `sum_onSiteS_smul` — scalars pull out of a sum of site embeddings.
-* `manyBodySPiRotation_eq_exp` — **the capstone**: `manyBodySPiRotation Λ N α =
-  exp(−iπ Ŝ_tot^{(α)})`, uniform in the axis `α : Fin 3`, Tasaki eq. (2.2.11), p. 22.
+* `manyBodySPiRotation_eq_exp` — **the many-body exponential identification**:
+  `manyBodySPiRotation Λ N α = exp(−iπ Ŝ_tot^{(α)})`, uniform in the axis `α : Fin 3`, Tasaki
+  eq. (2.2.11), p. 22.
 * `manyBodySPiRotationExp_commute_of_even` / `manyBodySPiRotationExp_anticommute_of_odd` /
   `tasaki_problem_2_2_a_exp_eigenvector_orthogonal` — Problem 2.2.a (a)/(b)/(c) restated with both
   global rotations replaced by their operator exponentials.
 
-Also pinned: axis-by-axis entries of the capstone at `|Λ| = 1`, `N = 1` (must agree with the
-already-proved single-site closed forms `spinSPiRotation1/2/3` on `main`); a parity pin at
+Also pinned: axis-by-axis entries of the many-body exponential identification at `|Λ| = 1`,
+`N = 1` (must agree with the single-site closed forms `spinSPiRotation1/2/3`); a parity pin at
 `|Λ| = 2`, `N = 1` (even, commuting) and at `|Λ| = 1`, `N = 1` (odd, anticommuting +
 eigenvector-orthogonality, with an explicit nonzero eigenvector); a `(−i)^{|Λ|N}` phase control at
 `|Λ| = 2`, `N = 1`; and a non-identity control ruling out the degenerate "both sides collapse to
-`1`" reading of the capstone.
+`1`" reading of the many-body exponential identification.
 
 Every entry/parity pin below is a two-part `∧`/independent-argument statement so that a failure on
-a not-yet-existing PR-D identifier never masks or is masked by an unrelated tactic failure: each
-conjunct/argument depends on at most one new identifier, and the concrete-value conjunct uses only
-declarations already on `main`.
+an identifier of `ManyBodyPiRotationExp` never masks or is masked by an unrelated tactic failure:
+each conjunct/argument depends on at most one identifier of that module, and the concrete-value
+conjunct uses only declarations outside it.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), eq. (2.1.34) p. 20, Problem 2.1.g p. 20 (solution p. 495), eq. (2.2.11) p. 22, Problem 2.2.a
 p. 23 (solution p. 496).
-Refs #5455.
 -/
 
 namespace LatticeSystem.Quantum
@@ -80,10 +80,10 @@ example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ} (c : ℂ)
     (∑ x : Λ, onSiteS x (c • A) : ManyBodyOpS Λ N) = c • ∑ x : Λ, onSiteS x A :=
   sum_onSiteS_smul c A
 
-/-! ## Capstone: Tasaki eq. (2.2.11), p. 22 -/
+/-! ## The many-body exponential identification: Tasaki eq. (2.2.11), p. 22 -/
 
-/-- Signature pin: locks the exact name/signature of the capstone, uniform in the axis
-`α : Fin 3`, Tasaki eq. (2.2.11), p. 22. -/
+/-- Signature pin: locks the exact name/signature of the many-body exponential identification,
+uniform in the axis `α : Fin 3`, Tasaki eq. (2.2.11), p. 22. -/
 example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (N : ℕ) (α : Fin 3) :
     manyBodySPiRotation Λ N α =
       NormedSpace.exp
@@ -93,11 +93,12 @@ example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (N : ℕ) (α : Fin 3) :
 
 /-! ## Axis-by-axis entry pins, `|Λ| = 1`, `N = 1`
 
-Each pin is `capstone-at-this-axis ∧ concrete-entry-value`, split by `constructor` so the first
-(new-identifier) conjunct and the second (already-`main`) conjunct are checked independently. -/
+Each pin is `identification-at-this-axis ∧ concrete-entry-value`, split by `constructor` so the
+first conjunct (through `manyBodySPiRotation_eq_exp`) and the second (closed form only) are
+checked independently. -/
 
-/-- Axis-`1` (`α = 0`): the capstone at this instance, and the off-diagonal entry
-`spinSPiRotation1 1 0 1 = −i` it must match once combined. -/
+/-- Axis-`1` (`α = 0`): the many-body exponential identification at this instance, and the
+off-diagonal entry `spinSPiRotation1 1 0 1 = −i` it must match once combined. -/
 example :
     manyBodySPiRotation (Fin 1) 1 0 =
         NormedSpace.exp (-(((Real.pi : ℂ) * Complex.I)) • totalSpinSOp1 (Fin 1) 1)
@@ -214,14 +215,14 @@ capstone below is exercised non-vacuously. -/
 private noncomputable def expBridgeOneSitePhi : (Fin 1 → Fin 2) → ℂ :=
   fun σ => if σ = (fun _ => (0 : Fin 2)) then 1 else 0
 
-/-- `expBridgeOneSitePhi ≠ 0`, at `main` declarations only. -/
+/-- `expBridgeOneSitePhi ≠ 0`, without any identifier of `ManyBodyPiRotationExp`. -/
 private lemma expBridgeOneSitePhi_ne_zero : expBridgeOneSitePhi ≠ 0 := by
   intro hzero
   have hval := congrFun hzero (fun _ => (0 : Fin 2))
   simp [expBridgeOneSitePhi] at hval
 
 /-- `expBridgeOneSitePhi` is an eigenvector, eigenvalue `−i`, of the axis-`3` global rotation in
-its `main` closed form; combined below with `manyBodySPiRotation_eq_exp` to instantiate the
+its closed form; combined below with `manyBodySPiRotation_eq_exp` to instantiate the
 exponential-side eigenvector hypothesis of the capstone. -/
 private lemma expBridgeOneSitePhi_eigenvector_closedForm :
     Matrix.mulVec (manyBodySPiRotation (Fin 1) 1 2) expBridgeOneSitePhi
@@ -246,8 +247,9 @@ private lemma expBridgeOneSitePhi_eigenvector_closedForm :
 `expBridgeOneSitePhi` of `Û_π^{(3)}` is orthogonal to `Û_π^{(1)}` applied to it — consuming
 `tasaki_problem_2_2_a_exp_eigenvector_orthogonal` directly, applied to a non-vacuous, explicit
 `Φ ≠ 0` and an eigenvector hypothesis carried from the closed form by
-`manyBodySPiRotation_eq_exp` via `▸` (a single term, so the two new-identifier occurrences fail
-independently and no unrelated tactic can mask or be masked by either). -/
+`manyBodySPiRotation_eq_exp` via `▸` (a single term, so the two occurrences of identifiers of
+`ManyBodyPiRotationExp` fail independently and no unrelated tactic can mask or be masked by
+either). -/
 example :
     star expBridgeOneSitePhi ⬝ᵥ
         Matrix.mulVec
@@ -276,8 +278,9 @@ example :
       spinSAlternating, Fin.prod_univ_two]
 
 /-- Non-identity control: the closed-form axis-`3` global rotation at two sites is not the
-identity, so the capstone above cannot be discharged by a degenerate proof in which both sides
-collapse to `1`. No new identifier is used here — the fact holds already on `main`. -/
+identity, so the many-body exponential identification above cannot be discharged by a degenerate
+proof in which both sides collapse to `1`. No identifier of `ManyBodyPiRotationExp` is used
+here — the fact is about the closed form alone. -/
 example : manyBodySPiRotation (Fin 2) 1 2 ≠ (1 : ManyBodyOpS (Fin 2) 1) := by
   intro h
   have h00 :=

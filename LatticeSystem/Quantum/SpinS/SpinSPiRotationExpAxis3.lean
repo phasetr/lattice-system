@@ -22,7 +22,7 @@ The axes `1` and `2` are not treated here.  The axis-1 identification is
 route (a commutant argument, no entrywise closed form of `exp(−iπ Ŝ^{(1)})` being available); the
 axis-2 identification is `spinSPiRotation2_eq_exp_spinSOp2` of
 `Quantum/SpinS/SpinSPiRotationExpAxis2.lean`, by a quarter-turn conjugation of the axis-1 one.
-All three single-site axes are now identified, and the many-body lift of Problem 2.2.a, p. 23,
+All three single-site axes are identified, and the many-body lift of Problem 2.2.a, p. 23,
 is proved, `manyBodySPiRotation_eq_exp` of `Quantum/SpinS/ManyBodyPiRotationExp.lean`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,

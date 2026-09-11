@@ -191,7 +191,7 @@ theorem exp_neg_pi_mul_I_spinSOp2_eq_spinSRot3_pi_mul_spinSRot1_pi (N : ℕ) :
 /-- **The whole axis family is exponential**: `û_α = exp(−iπ Ŝ^{(α)})` for every axis `α : Fin 3`,
 the closed form (2.1.34), p. 20, in the uniform form of eq. (2.1.29), p. 19.  This is the
 statement the many-body lift of eq. (2.2.11), p. 22, multiplies over the lattice — a
-multiplication now also proved, `manyBodySPiRotation_eq_exp`. -/
+multiplication proved as `manyBodySPiRotation_eq_exp`. -/
 theorem spinSPiRotationAxis_eq_exp (N : ℕ) (α : Fin 3) :
     spinSPiRotationAxis N α =
       NormedSpace.exp
