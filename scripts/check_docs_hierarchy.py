@@ -88,12 +88,13 @@ whose file attribution now names both the axis-swap module and
 `Quantum/SpinS/ManyBodyTensorS.lean`, where the generic tensor adjoint is stated with the rest of
 that API.)
 (Applied once more for the `totalSpinHalfRot{1,2,3}Pi_two_site` row of
-`docs/formalization/legacy/20-total-spin-operator-tasaki-2-2-eq-2-2-7-2-2-8-part-01.md`, narrowing
-its disclosure of the unformalised identification with the book's exponentials: the axis-3
-exponential identification of the general-spin π-rotation is now proved (Tasaki eq. (2.1.34) /
-Problem 2.1.g, p. 20, `spinSPiRotation3_eq_spinSRot3_pi`,
-`Quantum/SpinS/SpinSPiRotationExpAxis3.lean`), so the row now names only axes 1 and 2 and the
-many-body lift as still open.)
+`docs/formalization/legacy/20-total-spin-operator-tasaki-2-2-eq-2-2-7-2-2-8-part-01.md`, whose
+disclosure of the identification with the book's exponentials names as proved the three
+single-site closed forms of Tasaki eq. (2.1.34) / Problem 2.1.g, p. 20
+(`spinSPiRotation3_eq_spinSRot3_pi`, `spinSPiRotation1_eq_spinSRot1_pi`,
+`spinSPiRotation2_eq_exp_spinSOp2`) and the many-body lift of eq. (2.2.11), p. 22
+(`manyBodySPiRotation_eq_exp`, `Quantum/SpinS/ManyBodyPiRotationExp.lean`), and so reports the
+coverage of Problem 2.2.a as complete.)
 Recomputing a pin is never on its own an
 authorization for what moved: the legacy pages still have to be edited to match, and the
 catalogue-row comparison is what proves they do. What the pins buy is that a change to the
@@ -1681,7 +1682,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "aa77453ca1fef0f7781d6b46c5c1c015065fa9e938eab636303a46262cfeb21a"
+SCRIPT_SOURCE_SHA256 = "b1f267e3b74d31db3714b3cafea5c4473b55d8ad1aae1cd758cc415fdc5ead03"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an

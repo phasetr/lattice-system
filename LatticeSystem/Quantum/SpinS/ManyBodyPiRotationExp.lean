@@ -68,8 +68,9 @@ theorem onSiteS_exp (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
 
 /-- A tensor whose factors outside a finite set `s` are the identity is the noncommutative product
 over `s` of the site embeddings of the remaining factors.  The induction on `s` is the general form
-of the printed remark that operators at different sites commute (below eq. (2.2.5), p. 21): each
-step peels off one site with `manyBodyTensorS_mul`, the base case being the all-identity tensor. -/
+of the printed remark that operators at different sites commute (the remark after eq. (2.2.5),
+p. 22): each step peels off one site with `manyBodyTensorS_mul`, the base case being the
+all-identity tensor. -/
 private theorem manyBodyTensorS_piecewise_eq_noncommProd
     (W : Λ → Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) (s : Finset Λ)
     (comm : (↑s : Set Λ).Pairwise

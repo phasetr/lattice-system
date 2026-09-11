@@ -82,32 +82,6 @@
       "axiom_dependencies": [],
       "capstone": false,
       "declaration_kind": "theorem",
-      "id": "tasaki-2020-problem-2-1-g-manybody-exponential",
-      "implementation_state": "implemented",
-      "lean_name": "LatticeSystem.Quantum.manyBodySPiRotation_eq_exp",
-      "lifecycle": "active",
-      "module": "LatticeSystem.Quantum.SpinS.ManyBodyPiRotationExp",
-      "origin": "literature",
-      "proof_guide_anchor": null,
-      "retirement": null,
-      "source_coverage": "complete",
-      "source_path": "LatticeSystem/Quantum/SpinS/ManyBodyPiRotationExp.lean",
-      "source_relations": [
-        {
-          "relation": "formalizes",
-          "source_item_id": "tasaki-2020-problem-2-1-g"
-        }
-      ],
-      "summary": "Tasaki eq. (2.2.11), p. 22, at theta = pi: the global pi rotation manyBodySPiRotation Lambda N alpha, the uniform lattice tensor of the single-site closed form, equals exp(-i*pi*S_tot^{(alpha)}) for every axis alpha : Fin 3, completing the many-body lift of Problem 2.1.g. The site embedding onSiteS is shown to be a continuous ring homomorphism, hence commutes with the matrix exponential (onSiteS_exp); a many-body tensor is the Finset.noncommProd of the site embeddings of its factors (manyBodyTensorS_eq_noncommProd); since distinct-site embeddings commute, the exponential of their sum is that product (manyBodyTensorS_const_exp). Combined with the single-site closed forms of eq. (2.1.34), p. 20 (spinSPiRotationAxis_eq_exp), this gives the capstone identity.",
-      "topic_ids": [
-        "quantum-spin"
-      ],
-      "trust_state": "axiom_free"
-    },
-    {
-      "axiom_dependencies": [],
-      "capstone": false,
-      "declaration_kind": "theorem",
       "id": "tasaki-2020-problem-2-2-a-anticommute",
       "implementation_state": "implemented",
       "lean_name": "LatticeSystem.Quantum.manyBodySPiRotation_anticommute_of_odd",
@@ -177,6 +151,32 @@
         }
       ],
       "summary": "Tasaki Problem 2.2.a (c): when |Lambda|*N is odd, every nonzero eigenvector of the global pi-rotation U_pi^{(alpha)} is orthogonal to its image under the anticommuting global pi-rotation U_pi^{(beta)}, alpha and beta distinct. Proved for the closed-form pi-rotation matrices spinSPiRotationAxis and their uniform lattice tensor manyBodySPiRotation; the identification of all three single-site closed forms with exp(-i*pi*S^{(alpha)}) at general S is proved (spinSPiRotation3_eq_spinSRot3_pi, spinSPiRotation1_eq_spinSRot1_pi, spinSPiRotation2_eq_exp_spinSOp2), and the many-body lift is also proved (manyBodySPiRotation_eq_exp), so the statement is restated on the book's exponential objects as tasaki_problem_2_2_a_exp_eigenvector_orthogonal, the terminal theorem of the Problem 2.2.a chain named by the legacy catalogue; the coverage of the source item is complete.",
+      "topic_ids": [
+        "quantum-spin"
+      ],
+      "trust_state": "axiom_free"
+    },
+    {
+      "axiom_dependencies": [],
+      "capstone": false,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-problem-2-2-a-manybody-exponential",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.manyBodySPiRotation_eq_exp",
+      "lifecycle": "active",
+      "module": "LatticeSystem.Quantum.SpinS.ManyBodyPiRotationExp",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "retirement": null,
+      "source_coverage": "complete",
+      "source_path": "LatticeSystem/Quantum/SpinS/ManyBodyPiRotationExp.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-problem-2-2-a"
+        }
+      ],
+      "summary": "Tasaki eq. (2.2.11), p. 22, at theta = pi, the definition of the global pi rotations of Problem 2.2.a, p. 23: the global pi rotation manyBodySPiRotation Lambda N alpha, the uniform lattice tensor of the single-site closed form, equals exp(-i*pi*S_tot^{(alpha)}) for every axis alpha in Fin 3, so the closed-form global rotations on which the Problem 2.2.a statements are proved are the exponentials the book writes. The site embedding onSiteS is shown to be a continuous ring homomorphism, hence commutes with the matrix exponential (onSiteS_exp); a many-body tensor is the Finset.noncommProd of the site embeddings of its factors (manyBodyTensorS_eq_noncommProd); since distinct-site embeddings commute, the exponential of their sum is that product (manyBodyTensorS_const_exp). Combined with the single-site closed forms of eq. (2.1.34), p. 20 (spinSPiRotationAxis_eq_exp), this gives the identity.",
       "topic_ids": [
         "quantum-spin"
       ],
