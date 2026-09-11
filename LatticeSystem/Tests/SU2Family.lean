@@ -44,8 +44,7 @@ example : ∫ θ in (0 : ℝ)..Real.pi, Real.sin θ = 2 :=
 /-! ## D. Half-angle / complex-exp helper integrals
 
 These power the SU(2)-averaged singlet computation
-(`problem_2_2_c`); previously only the three easiest base
-integrals above were pinned. -/
+(`tasaki_problem_2_2_b_upDown_average`). -/
 
 example : ∫ θ in (0 : ℝ)..Real.pi, Real.sin θ * Real.cos θ = 0 :=
   integral_sin_mul_cos_zero_pi
@@ -68,17 +67,14 @@ example :
       Complex.exp (-(Complex.I * (φ : ℂ))) = 0 :=
   integral_cexp_neg_I_mul_zero_two_pi
 
-/-! ## R. Red pins for TSK-065 Problem 2.2.b, eqs. (2.2.14)/(2.2.15), p. 23
+/-! ## R. Pins for Problem 2.2.b, eqs. (2.2.14)/(2.2.15), p. 23
 
-`problem_2_2_c` is renamed (no alias kept) to `tasaki_problem_2_2_b_upDown_average` and restated
-as a two-conjunct chain (component form, then the singlet identification via
-`twoSiteSinglet`, App. A.3.3 eq. (A.3.23)). `tasaki_problem_2_2_b_upUp_average` is new: a
-three-conjunct chain for eq. (2.2.15) ending in the non-SU(2)-invariance of `twoSiteTripletZero`
-(App. A.3.3 eq. (A.3.22)). All of `twoSiteSinglet`, `twoSiteTripletZero`,
-`tasaki_problem_2_2_b_upDown_average`, `tasaki_problem_2_2_b_upUp_average`, and the θ-integral
-helper `integral_sin_mul_cos_half_mul_sin_half_zero_pi` are unimplemented at this commit: every
-pin below must fail with `unknown identifier` (or `unknown constant`), never with an import or
-elaboration error of any other kind. -/
+`tasaki_problem_2_2_b_upDown_average` is the two-conjunct chain of eq. (2.2.14) (component form,
+then the singlet identification via `twoSiteSinglet`, App. A.3.3 eq. (A.3.23)).
+`tasaki_problem_2_2_b_upUp_average` is the three-conjunct chain of eq. (2.2.15) ending in the
+non-SU(2)-invariance of `twoSiteTripletZero` (App. A.3.3 eq. (A.3.22)). The θ-integral helper
+`integral_sin_mul_cos_half_mul_sin_half_zero_pi` and the values of the two states are pinned
+alongside. -/
 
 /-- Pin: `twoSiteSinglet` on the `upDown` configuration equals `(√2)⁻¹` (Tasaki App. A.3.3,
 eq. (A.3.23), p. 474). Distinguishes the `(√2)⁻¹` normalisation from `1/2` (mutation M11). -/
@@ -116,7 +112,7 @@ example :
     ∫ θ in (0 : ℝ)..Real.pi, Real.sin θ * (Real.cos (θ / 2) * Real.sin (θ / 2)) = Real.pi / 4 :=
   integral_sin_mul_cos_half_mul_sin_half_zero_pi
 
-/-- Red pin: full signature of eq. (2.2.14) restated on the renamed declaration, as the printed
+/-- Pin: full signature of eq. (2.2.14) as the printed
 chain of equalities — the SU(2)-averaged `|↑↓⟩` state (component form, stated on the exponential
 rotations rather than the closed `totalSpinHalfRot*` form) equals the unnormalised singlet
 combination, which in turn equals `(√2)⁻¹ • twoSiteSinglet` (Tasaki §2.2, eq. (2.2.14), p. 23,
@@ -134,7 +130,7 @@ example :
       ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ • twoSiteSinglet :=
   tasaki_problem_2_2_b_upDown_average
 
-/-- Red pin: positive control instantiating the eq. (2.2.14) component chain at
+/-- Pin: positive control instantiating the eq. (2.2.14) component chain at
 `τ = basisSwap upDown 0 1`, i.e. `|↓↑⟩`: the averaged coefficient is `-1/2` (distinguishes the
 sign, mutation M2, and the value from the `+π/8` value of the eq. (2.2.15) analogue below). -/
 example :
@@ -145,7 +141,7 @@ example :
           (basisVec upDown)) (basisSwap upDown (0 : Fin 2) 1)) =
     (-(1 / 2) : ℂ) :=
   (tasaki_problem_2_2_b_upDown_average.1 (basisSwap upDown (0 : Fin 2) 1)).trans (by
-    simp [upDown, basisSwap])
+    simp [basisVec, basisSwap_upDown, funext_iff, Fin.forall_fin_two, upDown])
 
 /-- Red pin: full signature of eq. (2.2.15) — the SU(2)-averaged `|↑↑⟩` state equals the
 unnormalised `Φ_{1,0}` combination times `π/8`, which in turn equals a `twoSiteTripletZero`

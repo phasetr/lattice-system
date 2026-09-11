@@ -17,8 +17,9 @@ mathlib's `integral_sin`, `integral_cos`, or
 `integral_sin_sq`/`integral_cos_sq`.
 
 The full integral statement assembled from these helpers is
-`problem_2_2_c` below. That name is a mislabel: what it proves is
-eq. (2.2.14). Neither eq. (2.2.15) nor Problem 2.2.c is formalised.
+`tasaki_problem_2_2_b_upDown_average` below, stated on the exponential
+rotations of eq. (2.2.11), p. 22, together with the identification of the
+average with `(1/√2)|Φ_{0,0}⟩` (`twoSiteSinglet`, App. A.3.3, eq. (A.3.23), p. 474).
 -/
 
 namespace LatticeSystem.Quantum
@@ -274,7 +275,7 @@ private lemma matrix_col1_eq_mulVec_down (M : Matrix (Fin 2) (Fin 2) ℂ) (k : F
 /-! ## The SU(2)-averaged state is the singlet (eq. (2.2.14))
 
 The SU(2)-averaged state `(1/4π) ∫₀²π dφ ∫₀π dθ sin θ · Û(φ,θ)|↑↓⟩`
-equals `(1/2)(|↑↓⟩ - |↓↑⟩)`, the spin singlet. This is Tasaki
+equals `(1/2)(|↑↓⟩ - |↓↑⟩) = (1/√2)|Φ_{0,0}⟩`, the spin singlet. This is Tasaki
 *Physics and Mathematics of Quantum Many-Body Systems*, §2.2,
 eq. (2.2.14), p. 23, the first display of Problem 2.2.b. -/
 
@@ -302,19 +303,26 @@ private theorem totalRot_mulVec_upDown_component (θ φ : ℝ) (τ : Fin 2 → F
 set_option maxHeartbeats 1600000 in
 -- The 16-case row-by-column analysis on `Fin 2 → Fin 2` together with
 -- the Euler-angle integrals exceeds the default 200k budget.
-/-- The SU(2)-averaged two-site state is the singlet, stated component-wise
-for each configuration `τ : Fin 2 → Fin 2`: Tasaki *Physics and Mathematics
-of Quantum Many-Body Systems*, §2.2, eq. (2.2.14), p. 23, the first display
-of Problem 2.2.b. The declaration name is a mislabel — neither eq. (2.2.15)
-nor Problem 2.2.c is formalised. -/
-theorem problem_2_2_c (τ : Fin 2 → Fin 2) :
-    (1 / (4 * (Real.pi : ℂ))) *
-      ∫ φ in (0 : ℝ)..(2 * Real.pi),
-        ∫ θ in (0 : ℝ)..Real.pi,
-          ((Real.sin θ : ℂ) *
-            ((totalSpinHalfRot3 (Fin 2) φ * totalSpinHalfRot2 (Fin 2) θ).mulVec
-              (basisVec upDown)) τ) =
-    (1 / 2 : ℂ) * (basisVec upDown τ - basisVec (basisSwap upDown (0 : Fin 2) 1) τ) := by
+/-- Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §2.2, Problem 2.2.b,
+eq. (2.2.14), p. 23: the solid-angle average of `|↑⟩₁|↓⟩₂` under the rotations
+`Û^(3)_φ Û^(2)_θ = exp(-iφŜ_tot^(3)) exp(-iθŜ_tot^(2))` of eq. (2.2.11), p. 22, is
+`(1/2)(|↑⟩₁|↓⟩₂ − |↓⟩₁|↑⟩₂) = (1/√2)|Φ_{0,0}⟩`. The first conjunct is the average stated
+component-wise at every configuration `τ`; the second identifies the result with the singlet
+`twoSiteSinglet` of App. A.3.3, eq. (A.3.23), p. 474. -/
+theorem tasaki_problem_2_2_b_upDown_average :
+    (∀ τ : Fin 2 → Fin 2,
+      (1 / (4 * (Real.pi : ℂ))) * ∫ φ in (0 : ℝ)..(2 * Real.pi), ∫ θ in (0 : ℝ)..Real.pi,
+        ((Real.sin θ : ℂ) *
+          ((NormedSpace.exp ((-(Complex.I * (φ : ℂ))) • totalSpinHalfOp3 (Fin 2)) *
+              NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp2 (Fin 2))).mulVec
+            (basisVec upDown)) τ) =
+        ((1 / 2 : ℂ) • (basisVec upDown - basisVec (basisSwap upDown (0 : Fin 2) 1))) τ) ∧
+    (1 / 2 : ℂ) • (basisVec upDown - basisVec (basisSwap upDown (0 : Fin 2) 1)) =
+      ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ • twoSiteSinglet := by
+  refine ⟨fun τ => ?_, by unfold twoSiteSinglet; rw [smul_smul, sqrt2_inv_mul_sqrt2_inv]⟩
+  -- The integrand sits under both binders, so the exponential bridges go through `simp only`.
+  simp only [← totalSpinHalfRot3_eq_exp, ← totalSpinHalfRot2_eq_exp, Pi.smul_apply,
+    Pi.sub_apply, smul_eq_mul]
   -- Expand integrand to explicit trig/exp products
   conv_lhs => arg 2; arg 1; ext φ; arg 1; ext θ; rw [totalRot_mulVec_upDown_component]
   -- Simplify RHS
