@@ -10,16 +10,18 @@ import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 # Trig-integral helpers for the SU(2)-averaged two-site state
 
 Concrete trig-integral evaluations needed for the SU(2)-averaged-state
-computation (Tasaki §2.2, eq. (2.2.14), p. 23 — the first display of
-Problem 2.2.b). These are proved using mathlib's `intervalIntegral`
+computations (Tasaki §2.2, eqs. (2.2.14) and (2.2.15), p. 23 — the two
+displays of Problem 2.2.b). These are proved using mathlib's `intervalIntegral`
 and `SpecialFunctions.Integrals`. Each is a thin wrapper around
 mathlib's `integral_sin`, `integral_cos`, or
 `integral_sin_sq`/`integral_cos_sq`.
 
-The full integral statement assembled from these helpers is
-`tasaki_problem_2_2_b_upDown_average` below, stated on the exponential
-rotations of eq. (2.2.11), p. 22, together with the identification of the
-average with `(1/√2)|Φ_{0,0}⟩` (`twoSiteSinglet`, App. A.3.3, eq. (A.3.23), p. 474).
+The full integral statements assembled from these helpers are
+`tasaki_problem_2_2_b_upDown_average` (eq. (2.2.14)) and
+`tasaki_problem_2_2_b_upUp_average` (eq. (2.2.15)) below, stated on the exponential
+rotations of eq. (2.2.11), p. 22, together with the identification of the averages
+with `(1/√2)|Φ_{0,0}⟩` and `(π/(4√2))|Φ_{1,0}⟩` (`twoSiteSinglet`, `twoSiteTripletZero`,
+App. A.3.3, eqs. (A.3.23)/(A.3.22), p. 474) and the non-SU(2)-invariance of `|Φ_{1,0}⟩`.
 -/
 
 namespace LatticeSystem.Quantum
@@ -144,7 +146,7 @@ theorem integral_sin_mul_cos_half_mul_sin_half_zero_pi :
   rw [intervalIntegral.integral_const_mul, integral_sin_sq, Real.sin_zero, Real.sin_pi]
   ring
 
-/-! ## Complex exponential integrals for the φ component of eq. (2.2.14)
+/-! ## Complex exponential integrals for the φ components of eqs. (2.2.14)/(2.2.15)
 
 `∫₀²π e^{±iφ} dφ = 0` follows from `e^{iφ} = cos φ + i sin φ` and the
 vanishing of `∫ cos` and `∫ sin` over one full period. -/
@@ -521,5 +523,103 @@ private theorem twoSiteTripletZero_not_su2_invariant :
   have hc : ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ ≠ 0 :=
     inv_ne_zero (Complex.ofReal_ne_zero.mpr (Real.sqrt_ne_zero'.mpr (by norm_num)))
   exact hc (by linear_combination (-(1 / 2) : ℂ) * h1)
+
+/-- Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §2.2, Problem 2.2.b,
+eq. (2.2.15), p. 23: the solid-angle average of `|↑⟩₁|↑⟩₂` under the rotations
+`Û^(3)_φ Û^(2)_θ = exp(-iφŜ_tot^(3)) exp(-iθŜ_tot^(2))` of eq. (2.2.11), p. 22, is
+`(π/8)(|↑⟩₁|↓⟩₂ + |↓⟩₁|↑⟩₂) = (π/(4√2))|Φ_{1,0}⟩`, and `|Φ_{1,0}⟩` is not SU(2) invariant.
+The first conjunct is the average stated component-wise at every configuration `τ`; the second
+identifies the result with the triplet `twoSiteTripletZero` of App. A.3.3, eq. (A.3.22), p. 474;
+the third says that not every rotation `exp(-iθŜ_tot^(α))` fixes `|Φ_{1,0}⟩`. -/
+theorem tasaki_problem_2_2_b_upUp_average :
+    (∀ τ : Fin 2 → Fin 2, (1 / (4 * (Real.pi : ℂ))) *
+      ∫ φ in (0 : ℝ)..(2 * Real.pi), ∫ θ in (0 : ℝ)..Real.pi,
+        ((Real.sin θ : ℂ) *
+          ((NormedSpace.exp ((-(Complex.I * (φ : ℂ))) • totalSpinHalfOp3 (Fin 2)) *
+              NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp2 (Fin 2))).mulVec
+            (basisVec (fun _ : Fin 2 => (0 : Fin 2)))) τ) =
+        (((Real.pi : ℂ) / 8) • (basisVec upDown + basisVec (basisSwap upDown (0 : Fin 2) 1))) τ) ∧
+    ((Real.pi : ℂ) / 8) • (basisVec upDown + basisVec (basisSwap upDown (0 : Fin 2) 1)) =
+      ((Real.pi : ℂ) / (4 * ((Real.sqrt 2 : ℝ) : ℂ))) • twoSiteTripletZero ∧
+    ¬ ∀ (α : Fin 3) (θ : ℝ),
+      (NormedSpace.exp ((-(Complex.I * (θ : ℂ))) •
+          ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] α)).mulVec
+        twoSiteTripletZero = twoSiteTripletZero := by
+  refine ⟨fun τ => ?_, ?_, twoSiteTripletZero_not_su2_invariant⟩
+  swap
+  · unfold twoSiteTripletZero
+    rw [smul_smul]
+    congr 1
+    linear_combination (-(Real.pi : ℂ) / 4) * sqrt2_inv_mul_sqrt2_inv
+  simp only [← totalSpinHalfRot3_eq_exp, ← totalSpinHalfRot2_eq_exp, Pi.smul_apply,
+    Pi.add_apply, smul_eq_mul]
+  conv_lhs => arg 2; arg 1; ext φ; arg 1; ext θ; rw [totalRot_mulVec_upUp_component]
+  have ht0 : τ 0 = 0 ∨ τ 0 = 1 := by rcases τ 0 with ⟨v, hv⟩; omega
+  have ht1 : τ 1 = 0 ∨ τ 1 = 1 := by rcases τ 1 with ⟨v, hv⟩; omega
+  rcases ht0 with h0 | h0 <;> rcases ht1 with h1 | h1 <;>
+    simp only [h0, h1, Matrix.cons_val_zero, Matrix.cons_val_one, basisVec, basisSwap_upDown,
+      upDown, fin2_eq_iff]
+  · have hexp : ∀ φ : ℝ, Complex.exp (-(Complex.I * (φ : ℂ) / 2)) *
+        Complex.exp (-(Complex.I * (φ : ℂ) / 2)) = Complex.exp (-(Complex.I * (φ : ℂ))) := by
+      intro φ; rw [← Complex.exp_add]; congr 1; ring
+    -- `rw`/`simp` with `intervalIntegral.integral_const_mul`/`integral_mul_const` find no match
+    -- in these ℂ-valued integrals, so both are applied as terms.
+    have hin : ∀ φ : ℝ, ∫ θ in (0 : ℝ)..Real.pi,
+        (Real.sin θ : ℂ) * (Complex.exp (-(Complex.I * (φ : ℂ) / 2)) * (Real.cos (θ / 2) : ℂ) *
+          (Complex.exp (-(Complex.I * (φ : ℂ) / 2)) * (Real.cos (θ / 2) : ℂ))) =
+        Complex.exp (-(Complex.I * (φ : ℂ))) * ∫ θ in (0 : ℝ)..Real.pi,
+          (Real.sin θ : ℂ) * ((Real.cos (θ / 2) : ℂ) * (Real.cos (θ / 2) : ℂ)) := fun φ =>
+      (intervalIntegral.integral_congr fun θ _ => by rw [← hexp φ]; ring).trans
+        (intervalIntegral.integral_const_mul _ _)
+    simp_rw [hin]
+    rw [show ∫ φ in (0 : ℝ)..(2 * Real.pi), Complex.exp (-(Complex.I * (φ : ℂ))) * _ =
+        (∫ φ in (0 : ℝ)..(2 * Real.pi), Complex.exp (-(Complex.I * (φ : ℂ)))) * _ from
+      intervalIntegral.integral_mul_const _ _, integral_cexp_neg_I_mul_zero_two_pi]
+    simp
+  · have hpt : ∀ φ θ : ℝ,
+        (Real.sin θ : ℂ) * (Complex.exp (-(Complex.I * (φ : ℂ) / 2)) * (Real.cos (θ / 2) : ℂ) *
+          (Complex.exp (Complex.I * (φ : ℂ) / 2) * (Real.sin (θ / 2) : ℂ))) =
+        ((Real.sin θ * (Real.cos (θ / 2) * Real.sin (θ / 2)) : ℝ) : ℂ) := by
+      intro φ θ
+      have hexp : Complex.exp (-(Complex.I * (φ : ℂ) / 2)) *
+          Complex.exp (Complex.I * (φ : ℂ) / 2) = 1 := by
+        rw [← Complex.exp_add, neg_add_cancel, Complex.exp_zero]
+      rw [Complex.ofReal_mul, Complex.ofReal_mul]
+      linear_combination (Real.sin θ : ℂ) * (Real.cos (θ / 2) : ℂ) * (Real.sin (θ / 2) : ℂ) * hexp
+    simp_rw [hpt, intervalIntegral.integral_ofReal, integral_sin_mul_cos_half_mul_sin_half_zero_pi,
+      intervalIntegral.integral_const]
+    simp
+    field_simp
+    ring
+  · have hpt : ∀ φ θ : ℝ,
+        (Real.sin θ : ℂ) * (Complex.exp (Complex.I * (φ : ℂ) / 2) * (Real.sin (θ / 2) : ℂ) *
+          (Complex.exp (-(Complex.I * (φ : ℂ) / 2)) * (Real.cos (θ / 2) : ℂ))) =
+        ((Real.sin θ * (Real.cos (θ / 2) * Real.sin (θ / 2)) : ℝ) : ℂ) := by
+      intro φ θ
+      have hexp : Complex.exp (Complex.I * (φ : ℂ) / 2) *
+          Complex.exp (-(Complex.I * (φ : ℂ) / 2)) = 1 := by
+        rw [← Complex.exp_add, add_neg_cancel, Complex.exp_zero]
+      rw [Complex.ofReal_mul, Complex.ofReal_mul]
+      linear_combination (Real.sin θ : ℂ) * (Real.cos (θ / 2) : ℂ) * (Real.sin (θ / 2) : ℂ) * hexp
+    simp_rw [hpt, intervalIntegral.integral_ofReal, integral_sin_mul_cos_half_mul_sin_half_zero_pi,
+      intervalIntegral.integral_const]
+    simp
+    field_simp
+    ring
+  · have hexp : ∀ φ : ℝ, Complex.exp (Complex.I * (φ : ℂ) / 2) *
+        Complex.exp (Complex.I * (φ : ℂ) / 2) = Complex.exp (Complex.I * (φ : ℂ)) := by
+      intro φ; rw [← Complex.exp_add]; congr 1; ring
+    have hin : ∀ φ : ℝ, ∫ θ in (0 : ℝ)..Real.pi,
+        (Real.sin θ : ℂ) * (Complex.exp (Complex.I * (φ : ℂ) / 2) * (Real.sin (θ / 2) : ℂ) *
+          (Complex.exp (Complex.I * (φ : ℂ) / 2) * (Real.sin (θ / 2) : ℂ))) =
+        Complex.exp (Complex.I * (φ : ℂ)) * ∫ θ in (0 : ℝ)..Real.pi,
+          (Real.sin θ : ℂ) * ((Real.sin (θ / 2) : ℂ) * (Real.sin (θ / 2) : ℂ)) := fun φ =>
+      (intervalIntegral.integral_congr fun θ _ => by rw [← hexp φ]; ring).trans
+        (intervalIntegral.integral_const_mul _ _)
+    simp_rw [hin]
+    rw [show ∫ φ in (0 : ℝ)..(2 * Real.pi), Complex.exp (Complex.I * (φ : ℂ)) * _ =
+        (∫ φ in (0 : ℝ)..(2 * Real.pi), Complex.exp (Complex.I * (φ : ℂ))) * _ from
+      intervalIntegral.integral_mul_const _ _, integral_cexp_I_mul_zero_two_pi]
+    simp
 
 end LatticeSystem.Quantum

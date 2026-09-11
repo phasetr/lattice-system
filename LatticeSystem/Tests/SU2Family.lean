@@ -143,7 +143,7 @@ example :
   (tasaki_problem_2_2_b_upDown_average.1 (basisSwap upDown (0 : Fin 2) 1)).trans (by
     simp [basisVec, basisSwap_upDown, funext_iff, Fin.forall_fin_two, upDown])
 
-/-- Red pin: full signature of eq. (2.2.15) — the SU(2)-averaged `|↑↑⟩` state equals the
+/-- Pin: full signature of eq. (2.2.15) — the SU(2)-averaged `|↑↑⟩` state equals the
 unnormalised `Φ_{1,0}` combination times `π/8`, which in turn equals a `twoSiteTripletZero`
 multiple, and `twoSiteTripletZero` is not SU(2)-invariant (Tasaki §2.2, eq. (2.2.15), p. 23,
 second display of Problem 2.2.b; App. A.3.3, eq. (A.3.22), p. 474; invariance witness at axis 2,
@@ -165,7 +165,7 @@ example :
         twoSiteTripletZero = twoSiteTripletZero :=
   tasaki_problem_2_2_b_upUp_average
 
-/-- Red pin: positive control instantiating the eq. (2.2.15) component chain at `τ = upDown`:
+/-- Pin: positive control instantiating the eq. (2.2.15) component chain at `τ = upDown`:
 the averaged coefficient is `+π/8` (distinguishes from `0`, the value at `τ = fun _ => 0` below,
 and from the `-1/2` value of eq. (2.2.14) at the swapped configuration above). -/
 example :
@@ -175,9 +175,10 @@ example :
             NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp2 (Fin 2))).mulVec
           (basisVec (fun _ : Fin 2 => (0 : Fin 2)))) upDown) =
     ((Real.pi : ℂ) / 8) :=
-  (tasaki_problem_2_2_b_upUp_average.1 upDown).trans (by simp [upDown, basisSwap])
+  (tasaki_problem_2_2_b_upUp_average.1 upDown).trans (by
+    simp [basisVec, basisSwap_upDown, funext_iff, Fin.forall_fin_two, upDown])
 
-/-- Red pin: positive control instantiating the eq. (2.2.15) component chain at
+/-- Pin: positive control instantiating the eq. (2.2.15) component chain at
 `τ = fun _ => 0`, i.e. `|↑↑⟩` itself: the averaged coefficient is `0` (distinguishes the vanishing
 diagonal component from the off-diagonal `π/8` value pinned above, mutation M9). -/
 example :
@@ -188,9 +189,9 @@ example :
           (basisVec (fun _ : Fin 2 => (0 : Fin 2)))) (fun _ : Fin 2 => (0 : Fin 2))) =
     (0 : ℂ) :=
   (tasaki_problem_2_2_b_upUp_average.1 (fun _ : Fin 2 => (0 : Fin 2))).trans (by
-    simp [upDown, basisSwap])
+    simp [basisVec, basisSwap_upDown, funext_iff, Fin.forall_fin_two, upDown])
 
-/-- Red pin (θ = 0 control on the non-invariance predicate, all three axes): at `θ = 0` every
+/-- Pin (θ = 0 control on the non-invariance predicate, all three axes): at `θ = 0` every
 axis rotation acts as the identity on `twoSiteTripletZero`, so the negated claim
 `¬ ∀ α θ, …` would be vacuously refuted if the predicate's `∀ θ` quantifier were narrowed to
 exclude `θ = 0`, or if `NormedSpace.exp` at the zero exponent failed to reduce to `1`. This
