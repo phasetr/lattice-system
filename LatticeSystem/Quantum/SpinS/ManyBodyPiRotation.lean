@@ -22,9 +22,9 @@ forms `spinSPiRotation3`/`spinSPiRotation1`/`spinSPiRotation2` with
 `spinSPiRotation3_eq_spinSRot3_pi` of `Quantum/SpinS/SpinSPiRotationExpAxis3.lean`,
 `spinSPiRotation1_eq_spinSRot1_pi` of `Quantum/SpinS/SpinSPiRotationExpAxis1.lean` and
 `spinSPiRotation2_eq_exp_spinSOp2` of `Quantum/SpinS/SpinSPiRotationExpAxis2.lean`, uniformly
-`spinSPiRotationAxis_eq_exp` of the last file (Tasaki eq. (2.1.34) / Problem 2.1.g, p. 20); only
-the lift through `manyBodyTensorS` to the many-body `Û_π^{(α)}` of this file remains **not**
-formalised — no declaration in this chain mentions `Matrix.exp` or `NormedSpace.exp`.  Exponential
+`spinSPiRotationAxis_eq_exp` of the last file (Tasaki eq. (2.1.34) / Problem 2.1.g, p. 20); the
+lift through `manyBodyTensorS` to the many-body `Û_π^{(α)}` of this file is proved,
+`manyBodySPiRotation_eq_exp` of `Quantum/SpinS/ManyBodyPiRotationExp.lean`.  Exponential
 rotations and bridges do exist elsewhere in the repository —
 `spinSRot3 N θ = exp(−iθ Ŝ^{(3)})` of `Quantum/SpinS/Problem25cZAxisRotationInput.lean`, whose
 closed form `spinSRot3_eq_diagonal` and general-`S` many-body bridge
@@ -37,9 +37,11 @@ the general-`S` twist bridge `lsmTwistOperator_eq_diagonal` of
 `Quantum/SpinS/LiebSchultzMattisProof.lean`; and the spin-`1/2` `totalSpinHalfRot{1,2,3}_eq_exp`
 of `Quantum/TotalSpin/Rotation.lean` — of these `spinSRot3` and `spinSRot1` are related to the
 closed forms used here, through the three axis identifications of the single-site factor
-`spinSPiRotationAxis` above; the many-body `manyBodySPiRotation` lift stays unrelated.  The
-exponentials written above and below are the book's notation for the closed-form matrices at the
-many-body level, proved equalities now at the single-site level for every axis.
+`spinSPiRotationAxis` above; the many-body `manyBodySPiRotation` lift is
+`manyBodySPiRotation_eq_exp` of `Quantum/SpinS/ManyBodyPiRotationExp.lean`.  The exponentials
+written above and below are the book's notation for the closed-form matrices at the many-body
+level, and every one written here is a proved equality, at both the single-site and the
+many-body level.
 
 At `S = 1` (`N = 2`) the same operator is also built as the whole-chain `piRotationS` of
 `Quantum/SpinS/KennedyTasakiTransformation.lean`, from the real involution `1 − 2(Ŝ^{(α)})²`.
@@ -88,8 +90,9 @@ private theorem manyBodyTensorS_const_smul (c : ℂ)
 /-- **Tasaki eq. (2.2.11), p. 22, at `θ = π`**: the global `π` rotation `Û_π^{(α)}` about the axis
 selected by `α : Fin 3`, as the uniform lattice tensor `⊗_{x ∈ Λ} û_α` of the closed-form
 single-site factor.  The book writes it `∏_{x ∈ Λ} exp(−iπ Ŝ_x^{(α)})`; each single-site factor is
-now identified with its exponential (`spinSPiRotationAxis_eq_exp`), but the lift of that
-identification to this lattice product is not formalised (see the module header). -/
+identified with its exponential (`spinSPiRotationAxis_eq_exp`), and the lift of that
+identification to this lattice product is proved, `manyBodySPiRotation_eq_exp` of
+`Quantum/SpinS/ManyBodyPiRotationExp.lean`. -/
 noncomputable def manyBodySPiRotation (α : Fin 3) : ManyBodyOpS Λ N :=
   manyBodyTensorS (fun _ : Λ => spinSPiRotationAxis N α)
 

@@ -861,16 +861,12 @@ $\hat S_x \cdot \hat S_y$.
 \begin{itemize}
   \item Global rotation operator
     $\hat U^{(\alpha)}_\theta = \exp(-i\theta \hat S_{\mathrm{tot}}^{(\alpha)})$
-    (eq.~(2.2.11)) at general $S$ about the axis $1$, and the identification
-    of the closed-form $\theta = \pi$ rotations
-    (\texttt{spinSPiRotationAxis}, \texttt{manyBodySPiRotation}) with the
-    exponential on axis $2$, and the many-body lift on any axis
-    (axes $3$ and $1$ at the single-site level are now proved,
-    \texttt{spinSPiRotation3\_eq\_spinSRot3\_pi} and
-    \texttt{spinSPiRotation1\_eq\_spinSRot1\_pi},
-    \S\ref{sec:problem21g}). The general-$S$ exponentials about
-    the axes $2$ and $3$ do exist, as \texttt{saturatedGlobalRot2} and
-    \texttt{saturatedGlobalRot3}; all three axes at spin-$1/2$ are proved as
+    (eq.~(2.2.11)) at general $S$ and general $\theta$ about the axis $1$;
+    the case $\theta = \pi$ is covered by
+    \texttt{manyBodySPiRotation\_eq\_exp} (\S\ref{sec:problem22a}). The
+    general-$S$ exponentials about the axes $2$ and $3$ exist, as
+    \texttt{saturatedGlobalRot2} and \texttt{saturatedGlobalRot3}; all three
+    axes at spin-$1/2$ are proved as
     \texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp}, and the general-$S$
     axis-$3$ many-body bridge as
     \texttt{manyBodyTensorS\_spinSRot3\_eq\_exp\_totalSpinSOp3}.
@@ -1040,7 +1036,9 @@ and the whole axis family is exponential, $\hat u^{(\alpha)} =
 e^{-i\pi \hat S^{(\alpha)}}$ for every $\alpha \in \{1,2,3\}$
 (\texttt{spinSPiRotationAxis\_eq\_exp}), the uniform statement the
 many-body lift of eq.~(2.2.11), p.~22 (Problem 2.2.a,
-\S\ref{sec:problem22a}), multiplies over the lattice.
+\S\ref{sec:problem22a}), multiplies over the lattice --- a multiplication
+proved as \texttt{manyBodySPiRotation\_eq\_exp}
+(\S\ref{sec:problem22a}).
 
 The printed entry form of the same relation,
 $\langle \psi_\sigma | \hat u^{(2)} | \psi_\tau \rangle =
@@ -1058,10 +1056,26 @@ $(-1)^{2S}$. It is the printed order $\hat u^{(2)} = \hat u^{(3)}\hat
 u^{(1)}$ that is the matrix part of the time reversal $\hat\Theta =
 \hat u^{(2)} \hat K$, p.~278.
 
-\paragraph{Not yet formalized.} The lift of the three single-site
-identifications to the many-body global rotation of eq.~(2.2.11)
-(Problem 2.2.a, \S\ref{sec:problem22a}) remains open; see the inventory
-there.
+\paragraph{The many-body lift.} The lift of the three single-site
+identifications to the many-body global rotation of eq.~(2.2.11), p.~22
+(Problem 2.2.a, \S\ref{sec:problem22a}), is proved by a five-step
+route independent of the axis: (1) the site embedding $\iota_x$ is a
+continuous unital ring homomorphism, hence commutes with the matrix
+exponential (\texttt{onSiteS\_exp}); (2) a many-body tensor is the
+noncommutative product $\prod_{x\in\Lambda}\iota_x(W_x)$ of the site
+embeddings of its factors (\texttt{manyBodyTensorS\_eq\_noncommProd});
+(3) since embeddings at distinct sites commute, the exponential of a sum
+of embeddings is that product
+(\texttt{manyBodyTensorS\_const\_exp}); (4) applying this to
+$A = -i\pi\hat S^{(\alpha)}$ and combining with the linearity of
+$\iota_x$ gives $\exp[-i\pi\hat S_{\mathrm{tot}}^{(\alpha)}] =
+\bigotimes_{x\in\Lambda}\exp[-i\pi\hat S^{(\alpha)}]$, the second
+equality of eq.~(2.2.11) at $\theta = \pi$; (5) the single-site input
+$\exp[-i\pi\hat S^{(\alpha)}] = \hat u^{(\alpha)}$
+(\texttt{spinSPiRotationAxis\_eq\_exp}, \S\ref{sec:problem21g}) then
+identifies the right-hand side with \texttt{manyBodySPiRotation}, giving
+the many-body exponential identification
+\texttt{manyBodySPiRotation\_eq\_exp}; see \S\ref{sec:problem22a}.
 
 \subsection{Problem 2.2.a: global \texorpdfstring{$\pi$}{pi}-rotations
   (Tasaki \S2.2, Problem 2.2.a, p.~23, solution p.~496)}
@@ -1093,10 +1107,13 @@ at general $S$ is now proved,
 \texttt{spinSPiRotation1\_eq\_spinSRot1\_pi} and
 \texttt{spinSPiRotation2\_eq\_exp\_spinSOp2}, uniformly
 \texttt{spinSPiRotationAxis\_eq\_exp}
-(\S\ref{sec:problem21g}, Tasaki eq.~(2.1.34) / Problem 2.1.g, p.~20); only
+(\S\ref{sec:problem21g}, Tasaki eq.~(2.1.34) / Problem 2.1.g, p.~20), and
 its lift through \texttt{manyBodyTensorS} to the many-body
-$\hat U^{(\alpha)}_\pi$ built here remains \textbf{not} formalized.
-Exponential rotations and bridges do exist elsewhere in the repository:
+$\hat U^{(\alpha)}_\pi$ built here is also proved,
+\texttt{manyBodySPiRotation\_eq\_exp}
+(\texttt{Quantum/SpinS/ManyBodyPiRotationExp.lean}), by the five-step
+route of \S\ref{sec:problem21g}. Exponential rotations and bridges do
+exist elsewhere in the repository:
 the single-site
 $\texttt{spinSRot3}\,N\,\theta = e^{-i\theta \hat S^{(3)}}$, whose closed
 form \texttt{spinSRot3\_eq\_diagonal} is proved, and
@@ -1111,10 +1128,10 @@ twist bridge \texttt{lsmTwistOperator\_eq\_diagonal}; and the spin-$1/2$
 and \texttt{spinSRot1} are related to the closed forms built here, through
 the three single-site identifications of the closed-form factor
 \texttt{spinSPiRotationAxis} above (\S\ref{sec:problem21g}); the many-body
-\texttt{manyBodySPiRotation} lift stays unrelated. The exponentials
-written in this subsection are the book's notation for those matrices,
-proved equalities now at the single-site level for every axis, but not
-yet for the many-body product.
+\texttt{manyBodySPiRotation} lift is proved as
+\texttt{manyBodySPiRotation\_eq\_exp}, so every exponential written in
+this subsection is a proved equality, at both the single-site and the
+many-body level.
 
 The single-site factors
 obey the sign identity of eq.~(2.1.25), p.~18,
@@ -1167,6 +1184,21 @@ $\langle \Phi, V\Phi \rangle = \langle U\Phi, VU\Phi\rangle
 Part (c) instantiates this with $U = \hat U^{(\alpha)}_\pi$,
 $V = \hat U^{(\beta)}_\pi$, and the anticommutation of part (b).
 \end{proof}
+
+\emph{Restatement on the book's own exponential objects.} Since
+\texttt{manyBodySPiRotation\_eq\_exp} identifies $\hat U^{(\alpha)}_\pi$
+with $\exp[-i\pi \hat S_{\mathrm{tot}}^{(\alpha)}]$ for every axis
+$\alpha$, parts (a), (b) and (c) above transfer verbatim to the
+exponential objects $\exp[-i\pi \hat S_{\mathrm{tot}}^{(\alpha)}]$ of
+eq.~(2.2.11), p.~22 --- the notation the book itself uses to state
+Problem 2.2.a --- by rewriting each closed-form statement along that
+equality; the parity dichotomy $(-1)^{|\Lambda| N}$ is untouched. Lean
+names, all in \texttt{Quantum/SpinS/ManyBodyPiRotationExp.lean}:
+\begin{itemize}
+  \item[(a)] \texttt{manyBodySPiRotationExp\_commute\_of\_even}
+  \item[(b)] \texttt{manyBodySPiRotationExp\_anticommute\_of\_odd}
+  \item[(c)] \texttt{tasaki\_problem\_2\_2\_a\_exp\_eigenvector\_orthogonal}
+\end{itemize}
 
 \emph{Sign convention.} The book's $\hat u^{(\alpha)} =
 e^{-i\pi \hat S^{(\alpha)}}$ is realised by retargeting the existing
@@ -1231,13 +1263,6 @@ and the corresponding actions of $\hat S^{-}$. Lean names:
     $\hat S^{\pm} = \hat S^{(1)} \pm i\hat S^{(2)}$ for $S = 1$
     (follows from the definitions~(2.1.9)).
   \item Problem 2.1.c: $S = 1$ analogue of the closed form~(2.1.26).
-  \item Problem 2.1.g: the many-body lift of eq.~(2.2.11) to
-    $e^{-i\pi\hat S^{(\alpha)}}$ on any axis. All three axes' closed-form
-    $\pi$-rotation matrices~(2.1.33)/(2.1.34) are proved at general $S$,
-    hence at $S = 1$: \texttt{spinSPiRotation3\_eq\_spinSRot3\_pi},
-    \texttt{spinSPiRotation1\_eq\_spinSRot1\_pi},
-    \texttt{spinSPiRotation2\_eq\_exp\_spinSOp2}
-    (\S\ref{sec:problem21g}).
 \end{itemize}
 
 %======================================================================

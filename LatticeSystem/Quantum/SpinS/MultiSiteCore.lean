@@ -393,4 +393,25 @@ theorem onSiteS_mul_onSiteS_same (i : Λ)
     · rw [if_neg h1, zero_mul]
 
 
+/-! ## The site embedding as a bundled homomorphism -/
+
+/-- `onSiteS i` as a ring homomorphism: it is unital, multiplicative on the same site, additive
+and zero-preserving.  Bundling is what lets generic ring-homomorphism machinery (for instance the
+matrix exponential's `NormedSpace.map_exp`) be applied to the site embedding. -/
+noncomputable def onSiteSRingHom {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ} (i : Λ) :
+    Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ →+* ManyBodyOpS Λ N where
+  toFun := fun A => onSiteS i A
+  map_one' := onSiteS_one i
+  map_mul' := fun A B => (onSiteS_mul_onSiteS_same i A B).symm
+  map_zero' := onSiteS_zero i
+  map_add' := fun A B => onSiteS_add i A B
+
+/-- `onSiteS i` as a `ℂ`-linear map.  Both source and target are finite dimensional, so this
+bundling is what supplies continuity of the site embedding. -/
+noncomputable def onSiteSLinearMap {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ} (i : Λ) :
+    Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ →ₗ[ℂ] ManyBodyOpS Λ N where
+  toFun := fun A => onSiteS i A
+  map_add' := fun A B => onSiteS_add i A B
+  map_smul' := fun c A => onSiteS_smul i c A
+
 end LatticeSystem.Quantum
