@@ -14,9 +14,8 @@ class of footnote 16 — an arbitrary finite product of the global rotations
 such that `Û Ŝ_x^{(3)} Û† = Ŝ_x · n` at both sites `x = 1, 2`. Problem 2.2.c asks to show that
 `Û |↑⟩₁|↓⟩₂` is determined solely by `n`, i.e. does not depend on the particular choice of `Û`
 within that class. This module states that conclusion pairwise: any two admissible rotations `U`,
-`V` with the same `n` send `|↑⟩₁|↓⟩₂` to the same vector. The printed hypothesis `‖n‖ = 1` is not
-used by the proof; only the doc comment records that it is unused, the theorem statement does not
-drop it as a stated conclusion.
+`V` with the same `n` send `|↑⟩₁|↓⟩₂` to the same vector. The statement carries no hypothesis
+`‖n‖ = 1`: the proof does not use the printed unit norm.
 -/
 
 namespace LatticeSystem.Quantum
@@ -109,5 +108,77 @@ private theorem twoSite_mulVec_upDown_of_eq_mul {u v w : Matrix (Fin 2) (Fin 2) 
     upDown_one]
   simp only [Matrix.mul_apply, Fin.sum_univ_two, h01, h10, mul_zero, add_zero, zero_add]
   linear_combination (v (τ 0) 0 * v (τ 1) 1) * hdet
+
+/-- The `SU(2)` core of Tasaki's Problem 2.2.c (pp. 23-24): if `u, v ∈ SU(2)` and the uniform
+operators `u ⊗ u`, `v ⊗ v` both conjugate `Ŝ_1^{(3)}` to `Ŝ_1 · n` (the site-`1` copy of the
+`Ŝ · v` of eq. (2.1.19), p. 17), then they send `|↑⟩₁|↓⟩₂` to the same vector. The two
+conjugation equations give `u Ŝ^{(3)} u† = v Ŝ^{(3)} v†`, so `w = v† u` commutes with `Ŝ^{(3)}`
+and has determinant `1`, and `u = v w`. -/
+private theorem su2_twoSite_mulVec_upDown_eq (n : Fin 3 → ℝ) {u v : Matrix (Fin 2) (Fin 2) ℂ}
+    (hu : u ∈ SU2) (hv : v ∈ SU2)
+    (hun : onSite (0 : Fin 2) u * onSite (1 : Fin 2) u * onSite (0 : Fin 2) spinHalfOp3 *
+        Matrix.conjTranspose (onSite (0 : Fin 2) u * onSite (1 : Fin 2) u) =
+      onSite (0 : Fin 2) (spinHalfDotVec fun α => (n α : ℂ)))
+    (hvn : onSite (0 : Fin 2) v * onSite (1 : Fin 2) v * onSite (0 : Fin 2) spinHalfOp3 *
+        Matrix.conjTranspose (onSite (0 : Fin 2) v * onSite (1 : Fin 2) v) =
+      onSite (0 : Fin 2) (spinHalfDotVec fun α => (n α : ℂ))) :
+    (onSite (0 : Fin 2) u * onSite (1 : Fin 2) u).mulVec (basisVec upDown) =
+      (onSite (0 : Fin 2) v * onSite (1 : Fin 2) v).mulVec (basisVec upDown) := by
+  rw [onSite_zero_conj_twoSite hu.1] at hun
+  rw [onSite_zero_conj_twoSite hv.1] at hvn
+  have h := hun.trans hvn.symm
+  have hconj : u * spinHalfOp3 * Matrix.conjTranspose u =
+      v * spinHalfOp3 * Matrix.conjTranspose v := by
+    ext a b
+    have hab := congrFun (congrFun h ![a, 0]) ![b, 0]
+    simpa [onSite_apply, Fin.forall_fin_two] using hab
+  have huu : Matrix.conjTranspose u * u = 1 := by
+    rw [← Matrix.star_eq_conjTranspose]
+    exact Unitary.star_mul_self_of_mem hu.1
+  have hvv : Matrix.conjTranspose v * v = 1 := by
+    rw [← Matrix.star_eq_conjTranspose]
+    exact Unitary.star_mul_self_of_mem hv.1
+  have hvv' : v * Matrix.conjTranspose v = 1 := by
+    rw [← Matrix.star_eq_conjTranspose]
+    exact Unitary.mul_star_self_of_mem hv.1
+  have hcomm : Matrix.conjTranspose v * u * spinHalfOp3 =
+      spinHalfOp3 * (Matrix.conjTranspose v * u) :=
+    calc Matrix.conjTranspose v * u * spinHalfOp3
+        = Matrix.conjTranspose v * (u * spinHalfOp3 * Matrix.conjTranspose u) * u := by
+          simp only [mul_assoc, huu, mul_one]
+      _ = Matrix.conjTranspose v * (v * spinHalfOp3 * Matrix.conjTranspose v) * u := by
+          rw [hconj]
+      _ = spinHalfOp3 * (Matrix.conjTranspose v * u) := by
+          simp only [← mul_assoc, hvv, one_mul]
+  have hdet : (Matrix.conjTranspose v * u).det = 1 := by
+    rw [Matrix.det_mul, Matrix.det_conjTranspose, hv.2, hu.2, star_one, one_mul]
+  have hvw : u = v * (Matrix.conjTranspose v * u) := by
+    rw [← mul_assoc, hvv', one_mul]
+  obtain ⟨h01, h10, hd⟩ := spinHalfOp3_commute_entries hcomm hdet
+  exact twoSite_mulVec_upDown_of_eq_mul hvw h01 h10 hd
+
+/-- **Tasaki Problem 2.2.c** (*Physics and Mathematics of Quantum Many-Body Systems*, §2.2,
+pp. 23-24; footnote 16, p. 23). Let `U` and `V` be uniform rotations of two spins in the class
+of footnote 16, i.e. finite products of the global rotations `Û_θ^{(α)} = exp(−iθ Ŝ_tot^{(α)})`
+of eq. (2.2.11), p. 22, over axes `α` and angles `θ` (the submonoid they generate). If both
+satisfy `Û Ŝ_x^{(3)} Û† = Ŝ_x · n` at both sites `x`, with `Ŝ_x · n` the site-`x` copy of the
+`Ŝ · v` of eq. (2.1.19), p. 17, then `U |↑⟩₁|↓⟩₂ = V |↑⟩₁|↓⟩₂`: the rotated state depends only
+on `n`, not on the choice of the rotation. The printed unit norm `‖n‖ = 1` is not used by the
+proof. -/
+theorem tasaki_problem_2_2_c_rotated_upDown_eq (n : Fin 3 → ℝ) {U V : ManyBodyOp (Fin 2)}
+    (hU : U ∈ Submonoid.closure (Set.range fun p : Fin 3 × ℝ =>
+      NormedSpace.exp ((-(Complex.I * (p.2 : ℂ))) •
+        ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] p.1)))
+    (hV : V ∈ Submonoid.closure (Set.range fun p : Fin 3 × ℝ =>
+      NormedSpace.exp ((-(Complex.I * (p.2 : ℂ))) •
+        ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] p.1)))
+    (hUn : ∀ x : Fin 2, U * onSite x spinHalfOp3 * Matrix.conjTranspose U =
+      onSite x (spinHalfDotVec fun α => (n α : ℂ)))
+    (hVn : ∀ x : Fin 2, V * onSite x spinHalfOp3 * Matrix.conjTranspose V =
+      onSite x (spinHalfDotVec fun α => (n α : ℂ))) :
+    U.mulVec (basisVec upDown) = V.mulVec (basisVec upDown) := by
+  obtain ⟨u, hu, rfl⟩ := mem_uniformRotClosure_exists_su2 hU
+  obtain ⟨v, hv, rfl⟩ := mem_uniformRotClosure_exists_su2 hV
+  exact su2_twoSite_mulVec_upDown_eq n hu hv (hUn 0) (hVn 0)
 
 end LatticeSystem.Quantum
