@@ -2624,7 +2624,8 @@ formalization of Tasaki \S2.1 and \S2.2.
   displays are formalized in \texttt{Quantum/SU2Integral.lean} as
   \texttt{tasaki\_problem\_2\_2\_b\_upDown\_average} (eq.~(2.2.14)) and
   \texttt{tasaki\_problem\_2\_2\_b\_upUp\_average} (eq.~(2.2.15));
-  Problem 2.2.c (pp.~23--24) below is not formalized.
+  Problem 2.2.c (pp.~23--24), the next problem in the book, is not
+  formalized.
 
   \textit{The states $|\Phi_{0,0}\rangle$ and $|\Phi_{1,0}\rangle$}
   (Tasaki, Appendix A.3.3, eqs.~(A.3.22)/(A.3.23), p.~474;
@@ -2675,9 +2676,9 @@ formalization of Tasaki \S2.1 and \S2.2.
     \begin{align*}
       M\,|\!\uparrow\rangle &=
         e^{-i\varphi/2}\cos\tfrac{\theta}{2}|\!\uparrow\rangle
-        - e^{-i\varphi/2}\sin\tfrac{\theta}{2}|\!\downarrow\rangle,\\
+        + e^{+i\varphi/2}\sin\tfrac{\theta}{2}|\!\downarrow\rangle,\\
       M\,|\!\downarrow\rangle &=
-        e^{+i\varphi/2}\sin\tfrac{\theta}{2}|\!\uparrow\rangle
+        -e^{-i\varphi/2}\sin\tfrac{\theta}{2}|\!\uparrow\rangle
         + e^{+i\varphi/2}\cos\tfrac{\theta}{2}|\!\downarrow\rangle.
     \end{align*}
 
@@ -2694,11 +2695,10 @@ formalization of Tasaki \S2.1 and \S2.2.
         the angular integral gives
         $-\int_0^\pi \sin\theta\,\sin^2\!\tfrac{\theta}{2}\,d\theta = -1$,
         contributing $-\tfrac{1}{2}$.
-      \item $|\!\uparrow\uparrow\rangle$: contains the factor
-        $e^{-i\varphi/2}\cdot e^{+i\varphi/2}\cdot e^{+i\varphi}
-         = e^{+i\varphi}$; the azimuthal integral
+      \item $|\!\uparrow\uparrow\rangle$: carries the phase $e^{-i\varphi}$;
+        the azimuthal integral
         $\int_0^{2\pi}e^{\pm i\varphi}\,d\varphi = 0$ forces this to zero.
-      \item $|\!\downarrow\downarrow\rangle$: contains $e^{-i\varphi}$;
+      \item $|\!\downarrow\downarrow\rangle$: carries $e^{+i\varphi}$;
         again vanishes by the azimuthal integral.
     \end{itemize}
 
@@ -2707,8 +2707,8 @@ formalization of Tasaki \S2.1 and \S2.2.
     combines with the angular integrals to give
     $\tfrac{1}{2}|\!\uparrow\downarrow\rangle - \tfrac{1}{2}|\!\downarrow\uparrow\rangle$,
     which is $\tfrac{1}{\sqrt2}|\Phi_{0,0}\rangle$ by the identity above
-    (the statement records the un-normalised form as in Tasaki
-    eq.~(2.2.14)).
+    (the statement records both the un-normalised form and the
+    $|\Phi_{0,0}\rangle$ form, as a chain, matching Tasaki eq.~(2.2.14)).
   \end{enumerate}
 
   \textit{Key helper lemmas, eq.~(2.2.14).}
