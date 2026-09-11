@@ -98,6 +98,7 @@ import LatticeSystem.Quantum.IsingLowEnergyProblem33aCapstone
 import LatticeSystem.Quantum.SpinS.RangeLocalDoubleCommutatorBound
 import LatticeSystem.Quantum.SpinS.FerromagneticGroundStateTheorem21
 import LatticeSystem.Quantum.SpinS.ManyBodyPiRotationExp
+import LatticeSystem.Quantum.UniformRotationProblem22c
 
 /-!
 # `lattice-system` library root
