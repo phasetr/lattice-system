@@ -57,4 +57,24 @@ private theorem mem_uniformRotClosure_exists_su2 {U : ManyBodyOp (Fin 2)}
       mul_assoc (onSite (0 : Fin 2) v), ← mul_assoc (onSite (0 : Fin 2) u),
       onSite_mul_onSite_same, onSite_mul_onSite_same]
 
+/-- Conjugating a site-`0` operator `A₁` by a uniform two-site operator `u ⊗ u` with `u` unitary
+gives the site-`0` copy of `u A u†`: the site-`1` factors cancel. This is how the hypothesis
+`Û Ŝ_1^{(3)} Û† = Ŝ_1 · n` of Tasaki's Problem 2.2.c (pp. 23-24) reduces to a single-spin
+equation. -/
+private theorem onSite_zero_conj_twoSite {u : Matrix (Fin 2) (Fin 2) ℂ}
+    (hu : u ∈ unitary (Matrix (Fin 2) (Fin 2) ℂ)) (A : Matrix (Fin 2) (Fin 2) ℂ) :
+    onSite (0 : Fin 2) u * onSite (1 : Fin 2) u * onSite (0 : Fin 2) A *
+        Matrix.conjTranspose (onSite (0 : Fin 2) u * onSite (1 : Fin 2) u) =
+      onSite (0 : Fin 2) (u * A * Matrix.conjTranspose u) := by
+  have huu : u * Matrix.conjTranspose u = 1 := by
+    rw [← Matrix.star_eq_conjTranspose]
+    exact Unitary.mul_star_self_of_mem hu
+  rw [Matrix.conjTranspose_mul, onSite_conjTranspose, onSite_conjTranspose,
+    mul_assoc (onSite (0 : Fin 2) u),
+    onSite_mul_onSite_of_ne (by decide : (1 : Fin 2) ≠ 0) u A,
+    ← mul_assoc (onSite (0 : Fin 2) u) (onSite (0 : Fin 2) A),
+    mul_assoc (onSite (0 : Fin 2) u * onSite (0 : Fin 2) A) (onSite (1 : Fin 2) u),
+    ← mul_assoc (onSite (1 : Fin 2) u), onSite_mul_onSite_same (1 : Fin 2), huu, onSite_one,
+    one_mul, onSite_mul_onSite_same, onSite_mul_onSite_same]
+
 end LatticeSystem.Quantum
