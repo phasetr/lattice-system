@@ -236,6 +236,32 @@
     },
     {
       "axiom_dependencies": [],
+      "capstone": true,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-problem-2-2-c-rotated-updown",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.tasaki_problem_2_2_c_rotated_upDown_eq",
+      "lifecycle": "active",
+      "module": "LatticeSystem.Quantum.UniformRotationProblem22c",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "retirement": null,
+      "source_coverage": "complete",
+      "source_path": "LatticeSystem/Quantum/UniformRotationProblem22c.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-problem-2-2-c"
+        }
+      ],
+      "summary": "Tasaki Problem 2.2.c, pp. 23-24 (footnote 16, p. 23; footnote 17, p. 24; solution p. 496, eq. (S.16)): fix n in R^3 and let U range over the footnote-16 class of arbitrary finite products of the global rotations U^(alpha)_theta = exp(-i*theta*S_tot^(alpha)), eq. (2.2.11), p. 22, over axes alpha = 1, 2, 3 and angles theta, satisfying U S_x^(3) U-dagger = S_x dot n at both sites x = 1, 2, where S_x dot n is the eq. (2.1.19) object; any two such U, V send |up_1 down_2> to the same vector. The statement carries no hypothesis norm(n) = 1, and the proof does not use the printed unit norm; it does not assert existence of an admissible rotation for a given n, only the pairwise conclusion. The coverage of the source item is complete for this pairwise form.",
+      "topic_ids": [
+        "quantum-spin"
+      ],
+      "trust_state": "axiom_free"
+    },
+    {
+      "axiom_dependencies": [],
       "capstone": false,
       "declaration_kind": "theorem",
       "id": "tasaki-2020-section-2-1-pauli-x-involutive",

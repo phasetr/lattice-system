@@ -876,9 +876,6 @@ $\hat S_x \cdot \hat S_y$.
     eigenvalues (eqs.~(2.2.17)-(2.2.19)).
   \item Magnetization eigenspace decomposition
     $\mathcal H = \bigoplus_M \mathcal H_M$ (eqs.~(2.2.9)-(2.2.10)).
-  \item Problem 2.2.c, pp.~23--24: the rotated state
-    $\hat U|\uparrow\rangle_1|\downarrow\rangle_2$ depends only on
-    the axis $n$, not on the choice of $\hat U$.
 \end{itemize}
 
 \subsection{Problem 2.1.g: general-spin closed form for the
@@ -2624,8 +2621,8 @@ formalization of Tasaki \S2.1 and \S2.2.
   displays are formalized in \texttt{Quantum/SU2Integral.lean} as
   \texttt{tasaki\_problem\_2\_2\_b\_upDown\_average} (eq.~(2.2.14)) and
   \texttt{tasaki\_problem\_2\_2\_b\_upUp\_average} (eq.~(2.2.15));
-  Problem 2.2.c (pp.~23--24), the next problem in the book, is not
-  formalized.
+  Problem 2.2.c (pp.~23--24), the next problem in the book, is
+  formalized below.
 
   \textit{The states $|\Phi_{0,0}\rangle$ and $|\Phi_{1,0}\rangle$}
   (Tasaki, Appendix A.3.3, eqs.~(A.3.22)/(A.3.23), p.~474;
@@ -2766,6 +2763,53 @@ formalization of Tasaki \S2.1 and \S2.2.
   Reference: Tasaki~\cite{Tasaki:QMB}, §2.2, eqs.~(2.2.14)/(2.2.15),
   p.~23 (Problem~2.2.b); the states $|\Phi_{0,0}\rangle$, $|\Phi_{1,0}\rangle$
   are Appendix A.3.3, eqs.~(A.3.23)/(A.3.22), p.~474.
+
+\item \textbf{Problem 2.2.c: the rotated $|\!\uparrow\rangle_1|\!\downarrow\rangle_2$
+  is determined by $n$ alone} (Tasaki §2.2, pp.~23--24; footnote 16,
+  p.~23; footnote 17, p.~24; solution p.~496, eq.~(S.16)):
+  fix $n \in \mathbb R^3$ and let $\hat U$ range over the footnote-16
+  class of \emph{arbitrary finite products} of the global rotations
+  $\hat U^{(\alpha)}_{\theta,{\rm tot}} = \exp(-i\theta \hat S^{(\alpha)}_{\rm tot})$
+  (eq.~(2.2.11), p.~22, over axes $\alpha=1,2,3$ and angles $\theta$)
+  satisfying $\hat U \hat S_x^{(3)} \hat U^\dagger = \hat S_x \cdot n$ at
+  both sites $x=1,2$, where $\hat S_x \cdot n$ is the (2.1.19) object.
+  Problem 2.2.c asks to show that $\hat U|\!\uparrow\rangle_1|\!\downarrow\rangle_2$
+  depends only on $n$, i.e.\ is the same for every admissible $\hat U$.
+  This is stated pairwise: if $U, V$ are both admissible for the same
+  $n$ then $U|\!\uparrow\rangle_1|\!\downarrow\rangle_2 = V|\!\uparrow\rangle_1|\!\downarrow\rangle_2$.
+  Formalized in \texttt{Quantum/UniformRotationProblem22c.lean} as
+  \texttt{tasaki\_problem\_2\_2\_c\_rotated\_upDown\_eq}. The statement
+  carries no hypothesis $\|n\|=1$; the proof does not use the printed
+  unit norm. It also does not assert existence of an admissible
+  rotation for a given $n$, only the pairwise conclusion.
+
+  \textit{Proof outline.} Every element of the footnote-16 class is a
+  uniform two-site rotation $u \otimes u$ with $u \in SU(2)$
+  (\texttt{mem\_uniformRotClosure\_exists\_su2}, by
+  \texttt{Submonoid.closure\_induction} on the exponential generators,
+  using \texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp} and
+  \texttt{totalSpinHalfRot\{1,2,3\}\_two\_site}). Conjugating the
+  site-$0$ copy of $\hat S^{(3)}$ by $u \otimes u$ reduces to the
+  single-site conjugation $u \hat S^{(3)} u^\dagger$
+  (\texttt{onSite\_zero\_conj\_twoSite}). If $U = u\otimes u$ and
+  $V = v \otimes v$ both satisfy the site-$0$ hypothesis for the same
+  $n$, then $u \hat S^{(3)} u^\dagger = v \hat S^{(3)} v^\dagger$, so
+  $w := v^\dagger u$ commutes with $\hat S^{(3)}$ and has
+  $\det w = 1$; a determinant-one matrix commuting with the diagonal
+  $\hat S^{(3)}$ is itself diagonal with $w_{00} w_{11} = 1$
+  (\texttt{spinHalfOp3\_commute\_entries}), and this diagonal phase
+  cancels on $|\!\uparrow\downarrow\rangle$
+  (\texttt{twoSite\_mulVec\_upDown\_of\_eq\_mul}), giving
+  $U|\!\uparrow\downarrow\rangle = V|\!\uparrow\downarrow\rangle$
+  (\texttt{su2\_twoSite\_mulVec\_upDown\_eq}). Only site $0$ is used in
+  the proof; site $1$ appears only in the hypotheses, for faithfulness
+  to the printed two-site claim.
+
+  \textit{Checks.} \texttt{\#print axioms} on the capstone is
+  \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}
+  only. (S.16), the printed solution route via the explicit closed
+  form $\Phi_{0,0}$, is not formalized; the module proves the pairwise
+  statement directly instead.
 \end{itemize}
 
 %======================================================================
@@ -23028,6 +23072,38 @@ $|\Phi_{1,0}\rangle$ is
 \texttt{twoSiteTripletZero\_not\_su2\_invariant}; see the detailed
 outline in the Tasaki §2.2 supplementary subsection above.
 
+\subsection*{DONE: Problem 2.2.c, the rotated
+  \texorpdfstring{$|\!\uparrow\rangle_1|\!\downarrow\rangle_2$}{up-down}
+  is determined by \texorpdfstring{$n$}{n} alone}
+
+\textbf{Statement} (Tasaki §2.2, pp.~23--24; footnote 16, p.~23;
+footnote 17, p.~24; solution p.~496, eq.~(S.16)): fix $n \in \mathbb
+R^3$ and let $\hat U$ range over the footnote-16 class of arbitrary
+finite products of the global rotations
+$\hat U^{(\alpha)}_{\theta,{\rm tot}} = \exp(-i\theta \hat
+S^{(\alpha)}_{\rm tot})$ (eq.~(2.2.11), p.~22) satisfying
+$\hat U \hat S_x^{(3)} \hat U^\dagger = \hat S_x \cdot n$ at both sites
+$x=1,2$. Any two such $U$, $V$ send $|\!\uparrow\rangle_1|\!\downarrow\rangle_2$
+to the same vector. The statement carries no hypothesis $\|n\|=1$;
+the proof does not use the printed unit norm, and it does not assert
+existence of an admissible rotation for a given $n$.
+
+\textbf{Status}: Formalized in
+\texttt{Quantum/UniformRotationProblem22c.lean} as
+\texttt{tasaki\_problem\_2\_2\_c\_rotated\_upDown\_eq}. The proof shows
+every admissible $\hat U$ is a uniform two-site $SU(2)$ rotation
+$u \otimes u$ (\texttt{mem\_uniformRotClosure\_exists\_su2}), reduces
+the hypothesis to a single-site conjugation
+(\texttt{onSite\_zero\_conj\_twoSite}), shows the difference $w$ of two
+admissible $SU(2)$ elements is diagonal with $w_{00}w_{11}=1$
+(\texttt{spinHalfOp3\_commute\_entries}), and shows this diagonal phase
+cancels on $|\!\uparrow\downarrow\rangle$
+(\texttt{twoSite\_mulVec\_upDown\_of\_eq\_mul},
+\texttt{su2\_twoSite\_mulVec\_upDown\_eq}); axiom-free
+(\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound});
+see the detailed outline in the Tasaki §2.2 supplementary subsection
+above.
+
 \subsection*{Roadmap status note: P1f''' (eqs.~(2.2.12)--(2.2.13))}
 
 The fully general operator-level statement is now formalised in
@@ -23065,6 +23141,7 @@ $S = 1/2$ $\pi$-rotations (eq.~2.1.25) & finite-dim & \emph{formalized} \\
 $S = 1/2$ $\pi$-rotation products and conjugations (Tasaki §2.1) & finite-dim & \emph{formalized} \\
 Abstract lattice + total spin (Tasaki §2.2, partial) & finite-dim & \emph{formalized} \\
 SU(2)-averaged singlet and triplet (Tasaki eqs.~2.2.14/2.2.15, Problem 2.2.b) & finite-dim & \emph{formalized} \\
+Rotated $|\!\uparrow\rangle_1|\!\downarrow\rangle_2$ determined by $n$ alone (Tasaki Problem 2.2.c, pp.~23--24) & finite-dim & \emph{formalized} \\
 Multi-body operator space / \texttt{onSite} & finite-dim & \emph{formalized} \\
 Site commutativity at distinct sites & finite-dim & \emph{formalized} \\
 1D open-chain quantum Ising, Hermiticity & finite-dim & \emph{formalized} \\

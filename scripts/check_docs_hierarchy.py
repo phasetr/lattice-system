@@ -101,6 +101,11 @@ coverage of Problem 2.2.a as complete.)
 whose closing sentence now names the sibling theorem `tasaki_problem_2_2_b_upUp_average` of the
 same file, which formalizes eq. (2.2.15), the second display of Problem 2.2.b, so the earlier
 "Neither eq. (2.2.15) nor Problem 2.2.c is formalized" no longer holds.)
+(Applied once more for the `tasaki_problem_2_2_b_upDown_average` row of
+`docs/formalization/legacy/12-basis-states-and-raising-lowering-for-s-1-tasaki-2-1.md`, whose
+closing sentence now names `tasaki_problem_2_2_c_rotated_upDown_eq`,
+`Quantum/UniformRotationProblem22c.lean`, as the separate formalization of Problem 2.2.c, so the
+earlier "Problem 2.2.c is not formalized" no longer holds.)
 Recomputing a pin is never on its own an
 authorization for what moved: the legacy pages still have to be edited to match, and the
 catalogue-row comparison is what proves they do. What the pins buy is that a change to the
@@ -198,12 +203,12 @@ LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
 CATALOGUE_BASELINE_SLICE = slice(216, 2731)
 # Pins the published catalogue text; this module's docstring records exactly what is hashed
 # and how the pin is legitimately updated.
-APPROVED_CHANGES_SHA256 = "9ca69850a3453dd19c5fbee4a1f52438444d195856c9f42fcea8256b5c6d5b9a"
+APPROVED_CHANGES_SHA256 = "5ec123562da42814c91ce42944d3d725d6512db54e7bfc49736669ce9e6449b9"
 # Pins the row sequence `main()` actually compares the legacy pages against. The text pin above
 # does not reach it: the rows are derived from the transformed text by `table_data_rows`, which
 # is outside the pinned text, so without this pin a row skipped there would go unpublished with
 # the text pin undisturbed.
-PUBLISHED_ROWS_SHA256 = "fc8e4f473cf5331672e5dd6705d7f0b8fcdca2b7f0744898c371249136e8f12e"
+PUBLISHED_ROWS_SHA256 = "a7fdc35f07b147e231a57d0267f5fd185628010ba6b49f71ab039c230b0dc24f"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -1644,6 +1649,16 @@ def _approved_replacements(text: str) -> str:
             "`tasaki_problem_2_2_b_upUp_average` in the same file; Problem 2.2.c is not "
             "formalized. | `Quantum/SU2Integral.lean` |",
         )
+        # Problem 2.2.c (pp. 23-24) is now formalized separately, in a new leaf module, so the
+        # `tasaki_problem_2_2_b_upDown_average` row's closing sentence names it instead of
+        # reporting it unformalized.
+        .replace(
+            "`tasaki_problem_2_2_b_upUp_average` in the same file; Problem 2.2.c is not "
+            "formalized. | `Quantum/SU2Integral.lean` |",
+            "`tasaki_problem_2_2_b_upUp_average` in the same file; Problem 2.2.c is now "
+            "formalized separately, as `tasaki_problem_2_2_c_rotated_upDown_eq` in "
+            "`Quantum/UniformRotationProblem22c.lean`. | `Quantum/SU2Integral.lean` |",
+        )
     )
 
 
@@ -1708,12 +1723,12 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "05040c18f38d6dfd89df6cb32fa8e14f10f7de3ec049d32eacbe191fd5c6a302"
+SCRIPT_SOURCE_SHA256 = "285e88c35437ba89ee3e58e811375e42bcacd97272b7eaaeb9c16568ff2c5555"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
-APPROVED_ENTRIES_SHA256 = "0c7cf5ceefa47e7382d3db3f0f605b2952ebfa6737a03b0d57a1db048375454b"
+APPROVED_ENTRIES_SHA256 = "a766f2e6628adf36d517e10fc437847745f91880003efbcf569789e741842e2f"
 
 # The only text `SCRIPT_SOURCE_SHA256` does not hash: the digits these four pins carry. Each is
 # restated by the very edit it pins, and a digest over its own value would have no fixed point.
