@@ -29,7 +29,6 @@ capstone shim, until the module is implemented.
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §2.2, Problem 2.2.c, pp. 23-24 (footnote 16, p. 23; footnote 17, p. 24; solution p. 496,
 eq. (S.16)); eq. (2.2.11), p. 22.
-Refs #5379.
 -/
 
 namespace LatticeSystem.Tests
