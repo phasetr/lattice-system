@@ -95,4 +95,19 @@ private theorem spinHalfOp3_commute_entries {w : Matrix (Fin 2) (Fin 2) ℂ}
   have h10 : w 1 0 = 0 := by linear_combination e10
   exact ⟨h01, h10, by linear_combination hdet + w 1 0 * h01⟩
 
+/-- If `u = v w` with `w` diagonal and `w₀₀ w₁₁ = 1`, then `u ⊗ u` and `v ⊗ v` send
+`|↑⟩₁|↓⟩₂` to the same vector: the phases `w₀₀` on the up spin and `w₁₁` on the down spin
+cancel. This is the absence, for `|↑⟩₁|↓⟩₂`, of the phase of Problem 2.1.e (p. 18) that Tasaki's
+Problem 2.2.c (pp. 23-24) refers to. -/
+private theorem twoSite_mulVec_upDown_of_eq_mul {u v w : Matrix (Fin 2) (Fin 2) ℂ}
+    (huvw : u = v * w) (h01 : w 0 1 = 0) (h10 : w 1 0 = 0) (hdet : w 0 0 * w 1 1 = 1) :
+    (onSite (0 : Fin 2) u * onSite (1 : Fin 2) u).mulVec (basisVec upDown) =
+      (onSite (0 : Fin 2) v * onSite (1 : Fin 2) v).mulVec (basisVec upDown) := by
+  subst huvw
+  funext τ
+  rw [onSite_zero_mul_one_mulVec_basisVec, onSite_zero_mul_one_mulVec_basisVec, upDown_zero,
+    upDown_one]
+  simp only [Matrix.mul_apply, Fin.sum_univ_two, h01, h10, mul_zero, add_zero, zero_add]
+  linear_combination (v (τ 0) 0 * v (τ 1) 1) * hdet
+
 end LatticeSystem.Quantum
