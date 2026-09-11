@@ -57,11 +57,12 @@ theorem integral_sin_two_pi_pi :
   rw [intervalIntegral.integral_const]
   simp [smul_eq_mul]; ring
 
-/-! ## Half-angle integrals for the θ component of eq. (2.2.14)
+/-! ## Half-angle integrals for the θ components of eqs. (2.2.14)/(2.2.15)
 
 `sin θ cos²(θ/2) = (sin θ + sin θ cos θ) / 2 = (sin θ) / 2 + (sin 2θ) / 4`
 and similarly for `sin²(θ/2)`. Integrated over `[0, π]`, the `sin 2θ`
-term vanishes and the `sin θ` term gives 1 for each. -/
+term vanishes and the `sin θ` term gives 1 for each. The mixed product
+`sin θ cos(θ/2) sin(θ/2) = (sin² θ) / 2` integrates to `π/4`. -/
 
 /-- `∫ θ in 0..π, sin θ · cos θ = 0`. Antiderivative: `sin²(θ)/2`. -/
 theorem integral_sin_mul_cos_zero_pi :
@@ -123,6 +124,24 @@ theorem integral_sin_mul_sin_sq_half_zero_pi :
   rw [intervalIntegral.integral_sub h1 h2,
       intervalIntegral.integral_const_mul, intervalIntegral.integral_const_mul,
       integral_sin_zero_pi, integral_sin_mul_cos_zero_pi]
+  ring
+
+/-- `∫ θ in 0..π, sin θ · (cos(θ/2) · sin(θ/2)) = π/4`, the θ-integral of the `|↑↓⟩` and
+`|↓↑⟩` components in Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §2.2,
+Problem 2.2.b, eq. (2.2.15), p. 23. Pointwise the integrand is `(1/2) sin² θ` by the
+double-angle formula, and `∫₀^π sin² θ dθ = π/2`. -/
+theorem integral_sin_mul_cos_half_mul_sin_half_zero_pi :
+    ∫ θ in (0 : ℝ)..Real.pi, Real.sin θ * (Real.cos (θ / 2) * Real.sin (θ / 2)) =
+      Real.pi / 4 := by
+  have hid : ∀ θ : ℝ, Real.sin θ * (Real.cos (θ / 2) * Real.sin (θ / 2)) =
+      (1 / 2) * Real.sin θ ^ 2 := by
+    intro θ
+    have hsin : Real.sin θ = 2 * Real.sin (θ / 2) * Real.cos (θ / 2) := by
+      have h := Real.sin_two_mul (θ / 2)
+      rwa [show 2 * (θ / 2) = θ from by ring] at h
+    linear_combination -(1 / 2) * Real.sin θ * hsin
+  conv_lhs => arg 1; ext θ; rw [hid θ]
+  rw [intervalIntegral.integral_const_mul, integral_sin_sq, Real.sin_zero, Real.sin_pi]
   ring
 
 /-! ## Complex exponential integrals for the φ component of eq. (2.2.14)

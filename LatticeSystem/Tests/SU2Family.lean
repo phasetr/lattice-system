@@ -106,7 +106,7 @@ is not the zero function). -/
 example : twoSiteTripletZero upDown ≠ 0 := by
   simp [twoSiteTripletZero, basisVec, basisSwap_upDown, funext_iff, Fin.forall_fin_two, upDown]
 
-/-- Red pin (θ-integral helper for eq. (2.2.15)): `∫ θ in 0..π, sin θ · cos(θ/2) · sin(θ/2) = π/4`.
+/-- Pin (θ-integral helper for eq. (2.2.15)): `∫ θ in 0..π, sin θ · cos(θ/2) · sin(θ/2) = π/4`.
 Distinguishes `π/4` from `π/8` (mutation M1) via `Real.sin_two_mul` and `integral_sin_sq`. -/
 example :
     ∫ θ in (0 : ℝ)..Real.pi, Real.sin θ * (Real.cos (θ / 2) * Real.sin (θ / 2)) = Real.pi / 4 :=
