@@ -498,4 +498,28 @@ private theorem totalRot_mulVec_upUp_component (θ φ : ℝ) (τ : Fin 2 → Fin
     matrix_col0_eq_mulVec_up (spinHalfRot3 φ * spinHalfRot2 θ) (τ 1),
     spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp]
 
+/-- `|Φ_{1,0}⟩ = twoSiteTripletZero` is not SU(2) invariant in the sense of Tasaki, *Physics and
+Mathematics of Quantum Many-Body Systems*, §2.2, Problem 2.2.b, p. 23: it is not the case that
+`exp(-iθŜ_tot^(α)) |Φ_{1,0}⟩ = |Φ_{1,0}⟩` for every axis `α` and angle `θ` (eq. (2.2.11), p. 22).
+The witness is axis 2 (`(1 : Fin 3)`) at `θ = π`, read at the component `|↑↓⟩`: there
+`Û^(2)_π = -2iŜ^(2)` on each site sends `|↑⟩₁|↓⟩₂ + |↓⟩₁|↑⟩₂` to its negative. -/
+private theorem twoSiteTripletZero_not_su2_invariant :
+    ¬ ∀ (α : Fin 3) (θ : ℝ),
+      (NormedSpace.exp ((-(Complex.I * (θ : ℂ))) •
+          ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] α)).mulVec
+        twoSiteTripletZero = twoSiteTripletZero := by
+  intro h
+  have h1 := congrFun (h 1 Real.pi) upDown
+  simp only [Matrix.cons_val_one, Matrix.cons_val_zero] at h1
+  rw [← totalSpinHalfRot2_eq_exp, totalSpinHalfRot2_two_site] at h1
+  simp only [twoSiteTripletZero, Matrix.mulVec_smul, Matrix.mulVec_add, Pi.smul_apply,
+    Pi.add_apply, onSite_zero_mul_one_mulVec_basisVec, smul_eq_mul] at h1
+  simp [spinHalfRot2_pi, spinHalfOp2, pauliY, basisVec, basisSwap_upDown, funext_iff,
+    Fin.forall_fin_two, upDown] at h1
+  ring_nf at h1
+  simp only [Complex.I_pow_four, mul_one] at h1
+  have hc : ((Real.sqrt 2 : ℝ) : ℂ)⁻¹ ≠ 0 :=
+    inv_ne_zero (Complex.ofReal_ne_zero.mpr (Real.sqrt_ne_zero'.mpr (by norm_num)))
+  exact hc (by linear_combination (-(1 / 2) : ℂ) * h1)
+
 end LatticeSystem.Quantum
