@@ -77,4 +77,22 @@ private theorem onSite_zero_conj_twoSite {u : Matrix (Fin 2) (Fin 2) ℂ}
     ← mul_assoc (onSite (1 : Fin 2) u), onSite_mul_onSite_same (1 : Fin 2), huu, onSite_one,
     one_mul, onSite_mul_onSite_same, onSite_mul_onSite_same]
 
+/-- A `2 × 2` matrix `w` commuting with `Ŝ^{(3)}` and of determinant `1` is diagonal with
+`w₀₀ w₁₁ = 1`. In Tasaki's Problem 2.2.c (pp. 23-24) `w` relates two admissible rotations with
+the same `n`, and its commuting with `Ŝ^{(3)}` is the `U(1)` invariance about the `3`-axis in the
+sense of eqs. (2.2.12)-(2.2.13), pp. 22-23. -/
+private theorem spinHalfOp3_commute_entries {w : Matrix (Fin 2) (Fin 2) ℂ}
+    (hw : w * spinHalfOp3 = spinHalfOp3 * w) (hdet : w.det = 1) :
+    w 0 1 = 0 ∧ w 1 0 = 0 ∧ w 0 0 * w 1 1 = 1 := by
+  have e01 := congrFun (congrFun hw 0) 1
+  have e10 := congrFun (congrFun hw 1) 0
+  simp only [spinHalfOp3, one_div, pauliZ, Matrix.smul_of, Matrix.smul_cons, smul_eq_mul, mul_one,
+    mul_zero, Matrix.smul_empty, mul_neg, Fin.isValue, Matrix.mul_apply, Matrix.of_apply,
+    Matrix.cons_val', Matrix.cons_val_one, Matrix.cons_val_fin_one, Fin.sum_univ_two,
+    Matrix.cons_val_zero, zero_add, zero_mul, add_zero, neg_mul] at e01 e10
+  rw [Matrix.det_fin_two] at hdet
+  have h01 : w 0 1 = 0 := by linear_combination -e01
+  have h10 : w 1 0 = 0 := by linear_combination e10
+  exact ⟨h01, h10, by linear_combination hdet + w 1 0 * h01⟩
+
 end LatticeSystem.Quantum
