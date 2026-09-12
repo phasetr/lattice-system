@@ -86,10 +86,10 @@ follows:
   identifies the Hermitian minimum with the predicted energy
   `singleClusterGSEnergyS z N` for `1 ≤ z` under the explicit
   `[IsAlgClosed ℂ]` hypothesis.
-- **DONE: Problem 2.5.b.**  The graph-local lower-bound chain reaches the
-  closed-form degree wrappers
-  `tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_closed_form` and
-  `tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_degree_closed_form`.
+- **DONE: Problem 2.5.b.**  The Anderson lower bound on the ground-state
+  energy is `tasaki_problem_2_5_b_groundEnergy_lower_bound`; no degree
+  hypothesis is needed, since at an isolated site the local star
+  Hamiltonian is the zero operator, whose minimum eigenvalue is zero.
 - **DONE: Problem 2.5.c.**  The balanced structural wrapper
   `singleSiteSpinSquareExpectationS_all_axes_eq_of_balanced_bipartiteCompletePositive`
   removes the explicit Theorem 2.3 witness and proves

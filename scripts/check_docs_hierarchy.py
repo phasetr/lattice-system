@@ -203,12 +203,12 @@ LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
 CATALOGUE_BASELINE_SLICE = slice(216, 2731)
 # Pins the published catalogue text; this module's docstring records exactly what is hashed
 # and how the pin is legitimately updated.
-APPROVED_CHANGES_SHA256 = "34046f355f1b2a9edd69010b9958e6243c8f5cb7315dc7e8bef143dd811c59c2"
+APPROVED_CHANGES_SHA256 = "35732632830cb6ec14f615b9880df352e70dbc670b4a2c5e7d8b4ad4b15d9968"
 # Pins the row sequence `main()` actually compares the legacy pages against. The text pin above
 # does not reach it: the rows are derived from the transformed text by `table_data_rows`, which
 # is outside the pinned text, so without this pin a row skipped there would go unpublished with
 # the text pin undisturbed.
-PUBLISHED_ROWS_SHA256 = "12de5d4f55522d0c2948047a68267e4ca3c8f08817afa48f284984263522b00e"
+PUBLISHED_ROWS_SHA256 = "65e67110f8ccc661f100eb36431632b6f1fc19779be7e0808282d347ea95aabd"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -1659,6 +1659,139 @@ def _approved_replacements(text: str) -> str:
             "formalized separately, as `tasaki_problem_2_2_c_rotated_upDown_eq` in "
             "`Quantum/UniformRotationProblem22c.lean`. | `Quantum/SU2Integral.lean` |",
         )
+        # TSK-067 (PR #5464) generalizes the Problem 2.5.b chain to drop its local
+        # positive-degree hypothesis (an isolated centre's star is the zero operator, whose
+        # minimum eigenvalue `0` is itself `≥ -S`, so the printed inequality never needed a
+        # degree bound) and adds the capstone `tasaki_problem_2_5_b_groundEnergy_lower_bound`
+        # (`Quantum/SpinS/GraphLocalStarSumWrapper.lean`). Nine declarations named on these four
+        # frozen rows are retired as a result; the rows are rewritten in place, never deleted,
+        # per the standing rule above them.
+        .replace(
+            "| `Matrix.isHermitian_sum` / `rayleighOnVec_sum_matrix` / "
+            "`sum_lower_bounds_le_hermitianMinEigenvalue_sum` / "
+            "`add_lower_bounds_le_hermitianMinEigenvalue_add` / "
+            "`tasaki25b_local_cluster_sum_lower_bound` / "
+            "`tasaki25b_local_cluster_sum_lower_bound_closed_form` | **Problem 2.5.b sum "
+            "lower-bound bridge**: packages Tasaki's Lemma A.5 argument for finite-dimensional "
+            "Hermitian matrices. If each local Hamiltonian has a lower bound `ε x`, then the "
+            "Hermitian minimum eigenvalue of the sum is at least `Σ x, ε x`. The local-cluster "
+            "wrappers specialize this to the Problem 2.5.a star-cluster energies, yielding the "
+            "abstract lower bound `E_GS ≥ -Σ_{x∈A} S(1 + degree(x) S)` with `S = N/2` once a "
+            "graph Hamiltonian is decomposed into centered local cluster terms (γ-6 step 339). "
+            "The generic \"a finite sum of Hermitian matrices is Hermitian\" helper has been "
+            "extracted as `Matrix.isHermitian_sum` into `Math/MatrixAnalysis/HermitianSum.lean` "
+            "(PR #4341), replacing the per-file private copies in `Quantum/IsingChain.lean`, "
+            "`Quantum/TotalSpin.lean`, and `Quantum/SpinS/TotalSpin.lean` | "
+            "`Quantum/SpinS/HermitianMinEigenvalueSumLower.lean` (PR #4048), "
+            "`Math/MatrixAnalysis/HermitianSum.lean` (PR #4341) |",
+            "| `Matrix.isHermitian_sum` / `rayleighOnVec_sum_matrix` / "
+            "`sum_lower_bounds_le_hermitianMinEigenvalue_sum` | **Problem 2.5.b sum lower-bound "
+            "bridge**: packages Tasaki's Lemma A.5 argument for finite-dimensional Hermitian "
+            "matrices. If each local Hamiltonian has a lower bound `ε x`, then the Hermitian "
+            "minimum eigenvalue of the sum is at least `Σ x, ε x`. "
+            "`add_lower_bounds_le_hermitianMinEigenvalue_add`, "
+            "`tasaki25b_local_cluster_sum_lower_bound` and "
+            "`tasaki25b_local_cluster_sum_lower_bound_closed_form` have since been retired "
+            "(ref-0); the bridge is now consumed directly by the generalized "
+            "`tasaki25b_graphLocalCluster_sum_lower_bound` (no degree hypothesis, PR #5464) "
+            "feeding the Problem 2.5.b capstone `tasaki_problem_2_5_b_groundEnergy_lower_bound` "
+            "(`Quantum/SpinS/GraphLocalStarSumWrapper.lean`). The generic finite-sum-of-"
+            "Hermitian-matrices-is-Hermitian helper has been extracted as "
+            "`Matrix.isHermitian_sum` into `Math/MatrixAnalysis/HermitianSum.lean` (PR #4341), "
+            "replacing the per-file private copies in `Quantum/IsingChain.lean`, "
+            "`Quantum/TotalSpin.lean`, and `Quantum/SpinS/TotalSpin.lean` | "
+            "`Quantum/SpinS/HermitianMinEigenvalueSumLower.lean` (PR #4048), "
+            "`Math/MatrixAnalysis/HermitianSum.lean` (PR #4341) |",
+        )
+        .replace(
+            "| `graphLocalClusterHamiltonianS` / `graphLocalClusterHamiltonianS_isHermitian` / "
+            "`heisenbergHamiltonianOnGraphS_one_eq_sum_graphLocalClusterHamiltonianS` / "
+            "`heisenbergHamiltonianOnGraphS_half_eq_sum_filter_graphLocalClusterHamiltonianS` | "
+            "**Problem 2.5.b graph-local decomposition**: defines the same-Hilbert-space local "
+            "star Hamiltonian `h_x = Σ_{y∈N_G(x)} Ŝ_x · Ŝ_y`. The unit-coupling graph "
+            "Hamiltonian is `Σ_x h_x` under the repository's ordered-pair convention, and on a "
+            "bipartite graph the half-coupling Hamiltonian is the one-sided sum `Σ_{x∈A} h_x`, "
+            "using the pair swap and `spinSDot_comm`. This pins the coefficient convention "
+            "needed before applying the Problem 2.5.a local-cluster lower bounds (γ-6 step 340) "
+            "| `Quantum/SpinS/HeisenbergGraphLocal.lean` (PR #4050) |",
+            "| `graphLocalClusterHamiltonianS` / `graphLocalClusterHamiltonianS_isHermitian` / "
+            "`heisenbergHamiltonianOnGraphS_half_eq_sum_filter_graphLocalClusterHamiltonianS` | "
+            "**Problem 2.5.b graph-local decomposition**: defines the same-Hilbert-space local "
+            "star Hamiltonian `h_x = Σ_{y∈N_G(x)} Ŝ_x · Ŝ_y`. On a bipartite graph the "
+            "half-coupling Hamiltonian is the one-sided sum `Σ_{x∈A} h_x`, using the pair swap "
+            "and `spinSDot_comm`; this pins the coefficient convention needed before applying "
+            "the Problem 2.5.a local-cluster lower bounds (γ-6 step 340). "
+            "`heisenbergHamiltonianOnGraphS_one_eq_sum_graphLocalClusterHamiltonianS` has since "
+            "been retired (ref-0): the half-coupling decomposition proves itself directly and "
+            "does not go through the unit-coupling one | "
+            "`Quantum/SpinS/HeisenbergGraphLocal.lean` (PR #4050) |",
+        )
+        .replace(
+            "| `transportedSingleClusterHamiltonianS_isHermitian` / "
+            "`optionClusterHamiltonianS_isHermitian` / `dotProduct_comp_equiv` / "
+            "`rayleighOnVec_reindex_comp` / "
+            "`optionClusterHamiltonianS_rayleigh_lower_singleClusterGSEnergy` / "
+            "`graphLocalClusterHamiltonianS_minEigenvalue_lower_singleClusterGSEnergy` / "
+            "`tasaki25b_graphLocalCluster_sum_lower_bound` / "
+            "`tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound` | **Problem 2.5.b "
+            "option-star and graph-local sum wrapper**: transports the Problem 2.5.a "
+            "minimum-eigenvalue formula to the canonical option-star Hamiltonian by Rayleigh "
+            "reindexing. Under `[IsAlgClosed ℂ]` and the local positive-degree hypothesis "
+            "`1 ≤ (G.neighborFinset x).card`, this gives the single-cluster ground-energy lower "
+            "bound for the same-Hilbert-space graph-local star. The finite-sum wrapper then "
+            "bounds a chosen family of graph-local stars, and the bipartite half-coupling "
+            "theorem applies the bound directly to "
+            "`heisenbergHamiltonianOnGraphS G (1 / 2) N = Σ_{x∈A} h_x` for one side of a "
+            "bipartition (γ-6 step 344) | `Quantum/SpinS/GraphLocalStarSumWrapper.lean` "
+            "(PR #4054) |",
+            "| `transportedSingleClusterHamiltonianS_isHermitian` / "
+            "`optionClusterHamiltonianS_isHermitian` / `dotProduct_comp_equiv` / "
+            "`rayleighOnVec_reindex_comp` / "
+            "`optionClusterHamiltonianS_rayleigh_lower_singleClusterGSEnergy` / "
+            "`graphLocalClusterHamiltonianS_minEigenvalue_lower_singleClusterGSEnergy` / "
+            "`tasaki25b_graphLocalCluster_sum_lower_bound` | **Problem 2.5.b option-star and "
+            "graph-local sum wrapper**: transports the Problem 2.5.a minimum-eigenvalue formula "
+            "to the canonical option-star Hamiltonian by Rayleigh reindexing. Under "
+            "`[IsAlgClosed ℂ]`, this gives the single-cluster ground-energy lower bound for the "
+            "same-Hilbert-space graph-local star with **no restriction on the local degree**: "
+            "at an isolated centre the star Hamiltonian is the zero operator, whose minimum "
+            "eigenvalue is `0`, and `0 ≥ -S`, so an isolated centre only weakens the bound "
+            "rather than invalidating it. The finite-sum wrapper then bounds a chosen family of "
+            "graph-local stars (γ-6 step 344). "
+            "`tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound` has since been retired "
+            "(subsumed): the bipartite half-coupling bound is now the Problem 2.5.b capstone "
+            "`tasaki_problem_2_5_b_groundEnergy_lower_bound` (PR #5464) | "
+            "`Quantum/SpinS/GraphLocalStarSumWrapper.lean` (PR #4054) |",
+        )
+        .replace(
+            "| `tasaki25b_graphLocalCluster_sum_lower_bound_closed_form` / "
+            "`tasaki25b_graphLocalCluster_sum_lower_bound_degree_closed_form` / "
+            "`tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_closed_form` / "
+            "`tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_degree_closed_form` | "
+            "**Problem 2.5.b closed-form and degree wrappers**: rewrites the graph-local star "
+            "and half-coupling graph-Hamiltonian lower bounds using the explicit Problem 2.5.a "
+            "formula `Re E_GS(z) = -(N/2)(zN/2+1)`. The degree-spelled variants replace "
+            "`(G.neighborFinset x).card` by `G.degree x`, matching Tasaki's graph-theoretic "
+            "statement while preserving the necessary positive-degree hypothesis for centers on "
+            "the chosen side (γ-6 step 345) | `Quantum/SpinS/GraphLocalStarSumWrapper.lean` "
+            "(PR #4055) |",
+            "| `tasaki25b_graphLocalCluster_sum_lower_bound_closed_form` / "
+            "`tasaki25b_graphLocalCluster_sum_lower_bound_degree_closed_form` / "
+            "`tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_closed_form` / "
+            "`tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_degree_closed_form` | "
+            "**Problem 2.5.b closed-form and degree wrappers (retired)**: these four "
+            "declarations rewrote the graph-local star and half-coupling graph-Hamiltonian "
+            "lower bounds using the explicit Problem 2.5.a formula "
+            "`Re E_GS(z) = -(N/2)(zN/2+1)`, each carrying a local positive-degree hypothesis "
+            "`1 ≤ (G.neighborFinset x).card`. That hypothesis was never necessary: at degree "
+            "`0` the local star is the zero operator, whose minimum eigenvalue is `0 ≥ -S`, so "
+            "the bound only weakens there, never fails. All four are retired (ref-0), "
+            "superseded by the Problem 2.5.b capstone "
+            "`tasaki_problem_2_5_b_groundEnergy_lower_bound`, which carries no degree "
+            "hypothesis and is proved directly (PR #5464) | "
+            "`Quantum/SpinS/GraphLocalStarSumWrapper.lean` (retired names; capstone in the same "
+            "file, PR #5464) |",
+        )
     )
 
 
@@ -1723,12 +1856,12 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "d9e02600768d26e0134e5658daec2f04c22e31e1d87ed65b6a1e1887918f0697"
+SCRIPT_SOURCE_SHA256 = "a4da5e963e5d17a36cbb7fe5d9227132a8142ef17b6edc0aa28437a1ed049996"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
-APPROVED_ENTRIES_SHA256 = "d9045d0c2d1345370434847c83bb9cdd5086d1f554b8966b5789a93115bbd459"
+APPROVED_ENTRIES_SHA256 = "363cc30f5198c6e08a086daee985109fde200f0524ae23b37567bf30000d0b3e"
 
 # The only text `SCRIPT_SOURCE_SHA256` does not hash: the digits these four pins carry. Each is
 # restated by the very edit it pins, and a digest over its own value would have no fixed point.
@@ -2610,6 +2743,19 @@ MOVED_PROSE_CORRECTIONS = (
         "SU(2)-invariant.",
         "problem asks to verify this and to characterize states that fail to be SU(2)-invariant.",
     ),
+    (
+        # TSK-067 (PR #5464): the Problem 2.5.b chain drops its local positive-degree hypothesis
+        # (an isolated centre's star is the zero operator, minimum eigenvalue 0, itself >= -S) and
+        # is capped by the new capstone; the two retired closed-form degree wrappers this bullet
+        # named no longer exist.
+        "- **DONE: Problem 2.5.b.** The Anderson lower bound on the ground-state energy is "
+        "`tasaki_problem_2_5_b_groundEnergy_lower_bound`; no degree hypothesis is needed, since "
+        "at an isolated site the local star Hamiltonian is the zero operator, whose minimum "
+        "eigenvalue is zero.",
+        "- **DONE: Problem 2.5.b.** The graph-local lower-bound chain reaches the closed-form "
+        "degree wrappers `tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_closed_form` "
+        "and `tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_degree_closed_form`.",
+    ),
 )
 
 # Where each correction above fires, in declaration order: the sites it rewrites, a site being the
@@ -2629,6 +2775,7 @@ MOVED_PROSE_CORRECTIONS = (
 # weakness this pin removes from these five.
 MOVED_PROSE_CORRECTION_SITES = (
     (("docs/history/roadmap/foundations.md", 139, 139, 1),),
+    (("docs/history/open-items.md", 2780, 3037, 1),),
     (("docs/history/open-items.md", 2780, 3037, 1),),
     (("docs/history/open-items.md", 2780, 3037, 1),),
     (("docs/history/open-items.md", 2780, 3037, 1),),
