@@ -385,15 +385,17 @@ git grep -P -n -I '\b(now|previously|formerly|earlier|no longer|used to|recently
 At revision `a12cbb0e`: 609 identifier occurrences on 508 lines of the proof guide, 430 lines
 across 24 files under `docs/`, and 298 lines across 25 files carrying one of the listed words.
 
-**Reason.** Neither population is a defect class that a pattern settles. The identifiers are known
-to include deliberate provenance pointers, which is what the formalization-status entry below
-records for three of them, so a pattern edit would delete pointers whose removal leaves a claim
-with no reachable source. The listed words are ordinary English that mathematical prose uses for
-reasons unrelated to repository history, so the third command measures an upper bound on the
-population rather than the population itself; acting on it requires reading several hundred lines
-one at a time, which is off the critical path of the book-order formalization. The classification
-of individual sites is therefore not recorded here, and neither figure should be read as a count of
-defects.
+**Reason.** Neither population is a defect class that a pattern settles. The identifier counts (609
+occurrences on 508 lines in the proof guide; 430 lines across 24 files under `docs/`) are known to
+include deliberate provenance pointers, which is what the formalization-status entry above records
+for three of them, so a pattern edit would delete pointers whose removal leaves a claim with no
+reachable source; both counts are therefore upper bounds on the population of unwanted identifiers
+rather than exact counts of it. The listed words are ordinary English that mathematical prose uses
+for reasons unrelated to repository history, so the third command's count (298 lines across 25
+files) is likewise an upper bound on the population rather than the population itself; acting on it
+requires reading several hundred lines one at a time, which is off the critical path of the
+book-order formalization. The classification of individual sites is therefore not recorded here,
+and none of the three figures above should be read as a count of defects.
 
 **Fix on touch.** A change that edits one of these passages for another reason converts that
 passage in the same commit. No separate sweep is opened for the remainder.

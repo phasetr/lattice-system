@@ -1723,7 +1723,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "3c4ae81276ee5c28e38bb95289b67746b132d4c81c0bb30214ec1e1159227f4c"
+SCRIPT_SOURCE_SHA256 = "1ea6e9fbaf2b781a5be13448cb095a45fe49e1991547ebe76069cc730ef6d0f2"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -2616,8 +2616,8 @@ MOVED_PROSE_CORRECTIONS = (
 # reverted to the baseline wording simply stops it firing and parity passes either way, leaving
 # the published spelling unpinned. With the count fixed at one apiece, the reversion that would
 # otherwise pass silently is a hard failure, and a correction that starts matching a second site
-# is one too. The three older corrections below are not counted, so they carry the fail-open
-# weakness this pin removes from these five.
+# is one too. The four older `.replace` calls below (in `normalize_current_moved_prose`) are not
+# counted, so they carry the fail-open weakness this pin removes from these five.
 MOVED_PROSE_CORRECTION_COUNTS = (1, 1, 1, 1, 1)
 
 
