@@ -35,7 +35,6 @@ Pinned:
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed.,
 Springer, 2020), §2.1, Û_θ^{(α)} definition p. 15, eq. (2.1.34) p. 20, Problem 2.1.g p. 20
 (solution p. 495), eq. (2.2.11) p. 22.
-Refs #5455.
 -/
 
 namespace LatticeSystem.Quantum
@@ -118,7 +117,7 @@ PR-B closes the axis-1 (crux) case, the first relation of Tasaki (2.1.34), p. 20
 `⟨ψ^σ|û₁|ψ^τ⟩ = (−i)^{2S}δ_{σ,−τ}`, i.e. `spinSPiRotation1 N = spinSRot1 N Real.pi`, by a
 Schur/commutant route rather than the entrywise computation that settles axis 3. The route
 conjugates the generators `Ŝ¹, Ŝ², Ŝ³` by `W := spinSRot1 N Real.pi` at `θ = π` (the `π`-rotation
-relation (2.1.25), p. 18, read off the `±` commutation proved for arbitrary `θ` by
+relation (2.1.21), p. 17, read off the `±` commutation proved for arbitrary `θ` by
 `spinSRot1_conj_spinSLadder1Plus/Minus`) and by `V := spinSPiRotation1 N` (via
 `spinReversalS_conj_spinSOp1/2/3`), concludes their quotient `Z` is scalar by the commutant/Schur
 argument (`spinS_adjoin_eq_top`), and pins the scalar to `1` on the explicit binomial
@@ -143,7 +142,6 @@ Pinned:
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed.,
 Springer, 2020), (2.1.25) p. 18 (`±` commutation of two `π`-rotations), (2.1.34) p. 20,
 Problem 2.1.g p. 20 (solution p. 495).
-Refs #5455.
 -/
 
 /-! ## Sanity control, already valid: the concrete `N = 1` target matrix -/
@@ -168,7 +166,9 @@ example (N : ℕ) (θ : ℝ) :
 
 /-! ## R1-W: `θ = π` conjugation of the three generators by `W := spinSRot1 N Real.pi` -/
 
-/-- R1-W pin (`Ŝ¹`): `W` commutes with `Ŝ¹` (Tasaki (2.1.25) p. 18 specialised, `α = 1`). -/
+/-- R1-W pin (`Ŝ¹`): `W` commutes with `Ŝ¹` — the `β = α` case, which lies outside the `β ≠ α`
+conjugation relation (2.1.21), p. 17, and is immediate from `Û^{(1)}_π = exp(−iπ Ŝ^{(1)})`,
+p. 15. -/
 example (N : ℕ) :
     spinSRot1 N Real.pi * spinSOp1 N * spinSRot1 N (-Real.pi) = spinSOp1 N :=
   spinSRot1_pi_conj_spinSOp1 N
@@ -406,7 +406,6 @@ Pinned:
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed.,
 Springer, 2020), the conjugation relations (2.1.21)/(2.1.22) p. 17, eq. (2.1.29) p. 19,
 eq. (2.1.34) p. 20, Problem 2.1.g p. 20 (solution p. 495).
-Refs #5455.
 -/
 
 /-! ## R2-rev: the angle-flip commutation of the reversal past a `z`-rotation -/

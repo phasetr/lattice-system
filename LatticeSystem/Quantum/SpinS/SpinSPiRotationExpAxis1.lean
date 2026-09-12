@@ -14,8 +14,9 @@ general-`S` derivation is left to the reader as Problem 2.1.g, p. 20 (solution p
 Unlike the axis-3 case, no closed form of `exp(−iπ Ŝ^{(1)})` is available entrywise: `Ŝ^{(1)}` is
 tridiagonal in the `Ŝ^{(3)}` basis.  The route is the commutant one.  Both `W := spinSRot1 N π`
 and `V := spinSPiRotation1 N` conjugate the generators the same way — fixing `Ŝ^{(1)}`, negating
-`Ŝ^{(2)}` and `Ŝ^{(3)}` (the `π`-rotation relation (2.1.25), p. 18) — so `V⁻¹W` commutes with all
-three; the spanning theorem `spinS_adjoin_eq_top` (Problem 2.1.a, p. 15) then makes it a scalar.
+`Ŝ^{(2)}` and `Ŝ^{(3)}` (the `π`-rotation relation (2.1.21), p. 17, which reverses `Ŝ^{(β)}` for
+`β ≠ 1`) — so `V⁻¹W` commutes with all three; the spanning theorem `spinS_adjoin_eq_top`
+(Problem 2.1.a, p. 15) then makes it a scalar.
 The scalar is pinned to `1` on the `x`-polarised highest-weight vector
 `u₀ = (√binom(N,k))_k` built here, on which `W` acts by `exp(−iπN/2) = (−i)^N` and `V` by the same
 phase.  A vector-level pin is unavoidable: for odd `N` both `tr V = tr W = 0` and the determinant
@@ -30,7 +31,7 @@ move to `Math/MatrixAnalysis/` together rather than one at a time.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §2.1: the rotation `Û_θ^{(α)} = exp(−iθ Ŝ^{(α)})`, p. 15; the `π`-rotation relation
-(2.1.25), p. 18; the closed form (2.1.34) and Problem 2.1.g, p. 20 (solution p. 495); the spanning
+(2.1.21), p. 17; the closed form (2.1.34) and Problem 2.1.g, p. 20 (solution p. 495); the spanning
 Problem 2.1.a, p. 15 (solution p. 493).
 -/
 
@@ -207,9 +208,10 @@ theorem spinReversalS_mulVec_spinSTopVector (N : ℕ) :
 /-! ## Conjugation of the generators at `θ = π`
 
 Both `W := spinSRot1 N π` and `V := spinSPiRotation1 N` implement the same `π` rotation about
-axis 1 on the generators — Tasaki (2.1.25), p. 18: axis `1` is fixed, axes `2` and `3` are
-reversed.  For `W` this is the `θ = π` case of the ladder conjugation
-`spinSRot1_conj_spinSLadder1Plus/Minus`, proved here for each generator; for `V` the existing
+axis 1 on the generators — Tasaki (2.1.21), p. 17, reverses `Ŝ^{(2)}` and `Ŝ^{(3)}`, while axis
+`1` is fixed because the rotation commutes with its own generator.  For `W` this is the `θ = π`
+case of the ladder conjugation `spinSRot1_conj_spinSLadder1Plus/Minus`, proved here for each
+generator; for `V` the existing
 basis-reversal conjugations `spinReversalS_conj_spinSOp1/2/3` are used directly by the capstone,
 the phase `(−i)^{2S}` cancelling against its inverse `i^{2S}` via
 `spinSPiRotation1_inv_conj_eq_spinReversalS_conj`.
@@ -224,7 +226,7 @@ theorem spinSRot1_pi_conj_spinSOp1 (N : ℕ) :
     Matrix.mul_assoc, spinSRot1_mul_neg, Matrix.mul_one]
 
 /-- **Conjugation of `Ŝ^{(2)}` by `W = exp(−iπ Ŝ^{(1)})` reverses it** — the transverse axis 2 of
-Tasaki (2.1.25), p. 18.  The two axis-1 ladder operators `L^± = Ŝ^{(2)} ± i Ŝ^{(3)}` are each
+Tasaki (2.1.21), p. 17.  The two axis-1 ladder operators `L^± = Ŝ^{(2)} ± i Ŝ^{(3)}` are each
 scaled by `e^{∓iπ} = −1`, and their sum is `2 Ŝ^{(2)}`. -/
 theorem spinSRot1_pi_conj_spinSOp2 (N : ℕ) :
     spinSRot1 N Real.pi * spinSOp2 N * spinSRot1 N (-Real.pi) = -spinSOp2 N := by
@@ -244,7 +246,7 @@ theorem spinSRot1_pi_conj_spinSOp2 (N : ℕ) :
   exact smul_right_injective _ (by norm_num) hcancel
 
 /-- **Conjugation of `Ŝ^{(3)}` by `W = exp(−iπ Ŝ^{(1)})` reverses it** — the transverse axis 3 of
-Tasaki (2.1.25), p. 18.  Same computation as for `Ŝ^{(2)}`, read off the difference
+Tasaki (2.1.21), p. 17.  Same computation as for `Ŝ^{(2)}`, read off the difference
 `L^+ − L^- = 2i Ŝ^{(3)}` instead of the sum. -/
 theorem spinSRot1_pi_conj_spinSOp3 (N : ℕ) :
     spinSRot1 N Real.pi * spinSOp3 N * spinSRot1 N (-Real.pi) = -spinSOp3 N := by
@@ -316,7 +318,7 @@ of the definition on p. 15.  This is the first relation of Tasaki (2.1.34), p. 2
 (`⟨ψ^σ|û₁|ψ^τ⟩ = (−i)^{2S}δ_{σ,−τ}`), left to the reader as Problem 2.1.g, p. 20 (solution
 p. 495).
 
-Both matrices conjugate the three generators identically (Tasaki (2.1.25), p. 18), so
+Both matrices conjugate the three generators identically (Tasaki (2.1.21), p. 17), so
 `Z = û₁⁻¹ exp(−iπ Ŝ^{(1)})` commutes with all of them and is therefore a scalar
 (`spinS_scalar_of_commute_generators`).  The scalar is `1` because both matrices multiply the
 `x`-polarised top vector `u₀` by the same phase `(−i)^{2S}`: for `exp(−iπ Ŝ^{(1)})` because `u₀` is

@@ -308,13 +308,16 @@ theorem tasaki_corollary_8_5_z2z2 (N : ℕ) (hN : Odd N) :
     (tasaki_theorem_8_7 hrep hMPS)
 
 /-- **The on-site time-reversal representation of p. 278** for spin `S = N/2`: the group
-`Z₂ = {e, a}`, realised as `ℤˣ`, acts antiunitarily by `v̂(a) = Θ̂ = X K̂` with `X = û₁û₃`. -/
+`Z₂ = {e, a}`, realised as `ℤˣ`, acts antiunitarily by `v̂(a) = Θ̂ = X K̂`.  The book prints the
+matrix part as `û₂`; here `X = û₁û₃`, which is `(−1)^{2S}û₂` by eq. (2.1.29), p. 19, together
+with eq. (2.1.25), p. 18, so the two differ by a sign that the square does not see. -/
 noncomputable def timeReversalSpinRep (N : ℕ) : ℤˣ → Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ :=
   timeReversalRep (spinSPiRotation1 N * spinSPiRotation3 N)
 
 /-- **`Θ̂² = -1̂` for half-odd-integer spin** (p. 278), in the matrix encoding of eq. (8.3.40):
 entrywise conjugation fixes `û₁û₃`, whose entries are real, so the antiunitary square `X·C[X]` is
-the plain square `(û₁û₃)²`, and that is `-1̂` at odd `N`. -/
+the plain square `(û₁û₃)²`, and that is `-1̂` at odd `N`.  The book's matrix part there is `û₂`,
+which `û₁û₃` matches up to the sign `(−1)^{2S}` and so has the same square. -/
 private theorem spinSTimeReversal_antiunitary_square {N : ℕ} (hN : Odd N) :
     (spinSPiRotation1 N * spinSPiRotation3 N) *
         signConjMatrix (-1) (spinSPiRotation1 N * spinSPiRotation3 N) = -1 := by
