@@ -6,15 +6,16 @@ import LatticeSystem.Quantum.SpinS.SingleClusterGSJointWitness
 /-!
 # Option-star and graph-local sum lower bounds
 
-This file completes the next Tasaki §2.5 Problem 2.5.b bridge: it transports
-the Problem 2.5.a single-cluster minimum-eigenvalue formula to the canonical
+This file completes the Tasaki §2.5 Problem 2.5.b chain: it transports the
+Problem 2.5.a single-cluster minimum-eigenvalue formula to the canonical
 option-star Hamiltonian, feeds that Rayleigh lower bound into the graph-local
-block decomposition, and packages the finite-sum lower bound for the one-sided
-bipartite graph decomposition.
+block decomposition, sums the local bounds through the minimum-eigenvalue form
+of Lemma A.5, and concludes the Anderson lower bound on the ground-state energy
+of the antiferromagnetic Heisenberg Hamiltonian (2.5.1) on a bipartite lattice.
 
 References:
 - H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020,
-  §2.5 Problem 2.5.b, p. 38, solution p. 497, using Problem 2.5.a, pp. 38,
+  §2.5 Problem 2.5.b, p. 38, solution pp. 497-498, using Problem 2.5.a, pp. 38,
   496-497, and Lemma A.5, p. 468.
 -/
 
@@ -90,24 +91,55 @@ theorem optionClusterHamiltonianS_rayleigh_lower_singleClusterGSEnergy
 
 variable [Fintype Λ] [DecidableEq Λ]
 
-/-- Problem 2.5.a gives the graph-local star minimum-eigenvalue lower bound once
-the center has at least one graph neighbour. -/
+/-- Problem 2.5.a bounds the minimum eigenvalue of the graph-local star at any
+centre, with no condition on the local degree.
+
+For a centre with at least one graph neighbour the bound is the Problem 2.5.a
+ground energy transported to the graph-local star.  For an isolated centre the
+star Hamiltonian is the zero matrix, so its minimum eigenvalue is `0`, while the
+Problem 2.5.a expression evaluates to `-(N / 2) ≤ 0`; the bound therefore holds
+with slack.  Only the inequality survives at an isolated centre: the Problem
+2.5.a equality itself fails there, since its derivation evaluates `min {zS, S}`
+as `S`, which requires `1 ≤ z`.
+
+References: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
+Springer 2020, Problem 2.5.a, p. 38, solution pp. 496-497. -/
 theorem graphLocalClusterHamiltonianS_minEigenvalue_lower_singleClusterGSEnergy
-    [IsAlgClosed ℂ] (G : SimpleGraph Λ) [DecidableRel G.Adj] (x : Λ) (N : ℕ)
-    (hx : 1 ≤ (G.neighborFinset x).card) :
+    [IsAlgClosed ℂ] (G : SimpleGraph Λ) [DecidableRel G.Adj] (x : Λ) (N : ℕ) :
     (singleClusterGSEnergyS (G.neighborFinset x).card N).re ≤
       hermitianMinEigenvalue (graphLocalClusterHamiltonianS_isHermitian G x N) := by
-  refine graphLocalClusterHamiltonianS_minEigenvalue_lower G x N ?_
-  intro _η w
-  exact optionClusterHamiltonianS_rayleigh_lower_singleClusterGSEnergy
-    (G.neighborFinset x) N hx w
+  by_cases hx : 1 ≤ (G.neighborFinset x).card
+  · refine graphLocalClusterHamiltonianS_minEigenvalue_lower G x N ?_
+    intro _η w
+    exact optionClusterHamiltonianS_rayleigh_lower_singleClusterGSEnergy
+      (G.neighborFinset x) N hx w
+  · have hcard : (G.neighborFinset x).card = 0 := by omega
+    have hzero : graphLocalClusterHamiltonianS G x N = 0 := by
+      unfold graphLocalClusterHamiltonianS
+      rw [Finset.card_eq_zero.mp hcard, Finset.sum_empty]
+    obtain ⟨v, _hunit, hv⟩ :=
+      exists_unit_vec_rayleighOnVec_eq_hermitianMinEigenvalue
+        (graphLocalClusterHamiltonianS_isHermitian G x N)
+    have hray : rayleighOnVec (graphLocalClusterHamiltonianS G x N) v = 0 := by
+      rw [hzero]
+      simp [rayleighOnVec]
+    rw [hray] at hv
+    rw [hcard, singleClusterGSEnergyS_re_eq, ← hv]
+    have hN : (0 : ℝ) ≤ (N : ℝ) := Nat.cast_nonneg N
+    nlinarith
 
 /-- Finite-sum Problem 2.5.b lower bound for any chosen family of graph-local
-stars with positive local degree. -/
+stars, with no condition on the local degrees.
+
+This is the minimum-eigenvalue form of Tasaki's Lemma A.5 (p. 468), applied to
+the star Hamiltonians of the chosen family; the hint of Problem 2.5.b is exactly
+that this step needs no commutation between the summands.
+
+References: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
+Springer 2020, Problem 2.5.b, p. 38, solution pp. 497-498, Lemma A.5, p. 468. -/
 theorem tasaki25b_graphLocalCluster_sum_lower_bound
     [IsAlgClosed ℂ] (G : SimpleGraph Λ) [DecidableRel G.Adj]
-    (s : Finset Λ) (N : ℕ)
-    (hdeg : ∀ x ∈ s, 1 ≤ (G.neighborFinset x).card) :
+    (s : Finset Λ) (N : ℕ) :
     ∑ x ∈ s, (singleClusterGSEnergyS (G.neighborFinset x).card N).re ≤
       hermitianMinEigenvalue
         (Matrix.isHermitian_sum s
@@ -116,130 +148,8 @@ theorem tasaki25b_graphLocalCluster_sum_lower_bound
     (fun x => graphLocalClusterHamiltonianS G x N)
     (fun x => (singleClusterGSEnergyS (G.neighborFinset x).card N).re)
     (fun x _hx => graphLocalClusterHamiltonianS_isHermitian G x N) ?_
-  intro x hx
+  intro x _hx
   exact graphLocalClusterHamiltonianS_minEigenvalue_lower_singleClusterGSEnergy
-    G x N (hdeg x hx)
-
-/-- Closed-form finite-sum Problem 2.5.b lower bound for any chosen family of
-graph-local stars with positive local degree. -/
-theorem tasaki25b_graphLocalCluster_sum_lower_bound_closed_form
-    [IsAlgClosed ℂ] (G : SimpleGraph Λ) [DecidableRel G.Adj]
-    (s : Finset Λ) (N : ℕ)
-    (hdeg : ∀ x ∈ s, 1 ≤ (G.neighborFinset x).card) :
-    ∑ x ∈ s,
-        -((N : ℝ) / 2) *
-          (((G.neighborFinset x).card : ℝ) * (N : ℝ) / 2 + 1) ≤
-      hermitianMinEigenvalue
-        (Matrix.isHermitian_sum s
-          (fun x _hx => graphLocalClusterHamiltonianS_isHermitian G x N)) := by
-  simpa [singleClusterGSEnergyS_re_eq] using
-    tasaki25b_graphLocalCluster_sum_lower_bound G s N hdeg
-
-/-- Closed-form finite-sum Problem 2.5.b lower bound with the local size stated
-as the graph degree. -/
-theorem tasaki25b_graphLocalCluster_sum_lower_bound_degree_closed_form
-    [IsAlgClosed ℂ] (G : SimpleGraph Λ) [DecidableRel G.Adj]
-    (s : Finset Λ) (N : ℕ)
-    (hdeg : ∀ x ∈ s, 1 ≤ G.degree x) :
-    ∑ x ∈ s,
-        -((N : ℝ) / 2) * ((G.degree x : ℝ) * (N : ℝ) / 2 + 1) ≤
-      hermitianMinEigenvalue
-        (Matrix.isHermitian_sum s
-          (fun x _hx => graphLocalClusterHamiltonianS_isHermitian G x N)) := by
-  have hcard : ∀ x ∈ s, 1 ≤ (G.neighborFinset x).card := by
-    intro x hx
-    simpa using hdeg x hx
-  simpa using
-    tasaki25b_graphLocalCluster_sum_lower_bound_closed_form G s N hcard
-
-/-- One-sided bipartite Problem 2.5.b lower bound for the half-coupling graph
-Hamiltonian, using the decomposition into graph-local stars over one side of the
-bipartition. -/
-theorem tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound
-    [IsAlgClosed ℂ] (G : SimpleGraph Λ) [DecidableRel G.Adj]
-    {A : Λ → Prop} [DecidablePred A]
-    (hA : ∀ {x y : Λ}, G.Adj x y → A x ≠ A y) (N : ℕ)
-    (hdeg : ∀ x ∈ (Finset.univ : Finset Λ).filter A,
-      1 ≤ (G.neighborFinset x).card) :
-    ∑ x ∈ (Finset.univ : Finset Λ).filter A,
-        (singleClusterGSEnergyS (G.neighborFinset x).card N).re ≤
-      hermitianMinEigenvalue
-        (heisenbergHamiltonianOnGraphS_isHermitian G
-          (by norm_num : star ((1 : ℂ) / 2) = (1 : ℂ) / 2) N) := by
-  classical
-  let s : Finset Λ := (Finset.univ : Finset Λ).filter A
-  let localH : Λ → Matrix (Λ → Fin (N + 1)) (Λ → Fin (N + 1)) ℂ :=
-    fun x => graphLocalClusterHamiltonianS G x N
-  let ε : Λ → ℝ :=
-    fun x => (singleClusterGSEnergyS (G.neighborFinset x).card N).re
-  let hGraph :=
-    heisenbergHamiltonianOnGraphS_isHermitian G
-      (by norm_num : star ((1 : ℂ) / 2) = (1 : ℂ) / 2) N
-  obtain ⟨v, hunit, hv⟩ :=
-    exists_unit_vec_rayleighOnVec_eq_hermitianMinEigenvalue hGraph
-  have hterm : ∀ x ∈ s, ε x ≤ rayleighOnVec (localH x) v := by
-    intro x hx
-    exact le_trans
-      (graphLocalClusterHamiltonianS_minEigenvalue_lower_singleClusterGSEnergy
-        G x N (hdeg x hx))
-      (hermitianMinEigenvalue_le_rayleighOnVec_of_unit
-        (graphLocalClusterHamiltonianS_isHermitian G x N) hunit)
-  have hsum :
-      ∑ x ∈ s, ε x ≤ ∑ x ∈ s, rayleighOnVec (localH x) v :=
-    Finset.sum_le_sum hterm
-  have hdecomp :
-      heisenbergHamiltonianOnGraphS G ((1 : ℂ) / 2) N =
-        ∑ x ∈ s, localH x := by
-    dsimp [s, localH]
-    exact heisenbergHamiltonianOnGraphS_half_eq_sum_filter_graphLocalClusterHamiltonianS
-      G hA N
-  calc
-    ∑ x ∈ (Finset.univ : Finset Λ).filter A,
-        (singleClusterGSEnergyS (G.neighborFinset x).card N).re =
-        ∑ x ∈ s, ε x := rfl
-    _ ≤ ∑ x ∈ s, rayleighOnVec (localH x) v := hsum
-    _ = rayleighOnVec (∑ x ∈ s, localH x) v :=
-        (rayleighOnVec_sum_matrix s localH v).symm
-    _ = rayleighOnVec (heisenbergHamiltonianOnGraphS G ((1 : ℂ) / 2) N) v := by
-        rw [hdecomp]
-    _ = hermitianMinEigenvalue hGraph := hv
-
-/-- Closed-form one-sided bipartite Problem 2.5.b lower bound for the
-half-coupling graph Hamiltonian. -/
-theorem tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_closed_form
-    [IsAlgClosed ℂ] (G : SimpleGraph Λ) [DecidableRel G.Adj]
-    {A : Λ → Prop} [DecidablePred A]
-    (hA : ∀ {x y : Λ}, G.Adj x y → A x ≠ A y) (N : ℕ)
-    (hdeg : ∀ x ∈ (Finset.univ : Finset Λ).filter A,
-      1 ≤ (G.neighborFinset x).card) :
-    ∑ x ∈ (Finset.univ : Finset Λ).filter A,
-        -((N : ℝ) / 2) *
-          (((G.neighborFinset x).card : ℝ) * (N : ℝ) / 2 + 1) ≤
-      hermitianMinEigenvalue
-        (heisenbergHamiltonianOnGraphS_isHermitian G
-          (by norm_num : star ((1 : ℂ) / 2) = (1 : ℂ) / 2) N) := by
-  simpa [singleClusterGSEnergyS_re_eq] using
-    tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound G hA N hdeg
-
-/-- Closed-form one-sided bipartite Problem 2.5.b lower bound for the
-half-coupling graph Hamiltonian, with the local size stated as the graph degree.
--/
-theorem tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_degree_closed_form
-    [IsAlgClosed ℂ] (G : SimpleGraph Λ) [DecidableRel G.Adj]
-    {A : Λ → Prop} [DecidablePred A]
-    (hA : ∀ {x y : Λ}, G.Adj x y → A x ≠ A y) (N : ℕ)
-    (hdeg : ∀ x ∈ (Finset.univ : Finset Λ).filter A, 1 ≤ G.degree x) :
-    ∑ x ∈ (Finset.univ : Finset Λ).filter A,
-        -((N : ℝ) / 2) * ((G.degree x : ℝ) * (N : ℝ) / 2 + 1) ≤
-      hermitianMinEigenvalue
-        (heisenbergHamiltonianOnGraphS_isHermitian G
-          (by norm_num : star ((1 : ℂ) / 2) = (1 : ℂ) / 2) N) := by
-  have hcard : ∀ x ∈ (Finset.univ : Finset Λ).filter A,
-      1 ≤ (G.neighborFinset x).card := by
-    intro x hx
-    simpa using hdeg x hx
-  simpa using
-    tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_closed_form
-      G hA N hcard
+    G x N
 
 end LatticeSystem.Quantum
