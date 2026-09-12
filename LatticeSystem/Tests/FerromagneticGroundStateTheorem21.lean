@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.FerromagneticGroundStateTheorem21
+import LatticeSystem.Quantum.SpinS.MaximalCasimirEigenvectorSpan
 
 /-!
 # Signature pin: Tasaki §2.4 Theorem 2.1, the `Ĥ`-eigenspace capstone (p. 34)
@@ -246,5 +247,47 @@ example :
         (Module.End.eigenspace ((totalSpinSSquared (Fin 3) 1).mulVecLin)
           (saturatedFerromagnetCasimirEigenvalueS (Fin 3) 1)) :=
   totalSpinSSquared_eigenspace_finrank_ge_succ_card_mul_N
+
+/-! ## Signature pin: the maximal-eigenvalue reading of the remark after eq. (2.4.10), p. 34
+
+`totalSpinSSquared_maximal_eigenvector_mem_span_ladderIterateUp` states that an eigenvector of
+`(Ŝ_tot)²` whose eigenvalue is maximal — no eigenvalue with a non-zero eigenvector has a larger
+real part — lies in the span of the ladder family. The pins below fix that signature and record
+that the hypotheses it places on the eigenvalue are satisfiable. -/
+
+/-- **PIN-M.** An eigenvector of `(Ŝ_tot)²` at an eigenvalue whose real part dominates the real
+part of every eigenvalue of `(Ŝ_tot)²` with a non-zero eigenvector lies in the span of the
+ladder family. No graph, coupling, connectivity or `1 ≤ N` hypothesis is present in this pin. -/
+example {V : Type*} [Fintype V] [DecidableEq V] [Nonempty V] {N : ℕ}
+    {γ : ℂ} {v : (V → Fin (N + 1)) → ℂ}
+    (hv : v ≠ 0)
+    (hcas : (totalSpinSSquared V N).mulVec v = γ • v)
+    (hmax : ∀ (δ : ℂ) (w : (V → Fin (N + 1)) → ℂ), w ≠ 0 →
+      (totalSpinSSquared V N).mulVec w = δ • w → δ.re ≤ γ.re) :
+    v ∈ Submodule.span ℂ (Set.range (ladderIterateUp V N)) :=
+  totalSpinSSquared_maximal_eigenvector_mem_span_ladderIterateUp hv hcas hmax
+
+/-- **PC-M (non-vacuity control).** The three hypotheses of PIN-M are simultaneously
+satisfiable: the first ladder iterate is a non-zero eigenvector of `(Ŝ_tot)²` whose eigenvalue
+has maximal real part. Without this, PIN-M could hold vacuously for want of any eigenvalue
+meeting its maximality hypothesis. -/
+example {V : Type*} [Fintype V] [DecidableEq V] [Nonempty V] {N : ℕ} :
+    ∃ (γ : ℂ) (v : (V → Fin (N + 1)) → ℂ), v ≠ 0 ∧
+      (totalSpinSSquared V N).mulVec v = γ • v ∧
+      ∀ (δ : ℂ) (w : (V → Fin (N + 1)) → ℂ), w ≠ 0 →
+        (totalSpinSSquared V N).mulVec w = δ • w → δ.re ≤ γ.re := by
+  have hCcast : saturatedFerromagnetCasimirEigenvalueS V N =
+      ((((Fintype.card V : ℝ) * (N : ℝ) / 2) *
+        ((Fintype.card V : ℝ) * (N : ℝ) / 2 + 1) : ℝ) : ℂ) := by
+    unfold saturatedFerromagnetCasimirEigenvalueS
+    push_cast
+    ring
+  have hladder := ladderIterateUp_totalSpinSSquared_hasEigenvector (V := V) (N := N) 0
+  refine ⟨saturatedFerromagnetCasimirEigenvalueS V N, ladderIterateUp V N 0, hladder.2, ?_,
+    fun δ w hw hδ => ?_⟩
+  · have h := hladder.1
+    rwa [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at h
+  · rw [hCcast, Complex.ofReal_re]
+    exact totalSpinSSquared_eigenvalue_re_le_sMax hw hδ
 
 end LatticeSystem.Quantum

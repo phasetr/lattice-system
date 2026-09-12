@@ -65,7 +65,7 @@ import LatticeSystem.Fermion.SingleMode
 import LatticeSystem.Fermion.JordanWigner.FockSpaceRepresentation
 import LatticeSystem.Fermion.JordanWigner.SmearedCAR
 import LatticeSystem.Quantum.SpinS.Theorem23PFConstancy
-import LatticeSystem.Quantum.SpinS.CasimirSpectralBound
+import LatticeSystem.Quantum.SpinS.MaximalCasimirEigenvectorSpan
 import LatticeSystem.Quantum.SpinS.Theorem23AntialignedJointEigenvector
 import LatticeSystem.Quantum.SpinS.JointCasimirEigenspaceLadderInvariant
 import LatticeSystem.Quantum.SpinS.JointCasimirEigenspaceMagInvariant
