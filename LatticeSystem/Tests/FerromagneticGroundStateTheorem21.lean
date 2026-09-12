@@ -286,12 +286,22 @@ example {V : Type*} [Fintype V] [DecidableEq V] [Nonempty V] {N : ℕ}
 /-- **PC-M (non-vacuity control).** The three hypotheses of PIN-M are simultaneously
 satisfiable: the first ladder iterate is a non-zero eigenvector of `(Ŝ_tot)²` whose eigenvalue
 has maximal real part. Without this, PIN-M could hold vacuously for want of any eigenvalue
-meeting its maximality hypothesis. -/
+meeting its maximality hypothesis.
+
+The fourth conjunct is the conclusion of
+`totalSpinSSquared_maximal_eigenvector_mem_span_ladderIterateUp`, discharged by applying that
+theorem to the first three, so this control's proof term traverses the declaration PIN-M pins.
+Strengthening the theorem's maximality hypothesis makes that application ill-typed and turns
+this control red, which a free-standing restatement of the hypotheses would not do. What it
+still does not catch: *weakening* the theorem's hypothesis leaves it green, and the membership
+conjunct is independently provable, so the coupling lives in the proof term rather than in the
+statement. -/
 example {V : Type*} [Fintype V] [DecidableEq V] [Nonempty V] {N : ℕ} :
     ∃ (γ : ℂ) (v : (V → Fin (N + 1)) → ℂ), v ≠ 0 ∧
       (totalSpinSSquared V N).mulVec v = γ • v ∧
-      ∀ (δ : ℂ) (w : (V → Fin (N + 1)) → ℂ), w ≠ 0 →
-        (totalSpinSSquared V N).mulVec w = δ • w → δ.re ≤ γ.re := by
+      (∀ (δ : ℂ) (w : (V → Fin (N + 1)) → ℂ), w ≠ 0 →
+        (totalSpinSSquared V N).mulVec w = δ • w → δ.re ≤ γ.re) ∧
+      v ∈ Submodule.span ℂ (Set.range (ladderIterateUp V N)) := by
   have hCcast : saturatedFerromagnetCasimirEigenvalueS V N =
       ((((Fintype.card V : ℝ) * (N : ℝ) / 2) *
         ((Fintype.card V : ℝ) * (N : ℝ) / 2 + 1) : ℝ) : ℂ) := by
@@ -299,11 +309,17 @@ example {V : Type*} [Fintype V] [DecidableEq V] [Nonempty V] {N : ℕ} :
     push_cast
     ring
   have hladder := ladderIterateUp_totalSpinSSquared_hasEigenvector (V := V) (N := N) 0
-  refine ⟨saturatedFerromagnetCasimirEigenvalueS V N, ladderIterateUp V N 0, hladder.2, ?_,
-    fun δ w hw hδ => ?_⟩
-  · have h := hladder.1
+  have hcas : (totalSpinSSquared V N).mulVec (ladderIterateUp V N 0) =
+      saturatedFerromagnetCasimirEigenvalueS V N • ladderIterateUp V N 0 := by
+    have h := hladder.1
     rwa [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at h
-  · rw [hCcast, Complex.ofReal_re]
+  have hmax : ∀ (δ : ℂ) (w : (V → Fin (N + 1)) → ℂ), w ≠ 0 →
+      (totalSpinSSquared V N).mulVec w = δ • w →
+      δ.re ≤ (saturatedFerromagnetCasimirEigenvalueS V N).re := by
+    intro δ w hw hδ
+    rw [hCcast, Complex.ofReal_re]
     exact totalSpinSSquared_eigenvalue_re_le_sMax hw hδ
+  exact ⟨saturatedFerromagnetCasimirEigenvalueS V N, ladderIterateUp V N 0, hladder.2, hcas,
+    hmax, totalSpinSSquared_maximal_eigenvector_mem_span_ladderIterateUp hladder.2 hcas hmax⟩
 
 end LatticeSystem.Quantum
