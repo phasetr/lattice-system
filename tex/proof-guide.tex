@@ -22768,8 +22768,26 @@ gives the degeneracy $|V| \cdot N + 1 = 2S_{\max} + 1$, and
 identifies this eigenspace with the joint eigenspace above, proving the
 ground-state half of the remark after eq.~(2.4.10), p.~34: every $\hat
 H$-ground state of a connected ferromagnetic lattice automatically has maximal
-total spin. The converse printed there --- that the states of eq.~(2.4.10) are
-the \emph{only} states of maximal total spin --- is not proved here. Specialised to
+total spin. The converse printed there --- that the states of eq.~(2.4.10),
+p.~33 (Theorem~2.1, pp.~33--34), are the \emph{only} states of maximal total
+spin --- is a statement about $(\hat S_{\rm tot})^2$ alone, with no graph,
+coupling, connectivity or $N \ge 1$ hypothesis, and is proved separately in
+two forms. The theorem
+\texttt{totalSpinSSquared\_eigenspace\_eq\_span\_ladderIterateUp}
+(\texttt{Quantum/SpinS/SaturatedLadderJointEigenspace.lean}), for a finite
+non-empty $V$ and arbitrary $N$, identifies the $(\hat S_{\rm tot})^2$-eigenspace
+at the explicit numeric value $S_{\max}(S_{\max}+1)$ with
+$\texttt{span}(\texttt{ladderIterateUp})$; it pins that explicit value without
+itself asserting that it is the largest eigenvalue of $(\hat S_{\rm tot})^2$. The
+theorem \texttt{totalSpinSSquared\_maximal\_eigenvector\_mem\_span\_ladderIterateUp}
+(\texttt{Quantum/SpinS/MaximalCasimirEigenvectorSpan.lean}), under the same
+finite-non-empty-$V$ hypothesis, restates this at the printed maximal
+eigenvalue: given an eigenvector at an eigenvalue $\gamma$ that is maximal in
+the sense that no eigenvalue of $(\hat S_{\rm tot})^2$ with a non-zero
+eigenvector has a larger real part, it lies in
+$\texttt{span}(\texttt{ladderIterateUp})$; the real part bound plus
+Hermitian-eigenvalue reality upgrade $\gamma$ to the explicit numeric value,
+after which the first theorem supplies the span. Specialised to
 the printed uniform coupling $J = \texttt{couplingOf}\,G\,(-1/2)$, the
 theorem \texttt{saturatedFerromagnetEigenvalueS\_couplingOf\_neg\_half}
 recovers the printed ground energy $E_{\rm GS} = -|B| S^2$
