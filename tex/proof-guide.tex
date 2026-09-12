@@ -20425,9 +20425,11 @@ imports the abstract Hamiltonian and energy companion, and
         (\texttt{Math/MatrixAnalysis/HermitianSum.lean}), shared across the
         physics files that previously each carried a private copy.
 
-        The two \texttt{tasaki25b\_local\_cluster} wrappers specialize this
-        abstract sum bound to local cluster Hamiltonians whose
-        minimum eigenvalues are the Problem~2.5.a values.  In closed form this
+        The capstone
+        \texttt{tasaki\_problem\_2\_5\_b\_groundEnergy\_lower\_bound}
+        specializes this abstract sum bound to the graph-local star
+        Hamiltonians, whose minimum eigenvalues are bounded below by the
+        Problem~2.5.a values.  In closed form this
         is Tasaki's lower bound
         \[
           E_{\rm GS}
