@@ -1723,7 +1723,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "7f84f80cf6c55d745d8580232518aa20a8895706482f23b2f3cd29bb8e692657"
+SCRIPT_SOURCE_SHA256 = "d9e02600768d26e0134e5658daec2f04c22e31e1d87ed65b6a1e1887918f0697"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -2803,6 +2803,7 @@ def public_target(
 CLONE_BASED_SELF_TEST_CALLS = (
     "    frozen_row_drop_negative_self_test()\n",
     "    absent_name_row_drop_negative_self_test()\n",
+    "    moved_prose_correction_site_negative_self_test()\n",
     "    unrecognized_argument_self_test()\n",
 )
 
@@ -3011,6 +3012,97 @@ def absent_name_row_drop_negative_self_test() -> None:
             )
 
 
+def moved_prose_correction_site_negative_self_test() -> None:
+    """A governance correction must not be satisfiable by firing somewhere else.
+
+    `MOVED_PROSE_CORRECTIONS` inverts corrected published wording back to the frozen baseline, so
+    a page reverted to the baseline spelling merely stops its correction firing and parity passes
+    either way. A bare firing count does not close that: correction #0 inverts to the empty
+    string, so reverting its heading and writing the same literal into any other marked paragraph
+    holds the total at one, and the relocated copy is erased before parity ever sees it. This
+    probes that edit in a disposable clone -- the heading at correction #0's own site goes back to
+    the wording `reconstruct_roadmap_prose` rebuilds from the frozen row, and the published
+    literal is spliced mid-line into the marker block the other four corrections live in -- and
+    requires the refusal to name the site the correction moved to.
+
+    Unlike its clone-based siblings this runs the mirror once, with no setup control, because the
+    assertion is on the diagnostic and not on the exit status alone: the refusal has to be the
+    correction-site comparison reporting exactly the relocated tuple derived from
+    `MOVED_PROSE_CORRECTION_SITES`, so a mirror already failing for an unrelated reason is
+    reported as a failed self-test instead of being mistaken for a successful detection. Splicing
+    mid-line rather than appending keeps the page free of both a new heading and a trailing space,
+    each of which an earlier check refuses and would make the probe fail for the wrong reason.
+    """
+    literal = MOVED_PROSE_CORRECTIONS[0][0]
+    page, start, _end, _count = MOVED_PROSE_CORRECTION_SITES[0][0]
+    relocated = MOVED_PROSE_CORRECTION_SITES[1][0][0]
+    expected_sites = (MOVED_PROSE_CORRECTION_SITES[1],) + MOVED_PROSE_CORRECTION_SITES[1:]
+    with tempfile.TemporaryDirectory(prefix="moved-prose-correction-site-") as scratch:
+        mirror = Path(scratch) / "mirror"
+        subprocess.run(
+            ["git", "clone", "--quiet", "--shared", str(ROOT), str(mirror)], check=True
+        )
+        script_path = mirror / "scripts" / "check_docs_hierarchy.py"
+        script_path.write_text(
+            _without_clone_based_self_tests(
+                Path(__file__).resolve().read_text(),
+                "moved-prose correction site self-test",
+            )
+        )
+
+        # The pinned literal ends in the space whitespace normalization makes of the line feed
+        # after the heading, so the raw page line is the literal without it.
+        heading_line = literal.rstrip() + "\n"
+        source_page = mirror / page
+        source_text = source_page.read_text()
+        if source_text.count(heading_line) != 1:
+            fail(
+                "moved-prose correction site self-test needs exactly one corrected heading to "
+                f"revert in {page}, found {source_text.count(heading_line)}"
+            )
+        baseline_line = baseline_index().splitlines(keepends=True)[start - 1]
+        cells = baseline_line.removeprefix("| ").removesuffix(" |\n").split(" | ", 2)
+        phase, scope, _status = (cells[0], "", cells[1]) if len(cells) == 2 else cells
+        rebuilt = f"## {phase}: {scope}\n" if scope else f"## {phase}\n"
+        source_page.write_text(source_text.replace(heading_line, rebuilt, 1))
+
+        before, after = "They are tracked here ", "so that future PRs can pick them up"
+        target_page = mirror / relocated
+        target_text = target_page.read_text()
+        if target_text.count(before + after) != 1:
+            fail(
+                "moved-prose correction site self-test needs exactly one splice anchor in "
+                f"{relocated}, found {target_text.count(before + after)}"
+            )
+        target_page.write_text(
+            target_text.replace(before + after, f"{before}{literal}{after}", 1)
+        )
+
+        probe = subprocess.run(
+            [sys.executable, "scripts/check_docs_hierarchy.py"],
+            cwd=mirror,
+            capture_output=True,
+            text=True,
+        )
+        if probe.returncode == 0:
+            fail(
+                "moved-prose correction site fail-open: the first correction was reverted at its "
+                f"own site in {page} and its literal relocated into {relocated}, which holds the "
+                "firing count at one, but the mirror exited 0"
+            )
+        if "audited moved-prose correction sites differ" not in probe.stderr:
+            fail(
+                "moved-prose correction site probe failed for the wrong reason: expected the "
+                "correction-site comparison to refuse the relocation, got "
+                f"(exit={probe.returncode}): {probe.stderr}"
+            )
+        if f"actual={expected_sites}" not in probe.stderr:
+            fail(
+                "moved-prose correction site probe refused a different site set than the "
+                f"relocation it made: expected actual={expected_sites}, got: {probe.stderr}"
+            )
+
+
 def unrecognized_argument_self_test() -> None:
     """`main()` must refuse argv it does not accept instead of running as if it were bare.
 
@@ -3068,6 +3160,7 @@ def main() -> None:
     moved_prose_negative_self_tests()
     frozen_row_drop_negative_self_test()
     absent_name_row_drop_negative_self_test()
+    moved_prose_correction_site_negative_self_test()
     unrecognized_argument_self_test()
     generated_records = DOCS / "formalization" / "records"
     if generated_records.exists() or generated_records.is_symlink():
