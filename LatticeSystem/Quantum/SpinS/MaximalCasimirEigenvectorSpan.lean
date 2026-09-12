@@ -5,7 +5,7 @@ import LatticeSystem.Math.CommutingHermitianEigenvector
 # Eigenvectors at the maximal total-spin eigenvalue
 
 The remark following eq. (2.4.10), p. 34, describes the states of eq. (2.4.9), p. 33, as the
-only ones carrying the *maximum* total spin `S_max = |Λ|S`. Carrying that reading needs two
+only ones carrying the *maximum* total spin `S_max = |Λ|S`. Carrying that reading needs three
 results which are proved in different modules:
 
 * `totalSpinSSquared_eigenspace_eq_span_ladderIterateUp` identifies the `(Ŝ_tot)²`-eigenspace
@@ -13,9 +13,12 @@ results which are proved in different modules:
   family, and says nothing about where that value sits in the spectrum;
 * `totalSpinSSquared_eigenvalue_re_le_sMax` bounds the real part of every `(Ŝ_tot)²`-eigenvalue
   by `S_max(S_max + 1)`, and is proved in a module which imports the one holding the eigenspace
-  identification, so the two cannot be combined in either of them.
+  identification, so the two cannot be combined in either of them;
+* `ladderIterateUp_totalSpinSSquared_hasEigenvector` attains that value: the ladder iterates are
+  non-zero eigenvectors at it, without which the bound would cap the spectrum without any
+  eigenvalue reaching the cap.
 
-This module imports both and states the combination: an eigenvector whose eigenvalue is maximal
+This module imports them and states the combination: an eigenvector whose eigenvalue is maximal
 lies in the span of the ladder family. Reality of the eigenvalue, needed to pass from the real
 part supplied by the bound to the complex eigenvalue carried by the eigenspace identification,
 comes from the Hermitian total Casimir.
@@ -45,8 +48,9 @@ The inputs enter as follows. The spectral bound gives `γ.re ≤ S_max(S_max + 1
 `γ.re` to that value. Since `(Ŝ_tot)²` is Hermitian, `γ` is real, hence equal to
 `saturatedFerromagnetCasimirEigenvalueS V N`, and the eigenspace identification
 `totalSpinSSquared_eigenspace_eq_span_ladderIterateUp` then supplies the span. The bound alone
-locates the value in the spectrum; the eigenspace identification alone describes the
-eigenvectors at it.
+caps the real parts without placing any eigenvalue at the cap; it is attainment by the ladder
+iterates that puts the value in the spectrum, and the eigenspace identification alone describes
+the eigenvectors at it.
 
 No graph, coupling, connectivity or `1 ≤ N` hypothesis appears, in contrast with Theorem 2.1
 itself (`heisenbergHamiltonianS_eigenspace_eq_span_ladderIterateUp_of_connected_ferro`),

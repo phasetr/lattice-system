@@ -1723,7 +1723,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "4a0c8c77fa7882e0158c74065b58239693ab956e6eb3b84bfa4b8a3274b340c5"
+SCRIPT_SOURCE_SHA256 = "d9e02600768d26e0134e5658daec2f04c22e31e1d87ed65b6a1e1887918f0697"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -2560,6 +2560,91 @@ def apply_moved_prose_link_rewrites(text: str, counts: list[int] | None = None) 
     return text
 
 
+# Governance corrections to migrated pages whose text states a wrong attribution: the recorded
+# averaging work is Problem 2.2.b, whose two displays are eqs. (2.2.14) and (2.2.15), p. 23, and
+# not Problem 2.2.c, pp. 23-24, which asks instead that the rotated state depend only on the axis;
+# the declaration the status paragraph named has since been renamed, and Problem 2.2.c has a
+# formalization of its own.  Problem 2.2.b asks for those two explicit calculations, the second
+# of which exhibits a state that is not SU(2) invariant; what characterizes the non-invariance is
+# asked by Problem 2.2.c, so the sentence stating what the problem asks follows p. 23.  Each
+# entry maps the corrected published text back to the frozen
+# baseline wording, so the parity comparison keeps measuring the baseline.  The roadmap entry
+# carries the whole reconstructed heading, because a heading that no longer matches the one
+# `reconstruct_roadmap_prose` rebuilds from the baseline row is left in the payload by it.
+MOVED_PROSE_CORRECTIONS = (
+    (
+        "## P1f-2c (Tasaki §2.2 Problem 2.2.b): SU(2)-averaged two-site state = singlet "
+        "projector (eqs. (2.2.14) and (2.2.15)); integration over Euler angles `φ ∈ [0,2π]`, "
+        "`θ ∈ [0,π]` ",
+        "",
+    ),
+    (
+        "### ~~TODO — Tasaki Problem 2.2.b (SU(2)-averaged two-site state)~~ **DONE**",
+        "### ~~TODO — Tasaki Problem 2.2.c (SU(2) non-invariance / averaged state)~~ **DONE**",
+    ),
+    (
+        "**Statement (Tasaki p. 23, eqs. (2.2.14) and (2.2.15) of Problem 2.2.b)**:",
+        "**Statement (Tasaki p.23, eq. (2.2.15))**:",
+    ),
+    (
+        "as `tasaki_problem_2_2_b_upDown_average` (eq. (2.2.14)) and "
+        "`tasaki_problem_2_2_b_upUp_average` (eq. (2.2.15)). The proof integrates over the "
+        "Euler-angle parameter space using `integral_cexp_I_mul_zero_two_pi`, "
+        "`integral_cexp_neg_I_mul_zero_two_pi`, and the half-angle trig integrals of the same "
+        "file. See `Quantum/SpinHalfRotation.lean` for "
+        "`spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfDown` and `Quantum/SU2Integral.lean` for "
+        "all supporting lemmas. Problem 2.2.c (pp. 23-24) is a separate question and is proved "
+        "as `tasaki_problem_2_2_c_rotated_upDown_eq` in "
+        "`Quantum/UniformRotationProblem22c.lean`.",
+        "as `problem_2_2_c`. The proof integrates over the Euler-angle parameter space using "
+        "`integral_cexp_I_mul_zero_two_pi`, `integral_cexp_neg_I_mul_zero_two_pi`, and the "
+        "half-angle trig integrals established in earlier PRs. See "
+        "`Quantum/SpinHalfRotation.lean` for "
+        "`spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfDown` and `Quantum/SU2Integral.lean` for "
+        "all supporting lemmas.",
+    ),
+    (
+        "problem asks to verify this by explicit calculation and to show, again by explicit "
+        "calculation, that the corresponding average of `|↑₁⟩|↑₂⟩` is `(π/8)(|↑₁⟩|↓₂⟩ + "
+        "|↓₁⟩|↑₂⟩) = (π/(4√2))|Φ_{1,0}⟩`, the triplet state of eq. (2.2.15), which is not "
+        "SU(2)-invariant.",
+        "problem asks to verify this and to characterize states that fail to be SU(2)-invariant.",
+    ),
+)
+
+# Where each correction above fires, in declaration order: the sites it rewrites, a site being the
+# page carrying the corrected wording, the baseline source range of the marker block it sits in,
+# and how many occurrences it rewrites there. Pinned because an inverse rewrite is fail-open on its
+# own: it maps the corrected wording back to the baseline, so a page reverted to the baseline
+# wording simply stops it firing and parity passes either way, leaving the published spelling
+# unpinned. A bare firing count summed over every marker block closes only part of that, because it
+# fixes how often a correction fires and not where: correction #0 inverts to the empty string, so
+# reverting its heading and writing the same literal into any other marked paragraph holds the
+# total at one, and the relocated copy is erased before the parity comparison ever sees it --
+# measured fail-open, which is what binding each count to a site refuses. Site by site, reverting a
+# correction, relocating it, duplicating it at its own site, and applying it on a page that is not
+# its own are each a hard failure. A correction that straddled two pages sharing one range is
+# counted on neither and fails the same way, which is the safe direction. The four older `.replace`
+# calls below (in `normalize_current_moved_prose`) are not counted, so they carry the fail-open
+# weakness this pin removes from these five.
+MOVED_PROSE_CORRECTION_SITES = (
+    (("docs/history/roadmap/foundations.md", 139, 139, 1),),
+    (("docs/history/open-items.md", 2780, 3037, 1),),
+    (("docs/history/open-items.md", 2780, 3037, 1),),
+    (("docs/history/open-items.md", 2780, 3037, 1),),
+    (("docs/history/open-items.md", 2780, 3037, 1),),
+)
+
+
+def apply_moved_prose_corrections(text: str, counts: list[int] | None = None) -> str:
+    """Invert the audited governance corrections, counting the sites each one rewrites."""
+    for index, (published, baseline) in enumerate(MOVED_PROSE_CORRECTIONS):
+        if counts is not None:
+            counts[index] += text.count(published)
+        text = text.replace(published, baseline)
+    return text
+
+
 def reconstruct_roadmap_prose(current: str, baseline_line: str) -> str:
     """Invert the known heading/list layout used for one former roadmap row."""
     cells = baseline_line.removeprefix("| ").removesuffix(" |\n").split(" | ", 2)
@@ -2574,8 +2659,10 @@ def reconstruct_roadmap_prose(current: str, baseline_line: str) -> str:
     return " ".join(part for part in (phase, scope, "\n".join(payload)) if part)
 
 
-def normalize_current_moved_prose(start: int, end: int, current: str, old_lines: list[str]) -> str:
-    """Invert only documented presentation wrappers and three governance corrections."""
+def normalize_current_moved_prose(
+    start: int, end: int, current: str, old_lines: list[str], counts: list[int] | None = None
+) -> str:
+    """Invert only documented presentation wrappers and the audited governance corrections."""
     if start == end and 114 <= start <= 153:
         current = reconstruct_roadmap_prose(current, old_lines[start - 1])
     current = current.replace(
@@ -2596,7 +2683,7 @@ def normalize_current_moved_prose(start: int, end: int, current: str, old_lines:
     # axiom-free", and the sentence recording Theorem 10.4 as fully axiomatized is deleted outright
     # (rather than edited), so it must be reinstated here — with the still-open tracker issue,
     # which the next .replace folds back to the closed #5004 to match the historical baseline.
-    return whitespace_normalized(current).replace(
+    corrected = whitespace_normalized(current).replace(
         "- **Perturbation-theoretic results** (e.g., the singular-perturbation and "
         "adiabatic-continuation arguments in Chapter 10, the cluster expansions behind **Theorem "
         "7.3** and **Theorem 8.1**, and the quasi-adiabatic continuation behind **Theorem 8.9**): "
@@ -2624,6 +2711,7 @@ def normalize_current_moved_prose(start: int, end: int, current: str, old_lines:
         "full theorem discharge is tracked in Issue #5320.",
         "full theorem discharge is tracked in Issue #5004.",
     )
+    return apply_moved_prose_corrections(corrected, counts)
 
 
 def moved_prose_negative_self_tests() -> None:
@@ -2715,6 +2803,7 @@ def public_target(
 CLONE_BASED_SELF_TEST_CALLS = (
     "    frozen_row_drop_negative_self_test()\n",
     "    absent_name_row_drop_negative_self_test()\n",
+    "    moved_prose_correction_site_negative_self_test()\n",
     "    unrecognized_argument_self_test()\n",
 )
 
@@ -2923,6 +3012,97 @@ def absent_name_row_drop_negative_self_test() -> None:
             )
 
 
+def moved_prose_correction_site_negative_self_test() -> None:
+    """A governance correction must not be satisfiable by firing somewhere else.
+
+    `MOVED_PROSE_CORRECTIONS` inverts corrected published wording back to the frozen baseline, so
+    a page reverted to the baseline spelling merely stops its correction firing and parity passes
+    either way. A bare firing count does not close that: correction #0 inverts to the empty
+    string, so reverting its heading and writing the same literal into any other marked paragraph
+    holds the total at one, and the relocated copy is erased before parity ever sees it. This
+    probes that edit in a disposable clone -- the heading at correction #0's own site goes back to
+    the wording `reconstruct_roadmap_prose` rebuilds from the frozen row, and the published
+    literal is spliced mid-line into the marker block the other four corrections live in -- and
+    requires the refusal to name the site the correction moved to.
+
+    Unlike its clone-based siblings this runs the mirror once, with no setup control, because the
+    assertion is on the diagnostic and not on the exit status alone: the refusal has to be the
+    correction-site comparison reporting exactly the relocated tuple derived from
+    `MOVED_PROSE_CORRECTION_SITES`, so a mirror already failing for an unrelated reason is
+    reported as a failed self-test instead of being mistaken for a successful detection. Splicing
+    mid-line rather than appending keeps the page free of both a new heading and a trailing space,
+    each of which an earlier check refuses and would make the probe fail for the wrong reason.
+    """
+    literal = MOVED_PROSE_CORRECTIONS[0][0]
+    page, start, _end, _count = MOVED_PROSE_CORRECTION_SITES[0][0]
+    relocated = MOVED_PROSE_CORRECTION_SITES[1][0][0]
+    expected_sites = (MOVED_PROSE_CORRECTION_SITES[1],) + MOVED_PROSE_CORRECTION_SITES[1:]
+    with tempfile.TemporaryDirectory(prefix="moved-prose-correction-site-") as scratch:
+        mirror = Path(scratch) / "mirror"
+        subprocess.run(
+            ["git", "clone", "--quiet", "--shared", str(ROOT), str(mirror)], check=True
+        )
+        script_path = mirror / "scripts" / "check_docs_hierarchy.py"
+        script_path.write_text(
+            _without_clone_based_self_tests(
+                Path(__file__).resolve().read_text(),
+                "moved-prose correction site self-test",
+            )
+        )
+
+        # The pinned literal ends in the space whitespace normalization makes of the line feed
+        # after the heading, so the raw page line is the literal without it.
+        heading_line = literal.rstrip() + "\n"
+        source_page = mirror / page
+        source_text = source_page.read_text()
+        if source_text.count(heading_line) != 1:
+            fail(
+                "moved-prose correction site self-test needs exactly one corrected heading to "
+                f"revert in {page}, found {source_text.count(heading_line)}"
+            )
+        baseline_line = baseline_index().splitlines(keepends=True)[start - 1]
+        cells = baseline_line.removeprefix("| ").removesuffix(" |\n").split(" | ", 2)
+        phase, scope, _status = (cells[0], "", cells[1]) if len(cells) == 2 else cells
+        rebuilt = f"## {phase}: {scope}\n" if scope else f"## {phase}\n"
+        source_page.write_text(source_text.replace(heading_line, rebuilt, 1))
+
+        before, after = "They are tracked here ", "so that future PRs can pick them up"
+        target_page = mirror / relocated
+        target_text = target_page.read_text()
+        if target_text.count(before + after) != 1:
+            fail(
+                "moved-prose correction site self-test needs exactly one splice anchor in "
+                f"{relocated}, found {target_text.count(before + after)}"
+            )
+        target_page.write_text(
+            target_text.replace(before + after, f"{before}{literal}{after}", 1)
+        )
+
+        probe = subprocess.run(
+            [sys.executable, "scripts/check_docs_hierarchy.py"],
+            cwd=mirror,
+            capture_output=True,
+            text=True,
+        )
+        if probe.returncode == 0:
+            fail(
+                "moved-prose correction site fail-open: the first correction was reverted at its "
+                f"own site in {page} and its literal relocated into {relocated}, which holds the "
+                "firing count at one, but the mirror exited 0"
+            )
+        if "audited moved-prose correction sites differ" not in probe.stderr:
+            fail(
+                "moved-prose correction site probe failed for the wrong reason: expected the "
+                "correction-site comparison to refuse the relocation, got "
+                f"(exit={probe.returncode}): {probe.stderr}"
+            )
+        if f"actual={expected_sites}" not in probe.stderr:
+            fail(
+                "moved-prose correction site probe refused a different site set than the "
+                f"relocation it made: expected actual={expected_sites}, got: {probe.stderr}"
+            )
+
+
 def unrecognized_argument_self_test() -> None:
     """`main()` must refuse argv it does not accept instead of running as if it were bare.
 
@@ -2980,6 +3160,7 @@ def main() -> None:
     moved_prose_negative_self_tests()
     frozen_row_drop_negative_self_test()
     absent_name_row_drop_negative_self_test()
+    moved_prose_correction_site_negative_self_test()
     unrecognized_argument_self_test()
     generated_records = DOCS / "formalization" / "records"
     if generated_records.exists() or generated_records.is_symlink():
@@ -3237,6 +3418,9 @@ def main() -> None:
     expected_prose_stream: list[str] = []
     actual_prose_stream: list[str] = []
     rewrite_counts = [0] * len(MOVED_PROSE_LINK_REWRITES)
+    correction_sites: list[list[tuple[str, int, int, int]]] = [
+        [] for _ in MOVED_PROSE_CORRECTIONS
+    ]
     for source_range in sorted(markers):
         start, end = source_range
         expected = "".join(old_lines[start - 1 : end])
@@ -3247,7 +3431,8 @@ def main() -> None:
             cells = old_lines[start - 1].removeprefix("| ").removesuffix(" |\n").split(" | ", 2)
             phase, scope, status = (cells[0], "", cells[1]) if len(cells) == 2 else cells
             expected = f"{phase} {scope} {status}"
-        current = "".join(text for _page, text in sorted(markers[source_range], key=lambda item: str(item[0])))
+        entries = sorted(markers[source_range], key=lambda item: str(item[0]))
+        current = "".join(text for _page, text in entries)
         if 217 <= start <= 2731:
             current = "\n".join(line for line in current.splitlines() if not line.startswith("|"))
         normalized_expected = whitespace_normalized(
@@ -3255,7 +3440,28 @@ def main() -> None:
         )
         working_note_counts[2] += len(_WORKING_NOTE_PROSE_CITATION.findall(normalized_expected))
         expected_prose_stream.append(_drop_working_note_prose_citation(normalized_expected))
-        actual_prose_stream.append(normalize_current_moved_prose(start, end, current, old_lines))
+        actual_prose_stream.append(
+            normalize_current_moved_prose(start, end, current, old_lines)
+        )
+        # Attribute every firing to the page and the baseline range it happens on. The parity
+        # stream above is computed on the concatenation of the pages sharing a range, so a count
+        # taken there cannot say which page a correction fired on; taken per page it can.
+        for page, text in entries:
+            if 217 <= start <= 2731:
+                text = "\n".join(line for line in text.splitlines() if not line.startswith("|"))
+            counts = [0] * len(MOVED_PROSE_CORRECTIONS)
+            normalize_current_moved_prose(start, end, text, old_lines, counts)
+            for index, count in enumerate(counts):
+                if count:
+                    correction_sites[index].append(
+                        (str(page.relative_to(ROOT)), start, end, count)
+                    )
+    observed_correction_sites = tuple(tuple(sorted(sites)) for sites in correction_sites)
+    if observed_correction_sites != MOVED_PROSE_CORRECTION_SITES:
+        fail(
+            "audited moved-prose correction sites differ: "
+            f"expected={MOVED_PROSE_CORRECTION_SITES}, actual={observed_correction_sites}"
+        )
     if tuple(rewrite_counts) != MOVED_PROSE_LINK_REWRITE_COUNTS:
         fail(
             "audited moved-prose link rewrite counts differ: "

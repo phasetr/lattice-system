@@ -401,8 +401,7 @@ theorem saturatedFerromagnetJointEigenspace_eq_span_ladderIterateUp
       Submodule.span ℂ (Set.range (ladderIterateUp V N)) := by
   apply le_antisymm
   · exact saturatedFerromagnetJointEigenspace_le_span_ladderIterateUp J
-  · -- Reverse inclusion: span ⊆ joint.
-    rw [Submodule.span_le, Set.range_subset_iff]
+  · rw [Submodule.span_le, Set.range_subset_iff]
     intro k
     exact ladderIterateUp_mem_saturatedFerromagnetJointEigenspace J k
 
@@ -426,9 +425,10 @@ Two limitations are deliberate. First, the eigenvalue is pinned as the explicit 
 `S_max(S_max + 1)`, and this statement does not itself assert that the value is the largest
 eigenvalue of `(Ŝ_tot)²`; an upper bound on the real part of every `(Ŝ_tot)²`-eigenvalue is
 `totalSpinSSquared_eigenvalue_re_le_sMax`, whose module imports this one, so the two are not
-combined here. Second, `[Nonempty V]` is inherited from the joint-eigenspace closure rather
-than known to be necessary: for an empty `V` the ambient space is one-dimensional and both
-sides are the whole space, a case this route does not cover and which is not formalised. -/
+combined here but in `MaximalCasimirEigenvectorSpan`, which imports both. Second,
+`[Nonempty V]` is inherited from the joint-eigenspace closure rather than known to be
+necessary: the empty `V` lies outside this route and is not formalised, so what the two sides
+are in that case is not settled here. -/
 theorem totalSpinSSquared_eigenspace_eq_span_ladderIterateUp [Nonempty V] :
     Module.End.eigenspace ((totalSpinSSquared V N).mulVecLin)
         (saturatedFerromagnetCasimirEigenvalueS V N)

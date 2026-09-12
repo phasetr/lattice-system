@@ -213,7 +213,7 @@ Done
 <!-- legacy-source:end:138:138 -->
 
 <!-- legacy-source:start:139:139 -->
-## P1f-2c (Tasaki §2.2 Problem 2.2.c): SU(2)-averaged two-site state = singlet projector (eq. (2.2.15)); integration over Euler angles `φ ∈ [0,2π]`, `θ ∈ [0,π]`
+## P1f-2c (Tasaki §2.2 Problem 2.2.b): SU(2)-averaged two-site state = singlet projector (eqs. (2.2.14) and (2.2.15)); integration over Euler angles `φ ∈ [0,2π]`, `θ ∈ [0,π]`
 
 Done
 <!-- legacy-source:end:139:139 -->

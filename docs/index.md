@@ -191,7 +191,7 @@ links to the section's new purpose-specific home.
 
 <a id="todo-p1d--problem-21a-for-general-s--1-done"></a> [~~TODO (P1d''') — Problem 2.1.a for general `S ≥ 1`~~ **DONE**](/lattice-system/history/open-items/)
 
-<a id="todo--tasaki-problem-22c-su2-non-invariance--averaged-state-done"></a> [~~TODO — Tasaki Problem 2.2.c (SU(2) non-invariance / averaged state)~~ **DONE**](/lattice-system/history/open-items/)
+<a id="todo--tasaki-problem-22c-su2-non-invariance--averaged-state-done"></a> [~~TODO — Tasaki Problem 2.2.b (SU(2)-averaged two-site state)~~ **DONE**](/lattice-system/history/open-items/)
 
 <a id="tasaki-25-antiferromagnetic-status-issues-240-412"></a> [Tasaki §2.5 antiferromagnetic status (issues #240, #412)](/lattice-system/history/open-items/)
 
