@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.FerromagneticGroundStateTheorem21
+import LatticeSystem.Quantum.SpinS.MaximalCasimirEigenvectorSpan
 
 /-!
 # Signature pin: Tasaki §2.4 Theorem 2.1, the `Ĥ`-eigenspace capstone (p. 34)
@@ -23,8 +24,10 @@ Pinned:
 * C3 `heisenbergHamiltonianS_eigenspace_eq_satFerroJointEigenspace_of_connected_ferro` — the
   ground-state half of the remark after eq. (2.4.10), p. 34: the `Ĥ`-ground eigenspace coincides
   with the joint `(Ĥ, (Ŝ_tot)²)`-eigenspace, i.e. every ground state carries maximal total spin.
-  The converse the book prints — that these are the *only* maximal-total-spin states — is not
-  proved upstream and is not pinned here.
+  The converse the book prints — that these are the *only* maximal-total-spin states — is
+  `totalSpinSSquared_eigenspace_eq_span_ladderIterateUp`, pinned in its own section below, at
+  the explicit value `S_max(S_max + 1)`; the maximal-eigenvalue reading is
+  `totalSpinSSquared_maximal_eigenvector_mem_span_ladderIterateUp`, pinned as PIN-M below.
 * C5a `saturatedFerromagnetEigenvalueS_couplingOf_neg_half` — the printed ground energy formula
   `E_GS = −|B|·S²` (p. 32, below eq. (2.4.5)) for the uniform coupling `J = couplingOf G (−1/2)`
   of eq. (2.4.1), p. 32; no hypotheses at all — it is an unconditional rewrite of
@@ -33,6 +36,10 @@ Pinned:
   three-conjunct statement: `Ĥ − E_GS` is `PosSemidef` (energy minimality), the `Ĥ`-eigenspace at
   `E_GS` is `span ℂ (Set.range (ladderIterateUp V N))`, and its dimension is
   `Fintype.card V * N + 1`.
+* PIN-M `totalSpinSSquared_maximal_eigenvector_mem_span_ladderIterateUp` — the maximal-eigenvalue
+  reading of the converse: an eigenvector of `(Ŝ_tot)²` at an eigenvalue with maximal real part
+  lies in `span ℂ (Set.range (ladderIterateUp V N))`. Non-vacuity of the maximality hypothesis is
+  exercised by control PC-M below.
 
 A positive control on the triangle (`V := Fin 3`, `G := cycleGraph 3`, `N := 1`,
 `J := couplingOf (cycleGraph 3) (−1/2)`) exercises C5a/C1/C2 with `|B| = 3` derived from
@@ -85,8 +92,8 @@ example {G : SimpleGraph V} {J : V → V → ℂ}
     hGconn hJ_real hJ_sym hJ_supp hJ_ferro hN
 
 /-- **C3 pin.** The `Ĥ`-eigenspace at the saturated-ferromagnet eigenvalue equals the joint
-`(Ĥ, (Ŝ_tot)²)`-eigenspace: every ground state carries maximal total spin (the remark after eq.
-(2.4.10), p. 34). -/
+`(Ĥ, (Ŝ_tot)²)`-eigenspace: every ground state carries maximal total spin (the ground-state half
+of the remark after eq. (2.4.10), p. 34). -/
 example {G : SimpleGraph V} {J : V → V → ℂ}
     (hGconn : G.Connected)
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -185,5 +192,108 @@ example :
     (fun x y h => by simp [couplingOf, h])
     (fun x y h => by simp [couplingOf, h])
     (le_refl 1)
+
+/-! ## Signature pin: the converse half of the remark after eq. (2.4.10), p. 34
+
+`totalSpinSSquared_eigenspace_eq_span_ladderIterateUp` states that the `(Ŝ_tot)²`-eigenspace at
+`S_max(S_max+1)` is the span of the ladder family, with no graph, coupling, connectivity or
+`1 ≤ N` hypothesis. The pins below fix that signature and exercise it at concrete `V`, `N`. -/
+
+/-- **PIN.** The maximal-Casimir eigenspace — the `(Ŝ_tot)²`-eigenspace at
+`S_max(S_max+1) = saturatedFerromagnetCasimirEigenvalueS V N` — equals the span of the ladder
+family, for a finite non-empty `V` and any `N`. States only that this equality holds: no graph,
+coupling, connectivity or `1 ≤ N` hypothesis is present in this pin. -/
+example {V : Type*} [Fintype V] [DecidableEq V] [Nonempty V] {N : ℕ} :
+    Module.End.eigenspace ((totalSpinSSquared V N).mulVecLin)
+        (saturatedFerromagnetCasimirEigenvalueS V N)
+      = Submodule.span ℂ (Set.range (ladderIterateUp V N)) :=
+  totalSpinSSquared_eigenspace_eq_span_ladderIterateUp
+
+/-- **PC-a (hypothesis-free control).** The PIN statement instantiated at `V := Fin 3`, `N := 1`,
+with no graph, coupling or `hN` in scope. Establishes only that the PIN's generic statement
+type-checks and is usable at this concrete `V`, `N` without any of those hypotheses; it does not by
+itself establish anything about the value of either side. -/
+example :
+    Module.End.eigenspace ((totalSpinSSquared (Fin 3) 1).mulVecLin)
+        (saturatedFerromagnetCasimirEigenvalueS (Fin 3) 1)
+      = Submodule.span ℂ (Set.range (ladderIterateUp (Fin 3) 1)) :=
+  totalSpinSSquared_eigenspace_eq_span_ladderIterateUp
+
+/-- **PC-b (`N = 0` control).** The PIN statement instantiated at `V := Fin 2`, `N := 0`. At
+`N = 0` both sides of the PIN equality are the whole space `(V → Fin 1) → ℂ`, so on its own this
+pin does not discriminate the right-hand side of the PIN statement; its purpose is only to show
+that the PIN's generic statement admits `N = 0` (no `1 ≤ N` hypothesis is required). -/
+example :
+    Module.End.eigenspace ((totalSpinSSquared (Fin 2) 0).mulVecLin)
+        (saturatedFerromagnetCasimirEigenvalueS (Fin 2) 0)
+      = Submodule.span ℂ (Set.range (ladderIterateUp (Fin 2) 0)) :=
+  totalSpinSSquared_eigenspace_eq_span_ladderIterateUp
+
+/-- **PC-c (dimension control).** At `V := Fin 3`, `N := 1`, the finrank of the maximal-Casimir
+eigenspace named in the PIN is `4`. Together with the ambient dimension `2³ = 8` (not pinned
+here), this establishes that the PIN's right-hand side is a proper subspace at this `V`, `N`,
+unlike at `N = 0` (PC-b). -/
+example :
+    Module.finrank ℂ
+        (Module.End.eigenspace ((totalSpinSSquared (Fin 3) 1).mulVecLin)
+          (saturatedFerromagnetCasimirEigenvalueS (Fin 3) 1))
+      = 4 := by
+  rw [totalSpinSSquared_eigenspace_eq_span_ladderIterateUp,
+    finrank_span_eq_card ladderIterateUp_linearIndependent, Fintype.card_fin]
+  simp
+
+/-- **RC (already compiles at Red).** The existing lower bound
+`totalSpinSSquared_eigenspace_finrank_ge_succ_card_mul_N`, instantiated at `V := Fin 3`, `N := 1`,
+applied to the same eigenspace term that appears in PC-c. Establishes only that this eigenspace
+term type-checks against an already-proved declaration, so that the `Unknown identifier` failures
+above are isolated to the new name and are not a symptom of a malformed eigenspace term. -/
+example :
+    Fintype.card (Fin 3) * 1 + 1 ≤
+      Module.finrank ℂ
+        (Module.End.eigenspace ((totalSpinSSquared (Fin 3) 1).mulVecLin)
+          (saturatedFerromagnetCasimirEigenvalueS (Fin 3) 1)) :=
+  totalSpinSSquared_eigenspace_finrank_ge_succ_card_mul_N
+
+/-! ## Signature pin: the maximal-eigenvalue reading of the remark after eq. (2.4.10), p. 34
+
+`totalSpinSSquared_maximal_eigenvector_mem_span_ladderIterateUp` states that an eigenvector of
+`(Ŝ_tot)²` whose eigenvalue is maximal — no eigenvalue with a non-zero eigenvector has a larger
+real part — lies in the span of the ladder family. The pins below fix that signature and record
+that the hypotheses it places on the eigenvalue are satisfiable. -/
+
+/-- **PIN-M.** An eigenvector of `(Ŝ_tot)²` at an eigenvalue whose real part dominates the real
+part of every eigenvalue of `(Ŝ_tot)²` with a non-zero eigenvector lies in the span of the
+ladder family. No graph, coupling, connectivity or `1 ≤ N` hypothesis is present in this pin. -/
+example {V : Type*} [Fintype V] [DecidableEq V] [Nonempty V] {N : ℕ}
+    {γ : ℂ} {v : (V → Fin (N + 1)) → ℂ}
+    (hv : v ≠ 0)
+    (hcas : (totalSpinSSquared V N).mulVec v = γ • v)
+    (hmax : ∀ (δ : ℂ) (w : (V → Fin (N + 1)) → ℂ), w ≠ 0 →
+      (totalSpinSSquared V N).mulVec w = δ • w → δ.re ≤ γ.re) :
+    v ∈ Submodule.span ℂ (Set.range (ladderIterateUp V N)) :=
+  totalSpinSSquared_maximal_eigenvector_mem_span_ladderIterateUp hv hcas hmax
+
+/-- **PC-M (non-vacuity control).** The three hypotheses of PIN-M are simultaneously
+satisfiable: the first ladder iterate is a non-zero eigenvector of `(Ŝ_tot)²` whose eigenvalue
+has maximal real part. Without this, PIN-M could hold vacuously for want of any eigenvalue
+meeting its maximality hypothesis. -/
+example {V : Type*} [Fintype V] [DecidableEq V] [Nonempty V] {N : ℕ} :
+    ∃ (γ : ℂ) (v : (V → Fin (N + 1)) → ℂ), v ≠ 0 ∧
+      (totalSpinSSquared V N).mulVec v = γ • v ∧
+      ∀ (δ : ℂ) (w : (V → Fin (N + 1)) → ℂ), w ≠ 0 →
+        (totalSpinSSquared V N).mulVec w = δ • w → δ.re ≤ γ.re := by
+  have hCcast : saturatedFerromagnetCasimirEigenvalueS V N =
+      ((((Fintype.card V : ℝ) * (N : ℝ) / 2) *
+        ((Fintype.card V : ℝ) * (N : ℝ) / 2 + 1) : ℝ) : ℂ) := by
+    unfold saturatedFerromagnetCasimirEigenvalueS
+    push_cast
+    ring
+  have hladder := ladderIterateUp_totalSpinSSquared_hasEigenvector (V := V) (N := N) 0
+  refine ⟨saturatedFerromagnetCasimirEigenvalueS V N, ladderIterateUp V N 0, hladder.2, ?_,
+    fun δ w hw hδ => ?_⟩
+  · have h := hladder.1
+    rwa [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at h
+  · rw [hCcast, Complex.ofReal_re]
+    exact totalSpinSSquared_eigenvalue_re_le_sMax hw hδ
 
 end LatticeSystem.Quantum

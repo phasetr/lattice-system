@@ -336,7 +336,7 @@
           "source_item_id": "tasaki-2020-theorem-2-1"
         }
       ],
-      "summary": "On a connected graph with a real, symmetric, edge-supported, strictly ferromagnetic spin-S coupling at the printed uniform strength, the Heisenberg Hamiltonian minus its ground energy is positive semidefinite, its ground eigenspace equals the linear span of the ladder family generated from the all-up state, i.e. the states of eq. (2.4.10), and that eigenspace has dimension |V|*N + 1 = 2*S_max + 1. The companion joint-eigenspace result in the same module adds that every ground state has maximal total spin; the printed converse, that these are the only states of maximal total spin, is not proved.",
+      "summary": "On a connected graph with a real, symmetric, edge-supported, strictly ferromagnetic spin-S coupling at the printed uniform strength, the Heisenberg Hamiltonian minus its ground energy is positive semidefinite, its ground eigenspace equals the linear span of the ladder family generated from the all-up state, i.e. the states of eq. (2.4.10), and that eigenspace has dimension |V|*N + 1 = 2*S_max + 1. The companion joint-eigenspace result in the same module adds that every ground state has maximal total spin; the printed converse, that these are the only states of maximal total spin, is recorded separately.",
       "topic_ids": [
         "quantum-spin"
       ],
@@ -363,6 +363,58 @@
         }
       ],
       "summary": "On a connected graph with a real, symmetric, edge-supported, strictly ferromagnetic spin-S coupling, the eigenspace of the Heisenberg Hamiltonian alone at the saturated-ferromagnet energy equals the joint eigenspace of that Hamiltonian and the total-spin Casimir at the saturated values; this is the ground-state half of Tasaki's remark after eq. (2.4.10), that every ferromagnetic ground state carries maximal total spin, and not the converse inclusion the remark also asserts.",
+      "topic_ids": [
+        "quantum-spin"
+      ],
+      "trust_state": "axiom_free"
+    },
+    {
+      "axiom_dependencies": [],
+      "capstone": false,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-theorem-2-1-maximal-total-spin-converse",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.totalSpinSSquared_eigenspace_eq_span_ladderIterateUp",
+      "lifecycle": "active",
+      "module": "LatticeSystem.Quantum.SpinS.SaturatedLadderJointEigenspace",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "retirement": null,
+      "source_coverage": "partial",
+      "source_path": "LatticeSystem/Quantum/SpinS/SaturatedLadderJointEigenspace.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-theorem-2-1"
+        }
+      ],
+      "summary": "On any finite non-empty spin-S lattice, with no graph, coupling, connectivity or spin-lower-bound hypothesis, the total-spin Casimir eigenspace at the explicit numeric value S_max*(S_max+1), S_max = |V|*N/2, equals the linear span of the ladder family generated from the all-up state; this is the converse half of Tasaki's remark after eq. (2.4.10), that the states of eq. (2.4.10) are the only ones of maximal total spin, stated at the explicit eigenvalue without itself asserting that value is the largest eigenvalue of the Casimir operator.",
+      "topic_ids": [
+        "quantum-spin"
+      ],
+      "trust_state": "axiom_free"
+    },
+    {
+      "axiom_dependencies": [],
+      "capstone": false,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-theorem-2-1-maximal-total-spin-converse-spectral",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.totalSpinSSquared_maximal_eigenvector_mem_span_ladderIterateUp",
+      "lifecycle": "active",
+      "module": "LatticeSystem.Quantum.SpinS.MaximalCasimirEigenvectorSpan",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "retirement": null,
+      "source_coverage": "partial",
+      "source_path": "LatticeSystem/Quantum/SpinS/MaximalCasimirEigenvectorSpan.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-theorem-2-1"
+        }
+      ],
+      "summary": "On any finite non-empty spin-S lattice, an eigenvector of the total-spin Casimir operator whose eigenvalue has maximal real part among eigenvalues with non-zero eigenvectors lies in the linear span of the ladder family generated from the all-up state; maximality plus Hermitian-eigenvalue reality identify the eigenvalue with the explicit numeric value S_max*(S_max+1), after which the eigenspace identification supplies the span, reading Tasaki's converse remark after eq. (2.4.10) as a statement about the top of the spectrum rather than about that explicit value alone.",
       "topic_ids": [
         "quantum-spin"
       ],

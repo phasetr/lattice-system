@@ -11,20 +11,28 @@ import LatticeSystem.Quantum.SpinS.ToyHamiltonianCasimir
 import LatticeSystem.Quantum.SpinS.SaturatedLadderJointEigenspaceCore
 
 /-!
-# The saturated-ferromagnet ladder lies in the joint
-`(H, (Ŝ_{tot})²)` eigenspace
+# The saturated-ferromagnet ladder spans the joint and the
+maximal-Casimir eigenspaces
 
-Refines PRs #899 and #900: every iterate
-`(Ŝ^-_{tot})^k · |σ_⊤⟩` lies in the **joint** eigenspace
-`H-eigenspace at c_J` ∩ `(Ŝ_{tot})²-eigenspace at m_max(m_max+1)`.
+Two closures for the ladder family `ladderIterateUp`, whose members
+are the unnormalised `(Ŝ⁻_tot)^k Φ↑` of eq. (2.4.9), p. 33.
 
-The joint eigenspace contains the LI ladder family, hence has
-`Module.finrank ℂ ≥ 2m_max + 1`. This is the cleanest dimension
-lower bound on the saturated-ferromagnet ground-state sector
-satisfying both Heisenberg and Casimir eigenvalue constraints.
+* `saturatedFerromagnetJointEigenspace_eq_span_ladderIterateUp`:
+  for every coupling `J`, the joint eigenspace
+  `Ĥ-eigenspace at c_J` ∩ `(Ŝ_tot)²-eigenspace at m_max(m_max+1)`
+  is the span of the ladder family. A joint eigenvector is split
+  into its magnetisation components by the pointwise projector
+  `magProjFn` defined here, and each component is identified
+  through the per-sector equality proved upstream.
+* `totalSpinSSquared_eigenspace_eq_span_ladderIterateUp`: the
+  `(Ŝ_tot)²`-eigenspace alone at `m_max(m_max+1)` is that same
+  span. This is the converse half of the remark following
+  eq. (2.4.10), p. 34, and it is the previous closure taken at the
+  zero coupling, where the `Ĥ` factor becomes the whole space.
 
-Tracked as part of Tasaki §2.4 / §2.5 spin-`S` infrastructure
-(Issue #412).
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum
+Many-Body Systems* (1st ed., Springer, 2020), §2.4: eq. (2.4.9),
+p. 33; Theorem 2.1 and the remark following eq. (2.4.10), p. 34.
 -/
 
 namespace LatticeSystem.Quantum
@@ -34,7 +42,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 Concrete projector `magProjFn M v` mapping each component of `v`
 through the magnetisation filter. Used to decompose elements of
-`joint` into the per-sector pieces identified by PR #2764. -/
+`joint` into their per-sector pieces. -/
 
 /-- Pointwise magnetisation projector: keeps `v σ` when
 `magEigenvalueS σ = M` and zeros it out otherwise. -/
@@ -138,7 +146,7 @@ projector. Argument via the matrix-entry vanishing property: for
 any `σ` and `τ` with `magEigenvalueS σ ≠ magEigenvalueS τ`, the
 matrix entry `(heisenbergHamiltonianS J N) σ τ = 0` (since
 `H · basisVecS τ ∈ magSubspaceS V N (magEigenvalueS τ)` by
-PR #1078 / `heisenbergHamiltonianS_mulVec_basisVecS_mem_magSubspaceS`,
+`heisenbergHamiltonianS_mulVec_basisVecS_mem_magSubspaceS`,
 and applying the support property). -/
 theorem heisenbergHamiltonianS_mulVec_magProjFn_eq
     (J : V → V → ℂ) (M : ℂ) (v : (V → Fin (N + 1)) → ℂ) :
@@ -207,9 +215,9 @@ theorem heisenbergHamiltonianS_mulVec_magProjFn_eq
 
 /-- **Commutation `(Ŝ_tot)² · magProjFn M v = magProjFn M ((Ŝ_tot)² · v)`**.
 
-Same matrix-entry-vanishing argument as the Heisenberg case
-(PR #2766), now applied to `(Ŝ_tot)² · basisVecS τ`
-(`totalSpinSSquared_mulVec_mem_magSubspaceS` from PR #1078). -/
+Same matrix-entry-vanishing argument as the Heisenberg case,
+now applied to `(Ŝ_tot)² · basisVecS τ`
+(via `totalSpinSSquared_mulVec_mem_magSubspaceS`). -/
 theorem totalSpinSSquared_mulVec_magProjFn_eq
     (M : ℂ) (v : (V → Fin (N + 1)) → ℂ) :
     (totalSpinSSquared V N).mulVec (magProjFn (V := V) (N := N) M v) =
@@ -338,9 +346,9 @@ theorem ladderIterateUp_singleton_span_le_span_range (N : ℕ)
 eigenspace decomposes into the linear span of the ladder iterates.
 
 For any `v ∈ joint`, the magnetisation decomposition
-`v = ∑_k magProjFn (m_max - k.val) v` (PR #2768) lifts each
-component into `joint ⊓ H_{m_max - k.val} = span {ladderIterateUp V N k}`
-(PR #2764). Summing across the `2m_max + 1` sectors yields
+`v = ∑_k magProjFn (m_max - k.val) v` lifts each
+component into `joint ⊓ H_{m_max - k.val} = span {ladderIterateUp V N k}`.
+Summing across the `2m_max + 1` sectors yields
 `v ∈ span (Set.range ladderIterateUp)`. -/
 theorem saturatedFerromagnetJointEigenspace_le_span_ladderIterateUp
     [Nonempty V] (J : V → V → ℂ) :
@@ -380,7 +388,7 @@ Tasaki §2.4 Theorem 2.1**:
 The joint `(H, (Ŝ_tot)²)`-eigenspace at the saturated-ferromagnet
 eigenvalues coincides with the `(2m_max + 1)`-dimensional linear
 span of the ladder iterates. Combined with the linear independence
-(PR #896) and dimension (PR #904), this identifies the joint
+and dimension of that span, this identifies the joint
 eigenspace as the `J_tot = m_max` irreducible SU(2) representation.
 
 This is not Theorem 2.1 itself: it constrains the total spin as well
@@ -393,9 +401,45 @@ theorem saturatedFerromagnetJointEigenspace_eq_span_ladderIterateUp
       Submodule.span ℂ (Set.range (ladderIterateUp V N)) := by
   apply le_antisymm
   · exact saturatedFerromagnetJointEigenspace_le_span_ladderIterateUp J
-  · -- Reverse inclusion: span ⊆ joint (PR #904).
+  · -- Reverse inclusion: span ⊆ joint.
     rw [Submodule.span_le, Set.range_subset_iff]
     intro k
     exact ladderIterateUp_mem_saturatedFerromagnetJointEigenspace J k
+
+/-- **The maximal-Casimir eigenspace is the span of the ladder family** -- the converse half of
+the remark following Tasaki eq. (2.4.10), p. 34.
+
+The `(Ŝ_tot)²`-eigenspace at `saturatedFerromagnetCasimirEigenvalueS V N`, which is the value
+`S_max(S_max + 1)` with `S_max = |V|·N/2`, equals the span of the ladder family
+`ladderIterateUp`, whose members are the unnormalised `(Ŝ⁻_tot)^k Φ↑` of eq. (2.4.9), p. 33.
+The printed remark says that the states of eq. (2.4.10) are the only ones which have the
+maximum total spin `S_max = |Λ|S`, i.e. which satisfy `(Ŝ_tot)²Φ = S_max(S_max+1)Φ`; it is that
+closing eigenvalue equation which this statement formalises.
+
+Unlike Theorem 2.1 itself
+(`heisenbergHamiltonianS_eigenspace_eq_span_ladderIterateUp_of_connected_ferro`), no graph,
+coupling, connectivity or `1 ≤ N` hypothesis appears here, because the remark constrains
+`(Ŝ_tot)²` alone. Only the span of the family occurs, so the normalising denominator printed
+in eq. (2.4.9) does not affect the statement.
+
+Two limitations are deliberate. First, the eigenvalue is pinned as the explicit value
+`S_max(S_max + 1)`, and this statement does not itself assert that the value is the largest
+eigenvalue of `(Ŝ_tot)²`; an upper bound on the real part of every `(Ŝ_tot)²`-eigenvalue is
+`totalSpinSSquared_eigenvalue_re_le_sMax`, whose module imports this one, so the two are not
+combined here. Second, `[Nonempty V]` is inherited from the joint-eigenspace closure rather
+than known to be necessary: for an empty `V` the ambient space is one-dimensional and both
+sides are the whole space, a case this route does not cover and which is not formalised. -/
+theorem totalSpinSSquared_eigenspace_eq_span_ladderIterateUp [Nonempty V] :
+    Module.End.eigenspace ((totalSpinSSquared V N).mulVecLin)
+        (saturatedFerromagnetCasimirEigenvalueS V N)
+      = Submodule.span ℂ (Set.range (ladderIterateUp V N)) := by
+  -- The joint closure holds for every coupling, so it may be read at the zero coupling.
+  rw [← saturatedFerromagnetJointEigenspace_eq_span_ladderIterateUp (V := V) (N := N)
+    (fun _ _ => (0 : ℂ))]
+  refine le_antisymm (fun v hv => ⟨?_, hv⟩) inf_le_right
+  simp only [SetLike.mem_coe, Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
+  unfold saturatedFerromagnetEigenvalueS
+  rw [heisenbergHamiltonianS_zero]
+  simp
 
 end LatticeSystem.Quantum
