@@ -4,13 +4,12 @@ import LatticeSystem.Quantum.UniformRotationProblem22c
 # Tests: Tasaki Problem 2.2.c, the rotated `|↑⟩₁|↓⟩₂` is determined by `n` alone (pp. 23-24)
 
 Pins the exact public name/signature of the Problem 2.2.c capstone
-`tasaki_problem_2_2_c_rotated_upDown_eq` before it exists (Red), plus non-vacuity and
-non-triviality controls that are provable already from existing API (so the fixture type-checks
-independently of the capstone) and fail the same way (`Unknown identifier`) only via **R0**, the
-capstone shim, until the module is implemented.
+`tasaki_problem_2_2_c_rotated_upDown_eq`, plus non-vacuity and non-triviality controls provable
+independently from existing API (so PC1a/PC1b/PC2/NC1/NC2 do not depend on the capstone's own
+proof), tied to the capstone only through **R0**, the capstone shim.
 
-* **R0** the capstone shim: restates the full `∀`-closed signature and closes it with the (not yet
-  existing) capstone name, pinning every hypothesis/conclusion shape — the admissible class as a
+* **R0** the capstone shim: restates the full `∀`-closed signature and closes it with the
+  capstone name, pinning every hypothesis/conclusion shape — the admissible class as a
   `Submonoid.closure` of the exponential global rotations, the same-`n` hypothesis at both sites,
   the pairwise conclusion.
 * **PC1a/PC1b** class membership only: `U = 1` and `V = exp(−iπ Ŝ_tot^{(3)})` are two distinct
@@ -27,8 +26,8 @@ capstone shim, until the module is implemented.
 * **NC2** widening the admissible class from the footnote-16 closure to all of
   `unitary (ManyBodyOp (Fin 2))` makes the statement false: `U = 1` and `V = −1` are both unitary,
   both act as scalars (hence commute with every `Ŝ_x^{(3)}`, satisfying the conjugation hypothesis
-  vacuously with `n = e₃`), yet `V` sends `|↑↓⟩` to `−|↑↓⟩ ≠ |↑↓⟩`. NC2's internal witness for `U`
-  is the only place in this file where the conjugation hypothesis itself (not just class
+  by centrality with `n = e₃`), yet `V` sends `|↑↓⟩` to `−|↑↓⟩ ≠ |↑↓⟩`. NC2's internal witness
+  for `U` is the only place in this file where the conjugation hypothesis itself (not just class
   membership) is checked, and it is checked for the scalar `U = 1` under the widened class, not for
   a nontrivial rotation inside the footnote-16 closure.
 
@@ -69,8 +68,9 @@ example : ∀ (n : Fin 3 → ℝ) {U V : ManyBodyOp (Fin 2)},
 
 /-! ## PC1 / PC2: non-vacuity at `n = e₃` -/
 
-/-- PC1a: `U = 1` is an admissible rotation for `n = ![0, 0, 1]` (the empty product of the
-footnote-16 class, `one_mem`). -/
+/-- PC1a: `U = 1` is a member of the footnote-16 admissible class (the empty product, `one_mem`).
+This proves only class membership, not that `U` satisfies the capstone's same-`n` conjugation
+hypothesis. -/
 example : (1 : ManyBodyOp (Fin 2)) ∈ Submonoid.closure (Set.range fun p : Fin 3 × ℝ =>
       NormedSpace.exp ((-(Complex.I * (p.2 : ℂ))) •
         ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] p.1)) :=
@@ -128,7 +128,7 @@ example : NormedSpace.exp ((-(Complex.I * ((Real.pi : ℝ) : ℂ))) •
 
 /-- NC2: widening the admissible class to all unitaries makes the statement false: `U = 1` and
 `V = −1` are both unitary, both act as scalars, and both satisfy the same-`n` conjugation
-hypothesis vacuously with `n = e₃`, yet `V` sends `|↑↓⟩` to `−|↑↓⟩ ≠ |↑↓⟩`. -/
+hypothesis by centrality with `n = e₃`, yet `V` sends `|↑↓⟩` to `−|↑↓⟩ ≠ |↑↓⟩`. -/
 example : ¬ (∀ {U V : ManyBodyOp (Fin 2)},
     U ∈ unitary (ManyBodyOp (Fin 2)) →
     V ∈ unitary (ManyBodyOp (Fin 2)) →
