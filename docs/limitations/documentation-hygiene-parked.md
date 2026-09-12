@@ -330,3 +330,77 @@ larger and carries the same shape, so nothing downstream waits on the open regim
 constant proved here is tightened to the printed one.
 
 **Cadence.** None; the entry is reopened by the condition above rather than by a schedule.
+
+## Superseded headings preserved in the migration map and the permalink stubs
+
+**Target.** Two records of what a heading used to be, both held verbatim against the frozen
+baseline by `scripts/check_docs_hierarchy.py`: the third column of every row of
+`docs/formalization/migration-map.md`, which reproduces the baseline heading its row maps, and the
+`<a id="..."></a>` stubs on `docs/index.md`, whose identifiers are the Kramdown identifiers of
+those same baseline headings. When a heading is corrected on the page that now owns it, both of
+these keep stating the superseded wording.
+
+**Measurement.** Each population is the set the checker matches one to one against the frozen
+headings, so counting the rows and the stubs counts it:
+
+```
+git grep -c -P '^\| `[^`]+` \| `\d+` \| ' a12cbb0e -- docs/formalization/migration-map.md
+git grep -c -P '<a\s+id="[^"]+"></a>' a12cbb0e -- docs/index.md
+```
+
+At revision `a12cbb0e`: 68 mapped rows and 68 anchor stubs.
+
+**Reason.** Neither is a current claim of this project. The map's third column is defined as the
+historical heading that its anchor and line number identify, and the checker compares it against
+the baseline text, so rewriting it would falsify the map rather than correct it. An anchor
+identifier is a permalink for a page that once carried the heading; changing it breaks the external
+links that resolve through it, and the checker requires the stub set to equal the identifiers
+derived from the frozen headings. Where a heading has been corrected, the correction is carried by
+the page that owns it and by the visible link label, which no check reads.
+
+**Reopen condition.** The frozen baseline stops being the authority for the migrated pages, at
+which point the map and the stubs are regenerated from the current headings in the same change.
+
+**Cadence.** None. Both counts move only when the fixture moves, which the checker reports on every
+run.
+
+## Issue identifiers and time-relative wording in the proof guide and the non-legacy pages
+
+**Target.** References of four digits or more to issues and pull requests, and wording that dates a
+statement by when it changed rather than by what it says, in `tex/proof-guide.tex` and under
+`docs/` outside the frozen legacy catalogue. The entry on Lean doc comments above covers the same
+identifiers under `LatticeSystem/`, and the entry on the formalization-status surface covers the
+three governance identifiers kept there on purpose.
+
+**Measurement.** The patterns need PCRE: `git grep -E` accepts `\b` and then matches nothing, so an
+ERE spelling reports an empty population instead of failing. The identifier pattern accepts the TeX
+spelling, in which the hash is escaped:
+
+```
+git grep -P -o -I '(?<!\w)\\?#\d{4,}' a12cbb0e -- tex | wc -l
+git grep -P -n -I '(?<!\w)#\d{4,}' a12cbb0e -- docs ':!docs/formalization/legacy' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
+git grep -P -n -I '\b(now|previously|formerly|earlier|no longer|used to|recently|originally)\b' a12cbb0e -- tex docs ':!docs/formalization/legacy' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
+```
+
+At revision `a12cbb0e`: 609 identifier occurrences on 508 lines of the proof guide, 430 lines
+across 24 files under `docs/`, and 298 lines across 25 files carrying one of the listed words.
+
+**Reason.** Neither population is a defect class that a pattern settles. The identifiers are known
+to include deliberate provenance pointers, which is what the formalization-status entry below
+records for three of them, so a pattern edit would delete pointers whose removal leaves a claim
+with no reachable source. The listed words are ordinary English that mathematical prose uses for
+reasons unrelated to repository history, so the third command measures an upper bound on the
+population rather than the population itself; acting on it requires reading several hundred lines
+one at a time, which is off the critical path of the book-order formalization. The classification
+of individual sites is therefore not recorded here, and neither figure should be read as a count of
+defects.
+
+**Fix on touch.** A change that edits one of these passages for another reason converts that
+passage in the same commit. No separate sweep is opened for the remainder.
+
+**Reopen condition.** Fix-on-touch brings the proof-guide identifier count low enough that one
+closing sweep is reviewable as a single diff, or a prose linter that rejects the identifier pattern
+outside frozen text is adopted.
+
+**Cadence.** Re-measure with the commands above at every 20-PR refactor cycle and replace the
+figures here with the new ones.
