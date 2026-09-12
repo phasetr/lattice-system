@@ -203,12 +203,12 @@ LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
 CATALOGUE_BASELINE_SLICE = slice(216, 2731)
 # Pins the published catalogue text; this module's docstring records exactly what is hashed
 # and how the pin is legitimately updated.
-APPROVED_CHANGES_SHA256 = "35732632830cb6ec14f615b9880df352e70dbc670b4a2c5e7d8b4ad4b15d9968"
+APPROVED_CHANGES_SHA256 = "022882f4f0bed6de11a0ea1889433d4fdca29555f2d4e5984b023eaf7ea34381"
 # Pins the row sequence `main()` actually compares the legacy pages against. The text pin above
 # does not reach it: the rows are derived from the transformed text by `table_data_rows`, which
 # is outside the pinned text, so without this pin a row skipped there would go unpublished with
 # the text pin undisturbed.
-PUBLISHED_ROWS_SHA256 = "65e67110f8ccc661f100eb36431632b6f1fc19779be7e0808282d347ea95aabd"
+PUBLISHED_ROWS_SHA256 = "551258704fe01b3a1c6db19e6cbb15d90bbe3371ac80db17b494ec4df7b37389"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -1691,8 +1691,8 @@ def _approved_replacements(text: str) -> str:
             "minimum eigenvalue of the sum is at least `Σ x, ε x`. "
             "`add_lower_bounds_le_hermitianMinEigenvalue_add`, "
             "`tasaki25b_local_cluster_sum_lower_bound` and "
-            "`tasaki25b_local_cluster_sum_lower_bound_closed_form` have since been retired "
-            "(ref-0); the bridge is now consumed directly by the generalized "
+            "`tasaki25b_local_cluster_sum_lower_bound_closed_form` are retired "
+            "(ref-0); the bridge is consumed directly by the generalized "
             "`tasaki25b_graphLocalCluster_sum_lower_bound` (no degree hypothesis, PR #5464) "
             "feeding the Problem 2.5.b capstone `tasaki_problem_2_5_b_groundEnergy_lower_bound` "
             "(`Quantum/SpinS/GraphLocalStarSumWrapper.lean`). The generic finite-sum-of-"
@@ -1721,8 +1721,8 @@ def _approved_replacements(text: str) -> str:
             "half-coupling Hamiltonian is the one-sided sum `Σ_{x∈A} h_x`, using the pair swap "
             "and `spinSDot_comm`; this pins the coefficient convention needed before applying "
             "the Problem 2.5.a local-cluster lower bounds (γ-6 step 340). "
-            "`heisenbergHamiltonianOnGraphS_one_eq_sum_graphLocalClusterHamiltonianS` has since "
-            "been retired (ref-0): the half-coupling decomposition proves itself directly and "
+            "`heisenbergHamiltonianOnGraphS_one_eq_sum_graphLocalClusterHamiltonianS` is "
+            "retired (ref-0): the half-coupling decomposition proves itself directly and "
             "does not go through the unit-coupling one | "
             "`Quantum/SpinS/HeisenbergGraphLocal.lean` (PR #4050) |",
         )
@@ -1758,8 +1758,8 @@ def _approved_replacements(text: str) -> str:
             "eigenvalue is `0`, and `0 ≥ -S`, so an isolated centre only weakens the bound "
             "rather than invalidating it. The finite-sum wrapper then bounds a chosen family of "
             "graph-local stars (γ-6 step 344). "
-            "`tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound` has since been retired "
-            "(subsumed): the bipartite half-coupling bound is now the Problem 2.5.b capstone "
+            "`tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound` is retired "
+            "(subsumed): the bipartite half-coupling bound is the Problem 2.5.b capstone "
             "`tasaki_problem_2_5_b_groundEnergy_lower_bound` (PR #5464) | "
             "`Quantum/SpinS/GraphLocalStarSumWrapper.lean` (PR #4054) |",
         )
@@ -1856,12 +1856,12 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "a4da5e963e5d17a36cbb7fe5d9227132a8142ef17b6edc0aa28437a1ed049996"
+SCRIPT_SOURCE_SHA256 = "4d0681a8746428c186c7c78bb33de06f8a1a256ea6527a36ca3e79dece393fe2"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
-APPROVED_ENTRIES_SHA256 = "363cc30f5198c6e08a086daee985109fde200f0524ae23b37567bf30000d0b3e"
+APPROVED_ENTRIES_SHA256 = "fac63fae002a7fcc1db9c6995800d8ca1b12fc9a4b530d97af9db665752575da"
 
 # The only text `SCRIPT_SOURCE_SHA256` does not hash: the digits these four pins carry. Each is
 # restated by the very edit it pins, and a digest over its own value would have no fixed point.

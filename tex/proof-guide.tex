@@ -20459,10 +20459,9 @@ imports the abstract Hamiltonian and energy companion, and
         \(\hat{\mathbf S}_x\cdot\hat{\mathbf S}_y
         =\hat{\mathbf S}_y\cdot\hat{\mathbf S}_x\).  This fixes the coefficient
         convention for Tasaki's local-cluster decomposition (Tasaki, Springer
-        2020, Problem~2.5.b, p.~38; solution p.~497).  (The unit-coupling
-        analogue \(\hat H_G(1)=\sum_x h_x\) that this once factored through has
-        been retired: the bipartite decomposition proves itself directly and
-        does not go through it.)
+        2020, Problem~2.5.b, p.~38; solution p.~497).  (The bipartite
+        decomposition proves itself directly, without going through the
+        unit-coupling analogue \(\hat H_G(1)=\sum_x h_x\).)
   \item Problem 2.5.b single-cluster transport bridge.  The declaration
         \texttt{siteConfigEquiv} lifts a site equivalence \(e:\alpha\simeq\beta\)
         to the corresponding equivalence of spin-configuration spaces, with
@@ -20576,9 +20575,8 @@ imports the abstract Hamiltonian and energy companion, and
           \lambda_{\min}(\hat H_G(1/2)),
         \]
         with \textbf{no} hypothesis on the local degrees, no connectedness,
-        and no \(|A|=|B|\).  The four closed-form/degree wrappers this proof
-        once specialized through, each of which carried an unneeded
-        positive-degree hypothesis, have been retired.
+        and no \(|A|=|B|\); no closed-form or degree wrapper carrying a
+        positive-degree hypothesis remains in the chain.
         The exact Lean names are listed in the complete interim catalogue under
         \texttt{docs/formalization/legacy/}.  This is
         the graph-local form of Tasaki's Problem~2.5.b lower-bound argument
@@ -20590,7 +20588,8 @@ available for \(1\le z\) under the explicit
 \texttt{[IsAlgClosed \(\mathbb C\)]} hypothesis.  The remaining optional
 cleanup is to discharge that hypothesis by replacing the algebraically closed
 eigenvector-extraction bridge with a constructive finite-dimensional spectral
-decomposition if that later becomes useful.  Problem~2.5.b itself is now fully
+decomposition if that later becomes useful.  Under the same
+\texttt{[IsAlgClosed \(\mathbb C\)]} hypothesis, Problem~2.5.b itself is
 closed: the capstone
 \texttt{tasaki\_problem\_2\_5\_b\_groundEnergy\_lower\_bound} proves the
 printed lower bound on any finite bipartite graph and any spin, with no

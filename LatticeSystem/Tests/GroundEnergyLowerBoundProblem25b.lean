@@ -11,8 +11,7 @@ Mathematics of Quantum Many-Body Systems*, Springer 2020, §2.5 Problem 2.5.b (p
 pp. 497–498, using Problem 2.5.a and Lemma A.5, p. 468): on a finite bipartite lattice
 `(Λ, B)` with sublattice `A`, the ground-state energy of the printed antiferromagnetic
 Heisenberg Hamiltonian `Ĥ = Σ_{{x,y}∈B} Ŝ_x·Ŝ_y` (2.5.1) satisfies
-`E_GS ≥ −Σ_{x∈A} S(1 + |N(x)| S)`, `S = N/2`, with **no** minimum-degree hypothesis on `A`
-(TSK-067; see `.self-local/docs/math/problem-2-5-b-ground-state-energy-lower-bound.tex`).
+`E_GS ≥ −Σ_{x∈A} S(1 + |N(x)| S)`, `S = N/2`, with **no** minimum-degree hypothesis on `A`.
 
 Pinned:
 * R0 `tasaki_problem_2_5_b_groundEnergy_lower_bound` — the full capstone signature, no `hdeg`,
@@ -121,12 +120,15 @@ noncomputable def sigma0 : Fin 2 → Fin 2 := ![0, 1]
 noncomputable def psi0 : (Fin 2 → Fin 2) → ℂ :=
   basisVec sigma0 - basisVec (basisSwap sigma0 0 1)
 
+/-- The real-valued basis vector `basisVec ρ` is fixed by `star` (its entries are `0` or `1`). -/
 theorem star_basisVec_eq (ρ : Fin 2 → Fin 2) :
     star (basisVec ρ : (Fin 2 → Fin 2) → ℂ) = basisVec ρ := by
   funext τ
   simp only [Pi.star_apply, basisVec_apply]
   by_cases h : τ = ρ <;> simp [h]
 
+/-- The singlet witness `psi0` is fixed by `star`, since each of its two basis-vector
+summands is. -/
 theorem star_psi0_eq : star psi0 = psi0 := by
   unfold psi0
   rw [star_sub, star_basisVec_eq, star_basisVec_eq]
@@ -302,7 +304,7 @@ theorem nc3_coupling_one_lambdaMin_le_neg_three_halves :
 /-- **SC1.** `cycleGraph 3` (the triangle) admits *no* bipartition, matching the fact that §2.5
 (p. 37) excludes it by standing assumption. Establishes that the capstone is vacuous on the
 frustrated triangle; does *not* establish any lower bound for the triangle (deriving one would
-be a different, unprinted theorem, out of scope for TSK-067). -/
+be a different, unprinted theorem, out of scope here). -/
 theorem cycleGraph3_not_bipartite :
     ¬ ∃ A : Fin 3 → Prop, ∀ {x y : Fin 3}, (cycleGraph 3).Adj x y → A x ≠ A y := by
   rintro ⟨A, hA⟩
