@@ -54,7 +54,6 @@ import LatticeSystem.Quantum.SpinS.CasimirInvariance
 import LatticeSystem.Quantum.SpinS.DiagProjOrtho
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Lattice.GraphLaplacianQuadraticForm
-import LatticeSystem.Quantum.SU2Integral
 import LatticeSystem.Quantum.SpinOneDecomp
 import LatticeSystem.Quantum.Rotation3D
 import LatticeSystem.Quantum.HeisenbergChain.Gibbs
@@ -98,6 +97,7 @@ import LatticeSystem.Quantum.IsingLowEnergyProblem33aCapstone
 import LatticeSystem.Quantum.SpinS.RangeLocalDoubleCommutatorBound
 import LatticeSystem.Quantum.SpinS.FerromagneticGroundStateTheorem21
 import LatticeSystem.Quantum.SpinS.ManyBodyPiRotationExp
+import LatticeSystem.Quantum.UniformRotationProblem22c
 
 /-!
 # `lattice-system` library root

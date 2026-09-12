@@ -85,6 +85,18 @@
     },
     {
       "equations": [
+        "2.2.11"
+      ],
+      "id": "tasaki-2020-problem-2-2-c",
+      "item_kind": "exercise",
+      "item_number": "2.2.c",
+      "pages": "23-24",
+      "section": "2.2",
+      "source_id": "tasaki-2020",
+      "title": "Rotated up-down two-site state is determined by the axis n alone"
+    },
+    {
+      "equations": [
         "2.1.8"
       ],
       "id": "tasaki-2020-section-2-1-pauli",

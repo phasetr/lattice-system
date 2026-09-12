@@ -1,0 +1,173 @@
+import LatticeSystem.Quantum.UniformRotationProblem22c
+
+/-!
+# Tests: Tasaki Problem 2.2.c, the rotated `|↑⟩₁|↓⟩₂` is determined by `n` alone (pp. 23-24)
+
+Pins the exact public name/signature of the Problem 2.2.c capstone
+`tasaki_problem_2_2_c_rotated_upDown_eq`, plus non-vacuity and non-triviality controls provable
+independently from existing API (so PC1a/PC1b/PC2/NC1/NC2 do not depend on the capstone's own
+proof), tied to the capstone only through **R0**, the capstone shim.
+
+* **R0** the capstone shim: restates the full `∀`-closed signature and closes it with the
+  capstone name, pinning every hypothesis/conclusion shape — the admissible class as a
+  `Submonoid.closure` of the exponential global rotations, the same-`n` hypothesis at both sites,
+  the pairwise conclusion.
+* **PC1a/PC1b** class membership only: `U = 1` and `V = exp(−iπ Ŝ_tot^{(3)})` are two distinct
+  members of the footnote-16 admissible class for `n = e₃`. Neither control proves that its member
+  satisfies the capstone's same-`n` conjugation hypothesis, so PC1a/PC1b alone do not exercise the
+  capstone's premises on a distinct pair.
+* **PC2** the value `V.mulVec |↑↓⟩ = |↑↓⟩`, computed independently of the capstone from the
+  two-site `π`-rotation entries directly, so the value is available if `V` is ever paired with an
+  admissible `U` shown to satisfy the same conjugation hypothesis.
+* **NC1** widening the target vector to `|↑↑⟩` (`M_tot ≠ 0`): `V = exp(−iπ Ŝ_tot^{(3)})` — a
+  member of the footnote-16 class for `n = e₃` by PC1b, which proves only that membership, not the
+  conjugation hypothesis — sends `|↑↑⟩` to `−|↑↑⟩`, illustrating why the target `|↑↓⟩`
+  (`M_tot = 0`) is load-bearing.
+* **NC2** widening the admissible class from the footnote-16 closure to all of
+  `unitary (ManyBodyOp (Fin 2))` makes the statement false: `U = 1` and `V = −1` are both unitary,
+  both act as scalars (hence commute with every `Ŝ_x^{(3)}`, satisfying the conjugation hypothesis
+  by centrality with `n = e₃`), yet `V` sends `|↑↓⟩` to `−|↑↓⟩ ≠ |↑↓⟩`. NC2's internal witness
+  for `U` is the only place in this file where the conjugation hypothesis itself (not just class
+  membership) is checked, and it is checked for the scalar `U = 1` under the widened class, not for
+  a nontrivial rotation inside the footnote-16 closure.
+
+The only instance of the capstone's premises exercised anywhere in this file — class membership
+plus the conjugation hypothesis, both checked, for a matching `U, V` pair — is the trivial diagonal
+pair `U = V = 1` (membership from PC1a, hypothesis from a proof of the same shape as NC2's `hUhyp`).
+No control here joins the conjugation hypothesis to a *distinct* class member such as PC1b's `V`;
+that two-distinct-rotation case rests on the capstone's own proof, not on a pinned control.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §2.2, Problem 2.2.c, pp. 23-24 (footnote 16, p. 23; footnote 17, p. 24; solution p. 496,
+eq. (S.16)); eq. (2.2.11), p. 22.
+-/
+
+namespace LatticeSystem.Tests
+
+open LatticeSystem.Quantum Matrix
+
+/-! ## R0: the capstone shim -/
+
+/-- R0: the capstone's full `∀`-closed signature, closed by the public name. Pins the admissible
+class (`Submonoid.closure` of the exponential global rotations `exp(−iθ Ŝ_tot^{(α)})`), the
+same-`n` conjugation hypothesis at both sites `x : Fin 2`, and the pairwise conclusion
+`U.mulVec |↑↓⟩ = V.mulVec |↑↓⟩`. -/
+example : ∀ (n : Fin 3 → ℝ) {U V : ManyBodyOp (Fin 2)},
+    U ∈ Submonoid.closure (Set.range fun p : Fin 3 × ℝ =>
+      NormedSpace.exp ((-(Complex.I * (p.2 : ℂ))) •
+        ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] p.1)) →
+    V ∈ Submonoid.closure (Set.range fun p : Fin 3 × ℝ =>
+      NormedSpace.exp ((-(Complex.I * (p.2 : ℂ))) •
+        ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] p.1)) →
+    (∀ x : Fin 2, U * onSite x spinHalfOp3 * Matrix.conjTranspose U =
+      onSite x (spinHalfDotVec fun α => (n α : ℂ))) →
+    (∀ x : Fin 2, V * onSite x spinHalfOp3 * Matrix.conjTranspose V =
+      onSite x (spinHalfDotVec fun α => (n α : ℂ))) →
+    U.mulVec (basisVec upDown) = V.mulVec (basisVec upDown) :=
+  tasaki_problem_2_2_c_rotated_upDown_eq
+
+/-! ## PC1 / PC2: non-vacuity at `n = e₃` -/
+
+/-- PC1a: `U = 1` is a member of the footnote-16 admissible class (the empty product, `one_mem`).
+This proves only class membership, not that `U` satisfies the capstone's same-`n` conjugation
+hypothesis. -/
+example : (1 : ManyBodyOp (Fin 2)) ∈ Submonoid.closure (Set.range fun p : Fin 3 × ℝ =>
+      NormedSpace.exp ((-(Complex.I * (p.2 : ℂ))) •
+        ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] p.1)) :=
+  one_mem _
+
+/-- PC1b: `V = exp(−iπ Ŝ_tot^{(3)})` is a member of the footnote-16 admissible class for
+`n = ![0, 0, 1]` (a generator of the class, axis `α = 2` i.e. the book's axis `3`, angle `θ = π`).
+This proves only class membership, not that `V` satisfies the capstone's same-`n` conjugation
+hypothesis. -/
+example : NormedSpace.exp ((-(Complex.I * ((Real.pi : ℝ) : ℂ))) •
+      ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] (2 : Fin 3))
+    ∈ Submonoid.closure (Set.range fun p : Fin 3 × ℝ =>
+      NormedSpace.exp ((-(Complex.I * (p.2 : ℂ))) •
+        ![totalSpinHalfOp1 (Fin 2), totalSpinHalfOp2 (Fin 2), totalSpinHalfOp3 (Fin 2)] p.1)) :=
+  Submonoid.subset_closure ⟨(2, Real.pi), rfl⟩
+
+/-- PC2: the value `V = exp(−iπ Ŝ_tot^{(3)})` gives on `|↑↓⟩`, computed independently of the
+capstone from the two-site `π`-rotation entries directly: `V.mulVec |↑↓⟩ = |↑↓⟩`. This value is the
+one the capstone would have to reproduce for `V` if `V` were paired with an admissible `U`
+satisfying the same conjugation hypothesis; that pairing is not checked here (see PC1b). -/
+example : NormedSpace.exp ((-(Complex.I * ((Real.pi : ℝ) : ℂ))) •
+      totalSpinHalfOp3 (Fin 2)) *ᵥ basisVec upDown = basisVec upDown := by
+  rw [← totalSpinHalfRot3_eq_exp, totalSpinHalfRot3_two_site]
+  funext τ
+  rw [onSite_zero_mul_one_mulVec_basisVec, spinHalfRot3_pi, basisVec_apply, upDown_zero,
+    upDown_one]
+  generalize ha : τ 0 = a
+  generalize hb : τ 1 = b
+  fin_cases a <;> fin_cases b <;>
+    simp_all [spinHalfOp3, pauliZ, upDown, funext_iff, Fin.forall_fin_two]
+  ring_nf
+  simp [Complex.I_sq]
+
+/-! ## NC1: `M_tot = 0` (the target `|↑↓⟩`) is load-bearing -/
+
+/-- NC1: at the `M_tot ≠ 0` configuration `|↑↑⟩`, `V = exp(−iπ Ŝ_tot^{(3)})` — a member of the
+footnote-16 admissible class for `n = e₃` by PC1b, which proves only that membership, not that `V`
+satisfies the capstone's same-`n` conjugation hypothesis — sends `|↑↑⟩` to `−|↑↑⟩`; this is the
+value the same-`n` rotation class would fail to fix on `|↑↑⟩` if `V` also satisfied that
+hypothesis, illustrating why the target `|↑↓⟩` of the capstone is load-bearing. -/
+example : NormedSpace.exp ((-(Complex.I * ((Real.pi : ℝ) : ℂ))) •
+      totalSpinHalfOp3 (Fin 2)) *ᵥ basisVec (fun _ : Fin 2 => (0 : Fin 2))
+      = -(basisVec (fun _ : Fin 2 => (0 : Fin 2))) := by
+  rw [← totalSpinHalfRot3_eq_exp, totalSpinHalfRot3_two_site]
+  funext τ
+  rw [onSite_zero_mul_one_mulVec_basisVec, spinHalfRot3_pi, Pi.neg_apply, basisVec_apply]
+  generalize ha : τ 0 = a
+  generalize hb : τ 1 = b
+  fin_cases a <;> fin_cases b <;>
+    simp_all [spinHalfOp3, pauliZ, funext_iff, Fin.forall_fin_two]
+  ring_nf
+  simp [Complex.I_sq]
+
+/-! ## NC2: the footnote-16 class restriction is load-bearing -/
+
+/-- NC2: widening the admissible class to all unitaries makes the statement false: `U = 1` and
+`V = −1` are both unitary, both act as scalars, and both satisfy the same-`n` conjugation
+hypothesis by centrality with `n = e₃`, yet `V` sends `|↑↓⟩` to `−|↑↓⟩ ≠ |↑↓⟩`. -/
+example : ¬ (∀ {U V : ManyBodyOp (Fin 2)},
+    U ∈ unitary (ManyBodyOp (Fin 2)) →
+    V ∈ unitary (ManyBodyOp (Fin 2)) →
+    (∀ x : Fin 2, U * onSite x spinHalfOp3 * Matrix.conjTranspose U =
+      onSite x (spinHalfDotVec fun α => ((![0, 0, 1] : Fin 3 → ℝ) α : ℂ))) →
+    (∀ x : Fin 2, V * onSite x spinHalfOp3 * Matrix.conjTranspose V =
+      onSite x (spinHalfDotVec fun α => ((![0, 0, 1] : Fin 3 → ℝ) α : ℂ))) →
+    U.mulVec (basisVec upDown) = V.mulVec (basisVec upDown)) := by
+  intro h
+  have hn : spinHalfDotVec (fun α => ((![0, 0, 1] : Fin 3 → ℝ) α : ℂ)) = spinHalfOp3 := by
+    unfold spinHalfDotVec
+    simp
+  have hU1 : (1 : ManyBodyOp (Fin 2)) ∈ unitary (ManyBodyOp (Fin 2)) := one_mem _
+  have hVneg1 : (-1 : ManyBodyOp (Fin 2)) ∈ unitary (ManyBodyOp (Fin 2)) :=
+    Unitary.mem_iff.mpr ⟨by rw [star_neg, star_one, neg_mul_neg, one_mul],
+      by rw [star_neg, star_one, neg_mul_neg, one_mul]⟩
+  have hUhyp : ∀ x : Fin 2, (1 : ManyBodyOp (Fin 2)) * onSite x spinHalfOp3 *
+      Matrix.conjTranspose (1 : ManyBodyOp (Fin 2)) =
+      onSite x (spinHalfDotVec fun α => ((![0, 0, 1] : Fin 3 → ℝ) α : ℂ)) := by
+    intro x
+    rw [hn, one_mul, Matrix.conjTranspose_one, mul_one]
+  have hVhyp : ∀ x : Fin 2, (-1 : ManyBodyOp (Fin 2)) * onSite x spinHalfOp3 *
+      Matrix.conjTranspose (-1 : ManyBodyOp (Fin 2)) =
+      onSite x (spinHalfDotVec fun α => ((![0, 0, 1] : Fin 3 → ℝ) α : ℂ)) := by
+    intro x
+    rw [hn]
+    have hct : Matrix.conjTranspose (-1 : ManyBodyOp (Fin 2)) = -1 := by
+      rw [Matrix.conjTranspose_neg, Matrix.conjTranspose_one]
+    rw [hct]
+    simp only [neg_mul, mul_neg, one_mul, mul_one]
+    exact neg_neg (onSite x spinHalfOp3 : ManyBodyOp (Fin 2))
+  have hUV := h hU1 hVneg1 hUhyp hVhyp
+  rw [Matrix.one_mulVec] at hUV
+  have hVm : ((-1 : ManyBodyOp (Fin 2))).mulVec (basisVec upDown) = -(basisVec upDown) := by
+    show ((-(1 : ManyBodyOp (Fin 2))).mulVec (basisVec upDown)) = _
+    rw [Matrix.neg_mulVec, Matrix.one_mulVec]
+  rw [hVm] at hUV
+  have hUV' := congrFun hUV upDown
+  rw [Pi.neg_apply, basisVec_self] at hUV'
+  norm_num at hUV'
+
+end LatticeSystem.Tests

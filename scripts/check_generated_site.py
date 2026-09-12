@@ -2014,8 +2014,8 @@ def run_staged_mutation_tests(
         (
             "status count",
             "formalization/status.md",
-            'data-status-label="proved" data-record-count="16">proved: 16',
             'data-status-label="proved" data-record-count="17">proved: 17',
+            'data-status-label="proved" data-record-count="18">proved: 18',
         ),
         (
             "extra unrelated record",
