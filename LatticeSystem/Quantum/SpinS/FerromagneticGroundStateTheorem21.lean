@@ -15,7 +15,10 @@ eigenspace, i.e. every ground state carries maximal total spin.  The remark prin
 eq. (2.4.10), p. 34, asserts that the states of eq. (2.4.10) are the *only* states of maximal
 total spin; what is proved here is the ground state ⇒ maximal total spin direction alone.  The
 converse direction is `totalSpinSSquared_eigenspace_eq_span_ladderIterateUp`, proved without any
-graph or coupling hypothesis in `SaturatedLadderJointEigenspace`.
+graph or coupling hypothesis in `SaturatedLadderJointEigenspace`, at the explicit value
+`S_max(S_max + 1)`; the maximal-eigenvalue reading is
+`totalSpinSSquared_maximal_eigenvector_mem_span_ladderIterateUp` of
+`MaximalCasimirEigenvectorSpan`.
 
 Specialised to the printed uniform coupling `couplingOf G (-1/2)` of eq. (2.4.1), p. 32, the
 saturated-ferromagnet energy is the printed `E_GS = -|B| S²`, and the three statements combine
@@ -147,7 +150,10 @@ connected ferromagnet.  Both sides are the span of the ladder family, by eq. (2.
 What the book prints is the converse: that the states of eq. (2.4.10) are the *only* states
 with maximal total spin `S_max = |Λ| S`.  That inclusion is a separate statement about
 `(Ŝ_tot)²` alone, and it is `totalSpinSSquared_eigenspace_eq_span_ladderIterateUp` of
-`SaturatedLadderJointEigenspace`, which this module does not use. -/
+`SaturatedLadderJointEigenspace`, at the explicit value `S_max(S_max + 1)`, which this module
+does not use; the maximal-eigenvalue reading is
+`totalSpinSSquared_maximal_eigenvector_mem_span_ladderIterateUp` of
+`MaximalCasimirEigenvectorSpan`. -/
 theorem heisenbergHamiltonianS_eigenspace_eq_satFerroJointEigenspace_of_connected_ferro
     {G : SimpleGraph V} {J : V → V → ℂ}
     (hGconn : G.Connected)

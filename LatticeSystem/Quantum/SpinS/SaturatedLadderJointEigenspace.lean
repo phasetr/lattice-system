@@ -42,7 +42,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 Concrete projector `magProjFn M v` mapping each component of `v`
 through the magnetisation filter. Used to decompose elements of
-`joint` into the per-sector pieces identified by PR #2764. -/
+`joint` into their per-sector pieces. -/
 
 /-- Pointwise magnetisation projector: keeps `v σ` when
 `magEigenvalueS σ = M` and zeros it out otherwise. -/
@@ -146,7 +146,7 @@ projector. Argument via the matrix-entry vanishing property: for
 any `σ` and `τ` with `magEigenvalueS σ ≠ magEigenvalueS τ`, the
 matrix entry `(heisenbergHamiltonianS J N) σ τ = 0` (since
 `H · basisVecS τ ∈ magSubspaceS V N (magEigenvalueS τ)` by
-PR #1078 / `heisenbergHamiltonianS_mulVec_basisVecS_mem_magSubspaceS`,
+`heisenbergHamiltonianS_mulVec_basisVecS_mem_magSubspaceS`,
 and applying the support property). -/
 theorem heisenbergHamiltonianS_mulVec_magProjFn_eq
     (J : V → V → ℂ) (M : ℂ) (v : (V → Fin (N + 1)) → ℂ) :
@@ -215,9 +215,9 @@ theorem heisenbergHamiltonianS_mulVec_magProjFn_eq
 
 /-- **Commutation `(Ŝ_tot)² · magProjFn M v = magProjFn M ((Ŝ_tot)² · v)`**.
 
-Same matrix-entry-vanishing argument as the Heisenberg case
-(PR #2766), now applied to `(Ŝ_tot)² · basisVecS τ`
-(`totalSpinSSquared_mulVec_mem_magSubspaceS` from PR #1078). -/
+Same matrix-entry-vanishing argument as the Heisenberg case,
+now applied to `(Ŝ_tot)² · basisVecS τ`
+(via `totalSpinSSquared_mulVec_mem_magSubspaceS`). -/
 theorem totalSpinSSquared_mulVec_magProjFn_eq
     (M : ℂ) (v : (V → Fin (N + 1)) → ℂ) :
     (totalSpinSSquared V N).mulVec (magProjFn (V := V) (N := N) M v) =
@@ -346,9 +346,9 @@ theorem ladderIterateUp_singleton_span_le_span_range (N : ℕ)
 eigenspace decomposes into the linear span of the ladder iterates.
 
 For any `v ∈ joint`, the magnetisation decomposition
-`v = ∑_k magProjFn (m_max - k.val) v` (PR #2768) lifts each
-component into `joint ⊓ H_{m_max - k.val} = span {ladderIterateUp V N k}`
-(PR #2764). Summing across the `2m_max + 1` sectors yields
+`v = ∑_k magProjFn (m_max - k.val) v` lifts each
+component into `joint ⊓ H_{m_max - k.val} = span {ladderIterateUp V N k}`.
+Summing across the `2m_max + 1` sectors yields
 `v ∈ span (Set.range ladderIterateUp)`. -/
 theorem saturatedFerromagnetJointEigenspace_le_span_ladderIterateUp
     [Nonempty V] (J : V → V → ℂ) :
@@ -388,7 +388,7 @@ Tasaki §2.4 Theorem 2.1**:
 The joint `(H, (Ŝ_tot)²)`-eigenspace at the saturated-ferromagnet
 eigenvalues coincides with the `(2m_max + 1)`-dimensional linear
 span of the ladder iterates. Combined with the linear independence
-(PR #896) and dimension (PR #904), this identifies the joint
+and dimension of that span, this identifies the joint
 eigenspace as the `J_tot = m_max` irreducible SU(2) representation.
 
 This is not Theorem 2.1 itself: it constrains the total spin as well
@@ -401,7 +401,7 @@ theorem saturatedFerromagnetJointEigenspace_eq_span_ladderIterateUp
       Submodule.span ℂ (Set.range (ladderIterateUp V N)) := by
   apply le_antisymm
   · exact saturatedFerromagnetJointEigenspace_le_span_ladderIterateUp J
-  · -- Reverse inclusion: span ⊆ joint (PR #904).
+  · -- Reverse inclusion: span ⊆ joint.
     rw [Submodule.span_le, Set.range_subset_iff]
     intro k
     exact ladderIterateUp_mem_saturatedFerromagnetJointEigenspace J k

@@ -25,7 +25,9 @@ Pinned:
   ground-state half of the remark after eq. (2.4.10), p. 34: the `Ĥ`-ground eigenspace coincides
   with the joint `(Ĥ, (Ŝ_tot)²)`-eigenspace, i.e. every ground state carries maximal total spin.
   The converse the book prints — that these are the *only* maximal-total-spin states — is
-  `totalSpinSSquared_eigenspace_eq_span_ladderIterateUp`, pinned in its own section below.
+  `totalSpinSSquared_eigenspace_eq_span_ladderIterateUp`, pinned in its own section below, at
+  the explicit value `S_max(S_max + 1)`; the maximal-eigenvalue reading is
+  `totalSpinSSquared_maximal_eigenvector_mem_span_ladderIterateUp`, pinned as PIN-M below.
 * C5a `saturatedFerromagnetEigenvalueS_couplingOf_neg_half` — the printed ground energy formula
   `E_GS = −|B|·S²` (p. 32, below eq. (2.4.5)) for the uniform coupling `J = couplingOf G (−1/2)`
   of eq. (2.4.1), p. 32; no hypotheses at all — it is an unconditional rewrite of
@@ -34,6 +36,10 @@ Pinned:
   three-conjunct statement: `Ĥ − E_GS` is `PosSemidef` (energy minimality), the `Ĥ`-eigenspace at
   `E_GS` is `span ℂ (Set.range (ladderIterateUp V N))`, and its dimension is
   `Fintype.card V * N + 1`.
+* PIN-M `totalSpinSSquared_maximal_eigenvector_mem_span_ladderIterateUp` — the maximal-eigenvalue
+  reading of the converse: an eigenvector of `(Ŝ_tot)²` at an eigenvalue with maximal real part
+  lies in `span ℂ (Set.range (ladderIterateUp V N))`. Non-vacuity of the maximality hypothesis is
+  exercised by control PC-M below.
 
 A positive control on the triangle (`V := Fin 3`, `G := cycleGraph 3`, `N := 1`,
 `J := couplingOf (cycleGraph 3) (−1/2)`) exercises C5a/C1/C2 with `|B| = 3` derived from
@@ -224,9 +230,9 @@ example :
   totalSpinSSquared_eigenspace_eq_span_ladderIterateUp
 
 /-- **PC-c (dimension control).** At `V := Fin 3`, `N := 1`, the finrank of the maximal-Casimir
-eigenspace named in the PIN is `4`. Since the whole space `(Fin 3 → Fin 2) → ℂ` has finrank `8`,
-this establishes that the PIN's right-hand side is a proper subspace at this `V`, `N`, unlike at
-`N = 0` (PC-b). -/
+eigenspace named in the PIN is `4`. Together with the ambient dimension `2³ = 8` (not pinned
+here), this establishes that the PIN's right-hand side is a proper subspace at this `V`, `N`,
+unlike at `N = 0` (PC-b). -/
 example :
     Module.finrank ℂ
         (Module.End.eigenspace ((totalSpinSSquared (Fin 3) 1).mulVecLin)
