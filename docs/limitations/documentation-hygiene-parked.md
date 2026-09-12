@@ -379,16 +379,16 @@ over the same pattern, so each has its own command: `-o` prints one match per oc
 per line, `-l` one per file.
 
 ```
-git grep -P -o -I '(?<!\w)\\?#\d{4,}' a12cbb0e -- tex | wc -l
-git grep -P -n -I '(?<!\w)\\?#\d{4,}' a12cbb0e -- tex | wc -l
-git grep -P -n -I '(?<!\w)#\d{4,}' a12cbb0e -- docs ':!docs/formalization/legacy' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
-git grep -P -l -I '(?<!\w)#\d{4,}' a12cbb0e -- docs ':!docs/formalization/legacy' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
-git grep -P -n -I '\b(now|previously|formerly|earlier|no longer|used to|recently|originally)\b' a12cbb0e -- tex docs ':!docs/formalization/legacy' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
-git grep -P -l -I '\b(now|previously|formerly|earlier|no longer|used to|recently|originally)\b' a12cbb0e -- tex docs ':!docs/formalization/legacy' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
+git grep -P -o -I '(?<!\w)\\?#\d{4,}' 19d8d23c -- tex | wc -l
+git grep -P -n -I '(?<!\w)\\?#\d{4,}' 19d8d23c -- tex | wc -l
+git grep -P -n -I '(?<!\w)#\d{4,}' 19d8d23c -- docs ':!docs/formalization/legacy' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
+git grep -P -l -I '(?<!\w)#\d{4,}' 19d8d23c -- docs ':!docs/formalization/legacy' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
+git grep -P -n -I '\b(now|previously|formerly|earlier|no longer|used to|recently|originally)\b' 19d8d23c -- tex docs ':!docs/formalization/legacy' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
+git grep -P -l -I '\b(now|previously|formerly|earlier|no longer|used to|recently|originally)\b' 19d8d23c -- tex docs ':!docs/formalization/legacy' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
 ```
 
-At revision `a12cbb0e`, in the order the commands are printed above: 609 identifier occurrences on
-508 lines of the proof guide, then 430 lines across 24 files under `docs/`, then 298 lines across
+At revision `19d8d23c`, in the order the commands are printed above: 609 identifier occurrences on
+508 lines of the proof guide, then 430 lines across 24 files under `docs/`, then 299 lines across
 25 files carrying one of the listed words.
 
 **Reason.** Neither population is a defect class that a pattern settles. The identifier counts (609
@@ -397,7 +397,7 @@ include deliberate provenance pointers, which is what the formalization-status e
 for three of them, so a pattern edit would delete pointers whose removal leaves a claim with no
 reachable source; both counts are therefore upper bounds on the population of unwanted identifiers
 rather than exact counts of it. The listed words are ordinary English that mathematical prose uses
-for reasons unrelated to repository history, so the third command's count (298 lines across 25
+for reasons unrelated to repository history, so the third command's count (299 lines across 25
 files) is likewise an upper bound on the population rather than the population itself; acting on it
 requires reading several hundred lines one at a time, which is off the critical path of the
 book-order formalization. The classification of individual sites is therefore not recorded here,
