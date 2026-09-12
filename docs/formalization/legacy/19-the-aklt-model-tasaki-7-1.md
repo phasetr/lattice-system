@@ -45,6 +45,18 @@ permalink: /formalization/legacy/19-the-aklt-model-tasaki-7-1/
 
 <!-- legacy-source:end:752:783 -->
 
+## Correction to the migrated catalogue block (§8.3.5 time reversal)
+
+This section lies outside the migrated catalogue block above and is not subject to its frozen
+byte-for-byte parity. The block is a historical snapshot, so a correction to one of its rows is
+written here rather than inside it.
+
+The row for `tasaki_corollary_8_5_time_reversal` writes the antiunitary time reversal as
+`Θ̂ = û₁û₃K̂`. The book writes `Θ̂ = û₂K̂` (Tasaki, *Physics and Mathematics of Quantum Many-Body
+Systems*, 1st ed. (Springer, 2020), §8.3.5, p. 278). The construction here uses `X = û₁û₃`, and
+`û₁û₃ = (−1)^{2S} û₂` (eqs. (2.1.25) and (2.1.29), pp. 18-19), so the two differ by a sign that is
+inert for the antiunitary square `Θ̂² = −1̂`, which is all that enters the argument.
+
 ## Authoritative supplemental implementation record (§7.2.3 open AKLT chain)
 
 This section is maintained by hand, lies outside the migrated catalogue block above, and records

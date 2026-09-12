@@ -1723,7 +1723,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "40169b013d3396e8406e5a12e96a81fe0bbe7f5590bbf00b9cc524e46d380de0"
+SCRIPT_SOURCE_SHA256 = "3c4ae81276ee5c28e38bb95289b67746b132d4c81c0bb30214ec1e1159227f4c"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -2564,7 +2564,10 @@ def apply_moved_prose_link_rewrites(text: str, counts: list[int] | None = None) 
 # averaging work is Problem 2.2.b, whose two displays are eqs. (2.2.14) and (2.2.15), p. 23, and
 # not Problem 2.2.c, pp. 23-24, which asks instead that the rotated state depend only on the axis;
 # the declaration the status paragraph named has since been renamed, and Problem 2.2.c has a
-# formalization of its own.  Each entry maps the corrected published text back to the frozen
+# formalization of its own.  Problem 2.2.b asks for those two explicit calculations, the second
+# of which exhibits a state that is not SU(2) invariant; what characterizes the non-invariance is
+# asked by Problem 2.2.c, so the sentence stating what the problem asks follows p. 23.  Each
+# entry maps the corrected published text back to the frozen
 # baseline wording, so the parity comparison keeps measuring the baseline.  The roadmap entry
 # carries the whole reconstructed heading, because a heading that no longer matches the one
 # `reconstruct_roadmap_prose` rebuilds from the baseline row is left in the payload by it.
@@ -2600,6 +2603,12 @@ MOVED_PROSE_CORRECTIONS = (
         "`spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfDown` and `Quantum/SU2Integral.lean` for "
         "all supporting lemmas.",
     ),
+    (
+        "problem asks to verify this by explicit calculation and to show, again by explicit "
+        "calculation, that the corresponding average of `|↑₁⟩|↑₂⟩` is the triplet state of eq. "
+        "(2.2.15), which is not SU(2)-invariant.",
+        "problem asks to verify this and to characterize states that fail to be SU(2)-invariant.",
+    ),
 )
 
 # Number of sites each correction above rewrites, in declaration order. Pinned because an inverse
@@ -2608,8 +2617,8 @@ MOVED_PROSE_CORRECTIONS = (
 # the published spelling unpinned. With the count fixed at one apiece, the reversion that would
 # otherwise pass silently is a hard failure, and a correction that starts matching a second site
 # is one too. The three older corrections below are not counted, so they carry the fail-open
-# weakness this pin removes from these four.
-MOVED_PROSE_CORRECTION_COUNTS = (1, 1, 1, 1)
+# weakness this pin removes from these five.
+MOVED_PROSE_CORRECTION_COUNTS = (1, 1, 1, 1, 1)
 
 
 def apply_moved_prose_corrections(text: str, counts: list[int] | None = None) -> str:

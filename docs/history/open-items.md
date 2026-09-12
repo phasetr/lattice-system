@@ -47,8 +47,9 @@ explicit averaged state of the form
 ```
 
 equals (up to phase) the singlet `(1/√2)(|↑₁⟩|↓₂⟩ - |↓₁⟩|↑₂⟩)`. The
-problem asks to verify this and to characterize states that fail to be
-SU(2)-invariant.
+problem asks to verify this by explicit calculation and to show, again by
+explicit calculation, that the corresponding average of `|↑₁⟩|↑₂⟩` is the
+triplet state of eq. (2.2.15), which is not SU(2)-invariant.
 
 **Status**: Formally proved with zero `sorry` in `Quantum/SU2Integral.lean`
 as `tasaki_problem_2_2_b_upDown_average` (eq. (2.2.14)) and
