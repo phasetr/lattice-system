@@ -344,11 +344,11 @@ these keep stating the superseded wording.
 headings, so counting the rows and the stubs counts it:
 
 ```
-git grep -c -P '^\| `[^`]+` \| `\d+` \| ' a12cbb0e -- docs/formalization/migration-map.md
-git grep -c -P '<a\s+id="[^"]+"></a>' a12cbb0e -- docs/index.md
+git grep -c -P '^\| `[^`]+` \| `\d+` \| ' 19d8d23c -- docs/formalization/migration-map.md
+git grep -c -P '<a\s+id="[^"]+"></a>' 19d8d23c -- docs/index.md
 ```
 
-At revision `a12cbb0e`: 68 mapped rows and 68 anchor stubs.
+At revision `19d8d23c`: 68 mapped rows and 68 anchor stubs.
 
 **Reason.** Neither is a current claim of this project. The map's third column is defined as the
 historical heading that its anchor and line number identify, and the checker compares it against
