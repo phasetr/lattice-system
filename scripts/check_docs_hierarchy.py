@@ -1723,7 +1723,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "4a0c8c77fa7882e0158c74065b58239693ab956e6eb3b84bfa4b8a3274b340c5"
+SCRIPT_SOURCE_SHA256 = "40169b013d3396e8406e5a12e96a81fe0bbe7f5590bbf00b9cc524e46d380de0"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -2560,6 +2560,67 @@ def apply_moved_prose_link_rewrites(text: str, counts: list[int] | None = None) 
     return text
 
 
+# Governance corrections to migrated pages whose text states a wrong attribution: the recorded
+# averaging work is Problem 2.2.b, whose two displays are eqs. (2.2.14) and (2.2.15), p. 23, and
+# not Problem 2.2.c, pp. 23-24, which asks instead that the rotated state depend only on the axis;
+# the declaration the status paragraph named has since been renamed, and Problem 2.2.c has a
+# formalization of its own.  Each entry maps the corrected published text back to the frozen
+# baseline wording, so the parity comparison keeps measuring the baseline.  The roadmap entry
+# carries the whole reconstructed heading, because a heading that no longer matches the one
+# `reconstruct_roadmap_prose` rebuilds from the baseline row is left in the payload by it.
+MOVED_PROSE_CORRECTIONS = (
+    (
+        "## P1f-2c (Tasaki §2.2 Problem 2.2.b): SU(2)-averaged two-site state = singlet "
+        "projector (eqs. (2.2.14) and (2.2.15)); integration over Euler angles `φ ∈ [0,2π]`, "
+        "`θ ∈ [0,π]` ",
+        "",
+    ),
+    (
+        "### ~~TODO — Tasaki Problem 2.2.b (SU(2)-averaged two-site state)~~ **DONE**",
+        "### ~~TODO — Tasaki Problem 2.2.c (SU(2) non-invariance / averaged state)~~ **DONE**",
+    ),
+    (
+        "**Statement (Tasaki p. 23, eqs. (2.2.14) and (2.2.15) of Problem 2.2.b)**:",
+        "**Statement (Tasaki p.23, eq. (2.2.15))**:",
+    ),
+    (
+        "as `tasaki_problem_2_2_b_upDown_average` (eq. (2.2.14)) and "
+        "`tasaki_problem_2_2_b_upUp_average` (eq. (2.2.15)). The proof integrates over the "
+        "Euler-angle parameter space using `integral_cexp_I_mul_zero_two_pi`, "
+        "`integral_cexp_neg_I_mul_zero_two_pi`, and the half-angle trig integrals of the same "
+        "file. See `Quantum/SpinHalfRotation.lean` for "
+        "`spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfDown` and `Quantum/SU2Integral.lean` for "
+        "all supporting lemmas. Problem 2.2.c (pp. 23-24) is a separate question and is proved "
+        "as `tasaki_problem_2_2_c_rotated_upDown_eq` in "
+        "`Quantum/UniformRotationProblem22c.lean`.",
+        "as `problem_2_2_c`. The proof integrates over the Euler-angle parameter space using "
+        "`integral_cexp_I_mul_zero_two_pi`, `integral_cexp_neg_I_mul_zero_two_pi`, and the "
+        "half-angle trig integrals established in earlier PRs. See "
+        "`Quantum/SpinHalfRotation.lean` for "
+        "`spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfDown` and `Quantum/SU2Integral.lean` for "
+        "all supporting lemmas.",
+    ),
+)
+
+# Number of sites each correction above rewrites, in declaration order. Pinned because an inverse
+# rewrite is fail-open on its own: it maps the corrected wording back to the baseline, so a page
+# reverted to the baseline wording simply stops it firing and parity passes either way, leaving
+# the published spelling unpinned. With the count fixed at one apiece, the reversion that would
+# otherwise pass silently is a hard failure, and a correction that starts matching a second site
+# is one too. The three older corrections below are not counted, so they carry the fail-open
+# weakness this pin removes from these four.
+MOVED_PROSE_CORRECTION_COUNTS = (1, 1, 1, 1)
+
+
+def apply_moved_prose_corrections(text: str, counts: list[int] | None = None) -> str:
+    """Invert the audited governance corrections, counting the sites each one rewrites."""
+    for index, (published, baseline) in enumerate(MOVED_PROSE_CORRECTIONS):
+        if counts is not None:
+            counts[index] += text.count(published)
+        text = text.replace(published, baseline)
+    return text
+
+
 def reconstruct_roadmap_prose(current: str, baseline_line: str) -> str:
     """Invert the known heading/list layout used for one former roadmap row."""
     cells = baseline_line.removeprefix("| ").removesuffix(" |\n").split(" | ", 2)
@@ -2574,8 +2635,10 @@ def reconstruct_roadmap_prose(current: str, baseline_line: str) -> str:
     return " ".join(part for part in (phase, scope, "\n".join(payload)) if part)
 
 
-def normalize_current_moved_prose(start: int, end: int, current: str, old_lines: list[str]) -> str:
-    """Invert only documented presentation wrappers and three governance corrections."""
+def normalize_current_moved_prose(
+    start: int, end: int, current: str, old_lines: list[str], counts: list[int] | None = None
+) -> str:
+    """Invert only documented presentation wrappers and the audited governance corrections."""
     if start == end and 114 <= start <= 153:
         current = reconstruct_roadmap_prose(current, old_lines[start - 1])
     current = current.replace(
@@ -2596,7 +2659,7 @@ def normalize_current_moved_prose(start: int, end: int, current: str, old_lines:
     # axiom-free", and the sentence recording Theorem 10.4 as fully axiomatized is deleted outright
     # (rather than edited), so it must be reinstated here — with the still-open tracker issue,
     # which the next .replace folds back to the closed #5004 to match the historical baseline.
-    return whitespace_normalized(current).replace(
+    corrected = whitespace_normalized(current).replace(
         "- **Perturbation-theoretic results** (e.g., the singular-perturbation and "
         "adiabatic-continuation arguments in Chapter 10, the cluster expansions behind **Theorem "
         "7.3** and **Theorem 8.1**, and the quasi-adiabatic continuation behind **Theorem 8.9**): "
@@ -2624,6 +2687,7 @@ def normalize_current_moved_prose(start: int, end: int, current: str, old_lines:
         "full theorem discharge is tracked in Issue #5320.",
         "full theorem discharge is tracked in Issue #5004.",
     )
+    return apply_moved_prose_corrections(corrected, counts)
 
 
 def moved_prose_negative_self_tests() -> None:
@@ -3237,6 +3301,7 @@ def main() -> None:
     expected_prose_stream: list[str] = []
     actual_prose_stream: list[str] = []
     rewrite_counts = [0] * len(MOVED_PROSE_LINK_REWRITES)
+    correction_counts = [0] * len(MOVED_PROSE_CORRECTIONS)
     for source_range in sorted(markers):
         start, end = source_range
         expected = "".join(old_lines[start - 1 : end])
@@ -3255,7 +3320,14 @@ def main() -> None:
         )
         working_note_counts[2] += len(_WORKING_NOTE_PROSE_CITATION.findall(normalized_expected))
         expected_prose_stream.append(_drop_working_note_prose_citation(normalized_expected))
-        actual_prose_stream.append(normalize_current_moved_prose(start, end, current, old_lines))
+        actual_prose_stream.append(
+            normalize_current_moved_prose(start, end, current, old_lines, correction_counts)
+        )
+    if tuple(correction_counts) != MOVED_PROSE_CORRECTION_COUNTS:
+        fail(
+            "audited moved-prose correction counts differ: "
+            f"expected={MOVED_PROSE_CORRECTION_COUNTS}, actual={tuple(correction_counts)}"
+        )
     if tuple(rewrite_counts) != MOVED_PROSE_LINK_REWRITE_COUNTS:
         fail(
             "audited moved-prose link rewrite counts differ: "
