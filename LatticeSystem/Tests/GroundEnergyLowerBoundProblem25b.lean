@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.GraphLocalStarSumWrapper
 import LatticeSystem.Quantum.SpinS.SpinHalfSpecializationMultiSite
 import LatticeSystem.Quantum.SpinS.HermitianMinSimilarInvariance
+import Mathlib.Analysis.Complex.Polynomial.Basic
 
 /-!
 # Signature pin: Tasaki Problem 2.5.b, the Anderson ground-state energy lower bound
@@ -16,17 +17,18 @@ Heisenberg Hamiltonian `Ĥ = Σ_{{x,y}∈B} Ŝ_x·Ŝ_y` (2.5.1) satisfies
 Pinned:
 * R0 `tasaki_problem_2_5_b_groundEnergy_lower_bound` — the full capstone signature, no `hdeg`,
   `filter A`, coupling `1/2` (the ordered-pair-convention unit coupling per bond of (2.5.1)),
-  and the `[IsAlgClosed ℂ]` binder (kept per gate G2: the instance does not resolve in this
-  module without it — see the research report for TSK-067).
+  and the `[IsAlgClosed ℂ]` binder, which the capstone keeps because the import closure of its
+  own module does not provide mathlib's `Complex.isAlgClosed`. That instance is always
+  satisfiable, and this fixture imports it so that the concrete controls below can discharge it.
 
 Controls, all compiling now from existing API (none of them establishes tightness of the bound
 in general; see each doc comment for what it does and does not show):
 * PC1 (`isolatedVertexGraph`, `sublatticeAneOne`) — a three-site graph with a single edge `0`–`1`
   and vertex `2` isolated: `hA` holds and `¬ (1 ≤ degree 2)`, so the retired positive-degree
-  wrappers cannot apply here but the capstone (once implemented) is expected to.
+  wrappers could not apply here, while the capstone does.
 * PC2 (`pathGraph 2`, `N = 1`, the singlet witness) — establishes
-  `hermitianMinEigenvalue (H_{1/2}) ≤ -3/4` independently of the capstone, which the capstone
-  application (R0-dependent) is expected to match as an equality (the bound attained).
+  `hermitianMinEigenvalue (H_{1/2}) ≤ -3/4` independently of the capstone, and the capstone
+  application (R0-dependent) matches it as an equality (the bound attained).
 * NC1–NC4 — mutation controls at the PC2 witness: dropping `hA` (NC1), dropping the `+1` (NC2),
   the `S`-halving slip `N/2 → N/4` (NC4), and the coupling slip `J = 1` (NC3) each produce a
   bound that is *not* a valid lower bound there. None of these separates "sum over `A`" from
@@ -99,16 +101,15 @@ theorem isolatedVertexGraph_degree_two_lt_one :
 
 /-- **PC1c (R0-dependent).** The capstone instantiated at `isolatedVertexGraph`, `N = 1` gives
 `-5/4 ≤ λmin`, strictly slack (the true value is `-3/4`, since the isolated vertex contributes
-only slack). This does *not* establish tightness; it establishes only that the capstone
-(once it exists) is expected to apply at an instance the retired `hdeg`-bearing wrappers
-cannot reach. Currently fails only with `unknown identifier` on the capstone name. -/
+only slack). This does *not* establish tightness; it establishes only that the capstone applies
+at an instance the retired `hdeg`-bearing wrappers could not reach. -/
 example :
     ∑ x ∈ (Finset.univ : Finset (Fin 3)).filter sublatticeAneOne,
         -((1 : ℝ) / 2) * ((isolatedVertexGraph.degree x : ℝ) * (1 : ℝ) / 2 + 1) ≤
       hermitianMinEigenvalue
         (heisenbergHamiltonianOnGraphS_isHermitian isolatedVertexGraph
-          (by norm_num : star ((1 : ℂ) / 2) = (1 : ℂ) / 2) 1) :=
-  tasaki_problem_2_5_b_groundEnergy_lower_bound isolatedVertexGraph
+          (by norm_num : star ((1 : ℂ) / 2) = (1 : ℂ) / 2) 1) := by
+  exact_mod_cast tasaki_problem_2_5_b_groundEnergy_lower_bound isolatedVertexGraph
     isolatedVertexGraph_isBipartite 1
 
 /-! ## PC2: the attained-bound control (`pathGraph 2`, spin-`1/2`, the singlet) -/
@@ -206,15 +207,14 @@ theorem pathGraph2_lambdaMin_le_neg_three_quarters :
 
 /-- **PC2 (R0-dependent).** The capstone applied at `pathGraph 2`, `N = 1`, `A := (· = 0)` gives
 `-3/4 ≤ λmin`, which together with `pathGraph2_lambdaMin_le_neg_three_quarters` shows the bound
-is *attained* (`λmin = -3/4`). Currently fails only with `unknown identifier` on the capstone
-name. -/
+is *attained* (`λmin = -3/4`). -/
 example :
     ∑ x ∈ (Finset.univ : Finset (Fin 2)).filter (fun x => x = 0),
         -((1 : ℝ) / 2) * (((SimpleGraph.pathGraph 2).degree x : ℝ) * (1 : ℝ) / 2 + 1) ≤
       hermitianMinEigenvalue
         (heisenbergHamiltonianOnGraphS_isHermitian (SimpleGraph.pathGraph 2)
-          (by norm_num : star ((1 : ℂ) / 2) = (1 : ℂ) / 2) 1) :=
-  tasaki_problem_2_5_b_groundEnergy_lower_bound (SimpleGraph.pathGraph 2)
+          (by norm_num : star ((1 : ℂ) / 2) = (1 : ℂ) / 2) 1) := by
+  exact_mod_cast tasaki_problem_2_5_b_groundEnergy_lower_bound (SimpleGraph.pathGraph 2)
     pathGraph2_isBipartite 1
 
 /-! ## NC1–NC4: mutation controls at the PC2 witness -/

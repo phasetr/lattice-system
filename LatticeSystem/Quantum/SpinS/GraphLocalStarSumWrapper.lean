@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.GraphLocalStarLowerBound
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueSumLower
+import LatticeSystem.Quantum.SpinS.HermitianMinSimilarInvariance
 import LatticeSystem.Quantum.SpinS.HermitianVariationalLowerBound
 import LatticeSystem.Quantum.SpinS.SingleClusterGSJointWitness
 
@@ -151,5 +152,62 @@ theorem tasaki25b_graphLocalCluster_sum_lower_bound
   intro x _hx
   exact graphLocalClusterHamiltonianS_minEigenvalue_lower_singleClusterGSEnergy
     G x N
+
+/-- **Tasaki Problem 2.5.b**: the Anderson lower bound on the ground-state
+energy of the antiferromagnetic Heisenberg model on a bipartite lattice.
+
+With `hA` saying that every bond of `G` joins `A` to its complement, and with
+`S = N / 2`, the ground-state energy of the Hamiltonian
+`Ĥ = ∑_{{x,y}∈B} Ŝ_x · Ŝ_y` of eq. (2.5.1) satisfies
+`E_GS ≥ -∑_{x∈A} S (1 + |N(x)| S)`.
+
+The graph Hamiltonian here sums over ordered pairs, so each undirected bond is
+counted twice; the coupling `1 / 2` is therefore the unit coupling per bond of
+(2.5.1), not a weakened model.
+
+The proof decomposes `Ĥ` as the sum of the star Hamiltonians `ĥ_x` over the
+chosen sublattice, bounds each star by Problem 2.5.a, and adds those bounds
+through the minimum-eigenvalue form of Lemma A.5, which needs no commutation
+between the summands.
+
+No hypothesis restricts the local degrees: an isolated site of `A` contributes a
+term that only weakens the bound.  `[IsAlgClosed ℂ]` is an always-satisfiable
+instance assumption, discharged at every use site by mathlib's
+`Complex.isAlgClosed`; it is carried only because this module's import closure
+does not contain that instance, and it is not a hypothesis of the printed
+statement.
+
+References: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
+Springer 2020, Problem 2.5.b, p. 38, solution pp. 497-498, Problem 2.5.a, p. 38,
+and Lemma A.5, p. 468. -/
+theorem tasaki_problem_2_5_b_groundEnergy_lower_bound
+    [IsAlgClosed ℂ] (G : SimpleGraph Λ) [DecidableRel G.Adj]
+    {A : Λ → Prop} [DecidablePred A]
+    (hA : ∀ {x y : Λ}, G.Adj x y → A x ≠ A y) (N : ℕ) :
+    ∑ x ∈ (Finset.univ : Finset Λ).filter A,
+        -((N : ℝ) / 2) * ((G.degree x : ℝ) * (N : ℝ) / 2 + 1) ≤
+      hermitianMinEigenvalue
+        (heisenbergHamiltonianOnGraphS_isHermitian G
+          (by norm_num : star ((1 : ℂ) / 2) = (1 : ℂ) / 2) N) := by
+  classical
+  have hdecomp :
+      heisenbergHamiltonianOnGraphS G ((1 : ℂ) / 2) N =
+        ∑ x ∈ (Finset.univ : Finset Λ).filter A,
+          graphLocalClusterHamiltonianS G x N :=
+    heisenbergHamiltonianOnGraphS_half_eq_sum_filter_graphLocalClusterHamiltonianS
+      G hA N
+  have hsum :=
+    tasaki25b_graphLocalCluster_sum_lower_bound G
+      ((Finset.univ : Finset Λ).filter A) N
+  have heig :
+      hermitianMinEigenvalue
+          (Matrix.isHermitian_sum ((Finset.univ : Finset Λ).filter A)
+            (fun x _hx => graphLocalClusterHamiltonianS_isHermitian G x N)) =
+        hermitianMinEigenvalue
+          (heisenbergHamiltonianOnGraphS_isHermitian G
+            (by norm_num : star ((1 : ℂ) / 2) = (1 : ℂ) / 2) N) :=
+    hermitianMinEigenvalue_eq_of_spectrum_eq _ _ (by rw [hdecomp])
+  rw [heig] at hsum
+  simpa [singleClusterGSEnergyS_re_eq] using hsum
 
 end LatticeSystem.Quantum
