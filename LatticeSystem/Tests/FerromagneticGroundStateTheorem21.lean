@@ -46,8 +46,9 @@ Pinned:
 * PC-a — the PIN statement at `V := Fin 3`, `N := 1` with none of those hypotheses in scope.
 * PC-b — the PIN statement at `N = 0`, where both sides are the whole space, so it shows only
   that `N = 0` is admitted and does not discriminate the right-hand side.
-* PC-c — the finrank of the PIN's eigenspace is `4` at `V := Fin 3`, `N := 1`, which makes the
-  right-hand side a proper subspace there.
+* PC-c — the finrank of the PIN's eigenspace is `4` at `V := Fin 3`, `N := 1`, which together
+  with the ambient dimension `2³ = 8` (not pinned here) makes the right-hand side a proper
+  subspace there.
 * RC — the already-proved lower bound `totalSpinSSquared_eigenspace_finrank_ge_succ_card_mul_N`
   applied to the eigenspace term PC-c names.
 

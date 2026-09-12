@@ -374,16 +374,22 @@ three governance identifiers kept there on purpose.
 
 **Measurement.** The patterns need PCRE: `git grep -E` accepts `\b` and then matches nothing, so an
 ERE spelling reports an empty population instead of failing. The identifier pattern accepts the TeX
-spelling, in which the hash is escaped:
+spelling, in which the hash is escaped. Occurrences, lines and files are three different figures
+over the same pattern, so each has its own command: `-o` prints one match per occurrence, `-n` one
+per line, `-l` one per file.
 
 ```
 git grep -P -o -I '(?<!\w)\\?#\d{4,}' a12cbb0e -- tex | wc -l
+git grep -P -n -I '(?<!\w)\\?#\d{4,}' a12cbb0e -- tex | wc -l
 git grep -P -n -I '(?<!\w)#\d{4,}' a12cbb0e -- docs ':!docs/formalization/legacy' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
+git grep -P -l -I '(?<!\w)#\d{4,}' a12cbb0e -- docs ':!docs/formalization/legacy' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
 git grep -P -n -I '\b(now|previously|formerly|earlier|no longer|used to|recently|originally)\b' a12cbb0e -- tex docs ':!docs/formalization/legacy' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
+git grep -P -l -I '\b(now|previously|formerly|earlier|no longer|used to|recently|originally)\b' a12cbb0e -- tex docs ':!docs/formalization/legacy' ':!docs/limitations/documentation-hygiene-parked.md' | wc -l
 ```
 
-At revision `a12cbb0e`: 609 identifier occurrences on 508 lines of the proof guide, 430 lines
-across 24 files under `docs/`, and 298 lines across 25 files carrying one of the listed words.
+At revision `a12cbb0e`, in the order the commands are printed above: 609 identifier occurrences on
+508 lines of the proof guide, then 430 lines across 24 files under `docs/`, then 298 lines across
+25 files carrying one of the listed words.
 
 **Reason.** Neither population is a defect class that a pattern settles. The identifier counts (609
 occurrences on 508 lines in the proof guide; 430 lines across 24 files under `docs/`) are known to

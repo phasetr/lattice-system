@@ -1723,7 +1723,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "1ea6e9fbaf2b781a5be13448cb095a45fe49e1991547ebe76069cc730ef6d0f2"
+SCRIPT_SOURCE_SHA256 = "7f84f80cf6c55d745d8580232518aa20a8895706482f23b2f3cd29bb8e692657"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -2605,20 +2605,35 @@ MOVED_PROSE_CORRECTIONS = (
     ),
     (
         "problem asks to verify this by explicit calculation and to show, again by explicit "
-        "calculation, that the corresponding average of `|↑₁⟩|↑₂⟩` is the triplet state of eq. "
-        "(2.2.15), which is not SU(2)-invariant.",
+        "calculation, that the corresponding average of `|↑₁⟩|↑₂⟩` is `(π/8)(|↑₁⟩|↓₂⟩ + "
+        "|↓₁⟩|↑₂⟩) = (π/(4√2))|Φ_{1,0}⟩`, the triplet state of eq. (2.2.15), which is not "
+        "SU(2)-invariant.",
         "problem asks to verify this and to characterize states that fail to be SU(2)-invariant.",
     ),
 )
 
-# Number of sites each correction above rewrites, in declaration order. Pinned because an inverse
-# rewrite is fail-open on its own: it maps the corrected wording back to the baseline, so a page
-# reverted to the baseline wording simply stops it firing and parity passes either way, leaving
-# the published spelling unpinned. With the count fixed at one apiece, the reversion that would
-# otherwise pass silently is a hard failure, and a correction that starts matching a second site
-# is one too. The four older `.replace` calls below (in `normalize_current_moved_prose`) are not
-# counted, so they carry the fail-open weakness this pin removes from these five.
-MOVED_PROSE_CORRECTION_COUNTS = (1, 1, 1, 1, 1)
+# Where each correction above fires, in declaration order: the sites it rewrites, a site being the
+# page carrying the corrected wording, the baseline source range of the marker block it sits in,
+# and how many occurrences it rewrites there. Pinned because an inverse rewrite is fail-open on its
+# own: it maps the corrected wording back to the baseline, so a page reverted to the baseline
+# wording simply stops it firing and parity passes either way, leaving the published spelling
+# unpinned. A bare firing count summed over every marker block closes only part of that, because it
+# fixes how often a correction fires and not where: correction #0 inverts to the empty string, so
+# reverting its heading and writing the same literal into any other marked paragraph holds the
+# total at one, and the relocated copy is erased before the parity comparison ever sees it --
+# measured fail-open, which is what binding each count to a site refuses. Site by site, reverting a
+# correction, relocating it, duplicating it at its own site, and applying it on a page that is not
+# its own are each a hard failure. A correction that straddled two pages sharing one range is
+# counted on neither and fails the same way, which is the safe direction. The four older `.replace`
+# calls below (in `normalize_current_moved_prose`) are not counted, so they carry the fail-open
+# weakness this pin removes from these five.
+MOVED_PROSE_CORRECTION_SITES = (
+    (("docs/history/roadmap/foundations.md", 139, 139, 1),),
+    (("docs/history/open-items.md", 2780, 3037, 1),),
+    (("docs/history/open-items.md", 2780, 3037, 1),),
+    (("docs/history/open-items.md", 2780, 3037, 1),),
+    (("docs/history/open-items.md", 2780, 3037, 1),),
+)
 
 
 def apply_moved_prose_corrections(text: str, counts: list[int] | None = None) -> str:
@@ -3310,7 +3325,9 @@ def main() -> None:
     expected_prose_stream: list[str] = []
     actual_prose_stream: list[str] = []
     rewrite_counts = [0] * len(MOVED_PROSE_LINK_REWRITES)
-    correction_counts = [0] * len(MOVED_PROSE_CORRECTIONS)
+    correction_sites: list[list[tuple[str, int, int, int]]] = [
+        [] for _ in MOVED_PROSE_CORRECTIONS
+    ]
     for source_range in sorted(markers):
         start, end = source_range
         expected = "".join(old_lines[start - 1 : end])
@@ -3321,7 +3338,8 @@ def main() -> None:
             cells = old_lines[start - 1].removeprefix("| ").removesuffix(" |\n").split(" | ", 2)
             phase, scope, status = (cells[0], "", cells[1]) if len(cells) == 2 else cells
             expected = f"{phase} {scope} {status}"
-        current = "".join(text for _page, text in sorted(markers[source_range], key=lambda item: str(item[0])))
+        entries = sorted(markers[source_range], key=lambda item: str(item[0]))
+        current = "".join(text for _page, text in entries)
         if 217 <= start <= 2731:
             current = "\n".join(line for line in current.splitlines() if not line.startswith("|"))
         normalized_expected = whitespace_normalized(
@@ -3330,12 +3348,26 @@ def main() -> None:
         working_note_counts[2] += len(_WORKING_NOTE_PROSE_CITATION.findall(normalized_expected))
         expected_prose_stream.append(_drop_working_note_prose_citation(normalized_expected))
         actual_prose_stream.append(
-            normalize_current_moved_prose(start, end, current, old_lines, correction_counts)
+            normalize_current_moved_prose(start, end, current, old_lines)
         )
-    if tuple(correction_counts) != MOVED_PROSE_CORRECTION_COUNTS:
+        # Attribute every firing to the page and the baseline range it happens on. The parity
+        # stream above is computed on the concatenation of the pages sharing a range, so a count
+        # taken there cannot say which page a correction fired on; taken per page it can.
+        for page, text in entries:
+            if 217 <= start <= 2731:
+                text = "\n".join(line for line in text.splitlines() if not line.startswith("|"))
+            counts = [0] * len(MOVED_PROSE_CORRECTIONS)
+            normalize_current_moved_prose(start, end, text, old_lines, counts)
+            for index, count in enumerate(counts):
+                if count:
+                    correction_sites[index].append(
+                        (str(page.relative_to(ROOT)), start, end, count)
+                    )
+    observed_correction_sites = tuple(tuple(sorted(sites)) for sites in correction_sites)
+    if observed_correction_sites != MOVED_PROSE_CORRECTION_SITES:
         fail(
-            "audited moved-prose correction counts differ: "
-            f"expected={MOVED_PROSE_CORRECTION_COUNTS}, actual={tuple(correction_counts)}"
+            "audited moved-prose correction sites differ: "
+            f"expected={MOVED_PROSE_CORRECTION_SITES}, actual={observed_correction_sites}"
         )
     if tuple(rewrite_counts) != MOVED_PROSE_LINK_REWRITE_COUNTS:
         fail(
