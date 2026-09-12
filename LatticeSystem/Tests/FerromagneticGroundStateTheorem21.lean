@@ -40,6 +40,16 @@ Pinned:
   reading of the converse: an eigenvector of `(Ŝ_tot)²` at an eigenvalue with maximal real part
   lies in `span ℂ (Set.range (ladderIterateUp V N))`. Non-vacuity of the maximality hypothesis is
   exercised by control PC-M below.
+* PIN `totalSpinSSquared_eigenspace_eq_span_ladderIterateUp` — the converse at the explicit
+  value: the `(Ŝ_tot)²`-eigenspace at `S_max(S_max + 1)` equals the span of the ladder family,
+  with no graph, coupling, connectivity or `1 ≤ N` hypothesis.
+* PC-a — the PIN statement at `V := Fin 3`, `N := 1` with none of those hypotheses in scope.
+* PC-b — the PIN statement at `N = 0`, where both sides are the whole space, so it shows only
+  that `N = 0` is admitted and does not discriminate the right-hand side.
+* PC-c — the finrank of the PIN's eigenspace is `4` at `V := Fin 3`, `N := 1`, which makes the
+  right-hand side a proper subspace there.
+* RC — the already-proved lower bound `totalSpinSSquared_eigenspace_finrank_ge_succ_card_mul_N`
+  applied to the eigenspace term PC-c names.
 
 A positive control on the triangle (`V := Fin 3`, `G := cycleGraph 3`, `N := 1`,
 `J := couplingOf (cycleGraph 3) (−1/2)`) exercises C5a/C1/C2 with `|B| = 3` derived from

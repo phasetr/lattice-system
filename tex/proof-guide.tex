@@ -22770,7 +22770,7 @@ ground-state half of the remark after eq.~(2.4.10), p.~34: every $\hat
 H$-ground state of a connected ferromagnetic lattice automatically has maximal
 total spin. The converse printed there --- that the states of eq.~(2.4.10),
 p.~34 (whose $\Phi_M$ are eq.~(2.4.9), p.~33), are the \emph{only} states of
-maximal total spin, per Theorem~2.1 (p.~34) --- is a statement about
+maximal total spin --- is a statement about
 $(\hat S_{\rm tot})^2$ alone, with no graph,
 coupling, connectivity or $N \ge 1$ hypothesis, and is proved separately in
 two forms. The theorem
@@ -22782,8 +22782,9 @@ $\texttt{span}(\texttt{ladderIterateUp})$; it pins that explicit value without
 itself asserting that it is the largest eigenvalue of $(\hat S_{\rm tot})^2$. The
 theorem \texttt{totalSpinSSquared\_maximal\_eigenvector\_mem\_span\_ladderIterateUp}
 (\texttt{Quantum/SpinS/MaximalCasimirEigenvectorSpan.lean}), under the same
-finite-non-empty-$V$ hypothesis, restates this at the printed maximal
-eigenvalue: given an eigenvector at an eigenvalue $\gamma$ that is maximal in
+finite-non-empty-$V$ hypothesis, gives the corresponding membership statement
+at the printed maximal eigenvalue: given an eigenvector at an eigenvalue
+$\gamma$ that is maximal in
 the sense that no eigenvalue of $(\hat S_{\rm tot})^2$ with a non-zero
 eigenvector has a larger real part, it lies in
 $\texttt{span}(\texttt{ladderIterateUp})$; the real part bound plus
