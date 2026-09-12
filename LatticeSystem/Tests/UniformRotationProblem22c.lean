@@ -20,9 +20,10 @@ capstone shim, until the module is implemented.
 * **PC2** the value `V.mulVec |↑↓⟩ = |↑↓⟩`, computed independently of the capstone from the
   two-site `π`-rotation entries directly, so the value is available if `V` is ever paired with an
   admissible `U` shown to satisfy the same conjugation hypothesis.
-* **NC1** widening the target vector to `|↑↑⟩` (`M_tot ≠ 0`) makes the analogous statement false:
-  `V = exp(−iπ Ŝ_tot^{(3)})` sends `|↑↑⟩` to `−|↑↑⟩`, so the same-`n` rotation class does *not*
-  fix every vector — the target `|↑↓⟩` (`M_tot = 0`) is load-bearing.
+* **NC1** widening the target vector to `|↑↑⟩` (`M_tot ≠ 0`): `V = exp(−iπ Ŝ_tot^{(3)})` — a
+  member of the footnote-16 class for `n = e₃` by PC1b, which proves only that membership, not the
+  conjugation hypothesis — sends `|↑↑⟩` to `−|↑↑⟩`, illustrating why the target `|↑↓⟩`
+  (`M_tot = 0`) is load-bearing.
 * **NC2** widening the admissible class from the footnote-16 closure to all of
   `unitary (ManyBodyOp (Fin 2))` makes the statement false: `U = 1` and `V = −1` are both unitary,
   both act as scalars (hence commute with every `Ŝ_x^{(3)}`, satisfying the conjugation hypothesis
@@ -105,9 +106,11 @@ example : NormedSpace.exp ((-(Complex.I * ((Real.pi : ℝ) : ℂ))) •
 
 /-! ## NC1: `M_tot = 0` (the target `|↑↓⟩`) is load-bearing -/
 
-/-- NC1: at the `M_tot ≠ 0` configuration `|↑↑⟩`, `V = exp(−iπ Ŝ_tot^{(3)})` (an admissible
-rotation for `n = e₃`, by PC1b) sends `|↑↑⟩` to `−|↑↑⟩`; hence the same-`n` rotation class does
-*not* fix every two-site basis vector, and the target `|↑↓⟩` of the capstone is load-bearing. -/
+/-- NC1: at the `M_tot ≠ 0` configuration `|↑↑⟩`, `V = exp(−iπ Ŝ_tot^{(3)})` — a member of the
+footnote-16 admissible class for `n = e₃` by PC1b, which proves only that membership, not that `V`
+satisfies the capstone's same-`n` conjugation hypothesis — sends `|↑↑⟩` to `−|↑↑⟩`; this is the
+value the same-`n` rotation class would fail to fix on `|↑↑⟩` if `V` also satisfied that
+hypothesis, illustrating why the target `|↑↓⟩` of the capstone is load-bearing. -/
 example : NormedSpace.exp ((-(Complex.I * ((Real.pi : ℝ) : ℂ))) •
       totalSpinHalfOp3 (Fin 2)) *ᵥ basisVec (fun _ : Fin 2 => (0 : Fin 2))
       = -(basisVec (fun _ : Fin 2 => (0 : Fin 2))) := by
