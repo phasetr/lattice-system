@@ -23,8 +23,8 @@ Pinned:
 * C3 `heisenbergHamiltonianS_eigenspace_eq_satFerroJointEigenspace_of_connected_ferro` — the
   ground-state half of the remark after eq. (2.4.10), p. 34: the `Ĥ`-ground eigenspace coincides
   with the joint `(Ĥ, (Ŝ_tot)²)`-eigenspace, i.e. every ground state carries maximal total spin.
-  The converse the book prints — that these are the *only* maximal-total-spin states — is not
-  proved upstream and is not pinned here.
+  The converse the book prints — that these are the *only* maximal-total-spin states — is
+  `totalSpinSSquared_eigenspace_eq_span_ladderIterateUp`, pinned in its own section below.
 * C5a `saturatedFerromagnetEigenvalueS_couplingOf_neg_half` — the printed ground energy formula
   `E_GS = −|B|·S²` (p. 32, below eq. (2.4.5)) for the uniform coupling `J = couplingOf G (−1/2)`
   of eq. (2.4.1), p. 32; no hypotheses at all — it is an unconditional rewrite of
@@ -85,8 +85,8 @@ example {G : SimpleGraph V} {J : V → V → ℂ}
     hGconn hJ_real hJ_sym hJ_supp hJ_ferro hN
 
 /-- **C3 pin.** The `Ĥ`-eigenspace at the saturated-ferromagnet eigenvalue equals the joint
-`(Ĥ, (Ŝ_tot)²)`-eigenspace: every ground state carries maximal total spin (the remark after eq.
-(2.4.10), p. 34). -/
+`(Ĥ, (Ŝ_tot)²)`-eigenspace: every ground state carries maximal total spin (the ground-state half
+of the remark after eq. (2.4.10), p. 34). -/
 example {G : SimpleGraph V} {J : V → V → ℂ}
     (hGconn : G.Connected)
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -188,8 +188,9 @@ example :
 
 /-! ## Signature pin: the converse half of the remark after eq. (2.4.10), p. 34
 
-`totalSpinSSquared_eigenspace_eq_span_ladderIterateUp` is not yet defined; every pin below fails
-at `Unknown identifier`. -/
+`totalSpinSSquared_eigenspace_eq_span_ladderIterateUp` states that the `(Ŝ_tot)²`-eigenspace at
+`S_max(S_max+1)` is the span of the ladder family, with no graph, coupling, connectivity or
+`1 ≤ N` hypothesis. The pins below fix that signature and exercise it at concrete `V`, `N`. -/
 
 /-- **PIN.** The maximal-Casimir eigenspace — the `(Ŝ_tot)²`-eigenspace at
 `S_max(S_max+1) = saturatedFerromagnetCasimirEigenvalueS V N` — equals the span of the ladder
@@ -232,6 +233,7 @@ example :
       = 4 := by
   rw [totalSpinSSquared_eigenspace_eq_span_ladderIterateUp,
     finrank_span_eq_card ladderIterateUp_linearIndependent, Fintype.card_fin]
+  simp
 
 /-- **RC (already compiles at Red).** The existing lower bound
 `totalSpinSSquared_eigenspace_finrank_ge_succ_card_mul_N`, instantiated at `V := Fin 3`, `N := 1`,
