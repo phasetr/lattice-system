@@ -1912,7 +1912,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "ce99eded44d16b94fbe3ec08281b9baeb16848629736477227308acb7861920f"
+SCRIPT_SOURCE_SHA256 = "e778122f07ce5c6477e58c5ad99b92da366f48ef076ea28b73a502f07d943ad4"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -2835,6 +2835,26 @@ MOVED_PROSE_CORRECTIONS = (
         "hypotheses.",
     ),
     (
+        # TSK-069 (PR #5470): the earlier row cited an endpoint covering only the
+        # cross-sublattice branch and, through its hypothesis bundle, Theorem 2.3 (which the
+        # printed problem never invokes). The capstone now proves both branches of (2.5.7)
+        # under Theorem 2.2's own hypotheses, plus the printed-model instance.
+        "- **DONE: Problem 2.5.d (p. 40, eq. (2.5.7); solution p. 498).** The capstone "
+        "`tasaki_problem_2_5_d_twoSpin_correlation_sign` proves both branches of the sign under "
+        "Theorem 2.2's own hypotheses (connected, bipartite, balanced sublattices): the two-spin "
+        "correlation is strictly positive on a same-sublattice pair and strictly negative across "
+        "sublattices, for a general real symmetric non-negative exchange; "
+        "`tasaki_problem_2_5_d_couplingOf_half` is the instance at the printed Hamiltonian "
+        "(2.5.1), coupling one half. Neither carries Theorem 2.3's hypotheses, which the printed "
+        "problem never invokes; the complete bipartite graph is not a hypothesis of either, "
+        "being only the toy Hamiltonian's bond graph at (2.5.10), p. 41, internal to Tasaki's own "
+        "proof of Theorem 2.2.",
+        "- **DONE: Problem 2.5.d.** The endpoint "
+        "`twoSpinCorrelationS_re_neg_of_tasaki23_balanced_pf_cross` extracts the concrete "
+        "cross-sublattice negative real two-spin correlation from the balanced "
+        "Perron-Frobenius package.",
+    ),
+    (
         # PR #5467: the Marshall-Lieb-Mattis Theorem 2.2 capstone
         # `tasaki_2_5_theorem_2_2_of_connected` now proves the printed theorem at connected
         # generality (all four conjuncts, no sector restriction, no complete-bipartite
@@ -2989,6 +3009,7 @@ MOVED_PROSE_CORRECTIONS = (
 # any correction left unregistered here, so no separately asserted count is needed).
 MOVED_PROSE_CORRECTION_SITES = (
     (("docs/history/roadmap/foundations.md", 139, 139, 1),),
+    (("docs/history/open-items.md", 2780, 3037, 1),),
     (("docs/history/open-items.md", 2780, 3037, 1),),
     (("docs/history/open-items.md", 2780, 3037, 1),),
     (("docs/history/open-items.md", 2780, 3037, 1),),

@@ -18386,11 +18386,19 @@ Marshall sign machinery + time-reversal action; see
   bipartite graph is not a hypothesis of this result; it is only the toy
   Hamiltonian's bond graph at (2.5.10), p.~41, internal to Tasaki's own
   proof.
-\item \textbf{DONE} Problem 2.5.d (two-spin correlation under MLM).  The
-  endpoint
-  \texttt{twoSpinCorrelationS\_re\_neg\_of\_tasaki23\_balanced\_pf\_cross}
-  extracts the concrete cross-sublattice negative real correlation from the
-  balanced Perron--Frobenius package.
+\item \textbf{DONE} Problem 2.5.d, p.~40, eq.~(2.5.7) (solution p.~498).
+  The capstone
+  \texttt{tasaki\_problem\_2\_5\_d\_twoSpin\_correlation\_sign} proves
+  both branches of the sign under Theorem~2.2's own hypotheses
+  (connected, bipartite, balanced sublattices): strictly positive on a
+  same-sublattice pair and strictly negative across sublattices, for a
+  general real symmetric non-negative exchange;
+  \texttt{tasaki\_problem\_2\_5\_d\_couplingOf\_half} is the instance at
+  the printed Hamiltonian (2.5.1), coupling one half.  Neither carries
+  Theorem~2.3's hypotheses, which the printed problem never invokes; the
+  complete bipartite graph is not a hypothesis of either, being only the
+  toy Hamiltonian's bond graph at (2.5.10), p.~41, internal to Tasaki's
+  own proof of Theorem~2.2.
 \item \textbf{Theorem~2.4 status}.  The spin-$1/2$ case-(i) target uniqueness
   and zero-magnetization wrappers are live for
   \(-1<\lambda<1\), \(D\ge 0\) as
@@ -21792,7 +21800,7 @@ wrapper uses the Theorem~2.3/SU(2) endpoint to supply the one-dimensional
 ground eigenspace at the Hermitian minimum.  This wrapper is for a full-space
 coefficient function; the sector-supported Perron--Frobenius ground-state
 shape is handled by the next wrapper.  Reference: Tasaki, Springer 2020,
-Problem~2.5.d, p.~40, solution pp.~498--499, equations (S.22)--(S.23), with
+Problem~2.5.d, p.~40, solution p.~498, equations (S.22)--(S.23), with
 Theorems~2.3--2.4, pp.~42--44.
 
 \textbf{Problem 2.5.d sector-supported wrapper (PR~\#4076)}.
@@ -21816,7 +21824,7 @@ axis-phase equality gives the sector-supported signed dot-product positivity
 wrapper.  Finally, a normalized non-zero sector-supported eigenvector in a
 one-dimensional Heisenberg eigenspace obtains the same axis-swap and
 z-rotation phases as in PR~\#4075.  Reference: Tasaki, Springer 2020,
-Problem~2.5.d, p.~40, solution pp.~498--499, equations (S.22)--(S.23), with
+Problem~2.5.d, p.~40, solution p.~498, equations (S.22)--(S.23), with
 Theorems~2.3--2.4, pp.~42--44.
 
 \textbf{Problem 2.5.d balanced-sector ladder witness (PR~\#4077)}.
@@ -21852,7 +21860,7 @@ packages this witness, and
 \path{twoSpinCorrelationS_bipartite_signed_re_pos_of_marshall_balanced_sector_cross_eigenphase}
 feeds it into the sector-supported eigenspace-phase wrapper so the balanced
 sector no longer needs an explicit strict-entry hypothesis.  Reference:
-Tasaki, Springer 2020, Problem~2.5.d, p.~40, solution pp.~498--499, equations
+Tasaki, Springer 2020, Problem~2.5.d, p.~40, solution p.~498, equations
 (S.22)--(S.23), with Theorems~2.3--2.4, pp.~42--44.
 
 \textbf{Problem 2.5.d balanced Perron--Frobenius endpoint (PR~\#4078)}.
@@ -21887,7 +21895,7 @@ returns the Hermitian minimum energy, the strictly positive balanced
 coefficients, the non-zero embedded eigenvector, full eigenspace
 \(\mathrm{finrank}\le1\), and signed cross-sublattice two-spin correlation
 positivity for this concrete PF vector.  Reference: Tasaki, Springer 2020,
-Problem~2.5.d, p.~40, solution pp.~498--499, equations (S.22)--(S.23), with
+Problem~2.5.d, p.~40, solution p.~498, equations (S.22)--(S.23), with
 Theorems~2.3--2.4, pp.~42--44.
 
 \textbf{Problem 2.5.d balanced Perron--Frobenius sign cases (PR~\#4079)}.
@@ -21905,7 +21913,7 @@ hypothesis by the four Boolean conclusions of
 real two-spin correlation on the same Boolean sublattice and negative real
 two-spin correlation on opposite Boolean sublattices, after the corresponding
 Boolean assumptions are supplied.  Reference: Tasaki, Springer 2020,
-Problem~2.5.d, p.~40, solution pp.~498--499, equations (S.22)--(S.23), with
+Problem~2.5.d, p.~40, solution p.~498, equations (S.22)--(S.23), with
 Theorems~2.3--2.4, pp.~42--44.
 
 \textbf{Problem 2.5.d balanced Perron--Frobenius cross sign (PR~\#4080)}.
@@ -21926,7 +21934,7 @@ the appropriate cross-sublattice field of the PR~\#4079 theorem gives
 The Hermitian minimum, strictly positive balanced coefficients, non-zero
 embedded eigenvector, and full eigenspace \(\mathrm{finrank}\le1\) are
 preserved unchanged.  Reference: Tasaki, Springer 2020, Problem~2.5.d, p.~40,
-solution pp.~498--499, equations (S.22)--(S.23), with Theorems~2.3--2.4,
+solution p.~498, equations (S.22)--(S.23), with Theorems~2.3--2.4,
 pp.~42--44.
 
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$

@@ -9,7 +9,7 @@ so their expectations have equal real parts after multiplication by the real
 bipartite gauge sign.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
-Springer 2020, Problem 2.5.d, p. 43, and solution pp. 498--499.
+Springer 2020, Problem 2.5.d, p. 40, and solution p. 498.
 -/
 
 namespace LatticeSystem.Quantum

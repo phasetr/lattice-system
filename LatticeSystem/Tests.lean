@@ -179,6 +179,7 @@ import LatticeSystem.Tests.SpinSPiRotationExpBridge
 import LatticeSystem.Tests.UniformRotationProblem22c
 import LatticeSystem.Tests.GroundEnergyLowerBoundProblem25b
 import LatticeSystem.Tests.Problem25cGroundStateSpinSquare
+import LatticeSystem.Tests.Problem25dGroundStateCorrelationSign
 
 /-!
 # Test aggregator for the `lattice-system` library
