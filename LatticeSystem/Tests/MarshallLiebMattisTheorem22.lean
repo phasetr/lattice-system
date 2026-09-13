@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralMLMFull
 import LatticeSystem.Quantum.SpinS.ConnectedTheorem23
 import LatticeSystem.Quantum.SpinS.Theorem24SU2GlobalUniquenessFromMLMCore
+import LatticeSystem.Quantum.SpinS.Theorem22Connected
 
 /-!
 # Signature pin: Marshall–Lieb–Mattis without the scaffolding shift binder
@@ -25,7 +26,7 @@ complete-bipartite generality,
 (whole-Hilbert-space uniqueness) and, conditionally on a supplied sector eigenvector,
 `tasaki23_sector_lift_and_casimir_zero_of_card_eq` (`S_tot = 0`).
 
-This module also pins the not-yet-existing connected-generality capstone
+This module also pins the connected-generality capstone
 `tasaki_2_5_theorem_2_2_of_connected` (Theorem 2.2, p. 39, at connectedness
 instead of complete-bipartite positivity, with no sector restriction), plus
 the four-vertex-path discriminating witness for that hypothesis change.
@@ -106,9 +107,9 @@ example :
       (bipartiteCompleteGraphOf (fun x : Fin 4 => decide (x = 0 ∨ x = 2))).Adj x y := by
   decide
 
-/-- **Signature pin (RED — `tasaki_2_5_theorem_2_2_of_connected` does not exist
-yet).** Pins the connected-generality Theorem 2.2 capstone: Tasaki, *Physics
-and Mathematics of Quantum Many-Body Systems*, Springer 2020, §2.5 Theorem 2.2,
+/-- **Signature pin.** Pins the connected-generality Theorem 2.2 capstone:
+Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020,
+§2.5 Theorem 2.2,
 p. 39, eq. (2.5.4), p. 39, Hamiltonian (2.5.1), p. 37, general couplings by
 Remark (2.5.13), p. 43; connectedness is Footnote 28, p. 33. The complete
 bipartite graph is never a hypothesis here — it is only the bond graph of the
@@ -119,9 +120,9 @@ zero off them (H5/(2.5.13)). Conclusions, all four conjuncts: (C1) the full
 eigenspace at `μ` has `finrank ≤ 1` and `μ` is a global lower bound on every
 real eigenvalue; (C3) a Marshall-signed eigenvector on the balanced sector
 `|A| * N`; (C4) its sector coefficients are all strictly positive; (C2) that
-eigenvector is annihilated by `totalSpinSSquared`, i.e. `S_tot = 0`. Building
-this module must fail with `unknown identifier
-'tasaki_2_5_theorem_2_2_of_connected'`, never with a bad-import error. -/
+eigenvector is annihilated by `totalSpinSSquared`, i.e. `S_tot = 0`. The pin is
+discharged by *applying* the capstone rather than restating it, so weakening any
+of those hypotheses or conclusions breaks the build. -/
 example (A : V → Bool) (G : SimpleGraph V) {J : V → V → ℂ}
     (hGconn : G.Connected)
     (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
