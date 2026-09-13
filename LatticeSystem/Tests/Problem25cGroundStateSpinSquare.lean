@@ -53,10 +53,11 @@ private def witnessMarker : Fin 4 → Bool := fun x => decide (x = 0 ∨ x = 2)
 /-- **Discriminating witness graph.**  The four-vertex path (edges `{0,1}`,
 `{1,2}`, `{2,3}`), *not* the four-cycle: with `witnessMarker` the four-cycle's
 edge set is exactly the four crossing pairs of the marker, i.e. it coincides
-with `bipartiteCompleteGraphOf witnessMarker` (see
-`witness_cycle_eq_completeBipartite` below), so it cannot discriminate
-Theorem 2.2's hypotheses from complete-bipartite positivity.  The path omits
-the crossing pair `{0,3}` and is the smallest witness that does. -/
+with `bipartiteCompleteGraphOf witnessMarker` (checked by `decide` as an
+anonymous `example` in `LatticeSystem/Tests/MarshallLiebMattisTheorem22.lean`),
+so it cannot discriminate Theorem 2.2's hypotheses from complete-bipartite
+positivity.  The path omits the crossing pair `{0,3}` and is the smallest
+witness that does. -/
 private def witnessGraph : SimpleGraph (Fin 4) := SimpleGraph.pathGraph 4
 
 /-- **Adjacency decidability instance.**  `couplingOf` requires deciding
@@ -80,16 +81,6 @@ private theorem witness_bipartite :
 private theorem witness_balanced :
     (Finset.univ.filter (fun x : Fin 4 => witnessMarker x = true)).card =
       (Finset.univ.filter (fun x : Fin 4 => (! witnessMarker x) = true)).card := by
-  decide
-
-/-- **Non-discrimination of the four-cycle (documentation).**  With the same
-marker, the four-cycle's edges are exactly `bipartiteCompleteGraphOf
-witnessMarker`'s edges, so it satisfies the old (stronger) hypotheses too and
-cannot discriminate them from Theorem 2.2's; this is why `witnessGraph` above
-is the path and not the cycle. -/
-private theorem witness_cycle_eq_completeBipartite :
-    ∀ x y : Fin 4, (SimpleGraph.cycleGraph 4).Adj x y ↔
-      (bipartiteCompleteGraphOf witnessMarker).Adj x y := by
   decide
 
 /-- **Value + generality + anti-vacuity + axis/site control, `N = 1` (`S = 1/2`).**

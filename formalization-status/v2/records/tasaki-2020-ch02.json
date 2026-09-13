@@ -306,7 +306,7 @@
           "source_item_id": "tasaki-2020-problem-2-5-c"
         }
       ],
-      "summary": "Tasaki Problem 2.5.c, p. 39, eq. (2.5.6), at the printed Hamiltonian (2.5.1), p. 37: the instance of the general statement above at coupling couplingOf G (1/2), the ordered-pair-convention identification of the unit-weight bond sum Ĥ = sum over {x,y} in B of Ŝ_x·Ŝ_y. Every hypothesis the general statement places on the coupling is discharged here from couplingOf itself, so the printed model assumes only connectedness, bipartiteness, balance and S >= 1/2.",
+      "summary": "Tasaki Problem 2.5.c, p. 39, eq. (2.5.6), at the printed Hamiltonian (2.5.1), p. 37: the instance of the general statement below at coupling couplingOf G (1/2), the ordered-pair-convention identification of the unit-weight bond sum Ĥ = sum over {x,y} in B of Ŝ_x·Ŝ_y. Every hypothesis the general statement places on the coupling is discharged here from couplingOf itself, so the printed model assumes only connectedness, bipartiteness, balance and S >= 1/2.",
       "topic_ids": [
         "quantum-spin"
       ],
