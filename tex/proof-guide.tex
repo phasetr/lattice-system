@@ -18297,10 +18297,10 @@ Marshall sign machinery + time-reversal action; see
   declaration -- it is only the bond graph of the toy Hamiltonian
   (2.5.10), p.~41, that the printed proof uses internally.
   The capstone assembles, without new mathematics beyond one rebase,
-  the pre-existing graph-agnostic connected chain: the earlier
-  \emph{per-sector} declaration
-  \texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full}
-  (\S\ref{subsec:mlm-spin-s-formalisation}), the connected strict
+  the pre-existing graph-agnostic connected chain: the connected
+  per-sector Perron--Frobenius simplicity lemma
+  \texttt{heisenbergHamiltonianSMatrixOnMagSector\_finrank\_le\_one\_of%
+  \_marshall\_positive\_connected}, the connected strict
   outside-sector ordering \texttt{tasaki23\_strict\_hOutside\_of\_connected},
   the graph-agnostic full-eigenspace engine
   \texttt{heisenbergHamiltonianS\_full\_eigenspace\_finrank\_le\_one\_of\_strict\_sector\_lower},
@@ -18410,7 +18410,10 @@ sector restriction, all four conjuncts) is now proved by
 \texttt{tasaki\_2\_5\_theorem\_2\_2\_of\_connected}
 (\texttt{Quantum/SpinS/Theorem22Connected.lean}); see the DONE bullet
 above. This outline documents the earlier, still-present per-sector
-route the capstone assembles from.
+route, which the capstone does \emph{not} use:
+\texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full}
+is not in the capstone's dependency closure, the connected chain it
+assembles being graph-agnostic throughout.
 
 \textbf{Statement} (the per-sector form as formalised; cf.\ Tasaki §2.5
 Theorem 2.2, p.~39, generic spin $S$). Let $V$ be a finite vertex type

@@ -1974,6 +1974,23 @@ def run_staged_mutation_tests(
             raise AssertionError("staged source accepted a missing canonical detail page")
     finally:
         shutil.rmtree(missing_temporary)
+    # Mutating the attribute alone is already covered above; only a self-consistent
+    # count forces the checker to recompute from the catalogue instead of comparing
+    # the row against itself.
+    proved_row = re.search(
+        r'data-status-label="proved" data-record-count="(\d+)">proved: (\d+)</li>',
+        status_text,
+    )
+    if proved_row is None or proved_row.group(1) != proved_row.group(2):
+        raise AssertionError("consistent status count mutation fixture is absent")
+    proved_count = int(proved_row.group(1))
+    consistent_count_before = (
+        f'data-status-label="proved" data-record-count="{proved_count}">proved: {proved_count}'
+    )
+    consistent_count_after = (
+        f'data-status-label="proved" data-record-count="{proved_count + 1}">'
+        f"proved: {proved_count + 1}"
+    )
     replacements = (
         (
             "implementation status",
@@ -2014,8 +2031,8 @@ def run_staged_mutation_tests(
         (
             "status count",
             "formalization/status.md",
-            'data-status-label="proved" data-record-count="20">proved: 20',
-            'data-status-label="proved" data-record-count="21">proved: 21',
+            consistent_count_before,
+            consistent_count_after,
         ),
         (
             "extra unrelated record",

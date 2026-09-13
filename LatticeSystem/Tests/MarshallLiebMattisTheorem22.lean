@@ -1,6 +1,4 @@
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralMLMFull
-import LatticeSystem.Quantum.SpinS.ConnectedTheorem23
-import LatticeSystem.Quantum.SpinS.Theorem24SU2GlobalUniquenessFromMLMCore
 import LatticeSystem.Quantum.SpinS.Theorem22Connected
 
 /-!

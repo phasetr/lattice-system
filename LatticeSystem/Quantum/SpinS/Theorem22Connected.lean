@@ -58,8 +58,9 @@ implicit.  First, per site: under the repository dictionary `σ_x = S − (σ x)
 and `(−1)^k` depends only on the parity of `k`, so the printed per-site factor *equals* the
 Lean factor `(−1)^{(σ x).val}`; there is no residual `S`-shift.  Second, the index set: the
 marker `A` here is universally quantified and every hypothesis is invariant under
-`A ↦ fun x => ! A x` (`hGbip` is symmetric in the two classes, and `h_card_eq` is an equality
-between the two class cardinalities), so instantiating this theorem at the indicator of
+`A ↦ fun x => ! A x` (`hGbip` is symmetric in the two classes, `h_card_eq` is an equality
+between the two class cardinalities, and `hJ_bipartite` constrains only whether `A x = A y`),
+so instantiating this theorem at the indicator of
 Tasaki's `B` sublattice makes `marshallSignS A` *literally* the printed prefactor and C3/C4
 the printed claims.  No bridge lemma is needed on that route.  Instantiated instead at
 Tasaki's `A`, the two prefactors differ by the global constant `(−1)^{magSumS σ}`, which is
