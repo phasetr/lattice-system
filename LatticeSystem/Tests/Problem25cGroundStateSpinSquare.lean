@@ -6,8 +6,12 @@ import LatticeSystem.Quantum.SpinS.SubmatrixMinEigenvalue
 # Red fixture: Tasaki Problem 2.5.c, p. 39, eq. (2.5.6) — single-site spin square
 
 Pins the not-yet-existing capstone
-`tasaki_problem_2_5_c_singleSite_spinSquare_expectation` and its printed-model
-instance `tasaki_problem_2_5_c_couplingOf_half`.
+`tasaki_problem_2_5_c_singleSite_spinSquare_expectation` (applied directly
+under Theorem 2.2's own hypotheses, with an explicit coupling, in
+`redPin_general_capstone_N1`) **and** its printed-model instance
+`tasaki_problem_2_5_c_couplingOf_half` (in the other `redPin_*` lemmas): both
+are named so the general statement cannot be left unproved by discharging
+only the printed case.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, Problem 2.5.c, p. 39, eq. (2.5.6), solution p. 498.
@@ -54,8 +58,10 @@ Theorem 2.2's hypotheses from complete-bipartite positivity.  The path omits
 the crossing pair `{0,3}` and is the smallest witness that does. -/
 private def witnessGraph : SimpleGraph (Fin 4) := SimpleGraph.pathGraph 4
 
-/-- Decidability instance for `witnessGraph`'s adjacency, needed only to form
-`couplingOf witnessGraph _` in the identification control below. -/
+/-- **Adjacency decidability instance.**  `couplingOf` requires deciding
+adjacency of its graph argument; `witnessGraph` carries no such instance by
+construction, so one is supplied here (classically, since only existence is
+needed) for every use of `couplingOf witnessGraph _` below. -/
 private noncomputable instance : DecidableRel witnessGraph.Adj := Classical.decRel _
 
 /-- **H1 (Footnote 28, p. 33).** The path witness is connected. -/
@@ -104,6 +110,56 @@ private theorem redPin_N1_axis_value_and_generality :
   obtain ⟨_μ, _hμ_def, _hrank, ⟨Φ, hΦne, hΦnorm, hΦeig⟩, huniv⟩ :=
     tasaki_problem_2_5_c_couplingOf_half witnessMarker witnessGraph 1
       witness_connected witness_bipartite witness_balanced (le_refl 1)
+  refine ⟨Φ, hΦne, hΦnorm, fun x => ?_⟩
+  obtain ⟨h1, h2, h3⟩ := huniv hΦne hΦnorm hΦeig x
+  exact ⟨by rw [h1]; norm_num, by rw [h2]; norm_num, by rw [h3]; norm_num⟩
+
+/-- **General-hypothesis pin.**  Applies the not-yet-existing
+`tasaki_problem_2_5_c_singleSite_spinSquare_expectation` *directly*, at
+explicit `J = couplingOf witnessGraph (1/2)`, discharging every coupling
+hypothesis by hand exactly as `tasaki_2_5_theorem_2_2_couplingOf_half`'s own
+proof does.  This is the identifier the design calls the target; pinning only
+the printed-model instance `tasaki_problem_2_5_c_couplingOf_half` above would
+let an implementer discharge the printed case alone without ever stating the
+general one, which is the failure mode this lemma forecloses. -/
+private theorem redPin_general_capstone_N1 :
+    ∃ Φ : (Fin 4 → Fin 2) → ℂ, Φ ≠ 0 ∧ star Φ ⬝ᵥ Φ = 1 ∧
+      ∀ x : Fin 4,
+        singleSiteSpinSquareExpectationS x (spinSOp1 1) Φ = 1 / 4 ∧
+        singleSiteSpinSquareExpectationS x (spinSOp2 1) Φ = 1 / 4 ∧
+        singleSiteSpinSquareExpectationS x (spinSOp3 1) Φ = 1 / 4 := by
+  have hJ_real : ∀ x y : Fin 4, (couplingOf witnessGraph ((1 : ℂ) / 2) x y).im = 0 := by
+    intro x y
+    unfold couplingOf
+    by_cases h : witnessGraph.Adj x y
+    · rw [if_pos h]; norm_num
+    · rw [if_neg h, Complex.zero_im]
+  have hJ_pos_G : ∀ x y : Fin 4, witnessGraph.Adj x y →
+      0 < (couplingOf witnessGraph ((1 : ℂ) / 2) x y).re := by
+    intro x y h
+    unfold couplingOf
+    rw [if_pos h]; norm_num
+  have hJ_off : ∀ x y : Fin 4, ¬ witnessGraph.Adj x y →
+      couplingOf witnessGraph ((1 : ℂ) / 2) x y = 0 := by
+    intro x y h
+    unfold couplingOf
+    exact if_neg h
+  have hJ_nn : ∀ x y : Fin 4, 0 ≤ (couplingOf witnessGraph ((1 : ℂ) / 2) x y).re := by
+    intro x y
+    by_cases h : witnessGraph.Adj x y
+    · exact (hJ_pos_G x y h).le
+    · rw [hJ_off x y h, Complex.zero_re]
+  have hJ_bipartite : ∀ x y : Fin 4, witnessMarker x = witnessMarker y →
+      couplingOf witnessGraph ((1 : ℂ) / 2) x y = 0 := by
+    intro x y hxy
+    unfold couplingOf
+    exact if_neg fun hadj => witness_bipartite x y hadj hxy
+  obtain ⟨_μ, _hμ_def, _hrank, ⟨Φ, hΦne, hΦnorm, hΦeig⟩, huniv⟩ :=
+    tasaki_problem_2_5_c_singleSite_spinSquare_expectation
+      witnessMarker witnessGraph 1 witness_connected witness_bipartite
+      witness_balanced (le_refl 1) hJ_real
+      (couplingOf_real witnessGraph (J := (1 : ℂ) / 2) (by norm_num))
+      (couplingOf_symm witnessGraph ((1 : ℂ) / 2)) hJ_nn hJ_bipartite hJ_pos_G hJ_off
   refine ⟨Φ, hΦne, hΦnorm, fun x => ?_⟩
   obtain ⟨h1, h2, h3⟩ := huniv hΦne hΦnorm hΦeig x
   exact ⟨by rw [h1]; norm_num, by rw [h2]; norm_num, by rw [h3]; norm_num⟩
