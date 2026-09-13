@@ -1912,7 +1912,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "25ec84116661c9927d3a6fe72288fb3901b2d0c844db10737ff07f9648f038a4"
+SCRIPT_SOURCE_SHA256 = "6c3a6bddb711e85e0a6fa99758ded67caf81e3a222f92a253bec401786a13ef5"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -2874,8 +2874,9 @@ MOVED_PROSE_CORRECTIONS = (
         "`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`.",
     ),
     (
-        # The legacy page's closing prose paragraph repeated the same overclaim as the table row
-        # above (correction #6): PR #5465 removed the spectral shift `c` / `hc_strict` / `μ < c`
+        # The legacy page's closing prose paragraph repeated the same overclaim as the PARTIAL
+        # table-row correction directly above (the one replacing the full-Hilbert-space
+        # "DONE" overclaim): PR #5465 removed the spectral shift `c` / `hc_strict` / `μ < c`
         # conjunct from `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` (#869),
         # so `tasaki_2_5_theorem_2_3`'s hypothesis bundle (itself untouched, still carrying `c`
         # and `μ < c`) no longer matches #869 "exactly". This is prose, not a table row, so it is

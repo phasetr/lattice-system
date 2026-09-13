@@ -4,16 +4,16 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralFullHilbertEigenvec
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralUniqueness
 
 /-!
-# Structural Tasaki §2.5 Theorem 2.2 bundled full-Hilbert form (no `h_intermediate`)
+# Structural Tasaki §2.5 Theorem 2.2, sector form lifted through the sector embedding
 
-(Thm23-#3887.15): structural variant of
-`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full_legacy` bundling
+(Thm23-#3887.15): assembles
 - existence (Thm23-#3887.13 `exists_marshallSign_eigenvector_heisenbergHamiltonianS_full`)
 - support (zero outside sector — direct from `magSectorEmbedding_apply_of_not_mem`)
 - uniqueness (Thm23-#3887.14
   `marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector`)
-into the textbook statement of the §2.5 Theorem 2.2 ground state on the actual quantum
-Heisenberg Hamiltonian, with `(hA_ne, hB_ne, hN)` instead of `h_intermediate`.
+into `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`, with
+`(hA_ne, hB_ne, hN)` instead of `h_intermediate`; see that theorem's docstring for the
+exact scope of what is and is not proved.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, §2.5 Theorem 2.2, pp. 39–43.

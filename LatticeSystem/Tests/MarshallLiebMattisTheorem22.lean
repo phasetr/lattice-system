@@ -15,28 +15,13 @@ pins that binder-free signature, so re-introducing a `(c : ℝ)` binder, a stric
 `∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c` for it, or a `μ < c` conjunct comparing the
 eigenvalue against it breaks the build.
 
-**It establishes** that the per-sector Perron–Frobenius proposition — existence of a real
-eigenvalue and a strictly positive sector eigenvector for the dressed Heisenberg matrix,
-vanishing outside the sector, and uniqueness up to a positive scalar among Marshall-positive
-sector-supported competitors — is available from the coupling, spin and cardinality hypotheses
-alone. **It does not establish** anything about the printed theorem's connectedness hypothesis:
-the declaration assumes strict positivity on every cross-sublattice pair, which is strictly
-stronger. Nor does it reach the printed theorem's whole-Hilbert-space uniqueness or its
-`S_tot = 0` conjunct: neither follows from a statement about a single sector, and neither is
-established at the printed theorem's generality (an arbitrary connected bipartite lattice).
-Related results exist elsewhere in this repository. `ringSym_ground_uniqueness` gives
-whole-Hilbert-space uniqueness for the even antiferromagnetic Heisenberg ring (every even `L ≥ 2`,
-every `N ≥ 1`) through the connected-bipartite chain, not the complete-bipartite chain: for
-`L ≥ 6` the ring coupling does not even satisfy the complete-bipartite positivity hypothesis
-(it vanishes on non-adjacent cross-sublattice pairs). Separately,
-`tasaki23_sector_lift_and_casimir_zero_of_card_eq` gives `S_tot = 0` in the balanced-cardinality
-case through the complete-bipartite chain, with no `h_intermediate` hypothesis. Whole-Hilbert-space
-uniqueness is also available at general balanced complete-bipartite generality, through the
-complete-bipartite chain rather than the connected one, by
-`exists_t23_commonE_and_heisHamS_fullEig_finrank_le_one_of_casLadder_t23_pf`; its `hT23` premise
-is discharged for any balanced bipartition by
-`tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive`, and its diagonal-bound constants `c`,
-`c_toy` by `exists_strict_diag_bound_dressedHeisenbergSReMatrix`.
+See `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`'s own docstring for the
+exact scope of what this declaration establishes and does not. Related results proved elsewhere:
+`ringSym_ground_uniqueness` (whole-Hilbert-space uniqueness, AFM ring), and, at general balanced
+complete-bipartite generality,
+`exists_t23_commonE_and_heisHamS_fullEig_finrank_le_one_of_casLadder_t23_pf`
+(whole-Hilbert-space uniqueness) and, conditionally on a supplied sector eigenvector,
+`tasaki23_sector_lift_and_casimir_zero_of_card_eq` (`S_tot = 0`).
 -/
 
 namespace LatticeSystem.Tests.MarshallLiebMattisTheorem22

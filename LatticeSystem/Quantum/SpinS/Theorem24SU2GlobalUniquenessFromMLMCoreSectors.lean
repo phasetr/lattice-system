@@ -78,10 +78,15 @@ theorem tasaki23PredictedCasimirValue_eq_zero_of_card_eq
     tasaki23PredictedTotalSpin_eq_zero_of_card_eq A N h_card_eq]
   ring
 
-/-- **Symmetric-sector lift with zero total Casimir**: the structural
-Theorem 2.3 PF/Casimir lift specializes in the balanced-cardinality case to a
-full Heisenberg eigenvector whose total-Casimir eigenvalue is `0`.  This is
-the equality-case input needed for the strict outside-sector MLM endpoint. -/
+/-- **Symmetric-sector lift with zero total Casimir, conditional on a supplied sector
+eigenvector**: given a balanced sublattice split (`h_card_eq`), an admissible sector `M`
+(`hM`), and a Marshall-positive real eigenvector `v` of the sector-restricted Heisenberg
+matrix at eigenvalue `μ` (`hv_pos`, `hReEig` -- both hypotheses, not derived here), the
+full-Hilbert-space vector obtained by embedding `v` through the sector embedding is both a
+Heisenberg eigenvector at `μ` and a total-Casimir eigenvector at `0`. This is the
+equality-case input needed for the strict outside-sector MLM endpoint; it does **not** by
+itself assert `S_tot = 0` for every ground state at this generality, since a caller must
+still supply `v`, `hv_pos` and `hReEig`. -/
 theorem tasaki23_sector_lift_and_casimir_zero_of_card_eq
     (A : V → Bool) (N : ℕ) (c c_toy : ℝ)
     (h_card_eq : (Finset.univ.filter (fun x : V => A x = true)).card =
