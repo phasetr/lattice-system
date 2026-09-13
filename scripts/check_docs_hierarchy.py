@@ -1659,7 +1659,7 @@ def _approved_replacements(text: str) -> str:
             "formalized separately, as `tasaki_problem_2_2_c_rotated_upDown_eq` in "
             "`Quantum/UniformRotationProblem22c.lean`. | `Quantum/SU2Integral.lean` |",
         )
-        # TSK-067 (PR #5464) generalizes the Problem 2.5.b chain to drop its local
+        # PR #5464 generalizes the Problem 2.5.b chain to drop its local
         # positive-degree hypothesis (an isolated centre's star is the zero operator, whose
         # minimum eigenvalue `0` is itself `≥ -S`, so the printed inequality never needed a
         # degree bound) and adds the capstone `tasaki_problem_2_5_b_groundEnergy_lower_bound`
@@ -1856,7 +1856,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "4d0681a8746428c186c7c78bb33de06f8a1a256ea6527a36ca3e79dece393fe2"
+SCRIPT_SOURCE_SHA256 = "88e99b6fa9c5bfd11eacf26bb2d0ce2c30a5dc2a60d5a2ab8bb195e01be406c5"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -2744,14 +2744,16 @@ MOVED_PROSE_CORRECTIONS = (
         "problem asks to verify this and to characterize states that fail to be SU(2)-invariant.",
     ),
     (
-        # TSK-067 (PR #5464): the Problem 2.5.b chain drops its local positive-degree hypothesis
+        # PR #5464: the Problem 2.5.b chain drops its local positive-degree hypothesis
         # (an isolated centre's star is the zero operator, minimum eigenvalue 0, itself >= -S) and
-        # is capped by the new capstone; the two retired closed-form degree wrappers this bullet
+        # is capped by the capstone; the two retired closed-form degree wrappers this bullet
         # named no longer exist.
         "- **DONE: Problem 2.5.b.** The Anderson lower bound on the ground-state energy is "
         "`tasaki_problem_2_5_b_groundEnergy_lower_bound`; no degree hypothesis is needed, since "
         "at an isolated site the local star Hamiltonian is the zero operator, whose minimum "
-        "eigenvalue is zero.",
+        "eigenvalue is zero. The capstone carries the `[IsAlgClosed ℂ]` instance argument, "
+        "required for elaboration and always satisfiable for ℂ; it is not a hypothesis of the "
+        "printed theorem.",
         "- **DONE: Problem 2.5.b.** The graph-local lower-bound chain reaches the closed-form "
         "degree wrappers `tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_closed_form` "
         "and `tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_degree_closed_form`.",

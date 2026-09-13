@@ -18323,7 +18323,10 @@ Marshall sign machinery + time-reversal action; see
   2.5.a).  The graph-local chain reaches the capstone
   \texttt{tasaki\_problem\_2\_5\_b\_groundEnergy\_lower\_bound}, which proves
   $E_{\mathrm{GS}}\ge-\sum_{x\in A}S\bigl(1+|N(x)|S\bigr)$ on a finite
-  bipartite lattice, with no hypothesis on the local degrees.
+  bipartite lattice, with no hypothesis on the local degrees.  The capstone
+  carries the \texttt{[IsAlgClosed \(\mathbb C\)]} instance argument, required
+  for elaboration and always satisfiable for \(\mathbb C\); it is not a
+  hypothesis of the printed theorem.
 \item \textbf{DONE} Problem 2.5.c (single-site squared expectation
   $\langle\Phi_{\mathrm{GS}},(\hat S_x^{(\alpha)})^2
   \Phi_{\mathrm{GS}}\rangle = S(S+1)/3$ in the AFM ground state).  The
@@ -20459,7 +20462,7 @@ imports the abstract Hamiltonian and energy companion, and
         \(\hat{\mathbf S}_x\cdot\hat{\mathbf S}_y
         =\hat{\mathbf S}_y\cdot\hat{\mathbf S}_x\).  This fixes the coefficient
         convention for Tasaki's local-cluster decomposition (Tasaki, Springer
-        2020, Problem~2.5.b, p.~38; solution p.~497).  (The bipartite
+        2020, Problem~2.5.b, p.~38; solution pp.~497--498).  (The bipartite
         decomposition proves itself directly, without going through the
         unit-coupling analogue \(\hat H_G(1)=\sum_x h_x\).)
   \item Problem 2.5.b single-cluster transport bridge.  The declaration
@@ -20588,12 +20591,14 @@ available for \(1\le z\) under the explicit
 \texttt{[IsAlgClosed \(\mathbb C\)]} hypothesis.  The remaining optional
 cleanup is to discharge that hypothesis by replacing the algebraically closed
 eigenvector-extraction bridge with a constructive finite-dimensional spectral
-decomposition if that later becomes useful.  Under the same
-\texttt{[IsAlgClosed \(\mathbb C\)]} hypothesis, Problem~2.5.b itself is
-closed: the capstone
+decomposition if that later becomes useful.  Problem~2.5.b itself is closed
+unconditionally: the capstone
 \texttt{tasaki\_problem\_2\_5\_b\_groundEnergy\_lower\_bound} proves the
 printed lower bound on any finite bipartite graph and any spin, with no
-degree, connectedness, or \(|A|=|B|\) hypothesis.
+degree, connectedness, or \(|A|=|B|\) hypothesis.  It carries the
+\texttt{[IsAlgClosed \(\mathbb C\)]} instance argument, required for
+elaboration and always satisfiable for \(\mathbb C\); this is not a
+hypothesis of the printed theorem.
 
 \subsection*{DONE: Spin-$S$ saturated ferromagnetic state (Tasaki §2.4 generalised)}
 \label{subsec:spin-s-all-aligned}

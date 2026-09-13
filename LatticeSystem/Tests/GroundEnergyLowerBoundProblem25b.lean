@@ -20,7 +20,7 @@ Pinned:
   own module does not provide mathlib's `Complex.isAlgClosed`. That instance is always
   satisfiable, and this fixture imports it so that the concrete controls below can discharge it.
 
-Controls, all compiling now from existing API (none of them establishes tightness of the bound
+Controls, all compiling from existing API (none of them establishes tightness of the bound
 in general; see each doc comment for what it does and does not show):
 * PC1 (`isolatedVertexGraph`, `sublatticeAneOne`) — a three-site graph with a single edge `0`–`1`
   and vertex `2` isolated: `hA` holds and `¬ (1 ≤ degree 2)`, so the retired positive-degree
@@ -44,9 +44,9 @@ open LatticeSystem.Lattice LatticeSystem.Quantum SimpleGraph Matrix
 
 /-! ## R0: the capstone signature pin -/
 
-/-- **R0.** Restates the exact signature of the planned capstone
-`tasaki_problem_2_5_b_groundEnergy_lower_bound` as a shim `example`, so that Red fails only with
-`unknown identifier` on the new name. Establishes nothing about the mathematics; it is a
+/-- **R0.** Restates the exact signature of the capstone
+`tasaki_problem_2_5_b_groundEnergy_lower_bound` as an `example` discharged by direct application.
+Establishes nothing about the mathematics beyond what the capstone itself proves; it is a
 syntactic pin of the capstone's exact hypotheses (no `hdeg`, `filter A`, coupling `1/2`, the
 `[IsAlgClosed ℂ]` binder). -/
 example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] [IsAlgClosed ℂ]
@@ -89,8 +89,8 @@ theorem isolatedVertexGraph_isBipartite :
 
 /-- **PC1b.** The vertex `2 ∈ A` is isolated (`¬ (1 ≤ degree 2)`), so none of the retired
 positive-degree wrappers can apply to it. Establishes that dropping `hdeg` is load-bearing
-(the capstone, unlike the retired wrappers, is expected to still apply here); proves nothing
-about the value of the ground energy. -/
+(the capstone, unlike the retired wrappers, applies here, as **PC1c** below shows); proves
+nothing about the value of the ground energy. -/
 theorem isolatedVertexGraph_degree_two_lt_one :
     ¬ (1 ≤ isolatedVertexGraph.degree (2 : Fin 3)) := by
   have hnbr : isolatedVertexGraph.neighborFinset (2 : Fin 3) = ∅ := by decide
@@ -176,10 +176,10 @@ theorem heisenbergHamiltonianOnGraphS_pathGraph2_eq_spinHalfDot :
 /-- **PC2.** `λmin (H_{1/2}) ≤ -3/4` on `pathGraph 2` at `N = 1`, proved independently of the
 capstone via the variational (Rayleigh-quotient) route at the singlet witness `psi0`.
 Establishes that the printed bound is not vacuous and is sharp at least somewhere; the R0-
-dependent application below is expected to match it as an equality (the bound attained).
-Does *not* establish sharpness in general (Remark on Lemma A.5's commutation-freeness: the
-bound is typically strict once two stars share a neighbour, which cannot happen on a single
-edge). -/
+dependent application below (**PC2 (R0-dependent)**) matches it as an equality (the bound
+attained). Does *not* establish sharpness in general (Remark on Lemma A.5's
+commutation-freeness: the bound is typically strict once two stars share a neighbour, which
+cannot happen on a single edge). -/
 theorem pathGraph2_lambdaMin_le_neg_three_quarters :
     hermitianMinEigenvalue
       (heisenbergHamiltonianOnGraphS_isHermitian (SimpleGraph.pathGraph 2)
