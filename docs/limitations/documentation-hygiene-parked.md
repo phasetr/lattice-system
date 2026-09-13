@@ -299,6 +299,18 @@ phrases begin guarding the published state; or the next approved change to
 `scripts/check_generated_site.py`, which is the occasion on which the self-test can be strengthened
 in the same change.
 
+**Reopened.** Pull request #5467 changed `scripts/check_generated_site.py` twice
+(`01576a5e6360f63c22b3fccbd517a89d8fd4b533`, then a comment-only fix at
+`4ebac90046f2fac4a512b143b609f6303f8317a6`); the earlier of the two is the next approved change to
+the script, so the second limb of the reopen condition has fired. The condition's own wording makes
+strengthening the self-test optional in the change that reopens it, so this pull request does not
+do so; the entry stays reopened rather than parked. The obligation is tracked as the sixth defect of
+a separate guard-hygiene change that already carries five: a site fixture hardcoding zero
+project-original records where there are two, a structure-rejection check with no anti-vacuity
+guard, the plain self-test flag never reaching the staged mutation tests at all, a name-token search
+needing keyword and binder filtering, and a source-item equation locator that cannot absorb the
+printed Hamiltonian's number without re-widening a locator this pull request deliberately narrowed.
+
 **Cadence.** Re-measure with the commands above at every 20-PR refactor cycle and replace the
 figures here with the new ones.
 
