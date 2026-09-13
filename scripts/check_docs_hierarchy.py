@@ -203,12 +203,12 @@ LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
 CATALOGUE_BASELINE_SLICE = slice(216, 2731)
 # Pins the published catalogue text; this module's docstring records exactly what is hashed
 # and how the pin is legitimately updated.
-APPROVED_CHANGES_SHA256 = "28514d895e62e01077d23630f9541311190708e0b7c04ed7d24773a469969b28"
+APPROVED_CHANGES_SHA256 = "3cadfe2fff0417fd9b3f4a7a79b8cb9076b325ffefe8bce7c70a9d0cf79b79da"
 # Pins the row sequence `main()` actually compares the legacy pages against. The text pin above
 # does not reach it: the rows are derived from the transformed text by `table_data_rows`, which
 # is outside the pinned text, so without this pin a row skipped there would go unpublished with
 # the text pin undisturbed.
-PUBLISHED_ROWS_SHA256 = "be576e454cc1f6c766cd0167cd95baac053c11d4f8a475c8140a91f629f2d00a"
+PUBLISHED_ROWS_SHA256 = "66c5ac4f2d26b4d891309c663a58f7e3751a020fd11de7370eafe226a6adb081"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -1831,6 +1831,23 @@ def _approved_replacements(text: str) -> str:
             "comparison, neither of which #869 states any more — and asserts existence of a "
             "common GS energy `μ`",
         )
+        .replace(
+            # Two residual defects in the previous correction's own wording: (1) "any more" is
+            # session-relative (round 4 already made the Lean side current-state); (2) "carries
+            # ... the resulting `μ < c` comparison" attaches a conclusion conjunct of
+            # `tasaki_2_5_theorem_2_3` to "the hypothesis bundle" -- `hc_strict : ∀ σ, ... < c`
+            # is the hypothesis, `μ < c` sits inside the existential conclusion
+            # (`Theorem23StructuralBipartiteToy.lean:56`). Split into a hypothesis clause and a
+            # conclusion clause and dropped "any more".
+            "non-empty sublattices, and sector non-emptiness, but additionally carries its own "
+            "spectral shift `c` strictly above the dressed diagonal and the resulting `μ < c` "
+            "comparison, neither of which #869 states any more — and asserts existence of a "
+            "common GS energy `μ`",
+            "non-empty sublattices, and sector non-emptiness, but additionally requires its own "
+            "spectral shift `c` strictly above the dressed diagonal as a hypothesis and "
+            "concludes `μ < c`, neither of which #869 states — and asserts existence of a "
+            "common GS energy `μ`",
+        )
     )
 
 
@@ -1895,12 +1912,12 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "068d720a4c01df38d7d4af3a7d99818b2b00c865b383b1a46bd00341e765a172"
+SCRIPT_SOURCE_SHA256 = "25ec84116661c9927d3a6fe72288fb3901b2d0c844db10737ff07f9648f038a4"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
-APPROVED_ENTRIES_SHA256 = "49ab92a0d52a103f38ac5f59adde7eeceb8541861a9488739d9592b4c8e2456e"
+APPROVED_ENTRIES_SHA256 = "d1d4c041d9dc532c58130cc13f8c20ed4c9da0f9ed957edfb298ddf5b44c8b87"
 
 # The only text `SCRIPT_SOURCE_SHA256` does not hash: the digits these four pins carry. Each is
 # restated by the very edit it pins, and a digest over its own value would have no fixed point.
@@ -2798,11 +2815,11 @@ MOVED_PROSE_CORRECTIONS = (
         "and `tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_degree_closed_form`.",
     ),
     (
-        # PR #5465's docs-sync round 4 adds a clause the previous correction (below) does not
-        # know about yet: whole-Hilbert-space uniqueness is separately proved (through the
+        # This correction inverts a clause added to the published text after the correction
+        # below was written: whole-Hilbert-space uniqueness is separately proved (through the
         # complete-bipartite chain, at general balanced generality rather than the printed
-        # theorem's connected one) by a declaration not previously cited here. Undoing this
-        # clause first restores the exact text the correction below expects as its own
+        # theorem's connected one) by a declaration the correction below does not cite. Undoing
+        # this clause first restores the exact text the correction below expects as its own
         # "published" field, so the chain still reaches the same historical baseline.
         "chain by `tasaki23_sector_lift_and_casimir_zero_of_card_eq`, with no "
         "`h_intermediate` hypothesis. Whole-Hilbert-space uniqueness is also proved "
@@ -2865,8 +2882,8 @@ MOVED_PROSE_CORRECTIONS = (
         # corrected here rather than in `_approved_replacements`.
         "The hypothesis bundle shares its coupling and cardinality hypotheses with "
         "`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` (#869), but "
-        "additionally carries its own spectral shift `c` and the resulting `μ < c` comparison, "
-        "which #869 no longer states.",
+        "additionally requires its own spectral shift `c` as a hypothesis and concludes "
+        "`μ < c`, which #869 does not state.",
         "The hypothesis bundle matches "
         "`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` (#869) exactly.",
     ),
