@@ -1,4 +1,6 @@
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralMLMFull
+import LatticeSystem.Quantum.SpinS.ConnectedTheorem23
+import LatticeSystem.Quantum.SpinS.Theorem24SU2GlobalUniquenessFromMLMCore
 
 /-!
 # Signature pin: Marshall–Lieb–Mattis without the scaffolding shift binder
@@ -22,11 +24,17 @@ complete-bipartite generality,
 `exists_t23_commonE_and_heisHamS_fullEig_finrank_le_one_of_casLadder_t23_pf`
 (whole-Hilbert-space uniqueness) and, conditionally on a supplied sector eigenvector,
 `tasaki23_sector_lift_and_casimir_zero_of_card_eq` (`S_tot = 0`).
+
+This module also pins the not-yet-existing connected-generality capstone
+`tasaki_2_5_theorem_2_2_of_connected` (Theorem 2.2, p. 39, at connectedness
+instead of complete-bipartite positivity, with no sector restriction), plus
+the four-vertex-path discriminating witness for that hypothesis change.
 -/
 
 namespace LatticeSystem.Tests.MarshallLiebMattisTheorem22
 
 open LatticeSystem.Quantum
+open Matrix Module
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
@@ -61,23 +69,88 @@ example (A : V → Bool) {J : V → V → ℂ} {M : ℕ}
   marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full
     A hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hA_ne hB_ne hN
 
-/-- **Gap control (not the discriminating fixture).** The math note's discriminating
-control needs a connected-`G` Theorem 2.2 capstone (C1∧C2∧C3∧C4) that this repository does not
-carry (connected-`G` layers of Theorem 2.3 do exist, e.g.
-`tasaki_2_5_theorem_2_3_data_of_connected`), so it cannot be pinned by applying anything here:
-the declaration above has
-no `G`/support binder at all, only `hJ_pos` over *every* crossing pair of `A`. What can be pinned
-instead is the combinatorial fact that makes `hJ_pos` strictly stronger than connectedness (the
-math note's Prop. "strictly stronger", §Delta 3): on the path on four vertices `0,1,2,3` with
-sublattices `A = {0, 2}`, `B = {1, 3}`, the pair `{0, 3}` is a crossing pair with no path edge, so
-this declaration's `hJ_pos` demands positivity at a pair the path does not bond. This is the
-exact obstruction that a path-supported coupling satisfies while this declaration's `hJ_pos`
-hypothesis excludes it. -/
+/-- **Discriminating witness (four-vertex path, not the four-cycle).** On
+`V = Fin 4`, `A = {0, 2}`, `B = {1, 3}`, the path `pathGraph 4` (edges
+`{0,1},{1,2},{2,3}`) is connected (H1, Footnote 28 p. 33), bipartite for this
+`A` (H2, §2.5 p. 37) and balanced (H3, `|A| = |B| = 2`), so it satisfies every
+hypothesis of the new connected capstone. Yet the crossing pair `{0,3}` is not
+a path edge, so it violates the old `hJ_pos` of
+`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`, which
+demands positivity at *every* crossing pair of `bipartiteCompleteGraphOf A`.
+The four-cycle `cycleGraph 4` does **not** discriminate: with this same `A` its
+edge set `{0,1},{1,2},{2,3},{3,0}` is *exactly* the four crossing pairs of `A`,
+so `cycleGraph 4 = bipartiteCompleteGraphOf A` as graphs and the two hypotheses
+coincide on it (on 4 vertices split 2+2 there are exactly four crossing pairs,
+and a bipartite graph carrying all of them is complete bipartite; the path
+omits `{0,3}` and is the smallest witness that does). -/
 example :
-    (bipartiteCompleteGraphOf (fun x : Fin 4 => decide (x = 0 ∨ x = 2))).Adj 0 3 ∧
+    (SimpleGraph.pathGraph 4).Connected ∧
+      (∀ x y : Fin 4, (SimpleGraph.pathGraph 4).Adj x y →
+        decide (x = 0 ∨ x = 2) ≠ decide (y = 0 ∨ y = 2)) ∧
+      (Finset.univ.filter (fun x : Fin 4 => decide (x = 0 ∨ x = 2) = true)).card =
+        (Finset.univ.filter (fun x : Fin 4 => decide (x = 0 ∨ x = 2) = false)).card ∧
+      (bipartiteCompleteGraphOf (fun x : Fin 4 => decide (x = 0 ∨ x = 2))).Adj 0 3 ∧
       ¬ (SimpleGraph.pathGraph 4).Adj (0 : Fin 4) 3 := by
-  refine ⟨?_, ?_⟩
+  refine ⟨SimpleGraph.pathGraph_connected 3, ?_, by decide, ?_, ?_⟩
+  · intro x y hxy
+    fin_cases x <;> fin_cases y <;> simp_all [SimpleGraph.pathGraph_adj]
   · simp
   · simp [SimpleGraph.pathGraph_adj]
+
+/-- **Cycle non-discrimination (documentation).** With the same marking the
+four-cycle's edges coincide exactly with the complete bipartite graph, so it
+cannot serve as the discriminating witness above: it satisfies old and new
+hypotheses alike. -/
+example :
+    ∀ x y : Fin 4, (SimpleGraph.cycleGraph 4).Adj x y ↔
+      (bipartiteCompleteGraphOf (fun x : Fin 4 => decide (x = 0 ∨ x = 2))).Adj x y := by
+  decide
+
+/-- **Signature pin (RED — `tasaki_2_5_theorem_2_2_of_connected` does not exist
+yet).** Pins the connected-generality Theorem 2.2 capstone: Tasaki, *Physics
+and Mathematics of Quantum Many-Body Systems*, Springer 2020, §2.5 Theorem 2.2,
+p. 39, eq. (2.5.4), p. 39, Hamiltonian (2.5.1), p. 37, general couplings by
+Remark (2.5.13), p. 43; connectedness is Footnote 28, p. 33. The complete
+bipartite graph is never a hypothesis here — it is only the bond graph of the
+proof's toy Hamiltonian (2.5.10), p. 41.
+Hypotheses: `G` connected (H1) and bipartite w.r.t. `A` (H2), balanced
+sublattices (H3), `N ≥ 1` (H4), `J` positive exactly on the edges of `G` and
+zero off them (H5/(2.5.13)). Conclusions, all four conjuncts: (C1) the full
+eigenspace at `μ` has `finrank ≤ 1` and `μ` is a global lower bound on every
+real eigenvalue; (C3) a Marshall-signed eigenvector on the balanced sector
+`|A| * N`; (C4) its sector coefficients are all strictly positive; (C2) that
+eigenvector is annihilated by `totalSpinSSquared`, i.e. `S_tot = 0`. Building
+this module must fail with `unknown identifier
+'tasaki_2_5_theorem_2_2_of_connected'`, never with a bad-import error. -/
+example (A : V → Bool) (G : SimpleGraph V) {J : V → V → ℂ}
+    (hGconn : G.Connected)
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (h_card_eq : (Finset.univ.filter (fun x : V => A x = true)).card =
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card)
+    (hN : 1 ≤ N)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
+    (hJ_off : ∀ x y, ¬ G.Adj x y → J x y = 0) :
+    ∃ μ : ℝ,
+      finrank ℂ ↥(End.eigenspace
+          (Matrix.toLin' (heisenbergHamiltonianS J N)) (μ : ℂ)) ≤ 1 ∧
+      (∀ {μM : ℝ} {φ : (V → Fin (N + 1)) → ℂ}, φ ≠ 0 →
+        (heisenbergHamiltonianS J N).mulVec φ = (μM : ℂ) • φ → μ ≤ μM) ∧
+      ∃ v : magConfigS V N
+          ((Finset.univ.filter (fun x : V => A x = true)).card * N) → ℝ,
+        (∀ σ, 0 < v σ) ∧
+        (heisenbergHamiltonianS J N).mulVec
+            (magSectorEmbedding (fun τ => ((marshallSignS A τ.1).re * v τ : ℝ))) =
+          (μ : ℂ) •
+            magSectorEmbedding (fun τ => ((marshallSignS A τ.1).re * v τ : ℝ)) ∧
+        (totalSpinSSquared V N).mulVec
+            (magSectorEmbedding (fun τ => ((marshallSignS A τ.1).re * v τ : ℝ))) = 0 :=
+  tasaki_2_5_theorem_2_2_of_connected
+    A G N hGconn hGbip h_card_eq hN hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite
+    hJ_pos_G hJ_off
 
 end LatticeSystem.Tests.MarshallLiebMattisTheorem22
