@@ -30,7 +30,13 @@ every `N ≥ 1`) through the connected-bipartite chain, not the complete-biparti
 `L ≥ 6` the ring coupling does not even satisfy the complete-bipartite positivity hypothesis
 (it vanishes on non-adjacent cross-sublattice pairs). Separately,
 `tasaki23_sector_lift_and_casimir_zero_of_card_eq` gives `S_tot = 0` in the balanced-cardinality
-case through the complete-bipartite chain, with no `h_intermediate` hypothesis.
+case through the complete-bipartite chain, with no `h_intermediate` hypothesis. Whole-Hilbert-space
+uniqueness is also available at general balanced complete-bipartite generality, through the
+complete-bipartite chain rather than the connected one, by
+`exists_t23_commonE_and_heisHamS_fullEig_finrank_le_one_of_casLadder_t23_pf`; its `hT23` premise
+is discharged for any balanced bipartition by
+`tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive`, and its diagonal-bound constants `c`,
+`c_toy` by `exists_strict_diag_bound_dressedHeisenbergSReMatrix`.
 -/
 
 namespace LatticeSystem.Tests.MarshallLiebMattisTheorem22
@@ -70,9 +76,11 @@ example (A : V → Bool) {J : V → V → ℂ} {M : ℕ}
   marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full
     A hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hA_ne hB_ne hN
 
-/-- **Gap control (not the discriminating fixture yet).** The math note's discriminating
-control needs a connected-`G` capstone (PR-2/3 of the design) that this repository does not
-carry, so it cannot be pinned by applying anything here: the declaration above has
+/-- **Gap control (not the discriminating fixture).** The math note's discriminating
+control needs a connected-`G` Theorem 2.2 capstone (C1∧C2∧C3∧C4) that this repository does not
+carry (connected-`G` layers of Theorem 2.3 do exist, e.g.
+`tasaki_2_5_theorem_2_3_data_of_connected`), so it cannot be pinned by applying anything here:
+the declaration above has
 no `G`/support binder at all, only `hJ_pos` over *every* crossing pair of `A`. What can be pinned
 instead is the combinatorial fact that makes `hJ_pos` strictly stronger than connectedness (the
 math note's Prop. "strictly stronger", §Delta 3): on the path on four vertices `0,1,2,3` with

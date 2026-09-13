@@ -18297,7 +18297,14 @@ Marshall sign machinery + time-reversal action; see
   non-adjacent cross-sublattice pairs). Separately, $S_{\rm tot} = 0$ in the
   balanced-cardinality case is proved through the complete-bipartite chain
   by \texttt{tasaki23\_sector\_lift\_and\_casimir\_zero\_of\_card\_eq}, with
-  no \texttt{h\_intermediate} hypothesis.
+  no \texttt{h\_intermediate} hypothesis. Whole-Hilbert-space uniqueness is
+  also proved at general balanced complete-bipartite generality, through the
+  complete-bipartite chain rather than the connected one, by
+  \texttt{exists\_t23\_commonE\_and\_heisHamS\_fullEig\_finrank\_le\_one\_of\_casLadder\_t23\_pf}:
+  its Theorem~2.3 premise is discharged for any balanced bipartition by
+  \texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_bipartiteCompletePositive}, and its
+  diagonal-bound constants by
+  \texttt{exists\_strict\_diag\_bound\_dressedHeisenbergSReMatrix}.
   The coupling hypothesis carried is also stronger than the printed one:
   strict positivity is demanded on every cross-sublattice pair, i.e.\ on
   every edge of the complete bipartite graph on $A \sqcup B$, whereas

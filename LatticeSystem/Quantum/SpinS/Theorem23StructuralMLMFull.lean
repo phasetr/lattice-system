@@ -108,7 +108,7 @@ theorem marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full
 
 /-- **The Marshall-positive sector eigenvalue lies below any strict bound on the dressed
 diagonal.** This is the opt-in form of the comparison that
-`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` no longer carries as a
+`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` does not carry as a
 conjunct: a caller that has its own shift `c` above every dressed diagonal entry recovers
 `μ < c` for the Marshall-positive sector eigenvector it obtained, without that shift having to
 appear in the bundled statement.  Both eigenvalues are pinned to the same sector value by the

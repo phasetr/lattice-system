@@ -87,7 +87,14 @@ follows:
   on non-adjacent cross-sublattice pairs). Separately, `S_tot = 0` in the
   balanced-cardinality case is proved through the complete-bipartite chain by
   `tasaki23_sector_lift_and_casimir_zero_of_card_eq`, with no
-  `h_intermediate` hypothesis. Assembled through
+  `h_intermediate` hypothesis. Whole-Hilbert-space uniqueness is also proved
+  at general balanced complete-bipartite generality, through the
+  complete-bipartite chain rather than the connected one, by
+  `exists_t23_commonE_and_heisHamS_fullEig_finrank_le_one_of_casLadder_t23_pf`:
+  its Theorem 2.3 premise is discharged for any balanced bipartition by
+  `tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive`, and its
+  diagonal-bound constants by
+  `exists_strict_diag_bound_dressedHeisenbergSReMatrix`. Assembled through
   PRs #794-#870, including the bundled sector theorem
   `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`.
 - **DONE: Tasaki Theorem 2.3.**  The current public statement is
