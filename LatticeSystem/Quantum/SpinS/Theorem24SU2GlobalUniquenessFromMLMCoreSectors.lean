@@ -80,11 +80,12 @@ theorem tasaki23PredictedCasimirValue_eq_zero_of_card_eq
 
 /-- **Symmetric-sector lift with zero total Casimir, conditional on a supplied sector
 eigenvector**: given a balanced sublattice split (`h_card_eq`), an admissible sector `M`
-(`hM`), and a Marshall-positive real eigenvector `v` of the sector-restricted Heisenberg
+(`hM`), and a strictly positive real vector `v` whose Marshall-signed multiple
+`fun σ => (marshallSignS A σ.1).re * v σ` is an eigenvector of the sector-restricted Heisenberg
 matrix at eigenvalue `μ` (`hv_pos`, `hReEig` -- both hypotheses, not derived here), the
-full-Hilbert-space vector obtained by embedding `v` through the sector embedding is both a
-Heisenberg eigenvector at `μ` and a total-Casimir eigenvector at `0`. This is the
-equality-case input needed for the strict outside-sector MLM endpoint; it does **not** by
+full-Hilbert-space vector obtained by embedding that Marshall-signed vector through the sector
+embedding is both a Heisenberg eigenvector at `μ` and a total-Casimir eigenvector at `0`. This is
+the equality-case input needed for the strict outside-sector MLM endpoint; it does **not** by
 itself assert `S_tot = 0` for every ground state at this generality, since a caller must
 still supply `v`, `hv_pos` and `hReEig`.
 

@@ -1912,7 +1912,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "ced7477e17967bae0c76033a6cedd200e54310e31646201b508621a4b150886d"
+SCRIPT_SOURCE_SHA256 = "99e1e74ebc905b4055ced64939d163f217fac14fe060833976a5d5e575c3a191"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -2863,7 +2863,8 @@ MOVED_PROSE_CORRECTIONS = (
         "complete-bipartite chain: for `L >= 6` the ring coupling does not even "
         "satisfy the complete-bipartite positivity hypothesis (it vanishes on "
         "non-adjacent cross-sublattice pairs). Separately, `S_tot = 0` in the "
-        "balanced-cardinality case is proved through the complete-bipartite "
+        "balanced-cardinality case is proved, conditionally on a supplied "
+        "sector eigenvector, through the complete-bipartite "
         "chain by `tasaki23_sector_lift_and_casimir_zero_of_card_eq`, with no "
         "`h_intermediate` hypothesis. Assembled through "
         "PRs #794-#870, including the bundled sector theorem "

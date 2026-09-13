@@ -116,8 +116,10 @@ diagonal.** This is the opt-in form of the comparison that
 `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` does not carry as a
 conjunct: a caller that has its own shift `c` above every dressed diagonal entry recovers
 `μ < c` for the Marshall-positive sector eigenvector it obtained, without that shift having to
-appear in the bundled statement.  Both eigenvalues are pinned to the same sector value by the
-bundled theorem's uniqueness clause, so no new spectral input is used. -/
+appear in the bundled statement.  What this consumes is that caller's own `hc_strict`: it is the
+hypothesis under which `exists_marshallSign_eigenvector_heisenbergHamiltonianS_full` produces a
+sector eigenvector below `c`, and the bundled theorem's uniqueness clause then pins both
+eigenvalues to the same sector value, carrying the bound over to `μ`. -/
 theorem marshallSign_sector_eigenvalue_lt_of_dressedDiagonal_lt
     (A : V → Bool)
     {J : V → V → ℂ} (c : ℝ) {M : ℕ}

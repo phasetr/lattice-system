@@ -85,7 +85,8 @@ follows:
   chain, not the complete-bipartite chain: for `L >= 6` the ring coupling does
   not even satisfy the complete-bipartite positivity hypothesis (it vanishes
   on non-adjacent cross-sublattice pairs). Separately, `S_tot = 0` in the
-  balanced-cardinality case is proved through the complete-bipartite chain by
+  balanced-cardinality case is proved, conditionally on a supplied sector
+  eigenvector, through the complete-bipartite chain by
   `tasaki23_sector_lift_and_casimir_zero_of_card_eq`, with no
   `h_intermediate` hypothesis. Whole-Hilbert-space uniqueness is also proved
   at general balanced complete-bipartite generality, through the
