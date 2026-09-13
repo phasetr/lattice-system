@@ -22,7 +22,13 @@ sector-supported competitors — is available from the coupling, spin and cardin
 alone. **It does not establish** anything about the printed theorem's connectedness hypothesis:
 the declaration assumes strict positivity on every cross-sublattice pair, which is strictly
 stronger. Nor does it reach the printed theorem's whole-Hilbert-space uniqueness or its
-`S_tot = 0` conjunct, neither of which follows from a statement about a single sector.
+`S_tot = 0` conjunct: neither follows from a statement about a single sector, and neither is
+established at the printed theorem's generality (an arbitrary connected bipartite lattice).
+Related results exist elsewhere in this repository, reachable only through the complete-bipartite
+chain: `ringSym_ground_uniqueness` gives whole-Hilbert-space uniqueness unconditionally for the
+even antiferromagnetic Heisenberg ring, and `tasaki23PredictedCasimirValue_eq_zero_of_card_eq`
+together with `tasaki23_pf_groundState_casimir_eq_predicted_base` give `S_tot = 0` in the
+balanced-cardinality case.
 -/
 
 namespace LatticeSystem.Tests.MarshallLiebMattisTheorem22
@@ -63,15 +69,15 @@ example (A : V → Bool) {J : V → V → ℂ} {M : ℕ}
     A hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hA_ne hB_ne hN
 
 /-- **Gap control (not the discriminating fixture yet).** The math note's discriminating
-control needs the not-yet-existing connected-`G` capstone (PR-2/3 of the design), which does not
-exist at this tip, so it cannot be pinned by applying anything today: the declaration above has
+control needs a connected-`G` capstone (PR-2/3 of the design) that this repository does not
+carry, so it cannot be pinned by applying anything here: the declaration above has
 no `G`/support binder at all, only `hJ_pos` over *every* crossing pair of `A`. What can be pinned
-now is the combinatorial fact that makes `hJ_pos` strictly stronger than connectedness (the math
-note's Prop. "strictly stronger", §Delta 3): on the path on four vertices `0,1,2,3` with
+instead is the combinatorial fact that makes `hJ_pos` strictly stronger than connectedness (the
+math note's Prop. "strictly stronger", §Delta 3): on the path on four vertices `0,1,2,3` with
 sublattices `A = {0, 2}`, `B = {1, 3}`, the pair `{0, 3}` is a crossing pair with no path edge, so
-today's `hJ_pos` demands positivity at a pair the path does not bond. This is the exact
-obstruction that a path-supported coupling will satisfy once the connected-`G` capstone lands and
-fails against today's declaration. -/
+this declaration's `hJ_pos` demands positivity at a pair the path does not bond. This is the
+exact obstruction that a path-supported coupling satisfies while this declaration's `hJ_pos`
+hypothesis excludes it. -/
 example :
     (bipartiteCompleteGraphOf (fun x : Fin 4 => decide (x = 0 ∨ x = 2))).Adj 0 3 ∧
       ¬ (SimpleGraph.pathGraph 4).Adj (0 : Fin 4) 3 := by

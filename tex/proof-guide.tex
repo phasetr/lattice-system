@@ -18283,10 +18283,18 @@ Marshall sign machinery + time-reversal action; see
   Marshall-positive eigenvector of the Heisenberg Hamiltonian vanishing
   off that sector, unique up to a positive scalar among Marshall-positive
   sector-supported competitors, and presented as a vector of the full
-  Hilbert space through the sector embedding. Two conjuncts of the printed
-  theorem are \emph{not} formalised: that the ground state is unique in the
-  whole Hilbert space, and that it has $S_{\rm tot} = 0$. Neither follows
-  from the per-sector statement, which compares nothing across sectors.
+  Hilbert space through the sector embedding. Neither of the printed
+  theorem's other two conjuncts -- whole-Hilbert-space uniqueness of the
+  ground state and $S_{\rm tot} = 0$ -- is a conclusion of this declaration,
+  which compares nothing across sectors; they are not established at the
+  printed theorem's generality (an arbitrary connected bipartite lattice).
+  Related results exist elsewhere in the repository, reachable only through
+  the complete-bipartite chain: whole-Hilbert-space uniqueness is proved
+  unconditionally for the even antiferromagnetic Heisenberg ring
+  (\texttt{ringSym\_ground\_uniqueness}), and $S_{\rm tot} = 0$ is proved in
+  the balanced-cardinality case
+  (\texttt{tasaki23PredictedCasimirValue\_eq\_zero\_of\_card\_eq} together
+  with \texttt{tasaki23\_pf\_groundState\_casimir\_eq\_predicted\_base}).
   The coupling hypothesis carried is also stronger than the printed one:
   strict positivity is demanded on every cross-sublattice pair, i.e.\ on
   every edge of the complete bipartite graph on $A \sqcup B$, whereas
@@ -18392,8 +18400,10 @@ non-negative coupling supported on bipartite bonds (i.e.\
 $J(x,y) = 0$ when $A(x) = A(y)$) and strictly positive on \emph{every}
 cross-sublattice pair, i.e.\ on every edge of the complete bipartite
 graph on $A \sqcup B$. That positivity hypothesis is stronger than the
-printed one, which asks only that the bond set be connected; neither a
-graph nor a connectedness assumption enters the formalised statement.
+printed one, which asks only that the bond set be connected; no
+connectedness assumption and no variable graph enters the formalised
+statement -- the graph is the fixed complete bipartite graph on
+$A \sqcup B$ determined by $A$.
 For a fixed magnetization quantum number $M$, the ground state of
 the Heisenberg Hamiltonian
 \[
@@ -23198,7 +23208,7 @@ Quantum Heisenberg lattice (2D / 3D, Gibbs state + expectation companions) & fin
 Néel state on bipartite chain / 2D / 3D + per-bond expectation $-1/4$ (Tasaki §2.5) & finite-dim & \emph{formalized} \\
 Generic graph-centric Néel state \texttt{neelStateOf} (Tasaki §2.5 (2.5.2)) & finite-dim & \emph{formalized} \\
 Marshall sign, generic + chain / 2D / 3D, flip + time-reversal bridge (Tasaki §2.5) & finite-dim & \emph{formalized} \\
-Spin-$S$ Marshall--Lieb--Mattis Theorem 2.2 (Tasaki §2.5), magnetization-sector form (real and complex), lifted to the full Hilbert space through the sector embedding; whole-Hilbert-space uniqueness and $S_{\rm tot}=0$ are not formalized, and positivity is assumed on every cross-sublattice pair rather than only on the bonds of a connected lattice & finite-dim & \emph{partial} \\
+Spin-$S$ Marshall--Lieb--Mattis Theorem 2.2 (Tasaki §2.5), magnetization-sector form (real and complex), lifted to the full Hilbert space through the sector embedding; whole-Hilbert-space uniqueness and $S_{\rm tot}=0$ are not conjuncts of this declaration and are not established at this theorem's generality (related results exist for the AFM Heisenberg ring and, for $S_{\rm tot}=0$, the balanced-cardinality complete-bipartite case), and positivity is assumed on every cross-sublattice pair rather than only on the bonds of a connected lattice & finite-dim & \emph{partial} \\
 Spin-$S$ saturated ferromagnetic state (Tasaki §2.4 generalised): all-up/all-down as Heisenberg eigenvector for any coupling, ladder annihilation $\hat S^\pm_{\rm tot}$, Casimir eigenvalue $(|V|\cdot N/2)(|V|\cdot N/2 + 1)$ & finite-dim & \emph{formalized} \\
 Time-reversal map for many-body $S=1/2$ + multi-body Kramers degeneracy (Tasaki §2.3) & finite-dim & \emph{formalized} \\
 Tasaki Problem 2.3.a, Kramers-degeneracy orthogonality for abstract inner-product-reversing $V$ with $V^2=-\mathrm{id}$ (\texttt{inner\_timeReversal\_eq\_zero\_of\_sq\_neg}) & finite-dim & \emph{formalized} \\

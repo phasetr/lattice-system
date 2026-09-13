@@ -72,13 +72,21 @@ The graph-centric Néel state foundation (`neelStateOf`) remains the common
 entry point, but the main §2.5 theorem/problem endpoints are now formalised as
 follows:
 
-- **PARTIAL: Marshall-Lieb-Mattis Theorem 2.2.**  What is formalised is
+- **PARTIAL: Marshall-Lieb-Mattis Theorem 2.2.** What is formalised is
   the per-sector result, presented as a vector of the full Hilbert space
   through the sector embedding, under a coupling hypothesis of strict
   positivity on every cross-sublattice pair, which is stronger than the
-  connectedness Tasaki assumes; whole-Hilbert-space uniqueness and
-  `S_tot = 0` are not formalised. Assembled through PRs #794-#870,
-  including the bundled sector theorem
+  connectedness Tasaki assumes. Whole-Hilbert-space uniqueness and
+  `S_tot = 0` are not conjuncts of this result and are not established at
+  the printed theorem's generality (an arbitrary connected bipartite
+  lattice); related results exist elsewhere, reachable only through the
+  complete-bipartite chain: whole-Hilbert-space uniqueness holds
+  unconditionally for the even antiferromagnetic Heisenberg ring
+  (`ringSym_ground_uniqueness`), and `S_tot = 0` holds in the
+  balanced-cardinality case
+  (`tasaki23PredictedCasimirValue_eq_zero_of_card_eq` together with
+  `tasaki23_pf_groundState_casimir_eq_predicted_base`). Assembled through
+  PRs #794-#870, including the bundled sector theorem
   `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`.
 - **DONE: Tasaki Theorem 2.3.**  The current public statement is
   `tasaki_2_5_theorem_2_3`, with structural proof witnesses
