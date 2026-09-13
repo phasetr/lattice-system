@@ -1856,7 +1856,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "88e99b6fa9c5bfd11eacf26bb2d0ce2c30a5dc2a60d5a2ab8bb195e01be406c5"
+SCRIPT_SOURCE_SHA256 = "521373c41cbe874a4e5b7ff11f5430b71e80124544d2a621914aea396f255c60"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -2758,6 +2758,26 @@ MOVED_PROSE_CORRECTIONS = (
         "degree wrappers `tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_closed_form` "
         "and `tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_degree_closed_form`.",
     ),
+    (
+        # TSK-051 PR-1: the record repeated the proof guide's Theorem 2.2 overclaim (a "DONE"
+        # full-Hilbert-space form). Corrected to match what the guide now states: a per-sector
+        # result lifted through the sector embedding, under a coupling hypothesis stronger than
+        # the book's connectedness, with whole-space uniqueness and S_tot = 0 not formalised.
+        # Written whitespace-normalized (single spaces, no embedded newline), matching how the
+        # comparison this fires against is computed.
+        "- **PARTIAL: Marshall-Lieb-Mattis Theorem 2.2.** What is formalised is "
+        "the per-sector result, presented as a vector of the full Hilbert space "
+        "through the sector embedding, under a coupling hypothesis of strict "
+        "positivity on every cross-sublattice pair, which is stronger than the "
+        "connectedness Tasaki assumes; whole-Hilbert-space uniqueness and "
+        "`S_tot = 0` are not formalised. Assembled through PRs #794-#870, "
+        "including the bundled sector theorem "
+        "`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`.",
+        "- **DONE: Marshall-Lieb-Mattis Theorem 2.2.** The general spin-`S` "
+        "magnetization-sector and full-Hilbert-space forms were assembled through "
+        "PRs #794-#870, including the bundled full theorem "
+        "`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`.",
+    ),
 )
 
 # Where each correction above fires, in declaration order: the sites it rewrites, a site being the
@@ -2777,6 +2797,7 @@ MOVED_PROSE_CORRECTIONS = (
 # weakness this pin removes from these five.
 MOVED_PROSE_CORRECTION_SITES = (
     (("docs/history/roadmap/foundations.md", 139, 139, 1),),
+    (("docs/history/open-items.md", 2780, 3037, 1),),
     (("docs/history/open-items.md", 2780, 3037, 1),),
     (("docs/history/open-items.md", 2780, 3037, 1),),
     (("docs/history/open-items.md", 2780, 3037, 1),),
