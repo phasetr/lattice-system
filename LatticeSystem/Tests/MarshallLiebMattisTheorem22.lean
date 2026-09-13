@@ -6,20 +6,23 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralMLMFull
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020,
 §2.5 Theorem 2.2, p. 39 (statement), pp. 39–42 (proof); general coupling (2.5.13), p. 43.
 
-**Red pin (this commit).** `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`
-(`LatticeSystem/Quantum/SpinS/Theorem23StructuralMLMFull.lean:26`) currently carries a scaffolding
-binder pair `(c : ℝ)` / `(hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)` with no
-counterpart in Theorem 2.2: it is Tasaki's own internal shift `α` from the proof of Theorem A.18
-(p. 475, step (1)), leaked into the signature. This pin fixes the *binder-free* signature — the
-same per-sector Perron–Frobenius proposition the declaration proves today (existence of a real
-eigenvalue and a strictly positive sector eigenvector for the dressed Heisenberg matrix, support
-outside the sector, and uniqueness up to a positive scalar among Marshall-positive
-sector-supported competitors), with `c` and `hc_strict` removed and the `μ < c` conjunct dropped
-along with them. **It establishes** that a `c`-free wrapper of this shape must exist under
-exactly the book's remaining hypotheses (H2 bipartite-complete positivity as it stands today,
-H3/H4 spin and cardinality side conditions). **It does not establish** anything about H1
-(connectedness in place of complete-bipartite positivity, Delta 3 of the math note) or about the
-global/`S_tot = 0` conjuncts (Delta 1); those are out of scope for this pull request.
+`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`
+(`LatticeSystem/Quantum/SpinS/Theorem23StructuralMLMFull.lean`) carries no auxiliary spectral
+parameter. The shift the Perron–Frobenius step needs is Tasaki's own internal `α` from the proof
+of Theorem A.18 (p. 475, step (1)); it is produced inside the proof from finiteness of the
+configuration type rather than assumed, and Theorem 2.2 has no counterpart for it. This module
+pins that binder-free signature, so re-introducing a `(c : ℝ)` binder, a strictness hypothesis
+`∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c` for it, or a `μ < c` conjunct comparing the
+eigenvalue against it breaks the build.
+
+**It establishes** that the per-sector Perron–Frobenius proposition — existence of a real
+eigenvalue and a strictly positive sector eigenvector for the dressed Heisenberg matrix,
+vanishing outside the sector, and uniqueness up to a positive scalar among Marshall-positive
+sector-supported competitors — is available from the coupling, spin and cardinality hypotheses
+alone. **It does not establish** anything about the printed theorem's connectedness hypothesis:
+the declaration assumes strict positivity on every cross-sublattice pair, which is strictly
+stronger. Nor does it reach the printed theorem's whole-Hilbert-space uniqueness or its
+`S_tot = 0` conjunct, neither of which follows from a statement about a single sector.
 -/
 
 namespace LatticeSystem.Tests.MarshallLiebMattisTheorem22
@@ -28,10 +31,10 @@ open LatticeSystem.Quantum
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
-/-- **Red pin.** The binder-free signature: same conclusion shape as
-`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` with the scaffolding
-`(c : ℝ)` / `hc_strict` binders removed and the `μ < c` conjunct dropped. Fails today because the
-existing declaration still requires `c` and `hc_strict` as explicit arguments. -/
+/-- **Signature pin.** The binder-free signature of
+`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`: its conclusion carries no
+shift parameter, no strictness hypothesis for one, and no conjunct comparing the eigenvalue
+against one. -/
 example (A : V → Bool) {J : V → V → ℂ} {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)

@@ -100,9 +100,20 @@ theorem tasaki_2_5_theorem_2_3_bipartiteToy
     · rw [hAb] at hbf; cases hbf
   refine ⟨(bipartiteToyMinEnergyPredicted (Λ := V) A N).re, ?_, ?_⟩
   · intro M hM _hNe
-    obtain ⟨vM, hE_lt, hvM_pos, hH_M, _hReEig, huniq⟩ :=
-      toy_sector_groundState_at_predicted (N := N) A c horient hc_strict
-        hA_ne hB_ne hN hM
+    obtain ⟨vM, hvM_pos, hH_M, _hReEig, huniq⟩ :=
+      toy_sector_groundState_at_predicted (N := N) A horient hA_ne hB_ne hN hM
+    have hE_lt : (bipartiteToyMinEnergyPredicted (Λ := V) A N).re < c :=
+      marshallSign_sector_eigenvalue_lt_of_dressedDiagonal_lt (N := N) (M := M) A c
+        (bipartiteCoupling_im A)
+        (fun x y => by
+          rw [Complex.star_def, Complex.conj_eq_iff_im]; exact bipartiteCoupling_im A x y)
+        (fun x y hadj => by
+          rw [bipartiteCompleteGraphOf_adj_iff] at hadj
+          exact bipartiteCoupling_pos_of_diff_sublattice A hadj.2)
+        (fun x y => bipartiteCoupling_nonneg A x y)
+        (bipartiteCoupling_symm A)
+        (fun _ _ h => bipartiteCoupling_eq_zero_of_same_sublattice A h)
+        hc_strict hA_ne hB_ne hN hvM_pos hH_M
     exact ⟨vM, hE_lt, hvM_pos, hH_M, huniq⟩
   · refine tasaki23_eigenvalue_ge_common A N c (bipartiteCoupling_im A)
       (fun x y => by
@@ -118,9 +129,8 @@ theorem tasaki_2_5_theorem_2_3_bipartiteToy
           (le_trans hM.2 (Nat.mul_le_mul_right N
             (by rw [← tasaki23_card_filter_A_add_card_notA A]
                 exact max_le (Nat.le_add_right _ _) (Nat.le_add_left _ _))))
-      obtain ⟨vM, _hE_lt, hvM_pos, _hH_M, hReEig, _huniq⟩ :=
-        toy_sector_groundState_at_predicted (N := N) A c horient hc_strict
-          hA_ne hB_ne hN hM
+      obtain ⟨vM, hvM_pos, _hH_M, hReEig, _huniq⟩ :=
+        toy_sector_groundState_at_predicted (N := N) A horient hA_ne hB_ne hN hM
       exact ⟨vM, hvM_pos, hReEig⟩
     · intro M _hM_non μM φ hφ_ne hφ
       haveI : Nonempty (magConfigS V N M) := nonempty_magConfigS_of_fn_ne_zero_structural hφ_ne
