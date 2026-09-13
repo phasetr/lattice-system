@@ -98,7 +98,7 @@ import LatticeSystem.Quantum.SpinS.RangeLocalDoubleCommutatorBound
 import LatticeSystem.Quantum.SpinS.FerromagneticGroundStateTheorem21
 import LatticeSystem.Quantum.SpinS.ManyBodyPiRotationExp
 import LatticeSystem.Quantum.UniformRotationProblem22c
-import LatticeSystem.Quantum.SpinS.Theorem22Connected
+import LatticeSystem.Quantum.SpinS.Problem25cTheorem22GroundState
 
 /-!
 # `lattice-system` library root
