@@ -1912,7 +1912,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "f70f560ffb4d0e5fd301199ffa8bd34b091e40cf423067b67eb03f5165d3c5e8"
+SCRIPT_SOURCE_SHA256 = "ce99eded44d16b94fbe3ec08281b9baeb16848629736477227308acb7861920f"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -2815,6 +2815,26 @@ MOVED_PROSE_CORRECTIONS = (
         "and `tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_degree_closed_form`.",
     ),
     (
+        # PR #5469: Problem 2.5.c is now proved under Theorem 2.2's own hypotheses (connected,
+        # bipartite, balanced sublattices), not only under the stronger balanced
+        # complete-bipartite-positive hypotheses the earlier structural wrapper carried; the
+        # capstone also identifies the energy with the Hermitian minimum and supplies a
+        # normalised ground-state witness, and names the printed-model instance separately.
+        "- **DONE: Problem 2.5.c (p. 39, eq. (2.5.6); solution p. 498).** The capstone "
+        "`tasaki_problem_2_5_c_singleSite_spinSquare_expectation` proves `E_1 = E_2 = E_3 = "
+        "N(N+2)/12 = S(S+1)/3` under Theorem 2.2's own hypotheses (connected, bipartite, "
+        "balanced sublattices), also identifying the energy as the Hermitian minimum and "
+        "supplying a normalized ground-state witness; `tasaki_problem_2_5_c_couplingOf_half` is "
+        "the instance at the printed Hamiltonian (2.5.1), coupling one half. The complete "
+        "bipartite graph is not a hypothesis of this result; it is only the toy Hamiltonian's "
+        "bond graph at (2.5.10), p. 41, internal to Tasaki's own proof.",
+        "- **DONE: Problem 2.5.c.** The balanced structural wrapper "
+        "`singleSiteSpinSquareExpectationS_all_axes_eq_of_balanced_bipartiteCompletePositive` "
+        "removes the explicit Theorem 2.3 witness and proves `E_1 = E_2 = E_3 = N(N+2)/12` for "
+        "normalized non-zero Heisenberg ground states under the standard balanced bipartite "
+        "hypotheses.",
+    ),
+    (
         # PR #5467: the Marshall-Lieb-Mattis Theorem 2.2 capstone
         # `tasaki_2_5_theorem_2_2_of_connected` now proves the printed theorem at connected
         # generality (all four conjuncts, no sector restriction, no complete-bipartite
@@ -2969,6 +2989,7 @@ MOVED_PROSE_CORRECTIONS = (
 # any correction left unregistered here, so no separately asserted count is needed).
 MOVED_PROSE_CORRECTION_SITES = (
     (("docs/history/roadmap/foundations.md", 139, 139, 1),),
+    (("docs/history/open-items.md", 2780, 3037, 1),),
     (("docs/history/open-items.md", 2780, 3037, 1),),
     (("docs/history/open-items.md", 2780, 3037, 1),),
     (("docs/history/open-items.md", 2780, 3037, 1),),

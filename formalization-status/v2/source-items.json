@@ -109,6 +109,18 @@
     },
     {
       "equations": [
+        "2.5.6"
+      ],
+      "id": "tasaki-2020-problem-2-5-c",
+      "item_kind": "exercise",
+      "item_number": "2.5.c",
+      "pages": "39",
+      "section": "2.5",
+      "source_id": "tasaki-2020",
+      "title": "Single-site squared spin expectation in the ground state of the antiferromagnetic Heisenberg model on a bipartite lattice"
+    },
+    {
+      "equations": [
         "2.1.8"
       ],
       "id": "tasaki-2020-section-2-1-pauli",
