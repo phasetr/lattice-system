@@ -28,8 +28,10 @@ This module also pins the connected-generality capstone
 `tasaki_2_5_theorem_2_2_of_connected` (Theorem 2.2, p. 39, at connectedness
 instead of complete-bipartite positivity, with no sector restriction), its
 printed-Hamiltonian instance `tasaki_2_5_theorem_2_2_couplingOf_half`
-(eq. (2.5.1), p. 37: unit weight on every bond), plus the four-vertex-path
-discriminating witness for that hypothesis change.
+(eq. (2.5.1), p. 37: unit weight on every bond), the normalisation control
+`heisenbergHamiltonianS_couplingOf_half_eq_bondSum` together with Theorem 2.2
+restated on the printed bond sum itself, plus the four-vertex-path
+discriminating witness for the hypothesis change.
 -/
 
 namespace LatticeSystem.Tests.MarshallLiebMattisTheorem22
@@ -190,5 +192,59 @@ example (A : V → Bool) (G : SimpleGraph V) [DecidableRel G.Adj]
         (totalSpinSSquared V N).mulVec
             (magSectorEmbedding (fun τ => ((marshallSignS A τ.1).re * v τ : ℝ))) = 0 :=
   tasaki_2_5_theorem_2_2_couplingOf_half A G N hGconn hGbip h_card_eq hN
+
+/-- **Normalisation control.** The ordered double sum at `couplingOf G (1/2)` *is* Tasaki's
+printed `Ĥ = Σ_{{x,y} ∈ B} Ŝ_x · Ŝ_y`, eq. (2.5.1), p. 37 — the unordered sum over the bonds
+of `G` at unit weight.
+
+This is the only statement in this module from which the normalisation can be read off. It is
+false at every other uniform weight, whereas the four conclusions of Theorem 2.2 are invariant
+under rescaling `J` — the energy is existentially quantified — and so hold verbatim at any
+positive weight. Without it, replacing `1/2` by another weight throughout the capstone module
+*and* the pins above leaves this module green. -/
+example (G : SimpleGraph V) [DecidableRel G.Adj] (N : ℕ) :
+    heisenbergHamiltonianS (couplingOf G ((1 : ℂ) / 2)) N
+      = ∑ e ∈ G.edgeFinset,
+          Sym2.lift ⟨fun x y => spinSDot x y N, fun a b => spinSDot_comm a b N⟩ e :=
+  heisenbergHamiltonianS_couplingOf_half_eq_bondSum G N
+
+/-- **Signature pin (printed operator, no normalisation in the statement).** Theorem 2.2,
+p. 39, stated directly on Tasaki's printed `Ĥ = Σ_{{x,y} ∈ B} Ŝ_x · Ŝ_y`, eq. (2.5.1), p. 37:
+the unordered unit-weight bond sum, with no coupling function and no factor `1/2` anywhere in
+the statement. Hypotheses are connectedness, bipartiteness, balance and `1 ≤ N`; the four
+conjuncts are those of the pins above.
+
+Discharged by rewriting the printed operator into `couplingOf G (1/2)` along
+`heisenbergHamiltonianS_couplingOf_half_eq_bondSum` and applying
+`tasaki_2_5_theorem_2_2_couplingOf_half`. Because the statement carries no normalisation, no
+edit to this module can absorb a change of the capstone's weight: mutating it breaks the
+rewrite here, while mutating this control's own weight in step makes the control false. -/
+example (A : V → Bool) (G : SimpleGraph V) [DecidableRel G.Adj]
+    (hGconn : G.Connected)
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (h_card_eq : (Finset.univ.filter (fun x : V => A x = true)).card =
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card)
+    (hN : 1 ≤ N) :
+    ∃ μ : ℝ,
+      finrank ℂ ↥(End.eigenspace
+          (Matrix.toLin' (∑ e ∈ G.edgeFinset,
+            Sym2.lift ⟨fun x y => spinSDot x y N, fun a b => spinSDot_comm a b N⟩ e))
+          (μ : ℂ)) ≤ 1 ∧
+      (∀ {μM : ℝ} {φ : (V → Fin (N + 1)) → ℂ}, φ ≠ 0 →
+        (∑ e ∈ G.edgeFinset,
+            Sym2.lift ⟨fun x y => spinSDot x y N, fun a b => spinSDot_comm a b N⟩ e).mulVec φ =
+          (μM : ℂ) • φ → μ ≤ μM) ∧
+      ∃ v : magConfigS V N
+          ((Finset.univ.filter (fun x : V => A x = true)).card * N) → ℝ,
+        (∀ σ, 0 < v σ) ∧
+        (∑ e ∈ G.edgeFinset,
+            Sym2.lift ⟨fun x y => spinSDot x y N, fun a b => spinSDot_comm a b N⟩ e).mulVec
+            (magSectorEmbedding (fun τ => ((marshallSignS A τ.1).re * v τ : ℝ))) =
+          (μ : ℂ) •
+            magSectorEmbedding (fun τ => ((marshallSignS A τ.1).re * v τ : ℝ)) ∧
+        (totalSpinSSquared V N).mulVec
+            (magSectorEmbedding (fun τ => ((marshallSignS A τ.1).re * v τ : ℝ))) = 0 := by
+  rw [← heisenbergHamiltonianS_couplingOf_half_eq_bondSum G N]
+  exact tasaki_2_5_theorem_2_2_couplingOf_half A G N hGconn hGbip h_card_eq hN
 
 end LatticeSystem.Tests.MarshallLiebMattisTheorem22

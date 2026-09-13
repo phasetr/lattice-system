@@ -24,9 +24,9 @@ and (2.5.13), p. 43, sum over **unordered** bonds.  A symmetric `J` supported on
 `G` therefore yields twice the printed bond sum: the printed exchange `J_{x,y}` of (2.5.13)
 is the ordered-pair coupling `J_{x,y} / 2`, each bond contributing once in each order.
 Restricting the support of `J` to the bonds of `G` deletes the non-bond terms; it does not
-undo that doubling, which is a property of the index set.  The doubling itself is proved in
-general by `two_sum_edgeFinset_lift_eq_sum_adj` (`Lattice/Graph.lean`), applicable here
-because `spinSDot` is symmetric (`spinSDot_comm`).  No conclusion depends on the
+undo that doubling, which is a property of the index set.  The general doubling bridge
+`two_sum_edgeFinset_lift_eq_sum_adj` (`Lattice/Graph.lean`) is applied to this Hamiltonian
+by `heisenbergHamiltonianS_couplingOf_half_eq_bondSum` below.  No conclusion depends on the
 normalisation: the hypotheses below are closed under multiplying `J` by a positive constant,
 and the conclusions are invariant under `Ĥ ↦ c Ĥ` because the energy `μ` is existentially
 quantified.  The printed unit-weight model (2.5.1) is the instance `J = couplingOf G (1/2)`,
@@ -188,6 +188,44 @@ theorem tasaki_2_5_theorem_2_2_of_connected
   · have hpred0 := tasaki23PredictedCasimirValue_eq_zero_of_card_eq (V := V) A N h_card_eq
     simpa [hpred0] using hCas
 
+/-- **The printed unit-weight bond sum (2.5.1), p. 37, in the ordered-pair convention.**
+
+Tasaki's `Ĥ = Σ_{{x,y} ∈ B} Ŝ_x · Ŝ_y`, eq. (2.5.1), p. 37, sums over *unordered* bonds,
+while `heisenbergHamiltonianS` sums over *ordered* pairs (module doc above).  At the uniform
+coupling `couplingOf G (1/2)` the two agree on the nose: each bond `{x, y}` is met twice by
+`Σ_x Σ_y`, once as `(x, y)` and once as `(y, x)`, and the two halves recombine into the
+printed weight `1`.
+
+This is the general doubling bridge `two_sum_edgeFinset_lift_eq_sum_adj`
+(`Lattice/Graph.lean`) applied to `spinSDot`, symmetric by `spinSDot_comm`.  It is the
+statement that fixes the normalisation as the printed one: it is false at every other
+uniform weight, whereas the conclusions of `tasaki_2_5_theorem_2_2_couplingOf_half` below
+cannot see the normalisation at all, being invariant under rescaling `J`. -/
+theorem heisenbergHamiltonianS_couplingOf_half_eq_bondSum
+    (G : SimpleGraph V) [DecidableRel G.Adj] (N : ℕ) :
+    heisenbergHamiltonianS (couplingOf G ((1 : ℂ) / 2)) N
+      = ∑ e ∈ G.edgeFinset,
+          Sym2.lift ⟨fun x y => spinSDot x y N, fun a b => spinSDot_comm a b N⟩ e := by
+  classical
+  have hbridge : (∑ e ∈ G.edgeFinset,
+        Sym2.lift ⟨fun x y => spinSDot x y N, fun a b => spinSDot_comm a b N⟩ e)
+      + ∑ e ∈ G.edgeFinset,
+        Sym2.lift ⟨fun x y => spinSDot x y N, fun a b => spinSDot_comm a b N⟩ e
+      = ∑ x : V, ∑ y : V, (if G.Adj x y then spinSDot x y N else 0) :=
+    two_sum_edgeFinset_lift_eq_sum_adj G _
+  have hH : heisenbergHamiltonianS (couplingOf G ((1 : ℂ) / 2)) N
+      = ((1 : ℂ) / 2) • ∑ x : V, ∑ y : V, (if G.Adj x y then spinSDot x y N else 0) := by
+    rw [heisenbergHamiltonianS_def, Finset.smul_sum]
+    refine Finset.sum_congr rfl fun x _ => ?_
+    rw [Finset.smul_sum]
+    refine Finset.sum_congr rfl fun y _ => ?_
+    unfold couplingOf
+    by_cases h : G.Adj x y
+    · rw [if_pos h, if_pos h]
+    · rw [if_neg h, if_neg h, zero_smul, smul_zero]
+  rw [hH, ← hbridge, ← two_smul ℂ, smul_smul]
+  norm_num
+
 /-- **Tasaki §2.5 Theorem 2.2 at the printed Hamiltonian (2.5.1), p. 37.**
 
 Theorem 2.2, p. 39, with the expansion (2.5.4), p. 39, for the model exactly as printed at
@@ -196,7 +234,10 @@ bond of a connected (Footnote 28, p. 33) bipartite graph `G` with balanced subla
 spin `S = N / 2 ≥ 1 / 2`.  In the ordered-pair convention of `heisenbergHamiltonianS`
 (module doc above) that unit-weight bond sum is the coupling `couplingOf G (1/2)`: each bond
 `{x, y}` is met twice by `Σ_x Σ_y`, once as `(x, y)` and once as `(y, x)`, so the two halves
-recombine into the printed weight `1`.  The general positive exchange couplings of the
+recombine into the printed weight `1`; that identification is proved above as
+`heisenbergHamiltonianS_couplingOf_half_eq_bondSum`, and it, rather than anything in the
+conclusions below, is what pins the weight `1/2` as the printed one.  The general positive
+exchange couplings of the
 Remark and eq. (2.5.13), p. 43, are `tasaki_2_5_theorem_2_2_of_connected`, of which this is
 the instance at half the printed exchange; the conclusions are its same four conjuncts.
 
