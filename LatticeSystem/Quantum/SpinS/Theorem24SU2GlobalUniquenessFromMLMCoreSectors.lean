@@ -88,14 +88,15 @@ equality-case input needed for the strict outside-sector MLM endpoint; it does *
 itself assert `S_tot = 0` for every ground state at this generality, since a caller must
 still supply `v`, `hv_pos` and `hReEig`.
 
-The remaining hypotheses are carried from the outside-sector ladder this lift feeds into, and
-are not derived here either: `hJ_pos` demands strict positivity on every cross-sublattice pair
-(`bipartiteCompleteGraphOf A`), strictly stronger than the printed theorem's connectedness;
-`hJ_real`, `hJ_nn`, `hJ_sym`, `hJ_bipartite` fix the coupling to be real, non-negative,
-symmetric, and supported only across sublattices; `c`, `c_toy` with `hc_strict`, `hc_strict_toy`
-are the actual and toy Perron–Frobenius diagonal shifts; `hsB` bounds the toy total spin below;
-`hA_ne`, `hB_ne`, `hN` rule out an empty sublattice or a spinless site; and
-`[Nonempty (magConfigS V N M)]` keeps the sector itself non-degenerate. -/
+The remaining hypotheses are required by the sector lift `tasaki23_sector_lift_and_casimir`
+this proof invokes, and are not derived here either: `hJ_pos` demands strict positivity on
+every cross-sublattice pair (`bipartiteCompleteGraphOf A`), strictly stronger than the printed
+theorem's connectedness; `hJ_real`, `hJ_nn`, `hJ_sym`, `hJ_bipartite` fix the coupling to be
+real, non-negative, symmetric, and supported only across sublattices; `c`, `c_toy` with
+`hc_strict`, `hc_strict_toy` are the actual and toy Perron–Frobenius diagonal shifts; `hsB`
+asserts that the sublattice-`¬A` spin `s_B = |¬A| * N / 2` is strictly positive; `hA_ne`,
+`hB_ne`, `hN` rule out an empty sublattice or a spinless site; and
+`[Nonempty (magConfigS V N M)]` keeps the sector itself non-empty. -/
 theorem tasaki23_sector_lift_and_casimir_zero_of_card_eq
     (A : V → Bool) (N : ℕ) (c c_toy : ℝ)
     (h_card_eq : (Finset.univ.filter (fun x : V => A x = true)).card =
