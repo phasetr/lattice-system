@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.Theorem22Connected
 import LatticeSystem.Quantum.SpinS.Problem25cTheorem22GroundState
 import LatticeSystem.Quantum.SpinS.Problem25dCorrelationSignBridge
+import LatticeSystem.Quantum.SpinS.Problem25dTheorem22GroundState
 import LatticeSystem.Quantum.SpinS.SubmatrixMinEigenvalue
 
 /-!
