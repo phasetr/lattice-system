@@ -18371,13 +18371,21 @@ Marshall sign machinery + time-reversal action; see
   carries the \texttt{[IsAlgClosed \(\mathbb C\)]} instance argument, required
   for elaboration and always satisfiable for \(\mathbb C\); it is not a
   hypothesis of the printed theorem.
-\item \textbf{DONE} Problem 2.5.c (single-site squared expectation
+\item \textbf{DONE} Problem 2.5.c, p.~39, eq.~(2.5.6) (solution p.~498)
+  (single-site squared expectation
   $\langle\Phi_{\mathrm{GS}},(\hat S_x^{(\alpha)})^2
-  \Phi_{\mathrm{GS}}\rangle = S(S+1)/3$ in the AFM ground state).  The
-  balanced structural wrapper
-  \texttt{singleSiteSpinSquareExpectationS\_all\_axes\_eq\_of\_balanced\_bipartiteCompletePositive}
-  proves the all-axis value $N(N+2)/12$ for normalized non-zero Heisenberg
-  ground states under the standard balanced bipartite hypotheses.
+  \Phi_{\mathrm{GS}}\rangle = S(S+1)/3$ in the ground state of
+  Theorem~2.2).  The capstone
+  \texttt{tasaki\_problem\_2\_5\_c\_singleSite\_spinSquare\_expectation}
+  proves the all-axis value $N(N+2)/12$ under Theorem~2.2's own
+  hypotheses (connected, bipartite, balanced sublattices), also
+  identifying the energy as the Hermitian minimum and supplying a
+  normalized ground-state witness;
+  \texttt{tasaki\_problem\_2\_5\_c\_couplingOf\_half} is the instance at
+  the printed Hamiltonian (2.5.1), coupling one half.  The complete
+  bipartite graph is not a hypothesis of this result; it is only the toy
+  Hamiltonian's bond graph at (2.5.10), p.~41, internal to Tasaki's own
+  proof.
 \item \textbf{DONE} Problem 2.5.d (two-spin correlation under MLM).  The
   endpoint
   \texttt{twoSpinCorrelationS\_re\_neg\_of\_tasaki23\_balanced\_pf\_cross}
@@ -21540,6 +21548,32 @@ satisfies
 under the standard balanced bipartite antiferromagnetic hypotheses.
 Reference: Tasaki, Springer 2020, Problem~2.5.c, p.~43, and
 Theorems~2.3--2.4, pp.~42--44.
+
+\textbf{Problem 2.5.c at Theorem~2.2's own generality (PR~\#5469)}: the
+new file
+\texttt{Quantum/SpinS/Problem25cTheorem22GroundState.lean} closes the
+remaining gap between the preceding wrappers and the printed problem: both
+of them assume strictly more than Theorem~2.2, p.~39 (connected,
+bipartite, balanced sublattices) --- a supplied normalized eigenvector at
+the Hermitian minimum, plus either an explicit Theorem~2.3 witness or the
+balanced complete-bipartite positivity that discharges one. The capstone
+\texttt{tasaki\_problem\_2\_5\_c\_singleSite\_spinSquare\_expectation}
+takes Theorem~2.2's own hypotheses and no more, obtains its Marshall-signed
+sector eigenvector, shows it is non-zero from the strict positivity of its
+coefficients, unit-normalizes it, and identifies its eigenvalue with the
+Hermitian minimum via
+\texttt{hermitianMinEigenvalue\_eq\_common\_of\_eigenvector\_and\_global\_lower}.
+This produces \emph{both} the existence witness the earlier wrappers had to
+assume \emph{and} the identification of ``the present ground state'' with
+the spectral minimum, then concludes (2.5.6) for every normalized
+ground-state eigenvector at every site by the PR~\#4066 phase wrapper. The
+printed-model instance \texttt{tasaki\_problem\_2\_5\_c\_couplingOf\_half}
+is the same statement at coupling \(\mathrm{couplingOf}\,G\,(1/2)\), the
+ordered-pair-convention identification of the unit-weight bond sum
+(2.5.1). The complete bipartite graph is not a hypothesis of this result;
+it is only the bond graph of the toy Hamiltonian (2.5.10), p.~41, internal
+to Tasaki's own proof. Reference: Tasaki, Springer 2020, Problem~2.5.c,
+p.~39, eq.~(2.5.6); solution p.~498.
 
 \textbf{Problem 2.5.d correlation sign bridge (PR~\#4068)}:
 the new file \texttt{Quantum/SpinS/Problem25dCorrelationSignBridge.lean}
