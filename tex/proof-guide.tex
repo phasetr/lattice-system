@@ -18320,10 +18320,13 @@ Marshall sign machinery + time-reversal action; see
   $1\le z$, under the explicit \texttt{[IsAlgClosed \(\mathbb C\)]}
   hypothesis.
 \item \textbf{DONE} Problem 2.5.b (lower bound on $E_{\mathrm{GS}}$ via
-  2.5.a).  The graph-local chain reaches the closed-form degree wrappers
-  \texttt{tasaki25b\_heisenbergHamiltonianOnGraphS\_half\_lower\_bound\_closed\_form}
-  and
-  \texttt{tasaki25b\_heisenbergHamiltonianOnGraphS\_half\_lower\_bound\_degree\_closed\_form}.
+  2.5.a).  The graph-local chain reaches the capstone
+  \texttt{tasaki\_problem\_2\_5\_b\_groundEnergy\_lower\_bound}, which proves
+  $E_{\mathrm{GS}}\ge-\sum_{x\in A}S\bigl(1+|N(x)|S\bigr)$ on a finite
+  bipartite lattice, with no hypothesis on the local degrees.  The capstone
+  carries the \texttt{[IsAlgClosed \(\mathbb C\)]} instance argument, required
+  for elaboration and always satisfiable for \(\mathbb C\); it is not a
+  hypothesis of the printed theorem.
 \item \textbf{DONE} Problem 2.5.c (single-site squared expectation
   $\langle\Phi_{\mathrm{GS}},(\hat S_x^{(\alpha)})^2
   \Phi_{\mathrm{GS}}\rangle = S(S+1)/3$ in the AFM ground state).  The
@@ -20425,9 +20428,11 @@ imports the abstract Hamiltonian and energy companion, and
         (\texttt{Math/MatrixAnalysis/HermitianSum.lean}), shared across the
         physics files that previously each carried a private copy.
 
-        The two \texttt{tasaki25b\_local\_cluster} wrappers specialize this
-        abstract sum bound to local cluster Hamiltonians whose
-        minimum eigenvalues are the Problem~2.5.a values.  In closed form this
+        The capstone
+        \texttt{tasaki\_problem\_2\_5\_b\_groundEnergy\_lower\_bound}
+        specializes this abstract sum bound to the graph-local star
+        Hamiltonians, whose minimum eigenvalues are bounded below by the
+        Problem~2.5.a values.  In closed form this
         is Tasaki's lower bound
         \[
           E_{\rm GS}
@@ -20445,17 +20450,10 @@ imports the abstract Hamiltonian and energy companion, and
           h_x=\sum_{y\in N_G(x)}
             \hat{\mathbf S}_x\cdot\hat{\mathbf S}_y .
         \]
-        The theorem
-        \texttt{heisenbergHamiltonianOnGraphS\_one\_eq\_sum}
-        \texttt{\_graphLocalClusterHamiltonianS} records the repository's
-        ordered-pair convention:
-        \[
-          \hat H_G(1)=\sum_x h_x .
-        \]
         The bipartite refinement
         \texttt{heisenbergHamiltonianOnGraphS\_half\_eq\_sum}
-        \texttt{\_filter\_graphLocalClusterHamiltonianS} proves that, if every
-        edge crosses the chosen side \(A\),
+        \texttt{\_filter\_graphLocalClusterHamiltonianS} proves directly that,
+        if every edge crosses the chosen side \(A\),
         \[
           \hat H_G(1/2)=\sum_{x\in A}h_x .
         \]
@@ -20464,7 +20462,9 @@ imports the abstract Hamiltonian and energy companion, and
         \(\hat{\mathbf S}_x\cdot\hat{\mathbf S}_y
         =\hat{\mathbf S}_y\cdot\hat{\mathbf S}_x\).  This fixes the coefficient
         convention for Tasaki's local-cluster decomposition (Tasaki, Springer
-        2020, Problem~2.5.b, p.~38; solution p.~497).
+        2020, Problem~2.5.b, p.~38; solution pp.~497--498).  (The bipartite
+        decomposition proves itself directly, without going through the
+        unit-coupling analogue \(\hat H_G(1)=\sum_x h_x\).)
   \item Problem 2.5.b single-cluster transport bridge.  The declaration
         \texttt{siteConfigEquiv} lifts a site equivalence \(e:\alpha\simeq\beta\)
         to the corresponding equivalence of spin-configuration spaces, with
@@ -20546,33 +20546,40 @@ imports the abstract Hamiltonian and energy companion, and
           \le
           \lambda_{\min}(h_x)
         \]
-        whenever the center has at least one graph neighbour.  Summing these
-        local lower bounds and using the one-sided bipartite decomposition
-        \(\hat H_G(1/2)=\sum_{x\in A}h_x\) gives the formal lower bound
+        whenever the center has at least one graph neighbour.  At an isolated
+        center (\(N_G(x)=\emptyset\)) the local star \(h_x\) is the zero
+        operator, whose unique eigenvalue is \(0\); since
+        \(\operatorname{Re}E_{\rm GS}(0)=-N/2\le 0\), the same inequality
+        \(\operatorname{Re}E_{\rm GS}(0)\le\lambda_{\min}(h_x)=0\) holds
+        there too, so \emph{no hypothesis on the local degree is needed}: an
+        isolated center only weakens the bound, it never invalidates it.
+        Summing these local lower bounds over every \(x\in A\) and using the
+        one-sided bipartite decomposition \(\hat H_G(1/2)=\sum_{x\in A}h_x\)
+        gives the formal lower bound
         \[
           \sum_{x\in A}\operatorname{Re}E_{\rm GS}(|N_G(x)|)
           \le
           \lambda_{\min}(\hat H_G(1/2)).
         \]
-        The closed-form wrappers substitute the Problem~2.5.a formula
+        The capstone
+        \texttt{tasaki\_problem\_2\_5\_b\_groundEnergy\_lower\_bound}
+        substitutes the Problem~2.5.a formula
         \[
           \operatorname{Re}E_{\rm GS}(z)
           =
           -\frac{N}{2}\left(\frac{zN}{2}+1\right)
         \]
-        and use the graph identity \(|N_G(x)|=\deg_G(x)\).  Thus the
-        one-sided graph-Hamiltonian theorem is stated in the expected
-        degree form
+        and the graph identity \(|N_G(x)|=\deg_G(x)\) to state the one-sided
+        graph-Hamiltonian bound in closed degree form,
         \[
           \sum_{x\in A}
           -\frac{N}{2}\left(\frac{\deg_G(x)N}{2}+1\right)
           \le
           \lambda_{\min}(\hat H_G(1/2)),
         \]
-        still under the explicit positive-degree assumption on the selected
-        side.  Isolated centers are intentionally excluded because their
-        local star Hamiltonian is zero, whereas the closed formula would
-        contribute a negative number.
+        with \textbf{no} hypothesis on the local degrees, no connectedness,
+        and no \(|A|=|B|\); no closed-form or degree wrapper carrying a
+        positive-degree hypothesis remains in the chain.
         The exact Lean names are listed in the complete interim catalogue under
         \texttt{docs/formalization/legacy/}.  This is
         the graph-local form of Tasaki's Problem~2.5.b lower-bound argument
@@ -20584,10 +20591,14 @@ available for \(1\le z\) under the explicit
 \texttt{[IsAlgClosed \(\mathbb C\)]} hypothesis.  The remaining optional
 cleanup is to discharge that hypothesis by replacing the algebraically closed
 eigenvector-extraction bridge with a constructive finite-dimensional spectral
-decomposition if that later becomes useful.  For Problem~2.5.b, the graph-local
-finite-sum lower bound is now available for the half-coupling graph Hamiltonian
-under the same algebraically closed-field hypothesis and a positive local-degree
-assumption on the chosen bipartition side.
+decomposition if that later becomes useful.  Problem~2.5.b itself is closed
+unconditionally: the capstone
+\texttt{tasaki\_problem\_2\_5\_b\_groundEnergy\_lower\_bound} proves the
+printed lower bound on any finite bipartite graph and any spin, with no
+degree, connectedness, or \(|A|=|B|\) hypothesis.  It carries the
+\texttt{[IsAlgClosed \(\mathbb C\)]} instance argument, required for
+elaboration and always satisfiable for \(\mathbb C\); this is not a
+hypothesis of the printed theorem.
 
 \subsection*{DONE: Spin-$S$ saturated ferromagnetic state (Tasaki §2.4 generalised)}
 \label{subsec:spin-s-all-aligned}

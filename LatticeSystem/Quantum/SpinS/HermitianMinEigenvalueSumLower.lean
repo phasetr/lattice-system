@@ -1,6 +1,5 @@
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueViaRayleigh
 import LatticeSystem.Quantum.SpinS.RayleighRitzEquality
-import LatticeSystem.Quantum.SpinS.SingleClusterHamiltonianEnergy
 import LatticeSystem.Math.MatrixAnalysis.HermitianSum
 
 /-!
@@ -57,59 +56,5 @@ theorem sum_lower_bounds_le_hermitianMinEigenvalue_sum {ι : Type*} (s : Finset 
     ∑ i ∈ s, ε i ≤ ∑ i ∈ s, rayleighOnVec (M i) v := Finset.sum_le_sum hterm
     _ = rayleighOnVec (∑ i ∈ s, M i) v := (rayleighOnVec_sum_matrix s M v).symm
     _ = hermitianMinEigenvalue (Matrix.isHermitian_sum s hM) := hv
-
-/-- Binary convenience form of `sum_lower_bounds_le_hermitianMinEigenvalue_sum`. -/
-theorem add_lower_bounds_le_hermitianMinEigenvalue_add
-    {A B : Matrix n n ℂ} (hA : A.IsHermitian) (hB : B.IsHermitian)
-    {a b : ℝ}
-    (ha : a ≤ hermitianMinEigenvalue hA) (hb : b ≤ hermitianMinEigenvalue hB) :
-    a + b ≤ hermitianMinEigenvalue (hA.add hB) := by
-  obtain ⟨v, hunit, hv⟩ :=
-    exists_unit_vec_rayleighOnVec_eq_hermitianMinEigenvalue (hA.add hB)
-  have hA_le : a ≤ rayleighOnVec A v :=
-    le_trans ha (hermitianMinEigenvalue_le_rayleighOnVec_of_unit hA hunit)
-  have hB_le : b ≤ rayleighOnVec B v :=
-    le_trans hb (hermitianMinEigenvalue_le_rayleighOnVec_of_unit hB hunit)
-  calc
-    a + b ≤ rayleighOnVec A v + rayleighOnVec B v := add_le_add hA_le hB_le
-    _ = rayleighOnVec (A + B) v := (rayleighOnVec_add_matrix A B v).symm
-    _ = hermitianMinEigenvalue (hA.add hB) := hv
-
-/-- **Problem 2.5.b local-cluster lower-bound bridge**:
-if a finite family of local Hamiltonians has the single-cluster ground energies from
-Problem 2.5.a, then the minimum eigenvalue of their sum is bounded below by the sum
-of those local cluster energies.
-
-For a bipartite Heisenberg model this is the abstract form of Tasaki's decomposition
-`H = ∑_{x∈A} h_x`, where each `h_x` is the star Hamiltonian centred at `x` with
-`degree x` neighbours. -/
-theorem tasaki25b_local_cluster_sum_lower_bound {ι : Type*} (s : Finset ι)
-    (localH : ι → Matrix n n ℂ) (degree : ι → ℕ) (N : ℕ)
-    (hH : ∀ x ∈ s, (localH x).IsHermitian)
-    (hlocal : ∀ x (hx : x ∈ s),
-      hermitianMinEigenvalue (hH x hx) = (singleClusterGSEnergyS (degree x) N).re) :
-    ∑ x ∈ s, (singleClusterGSEnergyS (degree x) N).re ≤
-      hermitianMinEigenvalue (Matrix.isHermitian_sum s hH) := by
-  refine sum_lower_bounds_le_hermitianMinEigenvalue_sum s localH
-    (fun x => (singleClusterGSEnergyS (degree x) N).re) hH ?_
-  intro x hx
-  rw [hlocal x hx]
-
-/-- **Problem 2.5.b closed-form local-cluster lower bound**:
-same as `tasaki25b_local_cluster_sum_lower_bound`, but with
-`Re(singleClusterGSEnergyS z N)` expanded as
-`-(N/2) * (zN/2 + 1)`.
-
-This is the formal version of Tasaki's solution
-`E_GS ≥ -∑_{x∈A} S(1 + |N(x)|S)` with `S = N/2`. -/
-theorem tasaki25b_local_cluster_sum_lower_bound_closed_form {ι : Type*} (s : Finset ι)
-    (localH : ι → Matrix n n ℂ) (degree : ι → ℕ) (N : ℕ)
-    (hH : ∀ x ∈ s, (localH x).IsHermitian)
-    (hlocal : ∀ x (hx : x ∈ s),
-      hermitianMinEigenvalue (hH x hx) = (singleClusterGSEnergyS (degree x) N).re) :
-    ∑ x ∈ s, -((N : ℝ) / 2) * ((degree x : ℝ) * (N : ℝ) / 2 + 1) ≤
-      hermitianMinEigenvalue (Matrix.isHermitian_sum s hH) := by
-  simpa [singleClusterGSEnergyS_re_eq] using
-    tasaki25b_local_cluster_sum_lower_bound s localH degree N hH hlocal
 
 end LatticeSystem.Quantum

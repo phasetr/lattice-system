@@ -4,8 +4,10 @@ import LatticeSystem.Quantum.SpinS.Heisenberg
 # Graph-local decomposition of spin-`S` Heisenberg Hamiltonians
 
 This file packages the local star terms used in Tasaki §2.5 Problem 2.5.b.
-The repository's graph Hamiltonian uses an ordered-pair sum, so the unit-coupling
-graph Hamiltonian is the sum of all vertex-star terms.
+The repository's graph Hamiltonian uses an ordered-pair sum, so each undirected
+bond is counted once from each endpoint; on a bipartite graph the coupling `1 / 2`
+therefore makes the graph Hamiltonian the sum of the star terms over one side of
+the bipartition, which is the decomposition the Problem 2.5.b bound consumes.
 
 References:
 - H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020,
@@ -42,30 +44,6 @@ theorem graphLocalClusterHamiltonianS_isHermitian
   | @insert y s hys ih =>
     rw [Finset.sum_insert hys]
     exact Matrix.IsHermitian.add (spinSDot_isHermitian x y N) ih
-
-/-- The unit-coupling graph Hamiltonian is the sum of all graph-local star
-Hamiltonians.  This is the ordered-pair convention: each undirected edge appears
-once from each endpoint. -/
-theorem heisenbergHamiltonianOnGraphS_one_eq_sum_graphLocalClusterHamiltonianS
-    (G : SimpleGraph Λ) [DecidableRel G.Adj] (N : ℕ) :
-    heisenbergHamiltonianOnGraphS G (1 : ℂ) N =
-      ∑ x : Λ, graphLocalClusterHamiltonianS G x N := by
-  classical
-  unfold heisenbergHamiltonianOnGraphS heisenbergHamiltonianS
-    graphLocalClusterHamiltonianS LatticeSystem.Lattice.couplingOf
-  refine Finset.sum_congr rfl ?_
-  intro x _
-  rw [show (∑ y : Λ, (if G.Adj x y then (1 : ℂ) else 0) • spinSDot x y N) =
-      ∑ y : Λ, if G.Adj x y then spinSDot x y N else 0 from by
-    refine Finset.sum_congr rfl ?_
-    intro y _
-    by_cases hxy : G.Adj x y
-    · simp [hxy]
-    · simp [hxy]]
-  rw [show (∑ y : Λ, if G.Adj x y then spinSDot x y N else 0) =
-      ∑ y ∈ (Finset.univ : Finset Λ).filter (G.Adj x), spinSDot x y N from by
-    rw [← Finset.sum_filter]]
-  rw [← SimpleGraph.neighborFinset_eq_filter]
 
 /-- The half-coupling graph Hamiltonian is the sum of half-weighted
 graph-local star Hamiltonians.  This is a coefficient-normalised form of the

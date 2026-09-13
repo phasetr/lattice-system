@@ -176,6 +176,7 @@ import LatticeSystem.Tests.ManyBodyPiRotationProblem22a
 import LatticeSystem.Tests.ManyBodyPiRotationExpBridge
 import LatticeSystem.Tests.SpinSPiRotationExpBridge
 import LatticeSystem.Tests.UniformRotationProblem22c
+import LatticeSystem.Tests.GroundEnergyLowerBoundProblem25b
 
 /-!
 # Test aggregator for the `lattice-system` library

@@ -97,6 +97,18 @@
     },
     {
       "equations": [
+        "2.5.1"
+      ],
+      "id": "tasaki-2020-problem-2-5-b",
+      "item_kind": "exercise",
+      "item_number": "2.5.b",
+      "pages": "38",
+      "section": "2.5",
+      "source_id": "tasaki-2020",
+      "title": "Anderson lower bound for the ground-state energy of the antiferromagnetic Heisenberg model on a bipartite lattice"
+    },
+    {
+      "equations": [
         "2.1.8"
       ],
       "id": "tasaki-2020-section-2-1-pauli",
