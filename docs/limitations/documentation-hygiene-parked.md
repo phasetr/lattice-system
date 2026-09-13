@@ -301,15 +301,11 @@ phrases begin guarding the published state; or the next approved change to
 `scripts/check_generated_site.py`, which is the occasion on which the self-test can be strengthened
 in the same change.
 
-**Reopened.** The second limb of the reopen condition first fired at `8b2895c7`, the earliest of ten
-commits between the pin above and the base of pull request #5467 that changed
-`scripts/check_generated_site.py`, several of them editing the very status-count fixture this entry
-measures; it was overdue by those ten changes. Pull request #5467, which itself changed the script
-twice (`01576a5e`, then a comment-only fix at `4ebac900`), is the occasion on which the already-fired
-condition was noticed and acted on, not the change that fired it. The condition's own wording makes
-strengthening the self-test optional in the change that acts on it, so this pull request does not do
-so; the entry stays reopened rather than parked. The obligation is tracked in public issue #5468,
-which carries five measured items.
+**Reopened.** The second limb of the reopen condition first fired at `8b2895c7`, a change to
+`scripts/check_generated_site.py` earlier than this pull request, with this pull request being the
+occasion on which the already-fired condition was noticed and acted on. Pull request #5467, which
+itself changed the script twice (`01576a5e`, then a comment-only fix at `4ebac900`), is that
+occasion, not the change that fired the condition. The obligation is tracked in public issue #5468.
 
 **Cadence.** Re-measure with the commands above at every 20-PR refactor cycle and replace the
 figures here with the new ones.
