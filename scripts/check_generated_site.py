@@ -1974,9 +1974,12 @@ def run_staged_mutation_tests(
             raise AssertionError("staged source accepted a missing canonical detail page")
     finally:
         shutil.rmtree(missing_temporary)
-    # Mutating the attribute alone is already covered above; only a self-consistent
-    # count forces the checker to recompute from the catalogue instead of comparing
-    # the row against itself.
+    # A self-consistent bump: attribute and visible text move together. It adds no
+    # discriminating power over the attribute-only bump staged above -- both are rejected by
+    # the byte-exact marker comparison in check_staged_source, with the same message, before
+    # any status row is recomputed, and with that comparison bypassed the catalogue recompute
+    # rejects both too, so there is no row-against-itself weakness for a consistent count to
+    # close. Kept as the self-consistent shape of the class, not for reach the other lacks.
     proved_row = re.search(
         r'data-status-label="proved" data-record-count="(\d+)">proved: (\d+)</li>',
         status_text,
