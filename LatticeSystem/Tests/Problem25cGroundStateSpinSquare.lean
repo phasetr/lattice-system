@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.Theorem22Connected
 import LatticeSystem.Quantum.SpinS.Problem25cAxisSwapGroundStatePhase
 import LatticeSystem.Quantum.SpinS.SubmatrixMinEigenvalue
+import LatticeSystem.Quantum.SpinS.Problem25cTheorem22GroundState
 
 /-!
 # Red fixture: Tasaki Problem 2.5.c, p. 39, eq. (2.5.6) — single-site spin square

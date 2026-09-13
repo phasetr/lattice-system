@@ -131,4 +131,61 @@ theorem tasaki_problem_2_5_c_singleSite_spinSquare_expectation
   exact singleSiteSpinSquareExpectationS_all_axes_eq_of_zAxisRot_axisSwap_eigenphase
     J (μ : ℂ) x huniq hΦ_ne hΦnorm hΦ
 
+/-- **Tasaki Problem 2.5.c, p. 39, eq. (2.5.6), at the printed Hamiltonian (2.5.1), p. 37.**
+
+The instance of the theorem above at the model exactly as printed at the head of §2.5,
+`Ĥ = Σ_{{x,y} ∈ B} Ŝ_x · Ŝ_y` — unit weight on every bond of a connected bipartite graph with
+balanced sublattices.  In the ordered-pair convention of `heisenbergHamiltonianS` that
+unit-weight bond sum is the coupling `couplingOf G (1/2)`, the identification being
+`heisenbergHamiltonianS_couplingOf_half_eq_bondSum`.  Every hypothesis the general statement
+places on the coupling is discharged here from `couplingOf` itself, so the printed model
+assumes only connectedness, bipartiteness, balance and `S ≥ 1/2`. -/
+theorem tasaki_problem_2_5_c_couplingOf_half
+    (A : V → Bool) (G : SimpleGraph V) [DecidableRel G.Adj] (N : ℕ)
+    (hGconn : G.Connected)
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (h_card_eq : (Finset.univ.filter (fun x : V => A x = true)).card =
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card)
+    (hN : 1 ≤ N) :
+    ∃ μ : ℝ,
+      μ = hermitianMinEigenvalue (heisenbergHamiltonianS_isHermitian_of_real
+          (Λ := V) (couplingOf_real G (J := (1 : ℂ) / 2) (by norm_num)) N) ∧
+      finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+          (heisenbergHamiltonianS (couplingOf G ((1 : ℂ) / 2)) N)) (μ : ℂ)) ≤ 1 ∧
+      (∃ Φ : (V → Fin (N + 1)) → ℂ, Φ ≠ 0 ∧ star Φ ⬝ᵥ Φ = 1 ∧
+        (heisenbergHamiltonianS (couplingOf G ((1 : ℂ) / 2)) N).mulVec Φ = (μ : ℂ) • Φ) ∧
+      (∀ {Φ : (V → Fin (N + 1)) → ℂ}, Φ ≠ 0 → star Φ ⬝ᵥ Φ = 1 →
+        (heisenbergHamiltonianS (couplingOf G ((1 : ℂ) / 2)) N).mulVec Φ = (μ : ℂ) • Φ →
+        ∀ x : V,
+          singleSiteSpinSquareExpectationS x (spinSOp1 N) Φ = (N : ℂ) * (N + 2) / 12 ∧
+          singleSiteSpinSquareExpectationS x (spinSOp2 N) Φ = (N : ℂ) * (N + 2) / 12 ∧
+          singleSiteSpinSquareExpectationS x (spinSOp3 N) Φ = (N : ℂ) * (N + 2) / 12) := by
+  have hJ_real : ∀ x y : V, (couplingOf G ((1 : ℂ) / 2) x y).im = 0 := by
+    intro x y
+    unfold couplingOf
+    by_cases h : G.Adj x y
+    · rw [if_pos h]; norm_num
+    · rw [if_neg h, Complex.zero_im]
+  have hJ_pos_G : ∀ x y : V, G.Adj x y → 0 < (couplingOf G ((1 : ℂ) / 2) x y).re := by
+    intro x y h
+    unfold couplingOf
+    rw [if_pos h]
+    norm_num
+  have hJ_off : ∀ x y : V, ¬ G.Adj x y → couplingOf G ((1 : ℂ) / 2) x y = 0 := by
+    intro x y h
+    unfold couplingOf
+    exact if_neg h
+  have hJ_nn : ∀ x y : V, 0 ≤ (couplingOf G ((1 : ℂ) / 2) x y).re := by
+    intro x y
+    by_cases h : G.Adj x y
+    · exact (hJ_pos_G x y h).le
+    · rw [hJ_off x y h, Complex.zero_re]
+  have hJ_bipartite : ∀ x y : V, A x = A y → couplingOf G ((1 : ℂ) / 2) x y = 0 := by
+    intro x y hxy
+    unfold couplingOf
+    exact if_neg fun hadj => hGbip x y hadj hxy
+  exact tasaki_problem_2_5_c_singleSite_spinSquare_expectation A G N hGconn hGbip h_card_eq hN
+    hJ_real (couplingOf_real G (by norm_num)) (couplingOf_symm G ((1 : ℂ) / 2)) hJ_nn
+    hJ_bipartite hJ_pos_G hJ_off
+
 end LatticeSystem.Quantum
