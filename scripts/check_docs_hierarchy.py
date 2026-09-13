@@ -203,12 +203,12 @@ LEDGER_BASELINE_COMMIT = "94385e4521a36025496bffae7a825aab8362d46b"
 CATALOGUE_BASELINE_SLICE = slice(216, 2731)
 # Pins the published catalogue text; this module's docstring records exactly what is hashed
 # and how the pin is legitimately updated.
-APPROVED_CHANGES_SHA256 = "022882f4f0bed6de11a0ea1889433d4fdca29555f2d4e5984b023eaf7ea34381"
+APPROVED_CHANGES_SHA256 = "3cadfe2fff0417fd9b3f4a7a79b8cb9076b325ffefe8bce7c70a9d0cf79b79da"
 # Pins the row sequence `main()` actually compares the legacy pages against. The text pin above
 # does not reach it: the rows are derived from the transformed text by `table_data_rows`, which
 # is outside the pinned text, so without this pin a row skipped there would go unpublished with
 # the text pin undisturbed.
-PUBLISHED_ROWS_SHA256 = "551258704fe01b3a1c6db19e6cbb15d90bbe3371ac80db17b494ec4df7b37389"
+PUBLISHED_ROWS_SHA256 = "66c5ac4f2d26b4d891309c663a58f7e3751a020fd11de7370eafe226a6adb081"
 SCOPED_ROOTS = [DOCS / name for name in ("formalization", "roadmap", "limitations", "history")]
 PAGES = [DOCS / "index.md"] + sorted(path for root in SCOPED_ROOTS for path in root.rglob("*.md"))
 ALL_DOC_PAGES = sorted(DOCS.rglob("*.md"))
@@ -1792,6 +1792,62 @@ def _approved_replacements(text: str) -> str:
             "`Quantum/SpinS/GraphLocalStarSumWrapper.lean` (retired names; capstone in the same "
             "file, PR #5464) |",
         )
+        .replace(
+            # The frozen row overclaimed an exact hypothesis-bundle match with #869: PR #5465
+            # removed the spectral shift `c` / `hc_strict` / `μ < c` conjunct from #869, so the
+            # match no longer holds (`tasaki_2_5_theorem_2_3` itself, the predicate this row
+            # documents, is untouched and still carries `c` and `μ < c`). Corrected to name the
+            # hypotheses actually shared and the ones #869 no longer states, dropping the false
+            # "the #869 intermediate-existence hypothesis" clause (#869 never carried
+            # `h_intermediate`).
+            "The hypothesis bundle and conclusion match the per-sector bundled Theorem 2.2 "
+            "`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` (#869) exactly — "
+            "real symmetric coupling (`(J x y).im = 0`, `star (J x y) = J x y`, "
+            "`J x y = J y x`, `0 ≤ (J x y).re`), bipartite support, positivity on "
+            "`bipartiteCompleteGraphOf A`, non-empty sublattices, a spectral shift `c` strictly "
+            "above the dressed diagonal, the #869 intermediate-existence hypothesis, plus sector "
+            "non-emptiness — and asserts existence of a common GS energy `μ`",
+            "The hypothesis bundle shares with the per-sector bundled Theorem 2.2 "
+            "`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` (#869) the real "
+            "symmetric coupling (`(J x y).im = 0`, `star (J x y) = J x y`, `J x y = J y x`, "
+            "`0 ≤ (J x y).re`), bipartite support, positivity on `bipartiteCompleteGraphOf A`, "
+            "and non-empty sublattices, but additionally carries its own spectral shift `c` "
+            "strictly above the dressed diagonal and the resulting `μ < c` comparison, neither "
+            "of which #869 states any more, plus sector non-emptiness — and asserts existence "
+            "of a common GS energy `μ`",
+        )
+        .replace(
+            # The previous correction's "additionally carries ... plus sector non-emptiness"
+            # misattributed sector non-emptiness: #869 also carries it
+            # (`[Nonempty (magConfigS V N M)]`, `MarshallLiebMattisTheorem22.lean:47`), so it is
+            # not something #869 lacks. Moved into the shared clause, leaving only the shift `c`
+            # and the `μ < c` comparison in the "additionally carries" list.
+            "and non-empty sublattices, but additionally carries its own spectral shift `c` "
+            "strictly above the dressed diagonal and the resulting `μ < c` comparison, neither "
+            "of which #869 states any more, plus sector non-emptiness — and asserts existence "
+            "of a common GS energy `μ`",
+            "non-empty sublattices, and sector non-emptiness, but additionally carries its own "
+            "spectral shift `c` strictly above the dressed diagonal and the resulting `μ < c` "
+            "comparison, neither of which #869 states any more — and asserts existence of a "
+            "common GS energy `μ`",
+        )
+        .replace(
+            # Two residual defects in the previous correction's own wording: (1) "any more" is
+            # session-relative (round 4 already made the Lean side current-state); (2) "carries
+            # ... the resulting `μ < c` comparison" attaches a conclusion conjunct of
+            # `tasaki_2_5_theorem_2_3` to "the hypothesis bundle" -- `hc_strict : ∀ σ, ... < c`
+            # is the hypothesis, `μ < c` sits inside the existential conclusion
+            # (`Theorem23StructuralBipartiteToy.lean:56`). Split into a hypothesis clause and a
+            # conclusion clause and dropped "any more".
+            "non-empty sublattices, and sector non-emptiness, but additionally carries its own "
+            "spectral shift `c` strictly above the dressed diagonal and the resulting `μ < c` "
+            "comparison, neither of which #869 states any more — and asserts existence of a "
+            "common GS energy `μ`",
+            "non-empty sublattices, and sector non-emptiness, but additionally requires its own "
+            "spectral shift `c` strictly above the dressed diagonal as a hypothesis and "
+            "concludes `μ < c`, neither of which #869 states — and asserts existence of a "
+            "common GS energy `μ`",
+        )
     )
 
 
@@ -1856,12 +1912,12 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "88e99b6fa9c5bfd11eacf26bb2d0ce2c30a5dc2a60d5a2ab8bb195e01be406c5"
+SCRIPT_SOURCE_SHA256 = "99e1e74ebc905b4055ced64939d163f217fac14fe060833976a5d5e575c3a191"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
 # entry that no longer matches anything, say -- is a moved pin rather than a silent edit.
-APPROVED_ENTRIES_SHA256 = "fac63fae002a7fcc1db9c6995800d8ca1b12fc9a4b530d97af9db665752575da"
+APPROVED_ENTRIES_SHA256 = "d1d4c041d9dc532c58130cc13f8c20ed4c9da0f9ed957edfb298ddf5b44c8b87"
 
 # The only text `SCRIPT_SOURCE_SHA256` does not hash: the digits these four pins carry. Each is
 # restated by the very edit it pins, and a digest over its own value would have no fixed point.
@@ -2758,6 +2814,81 @@ MOVED_PROSE_CORRECTIONS = (
         "degree wrappers `tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_closed_form` "
         "and `tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_degree_closed_form`.",
     ),
+    (
+        # This correction inverts a clause added to the published text after the correction
+        # below was written: whole-Hilbert-space uniqueness is separately proved (through the
+        # complete-bipartite chain, at general balanced generality rather than the printed
+        # theorem's connected one) by a declaration the correction below does not cite. Undoing
+        # this clause first restores the exact text the correction below expects as its own
+        # "published" field, so the chain still reaches the same historical baseline.
+        "chain by `tasaki23_sector_lift_and_casimir_zero_of_card_eq`, with no "
+        "`h_intermediate` hypothesis. Whole-Hilbert-space uniqueness is also proved "
+        "at general balanced complete-bipartite generality, through the "
+        "complete-bipartite chain rather than the connected one, by "
+        "`exists_t23_commonE_and_heisHamS_fullEig_finrank_le_one_of_casLadder_t23_pf`: "
+        "its Theorem 2.3 premise is discharged for any balanced bipartition by "
+        "`tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive`, and its "
+        "diagonal-bound constants by "
+        "`exists_strict_diag_bound_dressedHeisenbergSReMatrix`. Assembled through "
+        "PRs #794-#870, including the bundled sector theorem "
+        "`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`.",
+        "chain by `tasaki23_sector_lift_and_casimir_zero_of_card_eq`, with no "
+        "`h_intermediate` hypothesis. Assembled through "
+        "PRs #794-#870, including the bundled sector theorem "
+        "`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`.",
+    ),
+    (
+        # The record repeated the proof guide's Theorem 2.2 overclaim (a "DONE"
+        # full-Hilbert-space form). Corrected to match what the guide now states: a per-sector
+        # result lifted through the sector embedding, under a coupling hypothesis stronger than
+        # the book's connectedness; whole-Hilbert-space uniqueness and S_tot = 0 are not
+        # conjuncts of that result and are not established at the printed theorem's generality,
+        # though related results exist elsewhere in the repository: the even antiferromagnetic
+        # Heisenberg ring's whole-Hilbert-space uniqueness is proved through the connected- (not
+        # complete-) bipartite chain, and the balanced-cardinality case's S_tot = 0 through the
+        # complete-bipartite chain.
+        # Written whitespace-normalized (single spaces, no embedded newline), matching how the
+        # comparison this fires against is computed.
+        "- **PARTIAL: Marshall-Lieb-Mattis Theorem 2.2.** What is formalised is "
+        "the per-sector result, presented as a vector of the full Hilbert space "
+        "through the sector embedding, under a coupling hypothesis of strict "
+        "positivity on every cross-sublattice pair, which is stronger than the "
+        "connectedness Tasaki assumes. Whole-Hilbert-space uniqueness and "
+        "`S_tot = 0` are not conjuncts of this result and are not established at "
+        "the printed theorem's generality (an arbitrary connected bipartite "
+        "lattice); related results exist elsewhere. Whole-Hilbert-space "
+        "uniqueness for the even antiferromagnetic Heisenberg ring "
+        "(`ringSym_ground_uniqueness`, every even `L >= 2`, every `N >= 1`) is "
+        "proved through the connected-bipartite chain, not the "
+        "complete-bipartite chain: for `L >= 6` the ring coupling does not even "
+        "satisfy the complete-bipartite positivity hypothesis (it vanishes on "
+        "non-adjacent cross-sublattice pairs). Separately, `S_tot = 0` in the "
+        "balanced-cardinality case is proved, conditionally on a supplied "
+        "sector eigenvector, through the complete-bipartite "
+        "chain by `tasaki23_sector_lift_and_casimir_zero_of_card_eq`, with no "
+        "`h_intermediate` hypothesis. Assembled through "
+        "PRs #794-#870, including the bundled sector theorem "
+        "`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`.",
+        "- **DONE: Marshall-Lieb-Mattis Theorem 2.2.** The general spin-`S` "
+        "magnetization-sector and full-Hilbert-space forms were assembled through "
+        "PRs #794-#870, including the bundled full theorem "
+        "`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`.",
+    ),
+    (
+        # The legacy page's closing prose paragraph repeated the same overclaim as the PARTIAL
+        # bullet correction directly above (the one replacing the full-Hilbert-space
+        # "DONE" overclaim): PR #5465 removed the spectral shift `c` / `hc_strict` / `μ < c`
+        # conjunct from `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` (#869),
+        # so `tasaki_2_5_theorem_2_3`'s hypothesis bundle (itself untouched, still carrying `c`
+        # and `μ < c`) no longer matches #869 "exactly". This is prose, not a table row, so it is
+        # corrected here rather than in `_approved_replacements`.
+        "The hypothesis bundle shares its coupling and cardinality hypotheses with "
+        "`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` (#869), but "
+        "additionally requires its own spectral shift `c` as a hypothesis and concludes "
+        "`μ < c`, which #869 does not state.",
+        "The hypothesis bundle matches "
+        "`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` (#869) exactly.",
+    ),
 )
 
 # Where each correction above fires, in declaration order: the sites it rewrites, a site being the
@@ -2774,7 +2905,9 @@ MOVED_PROSE_CORRECTIONS = (
 # its own are each a hard failure. A correction that straddled two pages sharing one range is
 # counted on neither and fails the same way, which is the safe direction. The four older `.replace`
 # calls below (in `normalize_current_moved_prose`) are not counted, so they carry the fail-open
-# weakness this pin removes from these five.
+# weakness this pin removes from every correction registered in `MOVED_PROSE_CORRECTIONS` above
+# (the length of this tuple always matches it, and the site-probe self-test below fails closed on
+# any correction left unregistered here, so no separately asserted count is needed).
 MOVED_PROSE_CORRECTION_SITES = (
     (("docs/history/roadmap/foundations.md", 139, 139, 1),),
     (("docs/history/open-items.md", 2780, 3037, 1),),
@@ -2782,6 +2915,17 @@ MOVED_PROSE_CORRECTION_SITES = (
     (("docs/history/open-items.md", 2780, 3037, 1),),
     (("docs/history/open-items.md", 2780, 3037, 1),),
     (("docs/history/open-items.md", 2780, 3037, 1),),
+    (("docs/history/open-items.md", 2780, 3037, 1),),
+    (("docs/history/open-items.md", 2780, 3037, 1),),
+    (
+        (
+            "docs/formalization/legacy/"
+            "27-spin-marshall-lieb-mattis-on-the-magnetization-sector-tasa-part-04.md",
+            1915,
+            2016,
+            1,
+        ),
+    ),
 )
 
 

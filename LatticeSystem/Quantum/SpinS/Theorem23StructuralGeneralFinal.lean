@@ -64,9 +64,13 @@ theorem tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive
       hA_ne hB_ne hN
   refine ⟨μ, ?_, ?_⟩
   · intro M hM _hNe
-    obtain ⟨μM, vM, hμM_lt, hvM_pos, hH_M, _hsupp, huniq⟩ :=
-      marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full (N := N) (M := M) A c
+    obtain ⟨μM, vM, hvM_pos, hH_M, _hsupp, huniq⟩ :=
+      marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full (N := N) (M := M) A
+        hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hA_ne hB_ne hN
+    have hμM_lt : μM < c :=
+      marshallSign_sector_eigenvalue_lt_of_dressedDiagonal_lt (N := N) (M := M) A c
         hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hA_ne hB_ne hN
+        hvM_pos hH_M
     have hReEig_M : (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
         (fun σ => (marshallSignS A σ.1).re * vM σ) =
         μM • (fun σ => (marshallSignS A σ.1).re * vM σ) := by

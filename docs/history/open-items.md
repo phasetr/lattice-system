@@ -72,9 +72,31 @@ The graph-centric Néel state foundation (`neelStateOf`) remains the common
 entry point, but the main §2.5 theorem/problem endpoints are now formalised as
 follows:
 
-- **DONE: Marshall-Lieb-Mattis Theorem 2.2.**  The general spin-`S`
-  magnetization-sector and full-Hilbert-space forms were assembled through
-  PRs #794-#870, including the bundled full theorem
+- **PARTIAL: Marshall-Lieb-Mattis Theorem 2.2.** What is formalised is
+  the per-sector result, presented as a vector of the full Hilbert space
+  through the sector embedding, under a coupling hypothesis of strict
+  positivity on every cross-sublattice pair, which is stronger than the
+  connectedness Tasaki assumes. Whole-Hilbert-space uniqueness and
+  `S_tot = 0` are not conjuncts of this result and are not established at
+  the printed theorem's generality (an arbitrary connected bipartite
+  lattice); related results exist elsewhere. Whole-Hilbert-space uniqueness
+  for the even antiferromagnetic Heisenberg ring (`ringSym_ground_uniqueness`,
+  every even `L >= 2`, every `N >= 1`) is proved through the connected-bipartite
+  chain, not the complete-bipartite chain: for `L >= 6` the ring coupling does
+  not even satisfy the complete-bipartite positivity hypothesis (it vanishes
+  on non-adjacent cross-sublattice pairs). Separately, `S_tot = 0` in the
+  balanced-cardinality case is proved, conditionally on a supplied sector
+  eigenvector, through the complete-bipartite chain by
+  `tasaki23_sector_lift_and_casimir_zero_of_card_eq`, with no
+  `h_intermediate` hypothesis. Whole-Hilbert-space uniqueness is also proved
+  at general balanced complete-bipartite generality, through the
+  complete-bipartite chain rather than the connected one, by
+  `exists_t23_commonE_and_heisHamS_fullEig_finrank_le_one_of_casLadder_t23_pf`:
+  its Theorem 2.3 premise is discharged for any balanced bipartition by
+  `tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive`, and its
+  diagonal-bound constants by
+  `exists_strict_diag_bound_dressedHeisenbergSReMatrix`. Assembled through
+  PRs #794-#870, including the bundled sector theorem
   `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`.
 - **DONE: Tasaki Theorem 2.3.**  The current public statement is
   `tasaki_2_5_theorem_2_3`, with structural proof witnesses

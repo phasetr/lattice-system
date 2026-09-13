@@ -26,15 +26,14 @@ variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 /-- **Structural per-sector toy ground state at the predicted minimum energy
 (no `h_intermediate`)**. -/
 theorem toy_sector_groundState_at_predicted
-    (A : V → Bool) (c : ℝ)
+    (A : V → Bool)
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card)
-    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A (bipartiteCoupling A) N σ σ < c)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false) (hN : 1 ≤ N)
     {M : ℕ} (hM : M ∈ tasaki23GroundStateSectors (V := V) A N)
     [Nonempty (magConfigS V N M)] :
     ∃ vM : magConfigS V N M → ℝ,
-      (bipartiteToyMinEnergyPredicted (Λ := V) A N).re < c ∧ (∀ σ, 0 < vM σ) ∧
+      (∀ σ, 0 < vM σ) ∧
       (heisenbergHamiltonianS (bipartiteCoupling A) N).mulVec
           (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * vM τ : ℝ) : ℂ))) =
         ((bipartiteToyMinEnergyPredicted (Λ := V) A N).re : ℂ) • magSectorEmbedding
@@ -52,8 +51,10 @@ theorem toy_sector_groundState_at_predicted
             (Ψ' τ.1).re = r * ((marshallSignS A τ.1).re * vM τ)) := by
   classical
   set E := (bipartiteToyMinEnergyPredicted (Λ := V) A N).re with hEdef
-  obtain ⟨μM, vM, hμM_lt, hvM_pos, hH_M, _hsupp, huniq⟩ :=
-    marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full (M := M) A c
+  obtain ⟨c, hc_strict⟩ := LatticeSystem.Math.exists_gt_of_finite
+    (fun σ : V → Fin (N + 1) => dressedHeisenbergSReMatrix A (bipartiteCoupling A) N σ σ)
+  obtain ⟨μM, vM, hvM_pos, hH_M, _hsupp, huniq⟩ :=
+    marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full (M := M) A
       (bipartiteCoupling_im A)
       (fun x y => by
         rw [Complex.star_def, Complex.conj_eq_iff_im]; exact bipartiteCoupling_im A x y)
@@ -63,7 +64,7 @@ theorem toy_sector_groundState_at_predicted
       (fun x y => bipartiteCoupling_nonneg A x y)
       (bipartiteCoupling_symm A)
       (fun _ _ h => bipartiteCoupling_eq_zero_of_same_sublattice A h)
-      hc_strict hA_ne hB_ne hN
+      hA_ne hB_ne hN
   have hReEig_M : (heisenbergHamiltonianSReMatrixOnMagSector (bipartiteCoupling A) N M).mulVec
       (fun σ => (marshallSignS A σ.1).re * vM σ) =
       μM • (fun σ => (marshallSignS A σ.1).re * vM σ) := by
@@ -121,6 +122,6 @@ theorem toy_sector_groundState_at_predicted
       hφ_ne hφ_E
   have hμM_eq : μM = E := le_antisymm hle hge
   subst hμM_eq
-  exact ⟨vM, hμM_lt, hvM_pos, hH_M, hReEig_M, huniq⟩
+  exact ⟨vM, hvM_pos, hH_M, hReEig_M, huniq⟩
 
 end LatticeSystem.Quantum
