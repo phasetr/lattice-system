@@ -72,32 +72,41 @@ The graph-centric Néel state foundation (`neelStateOf`) remains the common
 entry point, but the main §2.5 theorem/problem endpoints are now formalised as
 follows:
 
-- **PARTIAL: Marshall-Lieb-Mattis Theorem 2.2.** What is formalised is
-  the per-sector result, presented as a vector of the full Hilbert space
-  through the sector embedding, under a coupling hypothesis of strict
-  positivity on every cross-sublattice pair, which is stronger than the
-  connectedness Tasaki assumes. Whole-Hilbert-space uniqueness and
-  `S_tot = 0` are not conjuncts of this result and are not established at
-  the printed theorem's generality (an arbitrary connected bipartite
-  lattice); related results exist elsewhere. Whole-Hilbert-space uniqueness
-  for the even antiferromagnetic Heisenberg ring (`ringSym_ground_uniqueness`,
-  every even `L >= 2`, every `N >= 1`) is proved through the connected-bipartite
-  chain, not the complete-bipartite chain: for `L >= 6` the ring coupling does
-  not even satisfy the complete-bipartite positivity hypothesis (it vanishes
-  on non-adjacent cross-sublattice pairs). Separately, `S_tot = 0` in the
-  balanced-cardinality case is proved, conditionally on a supplied sector
-  eigenvector, through the complete-bipartite chain by
-  `tasaki23_sector_lift_and_casimir_zero_of_card_eq`, with no
-  `h_intermediate` hypothesis. Whole-Hilbert-space uniqueness is also proved
-  at general balanced complete-bipartite generality, through the
-  complete-bipartite chain rather than the connected one, by
-  `exists_t23_commonE_and_heisHamS_fullEig_finrank_le_one_of_casLadder_t23_pf`:
-  its Theorem 2.3 premise is discharged for any balanced bipartition by
-  `tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive`, and its
-  diagonal-bound constants by
-  `exists_strict_diag_bound_dressedHeisenbergSReMatrix`. Assembled through
-  PRs #794-#870, including the bundled sector theorem
-  `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`.
+- **DONE: Marshall-Lieb-Mattis Theorem 2.2, at the printed generality.**
+  `tasaki_2_5_theorem_2_2_of_connected`
+  (`Quantum/SpinS/Theorem22Connected.lean`) proves Theorem 2.2, p. 39, eq.
+  (2.5.4), general couplings by the Remark and eq. (2.5.13), p. 43: a
+  connected bipartite graph `G` with balanced sublattices `|A| = |B|`,
+  arbitrary spin `N >= 1`, coupling strictly positive on the edges of `G`
+  and zero off them. `heisenbergHamiltonianS` sums over ordered pairs while
+  (2.5.1) and (2.5.13) sum over unordered bonds, so a symmetric coupling
+  supported on the bonds is twice the printed bond sum: the printed exchange
+  `J_{x,y}` of (2.5.13) is the ordered-pair coupling `J_{x,y}/2`, and
+  restricting the support to the bonds of `G` removes the non-bond terms but
+  not that doubling. No conclusion depends on the normalisation, the
+  hypotheses being closed under positive rescaling of the coupling and the
+  energy existentially quantified. The printed unit-weight Hamiltonian
+  (2.5.1), p. 37, is the instance `tasaki_2_5_theorem_2_2_couplingOf_half`
+  of the same file: Theorem 2.2 at `couplingOf G (1/2)`, whose ordered double
+  sum reproduces the unit-weight bond sum exactly. It concludes all four
+  printed conjuncts with no
+  magnetization-sector restriction and no auxiliary spectral shift
+  parameter: whole-Hilbert-space uniqueness (full eigenspace `finrank <= 1`
+  at a globally minimal energy), the Marshall-signed eigenvector on the
+  balanced sector with strictly positive coefficients, and `S_tot = 0`. The
+  complete bipartite graph is not a hypothesis; it is only the bond graph
+  of the proof's toy Hamiltonian (2.5.10), p. 41. The capstone assembles
+  the pre-existing connected chain (`tasaki23_strict_hOutside_of_connected`,
+  the graph-agnostic full-eigenspace engine, and
+  `tasaki23_sector_lift_and_casimir_of_irreducible`) with one rebase, the
+  same route by which `ringSym_ground_uniqueness` already gets
+  whole-Hilbert-space uniqueness for the even antiferromagnetic Heisenberg
+  ring (every even `L >= 2`, every `N >= 1`), for which `L >= 6` rings do
+  not satisfy the complete-bipartite positivity hypothesis of the earlier
+  sector-only route. The earlier per-sector result
+  `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`
+  remains available, presented as a vector of the full Hilbert space
+  through the sector embedding. Assembled through PRs #794-#870, #5467.
 - **DONE: Tasaki Theorem 2.3.**  The current public statement is
   `tasaki_2_5_theorem_2_3`, with structural proof witnesses
   `tasaki_2_5_theorem_2_3_bipartiteToy` and

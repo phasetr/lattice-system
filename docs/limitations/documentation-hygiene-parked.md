@@ -11,8 +11,10 @@ act on, together with the measurements that settled such a population instead of
 entry states what it covers, the command that measures it on tracked paths at a pinned revision,
 and how often the measurement is retaken. A parked entry adds why it is not being fixed and the
 condition that reopens it; an entry whose population is measured empty states its disposition
-instead, because there is nothing left to reopen. A state diagnosis that encounters one of these
-populations reads the entry first and does not record it as an unresolved defect.
+instead, because there is nothing left to reopen; an entry whose reopen condition has fired states
+when and records where the resulting obligation is tracked, instead of parking again. A state
+diagnosis that encounters one of these populations reads the entry first and does not record it as
+an unresolved defect.
 
 A command whose paths reach this page excludes it from its own pathspec. The page quotes the
 phrases it measures, so without that exclusion a command would count this record of a population as
@@ -298,6 +300,12 @@ publication state this repository has not entered.
 phrases begin guarding the published state; or the next approved change to
 `scripts/check_generated_site.py`, which is the occasion on which the self-test can be strengthened
 in the same change.
+
+**Reopened.** The second limb of the reopen condition first fired at `8b2895c7`, a change to
+`scripts/check_generated_site.py` earlier than this pull request, with this pull request being the
+occasion on which the already-fired condition was noticed and acted on. Pull request #5467, which
+itself changed the script twice (`01576a5e`, then a comment-only fix at `4ebac900`), is that
+occasion, not the change that fired the condition. The obligation is tracked in public issue #5468.
 
 **Cadence.** Re-measure with the commands above at every 20-PR refactor cycle and replace the
 figures here with the new ones.

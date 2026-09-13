@@ -445,6 +445,58 @@
         "quantum-spin"
       ],
       "trust_state": "axiom_free"
+    },
+    {
+      "axiom_dependencies": [],
+      "capstone": true,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-theorem-2-2-connected",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.tasaki_2_5_theorem_2_2_of_connected",
+      "lifecycle": "active",
+      "module": "LatticeSystem.Quantum.SpinS.Theorem22Connected",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "retirement": null,
+      "source_coverage": "complete",
+      "source_path": "LatticeSystem/Quantum/SpinS/Theorem22Connected.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-theorem-2-2"
+        }
+      ],
+      "summary": "Tasaki Theorem 2.2 (Marshall-Lieb-Mattis), p. 39, eq. (2.5.4), p. 39, general exchange couplings by the Remark and eq. (2.5.13), p. 43, at the printed generality: a connected (Footnote 28, p. 33) bipartite graph G with balanced sublattices, arbitrary spin N >= 1, and coupling J real, symmetric, non-negative, vanishing within a sublattice, strictly positive on the edges of G and vanishing off G. heisenbergHamiltonianS sums over ordered pairs while (2.5.13) sums over unordered bonds, so this J is half the printed exchange, each bond contributing once in each order, and restricting the support of J to the bonds of G removes the non-bond terms but not that doubling; no conclusion depends on the normalisation, since the hypotheses are closed under positive rescaling of J and the energy is existentially quantified. Concludes, with no magnetization-sector restriction and no auxiliary spectral shift parameter: whole-space ground-state uniqueness (full eigenspace finrank <= 1 at a globally minimal energy), the Marshall-signed eigenvector on the balanced sector with strictly positive coefficients (the (2.5.4) expansion), and vanishing total spin ((S_tot)^2 Phi = 0). The complete bipartite graph is not a hypothesis; it is only the bond graph of the proof's toy Hamiltonian (2.5.10), p. 41. The printed unit-weight model (2.5.1), p. 37, is the instance tasaki_2_5_theorem_2_2_couplingOf_half.",
+      "topic_ids": [
+        "quantum-spin"
+      ],
+      "trust_state": "axiom_free"
+    },
+    {
+      "axiom_dependencies": [],
+      "capstone": true,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-theorem-2-2-printed-hamiltonian",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.tasaki_2_5_theorem_2_2_couplingOf_half",
+      "lifecycle": "active",
+      "module": "LatticeSystem.Quantum.SpinS.Theorem22Connected",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "retirement": null,
+      "source_coverage": "complete",
+      "source_path": "LatticeSystem/Quantum/SpinS/Theorem22Connected.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-theorem-2-2"
+        }
+      ],
+      "summary": "Tasaki Theorem 2.2 (Marshall-Lieb-Mattis), p. 39, eq. (2.5.4), p. 39, at the printed Hamiltonian (2.5.1), p. 37: unit weight on every unordered bond of a connected (Footnote 28, p. 33) bipartite graph G with balanced sublattices, arbitrary spin N >= 1. Because heisenbergHamiltonianS sums over ordered pairs, that printed unit weight is the coupling couplingOf G (1/2), each bond being met once in each order, so the ordered double sum reproduces the printed bond sum exactly. Concludes the four conjuncts of the general-coupling statement tasaki_2_5_theorem_2_2_of_connected (whole-space ground-state uniqueness at a globally minimal energy, the Marshall-signed strictly positive eigenvector on the balanced sector, and vanishing total spin), with every hypothesis on the coupling discharged from couplingOf together with bipartiteness of G, leaving only connectedness, bipartiteness, balance and N >= 1.",
+      "topic_ids": [
+        "quantum-spin"
+      ],
+      "trust_state": "axiom_free"
     }
   ],
   "schema_version": 2,

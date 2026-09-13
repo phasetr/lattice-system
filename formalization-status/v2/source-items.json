@@ -137,6 +137,19 @@
     },
     {
       "equations": [
+        "2.5.4",
+        "2.5.13"
+      ],
+      "id": "tasaki-2020-theorem-2-2",
+      "item_kind": "theorem",
+      "item_number": "2.2",
+      "pages": "39",
+      "section": "2.5",
+      "source_id": "tasaki-2020",
+      "title": "Marshall-Lieb-Mattis theorem"
+    },
+    {
+      "equations": [
         "3.4.7-3.4.12"
       ],
       "id": "tasaki-2020-theorem-3-1",
