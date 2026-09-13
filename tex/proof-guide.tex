@@ -18288,13 +18288,16 @@ Marshall sign machinery + time-reversal action; see
   ground state and $S_{\rm tot} = 0$ -- is a conclusion of this declaration,
   which compares nothing across sectors; they are not established at the
   printed theorem's generality (an arbitrary connected bipartite lattice).
-  Related results exist elsewhere in the repository, reachable only through
-  the complete-bipartite chain: whole-Hilbert-space uniqueness is proved
-  unconditionally for the even antiferromagnetic Heisenberg ring
-  (\texttt{ringSym\_ground\_uniqueness}), and $S_{\rm tot} = 0$ is proved in
-  the balanced-cardinality case
-  (\texttt{tasaki23PredictedCasimirValue\_eq\_zero\_of\_card\_eq} together
-  with \texttt{tasaki23\_pf\_groundState\_casimir\_eq\_predicted\_base}).
+  Related results exist elsewhere in the repository. Whole-Hilbert-space
+  uniqueness for the even antiferromagnetic Heisenberg ring
+  (\texttt{ringSym\_ground\_uniqueness}, every even $L\ge 2$, every
+  $N\ge 1$) is proved through the connected-bipartite chain, not the
+  complete-bipartite chain: for $L\ge 6$ the ring coupling does not even
+  satisfy the complete-bipartite positivity hypothesis (it vanishes on
+  non-adjacent cross-sublattice pairs). Separately, $S_{\rm tot} = 0$ in the
+  balanced-cardinality case is proved through the complete-bipartite chain
+  by \texttt{tasaki23\_sector\_lift\_and\_casimir\_zero\_of\_card\_eq}, with
+  no \texttt{h\_intermediate} hypothesis.
   The coupling hypothesis carried is also stronger than the printed one:
   strict positivity is demanded on every cross-sublattice pair, i.e.\ on
   every edge of the complete bipartite graph on $A \sqcup B$, whereas
@@ -18404,8 +18407,8 @@ printed one, which asks only that the bond set be connected; no
 connectedness assumption and no variable graph enters the formalised
 statement -- the graph is the fixed complete bipartite graph on
 $A \sqcup B$ determined by $A$.
-For a fixed magnetization quantum number $M$, the ground state of
-the Heisenberg Hamiltonian
+For a fixed magnetization quantum number $M$, a Marshall-positive
+eigenvector of the Heisenberg Hamiltonian
 \[
   \hat H = \sum_{x,y \in V} J(x,y)\,\hat{\boldsymbol S}_x \cdot
   \hat{\boldsymbol S}_y
@@ -18413,7 +18416,7 @@ the Heisenberg Hamiltonian
 restricted to the $M$-sector subspace
 $\mathcal H_M = \{\Psi : (V \to \mathrm{Fin}(N+1)) \to \mathbb C \mid
   \Psi$ supported on $\{\sigma : \mathrm{magSum}(\sigma) = M\}\}$
-exists, is unique up to a positive real scalar in its real part among
+exists and is unique up to a positive real scalar in its real part among
 Marshall-positive sector-supported eigenvectors, and
 has the Marshall sign structure
 \[

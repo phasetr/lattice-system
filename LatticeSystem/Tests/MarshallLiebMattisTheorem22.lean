@@ -24,11 +24,13 @@ the declaration assumes strict positivity on every cross-sublattice pair, which 
 stronger. Nor does it reach the printed theorem's whole-Hilbert-space uniqueness or its
 `S_tot = 0` conjunct: neither follows from a statement about a single sector, and neither is
 established at the printed theorem's generality (an arbitrary connected bipartite lattice).
-Related results exist elsewhere in this repository, reachable only through the complete-bipartite
-chain: `ringSym_ground_uniqueness` gives whole-Hilbert-space uniqueness unconditionally for the
-even antiferromagnetic Heisenberg ring, and `tasaki23PredictedCasimirValue_eq_zero_of_card_eq`
-together with `tasaki23_pf_groundState_casimir_eq_predicted_base` give `S_tot = 0` in the
-balanced-cardinality case.
+Related results exist elsewhere in this repository. `ringSym_ground_uniqueness` gives
+whole-Hilbert-space uniqueness for the even antiferromagnetic Heisenberg ring (every even `L ≥ 2`,
+every `N ≥ 1`) through the connected-bipartite chain, not the complete-bipartite chain: for
+`L ≥ 6` the ring coupling does not even satisfy the complete-bipartite positivity hypothesis
+(it vanishes on non-adjacent cross-sublattice pairs). Separately,
+`tasaki23_sector_lift_and_casimir_zero_of_card_eq` gives `S_tot = 0` in the balanced-cardinality
+case through the complete-bipartite chain, with no `h_intermediate` hypothesis.
 -/
 
 namespace LatticeSystem.Tests.MarshallLiebMattisTheorem22

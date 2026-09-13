@@ -79,13 +79,15 @@ follows:
   connectedness Tasaki assumes. Whole-Hilbert-space uniqueness and
   `S_tot = 0` are not conjuncts of this result and are not established at
   the printed theorem's generality (an arbitrary connected bipartite
-  lattice); related results exist elsewhere, reachable only through the
-  complete-bipartite chain: whole-Hilbert-space uniqueness holds
-  unconditionally for the even antiferromagnetic Heisenberg ring
-  (`ringSym_ground_uniqueness`), and `S_tot = 0` holds in the
-  balanced-cardinality case
-  (`tasaki23PredictedCasimirValue_eq_zero_of_card_eq` together with
-  `tasaki23_pf_groundState_casimir_eq_predicted_base`). Assembled through
+  lattice); related results exist elsewhere. Whole-Hilbert-space uniqueness
+  for the even antiferromagnetic Heisenberg ring (`ringSym_ground_uniqueness`,
+  every even `L >= 2`, every `N >= 1`) is proved through the connected-bipartite
+  chain, not the complete-bipartite chain: for `L >= 6` the ring coupling does
+  not even satisfy the complete-bipartite positivity hypothesis (it vanishes
+  on non-adjacent cross-sublattice pairs). Separately, `S_tot = 0` in the
+  balanced-cardinality case is proved through the complete-bipartite chain by
+  `tasaki23_sector_lift_and_casimir_zero_of_card_eq`, with no
+  `h_intermediate` hypothesis. Assembled through
   PRs #794-#870, including the bundled sector theorem
   `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`.
 - **DONE: Tasaki Theorem 2.3.**  The current public statement is
