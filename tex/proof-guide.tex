@@ -18276,41 +18276,43 @@ Marshall sign machinery + time-reversal action; see
 §\ref{subsec:neel-state-of}). Status of the substructure items:
 
 \begin{itemize}
-\item \textbf{PARTIAL} Marshall--Lieb--Mattis Theorem 2.2 for general
-  spin~$S$. What is formalised is the \emph{per-sector} statement, via a
-  Perron--Frobenius argument on the Marshall-rotated dressed Heisenberg
-  sector matrix: on a fixed magnetization-$M$ sector it produces a
-  Marshall-positive eigenvector of the Heisenberg Hamiltonian vanishing
-  off that sector, unique up to a positive real scalar in its real part among Marshall-positive
-  sector-supported competitors, and presented as a vector of the full
-  Hilbert space through the sector embedding. Neither of the printed
-  theorem's other two conjuncts -- whole-Hilbert-space uniqueness of the
-  ground state and $S_{\rm tot} = 0$ -- is a conclusion of this declaration,
-  which compares nothing across sectors; they are not established at the
-  printed theorem's generality (an arbitrary connected bipartite lattice).
-  Related results exist elsewhere in the repository. Whole-Hilbert-space
-  uniqueness for the even antiferromagnetic Heisenberg ring
-  (\texttt{ringSym\_ground\_uniqueness}, every even $L\ge 2$, every
-  $N\ge 1$) is proved through the connected-bipartite chain, not the
-  complete-bipartite chain: for $L\ge 6$ the ring coupling does not even
-  satisfy the complete-bipartite positivity hypothesis (it vanishes on
-  non-adjacent cross-sublattice pairs). Separately, $S_{\rm tot} = 0$ in the
-  balanced-cardinality case is proved, conditionally on a supplied sector
-  eigenvector, through the complete-bipartite chain
-  by \texttt{tasaki23\_sector\_lift\_and\_casimir\_zero\_of\_card\_eq}, with
-  no \texttt{h\_intermediate} hypothesis. Whole-Hilbert-space uniqueness is
-  also proved at general balanced complete-bipartite generality, through the
-  complete-bipartite chain rather than the connected one, by
-  \texttt{exists\_t23\_commonE\_and\_heisHamS\_fullEig\_finrank\_le\_one\_of\_casLadder\_t23\_pf}:
-  its Theorem~2.3 premise is discharged for any balanced bipartition by
-  \texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_bipartiteCompletePositive}, and its
-  diagonal-bound constants by
-  \texttt{exists\_strict\_diag\_bound\_dressedHeisenbergSReMatrix}.
-  The coupling hypothesis carried is also stronger than the printed one:
-  strict positivity is demanded on every cross-sublattice pair, i.e.\ on
-  every edge of the complete bipartite graph on $A \sqcup B$, whereas
-  Tasaki assumes only that the bond set is connected.
-  Tracked in Issue~\#412; assembled in PRs~\#794--\#869.
+\item \textbf{DONE} Marshall--Lieb--Mattis Theorem 2.2 for general
+  spin~$S$, at the printed generality (Theorem 2.2, p.~39, eq.~(2.5.4),
+  p.~39; Hamiltonian (2.5.1), p.~37, general exchange couplings by the
+  Remark and eq.~(2.5.13), p.~43): \texttt{tasaki\_2\_5\_theorem\_2\_2\_of\_connected}
+  (\texttt{Quantum/SpinS/Theorem22Connected.lean}) takes a connected
+  (Footnote~28, p.~33) bipartite graph $G$ with balanced sublattices
+  $|A| = |B|$, arbitrary spin $N \ge 1$, and coupling $J$ real,
+  symmetric, non-negative, vanishing within a sublattice, strictly
+  positive on the edges of $G$ and vanishing off $G$ -- exactly the
+  printed hypotheses, with no restriction to the complete bipartite
+  graph. It concludes all four printed conjuncts with no
+  magnetization-sector restriction and no auxiliary spectral shift
+  parameter: whole-Hilbert-space ground-state uniqueness (the full
+  eigenspace has $\mathrm{finrank}\le 1$ at a globally minimal energy),
+  the Marshall-signed eigenvector on the balanced sector with strictly
+  positive coefficients (the (2.5.4) expansion), and
+  $S_{\rm tot} = 0$ (the eigenvector is annihilated by the total-spin
+  Casimir). The complete bipartite graph is not a hypothesis of this
+  declaration -- it is only the bond graph of the toy Hamiltonian
+  (2.5.10), p.~41, that the printed proof uses internally.
+  The capstone assembles, without new mathematics beyond one rebase,
+  the pre-existing graph-agnostic connected chain: the earlier
+  \emph{per-sector} declaration
+  \texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full}
+  (\S\ref{subsec:mlm-spin-s-formalisation}), the connected strict
+  outside-sector ordering \texttt{tasaki23\_strict\_hOutside\_of\_connected},
+  the graph-agnostic full-eigenspace engine
+  \texttt{heisenbergHamiltonianS\_full\_eigenspace\_finrank\_le\_one\_of\_strict\_sector\_lower},
+  and the irreducibility-parameterised sector lift
+  \texttt{tasaki23\_sector\_lift\_and\_casimir\_of\_irreducible}, whose
+  predicted Casimir value vanishes on the balanced sector -- the same
+  route by which \texttt{ringSym\_ground\_uniqueness} already obtains
+  whole-Hilbert-space uniqueness for the even antiferromagnetic
+  Heisenberg ring (every even $L\ge 2$, every $N\ge 1$), for which
+  $L\ge 6$ rings do not satisfy the complete-bipartite positivity
+  hypothesis of the older sector-only route.
+  Tracked in Issue~\#412; assembled in PRs~\#794--\#869, \#5467.
   \begin{itemize}
   \item \emph{Sector form (real)}: existence (\#853), eigenvector
     uniqueness (\#854), eigenvalue uniqueness (\#856), bundled
@@ -18400,8 +18402,15 @@ foundation for the older Néel-state examples, while the later spin-$S$
 Marshall--Lieb--Mattis work is tracked by Issue~\#412.
 
 \subsection*{Marshall--Lieb--Mattis Theorem 2.2 (Tasaki §2.5)
-              — formalisation outline}
+              — sector-only formalisation outline (historical route)}
 \label{subsec:mlm-spin-s-formalisation}
+
+The printed generality of Theorem 2.2 (connected bipartite $G$, no
+sector restriction, all four conjuncts) is now proved by
+\texttt{tasaki\_2\_5\_theorem\_2\_2\_of\_connected}
+(\texttt{Quantum/SpinS/Theorem22Connected.lean}); see the DONE bullet
+above. This outline documents the earlier, still-present per-sector
+route the capstone assembles from.
 
 \textbf{Statement} (the per-sector form as formalised; cf.\ Tasaki §2.5
 Theorem 2.2, p.~39, generic spin $S$). Let $V$ be a finite vertex type
@@ -18412,9 +18421,9 @@ $J(x,y) = 0$ when $A(x) = A(y)$) and strictly positive on \emph{every}
 cross-sublattice pair, i.e.\ on every edge of the complete bipartite
 graph on $A \sqcup B$. That positivity hypothesis is stronger than the
 printed one, which asks only that the bond set be connected; no
-connectedness assumption and no variable graph enters the formalised
-statement -- the graph is the fixed complete bipartite graph on
-$A \sqcup B$ determined by $A$.
+connectedness assumption and no variable graph enters \emph{this
+sector-only} statement -- the graph here is the fixed complete
+bipartite graph on $A \sqcup B$ determined by $A$.
 For a fixed magnetization quantum number $M$, a Marshall-positive
 eigenvector of the Heisenberg Hamiltonian
 \[
@@ -18596,9 +18605,10 @@ bipartite $J$ positive on the complete bipartite graph, the sorry-free capstone
 carries no \texttt{hOutside} hypothesis but does keep the canonical orientation
 \(|\bar A|\le|A|\), a non-empty $\bar A$ with $N\ge1$, and a constant
 $c_{\rm toy}$ strictly above every diagonal entry of the dressed toy-coupling
-matrix.  The Theorem~2.2
-sector statement is the preceding subsection, \emph{Marshall--Lieb--Mattis
-Theorem 2.2 (Tasaki §2.5) --- formalisation outline}.  The interim
+matrix.  The Theorem~2.2 sector-only route is the preceding subsection,
+\emph{Marshall--Lieb--Mattis Theorem 2.2 (Tasaki §2.5) --- sector-only
+formalisation outline (historical route)}; the printed generality is now
+proved by \texttt{tasaki\_2\_5\_theorem\_2\_2\_of\_connected}.  The interim
 per-declaration record for the survivors is the complete catalogue under
 \texttt{docs/formalization/legacy/}, which --- as counted earlier in this note
 --- names most of them but not all.  Which of its former rows were pruned when
@@ -23219,7 +23229,19 @@ Quantum Heisenberg lattice (2D / 3D, Gibbs state + expectation companions) & fin
 Néel state on bipartite chain / 2D / 3D + per-bond expectation $-1/4$ (Tasaki §2.5) & finite-dim & \emph{formalized} \\
 Generic graph-centric Néel state \texttt{neelStateOf} (Tasaki §2.5 (2.5.2)) & finite-dim & \emph{formalized} \\
 Marshall sign, generic + chain / 2D / 3D, flip + time-reversal bridge (Tasaki §2.5) & finite-dim & \emph{formalized} \\
-Spin-$S$ Marshall--Lieb--Mattis Theorem 2.2 (Tasaki §2.5), magnetization-sector form (real and complex), lifted to the full Hilbert space through the sector embedding (see \texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full} for the exact scope); whole-Hilbert-space uniqueness and $S_{\rm tot}=0$ are not conjuncts of this declaration and are not established at the printed theorem's generality (an arbitrary connected bipartite lattice) -- related results are proved elsewhere by \texttt{ringSym\_ground\_uniqueness}, \texttt{exists\_t23\_commonE\_and\_heisHamS\_fullEig\_finrank\_le\_one\_of\_casLadder\_t23\_pf}, and, conditionally on a supplied sector eigenvector, \texttt{tasaki23\_sector\_lift\_and\_casimir\_zero\_of\_card\_eq} & finite-dim & \emph{partial} \\
+Spin-$S$ Marshall--Lieb--Mattis Theorem 2.2 (Tasaki §2.5), p.~39, eq.~(2.5.4),
+p.~39, general couplings by the Remark and eq.~(2.5.13), p.~43, at the printed
+generality by \texttt{tasaki\_2\_5\_theorem\_2\_2\_of\_connected}: connected
+bipartite graph with balanced sublattices, arbitrary spin, no
+magnetization-sector restriction and no auxiliary spectral shift parameter,
+concluding whole-Hilbert-space uniqueness, the Marshall-signed positive
+eigenvector, and $S_{\rm tot}=0$, all four conjuncts (the complete bipartite
+graph is not a hypothesis -- it is only the bond graph of the proof's toy
+Hamiltonian (2.5.10), p.~41); the earlier magnetization-sector form (real and
+complex), lifted to the full Hilbert space through the sector embedding,
+remains available via
+\texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full}
+& finite-dim & \emph{formalized} \\
 Spin-$S$ saturated ferromagnetic state (Tasaki §2.4 generalised): all-up/all-down as Heisenberg eigenvector for any coupling, ladder annihilation $\hat S^\pm_{\rm tot}$, Casimir eigenvalue $(|V|\cdot N/2)(|V|\cdot N/2 + 1)$ & finite-dim & \emph{formalized} \\
 Time-reversal map for many-body $S=1/2$ + multi-body Kramers degeneracy (Tasaki §2.3) & finite-dim & \emph{formalized} \\
 Tasaki Problem 2.3.a, Kramers-degeneracy orthogonality for abstract inner-product-reversing $V$ with $V^2=-\mathrm{id}$ (\texttt{inner\_timeReversal\_eq\_zero\_of\_sq\_neg}) & finite-dim & \emph{formalized} \\
