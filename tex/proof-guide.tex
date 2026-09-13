@@ -18386,11 +18386,19 @@ Marshall sign machinery + time-reversal action; see
   bipartite graph is not a hypothesis of this result; it is only the toy
   Hamiltonian's bond graph at (2.5.10), p.~41, internal to Tasaki's own
   proof.
-\item \textbf{DONE} Problem 2.5.d (two-spin correlation under MLM).  The
-  endpoint
-  \texttt{twoSpinCorrelationS\_re\_neg\_of\_tasaki23\_balanced\_pf\_cross}
-  extracts the concrete cross-sublattice negative real correlation from the
-  balanced Perron--Frobenius package.
+\item \textbf{DONE} Problem 2.5.d, p.~40, eq.~(2.5.7) (solution p.~498).
+  The capstone
+  \texttt{tasaki\_problem\_2\_5\_d\_twoSpin\_correlation\_sign} proves
+  both branches of the sign under Theorem~2.2's own hypotheses
+  (connected, bipartite, balanced sublattices): strictly positive on a
+  same-sublattice pair and strictly negative across sublattices, for a
+  general real symmetric non-negative exchange;
+  \texttt{tasaki\_problem\_2\_5\_d\_couplingOf\_half} is the instance at
+  the printed Hamiltonian (2.5.1), coupling one half.  Neither carries
+  Theorem~2.3's hypotheses, which the printed problem never invokes; the
+  complete bipartite graph is not a hypothesis of either, being only the
+  toy Hamiltonian's bond graph at (2.5.10), p.~41, internal to Tasaki's
+  own proof of Theorem~2.2.
 \item \textbf{Theorem~2.4 status}.  The spin-$1/2$ case-(i) target uniqueness
   and zero-magnetization wrappers are live for
   \(-1<\lambda<1\), \(D\ge 0\) as

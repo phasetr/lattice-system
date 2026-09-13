@@ -134,10 +134,18 @@ follows:
   The complete bipartite graph is not a hypothesis of this result; it is
   only the toy Hamiltonian's bond graph at (2.5.10), p. 41, internal to
   Tasaki's own proof.
-- **DONE: Problem 2.5.d.**  The endpoint
-  `twoSpinCorrelationS_re_neg_of_tasaki23_balanced_pf_cross` extracts the
-  concrete cross-sublattice negative real two-spin correlation from the
-  balanced Perron-Frobenius package.
+- **DONE: Problem 2.5.d (p. 40, eq. (2.5.7); solution p. 498).**  The
+  capstone `tasaki_problem_2_5_d_twoSpin_correlation_sign` proves both
+  branches of the sign under Theorem 2.2's own hypotheses (connected,
+  bipartite, balanced sublattices): the two-spin correlation is strictly
+  positive on a same-sublattice pair and strictly negative across
+  sublattices, for a general real symmetric non-negative exchange;
+  `tasaki_problem_2_5_d_couplingOf_half` is the instance at the printed
+  Hamiltonian (2.5.1), coupling one half. Neither carries Theorem 2.3's
+  hypotheses, which the printed problem never invokes; the complete
+  bipartite graph is not a hypothesis of either, being only the toy
+  Hamiltonian's bond graph at (2.5.10), p. 41, internal to Tasaki's own
+  proof of Theorem 2.2.
 - **Theorem 2.4 status.**  The spin-`1/2` case-(i) target
   uniqueness and zero-magnetization wrappers are live for
   (`-1 < λ < 1`, `D ≥ 0`) as
