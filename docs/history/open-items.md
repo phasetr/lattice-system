@@ -124,11 +124,16 @@ follows:
   capstone carries the `[IsAlgClosed ℂ]` instance argument, required for
   elaboration and always satisfiable for ℂ; it is not a hypothesis of the
   printed theorem.
-- **DONE: Problem 2.5.c.**  The balanced structural wrapper
-  `singleSiteSpinSquareExpectationS_all_axes_eq_of_balanced_bipartiteCompletePositive`
-  removes the explicit Theorem 2.3 witness and proves
-  `E_1 = E_2 = E_3 = N(N+2)/12` for normalized non-zero Heisenberg ground
-  states under the standard balanced bipartite hypotheses.
+- **DONE: Problem 2.5.c (p. 39, eq. (2.5.6); solution p. 498).**  The
+  capstone `tasaki_problem_2_5_c_singleSite_spinSquare_expectation` proves
+  `E_1 = E_2 = E_3 = N(N+2)/12 = S(S+1)/3` under Theorem 2.2's own
+  hypotheses (connected, bipartite, balanced sublattices), also
+  identifying the energy as the Hermitian minimum and supplying a
+  normalized ground-state witness; `tasaki_problem_2_5_c_couplingOf_half`
+  is the instance at the printed Hamiltonian (2.5.1), coupling one half.
+  The complete bipartite graph is not a hypothesis of this result; it is
+  only the toy Hamiltonian's bond graph at (2.5.10), p. 41, internal to
+  Tasaki's own proof.
 - **DONE: Problem 2.5.d.**  The endpoint
   `twoSpinCorrelationS_re_neg_of_tasaki23_balanced_pf_cross` extracts the
   concrete cross-sublattice negative real two-spin correlation from the

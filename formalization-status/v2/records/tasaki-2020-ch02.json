@@ -288,6 +288,58 @@
     },
     {
       "axiom_dependencies": [],
+      "capstone": true,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-problem-2-5-c-couplingof-half",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.tasaki_problem_2_5_c_couplingOf_half",
+      "lifecycle": "active",
+      "module": "LatticeSystem.Quantum.SpinS.Problem25cTheorem22GroundState",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "retirement": null,
+      "source_coverage": "complete",
+      "source_path": "LatticeSystem/Quantum/SpinS/Problem25cTheorem22GroundState.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-problem-2-5-c"
+        }
+      ],
+      "summary": "Tasaki Problem 2.5.c, p. 39, eq. (2.5.6), at the printed Hamiltonian (2.5.1), p. 37: the instance of the general statement below at coupling couplingOf G (1/2), the ordered-pair-convention identification of the unit-weight bond sum Ĥ = sum over {x,y} in B of Ŝ_x·Ŝ_y. Every hypothesis the general statement places on the coupling is discharged here from couplingOf itself, so the printed model assumes only connectedness, bipartiteness, balance and S >= 1/2.",
+      "topic_ids": [
+        "quantum-spin"
+      ],
+      "trust_state": "axiom_free"
+    },
+    {
+      "axiom_dependencies": [],
+      "capstone": true,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-problem-2-5-c-single-site-spin-square-expectation",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.tasaki_problem_2_5_c_singleSite_spinSquare_expectation",
+      "lifecycle": "active",
+      "module": "LatticeSystem.Quantum.SpinS.Problem25cTheorem22GroundState",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "retirement": null,
+      "source_coverage": "complete",
+      "source_path": "LatticeSystem/Quantum/SpinS/Problem25cTheorem22GroundState.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-problem-2-5-c"
+        }
+      ],
+      "summary": "Tasaki Problem 2.5.c, p. 39, eq. (2.5.6) (solution p. 498), under Theorem 2.2's own hypotheses (p. 39): G connected (Footnote 28, p. 33), bipartite for the sublattice marker A (standing for the whole of Section 2.5 from p. 37) with balanced classes |A| = |B|, and J a real symmetric non-negative exchange vanishing within a sublattice, strictly positive on the bonds of G and vanishing off G, at spin S = N/2 >= 1/2. There is a ground energy mu, equal to the Hermitian minimum eigenvalue of the Heisenberg Hamiltonian, with eigenspace finrank <= 1, a normalised ground state witnessing non-vacuity, and every normalised ground state has all three squared single-site spin expectations equal to N(N+2)/12 = S(S+1)/3 at every site x. The complete bipartite graph is not a hypothesis; it is only the bond graph of the toy Hamiltonian (2.5.10), p. 41, internal to Tasaki's own proof.",
+      "topic_ids": [
+        "quantum-spin"
+      ],
+      "trust_state": "axiom_free"
+    },
+    {
+      "axiom_dependencies": [],
       "capstone": false,
       "declaration_kind": "theorem",
       "id": "tasaki-2020-section-2-1-pauli-x-involutive",
