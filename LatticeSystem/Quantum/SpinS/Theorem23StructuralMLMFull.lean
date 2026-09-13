@@ -33,7 +33,12 @@ a shift is available separately as
 
 The statement is per-sector: it fixes a magnetization index `M`, and its uniqueness clause ranges
 over competitors that are both supported on that sector and Marshall-positive. It therefore does
-not assert that `μ` is the minimum of the whole spectrum, nor anything about the total spin. -/
+not assert that `μ` is the minimum of the whole spectrum, nor anything about the total spin.
+
+Its coupling hypothesis `hJ_pos` also demands strict positivity on every cross-sublattice pair
+(every edge of `bipartiteCompleteGraphOf A`, the complete bipartite graph on the two sublattices),
+which is strictly stronger than the printed theorem's hypothesis that the bond set merely be
+connected. -/
 theorem marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full
     (A : V → Bool)
     {J : V → V → ℂ} {M : ℕ}
