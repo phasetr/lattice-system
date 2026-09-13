@@ -78,7 +78,18 @@ follows:
   (2.5.4), general couplings by the Remark and eq. (2.5.13), p. 43: a
   connected bipartite graph `G` with balanced sublattices `|A| = |B|`,
   arbitrary spin `N >= 1`, coupling strictly positive on the edges of `G`
-  and zero off them. It concludes all four printed conjuncts with no
+  and zero off them. `heisenbergHamiltonianS` sums over ordered pairs while
+  (2.5.1) and (2.5.13) sum over unordered bonds, so a symmetric coupling
+  supported on the bonds is twice the printed bond sum: the printed exchange
+  `J_{x,y}` of (2.5.13) is the ordered-pair coupling `J_{x,y}/2`, and
+  restricting the support to the bonds of `G` removes the non-bond terms but
+  not that doubling. No conclusion depends on the normalisation, the
+  hypotheses being closed under positive rescaling of the coupling and the
+  energy existentially quantified. The printed unit-weight Hamiltonian
+  (2.5.1), p. 37, is the instance `tasaki_2_5_theorem_2_2_couplingOf_half`
+  of the same file: Theorem 2.2 at `couplingOf G (1/2)`, whose ordered double
+  sum reproduces the unit-weight bond sum exactly. It concludes all four
+  printed conjuncts with no
   magnetization-sector restriction and no auxiliary spectral shift
   parameter: whole-Hilbert-space uniqueness (full eigenspace `finrank <= 1`
   at a globally minimal energy), the Marshall-signed eigenvector on the

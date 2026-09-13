@@ -26,13 +26,16 @@ complete-bipartite generality,
 
 This module also pins the connected-generality capstone
 `tasaki_2_5_theorem_2_2_of_connected` (Theorem 2.2, p. 39, at connectedness
-instead of complete-bipartite positivity, with no sector restriction), plus
-the four-vertex-path discriminating witness for that hypothesis change.
+instead of complete-bipartite positivity, with no sector restriction), its
+printed-Hamiltonian instance `tasaki_2_5_theorem_2_2_couplingOf_half`
+(eq. (2.5.1), p. 37: unit weight on every bond), plus the four-vertex-path
+discriminating witness for that hypothesis change.
 -/
 
 namespace LatticeSystem.Tests.MarshallLiebMattisTheorem22
 
 open LatticeSystem.Quantum
+open LatticeSystem.Lattice
 open Matrix Module
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
@@ -108,13 +111,16 @@ example :
 /-- **Signature pin.** Pins the connected-generality Theorem 2.2 capstone:
 Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020,
 §2.5 Theorem 2.2,
-p. 39, eq. (2.5.4), p. 39, Hamiltonian (2.5.1), p. 37, general couplings by
-Remark (2.5.13), p. 43; connectedness is Footnote 28, p. 33. The complete
+p. 39, eq. (2.5.4), p. 39; general couplings by Remark (2.5.13), p. 43;
+connectedness is Footnote 28, p. 33. The complete
 bipartite graph is never a hypothesis here — it is only the bond graph of the
 proof's toy Hamiltonian (2.5.10), p. 41.
 Hypotheses: `G` connected (H1) and bipartite w.r.t. `A` (H2), balanced
 sublattices (H3), `N ≥ 1` (H4), `J` positive exactly on the edges of `G` and
-zero off them (H5/(2.5.13)). Conclusions, all four conjuncts: (C1) the full
+zero off them (H5), which in the ordered-pair convention of
+`heisenbergHamiltonianS` is the printed bond sum (2.5.13) at printed exchange
+`2 J_{x,y}`; the printed unit-weight Hamiltonian (2.5.1), p. 37, is the
+instance pinned after this one. Conclusions, all four conjuncts: (C1) the full
 eigenspace at `μ` has `finrank ≤ 1` and `μ` is a global lower bound on every
 real eigenvalue; (C3) a Marshall-signed eigenvector on the balanced sector
 `|A| * N`; (C4) its sector coefficients are all strictly positive; (C2) that
@@ -151,5 +157,38 @@ example (A : V → Bool) (G : SimpleGraph V) {J : V → V → ℂ}
   tasaki_2_5_theorem_2_2_of_connected
     A G N hGconn hGbip h_card_eq hN hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite
     hJ_pos_G hJ_off
+
+/-- **Signature pin (printed Hamiltonian).** Pins Theorem 2.2 at the model as
+printed: `Ĥ = Σ_{{x,y} ∈ B} Ŝ_x · Ŝ_y`, eq. (2.5.1), p. 37, unit weight on
+every bond, which in the ordered-pair convention of `heisenbergHamiltonianS`
+is the coupling `couplingOf G (1/2)` — each bond met once in each order. Only
+connectedness, bipartiteness, balance and `1 ≤ N` remain as hypotheses: every
+condition on the coupling is discharged inside the theorem, so re-introducing
+one of them here breaks the build. The four conjuncts are those of the
+general-coupling capstone pinned above. Discharged by *applying*
+`tasaki_2_5_theorem_2_2_couplingOf_half` rather than restating it. -/
+example (A : V → Bool) (G : SimpleGraph V) [DecidableRel G.Adj]
+    (hGconn : G.Connected)
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (h_card_eq : (Finset.univ.filter (fun x : V => A x = true)).card =
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card)
+    (hN : 1 ≤ N) :
+    ∃ μ : ℝ,
+      finrank ℂ ↥(End.eigenspace
+          (Matrix.toLin' (heisenbergHamiltonianS (couplingOf G ((1 : ℂ) / 2)) N))
+          (μ : ℂ)) ≤ 1 ∧
+      (∀ {μM : ℝ} {φ : (V → Fin (N + 1)) → ℂ}, φ ≠ 0 →
+        (heisenbergHamiltonianS (couplingOf G ((1 : ℂ) / 2)) N).mulVec φ = (μM : ℂ) • φ →
+          μ ≤ μM) ∧
+      ∃ v : magConfigS V N
+          ((Finset.univ.filter (fun x : V => A x = true)).card * N) → ℝ,
+        (∀ σ, 0 < v σ) ∧
+        (heisenbergHamiltonianS (couplingOf G ((1 : ℂ) / 2)) N).mulVec
+            (magSectorEmbedding (fun τ => ((marshallSignS A τ.1).re * v τ : ℝ))) =
+          (μ : ℂ) •
+            magSectorEmbedding (fun τ => ((marshallSignS A τ.1).re * v τ : ℝ)) ∧
+        (totalSpinSSquared V N).mulVec
+            (magSectorEmbedding (fun τ => ((marshallSignS A τ.1).re * v τ : ℝ))) = 0 :=
+  tasaki_2_5_theorem_2_2_couplingOf_half A G N hGconn hGbip h_card_eq hN
 
 end LatticeSystem.Tests.MarshallLiebMattisTheorem22

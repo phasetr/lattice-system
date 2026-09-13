@@ -1912,7 +1912,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "d6ac63f5c72432410b05778ab10c1c6313227dd4ff7a99bb372919b05975bb57"
+SCRIPT_SOURCE_SHA256 = "f70f560ffb4d0e5fd301199ffa8bd34b091e40cf423067b67eb03f5165d3c5e8"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -2823,21 +2823,30 @@ MOVED_PROSE_CORRECTIONS = (
         # (the pre-#5467 wording) unchanged when this one restores it first.
         "- **DONE: Marshall-Lieb-Mattis Theorem 2.2, at the printed generality.** "
         "`tasaki_2_5_theorem_2_2_of_connected` (`Quantum/SpinS/Theorem22Connected.lean`) proves "
-        "Theorem 2.2, p. 39, eq. (2.5.4), general couplings by the Remark and eq. (2.5.13), p. "
-        "43: a connected bipartite graph `G` with balanced sublattices `|A| = |B|`, arbitrary "
-        "spin `N >= 1`, coupling strictly positive on the edges of `G` and zero off them. It "
-        "concludes all four printed conjuncts with no magnetization-sector restriction and no "
-        "auxiliary spectral shift parameter: whole-Hilbert-space uniqueness (full eigenspace "
-        "`finrank <= 1` at a globally minimal energy), the Marshall-signed eigenvector on the "
-        "balanced sector with strictly positive coefficients, and `S_tot = 0`. The complete "
-        "bipartite graph is not a hypothesis; it is only the bond graph of the proof's toy "
-        "Hamiltonian (2.5.10), p. 41. The capstone assembles the pre-existing connected chain "
+        "Theorem 2.2, p. 39, eq. (2.5.4), general couplings by the Remark and eq. (2.5.13), p. 43: a "
+        "connected bipartite graph `G` with balanced sublattices `|A| = |B|`, arbitrary spin `N >= "
+        "1`, coupling strictly positive on the edges of `G` and zero off them. "
+        "`heisenbergHamiltonianS` sums over ordered pairs while (2.5.1) and (2.5.13) sum over "
+        "unordered bonds, so a symmetric coupling supported on the bonds is twice the printed bond "
+        "sum: the printed exchange `J_{x,y}` of (2.5.13) is the ordered-pair coupling `J_{x,y}/2`, "
+        "and restricting the support to the bonds of `G` removes the non-bond terms but not that "
+        "doubling. No conclusion depends on the normalisation, the hypotheses being closed under "
+        "positive rescaling of the coupling and the energy existentially quantified. The printed "
+        "unit-weight Hamiltonian (2.5.1), p. 37, is the instance "
+        "`tasaki_2_5_theorem_2_2_couplingOf_half` of the same file: Theorem 2.2 at `couplingOf G "
+        "(1/2)`, whose ordered double sum reproduces the unit-weight bond sum exactly. It concludes "
+        "all four printed conjuncts with no magnetization-sector restriction and no auxiliary "
+        "spectral shift parameter: whole-Hilbert-space uniqueness (full eigenspace `finrank <= 1` at "
+        "a globally minimal energy), the Marshall-signed eigenvector on the balanced sector with "
+        "strictly positive coefficients, and `S_tot = 0`. The complete bipartite graph is not a "
+        "hypothesis; it is only the bond graph of the proof's toy Hamiltonian (2.5.10), p. 41. The "
+        "capstone assembles the pre-existing connected chain "
         "(`tasaki23_strict_hOutside_of_connected`, the graph-agnostic full-eigenspace engine, and "
-        "`tasaki23_sector_lift_and_casimir_of_irreducible`) with one rebase, the same route by "
-        "which `ringSym_ground_uniqueness` already gets whole-Hilbert-space uniqueness for the "
-        "even antiferromagnetic Heisenberg ring (every even `L >= 2`, every `N >= 1`), for which "
-        "`L >= 6` rings do not satisfy the complete-bipartite positivity hypothesis of the "
-        "earlier sector-only route. The earlier per-sector result "
+        "`tasaki23_sector_lift_and_casimir_of_irreducible`) with one rebase, the same route by which "
+        "`ringSym_ground_uniqueness` already gets whole-Hilbert-space uniqueness for the even "
+        "antiferromagnetic Heisenberg ring (every even `L >= 2`, every `N >= 1`), for which `L >= 6` "
+        "rings do not satisfy the complete-bipartite positivity hypothesis of the earlier sector-only "
+        "route. The earlier per-sector result "
         "`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` remains available, "
         "presented as a vector of the full Hilbert space through the sector embedding. Assembled "
         "through PRs #794-#870, #5467.",

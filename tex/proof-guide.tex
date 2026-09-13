@@ -18286,7 +18286,20 @@ Marshall sign machinery + time-reversal action; see
   symmetric, non-negative, vanishing within a sublattice, strictly
   positive on the edges of $G$ and vanishing off $G$ -- exactly the
   printed hypotheses, with no restriction to the complete bipartite
-  graph. It concludes all four printed conjuncts with no
+  graph.  The repository's \texttt{heisenbergHamiltonianS} sums over
+  \emph{ordered} pairs while (2.5.1) and (2.5.13) sum over
+  \emph{unordered} bonds, so a symmetric coupling supported on the bonds
+  is twice the printed bond sum: the printed exchange $J_{x,y}$
+  of~(2.5.13) is the ordered-pair coupling $J_{x,y}/2$, and restricting
+  the support of $J$ to the bonds of $G$ removes the non-bond terms but
+  not that doubling.  No conclusion depends on the normalisation, since
+  the hypotheses are closed under multiplying $J$ by a positive constant
+  and the energy is existentially quantified.  The printed unit-weight
+  Hamiltonian~(2.5.1), p.~37, is the instance
+  \texttt{tasaki\_2\_5\_theorem\_2\_2\_couplingOf\_half} of the same file:
+  Theorem~2.2 at $J = \texttt{couplingOf}\; G\; (1/2)$, whose ordered
+  double sum reproduces the unit-weight bond sum exactly.
+  It concludes all four printed conjuncts with no
   magnetization-sector restriction and no auxiliary spectral shift
   parameter: whole-Hilbert-space ground-state uniqueness (the full
   eigenspace has $\mathrm{finrank}\le 1$ at a globally minimal energy),
@@ -23240,7 +23253,11 @@ magnetization-sector restriction and no auxiliary spectral shift parameter,
 concluding whole-Hilbert-space uniqueness, the Marshall-signed positive
 eigenvector, and $S_{\rm tot}=0$, all four conjuncts (the complete bipartite
 graph is not a hypothesis -- it is only the bond graph of the proof's toy
-Hamiltonian (2.5.10), p.~41); the earlier magnetization-sector form (real and
+Hamiltonian (2.5.10), p.~41); the general-$J$ statement is the ordered-pair
+form of the unordered bond sum (2.5.13) at printed exchange $2J_{x,y}$, and
+the printed unit-weight Hamiltonian (2.5.1), p.~37, is its instance
+\texttt{tasaki\_2\_5\_theorem\_2\_2\_couplingOf\_half} at
+$J = \texttt{couplingOf}\; G\; (1/2)$; the earlier magnetization-sector form (real and
 complex), lifted to the full Hilbert space through the sector embedding,
 remains available via
 \texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full}
