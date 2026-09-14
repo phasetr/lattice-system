@@ -7,8 +7,8 @@ import LatticeSystem.Math.PerronFrobeniusMain
 Issue #3739 (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori).
 
 Given **reachability totality** within a parity block (every two distinct same-parity configs are
-`ParityReachableS`-connected via `bipartiteCompleteGraphOf A`-moves), the parity-block shifted PF
-matrix is `Matrix.IsIrreducible` under case (i.2) strict.
+`ParityReachableS`-connected by moves along a graph `G` whose edges join opposite sublattices), the
+parity-block shifted PF matrix is `Matrix.IsIrreducible` under case (i.2) strict.
 
 This is the irreducibility step (e) of PR5 / Tasaki §2.5 Theorem 2.4, modulo the remaining
 combinatorial piece (d) `hreach_total` — the canonical-representative reachability proof.
@@ -31,9 +31,10 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 /-- **Parity-block shifted PF matrix is irreducible** under reachability totality (case (i.2)
 strict). -/
 theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_parityReachable_total
-    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
-    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     {lam : ℂ} (hlam : lam.im = 0) (hlb : -1 < lam.re) (hub : lam.re < 1)
     {D : ℂ} (hDim : D.im = 0) (hDpos : 0 < D.re)
@@ -43,7 +44,7 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_parityRe
     (p : ℕ)
     [Nonempty (parityConfigS Λ N p)]
     (hreach_total : ∀ σ' σ : parityConfigS Λ N p, σ' ≠ σ →
-      ParityReachableS (bipartiteCompleteGraphOf A) σ.1 σ'.1) :
+      ParityReachableS G σ.1 σ'.1) :
     (shiftedDressedAxisSwappedReMatrixOnParityBlock A J lam D N c p).IsIrreducible := by
   have hc_le : ∀ σ : Λ → Fin (N + 1),
       dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ ≤ c := fun σ =>
@@ -63,7 +64,7 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_parityRe
     have hreach := hreach_total σ' σ hsig
     obtain ⟨k, hk⟩ :=
       shiftedDressedAxisSwappedReMatrixOnParityBlock_pow_apply_pos_of_parityReachable
-        A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_le p hreach
+        A hJim hJnn hGbip hJ_pos_G hJself hJbip hlam hlb hub hDim hDpos hc_le p hreach
     have hk_pos : 0 < k := by
       rcases Nat.eq_zero_or_pos k with hk0 | hkp
       · subst hk0

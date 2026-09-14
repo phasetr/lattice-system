@@ -35,12 +35,14 @@ open Matrix
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-- **Block matrix power positivity from parity reachability** (case (i.2) strict, `D > 0`).
-For any `ParityReachableS σ.1 σ'.1` between two parity-block configurations, some power of the
-parity-block submatrix takes a strict positive value at `(σ', σ)`. -/
+For any `ParityReachableS G σ.1 σ'.1` between two parity-block configurations, along a graph `G`
+whose edges join opposite sublattices, some power of the parity-block submatrix takes a strict
+positive value at `(σ', σ)`. -/
 theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_pow_apply_pos_of_parityReachable
-    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
-    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     {lam : ℂ} (hlam : lam.im = 0) (hlb : -1 < lam.re) (hub : lam.re < 1)
     {D : ℂ} (hDim : D.im = 0) (hDpos : 0 < D.re)
@@ -49,22 +51,20 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_pow_apply_pos_of_parityRe
       dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ ≤ c)
     (p : ℕ)
     {σ' σ : parityConfigS Λ N p}
-    (hreach : ParityReachableS (bipartiteCompleteGraphOf A) σ.1 σ'.1) :
+    (hreach : ParityReachableS G σ.1 σ'.1) :
     ∃ k : ℕ,
       0 < (shiftedDressedAxisSwappedReMatrixOnParityBlock A J lam D N c p ^ k) σ' σ := by
   have hB_nn : ∀ ρ τ, 0 ≤ shiftedDressedAxisSwappedReMatrix A J lam D N c ρ τ :=
     fun ρ τ => shiftedDressedAxisSwappedReMatrix_nonneg A hJim hJnn hJself hJbip hlam
       (le_of_lt hlb) (le_of_lt hub) hDim (le_of_lt hDpos) hc ρ τ
-  have hGbip : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → A x ≠ A y :=
-    fun _ _ hadj => bipartiteCompleteGraphOf_adj_sublattice_ne hadj
   have hB_step : ∀ {ρ τ : Λ → Fin (N + 1)},
-      ParityStepS (bipartiteCompleteGraphOf A) ρ τ →
+      ParityStepS G ρ τ →
         0 < shiftedDressedAxisSwappedReMatrix A J lam D N c τ ρ :=
     fun {ρ τ} hstep =>
       shiftedDressedAxisSwappedReMatrix_apply_pos_of_parityStepS_bipartite
-        A hJim hJnn hGbip hJpos hJself hJbip hlam hlb hub hDim hDpos c hstep
+        A hJim hJnn hGbip hJ_pos_G hJself hJbip hlam hlb hub hDim hDpos c hstep
   obtain ⟨k, hpow_pos⟩ := exists_matrixPow_apply_pos_of_parityReachableS
-    (G := bipartiteCompleteGraphOf A) (N := N)
+    (G := G) (N := N)
     (B := shiftedDressedAxisSwappedReMatrix A J lam D N c) hB_nn hB_step hreach
   refine ⟨k, ?_⟩
   rw [shiftedDressedAxisSwappedReMatrixOnParityBlock_pow_apply A hJself]

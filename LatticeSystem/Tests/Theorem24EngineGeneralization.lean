@@ -13,27 +13,22 @@ import LatticeSystem.Quantum.SpinS.DressedAxisSwapBondParityBlockIrreducibleDNon
 # Signature pins: connected-graph generalization of the Theorem 2.4 engine (Red fixture)
 
 Issue #5473 (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori), PR-2a of the connectivity/reachability
-arc. Pins the exact **future** signatures of the eleven conditional irreducibility-engine
+arc. Pins the signatures of the twelve conditional irreducibility-engine
 statements that PR-2a generalizes **in place** from `bipartiteCompleteGraphOf A` to a general
 `G : SimpleGraph Λ` (plus the explicit sign-gauge hypothesis `hGbip : ∀ x y, G.Adj x y →
 A x ≠ A y`, since at a general `G` bipartiteness is no longer recoverable from adjacency the way
 `bipartiteCompleteGraphOf_adj_sublattice_ne` recovers it today).
 
-Each pin below states the target (post-generalization) signature and discharges it by *calling
-the current, still-specialized theorem*. This must fail today: the current theorem's hypothesis
-`hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re` (and, where applicable,
-its step/reachability hypothesis on `bipartiteCompleteGraphOf A`) is not defeq to the pin's
-`hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re` (resp. the step/reachability relation at `G`) for
-an arbitrary `G`, so elaboration reports a type mismatch citing `bipartiteCompleteGraphOf A`
-against the free variable `G` — not an `unknown identifier` and not an `unknown module`. After
-PR-2a generalizes the eleven statements in place, each pin becomes definitionally the identity
-application and typechecks.
+Each pin states the generalized signature and discharges it by applying the generalized theorem,
+so the pinned hypothesis `hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re`, the sign gauge
+`hGbip`, and the step/reachability relations are all read at the free variable `G` rather than at
+`bipartiteCompleteGraphOf A`.
 
 The three unconditional complete-bipartite engines
 (`shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible`,
 `..._isIrreducible_lambda_one_D_pos`, `..._isIrreducible_D_nonneg`) are deliberately **not** pinned
 here: PR-2a leaves their statements exactly as they are (still at `bipartiteCompleteGraphOf A`,
-via `hA_ne`/`hB_ne`) and only touches their proofs, since generalizing the eleven engines they
+via `hA_ne`/`hB_ne`) and only touches their proofs, since generalizing the twelve engines they
 call changes what those proofs must supply at the call site.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020,
@@ -46,7 +41,7 @@ open LatticeSystem.Quantum
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-/-- **Signature pin 1/11** (`shiftedDressedAxisSwappedReMatrix_apply_pos_of_parityStepS_bipartite`,
+/-- **Signature pin 1/12** (`shiftedDressedAxisSwappedReMatrix_apply_pos_of_parityStepS_bipartite`,
 `DressedAxisSwapParityStepStrictPos.lean`). Unified `ParityStepS` strict positivity at a general
 connected-bipartite `G`. -/
 example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
@@ -60,9 +55,9 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
     {σ τ : Λ → Fin (N + 1)} (hstep : ParityStepS G σ τ) :
     0 < shiftedDressedAxisSwappedReMatrix A J lam D N c τ σ :=
   shiftedDressedAxisSwappedReMatrix_apply_pos_of_parityStepS_bipartite
-    A hJim hJnn hJ_pos_G hJself hJbip hlam hlb hub hDim hDpos c hstep
+    A hJim hJnn hGbip hJ_pos_G hJself hJbip hlam hlb hub hDim hDpos c hstep
 
-/-- **Signature pin 2/11**
+/-- **Signature pin 2/12**
 (`shiftedDressedAxisSwappedReMatrix_apply_pos_of_parityBondStepS_bipartite`,
 `DressedAxisSwapParityBondStrictPos.lean`). Bond-parity strict positivity at a general
 connected-bipartite `G`, `D.re ≥ 0`. -/
@@ -77,9 +72,9 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
     {σ τ : Λ → Fin (N + 1)} (hstep : ParityBondStepS G σ τ) :
     0 < shiftedDressedAxisSwappedReMatrix A J lam D N c τ σ :=
   shiftedDressedAxisSwappedReMatrix_apply_pos_of_parityBondStepS_bipartite
-    A hJim hJnn hJ_pos_G hJself hJbip hlam hlb hub hDim hDnn c hstep
+    A hJim hJnn hGbip hJ_pos_G hJself hJbip hlam hlb hub hDim hDnn c hstep
 
-/-- **Signature pin 3/11**
+/-- **Signature pin 3/12**
 (`shiftedDressedAxisSwappedReMatrix_apply_pos_of_raiseLowerStepS_bipartite`,
 `DressedAxisSwapRaiseLowerStrictNeg.lean`). Transverse-step strict positivity at a general
 connected-bipartite `G`. -/
@@ -94,9 +89,9 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
     {σ τ : Λ → Fin (N + 1)} (hstep : RaiseLowerStepS G σ τ) :
     0 < shiftedDressedAxisSwappedReMatrix A J lam D N c τ σ :=
   shiftedDressedAxisSwappedReMatrix_apply_pos_of_raiseLowerStepS_bipartite
-    A hJim hJnn hJ_pos_G hJself hJbip hlam hlb hub hDim hDnn c hstep
+    A hJim hJnn hGbip hJ_pos_G hJself hJbip hlam hlb hub hDim hDnn c hstep
 
-/-- **Signature pin 4/11** (`neg_dressedHeisenbergSReMatrix_apply_pos_of_raiseLowerStepS_bipartite`,
+/-- **Signature pin 4/12** (`neg_dressedHeisenbergSReMatrix_apply_pos_of_raiseLowerStepS_bipartite`,
 `DressedHeisenbergRaiseLower.lean`). The isotropic-dressed transverse-step positivity, at a
 general connected-bipartite `G`. -/
 example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ} (M : ℕ)
@@ -108,9 +103,9 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ} (M : ℕ)
     (hstep : RaiseLowerStepS G σ τ) :
     0 < (-dressedHeisenbergSReMatrix A J M) τ σ :=
   neg_dressedHeisenbergSReMatrix_apply_pos_of_raiseLowerStepS_bipartite
-    A M hJ_real hJ_pos_G hJ_sym hstep
+    A M hGbip hJ_real hJ_pos_G hJ_sym hstep
 
-/-- **Signature pin 5/11**
+/-- **Signature pin 5/12**
 (`shiftedDressedAxisSwappedReMatrix_apply_pos_of_ionParityStepS_lambda_one`,
 `DressedAxisSwapIonParityLambdaOne.lean`). Ion-only strict positivity at `lambda = 1`, `D > 0`, at
 a general connected-bipartite `G`. -/
@@ -125,9 +120,9 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
     (hstep : IonParityStepS G σ τ) :
     0 < shiftedDressedAxisSwappedReMatrix A J 1 D N c τ σ :=
   shiftedDressedAxisSwappedReMatrix_apply_pos_of_ionParityStepS_lambda_one
-    A hJim hJnn hJ_pos_G hJself hJbip hDim hDpos c hstep
+    A hJim hJnn hGbip hJ_pos_G hJself hJbip hDim hDpos c hstep
 
-/-- **Signature pin 6/11** (`shiftedDressedReMatParity_pow_apply_pos_of_ionParityReach_lam1`,
+/-- **Signature pin 6/12** (`shiftedDressedReMatParity_pow_apply_pos_of_ionParityReach_lam1`,
 `DressedAxisSwapIonParityLambdaOne.lean`). Ion-only block matrix power positivity from ion-only
 reachability at a general connected-bipartite `G`. -/
 example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
@@ -145,9 +140,9 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
     ∃ k : ℕ,
       0 < (shiftedDressedAxisSwappedReMatrixOnParityBlock A J 1 D N c p ^ k) σ' σ :=
   shiftedDressedReMatParity_pow_apply_pos_of_ionParityReach_lam1
-    A hJim hJnn hJ_pos_G hJself hJbip hDim hDpos hc p hreach
+    A hJim hJnn hGbip hJ_pos_G hJself hJbip hDim hDpos hc p hreach
 
-/-- **Signature pin 7/11**
+/-- **Signature pin 7/12**
 (`shiftedDressedAxisSwappedReMatrix_apply_pos_of_bondParityStepS_bipartite`,
 `DressedAxisSwapBondParityDNonneg.lean`). Bond-only strict positivity with `D.re ≥ 0`, at a
 general connected-bipartite `G`. -/
@@ -163,9 +158,9 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
     (hstep : BondParityStepS G σ τ) :
     0 < shiftedDressedAxisSwappedReMatrix A J lam D N c τ σ :=
   shiftedDressedAxisSwappedReMatrix_apply_pos_of_bondParityStepS_bipartite
-    A hJim hJnn hJ_pos_G hJself hJbip hlam hlb hub hDim hDnn c hstep
+    A hJim hJnn hGbip hJ_pos_G hJself hJbip hlam hlb hub hDim hDnn c hstep
 
-/-- **Signature pin 8/11**
+/-- **Signature pin 8/12**
 (`shiftedDressedAxisSwappedReMatrixOnParityBlock_pow_apply_pos_of_bondParityReachable`,
 `DressedAxisSwapBondParityDNonneg.lean`). Bond-only block matrix power positivity at a general
 connected-bipartite `G`, `D.re ≥ 0`. -/
@@ -185,9 +180,9 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
     ∃ k : ℕ,
       0 < (shiftedDressedAxisSwappedReMatrixOnParityBlock A J lam D N c p ^ k) σ' σ :=
   shiftedDressedAxisSwappedReMatrixOnParityBlock_pow_apply_pos_of_bondParityReachable
-    A hJim hJnn hJ_pos_G hJself hJbip hlam hlb hub hDim hDnn hc p hreach
+    A hJim hJnn hGbip hJ_pos_G hJself hJbip hlam hlb hub hDim hDnn hc p hreach
 
-/-- **Signature pin 9/11**
+/-- **Signature pin 9/12**
 (`shiftedDressedAxisSwappedReMatrixOnParityBlock_pow_apply_pos_of_parityReachable`,
 `DressedAxisSwapBlockPowPos.lean`). Full block matrix power positivity from parity reachability
 at a general connected-bipartite `G`, case (i.2) strict. -/
@@ -207,9 +202,9 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
     ∃ k : ℕ,
       0 < (shiftedDressedAxisSwappedReMatrixOnParityBlock A J lam D N c p ^ k) σ' σ :=
   shiftedDressedAxisSwappedReMatrixOnParityBlock_pow_apply_pos_of_parityReachable
-    A hJim hJnn hJ_pos_G hJself hJbip hlam hlb hub hDim hDpos hc p hreach
+    A hJim hJnn hGbip hJ_pos_G hJself hJbip hlam hlb hub hDim hDpos hc p hreach
 
-/-- **Signature pin 10/11**
+/-- **Signature pin 10/12**
 (`shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_parityReachable_total`,
 `DressedAxisSwapBlockIrreducible.lean`). The interior conditional irreducibility engine, at a
 general connected-bipartite `G` and an external total-reachability hypothesis over `G`. -/
@@ -229,9 +224,9 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
       ParityReachableS G σ.1 σ'.1) :
     (shiftedDressedAxisSwappedReMatrixOnParityBlock A J lam D N c p).IsIrreducible :=
   shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_parityReachable_total
-    A hJim hJnn hJ_pos_G hJself hJbip hlam hlb hub hDim hDpos hc_strict p hreach_total
+    A hJim hJnn hGbip hJ_pos_G hJself hJbip hlam hlb hub hDim hDpos hc_strict p hreach_total
 
-/-- **Signature pin 11/11** (`shiftedDressedReMatParity_irred_of_ionParityReach_total_lam1`,
+/-- **Signature pin 11/12** (`shiftedDressedReMatParity_irred_of_ionParityReach_total_lam1`,
 `DressedAxisSwapIonParityBlockIrreducibleLambdaOne.lean`). The `lambda = 1` boundary conditional
 irreducibility engine, at a general connected-bipartite `G`. -/
 example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
@@ -249,20 +244,12 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
       IonParityReachableS G σ.1 σ'.1) :
     (shiftedDressedAxisSwappedReMatrixOnParityBlock A J 1 D N c p).IsIrreducible :=
   shiftedDressedReMatParity_irred_of_ionParityReach_total_lam1
-    A hJim hJnn hJ_pos_G hJself hJbip hDim hDpos hc_strict p hreach_total
+    A hJim hJnn hGbip hJ_pos_G hJself hJbip hDim hDpos hc_strict p hreach_total
 
 /-- **Signature pin 12/12**
 (`shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_bondParityReachable_total`,
 `DressedAxisSwapBondParityBlockIrreducibleDNonneg.lean`). The `D.re ≥ 0` boundary conditional
-irreducibility engine, at a general connected-bipartite `G`. This file pins **twelve**, not
-eleven, `bipartiteCompleteGraphOf`-typed conditional-engine statements: grepping
-`(bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re` across the eleven modules named in the
-module doc above, and excluding the three unconditional complete-bipartite engines that PR-2a
-leaves stated as-is, yields exactly this set of twelve theorem names (positive control: the same
-probe finds 0 occurrences of that hypothesis shape in a module known to be already general, e.g.
-`ParityReachConnectedTotal.lean`). Pinning a superset of the declared eleven is deliberately safe
-per the two known under-pinning failure modes (conjunct halving, engine halving); main should
-reconcile the count against the design phase's own list before Green. -/
+irreducibility engine, at a general connected-bipartite `G`. -/
 example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
@@ -279,7 +266,7 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
       BondParityReachableS G σ.1 σ'.1) :
     (shiftedDressedAxisSwappedReMatrixOnParityBlock A J lam D N c p).IsIrreducible :=
   shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_bondParityReachable_total
-    A hJim hJnn hJ_pos_G hJself hJbip hlam hlb hub hDim hDnn hc_strict p hreach_total
+    A hJim hJnn hGbip hJ_pos_G hJself hJbip hlam hlb hub hDim hDnn hc_strict p hreach_total
 
 /-- **Discriminating witness (four-vertex path, not the four-cycle)**, reused from PR-1's fixture
 (`Tests/ParityReachabilityConnected.lean`). On `V = Fin 4`, `A = {0, 2}`, `pathGraph 4` is
