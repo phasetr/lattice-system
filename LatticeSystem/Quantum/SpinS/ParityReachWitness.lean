@@ -2,17 +2,20 @@ import LatticeSystem.Quantum.SpinS.ParityReachable
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphCore
 
 /-!
-# Concrete witness constructors for `ParityReachableS` on the bipartite complete graph
+# Concrete witness constructors for elementary parity-block steps
 
 Issue #3739 (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori).
 
 Foundational building blocks for (d) reachability totality.  These provide explicit
-configurations `σ'` and short proofs that `ParityStepS (bipartiteCompleteGraphOf A) σ σ'` holds:
+configurations `σ'` and short proofs that the corresponding elementary move takes `σ` to `σ'`:
 
 * **`raiseLowerStepS_pair_shift`**: from `σ` with `σ a ≥ 1`, `σ b ≤ N − 1`, `a ≠ b`,
   `A a ≠ A b`, the move that *lowers* `a` and *raises* `b` by `1` each is a `RaiseLowerStepS`.
-* **`parityBondStepS_pair_raise`** / **`parityBondStepS_pair_lower`**: pair-parity raise / lower
-  moves at `(a, b)` are `ParityBondStepS`.
+* **`parityBondStepS_pair_raise`**: the both-raise pair move on a bipartite complete graph edge
+  is a `ParityBondStepS`.
+* **`parityBondStepS_pair_lower`**: the both-lower pair move on an edge of an *arbitrary* graph
+  `G` is a `ParityBondStepS` — the graph enters only through the edge, so the bipartite complete
+  graph is just one instance.
 * **`singleIonStepS_raise`** / **`singleIonStepS_lower`**: same-site `±2` moves are
   `SingleIonStepS`.
 
@@ -106,12 +109,13 @@ theorem parityBondStepS_pair_raise
   · exact configUpdateTwo_agree _ _ _ _ _
 
 omit [Fintype V] in
-/-- **ParityBondStepS witness (both lower)** on a bipartite edge. -/
+/-- **ParityBondStepS witness (both lower)** on an edge of an arbitrary graph `G`: lowering both
+endpoints of a `G`-edge by one is a `ParityBondStepS`.  No bipartite structure is involved. -/
 theorem parityBondStepS_pair_lower
-    (A : V → Bool) {a b : V} (hadj : (bipartiteCompleteGraphOf A).Adj a b)
+    {G : SimpleGraph V} {a b : V} (hadj : G.Adj a b)
     {σ : V → Fin (N + 1)}
     (hka : 1 ≤ (σ a).val) (hkb : 1 ≤ (σ b).val) :
-    ParityBondStepS (bipartiteCompleteGraphOf A) σ
+    ParityBondStepS G σ
       (configUpdateTwo σ a b ⟨(σ a).val - 1, by have := (σ a).isLt; omega⟩
         ⟨(σ b).val - 1, by have := (σ b).isLt; omega⟩) := by
   refine ⟨a, b, hadj, ?_, ?_⟩

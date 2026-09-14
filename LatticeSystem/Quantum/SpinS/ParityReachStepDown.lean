@@ -56,6 +56,6 @@ theorem parityReachableS_step_down_easy
     refine ⟨configUpdateTwo σ a b ⟨(σ a).val - 1, by have := (σ a).isLt; omega⟩
             ⟨(σ b).val - 1, by have := (σ b).isLt; omega⟩, ?_, ?_⟩
     · exact parityBondStepS_pair_lower_magSumS_decrease hab hka hkb
-    · exact ParityReachableS.of_bond (parityBondStepS_pair_lower A hadj hka hkb)
+    · exact ParityReachableS.of_bond (parityBondStepS_pair_lower hadj hka hkb)
 
 end LatticeSystem.Quantum

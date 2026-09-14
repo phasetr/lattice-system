@@ -71,7 +71,7 @@ theorem parityReachableS_step_down_hard_A
   have hka₂_mid_pos : 1 ≤ (σ_mid a₂).val := by rw [h_mid_a₂_val]
   have hkb_mid_pos : 1 ≤ (σ_mid b).val := by rw [h_mid_b_val]
   have hstep1 := raiseLowerStepS_pair_shift_lower_a_raise_b A hadj_a₁b hka₁_pos hkb_lt_N
-  have hstep2 := parityBondStepS_pair_lower A hadj_a₂b hka₂_mid_pos hkb_mid_pos
+  have hstep2 := parityBondStepS_pair_lower hadj_a₂b hka₂_mid_pos hkb_mid_pos
   refine ⟨_, ?_, ParityReachableS.trans (ParityReachableS.of_raiseLower hstep1)
       (ParityReachableS.of_bond hstep2)⟩
   -- magSumS bond-parity lower on σ_mid decreases by 2; transverse preserves magSumS.
@@ -123,7 +123,7 @@ theorem parityReachableS_step_down_hard_B
   have hkb₂_mid_pos : 1 ≤ (σ_mid b₂).val := by rw [h_mid_b₂_val]
   have hka_mid_pos : 1 ≤ (σ_mid a).val := by rw [h_mid_a_val]
   have hstep1 := raiseLowerStepS_pair_shift_lower_a_raise_b A hadj_b₁a hkb₁_pos hka_lt_N
-  have hstep2 := parityBondStepS_pair_lower A hadj_b₂a hkb₂_mid_pos hka_mid_pos
+  have hstep2 := parityBondStepS_pair_lower hadj_b₂a hkb₂_mid_pos hka_mid_pos
   refine ⟨_, ?_, ParityReachableS.trans (ParityReachableS.of_raiseLower hstep1)
       (ParityReachableS.of_bond hstep2)⟩
   have h_final := parityBondStepS_pair_lower_magSumS_decrease (σ := σ_mid) hb₂_ne_a
