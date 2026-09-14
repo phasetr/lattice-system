@@ -182,6 +182,262 @@ theorem heisenbergHamiltonianS_outside_projection_zero_of_strict_sectors
             N hJ_real hW_eig⟩
     exact absurd (h_strict_outside hM hφ_ne hφ) (lt_irrefl μ)
 
+/-- **Tasaki §2.5 Theorem 2.3, p. 42, at a fixed orientation of the two sublattices.**
+
+The workhorse behind `tasaki_2_5_theorem_2_3_of_connected`, carrying the extra hypothesis
+`horient : |B| ≤ |A|` that the printed theorem does not state and that the underlying chain
+(`tasaki23_strict_hOutside_of_connected`, the per-sector Casimir lift) requires.  The capstone
+below quantifies over both orientations and discharges `horient` by a case split, so this
+hypothesis never reaches the public statement.
+
+The five conclusions are the printed ones at a fixed orientation: the ground eigenspace has
+dimension `2 S_tot + 1`; every admissible sector carries the Marshall-signed expansion (2.5.4)
+with strictly positive coefficients; a ground state exists; every ground state is a
+`(Ŝ_tot)²`-eigenvector at the predicted `S_tot(S_tot + 1)`; and `μ` is the least eigenvalue. -/
+private theorem tasaki23_groundStates_of_connected_oriented
+    (A : V → Bool) (G : SimpleGraph V) (N : ℕ)
+    (hGconn : G.Connected)
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+      (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hcardA : 1 ≤ (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hcardB : 1 ≤ (Finset.univ.filter (fun x : V => (! A x) = true)).card)
+    (hN : 1 ≤ N)
+    {J : V → V → ℂ}
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re) :
+    ∃ μ : ℝ,
+      finrank ℂ ↥(End.eigenspace (Matrix.toLin' (heisenbergHamiltonianS J N)) (μ : ℂ))
+          = tasaki23PredictedDegeneracy (V := V) A N ∧
+      (∀ M ∈ tasaki23GroundStateSectors (V := V) A N,
+        Nonempty (magConfigS V N M) →
+        ∃ v : magConfigS V N M → ℝ, (∀ σ, 0 < v σ) ∧
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) ∧
+      (∃ Φ : (V → Fin (N + 1)) → ℂ, Φ ≠ 0 ∧
+        (heisenbergHamiltonianS J N).mulVec Φ = (μ : ℂ) • Φ) ∧
+      (∀ {Φ : (V → Fin (N + 1)) → ℂ},
+        (heisenbergHamiltonianS J N).mulVec Φ = (μ : ℂ) • Φ →
+        (totalSpinSSquared V N).mulVec Φ =
+          ((tasaki23PredictedCasimirValue (V := V) A N : ℝ) : ℂ) • Φ) ∧
+      (∀ {μM : ℝ} {φ : (V → Fin (N + 1)) → ℂ}, φ ≠ 0 →
+        (heisenbergHamiltonianS J N).mulVec φ = (μM : ℂ) • φ → μ ≤ μM) := by
+  classical
+  obtain ⟨c, hc⟩ := exists_strict_diag_bound_dressedHeisenbergSReMatrix A J N
+  obtain ⟨c_toy, hc_toy⟩ :=
+    exists_strict_diag_bound_dressedHeisenbergSReMatrix A (bipartiteCoupling A) N
+  have hsB : 0 < ((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℝ) * (N : ℝ) / 2 := by
+    have hb : (0 : ℝ) < ((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℝ) := by
+      exact_mod_cast hcardB
+    have hNr : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
+    positivity
+  obtain ⟨μ, hcommon, hstrict⟩ :=
+    tasaki23_strict_hOutside_of_connected A G N c c_toy horient hsB hGconn hGbip
+      hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos_G hc hc_toy hN hcardA hcardB
+  have hA_ne : ∃ a, A a = true := by
+    obtain ⟨a, ha⟩ := Finset.card_pos.mp hcardA
+    exact ⟨a, (Finset.mem_filter.mp ha).2⟩
+  have hB_ne : ∃ b, A b = false := by
+    obtain ⟨b, hb⟩ := Finset.card_pos.mp hcardB
+    have hbf := (Finset.mem_filter.mp hb).2
+    cases hAb : A b with
+    | false => exact ⟨b, hAb⟩
+    | true => rw [hAb] at hbf; cases hbf
+  -- Per-admissible-sector package: the Marshall-positive ground vector, its lift to the full
+  -- Hilbert space, its predicted Casimir value, and Perron-Frobenius simplicity of its sector.
+  have hpack : ∀ M ∈ tasaki23GroundStateSectors (V := V) A N,
+      ∃ v : magConfigS V N M → ℝ, (∀ σ, 0 < v σ) ∧
+        (heisenbergHamiltonianS J N).mulVec
+            (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+          (μ : ℂ) • magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∧
+        (totalSpinSSquared V N).mulVec
+            (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+          ((tasaki23PredictedCasimirValue (V := V) A N : ℝ) : ℂ) • magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∧
+        finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+            (heisenbergHamiltonianSMatrixOnMagSector J N M)) (μ : ℂ)) ≤ 1 := by
+    intro M hM
+    haveI : Nonempty (magConfigS V N M) :=
+      magConfigS_nonempty_of_le_card_mul (tasaki23GroundStateSectors_le_card_mul A N hM)
+    obtain ⟨v, hv_pos, hReEig⟩ := hcommon M hM
+    have hIrred : (shiftedDressedSReMatrixOnMagSector A J N c M).IsIrreducible :=
+      isIrreducible_shiftedDressedSReMatrixOnMagSector_connected A c hGconn hGbip
+        hJ_real hJ_pos_G hJ_nn hJ_sym hJ_bipartite hc
+    obtain ⟨hLift, hCas⟩ :=
+      tasaki23_sector_lift_and_casimir_of_irreducible A c c_toy horient hsB hM
+        hJ_real hc_toy hA_ne hB_ne hN hIrred hv_pos hReEig
+    have hpf :=
+      heisenbergHamiltonianSMatrixOnMagSector_finrank_le_one_of_marshall_positive_connected
+        A c hGconn hGbip hJ_real hJ_pos_G hJ_nn hJ_sym hJ_bipartite hc hv_pos hReEig
+    exact ⟨v, hv_pos, hLift, hCas, hpf⟩
+  have hmemE : ∀ Ψ : (V → Fin (N + 1)) → ℂ,
+      Ψ ∈ End.eigenspace (Matrix.toLin' (heisenbergHamiltonianS J N)) (μ : ℂ) ↔
+        (heisenbergHamiltonianS J N).mulVec Ψ = (μ : ℂ) • Ψ := by
+    intro Ψ
+    rw [End.mem_eigenspace_iff, Matrix.toLin'_apply]
+  -- A ground state has no component outside the admissible band.
+  have hoff : ∀ {Ψ : (V → Fin (N + 1)) → ℂ},
+      (heisenbergHamiltonianS J N).mulVec Ψ = (μ : ℂ) • Ψ →
+      ∀ {M : ℕ}, M ∉ tasaki23GroundStateSectors (V := V) A N →
+        magSectorEmbedding (magSectorRestriction (M := M) Ψ) = 0 := by
+    intro Ψ hΨ M hM
+    exact heisenbergHamiltonianS_outside_projection_zero_of_strict_sectors J _ hJ_real
+      hstrict hΨ hM
+  -- Each weight component of a ground state is again a ground state, inside its own sector.
+  have hcomp : ∀ Ψ : (V → Fin (N + 1)) → ℂ,
+      (heisenbergHamiltonianS J N).mulVec Ψ = (μ : ℂ) • Ψ → ∀ M : ℕ,
+      magSectorEmbedding (magSectorRestriction (M := M) Ψ) ∈
+        End.eigenspace (Matrix.toLin' (heisenbergHamiltonianS J N)) (μ : ℂ) ⊓
+          magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M : ℂ)) := by
+    intro Ψ hΨ M
+    refine Submodule.mem_inf.mpr ⟨(hmemE _).mpr ?_, magSectorEmbedding_mem_magSubspaceS _⟩
+    exact heisenbergHamiltonianS_mulVec_magSectorEmbedding J _
+      (heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen J hΨ)
+  -- Every admissible weight block of the ground eigenspace is exactly one-dimensional.
+  have hblock1 : ∀ M ∈ tasaki23GroundStateSectors (V := V) A N,
+      finrank ℂ ↥(End.eigenspace (Matrix.toLin' (heisenbergHamiltonianS J N)) (μ : ℂ) ⊓
+        magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M : ℂ))) = 1 := by
+    intro M hM
+    haveI : Nonempty (magConfigS V N M) :=
+      magConfigS_nonempty_of_le_card_mul (tasaki23GroundStateSectors_le_card_mul A N hM)
+    obtain ⟨v, hv_pos, hLift, _, hpf⟩ := hpack M hM
+    set W := End.eigenspace (Matrix.toLin' (heisenbergHamiltonianS J N)) (μ : ℂ) ⊓
+      magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M : ℂ)) with hWdef
+    have hle : finrank ℂ ↥W ≤ 1 := by
+      rw [hWdef]
+      exact heisenbergHamiltonianS_eigenspace_inf_magSubspaceS_finrank_le_one_of_sector
+        (Λ := V) (N := N) J M (μ : ℂ) hpf
+    have hXne : magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ≠ 0 :=
+      tasaki23_marshallPositive_magSectorEmbedding_ne_zero A hv_pos
+    have hXmem : magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈ W := by
+      rw [hWdef]
+      exact Submodule.mem_inf.mpr
+        ⟨(hmemE _).mpr hLift, magSectorEmbedding_mem_magSubspaceS _⟩
+    have hspan : Submodule.span ℂ
+        {magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))} ≤ W := by
+      rw [Submodule.span_le, Set.singleton_subset_iff]
+      exact hXmem
+    have hge := Submodule.finrank_mono hspan
+    rw [finrank_span_singleton hXne] at hge
+    omega
+  -- Index the admissible band by `Fin (2 S_tot + 1)` and read off the dimension.
+  have hscard : (tasaki23GroundStateSectors (V := V) A N).card =
+      tasaki23PredictedDegeneracy (V := V) A N := tasaki23GroundStateSectors_card A N
+  set e := (tasaki23GroundStateSectors (V := V) A N).orderIsoOfFin hscard with he
+  set wt : Fin (tasaki23PredictedDegeneracy (V := V) A N) → ℂ :=
+    fun a => ((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (((e a : ℕ)) : ℂ) with hwtdef
+  have hwt_inj : Function.Injective wt := by
+    intro a b hab
+    simp only [hwtdef] at hab
+    have h1 : (((e a : ℕ)) : ℂ) = (((e b : ℕ)) : ℂ) := by linear_combination -hab
+    exact e.injective (Subtype.ext (Nat.cast_injective h1))
+  have hsup : ⨆ a, End.eigenspace (Matrix.toLin' (heisenbergHamiltonianS J N)) (μ : ℂ) ⊓
+        End.eigenspace ((totalSpinSOp3 V N).mulVecLin) (wt a) =
+      End.eigenspace (Matrix.toLin' (heisenbergHamiltonianS J N)) (μ : ℂ) := by
+    refine le_antisymm (iSup_le fun a => inf_le_left) ?_
+    intro Ψ hΨ
+    have heig : (heisenbergHamiltonianS J N).mulVec Ψ = (μ : ℂ) • Ψ := (hmemE Ψ).mp hΨ
+    have hsum := eq_sum_magSectorEmbedding_magSectorRestriction Ψ
+    rw [hsum]
+    refine Submodule.sum_mem _ fun M _ => ?_
+    by_cases hM : M ∈ tasaki23GroundStateSectors (V := V) A N
+    · obtain ⟨a, ha⟩ : ∃ a, ((e a : ℕ)) = M :=
+        ⟨e.symm ⟨M, hM⟩, by rw [OrderIso.apply_symm_apply]⟩
+      refine Submodule.mem_iSup_of_mem a ?_
+      simp only [hwtdef, ha, ← magSubspaceS_eq_eigenspace]
+      exact hcomp Ψ heig M
+    · rw [hoff heig hM]
+      exact Submodule.zero_mem _
+  have hblockE : ∀ a : Fin (tasaki23PredictedDegeneracy (V := V) A N),
+      finrank ℂ ↥(End.eigenspace (Matrix.toLin' (heisenbergHamiltonianS J N)) (μ : ℂ) ⊓
+        End.eigenspace ((totalSpinSOp3 V N).mulVecLin) (wt a)) = 1 := by
+    intro a
+    have heq : End.eigenspace (Matrix.toLin' (heisenbergHamiltonianS J N)) (μ : ℂ) ⊓
+          magSubspaceS V N (wt a) =
+        End.eigenspace (Matrix.toLin' (heisenbergHamiltonianS J N)) (μ : ℂ) ⊓
+          End.eigenspace ((totalSpinSOp3 V N).mulVecLin) (wt a) := by
+      rw [magSubspaceS_eq_eigenspace]
+    refine (congrArg
+      (fun S : Submodule ℂ ((V → Fin (N + 1)) → ℂ) => finrank ℂ ↥S) heq).symm.trans ?_
+    exact hblock1 ((e a : ℕ)) (e a).2
+  have hdim : finrank ℂ ↥(End.eigenspace (Matrix.toLin' (heisenbergHamiltonianS J N)) (μ : ℂ))
+      = tasaki23PredictedDegeneracy (V := V) A N := by
+    rw [LatticeSystem.Math.finrank_eq_sum_of_weight_blocks _ _ wt hwt_inj hsup]
+    simp [hblockE]
+  -- Every ground state carries the predicted total spin.
+  have hcasall : ∀ Ψ : (V → Fin (N + 1)) → ℂ,
+      (heisenbergHamiltonianS J N).mulVec Ψ = (μ : ℂ) • Ψ →
+      (totalSpinSSquared V N).mulVec Ψ =
+        ((tasaki23PredictedCasimirValue (V := V) A N : ℝ) : ℂ) • Ψ := by
+    intro Ψ hΨ
+    have hcomp_cas : ∀ M : ℕ,
+        (totalSpinSSquared V N).mulVec (magSectorEmbedding (magSectorRestriction (M := M) Ψ)) =
+          ((tasaki23PredictedCasimirValue (V := V) A N : ℝ) : ℂ) •
+            magSectorEmbedding (magSectorRestriction (M := M) Ψ) := by
+      intro M
+      by_cases hM : M ∈ tasaki23GroundStateSectors (V := V) A N
+      · haveI : Nonempty (magConfigS V N M) :=
+          magConfigS_nonempty_of_le_card_mul (tasaki23GroundStateSectors_le_card_mul A N hM)
+        obtain ⟨v, hv_pos, hLift, hCas, _⟩ := hpack M hM
+        have hXne : magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ≠ 0 :=
+          tasaki23_marshallPositive_magSectorEmbedding_ne_zero A hv_pos
+        have hXmem : magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            End.eigenspace (Matrix.toLin' (heisenbergHamiltonianS J N)) (μ : ℂ) ⊓
+              magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M : ℂ)) :=
+          Submodule.mem_inf.mpr ⟨(hmemE _).mpr hLift, magSectorEmbedding_mem_magSubspaceS _⟩
+        obtain ⟨r, hr⟩ := LatticeSystem.Math.exists_smul_of_mem_of_finrank_le_one
+          (hblock1 M hM).le hXmem (hcomp Ψ hΨ M) hXne
+        rw [← hr, Matrix.mulVec_smul, hCas, smul_comm]
+      · rw [hoff hΨ hM, Matrix.mulVec_zero, smul_zero]
+    have hsum := eq_sum_magSectorEmbedding_magSectorRestriction Ψ
+    calc (totalSpinSSquared V N).mulVec Ψ
+        = (totalSpinSSquared V N).mulVecLin
+            (∑ M ∈ Finset.range (Fintype.card V * N + 1),
+              magSectorEmbedding (magSectorRestriction (M := M) Ψ)) := by
+          rw [Matrix.mulVecLin_apply, ← hsum]
+      _ = ∑ M ∈ Finset.range (Fintype.card V * N + 1),
+            (totalSpinSSquared V N).mulVecLin
+              (magSectorEmbedding (magSectorRestriction (M := M) Ψ)) := map_sum _ _ _
+      _ = ∑ M ∈ Finset.range (Fintype.card V * N + 1),
+            ((tasaki23PredictedCasimirValue (V := V) A N : ℝ) : ℂ) •
+              magSectorEmbedding (magSectorRestriction (M := M) Ψ) := by
+          refine Finset.sum_congr rfl fun M _ => ?_
+          rw [Matrix.mulVecLin_apply]
+          exact hcomp_cas M
+      _ = ((tasaki23PredictedCasimirValue (V := V) A N : ℝ) : ℂ) •
+            ∑ M ∈ Finset.range (Fintype.card V * N + 1),
+              magSectorEmbedding (magSectorRestriction (M := M) Ψ) := (Finset.smul_sum).symm
+      _ = ((tasaki23PredictedCasimirValue (V := V) A N : ℝ) : ℂ) • Ψ := by rw [← hsum]
+  -- Global minimality of the common admissible energy.
+  have hminimal : ∀ (μM : ℝ) (φ : (V → Fin (N + 1)) → ℂ), φ ≠ 0 →
+      (heisenbergHamiltonianS J N).mulVec φ = (μM : ℂ) • φ → μ ≤ μM := by
+    intro μM φ hφ_ne hφ
+    refine tasaki23_eigenvalue_ge_common A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc
+      hcommon (fun {M} hM_non {μ' φ'} hφ'_ne hφ' => ?_) hφ_ne hφ
+    haveI : Nonempty (magConfigS V N M) := by
+      by_contra hcon
+      rw [not_nonempty_iff] at hcon
+      exact hφ'_ne (funext fun τ => (hcon.false τ).elim)
+    exact le_of_lt (hstrict hM_non hφ'_ne hφ')
+  refine ⟨μ, hdim, fun M hM _ => ?_, ?_, fun {Φ} hΦ => hcasall Φ hΦ,
+    fun {μM φ} hφ_ne hφ => hminimal μM φ hφ_ne hφ⟩
+  · obtain ⟨v, hv_pos, hLift, _, _⟩ := hpack M hM
+    exact ⟨v, hv_pos, hLift⟩
+  · have hlo := tasaki23GroundStateSectors_left_mem (V := V) A N
+    haveI : Nonempty (magConfigS V N
+        (min (Finset.univ.filter (fun x : V => A x = true)).card
+          (Finset.univ.filter (fun x : V => (! A x) = true)).card * N)) :=
+      magConfigS_nonempty_of_le_card_mul (tasaki23GroundStateSectors_le_card_mul A N hlo)
+    obtain ⟨v, hv_pos, hLift, _, _⟩ := hpack _ hlo
+    exact ⟨_, tasaki23_marshallPositive_magSectorEmbedding_ne_zero A hv_pos, hLift⟩
+
 end GroundStates
 
 end LatticeSystem.Quantum
