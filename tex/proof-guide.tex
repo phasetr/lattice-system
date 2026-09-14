@@ -14648,11 +14648,15 @@ ground state $\Phi^0$,
 $(N/2)^2(|A|-|B|)^2\,\langle\Phi^0|\Phi^0\rangle_{\mathrm{re}}\le
 \langle\Phi^0|(\hat O_\Lambda)^2|\Phi^0\rangle_{\mathrm{re}}$ (existence form, coupling-agnostic via a
 \texttt{tasaki\_2\_5\_theorem\_2\_3} hypothesis; sorry-free, axiom-clean, independent of the
-\texttt{shenQiuTian\_ferrimagnetic\_lro} axiom).  The original axiom is \emph{retained}: it asserts
-the bound for an \emph{arbitrary} ground state under a \emph{connected}-graph coupling, which
-additionally needs (i) the connected Marshall--Lieb--Mattis extension --- supplied since by
-\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_connected} --- and (ii) the $(\hat O_\Lambda)^2$
-$SU(2)$-invariance / ground-multiplet expectation transfer.  Chapters~3--10 backfill.
+\texttt{shenQiuTian\_ferrimagnetic\_lro} axiom).  At that stage the original axiom was
+\emph{retained}: it asserted the bound for an \emph{arbitrary} ground state under a
+\emph{connected}-graph coupling, which additionally needed (i) the connected
+Marshall--Lieb--Mattis extension and (ii) the $(\hat O_\Lambda)^2$ $SU(2)$-invariance /
+ground-multiplet expectation transfer.  Both were supplied afterwards, by
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_connected} and by the $SU(2)$ ladder constancy of the
+staggered-order Rayleigh ratio, so \texttt{shenQiuTian\_ferrimagnetic\_lro} is no longer an axiom:
+it is the theorem proved in \texttt{Quantum/SpinS/FerrimagneticLROUniversalFinal.lean}.
+Chapters~3--10 backfill.
 
 \noindent\textbf{Lemma 4.5} (Tasaki §4.1.2, eqs.~(4.1.55)--(4.1.57), pp.~87--88; proved axiom-free,
 \texttt{Math/ReflectionPositivityAveraging.lean}, Issue \#4597).  The abstract reflection-positivity

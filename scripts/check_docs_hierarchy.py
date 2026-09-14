@@ -1936,7 +1936,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "07469c29bdbb0f1ed1d9b0e4801294de0d10e3f777a14c4859da58b3a6785695"
+SCRIPT_SOURCE_SHA256 = "5e52f5e398ece86c8306aa00dbe965d275e013bb62eb3d9e3ac7e7776f07b900"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -3087,12 +3087,14 @@ MOVED_PROSE_CORRECTIONS = (
     (
         # PR #5471: the closing prose paragraph of the same legacy page called the `Prop`
         # definition `tasaki_2_5_theorem_2_3` Theorem 2.3's "final-statement form" -- the very
-        # identification this PR corrected in the row headline above, through
-        # `_approved_replacements`. Left alone, the page asserted both readings at once. The
-        # predicate proves neither the total spin nor the ground-eigenspace dimension, so the
-        # paragraph now records what that definition is and names the two capstones that carry
-        # the final statement. This is prose, not a table row, so it is corrected here rather
-        # than in `_approved_replacements`, exactly as the correction directly above it.
+        # identification this PR corrected in that page's row headline for
+        # `tasaki_2_5_theorem_2_3_of_connected`, through `_approved_replacements`. Left alone,
+        # the page asserted both readings at once. The predicate proves neither the total spin
+        # nor the ground-eigenspace dimension, so the paragraph now records what that definition
+        # is and names the two capstones that carry the final statement. This is prose, not a
+        # table row, so it is corrected here rather than in `_approved_replacements`, exactly as
+        # the correction of this same paragraph's `The hypothesis bundle matches ... (#869)
+        # exactly` sentence is.
         "`tasaki_2_5_theorem_2_3` (PR #3337) is the **per-sector structural form** of the "
         "`|A| ≠ |¬A|` case. The final statement of Theorem 2.3 is "
         "`tasaki_2_5_theorem_2_3_of_connected`, with printed-model instance "

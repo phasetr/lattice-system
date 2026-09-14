@@ -15,15 +15,15 @@ for the **complete-bipartite** family.  The pieces are
 * PR3 (`FerrimagneticLROTotalSpin.lean`): the centered ground state with the predicted total Casimir
   value `S_tot(S_tot + 1)`.
 
-Because the existing axiom `shenQiuTian_ferrimagnetic_lro` (left untouched in
-`FerrimagneticLRO.lean`) assumes a *connected*-graph coupling and quantifies over *any* ground
-state — both beyond the per-sector structural `tasaki_2_5_theorem_2_3` this file takes as `hT23`
-(Theorem 2.3 is since proved at connected-bipartite generality by
+Because `shenQiuTian_ferrimagnetic_lro` (the universal form, proved in
+`FerrimagneticLROUniversalFinal.lean`) assumes a *connected*-graph coupling and quantifies over
+*any* ground state — both beyond the per-sector structural `tasaki_2_5_theorem_2_3` this file
+takes as `hT23` (Theorem 2.3 is since proved at connected-bipartite generality by
 `tasaki_2_5_theorem_2_3_of_connected`) and the
 SU(2)-invariance / Schur transfer needed for the "any ground state" form — this file proves a
-**new, honestly-scoped existence theorem** that takes the Theorem-2.3 ground-state data
+**narrower existence theorem** that takes the Theorem-2.3 ground-state data
 `hT23 : tasaki_2_5_theorem_2_3 A N J c` as a hypothesis and produces *one* concrete centered
-Marshall-positive ground state realizing Tasaki's bound.  The axiom is not discharged.
+Marshall-positive ground state realizing Tasaki's bound.  The universal form is not proved here.
 
 The chain (4.1.16) on the centered ground state `Φ⁰` reads, with `nrm = ⟨Φ⁰, Φ⁰⟩ ≥ 0`,
 
@@ -52,8 +52,9 @@ variable {V : Type*} [Fintype V] [DecidableEq V]
 
 omit [DecidableEq V] in
 /-- **The `A x = false` and `(! A x) = true` sublattice fibers coincide.**  Over `Bool`,
-`A x = false ↔ (! A x) = true`, so the two `B`-sublattice cardinalities used by the axiom RHS
-(`A x = false`) and by `tasaki23PredictedTotalSpin` (`(! A x) = true`) are equal. -/
+`A x = false ↔ (! A x) = true`, so the two `B`-sublattice cardinalities used by the
+`shenQiuTian_ferrimagnetic_lro` RHS (`A x = false`) and by `tasaki23PredictedTotalSpin`
+(`(! A x) = true`) are equal. -/
 theorem card_filter_A_false_eq_card_filter_notA (A : V → Bool) :
     (Finset.univ.filter (fun x : V => A x = false)).card =
       (Finset.univ.filter (fun x : V => (! A x) = true)).card := by
@@ -64,8 +65,8 @@ theorem card_filter_A_false_eq_card_filter_notA (A : V → Bool) :
   cases A x <;> simp
 
 omit [DecidableEq V] in
-/-- **Square of the predicted total spin** as the axiom RHS coefficient.
-`S_tot² = (N/2)² (|A| − |B|)²`, where `S_tot = ||A| − |B|| · (N/2)`
+/-- **Square of the predicted total spin** as the `shenQiuTian_ferrimagnetic_lro` RHS
+coefficient.  `S_tot² = (N/2)² (|A| − |B|)²`, where `S_tot = ||A| − |B|| · (N/2)`
 (`tasaki23PredictedTotalSpin`) and the `B`-cardinality is taken with the `A x = false` fiber (the
 form appearing in `shenQiuTian_ferrimagnetic_lro`). -/
 theorem tasaki23PredictedTotalSpin_sq_eq (A : V → Bool) (N : ℕ) :
@@ -108,8 +109,9 @@ centered Marshall-positive ground state `Φ⁰` of the spin-`S` Heisenberg Hamil
 
 This is the assembled chain (4.1.16): the cross-term inequality (4.1.15, PR2), the longitudinal
 positivity split (4.1.12, PR1), and the total-spin value `S_tot(S_tot + 1)` from Theorem 2.3 (PR3),
-evaluated on the centered (`Ŝ_tot^{(3)} = 0`) sector ground state.  The existing axiom
-`shenQiuTian_ferrimagnetic_lro` (connected coupling, *any* ground state) is left in place. -/
+evaluated on the centered (`Ŝ_tot^{(3)} = 0`) sector ground state.  The universal form
+`shenQiuTian_ferrimagnetic_lro` (connected coupling, *any* ground state) is proved separately in
+`FerrimagneticLROUniversalFinal.lean`. -/
 theorem ferrimagnetic_lro_completeBipartite_centered
     (A : V → Bool) (N : ℕ) {J : V → V → ℂ} (c c_toy : ℝ)
     (hT23 : tasaki_2_5_theorem_2_3 A N J c)
