@@ -17,8 +17,9 @@ for the **complete-bipartite** family.  The pieces are
 
 Because the existing axiom `shenQiuTian_ferrimagnetic_lro` (left untouched in
 `FerrimagneticLRO.lean`) assumes a *connected*-graph coupling and quantifies over *any* ground
-state — both beyond the
-currently available Theorem 2.3 (which needs complete-bipartite positivity) and the
+state — both beyond the per-sector structural `tasaki_2_5_theorem_2_3` this file takes as `hT23`
+(Theorem 2.3 is since proved at connected-bipartite generality by
+`tasaki_2_5_theorem_2_3_of_connected`) and the
 SU(2)-invariance / Schur transfer needed for the "any ground state" form — this file proves a
 **new, honestly-scoped existence theorem** that takes the Theorem-2.3 ground-state data
 `hT23 : tasaki_2_5_theorem_2_3 A N J c` as a hypothesis and produces *one* concrete centered

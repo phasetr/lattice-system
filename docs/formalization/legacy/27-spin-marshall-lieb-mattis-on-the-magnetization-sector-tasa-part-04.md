@@ -96,9 +96,11 @@ Heisenberg Hamiltonian restricted to the sector is unique (up to a
 positive real scalar in its real part) and has the Marshall sign
 structure `Φ σ := ((sign A σ.1).re * v σ : ℂ)` with `v > 0`.
 
-`tasaki_2_5_theorem_2_3` (PR #3337) is the **final-statement form**
-of the `|A| ≠ |¬A|` case. The hypothesis bundle shares its coupling
-and cardinality hypotheses with
+`tasaki_2_5_theorem_2_3` (PR #3337) is the **per-sector structural
+form** of the `|A| ≠ |¬A|` case. The final statement of Theorem 2.3
+is `tasaki_2_5_theorem_2_3_of_connected`, with printed-model instance
+`tasaki_2_5_theorem_2_3_couplingOf_half` (PR #5471). The hypothesis
+bundle shares its coupling and cardinality hypotheses with
 `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`
 (#869), but additionally requires its own spectral shift `c` as a
 hypothesis and concludes `μ < c`, which #869 does not state. The
