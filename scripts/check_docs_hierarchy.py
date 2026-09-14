@@ -1936,7 +1936,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "5e52f5e398ece86c8306aa00dbe965d275e013bb62eb3d9e3ac7e7776f07b900"
+SCRIPT_SOURCE_SHA256 = "b815e1a7219d15a8ec99d69f6ba8c2ea1e8d3c092c883634736d54573247216c"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -3087,8 +3087,8 @@ MOVED_PROSE_CORRECTIONS = (
     (
         # PR #5471: the closing prose paragraph of the same legacy page called the `Prop`
         # definition `tasaki_2_5_theorem_2_3` Theorem 2.3's "final-statement form" -- the very
-        # identification this PR corrected in that page's row headline for
-        # `tasaki_2_5_theorem_2_3_of_connected`, through `_approved_replacements`. Left alone,
+        # identification this PR corrected in that page's `tasaki_2_5_theorem_2_3` row headline,
+        # through `_approved_replacements`. Left alone,
         # the page asserted both readings at once. The predicate proves neither the total spin
         # nor the ground-eigenspace dimension, so the paragraph now records what that definition
         # is and names the two capstones that carry the final statement. This is prose, not a
