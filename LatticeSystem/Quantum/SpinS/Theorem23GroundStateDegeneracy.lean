@@ -556,6 +556,79 @@ theorem tasaki_2_5_theorem_2_3_of_connected
       rw [← tasaki23PredictedCasimirValue_not A N]
       exact hcas hΦ
 
+/-- **Tasaki §2.5 Theorem 2.3 at the printed Hamiltonian (2.5.1), p. 37.**
+
+Theorem 2.3, p. 42, with the expansion (2.5.4), p. 39, for the model exactly as printed at the
+head of §2.5: `Ĥ = Σ_{{x,y} ∈ B} Ŝ_x · Ŝ_y`, eq. (2.5.1), p. 37 — unit weight on every bond of a
+connected (Footnote 28, p. 33) bipartite graph `G` with both sublattices non-empty, at spin
+`S = N / 2 ≥ 1 / 2`.  In the ordered-pair convention of `heisenbergHamiltonianS` that
+unit-weight bond sum is the coupling `couplingOf G (1/2)`, the identification being
+`heisenbergHamiltonianS_couplingOf_half_eq_bondSum` (`Theorem22Connected.lean`), which is what
+pins the weight `1/2` as the printed one; the conclusions below cannot see the normalisation,
+being invariant under rescaling `J`.  The general positive exchange couplings of the Remark and
+eq. (2.5.13), p. 43, are `tasaki_2_5_theorem_2_3_of_connected`, of which this is the instance at
+half the printed exchange; the conclusions are its same five conjuncts.
+
+Every hypothesis that statement places on the coupling is discharged here from `couplingOf`
+itself, together with bipartiteness of `G`, so the printed model assumes only connectedness,
+bipartiteness, `1 ≤ |A|`, `1 ≤ |B|` and `1 ≤ N` — the printed hypothesis list.  The instance
+binder `[DecidableRel G.Adj]` is what lets `couplingOf G (1/2)` be written at all; it carries no
+mathematical content. -/
+theorem tasaki_2_5_theorem_2_3_couplingOf_half
+    (A : V → Bool) (G : SimpleGraph V) [DecidableRel G.Adj] (N : ℕ)
+    (hGconn : G.Connected)
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (hcardA : 1 ≤ (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hcardB : 1 ≤ (Finset.univ.filter (fun x : V => (! A x) = true)).card)
+    (hN : 1 ≤ N) :
+    ∃ μ : ℝ,
+      finrank ℂ ↥(End.eigenspace
+          (Matrix.toLin' (heisenbergHamiltonianS (couplingOf G ((1 : ℂ) / 2)) N)) (μ : ℂ))
+          = tasaki23PredictedDegeneracy (V := V) A N ∧
+      (∀ M ∈ tasaki23GroundStateSectors (V := V) A N,
+        Nonempty (magConfigS V N M) →
+        ∃ v : magConfigS V N M → ℝ, (∀ σ, 0 < v σ) ∧
+          (heisenbergHamiltonianS (couplingOf G ((1 : ℂ) / 2)) N).mulVec
+              (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) ∧
+      (∃ Φ : (V → Fin (N + 1)) → ℂ, Φ ≠ 0 ∧
+        (heisenbergHamiltonianS (couplingOf G ((1 : ℂ) / 2)) N).mulVec Φ = (μ : ℂ) • Φ) ∧
+      (∀ {Φ : (V → Fin (N + 1)) → ℂ},
+        (heisenbergHamiltonianS (couplingOf G ((1 : ℂ) / 2)) N).mulVec Φ = (μ : ℂ) • Φ →
+        (totalSpinSSquared V N).mulVec Φ =
+          ((tasaki23PredictedCasimirValue (V := V) A N : ℝ) : ℂ) • Φ) ∧
+      (∀ {μM : ℝ} {φ : (V → Fin (N + 1)) → ℂ}, φ ≠ 0 →
+        (heisenbergHamiltonianS (couplingOf G ((1 : ℂ) / 2)) N).mulVec φ = (μM : ℂ) • φ →
+          μ ≤ μM) := by
+  have hJ_real : ∀ x y : V, (couplingOf G ((1 : ℂ) / 2) x y).im = 0 := by
+    intro x y
+    unfold couplingOf
+    by_cases h : G.Adj x y
+    · rw [if_pos h]; norm_num
+    · rw [if_neg h, Complex.zero_im]
+  have hJ_pos_G : ∀ x y : V, G.Adj x y → 0 < (couplingOf G ((1 : ℂ) / 2) x y).re := by
+    intro x y h
+    unfold couplingOf
+    rw [if_pos h]
+    norm_num
+  have hJ_off : ∀ x y : V, ¬ G.Adj x y → couplingOf G ((1 : ℂ) / 2) x y = 0 := by
+    intro x y h
+    unfold couplingOf
+    exact if_neg h
+  have hJ_nn : ∀ x y : V, 0 ≤ (couplingOf G ((1 : ℂ) / 2) x y).re := by
+    intro x y
+    by_cases h : G.Adj x y
+    · exact (hJ_pos_G x y h).le
+    · rw [hJ_off x y h, Complex.zero_re]
+  have hJ_bipartite : ∀ x y : V, A x = A y → couplingOf G ((1 : ℂ) / 2) x y = 0 := by
+    intro x y hxy
+    unfold couplingOf
+    exact if_neg fun hadj => hGbip x y hadj hxy
+  exact tasaki_2_5_theorem_2_3_of_connected A G N hGconn hGbip hcardA hcardB hN hJ_real
+    (couplingOf_real G (by norm_num)) (couplingOf_symm G ((1 : ℂ) / 2)) hJ_nn hJ_bipartite
+    hJ_pos_G hJ_off
+
 end GroundStates
 
 end LatticeSystem.Quantum

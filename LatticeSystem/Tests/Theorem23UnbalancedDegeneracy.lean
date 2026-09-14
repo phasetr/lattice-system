@@ -1,3 +1,4 @@
+import LatticeSystem.Quantum.SpinS.Theorem23GroundStateDegeneracy
 import LatticeSystem.Quantum.SpinS.Theorem22Connected
 import LatticeSystem.Quantum.SpinS.ConnectedTheorem23
 import LatticeSystem.Quantum.SpinS.StrictHOutsideFerrimagnetic
