@@ -17,9 +17,9 @@ diagnosis that encounters one of these populations reads the entry first and doe
 an unresolved defect.
 
 This page also carries claims that are false or stale about the Lean they describe, not just
-hygiene populations; the final section below uses six fields of its own (Claim as written / What is
-actually true / Why not fixed now / Fix trigger / Measurement / Control) for that different kind of
-record.
+hygiene populations; the entries of the final section below use six fields of their own (True /
+False / Not fixed / Fix trigger / Measurement / Control), and that section closes with a decision
+about mechanical checking, which is not one of those records and carries none of those fields.
 
 A command whose paths reach this page excludes it from its own pathspec. The page quotes the
 phrases it measures, so without that exclusion a command would count this record of a population as
@@ -430,71 +430,71 @@ figures here with the new ones.
 
 Fix-on-touch below is per subject, not per module: touching any listed site for another reason
 corrects every site of that subject in the same commit (per-module fragmented one claim into
-partial fixes on an earlier round). Four sites inside frozen `legacy-source`/`legacy-detail`
-regions carry this class, already governed by "Frozen historical text in migrated pages" above —
-not parked again.
+partial fixes on an earlier round). Two sites inside frozen `legacy-detail` records
+(`docs/formalization/legacy/details/group-spin-models-part-02.md:160,183`) carry this class, already
+governed by "Frozen historical text in migrated pages" above — not parked again.
 
-**`shenQiuTian_ferrimagnetic_lro` called "the axiom" where it is a proved theorem, 9 sites.** True:
-`theorem shenQiuTian_ferrimagnetic_lro` (`FerrimagneticLROUniversalFinal.lean:136`, Tasaki §4.1 Thm
-4.4, axiom-free). False: 7 Lean sites/5 modules — `FerrimagneticLROComponentAlgebra.lean:14`,
-`FerrimagneticLROCrossTerm.lean:28` (future), `FerrimagneticLROUniversal.lean:11,45` (present),
-`StaggeredCasimirSU2Invariance.lean:22` (present), `FerrimagneticLROUniversalFinal.lean:6,122`
-(historical, defensible) — plus 2 `tex/proof-guide.tex` sites, `:14568`/`:14595` ("axiom … remains
-pending" / "remains to discharge …"), which the same file self-corrects at `:14652`/`:14657` ("is
-now the theorem proved in …"). Not fixed: a 5-module Lean sweep rebuilds every downstream importer
-for a wording change, off the critical path (`tex/` is read by no CI workflow). Fix trigger:
-fix-on-touch, all 9 at once (the 2 historical Lean sites may stay). Measurement: `git grep -n -P
+**`shenQiuTian_ferrimagnetic_lro` described as an unproved axiom where it is a proved theorem, 9
+sites.** True: `theorem shenQiuTian_ferrimagnetic_lro` (`FerrimagneticLROUniversalFinal.lean:136`,
+Tasaki §4.1 Thm 4.4, axiom-free). False: 7 Lean sites/5 modules —
+`FerrimagneticLROComponentAlgebra.lean:14`, `FerrimagneticLROCrossTerm.lean:28` (future),
+`FerrimagneticLROUniversal.lean:11,45` (present), `StaggeredCasimirSU2Invariance.lean:22` (present),
+`FerrimagneticLROUniversalFinal.lean:6,122` (historical) — plus `tex/proof-guide.tex:14568` ("axiom
+… remains pending") and `tex/proof-guide.tex:14595` ("remains to discharge …"), which that file
+self-corrects at `tex/proof-guide.tex:14652,14657`. Not fixed: a 5-module sweep rebuilds every
+downstream importer for a wording change, off the critical path (`tex/` is read by no CI workflow).
+Fix trigger: fix-on-touch, all 9 at once. Measurement: `git grep -n -P
 'shenQiuTian_ferrimagnetic_lro' fbacb9c9 -- 'LatticeSystem/**/*.lean' | grep -ci axiom` → 7, and
-`grep -n 'shenQiuTian' tex/proof-guide.tex` → 4 (2 stale, 2 self-correcting). Control: the Lean
-command without the `axiom` filter → 17 total mentions, so 7 is a real subset; the 2
-self-correcting tex lines are the file's own positive control that the identifier is traceable.
+`git grep -n 'shenQiuTian' fbacb9c9 -- tex/proof-guide.tex` → 4 (2 stale, 2 self-correcting); both
+identifier-anchored, so 9 is a lower bound. Control: the same Lean command without `axiom` → 17.
 
-**Three present-tense "documented axiom" descriptions, plus one parenthetical, contradicted in
+**Five present-tense "documented axiom" descriptions, plus one parenthetical, contradicted in
 their own files.** (1) `AndersonTower.lean:28` vs `theorem tower_lowLying_energy_bound`
-(`AndersonTowerTheorem46.lean:551`), contradicted at `:166,:216`. (2)
-`HiddenAntiferromagneticOrder.lean` module doc `:33`–`35` vs `theorem
-tasaki_prop_6_5_hhaf_spin_one` (`HiddenAntiferromagneticOrderUniqueness.lean:1110`), contradicted
-at `:1044`, already noted as ancillary defect (ii) at
+(`AndersonTowerTheorem46.lean:551`), contradicted at `AndersonTower.lean:166,216`. (2)
+`HiddenAntiferromagneticOrder.lean:38-40` (module doc) vs `theorem tasaki_prop_6_5_hhaf_spin_one`
+(`HiddenAntiferromagneticOrderUniqueness.lean:1110`), contradicted at
+`HiddenAntiferromagneticOrder.lean:1042-1047`, already noted as ancillary defect (ii) at
 `docs/limitations/documented-axioms/chapter-08-part-01.md:51` (point there, don't restate); the
-same file's `:1035` parenthetical "…for the (still axiomatic) ground state" names Proposition 6.5,
-not a Lean identifier, and is fixed together with (2). (3) `tex/proof-guide.tex:12304` vs `theorem
-exists_joint_su2_energy_eigenstate` (`SpinHalfSector.lean:46`), already listed proved at
-`docs/limitations/documented-axioms.md:34`. Not fixed: stale beside its own correction. Fix
-trigger: fix-on-touch per file. Measurement: sites above, `fbacb9c9`, plus `git grep -n -P
-'\(.*axiomatic.*\)' fbacb9c9 -- 'LatticeSystem/**/*.lean'` → 3 lines for the parenthetical.
-Control: each file's own later correct line, e.g. `tex/proof-guide.tex:18120` ("is now proved
-(axiom-free)"), 1 of 5 mentions there being stale; for the parenthetical, the other 2 of those 3
-lines (`LiebRepulsiveBalancedGround.lean:269`, `LiebRepulsiveCorrelation.lean:36`) describe
-`tasaki_lemma_10_1_degenerate_perturbation` and are true, so 1-of-3 is a real minority, not a
-pattern artifact.
+parenthetical at `HiddenAntiferromagneticOrder.lean:1035` "…for the (still axiomatic) ground state"
+names Proposition 6.5, not a Lean identifier, and is fixed together with (2). (3)
+`tex/proof-guide.tex:12071,12304,12477` vs `theorem exists_joint_su2_energy_eigenstate`
+(`SpinHalfSector.lean:46`), already listed proved at `docs/limitations/documented-axioms.md:34`. Not
+fixed: stale beside its own correction. Fix trigger: fix-on-touch per file. Measurement: sites above
+at `fbacb9c9`, plus `git grep -n -P '\(.*axiomatic.*\)' fbacb9c9 -- 'LatticeSystem/**/*.lean'` → 1
+line, the parenthetical itself. Control: `git grep -n -P 'exists.{0,2}joint.{0,2}su2' fbacb9c9 --
+tex/proof-guide.tex` → 5 mentions, 3 stale (`:12030` neutral, `:18120` the correction); dropping the
+parenthesis restriction → 9 files carrying "axiomatic", so the 1 hit is a real minority.
 
 **Issue #5132, closed with its stated target unmet.** Title "Tasaki §7.3.2 Theorem 7.7 … full
 discharge", closed `NOT_PLANNED` 2026-08-16, but `axiom tasaki_theorem_7_7`
 (`GeneralAKLT.lean:186`, `fbacb9c9`) still exists; the KLT [41] citation this discharge needs is
 not obtainable now; reopening without the condition below firing is unauthorized. Fix trigger: not
-fix-on-touch — reopens only if `docs/limitations/documented-axioms/chapter-07.md:74-81` fires (KLT
+fix-on-touch — reopens only if `docs/limitations/documented-axioms/chapter-07.md:72-77` fires (KLT
 [41] obtained and transcribed, or an independent [41]-free proof of eq. (7.3.9)). Measurement: `gh
 issue view 5132 --json state,stateReason` → `CLOSED`/`NOT_PLANNED` (not in the git tree; re-run at
-read time). Control: `gh issue view 4718 --json state` (master tracker) → `OPEN`, a live read.
+read time). Control: `gh issue view 5379 --json state` (current tracker) → `OPEN`, a live read.
 
-**Verified non-defect: six "outer absolute value" prose sites are sound.** Carried risk: that
-`S_tot = ||A| − |B|| S` (Theorem 2.3) was missing its outer bar. True: the rendered PDF prints it
-(`.self-local/refs/Hal.Tasaki.P534….pdf`, page 57 = printed p. 42); the `pdftotext` transcript this
-repository otherwise reads drops it, the suspicion's sole source. `tasaki23PredictedTotalSpin`
-(`Theorem23Sectors.lean:25-28`) carries the outer `|·|`, and `tasaki_2_5_theorem_2_3_of_connected`
+**Verified non-defect: four "outer absolute value" prose sites are sound.** Carried risk: that
+`S_tot = ||A| − |B|| S` (Theorem 2.3) was missing its outer bar. True: the book's rendered PDF
+prints it (H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
+2020, Theorem 2.3, printed p. 42); the `pdftotext` transcript this repository otherwise reads drops
+it, the suspicion's sole source. `tasaki23PredictedTotalSpin` (`Theorem23Sectors.lean:25-28`)
+carries the outer `|·|`, and `tasaki_2_5_theorem_2_3_of_connected`
 (`Theorem23GroundStateDegeneracy.lean:428`) takes no orientation hypothesis. Nothing to fix;
 recorded so this is not re-adjudicated. Measurement: `git grep -P -n -I 'outer\W{0,4}\s*absolute
 value' fbacb9c9 -- LatticeSystem docs tex ':!docs/limitations/documentation-hygiene-parked.md'` → 4
-lines (`Theorem23GroundStateDegeneracy.lean:31,82,414`,
-`Tests/Theorem23UnbalancedDegeneracy.lean:289`) plus 2 formula sites
-(`tex/proof-guide.tex:14615,14640`) = 6. Control: `git grep -F 'outer absolute value' fbacb9c9 --
-LatticeSystem docs tex` → 2 (spelling-dependent subset; two sites carry emphasis markup),
-confirming the tolerant pattern does real work.
+lines (`Theorem23GroundStateDegeneracy.lean:31,82,414` and
+`Tests/Theorem23UnbalancedDegeneracy.lean:289`). Control: the same pattern as a fixed string, same
+pathspec → 2 (a spelling-dependent subset), confirming the tolerant pattern does real work.
 
-**No mechanical check.** Status sentences matching `(recorded as|is|stays|remains|kept as)
-(a|an|the)? (documented|faithful)? axiom` over `LatticeSystem/**/*.lean` + `tex`, `fbacb9c9`: 82
-total, only 17 name a declaration on same line — 65 (79%) invisible to adjacency check, including
-the three worst sites above. Green on 79% reports "clean" precisely where it cannot see, the
-fail-open shape already abolished (`audit_gate.py`, 2026-07-22, #5104); no checker added.
+**No mechanical check.** A checker here would pattern-match status sentences and then require a
+declaration name beside them, so it sees only sites whose verb and the word `axiom` share a line.
+Measured at `fbacb9c9`, the pattern on one line and spacing as printed:
+`git grep -n -P '(recorded as|is|stays|remains|kept as) ((a|an|the) )?((documented|faithful) )?axiom(?!-(free|clean))' fbacb9c9 -- 'LatticeSystem/**/*.lean' tex`
+→ 73 lines, holding `AndersonTower.lean:28` but neither the module-doc site (verb and `axiom` split
+across a line break) nor `tex/proof-guide.tex:12304` (no verb on the line); pipe to `grep -c` per
+site. A check blind to two of these three reports "clean" exactly where it cannot
+see, the fail-open shape already abolished (`audit_gate.py`, 2026-07-22, #5104); no checker added.
+
 **Cadence.** Re-run each command every 20-PR cycle, except the issue-state figure (read time) and
 #5132's reopen trigger.
