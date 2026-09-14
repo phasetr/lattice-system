@@ -14603,7 +14603,8 @@ per-sector bound from a near-central admissible sector to all sectors via the me
 ladder-invariance), Issue~\#4617.
 
 \noindent\textbf{Theorem 4.4} (Shen--Qiu--Tian, Tasaki §4.1, eqs.~(4.1.12)--(4.1.13), pp.~77--78;
-PROVED axiom-free (PR \#4622), \texttt{Quantum/SpinS/FerrimagneticLRO.lean}, Issue \#4485).  Ferrimagnetic
+PROVED axiom-free (PR \#4622), \texttt{Quantum/SpinS/FerrimagneticLROUniversalFinal.lean},
+Issue \#4485).  Ferrimagnetic
 long-range order on an asymmetric bipartite lattice: for the spin-$S$ antiferromagnetic Heisenberg
 model on a connected bipartite lattice $\Lambda=A\cup B$ (same hypotheses as Theorem 2.3), every
 ground state satisfies $\langle\Phi_{\mathrm{GS}}|(\hat O_\Lambda)^2|\Phi_{\mathrm{GS}}\rangle\ge
@@ -14641,7 +14642,7 @@ $(\hat S_{\mathrm{tot}})^2\Phi^0=S_{\mathrm{tot}}(S_{\mathrm{tot}}+1)\,\Phi^0$
 \emph{Structural gap} (Issue \#4604): the statement, an axiom at the time, was set at a
 \emph{connected}-graph coupling, which then exceeded the available Theorem 2.3, proved only under
 \emph{complete-bipartite} positivity.  That gap has since been closed --- Theorem 2.3 now holds at
-connected-bipartite generality, \texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_connected}.  PR4 (\#4608)
+connected-bipartite generality.  PR4 (\#4608)
 proves the capstone \texttt{ferrimagnetic\_lro\_completeBipartite\_centered}
 (\texttt{Quantum/SpinS/FerrimagneticLROCapstone.lean}): assembling chain (4.1.16) on the centered
 ground state $\Phi^0$,
