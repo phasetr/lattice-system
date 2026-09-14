@@ -31,6 +31,18 @@ implementing only the printed-model instance cannot turn this fixture green. Thi
 escape that was live in the Problem 2.5.d fixture two rounds ago, where only the printed
 instance was pinned.
 
+The pinned conjunct list forces all **three** printed conclusions: (K1) the total-spin
+value, via the universal Casimir eigen-equation at `tasaki23PredictedCasimirValue`; (K2) the
+degeneracy, via the `Module.finrank` equality; and (K3) the sector expansion with
+Marshall-signed positive coefficients, via an explicit per-sector existence conjunct
+(`∀ M ∈ tasaki23GroundStateSectors A N, Nonempty (magConfigS V N M) → ∃ v, …`, Control 9
+below). K3 uses a plain (non-instance) `Nonempty` hypothesis rather than the `[Nonempty …]`
+instance bracket that `tasaki_2_5_theorem_2_3_data_of_connected` carries internally
+(`ConnectedTheorem23.lean:230`): the two produce the identical core `Prop` (the bracket is
+only an elaboration hint, not part of the term), so this pin does not itself require or admit
+a typeclass-binder escape. A capstone that omits this conjunct, or states it for only some
+admissible sector, fails Control 9 to even destructure — verified by mutation.
+
 ## The witness
 
 `V := Fin 5`, `G := SimpleGraph.pathGraph 5` (edges `{0,1},{1,2},{2,3},{3,4}`),
@@ -73,15 +85,24 @@ complete bipartite.
    coupling or connectivity input anywhere in its proof) but are not the same reading, and the
    book's claim is a Hilbert-space dimension count (Theorem A.16), not sector bookkeeping. A
    control exercising this distinction closes the module.
+9. **K3 consumption.** At the admissible sector `M = 2` (`|B|·N ≤ 2 ≤ |A|·N`, `N = 1`), the
+   per-sector conjunct is instantiated and destructured into an actual Marshall-signed
+   positive-coefficient eigenvector. Fails for a capstone that omits the per-sector conjunct
+   entirely, or restricts it to a strict subset of the admissible sectors — verified by
+   mutation (removing the conjunct breaks the destructure itself, an arity mismatch, before
+   any arithmetic is checked).
 
-## Two gaps this fixture cannot close (measured, not assumed)
+## One gap this fixture cannot close (measured, not assumed)
 
-* **Typeclass binders.** A hypothesis smuggled in as an instance binder (e.g.
-  `[Nonempty V]`, `[Nonempty (magConfigS V N M)]`, `[DecidableRel G.Adj]`, `[IsAlgClosed ℂ]`)
-  passes every control here, because instance arguments are synthesized silently at each call
-  site and never show up as an elaboration failure. Must be checked by reading the elaborated
-  binder list of the merged declaration (`#check @tasaki_2_5_theorem_2_3_of_connected`) by
-  hand once it exists.
+* **Extra typeclass binders on the declaration's own parameter list.** A hypothesis
+  smuggled in as a *top-level* instance binder of `tasaki_2_5_theorem_2_3_of_connected`
+  itself (e.g. `[Nonempty V]`, `[DecidableRel G.Adj]`, `[IsAlgClosed ℂ]`) passes every control
+  here, because instance arguments are synthesized silently at each call site and never show
+  up as an elaboration failure. This is distinct from the `Nonempty (magConfigS V N M)`
+  hypothesis inside the K3 conjunct above, which this fixture does pin (as a plain, explicit
+  hypothesis the caller must discharge per sector, not a top-level instance). Must be checked
+  by reading the elaborated binder list of the merged declaration
+  (`#check @tasaki_2_5_theorem_2_3_of_connected`) by hand once it exists.
 * **Smuggled explicit hypotheses.** An added explicit hypothesis that the witness below
   happens to discharge (e.g. an `hJ_pos` over `bipartiteCompleteGraphOf`, a `c`/`c_toy`
   strictness binder, or an `horient` binder that the witness order below happens to satisfy)
@@ -164,17 +185,28 @@ that proves only the printed instance leaves this pin red. -/
 unbalanced witness with `J := couplingOf (pathGraph 5) (1/2)` and `N = 1`: the ground
 eigenspace has dimension `2` (`||A| − |B||·N + 1 = 1·1 + 1`, control 1), a ground state exists
 and is fed to the universal Casimir conjunct (control 7) to exhibit the non-zero predicted
-value `3/4` (control 3), which fails for a restatement of Theorem 2.2's `S_tot = 0`. -/
+value `3/4` (control 3), which fails for a restatement of Theorem 2.2's `S_tot = 0`. The
+per-sector K3 conjunct (control 9) is destructured too and is passed through unchanged, to
+pin it on `_of_connected` independently of the `couplingOf_half` instance below. -/
 example :
     ∃ μ : ℝ,
       Module.finrank ℂ ↥(Module.End.eigenspace
           (Matrix.toLin' (heisenbergHamiltonianS (couplingOf (SimpleGraph.pathGraph 5)
             ((1 : ℂ) / 2)) 1)) (μ : ℂ)) = 2 ∧
+      (∀ M ∈ tasaki23GroundStateSectors (V := Fin 5) unbalancedMarker 1,
+        Nonempty (magConfigS (Fin 5) 1 M) →
+        ∃ v : magConfigS (Fin 5) 1 M → ℝ,
+          (∀ σ, 0 < v σ) ∧
+          (heisenbergHamiltonianS (couplingOf (SimpleGraph.pathGraph 5) ((1 : ℂ) / 2)) 1).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS unbalancedMarker τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS unbalancedMarker τ.1).re * v τ : ℝ) : ℂ))) ∧
       (∃ Φ : (Fin 5 → Fin 2) → ℂ, Φ ≠ 0 ∧
         (heisenbergHamiltonianS (couplingOf (SimpleGraph.pathGraph 5) ((1 : ℂ) / 2)) 1).mulVec Φ
           = (μ : ℂ) • Φ ∧
         (totalSpinSSquared (Fin 5) 1).mulVec Φ = (((3 : ℝ) / 4 : ℝ) : ℂ) • Φ) := by
-  obtain ⟨μ, hdim, hexists, hcas, hmin⟩ :=
+  obtain ⟨μ, hdim, hsector, hexists, hcas, hmin⟩ :=
     tasaki_2_5_theorem_2_3_of_connected (N := 1) unbalancedMarker (SimpleGraph.pathGraph 5)
       unbalancedWitness_connected unbalancedWitness_bipartite
       (by decide) (by decide) (le_refl 1)
@@ -194,7 +226,7 @@ example :
         simp [couplingOf, hnadj])
       (fun x y h => by simp [couplingOf, h])
       (fun x y h => by simp [couplingOf, h])
-  refine ⟨μ, ?_, ?_⟩
+  refine ⟨μ, ?_, hsector, ?_⟩
   · rw [hdim]
     decide
   · obtain ⟨Φ, hΦne, hΦeig⟩ := hexists
@@ -217,13 +249,37 @@ example :
       Module.finrank ℂ ↥(Module.End.eigenspace
           (Matrix.toLin' (heisenbergHamiltonianS
             (couplingOf (SimpleGraph.pathGraph 5) ((1 : ℂ) / 2)) 2)) (μ : ℂ)) = 3 := by
-  obtain ⟨μ, hdim, -, -, -⟩ :=
+  obtain ⟨μ, hdim, -, -, -, -⟩ :=
     tasaki_2_5_theorem_2_3_couplingOf_half (N := 2) unbalancedMarker (SimpleGraph.pathGraph 5)
       unbalancedWitness_connected unbalancedWitness_bipartite
       (by decide) (by decide) (by decide)
   refine ⟨μ, ?_⟩
   rw [hdim]
   decide
+
+/-- **Control 9 (K3 consumption, load-bearing).** At the admissible sector `M = 2`
+(`min(|A|, |B|)·N = 2 ≤ M ≤ max(|A|, |B|)·N = 3`, `N = 1`), the per-sector conjunct is
+instantiated and destructured into an actual positive-coefficient Marshall-signed eigenvector.
+Fails to even destructure for a capstone that omits this conjunct — verified by mutation:
+removing it and re-running this control raises `rcases failed: ... is not an inductive
+datatype`, an arity mismatch, before any arithmetic is checked. -/
+example :
+    ∃ μ : ℝ, ∃ v : magConfigS (Fin 5) 1 2 → ℝ, (∀ σ, 0 < v σ) ∧
+      (heisenbergHamiltonianS (couplingOf (SimpleGraph.pathGraph 5) ((1 : ℂ) / 2)) 1).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS unbalancedMarker τ.1).re * v τ : ℝ) : ℂ))) =
+        (μ : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS unbalancedMarker τ.1).re * v τ : ℝ) : ℂ)) := by
+  obtain ⟨μ, -, hsector, -, -, -⟩ :=
+    tasaki_2_5_theorem_2_3_couplingOf_half (N := 1) unbalancedMarker (SimpleGraph.pathGraph 5)
+      unbalancedWitness_connected unbalancedWitness_bipartite
+      (by decide) (by decide) (le_refl 1)
+  have hmem : 2 ∈ tasaki23GroundStateSectors (V := Fin 5) unbalancedMarker 1 := by decide
+  have hne : Nonempty (magConfigS (Fin 5) 1 2) :=
+    magConfigS_nonempty_of_le_card_mul
+      (tasaki23GroundStateSectors_le_card_mul unbalancedMarker 1 hmem)
+  obtain ⟨v, hv, heq⟩ := hsector 2 hmem hne
+  exact ⟨μ, v, hv, heq⟩
 
 /-- **Control 4 (marker inversion, the load-bearing control).** The *same* printed-model
 capstone, applied at `unbalancedMarkerFlip` (`|A| = 2`, `|B| = 3`, the opposite orientation)
@@ -242,7 +298,7 @@ example :
         (heisenbergHamiltonianS (couplingOf (SimpleGraph.pathGraph 5) ((1 : ℂ) / 2)) 1).mulVec Φ
           = (μ : ℂ) • Φ ∧
         (totalSpinSSquared (Fin 5) 1).mulVec Φ = (((3 : ℝ) / 4 : ℝ) : ℂ) • Φ) := by
-  obtain ⟨μ, hdim, hexists, hcas, -⟩ :=
+  obtain ⟨μ, hdim, -, hexists, hcas, -⟩ :=
     tasaki_2_5_theorem_2_3_couplingOf_half (N := 1) unbalancedMarkerFlip
       (SimpleGraph.pathGraph 5)
       unbalancedWitness_connected unbalancedWitnessFlip_bipartite
@@ -275,7 +331,7 @@ example :
       Module.finrank ℂ ↥(Module.End.eigenspace
           (Matrix.toLin' (heisenbergHamiltonianS
             (couplingOf (SimpleGraph.pathGraph 4) ((1 : ℂ) / 2)) 1)) (μ : ℂ)) = 1 := by
-  obtain ⟨μ, hdim, -, -, -⟩ :=
+  obtain ⟨μ, hdim, -, -, -, -⟩ :=
     tasaki_2_5_theorem_2_3_couplingOf_half (N := 1) balancedMarker (SimpleGraph.pathGraph 4)
       balancedWitness_connected balancedWitness_bipartite
       (by decide) (by decide) (by decide)
