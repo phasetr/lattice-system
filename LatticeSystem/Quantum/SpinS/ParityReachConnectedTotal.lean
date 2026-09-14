@@ -17,8 +17,10 @@ counterparts (`parityReachableS_total`, `ionParityReachableS_total`,
 hypothesis: reachability along the three relations is purely graph-theoretic, and the
 bipartite structure of §2.5 is needed only downstream, by the sign gauge and the sector
 argument.  Mathematically the complete-bipartite trio is a special case: `hA_ne` together with
-`hB_ne` already makes `bipartiteCompleteGraphOf A` connected.  That connectivity lemma is not
-available in the repo, so neither family is stated in terms of the other and both remain in use.
+`hB_ne` already makes `bipartiteCompleteGraphOf A` connected, via
+`bipartiteCompleteGraphOf_preconnected` (`BipartiteCompleteGraph.lean`) plus `Nonempty V`; only the
+thin `.Connected`-packaging wrapper is absent, so neither family is stated in terms of the other
+and both remain in use.
 
 The route is the same in all three cases: descend both configurations to magnetization sum
 below `2` (`ParityReachConnectedStepDown.lean`), where equal parity forces equal magnetization

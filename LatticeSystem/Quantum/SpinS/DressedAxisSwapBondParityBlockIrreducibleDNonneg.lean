@@ -9,9 +9,13 @@ Issue #412 -- Tasaki Section 2.5 Theorem 2.4.
 
 This file gives the conditional irreducibility capstone for the shifted
 axis-swapped parity-block matrix using only bond-generated parity reachability.
-The hypothesis is deliberately stated as a bond-only totality assumption; the
-remaining combinatorial task for the general spin-`S` `D >= 0` boundary is to
-prove that assumption on `bipartiteCompleteGraphOf A`.
+The hypothesis is deliberately stated as a bond-only totality assumption over a
+graph `G` whose edges join opposite sublattices, so that it can be discharged by
+whichever totality layer fits the graph at hand: `bondParityReachableS_total`
+(`ParityReachableNoSingleIonTotal.lean`) on `bipartiteCompleteGraphOf A`, which
+is what the unconditional wrapper below uses, or
+`bondParityReachableS_total_of_connected` (`ParityReachConnectedTotal.lean`) on a
+connected graph.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, Section 2.5 Theorem 2.4, pp. 43--44.
@@ -25,12 +29,14 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-- **Bond-only shifted parity-block irreducibility under reachability
 totality**.  If every two distinct configurations in a parity block are
-connected by bond-only parity moves, then the shifted parity-block matrix is
-irreducible under `-1 < lambda < 1` and `D.re >= 0`. -/
+connected by bond-only parity moves along a graph `G` whose edges join opposite
+sublattices, then the shifted parity-block matrix is irreducible under
+`-1 < lambda < 1` and `D.re >= 0`. -/
 theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_bondParityReachable_total
-    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
-    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     {lam : ℂ} (hlam : lam.im = 0) (hlb : -1 < lam.re) (hub : lam.re < 1)
     {D : ℂ} (hDim : D.im = 0) (hDnn : 0 ≤ D.re)
@@ -40,7 +46,7 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_bondPari
     (p : ℕ)
     [Nonempty (parityConfigS Λ N p)]
     (hreach_total : ∀ σ' σ : parityConfigS Λ N p, σ' ≠ σ →
-      BondParityReachableS (bipartiteCompleteGraphOf A) σ.1 σ'.1) :
+      BondParityReachableS G σ.1 σ'.1) :
     (shiftedDressedAxisSwappedReMatrixOnParityBlock A J lam D N c p).IsIrreducible := by
   have hc_le : ∀ σ : Λ → Fin (N + 1),
       dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ ≤ c := fun σ =>
@@ -59,7 +65,7 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_bondPari
   · have hreach := hreach_total σ' σ hsig
     obtain ⟨k, hk⟩ :=
       shiftedDressedAxisSwappedReMatrixOnParityBlock_pow_apply_pos_of_bondParityReachable
-        A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDnn hc_le p hreach
+        A hJim hJnn hGbip hJ_pos_G hJself hJbip hlam hlb hub hDim hDnn hc_le p hreach
     have hk_pos : 0 < k := by
       rcases Nat.eq_zero_or_pos k with hk0 | hkp
       · subst hk0
@@ -88,7 +94,8 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_D_nonneg
     [Nonempty (parityConfigS Λ N p)] :
     (shiftedDressedAxisSwappedReMatrixOnParityBlock A J lam D N c p).IsIrreducible := by
   refine shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_bondParityReachable_total
-    A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDnn hc_strict p ?_
+    A hJim hJnn (fun _ _ hadj => bipartiteCompleteGraphOf_adj_sublattice_ne hadj)
+    hJpos hJself hJbip hlam hlb hub hDim hDnn hc_strict p ?_
   intro σ' σ _hne
   refine bondParityReachableS_total A hA_ne hB_ne hN ?_
   have hp_σ : magSumS σ.1 % 2 = p := σ.2

@@ -146,7 +146,9 @@ theorem shiftedDressedSReMatrix_apply_pos_of_raiseLowerStepS_bipartite
     · have : (τ x).val = (σ x).val := by rw [heq]
       omega
   rw [shiftedDressedSReMatrix_apply_off_diag A J N c hne]
+  have hGbip : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → A x ≠ A y :=
+    fun _ _ hadj => bipartiteCompleteGraphOf_adj_sublattice_ne hadj
   exact neg_dressedHeisenbergSReMatrix_apply_pos_of_raiseLowerStepS_bipartite A
-    N hJ_real hJ_pos hJ_sym hstep
+    N hGbip hJ_real hJ_pos hJ_sym hstep
 
 end LatticeSystem.Quantum

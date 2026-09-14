@@ -30,23 +30,24 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-- **Unified `ParityStepS` strict positivity of the shifted PF matrix** (case (i.2) strict, `D >
 0`).
-For a `ParityStepS` on `bipartiteCompleteGraphOf A` under `−1 < λ.re < 1` real, real `D > 0`
-strict, the shifted matrix entry is strict positive. -/
+For a `ParityStepS` on a graph `G` whose edges join opposite sublattices, under `−1 < λ.re < 1`
+real, real `D > 0` strict, the shifted matrix entry is strict positive. -/
 theorem shiftedDressedAxisSwappedReMatrix_apply_pos_of_parityStepS_bipartite
-    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
-    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     {lam : ℂ} (hlam : lam.im = 0) (hlb : -1 < lam.re) (hub : lam.re < 1)
     {D : ℂ} (hDim : D.im = 0) (hDpos : 0 < D.re)
     (c : ℝ)
-    {σ τ : Λ → Fin (N + 1)} (hstep : ParityStepS (bipartiteCompleteGraphOf A) σ τ) :
+    {σ τ : Λ → Fin (N + 1)} (hstep : ParityStepS G σ τ) :
     0 < shiftedDressedAxisSwappedReMatrix A J lam D N c τ σ := by
   rcases hstep with hRL | hPB | hSI
   · exact shiftedDressedAxisSwappedReMatrix_apply_pos_of_raiseLowerStepS_bipartite
-      A hJim hJnn hJpos hJself hJbip hlam hlb (le_of_lt hub) hDim (le_of_lt hDpos) c hRL
+      A hJim hJnn hGbip hJ_pos_G hJself hJbip hlam hlb (le_of_lt hub) hDim (le_of_lt hDpos) c hRL
   · exact shiftedDressedAxisSwappedReMatrix_apply_pos_of_parityBondStepS_bipartite
-      A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim (le_of_lt hDpos) c hPB
+      A hJim hJnn hGbip hJ_pos_G hJself hJbip hlam hlb hub hDim (le_of_lt hDpos) c hPB
   · exact shiftedDressedAxisSwappedReMatrix_apply_pos_of_singleIonStepS
       A hJself hDim hDpos c hSI
 

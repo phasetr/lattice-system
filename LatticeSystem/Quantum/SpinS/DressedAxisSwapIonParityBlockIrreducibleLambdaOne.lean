@@ -24,12 +24,13 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-- **Ion-only shifted parity-block irreducibility under reachability totality**.
 If every two distinct configurations in a parity block are connected by
-ion-only parity moves, then the shifted parity-block matrix is irreducible at
-`lambda = 1`, `D > 0`. -/
+ion-only parity moves along a graph `G` whose edges join opposite sublattices,
+then the shifted parity-block matrix is irreducible at `lambda = 1`, `D > 0`. -/
 theorem shiftedDressedReMatParity_irred_of_ionParityReach_total_lam1
-    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
-    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     {D : ℂ} (hDim : D.im = 0) (hDpos : 0 < D.re)
     {c : ℝ}
@@ -38,7 +39,7 @@ theorem shiftedDressedReMatParity_irred_of_ionParityReach_total_lam1
     (p : ℕ)
     [Nonempty (parityConfigS Λ N p)]
     (hreach_total : ∀ σ' σ : parityConfigS Λ N p, σ' ≠ σ →
-      IonParityReachableS (bipartiteCompleteGraphOf A) σ.1 σ'.1) :
+      IonParityReachableS G σ.1 σ'.1) :
     (shiftedDressedAxisSwappedReMatrixOnParityBlock A J 1 D N c p).IsIrreducible := by
   have hc_le : ∀ σ : Λ → Fin (N + 1),
       dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J 1 D N σ σ ≤ c := fun σ =>
@@ -57,7 +58,7 @@ theorem shiftedDressedReMatParity_irred_of_ionParityReach_total_lam1
   · have hreach := hreach_total σ' σ hsig
     obtain ⟨k, hk⟩ :=
       shiftedDressedReMatParity_pow_apply_pos_of_ionParityReach_lam1
-        A hJim hJnn hJpos hJself hJbip hDim hDpos hc_le p hreach
+        A hJim hJnn hGbip hJ_pos_G hJself hJbip hDim hDpos hc_le p hreach
     have hk_pos : 0 < k := by
       rcases Nat.eq_zero_or_pos k with hk0 | hkp
       · subst hk0
@@ -84,7 +85,8 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_lambda_one_
     [Nonempty (parityConfigS Λ N p)] :
     (shiftedDressedAxisSwappedReMatrixOnParityBlock A J 1 D N c p).IsIrreducible := by
   refine shiftedDressedReMatParity_irred_of_ionParityReach_total_lam1
-    A hJim hJnn hJpos hJself hJbip hDim hDpos hc_strict p ?_
+    A hJim hJnn (fun _ _ hadj => bipartiteCompleteGraphOf_adj_sublattice_ne hadj)
+    hJpos hJself hJbip hDim hDpos hc_strict p ?_
   intro σ' σ _hne
   refine ionParityReachableS_total A hA_ne hB_ne hN ?_
   have hp_σ : magSumS σ.1 % 2 = p := σ.2

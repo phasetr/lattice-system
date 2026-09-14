@@ -66,24 +66,23 @@ theorem neg_dressedHeisenbergSReMatrix_apply_pos_of_raiseLowerStepS_witness
   change 0 < -dressedHeisenbergSReMatrix A J N σ' σ
   linarith
 
-/-- For a `RaiseLowerStepS` in the bipartite complete graph
-`bipartiteCompleteGraphOf A` (so the witness sites are automatically
-bipartite), the negation `-dressedHeisenbergSReMatrix` has strictly
+/-- For a `RaiseLowerStepS` in a graph `G` whose edges join opposite
+sublattices, the negation `-dressedHeisenbergSReMatrix` has strictly
 positive entries between the two configurations:
 
     `0 < (-dressedHeisenbergSReMatrix A J N) τ σ`. -/
 theorem neg_dressedHeisenbergSReMatrix_apply_pos_of_raiseLowerStepS_bipartite
     (A : V → Bool)
-    {J : V → V → ℂ} (N : ℕ)
+    {J : V → V → ℂ} (N : ℕ) {G : SimpleGraph V}
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
     (hJ_real : ∀ x y, (J x y).im = 0)
-    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_pos : ∀ x y : V, G.Adj x y → 0 < (J x y).re)
     (hJ_sym : ∀ x y, J x y = J y x)
     {σ τ : V → Fin (N + 1)}
-    (hstep : RaiseLowerStepS (bipartiteCompleteGraphOf A) σ τ) :
+    (hstep : RaiseLowerStepS G σ τ) :
     0 < (-dressedHeisenbergSReMatrix A J N) τ σ := by
   obtain ⟨x, y, hadj, hsh, hagree⟩ := hstep
-  -- A x ≠ A y from bipartiteCompleteGraphOf adjacency.
-  have hAne : A x ≠ A y := bipartiteCompleteGraphOf_adj_sublattice_ne hadj
+  have hAne : A x ≠ A y := hGbip x y hadj
   exact neg_dressedHeisenbergSReMatrix_apply_pos_of_raiseLowerStepS_witness A N
     hadj hAne (hJ_real x y) (hJ_pos x y hadj) (hJ_sym x y) hsh hagree
 

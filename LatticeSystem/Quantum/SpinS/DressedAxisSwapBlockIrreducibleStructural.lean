@@ -39,7 +39,8 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible
     [Nonempty (parityConfigS Λ N p)] :
     (shiftedDressedAxisSwappedReMatrixOnParityBlock A J lam D N c p).IsIrreducible := by
   refine shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_parityReachable_total
-    A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict p ?_
+    A hJim hJnn (fun _ _ hadj => bipartiteCompleteGraphOf_adj_sublattice_ne hadj)
+    hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict p ?_
   intro σ' σ _hne
   refine parityReachableS_total A hA_ne hB_ne hN ?_
   -- magSumS σ.1 % 2 = p = magSumS σ'.1 % 2 from parityConfigS membership.

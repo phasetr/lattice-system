@@ -23,33 +23,35 @@ open Matrix
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-- **Ion-only parity-step strict positivity at `lambda = 1`, `D > 0`**.  For
-an ion-only parity move on `bipartiteCompleteGraphOf A`, the shifted dressed
-matrix entry is strictly positive. -/
+an ion-only parity move on a graph `G` whose edges join opposite sublattices,
+the shifted dressed matrix entry is strictly positive. -/
 theorem shiftedDressedAxisSwappedReMatrix_apply_pos_of_ionParityStepS_lambda_one
-    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
-    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     {D : ℂ} (hDim : D.im = 0) (hDpos : 0 < D.re)
     (c : ℝ)
     {σ τ : Λ → Fin (N + 1)}
-    (hstep : IonParityStepS (bipartiteCompleteGraphOf A) σ τ) :
+    (hstep : IonParityStepS G σ τ) :
     0 < shiftedDressedAxisSwappedReMatrix A J 1 D N c τ σ := by
   rcases hstep with hRL | hSI
   · exact shiftedDressedAxisSwappedReMatrix_apply_pos_of_raiseLowerStepS_bipartite
-      A hJim hJnn hJpos hJself hJbip (by norm_num) (by norm_num) (by norm_num)
+      A hJim hJnn hGbip hJ_pos_G hJself hJbip (by norm_num) (by norm_num) (by norm_num)
       hDim (le_of_lt hDpos) c hRL
   · exact shiftedDressedAxisSwappedReMatrix_apply_pos_of_singleIonStepS
       A hJself hDim hDpos c hSI
 
 /-- **Block matrix power positivity from ion-only parity reachability at
-`lambda = 1`, `D > 0`**.  For any ion-only reachable pair of parity-block
-configurations, some power of the shifted parity-block submatrix is strictly
-positive at that pair. -/
+`lambda = 1`, `D > 0`**.  For any pair of parity-block configurations that are
+ion-only reachable along a graph `G` whose edges join opposite sublattices, some
+power of the shifted parity-block submatrix is strictly positive at that pair. -/
 theorem shiftedDressedReMatParity_pow_apply_pos_of_ionParityReach_lam1
-    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
-    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     {D : ℂ} (hDim : D.im = 0) (hDpos : 0 < D.re)
     {c : ℝ}
@@ -57,20 +59,20 @@ theorem shiftedDressedReMatParity_pow_apply_pos_of_ionParityReach_lam1
       dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J 1 D N σ σ ≤ c)
     (p : ℕ)
     {σ' σ : parityConfigS Λ N p}
-    (hreach : IonParityReachableS (bipartiteCompleteGraphOf A) σ.1 σ'.1) :
+    (hreach : IonParityReachableS G σ.1 σ'.1) :
     ∃ k : ℕ,
       0 < (shiftedDressedAxisSwappedReMatrixOnParityBlock A J 1 D N c p ^ k) σ' σ := by
   have hB_nn : ∀ ρ τ, 0 ≤ shiftedDressedAxisSwappedReMatrix A J 1 D N c ρ τ :=
     fun ρ τ => shiftedDressedAxisSwappedReMatrix_nonneg A hJim hJnn hJself hJbip
       (by norm_num) (by norm_num) (by norm_num) hDim (le_of_lt hDpos) hc ρ τ
   have hB_step : ∀ {ρ τ : Λ → Fin (N + 1)},
-      IonParityStepS (bipartiteCompleteGraphOf A) ρ τ →
+      IonParityStepS G ρ τ →
         0 < shiftedDressedAxisSwappedReMatrix A J 1 D N c τ ρ :=
     fun {ρ τ} hstep =>
       shiftedDressedAxisSwappedReMatrix_apply_pos_of_ionParityStepS_lambda_one
-        A hJim hJnn hJpos hJself hJbip hDim hDpos c hstep
+        A hJim hJnn hGbip hJ_pos_G hJself hJbip hDim hDpos c hstep
   obtain ⟨k, hpow_pos⟩ := exists_matrixPow_apply_pos_of_ionParityReachableS
-    (G := bipartiteCompleteGraphOf A) (N := N)
+    (G := G) (N := N)
     (B := shiftedDressedAxisSwappedReMatrix A J 1 D N c) hB_nn hB_step hreach
   refine ⟨k, ?_⟩
   rw [shiftedDressedAxisSwappedReMatrixOnParityBlock_pow_apply A hJself]

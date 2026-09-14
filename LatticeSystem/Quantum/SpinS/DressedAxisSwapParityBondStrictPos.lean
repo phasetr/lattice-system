@@ -7,9 +7,10 @@ import LatticeSystem.Quantum.SpinS.ParityReachable
 
 Issue #3739 (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori).
 
-For a `ParityBondStepS` witness on `bipartiteCompleteGraphOf A` (both endpoints of a bond shifted
-in the *same* Fin direction by `±1`), under case (i) strict² (`−1 < λ.re < 1` real, `D.re ≥ 0`),
-the shifted PF matrix entry `shiftedDressedAxisSwappedReMatrix τ σ > 0`.
+For a `ParityBondStepS` witness on a graph `G` whose edges join opposite sublattices (both
+endpoints of a bond shifted in the *same* Fin direction by `±1`), under case (i) strict²
+(`−1 < λ.re < 1` real, `D.re ≥ 0`), the shifted PF matrix entry
+`shiftedDressedAxisSwappedReMatrix τ σ > 0`.
 
 Parallels the transverse step (#3790–#3792) with the parity ladder pair replacing the transverse
 ladder pair:
@@ -286,22 +287,24 @@ theorem shiftedDressedAxisSwappedReMatrix_apply_pos_of_parityBondStepS_witness_b
   change 0 < -((dressedAxisSwappedAnisotropicHeisenbergS A J lam D N) σ' σ).re
   linarith
 
-/-- **Shifted PF strictly positive on a `ParityBondStepS`**.  For a bond-parity move on
-`bipartiteCompleteGraphOf A` under case (i) strict², the shifted matrix is strict positive. -/
+/-- **Shifted PF strictly positive on a `ParityBondStepS`**.  For a bond-parity move on a graph
+`G` whose edges join opposite sublattices, under case (i) strict², the shifted matrix is strict
+positive. -/
 theorem shiftedDressedAxisSwappedReMatrix_apply_pos_of_parityBondStepS_bipartite
-    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
-    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     {lam : ℂ} (hlam : lam.im = 0) (hlb : -1 < lam.re) (hub : lam.re < 1)
     {D : ℂ} (hDim : D.im = 0) (hDnn : 0 ≤ D.re)
     (c : ℝ)
-    {σ τ : Λ → Fin (N + 1)} (hstep : ParityBondStepS (bipartiteCompleteGraphOf A) σ τ) :
+    {σ τ : Λ → Fin (N + 1)} (hstep : ParityBondStepS G σ τ) :
     0 < shiftedDressedAxisSwappedReMatrix A J lam D N c τ σ := by
   obtain ⟨x, y, hadj, hsh, hagree⟩ := hstep
   have hxy : x ≠ y := hadj.ne
-  have hAne : A x ≠ A y := bipartiteCompleteGraphOf_adj_sublattice_ne hadj
+  have hAne : A x ≠ A y := hGbip x y hadj
   exact shiftedDressedAxisSwappedReMatrix_apply_pos_of_parityBondStepS_witness_bipartite
-    A hJim hJnn hJself hJbip hlam hlb hub hDim hDnn c hxy hAne (hJpos x y hadj) hsh hagree
+    A hJim hJnn hJself hJbip hlam hlb hub hDim hDnn c hxy hAne (hJ_pos_G x y hadj) hsh hagree
 
 end LatticeSystem.Quantum
