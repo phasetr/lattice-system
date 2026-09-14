@@ -56,13 +56,15 @@ example {G : SimpleGraph V} (hV : Nontrivial V) (hG : G.Connected) (hN : 1 ≤ N
 
 /-- **Discriminating witness (four-vertex path, not the four-cycle).** On `V = Fin 4`,
 `A = {0, 2}`, the path `pathGraph 4` (edges `{0,1},{1,2},{2,3}`) is connected (Footnote 28, p. 33)
-and satisfies every hypothesis of the new connected capstones above. Yet the crossing pair
-`{0,3}` is not a path edge, so it violates `hA_ne`/`hB_ne`'s implicit demand of the old
-complete-bipartite theorems (`(bipartiteCompleteGraphOf A).Adj 0 3` while
-`¬ (pathGraph 4).Adj 0 3`): the new hypotheses hold strictly more often than the old ones. The
-four-cycle `cycleGraph 4` does **not** discriminate: with this same marking its edge set is
-exactly the four crossing pairs, so `cycleGraph 4 = bipartiteCompleteGraphOf A` as graphs and the
-two hypotheses coincide on it. -/
+and satisfies every hypothesis of the new connected capstones above. The old complete-bipartite
+theorems say nothing about it, and not because their hypotheses fail: `hA_ne` (`a = 0`) and
+`hB_ne` (`b = 1`) both hold for this marking, and neither mentions adjacency. What fails is the
+*conclusion*, which is about the fixed graph `bipartiteCompleteGraphOf A` — and for this marking
+that graph is not `pathGraph 4`, witnessed by the crossing pair `{0,3}`
+(`(bipartiteCompleteGraphOf A).Adj 0 3` while `¬ (pathGraph 4).Adj 0 3`). The four-cycle
+`cycleGraph 4` does **not** discriminate: with this same marking its edge set is exactly the four
+crossing pairs, so `cycleGraph 4 = bipartiteCompleteGraphOf A` as graphs and the old theorems
+already cover it. -/
 example :
     (SimpleGraph.pathGraph 4).Connected ∧
       (bipartiteCompleteGraphOf (fun x : Fin 4 => decide (x = 0 ∨ x = 2))).Adj 0 3 ∧

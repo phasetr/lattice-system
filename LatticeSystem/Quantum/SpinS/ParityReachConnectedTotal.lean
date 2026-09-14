@@ -8,15 +8,17 @@ import LatticeSystem.Quantum.SpinS.ParityReachableMagSum
 
 Issue #5473 (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori).
 
-On a graph `G` with `G.Connected` (plus `Nontrivial V` for the bond-only relation), any two
-configurations of equal `magSumS`-parity are related by `ParityReachableS`,
-`IonParityReachableS` and `BondParityReachableS` respectively.  Unlike their complete-bipartite
+On a graph `G` with `G.Connected`, any two configurations of equal `magSumS`-parity are related
+by `ParityReachableS` (under `1 ≤ N`), by `IonParityReachableS` (under `2 ≤ N`, the room the
+single-ion `±2` move needs) and by `BondParityReachableS` (under `1 ≤ N` and `Nontrivial V`,
+without which the one-vertex graph carries no bond move at all).  Unlike their complete-bipartite
 counterparts (`parityReachableS_total`, `ionParityReachableS_total`,
 `bondParityReachableS_total`), these carry **no** bipartiteness or balanced-sublattice
 hypothesis: reachability along the three relations is purely graph-theoretic, and the
 bipartite structure of §2.5 is needed only downstream, by the sign gauge and the sector
-argument.  The complete-bipartite trio is not superseded — the two families take different
-graph arguments and both remain in use.
+argument.  Mathematically the complete-bipartite trio is a special case: `hA_ne` together with
+`hB_ne` already makes `bipartiteCompleteGraphOf A` connected.  That connectivity lemma is not
+available in the repo, so neither family is stated in terms of the other and both remain in use.
 
 The route is the same in all three cases: descend both configurations to magnetization sum
 below `2` (`ParityReachConnectedStepDown.lean`), where equal parity forces equal magnetization

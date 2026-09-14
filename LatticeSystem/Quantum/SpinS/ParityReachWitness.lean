@@ -11,15 +11,17 @@ configurations `σ'` and short proofs that the corresponding elementary move tak
 
 * **`raiseLowerStepS_pair_shift`**: from `σ` with `σ a ≥ 1`, `σ b ≤ N − 1`, `a ≠ b`,
   `A a ≠ A b`, the move that *lowers* `a` and *raises* `b` by `1` each is a `RaiseLowerStepS`.
-* **`parityBondStepS_pair_raise`**: the both-raise pair move on a bipartite complete graph edge
-  is a `ParityBondStepS`.
-* **`parityBondStepS_pair_lower`**: the both-lower pair move on an edge of an *arbitrary* graph
-  `G` is a `ParityBondStepS` — the graph enters only through the edge, so the bipartite complete
-  graph is just one instance.
+* **`parityBondStepS_pair_raise`**: the both-raise pair move is a `ParityBondStepS`; it is
+  stated on a bipartite complete graph edge.
+* **`parityBondStepS_pair_lower`**: the both-lower pair move is a `ParityBondStepS`; it is
+  stated on an edge of an *arbitrary* graph `G`.
 * **`singleIonStepS_raise`** / **`singleIonStepS_lower`**: same-site `±2` moves are
   `SingleIonStepS`.
 
-These wrap raw move constructions into reusable witnesses for building reachability chains.
+These wrap raw move constructions into reusable witnesses for building reachability chains.  The
+two `parityBondStepS_pair_*` witnesses differ only in the graph they are stated over: neither
+proof uses bipartiteness, each moving just the two endpoints of the given edge, so the graph
+enters only through that edge in both cases.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.4, p. 43.
@@ -93,7 +95,9 @@ theorem raiseLowerStepS_pair_shift_raise_a_lower_b
   · exact configUpdateTwo_agree _ _ _ _ _
 
 omit [Fintype V] in
-/-- **ParityBondStepS witness (both raise)** on a bipartite edge. -/
+/-- **ParityBondStepS witness (both raise)** on a bipartite edge.  As in the both-lower witness
+below, the proof uses only the edge; the bipartite complete graph is part of the statement, not
+of the argument. -/
 theorem parityBondStepS_pair_raise
     (A : V → Bool) {a b : V} (hadj : (bipartiteCompleteGraphOf A).Adj a b)
     {σ : V → Fin (N + 1)}

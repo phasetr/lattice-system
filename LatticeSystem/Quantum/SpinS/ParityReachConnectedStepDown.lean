@@ -18,8 +18,9 @@ analogues of the step-down lemmas behind the complete-bipartite totality theorem
 `ParityReachableNoSingleIonTotal.lean`), and they carry **no** bipartiteness or balance
 hypothesis: lowering the magnetization needs only an edge whose two endpoints both carry a
 unit, and connectivity supplies one through the single-quantum walk transport of
-`ConnectedRaiseLower.lean`.  None of the concentration / canonical-form machinery of the
-complete-bipartite route is used.
+`ConnectedRaiseLower.lean`.  From the complete-bipartite route only the counting lemma
+`magSumS_eq_card_one_sites_of_le_one` is taken — that is what `ParityReachStepDownFull.lean` is
+imported for — while none of its concentration / canonical-form machinery is used.
 
 The auxiliary hypotheses differ between the three relations, and each difference is forced:
 
