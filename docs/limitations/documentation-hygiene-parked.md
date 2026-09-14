@@ -19,7 +19,7 @@ an unresolved defect.
 This page also carries claims that are false or stale about the Lean they describe, not just
 hygiene populations; each entry of the final section below uses the subset it needs of seven fields
 of its own (True / False / Not fixed / Carried risk / Fix trigger / Measurement / Control), and that
-section closes with a decision about mechanical checking, not a record and carrying none of them.
+section includes a decision about mechanical checking, not a record and carrying none of them.
 
 A command whose paths reach this page excludes it from its own pathspec. The page quotes the
 phrases it measures, so without that exclusion a command would count this record of a population as
