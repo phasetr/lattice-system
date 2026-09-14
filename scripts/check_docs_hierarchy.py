@@ -1912,7 +1912,7 @@ BASELINE_CATALOGUE_ROW_COUNT = 2052
 # sha256 over this whole file's source text, the pin values of `_MASKED_PIN_NAMES` aside.
 # Every edit to this script moves it, so no edit lands without a recompute in the same reviewed
 # commit; a catalogue page edit does not move it.
-SCRIPT_SOURCE_SHA256 = "e778122f07ce5c6477e58c5ad99b92da366f48ef076ea28b73a502f07d943ad4"
+SCRIPT_SOURCE_SHA256 = "2136148a518f734818d6958748c1a146b3a39f175327e0a9e536c3021f5a054d"
 
 # sha256 over the ordered `(a, b)` literal pairs `_approved_replacements` chains, so that
 # surgery inside the reviewed literal list that leaves the published bytes alone -- dropping an
@@ -2988,6 +2988,78 @@ MOVED_PROSE_CORRECTIONS = (
         "The hypothesis bundle matches "
         "`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` (#869) exactly.",
     ),
+    (
+        # PR #5471: the bullet named only the structural predicate `tasaki_2_5_theorem_2_3`,
+        # whose body carries neither the total-spin conjunct nor the degeneracy conjunct
+        # (docs-sync design pass, TSK-052). Corrected to the two new capstones that prove all
+        # three printed conjuncts at connected-bipartite generality.
+        '- **DONE: Tasaki Theorem 2.3, p. 42.** `tasaki_2_5_theorem_2_3_of_connected` '
+        '(general connected exchange, eq. (2.5.13), p. 43) and its printed-model instance '
+        '`tasaki_2_5_theorem_2_3_couplingOf_half` (eq. (2.5.1), p. 37) prove all three '
+        'printed conjuncts: total spin `S_tot = ||A| − |B||·S`, ground-eigenspace '
+        "dimension `2 S_tot + 1` (a `Module.finrank` equality on the Hamiltonian's ground "
+        'eigenspace, not a count of magnetization sectors), and the per-sector eq. (2.5.4) '
+        'Marshall-signed expansion with strictly positive coefficients, at '
+        'connected-bipartite generality (the complete bipartite graph is not a hypothesis '
+        'of either). The earlier public statement `tasaki_2_5_theorem_2_3` (witnesses '
+        '`tasaki_2_5_theorem_2_3_bipartiteToy` and '
+        '`tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive`) proves neither the total '
+        'spin value nor the degeneracy; it remains available as a separate per-sector '
+        "structural result. PR #5471.",
+        '- **DONE: Tasaki Theorem 2.3.** The current public statement is '
+        '`tasaki_2_5_theorem_2_3`, with structural proof witnesses '
+        '`tasaki_2_5_theorem_2_3_bipartiteToy` and '
+        '`tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive`; PR #4082 synchronized the '
+        "public status rows with these canonical names.",
+    ),
+    (
+        # PR #5471: the roadmap page's P1n entry called `tasaki_2_5_theorem_2_3` the "final
+        # statement" of Tasaki Theorem 2.3; the predicate carries neither the total-spin nor
+        # the degeneracy conjunct, so that framing is corrected the same way as the
+        # open-items.md bullet above, naming the two new capstones instead. `published` here
+        # is `reconstruct_roadmap_prose`'s output on the edited heading, whitespace-normalized:
+        # since the new heading no longer matches the frozen baseline heading byte-for-byte,
+        # the strip step does not fire and the frozen scope text is folded into the payload
+        # unstripped: this is a mechanical artifact of the inversion, not published prose.
+        'P1n (Tasaki §2.5 Theorem 2.3, final statement) **Tasaki §2.5 Theorem 2.3 '
+        '(Lieb–Mattis, general spin-S, `\\|A\\| ≠ \\|¬A\\|`) — final statement.** The '
+        'current `Prop` definition `tasaki_2_5_theorem_2_3` is the structural, '
+        '`h_intermediate`-free statement: it closes the conclusion from the physical '
+        'hypotheses `(1 ≤ N, 1 ≤ \\|A\\|, 1 ≤ \\|¬A\\|)` rather than the older '
+        'vacuous-at-`N=1` intermediate-support hypothesis. The canonical proof witnesses '
+        'are `tasaki_2_5_theorem_2_3_bipartiteToy` (PR #3891, toy coupling) and '
+        '`tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive` (PR #3893, general '
+        'bipartite `J` positive on the complete bipartite graph). These declarations are '
+        'the structurally repaired replacements for the older `h_intermediate` capstones '
+        'removed in PR #3917. Tasaki, Springer 2020, §2.5 Theorem 2.3, p. 42 ## P1n '
+        '(Tasaki §2.5 Theorem 2.3): **Tasaki §2.5 Theorem 2.3 (Lieb–Mattis, general '
+        'spin-S), p. 42, at connected-bipartite generality (no complete-bipartite '
+        'hypothesis).** `tasaki_2_5_theorem_2_3_of_connected` (general exchange, eq. '
+        '(2.5.13), p. 43) and its printed-model instance '
+        '`tasaki_2_5_theorem_2_3_couplingOf_half` (eq. (2.5.1), p. 37) prove all three '
+        'printed conjuncts: total spin `S_tot = ||A| − |B||·S`, ground-eigenspace '
+        "dimension `2 S_tot + 1` (a `Module.finrank` equality on the Hamiltonian's ground "
+        'eigenspace, not a count of magnetization sectors), and the per-sector eq. (2.5.4) '
+        'Marshall-signed expansion with strictly positive coefficients. The earlier `Prop` '
+        'definition `tasaki_2_5_theorem_2_3` (witnesses '
+        '`tasaki_2_5_theorem_2_3_bipartiteToy` and '
+        '`tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive`) proves neither the total '
+        'spin value nor the degeneracy; it remains available as a separate per-sector '
+        'structural result. PR #5471. Truly-unconditional closure at all `N ≥ 1` (PR #3891 '
+        'toy, PR #3893 general)',
+        'P1n (Tasaki §2.5 Theorem 2.3, final statement) **Tasaki §2.5 Theorem 2.3 '
+        '(Lieb–Mattis, general spin-S, `\\|A\\| ≠ \\|¬A\\|`) — final statement.** The '
+        'current `Prop` definition `tasaki_2_5_theorem_2_3` is the structural, '
+        '`h_intermediate`-free statement: it closes the conclusion from the physical '
+        'hypotheses `(1 ≤ N, 1 ≤ \\|A\\|, 1 ≤ \\|¬A\\|)` rather than the older '
+        'vacuous-at-`N=1` intermediate-support hypothesis. The canonical proof witnesses '
+        'are `tasaki_2_5_theorem_2_3_bipartiteToy` (PR #3891, toy coupling) and '
+        '`tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive` (PR #3893, general '
+        'bipartite `J` positive on the complete bipartite graph). These declarations are '
+        'the structurally repaired replacements for the older `h_intermediate` capstones '
+        'removed in PR #3917. Tasaki, Springer 2020, §2.5 Theorem 2.3, p. 42 '
+        'Truly-unconditional closure at all `N ≥ 1` (PR #3891 toy, PR #3893 general)',
+    ),
 )
 
 # Where each correction above fires, in declaration order: the sites it rewrites, a site being the
@@ -3028,6 +3100,8 @@ MOVED_PROSE_CORRECTION_SITES = (
             1,
         ),
     ),
+    (("docs/history/open-items.md", 2780, 3037, 1),),
+    (("docs/history/roadmap/spin-theorems.md", 147, 147, 1),),
 )
 
 
