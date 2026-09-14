@@ -92,6 +92,7 @@ import LatticeSystem.Tests.MarshallLiebMattisMatrixPowExtend
 import LatticeSystem.Tests.MarshallLiebMattisToyHamiltonian
 import LatticeSystem.Tests.MarshallLiebMattisBipartiteGraph
 import LatticeSystem.Tests.MarshallLiebMattisTheorem22
+import LatticeSystem.Tests.ParityReachabilityConnected
 import LatticeSystem.Tests.TimeReversalSpinHalf
 import LatticeSystem.Tests.TimeReversalMulti
 import LatticeSystem.Tests.Problem23a
