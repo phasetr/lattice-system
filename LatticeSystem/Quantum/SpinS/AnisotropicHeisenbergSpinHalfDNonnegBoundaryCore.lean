@@ -56,11 +56,13 @@ theorem shiftedDressedAxisSwappedReMatrix_apply_pos_of_parityStepS_spinHalf_D_no
     (c : ℝ)
     {σ τ : Λ → Fin (1 + 1)} (hstep : ParityStepS (bipartiteCompleteGraphOf A) σ τ) :
     0 < shiftedDressedAxisSwappedReMatrix A J lam D 1 c τ σ := by
+  have hGbip : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → A x ≠ A y :=
+    fun _ _ hadj => bipartiteCompleteGraphOf_adj_sublattice_ne hadj
   rcases hstep with hRL | hPB | hSI
   · exact shiftedDressedAxisSwappedReMatrix_apply_pos_of_raiseLowerStepS_bipartite
-      A hJim hJnn hJpos hJself hJbip hlam hlb (le_of_lt hub) hDim hDnn c hRL
+      A hJim hJnn hGbip hJpos hJself hJbip hlam hlb (le_of_lt hub) hDim hDnn c hRL
   · exact shiftedDressedAxisSwappedReMatrix_apply_pos_of_parityBondStepS_bipartite
-      A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDnn c hPB
+      A hJim hJnn hGbip hJpos hJself hJbip hlam hlb hub hDim hDnn c hPB
   · exact False.elim (singleIonStepS_spinHalf_false hSI)
 
 /-- Spin-`1/2` block matrix power positivity from parity reachability with

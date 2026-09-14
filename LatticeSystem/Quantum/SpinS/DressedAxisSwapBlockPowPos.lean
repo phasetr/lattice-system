@@ -55,12 +55,14 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_pow_apply_pos_of_parityRe
   have hB_nn : ∀ ρ τ, 0 ≤ shiftedDressedAxisSwappedReMatrix A J lam D N c ρ τ :=
     fun ρ τ => shiftedDressedAxisSwappedReMatrix_nonneg A hJim hJnn hJself hJbip hlam
       (le_of_lt hlb) (le_of_lt hub) hDim (le_of_lt hDpos) hc ρ τ
+  have hGbip : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → A x ≠ A y :=
+    fun _ _ hadj => bipartiteCompleteGraphOf_adj_sublattice_ne hadj
   have hB_step : ∀ {ρ τ : Λ → Fin (N + 1)},
       ParityStepS (bipartiteCompleteGraphOf A) ρ τ →
         0 < shiftedDressedAxisSwappedReMatrix A J lam D N c τ ρ :=
     fun {ρ τ} hstep =>
       shiftedDressedAxisSwappedReMatrix_apply_pos_of_parityStepS_bipartite
-        A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos c hstep
+        A hJim hJnn hGbip hJpos hJself hJbip hlam hlb hub hDim hDpos c hstep
   obtain ⟨k, hpow_pos⟩ := exists_matrixPow_apply_pos_of_parityReachableS
     (G := bipartiteCompleteGraphOf A) (N := N)
     (B := shiftedDressedAxisSwappedReMatrix A J lam D N c) hB_nn hB_step hreach

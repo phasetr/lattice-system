@@ -10,8 +10,8 @@ import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphCore
 Issue #3739 (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori).
 
 Strict counterpart of `dressedAxisSwappedAnisotropicHeisenbergS_offdiag_re_nonpos` (#3770).  On a
-`RaiseLowerStepS` witness at a bipartite bond `{x, y}` of the bipartite complete graph
-`bipartiteCompleteGraphOf A` (so `A x ≠ A y`), under case (i) strict (`−1 < λ.re ≤ 1` real,
+`RaiseLowerStepS` witness at a bond `{x, y}` of a graph `G` whose edges join opposite sublattices
+(so `A x ≠ A y`), under case (i) strict (`−1 < λ.re ≤ 1` real,
 `D.re ≥ 0`), the full dressed `Ĥ'` off-diagonal entry has **strict negative** real part.
 
 The proof inherits the nonpos sum structure of #3770: every per-bond dressed contribution is
@@ -177,22 +177,23 @@ theorem shiftedDressedAxisSwappedReMatrix_apply_pos_of_raiseLowerStepS_witness_b
   linarith
 
 /-- **Shifted PF matrix entry strictly positive on a transverse step**.  For a
-`RaiseLowerStepS` on `bipartiteCompleteGraphOf A`, case (i) strict, the shifted matrix
-`shiftedDressedAxisSwappedReMatrix A J λ D N c σ' σ > 0`. -/
+`RaiseLowerStepS` on a graph `G` whose edges join opposite sublattices, case (i) strict, the
+shifted matrix `shiftedDressedAxisSwappedReMatrix A J λ D N c σ' σ > 0`. -/
 theorem shiftedDressedAxisSwappedReMatrix_apply_pos_of_raiseLowerStepS_bipartite
-    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
-    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     {lam : ℂ} (hlam : lam.im = 0) (hlb : -1 < lam.re) (hub : lam.re ≤ 1)
     {D : ℂ} (hDim : D.im = 0) (hDnn : 0 ≤ D.re)
     (c : ℝ)
-    {σ τ : Λ → Fin (N + 1)} (hstep : RaiseLowerStepS (bipartiteCompleteGraphOf A) σ τ) :
+    {σ τ : Λ → Fin (N + 1)} (hstep : RaiseLowerStepS G σ τ) :
     0 < shiftedDressedAxisSwappedReMatrix A J lam D N c τ σ := by
   obtain ⟨x, y, hadj, hsh, hagree⟩ := hstep
   have hxy : x ≠ y := hadj.ne
-  have hAne : A x ≠ A y := bipartiteCompleteGraphOf_adj_sublattice_ne hadj
+  have hAne : A x ≠ A y := hGbip x y hadj
   exact shiftedDressedAxisSwappedReMatrix_apply_pos_of_raiseLowerStepS_witness_bipartite
-    A hJim hJnn hJself hJbip hlam hlb hub hDim hDnn c hxy hAne (hJpos x y hadj) hsh hagree
+    A hJim hJnn hJself hJbip hlam hlb hub hDim hDnn c hxy hAne (hJ_pos_G x y hadj) hsh hagree
 
 end LatticeSystem.Quantum

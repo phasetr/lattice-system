@@ -23,21 +23,22 @@ open Matrix
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-- **Ion-only parity-step strict positivity at `lambda = 1`, `D > 0`**.  For
-an ion-only parity move on `bipartiteCompleteGraphOf A`, the shifted dressed
-matrix entry is strictly positive. -/
+an ion-only parity move on a graph `G` whose edges join opposite sublattices,
+the shifted dressed matrix entry is strictly positive. -/
 theorem shiftedDressedAxisSwappedReMatrix_apply_pos_of_ionParityStepS_lambda_one
-    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
-    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     {D : ℂ} (hDim : D.im = 0) (hDpos : 0 < D.re)
     (c : ℝ)
     {σ τ : Λ → Fin (N + 1)}
-    (hstep : IonParityStepS (bipartiteCompleteGraphOf A) σ τ) :
+    (hstep : IonParityStepS G σ τ) :
     0 < shiftedDressedAxisSwappedReMatrix A J 1 D N c τ σ := by
   rcases hstep with hRL | hSI
   · exact shiftedDressedAxisSwappedReMatrix_apply_pos_of_raiseLowerStepS_bipartite
-      A hJim hJnn hJpos hJself hJbip (by norm_num) (by norm_num) (by norm_num)
+      A hJim hJnn hGbip hJ_pos_G hJself hJbip (by norm_num) (by norm_num) (by norm_num)
       hDim (le_of_lt hDpos) c hRL
   · exact shiftedDressedAxisSwappedReMatrix_apply_pos_of_singleIonStepS
       A hJself hDim hDpos c hSI
@@ -63,12 +64,14 @@ theorem shiftedDressedReMatParity_pow_apply_pos_of_ionParityReach_lam1
   have hB_nn : ∀ ρ τ, 0 ≤ shiftedDressedAxisSwappedReMatrix A J 1 D N c ρ τ :=
     fun ρ τ => shiftedDressedAxisSwappedReMatrix_nonneg A hJim hJnn hJself hJbip
       (by norm_num) (by norm_num) (by norm_num) hDim (le_of_lt hDpos) hc ρ τ
+  have hGbip : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → A x ≠ A y :=
+    fun _ _ hadj => bipartiteCompleteGraphOf_adj_sublattice_ne hadj
   have hB_step : ∀ {ρ τ : Λ → Fin (N + 1)},
       IonParityStepS (bipartiteCompleteGraphOf A) ρ τ →
         0 < shiftedDressedAxisSwappedReMatrix A J 1 D N c τ ρ :=
     fun {ρ τ} hstep =>
       shiftedDressedAxisSwappedReMatrix_apply_pos_of_ionParityStepS_lambda_one
-        A hJim hJnn hJpos hJself hJbip hDim hDpos c hstep
+        A hJim hJnn hGbip hJpos hJself hJbip hDim hDpos c hstep
   obtain ⟨k, hpow_pos⟩ := exists_matrixPow_apply_pos_of_ionParityReachableS
     (G := bipartiteCompleteGraphOf A) (N := N)
     (B := shiftedDressedAxisSwappedReMatrix A J 1 D N c) hB_nn hB_step hreach
