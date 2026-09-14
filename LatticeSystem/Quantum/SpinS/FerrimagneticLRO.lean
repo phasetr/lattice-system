@@ -15,7 +15,7 @@ with `a > 0` (e.g. the Lieb lattice, `a = 1/3`), eq. (4.1.13) gives
 
 Unlike the existence theorems 4.1–4.3, Theorem 4.4 has a complete *finite-volume* proof in Tasaki
 (the chain (4.1.16): the cross-term positivity (4.1.15) from Problem 2.5.d, the Lieb–Mattis total
-spin `S_tot = (|A| − |B|) S` from Theorem 2.3, and `⟨(Ŝ_tot)²⟩ = S_tot(S_tot + 1) ≥ S_tot²`).  It is
+spin `S_tot = ||A| − |B|| S` from Theorem 2.3, and `⟨(Ŝ_tot)²⟩ = S_tot(S_tot + 1) ≥ S_tot²`).  It is
 therefore fully **discharged**: this file defines only the `SU(2)`-invariant squared staggered
 order operator `staggeredCasimirOpS`, while Theorem 4.4 itself is proved sorry-free as the theorem
 `shenQiuTian_ferrimagnetic_lro` in `FerrimagneticLROUniversalFinal.lean` (the universal form over

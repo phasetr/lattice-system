@@ -130,58 +130,6 @@ section GroundStates
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
-/-- **Off-sector projections of a ground state vanish (finite-set form).**  Suppose every
-magnetization sector outside a finite set `S` has all of its real sector eigenvalues strictly
-above `μ`.  Then a full Heisenberg eigenvector at `μ` has zero projection to every sector
-outside `S`.
-
-This is the `Finset`-indexed analogue of
-`heisenbergHamiltonianS_outside_projection_zero_of_strict_sector_lower`, which excludes a single
-sector `M0`.  The singleton form cannot express what Theorem 2.3 needs, namely the whole
-admissible band excluded at once: away from the balanced case the admissible sectors other than
-a chosen one realise `μ` rather than exceeding it, so the singleton hypothesis is unavailable. -/
-theorem heisenbergHamiltonianS_outside_projection_zero_of_strict_sectors
-    (J : V → V → ℂ) {N : ℕ} (S : Finset ℕ) {μ : ℝ}
-    (hJ_real : ∀ x y, (J x y).im = 0)
-    (h_strict_outside : ∀ {M : ℕ}, M ∉ S → [Nonempty (magConfigS V N M)] →
-      ∀ {μM : ℝ} {φ : magConfigS V N M → ℝ}, φ ≠ 0 →
-        (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec φ = μM • φ →
-        μ < μM)
-    {Ψ : (V → Fin (N + 1)) → ℂ}
-    (hΨ : (heisenbergHamiltonianS J N).mulVec Ψ = (μ : ℂ) • Ψ)
-    {M : ℕ} (hM : M ∉ S) :
-    magSectorEmbedding (magSectorRestriction (M := M) Ψ) = 0 := by
-  classical
-  by_cases hW_zero : magSectorRestriction (M := M) Ψ = 0
-  · rw [hW_zero, magSectorEmbedding_zero]
-  · haveI : Nonempty (magConfigS V N M) := by
-      by_contra h
-      rw [not_nonempty_iff] at h
-      exact hW_zero (funext (fun τ => (h.false τ).elim))
-    have hW_eig : (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec
-        (magSectorRestriction (M := M) Ψ) =
-        (μ : ℂ) • magSectorRestriction (M := M) Ψ :=
-      heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen J hΨ
-    obtain ⟨φ, hφ_ne, hφ⟩ :
-        ∃ φ : magConfigS V N M → ℝ, φ ≠ 0 ∧
-          (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec φ = μ • φ := by
-      by_cases hre : (fun σ => (magSectorRestriction (M := M) Ψ σ).re) =
-          (0 : magConfigS V N M → ℝ)
-      · refine ⟨fun σ => (magSectorRestriction (M := M) Ψ σ).im, ?_,
-          heisenbergHamiltonianSReMatrixOnMagSector_mulVec_im_of_complex_eigenvec
-            N hJ_real hW_eig⟩
-        intro him
-        apply hW_zero
-        funext τ
-        have hr := congrFun hre τ
-        have hi := congrFun him τ
-        simp only [Pi.zero_apply] at hr hi ⊢
-        exact Complex.ext hr hi
-      · exact ⟨fun σ => (magSectorRestriction (M := M) Ψ σ).re, hre,
-          heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec
-            N hJ_real hW_eig⟩
-    exact absurd (h_strict_outside hM hφ_ne hφ) (lt_irrefl μ)
-
 /-- **Tasaki §2.5 Theorem 2.3, p. 42, at a fixed orientation of the two sublattices.**
 
 The workhorse behind `tasaki_2_5_theorem_2_3_of_connected`, carrying the extra hypothesis
