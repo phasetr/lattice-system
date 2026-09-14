@@ -448,7 +448,7 @@ grep -ci axiom` → 7 lines (2 accurate, above); `git grep -n 'shenQiuTian' fbac
 frozen sites above, 2 bare mentions, `:96,103` accurate). Identifier-anchored, so 7 is a lower
 bound. Control: the same Lean command without `axiom` → 17.
 
-**Five present-tense "documented axiom" descriptions, plus one parenthetical, contradicted in
+**At least five present-tense "documented axiom" sites, plus one parenthetical, contradicted in
 their own files.** (1) `AndersonTower.lean:28` vs `theorem tower_lowLying_energy_bound`
 (`AndersonTowerTheorem46.lean:551`), contradicted at `AndersonTower.lean:166,216`. (2)
 `HiddenAntiferromagneticOrder.lean:38-40` (module doc) vs `theorem tasaki_prop_6_5_hhaf_spin_one`
@@ -496,5 +496,5 @@ across a line break) nor `tex/proof-guide.tex:12304` (no verb on the line); pipe
 site. A check blind to two of these three reports "clean" exactly where it cannot
 see, the fail-open shape already abolished (`audit_gate.py`, 2026-07-22, #5104); no checker added.
 
-**Cadence.** Re-run each command every 20-PR cycle, except the issue-state figure (read time) and
-#5132's reopen trigger.
+**Cadence.** Re-measure with the commands above at every 20-PR refactor cycle and replace the
+figures here with the new ones, except the issue state (read time) and #5132's reopen trigger.
