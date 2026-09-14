@@ -18641,16 +18641,18 @@ Marshall-positive expansion, so its overlap with the antiferromagnetic ground
 state cannot vanish, which with the uniqueness inside the sector pins that
 state's total Casimir.  (Issue~\#3542.)
 
-\textbf{Where the current account is.}  The state of Theorem~2.3 today is the
-next subsection, \emph{DONE: Tasaki §2.5 Theorem 2.3 for the standard bipartite
-coupling} (p.~\pageref{subsec:tasaki-2-5-theorem-2-3-toy-done}): the sound
-Perron--Frobenius route for the standard bipartite coupling, and, for a general
-bipartite $J$ positive on the complete bipartite graph, the sorry-free capstone
-\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_bipartiteCompletePositive}, which
-carries no \texttt{hOutside} hypothesis but does keep the canonical orientation
-\(|\bar A|\le|A|\), a non-empty $\bar A$ with $N\ge1$, and a constant
-$c_{\rm toy}$ strictly above every diagonal entry of the dressed toy-coupling
-matrix.  The Theorem~2.2 sector-only route is the preceding subsection,
+\textbf{Where the current account is.}  Theorem~2.3 is proved at the book's own
+hypotheses --- a connected bipartite exchange with both sublattices non-empty
+and $S\ge1/2$ --- by \texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_connected}, with
+the printed model (2.5.1), p.~37, as its instance at coupling one half,
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_couplingOf\_half}.  Neither carries an
+orientation condition: the total spin is the absolute difference
+$S_{\rm tot}=\bigl||A|-|B|\bigr|S$, the ground eigenspace has dimension
+$2S_{\rm tot}+1$, and every admissible sector carries the (2.5.4)
+Marshall-signed expansion with strictly positive coefficients.  The next
+subsection (p.~\pageref{subsec:tasaki-2-5-theorem-2-3-toy-done}) is the earlier
+standard-bipartite-coupling route, kept as the record of how that capstone was
+reached.  The Theorem~2.2 sector-only route is the preceding subsection,
 \emph{Marshall--Lieb--Mattis Theorem 2.2 (Tasaki §2.5) --- sector-only
 formalisation outline (historical route)}; the printed generality is now
 proved by \texttt{tasaki\_2\_5\_theorem\_2\_2\_of\_connected}.  The interim
@@ -18719,12 +18721,13 @@ witness (\#3729 / \#3680), and the minimality engine closes the global
 clause.
 \end{itemize}
 
-The only gap to the fully general coupling is the Lieb--Mattis energy
-monotonicity \texttt{hOutside} for an arbitrary bipartite \(J\) --- the
-single remaining hypothesis of the minimality engine.  The symmetric
-orientation \(|A|<|\bar A|\) is the mirror image.
+The gap this route still had to the fully general coupling was the Lieb--Mattis
+energy monotonicity \texttt{hOutside} for an arbitrary bipartite \(J\), the one
+remaining hypothesis of its minimality engine; it was discharged as described
+next.  Within this route the symmetric orientation \(|A|<|\bar A|\) is the
+mirror image; the capstones recorded above assume no orientation at all.
 
-\textbf{General-\(J\) \texttt{hOutside} route (in progress).}
+\textbf{General-\(J\) \texttt{hOutside} route (completed).}
 This needs only the SU(2) \emph{inward ladder}, not reflection positivity:
 an eigenvector in a non-admissible sector is moved to the admissible band
 edge by \(\hat S^\mp_{\mathrm{tot}}\) (which commutes with \(H\), so the
@@ -18758,9 +18761,11 @@ coupling positive on the complete bipartite graph: the common energy
 eigenvalue reconciled to \(\mu\) by the two-sided Collatz--Wielandt bound,
 and global minimality from the engine plus the general-\(J\)
 \texttt{hOutside}.  It is sorry-free (\texttt{\#print axioms} =
-\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}).  The only
-residual restrictions are the canonical orientation \(|\bar A|\le|A|\) (the
-mirror case is \(A\leftrightarrow\bar A\)) and \(s_B>0\) (non-degeneracy).
+\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}).  That
+declaration is stated under the canonical orientation \(|\bar A|\le|A|\) (the
+mirror case is \(A\leftrightarrow\bar A\)) and \(s_B>0\); neither is a
+restriction on Theorem~2.3 any longer, the capstones above assuming only the
+printed hypotheses.
 
 Reference: H.\ Tasaki, \emph{Physics and Mathematics of Quantum
 Many-Body Systems}, Springer 2020, §2.5 Theorem 2.3, p.~42;
