@@ -17,9 +17,9 @@ diagnosis that encounters one of these populations reads the entry first and doe
 an unresolved defect.
 
 This page also carries claims that are false or stale about the Lean they describe, not just
-hygiene populations; the entries of the final section below use six fields of their own (True /
-False / Not fixed / Fix trigger / Measurement / Control), and that section closes with a decision
-about mechanical checking, which is not one of those records and carries none of those fields.
+hygiene populations; each entry of the final section below uses the subset it needs of seven fields
+of its own (True / False / Not fixed / Carried risk / Fix trigger / Measurement / Control), and that
+section closes with a decision about mechanical checking, not a record and carrying none of them.
 
 A command whose paths reach this page excludes it from its own pathspec. The page quotes the
 phrases it measures, so without that exclusion a command would count this record of a population as
@@ -430,23 +430,23 @@ figures here with the new ones.
 
 Fix-on-touch below is per subject, not per module: touching any listed site for another reason
 corrects every site of that subject in the same commit (per-module fragmented one claim into
-partial fixes on an earlier round). Two sites inside frozen `legacy-detail` records
-(`docs/formalization/legacy/details/group-spin-models-part-02.md:160,183`) carry this class, already
-governed by "Frozen historical text in migrated pages" above — not parked again.
+partial fixes on an earlier round). Two sites inside frozen `legacy-detail` records assert this
+class (`…/details/group-spin-models-part-02.md:160,183`, counted by the first entry's legacy grep
+below), already governed by "Frozen historical text in migrated pages" above — not parked again.
 
-**`shenQiuTian_ferrimagnetic_lro` described as an unproved axiom where it is a proved theorem, 9
+**`shenQiuTian_ferrimagnetic_lro` described as an unproved axiom where it is a proved theorem, 7
 sites.** True: `theorem shenQiuTian_ferrimagnetic_lro` (`FerrimagneticLROUniversalFinal.lean:136`,
-Tasaki §4.1 Thm 4.4, axiom-free). False: 7 Lean sites/5 modules —
-`FerrimagneticLROComponentAlgebra.lean:14`, `FerrimagneticLROCrossTerm.lean:28` (future),
-`FerrimagneticLROUniversal.lean:11,45` (present), `StaggeredCasimirSU2Invariance.lean:22` (present),
-`FerrimagneticLROUniversalFinal.lean:6,122` (historical) — plus `tex/proof-guide.tex:14568` ("axiom
-… remains pending") and `tex/proof-guide.tex:14595` ("remains to discharge …"), which that file
-self-corrects at `tex/proof-guide.tex:14652,14657`. Not fixed: a 5-module sweep rebuilds every
-downstream importer for a wording change, off the critical path (`tex/` is read by no CI workflow).
-Fix trigger: fix-on-touch, all 9 at once. Measurement: `git grep -n -P
-'shenQiuTian_ferrimagnetic_lro' fbacb9c9 -- 'LatticeSystem/**/*.lean' | grep -ci axiom` → 7, and
-`git grep -n 'shenQiuTian' fbacb9c9 -- tex/proof-guide.tex` → 4 (2 stale, 2 self-correcting); both
-identifier-anchored, so 9 is a lower bound. Control: the same Lean command without `axiom` → 17.
+Tasaki §4.1 Thm 4.4, axiom-free), as its own `:6,122` say. False: 5 Lean sites/4 modules —
+`FerrimagneticLROComponentAlgebra.lean:14`, `…CrossTerm.lean:28` (future), `…Universal.lean:11,45`
+(present), `StaggeredCasimirSU2Invariance.lean:22` (present) — plus `tex/proof-guide.tex:14568`
+("axiom … remains pending") and `:14595` ("remains to discharge …"), self-corrected at
+`:14652,14657`. Not fixed: a 4-module sweep rebuilds every downstream importer for a wording change,
+off the critical path (`tex/` is read by no CI workflow). Fix trigger: fix-on-touch, all 7 at once.
+Measurement: `git grep -n -P 'shenQiuTian_ferrimagnetic_lro' fbacb9c9 -- 'LatticeSystem/**/*.lean' |
+grep -ci axiom` → 7 lines (2 accurate, above); `git grep -n 'shenQiuTian' fbacb9c9 --` over
+`tex/proof-guide.tex` → 4 (2 stale, 2 self-correcting) and over `docs/formalization/legacy` → 6 (2
+frozen sites above, 2 bare mentions, `:96,103` accurate). Identifier-anchored, so 7 is a lower
+bound. Control: the same Lean command without `axiom` → 17.
 
 **Five present-tense "documented axiom" descriptions, plus one parenthetical, contradicted in
 their own files.** (1) `AndersonTower.lean:28` vs `theorem tower_lowLying_energy_bound`
@@ -463,7 +463,7 @@ fixed: stale beside its own correction. Fix trigger: fix-on-touch per file. Meas
 at `fbacb9c9`, plus `git grep -n -P '\(.*axiomatic.*\)' fbacb9c9 -- 'LatticeSystem/**/*.lean'` → 1
 line, the parenthetical itself. Control: `git grep -n -P 'exists.{0,2}joint.{0,2}su2' fbacb9c9 --
 tex/proof-guide.tex` → 5 mentions, 3 stale (`:12030` neutral, `:18120` the correction); dropping the
-parenthesis restriction → 9 files carrying "axiomatic", so the 1 hit is a real minority.
+parenthesis restriction → 13 lines (9 files) carrying "axiomatic", so the 1 hit is a real minority.
 
 **Issue #5132, closed with its stated target unmet.** Title "Tasaki §7.3.2 Theorem 7.7 … full
 discharge", closed `NOT_PLANNED` 2026-08-16, but `axiom tasaki_theorem_7_7`
