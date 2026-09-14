@@ -438,6 +438,124 @@ private theorem tasaki23_groundStates_of_connected_oriented
     obtain ⟨v, hv_pos, hLift, _, _⟩ := hpack _ hlo
     exact ⟨_, tasaki23_marshallPositive_magSectorEmbedding_ne_zero A hv_pos, hLift⟩
 
+/-- **Tasaki §2.5 Theorem 2.3 (Marshall–Lieb–Mattis for unbalanced sublattices), p. 42.**
+
+Let `G` be a connected (Footnote 28, p. 33) graph on the finite vertex type `V`, bipartite with
+respect to the sublattice marker `A` (every edge joins the two `A`-classes, §2.5, p. 37), with
+both classes non-empty.  Let the exchange coupling `J` be real, symmetric, non-negative, vanish
+within a sublattice, be strictly positive on the edges of `G`, and vanish off `G`.  In the
+ordered-pair convention recorded in the module doc of `Theorem22Connected.lean` this is Tasaki's
+Hamiltonian (2.5.13), p. 43, with printed exchange `2 J_{x,y}`, at spin `S = N / 2 ≥ 1 / 2`; the
+printed normalisation is the instance `couplingOf G (1/2)` of
+`tasaki_2_5_theorem_2_3_couplingOf_half`.  Write `S_tot = ||A| − |B|| · S`.  Then there is an
+energy `μ` such that
+
+* (K2) the ground eigenspace at `μ` has `finrank ℂ = 2 S_tot + 1 = ||A| − |B||·N + 1`, i.e. the
+  ground states are `2 S_tot + 1` fold degenerate;
+* (K3) every admissible magnetization sector `M` carries the expansion (2.5.4), p. 39 — the
+  Marshall-signed vector `magSectorEmbedding (marshallSignS A · * v)` is an eigenvector at `μ`
+  with strictly positive coefficients `v`, i.e. `c_σ > 0`, one sector per magnetization
+  `σ̄ = M`;
+* a ground state exists (the eigenspace is not the zero space);
+* (K1) every ground state `Φ` satisfies `(Ŝ_tot)² Φ = S_tot(S_tot + 1) Φ`, i.e. carries total
+  spin `S_tot`;
+* `μ` is a lower bound for every eigenvalue of `heisenbergHamiltonianS J N`, which is what makes
+  the four conclusions above statements about *ground* states.
+
+**Orientation.**  Neither `|B| ≤ |A|` nor `|A| ≤ |B|` is assumed: the statement is symmetric
+under exchanging the two sublattices, as the outer absolute value in `S_tot` requires, and the
+proof case-splits on the orientation, running the oriented workhorse at the exchanged marker
+`fun x => ! A x` in the second case (module doc above).
+
+**Sign convention.**  As for Theorem 2.2: the marker `A` is universally quantified and every
+hypothesis is invariant under `A ↦ fun x => ! A x`, so instantiating at the indicator of
+Tasaki's `B` sublattice makes `marshallSignS A` literally the printed prefactor
+`∏_{x ∈ B} (−1)^{σ_x − S}` of (2.5.4); instantiated at `A` the two differ by the sector-constant
+factor `(−1)^{magSumS σ}`, which only rescales the expansion.
+
+`_hJ_off` records that `J` is supported on the bonds of `G`, so that only bonds of the printed
+lattice contribute.  It is carried for faithfulness to the printed model and is deliberately not
+consumed (hence the leading underscore, which the unused-variable linter requires): the chain
+needs only `hJ_bipartite`, which `hGbip` and `_hJ_off` together imply. -/
+theorem tasaki_2_5_theorem_2_3_of_connected
+    (A : V → Bool) (G : SimpleGraph V) (N : ℕ)
+    (hGconn : G.Connected)
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (hcardA : 1 ≤ (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hcardB : 1 ≤ (Finset.univ.filter (fun x : V => (! A x) = true)).card)
+    (hN : 1 ≤ N)
+    {J : V → V → ℂ}
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
+    (_hJ_off : ∀ x y, ¬ G.Adj x y → J x y = 0) :
+    ∃ μ : ℝ,
+      finrank ℂ ↥(End.eigenspace (Matrix.toLin' (heisenbergHamiltonianS J N)) (μ : ℂ))
+          = tasaki23PredictedDegeneracy (V := V) A N ∧
+      (∀ M ∈ tasaki23GroundStateSectors (V := V) A N,
+        Nonempty (magConfigS V N M) →
+        ∃ v : magConfigS V N M → ℝ, (∀ σ, 0 < v σ) ∧
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) ∧
+      (∃ Φ : (V → Fin (N + 1)) → ℂ, Φ ≠ 0 ∧
+        (heisenbergHamiltonianS J N).mulVec Φ = (μ : ℂ) • Φ) ∧
+      (∀ {Φ : (V → Fin (N + 1)) → ℂ},
+        (heisenbergHamiltonianS J N).mulVec Φ = (μ : ℂ) • Φ →
+        (totalSpinSSquared V N).mulVec Φ =
+          ((tasaki23PredictedCasimirValue (V := V) A N : ℝ) : ℂ) • Φ) ∧
+      (∀ {μM : ℝ} {φ : (V → Fin (N + 1)) → ℂ}, φ ≠ 0 →
+        (heisenbergHamiltonianS J N).mulVec φ = (μM : ℂ) • φ → μ ≤ μM) := by
+  classical
+  rcases le_total (Finset.univ.filter (fun x : V => (! A x) = true)).card
+    (Finset.univ.filter (fun x : V => A x = true)).card with horient | horient
+  · exact tasaki23_groundStates_of_connected_oriented A G N hGconn hGbip horient hcardA hcardB hN
+      hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos_G
+  · have hGbip' : ∀ x y, G.Adj x y → (! A x) ≠ (! A y) := by
+      intro x y hadj hEq
+      refine hGbip x y hadj ?_
+      cases hx : A x <;> cases hy : A y <;> simp_all
+    have hJbip' : ∀ x y, (! A x) = (! A y) → J x y = 0 := by
+      intro x y hEq
+      refine hJ_bipartite x y ?_
+      cases hx : A x <;> cases hy : A y <;> simp_all
+    obtain ⟨μ, hdim, hK3, hex, hcas, hmin⟩ :=
+      tasaki23_groundStates_of_connected_oriented (fun x => ! A x) G N hGconn hGbip'
+        (by rw [tasaki23_filter_not_not]; exact horient) hcardB
+        (by rw [tasaki23_filter_not_not]; exact hcardA) hN
+        hJ_real hJ_real' hJ_sym hJ_nn hJbip' hJ_pos_G
+    refine ⟨μ, ?_, ?_, hex, ?_, hmin⟩
+    · rw [hdim]
+      exact tasaki23PredictedDegeneracy_not A N
+    · intro M hM hne
+      obtain ⟨v, hv_pos, hveig⟩ :=
+        hK3 M (by rw [tasaki23GroundStateSectors_not]; exact hM) hne
+      refine ⟨v, hv_pos, ?_⟩
+      have hfun : (fun τ : magConfigS V N M =>
+            (((marshallSignS (fun x => ! A x) τ.1).re * v τ : ℝ) : ℂ)) =
+          ((((-1 : ℝ) ^ M : ℝ)) : ℂ) • fun τ : magConfigS V N M =>
+            (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ) := by
+        funext τ
+        have hsign : (marshallSignS (fun x => ! A x) τ.1).re
+            = (-1 : ℝ) ^ M * (marshallSignS A τ.1).re := by
+          have h := marshallSignS_not A τ.1
+          rw [τ.2] at h
+          rw [h, show ((-1 : ℂ) ^ M) = (((-1 : ℝ) ^ M : ℝ) : ℂ) by push_cast; ring,
+            Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, zero_mul, sub_zero]
+        simp only [Pi.smul_apply, smul_eq_mul, hsign]
+        push_cast
+        ring
+      rw [hfun, magSectorEmbedding_smul, Matrix.mulVec_smul] at hveig
+      have hε : ((((-1 : ℝ) ^ M : ℝ)) : ℂ) ≠ 0 := by simp
+      exact smul_right_injective _ hε (hveig.trans (smul_comm _ _ _))
+    · intro Φ hΦ
+      rw [← tasaki23PredictedCasimirValue_not A N]
+      exact hcas hΦ
+
 end GroundStates
 
 end LatticeSystem.Quantum
