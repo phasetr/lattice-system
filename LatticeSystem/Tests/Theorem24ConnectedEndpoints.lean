@@ -2,7 +2,6 @@ import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinSTheorem24
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBlockIrreducibleStructural
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapIonParityBlockIrreducibleLambdaOne
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBondParityBlockIrreducibleDNonneg
-import Mathlib.Combinatorics.SimpleGraph.Hasse
 
 /-!
 # Signature pins: connected-graph Theorem 2.4 case (i) + SU(2) endpoints (Red fixture)
@@ -18,11 +17,21 @@ arc. Pins the exact signatures of:
    `finrank ≤ 1` and zero axis-3 magnetization) that PR-2b adds, replacing the scaffolding-scalar
    hypotheses `c_axis`/`hc_axis_strict`, `c_mlm`/`c_toy`/`hT23` and the complete-bipartite
    `hA_ne`/`hB_ne` bookkeeping with `hGconn`/`hGbip`/`hJ_pos_G`/`hJ_off` at a general connected
-   graph `G`;
-3. the **type mismatch** in the six existing case-(i)/SU(2) endpoint declarations that PR-2b must
-   generalize: each currently requires `hJpos` stated at the fixed graph `bipartiteCompleteGraphOf
-   A`, and a hypothesis of the connected-graph shape `∀ x y, G.Adj x y → 0 < (J x y).re` does not
-   unify with that fixed-graph type, so it cannot be substituted into any of the six today.
+   graph `G`.
+
+The six existing case-(i)/SU(2) endpoint declarations
+(`anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general` and
+its five siblings) are **not** pinned for generalization here: each takes `hT23 :
+tasaki_2_5_theorem_2_3 A N J c_mlm` as a hypothesis, and that `Prop`'s own sixth premise is the
+*fixed-graph* positivity `∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re`
+(`LatticeSystem/Quantum/SpinS/Theorem23StructuralBipartiteToy.lean:40`) — supplied, not consumed,
+by callers of the six declarations. A pin requiring these six to accept a connected-graph
+`hJ_pos_G` in place of that fixed-graph premise would be a **false obligation**: with `Λ = Fin 2`,
+`A = {0}`, `N = 1`, `G = ⊥`, `J ≡ 0`, both `hGconn`-style hypotheses on `⊥` and `hT23` hold
+vacuously (the latter because its own sixth premise is vacuous on `⊥`), yet `H = 0` has a
+4-dimensional ground eigenspace, so `finrank ≤ 1` is false. The six existing declarations stay at
+`bipartiteCompleteGraphOf A` (fully complete bipartite, not merely connected); the connected-graph
+analogues are the new declarations in Part 2 above.
 
 R4 (case (ii), `λ ≥ 1`, `D ≤ 0`) is explicitly out of scope for this PR (PR-2c); no pin for it is
 placed here.
@@ -260,218 +269,5 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
     (totalSpinSOp3 Λ N).mulVec Φ = 0 :=
   aHeisS_target_zeroMag_lam1_D_zero_of_connected
     A G hGconn hGbip hJim hJnn hJ_pos_G hJ_off hJbip hJ_star hJ_sym hN h_card_eq Φ hΦ_ne hΦ_eig
-
-/-! ## Part 3: existing case-(i)/SU(2) endpoints cannot yet accept a connected-graph hypothesis
-
-Each of the six examples below is byte-for-byte the *current* endpoint declaration's signature
-with its complete-bipartite hypothesis `hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y →
-0 < (J x y).re` replaced by the general connected-graph hypothesis `hJ_pos_G : ∀ x y, G.Adj x y →
-0 < (J x y).re`, and applied directly. `bipartiteCompleteGraphOf A` and the free variable `G` do
-not unify, so every one of the six fails to elaborate with `type mismatch`, not `unknown
-identifier`: the declarations themselves already exist, only their fixed-graph hypothesis is the
-obstruction PR-2b removes. -/
-
-/-- **Type-mismatch pin (R1 finrank).** -/
-example (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
-    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
-    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
-    (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
-    (hJ_star : ∀ x y, star (J x y) = J x y) (hJ_sym : ∀ x y, J x y = J y x)
-    {c_axis : ℝ}
-    (hc_axis_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c_axis)
-    (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
-    (hN : 1 ≤ N)
-    [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
-    [Nonempty (Λ → Fin (N + 1))]
-    (c_mlm c_toy : ℝ)
-    (hT23 : tasaki_2_5_theorem_2_3 A N J c_mlm)
-    (hc_heis_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c_mlm)
-    (hc_toy_strict : ∀ σ, dressedHeisenbergSReMatrix A (bipartiteCoupling A) N σ σ < c_toy)
-    (h_card_eq : (Finset.univ.filter (fun x : Λ => A x = true)).card =
-      (Finset.univ.filter (fun x : Λ => (! A x) = true)).card)
-    (M_balanced : ℕ) [Nonempty (magConfigS Λ N M_balanced)]
-    (h_balanced : ((Fintype.card Λ : ℂ) * (N : ℂ) / 2) - (M_balanced : ℂ) = 0)
-    (h_centered_nonzero : ∀ M' : ℕ, M' ∈ Finset.range (Fintype.card Λ * N + 1) → M' ≠ M_balanced →
-      (((Fintype.card Λ : ℂ) * (N : ℂ) / 2) - (M' : ℂ)) ≠ 0)
-    {lam' D' : ℝ} (hlam'_lb : -1 < lam') (hlam'_ub : lam' < 1) (hD' : 0 ≤ D') :
-    finrank ℂ ↥(End.eigenspace (Matrix.toLin'
-      (anisotropicHeisenbergS (Λ := Λ) J (lam' : ℂ) (D' : ℂ) N))
-      ((hermitianMinEigenvalue
-        (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star N lam' D') :
-          ℝ) : ℂ)) ≤ 1 :=
-  anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general
-    A hJim hJnn hJ_pos_G hJself hJbip hJ_star hJ_sym hc_axis_strict hA_ne hB_ne hN c_mlm c_toy hT23
-    hc_heis_strict hc_toy_strict h_card_eq M_balanced h_balanced h_centered_nonzero
-    hlam'_lb hlam'_ub hD'
-
-/-- **Type-mismatch pin (R1 zero-magnetization).** -/
-example (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
-    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
-    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
-    (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
-    (hJ_star : ∀ x y, star (J x y) = J x y) (hJ_sym : ∀ x y, J x y = J y x)
-    {c_axis : ℝ}
-    (hc_axis_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c_axis)
-    (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
-    (hN : 1 ≤ N)
-    [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
-    [Nonempty (Λ → Fin (N + 1))]
-    (c_mlm c_toy : ℝ)
-    (hT23 : tasaki_2_5_theorem_2_3 A N J c_mlm)
-    (hc_heis_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c_mlm)
-    (hc_toy_strict : ∀ σ, dressedHeisenbergSReMatrix A (bipartiteCoupling A) N σ σ < c_toy)
-    (h_card_eq : (Finset.univ.filter (fun x : Λ => A x = true)).card =
-      (Finset.univ.filter (fun x : Λ => (! A x) = true)).card)
-    (M_balanced : ℕ) [Nonempty (magConfigS Λ N M_balanced)]
-    (h_balanced : ((Fintype.card Λ : ℂ) * (N : ℂ) / 2) - (M_balanced : ℂ) = 0)
-    (h_centered_nonzero : ∀ M' : ℕ, M' ∈ Finset.range (Fintype.card Λ * N + 1) → M' ≠ M_balanced →
-      (((Fintype.card Λ : ℂ) * (N : ℂ) / 2) - (M' : ℂ)) ≠ 0)
-    {lam' D' : ℝ} (hlam'_lb : -1 < lam') (hlam'_ub : lam' < 1) (hD' : 0 ≤ D')
-    (Φ : (Λ → Fin (N + 1)) → ℂ) (hΦ_ne : Φ ≠ 0)
-    (hΦ_gs : (anisotropicHeisenbergS J (lam' : ℂ) (D' : ℂ) N).mulVec Φ =
-      ((hermitianMinEigenvalue
-        (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star N lam' D') :
-          ℝ) : ℂ) • Φ) :
-    (totalSpinSOp3 Λ N).mulVec Φ = 0 :=
-  aHeisS_target_zeroMag_of_MLM_casLadder_t23_pf_D_nonneg_gen
-    A hJim hJnn hJ_pos_G hJself hJbip hJ_star hJ_sym hc_axis_strict hA_ne hB_ne hN c_mlm c_toy hT23
-    hc_heis_strict hc_toy_strict h_card_eq M_balanced h_balanced h_centered_nonzero
-    hlam'_lb hlam'_ub hD' Φ hΦ_ne hΦ_gs
-
-/-- **Type-mismatch pin (R2 finrank).** -/
-example (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
-    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
-    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
-    (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
-    (hJ_star : ∀ x y, star (J x y) = J x y) (hJ_sym : ∀ x y, J x y = J y x)
-    {c_axis : ℝ}
-    (hc_axis_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c_axis)
-    (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
-    (hN : 2 ≤ N)
-    [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
-    [Nonempty (Λ → Fin (N + 1))]
-    (c_mlm c_toy : ℝ)
-    (hT23 : tasaki_2_5_theorem_2_3 A N J c_mlm)
-    (hc_heis_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c_mlm)
-    (hc_toy_strict : ∀ σ, dressedHeisenbergSReMatrix A (bipartiteCoupling A) N σ σ < c_toy)
-    (h_card_eq : (Finset.univ.filter (fun x : Λ => A x = true)).card =
-      (Finset.univ.filter (fun x : Λ => (! A x) = true)).card)
-    (M_balanced : ℕ) [Nonempty (magConfigS Λ N M_balanced)]
-    (h_balanced : ((Fintype.card Λ : ℂ) * (N : ℂ) / 2) - (M_balanced : ℂ) = 0)
-    (h_centered_nonzero : ∀ M' : ℕ, M' ∈ Finset.range (Fintype.card Λ * N + 1) → M' ≠ M_balanced →
-      (((Fintype.card Λ : ℂ) * (N : ℂ) / 2) - (M' : ℂ)) ≠ 0)
-    {D' : ℝ} (hD' : 0 < D') :
-    finrank ℂ ↥(End.eigenspace (Matrix.toLin'
-      (anisotropicHeisenbergS (Λ := Λ) J 1 (D' : ℂ) N))
-      ((hermitianMinEigenvalue
-        (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star N 1 D') :
-          ℝ) : ℂ)) ≤ 1 :=
-  aHeisS_target_finrank_le_one_of_MLM_casLadder_t23_pf_lam1_D_pos_gen
-    A hJim hJnn hJ_pos_G hJself hJbip hJ_star hJ_sym hc_axis_strict hA_ne hB_ne hN c_mlm c_toy hT23
-    hc_heis_strict hc_toy_strict h_card_eq M_balanced h_balanced h_centered_nonzero hD'
-
-/-- **Type-mismatch pin (R2 zero-magnetization).** -/
-example (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
-    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
-    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
-    (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
-    (hJ_star : ∀ x y, star (J x y) = J x y) (hJ_sym : ∀ x y, J x y = J y x)
-    {c_axis : ℝ}
-    (hc_axis_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c_axis)
-    (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
-    (hN : 2 ≤ N)
-    [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
-    [Nonempty (Λ → Fin (N + 1))]
-    (c_mlm c_toy : ℝ)
-    (hT23 : tasaki_2_5_theorem_2_3 A N J c_mlm)
-    (hc_heis_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c_mlm)
-    (hc_toy_strict : ∀ σ, dressedHeisenbergSReMatrix A (bipartiteCoupling A) N σ σ < c_toy)
-    (h_card_eq : (Finset.univ.filter (fun x : Λ => A x = true)).card =
-      (Finset.univ.filter (fun x : Λ => (! A x) = true)).card)
-    (M_balanced : ℕ) [Nonempty (magConfigS Λ N M_balanced)]
-    (h_balanced : ((Fintype.card Λ : ℂ) * (N : ℂ) / 2) - (M_balanced : ℂ) = 0)
-    (h_centered_nonzero : ∀ M' : ℕ, M' ∈ Finset.range (Fintype.card Λ * N + 1) → M' ≠ M_balanced →
-      (((Fintype.card Λ : ℂ) * (N : ℂ) / 2) - (M' : ℂ)) ≠ 0)
-    {D' : ℝ} (hD' : 0 < D')
-    (Φ : (Λ → Fin (N + 1)) → ℂ) (hΦ_ne : Φ ≠ 0)
-    (hΦ_eig : (anisotropicHeisenbergS J 1 (D' : ℂ) N).mulVec Φ =
-      ((hermitianMinEigenvalue
-        (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star N 1 D') :
-          ℝ) : ℂ) • Φ) :
-    (totalSpinSOp3 Λ N).mulVec Φ = 0 :=
-  aHeisS_target_zeroMag_of_MLM_casLadder_t23_pf_lam1_D_pos_gen
-    A hJim hJnn hJ_pos_G hJself hJbip hJ_star hJ_sym hc_axis_strict hA_ne hB_ne hN c_mlm c_toy hT23
-    hc_heis_strict hc_toy_strict h_card_eq M_balanced h_balanced h_centered_nonzero hD'
-    Φ hΦ_ne hΦ_eig
-
-/-- **Type-mismatch pin (R3/SU(2) finrank).** -/
-example (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
-    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
-    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
-    (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
-    (hJ_star : ∀ x y, star (J x y) = J x y) (hJ_sym : ∀ x y, J x y = J y x)
-    (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
-    (hN : 1 ≤ N) [Nonempty (Λ → Fin (N + 1))]
-    (c_mlm c_toy : ℝ)
-    (hT23 : tasaki_2_5_theorem_2_3 A N J c_mlm)
-    (hc_heis_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c_mlm)
-    (hc_toy_strict : ∀ σ, dressedHeisenbergSReMatrix A (bipartiteCoupling A) N σ σ < c_toy)
-    (h_card_eq : (Finset.univ.filter (fun x : Λ => A x = true)).card =
-      (Finset.univ.filter (fun x : Λ => (! A x) = true)).card) :
-    finrank ℂ ↥(End.eigenspace (Matrix.toLin'
-      (anisotropicHeisenbergS (Λ := Λ) J 1 0 N))
-      ((hermitianMinEigenvalue
-        (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star N 1 0) :
-          ℝ) : ℂ)) ≤ 1 :=
-  aHeisS_target_finrank_le_one_of_MLM_casLadder_t23_pf_lam1_D_zero_gen
-    A hJim hJnn hJ_pos_G hJbip hJ_star hJ_sym hA_ne hB_ne hN c_mlm c_toy hT23
-    hc_heis_strict hc_toy_strict h_card_eq
-
-/-- **Type-mismatch pin (R3/SU(2) zero-magnetization).** -/
-example (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
-    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
-    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
-    (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
-    (hJ_star : ∀ x y, star (J x y) = J x y) (hJ_sym : ∀ x y, J x y = J y x)
-    (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
-    (hN : 1 ≤ N) [Nonempty (Λ → Fin (N + 1))]
-    (c_mlm c_toy : ℝ)
-    (hT23 : tasaki_2_5_theorem_2_3 A N J c_mlm)
-    (hc_heis_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c_mlm)
-    (hc_toy_strict : ∀ σ, dressedHeisenbergSReMatrix A (bipartiteCoupling A) N σ σ < c_toy)
-    (h_card_eq : (Finset.univ.filter (fun x : Λ => A x = true)).card =
-      (Finset.univ.filter (fun x : Λ => (! A x) = true)).card)
-    (Φ : (Λ → Fin (N + 1)) → ℂ) (hΦ_ne : Φ ≠ 0)
-    (hΦ_eig : (anisotropicHeisenbergS J 1 0 N).mulVec Φ =
-      ((hermitianMinEigenvalue
-        (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star N 1 0) :
-          ℝ) : ℂ) • Φ) :
-    (totalSpinSOp3 Λ N).mulVec Φ = 0 :=
-  aHeisS_target_zeroMag_of_MLM_casLadder_t23_pf_lam1_D_zero_gen
-    A hJim hJnn hJ_pos_G hJbip hJ_star hJ_sym hA_ne hB_ne hN c_mlm c_toy hT23
-    hc_heis_strict hc_toy_strict h_card_eq Φ hΦ_ne hΦ_eig
-
-/-! ## Part 4: discriminating witness -/
-
-/-- **Discriminating witness (four-vertex path, not the four-cycle).** On `V = Fin 4`, `A = {0,
-2}`, `pathGraph 4` is connected, every edge joins opposite sublattices under this marking, and it
-is genuinely a different graph from `bipartiteCompleteGraphOf A`: it is missing the crossing edge
-`{0, 3}`. `cycleGraph 4` would **not** discriminate here — with this same marking its edge set is
-exactly the four crossing pairs, so it coincides with `bipartiteCompleteGraphOf A`. Reused from
-PR-1's/PR-2a's fixtures (`Tests/ParityReachabilityConnected.lean`,
-`Tests/Theorem24EngineGeneralization.lean`). -/
-example :
-    (SimpleGraph.pathGraph 4).Connected ∧
-      (∀ x y : Fin 4, (SimpleGraph.pathGraph 4).Adj x y →
-        decide (x = 0 ∨ x = 2) ≠ decide (y = 0 ∨ y = 2)) ∧
-      (bipartiteCompleteGraphOf (fun x : Fin 4 => decide (x = 0 ∨ x = 2))).Adj 0 3 ∧
-      ¬ (SimpleGraph.pathGraph 4).Adj (0 : Fin 4) 3 := by
-  refine ⟨SimpleGraph.pathGraph_connected 3, by decide, ?_, ?_⟩
-  · simp
-  · simp [SimpleGraph.pathGraph_adj]
 
 end LatticeSystem.Tests.Theorem24ConnectedEndpoints
