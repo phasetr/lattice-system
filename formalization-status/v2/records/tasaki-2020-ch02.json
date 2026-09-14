@@ -601,6 +601,58 @@
         "quantum-spin"
       ],
       "trust_state": "axiom_free"
+    },
+    {
+      "axiom_dependencies": [],
+      "capstone": true,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-theorem-2-3-connected",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.tasaki_2_5_theorem_2_3_of_connected",
+      "lifecycle": "active",
+      "module": "LatticeSystem.Quantum.SpinS.Theorem23GroundStateDegeneracy",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "retirement": null,
+      "source_coverage": "complete",
+      "source_path": "LatticeSystem/Quantum/SpinS/Theorem23GroundStateDegeneracy.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-theorem-2-3"
+        }
+      ],
+      "summary": "Tasaki Theorem 2.3 (Marshall-Lieb-Mattis for unbalanced sublattices), p. 42, general exchange couplings by the Remark and eq. (2.5.13), p. 43, at the printed generality: a connected (Footnote 28, p. 33) bipartite graph G with both sublattices non-empty, arbitrary spin N >= 1, and coupling J real, symmetric, non-negative, vanishing within a sublattice, strictly positive on the edges of G and vanishing off G. heisenbergHamiltonianS sums over ordered pairs while (2.5.13) sums over unordered bonds, so this J is half the printed exchange; no conclusion depends on the normalisation, since the hypotheses are closed under positive rescaling of J and the energy is existentially quantified. Concludes: the ground eigenspace at the produced energy has finrank = 2 S_tot + 1 where S_tot = ||A| - |B||*(N/2) (a Module.finrank equality on the whole Hilbert space, not a count of magnetization sectors); every admissible magnetization sector carries the eq. (2.5.4) Marshall-signed expansion with strictly positive coefficients; a ground state exists; every ground state satisfies the total-spin Casimir eigenvalue equation at S_tot(S_tot+1); and the energy is a global lower bound. Neither orientation |A| <= |B| nor |B| <= |A| is assumed. The complete bipartite graph is not a hypothesis; it is only the bond graph of the proof's toy Hamiltonian (2.5.10), p. 41. The printed unit-weight model (2.5.1), p. 37, is the instance tasaki_2_5_theorem_2_3_couplingOf_half.",
+      "topic_ids": [
+        "quantum-spin"
+      ],
+      "trust_state": "axiom_free"
+    },
+    {
+      "axiom_dependencies": [],
+      "capstone": true,
+      "declaration_kind": "theorem",
+      "id": "tasaki-2020-theorem-2-3-printed-hamiltonian",
+      "implementation_state": "implemented",
+      "lean_name": "LatticeSystem.Quantum.tasaki_2_5_theorem_2_3_couplingOf_half",
+      "lifecycle": "active",
+      "module": "LatticeSystem.Quantum.SpinS.Theorem23GroundStateDegeneracy",
+      "origin": "literature",
+      "proof_guide_anchor": null,
+      "retirement": null,
+      "source_coverage": "complete",
+      "source_path": "LatticeSystem/Quantum/SpinS/Theorem23GroundStateDegeneracy.lean",
+      "source_relations": [
+        {
+          "relation": "formalizes",
+          "source_item_id": "tasaki-2020-theorem-2-3"
+        }
+      ],
+      "summary": "Tasaki Theorem 2.3 (Marshall-Lieb-Mattis for unbalanced sublattices), p. 42, at the printed Hamiltonian (2.5.1), p. 37: unit weight on every unordered bond of a connected (Footnote 28, p. 33) bipartite graph G with both sublattices non-empty, arbitrary spin N >= 1. Because heisenbergHamiltonianS sums over ordered pairs, that printed unit weight is the coupling couplingOf G (1/2), so the ordered double sum reproduces the printed bond sum exactly. Concludes the five conjuncts of the general-coupling statement tasaki_2_5_theorem_2_3_of_connected (ground-eigenspace dimension 2 S_tot + 1, the per-sector Marshall-signed expansion, ground-state existence, the total-spin Casimir eigenvalue equation, and global minimality), with every hypothesis on the coupling discharged from couplingOf together with bipartiteness of G, leaving only connectedness, bipartiteness, 1 <= |A|, 1 <= |B| and N >= 1 -- the printed hypothesis list.",
+      "topic_ids": [
+        "quantum-spin"
+      ],
+      "trust_state": "axiom_free"
     }
   ],
   "schema_version": 2,

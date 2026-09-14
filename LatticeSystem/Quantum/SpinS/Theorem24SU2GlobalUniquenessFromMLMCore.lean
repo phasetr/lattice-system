@@ -202,22 +202,26 @@ theorem heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_outside_project
       (V := V) (N := N) M0 (h_projection_zero hΨ))
     h_sector_pf
 
-/-- **Outside-sector strict lower bound kills outside projections**: suppose
-every real sector eigenvalue outside `M0` is strictly above `μ`.  Then a full
-Heisenberg eigenvector at `μ` has zero projection to every outside sector.
+/-- **Off-sector projections of a ground state vanish (finite-set form).**  Suppose
+every magnetization sector outside a finite set `S` has all of its real sector
+eigenvalues strictly above `μ`.  Then a full Heisenberg eigenvector at `μ` has
+zero projection to every sector outside `S`.
 
-This isolates the remaining Casimir/MLM ordering obligation in the exact form
-needed by the SU(2)-endpoint uniqueness bridge. -/
-theorem heisenbergHamiltonianS_outside_projection_zero_of_strict_sector_lower
-    (J : V → V → ℂ) (M0 : ℕ) {μ : ℝ}
+Tasaki §2.5 Theorem 2.3 needs the whole admissible band excluded at once: away
+from the balanced case the admissible sectors other than a chosen one realise
+`μ` rather than exceeding it, so the singleton hypothesis of
+`heisenbergHamiltonianS_outside_projection_zero_of_strict_sector_lower` — the
+instance of this statement at `S = {M0}` — is unavailable there. -/
+theorem heisenbergHamiltonianS_outside_projection_zero_of_strict_sectors
+    (J : V → V → ℂ) (S : Finset ℕ) {μ : ℝ}
     (hJ_real : ∀ x y, (J x y).im = 0)
-    (h_strict_outside : ∀ M : ℕ, M ≠ M0 → [Nonempty (magConfigS V N M)] →
+    (h_strict_outside : ∀ {M : ℕ}, M ∉ S → [Nonempty (magConfigS V N M)] →
       ∀ {μM : ℝ} {φ : magConfigS V N M → ℝ}, φ ≠ 0 →
         (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec φ = μM • φ →
         μ < μM)
     {Ψ : (V → Fin (N + 1)) → ℂ}
     (hΨ : (heisenbergHamiltonianS J N).mulVec Ψ = (μ : ℂ) • Ψ)
-    (M : ℕ) (hM_ne : M ≠ M0) :
+    {M : ℕ} (hM : M ∉ S) :
     magSectorEmbedding (magSectorRestriction (M := M) Ψ) = 0 := by
   classical
   by_cases hW_zero : magSectorRestriction (M := M) Ψ = 0
@@ -249,8 +253,36 @@ theorem heisenbergHamiltonianS_outside_projection_zero_of_strict_sector_lower
       · exact ⟨fun σ => (magSectorRestriction (M := M) Ψ σ).re, hre,
           heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec
             N hJ_real hW_eig⟩
-    have hlt : μ < μ := h_strict_outside M hM_ne hφ_ne hφ
-    exact (lt_irrefl μ hlt).elim
+    exact absurd (h_strict_outside hM hφ_ne hφ) (lt_irrefl μ)
+
+/-- **Outside-sector strict lower bound kills outside projections**: suppose
+every real sector eigenvalue outside `M0` is strictly above `μ`.  Then a full
+Heisenberg eigenvector at `μ` has zero projection to every outside sector.
+
+This isolates the remaining Casimir/MLM ordering obligation in the exact form
+needed by the SU(2)-endpoint uniqueness bridge.  It is the instance of the
+finite-set form above at `S = {M0}`. -/
+theorem heisenbergHamiltonianS_outside_projection_zero_of_strict_sector_lower
+    (J : V → V → ℂ) (M0 : ℕ) {μ : ℝ}
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (h_strict_outside : ∀ M : ℕ, M ≠ M0 → [Nonempty (magConfigS V N M)] →
+      ∀ {μM : ℝ} {φ : magConfigS V N M → ℝ}, φ ≠ 0 →
+        (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec φ = μM • φ →
+        μ < μM)
+    {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : (heisenbergHamiltonianS J N).mulVec Ψ = (μ : ℂ) • Ψ)
+    (M : ℕ) (hM_ne : M ≠ M0) :
+    magSectorEmbedding (magSectorRestriction (M := M) Ψ) = 0 := by
+  have h_outside : ∀ {M' : ℕ}, M' ∉ ({M0} : Finset ℕ) →
+      [Nonempty (magConfigS V N M')] →
+      ∀ {μM : ℝ} {φ : magConfigS V N M' → ℝ}, φ ≠ 0 →
+        (heisenbergHamiltonianSReMatrixOnMagSector J N M').mulVec φ = μM • φ →
+        μ < μM := by
+    intro M' hM' inst μM φ hφ_ne hφ
+    haveI := inst
+    exact h_strict_outside M' (by simpa using hM') hφ_ne hφ
+  exact heisenbergHamiltonianS_outside_projection_zero_of_strict_sectors J {M0} hJ_real
+    h_outside hΨ (by simpa using hM_ne)
 
 /-- **Full SU(2) eigenspace simplicity from strict outside-sector ordering**:
 if the balanced sector has sector-matrix `finrank <= 1` at `μ` and every

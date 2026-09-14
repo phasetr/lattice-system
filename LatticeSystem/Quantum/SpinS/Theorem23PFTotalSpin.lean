@@ -9,7 +9,7 @@ import LatticeSystem.Quantum.SpinS.TotalSquared
 Sound Perron–Frobenius route (Issue #3542).  The remaining global
 obligation of the route is to show that the per-sector Marshall-positive
 Heisenberg ground state lies in the predicted toy ground-state subspace
-(i.e. has the predicted total spin `S_tot = (|A| − |B|)·N/2`).
+(i.e. has the predicted total spin `S_tot = ||A| − |B||·N/2`).
 
 Tasaki's argument (§2.5, p.42, via the toy Hamiltonian 2.5.10–2.5.12)
 turns on the fact that two Marshall-positive vectors in the same

@@ -107,11 +107,20 @@ follows:
   `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`
   remains available, presented as a vector of the full Hilbert space
   through the sector embedding. Assembled through PRs #794-#870, #5467.
-- **DONE: Tasaki Theorem 2.3.**  The current public statement is
-  `tasaki_2_5_theorem_2_3`, with structural proof witnesses
+- **DONE: Tasaki Theorem 2.3, p. 42.** `tasaki_2_5_theorem_2_3_of_connected`
+  (general connected exchange, eq. (2.5.13), p. 43) and its printed-model
+  instance `tasaki_2_5_theorem_2_3_couplingOf_half` (eq. (2.5.1), p. 37)
+  prove all three printed conjuncts: total spin `S_tot = ||A| − |B||·S`,
+  ground-eigenspace dimension `2 S_tot + 1` (a `Module.finrank` equality on
+  the Hamiltonian's ground eigenspace, not a count of magnetization
+  sectors), and the per-sector eq. (2.5.4) Marshall-signed expansion with
+  strictly positive coefficients, at connected-bipartite generality (the
+  complete bipartite graph is not a hypothesis of either). The earlier
+  public statement `tasaki_2_5_theorem_2_3` (witnesses
   `tasaki_2_5_theorem_2_3_bipartiteToy` and
-  `tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive`; PR #4082
-  synchronized the public status rows with these canonical names.
+  `tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive`) proves neither the
+  total spin value nor the degeneracy; it remains available as a separate
+  per-sector structural result. PR #5471.
 - **DONE: Problem 2.5.a.**  The final single-cluster equality wrapper
   `singleClusterHamiltonianS_minEigenvalue_eq_gs_of_predicted_joint_witness`
   identifies the Hermitian minimum with the predicted energy

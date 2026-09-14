@@ -99,6 +99,7 @@ import LatticeSystem.Quantum.SpinS.FerromagneticGroundStateTheorem21
 import LatticeSystem.Quantum.SpinS.ManyBodyPiRotationExp
 import LatticeSystem.Quantum.UniformRotationProblem22c
 import LatticeSystem.Quantum.SpinS.Problem25dTheorem22GroundState
+import LatticeSystem.Quantum.SpinS.Theorem23GroundStateDegeneracy
 
 /-!
 # `lattice-system` library root
