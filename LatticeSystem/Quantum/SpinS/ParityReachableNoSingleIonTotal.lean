@@ -38,7 +38,7 @@ theorem bondParityReachableS_step_down_direct
       ⟨(σ x).val - 1, by have := (σ x).isLt; omega⟩
       ⟨(σ y).val - 1, by have := (σ y).isLt; omega⟩, ?_, ?_⟩
   · exact parityBondStepS_pair_lower_magSumS_decrease hxy hx hy
-  · exact BondParityReachableS.of_bond (parityBondStepS_pair_lower A hadj hx hy)
+  · exact BondParityReachableS.of_bond (parityBondStepS_pair_lower hadj hx hy)
 
 set_option linter.unusedDecidableInType false in
 /-- If a site has at least two units and an opposite-color site is empty, a
@@ -70,7 +70,7 @@ theorem bondParityReachableS_step_down_transfer_then_lower
   have hx_mid_pos : 1 ≤ (σ_mid x).val := by rw [h_mid_x]; omega
   have hz_mid_pos : 1 ≤ (σ_mid z).val := by rw [h_mid_z]
   have hstep1 := raiseLowerStepS_pair_shift_lower_a_raise_b A hadj hx_pos hz_lt
-  have hstep2 := parityBondStepS_pair_lower A hadj hx_mid_pos hz_mid_pos
+  have hstep2 := parityBondStepS_pair_lower hadj hx_mid_pos hz_mid_pos
   refine ⟨_, ?_, BondParityReachableS.trans
       (BondParityReachableS.of_raiseLower hstep1)
       (BondParityReachableS.of_bond hstep2)⟩
@@ -168,7 +168,8 @@ theorem bondParityReachableS_step_down
           omega
         have hstep1 := raiseLowerStepS_pair_shift_lower_a_raise_b A hadj_a₁b
           (by omega : 1 ≤ (σ a₁).val) (by rw [hkb]; omega)
-        have hstep2 := parityBondStepS_pair_lower A
+        have hstep2 := parityBondStepS_pair_lower
+          (G := bipartiteCompleteGraphOf A)
           (by
             rw [bipartiteCompleteGraphOf_adj_iff]
             exact ⟨ha₂_ne_b, by rw [hA_a₂, hAb]; decide⟩)
@@ -234,7 +235,8 @@ theorem bondParityReachableS_step_down
           omega
         have hstep1 := raiseLowerStepS_pair_shift_lower_a_raise_b A hadj_b₁a
           (by omega : 1 ≤ (σ b₁).val) (by rw [hka]; omega)
-        have hstep2 := parityBondStepS_pair_lower A
+        have hstep2 := parityBondStepS_pair_lower
+          (G := bipartiteCompleteGraphOf A)
           (by
             rw [bipartiteCompleteGraphOf_adj_iff]
             exact ⟨hb₂_ne_a, by rw [hB_b₂, hAa]; decide⟩)
