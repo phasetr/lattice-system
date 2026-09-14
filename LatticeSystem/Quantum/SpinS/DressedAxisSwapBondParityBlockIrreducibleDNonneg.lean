@@ -9,9 +9,13 @@ Issue #412 -- Tasaki Section 2.5 Theorem 2.4.
 
 This file gives the conditional irreducibility capstone for the shifted
 axis-swapped parity-block matrix using only bond-generated parity reachability.
-The hypothesis is deliberately stated as a bond-only totality assumption; the
-remaining combinatorial task for the general spin-`S` `D >= 0` boundary is to
-prove that assumption on `bipartiteCompleteGraphOf A`.
+The hypothesis is deliberately stated as a bond-only totality assumption over a
+graph `G` whose edges join opposite sublattices, so that it can be discharged by
+whichever totality layer fits the graph at hand: `bondParityReachableS_total`
+(`ParityReachableNoSingleIonTotal.lean`) on `bipartiteCompleteGraphOf A`, which
+is what the unconditional wrapper below uses, or
+`bondParityReachableS_total_of_connected` (`ParityReachConnectedTotal.lean`) on a
+connected graph.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, Section 2.5 Theorem 2.4, pp. 43--44.
