@@ -40,9 +40,6 @@ theorem anisotropicHeisenbergS_tasaki24_target_finrank_le_one_of_MLM_casimir_lad
     (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     (hJ_star : ∀ x y, star (J x y) = J x y)
     (hJ_sym : ∀ x y, J x y = J y x)
-    {c_axis : ℝ}
-    (hc_axis_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c_axis)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 2 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -76,7 +73,7 @@ theorem anisotropicHeisenbergS_tasaki24_target_finrank_le_one_of_MLM_casimir_lad
   · rcases h_case_i with ⟨hlam_lb, hlam_ub, hD_nonneg⟩
     exact anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general
       (Λ := Λ) (N := N) A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym
-      hc_axis_strict hA_ne hB_ne hN_one c_mlm c_toy hT23 hc_heis_strict
+      hA_ne hB_ne hN_one c_mlm c_toy hT23 hc_heis_strict
       hc_toy_strict h_card_eq M_balanced h_balanced h_centered_nonzero
       hlam_lb hlam_ub hD_nonneg
   rcases h_boundary_or_case_ii with h_lambda_one | h_case_ii
@@ -85,7 +82,7 @@ theorem anisotropicHeisenbergS_tasaki24_target_finrank_le_one_of_MLM_casimir_lad
     rcases lt_or_eq_of_le hD_nonneg with hD_pos | hD_zero
     · exact aHeisS_target_finrank_le_one_of_MLM_casLadder_t23_pf_lam1_D_pos_gen
         (Λ := Λ) (N := N) A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym
-        hc_axis_strict hA_ne hB_ne hN c_mlm c_toy hT23 hc_heis_strict
+        hA_ne hB_ne hN c_mlm c_toy hT23 hc_heis_strict
         hc_toy_strict h_card_eq M_balanced h_balanced h_centered_nonzero hD_pos
     · rw [← hD_zero]
       exact aHeisS_target_finrank_le_one_of_MLM_casLadder_t23_pf_lam1_D_zero_gen
@@ -109,9 +106,6 @@ theorem aHeisS_tasaki24_target_zeroMag_of_MLM_casLadder_t23_pf_gen
     (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     (hJ_star : ∀ x y, star (J x y) = J x y)
     (hJ_sym : ∀ x y, J x y = J y x)
-    {c_axis : ℝ}
-    (hc_axis_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c_axis)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 2 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -144,7 +138,7 @@ theorem aHeisS_tasaki24_target_zeroMag_of_MLM_casLadder_t23_pf_gen
   have huniq :=
     anisotropicHeisenbergS_tasaki24_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_general
       (Λ := Λ) (N := N) A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym
-      hc_axis_strict hA_ne hB_ne hN c_mlm c_toy hT23 hc_heis_strict
+      hA_ne hB_ne hN c_mlm c_toy hT23 hc_heis_strict
       hc_toy_strict h_card_eq M_balanced h_balanced h_centered_nonzero h_region
   exact anisotropicHeisenbergS_unique_groundState_has_zero_magnetization
     (Λ := Λ) (N := N) J (lam : ℂ) (D : ℂ)

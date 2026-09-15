@@ -66,9 +66,6 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_p
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     (hJ_star : ∀ x y, star (J x y) = J x y)
     (hJ_sym : ∀ x y, J x y = J y x)
-    {c_axis : ℝ}
-    (hc_axis_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c_axis)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 1 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -117,7 +114,7 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_p
     anisotropicHeisenbergS_SU2_ground_eigenspace_finrank_le_one_of_heisenberg_general
       (Λ := Λ) (N := N) hJ_star hμ_min huniq_heis
   exact anisotropicHeisenbergS_target_finrank_le_one_of_SU2_global_unique_general
-    A hJim hJnn hJpos hJself hJbip hJ_sym hc_axis_strict hA_ne hB_ne hN hJ_star
+    A hJim hJnn hJpos hJself hJbip hJ_sym hA_ne hB_ne hN hJ_star
     M_balanced h_balanced h_centered_nonzero h_SU2_global_unique
     hlam'_lb hlam'_ub hD'
 
@@ -131,9 +128,6 @@ theorem anisotropicHeisenbergS_target_zero_magnetization_of_MLM_casimir_ladder_t
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     (hJ_star : ∀ x y, star (J x y) = J x y)
     (hJ_sym : ∀ x y, J x y = J y x)
-    {c_axis : ℝ}
-    (hc_axis_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c_axis)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 1 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -164,7 +158,7 @@ theorem anisotropicHeisenbergS_target_zero_magnetization_of_MLM_casimir_ladder_t
   classical
   have huniq :=
     anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_general
-      A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym hc_axis_strict hA_ne hB_ne hN
+      A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym hA_ne hB_ne hN
       c_mlm c_toy hT23 hc_heis_strict hc_toy_strict h_card_eq
       M_balanced h_balanced h_centered_nonzero hlam'_lb hlam'_ub hD'
   exact anisotropicHeisenbergS_unique_groundState_has_zero_magnetization

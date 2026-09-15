@@ -39,9 +39,6 @@ theorem anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_general
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
-    {c : ℝ}
-    (hc_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 1 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -94,7 +91,7 @@ theorem anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_general
       h_balanced (h_centered_nonzero M' hM'_range hM'_ne_bal)
       h_SU2_global_unique h_GS_at_SU2
   exact anisotropicHeisenbergS_obligation_2_single_axiom_general
-    A hJim hJnn hJpos hJself hJbip hc_strict hA_ne hB_ne hN hJ_star
+    A hJim hJnn hJpos hJself hJbip hA_ne hB_ne hN hJ_star
     M_balanced M_orig h_balanced hM_orig_ne h_centered_nonzero
     hlam'_lb hlam'_ub hD' h_violation_orig h_strict_gap_at_SU2
 
@@ -106,9 +103,6 @@ theorem anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_only_general
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
-    {c : ℝ}
-    (hc_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 1 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -140,7 +134,7 @@ theorem anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_only_general
     hermitianMinEigenvalue_balanced_eq_full_at_SU2_of_global_unique
       (Λ := Λ) hJ_star N M_balanced h_balanced h_SU2_global_unique
   exact anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_general
-    A hJim hJnn hJpos hJself hJbip hc_strict hA_ne hB_ne hN hJ_star
+    A hJim hJnn hJpos hJself hJbip hA_ne hB_ne hN hJ_star
     M_balanced M_orig h_balanced hM_orig_ne h_centered_nonzero
     hlam'_lb hlam'_ub hD' h_violation_orig h_SU2_global_unique h_GS_at_SU2
 
@@ -152,9 +146,6 @@ theorem anisotropicHeisenbergS_strict_gap_all_M_of_SU2_global_unique_general
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
-    {c : ℝ}
-    (hc_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 1 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -189,7 +180,7 @@ theorem anisotropicHeisenbergS_strict_gap_all_M_of_SU2_global_unique_general
     exact lt_of_not_ge (by
       intro h_violation
       exact anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_only_general
-        A hJim hJnn hJpos hJself hJbip hc_strict hA_ne hB_ne hN hJ_star
+        A hJim hJnn hJpos hJself hJbip hA_ne hB_ne hN hJ_star
         M_balanced M h_balanced hM_ne h_centered_nonzero
         hlam'_lb hlam'_ub hD' h_violation h_SU2_global_unique)
   unfold anisotropicHeisenbergS_magSector_minEigenvalue_alongParametricPath at hpath
@@ -205,9 +196,6 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_SU2_global_unique_genera
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     (hJ_sym : ∀ x y, J x y = J y x)
-    {c : ℝ}
-    (hc_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 1 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -247,10 +235,13 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_SU2_global_unique_genera
       rw [Complex.star_def, Complex.conj_ofReal]
     have hD_star : star (D' : ℂ) = (D' : ℂ) := by
       rw [Complex.star_def, Complex.conj_ofReal]
+    obtain ⟨c, hc⟩ :=
+      exists_strict_diag_bound_dressedAxisSwappedAnisotropicHeisenbergSReMatrix
+        A J (lam' : ℂ) (D' : ℂ) N
     exact anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_general
       A hJim hJnn hJpos hJself hJbip
       hlam_im (by simpa [hlam_re] using hlam'_lb) (by simpa [hlam_re] using hlam'_ub)
-      hD_im (by simpa [hD_re] using hD') (hc_strict (lam' : ℂ) (D' : ℂ))
+      hD_im (by simpa [hD_re] using hD') hc
       hA_ne hB_ne hN hJ_star hlam_star hD_star
   have h_strict_gap :
       ∀ M : ℕ, ∀ _ : Nonempty (magConfigS Λ N M), M ≠ M_balanced →
@@ -263,7 +254,7 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_SU2_global_unique_genera
     intro M hM hM_ne
     haveI := hM
     exact anisotropicHeisenbergS_strict_gap_all_M_of_SU2_global_unique_general
-      A hJim hJnn hJpos hJself hJbip hc_strict hA_ne hB_ne hN hJ_star
+      A hJim hJnn hJpos hJself hJbip hA_ne hB_ne hN hJ_star
       M_balanced h_balanced h_centered_nonzero h_SU2_global_unique
       hlam'_lb hlam'_ub hD' M hM_ne
   exact anisotropicHeisenbergS_target_finrank_le_one_of_strict_gap
@@ -279,9 +270,6 @@ theorem anisotropicHeisenbergS_target_groundState_zero_magnetization_of_SU2_glob
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     (hJ_sym : ∀ x y, J x y = J y x)
-    {c : ℝ}
-    (hc_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 1 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -312,7 +300,7 @@ theorem anisotropicHeisenbergS_target_groundState_zero_magnetization_of_SU2_glob
   classical
   have huniq :=
     anisotropicHeisenbergS_target_finrank_le_one_of_SU2_global_unique_general
-      A hJim hJnn hJpos hJself hJbip hJ_sym hc_strict hA_ne hB_ne hN hJ_star
+      A hJim hJnn hJpos hJself hJbip hJ_sym hA_ne hB_ne hN hJ_star
       M_balanced h_balanced h_centered_nonzero h_SU2_global_unique
       hlam'_lb hlam'_ub hD'
   exact anisotropicHeisenbergS_unique_groundState_has_zero_magnetization

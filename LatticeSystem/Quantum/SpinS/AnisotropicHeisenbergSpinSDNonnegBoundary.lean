@@ -24,9 +24,6 @@ theorem anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_only_D_nonneg_g
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
-    {c : ℝ}
-    (hc_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 1 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -76,7 +73,7 @@ theorem anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_only_D_nonneg_g
       h_balanced (h_centered_nonzero M' hM'_range hM'_ne_bal)
       h_SU2_global_unique h_GS_at_SU2
   exact anisotropicHeisenbergS_obligation_2_single_axiom_D_nonneg_general
-    A hJim hJnn hJpos hJself hJbip hc_strict hA_ne hB_ne hN hJ_star
+    A hJim hJnn hJpos hJself hJbip hA_ne hB_ne hN hJ_star
     M_balanced M_orig h_balanced hM_orig_ne h_centered_nonzero
     hlam'_lb hlam'_ub hD' h_violation_orig h_strict_gap_at_SU2
 
@@ -87,9 +84,6 @@ theorem anisotropicHeisenbergS_strict_gap_all_M_of_SU2_global_unique_D_nonneg_ge
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
-    {c : ℝ}
-    (hc_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 1 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -124,7 +118,7 @@ theorem anisotropicHeisenbergS_strict_gap_all_M_of_SU2_global_unique_D_nonneg_ge
     exact lt_of_not_ge (by
       intro h_violation
       exact anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_only_D_nonneg_general
-        A hJim hJnn hJpos hJself hJbip hc_strict hA_ne hB_ne hN hJ_star
+        A hJim hJnn hJpos hJself hJbip hA_ne hB_ne hN hJ_star
         M_balanced M h_balanced hM_ne h_centered_nonzero
         hlam'_lb hlam'_ub hD' h_violation h_SU2_global_unique)
   unfold anisotropicHeisenbergS_magSector_minEigenvalue_alongParametricPath at hpath
@@ -139,9 +133,6 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_SU2_global_unique_D_nonn
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     (hJ_sym : ∀ x y, J x y = J y x)
-    {c : ℝ}
-    (hc_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 1 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -173,11 +164,14 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_SU2_global_unique_D_nonn
         ((hermitianMinEigenvalue
           (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star N lam' D') :
             ℝ) : ℂ)) ≤ 2 := by
+    obtain ⟨c, hc⟩ :=
+      exists_strict_diag_bound_dressedAxisSwappedAnisotropicHeisenbergSReMatrix
+        A J (lam' : ℂ) (D' : ℂ) N
     have hraw :=
       anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_D_nonneg_general
         A hJim hJnn hJpos hJself hJbip
         (by simp) hlam'_lb hlam'_ub (by simp) hD'
-        (hc_strict (lam' : ℂ) (D' : ℂ)) hA_ne hB_ne hN hJ_star
+        hc hA_ne hB_ne hN hJ_star
         (show star (lam' : ℂ) = (lam' : ℂ) from by
           rw [Complex.star_def, Complex.conj_ofReal])
         (show star (D' : ℂ) = (D' : ℂ) from by
@@ -194,7 +188,7 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_SU2_global_unique_D_nonn
     intro M hM hM_ne
     haveI := hM
     exact anisotropicHeisenbergS_strict_gap_all_M_of_SU2_global_unique_D_nonneg_general
-      A hJim hJnn hJpos hJself hJbip hc_strict hA_ne hB_ne hN hJ_star
+      A hJim hJnn hJpos hJself hJbip hA_ne hB_ne hN hJ_star
       M_balanced h_balanced h_centered_nonzero h_SU2_global_unique
       hlam'_lb hlam'_ub hD' M hM_ne
   exact anisotropicHeisenbergS_target_finrank_le_one_of_strict_gap
@@ -209,9 +203,6 @@ theorem aHeisS_target_gState_zeroMag_of_su2Uniq_D_nonneg_gen
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     (hJ_sym : ∀ x y, J x y = J y x)
-    {c : ℝ}
-    (hc_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 1 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -242,7 +233,7 @@ theorem aHeisS_target_gState_zeroMag_of_su2Uniq_D_nonneg_gen
   classical
   have huniq :=
     anisotropicHeisenbergS_target_finrank_le_one_of_SU2_global_unique_D_nonneg_general
-      A hJim hJnn hJpos hJself hJbip hJ_sym hc_strict hA_ne hB_ne hN hJ_star
+      A hJim hJnn hJpos hJself hJbip hJ_sym hA_ne hB_ne hN hJ_star
       M_balanced h_balanced h_centered_nonzero h_SU2_global_unique
       hlam'_lb hlam'_ub hD'
   exact anisotropicHeisenbergS_unique_groundState_has_zero_magnetization
@@ -261,9 +252,6 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_p
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     (hJ_star : ∀ x y, star (J x y) = J x y)
     (hJ_sym : ∀ x y, J x y = J y x)
-    {c_axis : ℝ}
-    (hc_axis_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c_axis)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 1 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -312,7 +300,7 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_p
     anisotropicHeisenbergS_SU2_ground_eigenspace_finrank_le_one_of_heisenberg_general
       (Λ := Λ) (N := N) hJ_star hμ_min huniq_heis
   exact anisotropicHeisenbergS_target_finrank_le_one_of_SU2_global_unique_D_nonneg_general
-    A hJim hJnn hJpos hJself hJbip hJ_sym hc_axis_strict hA_ne hB_ne hN hJ_star
+    A hJim hJnn hJpos hJself hJbip hJ_sym hA_ne hB_ne hN hJ_star
     M_balanced h_balanced h_centered_nonzero h_SU2_global_unique
     hlam'_lb hlam'_ub hD'
 
@@ -325,9 +313,6 @@ theorem aHeisS_target_zeroMag_of_MLM_casLadder_t23_pf_D_nonneg_gen
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
     (hJ_star : ∀ x y, star (J x y) = J x y)
     (hJ_sym : ∀ x y, J x y = J y x)
-    {c_axis : ℝ}
-    (hc_axis_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c_axis)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 1 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -358,7 +343,7 @@ theorem aHeisS_target_zeroMag_of_MLM_casLadder_t23_pf_D_nonneg_gen
   classical
   have huniq :=
     anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general
-      A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym hc_axis_strict hA_ne hB_ne hN
+      A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym hA_ne hB_ne hN
       c_mlm c_toy hT23 hc_heis_strict hc_toy_strict h_card_eq
       M_balanced h_balanced h_centered_nonzero hlam'_lb hlam'_ub hD'
   exact anisotropicHeisenbergS_unique_groundState_has_zero_magnetization
