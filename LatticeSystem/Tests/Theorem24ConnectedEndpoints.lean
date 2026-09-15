@@ -28,17 +28,24 @@ arc. Pins the exact signatures of:
 
 The six existing case-(i)/SU(2) endpoint declarations
 (`anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general` and
-its five siblings) are **not** pinned for generalization here: each takes `hT23 :
-tasaki_2_5_theorem_2_3 A N J c_mlm` as a hypothesis, and that `Prop`'s own sixth premise is the
-*fixed-graph* positivity `∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re`
-(`LatticeSystem/Quantum/SpinS/Theorem23StructuralBipartiteToy.lean:40`) — supplied, not consumed,
-by callers of the six declarations. A pin requiring these six to accept a connected-graph
-`hJ_pos_G` in place of that fixed-graph premise would be a **false obligation**: with `Λ = Fin 2`,
-`A = {0}`, `N = 1`, `G = ⊥`, `J ≡ 0`, both `hGconn`-style hypotheses on `⊥` and `hT23` hold
-vacuously (the latter because its own sixth premise is vacuous on `⊥`), yet `H = 0` has a
-4-dimensional ground eigenspace, so `finrank ≤ 1` is false. The six existing declarations stay at
-`bipartiteCompleteGraphOf A` (fully complete bipartite, not merely connected); the connected-graph
-analogue for the SU(2) corner is the R3 pin in Part 2 above.
+its five siblings) are **not** pinned for generalization here. Each carries both the *fixed-graph*
+positivity `hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re` and
+`hT23 : tasaki_2_5_theorem_2_3 A N J c_mlm`, and it is exactly that `hJpos` which discharges the
+sixth premise of `hT23`
+(`LatticeSystem/Quantum/SpinS/Theorem23StructuralBipartiteToy.lean:47`), which is the very same
+fixed-graph positivity. A connected-graph `hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re` does not
+discharge it, so none of the six can be re-derived at a merely connected `G` along its own route.
+
+The obstruction is therefore one of proof route, not of truth. Substituting `hJ_pos_G` for `hJpos`
+*without* a connectedness hypothesis leaves `G` unconstrained and does make the SU(2) `finrank`
+statement false: `Λ = Fin 2`, `A = {0}`, `N = 1`, `G = ⊥`, `J ≡ 0` satisfies every hypothesis
+(`hT23` vacuously, its sixth premise failing on the `bipartiteCompleteGraphOf A` edge `{0, 1}`)
+while `H = 0` has a 4-dimensional ground eigenspace. But `(⊥ : SimpleGraph (Fin 2))` is *not*
+connected, so `hGconn` removes that witness, and under `hGconn` both SU(2) statements do hold: the
+support graph of `J` contains `G`, hence is connected, and carries the sign gauge, the edge
+positivity and the support condition, which is exactly the input of the Part 2 endpoints. The six
+existing declarations stay at `bipartiteCompleteGraphOf A` (fully complete bipartite, not merely
+connected); the connected-graph analogue for the SU(2) corner is the R3 pin in Part 2 above.
 
 R4 (case (ii), `λ ≥ 1`, `D ≤ 0`) is explicitly out of scope for this PR (PR-2c); no pin for it is
 placed here.
@@ -132,7 +139,7 @@ follow in a later PR once that binder is repaired. -/
 
 /-- **Signature pin (R3 finrank, SU(2) corner `(λ,D) = (1,0)`).** Connected-graph analogue of
 `aHeisS_target_finrank_le_one_of_MLM_casLadder_t23_pf_lam1_D_zero_gen`
-(`AnisotropicHeisenbergSpinSSU2Boundary.lean:25`), `hN : 1 ≤ N`, no balanced-sector bookkeeping
+(`AnisotropicHeisenbergSpinSSU2Boundary.lean:27`), `hN : 1 ≤ N`, no balanced-sector bookkeeping
 (the SU(2) endpoint needs none). -/
 example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
     (hGconn : G.Connected) (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
@@ -154,7 +161,7 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
 
 /-- **Signature pin (R3 zero-magnetization, SU(2) corner `(λ,D) = (1,0)`).** Connected-graph
 analogue of `aHeisS_target_zeroMag_of_MLM_casLadder_t23_pf_lam1_D_zero_gen`
-(`AnisotropicHeisenbergSpinSSU2Boundary.lean:68`). -/
+(`AnisotropicHeisenbergSpinSSU2Boundary.lean:70`). -/
 example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
     (hGconn : G.Connected) (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
