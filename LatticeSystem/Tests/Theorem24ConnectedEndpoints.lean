@@ -6,10 +6,9 @@ import LatticeSystem.Quantum.SpinS.DressedAxisSwapBondParityBlockIrreducibleDNon
 /-!
 # Signature pins: connected-graph Theorem 2.4 case (i) + SU(2) endpoints (Red fixture)
 
-Issue #5473 (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori), PR-2b of the connectivity/reachability
-arc. Pins the exact signatures of:
+Issue #5473 (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori). Pins the exact signatures of:
 
-1. the three **unconditional connected-graph irreducibility engines** that PR-2b adds (the
+1. the three **unconditional connected-graph irreducibility engines** (the
    connected-graph analogues of the unconditional complete-bipartite engines
    `shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible`,
    `..._isIrreducible_lambda_one_D_pos`, `..._isIrreducible_D_nonneg`). Engine 3 (the `D ≥ 0`
@@ -20,9 +19,9 @@ arc. Pins the exact signatures of:
    `p = 0` satisfies every remaining hypothesis while the shifted matrix on the two-element
    `p = 0` parity block is the identity matrix, which is not irreducible;
 2. the **two R3 (SU(2) corner) region-endpoint declarations** (target `finrank ≤ 1` and zero
-   axis-3 magnetization) that PR-2b adds, replacing the scaffolding-scalar hypotheses
-   `c_axis`/`hc_axis_strict`, `c_mlm`/`c_toy`/`hT23` and the complete-bipartite `hA_ne`/`hB_ne`
-   bookkeeping with `hGconn`/`hGbip`/`hJ_pos_G`/`hJ_off` at a general connected graph `G`. R1
+   axis-3 magnetization), which carry no scaffolding-scalar hypotheses
+   `c_axis`/`hc_axis_strict`, `c_mlm`/`c_toy`/`hT23` and no complete-bipartite `hA_ne`/`hB_ne`
+   bookkeeping, taking `hGconn`/`hGbip`/`hJ_pos_G`/`hJ_off` at a general connected graph `G`. R1
    (`-1 < λ < 1`, `D ≥ 0`) and R2 (`λ = 1`, `D > 0`) connected endpoints are **not** pinned here:
    see Part 2 below.
 
@@ -58,8 +57,7 @@ input of the Part 2 endpoints. The eight existing declarations stay at
 `bipartiteCompleteGraphOf A` (fully complete bipartite, not merely connected); the connected-graph
 analogue for the SU(2) corner is the R3 pin in Part 2 above.
 
-R4 (case (ii), `λ ≥ 1`, `D ≤ 0`) is explicitly out of scope for this PR (PR-2c); no pin for it is
-placed here.
+No pin for R4 (case (ii), `λ ≥ 1`, `D ≤ 0`) is placed here.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020,
 §2.5 Theorem 2.4, pp. 43–44.
@@ -72,7 +70,7 @@ open Matrix Module
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-/-! ## Part 1: the three unconditional connected irreducibility engines (new declarations) -/
+/-! ## Part 1: the three unconditional connected irreducibility engines -/
 
 /-- **Signature pin (engine 1/3, interior).** Connected-graph analogue of the unconditional
 complete-bipartite engine `shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible`
@@ -135,7 +133,7 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
   shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_D_nonneg_of_connected
     A hΛnt hGconn hGbip hJim hJnn hJ_pos_G hJself hJbip hlam hlb hub hDim hDnn hc_strict hN p
 
-/-! ## Part 2: the two R3 connected region-endpoint declarations (new declarations)
+/-! ## Part 2: the two R3 connected region-endpoint declarations
 
 R1 (`-1 < λ < 1`, `D ≥ 0`) and R2 (`λ = 1`, `D > 0`) endpoints are **not** pinned here. What blocks
 them at a merely connected `G` is the `hJpos` route obstruction described above: the case-(i)

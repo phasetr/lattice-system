@@ -10,8 +10,8 @@ Repository-internal regression guard, **not** a Tasaki result on its own. This f
 acceptance criteria of Issue #5475's first PR (spin-`S` tower, 7 modules): the `∀ (lam D : ℂ)
 (σ : Λ → Fin (N + 1)), … < c` shaped hypothesis binders (`hc_axis_strict` / `hc_strict`) are
 **not** replaced by a function-valued or path-restricted variant — they are **deleted**, with
-`c` obtained internally at each of the 6 point-wise consumption sites from a new one-line
-existence lemma, the axis-swapped twin of
+`c` obtained internally at each of the 6 point-wise consumption sites from the existence lemma
+that is the axis-swapped twin of
 `exists_strict_diag_bound_dressedHeisenbergSReMatrix`
 (`LatticeSystem/Quantum/SpinS/FerrimagneticLROUniversal.lean:61`).
 
@@ -22,8 +22,10 @@ application (§1 of this file), its own declaration, and 2 prose citations (§ b
 of consumption sites and must not be quoted as one, and neither number may be quoted without its
 unit.
 
-This fixture is Red against any tree carrying the pre-repair signatures, in three independent
-ways:
+Sections 1 and 2 are Red against any tree carrying the pre-repair signatures, by two independent
+mechanisms. §3 is not Red: every declaration it mentions already exists at the baseline recorded
+below, so it type-checks against either tree, and what it contributes is a standing refutation of
+the deleted binder.
 
 1. **Identifier Red** (§1): applying the supplier lemma
    `exists_strict_diag_bound_dressedAxisSwappedAnisotropicHeisenbergSReMatrix` fails with
@@ -48,13 +50,12 @@ ways:
    `example` of §3 discharges in Lean every *explicit* hypothesis that theorem places on
    `(A, J, N)`: the seven `J` conditions standing before the deleted binder (`hJim`, `hJnn`,
    `hJpos` on `bipartiteCompleteGraphOf A`, `hJself`, `hJbip`, `hJ_star`, `hJ_sym`) together with
-   `hA_ne`, `hB_ne` and `hN : 1 ≤ N`. Its three instance-implicit arguments
-   (`Nonempty (parityConfigS Λ N 0)`, `Nonempty (parityConfigS Λ N 1)`,
-   `Nonempty (Λ → Fin (N + 1))`) are outside that enumeration and are left to instance search.
-   `Λ = Unit` is *not* such an instance — `hA_ne` and `hB_ne` cannot
-   both hold at a one-point type, and all 30 binder-carrying declarations in this PR's scope
-   bind both — so a witness there would show only that the binder is unsatisfiable in
-   isolation, not that the theorems carrying it are vacuous, which is the claim at issue.
+   `hA_ne`, `hB_ne`, `hN : 1 ≤ N` and `h_card_eq`. Its instance-implicit arguments are outside
+   that enumeration: they are discharged by type-class search, not supplied by this fixture.
+   `Λ = Unit` is *not* such an instance — `hA_ne` and `hB_ne` cannot both hold at a one-point
+   type, and each of the 30 binder-carrying declarations counted at the baseline below binds
+   both — so a witness there would show only that the binder is unsatisfiable in isolation, not
+   that the theorems carrying it are vacuous, which is the claim at issue.
    On the admissible witness the diagonal splits as (bond part) `+ D.re / 2`: at `N = 1` the
    single-ion term contributes `D * |Λ| / 4 = D / 2` on every configuration, independently of
    `lam` and of `σ`. The binder places `c` *before* `lam` and `D`, so one `c` would have to
@@ -220,10 +221,11 @@ private def negCtrlA : Fin 2 → Bool := fun x => x = 0
 `J = bipartiteCoupling A`, `N = 1` discharges every *explicit* hypothesis that
 `anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general`
 places on `(A, J, N)`: the seven `J` conditions standing before the deleted binder, together
-with `hA_ne`, `hB_ne` and `hN`. That theorem's three instance-implicit `Nonempty` arguments
-(`parityConfigS Λ N 0`, `parityConfigS Λ N 1`, `Λ → Fin (N + 1)`) are outside this enumeration
-and are left to instance search. The refutation below therefore concerns an instance the
-binder-carrying theorems accept, not one their own standing assumptions exclude. -/
+with `hA_ne`, `hB_ne`, `hN` and the balanced-sublattice `h_card_eq`. Carrying `h_card_eq` in the
+conjunction is what makes the completeness of that enumeration machine-checked here rather than
+asserted in prose. The theorem's instance-implicit `Nonempty` arguments are outside the
+enumeration and are discharged by type-class search. The refutation below therefore concerns an
+instance the binder-carrying theorems accept, not one their own standing assumptions exclude. -/
 example :
     (∀ x y, (bipartiteCoupling negCtrlA x y).im = 0) ∧
     (∀ x y, 0 ≤ (bipartiteCoupling negCtrlA x y).re) ∧
@@ -233,12 +235,14 @@ example :
     (∀ x y, bipartiteCoupling negCtrlA x y ≠ 0 → negCtrlA x ≠ negCtrlA y) ∧
     (∀ x y, star (bipartiteCoupling negCtrlA x y) = bipartiteCoupling negCtrlA x y) ∧
     (∀ x y, bipartiteCoupling negCtrlA x y = bipartiteCoupling negCtrlA y x) ∧
-    (∃ a, negCtrlA a = true) ∧ (∃ b, negCtrlA b = false) ∧ (1 : ℕ) ≤ 1 := by
+    (∃ a, negCtrlA a = true) ∧ (∃ b, negCtrlA b = false) ∧ (1 : ℕ) ≤ 1 ∧
+    (Finset.univ.filter (fun x : Fin 2 => negCtrlA x = true)).card =
+      (Finset.univ.filter (fun x : Fin 2 => (! negCtrlA x) = true)).card := by
   refine ⟨fun x y => bipartiteCoupling_im _ x y, fun x y => bipartiteCoupling_nonneg _ x y,
     fun _ _ hadj =>
       bipartiteCoupling_pos_of_diff_sublattice _ (bipartiteCompleteGraphOf_adj_sublattice_ne hadj),
     fun _ => bipartiteCoupling_eq_zero_of_same_sublattice _ rfl, ?_, ?_,
-    fun x y => bipartiteCoupling_symm _ x y, ⟨0, by decide⟩, ⟨1, by decide⟩, le_refl 1⟩
+    fun x y => bipartiteCoupling_symm _ x y, ⟨0, by decide⟩, ⟨1, by decide⟩, le_refl 1, by decide⟩
   · intro _ _ hne hAeq
     exact hne (bipartiteCoupling_eq_zero_of_same_sublattice _ hAeq)
   · intro x y
