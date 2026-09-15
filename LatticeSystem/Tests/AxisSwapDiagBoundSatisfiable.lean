@@ -15,23 +15,27 @@ existence lemma, the axis-swapped twin of
 `exists_strict_diag_bound_dressedHeisenbergSReMatrix`
 (`LatticeSystem/Quantum/SpinS/FerrimagneticLROUniversal.lean:61`).
 
-Unit for that 6: proof-body applications of the supplier identifier. Its repo-wide grep hits
-number 10 — those 6, plus its own declaration, plus 3 prose citations — so the raw hit count is
-not the count of consumption sites and must not be quoted as one.
+Unit for that 6: proof-body applications of the supplier identifier *within those 7 modules*.
+Repo-wide the identifier has 10 grep hits, splitting as those 6, one further proof-body
+application (§1 of this file), its own declaration, and 2 prose citations (§ below and
+`LatticeSystem/Tests/Theorem24ConnectedEndpoints.lean`) — so the raw hit count is not the count
+of consumption sites and must not be quoted as one, and neither number may be quoted without its
+unit.
 
-Before the repair this file is Red in three independent ways:
+This fixture is Red against any tree carrying the pre-repair signatures, in three independent
+ways:
 
-1. **Identifier Red** (§1): the new supplier lemma
-   `exists_strict_diag_bound_dressedAxisSwappedAnisotropicHeisenbergSReMatrix` does not exist
-   yet, so applying it fails with `unknown identifier`.
+1. **Identifier Red** (§1): applying the supplier lemma
+   `exists_strict_diag_bound_dressedAxisSwappedAnisotropicHeisenbergSReMatrix` fails with
+   `unknown identifier` unless that declaration is present.
 2. **Binder-deletion pin** (§2): the two capstones of Tasaki Theorem 2.4
    (`anisotropicHeisenbergS_tasaki24_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_general`,
-   `aHeisS_tasaki24_target_zeroMag_of_MLM_casLadder_t23_pf_gen`) currently *require* the
-   `hc_axis_strict` argument positionally; applying them with every other hypothesis supplied
-   abstractly but this one omitted is a genuine type mismatch (not a parse/import failure).
-   After the repair the same term (with the binder dropped from both the `example`'s own
-   parameter list and the application) type-checks, because the target signature no longer
-   has that parameter. This simultaneously serves as the **strength control**: the endpoint
+   `aHeisS_tasaki24_target_zeroMag_of_MLM_casLadder_t23_pf_gen`) are applied with every
+   hypothesis supplied abstractly *except* `hc_axis_strict`, which is absent from both the
+   `example`'s own parameter list and the application. Such a term type-checks exactly when the
+   target signature has no such parameter; against a signature that still binds it positionally
+   the application is short one argument, a genuine type mismatch (not a parse/import failure).
+   This simultaneously serves as the **strength control**: the endpoint
    conclusion is derived supplying *no axis-swapped diagonal-shift* hypothesis
    (`c_axis` / `hc_axis_strict`) at all, which cannot be written against the old
    (binder-carrying) signature. It is not a claim that no `c`-hypothesis of any kind is
@@ -41,10 +45,13 @@ Before the repair this file is Red in three independent ways:
    an instance the binder-carrying theorems actually admit. Take
    `anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general`
    and the witness `Λ = Fin 2`, `A = (· = 0)`, `J = bipartiteCoupling A`, `N = 1`. The first
-   `example` of §3 discharges in Lean every hypothesis that theorem places on `(A, J, N)`: the
-   seven `J` conditions standing before the deleted binder (`hJim`, `hJnn`, `hJpos` on
-   `bipartiteCompleteGraphOf A`, `hJself`, `hJbip`, `hJ_star`, `hJ_sym`) together with `hA_ne`,
-   `hB_ne` and `hN : 1 ≤ N`. `Λ = Unit` is *not* such an instance — `hA_ne` and `hB_ne` cannot
+   `example` of §3 discharges in Lean every *explicit* hypothesis that theorem places on
+   `(A, J, N)`: the seven `J` conditions standing before the deleted binder (`hJim`, `hJnn`,
+   `hJpos` on `bipartiteCompleteGraphOf A`, `hJself`, `hJbip`, `hJ_star`, `hJ_sym`) together with
+   `hA_ne`, `hB_ne` and `hN : 1 ≤ N`. Its three instance-implicit arguments
+   (`Nonempty (parityConfigS Λ N 0)`, `Nonempty (parityConfigS Λ N 1)`,
+   `Nonempty (Λ → Fin (N + 1))`) are outside that enumeration and are left to instance search.
+   `Λ = Unit` is *not* such an instance — `hA_ne` and `hB_ne` cannot
    both hold at a one-point type, and all 30 binder-carrying declarations in this PR's scope
    bind both — so a witness there would show only that the binder is unsatisfiable in
    isolation, not that the theorems carrying it are vacuous, which is the claim at issue.
@@ -59,7 +66,7 @@ Before the repair this file is Red in three independent ways:
 This file cannot itself pin a repo-wide grep count, so the two invariants for `dev-verify` to
 re-measure after the repair are recorded here as the exact commands used:
 
-* **∀-lam-D binder lines in this PR's 7-module scope must become 0** (currently **30**):
+* **∀-lam-D binder lines in this PR's 7-module scope must become 0** (**30** at that baseline):
   ```
   git grep -n '(hc_axis_strict : ∀ (lam D : ℂ)\|(hc_strict : ∀ (lam D : ℂ)' -- \
     LatticeSystem/Quantum/SpinS/AnisotropicHeisenbergSpinSDNonnegBoundary.lean \
@@ -93,12 +100,12 @@ namespace LatticeSystem.Tests.AxisSwapDiagBoundSatisfiable
 
 open LatticeSystem.Quantum Module
 
-/-! ## §1 Identifier Red: the new supplier lemma does not exist yet -/
+/-! ## §1 Identifier Red: the supplier lemma must be present and applicable -/
 
-/-- **Identifier Red.** The axis-swapped twin of
-`exists_strict_diag_bound_dressedHeisenbergSReMatrix`, applied at a concrete small instance
-(so this is a positive-control-style application, not merely a signature) — fails today with
-`unknown identifier` because the declaration does not exist. -/
+/-- **Identifier Red.** Pins the axis-swapped twin of
+`exists_strict_diag_bound_dressedHeisenbergSReMatrix` by applying it at a concrete small instance
+(so this is a positive-control-style application, not merely a signature): the term elaborates
+only where that declaration exists, and fails with `unknown identifier` where it does not. -/
 example :
     ∃ c : ℝ, ∀ σ : Fin 2 → Fin (1 + 1),
       dressedAxisSwappedAnisotropicHeisenbergSReMatrix
@@ -111,13 +118,14 @@ example :
 
 /-- **Binder-deletion pin (finrank conjunct).** Every hypothesis of
 `anisotropicHeisenbergS_tasaki24_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_general`
-is supplied here as an abstract bound variable **except** `hc_axis_strict`, which is dropped
-from both this `example`'s binder list and the application. Today the application is missing
-a positional argument (`hA_ne` lands where `hc_axis_strict` is expected), a genuine type
-mismatch — not a parse or import failure. After the binder is deleted from the target theorem,
-this term type-checks unchanged, which also certifies the **strength control**: the conclusion
-is reached with no axis-swapped diagonal-shift `c` hypothesis (`c_axis` / `hc_axis_strict`).
-The MLM/toy scalars `c_mlm`, `c_toy` and their strict bounds remain bound below. -/
+is supplied here as an abstract bound variable **except** `hc_axis_strict`, which is absent from
+both this `example`'s binder list and the application. The term type-checks exactly when the
+target signature carries no such parameter; against a signature that still binds it the
+application is short one positional argument (`hA_ne` lands where `hc_axis_strict` is expected),
+a genuine type mismatch rather than a parse or import failure. It thereby certifies the
+**strength control**: the conclusion is reached with no axis-swapped diagonal-shift `c`
+hypothesis (`c_axis` / `hc_axis_strict`). The MLM/toy scalars `c_mlm`, `c_toy` and their strict
+bounds remain bound below. -/
 example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
@@ -159,7 +167,8 @@ example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-- **Binder-deletion pin (zero-magnetization conjunct).** Same construction as above for
 `aHeisS_tasaki24_target_zeroMag_of_MLM_casLadder_t23_pf_gen`, the second conjunct of Tasaki
-Theorem 2.4. -/
+Theorem 2.4: `hc_axis_strict` is absent from both the binder list and the application, so the
+term type-checks exactly when the target signature carries no such parameter. -/
 example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
@@ -208,10 +217,12 @@ example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 private def negCtrlA : Fin 2 → Bool := fun x => x = 0
 
 /-- **Admissibility of the negative-control witness.** `Λ = Fin 2`, `A = negCtrlA`,
-`J = bipartiteCoupling A`, `N = 1` discharges every hypothesis that
+`J = bipartiteCoupling A`, `N = 1` discharges every *explicit* hypothesis that
 `anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general`
 places on `(A, J, N)`: the seven `J` conditions standing before the deleted binder, together
-with `hA_ne`, `hB_ne` and `hN`. The refutation below therefore concerns an instance the
+with `hA_ne`, `hB_ne` and `hN`. That theorem's three instance-implicit `Nonempty` arguments
+(`parityConfigS Λ N 0`, `parityConfigS Λ N 1`, `Λ → Fin (N + 1)`) are outside this enumeration
+and are left to instance search. The refutation below therefore concerns an instance the
 binder-carrying theorems accept, not one their own standing assumptions exclude. -/
 example :
     (∀ x y, (bipartiteCoupling negCtrlA x y).im = 0) ∧
@@ -238,7 +249,7 @@ example :
 plus `D.re / 2`: the single-ion term reduces to `spinHalfOp2 * spinHalfOp2 = (1/4 : ℂ) • 1` at
 each of the two sites, so it contributes `D / 2` on every configuration, independently of `lam`
 and of `σ`. The bond part never mentions `D`. -/
-theorem dressedAxisSwappedDiag_fin2_spinHalf_bond_add_D
+private theorem dressedAxisSwappedDiag_fin2_spinHalf_bond_add_D
     (A : Fin 2 → Bool) (J : Fin 2 → Fin 2 → ℂ) (lam D : ℂ) (σ : Fin 2 → Fin (1 + 1)) :
     dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D 1 σ σ
       = ((∑ x : Fin 2, ∑ y : Fin 2, J x y • spinSDotXXZSwap x y lam 1) σ σ).re + D.re / 2 := by
@@ -265,7 +276,7 @@ every `(lam, D)`. The binder quantifies `c` *before* `lam` and `D`, so a single 
 to dominate the `D.re / 2` single-ion contribution for every `D`; taking `lam := 0` and
 `D := ((2 * (c - bond) + 2 : ℝ) : ℂ)` at the all-`0` configuration pushes the diagonal to
 `c + 1 > c`. So the deleted `hc_axis_strict` / `hc_strict` binder is unsatisfiable on an
-instance that satisfies the standing assumptions of the theorems that used to carry it. -/
+instance that satisfies the standing assumptions of the binder-carrying signatures. -/
 example (c : ℝ) :
     ¬ ∀ (lam D : ℂ) (σ : Fin 2 → Fin (1 + 1)),
       dressedAxisSwappedAnisotropicHeisenbergSReMatrix negCtrlA (bipartiteCoupling negCtrlA)

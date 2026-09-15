@@ -47,8 +47,10 @@ discharge it, so none of the eight can be re-derived at a merely connected `G` a
 The obstruction is therefore one of proof route, not of truth. Substituting `hJ_pos_G` for `hJpos`
 *without* a connectedness hypothesis leaves `G` unconstrained and does make the SU(2) `finrank`
 statement false: `Λ = Fin 2`, `A = (· = 0)`, `N = 1`, `G = ⊥`, `J ≡ 0` satisfies every hypothesis
-of that connectedness-free variant (`hGbip`, `hJ_pos_G` and `hJ_off` hold vacuously at `G = ⊥`,
-and `h_card_eq` reads `1 = 1`) while `H = 0` has a 4-dimensional ground eigenspace. But
+of that connectedness-free variant (`hGbip` and `hJ_pos_G` hold vacuously at `G = ⊥`, which has
+no adjacent pair; `hJ_off`, whose hypothesis `¬ (⊥ : SimpleGraph (Fin 2)).Adj x y` holds of every
+pair, is not vacuous and holds because `J ≡ 0`; and `h_card_eq` reads `1 = 1`) while `H = 0` has
+a 4-dimensional ground eigenspace. But
 `(⊥ : SimpleGraph (Fin 2))` is *not* connected, so `hGconn` removes that witness, and under
 `hGconn` both SU(2) statements do hold: the support graph of `J` contains `G`, hence is connected,
 and carries the sign gauge, the edge positivity and the support condition, which is exactly the
@@ -138,7 +140,7 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
 R1 (`-1 < λ < 1`, `D ≥ 0`) and R2 (`λ = 1`, `D > 0`) endpoints are **not** pinned here. What blocks
 them at a merely connected `G` is the `hJpos` route obstruction described above: the case-(i)
 spin-`S` routes reach `h_strict_gap` through `hT23`, whose sixth premise only the fixed-graph
-positivity `hJpos` discharges. Their diagonal shift is no longer an obstruction — those routes
+positivity `hJpos` discharges. Their diagonal shift is not an obstruction — those routes
 take no axis-swapped diagonal-shift `c` hypothesis, obtaining one point-wise from
 `exists_strict_diag_bound_dressedAxisSwappedAnisotropicHeisenbergSReMatrix`. They do still bind
 the MLM/toy scalars `c_mlm` / `c_toy` and their strict bounds, as in
