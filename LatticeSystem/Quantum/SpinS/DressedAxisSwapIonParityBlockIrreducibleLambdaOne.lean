@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapIonParityLambdaOne
 import LatticeSystem.Quantum.SpinS.ParityReachableNoParityBondTotal
+import LatticeSystem.Quantum.SpinS.ParityReachConnectedTotal
 import LatticeSystem.Math.PerronFrobeniusMain
 
 /-!
@@ -11,6 +12,12 @@ This file gives the shifted axis-swapped parity-block irreducibility result for
 the `lambda = 1`, `D > 0` boundary.  The proof uses only transverse
 raise/lower moves and single-ion moves, avoiding the parity-bond branch whose
 coefficient vanishes at `lambda = 1`.
+
+The conditional engine is discharged twice, by the two ion-only totality layers:
+`ionParityReachableS_total` (`ParityReachableNoParityBondTotal.lean`) on
+`bipartiteCompleteGraphOf A` from `hA_ne + hB_ne`, and
+`ionParityReachableS_total_of_connected` (`ParityReachConnectedTotal.lean`) on a connected
+`G` from `hGconn`.  Both require `2 ≤ N`, the room the single-ion `±2` move needs.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, Section 2.5 Theorem 2.4, pp. 43--44.
@@ -89,6 +96,37 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_lambda_one_
     hJpos hJself hJbip hDim hDpos hc_strict p ?_
   intro σ' σ _hne
   refine ionParityReachableS_total A hA_ne hB_ne hN ?_
+  have hp_σ : magSumS σ.1 % 2 = p := σ.2
+  have hp_σ' : magSumS σ'.1 % 2 = p := σ'.2
+  omega
+
+/-- **Connected-graph ion-only shifted parity-block irreducibility at `lambda = 1`, `D > 0`**.
+The analogue of `shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_lambda_one_D_pos`
+for an arbitrary connected graph `G` whose edges join opposite sublattices (`hGbip`) and on
+whose edges the coupling is strictly positive (`hJ_pos_G`), replacing `hA_ne`/`hB_ne` by
+`hGconn`.
+
+The ion-only totality layer `ionParityReachableS_total_of_connected`
+(`ParityReachConnectedTotal.lean`) discharges the conditional hypothesis under `2 ≤ N` alone:
+the on-site single-ion `±2` move needs no second vertex, so no `Nontrivial Λ` is required. -/
+theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_lambda_one_D_pos_of_connected
+    (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
+    (hGconn : G.Connected) (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
+    (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
+    {D : ℂ} (hDim : D.im = 0) (hDpos : 0 < D.re)
+    {c : ℝ}
+    (hc_strict : ∀ σ : Λ → Fin (N + 1),
+      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J 1 D N σ σ < c)
+    (hN : 2 ≤ N)
+    (p : ℕ)
+    [Nonempty (parityConfigS Λ N p)] :
+    (shiftedDressedAxisSwappedReMatrixOnParityBlock A J 1 D N c p).IsIrreducible := by
+  refine shiftedDressedReMatParity_irred_of_ionParityReach_total_lam1
+    A hJim hJnn hGbip hJ_pos_G hJself hJbip hDim hDpos hc_strict p ?_
+  intro σ' σ _hne
+  refine ionParityReachableS_total_of_connected hGconn hN ?_
   have hp_σ : magSumS σ.1 % 2 = p := σ.2
   have hp_σ' : magSumS σ'.1 % 2 = p := σ'.2
   omega

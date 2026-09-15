@@ -87,7 +87,6 @@ import LatticeSystem.Quantum.SpinS.DressedSubmatrixBoundAtMin
 import LatticeSystem.Quantum.SpinS.FerrimagneticLROUniversalFinal
 import LatticeSystem.Quantum.SpinS.ParityReachConcentrateAB
 import LatticeSystem.Quantum.SpinS.ParityReachCanonicalMagShift
-import LatticeSystem.Quantum.SpinS.ParityReachConnectedTotal
 import LatticeSystem.Quantum.SpinS.DressedParityBlockMatrix
 import LatticeSystem.Quantum.SpinS.SublatticeMaxCasimirFinrankGeComplement
 import LatticeSystem.Quantum.SpinS.Problem25dGroundStatePhaseWrapper

@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBondParityDNonneg
 import LatticeSystem.Quantum.SpinS.ParityReachableNoSingleIonTotal
+import LatticeSystem.Quantum.SpinS.ParityReachConnectedTotal
 import LatticeSystem.Math.PerronFrobeniusMain
 
 /-!
@@ -11,11 +12,15 @@ This file gives the conditional irreducibility capstone for the shifted
 axis-swapped parity-block matrix using only bond-generated parity reachability.
 The hypothesis is deliberately stated as a bond-only totality assumption over a
 graph `G` whose edges join opposite sublattices, so that it can be discharged by
-whichever totality layer fits the graph at hand: `bondParityReachableS_total`
-(`ParityReachableNoSingleIonTotal.lean`) on `bipartiteCompleteGraphOf A`, which
-is what the unconditional wrapper below uses, or
+whichever totality layer fits the graph at hand — each under its own side
+conditions, which the wrappers below therefore carry: `bondParityReachableS_total`
+(`ParityReachableNoSingleIonTotal.lean`) on `bipartiteCompleteGraphOf A` under
+`hA_ne`, `hB_ne` and `1 <= N`, used by the first wrapper below, or
 `bondParityReachableS_total_of_connected` (`ParityReachConnectedTotal.lean`) on a
-connected graph.
+connected graph under `Nontrivial V` and `1 <= N`, used by the second.  The
+`Nontrivial V` of the connected layer is not bookkeeping carried over from the
+complete-bipartite side: both step kinds of the bond-only relation require an
+edge, so on a one-vertex graph the relation has no move at all.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, Section 2.5 Theorem 2.4, pp. 43--44.
@@ -98,6 +103,43 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_D_nonneg
     hJpos hJself hJbip hlam hlb hub hDim hDnn hc_strict p ?_
   intro σ' σ _hne
   refine bondParityReachableS_total A hA_ne hB_ne hN ?_
+  have hp_σ : magSumS σ.1 % 2 = p := σ.2
+  have hp_σ' : magSumS σ'.1 % 2 = p := σ'.2
+  omega
+
+/-- **Connected-graph bond-only shifted parity-block irreducibility with `D >= 0`**.  The
+analogue of `shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_D_nonneg` for an
+arbitrary connected graph `G` whose edges join opposite sublattices (`hGbip`) and on whose
+edges the coupling is strictly positive (`hJ_pos_G`), replacing `hA_ne`/`hB_ne` by `hGconn`.
+
+Unlike the connected interior and `lambda = 1` engines
+(`shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_connected`,
+`..._isIrreducible_lambda_one_D_pos_of_connected`), this one also takes
+`hΛnt : Nontrivial Λ`.  It is required by the bond-only totality layer
+`bondParityReachableS_total_of_connected` (`ParityReachConnectedTotal.lean`), and for the
+same reason: the moves available here are the transverse and bond-parity steps, both of which
+require an edge, so on a one-vertex graph the relation is empty while `G.Connected` still
+holds. -/
+theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_D_nonneg_of_connected
+    (A : Λ → Bool) {G : SimpleGraph Λ} {J : Λ → Λ → ℂ}
+    (hΛnt : Nontrivial Λ)
+    (hGconn : G.Connected) (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
+    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re)
+    (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
+    {lam : ℂ} (hlam : lam.im = 0) (hlb : -1 < lam.re) (hub : lam.re < 1)
+    {D : ℂ} (hDim : D.im = 0) (hDnn : 0 ≤ D.re)
+    {c : ℝ}
+    (hc_strict : ∀ σ : Λ → Fin (N + 1),
+      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c)
+    (hN : 1 ≤ N)
+    (p : ℕ)
+    [Nonempty (parityConfigS Λ N p)] :
+    (shiftedDressedAxisSwappedReMatrixOnParityBlock A J lam D N c p).IsIrreducible := by
+  refine shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_bondParityReachable_total
+    A hJim hJnn hGbip hJ_pos_G hJself hJbip hlam hlb hub hDim hDnn hc_strict p ?_
+  intro σ' σ _hne
+  refine bondParityReachableS_total_of_connected hΛnt hGconn hN ?_
   have hp_σ : magSumS σ.1 % 2 = p := σ.2
   have hp_σ' : magSumS σ'.1 % 2 = p := σ'.2
   omega
