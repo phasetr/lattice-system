@@ -43,20 +43,24 @@ the deleted binder.
    (binder-carrying) signature. It is not a claim that no `c`-hypothesis of any kind is
    supplied: the MLM/toy scalars `c_mlm`, `c_toy` and their bounds `hc_heis_strict`,
    `hc_toy_strict` are still bound here and on the target signature.
-3. **Negative control** (§3): the old `∀ (lam D : ℂ) (σ : …), … < c` form is unsatisfiable at
-   an instance the binder-carrying theorems actually admit. Take
+3. **Negative control** (§3): the old `∀ (lam D : ℂ) (σ : …), … < c` form is unsatisfiable at an
+   instance that the hypotheses discharged in §3 do not exclude. Take
    `anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general`
    and the witness `Λ = Fin 2`, `A = (· = 0)`, `J = bipartiteCoupling A`, `N = 1`. The first
-   `example` of §3 discharges in Lean every *explicit* hypothesis that theorem places on
-   `(A, J, N)`: the seven `J` conditions standing before the deleted binder (`hJim`, `hJnn`,
-   `hJpos` on `bipartiteCompleteGraphOf A`, `hJself`, `hJbip`, `hJ_star`, `hJ_sym`) together with
-   `hA_ne`, `hB_ne`, `hN : 1 ≤ N` and `h_card_eq`. Its instance-implicit `Nonempty` arguments lie
-   outside that enumeration, which is of the explicit hypotheses only.
+   `example` of §3 discharges in Lean a proper subset of that theorem's explicit hypotheses:
+   the seven `J` conditions standing before the deleted binder (`hJim`, `hJnn`, `hJpos` on
+   `bipartiteCompleteGraphOf A`, `hJself`, `hJbip`, `hJ_star`, `hJ_sym`), together with `hA_ne`,
+   `hB_ne`, `hN : 1 ≤ N` and `h_card_eq`, which stand after it. Left undischarged, and unchecked
+   anywhere in this file, are `hT23`, the MLM/toy scalars with their strict bounds, the
+   balanced-sector and region hypotheses, and the four instance-implicit `Nonempty` arguments.
+   §3 also never applies the theorem, so it does not establish that the binder-carrying
+   signatures accept this witness.
    `Λ = Unit` is *not* such an instance — `hA_ne` and `hB_ne` cannot both hold at a one-point
-   type, and each of the 30 binder-carrying declarations counted at the baseline below binds
-   both — so a witness there would show only that the binder is unsatisfiable in isolation, not
-   that the theorems carrying it are vacuous, which is the claim at issue.
-   On the admissible witness the diagonal splits as (bond part) `+ D.re / 2`: at `N = 1` the
+   type, and each of the 30 binder-carrying declarations at the baseline below binds both (one
+   declaration per binder line counted there) — so a witness there would show only that the
+   binder is unsatisfiable in isolation, not that the theorems carrying it are vacuous, which is
+   the claim at issue.
+   On that witness the diagonal splits as (bond part) `+ D.re / 2`: at `N = 1` the
    single-ion term contributes `D * |Λ| / 4 = D / 2` on every configuration, independently of
    `lam` and of `σ`. The binder places `c` *before* `lam` and `D`, so one `c` would have to
    dominate every `D`; `D := ((2 * (c - bond) + 2 : ℝ) : ℂ)` refutes any fixed `c`. This is
@@ -121,10 +125,11 @@ example :
 /-- **Binder-deletion pin (finrank conjunct).** Every hypothesis of
 `anisotropicHeisenbergS_tasaki24_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_general`
 is supplied here as an abstract bound variable **except** `hc_axis_strict`, which is absent from
-both this `example`'s binder list and the application. The term type-checks exactly when the
-target signature carries no such parameter; against a signature that still binds it the
-application is short one positional argument (`hA_ne` lands where `hc_axis_strict` is expected),
-a genuine type mismatch rather than a parse or import failure. It thereby certifies the
+both this `example`'s binder list and the application. The term elaborates against a target
+signature carrying no such parameter. At the baseline recorded above that binder is the explicit
+parameter standing immediately before `hA_ne`, so against that signature the same application is
+short one positional argument (`hA_ne` lands where `hc_axis_strict` is expected), a genuine type
+mismatch rather than a parse or import failure. It thereby certifies the
 **strength control**: the conclusion is reached with no axis-swapped diagonal-shift `c`
 hypothesis (`c_axis` / `hc_axis_strict`). The MLM/toy scalars `c_mlm`, `c_toy` and their strict
 bounds remain bound below. -/
@@ -169,8 +174,9 @@ example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-- **Binder-deletion pin (zero-magnetization conjunct).** Same construction as above for
 `aHeisS_tasaki24_target_zeroMag_of_MLM_casLadder_t23_pf_gen`, the second conjunct of Tasaki
-Theorem 2.4: `hc_axis_strict` is absent from both the binder list and the application, so the
-term type-checks exactly when the target signature carries no such parameter. -/
+Theorem 2.4: `hc_axis_strict` is absent from both the binder list and the application, so, as
+above, the term elaborates against a signature carrying no such parameter and is one positional
+argument short against the baseline signature. -/
 example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
@@ -213,20 +219,22 @@ example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
     hc_heis_strict hc_toy_strict h_card_eq M_balanced h_balanced h_centered_nonzero h_region
     hΦ_ne hΦ_gs
 
-/-! ## §3 Negative control: the old binder is unsatisfiable at an instance the theorems admit -/
+/-! ## §3 Negative control: the old binder is unsatisfiable at an instance the hypotheses
+discharged here do not exclude -/
 
 /-- The negative-control bipartition on `Fin 2`: site `0` on sublattice `A`, site `1` on `B`. -/
 private def negCtrlA : Fin 2 → Bool := fun x => x = 0
 
-/-- **Admissibility of the negative-control witness.** `Λ = Fin 2`, `A = negCtrlA`,
-`J = bipartiteCoupling A`, `N = 1` discharges every *explicit* hypothesis that
+/-- **Hypotheses discharged at the negative-control witness.** At `Λ = Fin 2`, `A = negCtrlA`,
+`J = bipartiteCoupling A`, `N = 1` this conjunction discharges a proper subset of the explicit
+hypotheses that
 `anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general`
 places on `(A, J, N)`: the seven `J` conditions standing before the deleted binder, together
-with `hA_ne`, `hB_ne`, `hN` and the balanced-sublattice `h_card_eq`. Carrying `h_card_eq` in the
-conjunction is what makes the completeness of that enumeration machine-checked here rather than
-asserted in prose. The theorem's instance-implicit `Nonempty` arguments lie outside the
-enumeration, which is of the explicit hypotheses only. The refutation below therefore concerns an
-instance the binder-carrying theorems do not exclude by their own standing assumptions. -/
+with `hA_ne`, `hB_ne`, `hN` and the balanced-sublattice `h_card_eq`. Undischarged here, and
+unchecked anywhere in this file, are `hT23`, the MLM/toy scalars with their strict bounds, the
+balanced-sector and region hypotheses, and the four instance-implicit `Nonempty` arguments; the
+theorem is also never applied. So the refutation below concerns an instance that the hypotheses
+discharged here do not exclude, which is weaker than the theorems accepting it. -/
 example :
     (∀ x y, (bipartiteCoupling negCtrlA x y).im = 0) ∧
     (∀ x y, 0 ≤ (bipartiteCoupling negCtrlA x y).re) ∧
@@ -276,12 +284,12 @@ private theorem dressedAxisSwappedDiag_fin2_spinHalf_bond_add_D
   have hD2 : (D / 2 : ℂ).re = D.re / 2 := by simp
   rw [hD2]
 
-/-- **Negative control.** At the admissible witness above no fixed `c` bounds the diagonal for
+/-- **Negative control.** At the witness above no fixed `c` bounds the diagonal for
 every `(lam, D)`. The binder quantifies `c` *before* `lam` and `D`, so a single `c` would have
 to dominate the `D.re / 2` single-ion contribution for every `D`; taking `lam := 0` and
 `D := ((2 * (c - bond) + 2 : ℝ) : ℂ)` at the all-`0` configuration pushes the diagonal to
 `c + 1 > c`. So the deleted `hc_axis_strict` / `hc_strict` binder is unsatisfiable on an
-instance that satisfies the standing assumptions of the binder-carrying signatures. -/
+instance that the hypotheses discharged above do not exclude. -/
 example (c : ℝ) :
     ¬ ∀ (lam D : ℂ) (σ : Fin 2 → Fin (1 + 1)),
       dressedAxisSwappedAnisotropicHeisenbergSReMatrix negCtrlA (bipartiteCoupling negCtrlA)
