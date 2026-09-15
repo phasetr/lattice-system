@@ -76,7 +76,7 @@ theorem neg_dressedHeisenbergSReMatrix_apply_pos_of_raiseLowerStepS_bipartite
     {J : V → V → ℂ} (N : ℕ) {G : SimpleGraph V}
     (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
     (hJ_real : ∀ x y, (J x y).im = 0)
-    (hJ_pos : ∀ x y : V, G.Adj x y → 0 < (J x y).re)
+    (hJ_pos_G : ∀ x y : V, G.Adj x y → 0 < (J x y).re)
     (hJ_sym : ∀ x y, J x y = J y x)
     {σ τ : V → Fin (N + 1)}
     (hstep : RaiseLowerStepS G σ τ) :
@@ -84,6 +84,6 @@ theorem neg_dressedHeisenbergSReMatrix_apply_pos_of_raiseLowerStepS_bipartite
   obtain ⟨x, y, hadj, hsh, hagree⟩ := hstep
   have hAne : A x ≠ A y := hGbip x y hadj
   exact neg_dressedHeisenbergSReMatrix_apply_pos_of_raiseLowerStepS_witness A N
-    hadj hAne (hJ_real x y) (hJ_pos x y hadj) (hJ_sym x y) hsh hagree
+    hadj hAne (hJ_real x y) (hJ_pos_G x y hadj) (hJ_sym x y) hsh hagree
 
 end LatticeSystem.Quantum
