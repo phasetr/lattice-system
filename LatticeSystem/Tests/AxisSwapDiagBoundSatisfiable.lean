@@ -55,9 +55,13 @@ re-measure after the repair are recorded here as the exact commands used:
   ```
 * **Point-wise `(hc_strict : ∀ σ : Λ → Fin …)` binder lines repo-wide must stay unchanged**
   (measured **52**, positive control = the command itself finding 52 non-zero hits so a silent
-  `0` cannot pass unnoticed):
+  `0` cannot pass unnoticed). This file's own module doc quotes the pattern twice (this bullet
+  and the command below), so re-running the grep verbatim over the whole tree double-counts
+  this file's prose by 2 (54, not 52); the command below excludes this file by path to measure
+  the invariant it documents rather than its own citation of it:
   ```
-  git grep -c '(hc_strict : ∀ σ : Λ → Fin' -- '*.lean' | awk -F: '{s+=$2} END{print s}'
+  git grep -c '(hc_strict : ∀ σ : Λ → Fin' -- '*.lean' \
+    ':!LatticeSystem/Tests/AxisSwapDiagBoundSatisfiable.lean' | awk -F: '{s+=$2} END{print s}'
   ```
   A drop below 52 after the repair means the deletion went one layer too deep into the
   irreducibility engines (whose conclusions carry `c`, e.g.
