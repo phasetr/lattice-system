@@ -126,16 +126,12 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
 
 /-! ## Part 2: the two R3 connected region-endpoint declarations (new declarations)
 
-R1 (`-1 < λ < 1`, `D ≥ 0`) and R2 (`λ = 1`, `D > 0`) endpoints are **not** pinned in this PR: every
-existing route to `h_strict_gap` for case (i)
-(`AnisotropicHeisenbergSpinSDNonnegBoundary.lean:28`,
-`AnisotropicHeisenbergSpinSLambdaOneBoundary.lean:54`,
-`AnisotropicHeisenbergSpinSObligation2FromSU2UniqueCore.lean:85`) carries a binder
-`hc_strict : ∀ (lam D : ℂ) (σ), diag < c` — a single `c` bounding the diagonal for *every* `lam`
-and `D`, not just the target pair. That binder is unsatisfiable: at `Λ = Unit`, `N = 1`, `J = 0`
-the diagonal is exactly `D.re / 4` for every `σ`, so no single `c` bounds it strictly above as
-`D → ∞`. Fixing this binder is issue #5475's scope, out of scope here; R1/R2 connected endpoints
-follow in a later PR once that binder is repaired. -/
+R1 (`-1 < λ < 1`, `D ≥ 0`) and R2 (`λ = 1`, `D > 0`) endpoints are **not** pinned here. What blocks
+them at a merely connected `G` is the `hJpos` route obstruction described above: the case-(i)
+spin-`S` routes reach `h_strict_gap` through `hT23`, whose sixth premise only the fixed-graph
+positivity `hJpos` discharges. Their diagonal shift is no longer an obstruction — those routes take
+no `c` hypothesis at all, obtaining one point-wise from
+`exists_strict_diag_bound_dressedAxisSwappedAnisotropicHeisenbergSReMatrix`. -/
 
 /-- **Signature pin (R3 finrank, SU(2) corner `(λ,D) = (1,0)`).** Connected-graph analogue of
 `aHeisS_target_finrank_le_one_of_MLM_casLadder_t23_pf_lam1_D_zero_gen`
