@@ -83,7 +83,7 @@ example :
       dressedAxisSwappedAnisotropicHeisenbergSReMatrix
         (fun x => x = 0) (fun x y => if x ≠ y then (1 : ℂ) else 0) (0 : ℂ) (0 : ℂ) 1 σ σ < c :=
   exists_strict_diag_bound_dressedAxisSwappedAnisotropicHeisenbergSReMatrix
-    (fun x => x = 0) (fun x y => if x ≠ y then (1 : ℂ) else 0) (0 : ℂ) (0 : ℂ) 1
+    _ _ _ _ _
 
 /-! ## §2 Binder-deletion pin (+ strength control): apply the Theorem 2.4 capstones with the
 `∀-lam-D` hypothesis omitted entirely -/
