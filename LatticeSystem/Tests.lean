@@ -95,6 +95,7 @@ import LatticeSystem.Tests.MarshallLiebMattisTheorem22
 import LatticeSystem.Tests.ParityReachabilityConnected
 import LatticeSystem.Tests.Theorem24EngineGeneralization
 import LatticeSystem.Tests.Theorem24ConnectedEndpoints
+import LatticeSystem.Tests.AxisSwapDiagBoundSatisfiable
 import LatticeSystem.Tests.TimeReversalSpinHalf
 import LatticeSystem.Tests.TimeReversalMulti
 import LatticeSystem.Tests.Problem23a
