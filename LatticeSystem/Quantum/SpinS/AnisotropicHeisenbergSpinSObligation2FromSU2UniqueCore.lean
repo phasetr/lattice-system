@@ -81,9 +81,6 @@ theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_path_gene
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
-    {c : ℝ}
-    (hc_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 1 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -121,10 +118,12 @@ theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_path_gene
   have hlb_t : -1 < lam_t.re := by rw [hlam_t_re]; exact hlb
   have hub_t : lam_t.re < 1 := by rw [hlam_t_re]; exact hub
   have hDpos_t : 0 < D_t.re := by rw [hD_t_re]; exact hDpos
+  obtain ⟨c, hc⟩ :=
+    exists_strict_diag_bound_dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam_t D_t N
   exact anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_general
     A hJim hJnn hJpos hJself hJbip
     hlam_t_im hlb_t hub_t hD_t_im hDpos_t
-    (hc_strict lam_t D_t) hA_ne hB_ne hN hJ_star hlam_t_star hD_t_star
+    hc hA_ne hB_ne hN hJ_star hlam_t_star hD_t_star
 
 /-- **General spin-S obligation (2), first-crossing capstone**: a non-empty
 crossing set for a non-balanced sector contradicts the strict SU(2) endpoint
@@ -136,9 +135,6 @@ theorem anisotropicHeisenbergS_obligation_2_axiomatic_sup_crossing_hne_general
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
-    {c : ℝ}
-    (hc_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 1 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -218,7 +214,7 @@ theorem anisotropicHeisenbergS_obligation_2_axiomatic_sup_crossing_hne_general
   rw [h_bal_eq_full] at hΦ_bal_eig
   have h_finrank :=
     anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_path_general
-      A hJim hJnn hJpos hJself hJbip hc_strict hA_ne hB_ne hN hJ_star
+      A hJim hJnn hJpos hJself hJbip hA_ne hB_ne hN hJ_star
       hlam'_lb hlam'_ub hD' ht_pos ht_le
   rw [h_bal_eq_full] at hΦ_M_eig
   exact anisotropicHeisenbergS_embedded_two_sector_contradiction_finrank_le_two
@@ -234,9 +230,6 @@ theorem anisotropicHeisenbergS_obligation_2_single_axiom_general
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
     (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
-    {c : ℝ}
-    (hc_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (N + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 1 ≤ N)
     [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
@@ -323,7 +316,7 @@ theorem anisotropicHeisenbergS_obligation_2_single_axiom_general
     (strict_gap_all_M_below_sInf_of_argmin hJ_star N M_balanced M_chosen lam' D'
       hM_chosen_cross h_argmin)
   exact anisotropicHeisenbergS_obligation_2_axiomatic_sup_crossing_hne_general
-    A hJim hJnn hJpos hJself hJbip hc_strict hA_ne hB_ne hN hJ_star
+    A hJim hJnn hJpos hJself hJbip hA_ne hB_ne hN hJ_star
     M_balanced M_chosen h_balanced hM_chosen_centered_ne hlam'_lb hlam'_ub hD'
     hM_chosen_cross h_strict_chosen axiom_GS_at_SU2 h_below
 

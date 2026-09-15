@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapHermitian
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapOffDiag
 import LatticeSystem.Quantum.SpinS.ParityConfig
+import LatticeSystem.Math.FiniteStrictUpperBound
 
 /-!
 # The Perron–Frobenius real matrix of the Marshall-dressed axis-swapped Hamiltonian
@@ -57,6 +58,17 @@ theorem dressedAxisSwappedAnisotropicHeisenbergSReMatrix_isSymm_of_real
   have h := congrFun (congrFun hH σ) σ'
   rw [Matrix.conjTranspose_apply] at h
   rw [← h, Complex.star_def, Complex.conj_re]
+
+/-- **Strict diagonal bound exists.** Over the finite configuration type `Λ → Fin (N + 1)`, the
+diagonal of `dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N` is bounded strictly
+above.  The bound is produced at each fixed `(lam, D)`; it is the axis-swapped twin of
+`exists_strict_diag_bound_dressedHeisenbergSReMatrix`, and it is what supplies the shift `c` to
+`shiftedDressedAxisSwappedReMatrix_diag_pos` and the parity-block irreducibility engines. -/
+theorem exists_strict_diag_bound_dressedAxisSwappedAnisotropicHeisenbergSReMatrix
+    (A : Λ → Bool) (J : Λ → Λ → ℂ) (lam D : ℂ) (N : ℕ) :
+    ∃ c : ℝ, ∀ σ, dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c :=
+  LatticeSystem.Math.exists_gt_of_finite fun σ =>
+    dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ
 
 /-- The real-part matrix has non-positive off-diagonal entries (case (i), bipartite AFM). -/
 theorem dressedAxisSwappedAnisotropicHeisenbergSReMatrix_offdiag_nonpos

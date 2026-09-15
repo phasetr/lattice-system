@@ -4,51 +4,62 @@ import LatticeSystem.Quantum.SpinS.DressedAxisSwapIonParityBlockIrreducibleLambd
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBondParityBlockIrreducibleDNonneg
 
 /-!
-# Signature pins: connected-graph Theorem 2.4 case (i) + SU(2) endpoints (Red fixture)
+# Signature pins: connected-graph Theorem 2.4 case (i) + SU(2) endpoints
 
-Issue #5473 (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori), PR-2b of the connectivity/reachability
-arc. Pins the exact signatures of:
+Issue #5473 (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori). Pins the exact signatures of:
 
-1. the three **unconditional connected-graph irreducibility engines** that PR-2b adds (the
+1. the three **unconditional connected-graph irreducibility engines** (the
    connected-graph analogues of the unconditional complete-bipartite engines
    `shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible`,
    `..._isIrreducible_lambda_one_D_pos`, `..._isIrreducible_D_nonneg`). Engine 3 (the `D ≥ 0`
    boundary) additionally carries `hΛnt : Nontrivial Λ`, absent from engines 1/2: it routes
    through `bondParityReachableS_total_of_connected`
    (`LatticeSystem/Quantum/SpinS/ParityReachConnectedTotal.lean:158`), which requires
-   `Nontrivial V`. Without it, `Λ = Unit`, `N = 2`, `G = ⊥`, `J = 0`, `lam = D = 0`, `c = 1`,
-   `p = 0` satisfies every remaining hypothesis while the shifted matrix on the two-element
-   `p = 0` parity block is the identity matrix, which is not irreducible;
+   `Nontrivial V`. The reading recorded as the motivation for carrying it — `Λ = Unit`, `N = 2`,
+   `G = ⊥`, `J = 0`, `lam = D = 0`, `c = 1`, `p = 0` — is repeated in the engine-3 doc comment
+   below; no `example` here discharges the remaining hypotheses there, so it is motivation and
+   not something this file checks;
 2. the **two R3 (SU(2) corner) region-endpoint declarations** (target `finrank ≤ 1` and zero
-   axis-3 magnetization) that PR-2b adds, replacing the scaffolding-scalar hypotheses
-   `c_axis`/`hc_axis_strict`, `c_mlm`/`c_toy`/`hT23` and the complete-bipartite `hA_ne`/`hB_ne`
-   bookkeeping with `hGconn`/`hGbip`/`hJ_pos_G`/`hJ_off` at a general connected graph `G`. R1
+   axis-3 magnetization), which carry no scaffolding-scalar hypotheses
+   `c_axis`/`hc_axis_strict`, `c_mlm`/`c_toy`/`hT23` and no complete-bipartite `hA_ne`/`hB_ne`
+   bookkeeping, taking `hGconn`/`hGbip`/`hJ_pos_G`/`hJ_off` at a general connected graph `G`. R1
    (`-1 < λ < 1`, `D ≥ 0`) and R2 (`λ = 1`, `D > 0`) connected endpoints are **not** pinned here:
    see Part 2 below.
 
-The six existing case-(i)/SU(2) endpoint declarations
-(`anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general` and
-its five siblings) are **not** pinned for generalization here. Each carries both the *fixed-graph*
+The eight existing case-(i)/SU(2) endpoint declarations are **not** pinned for generalization
+here. Unit for that eight: general spin-`S` target endpoints binding both the *fixed-graph*
 positivity `hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re` and
-`hT23 : tasaki_2_5_theorem_2_3 A N J c_mlm`, and it is exactly that `hJpos` which discharges the
-sixth premise of `hT23`
+`hT23 : tasaki_2_5_theorem_2_3 A N J c_mlm` — namely
+`anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general`
+and its seven siblings across `AnisotropicHeisenbergSpinSMLMEndpoint.lean`,
+`AnisotropicHeisenbergSpinSDNonnegBoundary.lean`,
+`AnisotropicHeisenbergSpinSLambdaOneBoundary.lean` and
+`AnisotropicHeisenbergSpinSSU2Boundary.lean`. Adding the two region-dispatch wrappers of
+`AnisotropicHeisenbergSpinSTheorem24.lean` makes ten, and widening the unit past the general
+spin-`S` case-(i)/SU(2) endpoints (to the spin-`1/2` specializations and the case-(ii) targets)
+raises it further, so the unit has to travel with the number.
+
+It is exactly that `hJpos` which discharges the sixth premise of `hT23`
 (`LatticeSystem/Quantum/SpinS/Theorem23StructuralBipartiteToy.lean:47`), which is the very same
-fixed-graph positivity. A connected-graph `hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re` does not
-discharge it, so none of the six can be re-derived at a merely connected `G` along its own route.
+fixed-graph positivity. A connected-graph `hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re` is a
+different statement and does not discharge it, so that route does not transfer to a merely
+connected `G`. Whether the eight admit some other route there is not examined here.
 
-The obstruction is therefore one of proof route, not of truth. Substituting `hJ_pos_G` for `hJpos`
-*without* a connectedness hypothesis leaves `G` unconstrained and does make the SU(2) `finrank`
-statement false: `Λ = Fin 2`, `A = {0}`, `N = 1`, `G = ⊥`, `J ≡ 0` satisfies every hypothesis
-(`hT23` vacuously, its sixth premise failing on the `bipartiteCompleteGraphOf A` edge `{0, 1}`)
-while `H = 0` has a 4-dimensional ground eigenspace. But `(⊥ : SimpleGraph (Fin 2))` is *not*
-connected, so `hGconn` removes that witness, and under `hGconn` both SU(2) statements do hold: the
-support graph of `J` contains `G`, hence is connected, and carries the sign gauge, the edge
-positivity and the support condition, which is exactly the input of the Part 2 endpoints. The six
-existing declarations stay at `bipartiteCompleteGraphOf A` (fully complete bipartite, not merely
-connected); the connected-graph analogue for the SU(2) corner is the R3 pin in Part 2 above.
+What this file records is therefore an obstruction of proof route; it does not decide the truth
+of the eight statements at a merely connected `G`. Substituting `hJ_pos_G` for `hJpos` *without*
+a connectedness hypothesis would leave `G` unconstrained, and the reading recorded against that
+variant is `Λ = Fin 2`, `A = (· = 0)`, `N = 1`, `G = ⊥`, `J ≡ 0` (`hGbip` and `hJ_pos_G` hold
+vacuously at `G = ⊥`, which has no adjacent pair; `hJ_off`, whose hypothesis
+`¬ (⊥ : SimpleGraph (Fin 2)).Adj x y` holds of every pair, is not vacuous and holds because
+`J ≡ 0`; and `h_card_eq` reads `1 = 1`), where `H = 0` would have a 4-dimensional ground
+eigenspace. No `example` here discharges those hypotheses or computes that dimension. But
+`(⊥ : SimpleGraph (Fin 2))` is *not* connected, so `hGconn` excludes that reading, and under
+`hGconn` both SU(2) statements are proved — that is what the Part 2 pins below apply. The eight
+existing declarations stay at
+`bipartiteCompleteGraphOf A` (fully complete bipartite, not merely connected); the connected-graph
+analogue for the SU(2) corner is the R3 pin in Part 2 above.
 
-R4 (case (ii), `λ ≥ 1`, `D ≤ 0`) is explicitly out of scope for this PR (PR-2c); no pin for it is
-placed here.
+No pin for R4 (case (ii), `λ ≥ 1`, `D ≤ 0`) is placed here.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020,
 §2.5 Theorem 2.4, pp. 43–44.
@@ -61,7 +72,7 @@ open Matrix Module
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-/-! ## Part 1: the three unconditional connected irreducibility engines (new declarations) -/
+/-! ## Part 1: the three unconditional connected irreducibility engines -/
 
 /-- **Signature pin (engine 1/3, interior).** Connected-graph analogue of the unconditional
 complete-bipartite engine `shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible`
@@ -105,10 +116,11 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
 (`DressedAxisSwapBondParityBlockIrreducibleDNonneg.lean`), `hN : 1 ≤ N`, and (unlike engines 1/2)
 `hΛnt : Nontrivial Λ`: the bond-only totality layer this engine routes through
 (`bondParityReachableS_total_of_connected`, `ParityReachConnectedTotal.lean:158`) requires
-`Nontrivial V`, and this is not vacuous bookkeeping — at `Λ = Unit`, `N = 2`, `G = ⊥`, `J = 0`,
-`lam = D = 0`, `c = 1`, `p = 0` every hypothesis below other than `Nontrivial Λ` holds (`⊥` is
-connected on a one-point type), yet the shifted matrix on the two-element `p = 0` parity block is
-the identity matrix, which is not irreducible. -/
+`Nontrivial V`. The reading recorded as the motivation for carrying it is `Λ = Unit`, `N = 2`,
+`G = ⊥`, `J = 0`, `lam = D = 0`, `c = 1`, `p = 0`, where `⊥` is connected on a one-point type and
+the shifted matrix on the two-element `p = 0` parity block is expected to be the identity matrix.
+This pin records only that the engine binds `hΛnt`; nothing here discharges the other hypotheses
+at that reading or computes that matrix. -/
 example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
     (hΛnt : Nontrivial Λ) (hGconn : G.Connected) (hGbip : ∀ x y, G.Adj x y → A x ≠ A y)
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
@@ -124,18 +136,16 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
   shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_D_nonneg_of_connected
     A hΛnt hGconn hGbip hJim hJnn hJ_pos_G hJself hJbip hlam hlb hub hDim hDnn hc_strict hN p
 
-/-! ## Part 2: the two R3 connected region-endpoint declarations (new declarations)
+/-! ## Part 2: the two R3 connected region-endpoint declarations
 
-R1 (`-1 < λ < 1`, `D ≥ 0`) and R2 (`λ = 1`, `D > 0`) endpoints are **not** pinned in this PR: every
-existing route to `h_strict_gap` for case (i)
-(`AnisotropicHeisenbergSpinSDNonnegBoundary.lean:28`,
-`AnisotropicHeisenbergSpinSLambdaOneBoundary.lean:54`,
-`AnisotropicHeisenbergSpinSObligation2FromSU2UniqueCore.lean:85`) carries a binder
-`hc_strict : ∀ (lam D : ℂ) (σ), diag < c` — a single `c` bounding the diagonal for *every* `lam`
-and `D`, not just the target pair. That binder is unsatisfiable: at `Λ = Unit`, `N = 1`, `J = 0`
-the diagonal is exactly `D.re / 4` for every `σ`, so no single `c` bounds it strictly above as
-`D → ∞`. Fixing this binder is issue #5475's scope, out of scope here; R1/R2 connected endpoints
-follow in a later PR once that binder is repaired. -/
+R1 (`-1 < λ < 1`, `D ≥ 0`) and R2 (`λ = 1`, `D > 0`) endpoints are **not** pinned here. Their own
+route runs into the `hJpos` obstruction described above: the case-(i) spin-`S` routes reach
+`h_strict_gap` through `hT23`, whose sixth premise is the fixed-graph positivity `hJpos`. Their
+diagonal shift is not an obstruction — those routes
+take no axis-swapped diagonal-shift `c` hypothesis, obtaining one point-wise from
+`exists_strict_diag_bound_dressedAxisSwappedAnisotropicHeisenbergSReMatrix`. They do still bind
+the MLM/toy scalars `c_mlm` / `c_toy` and their strict bounds, as in
+`anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general`. -/
 
 /-- **Signature pin (R3 finrank, SU(2) corner `(λ,D) = (1,0)`).** Connected-graph analogue of
 `aHeisS_target_finrank_le_one_of_MLM_casLadder_t23_pf_lam1_D_zero_gen`
