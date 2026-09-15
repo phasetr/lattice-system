@@ -34,9 +34,9 @@ the deleted binder.
    (`anisotropicHeisenbergS_tasaki24_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_general`,
    `aHeisS_tasaki24_target_zeroMag_of_MLM_casLadder_t23_pf_gen`) are applied with every
    hypothesis supplied abstractly *except* `hc_axis_strict`, which is absent from both the
-   `example`'s own parameter list and the application. Such a term type-checks exactly when the
-   target signature has no such parameter; against a signature that still binds it positionally
-   the application is short one argument, a genuine type mismatch (not a parse/import failure).
+   `example`'s own parameter list and the application. At the baseline recorded below that binder
+   is the explicit parameter standing immediately before `hA_ne` on both capstones, so against
+   that signature the same application is one explicit argument short.
    This simultaneously serves as the **strength control**: the endpoint
    conclusion is derived supplying *no axis-swapped diagonal-shift* hypothesis
    (`c_axis` / `hc_axis_strict`) at all, which cannot be written against the old
@@ -50,8 +50,8 @@ the deleted binder.
    `example` of §3 discharges in Lean every *explicit* hypothesis that theorem places on
    `(A, J, N)`: the seven `J` conditions standing before the deleted binder (`hJim`, `hJnn`,
    `hJpos` on `bipartiteCompleteGraphOf A`, `hJself`, `hJbip`, `hJ_star`, `hJ_sym`) together with
-   `hA_ne`, `hB_ne`, `hN : 1 ≤ N` and `h_card_eq`. Its instance-implicit arguments are outside
-   that enumeration: they are discharged by type-class search, not supplied by this fixture.
+   `hA_ne`, `hB_ne`, `hN : 1 ≤ N` and `h_card_eq`. Its instance-implicit `Nonempty` arguments lie
+   outside that enumeration, which is of the explicit hypotheses only.
    `Λ = Unit` is *not* such an instance — `hA_ne` and `hB_ne` cannot both hold at a one-point
    type, and each of the 30 binder-carrying declarations counted at the baseline below binds
    both — so a witness there would show only that the binder is unsatisfiable in isolation, not
@@ -79,19 +79,20 @@ re-measure after the repair are recorded here as the exact commands used:
     LatticeSystem/Quantum/SpinS/AnisotropicHeisenbergSpinSTheorem24.lean | wc -l
   ```
 * **Point-wise `(hc_strict : ∀ σ : Λ → Fin …)` binder lines repo-wide must stay unchanged**
-  (measured **52**, positive control = the command itself finding 52 non-zero hits so a silent
-  `0` cannot pass unnoticed). This file's own module doc quotes the pattern twice (this bullet
-  and the command below), so re-running the grep verbatim over the whole tree double-counts
+  (measured **52** at that baseline and **52** at this PR's tip: a non-zero baseline, so a silent
+  `0` from a mis-written command is distinguishable from the invariant holding, and the two
+  measurements bracket the repair). This file's own module doc quotes the pattern twice (this
+  bullet and the command below), so re-running the grep verbatim over the whole tree double-counts
   this file's prose by 2 (54, not 52); the command below excludes this file by path to measure
   the invariant it documents rather than its own citation of it:
   ```
   git grep -c '(hc_strict : ∀ σ : Λ → Fin' -- '*.lean' \
     ':!LatticeSystem/Tests/AxisSwapDiagBoundSatisfiable.lean' | awk -F: '{s+=$2} END{print s}'
   ```
-  A drop below 52 after the repair means the deletion went one layer too deep into the
-  irreducibility engines (whose conclusions carry `c`, e.g.
-  `(shiftedDressedAxisSwappedReMatrixOnParityBlock A J lam D N c p).IsIrreducible`), which must
-  not be touched by this issue.
+  Those 52 lines sit in 26 files, only two of which are in this PR's 7-module scope; the rest
+  include the irreducibility engines whose conclusions carry `c` (e.g.
+  `(shiftedDressedAxisSwappedReMatrixOnParityBlock A J lam D N c p).IsIrreducible`), which this
+  issue does not touch. A drop below 52 therefore reaches point-wise binders it does not remove.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, §2.5 Theorem 2.4, p. 43.
@@ -105,8 +106,8 @@ open LatticeSystem.Quantum Module
 
 /-- **Identifier Red.** Pins the axis-swapped twin of
 `exists_strict_diag_bound_dressedHeisenbergSReMatrix` by applying it at a concrete small instance
-(so this is a positive-control-style application, not merely a signature): the term elaborates
-only where that declaration exists, and fails with `unknown identifier` where it does not. -/
+(a concrete application, not merely a restatement of the signature): the term elaborates only
+where that declaration exists, and fails with `unknown identifier` where it does not. -/
 example :
     ∃ c : ℝ, ∀ σ : Fin 2 → Fin (1 + 1),
       dressedAxisSwappedAnisotropicHeisenbergSReMatrix
@@ -223,9 +224,9 @@ private def negCtrlA : Fin 2 → Bool := fun x => x = 0
 places on `(A, J, N)`: the seven `J` conditions standing before the deleted binder, together
 with `hA_ne`, `hB_ne`, `hN` and the balanced-sublattice `h_card_eq`. Carrying `h_card_eq` in the
 conjunction is what makes the completeness of that enumeration machine-checked here rather than
-asserted in prose. The theorem's instance-implicit `Nonempty` arguments are outside the
-enumeration and are discharged by type-class search. The refutation below therefore concerns an
-instance the binder-carrying theorems accept, not one their own standing assumptions exclude. -/
+asserted in prose. The theorem's instance-implicit `Nonempty` arguments lie outside the
+enumeration, which is of the explicit hypotheses only. The refutation below therefore concerns an
+instance the binder-carrying theorems do not exclude by their own standing assumptions. -/
 example :
     (∀ x y, (bipartiteCoupling negCtrlA x y).im = 0) ∧
     (∀ x y, 0 ≤ (bipartiteCoupling negCtrlA x y).re) ∧
