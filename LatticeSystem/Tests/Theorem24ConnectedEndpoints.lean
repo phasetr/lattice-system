@@ -26,26 +26,35 @@ arc. Pins the exact signatures of:
    (`-1 < λ < 1`, `D ≥ 0`) and R2 (`λ = 1`, `D > 0`) connected endpoints are **not** pinned here:
    see Part 2 below.
 
-The six existing case-(i)/SU(2) endpoint declarations
-(`anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general` and
-its five siblings) are **not** pinned for generalization here. Each carries both the *fixed-graph*
+The eight existing case-(i)/SU(2) endpoint declarations are **not** pinned for generalization
+here. Unit for that eight: general spin-`S` target endpoints binding both the *fixed-graph*
 positivity `hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re` and
-`hT23 : tasaki_2_5_theorem_2_3 A N J c_mlm`, and it is exactly that `hJpos` which discharges the
-sixth premise of `hT23`
+`hT23 : tasaki_2_5_theorem_2_3 A N J c_mlm` — namely
+`anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general`
+and its seven siblings across `AnisotropicHeisenbergSpinSMLMEndpoint.lean`,
+`AnisotropicHeisenbergSpinSDNonnegBoundary.lean`,
+`AnisotropicHeisenbergSpinSLambdaOneBoundary.lean` and
+`AnisotropicHeisenbergSpinSSU2Boundary.lean`. Adding the two region-dispatch wrappers of
+`AnisotropicHeisenbergSpinSTheorem24.lean` makes ten, and widening the unit past the general
+spin-`S` case-(i)/SU(2) endpoints (to the spin-`1/2` specializations and the case-(ii) targets)
+raises it further, so the unit has to travel with the number.
+
+It is exactly that `hJpos` which discharges the sixth premise of `hT23`
 (`LatticeSystem/Quantum/SpinS/Theorem23StructuralBipartiteToy.lean:47`), which is the very same
 fixed-graph positivity. A connected-graph `hJ_pos_G : ∀ x y, G.Adj x y → 0 < (J x y).re` does not
-discharge it, so none of the six can be re-derived at a merely connected `G` along its own route.
+discharge it, so none of the eight can be re-derived at a merely connected `G` along its own route.
 
 The obstruction is therefore one of proof route, not of truth. Substituting `hJ_pos_G` for `hJpos`
 *without* a connectedness hypothesis leaves `G` unconstrained and does make the SU(2) `finrank`
-statement false: `Λ = Fin 2`, `A = {0}`, `N = 1`, `G = ⊥`, `J ≡ 0` satisfies every hypothesis
-(`hT23` vacuously, its sixth premise failing on the `bipartiteCompleteGraphOf A` edge `{0, 1}`)
-while `H = 0` has a 4-dimensional ground eigenspace. But `(⊥ : SimpleGraph (Fin 2))` is *not*
-connected, so `hGconn` removes that witness, and under `hGconn` both SU(2) statements do hold: the
-support graph of `J` contains `G`, hence is connected, and carries the sign gauge, the edge
-positivity and the support condition, which is exactly the input of the Part 2 endpoints. The six
-existing declarations stay at `bipartiteCompleteGraphOf A` (fully complete bipartite, not merely
-connected); the connected-graph analogue for the SU(2) corner is the R3 pin in Part 2 above.
+statement false: `Λ = Fin 2`, `A = (· = 0)`, `N = 1`, `G = ⊥`, `J ≡ 0` satisfies every hypothesis
+of that connectedness-free variant (`hGbip`, `hJ_pos_G` and `hJ_off` hold vacuously at `G = ⊥`,
+and `h_card_eq` reads `1 = 1`) while `H = 0` has a 4-dimensional ground eigenspace. But
+`(⊥ : SimpleGraph (Fin 2))` is *not* connected, so `hGconn` removes that witness, and under
+`hGconn` both SU(2) statements do hold: the support graph of `J` contains `G`, hence is connected,
+and carries the sign gauge, the edge positivity and the support condition, which is exactly the
+input of the Part 2 endpoints. The eight existing declarations stay at
+`bipartiteCompleteGraphOf A` (fully complete bipartite, not merely connected); the connected-graph
+analogue for the SU(2) corner is the R3 pin in Part 2 above.
 
 R4 (case (ii), `λ ≥ 1`, `D ≤ 0`) is explicitly out of scope for this PR (PR-2c); no pin for it is
 placed here.
@@ -129,9 +138,11 @@ example (A : Λ → Bool) (G : SimpleGraph Λ) {J : Λ → Λ → ℂ}
 R1 (`-1 < λ < 1`, `D ≥ 0`) and R2 (`λ = 1`, `D > 0`) endpoints are **not** pinned here. What blocks
 them at a merely connected `G` is the `hJpos` route obstruction described above: the case-(i)
 spin-`S` routes reach `h_strict_gap` through `hT23`, whose sixth premise only the fixed-graph
-positivity `hJpos` discharges. Their diagonal shift is no longer an obstruction — those routes take
-no `c` hypothesis at all, obtaining one point-wise from
-`exists_strict_diag_bound_dressedAxisSwappedAnisotropicHeisenbergSReMatrix`. -/
+positivity `hJpos` discharges. Their diagonal shift is no longer an obstruction — those routes
+take no axis-swapped diagonal-shift `c` hypothesis, obtaining one point-wise from
+`exists_strict_diag_bound_dressedAxisSwappedAnisotropicHeisenbergSReMatrix`. They do still bind
+the MLM/toy scalars `c_mlm` / `c_toy` and their strict bounds, as in
+`anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general`. -/
 
 /-- **Signature pin (R3 finrank, SU(2) corner `(λ,D) = (1,0)`).** Connected-graph analogue of
 `aHeisS_target_finrank_le_one_of_MLM_casLadder_t23_pf_lam1_D_zero_gen`

@@ -10,10 +10,14 @@ Repository-internal regression guard, **not** a Tasaki result on its own. This f
 acceptance criteria of Issue #5475's first PR (spin-`S` tower, 7 modules): the `∀ (lam D : ℂ)
 (σ : Λ → Fin (N + 1)), … < c` shaped hypothesis binders (`hc_axis_strict` / `hc_strict`) are
 **not** replaced by a function-valued or path-restricted variant — they are **deleted**, with
-`c` obtained internally at each of the (measured) 10 point-wise consumption sites from a new
-one-line existence lemma, the axis-swapped twin of
+`c` obtained internally at each of the 6 point-wise consumption sites from a new one-line
+existence lemma, the axis-swapped twin of
 `exists_strict_diag_bound_dressedHeisenbergSReMatrix`
 (`LatticeSystem/Quantum/SpinS/FerrimagneticLROUniversal.lean:61`).
+
+Unit for that 6: proof-body applications of the supplier identifier. Its repo-wide grep hits
+number 10 — those 6, plus its own declaration, plus 3 prose citations — so the raw hit count is
+not the count of consumption sites and must not be quoted as one.
 
 Before the repair this file is Red in three independent ways:
 
@@ -28,14 +32,27 @@ Before the repair this file is Red in three independent ways:
    After the repair the same term (with the binder dropped from both the `example`'s own
    parameter list and the application) type-checks, because the target signature no longer
    has that parameter. This simultaneously serves as the **strength control**: the endpoint
-   conclusion is derived supplying *no* `c`-hypothesis at all, which cannot be written against
-   the old (binder-carrying) signature.
+   conclusion is derived supplying *no axis-swapped diagonal-shift* hypothesis
+   (`c_axis` / `hc_axis_strict`) at all, which cannot be written against the old
+   (binder-carrying) signature. It is not a claim that no `c`-hypothesis of any kind is
+   supplied: the MLM/toy scalars `c_mlm`, `c_toy` and their bounds `hc_heis_strict`,
+   `hc_toy_strict` are still bound here and on the target signature.
 3. **Negative control** (§3): the old `∀ (lam D : ℂ) (σ : …), … < c` form is unsatisfiable at
-   the minimal instance `Λ = Unit`, `N = 1`, `J = 0`: the diagonal there is exactly `D.re / 4`
-   for every `(lam, D, σ)` (the bond term vanishes since `J = 0`; the single-ion term reduces
-   to `spinHalfOp2 * spinHalfOp2 = (1/4 : ℂ) • 1` at `N = 1`), so `D := ((4 * c + 1 : ℝ) : ℂ)`
-   refutes any fixed `c`. This is real proof work (not a decorative `sorry`) because it is the
-   fact that #5475 is diagnosing: no fixed `c` can witness the old binder.
+   an instance the binder-carrying theorems actually admit. Take
+   `anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general`
+   and the witness `Λ = Fin 2`, `A = (· = 0)`, `J = bipartiteCoupling A`, `N = 1`. The first
+   `example` of §3 discharges in Lean every hypothesis that theorem places on `(A, J, N)`: the
+   seven `J` conditions standing before the deleted binder (`hJim`, `hJnn`, `hJpos` on
+   `bipartiteCompleteGraphOf A`, `hJself`, `hJbip`, `hJ_star`, `hJ_sym`) together with `hA_ne`,
+   `hB_ne` and `hN : 1 ≤ N`. `Λ = Unit` is *not* such an instance — `hA_ne` and `hB_ne` cannot
+   both hold at a one-point type, and all 30 binder-carrying declarations in this PR's scope
+   bind both — so a witness there would show only that the binder is unsatisfiable in
+   isolation, not that the theorems carrying it are vacuous, which is the claim at issue.
+   On the admissible witness the diagonal splits as (bond part) `+ D.re / 2`: at `N = 1` the
+   single-ion term contributes `D * |Λ| / 4 = D / 2` on every configuration, independently of
+   `lam` and of `σ`. The binder places `c` *before* `lam` and `D`, so one `c` would have to
+   dominate every `D`; `D := ((2 * (c - bond) + 2 : ℝ) : ℂ)` refutes any fixed `c`. This is
+   real proof work (not a decorative `sorry`) because it is the fact that #5475 is diagnosing.
 
 ## Differential-gate baseline (measured at `main = febc306e9d195e5f7724b8a99950764ebb1be8ff`)
 
@@ -99,7 +116,8 @@ from both this `example`'s binder list and the application. Today the applicatio
 a positional argument (`hA_ne` lands where `hc_axis_strict` is expected), a genuine type
 mismatch — not a parse or import failure. After the binder is deleted from the target theorem,
 this term type-checks unchanged, which also certifies the **strength control**: the conclusion
-is reached with no `c`-hypothesis of any kind. -/
+is reached with no axis-swapped diagonal-shift `c` hypothesis (`c_axis` / `hc_axis_strict`).
+The MLM/toy scalars `c_mlm`, `c_toy` and their strict bounds remain bound below. -/
 example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
@@ -184,46 +202,80 @@ example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
     hc_heis_strict hc_toy_strict h_card_eq M_balanced h_balanced h_centered_nonzero h_region
     hΦ_ne hΦ_gs
 
-/-! ## §3 Negative control: the old binder is unsatisfiable at a minimal instance -/
+/-! ## §3 Negative control: the old binder is unsatisfiable at an instance the theorems admit -/
 
-/-- The Marshall-dressed axis-swapped diagonal at `Λ = Unit`, `N = 1`, `J = 0` is exactly
-`D.re / 4`, for every `lam` and every configuration `σ` (the sole site's own coupling `J () ()`
-is `0`, so the bond term vanishes; the single-ion term reduces to `spinHalfOp2 * spinHalfOp2
-= (1/4 : ℂ) • 1` via the `N = 1` specialization). -/
-theorem dressedAxisSwappedDiag_unit_zero_coupling
-    (A : Unit → Bool) (lam D : ℂ) (σ : Unit → Fin (1 + 1)) :
-    dressedAxisSwappedAnisotropicHeisenbergSReMatrix A (fun _ _ => (0 : ℂ)) lam D 1 σ σ
-      = D.re / 4 := by
+/-- The negative-control bipartition on `Fin 2`: site `0` on sublattice `A`, site `1` on `B`. -/
+private def negCtrlA : Fin 2 → Bool := fun x => x = 0
+
+/-- **Admissibility of the negative-control witness.** `Λ = Fin 2`, `A = negCtrlA`,
+`J = bipartiteCoupling A`, `N = 1` discharges every hypothesis that
+`anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf_D_nonneg_general`
+places on `(A, J, N)`: the seven `J` conditions standing before the deleted binder, together
+with `hA_ne`, `hB_ne` and `hN`. The refutation below therefore concerns an instance the
+binder-carrying theorems accept, not one their own standing assumptions exclude. -/
+example :
+    (∀ x y, (bipartiteCoupling negCtrlA x y).im = 0) ∧
+    (∀ x y, 0 ≤ (bipartiteCoupling negCtrlA x y).re) ∧
+    (∀ x y, (bipartiteCompleteGraphOf negCtrlA).Adj x y →
+      0 < (bipartiteCoupling negCtrlA x y).re) ∧
+    (∀ x, bipartiteCoupling negCtrlA x x = 0) ∧
+    (∀ x y, bipartiteCoupling negCtrlA x y ≠ 0 → negCtrlA x ≠ negCtrlA y) ∧
+    (∀ x y, star (bipartiteCoupling negCtrlA x y) = bipartiteCoupling negCtrlA x y) ∧
+    (∀ x y, bipartiteCoupling negCtrlA x y = bipartiteCoupling negCtrlA y x) ∧
+    (∃ a, negCtrlA a = true) ∧ (∃ b, negCtrlA b = false) ∧ (1 : ℕ) ≤ 1 := by
+  refine ⟨fun x y => bipartiteCoupling_im _ x y, fun x y => bipartiteCoupling_nonneg _ x y,
+    fun _ _ hadj =>
+      bipartiteCoupling_pos_of_diff_sublattice _ (bipartiteCompleteGraphOf_adj_sublattice_ne hadj),
+    fun _ => bipartiteCoupling_eq_zero_of_same_sublattice _ rfl, ?_, ?_,
+    fun x y => bipartiteCoupling_symm _ x y, ⟨0, by decide⟩, ⟨1, by decide⟩, le_refl 1⟩
+  · intro _ _ hne hAeq
+    exact hne (bipartiteCoupling_eq_zero_of_same_sublattice _ hAeq)
+  · intro x y
+    unfold bipartiteCoupling
+    split_ifs <;> simp
+
+/-- At `Λ = Fin 2`, `N = 1` the Marshall-dressed axis-swapped diagonal splits as the bond part
+plus `D.re / 2`: the single-ion term reduces to `spinHalfOp2 * spinHalfOp2 = (1/4 : ℂ) • 1` at
+each of the two sites, so it contributes `D / 2` on every configuration, independently of `lam`
+and of `σ`. The bond part never mentions `D`. -/
+theorem dressedAxisSwappedDiag_fin2_spinHalf_bond_add_D
+    (A : Fin 2 → Bool) (J : Fin 2 → Fin 2 → ℂ) (lam D : ℂ) (σ : Fin 2 → Fin (1 + 1)) :
+    dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D 1 σ σ
+      = ((∑ x : Fin 2, ∑ y : Fin 2, J x y • spinSDotXXZSwap x y lam 1) σ σ).re + D.re / 2 := by
   rw [dressedAxisSwappedAnisotropicHeisenbergSReMatrix_apply,
-    dressedAxisSwappedAnisotropicHeisenbergS_diag, axisSwappedAnisotropicHeisenbergS_def]
-  have hbond :
-      (∑ x : Unit, ∑ y : Unit,
-          (0 : ℂ) • spinSDotXXZSwap x y lam 1) σ σ = 0 := by
-    simp
-  have honeIon :
-      singleIonAnisotropyS2 (Λ := Unit) D 1 σ σ = D / 4 := by
+    dressedAxisSwappedAnisotropicHeisenbergS_diag, axisSwappedAnisotropicHeisenbergS_def,
+    Matrix.add_apply]
+  have hself : ∀ x : Fin 2,
+      (onSiteS x (spinSOp2 1) * onSiteS x (spinSOp2 1) : ManyBodyOpS (Fin 2) 1)
+        = (1 / 4 : ℂ) • 1 := by
+    intro x
+    rw [onSiteS_mul_onSiteS_same, spinSOp2_one_eq_spinHalfOp2, spinHalfOp2_mul_self,
+      onSiteS_smul, onSiteS_one]
+  have honeIon : singleIonAnisotropyS2 (Λ := Fin 2) D 1 σ σ = D / 2 := by
     unfold singleIonAnisotropyS2
-    rw [Finset.univ_unique, Finset.sum_singleton]
-    have hself : onSiteS () (spinSOp2 1) * onSiteS () (spinSOp2 1)
-        = onSiteS (Λ := Unit) () ((1 / 4 : ℂ) • (1 : Matrix (Fin (1 + 1)) (Fin (1 + 1)) ℂ)) := by
-      rw [onSiteS_mul_onSiteS_same, spinSOp2_one_eq_spinHalfOp2, spinHalfOp2_mul_self]
-    rw [hself, onSiteS_smul, onSiteS_one]
-    simp [Matrix.smul_apply, Matrix.one_apply_eq]
+    rw [Finset.sum_congr rfl (fun x _ => hself x), Matrix.smul_apply, Matrix.sum_apply]
+    simp
     ring
-  rw [Matrix.add_apply, hbond, honeIon]
-  simp
+  rw [honeIon, Complex.add_re]
+  have hD2 : (D / 2 : ℂ).re = D.re / 2 := by simp
+  rw [hD2]
 
-/-- **Negative control.** No fixed `c` bounds the diagonal for every `(lam, D)`: choosing
-`D := 4 * c + 1` (real, embedded in `ℂ`) forces the diagonal to `c + 1/4 > c`, refuting the old
-`hc_axis_strict`/`hc_strict` binder at the minimal instance `Λ = Unit`, `N = 1`, `J = 0`. -/
-example (A : Unit → Bool) (c : ℝ) :
-    ¬ ∀ (lam D : ℂ) (σ : Unit → Fin (1 + 1)),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A (fun _ _ => (0 : ℂ)) lam D 1 σ σ < c := by
+/-- **Negative control.** At the admissible witness above no fixed `c` bounds the diagonal for
+every `(lam, D)`. The binder quantifies `c` *before* `lam` and `D`, so a single `c` would have
+to dominate the `D.re / 2` single-ion contribution for every `D`; taking `lam := 0` and
+`D := ((2 * (c - bond) + 2 : ℝ) : ℂ)` at the all-`0` configuration pushes the diagonal to
+`c + 1 > c`. So the deleted `hc_axis_strict` / `hc_strict` binder is unsatisfiable on an
+instance that satisfies the standing assumptions of the theorems that used to carry it. -/
+example (c : ℝ) :
+    ¬ ∀ (lam D : ℂ) (σ : Fin 2 → Fin (1 + 1)),
+      dressedAxisSwappedAnisotropicHeisenbergSReMatrix negCtrlA (bipartiteCoupling negCtrlA)
+        lam D 1 σ σ < c := by
   intro h
-  have hval := h 0 (((4 * c + 1 : ℝ) : ℂ)) (fun _ => 0)
-  rw [dressedAxisSwappedDiag_unit_zero_coupling] at hval
-  have : ((((4 * c + 1 : ℝ) : ℂ)).re) = 4 * c + 1 := Complex.ofReal_re _
-  rw [this] at hval
+  set b : ℝ := ((∑ x : Fin 2, ∑ y : Fin 2,
+      bipartiteCoupling negCtrlA x y • spinSDotXXZSwap x y (0 : ℂ) 1)
+        (fun _ => 0) (fun _ => 0)).re with hb
+  have hval := h 0 (((2 * (c - b) + 2 : ℝ) : ℂ)) (fun _ => 0)
+  rw [dressedAxisSwappedDiag_fin2_spinHalf_bond_add_D, Complex.ofReal_re, ← hb] at hval
   linarith
 
 end LatticeSystem.Tests.AxisSwapDiagBoundSatisfiable
