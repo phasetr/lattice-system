@@ -1,0 +1,3 @@
+claim_id	source_id	order_key	page_id	locator	disposition	subkind	normalized_content	content_oid	exclusion_rationale	exclusion_review_ref	tombstone	superseded_by	tombstone_rationale	tombstone_review_ref
+CL-TASAKI2020-0001	TASAKI2020	000001.0001	PG-TASAKI2020-0001	page 1 claim 1	assertion	theorem	Fixture claim 1.	1111111111111111111111111111111111111111	NONE	NONE	true	CL-TASAKI2020-0002	replaced-by-corrected-statement	review-1
+CL-TASAKI2020-0002	TASAKI2020	000001.0002	PG-TASAKI2020-0001	page 1 claim 2	assertion	theorem	Fixture claim 2.	2222222222222222222222222222222222222222	NONE	NONE	false	NONE	NONE	NONE

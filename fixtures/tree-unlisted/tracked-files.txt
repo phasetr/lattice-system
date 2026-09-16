@@ -1,0 +1,1 @@
+fixtures/tree-ghost/tracked-files.txt

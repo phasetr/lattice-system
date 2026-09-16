@@ -1,0 +1,2 @@
+axiom_id	declaration	module	category	source_locator	rationale	reopen_condition
+AX-PROJECT-0001	LatticeSystem.Axioms.State.interfaceAxiom	LatticeSystem.Axioms.State	abstract_cstar	not applicable	fixture rationale	reopen when implemented
