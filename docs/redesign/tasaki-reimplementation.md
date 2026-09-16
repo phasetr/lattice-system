@@ -554,9 +554,12 @@ consumer が同一の数学的対象を受け取るために使う。constructor
 4. axiom の許可 taxonomy は、`OperatorAlgebra/{CStar,State,GNS,KMS}`、
    `FunctionalAnalysis/WeakDual`、`Symmetry/Wigner` に閉じる。`Misc`、`Temporary`、`TODO`、
    chapter 名を category にしてはならない。Wigner も有限次元で証明可能な形は証明する。
-5. 摂動論で defer してよいのは、cluster expansion、quasi-adiabatic continuation、
-   Lieb--Robinson bound、Rellich--Kato 型の分岐連続性の一般論など、真に作用素環的・
-   解析的極限を要するものに限る。
+5. cluster expansion、quasi-adiabatic continuation、Lieb--Robinson bound、一般の
+   Rellich--Kato 型分岐連続性など、真に作用素環的・解析的極限を要する対象であっても、
+   現在の許可 taxonomy のどれかへ無理に分類してはならない。将来それらが current frontier
+   で必要になった時は、独立 design PR で数学的境界、専用 category/path、許可する declaration
+   範囲、reopen condition、CI rule を review し、closed taxonomy への追加が承認されるまで
+   axiom 化できない。現在許可される taxonomy は第4項の列挙だけである。
 6. **無限体積、難しさ、実装量、有限次元であることは axiom category でも defer 理由でもない。**
    無限グラフ、volume exhaustion、極限の存在・性質は長期中心目標として証明する。
    その途中で上記の許可 taxonomy に該当する個別 component だけを、宣言単位で
@@ -700,18 +703,23 @@ base branch と PR head の machine-readable diff で、次を default reject �
 - source item の削除、stable ID の再利用、tombstone の復活。
 - `proved` / `proved-relative` / `typed` からの無承認 downgrade、proof declaration の消失。
 - locator、disposition、statement digest の silent change。
-- hypothesis/結論の弱化。source 誤読訂正は dedicated statement-change PR で旧 item を
-  tombstone/supersession し、訂正根拠を独立 review する。
+- semantic weakening、すなわち仮定の強化、結論の弱化、量化域の縮小、または同等の適用範囲・
+  内容の後退。source 誤読訂正であっても旧 item を tombstone/supersession し、訂正根拠を
+  dedicated statement-change PR で独立 review するまでは reject する。
 - statement change と proof change の同居。
 - expected project axiom set の拡大、`proved` から `proved-relative` への silent change。
 - frontier より後の item の状態遷移、source-order の変更。
 - active binding の declaration 不在、未登録 public result、build 対象外 module。
 
-statement digest を変える場合は dedicated statement-change PR とし、既存 proof result を一度
-外して `typed` に戻し、source equivalence の独立 review を受ける。semantic foundation の
-definition を変える場合は dedicated breaking-foundation PR とし、Lean constant dependency
-graph による transitive impact closure、影響する全 statement/result、semantic tests、full build
-を提示する。proof PR と混ぜない。
+base diff は statement digest の一致/不一致を機械判定し、不一致なら変更方向にかかわらず
+通常 PR を止め、dedicated statement-change PR、既存 proof result の一時除去、`typed` への
+戻し、独立 source-equivalence review を要求する。その review で仮定の強化・結論の弱化・
+量化域縮小等を semantic regression と分類し default reject する。仮定の弱化、結論の強化、
+量化域拡大等も digest change であり同じ専用 PR と review を必須とするが、それだけを理由に
+semantic regression とは分類しない。semantic foundation の definition を変える場合は
+dedicated breaking-foundation PR とし、Lean constant dependency graph による transitive impact
+closure、影響する全 statement/result、semantic tests、full build を提示する。proof PR と
+混ぜない。
 
 `rewrite-main` は protected branch とし、direct push と force push を禁止する。build、census、
 layer、environment axiom、monotonicity check を required にし、statement PR は独立 statement
@@ -985,7 +993,7 @@ Hubbard の完成 proof を先に救出しない。
 5. **logical axiom baseline**: proved capstone の project-specific axiom は既定で空集合。
    Lean/mathlib の logical axioms `propext`、`Classical.choice`、`Quot.sound` は許容 universe
    とし、各 capstone record には実際に使う subset を完全一致で記録する。それ以外は
-   explicit deferred record がなければ reject する。
+   current closed taxonomy 内の explicit approved-deferred record がなければ reject する。
 6. **file / compile budget**: 700 行を responsibility review trigger、900 行を強い split
    signal とするが、数値だけで機械分割しない。compile/import budget は最初の Chapter 2
    実測を baseline とし、各 PR で delta を記録する。
@@ -1014,11 +1022,14 @@ Hubbard の完成 proof を先に救出しない。
     append-only+tombstone/supersession とする。
 15. **axiom isolation**: `LatticeSystem/Axioms/**` は空から始め、閉じた taxonomy、path/namespace、
     directional import、exact registry/environment gate を強制する。`proved` は project axiom
-    zero、依存 result は `proved-relative`、axiom は `approved-deferred`。
+    zero、依存 result は `proved-relative`、axiom は `approved-deferred`。列挙外の解析的対象は
+    独立 design PR で新 category/path が承認されるまで axiom 化しない。
 16. **anti-regression / protection**: source deletion、downgrade、statement/locator drift、axiom
-    expansion、proof disappearance、frontier violation を base-diff で reject する。foundation
-    change は impact closure 付き dedicated PR。`rewrite-main` は direct/force push 禁止、
-    independent statement/verification review 必須とする。
+    expansion、proof disappearance、frontier violation と、仮定強化・結論弱化・量化域縮小
+    等の semantic regression を base-diff gate で reject する。全 digest change は変更方向に
+    かかわらず dedicated statement PR と独立 review を要求する。foundation change は impact
+    closure 付き dedicated PR。`rewrite-main` は direct/force push 禁止、independent
+    statement/verification review 必須とする。
 
 ## Documentation sync conclusion for this PR
 
