@@ -21,7 +21,9 @@
 2. 設計承認後の atomic bootstrap PR で、旧 `LatticeSystem/**`、tests、root aggregator、
    `formalization-status/**`、旧 scripts/checkers/workflows、legacy anchor 由来の `tex/**`、旧
    docs/site/history/catalogue を全面削除する。既存 code は一切 carry-forward、import、cherry-pick しない。
-   path を再利用する場合も内容は scratch rewrite とする。
+   path を再利用する場合も内容は scratch rewrite とする。byte-preserve する実装系 file は
+   `lean-toolchain` と `lake-manifest.json` だけとし、`AGENTS.md`、`CLAUDE.local.md`、`LICENSE`、
+   git metadata 等の project governance/legal metadata は保持して新系列の phase override へ改訂する。
 3. 新系列は、無限頂点型上の graph と有限 volume を分離し、有限 volume の
    configuration/operator を一つだけ定義する。
 4. 有限次元 operator の canonical representation は `Matrix` とする。
@@ -53,23 +55,31 @@
     source claim ID と implementation slice ID を別 namespace にし、番号付き数式、番号のない
     proof obligation、独立結論のそれぞれに個別の binding、content digest、status、phase
     eligibility を持たせる。slice はそれらの ID の順序付き集約であり、それ自身を一個の
-    `ItemStatement` や status 正本にしない。`...Statement : Prop → proof` lifecycle は assertion
+    `ItemStatement` や status 正本にしない。exact theorem skeleton→proof lifecycle は assertion
     disposition だけに適用する。definition/notation は declaration と必要 law、hypothesis/domain
     は consumer の binder/metadata、conjecture/out-of-scope は非 proof terminal として別 lifecycle
-    を持つ。derived assertion は parent terminal 後の `consequence` と current proof frontier に
-    必要な `prerequisite` を排他分類する。production/repository に `sorry` theorem stub または
-    temporary axiom を置かない。
+    を持つ。derived assertion は parent terminal と source-order passage 後の `consequence` と current proof frontier に
+    必要な `prerequisite` を排他分類する。全 assertion は skeleton phase に exact theorem
+    statement `:= by sorry` として一度だけ型検査する。未解決 assertion registry entry、theorem
+    declaration/module、その declaration value にある direct `sorryAx` occurrence を一対一にする。
+    stub module は production root/import graph から隔離する。proof phase では theorem name、exact
+    type、statement digest、module path を固定し、proof body を置換する。import 追加は既 proved かつ
+    transitive `sorryAx`-free の先行/prerequisite module だけに限る。未登録 `sorry`、`admit`、
+    `native_decide`、temporary axiom は禁止する。
 15. project axiom は空の `LatticeSystem/Axioms/**` から始め、専用 path/namespace、閉じた分類、
     exact environment check の下でのみ追加できる。project axiom が空の result だけを
     `proved`、依存する result を `proved-relative`、axiom 自身を `approved-deferred` とする。
-16. Tasaki §2.1 の `S=1/2,1,...` は source assertion のまま保持し、`N : ℕ` kernel の `N=0` は
+16. Tasaki §2.1 の `S=1/2,1,...` は source `domain` claim のまま保持し、`N : ℕ` kernel の `N=0` は
     別 `consequence` derived assertion とする。basis は `m(k)=N/2-k`、matrix は
     row=output/column=input とする。
-17. legacy status/docs/TeX の複製は捨てるが、新系列の公開数学 docs/TeX は禁止しない。書誌・
-    claim registry・Lean environment を正本とし、docs/TeX は claim ID と locator を参照して
-    数学変更 PR と同時同期する。
+17. legacy status/docs/TeX は全面削除し、reset 後の `docs/` / `tex/` は存在させない。必要最小の
+    人間向け文書は root `DESIGN.md` / `README.md`、machine-readable data は `blueprint/` /
+    `references/` に限定する。新しい docs/TeX はユーザーの将来の明示承認なしに作らない。
 18. warning-as-error/standard linter とは別に、private を含む全 project declaration の doc
     comment を `docBlame` / `docBlameThm` / `#lint` 相当で CI gate する。
+19. 工程は **全巻 two-pass census/hash lock → source vocabulary/type layer の scratch 実装 →
+    全巻 typed assertion skeleton の build/freeze → front-to-back proof discharge** の四段階に固定する。
+    skeleton freeze acceptance 前に proof PR を開始しない。
 
 この文書の承認は設計の承認であり、旧 source の数学的正当性や移植可否を一括承認する
 ものではない。
@@ -83,10 +93,12 @@
 - underlying combinatorial datum を graph とし、頂点型自体には有限性を組み込まない。
 - 同じ有限 volume kernel を spin、fermion、将来の局所 observable に再利用できる
   ようにする。
-- theorem/proof、source locator、actual axiom set、status の関係を一意にする。
+- theorem/proof、source locator、prospective approved project-axiom set、proof 後の actual axiom set、
+  status の関係を一意にする。
 - 全巻 atomic source claim を実装前に列挙し、未実装が不可視になる余地をなくす。
 - 小さい import surface と一方向の dependency DAG を保つ。
-- `lake build` warning zero、`sorry` / `admit` / `native_decide` 不在を継続する。
+- production build は warning zero、`sorryAx` / `admit` / `native_decide` 不在を継続する。
+  skeleton build では registry-bound stub の `sorry` warning だけを局所許容し、他 warning は error とする。
 - 強い仮定を置く theorem について、仮定の同時充足可能性と結論の非空虚性を確認する。
 - 無限体積極限を長期目標として保持しつつ、Chapter 2 より先に C\*-algebra framework を
   作り込まない。
@@ -98,9 +110,10 @@
 - 旧 source を新しい directory へ機械的に移動すること。
 - 旧 catalogue の全行を新 status ledger へ機械的に移すこと。
 - 旧 proof-stage module を順番に「きれいにする」漸進 refactor。
-- `sorry` theorem や temporary axiom を backlog 表現として使うこと。
-- legacy status を複製した TeX proof guide や、Lean/blueprint と独立に進捗を手編集すること。
-  新系列の人間向け公開数学 docs/TeX は non-goal ではなく、数学内容を公開する PR で同期する。
+- 未登録 `sorry`、production-importable な sorry-backed theorem、temporary axiom を backlog 表現に
+  使うこと。全巻 skeleton の登録済み・隔離済み stub はこの禁止の対象外である。
+- legacy status を複製した TeX proof guide、またはユーザーの将来の明示承認なしに新しい
+  `docs/` / `tex/` を作ること。
 - Tasaki 本で現在必要のない Lieb、Miyao、別文献の独立形式化。
 - 二つ目の具体的利用がない一般化や、将来便利そうという理由だけの helper。
 - Chapter 2 の bootstrap 時点で quasi-local algebra、KMS、GNS、thermodynamic limit を
@@ -294,9 +307,9 @@ catalogue、`tex/proof-guide.tex`、一部の structured records に反復され
 | status validator | actual axiom set と declaration module を Lean 環境から検査する発想 | 旧 script は削除し、environment-based checker を最小から作り直す |
 | Tasaki の書誌・locator | 1st ed., Springer 2020 の chapter/section/equation/page | tracked citation metadata に保持し、gitignored file を build/review の前提にしない |
 
-低層資産は file 単位で採用しない。採用単位は「定義の数学的内容」「証明アイデア」または
-「検証方法」であり、新系列の source は原則として書き直す。旧 code を直接 import せず、
-commit や file を cherry-pick しない。各 implementation-slice PR は adopt gate の各項目について
+低層資産は file 単位で採用しない。採用単位は「失敗から得た設計判断」「再照合すべき数学的
+アイデア」または「検証方法」であり、実装入力は Tasaki 原典と mathlib に限る。旧 code を
+copy/import/API dependency にせず、commit や file を cherry-pick しない。各 implementation-slice PR は adopt gate の各項目について
 `adopt / rewrite / drop` と根拠を PR 内の legacy assessment に記録する。
 
 ### Rewrite: 数学的目的を保ち、表現を変更
@@ -322,9 +335,10 @@ commit や file を cherry-pick しない。各 implementation-slice PR は adop
 - theorem の statement を再掲するだけの test。
 - grep 数、line number、一時 signature を仕様化する test。
 - legacy catalogue の手移植と旧 roadmap の PR chronicle。
-- `docs/` の旧 site/history/catalogue/limitations/roadmap と、手編集 status を複製する site generator。
-- legacy `tex/` の status/proof-guide 複製と旧 TeX workflow/reference。新系列で source claim を
-  解説する公開数学 docs/TeX とその同期・生成 workflow まで禁止するものではない。
+- `docs/**` の全内容と、site/history/catalogue/limitations/roadmap、手編集 status を複製する
+  site generator。reset 後は `docs/` 自体を置かない。
+- `tex/**` の全内容と TeX workflow/reference。reset 後は `tex/` 自体を置かず、新しい TeX も
+  ユーザーが将来明示的に承認するまで作らない。
 - `formalization-status/` と旧 status/schema/retirement/cutover machinery。
 - 旧 scripts/checkers および release/pages/update workflow。
 - 参照ゼロの decorative helper と、将来便利そうという理由だけの一般化。
@@ -391,12 +405,13 @@ LatticeSystem/
       Ferromagnet.lean
       Antiferromagnet.lean
   Tasaki2020/
-    Chapter02/
-      Section01.lean
-      Section02.lean
-      Theorem21.lean
-      Theorem22.lean
+    Vocabulary/                  # R3 の source vocabulary/type layer
       ...
+    Claims/
+      Chapter02/
+        C02S01SelfAdjointComponents.lean  # atomic assertion 一件/細粒度 module
+        C02S01Equation2_1_1.lean
+        ...
   Tests/
     Quantum/
     Tasaki2020/
@@ -407,48 +422,52 @@ blueprint/
     bindings/
 references/
   tasaki-2020.json            # 書誌・edition・source hash metadata のみ
-docs/
-  math/                       # 新系列の人間向け公開数学解説（必要になった時に追加）
-tex/
-  tasaki-2020/                # 公開数学文書の TeX source（必要になった時に追加）
 ```
 
-`LatticeSystem.lean` は stable public surface だけを import する。全 leaf/tip coverage は
-build target が担い、root file の責務にしない。atomic claim の追加ごとに file を作る必要は
-なく、同じ数学的責務で 700 行未満を目安に育てる。分割は責務が二つになった時に行う。
+`LatticeSystem.lean` は production-eligible な stable public surface だけを import する。R4 skeleton
+target は manifest 上の全 claim module、production target は `sorryAx`-free の proved module だけを
+import する。proof body 置換後は theorem name、module path、exact type、statement digest を保った
+module を manifest 上で skeleton から proved に昇格させる。R4 stub は statement typing に必要な
+shared vocabulary だけを import し、prospective axiom dependency を作るための unused `Axioms`
+import や人工参照を置かない。R5 の proof PR が新たに追加できる ordinary claim-module import は、
+既 proved かつ transitive `sorryAx`-free の source-order 上の先行 module、
+または current frontier に承認済み `required_by` を持つ proved prerequisite module だけを import に
+追加できる。これとは別に、**current prospective approved set**、すなわち R4 で freeze 済み、
+または freeze 後の専用 axiom-policy/statement-dependency PR で source/rationale/user approval/
+independent review/digest update 済みの集合に列挙された exact `Axioms` module は R5 で追加できる。
+future/unproved/sorry-backed ordinary module と未登録
+`Axioms` module は import できない。atomic assertion stub は相互に証拠依存しない細粒度 module
+一件ずつとする。
 本の本文、PDF、抽出 text、statement の大量引用は tracked しない。tracked に置くのは書誌、
 locator、hash、formalization に必要な数学的 restatement だけである。
 
-### Single source of truth and public mathematical documents
+### Single source of truth and minimal tracked artifacts
 
 旧 `docs/formalization/legacy/`、旧 status site、`tex/proof-guide.tex` のように同じ claim/status を
-複数箇所へ手入力する構成は廃止する。しかしこれは新系列の人間向け公開数学 docs/TeX を永久に
-禁止する決定ではない。新しい数学内容を実装・変更する PR は、`CLAUDE.local.md` の公開
-ドキュメント同期規律に従い、必要な `docs/math/**` と `tex/tasaki-2020/**` を同じ PR で更新する。
-公開 TeX/doc comment には文献名、edition、節・定理/式番号、printed page と PDF page、claim ID
-を明記する。
+複数箇所へ手入力する構成は廃止する。complete reset 後の説明文書は root `README.md` と
+`DESIGN.md`、machine-readable blueprint、書誌 reference だけに閉じる。`docs/` と `tex/` は
+存在させず、新規 docs/TeX、その生成物、workflow、dependency はユーザーの将来の明示承認と
+専用 design change があるまで追加しない。R1 で `CLAUDE.local.md` にこの rewrite-main phase
+override を記録し、通常の公開 docs/TeX 同期規律より優先させる。
 
 重複を避ける正本と生成/参照関係は次に固定する。
 
 - 書誌、edition、page mapping、source fingerprint の正本は `references/tasaki-2020.json`。
 - source locator、atomic restatement、source-order、claim/slice membership の正本は claim registry
   (`blueprint/tasaki-2020/source-index.json` と binding shard)。
-- assertion が `typed` になった後の形式 statement の正本は claim ID に bind された唯一の Lean
-  `...Statement` declaration、その proof/axiom dependency の正本は Lean environment である。
+- assertion が `skeletonized-unproved` になった後の形式 statement の正本は claim ID に bind された
+  唯一の Lean theorem declaration、prospective approved project-axiom set/digest の正本は binding
+  registry、proof 後の actual dependency の正本は Lean environment である。
   definition/notation の正本は bind された Lean declaration、hypothesis/domain の正本は bind
   された consumer binder、conjecture/out-of-scope の正本は disposition-specific registry record
   であり、存在しない `Statement` / proof binding を要求しない。
-- atomic status、frontier、slice/chapter 集計は上記 registry/binding/environment から生成する。
-  docs/TeX に手編集 status table を置かない。表示する場合は generated region/artifact とし、
-  stale generation を CI が reject する。
-- 人間向け docs/TeX は数学的動機・定義・証明案内を著述してよいが、claim ID を参照し、式や
-  theorem の canonical restatement を再定義しない。checker は参照 ID、locator、binding digest
-  を照合する。数学 API/claim/proof を変えた PR は対応する公開説明も同期する。
-
-bootstrap 時点で数学解説がまだ無ければ `docs/math/` / `tex/tasaki-2020/` を空で作る必要はない。
-ただし closed-tree policy は manifest に登録された新系列の公開 docs/TeX と、その生成・検証
-tooling を許容し、後続 PR での追加を設計変更扱いにしない。TeX compiler 等の dependency は
-既存の project-local/reproducible 環境だけを使い、追加が必要なら別の明示的 dependency 変更とする。
+- atomic status、frontier、slice/chapter 集計は上記 registry/binding/environment から生成し、
+  root 文書へ手編集 status table を複製しない。
+- 全 atomic assertion の Lean doc comment が人間向け source trace の正本であり、claim ID、書名、
+  edition、section、printed page、PDF page、theorem/equation/problem number、subclaim locator を
+  省略なく持つ。definition/notation 等の Lean-bound record も対応 locator と claim ID を持つ。
+- closed-tree checker は `docs/` / `tex/` と未承認の説明 artifact を reject する。将来承認される
+  場合は、その PR で正本との生成/参照関係と checker を再設計する。
 
 ## Canonical types
 
@@ -625,12 +644,15 @@ consumer が同一の数学的対象を受け取るために使う。constructor
 
 ## Axiom policy
 
-1. `sorry`、`admit`、`native_decide`、未証明 theorem stub、temporary axiom を禁止する。
+1. `admit`、`native_decide`、未登録 `sorry`、production import closure の `sorryAx`、temporary axiom
+   を禁止する。唯一の例外は whole-book skeleton phase で registry と一対一に対応する
+   `theorem ... := by sorry` であり、専用 skeleton module/build target に隔離する。
 2. 旧 project axiom declaration 70 個は一つも自動移植しない。bootstrap 後の
    `LatticeSystem/Axioms/` は空から始める。
 3. primitive vocabulary は axiom ではなく `structure` / `def` で表す。内容のない predicate
    も、命題を真とする証拠を与えない限り `def ... : Prop` とする。
-4. axiom の許可 taxonomy は、`OperatorAlgebra/{CStar,State,GNS,KMS}`、
+4. axiom の許可 taxonomy は `CLAUDE.local.md` の defer 分類に対応するものだけとし、
+   `OperatorAlgebra/{CStar,State,GNS,KMS}`、
    `FunctionalAnalysis/WeakDual`、`Symmetry/Wigner` に閉じる。`Misc`、`Temporary`、`TODO`、
    chapter 名を category にしてはならない。Wigner も有限次元で証明可能な形は証明する。
 5. cluster expansion、quasi-adiabatic continuation、Lieb--Robinson bound、一般の
@@ -653,14 +675,37 @@ consumer が同一の数学的対象を受け取るために使う。constructor
    import してはならない。
 10. deferred declaration には stable axiom ID、source locator、exact statement、category、
     欠けている数学、consumer obligations、承認 PR、reopen condition を registry に記録する。
+    assertion binding は R4 freeze 時に、使用を将来許可する axiom ID/module の
+    **prospective approved project-axiom set**、source/rationale、user approval、independent review、
+    set digest を metadata として固定する。これは stub の actual dependency を主張しない。
+    以後の **current prospective approved set** は、この R4 freeze 済み集合、または freeze 後の
+    専用 axiom-policy/statement-dependency PR で source/rationale/user approval/independent review/
+    digest update 済みの集合、と定義する。
 11. CI は Lean environment の全 project axiom と registry を双方向完全一致で検査し、binding
-    された全 declaration の expected/actual axiom set も完全一致で検査する。path/namespace
-    違反、未登録 axiom、存在しない登録、axiom set の過不足、`sorryAx` を reject する。
-12. project axiom dependency が空の result だけを `proved`、非空で完全一致する result を
+    された **proof-terminal assertion declaration に限って** current prospective approved project-axiom set と
+    actual project-axiom dependency set の完全一致を検査する。skeleton declaration は direct
+    `sorryAx` exactly 1 を要求する一方、prospective set との actual 一致を要求せず、set を満たす
+    ための unused import/人工参照を reject する。path/namespace 違反、未登録 axiom、存在しない登録、
+    terminal proof の axiom set 過不足を reject する。`sorryAx` は共通 constant なので actual axiom
+    set の要素を claim ごとに対応付けない。skeleton target では actual axiom set に `sorryAx` が
+    含まれるかを検査し、個別対応は registry binding、declaration/module、後述の direct-body
+    occurrence mapping で検査する。production target と `proved` / `proved-relative` result は
+    direct/transitive のいずれの `sorryAx` も一つでも検出したら reject する。
+12. proof-terminal result の project axiom dependency が current prospective approved set と一致して空なら
+    `proved`、一致して非空なら
     `proved-relative`、axiom declaration 自身を `approved-deferred` と生成表示する。
     `proved-relative` を chapter の axiom-free 完了数へ算入しない。
-13. 大型 theorem は proved supporting lemma の列へ分割し、未証明 capstone を source に
-    置かない。
+13. ordinary assertion stub を axiom に置換して proof obligation を逃がしてはならない。意図的
+    axiom は専用 stable axiom ID、許可 category、source locator、rationale、approval を持つ
+    `LatticeSystem/Axioms/**` の別 declaration とし、actual declaration↔registry と proof-terminal
+    consumer の actual dependency↔current prospective approved set を双方向に照合する。
+14. freeze 後の新 axiom または prospective approved set の追加・拡大を通常 proof PR に混ぜない。
+    必要なら専用 axiom-policy/statement-dependency change PR とし、source locator、数学的 rationale、
+    user approval、independent review を得て registry/set digest を更新し、更新後の集合を current
+    prospective approved set とする。sorry 数の増加、
+    proved→stub、source frontier の迂回はこの例外でも禁止する。
+15. 大型 theorem は細粒度の独立 assertion stub と supporting lemma に分割する。未証明 stub は
+    skeleton tree にだけ置き、production root/import closure へ露出させない。
 
 ## Atomic claim, implementation slice, PR, and test policy
 
@@ -709,7 +754,7 @@ disposition 別 lifecycle を次に固定する。
 
 | disposition | binding / digest | generated lifecycle | proof frontier |
 |---|---|---|---|
-| `assertion` | 唯一の Lean `...Statement : Prop` と `statement_digest`、proof declaration、actual axiom set、non-vacuity obligation | `inventoried → catalogued → typed → proved` または `proved-relative` / `approved-deferred` | source assertion のみ eligible |
+| `assertion` | exact type を持つ唯一の Lean theorem、`statement_digest`、不変 module path、prospective approved project-axiom set+digest、terminal proof の actual set、direct-body `sorryAx` count、non-vacuity obligation | `inventoried → catalogued → skeletonized-unproved (direct sorryAx = 1; actual-match not required) → proved` または `proved-relative` (direct/transitive sorryAx = 0; current prospective approved=actual)。承認 defer は通常 stub の変形でなく別 axiom record | source assertion の proof discharge のみ eligible |
 | `definition` | Lean `def` / `structure` / `abbrev` と `declaration_digest`、actual axiom set、必要 law の assertion claim ID list | `inventoried → catalogued → declaration-bound`。law が無ければ `definition-implemented`、必要 law が全て proof-terminal なら `definition-implemented-with-laws` | ineligible。consumer assertion の非 frontier dependency |
 | `notation` | notation/syntax declaration、展開先、`declaration_digest`、展開先 declaration の actual axiom set、必要 law claim ID list | `inventoried → catalogued → declaration-bound → notation-implemented`。law があれば全 law terminal を要求 | ineligible。consumer assertion の非 frontier dependency |
 | `hypothesis` / `domain` | consumer claim ID、binder 名・型・量化位置の `binder_digest` | `inventoried → catalogued → binder-bound` | ineligible。consumer assertion の非 frontier dependency |
@@ -720,80 +765,103 @@ definition/notation の law は同じ record 内の手書き checkbox で済ま�
 `assertion` claim ID として通常の statement/proof lifecycle を通す。hypothesis/domain record は
 真であることを証明する claim ではなく、どの consumer のどの binder が原典の仮定・量化域を
 表すかを検査する。外部文献に証明を委ねる assertion も消さず、新 axiom policy に従って
-prove/defer を判断する。
+prove/defer を判断する。definition の well-definedness、closure、independence-of-choice 等、証明を
+要する性質は definition record に埋めず、別の atomic assertion stub とする。
 
-初期 blueprint は metadata と数学的 restatement だけを持つ。frontier は slice でなく、
-**proof-eligible source assertion ID だけ**から `statement_frontier`（最古の未 `typed` assertion）と
-`proof_frontier`（最古の未 proof-terminal assertion）を計算する。definition/notation/
-hypothesis/domain は current assertion が必要とする非 frontier dependency として直前に実現し、
-conjecture/out-of-scope は source-order gate 上で disposition-specific terminal に記録する。
-後の source assertion へ進むには、それ以前の全 record が各 disposition の required state を
-満たさなければならない。derived assertion の eligibility は dependency role ごとに分ける。
+初期 blueprint は metadata と数学的 restatement を持つ。R3 で全巻の assertion を型として表現
+できる source vocabulary/type layer を scratch 実装し、R4 で全 source assertion を一括して
+skeletonize する。したがって statement visibility は全巻 freeze され、順序制約を受けるのは
+R5 以後の **proof discharge frontier** である。frontier は slice でなく proof-eligible source
+assertion ID だけから最古の未 proof-terminal assertionとして計算する。definition/notation/
+hypothesis/domain は R3 の非 frontier dependency、conjecture/out-of-scope は disposition-specific
+terminal であり、proof frontier を占有しない。derived assertion の skeletonization と proof
+eligibility は分離し、dependency role ごとに次を課す。
 
-- **`consequence`**: 一つ以上の `derived_from` parent が全て required terminal に到達した後だけ
-  `typed/proved` eligible。parent の結果として後から得る claim であり、source proof の前提には
-  できない。
+- **`consequence`**: 一つ以上の `derived_from` parent が全て disposition-specific required terminal
+  に到達し、かつ source-order gate が全 parent の位置を通過した後だけ proof discharge eligible。
+  assertion parent では proof-terminal、domain/hypothesis 等の非 assertion parent では R3 の binding
+  terminal と R5 の source-order passage の双方を要求する。statement stub は R4 で型検査してよいが、
+  parent より前に証明したり source proof の前提にしたりできない。
 - **`prerequisite`**: `required_by` target がその時点の current **source proof frontier assertion**
-  と一致し、その target が `typed`、かつ target の final line から backward-chain した証明上の
-  必要性が review 済みの場合だけ先行して `typed/proved` eligible。全 prerequisite は target を
+  と一致し、その target が `skeletonized-unproved`、かつ target の final line から backward-chain
+  した証明上の必要性が review 済みの場合だけ先行して proof discharge eligible。stub 自体は
+  R4 で型検査してよい。全 prerequisite は target を
   root とする非巡回 DAG をなし、target またはその proof に依存してはならない。future/past source
   claim、単なる便利 helper、statement 構築だけを理由とする先行は reject する。
 
 どちらも source assertion frontier の位置を持たず、完了しても frontier を進めない。一つの
 derived assertion に両 role/edge を許さず、checker は role/edge cardinality、target=current
-frontier、parent terminal、DAG acyclicity を environment dependency と registry の双方から検査する。
+frontier、parent terminal/source-order passage、DAG acyclicity を environment dependency と registry
+の双方から検査する。
 ここで target=current は prerequisite の **最初の状態遷移時の base proof frontier** に対する
 条件である。registry は target、base frontier key、承認済み dependency digest を immutable に
 記録し、target 完了後は current でなくなっても履歴を再検証して completed prerequisite を保持する。
 
-必要な型が実装済みになってから、realization PR は `assertion` claim ごとに次のような
-declaration を build する。
+R3 で必要な型と語彙を実装した後、R4 の skeleton PR は atomic `assertion` claim ごとに次の
+ような exact theorem declaration を build する。
 
 ```lean
 /--
-Tasaki 2020, 1st ed., §2.4, Theorem 2.1, printed p. 35.
+Hal Tasaki, Physics and Mathematics of Quantum Many-Body Systems,
+1st ed., §2.4, Theorem 2.1, printed p. 35, PDF p. 52, subclaim (a).
 Claim: `TASAKI2020-CLAIM-C02-S04-THM-2.1`.
 -/
-def Theorem21Statement : Prop := ...
+theorem theorem21_subclaim_a (/* exact binders */) : ExactStatement := by
+  sorry
 ```
 
-同じ theorem に三つの独立 assertion があれば三つの claim ID と三つの `...Statement` を置き、
-conjunction 一個で一括 binding しない。この段階は `typed` であり、真とは主張しない。別の proof PR でだけ
-`theorem theorem21 : Theorem21Statement := by ...` を追加して `proved` に進める。
-assertion binding は **claim ID ごとに** claim declaration、proof declaration、module、statement digest、
-expected logical/project axiom set、non-vacuity declaration を結ぶ。proof theorem の型が対応
-claim と definitionally equal でなければ CI failure とする。他 disposition は上表の binding を
-個別に検査する。claim ごとの status は binding と Lean environment から生成し、phase eligibility
-も claim ごとに検査する。
+同じ theorem に三つの独立 assertion があれば三つの claim ID と三つの細粒度 stub を置き、
+conjunction 一個で一括 binding しない。各 stub は独立 module に置き、whole-book skeleton target
+だけが import する。production root と proved module は unresolved stub module を import できない。R5 の
+proof PR は theorem name、declaration の exact type、`statement_digest`、module path を変えず、
+同じ declaration の body を proof に置換する。必要な import は、既 proved かつ transitive
+`sorryAx`-free の source-order predecessor、または current target の承認済み `required_by`
+prerequisite module に限って追加できる。別枠で current prospective approved set、すなわち R4 で
+freeze 済み、または freeze 後の専用 axiom-policy/statement-dependency PR で source/rationale/
+user approval/independent review/digest update 済みの集合に列挙された `Axioms` module だけを追加できる。
+assertion binding は **claim ID ごとに** declaration、module、statement
+digest、prospective approved project-axiom set/digest、proof-terminal 時の actual set、non-vacuity
+obligation を結ぶ。claim ごとの status と
+transitive `sorryAx` は Lean environment から生成する。
 
-全 theorem を `sorry` で先置きする案は statement を型検査できる利点があるが、未証明 result
-を downstream が利用でき、`sorryAx` を theorem として存在させ、後半章の型を作るために全
-architecture を早期固定する。metadata → built `Prop` → proof の分離は、全 target の可視性を
-保ちつつ未証明命題を証拠として利用不能にするため、`sorry` stub より強い。
+skeleton target では manifest-bound stub の `declaration uses 'sorry'` warning だけを局所的に許す。
+`warningAsError` を全面解除せず、その他の warning、`admit`、`native_decide`、未登録 `sorry` は
+全 phase で error とする。ここで **direct `sorryAx` occurrence** は Lean environment の対象 theorem
+`ConstantInfo.value?` expression を、参照先 declaration を unfold せず走査した時に現れる
+`sorryAx` constant occurrence と定義する。各 `skeletonized-unproved` declaration は direct occurrence
+を exactly 1 持ち、未解決 assertion registry entry ↔ theorem declaration ↔ module path ↔ direct-body
+occurrence を exact bijection にする。source syntax の `:= by sorry` 一件と elaborated environment の
+direct occurrence 一件を構文 checker と environment checker の双方で照合する。別 declaration への
+依存を通じた transitive-only `sorryAx` は stub の正当化にならない。`proved` / `proved-relative`
+entry とその declaration は direct/transitive occurrence とも zero とし、production eligibility も
+transitive `sorryAx` が空の proved module に限る。
 
 status field は人が書かない。claim registry、binding、Lean environment から上表の
 disposition-specific status を atomic claim ごとに生成する。slice/chapter の status は atomic
 status の順序付き集約から生成する。derived assertion の表示は status とともに role、eligibility
-parent/target、frontier-history key を必ず示し、`typed/proved` だけで先行可否を隠さない。tracked
+parent/target、frontier-history key を必ず示し、skeleton/proof status だけで先行可否を隠さない。tracked
 prose を第二の status 正本にしない。
 
 ### PR unit and frontier
 
-- 通常は一つの implementation slice について realization PR と assertion proof PR を分離してよいが、
-  PR 内でも binding/digest/status/phase eligibility は atomic claim ごとに独立させる。
-- realization PR は必要な definition/notation declaration、hypothesis/domain binder binding、
-  conjecture/out-of-scope record、および assertion ごとの built `Statement : Prop` と source
-  equivalence/non-vacuity 計画までを含み、assertion の result theorem を含まない。
-- proof PR は assertion ごとの凍結済み statement を変更せず、直前から backward-chain した必要補題、result、
-  semantic test、environment verification を完結させる。
+- R3 の vocabulary/type PR、R4 の whole-book assertion skeleton PR、R5 以後の assertion proof PR
+  を分離し、binding/digest/status/phase eligibility は atomic claim ごとに独立させる。
+- vocabulary/type PR は全巻 assertion の exact statement に必要な definition/notation declaration、
+  hypothesis/domain binder metadata、conjecture/out-of-scope record を含むが、proof body を含まない。
+- skeleton PR は全 atomic assertion の exact theorem stub と source equivalence/non-vacuity review を
+  完成させる。R4 freeze acceptance 前は assertion proof PR を一件も開始しない。
+- proof PR は assertion ごとの theorem name/module path/exact type/statement digest を変更せず、
+  body と eligible import 増分、直前から backward-chain した必要補題、semantic test、environment
+  verification を完結させる。追加 import は既 proved かつ transitive `sorryAx`-free の先行 claim
+  または承認済み `required_by` prerequisite module だけとする。
 - 大型 theorem だけ、同じ theorem issue の中で複数 PR に分割できる。各 PR はそれ自体で
   axiom-free な一つの数学結果を完成させ、最終 theorem のどの step に必要かを明記する。
 - PR 分割の都合で `Core` / `Bridge` / `Final` file を増やさない。
 - unrelated refactor、将来用 helper、別 chapter の準備を混ぜない。
 - capstone 実装前に、本文との statement review と hypothesis audit を独立に行う。
-- source-order 上の source-assertion statement/proof frontier を越えて遷移しない。同じ slice の
-  後続 assertion も、先行 assertion が同 phase の required state を満たした後でだけ typed/proved
-  に進める。非 assertion member は consumer 前に disposition terminal/required state を満たす。
+- R4 で statement skeleton は全巻一括 freeze する。R5 以後は source-order 上の proof frontier を
+  越えて proof-terminal へ遷移しない。同じ slice の後続 assertion も、先行 assertionが
+  proof-terminal になった後でだけ discharge する。非 assertion member は R3 で必要 state を満たす。
   一つの atomic PR で contiguous な複数 member を進める場合、checker は base からの遷移を
   member 順に simulation し、gap/skip を reject する。現在の source proof frontier assertion の
   final line から必要な Appendix dependency と `prerequisite` derived assertion だけ、上記
@@ -803,9 +871,9 @@ prose を第二の status 正本にしない。
 - 各 slice PR に claim 別の `Legacy assessment` を置き、参照した旧 declaration ごとに
   `adopt idea / rewrite / drop`、adopt gate の判定、直接 code 移植がないことを記録する。
 
-### Adopt gate for an old declaration
+### Adopt gate for an old declaration idea
 
-旧 declaration の内容を再利用するには、次をすべて満たす。
+旧 declaration を数学的アイデアまたは negative evidence として参照するには、次をすべて満たす。
 
 1. source locator と本文 statement を再照合した。
 2. 本文より強い仮定がない。
@@ -819,7 +887,8 @@ prose を第二の status 正本にしない。
 10. statement review または小さい semantic test がある。
 
 一項でも落ちたものは修理移植ではなく、本文 statement から再構成する。判定結果は当該
-slice PR の claim 別 `Legacy assessment` に残し、設計 PR で旧資産全体を事前承認しない。
+slice PR の claim 別 `Legacy assessment` に残し、設計 PR で旧資産全体を事前承認しない。この
+gate を通っても旧 source の copy/cherry-pick/import を許可するものではない。
 
 ### Test policy
 
@@ -837,23 +906,37 @@ slice PR の claim 別 `Legacy assessment` に残し、設計 PR で旧資産全
 ### Per-PR verification
 
 1. 対象 module の局所 build。
-2. 全 module を含む `lake build`、warning zero。public root から未 import でも build する。
+2. production build と whole-book skeleton build。production は warning zero、skeleton は registry-bound
+   stub の sorry warning だけを許し、それ以外は warning zero。public root から未 import の対象も build する。
 3. 専用 doc-comment gate。public/private を含む全 project declaration を environment から列挙し、
    `docBlame` / `docBlameThm` / `#lint` 相当で doc comment 欠落を error にする。
    `mathlibStandardSet` と `warningAsError` だけで代用しない。
-4. `sorry` / `admit` / `native_decide` / `sorryAx` 不在。
-5. Lean-bound assertion/definition/notation declaration の actual logical/project axiom set の完全
-   一致確認。hypothesis/domain/conjecture/out-of-scope に存在しない proof axiom set を要求しない。
-6. source locator、disposition-specific binding/digest/status/phase eligibility。assertion ではさらに
-   claim/proof binding と proof type の definitional equality。
-7. dependency-layer 違反、import cycle、unregistered/orphan declaration がゼロ。
+4. `admit` / `native_decide` / 未登録 `sorry` 不在。skeleton では unresolved registry entry↔theorem
+   declaration↔module path↔direct-body `sorryAx` occurrence の exact bijection、各 stub の direct count
+   exactly 1、transitive-only dependency 不可を構文+environment で検査する。production と
+   proof-terminal declaration は direct/transitive `sorryAx` とも不在。
+5. skeleton assertion は prospective approved project-axiom set/digest の承認済み metadata と direct
+   `sorryAx` exactly 1 を別々に検査し、project axiom の actual 一致や人工参照を要求しない。
+   proof-terminal assertion だけ current prospective approved project-axiom set と actual dependency set の完全
+   一致、direct/transitive `sorryAx` zero を要求する。definition/notation は実際の dependency を検査し、
+   hypothesis/domain/conjecture/out-of-scope に存在しない proof axiom set を要求しない。
+6. source locator、disposition-specific binding/digest/status/phase eligibility。全 assertion の Lean
+   doc comment に claim ID、edition、section、printed/PDF page、theorem/equation/problem/subclaim
+   locator が完全にあり、proof body 置換後も statement digest が不変であること。
+7. dependency-layer 違反、import cycle、unregistered/orphan declaration がゼロ。proof PR の ordinary
+   import 増分は既 proved かつ transitive `sorryAx`-free の source-order predecessor または承認済み
+   `required_by` prerequisite だけとする。Axioms import 増分は current prospective approved set、
+   すなわち R4 で freeze 済み、または freeze 後の専用 axiom-policy/statement-dependency PR で
+   source/rationale/user approval/independent review/digest update 済みの集合の exact module だけとし、
+   future/unproved/sorry-backed ordinary import と未登録 axiom import がゼロ。
 8. semantic test と non-vacuity witness。強い hypothesis に witness がない例外は理由と独立承認を要求。
-9. source index と base branch の diff に対する disposition-aware state/source-assertion-frontier
-   monotonicity check。derived assertion について consequence parent terminal、prerequisite target が
+9. source index と base branch の diff に対する disposition-aware state/source-proof-frontier
+   monotonicity check。derived assertion について consequence parent terminal/source-order passage、
+   prerequisite target が
    その状態遷移時の base current proof frontier、role/edge 排他、dependency DAG 非巡回、完了後の
    immutable eligibility history も検査する。
-10. public math docs/TeX の claim ID・書誌・定理/式番号・printed/PDF page・digest 参照と generated
-    status region が同期していること。数学内容に影響しない PR は no-sync 理由を記録する。
+10. closed-tree allowlist に合格し、`docs/` / `tex/`、未承認 artifact、legacy path、production から
+    skeleton module への import が存在しないこと。
 11. cold/warm のどちらかを明記した compile-time delta と import 増分の記録。
 
 ### Anti-regression gates
@@ -862,7 +945,7 @@ base branch と PR head の machine-readable diff で、次を default reject �
 
 - atomic claim の削除、stable claim ID の再利用、tombstone の復活、source claim ID と slice ID
   の混同、slice member の無承認並べ替え。
-- disposition-specific terminal、`proved` / `proved-relative` / `typed` からの無承認 downgrade。
+- disposition-specific terminal、`proved` / `proved-relative` / `skeletonized-unproved` からの無承認 downgrade。
   assertion の proof、definition/notation declaration、hypothesis/domain binder binding、terminal
   metadata record の消失。
 - locator、disposition、`content_digest` または disposition-specific digest の silent change。
@@ -871,18 +954,31 @@ base branch と PR head の machine-readable diff で、次を default reject �
   dedicated statement-change PR で独立 review するまでは reject する。
 - assertion statement change と proof change の同居。definition/notation declaration change と
   dependent law proof change の同居。
-- expected project axiom set の拡大、`proved` から `proved-relative` への silent change。
-- source-assertion frontier より後の assertion の状態遷移、非 frontier dependency でない
-  definition/notation/binder の先行実装、source-order の変更。
+- current prospective approved project-axiom set/digest の通常 proof PR での追加・拡大、terminal actual set の
+  current set からの過不足、`proved` から `proved-relative` への silent change。
+- R4 freeze 後の全巻 `sorry` 数の増加、新規・未登録 `sorry`、`proved` / `proved-relative` から
+  `skeletonized-unproved` への後退、proof body の消失、production import closure への `sorryAx` 混入。
+- theorem name、module path、exact type、statement digest の無承認変更。proof PR の import diff に
+  future/unproved/sorry-backed module、source-order predecessor でも承認済み `required_by`
+  prerequisite でもない ordinary module、current prospective approved set にない `Axioms` module が加わること。
+- ordinary assertion stub から intentional axiom への置換、許可 taxonomy・registry・独立承認なしの
+  axiom 追加、terminal actual axiom dependency の current prospective approved set からの拡大。
+- freeze 後の axiom/set 変更を専用 axiom-policy/statement-dependency PR、source/rationale、user
+  approval、independent review、digest update なしに行うこと。これらを満たす controlled exception
+  だけが current prospective approved set を更新でき、その専用 PR でも sorry 数増加や frontier
+  迂回は禁止する。
+- source proof frontier より後の assertion の proof-terminal 遷移、R3 vocabulary freeze 後の無承認
+  definition/notation/binder drift、source-order の変更。
 - derived assertion の role/edge の silent change、両 role 併記、`consequence` の parent-terminal
   前進行または parent proof からの利用、`prerequisite` の target が遷移時 current proof frontier
   でない先行、dependency cycle、target proof 後に追加された未承認 prerequisite。
 - active binding の declaration 不在、未登録 public result、build 対象外 module。
 
-base diff は `content_digest` と disposition-specific digest の一致/不一致を機械判定する。
+base diff は `content_digest` と disposition-specific digest の一致/不一致、全巻 sorry count、proof
+body presence、theorem/module identity、import 増分、production import closure を機械判定する。
 assertion の statement digest が不一致なら変更方向にかかわらず通常 PR を止め、dedicated
-statement-change PR、既存 proof result の一時除去、`typed` への戻し、独立 source-equivalence
-review を要求する。その review で仮定の強化・結論の弱化・
+statement-change PR、source diff、既存 proof result の一時除去、`skeletonized-unproved` への戻し、
+独立 source-equivalence approval を要求する。その review で仮定の強化・結論の弱化・
 量化域縮小等を semantic regression と分類し default reject する。仮定の弱化、結論の強化、
 量化域拡大等も digest change であり同じ専用 PR と review を必須とするが、それだけを理由に
 semantic regression とは分類しない。semantic foundation の definition を変える場合は
@@ -891,10 +987,11 @@ closure、影響する全 statement/result、semantic tests、full build を提�
 混ぜない。definition/notation/binder/metadata digest の変更も dedicated disposition-change PR と
 dependent assertion の impact closure を要求する。
 
-`rewrite-main` は protected branch とし、direct push と force push を禁止する。build、census、
-layer、environment axiom、全 declaration doc-comment、public math docs/TeX sync、monotonicity check
-を required にし、realization PR は独立 disposition/source-equivalence review、assertion proof PR は
-独立 verification review を required にする。人間向け status は常に生成物で、
+`rewrite-main` は protected branch とし、direct push と force push を禁止する。production/skeleton
+build、census、closed-tree、layer、unresolved-registry/declaration/module/direct-body-sorry bijection、
+sorry monotonicity、proof-import eligibility、environment axiom、
+全 declaration doc-comment、monotonicity check を required にする。`.github/CODEOWNERS` で
+vocabulary/skeleton/statement change と assertion proof に独立 reviewer を要求する。人間向け status は常に生成物で、
 手編集可能な `proved` label を正本にしない。
 
 ## Migration sequence
@@ -912,28 +1009,26 @@ layer、environment axiom、全 declaration doc-comment、public math docs/TeX s
 
 ### R1: atomic complete-reset bootstrap
 
-設計承認後の一つの bootstrap PR で、次を全面削除する。
+設計承認後の一つの bootstrap PR で、旧 `LatticeSystem/**` の production code と tests、
+`LatticeSystem/Tests.lean`、root tip aggregator `LatticeSystem.lean`、`docs/**`、
+`formalization-status/**`、`scripts/**`、`tex/**`、legacy workflows、status/schema/retirement/cutover
+machinery、site generator を全面削除する。旧内容は main anchor SHA からだけ参照し、新 tree に
+archive/copy を残さない。
 
-- 旧 `LatticeSystem/**` production/tests と `LatticeSystem/Tests.lean`
-- 旧 root tip aggregator `LatticeSystem.lean`
-- `formalization-status/**` と旧 status/schema/retirement/cutover machinery
-- 旧 `scripts/**`、checkers、site generators
-- legacy `tex/**` と旧 TeX tooling/workflow/reference（特に status/proof-guide の複製）
-- `docs/**` の旧 site/history/catalogue/limitations/roadmap と手編集 status generator
-- release/pages/update を含む旧 workflows
-
-bootstrap 後に旧内容を保持してよい closed allowlist は `lean-toolchain` と
-`lake-manifest.json` の pinned toolchain/dependency 内容だけである。`.gitignore`、`README.md`、
-`lakefile.toml`、`LatticeSystem.lean`、CI path を再利用する場合も scratch rewrite とする。
-承認済み本設計は root `DESIGN.md` へ移す。legacy `docs/` / `tex/` の内容は残さないが、
-新系列の public math docs/TeX は manifest 登録された path として後から追加可能であり、directory
-自体を永久禁止しない。新しい tracked tree は概念的に次へ閉じる。
+byte-for-byte 保持を許す実装関連 file は `lean-toolchain` と `lake-manifest.json` だけである。
+`lakefile.toml`、`.gitignore`、`README.md`、root `LatticeSystem.lean`、CI は scratch rewrite する。
+project governance の `AGENTS.md`、`CLAUDE.local.md`、`LICENSE` と git metadata は保持対象だが、
+`CLAUDE.local.md` は本 phase policy に更新する。承認済み本設計は root `DESIGN.md` へ移す。
+R1 head の concrete closed-tree allowlist は次の通りとする。
 
 ```text
 .github/CODEOWNERS
 .github/workflows/lean_action_ci.yml
 .gitignore
+AGENTS.md
+CLAUDE.local.md
 DESIGN.md
+LICENSE
 README.md
 LatticeSystem.lean
 blueprint/schema.json
@@ -943,18 +1038,40 @@ lakefile.toml
 lean-toolchain
 references/tasaki-2020.json
 scripts/check_blueprint.py
+scripts/check_base_diff.py
 scripts/check_closed_tree.py
 scripts/check_layers.py
 scripts/check_lean_environment.lean
 scripts/check_doc_comments.lean
-scripts/check_public_math_docs.py
-scripts/fixtures/                 # checker の tracked positive/negative fixtures
+scripts/check_skeleton.py
+scripts/fixtures/blueprint-valid-empty.json
+scripts/fixtures/blueprint-invalid-duplicate-id.json
+scripts/fixtures/doc-comments-valid.lean
+scripts/fixtures/doc-comments-invalid-private.lean
+scripts/fixtures/doc-comments-invalid-public.lean
+scripts/fixtures/skeleton-valid-empty.json
+scripts/fixtures/skeleton-invalid-unregistered-sorry.json
+scripts/fixtures/skeleton-invalid-transitive-only-sorry.json
+scripts/fixtures/skeleton-invalid-production-import.json
+scripts/fixtures/skeleton-invalid-future-import.json
+scripts/fixtures/skeleton-invalid-unproved-import.json
+scripts/fixtures/skeleton-invalid-sorry-backed-import.json
+scripts/fixtures/axiom-valid-prospective-unused.json
+scripts/fixtures/axiom-valid-terminal-exact.json
+scripts/fixtures/axiom-invalid-stub-artificial-reference.json
+scripts/fixtures/axiom-invalid-terminal-mismatch.json
+scripts/fixtures/axiom-invalid-unapproved-import.json
+scripts/fixtures/frontier-valid-current-prerequisite.json
+scripts/fixtures/frontier-invalid-early-consequence.json
+scripts/fixtures/frontier-invalid-future-prerequisite.json
+scripts/fixtures/frontier-invalid-cyclic-prerequisite.json
+scripts/fixtures/frontier-valid-completed-prerequisite.json
 ```
 
-source directory と binding shard は、最初に実需要が出た PR でこの allowlist に manifest-driven
-に追加する。allowlist 外の legacy path/file が残れば bootstrap CI を落とす。この PR は
-「削除だけ」を一時的に merge して後続 PR で直す二段階にしない。同じ PR の最終 tree で次を
-同時に成立させる。
+`.git/**` は repository metadata であり tracked allowlist 外で保持する。`docs/` と `tex/` は
+directory ごと不在でなければならない。後続 phase の `LatticeSystem/**` source、binding shard、
+checker extension は machine manifest と phase-specific allowlist change によってだけ追加する。
+この PR は「削除だけ」を一時 merge して後続 PR で直す二段階にせず、最終 tree で次を同時に成立させる。
 
 - package identity、`lean-toolchain`、依存を変えない最小 `lakefile.toml` / manifest。
 - public root `LatticeSystem.lean`。DAG tip aggregator ではなく、bootstrap 時点の空の stable
@@ -962,17 +1079,29 @@ source directory と binding shard は、最初に実需要が出た PR でこ�
 - default build target と、checker を含む CI target。
 - import layer rule を検査する dependency-free checker。
 - empty blueprint から開始できる atomic-claim/slice schema、closed-tree check、layer check、
-  actual-axiom checker、disposition-aware base-diff/source-assertion-frontier monotonicity check。
+  actual-axiom checker、disposition-aware base-diff/source-proof-frontier monotonicity check。
   schema/checker は derived assertion の `consequence` / `prerequisite` role、排他的 edge、parent
-  terminal、遷移時 target=base current proof frontier、immutable eligibility history、dependency
+  terminal/source-order passage、遷移時 target=base current proof frontier、immutable eligibility history、dependency
   DAG acyclicity を初期状態から扱う。
 - `mathlibStandardSet` / `warningAsError` とは別に、全 build 対象 module の environment を走査し、
   public/private を含む全 project declaration へ `docBlame` / `docBlameThm` / `#lint` 相当を
   適用する `check_doc_comments`。欠落 doc comment は CI error とし、private helper も例外にしない。
-- public math docs/TeX がまだ空でも実行でき、後続追加時に claim ID、書誌、定理/式番号、
-  printed/PDF page、binding digest、generated status region を照合する generic
-  `check_public_math_docs`。R3 で bootstrap infrastructure を追加・修理せず同期 check を使える
-  よう、schema と pass/fail fixture を R1 で完成させる。
+- unresolved registry entry、theorem declaration/module、direct-body `sorryAx` occurrence の exact
+  bijection、各 direct count exactly 1、transitive-only rejection、production import isolation、
+  proof-import eligibility、局所 sorry-warning 例外を構文+environment で検査する phase-aware
+  `check_skeleton` と正負 fixture。actual axiom set は `sorryAx` の有無だけを検査し、個別対応に使わない。
+- prospective approved project-axiom metadata/set digest と proof-terminal actual set を phase-aware に
+  分離し、stub の unused import/人工参照、terminal mismatch、未承認 Axioms import、通常 proof PR
+  での set expansion を拒否する actual-axiom checker と正負 fixture。checker/base-diff は current
+  prospective approved set を、R4 で freeze 済み、または freeze 後の専用 axiom-policy/
+  statement-dependency PR で source/rationale/user approval/independent review/digest update 済みの
+  集合だけとして再構成する。
+- allowlist 外 path、`docs/`、`tex/`、legacy artifact を拒否する `check_closed_tree` と正負 fixture。
+- `CLAUDE.local.md` に rewrite-main phase override を明記する。すなわち (a) `docs/` / `tex/` は
+  明示的な将来承認まで禁止、(b) registry-bound skeleton sorry だけを R4 skeleton target で許し
+  production は no-sorry、(c) legacy catalogue/capstone/status は authority でなく新 blueprint と
+  Lean environment だけが authority、(d) legacy code は anchor から failure lesson/数学的 idea の
+  照合にだけ用い、実装入力は Tasaki 原典と mathlib に限る。
 - `README.md` の最小 project identity、build command、legacy anchor、新 trunk の説明。
 - tracked `references/tasaki-2020.json` に edition、ISBN/DOI、chapter/section/page range、
   source fingerprint metadata だけを保持する。本の source copy、PDF、抽出 text は tracked
@@ -982,20 +1111,22 @@ source directory と binding shard は、最初に実需要が出た PR でこ�
 - `README.md` / `DESIGN.md` の link は相対 link を優先し、legacy 証跡だけは anchor SHA の
   permalink を使う。`/blob/main/` を新系列の current link として残さない。
 
-削除 scope は bootstrap PR 内で read-only inventory を取り、legacy anchor から常に回収
+削除 scope は bootstrap PR 内で read-only inventory を取り、legacy anchor から常に参照
 できることを確認する。bootstrap PR の最終 head は `lake build`、closed-tree、layer、
-empty-blueprint、actual-axiom、全 declaration doc-comment、空 docs と fixture に対する public
-math docs/TeX sync check をすべて通す。checker 自体は doc comment あり/なしの private/public
-fixture と、正/負の claim-reference fixture に加え、valid current prerequisite、early consequence、
+empty-blueprint、actual-axiom、全 declaration doc-comment、direct-body skeleton isolation/bijection と
+proof-import eligibility check を
+すべて通す。checker 自体は doc comment あり/なしの private/public fixture、closed-tree と
+skeleton の正負 fixture に加え、valid current prerequisite、early consequence、
 future-target/cyclic prerequisite、completed-history prerequisite の fixture で fail/pass を検証する。
 途中の壊れた commit を trunk に置かず、
 atomic PR 全体だけを merge する。
 
-旧 API への compatibility shim、deprecated alias、facade は作らない。旧 proof を参照する時は
+旧 API への compatibility shim、deprecated alias、facade は作らない。旧 proof idea を照合する時は
 `git show 01bcb49d49db92c225cfa74b74d409dd0a9c4edc:<path>` 等で読み、新 source から
-import せず、code を copy せず、commit/file を cherry-pick しない。
+import せず、code を copy せず、API dependency にせず、commit/file を cherry-pick しない。
+これは法的な clean-room 主張ではなく、品質回復のための complete reset / scratch rewrite である。
 
-### R2: complete source census and freeze
+### R2: whole-book two-pass census and hash lock
 
 - Chapter 2--11、Appendix A、Solutions pp. 493--520 と全 out-of-scope page を inventory する。
 - machine candidates をすべて closed disposition の atomic source claim に結び、番号付き数式、
@@ -1007,65 +1138,69 @@ import せず、code を copy せず、commit/file を cherry-pick しない。
   duplicate active claim ID、non-claim member を持つ slice、disposition/lifecycle mismatch、derived
   assertion の role/edge 未分類・重複をゼロにする。
 - source index を hash-lock し、source/derived claim ID と ordered slice ID の別 schema、
-  append-only/tombstone policy、disposition-aware base-diff/source-assertion-frontier checker を有効にする。
+  append-only/tombstone policy、disposition-aware base-diff/source-proof-frontier checker を有効にする。
 
-R2 が完了するまで数学定義・statement・proof の実装 PR を開始しない。census は chapter ごとの
+R2 が完了するまで数学定義・statement/skeleton・proof の実装 PR を開始しない。census は chapter ごとの
 reviewable PR に分割してよいが、最後の freeze gate が通るまでは全て inventory work である。
 
-### R3: first realization slice
+### R3: whole-book source vocabulary/type layer
 
-- exact slice は `TASAKI2020-SLICE-C02-S01-001` とし、下記 backlog group 1 の先頭に列挙する
-  atomic claim ID だけを source order の順序付き member とする。最初の statement frontier は
-  self-adjoint assertion、次は eq. (2.1.1) assertion であり、proof frontier はまだ進めない。
-- `SPIN-OPERATOR` definition と `AXIS-NOTATION` notation を current assertion の非 frontier
-  dependency として scratch 実装し、それぞれ `declaration-bound` / `notation-implemented`
-  binding を作る。definition の required-law list は `SELFADJOINT-COMPONENTS` と `EQ-2.1.1` を
-  指す。Levi-Civita notation は Appendix A.3.1 claim への `required_by` dependency とする。
-- `SELFADJOINT-COMPONENTS` と `EQ-2.1.1` assertion にだけ built `...Statement : Prop`、statement
-  digest、non-vacuity obligation を置いて `typed` とする。definition/notation に架空の
-  `Statement` / proof binding を置かない。
-- source order 上で後に現れる Casimir、`S = 1/2, 1, 3/2, ...` domain assertion、Hilbert
-  dimension を R3 に先取りしない。kernel の `N=0` は `consequence` derived assertion なので
-  source domain proof-terminal 前には eligible でなく、この slice に入れない。
-- 各 atomic claim の source locator と stable claim ID を対応する doc comment に置く。
-- source equivalence、hypothesis strength、quantifier order、row/column semantics、non-vacuity を
-  assertion ごとに独立 review し、definition/notation は展開先と consumer binding を review する。
-- public/private 全 declaration の doc-comment gate と、対応する公開 math docs/TeX の locator/
-  claim-ID 同期を R1 の generic checkerで通す。
-- bootstrap infrastructure の追加・修理、many-body、graph、future chapter の準備を混ぜない。
+- hash-lock した全巻 assertion の exact type を表現するために必要な source vocabulary、canonical
+  carrier、definition、structure、notation を Tasaki 原典と mathlib だけから scratch 実装する。
+- definition/notation は実 declaration、hypothesis/domain は各 consumer の binder/metadata binding、
+  conjecture/out-of-scope は disposition-specific nonproof terminal にする。well-definedness 等の
+  proof obligation は別 assertion ID とし、この phase で証明しない。
+- Chapter 2--11、Appendix A、Solutions の statement typing に必要な最小 layer を全巻について
+  完成させるが、proof body、legacy API shim、将来一般化、未使用 helper は作らない。
+- public/private 全 declaration の doc-comment gate、layer/closed-tree/actual-axiom check を通し、
+  vocabulary/declaration/binder digest を freeze する。
 
-この段階では many-body、graph Hamiltonian、infinite-volume framework を作らない。
+### R4: whole-book typed assertion skeleton and freeze
 
-### R4: first proof slice
+- 全 atomic assertion を exact theorem statement `:= by sorry` として細粒度の独立 module に置く。
+  全 stub の doc comment に stable claim ID と完全 source locator を記載する。
+- skeleton build target は全 stub を型検査するが、production root/import closure から完全隔離する。
+  unresolved assertion registry entry、stub theorem declaration、module path、declaration value の direct
+  `sorryAx` occurrence を exact bijection にし、各 stub の direct occurrence は exactly 1 とする。
+  transitive-only `sorryAx` dependency は stub として認めず、actual axiom set は `sorryAx` の有無だけを
+  検査する。source syntax と elaborated environment の双方で照合する。
+- stub は statement typing に必要な shared vocabulary だけを import する。prospective approved
+  project-axiom set は source/rationale/approval/set digest を持つ metadata として freeze するが、stub
+  actual dependency との一致を要求せず、unused `Axioms` import や人工参照を置かない。
+- manifest-bound stub の sorry warning だけを局所許容し、その他の warning、未登録 `sorry`、
+  `admit`、`native_decide`、intentional axiom への逃避を reject する。
+- source-equivalence、仮定強度、quantifier order、non-vacuity plan、statement digest を assertion
+  ごとに独立 review して freeze する。この acceptance 前に proof PR を一件も開始しない。
 
-- R3 で assertion ごとに凍結した statement digest を変えず、source order に対応 proof theorem を
-  **proof-eligible assertion にだけ**追加する。definition/notation を proof 対象にしない。後続
-  assertion への遷移は checker が先行 assertion の同 phase 到達後として検査する。
-- assertion/proof definitional equality、basis-column action/endpoint semantic test、non-vacuity、
-  actual axiom exact-set、全 declaration doc-comment gate、全 module build を通す。
-- proof に derived assertion が不可欠なら、`prerequisite` role と current proof frontier assertion
-  への `required_by` を登録し、target に依存しない DAG 順で先に完成させる。`consequence` や
-  future source claim 由来の結果を prerequisite として利用しない。
-- project axiom set が空なら assertion ごとに `proved`、非空なら `proved-relative` を生成する。
-  両 required law が proof-terminal になれば `SPIN-OPERATOR` は自動で
-  `definition-implemented-with-laws` へ進み、notation status は R3 のまま保持する。slice status は
-  member status からだけ集約する。
+### R5 onward: front-to-back proof discharge
 
-### R5 onward: front-to-back repetition
-
-各 frontier source assertion（review 単位は ordered slice）について R3/R4 を繰り返す。
-definition/notation/hypothesis/domain は current assertion の非 frontier dependency としてだけ
-実現する。derived assertion は次の二経路だけを許す。`prerequisite` は現在の source proof
-frontier assertion の backward chain に必要で、そこへの `required_by` と非巡回 dependency DAG
-を持つ場合だけ先行できる。`consequence` は全 `derived_from` parent の required terminal 後に
-だけ進める。いずれも source assertion frontier を進めない。
+R4 freeze 後、最古の source proof frontier assertion から印刷順に、theorem name、module path、
+exact statement/type、digest を変えず proof body を置換する。proof に必要な import は、その時点で
+既 proved かつ transitive `sorryAx`-free の source-order predecessor、または current frontier への
+承認済み `required_by` を持ち先に discharge 済みの prerequisite module だけ追加できる。
+ordinary import と分離して、current prospective approved set、すなわち R4 で freeze 済み、または
+freeze 後の専用 axiom-policy/statement-dependency PR で source/rationale/user approval/independent
+review/digest update 済みの集合に列挙された exact `Axioms` module だけは追加できる。
+future/unproved/sorry-backed ordinary module と未承認 axiom
+module は禁止し、base-diff、layer、environment checker の三者で検査する。proof 後は actual project
+axiom dependency set が current prospective approved set と exact equality、direct/transitive `sorryAx` が zero
+でなければ terminal にしない。project axiom set が空なら `proved`、非空なら `proved-relative` とする。
+current prospective approved set にない axiom が必要と判明したら proof PR を停止し、専用
+axiom-policy/statement-dependency PR で source/rationale/user approval/independent review/digest
+update を完了するまで import/registry を変更しない。更新後の current set は利用できるが、その
+専用 PR でも sorry 増加や frontier 迂回はできない。
+derived `prerequisite` は current frontier の backward chain に必要で `required_by` と非巡回 DAG を
+持つ場合だけ先に proof discharge できる。`consequence` は
+全 `derived_from` parent の required terminal と source-order passage 後だけ discharge できる。
+どちらも source frontier を進めない。各 proof の actual axiom set を検査し、非空なら
+`proved-relative` として axiom-free `proved` と別集計する。
 
 ### R6: chapter audit
 
 chapter milestone では旧 declaration 数でなく frozen source census を基準にする。対象 claim の
-未分類、disposition required state 未到達、assertion の `catalogued` / `typed` 残存をゼロにし、
+未分類、disposition required state 未到達、assertion の `skeletonized-unproved` 残存をゼロにし、
 `proved-relative` / `approved-deferred` は axiom-free 完了と別集計する。content/disposition-specific
-digest、actual axiom、non-vacuity、orphan、layer、source-assertion frontier history、derived role/edge
+digest、actual axiom、non-vacuity、orphan、layer、source-proof-frontier history、derived role/edge
 eligibility history と dependency DAG を全件再監査する。
 
 ## Initial Tasaki front-to-back backlog
@@ -1082,20 +1217,21 @@ slice を一個の statement/status として扱わない。これらは全巻 s
      members と exact lifecycle は次の通りである。
      1. `TASAKI2020-CLAIM-C02-S01-SPIN-OPERATOR`: `definition`。`Ŝ=(Ŝ⁽¹⁾,Ŝ⁽²⁾,Ŝ⁽³⁾)` の
         declaration binding を作り R3 で `declaration-bound`。下記二 assertion を required
-        law とし、両者の R4 terminal 後に `definition-implemented-with-laws`。proof frontier ineligible。
+        law とし、両者の R5 terminal 後に `definition-implemented-with-laws`。proof frontier ineligible。
      2. `TASAKI2020-CLAIM-C02-S01-AXIS-NOTATION`: `notation`。`1,2,3` axis notation と展開先を
-        bind して `notation-implemented`。proof frontier ineligible。
-     3. `TASAKI2020-CLAIM-C02-S01-SELFADJOINT-COMPONENTS`: `assertion`。R3 で `typed`、R4 で
-        `proved` / `proved-relative`。最初の statement/proof frontier。
-     4. `TASAKI2020-CLAIM-C02-S01-EQ-2.1.1`: `assertion`。R3 で `typed`、R4 で proof-terminal。
-        二番目の statement/proof frontier。
-     Levi-Civita symbol は Appendix A.3.1 の notation claim を `required_by` で実現する非 frontier
-     dependency であり、slice member や独立 assertion を捏造しない。
+        R3 で bind して `notation-implemented`。proof frontier ineligible。
+     3. `TASAKI2020-CLAIM-C02-S01-SELFADJOINT-COMPONENTS`: `assertion`。R4 で
+        `skeletonized-unproved`、R5 で `proved` / `proved-relative`。最初の proof frontier。
+     4. `TASAKI2020-CLAIM-C02-S01-EQ-2.1.1`: `assertion`。R4 で `skeletonized-unproved`、R5 で
+        proof-terminal。二番目の proof frontier。
+     Levi-Civita symbol は Appendix A.3.1 の notation claim を R3 の必要な非 frontier dependency
+     として実現し、slice member や独立 assertion を捏造しない。
    - 以後の slice と source assertion frontier は原典順に固定する。
      - **slice 002**: unnumbered Casimir assertion `Ŝ²=S(S+1)1̂`, p. 14。
-     - **slice 003**: `TASAKI2020-CLAIM-C02-S01-SPIN-DOMAIN` assertion
-       (`S=1/2,1,3/2,2,...`)。これが proof-terminal になった後だけ
-       `LATTICE-DERIVED-SPIN-N-ZERO` `consequence` assertion を `typed → proved` にできる。
+     - **slice 003**: `TASAKI2020-CLAIM-C02-S01-SPIN-DOMAIN` `domain` record
+       (`S=1/2,1,3/2,2,...`)。R3 で consumer binder として `binder-bound` になり、R5 の
+       source-order gate がこの record を通過した後だけ
+       `LATTICE-DERIVED-SPIN-N-ZERO` `consequence` assertion の R4 stub を proof discharge できる。
        source domain への `derived_from` を持ち、source coverage に数えず、source frontier の
        位置を持たず、次 frontier を進めない。
      - **slice 004**: `h₀` の `definition` record を非 frontier dependency として実現した後、
@@ -1143,8 +1279,9 @@ slice を一個の statement/status として扱わない。これらは全巻 s
 decomposition を §2.2 の source order で追加する。§2.2 より前に future-proof な many-body
 kernel を作らない。
 
-Appendix の一般論は、本文の現在 atomic claim が必要とする時に mathlib と照合し、必要最小限を
-`Math` に置く。Appendix 全体を先回りして形式化しない。旧 Theorem 2.4、Chapter 4、AKLT、
+Appendix の assertion も R4 で全巻 skeletonize するが、proof は本文の current frontier が必要と
+する `prerequisite` または Appendix 自身の source frontier に到達するまで先行しない。一般論の
+実装は mathlib と照合した必要最小限を `Math` に置く。旧 Theorem 2.4、Chapter 4、AKLT、
 Hubbard の完成 proof を先に救出しない。
 
 ## Acceptance criteria
@@ -1157,15 +1294,17 @@ Hubbard の完成 proof を先に救出しない。
 - canonical representation、graph/volume boundary、generic local basis、coupling bundle が
   decision として記録されている。
 - dependency DAG と初期 directory が一方向である。
-- complete reset の closed keep allowlist、legacy TeX/docs/status 複製の不存在、新系列の
-  public math docs/TeX の single-source/generation/reference rule が確定している。
+- complete reset の closed keep allowlist、`docs/` / `tex/` / legacy status の不存在、新規
+  docs/TeX の将来明示承認制、root 文書・blueprint・reference の single-source 関係が確定している。
 - axiom の自動移植禁止、専用 path/namespace/taxonomy、defer 境界が明記されている。
 - source/derived claim ID と ordered slice ID の分離、disposition-specific binding/digest/status/
-  phase eligibility、source-assertion frontier、anti-regression policy が明記されている。
+  phase eligibility、source-proof frontier、anti-regression policy が明記されている。
 - derived assertion が `consequence` / `prerequisite` に排他分類され、parent-terminal と
   current-frontier/acyclic-DAG の eligibility が区別されている。
-- assertion だけが Statement/proof lifecycle を持ち、definition/notation、hypothesis/domain、
+- assertion だけが skeleton/proof lifecycle を持ち、definition/notation、hypothesis/domain、
   conjecture/out-of-scope がそれぞれ declaration/law、binder、nonproof terminal を持つ。
+- unresolved assertion registry entry↔theorem declaration/module↔direct-body `sorryAx` occurrence の
+  exact bijection と、proof 昇格時の theorem/module/type/digest 不変・eligible import 増分が明記されている。
 - §2.1 の source domain `S=1/2,1,...`、derived `N=0`、`m(k)=N/2-k`、matrix row/column convention、
   legacy endpoint lemma の negative evidence と drop 判定が明記されている。
 - bootstrap が設計承認後の別 PR であり、本 PR が現コードを変更しないことが明記されている。
@@ -1179,26 +1318,34 @@ Hubbard の完成 proof を先に救出しない。
 
 - 旧 `main` が変更されず、legacy tip が参照可能である。
 - 削除対象の read-only inventory と回収方法が記録されている。
-- 旧 `LatticeSystem/**`、tests、root aggregator、status、scripts/checkers/workflows、legacy TeX、
-  site/history/catalogue/docs が final tree に存在しない。
+- 旧 `LatticeSystem/**`、tests、root aggregator、status、旧 scripts/checkers/workflows、legacy TeX、
+  site/history/catalogue/docs が final tree に存在せず、同名 path の必要物も scratch rewrite である。
 - 既存 code の carry-forward/import/copy/cherry-pick がなく、path 再利用も scratch rewrite である。
 - 内容を保持した file が `lean-toolchain` と `lake-manifest.json` だけで、closed-tree check が通る。
-- 承認済み設計が root `DESIGN.md` にあり、legacy docs/TeX は存在しない。新系列の manifest 登録
-  public math docs/TeX は許容され、手編集 status 正本にはならない。
+- 承認済み設計が root `DESIGN.md` にあり、`docs/` / `tex/` は directory ごと存在しない。
+  新規 docs/TeX はユーザーの将来の明示承認なしに追加できない。
+- `AGENTS.md`、更新済み `CLAUDE.local.md`、`LICENSE`、git metadata は governance として保持され、
+  byte-preserve された実装関連 file は `lean-toolchain` と `lake-manifest.json` だけである。
 - package/toolchain は再現可能で、依存更新を混ぜていない。
 - minimal `lake build` が warning zero で通る。
-- closed-tree、disposition-aware atomic-claim/ordered-slice blueprint schema、layer、forbidden proof
-  construct、actual axiom、source-assertion-frontier monotonicity check がある。
-- derived assertion role/edge 排他、consequence parent terminal、prerequisite target=current proof
+- closed-tree、disposition-aware atomic-claim/ordered-slice blueprint schema、layer、phase-aware forbidden
+  proof construct、direct-body skeleton bijection/isolation、proof-import eligibility、actual axiom、
+  source-proof-frontier monotonicity check がある。
+- actual-axiom checker は skeleton の prospective approved metadata と terminal proof の actual set を
+  分離し、stub の人工依存、terminal mismatch、未承認 Axioms import、通常 proof PR の set expansion
+  を正負 fixture で検査する。
+- derived assertion role/edge 排他、consequence parent terminal/source-order passage、prerequisite target=current proof
   frontier（初回遷移時）、immutable eligibility history、dependency DAG 非巡回を検査する
   schema/checker fixture がある。
 - public/private を含む全 project declaration を検査する `docBlame` / `docBlameThm` / `#lint`
   相当の専用 doc-comment gate があり、fixture と CI が通る。`mathlibStandardSet` と
   `warningAsError` だけを合格根拠にしない。
-- 空 docs と正/負 fixture で動く generic public math docs/TeX checker が R1 にあり、claim ID、
-  locator、書誌、binding digest、generated status region の同期を CI で検査する。
+- `CLAUDE.local.md` に docs/TeX 禁止、skeleton-phase sorry 例外、production no-sorry、legacy catalogue
+  無効化、新 blueprint authority の rewrite-main override が明記され、その正負 fixture が通る。
 - public root が DAG tip aggregator ではない。
 - CI の push target が `rewrite-main` で、required check が branch protection に登録される。
+- `.github/CODEOWNERS` が vocabulary、skeleton/statement、axiom、proof change に独立 reviewer を
+  要求し、branch protection がその approval を必須にする。
 - direct/force push が禁止され、current link に `/blob/main/` が残らない。
 - bootstrap final head の全 check が成功し、壊れた中間 commit を trunk に置いていない。
 
@@ -1215,56 +1362,78 @@ Hubbard の完成 proof を先に救出しない。
   の順序付き集約である。
 - この acceptance 前に数学実装 PR が一つも始まっていない。
 
-### Each realization PR
+### Whole-book vocabulary/type layer freeze
 
-- 全 record が atomic claim stable ID、edition、section、printed/PDF page、number/subclaim key を
-  registry に持ち、Lean-bound disposition の declaration だけが同 locator を doc comment に持つ。
-  Lean binding 禁止の `out_of_scope` に架空の doc comment/declaration を要求しない。
-- manifest が全 claim に `content_digest`、disposition、status、phase eligibility を持ち、assertion
-  だけに statement digest/non-vacuity、definition/notation に declaration/law binding、
-  hypothesis/domain に binder binding、conjecture/out-of-scope に nonproof terminal を要求する。
-- assertion result theorem を含まず、独立 source-equivalence review に合格する。
-- source-assertion statement frontier、明示 Appendix dependency、または role-valid derived
-  assertion であり、slice は contiguous ordered aggregate にすぎない。非 assertion は current
-  consumer の dependency に限る。
-  derived assertion は consequence parent-terminal または prerequisite target=遷移時 base current
-  proof frontier のどちらか一方の eligibility を満たす。
-- assertion は本文より強い仮定がなく、quantifier order と consistency/non-vacuity evidence が
-  ある。他 disposition は上表の required state に到達する。
-- public/private を含む全 declaration の doc-comment gate と、公開 docs/TeX の claim-ID/locator/
-  digest 同期 check に合格する。
+- 全巻 assertion の exact type を表す最小 vocabulary/type layer が Tasaki 原典と mathlib から
+  scratch 実装され、legacy code の copy/import/API dependency がない。
+- definition/notation は declaration と必要 law ID、hypothesis/domain は binder/metadata、
+  conjecture/out-of-scope は nonproof terminal を持つ。proof を要する law は独立 assertion ID である。
+- public/private 全 declaration の doc-comment gate、closed-tree、layer、actual axiom check が通り、
+  declaration/binder digest が freeze される。assertion proof body はまだ存在しない。
 
-### First implementation slice
+### Whole-book assertion skeleton freeze
+
+- Chapter 2--11、Appendix A、Solutions の全 atomic assertion が exact theorem `:= by sorry` として
+  独立した細粒度 module にある。unresolved registry entry↔theorem declaration↔module path↔その
+  declaration value の direct `sorryAx` occurrence が exact bijection で、各 stub の direct count は
+  exactly 1、transitive-only dependency はゼロである。
+- 各 stub の doc comment に stable claim ID、書名、edition、section、printed/PDF page、
+  theorem/equation/problem/subclaim locator が揃う。
+- skeleton build は全 stub を型検査し、production root/import closure は unresolved stub module と
+  transitive `sorryAx` を含まない。actual axiom set は `sorryAx` の有無を検査し、個別対応は
+  declaration body/module mapping で検査する。局所許容された sorry warning 以外は warning zero である。
+- 各 assertion の prospective approved project-axiom set が、空集合を含め source/rationale/user
+  approval/independent review/set digest とともに freeze される。stub はその project axiom への
+  actual dependency 一致を要求されず、unused `Axioms` import/人工参照がない。
+- statement digest、source-equivalence、仮定強度、quantifier order、non-vacuity plan が独立 review
+  で freeze され、全巻 stub count と registry count が一致する。
+- この acceptance 前に proof PR が一件も開始されていない。
+
+### First proof slice
 
 - slice ID は `TASAKI2020-SLICE-C02-S01-001` で、R2 で freeze した ordered member claim 以外を
   含まない。各 member が固有 binding/status/digest/frontier eligibility を持ち、slice 全体の
   `ItemStatement` や手編集 status は存在しない。
 - ordered member は `SPIN-OPERATOR` definition → `AXIS-NOTATION` notation →
   `SELFADJOINT-COMPONENTS` assertion → `EQ-2.1.1` assertion。前二者は R3 で declaration binding
-  を得て、spin definition は後二者の R4 terminal 後に `definition-implemented-with-laws` となる。
-  後二者だけが R3 `typed` / R4 proof-terminal になる。
-- 次の source assertion は slice 002 Casimir、slice 003 `S=1/2,1,...` domain、slice 004 dimension。
-  `N=0` は `consequence` derived assertion であり、domain proof-terminal 後だけ eligible で、
+  を得て、後二者は R4 で skeletonized-unproved になる。R5 は後二者をこの順に discharge し、
+  両者 terminal 後に spin definition が `definition-implemented-with-laws` となる。
+- 次の source record は slice 002 Casimir assertion、slice 003 `S=1/2,1,...` domain、slice 004
+  dimension assertion。`N=0` は `consequence` derived assertion であり、domain が `binder-bound`
+  terminal に到達し、R5 source-order gate がその domain record を通過した後だけ proof eligible で、
   source frontier を進めない。
 - `m(k)=N/2-k`、`k=0` highest、`k=N` lowest、row=output/column=input は derived concrete
-  representation choice として doc comment、semantic test、公開数学 docs/TeX に記録する。
+  representation choice として doc comment と semantic test に記録する。
 - legacy endpoint row lemma の名称・物理解釈を移植せず、`S⁺` highest / `S⁻` lowest annihilation
   は basis-vector column action として検査する。
-- R3 は disposition-specific realization、R4 は assertion の凍結 statement に対する proof だけを
-  source order で進め、many-body、graph、rotation、future helper を含めない。
+- R5 の最初の proof PR は theorem name/module path/type/digest を保って body を source order で
+  置換する。追加 import は既 proved かつ transitive `sorryAx`-free の先行/prerequisite module に
+  限る。別枠の `Axioms` import は current prospective approved set、すなわち R4 で freeze 済み、
+  または freeze 後の専用 axiom-policy/statement-dependency PR で source/rationale/user approval/
+  independent review/digest update 済みの集合の exact module に限り、
+  many-body、graph、rotation、future helper を含めない。
 
 ### Each proof PR
 
 - proof-eligible assertion のみを対象にし、凍結済み statement digest を変えていない。
-- proof type が対応 assertion と definitionally equal である。
+- theorem name/module path が不変で、proof type が対応 assertion と definitionally equal である。
 - derived prerequisite を含む場合、`required_by` target が遷移時の current source proof frontier、
   dependency DAG が非巡回で、prerequisite 側から target declaration/proof への依存がない。
   consequence を先行利用していない。
 - final line から必要性を説明できない declaration がない。
-- 全 module build warning zero、禁止 proof construct zero、actual axiom exact-set 合格。
+- production build warning zero、禁止 proof construct zero、direct/transitive `sorryAx` zero、actual
+  project axiom set = current prospective approved set の exact equality に合格。空なら `proved`、
+  非空なら `proved-relative` である。skeleton build の残存 sorry count は base 以下である。
+- import diff は既 proved かつ transitive `sorryAx`-free の source-order predecessor または承認済み
+  `required_by` prerequisite の ordinary module、または current prospective approved set に列挙済みの
+  exact `Axioms` module だけで、future/unproved/sorry-backed/未承認 dependency がない。current set は
+  R4 freeze 済み、または freeze 後の専用 axiom-policy/statement-dependency PR で source/rationale/
+  user approval/independent review/digest update 済みの集合に限る。
+- 通常 proof PR 内で current prospective approved set/digest を変更していない。追加・拡大が必要なら
+  proof PR を止め、上記専用 PR で controlled update する。
 - unrelated atomic claim、future helper、compatibility work を含まない。
 - orphan declaration がなく、status が environment から正しく生成される。
-- public/private を含む全 declaration の doc-comment gate と、必要な公開 docs/TeX 同期に合格する。
+- public/private を含む全 declaration の doc-comment gate と closed-tree check に合格する。
 - independent verification review に合格する。
 
 ### Chapter 2 milestone
@@ -1274,7 +1443,7 @@ Hubbard の完成 proof を先に救出しない。
 - graph の有限性と finite volume の有限性が分離されている。
 - public theorem が proof-route helper や `Matrix.toLin'` を露出しない。
 - 旧 source を import せず、旧実装と同等の対象 statement を新 axiom policy 下で再現する。
-- Chapter 2 census の未分類、disposition required state 未到達、assertion の `catalogued` / `typed`
+- Chapter 2 census の未分類、disposition required state 未到達、assertion の `skeletonized-unproved`
   がゼロである。
 - derived assertion の role/edge mismatch、未完 prerequisite、parent 前 consequence がゼロである。
 - `proved-relative` / `approved-deferred` が axiom-free `proved` と別集計される。
@@ -1284,20 +1453,23 @@ Hubbard の完成 proof を先に救出しない。
 以下をすべて **decided** とする。未決 P0 はゼロである。
 
 1. **trunk**: 新 trunk は `rewrite-main`。bootstrap merge 後に repository default を
-   `rewrite-main` とし、build/layer/status/axiom/doc-comment/public-doc-sync checks を required にする。旧 `main` は
+   `rewrite-main` とし、production/skeleton build、closed-tree、layer、status、stub/sorry、axiom、
+   doc-comment checks を required にする。direct/force push を禁止し、CODEOWNERS の独立 review を
+   必須にする。旧 `main` は
    anchor `01bcb49d49db92c225cfa74b74d409dd0a9c4edc` を含む frozen legacy として保護する。
 2. **package / namespace**: package name と root namespace `LatticeSystem` は維持する。
    旧 declaration/import path の互換性は維持しない。
 3. **complete reset allowlist**: 旧内容を保持するのは `lean-toolchain` と
    `lake-manifest.json` のみ。旧 code/tests/status/scripts/workflows/legacy TeX/docs は全面削除し、
-   再利用 path も scratch rewrite。承認済み設計は root `DESIGN.md` に移す。新系列の manifest
-   登録 public math docs/TeX は後続追加を許容する。
+   再利用 path も scratch rewrite。AGENTS/CLAUDE/LICENSE/git metadata は governance として保持し、
+   CLAUDE は phase policy に更新する。承認済み設計は root `DESIGN.md` に移す。`docs/` / `tex/`
+   は不在とし、新規 docs/TeX はユーザーの将来の明示承認まで禁止する。
 4. **blueprint / generated status**: source/derived atomic claim ID と implementation slice ID を
    分離する。番号付き数式、unnumbered obligation、独立結論ごとに source-order key、二 locator、
    disposition、`content_digest`、disposition-specific binding/digest/status/phase eligibility を持つ。
-   assertion だけが statement/proof/axiom binding を持ち、definition/notation は declaration/law、
+   assertion だけが exact theorem skeleton/proof binding を持ち、definition/notation は declaration/law、
    hypothesis/domain は binder、conjecture/out-of-scope は nonproof terminal を持つ。slice は claim ID
-   の順序付き list だけを持ち、独自 statement/status 正本にしない。source-assertion frontier と
+   の順序付き list だけを持ち、独自 statement/status 正本にしない。source-proof frontier と
    status は claim registry と Lean environment から生成する。derived assertion は
    `consequence` (`derived_from`) / `prerequisite` (`required_by`) の排他的 role を必須とする。
 5. **logical axiom baseline**: proved capstone の project-specific axiom は既定で空集合。
@@ -1312,9 +1484,11 @@ Hubbard の完成 proof を先に救出しない。
    Chapter 1/front matter/references/index も `out_of_scope` page として記録する。
 8. **first implementation slice**: `TASAKI2020-SLICE-C02-S01-001`, 1st ed. §2.1,
    pp. 13--14。member は spin-operator definition → axis notation → self-adjoint assertion →
-   eq. (2.1.1) assertion。続いて slice 002 Casimir → slice 003 `S=1/2,1,...` domain assertion →
+   eq. (2.1.1) assertion。続いて slice 002 Casimir assertion → slice 003 `S=1/2,1,...` domain record →
    slice 004 dimension assertion → eqs. (2.1.2), (2.1.3) を原典順に進める。`N=0` derived assertion
-   は `consequence` であり、domain proof-terminal 後だけ eligible で source frontier を進めない。
+   は R4 で skeletonize しても `consequence` であり、domain の `binder-bound` terminal と
+   source-order passage の後だけ proof eligible で
+   source frontier を進めない。
 9. **spectral API**: `Matrix` が計算 canonical、Hermitian proof を持つ `Observable` が
    self-adjoint な物理量の API。`IsEigenvector` は nonzero を含み、spectral bridge は
    `Quantum.Finite.Spectrum` だけに置く。
@@ -1328,43 +1502,66 @@ Hubbard の完成 proof を先に救出しない。
     を fermion API に使わない。Chapter 9 で ordered Jordan--Wigner を canonical とし、
     graded/CAR 一般化は実需要まで行わない。
 13. **bootstrap atomicity / CI / citations**: R1 の最終 tree で build/root/closed-tree/layer/
-    blueprint/axiom/monotonicity checks、および private を含む全 declaration の
-    `docBlame` / `docBlameThm` / `#lint` 相当 gate、空 docs と正/負 fixture で動く generic public
-    math docs/TeX sync checker、`rewrite-main` CI を同時成立させる。書誌・hash metadata のみ
+    blueprint/direct-body-skeleton-bijection/proof-import/phase-aware prospective-vs-actual axiom/
+    monotonicity checks、および private を含む全 declaration の
+    `docBlame` / `docBlameThm` / `#lint` 相当 gate、`rewrite-main` CI を同時成立させる。
+    `CLAUDE.local.md` の phase override と closed-tree fixture を含め、書誌・hash metadata のみ
     tracked し、本の source copy を置かない。
-14. **disposition lifecycle**: assertion だけを `catalogued → typed → proved/proved-relative/
-    approved-deferred` とし realization PR と proof PR を分ける。definition/notation は declaration
+14. **disposition lifecycle**: assertion を `catalogued → skeletonized-unproved (sorryAx) →
+    proved/proved-relative` とし、whole-book skeleton freeze 後にだけ proof PR を開始する。
+    definition/notation は declaration
     と必要 law、hypothesis/domain は binder binding、conjecture/out-of-scope は nonproof terminal。
-    derived consequence は parent terminal 後、derived prerequisite は遷移時 base current source
+    derived consequence は parent terminal と source-order passage 後、derived prerequisite は遷移時 base current source
     proof frontier への required-by、immutable eligibility history、非巡回 DAG の下だけで先行可。
-    `sorry` stub/temporary axiom は使わず、
+    derived stub の型検査は R4 で可能だが proof eligibility はこの rule に従う。登録 skeleton 以外の
+    `sorry` と temporary axiom は使わない。各 unresolved theorem の elaborated value は direct
+    `sorryAx` を exactly 1 持ち、transitive-only dependency は stub として数えない。proved declaration
+    は direct/transitive とも zero とする。actual axiom set は共通 `sorryAx` の有無を検査し、
+    claim ごとの対応は declaration body/module mapping で検査する。
+    prospective approved project-axiom set は R4 で source/rationale/approval/digest として freeze し、
+    stub に actual 一致や人工参照を要求しない。current set はこの freeze 済み集合、または freeze 後の
+    専用 axiom-policy/statement-dependency PR で source/rationale/user approval/independent review/
+    digest update 済みの集合だけとする。R5 terminal でだけ current prospective approved=actual を要求し、
+    empty/nonempty により `proved` / `proved-relative` を生成する。
     stable claim ID は append-only+tombstone/supersession とする。
 15. **axiom isolation**: `LatticeSystem/Axioms/**` は空から始め、閉じた taxonomy、path/namespace、
     directional import、exact registry/environment gate を強制する。`proved` は project axiom
     zero、依存 result は `proved-relative`、axiom は `approved-deferred`。列挙外の解析的対象は
-    独立 design PR で新 category/path が承認されるまで axiom 化しない。
+    独立 design PR で新 category/path が承認されるまで axiom 化しない。ordinary stub の axiom
+    置換は禁止し、全 terminal proof の actual axiom set と current prospective approved set の exact equality、
+    transitive `sorryAx` zero を検査する。freeze 後の新 axiom/set expansion は通常 proof PR で禁止し、
+    専用 policy/dependency PR、source/rationale/user approval/independent review/digest update を要求する。
 16. **anti-regression / protection**: source deletion、disposition-specific status downgrade、
-    content/binding/locator drift、axiom expansion、binding 消失、source-assertion frontier violation
+    content/binding/locator drift、axiom expansion、binding 消失、source-proof-frontier violation
     と、仮定強化・結論弱化・量化域縮小等の semantic regression を base-diff gate で reject する。
     derived role/edge flip、consequence の早期進行、non-current/cyclic prerequisite も reject する。
-    全 digest change は disposition に対応する dedicated change PR と独立 review を要求する。
+    R4 freeze 後の sorry 増加、新規/未登録 sorry、proved→sorry、proof 消失、future-frontier proof
+    に加え、theorem name/module path/type の drift、future/unproved/sorry-backed import も reject する。
+    proof import 追加は既 proved かつ transitive `sorryAx`-free の source-order predecessor または
+    approved `required_by` prerequisite の ordinary module に限る。Axioms import は別枠で freeze 済み
+    current prospective approved set の exact module だけを許す。current set は R4 freeze 済み、または
+    freeze 後の専用 axiom-policy/statement-dependency PR で source/rationale/user approval/
+    independent review/digest update 済みの controlled exception に限る。全 digest change は
+    disposition に対応する dedicated change PR、source diff、
+    独立 review を要求する。
     foundation change は impact closure 付き dedicated PR。`rewrite-main` は direct/force push 禁止、
-    independent realization/verification review 必須とする。
-17. **source fidelity / basis semantics**: Tasaki の source assertion `S=1/2,1,...` と kernel の
+    independent vocabulary/skeleton/source-equivalence/verification review 必須とする。
+17. **source fidelity / basis semantics**: Tasaki の source `domain` claim `S=1/2,1,...` と kernel の
     `consequence` derived assertion `N=0` を分離する。basis は `m(k)=N/2-k`、row=output、column=input。legacy
     `SpinS/Operators.lean` の係数・基底順だけを再照合候補とし、endpoint row lemma の誤名・
     物理解釈は negative evidence として drop する。
-18. **public math docs/TeX**: legacy status/catalogue/TeX 複製は drop するが、新系列の公開数学
-    docs/TeX は禁止しない。書誌/locator は references+claim registry、typed assertion statement
-    と definition/notation declaration は Lean、status/frontier は environment-derived data を
-    正本とし、docs/TeX は claim ID を参照して
-    文献名・定理/式番号・printed/PDF page を明記し、数学変更 PR と同時同期する。
+18. **minimal documentation boundary**: `docs/` / `tex/` は complete reset で削除して不在にし、
+    新規 docs/TeX はユーザーの将来の明示承認まで作らない。root `DESIGN.md` / `README.md`、
+    blueprint、references、完全 locator 付き Lean doc comment だけを tracked source trace とし、
+    status/frontier は registry と environment から生成する。
+19. **phase order**: whole-book two-pass census/hash lock → whole-book source vocabulary/type layer →
+    whole-book typed assertion skeleton freeze → front-to-back proof discharge の順を固定し、R4 acceptance
+    前の proof PR を禁止する。
 
 ## Documentation sync conclusion for this PR
 
 本 PR は review 中の再設計提案一ファイルだけを変更し、現在の実装・公開 status を変更しない。
 したがって本 PR では README や旧公開物を同期しない。設計承認後の R1 で legacy `tex/` と旧
 docs/status 複製を全面削除し、本設計を root `DESIGN.md` へ移し、README と current branch link
-を scratch rewrite する。以後の status は claim registry/binding と Lean environment からだけ
-生成する一方、新系列の公開数学 docs/TeX は claim ID を参照する従属文書として数学変更 PR と
-同時に追加・同期できる。
+を scratch rewrite する。reset 後は `docs/` / `tex/` を置かず、ユーザーの将来の明示承認なしに
+新設しない。以後の status は claim registry/binding と Lean environment からだけ生成する。
