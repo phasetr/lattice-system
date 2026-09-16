@@ -1,20 +1,10 @@
 /.lake
-
-# TeX auxiliary files
-*.aux
-*.fdb_latexmk
-*.fls
+*.olean
+*.ilean
+*.c
+*.o
 *.log
-*.out
-*.toc
-*.synctex.gz
-*.pdf
 
-# sed/perl backup files
-*.bak
-
-# personal working notes; never committed
+# Local, untracked working state.
 /.self-local/
-
-# untracked scratch dir (raw logs / API dumps); never committed
 /.tmp-im/

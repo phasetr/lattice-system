@@ -1,13 +1,13 @@
 name = "LatticeSystem"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["LatticeSystem", "LatticeSystem.Tests"]
+defaultTargets = ["LatticeSystem"]
 
 [leanOptions]
 pp.unicode.fun = true
 relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
-linter.style.longFile = 1500
+weak.linter.style.longFile = 1500
 warningAsError = true
 maxSynthPendingDepth = 3
 

@@ -1,104 +1,35 @@
 # lattice-system
 
-A Lean 4 + mathlib project for formalizing theorems about many-body
-systems on **graphs**. Despite the name, the primary combinatorial
-abstraction is a graph `(Λ, E_Λ)` — finite for finite-volume work
-and infinite for the thermodynamic-limit / algebraic-formulation
-work that is a major long-term goal — with concrete lattices
-(1D chain, square / cubic grids, infinite chains, ℤ^d, …)
-appearing as specific graph instances (`SimpleGraph.pathGraph`,
-`SimpleGraph.cycleGraph`, products of these, infinite analogues, …).
-This convention follows the standard mathematical-physics literature
-on many-body systems on graphs.
+This repository is the scratch reimplementation of Hal Tasaki's *Physics and Mathematics of Quantum
+Many-Body Systems* in Lean 4 and mathlib.
 
-The project subsumes and generalizes the earlier
-[ising-model](https://github.com/phasetr/ising-model) project, with
-the current focus on finite-volume quantum spin systems and the
-longer-term goal of covering Hubbard / BCS, CAR-algebraic fermion
-systems, the **infinite-volume / thermodynamic limit** (which
-intrinsically requires infinite graphs), and eventually lattice QCD.
+The previous implementation is frozen at
+[`01bcb49d49db92c225cfa74b74d409dd0a9c4edc`](https://github.com/phasetr/lattice-system/tree/01bcb49d49db92c225cfa74b74d409dd0a9c4edc).
+No Lean source, theorem, test, API, status catalogue, script, documentation, or TeX artifact from that
+implementation is carried into this rewrite. The anchor may be consulted only for failure lessons and
+mathematical ideas; the implementation inputs are Tasaki's source and mathlib.
 
-## About this project
+## Current status
 
-This repository is written by a programmer without an academic
-position, whose interests lie in non-relativistic quantum field theory
-and rigorous statistical mechanics. Continuing a long-standing interest
-in mathematical physics from my student days, and combined with the
-goal of improving my technical skills as a programmer, I maintain
-`lattice-system` as a personal hobby project to become proficient in
-Lean 4 by formalizing results around lattice models.
+The repository is at the atomic reset/bootstrap phase. It currently contains no mathematical
+implementation or proof. Machine-readable source census and status data have only empty bootstrap shapes;
+their validators and generated status views are planned work and are not yet implemented.
 
-The intended scope is finite-volume results in the first instance and,
-more gradually, the infinite-volume / algebraic formulations described
-in the project page. This project is not intended to interfere with
-the work of researchers in the field, and if any overlap arises I am
-happy to coordinate accordingly.
+The authoritative plan is [DESIGN.md](DESIGN.md). Work proceeds in this order:
 
-## Formalization status
+1. whole-book two-pass census and hash lock;
+2. scratch source vocabulary/type layer;
+3. whole-book typed assertion skeleton freeze;
+4. front-to-back proof discharge.
 
-All theorems are formally proved with **zero `sorry`**, and
-`lake build` produces **zero linter warnings** (Phase 4 milestone,
-2026-04-23).
+## Hard merge gate
 
-For the complete list of formalized theorems, the phase-by-phase
-progress table, and the primary textbook references used at each step,
-see the
-**[project page](https://phasetr.github.io/lattice-system/)**.
-
-## Documentation
-
-- Project page: [https://phasetr.github.io/lattice-system/](https://phasetr.github.io/lattice-system/)
-- Formalization-status data contract and publication runbook:
-  [repository documentation](https://github.com/phasetr/lattice-system/blob/main/docs/formalization-publication.md)
-- API documentation (doc-gen4): **currently disabled** because the
-  docs-generation CI job was consistently slow (often >1h per push
-  to `main`). To build the API docs locally, run
-  `lake build +Mathlib:docs` (or consult
-  [doc-gen4](https://github.com/leanprover-community/doc-gen4)
-  directly). The CI job is commented out in
-  `.github/workflows/lean_action_ci.yml` with a note on how to
-  re-enable.
-
-Mathematical documentation for the formalized proofs is in `tex/` as
-LaTeX source files. To compile:
-
-```sh
-cd tex
-latexmk -pdf proof-guide.tex
-```
-
-Requires a TeX Live installation. The public proof guide currently uses
-portable LaTeX packages and is verified with pdfLaTeX. LuaLaTeX remains
-appropriate for documents that actually use LuaTeX/LuaTeX-ja features, but
-TeX Live 2026 LuaHBTeX/luaotfload can mis-detect writable cache directories
-on some sandboxed runs even when `TEXMFCACHE` points at a writable absolute
-path. PDFs are not committed to the repository.
-
-| File                  | Description                                       |
-|-----------------------|---------------------------------------------------|
-| `tex/proof-guide.tex` | Mathematical walkthrough of the formalized proofs |
-
-## Related projects and references
-
-- Tasaki, H., *Physics and Mathematics of Quantum Many-Body Systems* — [Springer](https://link.springer.com/book/10.1007/978-3-030-41265-4)
-- Nielsen, M. A. and Chuang, I. L., *Quantum Computation and Quantum Information* — [Cambridge UP](https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE)
-- Araki, H. and Moriya, H., *Equilibrium Statistical Mechanics of Fermion Lattice Systems*, Rev. Math. Phys. 15 (2003), 93-198 — [World Scientific](https://www.worldscientific.com/doi/10.1142/S0129055X03001606)
-- Bru, J.-B. and de Siqueira Pedra, W., *C\*-Algebras and Mathematical Foundations of Quantum Statistical Mechanics: An Introduction* — [Springer](https://link.springer.com/book/10.1007/978-3-031-28949-1)
-- Tasaki, H., *From Nagaoka's Ferromagnetism to Flat-Band Ferromagnetism and Beyond* (1998) — [arXiv:cond-mat/9712219](https://arxiv.org/abs/cond-mat/9712219)
-- Simon, B., *The Statistical Mechanics of Lattice Gases, Vol. I* — [Princeton UP](https://press.princeton.edu/books/hardcover/9780691636436/the-statistical-mechanics-of-lattice-gases-volume-i)
-- Friedli, S. and Velenik, Y., *Statistical Mechanics of Lattice Systems: A Concrete Mathematical Introduction* — [Cambridge UP](https://www.unige.ch/math/folks/velenik/smbook/)
-- Glimm, J. and Jaffe, A., *Quantum Physics: A Functional Integral Point of View* — [Springer](https://link.springer.com/book/10.1007/978-1-4612-4728-9)
-- Fernández, R., Fröhlich, J., and Sokal, A. D., *Random Walks, Critical Phenomena, and Triviality in Quantum Field Theory* — [Springer](https://link.springer.com/book/10.1007/978-3-662-02866-7)
-- Aarts, G., *Introductory lectures on lattice QCD at nonzero baryon number* (2015) — [arXiv:1512.05145](https://arxiv.org/abs/1512.05145)
-- [phasetr/ising-model](https://github.com/phasetr/ising-model) — Upstream project; this repository reuses its conventions and infrastructure.
-- [leanprover-community/physlib](https://github.com/leanprover-community/physlib) — A physics library in Lean 4.
-- [YaelDillies/gibbs-measure](https://github.com/YaelDillies/gibbs-measure) — Lean 4 formalization project on Gibbs measures (classical).
-
-## Learning resources
-
-- [Lean by Example](https://lean-ja.github.io/lean-by-example/)
-- [The Mechanics of Proof (Math 2001)](https://hrmacbeth.github.io/math2001/) by Heather Macbeth
-- [Mathematics in Lean](https://leanprover-community.github.io/mathematics_in_lean/index.html)
+For every pull request in the rewrite program, including PR #5480, merge is forbidden until the user
+currently and explicitly confirms the target PR number and its current exact head SHA and authorizes merging
+that head. There is no phase or branch exception. CI GREEN, review APPROVE, design approval, past approval,
+and approval for another PR are not merge authority. A head change invalidates approval. Auto-merge, merge
+queue use, direct push, and force push to the protected trunk are forbidden. Agents must not check the
+merge-confirmation checkbox themselves.
 
 ## Build
 
@@ -106,5 +37,4 @@ path. PDFs are not committed to the repository.
 lake build
 ```
 
-Uses Lean 4.29.0 and Mathlib `v4.29.0` (see `lean-toolchain` and
-`lakefile.toml`).
+The existing `lean-toolchain` and `lake-manifest.json` pins are preserved unchanged.
