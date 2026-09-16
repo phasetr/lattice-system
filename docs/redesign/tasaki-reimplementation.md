@@ -2,24 +2,26 @@
 
 ## Status / Decision
 
-- Status: **review-ready proposal**。PR merge 前なので accepted ではないが、bootstrap を
-  止める未決 P0 は残していない。以下の decision set 全体をこの PR で review する。
+- Status: **review-ready proposal (complete-reset revision)**。PR merge 前なので accepted
+  ではないが、bootstrap を止める未決 P0 は残していない。以下の decision set 全体を
+  この PR で review する。
 - 対象: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
   (Springer, 2020) の形式化を、保存された旧 `main` とは別の再実装系列で
   front-to-back に作り直す。
 - 基準 revision: `01bcb49d49db92c225cfa74b74d409dd0a9c4edc`
   (`main` の 2026-09-15 時点の tip)。本書中の測定値は、特記しない限りこの
   revision で得た。
-- この設計 PR の変更範囲は本ファイルだけである。現行 Lean source、tests、CI、
-  catalogue、依存 manifest は削除も変更もしない。
+- この設計 PR の変更範囲は本ファイルだけである。現行 Lean source、tests、CI、TeX、
+  catalogue、依存 manifest の reset は、設計承認後の atomic bootstrap PR で行う。
 
 本提案の decision は次の通りである。
 
 1. 旧 `main` は履歴・比較・証明アイデアを読むための **frozen legacy** として残す。
    新系列に旧公開 API との互換性は要求しない。
-2. 設計承認後の bootstrap PR で、新系列から旧 `LatticeSystem/` source、旧 tests、
-   旧 status catalogue を除き、package/toolchain、最小 CI、参照文献だけを残す。
-   本 PR ではその除去を先取りしない。
+2. 設計承認後の atomic bootstrap PR で、旧 `LatticeSystem/**`、tests、root aggregator、
+   `formalization-status/**`、旧 scripts/checkers/workflows、`tex/**`、旧 docs/site/history/
+   catalogue を全面削除する。既存 code は一切 carry-forward、import、cherry-pick しない。
+   path を再利用する場合も内容は scratch rewrite とする。
 3. 新系列は、無限頂点型上の graph と有限 volume を分離し、有限 volume の
    configuration/operator を一つだけ定義する。
 4. 有限次元 operator の canonical representation は `Matrix` とする。
@@ -28,12 +30,12 @@
    kernel の特殊化・制限として構成する。
 6. Tasaki の source item を印刷順に進める。旧実装の進捗地点や救出しやすさを理由に
    §2.5、Chapter 4、Hubbard 等へ先回りしない。
-7. 旧 proof は仕様でも依存でもなく、再証明時に監査する参考資料である。旧 axiom は
-   一括移植しない。
-8. coverage universe は Chapter 2--11 と Appendix A の、番号付き Definition / Theorem /
-   Lemma / Proposition / Corollary / Conjecture / Problem、および後続結果が参照する番号付き
-   数式とする。Chapter 1 の概説と、番号がなく後続結果にも使われない説明は coverage 外と
-   する。外部文献に証明を委ねるという理由だけでは coverage から外さない。
+7. 旧 proof は仕様でも依存でもなく、legacy anchor から読む参考資料にすぎない。新系列へ
+   旧 code を一行も移植せず、旧 axiom も一括移植しない。
+8. 数学実装を始める前に、本書全体の source census を完了し hash-lock する。Chapter 2--11、
+   Appendix A、Solutions pp. 493--520 の named result/problem/definition/conjecture、全番号付き
+   数式、番号のない proof obligation を対象とする。Chapter 1、references、index 等も
+   `out_of_scope` page として census に残し、無言で読み飛ばした page を作らない。
 9. 計算上の canonical operator は `Matrix`、物理 observable は Hermitian 証明を持つ
    `Observable` bundle とする。zero vector を eigenvector と呼ばない。
 10. volume inclusion、configuration restriction、operator の identity extension、volume
@@ -44,8 +46,15 @@
 12. fermion は finite configuration/operator carrier だけを共有する。bosonic `embedSite` を
     fermion operator の API として共有せず、Chapter 9 到達時に ordered Jordan--Wigner 表現を
     canonical とする。
-13. bootstrap は一つの atomic PR とし、旧 source 除去後の最終 tree、build target、public
-    root、layer check、minimal status/axiom checker、新 trunk 用 CI を同時に成立させる。
+13. bootstrap は一つの atomic PR とし、削除と fresh minimal root/lake/CI/checkers/
+    blueprint を同時に成立させる。trunk には途中の壊れた commit を置かない。
+14. 未実装 source item は metadata blueprint で `inventoried` / `catalogued` として保持する。
+    frontier 到達後に別 PR で `def ItemStatement : Prop` を build して `typed` とし、さらに
+    別 PR の theorem でだけ `proved` とする。production/repository に `sorry` theorem stub
+    または temporary axiom を置かない。
+15. project axiom は空の `LatticeSystem/Axioms/**` から始め、専用 path/namespace、閉じた分類、
+    exact environment check の下でのみ追加できる。project axiom が空の result だけを
+    `proved`、依存する result を `proved-relative`、axiom 自身を `approved-deferred` とする。
 
 この文書の承認は設計の承認であり、旧 source の数学的正当性や移植可否を一括承認する
 ものではない。
@@ -60,6 +69,7 @@
 - 同じ有限 volume kernel を spin、fermion、将来の局所 observable に再利用できる
   ようにする。
 - theorem/proof、source locator、actual axiom set、status の関係を一意にする。
+- 全巻 source item を実装前に列挙し、未実装が不可視になる余地をなくす。
 - 小さい import surface と一方向の dependency DAG を保つ。
 - `lake build` warning zero、`sorry` / `admit` / `native_decide` 不在を継続する。
 - 強い仮定を置く theorem について、仮定の同時充足可能性と結論の非空虚性を確認する。
@@ -69,9 +79,12 @@
 ## Non-goals
 
 - 旧 namespace、declaration name、import path の互換維持。
+- 旧 source/test/checker/docs/TeX の一部を「ひとまず」残すこと。
 - 旧 source を新しい directory へ機械的に移動すること。
 - 旧 catalogue の全行を新 status ledger へ機械的に移すこと。
 - 旧 proof-stage module を順番に「きれいにする」漸進 refactor。
+- `sorry` theorem や temporary axiom を backlog 表現として使うこと。
+- TeX tooling、TeX workflow、`tex/`、TeX source/reference を新系列で復活させること。
 - Tasaki 本で現在必要のない Lieb、Miyao、別文献の独立形式化。
 - 二つ目の具体的利用がない一般化や、将来便利そうという理由だけの helper。
 - Chapter 2 の bootstrap 時点で quasi-local algebra、KMS、GNS、thermodynamic limit を
@@ -237,14 +250,14 @@ catalogue、`tex/proof-guide.tex`、一部の structured records に反復され
 
 | 資産 | 採用する部分 | 条件 |
 |---|---|---|
-| `lakefile.toml` | pinned mathlib、`relaxedAutoImplicit = false`、warning-as-error、標準 linter、long-file check | bootstrap で最小構成として再確認する |
-| `lean-toolchain`, `lake-manifest.json` | reproducible toolchain | 設計と無関係な dependency 更新をしない |
+| `lakefile.toml` | pinned mathlib revision、`relaxedAutoImplicit = false`、warning-as-error、標準 linter、long-file check という判断 | file は scratch rewrite し、最小構成で再確認する |
+| `lean-toolchain`, `lake-manifest.json` | reproducible toolchain と pinned dependency | この二つだけは内容を保持し、dependency 更新を混ぜない |
 | `Lattice/Graph.lean` | graph に有限性を埋め込まない判断、path/cycle/hypercubic との接続 | API は新 `Geometry` 層で再記述する |
 | `SpinS/Operators.lean` | `N = 2S`、basis `Fin (N+1)`、raising/lowering の係数 | source と再照合し、新 canonical API 上で証明し直す |
 | `ManyBody.lean`, `MultiSiteCore.lean` | configuration basis 上の site embedding と可換性の数学的アイデア | generic local basis 一本に統合する |
 | `Math/MatrixAnalysis/` 等 | source-neutral な有限次元線形代数の proof idea | 実際の次 theorem に必要、mathlib に同等物なし、最弱仮定を満たすものだけ |
 | tests の具体的手法 | `Fin n` の全ケース証明、small matrix の全 entry 計算、二つの独立定義の等式 | 意味を検査する短い test に限定 |
-| status validator | actual axiom set と declaration module を Lean 環境から検査する発想 | ledger と checker を最小から作り直す |
+| status validator | actual axiom set と declaration module を Lean 環境から検査する発想 | 旧 script は削除し、environment-based checker を最小から作り直す |
 | Tasaki の書誌・locator | 1st ed., Springer 2020 の chapter/section/equation/page | tracked citation metadata に保持し、gitignored file を build/review の前提にしない |
 
 低層資産は file 単位で採用しない。採用単位は「定義の数学的内容」「証明アイデア」または
@@ -275,6 +288,10 @@ commit や file を cherry-pick しない。各 source-item PR は adopt gate �
 - theorem の statement を再掲するだけの test。
 - grep 数、line number、一時 signature を仕様化する test。
 - legacy catalogue の手移植と旧 roadmap の PR chronicle。
+- `docs/` の旧 site/history/catalogue/limitations/roadmap と site generator。
+- `tex/` 全体、TeX build tooling/workflow/reference、TeX 同期規約。
+- `formalization-status/` と旧 status/schema/retirement/cutover machinery。
+- 旧 scripts/checkers および release/pages/update workflow。
 - 参照ゼロの decorative helper と、将来便利そうという理由だけの一般化。
 - 旧 axiom の一括移植。
 - 本文より強いが証明を通しやすい仮定。
@@ -293,16 +310,27 @@ LatticeSystem.Math       LatticeSystem.Geometry
                Quantum.Spin
                     ↓
                   Models
-                    ↓
+                    ↓        ↘
+                    │      Axioms (approved assumptions only)
+                    │        ↓
           Tasaki2020.ChapterNN
                     ↓
             Tests / StatusChecks
 ```
 
+`Blueprint` は Lean dependency graph の外側にある immutable source inventory であり、Lean
+declaration への binding だけを持つ。`Axioms` は foundation/model を import してよいが、
+foundation/model から `Axioms` への逆 import は禁止する。chapter result は必要な axiom module
+だけを直接 import し、axiom umbrella import は作らない。
+
 初期 directory 案は次の通りである。file は PR 単位ではなく数学的責務で分ける。
 
 ```text
 LatticeSystem/
+  Axioms/                     # bootstrap 時は空。承認済み分類だけを後から作る
+    OperatorAlgebra/
+    FunctionalAnalysis/
+    Symmetry/
   Math/
     ...                         # 要求された時だけ追加
   Geometry/
@@ -337,11 +365,20 @@ LatticeSystem/
   Tests/
     Quantum/
     Tasaki2020/
+blueprint/
+  schema.json
+  tasaki-2020/
+    source-index.json
+    bindings/
+references/
+  tasaki-2020.json            # 書誌・edition・source hash metadata のみ
 ```
 
 `LatticeSystem.lean` は stable public surface だけを import する。全 leaf/tip coverage は
 build target が担い、root file の責務にしない。source item の追加ごとに file を作る必要は
 なく、同じ数学的責務で 700 行未満を目安に育てる。分割は責務が二つになった時に行う。
+本の本文、PDF、抽出 text、statement の大量引用は tracked しない。tracked に置くのは書誌、
+locator、hash、formalization に必要な数学的 restatement だけである。
 
 ## Canonical types
 
@@ -509,59 +546,105 @@ consumer が同一の数学的対象を受け取るために使う。constructor
 
 ## Axiom policy
 
-1. `sorry`、`admit`、`native_decide` は禁止する。
-2. 旧 project axiom declaration 70 個は一つも自動移植しない。
-3. defer してよい対象は、抽象 C\*-algebra、GNS、KMS、`WeakDual`、state、Wigner、
-   内容のない述語定義に限る。
-4. 摂動論で defer してよいのは、cluster expansion、quasi-adiabatic continuation、
+1. `sorry`、`admit`、`native_decide`、未証明 theorem stub、temporary axiom を禁止する。
+2. 旧 project axiom declaration 70 個は一つも自動移植しない。bootstrap 後の
+   `LatticeSystem/Axioms/` は空から始める。
+3. primitive vocabulary は axiom ではなく `structure` / `def` で表す。内容のない predicate
+   も、命題を真とする証拠を与えない限り `def ... : Prop` とする。
+4. axiom の許可 taxonomy は、`OperatorAlgebra/{CStar,State,GNS,KMS}`、
+   `FunctionalAnalysis/WeakDual`、`Symmetry/Wigner` に閉じる。`Misc`、`Temporary`、`TODO`、
+   chapter 名を category にしてはならない。Wigner も有限次元で証明可能な形は証明する。
+5. 摂動論で defer してよいのは、cluster expansion、quasi-adiabatic continuation、
    Lieb--Robinson bound、Rellich--Kato 型の分岐連続性の一般論など、真に作用素環的・
    解析的極限を要するものに限る。
-5. **無限体積または thermodynamic limit であること自体は defer 理由にならない。**
+6. **無限体積、難しさ、実装量、有限次元であることは axiom category でも defer 理由でもない。**
    無限グラフ、volume exhaustion、極限の存在・性質は長期中心目標として証明する。
-   その途中で上記の抽象 C\*-algebra/state 等に該当する個別 component だけを、宣言単位で
+   その途中で上記の許可 taxonomy に該当する個別 component だけを、宣言単位で
    defer 審査する。
-6. 有限次元・固定 finite volume の線形代数、spectral theory、固有値連続性、縮退摂動、
+7. 有限次元・固定 finite volume の線形代数、spectral theory、固有値連続性、縮退摂動、
    変分評価は必ず証明する。「難しい」「摂動論」「後で使う」は defer 理由にならない。
-7. 内容のない predicate を `axiom ... : ... → Prop` として導入する場合も、存在 theorem を
-   暗黙に与えていないか、結論を vacuous にしていないかを source item ごとに審査する。
 8. conjecture は `def ... : Prop` として statement を記録してよいが、true と主張する
    `axiom` を置かない。
-9. deferred declaration には source locator、欠けている数学、reopen condition、依存する
-   capstone を一つの ledger entry に記録する。
-10. 各 proved capstone の actual axiom set を Lean environment から検査する。許可される
-   logical axioms と project-specific axiom を完全一致で区別する。
-11. temporary axiom を後で discharge する workflow は使わない。大型 theorem は proved
-   supporting lemma の列へ分割し、未証明 capstone を source に置かない。
+9. axiom declaration は分類に対応する `LatticeSystem/Axioms/**` path と
+   `LatticeSystem.Axioms.*` namespace の中だけに置く。axiom umbrella module は作らず、
+   consumer は必要な module だけを直接 import する。foundation/model は `Axioms` を
+   import してはならない。
+10. deferred declaration には stable axiom ID、source locator、exact statement、category、
+    欠けている数学、consumer obligations、承認 PR、reopen condition を registry に記録する。
+11. CI は Lean environment の全 project axiom と registry を双方向完全一致で検査し、binding
+    された全 declaration の expected/actual axiom set も完全一致で検査する。path/namespace
+    違反、未登録 axiom、存在しない登録、axiom set の過不足、`sorryAx` を reject する。
+12. project axiom dependency が空の result だけを `proved`、非空で完全一致する result を
+    `proved-relative`、axiom declaration 自身を `approved-deferred` と生成表示する。
+    `proved-relative` を chapter の axiom-free 完了数へ算入しない。
+13. 大型 theorem は proved supporting lemma の列へ分割し、未証明 capstone を source に
+    置かない。
 
 ## Source-item, PR, and test policy
 
 ### Source item
 
-coverage universe は、Tasaki 1st ed. (Springer, 2020) の Chapter 2--11 と Appendix A に
-ある番号付き Definition / Theorem / Lemma / Proposition / Corollary / Conjecture / Problem、
-および後続の covered result が参照する番号付き数式である。Chapter 1 の概説と、番号がなく
-後続結果にも使われない説明は対象外である。この閉じた universe は tracked citation metadata
-へ source-order key とともに登録し、未登録 item を ad hoc に選ばない。
+coverage census は Tasaki 1st ed. (Springer, 2020) の全 page を対象とする。Chapter 2--11、
+Appendix A、Solutions pp. 493--520 では、全 named Definition / Theorem / Lemma /
+Proposition / Corollary / Conjecture / Problem、全番号付き数式、番号のない proof obligation、
+一つの result 内の複数の独立結論を登録する。Chapter 1、front matter、references、index 等も
+page record を作り `out_of_scope` disposition とする。zero-item page も明示し、読んだ page と
+未監査 page を区別する。
 
-source item は Tasaki の一定理、一問題、または一つの数学的責務をなす連続した equation
-block とする。edition、chapter/section、theorem/problem/equation number、page を必須にする。
-外部文献に証明を委ねる item も coverage に残し、新 axiom policy に従って prove/defer を
-判断する。
+local text 抽出から得た約 194 named-heading candidate と約 1,283 equation-token candidate は
+機械 seed でしかない。抽出方法により equation token は約 1,287 とも数えられるため、どちらも
+完成件数として固定しない。printed page と PDF page の二 locator、候補から disposition への
+対応、solution locator を人手で一巡し、fresh な独立 reviewer が page-by-page に二巡目を行う。
+unresolved candidate、未分類 equation、未監査 page がゼロになった時だけ source index を
+hash-lock する。
 
-Lean source が declaration の statement/kind/module の正本である。status、source locator、
-actual axiom dependency は一つの小さな machine-readable ledger を正本とし、人間向け一覧は
-生成する。proof exposition は重複 status ledger ではなく、Lean declaration へリンクする。
+source item の stable ID は append-only とする。誤登録も削除・再利用せず tombstone と
+`superseded_by` を残す。各 claim は `definition`、`hypothesis`、`independent_claim`、
+`derived_claim`、`restatement`、`proof_step`、`notation`、`out_of_scope` の disposition を持つ。
+外部文献に証明を委ねる item も消さず、新 axiom policy に従って prove/defer を判断する。
 
-### PR unit
+初期 blueprint は metadata と数学的 restatement だけを持ち、状態は `inventoried` または
+`catalogued` である。frontier 到達後、必要な型が実装済みになってから statement-only PR で
+次のような declaration を build する。
 
-- 通常は 1 PR = 1 source item の完成した vertical slice。
-- PR は定義、直前から backward-chain した必要補題、capstone、意味 test、source/status 更新を
-  同時に完結させる。
+```lean
+/--
+Tasaki 2020, 1st ed., §2.4, Theorem 2.1, printed p. 35.
+Blueprint: `TASAKI2020-THM-02-001`.
+-/
+def Theorem21Statement : Prop := ...
+```
+
+この段階は `typed` であり、真とは主張しない。別の proof PR でだけ
+`theorem theorem21 : Theorem21Statement := by ...` を追加して `proved` に進める。
+manifest binding は claim declaration、proof declaration、module、statement digest、expected
+logical/project axiom set、non-vacuity declaration を結ぶ。proof theorem の型が対応 claim と
+definitionally equal でなければ CI failure とする。
+
+全 theorem を `sorry` で先置きする案は statement を型検査できる利点があるが、未証明 result
+を downstream が利用でき、`sorryAx` を theorem として存在させ、後半章の型を作るために全
+architecture を早期固定する。metadata → built `Prop` → proof の分離は、全 target の可視性を
+保ちつつ未証明命題を証拠として利用不能にするため、`sorry` stub より強い。
+
+status field は人が書かない。source index、binding、Lean environment から
+`inventoried/catalogued/typed/proved/proved-relative/approved-deferred/conjecture-recorded/
+definition-implemented-with-laws` を生成する。tracked prose を第二の status 正本にしない。
+
+### PR unit and frontier
+
+- 通常は一つの source item について、statement-only PR と proof PR を分離する。
+- statement-only PR は必要最小限の定義、built `Statement : Prop`、source equivalence review、
+  non-vacuity 計画までを含み、result theorem を含まない。
+- proof PR は凍結済み statement を変更せず、直前から backward-chain した必要補題、result、
+  semantic test、environment verification を完結させる。
 - 大型 theorem だけ、同じ theorem issue の中で複数 PR に分割できる。各 PR はそれ自体で
   axiom-free な一つの数学結果を完成させ、最終 theorem のどの step に必要かを明記する。
 - PR 分割の都合で `Core` / `Bridge` / `Final` file を増やさない。
 - unrelated refactor、将来用 helper、別 chapter の準備を混ぜない。
 - capstone 実装前に、本文との statement review と hypothesis audit を独立に行う。
+- source-order 上の最古の未完 item だけを frontier とする。frontier より後の item は typed/
+  proved に進めない。現在 item の final line から必要な Appendix dependency だけ、
+  `required_by` edge を登録して先行できる。
 - 旧 code を import または cherry-pick しない。proof idea を読む場合も、新 canonical API
   上で source から実装し直す。
 - 各 source-item PR に `Legacy assessment` を置き、参照した旧 declaration ごとに
@@ -601,17 +684,43 @@ source-item PR の `Legacy assessment` に残し、設計 PR で旧資産全体�
 ### Per-PR verification
 
 1. 対象 module の局所 build。
-2. `lake build`、warning zero。
-3. `sorry` / `admit` / `native_decide` 不在。
-4. capstone actual axiom set の完全一致確認。
-5. source locator と statement review。
-6. dependency-layer 違反と import cycle の確認。
-7. semantic test と non-vacuity control。
-8. cold/warm のどちらかを明記した compile-time delta と import 増分の記録。
+2. 全 module を含む `lake build`、warning zero。public root から未 import でも build する。
+3. `sorry` / `admit` / `native_decide` / `sorryAx` 不在。
+4. binding された全 declaration の actual logical/project axiom set の完全一致確認。
+5. source locator、claim/proof binding、proof type と claim の definitional equality。
+6. dependency-layer 違反、import cycle、unregistered/orphan declaration がゼロ。
+7. semantic test と non-vacuity witness。強い hypothesis に witness がない例外は理由と独立承認を要求。
+8. source index と base branch の diff に対する state monotonicity check。
+9. cold/warm のどちらかを明記した compile-time delta と import 増分の記録。
+
+### Anti-regression gates
+
+base branch と PR head の machine-readable diff で、次を default reject する。
+
+- source item の削除、stable ID の再利用、tombstone の復活。
+- `proved` / `proved-relative` / `typed` からの無承認 downgrade、proof declaration の消失。
+- locator、disposition、statement digest の silent change。
+- hypothesis/結論の弱化。source 誤読訂正は dedicated statement-change PR で旧 item を
+  tombstone/supersession し、訂正根拠を独立 review する。
+- statement change と proof change の同居。
+- expected project axiom set の拡大、`proved` から `proved-relative` への silent change。
+- frontier より後の item の状態遷移、source-order の変更。
+- active binding の declaration 不在、未登録 public result、build 対象外 module。
+
+statement digest を変える場合は dedicated statement-change PR とし、既存 proof result を一度
+外して `typed` に戻し、source equivalence の独立 review を受ける。semantic foundation の
+definition を変える場合は dedicated breaking-foundation PR とし、Lean constant dependency
+graph による transitive impact closure、影響する全 statement/result、semantic tests、full build
+を提示する。proof PR と混ぜない。
+
+`rewrite-main` は protected branch とし、direct push と force push を禁止する。build、census、
+layer、environment axiom、monotonicity check を required にし、statement PR は独立 statement
+review、proof PR は独立 verification review を required にする。人間向け status は常に生成物で、
+手編集可能な `proved` label を正本にしない。
 
 ## Migration sequence
 
-### M0: legacy freeze and design
+### R0: legacy freeze and design update
 
 - 旧 `main` の anchor は
   `01bcb49d49db92c225cfa74b74d409dd0a9c4edc` とし、frozen legacy とする。
@@ -619,61 +728,123 @@ source-item PR の `Legacy assessment` に残し、設計 PR で旧資産全体�
   履歴比較可能性を保つ。
 - `redesign/tasaki-reimplementation-plan` を `rewrite-main` への設計 PR とする。
 - 本 PR は本ファイルだけを追加し、現コードを変更しない。
+- complete reset、closed keep allowlist、complete census、state machine、Axioms isolation、
+  anti-regression gate を一つの矛盾のない設計として承認し、未決 P0 をゼロにする。
 
-### M1: atomic bootstrap after approval
+### R1: atomic complete-reset bootstrap
 
-設計承認後の一つの bootstrap PR で初めて、再実装系列から次を除く。
+設計承認後の一つの bootstrap PR で、次を全面削除する。
 
-- 旧 `LatticeSystem/` production source
-- 旧 `LatticeSystem/Tests*`
-- 旧 legacy/prototype status catalogue と専用 migration guards
-- 旧 root tip aggregator
+- 旧 `LatticeSystem/**` production/tests と `LatticeSystem/Tests.lean`
+- 旧 root tip aggregator `LatticeSystem.lean`
+- `formalization-status/**` と旧 status/schema/retirement/cutover machinery
+- 旧 `scripts/**`、checkers、site generators
+- `tex/**` と TeX tooling/workflow/reference。新系列で復活させない
+- `docs/**` の旧 site/history/catalogue/limitations/roadmap
+- release/pages/update を含む旧 workflows
 
-この PR は「削除だけ」を一時的に merge して後続 PR で直す二段階にしない。同じ PR の
-最終 tree で次を同時に成立させる。
+bootstrap 後に旧内容を保持してよい closed allowlist は `lean-toolchain` と
+`lake-manifest.json` の pinned toolchain/dependency 内容だけである。`.gitignore`、`README.md`、
+`lakefile.toml`、`LatticeSystem.lean`、CI path を再利用する場合も scratch rewrite とする。
+承認済み本設計は `docs/` に残さず root `DESIGN.md` へ移し、最終 tree から `docs/` 自体を
+削除する。新しい tracked tree は概念的に次へ閉じる。
+
+```text
+.github/CODEOWNERS
+.github/workflows/lean_action_ci.yml
+.gitignore
+DESIGN.md
+README.md
+LatticeSystem.lean
+blueprint/schema.json
+blueprint/tasaki-2020/source-index.json
+lake-manifest.json
+lakefile.toml
+lean-toolchain
+references/tasaki-2020.json
+scripts/check_blueprint.py
+scripts/check_closed_tree.py
+scripts/check_layers.py
+scripts/check_lean_environment.lean
+```
+
+source directory と binding shard は、最初に実需要が出た PR でこの allowlist に manifest-driven
+に追加する。allowlist 外の legacy path/file が残れば bootstrap CI を落とす。この PR は
+「削除だけ」を一時的に merge して後続 PR で直す二段階にしない。同じ PR の最終 tree で次を
+同時に成立させる。
 
 - package identity、`lean-toolchain`、依存を変えない最小 `lakefile.toml` / manifest。
 - public root `LatticeSystem.lean`。DAG tip aggregator ではなく、bootstrap 時点の空の stable
   surface を表す。
 - default build target と、checker を含む CI target。
 - import layer rule を検査する dependency-free checker。
-- empty catalogue から開始できる minimal source/status schema と actual-axiom checker。
+- empty blueprint から開始できる source schema、closed-tree check、layer check、actual-axiom
+  checker、base-diff monotonicity check。
 - `README.md` の最小 project identity、build command、legacy anchor、新 trunk の説明。
 - tracked `references/tasaki-2020.json` に edition、ISBN/DOI、chapter/section/page range、
-  source-order key を保持する。local extracted text/PDF は調査補助にすぎず、build、CI、
-  review、再開の依存にしない。
+  source fingerprint metadata だけを保持する。本の source copy、PDF、抽出 text は tracked
+  せず、build、CI、review、再開の依存にしない。
 - `.github/workflows/lean_action_ci.yml` の push branch を `main` から `rewrite-main` へ変更し、
   pull request でも同じ build/check を実行する。
-- tracked docs 内の repository link は相対 link を優先し、branch を埋め込む必要がある link は
-  `/blob/rewrite-main/` を使う。legacy 証跡だけは anchor SHA の permalink を使い、
-  `/blob/main/` を新系列の current link として残さない。
+- `README.md` / `DESIGN.md` の link は相対 link を優先し、legacy 証跡だけは anchor SHA の
+  permalink を使う。`/blob/main/` を新系列の current link として残さない。
 
 削除 scope は bootstrap PR 内で read-only inventory を取り、legacy anchor から常に回収
-できることを確認する。bootstrap commit 自身が `lake build`、layer check、empty-status
-validation、actual-axiom check を通らない状態を branch 上に残さない。
+できることを確認する。bootstrap PR の最終 head は `lake build`、closed-tree、layer、
+empty-blueprint、actual-axiom check をすべて通す。途中の壊れた commit を trunk に置かず、
+atomic PR 全体だけを merge する。
 
 旧 API への compatibility shim、deprecated alias、facade は作らない。旧 proof を参照する時は
 `git show 01bcb49d49db92c225cfa74b74d409dd0a9c4edc:<path>` 等で読み、新 source から
-import せず、commit/file を cherry-pick しない。
+import せず、code を copy せず、commit/file を cherry-pick しない。
 
-### M2: first source-item vertical slice
+### R2: complete source census and freeze
 
-- 下記 backlog item 1 を最初の implementation PR とする。
-- item 1 に必要な single-site basis/operator だけを同じ vertical slice 内で導入する。
-- bootstrap infrastructure の追加・修理をこの PR に持ち越さない。
+- Chapter 2--11、Appendix A、Solutions pp. 493--520 と全 out-of-scope page を inventory する。
+- machine candidates をすべて disposition に結び、zero-item page も記録する。
+- printed/PDF page の二 locator と problem/solution link を検査する。
+- human first pass と fresh independent second pass を完了する。
+- unresolved candidate、unclassified equation、unreviewed page、duplicate active ID をゼロにする。
+- source index を hash-lock し、append-only/tombstone policy と base-diff checker を有効にする。
+
+R2 が完了するまで数学定義・statement・proof の実装 PR を開始しない。census は chapter ごとの
+reviewable PR に分割してよいが、最後の freeze gate が通るまでは全て inventory work である。
+
+### R3: first statement-only slice
+
+- 下記 backlog item 1 を exact frontier とする。
+- item 1 に必要な single-site basis/operator だけを scratch 実装する。
+- source locator と stable blueprint ID を doc comment に置く。
+- built `def ItemStatement : Prop` と manifest binding を追加し、result theorem は置かない。
+- source equivalence、hypothesis strength、quantifier order、non-vacuity を独立 review する。
+- bootstrap infrastructure の追加・修理、many-body、graph、future chapter の準備を混ぜない。
 
 この段階では many-body、graph Hamiltonian、infinite-volume framework を作らない。
 
-### M3 onward: front-to-back source slices
+### R4: first proof slice
 
-各 source item について source statement、math-before-code、implementation、independent
-verification、status generation を一周させる。chapter milestone では旧 declaration 数でなく、
-Tasaki source item coverage と statement equivalence を監査する。
+- R3 で凍結した statement digest を変えず、対応 proof theorem を追加する。
+- claim/proof definitional equality、semantic test、non-vacuity、actual axiom exact-set、全 module
+  build を通す。
+- project axiom set が空なら `proved`、非空なら `proved-relative` を生成する。
+
+### R5 onward: front-to-back repetition
+
+各 frontier item について R3/R4 を繰り返す。Appendix dependency の先行は現在 item の
+backward chain に必要で manifest に `required_by` を持つ場合だけ許す。
+
+### R6: chapter audit
+
+chapter milestone では旧 declaration 数でなく frozen source census を基準にする。対象 claim の
+未分類、`catalogued`、`typed` 残存をゼロにし、`proved-relative` / `approved-deferred` は
+axiom-free 完了と別集計する。statement digest、actual axiom、non-vacuity、orphan、layer、
+frontier history を全件再監査する。
 
 ## Initial Tasaki front-to-back backlog
 
-最初の backlog は「既存コードで完成度が高い順」ではなく、Tasaki 1st ed., Springer 2020,
-§2.1, pp. 13--20 の印刷順である。次の 10 item を tracked citation metadata にこの順で置く。
+R2 の全巻 census freeze 後の最初の execution frontier は、「既存コードで完成度が高い順」では
+なく、Tasaki 1st ed., Springer 2020, §2.1, pp. 13--20 の印刷順である。次の10 item は全巻
+source index の先頭部分であり、これだけを先に catalogue として完成扱いするものではない。
 
 1. **`tasaki-2020-2.1-single-spin-foundation`, §2.1, pp. 13--14**
    - exact first implementation item。
@@ -729,37 +900,62 @@ Hubbard の完成 proof を先に救出しない。
 - canonical representation、graph/volume boundary、generic local basis、coupling bundle が
   decision として記録されている。
 - dependency DAG と初期 directory が一方向である。
-- axiom の自動移植禁止と defer 境界が明記されている。
-- source-item/PR/test/verification policy が明記されている。
+- complete reset の closed keep allowlist、`tex/` と最終 `docs/` の不存在が確定している。
+- axiom の自動移植禁止、専用 path/namespace/taxonomy、defer 境界が明記されている。
+- complete census、state machine、frontier、statement/proof 分離、anti-regression policy が
+  明記されている。
 - bootstrap が設計承認後の別 PR であり、本 PR が現コードを変更しないことが明記されている。
 - compatibility shim を作らないことが明記されている。
 - initial backlog が §2.1 から始まり、many-body kernel を §2.2 より前に作り過ぎない。
 - coverage、first item、spectral、volume、coupling、fermion を含む P0 decision がすべて
   本文と末尾の decision register で確定し、未決 P0 がゼロである。
-- この PR が現在の implementation/status claim を変えないため、README、`docs/index.md`、
-  `tex/proof-guide.tex` の同期が不要であることを確認している。
+- この PR の変更が本設計文書一つだけである。
 
 ### Bootstrap PR
 
 - 旧 `main` が変更されず、legacy tip が参照可能である。
 - 削除対象の read-only inventory と回収方法が記録されている。
-- 新系列に旧 production/test module の import がない。
+- 旧 `LatticeSystem/**`、tests、root aggregator、status、scripts/checkers/workflows、TeX、
+  site/history/catalogue/docs が final tree に存在しない。
+- 既存 code の carry-forward/import/copy/cherry-pick がなく、path 再利用も scratch rewrite である。
+- 内容を保持した file が `lean-toolchain` と `lake-manifest.json` だけで、closed-tree check が通る。
+- `docs/` が存在せず、承認済み設計が root `DESIGN.md` にある。
 - package/toolchain は再現可能で、依存更新を混ぜていない。
 - minimal `lake build` が warning zero で通る。
-- layer rule、forbidden proof construct check、actual axiom check の最小 gate がある。
+- closed-tree、blueprint schema、layer、forbidden proof construct、actual axiom、base-diff
+  monotonicity check がある。
 - public root が DAG tip aggregator ではない。
 - CI の push target が `rewrite-main` で、required check が branch protection に登録される。
-- current repository link に `/blob/main/` が残らず、relative / `rewrite-main` / legacy anchor
-  permalink の使い分けが検査される。
+- direct/force push が禁止され、current link に `/blob/main/` が残らない。
+- bootstrap final head の全 check が成功し、壊れた中間 commit を trunk に置いていない。
 
-### Each source-item PR
+### Complete census freeze
 
-- Tasaki locator と statement review がある。
+- Chapter 2--11、Appendix A、Solutions pp. 493--520 の全対象が inventory されている。
+- Chapter 1、front matter、references、index 等も `out_of_scope` page として記録されている。
+- named item、全番号付き数式、unnumbered proof obligation、zero-item page を二巡監査した。
+- printed/PDF page 二 locator、problem/solution link、disposition が全件にある。
+- machine candidate 未解決、未分類 item、未監査 page、duplicate active ID がゼロ。
+- source index が hash-lock され、stable ID が append-only である。
+- この acceptance 前に数学実装 PR が一つも始まっていない。
+
+### Each statement PR
+
+- stable ID、edition、section、printed/PDF page、number を持つ doc comment がある。
+- manifest が claim declaration、module、statement digest、non-vacuity obligation を bind する。
+- result theorem を含まず、独立 source-equivalence review に合格する。
+- frontier item またはその明示 Appendix dependency である。
+- 本文より強い仮定がなく、quantifier order と consistency/non-vacuity evidence がある。
+
+### Each proof PR
+
+- 凍結済み statement digest を変えていない。
+- proof type が対応 claim と definitionally equal である。
 - final line から必要性を説明できない declaration がない。
-- 本文より強い仮定がなく、強い仮定には consistency/non-vacuity evidence がある。
-- build warning zero、禁止 proof construct zero、actual axiom set 合格。
+- 全 module build warning zero、禁止 proof construct zero、actual axiom exact-set 合格。
 - unrelated source item、future helper、compatibility work を含まない。
-- status の正本が一箇所だけ更新され、表示は生成される。
+- orphan declaration がなく、status が environment から正しく生成される。
+- independent verification review に合格する。
 
 ### Chapter 2 milestone
 
@@ -768,6 +964,8 @@ Hubbard の完成 proof を先に救出しない。
 - graph の有限性と finite volume の有限性が分離されている。
 - public theorem が proof-route helper や `Matrix.toLin'` を露出しない。
 - 旧 source を import せず、旧実装と同等の対象 statement を新 axiom policy 下で再現する。
+- Chapter 2 census の未分類、`catalogued`、`typed` がゼロである。
+- `proved-relative` / `approved-deferred` が axiom-free `proved` と別集計される。
 
 ## P0 decision register
 
@@ -778,13 +976,12 @@ Hubbard の完成 proof を先に救出しない。
    anchor `01bcb49d49db92c225cfa74b74d409dd0a9c4edc` を含む frozen legacy として保護する。
 2. **package / namespace**: package name と root namespace `LatticeSystem` は維持する。
    旧 declaration/import path の互換性は維持しない。
-3. **bootstrap public docs**: project identity、build instruction、本設計、tracked citation
-   metadata を残す。旧 status/history は legacy anchor で読む。必要な external route の
-   redirect は bootstrap と混ぜず、別の docs-only PR で扱う。
-4. **status ledger schema**: stable source-item id、source-order key、edition/locator、Lean
-   declaration、status、expected logical axiom subset、expected project-specific axioms、
-   legacy assessment を必須 field とする。PR chronicle、proof prose、statement copy は
-   入れない。
+3. **complete reset allowlist**: 旧内容を保持するのは `lean-toolchain` と
+   `lake-manifest.json` のみ。旧 code/tests/status/scripts/workflows/TeX/docs は全面削除し、
+   再利用 path も scratch rewrite。承認済み設計は root `DESIGN.md` に移して `docs/` を消す。
+4. **blueprint / generated status**: stable source/obligation ID、source-order key、二 locator、
+   disposition、claim/proof binding、statement digest、expected axiom subset を持つ。status は
+   source index と Lean environment から生成し、manual status field を正本にしない。
 5. **logical axiom baseline**: proved capstone の project-specific axiom は既定で空集合。
    Lean/mathlib の logical axioms `propext`、`Classical.choice`、`Quot.sound` は許容 universe
    とし、各 capstone record には実際に使う subset を完全一致で記録する。それ以外は
@@ -792,8 +989,9 @@ Hubbard の完成 proof を先に救出しない。
 6. **file / compile budget**: 700 行を responsibility review trigger、900 行を強い split
    signal とするが、数値だけで機械分割しない。compile/import budget は最初の Chapter 2
    実測を baseline とし、各 PR で delta を記録する。
-7. **coverage universe**: Chapter 2--11 と Appendix A の番号付き result/problem、および
-   covered result が参照する番号付き数式。Chapter 1 の概説は除く。
+7. **coverage census**: 数学実装前に Chapter 2--11、Appendix A、Solutions pp. 493--520 の
+   named items、全番号付き数式、unnumbered obligations を二巡監査し hash-lock する。
+   Chapter 1/front matter/references/index も `out_of_scope` page として記録する。
 8. **first source item**: `tasaki-2020-2.1-single-spin-foundation`, 1st ed. §2.1,
    pp. 13--14。eq. (2.1.1) → Casimir → eqs. (2.1.2), (2.1.3) の順を固定する。
 9. **spectral API**: `Matrix` が計算 canonical、Hermitian proof を持つ `Observable` が
@@ -808,15 +1006,23 @@ Hubbard の完成 proof を先に救出しない。
 12. **fermion representation**: carrier/volume/reindexing だけを共有し、bosonic `embedSite`
     を fermion API に使わない。Chapter 9 で ordered Jordan--Wigner を canonical とし、
     graded/CAR 一般化は実需要まで行わない。
-13. **bootstrap atomicity / CI / citations**: M1 の最終 tree で build/root/layer/status/axiom
-    checks と `rewrite-main` CI を同時成立させる。書誌・locator は tracked metadata に置き、
-    gitignored local artifact を前提にしない。current link は relative または
-    `rewrite-main`、legacy evidence は anchor SHA permalink とする。
+13. **bootstrap atomicity / CI / citations**: R1 の最終 tree で build/root/closed-tree/layer/
+    blueprint/axiom/monotonicity checks と `rewrite-main` CI を同時成立させる。書誌・hash
+    metadata のみ tracked し、本の source copy を置かない。
+14. **claim/proof lifecycle**: `inventoried/catalogued → typed → proved` を分離し、statement-only
+    PR と proof PR を別にする。`sorry` stub/temporary axiom は使わず、stable ID は
+    append-only+tombstone/supersession とする。
+15. **axiom isolation**: `LatticeSystem/Axioms/**` は空から始め、閉じた taxonomy、path/namespace、
+    directional import、exact registry/environment gate を強制する。`proved` は project axiom
+    zero、依存 result は `proved-relative`、axiom は `approved-deferred`。
+16. **anti-regression / protection**: source deletion、downgrade、statement/locator drift、axiom
+    expansion、proof disappearance、frontier violation を base-diff で reject する。foundation
+    change は impact closure 付き dedicated PR。`rewrite-main` は direct/force push 禁止、
+    independent statement/verification review 必須とする。
 
 ## Documentation sync conclusion for this PR
 
-本 PR は review 中の再設計提案を一ファイル追加するだけで、現在の実装、公開 theorem status、
-build command、axiom status を変更しない。したがって `README.md`、`docs/index.md`、
-`tex/proof-guide.tex` を同期すると、未承認の新系列を現在の公開状態として誤表示する。
-この PR では三者の同期は **不要かつ行わない**。bootstrap merge 時に README と current
-branch link を更新し、最初の source-item PR から生成 status を同期する。
+本 PR は review 中の再設計提案一ファイルだけを変更し、現在の実装・公開 status を変更しない。
+したがって本 PR では README や旧公開物を同期しない。設計承認後の R1 で `tex/` と旧 docs を
+全面削除し、本設計を root `DESIGN.md` へ移し、README と current branch link を scratch
+rewrite する。以後の status は blueprint と Lean environment からだけ生成する。
