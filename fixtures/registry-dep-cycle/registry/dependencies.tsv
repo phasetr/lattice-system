@@ -1,0 +1,4 @@
+claim_id	role	target_claim_id	rationale
+CL-TASAKI2020-0002	required_by	CL-TASAKI2020-0001	frontier-exception
+CL-TASAKI2020-0003	required_by	CL-TASAKI2020-0002	frontier-exception
+CL-TASAKI2020-0003	requires	CL-TASAKI2020-0001	NONE

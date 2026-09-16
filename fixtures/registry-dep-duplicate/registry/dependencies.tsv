@@ -1,0 +1,3 @@
+claim_id	role	target_claim_id	rationale
+CL-TASAKI2020-0002	requires	CL-TASAKI2020-0001	NONE
+CL-TASAKI2020-0002	consequence_of	CL-TASAKI2020-0001	NONE
