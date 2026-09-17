@@ -54,6 +54,8 @@ LC_ALL=C awk -F '\t' '
   $2 == "" || $3 == "" { bad("empty reference identity field") }
   $4 != "" && ($4 !~ /^[0-9a-f]+$/ || (length($4) != 40 && length($4) != 64)) { bad("bad PDF OID") }
   $5 != "" && ($5 !~ /^[0-9a-f]+$/ || (length($5) != 40 && length($5) != 64)) { bad("bad text OID") }
+  ($4 == "") != ($5 == "") { bad("PDF and text OIDs must transition atomically") }
+  $4 != "" && length($4) != length($5) { bad("PDF and text OIDs must have equal width") }
   $6 !~ /^(pending|pass1|pass2|reconciled|frozen)$/ { bad("bad coverage " $6) }
   function bad(s) { print FILENAME ":" FNR ": " s > "/dev/stderr"; failed=1 }
   END { exit failed }
@@ -66,9 +68,13 @@ LC_ALL=C awk -F '\t' '
   $1 !~ /^PG-[A-Z0-9_]+-[0-9][0-9][0-9][0-9]$/ { bad("bad page ID " $1) }
   !($2 in source) { bad("unknown source " $2) }
   $3 !~ /^[0-9][0-9][0-9][0-9][0-9][0-9]$/ { bad("bad page order key " $3) }
+  $4 == "" || $4 == "unspecified" { bad("missing printed page label must use NONE") }
+  $5 !~ /^[1-9][0-9]*$/ { bad("PDF page must be a positive integer") }
+  $6 == "" { bad("missing section must use NONE") }
   $7 !~ /^(content|front_matter|back_matter|blank|index)$/ { bad("bad page kind " $7) }
   $8 !~ /^(pending|complete|disputed)$/ || $9 !~ /^(pending|complete|disputed)$/ { bad("bad census pass value") }
   $10 != "PENDING" && ($10 !~ /^[0-9a-f]+$/ || (length($10) != 40 && length($10) != 64)) { bad("bad source OID") }
+  $8 == "complete" && $9 == "complete" && $10 == "PENDING" { bad("two-pass-complete page needs a frozen source OID") }
   ($2 in lastOrder) && $3 <= lastOrder[$2] { bad("page order is not strictly increasing") }
   { lastOrder[$2]=$3 }
   function bad(s) { print FILENAME ":" FNR ": " s > "/dev/stderr"; failed=1 }
@@ -182,7 +188,17 @@ if [[ "$phase" == bootstrap ]]; then
   for table in pages claims slices dependencies bindings axioms claim-axioms; do
     [[ $(awk 'END { print NR }' "$REG/$table.tsv") -eq 1 ]] || fail "bootstrap requires header-only $table.tsv"
   done
-  awk -F '\t' 'NR == 2 && ($1 != "TASAKI2020" || $2 == "" || $3 != "unspecified" || $4 != "" || $5 != "" || $6 != "pending") { exit 1 }' "$REF" || fail "bootstrap reference must use edition unspecified, blank OIDs, and pending coverage"
+  awk -F '\t' '
+    function edition(s, lower) {
+      lower=tolower(s)
+      return s ~ /^[A-Za-z0-9][A-Za-z0-9._+-]*$/ && lower !~ /^(unspecified|pending|unknown|none)$/
+    }
+    NR == 2 {
+      unverified=($3 == "unspecified" && $4 == "" && $5 == "" && $6 == "pending")
+      verified=(edition($3) && $4 ~ /^[0-9a-f]+$/ && ($5 ~ /^[0-9a-f]+$/) && (length($4) == 40 || length($4) == 64) && length($4) == length($5) && $6 == "pending")
+      if ($1 != "TASAKI2020" || $2 == "" || (!unverified && !verified)) exit 1
+    }
+  ' "$REF" || fail "bootstrap reference must be either unverified or atomically source-frozen, with pending coverage"
 else
   awk -F '\t' 'NR == 2 { e=tolower($3); if (e ~ /^(unspecified|pending|unknown|none)$/ || $3 !~ /^[A-Za-z0-9][A-Za-z0-9._+-]*$/ || $4 == "" || $5 == "" || length($4) != length($5) || $6 == "pending") exit 1 }' "$REF" || fail "post-bootstrap reference requires verified edition, equal-width OIDs, and non-pending coverage"
 fi

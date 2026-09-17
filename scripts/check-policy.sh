@@ -34,6 +34,9 @@ fi
 awk 'index($0, "- [ ] USER ONLY") { found=1 } END { exit !found }' "$ROOT/.github/pull_request_template.md" || fail "template lacks unchecked USER ONLY gate"
 
 { IFS= read -r _; IFS= read -r phase; } < "$ROOT/registry/phase.tsv"
-[[ "$phase" == bootstrap ]] || fail "semantic phase checker not implemented; production phase must remain bootstrap"
+case "$phase" in
+  bootstrap|census) ;;
+  *) fail "production policy is implemented only through the declaration-free census phase" ;;
+esac
 
 echo "check-policy: ok"

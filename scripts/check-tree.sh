@@ -6,6 +6,7 @@ SCRIPT_DIR=${BASH_SOURCE[0]%/*}
 PROJECT_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
 ANCHOR=01bcb49d49db92c225cfa74b74d409dd0a9c4edc
 MANIFEST="$PROJECT_ROOT/fixtures/manifest.tsv"
+CENSUS_MANIFEST="$PROJECT_ROOT/fixtures/census-manifest.tsv"
 fail() { echo "check-tree: $*" >&2; exit 1; }
 
 if [[ ${1:-} == "--fixture" ]]; then
@@ -46,8 +47,8 @@ allowed_path() {
     .github/CODEOWNERS|.github/pull_request_template.md|.github/workflows/rewrite-ci.yml|.gitignore|DESIGN.md|LatticeSystem.lean|README.md|lake-manifest.json|lakefile.toml|lean-toolchain) return 0 ;;
     references/tasaki-2020.tsv) return 0 ;;
     registry/phase.tsv|registry/pages.tsv|registry/claims.tsv|registry/slices.tsv|registry/dependencies.tsv|registry/bindings.tsv|registry/axioms.tsv|registry/claim-axioms.tsv) return 0 ;;
-    scripts/check-all.sh|scripts/check-tree.sh|scripts/check-registry.sh|scripts/check-policy.sh|scripts/check-base-diff.sh|scripts/test-checkers.sh) return 0 ;;
-    fixtures/manifest.tsv) return 0 ;;
+    scripts/check-all.sh|scripts/check-tree.sh|scripts/check-registry.sh|scripts/check-census.sh|scripts/check-policy.sh|scripts/check-base-diff.sh|scripts/test-checkers.sh) return 0 ;;
+    fixtures/manifest.tsv|fixtures/census-manifest.tsv) return 0 ;;
     fixtures/policy-*/LatticeSystem.lean|fixtures/policy-*/README.md|fixtures/policy-*/DESIGN.md|fixtures/policy-*/.github/pull_request_template.md|fixtures/policy-*/registry/phase.tsv) return 0 ;;
     fixtures/tree-*/tracked-files.txt|fixtures/base-invalid/ref.txt) return 0 ;;
     *) return 1 ;;
@@ -61,21 +62,25 @@ while IFS= read -r path; do
 done <<< "$tracked"
 
 [[ -f "$MANIFEST" ]] || fail "missing fixtures/manifest.tsv"
-IFS= read -r manifest_header < "$MANIFEST"
-[[ "$manifest_header" == $'path\toid' ]] || fail "bad fixture manifest header"
-awk -F '\t' '
-  NR == 1 { next }
-  NF != 2 || $1 !~ /^fixtures\// || $2 !~ /^[0-9a-f]+$/ || length($2) != 40 { bad=1 }
-  $1 == "fixtures/manifest.tsv" || seen[$1]++ { bad=1 }
-  NR > 2 && $1 <= previous { bad=1 }
-  { previous=$1 }
-  END { exit bad }
-' "$MANIFEST" || fail "invalid, duplicate, or unsorted fixture manifest row"
+[[ -f "$CENSUS_MANIFEST" ]] || fail "missing fixtures/census-manifest.tsv"
+for fixture_manifest in "$MANIFEST" "$CENSUS_MANIFEST"; do
+  IFS= read -r manifest_header < "$fixture_manifest"
+  [[ "$manifest_header" == $'path\toid' ]] || fail "bad fixture manifest header"
+  awk -F '\t' '
+    NR == 1 { next }
+    NF != 2 || $1 !~ /^fixtures\// || $2 !~ /^[0-9a-f]+$/ || length($2) != 40 { bad=1 }
+    $1 == "fixtures/manifest.tsv" || seen[$1]++ { bad=1 }
+    NR > 2 && $1 <= previous { bad=1 }
+    { previous=$1 }
+    END { exit bad }
+  ' "$fixture_manifest" || fail "invalid, duplicate, or unsorted fixture manifest row"
+done
+awk -F '\t' 'FNR > 1 && seen[$1]++ { bad=1 } END { exit bad }' "$MANIFEST" "$CENSUS_MANIFEST" || fail "fixture path occurs in more than one manifest"
 
 if [[ "$FIXTURE_MODE" -eq 1 ]]; then
   while IFS= read -r path; do
     [[ -z "$path" || "$path" == "fixtures/manifest.tsv" ]] && continue
-    awk -F '\t' -v path="$path" 'NR > 1 && $1 == path { found=1 } END { exit !found }' "$MANIFEST" || fail "fixture path is not listed in manifest: $path"
+    awk -F '\t' -v path="$path" 'FNR > 1 && $1 == path { found=1 } END { exit !found }' "$MANIFEST" "$CENSUS_MANIFEST" || fail "fixture path is not listed in a manifest: $path"
   done <<< "$tracked"
   echo "check-tree: fixture ok"
   exit 0
@@ -87,12 +92,14 @@ if git -C "$ROOT" ls-files -s | awk '$1 == "120000" { found=1 } END { exit !foun
 fi
 manifest_oid=$(git -C "$ROOT" rev-parse :fixtures/manifest.tsv)
 [[ $(git -C "$ROOT" cat-file -s "$manifest_oid") -le 65536 ]] || fail "oversized fixture manifest"
+census_manifest_oid=$(git -C "$ROOT" rev-parse :fixtures/census-manifest.tsv)
+[[ $(git -C "$ROOT" cat-file -s "$census_manifest_oid") -le 65536 ]] || fail "oversized census fixture manifest"
 
 awk -F '\t' '
-  NR == FNR { if (FNR > 1) expected[$1]=$2; next }
+  NR == FNR { expected[$1]=$2; next }
   { path=$1; oid=$2; actual[path]=oid; if (!(path in expected) || expected[path] != oid) bad=1 }
   END { for (path in expected) if (!(path in actual)) bad=1; exit bad }
-' "$MANIFEST" <(git -C "$ROOT" ls-files -s 'fixtures/**' | awk '$4 != "fixtures/manifest.tsv" { print $4 "\t" $2 }') || fail "fixture manifest does not exactly match index paths and OIDs"
+' <(awk -F '\t' 'FNR > 1 { print }' "$MANIFEST" "$CENSUS_MANIFEST") <(git -C "$ROOT" ls-files -s 'fixtures/**' | awk '$4 != "fixtures/manifest.tsv" { print $4 "\t" $2 }') || fail "fixture manifests do not exactly match index paths and OIDs"
 
 while IFS=$'\t' read -r path oid; do
   [[ -z "$path" ]] && continue

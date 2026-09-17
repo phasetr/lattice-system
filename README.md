@@ -6,7 +6,9 @@ definitions, theorems, or proofs**. The former implementation is not an API or
 source for this rewrite.
 
 The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
-progress begins in `registry/`; its current phase is R1 (bootstrap). The only
+progress begins in `registry/`; its current phase is `census`. The reconciled
+R2 ledger contains all 534 physical PDF pages, 3,172 active atomic claims,
+1,401 unique equation-label/page pairs, and 63 pages with no claim. The only
 production Lean source is an empty module root. A negative checker fixture also
 uses a `.lean` suffix but is not a production module.
 
@@ -17,8 +19,9 @@ scripts/check-all.sh
 lake build
 ```
 
-These commands use the already pinned toolchain and dependencies. They do not
-certify source-book completeness or mathematical correctness.
+These commands use the already pinned toolchain and dependencies. They enforce
+the frozen census shape but cannot independently establish that human readers
+identified every mathematical claim or that a claim is mathematically correct.
 
 ## Reset boundary
 

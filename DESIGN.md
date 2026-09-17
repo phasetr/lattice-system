@@ -4,7 +4,10 @@
 ## 1. Status and authority
 
 This document is the tracked design authority for the rewrite.
-The current registry phase is `bootstrap` (R1 in this document).
+The current registry phase is `census`.
+The R2 ledger has been reconciled and frozen. It contains 534 physical PDF
+pages, 3,172 active atomic claims, 1,401 unique equation-label/page pairs, and
+63 pages with no claim.
 There is no mathematical implementation in the current tree.
 There are no definitions, theorem statements, proofs, or intended axioms yet.
 No claim is represented merely because its source PDF exists locally.
@@ -33,8 +36,8 @@ Nothing else under `.self-local` belongs to the tracked design.
 ## 3. Reset tree
 
 The production Lean root is `LatticeSystem.lean`.
-During R1 it contains a module doc comment and nothing else.
-There is no `LatticeSystem/` source directory during R1.
+During R1 and R2 it contains a module doc comment and nothing else.
+There is no `LatticeSystem/` source directory during R1 or R2.
 There is no tracked `docs/`, `tex/`, or `formalization-status/` directory.
 There is no compatibility shim or archived source subtree.
 There is one CI workflow for the rewrite.
@@ -64,8 +67,13 @@ Convenience APIs are added only after their necessity is demonstrated.
 Every phase contains exactly one source row, whose stable ID is `TASAKI2020`;
 missing, alternate, and extra sources are rejected until a future design change
 explicitly extends the source set.
-Bootstrap requires a nonempty local key, edition exactly `unspecified`, blank
-PDF/text OIDs, and `pending` coverage.
+The initial bootstrap row requires a nonempty local key, edition exactly
+`unspecified`, blank PDF/text OIDs, and `pending` coverage.
+As the first R2 prerequisite, that row may transition while the phase remains
+`bootstrap` to a verified edition and two valid, equal-width Git OIDs, while
+coverage remains `pending` and all census registries remain header-only.
+This source-freeze transition is atomic and does not assert that census has
+started or completed.
 The local reference key identifies a private file without tracking that file.
 Edition, pagination, and coverage remain `pending` or `unspecified` until
 verified from the actual source.
@@ -87,9 +95,20 @@ Changing either source fingerprint requires explicit review and a new census.
 `registry/pages.tsv` is the page-by-page census ledger.
 Each row has a stable page ID and source-relative order.
 Printed and PDF page coordinates are separate fields.
-Missing printed page numbers are explicit, not inferred.
-Section labels are transcribed from the verified source.
-Pass-one and pass-two census results are independently recorded.
+The PDF coordinate is a positive physical-page number. A physical PDF page
+without a printed page label uses exactly `NONE`; labels are never inferred.
+The section field is the most-specific source section active at the start of
+the physical PDF page, or exactly `NONE` when no section is active. When a new
+section starts partway through a page, claims after the transition carry that
+exact local section in their locators even though the page row retains the
+section active at page start.
+For each physical page, `source_oid` is the Git blob OID of the exact raw UTF-8
+page segment in the frozen extracted text, including its terminal form-feed.
+`PENDING` is permitted only before that page fingerprint is fixed; a page whose
+two census passes are complete must have a valid Git OID.
+Pass-one and pass-two census results are recorded separately. Their operational
+independence is a human and pull-request attestation under Section 18, not a
+second machine-readable observation registry.
 Pages with no formalization target still receive a page row after census.
 That negative fact must be independently confirmed in pass two.
 
@@ -205,7 +224,8 @@ registered stubs.
 Global `warningAsError` must remain enabled.
 The skeleton mechanism must not disable all warnings to accommodate `sorry`.
 R1 contains no fake Lean stubs and no skeleton umbrella.
-R1 supplies only the checker contract and static checker fixtures.
+The declaration-free bootstrap and census phases supply only registry data,
+the checker contract, and static checker fixtures.
 
 ## 13. Direct-sorry bijection
 
@@ -234,6 +254,9 @@ Pass one records every page and candidate atomic claim in source order.
 Pass two independently reconciles every page, label, equation, claim boundary,
 and no-claim page.
 R2 cannot finish with an unreviewed page or an unresolved census discrepancy.
+The completed R2 registry has every page in both-pass `complete` state, a
+frozen page-source OID, and no tombstoned claim. Slices, dependencies, bindings,
+axioms, and claim-to-axiom relations remain empty until their later phases.
 R3 is vocabulary and type construction.
 Only vocabulary required to state the full registered corpus is implemented.
 Graph-centric structure and local finiteness are enforced during R3 review.
@@ -259,12 +282,13 @@ Source order and slice positions cannot move backward or silently change.
 Verified locators cannot drift.
 Frozen source-content and binding statement OIDs cannot change silently.
 Bindings cannot disappear after introduction.
-The phase value cannot regress. Until a semantic phase checker is implemented,
-the production phase is required to remain exactly `bootstrap`.
+The phase value cannot regress. The production policy currently recognizes
+only the declaration-free `bootstrap` and `census` phases. It rejects
+`vocabulary`, `skeleton`, and `proof` until their semantic phase checks exist.
 Derived claim state cannot regress from proved to unresolved.
 The number of registered unresolved claim bindings is monotone nonincreasing in R5.
-During bootstrap the exact canonical root contains no `sorry`, `admit`,
-`native_decide`, declaration, import, or axiom.
+During bootstrap and census the exact canonical root contains no `sorry`,
+`admit`, `native_decide`, declaration, import, or axiom.
 A theorem deletion is not proof progress.
 An assumption strengthening or conclusion weakening is statement drift.
 Future or unresolved modules cannot enter production imports.
@@ -276,17 +300,25 @@ Default base-diff freezes all exclusion and supersession fields. Retirement is
 accepted only by the explicit dedicated supersession mode, with a new stable
 claim ID and reviewed tombstone transition; ordinary PR checks reject it.
 
-## 16. Bootstrap checker guarantee
+## 16. Structural checker guarantee through R2
 
-The R1 checker guarantees only structural facts visible in tracked files.
+The checker guarantees only structural facts visible in tracked files.
 It enforces the closed tracked-path policy and rejects tracked symlinks.
 It binds every committed fixture path to its staged Git blob OID, rejects
 unlisted, binary/NUL, oversized, symlink, and unexpected fixture paths, and
 permits fixture mode only through an explicit test-only flag below `fixtures/`.
 It verifies the two preserved pin blobs against the legacy anchor.
+It accepts the atomic source-freeze prerequisite during `bootstrap` and keeps
+coverage `pending` until census begins.
 It validates TSV headers, column counts, control-character exclusions, ID
 forms, enumerations, uniqueness, ordering, foreign keys, slice positions,
-dependency roles, axiom references, and R1 empty-registry semantics.
+dependency roles, axiom references, and phase-specific registry semantics.
+For the production census it additionally requires the exact one-row frozen
+source record, 534 contiguous page IDs/order keys/PDF coordinates with two
+complete passes and fixed source OIDs, exactly 3,172 active, unsuperseded claims
+in strict source order whose order-key page prefix matches the referenced page,
+exactly 1,401 unique equation-label/page pairs, and header-only skeleton-era
+registries.
 It compares the production root byte-for-byte with the canonical doc-only
 source, so comments cannot cause lexical false positives and every extra Lean
 command fails.
@@ -298,7 +330,8 @@ Against a valid registry-bearing merge base it detects stable-ID deletion,
 identity/order/locator/OID drift, page-pass and reference-coverage regression,
 slice membership or position loss, dependency or claim-axiom loss, binding
 loss or frozen declaration drift, tombstone reversal, and phase regression.
-It does not prove whole-book census completeness.
+It does not independently prove that the reviewed census omitted no source
+claim or that two readings were operationally independent.
 It does not parse or understand mathematics.
 It does not prove that a locator matches the book.
 It does not inspect the elaborated Lean environment.
@@ -306,9 +339,10 @@ It does not establish the direct-`sorryAx` bijection.
 It does not compute transitive axiom dependencies.
 It does not certify theorem correctness or adequacy of hypotheses.
 Those are future semantic checks and human review obligations.
-R1 must not be represented as satisfying any R2, R3, or R4 gate.
-The current checker rejects every production phase other than `bootstrap` with
-`semantic phase checker not implemented`.
+The source-freeze prerequisite must not be represented as satisfying the R2
+census gate, and R1 must not be represented as satisfying any R2, R3, or R4
+gate. The current production policy accepts `bootstrap` and the
+declaration-free `census` phase and rejects every later phase.
 
 ## 17. Review and merge authority
 

@@ -1,0 +1,2 @@
+axiom_id	declaration	module	category	source_locator	rationale	reopen_condition
+AX-PROJECT-0002	LatticeSystem.Axioms.State.fixture0002	LatticeSystem.Axioms.State	state	not applicable	fixture rationale	reopen when implemented
