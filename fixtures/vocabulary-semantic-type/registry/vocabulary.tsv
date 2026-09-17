@@ -1,0 +1,2 @@
+vocabulary_id	declaration	module	declaration_kind	origin	parent_vocabulary_id	type_oid	declaration_oid	design_role	finiteness_scope
+VO-FIXTURE-0001	Fixture.Item	Fixture.Subject	abbrev	primary	NONE	0000000000000000000000000000000000000000	PENDING	fixture	none

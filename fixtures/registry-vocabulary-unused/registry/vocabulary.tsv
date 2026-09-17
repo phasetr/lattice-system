@@ -1,0 +1,3 @@
+vocabulary_id	declaration	module	declaration_kind	origin	parent_vocabulary_id	type_oid	declaration_oid	design_role	finiteness_scope
+VO-TASAKI2020-0001	LatticeSystem.Fixture.Term	LatticeSystem.Fixture	definition	primary	NONE	aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa	cccccccccccccccccccccccccccccccccccccccc	graph_core	none
+VO-TASAKI2020-0002	LatticeSystem.Fixture.Unused	LatticeSystem.Fixture	abbrev	primary	NONE	bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb	cccccccccccccccccccccccccccccccccccccccc	linear_algebra	none

@@ -1,0 +1,5 @@
+module	position	imported_module	is_exported	is_meta	import_all
+LatticeSystem.Vocabulary.Quantum	1	Mathlib.LinearAlgebra.Matrix.Trace	true	false	false
+LatticeSystem.Vocabulary.Quantum	2	Mathlib.Data.Complex.Basic	true	false	false
+LatticeSystem.Vocabulary	1	LatticeSystem.Vocabulary.Quantum	true	false	false
+LatticeSystem	1	LatticeSystem.Vocabulary	true	false	false

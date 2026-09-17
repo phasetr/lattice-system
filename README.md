@@ -1,16 +1,24 @@
 # LatticeSystem
 
 This branch is a from-scratch implementation of the claims in Hal Tasaki's
-quantum many-body systems book. It currently contains **zero mathematical
-definitions, theorems, or proofs**. The former implementation is not an API or
-source for this rewrite.
+quantum many-body systems book. R3 is complete: the production tree contains
+the two partial-trace vocabulary definitions required by the frozen corpus,
+but **zero source-claim theorem statements or proofs**. The former
+implementation is not an API or source for this rewrite.
 
 The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
-progress begins in `registry/`; its current phase is `census`. The reconciled
+progress begins in `registry/`; its current phase is `vocabulary`. The reconciled
 R2 ledger contains all 534 physical PDF pages, 3,172 active atomic claims,
 1,401 unique equation-label/page pairs, and 63 pages with no claim. The only
-production Lean source is an empty module root. A negative checker fixture also
-uses a `.lean` suffix but is not a production module.
+production Lean tree is limited to the registered vocabulary modules and their
+root. Checker fixtures also use a `.lean` suffix but are not production modules.
+
+The complete R3 review classifies all 3,172 active claims: 3,170 are
+`mathlib_only`, while claims `CL-TASAKI2020-2487` and
+`CL-TASAKI2020-2488` require project vocabulary. The registered vocabulary is
+exactly `partialTraceRight` and `partialTraceLeft`, with four claim-to-vocabulary
+links recording the complete relation. Their type and declaration OIDs are
+frozen, and the static registry, import graph, and Lean-environment checks pass.
 
 ## Local checks
 

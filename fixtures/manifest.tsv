@@ -175,7 +175,7 @@ fixtures/policy-forbidden/README.md	28313c2446b7d61d2d496065e83f140459bc490f
 fixtures/policy-forbidden/registry/phase.tsv	0b9ef39cf76ffc6d13045deae99646b7dfebf75c
 fixtures/policy-future-phase/.github/pull_request_template.md	4dbb1bd002c20a617bd0fb41b14b2f52e8434cc9
 fixtures/policy-future-phase/DESIGN.md	28313c2446b7d61d2d496065e83f140459bc490f
-fixtures/policy-future-phase/LatticeSystem.lean	f94581f054ad1f1a0b343257b72d1e81c2d786c9
+fixtures/policy-future-phase/LatticeSystem.lean	3936875b61b943e3a28c70410b049d6be2d431c5
 fixtures/policy-future-phase/README.md	28313c2446b7d61d2d496065e83f140459bc490f
 fixtures/policy-future-phase/registry/phase.tsv	bfd86a14e428b7bee52f304239913c46f77df3ec
 fixtures/policy-merge-checked/.github/pull_request_template.md	066ded40ca6bdb0ed4a6b5ebf6ac42bfcc026add
@@ -642,3 +642,5 @@ fixtures/registry-supersession-self/registry/slices.tsv	7396548bca95bd383dce73e4
 fixtures/tree-fake-bypass/tracked-files.txt	b43bf86b50fd8d3529a0dc062c30006ed38f309e
 fixtures/tree-unexpected/tracked-files.txt	db30f88e631dd3fdd87df926082ea75ce396761d
 fixtures/tree-unlisted/tracked-files.txt	409ba0e063936e7787a9ecf479651036768546c8
+fixtures/vocabulary-manifest.tsv	e4303cea73f40cc5aab3ed4065d02d4fd316ab4c
+fixtures/vocabulary-semantic-manifest.tsv	648d00ca86f54686e2feee8635e4b379991fa34b

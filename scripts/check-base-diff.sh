@@ -39,6 +39,16 @@ fi
 
 base_file() {
   local path=$1
+  if ! base_exists "$path"; then
+    case "$path" in
+      registry/claim-vocabulary-review.tsv) printf '%s\n' $'claim_id\tbasis\treview_ref'; return ;;
+      registry/vocabulary.tsv) printf '%s\n' $'vocabulary_id\tdeclaration\tmodule\tdeclaration_kind\torigin\tparent_vocabulary_id\ttype_oid\tdeclaration_oid\tdesign_role\tfiniteness_scope'; return ;;
+      registry/claim-vocabulary.tsv) printf '%s\n' $'claim_id\tvocabulary_id'; return ;;
+      registry/modules.tsv) printf '%s\n' $'module\tsource_path\trole'; return ;;
+      registry/imports.tsv) printf '%s\n' $'module\tposition\timported_module\tis_exported\tis_meta\timport_all'; return ;;
+      *) fail "base missing $path" ;;
+    esac
+  fi
   if [[ "$BASE_MODE" == directory ]]; then
     awk '{ print }' "$BASE_DIR/$path"
   else
@@ -52,6 +62,9 @@ base_exists() {
 
 for path in registry/phase.tsv registry/pages.tsv registry/claims.tsv registry/slices.tsv registry/dependencies.tsv registry/bindings.tsv registry/axioms.tsv registry/claim-axioms.tsv references/tasaki-2020.tsv; do
   base_exists "$path" || fail "base missing $path"
+  [[ -f "$CURRENT_DIR/$path" ]] || fail "current missing $path"
+done
+for path in registry/claim-vocabulary-review.tsv registry/vocabulary.tsv registry/claim-vocabulary.tsv registry/modules.tsv registry/imports.tsv; do
   [[ -f "$CURRENT_DIR/$path" ]] || fail "current missing $path"
 done
 
@@ -81,7 +94,7 @@ require_old_rows() {
   ' <(base_file "$path") "$CURRENT_DIR/$path" || fail "$path $label regression"
 }
 
-for path in registry/pages.tsv registry/claims.tsv registry/axioms.tsv references/tasaki-2020.tsv; do detect_deleted_id "$path"; done
+for path in registry/pages.tsv registry/claims.tsv registry/axioms.tsv registry/claim-vocabulary-review.tsv registry/vocabulary.tsv registry/modules.tsv references/tasaki-2020.tsv; do detect_deleted_id "$path"; done
 compare_columns registry/pages.tsv '2,3,4,5,6,7' 'identity/order/locator'
 if [[ "$ALLOW_SUPERSESSION" -eq 1 ]]; then
   compare_columns registry/claims.tsv '2,3,4,5,6,7,8,10,11' 'identity/order/locator/content/exclusion'
@@ -89,9 +102,34 @@ else
   compare_columns registry/claims.tsv '2,3,4,5,6,7,8,10,11,12,13,14,15' 'identity/order/locator/content/exclusion/supersession'
 fi
 compare_columns registry/axioms.tsv '2,3,4,5,6,7' 'identity/locator/declaration'
+compare_columns registry/claim-vocabulary-review.tsv '2,3' 'vocabulary review'
+compare_columns registry/vocabulary.tsv '2,3,4,5,6,9,10' 'declaration/module/kind/origin/parent/design/finiteness'
+compare_columns registry/modules.tsv '2,3' 'source path/role'
 compare_columns references/tasaki-2020.tsv '2' 'source identity'
 require_old_rows registry/dependencies.tsv dependency
 require_old_rows registry/claim-axioms.tsv claim-axiom
+require_old_rows registry/claim-vocabulary.tsv claim-vocabulary
+require_old_rows registry/imports.tsv import
+
+awk -F '\t' '
+  function validOid(s) { return s ~ /^[0-9a-f]+$/ && (length(s)==40 || length(s)==64) }
+  NR == FNR { if (FNR > 1) oid[$1]=$7; next }
+  FNR > 1 && ($1 in oid) {
+    if (oid[$1]=="PENDING") { if ($7!="PENDING" && !validOid($7)) bad=1 }
+    else if (!validOid(oid[$1]) || $7!=oid[$1]) bad=1
+  }
+  END { if (bad) print "vocabulary type OID regressed" > "/dev/stderr"; exit bad }
+' <(base_file registry/vocabulary.tsv) "$CURRENT_DIR/registry/vocabulary.tsv" || fail "vocabulary type regression"
+
+awk -F '\t' '
+  function validOid(s) { return s ~ /^[0-9a-f]+$/ && (length(s)==40 || length(s)==64) }
+  NR == FNR { if (FNR > 1) oid[$1]=$8; next }
+  FNR > 1 && ($1 in oid) {
+    if (oid[$1]=="PENDING") { if ($8!="PENDING" && !validOid($8)) bad=1 }
+    else if (!validOid(oid[$1]) || $8!=oid[$1]) bad=1
+  }
+  END { if (bad) print "vocabulary declaration OID regressed" > "/dev/stderr"; exit bad }
+' <(base_file registry/vocabulary.tsv) "$CURRENT_DIR/registry/vocabulary.tsv" || fail "vocabulary declaration regression"
 
 awk -F '\t' '
   NR == FNR { if (FNR > 1) old[$1 SUBSEP $3]=$2; next }

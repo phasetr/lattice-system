@@ -1,0 +1,2 @@
+module	position	imported_module	is_exported	is_meta	import_all
+Fixture.Subject	1	Mathlib.FixtureDependency	true	false	false

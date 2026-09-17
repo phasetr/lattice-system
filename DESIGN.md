@@ -8,8 +8,13 @@ The current registry phase is `census`.
 The R2 ledger has been reconciled and frozen. It contains 534 physical PDF
 pages, 3,172 active atomic claims, 1,401 unique equation-label/page pairs, and
 63 pages with no claim.
-There is no mathematical implementation in the current tree.
-There are no definitions, theorem statements, proofs, or intended axioms yet.
+The current tree has two candidate R3 vocabulary definitions for partial trace.
+There are no source-claim theorem statements, proofs, or intended axioms yet.
+The R3 vocabulary schema, working inventory, and candidate vocabulary type
+OIDs exist, but the phase has not advanced. Rows staged while the phase remains
+`census`, including apparently complete rows and non-`PENDING` OIDs, are work
+in progress rather than evidence that the R3 review, implementation,
+independent review, or semantic gate is complete.
 No claim is represented merely because its source PDF exists locally.
 The registries are authoritative only for facts they explicitly record.
 An empty claims registry means that the census has not begun.
@@ -172,6 +177,85 @@ An unregistered helper cannot silently become a source-level prerequisite.
 Proof-local helpers remain local unless reused and independently justified.
 Front-to-back order is checked against the dependency graph and registry.
 
+## 9A. R3 vocabulary and import contract
+
+R3 begins with a complete review of the frozen active claim corpus before its
+phase advances. `registry/claim-vocabulary-review.tsv` has columns `claim_id`,
+`basis`, and `review_ref`. Every active claim has exactly one row. The closed
+`basis` values are `mathlib_only` and `project_vocabulary`; `review_ref` is a
+nonempty ASCII machine token. A `mathlib_only` claim has no row in
+`registry/claim-vocabulary.tsv`. A `project_vocabulary` claim has at least one
+such row. Tombstoned claims have no R3 review or use rows.
+
+`registry/vocabulary.tsv` has columns `vocabulary_id`, `declaration`, `module`,
+`declaration_kind`, `origin`, `parent_vocabulary_id`, `type_oid`,
+`declaration_oid`, `design_role`, and `finiteness_scope`. Stable vocabulary IDs have the form
+`VO-TASAKI2020-NNNN`. Declaration and module names live below
+`LatticeSystem`. The closed declaration kinds are `definition`, `abbrev`,
+`inductive`, `structure`, `class`, `constructor`, `recursor`, `projection`,
+and `instance`. Notation has no `ConstantInfo` and is not a registrable R3
+vocabulary declaration. The closed origins are `primary` and `generated`.
+A primary row has parent `NONE`; a generated row names a distinct primary row
+and records a generated declaration kind. Each `type_oid` is the Git object ID
+of the canonical serialization of the elaborated declaration's
+`ConstantInfo.type` under the R3 environment checker contract. The separate
+`declaration_oid` freezes the canonical semantic payload, including a
+definition value or abbreviation RHS, so body drift is rejected even when its
+type is unchanged. Generated and inductive-family rows use the kind-specific
+payload defined by the semantic checker. Both OIDs may be `PENDING` only before
+the phase advances to `vocabulary`.
+
+The closed design roles are `graph_core`, `finite_volume`, `linear_algebra`,
+`operator_algebra`, `quantum_state`, `stat_mech`, `fermion`, and `generated`.
+The closed finiteness scopes are `none`, `local_operation`,
+`explicit_finite_volume`, and `inherited`. Generated rows use the `generated`
+role and inherit their parent's finiteness scope. A global lattice or graph
+vocabulary declaration may not require `Fintype`; finiteness appears only in a
+local operation or in explicit finite-volume data.
+
+`registry/claim-vocabulary.tsv` has columns `claim_id` and `vocabulary_id`.
+It records the complete many-to-many use relation. Every project vocabulary
+row, including every registrable surface generated declaration, maps
+to at least one reviewed active claim. Thus an unused convenience declaration
+is rejected. Compiler-internal generated artifacts in the checker's exact,
+version-pinned baseline are not public vocabulary and are not registry rows.
+This relation is vocabulary use, not a source-claim dependency
+and not evidence that the source claim has been stated or proved.
+
+`registry/modules.tsv` has columns `module`, `source_path`, and `role`, with
+closed roles `leaf`, `umbrella`, and `root`. Module names and source paths are
+bijective by the standard dot-to-directory mapping, and exactly one row is the
+root `LatticeSystem` module at `LatticeSystem.lean`. Every project vocabulary
+declaration belongs to a registered leaf module. Umbrella and root modules
+contain no vocabulary declarations of their own.
+
+`registry/imports.tsv` has columns `module`, `position`, `imported_module`,
+`is_exported`, `is_meta`, and `import_all`. Positions start at one and are
+contiguous within a module. The three flags are literal booleans. Every actual
+direct import of a registered module is represented exactly once in source
+order, and every recorded import exists in the elaborated module. Imports
+below `LatticeSystem` target registered modules; production external imports
+target Mathlib modules allowed by the R3 environment contract. Compiler-added
+implicit `Init` is a semantic-checker baseline and is not a registry row.
+Project import
+edges are acyclic. Unregistered modules, declarations, or imports fail R3.
+
+The R3 semantic checker inspects the elaborated Lean environment rather than
+trusting source text. It compares declaration name, owning module, kind, and
+normalized type OID with the registries; compares the direct import structures
+and their flags with `imports.tsv`; and rejects all unregistered project
+declarations. It also rejects project axioms, theorem or lemma declarations,
+direct or transitive `sorryAx` use, and source-claim declarations disguised as
+vocabulary. Static lexical checks remain defense in depth only.
+
+All five R3 registries are header-only in `bootstrap`. During `census`, R3 may
+stage partial review, vocabulary, module, and import rows, and either vocabulary
+OID may be `PENDING`; those rows carry no phase-completion meaning. In
+`vocabulary`, the review covers the entire frozen active claim corpus, every
+type OID is frozen, the vocabulary/use relation is complete, and module and
+import registries match the environment. The existence of this contract and a
+staged inventory do not mean those vocabulary-phase conditions currently hold.
+
 ## 10. Bindings
 
 `registry/bindings.tsv` is the declaration binding ledger.
@@ -259,6 +343,9 @@ frozen page-source OID, and no tombstoned claim. Slices, dependencies, bindings,
 axioms, and claim-to-axiom relations remain empty until their later phases.
 R3 is vocabulary and type construction.
 Only vocabulary required to state the full registered corpus is implemented.
+Every active claim is classified as Mathlib-only or as requiring registered
+project vocabulary, and every project declaration is justified by at least
+one active claim.
 Graph-centric structure and local finiteness are enforced during R3 review.
 R3 does not prove source claims except unavoidable well-definedness obligations,
 which are registered as their own slices.
@@ -282,13 +369,22 @@ Source order and slice positions cannot move backward or silently change.
 Verified locators cannot drift.
 Frozen source-content and binding statement OIDs cannot change silently.
 Bindings cannot disappear after introduction.
-The phase value cannot regress. The production policy currently recognizes
-only the declaration-free `bootstrap` and `census` phases. It rejects
-`vocabulary`, `skeleton`, and `proof` until their semantic phase checks exist.
+The phase value cannot regress. The production policy recognizes `vocabulary`
+only when the R3 registry, module/import, and Lean-environment checks all run
+and pass. It rejects `skeleton` and `proof` until their semantic phase checks
+exist.
 Derived claim state cannot regress from proved to unresolved.
 The number of registered unresolved claim bindings is monotone nonincreasing in R5.
-During bootstrap and census the exact canonical root contains no `sorry`,
-`admit`, `native_decide`, declaration, import, or axiom.
+Bootstrap and a declaration-free census use the exact canonical doc-only root.
+Once R3 staging registries name production modules during census, only the
+canonical vocabulary root and registered vocabulary modules are permitted;
+they remain subject to the semantic vocabulary gate and contain no source-claim
+theorem, `sorry`, `admit`, `native_decide`, or axiom.
+A later phase never disables the frozen source identity, 534-page, 3,172-claim,
+1,401-equation, active-state, source-order, page-coupling, or two-pass census
+invariants. The census requirement that slices, source-claim dependencies,
+bindings, axioms, and claim-to-axiom relations are header-only is phase-local;
+it is not part of the later frozen-census invariant check.
 A theorem deletion is not proof progress.
 An assumption strengthening or conclusion weakening is statement drift.
 Future or unresolved modules cannot enter production imports.
@@ -300,7 +396,7 @@ Default base-diff freezes all exclusion and supersession fields. Retirement is
 accepted only by the explicit dedicated supersession mode, with a new stable
 claim ID and reviewed tombstone transition; ordinary PR checks reject it.
 
-## 16. Structural checker guarantee through R2
+## 16. Structural checker guarantee through R3
 
 The checker guarantees only structural facts visible in tracked files.
 It enforces the closed tracked-path policy and rejects tracked symlinks.
@@ -313,15 +409,21 @@ coverage `pending` until census begins.
 It validates TSV headers, column counts, control-character exclusions, ID
 forms, enumerations, uniqueness, ordering, foreign keys, slice positions,
 dependency roles, axiom references, and phase-specific registry semantics.
-For the production census it additionally requires the exact one-row frozen
+For the production census and every later phase it additionally requires the
+exact one-row frozen
 source record, 534 contiguous page IDs/order keys/PDF coordinates with two
 complete passes and fixed source OIDs, exactly 3,172 active, unsuperseded claims
 in strict source order whose order-key page prefix matches the referenced page,
-exactly 1,401 unique equation-label/page pairs, and header-only skeleton-era
-registries.
-It compares the production root byte-for-byte with the canonical doc-only
-source, so comments cannot cause lexical false positives and every extra Lean
-command fails.
+and exactly 1,401 unique equation-label/page pairs. Only `census` requires the
+five pre-R3 implementation registries to be header-only. `vocabulary` instead
+requires complete claim review and vocabulary use, exact registered module and
+import coverage; its absence requirements are enforced by the R3 contract,
+not by the frozen census check.
+During bootstrap and a declaration-free census it compares the production root
+byte-for-byte with the canonical doc-only source. During R3 staging and in
+vocabulary it compares the root with the canonical registered umbrella import
+and requires every production Lean path to be derived exactly from
+`modules.tsv`.
 Future-file lexical checks are only nonsemantic hygiene and never environment
 evidence.
 It checks the written merge gate and an unchecked `USER ONLY` box.
@@ -341,8 +443,7 @@ It does not certify theorem correctness or adequacy of hypotheses.
 Those are future semantic checks and human review obligations.
 The source-freeze prerequisite must not be represented as satisfying the R2
 census gate, and R1 must not be represented as satisfying any R2, R3, or R4
-gate. The current production policy accepts `bootstrap` and the
-declaration-free `census` phase and rejects every later phase.
+gate. A staged R3 inventory does not satisfy the vocabulary gate.
 
 ## 17. Review and merge authority
 

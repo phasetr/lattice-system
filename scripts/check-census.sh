@@ -33,7 +33,7 @@ if [[ "$phase" == bootstrap ]]; then
   echo "check-census: bootstrap; census completion gate not active"
   exit 0
 fi
-[[ "$phase" == census ]] || fail "completion gate is implemented only for census"
+case "$phase" in census|vocabulary|skeleton|proof) ;; *) fail "unknown post-bootstrap phase: $phase" ;; esac
 
 if [[ "$FIXTURE_MODE" -eq 0 ]]; then
   awk -F '\t' '
@@ -90,8 +90,10 @@ LC_ALL=C awk -F '\t' -v expectedClaims="$EXPECTED_CLAIMS" -v expectedEquations="
   END { if (claims == 0 || claims != expectedClaims || equations != expectedEquations || bad) exit 1 }
 ' "$REG/pages.tsv" "$REG/claims.tsv" || fail "claim count, active state, source order, page coupling, or equation label/page pairs are not exact"
 
-for table in slices dependencies bindings axioms claim-axioms; do
-  [[ $(awk 'END { print NR }' "$REG/$table.tsv") -eq 1 ]] || fail "census requires header-only $table.tsv"
-done
+if [[ "$phase" == census ]]; then
+  for table in slices dependencies bindings axioms claim-axioms; do
+    [[ $(awk 'END { print NR }' "$REG/$table.tsv") -eq 1 ]] || fail "census requires header-only $table.tsv"
+  done
+fi
 
 echo "check-census: ok"

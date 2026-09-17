@@ -1,0 +1,3 @@
+module	position	imported_module	is_exported	is_meta	import_all
+LatticeSystem	1	LatticeSystem.Fixture	false	false	false
+LatticeSystem.Fixture	1	Lean.Meta	false	false	false
