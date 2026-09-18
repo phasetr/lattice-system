@@ -4,8 +4,9 @@ set -euo pipefail
 SCRIPT_DIR=${BASH_SOURCE[0]%/*}
 [[ "$SCRIPT_DIR" == "${BASH_SOURCE[0]}" ]] && SCRIPT_DIR=.
 ROOT=${1:-$(cd "$SCRIPT_DIR/.." && pwd)}
-TMP=$(mktemp -d "$ROOT/fixtures/.multisource.XXXXXX")
+TMP=$(mktemp -d "${TMPDIR:-/tmp}/lattice-system-tests.multisource.XXXXXX")
 trap 'rm -rf "$TMP"' EXIT
+export LATTICE_TEST_ROOT=$TMP
 BASE="$TMP/base"
 mkdir -p "$BASE/registry"
 
@@ -46,8 +47,8 @@ printf '%s\n' \
   $'CL-SRB-0001\tSRB\t000001.0001\tPG-SRB-0001\tPDF p. 1; paragraph 1\tassertion\tunnumbered_obligation\tClaim B\tcccccccccccccccccccccccccccccccccccccccc\tNONE\tNONE\tfalse\tNONE\tNONE\tNONE' > "$BASE/registry/claims.tsv"
 printf '%s\n' \
   $'item_id\tsource_id\torder_key\tpage_id\titem_kind\tsource_label\ttitle\tlocator\tpublic_group\tpublic_slug\treview_ref' \
-  $'IT-SRA-0001\tSRA\t000001.0001\tPG-SRA-0001\tunlabeled\tNONE\tNONE\tPDF p. 1; paragraph 1\tChapter 1\tchapter-1\tREVIEW-A' \
-  $'IT-SRB-0001\tSRB\t000001.0001\tPG-SRB-0001\tunlabeled\tNONE\tNONE\tPDF p. 1; paragraph 1\tChapter 1\tchapter-1\tREVIEW-B' > "$BASE/registry/source-items.tsv"
+  $'IT-SRA-0001\tSRA\t000001.0001\tPG-SRA-0001\tunlabeled\tNONE\tNONE\tPDF p. 1; paragraph 1\tChapter 01\tchapter-01\tREVIEW-A' \
+  $'IT-SRB-0001\tSRB\t000001.0001\tPG-SRB-0001\tunlabeled\tNONE\tNONE\tPDF p. 1; paragraph 1\tChapter 01\tchapter-01\tREVIEW-B' > "$BASE/registry/source-items.tsv"
 printf '%s\n' \
   $'item_id\tposition\tclaim_id' \
   $'IT-SRA-0001\t1\tCL-SRA-0001' \
@@ -80,6 +81,10 @@ mutate() {
 "$ROOT/scripts/check-registry.sh" "$BASE" >/dev/null
 "$ROOT/scripts/check-census.sh" --fixture "$BASE" >/dev/null
 "$ROOT/scripts/check-source-items.sh" "$BASE" >/dev/null
+
+cp -R "$BASE" "$TMP/unpadded-chapter"
+mutate "$BASE/registry/source-items.tsv" "$TMP/unpadded-chapter/registry/source-items.tsv" 'NR==2 {$9="Chapter 1";$10="chapter-1"} {print}'
+expect_fail unpadded-chapter "numeric chapter group is not zero-padded" "$ROOT/scripts/check-source-items.sh" "$TMP/unpadded-chapter"
 
 cp -R "$BASE" "$TMP/id-mismatch"
 mutate "$BASE/registry/pages.tsv" "$TMP/id-mismatch/registry/pages.tsv" 'NR==2 {$1="PG-SRB-0002"} {print}'
@@ -133,7 +138,7 @@ cp -R "$BASE" "$TMP/dependency"
 printf '%s\n' $'CL-SRA-0001\trequires\tCL-SRB-0001\tCROSS-SOURCE-NEGATIVE' >> "$TMP/dependency/registry/dependencies.tsv"
 expect_fail cross-source-dependency "dependency target is not earlier in global source order" "$ROOT/scripts/check-order.sh" "$TMP/dependency"
 
-# Exercise every frozen R1-R3 base-diff gate with a multi-source current tree.
+# Exercise every frozen through-vocabulary base-diff gate with a multi-source current tree.
 # These rows need not satisfy the census phase policy: they are a compact pair
 # of base/current snapshots used only by the anti-regression checker.
 DIFF_BASE="$TMP/diff-base"

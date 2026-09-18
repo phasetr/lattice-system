@@ -26,6 +26,11 @@ LC_ALL=C awk -F '\t' '
     if ($6!="NONE" && index($8,$6)==0) bad("item locator does not contain exact label " $1)
     if ($7=="") bad("empty item title " $1)
     if ($8=="") bad("empty item locator " $1)
+    if ($9 ~ /^Chapter [0-9]+$/) {
+      chapter=substr($9,9)+0
+      canonical=sprintf("Chapter %02d",chapter)
+      if ($9!=canonical) bad("numeric chapter group is not zero-padded " $1)
+    }
     if ($9=="" || $10!=slug($9)) bad("item public group/slug mismatch " $1)
     if (!token($11)) bad("bad item review token " $1)
     if (seenId[$1]++) bad("duplicate item ID " $1)

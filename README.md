@@ -14,7 +14,8 @@ while each source advances independently through `source-progress.tsv`;
 534 physical PDF pages, 3,172 active atomic claims,
 1,401 unique equation-label/page pairs, and 63 pages with no claim. The only
 production Lean tree is limited to the registered vocabulary modules and their
-root. Checker fixtures also use a `.lean` suffix but are not production modules.
+root. Checker cases are generated only under isolated system temporary roots;
+the repository contains no tracked fixture tree.
 
 The complete R3 review classifies all 3,172 active claims: 3,170 are
 `mathlib_only`, while claims `CL-TASAKI2020-2487` and

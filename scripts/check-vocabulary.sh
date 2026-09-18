@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR=${BASH_SOURCE[0]%/*}
 [[ "$SCRIPT_DIR" == "${BASH_SOURCE[0]}" ]] && SCRIPT_DIR=.
-PROJECT_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
+PROJECT_ROOT=$(cd -P "$SCRIPT_DIR/.." && pwd)
 fail() { echo "check-vocabulary: $*" >&2; exit 1; }
 
 MODE=check
@@ -20,7 +20,12 @@ done
 ROOT=${ROOT:-$PROJECT_ROOT}
 ROOT=$(cd "$ROOT" && pwd) || fail "invalid root"
 if [[ "$FIXTURE" -eq 1 ]]; then
-  case "$ROOT/" in "$PROJECT_ROOT/fixtures/"*) ;; *) fail "fixture root must be below fixtures/" ;; esac
+  [[ -n "${LATTICE_TEST_ROOT:-}" ]] || fail "fixture mode requires LATTICE_TEST_ROOT"
+  TEST_ROOT=$(cd "$LATTICE_TEST_ROOT" && pwd) || fail "invalid LATTICE_TEST_ROOT"
+  case "$TEST_ROOT" in "$PROJECT_ROOT"|"$PROJECT_ROOT"/*) fail "LATTICE_TEST_ROOT must be repository-external" ;; esac
+  [[ "$TEST_ROOT" != / ]] || fail "LATTICE_TEST_ROOT must not contain the repository"
+  case "$PROJECT_ROOT" in "$TEST_ROOT"|"$TEST_ROOT"/*) fail "LATTICE_TEST_ROOT must not contain the repository" ;; esac
+  case "$ROOT/" in "$TEST_ROOT/"*) ;; *) fail "fixture root must be below LATTICE_TEST_ROOT" ;; esac
 else
   [[ $(git -C "$ROOT" rev-parse --show-toplevel 2>/dev/null) == "$ROOT" ]] ||
     fail "ROOT must be the repository top (use --fixture for a fixture)"
@@ -37,7 +42,7 @@ IMPORTS=$REG/imports.tsv
 [[ $(head -n 1 "$VOCAB") == $'vocabulary_id\tdeclaration\tmodule\tdeclaration_kind\torigin\tparent_vocabulary_id\ttype_oid\tdeclaration_oid\tdesign_role\tfiniteness_scope' ]] || fail "bad vocabulary.tsv header"
 [[ $(head -n 1 "$IMPORTS") == $'module\tposition\timported_module\tis_exported\tis_meta\timport_all' ]] || fail "bad imports.tsv header"
 
-TMP=$(mktemp -d "${TMPDIR:-/tmp}/lattice-r3-vocabulary.XXXXXX")
+TMP=$(mktemp -d "${TMPDIR:-/tmp}/lattice-vocabulary.XXXXXX")
 cleanup() { rm -rf "$TMP"; }
 trap cleanup EXIT HUP INT TERM
 
@@ -46,8 +51,8 @@ BASE_LEAN_PATH=$(cd "$PROJECT_ROOT" && lake env printenv LEAN_PATH)
 export LEAN_PATH="$TMP:$BASE_LEAN_PATH"
 
 mkdir -p "$TMP/Checker"
-"$LEAN" --root="$PROJECT_ROOT" "$PROJECT_ROOT/Checker/R3Vocabulary.lean" \
-  -o "$TMP/Checker/R3Vocabulary.olean" >/dev/null || fail "failed to compile semantic checker"
+"$LEAN" --root="$PROJECT_ROOT" "$PROJECT_ROOT/Checker/Vocabulary.lean" \
+  -o "$TMP/Checker/Vocabulary.olean" >/dev/null || fail "failed to compile semantic checker"
 
 awk -F '\t' 'NR > 1 { print $1 }' "$MODULES" > "$TMP/modules.list"
 : > "$TMP/compiled.list"
@@ -86,11 +91,11 @@ done
   while IFS= read -r module; do
     printf 'public import %s\n' "$module"
   done < "$TMP/modules.list"
-  echo 'public meta import Checker.R3Vocabulary'
+  echo 'public meta import Checker.Vocabulary'
   echo
-  printf '#r3_vocabulary_dump "%s" "%s"\n' "$TMP/modules.list" "$TMP/environment.tsv"
-} > "$TMP/R3VocabularyRun.lean"
-"$LEAN" --root="$TMP" "$TMP/R3VocabularyRun.lean" -o "$TMP/R3VocabularyRun.olean" >/dev/null ||
+  printf '#vocabulary_dump "%s" "%s"\n' "$TMP/modules.list" "$TMP/environment.tsv"
+} > "$TMP/VocabularyRun.lean"
+"$LEAN" --root="$TMP" "$TMP/VocabularyRun.lean" -o "$TMP/VocabularyRun.olean" >/dev/null ||
   fail "semantic environment inspection failed"
 
 : > "$TMP/actual-vocabulary.tsv"

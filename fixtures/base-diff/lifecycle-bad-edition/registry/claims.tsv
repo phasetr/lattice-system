@@ -1,2 +1,0 @@
-claim_id	source_id	order_key	page_id	locator	disposition	subkind	normalized_content	content_oid	exclusion_rationale	exclusion_review_ref	tombstone	superseded_by	tombstone_rationale	tombstone_review_ref
-CL-TASAKI2020-0001	TASAKI2020	000001.0001	PG-TASAKI2020-0001	printed page 10	assertion	theorem	Fixture theorem.	2222222222222222222222222222222222222222	NONE	NONE	false	NONE	NONE	NONE

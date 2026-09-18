@@ -15,5 +15,5 @@
 - `VO-TASAKI2020-0001` — `LatticeSystem.partialTraceRight`; kind `definition`; role `linear_algebra`; finiteness `local_operation`
 - `VO-TASAKI2020-0002` — `LatticeSystem.partialTraceLeft`; kind `definition`; role `linear_algebra`; finiteness `local_operation`
 
-`vocabulary_ready` records only R3 readiness to state future claims. It is not
+`vocabulary_ready` records only vocabulary readiness to state future claims. It is not
 a statement binding or proof status.

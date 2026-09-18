@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR=${BASH_SOURCE[0]%/*}
 [[ "$SCRIPT_DIR" == "${BASH_SOURCE[0]}" ]] && SCRIPT_DIR=.
-PROJECT_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
+PROJECT_ROOT=$(cd -P "$SCRIPT_DIR/.." && pwd)
 fail() { echo "check-base-diff: $*" >&2; exit 1; }
 
 ALLOW_SUPERSESSION=0
@@ -16,8 +16,13 @@ if [[ ${1:-} == "--fixture-dirs" ]]; then
   [[ $# -eq 3 ]] || fail "usage: check-base-diff.sh --fixture-dirs BASE CURRENT"
   BASE_DIR=$(cd "$2" && pwd) || fail "invalid fixture base directory"
   CURRENT_DIR=$(cd "$3" && pwd) || fail "invalid fixture current directory"
-  case "$BASE_DIR/" in "$PROJECT_ROOT/fixtures/"*) ;; *) fail "fixture base must be below fixtures/" ;; esac
-  case "$CURRENT_DIR/" in "$PROJECT_ROOT/fixtures/"*) ;; *) fail "fixture current must be below fixtures/" ;; esac
+  [[ -n "${LATTICE_TEST_ROOT:-}" ]] || fail "fixture mode requires LATTICE_TEST_ROOT"
+  TEST_ROOT=$(cd "$LATTICE_TEST_ROOT" && pwd) || fail "invalid LATTICE_TEST_ROOT"
+  case "$TEST_ROOT" in "$PROJECT_ROOT"|"$PROJECT_ROOT"/*) fail "LATTICE_TEST_ROOT must be repository-external" ;; esac
+  [[ "$TEST_ROOT" != / ]] || fail "LATTICE_TEST_ROOT must not contain the repository"
+  case "$PROJECT_ROOT" in "$TEST_ROOT"|"$TEST_ROOT"/*) fail "LATTICE_TEST_ROOT must not contain the repository" ;; esac
+  case "$BASE_DIR/" in "$TEST_ROOT/"*) ;; *) fail "fixture base must be below LATTICE_TEST_ROOT" ;; esac
+  case "$CURRENT_DIR/" in "$TEST_ROOT/"*) ;; *) fail "fixture current must be below LATTICE_TEST_ROOT" ;; esac
   [[ "$BASE_DIR" != "$PROJECT_ROOT" && "$CURRENT_DIR" != "$PROJECT_ROOT" ]] || fail "production root cannot use fixture mode"
   BASE_MODE=directory
 else
@@ -39,24 +44,6 @@ fi
 MULTI_CURRENT=0
 [[ -f "$CURRENT_DIR/registry/sources.tsv" ]] && MULTI_CURRENT=1
 
-# Historical base-diff fixture snapshots predate the R3 tables. Materialize
-# their shared header-only state once per test rather than tracking it in every
-# snapshot directory.
-if [[ "$BASE_MODE" == directory && "$MULTI_CURRENT" -eq 0 && ! -f "$CURRENT_DIR/registry/claim-vocabulary-review.tsv" ]]; then
-  ORIGINAL_CURRENT_DIR=$CURRENT_DIR
-  CURRENT_OVERLAY=$(mktemp -d "$PROJECT_ROOT/fixtures/.base-diff-overlay.XXXXXX")
-  trap 'rm -rf "$CURRENT_OVERLAY"' EXIT
-  mkdir -p "$CURRENT_OVERLAY/registry" "$CURRENT_OVERLAY/references"
-  for file in "$ORIGINAL_CURRENT_DIR/registry"/*.tsv; do ln -s "$file" "$CURRENT_OVERLAY/registry/${file##*/}"; done
-  for file in "$ORIGINAL_CURRENT_DIR/references"/*.tsv; do ln -s "$file" "$CURRENT_OVERLAY/references/${file##*/}"; done
-  printf '%s\n' $'claim_id\tbasis\treview_ref' > "$CURRENT_OVERLAY/registry/claim-vocabulary-review.tsv"
-  printf '%s\n' $'vocabulary_id\tdeclaration\tmodule\tdeclaration_kind\torigin\tparent_vocabulary_id\ttype_oid\tdeclaration_oid\tdesign_role\tfiniteness_scope' > "$CURRENT_OVERLAY/registry/vocabulary.tsv"
-  printf '%s\n' $'claim_id\tvocabulary_id' > "$CURRENT_OVERLAY/registry/claim-vocabulary.tsv"
-  printf '%s\n' $'module\tsource_path\trole' > "$CURRENT_OVERLAY/registry/modules.tsv"
-  printf '%s\n' $'module\tposition\timported_module\tis_exported\tis_meta\timport_all' > "$CURRENT_OVERLAY/registry/imports.tsv"
-  CURRENT_DIR=$CURRENT_OVERLAY
-fi
-
 base_file() {
   local path=$1
   if ! base_exists "$path"; then
@@ -69,9 +56,21 @@ base_file() {
       registry/tracks.tsv) printf '%s\n%s\n' $'track_id\tposition\ttitle\tpublic_slug' $'TR-TASAKI\t1\tTasaki front-to-back\ttasaki'; return ;;
       registry/sources.tsv) printf '%s\n%s\n' $'source_id\ttrack_id\tsource_position\tsource_kind\tcitation_key\ttitle\tauthors\tyear\tedition\tidentifier_kind\tidentifier\tpublic_url\tpublic_slug\tlocal_ref_key\tpdf_oid\ttext_oid\tcoverage' $'TASAKI2020\tTR-TASAKI\t1\tbook\tTASAKI2020\tPhysics and Mathematics of Quantum Many-Body Systems\tHal Tasaki\t2020\t2020.springer.ebook.9783030412654\tdoi\t10.1007/978-3-030-41265-4\thttps://doi.org/10.1007/978-3-030-41265-4\ttasaki-2020\tHal.Tasaki.P534.Physics_and_Mathematics_of_Quantum_Many_Body_Systems.pdf\t91d1237a6384d470bcdc453f058f8e08603767c5\t342ef0ce220dd3ed1c6cc0cdfab5a4d86bbd044f\tfrozen'; return ;;
       registry/source-invariants.tsv) printf '%s\n%s\n' $'source_id\tphysical_page_count\tactive_claim_count\tequation_pair_count\tno_claim_page_count\tcensus_oid\treview_ref' $'TASAKI2020\t534\t3172\t1401\t63\tf65e4f7c57b2ef82e71156c147d3539609e02074\tR2-CENSUS-RECONCILED'; return ;;
-      registry/source-progress.tsv) printf '%s\n%s\n' $'source_id\tlifecycle\treview_ref' $'TASAKI2020\tvocabulary_reviewed\tR3-INDEPENDENT-REVIEW-P0'; return ;;
+      registry/source-progress.tsv) printf '%s\n%s\n' $'source_id\tlifecycle\treview_ref' $'TASAKI2020\tvocabulary_reviewed\tVOCABULARY-INDEPENDENT-REVIEW'; return ;;
       *) fail "base missing $path" ;;
     esac
+  fi
+  # One-release migration alias for the phase-numbered review token in the
+  # pre-rename base. Remove once every supported base contains the neutral
+  # token. No other review-token rewrite is accepted here.
+  if [[ "$MULTI_CURRENT" -eq 1 && "$path" == registry/claim-vocabulary-review.tsv ]]; then
+    if [[ "$BASE_MODE" == directory ]]; then
+      awk -F '\t' -v OFS='\t' '$3=="R3-INDEPENDENT-REVIEW-P0" {$3="VOCABULARY-INDEPENDENT-REVIEW"} {print}' "$BASE_DIR/$path"
+    else
+      git -C "$ROOT" show "$BASE_COMMIT:$path" |
+        awk -F '\t' -v OFS='\t' '$3=="R3-INDEPENDENT-REVIEW-P0" {$3="VOCABULARY-INDEPENDENT-REVIEW"} {print}'
+    fi
+    return
   fi
   if [[ "$BASE_MODE" == directory ]]; then
     awk '{ print }' "$BASE_DIR/$path"

@@ -16,22 +16,6 @@ else
 fi
 fail() { echo "check-registry: $*" >&2; exit 1; }
 
-# R1/R2 fixture snapshots predate the R3 tables. Supply their header-only
-# state through a disposable union view instead of copying five identical
-# files into every historical fixture directory.
-if [[ "$MULTI_SOURCE" -eq 0 && ! -f "$REG/claim-vocabulary-review.tsv" ]]; then
-  case "$ROOT/" in "$PROJECT_ROOT/fixtures/"*) ;; *) fail "production root lacks R3 registry tables" ;; esac
-  OVERLAY=$(mktemp -d "$PROJECT_ROOT/fixtures/.registry-overlay.XXXXXX")
-  trap 'rm -rf "$OVERLAY"' EXIT
-  mkdir -p "$OVERLAY/registry"
-  for file in "$REG"/*.tsv; do ln -s "$file" "$OVERLAY/registry/${file##*/}"; done
-  printf '%s\n' $'claim_id\tbasis\treview_ref' > "$OVERLAY/registry/claim-vocabulary-review.tsv"
-  printf '%s\n' $'vocabulary_id\tdeclaration\tmodule\tdeclaration_kind\torigin\tparent_vocabulary_id\ttype_oid\tdeclaration_oid\tdesign_role\tfiniteness_scope' > "$OVERLAY/registry/vocabulary.tsv"
-  printf '%s\n' $'claim_id\tvocabulary_id' > "$OVERLAY/registry/claim-vocabulary.tsv"
-  printf '%s\n' $'module\tsource_path\trole' > "$OVERLAY/registry/modules.tsv"
-  printf '%s\n' $'module\tposition\timported_module\tis_exported\tis_meta\timport_all' > "$OVERLAY/registry/imports.tsv"
-  REG="$OVERLAY/registry"
-fi
 check_table() {
   local file=$1 header=$2 columns=$3
   [[ -f "$file" ]] || fail "missing ${file#"$ROOT/"}"

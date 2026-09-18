@@ -428,10 +428,13 @@ claim ID and reviewed tombstone transition; ordinary PR checks reject it.
 ## 16. Structural checker guarantee through R3
 
 The checker guarantees only structural facts visible in tracked files.
-It enforces the closed tracked-path policy and rejects tracked symlinks.
-It binds every committed fixture path to its staged Git blob OID, rejects
-unlisted, binary/NUL, oversized, symlink, and unexpected fixture paths, and
-permits fixture mode only through an explicit test-only flag below `fixtures/`.
+It enforces the closed tracked-path policy, rejects tracked symlinks, and
+requires `git ls-files fixtures` to be empty. Test-only fixture mode requires
+an explicit flag and a canonical path below an exported, repository-external
+`LATTICE_TEST_ROOT`. Runtime tests copy the production registry into a system
+temporary root and apply named mutations; cases absent from production, such
+as minimal multi-source, Lean-semantic, tree, policy, and base-diff scenarios,
+are generated there deterministically.
 It verifies the two preserved pin blobs against the legacy anchor.
 It accepts the atomic source-freeze prerequisite during `bootstrap` and keeps
 coverage `pending` until census begins.
@@ -454,7 +457,8 @@ and requires every production Lean path to be derived exactly from
 Future-file lexical checks are only nonsemantic hygiene and never environment
 evidence.
 It checks the written merge gate and an unchecked `USER ONLY` box.
-It exercises committed positive and negative fixtures.
+It exercises generated positive and negative runtime cases without committed
+fixture data.
 Against a valid registry-bearing merge base it detects stable-ID deletion,
 identity/order/locator/OID drift, page-pass and reference-coverage regression,
 slice membership or position loss, dependency or claim-axiom loss, binding

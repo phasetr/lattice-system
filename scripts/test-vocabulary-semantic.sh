@@ -4,9 +4,9 @@ set -euo pipefail
 SCRIPT_DIR=${BASH_SOURCE[0]%/*}
 [[ "$SCRIPT_DIR" == "${BASH_SOURCE[0]}" ]] && SCRIPT_DIR=.
 ROOT=${1:-$(cd "$SCRIPT_DIR/.." && pwd)}
-TMP=$(mktemp -d "$ROOT/fixtures/.vocabulary-semantic.XXXXXX")
+TMP=$(mktemp -d "${TMPDIR:-/tmp}/lattice-system-tests.vocabulary-semantic.XXXXXX")
 trap 'rm -rf "$TMP"' EXIT
-BASE_REG="$ROOT/fixtures/vocabulary-semantic-good/registry"
+export LATTICE_TEST_ROOT=$TMP
 
 expect_pass() { local label=$1; shift; "$@" >/dev/null 2>&1 || { echo "test-vocabulary-semantic: expected pass: $label" >&2; exit 1; }; }
 expect_fail() {
@@ -17,10 +17,34 @@ expect_fail() {
 }
 prepare() {
   local name=$1 target="$TMP/$1"
-  mkdir -p "$target/registry"
-  cp -R "$ROOT/fixtures/vocabulary-semantic-$name/Fixture" "$target/Fixture"
-  [[ ! -d "$ROOT/fixtures/vocabulary-semantic-$name/Mathlib" ]] || cp -R "$ROOT/fixtures/vocabulary-semantic-$name/Mathlib" "$target/Mathlib"
-  cp "$BASE_REG"/*.tsv "$target/registry/"
+  mkdir -p "$target/registry" "$target/Fixture"
+  printf '%s\n' $'module\tsource_path\trole' $'Fixture.Subject\tFixture/Subject.lean\tumbrella' > "$target/registry/modules.tsv"
+  printf '%s\n' $'module\tposition\timported_module\tis_exported\tis_meta\timport_all' > "$target/registry/imports.tsv"
+  printf '%s\n' \
+    $'vocabulary_id\tdeclaration\tmodule\tdeclaration_kind\torigin\tparent_vocabulary_id\ttype_oid\tdeclaration_oid\tdesign_role\tfiniteness_scope' \
+    $'VO-FIXTURE-0001\tFixture.Item\tFixture.Subject\tabbrev\tprimary\tNONE\teda6899694a1d94c33f3b10aa4e8e71fe7970cd3\teedad8e975235d5b3d0801932bc9e971a4c2a5a3\tfixture\tnone' > "$target/registry/vocabulary.tsv"
+  case "$name" in
+    axiom) body=$'/-- Forbidden axiom fixture. -/\naxiom Item : Nat' ;;
+    body) body=$'/-- Body drift fixture. -/\nabbrev Item := Int' ;;
+    extra) body=$'/-- Registered fixture. -/\nabbrev Item := Nat\n/-- Unregistered fixture. -/\nabbrev Extra := Nat' ;;
+    sorry) body=$'/-- Sorry fixture. -/\ndef Item : Nat := by sorry' ;;
+    theorem) body=$'/-- Theorem fixture. -/\ntheorem Item : True := trivial' ;;
+    structure) body=$'/-- Structure fixture. -/\nstructure Pair where\n  left : Nat\n  right : Nat' ;;
+    transitive)
+      mkdir -p "$target/Mathlib"
+      printf '%s\n' 'module' '' '@[expose] public section' '' 'namespace Mathlib' '' '/-- Hidden unresolved dependency. -/' 'def hidden : Nat := by sorry' '' 'end Mathlib' > "$target/Mathlib/FixtureDependency.lean"
+      body=$'/-- Transitive dependency fixture. -/\ndef Item : Nat := Mathlib.hidden'
+      ;;
+    *) body=$'/-- Harmless semantic-checker fixture. -/\nabbrev Item := Nat' ;;
+  esac
+  if [[ "$name" == import ]]; then
+    imported='Mathlib.Data.Nat.Basic'
+  elif [[ "$name" == transitive ]]; then
+    imported='Mathlib.FixtureDependency'
+  else
+    imported='Init'
+  fi
+  printf '%s\n' 'module' '' "public import $imported" '' '@[expose] public section' '' 'namespace Fixture' '' "$body" '' 'end Fixture' > "$target/Fixture/Subject.lean"
 }
 mutate_vocab() {
   local name=$1 program=$2 file="$TMP/$1/registry/vocabulary.tsv"

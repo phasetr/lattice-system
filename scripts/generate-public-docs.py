@@ -131,6 +131,9 @@ def extract_source_label(locator):
 
 
 def slug_for_group(group):
+    chapter_match = re.fullmatch(r"Chapter\s+([0-9]+)", group.strip(), re.IGNORECASE)
+    if chapter_match:
+        return "chapter-{:02d}".format(int(chapter_match.group(1)))
     value = group
     value = value.lower().replace("–", "-").replace("—", "-")
     value = re.sub(r"[^a-z0-9]+", "-", value).strip("-")
@@ -148,7 +151,7 @@ def public_group_for(page, locator):
     if section_match:
         top = section_match.group(1)
         if top.isdigit():
-            return "Chapter " + top
+            return "Chapter {:02d}".format(int(top))
         return "Appendix " + top.upper()
     if section in {"Contents", "Preface", "Symbols"}:
         return "Front matter"
@@ -349,7 +352,7 @@ def public_catalog(data):
                 "disposition": claim["disposition"],
                 "subkind": claim["subkind"],
                 "lifecycle": lifecycle,
-                "r3_status": (
+                "vocabulary_status": (
                     "vocabulary_ready" if vocabulary_ready
                     else "review_staged" if reviewed else "not_reviewed"
                 ),
@@ -438,7 +441,7 @@ def public_catalog(data):
         for row in data["vocabulary"]
     ]
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "phase": phase,
         "summary": {
             "active_claims": active_claims,
@@ -449,7 +452,7 @@ def public_catalog(data):
             "claim_vocabulary_links": len(data["claim_vocabulary"]),
         },
         "status_semantics": {
-            "r3_status": "vocabulary_ready requires both a review row and a vocabulary-reviewed-or-later source lifecycle; review_staged is not ready",
+            "vocabulary_status": "vocabulary_ready requires both a review row and a vocabulary-reviewed-or-later source lifecycle; review_staged is not ready",
             "binding_status": "not_bound means no binding row is registered",
             "proof_status": "not_recorded does not assert that a proof is absent from the source",
             "axiom_status": "not_assessed is not an axiom-free claim",
@@ -475,7 +478,7 @@ def claim_line(claim):
     axioms = claim["axiom_status"]
     return (
         "- `{claim_id}` — {disposition} / {subkind}; lifecycle `{lifecycle}`; "
-        "R3 `{r3_status}`; binding `{binding_status}`; Lean statement "
+        "Vocabulary `{vocabulary_status}`; binding `{binding_status}`; Lean statement "
         "`{statement}` in `{module}`; proof `{proof_status}` as `{proof}`; "
         "axioms `{axioms}`; required vocabulary: {required}"
     ).format(
@@ -483,7 +486,7 @@ def claim_line(claim):
         disposition=markdown_text(claim["disposition"]),
         subkind=markdown_text(claim["subkind"]),
         lifecycle=claim["lifecycle"],
-        r3_status=claim["r3_status"],
+        vocabulary_status=claim["vocabulary_status"],
         binding_status=claim["binding_status"],
         statement=claim["statement_declaration"],
         module=claim["statement_module"],
@@ -636,7 +639,7 @@ Machine-readable data: [catalog.json](catalog.json).
 
 {vocabulary}
 
-`vocabulary_ready` records only R3 readiness to state future claims. It is not
+`vocabulary_ready` records only vocabulary readiness to state future claims. It is not
 a statement binding or proof status.
 """.format(
             title=markdown_text(track["title"]),
@@ -801,6 +804,28 @@ def check_outputs(root, outputs, quiet=False):
 
 
 class GeneratorTests(unittest.TestCase):
+    def test_numeric_chapter_paths_follow_source_order_lexicographically(self):
+        chapter_numbers = [1, 2, 9, 10, 11]
+        groups = [
+            public_group_for(
+                {"section": "§{}.1".format(number), "page_kind": "body"},
+                "PDF p. {}; §{}.1".format(number, number),
+            )
+            for number in chapter_numbers
+        ]
+        paths = [
+            "docs/generated/groups/source/{}.md".format(slug_for_group(group))
+            for group in groups
+        ]
+        self.assertEqual(
+            groups,
+            ["Chapter 01", "Chapter 02", "Chapter 09", "Chapter 10", "Chapter 11"],
+        )
+        self.assertEqual(paths, sorted(paths))
+        self.assertEqual(slug_for_group("Chapter 1"), "chapter-01")
+        self.assertEqual(slug_for_group("Appendix A"), "appendix-a")
+        self.assertEqual(slug_for_group("Front matter"), "front-matter")
+
     def test_label_grouping_and_private_data_exclusion(self):
         tracks = [{
             "track_id": "TR-SRC", "position": "1", "title": "Test track",
@@ -950,16 +975,17 @@ class GeneratorTests(unittest.TestCase):
             "phase": [{"phase": "vocabulary"}],
         }
         catalog = public_catalog(data)
+        self.assertEqual(catalog["schema_version"], 2)
         self.assertEqual(catalog["items"][0]["source_id"], "ZFIRST")
         statuses = {
-            claim["claim_id"]: claim["r3_status"]
+            claim["claim_id"]: claim["vocabulary_status"]
             for item in catalog["items"] for claim in item["claims"]
         }
         self.assertEqual(statuses["CL-ZFIRST-0001"], "vocabulary_ready")
         self.assertEqual(statuses["CL-ASECOND-0001"], "review_staged")
         outputs = build_outputs(catalog)
-        first_path = "docs/generated/groups/first-source/chapter-1.md"
-        second_path = "docs/generated/groups/second-source/chapter-1.md"
+        first_path = "docs/generated/groups/first-source/chapter-01.md"
+        second_path = "docs/generated/groups/second-source/chapter-01.md"
         self.assertIn(first_path, outputs)
         self.assertIn(second_path, outputs)
         self.assertIn("CL-ZFIRST-0001", outputs[first_path])
