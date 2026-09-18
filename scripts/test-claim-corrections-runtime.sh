@@ -356,6 +356,48 @@ add_event1_source_item "$ITEM_EVENT1_CURRENT"
 expect_pass event1-source-item-contract check_item_public_contract \
   "$ITEM_EVENT1_BASE" "$ITEM_EVENT1_CURRENT"
 
+clone_case "$ITEM_EVENT1_CURRENT" "$CASES/item-addition-id-duplicate"
+printf '%s\n' \
+  $'IA-TASAKI2020-0001\tCORPUS-NORMALIZATION-TASAKI2020-2026\tCC-TASAKI2020-0012\t2\tIT-TASAKI2020-3038\tCORPUS-NORMALIZATION-INDEPENDENT-REVIEW' \
+  >> "$CASES/item-addition-id-duplicate/registry/source-item-additions.tsv"
+awk -F '\t' -v OFS='\t' '
+  {print}
+  $1=="IT-TASAKI2020-3037" {
+    print "IT-TASAKI2020-3038","TASAKI2020","000301.0003.0002", \
+      "PG-TASAKI2020-0301","unlabeled","NONE","NONE", \
+      "PDF p. 301; print p. 289; §8.4; paragraph 6 duplicate ID", \
+      "Chapter 08","chapter-08","PUBLIC-DOCS-SOURCE-ITEM-REVIEW-V1"
+  }
+' "$CASES/item-addition-id-duplicate/registry/source-items.tsv" \
+  > "$CASES/item-addition-id-duplicate/registry/source-items.tsv.tmp"
+mv "$CASES/item-addition-id-duplicate/registry/source-items.tsv.tmp" \
+  "$CASES/item-addition-id-duplicate/registry/source-items.tsv"
+rewrite "$CASES/item-addition-id-duplicate/registry/item-claims.tsv" '
+  $1=="IT-TASAKI2020-3037" && $3=="CL-TASAKI2020-3443" {
+    print "IT-TASAKI2020-3038",1,$3
+    next
+  }
+  {print}
+'
+expect_fail item-addition-id-duplicate "duplicate source item addition ID" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$ITEM_EVENT1_BASE" \
+  "$CASES/item-addition-id-duplicate"
+
+clone_case "$ITEM_EVENT1_CURRENT" "$CASES/item-double-manifest"
+printf '%s\n' \
+  $'IA-TASAKI2020-0099\tCORPUS-NORMALIZATION-TASAKI2020-2026\tCC-TASAKI2020-0012\t2\tIT-TASAKI2020-3037\tCORPUS-NORMALIZATION-INDEPENDENT-REVIEW' \
+  >> "$CASES/item-double-manifest/registry/source-item-additions.tsv"
+expect_fail item-double-manifest "source item is manifested more than once" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$ITEM_EVENT1_BASE" \
+  "$CASES/item-double-manifest"
+
+clone_case "$ITEM_EVENT1_CURRENT" "$CASES/item-addition-id-invalid"
+rewrite "$CASES/item-addition-id-invalid/registry/source-item-additions.tsv" \
+  '$1=="IA-TASAKI2020-0001" {$1="IA-bad"} {print}'
+expect_fail item-addition-id-invalid "bad source item addition ID" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$ITEM_EVENT1_BASE" \
+  "$CASES/item-addition-id-invalid"
+
 clone_case "$ITEM_EVENT1_CURRENT" "$CASES/item-missing-ledger"
 rewrite "$CASES/item-missing-ledger/registry/source-item-additions.tsv" 'FNR==1 {print}'
 expect_fail item-missing-ledger "unmanifested source item addition" \

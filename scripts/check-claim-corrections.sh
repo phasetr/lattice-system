@@ -33,6 +33,20 @@ for f in correction-events.tsv claim-normalization-reviews.tsv claim-corrections
 [[ $(head -1 "$CURRENT_REG/claim-corrections.tsv") == $'correction_id\tevent_id\tcorrection_position\treview_id\tclaim_id\taction\told_disposition\told_subkind\tnew_disposition\tnew_subkind' ]] || fail "bad claim-corrections.tsv header"
 [[ $(head -1 "$CURRENT_REG/claim-successors.tsv") == $'successor_edge_id\tevent_id\tcorrection_id\tpredecessor_claim_id\tsuccessor_position\trelation\tsuccessor_claim_id' ]] || fail "bad claim-successors.tsv header"
 [[ $(head -1 "$CURRENT_REG/source-item-additions.tsv") == $'item_addition_id\tevent_id\tcorrection_id\taddition_position\titem_id\treview_ref' ]] || fail "bad source-item-additions.tsv header"
+source_item_addition_shape=$(awk -F '\t' '
+  FNR>1 {
+    if(NF!=6){print "columns";exit}
+    if($1!~/^IA-[A-Za-z0-9][A-Za-z0-9._:#@+-]*-[0-9][0-9][0-9][0-9]$/){print "id";exit}
+    if(seenID[$1]++){print "duplicate-id";exit}
+    if(seenItem[$5]++){print "duplicate-item";exit}
+  }
+' "$CURRENT_REG/source-item-additions.tsv")
+case "$source_item_addition_shape" in
+  columns) fail "bad source item addition row" ;;
+  id) fail "bad source item addition ID" ;;
+  duplicate-id) fail "duplicate source item addition ID" ;;
+  duplicate-item) fail "source item is manifested more than once" ;;
+esac
 
 if [[ -f "$BASE_REG/source-item-additions.tsv" ]] &&
    ! awk -F '\t' 'NR==FNR{if(FNR>1)o[$1]=$0;next}FNR>1{c[$1]=$0}END{for(i in o)if(c[i]!=o[i])exit 1}' \
