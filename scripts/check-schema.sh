@@ -28,7 +28,7 @@ check_table() {
 check_table "$REG/phase.tsv" 'phase' 1
 check_table "$REG/tracks.tsv" $'track_id\tposition\ttitle\tpublic_slug' 4
 check_table "$REG/sources.tsv" $'source_id\ttrack_id\tsource_position\tsource_kind\tcitation_key\ttitle\tauthors\tyear\tedition\tidentifier_kind\tidentifier\tpublic_url\tpublic_slug\tlocal_ref_key\tpdf_oid\ttext_oid\tcoverage' 17
-check_table "$REG/source-invariants.tsv" $'source_id\tphysical_page_count\tactive_claim_count\tequation_pair_count\tno_claim_page_count\tcensus_oid\treview_ref' 7
+check_table "$REG/source-invariants.tsv" $'source_id\tphysical_page_count\tactive_claim_count\tformalization_target_count\tequation_pair_count\tno_claim_page_count\tcensus_oid\treview_ref' 8
 check_table "$REG/source-progress.tsv" $'source_id\tlifecycle\treview_ref' 3
 check_table "$REG/pages.tsv" $'page_id\tsource_id\torder_key\tprinted_page\tpdf_page\tsection\tpage_kind\tpass1\tpass2\tsource_oid' 10
 check_table "$REG/claims.tsv" $'claim_id\tsource_id\torder_key\tpage_id\tlocator\tdisposition\tsubkind\tnormalized_content\tcontent_oid\texclusion_rationale\texclusion_review_ref\ttombstone\tsuperseded_by\ttombstone_rationale\ttombstone_review_ref' 15
@@ -44,6 +44,11 @@ check_table "$REG/vocabulary.tsv" $'vocabulary_id\tdeclaration\tmodule\tdeclarat
 check_table "$REG/claim-vocabulary.tsv" $'claim_id\tvocabulary_id' 2
 check_table "$REG/modules.tsv" $'module\tsource_path\trole' 3
 check_table "$REG/imports.tsv" $'module\tposition\timported_module\tis_exported\tis_meta\timport_all' 6
+check_table "$REG/correction-events.tsv" $'event_id\tevent_position\tsource_id\tbase_commit\treview_ref' 5
+check_table "$REG/claim-normalization-reviews.tsv" $'review_id\tevent_id\treview_position\tclaim_id\treview_scope\toutcome\tstatus\trationale\treview_ref' 9
+check_table "$REG/claim-corrections.tsv" $'correction_id\tevent_id\tcorrection_position\treview_id\tclaim_id\taction\told_disposition\told_subkind\tnew_disposition\tnew_subkind' 10
+check_table "$REG/claim-successors.tsv" $'successor_edge_id\tevent_id\tcorrection_id\tpredecessor_claim_id\tsuccessor_position\trelation\tsuccessor_claim_id' 7
+check_table "$REG/source-item-additions.tsv" $'item_addition_id\tevent_id\tcorrection_id\taddition_position\titem_id\treview_ref' 6
 
 [[ $(awk 'END { print NR }' "$REG/phase.tsv") -eq 2 ]] || fail "phase.tsv must have exactly one data row"
 { IFS= read -r _; IFS= read -r phase; } < "$REG/phase.tsv"

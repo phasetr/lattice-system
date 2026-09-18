@@ -1,2 +1,2 @@
-source_id	physical_page_count	active_claim_count	equation_pair_count	no_claim_page_count	census_oid	review_ref
-TASAKI2020	534	3172	1401	63	f65e4f7c57b2ef82e71156c147d3539609e02074	R2-CENSUS-RECONCILED
+source_id	physical_page_count	active_claim_count	formalization_target_count	equation_pair_count	no_claim_page_count	census_oid	review_ref
+TASAKI2020	534	3182	3171	1401	63	1d471b950a066ba12a41b154e92a12ccd1a6c4f6	CORPUS-NORMALIZATION-INDEPENDENT-REVIEW

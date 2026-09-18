@@ -10,6 +10,7 @@ fail() { echo "check-source-items: $*" >&2; exit 1; }
 LC_ALL=C awk -F '\t' '
   function slug(s) { s=tolower(s); gsub(/[^a-z0-9]+/, "-", s); gsub(/^-|-$/, "", s); return s }
   function token(s) { return s ~ "^[A-Za-z0-9][A-Za-z0-9._:/#@+-]*$" }
+  function orderKey(s, n,a,i) { n=split(s,a,"."); if (n<2 || a[1] !~ /^[0-9][0-9][0-9][0-9][0-9][0-9]$/) return 0; for(i=2;i<=n;i++) if(a[i] !~ /^[0-9][0-9][0-9][0-9]$/) return 0; return 1 }
   FILENAME == ARGV[1] { if (FNR>1) { track[$1]=$2+0 } next }
   FILENAME == ARGV[2] { if (FNR>1) { source[$1]=1; sourceTrack[$1]=$2; sourcePosition[$1]=$3+0 } next }
   FILENAME == ARGV[3] { if (FNR>1) { page[$1]=1; pageSource[$1]=$2; pageOrder[$1]=$3 } next }
@@ -19,7 +20,7 @@ LC_ALL=C awk -F '\t' '
     if (index($1,expected)!=1 || suffix !~ /^[0-9]+$/ || length(suffix)<4) bad("item ID/source mismatch " $1)
     if (!($2 in source)) bad("unknown item source " $2)
     if (!($4 in page) || pageSource[$4]!=$2) bad("item source/page mismatch " $1)
-    if ($3 !~ /^[0-9]{6}\.[0-9]{4}$/ && $3 !~ /^[0-9][0-9][0-9][0-9][0-9][0-9]\.[0-9][0-9][0-9][0-9]$/) bad("bad item order key " $1)
+    if (!orderKey($3)) bad("bad item order key " $1)
     if (substr($3,1,6)!=pageOrder[$4]) bad("item/page order mismatch " $1)
     if ($5 !~ /^(theorem|lemma|corollary|proposition|definition|problem|conjecture|example|exercise|remark|note|equation|figure|footnote|table|unlabeled)$/) bad("bad item kind " $1)
     if (($5=="unlabeled") != ($6=="NONE")) bad("item label/kind mismatch " $1)
@@ -52,7 +53,6 @@ LC_ALL=C awk -F '\t' '
     if ($2 !~ /^[1-9][0-9]*$/ || $2+0 != ++position[$1]) bad("item relation positions are not contiguous " $1)
     if (seenPair[$1 SUBSEP $3]++) bad("duplicate item/claim relation")
     if (claimUse[$3]++) bad("claim occurs in more than one item " $3)
-    if (!active[$3]) bad("item relation uses tombstoned claim " $3)
     if (itemSource[$1]!=claimSource[$3] || itemPage[$1]!=claimPage[$3]) bad("item/claim source or page mismatch " $3)
     if ($2==1 && itemOrder[$1]!=claimOrder[$3]) bad("item order does not match first claim " $1)
     itemUse[$1]++
@@ -60,8 +60,7 @@ LC_ALL=C awk -F '\t' '
   function bad(s) { print s > "/dev/stderr"; failed=1 }
   END {
     for (id in item) if (!itemUse[id]) bad("item has no claims " id)
-    for (id in active) if (active[id] && claimUse[id]!=1) bad("active claim lacks exactly one source item " id)
-    for (id in active) if (!active[id] && claimUse[id]) bad("tombstoned claim has a source item " id)
+    for (id in active) if (claimUse[id]!=1) bad("claim lacks exactly one source item " id)
     exit failed
   }
 ' "$REG/source-items.tsv" "$REG/claims.tsv" "$REG/item-claims.tsv" || fail "source item coverage invalid"

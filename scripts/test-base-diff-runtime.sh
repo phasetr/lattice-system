@@ -82,6 +82,14 @@ rewrite "$BASE/registry/claims.tsv" \
   'NR==2 {$9="1111111111111111111111111111111111111111"} {print}'
 clone_case "$BASE" "$GOOD"
 
+# Historical correction ledgers are append-only by event, but every historical
+# event is fully frozen.  An attacker must not be able to append a fabricated
+# edge to an event that is already present in the base snapshot.
+clone_case "$BASE" "$CASES/historical-fake-edge"
+printf '%s\n' \
+  $'SE-TASAKI2020-9999\tCORPUS-NORMALIZATION-TASAKI2020-2026\tCC-TASAKI2020-0001\tCL-TASAKI2020-0287\t99\texisting_duplicate\tCL-TASAKI2020-0001' \
+  >> "$CASES/historical-fake-edge/registry/claim-successors.tsv"
+
 clone_case "$BASE" "$CASES/deletion"
 rewrite "$CASES/deletion/registry/pages.tsv" 'NR!=2 {print}'
 
@@ -187,7 +195,7 @@ rewrite "$CASES/vocabulary-regression/registry/vocabulary.tsv" \
 TOKEN_MIGRATION_BASE="$CASES/review-token-migration-base"
 clone_production "$TOKEN_MIGRATION_BASE"
 rewrite "$TOKEN_MIGRATION_BASE/registry/claim-vocabulary-review.tsv" \
-  'NR>1 {$3="R3-INDEPENDENT-REVIEW-P0"} {print}'
+  '$3=="VOCABULARY-INDEPENDENT-REVIEW" {$3="R3-INDEPENDENT-REVIEW-P0"} {print}'
 rewrite "$TOKEN_MIGRATION_BASE/registry/source-progress.tsv" \
   'NR>1 {$3="R3-INDEPENDENT-REVIEW-P0"} {print}'
 
@@ -208,6 +216,8 @@ expect_pass vocabulary-type-regression-snapshot-registry \
   "$CHECK_REGISTRY" "$CASES/vocabulary-type-regression"
 
 expect_pass base-good "$CHECK_BASE_DIFF" --fixture-dirs "$BASE" "$GOOD"
+expect_fail historical-fake-edge --diagnostic "correction ledger" \
+  "$CHECK_BASE_DIFF" --fixture-dirs "$BASE" "$CASES/historical-fake-edge"
 expect_fail base-deletion "$CHECK_BASE_DIFF" --fixture-dirs "$BASE" "$CASES/deletion"
 expect_fail base-drift "$CHECK_BASE_DIFF" --fixture-dirs "$BASE" "$CASES/drift"
 expect_fail base-regression "$CHECK_BASE_DIFF" --fixture-dirs "$BASE" "$CASES/regression"

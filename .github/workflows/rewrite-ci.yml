@@ -30,6 +30,6 @@ jobs:
           BASE_REF: origin/rewrite-main
         run: scripts/check-all.sh
       - name: Base-diff regression checks
-        run: scripts/check-base-diff.sh . origin/rewrite-main
+        run: scripts/check-base-diff-ci.sh . origin/rewrite-main
       - name: Build production root
         run: lake build

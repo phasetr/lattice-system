@@ -7,10 +7,17 @@ PROJECT_ROOT=$(cd -P "$SCRIPT_DIR/.." && pwd)
 fail() { echo "check-base-diff: $*" >&2; exit 1; }
 
 ALLOW_SUPERSESSION=0
-if [[ ${1:-} == "--allow-supersession" ]]; then
-  ALLOW_SUPERSESSION=1
-  shift
-fi
+CORRECTION_EVENT=
+while [[ ${1:-} == --* ]]; do
+  case "$1" in
+    --allow-supersession) ALLOW_SUPERSESSION=1; shift ;;
+    --correction-event)
+      [[ $# -ge 2 ]] || fail "--correction-event requires an event ID"
+      CORRECTION_EVENT=$2; shift 2 ;;
+    --fixture-dirs) break ;;
+    *) fail "unknown option: $1" ;;
+  esac
+done
 
 if [[ ${1:-} == "--fixture-dirs" ]]; then
   [[ $# -eq 3 ]] || fail "usage: check-base-diff.sh --fixture-dirs BASE CURRENT"
@@ -43,6 +50,25 @@ else
 fi
 MULTI_CURRENT=0
 [[ -f "$CURRENT_DIR/registry/sources.tsv" ]] && MULTI_CURRENT=1
+
+CORRECTION_REPLAY=0
+if [[ -n "$CORRECTION_EVENT" ]]; then
+  if [[ "$BASE_MODE" == directory && -f "$BASE_DIR/registry/correction-events.tsv" ]] &&
+     awk -F '\t' -v event="$CORRECTION_EVENT" 'FNR>1 && $1==event {found=1} END{exit !found}' "$BASE_DIR/registry/correction-events.tsv"; then
+    :
+  elif [[ "$BASE_MODE" == git ]] && git -C "$ROOT" cat-file -e "$BASE_COMMIT:registry/correction-events.tsv" 2>/dev/null &&
+       git -C "$ROOT" show "$BASE_COMMIT:registry/correction-events.tsv" | awk -F '\t' -v event="$CORRECTION_EVENT" 'FNR>1 && $1==event {found=1} END{exit !found}'; then
+    :
+  else
+    CORRECTION_REPLAY=1
+    ALLOW_SUPERSESSION=1
+    if [[ "$BASE_MODE" == directory ]]; then
+      "$SCRIPT_DIR/check-claim-corrections.sh" --fixture-dirs "$BASE_DIR" "$CURRENT_DIR" >/dev/null
+    else
+      "$SCRIPT_DIR/check-claim-corrections.sh" --correction-event "$CORRECTION_EVENT" "$ROOT" "$BASE_COMMIT" >/dev/null
+    fi
+  fi
+fi
 
 base_file() {
   local path=$1
@@ -126,7 +152,8 @@ require_old_rows() {
   ' <(base_file "$path") "$CURRENT_DIR/$path" || fail "$path $label regression"
 }
 
-for path in registry/pages.tsv registry/claims.tsv registry/axioms.tsv registry/claim-vocabulary-review.tsv registry/vocabulary.tsv registry/modules.tsv; do detect_deleted_id "$path"; done
+for path in registry/pages.tsv registry/claims.tsv registry/axioms.tsv registry/vocabulary.tsv registry/modules.tsv; do detect_deleted_id "$path"; done
+if [[ "$CORRECTION_REPLAY" -eq 0 ]]; then detect_deleted_id registry/claim-vocabulary-review.tsv; fi
 if [[ "$MULTI_CURRENT" -eq 1 ]]; then
   for path in registry/tracks.tsv registry/sources.tsv registry/source-invariants.tsv registry/source-progress.tsv; do detect_deleted_id "$path"; done
   if base_exists registry/source-items.tsv; then
@@ -136,19 +163,21 @@ else
   detect_deleted_id references/tasaki-2020.tsv
 fi
 compare_columns registry/pages.tsv '2,3,4,5,6,7' 'identity/order/locator'
-if [[ "$ALLOW_SUPERSESSION" -eq 1 ]]; then
+if [[ "$CORRECTION_REPLAY" -eq 1 ]]; then
+  : # The dedicated correction checker owns the complete claim transition.
+elif [[ "$ALLOW_SUPERSESSION" -eq 1 ]]; then
   compare_columns registry/claims.tsv '2,3,4,5,6,7,8,10,11' 'identity/order/locator/content/exclusion'
 else
   compare_columns registry/claims.tsv '2,3,4,5,6,7,8,10,11,12,13,14,15' 'identity/order/locator/content/exclusion/supersession'
 fi
 compare_columns registry/axioms.tsv '2,3,4,5,6,7' 'identity/locator/declaration'
-compare_columns registry/claim-vocabulary-review.tsv '2,3' 'vocabulary review'
+if [[ "$CORRECTION_REPLAY" -eq 0 ]]; then compare_columns registry/claim-vocabulary-review.tsv '2,3' 'vocabulary review'; fi
 compare_columns registry/vocabulary.tsv '2,3,4,5,6,9,10' 'declaration/module/kind/origin/parent/design/finiteness'
 compare_columns registry/modules.tsv '2,3' 'source path/role'
 if [[ "$MULTI_CURRENT" -eq 1 ]]; then
   compare_columns registry/tracks.tsv '2,3,4' 'track position/title/slug'
   compare_columns registry/sources.tsv '2,3,4,5,6,7,8,9,10,11,12,13,14' 'source identity/position/bibliography'
-  compare_columns registry/source-invariants.tsv '2,3,4,5,6,7' 'source frozen invariants'
+  if [[ "$CORRECTION_REPLAY" -eq 0 ]]; then compare_columns registry/source-invariants.tsv '2,3,4,5,6,7,8' 'source frozen invariants'; fi
   if base_exists registry/source-items.tsv; then
     compare_columns registry/source-items.tsv '2,3,4,5,6,7,8,9,10,11' 'source item identity/order/label'
     require_old_rows registry/item-claims.tsv item-claim
@@ -210,7 +239,7 @@ awk -F '\t' '
   END { if (bad) print "claim OID or tombstone regressed" > "/dev/stderr"; exit bad }
 ' <(base_file registry/claims.tsv) "$CURRENT_DIR/registry/claims.tsv" || fail "claim state regression"
 
-if [[ "$ALLOW_SUPERSESSION" -eq 1 ]]; then
+if [[ "$ALLOW_SUPERSESSION" -eq 1 && "$CORRECTION_REPLAY" -eq 0 ]]; then
   awk -F '\t' '
     function token(s) { return s ~ /^[A-Za-z0-9][A-Za-z0-9._:\/#@+-]*$/ }
     NR == FNR { if (FNR > 1) { baseKnown[$1]=1; oldC[$1]=$9; oldT[$1]=$12; oldS[$1]=$13; oldR[$1]=$14; oldV[$1]=$15 } next }
@@ -226,6 +255,15 @@ if [[ "$ALLOW_SUPERSESSION" -eq 1 ]]; then
     }
   ' <(base_file registry/claims.tsv) "$CURRENT_DIR/registry/claims.tsv" || fail "supersession transition regression"
 fi
+
+for path in registry/correction-events.tsv registry/claim-normalization-reviews.tsv registry/claim-corrections.tsv registry/claim-successors.tsv registry/source-item-additions.tsv; do
+  if base_exists "$path"; then
+    [[ -f "$CURRENT_DIR/$path" ]] || fail "current missing $path"
+    if [[ "$CORRECTION_REPLAY" -eq 0 ]] && ! cmp -s <(base_file "$path") "$CURRENT_DIR/$path"; then
+      fail "$path historical correction ledger drift"
+    fi
+  fi
+done
 
 awk -F '\t' '
   function fixed(s) { return s!="" && s!="NONE" }
