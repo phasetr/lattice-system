@@ -1,2 +1,0 @@
-axiom_id	declaration	module	category	source_locator	rationale	reopen_condition
-AX-PROJECT-0001	LatticeSystem.Axioms.AbstractCStar.interfaceAxiom	LatticeSystem.Axioms.AbstractCStar	analytic-limit	not applicable	fixture rationale	reopen when implemented

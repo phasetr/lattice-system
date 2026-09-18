@@ -1,0 +1,2 @@
+source_id	track_id	source_position	source_kind	citation_key	title	authors	year	edition	identifier_kind	identifier	public_url	public_slug	local_ref_key	pdf_oid	text_oid	coverage
+TASAKI2020	TR-TASAKI	1	book	TASAKI2020	Physics and Mathematics of Quantum Many-Body Systems	Hal Tasaki	2020	2020.springer.ebook.9783030412654	doi	10.1007/978-3-030-41265-4	https://doi.org/10.1007/978-3-030-41265-4	tasaki-2020	Hal.Tasaki.P534.Physics_and_Mathematics_of_Quantum_Many_Body_Systems.pdf	91d1237a6384d470bcdc453f058f8e08603767c5	342ef0ce220dd3ed1c6cc0cdfab5a4d86bbd044f	frozen

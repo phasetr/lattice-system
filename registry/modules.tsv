@@ -1,0 +1,4 @@
+module	source_path	role
+LatticeSystem.Vocabulary.Quantum	LatticeSystem/Vocabulary/Quantum.lean	leaf
+LatticeSystem.Vocabulary	LatticeSystem/Vocabulary.lean	umbrella
+LatticeSystem	LatticeSystem.lean	root

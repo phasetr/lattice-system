@@ -14,12 +14,22 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Structural checks and checker self-tests
-        run: scripts/check-all.sh
-      - name: Base-diff regression checks
-        run: scripts/check-base-diff.sh . "${{ github.event.pull_request.base.sha || 'HEAD^' }}"
-      - name: Build empty production root
+      - name: Set up Lean toolchain and Mathlib cache
         uses: leanprover/lean-action@v1
         with:
           lake-package-directory: .
-          build: true
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          use-mathlib-cache: true
+      - name: Verify rewrite trunk base is available
+        run: git rev-parse --verify 'origin/rewrite-main^{commit}'
+      - name: Structural checks and checker self-tests
+        env:
+          BASE_REF: origin/rewrite-main
+        run: scripts/check-all.sh
+      - name: Base-diff regression checks
+        run: scripts/check-base-diff.sh . origin/rewrite-main
+      - name: Build production root
+        run: lake build

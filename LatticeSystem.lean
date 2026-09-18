@@ -1,6 +1,9 @@
+module
+
+public import LatticeSystem.Vocabulary
+
 /-!
 # LatticeSystem
 
-Empty production root for the from-scratch Tasaki formalization.
-No theorem declarations, imports, commands, or notation exist here.
+Production root for the from-scratch Tasaki formalization vocabulary phase.
 -/

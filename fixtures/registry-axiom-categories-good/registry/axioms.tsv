@@ -1,8 +1,0 @@
-axiom_id	declaration	module	category	source_locator	rationale	reopen_condition
-AX-PROJECT-0001	LatticeSystem.Axioms.AbstractCStar.fixture0001	LatticeSystem.Axioms.AbstractCStar	abstract_cstar	not applicable	fixture rationale	reopen when implemented
-AX-PROJECT-0002	LatticeSystem.Axioms.State.fixture0002	LatticeSystem.Axioms.State	state	not applicable	fixture rationale	reopen when implemented
-AX-PROJECT-0003	LatticeSystem.Axioms.GNS.fixture0003	LatticeSystem.Axioms.GNS	gns	not applicable	fixture rationale	reopen when implemented
-AX-PROJECT-0004	LatticeSystem.Axioms.KMS.fixture0004	LatticeSystem.Axioms.KMS	kms	not applicable	fixture rationale	reopen when implemented
-AX-PROJECT-0005	LatticeSystem.Axioms.WeakDual.fixture0005	LatticeSystem.Axioms.WeakDual	weak_dual	not applicable	fixture rationale	reopen when implemented
-AX-PROJECT-0006	LatticeSystem.Axioms.Wigner.fixture0006	LatticeSystem.Axioms.Wigner	wigner	not applicable	fixture rationale	reopen when implemented
-AX-PROJECT-0007	LatticeSystem.Axioms.ContentlessPredicate.fixture0007	LatticeSystem.Axioms.ContentlessPredicate	contentless_predicate	not applicable	fixture rationale	reopen when implemented
