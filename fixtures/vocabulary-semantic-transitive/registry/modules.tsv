@@ -1,3 +1,0 @@
-module	source_path	role
-Mathlib.FixtureDependency	Mathlib/FixtureDependency.lean	leaf
-Fixture.Subject	Fixture/Subject.lean	umbrella

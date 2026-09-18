@@ -3,10 +3,35 @@ set -euo pipefail
 
 SCRIPT_DIR=${BASH_SOURCE[0]%/*}
 [[ "$SCRIPT_DIR" == "${BASH_SOURCE[0]}" ]] && SCRIPT_DIR=.
+PROJECT_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
 ROOT=${1:-$(cd "$SCRIPT_DIR/.." && pwd)}
+ROOT=$(cd "$ROOT" && pwd) || { echo "check-registry: invalid root" >&2; exit 1; }
 REG="$ROOT/registry"
-REF="$ROOT/references/tasaki-2020.tsv"
+MULTI_SOURCE=0
+if [[ -f "$REG/sources.tsv" ]]; then
+  MULTI_SOURCE=1
+  SOURCE="$REG/sources.tsv"
+else
+  SOURCE="$ROOT/references/tasaki-2020.tsv"
+fi
 fail() { echo "check-registry: $*" >&2; exit 1; }
+
+# R1/R2 fixture snapshots predate the R3 tables. Supply their header-only
+# state through a disposable union view instead of copying five identical
+# files into every historical fixture directory.
+if [[ "$MULTI_SOURCE" -eq 0 && ! -f "$REG/claim-vocabulary-review.tsv" ]]; then
+  case "$ROOT/" in "$PROJECT_ROOT/fixtures/"*) ;; *) fail "production root lacks R3 registry tables" ;; esac
+  OVERLAY=$(mktemp -d "$PROJECT_ROOT/fixtures/.registry-overlay.XXXXXX")
+  trap 'rm -rf "$OVERLAY"' EXIT
+  mkdir -p "$OVERLAY/registry"
+  for file in "$REG"/*.tsv; do ln -s "$file" "$OVERLAY/registry/${file##*/}"; done
+  printf '%s\n' $'claim_id\tbasis\treview_ref' > "$OVERLAY/registry/claim-vocabulary-review.tsv"
+  printf '%s\n' $'vocabulary_id\tdeclaration\tmodule\tdeclaration_kind\torigin\tparent_vocabulary_id\ttype_oid\tdeclaration_oid\tdesign_role\tfiniteness_scope' > "$OVERLAY/registry/vocabulary.tsv"
+  printf '%s\n' $'claim_id\tvocabulary_id' > "$OVERLAY/registry/claim-vocabulary.tsv"
+  printf '%s\n' $'module\tsource_path\trole' > "$OVERLAY/registry/modules.tsv"
+  printf '%s\n' $'module\tposition\timported_module\tis_exported\tis_meta\timport_all' > "$OVERLAY/registry/imports.tsv"
+  REG="$OVERLAY/registry"
+fi
 check_table() {
   local file=$1 header=$2 columns=$3
   [[ -f "$file" ]] || fail "missing ${file#"$ROOT/"}"
@@ -37,11 +62,15 @@ check_table "$REG/vocabulary.tsv" $'vocabulary_id\tdeclaration\tmodule\tdeclarat
 check_table "$REG/claim-vocabulary.tsv" $'claim_id\tvocabulary_id' 2
 check_table "$REG/modules.tsv" $'module\tsource_path\trole' 3
 check_table "$REG/imports.tsv" $'module\tposition\timported_module\tis_exported\tis_meta\timport_all' 6
-check_table "$REF" $'source_id\tlocal_ref_key\tedition\tpdf_oid\ttext_oid\tcoverage\tnotes' 7
+if [[ "$MULTI_SOURCE" -eq 1 ]]; then
+  "$SCRIPT_DIR/check-schema.sh" "$ROOT" >/dev/null
+else
+  check_table "$SOURCE" $'source_id\tlocal_ref_key\tedition\tpdf_oid\ttext_oid\tcoverage\tnotes' 7
+fi
 [[ $(awk 'END { print NR }' "$REG/phase.tsv") -eq 2 ]] || fail "phase.tsv must have exactly one data row"
 { IFS= read -r _; IFS= read -r phase; } < "$REG/phase.tsv"
 case "$phase" in bootstrap|census|vocabulary|skeleton|proof) ;; *) fail "bad phase: $phase" ;; esac
-for file in "$REG/pages.tsv" "$REG/claims.tsv" "$REG/bindings.tsv" "$REG/axioms.tsv" "$REG/claim-vocabulary-review.tsv" "$REG/vocabulary.tsv" "$REG/modules.tsv" "$REF"; do
+for file in "$REG/pages.tsv" "$REG/claims.tsv" "$REG/bindings.tsv" "$REG/axioms.tsv" "$REG/claim-vocabulary-review.tsv" "$REG/vocabulary.tsv" "$REG/modules.tsv" "$SOURCE"; do
   LC_ALL=C awk -F '\t' 'NR > 1 && seen[$1]++ { print FILENAME ": duplicate first-column ID " $1 > "/dev/stderr"; bad=1 } END { exit bad }' "$file" || exit 1
 done
 for spec in "$REG/claim-axioms.tsv:1,2" "$REG/claim-vocabulary.tsv:1,2" "$REG/imports.tsv:1,2"; do
@@ -52,6 +81,7 @@ for spec in "$REG/claim-axioms.tsv:1,2" "$REG/claim-vocabulary.tsv:1,2" "$REG/im
     END { exit bad }
   ' "$file" || exit 1
 done
+if [[ "$MULTI_SOURCE" -eq 0 ]]; then
 LC_ALL=C awk -F '\t' '
   NR == FNR { if (FNR > 1) source[$1]=1; next }
   FNR == 1 { next }
@@ -64,13 +94,16 @@ LC_ALL=C awk -F '\t' '
   $6 !~ /^(pending|pass1|pass2|reconciled|frozen)$/ { bad("bad coverage " $6) }
   function bad(s) { print FILENAME ":" FNR ": " s > "/dev/stderr"; failed=1 }
   END { exit failed }
-' "$REF" "$REF" || exit 1
-[[ $(awk 'END { print NR }' "$REF") -eq 2 ]] || fail "every phase requires exactly one reference row"
-awk -F '\t' 'NR == 2 && ($1 != "TASAKI2020" || $2 == "" || $3 == "") { exit 1 }' "$REF" || fail "reference identity must be the single TASAKI2020 source"
+' "$SOURCE" "$SOURCE" || exit 1
+[[ $(awk 'END { print NR }' "$SOURCE") -eq 2 ]] || fail "legacy fixture requires exactly one reference row"
+awk -F '\t' 'NR == 2 && ($1 != "TASAKI2020" || $2 == "" || $3 == "") { exit 1 }' "$SOURCE" || fail "legacy fixture identity must be TASAKI2020"
+else
+  "$SCRIPT_DIR/check-sources.sh" "$ROOT" >/dev/null
+fi
 LC_ALL=C awk -F '\t' '
   NR == FNR { if (FNR > 1) source[$1]=1; next }
   FNR == 1 { next }
-  $1 !~ /^PG-[A-Z0-9_]+-[0-9][0-9][0-9][0-9]$/ { bad("bad page ID " $1) }
+  $1 !~ /^PG-[A-Z0-9_]+-[0-9][0-9][0-9][0-9][0-9]*$/ { bad("bad page ID " $1) }
   !($2 in source) { bad("unknown source " $2) }
   $3 !~ /^[0-9][0-9][0-9][0-9][0-9][0-9]$/ { bad("bad page order key " $3) }
   $4 == "" || $4 == "unspecified" { bad("missing printed page label must use NONE") }
@@ -84,13 +117,13 @@ LC_ALL=C awk -F '\t' '
   { lastOrder[$2]=$3 }
   function bad(s) { print FILENAME ":" FNR ": " s > "/dev/stderr"; failed=1 }
   END { exit failed }
-' "$REF" "$REG/pages.tsv" || exit 1
+' "$SOURCE" "$REG/pages.tsv" || exit 1
 LC_ALL=C awk -F '\t' '
   function token(s) { return s ~ /^[A-Za-z0-9][A-Za-z0-9._:\/#@+-]*$/ }
   FILENAME == ARGV[1] { if (FNR > 1) source[$1]=1; next }
   FILENAME == ARGV[2] { if (FNR > 1) { page[$1]=1; pageSource[$1]=$2 } next }
   FNR == 1 { next }
-  $1 !~ /^CL-[A-Z0-9_]+-[0-9][0-9][0-9][0-9]$/ { bad("bad claim ID " $1) }
+  $1 !~ /^CL-[A-Z0-9_]+-[0-9][0-9][0-9][0-9][0-9]*$/ { bad("bad claim ID " $1) }
   !($2 in source) || !($4 in page) || pageSource[$4] != $2 { bad("bad claim source/page foreign key") }
   $3 !~ /^[0-9][0-9][0-9][0-9][0-9][0-9]\.[0-9][0-9][0-9][0-9]$/ { bad("bad claim order key " $3) }
   $5 == "" || $8 == "" { bad("empty locator or normalized content") }
@@ -124,7 +157,8 @@ LC_ALL=C awk -F '\t' '
     for (id in known) visit(id)
     exit failed
   }
-' "$REF" "$REG/pages.tsv" "$REG/claims.tsv" || exit 1
+' "$SOURCE" "$REG/pages.tsv" "$REG/claims.tsv" || exit 1
+if [[ "$MULTI_SOURCE" -eq 0 ]]; then
 LC_ALL=C awk -F '\t' '
   NR == FNR { if (FNR > 1) { claim[$1]=1; tombstone[$1]=$12 } next }
   FNR == 1 { next }
@@ -159,6 +193,9 @@ LC_ALL=C awk -F '\t' '
   function bad(s) { print FILENAME ":" FNR ": " s > "/dev/stderr"; failed=1 }
   END { for (n in node) visit(n); exit failed }
 ' "$REG/claims.tsv" "$REG/dependencies.tsv" || exit 1
+else
+  "$SCRIPT_DIR/check-order.sh" "$ROOT" >/dev/null
+fi
 LC_ALL=C awk -F '\t' '
   NR == FNR { if (FNR > 1) claim[$1]=1; next }
   FNR == 1 { next }
@@ -205,7 +242,7 @@ LC_ALL=C awk -F '\t' '
 LC_ALL=C awk -F '\t' '
   function validName(s) { return s ~ /^LatticeSystem(\.[A-Za-z_][A-Za-z0-9_'"'"']*)+$/ }
   FNR == 1 { next }
-  $1 !~ /^VO-TASAKI2020-[0-9][0-9][0-9][0-9]$/ { bad("bad vocabulary ID " $1) }
+  !($1 ~ /^VO-LS-[0-9][0-9][0-9][0-9][0-9]*$/ || $1 ~ /^VO-TASAKI2020-000[12]$/) { bad("bad vocabulary ID " $1) }
   !validName($2) || !validName($3) { bad("vocabulary declaration and module must be below LatticeSystem") }
   $4 !~ /^(definition|abbrev|inductive|structure|class|constructor|recursor|projection|instance)$/ { bad("bad vocabulary declaration kind " $4) }
   $5 !~ /^(primary|generated)$/ { bad("bad vocabulary origin " $5) }
@@ -291,6 +328,7 @@ if [[ "$phase" == vocabulary ]]; then
   for table in slices dependencies bindings axioms claim-axioms; do
     [[ $(awk 'END { print NR }' "$REG/$table.tsv") -eq 1 ]] || fail "vocabulary requires header-only $table.tsv"
   done
+  if [[ "$MULTI_SOURCE" -eq 0 ]]; then
   LC_ALL=C awk -F '\t' '
     FILENAME == ARGV[1] { if (FNR > 1) { active[$1]=($12=="false") } next }
     FILENAME == ARGV[2] { if (FNR > 1) { review[$1]=$2; reviewed[$1]++ } next }
@@ -313,12 +351,16 @@ if [[ "$phase" == vocabulary ]]; then
     }
     function bad(s) { print "vocabulary contract: " s > "/dev/stderr"; failed=1 }
   ' "$REG/claims.tsv" "$REG/claim-vocabulary-review.tsv" "$REG/vocabulary.tsv" "$REG/claim-vocabulary.tsv" || exit 1
+  else
+    awk -F '\t' 'FNR>1 && ($7=="PENDING" || $8=="PENDING") { bad=1 } END { exit bad }' "$REG/vocabulary.tsv" || fail "vocabulary capability forbids pending declaration OIDs"
+  fi
 fi
 
 if [[ "$phase" == bootstrap ]]; then
   for table in pages claims slices dependencies bindings axioms claim-axioms claim-vocabulary-review vocabulary claim-vocabulary modules imports; do
     [[ $(awk 'END { print NR }' "$REG/$table.tsv") -eq 1 ]] || fail "bootstrap requires header-only $table.tsv"
   done
+  if [[ "$MULTI_SOURCE" -eq 0 ]]; then
   awk -F '\t' '
     function edition(s, lower) {
       lower=tolower(s)
@@ -329,8 +371,14 @@ if [[ "$phase" == bootstrap ]]; then
       verified=(edition($3) && $4 ~ /^[0-9a-f]+$/ && ($5 ~ /^[0-9a-f]+$/) && (length($4) == 40 || length($4) == 64) && length($4) == length($5) && $6 == "pending")
       if ($1 != "TASAKI2020" || $2 == "" || (!unverified && !verified)) exit 1
     }
-  ' "$REF" || fail "bootstrap reference must be either unverified or atomically source-frozen, with pending coverage"
+  ' "$SOURCE" || fail "bootstrap reference must be either unverified or atomically source-frozen, with pending coverage"
+  fi
 else
-  awk -F '\t' 'NR == 2 { e=tolower($3); if (e ~ /^(unspecified|pending|unknown|none)$/ || $3 !~ /^[A-Za-z0-9][A-Za-z0-9._+-]*$/ || $4 == "" || $5 == "" || length($4) != length($5) || $6 == "pending") exit 1 }' "$REF" || fail "post-bootstrap reference requires verified edition, equal-width OIDs, and non-pending coverage"
+  if [[ "$MULTI_SOURCE" -eq 0 ]]; then
+    awk -F '\t' 'NR == 2 { e=tolower($3); if (e ~ /^(unspecified|pending|unknown|none)$/ || $3 !~ /^[A-Za-z0-9][A-Za-z0-9._+-]*$/ || $4 == "" || $5 == "" || length($4) != length($5) || $6 == "pending") exit 1 }' "$SOURCE" || fail "post-bootstrap reference requires verified edition, equal-width OIDs, and non-pending coverage"
+  fi
+fi
+if [[ "$MULTI_SOURCE" -eq 1 ]]; then
+  "$SCRIPT_DIR/check-lifecycle.sh" "$ROOT" >/dev/null
 fi
 echo "check-registry: ok"

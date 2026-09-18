@@ -1,2 +1,0 @@
-vocabulary_id	declaration	module	declaration_kind	origin	parent_vocabulary_id	type_oid	declaration_oid	design_role	finiteness_scope
-VO-FIXTURE-0001	Fixture.Item	Fixture.Subject	abbrev	primary	NONE	eda6899694a1d94c33f3b10aa4e8e71fe7970cd3	eedad8e975235d5b3d0801932bc9e971a4c2a5a3	graph_core	none

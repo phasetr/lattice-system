@@ -1,20 +1,20 @@
-# Tasaki formalization: from-scratch design
+# LatticeSystem formalization: from-scratch design
 
 
 ## 1. Status and authority
 
 This document is the tracked design authority for the rewrite.
-The current registry phase is `census`.
-The R2 ledger has been reconciled and frozen. It contains 534 physical PDF
-pages, 3,172 active atomic claims, 1,401 unique equation-label/page pairs, and
-63 pages with no claim.
-The current tree has two candidate R3 vocabulary definitions for partial trace.
+The global checker capability is `vocabulary`. It describes the strongest
+contract implemented by the checkers, not a single global source frontier.
+Each source advances independently through `registry/source-progress.tsv`.
+`TASAKI2020` is currently `vocabulary_reviewed`; its reconciled and frozen
+census contains 534 physical PDF pages, 3,172 active atomic claims, 1,401
+unique equation-label/page pairs, and 63 pages with no claim.
+The current tree has the two R3 vocabulary definitions required by that source.
 There are no source-claim theorem statements, proofs, or intended axioms yet.
-The R3 vocabulary schema, working inventory, and candidate vocabulary type
-OIDs exist, but the phase has not advanced. Rows staged while the phase remains
-`census`, including apparently complete rows and non-`PENDING` OIDs, are work
-in progress rather than evidence that the R3 review, implementation,
-independent review, or semantic gate is complete.
+Their type and declaration OIDs, direct imports, and elaborated environment
+have passed the R3 semantic contract. A newly registered source may remain at
+an earlier lifecycle while the global checker capability stays `vocabulary`.
 No claim is represented merely because its source PDF exists locally.
 The registries are authoritative only for facts they explicitly record.
 An empty claims registry means that the census has not begun.
@@ -43,7 +43,8 @@ Nothing else under `.self-local` belongs to the tracked design.
 The production Lean root is `LatticeSystem.lean`.
 During R1 and R2 it contains a module doc comment and nothing else.
 There is no `LatticeSystem/` source directory during R1 or R2.
-There is no tracked `docs/`, `tex/`, or `formalization-status/` directory.
+There is no tracked `tex/` or `formalization-status/` directory. The tracked
+`docs/` tree is generated public registry output and is drift-checked in CI.
 There is no compatibility shim or archived source subtree.
 There is one CI workflow for the rewrite.
 The root README reports current facts only.
@@ -67,38 +68,56 @@ No conclusion is weakened merely because it is easier to formalize.
 Definitions are introduced because a registered source claim needs them.
 Convenience APIs are added only after their necessity is demonstrated.
 
-## 5. Source identity
+## 5. Tracks, sources, and independent lifecycle
 
-Every phase contains exactly one source row, whose stable ID is `TASAKI2020`;
-missing, alternate, and extra sources are rejected until a future design change
-explicitly extends the source set.
-The initial bootstrap row requires a nonempty local key, edition exactly
-`unspecified`, blank PDF/text OIDs, and `pending` coverage.
-As the first R2 prerequisite, that row may transition while the phase remains
-`bootstrap` to a verified edition and two valid, equal-width Git OIDs, while
-coverage remains `pending` and all census registries remain header-only.
-This source-freeze transition is atomic and does not assert that census has
-started or completed.
-The local reference key identifies a private file without tracking that file.
-Edition, pagination, and coverage remain `pending` or `unspecified` until
-verified from the actual source.
-No ISBN, DOI, page range, or theorem number may be guessed.
-Edition may transition once from `unspecified` to a verified ASCII edition
-token and is then frozen. Post-bootstrap tokens may not equal `unspecified`,
-`pending`, `unknown`, or `NONE`, compared case-insensitively.
-The PDF object OID and extracted-text object OID transition atomically from
-both blank to two valid Git OIDs before R2 census begins and then freeze. Both
-fingerprints use the same Git object width (40 or 64 lowercase hexadecimal
-digits); mixed object formats are rejected.
-Coverage follows the closed monotone chain `pending`, `pass1`, `pass2`,
-`reconciled`, `frozen`; post-bootstrap coverage is not `pending`.
-Blank OIDs are permitted only during bootstrap.
-Changing either source fingerprint requires explicit review and a new census.
+`registry/tracks.tsv` has columns `track_id`, `position`, `title`, and
+`public_slug`. Track IDs have the form `TR-[A-Z][A-Z0-9_]*`; positions are
+globally unique and contiguous. `registry/sources.tsv` has columns `source_id`,
+`track_id`, `source_position`, `source_kind`, `citation_key`, `title`, `authors`,
+`year`, `edition`, `identifier_kind`, `identifier`, `public_url`, `public_slug`,
+`local_ref_key`, `pdf_oid`, `text_oid`, and `coverage`. Source positions are
+unique and contiguous inside a track. The closed source kinds are `book`,
+`paper`, `preprint`, and `other`; identifier kinds are `isbn`, `doi`, `arxiv`,
+and `none`. Bibliographic identifiers and URLs are verified, never guessed.
+
+The local reference key identifies private material without exposing it in
+public generated documentation. PDF and extracted-text OIDs freeze atomically,
+have the same Git object width, and cannot silently drift. Coverage follows the
+monotone chain `pending`, `pass1`, `pass2`, `reconciled`, `frozen`.
+
+`registry/source-progress.tsv` records each source's independent lifecycle and
+review token. The closed lifecycle is `registered`, `source_frozen`,
+`census_pass1`, `census_pass2`, `census_reconciled`, `vocabulary_reviewed`,
+`skeleton_frozen`, `proof_active`, `complete`. A lifecycle may not exceed the
+global checker capability and may not regress. This permits a new registered
+book or paper to coexist with an already vocabulary-reviewed source.
+
+`registry/source-invariants.tsv` freezes reconciled sources by source ID,
+physical-page count, active-claim count, equation-label/page-pair count,
+no-claim-page count, `census_oid`, and review token. The census OID is the Git
+blob OID of that source's canonical `pages.tsv` rows followed by `claims.tsv`
+rows, with headers excluded, registry order preserved, UTF-8, and LF endings.
+The legacy `references/tasaki-2020.tsv` data was migrated losslessly into these
+tables; existing Tasaki PG, CL, and VO IDs and all frozen OIDs remain unchanged.
+
+The tracked public catalog is derived from `registry/source-items.tsv` and
+`registry/item-claims.tsv`. Every active claim belongs to exactly one reviewed
+source item; item/source/page foreign keys, order, label, public group, and slug
+are checked. `scripts/generate-public-docs.py` deterministically generates the
+Markdown and JSON under `docs/`; both its unit tests and a no-drift check run in
+the aggregate checker. Group pages are source-scoped, so equal chapter/group
+slugs in different sources cannot mix. A claim is displayed as
+`vocabulary_ready` only when it has a review row and its source lifecycle is at
+least `vocabulary_reviewed`; an earlier source is at most `review_staged`.
+Private local keys, source fingerprints, normalized
+source text, and content OIDs are not emitted.
 
 ## 6. Page registry
 
 `registry/pages.tsv` is the page-by-page census ledger.
 Each row has a stable page ID and source-relative order.
+Page IDs are `PG-<source_id>-<decimal>` with a decimal suffix of at least four
+digits; the embedded source token must equal the row's source ID.
 Printed and PDF page coordinates are separate fields.
 The PDF coordinate is a positive physical-page number. A physical PDF page
 without a printed page label uses exactly `NONE`; labels are never inferred.
@@ -126,6 +145,8 @@ Definitions that carry mathematical obligations are registered claims.
 Displayed equations are claims when later reasoning depends on them.
 Exercises, `remark` claims, and proof-internal lemmas are classified explicitly.
 Each claim has one stable ID, one page ID, and one stable order key.
+Claim IDs are `CL-<source_id>-<decimal>` with a decimal suffix of at least four
+digits; the embedded source token must equal the row's source ID.
 Each claim records a precise locator and normalized source content.
 The normalized source content and its OID are recorded independently of Lean.
 Claim `content_oid` may remain `PENDING`, may transition once to a valid Git
@@ -164,11 +185,14 @@ For `requires`, a claim depends on an earlier target claim.
 For `consequence_of`, a claim is derived from an earlier target claim.
 For `required_by`, the later source claim is exceptionally pulled forward
 because the earlier target at the current frontier needs it.
-Thus every role targets an earlier source-order claim; `required_by` reverses
+Global source order is the tuple `(track.position, source.source_position,
+claim.order_key)`. Thus every role targets an earlier tuple; `required_by` reverses
 the logical edge and requires a nonempty review rationale.
 Logical edges are claim-to-target for `requires` and `consequence_of`, and
 target-to-claim for `required_by`.
 The resulting graph must be acyclic; self and duplicate edges are forbidden.
+Cross-track edges are permitted only when the target tuple is earlier and a
+nonempty review rationale records the deliberate track crossing.
 Every non-`NONE` dependency rationale is an ASCII machine token under the same
 rule as claim review fields.
 Vocabulary and module imports are not claim edges. R3 will add a separate
@@ -179,8 +203,8 @@ Front-to-back order is checked against the dependency graph and registry.
 
 ## 9A. R3 vocabulary and import contract
 
-R3 begins with a complete review of the frozen active claim corpus before its
-phase advances. `registry/claim-vocabulary-review.tsv` has columns `claim_id`,
+For a source to reach `vocabulary_reviewed`, R3 requires a complete review of
+its frozen active claim corpus. `registry/claim-vocabulary-review.tsv` has columns `claim_id`,
 `basis`, and `review_ref`. Every active claim has exactly one row. The closed
 `basis` values are `mathlib_only` and `project_vocabulary`; `review_ref` is a
 nonempty ASCII machine token. A `mathlib_only` claim has no row in
@@ -190,7 +214,8 @@ such row. Tombstoned claims have no R3 review or use rows.
 `registry/vocabulary.tsv` has columns `vocabulary_id`, `declaration`, `module`,
 `declaration_kind`, `origin`, `parent_vocabulary_id`, `type_oid`,
 `declaration_oid`, `design_role`, and `finiteness_scope`. Stable vocabulary IDs have the form
-`VO-TASAKI2020-NNNN`. Declaration and module names live below
+`VO-LS-NNNN`; the two existing `VO-TASAKI2020-NNNN` IDs are grandfathered and
+remain frozen. Declaration and module names live below
 `LatticeSystem`. The closed declaration kinds are `definition`, `abbrev`,
 `inductive`, `structure`, `class`, `constructor`, `recursor`, `projection`,
 and `instance`. Notation has no `ConstantInfo` and is not a registrable R3
@@ -203,7 +228,7 @@ of the canonical serialization of the elaborated declaration's
 definition value or abbreviation RHS, so body drift is rejected even when its
 type is unchanged. Generated and inductive-family rows use the kind-specific
 payload defined by the semantic checker. Both OIDs may be `PENDING` only before
-the phase advances to `vocabulary`.
+the global checker capability advances to `vocabulary`.
 
 The closed design roles are `graph_core`, `finite_volume`, `linear_algebra`,
 `operator_algebra`, `quantum_state`, `stat_mech`, `fermion`, and `generated`.
@@ -248,13 +273,11 @@ declarations. It also rejects project axioms, theorem or lemma declarations,
 direct or transitive `sorryAx` use, and source-claim declarations disguised as
 vocabulary. Static lexical checks remain defense in depth only.
 
-All five R3 registries are header-only in `bootstrap`. During `census`, R3 may
-stage partial review, vocabulary, module, and import rows, and either vocabulary
-OID may be `PENDING`; those rows carry no phase-completion meaning. In
-`vocabulary`, the review covers the entire frozen active claim corpus, every
-type OID is frozen, the vocabulary/use relation is complete, and module and
-import registries match the environment. The existence of this contract and a
-staged inventory do not mean those vocabulary-phase conditions currently hold.
+All five R3 registries are header-only in `bootstrap`. At global capability
+`vocabulary`, every source whose lifecycle is `vocabulary_reviewed` has complete
+active-claim review and vocabulary use, every vocabulary OID is frozen, and
+module and import registries match the environment. Sources at an earlier
+lifecycle may coexist without weakening those completed-source guarantees.
 
 ## 10. Bindings
 
@@ -328,7 +351,12 @@ Lexical grep checks remain defense in depth, not semantic evidence.
 R4 cannot complete until this checker exists and its positive and negative
 fixtures pass.
 
-## 14. Phases
+## 14. Checker capabilities and source lifecycles
+
+The value in `phase.tsv` is a global checker capability. It advances only when
+the corresponding validation is implemented and exercised, and it does not
+assert that every registered source has reached that stage. Source completion
+is represented only by `source-progress.tsv`.
 
 R1 is atomic reset and bootstrap checker construction.
 R1 produces the clean tree, schemas, exact-root check, base-diff guard, fixtures,
@@ -338,7 +366,7 @@ Pass one records every page and candidate atomic claim in source order.
 Pass two independently reconciles every page, label, equation, claim boundary,
 and no-claim page.
 R2 cannot finish with an unreviewed page or an unresolved census discrepancy.
-The completed R2 registry has every page in both-pass `complete` state, a
+For a source at `census_reconciled`, its R2 registry has every page in both-pass `complete` state, a
 frozen page-source OID, and no tombstoned claim. Slices, dependencies, bindings,
 axioms, and claim-to-axiom relations remain empty until their later phases.
 R3 is vocabulary and type construction.
@@ -369,20 +397,21 @@ Source order and slice positions cannot move backward or silently change.
 Verified locators cannot drift.
 Frozen source-content and binding statement OIDs cannot change silently.
 Bindings cannot disappear after introduction.
-The phase value cannot regress. The production policy recognizes `vocabulary`
+The global checker capability cannot regress. The production policy recognizes `vocabulary`
 only when the R3 registry, module/import, and Lean-environment checks all run
 and pass. It rejects `skeleton` and `proof` until their semantic phase checks
 exist.
 Derived claim state cannot regress from proved to unresolved.
 The number of registered unresolved claim bindings is monotone nonincreasing in R5.
 Bootstrap and a declaration-free census use the exact canonical doc-only root.
-Once R3 staging registries name production modules during census, only the
-canonical vocabulary root and registered vocabulary modules are permitted;
+At vocabulary capability, only the canonical vocabulary root and registered
+vocabulary modules are permitted;
 they remain subject to the semantic vocabulary gate and contain no source-claim
 theorem, `sorry`, `admit`, `native_decide`, or axiom.
-A later phase never disables the frozen source identity, 534-page, 3,172-claim,
-1,401-equation, active-state, source-order, page-coupling, or two-pass census
-invariants. The census requirement that slices, source-claim dependencies,
+A later lifecycle never disables that source's frozen identity, counts,
+census OID, active-state, source-order, page-coupling, or two-pass census
+invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,172 active
+claims, and 1,401 equation pairs. The census-capability requirement that slices, source-claim dependencies,
 bindings, axioms, and claim-to-axiom relations are header-only is phase-local;
 it is not part of the later frozen-census invariant check.
 A theorem deletion is not proof progress.
@@ -409,12 +438,10 @@ coverage `pending` until census begins.
 It validates TSV headers, column counts, control-character exclusions, ID
 forms, enumerations, uniqueness, ordering, foreign keys, slice positions,
 dependency roles, axiom references, and phase-specific registry semantics.
-For the production census and every later phase it additionally requires the
-exact one-row frozen
-source record, 534 contiguous page IDs/order keys/PDF coordinates with two
-complete passes and fixed source OIDs, exactly 3,172 active, unsuperseded claims
-in strict source order whose order-key page prefix matches the referenced page,
-and exactly 1,401 unique equation-label/page pairs. Only `census` requires the
+For every reconciled production source it additionally requires that source's
+frozen invariant row, contiguous page IDs/order keys/PDF coordinates with two
+complete passes and fixed source OIDs, its exact active-claim and equation-pair
+counts, and strict global tuple order with page coupling. Only `census` requires the
 five pre-R3 implementation registries to be header-only. `vocabulary` instead
 requires complete claim review and vocabulary use, exact registered module and
 import coverage; its absence requirements are enforced by the R3 contract,
@@ -436,14 +463,17 @@ It does not independently prove that the reviewed census omitted no source
 claim or that two readings were operationally independent.
 It does not parse or understand mathematics.
 It does not prove that a locator matches the book.
-It does not inspect the elaborated Lean environment.
+The separate R3 semantic gate inspects the elaborated Lean environment for the
+registered vocabulary and imports; this structural section does not claim a
+future source-claim proof audit.
 It does not establish the direct-`sorryAx` bijection.
 It does not compute transitive axiom dependencies.
 It does not certify theorem correctness or adequacy of hypotheses.
 Those are future semantic checks and human review obligations.
 The source-freeze prerequisite must not be represented as satisfying the R2
 census gate, and R1 must not be represented as satisfying any R2, R3, or R4
-gate. A staged R3 inventory does not satisfy the vocabulary gate.
+gate. For each source, only its reviewed lifecycle row records completion of a
+source-specific census, vocabulary review, skeleton, or proof stage.
 
 ## 17. Review and merge authority
 

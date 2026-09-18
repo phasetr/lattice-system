@@ -152,22 +152,8 @@ expect_fail census-claim-page-order --diagnostic "$census_claim_diagnostic" "$RO
 expect_fail census-claim-source-order --diagnostic "$census_claim_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-claim-source-order" 2 2 1
 expect_pass census-equation-label-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-equation-label"
 expect_fail census-equation-label --diagnostic "$census_claim_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-equation-label" 2 2 1
-expect_pass vocabulary-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-vocabulary-good"
-expect_fail vocabulary-uncovered --diagnostic "active claim lacks exactly one vocabulary review" "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-vocabulary-uncovered"
-expect_fail vocabulary-unused --diagnostic "unused vocabulary declaration" "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-vocabulary-unused"
-expect_fail vocabulary-bad-import --diagnostic "unauthorized external import" "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-vocabulary-bad-import"
-expect_fail vocabulary-slices-registry --diagnostic "vocabulary requires header-only slices.tsv" "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-vocabulary-slices-good"
-expect_pass later-phase-census-invariants "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-vocabulary-slices-good" 2 2 1
-expect_fail later-phase-census-regression --diagnostic "$census_page_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-vocabulary-census-bad" 2 2 1
-expect_pass vocabulary-semantic-good "$ROOT/scripts/check-vocabulary.sh" --fixture "$ROOT/fixtures/vocabulary-semantic-good"
-expect_pass vocabulary-semantic-structure "$ROOT/scripts/check-vocabulary.sh" --fixture "$ROOT/fixtures/vocabulary-semantic-structure"
-expect_fail vocabulary-semantic-axiom "$ROOT/scripts/check-vocabulary.sh" --fixture "$ROOT/fixtures/vocabulary-semantic-axiom"
-expect_fail vocabulary-semantic-extra "$ROOT/scripts/check-vocabulary.sh" --fixture "$ROOT/fixtures/vocabulary-semantic-extra"
-expect_fail vocabulary-semantic-import "$ROOT/scripts/check-vocabulary.sh" --fixture "$ROOT/fixtures/vocabulary-semantic-import"
-expect_fail vocabulary-semantic-sorry "$ROOT/scripts/check-vocabulary.sh" --fixture "$ROOT/fixtures/vocabulary-semantic-sorry"
-expect_fail vocabulary-semantic-theorem "$ROOT/scripts/check-vocabulary.sh" --fixture "$ROOT/fixtures/vocabulary-semantic-theorem"
-expect_fail vocabulary-semantic-type "$ROOT/scripts/check-vocabulary.sh" --fixture "$ROOT/fixtures/vocabulary-semantic-type"
-expect_fail vocabulary-semantic-body "$ROOT/scripts/check-vocabulary.sh" --fixture "$ROOT/fixtures/vocabulary-semantic-body"
+"$ROOT/scripts/test-vocabulary-registry.sh" "$ROOT"
+"$ROOT/scripts/test-vocabulary-semantic.sh" "$ROOT"
 expect_pass base-snapshot-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/base-diff/base"
 expect_pass good-snapshot-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/base-diff/good"
 expect_pass supersession-snapshot-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/base-diff/supersession-good"
@@ -201,10 +187,6 @@ expect_fail vocabulary-type-only-drift --diagnostic "vocabulary type OID regress
 expect_fail vocabulary-declaration-only-drift --diagnostic "vocabulary declaration OID regressed" "$ROOT/scripts/check-base-diff.sh" --fixture-dirs "$ROOT/fixtures/base-diff/vocabulary-good" "$ROOT/fixtures/base-diff/vocabulary-regression"
 IFS= read -r invalid_ref < "$ROOT/fixtures/base-invalid/ref.txt"
 expect_fail invalid-base-ref "$ROOT/scripts/check-base-diff.sh" "$ROOT" "$invalid_ref"
-expect_fail vocabulary-semantic-missing "$ROOT/scripts/check-vocabulary.sh" --fixture "$ROOT/fixtures/vocabulary-semantic-missing"
-expect_fail vocabulary-semantic-module "$ROOT/scripts/check-vocabulary.sh" --fixture "$ROOT/fixtures/vocabulary-semantic-module"
-expect_fail vocabulary-semantic-graph "$ROOT/scripts/check-vocabulary.sh" --fixture "$ROOT/fixtures/vocabulary-semantic-graph"
-expect_fail vocabulary-semantic-finiteness "$ROOT/scripts/check-vocabulary.sh" --fixture "$ROOT/fixtures/vocabulary-semantic-finiteness"
-expect_fail vocabulary-semantic-transitive --diagnostic "transitive sorryAx dependency: Fixture.Item" "$ROOT/scripts/check-vocabulary.sh" --fixture "$ROOT/fixtures/vocabulary-semantic-transitive"
+"$ROOT/scripts/test-multisource.sh" "$ROOT"
 
 echo "test-checkers: ok"

@@ -2,3 +2,8 @@
 /.self-local/
 /.claude/
 *.log
+/fixtures/.base-diff-overlay.*/
+/fixtures/.multisource.*/
+/fixtures/.registry-overlay.*/
+/fixtures/.vocabulary-registry.*/
+/fixtures/.vocabulary-semantic.*/

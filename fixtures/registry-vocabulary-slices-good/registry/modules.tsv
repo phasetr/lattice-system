@@ -1,3 +1,0 @@
-module	source_path	role
-LatticeSystem	LatticeSystem.lean	root
-LatticeSystem.Fixture	LatticeSystem/Fixture.lean	leaf

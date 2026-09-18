@@ -1,14 +1,17 @@
 # LatticeSystem
 
-This branch is a from-scratch implementation of the claims in Hal Tasaki's
-quantum many-body systems book. R3 is complete: the production tree contains
+This branch is a from-scratch, multi-source implementation of mathematical
+physics claims. R3 is complete for the first source, Hal Tasaki's quantum
+many-body systems book: the production tree contains
 the two partial-trace vocabulary definitions required by the frozen corpus,
 but **zero source-claim theorem statements or proofs**. The former
 implementation is not an API or source for this rewrite.
 
 The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
-progress begins in `registry/`; its current phase is `vocabulary`. The reconciled
-R2 ledger contains all 534 physical PDF pages, 3,172 active atomic claims,
+progress begins in `registry/`. Its global checker capability is `vocabulary`,
+while each source advances independently through `source-progress.tsv`;
+`TASAKI2020` is `vocabulary_reviewed`. Its reconciled R2 ledger contains all
+534 physical PDF pages, 3,172 active atomic claims,
 1,401 unique equation-label/page pairs, and 63 pages with no claim. The only
 production Lean tree is limited to the registered vocabulary modules and their
 root. Checker fixtures also use a `.lean` suffix but are not production modules.
@@ -19,6 +22,14 @@ The complete R3 review classifies all 3,172 active claims: 3,170 are
 exactly `partialTraceRight` and `partialTraceLeft`, with four claim-to-vocabulary
 links recording the complete relation. Their type and declaration OIDs are
 frozen, and the static registry, import graph, and Lean-environment checks pass.
+
+Tracks and sources have stable positions, bibliographic metadata, fingerprints,
+independent lifecycle, and per-source frozen census invariants. Global claim
+order is `(track position, source position, claim order key)`, so additional
+books and papers can be registered without weakening completed-source gates.
+The public catalog at [docs/index.md](docs/index.md) is generated from reviewed
+source items and includes source/section labels, claim summaries, Lean binding
+status, vocabulary, axioms, and links without publishing private source data.
 
 ## Local checks
 

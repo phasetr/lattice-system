@@ -642,5 +642,5 @@ fixtures/registry-supersession-self/registry/slices.tsv	7396548bca95bd383dce73e4
 fixtures/tree-fake-bypass/tracked-files.txt	b43bf86b50fd8d3529a0dc062c30006ed38f309e
 fixtures/tree-unexpected/tracked-files.txt	db30f88e631dd3fdd87df926082ea75ce396761d
 fixtures/tree-unlisted/tracked-files.txt	409ba0e063936e7787a9ecf479651036768546c8
-fixtures/vocabulary-manifest.tsv	e4303cea73f40cc5aab3ed4065d02d4fd316ab4c
-fixtures/vocabulary-semantic-manifest.tsv	648d00ca86f54686e2feee8635e4b379991fa34b
+fixtures/vocabulary-manifest.tsv	3e4e9760b5f523f4f2a79ca591d87641862b7627
+fixtures/vocabulary-semantic-manifest.tsv	fd981742bda912e7a0a47614b93342678d117e29

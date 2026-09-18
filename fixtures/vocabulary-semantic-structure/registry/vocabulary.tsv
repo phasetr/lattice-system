@@ -1,6 +1,0 @@
-vocabulary_id	declaration	module	declaration_kind	origin	parent_vocabulary_id	type_oid	declaration_oid	design_role	finiteness_scope
-VO-FIXTURE-0001	Fixture.Pair	Fixture.Subject	structure	primary	NONE	eda6899694a1d94c33f3b10aa4e8e71fe7970cd3	0586bd493d684bcfdfadaa8ff4947f51eec7c48e	fixture	none
-VO-FIXTURE-0002	Fixture.Pair.left	Fixture.Subject	projection	generated	VO-FIXTURE-0001	09117ddb3ec4f41df783154859883a9de3d050e2	dd7d0075df1dd47237fddb4cca34b753916ce4bb	generated	inherited
-VO-FIXTURE-0003	Fixture.Pair.mk	Fixture.Subject	constructor	generated	VO-FIXTURE-0001	70175a16711a85717984d042c516015d987420a8	9fff138066c2a8c1f2806a98d48afaa072024658	generated	inherited
-VO-FIXTURE-0004	Fixture.Pair.rec	Fixture.Subject	recursor	generated	VO-FIXTURE-0001	a0e3a5ba971ba56e66b0a2cf7a38ee6dab0137ef	83977b98a8d306caafe0acc5c6e163b7969eaeca	generated	inherited
-VO-FIXTURE-0005	Fixture.Pair.right	Fixture.Subject	projection	generated	VO-FIXTURE-0001	09117ddb3ec4f41df783154859883a9de3d050e2	f379ffda38c34d4b3959edf8c48281993ce88661	generated	inherited

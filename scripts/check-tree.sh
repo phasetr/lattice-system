@@ -53,9 +53,9 @@ allowed_path() {
   esac
   case "$1" in
     .github/CODEOWNERS|.github/pull_request_template.md|.github/workflows/rewrite-ci.yml|.gitignore|DESIGN.md|LatticeSystem.lean|README.md|lake-manifest.json|lakefile.toml|lean-toolchain) return 0 ;;
-    references/tasaki-2020.tsv) return 0 ;;
-    registry/phase.tsv|registry/pages.tsv|registry/claims.tsv|registry/slices.tsv|registry/dependencies.tsv|registry/bindings.tsv|registry/axioms.tsv|registry/claim-axioms.tsv|registry/claim-vocabulary-review.tsv|registry/vocabulary.tsv|registry/claim-vocabulary.tsv|registry/modules.tsv|registry/imports.tsv) return 0 ;;
-    scripts/check-all.sh|scripts/check-tree.sh|scripts/check-registry.sh|scripts/check-census.sh|scripts/check-policy.sh|scripts/check-base-diff.sh|scripts/check-vocabulary.sh|scripts/test-checkers.sh) return 0 ;;
+    registry/phase.tsv|registry/tracks.tsv|registry/sources.tsv|registry/source-invariants.tsv|registry/source-progress.tsv|registry/pages.tsv|registry/claims.tsv|registry/source-items.tsv|registry/item-claims.tsv|registry/slices.tsv|registry/dependencies.tsv|registry/bindings.tsv|registry/axioms.tsv|registry/claim-axioms.tsv|registry/claim-vocabulary-review.tsv|registry/vocabulary.tsv|registry/claim-vocabulary.tsv|registry/modules.tsv|registry/imports.tsv) return 0 ;;
+    scripts/check-all.sh|scripts/check-tree.sh|scripts/check-schema.sh|scripts/check-sources.sh|scripts/check-source-items.sh|scripts/check-order.sh|scripts/check-lifecycle.sh|scripts/check-registry.sh|scripts/check-census.sh|scripts/check-policy.sh|scripts/check-base-diff.sh|scripts/check-vocabulary.sh|scripts/test-checkers.sh|scripts/test-multisource.sh|scripts/test-vocabulary-registry.sh|scripts/test-vocabulary-semantic.sh|scripts/generate-public-docs.py) return 0 ;;
+    docs/index.md|docs/generated/index.md|docs/generated/catalog.json|docs/generated/groups/*.md|docs/generated/sources/*.md|docs/generated/tracks/*.md) return 0 ;;
     Checker/R3Vocabulary.lean) return 0 ;;
     LatticeSystem/*.lean|LatticeSystem/**/*.lean)
       [[ -f "$ROOT/registry/modules.tsv" ]] || return 1
@@ -72,7 +72,7 @@ allowed_path() {
 while IFS= read -r path; do
   [[ -z "$path" ]] && continue
   allowed_path "$path" || fail "unexpected tracked path: $path"
-  case "$path" in docs/*|tex/*|formalization-status/*) fail "forbidden legacy path: $path" ;; esac
+  case "$path" in tex/*|formalization-status/*) fail "forbidden legacy path: $path" ;; esac
 done <<< "$tracked"
 
 [[ -f "$MANIFEST" ]] || fail "missing fixtures/manifest.tsv"
