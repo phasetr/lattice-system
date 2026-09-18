@@ -30,12 +30,12 @@ Tracks and sources have stable positions, bibliographic metadata, fingerprints,
 independent lifecycle, and per-source frozen census invariants. Global claim
 order is `(track position, source position, claim order key)`, so additional
 books and papers can be registered without weakening completed-source gates.
-The reviewed correction event is recorded by four permanent ledgers for the
-event, its 36 statement-readiness reviews, 22 corrective actions, and 23
-ordered successor relations. The dedicated
+The reviewed correction event is recorded by five permanent ledgers for the
+event, its 36 statement-readiness reviews, 22 corrective actions, 23 ordered
+successor relations, and one event-owned source-item addition. The dedicated
 transition checker derives the corrected counts and census OID from the corpus
-and rejects unmanifested registry drift, contentless surrogates, axiom or R4
-artifacts, and incomplete successor propagation.
+and rejects cross-source ownership, unmanifested registry drift, contentless
+surrogates, axiom or R4 artifacts, and incomplete successor propagation.
 Historical event-owned rows are frozen exactly, while a later independently
 reviewed event may append rows with its own contiguous positions.
 CI selects this exceptional transition only while the event is new and its

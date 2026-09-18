@@ -103,7 +103,8 @@ The legacy `references/tasaki-2020.tsv` data was migrated losslessly into these
 tables; existing Tasaki PG, CL, and VO IDs and all frozen OIDs remain unchanged.
 
 The tracked public catalog is derived from `registry/source-items.tsv` and
-`registry/item-claims.tsv`. Every registered claim, including a reviewed
+`registry/item-claims.tsv`; the former is the authority for stable item IDs and
+public metadata rather than a disposable output of locator grouping. Every registered claim, including a reviewed
 tombstone retained for provenance, belongs to exactly one reviewed source
 item; item/source/page foreign keys, order, label, public group, and slug
 are checked. `scripts/generate-public-docs.py` deterministically generates the
@@ -172,7 +173,7 @@ identity and content fields remain fixed.
 Proof and implementation status is derived from these facts plus the Lean
 environment; it is never a hand-edited claim field.
 
-The permanent correction protocol uses four ledgers. `correction-events.tsv`
+The permanent correction protocol uses five ledgers. `correction-events.tsv`
 binds a position, event, and independent review token to one source and exact
 base commit. `claim-normalization-reviews.tsv` records every reviewed claim,
 including unchanged outcomes. `claim-corrections.tsv` is owned through the
@@ -180,17 +181,26 @@ review row and records one of `reclassify`, `exclude_nonclaim`, or `split`
 against each corrected frozen claim, including its old and new classification.
 `claim-successors.tsv` is owned through the correction row and records a
 contiguous ordered list of `new_successor` and `existing_duplicate` relations.
+`source-item-additions.tsv` is also owned through the correction row and
+manifests each new stable source-item ID introduced by an event. Its rows,
+their item metadata, and their item-to-claim relations become frozen history.
 Every split has at least one `new_successor`. A new successor receives a new stable claim
-ID, an independently frozen normalized-content OID, the predecessor's source
-item, and a fresh vocabulary review. Excluded and tombstoned predecessors have
+ID, an independently frozen normalized-content OID, an exactly one-item
+provenance relation, and a fresh vocabulary review. A correction may retain the
+predecessor item or introduce a manifested item when the source has a distinct
+publicly reviewed source unit. Excluded and tombstoned predecessors have
 no vocabulary review or use rows. The dedicated checker compares the event
 tree to its exact base and is the only mode that may admit the manifested
 classification, exclusion, tombstone, successor, item, review, and invariant
-changes. It rejects unrelated registry drift and any correction that introduces
+changes. The event source is a foreign key: every reviewed predecessor,
+successor, added item, and updated invariant must belong to it; other sources
+remain byte-for-byte frozen. Existing-duplicate successors must already be
+active formalization targets in the base and must remain unchanged. It rejects
+unrelated registry drift and any correction that introduces
 an axiom, binding, contentless surrogate, or other R4 artifact.
 All rows owned by an event already present in the base are byte-for-byte frozen.
 A future event may append its own contiguously positioned review, correction,
-and successor rows without changing historical ownership.
+successor, and item-addition rows without changing historical ownership.
 
 ## 8. Implementation slices
 
@@ -488,8 +498,9 @@ It checks the written merge gate and an unchecked `USER ONLY` box.
 It exercises generated positive and negative runtime cases without committed
 fixture data.
 The correction suite covers the three permitted positive transition shapes and
-negative cases for review, manifest completeness, successor provenance and ID
-freshness, item and vocabulary propagation, immutable rows and OIDs, derived
+negative cases for review, event-source ownership, manifest completeness,
+successor provenance and ID freshness, stable source-item additions, nested
+order keys, item and vocabulary propagation, immutable rows and OIDs, derived
 counts, census OID, contentless surrogates, production content OIDs, historical
 row forgery, split-without-new-successor, axioms, and premature R4 artifacts.
 The CI-selector suite separately checks the one-shot correction route,

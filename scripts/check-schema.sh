@@ -48,6 +48,7 @@ check_table "$REG/correction-events.tsv" $'event_id\tevent_position\tsource_id\t
 check_table "$REG/claim-normalization-reviews.tsv" $'review_id\tevent_id\treview_position\tclaim_id\treview_scope\toutcome\tstatus\trationale\treview_ref' 9
 check_table "$REG/claim-corrections.tsv" $'correction_id\tevent_id\tcorrection_position\treview_id\tclaim_id\taction\told_disposition\told_subkind\tnew_disposition\tnew_subkind' 10
 check_table "$REG/claim-successors.tsv" $'successor_edge_id\tevent_id\tcorrection_id\tpredecessor_claim_id\tsuccessor_position\trelation\tsuccessor_claim_id' 7
+check_table "$REG/source-item-additions.tsv" $'item_addition_id\tevent_id\tcorrection_id\taddition_position\titem_id\treview_ref' 6
 
 [[ $(awk 'END { print NR }' "$REG/phase.tsv") -eq 2 ]] || fail "phase.tsv must have exactly one data row"
 { IFS= read -r _; IFS= read -r phase; } < "$REG/phase.tsv"

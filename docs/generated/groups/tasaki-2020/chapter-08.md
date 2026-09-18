@@ -5217,6 +5217,23 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 
 - `CL-TASAKI2020-1521` — definition / definition; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
+<a id="IT-TASAKI2020-3037"></a>
+
+## Unlabeled item IT-TASAKI2020-3037
+
+- Item ID: `IT-TASAKI2020-3037`
+- Source: `TASAKI2020`
+- Page ID: `PG-TASAKI2020-0301`
+- Kind: `unlabeled`
+- Source label: `NONE`
+- Title: `NONE`
+- Locator: PDF p. 301; print p. 289; §8.4; paragraph 6
+
+### Atomic claims
+
+- `CL-TASAKI2020-3442` — definition / definition; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-3443` — definition / definition; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+
 <a id="IT-TASAKI2020-1538"></a>
 
 ## equation (8.4.1)
@@ -5248,8 +5265,6 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 ### Atomic claims
 
 - `CL-TASAKI2020-1523` — assertion / remark; lifecycle `superseded`; successor `CL-TASAKI2020-3442`; Vocabulary `not_reviewed`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
-- `CL-TASAKI2020-3442` — definition / definition; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
-- `CL-TASAKI2020-3443` — definition / definition; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
 <a id="IT-TASAKI2020-1540"></a>
 

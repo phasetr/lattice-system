@@ -8,7 +8,7 @@ publish private source paths and object identifiers.
 - Active atomic claims: 3182
 - Formalization targets: 3171
 - Superseded claim records: 8
-- Reviewed source items: 3036
+- Reviewed source items: 3037
 - Mathlib-only claims: 3169
 - Project-vocabulary claims: 2
 

@@ -273,13 +273,37 @@ def validate_source_items(data):
     expected_items, expected_relations = derive_source_items(
         data["claims"], data["pages"], data["sources"], data["tracks"]
     )
-    if data["source_items"] != expected_items:
+    metadata_fields = [
+        field for field in HEADERS["source_items"] if field != "item_id"
+    ]
+    actual_metadata = [
+        {field: row[field] for field in metadata_fields}
+        for row in data["source_items"]
+    ]
+    expected_metadata = [
+        {field: row[field] for field in metadata_fields}
+        for row in expected_items
+    ]
+    if actual_metadata != expected_metadata:
         raise CatalogError(
-            "source-items.tsv differs from deterministic locator-derived inventory"
+            "source-items.tsv metadata/order differs from locator-derived inventory"
         )
-    if data["item_claims"] != expected_relations:
+
+    expected_claims = defaultdict(list)
+    for row in expected_relations:
+        expected_claims[row["item_id"]].append(row["claim_id"])
+    actual_claims = defaultdict(list)
+    for row in data["item_claims"]:
+        actual_claims[row["item_id"]].append(row["claim_id"])
+    expected_groups = [
+        expected_claims[item["item_id"]] for item in expected_items
+    ]
+    actual_groups = [
+        actual_claims[item["item_id"]] for item in data["source_items"]
+    ]
+    if actual_groups != expected_groups:
         raise CatalogError(
-            "item-claims.tsv differs from deterministic active-claim coverage"
+            "item-claims.tsv differs from locator-derived claim grouping"
         )
     registered = {row["claim_id"] for row in data["claims"]}
     mapped = [row["claim_id"] for row in data["item_claims"]]

@@ -27,6 +27,7 @@ LC_ALL=C awk -F '\t' '
 ' "$REG/tracks.tsv" "$REG/sources.tsv" "$REG/pages.tsv" || fail "page identity or order invalid"
 
 LC_ALL=C awk -F '\t' '
+  function orderKey(s, n,a,i) { n=split(s,a,"."); if (n<2 || a[1] !~ /^[0-9][0-9][0-9][0-9][0-9][0-9]$/) return 0; for(i=2;i<=n;i++) if(a[i] !~ /^[0-9][0-9][0-9][0-9]$/) return 0; return 1 }
   FILENAME == ARGV[1] { if (FNR > 1) track[$1]=$2+0; next }
   FILENAME == ARGV[2] { if (FNR > 1) { source[$1]=1; sourceTrack[$1]=$2; sourcePosition[$1]=$3+0 } next }
   FILENAME == ARGV[3] { if (FNR > 1) { page[$1]=1; pageSource[$1]=$2; pageOrder[$1]=$3 } next }
@@ -36,7 +37,7 @@ LC_ALL=C awk -F '\t' '
     suffix=substr($1, length(expected)+1)
     if (index($1, expected)!=1 || suffix !~ /^[0-9]+$/ || length(suffix)<4) bad("claim ID/source mismatch " $1)
     if (!($2 in source) || !($4 in page) || pageSource[$4]!=$2) bad("claim source/page mismatch " $1)
-    if ($3 !~ /^[0-9][0-9][0-9][0-9][0-9][0-9]\.[0-9][0-9][0-9][0-9](\.[0-9][0-9][0-9][0-9])?$/) bad("bad claim order key " $3)
+    if (!orderKey($3)) bad("bad claim order key " $3)
     if (substr($3,1,6) != pageOrder[$4] && ($4 in pageOrder)) bad("claim/page order mismatch " $1)
     if (($2 in lastLocal) && $3 <= lastLocal[$2]) bad("claim order is not strictly increasing in " $2)
     tuple=sprintf("%09d.%09d.%s", track[sourceTrack[$2]], sourcePosition[$2], $3)

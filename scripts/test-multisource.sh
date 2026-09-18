@@ -26,6 +26,7 @@ write_headers() {
   printf '%s\n' $'review_id\tevent_id\treview_position\tclaim_id\treview_scope\toutcome\tstatus\trationale\treview_ref' > "$reg/claim-normalization-reviews.tsv"
   printf '%s\n' $'correction_id\tevent_id\tcorrection_position\treview_id\tclaim_id\taction\told_disposition\told_subkind\tnew_disposition\tnew_subkind' > "$reg/claim-corrections.tsv"
   printf '%s\n' $'successor_edge_id\tevent_id\tcorrection_id\tpredecessor_claim_id\tsuccessor_position\trelation\tsuccessor_claim_id' > "$reg/claim-successors.tsv"
+  printf '%s\n' $'item_addition_id\tevent_id\tcorrection_id\taddition_position\titem_id\treview_ref' > "$reg/source-item-additions.tsv"
 }
 
 printf '%s\n' 'phase' 'census' > "$BASE/registry/phase.tsv"

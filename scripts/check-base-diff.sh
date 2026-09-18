@@ -256,7 +256,7 @@ if [[ "$ALLOW_SUPERSESSION" -eq 1 && "$CORRECTION_REPLAY" -eq 0 ]]; then
   ' <(base_file registry/claims.tsv) "$CURRENT_DIR/registry/claims.tsv" || fail "supersession transition regression"
 fi
 
-for path in registry/correction-events.tsv registry/claim-normalization-reviews.tsv registry/claim-corrections.tsv registry/claim-successors.tsv; do
+for path in registry/correction-events.tsv registry/claim-normalization-reviews.tsv registry/claim-corrections.tsv registry/claim-successors.tsv registry/source-item-additions.tsv; do
   if base_exists "$path"; then
     [[ -f "$CURRENT_DIR/$path" ]] || fail "current missing $path"
     if [[ "$CORRECTION_REPLAY" -eq 0 ]] && ! cmp -s <(base_file "$path") "$CURRENT_DIR/$path"; then
