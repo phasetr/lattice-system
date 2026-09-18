@@ -71,10 +71,11 @@ LC_ALL=C awk -F '\t' '
   NR == FNR { if (FNR > 1) source[$1]=1; next }
   FNR == 1 { next }
   !($1 in source) { bad("unknown invariant source " $1) }
-  $2 !~ /^[1-9][0-9]*$/ || $3 !~ /^[0-9]+$/ || $4 !~ /^[0-9]+$/ || $5 !~ /^[0-9]+$/ { bad("bad source invariant count") }
-  $5+0 > $2+0 { bad("no-claim page count exceeds physical page count") }
-  !oid($6) { bad("bad census OID") }
-  !token($7) { bad("bad invariant review token") }
+  $2 !~ /^[1-9][0-9]*$/ || $3 !~ /^[0-9]+$/ || $4 !~ /^[0-9]+$/ || $5 !~ /^[0-9]+$/ || $6 !~ /^[0-9]+$/ { bad("bad source invariant count") }
+  $4+0 > $3+0 { bad("formalization target count exceeds active claim count") }
+  $6+0 > $2+0 { bad("no-claim page count exceeds physical page count") }
+  !oid($7) { bad("bad census OID") }
+  !token($8) { bad("bad invariant review token") }
   seen[$1]++ { bad("duplicate source invariant " $1) }
   function bad(s) { print s > "/dev/stderr"; failed=1 }
   END { exit failed }

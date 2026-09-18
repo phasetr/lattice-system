@@ -109,7 +109,7 @@ LC_ALL=C awk -F '\t' '
   FNR == 1 { next }
   $1 !~ /^CL-[A-Z0-9_]+-[0-9][0-9][0-9][0-9][0-9]*$/ { bad("bad claim ID " $1) }
   !($2 in source) || !($4 in page) || pageSource[$4] != $2 { bad("bad claim source/page foreign key") }
-  $3 !~ /^[0-9][0-9][0-9][0-9][0-9][0-9]\.[0-9][0-9][0-9][0-9]$/ { bad("bad claim order key " $3) }
+  $3 !~ /^[0-9][0-9][0-9][0-9][0-9][0-9]\.[0-9][0-9][0-9][0-9](\.[0-9][0-9][0-9][0-9])?$/ { bad("bad claim order key " $3) }
   $5 == "" || $8 == "" { bad("empty locator or normalized content") }
   $6 !~ /^(assertion|definition|notation|hypothesis|domain|conjecture|out_of_scope)$/ { bad("bad disposition " $6) }
   $7 !~ /^(theorem|lemma|proposition|corollary|equation|definition|notation|problem|remark|subclaim|unnumbered_obligation|hypothesis|domain|conjecture)$/ { bad("bad subkind " $7) }
@@ -314,14 +314,15 @@ if [[ "$phase" == vocabulary ]]; then
   done
   if [[ "$MULTI_SOURCE" -eq 0 ]]; then
   LC_ALL=C awk -F '\t' '
-    FILENAME == ARGV[1] { if (FNR > 1) { active[$1]=($12=="false") } next }
+    FILENAME == ARGV[1] { if (FNR > 1) { active[$1]=($12=="false"); target[$1]=($12=="false" && $6!="out_of_scope") } next }
     FILENAME == ARGV[2] { if (FNR > 1) { review[$1]=$2; reviewed[$1]++ } next }
     FILENAME == ARGV[3] { if (FNR > 1) { typeOid[$1]=$7; declarationOid[$1]=$8; vocabulary[$1]=1 } next }
     FNR == 1 { next }
     { claimUse[$1]++; vocabularyUse[$2]++ }
     END {
       for (id in active) {
-        if (active[id] && reviewed[id] != 1) bad("active claim lacks exactly one vocabulary review " id)
+        if (target[id] && reviewed[id] != 1) bad("active claim lacks exactly one vocabulary review " id)
+        if (active[id] && !target[id] && reviewed[id]) bad("out-of-scope claim has vocabulary review " id)
         if (!active[id] && reviewed[id]) bad("tombstoned claim has vocabulary review " id)
         if (review[id] == "mathlib_only" && claimUse[id]) bad("mathlib-only claim has project vocabulary " id)
         if (review[id] == "project_vocabulary" && !claimUse[id]) bad("project-vocabulary claim lacks vocabulary use " id)

@@ -22,6 +22,9 @@ write_headers() {
   printf '%s\n' 'claim_id	vocabulary_id' > "$reg/claim-vocabulary.tsv"
   printf '%s\n' 'module	source_path	role' > "$reg/modules.tsv"
   printf '%s\n' 'module	position	imported_module	is_exported	is_meta	import_all' > "$reg/imports.tsv"
+  printf '%s\n' $'event_id\tsource_id\tbase_commit\treview_ref' > "$reg/correction-events.tsv"
+  printf '%s\n' $'correction_id\tevent_id\tclaim_id\taction\told_disposition\told_subkind\tnew_disposition\tnew_subkind\trationale\treview_ref' > "$reg/claim-corrections.tsv"
+  printf '%s\n' $'predecessor_claim_id\tposition\trelation\tsuccessor_claim_id' > "$reg/claim-successors.tsv"
 }
 
 printf '%s\n' 'phase' 'census' > "$BASE/registry/phase.tsv"
@@ -58,9 +61,9 @@ write_headers "$BASE/registry"
 oid_a=$(LC_ALL=C awk -F '\t' 'FNR>1 && $2=="SRA" { print }' "$BASE/registry/pages.tsv" "$BASE/registry/claims.tsv" | git hash-object --stdin)
 oid_b=$(LC_ALL=C awk -F '\t' 'FNR>1 && $2=="SRB" { print }' "$BASE/registry/pages.tsv" "$BASE/registry/claims.tsv" | git hash-object --stdin)
 printf '%s\n' \
-  $'source_id\tphysical_page_count\tactive_claim_count\tequation_pair_count\tno_claim_page_count\tcensus_oid\treview_ref' \
-  "SRA"$'\t1\t1\t0\t0\t'"$oid_a"$'\tREVIEW-A' \
-  "SRB"$'\t1\t1\t0\t0\t'"$oid_b"$'\tREVIEW-B' > "$BASE/registry/source-invariants.tsv"
+  $'source_id\tphysical_page_count\tactive_claim_count\tformalization_target_count\tequation_pair_count\tno_claim_page_count\tcensus_oid\treview_ref' \
+  "SRA"$'\t1\t1\t1\t0\t0\t'"$oid_a"$'\tREVIEW-A' \
+  "SRB"$'\t1\t1\t1\t0\t0\t'"$oid_b"$'\tREVIEW-B' > "$BASE/registry/source-invariants.tsv"
 
 expect_fail() {
   local label=$1 diagnostic=$2

@@ -49,7 +49,7 @@ if [[ -f "$REG/sources.tsv" ]]; then
     [[ "$source" == source_id ]] && continue
     case "$lifecycle" in
       census_reconciled|vocabulary_reviewed|skeleton_frozen|proof_active|complete)
-        IFS=$'\t' read -r invariant_source expected_pages expected_claims expected_equations expected_empty_pages expected_oid invariant_review < <(awk -F '\t' -v s="$source" '$1==s { print; exit }' "$REG/source-invariants.tsv")
+        IFS=$'\t' read -r invariant_source expected_pages expected_claims expected_targets expected_equations expected_empty_pages expected_oid invariant_review < <(awk -F '\t' -v s="$source" '$1==s { print; exit }' "$REG/source-invariants.tsv")
         [[ "${invariant_source:-}" == "$source" ]] || fail "reconciled source lacks invariants: $source"
         LC_ALL=C awk -F '\t' -v source="$source" -v expected="$expected_pages" '
           FNR == 1 || $2 != source { next }
@@ -61,15 +61,15 @@ if [[ -f "$REG/sources.tsv" ]]; then
           }
           END { if (n!=expected || bad) exit 1 }
         ' "$REG/pages.tsv" || fail "page census invariant failed for $source; page census is not exact, contiguous, two-pass complete, and source-frozen"
-        LC_ALL=C awk -F '\t' -v source="$source" -v expectedClaims="$expected_claims" -v expectedEquations="$expected_equations" -v expectedEmpty="$expected_empty_pages" '
+        LC_ALL=C awk -F '\t' -v source="$source" -v expectedClaims="$expected_claims" -v expectedTargets="$expected_targets" -v expectedEquations="$expected_equations" -v expectedEmpty="$expected_empty_pages" '
           NR == FNR { if (FNR>1 && $2==source) page[$1]=1; next }
           FNR == 1 || $2 != source { next }
           $12=="false" {
-            active++; usedPage[$4]=1
+            active++; usedPage[$4]=1; if ($6!="out_of_scope") targets++
             if ($4=="" || $5=="" || $8=="" || $13!="NONE" || $14!="NONE" || $15!="NONE") bad=1
             if ($7=="equation") { equations++; label=$5; if (sub(/^.*; equation /,"",label)!=1 || label !~ /^\([^()]+\)$/) bad=1; pair=$4 SUBSEP label; if (seenPair[pair]++) bad=1 }
           }
-          END { for (id in page) if (!(id in usedPage)) empty++; if (active!=expectedClaims || equations!=expectedEquations || empty!=expectedEmpty || bad) exit 1 }
+          END { for (id in page) if (!(id in usedPage)) empty++; if (active!=expectedClaims || targets!=expectedTargets || equations!=expectedEquations || empty!=expectedEmpty || bad) exit 1 }
         ' "$REG/pages.tsv" "$REG/claims.tsv" || fail "claim census invariant failed for $source; claim count, active state, source order, page coupling, or equation label/page pairs are not exact"
         actual_oid=$(LC_ALL=C awk -F '\t' -v source="$source" 'FNR>1 && $2==source { print }' "$REG/pages.tsv" "$REG/claims.tsv" | git hash-object --stdin)
         [[ "$actual_oid" == "$expected_oid" ]] || fail "census OID mismatch for $source"

@@ -52,7 +52,6 @@ LC_ALL=C awk -F '\t' '
     if ($2 !~ /^[1-9][0-9]*$/ || $2+0 != ++position[$1]) bad("item relation positions are not contiguous " $1)
     if (seenPair[$1 SUBSEP $3]++) bad("duplicate item/claim relation")
     if (claimUse[$3]++) bad("claim occurs in more than one item " $3)
-    if (!active[$3]) bad("item relation uses tombstoned claim " $3)
     if (itemSource[$1]!=claimSource[$3] || itemPage[$1]!=claimPage[$3]) bad("item/claim source or page mismatch " $3)
     if ($2==1 && itemOrder[$1]!=claimOrder[$3]) bad("item order does not match first claim " $1)
     itemUse[$1]++
@@ -60,8 +59,7 @@ LC_ALL=C awk -F '\t' '
   function bad(s) { print s > "/dev/stderr"; failed=1 }
   END {
     for (id in item) if (!itemUse[id]) bad("item has no claims " id)
-    for (id in active) if (active[id] && claimUse[id]!=1) bad("active claim lacks exactly one source item " id)
-    for (id in active) if (!active[id] && claimUse[id]) bad("tombstoned claim has a source item " id)
+    for (id in active) if (claimUse[id]!=1) bad("claim lacks exactly one source item " id)
     exit failed
   }
 ' "$REG/source-items.tsv" "$REG/claims.tsv" "$REG/item-claims.tsv" || fail "source item coverage invalid"

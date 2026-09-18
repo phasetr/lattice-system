@@ -187,7 +187,7 @@ rewrite "$CASES/vocabulary-regression/registry/vocabulary.tsv" \
 TOKEN_MIGRATION_BASE="$CASES/review-token-migration-base"
 clone_production "$TOKEN_MIGRATION_BASE"
 rewrite "$TOKEN_MIGRATION_BASE/registry/claim-vocabulary-review.tsv" \
-  'NR>1 {$3="R3-INDEPENDENT-REVIEW-P0"} {print}'
+  '$3=="VOCABULARY-INDEPENDENT-REVIEW" {$3="R3-INDEPENDENT-REVIEW-P0"} {print}'
 rewrite "$TOKEN_MIGRATION_BASE/registry/source-progress.tsv" \
   'NR>1 {$3="R3-INDEPENDENT-REVIEW-P0"} {print}'
 

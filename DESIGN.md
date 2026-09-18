@@ -7,9 +7,10 @@ This document is the tracked design authority for the rewrite.
 The global checker capability is `vocabulary`. It describes the strongest
 contract implemented by the checkers, not a single global source frontier.
 Each source advances independently through `registry/source-progress.tsv`.
-`TASAKI2020` is currently `vocabulary_reviewed`; its reconciled and frozen
-census contains 534 physical PDF pages, 3,172 active atomic claims, 1,401
-unique equation-label/page pairs, and 63 pages with no claim.
+`TASAKI2020` is currently `vocabulary_reviewed`; its corrected, reconciled, and
+frozen census contains 534 physical PDF pages, 3,176 active atomic claims,
+3,166 formalization targets, 1,401 unique equation-label/page pairs, and 63
+pages with no claim. Eight additional rows are reviewed tombstones.
 The current tree has the two R3 vocabulary definitions required by that source.
 There are no source-claim theorem statements, proofs, or intended axioms yet.
 Their type and declaration OIDs, direct imports, and elaborated environment
@@ -93,16 +94,18 @@ global checker capability and may not regress. This permits a new registered
 book or paper to coexist with an already vocabulary-reviewed source.
 
 `registry/source-invariants.tsv` freezes reconciled sources by source ID,
-physical-page count, active-claim count, equation-label/page-pair count,
-no-claim-page count, `census_oid`, and review token. The census OID is the Git
+physical-page count, active-claim count, formalization-target count,
+equation-label/page-pair count, no-claim-page count, `census_oid`, and review
+token. A formalization target is active and not `out_of_scope`. The census OID is the Git
 blob OID of that source's canonical `pages.tsv` rows followed by `claims.tsv`
 rows, with headers excluded, registry order preserved, UTF-8, and LF endings.
 The legacy `references/tasaki-2020.tsv` data was migrated losslessly into these
 tables; existing Tasaki PG, CL, and VO IDs and all frozen OIDs remain unchanged.
 
 The tracked public catalog is derived from `registry/source-items.tsv` and
-`registry/item-claims.tsv`. Every active claim belongs to exactly one reviewed
-source item; item/source/page foreign keys, order, label, public group, and slug
+`registry/item-claims.tsv`. Every registered claim, including a reviewed
+tombstone retained for provenance, belongs to exactly one reviewed source
+item; item/source/page foreign keys, order, label, public group, and slug
 are checked. `scripts/generate-public-docs.py` deterministically generates the
 Markdown and JSON under `docs/`; both its unit tests and a no-drift check run in
 the aggregate checker. Group pages are source-scoped, so equal chapter/group
@@ -162,12 +165,27 @@ Stable IDs are never reused after deletion or reclassification.
 An active claim has `tombstone=false` and no supersession metadata.
 A tombstoned claim names a distinct existing successor and carries a nonempty
 rationale and review reference. Successor chains are acyclic.
-Ordinary PRs freeze all exclusion and supersession fields. A future dedicated,
-reviewed supersession workflow must invoke the explicit transition checker;
-only a false/`NONE` record may transition to true/new-ID/rationale/review while
-all original identity and content fields remain fixed.
+Ordinary PRs freeze all exclusion and supersession fields. A dedicated reviewed
+correction must invoke the explicit transition checker. Only a false/`NONE`
+record may transition to true/successor/rationale/review while all original
+identity and content fields remain fixed.
 Proof and implementation status is derived from these facts plus the Lean
 environment; it is never a hand-edited claim field.
+
+The permanent correction protocol uses three ledgers. `correction-events.tsv`
+binds an event and independent review token to one source and exact base
+commit. `claim-corrections.tsv` records one of `reclassify`,
+`exclude_nonclaim`, `exclude_duplicate`, or `split` against each corrected
+frozen claim, including its old and new classification. `claim-successors.tsv`
+records a contiguous ordered list of `new_successor` and
+`existing_duplicate` relations. A new successor receives a new stable claim
+ID, an independently frozen normalized-content OID, the predecessor's source
+item, and a fresh vocabulary review. Excluded and tombstoned predecessors have
+no vocabulary review or use rows. The dedicated checker compares the event
+tree to its exact base and is the only mode that may admit the manifested
+classification, exclusion, tombstone, successor, item, review, and invariant
+changes. It rejects unrelated registry drift and any correction that introduces
+an axiom, binding, contentless surrogate, or other R4 artifact.
 
 ## 8. Implementation slices
 
@@ -410,8 +428,8 @@ they remain subject to the semantic vocabulary gate and contain no source-claim
 theorem, `sorry`, `admit`, `native_decide`, or axiom.
 A later lifecycle never disables that source's frozen identity, counts,
 census OID, active-state, source-order, page-coupling, or two-pass census
-invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,172 active
-claims, and 1,401 equation pairs. The census-capability requirement that slices, source-claim dependencies,
+invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,176 active
+claims, 3,166 formalization targets, and 1,401 equation pairs. The census-capability requirement that slices, source-claim dependencies,
 bindings, axioms, and claim-to-axiom relations are header-only is phase-local;
 it is not part of the later frozen-census invariant check.
 A theorem deletion is not proof progress.
@@ -421,9 +439,14 @@ The base-diff checker compares the PR tree with a verified merge base.
 If the base predates registries, the checker reports a documented bootstrap
 skip only after proving that the base is a valid ancestor commit; it does not
 claim historical coverage.
-Default base-diff freezes all exclusion and supersession fields. Retirement is
-accepted only by the explicit dedicated supersession mode, with a new stable
-claim ID and reviewed tombstone transition; ordinary PR checks reject it.
+Default base-diff freezes all exclusion and supersession fields. A reviewed
+normalization is accepted only when `--correction-event` invokes the dedicated
+checker against the event's exact base commit; ordinary PR checks reject it.
+The CI selector supplies that option only when exactly one event is new relative
+to the actual merge base and its recorded `base_commit` equals that merge base.
+Once the event is present in the base, the selector returns to ordinary
+base-diff mode, so the exception is one-shot and the permanent ledgers are
+frozen like other registry history.
 
 ## 16. Structural checker guarantee through R3
 
@@ -459,6 +482,13 @@ evidence.
 It checks the written merge gate and an unchecked `USER ONLY` box.
 It exercises generated positive and negative runtime cases without committed
 fixture data.
+The correction suite covers the three permitted positive transition shapes and
+negative cases for review, manifest completeness, successor provenance and ID
+freshness, item and vocabulary propagation, immutable rows and OIDs, derived
+counts, census OID, contentless surrogates, axioms, and premature R4 artifacts.
+The CI-selector suite separately checks the one-shot correction route,
+historical-event fallback to normal mode, merge-base mismatch rejection,
+multiple-new-event rejection, and invalid-base rejection.
 Against a valid registry-bearing merge base it detects stable-ID deletion,
 identity/order/locator/OID drift, page-pass and reference-coverage regression,
 slice membership or position loss, dependency or claim-axiom loss, binding

@@ -191,13 +191,18 @@ def derive_source_items(claims, pages, sources, tracks):
     )
     groups = OrderedDict()
     for claim in ordered_claims:
-        if claim["tombstone"] != "false":
-            continue
         if claim["page_id"] not in page_by_id:
             raise CatalogError("claim refers to unknown page " + claim["claim_id"])
-        kind, label, canonical_locator = extract_source_label(claim["locator"])
+        grouping_locator = re.sub(
+            r"; corpus correction successor [0-9]+/[0-9]+$", "",
+            claim["locator"],
+        )
+        kind, label, canonical_locator = extract_source_label(grouping_locator)
         if label == "NONE":
-            key = (claim["source_id"], claim["page_id"], "locator", claim["locator"])
+            key = (
+                claim["source_id"], claim["page_id"], "locator",
+                grouping_locator,
+            )
         else:
             key = (claim["source_id"], claim["page_id"], "label", label)
         if key not in groups:
@@ -276,12 +281,10 @@ def validate_source_items(data):
         raise CatalogError(
             "item-claims.tsv differs from deterministic active-claim coverage"
         )
-    active = {
-        row["claim_id"] for row in data["claims"] if row["tombstone"] == "false"
-    }
+    registered = {row["claim_id"] for row in data["claims"]}
     mapped = [row["claim_id"] for row in data["item_claims"]]
-    if len(mapped) != len(set(mapped)) or set(mapped) != active:
-        raise CatalogError("active claims are not covered exactly once")
+    if len(mapped) != len(set(mapped)) or set(mapped) != registered:
+        raise CatalogError("registered claims are not covered exactly once")
 
 
 def index_unique(rows, key, description):
@@ -352,6 +355,7 @@ def public_catalog(data):
                 "disposition": claim["disposition"],
                 "subkind": claim["subkind"],
                 "lifecycle": lifecycle,
+                "successor_claim": claim["superseded_by"],
                 "vocabulary_status": (
                     "vocabulary_ready" if vocabulary_ready
                     else "review_staged" if reviewed else "not_reviewed"
@@ -424,6 +428,14 @@ def public_catalog(data):
     active_claims = sum(
         1 for claim in claims.values() if claim["tombstone"] == "false"
     )
+    formalization_targets = sum(
+        1 for claim in claims.values()
+        if claim["tombstone"] == "false"
+        and claim["disposition"] != "out_of_scope"
+    )
+    tombstoned_claims = sum(
+        1 for claim in claims.values() if claim["tombstone"] == "true"
+    )
     mathlib_only = sum(
         1 for row in review.values() if row["basis"] == "mathlib_only"
     )
@@ -445,6 +457,8 @@ def public_catalog(data):
         "phase": phase,
         "summary": {
             "active_claims": active_claims,
+            "formalization_target_claims": formalization_targets,
+            "tombstoned_claims": tombstoned_claims,
             "source_items": len(public_items),
             "mathlib_only_claims": mathlib_only,
             "project_vocabulary_claims": project_vocabulary,
@@ -477,7 +491,8 @@ def claim_line(claim):
     ) if vocabulary else "none"
     axioms = claim["axiom_status"]
     return (
-        "- `{claim_id}` — {disposition} / {subkind}; lifecycle `{lifecycle}`; "
+        "- `{claim_id}` — {disposition} / {subkind}; lifecycle `{lifecycle}`"
+        "{successor}; "
         "Vocabulary `{vocabulary_status}`; binding `{binding_status}`; Lean statement "
         "`{statement}` in `{module}`; proof `{proof_status}` as `{proof}`; "
         "axioms `{axioms}`; required vocabulary: {required}"
@@ -486,6 +501,10 @@ def claim_line(claim):
         disposition=markdown_text(claim["disposition"]),
         subkind=markdown_text(claim["subkind"]),
         lifecycle=claim["lifecycle"],
+        successor=(
+            "; successor `{}`".format(claim["successor_claim"])
+            if claim["successor_claim"] != "NONE" else ""
+        ),
         vocabulary_status=claim["vocabulary_status"],
         binding_status=claim["binding_status"],
         statement=claim["statement_declaration"],
@@ -508,6 +527,8 @@ publish private source paths and object identifiers.
 
 - Current phase: `{phase}`
 - Active atomic claims: {active_claims}
+- Formalization targets: {formalization_target_claims}
+- Superseded claim records: {tombstoned_claims}
 - Reviewed source items: {source_items}
 - Mathlib-only claims: {mathlib_only_claims}
 - Project-vocabulary claims: {project_vocabulary_claims}
@@ -548,6 +569,8 @@ Generated from the checked registries; do not edit by hand.
 - Phase: `{phase}`
 - Source items: {source_items}
 - Active claims: {active_claims}
+- Formalization targets: {formalization_target_claims}
+- Superseded claim records: {tombstoned_claims}
 - Vocabulary declarations: {vocabulary_declarations}
 - Claim-vocabulary links: {claim_vocabulary_links}
 
@@ -590,19 +613,28 @@ Machine-readable data: [catalog.json](catalog.json).
         track_claims = [
             claim for item in track_items for claim in item["claims"]
         ]
+        active_track_claims = [
+            claim for claim in track_claims if claim["lifecycle"] == "active"
+        ]
+        target_track_claims = [
+            claim for claim in active_track_claims
+            if claim["disposition"] != "out_of_scope"
+        ]
         track_vocabulary_ids = {
             row["vocabulary_id"]
             for claim in track_claims for row in claim["required_vocabulary"]
         }
         track_summary = {
-            "active_claims": len(track_claims),
+            "active_claims": len(active_track_claims),
+            "formalization_target_claims": len(target_track_claims),
+            "tombstoned_claims": len(track_claims) - len(active_track_claims),
             "mathlib_only_claims": sum(
                 claim["vocabulary_basis"] == "mathlib_only"
-                for claim in track_claims
+                for claim in active_track_claims
             ),
             "project_vocabulary_claims": sum(
                 claim["vocabulary_basis"] == "project_vocabulary"
-                for claim in track_claims
+                for claim in active_track_claims
             ),
             "claim_vocabulary_links": sum(
                 len(claim["required_vocabulary"]) for claim in track_claims
@@ -626,7 +658,9 @@ Machine-readable data: [catalog.json](catalog.json).
         outputs["docs/generated/tracks/{}.md".format(track["public_slug"])] = """# Track: {title}
 
 - Phase: `{phase}`
-- Reviewed claims: {active_claims}
+- Active claims: {active_claims}
+- Formalization targets: {formalization_target_claims}
+- Superseded claim records: {tombstoned_claims}
 - Mathlib-only: {mathlib_only_claims}
 - Project vocabulary: {project_vocabulary_claims}
 - Complete claim-vocabulary links: {claim_vocabulary_links}
@@ -997,8 +1031,8 @@ class GeneratorTests(unittest.TestCase):
         self.assertIn("Reviewed source items: 1", outputs["docs/generated/sources/second-source.md"])
         first_track = outputs["docs/generated/tracks/first-track.md"]
         second_track = outputs["docs/generated/tracks/second-track.md"]
-        self.assertIn("Reviewed claims: 1", first_track)
-        self.assertIn("Reviewed claims: 1", second_track)
+        self.assertIn("Active claims: 1", first_track)
+        self.assertIn("Active claims: 1", second_track)
         self.assertIn("Fixture.FirstTerm", first_track)
         self.assertNotIn("Fixture.SecondTerm", first_track)
         self.assertIn("Fixture.SecondTerm", second_track)

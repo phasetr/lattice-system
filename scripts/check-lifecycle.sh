@@ -35,13 +35,14 @@ LC_ALL=C awk -F '\t' -v phase="$phase" '
 
 LC_ALL=C awk -F '\t' '
   FILENAME == ARGV[1] { if (FNR > 1) rank[$1]=$2 ~ /^(vocabulary_reviewed|skeleton_frozen|proof_active|complete)$/; next }
-  FILENAME == ARGV[2] { if (FNR > 1) { source[$1]=$2; active[$1]=($12=="false") } next }
+  FILENAME == ARGV[2] { if (FNR > 1) { source[$1]=$2; active[$1]=($12=="false"); target[$1]=($12=="false" && $6!="out_of_scope") } next }
   FILENAME == ARGV[3] { if (FNR > 1) { basis[$1]=$2; reviewed[$1]++ } next }
   FILENAME == ARGV[4] { if (FNR > 1) vocabulary[$1]=1; next }
   FILENAME == ARGV[5] { if (FNR > 1) { claimUse[$1]++; vocabularyUse[$2]++ } next }
   END {
     for (id in active) {
-      if (rank[source[id]] && active[id] && reviewed[id]!=1) bad("active claim lacks exactly one vocabulary review " id)
+      if (rank[source[id]] && target[id] && reviewed[id]!=1) bad("active claim lacks exactly one vocabulary review " id)
+      if (active[id] && !target[id] && reviewed[id]) bad("out-of-scope claim has vocabulary review " id)
       if (!active[id] && reviewed[id]) bad("tombstoned claim has vocabulary review " id)
       if (basis[id]=="mathlib_only" && claimUse[id]) bad("mathlib-only claim has project vocabulary " id)
       if (rank[source[id]] && basis[id]=="project_vocabulary" && !claimUse[id]) bad("project-vocabulary claim lacks vocabulary use " id)
