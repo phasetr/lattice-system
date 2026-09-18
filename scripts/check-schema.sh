@@ -44,9 +44,10 @@ check_table "$REG/vocabulary.tsv" $'vocabulary_id\tdeclaration\tmodule\tdeclarat
 check_table "$REG/claim-vocabulary.tsv" $'claim_id\tvocabulary_id' 2
 check_table "$REG/modules.tsv" $'module\tsource_path\trole' 3
 check_table "$REG/imports.tsv" $'module\tposition\timported_module\tis_exported\tis_meta\timport_all' 6
-check_table "$REG/correction-events.tsv" $'event_id\tsource_id\tbase_commit\treview_ref' 4
-check_table "$REG/claim-corrections.tsv" $'correction_id\tevent_id\tclaim_id\taction\told_disposition\told_subkind\tnew_disposition\tnew_subkind\trationale\treview_ref' 10
-check_table "$REG/claim-successors.tsv" $'predecessor_claim_id\tposition\trelation\tsuccessor_claim_id' 4
+check_table "$REG/correction-events.tsv" $'event_id\tevent_position\tsource_id\tbase_commit\treview_ref' 5
+check_table "$REG/claim-normalization-reviews.tsv" $'review_id\tevent_id\treview_position\tclaim_id\treview_scope\toutcome\tstatus\trationale\treview_ref' 9
+check_table "$REG/claim-corrections.tsv" $'correction_id\tevent_id\tcorrection_position\treview_id\tclaim_id\taction\told_disposition\told_subkind\tnew_disposition\tnew_subkind' 10
+check_table "$REG/claim-successors.tsv" $'successor_edge_id\tevent_id\tcorrection_id\tpredecessor_claim_id\tsuccessor_position\trelation\tsuccessor_claim_id' 7
 
 [[ $(awk 'END { print NR }' "$REG/phase.tsv") -eq 2 ]] || fail "phase.tsv must have exactly one data row"
 { IFS= read -r _; IFS= read -r phase; } < "$REG/phase.tsv"

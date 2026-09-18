@@ -13,7 +13,7 @@ mkdir -p "$REPO/registry"
 git -C "$REPO" init -q
 git -C "$REPO" config user.name "Runtime Test"
 git -C "$REPO" config user.email "runtime@example.invalid"
-printf '%s\n' $'event_id\tsource_id\tbase_commit\treview_ref' > "$REPO/registry/correction-events.tsv"
+printf '%s\n' $'event_id\tevent_position\tsource_id\tbase_commit\treview_ref' > "$REPO/registry/correction-events.tsv"
 git -C "$REPO" add registry/correction-events.tsv
 git -C "$REPO" commit -qm base
 BASE=$(git -C "$REPO" rev-parse HEAD)
@@ -24,8 +24,8 @@ apply_stub() {
   if [[ "$mode" == correction ]]; then
     printf '%s\n' '#!/usr/bin/env bash' \
       'set -euo pipefail' \
-      '[[ $# -eq 4 && $1 == --correction-event && $2 == CORPUS-NORMALIZATION-TASAKI2020-2026 ]]' \
-      'echo stub-correction-ok' > "$STUB"
+      '[[ $# -eq 4 && $1 == --correction-event ]]' \
+      'echo "stub-correction-$2-ok"' > "$STUB"
   else
     printf '%s\n' '#!/usr/bin/env bash' \
       'set -euo pipefail' \
@@ -67,11 +67,11 @@ expect_fail() {
 }
 
 printf '%s\n' \
-  $'event_id\tsource_id\tbase_commit\treview_ref' \
-  "CORPUS-NORMALIZATION-TASAKI2020-2026"$'\tTASAKI2020\t'"$BASE"$'\tINDEPENDENT-REVIEW' \
+  $'event_id\tevent_position\tsource_id\tbase_commit\treview_ref' \
+  "CORPUS-NORMALIZATION-TASAKI2020-2026"$'\t1\tTASAKI2020\t'"$BASE"$'\tINDEPENDENT-REVIEW' \
   > "$REPO/registry/correction-events.tsv"
 apply_stub correction
-expect_pass new-event-selects-correction stub-correction-ok \
+expect_pass new-event-selects-correction stub-correction-CORPUS-NORMALIZATION-TASAKI2020-2026-ok \
   env CHECK_BASE_DIFF="$STUB" "$SELECTOR" "$REPO" "$BASE"
 
 git -C "$REPO" add registry/correction-events.tsv
@@ -81,18 +81,27 @@ apply_stub normal
 expect_pass historical-event-uses-normal stub-normal-ok \
   env CHECK_BASE_DIFF="$STUB" "$SELECTOR" "$REPO" "$HISTORICAL"
 
+printf '%s\n' \
+  $'event_id\tevent_position\tsource_id\tbase_commit\treview_ref' \
+  "CORPUS-NORMALIZATION-TASAKI2020-2026"$'\t1\tTASAKI2020\t'"$BASE"$'\tINDEPENDENT-REVIEW' \
+  "SECOND-CORRECTION"$'\t2\tTASAKI2020\t'"$HISTORICAL"$'\tSECOND-INDEPENDENT-REVIEW' \
+  > "$REPO/registry/correction-events.tsv"
+apply_stub correction
+expect_pass future-second-event-selects-correction stub-correction-SECOND-CORRECTION-ok \
+  env CHECK_BASE_DIFF="$STUB" "$SELECTOR" "$REPO" "$HISTORICAL"
+
 git -C "$REPO" reset -q --hard "$BASE"
 printf '%s\n' \
-  $'event_id\tsource_id\tbase_commit\treview_ref' \
-  $'CORPUS-NORMALIZATION-TASAKI2020-2026\tTASAKI2020\t0000000000000000000000000000000000000000\tINDEPENDENT-REVIEW' \
+  $'event_id\tevent_position\tsource_id\tbase_commit\treview_ref' \
+  $'CORPUS-NORMALIZATION-TASAKI2020-2026\t1\tTASAKI2020\t0000000000000000000000000000000000000000\tINDEPENDENT-REVIEW' \
   > "$REPO/registry/correction-events.tsv"
 expect_fail mismatched-base "does not match the actual merge base" \
   env CHECK_BASE_DIFF="$STUB" "$SELECTOR" "$REPO" "$BASE"
 
 printf '%s\n' \
-  $'event_id\tsource_id\tbase_commit\treview_ref' \
-  "CORPUS-NORMALIZATION-TASAKI2020-2026"$'\tTASAKI2020\t'"$BASE"$'\tINDEPENDENT-REVIEW' \
-  "SECOND-CORRECTION"$'\tTASAKI2020\t'"$BASE"$'\tINDEPENDENT-REVIEW' \
+  $'event_id\tevent_position\tsource_id\tbase_commit\treview_ref' \
+  "CORPUS-NORMALIZATION-TASAKI2020-2026"$'\t1\tTASAKI2020\t'"$BASE"$'\tINDEPENDENT-REVIEW' \
+  "SECOND-CORRECTION"$'\t2\tTASAKI2020\t'"$BASE"$'\tINDEPENDENT-REVIEW' \
   > "$REPO/registry/correction-events.tsv"
 expect_fail multiple-new-events "multiple new correction events" \
   env CHECK_BASE_DIFF="$STUB" "$SELECTOR" "$REPO" "$BASE"

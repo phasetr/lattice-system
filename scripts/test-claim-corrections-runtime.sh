@@ -10,7 +10,7 @@ trap 'rm -rf "$TMP"' EXIT
 export LATTICE_TEST_ROOT=$TMP
 
 CHECK_CORRECTIONS=${CHECK_CORRECTIONS:-"$PROJECT_ROOT/scripts/check-claim-corrections.sh"}
-EVENT_ID=CORPUS-NORMALIZATION-TASAKI2020-2026
+EVENT_ID=RUNTIME-CORRECTION-EVENT-2
 BASE_COMMIT=c6fb1ec6046626e14dd9a65f396a66386fcb9b7b
 REVIEW_REF=CORPUS-NORMALIZATION-TASAKI2020-2026-REVIEW
 BASE="$TMP/base"
@@ -71,21 +71,17 @@ rewrite() {
 prepare_event() {
   local target=$1
   clone_base "$target"
-  printf '%s\n' \
-    $'event_id\tsource_id\tbase_commit\treview_ref' \
-    "$EVENT_ID"$'\tTASAKI2020\t'"$BASE_COMMIT"$'\t'"$REVIEW_REF" \
-    > "$target/registry/correction-events.tsv"
-  printf '%s\n' \
-    $'correction_id\tevent_id\tclaim_id\taction\told_disposition\told_subkind\tnew_disposition\tnew_subkind\trationale\treview_ref' \
-    > "$target/registry/claim-corrections.tsv"
-  printf '%s\n' \
-    $'predecessor_claim_id\tposition\trelation\tsuccessor_claim_id' \
-    > "$target/registry/claim-successors.tsv"
+  printf '%s\n' "$EVENT_ID"$'\t2\tTASAKI2020\t'"$BASE_COMMIT"$'\t'"$REVIEW_REF" >> "$target/registry/correction-events.tsv"
 }
 
 append_correction() {
   local target=$1 row=$2
   printf '%s\n' "$row" >> "$target/registry/claim-corrections.tsv"
+}
+
+append_review() {
+  local target=$1 row=$2
+  printf '%s\n' "$row" >> "$target/registry/claim-normalization-reviews.tsv"
 }
 
 refresh_invariants() {
@@ -131,9 +127,18 @@ make_reclassify() {
     '$1=="CL-TASAKI2020-0001" {$6="definition";$7="definition"} {print}'
   rewrite "$target/registry/claim-vocabulary-review.tsv" \
     '$1=="CL-TASAKI2020-0001" {$3="'"$REVIEW_REF"'"} {print}'
+  append_review "$target" \
+    "NR-RUNTIME-0001"$'\t'"$EVENT_ID"$'\t1\tCL-TASAKI2020-0001\texact_statement_readiness\treclassify\tclosed\twrong-source-kind\t'"$REVIEW_REF"
   append_correction "$target" \
-    "CR-TASAKI2020-0001"$'\t'"$EVENT_ID"$'\tCL-TASAKI2020-0001\treclassify\tnotation\tnotation\tdefinition\tdefinition\twrong-source-kind\t'"$REVIEW_REF"
+    "CC-RUNTIME-0001"$'\t'"$EVENT_ID"$'\t1\tNR-RUNTIME-0001\tCL-TASAKI2020-0001\treclassify\tnotation\tnotation\tdefinition\tdefinition'
   refresh_invariants "$target"
+}
+
+make_unchanged() {
+  local target=$1
+  prepare_event "$target"
+  append_review "$target" \
+    "NR-RUNTIME-UNCHANGED"$'\t'"$EVENT_ID"$'\t1\tCL-TASAKI2020-0001\texact_statement_readiness\tunchanged\tclosed\texact-statement-ready\t'"$REVIEW_REF"
 }
 
 make_out_of_scope() {
@@ -143,15 +148,22 @@ make_out_of_scope() {
     '$1=="CL-TASAKI2020-0002" {$6="out_of_scope";$10="not-a-formalizable-claim";$11="'"$REVIEW_REF"'"} {print}'
   rewrite "$target/registry/claim-vocabulary-review.tsv" \
     '$1!="CL-TASAKI2020-0002" {print}'
+  append_review "$target" \
+    "NR-RUNTIME-0002"$'\t'"$EVENT_ID"$'\t1\tCL-TASAKI2020-0002\texact_statement_readiness\texclude_nonclaim\tclosed\tnot-a-formalizable-claim\t'"$REVIEW_REF"
   append_correction "$target" \
-    "CR-TASAKI2020-0002"$'\t'"$EVENT_ID"$'\tCL-TASAKI2020-0002\texclude_nonclaim\tnotation\tnotation\tout_of_scope\tnotation\tnot-a-formalizable-claim\t'"$REVIEW_REF"
+    "CC-RUNTIME-0002"$'\t'"$EVENT_ID"$'\t1\tNR-RUNTIME-0002\tCL-TASAKI2020-0002\texclude_nonclaim\tnotation\tnotation\tout_of_scope\tnotation'
   refresh_invariants "$target"
 }
 
 make_split() {
   local target=$1
+  local content1='For Problem 11.4.1.a, assume the stated local decay estimate.'
+  local content2='The estimate applies whenever the lattice distance exceeds one.'
+  local oid1 oid2
+  oid1=$(printf '%s' "$content1" | git hash-object --stdin)
+  oid2=$(printf '%s' "$content2" | git hash-object --stdin)
   prepare_event "$target"
-  awk -F '\t' -v OFS='\t' -v review="$REVIEW_REF" '
+  awk -F '\t' -v OFS='\t' -v review="$REVIEW_REF" -v oid1="$oid1" -v oid2="$oid2" '
     $1=="CL-TASAKI2020-3256" {
       $12="true"; $13="CL-TASAKI2020-9001"; $14="compound-claim"; $15=review
       print
@@ -160,13 +172,13 @@ make_split() {
         "PDF p. 528; print p. 519; NONE; paragraph 7; correction split atom 1/2", \
         "hypothesis","hypothesis", \
         "For Problem 11.4.1.a, assume the stated local decay estimate.", \
-        "PENDING","NONE","NONE","false","NONE","NONE","NONE"
+        oid1,"NONE","NONE","false","NONE","NONE","NONE"
       print "CL-TASAKI2020-9002","TASAKI2020","000528.0006", \
         "PG-TASAKI2020-0528", \
         "PDF p. 528; print p. 519; NONE; paragraph 7; correction split atom 2/2", \
         "hypothesis","hypothesis", \
         "The estimate applies whenever the lattice distance exceeds one.", \
-        "PENDING","NONE","NONE","false","NONE","NONE","NONE"
+        oid2,"NONE","NONE","false","NONE","NONE","NONE"
       next
     }
     {print}
@@ -186,11 +198,13 @@ make_split() {
     "CL-TASAKI2020-9001"$'\tmathlib_only\t'"$REVIEW_REF" \
     "CL-TASAKI2020-9002"$'\tmathlib_only\t'"$REVIEW_REF" \
     >> "$target/registry/claim-vocabulary-review.tsv"
+  append_review "$target" \
+    "NR-RUNTIME-0003"$'\t'"$EVENT_ID"$'\t1\tCL-TASAKI2020-3256\texact_statement_readiness\tsplit\tclosed\tcompound-claim\t'"$REVIEW_REF"
   append_correction "$target" \
-    "CR-TASAKI2020-0003"$'\t'"$EVENT_ID"$'\tCL-TASAKI2020-3256\tsplit\thypothesis\thypothesis\thypothesis\thypothesis\tcompound-claim\t'"$REVIEW_REF"
+    "CC-RUNTIME-0003"$'\t'"$EVENT_ID"$'\t1\tNR-RUNTIME-0003\tCL-TASAKI2020-3256\tsplit\thypothesis\thypothesis\thypothesis\thypothesis'
   printf '%s\n' \
-    $'CL-TASAKI2020-3256\t1\tnew_successor\tCL-TASAKI2020-9001' \
-    $'CL-TASAKI2020-3256\t2\tnew_successor\tCL-TASAKI2020-9002' \
+    "SE-RUNTIME-0001"$'\t'"$EVENT_ID"$'\tCC-RUNTIME-0003\tCL-TASAKI2020-3256\t1\tnew_successor\tCL-TASAKI2020-9001' \
+    "SE-RUNTIME-0002"$'\t'"$EVENT_ID"$'\tCC-RUNTIME-0003\tCL-TASAKI2020-3256\t2\tnew_successor\tCL-TASAKI2020-9002' \
     >> "$target/registry/claim-successors.tsv"
   refresh_invariants "$target"
 }
@@ -198,9 +212,11 @@ make_split() {
 RECLASSIFY="$CASES/reclassify"
 OUT_OF_SCOPE="$CASES/out-of-scope"
 SPLIT="$CASES/split"
+UNCHANGED="$CASES/unchanged"
 make_reclassify "$RECLASSIFY"
 make_out_of_scope "$OUT_OF_SCOPE"
 make_split "$SPLIT"
+make_unchanged "$UNCHANGED"
 
 # Positive transition coverage comes first deliberately.  Before the dedicated
 # checker exists, this is the measured TDD Red failure rather than a false
@@ -208,15 +224,66 @@ make_split "$SPLIT"
 expect_pass minimal-reclassify "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$RECLASSIFY"
 expect_pass minimal-out-of-scope "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$OUT_OF_SCOPE"
 expect_pass minimal-split "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$SPLIT"
+expect_pass minimal-unchanged-review "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$UNCHANGED"
+
+clone_case "$RECLASSIFY" "$CASES/event-position-gap"
+rewrite "$CASES/event-position-gap/registry/correction-events.tsv" \
+  '$1=="'"$EVENT_ID"'" {$2=3} {print}'
+expect_fail event-position-gap "invalid correction event ledger" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/event-position-gap"
+
+clone_case "$RECLASSIFY" "$CASES/review-position-gap"
+rewrite "$CASES/review-position-gap/registry/claim-normalization-reviews.tsv" \
+  '$1=="NR-RUNTIME-0001" {$3=2} {print}'
+expect_fail review-position-gap "invalid claim normalization review ledger" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/review-position-gap"
+
+clone_case "$RECLASSIFY" "$CASES/correction-position-gap"
+rewrite "$CASES/correction-position-gap/registry/claim-corrections.tsv" \
+  '$1=="CC-RUNTIME-0001" {$3=2} {print}'
+expect_fail correction-position-gap "invalid claim correction ledger" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/correction-position-gap"
+
+clone_case "$RECLASSIFY" "$CASES/correction-review-owner"
+rewrite "$CASES/correction-review-owner/registry/claim-corrections.tsv" \
+  '$1=="CC-RUNTIME-0001" {$4="NR-TASAKI2020-0001"} {print}'
+expect_fail correction-review-owner "invalid claim correction ledger" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/correction-review-owner"
+
+clone_case "$SPLIT" "$CASES/successor-correction-owner"
+rewrite "$CASES/successor-correction-owner/registry/claim-successors.tsv" \
+  '$1=="SE-RUNTIME-0001" {$3="CC-TASAKI2020-0001"} {print}'
+expect_fail successor-correction-owner "successor provenance has no split correction" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/successor-correction-owner"
+
+# A split is a decomposition, so at least one edge must introduce a genuinely
+# new atomic claim.  Pointing only at pre-existing claims is not a split.
+clone_case "$SPLIT" "$CASES/split-existing-only"
+rewrite "$CASES/split-existing-only/registry/claims.tsv" '
+  $1=="CL-TASAKI2020-3256" {$13="CL-TASAKI2020-0001"}
+  $1!="CL-TASAKI2020-9001" && $1!="CL-TASAKI2020-9002" {print}
+'
+rewrite "$CASES/split-existing-only/registry/claim-successors.tsv" '
+  $1=="SE-RUNTIME-0001" {$6="existing_duplicate";$7="CL-TASAKI2020-0001"}
+  $1=="SE-RUNTIME-0002" {$6="existing_duplicate";$7="CL-TASAKI2020-0002"}
+  {print}
+'
+rewrite "$CASES/split-existing-only/registry/item-claims.tsv" \
+  '$3!="CL-TASAKI2020-9001" && $3!="CL-TASAKI2020-9002" {print}'
+rewrite "$CASES/split-existing-only/registry/claim-vocabulary-review.tsv" \
+  '$1!="CL-TASAKI2020-9001" && $1!="CL-TASAKI2020-9002" {print}'
+refresh_invariants "$CASES/split-existing-only"
+expect_fail split-existing-only "split requires a new successor" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/split-existing-only"
 
 clone_case "$RECLASSIFY" "$CASES/missing-event-review"
-rewrite "$CASES/missing-event-review/registry/correction-events.tsv" 'FNR==1 {print}'
+rewrite "$CASES/missing-event-review/registry/correction-events.tsv" '$1!="'"$EVENT_ID"'" {print}'
 expect_fail missing-event-review "correction event is not reviewed" \
   "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/missing-event-review"
 
 clone_case "$RECLASSIFY" "$CASES/missing-ledger"
-rewrite "$CASES/missing-ledger/registry/claim-corrections.tsv" 'FNR==1 {print}'
-expect_fail disposition-without-ledger "unmanifested claim drift" \
+rewrite "$CASES/missing-ledger/registry/claim-corrections.tsv" '$2!="'"$EVENT_ID"'" {print}'
+expect_fail disposition-without-ledger "invalid claim correction ledger" \
   "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/missing-ledger"
 
 clone_case "$RECLASSIFY" "$CASES/unmanifested-drift"
@@ -227,19 +294,19 @@ expect_fail unmanifested-claim-drift "unmanifested claim drift" \
   "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/unmanifested-drift"
 
 clone_case "$SPLIT" "$CASES/split-provenance-missing"
-rewrite "$CASES/split-provenance-missing/registry/claim-successors.tsv" 'FNR==1 {print}'
+rewrite "$CASES/split-provenance-missing/registry/claim-successors.tsv" '$2!="'"$EVENT_ID"'" {print}'
 expect_fail split-provenance-missing "split successor provenance is incomplete" \
   "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/split-provenance-missing"
 
 clone_case "$SPLIT" "$CASES/split-duplicate-position"
 rewrite "$CASES/split-duplicate-position/registry/claim-successors.tsv" \
-  'FNR==3 {$2=1} {print}'
+  '$1=="SE-RUNTIME-0002" {$5=1} {print}'
 expect_fail split-duplicate-position "duplicate or noncontiguous successor position" \
   "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/split-duplicate-position"
 
 clone_case "$SPLIT" "$CASES/split-missing-successor"
 rewrite "$CASES/split-missing-successor/registry/claim-successors.tsv" \
-  'FNR==3 {$4="CL-TASAKI2020-9999"} {print}'
+  '$1=="SE-RUNTIME-0002" {$7="CL-TASAKI2020-9999"} {print}'
 rewrite "$CASES/split-missing-successor/registry/claims.tsv" \
   '$1!="CL-TASAKI2020-9002" {print}'
 rewrite "$CASES/split-missing-successor/registry/item-claims.tsv" \
@@ -252,7 +319,7 @@ expect_fail split-missing-successor "unknown correction successor" \
 
 clone_case "$SPLIT" "$CASES/split-id-reuse"
 rewrite "$CASES/split-id-reuse/registry/claim-successors.tsv" \
-  'FNR==3 {$4="CL-TASAKI2020-0001"} {print}'
+  '$1=="SE-RUNTIME-0002" {$7="CL-TASAKI2020-0001"} {print}'
 rewrite "$CASES/split-id-reuse/registry/claims.tsv" \
   '$1!="CL-TASAKI2020-9002" {print}'
 rewrite "$CASES/split-id-reuse/registry/item-claims.tsv" \
@@ -339,6 +406,20 @@ rewrite "$CASES/contentless-true/registry/claims.tsv" \
 refresh_invariants "$CASES/contentless-true"
 expect_fail contentless-true "contentless correction surrogate" \
   "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/contentless-true"
+
+clone_case "$SPLIT" "$CASES/successor-oid-pending"
+rewrite "$CASES/successor-oid-pending/registry/claims.tsv" \
+  '$1=="CL-TASAKI2020-9002" {$9="PENDING"} {print}'
+refresh_invariants "$CASES/successor-oid-pending"
+expect_fail successor-oid-pending "new correction successor lacks a frozen content OID" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/successor-oid-pending"
+
+clone_case "$SPLIT" "$CASES/successor-oid-stale"
+rewrite "$CASES/successor-oid-stale/registry/claims.tsv" \
+  '$1=="CL-TASAKI2020-9002" {$9="0000000000000000000000000000000000000000"} {print}'
+refresh_invariants "$CASES/successor-oid-stale"
+expect_fail successor-oid-stale "new correction successor content OID is stale" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/successor-oid-stale"
 
 clone_case "$RECLASSIFY" "$CASES/axiom-artifact"
 printf '%s\n' \

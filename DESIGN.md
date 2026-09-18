@@ -8,8 +8,8 @@ The global checker capability is `vocabulary`. It describes the strongest
 contract implemented by the checkers, not a single global source frontier.
 Each source advances independently through `registry/source-progress.tsv`.
 `TASAKI2020` is currently `vocabulary_reviewed`; its corrected, reconciled, and
-frozen census contains 534 physical PDF pages, 3,176 active atomic claims,
-3,166 formalization targets, 1,401 unique equation-label/page pairs, and 63
+frozen census contains 534 physical PDF pages, 3,182 active atomic claims,
+3,171 formalization targets, 1,401 unique equation-label/page pairs, and 63
 pages with no claim. Eight additional rows are reviewed tombstones.
 The current tree has the two R3 vocabulary definitions required by that source.
 There are no source-claim theorem statements, proofs, or intended axioms yet.
@@ -172,13 +172,15 @@ identity and content fields remain fixed.
 Proof and implementation status is derived from these facts plus the Lean
 environment; it is never a hand-edited claim field.
 
-The permanent correction protocol uses three ledgers. `correction-events.tsv`
-binds an event and independent review token to one source and exact base
-commit. `claim-corrections.tsv` records one of `reclassify`,
-`exclude_nonclaim`, `exclude_duplicate`, or `split` against each corrected
-frozen claim, including its old and new classification. `claim-successors.tsv`
-records a contiguous ordered list of `new_successor` and
-`existing_duplicate` relations. A new successor receives a new stable claim
+The permanent correction protocol uses four ledgers. `correction-events.tsv`
+binds a position, event, and independent review token to one source and exact
+base commit. `claim-normalization-reviews.tsv` records every reviewed claim,
+including unchanged outcomes. `claim-corrections.tsv` is owned through the
+review row and records one of `reclassify`, `exclude_nonclaim`, or `split`
+against each corrected frozen claim, including its old and new classification.
+`claim-successors.tsv` is owned through the correction row and records a
+contiguous ordered list of `new_successor` and `existing_duplicate` relations.
+Every split has at least one `new_successor`. A new successor receives a new stable claim
 ID, an independently frozen normalized-content OID, the predecessor's source
 item, and a fresh vocabulary review. Excluded and tombstoned predecessors have
 no vocabulary review or use rows. The dedicated checker compares the event
@@ -186,6 +188,9 @@ tree to its exact base and is the only mode that may admit the manifested
 classification, exclusion, tombstone, successor, item, review, and invariant
 changes. It rejects unrelated registry drift and any correction that introduces
 an axiom, binding, contentless surrogate, or other R4 artifact.
+All rows owned by an event already present in the base are byte-for-byte frozen.
+A future event may append its own contiguously positioned review, correction,
+and successor rows without changing historical ownership.
 
 ## 8. Implementation slices
 
@@ -428,8 +433,8 @@ they remain subject to the semantic vocabulary gate and contain no source-claim
 theorem, `sorry`, `admit`, `native_decide`, or axiom.
 A later lifecycle never disables that source's frozen identity, counts,
 census OID, active-state, source-order, page-coupling, or two-pass census
-invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,176 active
-claims, 3,166 formalization targets, and 1,401 equation pairs. The census-capability requirement that slices, source-claim dependencies,
+invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,182 active
+claims, 3,171 formalization targets, and 1,401 equation pairs. The census-capability requirement that slices, source-claim dependencies,
 bindings, axioms, and claim-to-axiom relations are header-only is phase-local;
 it is not part of the later frozen-census invariant check.
 A theorem deletion is not proof progress.
@@ -485,9 +490,10 @@ fixture data.
 The correction suite covers the three permitted positive transition shapes and
 negative cases for review, manifest completeness, successor provenance and ID
 freshness, item and vocabulary propagation, immutable rows and OIDs, derived
-counts, census OID, contentless surrogates, axioms, and premature R4 artifacts.
+counts, census OID, contentless surrogates, production content OIDs, historical
+row forgery, split-without-new-successor, axioms, and premature R4 artifacts.
 The CI-selector suite separately checks the one-shot correction route,
-historical-event fallback to normal mode, merge-base mismatch rejection,
+historical-event fallback to normal mode, a later event, merge-base mismatch rejection,
 multiple-new-event rejection, and invalid-base rejection.
 Against a valid registry-bearing merge base it detects stable-ID deletion,
 identity/order/locator/OID drift, page-pass and reference-coverage regression,

@@ -256,10 +256,12 @@ if [[ "$ALLOW_SUPERSESSION" -eq 1 && "$CORRECTION_REPLAY" -eq 0 ]]; then
   ' <(base_file registry/claims.tsv) "$CURRENT_DIR/registry/claims.tsv" || fail "supersession transition regression"
 fi
 
-for path in registry/correction-events.tsv registry/claim-corrections.tsv registry/claim-successors.tsv; do
+for path in registry/correction-events.tsv registry/claim-normalization-reviews.tsv registry/claim-corrections.tsv registry/claim-successors.tsv; do
   if base_exists "$path"; then
     [[ -f "$CURRENT_DIR/$path" ]] || fail "current missing $path"
-    require_old_rows "$path" correction-ledger
+    if [[ "$CORRECTION_REPLAY" -eq 0 ]] && ! cmp -s <(base_file "$path") "$CURRENT_DIR/$path"; then
+      fail "$path historical correction ledger drift"
+    fi
   fi
 done
 

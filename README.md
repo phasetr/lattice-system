@@ -11,15 +11,15 @@ The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
 progress begins in `registry/`. Its global checker capability is `vocabulary`,
 while each source advances independently through `source-progress.tsv`;
 `TASAKI2020` is `vocabulary_reviewed`. Its corrected corpus ledger contains all
-534 physical PDF pages, 3,176 active atomic claims, 3,166 formalization
+534 physical PDF pages, 3,182 active atomic claims, 3,171 formalization
 targets, 1,401 unique equation-label/page pairs, and 63 pages with no claim.
 Eight superseded records preserve the provenance of compound or duplicate
-claims, while ten active records are explicitly classified `out_of_scope`. The only
+claims, while eleven active records are explicitly classified `out_of_scope`. The only
 production Lean tree is limited to the registered vocabulary modules and their
 root. Checker cases are generated only under isolated system temporary roots;
 the repository contains no tracked fixture tree.
 
-The complete R3 review classifies all 3,166 formalization targets: 3,164 are
+The complete R3 review classifies all 3,171 formalization targets: 3,169 are
 `mathlib_only`, while claims `CL-TASAKI2020-2487` and
 `CL-TASAKI2020-2488` require project vocabulary. The registered vocabulary is
 exactly `partialTraceRight` and `partialTraceLeft`, with four claim-to-vocabulary
@@ -30,11 +30,14 @@ Tracks and sources have stable positions, bibliographic metadata, fingerprints,
 independent lifecycle, and per-source frozen census invariants. Global claim
 order is `(track position, source position, claim order key)`, so additional
 books and papers can be registered without weakening completed-source gates.
-The reviewed correction event is recorded by three permanent ledgers for the
-event, its 23 actions, and the 23 ordered successor relations. The dedicated
+The reviewed correction event is recorded by four permanent ledgers for the
+event, its 36 statement-readiness reviews, 22 corrective actions, and 23
+ordered successor relations. The dedicated
 transition checker derives the corrected counts and census OID from the corpus
 and rejects unmanifested registry drift, contentless surrogates, axiom or R4
 artifacts, and incomplete successor propagation.
+Historical event-owned rows are frozen exactly, while a later independently
+reviewed event may append rows with its own contiguous positions.
 CI selects this exceptional transition only while the event is new and its
 recorded base equals the actual merge base. Later pull requests automatically
 use the ordinary immutable base-diff path.

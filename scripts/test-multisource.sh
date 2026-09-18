@@ -22,9 +22,10 @@ write_headers() {
   printf '%s\n' 'claim_id	vocabulary_id' > "$reg/claim-vocabulary.tsv"
   printf '%s\n' 'module	source_path	role' > "$reg/modules.tsv"
   printf '%s\n' 'module	position	imported_module	is_exported	is_meta	import_all' > "$reg/imports.tsv"
-  printf '%s\n' $'event_id\tsource_id\tbase_commit\treview_ref' > "$reg/correction-events.tsv"
-  printf '%s\n' $'correction_id\tevent_id\tclaim_id\taction\told_disposition\told_subkind\tnew_disposition\tnew_subkind\trationale\treview_ref' > "$reg/claim-corrections.tsv"
-  printf '%s\n' $'predecessor_claim_id\tposition\trelation\tsuccessor_claim_id' > "$reg/claim-successors.tsv"
+  printf '%s\n' $'event_id\tevent_position\tsource_id\tbase_commit\treview_ref' > "$reg/correction-events.tsv"
+  printf '%s\n' $'review_id\tevent_id\treview_position\tclaim_id\treview_scope\toutcome\tstatus\trationale\treview_ref' > "$reg/claim-normalization-reviews.tsv"
+  printf '%s\n' $'correction_id\tevent_id\tcorrection_position\treview_id\tclaim_id\taction\told_disposition\told_subkind\tnew_disposition\tnew_subkind' > "$reg/claim-corrections.tsv"
+  printf '%s\n' $'successor_edge_id\tevent_id\tcorrection_id\tpredecessor_claim_id\tsuccessor_position\trelation\tsuccessor_claim_id' > "$reg/claim-successors.tsv"
 }
 
 printf '%s\n' 'phase' 'census' > "$BASE/registry/phase.tsv"

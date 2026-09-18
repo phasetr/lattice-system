@@ -25,7 +25,7 @@ if [[ ! -f "$EVENTS" ]]; then
   "$CHECK_BASE_DIFF" "$ROOT" "$BASE_REF"
   exit 0
 fi
-[[ $(head -n 1 "$EVENTS") == $'event_id\tsource_id\tbase_commit\treview_ref' ]] ||
+[[ $(head -n 1 "$EVENTS") == $'event_id\tevent_position\tsource_id\tbase_commit\treview_ref' ]] ||
   fail "bad correction-events.tsv header"
 
 TMP=$(mktemp -d "${TMPDIR:-/tmp}/lattice-base-diff-ci.XXXXXX")
@@ -34,13 +34,13 @@ BASE_EVENTS=$TMP/base-events.tsv
 if git -C "$ROOT" cat-file -e "$MERGE_BASE:registry/correction-events.tsv" 2>/dev/null; then
   git -C "$ROOT" show "$MERGE_BASE:registry/correction-events.tsv" > "$BASE_EVENTS"
 else
-  printf '%s\n' $'event_id\tsource_id\tbase_commit\treview_ref' > "$BASE_EVENTS"
+  printf '%s\n' $'event_id\tevent_position\tsource_id\tbase_commit\treview_ref' > "$BASE_EVENTS"
 fi
 
 NEW_EVENTS=$TMP/new-events.tsv
 awk -F '\t' '
   NR==FNR { if (FNR>1) old[$1]=1; next }
-  FNR>1 && !($1 in old) { print $1 "\t" $3 }
+  FNR>1 && !($1 in old) { print $1 "\t" $4 }
 ' "$BASE_EVENTS" "$EVENTS" > "$NEW_EVENTS"
 NEW_COUNT=$(awk 'END {print NR+0}' "$NEW_EVENTS")
 if [[ "$NEW_COUNT" -eq 0 ]]; then
