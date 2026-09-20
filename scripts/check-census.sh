@@ -77,7 +77,7 @@ if [[ -f "$REG/sources.tsv" ]]; then
     esac
   done < "$REG/source-progress.tsv"
   if [[ "$phase" == census ]]; then
-    for table in slices dependencies bindings axioms claim-axioms; do
+    for table in slices dependencies bindings claim-context axioms claim-axioms statement-modules statement-imports; do
       [[ $(awk 'END { print NR }' "$REG/$table.tsv") -eq 1 ]] || fail "census capability requires header-only $table.tsv"
     done
   fi
@@ -95,5 +95,5 @@ else
 fi
 LC_ALL=C awk -F '\t' -v expected="$EXPECTED_PAGES" 'FNR==1{next}{n++;if($1!=sprintf("PG-TASAKI2020-%04d",n)||$2!="TASAKI2020"||$3!=sprintf("%06d",n)||$4==""||$4=="unspecified"||$5!=n""||$6==""||$7==""||$8!="complete"||$9!="complete"||$10!~/^[0-9a-f]+$/||(length($10)!=40&&length($10)!=64))bad=1}END{if(n!=expected||bad)exit 1}' "$REG/pages.tsv" || fail "page census is not exact, contiguous, two-pass complete, and source-frozen"
 LC_ALL=C awk -F '\t' -v expectedClaims="$EXPECTED_CLAIMS" -v expectedEquations="$EXPECTED_EQUATIONS" 'NR==FNR{if(FNR>1)pageOrder[$1]=$3;next}FNR==1{next}{claims++;if($2!="TASAKI2020"||$3!~/^[0-9][0-9][0-9][0-9][0-9][0-9]\.[0-9][0-9][0-9][0-9]$/||!($4 in pageOrder)||$5==""||$8==""||$12!="false"||$13!="NONE"||$14!="NONE"||$15!="NONE")bad=1;order=$3;if(substr(order,1,6)!=pageOrder[$4])bad=1;if(claims>1&&order<=previous)bad=1;previous=order;if($7=="equation"){equations++;label=$5;if(sub(/^.*; equation /,"",label)!=1||label!~/^\([^()]+\)$/)bad=1;pair=$4 SUBSEP label;if(seen[pair]++)bad=1}}END{if(claims==0||claims!=expectedClaims||equations!=expectedEquations||bad)exit 1}' "$REG/pages.tsv" "$REG/claims.tsv" || fail "claim count, active state, source order, page coupling, or equation label/page pairs are not exact"
-if [[ "$phase" == census ]]; then for table in slices dependencies bindings axioms claim-axioms; do [[ $(awk 'END{print NR}' "$REG/$table.tsv") -eq 1 ]] || fail "census requires header-only $table.tsv"; done; fi
+if [[ "$phase" == census ]]; then for table in slices dependencies bindings claim-context axioms claim-axioms statement-modules statement-imports; do [[ $(awk 'END{print NR}' "$REG/$table.tsv") -eq 1 ]] || fail "census requires header-only $table.tsv"; done; fi
 echo "check-census: ok"

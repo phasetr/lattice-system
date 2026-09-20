@@ -18,9 +18,11 @@ ROOT=${1:-$(cd "$SCRIPT_DIR/.." && pwd)}
 if [[ "$phase" == vocabulary || $(awk 'END { print NR }' "$ROOT/registry/modules.tsv") -gt 1 ]]; then
   "$ROOT/scripts/check-vocabulary.sh" "$ROOT"
 fi
+"$ROOT/scripts/check-skeleton.sh" "$ROOT"
 python3 "$ROOT/scripts/generate-public-docs.py" --test --root "$ROOT"
 python3 "$ROOT/scripts/generate-public-docs.py" --check --root "$ROOT"
 "$ROOT/scripts/test-checkers.sh" "$ROOT"
+"$ROOT/scripts/test-skeleton-semantic.sh" "$ROOT"
 "$ROOT/scripts/test-claim-corrections-runtime.sh" "$ROOT"
 "$ROOT/scripts/test-base-diff-ci-runtime.sh" "$ROOT"
 "$ROOT/scripts/check-base-diff-ci.sh" "$ROOT" "${BASE_REF:-HEAD^}"

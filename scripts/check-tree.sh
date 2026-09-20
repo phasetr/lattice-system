@@ -31,13 +31,14 @@ allowed_path() {
   local candidate=$1
   case "$candidate" in
     .github/CODEOWNERS|.github/pull_request_template.md|.github/workflows/rewrite-ci.yml|.gitignore|DESIGN.md|LatticeSystem.lean|README.md|lake-manifest.json|lakefile.toml|lean-toolchain) return 0 ;;
-    registry/phase.tsv|registry/tracks.tsv|registry/sources.tsv|registry/source-invariants.tsv|registry/source-progress.tsv|registry/pages.tsv|registry/claims.tsv|registry/source-items.tsv|registry/item-claims.tsv|registry/slices.tsv|registry/dependencies.tsv|registry/bindings.tsv|registry/axioms.tsv|registry/claim-axioms.tsv|registry/claim-vocabulary-review.tsv|registry/vocabulary.tsv|registry/claim-vocabulary.tsv|registry/modules.tsv|registry/imports.tsv|registry/correction-events.tsv|registry/claim-normalization-reviews.tsv|registry/claim-corrections.tsv|registry/claim-successors.tsv|registry/source-item-additions.tsv) return 0 ;;
-    scripts/check-all.sh|scripts/check-tree.sh|scripts/check-schema.sh|scripts/check-sources.sh|scripts/check-source-items.sh|scripts/check-order.sh|scripts/check-lifecycle.sh|scripts/check-registry.sh|scripts/check-census.sh|scripts/check-policy.sh|scripts/check-base-diff.sh|scripts/check-base-diff-ci.sh|scripts/check-claim-corrections.sh|scripts/check-vocabulary.sh|scripts/test-base-diff-runtime.sh|scripts/test-base-diff-ci-runtime.sh|scripts/test-claim-corrections-runtime.sh|scripts/test-checkers.sh|scripts/test-multisource.sh|scripts/test-tree-policy.sh|scripts/test-vocabulary-registry.sh|scripts/test-vocabulary-semantic.sh|scripts/generate-public-docs.py) return 0 ;;
+    registry/phase.tsv|registry/tracks.tsv|registry/sources.tsv|registry/source-invariants.tsv|registry/source-progress.tsv|registry/pages.tsv|registry/claims.tsv|registry/source-items.tsv|registry/item-claims.tsv|registry/slices.tsv|registry/dependencies.tsv|registry/bindings.tsv|registry/axioms.tsv|registry/claim-axioms.tsv|registry/claim-vocabulary-review.tsv|registry/vocabulary.tsv|registry/claim-vocabulary.tsv|registry/modules.tsv|registry/imports.tsv|registry/correction-events.tsv|registry/claim-normalization-reviews.tsv|registry/claim-corrections.tsv|registry/claim-successors.tsv|registry/source-item-additions.tsv|registry/claim-context.tsv|registry/statement-modules.tsv|registry/statement-imports.tsv) return 0 ;;
+    scripts/check-all.sh|scripts/check-tree.sh|scripts/check-schema.sh|scripts/check-sources.sh|scripts/check-source-items.sh|scripts/check-order.sh|scripts/check-lifecycle.sh|scripts/check-registry.sh|scripts/check-census.sh|scripts/check-policy.sh|scripts/check-base-diff.sh|scripts/check-base-diff-ci.sh|scripts/check-claim-corrections.sh|scripts/check-vocabulary.sh|scripts/test-base-diff-runtime.sh|scripts/test-base-diff-ci-runtime.sh|scripts/test-claim-corrections-runtime.sh|scripts/test-checkers.sh|scripts/test-multisource.sh|scripts/test-tree-policy.sh|scripts/test-vocabulary-registry.sh|scripts/test-vocabulary-semantic.sh|scripts/generate-public-docs.py|scripts/check-skeleton.sh|scripts/test-skeleton-semantic.sh) return 0 ;;
     docs/index.md|docs/generated/index.md|docs/generated/catalog.json|docs/generated/groups/*.md|docs/generated/sources/*.md|docs/generated/tracks/*.md) return 0 ;;
-    Checker/Vocabulary.lean) return 0 ;;
+    Checker/Semantic.lean|Checker/Vocabulary.lean|Checker/Skeleton.lean) return 0 ;;
     LatticeSystem/*.lean|LatticeSystem/**/*.lean)
       [[ -f "$ROOT/registry/modules.tsv" ]] || return 1
-      awk -F '\t' -v path="$candidate" 'FNR > 1 && $2 == path { found=1 } END { exit !found }' "$ROOT/registry/modules.tsv"
+      awk -F '\t' -v path="$candidate" 'FNR > 1 && $2 == path { found=1 } END { exit !found }' \
+        "$ROOT/registry/modules.tsv" "$ROOT/registry/statement-modules.tsv"
       return
       ;;
     *) return 1 ;;
@@ -57,12 +58,18 @@ fi
 
 [[ -z $(git -C "$ROOT" ls-files 'fixtures/**') ]] || fail "tracked fixture data is forbidden; tests must generate runtime fixtures"
 
-if [[ -f "$ROOT/registry/modules.tsv" && $(awk 'END { print NR }' "$ROOT/registry/modules.tsv") -gt 1 ]]; then
+if [[ -f "$ROOT/registry/modules.tsv" ]]; then
+  [[ -f "$ROOT/registry/statement-modules.tsv" ]] || fail "missing registry/statement-modules.tsv"
+fi
+if [[ -f "$ROOT/registry/modules.tsv" &&
+      ( $(awk 'END { print NR }' "$ROOT/registry/modules.tsv") -gt 1 ||
+        $(awk 'END { print NR }' "$ROOT/registry/statement-modules.tsv") -gt 1 ) ]]; then
   awk -F '\t' '
-    NR == FNR { if (FNR > 1) registered[$2]=1; next }
+    FILENAME != ARGV[3] { if (FNR > 1) registered[$2]=1; next }
     { tracked[$0]=1; if (!($0 in registered)) bad=1 }
     END { for (path in registered) if (!(path in tracked)) bad=1; exit bad }
-  ' "$ROOT/registry/modules.tsv" <(printf '%s\n' "$tracked" | awk '$0 == "LatticeSystem.lean" || $0 ~ /^LatticeSystem\/.*\.lean$/') || fail "registered modules do not exactly match tracked production Lean sources"
+  ' "$ROOT/registry/modules.tsv" "$ROOT/registry/statement-modules.tsv" \
+    <(printf '%s\n' "$tracked" | awk '$0 == "LatticeSystem.lean" || $0 ~ /^LatticeSystem\/.*\.lean$/') || fail "registered modules do not exactly match tracked production Lean sources"
 fi
 
 if git -C "$ROOT" ls-files -s | awk '$1 == "120000" { found=1 } END { exit !found }'; then

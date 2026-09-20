@@ -30,13 +30,25 @@ case "$phase" in
   vocabulary)
     [[ $(git hash-object "$source_root") == "$VOCABULARY_ROOT_OID" ]] || fail "vocabulary root differs from canonical registered umbrella import"
     ;;
-  skeleton|proof) fail "production policy is not implemented for $phase" ;;
+  skeleton)
+    [[ $(git hash-object "$source_root") == "$VOCABULARY_ROOT_OID" ]] || fail "skeleton root differs from canonical registered umbrella import"
+    [[ -f "$ROOT/registry/statement-modules.tsv" ]] || fail "missing registry/statement-modules.tsv"
+    [[ $(awk 'END { print NR }' "$ROOT/registry/statement-modules.tsv") -gt 1 ]] ||
+      fail "skeleton phase requires registered statement modules"
+    ;;
+  proof) fail "production policy is not implemented for $phase" ;;
   *) fail "unknown phase: $phase" ;;
 esac
 
-if [[ "$phase" == vocabulary || "$VOCABULARY_STAGING" -eq 1 ]]; then
+# Registered statement modules carry proof stubs by construction, so they are
+# exempt. Every other tracked production source stays under lexical hygiene:
+# skipping by registration keeps an unregistered stray file covered.
+if [[ "$phase" == vocabulary || "$phase" == skeleton || "$VOCABULARY_STAGING" -eq 1 ]]; then
+  statement_paths=$ROOT/registry/statement-modules.tsv
+  [[ -f "$statement_paths" ]] || statement_paths=/dev/null
   while IFS= read -r lean_file; do
     [[ -z "$lean_file" ]] && continue
+    awk -F '\t' -v path="$lean_file" 'FNR > 1 && $2 == path { found=1 } END { exit !found }' "$statement_paths" && continue
     if LC_ALL=C awk '/(^|[[:space:]])(axiom|theorem|lemma|sorry|admit|native_decide)([[:space:]]|$)/ { found=1 } END { exit !found }' "$ROOT/$lean_file"; then
       fail "vocabulary lexical hygiene found a forbidden token (nonsemantic check): $lean_file"
     fi

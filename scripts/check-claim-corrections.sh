@@ -93,8 +93,14 @@ review_check=$(awk -F '\t' -v e="$EVENT" -v source="$EVENT_SOURCE" '
 [[ "$review_check" != source ]] || fail "normalization review source mismatch"
 
 cmp -s "$BASE_REG/axioms.tsv" "$CURRENT_REG/axioms.tsv" && cmp -s "$BASE_REG/claim-axioms.tsv" "$CURRENT_REG/claim-axioms.tsv" || fail "correction event introduces an axiom artifact"
-cmp -s "$BASE_REG/bindings.tsv" "$CURRENT_REG/bindings.tsv" || fail "correction event introduces an R4 artifact"
-for p in "$BASE_REG"/*.tsv; do f=${p##*/}; case "$f" in claims.tsv|source-items.tsv|item-claims.tsv|claim-vocabulary-review.tsv|claim-vocabulary.tsv|source-invariants.tsv|correction-events.tsv|claim-normalization-reviews.tsv|claim-corrections.tsv|claim-successors.tsv|source-item-additions.tsv|bindings.tsv|axioms.tsv|claim-axioms.tsv)continue;;esac; [[ -f "$CURRENT_REG/$f" ]]&&cmp -s "$p" "$CURRENT_REG/$f" || fail "unrelated frozen registry drift"; done
+# The guarded quantity is R4 rows, not file bytes: a schema migration of an
+# empty table introduces no artifact, and a base predating a table has none.
+r4_rows() { local file=$1; [[ -f "$file" ]] || return 0; awk 'FNR>1 {print}' "$file"; }
+for table in bindings claim-context statement-modules statement-imports; do
+  cmp -s <(r4_rows "$BASE_REG/$table.tsv") <(r4_rows "$CURRENT_REG/$table.tsv") ||
+    fail "correction event introduces an R4 artifact"
+done
+for p in "$BASE_REG"/*.tsv; do f=${p##*/}; case "$f" in claims.tsv|source-items.tsv|item-claims.tsv|claim-vocabulary-review.tsv|claim-vocabulary.tsv|source-invariants.tsv|correction-events.tsv|claim-normalization-reviews.tsv|claim-corrections.tsv|claim-successors.tsv|source-item-additions.tsv|bindings.tsv|claim-context.tsv|statement-modules.tsv|statement-imports.tsv|axioms.tsv|claim-axioms.tsv)continue;;esac; [[ -f "$CURRENT_REG/$f" ]]&&cmp -s "$p" "$CURRENT_REG/$f" || fail "unrelated frozen registry drift"; done
 
 awk -F '\t' -v e="$EVENT" '
  FILENAME==ARGV[1]{if(FNR>1&&$2==e){rat[$4]=$8;ref[$4]=$9;out[$4]=$6}next}

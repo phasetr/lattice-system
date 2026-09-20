@@ -38,7 +38,8 @@ check_table "$REG/pages.tsv" $'page_id\tsource_id\torder_key\tprinted_page\tpdf_
 check_table "$REG/claims.tsv" $'claim_id\tsource_id\torder_key\tpage_id\tlocator\tdisposition\tsubkind\tnormalized_content\tcontent_oid\texclusion_rationale\texclusion_review_ref\ttombstone\tsuperseded_by\ttombstone_rationale\ttombstone_review_ref' 15
 check_table "$REG/slices.tsv" $'slice_id\tposition\tclaim_id' 3
 check_table "$REG/dependencies.tsv" $'claim_id\trole\ttarget_claim_id\trationale' 4
-check_table "$REG/bindings.tsv" $'claim_id\tstatement_decl\tproof_decl\tmodule\tstatement_oid\tnonvacuity_decl' 6
+check_table "$REG/bindings.tsv" $'claim_id\tstatement_decl\tproof_decl\tmodule\tstatement_kind\tstatement_shape\tstatement_type_oid\tstatement_value_oid\timplementation_status\tproof_kind\tproof_type_oid\tproof_value_oid\tnonvacuity_decl\tnonvacuity_oid\treview_ref' 15
+check_table "$REG/claim-context.tsv" $'claim_id\tposition\tsetup_claim_id\tuse_kind\tscope\treview_ref' 6
 check_table "$REG/axioms.tsv" $'axiom_id\tdeclaration\tmodule\tcategory\tsource_locator\trationale\treopen_condition' 7
 check_table "$REG/claim-axioms.tsv" $'claim_id\taxiom_id' 2
 check_table "$REG/claim-vocabulary-review.tsv" $'claim_id\tbasis\treview_ref' 3
@@ -46,6 +47,8 @@ check_table "$REG/vocabulary.tsv" $'vocabulary_id\tdeclaration\tmodule\tdeclarat
 check_table "$REG/claim-vocabulary.tsv" $'claim_id\tvocabulary_id' 2
 check_table "$REG/modules.tsv" $'module\tsource_path\trole' 3
 check_table "$REG/imports.tsv" $'module\tposition\timported_module\tis_exported\tis_meta\timport_all' 6
+check_table "$REG/statement-modules.tsv" $'module\tsource_path\trole' 3
+check_table "$REG/statement-imports.tsv" $'module\tposition\timported_module\tis_exported\tis_meta\timport_all' 6
 if [[ "$MULTI_SOURCE" -eq 1 ]]; then
   "$SCRIPT_DIR/check-schema.sh" "$ROOT" >/dev/null
 else
@@ -54,10 +57,10 @@ fi
 [[ $(awk 'END { print NR }' "$REG/phase.tsv") -eq 2 ]] || fail "phase.tsv must have exactly one data row"
 { IFS= read -r _; IFS= read -r phase; } < "$REG/phase.tsv"
 case "$phase" in bootstrap|census|vocabulary|skeleton|proof) ;; *) fail "bad phase: $phase" ;; esac
-for file in "$REG/pages.tsv" "$REG/claims.tsv" "$REG/bindings.tsv" "$REG/axioms.tsv" "$REG/claim-vocabulary-review.tsv" "$REG/vocabulary.tsv" "$REG/modules.tsv" "$SOURCE"; do
+for file in "$REG/pages.tsv" "$REG/claims.tsv" "$REG/bindings.tsv" "$REG/axioms.tsv" "$REG/claim-vocabulary-review.tsv" "$REG/vocabulary.tsv" "$REG/modules.tsv" "$REG/statement-modules.tsv" "$SOURCE"; do
   LC_ALL=C awk -F '\t' 'NR > 1 && seen[$1]++ { print FILENAME ": duplicate first-column ID " $1 > "/dev/stderr"; bad=1 } END { exit bad }' "$file" || exit 1
 done
-for spec in "$REG/claim-axioms.tsv:1,2" "$REG/claim-vocabulary.tsv:1,2" "$REG/imports.tsv:1,2"; do
+for spec in "$REG/claim-axioms.tsv:1,2" "$REG/claim-vocabulary.tsv:1,2" "$REG/imports.tsv:1,2" "$REG/statement-imports.tsv:1,2" "$REG/claim-context.tsv:1,2"; do
   file=${spec%%:*}; columns=${spec#*:}
   LC_ALL=C awk -F '\t' -v columns="$columns" '
     NR == 1 { next }
@@ -66,7 +69,7 @@ for spec in "$REG/claim-axioms.tsv:1,2" "$REG/claim-vocabulary.tsv:1,2" "$REG/im
   ' "$file" || exit 1
 done
 if [[ "$MULTI_SOURCE" -eq 0 ]]; then
-LC_ALL=C awk -F '\t' '
+LC_ALL=C awk -F '\t' -v phase="$phase" '
   NR == FNR { if (FNR > 1) source[$1]=1; next }
   FNR == 1 { next }
   $1 !~ /^[A-Z][A-Z0-9_]*$/ { bad("bad source ID " $1) }
@@ -180,15 +183,63 @@ LC_ALL=C awk -F '\t' '
 else
   "$SCRIPT_DIR/check-order.sh" "$ROOT" >/dev/null
 fi
-LC_ALL=C awk -F '\t' '
-  NR == FNR { if (FNR > 1) claim[$1]=1; next }
+LC_ALL=C awk -F '\t' -v phase="$phase" '
+  function oid(s) { return s ~ /^[0-9a-f]+$/ && (length(s)==40 || length(s)==64) }
+  function name(s) { return s ~ /^[A-Za-z_][A-Za-z0-9_'"'"']*(\.[A-Za-z_][A-Za-z0-9_'"'"']*)*$/ }
+  FILENAME == ARGV[1] { if (FNR > 1) { claim[$1]=1; disposition[$1]=$6; active[$1]=($12=="false") } next }
+  FILENAME == ARGV[2] { if (FNR > 1) statementModule[$1]=$3; next }
   FNR == 1 { next }
-  !($1 in claim) { bad("unknown binding claim") }
-  $2 == "" || $4 == "" { bad("empty statement declaration or module") }
-  $5 != "PENDING" && ($5 !~ /^[0-9a-f]+$/ || (length($5) != 40 && length($5) != 64)) { bad("bad statement OID") }
+  !($1 in claim) || !active[$1] { bad("unknown or inactive binding claim " $1) }
+  disposition[$1] == "out_of_scope" { bad("out-of-scope claim has a binding " $1) }
+  !name($2) || !name($4) { bad("bad statement declaration or module") }
+  statementModule[$4] != "leaf" { bad("binding needs a registered statement leaf module " $4) }
+  $5 !~ /^(definition|abbrev)$/ { bad("bad statement kind " $5) }
+  $6 !~ /^(proof_proposition|definition_value|definition_relation|notation_expansion|notation_relation|hypothesis_prop|domain_type|domain_predicate|domain_context)$/ { bad("bad statement shape " $6) }
+  $7 != "PENDING" && !oid($7) { bad("bad statement type OID") }
+  $8 != "PENDING" && !oid($8) { bad("bad statement value OID") }
+  $9 !~ /^(proof_stub|definitional)$/ { bad("bad implementation status " $9) }
+  {
+    proof=($9=="proof_stub")
+    if (proof && (!name($3) || $10!="theorem" || ($11!="PENDING" && !oid($11)))) bad("proof stub metadata is incomplete")
+    if (proof && phase!="proof" && $12!="NONE") bad("R4 proof stub value OID must be NONE")
+    if (proof && phase=="proof" && $12!="NONE" && !oid($12)) bad("bad R5 proof value OID")
+    if (!proof && ($3!="NONE" || $10!="NONE" || $11!="NONE" || $12!="NONE")) bad("definitional binding has proof metadata")
+    if ((disposition[$1] ~ /^(assertion|conjecture)$/) != proof) bad("implementation status/disposition mismatch")
+    if (proof && $6!="proof_proposition") bad("proof claim has non-proposition shape")
+    if (disposition[$1]=="definition" && $6 !~ /^(definition_value|definition_relation)$/) bad("definition claim shape mismatch")
+    if (disposition[$1]=="notation" && $6 !~ /^(notation_expansion|notation_relation)$/) bad("notation claim shape mismatch")
+    if (disposition[$1]=="hypothesis" && $6!="hypothesis_prop") bad("hypothesis claim shape mismatch")
+    if (disposition[$1]=="domain" && $6 !~ /^(domain_type|domain_predicate|domain_context)$/) bad("domain claim shape mismatch")
+  }
+  ($13=="NONE") != ($14=="NONE") { bad("nonvacuity declaration/OID must be NONE together") }
+  $13!="NONE" && !name($13) { bad("bad nonvacuity declaration") }
+  $14!="NONE" && $14!="PENDING" && !oid($14) { bad("bad nonvacuity OID") }
+  $15=="" || $15=="NONE" { bad("binding needs review_ref") }
+  seenStatement[$2]++ { bad("duplicate statement declaration " $2) }
+  proof && seenProof[$3]++ { bad("duplicate proof declaration " $3) }
   function bad(s) { print FILENAME ":" FNR ": " s > "/dev/stderr"; failed=1 }
   END { exit failed }
-' "$REG/claims.tsv" "$REG/bindings.tsv" || exit 1
+' "$REG/claims.tsv" "$REG/statement-modules.tsv" "$REG/bindings.tsv" || exit 1
+
+if [[ $(awk 'END { print NR }' "$REG/claim-context.tsv") -gt 1 ]]; then
+[[ -f "$REG/item-claims.tsv" ]] || fail "claim-context rows require registry/item-claims.tsv"
+LC_ALL=C awk -F '\t' '
+  FILENAME == ARGV[1] { if(FNR>1){claim[$1]=1; disposition[$1]=$6; sequence[$1]=++claimSequence} next }
+  FILENAME == ARGV[2] { if(FNR>1){item[$3]=$1} next }
+  FNR==1 { next }
+  !($1 in claim) || !($3 in claim) { bad("unknown claim-context claim") }
+  $1==$3 { bad("self claim-context") }
+  sequence[$3]>=sequence[$1] { bad("claim-context target is not earlier") }
+  disposition[$3] !~ /^(definition|notation|hypothesis|domain)$/ { bad("claim-context target is not a setup claim") }
+  $2 !~ /^[1-9][0-9]*$/ || $2+0 != ++position[$1] { bad("non-contiguous claim-context position") }
+  $4 !~ /^(assumption|term_reference)$/ { bad("bad claim-context use kind") }
+  $5 !~ /^(same_item|inherited)$/ { bad("bad claim-context scope") }
+  $5=="same_item" && (item[$1]=="" || item[$1]!=item[$3]) { bad("same_item claim-context crosses source items") }
+  $6=="" || $6=="NONE" { bad("claim-context needs review_ref") }
+  function bad(s){print FILENAME ":" FNR ": " s > "/dev/stderr";failed=1}
+  END{exit failed}
+' "$REG/claims.tsv" "$REG/item-claims.tsv" "$REG/claim-context.tsv" || exit 1
+fi
 LC_ALL=C awk -F '\t' '
   FNR == 1 { next }
   $1 !~ /^AX-[A-Z0-9_]+-[0-9][0-9][0-9][0-9]$/ { bad("bad axiom ID " $1) }
@@ -256,6 +307,7 @@ LC_ALL=C awk -F '\t' '
   $2 !~ /^LatticeSystem(\/[A-Za-z_][A-Za-z0-9_'"'"']*)*\.lean$/ { bad("bad module source path " $2) }
   $3 !~ /^(leaf|umbrella|root)$/ { bad("bad module role " $3) }
   {
+    rows++
     expected=$1; gsub(/\./, "/", expected); expected=expected ".lean"
     if ($2 != expected) bad("module/source path mismatch")
     if ($3 == "root") { roots++; if ($1 != "LatticeSystem" || $2 != "LatticeSystem.lean") bad("root module identity mismatch") }
@@ -265,6 +317,25 @@ LC_ALL=C awk -F '\t' '
   function bad(s) { print FILENAME ":" FNR ": " s > "/dev/stderr"; failed=1 }
   END { if (NR > 1 && roots != 1) bad("module registry needs exactly one root"); exit failed }
 ' "$REG/modules.tsv" || exit 1
+
+LC_ALL=C awk -F '\t' '
+  function validModule(s) { return s ~ /^LatticeSystem(\.[A-Za-z_][A-Za-z0-9_'"'"']*)*$/ }
+  FILENAME == ARGV[1] { if (FNR > 1) vocabularyModule[$1]=1; next }
+  FNR == 1 { next }
+  !validModule($1) { bad("bad registered statement module " $1) }
+  $2 !~ /^LatticeSystem(\/[A-Za-z_][A-Za-z0-9_'"'"']*)*\.lean$/ { bad("bad statement module source path " $2) }
+  $3 !~ /^(leaf|umbrella)$/ { bad("bad statement module role " $3) }
+  {
+    rows++
+    expected=$1; gsub(/\./, "/", expected); expected=expected ".lean"
+    if ($2 != expected) bad("statement module/source path mismatch")
+    if ($1 in vocabularyModule) bad("module is registered in both vocabulary and statement registries " $1)
+    if ($3 == "umbrella") umbrellas++
+  }
+  seenPath[$2]++ { bad("duplicate statement module source path " $2) }
+  function bad(s) { print FILENAME ":" FNR ": " s > "/dev/stderr"; failed=1 }
+  END { if (rows && umbrellas != 1) bad("statement module registry needs exactly one umbrella"); exit failed }
+' "$REG/modules.tsv" "$REG/statement-modules.tsv" || exit 1
 
 LC_ALL=C awk -F '\t' '
   FILENAME == ARGV[1] { if (FNR > 1) { claim[$1]=1; tombstone[$1]=$12 } next }
@@ -308,8 +379,26 @@ LC_ALL=C awk -F '\t' '
   END { for (n in node) visit(n); exit failed }
 ' "$REG/modules.tsv" "$REG/imports.tsv" || exit 1
 
+LC_ALL=C awk -F '\t' '
+  function validModule(s) { return s ~ /^[A-Za-z_][A-Za-z0-9_'"'"']*(\.[A-Za-z_][A-Za-z0-9_'"'"']*)*$/ }
+  FILENAME == ARGV[1] { if (FNR > 1) project[$1]=1; next }
+  FILENAME == ARGV[2] { if (FNR > 1) { project[$1]=1; statement[$1]=1 } next }
+  FNR == 1 { next }
+  !($1 in statement) { bad("unknown statement import owner " $1) }
+  $2 !~ /^[1-9][0-9]*$/ || $2+0 != ++count[$1] { bad("non-contiguous statement import position") }
+  !validModule($3) { bad("bad statement imported module " $3) }
+  $4 !~ /^(false|true)$/ || $5 !~ /^(false|true)$/ || $6 !~ /^(false|true)$/ { bad("bad statement import flag") }
+  $1 == $3 { bad("self statement import") }
+  index($3,"LatticeSystem.")==1 && !($3 in project) { bad("unregistered statement project import " $3) }
+  index($3,"LatticeSystem.")!=1 && $3!="LatticeSystem" && $3 !~ /^Mathlib(\.|$)/ { bad("unauthorized statement external import " $3) }
+  { if ($3 in statement) { edge[$1 SUBSEP $3]=1; node[$1]=node[$3]=1 } }
+  function visit(n, k,p,to) { if(mark[n]==1){bad("statement import cycle");return} if(mark[n]==2)return; mark[n]=1; for(k in edge){split(k,p,SUBSEP);if(p[1]==n){to=p[2];visit(to)}} mark[n]=2 }
+  function bad(s) { print FILENAME ":" FNR ": " s > "/dev/stderr"; failed=1 }
+  END { for(n in node) visit(n); exit failed }
+' "$REG/modules.tsv" "$REG/statement-modules.tsv" "$REG/statement-imports.tsv" || exit 1
+
 if [[ "$phase" == vocabulary ]]; then
-  for table in slices dependencies bindings axioms claim-axioms; do
+  for table in slices dependencies bindings claim-context axioms claim-axioms statement-modules statement-imports; do
     [[ $(awk 'END { print NR }' "$REG/$table.tsv") -eq 1 ]] || fail "vocabulary requires header-only $table.tsv"
   done
   if [[ "$MULTI_SOURCE" -eq 0 ]]; then
@@ -339,6 +428,13 @@ if [[ "$phase" == vocabulary ]]; then
   else
     awk -F '\t' 'FNR>1 && ($7=="PENDING" || $8=="PENDING") { bad=1 } END { exit bad }' "$REG/vocabulary.tsv" || fail "vocabulary capability forbids pending declaration OIDs"
   fi
+fi
+
+# R4 freeze means every registered binding OID is a real object ID. The skeleton
+# semantic checker treats `PENDING` as a wildcard, so the ban lives here.
+if [[ "$phase" == skeleton || "$phase" == proof ]]; then
+  awk -F '\t' 'FNR>1 && ($7=="PENDING" || $8=="PENDING" || $11=="PENDING" || $14=="PENDING") { bad=1 } END { exit bad }' \
+    "$REG/bindings.tsv" || fail "$phase capability forbids pending binding OIDs"
 fi
 
 if [[ "$phase" == bootstrap ]]; then

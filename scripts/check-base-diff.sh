@@ -81,7 +81,10 @@ base_file() {
       registry/imports.tsv) printf '%s\n' $'module\tposition\timported_module\tis_exported\tis_meta\timport_all'; return ;;
       registry/tracks.tsv) printf '%s\n%s\n' $'track_id\tposition\ttitle\tpublic_slug' $'TR-TASAKI\t1\tTasaki front-to-back\ttasaki'; return ;;
       registry/sources.tsv) printf '%s\n%s\n' $'source_id\ttrack_id\tsource_position\tsource_kind\tcitation_key\ttitle\tauthors\tyear\tedition\tidentifier_kind\tidentifier\tpublic_url\tpublic_slug\tlocal_ref_key\tpdf_oid\ttext_oid\tcoverage' $'TASAKI2020\tTR-TASAKI\t1\tbook\tTASAKI2020\tPhysics and Mathematics of Quantum Many-Body Systems\tHal Tasaki\t2020\t2020.springer.ebook.9783030412654\tdoi\t10.1007/978-3-030-41265-4\thttps://doi.org/10.1007/978-3-030-41265-4\ttasaki-2020\tHal.Tasaki.P534.Physics_and_Mathematics_of_Quantum_Many_Body_Systems.pdf\t91d1237a6384d470bcdc453f058f8e08603767c5\t342ef0ce220dd3ed1c6cc0cdfab5a4d86bbd044f\tfrozen'; return ;;
-      registry/source-invariants.tsv) printf '%s\n%s\n' $'source_id\tphysical_page_count\tactive_claim_count\tequation_pair_count\tno_claim_page_count\tcensus_oid\treview_ref' $'TASAKI2020\t534\t3172\t1401\t63\tf65e4f7c57b2ef82e71156c147d3539609e02074\tR2-CENSUS-RECONCILED'; return ;;
+      registry/source-invariants.tsv) printf '%s\n%s\n' $'source_id\tphysical_page_count\tactive_claim_count\tformalization_target_count\tequation_pair_count\tno_claim_page_count\tcensus_oid\treview_ref' $'TASAKI2020\t534\t3182\t3171\t1401\t63\t1d471b950a066ba12a41b154e92a12ccd1a6c4f6\tCORPUS-NORMALIZATION-INDEPENDENT-REVIEW'; return ;;
+    registry/claim-context.tsv) printf '%s\n' $'claim_id\tposition\tsetup_claim_id\tuse_kind\tscope\treview_ref'; return ;;
+    registry/statement-modules.tsv) printf '%s\n' $'module\tsource_path\trole'; return ;;
+    registry/statement-imports.tsv) printf '%s\n' $'module\tposition\timported_module\tis_exported\tis_meta\timport_all'; return ;;
       registry/source-progress.tsv) printf '%s\n%s\n' $'source_id\tlifecycle\treview_ref' $'TASAKI2020\tvocabulary_reviewed\tVOCABULARY-INDEPENDENT-REVIEW'; return ;;
       *) fail "base missing $path" ;;
     esac
@@ -117,7 +120,7 @@ if [[ "$MULTI_CURRENT" -eq 0 ]]; then
   base_exists references/tasaki-2020.tsv || fail "base missing references/tasaki-2020.tsv"
   [[ -f "$CURRENT_DIR/references/tasaki-2020.tsv" ]] || fail "current missing references/tasaki-2020.tsv"
 fi
-for path in registry/claim-vocabulary-review.tsv registry/vocabulary.tsv registry/claim-vocabulary.tsv registry/modules.tsv registry/imports.tsv; do
+for path in registry/claim-vocabulary-review.tsv registry/vocabulary.tsv registry/claim-vocabulary.tsv registry/modules.tsv registry/imports.tsv registry/claim-context.tsv registry/statement-modules.tsv registry/statement-imports.tsv; do
   [[ -f "$CURRENT_DIR/$path" ]] || fail "current missing $path"
 done
 if [[ "$MULTI_CURRENT" -eq 1 ]]; then
@@ -265,11 +268,29 @@ for path in registry/correction-events.tsv registry/claim-normalization-reviews.
   fi
 done
 
+BINDINGS_HEADER=$'claim_id\tstatement_decl\tproof_decl\tmodule\tstatement_kind\tstatement_shape\tstatement_type_oid\tstatement_value_oid\timplementation_status\tproof_kind\tproof_type_oid\tproof_value_oid\tnonvacuity_decl\tnonvacuity_oid\treview_ref'
+if [[ $(base_file registry/bindings.tsv | head -n 1) != "$BINDINGS_HEADER" ]]; then
+  [[ $(base_file registry/bindings.tsv | awk 'END { print NR }') -eq 1 ]] ||
+    fail "base bindings.tsv carries rows under an unsupported schema"
+fi
+# Every frozen binding column is compared. `proof_value_oid` is deliberately
+# absent: R5 rewrites exactly that column when a stub is discharged.
 awk -F '\t' '
   function fixed(s) { return s!="" && s!="NONE" }
-  NR == FNR { if (FNR > 1) { statement[$1]=$2; proof[$1]=$3; module[$1]=$4; oid[$1]=$5; nonvac[$1]=$6 } next }
-  FNR > 1 { seen[$1]=1; if (($1 in statement) && (statement[$1]!=$2 || module[$1]!=$4 || (oid[$1]!="PENDING" && oid[$1]!=$5) || (fixed(proof[$1]) && proof[$1]!=$3) || (fixed(nonvac[$1]) && nonvac[$1]!=$6))) bad=1 }
-  END { for (id in statement) if (!(id in seen)) bad=1; if (bad) print "binding disappeared or identity drifted" > "/dev/stderr"; exit bad }
+  function frozen(old, current, id) { if (fixed(old) && old!="PENDING" && old!=current) drift(id) }
+  NR == FNR { if (FNR > 1) { statement[$1]=$2; proof[$1]=$3; module[$1]=$4; kind[$1]=$5; shape[$1]=$6; typeOid[$1]=$7; valueOid[$1]=$8; status[$1]=$9; proofKind[$1]=$10; proofType[$1]=$11; nonvac[$1]=$13; nonvacOid[$1]=$14 } next }
+  FNR > 1 {
+    seen[$1]=1
+    if ($1 in statement) {
+      if (statement[$1]!=$2 || module[$1]!=$4) drift($1)
+      frozen(proof[$1], $3, $1); frozen(kind[$1], $5, $1); frozen(shape[$1], $6, $1)
+      frozen(typeOid[$1], $7, $1); frozen(valueOid[$1], $8, $1); frozen(status[$1], $9, $1)
+      frozen(proofKind[$1], $10, $1); frozen(proofType[$1], $11, $1)
+      frozen(nonvac[$1], $13, $1); frozen(nonvacOid[$1], $14, $1)
+    }
+  }
+  END { for (id in statement) if (!(id in seen)) drift(id); exit bad }
+  function drift(id) { print "binding disappeared or identity drifted " id > "/dev/stderr"; bad=1 }
 ' <(base_file registry/bindings.tsv) "$CURRENT_DIR/registry/bindings.tsv" || fail "binding regression"
 
 if [[ "$MULTI_CURRENT" -eq 0 ]]; then

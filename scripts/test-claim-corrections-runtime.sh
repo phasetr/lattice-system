@@ -885,10 +885,29 @@ expect_fail axiom-artifact "correction event introduces an axiom artifact" \
 
 clone_case "$RECLASSIFY" "$CASES/r4-artifact"
 printf '%s\n' \
-  $'CL-TASAKI2020-0001\tLatticeSystem.Claims.TASAKI2020.statement0001\tLatticeSystem.Claims.TASAKI2020.claim0001\tLatticeSystem.Claims.TASAKI2020.Front\tPENDING\tNONE' \
+  $'CL-TASAKI2020-0001\tLatticeSystem.Claims.Front.statement0001\tLatticeSystem.Claims.Front.claim0001\tLatticeSystem.Claims.Front\tdefinition\tproof_proposition\tPENDING\tPENDING\tproof_stub\ttheorem\tPENDING\tNONE\tNONE\tNONE\tCORRECTION-FIXTURE-REVIEW' \
   >> "$CASES/r4-artifact/registry/bindings.tsv"
 expect_fail r4-artifact "correction event introduces an R4 artifact" \
   "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/r4-artifact"
+
+# Every R4 table is guarded, not only bindings.
+clone_case "$RECLASSIFY" "$CASES/r4-artifact-claim-context"
+printf '%s\n' $'CL-TASAKI2020-0002\t1\tCL-TASAKI2020-0001\tassumption\tsame_item\tCORRECTION-FIXTURE-REVIEW' \
+  >> "$CASES/r4-artifact-claim-context/registry/claim-context.tsv"
+expect_fail r4-artifact-claim-context "correction event introduces an R4 artifact" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/r4-artifact-claim-context"
+
+clone_case "$RECLASSIFY" "$CASES/r4-artifact-statement-modules"
+printf '%s\n' $'LatticeSystem.Claims.Front\tLatticeSystem/Claims/Front.lean\tleaf' \
+  >> "$CASES/r4-artifact-statement-modules/registry/statement-modules.tsv"
+expect_fail r4-artifact-statement-modules "correction event introduces an R4 artifact" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/r4-artifact-statement-modules"
+
+clone_case "$RECLASSIFY" "$CASES/r4-artifact-statement-imports"
+printf '%s\n' $'LatticeSystem.Claims.Front\t1\tMathlib\ttrue\tfalse\tfalse' \
+  >> "$CASES/r4-artifact-statement-imports/registry/statement-imports.tsv"
+expect_fail r4-artifact-statement-imports "correction event introduces an R4 artifact" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/r4-artifact-statement-imports"
 
 [[ $(baseline_digest) == "$BASELINE_DIGEST" ]] || {
   echo "test-claim-corrections-runtime: immutable runtime base changed" >&2

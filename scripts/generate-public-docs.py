@@ -47,7 +47,10 @@ HEADERS = {
     "claim_vocabulary": ["claim_id", "vocabulary_id"],
     "bindings": [
         "claim_id", "statement_decl", "proof_decl", "module",
-        "statement_oid", "nonvacuity_decl",
+        "statement_kind", "statement_shape", "statement_type_oid",
+        "statement_value_oid", "implementation_status", "proof_kind",
+        "proof_type_oid", "proof_value_oid", "nonvacuity_decl",
+        "nonvacuity_oid", "review_ref",
     ],
     "axioms": [
         "axiom_id", "declaration", "module", "category", "source_locator",
@@ -1028,7 +1031,12 @@ class GeneratorTests(unittest.TestCase):
             "bindings": [{
                 "claim_id": "CL-ZFIRST-0001", "statement_decl": "Fixture.statement",
                 "proof_decl": "Fixture.proof", "module": "Fixture.Module",
-                "statement_oid": "PRIVATE", "nonvacuity_decl": "NONE",
+                "statement_kind": "definition", "statement_shape": "proof_proposition",
+                "statement_type_oid": "PRIVATE", "statement_value_oid": "PRIVATE",
+                "implementation_status": "proof_stub", "proof_kind": "theorem",
+                "proof_type_oid": "PRIVATE", "proof_value_oid": "NONE",
+                "nonvacuity_decl": "NONE", "nonvacuity_oid": "NONE",
+                "review_ref": "FIXTURE-REVIEW",
             }],
             "phase": [{"phase": "vocabulary"}],
         }

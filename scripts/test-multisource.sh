@@ -14,7 +14,10 @@ write_headers() {
   local reg=$1
   printf '%s\n' 'slice_id	position	claim_id' > "$reg/slices.tsv"
   printf '%s\n' 'claim_id	role	target_claim_id	rationale' > "$reg/dependencies.tsv"
-  printf '%s\n' 'claim_id	statement_decl	proof_decl	module	statement_oid	nonvacuity_decl' > "$reg/bindings.tsv"
+  printf '%s\n' $'claim_id\tstatement_decl\tproof_decl\tmodule\tstatement_kind\tstatement_shape\tstatement_type_oid\tstatement_value_oid\timplementation_status\tproof_kind\tproof_type_oid\tproof_value_oid\tnonvacuity_decl\tnonvacuity_oid\treview_ref' > "$reg/bindings.tsv"
+  printf '%s\n' $'claim_id\tposition\tsetup_claim_id\tuse_kind\tscope\treview_ref' > "$reg/claim-context.tsv"
+  printf '%s\n' $'module\tsource_path\trole' > "$reg/statement-modules.tsv"
+  printf '%s\n' $'module\tposition\timported_module\tis_exported\tis_meta\timport_all' > "$reg/statement-imports.tsv"
   printf '%s\n' 'axiom_id	declaration	module	category	source_locator	rationale	reopen_condition' > "$reg/axioms.tsv"
   printf '%s\n' 'claim_id	axiom_id' > "$reg/claim-axioms.tsv"
   printf '%s\n' 'claim_id	basis	review_ref' > "$reg/claim-vocabulary-review.tsv"
@@ -87,6 +90,21 @@ mutate() {
 "$ROOT/scripts/check-census.sh" --fixture "$BASE" >/dev/null
 "$ROOT/scripts/check-source-items.sh" "$BASE" >/dev/null
 
+# The multi-source census path keeps the same header-only R4 tables as the
+# legacy fixture path.
+for table in bindings claim-context statement-modules statement-imports; do
+  case_dir="$TMP/census-r4-$table"
+  cp -R "$BASE" "$case_dir"
+  case "$table" in
+    bindings) printf '%s\n' $'CL-SRA-0001\tFixture.statement\tNONE\tFixture.Module\tdefinition\tdefinition_value\tPENDING\tPENDING\tdefinitional\tNONE\tNONE\tNONE\tNONE\tNONE\tFIXTURE-REVIEW' >> "$case_dir/registry/$table.tsv" ;;
+    claim-context) printf '%s\n' $'CL-SRA-0002\t1\tCL-SRA-0001\tassumption\tsame_item\tFIXTURE-REVIEW' >> "$case_dir/registry/$table.tsv" ;;
+    statement-modules) printf '%s\n' $'LatticeSystem.Claims.Front\tLatticeSystem/Claims/Front.lean\tleaf' >> "$case_dir/registry/$table.tsv" ;;
+    statement-imports) printf '%s\n' $'LatticeSystem.Claims.Front\t1\tMathlib\ttrue\tfalse\tfalse' >> "$case_dir/registry/$table.tsv" ;;
+  esac
+  expect_fail "census-r4-$table" "census capability requires header-only $table.tsv" \
+    "$ROOT/scripts/check-census.sh" --fixture "$case_dir"
+done
+
 cp -R "$BASE" "$TMP/unpadded-chapter"
 mutate "$BASE/registry/source-items.tsv" "$TMP/unpadded-chapter/registry/source-items.tsv" 'NR==2 {$9="Chapter 1";$10="chapter-1"} {print}'
 expect_fail unpadded-chapter "numeric chapter group is not zero-padded" "$ROOT/scripts/check-source-items.sh" "$TMP/unpadded-chapter"
@@ -149,7 +167,7 @@ expect_fail cross-source-dependency "dependency target is not earlier in global 
 DIFF_BASE="$TMP/diff-base"
 cp -R "$BASE" "$DIFF_BASE"
 printf '%s\n' $'SL-SRA-0001\t1\tCL-SRA-0001' >> "$DIFF_BASE/registry/slices.tsv"
-printf '%s\n' $'CL-SRA-0001\tFixture.statement\tNONE\tFixture.Module\taaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\tNONE' >> "$DIFF_BASE/registry/bindings.tsv"
+printf '%s\n' $'CL-SRA-0001\tFixture.statement\tFixture.proof\tFixture.Module\tdefinition\tproof_proposition\taaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\tbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\tproof_stub\ttheorem\tcccccccccccccccccccccccccccccccccccccccc\tNONE\tFixture.nonvacuity\tdddddddddddddddddddddddddddddddddddddddd\tMULTISOURCE-FIXTURE-REVIEW' >> "$DIFF_BASE/registry/bindings.tsv"
 printf '%s\n' $'VO-LS-0001\tFixture.term\tFixture.Module\tdefinition\tprimary\tNONE\taaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\tbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\tgraph_core\tnone' >> "$DIFF_BASE/registry/vocabulary.tsv"
 cp -R "$DIFF_BASE" "$TMP/diff-good"
 "$ROOT/scripts/check-base-diff.sh" --fixture-dirs "$DIFF_BASE" "$TMP/diff-good" >/dev/null
@@ -186,9 +204,32 @@ cp -R "$DIFF_BASE" "$TMP/diff-claim-oid"
 mutate "$DIFF_BASE/registry/claims.tsv" "$TMP/diff-claim-oid/registry/claims.tsv" 'NR==2 {$9="eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"} {print}'
 expect_fail base-claim-oid "claim OID or tombstone regressed" "$ROOT/scripts/check-base-diff.sh" --fixture-dirs "$DIFF_BASE" "$TMP/diff-claim-oid"
 
+for table in claim-context statement-modules statement-imports; do
+  case_dir="$TMP/diff-missing-$table"
+  cp -R "$DIFF_BASE" "$case_dir"
+  command rm -f "$case_dir/registry/$table.tsv"
+  expect_fail "base-missing-$table" "current missing registry/$table.tsv" \
+    "$ROOT/scripts/check-base-diff.sh" --fixture-dirs "$DIFF_BASE" "$case_dir"
+done
+
 cp -R "$DIFF_BASE" "$TMP/diff-binding"
-printf '%s\n' $'claim_id\tstatement_decl\tproof_decl\tmodule\tstatement_oid\tnonvacuity_decl' > "$TMP/diff-binding/registry/bindings.tsv"
+printf '%s\n' $'claim_id\tstatement_decl\tproof_decl\tmodule\tstatement_kind\tstatement_shape\tstatement_type_oid\tstatement_value_oid\timplementation_status\tproof_kind\tproof_type_oid\tproof_value_oid\tnonvacuity_decl\tnonvacuity_oid\treview_ref' > "$TMP/diff-binding/registry/bindings.tsv"
 expect_fail base-binding "binding disappeared or identity drifted" "$ROOT/scripts/check-base-diff.sh" --fixture-dirs "$DIFF_BASE" "$TMP/diff-binding"
+
+# Every frozen binding column is measured one at a time; `proof_value_oid` (12)
+# is intentionally absent because R5 rewrites exactly that column.
+for column in 2 3 4 5 6 7 8 9 10 11 13 14; do
+  case_dir="$TMP/diff-binding-column-$column"
+  cp -R "$DIFF_BASE" "$case_dir"
+  mutate "$DIFF_BASE/registry/bindings.tsv" "$case_dir/registry/bindings.tsv" \
+    "NR==2 {\$$column=\"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\"} {print}"
+  expect_fail "base-binding-column-$column" "binding disappeared or identity drifted" \
+    "$ROOT/scripts/check-base-diff.sh" --fixture-dirs "$DIFF_BASE" "$case_dir"
+done
+cp -R "$DIFF_BASE" "$TMP/diff-binding-proof-value"
+mutate "$DIFF_BASE/registry/bindings.tsv" "$TMP/diff-binding-proof-value/registry/bindings.tsv" \
+  'NR==2 {$12="eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"} {print}'
+"$ROOT/scripts/check-base-diff.sh" --fixture-dirs "$DIFF_BASE" "$TMP/diff-binding-proof-value" >/dev/null
 
 cp -R "$DIFF_BASE" "$TMP/diff-tombstone-base"
 mutate "$DIFF_BASE/registry/claims.tsv" "$TMP/diff-tombstone-base/registry/claims.tsv" 'NR==2 {$12="true";$13="CL-SRB-0001";$14="RETIRED";$15="REVIEW"} {print}'

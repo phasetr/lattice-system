@@ -42,7 +42,16 @@ make_legacy_base() {
     $'CL-TASAKI2020-0001\tTASAKI2020\t000001.0001\tPG-TASAKI2020-0001\tpage 1\tassertion\ttheorem\tFixture theorem.\tPENDING\tNONE\tNONE\tfalse\tNONE\tNONE\tNONE' > "$target/registry/claims.tsv"
   printf '%s\n' $'slice_id\tposition\tclaim_id' $'SL-TASAKI2020-0001\t1\tCL-TASAKI2020-0001' > "$target/registry/slices.tsv"
   printf '%s\n' $'claim_id\trole\ttarget_claim_id\trationale' > "$target/registry/dependencies.tsv"
-  printf '%s\n' $'claim_id\tstatement_decl\tproof_decl\tmodule\tstatement_oid\tnonvacuity_decl' $'CL-TASAKI2020-0001\tclaim0001\tNONE\tLatticeSystem.Claims.C0001\t0000000000000000000000000000000000000000\tNONE' > "$target/registry/bindings.tsv"
+  printf '%s\n' \
+    $'claim_id\tstatement_decl\tproof_decl\tmodule\tstatement_kind\tstatement_shape\tstatement_type_oid\tstatement_value_oid\timplementation_status\tproof_kind\tproof_type_oid\tproof_value_oid\tnonvacuity_decl\tnonvacuity_oid\treview_ref' \
+    $'CL-TASAKI2020-0001\tLatticeSystem.Claims.Front.statement0001\tLatticeSystem.Claims.Front.claim0001\tLatticeSystem.Claims.Front\tdefinition\tproof_proposition\t0000000000000000000000000000000000000000\t1111111111111111111111111111111111111111\tproof_stub\ttheorem\t2222222222222222222222222222222222222222\tNONE\tNONE\tNONE\tLEGACY-FIXTURE-REVIEW' > "$target/registry/bindings.tsv"
+  printf '%s\n' $'claim_id\tposition\tsetup_claim_id\tuse_kind\tscope\treview_ref' > "$target/registry/claim-context.tsv"
+  printf '%s\n' $'module\tsource_path\trole' \
+    $'LatticeSystem.Claims.Front\tLatticeSystem/Claims/Front.lean\tleaf' \
+    $'LatticeSystem.Skeleton\tLatticeSystem/Skeleton.lean\tumbrella' > "$target/registry/statement-modules.tsv"
+  printf '%s\n' $'module\tposition\timported_module\tis_exported\tis_meta\timport_all' \
+    $'LatticeSystem.Claims.Front\t1\tMathlib\ttrue\tfalse\tfalse' \
+    $'LatticeSystem.Skeleton\t1\tLatticeSystem.Claims.Front\ttrue\tfalse\tfalse' > "$target/registry/statement-imports.tsv"
   printf '%s\n' $'axiom_id\tdeclaration\tmodule\tcategory\tsource_locator\trationale\treopen_condition' $'AX-PROJECT-0001\tLatticeSystem.Axioms.AbstractCStar.interfaceAxiom\tLatticeSystem.Axioms.AbstractCStar\tabstract_cstar\tnot-applicable\tfixture-rationale\treopen-when-implemented' > "$target/registry/axioms.tsv"
   printf '%s\n' $'claim_id\taxiom_id' $'CL-TASAKI2020-0001\tAX-PROJECT-0001' > "$target/registry/claim-axioms.tsv"
   printf '%s\n' $'claim_id\tbasis\treview_ref' > "$target/registry/claim-vocabulary-review.tsv"
@@ -110,7 +119,10 @@ case_from "$THREE" registry-supersession-incoherent; rewrite "$ROOT/fixtures/reg
 case_from "$SUPER" registry-supersession-missing-rationale; rewrite "$ROOT/fixtures/registry-supersession-missing-rationale/registry/claims.tsv" 'NR==2 {$14="NONE"} {print}'
 case_from "$SUPER" registry-supersession-missing-review; rewrite "$ROOT/fixtures/registry-supersession-missing-review/registry/claims.tsv" 'NR==2 {$15="NONE"} {print}'
 
-case_from "$GOOD" registry-exclusion-good; rewrite "$ROOT/fixtures/registry-exclusion-good/registry/claims.tsv" 'NR==2 {$6="out_of_scope";$10="scope-reason";$11="review-1"} {print}'
+case_from "$GOOD" registry-exclusion-good; rewrite "$ROOT/fixtures/registry-exclusion-good/registry/claims.tsv" 'NR==2 {$6="out_of_scope";$10="scope-reason";$11="review-1"} {print}'; rewrite "$ROOT/fixtures/registry-exclusion-good/registry/bindings.tsv" 'NR==1 {print}'
+# An out-of-scope claim that keeps its binding silently breaks the skeleton
+# bijection, so the binding must stay otherwise schema-clean in this fixture.
+case_from "$GOOD" registry-binding-out-of-scope; rewrite "$ROOT/fixtures/registry-binding-out-of-scope/registry/claims.tsv" 'NR==2 {$6="out_of_scope";$10="scope-reason";$11="review-1"} {print}'; rewrite "$ROOT/fixtures/registry-binding-out-of-scope/registry/bindings.tsv" 'NR==2 {$3="NONE";$6="definition_value";$9="definitional";$10="NONE";$11="NONE"} {print}'
 case_from "$ROOT/fixtures/registry-exclusion-good" registry-exclusion-missing-rationale; rewrite "$ROOT/fixtures/registry-exclusion-missing-rationale/registry/claims.tsv" 'NR==2 {$10="NONE"} {print}'
 case_from "$ROOT/fixtures/registry-exclusion-good" registry-exclusion-missing-review; rewrite "$ROOT/fixtures/registry-exclusion-missing-review/registry/claims.tsv" 'NR==2 {$11="NONE"} {print}'
 case_from "$GOOD" registry-exclusion-incoherent; rewrite "$ROOT/fixtures/registry-exclusion-incoherent/registry/claims.tsv" 'NR==2 {$10="scope-reason";$11="review-1"} {print}'
@@ -135,6 +147,13 @@ case_from "$GOOD" registry-post-source-alternate; rewrite "$ROOT/fixtures/regist
 case_from "$GOOD" registry-bootstrap-edition-pending; printf '%s\n' phase bootstrap > "$ROOT/fixtures/registry-bootstrap-edition-pending/registry/phase.tsv"; rewrite "$ROOT/fixtures/registry-bootstrap-edition-pending/references/tasaki-2020.tsv" 'NR==2 {$3="pending";$4="";$5="";$6="pending"} {print}'
 case_from "$GOOD" registry-bootstrap-source-frozen; printf '%s\n' phase bootstrap > "$ROOT/fixtures/registry-bootstrap-source-frozen/registry/phase.tsv"; for f in pages claims slices bindings axioms claim-axioms; do rewrite "$ROOT/fixtures/registry-bootstrap-source-frozen/registry/$f.tsv" 'NR==1 {print}'; done; rewrite "$ROOT/fixtures/registry-bootstrap-source-frozen/references/tasaki-2020.tsv" 'NR==2 {$6="pending"} {print}'
 case_from "$GOOD" registry-post-edition-pending; rewrite "$ROOT/fixtures/registry-post-edition-pending/references/tasaki-2020.tsv" 'NR==2 {$3="pending"} {print}'
+# R4 freeze: at skeleton capability a binding OID is a real object ID, because
+# the skeleton semantic checker treats PENDING as a wildcard.
+case_from "$GOOD" registry-skeleton-frozen; printf '%s\n' phase skeleton > "$ROOT/fixtures/registry-skeleton-frozen/registry/phase.tsv"
+case_from "$ROOT/fixtures/registry-skeleton-frozen" registry-skeleton-pending-type; rewrite "$ROOT/fixtures/registry-skeleton-pending-type/registry/bindings.tsv" 'NR==2 {$7="PENDING"} {print}'
+case_from "$ROOT/fixtures/registry-skeleton-frozen" registry-skeleton-pending-value; rewrite "$ROOT/fixtures/registry-skeleton-pending-value/registry/bindings.tsv" 'NR==2 {$8="PENDING"} {print}'
+case_from "$ROOT/fixtures/registry-skeleton-frozen" registry-skeleton-pending-proof; rewrite "$ROOT/fixtures/registry-skeleton-pending-proof/registry/bindings.tsv" 'NR==2 {$11="PENDING"} {print}'
+case_from "$ROOT/fixtures/registry-skeleton-frozen" registry-skeleton-pending-nonvacuity; rewrite "$ROOT/fixtures/registry-skeleton-pending-nonvacuity/registry/bindings.tsv" 'NR==2 {$13="LatticeSystem.Claims.Front.nonvacuity0001";$14="PENDING"} {print}'
 case_from "$GOOD" registry-source-mixed-width; rewrite "$ROOT/fixtures/registry-source-mixed-width/references/tasaki-2020.tsv" 'NR==2 {$5="bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"} {print}'
 
 CENSUS="$ROOT/fixtures/registry-census-good"
@@ -148,7 +167,7 @@ printf '%s\n' \
   $'claim_id\tsource_id\torder_key\tpage_id\tlocator\tdisposition\tsubkind\tnormalized_content\tcontent_oid\texclusion_rationale\texclusion_review_ref\ttombstone\tsuperseded_by\ttombstone_rationale\ttombstone_review_ref' \
   $'CL-TASAKI2020-0001\tTASAKI2020\t000001.0001\tPG-TASAKI2020-0001\tPDF p. 1; print p. NONE; NONE; equation (F.1)\tassertion\tequation\tFixture-equation.\tPENDING\tNONE\tNONE\tfalse\tNONE\tNONE\tNONE' \
   $'CL-TASAKI2020-0002\tTASAKI2020\t000002.0001\tPG-TASAKI2020-0002\tPDF-p.2-section-1.1\tassertion\tunnumbered_obligation\tFixture-prose-claim.\tPENDING\tNONE\tNONE\tfalse\tNONE\tNONE\tNONE' > "$CENSUS/registry/claims.tsv"
-for f in slices dependencies bindings axioms claim-axioms; do rewrite "$CENSUS/registry/$f.tsv" 'NR==1 {print}'; done
+for f in slices dependencies bindings claim-context axioms claim-axioms statement-modules statement-imports; do rewrite "$CENSUS/registry/$f.tsv" 'NR==1 {print}'; done
 
 case_from "$CENSUS" registry-census-source-identity; rewrite "$ROOT/fixtures/registry-census-source-identity/references/tasaki-2020.tsv" 'NR==2 {$4="bad"} {print}'
 case_from "$CENSUS" registry-census-source-bad-header; rewrite "$ROOT/fixtures/registry-census-source-bad-header/references/tasaki-2020.tsv" 'NR==1 {$0="bad"} {print}'
@@ -161,10 +180,17 @@ case_from "$ROOT/fixtures/registry-census-claim-count" registry-census-claim-ina
 case_from "$CENSUS" registry-census-claim-superseded; rewrite "$ROOT/fixtures/registry-census-claim-superseded/registry/claims.tsv" 'NR==2 {$13="CL-TASAKI2020-0002"} {print}'
 case_from "$CENSUS" registry-census-equation-duplicate; append_row "$ROOT/fixtures/registry-census-equation-duplicate/registry/claims.tsv" $'CL-TASAKI2020-0003\tTASAKI2020\t000001.0002\tPG-TASAKI2020-0001\tPDF p. 1; print p. NONE; NONE; equation (F.1)\tassertion\tequation\tDuplicate.\tPENDING\tNONE\tNONE\tfalse\tNONE\tNONE\tNONE'; rewrite "$ROOT/fixtures/registry-census-equation-duplicate/registry/claims.tsv" 'NR<=2 {print} NR==3 {later=$0} NR==4 {print; print later}'
 case_from "$CENSUS" registry-census-claims-empty; rewrite "$ROOT/fixtures/registry-census-claims-empty/registry/claims.tsv" 'NR==1 {print}'
-for pair in slices:SL-TASAKI2020-0001$'\t'1$'\t'CL-TASAKI2020-0001 dependencies:CL-TASAKI2020-0002$'\t'required_by$'\t'CL-TASAKI2020-0001$'\t'fixture bindings:CL-TASAKI2020-0001$'\t'Fixture.statement$'\t'Fixture.proof$'\t'Fixture$'\t'PENDING$'\t'Fixture.nonvacuity axioms:AX-PROJECT-0002$'\t'LatticeSystem.Axioms.State.fixture$'\t'LatticeSystem.Axioms.State$'\t'state$'\t'not-applicable$'\t'rationale$'\t'reopen; do
+for pair in slices:SL-TASAKI2020-0001$'\t'1$'\t'CL-TASAKI2020-0001 dependencies:CL-TASAKI2020-0002$'\t'required_by$'\t'CL-TASAKI2020-0001$'\t'fixture bindings:CL-TASAKI2020-0001$'\t'LatticeSystem.Claims.Front.statement0001$'\t'LatticeSystem.Claims.Front.claim0001$'\t'LatticeSystem.Claims.Front$'\t'definition$'\t'proof_proposition$'\t'PENDING$'\t'PENDING$'\t'proof_stub$'\t'theorem$'\t'PENDING$'\t'NONE$'\t'NONE$'\t'NONE$'\t'CENSUS-FIXTURE-REVIEW axioms:AX-PROJECT-0002$'\t'LatticeSystem.Axioms.State.fixture$'\t'LatticeSystem.Axioms.State$'\t'state$'\t'not-applicable$'\t'rationale$'\t'reopen statement-modules:LatticeSystem.Claims.Front$'\t'LatticeSystem/Claims/Front.lean$'\t'leaf; do
   table=${pair%%:*}; row=${pair#*:}; name=registry-census-skeleton-$table; case_from "$CENSUS" "$name"; append_row "$ROOT/fixtures/$name/registry/$table.tsv" "$row"
 done
 append_row "$ROOT/fixtures/registry-census-skeleton-slices/registry/slices.tsv" $'SL-TASAKI2020-0001\t2\tCL-TASAKI2020-0002'
+# A schema-valid binding needs a registered statement leaf module. The census
+# gate reports the earlier bindings table first, so the diagnostic stays pinned.
+for f in registry-census-skeleton-bindings registry-census-skeleton-statement-modules; do
+  [[ "$f" == registry-census-skeleton-bindings ]] &&
+    append_row "$ROOT/fixtures/$f/registry/statement-modules.tsv" $'LatticeSystem.Claims.Front\tLatticeSystem/Claims/Front.lean\tleaf'
+  append_row "$ROOT/fixtures/$f/registry/statement-modules.tsv" $'LatticeSystem.Skeleton\tLatticeSystem/Skeleton.lean\tumbrella'
+done
 case_from "$ROOT/fixtures/registry-census-skeleton-axioms" registry-census-skeleton-claim-axioms; append_row "$ROOT/fixtures/registry-census-skeleton-claim-axioms/registry/claim-axioms.tsv" $'CL-TASAKI2020-0001\tAX-PROJECT-0002'
 case_from "$CENSUS" registry-census-skeleton-claim-axioms-diagnostic; append_row "$ROOT/fixtures/registry-census-skeleton-claim-axioms-diagnostic/registry/claim-axioms.tsv" $'CL-TASAKI2020-0001\tAX-TASAKI2020-0001'
 
@@ -243,6 +269,7 @@ expect_fail supersession-incoherent "$ROOT/scripts/check-registry.sh" "$ROOT/fix
 expect_fail supersession-missing-rationale "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-supersession-missing-rationale"
 expect_fail supersession-missing-review "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-supersession-missing-review"
 expect_pass exclusion-good "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-exclusion-good"
+expect_fail binding-out-of-scope --diagnostic "out-of-scope claim has a binding" "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-binding-out-of-scope"
 expect_fail exclusion-missing-rationale "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-exclusion-missing-rationale"
 expect_fail exclusion-missing-review "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-exclusion-missing-review"
 expect_fail exclusion-incoherent "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-exclusion-incoherent"
@@ -261,6 +288,11 @@ expect_fail post-source-alternate "$ROOT/scripts/check-registry.sh" "$ROOT/fixtu
 expect_fail bootstrap-pending-edition "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-bootstrap-edition-pending"
 expect_pass bootstrap-source-frozen "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-bootstrap-source-frozen"
 expect_fail post-pending-edition "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-post-edition-pending"
+expect_pass skeleton-frozen-oids "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-skeleton-frozen"
+for column in type value proof nonvacuity; do
+  expect_fail "skeleton-pending-$column" --diagnostic "skeleton capability forbids pending binding OIDs" \
+    "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-skeleton-pending-$column"
+done
 expect_fail source-mixed-oid-width "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-source-mixed-width"
 "$PROJECT_ROOT/scripts/test-tree-policy.sh" "$PROJECT_ROOT"
 census_source_diagnostic="check-census: fixture source is not verified and frozen"
@@ -294,6 +326,8 @@ expect_pass census-skeleton-bindings-registry "$ROOT/scripts/check-registry.sh" 
 expect_fail census-skeleton-bindings --diagnostic "check-census: census requires header-only bindings.tsv" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-skeleton-bindings" 2 2 1
 expect_pass census-skeleton-axioms-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-skeleton-axioms"
 expect_fail census-skeleton-axioms --diagnostic "check-census: census requires header-only axioms.tsv" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-skeleton-axioms" 2 2 1
+expect_pass census-skeleton-statement-modules-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-skeleton-statement-modules"
+expect_fail census-skeleton-statement-modules --diagnostic "check-census: census requires header-only statement-modules.tsv" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-skeleton-statement-modules" 2 2 1
 # A schema-valid claim-axiom relation necessarily carries its referenced axiom,
 # so the census gate reports the earlier axioms table first. The paired
 # diagnostic-only fixture omits that axiom solely to exercise the later

@@ -314,14 +314,51 @@ lifecycle may coexist without weakening those completed-source guarantees.
 
 ## 10. Bindings
 
-`registry/bindings.tsv` is the declaration binding ledger.
-A binding joins a claim to its statement declaration, optional proof
-declaration, stable module, statement OID, and optional nonvacuity declaration.
-The content OID identifies the frozen declaration text under a documented
-normalization rule.
+`registry/bindings.tsv` is the declaration binding ledger. A binding has the
+columns `claim_id`, `statement_decl`, `proof_decl`, `module`,
+`statement_kind`, `statement_shape`, `statement_type_oid`,
+`statement_value_oid`, `implementation_status`, `proof_kind`,
+`proof_type_oid`, `proof_value_oid`, `nonvacuity_decl`, `nonvacuity_oid`, and
+`review_ref`.
+
+Every formalization target has exactly one primary statement declaration, and
+an out-of-scope claim has none. Thus the
+TASAKI2020 skeleton has 3,171 primary declarations, not 3,171 theorem holes.
+The primary kind is the closed enum `definition|abbrev`; both its normalized
+kernel type and normalized kernel value have independent Git object IDs.
+This prevents a definition or abbreviation body from drifting behind an
+unchanged type. A binding OID may be `PENDING` only before the global
+checker capability advances to `skeleton`.
+
+The statement shape is disposition-aware. Assertion and conjecture use
+`proof_proposition`. Definition uses
+`definition_value|definition_relation`; notation uses
+`notation_expansion|notation_relation`; hypothesis uses `hypothesis_prop`; and
+domain uses `domain_type|domain_predicate|domain_context`. The corresponding
+implementation status is `proof_stub` only for assertion and conjecture and
+`definitional` for the other four dispositions.
+
+The 2,571 assertion-or-conjecture rows have a distinct proof declaration,
+`proof_kind=theorem`, frozen proof type OID, and an R4 proof value containing
+one direct temporary hole. The 600 definition, notation, hypothesis, and domain
+rows have literal `NONE` in all four proof fields and have no proof hole.
+An optional nonvacuity declaration is either `NONE` with OID `NONE`, or a
+separate registered declaration with its own frozen OID. A self-fulfilling
+nonvacuity statement such as `(h : P) : P`, a `True` surrogate, or an
+unreviewed stronger assumption is not evidence of nonvacuity.
+
+`registry/claim-context.tsv` has columns `claim_id`, `position`,
+`setup_claim_id`, `use_kind`, `scope`, and `review_ref`. Positions are
+contiguous per consuming claim. The target is an earlier setup claim with
+disposition definition, notation, hypothesis, or domain. `use_kind` is
+`assumption|term_reference`; `scope` is `same_item|inherited`. This table
+records reviewed context reuse and does not replace logical dependencies.
+
 Once frozen, a binding cannot disappear or silently change identity.
 Changing a frozen statement requires explicit user review, a migration record,
-and a new digest; ordinary proof PRs cannot do it.
+and new statement OIDs; ordinary proof PRs cannot do it. R5 changes only the
+registered proof body and its `proof_value_oid`; it cannot change the primary
+statement name, kind, shape, type, value, module, proof name, or proof type.
 Registry text alone does not prove that a Lean declaration exists.
 That fact requires a semantic Lean environment checker.
 
@@ -352,11 +389,23 @@ Unused approved axioms and unapproved actual axioms both fail the final gate.
 ## 12. Production and skeleton isolation
 
 Final claim modules use their stable production paths from the moment they are
-created.
-During skeleton construction those modules may contain registered `sorry`
-stubs only under the skeleton build target.
-A dedicated future `LatticeSystem.Skeleton` umbrella imports every registered
-claim module for completeness checking.
+created. `registry/statement-modules.tsv` and
+`registry/statement-imports.tsv` are distinct from the R3 vocabulary module
+and import registries, so claim declarations cannot be mistaken for
+vocabulary. During skeleton construction those modules may contain the 2,571
+registered proof stubs only under the skeleton build target. The 600 setup
+declarations contain no proof hole.
+A dedicated nondefault `LatticeSystem.Skeleton` module target imports every
+registered claim module for completeness checking. It is built explicitly as
+`lake build +LatticeSystem.Skeleton`; bare `lake build` continues to build the
+production root only.
+The reviewed partition uses 82 stable leaf modules and the one skeleton
+umbrella `LatticeSystem.Skeleton`. Each leaf stays below the 1,500-line linter
+limit; no claim-per-file fixture tree is created.
+The final source statements still require item-level semantic review. In
+particular, figure captions, qualitative assertions, following-lemma discourse,
+and same-logic references are manual review blockers rather than permission to
+introduce an alias or contentless surrogate.
 The production root must not import that umbrella or any unresolved claim.
 Production targets may import only declarations at the proved frontier.
 The skeleton target may locally permit the warnings corresponding exactly to
@@ -369,16 +418,25 @@ the checker contract, and static checker fixtures.
 
 ## 13. Direct-sorry bijection
 
-Before skeleton freeze, a semantic checker must inspect the elaborated Lean
-environment, not source text alone.
-It must establish a bijection between registered unresolved claim bindings and
-direct uses of `sorryAx` in their bound declarations.
-Every registered stub must exist at its claim-bound module and name.
-Every direct `sorryAx` occurrence must have exactly one registered claim.
+Before skeleton freeze, a semantic checker inspects the elaborated Lean
+environment, not source text alone. It establishes two separate exact
+bijections: all 3,171 formalization targets to their primary declaration,
+and the 2,571 `proof_stub` bindings to their distinct proof theorem
+containing exactly one
+direct use of `sorryAx`. The 600 `definitional` bindings have no proof
+declaration and no direct or transitive hole.
+Every registered primary and proof declaration exists at its claim-bound
+module and name. Every direct `sorryAx` occurrence belongs to exactly one
+registered proof stub; extra project declarations are rejected. A primary
+statement is therefore a plain term: `match`, `where`, and `let rec` elaborate
+to auxiliary declarations that no binding can own.
 The checker must reject a stub hidden behind another unproved declaration.
 It must distinguish direct unresolved status from transitive axiom dependency.
-It must also verify declaration kind, module ownership, statement type, and
-the normalized binding `statement_oid`.
+It also verifies declaration kind, module ownership, statement shape, and the
+separate normalized type and value OIDs for statement and proof.
+Project constants used by a primary statement must be registered R3 vocabulary
+or an earlier claim statement admitted by the reviewed dependency/context
+registries.
 The same environment inspection must compute actual intentional-axiom use.
 Lexical grep checks remain defense in depth, not semantic evidence.
 R4 cannot complete until this checker exists and its positive and negative
@@ -411,14 +469,19 @@ Graph-centric structure and local finiteness are enforced during R3 review.
 R3 does not prove source claims except unavoidable well-definedness obligations,
 which are registered as their own slices.
 R4 creates the whole-book exact-statement typed skeleton.
-Every implement disposition receives its final module, declaration, exact
-statement, locator doc comment, and registered temporary proof hole.
+Every implement disposition receives its final module, primary declaration,
+exact statement, locator doc comment, and frozen type/value OIDs. Exactly the
+2,571 assertion and conjecture claims additionally receive a separate theorem
+with one registered temporary proof hole. The 600 setup claims are executable
+definitional context and receive no theorem or hole.
 The skeleton umbrella elaborates all claims together.
 The production root remains isolated from every unresolved claim.
 R4 freezes IDs, locators, source order, module paths, names, types, and digests.
 The semantic environment bijection is a mandatory R4 completion gate.
 Proof work is blocked throughout R1, R2, R3, and R4.
-R5 replaces registered stubs with proofs strictly front to back.
+R5 replaces registered proof values strictly front to back. It changes the
+proof body and `proof_value_oid` only; the primary statement and proof type
+remain frozen.
 No R5 PR may skip an earlier unresolved logical prerequisite.
 The frontier advances only when the claim is proved and its actual axiom set
 matches the approved set exactly.
@@ -428,14 +491,17 @@ matches the approved set exactly.
 Stable IDs cannot be deleted or reused.
 Source order and slice positions cannot move backward or silently change.
 Verified locators cannot drift.
-Frozen source-content and binding statement OIDs cannot change silently.
+Frozen source-content and binding statement type/value OIDs cannot change
+silently.
 Bindings cannot disappear after introduction.
 The global checker capability cannot regress. The production policy recognizes `vocabulary`
 only when the R3 registry, module/import, and Lean-environment checks all run
 and pass. It rejects `skeleton` and `proof` until their semantic phase checks
 exist.
 Derived claim state cannot regress from proved to unresolved.
-The number of registered unresolved claim bindings is monotone nonincreasing in R5.
+The number of proof-stub declarations whose actual value contains `sorryAx` is
+monotone nonincreasing in R5. The permanent `implementation_status` class does
+not change when a proof body is discharged.
 Bootstrap and a declaration-free census use the exact canonical doc-only root.
 At vocabulary capability, only the canonical vocabulary root and registered
 vocabulary modules are permitted;
@@ -492,6 +558,10 @@ byte-for-byte with the canonical doc-only source. During R3 staging and in
 vocabulary it compares the root with the canonical registered umbrella import
 and requires every production Lean path to be derived exactly from
 `modules.tsv`.
+In `skeleton` it keeps that root comparison and requires registered statement
+modules. Lexical hygiene then covers every tracked production Lean source
+except the registered statement modules, which carry proof stubs by
+construction.
 Future-file lexical checks are only nonsemantic hygiene and never environment
 evidence.
 It checks the written merge gate and an unchecked `USER ONLY` box.
