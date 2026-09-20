@@ -223,6 +223,10 @@ claim.order_key)`. Thus every role targets an earlier tuple; `required_by` rever
 the logical edge and requires a nonempty review rationale.
 Logical edges are claim-to-target for `requires` and `consequence_of`, and
 target-to-claim for `required_by`.
+Accordingly the skeleton checker admits exactly one forward statement
+reference: the edge a `required_by` row creates runs from its earlier target to
+its later claim, and an admitted `required_by` edge that does not point forward
+is rejected.
 The resulting graph must be acyclic; self and duplicate edges are forbidden.
 Cross-track edges are permitted only when the target tuple is earlier and a
 nonempty review rationale records the deliberate track crossing.
@@ -359,6 +363,9 @@ Changing a frozen statement requires explicit user review, a migration record,
 and new statement OIDs; ordinary proof PRs cannot do it. R5 changes only the
 registered proof body and its `proof_value_oid`; it cannot change the primary
 statement name, kind, shape, type, value, module, proof name, or proof type.
+`proof_value_oid` is monotone: once it holds a real object ID it may be
+rewritten to another real object ID, but it may never return to `NONE`, which
+the skeleton checker reads as an open hole.
 Registry text alone does not prove that a Lean declaration exists.
 That fact requires a semantic Lean environment checker.
 
@@ -374,8 +381,16 @@ Thermodynamic or infinite limits and all finite-dimensional statements are not
 axiom categories.
 Taxonomy membership is not permission to add an axiom.
 Every axiom needs a stable ID, category, declaration, module, source locator,
-rationale, and reopen condition. Its declaration and module are under the
-category-consistent `LatticeSystem.Axioms.*` namespace.
+rationale, reopen condition, and frozen `axiom_type_oid`. Its declaration and
+module are under the category-consistent `LatticeSystem.Axioms.*` namespace.
+The type OID is the Git object ID of the same canonical type serialization used
+for bindings, so the interface an axiom asserts is frozen exactly like a
+statement and a registered name cannot quietly assert something stronger. It
+may be `PENDING` only before the global checker capability advances to
+`skeleton`. An axiom has no kernel value, so no value OID exists.
+Axiom modules are registered in `statement-modules.tsv`, not in the R3
+`modules.tsv`: the skeleton environment dump inspects exactly the registered
+statement modules, and that is where an actual axiom declaration is visible.
 That string-level namespace check is not semantic existence evidence; the Lean
 environment gate remains mandatory before skeleton freeze.
 Approval is an explicit review event, not a hand-edited derived status column.
@@ -410,6 +425,10 @@ The production root must not import that umbrella or any unresolved claim.
 Production targets may import only declarations at the proved frontier.
 The skeleton target may locally permit the warnings corresponding exactly to
 registered stubs.
+A registered statement module may lexically contain only `axiom`, `theorem`,
+`lemma`, and `sorry` beyond ordinary vocabulary; `admit` and `native_decide`
+are forbidden there as everywhere else, and a source path may be registered in
+at most one of the two module registries.
 Global `warningAsError` must remain enabled.
 The skeleton mechanism must not disable all warnings to accommodate `sorry`.
 R1 contains no fake Lean stubs and no skeleton umbrella.
@@ -433,14 +452,45 @@ to auxiliary declarations that no binding can own.
 The checker must reject a stub hidden behind another unproved declaration.
 It must distinguish direct unresolved status from transitive axiom dependency.
 It also verifies declaration kind, module ownership, statement shape, and the
-separate normalized type and value OIDs for statement and proof.
+separate normalized type and value OIDs for statement, proof, and registered
+axiom.
+A registered proof theorem's type is the bound primary statement constant
+itself, not merely an expression mentioning it, so a weakened obligation such
+as a disjunction, a self-implication, or `True` cannot occupy the binding and
+be discharged without proving the claim.
+A registered nonvacuity declaration must mention its bound primary statement,
+must not conclude `True`, and must not be discharged by its own hypotheses.
+That last test reduces one head at a time, so it also rejects a repeated
+hypothesis hidden behind a definition or padded with `True` conjuncts. It is a
+structural test, not a decision procedure: a nonvacuity obligation that is
+trivial only up to nontrivial mathematics still passes and remains a human
+review obligation.
 Project constants used by a primary statement must be registered R3 vocabulary
-or an earlier claim statement admitted by the reviewed dependency/context
-registries.
+or another claim statement; a reference to another claim statement must in
+addition be admitted by the reviewed dependency/context registries. A project
+constant is one whose root namespace component is the root component of a
+registered module.
+A reviewed `assumption` context must appear in a binder domain or antecedent of
+the declaration type or of its value. A term-level `let` binds a value rather
+than an assumption and never satisfies it.
 The same environment inspection must compute actual intentional-axiom use.
 Lexical grep checks remain defense in depth, not semantic evidence.
+The checker also exports the computed declaration table on request. That export
+is write-only, feeds no decision, and exists because the registry OIDs must be
+authored from the same environment the checker later compares against.
 R4 cannot complete until this checker exists and its positive and negative
 fixtures pass.
+
+The following R4 obligations are stated here but are not machine-checked yet,
+and no gate should be read as covering them.
+The per-declaration locator doc comment is a review obligation: `docBlame` and
+`docBlameThm` are environment linters that `lakefile.toml` options cannot
+enable, so nothing currently fails when a locator doc comment is missing.
+The production-only part of the skeleton gate, which pins the umbrella name to
+`LatticeSystem.Skeleton`, greps `defaultTargets`, and builds
+`lake build +LatticeSystem.Skeleton`, is skipped in fixture mode and has no
+production skeleton to run against; it first executes when the first statement
+module is registered.
 
 ## 14. Checker capabilities and source lifecycles
 
@@ -502,6 +552,10 @@ Derived claim state cannot regress from proved to unresolved.
 The number of proof-stub declarations whose actual value contains `sorryAx` is
 monotone nonincreasing in R5. The permanent `implementation_status` class does
 not change when a proof body is discharged.
+A bootstrap registry is header-only in every claim-derived table, including
+`claim-context.tsv`, `statement-modules.tsv`, and `statement-imports.tsv`, and
+that phase check runs before the per-table semantics so a stray row is reported
+as the phase violation it is.
 Bootstrap and a declaration-free census use the exact canonical doc-only root.
 At vocabulary capability, only the canonical vocabulary root and registered
 vocabulary modules are permitted;
@@ -548,8 +602,8 @@ dependency roles, axiom references, and phase-specific registry semantics.
 For every reconciled production source it additionally requires that source's
 frozen invariant row, contiguous page IDs/order keys/PDF coordinates with two
 complete passes and fixed source OIDs, its exact active-claim and equation-pair
-counts, and strict global tuple order with page coupling. Only `census` requires the
-five pre-R3 implementation registries to be header-only. `vocabulary` instead
+counts, and strict global tuple order with page coupling. Only `bootstrap` and
+`census` require whole registry tables to be header-only. `vocabulary` instead
 requires complete claim review and vocabulary use, exact registered module and
 import coverage; its absence requirements are enforced by the R3 contract,
 not by the frozen census check.
@@ -559,9 +613,11 @@ vocabulary it compares the root with the canonical registered umbrella import
 and requires every production Lean path to be derived exactly from
 `modules.tsv`.
 In `skeleton` it keeps that root comparison and requires registered statement
-modules. Lexical hygiene then covers every tracked production Lean source
-except the registered statement modules, which carry proof stubs by
-construction.
+modules. Lexical hygiene then covers every tracked production Lean source. A
+registered statement module is exempt only from the tokens it legitimately
+carries, `axiom`, `theorem`, `lemma`, and `sorry`; `admit` and `native_decide`
+stay forbidden in every production source. A path registered in both
+`modules.tsv` and `statement-modules.tsv` receives no exemption at all.
 Future-file lexical checks are only nonsemantic hygiene and never environment
 evidence.
 It checks the written merge gate and an unchecked `USER ONLY` box.

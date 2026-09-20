@@ -40,16 +40,30 @@ case "$phase" in
   *) fail "unknown phase: $phase" ;;
 esac
 
-# Registered statement modules carry proof stubs by construction, so they are
-# exempt. Every other tracked production source stays under lexical hygiene:
-# skipping by registration keeps an unregistered stray file covered.
+# Registered statement modules carry registered axioms, claim theorems, and
+# proof stubs by construction, so only those tokens are exempt there; `admit`
+# and `native_decide` stay forbidden everywhere. Every other tracked production
+# source stays under the full token ban, and a path claimed by both registries
+# gets no exemption at all.
 if [[ "$phase" == vocabulary || "$phase" == skeleton || "$VOCABULARY_STAGING" -eq 1 ]]; then
   statement_paths=$ROOT/registry/statement-modules.tsv
   [[ -f "$statement_paths" ]] || statement_paths=/dev/null
+  vocabulary_paths=$ROOT/registry/modules.tsv
+  [[ -f "$vocabulary_paths" ]] || vocabulary_paths=/dev/null
   while IFS= read -r lean_file; do
     [[ -z "$lean_file" ]] && continue
-    awk -F '\t' -v path="$lean_file" 'FNR > 1 && $2 == path { found=1 } END { exit !found }' "$statement_paths" && continue
-    if LC_ALL=C awk '/(^|[[:space:]])(axiom|theorem|lemma|sorry|admit|native_decide)([[:space:]]|$)/ { found=1 } END { exit !found }' "$ROOT/$lean_file"; then
+    statement=0 vocabulary=0
+    awk -F '\t' -v path="$lean_file" 'FNR > 1 && $2 == path { found=1 } END { exit !found }' "$statement_paths" && statement=1
+    awk -F '\t' -v path="$lean_file" 'FNR > 1 && $2 == path { found=1 } END { exit !found }' "$vocabulary_paths" && vocabulary=1
+    [[ $statement -eq 1 && $vocabulary -eq 1 ]] &&
+      fail "source path is registered as both a vocabulary and a statement module: $lean_file"
+    if [[ $statement -eq 1 ]]; then
+      tokens='admit|native_decide'
+    else
+      tokens='axiom|theorem|lemma|sorry|admit|native_decide'
+    fi
+    if LC_ALL=C awk -v tokens="$tokens" \
+      '$0 ~ "(^|[[:space:]])(" tokens ")([[:space:]]|$)" { found=1 } END { exit !found }' "$ROOT/$lean_file"; then
       fail "vocabulary lexical hygiene found a forbidden token (nonsemantic check): $lean_file"
     fi
   done < <(git -C "$ROOT" ls-files 'LatticeSystem.lean' 'LatticeSystem/*.lean' 'LatticeSystem/**/*.lean')

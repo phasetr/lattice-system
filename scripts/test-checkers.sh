@@ -52,7 +52,7 @@ make_legacy_base() {
   printf '%s\n' $'module\tposition\timported_module\tis_exported\tis_meta\timport_all' \
     $'LatticeSystem.Claims.Front\t1\tMathlib\ttrue\tfalse\tfalse' \
     $'LatticeSystem.Skeleton\t1\tLatticeSystem.Claims.Front\ttrue\tfalse\tfalse' > "$target/registry/statement-imports.tsv"
-  printf '%s\n' $'axiom_id\tdeclaration\tmodule\tcategory\tsource_locator\trationale\treopen_condition' $'AX-PROJECT-0001\tLatticeSystem.Axioms.AbstractCStar.interfaceAxiom\tLatticeSystem.Axioms.AbstractCStar\tabstract_cstar\tnot-applicable\tfixture-rationale\treopen-when-implemented' > "$target/registry/axioms.tsv"
+  printf '%s\n' $'axiom_id\tdeclaration\tmodule\tcategory\tsource_locator\trationale\treopen_condition\taxiom_type_oid' $'AX-PROJECT-0001\tLatticeSystem.Axioms.AbstractCStar.interfaceAxiom\tLatticeSystem.Axioms.AbstractCStar\tabstract_cstar\tnot-applicable\tfixture-rationale\treopen-when-implemented\tPENDING' > "$target/registry/axioms.tsv"
   printf '%s\n' $'claim_id\taxiom_id' $'CL-TASAKI2020-0001\tAX-PROJECT-0001' > "$target/registry/claim-axioms.tsv"
   printf '%s\n' $'claim_id\tbasis\treview_ref' > "$target/registry/claim-vocabulary-review.tsv"
   printf '%s\n' $'vocabulary_id\tdeclaration\tmodule\tdeclaration_kind\torigin\tparent_vocabulary_id\ttype_oid\tdeclaration_oid\tdesign_role\tfiniteness_scope' > "$target/registry/vocabulary.tsv"
@@ -134,7 +134,7 @@ case_from "$GOOD" registry-axiom-categories-good
 axiom_number=2
 for spec in 'State state' 'GNS gns' 'KMS kms' 'WeakDual weak_dual' 'Wigner wigner' 'ContentlessPredicate contentless_predicate'; do
   set -- $spec
-  printf -v axiom_row 'AX-PROJECT-%04d\tLatticeSystem.Axioms.%s.fixture\tLatticeSystem.Axioms.%s\t%s\tnot-applicable\trationale\treopen' "$axiom_number" "$1" "$1" "$2"
+  printf -v axiom_row 'AX-PROJECT-%04d\tLatticeSystem.Axioms.%s.fixture\tLatticeSystem.Axioms.%s\t%s\tnot-applicable\trationale\treopen\tPENDING' "$axiom_number" "$1" "$1" "$2"
   append_row "$ROOT/fixtures/registry-axiom-categories-good/registry/axioms.tsv" "$axiom_row"
   axiom_number=$((axiom_number + 1))
 done
@@ -145,11 +145,25 @@ case_from "$GOOD" registry-source-bad-identity; rewrite "$ROOT/fixtures/registry
 case_from "$GOOD" registry-post-source-missing; rewrite "$ROOT/fixtures/registry-post-source-missing/references/tasaki-2020.tsv" 'NR==1 {print}'
 case_from "$GOOD" registry-post-source-alternate; rewrite "$ROOT/fixtures/registry-post-source-alternate/references/tasaki-2020.tsv" 'NR==2 {$1="OTHER"} {print}'
 case_from "$GOOD" registry-bootstrap-edition-pending; printf '%s\n' phase bootstrap > "$ROOT/fixtures/registry-bootstrap-edition-pending/registry/phase.tsv"; rewrite "$ROOT/fixtures/registry-bootstrap-edition-pending/references/tasaki-2020.tsv" 'NR==2 {$3="pending";$4="";$5="";$6="pending"} {print}'
-case_from "$GOOD" registry-bootstrap-source-frozen; printf '%s\n' phase bootstrap > "$ROOT/fixtures/registry-bootstrap-source-frozen/registry/phase.tsv"; for f in pages claims slices bindings axioms claim-axioms; do rewrite "$ROOT/fixtures/registry-bootstrap-source-frozen/registry/$f.tsv" 'NR==1 {print}'; done; rewrite "$ROOT/fixtures/registry-bootstrap-source-frozen/references/tasaki-2020.tsv" 'NR==2 {$6="pending"} {print}'
+case_from "$GOOD" registry-bootstrap-source-frozen; printf '%s\n' phase bootstrap > "$ROOT/fixtures/registry-bootstrap-source-frozen/registry/phase.tsv"; for f in pages claims slices bindings claim-context axioms claim-axioms statement-modules statement-imports; do rewrite "$ROOT/fixtures/registry-bootstrap-source-frozen/registry/$f.tsv" 'NR==1 {print}'; done; rewrite "$ROOT/fixtures/registry-bootstrap-source-frozen/references/tasaki-2020.tsv" 'NR==2 {$6="pending"} {print}'
+# Bootstrap carries no claim-derived registry at all, so every R4 and context
+# table stays header-only there too.
+BOOTSTRAP_ROWS=(
+  "claim-context:CL-TASAKI2020-0001\t1\tCL-TASAKI2020-0002\tassumption\tsame_item\tfixture"
+  "statement-modules:LatticeSystem.Claims.Front\tLatticeSystem/Claims/Front.lean\tleaf"
+  "statement-imports:LatticeSystem.Claims.Front\t1\tMathlib\ttrue\tfalse\tfalse"
+)
+for spec in "${BOOTSTRAP_ROWS[@]}"; do
+  table=${spec%%:*}
+  case_from "$ROOT/fixtures/registry-bootstrap-source-frozen" "registry-bootstrap-$table"
+  append_row "$ROOT/fixtures/registry-bootstrap-$table/registry/$table.tsv" "$(printf '%b' "${spec#*:}")"
+done
 case_from "$GOOD" registry-post-edition-pending; rewrite "$ROOT/fixtures/registry-post-edition-pending/references/tasaki-2020.tsv" 'NR==2 {$3="pending"} {print}'
 # R4 freeze: at skeleton capability a binding OID is a real object ID, because
 # the skeleton semantic checker treats PENDING as a wildcard.
-case_from "$GOOD" registry-skeleton-frozen; printf '%s\n' phase skeleton > "$ROOT/fixtures/registry-skeleton-frozen/registry/phase.tsv"
+case_from "$GOOD" registry-skeleton-frozen; printf '%s\n' phase skeleton > "$ROOT/fixtures/registry-skeleton-frozen/registry/phase.tsv"; rewrite "$ROOT/fixtures/registry-skeleton-frozen/registry/axioms.tsv" 'NR==2 {$8="3333333333333333333333333333333333333333"} {print}'
+case_from "$ROOT/fixtures/registry-skeleton-frozen" registry-skeleton-pending-axiom; rewrite "$ROOT/fixtures/registry-skeleton-pending-axiom/registry/axioms.tsv" 'NR==2 {$8="PENDING"} {print}'
+case_from "$ROOT/fixtures/registry-skeleton-frozen" registry-skeleton-bad-axiom-oid; rewrite "$ROOT/fixtures/registry-skeleton-bad-axiom-oid/registry/axioms.tsv" 'NR==2 {$8="not-an-object-id"} {print}'
 case_from "$ROOT/fixtures/registry-skeleton-frozen" registry-skeleton-pending-type; rewrite "$ROOT/fixtures/registry-skeleton-pending-type/registry/bindings.tsv" 'NR==2 {$7="PENDING"} {print}'
 case_from "$ROOT/fixtures/registry-skeleton-frozen" registry-skeleton-pending-value; rewrite "$ROOT/fixtures/registry-skeleton-pending-value/registry/bindings.tsv" 'NR==2 {$8="PENDING"} {print}'
 case_from "$ROOT/fixtures/registry-skeleton-frozen" registry-skeleton-pending-proof; rewrite "$ROOT/fixtures/registry-skeleton-pending-proof/registry/bindings.tsv" 'NR==2 {$11="PENDING"} {print}'
@@ -180,7 +194,7 @@ case_from "$ROOT/fixtures/registry-census-claim-count" registry-census-claim-ina
 case_from "$CENSUS" registry-census-claim-superseded; rewrite "$ROOT/fixtures/registry-census-claim-superseded/registry/claims.tsv" 'NR==2 {$13="CL-TASAKI2020-0002"} {print}'
 case_from "$CENSUS" registry-census-equation-duplicate; append_row "$ROOT/fixtures/registry-census-equation-duplicate/registry/claims.tsv" $'CL-TASAKI2020-0003\tTASAKI2020\t000001.0002\tPG-TASAKI2020-0001\tPDF p. 1; print p. NONE; NONE; equation (F.1)\tassertion\tequation\tDuplicate.\tPENDING\tNONE\tNONE\tfalse\tNONE\tNONE\tNONE'; rewrite "$ROOT/fixtures/registry-census-equation-duplicate/registry/claims.tsv" 'NR<=2 {print} NR==3 {later=$0} NR==4 {print; print later}'
 case_from "$CENSUS" registry-census-claims-empty; rewrite "$ROOT/fixtures/registry-census-claims-empty/registry/claims.tsv" 'NR==1 {print}'
-for pair in slices:SL-TASAKI2020-0001$'\t'1$'\t'CL-TASAKI2020-0001 dependencies:CL-TASAKI2020-0002$'\t'required_by$'\t'CL-TASAKI2020-0001$'\t'fixture bindings:CL-TASAKI2020-0001$'\t'LatticeSystem.Claims.Front.statement0001$'\t'LatticeSystem.Claims.Front.claim0001$'\t'LatticeSystem.Claims.Front$'\t'definition$'\t'proof_proposition$'\t'PENDING$'\t'PENDING$'\t'proof_stub$'\t'theorem$'\t'PENDING$'\t'NONE$'\t'NONE$'\t'NONE$'\t'CENSUS-FIXTURE-REVIEW axioms:AX-PROJECT-0002$'\t'LatticeSystem.Axioms.State.fixture$'\t'LatticeSystem.Axioms.State$'\t'state$'\t'not-applicable$'\t'rationale$'\t'reopen statement-modules:LatticeSystem.Claims.Front$'\t'LatticeSystem/Claims/Front.lean$'\t'leaf; do
+for pair in slices:SL-TASAKI2020-0001$'\t'1$'\t'CL-TASAKI2020-0001 dependencies:CL-TASAKI2020-0002$'\t'required_by$'\t'CL-TASAKI2020-0001$'\t'fixture bindings:CL-TASAKI2020-0001$'\t'LatticeSystem.Claims.Front.statement0001$'\t'LatticeSystem.Claims.Front.claim0001$'\t'LatticeSystem.Claims.Front$'\t'definition$'\t'proof_proposition$'\t'PENDING$'\t'PENDING$'\t'proof_stub$'\t'theorem$'\t'PENDING$'\t'NONE$'\t'NONE$'\t'NONE$'\t'CENSUS-FIXTURE-REVIEW axioms:AX-PROJECT-0002$'\t'LatticeSystem.Axioms.State.fixture$'\t'LatticeSystem.Axioms.State$'\t'state$'\t'not-applicable$'\t'rationale$'\t'reopen$'\t'PENDING statement-modules:LatticeSystem.Claims.Front$'\t'LatticeSystem/Claims/Front.lean$'\t'leaf; do
   table=${pair%%:*}; row=${pair#*:}; name=registry-census-skeleton-$table; case_from "$CENSUS" "$name"; append_row "$ROOT/fixtures/$name/registry/$table.tsv" "$row"
 done
 append_row "$ROOT/fixtures/registry-census-skeleton-slices/registry/slices.tsv" $'SL-TASAKI2020-0001\t2\tCL-TASAKI2020-0002'
@@ -287,12 +301,21 @@ expect_fail post-source-missing "$ROOT/scripts/check-registry.sh" "$ROOT/fixture
 expect_fail post-source-alternate "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-post-source-alternate"
 expect_fail bootstrap-pending-edition "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-bootstrap-edition-pending"
 expect_pass bootstrap-source-frozen "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-bootstrap-source-frozen"
+for spec in "${BOOTSTRAP_ROWS[@]}"; do
+  table=${spec%%:*}
+  expect_fail "bootstrap-$table" --diagnostic "bootstrap requires header-only $table.tsv" \
+    "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-bootstrap-$table"
+done
 expect_fail post-pending-edition "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-post-edition-pending"
 expect_pass skeleton-frozen-oids "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-skeleton-frozen"
 for column in type value proof nonvacuity; do
   expect_fail "skeleton-pending-$column" --diagnostic "skeleton capability forbids pending binding OIDs" \
     "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-skeleton-pending-$column"
 done
+expect_fail skeleton-pending-axiom --diagnostic "skeleton capability forbids pending axiom OIDs" \
+  "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-skeleton-pending-axiom"
+expect_fail skeleton-bad-axiom-oid --diagnostic "bad axiom type OID" \
+  "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-skeleton-bad-axiom-oid"
 expect_fail source-mixed-oid-width "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-source-mixed-width"
 "$PROJECT_ROOT/scripts/test-tree-policy.sh" "$PROJECT_ROOT"
 census_source_diagnostic="check-census: fixture source is not verified and frozen"

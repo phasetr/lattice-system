@@ -876,7 +876,7 @@ expect_fail successor-oid-stale "new correction successor content OID is stale" 
 
 clone_case "$RECLASSIFY" "$CASES/axiom-artifact"
 printf '%s\n' \
-  $'AX-PROJECT-9001\tLatticeSystem.Axioms.ContentlessPredicate.correctionAxiom\tLatticeSystem.Axioms.ContentlessPredicate\tcontentless_predicate\tTASAKI2020\tcorrection-surrogate\treplace-with-source-content' \
+  $'AX-PROJECT-9001\tLatticeSystem.Axioms.ContentlessPredicate.correctionAxiom\tLatticeSystem.Axioms.ContentlessPredicate\tcontentless_predicate\tTASAKI2020\tcorrection-surrogate\treplace-with-source-content\tPENDING' \
   >> "$CASES/axiom-artifact/registry/axioms.tsv"
 printf '%s\n' $'CL-TASAKI2020-0001\tAX-PROJECT-9001' \
   >> "$CASES/axiom-artifact/registry/claim-axioms.tsv"

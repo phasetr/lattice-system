@@ -40,7 +40,7 @@ check_table "$REG/slices.tsv" $'slice_id\tposition\tclaim_id' 3
 check_table "$REG/dependencies.tsv" $'claim_id\trole\ttarget_claim_id\trationale' 4
 check_table "$REG/bindings.tsv" $'claim_id\tstatement_decl\tproof_decl\tmodule\tstatement_kind\tstatement_shape\tstatement_type_oid\tstatement_value_oid\timplementation_status\tproof_kind\tproof_type_oid\tproof_value_oid\tnonvacuity_decl\tnonvacuity_oid\treview_ref' 15
 check_table "$REG/claim-context.tsv" $'claim_id\tposition\tsetup_claim_id\tuse_kind\tscope\treview_ref' 6
-check_table "$REG/axioms.tsv" $'axiom_id\tdeclaration\tmodule\tcategory\tsource_locator\trationale\treopen_condition' 7
+check_table "$REG/axioms.tsv" $'axiom_id\tdeclaration\tmodule\tcategory\tsource_locator\trationale\treopen_condition\taxiom_type_oid' 8
 check_table "$REG/claim-axioms.tsv" $'claim_id\taxiom_id' 2
 check_table "$REG/claim-vocabulary-review.tsv" $'claim_id\tbasis\treview_ref' 3
 check_table "$REG/vocabulary.tsv" $'vocabulary_id\tdeclaration\tmodule\tdeclaration_kind\torigin\tparent_vocabulary_id\ttype_oid\tdeclaration_oid\tdesign_role\tfiniteness_scope' 10
@@ -57,6 +57,14 @@ fi
 [[ $(awk 'END { print NR }' "$REG/phase.tsv") -eq 2 ]] || fail "phase.tsv must have exactly one data row"
 { IFS= read -r _; IFS= read -r phase; } < "$REG/phase.tsv"
 case "$phase" in bootstrap|census|vocabulary|skeleton|proof) ;; *) fail "bad phase: $phase" ;; esac
+# A bootstrap tree carries no claim-derived registry at all. This runs before
+# the per-table semantics so that a stray row is reported as the phase
+# violation it is rather than as a downstream foreign-key failure.
+if [[ "$phase" == bootstrap ]]; then
+  for table in pages claims slices dependencies bindings claim-context axioms claim-axioms claim-vocabulary-review vocabulary claim-vocabulary modules imports statement-modules statement-imports; do
+    [[ $(awk 'END { print NR }' "$REG/$table.tsv") -eq 1 ]] || fail "bootstrap requires header-only $table.tsv"
+  done
+fi
 for file in "$REG/pages.tsv" "$REG/claims.tsv" "$REG/bindings.tsv" "$REG/axioms.tsv" "$REG/claim-vocabulary-review.tsv" "$REG/vocabulary.tsv" "$REG/modules.tsv" "$REG/statement-modules.tsv" "$SOURCE"; do
   LC_ALL=C awk -F '\t' 'NR > 1 && seen[$1]++ { print FILENAME ": duplicate first-column ID " $1 > "/dev/stderr"; bad=1 } END { exit bad }' "$file" || exit 1
 done
@@ -241,9 +249,11 @@ LC_ALL=C awk -F '\t' '
 ' "$REG/claims.tsv" "$REG/item-claims.tsv" "$REG/claim-context.tsv" || exit 1
 fi
 LC_ALL=C awk -F '\t' '
+  function oid(s) { return s ~ /^[0-9a-f]+$/ && (length(s)==40 || length(s)==64) }
   FNR == 1 { next }
   $1 !~ /^AX-[A-Z0-9_]+-[0-9][0-9][0-9][0-9]$/ { bad("bad axiom ID " $1) }
   $2 == "" || $3 == "" || $5 == "" || $6 == "" || $7 == "" { bad("empty axiom field") }
+  $8 != "PENDING" && !oid($8) { bad("bad axiom type OID " $1) }
   $4 !~ /^(abstract_cstar|state|gns|kms|weak_dual|wigner|contentless_predicate)$/ { bad("bad axiom category " $4) }
   {
     suffix=$4=="abstract_cstar" ? "AbstractCStar" : $4=="state" ? "State" : $4=="gns" ? "GNS" : $4=="kms" ? "KMS" : $4=="weak_dual" ? "WeakDual" : $4=="wigner" ? "Wigner" : "ContentlessPredicate"
@@ -430,17 +440,17 @@ if [[ "$phase" == vocabulary ]]; then
   fi
 fi
 
-# R4 freeze means every registered binding OID is a real object ID. The skeleton
-# semantic checker treats `PENDING` as a wildcard, so the ban lives here.
+# R4 freeze means every registered binding and axiom OID is a real object ID.
+# The skeleton semantic checker treats `PENDING` as a wildcard, so the ban lives
+# here.
 if [[ "$phase" == skeleton || "$phase" == proof ]]; then
   awk -F '\t' 'FNR>1 && ($7=="PENDING" || $8=="PENDING" || $11=="PENDING" || $14=="PENDING") { bad=1 } END { exit bad }' \
     "$REG/bindings.tsv" || fail "$phase capability forbids pending binding OIDs"
+  awk -F '\t' 'FNR>1 && $8=="PENDING" { bad=1 } END { exit bad }' \
+    "$REG/axioms.tsv" || fail "$phase capability forbids pending axiom OIDs"
 fi
 
 if [[ "$phase" == bootstrap ]]; then
-  for table in pages claims slices dependencies bindings axioms claim-axioms claim-vocabulary-review vocabulary claim-vocabulary modules imports; do
-    [[ $(awk 'END { print NR }' "$REG/$table.tsv") -eq 1 ]] || fail "bootstrap requires header-only $table.tsv"
-  done
   if [[ "$MULTI_SOURCE" -eq 0 ]]; then
   awk -F '\t' '
     function edition(s, lower) {

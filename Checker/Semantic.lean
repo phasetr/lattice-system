@@ -138,14 +138,15 @@ meta def valueExpr? : ConstantInfo → Option Expr
 /--
 Collect constants used in binder domains of an expression. For propositions,
 this records constants used as explicit antecedents or dependent hypotheses.
+A `let` supplies a value rather than an assumption, so neither its ascribed
+type nor its value is an antecedent and only its body is traversed.
 -/
 meta partial def binderDomainConstants : Expr → Array Name
   | .forallE _ domain body _ =>
       domain.getUsedConstants ++ binderDomainConstants body
   | .lam _ domain body _ =>
       domain.getUsedConstants ++ binderDomainConstants body
-  | .letE _ type value body _ =>
-      type.getUsedConstants ++ value.getUsedConstants ++ binderDomainConstants body
+  | .letE _ _ _ body _ => binderDomainConstants body
   | .mdata _ expr => binderDomainConstants expr
   | _ => #[]
 

@@ -174,6 +174,21 @@ else
   compare_columns registry/claims.tsv '2,3,4,5,6,7,8,10,11,12,13,14,15' 'identity/order/locator/content/exclusion/supersession'
 fi
 compare_columns registry/axioms.tsv '2,3,4,5,6,7' 'identity/locator/declaration'
+AXIOMS_HEADER=$'axiom_id\tdeclaration\tmodule\tcategory\tsource_locator\trationale\treopen_condition\taxiom_type_oid'
+if [[ $(base_file registry/axioms.tsv | head -n 1) == "$AXIOMS_HEADER" ]]; then
+  awk -F '\t' '
+    function validOid(s) { return s ~ /^[0-9a-f]+$/ && (length(s)==40 || length(s)==64) }
+    NR == FNR { if (FNR > 1) oid[$1]=$8; next }
+    FNR > 1 && ($1 in oid) {
+      if (oid[$1]=="PENDING") { if ($8!="PENDING" && !validOid($8)) bad=1 }
+      else if (!validOid(oid[$1]) || $8!=oid[$1]) bad=1
+    }
+    END { if (bad) print "axiom type OID regressed" > "/dev/stderr"; exit bad }
+  ' <(base_file registry/axioms.tsv) "$CURRENT_DIR/registry/axioms.tsv" || fail "axiom type OID regression"
+else
+  [[ $(base_file registry/axioms.tsv | awk 'END { print NR }') -eq 1 ]] ||
+    fail "base axioms.tsv carries rows under an unsupported schema"
+fi
 if [[ "$CORRECTION_REPLAY" -eq 0 ]]; then compare_columns registry/claim-vocabulary-review.tsv '2,3' 'vocabulary review'; fi
 compare_columns registry/vocabulary.tsv '2,3,4,5,6,9,10' 'declaration/module/kind/origin/parent/design/finiteness'
 compare_columns registry/modules.tsv '2,3' 'source path/role'
@@ -273,12 +288,14 @@ if [[ $(base_file registry/bindings.tsv | head -n 1) != "$BINDINGS_HEADER" ]]; t
   [[ $(base_file registry/bindings.tsv | awk 'END { print NR }') -eq 1 ]] ||
     fail "base bindings.tsv carries rows under an unsupported schema"
 fi
-# Every frozen binding column is compared. `proof_value_oid` is deliberately
-# absent: R5 rewrites exactly that column when a stub is discharged.
+# Every frozen binding column is compared exactly except `proof_value_oid`:
+# R5 rewrites that one column when a stub is discharged. It is still monotone,
+# so a real object ID may become another real object ID but never returns to the
+# unresolved `NONE` that the skeleton checker reads as an open hole.
 awk -F '\t' '
   function fixed(s) { return s!="" && s!="NONE" }
   function frozen(old, current, id) { if (fixed(old) && old!="PENDING" && old!=current) drift(id) }
-  NR == FNR { if (FNR > 1) { statement[$1]=$2; proof[$1]=$3; module[$1]=$4; kind[$1]=$5; shape[$1]=$6; typeOid[$1]=$7; valueOid[$1]=$8; status[$1]=$9; proofKind[$1]=$10; proofType[$1]=$11; nonvac[$1]=$13; nonvacOid[$1]=$14 } next }
+  NR == FNR { if (FNR > 1) { statement[$1]=$2; proof[$1]=$3; module[$1]=$4; kind[$1]=$5; shape[$1]=$6; typeOid[$1]=$7; valueOid[$1]=$8; status[$1]=$9; proofKind[$1]=$10; proofType[$1]=$11; proofValue[$1]=$12; nonvac[$1]=$13; nonvacOid[$1]=$14 } next }
   FNR > 1 {
     seen[$1]=1
     if ($1 in statement) {
@@ -286,11 +303,13 @@ awk -F '\t' '
       frozen(proof[$1], $3, $1); frozen(kind[$1], $5, $1); frozen(shape[$1], $6, $1)
       frozen(typeOid[$1], $7, $1); frozen(valueOid[$1], $8, $1); frozen(status[$1], $9, $1)
       frozen(proofKind[$1], $10, $1); frozen(proofType[$1], $11, $1)
+      if (fixed(proofValue[$1]) && proofValue[$1]!="PENDING" && !fixed($12)) regress($1)
       frozen(nonvac[$1], $13, $1); frozen(nonvacOid[$1], $14, $1)
     }
   }
   END { for (id in statement) if (!(id in seen)) drift(id); exit bad }
   function drift(id) { print "binding disappeared or identity drifted " id > "/dev/stderr"; bad=1 }
+  function regress(id) { print "proof value regressed to an unresolved hole " id > "/dev/stderr"; bad=1 }
 ' <(base_file registry/bindings.tsv) "$CURRENT_DIR/registry/bindings.tsv" || fail "binding regression"
 
 if [[ "$MULTI_CURRENT" -eq 0 ]]; then

@@ -18,7 +18,7 @@ write_headers() {
   printf '%s\n' $'claim_id\tposition\tsetup_claim_id\tuse_kind\tscope\treview_ref' > "$reg/claim-context.tsv"
   printf '%s\n' $'module\tsource_path\trole' > "$reg/statement-modules.tsv"
   printf '%s\n' $'module\tposition\timported_module\tis_exported\tis_meta\timport_all' > "$reg/statement-imports.tsv"
-  printf '%s\n' 'axiom_id	declaration	module	category	source_locator	rationale	reopen_condition' > "$reg/axioms.tsv"
+  printf '%s\n' 'axiom_id	declaration	module	category	source_locator	rationale	reopen_condition	axiom_type_oid' > "$reg/axioms.tsv"
   printf '%s\n' 'claim_id	axiom_id' > "$reg/claim-axioms.tsv"
   printf '%s\n' 'claim_id	basis	review_ref' > "$reg/claim-vocabulary-review.tsv"
   printf '%s\n' 'vocabulary_id	declaration	module	declaration_kind	origin	parent_vocabulary_id	type_oid	declaration_oid	design_role	finiteness_scope' > "$reg/vocabulary.tsv"

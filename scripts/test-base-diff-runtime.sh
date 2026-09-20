@@ -199,6 +199,20 @@ rewrite "$TOKEN_MIGRATION_BASE/registry/claim-vocabulary-review.tsv" \
 rewrite "$TOKEN_MIGRATION_BASE/registry/source-progress.tsv" \
   'NR>1 {$3="R3-INDEPENDENT-REVIEW-P0"} {print}'
 
+# R5 rewrites `proof_value_oid` and nothing else in a binding, so that column is
+# monotone: a discharged proof may be rewritten but never returns to the
+# unresolved `NONE` that the skeleton checker reads as an open hole.
+BINDING_HEADER=$'claim_id\tstatement_decl\tproof_decl\tmodule\tstatement_kind\tstatement_shape\tstatement_type_oid\tstatement_value_oid\timplementation_status\tproof_kind\tproof_type_oid\tproof_value_oid\tnonvacuity_decl\tnonvacuity_oid\treview_ref'
+BINDING_ROW=$'CL-TASAKI2020-0001\tLatticeSystem.Claims.Front.statement0001\tLatticeSystem.Claims.Front.claim0001\tLatticeSystem.Claims.Front\tdefinition\tproof_proposition\taaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\tbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\tproof_stub\ttheorem\tcccccccccccccccccccccccccccccccccccccccc\tdddddddddddddddddddddddddddddddddddddddd\tNONE\tNONE\tRUNTIME-REVIEW'
+PROOF_VALUE_BASE="$CASES/proof-value-base"
+clone_production "$PROOF_VALUE_BASE"
+printf '%s\n' "$BINDING_HEADER" "$BINDING_ROW" > "$PROOF_VALUE_BASE/registry/bindings.tsv"
+clone_case "$PROOF_VALUE_BASE" "$CASES/proof-value-rewritten"
+rewrite "$CASES/proof-value-rewritten/registry/bindings.tsv" \
+  'NR==2 {$12="eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"} {print}'
+clone_case "$PROOF_VALUE_BASE" "$CASES/proof-value-reopened"
+rewrite "$CASES/proof-value-reopened/registry/bindings.tsv" 'NR==2 {$12="NONE"} {print}'
+
 clone_production "$CASES/review-ref-arbitrary"
 rewrite "$CASES/review-ref-arbitrary/registry/claim-vocabulary-review.tsv" \
   'NR==2 {$3="ARBITRARY-REVIEW-REF"} {print}'
@@ -260,6 +274,11 @@ expect_pass review-token-migration-positive \
   "$CHECK_BASE_DIFF" --fixture-dirs "$TOKEN_MIGRATION_BASE" "$TMP/production"
 expect_fail review-ref-arbitrary-reject --diagnostic "vocabulary review" \
   "$CHECK_BASE_DIFF" --fixture-dirs "$TMP/production" "$CASES/review-ref-arbitrary"
+
+expect_pass proof-value-rewritten \
+  "$CHECK_BASE_DIFF" --fixture-dirs "$PROOF_VALUE_BASE" "$CASES/proof-value-rewritten"
+expect_fail proof-value-reopened --diagnostic "proof value regressed to an unresolved hole" \
+  "$CHECK_BASE_DIFF" --fixture-dirs "$PROOF_VALUE_BASE" "$CASES/proof-value-reopened"
 
 expect_fail invalid-base-ref \
   "$CHECK_BASE_DIFF" "$PROJECT_ROOT" refs/heads/runtime-base-ref-that-does-not-exist

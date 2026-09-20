@@ -16,6 +16,9 @@ else
   ROOT=${1:-$PROJECT_ROOT}
 fi
 ROOT=$(cd "$ROOT" && pwd) || fail "invalid root"
+# The semantic checker is the tool under test in the mutation suite, so an
+# alternate copy is accepted only for an explicit, repository-external fixture.
+CHECKER_ROOT=$PROJECT_ROOT
 if [[ $FIXTURE -eq 1 ]]; then
   [[ -n "${LATTICE_TEST_ROOT:-}" ]] || fail "fixture mode requires LATTICE_TEST_ROOT"
   TEST_ROOT=$(cd "$LATTICE_TEST_ROOT" && pwd) || fail "invalid LATTICE_TEST_ROOT"
@@ -23,16 +26,22 @@ if [[ $FIXTURE -eq 1 ]]; then
   [[ "$TEST_ROOT" != / ]] || fail "LATTICE_TEST_ROOT must not contain the repository"
   case "$PROJECT_ROOT" in "$TEST_ROOT"|"$TEST_ROOT"/*) fail "LATTICE_TEST_ROOT must not contain the repository" ;; esac
   case "$ROOT/" in "$TEST_ROOT/"*) ;; *) fail "fixture root must be below LATTICE_TEST_ROOT" ;; esac
+  if [[ -n "${LATTICE_SKELETON_CHECKER_DIR:-}" ]]; then
+    CHECKER_ROOT=$(cd "$LATTICE_SKELETON_CHECKER_DIR" && pwd) || fail "invalid LATTICE_SKELETON_CHECKER_DIR"
+    case "$CHECKER_ROOT/" in "$TEST_ROOT/"*) ;; *) fail "fixture checker must be below LATTICE_TEST_ROOT" ;; esac
+  fi
 else
   [[ $(git -C "$ROOT" rev-parse --show-toplevel 2>/dev/null) == "$ROOT" ]] ||
     fail "ROOT must be repository top; fixture mode is explicit"
+  [[ -z "${LATTICE_SKELETON_CHECKER_DIR:-}" ]] || fail "production run cannot substitute the semantic checker"
 fi
 
 REG=$ROOT/registry
-for table in phase sources source-progress claims item-claims bindings dependencies claim-context axioms claim-axioms modules imports statement-modules statement-imports; do
+for table in phase sources source-progress claims item-claims bindings dependencies claim-context axioms claim-axioms vocabulary modules imports statement-modules statement-imports; do
   [[ -f "$REG/$table.tsv" ]] || fail "missing registry/$table.tsv"
 done
 [[ $(head -n 1 "$REG/bindings.tsv") == $'claim_id\tstatement_decl\tproof_decl\tmodule\tstatement_kind\tstatement_shape\tstatement_type_oid\tstatement_value_oid\timplementation_status\tproof_kind\tproof_type_oid\tproof_value_oid\tnonvacuity_decl\tnonvacuity_oid\treview_ref' ]] || fail "bad bindings.tsv header"
+[[ $(head -n 1 "$REG/axioms.tsv") == $'axiom_id\tdeclaration\tmodule\tcategory\tsource_locator\trationale\treopen_condition\taxiom_type_oid' ]] || fail "bad axioms.tsv header"
 
 [[ $(awk 'END{print NR}' "$REG/phase.tsv") -eq 2 ]] || fail "phase.tsv must have exactly one data row"
 { IFS= read -r _; IFS= read -r PHASE; } < "$REG/phase.tsv"
@@ -72,9 +81,9 @@ LEAN=$(elan which lean)
 BASE_LEAN_PATH=$(cd "$PROJECT_ROOT" && lake env printenv LEAN_PATH)
 export LEAN_PATH="$TMP:$BASE_LEAN_PATH"
 mkdir -p "$TMP/Checker"
-"$LEAN" --root="$PROJECT_ROOT" "$PROJECT_ROOT/Checker/Semantic.lean" -o "$TMP/Checker/Semantic.olean" >/dev/null ||
+"$LEAN" --root="$CHECKER_ROOT" "$CHECKER_ROOT/Checker/Semantic.lean" -o "$TMP/Checker/Semantic.olean" >/dev/null ||
   fail "failed to compile shared semantic checker"
-"$LEAN" --root="$PROJECT_ROOT" "$PROJECT_ROOT/Checker/Skeleton.lean" -o "$TMP/Checker/Skeleton.olean" >/dev/null ||
+"$LEAN" --root="$CHECKER_ROOT" "$CHECKER_ROOT/Checker/Skeleton.lean" -o "$TMP/Checker/Skeleton.olean" >/dev/null ||
   fail "failed to compile skeleton semantic checker"
 
 awk -F '\t' 'FNR>1{print $1 "\t" $2 "\t" $3}' "$REG/modules.tsv" "$REG/statement-modules.tsv" > "$TMP/modules.tsv"
@@ -122,8 +131,8 @@ done
 
 mkdir -p "$TMP/types" "$TMP/values"
 awk -F '\t' -v td="$TMP/types" -v vd="$TMP/values" '$1=="D"{
-  n++;print n "\t" $2 "\t" $3 "\t" $4 "\t" $5 "\t" $6 "\t" $7 "\t" $8 "\t" $9 "\t" $10 "\t" $11 "\t" $12 "\t" $13 "\t" $14 "\t" $15
-  printf "%s",$16 > (td "/" n);printf "%s",$17 > (vd "/" n)
+  n++;print n "\t" $2 "\t" $3 "\t" $4 "\t" $5 "\t" $6 "\t" $7 "\t" $8 "\t" $9 "\t" $10 "\t" $11 "\t" $12 "\t" $13 "\t" $14 "\t" $15 "\t" $16 "\t" $17
+  printf "%s",$18 > (td "/" n);printf "%s",$19 > (vd "/" n)
 }' "$TMP/environment.tsv" > "$TMP/declaration-index.tsv"
 : > "$TMP/actual.tsv"
 while IFS= read -r index; do
@@ -131,15 +140,21 @@ while IFS= read -r index; do
   value_oid=$(git -C "$PROJECT_ROOT" hash-object "$TMP/values/$index")
   printf '%s\t%s\t%s\n' "$index" "$type_oid" "$value_oid" >> "$TMP/declaration-oids.tsv"
 done < <(cut -f1 "$TMP/declaration-index.tsv")
-awk -F '\t' 'BEGIN{OFS="\t"}NR==FNR{toid[$1]=$2;void[$1]=$3;next}{print $2,$3,$4,toid[$1],void[$1],$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15}' \
+awk -F '\t' 'BEGIN{OFS="\t"}NR==FNR{toid[$1]=$2;void[$1]=$3;next}{print $2,$3,$4,toid[$1],void[$1],$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17}' \
   "$TMP/declaration-oids.tsv" "$TMP/declaration-index.tsv" > "$TMP/actual.tsv"
+# Registry OIDs are authored from this environment, so the computed table is
+# exported on request. The export is write-only and changes no decision below.
+if [[ -n "${LATTICE_SKELETON_ACTUAL_OUT:-}" ]]; then
+  cp "$TMP/actual.tsv" "$LATTICE_SKELETON_ACTUAL_OUT" || fail "cannot export the actual declaration table"
+fi
 
 awk -F '\t' 'BEGIN{OFS="\t"}NR>1{
   print $4,$2,$5,$7,$8,"statement",$1,$6
   if($3!="NONE")print $4,$3,$10,$11,$12,"proof",$1,$6
   if($13!="NONE")print $4,$13,"theorem",$14,"NONE","nonvacuity",$1,$6
 }' "$REG/bindings.tsv" > "$TMP/expected.tsv"
-awk -F '\t' 'BEGIN{OFS="\t"}NR>1{print $3,$2,"axiom","ANY","ANY","axiom",$1,"axiom"}' "$REG/axioms.tsv" >> "$TMP/expected.tsv"
+# An axiom carries no kernel value, so only its frozen type OID is comparable.
+awk -F '\t' 'BEGIN{OFS="\t"}NR>1{print $3,$2,"axiom",$8,"NONE","axiom",$1,"axiom"}' "$REG/axioms.tsv" >> "$TMP/expected.tsv"
 
 awk -F '\t' '
   NR==FNR{key=$1 SUBSEP $2;if(seen[key]++)bad("duplicate registered declaration " $2);kind[key]=$3;toid[key]=$4;void[key]=$5;role[key]=$6;next}
@@ -151,57 +166,77 @@ awk -F '\t' '
   function bad(s){print s > "/dev/stderr";failed=1}
 ' "$TMP/expected.tsv" "$TMP/actual.tsv" || fail "declaration registry/environment mismatch"
 
-# Column 6 is `Meta.isProp` of the declaration type and column 14 is
+# Column 6 is `Meta.isProp` of the declaration type and column 15 is
 # `Meta.isProp` of its value. A primary statement carries the proposition as its
-# value, so only column 14 can witness a `proof_proposition` shape.
+# value, so only column 15 can witness a `proof_proposition` shape. Column 18
+# names the declaration type when it is exactly a constant, which is how a proof
+# obligation is pinned to its bound statement rather than to a weakening of it.
 awk -F '\t' '
-  FILENAME==ARGV[1]{if(FNR>1){statement[$2]=$1;shape[$2]=$6;if($3!="NONE"){proof[$3]=$1;target[$3]=$2;unresolved[$3]=($12=="NONE")};if($13!="NONE")nonvac[$13]=$1}next}
+  FILENAME==ARGV[1]{if(FNR>1){statement[$2]=$1;shape[$2]=$6;if($3!="NONE"){proof[$3]=$1;target[$3]=$2;unresolved[$3]=($12=="NONE")};if($13!="NONE"){nonvac[$13]=$1;witnessed[$13]=$2}}next}
   {
     d=$2;direct=$7+0;trans=$8
     if(d in statement){
       if(direct||trans=="true")bad("primary statement depends on sorryAx " d)
-      if($13=="true")bad("literal True primary statement " d)
-      if(shape[d]=="proof_proposition"&&$14!="true")bad("proof proposition is not Prop-valued " d)
+      if($14=="true")bad("literal True primary statement " d)
+      if(shape[d]=="proof_proposition"&&$15!="true")bad("proof proposition is not Prop-valued " d)
     }else if(d in proof){
       if($6!="true")bad("proof declaration is not Prop-valued " d)
-      n=split($9,a,",");found=0;for(i=1;i<=n;i++)if(a[i]==target[d])found=1
-      if(!found)bad("proof type does not reference bound primary " d)
+      if($18!=target[d])bad("proof type is not exactly the bound primary statement " d " expected=" target[d] " actual=" $18)
       if(unresolved[d]&&(direct!=1||trans!="true"))bad(direct==0&&trans=="true"?"hidden or transitive-only sorryAx " d:"proof stub needs exactly one direct sorryAx " d)
       if(!unresolved[d]&&(direct||trans=="true"))bad("completed proof depends on sorryAx " d)
     }else if(d in nonvac){
       if(direct||trans=="true")bad("nonvacuity declaration depends on sorryAx " d)
-      if($15=="true")bad("nonvacuity declaration concludes True " d)
-      if($16=="true")bad("nonvacuity declaration restates its own hypothesis " d)
+      if($16=="true")bad("nonvacuity declaration concludes True " d)
+      if($17=="true")bad("nonvacuity declaration follows from its own hypotheses " d)
+      n=split($9,a,",");found=0;for(i=1;i<=n;i++)if(a[i]==witnessed[d])found=1
+      if(!found)bad("nonvacuity declaration does not reference its bound statement " d)
     }
     else if(direct||trans=="true")bad("unregistered sorryAx declaration " d)
   }
   END{exit failed} function bad(s){print s > "/dev/stderr";failed=1}
 ' "$REG/bindings.tsv" "$TMP/actual.tsv" || fail "primary/proof-hole bijection failed"
 
-# Actual primary references to other claim statements must be admitted by the
-# reviewed context or dependency registry and must target an earlier claim.
-# Claim rows are in global source order, so row order is the order key.
-# Assumption context edges must occur in a binder domain/antecedent.
+# Every project constant a primary statement uses must be registered vocabulary
+# or another claim statement. References to other claim statements must in turn
+# be admitted by the reviewed context or dependency registry. Claim rows are in
+# global source order, so row order is the order key; a `required_by` edge is
+# the reviewed exception that deliberately pulls a later claim forward.
+# Assumption context edges must occur in a binder domain/antecedent, which for a
+# definitional binding lives in the declaration type rather than in its value.
 awk -F '\t' '
+  function root(s,  cut){cut=index(s,".");return cut?substr(s,1,cut-1):s}
   FILENAME==ARGV[1]{if(FNR>1)sequence[$1]=++claims;next}
-  FILENAME==ARGV[2]{if(FNR>1)claimOf[$2]=$1;next}
-  FILENAME==ARGV[3]{if(FNR>1){context[$1 SUBSEP $3]=$4;admitted[$1 SUBSEP $3]=1}next}
-  FILENAME==ARGV[4]{if(FNR>1){if($2=="required_by")admitted[$3 SUBSEP $1]=1;else admitted[$1 SUBSEP $3]=1}next}
+  FILENAME==ARGV[2]{if(FNR>1){claimOf[$2]=$1;registered[$2]=1}next}
+  FILENAME==ARGV[3]{if(FNR>1)registered[$2]=1;next}
+  FILENAME==ARGV[4]{if(FNR>1){context[$1 SUBSEP $3]=$4;admitted[$1 SUBSEP $3]=1}next}
+  FILENAME==ARGV[5]{if(FNR>1){if($2=="required_by"){admitted[$3 SUBSEP $1]=1;forward[$3 SUBSEP $1]=1}else admitted[$1 SUBSEP $3]=1}next}
+  FILENAME==ARGV[6]||FILENAME==ARGV[7]{if(FNR>1)project[root($1)]=1;next}
   {
-    if($2 in claimOf){owner=claimOf[$2];n=split($10,a,",");for(i=1;i<=n;i++)if(a[i] in claimOf&&claimOf[a[i]]!=owner)actual[owner SUBSEP claimOf[a[i]]]=1
-      n=split($12,g,",");for(i=1;i<=n;i++)if(g[i] in claimOf)guard[owner SUBSEP claimOf[g[i]]]=1}
+    if($2 in claimOf){
+      owner=claimOf[$2]
+      n=split($9 "," $10,a,",")
+      for(i=1;i<=n;i++){
+        if(a[i]=="")continue
+        if(a[i] in claimOf&&claimOf[a[i]]!=owner)actual[owner SUBSEP claimOf[a[i]]]=1
+        if((root(a[i]) in project)&&a[i]!=$2&&!(a[i] in registered))bad("primary statement uses an unregistered project constant " a[i])
+      }
+      n=split($12 "," $13,g,",")
+      for(i=1;i<=n;i++)if(g[i] in claimOf)guard[owner SUBSEP claimOf[g[i]]]=1
+    }
   }
   END{
     for(k in context){if(!(k in actual))bad("registered context is absent from statement " k);if(context[k]=="assumption"&&!(k in guard))bad("assumption context is not a binder or antecedent " k)}
     for(k in actual){
       split(k,edge,SUBSEP)
       if(!(k in admitted))bad("actual setup reference lacks claim-context or dependency " k)
+      else if(k in forward){if(sequence[edge[2]]<=sequence[edge[1]])bad("required_by reference does not pull a later claim forward " k)}
       else if(sequence[edge[2]]>=sequence[edge[1]])bad("statement references a claim that is not earlier " k)
     }
     exit failed
   }
   function bad(s){print s > "/dev/stderr";failed=1}
-' "$REG/claims.tsv" "$REG/bindings.tsv" "$REG/claim-context.tsv" "$REG/dependencies.tsv" "$TMP/actual.tsv" ||
+' "$REG/claims.tsv" "$REG/bindings.tsv" "$REG/vocabulary.tsv" "$REG/claim-context.tsv" \
+  "$REG/dependencies.tsv" "$REG/modules.tsv" "$REG/statement-modules.tsv" "$TMP/actual.tsv" ||
   fail "claim-context semantic mismatch"
 
 awk -F '\t' '

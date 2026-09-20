@@ -38,7 +38,7 @@ check_table "$REG/slices.tsv" $'slice_id\tposition\tclaim_id' 3
 check_table "$REG/dependencies.tsv" $'claim_id\trole\ttarget_claim_id\trationale' 4
 check_table "$REG/bindings.tsv" $'claim_id\tstatement_decl\tproof_decl\tmodule\tstatement_kind\tstatement_shape\tstatement_type_oid\tstatement_value_oid\timplementation_status\tproof_kind\tproof_type_oid\tproof_value_oid\tnonvacuity_decl\tnonvacuity_oid\treview_ref' 15
 check_table "$REG/claim-context.tsv" $'claim_id\tposition\tsetup_claim_id\tuse_kind\tscope\treview_ref' 6
-check_table "$REG/axioms.tsv" $'axiom_id\tdeclaration\tmodule\tcategory\tsource_locator\trationale\treopen_condition' 7
+check_table "$REG/axioms.tsv" $'axiom_id\tdeclaration\tmodule\tcategory\tsource_locator\trationale\treopen_condition\taxiom_type_oid' 8
 check_table "$REG/claim-axioms.tsv" $'claim_id\taxiom_id' 2
 check_table "$REG/claim-vocabulary-review.tsv" $'claim_id\tbasis\treview_ref' 3
 check_table "$REG/vocabulary.tsv" $'vocabulary_id\tdeclaration\tmodule\tdeclaration_kind\torigin\tparent_vocabulary_id\ttype_oid\tdeclaration_oid\tdesign_role\tfiniteness_scope' 10

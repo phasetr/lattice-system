@@ -21,18 +21,53 @@ private meta def namesField (names : Array Name) : String :=
   String.intercalate "," (names.toList.map toString)
 
 /--
-Report whether a declaration type is a self-fulfilling obligation. The first
-component holds when its conclusion reduces to `True`; the second holds when
-the conclusion repeats one of the declaration's own hypotheses, the `(h : P) : P`
-shape. Both are rejected as nonvacuity evidence.
+Decide whether a proposition is already discharged by the hypotheses gathered
+so far. `True`, a repeated hypothesis, a conjunction of such components, and an
+implication whose own antecedent supplies the conclusion all qualify. Each step
+reduces one head, so a wrapper definition cannot hide the shape; `fuel` bounds
+that unfolding.
 -/
-private meta def selfFulfillingFacts (type : Expr) : MetaM (Bool × Bool) :=
-  Meta.forallTelescope type fun binders conclusion => do
-    let concludesTrue := (← Meta.whnf conclusion).isConstOf (Name.mkSimple "True")
-    let mut repeatsHypothesis := false
-    for binder in binders do
-      if (← Meta.inferType binder) == conclusion then repeatsHypothesis := true
-    return (concludesTrue, repeatsHypothesis)
+private meta partial def impliedByHypotheses (hypotheses : Array Expr) (fuel : Nat)
+    (conclusion : Expr) : MetaM Bool := do
+  if hypotheses.any (· == conclusion) then return true
+  match fuel with
+  | 0 => return false
+  | fuel + 1 =>
+    let reduced ← Meta.whnf conclusion
+    if hypotheses.any (· == reduced) then return true
+    if reduced.isConstOf (Name.mkSimple "True") then return true
+    if reduced.isAppOfArity (Name.mkSimple "And") 2 then
+      let left ← impliedByHypotheses hypotheses fuel reduced.appFn!.appArg!
+      return left && (← impliedByHypotheses hypotheses fuel reduced.appArg!)
+    if reduced.isForall then
+      let nested ← Meta.forallBoundedTelescope reduced (some 1) fun binders body => do
+        let mut extended := hypotheses
+        for binder in binders do extended := extended.push (← Meta.inferType binder)
+        impliedByHypotheses extended fuel body
+      return nested
+    return false
+
+/--
+Report whether a declaration type is a self-fulfilling obligation. The first
+component holds when its conclusion reduces to `True`; the second holds when the
+whole obligation follows from its own hypotheses, which covers `(h : P) : P`,
+`(h : P) : P ∧ True`, and the same shapes wrapped in a definition. Both are
+rejected as nonvacuity evidence.
+-/
+private meta def selfFulfillingFacts (type : Expr) : MetaM (Bool × Bool) := do
+  let concludesTrue ← Meta.forallTelescope type fun _ conclusion => do
+    return (← Meta.whnf conclusion).isConstOf (Name.mkSimple "True")
+  return (concludesTrue, ← impliedByHypotheses #[] 16 type)
+
+/--
+Name the declaration type when it is exactly a universe-monomorphic constant.
+A registered proof obligation is spelled as its bound primary statement, so any
+larger type reports `NONE` and cannot match a binding.
+-/
+private meta def typeConstantName (info : ConstantInfo) : String :=
+  match info.type.consumeMData with
+  | .const name levels => if levels.isEmpty then toString name else "NONE"
+  | _ => "NONE"
 
 /-- Render semantic facts for one declaration owned by a statement module. -/
 private meta def declarationLine (env : Environment) (moduleName : Name)
@@ -47,15 +82,16 @@ private meta def declarationLine (env : Environment) (moduleName : Name)
   -- A primary statement carries its proposition as a value, so its own type is
   -- `Prop` and `Meta.isProp` on that type is necessarily false.
   let isPropValue ← value.mapM Meta.isProp
-  let (concludesTrue, repeatsHypothesis) ← selfFulfillingFacts info.type
+  let (concludesTrue, selfFulfilling) ← selfFulfillingFacts info.type
   return String.intercalate "\t" [
     "D", toString moduleName, toString info.name, declarationKind env info,
     boolField isProp, toString (directSorryCount info),
     boolField (axioms.contains (Name.mkSimple "sorryAx")),
     namesField (typeConstants info), namesField (valueConstants info),
-    namesField axioms, namesField (value.map binderDomainConstants |>.getD #[]),
+    namesField axioms, namesField (binderDomainConstants info.type),
+    namesField (value.map binderDomainConstants |>.getD #[]),
     boolField isTrueValue, boolField (isPropValue.getD false),
-    boolField concludesTrue, boolField repeatsHypothesis,
+    boolField concludesTrue, boolField selfFulfilling, typeConstantName info,
     encodeExpr info.levelParams info.type, valueEncoding info]
 
 /-- Inspect all registered statement modules in one elaborated environment. -/

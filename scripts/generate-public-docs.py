@@ -54,7 +54,7 @@ HEADERS = {
     ],
     "axioms": [
         "axiom_id", "declaration", "module", "category", "source_locator",
-        "rationale", "reopen_condition",
+        "rationale", "reopen_condition", "axiom_type_oid",
     ],
     "claim_axioms": ["claim_id", "axiom_id"],
     "phase": ["phase"],
