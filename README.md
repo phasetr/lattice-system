@@ -15,7 +15,7 @@ The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
 progress begins in `registry/`. Its global checker capability is `vocabulary`,
 while each source advances independently through `source-progress.tsv`;
 `TASAKI2020` is `vocabulary_reviewed`. Its corrected corpus ledger contains all
-534 physical PDF pages, 3,182 active atomic claims, 3,171 formalization
+534 physical PDF pages, 3,183 active atomic claims, 3,172 formalization
 targets, 1,401 unique equation-label/page pairs, and 63 pages with no claim.
 Eight superseded records preserve the provenance of compound or duplicate
 claims, while eleven active records are explicitly classified `out_of_scope`. The only
@@ -23,7 +23,7 @@ production Lean tree is limited to the registered vocabulary modules and their
 root. Checker cases are generated only under isolated system temporary roots;
 the repository contains no tracked fixture tree.
 
-The complete R3 review classifies all 3,171 formalization targets: 3,169 are
+The vocabulary reviews classify all 3,172 formalization targets: 3,170 are
 `mathlib_only`, while claims `CL-TASAKI2020-2487` and
 `CL-TASAKI2020-2488` require project vocabulary. The registered vocabulary is
 exactly `partialTraceRight` and `partialTraceLeft`, with four claim-to-vocabulary
@@ -44,16 +44,18 @@ and rejects cross-source ownership, unmanifested registry drift, contentless
 surrogates, axiom or R4 artifacts, and incomplete successor propagation.
 Historical event-owned rows are frozen exactly, while a later independently
 reviewed event may append rows with its own contiguous positions.
-The sixth ledger, `claim-content-amendments.tsv`, now records that one
-reviewed pre-R4 content correction, including actual old and new content hashes,
-the frozen source-page hash, and event ownership. The reviewed source unit
-recovers the complex spectral estimate and its surrounding conditions;
-it does not certify a proof, other claims, or the complete source corpus.
-The broader rendered-source re-audit and further corrections remain incomplete.
-The same permanent protocol supports independently reviewed additions of
-previously omitted atomic claims, with fresh IDs, frozen page provenance,
-item and vocabulary ownership, and derived census invariants. This capability
-does not itself add a source claim or certify source coverage.
+A setup-unit event records seven statement-readiness reviews, one amendment
+that makes the local model conditions explicit, and one previously omitted
+atomic claim about the sublattice cardinalities. It introduces a fresh claim and
+source item without a predecessor or successor, deriving the revised census
+invariants from the corpus. The sixth ledger, `claim-content-amendments.tsv`,
+records both reviewed pre-R4 amendments, including actual old and new content
+hashes, frozen source-page hashes, and event ownership. The reviewed units cover
+the complex spectral estimate and the opening model setup; they do not certify
+proofs, other source units, or the complete source corpus. The broader
+rendered-source re-audit and further corrections remain incomplete. The same
+permanent protocol supports independently reviewed additions with fresh IDs,
+frozen page provenance, and explicit item and vocabulary ownership.
 CI selects this exceptional transition only while the event is new and its
 recorded base equals the actual merge base. Later pull requests automatically
 use the ordinary immutable base-diff path.
