@@ -50,6 +50,22 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 
 - `CL-TASAKI2020-0403` — assertion / equation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
+<a id="IT-TASAKI2020-3038"></a>
+
+## Unlabeled item IT-TASAKI2020-3038
+
+- Item ID: `IT-TASAKI2020-3038`
+- Source: `TASAKI2020`
+- Page ID: `PG-TASAKI2020-0087`
+- Kind: `unlabeled`
+- Source label: `NONE`
+- Title: `NONE`
+- Locator: PDF p. 87; print p. 74; §4.1.1; paragraph 7; balanced-sublattice cardinality sentence
+
+### Atomic claims
+
+- `CL-TASAKI2020-3448` — assertion / unnumbered_obligation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+
 <a id="IT-TASAKI2020-0408"></a>
 
 ## Unlabeled item IT-TASAKI2020-0408

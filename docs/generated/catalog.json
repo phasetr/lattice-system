@@ -441,6 +441,7 @@
         "IT-TASAKI2020-0405",
         "IT-TASAKI2020-0406",
         "IT-TASAKI2020-0407",
+        "IT-TASAKI2020-3038",
         "IT-TASAKI2020-0408",
         "IT-TASAKI2020-0409",
         "IT-TASAKI2020-0410",
@@ -16106,6 +16107,37 @@
       "public_slug": "chapter-04",
       "source_id": "TASAKI2020",
       "source_label": "equation (4.1.3)",
+      "title": "NONE"
+    },
+    {
+      "claims": [
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-3448",
+          "disposition": "assertion",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "unnumbered_obligation",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
+        }
+      ],
+      "item_id": "IT-TASAKI2020-3038",
+      "item_kind": "unlabeled",
+      "locator": "PDF p. 87; print p. 74; §4.1.1; paragraph 7; balanced-sublattice cardinality sentence",
+      "order_key": "000087.0003.0001",
+      "page_id": "PG-TASAKI2020-0087",
+      "public_group": "Chapter 04",
+      "public_slug": "chapter-04",
+      "source_id": "TASAKI2020",
+      "source_label": "NONE",
       "title": "NONE"
     },
     {
@@ -99946,12 +99978,12 @@
     "vocabulary_status": "vocabulary_ready requires both a review row and a vocabulary-reviewed-or-later source lifecycle; review_staged is not ready"
   },
   "summary": {
-    "active_claims": 3182,
+    "active_claims": 3183,
     "claim_vocabulary_links": 4,
-    "formalization_target_claims": 3171,
-    "mathlib_only_claims": 3169,
+    "formalization_target_claims": 3172,
+    "mathlib_only_claims": 3170,
     "project_vocabulary_claims": 2,
-    "source_items": 3037,
+    "source_items": 3038,
     "tombstoned_claims": 8,
     "vocabulary_declarations": 2
   },
