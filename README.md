@@ -7,6 +7,10 @@ the two partial-trace vocabulary definitions required by the frozen corpus,
 but **zero source-claim theorem statements or proofs**. The former
 implementation is not an API or source for this rewrite.
 
+The recorded census, lifecycle, and vocabulary review do not certify that
+normalized claim statements match the printed source. The full rendered-source
+re-audit and reviewed content corrections remain incomplete.
+
 The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
 progress begins in `registry/`. Its global checker capability is `vocabulary`,
 while each source advances independently through `source-progress.tsv`;
@@ -65,11 +69,11 @@ identified every mathematical claim or that a claim is mathematically correct.
 ## Reset boundary
 
 The legacy anchor is
-`01bcb49d49db92c225cfa74b74d409dd0a9c4edc`. The reset is intentionally one
-atomic PR: old Lean, documentation, TeX, status data, scripts, and workflows
-are deleted rather than archived or shimmed. Only the dependency pins are
-byte-preserved. `.self-local/refs` is private reference material and is not
-part of the tracked rewrite tree.
+`01bcb49d49db92c225cfa74b74d409dd0a9c4edc`. The rewrite excludes the old Lean,
+documentation, TeX, status data, scripts, and workflows, including archives
+and compatibility shims. Only `lean-toolchain` and `lake-manifest.json` are
+byte-preserved from that anchor. Private reference material remains outside
+the tracked rewrite tree.
 
 ## Hard merge gate
 

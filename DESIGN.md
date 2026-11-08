@@ -16,6 +16,9 @@ There are no source-claim theorem statements, proofs, or intended axioms yet.
 Their type and declaration OIDs, direct imports, and elaborated environment
 have passed the R3 semantic contract. A newly registered source may remain at
 an earlier lifecycle while the global checker capability stays `vocabulary`.
+The recorded census, lifecycle, and vocabulary review do not certify printed-source
+statement fidelity. The full rendered-source re-audit and reviewed content
+corrections remain incomplete.
 No claim is represented merely because its source PDF exists locally.
 The registries are authoritative only for facts they explicitly record.
 An empty claims registry means that the census has not begun.
@@ -32,7 +35,6 @@ Legacy documentation, TeX, status records, scripts, and generated artifacts
 are not carried into the rewrite.
 Good architectural lessons may be restated as principles after independent
 review, but no old code or proof text is adopted.
-The reset is one atomic change, not a chain of design and deletion PRs.
 Only `lean-toolchain` and `lake-manifest.json` are byte-preserved from the
 anchor.
 The package name and the existing mathlib revision remain unchanged.
@@ -99,8 +101,6 @@ equation-label/page-pair count, no-claim-page count, `census_oid`, and review
 token. A formalization target is active and not `out_of_scope`. The census OID is the Git
 blob OID of that source's canonical `pages.tsv` rows followed by `claims.tsv`
 rows, with headers excluded, registry order preserved, UTF-8, and LF endings.
-The legacy `references/tasaki-2020.tsv` data was migrated losslessly into these
-tables; existing Tasaki PG, CL, and VO IDs and all frozen OIDs remain unchanged.
 
 The tracked public catalog is derived from `registry/source-items.tsv` and
 `registry/item-claims.tsv`; the former is the authority for stable item IDs and
@@ -282,8 +282,8 @@ Cross-track edges are permitted only when the target tuple is earlier and a
 nonempty review rationale records the deliberate track crossing.
 Every non-`NONE` dependency rationale is an ASCII machine token under the same
 rule as claim review fields.
-Vocabulary and module imports are not claim edges. R3 will add a separate
-import/environment checker for them.
+Vocabulary and module imports are not claim edges. The R3 registry, import,
+and Lean-environment checks validate them separately under Section 9A.
 An unregistered helper cannot silently become a source-level prerequisite.
 Proof-local helpers remain local unless reused and independently justified.
 Front-to-back order is checked against the dependency graph and registry.
