@@ -79,6 +79,7 @@ base_file() {
       registry/claim-vocabulary.tsv) printf '%s\n' $'claim_id\tvocabulary_id'; return ;;
       registry/modules.tsv) printf '%s\n' $'module\tsource_path\trole'; return ;;
       registry/imports.tsv) printf '%s\n' $'module\tposition\timported_module\tis_exported\tis_meta\timport_all'; return ;;
+      registry/claim-content-amendments.tsv) printf '%s\n' $'amendment_id\tevent_id\tcorrection_id\tclaim_id\told_content_oid\tnew_content_oid\tpage_source_oid\treview_ref'; return ;;
       registry/tracks.tsv) printf '%s\n%s\n' $'track_id\tposition\ttitle\tpublic_slug' $'TR-TASAKI\t1\tTasaki front-to-back\ttasaki'; return ;;
       registry/sources.tsv) printf '%s\n%s\n' $'source_id\ttrack_id\tsource_position\tsource_kind\tcitation_key\ttitle\tauthors\tyear\tedition\tidentifier_kind\tidentifier\tpublic_url\tpublic_slug\tlocal_ref_key\tpdf_oid\ttext_oid\tcoverage' $'TASAKI2020\tTR-TASAKI\t1\tbook\tTASAKI2020\tPhysics and Mathematics of Quantum Many-Body Systems\tHal Tasaki\t2020\t2020.springer.ebook.9783030412654\tdoi\t10.1007/978-3-030-41265-4\thttps://doi.org/10.1007/978-3-030-41265-4\ttasaki-2020\tHal.Tasaki.P534.Physics_and_Mathematics_of_Quantum_Many_Body_Systems.pdf\t91d1237a6384d470bcdc453f058f8e08603767c5\t342ef0ce220dd3ed1c6cc0cdfab5a4d86bbd044f\tfrozen'; return ;;
       registry/source-invariants.tsv) printf '%s\n%s\n' $'source_id\tphysical_page_count\tactive_claim_count\tequation_pair_count\tno_claim_page_count\tcensus_oid\treview_ref' $'TASAKI2020\t534\t3172\t1401\t63\tf65e4f7c57b2ef82e71156c147d3539609e02074\tR2-CENSUS-RECONCILED'; return ;;
@@ -228,16 +229,22 @@ awk -F '\t' '
   END { if (bad) print "page OID or census pass regressed" > "/dev/stderr"; exit bad }
 ' <(base_file registry/pages.tsv) "$CURRENT_DIR/registry/pages.tsv" || fail "page state regression"
 
-awk -F '\t' '
+awk -F '\t' -v replay="$CORRECTION_REPLAY" -v event="$CORRECTION_EVENT" '
   function validOid(s) { return s ~ /^[0-9a-f]+$/ && (length(s)==40 || length(s)==64) }
-  NR == FNR { if (FNR > 1) { oldOid[$1]=$9; tombstone[$1]=$12 } next }
+  FILENAME == ARGV[1] { if (FNR > 1 && replay==1 && $2==event) { amendedOld[$4]=$5; amendedNew[$4]=$6 } next }
+  FILENAME == ARGV[2] { if (FNR > 1) { oldOid[$1]=$9; tombstone[$1]=$12 } next }
   FNR > 1 && ($1 in oldOid) {
     if (oldOid[$1] == "PENDING") { if ($9 != "PENDING" && !validOid($9)) bad=1 }
-    else if (!validOid(oldOid[$1]) || $9 != oldOid[$1]) bad=1
+    else if (!validOid(oldOid[$1]) || ($9 != oldOid[$1] &&
+             !(amendedOld[$1]==oldOid[$1] && amendedNew[$1]==$9))) bad=1
     if (tombstone[$1]=="true" && $12!="true") bad=1
   }
   END { if (bad) print "claim OID or tombstone regressed" > "/dev/stderr"; exit bad }
-' <(base_file registry/claims.tsv) "$CURRENT_DIR/registry/claims.tsv" || fail "claim state regression"
+' <(if [[ -f "$CURRENT_DIR/registry/claim-content-amendments.tsv" ]]; then
+       awk '{print}' "$CURRENT_DIR/registry/claim-content-amendments.tsv"
+     else
+       printf '%s\n' $'amendment_id\tevent_id\tcorrection_id\tclaim_id\told_content_oid\tnew_content_oid\tpage_source_oid\treview_ref'
+     fi) <(base_file registry/claims.tsv) "$CURRENT_DIR/registry/claims.tsv" || fail "claim state regression"
 
 if [[ "$ALLOW_SUPERSESSION" -eq 1 && "$CORRECTION_REPLAY" -eq 0 ]]; then
   awk -F '\t' '
@@ -256,12 +263,14 @@ if [[ "$ALLOW_SUPERSESSION" -eq 1 && "$CORRECTION_REPLAY" -eq 0 ]]; then
   ' <(base_file registry/claims.tsv) "$CURRENT_DIR/registry/claims.tsv" || fail "supersession transition regression"
 fi
 
-for path in registry/correction-events.tsv registry/claim-normalization-reviews.tsv registry/claim-corrections.tsv registry/claim-successors.tsv registry/source-item-additions.tsv; do
+for path in registry/correction-events.tsv registry/claim-normalization-reviews.tsv registry/claim-corrections.tsv registry/claim-successors.tsv registry/source-item-additions.tsv registry/claim-content-amendments.tsv; do
   if base_exists "$path"; then
     [[ -f "$CURRENT_DIR/$path" ]] || fail "current missing $path"
     if [[ "$CORRECTION_REPLAY" -eq 0 ]] && ! cmp -s <(base_file "$path") "$CURRENT_DIR/$path"; then
       fail "$path historical correction ledger drift"
     fi
+  elif [[ "$path" == registry/claim-content-amendments.tsv && "$CORRECTION_REPLAY" -eq 0 && -f "$CURRENT_DIR/$path" ]]; then
+    cmp -s <(base_file "$path") "$CURRENT_DIR/$path" || fail "unowned content amendment ledger addition"
   fi
 done
 

@@ -366,4 +366,7 @@ fi
 if [[ "$MULTI_SOURCE" -eq 1 ]]; then
   "$SCRIPT_DIR/check-lifecycle.sh" "$ROOT" >/dev/null
 fi
+if [[ "$MULTI_SOURCE" -eq 1 ]]; then
+  python3 "$SCRIPT_DIR/check-content-amendments.py" --static "$ROOT" >/dev/null
+fi
 echo "check-registry: ok"

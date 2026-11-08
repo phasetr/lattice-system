@@ -84,6 +84,9 @@ clone_commit_registry() {
   while IFS= read -r path; do
     git -C "$PROJECT_ROOT" show "$commit:$path" > "$target/$path"
   done < <(git -C "$PROJECT_ROOT" ls-tree -r --name-only "$commit" registry)
+  if [[ ! -f "$target/registry/claim-content-amendments.tsv" ]]; then
+    printf '%s\n' $'amendment_id\tevent_id\tcorrection_id\tclaim_id\told_content_oid\tnew_content_oid\tpage_source_oid\treview_ref' > "$target/registry/claim-content-amendments.tsv"
+  fi
 }
 
 rewrite() {

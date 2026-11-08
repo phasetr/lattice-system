@@ -16,6 +16,9 @@ There are no source-claim theorem statements, proofs, or intended axioms yet.
 Their type and declaration OIDs, direct imports, and elaborated environment
 have passed the R3 semantic contract. A newly registered source may remain at
 an earlier lifecycle while the global checker capability stays `vocabulary`.
+The recorded census, lifecycle, and vocabulary review do not certify printed-source
+statement fidelity. The full rendered-source re-audit and reviewed content
+corrections remain incomplete.
 No claim is represented merely because its source PDF exists locally.
 The registries are authoritative only for facts they explicitly record.
 An empty claims registry means that the census has not begun.
@@ -32,7 +35,6 @@ Legacy documentation, TeX, status records, scripts, and generated artifacts
 are not carried into the rewrite.
 Good architectural lessons may be restated as principles after independent
 review, but no old code or proof text is adopted.
-The reset is one atomic change, not a chain of design and deletion PRs.
 Only `lean-toolchain` and `lake-manifest.json` are byte-preserved from the
 anchor.
 The package name and the existing mathlib revision remain unchanged.
@@ -99,8 +101,6 @@ equation-label/page-pair count, no-claim-page count, `census_oid`, and review
 token. A formalization target is active and not `out_of_scope`. The census OID is the Git
 blob OID of that source's canonical `pages.tsv` rows followed by `claims.tsv`
 rows, with headers excluded, registry order preserved, UTF-8, and LF endings.
-The legacy `references/tasaki-2020.tsv` data was migrated losslessly into these
-tables; existing Tasaki PG, CL, and VO IDs and all frozen OIDs remain unchanged.
 
 The tracked public catalog is derived from `registry/source-items.tsv` and
 `registry/item-claims.tsv`; the former is the authority for stable item IDs and
@@ -153,8 +153,10 @@ Claim IDs are `CL-<source_id>-<decimal>` with a decimal suffix of at least four
 digits; the embedded source token must equal the row's source ID.
 Each claim records a precise locator and normalized source content.
 The normalized source content and its OID are recorded independently of Lean.
-Claim `content_oid` may remain `PENDING`, may transition once to a valid Git
-OID, and is immutable thereafter; no other transition is valid.
+Claim `content_oid` may remain `PENDING` and may transition once to a valid Git
+OID. Ordinary changes freeze the normalized content and every fixed OID.
+The reviewed `amend_content` transition below is the only exception for
+correcting the content of the same source-atomic claim before R4.
 Disposition classifies assertions, definitions, notation, hypotheses, domains,
 conjectures, and material explicitly placed out of scope.
 Only `out_of_scope` claims carry an exclusion rationale and review reference;
@@ -173,17 +175,58 @@ identity and content fields remain fixed.
 Proof and implementation status is derived from these facts plus the Lean
 environment; it is never a hand-edited claim field.
 
-The permanent correction protocol uses five ledgers. `correction-events.tsv`
+The permanent correction protocol uses six ledgers. `correction-events.tsv`
 binds a position, event, and independent review token to one source and exact
 base commit. `claim-normalization-reviews.tsv` records every reviewed claim,
 including unchanged outcomes. `claim-corrections.tsv` is owned through the
-review row and records one of `reclassify`, `exclude_nonclaim`, or `split`
+review row and records one of `reclassify`, `exclude_nonclaim`, `split`, or `amend_content`
 against each corrected frozen claim, including its old and new classification.
 `claim-successors.tsv` is owned through the correction row and records a
 contiguous ordered list of `new_successor` and `existing_duplicate` relations.
 `source-item-additions.tsv` is also owned through the correction row and
 manifests each new stable source-item ID introduced by an event. Its rows,
 their item metadata, and their item-to-claim relations become frozen history.
+`claim-content-amendments.tsv` records the identity-preserving content
+transition with exactly these columns: `amendment_id`, `event_id`,
+`correction_id`, `claim_id`, `old_content_oid`, `new_content_oid`,
+`page_source_oid`, and `review_ref`. It is header-only until an actual reviewed
+content event is introduced. Amendment IDs have the form
+`CA-<machine-token>-<at-least-four-digits>` and are unique. Every
+`amend_content` correction owns exactly one amendment row, with the same
+event and claim; no other correction action may own one. The event's closed
+exact-statement-readiness review owns the correction, and all three review
+references agree. The source-atomic claim ID is retained because this action
+repairs its transcription, rather than splitting or replacing the assertion.
+
+An amendment changes only `claims.tsv` columns 8 and 9: `normalized_content`
+and `content_oid`. The claim must remain an active formalization target.
+Its source, order, page, locator, classification, exclusion and tombstone
+metadata remain fixed. The new content is nonempty, changed, and not a
+literal `True` or `False` surrogate. Both provenance content OIDs are real Git
+blob OIDs of the exact UTF-8 field bytes, without an appended newline. The
+old OID is recomputed from the event base's content even when the base claim
+still records `PENDING`; an already fixed base OID must also match those
+bytes. The new OID must equal both the new field's computed blob OID and its
+recorded `content_oid`. `page_source_oid` must match the unchanged frozen
+page fingerprint. The fingerprints establish which recorded bytes were
+reviewed; they do not establish agreement with the printed source.
+
+Both the base and current source lifecycle must precede `skeleton_frozen`,
+and the source must have no bindings in either tree. The target has no slice,
+dependency in either direction, or claim-to-axiom relation in either tree.
+Its vocabulary-use rows and review basis remain unchanged; its vocabulary
+review reference is refreshed to the owning event review. An amendment
+cannot introduce successors or source items. Existing correction rules still
+reject other unmanifested claim changes, vocabulary drift, unrelated source
+changes, stale derived census counts, and R4 or axiom artifacts.
+
+Every historical amendment row is immutable. A later event may amend the same
+claim again, deriving its old content OID from that later event's exact base;
+the per-claim event history must chain old and new OIDs. Historical new OIDs
+are not compared indiscriminately with the latest content. A historical base
+without this ledger is treated as an empty header; the current tree always
+requires it. An ordinary change may introduce only that missing empty header,
+and cannot add an amendment row or reopen a past event's exception.
 Every split has at least one `new_successor`. A new successor receives a new stable claim
 ID, an independently frozen normalized-content OID, an exactly one-item
 provenance relation, and a fresh vocabulary review. A correction may retain the
@@ -200,7 +243,18 @@ unrelated registry drift and any correction that introduces
 an axiom, binding, contentless surrogate, or other R4 artifact.
 All rows owned by an event already present in the base are byte-for-byte frozen.
 A future event may append its own contiguously positioned review, correction,
-successor, and item-addition rows without changing historical ownership.
+successor, item-addition, and content-amendment rows without changing historical ownership.
+
+Source-fidelity review precedes statement freezing. Review each claim against
+the rendered source, including its surrounding hypotheses, quantifiers,
+coefficients, decorations and limiting order. Record unresolved readings and
+the actual depth of verification; a prior audit's absence of findings is not
+a fidelity certificate. Coverage accounts separately for formalization
+targets, excluded records, and historical tombstones. Private source excerpts
+and working audit data remain untracked. Independently reviewed discrepancies
+enter the permanent correction protocol before the affected source's R4
+statements are accepted. A build, schema check, or OID comparison cannot
+replace this mathematical source review.
 
 ## 8. Implementation slices
 
@@ -228,8 +282,8 @@ Cross-track edges are permitted only when the target tuple is earlier and a
 nonempty review rationale records the deliberate track crossing.
 Every non-`NONE` dependency rationale is an ASCII machine token under the same
 rule as claim review fields.
-Vocabulary and module imports are not claim edges. R3 will add a separate
-import/environment checker for them.
+Vocabulary and module imports are not claim edges. The R3 registry, import,
+and Lean-environment checks validate them separately under Section 9A.
 An unregistered helper cannot silently become a source-level prerequisite.
 Proof-local helpers remain local unless reused and independently justified.
 Front-to-back order is checked against the dependency graph and registry.
@@ -411,6 +465,9 @@ Graph-centric structure and local finiteness are enforced during R3 review.
 R3 does not prove source claims except unavoidable well-definedness obligations,
 which are registered as their own slices.
 R4 creates the whole-book exact-statement typed skeleton.
+R4 infrastructure may be developed separately while source corrections are
+reviewed. Its existence does not make uncorrected statements ready to freeze;
+correction events and R4 artifacts remain separate changes.
 Every implement disposition receives its final module, declaration, exact
 statement, locator doc comment, and registered temporary proof hole.
 The skeleton umbrella elaborates all claims together.
@@ -497,12 +554,16 @@ evidence.
 It checks the written merge gate and an unchecked `USER ONLY` box.
 It exercises generated positive and negative runtime cases without committed
 fixture data.
-The correction suite covers the three permitted positive transition shapes and
+The correction suites cover the four permitted positive transition shapes and
 negative cases for review, event-source ownership, manifest completeness,
 successor provenance and ID freshness, stable source-item additions, nested
 order keys, item and vocabulary propagation, immutable rows and OIDs, derived
 counts, census OID, contentless surrogates, production content OIDs, historical
 row forgery, split-without-new-successor, axioms, and premature R4 artifacts.
+Content-amendment cases additionally exercise pending and fixed old content,
+actual old/new hashes, page fingerprints, unchanged identities, pre-R4 scope,
+vocabulary review renewal, absent historical ledgers, repeated amendments,
+unrelated sources, and the return to ordinary immutable-history checks.
 The CI-selector suite separately checks the one-shot correction route,
 historical-event fallback to normal mode, a later event, merge-base mismatch rejection,
 multiple-new-event rejection, and invalid-base rejection.
