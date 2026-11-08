@@ -179,8 +179,13 @@ The permanent correction protocol uses six ledgers. `correction-events.tsv`
 binds a position, event, and independent review token to one source and exact
 base commit. `claim-normalization-reviews.tsv` records every reviewed claim,
 including unchanged outcomes. `claim-corrections.tsv` is owned through the
-review row and records one of `reclassify`, `exclude_nonclaim`, `split`, or `amend_content`
-against each corrected frozen claim, including its old and new classification.
+review row and records one of `reclassify`, `exclude_nonclaim`, `split`,
+`amend_content`, or `add_omitted_claim`, including its old and new classification.
+The first four actions target a frozen claim. `add_omitted_claim` introduces a
+previously unrecorded source-atomic claim without pretending to split an
+existing assertion. Only this action uses `NONE` for both old classification
+fields: the claim did not exist in the event base. `NONE` never stands for an
+unknown classification of an existing claim.
 `claim-successors.tsv` is owned through the correction row and records a
 contiguous ordered list of `new_successor` and `existing_duplicate` relations.
 `source-item-additions.tsv` is also owned through the correction row and
@@ -216,7 +221,7 @@ and the source must have no bindings in either tree. The target has no slice,
 dependency in either direction, or claim-to-axiom relation in either tree.
 Its vocabulary-use rows and review basis remain unchanged; its vocabulary
 review reference is refreshed to the owning event review. An amendment
-cannot introduce successors or source items. Existing correction rules still
+owns no successor or source-item-addition rows. Existing correction rules still
 reject other unmanifested claim changes, vocabulary drift, unrelated source
 changes, stale derived census counts, and R4 or axiom artifacts.
 
@@ -241,6 +246,36 @@ remain byte-for-byte frozen. Existing-duplicate successors must already be
 active formalization targets in the base and must remain unchanged. It rejects
 unrelated registry drift and any correction that introduces
 an axiom, binding, contentless surrogate, or other R4 artifact.
+
+An omitted-claim addition requires exactly one owning closed
+`exact_statement_readiness` review with the matching action, event, source and
+review token. Its new stable claim ID must be absent from the exact event base.
+The new row is an active formalization target with its actual classification,
+nonempty source content and the computed Git blob OID of that UTF-8 field
+without a trailing newline. `PENDING` and literal `True` or `False` surrogates
+are rejected. Its page already exists in the base, with the same frozen source
+fingerprint. The source must precede R4 and have no bindings in either tree;
+the new claim has no slice, dependency or axiom relation. Existing source,
+page, vocabulary declarations and unrelated claim rows remain frozen.
+
+Each new claim has exactly one creation owner: either one split-successor
+relation or one omitted-claim correction, never both or multiple split owners.
+An addition has no predecessor, successor or content-amendment provenance.
+It receives exactly one source-item relation and an event-owned vocabulary
+review whose basis agrees with its uses of existing vocabulary. It may join an
+existing item while preserving its metadata and old relations. A genuinely
+new item requires a `source-item-additions.tsv` row owned by the same creation
+correction. Counts and the census OID are derived from the actual corpus;
+the updated source invariant carries the event's review token.
+
+Historical addition rows retain their creation-time classification and
+ownership. Static validation does not require a historically added claim to
+keep that classification or the source to remain before R4 forever: a later
+reviewed event may amend, reclassify or split it. Creation-time content,
+classification and scope are validated only against the creating event's
+exact base. An event may independently own an addition and an amendment;
+neither action inherits the other's exception. Ordinary changes cannot create
+an unmanifested claim or reopen a historical event.
 All rows owned by an event already present in the base are byte-for-byte frozen.
 A future event may append its own contiguously positioned review, correction,
 successor, item-addition, and content-amendment rows without changing historical ownership.

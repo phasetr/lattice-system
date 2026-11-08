@@ -25,6 +25,8 @@ baseline_digest() {
     xargs -0 shasum | shasum | awk '{print $1}'
 }
 BASELINE_DIGEST=$(baseline_digest)
+PASS_COUNT=0
+REJECT_COUNT=0
 
 expect_pass() {
   local label=$1
@@ -35,6 +37,7 @@ expect_pass() {
     echo "$output" >&2
     exit 1
   fi
+  PASS_COUNT=$((PASS_COUNT + 1))
 }
 
 expect_fail() {
@@ -50,6 +53,7 @@ expect_fail() {
     echo "$output" >&2
     exit 1
   fi
+  REJECT_COUNT=$((REJECT_COUNT + 1))
 }
 
 expect_registered_content() {
@@ -843,7 +847,7 @@ expect_fail unrelated-frozen-order "unmanifested claim drift" \
 
 clone_case "$OUT_OF_SCOPE" "$CASES/stale-count"
 rewrite "$CASES/stale-count/registry/source-invariants.tsv" \
-  'FNR==2 {$4=3172} {print}'
+  'FNR==2 {$4=$4+1} {print}'
 expect_fail stale-formalization-target-count "formalization target count is stale" \
   "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/stale-count"
 
@@ -896,6 +900,24 @@ printf '%s\n' \
 expect_fail r4-artifact "correction event introduces an R4 artifact" \
   "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/r4-artifact"
 
+# A fresh successor has one creation owner, even across split corrections.
+# A map that only remembers the last owner would silently accept this case.
+clone_case "$SPLIT" "$CASES/split-two-creation-owners"
+rewrite "$CASES/split-two-creation-owners/registry/claims.tsv" \
+  '$1=="CL-TASAKI2020-0001" {$12="true";$13="CL-TASAKI2020-9001";$14="compound-claim";$15="'"$REVIEW_REF"'"} {print}'
+rewrite "$CASES/split-two-creation-owners/registry/claim-vocabulary-review.tsv" \
+  '$1!="CL-TASAKI2020-0001" {print}'
+append_review "$CASES/split-two-creation-owners" \
+  "NR-RUNTIME-TWO-OWNERS"$'\t'"$EVENT_ID"$'\t2\tCL-TASAKI2020-0001\texact_statement_readiness\tsplit\tclosed\tcompound-claim\t'"$REVIEW_REF"
+append_correction "$CASES/split-two-creation-owners" \
+  "CC-RUNTIME-TWO-OWNERS"$'\t'"$EVENT_ID"$'\t2\tNR-RUNTIME-TWO-OWNERS\tCL-TASAKI2020-0001\tsplit\tnotation\tnotation\tnotation\tnotation'
+printf '%s\n' \
+  "SE-RUNTIME-TWO-OWNERS"$'\t'"$EVENT_ID"$'\tCC-RUNTIME-TWO-OWNERS\tCL-TASAKI2020-0001\t1\tnew_successor\tCL-TASAKI2020-9001' \
+  >> "$CASES/split-two-creation-owners/registry/claim-successors.tsv"
+refresh_invariants "$CASES/split-two-creation-owners"
+expect_fail split-two-creation-owners "split successor provenance is incomplete" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/split-two-creation-owners"
+
 [[ $(baseline_digest) == "$BASELINE_DIGEST" ]] || {
   echo "test-claim-corrections-runtime: immutable runtime base changed" >&2
   exit 1
@@ -905,4 +927,4 @@ expect_fail r4-artifact "correction event introduces an R4 artifact" \
   exit 1
 }
 
-echo "test-claim-corrections-runtime: ok"
+echo "test-claim-corrections-runtime: ok ($PASS_COUNT positive, $REJECT_COUNT rejection cases)"

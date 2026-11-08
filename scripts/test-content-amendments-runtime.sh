@@ -42,6 +42,12 @@ def refresh(root):
     pages, claims = table(root, 'pages.tsv'), table(root, 'claims.tsv')
     rows = table(root, 'source-invariants.tsv')
     for row in rows[1:]:
+        active = [r for r in claims[1:] if r[1] == row[0] and r[11] == 'false']
+        row[2] = str(len(active))
+        row[3] = str(sum(r[5] != 'out_of_scope' for r in active))
+        row[4] = str(sum(r[6] == 'equation' for r in active))
+        used = {r[3] for r in active}
+        row[5] = str(sum(p[1] == row[0] and p[0] not in used for p in pages[1:]))
         content = ''.join('\t'.join(r) + '\n' for r in pages[1:] + claims[1:]
                           if r[1] == row[0])
         row[6] = blob(content)
@@ -94,9 +100,72 @@ def prepare_amendment(before, after, content):
     refresh(after)
     return event_id, review_ref, correction_id, amendment_id, old, page
 
+
+def prepare_omission(before, after, new_item=True):
+    shutil.copytree(before, after)
+    event_id = unused_id(after, 'correction-events.tsv', 'RUNTIME-OMISSION-EVENT')
+    review_ref = event_id + '-REVIEW'
+    review_id = unused_id(after, 'claim-normalization-reviews.tsv', 'NR-RUNTIME')
+    correction_id = unused_id(after, 'claim-corrections.tsv', 'CC-RUNTIME')
+    claim_id = unused_id(after, 'claims.tsv', 'CL-TASAKI2020')
+    claims = table(after, 'claims.tsv')
+    anchor = claims[1]
+    content = 'The two finite parity classes have equal cardinality.'
+    suffix = 1
+    order = anchor[2] + '.' + format(suffix, '04d')
+    while any(r[2] == order and r[1] == anchor[1] for r in claims[1:]):
+        suffix += 1
+        order = anchor[2] + '.' + format(suffix, '04d')
+    locator = anchor[4] + '; independently reviewed omitted assertion'
+    index = next((i for i, r in enumerate(claims[1:], 1)
+                  if r[1] == anchor[1] and r[2] > order), len(claims))
+    claims.insert(index, [claim_id, anchor[1], order, anchor[3], locator,
+                      'assertion', 'unnumbered_obligation', content, blob(content),
+                      'NONE', 'NONE', 'false', 'NONE', 'NONE', 'NONE'])
+    write(after, 'claims.tsv', claims)
+    events = table(after, 'correction-events.tsv')
+    events.append([event_id, str(len(events)), anchor[1],
+                   subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=project).decode().strip(), review_ref])
+    write(after, 'correction-events.tsv', events)
+    write(after, 'claim-normalization-reviews.tsv', table(after, 'claim-normalization-reviews.tsv') + [
+        [review_id, event_id, '1', claim_id, 'exact_statement_readiness', 'add_omitted_claim',
+         'closed', 'omitted-source-assertion', review_ref]])
+    write(after, 'claim-corrections.tsv', table(after, 'claim-corrections.tsv') + [
+        [correction_id, event_id, '1', review_id, claim_id, 'add_omitted_claim',
+         'NONE', 'NONE', 'assertion', 'unnumbered_obligation']])
+    write(after, 'claim-vocabulary-review.tsv', table(after, 'claim-vocabulary-review.tsv') + [
+        [claim_id, 'mathlib_only', review_ref]])
+    relations = table(after, 'item-claims.tsv')
+    existing = next(r for r in relations[1:] if r[2] == anchor[0])
+    if new_item:
+        item_id = unused_id(after, 'source-items.tsv', 'IT-TASAKI2020')
+        items = table(after, 'source-items.tsv')
+        source_item = next(r for r in items[1:] if r[0] == existing[0])
+        index = next((i for i, r in enumerate(items[1:], 1)
+                      if r[1] == anchor[1] and r[2] > order), len(items))
+        items.insert(index,
+                     [item_id, anchor[1], order, anchor[3], 'unlabeled', 'NONE',
+                      'NONE', locator, source_item[8], source_item[9], review_ref])
+        write(after, 'source-items.tsv', items)
+        addition_id = unused_id(after, 'source-item-additions.tsv', 'IA-RUNTIME')
+        write(after, 'source-item-additions.tsv', table(after, 'source-item-additions.tsv') + [
+            [addition_id, event_id, correction_id, '1', item_id, review_ref]])
+        relations.insert(relations.index(existing) + 1, [item_id, '1', claim_id])
+    else:
+        item_id = existing[0]
+        position = 1 + max(int(r[1]) for r in relations[1:] if r[0] == item_id)
+        index = max(i for i, r in enumerate(relations) if r[0] == item_id) + 1
+        relations.insert(index, [item_id, str(position), claim_id])
+    write(after, 'item-claims.tsv', relations)
+    mutate(after, 'source-invariants.tsv', anchor[1], 7, review_ref)
+    refresh(after)
+    return event_id, review_ref, review_id, correction_id, claim_id, item_id
+
 count = 0
+accepted = 0
+rejected = 0
 def expect(label, expected, command, diagnostic=''):
-    global count
+    global count, accepted, rejected
     result = subprocess.run(command, cwd=project, env=os.environ,
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     if (result.returncode == 0) != expected or (diagnostic and diagnostic not in result.stdout):
@@ -104,6 +173,8 @@ def expect(label, expected, command, diagnostic=''):
         print(result.stdout, file=sys.stderr)
         raise SystemExit(1)
     count += 1
+    accepted += expected
+    rejected += not expected
 
 with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as temporary:
     root = Path(temporary)
@@ -138,6 +209,10 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
 
     def amendment_change(target, column, value):
         mutate(target, 'claim-content-amendments.tsv', amendment_id, column, value)
+
+    omitted = root / 'omitted-claim'
+    omission_event, omission_review, omission_nr, omission_cc, omitted_claim, omitted_item = prepare_omission(base, omitted)
+    transition('omitted-claim-new-item', base, omitted)
 
     static('pending-old-static', current)
     expect('pending-old-registry', True, [str(project / 'scripts/check-registry.sh'), str(current)])
@@ -282,7 +357,8 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     write(vocab_use, 'claim-vocabulary.tsv', table(vocab_use, 'claim-vocabulary.tsv') + [[claim, 'VO-TASAKI2020-0001']])
     transition('vocabulary-use-drift', base, vocab_use, False, 'changed vocabulary use')
     wrong_counts = case('wrong-census-count')
-    mutate(wrong_counts, 'source-invariants.tsv', 'TASAKI2020', 2, '3183')
+    current_count = next(r[2] for r in table(wrong_counts, 'source-invariants.tsv')[1:] if r[0] == 'TASAKI2020')
+    mutate(wrong_counts, 'source-invariants.tsv', 'TASAKI2020', 2, str(int(current_count) + 1))
     transition('stale-census-count', base, wrong_counts, False, 'census invariant count is stale')
 
     later = root / 'later-event'
@@ -318,5 +394,240 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     write(historical_ordinary, 'claim-content-amendments.tsv', records)
     base_diff('historical-event-no-ordinary-bypass', later, historical_ordinary, False, event_id=second_event,
               diagnostic='historical correction ledger drift')
-    print('test-content-amendments-runtime: ok (' + str(count) + ' cases)')
+
+    # Omitted assertions have no predecessor. Their creation still goes through
+    # the same reviewed event and immutable-history boundaries as amendments.
+    omission_start = count - 1
+    static('omitted-claim-static', omitted)
+    expect('omitted-claim-registry', True, [str(project / 'scripts/check-registry.sh'), str(omitted)])
+    expect('omitted-claim-item-contract', True, [str(project / 'scripts/check-source-items.sh'), str(omitted)])
+    base_diff('omitted-claim-dedicated-route', base, omitted, event_id=omission_event)
+    base_diff('omitted-claim-ordinary-rejected', base, omitted, False, diagnostic='frozen invariants regression')
+    base_diff('omitted-claim-later-ordinary-freeze', omitted, omitted)
+    base_diff('omitted-claim-no-historical-exception', omitted, omitted, event_id=omission_event)
+    existing_item = root / 'omitted-existing-item'
+    prepare_omission(base, existing_item, new_item=False)
+    transition('omitted-claim-existing-item', base, existing_item)
+    expect('omitted-existing-item-contract', True,
+           [str(project / 'scripts/check-source-items.sh'), str(existing_item)])
+
+    mixed = case('mixed-addition-amendment', omitted)
+    nr = unused_id(mixed, 'claim-normalization-reviews.tsv', 'NR-RUNTIME')
+    cc = unused_id(mixed, 'claim-corrections.tsv', 'CC-RUNTIME')
+    ca = unused_id(mixed, 'claim-content-amendments.tsv', 'CA-RUNTIME')
+    write(mixed, 'claim-normalization-reviews.tsv', table(mixed, 'claim-normalization-reviews.tsv') + [
+        [nr, omission_event, '2', claim, 'exact_statement_readiness', 'amend_content',
+         'closed', 'restore-source-condition', omission_review]])
+    write(mixed, 'claim-corrections.tsv', table(mixed, 'claim-corrections.tsv') + [
+        [cc, omission_event, '2', nr, claim, 'amend_content', old[5], old[6], old[5], old[6]]])
+    write(mixed, 'claim-content-amendments.tsv', table(mixed, 'claim-content-amendments.tsv') + [
+        [ca, omission_event, cc, claim, blob(old[7]), blob(new_content), page[9], omission_review]])
+    mutate(mixed, 'claims.tsv', claim, 7, new_content)
+    mutate(mixed, 'claims.tsv', claim, 8, blob(new_content))
+    mutate(mixed, 'claim-vocabulary-review.tsv', claim, 2, omission_review)
+    refresh(mixed)
+    transition('mixed-addition-and-amendment', base, mixed)
+    base_diff('mixed-addition-and-amendment-route', base, mixed, event_id=omission_event)
+
+    added_later = root / 'added-claim-later-amendment'
+    original_claim = claim
+    claim = omitted_claim
+    added_event, _, _, _, _, _ = prepare_amendment(omitted, added_later, 'The two finite classes have a common size.')
+    claim = original_claim
+    transition('historical-added-claim-later-amended', omitted, added_later)
+    static('historical-addition-static-after-amendment', added_later)
+    base_diff('historical-addition-amendment-route', omitted, added_later, event_id=added_event)
+
+    added_reclassified = case('added-claim-later-reclassified', omitted)
+    event_rows = table(added_reclassified, 'correction-events.tsv')
+    reclass_event = 'RUNTIME-ADDED-RECLASSIFY'
+    reclass_review = reclass_event + '-REVIEW'
+    event_rows.append([reclass_event, str(len(event_rows)), 'TASAKI2020',
+                       subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=project).decode().strip(), reclass_review])
+    write(added_reclassified, 'correction-events.tsv', event_rows)
+    nr = unused_id(added_reclassified, 'claim-normalization-reviews.tsv', 'NR-RUNTIME')
+    cc = unused_id(added_reclassified, 'claim-corrections.tsv', 'CC-RUNTIME')
+    write(added_reclassified, 'claim-normalization-reviews.tsv', table(added_reclassified, 'claim-normalization-reviews.tsv') + [
+        [nr, reclass_event, '1', omitted_claim, 'exact_statement_readiness', 'reclassify', 'closed',
+         'refine-source-classification', reclass_review]])
+    write(added_reclassified, 'claim-corrections.tsv', table(added_reclassified, 'claim-corrections.tsv') + [
+        [cc, reclass_event, '1', nr, omitted_claim, 'reclassify', 'assertion', 'unnumbered_obligation',
+         'definition', 'definition']])
+    mutate(added_reclassified, 'claims.tsv', omitted_claim, 5, 'definition')
+    mutate(added_reclassified, 'claims.tsv', omitted_claim, 6, 'definition')
+    mutate(added_reclassified, 'claim-vocabulary-review.tsv', omitted_claim, 2, reclass_review)
+    refresh(added_reclassified)
+    transition('historical-added-claim-later-reclassified', omitted, added_reclassified)
+    static('historical-addition-static-after-reclassification', added_reclassified)
+    added_bound = case('historical-addition-after-r4', omitted)
+    mutate(added_bound, 'source-progress.tsv', 'TASAKI2020', 1, 'skeleton_frozen')
+    write(added_bound, 'bindings.tsv', table(added_bound, 'bindings.tsv') + [
+        [omitted_claim, 'LatticeSystem.Claims.statement', 'NONE', 'LatticeSystem.Claims.Front', 'PENDING', 'NONE']])
+    static('historical-addition-static-after-r4', added_bound)
+    project_vocab = case('addition-project-vocabulary', omitted)
+    mutate(project_vocab, 'claim-vocabulary-review.tsv', omitted_claim, 1, 'project_vocabulary')
+    write(project_vocab, 'claim-vocabulary.tsv', table(project_vocab, 'claim-vocabulary.tsv') + [
+        [omitted_claim, 'VO-TASAKI2020-0001']])
+    transition('addition-reviewed-existing-project-vocabulary', base, project_vocab)
+
+    two_additions = root / 'two-additions'
+    event2, _, nr2, cc2, claim2, _ = prepare_omission(omitted, two_additions)
+    write(two_additions, 'correction-events.tsv', [r for r in table(two_additions, 'correction-events.tsv') if r[0] != event2])
+    for name, identifier in [('claim-normalization-reviews.tsv', nr2), ('claim-corrections.tsv', cc2)]:
+        mutate(two_additions, name, identifier, 1, omission_event)
+        mutate(two_additions, name, identifier, 2, '2')
+    mutate(two_additions, 'claim-normalization-reviews.tsv', nr2, 8, omission_review)
+    ia2 = table(two_additions, 'source-item-additions.tsv')[-1][0]
+    mutate(two_additions, 'source-item-additions.tsv', ia2, 1, omission_event)
+    mutate(two_additions, 'source-item-additions.tsv', ia2, 5, omission_review)
+    mutate(two_additions, 'claim-vocabulary-review.tsv', claim2, 2, omission_review)
+    mutate(two_additions, 'source-invariants.tsv', 'TASAKI2020', 7, omission_review)
+    transition('two-owned-omitted-claims', base, two_additions)
+    foreign_item_owner = case('addition-valid-foreign-item-owner', two_additions)
+    ia1 = table(omitted, 'source-item-additions.tsv')[-1][0]
+    mutate(foreign_item_owner, 'source-item-additions.tsv', ia1, 2, cc2)
+    mutate(foreign_item_owner, 'source-item-additions.tsv', ia2, 3, '2')
+    transition('addition-valid-foreign-item-owner', base, foreign_item_owner, False,
+               'new source item contains a successor from a different correction')
+
+    def reject_omission(label, name, identifier, column, value, diagnostic):
+        target = case('omission-' + label, omitted)
+        mutate(target, name, identifier, column, value)
+        if label == 'addition-claim-order':
+            refresh(target)
+        transition(label, base, target, False, diagnostic)
+
+    for label, name, identifier, column, value, diagnostic in [
+            ('addition-existing-id', 'claim-normalization-reviews.tsv', omission_nr, 3, claim,
+             'invalid claim correction ledger'),
+            ('addition-wrong-old-kind', 'claim-corrections.tsv', omission_cc, 6, 'assertion',
+             'invalid omitted claim classification'),
+            ('addition-wrong-old-subkind', 'claim-corrections.tsv', omission_cc, 7, 'equation',
+             'invalid omitted claim classification'),
+            ('addition-wrong-new-kind', 'claim-corrections.tsv', omission_cc, 8, 'definition',
+             'classification does not match'),
+            ('addition-out-of-scope', 'claim-corrections.tsv', omission_cc, 8, 'out_of_scope',
+             'invalid omitted claim classification'),
+            ('addition-review-open', 'claim-normalization-reviews.tsv', omission_nr, 6, 'open',
+             'invalid claim normalization review ledger'),
+            ('addition-review-scope', 'claim-normalization-reviews.tsv', omission_nr, 4, 'proof_readiness',
+             'invalid claim normalization review ledger'),
+            ('addition-review-token', 'claim-normalization-reviews.tsv', omission_nr, 8, 'WRONG-REVIEW',
+             'invalid claim normalization review ledger'),
+            ('addition-review-source', 'claims.tsv', omitted_claim, 1, 'SRB',
+             'normalization review source mismatch'),
+            ('addition-page-unknown', 'claims.tsv', omitted_claim, 3, 'PG-TASAKI2020-9999',
+             'source page mismatch'),
+            ('addition-page-hash-drift', 'pages.tsv', page[0], 9, '0' * 40,
+             'unchanged frozen source page'),
+            ('addition-pending-hash', 'claims.tsv', omitted_claim, 8, 'PENDING',
+             'content OID is not frozen or is stale'),
+            ('addition-stale-hash', 'claims.tsv', omitted_claim, 8, '0' * 40,
+             'content OID is not frozen or is stale'),
+            ('addition-content-surrogate', 'claims.tsv', omitted_claim, 7, 'True',
+             'contentless omitted claim surrogate'),
+            ('addition-tombstone', 'claims.tsv', omitted_claim, 11, 'true',
+             'active formalization target'),
+            ('addition-exclusion', 'claims.tsv', omitted_claim, 9, 'UNREVIEWED',
+             'active formalization target'),
+            ('addition-vocab-token', 'claim-vocabulary-review.tsv', omitted_claim, 2, 'WRONG-REVIEW',
+             'reviewed vocabulary basis and use'),
+            ('addition-vocab-basis', 'claim-vocabulary-review.tsv', omitted_claim, 1, 'project_vocabulary',
+             'reviewed vocabulary basis and use'),
+            ('addition-late-source', 'source-progress.tsv', 'TASAKI2020', 1, 'skeleton_frozen',
+             'requires a pre-R4 source'),
+            ('addition-item-foreign-owner', 'source-item-additions.tsv',
+             table(omitted, 'source-item-additions.tsv')[-1][0], 2, 'CC-UNOWNED-0001',
+             'source item addition event or correction mismatch'),
+            ('addition-item-token', 'source-item-additions.tsv',
+             table(omitted, 'source-item-additions.tsv')[-1][0], 5, 'WRONG-REVIEW',
+             'source item addition event or correction mismatch'),
+            ('addition-unrelated-claim-drift', 'claims.tsv', 'CL-TASAKI2020-0003', 4, 'unreviewed locator',
+             'unmanifested claim drift'),
+            ('addition-old-ledger-drift', 'claim-corrections.tsv',
+             table(base, 'claim-corrections.tsv')[1][0], 9, 'definition',
+             'historical correction ledger drift'),
+            ('addition-invariant-review', 'source-invariants.tsv', 'TASAKI2020', 7, 'WRONG-REVIEW',
+             'event invariant review'),
+            ('addition-physical-page-count', 'source-invariants.tsv', 'TASAKI2020', 1, '535',
+             'physical page count is stale'),
+            ('addition-source-fingerprint', 'sources.tsv', 'TASAKI2020', 14, 'PENDING',
+             'source fingerprints changed or are not frozen'),
+            ('addition-claim-order', 'claims.tsv', omitted_claim, 2, 'invalid-order',
+             'bad claim order key'),
+            ('addition-item-position', 'item-claims.tsv', omitted_item, 1, '2',
+             'item relation positions are not contiguous')]:
+        reject_omission(label, name, identifier, column, value, diagnostic)
+
+    for label, name, column, diagnostic in [
+            ('addition-missing-item', 'item-claims.tsv', 2, 'exactly one source item'),
+            ('addition-missing-vocab', 'claim-vocabulary-review.tsv', 0, 'reviewed vocabulary basis and use'),
+            ('addition-missing-item-manifest', 'source-item-additions.tsv', 2, 'unmanifested source item addition'),
+            ('addition-missing-correction', 'claim-corrections.tsv', 0, 'invalid claim correction ledger')]:
+        target = case(label, omitted)
+        key = omission_cc if name in {'claim-corrections.tsv', 'source-item-additions.tsv'} else omitted_claim
+        write(target, name, [r for i, r in enumerate(table(target, name)) if i == 0 or r[column] != key])
+        transition(label, base, target, False, diagnostic)
+
+    duplicate_relation = case('addition-duplicate-item-relation', omitted)
+    relation = next(r for r in table(duplicate_relation, 'item-claims.tsv')[1:] if r[2] == omitted_claim)
+    write(duplicate_relation, 'item-claims.tsv', table(duplicate_relation, 'item-claims.tsv') + [relation])
+    transition('addition-duplicate-item-relation', base, duplicate_relation, False, 'exactly one source item')
+    overlap = case('addition-successor-overlap', omitted)
+    write(overlap, 'claim-successors.tsv', table(overlap, 'claim-successors.tsv') + [
+        ['SE-RUNTIME-OMISSION-0001', omission_event, omission_cc, claim, '1', 'new_successor', omitted_claim]])
+    transition('addition-successor-overlap', base, overlap, False, 'cannot have successor provenance')
+
+    for label, name, row, diagnostic in [
+            ('addition-r4-binding', 'bindings.tsv', [omitted_claim, 'LatticeSystem.Claims.statement', 'NONE',
+                                                   'LatticeSystem.Claims.Front', 'PENDING', 'NONE'],
+             'source already has bindings'),
+            ('addition-slice', 'slices.tsv', ['SL-RUNTIME-0001', '1', omitted_claim],
+             'skeleton or axiom relations'),
+            ('addition-dependency', 'dependencies.tsv', [omitted_claim, 'requires', claim, 'NONE'],
+             'skeleton or axiom relations'),
+            ('addition-reverse-dependency', 'dependencies.tsv', [claim, 'required_by', omitted_claim, 'REVIEW'],
+             'skeleton or axiom relations'),
+            ('addition-axiom', 'claim-axioms.tsv', [omitted_claim, 'AX-RUNTIME-0001'],
+             'skeleton or axiom relations'),
+            ('addition-vocab-use', 'claim-vocabulary.tsv', [omitted_claim, 'VO-TASAKI2020-0001'],
+             'reviewed vocabulary basis and use')]:
+        target = case(label, omitted)
+        write(target, name, table(target, name) + [row])
+        transition(label, base, target, False, diagnostic)
+
+    for action in ('reclassify', 'exclude_nonclaim', 'split', 'amend_content'):
+        target = case('none-old-' + action, omitted)
+        mutate(target, 'claim-normalization-reviews.tsv', omission_nr, 5, action)
+        mutate(target, 'claim-corrections.tsv', omission_cc, 5, action)
+        transition('none-old-invalid-for-' + action, base, target, False,
+                   'correction predecessor source mismatch')
+        if action != 'amend_content':
+            static('none-old-static-invalid-for-' + action, target, False,
+                   'NONE old classification requires add_omitted_claim')
+    reused = case('addition-reuses-existing-id', omitted)
+    mutate(reused, 'claim-normalization-reviews.tsv', omission_nr, 3, claim)
+    mutate(reused, 'claim-corrections.tsv', omission_cc, 4, claim)
+    transition('addition-reuses-existing-id', base, reused, False, 'must introduce a fresh claim ID')
+    missing_claim = case('addition-missing-claim', omitted)
+    write(missing_claim, 'claims.tsv', [r for r in table(missing_claim, 'claims.tsv') if r[0] != omitted_claim])
+    transition('addition-missing-claim', base, missing_claim, False, 'must introduce a fresh claim ID')
+    unowned = case('addition-unowned-claim', omitted)
+    rows = table(unowned, 'claims.tsv')
+    extra = next(r[:] for r in rows[1:] if r[0] == omitted_claim)
+    extra[0] = unused_id(unowned, 'claims.tsv', 'CL-TASAKI2020')
+    extra[2] += '.0001'
+    rows.insert(rows.index(next(r for r in rows if r[0] == omitted_claim)) + 1, extra)
+    write(unowned, 'claims.tsv', rows)
+    transition('addition-unowned-new-claim', base, unowned, False, 'split successor provenance is incomplete')
+    for column, diagnostic in [(2, 'census invariant count is stale'),
+                               (3, 'formalization target count is stale'), (6, 'census OID is stale')]:
+        target = case('addition-stale-invariant-' + str(column), omitted)
+        invariant = next(r for r in table(target, 'source-invariants.tsv')[1:] if r[0] == 'TASAKI2020')
+        value = '0' * 40 if column == 6 else str(int(invariant[column]) + 1)
+        mutate(target, 'source-invariants.tsv', 'TASAKI2020', column, value)
+        transition('addition-stale-invariant-' + str(column), base, target, False, diagnostic)
+    print('test-content-amendments-runtime: omitted-claim cases ' + str(count - omission_start))
+    print('test-content-amendments-runtime: ok (' + str(count) + ' cases; ' +
+          str(accepted) + ' positive, ' + str(rejected) + ' rejection cases)')
 PY

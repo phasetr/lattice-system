@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate content-amendment ownership and its exact source-registry transition."""
+"""Validate reviewed content amendments and omitted-claim creation provenance."""
 
 import argparse
 import csv
@@ -44,6 +44,117 @@ def valid_oid(value):
 def blob(content):
     return subprocess.check_output(['git', 'hash-object', '--stdin'],
                                    input=content.encode('utf-8')).decode().strip()
+
+
+def validate_additions_static(root):
+    events = keyed(root, 'correction-events.tsv')
+    reviews = keyed(root, 'claim-normalization-reviews.tsv')
+    claims = keyed(root, 'claims.tsv')
+    pages = keyed(root, 'pages.tsv')
+    items = keyed(root, 'source-items.tsv')
+    corrections = keyed(root, 'claim-corrections.tsv')
+    additions = []
+    created_claims = set()
+    for correction in corrections.values():
+        if correction[5] != 'add_omitted_claim':
+            if 'NONE' in correction[6:8]:
+                fail('NONE old classification requires add_omitted_claim')
+            continue
+        event = events.get(correction[1])
+        review = reviews.get(correction[3])
+        claim = claims.get(correction[4])
+        if (event is None or review is None or claim is None or
+                review[1] != event[0] or review[3] != claim[0] or
+                review[4:7] != ['exact_statement_readiness', 'add_omitted_claim', 'closed'] or
+                review[8] != event[4] or claim[1] != event[2]):
+            fail('omitted claim review or source ownership mismatch')
+        if (sum(row[1] == event[0] and row[3] == claim[0] for row in reviews.values()) != 1 or
+                sum(row[1] == event[0] and row[4] == claim[0] for row in corrections.values()) != 1):
+            fail('omitted claim lacks exactly one owning review and correction')
+        if (correction[6:8] != ['NONE', 'NONE'] or
+                correction[8] not in {'assertion', 'definition', 'notation', 'hypothesis', 'domain', 'conjecture'} or
+                correction[9] not in {'theorem', 'lemma', 'proposition', 'corollary', 'equation',
+                                      'definition', 'notation', 'problem', 'remark', 'subclaim',
+                                      'unnumbered_obligation', 'hypothesis', 'domain', 'conjecture'}):
+            fail('invalid omitted claim classification')
+        if claim[0] in created_claims:
+            fail('omitted claim has more than one creation owner')
+        created_claims.add(claim[0])
+        page = pages.get(claim[3])
+        if page is None or page[1] != event[2]:
+            fail('omitted claim source page mismatch')
+        if any(row[1] == event[0] and (row[2] == correction[0] or row[3] == claim[0] or row[6] == claim[0])
+               for row in rows(root, 'claim-successors.tsv')):
+            fail('omitted claim cannot have successor provenance')
+        relations = [row for row in rows(root, 'item-claims.tsv') if row[2] == claim[0]]
+        if len(relations) != 1:
+            fail('omitted claim lacks exactly one source item')
+        item = items.get(relations[0][0])
+        if item is None or item[1] != event[2] or item[3] != claim[3]:
+            fail('omitted claim source item mismatch')
+        # A later reviewed correction may change this claim. Creation-time
+        # classification and content are checked against its own event base.
+        additions.append(correction)
+    return additions
+
+
+def validate_additions_transition(base, current, event):
+    additions = [row for row in validate_additions_static(current) if row[1] == event[0]]
+    if not additions:
+        return
+    old_claims, claims = keyed(base, 'claims.tsv'), keyed(current, 'claims.tsv')
+    old_pages, pages = keyed(base, 'pages.tsv'), keyed(current, 'pages.tsv')
+    old_source = keyed(base, 'sources.tsv').get(event[2])
+    source = keyed(current, 'sources.tsv').get(event[2])
+    if (source is None or old_source != source or not valid_oid(source[14]) or
+            not valid_oid(source[15]) or len(source[14]) != len(source[15])):
+        fail('omitted claim source fingerprints changed or are not frozen')
+    for root, known_claims in [(base, old_claims), (current, claims)]:
+        progress = keyed(root, 'source-progress.tsv').get(event[2])
+        if progress is None or progress[1] not in {'registered', 'source_frozen', 'census_pass1',
+                                                 'census_pass2', 'census_reconciled', 'vocabulary_reviewed'}:
+            fail('omitted claim requires a pre-R4 source')
+        if any(row[0] in known_claims and known_claims[row[0]][1] == event[2]
+               for row in rows(root, 'bindings.tsv')):
+            fail('omitted claim source already has bindings')
+    vocabulary = keyed(current, 'vocabulary.tsv')
+    invariant = keyed(current, 'source-invariants.tsv').get(event[2])
+    if invariant is None or invariant[7] != event[4]:
+        fail('omitted claim lacks its event invariant review')
+    if int(invariant[1]) != sum(row[1] == event[2] for row in pages.values()):
+        fail('omitted claim physical page count is stale')
+    for correction in additions:
+        claim_id = correction[4]
+        if claim_id in old_claims:
+            fail('omitted claim reuses a frozen claim ID')
+        claim = claims[claim_id]
+        if claim[5:7] != correction[8:10]:
+            fail('omitted claim classification does not match its correction')
+        if claim[5] == 'out_of_scope' or claim[9:] != ['NONE', 'NONE', 'false', 'NONE', 'NONE', 'NONE']:
+            fail('omitted claim is not an active formalization target')
+        if not claim[7].strip() or re.fullmatch(r'\s*(?:True|False)\.?\s*', claim[7]):
+            fail('contentless omitted claim surrogate')
+        if not valid_oid(claim[8]) or blob(claim[7]) != claim[8]:
+            fail('omitted claim content OID is not frozen or is stale')
+        old_page, page = old_pages.get(claim[3]), pages.get(claim[3])
+        if (old_page is None or page != old_page or page[1] != event[2] or
+                not valid_oid(page[9])):
+            fail('omitted claim must use an unchanged frozen source page')
+        for root in (base, current):
+            for name, columns in [('slices.tsv', (2,)), ('dependencies.tsv', (0, 2)),
+                                  ('claim-axioms.tsv', (0,))]:
+                if any(any(record[column] == claim_id for column in columns)
+                       for record in rows(root, name)):
+                    fail('omitted claim has skeleton or axiom relations')
+        review_rows = [row for row in rows(current, 'claim-vocabulary-review.tsv') if row[0] == claim_id]
+        uses = [row for row in rows(current, 'claim-vocabulary.tsv') if row[0] == claim_id]
+        if (len(review_rows) != 1 or review_rows[0][2] != event[4] or
+                review_rows[0][1] not in {'mathlib_only', 'project_vocabulary'} or
+                (review_rows[0][1] == 'mathlib_only' and uses) or
+                (review_rows[0][1] == 'project_vocabulary' and not uses) or
+                len({row[1] for row in uses}) != len(uses) or
+                any(row[1] not in vocabulary for row in uses)):
+            fail('omitted claim lacks its reviewed vocabulary basis and use')
 
 
 def validate_static(root):
@@ -100,6 +211,7 @@ def validate_static(root):
         for previous, current in zip(entries, entries[1:]):
             if previous[0] == current[0] or previous[2] != current[1]:
                 fail('content amendment history chain is stale')
+    validate_additions_static(root)
     return amendments
 
 
@@ -119,6 +231,7 @@ def validate_transition(base, current, event_id):
                 if row[1] == event_id and row[5] == 'amend_content'}
     if {row[2] for row in new} != expected:
         fail('content amendment provenance is not new for this event')
+    validate_additions_transition(base, current, event)
     if not new:
         return
     old_claims, claims = keyed(base, 'claims.tsv'), keyed(current, 'claims.tsv')
