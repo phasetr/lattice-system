@@ -50,6 +50,10 @@ the frozen source-page hash, and event ownership. The reviewed source unit
 recovers the complex spectral estimate and its surrounding conditions;
 it does not certify a proof, other claims, or the complete source corpus.
 The broader rendered-source re-audit and further corrections remain incomplete.
+The same permanent protocol supports independently reviewed additions of
+previously omitted atomic claims, with fresh IDs, frozen page provenance,
+item and vocabulary ownership, and derived census invariants. This capability
+does not itself add a source claim or certify source coverage.
 CI selects this exceptional transition only while the event is new and its
 recorded base equals the actual merge base. Later pull requests automatically
 use the ordinary immutable base-diff path.
