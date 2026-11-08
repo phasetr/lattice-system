@@ -48,11 +48,15 @@ A setup-unit event records seven statement-readiness reviews, one amendment
 that makes the local model conditions explicit, and one previously omitted
 atomic claim about the sublattice cardinalities. It introduces a fresh claim and
 source item without a predecessor or successor, deriving the revised census
-invariants from the corpus. The sixth ledger, `claim-content-amendments.tsv`,
-records both reviewed pre-R4 amendments, including actual old and new content
-hashes, frozen source-page hashes, and event ownership. The reviewed units cover
-the complex spectral estimate and the opening model setup; they do not certify
-proofs, other source units, or the complete source corpus. The broader
+invariants from the corpus. A symmetry/order-operator event records seven
+statement-readiness reviews and three identity-preserving amendments restoring
+the eigenphase factor, finite-system Taylor context, and distinct component
+conditions. The sixth ledger, `claim-content-amendments.tsv`, records five
+reviewed pre-R4 amendments, including actual old and new content hashes, frozen
+source-page hashes, and event ownership. The reviewed units cover the complex
+spectral estimate, opening model setup, and following symmetry/order-operator
+unit; they do not certify proofs, other source units, or the complete source
+corpus. The broader
 rendered-source re-audit and further corrections remain incomplete. The same
 permanent protocol supports independently reviewed additions with fresh IDs,
 frozen page provenance, and explicit item and vocabulary ownership.
