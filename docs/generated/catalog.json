@@ -454,6 +454,7 @@
         "IT-TASAKI2020-0417",
         "IT-TASAKI2020-0418",
         "IT-TASAKI2020-0419",
+        "IT-TASAKI2020-3039",
         "IT-TASAKI2020-0420",
         "IT-TASAKI2020-0421",
         "IT-TASAKI2020-0422",
@@ -16505,6 +16506,37 @@
       "item_kind": "unlabeled",
       "locator": "PDF p. 88; print p. 75; §4.1.1; paragraph 3",
       "order_key": "000088.0004",
+      "page_id": "PG-TASAKI2020-0088",
+      "public_group": "Chapter 04",
+      "public_slug": "chapter-04",
+      "source_id": "TASAKI2020",
+      "source_label": "NONE",
+      "title": "NONE"
+    },
+    {
+      "claims": [
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-3449",
+          "disposition": "assertion",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "unnumbered_obligation",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
+        }
+      ],
+      "item_id": "IT-TASAKI2020-3039",
+      "item_kind": "unlabeled",
+      "locator": "PDF p. 88; print p. 75; §4.1.1; finite-volume strict-positivity sentence after Theorem 4.1",
+      "order_key": "000088.0004.0001",
       "page_id": "PG-TASAKI2020-0088",
       "public_group": "Chapter 04",
       "public_slug": "chapter-04",
@@ -99978,12 +100010,12 @@
     "vocabulary_status": "vocabulary_ready requires both a review row and a vocabulary-reviewed-or-later source lifecycle; review_staged is not ready"
   },
   "summary": {
-    "active_claims": 3183,
+    "active_claims": 3184,
     "claim_vocabulary_links": 4,
-    "formalization_target_claims": 3172,
-    "mathlib_only_claims": 3170,
+    "formalization_target_claims": 3173,
+    "mathlib_only_claims": 3171,
     "project_vocabulary_claims": 2,
-    "source_items": 3038,
+    "source_items": 3039,
     "tombstoned_claims": 8,
     "vocabulary_declarations": 2
   },

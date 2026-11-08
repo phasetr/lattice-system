@@ -258,6 +258,22 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 
 - `CL-TASAKI2020-0416` — assertion / remark; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
+<a id="IT-TASAKI2020-3039"></a>
+
+## Unlabeled item IT-TASAKI2020-3039
+
+- Item ID: `IT-TASAKI2020-3039`
+- Source: `TASAKI2020`
+- Page ID: `PG-TASAKI2020-0088`
+- Kind: `unlabeled`
+- Source label: `NONE`
+- Title: `NONE`
+- Locator: PDF p. 88; print p. 75; §4.1.1; finite-volume strict-positivity sentence after Theorem 4.1
+
+### Atomic claims
+
+- `CL-TASAKI2020-3449` — assertion / unnumbered_obligation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+
 <a id="IT-TASAKI2020-0420"></a>
 
 ## Unlabeled item IT-TASAKI2020-0420
