@@ -13,6 +13,7 @@ CHECK_CORRECTIONS=${CHECK_CORRECTIONS:-"$PROJECT_ROOT/scripts/check-claim-correc
 GENERATE_PUBLIC_DOCS=${GENERATE_PUBLIC_DOCS:-"$PROJECT_ROOT/scripts/generate-public-docs.py"}
 EVENT_ID=RUNTIME-CORRECTION-EVENT-2
 BASE_COMMIT=c6fb1ec6046626e14dd9a65f396a66386fcb9b7b
+EVENT1_COMMIT=cf4a289e7c766554c8821e167eddac2c3e291c2a
 REVIEW_REF=CORPUS-NORMALIZATION-TASAKI2020-2026-REVIEW
 BASE="$TMP/base"
 CASES="$TMP/cases"
@@ -96,9 +97,10 @@ rewrite() {
 }
 
 prepare_event() {
-  local target=$1
+  local target=$1 position
   clone_base "$target"
-  printf '%s\n' "$EVENT_ID"$'\t2\tTASAKI2020\t'"$BASE_COMMIT"$'\t'"$REVIEW_REF" >> "$target/registry/correction-events.tsv"
+  position=$(awk 'END {print NR}' "$target/registry/correction-events.tsv")
+  printf '%s\n' "$EVENT_ID"$'\t'"$position"$'\tTASAKI2020\t'"$BASE_COMMIT"$'\t'"$REVIEW_REF" >> "$target/registry/correction-events.tsv"
 }
 
 append_correction() {
@@ -180,10 +182,11 @@ add_source_b() {
 }
 
 prepare_event_from() {
-  local base=$1 target=$2 source=$3
+  local base=$1 target=$2 source=$3 position
   clone_case "$base" "$target"
+  position=$(awk 'END {print NR}' "$target/registry/correction-events.tsv")
   printf '%s\n' \
-    "$EVENT_ID"$'\t2\t'"$source"$'\t'"$BASE_COMMIT"$'\t'"$REVIEW_REF" \
+    "$EVENT_ID"$'\t'"$position"$'\t'"$source"$'\t'"$BASE_COMMIT"$'\t'"$REVIEW_REF" \
     >> "$target/registry/correction-events.tsv"
 }
 
@@ -350,7 +353,7 @@ make_unchanged "$UNCHANGED"
 ITEM_EVENT1_BASE="$CASES/item-event1-base"
 ITEM_EVENT1_CURRENT="$CASES/item-event1-current"
 clone_commit_registry "$BASE_COMMIT" "$ITEM_EVENT1_BASE"
-clone_base "$ITEM_EVENT1_CURRENT"
+clone_commit_registry "$EVENT1_COMMIT" "$ITEM_EVENT1_CURRENT"
 add_event1_source_item "$ITEM_EVENT1_CURRENT"
 
 # Positive transition coverage comes first deliberately.  Before the dedicated
@@ -524,7 +527,7 @@ clone_case "$ITEM_EVENT1_CURRENT" "$CASES/ordinary-unauthorized-item-add"
 rewrite "$CASES/ordinary-unauthorized-item-add/registry/source-item-additions.tsv" \
   'FNR==1 {print}'
 expect_fail ordinary-unauthorized-item-add "unmanifested source item addition" \
-  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$ITEM_EVENT1_CURRENT" \
   "$CASES/ordinary-unauthorized-item-add"
 
 EVENT2=CORPUS-NORMALIZATION-TASAKI2020-2027
@@ -684,7 +687,7 @@ expect_fail new-successor-source-mismatch "new successor source mismatch" \
 
 clone_case "$RECLASSIFY" "$CASES/event-position-gap"
 rewrite "$CASES/event-position-gap/registry/correction-events.tsv" \
-  '$1=="'"$EVENT_ID"'" {$2=3} {print}'
+  '$1=="'"$EVENT_ID"'" {$2=$2+1} {print}'
 expect_fail event-position-gap "invalid correction event ledger" \
   "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/event-position-gap"
 

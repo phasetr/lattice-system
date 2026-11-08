@@ -16,8 +16,6 @@ import tempfile
 project = Path(sys.argv[1]).resolve()
 header = ['amendment_id', 'event_id', 'correction_id', 'claim_id',
           'old_content_oid', 'new_content_oid', 'page_source_oid', 'review_ref']
-event = 'RUNTIME-CONTENT-EVENT'
-review = 'RUNTIME-CONTENT-REVIEW'
 claim = 'CL-TASAKI2020-0001'
 
 def table(root, name):
@@ -49,6 +47,53 @@ def refresh(root):
         row[6] = blob(content)
     write(root, 'source-invariants.tsv', rows)
 
+def unused_id(root, name, prefix):
+    path = root / 'registry' / name
+    existing = {row[0] for row in table(root, name)[1:]} if path.exists() else set()
+    number = 1
+    while prefix + '-' + format(number, '04d') in existing:
+        number += 1
+    return prefix + '-' + format(number, '04d')
+
+def clone_commit_registry(commit, target):
+    paths = subprocess.check_output(
+        ['git', 'ls-tree', '-r', '--name-only', commit, 'registry'], cwd=project).decode().splitlines()
+    for relative in paths:
+        destination = target / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(subprocess.check_output(['git', 'show', commit + ':' + relative], cwd=project))
+    if not (target / 'registry/claim-content-amendments.tsv').exists():
+        write(target, 'claim-content-amendments.tsv', [header])
+
+def prepare_amendment(before, after, content):
+    shutil.copytree(before, after)
+    if not (after / 'registry/claim-content-amendments.tsv').exists():
+        write(after, 'claim-content-amendments.tsv', [header])
+    event_id = unused_id(after, 'correction-events.tsv', 'RUNTIME-CONTENT-EVENT')
+    review_ref = event_id + '-REVIEW'
+    review_id = unused_id(after, 'claim-normalization-reviews.tsv', 'NR-RUNTIME')
+    correction_id = unused_id(after, 'claim-corrections.tsv', 'CC-RUNTIME')
+    amendment_id = unused_id(after, 'claim-content-amendments.tsv', 'CA-RUNTIME')
+    old = next(row for row in table(before, 'claims.tsv')[1:] if row[0] == claim)
+    page = next(row for row in table(before, 'pages.tsv')[1:] if row[0] == old[3])
+    events = table(after, 'correction-events.tsv')
+    events.append([event_id, str(len(events)), old[1],
+                   subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=project).decode().strip(), review_ref])
+    write(after, 'correction-events.tsv', events)
+    write(after, 'claim-normalization-reviews.tsv', table(after, 'claim-normalization-reviews.tsv') + [
+        [review_id, event_id, '1', claim, 'exact_statement_readiness', 'amend_content',
+         'closed', 'restore-source-condition', review_ref]])
+    write(after, 'claim-corrections.tsv', table(after, 'claim-corrections.tsv') + [
+        [correction_id, event_id, '1', review_id, claim, 'amend_content',
+         old[5], old[6], old[5], old[6]]])
+    write(after, 'claim-content-amendments.tsv', table(after, 'claim-content-amendments.tsv') + [
+        [amendment_id, event_id, correction_id, claim, blob(old[7]), blob(content), page[9], review_ref]])
+    mutate(after, 'claims.tsv', claim, 7, content)
+    mutate(after, 'claims.tsv', claim, 8, blob(content))
+    mutate(after, 'claim-vocabulary-review.tsv', claim, 2, review_ref)
+    refresh(after)
+    return event_id, review_ref, correction_id, amendment_id, old, page
+
 count = 0
 def expect(label, expected, command, diagnostic=''):
     global count
@@ -65,34 +110,11 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     os.environ['LATTICE_TEST_ROOT'] = temporary
     base = root / 'base'
     shutil.copytree(project / 'registry', base / 'registry')
-    write(base, 'claim-content-amendments.tsv', [header])
-    mutate(base, 'claims.tsv', claim, 7, 'For every x, F(x) = G(x).')
     mutate(base, 'claims.tsv', claim, 8, 'PENDING')
     refresh(base)
     current = root / 'current'
-    shutil.copytree(base, current)
-    events = table(current, 'correction-events.tsv')
-    events.append([event, str(len(events)), 'TASAKI2020',
-                   subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=project).decode().strip(), review])
-    write(current, 'correction-events.tsv', events)
-    reviews = table(current, 'claim-normalization-reviews.tsv')
-    reviews.append(['NR-RUNTIME-0001', event, '1', claim, 'exact_statement_readiness',
-                    'amend_content', 'closed', 'restore-source-condition', review])
-    write(current, 'claim-normalization-reviews.tsv', reviews)
-    old = next(r for r in table(base, 'claims.tsv')[1:] if r[0] == claim)
-    corrections = table(current, 'claim-corrections.tsv')
-    corrections.append(['CC-RUNTIME-0001', event, '1', 'NR-RUNTIME-0001', claim,
-                        'amend_content', old[5], old[6], old[5], old[6]])
-    write(current, 'claim-corrections.tsv', corrections)
     new_content = 'For every admissible x, F(x) = G(x).'
-    mutate(current, 'claims.tsv', claim, 7, new_content)
-    mutate(current, 'claims.tsv', claim, 8, blob(new_content))
-    page = next(r for r in table(current, 'pages.tsv')[1:] if r[0] == old[3])
-    write(current, 'claim-content-amendments.tsv', [header,
-          ['CA-RUNTIME-0001', event, 'CC-RUNTIME-0001', claim,
-           blob(old[7]), blob(new_content), page[9], review]])
-    mutate(current, 'claim-vocabulary-review.tsv', claim, 2, review)
-    refresh(current)
+    event, review, correction_id, amendment_id, old, page = prepare_amendment(base, current, new_content)
     corrections_checker = str(project / 'scripts/check-claim-corrections.sh')
     base_checker = str(project / 'scripts/check-base-diff.sh')
     command = [corrections_checker, '--fixture-dirs', str(base), str(current)]
@@ -115,7 +137,7 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
         return target
 
     def amendment_change(target, column, value):
-        mutate(target, 'claim-content-amendments.tsv', 'CA-RUNTIME-0001', column, value)
+        mutate(target, 'claim-content-amendments.tsv', amendment_id, column, value)
 
     static('pending-old-static', current)
     expect('pending-old-registry', True, [str(project / 'scripts/check-registry.sh'), str(current)])
@@ -130,18 +152,31 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     transition('frozen-old-content-event', frozen_base, current)
     base_diff('frozen-old-dedicated-diff', frozen_base, current, event_id=event)
 
-    legacy_base = case('historical-no-ledger', base)
+    existing_amendments = table(base, 'claim-content-amendments.tsv')[1:]
+    snapshot_commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=project).decode().strip()
+    if existing_amendments:
+        event_rows = {row[0]: row for row in table(base, 'correction-events.tsv')[1:]}
+        earliest = min(existing_amendments, key=lambda row: int(event_rows[row[1]][1]))
+        snapshot_commit = event_rows[earliest[1]][3]
+    historical_header = root / 'pre-amendment-header'
+    clone_commit_registry(snapshot_commit, historical_header)
+    assert len(table(historical_header, 'claim-content-amendments.tsv')) == 1
+    assert not any(row[5] == 'amend_content' for row in table(historical_header, 'claim-corrections.tsv')[1:])
+    legacy_base = case('historical-no-ledger', historical_header)
     (legacy_base / 'registry/claim-content-amendments.tsv').unlink()
-    transition('historical-no-ledger-content-event', legacy_base, current)
-    base_diff('historical-no-ledger-dedicated-diff', legacy_base, current, event_id=event)
-    base_diff('ordinary-header-only-migration', legacy_base, base)
-    base_diff('ordinary-data-without-event', legacy_base, current, False)
+    legacy_current = root / 'historical-content-event'
+    legacy_event, _, _, _, _, _ = prepare_amendment(legacy_base, legacy_current, new_content)
+    transition('historical-no-ledger-content-event', legacy_base, legacy_current)
+    base_diff('historical-no-ledger-dedicated-diff', legacy_base, legacy_current, event_id=legacy_event)
+    base_diff('ordinary-header-only-migration', legacy_base, historical_header)
+    base_diff('ordinary-data-without-event', legacy_base, legacy_current, False)
 
     missing = case('missing-ledger')
     (missing / 'registry/claim-content-amendments.tsv').unlink()
     transition('missing-current-ledger', base, missing, False, 'missing registry/claim-content-amendments.tsv')
     missing_row = case('missing-row')
-    write(missing_row, 'claim-content-amendments.tsv', [header])
+    write(missing_row, 'claim-content-amendments.tsv',
+          [row for row in table(missing_row, 'claim-content-amendments.tsv') if row[0] != amendment_id])
     transition('missing-amendment-row', base, missing_row, False, 'missing its provenance row')
     duplicate = case('duplicate-amendment')
     amendment_rows = table(duplicate, 'claim-content-amendments.tsv')
@@ -162,7 +197,7 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
         static(name, target, False, diagnostic)
 
     wrong_action = case('wrong-action')
-    mutate(wrong_action, 'claim-corrections.tsv', 'CC-RUNTIME-0001', 5, 'reclassify')
+    mutate(wrong_action, 'claim-corrections.tsv', correction_id, 5, 'reclassify')
     static('amendment-owned-by-wrong-action', wrong_action, False, 'ownership mismatch')
     wrong_source = case('wrong-source')
     mutate(wrong_source, 'correction-events.tsv', event, 2, 'OTHER')
@@ -211,8 +246,8 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     refresh(unowned)
     transition('unowned-other-content-change', base, unowned, False, 'unmanifested claim drift')
     for name, record in [
-            ('claim-successors.tsv', ['SE-RUNTIME-0001', event, 'CC-RUNTIME-0001', claim, '1', 'new_successor', 'CL-TASAKI2020-0002']),
-            ('source-item-additions.tsv', ['IA-RUNTIME-0001', event, 'CC-RUNTIME-0001', '1', 'IT-RUNTIME-0001', review])]:
+            ('claim-successors.tsv', ['SE-RUNTIME-0001', event, correction_id, claim, '1', 'new_successor', 'CL-TASAKI2020-0002']),
+            ('source-item-additions.tsv', ['IA-RUNTIME-0001', event, correction_id, '1', 'IT-RUNTIME-0001', review])]:
         target = case('extra-' + name)
         write(target, name, table(target, name) + [record])
         static('amendment-cannot-add-' + name, target, False, 'cannot introduce successors or source items')
@@ -237,7 +272,8 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
         transition('existing-target-' + suffix, before, after, False, 'skeleton or axiom relations')
 
     stale_review = case('unrefreshed-vocab-review')
-    mutate(stale_review, 'claim-vocabulary-review.tsv', claim, 2, table(base, 'claim-vocabulary-review.tsv')[1][2])
+    mutate(stale_review, 'claim-vocabulary-review.tsv', claim, 2,
+           next(row[2] for row in table(base, 'claim-vocabulary-review.tsv')[1:] if row[0] == claim))
     transition('unrefreshed-vocabulary-review', base, stale_review, False, 'refreshed vocabulary review')
     vocab_basis = case('vocab-basis')
     mutate(vocab_basis, 'claim-vocabulary-review.tsv', claim, 1, 'project_vocabulary')
@@ -249,22 +285,9 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     mutate(wrong_counts, 'source-invariants.tsv', 'TASAKI2020', 2, '3183')
     transition('stale-census-count', base, wrong_counts, False, 'census invariant count is stale')
 
-    later = case('later-event')
-    second_event, second_review = 'RUNTIME-CONTENT-EVENT-2', 'RUNTIME-CONTENT-REVIEW-2'
-    events = table(later, 'correction-events.tsv')
-    events.append([second_event, str(len(events)), 'TASAKI2020', events[-1][3], second_review])
-    write(later, 'correction-events.tsv', events)
-    write(later, 'claim-normalization-reviews.tsv', table(later, 'claim-normalization-reviews.tsv') + [
-        ['NR-RUNTIME-0002', second_event, '1', claim, 'exact_statement_readiness', 'amend_content', 'closed', 'restore-second-condition', second_review]])
-    write(later, 'claim-corrections.tsv', table(later, 'claim-corrections.tsv') + [
-        ['CC-RUNTIME-0002', second_event, '1', 'NR-RUNTIME-0002', claim, 'amend_content', old[5], old[6], old[5], old[6]]])
+    later = root / 'later-event'
     final_content = 'For every admissible x, F(x) = conjugate("G(x)") + ε.'
-    write(later, 'claim-content-amendments.tsv', table(later, 'claim-content-amendments.tsv') + [
-        ['CA-RUNTIME-0002', second_event, 'CC-RUNTIME-0002', claim, blob(new_content), blob(final_content), page[9], second_review]])
-    mutate(later, 'claims.tsv', claim, 7, final_content)
-    mutate(later, 'claims.tsv', claim, 8, blob(final_content))
-    mutate(later, 'claim-vocabulary-review.tsv', claim, 2, second_review)
-    refresh(later)
+    second_event, _, _, second_amendment, _, _ = prepare_amendment(current, later, final_content)
     static('later-event-history-static', later)
     transition('repeat-amendment-exact-new-base', current, later)
     base_diff('repeat-amendment-dedicated-route', current, later, event_id=second_event)
@@ -274,7 +297,7 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     amendment_change(historical, 7, 'HISTORICAL-DRIFT')
     transition('historical-row-mutation', current, historical, False, 'historical correction ledger drift')
     stale_chain = case('history-chain-stale', later)
-    mutate(stale_chain, 'claim-content-amendments.tsv', 'CA-RUNTIME-0002', 4, blob(old[7]))
+    mutate(stale_chain, 'claim-content-amendments.tsv', second_amendment, 4, blob(old[7]))
     static('stale-history-chain', stale_chain, False, 'history chain is stale')
 
     multi_base, multi_current = case('multi-base', base), case('multi-current')
@@ -291,7 +314,7 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
 
     historical_ordinary = case('historical-ledger-piggyback', later)
     records = table(historical_ordinary, 'claim-content-amendments.tsv')
-    records[-1][0] = 'CA-RUNTIME-9999'
+    records[-1][0] = unused_id(later, 'claim-content-amendments.tsv', 'CA-PIGGYBACK')
     write(historical_ordinary, 'claim-content-amendments.tsv', records)
     base_diff('historical-event-no-ordinary-bypass', later, historical_ordinary, False, event_id=second_event,
               diagnostic='historical correction ledger drift')
