@@ -124,6 +124,11 @@ if len(sys.argv) > 2:
     adapt_empty_r4_schemas(target)
     raise SystemExit(0)
 
+# Adapter-only children exit above and retain their explicit optimized mode.
+# The full suite must never silently discard its assertion oracles.
+if not __debug__:
+    raise SystemExit('test-content-amendments-runtime: full mode requires Python assertions')
+
 def prepare_amendment(before, after, content):
     shutil.copytree(before, after)
     if not (after / 'registry/claim-content-amendments.tsv').exists():

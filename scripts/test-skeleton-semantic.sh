@@ -280,6 +280,12 @@ write_claims "$AXIOM_FROZEN/Fixture/Claims.lean" "${SETUP[@]}" "${STATEMENT[@]}"
 harvest "$AXIOM_FROZEN" "$TMP/axiom-dump.tsv"
 axiom_type_oid=$(declaration_oid "$TMP/axiom-dump.tsv" Fixture.interfaceAxiom 4)
 rewrite "$AXIOM_FROZEN/registry/axioms.tsv" "NR==2{\$8=\"$axiom_type_oid\"}{print}"
+# Per-claim approval is separate from global registration and global use.
+clone "$AXIOM_FROZEN" "$TMP/axiom-unapproved-actual"
+rewrite "$TMP/axiom-unapproved-actual/registry/claim-axioms.tsv" 'NR==1{print}'
+clone "$AXIOM_FROZEN" "$TMP/axiom-approved-unused"
+append "$TMP/axiom-approved-unused/registry/claim-axioms.tsv" \
+  $'CL-SRA-0001\tAX-FIXTURE-0001'
 clone "$AXIOM_FROZEN" "$TMP/axiom-restated"
 write_claims "$TMP/axiom-restated/Fixture/Claims.lean" "${SETUP[@]}" "${STATEMENT[@]}" \
   '/-- Registered interface axiom restated as a stronger assertion. -/' \
@@ -583,6 +589,11 @@ write_claims "$TMP/imported-opaque-axiom/Fixture/Claims.lean" \
 expect_pass frozen-oids "$ROOT/scripts/check-skeleton.sh" --fixture "$FROZEN"
 expect_pass checker-copy env "LATTICE_SKELETON_CHECKER_DIR=$CHECKER_COPY" "$ROOT/scripts/check-skeleton.sh" --fixture "$FROZEN"
 expect_pass axiom-frozen-type "$ROOT/scripts/check-skeleton.sh" --fixture "$AXIOM_FROZEN"
+expect_fail axiom-unapproved-actual "unapproved claim axiom is used" \
+  "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/axiom-unapproved-actual"
+expect_fail axiom-approved-unused "approved claim axiom is not used" \
+  "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/axiom-approved-unused"
+
 expect_pass required-by "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/required-by"
 expect_pass type-context "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/type-context"
 expect_pass registered-vocabulary "$ROOT/scripts/check-skeleton.sh" --fixture "$VOCABULARY"

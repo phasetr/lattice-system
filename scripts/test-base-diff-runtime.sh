@@ -217,6 +217,36 @@ clone_case "$PROOF_VALUE_BASE" "$CASES/binding-review-ref-updated"
 rewrite "$CASES/binding-review-ref-updated/registry/bindings.tsv" \
   'NR==2 {$15="RUNTIME-REVIEW-UPDATED"} {print}'
 
+# Ordinary base-diff freezes axiom OIDs and only migrates empty old schemas.
+AXIOM_HEADER=$'axiom_id\tdeclaration\tmodule\tcategory\tsource_locator\trationale\treopen_condition\taxiom_type_oid'
+AXIOM_ROW=$'AX-RUNTIME-0001\tLatticeSystem.Axioms.State.fixture\tLatticeSystem.Axioms.State\tstate\tfixture\tfixture\treopen\taaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+AXIOM_FIXED_BASE="$CASES/axiom-fixed-base"
+clone_production "$AXIOM_FIXED_BASE"
+printf '%s\n' "$AXIOM_HEADER" "$AXIOM_ROW" > "$AXIOM_FIXED_BASE/registry/axioms.tsv"
+clone_case "$AXIOM_FIXED_BASE" "$CASES/axiom-fixed-stable"
+clone_case "$AXIOM_FIXED_BASE" "$CASES/axiom-type-changed"
+rewrite "$CASES/axiom-type-changed/registry/axioms.tsv" 'NR==2{$8="bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}{print}'
+clone_case "$AXIOM_FIXED_BASE" "$CASES/axiom-type-reopened"
+rewrite "$CASES/axiom-type-reopened/registry/axioms.tsv" 'NR==2{$8="PENDING"}{print}'
+clone_case "$AXIOM_FIXED_BASE" "$CASES/axiom-pending-base"
+rewrite "$CASES/axiom-pending-base/registry/axioms.tsv" 'NR==2{$8="PENDING"}{print}'
+clone_case "$AXIOM_FIXED_BASE" "$CASES/axiom-pending-fixed"
+
+OLD_BINDING_HEADER=$'claim_id\tstatement_decl\tproof_decl\tmodule\tstatement_oid\tnonvacuity_decl'
+OLD_AXIOM_HEADER=$'axiom_id\tdeclaration\tmodule\tcategory\tsource_locator\trationale\treopen_condition'
+clone_production "$CASES/old-empty-schemas"
+printf '%s\n' "$OLD_BINDING_HEADER" > "$CASES/old-empty-schemas/registry/bindings.tsv"
+printf '%s\n' "$OLD_AXIOM_HEADER" > "$CASES/old-empty-schemas/registry/axioms.tsv"
+clone_production "$CASES/old-populated-bindings"
+printf '%s\n' "$OLD_BINDING_HEADER" \
+  $'CL-TASAKI2020-0001\tLatticeSystem.Claims.Front.statement0001\tLatticeSystem.Claims.Front.claim0001\tLatticeSystem.Claims.Front\taaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\tNONE' \
+  > "$CASES/old-populated-bindings/registry/bindings.tsv"
+clone_production "$CASES/current-populated-bindings"
+printf '%s\n' "$BINDING_HEADER" "$BINDING_ROW" > "$CASES/current-populated-bindings/registry/bindings.tsv"
+clone_case "$AXIOM_FIXED_BASE" "$CASES/old-populated-axioms"
+awk -F '\t' -v OFS='\t' '{NF=7;print}' "$AXIOM_FIXED_BASE/registry/axioms.tsv" \
+  > "$CASES/old-populated-axioms/registry/axioms.tsv"
+
 clone_production "$CASES/review-ref-arbitrary"
 rewrite "$CASES/review-ref-arbitrary/registry/claim-vocabulary-review.tsv" \
   'NR==2 {$3="ARBITRARY-REVIEW-REF"} {print}'
@@ -285,6 +315,21 @@ expect_fail proof-value-reopened --diagnostic "proof value regressed to an unres
   "$CHECK_BASE_DIFF" --fixture-dirs "$PROOF_VALUE_BASE" "$CASES/proof-value-reopened"
 expect_pass binding-review-provenance-updated \
   "$CHECK_BASE_DIFF" --fixture-dirs "$PROOF_VALUE_BASE" "$CASES/binding-review-ref-updated"
+
+expect_pass axiom-type-fixed-stable \
+  "$CHECK_BASE_DIFF" --fixture-dirs "$AXIOM_FIXED_BASE" "$CASES/axiom-fixed-stable"
+expect_pass axiom-type-pending-fixed \
+  "$CHECK_BASE_DIFF" --fixture-dirs "$CASES/axiom-pending-base" "$CASES/axiom-pending-fixed"
+expect_fail axiom-type-changed --diagnostic "axiom type OID regressed" \
+  "$CHECK_BASE_DIFF" --fixture-dirs "$AXIOM_FIXED_BASE" "$CASES/axiom-type-changed"
+expect_fail axiom-type-reopened --diagnostic "axiom type OID regressed" \
+  "$CHECK_BASE_DIFF" --fixture-dirs "$AXIOM_FIXED_BASE" "$CASES/axiom-type-reopened"
+expect_fail old-populated-bindings --diagnostic "base bindings.tsv carries rows under an unsupported schema" \
+  "$CHECK_BASE_DIFF" --fixture-dirs "$CASES/old-populated-bindings" "$CASES/current-populated-bindings"
+expect_fail old-populated-axioms --diagnostic "base axioms.tsv carries rows under an unsupported schema" \
+  "$CHECK_BASE_DIFF" --fixture-dirs "$CASES/old-populated-axioms" "$AXIOM_FIXED_BASE"
+expect_pass old-empty-schemas-migrate \
+  "$CHECK_BASE_DIFF" --fixture-dirs "$CASES/old-empty-schemas" "$BASE"
 
 expect_fail invalid-base-ref \
   "$CHECK_BASE_DIFF" "$PROJECT_ROOT" refs/heads/runtime-base-ref-that-does-not-exist
