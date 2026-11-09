@@ -196,6 +196,49 @@ write_claims "$TMP/nonvacuity-wrapped/Fixture/Claims.lean" "${SETUP[@]}" "${STAT
   '/-- Self-implication offered as nonvacuity through a wrapper. -/' \
   'theorem StatementNonvacuity (h : Statement) : SelfFulfilling := fun _ => h' ''
 
+# Reducibility attributes cannot conceal an otherwise identical obligation.
+clone "$TMP/nonvacuity-wrapped" "$TMP/nonvacuity-irreducible"
+write_claims "$TMP/nonvacuity-irreducible/Fixture/Claims.lean" "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}" \
+  '/-- Reviewed irreducible wrapper around a self-implication. -/' \
+  '@[irreducible] def SelfFulfilling : Prop := Statement → Statement' '' \
+  '/-- Self-implication hidden behind an irreducible definition. -/' \
+  'theorem StatementNonvacuity (h : Statement) : SelfFulfilling := by' \
+  '  delta SelfFulfilling' '  exact fun _ => h' ''
+
+# An irreducible identity can also conceal a literal True primary value.
+clone "$GOOD" "$TMP/primary-irreducible-true"
+rewrite "$TMP/primary-irreducible-true/registry/claim-context.tsv" 'NR==1{print}'
+append "$TMP/primary-irreducible-true/registry/dependencies.tsv" $'CL-SRA-0002\trequires\tCL-SRA-0001\tNONE'
+write_claims "$TMP/primary-irreducible-true/Fixture/Claims.lean" \
+  '/-- Reviewed irreducible proposition identity. -/' \
+  '@[irreducible] def Setup (p : Prop) : Prop := p' '' \
+  '/-- Literal True hidden behind the reviewed identity. -/' \
+  'def Statement : Prop := Setup True' '' "${PROOF[@]}"
+
+# Exact obligations quantify the primary's universes in the proof's own order.
+# The two declarations may spell their corresponding parameters differently.
+POLYMORPHIC=('/-- Reviewed universe-polymorphic proposition. -/'
+  'def Statement.{u} : Prop := ∀ (V : Type u), Setup → V = V' '')
+POLYMORPHIC_TWO=('/-- Reviewed proposition with two ordered universes. -/'
+  'def Statement.{u, v} : Prop := ∀ (V : Type u) (W : Type v), Setup → V = V ∧ W = W' '')
+for variant in one alpha-two specialized reordered duplicated; do
+  clone "$GOOD" "$TMP/proof-universe-$variant"
+done
+write_claims "$TMP/proof-universe-one/Fixture/Claims.lean" "${SETUP[@]}" "${POLYMORPHIC[@]}" \
+  'set_option warningAsError false in' '/-- Exact universally quantified proof hole. -/' \
+  'theorem StatementProof.{u} : Statement.{u} := by sorry' ''
+write_claims "$TMP/proof-universe-alpha-two/Fixture/Claims.lean" "${SETUP[@]}" "${POLYMORPHIC_TWO[@]}" \
+  'set_option warningAsError false in' '/-- Exact proof with alpha-renamed universe parameters. -/' \
+  'theorem StatementProof.{x, y} : Statement.{x, y} := by sorry' ''
+write_claims "$TMP/proof-universe-specialized/Fixture/Claims.lean" "${SETUP[@]}" "${POLYMORPHIC[@]}" \
+  'set_option warningAsError false in' '/-- Specialized universe is not the universal obligation. -/' \
+  'theorem StatementProof : Statement.{0} := by sorry' ''
+write_claims "$TMP/proof-universe-reordered/Fixture/Claims.lean" "${SETUP[@]}" "${POLYMORPHIC_TWO[@]}" \
+  'set_option warningAsError false in' '/-- Reordered universes are not the bound order. -/' \
+  'theorem StatementProof.{x, y} : Statement.{y, x} := by sorry' ''
+write_claims "$TMP/proof-universe-duplicated/Fixture/Claims.lean" "${SETUP[@]}" "${POLYMORPHIC_TWO[@]}" \
+  'set_option warningAsError false in' '/-- Reusing one universe specializes the obligation. -/' \
+  'theorem StatementProof.{x} : Statement.{x, x} := by sorry' ''
 # The shipped R4 configuration freezes all four binding OIDs, so the suite runs
 # the real registry shape rather than the `PENDING` wildcard R4 forbids.
 FROZEN=$TMP/frozen
@@ -581,6 +624,14 @@ expect_fail nonvacuity-id-conclusion "nonvacuity declaration follows from its ow
 expect_fail nonvacuity-id-hypothesis "nonvacuity declaration follows from its own hypotheses" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/nonvacuity-id-hypothesis"
 expect_fail nonvacuity-conjunct "nonvacuity declaration follows from its own hypotheses" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/nonvacuity-conjunct"
 expect_fail nonvacuity-wrapped "nonvacuity declaration follows from its own hypotheses" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/nonvacuity-wrapped"
+expect_fail nonvacuity-irreducible "nonvacuity declaration follows from its own hypotheses" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/nonvacuity-irreducible"
+expect_fail primary-irreducible-true "literal True primary statement Fixture.Statement" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/primary-irreducible-true"
+expect_pass proof-universe-one "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/proof-universe-one"
+expect_pass proof-universe-alpha-two "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/proof-universe-alpha-two"
+for variant in specialized reordered duplicated; do
+  expect_fail "proof-universe-$variant" "proof type is not exactly the bound primary statement" \
+    "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/proof-universe-$variant"
+done
 expect_fail nonvacuity-unrelated "nonvacuity declaration does not reference its bound statement" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/nonvacuity-unrelated"
 expect_fail frozen-statement-type "wrong type OID Fixture.Statement" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/frozen-statement-type"
 expect_fail frozen-statement-value "wrong value OID Fixture.Statement" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/frozen-statement-value"

@@ -483,13 +483,19 @@ source-order exception that pulls a later prerequisite forward.
 
 The environment gate verifies declaration kind and owning module, primary type
 and value OIDs, exact proof type, direct-hole status, ordered imports and
-reviewed context. A nonvacuity theorem must reference its bound statement and
+reviewed context. An exact proof type is the bare bound primary constant applied
+to the proof declaration's own universe parameters in their declared order. Both
+declarations quantify the same number of parameters; their parameter names may
+differ. Specialized, reordered, duplicated, or extra universe arguments are not
+that universally quantified obligation. A nonvacuity theorem must reference its bound statement and
 may not be `True`, a restatement of its own hypotheses, or those same shapes
 hidden behind a definition. These checks do not replace original-source
 statement review or the separate review of locator documentation.
 The nonvacuity guard unfolds the tested implication and conjunction shapes
 with fuel 16, comparing hypotheses and conclusions at the same weak-head
-normalization boundary. It is a bounded structural defense against self-fulfilling
+normalization boundary using explicit `.all` transparency, including irreducible
+definitions. The primary-value `True` check uses the same transparency. These
+local classifications do not change the frozen expression encodings. It is a bounded structural defense against self-fulfilling
 obligations, not a proof of mathematical nonemptiness or source fidelity.
 
 ## 11. Axioms
@@ -530,6 +536,10 @@ stubs only under the skeleton build target.
 A dedicated `LatticeSystem.Skeleton` umbrella imports every registered
 claim module for completeness checking.
 The production root must not import that umbrella or any unresolved claim.
+When registered statement modules and bindings are present, the skeleton gate
+also checks the following Lake isolation contract. With both tables empty, the
+gate instead performs the contract-only check described in §13 and does not run
+this Lake configuration inspection or the nondefault Skeleton build.
 The supported default Lake target is the `LatticeSystem` Lean library with its
 `leanArts` facet. The pinned Lake TOML decoder and effective glob expansion must
 select the canonical root and only registered vocabulary modules at their exact

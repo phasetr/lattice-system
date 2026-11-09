@@ -53,21 +53,29 @@ Report whether a declaration type is a self-fulfilling obligation. The first
 component holds when its conclusion reduces to `True`; the second holds when the
 whole obligation follows from its own hypotheses, which covers `(h : P) : P`,
 `(h : P) : P ∧ True`, and the same shapes wrapped in a definition. Both are
-rejected as nonvacuity evidence.
+rejected as nonvacuity evidence. `.all` also opens irreducible definitions;
+this local classification does not change the expression encodings.
 -/
-private meta def selfFulfillingFacts (type : Expr) : MetaM (Bool × Bool) := do
-  let concludesTrue ← Meta.forallTelescope type fun _ conclusion => do
-    return (← Meta.whnf conclusion).isConstOf (Name.mkSimple "True")
-  return (concludesTrue, ← impliedByHypotheses #[] 16 type)
+private meta def selfFulfillingFacts (type : Expr) : MetaM (Bool × Bool) :=
+  Meta.withTransparency .all do
+    let concludesTrue ← Meta.forallTelescope type fun _ conclusion => do
+      return (← Meta.whnf conclusion).isConstOf (Name.mkSimple "True")
+    return (concludesTrue, ← impliedByHypotheses #[] 16 type)
 
 /--
-Name the declaration type when it is exactly a universe-monomorphic constant.
-A registered proof obligation is spelled as its bound primary statement, so any
-larger type reports `NONE` and cannot match a binding.
+Name an exact primary type at the proof declaration's own ordered universe
+parameters. The primary and proof must quantify the same number of universes;
+specialized, reordered, duplicated, or extra levels report `NONE`, as do larger
+types. Parameter names may differ between the two declarations.
 -/
-private meta def typeConstantName (info : ConstantInfo) : String :=
+private meta def typeConstantName (env : Environment) (info : ConstantInfo) : String :=
   match info.type.consumeMData with
-  | .const name levels => if levels.isEmpty then toString name else "NONE"
+  | .const name levels =>
+    match env.find? name with
+    | some target =>
+      if target.levelParams.length == info.levelParams.length &&
+          levels == info.levelParams.map Level.param then toString name else "NONE"
+    | none => "NONE"
   | _ => "NONE"
 
 /-- The four direct option syntaxes handled by the pinned Lean elaborators. -/
@@ -184,7 +192,7 @@ private meta def declarationLine (env : Environment) (moduleName : Name)
   let axioms ← Lean.collectAxioms info.name
   let isProp ← Meta.isProp info.type
   let value := valueExpr? info
-  let reducedValue ← value.mapM Meta.whnf
+  let reducedValue ← Meta.withTransparency .all <| value.mapM Meta.whnf
   let isTrueValue := reducedValue.any fun
     | .const name _ => name == Name.mkSimple "True"
     | _ => false
@@ -200,7 +208,7 @@ private meta def declarationLine (env : Environment) (moduleName : Name)
     namesField axioms, namesField (binderDomainConstants info.type),
     namesField (value.map binderDomainConstants |>.getD #[]),
     boolField isTrueValue, boolField (isPropValue.getD false),
-    boolField concludesTrue, boolField selfFulfilling, typeConstantName info,
+    boolField concludesTrue, boolField selfFulfilling, typeConstantName env info,
     encodeExpr info.levelParams info.type, valueEncoding info]
 
 /-- Inspect all registered statement modules in one elaborated environment. -/
