@@ -264,8 +264,17 @@ An addition has no predecessor, successor or content-amendment provenance.
 It receives exactly one source-item relation and an event-owned vocabulary
 review whose basis agrees with its uses of existing vocabulary. It may join an
 existing item while preserving its metadata and old relations. A genuinely
-new item requires a `source-item-additions.tsv` row owned by the same creation
-correction. Counts and the census OID are derived from the actual corpus;
+new item requires exactly one `source-item-additions.tsv` row. For an
+omission-owned item, its canonical item creator is the omission correction of
+the position-1 claim. Further members may have distinct creation corrections,
+but each must be a fresh omitted claim with its own closed review and creation
+correction in that same event and source. Every member has exactly one item
+globally and shares the item's page; existing claims and split successors
+cannot join this branch. A split-owned item retains strict single-correction
+ownership for all its new successor members. Item manifests, canonical public
+grouping, relation positions, first-claim order and historical metadata remain
+enforced without exceptions for named items.
+Counts and the census OID are derived from the actual corpus;
 the updated source invariant carries the event's review token.
 
 Historical addition rows retain their creation-time classification and
@@ -599,6 +608,10 @@ Content-amendment cases additionally exercise pending and fixed old content,
 actual old/new hashes, page fingerprints, unchanged identities, pre-R4 scope,
 vocabulary review renewal, absent historical ledgers, repeated amendments,
 unrelated sources, and the return to ordinary immutable-history checks.
+Shared-item cases exercise independently created omissions within one named
+item, canonical first-relation ownership, per-member provenance and uniqueness,
+strict split ownership, unchanged public generation and privacy, frozen later
+item/history relations, and a later reviewed amendment of one grouped member.
 The CI-selector suite separately checks the one-shot correction route,
 historical-event fallback to normal mode, a later event, merge-base mismatch rejection,
 multiple-new-event rejection, and invalid-base rejection.
