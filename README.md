@@ -57,13 +57,18 @@ positivity assertion. A ferrimagnetic statement/model event records ten
 statement-readiness reviews and adds the omitted squared-order symmetry
 assertion to an existing source item, preserving all nine existing claim records
 and the item's metadata and first relation. Its printed proof context remains
-outside that statement/model scope. The sixth ledger,
-`claim-content-amendments.tsv`, records six reviewed pre-R4 amendments,
-including actual old and new content hashes,
+outside that statement/model scope. A proof-context event records two local
+context normalizations. Its J>0 guard on the intermediate chain is interpretive
+and unprinted. The separate balanced case preserves the main theorem's range,
+and every original chain term remains unchanged. This scoped normalization
+does not certify the printed proof, a Lean proof, or the full source audit.
+The sixth ledger, `claim-content-amendments.tsv`, records eight reviewed pre-R4
+amendments, including actual old and new content hashes,
 frozen source-page hashes, and event ownership. The reviewed units cover the
 complex spectral estimate, opening model setup, symmetry/order-operator unit,
-Theorem 4.1 core, and ferrimagnetic statement/model block; they do not certify
-proofs, other source units, or the complete source corpus. The broader
+Theorem 4.1 core, ferrimagnetic statement/model block, and the separately bounded
+ferrimagnetic proof-context unit; they do not certify proofs, other source units,
+or the complete source corpus. The broader
 rendered-source re-audit and further corrections remain incomplete. The same
 permanent protocol supports independently reviewed additions with fresh IDs,
 frozen page provenance, and explicit item and vocabulary ownership.
