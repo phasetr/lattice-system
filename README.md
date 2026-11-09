@@ -15,7 +15,7 @@ The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
 progress begins in `registry/`. Its global checker capability is `vocabulary`,
 while each source advances independently through `source-progress.tsv`;
 `TASAKI2020` is `vocabulary_reviewed`. Its corrected corpus ledger contains all
-534 physical PDF pages, 3,185 active atomic claims, 3,174 formalization
+534 physical PDF pages, 3,187 active atomic claims, 3,176 formalization
 targets, 1,401 unique equation-label/page pairs, and 63 pages with no claim.
 Eight superseded records preserve the provenance of compound or duplicate
 claims, while eleven active records are explicitly classified `out_of_scope`. The only
@@ -23,7 +23,7 @@ production Lean tree is limited to the registered vocabulary modules and their
 root. Checker cases are generated only under isolated system temporary roots;
 the repository contains no tracked fixture tree.
 
-The vocabulary reviews classify all 3,174 formalization targets: 3,172 are
+The vocabulary reviews classify all 3,176 formalization targets: 3,174 are
 `mathlib_only`, while claims `CL-TASAKI2020-2487` and
 `CL-TASAKI2020-2488` require project vocabulary. The registered vocabulary is
 exactly `partialTraceRight` and `partialTraceLeft`, with four claim-to-vocabulary
@@ -62,12 +62,19 @@ context normalizations. Its J>0 guard on the intermediate chain is interpretive
 and unprinted. The separate balanced case preserves the main theorem's range,
 and every original chain term remains unchanged. This scoped normalization
 does not certify the printed proof, a Lean proof, or the full source audit.
-The sixth ledger, `claim-content-amendments.tsv`, records eight reviewed pre-R4
+An infrared-bound model/Fourier setup event records eleven statement-readiness
+outcomes: two context amendments, two omitted orthogonality assertions in one
+genuine named footnote item, and seven unchanged records. Each new assertion
+has its own creation correction and review; the first claim's correction owns
+the shared item. The unit includes the immediate explanation after equation
+(4.1.23) and ends before (4.1.24), without certifying the later bound or proofs.
+The sixth ledger, `claim-content-amendments.tsv`, records ten reviewed pre-R4
 amendments, including actual old and new content hashes,
 frozen source-page hashes, and event ownership. The reviewed units cover the
 complex spectral estimate, opening model setup, symmetry/order-operator unit,
-Theorem 4.1 core, ferrimagnetic statement/model block, and the separately bounded
-ferrimagnetic proof-context unit; they do not certify proofs, other source units,
+Theorem 4.1 core, ferrimagnetic statement/model block, the separately bounded
+ferrimagnetic proof-context unit, and infrared-bound model/Fourier setup;
+they do not certify proofs, other source units,
 or the complete source corpus. The broader
 rendered-source re-audit and further corrections remain incomplete. The same
 permanent protocol supports independently reviewed additions with fresh IDs,

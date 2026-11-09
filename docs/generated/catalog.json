@@ -486,6 +486,7 @@
         "IT-TASAKI2020-0448",
         "IT-TASAKI2020-0449",
         "IT-TASAKI2020-0450",
+        "IT-TASAKI2020-3040",
         "IT-TASAKI2020-0451",
         "IT-TASAKI2020-0452",
         "IT-TASAKI2020-0453",
@@ -17673,6 +17674,54 @@
       "public_slug": "chapter-04",
       "source_id": "TASAKI2020",
       "source_label": "equation (4.1.22)",
+      "title": "NONE"
+    },
+    {
+      "claims": [
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-3451",
+          "disposition": "assertion",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "unnumbered_obligation",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
+        },
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-3452",
+          "disposition": "assertion",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "unnumbered_obligation",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
+        }
+      ],
+      "item_id": "IT-TASAKI2020-3040",
+      "item_kind": "footnote",
+      "locator": "PDF p. 93; print p. 80; §4.1.2; Footnote 6",
+      "order_key": "000093.0007",
+      "page_id": "PG-TASAKI2020-0093",
+      "public_group": "Chapter 04",
+      "public_slug": "chapter-04",
+      "source_id": "TASAKI2020",
+      "source_label": "Footnote 6",
       "title": "NONE"
     },
     {
@@ -100027,12 +100076,12 @@
     "vocabulary_status": "vocabulary_ready requires both a review row and a vocabulary-reviewed-or-later source lifecycle; review_staged is not ready"
   },
   "summary": {
-    "active_claims": 3185,
+    "active_claims": 3187,
     "claim_vocabulary_links": 4,
-    "formalization_target_claims": 3174,
-    "mathlib_only_claims": 3172,
+    "formalization_target_claims": 3176,
+    "mathlib_only_claims": 3174,
     "project_vocabulary_claims": 2,
-    "source_items": 3039,
+    "source_items": 3040,
     "tombstoned_claims": 8,
     "vocabulary_declarations": 2
   },
