@@ -1,10 +1,10 @@
 # Track: Tasaki front-to-back
 
 - Phase: `vocabulary`
-- Active claims: 3184
-- Formalization targets: 3173
+- Active claims: 3185
+- Formalization targets: 3174
 - Superseded claim records: 8
-- Mathlib-only: 3171
+- Mathlib-only: 3172
 - Project vocabulary: 2
 - Complete claim-vocabulary links: 4
 
