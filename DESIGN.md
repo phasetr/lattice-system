@@ -467,7 +467,9 @@ unresolved statement modules.
 `setup_claim_id`, `use_kind`, `scope`, and `review_ref`. Its targets are earlier
 registered definitions, notation, hypotheses, or domains. An `assumption` must
 occur in a binder domain or antecedent of the statement; a term-level `let`
-supplies a value and is not an assumption. `same_item` context cannot cross a
+supplies a value and is not an assumption. Repeated rows for a setup retain
+every assumption requirement; a `term_reference` row cannot erase it in either
+row order. `same_item` context cannot cross a
 source item; `inherited` context still requires explicit independent review.
 Every project constant used in a primary statement is registered vocabulary or
 a registered primary statement. Each vocabulary constant occurring directly
@@ -558,7 +560,10 @@ The future R5 production policy may import only declarations at the proved
 frontier; the current R4 production root reaches no statement module.
 The skeleton target may locally permit the warnings corresponding exactly to
 registered stubs.
-Global `warningAsError` must remain enabled.
+Global `warningAsError` must remain enabled. The registered-skeleton Lake gate
+requires it in the normalized package options and each library's effective
+build-type/package/library options; absence has Lean's false default. Library
+inheritance and equivalent typed true values are permitted.
 The skeleton mechanism must not disable all warnings to accommodate `sorry`.
 Lean's frontend advances parsing and elaboration together, retaining scoped
 and local syntax. Its command trees and imported declaration ranges bind each permitted

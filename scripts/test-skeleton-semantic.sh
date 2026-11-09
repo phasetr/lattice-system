@@ -336,6 +336,22 @@ write_claims "$TMP/let-guard/Fixture/Claims.lean" "${SETUP[@]}" \
   '/-- Reviewed proposition mentioning its setup only in a let value. -/' \
   'def Statement : Prop := let _s : Prop := Setup; False' '' "${PROOF[@]}"
 
+# Every recorded assumption survives duplicate relation rows, in either order.
+for variant in duplicate-after duplicate-before duplicate-assumption-good duplicate-term-good; do
+  source="$TMP/let-guard"
+  [[ $variant != duplicate-assumption-good ]] || source="$GOOD"
+  clone "$source" "$TMP/context-$variant"
+  first=assumption
+  last=term_reference
+  if [[ $variant == duplicate-before || $variant == duplicate-term-good ]]; then
+    first=term_reference
+  fi
+  [[ $variant != duplicate-before ]] || last=assumption
+  rewrite "$TMP/context-$variant/registry/claim-context.tsv" 'NR==2{$4="'"$first"'"}{print}'
+  append "$TMP/context-$variant/registry/claim-context.tsv" \
+    $'CL-SRA-0002\t2\tCL-SRA-0001\t'"$last"$'\tsame_item\tfixture-review'
+done
+
 # A primary statement may name registered R3 vocabulary; an unregistered project
 # constant is rejected even when it elaborates.
 VOCABULARY=$TMP/vocabulary
@@ -483,6 +499,12 @@ write_claims "$TMP/diagnostic-linter-grind/Fixture/Claims.lean" \
   'theorem StatementProof : Statement := by' '  grind (abstractProof := false) =>' \
   '    set_option warningAsError false in' \
   '      set_option linter.unusedVariables false in' '        sorry' ''
+# Conv forwards this sequence to the ordinary tactic option handler.
+clone "$GOOD" "$TMP/diagnostic-linter-conv"
+write_claims "$TMP/diagnostic-linter-conv/Fixture/Claims.lean" "${SETUP[@]}" "${STATEMENT[@]}" \
+  'set_option warningAsError false in' '/-- Registered stub with a nested ordinary tactic option. -/' \
+  'theorem StatementProof : Statement := by' '  conv =>' '    tactic =>' \
+  '      set_option linter.unusedVariables false in rfl' '  sorry' ''
 clone "$GOOD" "$TMP/diagnostic-guard-panic"
 write_claims "$TMP/diagnostic-guard-panic/Fixture/Claims.lean" \
   '#guard_panic in' '#check R4MissingPANIC' "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}"
@@ -646,6 +668,15 @@ expect_fail proof-true "proof type is not exactly the bound primary statement" "
 expect_fail required-by-backward "required_by reference does not pull a later claim forward" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/required-by-backward"
 expect_fail type-context-unadmitted "actual setup reference lacks claim-context or dependency CL-SRA-0003" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/type-context-unadmitted"
 expect_fail let-guard "assumption context is not a binder or antecedent" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/let-guard"
+expect_pass context-duplicate-assumption-good "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/context-duplicate-assumption-good"
+expect_pass context-duplicate-term-good "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/context-duplicate-term-good"
+for variant in after before; do
+  expect_fail "context-duplicate-$variant" "assumption context is not a binder or antecedent" \
+    "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/context-duplicate-$variant"
+done
+expect_fail diagnostic-linter-conv "forbidden diagnostic suppression linter.unusedVariables" \
+  "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/diagnostic-linter-conv"
+
 expect_fail vocabulary-unregistered "primary statement uses an unregistered project constant Fixture.Ground" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/vocabulary-unregistered"
 expect_fail context "actual setup reference lacks claim-context" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/context"
 expect_fail backward "statement references a claim that is not earlier" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/backward"
@@ -770,17 +801,22 @@ production_gates() {
   "$dir/scripts/check-skeleton.sh" "$dir"
 }
 expect_pass production-composed-gates production_gates "$PRODUCTION"
-for variant in package-warning package-linter library-warning library-linter unknown-weak; do
+for variant in package-warning package-linter library-warning library-linter unknown-weak missing-warning typed-true; do
   clone "$PRODUCTION" "$TMP/production-diagnostic-$variant"
 done
 python3 - "$TMP" <<'PYOPTIONS'
 from pathlib import Path
 import sys
 root=Path(sys.argv[1])
-for variant in ['package-warning','package-linter','library-warning','library-linter','unknown-weak']:
+for variant in ['package-warning','package-linter','library-warning','library-linter','unknown-weak','missing-warning','typed-true']:
     path=root/('production-diagnostic-'+variant)/'lakefile.toml'
     text=path.read_text()
-    if variant=='package-warning':
+    if variant=='missing-warning':
+        text=text.replace('warningAsError = true\n','')
+    elif variant=='typed-true':
+        text=text.replace('warningAsError = true','warningAsError = "true"')
+        text+='leanOptions = [["warningAsError", "true"]]\n'
+    elif variant=='package-warning':
         text=text.replace('warningAsError = true','warningAsError = false')
     elif variant in ['package-linter','unknown-weak']:
         name='unusedVariables' if variant=='package-linter' else 'fixtureMissing'
@@ -795,6 +831,10 @@ for variant in ['package-warning','package-linter','library-warning','library-li
     path.write_text(text)
 PYOPTIONS
 expect_pass production-diagnostic-unknown-weak-gates production_gates "$TMP/production-diagnostic-unknown-weak"
+expect_pass production-diagnostic-typed-true-gates production_gates "$TMP/production-diagnostic-typed-true"
+expect_fail production-diagnostic-missing-warning "Lake warningAsError is not enabled in package" \
+  production_gates "$TMP/production-diagnostic-missing-warning"
+
 for owner in package library; do
   expect_fail "production-diagnostic-$owner-warning" "Lake diagnostic option disables warningAsError" \
     "$TMP/production-diagnostic-$owner-warning/scripts/check-skeleton.sh" "$TMP/production-diagnostic-$owner-warning"

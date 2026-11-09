@@ -207,7 +207,7 @@ awk -F '\t' '
   FILENAME==ARGV[1]{if(FNR>1)sequence[$1]=++claims;next}
   FILENAME==ARGV[2]{if(FNR>1){claimOf[$2]=$1;registered[$2]=1}next}
   FILENAME==ARGV[3]{if(FNR>1)registered[$2]=1;next}
-  FILENAME==ARGV[4]{if(FNR>1){context[$1 SUBSEP $3]=$4;admitted[$1 SUBSEP $3]=1}next}
+  FILENAME==ARGV[4]{if(FNR>1){key=$1 SUBSEP $3;context[key]=1;if($4=="assumption")assumption[key]=1;admitted[key]=1}next}
   FILENAME==ARGV[5]{if(FNR>1){if($2=="required_by"){admitted[$3 SUBSEP $1]=1;forward[$3 SUBSEP $1]=1}else admitted[$1 SUBSEP $3]=1}next}
   FILENAME==ARGV[6]||FILENAME==ARGV[7]{if(FNR>1)project[root($1)]=1;next}
   {
@@ -224,7 +224,7 @@ awk -F '\t' '
     }
   }
   END{
-    for(k in context){if(!(k in actual))bad("registered context is absent from statement " k);if(context[k]=="assumption"&&!(k in guard))bad("assumption context is not a binder or antecedent " k)}
+    for(k in context){if(!(k in actual))bad("registered context is absent from statement " k);if((k in assumption)&&!(k in guard))bad("assumption context is not a binder or antecedent " k)}
     for(k in actual){
       split(k,edge,SUBSEP)
       if(!(k in admitted))bad("actual setup reference lacks claim-context or dependency " k)
@@ -337,14 +337,16 @@ open Lean Lake System
 private def fail (message : String) : IO α :=
   throw <| IO.userError s!"default skeleton isolation: {message}"
 
-private def checkDiagnosticOptions (owner : String) (options : Array LeanOption) : IO Unit := do
+private def checkDiagnosticOptions (owner : String) (options : LeanOptions) : IO Unit := do
   -- This is Lean's own CLI/Lake normalization: weak unknown options disappear,
   -- weak known names are unprefixed, and string-valued Booleans are parsed.
-  let effective ← Lean.Language.Lean.reparseOptions (LeanOptions.ofArray options).toOptions
+  let effective ← Lean.Language.Lean.reparseOptions options.toOptions
   for (name, value) in effective do
     if let .ofBool false := value then
       if name == `warningAsError || name.getRoot == `linter || name.getRoot == `warn then
         fail s!"Lake diagnostic option disables {name} in {owner}"
+  unless effective.getBool `warningAsError false do
+    fail s!"Lake warningAsError is not enabled in {owner}"
 
 def main (args : List String) : IO Unit := do
   let [rootString] := args | fail "expected repository root"
@@ -358,14 +360,14 @@ def main (args : List String) : IO Unit := do
       lakeEnv, wsDir := root, relConfigFile := "lakefile.toml" }).toBaseIO
     | fail "invalid Lake TOML configuration"
   unless pkg.defaultTargets == #[`LatticeSystem] do fail "default target must be LatticeSystem"
-  checkDiagnosticOptions "package" pkg.config.leanOptions
+  checkDiagnosticOptions "package" pkg.leanOptions
   unless pkg.config.moreLeanArgs.isEmpty && pkg.config.weakLeanArgs.isEmpty do
     fail "Lake raw Lean arguments are unsupported in package"
   unless pkg.config.extraDepTargets.isEmpty do fail "package extraDepTargets is unsupported"
   unless pkg.config.dynlibs.isEmpty do fail "package dynlibs is unsupported"
   unless pkg.config.plugins.isEmpty do fail "package plugins is unsupported"
   for configured in pkg.leanLibs do
-    checkDiagnosticOptions s!"library {configured.name}" configured.config.leanOptions
+    checkDiagnosticOptions s!"library {configured.name}" configured.leanOptions
     unless configured.config.moreLeanArgs.isEmpty && configured.config.weakLeanArgs.isEmpty do
       fail s!"Lake raw Lean arguments are unsupported in library {configured.name}"
     unless configured.config.needs.isEmpty && configured.config.extraDepTargets.isEmpty do

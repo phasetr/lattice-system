@@ -5,6 +5,11 @@ SCRIPT_DIR=${BASH_SOURCE[0]%/*}
 [[ "$SCRIPT_DIR" == "${BASH_SOURCE[0]}" ]] && SCRIPT_DIR=.
 PROJECT_ROOT=${1:-$(cd "$SCRIPT_DIR/.." && pwd)}
 [[ $# -eq 0 ]] || shift
+# Full-suite assertions are mandatory even under an optimized caller. The
+# adapter-only child retains its caller's mode for the explicit optimized oracles.
+if [[ "${1:-}" != --adapt-empty-r4-only ]]; then
+  export PYTHONOPTIMIZE=0
+fi
 python3 - "$PROJECT_ROOT" "$@" <<'PY'
 import csv
 import importlib.util
