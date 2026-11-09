@@ -15,7 +15,7 @@ The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
 progress begins in `registry/`. Its global checker capability is `vocabulary`,
 while each source advances independently through `source-progress.tsv`;
 `TASAKI2020` is `vocabulary_reviewed`. Its corrected corpus ledger contains all
-534 physical PDF pages, 3,184 active atomic claims, 3,173 formalization
+534 physical PDF pages, 3,185 active atomic claims, 3,174 formalization
 targets, 1,401 unique equation-label/page pairs, and 63 pages with no claim.
 Eight superseded records preserve the provenance of compound or duplicate
 claims, while eleven active records are explicitly classified `out_of_scope`. The only
@@ -23,7 +23,7 @@ production Lean tree is limited to the registered vocabulary modules and their
 root. Checker cases are generated only under isolated system temporary roots;
 the repository contains no tracked fixture tree.
 
-The vocabulary reviews classify all 3,173 formalization targets: 3,171 are
+The vocabulary reviews classify all 3,174 formalization targets: 3,172 are
 `mathlib_only`, while claims `CL-TASAKI2020-2487` and
 `CL-TASAKI2020-2488` require project vocabulary. The registered vocabulary is
 exactly `partialTraceRight` and `partialTraceLeft`, with four claim-to-vocabulary
@@ -53,12 +53,17 @@ statement-readiness reviews and three identity-preserving amendments restoring
 the eigenphase factor, finite-system Taylor context, and distinct component
 conditions. A theorem-core event records six statement-readiness reviews,
 one amendment to the rotation conditions, and a separately omitted finite-volume
-positivity assertion. The sixth ledger, `claim-content-amendments.tsv`, records
-six reviewed pre-R4 amendments, including actual old and new content hashes,
+positivity assertion. A ferrimagnetic statement/model event records ten
+statement-readiness reviews and adds the omitted squared-order symmetry
+assertion to an existing source item, preserving all nine existing claim records
+and the item's metadata and first relation. Its printed proof context remains
+outside that statement/model scope. The sixth ledger,
+`claim-content-amendments.tsv`, records six reviewed pre-R4 amendments,
+including actual old and new content hashes,
 frozen source-page hashes, and event ownership. The reviewed units cover the
 complex spectral estimate, opening model setup, symmetry/order-operator unit,
-and Theorem 4.1 core; they do not certify proofs, other source units, or the
-complete source corpus. The broader
+Theorem 4.1 core, and ferrimagnetic statement/model block; they do not certify
+proofs, other source units, or the complete source corpus. The broader
 rendered-source re-audit and further corrections remain incomplete. The same
 permanent protocol supports independently reviewed additions with fresh IDs,
 frozen page provenance, and explicit item and vocabulary ownership.
