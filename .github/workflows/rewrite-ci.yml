@@ -14,15 +14,165 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up Lean toolchain and Mathlib cache
-        uses: leanprover/lean-action@v1
+      - name: Prepare existing Lean tools through verified official release assets
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import base64
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import re
+          import subprocess
+          import sys
+          import tempfile
+
+          def run(*args):
+              result = subprocess.run(args, text=True, capture_output=True)
+              if result.returncode:
+                  print(result.stdout, end="")
+                  print(result.stderr, end="", file=sys.stderr)
+                  raise SystemExit(f"Tool preparation command failed: {args[0]}")
+              return result.stdout.strip()
+
+          def get(url, target, binary=False):
+              # A new output file per attempt avoids retaining a failed response body.
+              for attempt in range(3):
+                  target.unlink(missing_ok=True)
+                  command = ["curl", "--fail", "--location", "--silent", "--show-error",
+                             "--proto", "=https", "--proto-redir", "=https",
+                             "--connect-timeout", "10", "--max-time", "300" if binary else "30",
+                             "--output", str(target)]
+                  if binary:
+                      command += ["--header", "Accept: application/octet-stream"]
+                  result = subprocess.run(command + [url])
+                  if result.returncode == 0:
+                      return
+                  if attempt == 2:
+                      raise SystemExit(f"Official asset request failed after 3 attempts: {url}")
+                  import time
+                  time.sleep(5)
+
+          def metadata(repo, selector, target):
+              get(f"https://api.github.com/repos/{repo}/releases/{selector}", target)
+              release = json.loads(target.read_text())
+              if release.get("draft") is not False or release.get("prerelease") is not False:
+                  raise SystemExit("A stable published release is required")
+              if not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", release.get("tag_name", "")):
+                  raise SystemExit("Unexpected release tag")
+              if selector.startswith("tags/") and release["tag_name"] != selector[5:]:
+                  raise SystemExit("Release tag differs from the declared version")
+              return release
+
+          def asset(repo, release, name, target):
+              matches = [a for a in release.get("assets", []) if a.get("name") == name]
+              if len(matches) != 1:
+                  raise SystemExit(f"Expected exactly one official asset: {name}")
+              item = matches[0]
+              asset_id, size, digest = item.get("id"), item.get("size"), item.get("digest", "")
+              if type(asset_id) is not int or asset_id <= 0 or type(size) is not int or size <= 0:
+                  raise SystemExit("Invalid release asset ID or size")
+              expected_url = f"https://api.github.com/repos/{repo}/releases/assets/{asset_id}"
+              expected_browser = f"https://github.com/{repo}/releases/download/{release['tag_name']}/{name}"
+              if (item.get("state") != "uploaded" or item.get("url") != expected_url
+                      or item.get("browser_download_url") != expected_browser
+                      or not re.fullmatch(r"sha256:[0-9a-f]{64}", digest)):
+                  raise SystemExit("Official asset identity or SHA256 metadata is invalid")
+              get(expected_url, target, binary=True)
+              sha = hashlib.sha256()
+              with target.open("rb") as archive:
+                  for chunk in iter(lambda: archive.read(1024 * 1024), b""):
+                      sha.update(chunk)
+              if target.stat().st_size != size or sha.hexdigest() != digest[7:]:
+                  raise SystemExit(f"Asset size/SHA256 verification failed: {name}")
+              print(f"Verified official asset {repo}:{release['tag_name']}/{name}")
+
+          if run("uname", "-s") != "Linux" or run("uname", "-m") != "x86_64":
+              raise SystemExit("This workflow requires its existing x86_64 Linux runner")
+          toolchain = Path("lean-toolchain").read_text().strip()
+          match = re.fullmatch(r"leanprover/lean4:(v[0-9]+\.[0-9]+\.[0-9]+)", toolchain)
+          if not match:
+              raise SystemExit("Unsupported declared Lean toolchain")
+          lean_tag = match[1]
+          manifest = json.loads(Path("lake-manifest.json").read_text())
+          mathlib = [p for p in manifest["packages"] if p["name"] == "mathlib"]
+          if len(mathlib) != 1 or mathlib[0]["url"] != "https://github.com/leanprover-community/mathlib4":
+              raise SystemExit("Expected the existing declared Mathlib dependency")
+          mathlib_rev = mathlib[0]["rev"]
+          if not re.fullmatch(r"[0-9a-f]{40}", mathlib_rev):
+              raise SystemExit("Mathlib must use its declared exact commit")
+
+          tools = Path(tempfile.mkdtemp(prefix="rewrite-ci-tools-", dir=os.environ["RUNNER_TEMP"]))
+          elan_home, lean_root, mathlib_cache = tools / "elan", tools / "lean", tools / "mathlib-cache"
+          with open(os.environ["GITHUB_ENV"], "a") as env:
+              env.write(f"REWRITE_CI_TOOLS={tools}\nELAN_HOME={elan_home}\nMATHLIB_CACHE_DIR={mathlib_cache}\n")
+          os.environ["ELAN_HOME"] = str(elan_home)
+          with tempfile.TemporaryDirectory(prefix="downloads-", dir=tools) as download_dir:
+              work = Path(download_dir)
+              # Derive leantar's exact version from the already-pinned Mathlib source.
+              io_meta = work / "mathlib-io.json"
+              get(f"https://api.github.com/repos/leanprover-community/mathlib4/contents/Cache/IO.lean?ref={mathlib_rev}", io_meta)
+              io_data = json.loads(io_meta.read_text())
+              if io_data.get("encoding") != "base64":
+                  raise SystemExit("Unexpected pinned Mathlib source encoding")
+              source = base64.b64decode(io_data["content"], validate=False)
+              blob = hashlib.sha1(b"blob " + str(len(source)).encode() + b"\0" + source).hexdigest()
+              if blob != io_data.get("sha"):
+                  raise SystemExit("Pinned Mathlib source identity mismatch")
+              versions = re.findall(rb'def LEANTARVERSION\s*:=\s*"([0-9]+\.[0-9]+\.[0-9]+)"', source)
+              if len(versions) != 1:
+                  raise SystemExit("Cannot identify the existing pinned leantar version")
+              leantar_version = versions[0].decode()
+              elan_release = metadata("leanprover/elan", "latest", work / "elan.json")
+              lean_release = metadata("leanprover/lean4", "tags/" + lean_tag, work / "lean.json")
+              leantar_release = metadata("digama0/leangz", "tags/v" + leantar_version, work / "leantar.json")
+              elan_archive, lean_archive, leantar_archive = work / "elan.tar.gz", work / "lean.tar.zst", work / "leantar.tar.gz"
+              asset("leanprover/elan", elan_release, "elan-x86_64-unknown-linux-gnu.tar.gz", elan_archive)
+              asset("leanprover/lean4", lean_release, f"lean-{lean_tag[1:]}-linux.tar.zst", lean_archive)
+              asset("digama0/leangz", leantar_release, f"leantar-v{leantar_version}-x86_64-unknown-linux-musl.tar.gz", leantar_archive)
+              # All three whole archives have passed size and SHA256 checks before execution.
+              installer = work / "elan-installer"
+              for directory in (installer, lean_root, mathlib_cache):
+                  directory.mkdir()
+              run("tar", "-xzf", str(elan_archive), "-C", str(installer), "--no-same-owner")
+              run(str(installer / "elan-init"), "-y", "--default-toolchain", "none", "--no-modify-path")
+              run("tar", "--zstd", "-xf", str(lean_archive), "-C", str(lean_root), "--strip-components=1", "--no-same-owner")
+              run("tar", "-xzf", str(leantar_archive), "-C", str(mathlib_cache), "--strip-components=1", "--no-same-owner")
+              leantar = mathlib_cache / ("leantar-" + leantar_version)
+              (mathlib_cache / "leantar").rename(leantar)
+              elan = str(elan_home / "bin" / "elan")
+              run(elan, "toolchain", "link", toolchain, str(lean_root))
+              if Path(run(elan, "which", "lean")).resolve() != (lean_root / "bin" / "lean").resolve():
+                  raise SystemExit("Elan does not resolve the verified declared toolchain")
+              os.environ["PATH"] = str(elan_home / "bin") + os.pathsep + os.environ["PATH"]
+              print(run("lean", "--version"))
+              print(run("lake", "--version"))
+              if run(str(leantar), "--version") != "leantar " + leantar_version:
+                  raise SystemExit("Prepared leantar version differs from the pinned Mathlib requirement")
+          with open(os.environ["GITHUB_PATH"], "a") as path:
+              path.write(str(elan_home / "bin") + "\n")
+          PY
+      - uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # same v5 used by lean-action
+        id: cache-restore
         with:
-          lake-package-directory: .
-          auto-config: false
-          build: false
-          test: false
-          lint: false
-          use-mathlib-cache: true
+          path: .lake
+          key: lake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lake-manifest.json') }}-${{ github.sha }}
+          restore-keys: lake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lake-manifest.json') }}
+      - name: Get the existing Mathlib cache
+        shell: bash
+        run: |
+          if [ -z "${MATHLIB_CACHE_GET_URL+x}" ]; then
+            export MATHLIB_CACHE_GET_URL="https://cache.mathlib.org/mathlib4"
+          elif [ -z "$MATHLIB_CACHE_GET_URL" ]; then
+            unset MATHLIB_CACHE_GET_URL
+          fi
+          lake exe cache get
+      - uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # same v5 used by lean-action
+        if: ${{ success() && steps.cache-restore.outputs.cache-hit != 'true' }}
+        with:
+          path: .lake
+          key: lake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lake-manifest.json') }}-${{ github.sha }}
       - name: Verify rewrite trunk base is available
         run: git rev-parse --verify 'origin/rewrite-main^{commit}'
       - name: Structural checks and checker self-tests
@@ -33,3 +183,18 @@ jobs:
         run: scripts/check-base-diff-ci.sh . origin/rewrite-main
       - name: Build production root
         run: lake build
+      - name: Remove job-local toolchain files
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          import shutil
+          tools = os.environ.get("REWRITE_CI_TOOLS")
+          if tools:
+              path = Path(tools).resolve()
+              if path.parent != Path(os.environ["RUNNER_TEMP"]).resolve() or not path.name.startswith("rewrite-ci-tools-"):
+                  raise SystemExit("Refusing unexpected cleanup path")
+              shutil.rmtree(path, ignore_errors=False)
+          PY
