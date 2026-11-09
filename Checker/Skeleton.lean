@@ -34,7 +34,8 @@ private meta partial def impliedByHypotheses (hypotheses : Array Expr) (fuel : N
   | 0 => return false
   | fuel + 1 =>
     let reduced ← Meta.whnf conclusion
-    if hypotheses.any (· == reduced) then return true
+    for hypothesis in hypotheses do
+      if (← Meta.whnf hypothesis) == reduced then return true
     if reduced.isConstOf (Name.mkSimple "True") then return true
     if reduced.isAppOfArity (Name.mkSimple "And") 2 then
       let left ← impliedByHypotheses hypotheses fuel reduced.appFn!.appArg!

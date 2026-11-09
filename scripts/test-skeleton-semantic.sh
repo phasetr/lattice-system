@@ -25,7 +25,7 @@ expect_pass() {
     echo "$output" >&2
     exit 1
   }
-  if [[ $label == production-composed-gates ]]; then
+  if [[ $label == production-*-gates ]]; then
     printf '%s\n' "$output"
   fi
   PASSES=$((PASSES + 1))
@@ -121,6 +121,11 @@ printf '%s\n' $'axiom_id\tdeclaration\tmodule\tcategory\tsource_locator\trationa
 printf '%s\n' $'claim_id\taxiom_id' > "$GOOD/registry/claim-axioms.tsv"
 printf '%s\n' \
   $'vocabulary_id\tdeclaration\tmodule\tdeclaration_kind\torigin\tparent_vocabulary_id\ttype_oid\tdeclaration_oid\tdesign_role\tfiniteness_scope' > "$GOOD/registry/vocabulary.tsv"
+printf '%s\n' $'claim_id\tvocabulary_id' > "$GOOD/registry/claim-vocabulary.tsv"
+printf '%s\n' $'claim_id\tbasis\treview_ref' \
+  $'CL-SRA-0001\tmathlib_only\tfixture-review' \
+  $'CL-SRA-0002\tmathlib_only\tfixture-review' \
+  $'CL-SRB-0001\tmathlib_only\tfixture-review' > "$GOOD/registry/claim-vocabulary-review.tsv"
 printf '%s\n' $'module\tsource_path\trole' \
   $'Fixture.Production\tFixture/Production.lean\troot' > "$GOOD/registry/modules.tsv"
 printf '%s\n' $'module\tposition\timported_module\tis_exported\tis_meta\timport_all' \
@@ -144,7 +149,7 @@ append "$TMP/dependency/registry/dependencies.tsv" $'CL-SRA-0002\trequires\tCL-S
 expect_pass dependency-admitted "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/dependency"
 
 # A reviewed nonvacuity witness that is neither `True` nor self-fulfilling.
-NONVACUITY=('/-- Reviewed nonvacuity witness. -/' 'theorem StatementNonvacuity : Setup → Statement := fun h _ => h' '')
+NONVACUITY=('/-- Explicit inhabitation witness for the fixture statement. -/' 'theorem StatementNonvacuity : Nonempty Statement := ⟨fun h => h⟩' '')
 clone "$GOOD" "$TMP/nonvacuity"
 rewrite "$TMP/nonvacuity/registry/bindings.tsv" 'NR==3{$13="Fixture.StatementNonvacuity";$14="PENDING"}{print}'
 write_claims "$TMP/nonvacuity/Fixture/Claims.lean" "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}" "${NONVACUITY[@]}"
@@ -157,6 +162,16 @@ clone "$TMP/nonvacuity" "$TMP/nonvacuity-self"
 write_claims "$TMP/nonvacuity-self/Fixture/Claims.lean" "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}" \
   '/-- Self-fulfilling statement offered as nonvacuity. -/' \
   'theorem StatementNonvacuity (h : Statement) : Statement := h' ''
+clone "$TMP/nonvacuity" "$TMP/nonvacuity-id-conclusion"
+write_claims "$TMP/nonvacuity-id-conclusion/Fixture/Claims.lean" \
+  "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}" \
+  '/-- Self-fulfilling obligation behind a reducible conclusion wrapper. -/' \
+  'theorem StatementNonvacuity (h : Statement) : id Statement := h' ''
+clone "$TMP/nonvacuity" "$TMP/nonvacuity-id-hypothesis"
+write_claims "$TMP/nonvacuity-id-hypothesis/Fixture/Claims.lean" \
+  "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}" \
+  '/-- Self-fulfilling obligation behind a reducible hypothesis wrapper. -/' \
+  'theorem StatementNonvacuity (h : id Statement) : Statement := h' ''
 clone "$TMP/nonvacuity" "$TMP/nonvacuity-unrelated"
 write_claims "$TMP/nonvacuity-unrelated/Fixture/Claims.lean" "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}" \
   '/-- Unrelated triviality offered as nonvacuity. -/' \
@@ -289,6 +304,8 @@ append "$VOCABULARY/registry/imports.tsv" $'Fixture.Vocab\t1\tMathlib.Init\ttrue
 append "$VOCABULARY/registry/statement-imports.tsv" $'Fixture.Claims\t2\tFixture.Vocab\ttrue\tfalse\tfalse'
 append "$VOCABULARY/registry/vocabulary.tsv" \
   $'VO-FX-0001\tFixture.Ground\tFixture.Vocab\tdefinition\tprimary\tNONE\tPENDING\tPENDING\tfixture\tnone'
+append "$VOCABULARY/registry/claim-vocabulary.tsv" $'CL-SRA-0002\tVO-FX-0001'
+rewrite "$VOCABULARY/registry/claim-vocabulary-review.tsv" '$1=="CL-SRA-0002"{$2="project_vocabulary"}{print}'
 write_module "$VOCABULARY/Fixture/Claims.lean" 'Mathlib.Init Fixture.Vocab' "${SETUP[@]}" \
   '/-- Reviewed proposition naming registered vocabulary. -/' \
   'def Statement : Prop := Setup → Ground' '' "${PROOF[@]}"
@@ -309,7 +326,7 @@ write_claims "$TMP/nonstandard-nonvacuity-axiom/Fixture/Claims.lean" \
   "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}" \
   'set_option linter.deprecated false in' \
   '/-- Unsupported kernel axiom in a negative nonvacuity fixture. -/' \
-  'theorem StatementNonvacuity : Setup → Statement := fun h _ => (fun (_ : True) => h) Lean.trustCompiler' ''
+  'theorem StatementNonvacuity : Nonempty Statement := ⟨fun h => (fun (_ : True) => h) Lean.trustCompiler⟩' ''
 
 clone "$GOOD" "$TMP/contract"
 rewrite "$TMP/contract/registry/bindings.tsv" 'NR==1{print}'
@@ -422,8 +439,8 @@ clone "$TMP/nonvacuity" "$TMP/warning-tactic"
 write_claims "$TMP/warning-tactic/Fixture/Claims.lean" \
   "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}" \
   '/-- A completed witness cannot disable warnings in its tactic. -/' \
-  'theorem StatementNonvacuity : Setup → Statement := by' \
-  '  set_option warningAsError false in' '    exact fun h _ => h' ''
+  'theorem StatementNonvacuity : Nonempty Statement := by' \
+  '  set_option warningAsError false in' '    exact ⟨fun h => h⟩' ''
 clone "$GOOD" "$TMP/warning-umbrella"
 printf '%s\n' 'set_option warningAsError false -- umbrella exception' \
   >> "$TMP/warning-umbrella/Fixture/Skeleton.lean"
@@ -434,7 +451,7 @@ clone "$TMP/nonvacuity" "$TMP/imported-ordinary-theorem"
 write_claims "$TMP/imported-ordinary-theorem/Fixture/Claims.lean" \
   "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}" \
   '/-- Witness whose proof value actually refers to an imported ordinary theorem. -/' \
-  'theorem StatementNonvacuity : Setup → Statement := fun h _ => (fun (_ : 0 + 0 = 0) => h) (Nat.zero_add 0)' ''
+  'theorem StatementNonvacuity : Nonempty Statement := ⟨fun h => (fun (_ : 0 + 0 = 0) => h) (Nat.zero_add 0)⟩' ''
 clone "$GOOD" "$TMP/imported-opaque-axiom"
 write_claims "$TMP/imported-opaque-axiom/Fixture/Claims.lean" \
   'set_option linter.deprecated false in' \
@@ -484,6 +501,8 @@ expect_fail multiple "exactly one direct sorryAx" "$ROOT/scripts/check-skeleton.
 expect_fail hidden "hidden or transitive-only sorryAx" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/hidden"
 expect_fail nonvacuity-true "nonvacuity declaration concludes True" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/nonvacuity-true"
 expect_fail nonvacuity-self "nonvacuity declaration follows from its own hypotheses" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/nonvacuity-self"
+expect_fail nonvacuity-id-conclusion "nonvacuity declaration follows from its own hypotheses" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/nonvacuity-id-conclusion"
+expect_fail nonvacuity-id-hypothesis "nonvacuity declaration follows from its own hypotheses" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/nonvacuity-id-hypothesis"
 expect_fail nonvacuity-conjunct "nonvacuity declaration follows from its own hypotheses" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/nonvacuity-conjunct"
 expect_fail nonvacuity-wrapped "nonvacuity declaration follows from its own hypotheses" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/nonvacuity-wrapped"
 expect_fail nonvacuity-unrelated "nonvacuity declaration does not reference its bound statement" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/nonvacuity-unrelated"
@@ -656,6 +675,73 @@ expect_fail production-warning "unscoped warningAsError suppression" production_
 expect_fail production-inactive-owner "inactive claim-context owner or target" production_gates "$TMP/production-inactive-owner"
 expect_fail production-inactive-target "inactive claim-context owner or target" production_gates "$TMP/production-inactive-target"
 expect_fail production-proof-policy "production policy is not implemented for proof" production_gates "$TMP/production-proof-policy"
+
+# Global registration is distinct from this claim's reviewed vocabulary use.
+# The two counterexamples keep the R3 basis/use tables internally consistent.
+PRODUCTION_VOCABULARY=$TMP/production-vocabulary
+clone "$PRODUCTION" "$PRODUCTION_VOCABULARY"
+printf '%s\n' module '' 'public import Mathlib.Init' '' '@[expose] public section' '' \
+  'namespace LatticeSystem' '/-- First counterfactual vocabulary carrier. -/' \
+  'def Ground : Type := Nat' '' '/-- Second counterfactual vocabulary carrier. -/' \
+  'def AlternateGround : Type := Nat' '' 'end LatticeSystem' \
+  > "$PRODUCTION_VOCABULARY/LatticeSystem/VocabularyData.lean"
+printf '%s\n' module '' 'public import LatticeSystem.VocabularyData' '' \
+  '/-! Counterfactual vocabulary umbrella. -/' \
+  > "$PRODUCTION_VOCABULARY/LatticeSystem/Vocabulary.lean"
+append "$PRODUCTION_VOCABULARY/registry/modules.tsv" \
+  $'LatticeSystem.VocabularyData\tLatticeSystem/VocabularyData.lean\tleaf'
+rewrite "$PRODUCTION_VOCABULARY/registry/imports.tsv" '$1=="LatticeSystem.Vocabulary"{$3="LatticeSystem.VocabularyData"}{print}'
+append "$PRODUCTION_VOCABULARY/registry/imports.tsv" \
+  $'LatticeSystem.VocabularyData\t1\tMathlib.Init\ttrue\tfalse\tfalse'
+append "$PRODUCTION_VOCABULARY/registry/statement-imports.tsv" \
+  $'LatticeSystem.Claims.Front\t2\tLatticeSystem.VocabularyData\ttrue\tfalse\tfalse'
+append "$PRODUCTION_VOCABULARY/registry/vocabulary.tsv" \
+  $'VO-LS-9001\tLatticeSystem.Ground\tLatticeSystem.VocabularyData\tdefinition\tprimary\tNONE\tPENDING\tPENDING\tstat_mech\tnone' \
+  $'VO-LS-9002\tLatticeSystem.AlternateGround\tLatticeSystem.VocabularyData\tdefinition\tprimary\tNONE\tPENDING\tPENDING\tstat_mech\tnone'
+append "$PRODUCTION_VOCABULARY/registry/claim-vocabulary.tsv" \
+  $'CL-SRA-0001\tVO-LS-9001' $'CL-SRA-0002\tVO-LS-9001' $'CL-SRA-0002\tVO-LS-9002'
+rewrite "$PRODUCTION_VOCABULARY/registry/claim-vocabulary-review.tsv" '$1~/^CL-SRA-/{$2="project_vocabulary"}{print}'
+rewrite "$PRODUCTION_VOCABULARY/registry/claim-context.tsv" 'NR==2{$4="term_reference"}{print}'
+rewrite "$PRODUCTION_VOCABULARY/registry/bindings.tsv" '$1=="CL-SRA-0001"{$6="definition_value"}{print}'
+printf '%s\n' module '' 'public import Mathlib.Init' 'public import LatticeSystem.VocabularyData' '' \
+  '@[expose] public section' '' 'namespace LatticeSystem.Claims.Front' \
+  '/-- Primary type directly uses reviewed vocabulary. -/' \
+  'def Setup (x : LatticeSystem.Ground) : Nat := x' '' \
+  '/-- Primary value directly uses reviewed vocabulary and an earlier setup. -/' \
+  'def Statement : Prop :=' \
+  '  ∀ (x : LatticeSystem.Ground) (y : LatticeSystem.AlternateGround), Setup x = y' '' \
+  'set_option warningAsError false in' '/-- Registered counterfactual direct proof hole. -/' \
+  'theorem StatementProof : Statement := by sorry' '' 'end LatticeSystem.Claims.Front' \
+  > "$PRODUCTION_VOCABULARY/LatticeSystem/Claims/Front.lean"
+"$ROOT/scripts/check-vocabulary.sh" --dump --fixture "$PRODUCTION_VOCABULARY" > "$TMP/production-vocabulary-dump.tsv"
+awk -F '\t' -v OFS='\t' '
+  NR==FNR{if(FNR>1){type[$2]=$5;value[$2]=$6}next}
+  FNR>1{$7=type[$2];$8=value[$2]}{print}
+' "$TMP/production-vocabulary-dump.tsv" "$PRODUCTION_VOCABULARY/registry/vocabulary.tsv" > "$TMP/frozen-vocabulary.tsv"
+cp "$TMP/frozen-vocabulary.tsv" "$PRODUCTION_VOCABULARY/registry/vocabulary.tsv"
+harvest "$PRODUCTION_VOCABULARY" "$TMP/production-vocabulary-binding-dump.tsv"
+awk -F '\t' '$2=="LatticeSystem.Claims.Front.Setup"&&index(","$9",",",LatticeSystem.Ground,"){found=1}END{exit !found}' \
+  "$TMP/production-vocabulary-binding-dump.tsv" || abort "primary type vocabulary use was not observed"
+awk -F '\t' '$2=="LatticeSystem.Claims.Front.Statement"&&index(","$10",",",LatticeSystem.Ground,")&&index(","$10",",",LatticeSystem.AlternateGround,"){found=1}END{exit !found}' \
+  "$TMP/production-vocabulary-binding-dump.tsv" || abort "primary value vocabulary uses were not observed"
+freeze_bindings "$PRODUCTION_VOCABULARY/registry/bindings.tsv" "$TMP/production-vocabulary-binding-dump.tsv"
+python3 "$ROOT/scripts/generate-public-docs.py" --write --root "$PRODUCTION_VOCABULARY" >/dev/null
+git -C "$PRODUCTION_VOCABULARY" add -- LatticeSystem registry docs
+clone "$PRODUCTION_VOCABULARY" "$TMP/production-vocabulary-mathlib-basis"
+rewrite "$TMP/production-vocabulary-mathlib-basis/registry/claim-vocabulary-review.tsv" '$1=="CL-SRA-0001"{$2="mathlib_only"}{print}'
+rewrite "$TMP/production-vocabulary-mathlib-basis/registry/claim-vocabulary.tsv" '$1!="CL-SRA-0001"{print}'
+clone "$PRODUCTION_VOCABULARY" "$TMP/production-vocabulary-unadmitted"
+rewrite "$TMP/production-vocabulary-unadmitted/registry/claim-vocabulary.tsv" '!($1=="CL-SRA-0002"&&$2=="VO-LS-9002"){print}'
+append "$TMP/production-vocabulary-unadmitted/registry/claim-vocabulary.tsv" $'CL-SRB-0001\tVO-LS-9002'
+rewrite "$TMP/production-vocabulary-unadmitted/registry/claim-vocabulary-review.tsv" '$1=="CL-SRB-0001"{$2="project_vocabulary"}{print}'
+for dir in "$TMP/production-vocabulary-mathlib-basis" "$TMP/production-vocabulary-unadmitted"; do
+  python3 "$ROOT/scripts/generate-public-docs.py" --write --root "$dir" >/dev/null
+done
+expect_pass production-vocabulary-gates production_gates "$PRODUCTION_VOCABULARY"
+expect_fail production-vocabulary-mathlib-basis "primary project vocabulary contradicts claim review basis" \
+  production_gates "$TMP/production-vocabulary-mathlib-basis"
+expect_fail production-vocabulary-unadmitted "primary vocabulary use lacks claim-vocabulary admission" \
+  production_gates "$TMP/production-vocabulary-unadmitted"
 
 echo "test-skeleton-semantic: diagnostic reached by each negative fixture"
 LC_ALL=C sort "$REACHED" | awk -F '\t' '{printf "  %-20s %s\n", $1, $2}'

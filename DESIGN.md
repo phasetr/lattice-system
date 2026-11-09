@@ -470,7 +470,14 @@ occur in a binder domain or antecedent of the statement; a term-level `let`
 supplies a value and is not an assumption. `same_item` context cannot cross a
 source item; `inherited` context still requires explicit independent review.
 Every project constant used in a primary statement is registered vocabulary or
-a registered primary statement. Actual inter-claim uses require a reviewed
+a registered primary statement. Each vocabulary constant occurring directly
+in the primary type or value additionally requires that claim's reviewed
+`claim-vocabulary.tsv` admission and `project_vocabulary` basis. A generated
+surface declaration uses its own vocabulary ID; admitting its parent does not
+admit it automatically. This necessary direct-use check does not require all
+R3 review links to occur directly in a primary declaration, expand context
+dependencies into vocabulary links, or define future proof-use policy.
+Actual inter-claim uses require a reviewed
 context or dependency edge. The `required_by` dependency is the explicit
 source-order exception that pulls a later prerequisite forward.
 
@@ -481,7 +488,8 @@ may not be `True`, a restatement of its own hypotheses, or those same shapes
 hidden behind a definition. These checks do not replace original-source
 statement review or the separate review of locator documentation.
 The nonvacuity guard unfolds the tested implication and conjunction shapes
-with fuel 16. It is a bounded structural defense against self-fulfilling
+with fuel 16, comparing hypotheses and conclusions at the same weak-head
+normalization boundary. It is a bounded structural defense against self-fulfilling
 obligations, not a proof of mathematical nonemptiness or source fidelity.
 
 ## 11. Axioms

@@ -37,7 +37,7 @@ else
 fi
 
 REG=$ROOT/registry
-for table in phase sources source-progress claims item-claims bindings dependencies claim-context axioms claim-axioms vocabulary modules imports statement-modules statement-imports; do
+for table in phase sources source-progress claims item-claims bindings dependencies claim-context axioms claim-axioms vocabulary claim-vocabulary claim-vocabulary-review modules imports statement-modules statement-imports; do
   [[ -f "$REG/$table.tsv" ]] || fail "missing registry/$table.tsv"
 done
 [[ $(head -n 1 "$REG/bindings.tsv") == $'claim_id\tstatement_decl\tproof_decl\tmodule\tstatement_kind\tstatement_shape\tstatement_type_oid\tstatement_value_oid\timplementation_status\tproof_kind\tproof_type_oid\tproof_value_oid\tnonvacuity_decl\tnonvacuity_oid\treview_ref' ]] || fail "bad bindings.tsv header"
@@ -237,6 +237,29 @@ awk -F '\t' '
 ' "$REG/claims.tsv" "$REG/bindings.tsv" "$REG/vocabulary.tsv" "$REG/claim-context.tsv" \
   "$REG/dependencies.tsv" "$REG/modules.tsv" "$REG/statement-modules.tsv" "$TMP/actual.tsv" ||
   fail "claim-context semantic mismatch"
+
+# A globally registered vocabulary declaration is usable only under this
+# primary claim's reviewed admission. This is a necessary direct-use check,
+# not a reverse equality with all planned R3 links or future proof dependencies.
+awk -F '\t' '
+  FILENAME==ARGV[1]{if(FNR>1)vocabulary[$2]=$1;next}
+  FILENAME==ARGV[2]{if(FNR>1)owner[$2]=$1;next}
+  FILENAME==ARGV[3]{if(FNR>1)admitted[$1 SUBSEP $2]=1;next}
+  FILENAME==ARGV[4]{if(FNR>1)basis[$1]=$2;next}
+  $2 in owner {
+    claim=owner[$2]
+    n=split($9 "," $10,constants,",")
+    for(i=1;i<=n;i++)if(constants[i] in vocabulary){
+      id=vocabulary[constants[i]]
+      if(basis[claim]!="project_vocabulary")
+        bad("primary project vocabulary contradicts claim review basis " claim " " id)
+      else if(!(claim SUBSEP id in admitted))
+        bad("primary vocabulary use lacks claim-vocabulary admission " claim " " id)
+    }
+  }
+  END{exit failed} function bad(s){print s > "/dev/stderr";failed=1}
+' "$REG/vocabulary.tsv" "$REG/bindings.tsv" "$REG/claim-vocabulary.tsv" \
+  "$REG/claim-vocabulary-review.tsv" "$TMP/actual.tsv" || fail "claim vocabulary admission mismatch"
 
 awk -F '\t' '
   FILENAME==ARGV[1]{if(FNR>1){owner[$2]=$1;if($3!="NONE")owner[$3]=$1;if($13!="NONE")owner[$13]=$1}next}
