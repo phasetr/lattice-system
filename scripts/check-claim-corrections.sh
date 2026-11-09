@@ -176,8 +176,8 @@ relation_drift=$(awk -F '\t' -v e="$EVENT" '
 item_addition_check=$(awk -F '\t' -v e="$EVENT" -v source="$EVENT_SOURCE" -v review="$EVENT_REVIEW" '
   FILENAME==ARGV[1]{if(FNR>1)baseItem[$1]=1;next}
   FILENAME==ARGV[2]{if(FNR>1){item[$1]=1;itemSource[$1]=$2}next}
-  FILENAME==ARGV[3]{if(FNR>1&&$2==e){corr[$1]=1;corrClaim[$1]=$5;if($6=="add_omitted_claim"){newCorr[$5]=$1;new[$5]=1;hasNewCorr[$1]=1}}next}
-  FILENAME==ARGV[4]{if(FNR>1&&$2==e){if($6=="new_successor"){newCorr[$7]=$3;new[$7]=1;hasNewCorr[$3]=1}else if($6=="existing_duplicate")existing[$7]=1}next}
+  FILENAME==ARGV[3]{if(FNR>1&&$2==e){corr[$1]=1;action[$1]=$6;if($6=="add_omitted_claim"){omissionCorr[$5]=$1;new[$5]=1;hasNewCorr[$1]=1}}next}
+  FILENAME==ARGV[4]{if(FNR>1&&$2==e){if($6=="new_successor"){splitCorr[$7]=$3;new[$7]=1;hasNewCorr[$3]=1}else if($6=="existing_duplicate")existing[$7]=1}next}
   FILENAME==ARGV[5]{if(FNR>1)baseClaim[$1]=1;next}
   FILENAME==ARGV[6]{if(FNR>1){relItem[$3]=$1;claimUse[$3]++;pos[$1]++;rel[$1 SUBSEP pos[$1]]=$3}next}
   FNR>1&&$2!=e {if(!($5 in baseItem)){print "owner";exit};next}
@@ -192,15 +192,22 @@ item_addition_check=$(awk -F '\t' -v e="$EVENT" -v source="$EVENT_SOURCE" -v rev
     for(id in item)if(!(id in baseItem)&&!(id in added)){print "unmanifested";exit}
     for(id in added){
       if(pos[id]==0){print "unmanifested";exit}
+      owner=added[id]
+      if(action[owner]=="add_omitted_claim"){
+        # Claim creators remain independent; the first member creates the item.
+        if(omissionCorr[rel[id SUBSEP 1]]!=owner){print "different";exit}
+      }else if(action[owner]!="split"){print "owner";exit}
       for(i=1;i<=pos[id];i++){
         claim=rel[id SUBSEP i]
         if(claim in baseClaim){if(claim in existing)print "existing";else print "old";exit}
         if(!(claim in new)){print "old";exit}
-        if(newCorr[claim]!=added[id])mismatch=1
-        else {matched=1;if(claimUse[claim]>1){print "duplicate";exit}}
+        if(claimUse[claim]>1)duplicate=1
+        if(action[owner]=="add_omitted_claim" ? !(claim in omissionCorr) : splitCorr[claim]!=owner)mismatch=1
+        else matched=1
       }
     }
     if(mismatch){if(matched)print "different";else print "owner";exit}
+    if(duplicate){print "duplicate";exit}
   }
 ' "$BASE_REG/source-items.tsv" "$CURRENT_REG/source-items.tsv" "$CURRENT_REG/claim-corrections.tsv" "$CURRENT_REG/claim-successors.tsv" "$BASE_REG/claims.tsv" "$CURRENT_REG/item-claims.tsv" "$CURRENT_REG/source-item-additions.tsv")
 case "$item_addition_check" in

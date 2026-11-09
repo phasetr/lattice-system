@@ -72,6 +72,11 @@ or the complete source corpus. The broader
 rendered-source re-audit and further corrections remain incomplete. The same
 permanent protocol supports independently reviewed additions with fresh IDs,
 frozen page provenance, and explicit item and vocabulary ownership.
+Multiple independently created omissions may share one genuinely new item:
+the position-1 claim's correction owns the item, while every member retains
+its own same-event creation review and unique item relation. Split-created
+items retain single-correction ownership, and historical metadata stays frozen.
+This capability does not add a production claim or certify another source unit.
 CI selects this exceptional transition only while the event is new and its
 recorded base equals the actual merge base. Later pull requests automatically
 use the ordinary immutable base-diff path.

@@ -6,6 +6,8 @@ SCRIPT_DIR=${BASH_SOURCE[0]%/*}
 PROJECT_ROOT=${1:-$(cd "$SCRIPT_DIR/.." && pwd)}
 python3 - "$PROJECT_ROOT" <<'PY'
 import csv
+import importlib.util
+import json
 import os
 from pathlib import Path
 import shutil
@@ -161,6 +163,39 @@ def prepare_omission(before, after, new_item=True):
     refresh(after)
     return event_id, review_ref, review_id, correction_id, claim_id, item_id
 
+
+def prepare_grouped_omissions(before, after):
+    first = after.with_name(after.name + '-first')
+    event, review, nr1, cc1, claim1, item = prepare_omission(before, first)
+    event2, _, nr2, cc2, claim2, item2 = prepare_omission(first, after)
+    write(after, 'correction-events.tsv', [r for r in table(after, 'correction-events.tsv') if r[0] != event2])
+    for name, identifier in [('claim-normalization-reviews.tsv', nr2), ('claim-corrections.tsv', cc2)]:
+        mutate(after, name, identifier, 1, event)
+        mutate(after, name, identifier, 2, '2')
+    mutate(after, 'claim-normalization-reviews.tsv', nr2, 8, review)
+    mutate(after, 'claim-vocabulary-review.tsv', claim2, 2, review)
+    write(after, 'source-items.tsv', [r for r in table(after, 'source-items.tsv') if r[0] != item2])
+    write(after, 'source-item-additions.tsv',
+          [r for r in table(after, 'source-item-additions.tsv') if r[4] != item2])
+    relations = [r for r in table(after, 'item-claims.tsv') if r[0] != item2]
+    index = next(i for i, r in enumerate(relations) if r[0] == item)
+    relations.insert(index + 1, [item, '2', claim2])
+    write(after, 'item-claims.tsv', relations)
+    page = next(r[3] for r in table(after, 'claims.tsv')[1:] if r[0] == claim1)
+    page_order = next(r[2] for r in table(after, 'pages.tsv')[1:] if r[0] == page)
+    locator = 'PDF p. ' + str(int(page_order)) + '; Footnote 999'
+    for column, value in [(4, 'footnote'), (5, 'Footnote 999'), (7, locator),
+                          (10, 'PUBLIC-DOCS-SOURCE-ITEM-REVIEW-V1')]:
+        mutate(after, 'source-items.tsv', item, column, value)
+    for position, identifier in enumerate((claim1, claim2), 1):
+        content = 'Synthetic private assertion ' + str(position) + ' for a finite test family.'
+        mutate(after, 'claims.tsv', identifier, 4, locator + '; assertion ' + str(position))
+        mutate(after, 'claims.tsv', identifier, 7, content)
+        mutate(after, 'claims.tsv', identifier, 8, blob(content))
+    mutate(after, 'source-invariants.tsv', 'TASAKI2020', 7, review)
+    refresh(after)
+    return event, review, (nr1, nr2), (cc1, cc2), (claim1, claim2), item
+
 count = 0
 accepted = 0
 rejected = 0
@@ -213,6 +248,10 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     omitted = root / 'omitted-claim'
     omission_event, omission_review, omission_nr, omission_cc, omitted_claim, omitted_item = prepare_omission(base, omitted)
     transition('omitted-claim-new-item', base, omitted)
+
+    grouped = root / 'grouped-omissions'
+    grouped_event, grouped_review, grouped_nrs, grouped_ccs, grouped_claims, grouped_item = prepare_grouped_omissions(base, grouped)
+    transition('two-omissions-one-named-item', base, grouped)
 
     static('pending-old-static', current)
     expect('pending-old-registry', True, [str(project / 'scripts/check-registry.sh'), str(current)])
@@ -489,6 +528,192 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     mutate(foreign_item_owner, 'source-item-additions.tsv', ia2, 3, '2')
     transition('addition-valid-foreign-item-owner', base, foreign_item_owner, False,
                'new source item contains a successor from a different correction')
+
+    grouped_start = count - 1
+    nr1, nr2 = grouped_nrs
+    cc1, cc2 = grouped_ccs
+    first_claim, second_claim = grouped_claims
+    grouped_ia = table(grouped, 'source-item-additions.tsv')[-1][0]
+    static('grouped-omissions-static', grouped)
+    base_diff('grouped-omissions-dedicated-route', base, grouped, event_id=grouped_event)
+    base_diff('grouped-omissions-ordinary-rejected', base, grouped, False,
+              diagnostic='frozen invariants regression')
+    base_diff('grouped-omissions-later-ordinary-freeze', grouped, grouped)
+    base_diff('grouped-omissions-historical-event-is-ordinary', grouped, grouped, event_id=grouped_event)
+
+    # Exercise the unchanged public grouping and renderer with the same fixture,
+    # rather than a separately constructed approximation of the new item.
+    spec = importlib.util.spec_from_file_location('public_docs', project / 'scripts/generate-public-docs.py')
+    generator = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(generator)
+    data = generator.load_registry(grouped)
+    catalog = generator.public_catalog(data)
+    named = [item for item in catalog['items'] if item['item_id'] == grouped_item]
+    assert len(named) == 1
+    assert named[0]['item_kind'] == 'footnote' and named[0]['source_label'] == 'Footnote 999'
+    assert [c['claim_id'] for c in named[0]['claims']] == list(grouped_claims)
+    anchor_item = next(r for r in table(grouped, 'source-items.tsv')[1:] if r[0] == grouped_item)
+    assert named[0]['public_group'] == anchor_item[8] and named[0]['public_slug'] == anchor_item[9]
+    assert len(data['source_items']) == len(table(base, 'source-items.tsv'))
+    outputs = generator.build_outputs(catalog)
+    public_text = json.dumps(catalog) + ''.join(outputs.values())
+    for row in table(grouped, 'claims.tsv')[1:]:
+        if row[0] in grouped_claims:
+            assert row[7] not in public_text and row[8] not in public_text
+    assert grouped_review not in public_text and 'normalized_content' not in public_text
+    generator.write_outputs(grouped, outputs)
+    assert generator.check_outputs(grouped, outputs, quiet=True)
+    count += 1
+    accepted += 1
+
+    reversed_creators = case('grouped-correction-position-independent', grouped)
+    records = table(reversed_creators, 'claim-corrections.tsv')
+    earlier, later = records[-2:]
+    earlier[2], later[2] = '2', '1'
+    write(reversed_creators, 'claim-corrections.tsv', records[:-2] + [later, earlier])
+    transition('grouped-owner-is-first-relation-not-correction-position', base, reversed_creators)
+
+    for label, name, identifier, column, value, diagnostic in [
+            ('noncanonical-owner', 'source-item-additions.tsv', grouped_ia, 2, cc2,
+             'new source item contains a successor from a different correction'),
+            ('secondary-open-review', 'claim-normalization-reviews.tsv', nr2, 6, 'open',
+             'invalid claim normalization review ledger'),
+            ('secondary-source', 'claims.tsv', second_claim, 1, 'SRB',
+             'normalization review source mismatch'),
+            ('secondary-page', 'claims.tsv', second_claim, 3,
+             next(r[0] for r in table(base, 'pages.tsv')[1:] if r[0] != page[0]),
+             'source item mismatch'),
+            ('secondary-review-token', 'claim-vocabulary-review.tsv', second_claim, 2, 'WRONG-REVIEW',
+             'reviewed vocabulary basis and use'),
+            ('relation-position', 'item-claims.tsv', grouped_item, 1, '3',
+             'item relation positions are not contiguous'),
+            ('first-claim-order', 'source-items.tsv', grouped_item, 2, anchor_item[2] + '.0001',
+             'item order does not match first claim'),
+            ('reused-item', 'source-item-additions.tsv', grouped_ia, 4,
+             table(base, 'source-items.tsv')[1][0], 'source item addition reuses a frozen item ID')]:
+        target = case('grouped-' + label, grouped)
+        mutate(target, name, identifier, column, value)
+        transition('grouped-' + label, base, target, False, diagnostic)
+
+    for missing, records_to_remove in [
+            ('creator', [('claim-corrections.tsv', cc2)]),
+            ('review', [('claim-normalization-reviews.tsv', nr2)]),
+            ('both', [('claim-corrections.tsv', cc2), ('claim-normalization-reviews.tsv', nr2)])]:
+        target = case('grouped-secondary-missing-' + missing, grouped)
+        for name, identifier in records_to_remove:
+            write(target, name, [r for r in table(target, name) if r[0] != identifier])
+        diagnostic = 'split successor provenance is incomplete' if missing == 'both' else 'invalid claim correction ledger'
+        transition('grouped-secondary-missing-' + missing, base, target, False, diagnostic)
+
+    foreign_event = case('grouped-foreign-event', grouped)
+    events = table(foreign_event, 'correction-events.tsv')
+    other_event = 'RUNTIME-FOREIGN-OMISSION'
+    other_review = other_event + '-REVIEW'
+    events.append([other_event, str(len(events)), 'TASAKI2020', events[-1][3], other_review])
+    write(foreign_event, 'correction-events.tsv', events)
+    for name, identifier in [('claim-normalization-reviews.tsv', nr2), ('claim-corrections.tsv', cc2)]:
+        mutate(foreign_event, name, identifier, 1, other_event)
+        mutate(foreign_event, name, identifier, 2, '1')
+    mutate(foreign_event, 'claim-normalization-reviews.tsv', nr2, 8, other_review)
+    mutate(foreign_event, 'claim-vocabulary-review.tsv', second_claim, 2, other_review)
+    transition('grouped-secondary-foreign-event', base, foreign_event, False, 'correction event is not reviewed')
+
+    reordered = case('grouped-reordered-relation-rows', grouped)
+    relations = table(reordered, 'item-claims.tsv')
+    first_index = next(i for i, r in enumerate(relations) if r[0] == grouped_item)
+    relations[first_index:first_index + 2] = relations[first_index:first_index + 2][::-1]
+    write(reordered, 'item-claims.tsv', relations)
+    # Even matching the first encountered row cannot bypass the canonical
+    # relation-position order enforced by the transition's source-item gate.
+    mutate(reordered, 'source-item-additions.tsv', grouped_ia, 2, cc2)
+    transition('grouped-reordered-relation-rows', base, reordered, False,
+               'item relation positions are not contiguous')
+
+    frozen_member = case('grouped-frozen-member', grouped)
+    relations = table(frozen_member, 'item-claims.tsv')
+    index = max(i for i, r in enumerate(relations) if r[0] == grouped_item)
+    relations.insert(index + 1, [grouped_item, '3', claim])
+    write(frozen_member, 'item-claims.tsv', relations)
+    transition('grouped-frozen-member', base, frozen_member, False, 'new source item contains a frozen predecessor claim')
+    duplicate_member = case('grouped-secondary-duplicate-use', grouped)
+    relations = table(duplicate_member, 'item-claims.tsv')
+    old_item = table(base, 'source-items.tsv')[1][0]
+    index = max(i for i, r in enumerate(relations) if r[0] == old_item)
+    position = 1 + max(int(r[1]) for r in relations[1:] if r[0] == old_item)
+    relations.insert(index + 1, [old_item, str(position), second_claim])
+    write(duplicate_member, 'item-claims.tsv', relations)
+    transition('grouped-secondary-duplicate-use', base, duplicate_member, False, 'exactly one source item')
+    duplicate_ia = case('grouped-duplicate-manifest', grouped)
+    manifest = table(duplicate_ia, 'source-item-additions.tsv')
+    extra = manifest[-1].copy()
+    extra[0] = unused_id(duplicate_ia, 'source-item-additions.tsv', 'IA-RUNTIME')
+    extra[3] = '2'
+    write(duplicate_ia, 'source-item-additions.tsv', manifest + [extra])
+    transition('grouped-duplicate-manifest', base, duplicate_ia, False, 'source item is manifested more than once')
+
+    # A fully owned split successor is still ineligible for an omission-owned
+    # item, and an omission cannot join an item owned by a split correction.
+    split_items = case('independent-split-and-omission-items', two_additions)
+    predecessor = next(r for r in table(base, 'claims.tsv')[1:] if r[0] == claim)
+    mutate(split_items, 'claim-normalization-reviews.tsv', nr2, 3, claim)
+    mutate(split_items, 'claim-normalization-reviews.tsv', nr2, 5, 'split')
+    mutate(split_items, 'claim-corrections.tsv', cc2, 4, claim)
+    mutate(split_items, 'claim-corrections.tsv', cc2, 5, 'split')
+    mutate(split_items, 'claim-corrections.tsv', cc2, 6, predecessor[5])
+    mutate(split_items, 'claim-corrections.tsv', cc2, 7, predecessor[6])
+    mutate(split_items, 'claim-corrections.tsv', cc2, 8, predecessor[5])
+    mutate(split_items, 'claim-corrections.tsv', cc2, 9, predecessor[6])
+    for column, value in [(11, 'true'), (12, claim2), (13, 'omitted-source-assertion'), (14, omission_review)]:
+        mutate(split_items, 'claims.tsv', claim, column, value)
+    write(split_items, 'claim-vocabulary-review.tsv',
+          [r for r in table(split_items, 'claim-vocabulary-review.tsv') if r[0] != claim])
+    write(split_items, 'claim-successors.tsv', table(split_items, 'claim-successors.tsv') + [[
+        unused_id(split_items, 'claim-successors.tsv', 'CS-RUNTIME'), omission_event, cc2, claim, '1', 'new_successor', claim2]])
+    refresh(split_items)
+    transition('independently-owned-split-and-omission-items', base, split_items)
+    mixed_group = case('split-member-in-omission-item', split_items)
+    second_item = next(r[0] for r in table(mixed_group, 'item-claims.tsv')[1:] if r[2] == claim2)
+    write(mixed_group, 'source-items.tsv', [r for r in table(mixed_group, 'source-items.tsv') if r[0] != second_item])
+    write(mixed_group, 'source-item-additions.tsv',
+          [r for r in table(mixed_group, 'source-item-additions.tsv') if r[4] != second_item])
+    mutate(mixed_group, 'item-claims.tsv', second_item, 0, omitted_item)
+    records = table(mixed_group, 'item-claims.tsv')
+    for row in records[1:]:
+        if row[2] == claim2:
+            row[1] = '2'
+    write(mixed_group, 'item-claims.tsv', records)
+    transition('split-member-in-omission-item', base, mixed_group, False,
+               'new source item contains a successor from a different correction')
+    split_owner = case('omission-member-in-split-item', mixed_group)
+    mutate(split_owner, 'source-item-additions.tsv', ia1, 2, cc2)
+    transition('omission-member-in-split-item', base, split_owner, False,
+               'new source item contains a successor from a different correction')
+
+    for label, name, identifier, column, value, diagnostic in [
+            ('IA-owner', 'source-item-additions.tsv', grouped_ia, 2, cc2, 'historical correction ledger drift'),
+            ('metadata', 'source-items.tsv', grouped_item, 6, 'Changed title', 'source item identity/order/label regression')]:
+        target = case('grouped-later-frozen-' + label, grouped)
+        mutate(target, name, identifier, column, value)
+        base_diff('grouped-later-frozen-' + label, grouped, target, False, diagnostic=diagnostic)
+    for member in grouped_claims:
+        target = case('grouped-later-relation-' + member, grouped)
+        write(target, 'item-claims.tsv', [r for r in table(target, 'item-claims.tsv') if r[2] != member])
+        base_diff('grouped-later-relation-' + member, grouped, target, False, diagnostic='item-claim regression')
+    grouped_later = root / 'grouped-later-amendment'
+    claim = second_claim
+    try:
+        later_event, _, _, _, _, _ = prepare_amendment(grouped, grouped_later, 'The second synthetic test family has positive size.')
+    finally:
+        claim = original_claim
+    assert table(grouped_later, 'source-items.tsv') == table(grouped, 'source-items.tsv')
+    assert table(grouped_later, 'item-claims.tsv') == table(grouped, 'item-claims.tsv')
+    assert table(grouped_later, 'source-item-additions.tsv') == table(grouped, 'source-item-additions.tsv')
+    assert next(r for r in table(grouped_later, 'claims.tsv') if r[0] == first_claim) == next(
+        r for r in table(grouped, 'claims.tsv') if r[0] == first_claim)
+    transition('grouped-historical-member-amendment', grouped, grouped_later)
+    static('grouped-historical-member-amendment-static', grouped_later)
+    base_diff('grouped-historical-member-amendment-route', grouped, grouped_later, event_id=later_event)
+    print('test-content-amendments-runtime: shared-item cases ' + str(count - grouped_start))
 
     def reject_omission(label, name, identifier, column, value, diagnostic):
         target = case('omission-' + label, omitted)
