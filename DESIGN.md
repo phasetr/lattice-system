@@ -555,6 +555,24 @@ and local syntax. Its command trees and imported declaration ranges bind each pe
 `set_option warningAsError false in` to its exact registered unresolved theorem.
 File, section, namespace, unrelated-declaration, and completed-proof exceptions
 are rejected; comments and layout do not determine option scope.
+Diagnostic-consuming `#guard_msgs`/`#guard_panic` test commands, `nolint`
+attributes, and explicit
+Boolean-false `linter.*` or `warn.*` options are forbidden in registered statement
+sources, including within an otherwise permitted proof exception. The direct
+command, term, tactic, and grind option forms use the same recognizer; conversion
+tactics delegate their nested ordinary tactics to that ordinary tactic form.
+The owned
+warningAsError exception does not authorize additional checker exemptions.
+The ordinary missing-owner and kernel-axiom guards retain their independent
+diagnostics before this additional suppression policy is checked.
+The Lake configuration is checked using Lean's effective option normalization:
+known diagnostic-disabling options are forbidden in package or library options,
+including `weak` names and string-valued Booleans. Unknown weak options are
+ignored as Lean ignores them. Unrelated options, including harmless false values
+and recursion/printing settings, are permitted. Package and library
+`moreLeanArgs`/`weakLeanArgs` must be empty: these raw CLI argument arrays can
+override diagnostic options, and the supported configuration uses typed
+`leanOptions` instead of a general command-line argument interpreter.
 R1 contains no fake Lean stubs and no skeleton umbrella.
 The declaration-free bootstrap and census phases supply only registry data,
 the checker contract, and runtime-generated checker fixtures.
@@ -597,7 +615,8 @@ and no-claim page.
 R2 cannot finish with an unreviewed page or an unresolved census discrepancy.
 For a source at `census_reconciled`, its R2 registry has every page in both-pass `complete` state, a
 frozen page-source OID, and no tombstoned claim. Slices, dependencies, bindings,
-axioms, and claim-to-axiom relations remain empty until their later phases.
+claim contexts, axioms, claim-to-axiom relations, statement modules, and statement
+imports remain empty until their later phases.
 R3 is vocabulary and type construction.
 Only vocabulary required to state the full registered corpus is implemented.
 Every active claim is classified as Mathlib-only or as requiring registered

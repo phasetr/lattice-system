@@ -70,11 +70,16 @@ private meta def typeConstantName (info : ConstantInfo) : String :=
   | .const name levels => if levels.isEmpty then toString name else "NONE"
   | _ => "NONE"
 
+/-- The four direct option syntaxes handled by the pinned Lean elaborators. -/
+private meta def isSetOptionSyntax (stx : Syntax) : Bool :=
+  stx.isOfKind ``Parser.Command.set_option ||
+  stx.isOfKind ``Parser.Term.set_option ||
+  stx.isOfKind ``Parser.Tactic.set_option ||
+  stx.isOfKind `Lean.Parser.Tactic.Grind.setOption
+
 /-- Recognize the parsed option command, term, or tactic, independent of layout. -/
 private meta def disablesWarnings (stx : Syntax) : Bool :=
-  (stx.isOfKind ``Parser.Command.set_option ||
-    stx.isOfKind ``Parser.Term.set_option ||
-    stx.isOfKind ``Parser.Tactic.set_option) &&
+  isSetOptionSyntax stx &&
   stx[1].isIdent && stx[1].getId == `warningAsError && stx[3].getAtomVal == "false"
 
 /--
@@ -103,6 +108,31 @@ private meta partial def warningLines (moduleName : Name) (fileMap : FileMap)
   let mut result := #[]
   for child in stx.getArgs do
     result := result ++ warningLines moduleName fileMap theorems child insideException
+  return result
+
+/--
+Record direct mechanisms that consume diagnostics or disable a diagnostic
+checker. These events are distinct from the one owned warningAsError exception;
+no such additional exemption is permitted inside an owned proof either.
+-/
+private meta partial def suppressionLines (moduleName : Name) (stx : Syntax) :
+    Array String := Id.run do
+  let mut result := #[]
+  let line (mechanism : String) :=
+    String.intercalate "\t" ["S", toString moduleName, mechanism]
+  -- The pinned runAndCollectMessages API has exactly these two direct handlers.
+  for (kind, spelling) in #[(`Lean.guardMsgsCmd, "#guard_msgs"),
+      (`Lean.guardPanicCmd, "#guard_panic")] do
+    if stx.isOfKind kind then result := result.push (line spelling)
+  if stx.isOfKind `Batteries.Tactic.Lint.nolint then
+    result := result.push (line "nolint")
+  if isSetOptionSyntax stx &&
+      stx[1].isIdent && stx[3].getAtomVal == "false" then
+    let name := stx[1].getId.eraseMacroScopes
+    if name.getRoot == `linter || name.getRoot == `warn then
+      result := result.push (line (toString name))
+  for child in stx.getArgs do
+    result := result ++ suppressionLines moduleName child
   return result
 
 /--
@@ -144,7 +174,9 @@ private meta def moduleWarningLines (env : Environment) (moduleName : Name)
   let contents ← IO.FS.readFile sourcePath
   let inputCtx := Parser.mkInputContext contents sourcePath.toString
   let commands ← sourceCommands moduleName inputCtx
-  return commands.flatMap (warningLines moduleName inputCtx.fileMap theorems ·)
+  return commands.flatMap fun command =>
+    warningLines moduleName inputCtx.fileMap theorems command ++
+      suppressionLines moduleName command
 
 /-- Render semantic facts for one declaration owned by a statement module. -/
 private meta def declarationLine (env : Environment) (moduleName : Name)

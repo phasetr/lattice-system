@@ -399,6 +399,50 @@ write_claims "$TMP/warning/Fixture/Claims.lean" "${SETUP[@]}" "${STATEMENT[@]}" 
   'set_option warningAsError false' '/-- Module-wide suppression around the hole. -/' \
   'theorem StatementProof : Statement := by sorry' ''
 
+# Diagnostic consumers and explicit linter exemptions are separate from the
+# registered stub's one declaration-owned warningAsError exception.
+DIAGNOSTIC_SETUP=('/-- Setup whose unused argument normally emits a warning. -/'
+  'def Setup (unused : Nat) : Prop := False' '')
+DIAGNOSTIC_STATEMENT=('/-- Proposition referring to that setup. -/'
+  'def Statement : Prop := Setup 0 → False' '')
+for variant in guard-msgs linter-command linter-file linter-term linter-tactic nolint-inline nolint-command warn-option harmless-options; do
+  clone "$GOOD" "$TMP/diagnostic-$variant"
+done
+write_claims "$TMP/diagnostic-guard-msgs/Fixture/Claims.lean" \
+  '#guard_msgs (drop all) in' "${DIAGNOSTIC_SETUP[@]}" "${DIAGNOSTIC_STATEMENT[@]}" "${PROOF[@]}"
+write_claims "$TMP/diagnostic-linter-command/Fixture/Claims.lean" \
+  'set_option linter.unusedVariables false in' "${DIAGNOSTIC_SETUP[@]}" "${DIAGNOSTIC_STATEMENT[@]}" "${PROOF[@]}"
+write_claims "$TMP/diagnostic-linter-file/Fixture/Claims.lean" \
+  'set_option linter.unusedVariables false' "${DIAGNOSTIC_SETUP[@]}" "${DIAGNOSTIC_STATEMENT[@]}" "${PROOF[@]}"
+write_claims "$TMP/diagnostic-linter-term/Fixture/Claims.lean" \
+  '/-- A term-local linter exemption. -/' \
+  'def Setup : Prop := set_option linter.unusedVariables false in False' '' \
+  "${STATEMENT[@]}" "${PROOF[@]}"
+write_claims "$TMP/diagnostic-linter-tactic/Fixture/Claims.lean" "${SETUP[@]}" "${STATEMENT[@]}" \
+  'set_option warningAsError false in' '/-- A stub cannot disable an additional linter. -/' \
+  'theorem StatementProof : Statement := by' \
+  '  set_option linter.unusedVariables false in' '    sorry' ''
+write_claims "$TMP/diagnostic-nolint-inline/Fixture/Claims.lean" \
+  '/-- A declaration-local environment linter exemption. -/' \
+  '@[nolint unusedArguments]' 'def Setup : Prop := False' '' "${STATEMENT[@]}" "${PROOF[@]}"
+write_claims "$TMP/diagnostic-nolint-command/Fixture/Claims.lean" "${SETUP[@]}" \
+  'attribute [nolint unusedArguments] Setup' "${STATEMENT[@]}" "${PROOF[@]}"
+write_claims "$TMP/diagnostic-warn-option/Fixture/Claims.lean" \
+  'set_option warn.classDefReducibility false in' "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}"
+write_claims "$TMP/diagnostic-harmless-options/Fixture/Claims.lean" \
+  'set_option maxRecDepth 4096' 'set_option pp.universes false in' \
+  "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}"
+clone "$GOOD" "$TMP/diagnostic-linter-grind"
+write_claims "$TMP/diagnostic-linter-grind/Fixture/Claims.lean" \
+  '/-- Satisfiable setup for an unresolved grind fixture. -/' 'def Setup : Prop := (0 : Nat) = 0' '' \
+  "${STATEMENT[@]}" 'set_option warningAsError false in' \
+  '/-- Registered direct hole using the distinct grind option syntax. -/' \
+  'theorem StatementProof : Statement := by' '  grind (abstractProof := false) =>' \
+  '    set_option warningAsError false in' \
+  '      set_option linter.unusedVariables false in' '        sorry' ''
+clone "$GOOD" "$TMP/diagnostic-guard-panic"
+write_claims "$TMP/diagnostic-guard-panic/Fixture/Claims.lean" \
+  '#guard_panic in' '#check R4MissingPANIC' "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}"
 # Warning exceptions belong to the actual registered declaration, independently
 # of comments, line breaks, namespace spelling, or unrelated local options.
 clone "$GOOD" "$TMP/warning-local-layout"
@@ -482,6 +526,23 @@ expect_pass imported-ordinary-theorem env "LATTICE_SKELETON_ACTUAL_OUT=$TMP/impo
   "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/imported-ordinary-theorem"
 awk -F '\t' '$2=="Fixture.StatementNonvacuity"&&index(","$10",",",Nat.zero_add,")&&!index(","$11",",",Nat.zero_add,"){found=1}END{exit !found}' \
   "$TMP/imported-theorem-dump.tsv" || abort "imported ordinary theorem was not actually referenced"
+expect_pass diagnostic-harmless-options "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/diagnostic-harmless-options"
+expect_fail diagnostic-guard-msgs "forbidden diagnostic suppression #guard_msgs" \
+  "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/diagnostic-guard-msgs"
+for variant in command file term tactic; do
+  expect_fail "diagnostic-linter-$variant" "forbidden diagnostic suppression linter.unusedVariables" \
+    "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/diagnostic-linter-$variant"
+done
+for variant in inline command; do
+  expect_fail "diagnostic-nolint-$variant" "forbidden diagnostic suppression nolint" \
+    "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/diagnostic-nolint-$variant"
+done
+expect_fail diagnostic-guard-panic "forbidden diagnostic suppression #guard_panic" \
+  "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/diagnostic-guard-panic"
+expect_fail diagnostic-linter-grind "forbidden diagnostic suppression linter.unusedVariables" \
+  "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/diagnostic-linter-grind"
+expect_fail diagnostic-warn-option "forbidden diagnostic suppression warn.classDefReducibility" \
+  "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/diagnostic-warn-option"
 expect_pass warning-scoped-notation "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/warning-scoped-notation"
 expect_fail warning-missing-exception "unresolved proof needs exactly one declaration-local warningAsError exception" \
   "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/warning-missing-exception"
@@ -658,6 +719,57 @@ production_gates() {
   "$dir/scripts/check-skeleton.sh" "$dir"
 }
 expect_pass production-composed-gates production_gates "$PRODUCTION"
+for variant in package-warning package-linter library-warning library-linter unknown-weak; do
+  clone "$PRODUCTION" "$TMP/production-diagnostic-$variant"
+done
+python3 - "$TMP" <<'PYOPTIONS'
+from pathlib import Path
+import sys
+root=Path(sys.argv[1])
+for variant in ['package-warning','package-linter','library-warning','library-linter','unknown-weak']:
+    path=root/('production-diagnostic-'+variant)/'lakefile.toml'
+    text=path.read_text()
+    if variant=='package-warning':
+        text=text.replace('warningAsError = true','warningAsError = false')
+    elif variant in ['package-linter','unknown-weak']:
+        name='unusedVariables' if variant=='package-linter' else 'fixtureMissing'
+        extra='weak.linter.'+name+' = false\n'
+        if variant=='unknown-weak':
+            extra+='pp.universes = false\nmaxRecDepth = 4096\n'
+        text=text.replace('[[require]]',extra+'\n[[require]]')
+    elif variant=='library-warning':
+        text+='leanOptions = [["warningAsError", false]]\n'
+    else:
+        text+='leanOptions = [["weak.linter.unusedVariables", false]]\n'
+    path.write_text(text)
+PYOPTIONS
+expect_pass production-diagnostic-unknown-weak-gates production_gates "$TMP/production-diagnostic-unknown-weak"
+for owner in package library; do
+  expect_fail "production-diagnostic-$owner-warning" "Lake diagnostic option disables warningAsError" \
+    "$TMP/production-diagnostic-$owner-warning/scripts/check-skeleton.sh" "$TMP/production-diagnostic-$owner-warning"
+  expect_fail "production-diagnostic-$owner-linter" "Lake diagnostic option disables linter.unusedVariables" \
+    "$TMP/production-diagnostic-$owner-linter/scripts/check-skeleton.sh" "$TMP/production-diagnostic-$owner-linter"
+done
+for owner in package library; do
+  for field in moreLeanArgs weakLeanArgs; do
+    dir="$TMP/production-diagnostic-$owner-$field"
+    clone "$PRODUCTION" "$dir"
+    python3 - "$dir/lakefile.toml" "$owner" "$field" <<'PYRAW'
+from pathlib import Path
+import sys
+path,owner,field=Path(sys.argv[1]),sys.argv[2],sys.argv[3]
+extra=field+' = ["-DwarningAsError=false"]'
+text=path.read_text()
+if owner=='package':
+    text=text.replace('defaultTargets = ["LatticeSystem"]','defaultTargets = ["LatticeSystem"]\n'+extra)
+else:
+    text+=extra+'\n'
+path.write_text(text)
+PYRAW
+    expect_fail "production-diagnostic-$owner-$field" "Lake raw Lean arguments are unsupported in $owner" \
+      "$dir/scripts/check-skeleton.sh" "$dir"
+  done
+done
 for variant in safe-roots safe-globs skeleton-roots skeleton-globs package-deps library-deps library-needs facets source-path; do
   clone "$PRODUCTION" "$TMP/production-lake-$variant"
 done

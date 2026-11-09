@@ -312,20 +312,39 @@ awk -F '\t' '
   function bad(s){print s > "/dev/stderr";failed=1}
 ' "$REG/bindings.tsv" "$TMP/environment.tsv" || fail "warning exception ownership failed"
 
+# This check follows the kernel-axiom and exact warning-owner checks so their
+# independent negative controls still reach the specific contract they target.
+awk -F '\t' '$1=="S"{print "forbidden diagnostic suppression " $3 " in " $2 > "/dev/stderr";failed=1}END{exit failed}' \
+  "$TMP/environment.tsv" || fail "diagnostic suppression policy failed"
+
 if [[ $FIXTURE -eq 0 ]]; then
   awk -F '\t' 'NR>1&&$3=="umbrella"{if($1!="LatticeSystem.Skeleton")exit 1;found=1}END{exit !found}' "$REG/statement-modules.tsv" ||
     fail "production skeleton umbrella must be LatticeSystem.Skeleton"
   # Decode the effective pinned Lake configuration without loading a workspace
   # or resolving/updating dependencies. Library globs, not its target name,
   # determine which module seeds a default build actually compiles.
-  cat > "$TMP/LakeIsolation.lean" <<'LEAN'
+  {
+    # Load the already compiled canonical modules, not a new workspace, so
+    # option normalization sees the options actually registered by their imports.
+    while IFS= read -r module; do printf 'import %s\n' "$module"; done < "$TMP/modules.list"
+    cat <<'LEAN'
 import Lake
+import Lean.Language.Lean
 import Lake.Load.Toml
 
 open Lean Lake System
 
 private def fail (message : String) : IO α :=
   throw <| IO.userError s!"default skeleton isolation: {message}"
+
+private def checkDiagnosticOptions (owner : String) (options : Array LeanOption) : IO Unit := do
+  -- This is Lean's own CLI/Lake normalization: weak unknown options disappear,
+  -- weak known names are unprefixed, and string-valued Booleans are parsed.
+  let effective ← Lean.Language.Lean.reparseOptions (LeanOptions.ofArray options).toOptions
+  for (name, value) in effective do
+    if let .ofBool false := value then
+      if name == `warningAsError || name.getRoot == `linter || name.getRoot == `warn then
+        fail s!"Lake diagnostic option disables {name} in {owner}"
 
 def main (args : List String) : IO Unit := do
   let [rootString] := args | fail "expected repository root"
@@ -339,10 +358,16 @@ def main (args : List String) : IO Unit := do
       lakeEnv, wsDir := root, relConfigFile := "lakefile.toml" }).toBaseIO
     | fail "invalid Lake TOML configuration"
   unless pkg.defaultTargets == #[`LatticeSystem] do fail "default target must be LatticeSystem"
+  checkDiagnosticOptions "package" pkg.config.leanOptions
+  unless pkg.config.moreLeanArgs.isEmpty && pkg.config.weakLeanArgs.isEmpty do
+    fail "Lake raw Lean arguments are unsupported in package"
   unless pkg.config.extraDepTargets.isEmpty do fail "package extraDepTargets is unsupported"
   unless pkg.config.dynlibs.isEmpty do fail "package dynlibs is unsupported"
   unless pkg.config.plugins.isEmpty do fail "package plugins is unsupported"
   for configured in pkg.leanLibs do
+    checkDiagnosticOptions s!"library {configured.name}" configured.config.leanOptions
+    unless configured.config.moreLeanArgs.isEmpty && configured.config.weakLeanArgs.isEmpty do
+      fail s!"Lake raw Lean arguments are unsupported in library {configured.name}"
     unless configured.config.needs.isEmpty && configured.config.extraDepTargets.isEmpty do
       fail s!"library needs/extraDepTargets is unsupported: {configured.name}"
     unless configured.config.dynlibs.isEmpty do
@@ -387,6 +412,7 @@ def main (args : List String) : IO Unit := do
       fail s!"Lake statement provider source differs from registry: {name}"
   IO.println "default skeleton isolation: ok"
 LEAN
+  } > "$TMP/LakeIsolation.lean"
   "$LEAN" --run "$TMP/LakeIsolation.lean" "$ROOT" || fail "default Lake skeleton isolation failed"
   (cd "$ROOT" && lake build +LatticeSystem.Skeleton >/dev/null) || fail "nondefault Lake skeleton target failed"
 fi
