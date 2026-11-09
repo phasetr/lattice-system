@@ -886,7 +886,7 @@ expect_fail successor-oid-stale "new correction successor content OID is stale" 
 
 clone_case "$RECLASSIFY" "$CASES/axiom-artifact"
 printf '%s\n' \
-  $'AX-PROJECT-9001\tLatticeSystem.Axioms.ContentlessPredicate.correctionAxiom\tLatticeSystem.Axioms.ContentlessPredicate\tcontentless_predicate\tTASAKI2020\tcorrection-surrogate\treplace-with-source-content' \
+  $'AX-PROJECT-9001\tLatticeSystem.Axioms.ContentlessPredicate.correctionAxiom\tLatticeSystem.Axioms.ContentlessPredicate\tcontentless_predicate\tTASAKI2020\tcorrection-surrogate\treplace-with-source-content\tPENDING' \
   >> "$CASES/axiom-artifact/registry/axioms.tsv"
 printf '%s\n' $'CL-TASAKI2020-0001\tAX-PROJECT-9001' \
   >> "$CASES/axiom-artifact/registry/claim-axioms.tsv"
@@ -895,7 +895,7 @@ expect_fail axiom-artifact "correction event introduces an axiom artifact" \
 
 clone_case "$RECLASSIFY" "$CASES/r4-artifact"
 printf '%s\n' \
-  $'CL-TASAKI2020-0001\tLatticeSystem.Claims.TASAKI2020.statement0001\tLatticeSystem.Claims.TASAKI2020.claim0001\tLatticeSystem.Claims.TASAKI2020.Front\tPENDING\tNONE' \
+  $'CL-TASAKI2020-0001\tLatticeSystem.Claims.Front.statement0001\tLatticeSystem.Claims.Front.claim0001\tLatticeSystem.Claims.Front\tdefinition\tproof_proposition\tPENDING\tPENDING\tproof_stub\ttheorem\tPENDING\tNONE\tNONE\tNONE\tCORRECTION-FIXTURE-REVIEW' \
   >> "$CASES/r4-artifact/registry/bindings.tsv"
 expect_fail r4-artifact "correction event introduces an R4 artifact" \
   "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/r4-artifact"
@@ -917,6 +917,25 @@ printf '%s\n' \
 refresh_invariants "$CASES/split-two-creation-owners"
 expect_fail split-two-creation-owners "split successor provenance is incomplete" \
   "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/split-two-creation-owners"
+
+# Every R4 table is guarded, not only bindings.
+clone_case "$RECLASSIFY" "$CASES/r4-artifact-claim-context"
+printf '%s\n' $'CL-TASAKI2020-0002\t1\tCL-TASAKI2020-0001\tassumption\tsame_item\tCORRECTION-FIXTURE-REVIEW' \
+  >> "$CASES/r4-artifact-claim-context/registry/claim-context.tsv"
+expect_fail r4-artifact-claim-context "correction event introduces an R4 artifact" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/r4-artifact-claim-context"
+
+clone_case "$RECLASSIFY" "$CASES/r4-artifact-statement-modules"
+printf '%s\n' $'LatticeSystem.Claims.Front\tLatticeSystem/Claims/Front.lean\tleaf' \
+  >> "$CASES/r4-artifact-statement-modules/registry/statement-modules.tsv"
+expect_fail r4-artifact-statement-modules "correction event introduces an R4 artifact" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/r4-artifact-statement-modules"
+
+clone_case "$RECLASSIFY" "$CASES/r4-artifact-statement-imports"
+printf '%s\n' $'LatticeSystem.Claims.Front\t1\tMathlib\ttrue\tfalse\tfalse' \
+  >> "$CASES/r4-artifact-statement-imports/registry/statement-imports.tsv"
+expect_fail r4-artifact-statement-imports "correction event introduces an R4 artifact" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/r4-artifact-statement-imports"
 
 [[ $(baseline_digest) == "$BASELINE_DIGEST" ]] || {
   echo "test-claim-corrections-runtime: immutable runtime base changed" >&2

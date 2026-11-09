@@ -40,6 +40,20 @@ def blob(text):
     return subprocess.check_output(['git', 'hash-object', '--stdin'],
                                    input=text.encode('utf-8'), cwd=project).decode().strip()
 
+def binding_row(root, claim_id):
+    # Invalid R4-state cases still use the actual expanded binding schema.
+    record = next(row for row in table(root, 'claims.tsv')[1:] if row[0] == claim_id)
+    proof = record[5] in {'assertion', 'conjecture'}
+    shapes = {'assertion': 'proof_proposition', 'conjecture': 'proof_proposition',
+              'definition': 'definition_value', 'notation': 'notation_expansion',
+              'hypothesis': 'hypothesis_prop', 'domain': 'domain_type'}
+    return [claim_id, 'LatticeSystem.Claims.Runtime.statement',
+            'LatticeSystem.Claims.Runtime.proof' if proof else 'NONE',
+            'LatticeSystem.Claims.Runtime', 'definition', shapes[record[5]],
+            'PENDING', 'PENDING', 'proof_stub' if proof else 'definitional',
+            'theorem' if proof else 'NONE', 'PENDING' if proof else 'NONE',
+            'NONE', 'NONE', 'NONE', 'RUNTIME-BINDING-REVIEW']
+
 def refresh(root):
     pages, claims = table(root, 'pages.tsv'), table(root, 'claims.tsv')
     rows = table(root, 'source-invariants.tsv')
@@ -72,6 +86,17 @@ def clone_commit_registry(commit, target):
         destination.write_bytes(subprocess.check_output(['git', 'show', commit + ':' + relative], cwd=project))
     if not (target / 'registry/claim-content-amendments.tsv').exists():
         write(target, 'claim-content-amendments.tsv', [header])
+    # Historical source-data fixtures still need today's empty infrastructure
+    # schemas. Never reinterpret populated artifact rows during this adapter.
+    for name in ('bindings.tsv', 'axioms.tsv', 'claim-context.tsv',
+                 'statement-modules.tsv', 'statement-imports.tsv'):
+        expected = table(project, name)[0]
+        path = target / 'registry' / name
+        recorded = table(target, name) if path.exists() else [expected]
+        if recorded[0] != expected:
+            assert len(recorded) == 1, 'cannot migrate populated historical R4 fixture'
+            recorded = [expected]
+        write(target, name, recorded)
 
 def prepare_amendment(before, after, content):
     shutil.copytree(before, after)
@@ -245,6 +270,32 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     def amendment_change(target, column, value):
         mutate(target, 'claim-content-amendments.tsv', amendment_id, column, value)
 
+    # Empty schema changes and new empty R4 tables do not create artifacts.
+    old_schema = case('empty-r4-schema-migration-base', base)
+    write(old_schema, 'bindings.tsv', [['claim_id', 'statement_decl', 'proof_decl',
+                                      'module', 'statement_oid', 'nonvacuity_decl']])
+    write(old_schema, 'axioms.tsv', [['axiom_id', 'declaration', 'module', 'category',
+                                    'source_locator', 'rationale', 'reopen_condition']])
+    for name in ('claim-context.tsv', 'statement-modules.tsv', 'statement-imports.tsv'):
+        (old_schema / 'registry' / name).unlink()
+    transition('empty-r4-schema-migration', old_schema, current)
+    # The same relaxation must not reinterpret already populated artifact data.
+    for name, row, diagnostic in [
+            ('statement-modules.tsv', ['LatticeSystem.Claims.Front',
+                                       'LatticeSystem/Claims/Front.lean', 'leaf'], 'R4 artifact'),
+            ('axioms.tsv', ['AX-RUNTIME-0001', 'LatticeSystem.Axioms.State.fixture',
+                            'LatticeSystem.Axioms.State', 'state', 'fixture',
+                            'fixture', 'reopen', 'PENDING'], 'axiom artifact')]:
+        before = case('populated-' + name + '-base', base)
+        after = case('populated-' + name + '-current')
+        for target in (before, after):
+            write(target, name, table(target, name) + [row])
+        changed = table(after, name)
+        changed[0][-1] += '_drift'
+        write(after, name, changed)
+        transition('populated-artifact-header-drift-' + name,
+                   before, after, False, diagnostic)
+
     omitted = root / 'omitted-claim'
     omission_event, omission_review, omission_nr, omission_cc, omitted_claim, omitted_item = prepare_omission(base, omitted)
     transition('omitted-claim-new-item', base, omitted)
@@ -371,7 +422,7 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
         mutate(target, 'source-progress.tsv', 'TASAKI2020', 1, 'skeleton_frozen')
     transition('late-stage-source', late_base, late_current, False, 'requires a pre-R4 source')
     bound_base, bound_current = case('bound-base', base), case('bound-current')
-    binding = ['CL-TASAKI2020-0002', 'statement', 'NONE', 'LatticeSystem.Claims.Runtime', 'PENDING', 'NONE']
+    binding = binding_row(bound_base, 'CL-TASAKI2020-0002')
     for target in (bound_base, bound_current):
         write(target, 'bindings.tsv', table(target, 'bindings.tsv') + [binding])
     transition('already-bound-other-claim-in-source', bound_base, bound_current, False, 'source already has bindings')
@@ -501,7 +552,7 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     added_bound = case('historical-addition-after-r4', omitted)
     mutate(added_bound, 'source-progress.tsv', 'TASAKI2020', 1, 'skeleton_frozen')
     write(added_bound, 'bindings.tsv', table(added_bound, 'bindings.tsv') + [
-        [omitted_claim, 'LatticeSystem.Claims.statement', 'NONE', 'LatticeSystem.Claims.Front', 'PENDING', 'NONE']])
+        binding_row(added_bound, omitted_claim)])
     static('historical-addition-static-after-r4', added_bound)
     project_vocab = case('addition-project-vocabulary', omitted)
     mutate(project_vocab, 'claim-vocabulary-review.tsv', omitted_claim, 1, 'project_vocabulary')
@@ -804,8 +855,7 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     transition('addition-successor-overlap', base, overlap, False, 'cannot have successor provenance')
 
     for label, name, row, diagnostic in [
-            ('addition-r4-binding', 'bindings.tsv', [omitted_claim, 'LatticeSystem.Claims.statement', 'NONE',
-                                                   'LatticeSystem.Claims.Front', 'PENDING', 'NONE'],
+            ('addition-r4-binding', 'bindings.tsv', binding_row(omitted, omitted_claim),
              'source already has bindings'),
             ('addition-slice', 'slices.tsv', ['SL-RUNTIME-0001', '1', omitted_claim],
              'skeleton or axiom relations'),
