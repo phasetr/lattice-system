@@ -105,7 +105,32 @@ private meta partial def warningLines (moduleName : Name) (fileMap : FileMap)
     result := result ++ warningLines moduleName fileMap theorems child insideException
   return result
 
-/-- Parse each registered module using Lean's parser and exact declaration ranges. -/
+/--
+Recover command syntax through Lean's real frontend. Parsing and elaboration
+advance together, so scoped notation, local syntax, and namespaces use the same
+state as the source compilation rather than a fixed imported parser environment.
+-/
+private meta partial def sourceCommands (moduleName : Name)
+    (inputCtx : Parser.InputContext) : IO (Array Syntax) := do
+  let opts := Elab.async.set (({} : Options).setBool `warningAsError true) true
+  let snap ← Language.Lean.process (fun header => pure <| .ok {
+      mainModuleName := moduleName
+      isModule := header.isModule
+      imports := header.imports
+      opts }) none { inputCtx with }
+  if ← Language.toSnapshotTree snap |>.runAndReport opts false {} then
+    throw <| IO.userError "failed to elaborate warning-scope source"
+  let some processed := snap.processedResult.get
+    | throw <| IO.userError "warning-scope source has no processed header"
+  let mut current := processed.firstCmdSnap.get
+  let mut commands := #[]
+  repeat
+    commands := commands.push current.stx
+    let some next := current.nextCmdSnap? | break
+    current := next.get
+  return commands
+
+/-- Inspect each registered module's frontend syntax and exact declaration ranges. -/
 private meta def moduleWarningLines (env : Environment) (moduleName : Name)
     (sourcePath : System.FilePath) : CommandElabM (Array String) := do
   let some idx := moduleIndex? env moduleName
@@ -118,10 +143,8 @@ private meta def moduleWarningLines (env : Environment) (moduleName : Name)
       theorems := theorems.push (info.name, ranges.selectionRange.pos)
   let contents ← IO.FS.readFile sourcePath
   let inputCtx := Parser.mkInputContext contents sourcePath.toString
-  -- The parser rejects recovery/errors; comments and line breaks are syntax,
-  -- not a second, incomplete shell lexer for Lean commands.
-  let parsed ← Parser.testParseFile env sourcePath
-  return warningLines moduleName inputCtx.fileMap theorems parsed.raw
+  let commands ← sourceCommands moduleName inputCtx
+  return commands.flatMap (warningLines moduleName inputCtx.fileMap theorems ·)
 
 /-- Render semantic facts for one declaration owned by a statement module. -/
 private meta def declarationLine (env : Environment) (moduleName : Name)

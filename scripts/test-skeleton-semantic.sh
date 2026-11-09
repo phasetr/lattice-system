@@ -5,8 +5,8 @@ SCRIPT_DIR=${BASH_SOURCE[0]%/*}
 [[ "$SCRIPT_DIR" == "${BASH_SOURCE[0]}" ]] && SCRIPT_DIR=.
 ROOT=${1:-$(cd "$SCRIPT_DIR/.." && pwd)}
 ROOT=$(cd "$ROOT" && pwd)
-# Fixtures use only core propositions and natural numbers. Avoid importing the
-# complete Mathlib umbrella into the full-proof axiom inspection environment.
+# Fixtures use narrow imports; the scoped-notation case adds only its actual
+# matrix API. Avoid the complete Mathlib umbrella in full-proof inspection.
 TMP=$(mktemp -d "${TMPDIR:-/tmp}/lattice-system-tests.skeleton.XXXXXX")
 TMP=$(cd -P "$TMP" && pwd)
 trap 'rm -rf "$TMP"' EXIT
@@ -417,6 +417,18 @@ for scope in file section namespace split; do
   write_claims "$TMP/warning-$scope/Fixture/Claims.lean" "${prefix[@]}" \
     "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}" "${suffix[@]}"
 done
+clone "$GOOD" "$TMP/warning-missing-exception"
+write_claims "$TMP/warning-missing-exception/Fixture/Claims.lean" \
+  "${SETUP[@]}" "${STATEMENT[@]}" 'set_option warn.sorry false in' \
+  '/-- A quiet hole still requires its registered warning exception. -/' \
+  'theorem StatementProof : Statement := by sorry' ''
+clone "$GOOD" "$TMP/warning-scoped-notation"
+write_module "$TMP/warning-scoped-notation/Fixture/Claims.lean" \
+  'Mathlib.Init Mathlib.LinearAlgebra.Matrix.Defs' "${SETUP[@]}" \
+  'open scoped Matrix' '/-- A source proposition using imported scoped notation. -/' \
+  'def Statement : Prop := Setup → ∀ M : Matrix Unit Unit Nat, Mᵀ = M' '' "${PROOF[@]}"
+append "$TMP/warning-scoped-notation/registry/statement-imports.tsv" \
+  $'Fixture.Claims\t2\tMathlib.LinearAlgebra.Matrix.Defs\ttrue\tfalse\tfalse'
 clone "$GOOD" "$TMP/warning-borrowed-local"
 write_claims "$TMP/warning-borrowed-local/Fixture/Claims.lean" \
   'set_option warningAsError false -- file-wide exception' \
@@ -470,6 +482,9 @@ expect_pass imported-ordinary-theorem env "LATTICE_SKELETON_ACTUAL_OUT=$TMP/impo
   "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/imported-ordinary-theorem"
 awk -F '\t' '$2=="Fixture.StatementNonvacuity"&&index(","$10",",",Nat.zero_add,")&&!index(","$11",",",Nat.zero_add,"){found=1}END{exit !found}' \
   "$TMP/imported-theorem-dump.tsv" || abort "imported ordinary theorem was not actually referenced"
+expect_pass warning-scoped-notation "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/warning-scoped-notation"
+expect_fail warning-missing-exception "unresolved proof needs exactly one declaration-local warningAsError exception" \
+  "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/warning-missing-exception"
 for variant in file section namespace split borrowed-local unrelated-local term tactic umbrella; do
   expect_fail "warning-$variant" "unscoped warningAsError suppression" \
     "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/warning-$variant"
@@ -643,6 +658,74 @@ production_gates() {
   "$dir/scripts/check-skeleton.sh" "$dir"
 }
 expect_pass production-composed-gates production_gates "$PRODUCTION"
+for variant in safe-roots safe-globs skeleton-roots skeleton-globs package-deps library-deps library-needs facets source-path; do
+  clone "$PRODUCTION" "$TMP/production-lake-$variant"
+done
+python3 - "$TMP" <<'PYLAKE'
+from pathlib import Path
+import sys
+root = Path(sys.argv[1])
+changes = {
+    'safe-roots': 'roots = ["LatticeSystem", "LatticeSystem.Vocabulary"]',
+    'safe-globs': 'roots = ["LatticeSystem", "LatticeSystem.Skeleton"]\nglobs = ["LatticeSystem", "LatticeSystem.Vocabulary"]',
+    'skeleton-roots': 'roots = ["LatticeSystem", "LatticeSystem.Skeleton"]',
+    'skeleton-globs': 'globs = ["LatticeSystem.*"]',
+    'library-deps': 'extraDepTargets = ["LatticeSystem.Skeleton"]',
+    'library-needs': 'needs = ["+LatticeSystem.Skeleton"]',
+    'facets': 'defaultFacets = ["static"]',
+    'source-path': 'srcDir = "alternate"',
+}
+for variant, extra in changes.items():
+    path = root / ('production-lake-' + variant) / 'lakefile.toml'
+    path.write_text(path.read_text() + extra + '\n')
+path = root / 'production-lake-package-deps' / 'lakefile.toml'
+path.write_text(path.read_text().replace('defaultTargets = ["LatticeSystem"]',
+    'defaultTargets = ["LatticeSystem"]\nextraDepTargets = ["LatticeSystem.Skeleton"]'))
+# This untracked alternative is deliberately selected by Lake's srcDir. The
+# registry's physical source remains the production file, so path equality fails.
+target = root / 'production-lake-source-path'
+(target / 'alternate').mkdir()
+(target / 'alternate/LatticeSystem.lean').write_bytes((target / 'LatticeSystem.lean').read_bytes())
+PYLAKE
+expect_pass production-lake-safe-roots-gates production_gates "$TMP/production-lake-safe-roots"
+expect_pass production-lake-safe-globs-gates production_gates "$TMP/production-lake-safe-globs"
+for variant in skeleton-roots skeleton-globs; do
+  expect_fail "production-lake-$variant" "default library selects a statement or unregistered module" \
+    "$TMP/production-lake-$variant/scripts/check-skeleton.sh" "$TMP/production-lake-$variant"
+done
+expect_fail production-lake-package-deps "package extraDepTargets is unsupported" \
+  "$TMP/production-lake-package-deps/scripts/check-skeleton.sh" "$TMP/production-lake-package-deps"
+for variant in library-deps library-needs; do
+  expect_fail "production-lake-$variant" "library needs/extraDepTargets is unsupported" \
+    "$TMP/production-lake-$variant/scripts/check-skeleton.sh" "$TMP/production-lake-$variant"
+done
+expect_fail production-lake-facets "default library facets must be leanArts" \
+  "$TMP/production-lake-facets/scripts/check-skeleton.sh" "$TMP/production-lake-facets"
+expect_fail production-lake-source-path "default module source differs from registry" \
+  "$TMP/production-lake-source-path/scripts/check-skeleton.sh" "$TMP/production-lake-source-path"
+# Even leanArts fetches configured plugin/dynamic-library targets while setting
+# up a module. Reject these unsupported dependencies before executing any target.
+for owner in package library; do
+  for field in dynlibs plugins; do
+    dir="$TMP/production-lake-$owner-$field"
+    clone "$PRODUCTION" "$dir"
+    python3 - "$dir/lakefile.toml" "$owner" "$field" <<'PYLAKE'
+from pathlib import Path
+import sys
+path, owner, field = Path(sys.argv[1]), sys.argv[2], sys.argv[3]
+extra = field + ' = ["+LatticeSystem.Skeleton:dynlib"]'
+text = path.read_text()
+if owner == 'package':
+    text = text.replace('defaultTargets = ["LatticeSystem"]',
+        'defaultTargets = ["LatticeSystem"]\n' + extra)
+else:
+    text += extra + '\n'
+path.write_text(text)
+PYLAKE
+    expect_fail "production-lake-$owner-$field" "$owner $field is unsupported" \
+      "$dir/scripts/check-skeleton.sh" "$dir"
+  done
+done
 for variant in pending frozen-oid any imports warning inactive-owner inactive-target proof-policy; do
   clone "$PRODUCTION" "$TMP/production-$variant"
 done

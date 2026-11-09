@@ -315,7 +315,61 @@ awk -F '\t' '
 if [[ $FIXTURE -eq 0 ]]; then
   awk -F '\t' 'NR>1&&$3=="umbrella"{if($1!="LatticeSystem.Skeleton")exit 1;found=1}END{exit !found}' "$REG/statement-modules.tsv" ||
     fail "production skeleton umbrella must be LatticeSystem.Skeleton"
-  grep -Eq '^defaultTargets = \["LatticeSystem"\]$' "$ROOT/lakefile.toml" || fail "skeleton must remain nondefault"
+  # Decode the effective pinned Lake configuration without loading a workspace
+  # or resolving/updating dependencies. Library globs, not its target name,
+  # determine which module seeds a default build actually compiles.
+  cat > "$TMP/LakeIsolation.lean" <<'LEAN'
+import Lake
+import Lake.Load.Toml
+
+open Lean Lake System
+
+private def fail (message : String) : IO α :=
+  throw <| IO.userError s!"default skeleton isolation: {message}"
+
+def main (args : List String) : IO Unit := do
+  let [rootString] := args | fail "expected repository root"
+  let root := FilePath.mk rootString
+  let (elan?, lean?, lake?) ← findInstall?
+  let some lean := lean? | fail "Lean installation is unavailable"
+  let some lake := lake? | fail "Lake installation is unavailable"
+  let .ok lakeEnv ← (Lake.Env.compute lake lean elan?).toBaseIO
+    | fail "cannot compute the existing Lake environment"
+  let some pkg ← (loadTomlConfig {
+      lakeEnv, wsDir := root, relConfigFile := "lakefile.toml" }).toBaseIO
+    | fail "invalid Lake TOML configuration"
+  unless pkg.defaultTargets == #[`LatticeSystem] do fail "default target must be LatticeSystem"
+  unless pkg.config.extraDepTargets.isEmpty do fail "package extraDepTargets is unsupported"
+  unless pkg.config.dynlibs.isEmpty do fail "package dynlibs is unsupported"
+  unless pkg.config.plugins.isEmpty do fail "package plugins is unsupported"
+  for configured in pkg.leanLibs do
+    unless configured.config.needs.isEmpty && configured.config.extraDepTargets.isEmpty do
+      fail s!"library needs/extraDepTargets is unsupported: {configured.name}"
+    unless configured.config.dynlibs.isEmpty do
+      fail s!"library dynlibs is unsupported: {configured.name}"
+    unless configured.config.plugins.isEmpty do
+      fail s!"library plugins is unsupported: {configured.name}"
+  let some lib := pkg.findLeanLib? `LatticeSystem
+    | fail "default target is not a Lean library"
+  unless lib.config.defaultFacets == #[LeanLib.leanArtsFacet] do
+    fail "default library facets must be leanArts"
+  let records ← IO.FS.lines (root / "registry/modules.tsv")
+  let mut expected : Array (Name × FilePath) := #[]
+  for row in records.drop 1 do
+    let fields := row.splitOn "\t" |>.toArray
+    unless fields.size == 3 do fail "invalid vocabulary module row"
+    expected := expected.push (fields[0]!.toName, root / fields[1]!)
+  let mut includesRoot := false
+  for mod in (← lib.getModuleArray) do
+    let some (_, path) := expected.find? (·.1 == mod.name)
+      | fail s!"default library selects a statement or unregistered module: {mod.name}"
+    unless (← IO.FS.realPath mod.leanFile) == (← IO.FS.realPath path) do
+      fail s!"default module source differs from registry: {mod.name}"
+    includesRoot := includesRoot || mod.name == `LatticeSystem
+  unless includesRoot do fail "default library omits the canonical production root"
+  IO.println "default skeleton isolation: ok"
+LEAN
+  "$LEAN" --run "$TMP/LakeIsolation.lean" "$ROOT" || fail "default Lake skeleton isolation failed"
   (cd "$ROOT" && lake build +LatticeSystem.Skeleton >/dev/null) || fail "nondefault Lake skeleton target failed"
 fi
 echo "check-skeleton: ok"

@@ -530,13 +530,24 @@ stubs only under the skeleton build target.
 A dedicated `LatticeSystem.Skeleton` umbrella imports every registered
 claim module for completeness checking.
 The production root must not import that umbrella or any unresolved claim.
+The supported default Lake target is the `LatticeSystem` Lean library with its
+`leanArts` facet. The pinned Lake TOML decoder and effective glob expansion must
+select the canonical root and only registered vocabulary modules at their exact
+registered source paths. Multiple safe vocabulary seeds and explicit safe globs
+are allowed; a library's name or the spelling of its `roots` is not sufficient.
+Package `extraDepTargets` and every library's `needs`/`extraDepTargets` must be
+empty, as must package and library `dynlibs`/`plugins`, which also fetch build
+targets during ordinary module setup. Nonempty target dependencies and other
+default facets are unsupported and
+fail closed; this gate does not implement general custom/native target analysis.
 The future R5 production policy may import only declarations at the proved
 frontier; the current R4 production root reaches no statement module.
 The skeleton target may locally permit the warnings corresponding exactly to
 registered stubs.
 Global `warningAsError` must remain enabled.
 The skeleton mechanism must not disable all warnings to accommodate `sorry`.
-Lean's parsed command tree and imported declaration ranges bind each permitted
+Lean's frontend advances parsing and elaboration together, retaining scoped
+and local syntax. Its command trees and imported declaration ranges bind each permitted
 `set_option warningAsError false in` to its exact registered unresolved theorem.
 File, section, namespace, unrelated-declaration, and completed-proof exceptions
 are rejected; comments and layout do not determine option scope.
