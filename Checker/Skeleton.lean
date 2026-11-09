@@ -69,6 +69,59 @@ private meta def typeConstantName (info : ConstantInfo) : String :=
   | .const name levels => if levels.isEmpty then toString name else "NONE"
   | _ => "NONE"
 
+/-- Recognize the parsed option command, term, or tactic, independent of layout. -/
+private meta def disablesWarnings (stx : Syntax) : Bool :=
+  (stx.isOfKind ``Parser.Command.set_option ||
+    stx.isOfKind ``Parser.Term.set_option ||
+    stx.isOfKind ``Parser.Tactic.set_option) &&
+  stx[1].isIdent && stx[1].getId == `warningAsError && stx[3].getAtomVal == "false"
+
+/--
+Report warning exceptions from parsed commands. Only an immediate theorem
+declaration can own a command-level exception. Its actual imported declaration
+range, rather than a guessed namespace spelling, determines its identity.
+Nested term/tactic options stay inside that same declaration's exception.
+-/
+private meta partial def warningLines (moduleName : Name) (fileMap : FileMap)
+    (theorems : Array (Name × Position)) (stx : Syntax)
+    (insideException := false) : Array String := Id.run do
+  let line (owner scope : String) :=
+    String.intercalate "\t" ["W", toString moduleName, owner, scope]
+  if stx.isOfKind ``Parser.Command.in && disablesWarnings stx[0] then
+    let declaration := stx[2]
+    let theoremSyntax := declaration[1]
+    let owner := if declaration.isOfKind ``Parser.Command.declaration &&
+        theoremSyntax.isOfKind ``Parser.Command.theorem then
+      theoremSyntax[1][0].getPos? >>= fun pos =>
+        (theorems.find? fun entry => entry.2 == fileMap.toPosition pos).map (·.1)
+      else none
+    return #[line (owner.map toString |>.getD "NONE") "declaration"] ++
+      warningLines moduleName fileMap theorems declaration owner.isSome
+  if disablesWarnings stx && !insideException then
+    return #[line "NONE" "unscoped"]
+  let mut result := #[]
+  for child in stx.getArgs do
+    result := result ++ warningLines moduleName fileMap theorems child insideException
+  return result
+
+/-- Parse each registered module using Lean's parser and exact declaration ranges. -/
+private meta def moduleWarningLines (env : Environment) (moduleName : Name)
+    (sourcePath : System.FilePath) : CommandElabM (Array String) := do
+  let some idx := moduleIndex? env moduleName
+    | throwError "warning scope module {moduleName} is absent"
+  let mut theorems := #[]
+  for info in env.header.moduleData[idx]!.constants do
+    if let .thmInfo _ := info then
+      let some ranges ← findDeclarationRanges? info.name
+        | continue  -- A wrapper without a matching range is never permitted.
+      theorems := theorems.push (info.name, ranges.selectionRange.pos)
+  let contents ← IO.FS.readFile sourcePath
+  let inputCtx := Parser.mkInputContext contents sourcePath.toString
+  -- The parser rejects recovery/errors; comments and line breaks are syntax,
+  -- not a second, incomplete shell lexer for Lean commands.
+  let parsed ← Parser.testParseFile env sourcePath
+  return warningLines moduleName inputCtx.fileMap theorems parsed.raw
+
 /-- Render semantic facts for one declaration owned by a statement module. -/
 private meta def declarationLine (env : Environment) (moduleName : Name)
     (info : ConstantInfo) : MetaM String := do
@@ -95,7 +148,7 @@ private meta def declarationLine (env : Environment) (moduleName : Name)
     encodeExpr info.levelParams info.type, valueEncoding info]
 
 /-- Inspect all registered statement modules in one elaborated environment. -/
-private meta def dumpEnvironment (moduleListPath outputPath : String) :
+private meta def dumpEnvironment (moduleListPath outputPath rootPath registryPath : String) :
     CommandElabM Unit := do
   let moduleNames := parseModuleList (← IO.FS.readFile moduleListPath)
   let env ← getEnv
@@ -108,14 +161,19 @@ private meta def dumpEnvironment (moduleListPath outputPath : String) :
       lines := lines.push (← liftTermElabM <| declarationLine env moduleName info)
     for h : i in *...data.imports.size do
       lines := lines.push (importLine moduleName (i + 1) data.imports[i])
+  for row in (← IO.FS.readFile registryPath).splitOn "\n" |>.drop 1 do
+    let fields := row.splitOn "\t" |>.toArray
+    if fields.size == 3 then
+      lines := lines ++ (← moduleWarningLines env fields[0]!.toName
+        (System.FilePath.mk rootPath / fields[1]!))
   let body := String.intercalate "\n" lines.toList
   IO.FS.writeFile outputPath (if body.isEmpty then body else body ++ "\n")
 
-syntax "#skeleton_dump " str str : command
+syntax "#skeleton_dump " str str str str : command
 
 elab_rules : command
-  | `(#skeleton_dump $moduleList:str $output:str) =>
-      dumpEnvironment moduleList.getString output.getString
+  | `(#skeleton_dump $moduleList:str $output:str $root:str $registry:str) =>
+      dumpEnvironment moduleList.getString output.getString root.getString registry.getString
 
 end
 

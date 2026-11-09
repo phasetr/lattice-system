@@ -123,7 +123,7 @@ done
 {
   while IFS= read -r module; do printf 'import %s\n' "$module"; done < "$TMP/modules.list"
   echo 'import Checker.Skeleton'
-  printf '\n#skeleton_dump "%s" "%s"\n' "$TMP/statement-modules.list" "$TMP/environment.tsv"
+  printf '\n#skeleton_dump "%s" "%s" "%s" "%s"\n' "$TMP/statement-modules.list" "$TMP/environment.tsv" "$ROOT" "$REG/statement-modules.tsv"
 } > "$TMP/SkeletonRun.lean"
 "$LEAN" --root="$TMP" "$TMP/SkeletonRun.lean" -o "$TMP/SkeletonRun.olean" >/dev/null ||
   fail "skeleton environment inspection failed"
@@ -159,8 +159,8 @@ awk -F '\t' '
   NR==FNR{key=$1 SUBSEP $2;if(seen[key]++)bad("duplicate registered declaration " $2);kind[key]=$3;toid[key]=$4;void[key]=$5;role[key]=$6;next}
   {key=$1 SUBSEP $2;actual[key]=1;if(!(key in role)){bad("extra declaration " $2);next}
    if(kind[key]!=$3)bad("wrong declaration kind " $2 " expected=" kind[key] " actual=" $3 " row=" $0)
-   if(toid[key]!="ANY"&&toid[key]!="PENDING"&&toid[key]!=$4)bad("wrong type OID " $2)
-   if(void[key]!="ANY"&&void[key]!="NONE"&&void[key]!="PENDING"&&void[key]!=$5)bad("wrong value OID " $2)}
+   if(toid[key]!="PENDING"&&toid[key]!=$4)bad("wrong type OID " $2)
+   if(void[key]!="NONE"&&void[key]!="PENDING"&&void[key]!=$5)bad("wrong value OID " $2)}
   END{for(k in role)if(!(k in actual))bad("missing or wrong-module declaration " k);exit failed}
   function bad(s){print s > "/dev/stderr";failed=1}
 ' "$TMP/expected.tsv" "$TMP/actual.tsv" || fail "declaration registry/environment mismatch"
@@ -277,16 +277,17 @@ awk -F '\t' '
   function bad(s){print s > "/dev/stderr";failed=1}
 ' "$REG/modules.tsv" "$REG/statement-modules.tsv" "$REG/imports.tsv" "$REG/statement-imports.tsv" || fail "skeleton import isolation failed"
 
-stub_count=$(awk -F '\t' 'NR>1&&$9=="proof_stub"&&$12=="NONE"{n++}END{print n+0}' "$REG/bindings.tsv")
-suppress_count=0
-while IFS=$'\t' read -r module source_path role; do
-  [[ "$module" != module && "$role" == leaf ]] || continue
-  grep -Eq '^[[:space:]]*set_option[[:space:]]+warningAsError[[:space:]]+false[[:space:]]*$' "$ROOT/$source_path" &&
-    fail "module-wide warningAsError suppression in $source_path"
-  n=$(grep -Ec '^[[:space:]]*set_option[[:space:]]+warningAsError[[:space:]]+false[[:space:]]+in[[:space:]]*$' "$ROOT/$source_path" || true)
-  suppress_count=$((suppress_count+n))
-done < "$REG/statement-modules.tsv"
-[[ $suppress_count -eq $stub_count ]] || fail "local warning suppression count does not match unresolved proof stubs"
+awk -F '\t' '
+  FILENAME==ARGV[1]{if(FNR>1&&$9=="proof_stub"&&$12=="NONE")expected[$4 SUBSEP $3]=1;next}
+  $1=="W" {
+    key=$2 SUBSEP $3
+    if($4!="declaration"||$3=="NONE")bad("unscoped warningAsError suppression in " $2)
+    else if(!(key in expected))bad("warningAsError exception is not a registered unresolved proof " $3)
+    else seen[key]++
+  }
+  END{for(key in expected)if(seen[key]!=1)bad("unresolved proof needs exactly one declaration-local warningAsError exception " key);exit failed}
+  function bad(s){print s > "/dev/stderr";failed=1}
+' "$REG/bindings.tsv" "$TMP/environment.tsv" || fail "warning exception ownership failed"
 
 if [[ $FIXTURE -eq 0 ]]; then
   awk -F '\t' 'NR>1&&$3=="umbrella"{if($1!="LatticeSystem.Skeleton")exit 1;found=1}END{exit !found}' "$REG/statement-modules.tsv" ||

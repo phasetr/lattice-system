@@ -8,6 +8,7 @@ ROOT=$(cd "$ROOT" && pwd)
 # Fixtures use only core propositions and natural numbers. Avoid importing the
 # complete Mathlib umbrella into the full-proof axiom inspection environment.
 TMP=$(mktemp -d "${TMPDIR:-/tmp}/lattice-system-tests.skeleton.XXXXXX")
+TMP=$(cd -P "$TMP" && pwd)
 trap 'rm -rf "$TMP"' EXIT
 export LATTICE_TEST_ROOT=$TMP
 
@@ -24,6 +25,9 @@ expect_pass() {
     echo "$output" >&2
     exit 1
   }
+  if [[ $label == production-composed-gates ]]; then
+    printf '%s\n' "$output"
+  fi
   PASSES=$((PASSES + 1))
 }
 # A negative fixture is evidence only when it reaches the gate it targets, so
@@ -378,12 +382,88 @@ write_claims "$TMP/warning/Fixture/Claims.lean" "${SETUP[@]}" "${STATEMENT[@]}" 
   'set_option warningAsError false' '/-- Module-wide suppression around the hole. -/' \
   'theorem StatementProof : Statement := by sorry' ''
 
+# Warning exceptions belong to the actual registered declaration, independently
+# of comments, line breaks, namespace spelling, or unrelated local options.
+clone "$GOOD" "$TMP/warning-local-layout"
+write_claims "$TMP/warning-local-layout/Fixture/Claims.lean" "${SETUP[@]}" "${STATEMENT[@]}" \
+  'section Reviewed' 'set_option /- option -/ warningAsError /- value -/ false in -- local' \
+  '/-- Registered proof under a parsed local exception. -/' \
+  'theorem _root_.Fixture.StatementProof : Statement := by' \
+  '  set_option warningAsError false in' '    sorry' 'end Reviewed' ''
+for scope in file section namespace split; do
+  clone "$GOOD" "$TMP/warning-$scope"
+  prefix=('set_option warningAsError false -- trailing comment')
+  suffix=()
+  if [[ $scope == section ]]; then prefix=('section Quiet' "${prefix[@]}"); suffix=('end Quiet'); fi
+  if [[ $scope == namespace ]]; then prefix=('namespace Quiet' "${prefix[@]}" 'end Quiet'); fi
+  if [[ $scope == split ]]; then prefix=('set_option /- split -/ warningAsError' '  false -- trailing comment'); fi
+  write_claims "$TMP/warning-$scope/Fixture/Claims.lean" "${prefix[@]}" \
+    "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}" "${suffix[@]}"
+done
+clone "$GOOD" "$TMP/warning-borrowed-local"
+write_claims "$TMP/warning-borrowed-local/Fixture/Claims.lean" \
+  'set_option warningAsError false -- file-wide exception' \
+  'set_option warningAsError false in' "${SETUP[@]}" "${STATEMENT[@]}" \
+  '/-- Bound stub borrowing the setup declaration exception. -/' \
+  'theorem StatementProof : Statement := by sorry' ''
+clone "$GOOD" "$TMP/warning-unrelated-local"
+write_claims "$TMP/warning-unrelated-local/Fixture/Claims.lean" \
+  'set_option warningAsError false in' "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}"
+clone "$GOOD" "$TMP/warning-term"
+write_claims "$TMP/warning-term/Fixture/Claims.lean" \
+  '/-- A setup value cannot disable warnings. -/' \
+  'def Setup : Prop := set_option warningAsError false in False' '' \
+  "${STATEMENT[@]}" "${PROOF[@]}"
+clone "$TMP/nonvacuity" "$TMP/warning-completed"
+write_claims "$TMP/warning-completed/Fixture/Claims.lean" \
+  "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}" \
+  'set_option warningAsError false in' "${NONVACUITY[@]}"
+clone "$TMP/nonvacuity" "$TMP/warning-tactic"
+write_claims "$TMP/warning-tactic/Fixture/Claims.lean" \
+  "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}" \
+  '/-- A completed witness cannot disable warnings in its tactic. -/' \
+  'theorem StatementNonvacuity : Setup → Statement := by' \
+  '  set_option warningAsError false in' '    exact fun h _ => h' ''
+clone "$GOOD" "$TMP/warning-umbrella"
+printf '%s\n' 'set_option warningAsError false -- umbrella exception' \
+  >> "$TMP/warning-umbrella/Fixture/Skeleton.lean"
+
+# These values actually reference imported theorem/opaque constants. Merely
+# importing their modules would not exercise transitive kernel axiom traversal.
+clone "$TMP/nonvacuity" "$TMP/imported-ordinary-theorem"
+write_claims "$TMP/imported-ordinary-theorem/Fixture/Claims.lean" \
+  "${SETUP[@]}" "${STATEMENT[@]}" "${PROOF[@]}" \
+  '/-- Witness whose proof value actually refers to an imported ordinary theorem. -/' \
+  'theorem StatementNonvacuity : Setup → Statement := fun h _ => (fun (_ : 0 + 0 = 0) => h) (Nat.zero_add 0)' ''
+clone "$GOOD" "$TMP/imported-opaque-axiom"
+write_claims "$TMP/imported-opaque-axiom/Fixture/Claims.lean" \
+  'set_option linter.deprecated false in' \
+  '/-- Imported opaque wrapper concealing an unsupported kernel axiom. -/' \
+  'def Setup : Prop := Lean.reduceBool false = false' '' \
+  "${STATEMENT[@]}" "${PROOF[@]}"
+
 expect_pass frozen-oids "$ROOT/scripts/check-skeleton.sh" --fixture "$FROZEN"
 expect_pass checker-copy env "LATTICE_SKELETON_CHECKER_DIR=$CHECKER_COPY" "$ROOT/scripts/check-skeleton.sh" --fixture "$FROZEN"
 expect_pass axiom-frozen-type "$ROOT/scripts/check-skeleton.sh" --fixture "$AXIOM_FROZEN"
 expect_pass required-by "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/required-by"
 expect_pass type-context "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/type-context"
 expect_pass registered-vocabulary "$ROOT/scripts/check-skeleton.sh" --fixture "$VOCABULARY"
+expect_pass warning-local-layout "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/warning-local-layout"
+expect_pass imported-ordinary-theorem env "LATTICE_SKELETON_ACTUAL_OUT=$TMP/imported-theorem-dump.tsv" \
+  "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/imported-ordinary-theorem"
+awk -F '\t' '$2=="Fixture.StatementNonvacuity"&&index(","$10",",",Nat.zero_add,")&&!index(","$11",",",Nat.zero_add,"){found=1}END{exit !found}' \
+  "$TMP/imported-theorem-dump.tsv" || abort "imported ordinary theorem was not actually referenced"
+for variant in file section namespace split borrowed-local unrelated-local term tactic umbrella; do
+  expect_fail "warning-$variant" "unscoped warningAsError suppression" \
+    "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/warning-$variant"
+done
+expect_fail warning-completed "warningAsError exception is not a registered unresolved proof" \
+  "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/warning-completed"
+expect_fail imported-opaque-axiom "unregistered nonstandard axiom Lean.trustCompiler" \
+  env "LATTICE_SKELETON_ACTUAL_OUT=$TMP/imported-opaque-dump.tsv" \
+  "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/imported-opaque-axiom"
+awk -F '\t' '$2=="Fixture.Setup"&&index(","$10",",",Lean.reduceBool,")&&index(","$11",",",Lean.trustCompiler,"){found=1}END{exit !found}' \
+  "$TMP/imported-opaque-dump.tsv" || abort "imported opaque wrapper and its kernel axiom were not both visited"
 
 expect_fail nonstandard-primary-axiom "unregistered nonstandard axiom Lean.trustCompiler" \
   "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/nonstandard-primary-axiom"
@@ -427,6 +507,155 @@ expect_fail umbrella "umbrella misses" "$ROOT/scripts/check-skeleton.sh" --fixtu
 expect_fail leak "production root reaches" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/leak"
 expect_fail axiom "registered axiom is unused" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/axiom"
 expect_fail warning "warningAsError suppression" "$ROOT/scripts/check-skeleton.sh" --fixture "$TMP/warning"
+
+# A counterfactual, minimal canonical project also runs the production branches.
+# It owns its Git index and build outputs; only existing dependency artifacts
+# are shared. No self-test is replaced or called recursively in this pipeline.
+PRODUCTION=$TMP/production-composed
+git clone --shared --no-checkout -q "$ROOT" "$PRODUCTION"
+git -C "$PRODUCTION" checkout -q --detach HEAD
+python3 - "$ROOT" "$GOOD" "$PRODUCTION" <<'PY'
+from pathlib import Path
+import csv
+import importlib.util
+import shutil
+import subprocess
+import sys
+project, good, target = map(Path, sys.argv[1:])
+for path in subprocess.check_output(['git', 'ls-files'], cwd=project).decode().splitlines():
+    destination = target / path
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(project / path, destination)
+    destination.chmod((project / path).stat().st_mode)
+shutil.rmtree(target / 'LatticeSystem')
+(target / 'LatticeSystem/Claims').mkdir(parents=True)
+for path in (target / 'registry').glob('*.tsv'):
+    path.write_text(path.read_text().splitlines()[0] + '\n')
+for path in (good / 'registry').glob('*.tsv'):
+    (target / 'registry' / path.name).write_bytes(path.read_bytes())
+def write(name, rows):
+    path = target / 'registry' / name
+    header = path.read_text().splitlines()[0]
+    path.write_text(header + '\n' + ''.join('\t'.join(row) + '\n' for row in rows))
+write('tracks.tsv', [['TR-A', '1', 'Fixture A', 'a'], ['TR-B', '2', 'Fixture B', 'b']])
+write('pages.tsv', [
+    ['PG-SRA-0001', 'SRA', '000001', '1', '1', '1', 'content', 'complete', 'complete', 'a' * 40],
+    ['PG-SRB-0001', 'SRB', '000001', '1', '1', '1', 'content', 'complete', 'complete', 'b' * 40]])
+claim_rows = list(csv.reader((target / 'registry/claims.tsv').read_text().splitlines(), delimiter='\t'))
+for row in claim_rows[1:]:
+    row[4] = 'PDF p. 1; paragraph 1'
+write('claims.tsv', claim_rows[1:])
+# Use the canonical inventory derivation as well as its later strict validator.
+spec = importlib.util.spec_from_file_location('r4_fixture_generator', project / 'scripts/generate-public-docs.py')
+generator = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(generator)
+def records(name):
+    with (target / 'registry' / name).open(newline='') as stream:
+        return list(csv.DictReader(stream, delimiter='\t', quoting=csv.QUOTE_NONE))
+items, relations = generator.derive_source_items(
+    records('claims.tsv'), records('pages.tsv'), records('sources.tsv'), records('tracks.tsv'))
+write('source-items.tsv', [[row[field] for field in generator.HEADERS['source_items']] for row in items])
+write('item-claims.tsv', [[row[field] for field in generator.HEADERS['item_claims']] for row in relations])
+write('claim-vocabulary-review.tsv', [[claim, 'mathlib_only', 'FIXTURE-REVIEW'] for claim in
+    ['CL-SRA-0001', 'CL-SRA-0002', 'CL-SRB-0001']])
+write('modules.tsv', [['LatticeSystem', 'LatticeSystem.lean', 'root'],
+                      ['LatticeSystem.Vocabulary', 'LatticeSystem/Vocabulary.lean', 'umbrella']])
+write('imports.tsv', [['LatticeSystem', '1', 'LatticeSystem.Vocabulary', 'true', 'false', 'false'],
+                      ['LatticeSystem.Vocabulary', '1', 'Mathlib.Init', 'true', 'false', 'false']])
+write('statement-modules.tsv', [
+    ['LatticeSystem.Claims.Front', 'LatticeSystem/Claims/Front.lean', 'leaf'],
+    ['LatticeSystem.Skeleton', 'LatticeSystem/Skeleton.lean', 'umbrella']])
+write('statement-imports.tsv', [
+    ['LatticeSystem.Claims.Front', '1', 'Mathlib.Init', 'true', 'false', 'false'],
+    ['LatticeSystem.Skeleton', '1', 'LatticeSystem.Claims.Front', 'true', 'false', 'false']])
+bindings = (target / 'registry/bindings.tsv').read_text().replace('Fixture.Claims', 'LatticeSystem.Claims.Front')
+bindings = bindings.replace('Fixture.', 'LatticeSystem.Claims.Front.')
+(target / 'registry/bindings.tsv').write_text(bindings)
+source = (good / 'Fixture/Claims.lean').read_text().replace('namespace Fixture', 'namespace LatticeSystem.Claims.Front').replace('end Fixture', 'end LatticeSystem.Claims.Front')
+(target / 'LatticeSystem/Claims/Front.lean').write_text(source)
+(target / 'LatticeSystem/Vocabulary.lean').write_text('module\n\npublic import Mathlib.Init\n\n/-! Counterfactual declaration-free vocabulary umbrella. -/\n')
+(target / 'LatticeSystem/Skeleton.lean').write_text('module\n\npublic import LatticeSystem.Claims.Front\n\n/-! Counterfactual skeleton umbrella. -/\n')
+(target / '.lake').mkdir(exist_ok=True)
+(target / '.lake/packages').symlink_to((project / '.lake/packages').resolve(), target_is_directory=True)
+PY
+refresh_production() {
+  python3 - "$1" <<'PY'
+from pathlib import Path
+import csv
+import subprocess
+import sys
+root = Path(sys.argv[1])
+def rows(name):
+    with (root / 'registry' / name).open(newline='') as stream:
+        return list(csv.reader(stream, delimiter='\t', quoting=csv.QUOTE_NONE))
+def write(name, records):
+    (root / 'registry' / name).write_text(''.join('\t'.join(row) + '\n' for row in records))
+def blob(value):
+    return subprocess.check_output(['git', 'hash-object', '--stdin'], input=value.encode(), cwd=root).decode().strip()
+claims, pages = rows('claims.tsv'), rows('pages.tsv')
+for row in claims[1:]:
+    row[8] = blob(row[7])
+write('claims.tsv', claims)
+invariants = rows('source-invariants.tsv')[:1]
+for source in ['SRA', 'SRB']:
+    active = [row for row in claims[1:] if row[1] == source and row[11] == 'false']
+    source_pages = [row for row in pages[1:] if row[1] == source]
+    used = {row[3] for row in active}
+    content = ''.join('\t'.join(row) + '\n' for row in pages[1:] + claims[1:] if row[1] == source)
+    invariants.append([source, str(len(source_pages)), str(len(active)),
+        str(sum(row[5] != 'out_of_scope' for row in active)),
+        str(sum(row[6] == 'equation' for row in active)),
+        str(sum(row[0] not in used for row in source_pages)), blob(content), 'FIXTURE-REVIEW'])
+write('source-invariants.tsv', invariants)
+PY
+}
+refresh_production "$PRODUCTION"
+harvest "$PRODUCTION" "$TMP/production-dump.tsv"
+freeze_bindings "$PRODUCTION/registry/bindings.tsv" "$TMP/production-dump.tsv"
+python3 "$ROOT/scripts/generate-public-docs.py" --write --root "$PRODUCTION" >/dev/null
+git -C "$PRODUCTION" add -- LatticeSystem.lean LatticeSystem registry docs scripts Checker
+production_gates() {
+  local dir=$1 gate
+  for gate in tree schema sources order lifecycle registry census source-items policy vocabulary; do
+    "$dir/scripts/check-$gate.sh" "$dir" || return
+  done
+  python3 "$dir/scripts/generate-public-docs.py" --check --root "$dir" || return
+  (cd "$dir" && lake build) || return
+  "$dir/scripts/check-skeleton.sh" "$dir"
+}
+expect_pass production-composed-gates production_gates "$PRODUCTION"
+for variant in pending frozen-oid any imports warning inactive-owner inactive-target proof-policy; do
+  clone "$PRODUCTION" "$TMP/production-$variant"
+done
+rewrite "$TMP/production-pending/registry/bindings.tsv" 'NR==2{$7="PENDING"}{print}'
+rewrite "$TMP/production-frozen-oid/registry/bindings.tsv" 'NR==2{$7="0000000000000000000000000000000000000000"}{print}'
+rewrite "$TMP/production-any/registry/bindings.tsv" 'NR==2{$7="ANY"}{print}'
+rewrite "$TMP/production-imports/registry/statement-imports.tsv" 'NR==2{$4="false"}{print}'
+printf '%s\n' 'set_option warningAsError false -- file-wide exception' \
+  >> "$TMP/production-warning/LatticeSystem/Claims/Front.lean"
+printf '%s\n' phase proof > "$TMP/production-proof-policy/registry/phase.tsv"
+for variant in owner target; do
+  dir="$TMP/production-inactive-$variant"
+  inactive=CL-SRB-0001
+  [[ $variant != target ]] || inactive=CL-SRA-0001
+  rewrite "$dir/registry/claims.tsv" \
+    '$1=="'"$inactive"'"{$12="true";$13="CL-SRA-0002";$14="fixture-duplicate";$15="FIXTURE-REVIEW"}{print}'
+  rewrite "$dir/registry/bindings.tsv" '$1!="'"$inactive"'"{print}'
+  rewrite "$dir/registry/claim-vocabulary-review.tsv" '$1!="'"$inactive"'"{print}'
+  if [[ $variant == owner ]]; then
+    rewrite "$dir/registry/claim-context.tsv" 'NR==2{$1="CL-SRB-0001";$5="inherited"}{print}'
+  fi
+  refresh_production "$dir"
+done
+expect_fail production-pending "skeleton capability forbids pending binding OIDs" \
+  production_gates "$TMP/production-pending"
+expect_fail production-frozen-oid "wrong type OID" production_gates "$TMP/production-frozen-oid"
+expect_fail production-any "bad statement type OID" production_gates "$TMP/production-any"
+expect_fail production-imports "statement import registry/environment mismatch" production_gates "$TMP/production-imports"
+expect_fail production-warning "unscoped warningAsError suppression" production_gates "$TMP/production-warning"
+expect_fail production-inactive-owner "inactive claim-context owner or target" production_gates "$TMP/production-inactive-owner"
+expect_fail production-inactive-target "inactive claim-context owner or target" production_gates "$TMP/production-inactive-target"
+expect_fail production-proof-policy "production policy is not implemented for proof" production_gates "$TMP/production-proof-policy"
 
 echo "test-skeleton-semantic: diagnostic reached by each negative fixture"
 LC_ALL=C sort "$REACHED" | awk -F '\t' '{printf "  %-20s %s\n", $1, $2}'

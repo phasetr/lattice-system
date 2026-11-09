@@ -232,10 +232,11 @@ LC_ALL=C awk -F '\t' -v phase="$phase" '
 if [[ $(awk 'END { print NR }' "$REG/claim-context.tsv") -gt 1 ]]; then
 [[ -f "$REG/item-claims.tsv" ]] || fail "claim-context rows require registry/item-claims.tsv"
 LC_ALL=C awk -F '\t' '
-  FILENAME == ARGV[1] { if(FNR>1){claim[$1]=1; disposition[$1]=$6; sequence[$1]=++claimSequence} next }
+  FILENAME == ARGV[1] { if(FNR>1){claim[$1]=1; active[$1]=($12=="false"&&$6!="out_of_scope"); disposition[$1]=$6; sequence[$1]=++claimSequence} next }
   FILENAME == ARGV[2] { if(FNR>1){item[$3]=$1} next }
   FNR==1 { next }
   !($1 in claim) || !($3 in claim) { bad("unknown claim-context claim") }
+  !active[$1] || !active[$3] { bad("inactive claim-context owner or target") }
   $1==$3 { bad("self claim-context") }
   sequence[$3]>=sequence[$1] { bad("claim-context target is not earlier") }
   disposition[$3] !~ /^(definition|notation|hypothesis|domain)$/ { bad("claim-context target is not a setup claim") }

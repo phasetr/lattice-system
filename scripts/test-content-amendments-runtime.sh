@@ -4,7 +4,8 @@ set -euo pipefail
 SCRIPT_DIR=${BASH_SOURCE[0]%/*}
 [[ "$SCRIPT_DIR" == "${BASH_SOURCE[0]}" ]] && SCRIPT_DIR=.
 PROJECT_ROOT=${1:-$(cd "$SCRIPT_DIR/.." && pwd)}
-python3 - "$PROJECT_ROOT" <<'PY'
+[[ $# -eq 0 ]] || shift
+python3 - "$PROJECT_ROOT" "$@" <<'PY'
 import csv
 import importlib.util
 import json
@@ -77,6 +78,23 @@ def unused_id(root, name, prefix):
         number += 1
     return prefix + '-' + format(number, '04d')
 
+def adapt_empty_r4_schemas(target):
+    # Historical source-data fixtures still need today's empty infrastructure
+    # schemas. Never reinterpret populated artifact rows during this adapter.
+    for name in ('bindings.tsv', 'axioms.tsv', 'claim-context.tsv',
+                 'statement-modules.tsv', 'statement-imports.tsv'):
+        expected = table(project, name)[0]
+        path = target / 'registry' / name
+        if not path.exists():
+            write(target, name, [expected])
+            continue
+        recorded = table(target, name)
+        if recorded and recorded[0] == expected:
+            continue  # Preserve current files byte-for-byte, including final LF.
+        if len(recorded) != 1:
+            raise RuntimeError('cannot migrate populated historical R4 fixture: ' + name)
+        write(target, name, [expected])
+
 def clone_commit_registry(commit, target):
     paths = subprocess.check_output(
         ['git', 'ls-tree', '-r', '--name-only', commit, 'registry'], cwd=project).decode().splitlines()
@@ -86,17 +104,20 @@ def clone_commit_registry(commit, target):
         destination.write_bytes(subprocess.check_output(['git', 'show', commit + ':' + relative], cwd=project))
     if not (target / 'registry/claim-content-amendments.tsv').exists():
         write(target, 'claim-content-amendments.tsv', [header])
-    # Historical source-data fixtures still need today's empty infrastructure
-    # schemas. Never reinterpret populated artifact rows during this adapter.
-    for name in ('bindings.tsv', 'axioms.tsv', 'claim-context.tsv',
-                 'statement-modules.tsv', 'statement-imports.tsv'):
-        expected = table(project, name)[0]
-        path = target / 'registry' / name
-        recorded = table(target, name) if path.exists() else [expected]
-        if recorded[0] != expected:
-            assert len(recorded) == 1, 'cannot migrate populated historical R4 fixture'
-            recorded = [expected]
-        write(target, name, recorded)
+    adapt_empty_r4_schemas(target)
+
+# Exercise the same helper under optimization without recursively running the
+# transition suite. Only explicit, repository-external owned fixtures qualify.
+if len(sys.argv) > 2:
+    if len(sys.argv) != 4 or sys.argv[2] != '--adapt-empty-r4-only':
+        raise SystemExit('invalid adapter-only arguments')
+    test_root = Path(os.environ.get('LATTICE_TEST_ROOT', '/')).resolve()
+    target = Path(sys.argv[3]).resolve()
+    if (test_root == project or test_root in project.parents or project in test_root.parents
+            or test_root not in target.parents):
+        raise SystemExit('adapter-only target must be below an external LATTICE_TEST_ROOT')
+    adapt_empty_r4_schemas(target)
+    raise SystemExit(0)
 
 def prepare_amendment(before, after, content):
     shutil.copytree(before, after)
@@ -235,6 +256,8 @@ def expect(label, expected, command, diagnostic=''):
     count += 1
     accepted += expected
     rejected += not expected
+    if label.startswith('adapter-old-populated-'):
+        print(next(line for line in result.stdout.splitlines() if diagnostic in line))
 
 with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as temporary:
     root = Path(temporary)
@@ -279,6 +302,36 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     for name in ('claim-context.tsv', 'statement-modules.tsv', 'statement-imports.tsv'):
         (old_schema / 'registry' / name).unlink()
     transition('empty-r4-schema-migration', old_schema, current)
+    adapter_command = [str(project / 'scripts/test-content-amendments-runtime.sh'),
+                       str(project), '--adapt-empty-r4-only']
+    adapter_empty = case('adapter-historical-empty', old_schema)
+    expect('adapter-historical-empty', True, adapter_command + [str(adapter_empty)])
+    artifact_names = ('bindings.tsv', 'axioms.tsv', 'claim-context.tsv',
+                      'statement-modules.tsv', 'statement-imports.tsv')
+    if any(table(adapter_empty, name) != [table(project, name)[0]] for name in artifact_names):
+        raise SystemExit('adapter did not produce current empty R4 schemas')
+    adapter_current = case('adapter-current-populated', base)
+    adapter_rows = {
+        'bindings.tsv': binding_row(base, claim),
+        'axioms.tsv': ['AX-PROJECT-9001', 'LatticeSystem.Axioms.State.fixture',
+                       'LatticeSystem.Axioms.State', 'state', 'fixture', 'fixture', 'remove', 'PENDING'],
+        'claim-context.tsv': ['CL-TASAKI2020-0002', '1', claim, 'term_reference', 'inherited', 'FIXTURE'],
+        'statement-modules.tsv': ['LatticeSystem.Claims.Front', 'LatticeSystem/Claims/Front.lean', 'leaf'],
+        'statement-imports.tsv': ['LatticeSystem.Claims.Front', '1', 'Mathlib.Init', 'true', 'false', 'false']}
+    for name, row in adapter_rows.items():
+        (adapter_current / 'registry' / name).write_bytes(
+            ('\t'.join(table(project, name)[0]) + '\n' + '\t'.join(row)).encode())
+    adapter_bytes = {name: (adapter_current / 'registry' / name).read_bytes() for name in artifact_names}
+    expect('adapter-current-populated', True, adapter_command + [str(adapter_current)])
+    if any((adapter_current / 'registry' / name).read_bytes() != adapter_bytes[name] for name in artifact_names):
+        raise SystemExit('adapter rewrote a current-schema artifact file')
+    for name in ('bindings.tsv', 'axioms.tsv'):
+        adapter_old = case('adapter-old-populated-' + name, old_schema)
+        with (adapter_old / 'registry' / name).open('ab') as stream:
+            stream.write(b'populated\thistorical\tartifact\trows\tmust\tbe\tpreserved\n')
+        expect('adapter-old-populated-' + name, False,
+               ['env', 'PYTHONOPTIMIZE=1'] + adapter_command + [str(adapter_old)],
+               'cannot migrate populated historical R4 fixture: ' + name)
     # The same relaxation must not reinterpret already populated artifact data.
     for name, row, diagnostic in [
             ('statement-modules.tsv', ['LatticeSystem.Claims.Front',

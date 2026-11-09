@@ -503,7 +503,9 @@ environment gate remains mandatory before skeleton freeze.
 Approval is an explicit review event, not a hand-edited derived status column.
 `registry/claim-axioms.tsv` records the approved claim-to-axiom relation.
 Actual `#print axioms` dependency is derived from the Lean environment and
-compared exactly with that approved relation. Outside the kernel standards
+compared exactly with that approved relation. This is the actual syntactic
+kernel dependency closure, not a claim that every axiom is logically necessary.
+Outside the kernel standards
 `propext`, `Classical.choice`, and `Quot.sound`, every actual axiom must be
 registered and accounted for; an unknown imported axiom is rejected. A direct
 `sorryAx` is permitted only for its registered unresolved proof stub.
@@ -520,11 +522,16 @@ stubs only under the skeleton build target.
 A dedicated `LatticeSystem.Skeleton` umbrella imports every registered
 claim module for completeness checking.
 The production root must not import that umbrella or any unresolved claim.
-Production targets may import only declarations at the proved frontier.
+The future R5 production policy may import only declarations at the proved
+frontier; the current R4 production root reaches no statement module.
 The skeleton target may locally permit the warnings corresponding exactly to
 registered stubs.
 Global `warningAsError` must remain enabled.
 The skeleton mechanism must not disable all warnings to accommodate `sorry`.
+Lean's parsed command tree and imported declaration ranges bind each permitted
+`set_option warningAsError false in` to its exact registered unresolved theorem.
+File, section, namespace, unrelated-declaration, and completed-proof exceptions
+are rejected; comments and layout do not determine option scope.
 R1 contains no fake Lean stubs and no skeleton umbrella.
 The declaration-free bootstrap and census phases supply only registry data,
 the checker contract, and runtime-generated checker fixtures.
@@ -616,7 +623,8 @@ A later lifecycle never disables that source's frozen identity, counts,
 census OID, active-state, source-order, page-coupling, or two-pass census
 invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,187 active
 claims, 3,176 formalization targets, and 1,401 equation pairs. The census-capability requirement that slices, source-claim dependencies,
-bindings, axioms, and claim-to-axiom relations are header-only is phase-local;
+bindings, contexts, axioms, claim-to-axiom relations, statement modules, and
+statement imports are header-only is phase-local;
 it is not part of the later frozen-census invariant check.
 A theorem deletion is not proof progress.
 An assumption strengthening or conclusion weakening is statement drift.
@@ -653,11 +661,13 @@ dependency roles, axiom references, and phase-specific registry semantics.
 For every reconciled production source it additionally requires that source's
 frozen invariant row, contiguous page IDs/order keys/PDF coordinates with two
 complete passes and fixed source OIDs, its exact active-claim and equation-pair
-counts, and strict global tuple order with page coupling. Only `census` requires the
-five pre-R3 implementation registries to be header-only. `vocabulary` instead
-requires complete claim review and vocabulary use, exact registered module and
-import coverage; its absence requirements are enforced by the R3 contract,
-not by the frozen census check.
+counts, and strict global tuple order with page coupling. The census gate requires
+the eight implementation registries (slices, dependencies, bindings, contexts,
+axioms, claim-to-axiom relations, statement modules, and statement imports) to
+be header-only only at census capability. At vocabulary capability, the
+registry and R3 contract separately enforce their header-only requirements,
+complete claim review and vocabulary use, and exact registered module and
+import coverage; the frozen census check does not supply those R3 guarantees.
 During bootstrap and a declaration-free census it compares the production root
 byte-for-byte with the canonical doc-only source. During R3 staging and in
 vocabulary it compares the root with the canonical registered umbrella import
@@ -694,12 +704,13 @@ claim or that two readings were operationally independent.
 It does not parse or understand mathematics.
 It does not prove that a locator matches the book.
 The separate R3 semantic gate inspects the elaborated Lean environment for the
-registered vocabulary and imports; this structural section does not claim a
-future source-claim proof audit.
-It does not establish the direct-`sorryAx` bijection.
-It does not compute transitive axiom dependencies.
-It does not certify theorem correctness or adequacy of hypotheses.
-Those are future semantic checks and human review obligations.
+registered vocabulary and imports. The R4 infrastructure separately tests the
+direct-`sorryAx` bijection, exact statement/proof types, transitive axiom
+dependencies, contexts, and warning exception ownership, including a minimal
+counterfactual tree through the production gate entrypoints. These are not
+guarantees of this structural section or an actual source's R4 freeze. Neither
+gate certifies adequacy of hypotheses or original-source fidelity; source
+statement construction and independent review remain required.
 The source-freeze prerequisite must not be represented as satisfying the R2
 census gate, and R1 must not be represented as satisfying any R2, R3, or R4
 gate. For each source, only its reviewed lifecycle row records completion of a
