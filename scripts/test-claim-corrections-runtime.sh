@@ -53,6 +53,9 @@ expect_fail() {
     echo "$output" >&2
     exit 1
   fi
+  if [[ "$label" == adapter-old-populated-* ]]; then
+    printf '%s\n' "$output"
+  fi
   REJECT_COUNT=$((REJECT_COUNT + 1))
 }
 
@@ -83,6 +86,25 @@ clone_case() {
   cp -R "$source/registry" "$target/registry"
 }
 
+adapt_empty_r4_schemas() {
+  local target=$1 name path expected
+  # Historical source-data fixtures need current infrastructure headers. Never
+  # reinterpret populated artifact rows or rewrite a current-schema table.
+  for name in bindings.tsv axioms.tsv claim-context.tsv statement-modules.tsv statement-imports.tsv; do
+    path="$target/registry/$name"
+    expected=$(head -n 1 "$PROJECT_ROOT/registry/$name")
+    if [[ ! -f "$path" ]]; then
+      printf '%s\n' "$expected" > "$path"
+    elif [[ $(head -n 1 "$path") != "$expected" ]]; then
+      [[ $(awk 'END {print NR}' "$path") -eq 1 ]] || {
+        echo "test-claim-corrections-runtime: cannot migrate populated historical R4 fixture: $name" >&2
+        return 1
+      }
+      printf '%s\n' "$expected" > "$path"
+    fi
+  done
+}
+
 clone_commit_registry() {
   local commit=$1 target=$2 path
   mkdir -p "$target/registry"
@@ -92,6 +114,7 @@ clone_commit_registry() {
   if [[ ! -f "$target/registry/claim-content-amendments.tsv" ]]; then
     printf '%s\n' $'amendment_id\tevent_id\tcorrection_id\tclaim_id\told_content_oid\tnew_content_oid\tpage_source_oid\treview_ref' > "$target/registry/claim-content-amendments.tsv"
   fi
+  adapt_empty_r4_schemas "$target"
 }
 
 rewrite() {
@@ -365,6 +388,41 @@ add_event1_source_item "$ITEM_EVENT1_CURRENT"
 # success caused by every negative command failing with "command not found".
 expect_pass event1-source-item-contract check_item_public_contract \
   "$ITEM_EVENT1_BASE" "$ITEM_EVENT1_CURRENT"
+
+# Check the adapter itself independently of source-event rejection. Its normal
+# historical input is empty; a current-schema table may already carry rows.
+check_empty_r4_headers() {
+  local target=$1 name
+  for name in bindings.tsv axioms.tsv claim-context.tsv statement-modules.tsv statement-imports.tsv; do
+    [[ $(head -n 1 "$target/registry/$name") == $(head -n 1 "$PROJECT_ROOT/registry/$name") ]] || return 1
+    [[ $(awk 'END {print NR}' "$target/registry/$name") -eq 1 ]] || return 1
+  done
+}
+expect_pass adapter-historical-empty-headers check_empty_r4_headers "$ITEM_EVENT1_CURRENT"
+
+ADAPTER_POPULATED="$CASES/adapter-current-populated"
+clone_base "$ADAPTER_POPULATED"
+printf '%s\n' $'CL-TASAKI2020-0001\tLatticeSystem.Claims.Front.statement0001\tNONE\tLatticeSystem.Claims.Front\tdefinition\tnotation_relation\tPENDING\tPENDING\tdefinitional\tNONE\tNONE\tNONE\tNONE\tNONE\tRUNTIME-REVIEW' >> "$ADAPTER_POPULATED/registry/bindings.tsv"
+printf '%s\n' $'AX-PROJECT-9001\tLatticeSystem.Axioms.State.fixture\tLatticeSystem.Axioms.State\tstate\tfixture\tfixture\tremove\tPENDING' >> "$ADAPTER_POPULATED/registry/axioms.tsv"
+printf '%s\n' $'CL-TASAKI2020-0002\t1\tCL-TASAKI2020-0001\tterm_reference\tinherited\tRUNTIME-REVIEW' >> "$ADAPTER_POPULATED/registry/claim-context.tsv"
+printf '%s\n' $'LatticeSystem.Claims.Front\tLatticeSystem/Claims/Front.lean\tleaf' >> "$ADAPTER_POPULATED/registry/statement-modules.tsv"
+printf '%s\n' $'LatticeSystem.Claims.Front\t1\tMathlib\ttrue\tfalse\tfalse' >> "$ADAPTER_POPULATED/registry/statement-imports.tsv"
+check_adapter_preserves_current() {
+  local target=$1 before after
+  before=$(find "$target/registry" -type f -print0 | LC_ALL=C sort -z | xargs -0 shasum | shasum)
+  adapt_empty_r4_schemas "$target" || return
+  after=$(find "$target/registry" -type f -print0 | LC_ALL=C sort -z | xargs -0 shasum | shasum)
+  [[ "$before" == "$after" ]]
+}
+expect_pass adapter-current-populated-preserved check_adapter_preserves_current "$ADAPTER_POPULATED"
+for name in bindings.tsv axioms.tsv; do
+  target="$CASES/adapter-old-populated-${name%.tsv}"
+  clone_base "$target"
+  git -C "$PROJECT_ROOT" show "$BASE_COMMIT:registry/$name" > "$target/registry/$name"
+  printf '%s\n' $'historical\tpopulated\tartifact\trow\tmust\tremain\tunchanged' >> "$target/registry/$name"
+  expect_fail "adapter-old-populated-$name" "cannot migrate populated historical R4 fixture: $name" \
+    adapt_empty_r4_schemas "$target"
+done
 
 clone_case "$ITEM_EVENT1_CURRENT" "$CASES/item-addition-id-duplicate"
 printf '%s\n' \
@@ -886,7 +944,7 @@ expect_fail successor-oid-stale "new correction successor content OID is stale" 
 
 clone_case "$RECLASSIFY" "$CASES/axiom-artifact"
 printf '%s\n' \
-  $'AX-PROJECT-9001\tLatticeSystem.Axioms.ContentlessPredicate.correctionAxiom\tLatticeSystem.Axioms.ContentlessPredicate\tcontentless_predicate\tTASAKI2020\tcorrection-surrogate\treplace-with-source-content' \
+  $'AX-PROJECT-9001\tLatticeSystem.Axioms.ContentlessPredicate.correctionAxiom\tLatticeSystem.Axioms.ContentlessPredicate\tcontentless_predicate\tTASAKI2020\tcorrection-surrogate\treplace-with-source-content\tPENDING' \
   >> "$CASES/axiom-artifact/registry/axioms.tsv"
 printf '%s\n' $'CL-TASAKI2020-0001\tAX-PROJECT-9001' \
   >> "$CASES/axiom-artifact/registry/claim-axioms.tsv"
@@ -895,7 +953,7 @@ expect_fail axiom-artifact "correction event introduces an axiom artifact" \
 
 clone_case "$RECLASSIFY" "$CASES/r4-artifact"
 printf '%s\n' \
-  $'CL-TASAKI2020-0001\tLatticeSystem.Claims.TASAKI2020.statement0001\tLatticeSystem.Claims.TASAKI2020.claim0001\tLatticeSystem.Claims.TASAKI2020.Front\tPENDING\tNONE' \
+  $'CL-TASAKI2020-0001\tLatticeSystem.Claims.Front.statement0001\tLatticeSystem.Claims.Front.claim0001\tLatticeSystem.Claims.Front\tdefinition\tproof_proposition\tPENDING\tPENDING\tproof_stub\ttheorem\tPENDING\tNONE\tNONE\tNONE\tCORRECTION-FIXTURE-REVIEW' \
   >> "$CASES/r4-artifact/registry/bindings.tsv"
 expect_fail r4-artifact "correction event introduces an R4 artifact" \
   "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/r4-artifact"
@@ -917,6 +975,25 @@ printf '%s\n' \
 refresh_invariants "$CASES/split-two-creation-owners"
 expect_fail split-two-creation-owners "split successor provenance is incomplete" \
   "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/split-two-creation-owners"
+
+# Every R4 table is guarded, not only bindings.
+clone_case "$RECLASSIFY" "$CASES/r4-artifact-claim-context"
+printf '%s\n' $'CL-TASAKI2020-0002\t1\tCL-TASAKI2020-0001\tassumption\tsame_item\tCORRECTION-FIXTURE-REVIEW' \
+  >> "$CASES/r4-artifact-claim-context/registry/claim-context.tsv"
+expect_fail r4-artifact-claim-context "correction event introduces an R4 artifact" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/r4-artifact-claim-context"
+
+clone_case "$RECLASSIFY" "$CASES/r4-artifact-statement-modules"
+printf '%s\n' $'LatticeSystem.Claims.Front\tLatticeSystem/Claims/Front.lean\tleaf' \
+  >> "$CASES/r4-artifact-statement-modules/registry/statement-modules.tsv"
+expect_fail r4-artifact-statement-modules "correction event introduces an R4 artifact" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/r4-artifact-statement-modules"
+
+clone_case "$RECLASSIFY" "$CASES/r4-artifact-statement-imports"
+printf '%s\n' $'LatticeSystem.Claims.Front\t1\tMathlib\ttrue\tfalse\tfalse' \
+  >> "$CASES/r4-artifact-statement-imports/registry/statement-imports.tsv"
+expect_fail r4-artifact-statement-imports "correction event introduces an R4 artifact" \
+  "$CHECK_CORRECTIONS" --fixture-dirs "$BASE" "$CASES/r4-artifact-statement-imports"
 
 [[ $(baseline_digest) == "$BASELINE_DIGEST" ]] || {
   echo "test-claim-corrections-runtime: immutable runtime base changed" >&2

@@ -30,14 +30,40 @@ case "$phase" in
   vocabulary)
     [[ $(git hash-object "$source_root") == "$VOCABULARY_ROOT_OID" ]] || fail "vocabulary root differs from canonical registered umbrella import"
     ;;
-  skeleton|proof) fail "production policy is not implemented for $phase" ;;
+  skeleton)
+    [[ $(git hash-object "$source_root") == "$VOCABULARY_ROOT_OID" ]] || fail "skeleton root differs from canonical registered umbrella import"
+    [[ -f "$ROOT/registry/statement-modules.tsv" ]] || fail "missing registry/statement-modules.tsv"
+    [[ $(awk 'END { print NR }' "$ROOT/registry/statement-modules.tsv") -gt 1 ]] ||
+      fail "skeleton phase requires registered statement modules"
+    ;;
+  proof) fail "production policy is not implemented for $phase" ;;
   *) fail "unknown phase: $phase" ;;
 esac
 
-if [[ "$phase" == vocabulary || "$VOCABULARY_STAGING" -eq 1 ]]; then
+# Registered statement modules carry registered axioms, claim theorems, and
+# proof stubs by construction, so only those tokens are exempt there; `admit`
+# and `native_decide` stay forbidden everywhere. Every other tracked production
+# source stays under the full token ban, and a path claimed by both registries
+# gets no exemption at all.
+if [[ "$phase" == vocabulary || "$phase" == skeleton || "$VOCABULARY_STAGING" -eq 1 ]]; then
+  statement_paths=$ROOT/registry/statement-modules.tsv
+  [[ -f "$statement_paths" ]] || statement_paths=/dev/null
+  vocabulary_paths=$ROOT/registry/modules.tsv
+  [[ -f "$vocabulary_paths" ]] || vocabulary_paths=/dev/null
   while IFS= read -r lean_file; do
     [[ -z "$lean_file" ]] && continue
-    if LC_ALL=C awk '/(^|[[:space:]])(axiom|theorem|lemma|sorry|admit|native_decide)([[:space:]]|$)/ { found=1 } END { exit !found }' "$ROOT/$lean_file"; then
+    statement=0 vocabulary=0
+    awk -F '\t' -v path="$lean_file" 'FNR > 1 && $2 == path { found=1 } END { exit !found }' "$statement_paths" && statement=1
+    awk -F '\t' -v path="$lean_file" 'FNR > 1 && $2 == path { found=1 } END { exit !found }' "$vocabulary_paths" && vocabulary=1
+    [[ $statement -eq 1 && $vocabulary -eq 1 ]] &&
+      fail "source path is registered as both a vocabulary and a statement module: $lean_file"
+    if [[ $statement -eq 1 ]]; then
+      tokens='admit|native_decide'
+    else
+      tokens='axiom|theorem|lemma|sorry|admit|native_decide'
+    fi
+    if LC_ALL=C awk -v tokens="$tokens" \
+      '$0 ~ "(^|[[:space:]])(" tokens ")([[:space:]]|$)" { found=1 } END { exit !found }' "$ROOT/$lean_file"; then
       fail "vocabulary lexical hygiene found a forbidden token (nonsemantic check): $lean_file"
     fi
   done < <(git -C "$ROOT" ls-files 'LatticeSystem.lean' 'LatticeSystem/*.lean' 'LatticeSystem/**/*.lean')

@@ -4,9 +4,10 @@
 ## 1. Status and authority
 
 This document is the tracked design authority for the rewrite.
-The global checker capability is `vocabulary`. It describes the strongest
-contract implemented by the checkers, not a single global source frontier.
-Each source advances independently through `registry/source-progress.tsv`.
+The active production checker capability is `vocabulary`. It records the
+currently enabled production contract, independently of checker infrastructure
+available for later stages and of each source's frontier. Each source advances
+independently through `registry/source-progress.tsv`.
 `TASAKI2020` is currently `vocabulary_reviewed`; its corrected, reconciled, and
 frozen census contains 534 physical PDF pages, 3,187 active atomic claims,
 3,176 formalization targets, 1,401 unique equation-label/page pairs, and 63
@@ -300,6 +301,14 @@ enter the permanent correction protocol before the affected source's R4
 statements are accepted. A build, schema check, or OID comparison cannot
 replace this mathematical source review.
 
+
+An independent infrastructure change may migrate an empty bindings or axioms
+schema and introduce header-only statement/context tables. Correction guards
+compare all artifact rows and preserve the headers of populated tables;
+changing an empty header creates no mathematical artifact. A source correction
+may not introduce rows in any statement/context/binding or axiom table. Existing
+content-amendment and grouped-omission ownership contracts remain unchanged.
+
 ## 8. Implementation slices
 
 `registry/slices.tsv` assigns ordered, distinct claims to implementation slices.
@@ -410,18 +419,86 @@ active-claim review and vocabulary use, every vocabulary OID is frozen, and
 module and import registries match the environment. Sources at an earlier
 lifecycle may coexist without weakening those completed-source guarantees.
 
-## 10. Bindings
+## 10. Bindings and statement contexts
 
-`registry/bindings.tsv` is the declaration binding ledger.
-A binding joins a claim to its statement declaration, optional proof
-declaration, stable module, statement OID, and optional nonvacuity declaration.
-The content OID identifies the frozen declaration text under a documented
-normalization rule.
-Once frozen, a binding cannot disappear or silently change identity.
-Changing a frozen statement requires explicit user review, a migration record,
-and a new digest; ordinary proof PRs cannot do it.
-Registry text alone does not prove that a Lean declaration exists.
-That fact requires a semantic Lean environment checker.
+`registry/bindings.tsv` joins each active formalization target to its primary
+statement and, for an assertion or conjecture, its separate proof declaration.
+Its columns are `claim_id`, `statement_decl`, `proof_decl`, `module`,
+`statement_kind`, `statement_shape`, `statement_type_oid`,
+`statement_value_oid`, `implementation_status`, `proof_kind`,
+`proof_type_oid`, `proof_value_oid`, `nonvacuity_decl`, `nonvacuity_oid`, and
+`review_ref`. Primary statements are definitions or abbreviations whose kernel
+type and value are frozen independently. A `proof_proposition` carries its
+proposition as a value; the proof theorem's type is exactly that bound primary
+statement, rather than a disjunction, implication, or other weakening of it.
+Assertions and conjectures use `proof_stub`; definitions, notation, hypotheses,
+and domains use their corresponding definitional statement shapes and no
+separate proof fields. A definitional binding has no direct or transitive hole.
+The checker requires an actual proposition value for `proof_proposition`.
+The other shape names classify the source disposition; they do not by
+themselves certify that a definition, relation, hypothesis, or domain has a
+particular Lean type. Those bindings still have checked declaration kinds and
+frozen type and value OIDs. Whether their types and values express the source,
+including any parameterized hypothesis or predicate, requires independent
+original-source review.
+
+Before source skeleton freeze, every formalization target of that source must
+have exactly one binding, with no inactive or out-of-scope bindings. All type
+and value OIDs required by the frozen schema must be real Git object IDs;
+`PENDING` is only a staging value. The separate proof's `proof_value_oid` is
+`NONE` while its direct hole remains. R5 changes that value OID when discharging
+the proof, while preserving the primary statement and the proof's frozen type.
+No binding may disappear or silently change identity. A reviewed migration is
+required to change a frozen statement. Registry text alone does not establish
+that a declaration exists or that it faithfully represents the source.
+The semantic binding fields remain frozen subject to the staged OID rules;
+`proof_value_oid` can change when a proof is discharged or revised, and
+`review_ref` is mutable provenance metadata. Updating that review token grants
+no permission to change a frozen statement or its proof type.
+
+`registry/statement-modules.tsv` records each statement module's path and
+`leaf` or `umbrella` role. `statement-imports.tsv` freezes its ordered direct
+imports and environment flags. These are separate from the vocabulary module
+registries. One module cannot occupy both roles. Exactly one skeleton umbrella
+reaches every statement leaf, while the production root reaches none of the
+unresolved statement modules.
+
+`registry/claim-context.tsv` records `claim_id`, contiguous `position`,
+`setup_claim_id`, `use_kind`, `scope`, and `review_ref`. Its targets are earlier
+registered definitions, notation, hypotheses, or domains. An `assumption` must
+occur in a binder domain or antecedent of the statement; a term-level `let`
+supplies a value and is not an assumption. Repeated rows for a setup retain
+every assumption requirement; a `term_reference` row cannot erase it in either
+row order. `same_item` context cannot cross a
+source item; `inherited` context still requires explicit independent review.
+Every project constant used in a primary statement is registered vocabulary or
+a registered primary statement. Each vocabulary constant occurring directly
+in the primary type or value additionally requires that claim's reviewed
+`claim-vocabulary.tsv` admission and `project_vocabulary` basis. A generated
+surface declaration uses its own vocabulary ID; admitting its parent does not
+admit it automatically. This necessary direct-use check does not require all
+R3 review links to occur directly in a primary declaration, expand context
+dependencies into vocabulary links, or define future proof-use policy.
+Actual inter-claim uses require a reviewed
+context or dependency edge. The `required_by` dependency is the explicit
+source-order exception that pulls a later prerequisite forward.
+
+The environment gate verifies declaration kind and owning module, primary type
+and value OIDs, exact proof type, direct-hole status, ordered imports and
+reviewed context. An exact proof type is the bare bound primary constant applied
+to the proof declaration's own universe parameters in their declared order. Both
+declarations quantify the same number of parameters; their parameter names may
+differ. Specialized, reordered, duplicated, or extra universe arguments are not
+that universally quantified obligation. A nonvacuity theorem must reference its bound statement and
+may not be `True`, a restatement of its own hypotheses, or those same shapes
+hidden behind a definition. These checks do not replace original-source
+statement review or the separate review of locator documentation.
+The nonvacuity guard unfolds the tested implication and conjunction shapes
+with fuel 16, comparing hypotheses and conclusions at the same weak-head
+normalization boundary using explicit `.all` transparency, including irreducible
+definitions. The primary-value `True` check uses the same transparency. These
+local classifications do not change the frozen expression encodings. It is a bounded structural defense against self-fulfilling
+obligations, not a proof of mathematical nonemptiness or source fidelity.
 
 ## 11. Axioms
 
@@ -435,14 +512,19 @@ Thermodynamic or infinite limits and all finite-dimensional statements are not
 axiom categories.
 Taxonomy membership is not permission to add an axiom.
 Every axiom needs a stable ID, category, declaration, module, source locator,
-rationale, and reopen condition. Its declaration and module are under the
+rationale, reopen condition, and frozen `axiom_type_oid`. Its declaration and module are under the
 category-consistent `LatticeSystem.Axioms.*` namespace.
 That string-level namespace check is not semantic existence evidence; the Lean
 environment gate remains mandatory before skeleton freeze.
 Approval is an explicit review event, not a hand-edited derived status column.
 `registry/claim-axioms.tsv` records the approved claim-to-axiom relation.
 Actual `#print axioms` dependency is derived from the Lean environment and
-compared exactly with that approved relation.
+compared exactly with that approved relation. This is the actual syntactic
+kernel dependency closure, not a claim that every axiom is logically necessary.
+Outside the kernel standards
+`propext`, `Classical.choice`, and `Quot.sound`, every actual axiom must be
+registered and accounted for; an unknown imported axiom is rejected. A direct
+`sorryAx` is permitted only for its registered unresolved proof stub.
 An ordinary unproved theorem must never be converted to an axiom.
 An axiom cannot be hidden behind a definition, instance, or wrapper theorem.
 Unused approved axioms and unapproved actual axioms both fail the final gate.
@@ -453,17 +535,62 @@ Final claim modules use their stable production paths from the moment they are
 created.
 During skeleton construction those modules may contain registered `sorry`
 stubs only under the skeleton build target.
-A dedicated future `LatticeSystem.Skeleton` umbrella imports every registered
+A dedicated `LatticeSystem.Skeleton` umbrella imports every registered
 claim module for completeness checking.
 The production root must not import that umbrella or any unresolved claim.
-Production targets may import only declarations at the proved frontier.
+When registered statement modules and bindings are present, the skeleton gate
+also checks the following Lake isolation contract. With both tables empty, the
+gate instead performs the contract-only check described in §13 and does not run
+this Lake configuration inspection or the nondefault Skeleton build.
+The supported default Lake target is the `LatticeSystem` Lean library with its
+`leanArts` facet. The pinned Lake TOML decoder and effective glob expansion must
+select the canonical root and only registered vocabulary modules at their exact
+registered source paths. Every registered vocabulary module, including a
+transitive nonseed import, must also resolve through Lake's actual package
+provider to that same registered physical source. The nondefault Skeleton target
+must likewise resolve every registered statement umbrella and leaf to its exact
+registered physical source; statement modules remain excluded from default seeds. Multiple safe vocabulary seeds
+and explicit safe globs are allowed; a library's name or the spelling of its `roots` is not sufficient.
+Package `extraDepTargets` and every library's `needs`/`extraDepTargets` must be
+empty, as must package and library `dynlibs`/`plugins`, which also fetch build
+targets during ordinary module setup. Nonempty target dependencies and other
+default facets are unsupported and
+fail closed; this gate does not implement general custom/native target analysis.
+The future R5 production policy may import only declarations at the proved
+frontier; the current R4 production root reaches no statement module.
 The skeleton target may locally permit the warnings corresponding exactly to
 registered stubs.
-Global `warningAsError` must remain enabled.
+Global `warningAsError` must remain enabled. The registered-skeleton Lake gate
+requires it in the normalized package options and each library's effective
+build-type/package/library options; absence has Lean's false default. Library
+inheritance and equivalent typed true values are permitted.
 The skeleton mechanism must not disable all warnings to accommodate `sorry`.
+Lean's frontend advances parsing and elaboration together, retaining scoped
+and local syntax. Its command trees and imported declaration ranges bind each permitted
+`set_option warningAsError false in` to its exact registered unresolved theorem.
+File, section, namespace, unrelated-declaration, and completed-proof exceptions
+are rejected; comments and layout do not determine option scope.
+Diagnostic-consuming `#guard_msgs`/`#guard_panic` test commands, `nolint`
+attributes, and explicit
+Boolean-false `linter.*` or `warn.*` options are forbidden in registered statement
+sources, including within an otherwise permitted proof exception. The direct
+command, term, tactic, and grind option forms use the same recognizer; conversion
+tactics delegate their nested ordinary tactics to that ordinary tactic form.
+The owned
+warningAsError exception does not authorize additional checker exemptions.
+The ordinary missing-owner and kernel-axiom guards retain their independent
+diagnostics before this additional suppression policy is checked.
+The Lake configuration is checked using Lean's effective option normalization:
+known diagnostic-disabling options are forbidden in package or library options,
+including `weak` names and string-valued Booleans. Unknown weak options are
+ignored as Lean ignores them. Unrelated options, including harmless false values
+and recursion/printing settings, are permitted. Package and library
+`moreLeanArgs`/`weakLeanArgs` must be empty: these raw CLI argument arrays can
+override diagnostic options, and the supported configuration uses typed
+`leanOptions` instead of a general command-line argument interpreter.
 R1 contains no fake Lean stubs and no skeleton umbrella.
 The declaration-free bootstrap and census phases supply only registry data,
-the checker contract, and static checker fixtures.
+the checker contract, and runtime-generated checker fixtures.
 
 ## 13. Direct-sorry bijection
 
@@ -475,12 +602,16 @@ Every registered stub must exist at its claim-bound module and name.
 Every direct `sorryAx` occurrence must have exactly one registered claim.
 The checker must reject a stub hidden behind another unproved declaration.
 It must distinguish direct unresolved status from transitive axiom dependency.
-It must also verify declaration kind, module ownership, statement type, and
-the normalized binding `statement_oid`.
+It must also verify declaration kind, module ownership, the primary statement's
+`statement_type_oid` and `statement_value_oid`, and the separate proof's exact
+bound statement type and `proof_type_oid`.
 The same environment inspection must compute actual intentional-axiom use.
 Lexical grep checks remain defense in depth, not semantic evidence.
-R4 cannot complete until this checker exists and its positive and negative
-fixtures pass.
+The infrastructure provides this environment checker and positive and negative
+runtime cases. Its presence with empty production binding and statement tables
+is a contract-only check, not a registered skeleton or R4 completion. Source
+fidelity, exact statement construction, frozen OIDs, and complete source
+coverage remain separate prerequisites.
 
 ## 14. Checker capabilities and source lifecycles
 
@@ -499,7 +630,8 @@ and no-claim page.
 R2 cannot finish with an unreviewed page or an unresolved census discrepancy.
 For a source at `census_reconciled`, its R2 registry has every page in both-pass `complete` state, a
 frozen page-source OID, and no tombstoned claim. Slices, dependencies, bindings,
-axioms, and claim-to-axiom relations remain empty until their later phases.
+claim contexts, axioms, claim-to-axiom relations, statement modules, and statement
+imports remain empty until their later phases.
 R3 is vocabulary and type construction.
 Only vocabulary required to state the full registered corpus is implemented.
 Every active claim is classified as Mathlib-only or as requiring registered
@@ -533,10 +665,12 @@ Frozen source-content and binding statement OIDs cannot change silently.
 Bindings cannot disappear after introduction.
 The global checker capability cannot regress. The production policy recognizes `vocabulary`
 only when the R3 registry, module/import, and Lean-environment checks all run
-and pass. It rejects `skeleton` and `proof` until their semantic phase checks
-exist.
+and pass. The `skeleton` capability requires its registered semantic contract; `proof`
+production policy remains unavailable.
 Derived claim state cannot regress from proved to unresolved.
-The number of registered unresolved claim bindings is monotone nonincreasing in R5.
+The number of registered proof declarations whose actual values directly use
+`sorryAx` is monotone nonincreasing in R5. Their permanent `proof_stub`
+implementation classification does not change when their proof values do.
 Bootstrap and a declaration-free census use the exact canonical doc-only root.
 At vocabulary capability, only the canonical vocabulary root and registered
 vocabulary modules are permitted;
@@ -546,7 +680,8 @@ A later lifecycle never disables that source's frozen identity, counts,
 census OID, active-state, source-order, page-coupling, or two-pass census
 invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,187 active
 claims, 3,176 formalization targets, and 1,401 equation pairs. The census-capability requirement that slices, source-claim dependencies,
-bindings, axioms, and claim-to-axiom relations are header-only is phase-local;
+bindings, contexts, axioms, claim-to-axiom relations, statement modules, and
+statement imports are header-only is phase-local;
 it is not part of the later frozen-census invariant check.
 A theorem deletion is not proof progress.
 An assumption strengthening or conclusion weakening is statement drift.
@@ -583,11 +718,13 @@ dependency roles, axiom references, and phase-specific registry semantics.
 For every reconciled production source it additionally requires that source's
 frozen invariant row, contiguous page IDs/order keys/PDF coordinates with two
 complete passes and fixed source OIDs, its exact active-claim and equation-pair
-counts, and strict global tuple order with page coupling. Only `census` requires the
-five pre-R3 implementation registries to be header-only. `vocabulary` instead
-requires complete claim review and vocabulary use, exact registered module and
-import coverage; its absence requirements are enforced by the R3 contract,
-not by the frozen census check.
+counts, and strict global tuple order with page coupling. The census gate requires
+the eight implementation registries (slices, dependencies, bindings, contexts,
+axioms, claim-to-axiom relations, statement modules, and statement imports) to
+be header-only only at census capability. At vocabulary capability, the
+registry and R3 contract separately enforce their header-only requirements,
+complete claim review and vocabulary use, and exact registered module and
+import coverage; the frozen census check does not supply those R3 guarantees.
 During bootstrap and a declaration-free census it compares the production root
 byte-for-byte with the canonical doc-only source. During R3 staging and in
 vocabulary it compares the root with the canonical registered umbrella import
@@ -624,12 +761,13 @@ claim or that two readings were operationally independent.
 It does not parse or understand mathematics.
 It does not prove that a locator matches the book.
 The separate R3 semantic gate inspects the elaborated Lean environment for the
-registered vocabulary and imports; this structural section does not claim a
-future source-claim proof audit.
-It does not establish the direct-`sorryAx` bijection.
-It does not compute transitive axiom dependencies.
-It does not certify theorem correctness or adequacy of hypotheses.
-Those are future semantic checks and human review obligations.
+registered vocabulary and imports. The R4 infrastructure separately tests the
+direct-`sorryAx` bijection, exact statement/proof types, transitive axiom
+dependencies, contexts, and warning exception ownership, including a minimal
+counterfactual tree through the production gate entrypoints. These are not
+guarantees of this structural section or an actual source's R4 freeze. Neither
+gate certifies adequacy of hypotheses or original-source fidelity; source
+statement construction and independent review remain required.
 The source-freeze prerequisite must not be represented as satisfying the R2
 census gate, and R1 must not be represented as satisfying any R2, R3, or R4
 gate. For each source, only its reviewed lifecycle row records completion of a

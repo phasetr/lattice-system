@@ -1,1 +1,1 @@
-claim_id	statement_decl	proof_decl	module	statement_oid	nonvacuity_decl
+claim_id	statement_decl	proof_decl	module	statement_kind	statement_shape	statement_type_oid	statement_value_oid	implementation_status	proof_kind	proof_type_oid	proof_value_oid	nonvacuity_decl	nonvacuity_oid	review_ref

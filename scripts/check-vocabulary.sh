@@ -51,6 +51,8 @@ BASE_LEAN_PATH=$(cd "$PROJECT_ROOT" && lake env printenv LEAN_PATH)
 export LEAN_PATH="$TMP:$BASE_LEAN_PATH"
 
 mkdir -p "$TMP/Checker"
+"$LEAN" --root="$PROJECT_ROOT" "$PROJECT_ROOT/Checker/Semantic.lean" \
+  -o "$TMP/Checker/Semantic.olean" >/dev/null || fail "failed to compile shared semantic checker"
 "$LEAN" --root="$PROJECT_ROOT" "$PROJECT_ROOT/Checker/Vocabulary.lean" \
   -o "$TMP/Checker/Vocabulary.olean" >/dev/null || fail "failed to compile semantic checker"
 

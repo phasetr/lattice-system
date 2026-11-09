@@ -87,6 +87,12 @@ This capability does not add a production claim or certify another source unit.
 CI selects this exceptional transition only while the event is new and its
 recorded base equals the actual merge base. Later pull requests automatically
 use the ordinary immutable base-diff path.
+R4 checker infrastructure registers statement-module imports and reviewed
+claim contexts, and compares typed declarations, proof-hole ownership and
+actual axiom use with their registries. Its runtime cases exercise these
+contracts without adding production statements. The production binding and
+statement tables are header-only; capability and source lifecycle remain at
+vocabulary, and source fidelity and skeleton construction remain incomplete.
 The public catalog at [docs/index.md](docs/index.md) is generated from reviewed
 source items and includes source/section labels, claim summaries, Lean binding
 status, vocabulary, axioms, and links without publishing private source data.

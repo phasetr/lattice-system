@@ -79,6 +79,9 @@ base_file() {
       registry/claim-vocabulary.tsv) printf '%s\n' $'claim_id\tvocabulary_id'; return ;;
       registry/modules.tsv) printf '%s\n' $'module\tsource_path\trole'; return ;;
       registry/imports.tsv) printf '%s\n' $'module\tposition\timported_module\tis_exported\tis_meta\timport_all'; return ;;
+      registry/claim-context.tsv) printf '%s\n' $'claim_id\tposition\tsetup_claim_id\tuse_kind\tscope\treview_ref'; return ;;
+      registry/statement-modules.tsv) printf '%s\n' $'module\tsource_path\trole'; return ;;
+      registry/statement-imports.tsv) printf '%s\n' $'module\tposition\timported_module\tis_exported\tis_meta\timport_all'; return ;;
       registry/claim-content-amendments.tsv) printf '%s\n' $'amendment_id\tevent_id\tcorrection_id\tclaim_id\told_content_oid\tnew_content_oid\tpage_source_oid\treview_ref'; return ;;
       registry/tracks.tsv) printf '%s\n%s\n' $'track_id\tposition\ttitle\tpublic_slug' $'TR-TASAKI\t1\tTasaki front-to-back\ttasaki'; return ;;
       registry/sources.tsv) printf '%s\n%s\n' $'source_id\ttrack_id\tsource_position\tsource_kind\tcitation_key\ttitle\tauthors\tyear\tedition\tidentifier_kind\tidentifier\tpublic_url\tpublic_slug\tlocal_ref_key\tpdf_oid\ttext_oid\tcoverage' $'TASAKI2020\tTR-TASAKI\t1\tbook\tTASAKI2020\tPhysics and Mathematics of Quantum Many-Body Systems\tHal Tasaki\t2020\t2020.springer.ebook.9783030412654\tdoi\t10.1007/978-3-030-41265-4\thttps://doi.org/10.1007/978-3-030-41265-4\ttasaki-2020\tHal.Tasaki.P534.Physics_and_Mathematics_of_Quantum_Many_Body_Systems.pdf\t91d1237a6384d470bcdc453f058f8e08603767c5\t342ef0ce220dd3ed1c6cc0cdfab5a4d86bbd044f\tfrozen'; return ;;
@@ -118,7 +121,7 @@ if [[ "$MULTI_CURRENT" -eq 0 ]]; then
   base_exists references/tasaki-2020.tsv || fail "base missing references/tasaki-2020.tsv"
   [[ -f "$CURRENT_DIR/references/tasaki-2020.tsv" ]] || fail "current missing references/tasaki-2020.tsv"
 fi
-for path in registry/claim-vocabulary-review.tsv registry/vocabulary.tsv registry/claim-vocabulary.tsv registry/modules.tsv registry/imports.tsv; do
+for path in registry/claim-vocabulary-review.tsv registry/vocabulary.tsv registry/claim-vocabulary.tsv registry/modules.tsv registry/imports.tsv registry/claim-context.tsv registry/statement-modules.tsv registry/statement-imports.tsv; do
   [[ -f "$CURRENT_DIR/$path" ]] || fail "current missing $path"
 done
 if [[ "$MULTI_CURRENT" -eq 1 ]]; then
@@ -153,7 +156,7 @@ require_old_rows() {
   ' <(base_file "$path") "$CURRENT_DIR/$path" || fail "$path $label regression"
 }
 
-for path in registry/pages.tsv registry/claims.tsv registry/axioms.tsv registry/vocabulary.tsv registry/modules.tsv; do detect_deleted_id "$path"; done
+for path in registry/pages.tsv registry/claims.tsv registry/axioms.tsv registry/vocabulary.tsv registry/modules.tsv registry/statement-modules.tsv; do detect_deleted_id "$path"; done
 if [[ "$CORRECTION_REPLAY" -eq 0 ]]; then detect_deleted_id registry/claim-vocabulary-review.tsv; fi
 if [[ "$MULTI_CURRENT" -eq 1 ]]; then
   for path in registry/tracks.tsv registry/sources.tsv registry/source-invariants.tsv registry/source-progress.tsv; do detect_deleted_id "$path"; done
@@ -172,9 +175,25 @@ else
   compare_columns registry/claims.tsv '2,3,4,5,6,7,8,10,11,12,13,14,15' 'identity/order/locator/content/exclusion/supersession'
 fi
 compare_columns registry/axioms.tsv '2,3,4,5,6,7' 'identity/locator/declaration'
+AXIOMS_HEADER=$'axiom_id\tdeclaration\tmodule\tcategory\tsource_locator\trationale\treopen_condition\taxiom_type_oid'
+if [[ $(base_file registry/axioms.tsv | head -n 1) == "$AXIOMS_HEADER" ]]; then
+  awk -F '\t' '
+    function validOid(s) { return s ~ /^[0-9a-f]+$/ && (length(s)==40 || length(s)==64) }
+    NR == FNR { if (FNR > 1) oid[$1]=$8; next }
+    FNR > 1 && ($1 in oid) {
+      if (oid[$1]=="PENDING") { if ($8!="PENDING" && !validOid($8)) bad=1 }
+      else if (!validOid(oid[$1]) || $8!=oid[$1]) bad=1
+    }
+    END { if (bad) print "axiom type OID regressed" > "/dev/stderr"; exit bad }
+  ' <(base_file registry/axioms.tsv) "$CURRENT_DIR/registry/axioms.tsv" || fail "axiom type OID regression"
+else
+  [[ $(base_file registry/axioms.tsv | awk 'END { print NR }') -eq 1 ]] ||
+    fail "base axioms.tsv carries rows under an unsupported schema"
+fi
 if [[ "$CORRECTION_REPLAY" -eq 0 ]]; then compare_columns registry/claim-vocabulary-review.tsv '2,3' 'vocabulary review'; fi
 compare_columns registry/vocabulary.tsv '2,3,4,5,6,9,10' 'declaration/module/kind/origin/parent/design/finiteness'
 compare_columns registry/modules.tsv '2,3' 'source path/role'
+compare_columns registry/statement-modules.tsv '2,3' 'statement source path/role'
 if [[ "$MULTI_CURRENT" -eq 1 ]]; then
   compare_columns registry/tracks.tsv '2,3,4' 'track position/title/slug'
   compare_columns registry/sources.tsv '2,3,4,5,6,7,8,9,10,11,12,13,14' 'source identity/position/bibliography'
@@ -190,6 +209,8 @@ require_old_rows registry/dependencies.tsv dependency
 require_old_rows registry/claim-axioms.tsv claim-axiom
 require_old_rows registry/claim-vocabulary.tsv claim-vocabulary
 require_old_rows registry/imports.tsv import
+require_old_rows registry/statement-imports.tsv statement-import
+require_old_rows registry/claim-context.tsv claim-context
 
 awk -F '\t' '
   function validOid(s) { return s ~ /^[0-9a-f]+$/ && (length(s)==40 || length(s)==64) }
@@ -274,11 +295,34 @@ for path in registry/correction-events.tsv registry/claim-normalization-reviews.
   fi
 done
 
+BINDINGS_HEADER=$'claim_id\tstatement_decl\tproof_decl\tmodule\tstatement_kind\tstatement_shape\tstatement_type_oid\tstatement_value_oid\timplementation_status\tproof_kind\tproof_type_oid\tproof_value_oid\tnonvacuity_decl\tnonvacuity_oid\treview_ref'
+if [[ $(base_file registry/bindings.tsv | head -n 1) != "$BINDINGS_HEADER" ]]; then
+  [[ $(base_file registry/bindings.tsv | awk 'END { print NR }') -eq 1 ]] ||
+    fail "base bindings.tsv carries rows under an unsupported schema"
+fi
+# Semantic binding columns 2--14 are frozen except `proof_value_oid`; column 15
+# is mutable review provenance. R5 rewrites the proof value when a stub is
+# discharged. It is still monotone,
+# so a real object ID may become another real object ID but never returns to the
+# unresolved `NONE` that the skeleton checker reads as an open hole.
 awk -F '\t' '
   function fixed(s) { return s!="" && s!="NONE" }
-  NR == FNR { if (FNR > 1) { statement[$1]=$2; proof[$1]=$3; module[$1]=$4; oid[$1]=$5; nonvac[$1]=$6 } next }
-  FNR > 1 { seen[$1]=1; if (($1 in statement) && (statement[$1]!=$2 || module[$1]!=$4 || (oid[$1]!="PENDING" && oid[$1]!=$5) || (fixed(proof[$1]) && proof[$1]!=$3) || (fixed(nonvac[$1]) && nonvac[$1]!=$6))) bad=1 }
-  END { for (id in statement) if (!(id in seen)) bad=1; if (bad) print "binding disappeared or identity drifted" > "/dev/stderr"; exit bad }
+  function frozen(old, current, id) { if (fixed(old) && old!="PENDING" && old!=current) drift(id) }
+  NR == FNR { if (FNR > 1) { statement[$1]=$2; proof[$1]=$3; module[$1]=$4; kind[$1]=$5; shape[$1]=$6; typeOid[$1]=$7; valueOid[$1]=$8; status[$1]=$9; proofKind[$1]=$10; proofType[$1]=$11; proofValue[$1]=$12; nonvac[$1]=$13; nonvacOid[$1]=$14 } next }
+  FNR > 1 {
+    seen[$1]=1
+    if ($1 in statement) {
+      if (statement[$1]!=$2 || module[$1]!=$4) drift($1)
+      frozen(proof[$1], $3, $1); frozen(kind[$1], $5, $1); frozen(shape[$1], $6, $1)
+      frozen(typeOid[$1], $7, $1); frozen(valueOid[$1], $8, $1); frozen(status[$1], $9, $1)
+      frozen(proofKind[$1], $10, $1); frozen(proofType[$1], $11, $1)
+      if (fixed(proofValue[$1]) && proofValue[$1]!="PENDING" && !fixed($12)) regress($1)
+      frozen(nonvac[$1], $13, $1); frozen(nonvacOid[$1], $14, $1)
+    }
+  }
+  END { for (id in statement) if (!(id in seen)) drift(id); exit bad }
+  function drift(id) { print "binding disappeared or identity drifted " id > "/dev/stderr"; bad=1 }
+  function regress(id) { print "proof value regressed to an unresolved hole " id > "/dev/stderr"; bad=1 }
 ' <(base_file registry/bindings.tsv) "$CURRENT_DIR/registry/bindings.tsv" || fail "binding regression"
 
 if [[ "$MULTI_CURRENT" -eq 0 ]]; then

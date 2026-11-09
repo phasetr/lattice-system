@@ -122,6 +122,72 @@ printf '%s\n' \
 make_policy_case policy-phase-advance census canonical
 make_policy_case policy-future-phase vocabulary vocabulary
 
+# Lexical hygiene reads the tracked file set, so a policy fixture that exercises
+# it has to be a real index rather than a bare directory.
+make_policy_repo() {
+  local target=$1
+  git -C "$target" init --quiet
+  git -C "$target" add -A
+}
+make_skeleton_case() {
+  local name=$1 registered_path=$2 vocabulary_body=$3
+  local claim_body=${4:-'theorem stub : True := by sorry'}
+  local target="$TMP/$name"
+  make_policy_case "$name" skeleton vocabulary
+  mkdir -p "$target/registry" "$target/LatticeSystem/Vocabulary" "$target/LatticeSystem/Claims"
+  printf '%s\n' $'module\tsource_path\trole' > "$target/registry/statement-modules.tsv"
+  case "$registered_path" in
+    none) ;;
+    *) printf '%s\t%s\tleaf\n' \
+        "$(printf '%s' "${registered_path%.lean}" | tr '/' '.')" "$registered_path" \
+        >> "$target/registry/statement-modules.tsv" ;;
+  esac
+  printf '%s\n' '/-! Vocabulary fixture. -/' "$vocabulary_body" \
+    > "$target/LatticeSystem/Vocabulary/Quantum.lean"
+  printf '%s\n' '/-! Claim fixture. -/' "$claim_body" \
+    > "$target/LatticeSystem/Claims/Front.lean"
+  printf '%s\n' '/-! Second claim fixture. -/' > "$target/LatticeSystem/Claims/Other.lean"
+  make_policy_repo "$target"
+}
+
+make_skeleton_case policy-skeleton-good LatticeSystem/Claims/Front.lean 'def quantumDimension : Nat := 2'
+make_skeleton_case policy-skeleton-empty none 'def quantumDimension : Nat := 2'
+make_skeleton_case policy-skeleton-unregistered LatticeSystem/Claims/Other.lean 'def quantumDimension : Nat := 2'
+make_skeleton_case policy-skeleton-hygiene LatticeSystem/Claims/Front.lean 'theorem leaked : True := trivial'
+# A registered statement module legitimately carries registered axioms, claim
+# theorems, and proof stubs. It never carries `admit` or `native_decide`.
+make_skeleton_case policy-skeleton-axiom LatticeSystem/Claims/Front.lean \
+  'def quantumDimension : Nat := 2' 'axiom interfaceAxiom : True'
+make_skeleton_case policy-skeleton-native LatticeSystem/Claims/Front.lean \
+  'def quantumDimension : Nat := 2' 'theorem stub : True := by native_decide'
+make_skeleton_case policy-skeleton-admit LatticeSystem/Claims/Front.lean \
+  'def quantumDimension : Nat := 2' 'theorem stub : True := by admit'
+# Registering one path in both module registries must not buy the statement
+# exemption; check-policy closes that on its own.
+make_skeleton_case policy-skeleton-dual LatticeSystem/Claims/Front.lean \
+  'def quantumDimension : Nat := 2' 'theorem sneaky : True := trivial'
+printf '%s\n' $'module\tsource_path\trole' \
+  $'LatticeSystem.Claims.Front\tLatticeSystem/Claims/Front.lean\tleaf' \
+  > "$TMP/policy-skeleton-dual/registry/modules.tsv"
+git -C "$TMP/policy-skeleton-dual" add -A
+
+expect_pass skeleton-policy \
+  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-skeleton-good"
+expect_fail_diagnostic skeleton-policy-no-statement-modules "skeleton phase requires registered statement modules" \
+  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-skeleton-empty"
+expect_fail_diagnostic skeleton-policy-unregistered-statement "forbidden token (nonsemantic check): LatticeSystem/Claims/Front.lean" \
+  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-skeleton-unregistered"
+expect_fail_diagnostic skeleton-policy-hygiene "forbidden token (nonsemantic check): LatticeSystem/Vocabulary/Quantum.lean" \
+  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-skeleton-hygiene"
+expect_pass skeleton-policy-registered-axiom \
+  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-skeleton-axiom"
+expect_fail_diagnostic skeleton-policy-native-decide "forbidden token (nonsemantic check): LatticeSystem/Claims/Front.lean" \
+  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-skeleton-native"
+expect_fail_diagnostic skeleton-policy-admit "forbidden token (nonsemantic check): LatticeSystem/Claims/Front.lean" \
+  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-skeleton-admit"
+expect_fail_diagnostic skeleton-policy-dual-registration "registered as both a vocabulary and a statement module" \
+  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-skeleton-dual"
+
 expect_fail forbidden-token \
   "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-forbidden"
 expect_fail root-check \

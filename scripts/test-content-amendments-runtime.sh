@@ -4,7 +4,13 @@ set -euo pipefail
 SCRIPT_DIR=${BASH_SOURCE[0]%/*}
 [[ "$SCRIPT_DIR" == "${BASH_SOURCE[0]}" ]] && SCRIPT_DIR=.
 PROJECT_ROOT=${1:-$(cd "$SCRIPT_DIR/.." && pwd)}
-python3 - "$PROJECT_ROOT" <<'PY'
+[[ $# -eq 0 ]] || shift
+# Full-suite assertions are mandatory even under an optimized caller. The
+# adapter-only child retains its caller's mode for the explicit optimized oracles.
+if [[ "${1:-}" != --adapt-empty-r4-only ]]; then
+  export PYTHONOPTIMIZE=0
+fi
+python3 - "$PROJECT_ROOT" "$@" <<'PY'
 import csv
 import importlib.util
 import json
@@ -40,6 +46,20 @@ def blob(text):
     return subprocess.check_output(['git', 'hash-object', '--stdin'],
                                    input=text.encode('utf-8'), cwd=project).decode().strip()
 
+def binding_row(root, claim_id):
+    # Invalid R4-state cases still use the actual expanded binding schema.
+    record = next(row for row in table(root, 'claims.tsv')[1:] if row[0] == claim_id)
+    proof = record[5] in {'assertion', 'conjecture'}
+    shapes = {'assertion': 'proof_proposition', 'conjecture': 'proof_proposition',
+              'definition': 'definition_value', 'notation': 'notation_expansion',
+              'hypothesis': 'hypothesis_prop', 'domain': 'domain_type'}
+    return [claim_id, 'LatticeSystem.Claims.Runtime.statement',
+            'LatticeSystem.Claims.Runtime.proof' if proof else 'NONE',
+            'LatticeSystem.Claims.Runtime', 'definition', shapes[record[5]],
+            'PENDING', 'PENDING', 'proof_stub' if proof else 'definitional',
+            'theorem' if proof else 'NONE', 'PENDING' if proof else 'NONE',
+            'NONE', 'NONE', 'NONE', 'RUNTIME-BINDING-REVIEW']
+
 def refresh(root):
     pages, claims = table(root, 'pages.tsv'), table(root, 'claims.tsv')
     rows = table(root, 'source-invariants.tsv')
@@ -63,6 +83,23 @@ def unused_id(root, name, prefix):
         number += 1
     return prefix + '-' + format(number, '04d')
 
+def adapt_empty_r4_schemas(target):
+    # Historical source-data fixtures still need today's empty infrastructure
+    # schemas. Never reinterpret populated artifact rows during this adapter.
+    for name in ('bindings.tsv', 'axioms.tsv', 'claim-context.tsv',
+                 'statement-modules.tsv', 'statement-imports.tsv'):
+        expected = table(project, name)[0]
+        path = target / 'registry' / name
+        if not path.exists():
+            write(target, name, [expected])
+            continue
+        recorded = table(target, name)
+        if recorded and recorded[0] == expected:
+            continue  # Preserve current files byte-for-byte, including final LF.
+        if len(recorded) != 1:
+            raise RuntimeError('cannot migrate populated historical R4 fixture: ' + name)
+        write(target, name, [expected])
+
 def clone_commit_registry(commit, target):
     paths = subprocess.check_output(
         ['git', 'ls-tree', '-r', '--name-only', commit, 'registry'], cwd=project).decode().splitlines()
@@ -72,6 +109,25 @@ def clone_commit_registry(commit, target):
         destination.write_bytes(subprocess.check_output(['git', 'show', commit + ':' + relative], cwd=project))
     if not (target / 'registry/claim-content-amendments.tsv').exists():
         write(target, 'claim-content-amendments.tsv', [header])
+    adapt_empty_r4_schemas(target)
+
+# Exercise the same helper under optimization without recursively running the
+# transition suite. Only explicit, repository-external owned fixtures qualify.
+if len(sys.argv) > 2:
+    if len(sys.argv) != 4 or sys.argv[2] != '--adapt-empty-r4-only':
+        raise SystemExit('invalid adapter-only arguments')
+    test_root = Path(os.environ.get('LATTICE_TEST_ROOT', '/')).resolve()
+    target = Path(sys.argv[3]).resolve()
+    if (test_root == project or test_root in project.parents or project in test_root.parents
+            or test_root not in target.parents):
+        raise SystemExit('adapter-only target must be below an external LATTICE_TEST_ROOT')
+    adapt_empty_r4_schemas(target)
+    raise SystemExit(0)
+
+# Adapter-only children exit above and retain their explicit optimized mode.
+# The full suite must never silently discard its assertion oracles.
+if not __debug__:
+    raise SystemExit('test-content-amendments-runtime: full mode requires Python assertions')
 
 def prepare_amendment(before, after, content):
     shutil.copytree(before, after)
@@ -210,6 +266,8 @@ def expect(label, expected, command, diagnostic=''):
     count += 1
     accepted += expected
     rejected += not expected
+    if label.startswith('adapter-old-populated-'):
+        print(next(line for line in result.stdout.splitlines() if diagnostic in line))
 
 with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as temporary:
     root = Path(temporary)
@@ -244,6 +302,62 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
 
     def amendment_change(target, column, value):
         mutate(target, 'claim-content-amendments.tsv', amendment_id, column, value)
+
+    # Empty schema changes and new empty R4 tables do not create artifacts.
+    old_schema = case('empty-r4-schema-migration-base', base)
+    write(old_schema, 'bindings.tsv', [['claim_id', 'statement_decl', 'proof_decl',
+                                      'module', 'statement_oid', 'nonvacuity_decl']])
+    write(old_schema, 'axioms.tsv', [['axiom_id', 'declaration', 'module', 'category',
+                                    'source_locator', 'rationale', 'reopen_condition']])
+    for name in ('claim-context.tsv', 'statement-modules.tsv', 'statement-imports.tsv'):
+        (old_schema / 'registry' / name).unlink()
+    transition('empty-r4-schema-migration', old_schema, current)
+    adapter_command = [str(project / 'scripts/test-content-amendments-runtime.sh'),
+                       str(project), '--adapt-empty-r4-only']
+    adapter_empty = case('adapter-historical-empty', old_schema)
+    expect('adapter-historical-empty', True, adapter_command + [str(adapter_empty)])
+    artifact_names = ('bindings.tsv', 'axioms.tsv', 'claim-context.tsv',
+                      'statement-modules.tsv', 'statement-imports.tsv')
+    if any(table(adapter_empty, name) != [table(project, name)[0]] for name in artifact_names):
+        raise SystemExit('adapter did not produce current empty R4 schemas')
+    adapter_current = case('adapter-current-populated', base)
+    adapter_rows = {
+        'bindings.tsv': binding_row(base, claim),
+        'axioms.tsv': ['AX-PROJECT-9001', 'LatticeSystem.Axioms.State.fixture',
+                       'LatticeSystem.Axioms.State', 'state', 'fixture', 'fixture', 'remove', 'PENDING'],
+        'claim-context.tsv': ['CL-TASAKI2020-0002', '1', claim, 'term_reference', 'inherited', 'FIXTURE'],
+        'statement-modules.tsv': ['LatticeSystem.Claims.Front', 'LatticeSystem/Claims/Front.lean', 'leaf'],
+        'statement-imports.tsv': ['LatticeSystem.Claims.Front', '1', 'Mathlib.Init', 'true', 'false', 'false']}
+    for name, row in adapter_rows.items():
+        (adapter_current / 'registry' / name).write_bytes(
+            ('\t'.join(table(project, name)[0]) + '\n' + '\t'.join(row)).encode())
+    adapter_bytes = {name: (adapter_current / 'registry' / name).read_bytes() for name in artifact_names}
+    expect('adapter-current-populated', True, adapter_command + [str(adapter_current)])
+    if any((adapter_current / 'registry' / name).read_bytes() != adapter_bytes[name] for name in artifact_names):
+        raise SystemExit('adapter rewrote a current-schema artifact file')
+    for name in ('bindings.tsv', 'axioms.tsv'):
+        adapter_old = case('adapter-old-populated-' + name, old_schema)
+        with (adapter_old / 'registry' / name).open('ab') as stream:
+            stream.write(b'populated\thistorical\tartifact\trows\tmust\tbe\tpreserved\n')
+        expect('adapter-old-populated-' + name, False,
+               ['env', 'PYTHONOPTIMIZE=1'] + adapter_command + [str(adapter_old)],
+               'cannot migrate populated historical R4 fixture: ' + name)
+    # The same relaxation must not reinterpret already populated artifact data.
+    for name, row, diagnostic in [
+            ('statement-modules.tsv', ['LatticeSystem.Claims.Front',
+                                       'LatticeSystem/Claims/Front.lean', 'leaf'], 'R4 artifact'),
+            ('axioms.tsv', ['AX-RUNTIME-0001', 'LatticeSystem.Axioms.State.fixture',
+                            'LatticeSystem.Axioms.State', 'state', 'fixture',
+                            'fixture', 'reopen', 'PENDING'], 'axiom artifact')]:
+        before = case('populated-' + name + '-base', base)
+        after = case('populated-' + name + '-current')
+        for target in (before, after):
+            write(target, name, table(target, name) + [row])
+        changed = table(after, name)
+        changed[0][-1] += '_drift'
+        write(after, name, changed)
+        transition('populated-artifact-header-drift-' + name,
+                   before, after, False, diagnostic)
 
     omitted = root / 'omitted-claim'
     omission_event, omission_review, omission_nr, omission_cc, omitted_claim, omitted_item = prepare_omission(base, omitted)
@@ -371,7 +485,7 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
         mutate(target, 'source-progress.tsv', 'TASAKI2020', 1, 'skeleton_frozen')
     transition('late-stage-source', late_base, late_current, False, 'requires a pre-R4 source')
     bound_base, bound_current = case('bound-base', base), case('bound-current')
-    binding = ['CL-TASAKI2020-0002', 'statement', 'NONE', 'LatticeSystem.Claims.Runtime', 'PENDING', 'NONE']
+    binding = binding_row(bound_base, 'CL-TASAKI2020-0002')
     for target in (bound_base, bound_current):
         write(target, 'bindings.tsv', table(target, 'bindings.tsv') + [binding])
     transition('already-bound-other-claim-in-source', bound_base, bound_current, False, 'source already has bindings')
@@ -501,7 +615,7 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     added_bound = case('historical-addition-after-r4', omitted)
     mutate(added_bound, 'source-progress.tsv', 'TASAKI2020', 1, 'skeleton_frozen')
     write(added_bound, 'bindings.tsv', table(added_bound, 'bindings.tsv') + [
-        [omitted_claim, 'LatticeSystem.Claims.statement', 'NONE', 'LatticeSystem.Claims.Front', 'PENDING', 'NONE']])
+        binding_row(added_bound, omitted_claim)])
     static('historical-addition-static-after-r4', added_bound)
     project_vocab = case('addition-project-vocabulary', omitted)
     mutate(project_vocab, 'claim-vocabulary-review.tsv', omitted_claim, 1, 'project_vocabulary')
@@ -804,8 +918,7 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     transition('addition-successor-overlap', base, overlap, False, 'cannot have successor provenance')
 
     for label, name, row, diagnostic in [
-            ('addition-r4-binding', 'bindings.tsv', [omitted_claim, 'LatticeSystem.Claims.statement', 'NONE',
-                                                   'LatticeSystem.Claims.Front', 'PENDING', 'NONE'],
+            ('addition-r4-binding', 'bindings.tsv', binding_row(omitted, omitted_claim),
              'source already has bindings'),
             ('addition-slice', 'slices.tsv', ['SL-RUNTIME-0001', '1', omitted_claim],
              'skeleton or axiom relations'),
