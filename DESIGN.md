@@ -533,8 +533,12 @@ The production root must not import that umbrella or any unresolved claim.
 The supported default Lake target is the `LatticeSystem` Lean library with its
 `leanArts` facet. The pinned Lake TOML decoder and effective glob expansion must
 select the canonical root and only registered vocabulary modules at their exact
-registered source paths. Multiple safe vocabulary seeds and explicit safe globs
-are allowed; a library's name or the spelling of its `roots` is not sufficient.
+registered source paths. Every registered vocabulary module, including a
+transitive nonseed import, must also resolve through Lake's actual package
+provider to that same registered physical source. The nondefault Skeleton target
+must likewise resolve every registered statement umbrella and leaf to its exact
+registered physical source; statement modules remain excluded from default seeds. Multiple safe vocabulary seeds
+and explicit safe globs are allowed; a library's name or the spelling of its `roots` is not sufficient.
 Package `extraDepTargets` and every library's `needs`/`extraDepTargets` must be
 empty, as must package and library `dynlibs`/`plugins`, which also fetch build
 targets during ordinary module setup. Nonempty target dependencies and other

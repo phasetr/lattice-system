@@ -367,6 +367,24 @@ def main (args : List String) : IO Unit := do
       fail s!"default module source differs from registry: {mod.name}"
     includesRoot := includesRoot || mod.name == `LatticeSystem
   unless includesRoot do fail "default library omits the canonical production root"
+  -- Imports can resolve a different provider from a seed's own library. Check
+  -- every registered vocabulary module through Lake's actual package resolver,
+  -- including modules that are reached only through the canonical root imports.
+  for (name, path) in expected do
+    let some provider := pkg.findModule? name
+      | fail s!"registered vocabulary module has no Lake provider: {name}"
+    unless (← IO.FS.realPath provider.leanFile) == (← IO.FS.realPath path) do
+      fail s!"Lake vocabulary provider source differs from registry: {name}"
+  -- The nondefault Skeleton target must compile those same registered
+  -- statement sources, rather than another provider under the same module name.
+  for row in (← IO.FS.lines (root / "registry/statement-modules.tsv")).drop 1 do
+    let fields := row.splitOn "\t" |>.toArray
+    unless fields.size == 3 do fail "invalid statement module row"
+    let name := fields[0]!.toName
+    let some provider := pkg.findModule? name
+      | fail s!"registered statement module has no Lake provider: {name}"
+    unless (← IO.FS.realPath provider.leanFile) == (← IO.FS.realPath (root / fields[1]!)) do
+      fail s!"Lake statement provider source differs from registry: {name}"
   IO.println "default skeleton isolation: ok"
 LEAN
   "$LEAN" --run "$TMP/LakeIsolation.lean" "$ROOT" || fail "default Lake skeleton isolation failed"

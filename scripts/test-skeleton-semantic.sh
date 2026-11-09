@@ -726,6 +726,67 @@ PYLAKE
       "$dir/scripts/check-skeleton.sh" "$dir"
   done
 done
+# Matching only a seed's real path is insufficient: an ignored alternate srcDir
+# can symlink that root while replacing the vocabulary module imported by it.
+clone "$PRODUCTION" "$TMP/production-lake-shadow-vocabulary"
+python3 - "$TMP/production-lake-shadow-vocabulary" <<'PYLAKE'
+from pathlib import Path
+import sys
+root = Path(sys.argv[1])
+shadow = root / '.lake/shadow-source'
+(shadow / 'LatticeSystem').mkdir(parents=True)
+(shadow / 'LatticeSystem.lean').symlink_to(root / 'LatticeSystem.lean')
+(shadow / 'LatticeSystem/Vocabulary.lean').write_text(
+    'module\n\npublic import Mathlib.Init\n\n'
+    'set_option warningAsError false in\n'
+    '/-- Unregistered theorem hidden behind a different physical provider. -/\n'
+    'theorem UnregisteredShadow : True := by sorry\n')
+config = root / 'lakefile.toml'
+config.write_text(config.read_text() + 'srcDir = ".lake/shadow-source"\n')
+PYLAKE
+expect_fail production-lake-shadow-vocabulary "Lake vocabulary provider source differs from registry" \
+  "$TMP/production-lake-shadow-vocabulary/scripts/check-skeleton.sh" "$TMP/production-lake-shadow-vocabulary"
+# An alternate srcDir is harmless when every actual provider is a physical
+# alias of the registered source, including the nondefault statement modules.
+clone "$PRODUCTION" "$TMP/production-lake-alias-source"
+python3 - "$TMP/production-lake-alias-source" <<'PYLAKE'
+from pathlib import Path
+import sys
+root = Path(sys.argv[1])
+alias = root / '.lake/alias-source'
+for table in ['modules.tsv', 'statement-modules.tsv']:
+    for row in (root / 'registry' / table).read_text().splitlines()[1:]:
+        path = row.split('\t')[1]
+        destination = alias / path
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.symlink_to(root / path)
+config = root / 'lakefile.toml'
+config.write_text(config.read_text() + 'srcDir = ".lake/alias-source"\n')
+PYLAKE
+expect_pass production-lake-alias-source-gates production_gates "$TMP/production-lake-alias-source"
+clone "$TMP/production-lake-alias-source" "$TMP/production-lake-shadow-statement"
+python3 - "$TMP/production-lake-shadow-statement" <<'PYLAKE'
+from pathlib import Path
+import sys
+root = Path(sys.argv[1])
+alias = root / '.lake/alias-source'
+# Rebind copied absolute aliases to this independently owned clone.
+for table in ['modules.tsv', 'statement-modules.tsv']:
+    for row in (root / 'registry' / table).read_text().splitlines()[1:]:
+        path = row.split('\t')[1]
+        link = alias / path
+        link.unlink()
+        link.symlink_to(root / path)
+leaf = 'LatticeSystem/Claims/Front.lean'
+shadow = alias / leaf
+shadow.unlink()
+shadow.write_text((root / leaf).read_text() +
+    '\nset_option warningAsError false in\n'
+    '/-- Unregistered theorem in an alternate statement provider. -/\n'
+    'theorem UnregisteredShadowStatement : True := by sorry\n')
+PYLAKE
+expect_fail production-lake-shadow-statement "Lake statement provider source differs from registry" \
+  "$TMP/production-lake-shadow-statement/scripts/check-skeleton.sh" "$TMP/production-lake-shadow-statement"
 for variant in pending frozen-oid any imports warning inactive-owner inactive-target proof-policy; do
   clone "$PRODUCTION" "$TMP/production-$variant"
 done
