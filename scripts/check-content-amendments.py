@@ -12,6 +12,11 @@ import sys
 HEADER = ['amendment_id', 'event_id', 'correction_id', 'claim_id',
           'old_content_oid', 'new_content_oid', 'page_source_oid', 'review_ref']
 LEDGER = 'claim-content-amendments.tsv'
+CONTENT_ACTIONS = {'amend_content', 'amend_and_reclassify'}
+TARGET_DISPOSITIONS = {'assertion', 'definition', 'notation', 'hypothesis', 'domain', 'conjecture'}
+SUBKINDS = {'theorem', 'lemma', 'proposition', 'corollary', 'equation', 'definition',
+            'notation', 'problem', 'remark', 'subclaim', 'unnumbered_obligation',
+            'hypothesis', 'domain', 'conjecture'}
 
 
 def fail(message):
@@ -178,18 +183,28 @@ def validate_static(root):
         correction, event, claim = corrections.get(correction_id), events.get(event_id), claims.get(claim_id)
         if (correction is None or event is None or claim is None or
                 correction[1] != event_id or correction[4] != claim_id or
-                correction[5] != 'amend_content'):
+                correction[5] not in CONTENT_ACTIONS):
             fail('content amendment event or correction ownership mismatch')
         owning_review = reviews.get(correction[3])
         if (owning_review is None or owning_review[1] != event_id or
-                owning_review[3] != claim_id or owning_review[5] != 'amend_content' or
+                owning_review[3] != claim_id or owning_review[5] != correction[5] or
                 owning_review[4] != 'exact_statement_readiness' or owning_review[6] != 'closed' or
                 review != event[4] or owning_review[8] != review or
                 re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._:#@+-]*', review) is None):
             fail('content amendment review ownership mismatch')
         if claim[1] != event[2]:
             fail('content amendment source mismatch')
-        if correction[6:8] != correction[8:10]:
+        if correction[5] == 'amend_and_reclassify':
+            if (sum(record[1] == event_id and record[3] == claim_id for record in reviews.values()) != 1 or
+                    sum(record[1] == event_id and record[4] == claim_id for record in corrections.values()) != 1):
+                fail('combined correction lacks exactly one owning review and correction')
+            if (len(correction) != 10 or correction[6] not in TARGET_DISPOSITIONS or
+                    correction[8] not in TARGET_DISPOSITIONS or
+                    correction[7] not in SUBKINDS or correction[9] not in SUBKINDS):
+                fail('combined correction has invalid classification')
+            if correction[6:8] == correction[8:10]:
+                fail('combined correction requires changed classification')
+        elif correction[6:8] != correction[8:10]:
             fail('content amendment changes classification')
         page = pages.get(claim[3])
         if page is None or page[1] != event[2] or page[9] != page_oid or not valid_oid(page_oid):
@@ -200,7 +215,7 @@ def validate_static(root):
             fail('content amendment is a no-op')
         history.setdefault(claim_id, []).append((int(event[1]), old_oid, new_oid))
     for correction in corrections.values():
-        if correction[5] == 'amend_content' and correction[0] not in owned:
+        if correction[5] in CONTENT_ACTIONS and correction[0] not in owned:
             fail('content amendment is missing its provenance row')
     for name, column in [('claim-successors.tsv', 2), ('source-item-additions.tsv', 2)]:
         for row in rows(root, name):
@@ -220,7 +235,9 @@ def validate_transition(base, current, event_id):
     old_amendments = rows(base, LEDGER, optional=True)
     old_by_id = {row[0]: row for row in old_amendments}
     current_by_id = {row[0]: row for row in amendments}
-    if any(current_by_id.get(identifier) != row for identifier, row in old_by_id.items()):
+    old_path = base / 'registry' / LEDGER
+    if ((old_path.exists() and not (current / 'registry' / LEDGER).read_bytes().startswith(old_path.read_bytes())) or
+            any(current_by_id.get(identifier) != row for identifier, row in old_by_id.items())):
         fail('historical content amendment drift')
     new = [row for row in amendments if row[0] not in old_by_id]
     if any(row[1] != event_id for row in new):
@@ -228,7 +245,7 @@ def validate_transition(base, current, event_id):
     events = keyed(current, 'correction-events.tsv')
     event = events[event_id]
     expected = {row[0] for row in rows(current, 'claim-corrections.tsv')
-                if row[1] == event_id and row[5] == 'amend_content'}
+                if row[1] == event_id and row[5] in CONTENT_ACTIONS}
     if {row[2] for row in new} != expected:
         fail('content amendment provenance is not new for this event')
     validate_additions_transition(base, current, event)
@@ -250,11 +267,32 @@ def validate_transition(base, current, event_id):
         old, claim = old_claims.get(claim_id), claims.get(claim_id)
         if old is None or claim is None or old[1] != event[2]:
             fail('content amendment does not target a frozen source claim')
-        if old[11] != 'false' or old[5] == 'out_of_scope':
+        correction = keyed(current, 'claim-corrections.tsv')[row[2]]
+        combined = correction[5] == 'amend_and_reclassify'
+        if combined:
+            for record in (old, claim):
+                if (len(record) != 15 or record[5] not in TARGET_DISPOSITIONS or
+                        record[9:] != ['NONE', 'NONE', 'false', 'NONE', 'NONE', 'NONE']):
+                    fail('combined correction requires an active formalization target')
+            if correction[6:8] != old[5:7] or correction[8:10] != claim[5:7]:
+                fail('combined correction classification does not match claim transition')
+        elif old[11] != 'false' or old[5] == 'out_of_scope':
             fail('content amendment requires an active formalization target')
+        allowed = (5, 6, 7, 8) if combined else (7, 8)
         if any(left != right for index, (left, right) in enumerate(zip(old, claim))
-               if index not in (7, 8)) or len(old) != len(claim):
-            fail('content amendment changed frozen claim identity or metadata')
+               if index not in allowed) or len(old) != len(claim):
+            fail(('combined correction' if combined else 'content amendment') +
+                 ' changed frozen claim identity or metadata')
+        if combined:
+            old_source = keyed(base, 'sources.tsv').get(event[2])
+            source = keyed(current, 'sources.tsv').get(event[2])
+            if (source is None or old_source != source or not valid_oid(source[14]) or
+                    not valid_oid(source[15]) or len(source[14]) != len(source[15])):
+                fail('combined correction source record changed or is not frozen')
+            if old_pages[old[3]][9] != page_oid or pages[claim[3]][9] != page_oid:
+                fail('content amendment page source mismatch')
+            if old_pages[old[3]] != pages[claim[3]]:
+                fail('combined correction page record changed')
         if not claim[7].strip() or re.fullmatch(r'\s*(?:True|False)\.?\s*', claim[7]):
             fail('contentless content amendment surrogate')
         if old[7] == claim[7]:
@@ -280,6 +318,10 @@ def validate_transition(base, current, event_id):
         if (len(old_reviews) != 1 or len(new_reviews) != 1 or
                 old_reviews[0][:2] != new_reviews[0][:2] or new_reviews[0][2] != event[4]):
             fail('content amendment lacks its refreshed vocabulary review')
+        if combined:
+            invariant = keyed(current, 'source-invariants.tsv').get(event[2])
+            if invariant is None or invariant[7] != event[4]:
+                fail('combined correction lacks its event invariant review')
 
 
 def main():

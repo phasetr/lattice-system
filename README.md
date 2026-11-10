@@ -101,6 +101,12 @@ the position-1 claim's correction owns the item, while every member retains
 its own same-event creation review and unique item relation. Split-created
 items retain single-correction ownership, and historical metadata stays frozen.
 This capability does not add a production claim or certify another source unit.
+The permanent protocol also supports a reviewed `amend_and_reclassify` action
+that changes both content and the classification pair while preserving the same
+claim identity. It retains the content, provenance, pre-R4 and vocabulary gates,
+with exact historical ledger bytes and order preserved. This capability adds no
+production event or source data; a later source correction requires separate
+design, review and acceptance.
 CI selects this exceptional transition only while the event is new and its
 recorded base equals the actual merge base. Later pull requests automatically
 use the ordinary immutable base-diff path.
