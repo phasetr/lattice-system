@@ -973,6 +973,22 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 
 - `CL-TASAKI2020-0453` — assertion / unnumbered_obligation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
+<a id="IT-TASAKI2020-3041"></a>
+
+## Unlabeled item IT-TASAKI2020-3041
+
+- Item ID: `IT-TASAKI2020-3041`
+- Source: `TASAKI2020`
+- Page ID: `PG-TASAKI2020-0095`
+- Kind: `unlabeled`
+- Source label: `NONE`
+- Title: `NONE`
+- Locator: PDF p. 95; print p. 82; §4.1.2; paragraph following equation (4.1.29); full-integral finiteness sentence
+
+### Atomic claims
+
+- `CL-TASAKI2020-3453` — assertion / unnumbered_obligation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+
 <a id="IT-TASAKI2020-0462"></a>
 
 ## Unlabeled item IT-TASAKI2020-0462
@@ -988,6 +1004,22 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 ### Atomic claims
 
 - `CL-TASAKI2020-0454` — assertion / unnumbered_obligation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+
+<a id="IT-TASAKI2020-3042"></a>
+
+## Unlabeled item IT-TASAKI2020-3042
+
+- Item ID: `IT-TASAKI2020-3042`
+- Source: `TASAKI2020`
+- Page ID: `PG-TASAKI2020-0095`
+- Kind: `unlabeled`
+- Source label: `NONE`
+- Title: `NONE`
+- Locator: PDF p. 95; print p. 82; §4.1.2; paragraph following equation (4.1.29); reported numerical bound-positivity sentence
+
+### Atomic claims
+
+- `CL-TASAKI2020-3454` — assertion / unnumbered_obligation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
 <a id="IT-TASAKI2020-0463"></a>
 
@@ -1036,6 +1068,22 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 ### Atomic claims
 
 - `CL-TASAKI2020-0457` — assertion / equation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+
+<a id="IT-TASAKI2020-3043"></a>
+
+## Footnote 7
+
+- Item ID: `IT-TASAKI2020-3043`
+- Source: `TASAKI2020`
+- Page ID: `PG-TASAKI2020-0095`
+- Kind: `footnote`
+- Source label: `Footnote 7`
+- Title: `NONE`
+- Locator: PDF p. 95; print p. 82; §4.1.2; Footnote 7
+
+### Atomic claims
+
+- `CL-TASAKI2020-3455` — assertion / unnumbered_obligation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
 <a id="IT-TASAKI2020-0466"></a>
 
