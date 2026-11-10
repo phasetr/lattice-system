@@ -1037,6 +1037,23 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 
 - `CL-TASAKI2020-0455` — notation / notation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
+<a id="IT-TASAKI2020-3044"></a>
+
+## Unlabeled item IT-TASAKI2020-3044
+
+- Item ID: `IT-TASAKI2020-3044`
+- Source: `TASAKI2020`
+- Page ID: `PG-TASAKI2020-0095`
+- Kind: `unlabeled`
+- Source label: `NONE`
+- Title: `NONE`
+- Locator: PDF p. 95; print p. 82; §4.1.2; preliminary-estimate paragraph immediately before equation (4.1.30)
+
+### Atomic claims
+
+- `CL-TASAKI2020-3456` — assertion / unnumbered_obligation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-3457` — assertion / unnumbered_obligation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+
 <a id="IT-TASAKI2020-0464"></a>
 
 ## equation (4.1.30)
@@ -1099,7 +1116,7 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 
 ### Atomic claims
 
-- `CL-TASAKI2020-0458` — assertion / equation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-0458` — definition / equation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
 <a id="IT-TASAKI2020-0467"></a>
 
@@ -1148,6 +1165,23 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 ### Atomic claims
 
 - `CL-TASAKI2020-0461` — assertion / equation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+
+<a id="IT-TASAKI2020-3045"></a>
+
+## Unlabeled item IT-TASAKI2020-3045
+
+- Item ID: `IT-TASAKI2020-3045`
+- Source: `TASAKI2020`
+- Page ID: `PG-TASAKI2020-0096`
+- Kind: `unlabeled`
+- Source label: `NONE`
+- Title: `NONE`
+- Locator: PDF p. 96; print p. 83; §4.1.2; local double-commutator paragraph immediately before equation (4.1.35)
+
+### Atomic claims
+
+- `CL-TASAKI2020-3458` — assertion / unnumbered_obligation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-3459` — assertion / unnumbered_obligation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
 <a id="IT-TASAKI2020-0470"></a>
 
