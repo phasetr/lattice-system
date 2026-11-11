@@ -8,7 +8,7 @@
 - Public reference: [https://doi.org/10.1007/978-3-030-41265-4](https://doi.org/10.1007/978-3-030-41265-4)
 - Registry lifecycle: `frozen`
 - Formalization lifecycle: `vocabulary_reviewed`
-- Reviewed source items: 3060
+- Reviewed source items: 3062
 
 Private source paths and object identifiers are intentionally omitted.
 
@@ -18,7 +18,7 @@ Private source paths and object identifiers are intentionally omitted.
 - [Chapter 01](../groups/tasaki-2020/chapter-01.md) — 26 items
 - [Chapter 02](../groups/tasaki-2020/chapter-02.md) — 240 items
 - [Chapter 03](../groups/tasaki-2020/chapter-03.md) — 112 items
-- [Chapter 04](../groups/tasaki-2020/chapter-04.md) — 415 items
+- [Chapter 04](../groups/tasaki-2020/chapter-04.md) — 417 items
 - [Chapter 05](../groups/tasaki-2020/chapter-05.md) — 81 items
 - [Chapter 06](../groups/tasaki-2020/chapter-06.md) — 97 items
 - [Chapter 07](../groups/tasaki-2020/chapter-07.md) — 239 items

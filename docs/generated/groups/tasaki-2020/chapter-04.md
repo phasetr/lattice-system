@@ -2682,7 +2682,9 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 
 ### Atomic claims
 
-- `CL-TASAKI2020-0543` — assertion / unnumbered_obligation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-0543` — assertion / unnumbered_obligation; lifecycle `superseded`; successor `CL-TASAKI2020-3488`; Vocabulary `not_reviewed`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-3488` — assertion / unnumbered_obligation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-3489` — assertion / unnumbered_obligation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
 <a id="IT-TASAKI2020-0548"></a>
 
@@ -2700,6 +2702,23 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 
 - `CL-TASAKI2020-0544` — assertion / equation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
+<a id="IT-TASAKI2020-3061"></a>
+
+## Footnote 14
+
+- Item ID: `IT-TASAKI2020-3061`
+- Source: `TASAKI2020`
+- Page ID: `PG-TASAKI2020-0107`
+- Kind: `footnote`
+- Source label: `Footnote 14`
+- Title: `NONE`
+- Locator: PDF p. 107; print p. 94; §4.2; Footnote 14
+
+### Atomic claims
+
+- `CL-TASAKI2020-3490` — assertion / remark; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-3491` — assertion / remark; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+
 <a id="IT-TASAKI2020-0549"></a>
 
 ## equation (4.2.2)
@@ -2714,7 +2733,7 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 
 ### Atomic claims
 
-- `CL-TASAKI2020-0545` — assertion / equation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-0545` — definition / equation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
 <a id="IT-TASAKI2020-0550"></a>
 
@@ -2730,7 +2749,24 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 
 ### Atomic claims
 
-- `CL-TASAKI2020-0547` — assertion / equation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-0547` — definition / equation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+
+<a id="IT-TASAKI2020-3062"></a>
+
+## Unlabeled item IT-TASAKI2020-3062
+
+- Item ID: `IT-TASAKI2020-3062`
+- Source: `TASAKI2020`
+- Page ID: `PG-TASAKI2020-0107`
+- Kind: `unlabeled`
+- Source label: `NONE`
+- Title: `NONE`
+- Locator: PDF p. 107; print p. 94; §4.2.1; sector and orthogonality prose after (4.2.3)
+
+### Atomic claims
+
+- `CL-TASAKI2020-3492` — assertion / unnumbered_obligation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-3493` — assertion / unnumbered_obligation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
 <a id="IT-TASAKI2020-0551"></a>
 
