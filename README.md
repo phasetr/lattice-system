@@ -15,11 +15,11 @@ The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
 progress begins in `registry/`. Its global checker capability is `vocabulary`,
 while each source advances independently through `source-progress.tsv`;
 `TASAKI2020` is `vocabulary_reviewed`. Its corrected corpus ledger contains all
-534 physical PDF pages, 3,194 active atomic claims, 3,183 formalization
+534 physical PDF pages, 3,195 active atomic claims, 3,183 formalization
 targets, 1,401 unique equation-label/page pairs, and 63 pages with no claim.
 Eight superseded records preserve the provenance of compound or duplicate
-claims, while eleven active records are explicitly classified `out_of_scope`. The only
-production Lean tree is limited to the registered vocabulary modules and their
+claims, while twelve active records are explicitly classified `out_of_scope`.
+The only production Lean tree is limited to the registered vocabulary modules and their
 root. Checker cases are generated only under isolated system temporary roots;
 the repository contains no tracked fixture tree.
 
@@ -84,15 +84,25 @@ review and correction; the four additions share two genuine prose items. The uni
 includes the complete explanation after equation (4.1.36) and ends before the
 inverse-moment task paragraph and its attached footnote. It does not certify the
 full derivation, later bounds, external references, or R4 readiness.
-The sixth ledger, `claim-content-amendments.tsv`, records thirteen reviewed pre-R4
-amendments, including actual old and new content hashes,
-frozen source-page hashes, and event ownership. The reviewed units cover the
+An inverse-moment completion event records sixteen statement-readiness outcomes:
+eleven identity-preserving content repairs, including one combined classification
+and content repair, one classification-only correction, one exclusion of a
+derivation pointer, one omitted zero-deformation operator identity in a new
+unlabeled source item, and two unchanged records. The unit begins with the
+inverse-moment task paragraph after the complete explanation following (4.1.36),
+includes footnotes 9 and 10, and ends with the complete sentence deriving the
+desired bound after (4.1.46). The following reflection section and (4.1.47) onward remain
+outside this unit. It does not certify proofs, external references, the full
+source corpus, or R4 readiness.
+The sixth ledger, `claim-content-amendments.tsv`, records twenty-four reviewed
+pre-R4 amendments, including actual old and new content hashes, frozen
+source-page hashes, and event ownership. The reviewed units cover the
 complex spectral estimate, opening model setup, symmetry/order-operator unit,
 Theorem 4.1 core, ferrimagnetic statement/model block, the separately bounded
 ferrimagnetic proof-context unit, infrared-bound model/Fourier setup, the
-infrared-bound statement/application unit, and the bounded infrared-bound
-preliminary-derivation unit; they do not certify proofs, other source units,
-or the complete source corpus. The broader
+infrared-bound statement/application unit, the bounded infrared-bound
+preliminary-derivation unit, and the bounded inverse-moment completion unit;
+they do not certify proofs, other source units, or the complete source corpus. The broader
 rendered-source re-audit and further corrections remain incomplete. The same
 permanent protocol supports independently reviewed additions with fresh IDs,
 frozen page provenance, and explicit item and vocabulary ownership.
@@ -104,9 +114,9 @@ This capability does not add a production claim or certify another source unit.
 The permanent protocol also supports a reviewed `amend_and_reclassify` action
 that changes both content and the classification pair while preserving the same
 claim identity. It retains the content, provenance, pre-R4 and vocabulary gates,
-with exact historical ledger bytes and order preserved. This capability adds no
-production event or source data; a later source correction requires separate
-design, review and acceptance.
+with exact historical ledger bytes and order preserved. Capability infrastructure
+and source corrections remain separate changes. Every source correction requires
+its own design, review and acceptance.
 CI selects this exceptional transition only while the event is new and its
 recorded base equals the actual merge base. Later pull requests automatically
 use the ordinary immutable base-diff path.

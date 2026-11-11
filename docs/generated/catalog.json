@@ -518,6 +518,7 @@
         "IT-TASAKI2020-0474",
         "IT-TASAKI2020-0475",
         "IT-TASAKI2020-0476",
+        "IT-TASAKI2020-3046",
         "IT-TASAKI2020-0477",
         "IT-TASAKI2020-0478",
         "IT-TASAKI2020-0479",
@@ -18699,7 +18700,7 @@
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-0469",
-          "disposition": "assertion",
+          "disposition": "definition",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -18729,8 +18730,8 @@
         {
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
-          "claim_id": "CL-TASAKI2020-0470",
-          "disposition": "domain",
+          "claim_id": "CL-TASAKI2020-3460",
+          "disposition": "assertion",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -18738,7 +18739,38 @@
           "required_vocabulary": [],
           "statement_declaration": "NONE",
           "statement_module": "NONE",
-          "subkind": "domain",
+          "subkind": "unnumbered_obligation",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
+        }
+      ],
+      "item_id": "IT-TASAKI2020-3046",
+      "item_kind": "unlabeled",
+      "locator": "PDF p. 97; print p. 84; §4.1.2; paragraph 4; zero-deformation operator identity immediately after (4.1.37)",
+      "order_key": "000097.0001.0001",
+      "page_id": "PG-TASAKI2020-0097",
+      "public_group": "Chapter 04",
+      "public_slug": "chapter-04",
+      "source_id": "TASAKI2020",
+      "source_label": "NONE",
+      "title": "NONE"
+    },
+    {
+      "claims": [
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-0470",
+          "disposition": "notation",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "notation",
           "successor_claim": "NONE",
           "vocabulary_basis": "mathlib_only",
           "vocabulary_status": "vocabulary_ready"
@@ -18885,7 +18917,7 @@
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-0475",
-          "disposition": "notation",
+          "disposition": "out_of_scope",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -18895,8 +18927,8 @@
           "statement_module": "NONE",
           "subkind": "notation",
           "successor_claim": "NONE",
-          "vocabulary_basis": "mathlib_only",
-          "vocabulary_status": "vocabulary_ready"
+          "vocabulary_basis": "not_reviewed",
+          "vocabulary_status": "not_reviewed"
         }
       ],
       "item_id": "IT-TASAKI2020-0482",
@@ -100270,12 +100302,12 @@
     "vocabulary_status": "vocabulary_ready requires both a review row and a vocabulary-reviewed-or-later source lifecycle; review_staged is not ready"
   },
   "summary": {
-    "active_claims": 3194,
+    "active_claims": 3195,
     "claim_vocabulary_links": 4,
     "formalization_target_claims": 3183,
     "mathlib_only_claims": 3181,
     "project_vocabulary_claims": 2,
-    "source_items": 3045,
+    "source_items": 3046,
     "tombstoned_claims": 8,
     "vocabulary_declarations": 2
   },
