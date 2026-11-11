@@ -15,15 +15,15 @@ The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
 progress begins in `registry/`. Its global checker capability is `vocabulary`,
 while each source advances independently through `source-progress.tsv`;
 `TASAKI2020` is `vocabulary_reviewed`. Its corrected corpus ledger contains all
-534 physical PDF pages, 3,219 active atomic claims, 3,204 formalization
+534 physical PDF pages, 3,224 active atomic claims, 3,209 formalization
 targets, 1,401 unique equation-label/page pairs, and 63 pages with no claim.
-Eleven superseded records preserve the provenance of compound or duplicate
+Twelve superseded records preserve the provenance of compound or duplicate
 claims, while fifteen active records are explicitly classified `out_of_scope`.
 The only production Lean tree is limited to the registered vocabulary modules and their
 root. Checker cases are generated only under isolated system temporary roots;
 the repository contains no tracked fixture tree.
 
-The vocabulary reviews classify all 3,204 formalization targets: 3,202 are
+The vocabulary reviews classify all 3,209 formalization targets: 3,207 are
 `mathlib_only`, while claims `CL-TASAKI2020-2487` and
 `CL-TASAKI2020-2488` require project vocabulary. The registered vocabulary is
 exactly `partialTraceRight` and `partialTraceLeft`, with four claim-to-vocabulary
@@ -120,7 +120,21 @@ after (4.1.60), preserving its identity and stable metadata. Footnote 13 remains
 background with external conditions unresolved. This event does not certify
 the printed proof, unresolved source conventions, external references, other
 source units, or R4 readiness.
-The sixth ledger, `claim-content-amendments.tsv`, records seventy reviewed
+A tower-introduction and setup subset records eight correction-owning
+statement-readiness reviews and nine active mathematical outcomes: one
+split into separate long-range-order and absence-of-symmetry-breaking recalls,
+one identity-preserving variance repair, two combined definition and content
+repairs, and four omitted assertions. The additions comprise separate
+vector-independence and local-energy outcomes in one genuine named footnote,
+plus sector placement and pairwise orthogonality in their shared prose unit.
+The accepted statements and source context are preserved without importing
+the later tower-energy theorem. Its existing theorem and energy-display
+records remain unchanged pending resolution of their source-domain questions;
+the modal physical-state discussion remains covered without an active claim.
+This subset does not complete the broader source investigation, certify
+printed proofs, or establish R4 readiness.
+
+The sixth ledger, `claim-content-amendments.tsv`, records seventy-three reviewed
 pre-R4 amendments, including actual old and new content hashes, frozen
 source-page hashes, and event ownership. The reviewed units cover the
 complex spectral estimate, opening model setup, symmetry/order-operator unit,
@@ -129,7 +143,8 @@ ferrimagnetic proof-context unit, infrared-bound model/Fourier setup, the
 infrared-bound statement/application unit, the bounded infrared-bound
 preliminary-derivation unit, the bounded inverse-moment completion unit,
 the bounded reflection-to-uniform-field unit, and the bounded reflection-bound
-proof-source unit with its separately reviewed adjacent Note;
+proof-source unit with its separately reviewed adjacent Note, and the bounded
+tower-introduction and setup subset;
 they do not certify proofs, other source units, or the complete source corpus. The broader
 rendered-source re-audit and further corrections remain incomplete. The same
 permanent protocol supports independently reviewed additions with fresh IDs,

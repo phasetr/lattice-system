@@ -5,11 +5,11 @@ source-item and claim metadata. It does not reproduce source claim text or
 publish private source paths and object identifiers.
 
 - Current phase: `vocabulary`
-- Active atomic claims: 3219
-- Formalization targets: 3204
-- Superseded claim records: 11
-- Reviewed source items: 3060
-- Mathlib-only claims: 3202
+- Active atomic claims: 3224
+- Formalization targets: 3209
+- Superseded claim records: 12
+- Reviewed source items: 3062
+- Mathlib-only claims: 3207
 - Project-vocabulary claims: 2
 
 See the [generated catalog](generated/index.md). Status values are deliberately
