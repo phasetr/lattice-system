@@ -15,15 +15,15 @@ The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
 progress begins in `registry/`. Its global checker capability is `vocabulary`,
 while each source advances independently through `source-progress.tsv`;
 `TASAKI2020` is `vocabulary_reviewed`. Its corrected corpus ledger contains all
-534 physical PDF pages, 3,205 active atomic claims, 3,190 formalization
+534 physical PDF pages, 3,219 active atomic claims, 3,204 formalization
 targets, 1,401 unique equation-label/page pairs, and 63 pages with no claim.
-Eight superseded records preserve the provenance of compound or duplicate
+Eleven superseded records preserve the provenance of compound or duplicate
 claims, while fifteen active records are explicitly classified `out_of_scope`.
 The only production Lean tree is limited to the registered vocabulary modules and their
 root. Checker cases are generated only under isolated system temporary roots;
 the repository contains no tracked fixture tree.
 
-The vocabulary reviews classify all 3,190 formalization targets: 3,188 are
+The vocabulary reviews classify all 3,204 formalization targets: 3,202 are
 `mathlib_only`, while claims `CL-TASAKI2020-2487` and
 `CL-TASAKI2020-2488` require project vocabulary. The registered vocabulary is
 exactly `partialTraceRight` and `partialTraceLeft`, with four claim-to-vocabulary
@@ -105,15 +105,31 @@ from the reflection-to-uniform-field heading through the complete conclusion
 after (4.1.61), including Lemma 4.5 and its printed proof context, and ends
 before the following reflection-bound proof. It does not certify the printed
 proofs, unresolved source conventions, other source units, or R4 readiness.
-The sixth ledger, `claim-content-amendments.tsv`, records forty-four reviewed
+A reflection-bound proof-source event records thirty-eight statement-readiness
+outcomes: twenty-six identity-preserving content repairs, including eleven
+combined classification repairs, three compound-claim splits with eight new
+atomic successors and one unchanged canonical duplicate link, and nine
+previously omitted atomic claims. Eight genuine new source items preserve the
+additions' provenance; the scalar inequality joins its existing whole-Note item,
+and all split successors remain in their predecessor items. The unit begins at
+the reflection-bound proof heading after the complete conclusion following
+(4.1.61), includes (4.1.62)–(4.1.82), footnotes 12 and 13, and the full closing
+paragraph before section 4.2. A separately reviewed adjacent-Note addendum
+repairs the existing record for the repeated-layer configuration's x1 uniformity
+after (4.1.60), preserving its identity and stable metadata. Footnote 13 remains
+background with external conditions unresolved. This event does not certify
+the printed proof, unresolved source conventions, external references, other
+source units, or R4 readiness.
+The sixth ledger, `claim-content-amendments.tsv`, records seventy reviewed
 pre-R4 amendments, including actual old and new content hashes, frozen
 source-page hashes, and event ownership. The reviewed units cover the
 complex spectral estimate, opening model setup, symmetry/order-operator unit,
 Theorem 4.1 core, ferrimagnetic statement/model block, the separately bounded
 ferrimagnetic proof-context unit, infrared-bound model/Fourier setup, the
 infrared-bound statement/application unit, the bounded infrared-bound
-preliminary-derivation unit, the bounded inverse-moment completion unit, and
-the bounded reflection-to-uniform-field unit;
+preliminary-derivation unit, the bounded inverse-moment completion unit,
+the bounded reflection-to-uniform-field unit, and the bounded reflection-bound
+proof-source unit with its separately reviewed adjacent Note;
 they do not certify proofs, other source units, or the complete source corpus. The broader
 rendered-source re-audit and further corrections remain incomplete. The same
 permanent protocol supports independently reviewed additions with fresh IDs,

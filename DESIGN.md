@@ -9,9 +9,9 @@ currently enabled production contract, independently of checker infrastructure
 available for later stages and of each source's frontier. Each source advances
 independently through `registry/source-progress.tsv`.
 `TASAKI2020` is currently `vocabulary_reviewed`; its corrected, reconciled, and
-frozen census contains 534 physical PDF pages, 3,205 active atomic claims,
-3,190 formalization targets, 1,401 unique equation-label/page pairs, and 63
-pages with no claim. Eight additional rows are reviewed tombstones.
+frozen census contains 534 physical PDF pages, 3,219 active atomic claims,
+3,204 formalization targets, 1,401 unique equation-label/page pairs, and 63
+pages with no claim. Eleven additional rows are reviewed tombstones.
 The current tree has the two R3 vocabulary definitions required by that source.
 There are no source-claim theorem statements, proofs, or intended axioms yet.
 Their type and declaration OIDs, direct imports, and elaborated environment
@@ -20,6 +20,21 @@ an earlier lifecycle while the global checker capability stays `vocabulary`.
 The recorded census, lifecycle, and vocabulary review do not certify printed-source
 statement fidelity. The full rendered-source re-audit and reviewed content
 corrections remain incomplete.
+A reflection-bound proof-source event records thirty-eight statement-readiness
+outcomes: twenty-six identity-preserving content repairs, including eleven
+combined classification repairs, three compound-claim splits with eight new
+atomic successors and one unchanged canonical duplicate link, and nine
+previously omitted atomic claims. Eight genuine new source items preserve the
+additions' provenance; the scalar inequality joins its existing whole-Note item,
+and all split successors remain in their predecessor items. The unit begins at
+the reflection-bound proof heading after the complete conclusion following
+(4.1.61), includes (4.1.62)–(4.1.82), footnotes 12 and 13, and the full closing
+paragraph before section 4.2. A separately reviewed adjacent-Note addendum
+repairs the existing record for the repeated-layer configuration's x1 uniformity
+after (4.1.60), preserving its identity and stable metadata. Footnote 13 remains
+background with external conditions unresolved. This event does not certify
+the printed proof, unresolved source conventions, external references, other
+source units, or R4 readiness.
 No claim is represented merely because its source PDF exists locally.
 The registries are authoritative only for facts they explicitly record.
 An empty claims registry means that the census has not begun.
@@ -718,8 +733,8 @@ they remain subject to the semantic vocabulary gate and contain no source-claim
 theorem, `sorry`, `admit`, `native_decide`, or axiom.
 A later lifecycle never disables that source's frozen identity, counts,
 census OID, active-state, source-order, page-coupling, or two-pass census
-invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,205 active
-claims, 3,190 formalization targets, and 1,401 equation pairs. The census-capability requirement that slices, source-claim dependencies,
+invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,219 active
+claims, 3,204 formalization targets, and 1,401 equation pairs. The census-capability requirement that slices, source-claim dependencies,
 bindings, contexts, axioms, claim-to-axiom relations, statement modules, and
 statement imports are header-only is phase-local;
 it is not part of the later frozen-census invariant check.
