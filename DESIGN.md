@@ -156,8 +156,9 @@ Each claim records a precise locator and normalized source content.
 The normalized source content and its OID are recorded independently of Lean.
 Claim `content_oid` may remain `PENDING` and may transition once to a valid Git
 OID. Ordinary changes freeze the normalized content and every fixed OID.
-The reviewed `amend_content` transition below is the only exception for
-correcting the content of the same source-atomic claim before R4.
+The reviewed `amend_content` and `amend_and_reclassify` transitions below
+are the only exceptions for correcting the content of the same source-atomic
+claim before R4.
 Disposition classifies assertions, definitions, notation, hypotheses, domains,
 conjectures, and material explicitly placed out of scope.
 Only `out_of_scope` claims carry an exclusion rationale and review reference;
@@ -181,9 +182,9 @@ binds a position, event, and independent review token to one source and exact
 base commit. `claim-normalization-reviews.tsv` records every reviewed claim,
 including unchanged outcomes. `claim-corrections.tsv` is owned through the
 review row and records one of `reclassify`, `exclude_nonclaim`, `split`,
-`amend_content`, or `add_omitted_claim`, including its old and new classification.
-The first four actions target a frozen claim. `add_omitted_claim` introduces a
-previously unrecorded source-atomic claim without pretending to split an
+`amend_content`, `amend_and_reclassify`, or `add_omitted_claim`, including its
+old and new classification. The first five actions target a frozen claim.
+`add_omitted_claim` introduces a previously unrecorded source-atomic claim without pretending to split an
 existing assertion. Only this action uses `NONE` for both old classification
 fields: the claim did not exist in the event base. `NONE` never stands for an
 unknown classification of an existing claim.
@@ -198,14 +199,15 @@ transition with exactly these columns: `amendment_id`, `event_id`,
 `page_source_oid`, and `review_ref`. It is header-only until an actual reviewed
 content event is introduced. Amendment IDs have the form
 `CA-<machine-token>-<at-least-four-digits>` and are unique. Every
-`amend_content` correction owns exactly one amendment row, with the same
-event and claim; no other correction action may own one. The event's closed
-exact-statement-readiness review owns the correction, and all three review
+`amend_content` or `amend_and_reclassify` correction owns exactly one amendment
+row, with the same event and claim; no other correction action may own one.
+The event's closed exact-statement-readiness review owns the correction, and all three review
 references agree. The source-atomic claim ID is retained because this action
 repairs its transcription, rather than splitting or replacing the assertion.
 
-An amendment changes only `claims.tsv` columns 8 and 9: `normalized_content`
-and `content_oid`. The claim must remain an active formalization target.
+An `amend_content` correction changes only `claims.tsv` columns 8 and 9:
+`normalized_content` and `content_oid`. Its old and new classification pairs
+remain equal. The claim must remain an active formalization target.
 Its source, order, page, locator, classification, exclusion and tombstone
 metadata remain fixed. The new content is nonempty, changed, and not a
 literal `True` or `False` surrogate. Both provenance content OIDs are real Git
@@ -217,8 +219,37 @@ recorded `content_oid`. `page_source_oid` must match the unchanged frozen
 page fingerprint. The fingerprints establish which recorded bytes were
 reviewed; they do not establish agreement with the printed source.
 
-Both the base and current source lifecycle must precede `skeleton_frozen`,
-and the source must have no bindings in either tree. The target has no slice,
+An `amend_and_reclassify` correction changes both the classification pair
+(columns 6 and 7) and the content (columns 8 and 9) of the same claim. The old
+and new pairs must differ, although either individual component may stay fixed.
+Both pairs use the existing formalization-target disposition and subkind
+enumerations: neither `NONE` nor `out_of_scope` is allowed. The correction's
+recorded pairs must match the exact event base and current claim rows. The
+content bytes and recomputed old and new OIDs must also differ; a class-only
+or content-only change cannot use this action. Exactly one closed owning
+review, one correction and one amendment manifest the combined change.
+
+The permitted claim-column changes are:
+
+| Action | Mutable columns (1-based) | Required scope |
+| --- | --- | --- |
+| Ordinary | 9 (`PENDING` to fixed only) | Content and classification fixed |
+| `reclassify` | 6, 7 | Existing classification-only contract |
+| `amend_content` | 8, 9 | Changed content; classification fixed |
+| `amend_and_reclassify` | 6, 7, 8, 9 | Changed classification pair and changed content |
+| `exclude_nonclaim` | 6, 10, 11 | Existing reviewed exclusion contract |
+| `split` | 12, 13, 14, 15 | Existing reviewed tombstone and successor contract |
+| `add_omitted_claim` | Fresh row | Existing independent creation contract |
+
+Every unlisted column remains fixed. Both rows of a combined correction are
+active formalization targets with `NONE` exclusion and supersession metadata.
+The entire source and page records remain unchanged, with frozen source and
+page fingerprints. The source invariant review token matches the event review;
+counts and census OID are derived by the dedicated checker. These are capability
+rules; this foundation introduces no source correction event or registry row.
+
+For both content actions, the base and current source lifecycle must precede
+`skeleton_frozen`, and the source must have no bindings in either tree. The target has no slice,
 dependency in either direction, or claim-to-axiom relation in either tree.
 Its vocabulary-use rows and review basis remain unchanged; its vocabulary
 review reference is refreshed to the owning event review. An amendment
@@ -226,10 +257,15 @@ owns no successor or source-item-addition rows. Existing correction rules still
 reject other unmanifested claim changes, vocabulary drift, unrelated source
 changes, stale derived census counts, and R4 or axiom artifacts.
 
-Every historical amendment row is immutable. A later event may amend the same
+Every historical amendment row is immutable. Both content actions participate
+in one per-claim OID history. A later event may amend the same
 claim again, deriving its old content OID from that later event's exact base;
 the per-claim event history must chain old and new OIDs. Historical new OIDs
-are not compared indiscriminately with the latest content. A historical base
+and historical classification pairs are not compared indiscriminately with the
+latest claim. A pure reclassification between content events leaves the OID
+chain intact. Later split, exclusion or lifecycle advancement does not
+retroactively invalidate a content event: active-target and pre-R4 eligibility
+are checked against that event's base and current trees. A historical base
 without this ledger is treated as an empty header; the current tree always
 requires it. An ordinary change may introduce only that missing empty header,
 and cannot add an amendment row or reopen a past event's exception.
@@ -286,7 +322,11 @@ classification and scope are validated only against the creating event's
 exact base. An event may independently own an addition and an amendment;
 neither action inherits the other's exception. Ordinary changes cannot create
 an unmanifested claim or reopen a historical event.
-All rows owned by an event already present in the base are byte-for-byte frozen.
+All six correction ledgers, including their headers, retain the exact base
+bytes as a prefix in the same physical order. The content helper independently
+enforces this for the amendment ledger. This append restriction applies only
+to these six historical ledgers; claims, source items and vocabulary relations
+retain their existing canonical-order and set-comparison contracts.
 A future event may append its own contiguously positioned review, correction,
 successor, item-addition, and content-amendment rows without changing historical ownership.
 
@@ -735,7 +775,8 @@ evidence.
 It checks the written merge gate and an unchecked `USER ONLY` box.
 It exercises generated positive and negative runtime cases without committed
 fixture data.
-The correction suites cover the four permitted positive transition shapes and
+The correction suites cover classification-only, content-only, combined
+content/classification, exclusion, split and omitted-claim transition families and
 negative cases for review, event-source ownership, manifest completeness,
 successor provenance and ID freshness, stable source-item additions, nested
 order keys, item and vocabulary propagation, immutable rows and OIDs, derived
@@ -745,6 +786,16 @@ Content-amendment cases additionally exercise pending and fixed old content,
 actual old/new hashes, page fingerprints, unchanged identities, pre-R4 scope,
 vocabulary review renewal, absent historical ledgers, repeated amendments,
 unrelated sources, and the return to ordinary immutable-history checks.
+Combined cases additionally exercise mandatory dual changes, each classification
+component alone, exact old/new classification facts, direct static ownership,
+mixed chronological content histories, later split and exclusion, six-ledger
+byte-prefix ordering, legal nested claim/item insertion and vocabulary row-set
+permutations. Three real temporary-Git selector compositions exercise first and
+second combined events and historical ordinary fallback through the actual
+base-diff and transition guards, without replacing the selector's checker.
+These are distinct from the seven existing real skeleton composition chains.
+Synthetic public generation checks the corrected public classification while
+keeping content, hashes and correction ownership private.
 Shared-item cases exercise independently created omissions within one named
 item, canonical first-relation ownership, per-member provenance and uniqueness,
 strict split ownership, unchanged public generation and privacy, frozen later

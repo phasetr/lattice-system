@@ -268,6 +268,7 @@ def expect(label, expected, command, diagnostic=''):
     rejected += not expected
     if label.startswith('adapter-old-populated-'):
         print(next(line for line in result.stdout.splitlines() if diagnostic in line))
+    return result.stdout
 
 with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as temporary:
     root = Path(temporary)
@@ -966,6 +967,799 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
         mutate(target, 'source-invariants.tsv', 'TASAKI2020', column, value)
         transition('addition-stale-invariant-' + str(column), base, target, False, diagnostic)
     print('test-content-amendments-runtime: omitted-claim cases ' + str(count - omission_start))
+    # Combined corrections use the real static, transition, ordinary and CI
+    # entrypoints. Every named case below has one independently checked oracle.
+    combined_start = (count, accepted, rejected)
+    assert combined_start == (181, 49, 132)
+    content_actions = {'amend_content', 'amend_and_reclassify'}
+    history_tables = ('correction-events.tsv', 'claim-normalization-reviews.tsv',
+                      'claim-corrections.tsv', 'claim-successors.tsv',
+                      'source-item-additions.tsv', 'claim-content-amendments.tsv')
+    fixture_cache = {}
+
+    def record(target, name, identifier):
+        return next(r for r in table(target, name)[1:] if r[0] == identifier)
+
+    def append(target, name, row):
+        write(target, name, table(target, name) + [row])
+
+    def remove(target, name, identifier, column=0):
+        write(target, name, [r for i, r in enumerate(table(target, name))
+                             if i == 0 or r[column] != identifier])
+
+    def content_event(before, after, target, pair=None, content=None):
+        global claim
+        saved = claim
+        claim = target
+        try:
+            result = prepare_amendment(before, after, content or
+                                       'PRIVATE-COMBINED: F("x") = G(x) + ε, stage ' + after.name)
+        finally:
+            claim = saved
+        event_id, ref, cc, ca, old_row, _ = result
+        if pair is not None:
+            nr = record(after, 'claim-corrections.tsv', cc)[3]
+            mutate(after, 'claim-normalization-reviews.tsv', nr, 5, 'amend_and_reclassify')
+            mutate(after, 'claim-corrections.tsv', cc, 5, 'amend_and_reclassify')
+            for index, value in enumerate(pair, 5):
+                mutate(after, 'claims.tsv', target, index, value)
+                mutate(after, 'claim-corrections.tsv', cc, index + 3, value)
+        mutate(after, 'source-invariants.tsv', old_row[1], 7, ref)
+        refresh(after)
+        return event_id
+
+    def reclassification(before, after, target, pair):
+        event_id = content_event(before, after, target, pair)
+        old_row = record(before, 'claims.tsv', target)
+        cc = next(r for r in table(after, 'claim-corrections.tsv')[1:] if r[1] == event_id)
+        mutate(after, 'claim-normalization-reviews.tsv', cc[3], 5, 'reclassify')
+        mutate(after, 'claim-corrections.tsv', cc[0], 5, 'reclassify')
+        remove(after, 'claim-content-amendments.tsv', cc[0], 2)
+        for index in (7, 8):
+            mutate(after, 'claims.tsv', target, index, old_row[index])
+        refresh(after)
+        return event_id
+
+    def synthetic_base(name, source=project):
+        target = root / ('combined-base-' + name)
+        shutil.copytree(source / 'registry', target / 'registry')
+        for index, value in [(5, 'assertion'), (6, 'equation')]:
+            mutate(target, 'claims.tsv', claim, index, value)
+        mutate(target, 'claims.tsv', claim, 8, blob(record(target, 'claims.tsv', claim)[7]))
+        refresh(target)
+        return target
+
+    def assert_content_step(before, after, event_id):
+        event_row = record(after, 'correction-events.tsv', event_id)
+        for name in history_tables:
+            path = before / 'registry' / name
+            if path.exists():
+                assert (after / 'registry' / name).read_bytes().startswith(path.read_bytes()), name
+        for cc in table(after, 'claim-corrections.tsv')[1:]:
+            if cc[1] != event_id or cc[5] not in content_actions:
+                continue
+            x = cc[4]
+            old_row, new_row = record(before, 'claims.tsv', x), record(after, 'claims.tsv', x)
+            assert cc[6:8] == old_row[5:7] and cc[8:10] == new_row[5:7]
+            assert old_row[7] != new_row[7] and blob(old_row[7]) != blob(new_row[7])
+            mutable = (5, 6, 7, 8) if cc[5] == 'amend_and_reclassify' else (7, 8)
+            assert all(a == b for i, (a, b) in enumerate(zip(old_row, new_row)) if i not in mutable)
+            if cc[5] == 'amend_and_reclassify':
+                assert old_row[5:7] != new_row[5:7]
+            nrs = [r for r in table(after, 'claim-normalization-reviews.tsv')[1:]
+                   if r[1] == event_id and r[3] == x]
+            ccs = [r for r in table(after, 'claim-corrections.tsv')[1:]
+                   if r[1] == event_id and r[4] == x]
+            cas = [r for r in table(after, 'claim-content-amendments.tsv')[1:] if r[2] == cc[0]]
+            assert len(nrs) == len(ccs) == len(cas) == 1
+            ca = cas[0]
+            assert ca[4:6] == [blob(old_row[7]), blob(new_row[7])]
+            assert new_row[8] == ca[5] and nrs[0][8] == ca[7] == event_row[4]
+            assert record(before, 'pages.tsv', old_row[3]) == record(after, 'pages.tsv', new_row[3])
+            assert [r for r in table(before, 'item-claims.tsv')[1:] if r[2] == x] == [
+                r for r in table(after, 'item-claims.tsv')[1:] if r[2] == x]
+            for relation in [r for r in table(before, 'item-claims.tsv')[1:] if r[2] == x]:
+                assert record(before, 'source-items.tsv', relation[0]) == record(after, 'source-items.tsv', relation[0])
+        pages, claims = table(after, 'pages.tsv')[1:], table(after, 'claims.tsv')[1:]
+        invariant = record(after, 'source-invariants.tsv', event_row[2])
+        active = [r for r in claims if r[1] == event_row[2] and r[11] == 'false']
+        source_pages = [p for p in pages if p[1] == event_row[2]]
+        assert invariant[1:6] == [str(len(source_pages)), str(len(active)),
+            str(sum(r[5] != 'out_of_scope' for r in active)),
+            str(sum(r[6] == 'equation' for r in active)),
+            str(sum(p[0] not in {r[3] for r in active} for p in source_pages))]
+        assert invariant[6] == blob(''.join('\t'.join(r) + '\n' for r in pages + claims if r[1] == event_row[2]))
+        assert invariant[7] == event_row[4]
+
+    def fixture(kind):
+        if kind in fixture_cache:
+            return fixture_cache[kind]
+        after = root / ('combined-fixture-' + kind)
+        x = claim
+        if kind in ('F', 'P', 'D', 'K', 'V', 'N', 'A'):
+            before = synthetic_base(kind, legacy_base if kind == 'N' else project)
+            if kind == 'P':
+                mutate(before, 'claims.tsv', x, 8, 'PENDING')
+                refresh(before)
+            if kind == 'V':
+                mutate(before, 'claim-vocabulary-review.tsv', x, 1, 'project_vocabulary')
+                for vo in table(project, 'vocabulary.tsv')[1:]:
+                    append(before, 'claim-vocabulary.tsv', [x, vo[0]])
+            pairs = {'D': ['definition', 'equation'], 'K': ['assertion', 'lemma']}
+            event_id = content_event(before, after, x, None if kind == 'A' else
+                                     pairs.get(kind, ['definition', 'definition']))
+        elif kind == 'Q':
+            before = fixture('F')[0]
+            event_id = reclassification(before, after, x, ['definition', 'definition'])
+        elif kind == 'W':
+            before, source, event_id, x = fixture('V')
+            shutil.copytree(source, after)
+            uses = table(after, 'claim-vocabulary.tsv')
+            indices = [i for i, r in enumerate(uses[1:], 1) if r[0] == x]
+            assert len(indices) == 2
+            uses[indices[0]], uses[indices[1]] = uses[indices[1]], uses[indices[0]]
+            write(after, 'claim-vocabulary.tsv', uses)
+            reviews = table(after, 'claim-vocabulary-review.tsv')
+            row = next(r for r in reviews[1:] if r[0] == x)
+            write(after, 'claim-vocabulary-review.tsv', [r for r in reviews if r != row] + [row])
+        elif kind == 'M':
+            before, first, event_id, x = fixture('F')
+            extra_event, _, nr, cc, y, _ = prepare_omission(first, after)
+            ref = record(after, 'correction-events.tsv', event_id)[4]
+            remove(after, 'correction-events.tsv', extra_event)
+            for name, identifier in [('claim-normalization-reviews.tsv', nr), ('claim-corrections.tsv', cc)]:
+                mutate(after, name, identifier, 1, event_id)
+                mutate(after, name, identifier, 2, '2')
+            mutate(after, 'claim-normalization-reviews.tsv', nr, 8, ref)
+            ia = next(r for r in table(after, 'source-item-additions.tsv')[1:] if r[1] == extra_event)
+            mutate(after, 'source-item-additions.tsv', ia[0], 1, event_id)
+            mutate(after, 'source-item-additions.tsv', ia[0], 5, ref)
+            mutate(after, 'claim-vocabulary-review.tsv', y, 2, ref)
+            mutate(after, 'source-invariants.tsv', 'TASAKI2020', 7, ref)
+            refresh(after)
+            rows = table(after, 'claims.tsv')[1:]
+            assert next(i for i, r in enumerate(rows) if r[0] == y) < len(rows) - 1
+            assert record(after, 'claims.tsv', y)[2].startswith(record(before, 'claims.tsv', x)[2] + '.')
+        elif kind in ('CC', 'CA', 'AC', 'CRAC', 'OC', 'CS', 'CX'):
+            if kind == 'OC':
+                seed = synthetic_base(kind)
+                before = root / 'combined-omission-first'
+                _, _, _, _, x, _ = prepare_omission(seed, before)
+                event_id = content_event(before, after, x, ['definition', 'definition'])
+            else:
+                _, before, _, x = fixture('A' if kind == 'AC' else 'F')
+                if kind == 'CRAC':
+                    middle = root / 'combined-middle-reclass'
+                    middle_event = reclassification(before, middle, x, ['domain', 'domain'])
+                    fixture_cache['CRAC-middle'] = (before, middle, middle_event, x)
+                    before = middle
+                if kind in ('CA', 'CRAC'):
+                    event_id = content_event(before, after, x)
+                elif kind in ('CC', 'AC'):
+                    pair = ['assertion', 'equation'] if kind == 'CC' else ['definition', 'definition']
+                    event_id = content_event(before, after, x, pair)
+                elif kind == 'CX':
+                    event_id = reclassification(before, after, x, ['definition', 'definition'])
+                    cc = next(r for r in table(after, 'claim-corrections.tsv')[1:] if r[1] == event_id)
+                    ref = record(after, 'correction-events.tsv', event_id)[4]
+                    nr = record(after, 'claim-normalization-reviews.tsv', cc[3])
+                    mutate(after, 'claim-normalization-reviews.tsv', nr[0], 5, 'exclude_nonclaim')
+                    mutate(after, 'claim-corrections.tsv', cc[0], 5, 'exclude_nonclaim')
+                    mutate(after, 'claim-corrections.tsv', cc[0], 8, 'out_of_scope')
+                    for col, value in [(5, 'out_of_scope'), (9, nr[7]), (10, ref)]:
+                        mutate(after, 'claims.tsv', x, col, value)
+                    remove(after, 'claim-vocabulary-review.tsv', x)
+                    remove(after, 'claim-vocabulary.tsv', x)
+                    refresh(after)
+                else:
+                    event_id, ref, nr, cc, z, _ = prepare_omission(before, after)
+                    old_row = record(before, 'claims.tsv', x)
+                    mutate(after, 'claim-normalization-reviews.tsv', nr, 3, x)
+                    mutate(after, 'claim-normalization-reviews.tsv', nr, 5, 'split')
+                    for col, val in [(4, x), (5, 'split'), (6, old_row[5]), (7, old_row[6]),
+                                     (8, old_row[5]), (9, old_row[6])]:
+                        mutate(after, 'claim-corrections.tsv', cc, col, val)
+                    nr_row = record(after, 'claim-normalization-reviews.tsv', nr)
+                    for col, val in [(11, 'true'), (12, z), (13, nr_row[7]), (14, ref)]:
+                        mutate(after, 'claims.tsv', x, col, val)
+                    append(after, 'claim-successors.tsv',
+                           [unused_id(after, 'claim-successors.tsv', 'SE-RUNTIME'), event_id, cc, x, '1', 'new_successor', z])
+                    remove(after, 'claim-vocabulary-review.tsv', x)
+                    remove(after, 'claim-vocabulary.tsv', x)
+                    refresh(after)
+            # Earlier content events are checked by their own creating snapshots.
+            if kind in ('CC', 'CA', 'AC', 'CRAC'):
+                historical = [r for r in table(after, 'claim-content-amendments.tsv')[1:] if r[3] == x]
+                assert len(historical) >= 2 and historical[-2][5] == historical[-1][4]
+                assert historical[-2][5] != record(after, 'claims.tsv', x)[8]
+                if kind in ('CC', 'CRAC'):
+                    old_cc = record(after, 'claim-corrections.tsv', historical[-2][2])
+                    assert old_cc[8:10] != record(after, 'claims.tsv', x)[5:7]
+        elif kind == 'HIST':
+            _, before, _, x = fixture('CC')
+            event_id = content_event(before, after, x, ['definition', 'definition'])
+        else:
+            raise AssertionError('unknown fixture ' + kind)
+        assert_content_step(before, after, event_id)
+        fixture_cache[kind] = (before, after, event_id, x)
+        return fixture_cache[kind]
+
+    def second_source(target):
+        sources = table(target, 'sources.tsv')
+        row = sources[1].copy()
+        row[0], row[2], row[4], row[12], row[13] = 'SRB', '2', 'SRB2026', 'source-b', 'runtime-source-b.pdf'
+        write(target, 'sources.tsv', sources + [row])
+        append(target, 'source-progress.tsv', ['SRB', 'registered', 'RUNTIME-SOURCE-B-REVIEW'])
+
+    def mutate_combined(label, before, after, event_id, x):
+        cc = next(r for r in table(after, 'claim-corrections.tsv')[1:] if r[1] == event_id and r[4] == x)
+        nr, ref = cc[3], record(after, 'correction-events.tsv', event_id)[4]
+        cas = [r for r in table(after, 'claim-content-amendments.tsv')[1:] if r[2] == cc[0]]
+        ca = cas[0] if cas else None
+        other = next(r[0] for r in table(before, 'claims.tsv')[1:] if r[1] == 'TASAKI2020' and r[0] != x)
+        def change(name, identifier, col, value):
+            mutate(after, name, identifier, col, value)
+        def ca_change(col, value):
+            change('claim-content-amendments.tsv', ca[0], col, value)
+        def new_content(value):
+            change('claims.tsv', x, 7, value)
+            change('claims.tsv', x, 8, blob(value))
+            ca_change(5, blob(value))
+        def duplicate_nr(action='amend_and_reclassify'):
+            row = record(after, 'claim-normalization-reviews.tsv', nr).copy()
+            row[0] = unused_id(after, 'claim-normalization-reviews.tsv', 'NR-DUPLICATE')
+            row[2], row[5] = '2', action
+            append(after, 'claim-normalization-reviews.tsv', row)
+            return row[0]
+        simple = {
+            'combined-unknown-outcome': ('claim-normalization-reviews.tsv', nr, 5, 'unknown_action'),
+            'combined-unknown-action': ('claim-corrections.tsv', cc[0], 5, 'unknown_action'),
+            'combined-open-review': ('claim-normalization-reviews.tsv', nr, 6, 'open'),
+            'combined-wrong-scope': ('claim-normalization-reviews.tsv', nr, 4, 'census'),
+            'combined-wrong-outcome': ('claim-normalization-reviews.tsv', nr, 5, 'amend_content'),
+            'combined-static-ca-wrong-event': ('claim-content-amendments.tsv', ca[0] if ca else '', 1, 'UNKNOWN-EVENT'),
+            'combined-static-ca-wrong-correction': ('claim-content-amendments.tsv', ca[0] if ca else '', 2, 'CC-UNKNOWN-0001'),
+            'combined-static-ca-wrong-claim': ('claim-content-amendments.tsv', ca[0] if ca else '', 3, other),
+            'combined-static-ca-wrong-review': ('claim-content-amendments.tsv', ca[0] if ca else '', 7, 'DIFFERENT-REVIEW'),
+            'combined-static-nr-wrong-outcome': ('claim-normalization-reviews.tsv', nr, 5, 'amend_content'),
+            'combined-static-nr-wrong-scope': ('claim-normalization-reviews.tsv', nr, 4, 'census'),
+            'combined-static-nr-open': ('claim-normalization-reviews.tsv', nr, 6, 'open'),
+            'combined-static-event-wrong-source': ('correction-events.tsv', event_id, 2, 'OTHER'),
+            'combined-frozen-order': ('claims.tsv', x, 2, '000001.0999'),
+            'combined-frozen-locator': ('claims.tsv', x, 4, 'synthetic-altered-locator'),
+            'combined-source-identity-drift': ('claims.tsv', x, 1, 'OTHER'),
+            'combined-source-pin-drift': ('sources.tsv', 'TASAKI2020', 14, 'a' * 40),
+            'combined-vocabulary-basis-drift': ('claim-vocabulary-review.tsv', x, 1, 'project_vocabulary'),
+            'combined-vocabulary-stale-ref': ('claim-vocabulary-review.tsv', x, 2, record(before, 'claim-vocabulary-review.tsv', x)[2]),
+            'combined-unrelated-vocabulary-review': ('claim-vocabulary-review.tsv', other, 2, 'CHANGED-REVIEW'),
+            'combined-invariant-review': ('source-invariants.tsv', 'TASAKI2020', 7, 'WRONG-REVIEW'),
+        }
+        if label in simple:
+            change(*simple[label]); return
+        if label in ('combined-static-missing-ca', 'combined-missing-ca-integration'):
+            remove(after, 'claim-content-amendments.tsv', ca[0])
+        elif label == 'combined-static-duplicate-ca':
+            append(after, 'claim-content-amendments.tsv', ca.copy())
+        elif label in ('combined-static-duplicate-owner-nr', 'combined-duplicate-owner-integration'):
+            duplicate_nr()
+        elif label in ('combined-static-duplicate-owner-cc', 'combined-static-mixed-owner'):
+            row = cc.copy(); row[0] = unused_id(after, 'claim-corrections.tsv', 'CC-DUPLICATE'); row[2] = '2'
+            if label.endswith('mixed-owner'):
+                row[3], row[5] = duplicate_nr('reclassify'), 'reclassify'
+            append(after, 'claim-corrections.tsv', row)
+        elif label.startswith('combined-static-ca-owned-'):
+            change('claim-corrections.tsv', cc[0], 5, label.removeprefix('combined-static-ca-owned-'))
+        elif label.startswith('combined-class-pair-no-op-'):
+            for col, value in enumerate(record(before, 'claims.tsv', x)[5:7], 5):
+                change('claims.tsv', x, col, value); change('claim-corrections.tsv', cc[0], col + 3, value)
+        elif label.startswith('combined-wrong-') and any(s in label for s in ('disposition-', 'subkind-')):
+            which = label.removeprefix('combined-wrong-').rsplit('-', 1)[0]
+            col, value = {'old-disposition': (6, 'domain'), 'old-subkind': (7, 'lemma'),
+                          'new-disposition': (8, 'notation'), 'new-subkind': (9, 'theorem')}[which]
+            change('claim-corrections.tsv', cc[0], col, value)
+        elif label.startswith('combined-static-') and label.removeprefix('combined-static-') in {
+                'none-old-disposition', 'none-old-subkind', 'old-out-of-scope', 'new-out-of-scope',
+                'illegal-new-kind', 'illegal-new-subkind'}:
+            col, value = {'none-old-disposition': (6, 'NONE'), 'none-old-subkind': (7, 'NONE'),
+                          'old-out-of-scope': (6, 'out_of_scope'), 'new-out-of-scope': (8, 'out_of_scope'),
+                          'illegal-new-kind': (8, 'unrecognized'), 'illegal-new-subkind': (9, 'unrecognized')
+                          }[label.removeprefix('combined-static-')]
+            change('claim-corrections.tsv', cc[0], col, value)
+        elif label == 'legacy-amend-class-drift-static':
+            change('claim-corrections.tsv', cc[0], 8, 'definition')
+        elif label == 'legacy-amend-actual-class-drift-helper':
+            change('claims.tsv', x, 5, 'definition'); change('claims.tsv', x, 6, 'definition')
+        elif label == 'legacy-reclass-content-drift':
+            value = 'Synthetic changed pure reclassification content'
+            change('claims.tsv', x, 7, value); change('claims.tsv', x, 8, blob(value)); refresh(after)
+        elif label in ('combined-static-pending-old', 'combined-static-pending-new', 'combined-static-mismatched-oid-width', 'combined-static-same-manifest-oids'):
+            col, value = {'combined-static-pending-old': (4, 'PENDING'), 'combined-static-pending-new': (5, 'PENDING'),
+                          'combined-static-mismatched-oid-width': (5, 'a' * 64), 'combined-static-same-manifest-oids': (5, ca[4])}[label]
+            ca_change(col, value)
+        elif label in ('combined-actual-content-unchanged', 'combined-unchanged-content-integration'):
+            change('claims.tsv', x, 7, record(before, 'claims.tsv', x)[7])
+        elif label == 'combined-wrong-pending-old-manifest': ca_change(4, 'a' * 40)
+        elif label == 'combined-wrong-fixed-old-record':
+            mutate(before, 'claims.tsv', x, 8, 'a' * 40); refresh(before)
+        elif label == 'combined-wrong-new-manifest': ca_change(5, 'a' * 40)
+        elif label in ('combined-wrong-current-new-record', 'combined-pending-current-new-record'):
+            change('claims.tsv', x, 8, 'PENDING' if 'pending' in label else 'a' * 40)
+        elif label == 'combined-newline-appended-new-hash':
+            value = blob(record(after, 'claims.tsv', x)[7] + '\n'); ca_change(5, value); change('claims.tsv', x, 8, value)
+        elif label == 'combined-newline-appended-old-hash': ca_change(4, blob(record(before, 'claims.tsv', x)[7] + '\n'))
+        elif label.startswith('combined-contentless-'):
+            new_content({'empty': '', 'true': 'True.', 'false': 'False'}[label.removeprefix('combined-contentless-')])
+        elif label in ('combined-static-wrong-page-pin', 'combined-static-pending-page-pin'):
+            ca_change(6, 'PENDING' if 'pending' in label else 'a' * 40)
+        elif label == 'combined-base-page-pin-drift':
+            mutate(before, 'pages.tsv', record(before, 'claims.tsv', x)[3], 9, 'a' * 40)
+        elif label == 'combined-current-page-pin-drift':
+            change('pages.tsv', record(after, 'claims.tsv', x)[3], 9, 'a' * 40); ca_change(6, 'a' * 40)
+        elif label == 'combined-current-page-record-drift':
+            change('pages.tsv', record(after, 'claims.tsv', x)[3], 5, 'synthetic-section')
+        elif label in ('combined-unrelated-source-drift', 'combined-independent-second-source-control-t'):
+            second_source(before); second_source(after)
+            if 'unrelated' in label: change('sources.tsv', 'SRB', 5, 'Changed synthetic title')
+        elif label == 'combined-page-identity-drift':
+            page_row = next(r for r in table(after, 'pages.tsv')[1:] if r[1] == 'TASAKI2020' and r[0] != record(after, 'claims.tsv', x)[3])
+            change('claims.tsv', x, 3, page_row[0]); ca_change(6, page_row[9])
+        elif label.startswith(('combined-base-', 'combined-current-')):
+            side, what = label.removeprefix('combined-').split('-', 1)
+            target = before if side == 'base' else after
+            active = {'excluded': (5, 'out_of_scope'), 'tombstoned': (11, 'true'),
+                      'exclusion-rationale': (9, 'UNEXPECTED'), 'exclusion-ref': (10, 'UNEXPECTED'),
+                      'successor': (12, 'CL-SYNTHETIC-9999'), 'tombstone-rationale': (13, 'UNEXPECTED'), 'tombstone-ref': (14, 'UNEXPECTED')}
+            if what in active: mutate(target, 'claims.tsv', x, *active[what])
+            elif what in ('skeleton_frozen', 'proof_active'): mutate(target, 'source-progress.tsv', 'TASAKI2020', 1, what)
+            elif what.startswith('binding-'): append(target, 'bindings.tsv', binding_row(target, x if what == 'binding-x' else other))
+            else:
+                name, row = {'slice': ('slices.tsv', ['SL-RUNTIME-0001', '1', x]),
+                             'dependency-out': ('dependencies.tsv', [x, 'requires', other, 'NONE']),
+                             'dependency-in': ('dependencies.tsv', [other, 'consequence_of', x, 'NONE']),
+                             'claim-axiom': ('claim-axioms.tsv', [x, 'AX-PROJECT-0001'])}[what]
+                append(target, name, row)
+        elif label == 'combined-unknown-frozen-claim': remove(before, 'claims.tsv', x)
+        elif label.startswith('combined-new-') and label.endswith('-artifact'):
+            name = label.removeprefix('combined-new-').removesuffix('-artifact') + '.tsv'
+            values = {'bindings.tsv': ['CL-FOREIGN-9999'] + binding_row(after, other)[1:],
+                      'claim-context.tsv': [other, '1', x, 'term_reference', 'inherited', 'FIXTURE'],
+                      'statement-modules.tsv': ['LatticeSystem.Claims.Runtime', 'LatticeSystem/Claims/Runtime.lean', 'leaf'],
+                      'statement-imports.tsv': ['LatticeSystem.Claims.Runtime', '1', 'Mathlib.Init', 'true', 'false', 'false'],
+                      'axioms.tsv': ['AX-PROJECT-9999', 'LatticeSystem.Axioms.State.fixture', 'LatticeSystem.Axioms.State', 'state', 'fixture', 'fixture', 'reopen', 'PENDING']}
+            append(after, name, values[name])
+        elif label == 'combined-vocabulary-missing-review': remove(after, 'claim-vocabulary-review.tsv', x)
+        elif label == 'combined-vocabulary-duplicate-review': append(after, 'claim-vocabulary-review.tsv', record(after, 'claim-vocabulary-review.tsv', x).copy())
+        elif label == 'combined-vocabulary-add-use': append(after, 'claim-vocabulary.tsv', [x, table(after, 'vocabulary.tsv')[1][0]])
+        elif label in ('combined-vocabulary-remove-use', 'combined-vocabulary-alter-use'):
+            uses = table(after, 'claim-vocabulary.tsv'); indices = [i for i,r in enumerate(uses[1:],1) if r[0] == x]
+            if 'remove' in label: uses.pop(indices[0])
+            else: uses[indices[0]][1] = uses[indices[1]][1]
+            write(after, 'claim-vocabulary.tsv', uses)
+        elif label == 'combined-vocabulary-declaration-drift':
+            change('vocabulary.tsv', table(after, 'vocabulary.tsv')[1][0], table(after, 'vocabulary.tsv')[0].index('design_role'), 'SYNTHETIC-CHANGED')
+        elif label.startswith('combined-static-forbidden-'):
+            name = label.removeprefix('combined-static-forbidden-') + '.tsv'
+            row = ([unused_id(after, name, 'SE-RUNTIME'), event_id, cc[0], x, '1', 'new_successor', other]
+                   if name == 'claim-successors.tsv' else
+                   [unused_id(after, name, 'IA-RUNTIME'), event_id, cc[0], '1', 'IT-RUNTIME-0001', ref])
+            append(after, name, row)
+        elif label == 'combined-new-unowned-claim':
+            tmp = after.with_name(after.name + '-omission')
+            _, _, _, _, fresh, _ = prepare_omission(after, tmp)
+            rows = table(after, 'claims.tsv'); fresh_row = record(tmp, 'claims.tsv', fresh)
+            index = next(i for i,r in enumerate(rows[1:],1) if r[2] > fresh_row[2])
+            rows.insert(index, fresh_row); write(after, 'claims.tsv', rows); refresh(after)
+            shutil.rmtree(tmp)
+        elif label == 'combined-new-unowned-item':
+            tmp = after.with_name(after.name + '-omission'); _, _, _, _, _, fresh = prepare_omission(after, tmp)
+            rows = table(after, 'source-items.tsv'); new_row = record(tmp, 'source-items.tsv', fresh)
+            index = next(i for i,r in enumerate(rows[1:],1) if r[2] > new_row[2]); rows.insert(index,new_row)
+            write(after,'source-items.tsv',rows); shutil.rmtree(tmp)
+        elif label == 'combined-existing-item-metadata':
+            item = next(r[0] for r in table(after,'item-claims.tsv')[1:] if r[2] == x)
+            change('source-items.tsv',item,7,'Synthetic changed locator')
+        elif label == 'combined-old-item-relation-delete': remove(after,'item-claims.tsv',x,2)
+        elif label == 'combined-new-target-item-relation':
+            item = next(r[0] for r in table(after,'item-claims.tsv')[1:] if r[2] == other)
+            append(after,'item-claims.tsv',[item,'99',x])
+        elif label.startswith('combined-invariant-'):
+            col = {'active-count':2,'target-count':3,'equation-count':4,'no-claim-pages':5,'census-oid':6}[label.removeprefix('combined-invariant-')]
+            value = 'a'*40 if col == 6 else str(int(record(after,'source-invariants.tsv','TASAKI2020')[col])+1)
+            change('source-invariants.tsv','TASAKI2020',col,value)
+        elif label == 'history-later-lifecycle-static-only-s': change('source-progress.tsv','TASAKI2020',1,'skeleton_frozen')
+        elif label == 'history-stale-next-old-oid': ca_change(4, next(r[4] for r in table(after,'claim-content-amendments.tsv')[1:] if r[3] == x))
+        elif label == 'history-second-event-wrong-old-class':
+            change('claim-corrections.tsv',cc[0],6,'domain'); change('claim-corrections.tsv',cc[0],7,'domain')
+        elif label == 'history-same-event-second-owner':
+            previous = next(r for r in table(after,'claim-content-amendments.tsv')[1:] if r[3] == x and r[1] != event_id)
+            old_event = previous[1]; old_ref = record(after,'correction-events.tsv',old_event)[4]
+            for name, identifier in [('claim-normalization-reviews.tsv',nr),('claim-corrections.tsv',cc[0])]:
+                change(name,identifier,1,old_event); change(name,identifier,2,'2')
+            change('claim-normalization-reviews.tsv',nr,8,old_ref); ca_change(1,old_event); ca_change(7,old_ref)
+        elif label == 'history-foreign-new-ca-event':
+            tmp=after.with_name(after.name+'-foreign'); content_event(after,tmp,other)
+            for name in history_tables:
+                (after/'registry'/name).write_bytes((tmp/'registry'/name).read_bytes())
+            # Static ownership uses the current claim and unchanged source page.
+            for name in ('claims.tsv','claim-vocabulary-review.tsv','source-invariants.tsv'):
+                (after/'registry'/name).write_bytes((tmp/'registry'/name).read_bytes())
+            shutil.rmtree(tmp)
+        elif label.startswith('history-prefix-reorder-') or label == 'history-helper-ca-prefix-reorder':
+            name = ('claim-content-amendments.tsv' if label == 'history-helper-ca-prefix-reorder' else label.removeprefix('history-prefix-reorder-')+'.tsv')
+            rows=table(after,name); key=2 if name=='claim-successors.tsv' else 1
+            groups=[]
+            for row in rows[1:]:
+                if not groups or groups[-1][0][key] != row[key]: groups.append([])
+                groups[-1].append(row)
+            assert len(groups)>=2
+            groups[0],groups[1]=groups[1],groups[0]
+            write(after,name,[rows[0]]+[row for group in groups for row in group])
+        elif label == 'history-event-physical-reorder':
+            rows=table(after,'correction-events.tsv');rows[1],rows[2]=rows[2],rows[1];write(after,'correction-events.tsv',rows)
+        elif label.startswith('history-old-value-'):
+            name=label.removeprefix('history-old-value-')+'.tsv';row=table(after,name)[1]
+            col, value={'correction-events.tsv':(4,'CHANGED-REVIEW'),
+                'claim-normalization-reviews.tsv':(7,'exact-statement-ready-RUNTIME-HISTORY-MUTANT'),
+                'claim-corrections.tsv':(9,'lemma'), 'claim-successors.tsv':(6,other),
+                'source-item-additions.tsv':(5,'CORPUS-NORMALIZATION-INDEPENDENT-REVIEW-RUNTIME-HISTORY-MUTANT'),
+                'claim-content-amendments.tsv':(7,'SOURCE-FIDELITY-TASAKI2020-0478-INDEPENDENT-REVIEW-V1-RUNTIME-HISTORY-MUTANT')}[name]
+            frozen = {
+                'claim-normalization-reviews.tsv': ('NR-TASAKI2020-0001', 'exact-statement-ready'),
+                'claim-corrections.tsv': ('CC-TASAKI2020-0001', 'remark'),
+                'source-item-additions.tsv': ('IA-TASAKI2020-0001', 'CORPUS-NORMALIZATION-INDEPENDENT-REVIEW'),
+                'claim-content-amendments.tsv': ('CA-TASAKI2020-0001', 'SOURCE-FIDELITY-TASAKI2020-0478-INDEPENDENT-REVIEW-V1')}
+            if name in frozen:
+                assert (row[0], row[col]) == frozen[name]
+            assert row[col] != value
+            change(name,row[0],col,value)
+        elif label == 'combined-ordinary-rejects-full-diff': pass
+        elif label in ('history-reopen-old-event-class-content','selector-real-historical-reopen'):
+            change('claims.tsv',x,5,'notation');change('claims.tsv',x,6,'notation')
+            value='Synthetic historical reopen';change('claims.tsv',x,7,value);change('claims.tsv',x,8,blob(value));refresh(after)
+        elif label == 'history-ordinary-ca-piggyback':
+            row=ca.copy();row[0]=unused_id(after,'claim-content-amendments.tsv','CA-PIGGYBACK');append(after,'claim-content-amendments.tsv',row)
+        elif label == 'none-old-combined-static':
+            change('claim-corrections.tsv',cc[0],6,'NONE');change('claim-corrections.tsv',cc[0],7,'NONE')
+        else: raise AssertionError('unimplemented mutant '+label)
+
+    combined_cases = [
+        ('combined-fixed-s', 'F', 'S', True, 'check-content-amendments: ok'),
+        ('combined-fixed-h', 'F', 'H', True, 'check-content-amendments: ok'),
+        ('combined-fixed-t', 'F', 'T', True, 'check-claim-corrections: ok'),
+        ('combined-fixed-b', 'F', 'B', True, 'check-base-diff: ok'),
+        ('combined-fixed-c', 'F', 'C', True, 'check-registry: ok'),
+        ('combined-pending-h', 'P', 'H', True, 'check-content-amendments: ok'),
+        ('combined-pending-t', 'P', 'T', True, 'check-claim-corrections: ok'),
+        ('combined-pending-b', 'P', 'B', True, 'check-base-diff: ok'),
+        ('combined-disposition-only-h', 'D', 'H', True, 'check-content-amendments: ok'),
+        ('combined-disposition-only-t', 'D', 'T', True, 'check-claim-corrections: ok'),
+        ('combined-subkind-only-h', 'K', 'H', True, 'check-content-amendments: ok'),
+        ('combined-subkind-only-t', 'K', 'T', True, 'check-claim-corrections: ok'),
+        ('combined-project-vocabulary-h', 'V', 'H', True, 'check-content-amendments: ok'),
+        ('combined-project-vocabulary-t', 'V', 'T', True, 'check-claim-corrections: ok'),
+        ('combined-legacy-no-ca-header-s', 'N', 'S', True, 'check-content-amendments: ok'),
+        ('combined-legacy-no-ca-header-h', 'N', 'H', True, 'check-content-amendments: ok'),
+        ('combined-legacy-no-ca-header-t', 'N', 'T', True, 'check-claim-corrections: ok'),
+        ('combined-independent-omission-nested-insert-h', 'M', 'H', True, 'check-content-amendments: ok'),
+        ('combined-independent-omission-nested-insert-t', 'M', 'T', True, 'check-claim-corrections: ok'),
+        ('combined-independent-omission-nested-insert-b', 'M', 'B', True, 'check-base-diff: ok'),
+        ('combined-independent-omission-nested-insert-i', 'M', 'I', True, 'check-source-items: ok'),
+        ('combined-target-vocab-row-order-preserved-set-h', 'W', 'H', True, 'check-content-amendments: ok'),
+        ('combined-target-vocab-row-order-preserved-set-t', 'W', 'T', True, 'check-claim-corrections: ok'),
+        ('combined-unknown-outcome', 'F', 'T', False, 'invalid claim normalization review ledger'),
+        ('combined-unknown-action', 'F', 'T', False, 'invalid claim correction ledger'),
+        ('combined-open-review', 'F', 'T', False, 'invalid claim normalization review ledger'),
+        ('combined-wrong-scope', 'F', 'T', False, 'invalid claim normalization review ledger'),
+        ('combined-wrong-outcome', 'F', 'T', False, 'invalid claim correction ledger'),
+        ('combined-static-missing-ca', 'F', 'S', False, 'content amendment is missing its provenance row'),
+        ('combined-static-duplicate-ca', 'F', 'S', False, 'duplicate content amendment'),
+        ('combined-static-duplicate-owner-nr', 'F', 'S', False, 'combined correction lacks exactly one owning review and correction'),
+        ('combined-static-duplicate-owner-cc', 'F', 'S', False, 'combined correction lacks exactly one owning review and correction'),
+        ('combined-static-mixed-owner', 'F', 'S', False, 'combined correction lacks exactly one owning review and correction'),
+        ('combined-static-ca-wrong-event', 'F', 'S', False, 'content amendment event or correction ownership mismatch'),
+        ('combined-static-ca-wrong-correction', 'F', 'S', False, 'content amendment event or correction ownership mismatch'),
+        ('combined-static-ca-wrong-claim', 'F', 'S', False, 'content amendment event or correction ownership mismatch'),
+        ('combined-static-ca-wrong-review', 'F', 'S', False, 'content amendment review ownership mismatch'),
+        ('combined-static-nr-wrong-outcome', 'F', 'S', False, 'content amendment review ownership mismatch'),
+        ('combined-static-nr-wrong-scope', 'F', 'S', False, 'content amendment review ownership mismatch'),
+        ('combined-static-nr-open', 'F', 'S', False, 'content amendment review ownership mismatch'),
+        ('combined-static-event-wrong-source', 'F', 'S', False, 'content amendment source mismatch'),
+        ('combined-static-ca-owned-reclassify', 'F', 'S', False, 'content amendment event or correction ownership mismatch'),
+        ('combined-static-ca-owned-split', 'F', 'S', False, 'content amendment event or correction ownership mismatch'),
+        ('combined-static-ca-owned-add_omitted_claim', 'F', 'S', False, 'content amendment event or correction ownership mismatch'),
+        ('combined-duplicate-owner-integration', 'F', 'T', False, 'invalid claim normalization review ledger'),
+        ('combined-missing-ca-integration', 'F', 'T', False, 'content amendment is missing its provenance row'),
+        ('combined-class-pair-no-op-s', 'F', 'S', False, 'combined correction requires changed classification'),
+        ('combined-class-pair-no-op-h', 'F', 'H', False, 'combined correction requires changed classification'),
+        ('combined-wrong-old-disposition-h', 'F', 'H', False, 'combined correction classification does not match claim transition'),
+        ('combined-wrong-old-disposition-t', 'F', 'T', False, 'combined correction classification does not match claim transition'),
+        ('combined-wrong-old-subkind-h', 'F', 'H', False, 'combined correction classification does not match claim transition'),
+        ('combined-wrong-old-subkind-t', 'F', 'T', False, 'combined correction classification does not match claim transition'),
+        ('combined-wrong-new-disposition-h', 'F', 'H', False, 'combined correction classification does not match claim transition'),
+        ('combined-wrong-new-disposition-t', 'F', 'T', False, 'combined correction classification does not match claim transition'),
+        ('combined-wrong-new-subkind-h', 'F', 'H', False, 'combined correction classification does not match claim transition'),
+        ('combined-wrong-new-subkind-t', 'F', 'T', False, 'combined correction classification does not match claim transition'),
+        ('combined-static-none-old-disposition', 'F', 'S', False, 'combined correction has invalid classification'),
+        ('combined-static-none-old-subkind', 'F', 'S', False, 'combined correction has invalid classification'),
+        ('combined-static-old-out-of-scope', 'F', 'S', False, 'combined correction has invalid classification'),
+        ('combined-static-new-out-of-scope', 'F', 'S', False, 'combined correction has invalid classification'),
+        ('combined-static-illegal-new-kind', 'F', 'S', False, 'combined correction has invalid classification'),
+        ('combined-static-illegal-new-subkind', 'F', 'S', False, 'combined correction has invalid classification'),
+        ('legacy-amend-class-drift-static', 'A', 'S', False, 'content amendment changes classification'),
+        ('legacy-amend-actual-class-drift-helper', 'A', 'H', False, 'content amendment changed frozen claim identity or metadata'),
+        ('legacy-reclass-content-drift', 'Q', 'T', False, 'unmanifested claim drift'),
+        ('combined-static-pending-old', 'F', 'S', False, 'content amendment requires frozen old and new content OIDs'),
+        ('combined-static-pending-new', 'F', 'S', False, 'content amendment requires frozen old and new content OIDs'),
+        ('combined-static-mismatched-oid-width', 'F', 'S', False, 'content amendment requires frozen old and new content OIDs'),
+        ('combined-static-same-manifest-oids', 'F', 'S', False, 'content amendment is a no-op'),
+        ('combined-actual-content-unchanged', 'F', 'H', False, 'content amendment is a no-op'),
+        ('combined-wrong-pending-old-manifest', 'P', 'H', False, 'content amendment old content OID is stale'),
+        ('combined-wrong-fixed-old-record', 'F', 'H', False, 'content amendment old content OID is stale'),
+        ('combined-wrong-new-manifest', 'F', 'H', False, 'content amendment new content OID is stale'),
+        ('combined-wrong-current-new-record', 'F', 'H', False, 'content amendment new content OID is stale'),
+        ('combined-pending-current-new-record', 'F', 'H', False, 'content amendment new content OID is stale'),
+        ('combined-newline-appended-new-hash', 'F', 'H', False, 'content amendment new content OID is stale'),
+        ('combined-newline-appended-old-hash', 'P', 'H', False, 'content amendment old content OID is stale'),
+        ('combined-contentless-empty', 'F', 'H', False, 'contentless content amendment surrogate'),
+        ('combined-contentless-true', 'F', 'H', False, 'contentless content amendment surrogate'),
+        ('combined-contentless-false', 'F', 'H', False, 'contentless content amendment surrogate'),
+        ('combined-unchanged-content-integration', 'F', 'T', False, 'content amendment is a no-op'),
+        ('combined-static-wrong-page-pin', 'F', 'S', False, 'content amendment page source mismatch'),
+        ('combined-static-pending-page-pin', 'F', 'S', False, 'content amendment page source mismatch'),
+        ('combined-base-page-pin-drift', 'F', 'H', False, 'content amendment page source mismatch'),
+        ('combined-current-page-pin-drift', 'F', 'H', False, 'content amendment page source mismatch'),
+        ('combined-current-page-record-drift', 'F', 'H', False, 'combined correction page record changed'),
+        ('combined-source-pin-drift', 'F', 'H', False, 'combined correction source record changed or is not frozen'),
+        ('combined-unrelated-source-drift', 'F', 'T', False, 'unrelated frozen registry drift'),
+        ('combined-independent-second-source-control-t', 'F', 'T', True, 'check-claim-corrections: ok'),
+        ('combined-frozen-order', 'F', 'H', False, 'combined correction changed frozen claim identity or metadata'),
+        ('combined-frozen-locator', 'F', 'H', False, 'combined correction changed frozen claim identity or metadata'),
+        ('combined-source-identity-drift', 'F', 'H', False, 'content amendment source mismatch'),
+        ('combined-page-identity-drift', 'F', 'H', False, 'combined correction changed frozen claim identity or metadata'),
+        ('combined-base-excluded', 'F', 'H', False, 'combined correction requires an active formalization target'),
+        ('combined-base-tombstoned', 'F', 'H', False, 'combined correction requires an active formalization target'),
+        ('combined-base-exclusion-rationale', 'F', 'H', False, 'combined correction requires an active formalization target'),
+        ('combined-base-exclusion-ref', 'F', 'H', False, 'combined correction requires an active formalization target'),
+        ('combined-base-successor', 'F', 'H', False, 'combined correction requires an active formalization target'),
+        ('combined-base-tombstone-rationale', 'F', 'H', False, 'combined correction requires an active formalization target'),
+        ('combined-base-tombstone-ref', 'F', 'H', False, 'combined correction requires an active formalization target'),
+        ('combined-current-excluded', 'F', 'H', False, 'combined correction requires an active formalization target'),
+        ('combined-current-tombstoned', 'F', 'H', False, 'combined correction requires an active formalization target'),
+        ('combined-current-exclusion-rationale', 'F', 'H', False, 'combined correction requires an active formalization target'),
+        ('combined-current-exclusion-ref', 'F', 'H', False, 'combined correction requires an active formalization target'),
+        ('combined-current-successor', 'F', 'H', False, 'combined correction requires an active formalization target'),
+        ('combined-current-tombstone-rationale', 'F', 'H', False, 'combined correction requires an active formalization target'),
+        ('combined-current-tombstone-ref', 'F', 'H', False, 'combined correction requires an active formalization target'),
+        ('combined-unknown-frozen-claim', 'F', 'H', False, 'content amendment does not target a frozen source claim'),
+        ('combined-base-skeleton_frozen', 'F', 'H', False, 'content amendment requires a pre-R4 source'),
+        ('combined-base-proof_active', 'F', 'H', False, 'content amendment requires a pre-R4 source'),
+        ('combined-base-binding-x', 'F', 'H', False, 'content amendment source already has bindings'),
+        ('combined-base-binding-other_same_source', 'F', 'H', False, 'content amendment source already has bindings'),
+        ('combined-base-slice', 'F', 'H', False, 'content amendment target already has skeleton or axiom relations'),
+        ('combined-base-dependency-out', 'F', 'H', False, 'content amendment target already has skeleton or axiom relations'),
+        ('combined-base-dependency-in', 'F', 'H', False, 'content amendment target already has skeleton or axiom relations'),
+        ('combined-base-claim-axiom', 'F', 'H', False, 'content amendment target already has skeleton or axiom relations'),
+        ('combined-current-skeleton_frozen', 'F', 'H', False, 'content amendment requires a pre-R4 source'),
+        ('combined-current-proof_active', 'F', 'H', False, 'content amendment requires a pre-R4 source'),
+        ('combined-current-binding-x', 'F', 'H', False, 'content amendment source already has bindings'),
+        ('combined-current-binding-other_same_source', 'F', 'H', False, 'content amendment source already has bindings'),
+        ('combined-current-slice', 'F', 'H', False, 'content amendment target already has skeleton or axiom relations'),
+        ('combined-current-dependency-out', 'F', 'H', False, 'content amendment target already has skeleton or axiom relations'),
+        ('combined-current-dependency-in', 'F', 'H', False, 'content amendment target already has skeleton or axiom relations'),
+        ('combined-current-claim-axiom', 'F', 'H', False, 'content amendment target already has skeleton or axiom relations'),
+        ('combined-new-bindings-artifact', 'F', 'T', False, 'correction event introduces an R4 artifact'),
+        ('combined-new-claim-context-artifact', 'F', 'T', False, 'correction event introduces an R4 artifact'),
+        ('combined-new-statement-modules-artifact', 'F', 'T', False, 'correction event introduces an R4 artifact'),
+        ('combined-new-statement-imports-artifact', 'F', 'T', False, 'correction event introduces an R4 artifact'),
+        ('combined-new-axioms-artifact', 'F', 'T', False, 'correction event introduces an axiom artifact'),
+        ('combined-vocabulary-basis-drift', 'F', 'H', False, 'content amendment lacks its refreshed vocabulary review'),
+        ('combined-vocabulary-stale-ref', 'F', 'H', False, 'content amendment lacks its refreshed vocabulary review'),
+        ('combined-vocabulary-missing-review', 'F', 'H', False, 'content amendment lacks its refreshed vocabulary review'),
+        ('combined-vocabulary-duplicate-review', 'F', 'H', False, 'content amendment lacks its refreshed vocabulary review'),
+        ('combined-vocabulary-add-use', 'F', 'H', False, 'content amendment changed vocabulary use'),
+        ('combined-vocabulary-remove-use', 'V', 'H', False, 'content amendment changed vocabulary use'),
+        ('combined-vocabulary-alter-use', 'V', 'H', False, 'content amendment changed vocabulary use'),
+        ('combined-unrelated-vocabulary-review', 'F', 'T', False, 'unrelated vocabulary review drift'),
+        ('combined-vocabulary-declaration-drift', 'F', 'T', False, 'unrelated frozen registry drift'),
+        ('combined-static-forbidden-claim-successors', 'F', 'S', False, 'content amendment cannot introduce successors or source items'),
+        ('combined-static-forbidden-source-item-additions', 'F', 'S', False, 'content amendment cannot introduce successors or source items'),
+        ('combined-new-unowned-claim', 'F', 'T', False, 'split successor provenance is incomplete'),
+        ('combined-new-unowned-item', 'F', 'T', False, 'unmanifested source item addition'),
+        ('combined-existing-item-metadata', 'F', 'T', False, 'historical source item drift'),
+        ('combined-old-item-relation-delete', 'F', 'T', False, 'historical source item relation drift'),
+        ('combined-new-target-item-relation', 'F', 'T', False, 'unrelated item-claim drift'),
+        ('combined-invariant-active-count', 'F', 'T', False, 'census invariant count is stale'),
+        ('combined-invariant-target-count', 'F', 'T', False, 'formalization target count is stale'),
+        ('combined-invariant-equation-count', 'F', 'T', False, 'census invariant count is stale'),
+        ('combined-invariant-no-claim-pages', 'F', 'T', False, 'census invariant count is stale'),
+        ('combined-invariant-census-oid', 'F', 'T', False, 'census OID is stale'),
+        ('combined-invariant-review', 'F', 'H', False, 'combined correction lacks its event invariant review'),
+        ('history-combined-then-combined-t', 'CC', 'T', True, 'check-claim-corrections: ok'),
+        ('history-combined-then-combined-b', 'CC', 'B', True, 'check-base-diff: ok'),
+        ('history-combined-then-combined-s', 'CC', 'S', True, 'check-content-amendments: ok'),
+        ('history-combined-then-combined-o', 'CC', 'O', True, 'check-base-diff: ok'),
+        ('history-combined-then-amend-t', 'CA', 'T', True, 'check-claim-corrections: ok'),
+        ('history-combined-then-amend-b', 'CA', 'B', True, 'check-base-diff: ok'),
+        ('history-combined-then-amend-s', 'CA', 'S', True, 'check-content-amendments: ok'),
+        ('history-combined-then-amend-o', 'CA', 'O', True, 'check-base-diff: ok'),
+        ('history-amend-then-combined-t', 'AC', 'T', True, 'check-claim-corrections: ok'),
+        ('history-amend-then-combined-b', 'AC', 'B', True, 'check-base-diff: ok'),
+        ('history-amend-then-combined-s', 'AC', 'S', True, 'check-content-amendments: ok'),
+        ('history-amend-then-combined-o', 'AC', 'O', True, 'check-base-diff: ok'),
+        ('history-combined-reclass-amend-t', 'CRAC', 'T', True, 'check-claim-corrections: ok'),
+        ('history-combined-reclass-amend-b', 'CRAC', 'B', True, 'check-base-diff: ok'),
+        ('history-combined-reclass-amend-s', 'CRAC', 'S', True, 'check-content-amendments: ok'),
+        ('history-combined-reclass-amend-o', 'CRAC', 'O', True, 'check-base-diff: ok'),
+        ('history-omission-then-combined-t', 'OC', 'T', True, 'check-claim-corrections: ok'),
+        ('history-omission-then-combined-b', 'OC', 'B', True, 'check-base-diff: ok'),
+        ('history-omission-then-combined-s', 'OC', 'S', True, 'check-content-amendments: ok'),
+        ('history-omission-then-combined-o', 'OC', 'O', True, 'check-base-diff: ok'),
+        ('history-combined-then-split-t', 'CS', 'T', True, 'check-claim-corrections: ok'),
+        ('history-combined-then-split-b', 'CS', 'B', True, 'check-base-diff: ok'),
+        ('history-combined-then-split-s', 'CS', 'S', True, 'check-content-amendments: ok'),
+        ('history-combined-then-split-o', 'CS', 'O', True, 'check-base-diff: ok'),
+        ('history-combined-then-exclude-t', 'CX', 'T', True, 'check-claim-corrections: ok'),
+        ('history-combined-then-exclude-b', 'CX', 'B', True, 'check-base-diff: ok'),
+        ('history-combined-then-exclude-s', 'CX', 'S', True, 'check-content-amendments: ok'),
+        ('history-combined-then-exclude-o', 'CX', 'O', True, 'check-base-diff: ok'),
+        ('history-intervening-pure-reclassification-t', 'CRAC', 'T', True, 'check-claim-corrections: ok'),
+        ('history-later-lifecycle-static-only-s', 'CC', 'S', True, 'check-content-amendments: ok'),
+        ('history-stale-next-old-oid', 'CC', 'S', False, 'content amendment history chain is stale'),
+        ('history-second-event-wrong-old-class', 'CC', 'H', False, 'combined correction classification does not match claim transition'),
+        ('history-same-event-second-owner', 'CC', 'S', False, 'combined correction lacks exactly one owning review and correction'),
+        ('history-foreign-new-ca-event', 'F', 'H', False, 'content amendment belongs to another event'),
+        ('history-prefix-reorder-claim-normalization-reviews', 'HIST', 'T', False, 'historical correction ledger drift'),
+        ('history-prefix-reorder-claim-corrections', 'HIST', 'T', False, 'historical correction ledger drift'),
+        ('history-prefix-reorder-claim-successors', 'HIST', 'T', False, 'historical correction ledger drift'),
+        ('history-prefix-reorder-source-item-additions', 'HIST', 'T', False, 'historical correction ledger drift'),
+        ('history-prefix-reorder-claim-content-amendments', 'HIST', 'T', False, 'historical correction ledger drift'),
+        ('history-event-physical-reorder', 'HIST', 'T', False, 'invalid correction event ledger'),
+        ('history-helper-ca-prefix-reorder', 'HIST', 'H', False, 'historical content amendment drift'),
+        ('history-old-value-correction-events', 'HIST', 'T', False, 'historical correction ledger drift'),
+        ('history-old-value-claim-normalization-reviews', 'HIST', 'T', False, 'historical correction ledger drift'),
+        ('history-old-value-claim-corrections', 'HIST', 'T', False, 'historical correction ledger drift'),
+        ('history-old-value-claim-successors', 'HIST', 'T', False, 'historical correction ledger drift'),
+        ('history-old-value-source-item-additions', 'HIST', 'T', False, 'unmanifested source item addition'),
+        ('history-old-value-claim-content-amendments', 'HIST', 'T', False, 'historical correction ledger drift'),
+        ('combined-ordinary-rejects-full-diff', 'F', 'O', False, 'identity/order/locator/content/exclusion/supersession'),
+        ('history-reopen-old-event-class-content', 'CC', 'E', False, 'identity/order/locator/content/exclusion/supersession'),
+        ('history-ordinary-ca-piggyback', 'CC', 'O', False, 'historical correction ledger drift'),
+        ('selector-real-first-combined', 'J', 'R', True, 'check-base-diff: ok'),
+        ('selector-real-second-combined', 'J', 'R', True, 'check-base-diff: ok'),
+        ('selector-real-historical-ordinary', 'J', 'R', True, 'check-base-diff: ok'),
+        ('selector-real-wrong-base', 'J', 'R', False, 'new correction event base commit does not match the actual merge base'),
+        ('selector-real-two-new-events', 'J', 'R', False, 'multiple new correction events require an explicit CI policy change'),
+        ('selector-real-invalid-base', 'J', 'R', False, 'invalid or unfetched base ref'),
+        ('selector-real-class-fact-mutant', 'J', 'R', False, 'combined correction classification does not match claim transition'),
+        ('selector-real-historical-reopen', 'J', 'R', False, 'identity/order/locator/content/exclusion/supersession'),
+        ('none-old-combined-static', 'F', 'S', False, 'combined correction has invalid classification'),
+        ('none-old-combined-new-id-transition', 'F', 'T', False, 'correction predecessor source mismatch'),
+        ('combined-generator-privacy', 'PUBLIC', 'G', True, 'combined generator privacy contract: ok'),
+    ]
+    def run_selector(label, expected, diagnostic):
+        # Registry-only Git graph composes the actual selector and guards. There
+        # is deliberately no CHECK_BASE_DIFF override or substitute executable.
+        assert 'CHECK_BASE_DIFF' not in os.environ
+        with tempfile.TemporaryDirectory(prefix='selector-real-', dir=root) as directory:
+            repo = Path(directory)
+            def git(*args):
+                return subprocess.check_output(['git', '-C', str(repo), *args], stderr=subprocess.STDOUT).decode().strip()
+            git('init', '-q')
+            git('config', 'user.name', 'phasetr')
+            git('config', 'user.email', 'phasetr@gmail.com')
+            git('commit', '--allow-empty', '-qm', 'Synthetic selector seed')
+            seed = git('rev-parse', 'HEAD')
+            fbase = fixture('F')[0]
+            shutil.copytree(fbase / 'registry', repo / 'registry')
+            git('add', 'registry'); git('commit', '-qm', 'Synthetic selector base')
+            b0 = git('rev-parse', 'HEAD')
+            b0_snapshot = repo.with_name(repo.name + '-b0')
+            shutil.copytree(repo / 'registry', b0_snapshot / 'registry')
+            e1 = repo.with_name(repo.name + '-e1')
+            e1_event = content_event(b0_snapshot, e1, claim, ['definition', 'definition'])
+            mutate(e1, 'correction-events.tsv', e1_event, 3, b0)
+            shutil.copytree(e1 / 'registry', repo / 'registry', dirs_exist_ok=True)
+            base_ref = b0
+            if label in ('selector-real-second-combined', 'selector-real-historical-ordinary',
+                         'selector-real-two-new-events', 'selector-real-historical-reopen'):
+                assert_content_step(b0_snapshot, e1, e1_event)
+                git('add', 'registry'); git('commit', '-qm', 'Synthetic first combined event')
+                e1_sha = git('rev-parse', 'HEAD')
+                e2 = repo.with_name(repo.name + '-e2')
+                e2_event = content_event(e1, e2, claim, ['assertion', 'equation'])
+                mutate(e2, 'correction-events.tsv', e2_event, 3, e1_sha)
+                shutil.copytree(e2 / 'registry', repo / 'registry', dirs_exist_ok=True)
+                assert_content_step(e1, e2, e2_event)
+                base_ref = e1_sha
+                if label == 'selector-real-two-new-events': base_ref = b0
+                if label in ('selector-real-historical-ordinary', 'selector-real-historical-reopen'):
+                    git('add', 'registry'); git('commit', '-qm', 'Synthetic second combined event')
+                    base_ref = git('rev-parse', 'HEAD')
+                    if label.endswith('reopen'):
+                        mutate_combined(label, e2, repo, e2_event, claim)
+            else:
+                if label == 'selector-real-wrong-base': mutate(repo, 'correction-events.tsv', e1_event, 3, seed)
+                elif label == 'selector-real-invalid-base': base_ref = 'refs/heads/does-not-exist'
+                elif label == 'selector-real-class-fact-mutant':
+                    cc = next(r for r in table(repo,'claim-corrections.tsv')[1:] if r[1] == e1_event)
+                    mutate(repo,'claim-corrections.tsv',cc[0],6,'domain')
+                else: assert_content_step(b0_snapshot, repo, e1_event)
+            output = expect(label, expected,
+                            [str(project/'scripts/check-base-diff-ci.sh'), str(repo), base_ref], diagnostic)
+            if expected:
+                assert 'check-base-diff: ok' in output
+                assert ('check-base-diff-ci: ok' in output) == (label != 'selector-real-historical-ordinary')
+            for suffix in ('-b0','-e1','-e2'):
+                path = repo.with_name(repo.name + suffix)
+                if path.exists(): shutil.rmtree(path)
+
+    assert len(combined_cases) == len({c[0] for c in combined_cases}) == 212
+    assert sum(c[3] for c in combined_cases) == 58
+    for label, kind, route, expected, diagnostic in combined_cases:
+        if route == 'R':
+            run_selector(label, expected, diagnostic)
+            continue
+        source_kind = 'F' if kind == 'PUBLIC' else kind
+        source_before, source_after, event_id, x = fixture(source_kind)
+        if label == 'history-intervening-pure-reclassification-t':
+            source_before, source_after, event_id, x = fixture_cache['CRAC-middle']
+        with tempfile.TemporaryDirectory(prefix='combined-case-', dir=root) as directory:
+            case_root = Path(directory)
+            before, after = case_root/'base', case_root/'current'
+            if route in ('O','E') and label != 'combined-ordinary-rejects-full-diff':
+                source_before = source_after
+            shutil.copytree(source_before, before)
+            shutil.copytree(source_after, after)
+            if label == 'none-old-combined-new-id-transition':
+                shutil.rmtree(after)
+                event_id, ref, nr, cc, x, _ = prepare_omission(before, after)
+                mutate(after,'claim-normalization-reviews.tsv',nr,5,'amend_and_reclassify')
+                mutate(after,'claim-corrections.tsv',cc,5,'amend_and_reclassify')
+                row=record(after,'claims.tsv',x)
+                append(after,'claim-content-amendments.tsv',[
+                    unused_id(after,'claim-content-amendments.tsv','CA-RUNTIME'),event_id,cc,x,
+                    blob('Synthetic prior bytes'),row[8],record(after,'pages.tsv',row[3])[9],ref])
+            elif not expected or label in ('combined-independent-second-source-control-t','history-later-lifecycle-static-only-s'):
+                mutate_combined(label,before,after,event_id,x)
+            if expected and route not in ('O', 'G') and label != 'history-later-lifecycle-static-only-s':
+                assert_content_step(before,after,event_id)
+            if route == 'G':
+                data = generator.load_registry(after)
+                catalog = generator.public_catalog(data)
+                outputs = generator.build_outputs(catalog)
+                item_id = next(r[0] for r in table(after,'item-claims.tsv')[1:] if r[2] == x)
+                item = next(i for i in catalog['items'] if i['item_id'] == item_id)
+                rendered = next(c for c in item['claims'] if c['claim_id'] == x)
+                assert rendered['disposition'] == 'definition' and rendered['subkind'] == 'definition'
+                original_item=record(before,'source-items.tsv',item_id)
+                assert item['public_group'] == original_item[8] and item['public_slug'] == original_item[9]
+                assert table(before,'source-items.tsv') == table(after,'source-items.tsv')
+                assert table(before,'item-claims.tsv') == table(after,'item-claims.tsv')
+                public_text=json.dumps(catalog,ensure_ascii=False)+''.join(outputs.values())
+                row=record(after,'claims.tsv',x)
+                cc=next(r for r in table(after,'claim-corrections.tsv')[1:] if r[1] == event_id)
+                ca=next(r for r in table(after,'claim-content-amendments.tsv')[1:] if r[2] == cc[0])
+                for private in ('PRIVATE-COMBINED',record(before,'claims.tsv',x)[7],row[7],
+                                ca[4],ca[5],event_id,cc[0],cc[3],ca[0],ca[7]):
+                    assert private not in public_text, private
+                generator.write_outputs(after,outputs)
+                assert generator.check_outputs(after,outputs,quiet=True)
+                assert_content_step(before,after,event_id)
+                print(diagnostic)
+                count += 1; accepted += 1
+                continue
+            commands = {
+                'S':['python3',helper,'--static',str(after)],
+                'H':['python3',helper,'--transition',str(before),str(after),event_id],
+                'T':[corrections_checker,'--fixture-dirs',str(before),str(after)],
+                'B':[base_checker,'--correction-event',event_id,'--fixture-dirs',str(before),str(after)],
+                'O':[base_checker,'--fixture-dirs',str(before),str(after)],
+                'E':[base_checker,'--correction-event',event_id,'--fixture-dirs',str(before),str(after)],
+                'C':[str(project/'scripts/check-registry.sh'),str(after)],
+                'I':[str(project/'scripts/check-source-items.sh'),str(after)]}
+            expect(label,expected,commands[route],diagnostic)
+    assert (count-combined_start[0],accepted-combined_start[1],rejected-combined_start[2]) == (212,58,154)
+    print('test-content-amendments-runtime: combined cases 212 (58 positive, 154 rejection; 3 real selector positive chains)')
     print('test-content-amendments-runtime: ok (' + str(count) + ' cases; ' +
           str(accepted) + ' positive, ' + str(rejected) + ' rejection cases)')
 PY
