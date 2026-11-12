@@ -42,12 +42,16 @@ one identity-preserving variance repair, two combined definition and content
 repairs, and four omitted assertions. The additions comprise separate
 vector-independence and local-energy outcomes in one genuine named footnote,
 plus sector placement and pairwise orthogonality in their shared prose unit.
-The accepted statements and source context are preserved without importing
-the later tower-energy theorem. Its existing theorem and energy-display
-records remain unchanged pending resolution of their source-domain questions;
-the modal physical-state discussion remains covered without an active claim.
-This subset does not complete the broader source investigation, certify
-printed proofs, or establish R4 readiness.
+The accepted subset preserves its nine outcomes without adding the later
+tower-energy result. A separate event repairs the existing canonical
+energy-display record with its full source context, index domains, uniform
+positive constants, and explicit nonzero-numerator premise. The compound
+theorem record remains unchanged until a later split can reuse the corrected
+energy record as an unchanged canonical duplicate in that event's exact base.
+This separate correction adds no definedness successor. The modal
+physical-state discussion remains coverage-only.
+These corrections do not complete integration of the broader source unit,
+certify printed proofs, or establish R4 readiness.
 
 No claim is represented merely because its source PDF exists locally.
 The registries are authoritative only for facts they explicitly record.
