@@ -15,15 +15,15 @@ The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
 progress begins in `registry/`. Its global checker capability is `vocabulary`,
 while each source advances independently through `source-progress.tsv`;
 `TASAKI2020` is `vocabulary_reviewed`. Its corrected corpus ledger contains all
-534 physical PDF pages, 3,224 active atomic claims, 3,209 formalization
+534 physical PDF pages, 3,231 active atomic claims, 3,214 formalization
 targets, 1,401 unique equation-label/page pairs, and 63 pages with no claim.
 Thirteen superseded records preserve the provenance of compound or duplicate
-claims, while fifteen active records are explicitly classified `out_of_scope`.
+claims, while seventeen active records are explicitly classified `out_of_scope`.
 The only production Lean tree is limited to the registered vocabulary modules and their
 root. Checker cases are generated only under isolated system temporary roots;
 the repository contains no tracked fixture tree.
 
-The vocabulary reviews classify all 3,209 formalization targets: 3,207 are
+The vocabulary reviews classify all 3,214 formalization targets: 3,212 are
 `mathlib_only`, while claims `CL-TASAKI2020-2487` and
 `CL-TASAKI2020-2488` require project vocabulary. The registered vocabulary is
 exactly `partialTraceRight` and `partialTraceLeft`, with four claim-to-vocabulary
@@ -136,10 +136,20 @@ its existing theorem item, and reuses the corrected energy record unchanged
 as the canonical duplicate. The separate definedness and conditional-energy
 outcomes retain the original jointly witnessed statement through a common
 cutoff. The modal physical-state discussion remains coverage-only.
+A local-energy and spectral-consequence event records fifteen correction-owning
+statement-readiness reviews: five identity-preserving content repairs, one
+combined definition and content repair, two exclusions, and seven previously
+omitted atomic claims. Four new source items preserve the additions' provenance;
+the other three additions join their existing source items. The canonical
+spectral-equation record is repaired, while its duplicate corollary record
+remains unchanged and pending. A separate later retirement requires this
+canonical repair to be independently accepted in production first. This event
+does not close the whole unit or certify printed proofs, external-reference
+proofs, or R4 readiness.
 These bounded registry corrections do not certify printed proofs,
 whole-source fidelity, or R4 readiness.
 
-The sixth ledger, `claim-content-amendments.tsv`, records seventy-four reviewed
+The sixth ledger, `claim-content-amendments.tsv`, records eighty reviewed
 pre-R4 amendments, including actual old and new content hashes, frozen
 source-page hashes, and event ownership. The reviewed units cover the
 complex spectral estimate, opening model setup, symmetry/order-operator unit,
@@ -149,7 +159,8 @@ infrared-bound statement/application unit, the bounded infrared-bound
 preliminary-derivation unit, the bounded inverse-moment completion unit,
 the bounded reflection-to-uniform-field unit, and the bounded reflection-bound
 proof-source unit with its separately reviewed adjacent Note, and the bounded
-tower-introduction and setup subset, and the canonical tower-energy display;
+tower-introduction and setup subset, the canonical tower-energy display,
+and the local-energy and spectral-consequence subset;
 they do not certify proofs, other source units, or the complete source corpus. The broader
 rendered-source re-audit and further corrections remain incomplete. The same
 permanent protocol supports independently reviewed additions with fresh IDs,
