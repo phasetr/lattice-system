@@ -8,7 +8,7 @@ Generated from the checked registries; do not edit by hand.
 - Source items: 3062
 - Active claims: 3224
 - Formalization targets: 3209
-- Superseded claim records: 12
+- Superseded claim records: 13
 - Vocabulary declarations: 2
 - Claim-vocabulary links: 4
 
