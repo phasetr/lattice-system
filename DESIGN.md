@@ -216,8 +216,9 @@ binds a position, event, and independent review token to one source and exact
 base commit. `claim-normalization-reviews.tsv` records every reviewed claim,
 including unchanged outcomes. `claim-corrections.tsv` is owned through the
 review row and records one of `reclassify`, `exclude_nonclaim`, `split`,
-`amend_content`, `amend_and_reclassify`, or `add_omitted_claim`, including its
-old and new classification. The first five actions target a frozen claim.
+`amend_content`, `amend_and_reclassify`, `retire_duplicate`, or
+`add_omitted_claim`, including its old and new classification. The first six
+actions target a frozen claim.
 `add_omitted_claim` introduces a previously unrecorded source-atomic claim without pretending to split an
 existing assertion. Only this action uses `NONE` for both old classification
 fields: the claim did not exist in the event base. `NONE` never stands for an
@@ -273,6 +274,7 @@ The permitted claim-column changes are:
 | `amend_and_reclassify` | 6, 7, 8, 9 | Changed classification pair and changed content |
 | `exclude_nonclaim` | 6, 10, 11 | Existing reviewed exclusion contract |
 | `split` | 12, 13, 14, 15 | Existing reviewed tombstone and successor contract |
+| `retire_duplicate` | 12, 13, 14, 15 | Reviewed atomic duplicate; one unchanged existing canonical target; initial mathlib_only predecessor scope |
 | `add_omitted_claim` | Fresh row | Existing independent creation contract |
 
 Every unlisted column remains fixed. Both rows of a combined correction are
@@ -317,6 +319,42 @@ remain byte-for-byte frozen. Existing-duplicate successors must already be
 active formalization targets in the base and must remain unchanged. It rejects
 unrelated registry drift and any correction that introduces
 an axiom, binding, contentless surrogate, or other R4 artifact.
+
+A `retire_duplicate` correction retires a second registry record of the same
+source-atomic assertion without splitting that assertion or treating it as
+nonclaim. Its predecessor is an active formalization target in the exact base,
+has exactly one `mathlib_only` vocabulary review, and has no project-vocabulary
+use rows in either tree. The correction preserves claim columns 1--11,
+including a still-`PENDING` content OID, and changes only the tombstone fields.
+It owns exactly one position-1 `existing_duplicate` edge to a distinct
+same-source active formalization target that already exists in the base and
+remains entirely unchanged. The canonical target may have either reviewed
+vocabulary basis; its complete review rows and use-row set remain fixed even
+when another correction in the same event names that target. Any needed
+canonical repair must be accepted in an earlier separate production event.
+
+Retirement owns no fresh claim, source item or content amendment. Original
+item metadata and all existing item-to-claim relations remain fixed, including
+the predecessor's membership; the canonical is not inserted into that item.
+The source lifecycle in both trees precedes `skeleton_frozen`, and the source
+has no bindings in either tree. The predecessor has no slice, dependency in
+either direction, axiom or claim-context owner/setup relation in either tree.
+Eligibility is checked only against the selected event's base and current
+trees, so historical retirement does not prevent a later reviewed canonical
+amendment. A selected event containing a retirement must carry its own review
+token in the source invariant. Counts and census OID are derived from the
+actual resulting registry, including the preserved equation subkinds and item
+provenance; retirement grants no source-coverage exception.
+
+Independent source review must establish the same source-atomic assertion,
+its faithful context and shared witnesses. Proposition equivalence alone is
+insufficient, and normalized text need not be identical. Machine checks
+validate frozen evidence and ownership, not this mathematical judgment.
+Existing history, source/page fingerprint, vocabulary, R4, invariant and
+ordinary base-diff rules remain in force. This initial capability does not
+admit project-vocabulary predecessors; extending that boundary requires a
+separate reviewed capability change. Infrastructure acceptance does not
+accept a source retirement event.
 
 An omitted-claim addition requires exactly one owning closed
 `exact_statement_readiness` review with the matching action, event, source and
@@ -810,7 +848,7 @@ It checks the written merge gate and an unchecked `USER ONLY` box.
 It exercises generated positive and negative runtime cases without committed
 fixture data.
 The correction suites cover classification-only, content-only, combined
-content/classification, exclusion, split and omitted-claim transition families and
+content/classification, exclusion, split, duplicate retirement and omitted-claim transition families and
 negative cases for review, event-source ownership, manifest completeness,
 successor provenance and ID freshness, stable source-item additions, nested
 order keys, item and vocabulary propagation, immutable rows and OIDs, derived
@@ -834,6 +872,13 @@ Shared-item cases exercise independently created omissions within one named
 item, canonical first-relation ownership, per-member provenance and uniqueness,
 strict split ownership, unchanged public generation and privacy, frozen later
 item/history relations, and a later reviewed amendment of one grouped member.
+Duplicate-retirement cases exercise the initial mathlib-only predecessor
+boundary, an unchanged project-vocabulary canonical, direct canonical review
+and use preservation despite same-event correction ownership, pre-R4 and
+unreferenced-predecessor eligibility, preserved original item membership,
+exact event invariant review, and all six ledger prefixes. A real temporary
+Git chain exercises earlier canonical repair, retirement, ordinary historical
+fallback and later canonical amendment through the actual selector and guards.
 The CI-selector suite separately checks the one-shot correction route,
 historical-event fallback to normal mode, a later event, merge-base mismatch rejection,
 multiple-new-event rejection, and invalid-base rejection.
