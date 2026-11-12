@@ -15,15 +15,15 @@ The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
 progress begins in `registry/`. Its global checker capability is `vocabulary`,
 while each source advances independently through `source-progress.tsv`;
 `TASAKI2020` is `vocabulary_reviewed`. Its corrected corpus ledger contains all
-534 physical PDF pages, 3,231 active atomic claims, 3,214 formalization
+534 physical PDF pages, 3,230 active atomic claims, 3,213 formalization
 targets, 1,401 unique equation-label/page pairs, and 63 pages with no claim.
-Thirteen superseded records preserve the provenance of compound or duplicate
+Fourteen superseded records preserve the provenance of compound or duplicate
 claims, while seventeen active records are explicitly classified `out_of_scope`.
 The only production Lean tree is limited to the registered vocabulary modules and their
 root. Checker cases are generated only under isolated system temporary roots;
 the repository contains no tracked fixture tree.
 
-The vocabulary reviews classify all 3,214 formalization targets: 3,212 are
+The vocabulary reviews classify all 3,213 formalization targets: 3,211 are
 `mathlib_only`, while claims `CL-TASAKI2020-2487` and
 `CL-TASAKI2020-2488` require project vocabulary. The registered vocabulary is
 exactly `partialTraceRight` and `partialTraceLeft`, with four claim-to-vocabulary
@@ -141,11 +141,11 @@ statement-readiness reviews: five identity-preserving content repairs, one
 combined definition and content repair, two exclusions, and seven previously
 omitted atomic claims. Four new source items preserve the additions' provenance;
 the other three additions join their existing source items. The canonical
-spectral-equation record is repaired, while its duplicate corollary record
-remains unchanged and pending. A separate later retirement requires this
-canonical repair to be independently accepted in production first. This event
-does not close the whole unit or certify printed proofs, external-reference
-proofs, or R4 readiness.
+spectral-equation record carries the repaired shared witness contract. A
+separate reviewed event retires the duplicate corollary record in favor of
+that unchanged canonical record, preserving both original source items and
+memberships. These events do not certify printed proofs, external-reference
+proofs, whole-source fidelity, or R4 readiness.
 These bounded registry corrections do not certify printed proofs,
 whole-source fidelity, or R4 readiness.
 
