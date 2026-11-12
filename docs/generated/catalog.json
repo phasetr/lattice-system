@@ -613,12 +613,16 @@
         "IT-TASAKI2020-0552",
         "IT-TASAKI2020-0553",
         "IT-TASAKI2020-0554",
+        "IT-TASAKI2020-3063",
         "IT-TASAKI2020-0555",
+        "IT-TASAKI2020-3064",
+        "IT-TASAKI2020-3065",
         "IT-TASAKI2020-0556",
         "IT-TASAKI2020-0557",
         "IT-TASAKI2020-0558",
         "IT-TASAKI2020-0559",
         "IT-TASAKI2020-0560",
+        "IT-TASAKI2020-3066",
         "IT-TASAKI2020-0561",
         "IT-TASAKI2020-0562",
         "IT-TASAKI2020-0563",
@@ -21948,6 +21952,23 @@
           "successor_claim": "NONE",
           "vocabulary_basis": "mathlib_only",
           "vocabulary_status": "vocabulary_ready"
+        },
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-3495",
+          "disposition": "assertion",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "unnumbered_obligation",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
         }
       ],
       "item_id": "IT-TASAKI2020-0553",
@@ -21979,6 +22000,23 @@
           "successor_claim": "NONE",
           "vocabulary_basis": "mathlib_only",
           "vocabulary_status": "vocabulary_ready"
+        },
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-3496",
+          "disposition": "assertion",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "unnumbered_obligation",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
         }
       ],
       "item_id": "IT-TASAKI2020-0554",
@@ -21997,8 +22035,39 @@
         {
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
-          "claim_id": "CL-TASAKI2020-0552",
+          "claim_id": "CL-TASAKI2020-3497",
           "disposition": "assertion",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "unnumbered_obligation",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
+        }
+      ],
+      "item_id": "IT-TASAKI2020-3063",
+      "item_kind": "unlabeled",
+      "locator": "PDF p. 108; print p. 95; §4.2.1; sentence beginning Since M squared in the continuation after equation (4.2.5) and the bond-count sentence; local energy convergence before equation (4.2.6)",
+      "order_key": "000108.0002.0002",
+      "page_id": "PG-TASAKI2020-0108",
+      "public_group": "Chapter 04",
+      "public_slug": "chapter-04",
+      "source_id": "TASAKI2020",
+      "source_label": "NONE",
+      "title": "NONE"
+    },
+    {
+      "claims": [
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-0552",
+          "disposition": "definition",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -22021,6 +22090,68 @@
       "public_slug": "chapter-04",
       "source_id": "TASAKI2020",
       "source_label": "equation (4.2.6)",
+      "title": "NONE"
+    },
+    {
+      "claims": [
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-3498",
+          "disposition": "assertion",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "unnumbered_obligation",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
+        }
+      ],
+      "item_id": "IT-TASAKI2020-3064",
+      "item_kind": "footnote",
+      "locator": "PDF p. 108; print p. 95; §4.2.1; Footnote 16",
+      "order_key": "000108.0003.0001",
+      "page_id": "PG-TASAKI2020-0108",
+      "public_group": "Chapter 04",
+      "public_slug": "chapter-04",
+      "source_id": "TASAKI2020",
+      "source_label": "Footnote 16",
+      "title": "NONE"
+    },
+    {
+      "claims": [
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-3499",
+          "disposition": "definition",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "definition",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
+        }
+      ],
+      "item_id": "IT-TASAKI2020-3065",
+      "item_kind": "unlabeled",
+      "locator": "PDF p. 108; print p. 95; §4.2.1; paragraph beginning We shall regard; local bond-energy characterization",
+      "order_key": "000108.0003.0002",
+      "page_id": "PG-TASAKI2020-0108",
+      "public_group": "Chapter 04",
+      "public_slug": "chapter-04",
+      "source_id": "TASAKI2020",
+      "source_label": "NONE",
       "title": "NONE"
     },
     {
@@ -22153,7 +22284,7 @@
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-0557",
-          "disposition": "assertion",
+          "disposition": "out_of_scope",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -22163,8 +22294,8 @@
           "statement_module": "NONE",
           "subkind": "equation",
           "successor_claim": "NONE",
-          "vocabulary_basis": "mathlib_only",
-          "vocabulary_status": "vocabulary_ready"
+          "vocabulary_basis": "not_reviewed",
+          "vocabulary_status": "not_reviewed"
         }
       ],
       "item_id": "IT-TASAKI2020-0560",
@@ -22183,7 +22314,55 @@
         {
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-3501",
+          "disposition": "assertion",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "unnumbered_obligation",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
+        }
+      ],
+      "item_id": "IT-TASAKI2020-3066",
+      "item_kind": "unlabeled",
+      "locator": "PDF p. 109; print p. 96; §4.2.1; Ising-gap comparison sentence after equation (4.2.8) and before Remark; open-chain model (3.3.1), corrected exponential scale",
+      "order_key": "000109.0002.0001",
+      "page_id": "PG-TASAKI2020-0109",
+      "public_group": "Chapter 04",
+      "public_slug": "chapter-04",
+      "source_id": "TASAKI2020",
+      "source_label": "NONE",
+      "title": "NONE"
+    },
+    {
+      "claims": [
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-0558",
+          "disposition": "out_of_scope",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "remark",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "not_reviewed",
+          "vocabulary_status": "not_reviewed"
+        },
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-3500",
           "disposition": "assertion",
           "lifecycle": "active",
           "proof_declaration": "NONE",
@@ -101120,12 +101299,12 @@
     "vocabulary_status": "vocabulary_ready requires both a review row and a vocabulary-reviewed-or-later source lifecycle; review_staged is not ready"
   },
   "summary": {
-    "active_claims": 3224,
+    "active_claims": 3231,
     "claim_vocabulary_links": 4,
-    "formalization_target_claims": 3209,
-    "mathlib_only_claims": 3207,
+    "formalization_target_claims": 3214,
+    "mathlib_only_claims": 3212,
     "project_vocabulary_claims": 2,
-    "source_items": 3062,
+    "source_items": 3066,
     "tombstoned_claims": 13,
     "vocabulary_declarations": 2
   },
