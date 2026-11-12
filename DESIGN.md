@@ -11,7 +11,7 @@ independently through `registry/source-progress.tsv`.
 `TASAKI2020` is currently `vocabulary_reviewed`; its corrected, reconciled, and
 frozen census contains 534 physical PDF pages, 3,224 active atomic claims,
 3,209 formalization targets, 1,401 unique equation-label/page pairs, and 63
-pages with no claim. Twelve additional rows are reviewed tombstones.
+pages with no claim. Thirteen additional rows are reviewed tombstones.
 The current tree has the two R3 vocabulary definitions required by that source.
 There are no source-claim theorem statements, proofs, or intended axioms yet.
 Their type and declaration OIDs, direct imports, and elaborated environment
@@ -45,13 +45,14 @@ plus sector placement and pairwise orthogonality in their shared prose unit.
 The accepted subset preserves its nine outcomes without adding the later
 tower-energy result. A separate event repairs the existing canonical
 energy-display record with its full source context, index domains, uniform
-positive constants, and explicit nonzero-numerator premise. The compound
-theorem record remains unchanged until a later split can reuse the corrected
-energy record as an unchanged canonical duplicate in that event's exact base.
-This separate correction adds no definedness successor. The modal
-physical-state discussion remains coverage-only.
-These corrections do not complete integration of the broader source unit,
-certify printed proofs, or establish R4 readiness.
+positive constants, and explicit nonzero-numerator premise. A subsequent
+split retires the compound theorem record, adds one definedness successor in
+its existing theorem item, and reuses the corrected energy record unchanged
+as the canonical duplicate. The separate definedness and conditional-energy
+outcomes retain the original jointly witnessed statement through a common
+cutoff. The modal physical-state discussion remains coverage-only.
+These bounded registry corrections do not certify printed proofs,
+whole-source fidelity, or R4 readiness.
 
 No claim is represented merely because its source PDF exists locally.
 The registries are authoritative only for facts they explicitly record.

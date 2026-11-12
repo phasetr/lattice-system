@@ -17,7 +17,7 @@ while each source advances independently through `source-progress.tsv`;
 `TASAKI2020` is `vocabulary_reviewed`. Its corrected corpus ledger contains all
 534 physical PDF pages, 3,224 active atomic claims, 3,209 formalization
 targets, 1,401 unique equation-label/page pairs, and 63 pages with no claim.
-Twelve superseded records preserve the provenance of compound or duplicate
+Thirteen superseded records preserve the provenance of compound or duplicate
 claims, while fifteen active records are explicitly classified `out_of_scope`.
 The only production Lean tree is limited to the registered vocabulary modules and their
 root. Checker cases are generated only under isolated system temporary roots;
@@ -130,13 +130,14 @@ plus sector placement and pairwise orthogonality in their shared prose unit.
 The accepted subset preserves its nine outcomes without adding the later
 tower-energy result. A separate event repairs the existing canonical
 energy-display record with its full source context, index domains, uniform
-positive constants, and explicit nonzero-numerator premise. The compound
-theorem record remains unchanged until a later split can reuse the corrected
-energy record as an unchanged canonical duplicate in that event's exact base.
-This separate correction adds no definedness successor. The modal
-physical-state discussion remains coverage-only.
-These corrections do not complete integration of the broader source unit,
-certify printed proofs, or establish R4 readiness.
+positive constants, and explicit nonzero-numerator premise. A subsequent
+split retires the compound theorem record, adds one definedness successor in
+its existing theorem item, and reuses the corrected energy record unchanged
+as the canonical duplicate. The separate definedness and conditional-energy
+outcomes retain the original jointly witnessed statement through a common
+cutoff. The modal physical-state discussion remains coverage-only.
+These bounded registry corrections do not certify printed proofs,
+whole-source fidelity, or R4 readiness.
 
 The sixth ledger, `claim-content-amendments.tsv`, records seventy-four reviewed
 pre-R4 amendments, including actual old and new content hashes, frozen

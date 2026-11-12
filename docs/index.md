@@ -7,7 +7,7 @@ publish private source paths and object identifiers.
 - Current phase: `vocabulary`
 - Active atomic claims: 3224
 - Formalization targets: 3209
-- Superseded claim records: 12
+- Superseded claim records: 13
 - Reviewed source items: 3062
 - Mathlib-only claims: 3207
 - Project-vocabulary claims: 2

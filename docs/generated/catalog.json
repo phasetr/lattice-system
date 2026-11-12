@@ -21858,6 +21858,23 @@
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-0548",
           "disposition": "assertion",
+          "lifecycle": "superseded",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "theorem",
+          "successor_claim": "CL-TASAKI2020-3494",
+          "vocabulary_basis": "not_reviewed",
+          "vocabulary_status": "not_reviewed"
+        },
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-3494",
+          "disposition": "assertion",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -101109,7 +101126,7 @@
     "mathlib_only_claims": 3207,
     "project_vocabulary_claims": 2,
     "source_items": 3062,
-    "tombstoned_claims": 12,
+    "tombstoned_claims": 13,
     "vocabulary_declarations": 2
   },
   "tracks": [
