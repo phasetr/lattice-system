@@ -165,6 +165,17 @@ claim identity. It retains the content, provenance, pre-R4 and vocabulary gates,
 with exact historical ledger bytes and order preserved. Capability infrastructure
 and source corrections remain separate changes. Every source correction requires
 its own design, review and acceptance.
+
+The permanent protocol also supports reviewed `retire_duplicate` corrections
+for duplicate records of one source-atomic assertion. This initial capability
+is limited to active pre-R4 predecessors reviewed as `mathlib_only`, with no
+project-vocabulary uses. It preserves the original claim and item provenance,
+records one unchanged existing canonical target, and creates no new claim.
+The canonical target may use existing project vocabulary, whose declarations,
+reviews and uses remain unchanged. Duplicate identity requires independent
+source review. Capability infrastructure does not itself retire a production
+claim or certify a source unit.
+
 CI selects this exceptional transition only while the event is new and its
 recorded base equals the actual merge base. Later pull requests automatically
 use the ordinary immutable base-diff path.

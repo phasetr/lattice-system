@@ -72,8 +72,8 @@ awk -F '\t' -v s="$EVENT_SOURCE" 'FNR>1&&$1==s{n++}END{exit n!=1}' "$CURRENT_REG
 freeze(){ local f=$1 ec=$2; [[ -f "$BASE_REG/$f" ]] || return 0; cmp -s "$BASE_REG/$f" <(head -c "$(wc -c < "$BASE_REG/$f")" "$CURRENT_REG/$f") || fail "historical correction ledger drift"; awk -F '\t' -v e="$EVENT" -v ec="$ec" 'NR==FNR{if(FNR>1){o[$1]=$0;k[$1]=1}next}FNR>1{s[$1]++;if($1 in k){if($0!=o[$1])b=1}else if(ec==0?$1!=e:$ec!=e)b=1}END{for(i in k)if(s[i]!=1)b=1;exit b}' "$BASE_REG/$f" "$CURRENT_REG/$f" || fail "historical correction ledger drift"; }
 freeze correction-events.tsv 0; freeze claim-normalization-reviews.tsv 2; freeze claim-corrections.tsv 2; freeze claim-successors.tsv 2; freeze source-item-additions.tsv 2; freeze claim-content-amendments.tsv 2
 
-awk -F '\t' 'function t(s){return s~/^[A-Za-z0-9][A-Za-z0-9._:#@+-]*$/} FILENAME==ARGV[1]{if(FNR>1){e[$1]=1;r[$1]=$5}next}FNR>1{if(NF!=9||seen[$1]++||!($2 in e)||$3!=++p[$2]||sc[$2 SUBSEP $4]++||$5!="exact_statement_readiness"||$6!~/^(unchanged|reclassify|exclude_nonclaim|split|amend_content|amend_and_reclassify|add_omitted_claim)$/||$7!="closed"||!t($8)||$9!=r[$2])b=1}END{exit b}' "$CURRENT_REG/correction-events.tsv" "$CURRENT_REG/claim-normalization-reviews.tsv" || fail "invalid claim normalization review ledger"
-awk -F '\t' 'FILENAME==ARGV[1]{if(FNR>1)e[$1]=1;next}FILENAME==ARGV[2]{if(FNR>1){r[$1]=1;re[$1]=$2;rc[$1]=$4;ro[$1]=$6}next}FNR>1{if(NF!=10||seen[$1]++||!($2 in e)||$3!=++p[$2]||!($4 in r)||re[$4]!=$2||rc[$4]!=$5||$6!~/^(reclassify|exclude_nonclaim|split|amend_content|amend_and_reclassify|add_omitted_claim)$/||ro[$4]!=$6||sr[$4]++||sc[$2 SUBSEP $5]++)b=1}END{for(i in r){if(ro[i]=="unchanged"&&sr[i])b=1;if(ro[i]!="unchanged"&&sr[i]!=1)b=1}exit b}' "$CURRENT_REG/correction-events.tsv" "$CURRENT_REG/claim-normalization-reviews.tsv" "$CURRENT_REG/claim-corrections.tsv" || fail "invalid claim correction ledger"
+awk -F '\t' 'function t(s){return s~/^[A-Za-z0-9][A-Za-z0-9._:#@+-]*$/} FILENAME==ARGV[1]{if(FNR>1){e[$1]=1;r[$1]=$5}next}FNR>1{if(NF!=9||seen[$1]++||!($2 in e)||$3!=++p[$2]||sc[$2 SUBSEP $4]++||$5!="exact_statement_readiness"||$6!~/^(unchanged|reclassify|exclude_nonclaim|split|amend_content|amend_and_reclassify|retire_duplicate|add_omitted_claim)$/||$7!="closed"||!t($8)||$9!=r[$2])b=1}END{exit b}' "$CURRENT_REG/correction-events.tsv" "$CURRENT_REG/claim-normalization-reviews.tsv" || fail "invalid claim normalization review ledger"
+awk -F '\t' 'FILENAME==ARGV[1]{if(FNR>1)e[$1]=1;next}FILENAME==ARGV[2]{if(FNR>1){r[$1]=1;re[$1]=$2;rc[$1]=$4;ro[$1]=$6}next}FNR>1{if(NF!=10||seen[$1]++||!($2 in e)||$3!=++p[$2]||!($4 in r)||re[$4]!=$2||rc[$4]!=$5||$6!~/^(reclassify|exclude_nonclaim|split|amend_content|amend_and_reclassify|retire_duplicate|add_omitted_claim)$/||ro[$4]!=$6||sr[$4]++||sc[$2 SUBSEP $5]++)b=1}END{for(i in r){if(ro[i]=="unchanged"&&sr[i])b=1;if(ro[i]!="unchanged"&&sr[i]!=1)b=1}exit b}' "$CURRENT_REG/correction-events.tsv" "$CURRENT_REG/claim-normalization-reviews.tsv" "$CURRENT_REG/claim-corrections.tsv" || fail "invalid claim correction ledger"
 
 awk -F '\t' -v e="$EVENT" -v source="$EVENT_SOURCE" '
   FILENAME==ARGV[1]{if(FNR>1)s[$1]=$2;next}
@@ -92,6 +92,84 @@ review_check=$(awk -F '\t' -v e="$EVENT" -v source="$EVENT_SOURCE" '
 [[ "$review_check" != creation ]] || fail "omitted claim must introduce a fresh claim ID"
 [[ "$review_check" != unknown ]] || fail "normalization review targets an unknown claim"
 [[ "$review_check" != source ]] || fail "normalization review source mismatch"
+
+# Eligibility is checked only for the selected event, never against the latest
+# state of a historical retirement. In particular a later reviewed event may
+# amend its canonical claim without reopening the retirement exception.
+python3 - "$BASE" "$CURRENT" "$EVENT" "$EVENT_SOURCE" <<'PY'
+import csv
+from pathlib import Path
+import sys
+
+base, current = map(Path, sys.argv[1:3])
+event, source = sys.argv[3:]
+
+def rows(root, name):
+    path = root / 'registry' / name
+    if not path.exists():
+        return []
+    with path.open(newline='', encoding='utf-8') as stream:
+        return list(csv.reader(stream, delimiter='\t', quoting=csv.QUOTE_NONE))[1:]
+
+def fail(message):
+    raise SystemExit('check-claim-corrections: ' + message)
+
+actions = [r for r in rows(current, 'claim-corrections.tsv')
+           if r[1] == event and r[5] == 'retire_duplicate']
+if not actions:
+    raise SystemExit(0)
+claims = {root: {r[0]: r for r in rows(root, 'claims.tsv')} for root in (base, current)}
+formal = {'assertion', 'definition', 'notation', 'hypothesis', 'domain', 'conjecture'}
+for root in (base, current):
+    progress = [r for r in rows(root, 'source-progress.tsv') if r[0] == source]
+    if (len(progress) != 1 or progress[0][1] not in
+            {'registered', 'source_frozen', 'census_pass1', 'census_pass2',
+             'census_reconciled', 'vocabulary_reviewed'}):
+        fail('duplicate retirement requires a pre-R4 source')
+    if any(r[0] in claims[root] and claims[root][r[0]][1] == source
+           for r in rows(root, 'bindings.tsv')):
+        fail('duplicate retirement source already has bindings')
+for action in actions:
+    identifier = action[4]
+    old = claims[base].get(identifier)
+    new = claims[current].get(identifier)
+    if (old is None or new is None or len(old) != 15 or len(new) != 15 or
+            old[1] != source or new[1] != source or
+            old[5] not in formal or old[9:] != ['NONE', 'NONE', 'false', 'NONE', 'NONE', 'NONE']):
+        fail('duplicate retirement requires a frozen active formal predecessor')
+    basis = [r for r in rows(base, 'claim-vocabulary-review.tsv') if r[0] == identifier]
+    if len(basis) != 1 or basis[0][1] != 'mathlib_only':
+        fail('duplicate retirement requires exactly one base mathlib_only review')
+    for root in (base, current):
+        if any(r[0] == identifier for r in rows(root, 'claim-vocabulary.tsv')):
+            fail('duplicate retirement predecessor has vocabulary uses')
+        for name, columns in [('slices.tsv', (2,)), ('dependencies.tsv', (0, 2)),
+                              ('claim-axioms.tsv', (0,)), ('claim-context.tsv', (0, 2))]:
+            if any(any(r[column] == identifier for column in columns) for r in rows(root, name)):
+                fail('duplicate retirement predecessor has skeleton or axiom relations')
+    edges = [r for r in rows(current, 'claim-successors.tsv') if r[1] == event and r[2] == action[0]]
+    if (len(edges) != 1 or edges[0][3:6] != [identifier, '1', 'existing_duplicate'] or
+            edges[0][6] == identifier):
+        fail('duplicate retirement requires one existing successor at position 1')
+    canonical = edges[0][6]
+    before, after = claims[base].get(canonical), claims[current].get(canonical)
+    if (before is None or after is None or before[1] != source or after[1] != source or
+            before[5] not in formal or after[5] not in formal or
+            before[11] != 'false' or after[11] != 'false'):
+        fail('duplicate retirement canonical is not a frozen same-source active formal target')
+    if before != after:
+        fail('existing duplicate successor drift')
+    # Direct comparisons must not inherit the generic unrelated-row filter:
+    # another correction in this event may itself name the canonical target.
+    for name, diagnostic in [('claim-vocabulary-review.tsv', 'review'), ('claim-vocabulary.tsv', 'use')]:
+        old_rows = sorted(r for r in rows(base, name) if r[0] == canonical)
+        new_rows = sorted(r for r in rows(current, name) if r[0] == canonical)
+        if old_rows != new_rows:
+            fail('duplicate retirement canonical vocabulary ' + diagnostic + ' drift')
+    for name in ('source-item-additions.tsv', 'claim-content-amendments.tsv'):
+        if any(r[1] == event and r[2] == action[0] for r in rows(current, name)):
+            fail('duplicate retirement cannot own source items or content amendments')
+PY
 
 python3 "$SCRIPT_DIR/check-content-amendments.py" --transition "$BASE" "$CURRENT" "$EVENT" >/dev/null
 
@@ -121,7 +199,7 @@ awk -F '\t' -v e="$EVENT" '
  FILENAME==ARGV[3]{if(FNR>1){cur[$1]=$0;ck[$1]=1;nd[$1]=$6;ns[$1]=$7;ct[$1]=$8;oid[$1]=$9;ex[$1]=$10;xr[$1]=$11;tm[$1]=$12;su[$1]=$13;tr[$1]=$14;tv[$1]=$15}next}
  FILENAME==ARGV[4]{if(FNR>1&&$2==e){a[$5]=$6;c[$5]=1;lod[$5]=$7;los[$5]=$8;lnd[$5]=$9;lns[$5]=$10;rid[$5]=$4}next}
  END{
-  for(id in ok){if(!(id in ck))bad("unmanifested claim drift");if(!(id in c)){if(old[id]!=cur[id])bad("unmanifested claim drift");continue} if(out[id]!=a[id])bad("correction lacks owning review");if(lod[id]!=od[id]||los[id]!=os[id]||lnd[id]!=nd[id]||lns[id]!=ns[id])bad("correction ledger does not match claim transition");n=split(old[id],x,"\t");split(cur[id],y,"\t");if(a[id]=="reclassify"){for(i=1;i<=n;i++)if(i!=6&&i!=7&&x[i]!=y[i])bad("unmanifested claim drift");if(tm[id]!="false"||ex[id]!="NONE"||xr[id]!="NONE")bad("invalid reclassify transition")}else if(a[id]=="amend_content"){for(i=1;i<=n;i++)if(i!=8&&i!=9&&x[i]!=y[i])bad("unmanifested claim drift")}else if(a[id]=="amend_and_reclassify"){for(i=1;i<=n;i++)if(i!=6&&i!=7&&i!=8&&i!=9&&x[i]!=y[i])bad("unmanifested claim drift")}else if(a[id]=="exclude_nonclaim"){for(i=1;i<=n;i++)if(i!=6&&i!=10&&i!=11&&x[i]!=y[i])bad("unmanifested claim drift");if(nd[id]!="out_of_scope"||ns[id]!=os[id]||tm[id]!="false"||ex[id]!=rat[id]||xr[id]!=ref[id])bad("invalid nonclaim exclusion")}else{for(i=1;i<=n;i++)if(i<12&&x[i]!=y[i])bad("unmanifested claim drift");if(nd[id]!=od[id]||ns[id]!=os[id]||tm[id]!="true"||su[id]=="NONE"||tr[id]!=rat[id]||tv[id]!=ref[id])bad("invalid split transition")}}
+  for(id in ok){if(!(id in ck))bad("unmanifested claim drift");if(!(id in c)){if(old[id]!=cur[id])bad("unmanifested claim drift");continue} if(out[id]!=a[id])bad("correction lacks owning review");if(lod[id]!=od[id]||los[id]!=os[id]||lnd[id]!=nd[id]||lns[id]!=ns[id])bad("correction ledger does not match claim transition");n=split(old[id],x,"\t");split(cur[id],y,"\t");if(a[id]=="reclassify"){for(i=1;i<=n;i++)if(i!=6&&i!=7&&x[i]!=y[i])bad("unmanifested claim drift");if(tm[id]!="false"||ex[id]!="NONE"||xr[id]!="NONE")bad("invalid reclassify transition")}else if(a[id]=="amend_content"){for(i=1;i<=n;i++)if(i!=8&&i!=9&&x[i]!=y[i])bad("unmanifested claim drift")}else if(a[id]=="amend_and_reclassify"){for(i=1;i<=n;i++)if(i!=6&&i!=7&&i!=8&&i!=9&&x[i]!=y[i])bad("unmanifested claim drift")}else if(a[id]=="exclude_nonclaim"){for(i=1;i<=n;i++)if(i!=6&&i!=10&&i!=11&&x[i]!=y[i])bad("unmanifested claim drift");if(nd[id]!="out_of_scope"||ns[id]!=os[id]||tm[id]!="false"||ex[id]!=rat[id]||xr[id]!=ref[id])bad("invalid nonclaim exclusion")}else if(a[id]=="retire_duplicate"){for(i=1;i<=n;i++)if(i<12&&x[i]!=y[i])bad("unmanifested claim drift");if(nd[id]!=od[id]||ns[id]!=os[id]||tm[id]!="true"||su[id]=="NONE"||tr[id]!=rat[id]||tv[id]!=ref[id])bad("invalid duplicate retirement transition")}else{for(i=1;i<=n;i++)if(i<12&&x[i]!=y[i])bad("unmanifested claim drift");if(nd[id]!=od[id]||ns[id]!=os[id]||tm[id]!="true"||su[id]=="NONE"||tr[id]!=rat[id]||tv[id]!=ref[id])bad("invalid split transition")}}
   for(id in c)if(!(id in ok)){if(a[id]!="add_omitted_claim")bad("correction targets an unknown frozen claim");else if(!(id in ck)||lod[id]!="NONE"||los[id]!="NONE"||lnd[id]!=nd[id]||lns[id]!=ns[id])bad("invalid omitted claim transition")};for(id in ck)if(!(id in ok)){if(ct[id]~/^[[:space:]]*(True|False)[.]?[[:space:]]*$/||ct[id]=="")bad("contentless correction surrogate");if(oid[id]!~/^[0-9a-f]{40}$/)bad("new correction successor lacks a frozen content OID");if(tm[id]!="false"||ex[id]!="NONE"||xr[id]!="NONE")bad("new correction successor is not active")};exit failed}
  function bad(s){print s>"/dev/stderr";failed=1}
 ' "$CURRENT_REG/claim-normalization-reviews.tsv" "$BASE_REG/claims.tsv" "$CURRENT_REG/claims.tsv" "$CURRENT_REG/claim-corrections.tsv" || fail "unmanifested claim drift"
@@ -151,7 +229,7 @@ case "$successor_check" in
 esac
 
 awk -F '\t' -v e="$EVENT" '
- FILENAME==ARGV[1]{if(FNR>1)o[$1]=1;next}FILENAME==ARGV[2]{if(FNR>1){c[$1]=1;t[$1]=$12;s[$1]=$13}next}FILENAME==ARGV[3]{if(FNR>1&&$2==e){co[$1]=1;a[$1]=$6;p[$1]=$5;if($6=="add_omitted_claim")add[$5]++}next}FNR==1{next}$2==e{if(NF!=7||se[$1]++||!($3 in co)||p[$3]!=$4||a[$3]!="split")bad("successor provenance has no split correction");z=$5+0;if($5!~/^[1-9][0-9]*$/||z!=++n[$3]||sp[$3 SUBSEP z]++)bad("duplicate or noncontiguous successor position");if($6!~/^(new_successor|existing_duplicate)$/)bad("bad successor relation");if(!($7 in c))bad("unknown correction successor");if($6=="new_successor"&&($7 in o))bad("new successor reuses a frozen claim ID");if($6=="existing_duplicate"&&!($7 in o))bad("existing duplicate is not frozen");if(ss[$3 SUBSEP $7]++)bad("duplicate correction successor");if(z==1)first[$4]=$7;if($6=="new_successor"){nn[$3]++;newOwner[$7]++};succ[$7]=$6}END{for(x in co)if(a[x]=="split"&&(n[x]==0||nn[x]==0))bad(n[x]==0?"split successor provenance is incomplete":"split requires a new successor");for(x in c)if(!(x in o)){if(add[x]&&newOwner[x])bad("new claim has both addition and successor ownership");else if(add[x]+newOwner[x]!=1)bad("split successor provenance is incomplete")};for(x in first){if(t[x]!="true")bad("successor predecessor is not tombstoned");if(s[x]!=first[x])bad("tombstone does not name its first successor")};exit failed}function bad(s){print s>"/dev/stderr";failed=1}
+ FILENAME==ARGV[1]{if(FNR>1)o[$1]=1;next}FILENAME==ARGV[2]{if(FNR>1){c[$1]=1;t[$1]=$12;s[$1]=$13}next}FILENAME==ARGV[3]{if(FNR>1&&$2==e){co[$1]=1;a[$1]=$6;p[$1]=$5;if($6=="add_omitted_claim")add[$5]++}next}FNR==1{next}$2==e{if(NF!=7||se[$1]++||!($3 in co)||p[$3]!=$4||(a[$3]!="split"&&a[$3]!="retire_duplicate"))bad("successor provenance has no split or duplicate retirement correction");z=$5+0;if($5!~/^[1-9][0-9]*$/||z!=++n[$3]||sp[$3 SUBSEP z]++)bad("duplicate or noncontiguous successor position");if($6!~/^(new_successor|existing_duplicate)$/)bad("bad successor relation");if(!($7 in c))bad("unknown correction successor");if($6=="new_successor"&&($7 in o))bad("new successor reuses a frozen claim ID");if($6=="existing_duplicate"&&!($7 in o))bad("existing duplicate is not frozen");if(ss[$3 SUBSEP $7]++)bad("duplicate correction successor");if(z==1)first[$4]=$7;if($6=="new_successor"){nn[$3]++;newOwner[$7]++};succ[$7]=$6}END{for(x in co)if(a[x]=="split"&&(n[x]==0||nn[x]==0))bad(n[x]==0?"split successor provenance is incomplete":"split requires a new successor");for(x in c)if(!(x in o)){if(add[x]&&newOwner[x])bad("new claim has both addition and successor ownership");else if(add[x]+newOwner[x]!=1)bad("split successor provenance is incomplete")};for(x in first){if(t[x]!="true")bad("successor predecessor is not tombstoned");if(s[x]!=first[x])bad("tombstone does not name its first successor")};exit failed}function bad(s){print s>"/dev/stderr";failed=1}
 ' "$BASE_REG/claims.tsv" "$CURRENT_REG/claims.tsv" "$CURRENT_REG/claim-corrections.tsv" "$CURRENT_REG/claim-successors.tsv" || fail "split successor provenance is incomplete"
 
 while IFS= read -r id; do content=$(awk -F '\t' -v id="$id" '$1==id{print $8;exit}' "$CURRENT_REG/claims.tsv"); recorded=$(awk -F '\t' -v id="$id" '$1==id{print $9;exit}' "$CURRENT_REG/claims.tsv"); [[ "$recorded" == "$(printf '%s' "$content"|git hash-object --stdin)" ]] || fail "new correction successor content OID is stale"; done < <(awk -F '\t' -v e="$EVENT" 'FNR>1&&$2==e&&$6=="new_successor"{print $7}' "$CURRENT_REG/claim-successors.tsv")
@@ -250,6 +328,9 @@ awk -F '\t' -v s="$EVENT_SOURCE" '
 ' "$BASE_REG/source-invariants.tsv" "$CURRENT_REG/source-invariants.tsv" || fail "unrelated source invariant drift"
 IFS=$'\t' read -r source pages ra rt re rem ro rr < <(awk -F '\t' -v s="$EVENT_SOURCE" 'FNR>1&&$1==s{print}' "$CURRENT_REG/source-invariants.tsv")
 [[ "$source" == "$EVENT_SOURCE" ]] || fail "correction event source mismatch"
+if awk -F '\t' -v e="$EVENT" 'FNR>1&&$2==e&&$6=="retire_duplicate"{found=1}END{exit !found}' "$CURRENT_REG/claim-corrections.tsv"; then
+  [[ "$rr" == "$EVENT_REVIEW" ]] || fail "duplicate retirement lacks its event invariant review"
+fi
 aa=$(awk -F '\t' -v s="$EVENT_SOURCE" 'FNR>1&&$2==s&&$12=="false"{n++}END{print n+0}' "$CURRENT_REG/claims.tsv"); at=$(awk -F '\t' -v s="$EVENT_SOURCE" 'FNR>1&&$2==s&&$12=="false"&&$6!="out_of_scope"{n++}END{print n+0}' "$CURRENT_REG/claims.tsv"); ae=$(awk -F '\t' -v s="$EVENT_SOURCE" 'FNR>1&&$2==s&&$12=="false"&&$7=="equation"{n++}END{print n+0}' "$CURRENT_REG/claims.tsv"); am=$(awk -F '\t' -v s="$EVENT_SOURCE" 'NR==FNR{if(FNR>1&&$2==s)p[$1]=1;next}FNR>1&&$2==s&&$12=="false"{u[$4]=1}END{for(i in p)if(!(i in u))n++;print n+0}' "$CURRENT_REG/pages.tsv" "$CURRENT_REG/claims.tsv")
 [[ "$ra" == "$aa" && "$re" == "$ae" && "$rem" == "$am" ]] || fail "census invariant count is stale"
 [[ "$rt" == "$at" ]] || fail "formalization target count is stale"
