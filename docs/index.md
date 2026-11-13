@@ -6,10 +6,10 @@ publish private source paths and object identifiers.
 
 - Current phase: `vocabulary`
 - Active atomic claims: 3237
-- Formalization targets: 3214
-- Superseded claim records: 14
+- Formalization targets: 3211
+- Superseded claim records: 16
 - Reviewed source items: 3073
-- Mathlib-only claims: 3212
+- Mathlib-only claims: 3209
 - Project-vocabulary claims: 2
 
 See the [generated catalog](generated/index.md). Status values are deliberately

@@ -10,8 +10,8 @@ available for later stages and of each source's frontier. Each source advances
 independently through `registry/source-progress.tsv`.
 `TASAKI2020` is currently `vocabulary_reviewed`; its corrected, reconciled, and
 frozen census contains 534 physical PDF pages, 3,237 active atomic claims,
-3,214 formalization targets, 1,397 distinct source-label/page pairs among active
-claims with subkind `equation`, and 63 pages with no claim. Fourteen additional
+3,211 formalization targets, 1,394 distinct source-label/page pairs among active
+claims with subkind `equation`, and 63 pages with no claim. Sixteen additional
 rows are reviewed tombstones.
 The current tree has the two R3 vocabulary definitions required by that source.
 There are no source-claim theorem statements, proofs, or intended axioms yet.
@@ -71,6 +71,21 @@ claim identities, locators, item metadata, and memberships remain fixed. The
 unit covers the full-symmetry-breaking section through the final proposition
 proof route. It does not certify printed proofs, unresolved source conventions,
 whole-source fidelity, or R4 readiness.
+The first order-parameter comparison core event records eight statement-readiness
+outcomes: one unchanged theorem, one duplicate retirement into that unchanged
+theorem, three nonclaim exclusions, one split into a definition and a conjecture,
+one repair to definition content and classification, and one conjecture
+reclassification preserving its text. It adds two atomic successors to the
+existing conjecture item, preserves all original item metadata and memberships,
+and introduces no source item. Two repaired historical records remain active
+duplicates. Their separate duplicate-only transition under
+[Issue #5542](https://github.com/phasetr/lattice-system/issues/5542) requires
+independent acceptance of the first transition in actual production. The
+footnote 25 model and parameter-domain contract remains unknown under separate
+[BACKLOG #5541](https://github.com/phasetr/lattice-system/issues/5541), with no
+new formalization target. This core event does not certify whole-unit fidelity,
+absence of omissions, mathematical truth, printed-proof correctness, R4, or
+proof completion.
 These bounded registry corrections do not certify printed proofs,
 whole-source fidelity, or R4 readiness.
 
@@ -814,7 +829,7 @@ theorem, `sorry`, `admit`, `native_decide`, or axiom.
 A later lifecycle never disables that source's frozen identity, counts,
 census OID, active-state, source-order, page-coupling, or two-pass census
 invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,237 active
-claims, 3,214 formalization targets, and 1,397 distinct source-label/page pairs
+claims, 3,211 formalization targets, and 1,394 distinct source-label/page pairs
 among active claims with subkind `equation`. The census-capability requirement
 that slices, source-claim dependencies,
 bindings, contexts, axioms, claim-to-axiom relations, statement modules, and
