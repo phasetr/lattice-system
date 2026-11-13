@@ -23820,7 +23820,7 @@
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-0596",
           "disposition": "definition",
-          "lifecycle": "active",
+          "lifecycle": "superseded",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
           "registered_axioms": [],
@@ -23828,9 +23828,9 @@
           "statement_declaration": "NONE",
           "statement_module": "NONE",
           "subkind": "definition",
-          "successor_claim": "NONE",
-          "vocabulary_basis": "mathlib_only",
-          "vocabulary_status": "vocabulary_ready"
+          "successor_claim": "CL-TASAKI2020-3509",
+          "vocabulary_basis": "not_reviewed",
+          "vocabulary_status": "not_reviewed"
         }
       ],
       "item_id": "IT-TASAKI2020-0598",
@@ -23851,7 +23851,7 @@
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-0597",
           "disposition": "conjecture",
-          "lifecycle": "active",
+          "lifecycle": "superseded",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
           "registered_axioms": [],
@@ -23859,9 +23859,9 @@
           "statement_declaration": "NONE",
           "statement_module": "NONE",
           "subkind": "conjecture",
-          "successor_claim": "NONE",
-          "vocabulary_basis": "mathlib_only",
-          "vocabulary_status": "vocabulary_ready"
+          "successor_claim": "CL-TASAKI2020-3510",
+          "vocabulary_basis": "not_reviewed",
+          "vocabulary_status": "not_reviewed"
         }
       ],
       "item_id": "IT-TASAKI2020-0599",
@@ -101557,13 +101557,13 @@
     "vocabulary_status": "vocabulary_ready requires both a review row and a vocabulary-reviewed-or-later source lifecycle; review_staged is not ready"
   },
   "summary": {
-    "active_claims": 3237,
+    "active_claims": 3235,
     "claim_vocabulary_links": 4,
-    "formalization_target_claims": 3211,
-    "mathlib_only_claims": 3209,
+    "formalization_target_claims": 3209,
+    "mathlib_only_claims": 3207,
     "project_vocabulary_claims": 2,
     "source_items": 3073,
-    "tombstoned_claims": 16,
+    "tombstoned_claims": 18,
     "vocabulary_declarations": 2
   },
   "tracks": [
