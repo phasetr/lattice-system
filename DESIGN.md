@@ -80,13 +80,17 @@ existing conjecture item, preserves all original item metadata and memberships,
 and introduces no source item. The separate duplicate-only event retires the two
 repaired historical records into the existing definition and conjecture records.
 The canonical records, vocabulary reviews and uses, and all source-item metadata
-and memberships remain fixed. This completes only the ordered core registry
-correction data in this tree. Independent production integration and new
-automatic CI acceptance remain required before
-[Issue #5542](https://github.com/phasetr/lattice-system/issues/5542) can close. The
-footnote 25 model and parameter-domain contract remains unknown under separate
-[BACKLOG #5541](https://github.com/phasetr/lattice-system/issues/5541), with no
-new formalization target. Neither event certifies whole-unit fidelity,
+and memberships remain fixed.
+Both ordered core transitions are independently accepted in production,
+including faithful integration and each new automatic production CI, and
+[Issue #5542](https://github.com/phasetr/lattice-system/issues/5542) is completed
+and closed. The footnote 25 source contract remains unresolved and tracked in
+[Issue #5541](https://github.com/phasetr/lattice-system/issues/5541). The
+independently reviewed bounded assessment retains the reported source assertion;
+its exact model, objects, parameter domain and relation to the ordered-moment
+definition are not fully resolved. No correction event or new formalization
+target is authorized.
+Neither event certifies whole-unit fidelity,
 absence of omissions, mathematical truth, printed-proof correctness, R4, or
 proof completion.
 These bounded registry corrections do not certify printed proofs,
