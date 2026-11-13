@@ -10,8 +10,8 @@ available for later stages and of each source's frontier. Each source advances
 independently through `registry/source-progress.tsv`.
 `TASAKI2020` is currently `vocabulary_reviewed`; its corrected, reconciled, and
 frozen census contains 534 physical PDF pages, 3,235 active atomic claims,
-3,209 formalization targets, 1,394 distinct source-label/page pairs among active
-claims with subkind `equation`, and 63 pages with no claim. Eighteen additional
+3,209 formalization targets, 1,393 distinct source-label/page pairs among active
+claims with subkind `equation`, and 63 pages with no claim. Twenty additional
 rows are reviewed tombstones.
 The current tree has the two R3 vocabulary definitions required by that source.
 There are no source-claim theorem statements, proofs, or intended axioms yet.
@@ -93,6 +93,18 @@ target is authorized.
 Neither event certifies whole-unit fidelity,
 absence of omissions, mathematical truth, printed-proof correctness, R4, or
 proof completion.
+An infinitesimal-field source event records six statement-readiness outcomes:
+three identity-preserving content repairs, including one combined definition
+reclassification, two compound splits, and one unchanged recalled bound.
+Each split creates its own first-relation successor in its existing source item
+and reuses the unchanged earlier bound for the second relation. The two new
+successors retain distinct theorem and equation provenance; no source item or
+vocabulary declaration is added. Their later duplicate retirement requires
+independently accepted production of this split event and its new automatic CI,
+followed by fresh-base design and review. The definition and conjecture in the
+Remark remain separate. The bounded source normalization explicitly retains
+the footnote-qualified limiting convention; it does not certify printed proofs,
+whole-unit fidelity, absence of omissions, mathematical truth, or R4 readiness.
 These bounded registry corrections do not certify printed proofs,
 whole-source fidelity, or R4 readiness.
 
@@ -836,7 +848,7 @@ theorem, `sorry`, `admit`, `native_decide`, or axiom.
 A later lifecycle never disables that source's frozen identity, counts,
 census OID, active-state, source-order, page-coupling, or two-pass census
 invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,235 active
-claims, 3,209 formalization targets, and 1,394 distinct source-label/page pairs
+claims, 3,209 formalization targets, and 1,393 distinct source-label/page pairs
 among active claims with subkind `equation`. The census-capability requirement
 that slices, source-claim dependencies,
 bindings, contexts, axioms, claim-to-axiom relations, statement modules, and
