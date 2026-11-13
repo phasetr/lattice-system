@@ -9,9 +9,9 @@ currently enabled production contract, independently of checker infrastructure
 available for later stages and of each source's frontier. Each source advances
 independently through `registry/source-progress.tsv`.
 `TASAKI2020` is currently `vocabulary_reviewed`; its corrected, reconciled, and
-frozen census contains 534 physical PDF pages, 3,237 active atomic claims,
-3,211 formalization targets, 1,394 distinct source-label/page pairs among active
-claims with subkind `equation`, and 63 pages with no claim. Sixteen additional
+frozen census contains 534 physical PDF pages, 3,235 active atomic claims,
+3,209 formalization targets, 1,394 distinct source-label/page pairs among active
+claims with subkind `equation`, and 63 pages with no claim. Eighteen additional
 rows are reviewed tombstones.
 The current tree has the two R3 vocabulary definitions required by that source.
 There are no source-claim theorem statements, proofs, or intended axioms yet.
@@ -77,13 +77,16 @@ theorem, three nonclaim exclusions, one split into a definition and a conjecture
 one repair to definition content and classification, and one conjecture
 reclassification preserving its text. It adds two atomic successors to the
 existing conjecture item, preserves all original item metadata and memberships,
-and introduces no source item. Two repaired historical records remain active
-duplicates. Their separate duplicate-only transition under
-[Issue #5542](https://github.com/phasetr/lattice-system/issues/5542) requires
-independent acceptance of the first transition in actual production. The
+and introduces no source item. The separate duplicate-only event retires the two
+repaired historical records into the existing definition and conjecture records.
+The canonical records, vocabulary reviews and uses, and all source-item metadata
+and memberships remain fixed. This completes only the ordered core registry
+correction data in this tree. Independent production integration and new
+automatic CI acceptance remain required before
+[Issue #5542](https://github.com/phasetr/lattice-system/issues/5542) can close. The
 footnote 25 model and parameter-domain contract remains unknown under separate
 [BACKLOG #5541](https://github.com/phasetr/lattice-system/issues/5541), with no
-new formalization target. This core event does not certify whole-unit fidelity,
+new formalization target. Neither event certifies whole-unit fidelity,
 absence of omissions, mathematical truth, printed-proof correctness, R4, or
 proof completion.
 These bounded registry corrections do not certify printed proofs,
@@ -828,8 +831,8 @@ they remain subject to the semantic vocabulary gate and contain no source-claim
 theorem, `sorry`, `admit`, `native_decide`, or axiom.
 A later lifecycle never disables that source's frozen identity, counts,
 census OID, active-state, source-order, page-coupling, or two-pass census
-invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,237 active
-claims, 3,211 formalization targets, and 1,394 distinct source-label/page pairs
+invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,235 active
+claims, 3,209 formalization targets, and 1,394 distinct source-label/page pairs
 among active claims with subkind `equation`. The census-capability requirement
 that slices, source-claim dependencies,
 bindings, contexts, axioms, claim-to-axiom relations, statement modules, and
