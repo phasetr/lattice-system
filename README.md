@@ -15,15 +15,17 @@ The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
 progress begins in `registry/`. Its global checker capability is `vocabulary`,
 while each source advances independently through `source-progress.tsv`;
 `TASAKI2020` is `vocabulary_reviewed`. Its corrected corpus ledger contains all
-534 physical PDF pages, 3,230 active atomic claims, 3,213 formalization
-targets, 1,401 unique equation-label/page pairs, and 63 pages with no claim.
+534 physical PDF pages, 3,237 active atomic claims, 3,214 formalization
+targets, 1,397 distinct source-label/page pairs among active claims with subkind
+`equation`, and 63 pages with no claim. Classification repairs preserve the
+original equation source items.
 Fourteen superseded records preserve the provenance of compound or duplicate
-claims, while seventeen active records are explicitly classified `out_of_scope`.
+claims, while twenty-three active records are explicitly classified `out_of_scope`.
 The only production Lean tree is limited to the registered vocabulary modules and their
 root. Checker cases are generated only under isolated system temporary roots;
 the repository contains no tracked fixture tree.
 
-The vocabulary reviews classify all 3,213 formalization targets: 3,211 are
+The vocabulary reviews classify all 3,214 formalization targets: 3,212 are
 `mathlib_only`, while claims `CL-TASAKI2020-2487` and
 `CL-TASAKI2020-2488` require project vocabulary. The registered vocabulary is
 exactly `partialTraceRight` and `partialTraceLeft`, with four claim-to-vocabulary
@@ -146,10 +148,19 @@ separate reviewed event retires the duplicate corollary record in favor of
 that unchanged canonical record, preserving both original source items and
 memberships. These events do not certify printed proofs, external-reference
 proofs, whole-source fidelity, or R4 readiness.
+A full-symmetry-breaking source unit records forty-one statement-readiness
+outcomes: twenty identity-preserving content repairs, including four combined
+classification repairs, six exclusions of nonclaim prose, seven previously
+omitted atomic claims, and eight unchanged records. Seven new source items
+preserve the additions' provenance, including one named footnote. Existing
+claim identities, locators, item metadata, and memberships remain fixed. The
+unit covers the full-symmetry-breaking section through the final proposition
+proof route. It does not certify printed proofs, unresolved source conventions,
+whole-source fidelity, or R4 readiness.
 These bounded registry corrections do not certify printed proofs,
 whole-source fidelity, or R4 readiness.
 
-The sixth ledger, `claim-content-amendments.tsv`, records eighty reviewed
+The sixth ledger, `claim-content-amendments.tsv`, records one hundred reviewed
 pre-R4 amendments, including actual old and new content hashes, frozen
 source-page hashes, and event ownership. The reviewed units cover the
 complex spectral estimate, opening model setup, symmetry/order-operator unit,
@@ -160,7 +171,8 @@ preliminary-derivation unit, the bounded inverse-moment completion unit,
 the bounded reflection-to-uniform-field unit, and the bounded reflection-bound
 proof-source unit with its separately reviewed adjacent Note, and the bounded
 tower-introduction and setup subset, the canonical tower-energy display,
-and the local-energy and spectral-consequence subset;
+the local-energy and spectral-consequence subset, and the bounded
+full-symmetry-breaking unit;
 they do not certify proofs, other source units, or the complete source corpus. The broader
 rendered-source re-audit and further corrections remain incomplete. The same
 permanent protocol supports independently reviewed additions with fresh IDs,

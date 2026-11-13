@@ -9,9 +9,10 @@ currently enabled production contract, independently of checker infrastructure
 available for later stages and of each source's frontier. Each source advances
 independently through `registry/source-progress.tsv`.
 `TASAKI2020` is currently `vocabulary_reviewed`; its corrected, reconciled, and
-frozen census contains 534 physical PDF pages, 3,230 active atomic claims,
-3,213 formalization targets, 1,401 unique equation-label/page pairs, and 63
-pages with no claim. Fourteen additional rows are reviewed tombstones.
+frozen census contains 534 physical PDF pages, 3,237 active atomic claims,
+3,214 formalization targets, 1,397 distinct source-label/page pairs among active
+claims with subkind `equation`, and 63 pages with no claim. Fourteen additional
+rows are reviewed tombstones.
 The current tree has the two R3 vocabulary definitions required by that source.
 There are no source-claim theorem statements, proofs, or intended axioms yet.
 Their type and declaration OIDs, direct imports, and elaborated environment
@@ -61,6 +62,15 @@ separate reviewed event retires the duplicate corollary record in favor of
 that unchanged canonical record, preserving both original source items and
 memberships. These events do not certify printed proofs, external-reference
 proofs, whole-source fidelity, or R4 readiness.
+A full-symmetry-breaking source unit records forty-one statement-readiness
+outcomes: twenty identity-preserving content repairs, including four combined
+classification repairs, six exclusions of nonclaim prose, seven previously
+omitted atomic claims, and eight unchanged records. Seven new source items
+preserve the additions' provenance, including one named footnote. Existing
+claim identities, locators, item metadata, and memberships remain fixed. The
+unit covers the full-symmetry-breaking section through the final proposition
+proof route. It does not certify printed proofs, unresolved source conventions,
+whole-source fidelity, or R4 readiness.
 These bounded registry corrections do not certify printed proofs,
 whole-source fidelity, or R4 readiness.
 
@@ -142,8 +152,11 @@ book or paper to coexist with an already vocabulary-reviewed source.
 
 `registry/source-invariants.tsv` freezes reconciled sources by source ID,
 physical-page count, active-claim count, formalization-target count,
-equation-label/page-pair count, no-claim-page count, `census_oid`, and review
-token. A formalization target is active and not `out_of_scope`. The census OID is the Git
+`equation_pair_count`, no-claim-page count, `census_oid`, and review token.
+`equation_pair_count` counts distinct source-label/page pairs among active claims
+with subkind `equation`, independently of source-item kind. Classification
+repairs preserve the original equation source items.
+A formalization target is active and not `out_of_scope`. The census OID is the Git
 blob OID of that source's canonical `pages.tsv` rows followed by `claims.tsv`
 rows, with headers excluded, registry order preserved, UTF-8, and LF endings.
 
@@ -800,8 +813,10 @@ they remain subject to the semantic vocabulary gate and contain no source-claim
 theorem, `sorry`, `admit`, `native_decide`, or axiom.
 A later lifecycle never disables that source's frozen identity, counts,
 census OID, active-state, source-order, page-coupling, or two-pass census
-invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,230 active
-claims, 3,213 formalization targets, and 1,401 equation pairs. The census-capability requirement that slices, source-claim dependencies,
+invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,237 active
+claims, 3,214 formalization targets, and 1,397 distinct source-label/page pairs
+among active claims with subkind `equation`. The census-capability requirement
+that slices, source-claim dependencies,
 bindings, contexts, axioms, claim-to-axiom relations, statement modules, and
 statement imports are header-only is phase-local;
 it is not part of the later frozen-census invariant check.

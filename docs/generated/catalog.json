@@ -625,10 +625,14 @@
         "IT-TASAKI2020-3066",
         "IT-TASAKI2020-0561",
         "IT-TASAKI2020-0562",
+        "IT-TASAKI2020-3067",
         "IT-TASAKI2020-0563",
+        "IT-TASAKI2020-3073",
         "IT-TASAKI2020-0564",
         "IT-TASAKI2020-0565",
         "IT-TASAKI2020-0566",
+        "IT-TASAKI2020-3068",
+        "IT-TASAKI2020-3069",
         "IT-TASAKI2020-0567",
         "IT-TASAKI2020-0568",
         "IT-TASAKI2020-0569",
@@ -648,9 +652,12 @@
         "IT-TASAKI2020-0583",
         "IT-TASAKI2020-0584",
         "IT-TASAKI2020-0585",
+        "IT-TASAKI2020-3070",
         "IT-TASAKI2020-0586",
         "IT-TASAKI2020-0587",
         "IT-TASAKI2020-0588",
+        "IT-TASAKI2020-3071",
+        "IT-TASAKI2020-3072",
         "IT-TASAKI2020-0589",
         "IT-TASAKI2020-0590",
         "IT-TASAKI2020-0591",
@@ -22394,7 +22401,7 @@
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-0560",
-          "disposition": "assertion",
+          "disposition": "definition",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -22402,7 +22409,7 @@
           "required_vocabulary": [],
           "statement_declaration": "NONE",
           "statement_module": "NONE",
-          "subkind": "equation",
+          "subkind": "definition",
           "successor_claim": "NONE",
           "vocabulary_basis": "mathlib_only",
           "vocabulary_status": "vocabulary_ready"
@@ -22424,8 +22431,39 @@
         {
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
-          "claim_id": "CL-TASAKI2020-3000",
+          "claim_id": "CL-TASAKI2020-3502",
           "disposition": "assertion",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "unnumbered_obligation",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
+        }
+      ],
+      "item_id": "IT-TASAKI2020-3067",
+      "item_kind": "unlabeled",
+      "locator": "PDF p. 110; print p. 97; §4.2.1; paragraph after equation (4.2.9); q0-positive consequence before rough maximum interpretation",
+      "order_key": "000110.0001.0001",
+      "page_id": "PG-TASAKI2020-0110",
+      "public_group": "Chapter 04",
+      "public_slug": "chapter-04",
+      "source_id": "TASAKI2020",
+      "source_label": "NONE",
+      "title": "NONE"
+    },
+    {
+      "claims": [
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-3000",
+          "disposition": "out_of_scope",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -22435,8 +22473,8 @@
           "statement_module": "NONE",
           "subkind": "remark",
           "successor_claim": "NONE",
-          "vocabulary_basis": "mathlib_only",
-          "vocabulary_status": "vocabulary_ready"
+          "vocabulary_basis": "not_reviewed",
+          "vocabulary_status": "not_reviewed"
         }
       ],
       "item_id": "IT-TASAKI2020-0563",
@@ -22448,6 +22486,37 @@
       "public_slug": "chapter-04",
       "source_id": "TASAKI2020",
       "source_label": "NONE",
+      "title": "NONE"
+    },
+    {
+      "claims": [
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-3508",
+          "disposition": "assertion",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "unnumbered_obligation",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
+        }
+      ],
+      "item_id": "IT-TASAKI2020-3073",
+      "item_kind": "footnote",
+      "locator": "PDF p. 110; print p. 97; §4.2.1; Footnote 20",
+      "order_key": "000110.0002.0001",
+      "page_id": "PG-TASAKI2020-0110",
+      "public_group": "Chapter 04",
+      "public_slug": "chapter-04",
+      "source_id": "TASAKI2020",
+      "source_label": "Footnote 20",
       "title": "NONE"
     },
     {
@@ -22548,6 +22617,68 @@
         {
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-3503",
+          "disposition": "assertion",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "unnumbered_obligation",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
+        }
+      ],
+      "item_id": "IT-TASAKI2020-3068",
+      "item_kind": "unlabeled",
+      "locator": "PDF p. 110; print p. 97; §4.2.1; finite-distribution example after equation (4.2.9); even-moment weighted-sum identity",
+      "order_key": "000110.0005.0001",
+      "page_id": "PG-TASAKI2020-0110",
+      "public_group": "Chapter 04",
+      "public_slug": "chapter-04",
+      "source_id": "TASAKI2020",
+      "source_label": "NONE",
+      "title": "NONE"
+    },
+    {
+      "claims": [
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-3504",
+          "disposition": "assertion",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "unnumbered_obligation",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
+        }
+      ],
+      "item_id": "IT-TASAKI2020-3069",
+      "item_kind": "unlabeled",
+      "locator": "PDF p. 110; print p. 97; §4.2.1; finite-distribution example after equation (4.2.9); final even-moment root-limit conclusion",
+      "order_key": "000110.0005.0002",
+      "page_id": "PG-TASAKI2020-0110",
+      "public_group": "Chapter 04",
+      "public_slug": "chapter-04",
+      "source_id": "TASAKI2020",
+      "source_label": "NONE",
+      "title": "NONE"
+    },
+    {
+      "claims": [
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-0564",
           "disposition": "domain",
           "lifecycle": "active",
@@ -22580,7 +22711,7 @@
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-0566",
-          "disposition": "assertion",
+          "disposition": "definition",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -22588,7 +22719,7 @@
           "required_vocabulary": [],
           "statement_declaration": "NONE",
           "statement_module": "NONE",
-          "subkind": "equation",
+          "subkind": "definition",
           "successor_claim": "NONE",
           "vocabulary_basis": "mathlib_only",
           "vocabulary_status": "vocabulary_ready"
@@ -22611,7 +22742,7 @@
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-0567",
-          "disposition": "hypothesis",
+          "disposition": "out_of_scope",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -22621,8 +22752,8 @@
           "statement_module": "NONE",
           "subkind": "hypothesis",
           "successor_claim": "NONE",
-          "vocabulary_basis": "mathlib_only",
-          "vocabulary_status": "vocabulary_ready"
+          "vocabulary_basis": "not_reviewed",
+          "vocabulary_status": "not_reviewed"
         }
       ],
       "item_id": "IT-TASAKI2020-0569",
@@ -22921,7 +23052,7 @@
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-3002",
-          "disposition": "conjecture",
+          "disposition": "out_of_scope",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -22931,8 +23062,8 @@
           "statement_module": "NONE",
           "subkind": "conjecture",
           "successor_claim": "NONE",
-          "vocabulary_basis": "mathlib_only",
-          "vocabulary_status": "vocabulary_ready"
+          "vocabulary_basis": "not_reviewed",
+          "vocabulary_status": "not_reviewed"
         }
       ],
       "item_id": "IT-TASAKI2020-0579",
@@ -22969,7 +23100,7 @@
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-3005",
-          "disposition": "conjecture",
+          "disposition": "out_of_scope",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -22979,14 +23110,14 @@
           "statement_module": "NONE",
           "subkind": "conjecture",
           "successor_claim": "NONE",
-          "vocabulary_basis": "mathlib_only",
-          "vocabulary_status": "vocabulary_ready"
+          "vocabulary_basis": "not_reviewed",
+          "vocabulary_status": "not_reviewed"
         },
         {
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-3006",
-          "disposition": "conjecture",
+          "disposition": "out_of_scope",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -22996,8 +23127,8 @@
           "statement_module": "NONE",
           "subkind": "conjecture",
           "successor_claim": "NONE",
-          "vocabulary_basis": "mathlib_only",
-          "vocabulary_status": "vocabulary_ready"
+          "vocabulary_basis": "not_reviewed",
+          "vocabulary_status": "not_reviewed"
         }
       ],
       "item_id": "IT-TASAKI2020-0580",
@@ -23017,7 +23148,7 @@
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-3008",
-          "disposition": "assertion",
+          "disposition": "out_of_scope",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -23027,8 +23158,8 @@
           "statement_module": "NONE",
           "subkind": "remark",
           "successor_claim": "NONE",
-          "vocabulary_basis": "mathlib_only",
-          "vocabulary_status": "vocabulary_ready"
+          "vocabulary_basis": "not_reviewed",
+          "vocabulary_status": "not_reviewed"
         },
         {
           "axiom_status": "not_assessed",
@@ -23065,7 +23196,7 @@
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-0578",
-          "disposition": "assertion",
+          "disposition": "definition",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -23073,7 +23204,7 @@
           "required_vocabulary": [],
           "statement_declaration": "NONE",
           "statement_module": "NONE",
-          "subkind": "equation",
+          "subkind": "definition",
           "successor_claim": "NONE",
           "vocabulary_basis": "mathlib_only",
           "vocabulary_status": "vocabulary_ready"
@@ -23188,6 +23319,37 @@
         {
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-3505",
+          "disposition": "assertion",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "unnumbered_obligation",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
+        }
+      ],
+      "item_id": "IT-TASAKI2020-3070",
+      "item_kind": "unlabeled",
+      "locator": "PDF p. 112; print p. 99; §4.2.1; line following equation (4.2.18); limit of the common scalar m(L)",
+      "order_key": "000112.0010.0001",
+      "page_id": "PG-TASAKI2020-0112",
+      "public_group": "Chapter 04",
+      "public_slug": "chapter-04",
+      "source_id": "TASAKI2020",
+      "source_label": "NONE",
+      "title": "NONE"
+    },
+    {
+      "claims": [
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-0581",
           "disposition": "assertion",
           "lifecycle": "active",
@@ -23281,7 +23443,7 @@
         {
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
-          "claim_id": "CL-TASAKI2020-0585",
+          "claim_id": "CL-TASAKI2020-3506",
           "disposition": "assertion",
           "lifecycle": "active",
           "proof_declaration": "NONE",
@@ -23290,7 +23452,69 @@
           "required_vocabulary": [],
           "statement_declaration": "NONE",
           "statement_module": "NONE",
-          "subkind": "equation",
+          "subkind": "unnumbered_obligation",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
+        }
+      ],
+      "item_id": "IT-TASAKI2020-3071",
+      "item_kind": "unlabeled",
+      "locator": "PDF p. 113; print p. 100; §4.2.1; paragraph following equation (4.2.20); averaged vector remains a low-lying state",
+      "order_key": "000113.0001.0001",
+      "page_id": "PG-TASAKI2020-0113",
+      "public_group": "Chapter 04",
+      "public_slug": "chapter-04",
+      "source_id": "TASAKI2020",
+      "source_label": "NONE",
+      "title": "NONE"
+    },
+    {
+      "claims": [
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-3507",
+          "disposition": "assertion",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "unnumbered_obligation",
+          "successor_claim": "NONE",
+          "vocabulary_basis": "mathlib_only",
+          "vocabulary_status": "vocabulary_ready"
+        }
+      ],
+      "item_id": "IT-TASAKI2020-3072",
+      "item_kind": "unlabeled",
+      "locator": "PDF p. 113; print p. 100; §4.2.1; paragraph following equation (4.2.20); averaged vector is translation invariant",
+      "order_key": "000113.0001.0002",
+      "page_id": "PG-TASAKI2020-0113",
+      "public_group": "Chapter 04",
+      "public_slug": "chapter-04",
+      "source_id": "TASAKI2020",
+      "source_label": "NONE",
+      "title": "NONE"
+    },
+    {
+      "claims": [
+        {
+          "axiom_status": "not_assessed",
+          "binding_status": "not_bound",
+          "claim_id": "CL-TASAKI2020-0585",
+          "disposition": "conjecture",
+          "lifecycle": "active",
+          "proof_declaration": "NONE",
+          "proof_status": "not_recorded",
+          "registered_axioms": [],
+          "required_vocabulary": [],
+          "statement_declaration": "NONE",
+          "statement_module": "NONE",
+          "subkind": "conjecture",
           "successor_claim": "NONE",
           "vocabulary_basis": "mathlib_only",
           "vocabulary_status": "vocabulary_ready"
@@ -101299,12 +101523,12 @@
     "vocabulary_status": "vocabulary_ready requires both a review row and a vocabulary-reviewed-or-later source lifecycle; review_staged is not ready"
   },
   "summary": {
-    "active_claims": 3230,
+    "active_claims": 3237,
     "claim_vocabulary_links": 4,
-    "formalization_target_claims": 3213,
-    "mathlib_only_claims": 3211,
+    "formalization_target_claims": 3214,
+    "mathlib_only_claims": 3212,
     "project_vocabulary_claims": 2,
-    "source_items": 3066,
+    "source_items": 3073,
     "tombstoned_claims": 14,
     "vocabulary_declarations": 2
   },
