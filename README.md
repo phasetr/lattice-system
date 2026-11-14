@@ -16,10 +16,10 @@ progress begins in `registry/`. Its global checker capability is `vocabulary`,
 while each source advances independently through `source-progress.tsv`;
 `TASAKI2020` is `vocabulary_reviewed`. Its corrected corpus ledger contains all
 534 physical PDF pages, 3,235 active atomic claims, 3,209 formalization
-targets, 1,394 distinct source-label/page pairs among active claims with subkind
+targets, 1,393 distinct source-label/page pairs among active claims with subkind
 `equation`, and 63 pages with no claim. Classification repairs preserve the
 original equation source items.
-Eighteen superseded records preserve the provenance of compound or duplicate
+Twenty superseded records preserve the provenance of compound or duplicate
 claims, while twenty-six active records are explicitly classified `out_of_scope`.
 The only production Lean tree is limited to the registered vocabulary modules and their
 root. Checker cases are generated only under isolated system temporary roots;
@@ -179,10 +179,22 @@ target is authorized.
 Neither event certifies whole-unit
 fidelity, absence of omissions, mathematical truth, printed-proof correctness,
 R4 readiness, or proof completion.
+An infinitesimal-field source event records six statement-readiness outcomes:
+three identity-preserving content repairs, including one combined definition
+reclassification, two compound splits, and one unchanged recalled bound.
+Each split creates its own first-relation successor in its existing source item
+and reuses the unchanged earlier bound for the second relation. The two new
+successors retain distinct theorem and equation provenance; no source item or
+vocabulary declaration is added. Their later duplicate retirement requires
+independently accepted production of this split event and its new automatic CI,
+followed by fresh-base design and review. The definition and conjecture in the
+Remark remain separate. The bounded source normalization explicitly retains
+the footnote-qualified limiting convention; it does not certify printed proofs,
+whole-unit fidelity, absence of omissions, mathematical truth, or R4 readiness.
 These bounded registry corrections do not certify printed proofs,
 whole-source fidelity, or R4 readiness.
 
-The sixth ledger, `claim-content-amendments.tsv`, records one hundred and one
+The sixth ledger, `claim-content-amendments.tsv`, records one hundred and four
 reviewed pre-R4 amendments, including actual old and new content hashes, frozen
 source-page hashes, and event ownership. The reviewed units cover the
 complex spectral estimate, opening model setup, symmetry/order-operator unit,
@@ -194,7 +206,8 @@ the bounded reflection-to-uniform-field unit, and the bounded reflection-bound
 proof-source unit with its separately reviewed adjacent Note, and the bounded
 tower-introduction and setup subset, the canonical tower-energy display,
 the local-energy and spectral-consequence subset, the bounded
-full-symmetry-breaking unit, and the order-parameter comparison core;
+full-symmetry-breaking unit, the order-parameter comparison core, and the
+infinitesimal-field unit;
 they do not certify proofs, other source units, or the complete source corpus. The broader
 rendered-source re-audit and further corrections remain incomplete. The same
 permanent protocol supports independently reviewed additions with fresh IDs,
