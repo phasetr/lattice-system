@@ -6,9 +6,9 @@ Generated from the checked registries; do not edit by hand.
 
 - Phase: `vocabulary`
 - Source items: 3073
-- Active claims: 3234
-- Formalization targets: 3208
-- Superseded claim records: 21
+- Active claims: 3235
+- Formalization targets: 3209
+- Superseded claim records: 22
 - Vocabulary declarations: 2
 - Claim-vocabulary links: 4
 
