@@ -15,17 +15,17 @@ The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
 progress begins in `registry/`. Its global checker capability is `vocabulary`,
 while each source advances independently through `source-progress.tsv`;
 `TASAKI2020` is `vocabulary_reviewed`. Its corrected corpus ledger contains all
-534 physical PDF pages, 3,234 active atomic claims, 3,208 formalization
-targets, 1,393 distinct source-label/page pairs among active claims with subkind
+534 physical PDF pages, 3,235 active atomic claims, 3,209 formalization
+targets, 1,392 distinct source-label/page pairs among active claims with subkind
 `equation`, and 63 pages with no claim. Classification repairs preserve the
 original equation source items.
-Twenty-one superseded records preserve the provenance of compound or duplicate
+Twenty-two superseded records preserve the provenance of compound or duplicate
 claims, while twenty-six active records are explicitly classified `out_of_scope`.
 The only production Lean tree is limited to the registered vocabulary modules and their
 root. Checker cases are generated only under isolated system temporary roots;
 the repository contains no tracked fixture tree.
 
-The vocabulary reviews classify all 3,208 formalization targets: 3,206 are
+The vocabulary reviews classify all 3,209 formalization targets: 3,207 are
 `mathlib_only`, while claims `CL-TASAKI2020-2487` and
 `CL-TASAKI2020-2488` require project vocabulary. The registered vocabulary is
 exactly `partialTraceRight` and `partialTraceLeft`, with four claim-to-vocabulary
@@ -193,10 +193,20 @@ unchanged. The definition and conjecture in the Remark remain separate.
 The bounded source normalization explicitly retains
 the footnote-qualified limiting convention; it does not certify printed proofs,
 whole-unit fidelity, absence of omissions, mathematical truth, or R4 readiness.
+An XXZ local-description event records three active mathematical outcomes:
+one identity-preserving Hamiltonian definition repair and two independent
+ground-state consequences created by splitting the recalled compound record.
+The split preserves the historical predecessor and its source item; no source
+item or vocabulary declaration is added. These local model and ground-state
+descriptions do not resolve the remaining XXZ long-range-order, theorem-transfer
+or order-parameter contracts and duplicate question tracked in
+[Issue #5553](https://github.com/phasetr/lattice-system/issues/5553).
+They do not certify the whole XXZ unit, mathematical truth, printed proofs,
+whole-source fidelity, or R4 readiness.
 These bounded registry corrections do not certify printed proofs,
 whole-source fidelity, or R4 readiness.
 
-The sixth ledger, `claim-content-amendments.tsv`, records one hundred and four
+The sixth ledger, `claim-content-amendments.tsv`, records one hundred and five
 reviewed pre-R4 amendments, including actual old and new content hashes, frozen
 source-page hashes, and event ownership. The reviewed units cover the
 complex spectral estimate, opening model setup, symmetry/order-operator unit,
@@ -209,7 +219,7 @@ proof-source unit with its separately reviewed adjacent Note, and the bounded
 tower-introduction and setup subset, the canonical tower-energy display,
 the local-energy and spectral-consequence subset, the bounded
 full-symmetry-breaking unit, the order-parameter comparison core, and the
-infinitesimal-field unit;
+infinitesimal-field unit, and the local XXZ model and ground-state subset;
 they do not certify proofs, other source units, or the complete source corpus. The broader
 rendered-source re-audit and further corrections remain incomplete. The same
 permanent protocol supports independently reviewed additions with fresh IDs,
