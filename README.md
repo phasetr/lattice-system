@@ -15,17 +15,17 @@ The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
 progress begins in `registry/`. Its global checker capability is `vocabulary`,
 while each source advances independently through `source-progress.tsv`;
 `TASAKI2020` is `vocabulary_reviewed`. Its corrected corpus ledger contains all
-534 physical PDF pages, 3,235 active atomic claims, 3,209 formalization
+534 physical PDF pages, 3,234 active atomic claims, 3,208 formalization
 targets, 1,393 distinct source-label/page pairs among active claims with subkind
 `equation`, and 63 pages with no claim. Classification repairs preserve the
 original equation source items.
-Twenty superseded records preserve the provenance of compound or duplicate
+Twenty-one superseded records preserve the provenance of compound or duplicate
 claims, while twenty-six active records are explicitly classified `out_of_scope`.
 The only production Lean tree is limited to the registered vocabulary modules and their
 root. Checker cases are generated only under isolated system temporary roots;
 the repository contains no tracked fixture tree.
 
-The vocabulary reviews classify all 3,209 formalization targets: 3,207 are
+The vocabulary reviews classify all 3,208 formalization targets: 3,206 are
 `mathlib_only`, while claims `CL-TASAKI2020-2487` and
 `CL-TASAKI2020-2488` require project vocabulary. The registered vocabulary is
 exactly `partialTraceRight` and `partialTraceLeft`, with four claim-to-vocabulary
@@ -185,10 +185,12 @@ reclassification, two compound splits, and one unchanged recalled bound.
 Each split creates its own first-relation successor in its existing source item
 and reuses the unchanged earlier bound for the second relation. The two new
 successors retain distinct theorem and equation provenance; no source item or
-vocabulary declaration is added. Their later duplicate retirement requires
-independently accepted production of this split event and its new automatic CI,
-followed by fresh-base design and review. The definition and conjecture in the
-Remark remain separate. The bounded source normalization explicitly retains
+vocabulary declaration is added. A separate duplicate-only event retires the
+atomic theorem successor into the unchanged equation successor, preserving
+both source items, all historical memberships and the original split relations.
+The equation remains the active canonical record, with its vocabulary review
+unchanged. The definition and conjecture in the Remark remain separate.
+The bounded source normalization explicitly retains
 the footnote-qualified limiting convention; it does not certify printed proofs,
 whole-unit fidelity, absence of omissions, mathematical truth, or R4 readiness.
 These bounded registry corrections do not certify printed proofs,
