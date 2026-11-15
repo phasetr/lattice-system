@@ -9,9 +9,9 @@ currently enabled production contract, independently of checker infrastructure
 available for later stages and of each source's frontier. Each source advances
 independently through `registry/source-progress.tsv`.
 `TASAKI2020` is currently `vocabulary_reviewed`; its corrected, reconciled, and
-frozen census contains 534 physical PDF pages, 3,242 active atomic claims,
-3,216 formalization targets, 1,392 distinct source-label/page pairs among active
-claims with subkind `equation`, and 63 pages with no claim. Twenty-two additional
+frozen census contains 534 physical PDF pages, 3,250 active atomic claims,
+3,224 formalization targets, 1,392 distinct source-label/page pairs among active
+claims with subkind `equation`, and 63 pages with no claim. Twenty-three additional
 rows are reviewed tombstones.
 The current tree has the two R3 vocabulary definitions required by that source.
 There are no source-claim theorem statements, proofs, or intended axioms yet.
@@ -128,6 +128,15 @@ record with its standing model and ground-state setting, long-range-order
 lower-bound witness, transverse high-moment parameter, and local limiting
 qualification. It preserves the claim identity, classification, source item and
 census counts; the seven XXZ omission bodies remain unchanged.
+A ferrimagnetism source-record event splits one compound Remark record into
+two mathematical successors and adds seven independent source omissions,
+including a conjecture in its genuine numbered footnote. Eight new bodies join
+the existing Remark item; the footnote receives one new item. The linked
+exercise remains unchanged. Attribution, conjectural status, order-operator
+qualifications and qualitative source wording are preserved. Explanatory
+and note context remain in the independently reviewed source evidence.
+The vocabulary reviews record uses of registered project vocabulary;
+they do not certify typed physics contracts or R4 readiness.
 These bounded registry corrections do not certify printed proofs,
 whole-source fidelity, or R4 readiness.
 
