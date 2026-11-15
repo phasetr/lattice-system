@@ -5,18 +5,14 @@ namespace Checker.Publication
 open Lean System Checker.CheckAll
 
 /-- Group an ordered relation without sorting or deduplicating away provenance multiplicity. -/
-def relationIndex (rows : Array Row) (owner value : String) : IO (Std.HashMap String (Array String)) := do
-  let mut result := ({} : Std.HashMap String (Array String))
-  for row in rows do
+def relationIndex (rows : Array Row) (owner value : String) : IO (Std.HashMap String (Array String)) :=
+  rows.foldlM (fun result row => do
     let id ← str row owner
-    result := result.insert id ((result[id]?.getD #[]).push (← str row value))
-  return result
+    pure (result.insert id ((result[id]?.getD #[]).push (← str row value)))) {}
 
 /-- Count a public status predicate without changing row or dictionary iteration semantics. -/
-def countRows (rows : Array Row) (predicate : Row → IO Bool) : IO Nat := do
-  let mut result := 0
-  for row in rows do if ← predicate row then result := result + 1
-  return result
+def countRows (rows : Array Row) (predicate : Row → IO Bool) : IO Nat :=
+  rows.foldlM (fun count row => do pure (if ← predicate row then count+1 else count)) 0
 
 /-- Construct the reviewed public catalog with conservative lifecycle, binding and proof statuses. -/
 def publicCatalog (data : Data) : IO Json := do
@@ -35,45 +31,39 @@ def publicCatalog (data : Data) : IO Json := do
   let vocabularyLinks ← data.rows "claim_vocabulary"
   let vocabularyByClaim ← relationIndex vocabularyLinks "claim_id" "vocabulary_id"
   let axiomsByClaim ← relationIndex (← data.rows "claim_axioms") "claim_id" "axiom_id"
-  let mut claimsByItem : Std.HashMap String (Array (Int × String)) := {}
-  for relation in ← data.rows "item_claims" do
+  let claimsByItem ← (← data.rows "item_claims").foldlM (fun claimsByItem relation => do
     let id ← str relation "item_id"
-    claimsByItem := claimsByItem.insert id ((claimsByItem[id]?.getD #[]).push
-      (← integer (← str relation "position"),← str relation "claim_id"))
-  let mut publicItems := #[]
-  for item in ← data.rows "source_items" do
+    pure (claimsByItem.insert id ((claimsByItem[id]?.getD #[]).push
+      (← integer (← str relation "position"),← str relation "claim_id"))))
+    ({} : Std.HashMap String (Array (Int × String)))
+  let publicItems ← (← data.rows "source_items").mapM fun item => do
     let itemId ← str item "item_id"
-    let mut publicClaims := #[]
-    for (_,claimId) in (claimsByItem[itemId]?.getD #[]).qsort (fun a b => a.1 < b.1 || (a.1 == b.1 && a.2 < b.2)) do
+    let publicClaims ← ((claimsByItem[itemId]?.getD #[]).qsort (fun a b => a.1 < b.1 || (a.1 == b.1 && a.2 < b.2))).mapM fun (_,claimId) => do
       let claim ← lookup claims claimId
       let binding := bindings[claimId]?
       let axiomIds := axiomsByClaim[claimId]?.getD #[]
-      let mut requiredVocabulary := #[]
-      for id in vocabularyByClaim[claimId]?.getD #[] do
-        requiredVocabulary := requiredVocabulary.push (Json.mkObj [
-          ("vocabulary_id",toJson id),("declaration",← field (← lookup vocabulary id) "declaration")])
+      let requiredVocabulary ← (vocabularyByClaim[claimId]?.getD #[]).mapM fun id => do
+        pure (Json.mkObj [("vocabulary_id",toJson id),("declaration",← field (← lookup vocabulary id) "declaration")])
       let lifecycle ← if (← field claim "tombstone") == toJson "true" then
         pure (if (← field claim "superseded_by") != toJson "NONE" then "superseded" else "tombstoned")
         else pure "active"
       let reviewed := reviews.contains claimId
-      let mut ready := false
-      if reviewed then
+      let ready ← if reviewed then do
         let sourceProgress ← lookup progress (← str claim "source_id")
-        ready := #["vocabulary_reviewed","skeleton_frozen","proof_active","complete"].contains (← str sourceProgress "lifecycle")
+        pure (#["vocabulary_reviewed","skeleton_frozen","proof_active","complete"].contains (← str sourceProgress "lifecycle"))
+        else pure false
       let bindingField := fun name => do
         match binding with | some row => field row name | none => pure (toJson "NONE")
       let proofRecorded ← match binding with
         | some row => pure ((← field row "proof_decl") != toJson "NONE")
         | none => pure false
-      let mut registeredAxioms := #[]
-      for id in axiomIds do
+      let registeredAxioms ← axiomIds.mapM fun id => do
         let row ← lookup axioms id
-        registeredAxioms := registeredAxioms.push (Json.mkObj [
-          ("axiom_id",toJson id),("declaration",← field row "declaration"),("category",← field row "category")])
+        pure (Json.mkObj [("axiom_id",toJson id),("declaration",← field row "declaration"),("category",← field row "category")])
       let basis ← match reviews[claimId]? with
         | some row => field row "basis"
         | none => pure (toJson "not_reviewed")
-      publicClaims := publicClaims.push <| Json.mkObj [
+      pure <| Json.mkObj [
         ("claim_id",toJson claimId),("disposition",← field claim "disposition"),("subkind",← field claim "subkind"),
         ("lifecycle",toJson lifecycle),("successor_claim",← field claim "superseded_by"),
         ("vocabulary_status",toJson (if ready then "vocabulary_ready" else if reviewed then "review_staged" else "not_reviewed")),
@@ -86,30 +76,30 @@ def publicCatalog (data : Data) : IO Json := do
         ("required_vocabulary",toJson requiredVocabulary)]
     let publicItem ← project item #["item_id","source_id","order_key","page_id","item_kind",
       "source_label","title","locator","public_group","public_slug"]
-    publicItems := publicItems.push (publicItem.setObjVal! "claims" (toJson publicClaims))
+    pure (publicItem.setObjVal! "claims" (toJson publicClaims))
   let sourceRows ← data.rows "sources"
   let sourcesById ← indexUnique sourceRows "source_id" "source"
-  let mut groups := #[]; let mut groupIndex : Std.HashMap (String × String) Nat := {}
-  for item in publicItems do
+  let (groups,_) ← publicItems.foldlM (fun (groups,groupIndex) item => do
     let source ← str item "source_id"; let slug ← str item "public_slug"; let title ← str item "public_group"
     let key := (source,slug)
     if let some index := groupIndex[key]? then
       let current := groups[index]!
       require ((← str current "public_group") == title) ("public group slug collision: " ++ slug)
       let ids ← arr current "item_ids"
-      groups := groups.set! index (current.setObjVal! "item_ids" (toJson (ids.push (← field item "item_id"))))
+      pure (groups.set! index (current.setObjVal! "item_ids" (toJson (ids.push (← field item "item_id")))),groupIndex)
     else
-      groupIndex := groupIndex.insert key groups.size
-      groups := groups.push (Json.mkObj [("source_id",toJson source),
+      let group := Json.mkObj [("source_id",toJson source),
         ("source_public_slug",← field (← lookup sourcesById source) "public_slug"),
-        ("public_group",toJson title),("public_slug",toJson slug),("item_ids",toJson #[← field item "item_id"])])
+        ("public_group",toJson title),("public_slug",toJson slug),("item_ids",toJson #[← field item "item_id"])]
+      let groupIndex := groupIndex.insert key groups.size
+      pure (groups.push group,groupIndex))
+    ((#[],{}) : Array Json × Std.HashMap (String × String) Nat)
   let tracks ← (← data.rows "tracks").mapM (project · #["track_id","position","title","public_slug"])
-  let mut sources := #[]
-  for row in sourceRows do
+  let sources ← sourceRows.mapM fun row => do
     let publicSource ← project row #["source_id","track_id","source_position","source_kind","citation_key",
       "title","authors","year","edition","identifier_kind","identifier","public_url","public_slug","coverage"]
     let lifecycle ← field (← lookup progress (← str row "source_id")) "lifecycle"
-    sources := sources.push (publicSource.setObjVal! "lifecycle" lifecycle)
+    pure (publicSource.setObjVal! "lifecycle" lifecycle)
   let active ← countRows claimRows (fun row => do pure ((← field row "tombstone") == toJson "false"))
   let targets ← countRows claimRows (fun row => do pure ((← field row "tombstone") == toJson "false" && (← field row "disposition") != toJson "out_of_scope"))
   let tombstoned ← countRows claimRows (fun row => do pure ((← field row "tombstone") == toJson "true"))

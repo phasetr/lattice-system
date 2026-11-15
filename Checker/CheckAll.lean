@@ -25,15 +25,14 @@ def toolDigest (root path : System.FilePath) : IO String := do
   pure hash
 /-- Bind runner image and installed tool versions for reuse, not local paths or secrets. -/
 def environment (root : System.FilePath) : IO Json := do
-  let mut fields := []
-  for key in #["RUNNER_OS", "RUNNER_ARCH", "ImageOS", "ImageVersion"] do
-    fields := (key, toJson (← env key)) :: fields
-  for (name, command) in #[("lean", "lean"), ("lake", "lake"), ("git", "git"), ("curl", "curl")] do
+  let fields ← #["RUNNER_OS", "RUNNER_ARCH", "ImageOS", "ImageVersion"].foldlM (fun fields key => do
+    pure ((key,toJson (← env key)) :: fields)) []
+  let fields ← #[("lean", "lean"), ("lake", "lake"), ("git", "git"), ("curl", "curl")].foldlM (fun fields (name,command) => do
     let text ← output root command #["--version"]
-    fields := (name, toJson (split text "\n")[0]!) :: fields
+    pure ((name,toJson (split text "\n")[0]!) :: fields)) fields
   let sysroot ← toolchainRoot root
   let nativeVersion ← output root (sysroot / "bin/leanc").toString #["--no-default-config","--version"]
-  fields := ("native_compiler", Json.mkObj [
+  let fields := ("native_compiler", Json.mkObj [
     ("driver",toJson (← toolDigest root (sysroot / "bin/leanc"))),
     ("backend",toJson (← toolDigest root (sysroot / "bin/clang"))),
     ("version",toJson ((split nativeVersion "\n").extract 0 2)),
@@ -194,10 +193,10 @@ def load (root : System.FilePath) (e : Evidence) (runId : Nat) : IO Loaded := do
   validateCheckout receipt actualParents (← str (← field checkout "tree") "sha")
   let remote ← api root e ("/git/trees/" ++ (← str receipt "tree") ++ "?recursive=1")
   require ((← field remote "truncated") == Json.bool false) "truncated executable tree"
-  let mut rows := #[]
-  for row in ← arr remote "tree" do
+  let rows ← (← arr remote "tree").foldlM (fun rows row => do
     let kind ← str row "type"
-    if kind != "tree" then rows := rows.push ⟨← str row "path", ← str row "mode", kind, ← str row "sha"⟩
+    if kind != "tree" then return rows.push ⟨← str row "path", ← str row "mode", kind, ← str row "sha"⟩
+    else return rows) #[]
   require ((← engine root rows) == (← str receipt "engine")) "producer executable bytes mismatch"
   let origin := Json.mkObj [("run_id", toJson runId), ("run_attempt", toJson attempt), ("job_id", toJson jobId)]
   let value := Loaded.mk receipt origin
@@ -208,21 +207,21 @@ def candidates (root : System.FilePath) (e : Evidence) (ctx : Json) : IO (Array 
   let event ← str ctx "event"
   let source ← if event == "pull_request" then str ctx "base" else do
     let pulls ← api root e ("/commits/" ++ (← str ctx "head") ++ "/pulls?per_page=10")
-    let mut hits := #[]
-    for pr in ← IO.ofExcept pulls.getArr? do
+    let hits ← (← IO.ofExcept pulls.getArr?).foldlM (fun hits pr => do
       let base ← field pr "base"; let head ← field pr "head"; let repo ← field head "repo"
       if !(← field pr "merged_at").isNull && (← str pr "merge_commit_sha") == (← str ctx "head") &&
         (← str base "ref") == "rewrite-main" && !repo.isNull && (← str repo "full_name") == e.repository then
-        hits := hits.push (← str head "sha")
+        return hits.push (← str head "sha")
+      else return hits) #[]
     require (hits.size == 1) "no unique merged PR evidence"
     pure hits[0]!
   require (hex source 40) "invalid candidate source"
   let kind := if event == "pull_request" then "push" else "pull_request"
   let result ← api root e s!"/actions/workflows/rewrite-ci.yml/runs?event={kind}&head_sha={source}&per_page=5"
-  let mut found := #[]
-  for run in ← arr result "workflow_runs" do
+  let found ← (← arr result "workflow_runs").foldlM (fun found run => do
     if (← str run "status") == "completed" && (← str run "conclusion") == "success" then
-      found := found.push ((← nat run "id"), source)
+      return found.push ((← nat run "id"), source)
+    else return found) #[]
   pure <| found.extract 0 5
 /-- Unknown differences require execution; an exact tested postmerge tree may still reuse. -/
 def lookupAllowed (full : Bool) (event : String) : Bool := !full || event == "push"
@@ -242,34 +241,47 @@ def originalBound (original : Loaded) (expected : Json) (name signature : String
 def regressionRequired (mode : String) (accepted : Json) (name : String) : Bool :=
   mode != "--current" && (mode == "--full" || (accepted.getObjValD name).isNull)
 
-/-- Reuse only direct original executed results; malformed or unavailable evidence executes instead. -/
-def reuse (root : System.FilePath) (e : Evidence) (ctx sigs environment : Json) : IO Json := do
-  let mut accepted := Json.mkObj []
-  for (id, source) in ← candidates root e ctx do
-    try
+/-- Retain already validated readers on an exception, while stopping that candidate's remaining effects. -/
+def settleCandidate (accepted : Json) : Except Unit Json → Json × Bool
+  | .ok updated => (updated,true)
+  | .error _ => (accepted,false)
+
+/-- Visit the bounded candidate list, returning accepted origins and stopping once all readers are covered. -/
+def reuseCandidates (root : System.FilePath) (e : Evidence) (ctx sigs environment : Json) :
+    List (Nat × String) → Json → IO Json
+  | [], accepted => pure accepted
+  | (id,source) :: rest, accepted => do
+    let next ← try
       let candidate ← load root e id
       let j := candidate.receipt
-      if !(← candidateBound j ctx source environment) then continue
-      for (name, _) in suites do
-        let result ← field (← field j "suites") name
-        let signature ← str sigs name
-        if (← str result "input") != signature then continue
-        let mut origin := candidate.origin
-        if (← str result "result") == "reused" then
-          let expected ← field result "origin"
-          let original ← load root e (← nat expected "run_id")
-          if !(← originalBound original expected name signature environment) then continue
-          origin := original.origin
-        accepted := accepted.setObjVal! name origin
-      if (keys accepted).size == suites.size then break
-    catch _ => pure ()
-  pure accepted
+      if !(← candidateBound j ctx source environment) then pure accepted else do
+        let (completed,_) ← suites.foldlM (fun (accepted,active) (name,_) => do
+          if !active then return (accepted,false)
+          try
+            let result ← field (← field j "suites") name
+            let signature ← str sigs name
+            if (← str result "input") != signature then return settleCandidate accepted (.ok accepted)
+            let origin ← if (← str result "result") == "reused" then do
+              let expected ← field result "origin"
+              let original ← load root e (← nat expected "run_id")
+              if !(← originalBound original expected name signature environment) then pure none
+              else pure (some original.origin)
+              else pure (some candidate.origin)
+            pure (settleCandidate accepted (.ok (origin.map (accepted.setObjVal! name) |>.getD accepted)))
+          catch _ => pure (settleCandidate accepted (.error ()))) (accepted,true)
+        pure completed
+      catch _ => pure accepted
+    if (keys next).size == suites.size then pure next
+    else reuseCandidates root e ctx sigs environment rest next
+
+/-- Reuse only direct original executed results; malformed or unavailable evidence executes instead. -/
+def reuse (root : System.FilePath) (e : Evidence) (ctx sigs environment : Json) : IO Json := do
+  reuseCandidates root e ctx sigs environment (← candidates root e ctx).toList (Json.mkObj [])
 
 /-- Semantic and publication checks are shared by all modes; data gates run natively before this plan. -/
-def currentPlan (phase : String) (moduleRows : Nat) : Array String := Id.run do
-  let mut plan := #[]
-  if phase == "vocabulary" || moduleRows > 1 then plan := plan.push "vocabulary"
-  return plan ++ #["skeleton","generator-test","generator-check","transition"]
+def currentPlan (phase : String) (moduleRows : Nat) : Array String :=
+  (if phase == "vocabulary" || moduleRows > 1 then #["vocabulary"] else #[]) ++
+    #["skeleton","generator-test","generator-check","transition"]
 
 /-- Interpret one explicit current action, without a shell wrapper or arbitrary command route. -/
 def currentAction (root : System.FilePath) (base action : String) : IO Unit := do
@@ -351,17 +363,16 @@ def calculateSelection (root : System.FilePath) (ctx : Json) (full : Bool) : IO 
     c.toNat < 128 && (c.isAlphanum || c == '_' || c == '-' || c == '.')) "invalid repository scope"
   let cache ← IO.mkRef #[]
   let evidence : Evidence := ⟨repository,← env "GH_TOKEN",(← IO.monoMsNow)+45000,"",cache⟩
-  let mut build ← selectBuild root (← str ctx "base") (← str ctx "head")
-  let mut buildOrigin := Json.null
-  unless build.required do
-    try buildOrigin ← acceptedBase root evidence (← str ctx "base")
-    catch _ => build := {build with required := true, reason := "exact mathematical baseline acceptance unavailable"}
+  let build ← selectBuild root (← str ctx "base") (← str ctx "head")
+  let (build,buildOrigin) ← if build.required then pure (build,Json.null) else do
+    try pure (build,← acceptedBase root evidence (← str ctx "base"))
+    catch _ => pure ({build with required := true, reason := "exact mathematical baseline acceptance unavailable"},Json.null)
   let regressions ← orFull do
     let runtime ← environment root
     let (sigs,executable) ← signatures root (← str ctx "head") runtime
-    let mut accepted := Json.mkObj []
-    if lookupAllowed full (← str ctx "event") then
-      try accepted ← reuse root evidence ctx sigs runtime catch _ => pure ()
+    let accepted ← if lookupAllowed full (← str ctx "event") then do
+      try reuse root evidence ctx sigs runtime catch _ => pure (Json.mkObj [])
+      else pure (Json.mkObj [])
     return {sigs,executable,runtime,accepted}
   return {regressions with build,buildOrigin,reason := if full then "unknown/destructive input difference" else "actual reader input changed or accepted evidence absent"}
 
@@ -372,19 +383,17 @@ def cacheModule (name : String) : Bool :=
       part.toList.all (fun c => c.toNat < 128 && (c.isAlphanum || c == '_'))
 
 /-- Cache only current semantic imports and the selected groups' explicit external fixture roots. -/
-def importRoots (current : Registry.Data) (selected : Array String) : Option (Array String) := Id.run do
-  let mut roots := #[]
-  for row in (current.table "imports").rows ++ (current.table "statement-imports").rows do
+def importRoots (current : Registry.Data) (selected : Array String) : Option (Array String) := do
+  let roots ← ((current.table "imports").rows ++ (current.table "statement-imports").rows).foldlM (fun roots row => do
     let imported := Registry.col row 3
     if imported == "Mathlib" || imported.startsWith "Mathlib." then
-      if !cacheModule imported then return none
-      roots := roots.push imported
-  for name in selected do
-    let some group := Checker.Regressions.groups.find? (·.name == name) | return none
-    for imported in group.mathlibImports do
-      if !cacheModule imported then return none
-      roots := roots.push imported
-  return some (distinctPaths roots)
+      if !cacheModule imported then none else some (roots.push imported)
+    else some roots) #[]
+  let roots ← selected.foldlM (fun roots name => do
+    let group ← Checker.Regressions.groups.find? (·.name == name)
+    group.mathlibImports.foldlM (fun roots imported =>
+      if cacheModule imported then some (roots.push imported) else none) roots) roots
+  return distinctPaths roots
 
 /-- Import artifacts are necessary semantic preparation, distinct from the mathematical default build. -/
 def prepareImports (root : System.FilePath) (current : Registry.Data) (selected : Array String) : IO Unit := do
@@ -581,12 +590,58 @@ def selfTestInputs (_root : System.FilePath) (count : IO.Ref Nat) : IO Unit := d
   reject count (validReceipt (fixtureReceipt.setObjVal! "build" (build.setObjVal! "origin" Json.null))) "missing baseline acceptance cannot skip build"
   reject count (validReceipt (fixtureReceipt.setObjVal! "build" (build.setObjVal! "result" (toJson "success")))) "unexecuted build cannot masquerade as success"
 
+/-- Candidate-state regressions exercise the same pure update used by production evidence lookup. -/
+def selfTestCandidate (count : IO.Ref Nat) : IO Unit := do
+  let priorAccepted := Json.mkObj [("registry",toJson (1 : Nat))]
+  expect count (settleCandidate priorAccepted (.error ()) == (priorAccepted,false))
+    "candidate exception retains accepted readers and stops remaining effects"
+  expect count (settleCandidate priorAccepted (.ok priorAccepted) == (priorAccepted,true))
+    "candidate mismatch skips only its reader and continues"
+
+/-- Reader closure and compiler-input counterfactuals stay separate from producer transport tests. -/
+def selfTestReaderClosures (root : System.FilePath) (count : IO.Ref Nat) (envJson : Json)
+    (cache : IO.Ref (Array (Nat × Loaded))) : IO Unit := do
+  let rows : Array Entry := #[⟨"Checker/CheckAll.lean", "100644", "blob", "engine"⟩,
+    ⟨".gitignore", "100644", "blob", "ignore"⟩, ⟨"registry/claims.tsv", "100644", "blob", "old"⟩]
+  let headers := Json.mkObj [("registry/claims.tsv", toJson "header")]
+  let policy := Json.mkObj [("README.md", policyProjection "README.md" "exact PR exact head SHA")]
+  let registryA := Json.mkObj [("registry/claims.tsv", toJson "old")]
+  let registryB := Json.mkObj [("registry/claims.tsv", toJson "new")]
+  let (before, _) ← payloads root rows headers registryA policy (Json.mkObj []) envJson
+  let (after, _) ← payloads root rows headers registryB policy (Json.mkObj []) envJson
+  for (name, _) in suites do
+    expect count ((before.getObjValD name == after.getObjValD name) ==
+      (!(Checker.Regressions.groups.any (fun group => group.name == name && group.corpus)))) "corpus copy closure and synthetic projection"
+  let controlRows := rows.set! 0 ⟨"Checker/CheckAll.lean","100644","blob","new-control"⟩
+  let (controlInputs,controlEngine) ← payloads root controlRows headers registryA policy (Json.mkObj []) envJson
+  let (_,originalEngine) ← payloads root rows headers registryA policy (Json.mkObj []) envJson
+  expect count (controlEngine != originalEngine && controlInputs == before) "global producer authenticity is separate from each actual reader closure"
+  let (nativeInputs,_) ← payloads root (rows.push ⟨"Checker/Data.lean","100644","blob","data"⟩) headers registryA policy (Json.mkObj []) envJson
+  expect count (nativeInputs.getObjValD "skeleton-pure" == before.getObjValD "skeleton-pure" && nativeInputs.getObjValD "registry" != before.getObjValD "registry") "native validators do not invalidate pure semantic cases"
+  let (semanticInputs,_) ← payloads root (rows.push ⟨"Checker/SemanticDriver.lean","100644","blob","semantic"⟩) headers registryA policy (Json.mkObj []) envJson
+  expect count (semanticInputs.getObjValD "skeleton-pure" != before.getObjValD "skeleton-pure" && semanticInputs.getObjValD "content" == before.getObjValD "content") "semantic readers are separate from content transitions"
+  let compilerEnvironment := envJson.setObjVal! "native_compiler" (toJson "changed toolchain backend")
+  let (compilerInputs, _) ← payloads root rows headers registryA policy (Json.mkObj []) compilerEnvironment
+  expect count (suites.all fun (name, _) => before.getObjValD name != compilerInputs.getObjValD name) "native compiler identity changes every actual input"
+  let changedRows := rows.set! 1 ⟨".gitignore", "100644", "blob", "changed"⟩
+  let (changed, _) ← payloads root changedRows headers registryA policy (Json.mkObj []) envJson
+  expect count ((before.getObjValD "skeleton-composed") != (changed.getObjValD "skeleton-composed")) "composed gitignore is executable fixture input"
+  let changedHeaders := headers.setObjVal! "registry/claims.tsv" (toJson "new header")
+  let (changed, _) ← payloads root rows changedHeaders registryA policy (Json.mkObj []) envJson
+  expect count ((before.getObjValD "skeleton-composed") != (changed.getObjValD "skeleton-composed")) "composed registry schema closure"
+  let transport := curlArguments "owner/repo" "/actions/jobs/11/logs"
+  expect count (transport[0]! == "--disable" && transport.contains "--proto-redir" &&
+    !transport.contains "--location-trusted" && !transport.any (fun x => (x.splitOn "Authorization").length > 1)) "curl configuration and credential boundary"
+  let badToken : Evidence := ⟨"owner/repo", "invalid\ncredential", (← IO.monoMsNow) + 45000, "engine", cache⟩
+  reject count (http root badToken "/actions/runs/7") "credential config injection rejected before HTTP"
+
 /-- Fast negative and positive tests cover dispatch, schema, ancestry, scope and secrecy. -/
 def selfTest (root : System.FilePath) : IO Unit := do
   let count ← IO.mkRef 0
   selfTestDiagnostics root count
   selfTestData root count
   selfTestInputs root count
+  selfTestCandidate count
   expect count ((Json.mkObj [("z", toJson "last"), ("a", toJson "first")]).compress ==
     (Json.mkObj [("a", toJson "first"), ("z", toJson "last")]).compress) "canonical JSON key order"
   for status in #["A", "D", "T", "R100"] do
@@ -685,39 +740,7 @@ def selfTest (root : System.FilePath) : IO Unit := do
   let allAccepted := Json.mkObj (suites.toList.map fun (name, _) => (name, origin))
   expect count (suites.all fun (name, _) => !regressionRequired "--current" allAccepted name) "current coverage stays partial"
   expect count (suites.all fun (name, _) => regressionRequired "--full" allAccepted name) "explicit full cannot reuse"
-  let rows : Array Entry := #[⟨"Checker/CheckAll.lean", "100644", "blob", "engine"⟩,
-    ⟨".gitignore", "100644", "blob", "ignore"⟩, ⟨"registry/claims.tsv", "100644", "blob", "old"⟩]
-  let headers := Json.mkObj [("registry/claims.tsv", toJson "header")]
-  let policy := Json.mkObj [("README.md", policyProjection "README.md" "exact PR exact head SHA")]
-  let registryA := Json.mkObj [("registry/claims.tsv", toJson "old")]
-  let registryB := Json.mkObj [("registry/claims.tsv", toJson "new")]
-  let (before, _) ← payloads root rows headers registryA policy (Json.mkObj []) envJson
-  let (after, _) ← payloads root rows headers registryB policy (Json.mkObj []) envJson
-  for (name, _) in suites do
-    expect count ((before.getObjValD name == after.getObjValD name) ==
-      (!(Checker.Regressions.groups.any (fun group => group.name == name && group.corpus)))) "corpus copy closure and synthetic projection"
-  let controlRows := rows.set! 0 ⟨"Checker/CheckAll.lean","100644","blob","new-control"⟩
-  let (controlInputs,controlEngine) ← payloads root controlRows headers registryA policy (Json.mkObj []) envJson
-  let (_,originalEngine) ← payloads root rows headers registryA policy (Json.mkObj []) envJson
-  expect count (controlEngine != originalEngine && controlInputs == before) "global producer authenticity is separate from each actual reader closure"
-  let (nativeInputs,_) ← payloads root (rows.push ⟨"Checker/Data.lean","100644","blob","data"⟩) headers registryA policy (Json.mkObj []) envJson
-  expect count (nativeInputs.getObjValD "skeleton-pure" == before.getObjValD "skeleton-pure" && nativeInputs.getObjValD "registry" != before.getObjValD "registry") "native validators do not invalidate pure semantic cases"
-  let (semanticInputs,_) ← payloads root (rows.push ⟨"Checker/SemanticDriver.lean","100644","blob","semantic"⟩) headers registryA policy (Json.mkObj []) envJson
-  expect count (semanticInputs.getObjValD "skeleton-pure" != before.getObjValD "skeleton-pure" && semanticInputs.getObjValD "content" == before.getObjValD "content") "semantic readers are separate from content transitions"
-  let compilerEnvironment := envJson.setObjVal! "native_compiler" (toJson "changed toolchain backend")
-  let (compilerInputs, _) ← payloads root rows headers registryA policy (Json.mkObj []) compilerEnvironment
-  expect count (suites.all fun (name, _) => before.getObjValD name != compilerInputs.getObjValD name) "native compiler identity changes every actual input"
-  let changedRows := rows.set! 1 ⟨".gitignore", "100644", "blob", "changed"⟩
-  let (changed, _) ← payloads root changedRows headers registryA policy (Json.mkObj []) envJson
-  expect count ((before.getObjValD "skeleton-composed") != (changed.getObjValD "skeleton-composed")) "composed gitignore is executable fixture input"
-  let changedHeaders := headers.setObjVal! "registry/claims.tsv" (toJson "new header")
-  let (changed, _) ← payloads root rows changedHeaders registryA policy (Json.mkObj []) envJson
-  expect count ((before.getObjValD "skeleton-composed") != (changed.getObjValD "skeleton-composed")) "composed registry schema closure"
-  let transport := curlArguments "owner/repo" "/actions/jobs/11/logs"
-  expect count (transport[0]! == "--disable" && transport.contains "--proto-redir" &&
-    !transport.contains "--location-trusted" && !transport.any (fun x => (x.splitOn "Authorization").length > 1)) "curl configuration and credential boundary"
-  let badToken : Evidence := ⟨"owner/repo", "invalid\ncredential", (← IO.monoMsNow) + 45000, "engine", cache⟩
-  reject count (http root badToken "/actions/runs/7") "credential config injection rejected before HTTP"
+  selfTestReaderClosures root count envJson cache
   IO.println s!"check-all self-test: {(← count.get)} positive/negative assertions passed"
 
 /-- Describe each decision before any gate runs; skipped work is never reported as executed. -/
@@ -733,18 +756,17 @@ def printPlan (mode : String) (selection : Selection) : IO Unit := do
 /-- The current lane and selected regressions share one fatal sequential interpreter. -/
 def dispatch (root : System.FilePath) (o : Options) : IO Unit := do
   if o.mode == "--self-test" then selfTest root; return
-  let mut ctx := Json.null
-  let mut base := o.base
-  let mut selection : Selection := {}
-  if o.mode == "--ci" then
+  let (ctx,base,selection) ← if o.mode == "--ci" then do
     validateOverrides root
-    ctx ← context root
-    base ← str ctx "base"
+    let ctx ← context root
+    let base ← str ctx "base"
     let full ← fullRequired root base (← str ctx "head")
-    selection ← orFull (calculateSelection root ctx full)
-  else
-    base ← commit root base
-    selection := {selection with build := ← selectLocalBuild root base (← commit root "HEAD")}
+    let selection ← orFull (calculateSelection root ctx full)
+    pure (ctx,base,selection)
+    else do
+      let base ← commit root o.base
+      let selection : Selection := {build := ← selectLocalBuild root base (← commit root "HEAD")}
+      pure (Json.null,base,selection)
   printPlan o.mode selection
   selfTest root
   let current ← currentData root
@@ -754,19 +776,16 @@ def dispatch (root : System.FilePath) (o : Options) : IO Unit := do
   execute (fun action => do
     IO.println s!"check-all: current {action.cmd}"
     currentAction root base action.cmd) actions
-  let results ← IO.mkRef (Json.mkObj [])
-  unless o.mode == "--current" do
-    execute (fun action => do
-      let name := action.cmd
+  let results ← if o.mode == "--current" then pure (Json.mkObj []) else
+    suites.foldlM (fun results (name,_) => do
       let accepted := if o.mode == "--full" then Json.null else selection.accepted.getObjValD name
       if accepted.isNull then
         IO.println s!"check-all: execute regression {name}"
         Checker.Regressions.run root (← IO.appPath) name
       else IO.println s!"check-all: reused regression {name}"
-      results.modify (fun table => table.setObjVal! name <| Json.mkObj [
+      return results.setObjVal! name <| Json.mkObj [
         ("input",selection.sigs.getObjValD name),
-        ("result",toJson (if accepted.isNull then "executed" else "reused")),("origin",accepted)]))
-      (suites.map fun (name,_) => ⟨name,#[]⟩)
+        ("result",toJson (if accepted.isNull then "executed" else "reused")),("origin",accepted)]) (Json.mkObj [])
   if selection.build.required then runGate root ⟨"lake",#["build"]⟩
   else IO.println s!"check-all: mathematical build not_required: {selection.build.reason}"
   if o.mode == "--ci" && !selection.sigs.isNull && !selection.runtime.isNull && !selection.executable.isEmpty then
@@ -776,7 +795,7 @@ def dispatch (root : System.FilePath) (o : Options) : IO Unit := do
       ("origin",if selection.build.required then Json.null else selection.buildOrigin)]
     let receipt := ctx.mergeObj <| Json.mkObj [("version",toJson version),
       ("run_id",toJson ((← env "GITHUB_RUN_ID").toNat!)),("run_attempt",toJson ((← env "GITHUB_RUN_ATTEMPT").toNat!)),
-      ("engine",toJson selection.executable),("environment",selection.runtime),("suites",← results.get),
+      ("engine",toJson selection.executable),("environment",selection.runtime),("suites",results),
       ("current",toJson "success"),("transition",toJson "success"),("build",build)]
     validReceipt receipt
     IO.println (marker ++ receipt.compress)

@@ -82,6 +82,12 @@ structure Omission where
   claim : String
   item : String
 
+/-- Find the first unused nested order suffix, retaining the original sequential candidate search. -/
+private partial def omissionSuffix (claims : Array (Array String)) (anchor : Array String) (suffix : Nat) : Nat :=
+  if claims.any (fun r => r[1]?.getD "" == anchor[1]! && r[2]?.getD "" == anchor[2]! ++ "." ++ pad suffix) then
+    omissionSuffix claims anchor (suffix+1)
+  else suffix
+
 /-- Create an omitted assertion either in a fresh item or in the original source item. -/
 def prepareOmission (ctx : Context) (before after : FilePath) (newItem : Bool := true) : IO Omission := do
   copyFixture ctx before after
@@ -90,15 +96,13 @@ def prepareOmission (ctx : Context) (before after : FilePath) (newItem : Bool :=
   let nr ← unusedId after "claim-normalization-reviews.tsv" "NR-RUNTIME"
   let cc ← unusedId after "claim-corrections.tsv" "CC-RUNTIME"
   let id ← unusedId after "claims.tsv" "CL-TASAKI2020"
-  let mut claims ← table after "claims.tsv"
+  let claims ← table after "claims.tsv"
   let anchor := claims[1]!
   let content := "The two finite parity classes have equal cardinality."
-  let mut suffix := 1
-  while claims.any (fun r => r[1]?.getD "" == anchor[1]! &&
-      r[2]?.getD "" == anchor[2]! ++ "." ++ pad suffix) do suffix := suffix + 1
+  let suffix := omissionSuffix claims anchor 1
   let order := anchor[2]! ++ "." ++ pad suffix
   let locator := anchor[4]! ++ "; independently reviewed omitted assertion"
-  claims := orderedInsert claims #[id, anchor[1]!, order, anchor[3]!, locator, "assertion",
+  let claims := orderedInsert claims #[id, anchor[1]!, order, anchor[3]!, locator, "assertion",
     "unnumbered_obligation", content, ← blob ctx content, "NONE", "NONE", "false", "NONE", "NONE", "NONE"]
   writeTable after "claims.tsv" claims
   add after "correction-events.tsv" #[event, toString (← table after "correction-events.tsv").size,
@@ -108,9 +112,9 @@ def prepareOmission (ctx : Context) (before after : FilePath) (newItem : Bool :=
   add after "claim-corrections.tsv" #[cc, event, "1", nr, id, "add_omitted_claim", "NONE", "NONE",
     "assertion", "unnumbered_obligation"]
   add after "claim-vocabulary-review.tsv" #[id, "mathlib_only", review]
-  let mut relations ← table after "item-claims.tsv"
+  let relations ← table after "item-claims.tsv"
   let existing := (relations.find? fun r => r[2]?.getD "" == anchor[0]!).get!
-  let item ← if newItem then do
+  let (item,relations) ← if newItem then do
       let item ← unusedId after "source-items.tsv" "IT-TASAKI2020"
       let items ← table after "source-items.tsv"
       let sourceItem ← record after "source-items.tsv" existing[0]!
@@ -118,16 +122,15 @@ def prepareOmission (ctx : Context) (before after : FilePath) (newItem : Bool :=
         anchor[3]!, "unlabeled", "NONE", "NONE", locator, sourceItem[8]!, sourceItem[9]!, review]
       let ia ← unusedId after "source-item-additions.tsv" "IA-RUNTIME"
       add after "source-item-additions.tsv" #[ia, event, cc, "1", item, review]
-      relations := insertAfter relations (· == existing) #[#[item, "1", id]]
-      pure item
+      pure (item,insertAfter relations (· == existing) #[#[item, "1", id]])
     else do
       let item := existing[0]!
       let selected := relations.filter fun r => r[0]?.getD "" == item
       let position := 1 + (selected.foldl (fun n r => max n (r[1]!.toNat!)) 0)
       let last := ((List.range relations.size).filter fun i => relations[i]![0]! == item).getLast!
-      relations := relations.extract 0 (last + 1) ++ #[#[item, toString position, id]] ++
+      let relations := relations.extract 0 (last + 1) ++ #[#[item, toString position, id]] ++
         relations.extract (last + 1) relations.size
-      pure item
+      pure (item,relations)
   writeTable after "item-claims.tsv" relations
   mutate after "source-invariants.tsv" anchor[1]! 7 review
   refresh ctx after
@@ -204,18 +207,15 @@ def caseCopy (ctx : Context) (name : String) (source : FilePath) : IO FilePath :
 def groupedPublic (ctx : Context) (base grouped : FilePath) (data : Grouped) : IO Unit := do
   generate ctx grouped
   let value ← catalog grouped
-  let mut namedCount := 0
-  for item in ← jsonArray (← property value "items") do
-    if (← jsonString (← property item "item_id")) == data.first.item then namedCount := namedCount + 1
+  let namedCount ← (← jsonArray (← property value "items")).foldlM (fun count item => do
+    pure (if (← jsonString (← property item "item_id")) == data.first.item then count+1 else count)) 0
   ensure (namedCount == 1) "exactly one grouped public item"
   ensure ((← jsonArray (← property value "items")).size ==
     (← table base "source-items.tsv").size) "grouped catalog retains every source item"
   let named ← catalogItem value data.first.item
   ensure ((← jsonString (← property named "item_kind")) == "footnote" &&
     (← jsonString (← property named "source_label")) == "Footnote 999") "grouped item label"
-  let mut ids := #[]
-  for member in ← jsonArray (← property named "claims") do
-    ids := ids.push (← jsonString (← property member "claim_id"))
+  let ids ← (← jsonArray (← property named "claims")).mapM fun member => do jsonString (← property member "claim_id")
   ensure (ids == #[data.first.claim, data.second.claim]) "grouped public member order"
   let anchor ← record grouped "source-items.tsv" data.first.item
   ensure ((← jsonString (← property named "public_group")) == anchor[8]! &&
@@ -252,11 +252,10 @@ def schemaHistoryCases (ctx : Context) (base current : FilePath) (am : Amendment
     ("claim-context.tsv", #["CL-TASAKI2020-0002", "1", claim, "term_reference", "inherited", "FIXTURE"]),
     ("statement-modules.tsv", #["LatticeSystem.Claims.Front", "LatticeSystem/Claims/Front.lean", "leaf"]),
     ("statement-imports.tsv", #["LatticeSystem.Claims.Front", "1", "Mathlib.Init", "true", "false", "false"])]
-  let mut original := #[]
-  for (name, row) in adapterRows do
+  let original ← adapterRows.mapM fun (name, row) => do
     let text := String.intercalate "\t" (← table ctx.project name)[0]!.toList ++ "\n" ++ String.intercalate "\t" row.toList
     IO.FS.writeFile (adapterCurrent / "registry" / name) text
-    original := original.push (name, text)
+    pure (name,text)
   expectAction ctx "adapter-current-populated" true (adaptEmpty ctx adapterCurrent)
   for (name, text) in original do
     ensure ((← IO.FS.readFile (adapterCurrent / "registry" / name)) == text) "adapter changed current bytes"
@@ -288,15 +287,15 @@ def schemaHistoryCases (ctx : Context) (base current : FilePath) (am : Amendment
   transition ctx "frozen-old-content-event" frozenBase current
   baseDiff ctx "frozen-old-dedicated-diff" frozenBase current true am.event
   let existing ← table base "claim-content-amendments.tsv"
-  let mut snapshot := (← git ctx.project #["rev-parse", "HEAD"]).trimAscii.toString
-  if existing.size > 1 then
+  let snapshot := (← git ctx.project #["rev-parse", "HEAD"]).trimAscii.toString
+  let snapshot ← if existing.size > 1 then do
     let events ← table base "correction-events.tsv"
-    let mut minimum := 1000000000
-    for ca in existing.extract 1 existing.size do
+    let (_,snapshot) := (existing.extract 1 existing.size).foldl (fun (minimum,snapshot) ca =>
       let event := (events.find? fun r => r[0]?.getD "" == ca[1]!).get!
-      if event[1]!.toNat! < minimum then
-        minimum := event[1]!.toNat!
-        snapshot := event[3]!
+      if event[1]!.toNat! < minimum then (event[1]!.toNat!,event[3]!) else (minimum,snapshot))
+      (1000000000,snapshot)
+    pure snapshot
+    else pure snapshot
   let historicalHeader := ctx.temporary / "pre-amendment-header"
   cloneCommit ctx snapshot historicalHeader
   ensure ((← table historicalHeader "claim-content-amendments.tsv").size == 1) "historical empty amendment schema"
@@ -856,8 +855,8 @@ def syntheticBase (ctx : Context) (name : String) (source : FilePath) : IO FileP
 partial def fixture (ctx : Context) (cache : FixtureCache) (legacy : FilePath) (kind : String) : IO Fixture := do
   if let some entry := (← cache.get).find? (fun entry => entry.1 == kind) then return entry.2
   let after := ctx.temporary / ("combined-fixture-" ++ kind)
-  let mut x := claim
-  let (before, event) ← if #["F", "P", "D", "K", "V", "N", "A"].contains kind then do
+  let x := claim
+  let (before,event,x) ← if #["F", "P", "D", "K", "V", "N", "A"].contains kind then do
       let before ← syntheticBase ctx kind (if kind == "N" then legacy else ctx.project)
       if kind == "P" then
         mutate before "claims.tsv" x 8 "PENDING"
@@ -868,10 +867,10 @@ partial def fixture (ctx : Context) (cache : FixtureCache) (legacy : FilePath) (
         for vo in vocabulary.extract 1 vocabulary.size do add before "claim-vocabulary.tsv" #[x, vo[0]!]
       let pair := if kind == "A" then none else if kind == "D" then some ("definition", "equation")
         else if kind == "K" then some ("assertion", "lemma") else some ("definition", "definition")
-      pure (before, ← contentEvent ctx before after x pair)
+      pure (before, ← contentEvent ctx before after x pair,x)
     else if kind == "Q" then do
       let f ← fixture ctx cache legacy "F"
-      pure (f.before, ← reclassification ctx f.before after x ("definition", "definition"))
+      pure (f.before, ← reclassification ctx f.before after x ("definition", "definition"),x)
     else if kind == "W" then do
       let f ← fixture ctx cache legacy "V"
       copyFixture ctx f.after after
@@ -882,7 +881,7 @@ partial def fixture (ctx : Context) (cache : FixtureCache) (legacy : FilePath) (
       let reviews ← table after "claim-vocabulary-review.tsv"
       let row ← record after "claim-vocabulary-review.tsv" x
       writeTable after "claim-vocabulary-review.tsv" <| (reviews.filter (· != row)).push row
-      pure (f.before, f.event)
+      pure (f.before, f.event,x)
     else if kind == "M" then do
       let f ← fixture ctx cache legacy "F"
       let om ← prepareOmission ctx f.after after
@@ -902,21 +901,21 @@ partial def fixture (ctx : Context) (cache : FixtureCache) (legacy : FilePath) (
       let index := ((List.range rows.size).find? fun i => rows[i]![0]! == om.claim).get!
       ensure (index < rows.size - 1) "nested omission inserted inside corpus"
       ensure ((← record after "claims.tsv" om.claim)[2]!.startsWith ((← record f.before "claims.tsv" x)[2]! ++ ".")) "nested omission key"
-      pure (f.before, f.event)
+      pure (f.before, f.event,x)
     else if kind == "OC" then do
       let seed ← syntheticBase ctx kind ctx.project
       let before := ctx.temporary / "combined-omission-first"
       let om ← prepareOmission ctx seed before
-      x := om.claim
-      pure (before, ← contentEvent ctx before after x (some ("definition", "definition")))
+      let x := om.claim
+      pure (before, ← contentEvent ctx before after x (some ("definition", "definition")),x)
     else if #["CC", "CA", "AC", "CRAC", "CS", "CX"].contains kind then do
       let f ← fixture ctx cache legacy (if kind == "AC" then "A" else "F")
-      let mut before := f.after
-      if kind == "CRAC" then
+      let before ← if kind == "CRAC" then do
         let middle := ctx.temporary / "combined-middle-reclass"
-        let me ← reclassification ctx before middle x ("domain", "domain")
-        cache.modify (·.push ("CRAC-middle", ⟨before, middle, me, x⟩))
-        before := middle
+        let me ← reclassification ctx f.after middle x ("domain", "domain")
+        cache.modify (·.push ("CRAC-middle", ⟨f.after, middle, me, x⟩))
+        pure middle
+        else pure f.after
       let event ← if #["CA", "CRAC"].contains kind then contentEvent ctx before after x
         else if #["CC", "AC"].contains kind then do
           let pair := if kind == "CC" then ("assertion", "equation") else ("definition", "definition")
@@ -955,10 +954,10 @@ partial def fixture (ctx : Context) (cache : FixtureCache) (legacy : FilePath) (
         if #["CC", "CRAC"].contains kind then
           let oldCc ← record after "claim-corrections.tsv" history[history.size - 2]![2]!
           ensure (oldCc.extract 8 10 != (← record after "claims.tsv" x).extract 5 7) "historical classification preserved"
-      pure (before, event)
+      pure (before, event,x)
     else if kind == "HIST" then do
       let f ← fixture ctx cache legacy "CC"
-      pure (f.after, ← contentEvent ctx f.after after x (some ("definition", "definition")))
+      pure (f.after, ← contentEvent ctx f.after after x (some ("definition", "definition")),x)
     else throw <| IO.userError ("unknown fixture " ++ kind)
   assertContentStep ctx before after event
   let result : Fixture := ⟨before, after, event, x⟩
@@ -1016,8 +1015,10 @@ def mutateCombined (ctx : Context) (label : String) (before after : FilePath) (e
   else if #["combined-static-duplicate-owner-nr", "combined-duplicate-owner-integration"].contains label then
     discard <| duplicateReview after nr
   else if #["combined-static-duplicate-owner-cc", "combined-static-mixed-owner"].contains label then
-    let mut row := cc |>.set! 0 (← unusedId after "claim-corrections.tsv" "CC-DUPLICATE") |>.set! 2 "2"
-    if label.endsWith "mixed-owner" then row := row |>.set! 3 (← duplicateReview after nr "reclassify") |>.set! 5 "reclassify"
+    let row := cc |>.set! 0 (← unusedId after "claim-corrections.tsv" "CC-DUPLICATE") |>.set! 2 "2"
+    let row ← if label.endsWith "mixed-owner" then do
+      pure (row |>.set! 3 (← duplicateReview after nr "reclassify") |>.set! 5 "reclassify")
+      else pure row
     add after "claim-corrections.tsv" row
   else if label.startsWith "combined-static-ca-owned-" then
     change "claim-corrections.tsv" cc[0]! 5 (label.replace "combined-static-ca-owned-" "")
@@ -1187,12 +1188,11 @@ def mutateCombined (ctx : Context) (label : String) (before after : FilePath) (e
       else label.replace "history-prefix-reorder-" "" ++ ".tsv"
     let rows ← table after name
     let key := if name == "claim-successors.tsv" then 2 else 1
-    let mut groups : Array (Array (Array String)) := #[]
-    for row in rows.extract 1 rows.size do
-      if groups.isEmpty || groups.back![0]![key]! != row[key]! then groups := groups.push #[]
-      groups := groups.set! (groups.size - 1) (groups.back!.push row)
+    let groups := (rows.extract 1 rows.size).foldl (fun groups row =>
+      let groups := if groups.isEmpty || groups.back![0]![key]! != row[key]! then groups.push #[] else groups
+      groups.set! (groups.size - 1) (groups.back!.push row)) (#[] : Array (Array (Array String)))
     ensure (groups.size >= 2) "two historical event groups"
-    groups := (groups.set! 0 groups[1]!).set! 1 groups[0]!
+    let groups := (groups.set! 0 groups[1]!).set! 1 groups[0]!
     writeTable after name <| #[rows[0]!] ++ groups.flatten
   else if label == "history-event-physical-reorder" then
     let rows ← table after "correction-events.tsv"
@@ -1469,8 +1469,7 @@ def runSelector (ctx : Context) (cache : FixtureCache) (legacy : FilePath)
   let e1Event ← contentEvent ctx snapshot e1 claim (some ("definition", "definition"))
   mutate e1 "correction-events.tsv" e1Event 3 b0
   installRegistry ctx e1 repo
-  let mut baseRef := b0
-  if #["selector-real-second-combined", "selector-real-historical-ordinary", "selector-real-two-new-events", "selector-real-historical-reopen"].contains label then
+  let baseRef ← if #["selector-real-second-combined", "selector-real-historical-ordinary", "selector-real-two-new-events", "selector-real-historical-reopen"].contains label then do
     assertContentStep ctx snapshot e1 e1Event
     discard <| git #["add", "registry"]
     discard <| git #["commit", "-qm", "Synthetic first combined event"]
@@ -1480,19 +1479,25 @@ def runSelector (ctx : Context) (cache : FixtureCache) (legacy : FilePath)
     mutate e2 "correction-events.tsv" e2Event 3 e1Sha
     installRegistry ctx e2 repo
     assertContentStep ctx e1 e2 e2Event
-    baseRef := e1Sha
-    if label == "selector-real-two-new-events" then baseRef := b0
-    if #["selector-real-historical-ordinary", "selector-real-historical-reopen"].contains label then
+    let baseRef := if label == "selector-real-two-new-events" then b0 else e1Sha
+    if #["selector-real-historical-ordinary", "selector-real-historical-reopen"].contains label then do
       discard <| git #["add", "registry"]
       discard <| git #["commit", "-qm", "Synthetic second combined event"]
-      baseRef := (← git #["rev-parse", "HEAD"]).trimAscii.toString
+      let baseRef := (← git #["rev-parse", "HEAD"]).trimAscii.toString
       if label.endsWith "reopen" then mutateCombined ctx label e2 repo e2Event claim
-  else if label == "selector-real-wrong-base" then mutate repo "correction-events.tsv" e1Event 3 seed
-  else if label == "selector-real-invalid-base" then baseRef := "refs/heads/does-not-exist"
-  else if label == "selector-real-class-fact-mutant" then
-    let cc := ((← table repo "claim-corrections.tsv").find? fun r => r[1]?.getD "" == e1Event).get!
-    mutate repo "claim-corrections.tsv" cc[0]! 6 "domain"
-  else assertContentStep ctx snapshot repo e1Event
+      pure baseRef
+    else pure baseRef
+    else if label == "selector-real-wrong-base" then do
+      mutate repo "correction-events.tsv" e1Event 3 seed
+      pure b0
+    else if label == "selector-real-invalid-base" then pure "refs/heads/does-not-exist"
+    else if label == "selector-real-class-fact-mutant" then do
+      let cc := ((← table repo "claim-corrections.tsv").find? fun r => r[1]?.getD "" == e1Event).get!
+      mutate repo "claim-corrections.tsv" cc[0]! 6 "domain"
+      pure b0
+    else do
+      assertContentStep ctx snapshot repo e1Event
+      pure b0
   let output ← expect ctx label positive
     (ctx.command "base-diff-ci" #[repo.toString, baseRef]) diagnostic
   if positive then
@@ -1512,9 +1517,8 @@ def combinedPublic (ctx : Context) (before after : FilePath) (event x : String) 
   let itemId := ((← table after "item-claims.tsv").find? fun r => r[2]?.getD "" == x).get![0]!
   let item ← catalogItem value itemId
   let claims ← jsonArray (← property item "claims")
-  let mut rendered := Json.null
-  for member in claims do
-    if (← jsonString (← property member "claim_id")) == x then rendered := member
+  let rendered ← claims.foldlM (fun rendered member => do
+    pure (if (← jsonString (← property member "claim_id")) == x then member else rendered)) Json.null
   ensure ((← jsonString (← property rendered "disposition")) == "definition" &&
     (← jsonString (← property rendered "subkind")) == "definition") "combined public classification"
   let original ← record before "source-items.tsv" itemId
@@ -1542,33 +1546,35 @@ def combined (ctx : Context) (legacy : FilePath) : IO Unit := do
   for (label, kind, route, positive, diagnostic) in combinedCases do
     if route == "R" then runSelector ctx cache legacy label positive diagnostic
     else
-      let mut source ← fixture ctx cache legacy (if kind == "PUBLIC" then "F" else kind)
-      if label == "history-intervening-pure-reclassification-t" then
+      let source ← fixture ctx cache legacy (if kind == "PUBLIC" then "F" else kind)
+      let source ← if label == "history-intervening-pure-reclassification-t" then do
         match (← cache.get).find? (fun entry => entry.1 == "CRAC-middle") with
-        | some (_, middle) => source := middle
+        | some (_, middle) => pure middle
         | none => throw <| IO.userError ("missing historical fixture for " ++ label)
+        else pure source
       let caseRoot := ctx.temporary / ("combined-case-" ++ label)
       IO.FS.createDirAll caseRoot
       let before := caseRoot / "base"
       let after := caseRoot / "current"
       copyFixture ctx (if #["O", "E"].contains route && label != "combined-ordinary-rejects-full-diff" then source.after else source.before) before
       copyFixture ctx source.after after
-      let mut event := source.event
-      let mut x := source.target
-      if label == "none-old-combined-new-id-transition" then
+      let (event,x) ← if label == "none-old-combined-new-id-transition" then do
         ctx.owned after
         IO.FS.removeDirAll after
         let om ← prepareOmission ctx before after
-        event := om.event
-        x := om.claim
+        let event := om.event
+        let x := om.claim
         mutate after "claim-normalization-reviews.tsv" om.normalization 5 "amend_and_reclassify"
         mutate after "claim-corrections.tsv" om.correction 5 "amend_and_reclassify"
         let row ← record after "claims.tsv" x
         add after "claim-content-amendments.tsv" #[← unusedId after "claim-content-amendments.tsv" "CA-RUNTIME",
           event, om.correction, x, ← blob ctx "Synthetic prior bytes", row[8]!,
           (← record after "pages.tsv" row[3]!)[9]!, om.review]
-      else if !positive || #["combined-independent-second-source-control-t", "history-later-lifecycle-static-only-s"].contains label then
-        mutateCombined ctx label before after event x
+        pure (event,x)
+        else do
+          if !positive || #["combined-independent-second-source-control-t", "history-later-lifecycle-static-only-s"].contains label then
+            mutateCombined ctx label before after source.event source.target
+          pure (source.event,source.target)
       if positive && !#["O", "G"].contains route && label != "history-later-lifecycle-static-only-s" then
         assertContentStep ctx before after event
       if route == "G" then expectAction ctx label true (combinedPublic ctx before after event x)

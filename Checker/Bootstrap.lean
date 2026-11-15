@@ -176,25 +176,38 @@ private def decodeSource (encoded : String) (work : FilePath) : IO ByteArray := 
 /-- Bytes-mode regular-expression whitespace is ASCII, unlike registry-content Unicode strip. -/
 private def byteSpace (byte : UInt8) : Bool := #[9,10,11,12,13,32].contains byte.toNat
 
+/-- Scan only the available bytes, threading the position through a bounded pure recursion. -/
+private def scanBytes (source : ByteArray) (predicate : UInt8 → Bool) : Nat → Nat → Nat
+  | 0, position => position
+  | fuel+1, position =>
+    if (source[position]?).any predicate then scanBytes source predicate fuel (position+1) else position
+
 /-- Match the original numeric dotted version after a particular LEANTARVERSION definition. -/
-private def versionAt (source : ByteArray) (start : Nat) : Option String := Id.run do
-  let mut i := start
-  while i < source.size && byteSpace source[i]! do i := i+1
-  if source[i]? != some 58 || source[i+1]? != some 61 then return none
-  i := i+2
-  while i < source.size && byteSpace source[i]! do i := i+1
-  if source[i]? != some 34 then return none
-  i := i+1
-  let begin := i
-  for part in [:3] do
-    let first := i
-    while i < source.size && 48 ≤ source[i]! && source[i]! ≤ 57 do i := i+1
-    if i == first then return none
-    if part < 2 then
-      if source[i]? != some 46 then return none
-      i := i+1
-  if source[i]? != some 34 then return none
-  return String.fromUTF8? (source.extract begin i)
+private def versionAt (source : ByteArray) (start : Nat) : Option String := do
+  let first := scanBytes source byteSpace source.size start
+  if source[first]? != some 58 || source[first+1]? != some 61 then none else do
+    let quoted := scanBytes source byteSpace source.size (first+2)
+    if source[quoted]? != some 34 then none else do
+      let begin := quoted+1
+      let digits := scanBytes source (fun byte => 48 ≤ byte && byte ≤ 57) source.size
+      let endOne := digits begin
+      if endOne == begin || source[endOne]? != some 46 then none else do
+        let endTwo := digits (endOne+1)
+        if endTwo == endOne+1 || source[endTwo]? != some 46 then none else do
+          let endThree := digits (endTwo+1)
+          if endThree == endTwo+1 || source[endThree]? != some 34 then none else
+            String.fromUTF8? (source.extract begin endThree)
+
+/-- Collect matches in source order without constructing a range-sized list or array. -/
+private def matchingVersions (source marker : ByteArray) : Nat → Nat → Array String → Array String
+  | 0, _, found => found
+  | fuel+1, position, found =>
+    let next := if source.extract position (position+marker.size) == marker then
+      match versionAt source (position+marker.size) with
+      | some value => found.push value
+      | none => found
+      else found
+    matchingVersions source marker fuel (position+1) next
 
 /-- Derive exactly one leantar version from the exact Contents API blob at the declared Mathlib commit. -/
 private def leantarVersion (revision : String) (work : FilePath) : IO String := do
@@ -210,10 +223,7 @@ private def leantarVersion (revision : String) (work : FilePath) : IO String := 
   let actual ← run "Git blob verification" "git" #["hash-object","--no-filters",path.toString] (some work) gitEnv
   require (actual == (← stringField data "sha") && hex actual 40) "Pinned Mathlib source identity mismatch"
   let marker := "def LEANTARVERSION".toUTF8
-  let mut versions := #[]
-  for i in [:source.size] do
-    if source.extract i (i+marker.size) == marker then
-      if let some value := versionAt source (i+marker.size) then versions := versions.push value
+  let versions := matchingVersions source marker source.size 0 #[]
   require (versions.size == 1) "Cannot identify the existing pinned leantar version"
   return versions[0]!
 

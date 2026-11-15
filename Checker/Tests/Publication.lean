@@ -13,8 +13,8 @@ def twoSourcesInput : String := "{\"tracks\":[{\"track_id\":\"TR-FIRST\",\"posit
 /-- Materialize only the original synthetic in-memory table collection. -/
 def fixture (text : String) : IO Data := do
   let value ← parse text
-  let mut tables := ({} : Std.HashMap String (Array Row))
-  for name in keys value do tables := tables.insert name (← arr value name)
+  let tables ← (keys value).foldlM (fun tables name => do pure (tables.insert name (← arr value name)))
+    ({} : Std.HashMap String (Array Row))
   return ⟨".",tables⟩
 
 /-- Test assertions are mandatory executable checks, independent of optimization flags. -/
@@ -22,11 +22,10 @@ def check (condition : Bool) (message : String) : IO Unit := require condition (
 
 /-- Numeric chapter paths follow source order rather than unpadded lexical numerals. -/
 def chapterPaths : IO Unit := do
-  let mut groups := #[]; let mut paths := #[]
-  for n in #[1,2,9,10,11] do
+  let (groups,paths) ← #[1,2,9,10,11].foldlM (fun (groups,paths) n => do
     let group ← publicGroup (stringRow #[("section",s!"§{n}.1"),("page_kind","body")]) s!"PDF p. {n}; §{n}.1"
-    groups := groups.push group
-    paths := paths.push ("docs/generated/groups/source/" ++ (← slugForGroup group) ++ ".md")
+    pure (groups.push group, paths.push ("docs/generated/groups/source/" ++ (← slugForGroup group) ++ ".md")))
+    ((#[],#[]) : Array String × Array String)
   check (groups == #["Chapter 01","Chapter 02","Chapter 09","Chapter 10","Chapter 11"]) "numeric chapter display"
   check (paths == paths.qsort (· < ·)) "numeric chapter lexical order"
   check ((← slugForGroup "Chapter 1") == "chapter-01") "chapter slug padding"
@@ -56,9 +55,10 @@ def twoSources : IO Unit := do
   check ((← nat catalog "schema_version") == 2) "catalog schema"
   let catalogItems ← arr catalog "items"
   check ((← str catalogItems[0]! "source_id") == "ZFIRST") "public item order"
-  let mut statuses : Std.HashMap String String := {}
-  for item in catalogItems do
-    for claim in ← arr item "claims" do statuses := statuses.insert (← str claim "claim_id") (← str claim "vocabulary_status")
+  let statuses ← catalogItems.foldlM (fun statuses item => do
+    (← arr item "claims").foldlM (fun statuses claim => do
+      pure (statuses.insert (← str claim "claim_id") (← str claim "vocabulary_status"))) statuses)
+    ({} : Std.HashMap String String)
   check (statuses["CL-ZFIRST-0001"]? == some "vocabulary_ready") "reviewed source readiness"
   check (statuses["CL-ASECOND-0001"]? == some "review_staged") "registered source is not yet ready"
   let outputs ← buildOutputs catalog

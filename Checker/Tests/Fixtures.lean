@@ -47,11 +47,11 @@ def write (root : FilePath) (relative text : String) : IO Unit := do
 /-- Exact baseline-file identity for the immutable common-corpus oracle. -/
 def fingerprint (ctx : Context) (root : FilePath) : IO String := do
   let entries := (← (root / "registry").readDir).qsort (fun a b => a.fileName < b.fileName)
-  let mut text := ""
-  for entry in entries do
+  let text ← entries.foldlM (fun text entry => do
     if (← entry.path.symlinkMetadata).type == .file then
       let oid := (← git ctx.project #["hash-object",entry.path.toString]).trimAscii.toString
-      text := text ++ entry.fileName ++ "\x00" ++ oid ++ "\n"
+      pure (text ++ entry.fileName ++ "\x00" ++ oid ++ "\n")
+    else pure text) ""
   blob ctx text
 
 /-- Read the immutable tracked baseline without creating a checkout or copying private files. -/

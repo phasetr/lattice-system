@@ -36,14 +36,16 @@ def three (ctx : Context) (good target : FilePath) : IO Unit := do
 def census (ctx : Context) (good target : FilePath) : IO Unit := do
   copyFixture ctx good target
   replace target "phase.tsv" #["phase","census"]
-  editFile target "references/tasaki-2020.tsv" fun index original => Id.run do
-    let mut row := original
-    if index == 2 then
-      row := row.set! 2 "2020.ed1"
-      row := row.set! 3 "3333333333333333333333333333333333333333"
-      row := row.set! 4 "4444444444444444444444444444444444444444"
-      row := row.set! 5 "frozen"
-    return if (true) then some row else none
+  editFile target "references/tasaki-2020.tsv" fun index original =>
+    let row := if index == 2 then
+      let row := original
+      let row := row.set! 2 "2020.ed1"
+      let row := row.set! 3 "3333333333333333333333333333333333333333"
+      let row := row.set! 4 "4444444444444444444444444444444444444444"
+      let row := row.set! 5 "frozen"
+      row
+    else original
+    if (true) then some row else none
   write target "registry/pages.tsv" "page_id\tsource_id\torder_key\tprinted_page\tpdf_page\tsection\tpage_kind\tpass1\tpass2\tsource_oid\nPG-TASAKI2020-0001\tTASAKI2020\t000001\tNONE\t1\tNONE\tcontent\tcomplete\tcomplete\t4444444444444444444444444444444444444444\nPG-TASAKI2020-0002\tTASAKI2020\t000002\t1\t2\t1.1\tcontent\tcomplete\tcomplete\t4444444444444444444444444444444444444444\n"
   write target "registry/claims.tsv" "claim_id\tsource_id\torder_key\tpage_id\tlocator\tdisposition\tsubkind\tnormalized_content\tcontent_oid\texclusion_rationale\texclusion_review_ref\ttombstone\tsuperseded_by\ttombstone_rationale\ttombstone_review_ref\nCL-TASAKI2020-0001\tTASAKI2020\t000001.0001\tPG-TASAKI2020-0001\tPDF p. 1; print p. NONE; NONE; equation (F.1)\tassertion\tequation\tFixture-equation.\tPENDING\tNONE\tNONE\tfalse\tNONE\tNONE\tNONE\nCL-TASAKI2020-0002\tTASAKI2020\t000002.0001\tPG-TASAKI2020-0002\tPDF-p.2-section-1.1\tassertion\tunnumbered_obligation\tFixture-prose-claim.\tPENDING\tNONE\tNONE\tfalse\tNONE\tNONE\tNONE\n"
   for name in #["slices.tsv","dependencies.tsv","bindings.tsv","claim-context.tsv","axioms.tsv","claim-axioms.tsv","statement-modules.tsv","statement-imports.tsv"] do headerOnly target name
@@ -59,79 +61,96 @@ def cases0 (ctx : Context) (good threeRoot : FilePath) : IO Unit := do
   do
     let target := ctx.temporary / "registry-bad-fk"
     copyFixture ctx good target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 3 "PG-TASAKI2020-9999"
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 3 "PG-TASAKI2020-9999"
+        row
+      else original
+      if (true) then some row else none
   -- registry-bad-enum
   do
     let target := ctx.temporary / "registry-bad-enum"
     copyFixture ctx good target
-    editFile target "registry/pages.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 6 "invalid"
-      return if (true) then some row else none
+    editFile target "registry/pages.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 6 "invalid"
+        row
+      else original
+      if (true) then some row else none
   -- registry-bad-order
   do
     let target := ctx.temporary / "registry-bad-order"
     copyFixture ctx good target
-    editFile target "registry/pages.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 2 "bad"
-      return if (true) then some row else none
+    editFile target "registry/pages.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 2 "bad"
+        row
+      else original
+      if (true) then some row else none
   -- registry-bad-header
   do
     let target := ctx.temporary / "registry-bad-header"
     copyFixture ctx good target
-    editFile target "registry/pages.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 1 then
-        row := ("wrong_header".splitOn "\t").toArray
-      return if (true) then some row else none
+    editFile target "registry/pages.tsv" fun index original =>
+      let row := if index == 1 then
+        let row := ("wrong_header".splitOn "\t").toArray
+        row
+      else original
+      if (true) then some row else none
   -- registry-bad-column
   do
     let target := ctx.temporary / "registry-bad-column"
     copyFixture ctx good target
-    editFile target "registry/pages.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.extract 0 9
-      return if (true) then some row else none
+    editFile target "registry/pages.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.extract 0 9
+        row
+      else original
+      if (true) then some row else none
   -- registry-control-char
   do
     let target := ctx.temporary / "registry-control-char"
     copyFixture ctx good target
-    editFile target "registry/pages.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 5 "bad\u000bcontrol"
-      return if (true) then some row else none
+    editFile target "registry/pages.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 5 "bad\u000bcontrol"
+        row
+      else original
+      if (true) then some row else none
   -- registry-bad-id
   do
     let target := ctx.temporary / "registry-bad-id"
     copyFixture ctx good target
-    editFile target "registry/pages.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 0 "bad-page-id"
-      return if (true) then some row else none
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 3 "bad-page-id"
-      return if (true) then some row else none
+    editFile target "registry/pages.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 0 "bad-page-id"
+        row
+      else original
+      if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 3 "bad-page-id"
+        row
+      else original
+      if (true) then some row else none
   -- registry-page-missing-coordinate
   do
     let target := ctx.temporary / "registry-page-missing-coordinate"
     copyFixture ctx good target
-    editFile target "registry/pages.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 3 ""
-      return if (true) then some row else none
+    editFile target "registry/pages.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 3 ""
+        row
+      else original
+      if (true) then some row else none
   -- registry-slice-duplicate
   do
     let target := ctx.temporary / "registry-slice-duplicate"
@@ -146,11 +165,13 @@ def cases1 (ctx : Context) (threeRoot : FilePath) : IO Unit := do
   do
     let target := ctx.temporary / "registry-slice-position"
     copyFixture ctx threeRoot target
-    editFile target "registry/slices.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 1 "2"
-      return if (true) then some row else none
+    editFile target "registry/slices.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 1 "2"
+        row
+      else original
+      if (true) then some row else none
   -- registry-dep-bad-role
   do
     let target := ctx.temporary / "registry-dep-bad-role"
@@ -220,11 +241,13 @@ def cases1 (ctx : Context) (threeRoot : FilePath) : IO Unit := do
   do
     let target := ctx.temporary / "registry-fk-slice"
     copyFixture ctx threeRoot target
-    editFile target "registry/slices.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 4 then
-        row := row.set! 2 "CL-TASAKI2020-9999"
-      return if (true) then some row else none
+    editFile target "registry/slices.tsv" fun index original =>
+      let row := if index == 4 then
+        let row := original
+        let row := row.set! 2 "CL-TASAKI2020-9999"
+        row
+      else original
+      if (true) then some row else none
 
 /-- Construct the registry-fk-dependency through registry-supersession-missing-review counterfactuals. -/
 def cases2 (ctx : Context) (good threeRoot superRoot : FilePath) : IO Unit := do
@@ -239,29 +262,35 @@ def cases2 (ctx : Context) (good threeRoot superRoot : FilePath) : IO Unit := do
   do
     let target := ctx.temporary / "registry-fk-binding"
     copyFixture ctx good target
-    editFile target "registry/bindings.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 0 "CL-TASAKI2020-9999"
-      return if (true) then some row else none
+    editFile target "registry/bindings.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 0 "CL-TASAKI2020-9999"
+        row
+      else original
+      if (true) then some row else none
   -- registry-fk-claim-axiom-claim
   do
     let target := ctx.temporary / "registry-fk-claim-axiom-claim"
     copyFixture ctx good target
-    editFile target "registry/claim-axioms.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 0 "CL-TASAKI2020-9999"
-      return if (true) then some row else none
+    editFile target "registry/claim-axioms.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 0 "CL-TASAKI2020-9999"
+        row
+      else original
+      if (true) then some row else none
   -- registry-fk-claim-axiom-axiom
   do
     let target := ctx.temporary / "registry-fk-claim-axiom-axiom"
     copyFixture ctx good target
-    editFile target "registry/claim-axioms.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 1 "AX-PROJECT-9999"
-      return if (true) then some row else none
+    editFile target "registry/claim-axioms.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 1 "AX-PROJECT-9999"
+        row
+      else original
+      if (true) then some row else none
   -- registry-supersession-good
   do
     let target := ctx.temporary / "registry-supersession-good"
@@ -270,58 +299,71 @@ def cases2 (ctx : Context) (good threeRoot superRoot : FilePath) : IO Unit := do
   do
     let target := ctx.temporary / "registry-supersession-self"
     copyFixture ctx good target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 11 "true"
-        row := row.set! 12 row[0]!
-        row := row.set! 13 "bad-self"
-        row := row.set! 14 "review-1"
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 11 "true"
+        let row := row.set! 12 row[0]!
+        let row := row.set! 13 "bad-self"
+        let row := row.set! 14 "review-1"
+        row
+      else original
+      if (true) then some row else none
   -- registry-supersession-cycle
   do
     let target := ctx.temporary / "registry-supersession-cycle"
     copyFixture ctx threeRoot target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 11 "true"
-        row := row.set! 12 "CL-TASAKI2020-0002"
-        row := row.set! 13 "cycle-one"
-        row := row.set! 14 "review-1"
-      if index == 3 then
-        row := row.set! 11 "true"
-        row := row.set! 12 "CL-TASAKI2020-0001"
-        row := row.set! 13 "cycle-two"
-        row := row.set! 14 "review-2"
-      return if (index < 4) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 11 "true"
+        let row := row.set! 12 "CL-TASAKI2020-0002"
+        let row := row.set! 13 "cycle-one"
+        let row := row.set! 14 "review-1"
+        row
+      else original
+      let row := if index == 3 then
+        let row := row
+        let row := row.set! 11 "true"
+        let row := row.set! 12 "CL-TASAKI2020-0001"
+        let row := row.set! 13 "cycle-two"
+        let row := row.set! 14 "review-2"
+        row
+      else row
+      if (index < 4) then some row else none
   -- registry-supersession-incoherent
   do
     let target := ctx.temporary / "registry-supersession-incoherent"
     copyFixture ctx threeRoot target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 12 "CL-TASAKI2020-0002"
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 12 "CL-TASAKI2020-0002"
+        row
+      else original
+      if (true) then some row else none
   -- registry-supersession-missing-rationale
   do
     let target := ctx.temporary / "registry-supersession-missing-rationale"
     copyFixture ctx superRoot target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 13 "NONE"
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 13 "NONE"
+        row
+      else original
+      if (true) then some row else none
   -- registry-supersession-missing-review
   do
     let target := ctx.temporary / "registry-supersession-missing-review"
     copyFixture ctx superRoot target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 14 "NONE"
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 14 "NONE"
+        row
+      else original
+      if (true) then some row else none
 
 /-- Construct the registry-exclusion-good through registry-axiom-categories-good counterfactuals. -/
 def cases3 (ctx : Context) (good : FilePath) : IO Unit := do
@@ -329,101 +371,120 @@ def cases3 (ctx : Context) (good : FilePath) : IO Unit := do
   do
     let target := ctx.temporary / "registry-exclusion-good"
     copyFixture ctx good target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 5 "out_of_scope"
-        row := row.set! 9 "scope-reason"
-        row := row.set! 10 "review-1"
-      return if (true) then some row else none
-    editFile target "registry/bindings.tsv" fun index original => Id.run do
-      let mut row := original
-      return if (index == 1) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 5 "out_of_scope"
+        let row := row.set! 9 "scope-reason"
+        let row := row.set! 10 "review-1"
+        row
+      else original
+      if (true) then some row else none
+    editFile target "registry/bindings.tsv" fun index original =>
+      if (index == 1) then some original else none
   -- registry-binding-out-of-scope
   do
     let target := ctx.temporary / "registry-binding-out-of-scope"
     copyFixture ctx good target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 5 "out_of_scope"
-        row := row.set! 9 "scope-reason"
-        row := row.set! 10 "review-1"
-      return if (true) then some row else none
-    editFile target "registry/bindings.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 2 "NONE"
-        row := row.set! 5 "definition_value"
-        row := row.set! 8 "definitional"
-        row := row.set! 9 "NONE"
-        row := row.set! 10 "NONE"
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 5 "out_of_scope"
+        let row := row.set! 9 "scope-reason"
+        let row := row.set! 10 "review-1"
+        row
+      else original
+      if (true) then some row else none
+    editFile target "registry/bindings.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 2 "NONE"
+        let row := row.set! 5 "definition_value"
+        let row := row.set! 8 "definitional"
+        let row := row.set! 9 "NONE"
+        let row := row.set! 10 "NONE"
+        row
+      else original
+      if (true) then some row else none
   -- registry-exclusion-missing-rationale
   do
     let target := ctx.temporary / "registry-exclusion-missing-rationale"
     copyFixture ctx (ctx.temporary / "registry-exclusion-good") target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 9 "NONE"
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 9 "NONE"
+        row
+      else original
+      if (true) then some row else none
   -- registry-exclusion-missing-review
   do
     let target := ctx.temporary / "registry-exclusion-missing-review"
     copyFixture ctx (ctx.temporary / "registry-exclusion-good") target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 10 "NONE"
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 10 "NONE"
+        row
+      else original
+      if (true) then some row else none
   -- registry-exclusion-incoherent
   do
     let target := ctx.temporary / "registry-exclusion-incoherent"
     copyFixture ctx good target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 9 "scope-reason"
-        row := row.set! 10 "review-1"
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 9 "scope-reason"
+        let row := row.set! 10 "review-1"
+        row
+      else original
+      if (true) then some row else none
   -- registry-remark-good
   do
     let target := ctx.temporary / "registry-remark-good"
     copyFixture ctx good target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 6 "remark"
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 6 "remark"
+        row
+      else original
+      if (true) then some row else none
   -- registry-bad-subkind
   do
     let target := ctx.temporary / "registry-bad-subkind"
     copyFixture ctx good target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 6 "editorial"
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 6 "editorial"
+        row
+      else original
+      if (true) then some row else none
   -- registry-axiom-bad-category
   do
     let target := ctx.temporary / "registry-axiom-bad-category"
     copyFixture ctx good target
-    editFile target "registry/axioms.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 3 "analytic-limit"
-      return if (true) then some row else none
+    editFile target "registry/axioms.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 3 "analytic-limit"
+        row
+      else original
+      if (true) then some row else none
   -- registry-axiom-bad-path
   do
     let target := ctx.temporary / "registry-axiom-bad-path"
     copyFixture ctx good target
-    editFile target "registry/axioms.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 1 "LatticeSystem.Axioms.State.bad"
-        row := row.set! 2 "LatticeSystem.Axioms.State"
-      return if (true) then some row else none
+    editFile target "registry/axioms.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 1 "LatticeSystem.Axioms.State.bad"
+        let row := row.set! 2 "LatticeSystem.Axioms.State"
+        row
+      else original
+      if (true) then some row else none
   -- registry-axiom-categories-good
   do
     let target := ctx.temporary / "registry-axiom-categories-good"
@@ -439,9 +500,8 @@ def cases4 (ctx : Context) (good : FilePath) : IO Unit := do
   do
     let target := ctx.temporary / "registry-source-missing"
     copyFixture ctx good target
-    editFile target "references/tasaki-2020.tsv" fun index original => Id.run do
-      let mut row := original
-      return if (index == 1) then some row else none
+    editFile target "references/tasaki-2020.tsv" fun index original =>
+      if (index == 1) then some original else none
   -- registry-source-duplicate
   do
     let target := ctx.temporary / "registry-source-duplicate"
@@ -453,40 +513,45 @@ def cases4 (ctx : Context) (good : FilePath) : IO Unit := do
   do
     let target := ctx.temporary / "registry-source-bad-identity"
     copyFixture ctx good target
-    editFile target "references/tasaki-2020.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 0 "OTHER"
-      return if (true) then some row else none
+    editFile target "references/tasaki-2020.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 0 "OTHER"
+        row
+      else original
+      if (true) then some row else none
   -- registry-post-source-missing
   do
     let target := ctx.temporary / "registry-post-source-missing"
     copyFixture ctx good target
-    editFile target "references/tasaki-2020.tsv" fun index original => Id.run do
-      let mut row := original
-      return if (index == 1) then some row else none
+    editFile target "references/tasaki-2020.tsv" fun index original =>
+      if (index == 1) then some original else none
   -- registry-post-source-alternate
   do
     let target := ctx.temporary / "registry-post-source-alternate"
     copyFixture ctx good target
-    editFile target "references/tasaki-2020.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 0 "OTHER"
-      return if (true) then some row else none
+    editFile target "references/tasaki-2020.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 0 "OTHER"
+        row
+      else original
+      if (true) then some row else none
   -- registry-bootstrap-edition-pending
   do
     let target := ctx.temporary / "registry-bootstrap-edition-pending"
     copyFixture ctx good target
     replace target "phase.tsv" #["phase","bootstrap"]
-    editFile target "references/tasaki-2020.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 2 "pending"
-        row := row.set! 3 ""
-        row := row.set! 4 ""
-        row := row.set! 5 "pending"
-      return if (true) then some row else none
+    editFile target "references/tasaki-2020.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 2 "pending"
+        let row := row.set! 3 ""
+        let row := row.set! 4 ""
+        let row := row.set! 5 "pending"
+        row
+      else original
+      if (true) then some row else none
   -- registry-bootstrap-source-frozen
   do
     let target := ctx.temporary / "registry-bootstrap-source-frozen"
@@ -494,39 +559,47 @@ def cases4 (ctx : Context) (good : FilePath) : IO Unit := do
     replace target "phase.tsv" #["phase","bootstrap"]
     for table in #["pages.tsv","claims.tsv","slices.tsv","bindings.tsv","claim-context.tsv","axioms.tsv","claim-axioms.tsv","statement-modules.tsv","statement-imports.tsv"] do
       headerOnly target table
-    editFile target "references/tasaki-2020.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 5 "pending"
-      return if (true) then some row else none
+    editFile target "references/tasaki-2020.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 5 "pending"
+        row
+      else original
+      if (true) then some row else none
   -- registry-post-edition-pending
   do
     let target := ctx.temporary / "registry-post-edition-pending"
     copyFixture ctx good target
-    editFile target "references/tasaki-2020.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 2 "pending"
-      return if (true) then some row else none
+    editFile target "references/tasaki-2020.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 2 "pending"
+        row
+      else original
+      if (true) then some row else none
   -- registry-skeleton-frozen
   do
     let target := ctx.temporary / "registry-skeleton-frozen"
     copyFixture ctx good target
     replace target "phase.tsv" #["phase","skeleton"]
-    editFile target "registry/axioms.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 7 "3333333333333333333333333333333333333333"
-      return if (true) then some row else none
+    editFile target "registry/axioms.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 7 "3333333333333333333333333333333333333333"
+        row
+      else original
+      if (true) then some row else none
   -- registry-skeleton-pending-axiom
   do
     let target := ctx.temporary / "registry-skeleton-pending-axiom"
     copyFixture ctx (ctx.temporary / "registry-skeleton-frozen") target
-    editFile target "registry/axioms.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 7 "PENDING"
-      return if (true) then some row else none
+    editFile target "registry/axioms.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 7 "PENDING"
+        row
+      else original
+      if (true) then some row else none
 
 /-- Construct the registry-skeleton-bad-axiom-oid through registry-census-source-extra-row counterfactuals. -/
 def cases5 (ctx : Context) (good censusRoot : FilePath) : IO Unit := do
@@ -534,82 +607,96 @@ def cases5 (ctx : Context) (good censusRoot : FilePath) : IO Unit := do
   do
     let target := ctx.temporary / "registry-skeleton-bad-axiom-oid"
     copyFixture ctx (ctx.temporary / "registry-skeleton-frozen") target
-    editFile target "registry/axioms.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 7 "not-an-object-id"
-      return if (true) then some row else none
+    editFile target "registry/axioms.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 7 "not-an-object-id"
+        row
+      else original
+      if (true) then some row else none
   -- registry-skeleton-pending-type
   do
     let target := ctx.temporary / "registry-skeleton-pending-type"
     copyFixture ctx (ctx.temporary / "registry-skeleton-frozen") target
-    editFile target "registry/bindings.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 6 "PENDING"
-      return if (true) then some row else none
+    editFile target "registry/bindings.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 6 "PENDING"
+        row
+      else original
+      if (true) then some row else none
   -- registry-skeleton-pending-value
   do
     let target := ctx.temporary / "registry-skeleton-pending-value"
     copyFixture ctx (ctx.temporary / "registry-skeleton-frozen") target
-    editFile target "registry/bindings.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 7 "PENDING"
-      return if (true) then some row else none
+    editFile target "registry/bindings.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 7 "PENDING"
+        row
+      else original
+      if (true) then some row else none
   -- registry-skeleton-pending-proof
   do
     let target := ctx.temporary / "registry-skeleton-pending-proof"
     copyFixture ctx (ctx.temporary / "registry-skeleton-frozen") target
-    editFile target "registry/bindings.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 10 "PENDING"
-      return if (true) then some row else none
+    editFile target "registry/bindings.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 10 "PENDING"
+        row
+      else original
+      if (true) then some row else none
   -- registry-skeleton-pending-nonvacuity
   do
     let target := ctx.temporary / "registry-skeleton-pending-nonvacuity"
     copyFixture ctx (ctx.temporary / "registry-skeleton-frozen") target
-    editFile target "registry/bindings.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 12 "LatticeSystem.Claims.Front.nonvacuity0001"
-        row := row.set! 13 "PENDING"
-      return if (true) then some row else none
+    editFile target "registry/bindings.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 12 "LatticeSystem.Claims.Front.nonvacuity0001"
+        let row := row.set! 13 "PENDING"
+        row
+      else original
+      if (true) then some row else none
   -- registry-source-mixed-width
   do
     let target := ctx.temporary / "registry-source-mixed-width"
     copyFixture ctx good target
-    editFile target "references/tasaki-2020.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 4 "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
-      return if (true) then some row else none
+    editFile target "references/tasaki-2020.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 4 "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-source-identity
   do
     let target := ctx.temporary / "registry-census-source-identity"
     copyFixture ctx censusRoot target
-    editFile target "references/tasaki-2020.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 3 "bad"
-      return if (true) then some row else none
+    editFile target "references/tasaki-2020.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 3 "bad"
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-source-bad-header
   do
     let target := ctx.temporary / "registry-census-source-bad-header"
     copyFixture ctx censusRoot target
-    editFile target "references/tasaki-2020.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 1 then
-        row := ("bad".splitOn "\t").toArray
-      return if (true) then some row else none
+    editFile target "references/tasaki-2020.tsv" fun index original =>
+      let row := if index == 1 then
+        let row := ("bad".splitOn "\t").toArray
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-source-header-only
   do
     let target := ctx.temporary / "registry-census-source-header-only"
     copyFixture ctx censusRoot target
-    editFile target "references/tasaki-2020.tsv" fun index original => Id.run do
-      let mut row := original
-      return if (index == 1) then some row else none
+    editFile target "references/tasaki-2020.tsv" fun index original =>
+      if (index == 1) then some original else none
   -- registry-census-source-extra-row
   do
     let target := ctx.temporary / "registry-census-source-extra-row"
@@ -624,20 +711,24 @@ def cases6 (ctx : Context) (censusRoot : FilePath) : IO Unit := do
   do
     let target := ctx.temporary / "registry-census-source-malformed-column"
     copyFixture ctx censusRoot target
-    editFile target "references/tasaki-2020.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.extract 0 6
-      return if (true) then some row else none
+    editFile target "references/tasaki-2020.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.extract 0 6
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-source-reserved-edition
   do
     let target := ctx.temporary / "registry-census-source-reserved-edition"
     copyFixture ctx censusRoot target
-    editFile target "references/tasaki-2020.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 2 "pending"
-      return if (true) then some row else none
+    editFile target "references/tasaki-2020.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 2 "pending"
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-claim-count
   do
     let target := ctx.temporary / "registry-census-claim-count"
@@ -649,23 +740,27 @@ def cases6 (ctx : Context) (censusRoot : FilePath) : IO Unit := do
   do
     let target := ctx.temporary / "registry-census-claim-inactive"
     copyFixture ctx (ctx.temporary / "registry-census-claim-count") target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 11 "true"
-        row := row.set! 12 "CL-TASAKI2020-0003"
-        row := row.set! 13 "duplicate"
-        row := row.set! 14 "review-1"
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 11 "true"
+        let row := row.set! 12 "CL-TASAKI2020-0003"
+        let row := row.set! 13 "duplicate"
+        let row := row.set! 14 "review-1"
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-claim-superseded
   do
     let target := ctx.temporary / "registry-census-claim-superseded"
     copyFixture ctx censusRoot target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 12 "CL-TASAKI2020-0002"
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 12 "CL-TASAKI2020-0002"
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-equation-duplicate
   do
     let target := ctx.temporary / "registry-census-equation-duplicate"
@@ -679,9 +774,8 @@ def cases6 (ctx : Context) (censusRoot : FilePath) : IO Unit := do
   do
     let target := ctx.temporary / "registry-census-claims-empty"
     copyFixture ctx censusRoot target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      return if (index == 1) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      if (index == 1) then some original else none
   -- registry-census-skeleton-claim-axioms
   do
     let target := ctx.temporary / "registry-census-skeleton-claim-axioms"
@@ -700,16 +794,20 @@ def cases6 (ctx : Context) (censusRoot : FilePath) : IO Unit := do
   do
     let target := ctx.temporary / "registry-census-page-id"
     copyFixture ctx censusRoot target
-    editFile target "registry/pages.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 3 then
-        row := row.set! 0 "PG-TASAKI2020-0003"
-      return if (true) then some row else none
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 3 then
-        row := row.set! 3 "PG-TASAKI2020-0003"
-      return if (true) then some row else none
+    editFile target "registry/pages.tsv" fun index original =>
+      let row := if index == 3 then
+        let row := original
+        let row := row.set! 0 "PG-TASAKI2020-0003"
+        row
+      else original
+      if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 3 then
+        let row := original
+        let row := row.set! 3 "PG-TASAKI2020-0003"
+        row
+      else original
+      if (true) then some row else none
 
 /-- Construct the registry-census-page-source through registry-census-claim-source counterfactuals. -/
 def cases7 (ctx : Context) (censusRoot : FilePath) : IO Unit := do
@@ -717,97 +815,119 @@ def cases7 (ctx : Context) (censusRoot : FilePath) : IO Unit := do
   do
     let target := ctx.temporary / "registry-census-page-source"
     copyFixture ctx censusRoot target
-    editFile target "registry/pages.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 3 then
-        row := row.set! 1 "OTHER"
-      return if (true) then some row else none
+    editFile target "registry/pages.tsv" fun index original =>
+      let row := if index == 3 then
+        let row := original
+        let row := row.set! 1 "OTHER"
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-page-order
   do
     let target := ctx.temporary / "registry-census-page-order"
     copyFixture ctx censusRoot target
-    editFile target "registry/pages.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 3 then
-        row := row.set! 2 "000003"
-      return if (true) then some row else none
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 3 then
-        row := row.set! 2 "000003.0001"
-      return if (true) then some row else none
+    editFile target "registry/pages.tsv" fun index original =>
+      let row := if index == 3 then
+        let row := original
+        let row := row.set! 2 "000003"
+        row
+      else original
+      if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 3 then
+        let row := original
+        let row := row.set! 2 "000003.0001"
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-page-pdf
   do
     let target := ctx.temporary / "registry-census-page-pdf"
     copyFixture ctx censusRoot target
-    editFile target "registry/pages.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 3 then
-        row := row.set! 4 "3"
-      return if (true) then some row else none
+    editFile target "registry/pages.tsv" fun index original =>
+      let row := if index == 3 then
+        let row := original
+        let row := row.set! 4 "3"
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-page-printed
   do
     let target := ctx.temporary / "registry-census-page-printed"
     copyFixture ctx censusRoot target
-    editFile target "registry/pages.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 3 then
-        row := row.set! 3 ""
-      return if (true) then some row else none
+    editFile target "registry/pages.tsv" fun index original =>
+      let row := if index == 3 then
+        let row := original
+        let row := row.set! 3 ""
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-page-section
   do
     let target := ctx.temporary / "registry-census-page-section"
     copyFixture ctx censusRoot target
-    editFile target "registry/pages.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 3 then
-        row := row.set! 5 ""
-      return if (true) then some row else none
+    editFile target "registry/pages.tsv" fun index original =>
+      let row := if index == 3 then
+        let row := original
+        let row := row.set! 5 ""
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-page-kind
   do
     let target := ctx.temporary / "registry-census-page-kind"
     copyFixture ctx censusRoot target
-    editFile target "registry/pages.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 3 then
-        row := row.set! 6 ""
-      return if (true) then some row else none
+    editFile target "registry/pages.tsv" fun index original =>
+      let row := if index == 3 then
+        let row := original
+        let row := row.set! 6 ""
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-page-pass1
   do
     let target := ctx.temporary / "registry-census-page-pass1"
     copyFixture ctx censusRoot target
-    editFile target "registry/pages.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 3 then
-        row := row.set! 7 "pending"
-      return if (true) then some row else none
+    editFile target "registry/pages.tsv" fun index original =>
+      let row := if index == 3 then
+        let row := original
+        let row := row.set! 7 "pending"
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-page-pass2
   do
     let target := ctx.temporary / "registry-census-page-pass2"
     copyFixture ctx censusRoot target
-    editFile target "registry/pages.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 3 then
-        row := row.set! 8 "pending"
-      return if (true) then some row else none
+    editFile target "registry/pages.tsv" fun index original =>
+      let row := if index == 3 then
+        let row := original
+        let row := row.set! 8 "pending"
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-page-oid
   do
     let target := ctx.temporary / "registry-census-page-oid"
     copyFixture ctx censusRoot target
-    editFile target "registry/pages.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 3 then
-        row := row.set! 9 "PENDING"
-      return if (true) then some row else none
+    editFile target "registry/pages.tsv" fun index original =>
+      let row := if index == 3 then
+        let row := original
+        let row := row.set! 9 "PENDING"
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-claim-source
   do
     let target := ctx.temporary / "registry-census-claim-source"
     copyFixture ctx censusRoot target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 3 then
-        row := row.set! 1 "OTHER"
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 3 then
+        let row := original
+        let row := row.set! 1 "OTHER"
+        row
+      else original
+      if (true) then some row else none
 
 /-- Construct the registry-census-claim-locator through registry-census-equation-label counterfactuals. -/
 def cases8 (ctx : Context) (censusRoot : FilePath) : IO Unit := do
@@ -815,29 +935,35 @@ def cases8 (ctx : Context) (censusRoot : FilePath) : IO Unit := do
   do
     let target := ctx.temporary / "registry-census-claim-locator"
     copyFixture ctx censusRoot target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 3 then
-        row := row.set! 4 ""
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 3 then
+        let row := original
+        let row := row.set! 4 ""
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-claim-content
   do
     let target := ctx.temporary / "registry-census-claim-content"
     copyFixture ctx censusRoot target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 3 then
-        row := row.set! 7 ""
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 3 then
+        let row := original
+        let row := row.set! 7 ""
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-claim-page-order
   do
     let target := ctx.temporary / "registry-census-claim-page-order"
     copyFixture ctx censusRoot target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 3 "PG-TASAKI2020-0002"
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 3 "PG-TASAKI2020-0002"
+        row
+      else original
+      if (true) then some row else none
   -- registry-census-claim-source-order
   do
     let target := ctx.temporary / "registry-census-claim-source-order"
@@ -848,11 +974,13 @@ def cases8 (ctx : Context) (censusRoot : FilePath) : IO Unit := do
   do
     let target := ctx.temporary / "registry-census-equation-label"
     copyFixture ctx censusRoot target
-    editFile target "registry/claims.tsv" fun index original => Id.run do
-      let mut row := original
-      if index == 2 then
-        row := row.set! 4 "PDF-p.1-equation-F.1"
-      return if (true) then some row else none
+    editFile target "registry/claims.tsv" fun index original =>
+      let row := if index == 2 then
+        let row := original
+        let row := row.set! 4 "PDF-p.1-equation-F.1"
+        row
+      else original
+      if (true) then some row else none
 
 
 /-- Header-only artifacts stay absent until a fixture explicitly introduces a registered R4 relation. -/

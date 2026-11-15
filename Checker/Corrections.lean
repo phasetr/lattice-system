@@ -110,24 +110,22 @@ def ledgers (before current : Snapshot) (requested : String) : IO (String × Str
     require (current.files.contains ("registry/" ++ stem ++ ".tsv")) s!"missing registry/{stem}.tsv"
   for stem in #["correction-events","claim-normalization-reviews","claim-corrections","claim-successors","source-item-additions"] do
     header current stem
-  let mut additionIds : Std.HashSet String := {}; let mut additionItems : Std.HashSet String := {}
-  for row in rows current "source-item-additions" do
+  discard <| (rows current "source-item-additions").foldlM (fun (additionIds,additionItems) row => do
     require (row.size == 6) "bad source item addition row"
     require (additionId (col row 1)) "bad source item addition ID"
     require (!additionIds.contains (col row 1)) "duplicate source item addition ID"
     require (!additionItems.contains (col row 5)) "source item is manifested more than once"
-    additionIds := additionIds.insert (col row 1); additionItems := additionItems.insert (col row 5)
+    pure (additionIds.insert (col row 1),additionItems.insert (col row 5)))
+      (({} : Std.HashSet String),({} : Std.HashSet String))
   let additions := index (rows current "source-item-additions")
   require ((rows before "source-item-additions").all fun r => additions[col r 1]? == some r)
     "unmanifested source item addition"
   let events := rows current "correction-events"
-  let mut seen : Std.HashSet String := {}
-  for i in [:events.size] do
-    let row := events[i]!
+  discard <| events.foldlM (fun (seen,i) row => do
     require (row.size == 5 && correctionToken (col row 1) && col row 2 == toString (i+1) &&
       !seen.contains (col row 1) && correctionToken (col row 3) && hex (col row 4) 40 && correctionToken (col row 5))
       "invalid correction event ledger"
-    seen := seen.insert (col row 1)
+    pure (seen.insert (col row 1),i+1)) (({} : Std.HashSet String),0)
   let oldEvents := index (rows before "correction-events")
   let fresh := events.filter fun r => !oldEvents.contains (col r 1)
   let event ← if requested.isEmpty then do
@@ -142,9 +140,7 @@ def ledgers (before current : Snapshot) (requested : String) : IO (String × Str
   for stem in ledgerNames do freezeLedger before current stem event (if stem == "correction-events" then 0 else 2)
   let eventIndex := index events
   let reviews := rows current "claim-normalization-reviews"
-  let mut reviewIds : Std.HashSet String := {}; let mut reviewPositions : Std.HashMap String Nat := {}
-  let mut reviewed : Std.HashSet (String × String) := {}
-  for row in reviews do
+  discard <| reviews.foldlM (fun (reviewIds,reviewPositions,reviewed) row => do
     let owner := col row 2; let position := reviewPositions[owner]?.getD 0 + 1
     require (row.size == 9 && !reviewIds.contains (col row 1) && eventIndex.contains owner &&
       col row 3 == toString position && !reviewed.contains (owner,col row 4) &&
@@ -152,12 +148,10 @@ def ledgers (before current : Snapshot) (requested : String) : IO (String × Str
         "unchanged|reclassify|exclude_nonclaim|split|amend_content|amend_and_reclassify|retire_duplicate|add_omitted_claim" &&
       col row 7 == "closed" && correctionToken (col row 8) && col row 9 == col (eventIndex[owner]?.getD #[]) 5)
       "invalid claim normalization review ledger"
-    reviewIds := reviewIds.insert (col row 1); reviewPositions := reviewPositions.insert owner position
-    reviewed := reviewed.insert (owner,col row 4)
+    pure (reviewIds.insert (col row 1),reviewPositions.insert owner position,reviewed.insert (owner,col row 4)))
+      (({} : Std.HashSet String),({} : Std.HashMap String Nat),({} : Std.HashSet (String × String)))
   let reviewIndex := index reviews
-  let mut correctionIds : Std.HashSet String := {}; let mut correctionPositions : Std.HashMap String Nat := {}
-  let mut reviewUses : Std.HashSet String := {}; let mut claimUses : Std.HashSet (String × String) := {}
-  for row in rows current "claim-corrections" do
+  let (_,_,reviewUses,_) ← (rows current "claim-corrections").foldlM (fun (correctionIds,correctionPositions,reviewUses,claimUses) row => do
     let owner := col row 2; let position := correctionPositions[owner]?.getD 0 + 1
     let readiness := reviewIndex[col row 4]?.getD #[]
     require (row.size == 10 && !correctionIds.contains (col row 1) && eventIndex.contains owner &&
@@ -166,8 +160,9 @@ def ledgers (before current : Snapshot) (requested : String) : IO (String × Str
       !claimUses.contains (owner,col row 5) && oneOf (col row 6)
         "reclassify|exclude_nonclaim|split|amend_content|amend_and_reclassify|retire_duplicate|add_omitted_claim")
       "invalid claim correction ledger"
-    correctionIds := correctionIds.insert (col row 1); correctionPositions := correctionPositions.insert owner position
-    reviewUses := reviewUses.insert (col row 4); claimUses := claimUses.insert (owner,col row 5)
+    pure (correctionIds.insert (col row 1),correctionPositions.insert owner position,
+      reviewUses.insert (col row 4),claimUses.insert (owner,col row 5)))
+      (({} : Std.HashSet String),({} : Std.HashMap String Nat),({} : Std.HashSet String),({} : Std.HashSet (String × String)))
   for row in reviews do
     require ((col row 6 == "unchanged") != reviewUses.contains (col row 1)) "invalid claim correction ledger"
   let old := index (rows before "claims"); let after := index (rows current "claims")
@@ -247,12 +242,10 @@ def successors (project : FilePath) (before current : Snapshot) (event : String)
   let old := index (rows before "claims"); let after := index (rows current "claims")
   let actions := index ((rows current "claim-corrections").filter (col · 2 == event))
   let edges := (rows current "claim-successors").filter (col · 2 == event)
-  let mut positions : Std.HashMap String Nat := {}; let mut ids : Std.HashSet String := {}
-  let mut members : Std.HashSet (String × String) := {}; let mut newOwners : Std.HashMap String Nat := {}
-  let mut omissions : Std.HashMap String Nat := {}
-  for (_,action) in actions do
-    if col action 6 == "add_omitted_claim" then omissions := omissions.insert (col action 5) (omissions[col action 5]?.getD 0 + 1)
-  for edge in edges do
+  let omissions := actions.fold (fun omissions _ action =>
+    if col action 6 == "add_omitted_claim" then omissions.insert (col action 5) (omissions[col action 5]?.getD 0+1)
+    else omissions) ({} : Std.HashMap String Nat)
+  let (_,_,_,newOwners) ← edges.foldlM (fun (positions,ids,members,newOwners) edge => do
     let owner := col edge 3; let action := actions[owner]?.getD #[]
     require (edge.size == 7 && !ids.contains (col edge 1) && !action.isEmpty &&
       col action 5 == col edge 4 && oneOf (col action 6) "split|retire_duplicate")
@@ -269,13 +262,15 @@ def successors (project : FilePath) (before current : Snapshot) (event : String)
       let predecessor := after[col edge 4]?.getD #[]
       require (col predecessor 12 == "true") "successor predecessor is not tombstoned; split successor provenance is incomplete"
       require (col predecessor 13 == col edge 7) "tombstone does not name its first successor; split successor provenance is incomplete"
-    if col edge 6 == "new_successor" then
-      newOwners := newOwners.insert (col edge 7) (newOwners[col edge 7]?.getD 0 + 1)
+    let newOwners ← if col edge 6 == "new_successor" then do
+      let newOwners := newOwners.insert (col edge 7) (newOwners[col edge 7]?.getD 0 + 1)
       let row := after[col edge 7]?.getD #[]
       let actual ← output project "git" #["hash-object","--stdin"] (some (col row 8))
       require (col row 9 == trim actual) "new correction successor content OID is stale"
-    positions := positions.insert owner position; ids := ids.insert (col edge 1)
-    members := members.insert (owner,col edge 7)
+      pure newOwners
+      else pure newOwners
+    pure (positions.insert owner position,ids.insert (col edge 1),members.insert (owner,col edge 7),newOwners))
+      (({} : Std.HashMap String Nat),({} : Std.HashSet String),({} : Std.HashSet (String × String)),({} : Std.HashMap String Nat))
   for (owner,action) in actions do
     if col action 6 == "split" then
       let owned := edges.filter (col · 3 == owner)
@@ -290,32 +285,31 @@ def successors (project : FilePath) (before current : Snapshot) (event : String)
 /-- Global item order, historical membership and exclusive new-item creation ownership. -/
 def itemOwnership (before current : Snapshot) (event source review : String) : IO Unit := do
   let tracks := index (rows current "tracks"); let sources := index (rows current "sources")
-  let mut previous := ""
-  for item in rows current "source-items" do
+  discard <| (rows current "source-items").foldlM (fun previous item => do
     require (orderKey (col item 3)) "bad nested source item order key"
     let sourceRow := sources[col item 2]?.getD #[]
     let track := tracks[col sourceRow 2]?.getD #[]
     let key := pad 9 (toString ((col track 2).toNat?.getD 0)) ++ "." ++
       pad 9 (toString ((col sourceRow 3).toNat?.getD 0)) ++ "." ++ col item 3
     require (previous.isEmpty || previous < key) "source items are not in global source order"
-    previous := key
+    pure key) ""
   let actions := (rows current "claim-corrections").filter (col · 2 == event)
   let actionIndex := index actions
   let predecessors : Std.HashSet String := actions.foldl (fun result row => result.insert (col row 5)) {}
   let relatedItems : Std.HashSet String := (rows before "item-claims").foldl (fun result row =>
     if predecessors.contains (col row 3) then result.insert (col row 1) else result) {}
   let oldItems := index (rows before "source-items"); let items := index (rows current "source-items")
-  let mut relatedDrift := false; let mut unrelatedDrift := false
-  for (id,prior) in oldItems do
+  let (relatedDrift,unrelatedDrift) := oldItems.fold (fun (relatedDrift,unrelatedDrift) id prior =>
     if items[id]? != some prior then
-      if relatedItems.contains id then relatedDrift := true else unrelatedDrift := true
+      if relatedItems.contains id then (true,unrelatedDrift) else (relatedDrift,true)
+    else (relatedDrift,unrelatedDrift)) (false,false)
   require (!relatedDrift) "historical source item drift"
   require (!unrelatedDrift) "unrelated frozen registry drift"
   let relations := rows current "item-claims"
-  relatedDrift := false; unrelatedDrift := false
-  for row in rows before "item-claims" do
-    unless relations.contains row do
-      if predecessors.contains (col row 3) then relatedDrift := true else unrelatedDrift := true
+  let (relatedDrift,unrelatedDrift) := (rows before "item-claims").foldl (fun (relatedDrift,unrelatedDrift) row =>
+    if !relations.contains row then
+      if predecessors.contains (col row 3) then (true,unrelatedDrift) else (relatedDrift,true)
+    else (relatedDrift,unrelatedDrift)) (false,false)
   require (!relatedDrift) "historical source item relation drift"
   require (!unrelatedDrift) "unrelated item-claim drift"
   let edges := (rows current "claim-successors").filter (col · 2 == event)
@@ -326,11 +320,10 @@ def itemOwnership (before current : Snapshot) (event source review : String) : I
     if col row 6 == "new_successor" then result.insert (col row 7) (col row 3) else result) {}
   let existing : Std.HashSet String := edges.foldl (fun result row =>
     if col row 6 == "existing_duplicate" then result.insert (col row 7) else result) {}
-  let mut additionPositions : Std.HashMap String Nat := {}
-  let mut added : Std.HashMap String String := {}
-  for row in rows current "source-item-additions" do
+  let (_,added) ← (rows current "source-item-additions").foldlM (fun (additionPositions,added) row => do
     if col row 2 != event then
       require (oldItems.contains (col row 5)) "source item addition event or correction mismatch"
+      pure (additionPositions,added)
     else
       let owner := col row 3; let action := actionIndex[owner]?.getD #[]
       let hasNew := actions.any (fun a => col a 1 == owner && col a 6 == "add_omitted_claim") ||
@@ -342,12 +335,11 @@ def itemOwnership (before current : Snapshot) (event source review : String) : I
       require (!oldItems.contains (col row 5)) "source item addition reuses a frozen item ID"
       require (items.contains (col row 5) && col (items[col row 5]?.getD #[]) 2 == source)
         "source item addition source mismatch"
-      added := added.insert (col row 5) owner
-      additionPositions := additionPositions.insert owner position
+      pure (additionPositions.insert owner position,added.insert (col row 5) owner))
+        (({} : Std.HashMap String Nat),({} : Std.HashMap String String))
   for (id,_) in items do
     require (oldItems.contains id || added.contains id) "unmanifested source item addition"
-  let mut mismatched := false; let mut matched := false; let mut duplicated := false
-  for (id,owner) in added do
+  let (mismatched,matched,duplicated) ← added.foldM (fun (mismatched,matched,duplicated) id owner => do
     let members := relations.filter (col · 1 == id)
     require (!members.isEmpty) "unmanifested source item addition"
     let action := actionIndex[owner]?.getD #[]
@@ -355,17 +347,18 @@ def itemOwnership (before current : Snapshot) (event source review : String) : I
       require (omissionOwners[col members[0]! 3]? == some owner)
         "new source item contains a successor from a different correction"
     else require (col action 6 == "split") "source item addition event or correction mismatch"
-    for member in members do
+    members.foldlM (fun (mismatched,matched,duplicated) member => do
       let claim := col member 3
       if oldClaims.contains claim then
         throw <| IO.userError (if existing.contains claim then
           "new source item contains an existing-duplicate successor" else "new source item contains a frozen predecessor claim")
       require (omissionOwners.contains claim || splitOwners.contains claim)
         "new source item contains a frozen predecessor claim"
-      if (relations.filter (col · 3 == claim)).size > 1 then duplicated := true
+      let duplicated := duplicated || (relations.filter (col · 3 == claim)).size > 1
       let matchesOwner := if col action 6 == "add_omitted_claim" then omissionOwners.contains claim
         else splitOwners[claim]? == some owner
-      if matchesOwner then matched := true else mismatched := true
+      pure (mismatched || !matchesOwner,matched || matchesOwner,duplicated))
+        (mismatched,matched,duplicated)) (false,false,false)
   require (!mismatched) (if matched then "new source item contains a successor from a different correction"
     else "source item addition event or correction mismatch")
   require (!duplicated) "correction successor occurs in more than one source item"

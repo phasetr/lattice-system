@@ -42,8 +42,7 @@ private meta partial def impliedByHypotheses (hypotheses : Array Expr) (fuel : N
       return left && (← impliedByHypotheses hypotheses fuel reduced.appArg!)
     if reduced.isForall then
       let nested ← Meta.forallBoundedTelescope reduced (some 1) fun binders body => do
-        let mut extended := hypotheses
-        for binder in binders do extended := extended.push (← Meta.inferType binder)
+        let extended ← binders.foldlM (fun extended binder => do pure (extended.push (← Meta.inferType binder))) hypotheses
         impliedByHypotheses extended fuel body
       return nested
     return false
@@ -113,10 +112,7 @@ private meta partial def warningLines (moduleName : Name) (fileMap : FileMap)
       warningLines moduleName fileMap theorems declaration owner.isSome
   if disablesWarnings stx && !insideException then
     return #[line "NONE" "unscoped"]
-  let mut result := #[]
-  for child in stx.getArgs do
-    result := result ++ warningLines moduleName fileMap theorems child insideException
-  return result
+  return stx.getArgs.foldl (fun result child => result ++ warningLines moduleName fileMap theorems child insideException) #[]
 
 /--
 Record direct mechanisms that consume diagnostics or disable a diagnostic
@@ -125,23 +121,26 @@ no such additional exemption is permitted inside an owned proof either.
 -/
 private meta partial def suppressionLines (moduleName : Name) (stx : Syntax) :
     Array String := Id.run do
-  let mut result := #[]
   let line (mechanism : String) :=
     String.intercalate "\t" ["S", toString moduleName, mechanism]
   -- The pinned runAndCollectMessages API has exactly these two direct handlers.
-  for (kind, spelling) in #[(`Lean.guardMsgsCmd, "#guard_msgs"),
-      (`Lean.guardPanicCmd, "#guard_panic")] do
-    if stx.isOfKind kind then result := result.push (line spelling)
-  if stx.isOfKind `Batteries.Tactic.Lint.nolint then
-    result := result.push (line "nolint")
-  if isSetOptionSyntax stx &&
-      stx[1].isIdent && stx[3].getAtomVal == "false" then
+  let result := #[(`Lean.guardMsgsCmd, "#guard_msgs"), (`Lean.guardPanicCmd, "#guard_panic")].foldl
+    (fun result (kind,spelling) => if stx.isOfKind kind then result.push (line spelling) else result) #[]
+  let result := if stx.isOfKind `Batteries.Tactic.Lint.nolint then result.push (line "nolint") else result
+  let result := if isSetOptionSyntax stx && stx[1].isIdent && stx[3].getAtomVal == "false" then
     let name := stx[1].getId.eraseMacroScopes
     if name.getRoot == `linter || name.getRoot == `warn then
-      result := result.push (line (toString name))
-  for child in stx.getArgs do
-    result := result ++ suppressionLines moduleName child
-  return result
+      result.push (line (toString name)) else result
+    else result
+  return stx.getArgs.foldl (fun result child => result ++ suppressionLines moduleName child) result
+
+/-- Include each current command before waiting for the next snapshot, including the terminal command. -/
+private meta partial def commandSyntax (current : Language.Lean.CommandParsedSnapshot)
+    (commands : Array Syntax) : Array Syntax :=
+  let commands := commands.push current.stx
+  match current.nextCmdSnap? with
+  | none => commands
+  | some next => commandSyntax next.get commands
 
 /--
 Recover command syntax through Lean's real frontend. Parsing and elaboration
@@ -160,25 +159,19 @@ private meta partial def sourceCommands (moduleName : Name)
     throw <| IO.userError "failed to elaborate warning-scope source"
   let some processed := snap.processedResult.get
     | throw <| IO.userError "warning-scope source has no processed header"
-  let mut current := processed.firstCmdSnap.get
-  let mut commands := #[]
-  repeat
-    commands := commands.push current.stx
-    let some next := current.nextCmdSnap? | break
-    current := next.get
-  return commands
+  return commandSyntax processed.firstCmdSnap.get #[]
 
 /-- Inspect each registered module's frontend syntax and exact declaration ranges. -/
 private meta def moduleWarningLines (env : Environment) (moduleName : Name)
     (sourcePath : System.FilePath) : CommandElabM (Array String) := do
   let some idx := moduleIndex? env moduleName
     | throwError "warning scope module {moduleName} is absent"
-  let mut theorems := #[]
-  for info in env.header.moduleData[idx]!.constants do
+  let theorems ← env.header.moduleData[idx]!.constants.foldlM (fun theorems info => do
     if let .thmInfo _ := info then
       let some ranges ← findDeclarationRanges? info.name
-        | continue  -- A wrapper without a matching range is never permitted.
-      theorems := theorems.push (info.name, ranges.selectionRange.pos)
+        | return theorems  -- A wrapper without a matching range is never permitted.
+      return theorems.push (info.name, ranges.selectionRange.pos)
+    pure theorems) (#[] : Array (Name × Position))
   let contents ← IO.FS.readFile sourcePath
   let inputCtx := Parser.mkInputContext contents sourcePath.toString
   let commands ← sourceCommands moduleName inputCtx
@@ -216,20 +209,20 @@ private meta def dumpEnvironment (moduleListPath outputPath rootPath registryPat
     CommandElabM Unit := do
   let moduleNames := parseModuleList (← IO.FS.readFile moduleListPath)
   let env ← getEnv
-  let mut lines := #[]
-  for moduleName in moduleNames do
+  let lines ← moduleNames.foldlM (fun lines moduleName => do
     let some idx := moduleIndex? env moduleName
       | throwError "registered statement module {moduleName} is absent"
     let data := env.header.moduleData[idx]!
-    for info in data.constants do
-      lines := lines.push (← liftTermElabM <| declarationLine env moduleName info)
-    for h : i in *...data.imports.size do
-      lines := lines.push (importLine moduleName (i + 1) data.imports[i])
-  for row in (← IO.FS.readFile registryPath).splitOn "\n" |>.drop 1 do
+    let lines ← data.constants.foldlM (fun lines info => do
+      pure (lines.push (← liftTermElabM <| declarationLine env moduleName info))) lines
+    let (lines,_) := data.imports.foldl (fun (lines,i) entry => (lines.push (importLine moduleName (i+1) entry),i+1))
+      (lines,0)
+    pure lines) (#[] : Array String)
+  let lines ← ((← IO.FS.readFile registryPath).splitOn "\n" |>.drop 1).foldlM (fun lines row => do
     let fields := row.splitOn "\t" |>.toArray
     if fields.size == 3 then
-      lines := lines ++ (← moduleWarningLines env fields[0]!.toName
-        (System.FilePath.mk rootPath / fields[1]!))
+      pure (lines ++ (← moduleWarningLines env fields[0]!.toName (System.FilePath.mk rootPath / (fields[1]! : String))))
+    else pure lines) lines
   let body := String.intercalate "\n" lines.toList
   IO.FS.writeFile outputPath (if body.isEmpty then body else body ++ "\n")
 

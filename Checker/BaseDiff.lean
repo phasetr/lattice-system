@@ -13,12 +13,12 @@ structure Snapshot where
 
 /-- Read a directory's table bytes without interpreting an absent table as an empty artifact. -/
 def snapshot (root : FilePath) : IO Snapshot := do
-  let mut result : Snapshot := {}
-  for entry in ← (root / "registry").readDir do
+  let result ← (← (root / "registry").readDir).foldlM (fun (result : Snapshot) entry => do
     if entry.path.extension == some "tsv" then
-      result := {files := result.files.insert ("registry/" ++ entry.fileName) (← IO.FS.readFile entry.path)}
+      return {files := result.files.insert ("registry/" ++ entry.fileName) (← IO.FS.readFile entry.path)}
+    else return result) {}
   if ← (root / "references/tasaki-2020.tsv").pathExists then
-    result := {files := result.files.insert "references/tasaki-2020.tsv" (← IO.FS.readFile (root / "references/tasaki-2020.tsv"))}
+    return {files := result.files.insert "references/tasaki-2020.tsv" (← IO.FS.readFile (root / "references/tasaki-2020.tsv"))}
   return result
 
 /-- Extract data records using the old line-based TSV interpretation. -/
@@ -53,11 +53,10 @@ def baseline (before : Snapshot) (path : String) (modern : Bool) : IO String := 
         s!"base missing {path}"
       let some text := emptyHeader path | throw <| IO.userError s!"base missing {path}"
       pure text
-  let mut text : String := initial
-  if before.normalizeLines then
-    text := String.join <| (tableFromText text).records.toList.map (· ++ "\n")
+  let text := if before.normalizeLines then
+    String.join <| (tableFromText initial).records.toList.map (· ++ "\n") else initial
   if modern && path == "registry/claim-vocabulary-review.tsv" then
-    text := String.join <| (tableFromText text).records.toList.map fun line =>
+    return String.join <| (tableFromText text).records.toList.map fun line =>
       let row := split line "\t"
       String.intercalate "\t" (if row[2]?.getD "" == "R3-INDEPENDENT-REVIEW-P0" then
         (row.set! 2 "VOCABULARY-INDEPENDENT-REVIEW").toList else row.toList) ++ "\n"

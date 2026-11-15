@@ -69,6 +69,9 @@ Repository-owned validation, derivation, generation, regression execution and CI
 control are implemented in Lean. External commands provide only necessary thin
 OS, Git, HTTP, archive, filesystem and compiler operations; no interpreted
 implementation or embedded Python or Shell body substitutes for the Lean logic.
+Pure transformations, functional folds and explicit-state recursion represent
+implementation state; reference cells do not substitute for imperative local
+updates. IO stays at the external boundary, preserving order and validation.
 Generated files are not edited by hand. Use the declared dependencies and
 pinned toolchain; a failed command is not permission to install or update them.
 

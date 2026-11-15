@@ -67,20 +67,19 @@ def validateTreeFixture (project root testRoot : String) : IO Unit := do
   require (pathWithin root testRoot) "fixture root must be below LATTICE_TEST_ROOT"
 /-- Read working registry paths, preserving the header-only bootstrap exception. -/
 def treeModules (root : System.FilePath) (fixture : Bool := false) : IO (Array String) := do
-  let mut registered := #[]
   if ← (root / "registry/modules.tsv").pathExists then
     let hasStatements ← (root / "registry/statement-modules.tsv").pathExists
     if fixture && !hasStatements then return #[]
     require hasStatements "missing registry/statement-modules.tsv"
-    for table in #["modules", "statement-modules"] do
+    return ← #["modules", "statement-modules"].foldlM (fun registered table => do
       let text ← IO.FS.readFile (root / "registry" / (table ++ ".tsv"))
       let records := split text "\n"
       let records := if text.endsWith "\n" then records.pop else records
-      for line in records.toList.drop 1 do
+      ((records.extract 1 records.size)).foldlM (fun registered line => do
         let row := split line "\t"
         require (fixture || row.size ≥ 2) "invalid module registry row"
-        registered := registered.push (row[1]?.getD "")
-  pure registered
+        pure (registered.push (row[1]?.getD ""))) registered) #[]
+  pure #[]
 /-- Apply closed-path and optional production-module equality checks to an observed live inventory. -/
 def validateTreePaths (paths registered : Array String) (production : Bool) : IO Unit := do
   for path in paths do
@@ -92,17 +91,14 @@ def validateTreePaths (paths registered : Array String) (production : Bool) : IO
       "registered modules do not exactly match tracked production Lean sources"
 /-- Parse the live Git index, rejecting symbolic links, unresolved stages and ambiguous metadata. -/
 def treeIndex (raw : String) : IO (Array String) := do
-  let mut paths := #[]
-  for record in split raw "\u0000" do
-    if record.isEmpty then continue
+  ((split raw "\u0000").filter (!·.isEmpty)).mapM fun record => do
     let pair := split record "\t"
     require (pair.size == 2) "invalid Git index entry"
     let metadata := split pair[0]! " "
     require (metadata.size == 3 && metadata[2]! == "0" && hex metadata[1]! 40) "invalid or unresolved Git index stage"
     require (metadata[0]! != "120000") "tracked symlink found"
     require (#["100644", "100755"].contains metadata[0]!) "unsupported tracked Git file mode"
-    paths := paths.push pair[1]!
-  pure paths
+    pure pair[1]!
 /-- Preserve the live closed-tree, fixture isolation, production registry and immutable-pin guards. -/
 def checkTree (project target : System.FilePath) (fixture : Bool) : IO Unit := do
   let project ← IO.FS.realPath project
@@ -185,12 +181,11 @@ structure Table where
 /-- Data rows exclude exactly the header, not blank or malformed rows. -/
 def Table.rows (t : Table) : Array Row := t.data
 /-- Build the row array and associative index from a single exact byte read. -/
-def tableFromText (text : String) : Table := Id.run do
+def tableFromText (text : String) : Table :=
   let records := lines text
   let data := (records.extract 1 records.size).map (split · "\t")
-  let mut byId := {}
-  for row in data do byId := byId.insert (col row 1) row
-  return ⟨records, data, byId, text.contains '\n', (split text "\n").size ≥ 3⟩
+  let byId := data.foldl (fun byId row => byId.insert (col row 1) row) {}
+  ⟨records, data, byId, text.contains '\n', (split text "\n").size ≥ 3⟩
 /-- A single loading pass shared by native current-data validators. -/
 structure Data where
   /-- Working checkout being checked. -/
@@ -290,35 +285,34 @@ def schemaTable (d : Data) (table header : String) : IO Unit := do
     require (row.all validField) s!"{table}.tsv: control character or surrounding whitespace in field"
 /-- Require unique composite keys; no data row is silently overwritten. -/
 def unique (rows : Array Row) (columns : Array Nat) (message : String) : IO Unit := do
-  let mut seen : Std.HashSet (Array String) := {}
-  for row in rows do
+  discard <| rows.foldlM (fun (seen : Std.HashSet (Array String)) row => do
     let key := columns.map (col row)
     require (!seen.contains key) message
-    seen := seen.insert key
+    pure (seen.insert key)) {}
 /-- Require earlier ordering within each owner while allowing unrelated namespaces. -/
 def increasing (rows : Array Row) (owner order : Nat) (message : String) : IO Unit := do
-  let mut previous : Std.HashMap String String := {}
-  for row in rows do
+  discard <| rows.foldlM (fun (previous : Std.HashMap String String) row => do
     let id := col row owner; let key := col row order
     if let some old := previous[id]? then require (old < key) message
-    previous := previous.insert id key
+    pure (previous.insert id key)) {}
 /-- Validate contiguous positive positions independently for each owner. -/
 def contiguous (rows : Array Row) (owner position : Nat) (message : String) : IO Unit := do
-  let mut counts : Std.HashMap String Nat := {}
-  for row in rows do
+  discard <| rows.foldlM (fun (counts : Std.HashMap String Nat) row => do
     let id := col row owner
     let n := counts[id]?.getD 0 + 1
     require (digits (col row position) true && (col row position).toNat? == some n) message
-    counts := counts.insert id n
+    pure (counts.insert id n)) {}
+/-- Eliminate edges with an explicit bounded state; every nonempty pass must reduce the graph. -/
+def eliminateEdges (message : String) : Nat → Array (String × String) → IO Unit
+  | 0, remaining => require remaining.isEmpty message
+  | fuel+1, remaining => do
+    if remaining.isEmpty then return
+    let reduced := remaining.filter fun edge => remaining.any (·.2 == edge.1)
+    require (reduced.size < remaining.size) message
+    eliminateEdges message fuel reduced
 /-- Kahn elimination detects directed cycles without an unbounded recursive traversal. -/
 def acyclic (edges : Array (String × String)) (message : String) : IO Unit := do
-  let mut remaining := edges
-  for _ in [:edges.size + 1] do
-    if remaining.isEmpty then return
-    let reduced := remaining.filter fun e => remaining.any (·.2 == e.1)
-    require (reduced.size < remaining.size) message
-    remaining := reduced
-  require remaining.isEmpty message
+  eliminateEdges message (edges.size+1) edges
 /-- Retain stage-specific header-only requirements. -/
 def emptyTables (d : Data) (tables : Array String) (stem : String) : IO Unit :=
   tables.forM fun table => require ((d.table table).records.size == 1) s!"{stem} header-only {table}.tsv"
@@ -338,8 +332,7 @@ def sources (d : Data) : IO Unit := do
   require (!ss.isEmpty) "no sources registered"
   unique ss #[1] "duplicate source ID"; unique ss #[5] "duplicate citation key"; unique ss #[13] "duplicate source public slug"
   contiguous ss 2 3 "source positions are not contiguous"
-  let mut previous := ""
-  for r in ss do
+  discard <| ss.foldlM (fun previous r => do
     require (sourceId (col r 1)) "bad source ID"
     require (d.has "tracks" (col r 2)) "unknown source track"
     require (oneOf (col r 4) "book|paper|preprint|other") "bad source kind"
@@ -358,7 +351,7 @@ def sources (d : Data) : IO Unit := do
     require (oneOf (col r 17) "pending|pass1|pass2|reconciled|frozen") "bad source coverage"
     let key := globalKey d (col r 1) ""
     require (previous.isEmpty || previous < key) "sources are not in global track order"
-    previous := key
+    pure key) ""
   let progress := (d.table "source-progress").rows
   unique progress #[1] "duplicate source progress"
   for r in progress do
@@ -380,8 +373,7 @@ def sources (d : Data) : IO Unit := do
 def dependencies (d : Data) : IO Unit := do
   let deps := (d.table "dependencies").rows
   unique deps #[1,3] "duplicate dependency edge"
-  let mut edges := #[]
-  for r in deps do
+  let edges ← deps.mapM fun r => do
     let a := d.row "claims" (col r 1); let b := d.row "claims" (col r 3)
     require (!a.isEmpty && !b.isEmpty) "unknown dependency claim"
     require (oneOf (col r 2) "requires|required_by|consequence_of") "bad dependency role"
@@ -394,40 +386,38 @@ def dependencies (d : Data) : IO Unit := do
       let sa := d.sourceRow (col a 2); let sb := d.sourceRow (col b 2)
       require (col sa 2 == col sb 2 || (col r 4 != "NONE" && !(col r 4).isEmpty)) "cross-track dependency needs review rationale"
     require (col r 4 == "NONE" || token (col r 4)) "bad dependency rationale token"
-    edges := edges.push (if col r 2 == "required_by" then (col r 3,col r 1) else (col r 1,col r 3))
+    pure (if col r 2 == "required_by" then (col r 3,col r 1) else (col r 1,col r 3))
   acyclic edges "dependency cycle"
 /-- Full modern page/claim identity and global source order. -/
 def order (d : Data) : IO Unit := do
   present d #["tracks","sources","pages","claims","dependencies"]
   for table in #["pages", "claims"] do
-    let mut failures : Array String := #[]
-    let mut previous := ""
-    let mut lastLocal : Std.HashMap String String := {}
-    for r in (d.table table).rows do
+    let record := fun (failures : List String) (valid : Bool) (message : String) => if valid then failures else message :: failures
+    let (failures,_,_) := (d.table table).rows.foldl (fun (failures,previous,lastLocal) r =>
       let pageMode := table == "pages"
       let stem := (if pageMode then "PG-" else "CL-") ++ col r 2 ++ "-"
       let suffix := ((col r 1).drop stem.length).toString
-      if !((col r 1).startsWith stem && digits suffix && suffix.length ≥ 4) then
-        failures := failures.push (if pageMode then "page ID/source mismatch" else "claim ID/source mismatch")
-      if pageMode then
-        if (d.sourceRow (col r 2)).isEmpty then failures := failures.push "unknown page source"
-        if !(digits (col r 3) && (col r 3).length == 6) then failures := failures.push "bad page order key"
+      let failures := record failures ((col r 1).startsWith stem && digits suffix && suffix.length ≥ 4)
+        (if pageMode then "page ID/source mismatch" else "claim ID/source mismatch")
+      let failures := if pageMode then
+        let failures := record failures (!(d.sourceRow (col r 2)).isEmpty) "unknown page source"
+        record failures (digits (col r 3) && (col r 3).length == 6) "bad page order key"
       else
         let page := d.row "pages" (col r 4)
-        if (d.sourceRow (col r 2)).isEmpty || page.isEmpty || col page 2 != col r 2 then
-          failures := failures.push "claim source/page mismatch"
-        if !orderKey (col r 3) then failures := failures.push "bad claim order key"
-        if !page.isEmpty && ((col r 3).take 6).toString != col page 3 then
-          failures := failures.push "claim/page order mismatch"
-      if let some prior := lastLocal[col r 2]? then
-        if col r 3 ≤ prior then
-          failures := failures.push (if pageMode then "page order is not strictly increasing" else "claim order is not strictly increasing")
+        let failures := record failures (!(d.sourceRow (col r 2)).isEmpty && !page.isEmpty && col page 2 == col r 2)
+          "claim source/page mismatch"
+        let failures := record failures (orderKey (col r 3)) "bad claim order key"
+        record failures (page.isEmpty || ((col r 3).take 6).toString == col page 3) "claim/page order mismatch"
+      let failures := match lastLocal[col r 2]? with
+        | some prior => record failures (prior < col r 3)
+          (if pageMode then "page order is not strictly increasing" else "claim order is not strictly increasing")
+        | none => failures
       let key := globalKey d (col r 2) (col r 3)
-      if !previous.isEmpty && key ≤ previous then
-        failures := failures.push (if pageMode then "page rows are not in global source order" else "claim rows are not in global source order")
-      lastLocal := lastLocal.insert (col r 2) (col r 3)
-      previous := key
-    require failures.isEmpty (String.intercalate "\n" failures.toList ++ "\n" ++
+      let failures := record failures (previous.isEmpty || previous < key)
+        (if pageMode then "page rows are not in global source order" else "claim rows are not in global source order")
+      (failures,key,lastLocal.insert (col r 2) (col r 3)))
+        (([] : List String),"",({} : Std.HashMap String String))
+    require failures.isEmpty (String.intercalate "\n" failures.reverse ++ "\n" ++
       (if table == "pages" then "page identity or order invalid" else "claim identity or order invalid"))
   dependencies d
 
@@ -478,13 +468,13 @@ def lifecycle (d : Data) : IO Unit := do
 
 /-- Load existing table bytes once; schema owners decide which tables are mandatory. -/
 def load (root : System.FilePath) (names : Array String := headers.map (·.1)) : IO Data := do
-  let mut tables := #[]
-  for (name, _) in headers do
-    if !names.contains name then continue
+  let tables ← headers.foldlM (fun tables (name,_) => do
+    if !names.contains name then return tables
     let path := root / "registry" / (name ++ ".tsv")
-    if ← path.pathExists then tables := tables.push (name, tableFromText (← IO.FS.readFile path))
+    if ← path.pathExists then return tables.push (name,tableFromText (← IO.FS.readFile path))
+    else return tables) #[]
   if names.contains "reference" && (← (root / "references/tasaki-2020.tsv").pathExists) then
-    tables := tables.push ("reference", tableFromText (← IO.FS.readFile (root / "references/tasaki-2020.tsv")))
+    return ⟨root,tables.push ("reference",tableFromText (← IO.FS.readFile (root / "references/tasaki-2020.tsv")))⟩
   pure ⟨root, tables⟩
 /-- Check requested headers and exact row shapes without silently dropping missing files. -/
 def tables (d : Data) (names : Array String) : IO Unit := do
@@ -533,8 +523,7 @@ def claims (d : Data) : IO Unit := do
     require (col r 10 == "PENDING" || oid (col r 10)) "bad source OID"
     require (col r 8 != "complete" || col r 9 != "complete" || col r 10 != "PENDING") "two-pass-complete page needs a frozen source OID"
   increasing cs 2 3 "claim order is not strictly increasing"
-  let mut edges := #[]
-  for r in cs do
+  let edges ← cs.foldlM (fun edges r => do
     require (stableId (col r 1) "CL") "bad claim ID"
     require (!(d.sourceRow (col r 2)).isEmpty && d.has "pages" (col r 4) && col (d.row "pages" (col r 4)) 2 == col r 2) "bad claim source/page foreign key"
     require (claimOrder (col r 3)) "bad claim order key"
@@ -548,10 +537,11 @@ def claims (d : Data) : IO Unit := do
     require (oneOf (col r 12) "false|true") "bad tombstone flag"
     if col r 12 == "false" then
       require (#[13,14,15].all (col r · == "NONE")) "active claim has supersession metadata"
+      pure edges
     else
       require (d.has "claims" (col r 13) && col r 13 != col r 1) "unknown or self superseded_by"
       require (token (col r 14) && col r 14 != "NONE" && token (col r 15) && col r 15 != "NONE") "tombstone needs successor, rationale, and review ref"
-      edges := edges.push (col r 1,col r 13)
+      pure (edges.push (col r 1,col r 13))) #[]
   acyclic edges "supersession cycle"
   if !d.multi then
     let slices := (d.table "slices").rows
@@ -631,8 +621,7 @@ def axioms (d : Data) : IO Unit := do
 def vocabulary (d : Data) : IO Unit := do
   let vs := (d.table "vocabulary").rows
   unique vs #[2] "duplicate vocabulary declaration"
-  let mut previous := ""
-  for r in vs do
+  discard <| vs.foldlM (fun previous r => do
     let id := col r 1
     require ((id.startsWith "VO-LS-" && digits (id.drop 6).toString && (id.drop 6).toString.length ≥ 4) || oneOf id "VO-TASAKI2020-0001|VO-TASAKI2020-0002") "bad vocabulary ID"
     require (projectName (col r 2) && projectName (col r 3)) "vocabulary declaration and module must be below LatticeSystem"
@@ -651,8 +640,8 @@ def vocabulary (d : Data) : IO Unit := do
       require (oneOf (col r 4) "constructor|recursor|projection") "generated vocabulary has a non-generated declaration kind"
       require (col r 9 == "generated" && col r 10 == "inherited") "generated vocabulary needs generated/inherited metadata"
     require (previous.isEmpty || previous < id) "vocabulary IDs are not strictly increasing"
-    previous := id
     require (col (d.row "modules" (col r 3)) 3 == "leaf") "vocabulary declaration needs a registered leaf module"
+    pure id) ""
   for r in (d.table "claim-vocabulary-review").rows do
     require (d.has "claims" (col r 1)) "unknown vocabulary-review claim"
     require (col (d.row "claims" (col r 1)) 12 == "false") "tombstoned claim has vocabulary review"
@@ -682,8 +671,7 @@ def modules (d : Data) : IO Unit := do
     let rows := (d.table table).rows
     contiguous rows 1 2 (if table == "imports" then "non-contiguous import position" else "non-contiguous statement import position")
     let project := if table == "imports" then vocabularyModules else vocabularyModules ++ statementModules
-    let mut edges := #[]
-    for r in rows do
+    let edges ← rows.foldlM (fun edges r => do
       require (has owners (col r 1)) "import owner is not registered"
       require (name (col r 3)) "bad imported module"
       require (#[4,5,6].all fun n => oneOf (col r n) "false|true") "bad import flag"
@@ -693,7 +681,7 @@ def modules (d : Data) : IO Unit := do
       else
         require (col r 3 == "LatticeSystem" || col r 3 == "Mathlib" || (col r 3).startsWith "Mathlib.")
           (if table == "imports" then "unauthorized external import" else "unauthorized statement external import")
-      if has owners (col r 3) then edges := edges.push (col r 1,col r 3)
+      pure (if has owners (col r 3) then edges.push (col r 1,col r 3) else edges)) #[]
     acyclic edges (if table == "imports" then "project import cycle" else "statement import cycle")
 /-- Native common registry validation, excluding already-composed modern prerequisite gates. -/
 def registryCore (d : Data) : IO Unit := do
@@ -722,8 +710,7 @@ def items (d : Data) : IO Unit := do
   let rows := (d.table "source-items").rows; let cs := (d.table "claims").rows
   let relations := (d.table "item-claims").rows
   unique rows #[1] "duplicate item ID"
-  let mut previous := ""
-  for r in rows do
+  discard <| rows.foldlM (fun previous r => do
     let stem := "IT-" ++ col r 2 ++ "-"; let suffix := ((col r 1).drop stem.length).toString
     require ((col r 1).startsWith stem && digits suffix && suffix.length ≥ 4) "item ID/source mismatch"
     require (!(d.sourceRow (col r 2)).isEmpty) "unknown item source"
@@ -741,7 +728,7 @@ def items (d : Data) : IO Unit := do
     require (token (col r 11)) "bad item review token"
     let key := globalKey d (col r 2) (col r 3)
     require (previous.isEmpty || previous < key) "items are not in global source order"
-    previous := key
+    pure key) ""
   unique relations #[1,3] "duplicate item/claim relation"
   unique relations #[3] "claim occurs in more than one item"
   contiguous relations 1 2 "item relation positions are not contiguous"
@@ -775,27 +762,26 @@ def censusPages (rows : Array Row) (source : String) (expected : Nat) (diagnosti
 /-- Counts, active qualifications and equation occurrence pairs are distinct census obligations. -/
 def censusClaims (pages cs : Array Row) (source : String) (expected targets equations empty : Nat)
     (modern : Bool) (diagnostic : String) : IO Unit := do
-  let mut used : Std.HashSet String := {}; let mut pairs : Std.HashSet (String × String) := {}
-  let mut equationCount := 0
   require (cs.size == expected && (modern || !cs.isEmpty)) diagnostic
   if modern then require ((cs.filter (col · 6 != "out_of_scope")).size == targets) diagnostic
   let pageMap := pages.foldl (fun m r => m.insert (col r 1) (col r 3)) ({} : Std.HashMap String String)
-  let mut previous := ""
-  for r in cs do
+  let (used,_,equationCount,_) ← cs.foldlM (fun (used,pairs,equationCount,previous) r => do
     require (!(col r 4).isEmpty && !(col r 5).isEmpty && !(col r 8).isEmpty &&
       (#[13,14,15].all (col r · == "NONE"))) diagnostic
-    used := used.insert (col r 4)
-    if !modern then
+    let used := used.insert (col r 4)
+    let previous ← if !modern then do
       require (col r 2 == source && (split (col r 3) ".").size == 2 && orderKey (col r 3) &&
         pageMap.contains (col r 4) && ((col r 3).take 6).toString == pageMap[col r 4]! &&
         col r 12 == "false" && (previous.isEmpty || previous < col r 3)) diagnostic
-      previous := col r 3
+      pure (col r 3)
+      else pure previous
     if col r 7 == "equation" then
       let some label := equationLabel (col r 5) | throw <| IO.userError diagnostic
       let pair := (col r 4,label)
       require (!pairs.contains pair) diagnostic
-      pairs := pairs.insert pair
-      equationCount := equationCount + 1
+      pure (used,pairs.insert pair,equationCount+1,previous)
+    else pure (used,pairs,equationCount,previous))
+      (({} : Std.HashSet String),({} : Std.HashSet (String × String)),0,"")
   require (equationCount == equations) diagnostic
   if modern then require ((pages.filter fun p => !used.contains (col p 1)).size == empty) diagnostic
 /-- Source census arithmetic and exact printed-row LF hashing; prerequisite gates are composed by callers. -/
@@ -818,10 +804,9 @@ def census (d : Data) (fixture : Bool) (counts : Array Nat) : IO Unit := do
       censusClaims pages (cs.filter fun r => col r 2 == source && col r 12 == "false") source
         (col invariant 3).toNat! (col invariant 4).toNat! (col invariant 5).toNat! (col invariant 6).toNat! true
         s!"claim census invariant failed for {source}; claim count, active state, source order, page coupling, or equation label/page pairs are not exact"
-      let mut text := ""
-      for table in #["pages","claims"] do
-        for record in (d.table table).records.toList.drop 1 do
-          if col (split record "\t") 2 == source then text := text ++ record ++ "\n"
+      let text := #["pages","claims"].foldl (fun text table =>
+        ((d.table table).records.toList.drop 1).foldl (fun text record =>
+          if col (split record "\t") 2 == source then text ++ record ++ "\n" else text) text) ""
       let actual := trim (← output d.root "git" #["hash-object","--stdin"] (some text))
       require (actual == col invariant 7) s!"census OID mismatch for {source}"
   else
@@ -924,11 +909,10 @@ def dataEntry (project : System.FilePath) (gate : String) (args : List String) :
   require (!fixture || gate == "tree" || gate == "census") "fixture mode is explicit only for tree/census"
   require (countStrings.isEmpty || gate == "census") "only census accepts fixture counts"
   let root ← IO.FS.realPath target
-  let mut counts := #[534,3172,1401]
-  if !countStrings.isEmpty then
+  let counts ← if countStrings.isEmpty then pure #[534,3172,1401] else do
     require (Registry.digits countStrings[0]! true && Registry.digits countStrings[1]! && Registry.digits countStrings[2]!)
       "fixture counts must be nonnegative integers and pages must be positive"
-    counts := countStrings.toArray.map String.toNat!
+    pure (countStrings.toArray.map String.toNat!)
   if gate == "census" then
     if fixture then
       let some test ← IO.getEnv "LATTICE_TEST_ROOT" | throw <| IO.userError "fixture mode requires LATTICE_TEST_ROOT"

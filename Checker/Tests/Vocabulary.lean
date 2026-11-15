@@ -67,9 +67,9 @@ def prepare (ctx : Context) (name : String) : IO FilePath := do
 
 /-- All positive and negative vocabulary environment cases use actual elaboration and the shared driver. -/
 def semantic (ctx : Context) : IO Unit := do
-  let mut fixtures : Std.HashMap String FilePath := {}
-  for name in #["good","structure","axiom","extra","import","sorry","theorem","type","body","missing","module","graph","finiteness","transitive"] do
-    fixtures := fixtures.insert name (← prepare ctx name)
+  let names := #["good","structure","axiom","extra","import","sorry","theorem","type","body","missing","module","graph","finiteness","transitive"]
+  let fixtures ← names.foldlM (fun (fixtures : Std.HashMap String FilePath) name => do
+    pure (fixtures.insert name (← prepare ctx name))) {}
   let get := fun name => fixtures[name]!
   for name in #["axiom","sorry"] do
     mutateLine (get name) "vocabulary.tsv" 2 #[(3,"definition"),(6,"471dd3a050827d736f2fc6858b2dc396f864af71"),(7,"PENDING")]

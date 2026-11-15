@@ -127,23 +127,29 @@ def prepareChecker (project checker temporary compiler : FilePath) (kind : Strin
   IO.FS.writeFile marker (Json.mkObj [("source",toJson before),("artifacts",Json.mkObj artifacts.toList)]).compress
   return destination
 
+/-- Thread successful compilations through each complete pass, rejecting only a pass with no progress. -/
+private partial def compilePending (modules : Array Row)
+    (compile : Std.HashSet String → Row → IO (Std.HashSet String)) (compiled : Std.HashSet String) : IO Unit := do
+  if compiled.size >= modules.size then return
+  let before := compiled.size
+  let next ← modules.foldlM compile compiled
+  require (next.size > before) "registered module import graph is cyclic or incomplete"
+  compilePending modules compile next
+
 /-- Elaborate registered leaves in the exact direct-import dependency order. -/
 def compileModules (project target temporary compiler semantic : FilePath) (modules imports : Array Row) (strict : Bool := true) : IO Unit := do
   let names := modules.map (col · 1)
-  let mut compiled : Std.HashSet String := {}
   let search := temporary.toString ++ ":" ++ semantic.toString
-  while compiled.size < modules.size do
-    let mut progressed := false
-    for row in modules do
+  let compile := fun (compiled : Std.HashSet String) (row : Row) => do
       let name := col row 1; let source := col row 2
-      if compiled.contains name then continue
+      if compiled.contains name then return compiled
       require (row.size == 3 && !name.isEmpty && !source.isEmpty && (strict || !(col row 3).isEmpty)) "malformed module row"
       require ((name.splitOn ".").all fun p => !p.isEmpty &&
         (p.toList.head! == '_' || (('A' ≤ p.toList.head! && p.toList.head! ≤ 'Z') || ('a' ≤ p.toList.head! && p.toList.head! ≤ 'z'))) && p.toList.all (fun c => (('A' ≤ c && c ≤ 'Z') || ('a' ≤ c && c ≤ 'z') || ('0' ≤ c && c ≤ '9')) || c == '_')) "unsafe module name"
       require (!source.startsWith "/" && (source.splitOn "..").length == 1 && source.endsWith ".lean") "unsafe source path"
       require (← (target / source).pathExists) s!"missing source path {source}"
       let blocked := imports.any fun r => col r 1 == name && names.contains (col r 3) && !compiled.contains (col r 3)
-      if blocked then continue
+      if blocked then return compiled
       let destination := temporary / ((name.replace "." "/") ++ ".olean")
       if let some parent := destination.parent then IO.FS.createDirAll parent
       let base := trim (← output project "lake" #["env","printenv","LEAN_PATH"])
@@ -153,23 +159,22 @@ def compileModules (project target temporary compiler semantic : FilePath) (modu
         cwd := some project
         env := #[("LEAN_PATH",some (search ++ ":" ++ base))] }
       require (result.exitCode == 0) s!"failed to elaborate registered module {name}\n{result.stdout}{result.stderr}"
-      compiled := compiled.insert name; progressed := true
-    require progressed "registered module import graph is cyclic or incomplete"
+      pure (compiled.insert name)
+  compilePending modules compile {}
 
 /-- Reconstruct exact semantic hashes from the environment dumper's escaped single-line encodings. -/
-def declarationRows (project : FilePath) (environment : String) (skeleton : Bool) : IO (Array Row) := do
-  let mut result := #[]
-  for line in lines environment do
+def declarationRows (project : FilePath) (environment : String) (skeleton : Bool) : IO (Array Row) :=
+  (lines environment).foldlM (fun result line => do
     let row := split line "\t"
     if col row 1 == "D" then
       let typeIndex := if skeleton then 18 else 12
       let typeOid := trim (← output project "git" #["hash-object","--stdin"] (some (col row typeIndex)))
       let valueOid := trim (← output project "git" #["hash-object","--stdin"] (some (col row (typeIndex+1))))
       if skeleton then
-        result := result.push (#[col row 2,col row 3,col row 4,typeOid,valueOid] ++ row.extract 4 17)
+        pure (result.push (#[col row 2,col row 3,col row 4,typeOid,valueOid] ++ row.extract 4 17))
       else
-        result := result.push (row.extract 1 11 ++ #[typeOid,valueOid])
-  return result
+        pure (result.push (row.extract 1 11 ++ #[typeOid,valueOid]))
+    else pure result) #[]
 
 /-- Stable sorting of field rows reproduces the C-locale set comparison. -/
 def sorted (rows : Array Row) : Array String :=
@@ -180,84 +185,77 @@ def indexBy (rows : Array Row) (column : Nat) : Std.HashMap String Row :=
   rows.foldl (fun result row => result.insert (col row column) row) {}
 
 /-- Compare the ordered direct imports observed in the environment to the explicit registry. -/
-def importRows (environment : String) : Array Row := Id.run do
-  let mut positions : Std.HashMap String Nat := {}; let mut result := #[]
-  for line in lines environment do
+def importRows (environment : String) : Array Row :=
+  let (_,result) := (lines environment).foldl (fun (positions,result) line =>
     let row := split line "\t"
     if col row 1 == "I" && col row 4 != "Init" then
       let owner := col row 2; let position := positions[owner]?.getD 0 + 1
-      result := result.push (#[owner,toString position] ++ row.extract 3 7)
-      positions := positions.insert owner position
-  return result
+      (positions.insert owner position,result.push (#[owner,toString position] ++ row.extract 3 7))
+    else (positions,result)) (({},#[]) : Std.HashMap String Nat × Array Row)
+  result
 
 /-- Finite import reachability, without adding assumptions to mathematical vertex types. -/
-def reachability (modules imports : Array Row) : Std.HashSet (String × String) := Id.run do
+def reachability (modules imports : Array Row) : Std.HashSet (String × String) :=
   let names := modules.map (col · 1)
-  let mut reach : Std.HashSet (String × String) := names.foldl (fun result name => result.insert (name,name)) {}
-  for row in imports do
-    if names.contains (col row 1) && names.contains (col row 3) then reach := reach.insert (col row 1,col row 3)
-  for k in names do
-    for i in names do
-      for j in names do
-        if reach.contains (i,k) && reach.contains (k,j) then reach := reach.insert (i,j)
-  return reach
+  let reach : Std.HashSet (String × String) := names.foldl (fun result name => result.insert (name,name)) {}
+  let reach := imports.foldl (fun reach row =>
+    if names.contains (col row 1) && names.contains (col row 3) then reach.insert (col row 1,col row 3) else reach) reach
+  names.foldl (fun reach k => names.foldl (fun reach i => names.foldl (fun reach j =>
+    if reach.contains (i,k) && reach.contains (k,j) then reach.insert (i,j) else reach) reach) reach) reach
 
-/-- Preserve one historical diagnostic pass: collect all its errors, then fail before the next pass. -/
-def diagnosticPass (label : String) (action : (Bool → String → IO Unit) → IO Unit) : IO Unit := do
-  let errors ← IO.mkRef (#[] : Array String)
-  action fun valid message => unless valid do errors.modify (·.push message)
-  let failures ← errors.get
+/-- Append a failed rule without introducing effects or changing the ordered diagnostic stream. -/
+private def record (failures : Array String) (valid : Bool) (message : String) : Array String :=
+  if valid then failures else failures.push message
+
+/-- Preserve one historical diagnostic pass: its complete immutable error array fails before the next pass. -/
+private def diagnosticPass (label : String) (failures : Array String) : IO Unit := do
   require failures.isEmpty (String.intercalate "\n" failures.toList ++ "; " ++ label)
 
 /-- Enforce vocabulary declaration, generated-parent, finiteness and exact environment contracts. -/
 def validateVocabulary (modules imports vocabulary actual : Array Row) (environment : String) : IO Unit := do
   let registered := indexBy vocabulary 2
-  let errors ← IO.mkRef (#[] : Array String)
-  let record := fun (valid : Bool) (message : String) => do
-    unless valid do errors.modify (·.push message)
-  for row in actual do
+  let failures := actual.foldl (fun errors row =>
     let name := col row 2
-    let some expected := registered[name]? | do
-      errors.modify (·.push s!"unregistered declaration: {name}")
-      continue
-    record (!(#["theorem","axiom","opaque","quotient"].contains (col row 3))) s!"forbidden primary declaration kind: {name}"
-    record (col row 5 != "true") s!"Prop-valued vocabulary declaration: {name}"
-    record (col row 6 != "true") s!"direct sorryAx dependency: {name}"
-    record (col row 7 != "true") s!"transitive sorryAx dependency: {name}"
-    record (col expected 9 != "graph_core" || col row 8 == "true") s!"graph_core declaration does not mention SimpleGraph: {name}"
-    record (col expected 10 != "none" || col row 9 != "true") s!"global vocabulary declaration requires Fintype: {name}"
-    record (col expected 10 != "local_operation" || col row 9 == "true") s!"local_operation declaration lacks Fintype: {name}"
-    record (col expected 10 != "explicit_finite_volume" || (col row 9 != "true" && col row 10 == "true"))
-      s!"explicit_finite_volume declaration is not explicit Finset data: {name}"
-    if col row 4 == "NONE" then
-      record (col expected 5 == "primary" && col expected 6 == "NONE") s!"unsubstantiated generated origin/parent: {name}"
-    else
-      let parent := registered[col row 4]?.getD #[]
-      record (!parent.isEmpty && col expected 5 == "generated" && col expected 6 == col parent 1 &&
-        col expected 9 == "generated" && col expected 10 == "inherited") s!"generated declaration parent metadata mismatch: {name}"
-  let failures ← errors.get
+    match registered[name]? with
+    | none => errors.push s!"unregistered declaration: {name}"
+    | some expected =>
+      let errors := record errors (!(#["theorem","axiom","opaque","quotient"].contains (col row 3))) s!"forbidden primary declaration kind: {name}"
+      let errors := record errors (col row 5 != "true") s!"Prop-valued vocabulary declaration: {name}"
+      let errors := record errors (col row 6 != "true") s!"direct sorryAx dependency: {name}"
+      let errors := record errors (col row 7 != "true") s!"transitive sorryAx dependency: {name}"
+      let errors := record errors (col expected 9 != "graph_core" || col row 8 == "true") s!"graph_core declaration does not mention SimpleGraph: {name}"
+      let errors := record errors (col expected 10 != "none" || col row 9 != "true") s!"global vocabulary declaration requires Fintype: {name}"
+      let errors := record errors (col expected 10 != "local_operation" || col row 9 == "true") s!"local_operation declaration lacks Fintype: {name}"
+      let errors := record errors (col expected 10 != "explicit_finite_volume" || (col row 9 != "true" && col row 10 == "true"))
+        s!"explicit_finite_volume declaration is not explicit Finset data: {name}"
+      if col row 4 == "NONE" then
+        record errors (col expected 5 == "primary" && col expected 6 == "NONE") s!"unsubstantiated generated origin/parent: {name}"
+      else
+        let parent := registered[col row 4]?.getD #[]
+        record errors (!parent.isEmpty && col expected 5 == "generated" && col expected 6 == col parent 1 &&
+          col expected 9 == "generated" && col expected 10 == "inherited") s!"generated declaration parent metadata mismatch: {name}") #[]
   require failures.isEmpty (String.intercalate "\n" failures.toList ++ "; semantic declaration policy failed")
-  diagnosticPass "registry contains a semantically unverifiable declaration kind" fun record => do
-    for row in vocabulary do
-      record (col row 4 != "notation") s!"notation has no ConstantInfo and cannot be a vocabulary declaration: {col row 2}"
+  diagnosticPass "registry contains a semantically unverifiable declaration kind" <| vocabulary.foldl
+    (fun errors row => record errors (col row 4 != "notation")
+      s!"notation has no ConstantInfo and cannot be a vocabulary declaration: {col row 2}") #[]
   let expected := vocabulary.map fun row => #[col row 2,col row 3,col row 4,col row 7,col row 8]
   let observed := actual.map fun row => #[col row 2,col row 1,col row 3,col row 11,col row 12]
   require (sorted expected == sorted observed) "declaration/module/kind/type_oid/declaration_oid registry does not exactly match the environment"
-  diagnosticPass "production imports must target registered project modules or Mathlib" fun record => do
-    for row in imports do
-      let name := col row 3
-      record (name == "LatticeSystem" || name.startsWith "LatticeSystem." || name == "Mathlib" || name.startsWith "Mathlib.")
-        s!"unauthorized production import: {name}"
+  diagnosticPass "production imports must target registered project modules or Mathlib" <| imports.foldl (fun errors row =>
+    let name := col row 3
+    record errors (name == "LatticeSystem" || name.startsWith "LatticeSystem." || name == "Mathlib" || name.startsWith "Mathlib.")
+      s!"unauthorized production import: {name}") #[]
   require (sorted imports == sorted (importRows environment)) "direct imports are missing, reordered, drifted, or unauthorized"
-  diagnosticPass "registered umbrella reachability failed" fun record => do
-    let reach := reachability modules imports
-    record (modules.any (col · 3 == "umbrella")) "no umbrella module registered"
-    for owner in modules do
-      for target in modules do
-        if col owner 3 == "umbrella" && col target 3 == "leaf" then
-          record (reach.contains (col owner 1,col target 1)) s!"umbrella cannot reach leaf: {col owner 1} -> {col target 1}"
-        if col owner 3 == "root" then
-          record (reach.contains (col owner 1,col target 1)) s!"root cannot reach registered module: {col owner 1} -> {col target 1}"
+  let reach := reachability modules imports
+  let failures := record #[] (modules.any (col · 3 == "umbrella")) "no umbrella module registered"
+  diagnosticPass "registered umbrella reachability failed" <| modules.foldl (fun errors owner =>
+    modules.foldl (fun errors target =>
+      let errors := if col owner 3 == "umbrella" && col target 3 == "leaf" then
+        record errors (reach.contains (col owner 1,col target 1)) s!"umbrella cannot reach leaf: {col owner 1} -> {col target 1}"
+        else errors
+      if col owner 3 == "root" then
+        record errors (reach.contains (col owner 1,col target 1)) s!"root cannot reach registered module: {col owner 1} -> {col target 1}"
+      else errors) errors) failures
 
 /-- Parse explicit vocabulary fixture/dump options without executing a command string. -/
 def vocabularyOptions : List String → Bool → Bool → Option String → Except String (Bool × Bool × Option String)
@@ -303,186 +301,185 @@ def vocabulary (project : FilePath) (args : List String) : IO Unit := do
   catch error => throw <| IO.userError s!"check-vocabulary: {error}"
 
 /-- A frozen source binds every target exactly once; staged earlier sources may bind a subset. -/
-def skeletonCoverage (progress claims bindings : Array Row) : IO Unit := diagnosticPass "source skeleton coverage failed" fun record => do
+def skeletonCoverage (progress claims bindings : Array Row) : IO Unit := do
   let complete := indexBy progress 1; let known := indexBy claims 1
-  for claim in claims do
+  let failures := claims.foldl (fun errors claim =>
     if #["skeleton_frozen","proof_active","complete"].contains (col (complete[col claim 2]?.getD #[]) 2) &&
         col claim 12 == "false" && col claim 6 != "out_of_scope" then
-      record (bindings.any (col · 1 == col claim 1)) s!"skeleton source lacks a binding {col claim 1}"
-  for binding in bindings do
-    record ((bindings.filter (col · 1 == col binding 1)).size == 1)
-      s!"duplicate binding {col binding 1}"
-  for source in progress do
+      record errors (bindings.any (col · 1 == col claim 1)) s!"skeleton source lacks a binding {col claim 1}"
+    else errors) #[]
+  let failures := bindings.foldl (fun errors binding =>
+    record errors ((bindings.filter (col · 1 == col binding 1)).size == 1)
+      s!"duplicate binding {col binding 1}") failures
+  diagnosticPass "source skeleton coverage failed" <| progress.foldl (fun errors source =>
     if #["skeleton_frozen","proof_active","complete"].contains (col source 2) then
       let count := bindings.filter fun b => col (known[col b 1]?.getD #[]) 2 == col source 1
       let targets := claims.filter fun c => col c 2 == col source 1 && col c 12 == "false" && col c 6 != "out_of_scope"
-      record (count.size == targets.size) s!"binding count does not match formalization targets in {col source 1}"
+      record errors (count.size == targets.size) s!"binding count does not match formalization targets in {col source 1}"
+    else errors) failures
 
 /-- Match every expected statement, proof and axiom to exactly the observed module declaration. -/
 def skeletonDeclarations (bindings axioms actual : Array Row) : IO Unit := do
-  let errors ← IO.mkRef (#[] : Array String)
-  let record := fun (valid : Bool) (message : String) => do
-    unless valid do errors.modify (·.push message)
-  let mut expected : Std.HashMap (String × String) Row := {}
-  for row in bindings do
-    let mut entries := #[#[col row 4,col row 2,col row 5,col row 7,col row 8,"statement",col row 1,col row 6]]
-    if col row 3 != "NONE" then entries := entries.push #[col row 4,col row 3,col row 10,col row 11,col row 12,"proof",col row 1,col row 6]
-    if col row 13 != "NONE" then entries := entries.push #[col row 4,col row 13,"theorem",col row 14,"NONE","nonvacuity",col row 1,col row 6]
-    for declaration in entries do
+  let (expected,failures) := bindings.foldl (fun (expected,errors) row =>
+    let entries := #[#[col row 4,col row 2,col row 5,col row 7,col row 8,"statement",col row 1,col row 6]]
+    let entries := if col row 3 != "NONE" then entries.push #[col row 4,col row 3,col row 10,col row 11,col row 12,"proof",col row 1,col row 6] else entries
+    let entries := if col row 13 != "NONE" then entries.push #[col row 4,col row 13,"theorem",col row 14,"NONE","nonvacuity",col row 1,col row 6] else entries
+    entries.foldl (fun (expected,errors) declaration =>
       let key := (col declaration 1,col declaration 2)
-      record (!expected.contains key) s!"duplicate registered declaration {key.2}"
-      expected := expected.insert key declaration
-  for row in axioms do
+      let errors := record errors (!expected.contains key) s!"duplicate registered declaration {key.2}"
+      (expected.insert key declaration,errors)) (expected,errors))
+    (({},#[]) : Std.HashMap (String × String) Row × Array String)
+  let (expected,failures) := axioms.foldl (fun (expected,errors) row =>
     let key := (col row 3,col row 2)
-    record (!expected.contains key) s!"duplicate registered declaration {key.2}"
-    expected := expected.insert key #[key.1,key.2,"axiom",col row 8,"NONE","axiom",col row 1,"axiom"]
-  let mut observed : Std.HashSet (String × String) := {}
-  for row in actual do
+    let errors := record errors (!expected.contains key) s!"duplicate registered declaration {key.2}"
+    (expected.insert key #[key.1,key.2,"axiom",col row 8,"NONE","axiom",col row 1,"axiom"],errors)) (expected,failures)
+  let (observed,failures) := actual.foldl (fun (observed,errors) row =>
     let key := (col row 1,col row 2)
-    observed := observed.insert key
-    let some expectedRow := expected[key]? | do
-      errors.modify (·.push s!"extra declaration {key.2}")
-      continue
-    record (col expectedRow 3 == col row 3) s!"wrong declaration kind {key.2} expected={col expectedRow 3} actual={col row 3}"
-    record (col expectedRow 4 == "PENDING" || col expectedRow 4 == col row 4) s!"wrong type OID {key.2}"
-    record (#["NONE","PENDING"].contains (col expectedRow 5) || col expectedRow 5 == col row 5) s!"wrong value OID {key.2}"
-  for (key,_) in expected do
-    record (observed.contains key) s!"missing or wrong-module declaration {key.1}\x1c{key.2}"
-
-  let failures ← errors.get
-  require failures.isEmpty (String.intercalate "\n" failures.toList ++ "; declaration registry/environment mismatch")
+    let observed := observed.insert key
+    match expected[key]? with
+    | none => (observed,errors.push s!"extra declaration {key.2}")
+    | some expectedRow =>
+      let errors := record errors (col expectedRow 3 == col row 3) s!"wrong declaration kind {key.2} expected={col expectedRow 3} actual={col row 3}"
+      let errors := record errors (col expectedRow 4 == "PENDING" || col expectedRow 4 == col row 4) s!"wrong type OID {key.2}"
+      (observed,record errors (#["NONE","PENDING"].contains (col expectedRow 5) || col expectedRow 5 == col row 5) s!"wrong value OID {key.2}"))
+    (({},failures) : Std.HashSet (String × String) × Array String)
+  diagnosticPass "declaration registry/environment mismatch" <| expected.fold
+    (fun errors key _ => record errors (observed.contains key) s!"missing or wrong-module declaration {key.1}\x1c{key.2}") failures
 
 /-- Preserve exact primary propositions, proof types, nonvacuity and direct-hole ownership. -/
-def skeletonShapes (bindings actual : Array Row) : IO Unit := diagnosticPass "primary/proof-hole bijection failed" fun record => do
+def skeletonShapes (bindings actual : Array Row) : IO Unit := do
   let statements := indexBy bindings 2; let proofs := indexBy (bindings.filter (col · 3 != "NONE")) 3
   let nonvacuity := indexBy (bindings.filter (col · 13 != "NONE")) 13
-  for row in actual do
+  diagnosticPass "primary/proof-hole bijection failed" <| actual.foldl (fun errors row =>
     let name := col row 2; let direct := (col row 7).toNat?.getD 0; let transitive := col row 8 == "true"
     if let some binding := statements[name]? then
-      record (direct == 0 && !transitive) s!"primary statement depends on sorryAx {name}"
-      record (col row 14 != "true") s!"literal True primary statement {name}"
-      record (col binding 6 != "proof_proposition" || col row 15 == "true") s!"proof proposition is not Prop-valued {name}"
+      let errors := record errors (direct == 0 && !transitive) s!"primary statement depends on sorryAx {name}"
+      let errors := record errors (col row 14 != "true") s!"literal True primary statement {name}"
+      record errors (col binding 6 != "proof_proposition" || col row 15 == "true") s!"proof proposition is not Prop-valued {name}"
     else if let some binding := proofs[name]? then
-      record (col row 6 == "true") s!"proof declaration is not Prop-valued {name}"
-      record (col row 18 == col binding 2) s!"proof type is not exactly the bound primary statement {name} expected={col binding 2} actual={col row 18}"
+      let errors := record errors (col row 6 == "true") s!"proof declaration is not Prop-valued {name}"
+      let errors := record errors (col row 18 == col binding 2) s!"proof type is not exactly the bound primary statement {name} expected={col binding 2} actual={col row 18}"
       if col binding 12 == "NONE" then
-        record (direct == 1 && transitive) (if direct == 0 && transitive then
+        record errors (direct == 1 && transitive) (if direct == 0 && transitive then
           s!"hidden or transitive-only sorryAx {name}" else
           s!"proof stub needs exactly one direct sorryAx {name}")
-      else record (direct == 0 && !transitive) s!"completed proof depends on sorryAx {name}"
+      else record errors (direct == 0 && !transitive) s!"completed proof depends on sorryAx {name}"
     else if let some binding := nonvacuity[name]? then
-      record (direct == 0 && !transitive) s!"nonvacuity declaration depends on sorryAx {name}"
-      record (col row 16 != "true") s!"nonvacuity declaration concludes True {name}"
-      record (col row 17 != "true") s!"nonvacuity declaration follows from its own hypotheses {name}"
-      record ((col row 9).splitOn "," |>.contains (col binding 2)) s!"nonvacuity declaration does not reference its bound statement {name}"
-    else record (direct == 0 && !transitive) s!"unregistered sorryAx declaration {name}"
+      let errors := record errors (direct == 0 && !transitive) s!"nonvacuity declaration depends on sorryAx {name}"
+      let errors := record errors (col row 16 != "true") s!"nonvacuity declaration concludes True {name}"
+      let errors := record errors (col row 17 != "true") s!"nonvacuity declaration follows from its own hypotheses {name}"
+      record errors ((col row 9).splitOn "," |>.contains (col binding 2)) s!"nonvacuity declaration does not reference its bound statement {name}"
+    else record errors (direct == 0 && !transitive) s!"unregistered sorryAx declaration {name}") #[]
 
 /-- Actual setup uses must be earlier and admitted, with assumption context occurring in binders. -/
-def skeletonContext (claims bindings vocabulary contexts dependencies modules actual : Array Row) : IO Unit := diagnosticPass "claim-context semantic mismatch" fun record => do
+def skeletonContext (claims bindings vocabulary contexts dependencies modules actual : Array Row) : IO Unit := do
   let sequence : Std.HashMap String Nat := (claims.zipIdx).foldl (fun result (row,i) => result.insert (col row 1) (i+1)) {}
   let claimOf := indexBy bindings 2
   let registered : Std.HashSet String := (bindings ++ vocabulary).foldl (fun result row => result.insert (col row 2)) {}
   let rootOf := fun name : String => (name.splitOn ".").head!
   let projects : Std.HashSet String := modules.foldl (fun result row => result.insert (rootOf (col row 1))) {}
-  let mut admitted : Std.HashSet (String × String) := {}; let mut forward : Std.HashSet (String × String) := {}
-  let mut context : Std.HashSet (String × String) := {}; let mut assumptions : Std.HashSet (String × String) := {}
-  for row in contexts do
+  let (admitted,context,assumptions) := contexts.foldl (fun (admitted,context,assumptions) row =>
     let edge := (col row 1,col row 3)
-    admitted := admitted.insert edge; context := context.insert edge
-    if col row 4 == "assumption" then assumptions := assumptions.insert edge
-  for row in dependencies do
+    (admitted.insert edge,context.insert edge,if col row 4 == "assumption" then assumptions.insert edge else assumptions))
+    (({},{},{}) : Std.HashSet (String × String) × Std.HashSet (String × String) × Std.HashSet (String × String))
+  let (admitted,forward) := dependencies.foldl (fun (admitted,forward) row =>
     let edge := if col row 2 == "required_by" then (col row 3,col row 1) else (col row 1,col row 3)
-    admitted := admitted.insert edge
-    if col row 2 == "required_by" then forward := forward.insert edge
-  let mut used : Std.HashSet (String × String) := {}; let mut guards : Std.HashSet (String × String) := {}
-  for row in actual do
+    (admitted.insert edge,if col row 2 == "required_by" then forward.insert edge else forward))
+    (admitted,({} : Std.HashSet (String × String)))
+  let (used,guards,failures) := actual.foldl (fun (used,guards,errors) row =>
     if let some owner := claimOf[col row 2]? then
       let claim := col owner 1
-      for name in (col row 9 ++ "," ++ col row 10).splitOn "," do
-        if name.isEmpty then continue
-        if let some setup := claimOf[name]? then
-          if col setup 1 != claim then used := used.insert (claim,col setup 1)
-        record (!projects.contains (rootOf name) || name == col row 2 || registered.contains name)
-          s!"primary statement uses an unregistered project constant {name}"
-      for name in (col row 12 ++ "," ++ col row 13).splitOn "," do
-        if let some setup := claimOf[name]? then guards := guards.insert (claim,col setup 1)
-  for edge in context do
-    record (used.contains edge) s!"registered context is absent from statement {edge.1}\x1c{edge.2}"
-    record (!assumptions.contains edge || guards.contains edge) s!"assumption context is not a binder or antecedent {edge.1}\x1c{edge.2}"
-  for edge in used do
+      let (used,errors) := ((col row 9 ++ "," ++ col row 10).splitOn ",").foldl (fun (used,errors) name =>
+        if name.isEmpty then (used,errors) else
+        let used := if let some setup := claimOf[name]? then
+          if col setup 1 != claim then used.insert (claim,col setup 1) else used
+          else used
+        (used,record errors (!projects.contains (rootOf name) || name == col row 2 || registered.contains name)
+          s!"primary statement uses an unregistered project constant {name}")) (used,errors)
+      let guards := ((col row 12 ++ "," ++ col row 13).splitOn ",").foldl (fun guards name =>
+        if let some setup := claimOf[name]? then guards.insert (claim,col setup 1) else guards) guards
+      (used,guards,errors)
+    else (used,guards,errors))
+    (({},{},#[]) : Std.HashSet (String × String) × Std.HashSet (String × String) × Array String)
+  let failures := context.fold (fun errors edge =>
+    let errors := record errors (used.contains edge) s!"registered context is absent from statement {edge.1}\x1c{edge.2}"
+    record errors (!assumptions.contains edge || guards.contains edge) s!"assumption context is not a binder or antecedent {edge.1}\x1c{edge.2}") failures
+  diagnosticPass "claim-context semantic mismatch" <| used.fold (fun errors edge =>
     if !admitted.contains edge then
-      record false s!"actual setup reference lacks claim-context or dependency {edge.1}\x1c{edge.2}"
+      record errors false s!"actual setup reference lacks claim-context or dependency {edge.1}\x1c{edge.2}"
     else if forward.contains edge then
-      record (sequence[edge.2]?.getD 0 > sequence[edge.1]?.getD 0) s!"required_by reference does not pull a later claim forward {edge.1}\x1c{edge.2}"
-    else record (sequence[edge.2]?.getD 0 < sequence[edge.1]?.getD 0) s!"statement references a claim that is not earlier {edge.1}\x1c{edge.2}"
+      record errors (sequence[edge.2]?.getD 0 > sequence[edge.1]?.getD 0) s!"required_by reference does not pull a later claim forward {edge.1}\x1c{edge.2}"
+    else record errors (sequence[edge.2]?.getD 0 < sequence[edge.1]?.getD 0) s!"statement references a claim that is not earlier {edge.1}\x1c{edge.2}") failures
 
 /-- Vocabulary use is checked per primary claim, independently of the global declaration registry. -/
-def skeletonVocabulary (vocabulary bindings admissions reviews actual : Array Row) : IO Unit := diagnosticPass "claim vocabulary admission mismatch" fun record => do
+def skeletonVocabulary (vocabulary bindings admissions reviews actual : Array Row) : IO Unit := do
   let vocabularyByName := indexBy vocabulary 2; let owners := indexBy bindings 2; let basis := indexBy reviews 1
-  for row in actual do
+  diagnosticPass "claim vocabulary admission mismatch" <| actual.foldl (fun errors row =>
     if let some binding := owners[col row 2]? then
       let owner := col binding 1
-      for name in (col row 9 ++ "," ++ col row 10).splitOn "," do
+      ((col row 9 ++ "," ++ col row 10).splitOn ",").foldl (fun errors name =>
         if let some declaration := vocabularyByName[name]? then
           if col (basis[owner]?.getD #[]) 2 != "project_vocabulary" then
-            record false s!"primary project vocabulary contradicts claim review basis {owner} {col declaration 1}"
+            record errors false s!"primary project vocabulary contradicts claim review basis {owner} {col declaration 1}"
           else
-            record (admissions.any fun a => col a 1 == owner && col a 2 == col declaration 1)
+            record errors (admissions.any fun a => col a 1 == owner && col a 2 == col declaration 1)
               s!"primary vocabulary use lacks claim-vocabulary admission {owner} {col declaration 1}"
+        else errors) errors
+    else errors) #[]
 
 /-- Actual nonstandard kernel dependencies exactly match approved claim-to-axiom relations. -/
-def skeletonAxioms (bindings axioms approved actual : Array Row) : IO Unit := diagnosticPass "claim axiom contract failed" fun record => do
-  let mut owners : Std.HashMap String String := {}
-  for row in bindings do
-    owners := owners.insert (col row 2) (col row 1)
-    if col row 3 != "NONE" then owners := owners.insert (col row 3) (col row 1)
-    if col row 13 != "NONE" then owners := owners.insert (col row 13) (col row 1)
+def skeletonAxioms (bindings axioms approved actual : Array Row) : IO Unit := do
+  let owners := bindings.foldl (fun owners row =>
+    let owners := owners.insert (col row 2) (col row 1)
+    let owners := if col row 3 != "NONE" then owners.insert (col row 3) (col row 1) else owners
+    if col row 13 != "NONE" then owners.insert (col row 13) (col row 1) else owners) ({} : Std.HashMap String String)
   let axiomByName := indexBy axioms 2
-  let mut uses : Std.HashSet (String × String) := {}; let mut used : Std.HashSet String := {}
-  for row in actual do
+  let (uses,used,failures) := actual.foldl (fun state row =>
     if let some owner := owners[col row 2]? then
-      for name in (col row 11).splitOn "," do
+      ((col row 11).splitOn ",").foldl (fun (uses,used,errors) name =>
         if let some registeredAxiom := axiomByName[name]? then
-          uses := uses.insert (owner,col registeredAxiom 1); used := used.insert (col registeredAxiom 1)
+          (uses.insert (owner,col registeredAxiom 1),used.insert (col registeredAxiom 1),errors)
         else
-          record (#["","propext","Classical.choice","Quot.sound","sorryAx"].contains name) s!"unregistered nonstandard axiom {name} used by {col row 2}"
-  for edge in approved do
-    record (uses.contains (col edge 1,col edge 2)) "approved claim axiom is not used"
-  for edge in uses do
-    record (approved.any fun r => (col r 1,col r 2) == edge) "unapproved claim axiom is used"
-  for registeredAxiom in axioms do record (used.contains (col registeredAxiom 1)) s!"registered axiom is unused {col registeredAxiom 1}"
+          (uses,used,record errors (#["","propext","Classical.choice","Quot.sound","sorryAx"].contains name)
+            s!"unregistered nonstandard axiom {name} used by {col row 2}")) state
+    else state) (({},{},#[]) : Std.HashSet (String × String) × Std.HashSet String × Array String)
+  let failures := approved.foldl (fun errors edge =>
+    record errors (uses.contains (col edge 1,col edge 2)) "approved claim axiom is not used") failures
+  let failures := uses.fold (fun errors edge =>
+    record errors (approved.any fun r => (col r 1,col r 2) == edge) "unapproved claim axiom is used") failures
+  diagnosticPass "claim axiom contract failed" <| axioms.foldl (fun errors registeredAxiom =>
+    record errors (used.contains (col registeredAxiom 1)) s!"registered axiom is unused {col registeredAxiom 1}") failures
 
 /-- Reachability isolates unresolved statements from the default mathematical root. -/
-def skeletonIsolation (vocabulary statements imports : Array Row) : IO Unit := diagnosticPass "skeleton import isolation failed" fun record => do
+def skeletonIsolation (vocabulary statements imports : Array Row) : IO Unit := do
   let reach := reachability (vocabulary ++ statements) imports
   let umbrellas := statements.filter (col · 3 != "leaf")
-  record (umbrellas.size == 1) "skeleton needs exactly one umbrella"
+  let failures := record #[] (umbrellas.size == 1) "skeleton needs exactly one umbrella"
   let root := (vocabulary.filter (col · 3 == "root")).back?.map (col · 1) |>.getD ""
-  for row in statements do
-    if col row 3 == "leaf" then record (reach.contains (((umbrellas.back?).map (col · 1)).getD "",col row 1)) s!"umbrella misses {col row 1}"
-    record (root.isEmpty || !reach.contains (root,col row 1)) s!"production root reaches {col row 1}"
+  diagnosticPass "skeleton import isolation failed" <| statements.foldl (fun errors row =>
+    let errors := if col row 3 == "leaf" then record errors (reach.contains (((umbrellas.back?).map (col · 1)).getD "",col row 1))
+      s!"umbrella misses {col row 1}" else errors
+    record errors (root.isEmpty || !reach.contains (root,col row 1)) s!"production root reaches {col row 1}") failures
 
 /-- Only one declaration-local warning exception belongs to each registered unresolved proof. -/
 def skeletonWarnings (bindings : Array Row) (environment : String) : IO Unit := do
-  diagnosticPass "warning exception ownership failed" fun record => do
-    let expected : Std.HashSet (String × String) := bindings.foldl (fun result row =>
-      if col row 9 == "proof_stub" && col row 12 == "NONE" then result.insert (col row 4,col row 3) else result) {}
-    let mut seen : Std.HashMap (String × String) Nat := {}
-    for line in lines environment do
+  let expected : Std.HashSet (String × String) := bindings.foldl (fun result row =>
+    if col row 9 == "proof_stub" && col row 12 == "NONE" then result.insert (col row 4,col row 3) else result) {}
+  let (seen,failures) := (lines environment).foldl (fun (seen,errors) line =>
       let row := split line "\t"
       if col row 1 == "W" then
         let key := (col row 2,col row 3)
         if col row 4 != "declaration" || key.2 == "NONE" then
-          record false s!"unscoped warningAsError suppression in {key.1}"
+          (seen,record errors false s!"unscoped warningAsError suppression in {key.1}")
         else if !expected.contains key then
-          record false s!"warningAsError exception is not a registered unresolved proof {key.2}"
-        else seen := seen.insert key (seen[key]?.getD 0 + 1)
-    for key in expected do
-      record (seen[key]?.getD 0 == 1) s!"unresolved proof needs exactly one declaration-local warningAsError exception {key.1}\x1c{key.2}"
-  diagnosticPass "diagnostic suppression policy failed" fun record => do
-    for line in lines environment do
-      let row := split line "\t"
-      record (col row 1 != "S") s!"forbidden diagnostic suppression {col row 3} in {col row 2}"
+          (seen,record errors false s!"warningAsError exception is not a registered unresolved proof {key.2}")
+        else (seen.insert key (seen[key]?.getD 0 + 1),errors)
+      else (seen,errors)) (({},#[]) : Std.HashMap (String × String) Nat × Array String)
+  diagnosticPass "warning exception ownership failed" <| expected.fold (fun errors key =>
+    record errors (seen[key]?.getD 0 == 1) s!"unresolved proof needs exactly one declaration-local warningAsError exception {key.1}\x1c{key.2}") failures
+  diagnosticPass "diagnostic suppression policy failed" <| (lines environment).foldl (fun errors line =>
+    let row := split line "\t"
+    record errors (col row 1 != "S") s!"forbidden diagnostic suppression {col row 3} in {col row 2}") #[]
 
 /-- Inspect a staged or frozen typed skeleton without treating a contract-only state as source acceptance. -/
 def skeleton (project : FilePath) (args : List String) : IO Unit := do

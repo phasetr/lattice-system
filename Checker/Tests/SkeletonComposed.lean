@@ -8,9 +8,7 @@ open Checker.Tests.FixtureSupport (property jsonArray jsonString)
 
 /-- Read one strict JSON array of TSV fields without escaping or normalization changes. -/
 def jsonRow (value : Json) : IO (Array String) := do
-  let mut row := #[]
-  for field in ← jsonArray value do row := row.push (← jsonString field)
-  pure row
+  (← jsonArray value).mapM jsonString
 
 /-- Run the generator's unchanged canonical inventory derivation through its read-only typed CLI. -/
 def deriveItems (ctx : Context) (root : FilePath) : IO Unit := do
@@ -22,15 +20,14 @@ def deriveItems (ctx : Context) (root : FilePath) : IO Unit := do
     let data ← property value key
     let header ← jsonRow (← property data "header")
     ensure (header == (← table root name)[0]!) "canonical source-item derivation header"
-    let mut rows := #[header]
-    for row in ← jsonArray (← property data "rows") do rows := rows.push (← jsonRow row)
-    writeTable root name rows
+    let rows ← (← jsonArray (← property data "rows")).mapM jsonRow
+    writeTable root name (#[header] ++ rows)
 
 /-- Refresh claim field identities and every source's exact ordered census from real fixture bytes. -/
 def refreshProduction (ctx : Context) (root : FilePath) : IO Unit := do
   let claims ← table root "claims.tsv"
-  let mut rows := claims
-  for i in [1:rows.size] do rows := rows.set! i (rows[i]!.set! 8 (← blob ctx rows[i]![7]!))
+  let rows ← claims.zipIdx |>.mapM fun (row,index) => do
+    if index == 0 then pure row else pure (row.set! 8 (← blob ctx row[7]!))
   writeTable root "claims.tsv" rows
   let header := (← table root "source-invariants.tsv")[0]!
   let pages ← table root "pages.tsv"

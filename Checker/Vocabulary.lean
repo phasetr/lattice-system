@@ -35,20 +35,17 @@ private meta def dumpEnvironment (moduleListPath outputPath : String) : CommandE
   let moduleText ← IO.FS.readFile moduleListPath
   let moduleNames := parseModuleList moduleText
   let env ← getEnv
-  let mut lines := #[]
-  for moduleName in moduleNames do
+  let lines ← moduleNames.foldlM (fun lines moduleName => do
     let some idx := moduleIndex? env moduleName
       | throwError "registered module {moduleName} is absent from the elaborated environment"
     let data := env.header.moduleData[idx]!
     let structures := data.constants.filterMap fun
       | .inductInfo v => if isStructure env v.name then some v.name else none
       | _ => none
-    for info in data.constants do
-      unless isStructureImplementationArtifact structures info.name do
-        lines := lines.push (← liftTermElabM <|
-          vocabularyDeclarationLine env moduleName info)
-    for h : i in *...data.imports.size do
-      lines := lines.push (importLine moduleName (i + 1) data.imports[i])
+    let lines ← data.constants.foldlM (fun lines info => do
+      if isStructureImplementationArtifact structures info.name then pure lines
+      else return lines.push (← liftTermElabM <| vocabularyDeclarationLine env moduleName info)) lines
+    return lines ++ data.imports.zipIdx.map (fun (entry,index) => importLine moduleName (index+1) entry)) #[]
   let body := String.intercalate "\n" lines.toList
   IO.FS.writeFile outputPath (if body.isEmpty then body else body ++ "\n")
 

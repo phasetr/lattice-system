@@ -34,17 +34,10 @@ def integer (value : String) : IO Int := do
     | '-' :: tail => (true,tail)
     | '+' :: tail => (false,tail)
     | _ => (false,chars)
-  let mut result := 0
-  let mut priorDigit := false
-  let mut valid := !chars.isEmpty
-  for c in chars do
-    if c == '_' then
-      valid := valid && priorDigit
-      priorDigit := false
-    else if let some digit := decimal c then
-      result := result*10 + digit
-      priorDigit := true
-    else valid := false
+  let (result,priorDigit,valid) := chars.foldl (fun (result,priorDigit,valid) c =>
+    if c == '_' then (result,false,valid && priorDigit)
+    else if let some digit := decimal c then (result*10 + digit,true,valid)
+    else (result,priorDigit,false)) (0,false,!chars.isEmpty)
   require (valid && priorDigit) ("invalid literal for int() with base 10: '" ++ value ++ "'")
   return if negative then -(Int.ofNat result) else Int.ofNat result
 

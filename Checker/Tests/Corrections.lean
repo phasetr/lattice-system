@@ -34,12 +34,10 @@ def shellReview : String := "CORPUS-NORMALIZATION-TASAKI2020-2026-REVIEW"
 /-- Capture exact relative file identities and bytes for an immutable-baseline oracle. -/
 partial def snapshot (root : FilePath) (relativePrefix : String := "") : IO (Array (String × ByteArray)) := do
   let entries := (← root.readDir).qsort (fun a b => a.fileName < b.fileName)
-  let mut result := #[]
-  for entry in entries do
+  entries.foldlM (fun result entry => do
     let relative := relativePrefix ++ entry.fileName
-    if ← entry.path.isDir then result := result ++ (← snapshot entry.path (relative ++ "/"))
-    else result := result.push (relative, ← IO.FS.readBinFile entry.path)
-  pure result
+    if ← entry.path.isDir then return result ++ (← snapshot entry.path (relative ++ "/"))
+    else return result.push (relative, ← IO.FS.readBinFile entry.path)) #[]
 
 /-- Clone only registry bytes, matching the original shell fixture's copy boundary. -/
 def shellClone (ctx : Context) (before : FilePath) (name : String) : IO FilePath := do
@@ -96,16 +94,15 @@ def makeSplit (ctx : Context) (base : FilePath) : IO FilePath := do
   let oid1 ← blob ctx body1
   let oid2 ← blob ctx body2
   let rows ← table target "claims.tsv"
-  let mut output := #[]
-  for row in rows do
+  let output := rows.flatMap fun row =>
     if row[0]! == "CL-TASAKI2020-3256" then
-      output := output.push (row |>.set! 11 "true" |>.set! 12 "CL-TASAKI2020-9001" |>.set! 13 "compound-claim" |>.set! 14 shellReview)
-      for (id, order, atom, body, oid) in #[("CL-TASAKI2020-9001", "000528.0005", "1/2", body1, oid1),
-          ("CL-TASAKI2020-9002", "000528.0006", "2/2", body2, oid2)] do
-        output := output.push #[id, "TASAKI2020", order, "PG-TASAKI2020-0528",
+      #[row |>.set! 11 "true" |>.set! 12 "CL-TASAKI2020-9001" |>.set! 13 "compound-claim" |>.set! 14 shellReview] ++
+      (#[("CL-TASAKI2020-9001", "000528.0005", "1/2", body1, oid1),
+          ("CL-TASAKI2020-9002", "000528.0006", "2/2", body2, oid2)].map fun (id,order,atom,body,oid) =>
+        #[id, "TASAKI2020", order, "PG-TASAKI2020-0528",
           "PDF p. 528; print p. 519; NONE; paragraph 7; correction split atom " ++ atom,
-          "hypothesis", "hypothesis", body, oid, "NONE", "NONE", "false", "NONE", "NONE", "NONE"]
-    else output := output.push row
+          "hypothesis", "hypothesis", body, oid, "NONE", "NONE", "false", "NONE", "NONE", "NONE"])
+    else #[row]
   writeTable target "claims.tsv" output
   writeTable target "item-claims.tsv" <| insertAfter (← table target "item-claims.tsv")
     (fun r => r[0]?.getD "" == "IT-TASAKI2020-3034" && r[2]?.getD "" == "CL-TASAKI2020-3256")
@@ -889,10 +886,9 @@ def duplicatePublicCases (ctx : Context) (f : DuplicateFixtures) : IO Unit := do
     (← jsonString (← property canonicalClaims[0]! "claim_id")) == canonical &&
     (← jsonString (← property canonicalItem "source_label")) == "Equation (R.2)") "public original provenance and successor"
   let text ← publicText (publicRoot / "docs")
-  let mut tokens := #[dupEvent, dupReview, dupCorrection, "CA-RUNTIME-DUPLICATE", ".self-local", ctx.temporary.toString]
   let rows ← table f.base "claims.tsv"
-  for row in rows.extract 1 rows.size do
-    if row[1]! == dupSource then tokens := tokens ++ #[row[7]!, row[8]!]
+  let tokens := #[dupEvent, dupReview, dupCorrection, "CA-RUNTIME-DUPLICATE", ".self-local", ctx.temporary.toString] ++
+    ((rows.extract 1 rows.size).filter (fun row => row[1]! == dupSource)).flatMap (fun row => #[row[7]!,row[8]!])
   for token in tokens do ensure ((text.splitOn token).length == 1) "duplicate public output contains private bytes"
 
 /-- Create a separately owned canonical content repair before or after duplicate retirement. -/

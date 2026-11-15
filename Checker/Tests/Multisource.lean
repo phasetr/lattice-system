@@ -69,15 +69,15 @@ def base (ctx : Context) : IO FilePath := do
   let sources ← table root "sources.tsv"
   let pages ← table root "pages.tsv"
   let progress ← table root "source-progress.tsv"
-  let mut invariants := #[#["source_id","physical_page_count","active_claim_count","formalization_target_count",
-    "equation_pair_count","no_claim_page_count","census_oid","review_ref"]]
-  for source in sources.extract 1 sources.size do
+  let header := #["source_id","physical_page_count","active_claim_count","formalization_target_count",
+    "equation_pair_count","no_claim_page_count","census_oid","review_ref"]
+  let invariants ← (sources.extract 1 sources.size).mapM fun source => do
     let id := source[0]!
     let some state := progress.find? (fun row => row[0]?.getD "" == id)
       | throw <| IO.userError ("fixture source has no progress record " ++ id)
     let count := (pages.filter fun row => row[1]?.getD "" == id).size
-    invariants := invariants.push #[id,toString count,"0","0","0","0","PENDING",state[2]!]
-  writeTable root "source-invariants.tsv" invariants
+    pure #[id,toString count,"0","0","0","0","PENDING",state[2]!]
+  writeTable root "source-invariants.tsv" (#[header] ++ invariants)
   refresh ctx root
   pure root
 

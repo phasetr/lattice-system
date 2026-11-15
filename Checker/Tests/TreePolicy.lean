@@ -26,14 +26,12 @@ def policyCase (ctx : Context) (name phase : String) (vocabulary : Bool := false
 
 /-- Stage only this fixture's explicitly enumerated files, never a parent worktree or dependency tree. -/
 partial def fixtureFiles (root : FilePath) (relative : String := "") : IO (Array String) := do
-  let mut result := #[]
-  for entry in ← (root / relative).readDir do
-    if entry.fileName == ".git" then continue
+  (← (root / relative).readDir).foldlM (fun result entry => do
+    if entry.fileName == ".git" then return result
     let child := if relative.isEmpty then entry.fileName else relative ++ "/" ++ entry.fileName
     let metadata ← entry.path.symlinkMetadata
-    if metadata.type == .dir then result := result ++ (← fixtureFiles root child)
-    else result := result.push child
-  return result
+    if metadata.type == .dir then return result ++ (← fixtureFiles root child)
+    else return result.push child) #[]
 
 /-- Policy lexical hygiene requires an actual Git index in the isolated fixture. -/
 def policyRepo (root : FilePath) : IO Unit := do

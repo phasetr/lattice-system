@@ -40,9 +40,8 @@ def labelPart (segment : String) : Option (String × String) := Id.run do
         let body := String.ofList (suffix.toList.dropWhile textSpace)
         if body.startsWith "(" then
           let beforeSemicolon := (((body.drop 1).toString.splitOn ";").head!).toList.toArray
-          let mut ending := none
-          for i in [:beforeSemicolon.size] do
-            if beforeSemicolon[i]! == ')' then ending := some i
+          let (_,ending) := beforeSemicolon.foldl (fun (i,ending) c =>
+            (i+1,if c == ')' then some i else ending)) ((0,none) : Nat × Option Nat)
           if let some i := ending then
             if i > 0 then
               let middle := String.ofList (beforeSemicolon.extract 0 i).toList
@@ -76,12 +75,11 @@ def slugForGroup (group : String) : IO String := do
       return "chapter-" ++ String.ofList (List.replicate (2-value.length) '0') ++ value
   let lowered := String.join (group.toList.map fun c =>
     if c == 'İ' then "i\u0307" else if c == 'K' then "k" else (String.singleton c).toLower)
-  let mut slug := ""; let mut separator := false
-  for c in lowered.toList do
+  let (slug,_) := lowered.foldl (fun (slug,separator) c =>
     if ('a' ≤ c && c ≤ 'z') || ('0' ≤ c && c ≤ '9') then
-      if separator && !slug.isEmpty then slug := slug.push '-'
-      slug := slug.push c; separator := false
-    else separator := true
+      let slug := if separator && !slug.isEmpty then slug.push '-' else slug
+      (slug.push c,false)
+    else (slug,true)) ("",false)
   require (!slug.isEmpty) s!"public group has no safe slug: {group}"
   return slug
 
@@ -99,10 +97,8 @@ def sectionTop (text : String) (locator : Bool) : Option String := do
 /-- Derive display grouping from section metadata before the locator fallback. -/
 def publicGroup (page : Row) (locator : String) : IO String := do
   let sectionText ← str page "section"
-  let mut top := sectionTop sectionText false
-  if top.isNone then
-    for segment in locator.splitOn "; " do
-      if let some value := sectionTop segment true then top := some value; break
+  let top := (sectionTop sectionText false).orElse fun _ =>
+    (locator.splitOn "; ").findSome? (sectionTop · true)
   if let some value := top then
     if decimal value then
       let number := toString (← integer value)
@@ -129,26 +125,25 @@ def groupingLocator (locator : String) : String :=
 /-- Derive reviewed seed metadata and ordered claim membership without allocating canonical registry identities. -/
 def derive (claims pages sources tracks : Array Row) : IO (Array Row × Array Row) := do
   let pageById ← indexUnique pages "page_id" "page ID"
-  let mut trackPositions : Std.HashMap String Int := {}
-  for row in tracks do trackPositions := trackPositions.insert (← str row "track_id") (← integer (← str row "position"))
-  let mut sourceOrder : Std.HashMap String (Int × Int) := {}
-  for row in sources do
+  let trackPositions ← tracks.foldlM (fun positions row => do
+    pure (positions.insert (← str row "track_id") (← integer (← str row "position"))))
+    ({} : Std.HashMap String Int)
+  let sourceOrder ← sources.foldlM (fun sourceOrder row => do
     let source ← str row "source_id"; let track ← str row "track_id"
     let some position := trackPositions[track]? | throw <| IO.userError s!"source refers to unknown track {source}"
-    sourceOrder := sourceOrder.insert source (position,← integer (← str row "source_position"))
-  let mut ordered := #[]
-  for claim in claims do
+    pure (sourceOrder.insert source (position,← integer (← str row "source_position"))))
+    ({} : Std.HashMap String (Int × Int))
+  let ordered ← claims.foldlM (fun ordered claim => do
     let id ← str claim "claim_id"; let source ← str claim "source_id"
     let some order := sourceOrder[source]? | throw <| IO.userError s!"claim refers to unknown source {id}"
-    ordered := ordered.push ((order.1,order.2,← str claim "order_key",id),ordered.size,claim)
-  ordered := ordered.qsort fun a b =>
+    pure (ordered.push ((order.1,order.2,← str claim "order_key",id),ordered.size,claim)))
+    (#[] : Array ((Int × Int × String × String) × Nat × Row))
+  let ordered := ordered.qsort fun a b =>
     if a.1.1 != b.1.1 then a.1.1 < b.1.1 else
     if a.1.2.1 != b.1.2.1 then a.1.2.1 < b.1.2.1 else
     if a.1.2.2.1 != b.1.2.2.1 then a.1.2.2.1 < b.1.2.2.1 else
     if a.1.2.2.2 != b.1.2.2.2 then a.1.2.2.2 < b.1.2.2.2 else a.2.1 < b.2.1
-  let mut groups : Array (String × Row × Array String) := #[]
-  let mut positions : Std.HashMap String Nat := {}
-  for (_,_,claim) in ordered do
+  let (groups,_) ← ordered.foldlM (fun (groups,positions) (_,_,claim) => do
     let id ← str claim "claim_id"; let source ← str claim "source_id"; let pageId ← str claim "page_id"
     let some page := pageById[pageId]? | throw <| IO.userError s!"claim refers to unknown page {id}"
     let locator := groupingLocator (← str claim "locator")
@@ -157,22 +152,24 @@ def derive (claims pages sources tracks : Array Row) : IO (Array Row × Array Ro
     if let some i := positions[key]? then
       let (oldKey,item,members) := groups[i]!
       require ((← str item "item_kind") == kind && (← str item "locator") == canonical) s!"inconsistent explicit source label {label}"
-      groups := groups.set! i (oldKey,item,members.push id)
+      pure (groups.set! i (oldKey,item,members.push id),positions)
     else
       let group ← publicGroup page (← str claim "locator")
       let item := stringRow #[("source_id",source),("order_key",← str claim "order_key"),("page_id",pageId),
         ("item_kind",kind),("source_label",label),("title","NONE"),("locator",canonical),
         ("public_group",group),("public_slug",← slugForGroup group),("review_ref","PUBLIC-DOCS-SOURCE-ITEM-REVIEW-V1")]
-      positions := positions.insert key groups.size
-      groups := groups.push (key,item,#[id])
-  let mut counts : Std.HashMap String Nat := {}; let mut items := #[]; let mut relations := #[]
-  for (_,item,members) in groups do
+      let positions := positions.insert key groups.size
+      pure (groups.push (key,item,#[id]),positions))
+    ((#[],{}) : Array (String × Row × Array String) × Std.HashMap String Nat)
+  let (_,items,relations) ← groups.foldlM (fun (counts,items,relations) (_,item,members) => do
     let source ← str item "source_id"; let n := counts[source]?.getD 0 + 1
-    counts := counts.insert source n
     let number := toString n
     let id := "IT-" ++ source ++ "-" ++ String.ofList (List.replicate (4-number.length) '0') ++ number
-    items := items.push (item.setObjVal! "item_id" (toJson id))
-    for i in [:members.size] do relations := relations.push (stringRow #[("item_id",id),("position",toString (i+1)),("claim_id",members[i]!)])
+    let (relations,_) := members.foldl (fun (relations,i) member =>
+      (relations.push (stringRow #[("item_id",id),("position",toString (i+1)),("claim_id",member)]),i+1))
+      (relations,0)
+    pure (counts.insert source n,items.push (item.setObjVal! "item_id" (toJson id)),relations))
+    (({},#[],#[]) : Std.HashMap String Nat × Array Row × Array Row)
   return (items,relations)
 
 /-- Compare metadata independently of actual stable IDs, then preserve the raw relation order and total coverage. -/
@@ -184,12 +181,11 @@ def validateItems (data : Data) : IO Unit := do
   let expectedMetadata ← expected.mapM (project · columns)
   let actualMetadata ← actual.mapM (project · columns)
   require (actualMetadata == expectedMetadata) "source-items.tsv metadata/order differs from locator-derived inventory"
-  let members := fun (relations : Array Row) => do
-    let mut grouped : Std.HashMap String (Array String) := {}
-    for row in relations do
+  let members := fun (relations : Array Row) =>
+    relations.foldlM (fun grouped row => do
       let id ← str row "item_id"
-      grouped := grouped.insert id ((grouped[id]?.getD #[]).push (← str row "claim_id"))
-    return grouped
+      pure (grouped.insert id ((grouped[id]?.getD #[]).push (← str row "claim_id"))))
+      ({} : Std.HashMap String (Array String))
   let actualRelations ← data.rows "item_claims"
   let expectedClaims ← members expectedRelations; let actualClaims ← members actualRelations
   let expectedGroups ← expected.mapM fun row => do pure (expectedClaims[(← str row "item_id")]?.getD #[])

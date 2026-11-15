@@ -25,30 +25,39 @@ def headers : Array (String × Array String) := #[
   ("claim_axioms",#["claim_id","axiom_id"]),
   ("phase",#["phase"])]
 
-/-- Decode standard non-strict quoted TSV, including quoted tabs/newlines and missing fields. -/
-def csvRows (text : String) : Array (Array String) := Id.run do
-  let chars := text.toList.toArray
-  let mut i := 0; let mut result := #[]; let mut row := #[]
-  let mut value := ""; let mut quoted := false; let mut atStart := true; let mut touched := false
-  while i < chars.size do
+/-- The quoted reader carries one immutable record, field and lexical state through its scan. -/
+private structure CsvState where
+  result : Array (Array String) := #[]
+  row : Array String := #[]
+  value : String := ""
+  quoted : Bool := false
+  atStart : Bool := true
+  touched : Bool := false
+
+/-- Scan each character once, preserving doubled quotes, CRLF and non-strict unfinished quotes. -/
+private partial def scanCsv (chars : Array Char) (i : Nat) (state : CsvState) : Array (Array String) :=
+  if i >= chars.size then
+    if state.touched || !state.row.isEmpty || !state.value.isEmpty then state.result.push (state.row.push state.value)
+    else state.result
+  else
     let c := chars[i]!
-    if quoted then
+    if state.quoted then
       if c == '"' then
-        if chars[i+1]? == some '"' then value := value.push '"'; i := i+2
-        else quoted := false; i := i+1
-      else value := value.push c; i := i+1
-    else if c == '"' && atStart then
-      quoted := true; touched := true; atStart := false; i := i+1
+        if chars[i+1]? == some '"' then scanCsv chars (i+2) {state with value := state.value.push '"'}
+        else scanCsv chars (i+1) {state with quoted := false}
+      else scanCsv chars (i+1) {state with value := state.value.push c}
+    else if c == '"' && state.atStart then
+      scanCsv chars (i+1) {state with quoted := true, touched := true, atStart := false}
     else if c == '\t' then
-      row := row.push value; value := ""; atStart := true; touched := true; i := i+1
+      scanCsv chars (i+1) {state with row := state.row.push state.value, value := "", atStart := true, touched := true}
     else if c == '\n' || c == '\r' then
-      result := result.push (if touched || !row.isEmpty || !value.isEmpty then row.push value else #[])
-      row := #[]; value := ""; atStart := true; touched := false
-      i := i + (if c == '\r' && chars[i+1]? == some '\n' then 2 else 1)
-    else
-      value := value.push c; touched := true; atStart := false; i := i+1
-  if touched || !row.isEmpty || !value.isEmpty then result := result.push (row.push value)
-  return result
+      let row := if state.touched || !state.row.isEmpty || !state.value.isEmpty then state.row.push state.value else #[]
+      scanCsv chars (i + if c == '\r' && chars[i+1]? == some '\n' then 2 else 1)
+        {result := state.result.push row}
+    else scanCsv chars (i+1) {state with value := state.value.push c, touched := true, atStart := false}
+
+/-- Decode standard non-strict quoted TSV, including quoted tabs/newlines and missing fields. -/
+def csvRows (text : String) : Array (Array String) := scanCsv text.toList.toArray 0 {}
 
 /-- Read one known public schema; blank data records follow DictReader's skipped-row behavior. -/
 def readTsv (path : FilePath) (expected : Array String) : IO (Array Row) := do
@@ -67,12 +76,11 @@ def csvField (text : String) : String :=
 /-- Write a canonical quoted TSV fixture without changing its field order. -/
 def writeTsv (path : FilePath) (header : Array String) (rows : Array Row) : IO Unit := do
   if let some parent := path.parent then IO.FS.createDirAll parent
-  let mut records := #[header]
-  for row in rows do
+  let records ← rows.foldlM (fun records row => do
     let values ← header.mapM fun key => do
       let value ← field row key
       if value.isNull then pure "" else IO.ofExcept value.getStr?
-    records := records.push values
+    pure (records.push values)) #[header]
   IO.FS.writeFile path (String.join <| records.toList.map fun row =>
     String.intercalate "\t" (row.toList.map csvField) ++ "\n")
 
@@ -93,9 +101,9 @@ def Data.rows (data : Data) (name : String) : IO (Array Row) := do
 
 /-- Load exactly the required publication tables, or an explicit derive-only subset. -/
 def load (root : FilePath) (names : Array String := headers.map Prod.fst) : IO Data := do
-  let mut tables := {}
-  for name in names do
-    tables := tables.insert name (← readTsv (root / "registry" / (name.replace "_" "-" ++ ".tsv")) (← headerFor name))
+  let tables ← names.foldlM (fun tables name => do
+    pure (tables.insert name (← readTsv (root / "registry" / (name.replace "_" "-" ++ ".tsv")) (← headerFor name))))
+    ({} : Std.HashMap String (Array Row))
   return ⟨root,tables⟩
 
 /-- Construct a string-valued row without leaking an input row's private columns. -/
@@ -109,13 +117,11 @@ def project (row : Row) (names : Array String) : IO Json := do
 def integer (text : String) : IO Int := Checker.Text.integer text
 
 /-- Index stable identities uniquely, retaining the exact public duplicate diagnostic. -/
-def indexUnique (rows : Array Row) (key description : String) : IO (Std.HashMap String Row) := do
-  let mut result := {}
-  for row in rows do
+def indexUnique (rows : Array Row) (key description : String) : IO (Std.HashMap String Row) :=
+  rows.foldlM (fun result row => do
     let value ← str row key
     require (!result.contains value) s!"duplicate {description} {value}"
-    result := result.insert value row
-  return result
+    pure (result.insert value row)) {}
 
 /-- Read a required stable identity rather than fabricating an empty record. -/
 def lookup (rows : Std.HashMap String Row) (key : String) : IO Row := do

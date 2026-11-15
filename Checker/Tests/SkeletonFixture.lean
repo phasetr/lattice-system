@@ -73,13 +73,17 @@ def freezeBindings (root dump : FilePath) : IO Unit := do
   let actual := rowsOf (← IO.FS.readFile dump)
   rewrite root "bindings.tsv" fun index row => some <| Id.run do
       if index == 1 then return row
-      let mut row := row
-      if let some primary := actual.find? (fun data => data[1]?.getD "" == row[1]!) then
-        row := row |>.set! 6 primary[3]! |>.set! 7 primary[4]!
-      if row[2]! != "NONE" then
-        if let some proof := actual.find? (fun data => data[1]?.getD "" == row[2]!) then row := row.set! 10 proof[3]!
-      if row[12]! != "NONE" then
-        if let some witness := actual.find? (fun data => data[1]?.getD "" == row[12]!) then row := row.set! 13 witness[3]!
+      let row := match actual.find? (fun data => data[1]?.getD "" == row[1]!) with
+        | some primary => row |>.set! 6 primary[3]! |>.set! 7 primary[4]!
+        | none => row
+      let row := if row[2]! == "NONE" then row else
+        match actual.find? (fun data => data[1]?.getD "" == row[2]!) with
+        | some proof => row.set! 10 proof[3]!
+        | none => row
+      let row := if row[12]! == "NONE" then row else
+        match actual.find? (fun data => data[1]?.getD "" == row[12]!) with
+        | some witness => row.set! 13 witness[3]!
+        | none => row
       return row
   ensure (((← IO.FS.readFile (root / "registry/bindings.tsv")).splitOn "PENDING").length == 1)
     "frozen bindings still carry a wildcard OID"

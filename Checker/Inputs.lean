@@ -60,15 +60,12 @@ structure Entry where
 /-- Read complete tracked file/type/mode inventory. -/
 def entries (root : System.FilePath) (ref : String) : IO (Array Entry) := do
   let raw ← git root #["ls-tree", "-r", "-z", ref]
-  let mut result := #[]
-  for record in split raw "\u0000" do
-    if record.isEmpty then continue
+  ((split raw "\u0000").filter (!·.isEmpty)).mapM fun record => do
     let pair := split record "\t"
     require (pair.size == 2) "invalid Git tree entry"
     let metadata := split pair[0]! " "
     require (metadata.size == 3) "invalid Git tree metadata"
-    result := result.push ⟨pair[1]!, metadata[0]!, metadata[1]!, metadata[2]!⟩
-  pure result
+    pure ⟨pair[1]!, metadata[0]!, metadata[1]!, metadata[2]!⟩
 /-- Registry/docs/policy projections are distinct from executable bytes. -/
 def projected (p : String) : Bool := p.startsWith "registry/" || p.startsWith "docs/" || policyPaths.contains p
 /-- Independently compute executable/configuration identity. -/
@@ -86,12 +83,11 @@ def policyProjection (path text : String) : Json := Json.mkObj <|
 /-- Require available immutable historical fixture objects, not a shallow-clone guess. -/
 def historical (root : System.FilePath) (ref : String) : IO Json := do
   let events ← git root #["show", ref ++ ":registry/correction-events.tsv"]
-  let mut ids := #["c6fb1ec6046626e14dd9a65f396a66386fcb9b7b", "cf4a289e7c766554c8821e167eddac2c3e291c2a"]
-  for line in (split events "\n").toList.drop 1 do
+  let initial := #["c6fb1ec6046626e14dd9a65f396a66386fcb9b7b", "cf4a289e7c766554c8821e167eddac2c3e291c2a"]
+  let ids := ((split events "\n").extract 1 (split events "\n").size).foldl (fun ids line =>
     let row := split line "\t"
-    if row.size ≥ 4 && !ids.contains row[3]! then ids := ids.push row[3]!
-  let mut result := []
-  for id in ids do
+    if row.size ≥ 4 && !ids.contains row[3]! then ids.push row[3]! else ids) initial
+  let result ← ids.foldlM (fun result id => do
     let resolved ← commit root id
     let objects := (← entries root resolved).filter (·.path.startsWith "registry/")
     let checked ← output root "git" #["cat-file", "--batch-check"]
@@ -99,7 +95,7 @@ def historical (root : System.FilePath) (ref : String) : IO Json := do
     let lines := (split checked "\n").filter (!·.isEmpty)
     require (lines.size == objects.size && lines.all fun s =>
       let fields := split s " "; fields.size == 3 && fields[1]! == "blob") "historical fixture missing"
-    result := (id, toJson (← tree root resolved)) :: result
+    pure ((id, toJson (← tree root resolved)) :: result)) []
   pure <| Json.mkObj result
 
 /-- Known infrastructure files are selected by their readers, rather than a global engine-change veto. -/
@@ -117,22 +113,26 @@ def changeForcesFull (path status oldMode newMode : String) (headerChanged : Boo
   status != "M" || oldMode != newMode || !#["100644","100755"].contains newMode ||
     !knownPath path || headerChanged
 
+/-- Visit raw metadata/path pairs with explicit position and accumulated selection. -/
+def differenceSelection (root : FilePath) (base head : String) (raw : Array String) : Nat → Nat → Bool → IO Bool
+  | 0, _, full => pure full
+  | fuel+1, i, full => do
+    let fields := split raw[i*2]! " "
+    require (fields.size == 5) "invalid raw Git difference"
+    let path := raw[i*2+1]!
+    let changedHeader ← if fields[4]! == "M" && path.startsWith "registry/" && path.endsWith ".tsv" then do
+      pure ((split (← git root #["show",base ++ ":" ++ path]) "\n")[0]! !=
+        (split (← git root #["show",head ++ ":" ++ path]) "\n")[0]!)
+      else pure false
+    differenceSelection root base head raw fuel (i+1)
+      (full || changeForcesFull path fields[4]! (fields[0]!.drop 1).toString fields[1]! changedHeader)
+
 /-- Every raw NUL endpoint is inspected, including both sides of renames represented as delete/add. -/
 def fullRequired (root : FilePath) (base head : String) : IO Bool := do
   let raw := split (← git root #["diff","--raw","--no-renames","--no-abbrev","-z",base,head]) "\x00"
   require (raw.size > 0 && raw.back! == "") "invalid raw Git difference terminator"
-  let mut full := false
   require ((raw.size - 1) % 2 == 0) "invalid raw Git difference arity"
-  for i in [:(raw.size-1)/2] do
-    let fields := split raw[i*2]! " "
-    require (fields.size == 5) "invalid raw Git difference"
-    let path := raw[i*2+1]!
-    let mut changedHeader := false
-    if fields[4]! == "M" && path.startsWith "registry/" && path.endsWith ".tsv" then
-      changedHeader := (split (← git root #["show",base ++ ":" ++ path]) "\n")[0]! !=
-        (split (← git root #["show",head ++ ":" ++ path]) "\n")[0]!
-    full := full || changeForcesFull path fields[4]! (fields[0]!.drop 1).toString fields[1]! changedHeader
-  return full
+  differenceSelection root base head raw ((raw.size-1)/2) 0 false
 
 /-- A deterministic set avoids duplicated reader entries and duplicate JSON fields. -/
 def distinctPaths (paths : Array String) : Array String :=
@@ -145,29 +145,26 @@ def entryValue (entry : Entry) : Json := toJson #[entry.mode,entry.kind,entry.oi
 def payloads (root : FilePath) (rows : Array Entry)
     (headers registry policy history environment : Json) (production : Json := Json.mkObj []) : IO (Json × String) := do
   let executable ← engine root rows
-  let mut signatures := []
-  for group in Checker.Regressions.groups do
+  let signatures ← Checker.Regressions.groups.foldlM (fun signatures group => do
     let paths := distinctPaths (Checker.Regressions.commonInputs ++ group.inputs)
     let inputs := Json.mkObj <| paths.toList.map fun path =>
       (path, (rows.find? (·.path == path)).map entryValue |>.getD Json.null)
-    let mut fields := [("version",toJson version),("group",toJson group.name),
+    let fields := [("version",toJson version),("group",toJson group.name),
       ("environment",environment),("inputs",inputs)]
-    if group.corpus then fields := ("registry",registry) :: fields
-    if group.headers then fields := ("headers",headers) :: fields
-    if group.policy then fields := ("policy",policy) :: fields
-    if group.history then fields := ("history",history) :: fields
-    if group.production then fields := ("production",production) :: fields
-    if group.layout then fields := ("layout",Json.mkObj (rows.toList.map fun entry =>
-      (entry.path,toJson #[entry.mode,entry.kind]))) :: fields
-    signatures := (group.name,toJson (← digest root (Json.mkObj fields))) :: signatures
+    let fields := if group.corpus then ("registry",registry) :: fields else fields
+    let fields := if group.headers then ("headers",headers) :: fields else fields
+    let fields := if group.policy then ("policy",policy) :: fields else fields
+    let fields := if group.history then ("history",history) :: fields else fields
+    let fields := if group.production then ("production",production) :: fields else fields
+    let fields := if group.layout then ("layout",Json.mkObj (rows.toList.map fun entry =>
+      (entry.path,toJson #[entry.mode,entry.kind]))) :: fields else fields
+    pure ((group.name,toJson (← digest root (Json.mkObj fields))) :: signatures)) []
   return (Json.mkObj signatures,executable)
 
 /-- Resolve every real production file read by the production-derived vocabulary counterfactual. -/
 def registeredProduction (root : FilePath) (ref : String) (rows : Array Entry) : IO Json := do
   let text ← git root #["show",ref ++ ":registry/modules.tsv"]
-  let mut files := []
-  for line in (split text "\n").toList.drop 1 do
-    if line.isEmpty then continue
+  let files ← ((split text "\n").toList.drop 1 |>.filter (!·.isEmpty)).foldlM (fun files line => do
     let row := split line "\t"
     require (row.size == 3) "invalid production module input"
     let path := row[1]!
@@ -175,7 +172,7 @@ def registeredProduction (root : FilePath) (ref : String) (rows : Array Entry) :
       !(path.splitOn "/").contains ".." && path.endsWith ".lean") "unsafe production module input"
     let some entry := rows.find? (·.path == path) | throw <| IO.userError "missing production module input"
     require (entry.kind == "blob" && #["100644","100755"].contains entry.mode) "invalid production module input type"
-    files := (path,entryValue entry) :: files
+    pure ((path,entryValue entry) :: files)) []
   return Json.mkObj files
 
 /-- Establish each current group's closed actual inputs; missing required files fail into full execution. -/
@@ -185,15 +182,16 @@ def signatures (root : FilePath) (ref : String) (environment : Json) : IO (Json 
     for path in distinctPaths (Checker.Regressions.commonInputs ++ group.inputs) do
       let some entry := rows.find? (·.path == path) | throw <| IO.userError "missing regression source input"
       require (entry.kind == "blob" && #["100644","100755"].contains entry.mode) "unsupported regression source type"
-  let mut headers := []; let mut registry := []; let mut policy := []
-  for entry in rows do
+  let (headers,registry,policy) ← rows.foldlM (fun (headers,registry,policy) entry => do
     require (entry.kind == "blob") "non-blob tracked input"
-    if entry.path.startsWith "registry/" then
+    let (headers,registry) ← if entry.path.startsWith "registry/" then do
       let text ← git root #["show",ref ++ ":" ++ entry.path]
-      headers := (entry.path,toJson (split text "\n")[0]!) :: headers
-      registry := (entry.path,entryValue entry) :: registry
-    if policyPaths.contains entry.path then
-      policy := (entry.path,policyProjection entry.path (← git root #["show",ref ++ ":" ++ entry.path])) :: policy
+      pure ((entry.path,toJson (split text "\n")[0]!) :: headers,(entry.path,entryValue entry) :: registry)
+      else pure (headers,registry)
+    let policy ← if policyPaths.contains entry.path then do
+      pure ((entry.path,policyProjection entry.path (← git root #["show",ref ++ ":" ++ entry.path])) :: policy)
+      else pure policy
+    pure (headers,registry,policy)) ([],[],[])
   payloads root rows (Json.mkObj headers) (Json.mkObj registry) (Json.mkObj policy)
     (← historical root ref) environment (← registeredProduction root ref rows)
 
@@ -220,10 +218,9 @@ def mathematicalPath (path : String) : Bool :=
 def mathematicalInputs (root : FilePath) (ref : String) : IO String := do
   let rows ← entries root ref
   require (!(rows.any (fun entry => entry.path == "lakefile.lean"))) "unknown effective mathematical configuration"
-  let mut fields := []
-  for entry in rows.filter (mathematicalPath ·.path) do
+  let fields ← (rows.filter (mathematicalPath ·.path)).foldlM (fun fields entry => do
     require (entry.kind == "blob" && #["100644","100755"].contains entry.mode) "unsupported mathematical input type"
-    fields := (entry.path,entryValue entry) :: fields
+    pure ((entry.path,entryValue entry) :: fields)) []
   for path in #["LatticeSystem.lean","lean-toolchain","lake-manifest.json","registry/modules.tsv","registry/imports.tsv"] do
     require (rows.any (·.path == path)) "missing mathematical input"
   let some lake := rows.find? (·.path == "lakefile.toml") | throw <| IO.userError "missing mathematical configuration"

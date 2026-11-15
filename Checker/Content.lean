@@ -60,8 +60,8 @@ private structure Keyed where
 /-- Match dictionary construction, including duplicate rejection after all IDs have been read. -/
 private def keyed (root : FilePath) (name : String) : IO Keyed := do
   let data ← rows root name
-  let mut index := ({} : Std.HashMap String Row)
-  for row in data do index := index.insert (← cell row 0) row
+  let index ← data.foldlM (fun index row => do pure (index.insert (← cell row 0) row))
+    ({} : Std.HashMap String Row)
   require (index.size == data.size) ("duplicate ID in " ++ name)
   return ⟨data,index⟩
 
@@ -72,21 +72,15 @@ private def key (table : Keyed) (identifier : String) : IO Row :=
   | none => throw <| IO.userError ("'" ++ identifier ++ "'")
 
 /-- Count records in their original order, retaining short-circuit field checks in each predicate. -/
-private def countRows (data : Array Row) (predicate : Row → IO Bool) : IO Nat := do
-  let mut count := 0
-  for row in data do if ← predicate row then count := count + 1
-  return count
+private def countRows (data : Array Row) (predicate : Row → IO Bool) : IO Nat :=
+  data.foldlM (fun count row => do pure (if ← predicate row then count+1 else count)) 0
 
 /-- Select rows without changing their physical order or multiplicity. -/
-private def selectRows (data : Array Row) (predicate : Row → IO Bool) : IO (Array Row) := do
-  let mut result := #[]
-  for row in data do if ← predicate row then result := result.push row
-  return result
+private def selectRows (data : Array Row) (predicate : Row → IO Bool) : IO (Array Row) :=
+  data.foldlM (fun result row => do pure (if ← predicate row then result.push row else result)) #[]
 
 /-- Stop at the first matching record, as the original existential checks did. -/
-private def anyRow (data : Array Row) (predicate : Row → IO Bool) : IO Bool := do
-  for row in data do if ← predicate row then return true
-  return false
+private def anyRow (data : Array Row) (predicate : Row → IO Bool) : IO Bool := data.anyM predicate
 
 /-- Preserve Unicode edge whitespace without changing the normalized body. -/
 private def strip (text : String) : String := Checker.Text.strip text
@@ -134,12 +128,10 @@ private def additionsStatic (root : FilePath) : IO (Array Row) := do
   let pages ← keyed root "pages.tsv"
   let items ← keyed root "source-items.tsv"
   let corrections ← keyed root "claim-corrections.tsv"
-  let mut additions := #[]
-  let mut created := ({} : Std.HashSet String)
-  for correction in corrections.data do
+  let (additions,_) ← corrections.data.foldlM (fun (additions,created) correction => do
     if (← cell correction 5) != "add_omitted_claim" then
       require (!(correction.extract 6 8).contains "NONE") "NONE old classification requires add_omitted_claim"
-      continue
+      return (additions,created)
     let eventId ← cell correction 1
     let reviewId ← cell correction 3
     let claimId ← cell correction 4
@@ -166,7 +158,7 @@ private def additionsStatic (root : FilePath) : IO (Array Row) := do
     require (subkinds.contains (← cell correction 9)) invalid
     let id ← cell claim 0
     require (!created.contains id) "omitted claim has more than one creation owner"
-    created := created.insert id
+    let created := created.insert id
     let some page := pages.index[← cell claim 3]? | throw <| IO.userError "omitted claim source page mismatch"
     require ((← cell page 1) == (← cell event 2)) "omitted claim source page mismatch"
     let hasSuccessor ← anyRow (← rows root "claim-successors.tsv") fun row => do
@@ -180,7 +172,7 @@ private def additionsStatic (root : FilePath) : IO (Array Row) := do
     let some item := items.index[← cell relations[0]! 0]? | throw <| IO.userError "omitted claim source item mismatch"
     require ((← cell item 1) == (← cell event 2)) "omitted claim source item mismatch"
     require ((← cell item 3) == (← cell claim 3)) "omitted claim source item mismatch"
-    additions := additions.push correction
+    pure (additions.push correction,created)) ((#[],{}) : Array Row × Std.HashSet String)
   return additions
 
 /-- Reject an already bound source, using that snapshot's own claim-to-source lookup. -/
@@ -254,8 +246,8 @@ private def additionsTransition (project base current : FilePath) (event : Row) 
     require (#["mathlib_only","project_vocabulary"].contains basis) message
     if basis == "mathlib_only" then require uses.isEmpty message
     if basis == "project_vocabulary" then require (!uses.isEmpty) message
-    let mut used := ({} : Std.HashSet String)
-    for row in uses do used := used.insert (← cell row 1)
+    let used ← uses.foldlM (fun used row => do pure (used.insert (← cell row 1)))
+      ({} : Std.HashSet String)
     require (used.size == uses.size) message
     for row in uses do require (vocabulary.index.contains (← cell row 1)) message
 
@@ -267,17 +259,13 @@ def validateStatic (root : FilePath) : IO (Array Row) := do
   let reviews ← keyed root "claim-normalization-reviews.tsv"
   let claims ← keyed root "claims.tsv"
   let pages ← keyed root "pages.tsv"
-  let mut seen := ({} : Std.HashSet String)
-  let mut owned := ({} : Std.HashSet String)
-  let mut history := ({} : Std.HashMap String (Array (Int × String × String)))
-  let mut historyOrder := #[]
-  for row in amendments do
+  let (_,owned,history,historyOrder) ← amendments.foldlM (fun (seen,owned,history,historyOrder) row => do
     require (row.size == amendmentHeader.size) "bad content amendment row"
     let identifier := row[0]!; let eventId := row[1]!; let correctionId := row[2]!; let claimId := row[3]!
     let oldOid := row[4]!; let newOid := row[5]!; let pageOid := row[6]!; let reviewRef := row[7]!
     require (amendmentId identifier) "bad content amendment ID"
     require (!seen.contains identifier && !owned.contains correctionId) "duplicate content amendment"
-    seen := seen.insert identifier; owned := owned.insert correctionId
+    let seen := seen.insert identifier; let owned := owned.insert correctionId
     let message := "content amendment event or correction ownership mismatch"
     let some correction := corrections.index[correctionId]? | throw <| IO.userError message
     let some event := events.index[eventId]? | throw <| IO.userError message
@@ -324,8 +312,11 @@ def validateStatic (root : FilePath) : IO (Array Row) := do
     require (validOid oldOid && validOid newOid && oldOid.length == newOid.length) message
     require (oldOid != newOid) "content amendment is a no-op"
     let ordinal ← integer (← cell event 1)
-    if !history.contains claimId then historyOrder := historyOrder.push claimId
-    history := history.insert claimId ((history[claimId]?.getD #[]).push (ordinal,oldOid,newOid))
+    let historyOrder := if !history.contains claimId then historyOrder.push claimId else historyOrder
+    let history := history.insert claimId ((history[claimId]?.getD #[]).push (ordinal,oldOid,newOid))
+    pure (seen,owned,history,historyOrder))
+    (({},{},{},#[]) : Std.HashSet String × Std.HashSet String ×
+      Std.HashMap String (Array (Int × String × String)) × Array String)
   for correction in corrections.data do
     if contentActions.contains (← cell correction 5) then
       require (owned.contains (← cell correction 0)) "content amendment is missing its provenance row"
@@ -418,10 +409,10 @@ private def targetTransition (project base current : FilePath) (event row : Row)
 def validateTransitionAt (project base current : FilePath) (eventId : String) : IO Unit := do
   let amendments ← validateStatic current
   let oldAmendments ← rows base "claim-content-amendments.tsv" true
-  let mut oldById := ({} : Std.HashMap String Row)
-  for row in oldAmendments do oldById := oldById.insert (← cell row 0) row
-  let mut currentById := ({} : Std.HashMap String Row)
-  for row in amendments do currentById := currentById.insert (← cell row 0) row
+  let oldById ← oldAmendments.foldlM (fun index row => do pure (index.insert (← cell row 0) row))
+    ({} : Std.HashMap String Row)
+  let currentById ← amendments.foldlM (fun index row => do pure (index.insert (← cell row 0) row))
+    ({} : Std.HashMap String Row)
   let oldPath := base / "registry/claim-content-amendments.tsv"
   if ← oldPath.pathExists then
     let before ← IO.FS.readBinFile oldPath
@@ -433,12 +424,12 @@ def validateTransitionAt (project base current : FilePath) (eventId : String) : 
   for row in fresh do require ((← cell row 1) == eventId) "content amendment belongs to another event"
   let events ← keyed current "correction-events.tsv"
   let event ← key events eventId
-  let mut expected := ({} : Std.HashSet String)
-  for row in ← rows current "claim-corrections.tsv" do
+  let expected ← (← rows current "claim-corrections.tsv").foldlM (fun expected row => do
     if (← cell row 1) == eventId then
-      if contentActions.contains (← cell row 5) then expected := expected.insert (← cell row 0)
-  let mut actual := ({} : Std.HashSet String)
-  for row in fresh do actual := actual.insert (← cell row 2)
+      if contentActions.contains (← cell row 5) then return expected.insert (← cell row 0)
+    pure expected) ({} : Std.HashSet String)
+  let actual ← fresh.foldlM (fun actual row => do pure (actual.insert (← cell row 2)))
+    ({} : Std.HashSet String)
   require (actual.size == expected.size && expected.toArray.all actual.contains)
     "content amendment provenance is not new for this event"
   additionsTransition project base current event
@@ -466,42 +457,40 @@ private inductive Mode where
 private def optionToken (value : String) : Bool :=
   Checker.Text.optionToken value
 
-/-- Parse the original mode arguments, including help, repeated same-mode options and unique long prefixes. -/
-private def parseArgs (args : List String) : Except String Mode := Id.run do
-  let mut remaining := args
-  let mut selected : Option Mode := none
-  while !remaining.isEmpty do
-    let arg := remaining.head!
-    remaining := remaining.tail!
-    if arg == "-h" || arg == "--help" then return .ok .help
+/-- Carry the unconsumed arguments and last same-mode option explicitly, preserving help's early return. -/
+private partial def parseRemaining (args : List String) (selected : Option Mode) : Except String Mode := do
+  match args with
+  | [] => match selected with
+    | some mode => return mode
+    | none => throw "one of the arguments --static --transition is required"
+  | arg :: remaining =>
+    if arg == "-h" || arg == "--help" then return .help
     let pieces := arg.splitOn "="
     let option := pieces.head!
     let explicit := if pieces.length > 1 then some (String.intercalate "=" pieces.tail!) else none
     let candidates := #["--static","--transition","--help"].filter (fun name =>
       option.startsWith "--" && name.startsWith option)
-    if candidates.size != 1 then return .error ("unrecognized arguments: " ++ arg)
+    if candidates.size != 1 then throw ("unrecognized arguments: " ++ arg)
     let option := candidates[0]!
     if option == "--help" then
-      if explicit.isSome then return .error "argument -h/--help: ignored explicit argument"
-      return .ok .help
+      if explicit.isSome then throw "argument -h/--help: ignored explicit argument"
+      return .help
     if option == "--static" then
-      if let some (.transition ..) := selected then return .error "argument --static: not allowed with argument --transition"
+      if let some (.transition ..) := selected then throw "argument --static: not allowed with argument --transition"
       if explicit.isNone && (remaining.isEmpty || optionToken remaining.head!) then
-        return .error "argument --static: expected one argument"
+        throw "argument --static: expected one argument"
       let value := explicit.getD (remaining.headD "")
-      if explicit.isNone then remaining := remaining.tail!
-      selected := some (.static (FilePath.mk value))
+      parseRemaining (if explicit.isNone then remaining.tail! else remaining) (some (.static (FilePath.mk value)))
     else
-      if let some (.static _) := selected then return .error "argument --transition: not allowed with argument --static"
-      if explicit.isSome then return .error "argument --transition: expected 3 arguments"
+      if let some (.static _) := selected then throw "argument --transition: not allowed with argument --static"
+      if explicit.isSome then throw "argument --transition: expected 3 arguments"
       let values := remaining.take 3
       if values.length != 3 || values.any optionToken then
-        return .error "argument --transition: expected 3 arguments"
-      remaining := remaining.drop 3
-      selected := some (.transition (FilePath.mk values[0]!) (FilePath.mk values[1]!) values[2]!)
-  return match selected with
-    | some mode => .ok mode
-    | none => .error "one of the arguments --static --transition is required"
+        throw "argument --transition: expected 3 arguments"
+      parseRemaining (remaining.drop 3) (some (.transition (FilePath.mk values[0]!) (FilePath.mk values[1]!) values[2]!))
+
+/-- Parse the original mode arguments, including help, repeated same-mode options and unique long prefixes. -/
+private def parseArgs (args : List String) : Except String Mode := parseRemaining args none
 
 /-- Native replacement entry preserves helper diagnostics and success text for all existing callers. -/
 def entry (project : FilePath) (args : List String) : IO Unit := do

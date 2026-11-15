@@ -54,19 +54,17 @@ def check (root : FilePath) : IO Unit := do
   unless lib.config.defaultFacets == #[LeanLib.leanArtsFacet] do
     fail "default library facets must be leanArts"
   let records ← IO.FS.lines (root / "registry/modules.tsv")
-  let mut expected : Array (Name × FilePath) := #[]
-  for row in records.drop 1 do
+  let expected ← (records.drop 1).mapM fun row => do
     let fields := row.splitOn "\t" |>.toArray
     unless fields.size == 3 do fail "invalid vocabulary module row"
-    expected := expected.push (fields[0]!.toName, root / fields[1]!)
-  let mut includesRoot := false
-  for mod in (← lib.getModuleArray) do
+    pure (fields[0]!.toName, root / FilePath.mk fields[1]!)
+  let modules ← lib.getModuleArray
+  for mod in modules do
     let some (_, path) := expected.find? (·.1 == mod.name)
       | fail s!"default library selects a statement or unregistered module: {mod.name}"
     unless (← IO.FS.realPath mod.leanFile) == (← IO.FS.realPath path) do
       fail s!"default module source differs from registry: {mod.name}"
-    includesRoot := includesRoot || mod.name == `LatticeSystem
-  unless includesRoot do fail "default library omits the canonical production root"
+  unless modules.any (·.name == `LatticeSystem) do fail "default library omits the canonical production root"
   -- Imports can resolve a different provider from a seed's own library. Check
   -- every registered vocabulary module through Lake's actual package resolver,
   -- including modules that are reached only through the canonical root imports.

@@ -31,21 +31,25 @@ def scalar (value : Json) : String := match value with
   | .bool false => "False"
   | _ => value.compress
 
+/-- Scan a single placeholder key without interpreting its characters as template output. -/
+private partial def templateKey (chars : Array Char) (i : Nat) (key : String) : IO (Nat × String) := do
+  require (i < chars.size) "incomplete publication template"
+  if chars[i]! == '}' then return (i,key)
+  templateKey chars (i+1) (key.push chars[i]!)
+
+/-- Carry the output and input position explicitly; inserted field text is never scanned again. -/
+private partial def templateScan (chars : Array Char) (values : Json) (i : Nat) (output : String) : IO String := do
+  if i >= chars.size then return output
+  if chars[i]! == '{' then
+    if chars[i+1]? == some '{' then templateScan chars values (i+2) (output.push '{')
+    else
+      let (ending,key) ← templateKey chars (i+1) ""
+      templateScan chars values (ending+1) (output ++ scalar (← field values key))
+  else if chars[i]! == '}' && chars[i+1]? == some '}' then templateScan chars values (i+2) (output.push '}')
+  else templateScan chars values (i+1) (output.push chars[i]!)
+
 /-- Format a template in a single pass, never reinterpreting braces inside inserted public text. -/
-def format (template : String) (values : Json) : IO String := do
-  let chars := template.toList.toArray
-  let mut i := 0; let mut output := ""
-  while i < chars.size do
-    if chars[i]! == '{' then
-      if chars[i+1]? == some '{' then output := output.push '{'; i := i+2
-      else
-        let mut key := ""; i := i+1
-        while i < chars.size && chars[i]! != '}' do key := key.push chars[i]!; i := i+1
-        require (i < chars.size) "incomplete publication template"
-        output := output ++ scalar (← field values key); i := i+1
-    else if chars[i]! == '}' && chars[i+1]? == some '}' then output := output.push '}'; i := i+2
-    else output := output.push chars[i]!; i := i+1
-  return output
+def format (template : String) (values : Json) : IO String := templateScan template.toList.toArray values 0 ""
 
 /-- Render sorted JSON keys, two-space indentation, raw Unicode and canonical empty collections. -/
 partial def prettyJson (value : Json) (depth : Nat := 0) : String :=
@@ -75,55 +79,49 @@ def claimLine (claim : Json) : IO String := do
     (← str claim "axiom_status") ++ "`; required vocabulary: " ++ requiredText
 
 /-- Gather JSON records satisfying an ordered predicate. -/
-def select (values : Array Json) (predicate : Json → IO Bool) : IO (Array Json) := do
-  let mut result := #[]
-  for value in values do if ← predicate value then result := result.push value
-  return result
+def select (values : Array Json) (predicate : Json → IO Bool) : IO (Array Json) :=
+  values.foldlM (fun result value => do pure (if ← predicate value then result.push value else result)) #[]
 
 /-- Build all and only the established public output families from the public projection. -/
 def buildOutputs (catalog : Json) : IO (Std.HashMap String String) := do
   let summary ← field catalog "summary"; let phase ← field catalog "phase"
   let common := summary.setObjVal! "phase" phase
-  let mut outputs := ({} : Std.HashMap String String)
-  outputs := outputs.insert "docs/index.md" (← format rootTemplate common)
+  let outputs := ({} : Std.HashMap String String).insert "docs/index.md" (← format rootTemplate common)
   let groups ← arr catalog "groups"; let sources ← arr catalog "sources"; let tracks ← arr catalog "tracks"
   let items ← arr catalog "items"; let vocabulary ← arr catalog "vocabulary"
   -- Reverse list buckets avoid both repeated full-item scans and copying a growing array on each insertion.
-  let mut itemsBySource : Std.HashMap String (List Json) := {}
-  let mut itemsByGroup : Std.HashMap (String × String) (List Json) := {}
-  for item in items do
+  let (itemsBySource,itemsByGroup) ← items.foldlM (fun (itemsBySource,itemsByGroup) item => do
     let source ← str item "source_id"; let slug ← str item "public_slug"
-    itemsBySource := itemsBySource.insert source (item :: (itemsBySource[source]?.getD []))
     let key := (source,slug)
-    itemsByGroup := itemsByGroup.insert key (item :: (itemsByGroup[key]?.getD []))
-  let mut groupLinks := #[]; let mut sourceLinks := #[]; let mut trackLinks := #[]
-  for group in groups do groupLinks := groupLinks.push ("- [" ++ (← str group "source_id") ++ " / " ++ markdown (← str group "public_group") ++
+    pure (itemsBySource.insert source (item :: (itemsBySource[source]?.getD [])),
+      itemsByGroup.insert key (item :: (itemsByGroup[key]?.getD []))))
+    (({},{}) : Std.HashMap String (List Json) × Std.HashMap (String × String) (List Json))
+  let groupLinks ← groups.mapM fun group => do pure ("- [" ++ (← str group "source_id") ++ " / " ++ markdown (← str group "public_group") ++
     "](groups/" ++ (← str group "source_public_slug") ++ "/" ++ (← str group "public_slug") ++ ".md) — " ++ toString (← arr group "item_ids").size ++ " items")
-  for source in sources do sourceLinks := sourceLinks.push ("- [" ++ (← str source "source_id") ++ "](sources/" ++ (← str source "public_slug") ++ ".md)")
-  for track in tracks do trackLinks := trackLinks.push ("- [" ++ markdown (← str track "title") ++ "](tracks/" ++ (← str track "public_slug") ++ ".md)")
+  let sourceLinks ← sources.mapM fun source => do pure ("- [" ++ (← str source "source_id") ++ "](sources/" ++ (← str source "public_slug") ++ ".md)")
+  let trackLinks ← tracks.mapM fun track => do pure ("- [" ++ markdown (← str track "title") ++ "](tracks/" ++ (← str track "public_slug") ++ ".md)")
   let indexValues := common.mergeObj (Json.mkObj [("tracks",toJson (String.intercalate "\n" trackLinks.toList)),
     ("sources",toJson (String.intercalate "\n" sourceLinks.toList)),("groups",toJson (String.intercalate "\n" groupLinks.toList))])
-  outputs := outputs.insert "docs/generated/index.md" (← format indexTemplate indexValues)
-  for track in tracks do
+  let outputs := outputs.insert "docs/generated/index.md" (← format indexTemplate indexValues)
+  let outputs ← tracks.foldlM (fun outputs track => do
     let trackId ← str track "track_id"
     let sourceRows ← select sources (fun source => do pure ((← str source "track_id") == trackId))
     let ids ← sourceRows.mapM (fun row => str row "source_id")
     let trackItems ← select items (fun item => do pure (ids.contains (← str item "source_id")))
-    let mut trackClaims := #[]
-    for item in trackItems do trackClaims := trackClaims ++ (← arr item "claims")
+    let trackClaims ← trackItems.foldlM (fun claims item => do pure (claims ++ (← arr item "claims"))) #[]
     let active ← select trackClaims (fun claim => do pure ((← str claim "lifecycle") == "active"))
     let targets ← select active (fun claim => do pure ((← str claim "disposition") != "out_of_scope"))
-    let mut vocabularyIds : Std.HashSet String := {}; let mut linkCount := 0
-    for claim in trackClaims do
-      for row in ← arr claim "required_vocabulary" do
-        vocabularyIds := vocabularyIds.insert (← str row "vocabulary_id"); linkCount := linkCount+1
-    let mut sourceLines := #[]; let mut vocabularyLines := #[]
-    for source in sourceRows do sourceLines := sourceLines.push ("- [`" ++ (← str source "source_id") ++ "`](../sources/" ++
+    let (vocabularyIds,linkCount) ← trackClaims.foldlM (fun state claim => do
+      (← arr claim "required_vocabulary").foldlM (fun (ids,count) row => do
+        pure (ids.insert (← str row "vocabulary_id"),count+1)) state)
+      (({},0) : Std.HashSet String × Nat)
+    let sourceLines ← sourceRows.mapM fun source => do pure ("- [`" ++ (← str source "source_id") ++ "`](../sources/" ++
       (← str source "public_slug") ++ ".md) — " ++ markdown (← str source "title") ++ "; lifecycle `" ++ (← str source "lifecycle") ++ "`")
-    for row in vocabulary do
-      if vocabularyIds.contains (← str row "vocabulary_id") then vocabularyLines := vocabularyLines.push (
+    let vocabularyLines ← vocabulary.foldlM (fun lines row => do
+      if vocabularyIds.contains (← str row "vocabulary_id") then pure (lines.push (
         "- `" ++ (← str row "vocabulary_id") ++ "` — `" ++ (← str row "declaration") ++ "`; kind `" ++
-        scalar (← field row "declaration_kind") ++ "`; role `" ++ scalar (← field row "design_role") ++ "`; finiteness `" ++ scalar (← field row "finiteness_scope") ++ "`")
+        scalar (← field row "declaration_kind") ++ "`; role `" ++ scalar (← field row "design_role") ++ "`; finiteness `" ++ scalar (← field row "finiteness_scope") ++ "`"))
+      else pure lines) #[]
     let mathlib ← countRows active (fun claim => do pure ((← str claim "vocabulary_basis") == "mathlib_only"))
     let projectCount ← countRows active (fun claim => do pure ((← str claim "vocabulary_basis") == "project_vocabulary"))
     let values := Json.mkObj [("title",toJson (markdown (← str track "title"))),("phase",phase),
@@ -132,52 +130,48 @@ def buildOutputs (catalog : Json) : IO (Std.HashMap String String) := do
       ("project_vocabulary_claims",toJson projectCount),("claim_vocabulary_links",toJson linkCount),
       ("sources",toJson (String.intercalate "\n" sourceLines.toList)),
       ("vocabulary",toJson (if vocabularyLines.isEmpty then "- none" else String.intercalate "\n" vocabularyLines.toList))]
-    outputs := outputs.insert ("docs/generated/tracks/" ++ (← str track "public_slug") ++ ".md") (← format trackTemplate values)
-  for source in sources do
+    pure (outputs.insert ("docs/generated/tracks/" ++ (← str track "public_slug") ++ ".md") (← format trackTemplate values))) outputs
+  let outputs ← sources.foldlM (fun outputs source => do
     let sourceId ← str source "source_id"; let sourceSlug ← str source "public_slug"
     let sourceItems := (itemsBySource[sourceId]?.getD []).reverse.toArray
     let publicUrl ← str source "public_url"
     let reference := if publicUrl == "NONE" then "`NONE`" else "[" ++ markdown publicUrl ++ "](" ++ markdown publicUrl ++ ")"
-    let mut slugs := #[]; let mut titles : Std.HashMap String String := {}
-    for item in sourceItems do
+    let (slugs,titles) ← sourceItems.foldlM (fun (slugs,titles) item => do
       let slug ← str item "public_slug"
-      if !titles.contains slug then slugs := slugs.push slug
-      titles := titles.insert slug (← str item "public_group")
-    let mut links := #[]
-    for slug in slugs do
+      let slugs := if !titles.contains slug then slugs.push slug else slugs
+      pure (slugs,titles.insert slug (← str item "public_group")))
+      ((#[],{}) : Array String × Std.HashMap String String)
+    let links := slugs.map fun slug =>
       let members := itemsByGroup[(sourceId,slug)]?.getD []
-      links := links.push ("- [" ++ markdown (titles[slug]?.getD "") ++ "](../groups/" ++ sourceSlug ++ "/" ++ slug ++ ".md) — " ++ toString members.length ++ " items")
-    let mut values := source
-    for key in #["title","authors","year","edition","identifier_kind","identifier","coverage","lifecycle"] do
-      values := values.setObjVal! key (toJson (markdown (← str source key)))
-    values := values.mergeObj (Json.mkObj [("public_reference",toJson reference),("count",toJson sourceItems.size),
+      "- [" ++ markdown (titles[slug]?.getD "") ++ "](../groups/" ++ sourceSlug ++ "/" ++ slug ++ ".md) — " ++ toString members.length ++ " items"
+    let values ← #["title","authors","year","edition","identifier_kind","identifier","coverage","lifecycle"].foldlM
+      (fun values key => do pure (values.setObjVal! key (toJson (markdown (← str source key))))) source
+    let values := values.mergeObj (Json.mkObj [("public_reference",toJson reference),("count",toJson sourceItems.size),
       ("groups",toJson (String.intercalate "\n" links.toList))])
-    outputs := outputs.insert ("docs/generated/sources/" ++ sourceSlug ++ ".md") (← format sourceTemplate values)
-  for group in groups do
+    pure (outputs.insert ("docs/generated/sources/" ++ sourceSlug ++ ".md") (← format sourceTemplate values))) outputs
+  let outputs ← groups.foldlM (fun outputs group => do
     let source ← str group "source_id"; let slug ← str group "public_slug"
     let groupItems := (itemsByGroup[(source,slug)]?.getD []).reverse.toArray
-    let mut blocks := #[]
-    for item in groupItems do
+    let blocks ← groupItems.mapM fun item => do
       let label ← str item "source_label"; let itemId ← str item "item_id"; let title ← str item "title"
       let heading := if label == "NONE" then "Unlabeled item " ++ itemId else label
       let titleLine := if title == "NONE" then "- Title: `NONE`\n" else "- Title: " ++ markdown title ++ "\n"
       let lines ← (← arr item "claims").mapM claimLine
       let values := item.mergeObj (Json.mkObj [("heading",toJson (markdown heading)),("title_line",toJson titleLine),
         ("locator",toJson (markdown (← str item "locator"))),("claims",toJson (String.intercalate "\n" lines.toList))])
-      blocks := blocks.push (← format itemTemplate values)
+      format itemTemplate values
     let text := "# Group " ++ source ++ " / " ++ markdown (← str group "public_group") ++ "\n\n" ++
       "Generated from reviewed source-item metadata. Source claim text is not reproduced.\n\n" ++ String.intercalate "\n" blocks.toList
-    outputs := outputs.insert ("docs/generated/groups/" ++ (← str group "source_public_slug") ++ "/" ++ slug ++ ".md") text
+    pure (outputs.insert ("docs/generated/groups/" ++ (← str group "source_public_slug") ++ "/" ++ slug ++ ".md") text)) outputs
   return outputs.insert "docs/generated/catalog.json" (prettyJson catalog ++ "\n")
 
 /-- Walk only the managed generated tree; directory symlinks are never traversed. -/
 partial def managedBelow (root current : FilePath) : IO (Array String × Array FilePath) := do
-  let mut files := #[]; let mut directories := #[]
-  for entry in ← current.readDir do
+  (← current.readDir).foldlM (fun (files,directories) entry => do
     let metadata ← entry.path.symlinkMetadata
     if metadata.type == .dir then
       let (children,descendants) ← managedBelow root entry.path
-      files := files ++ children; directories := directories ++ descendants ++ #[entry.path]
+      pure (files ++ children,directories ++ descendants ++ #[entry.path])
     else
       let regular ← if metadata.type == .file then pure true else if metadata.type == .symlink then do
         try pure ((← entry.path.metadata).type == .file) catch _ => pure false
@@ -185,8 +179,8 @@ partial def managedBelow (root current : FilePath) : IO (Array String × Array F
       if regular then
         let parent := root.toString ++ "/"
         require (entry.path.toString.startsWith parent) "managed output escaped root"
-        files := files.push (entry.path.toString.drop parent.length).toString
-  return (files,directories)
+        pure (files.push (entry.path.toString.drop parent.length).toString,directories)
+      else pure (files,directories)) (#[],#[])
 
 /-- Enumerate the exact output ownership boundary, retaining stale files for comparison and safe retirement. -/
 def outputMetadata (path : FilePath) : IO (Option IO.FS.Metadata) := do
@@ -199,30 +193,33 @@ def outputMetadata (path : FilePath) : IO (Option IO.FS.Metadata) := do
 def outputDirectory (root : FilePath) (parts : List String) (create : Bool) : IO Bool := do
   let canonical ← IO.FS.realPath root
   require ((← root.symlinkMetadata).type == .dir) "output root is not a regular directory"
-  let mut current := canonical
-  for part in parts do
-    require (!part.isEmpty && part != "." && part != "..") "unsafe generated output directory"
-    current := current / part
-    match ← outputMetadata current with
-    | some metadata =>
-      require (metadata.type == .dir && (← IO.FS.realPath current) == current)
-        "generated output ancestor is not an owned directory"
-    | none =>
-      if !create then return false
-      IO.FS.createDir current
-  return true
+  let rec walk (current : FilePath) : List String → IO Bool
+    | [] => pure true
+    | part :: remaining => do
+      require (!part.isEmpty && part != "." && part != "..") "unsafe generated output directory"
+      let current := current / part
+      match ← outputMetadata current with
+      | some metadata =>
+        require (metadata.type == .dir && (← IO.FS.realPath current) == current)
+          "generated output ancestor is not an owned directory"
+      | none =>
+        if !create then return false
+        IO.FS.createDir current
+      walk current remaining
+  walk canonical parts
 
 /-- Enumerate only validated managed ancestors; symbolic parents never authorize an external walk. -/
 def managedPaths (root : FilePath) : IO (Array String) := do
-  let mut files := #[]
-  unless ← outputDirectory root ["docs"] false do return files
+  unless ← outputDirectory root ["docs"] false do return #[]
   let index := root / "docs/index.md"
-  if let some metadata ← outputMetadata index then
+  let files ← if let some metadata ← outputMetadata index then do
     require (metadata.type == .file) "expected generated output is not a regular file"
-    files := files.push "docs/index.md"
+    pure #["docs/index.md"]
+    else pure #[]
   let generated := root / "docs/generated"
-  if ← outputDirectory root ["docs","generated"] false then
-    files := files ++ (← managedBelow root generated).1
+  let files ← if ← outputDirectory root ["docs","generated"] false then
+    pure (files ++ (← managedBelow root generated).1)
+    else pure files
   return files.qsort (· < ·)
 
 /-- Output paths are a closed public family and may not escape to private or unrelated assets. -/
@@ -255,14 +252,14 @@ def writeOutputs (root : FilePath) (outputs : Std.HashMap String String) : IO Un
 def checkOutputs (root : FilePath) (outputs : Std.HashMap String String) (quiet : Bool := false) : IO Bool := do
   let actual ← managedPaths root
   let expected := (outputs.toArray.map Prod.fst).qsort (· < ·)
-  let mut errors := #[]
-  for relative in expected do
-    unless actual.contains relative do errors := errors.push ("missing generated file: " ++ relative)
-  for relative in actual do
-    unless outputs.contains relative do errors := errors.push ("stale generated file: " ++ relative)
-  for relative in expected do
+  let errors := expected.foldl (fun errors relative =>
+    if actual.contains relative then errors else errors.push ("missing generated file: " ++ relative)) #[]
+  let errors := actual.foldl (fun errors relative =>
+    if outputs.contains relative then errors else errors.push ("stale generated file: " ++ relative)) errors
+  let errors ← expected.foldlM (fun errors (relative : String) => do
     if actual.contains relative && (← IO.FS.readFile (root / relative)) != outputs[relative]?.getD "" then
-      errors := errors.push ("outdated generated file: " ++ relative)
+      pure (errors.push ("outdated generated file: " ++ relative))
+    else pure errors) errors
   unless quiet do
     for error in errors do IO.eprintln ("generate-public-docs: " ++ error)
   return errors.isEmpty

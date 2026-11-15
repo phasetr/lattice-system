@@ -51,12 +51,10 @@ def pad (n : Nat) : String :=
 
 /-- Insert rows immediately after a matching row. -/
 def insertAfter (rows : Array (Array String)) (predicate : Array String → Bool)
-    (extra : Array (Array String)) : Array (Array String) := Id.run do
-  let mut output := #[]
-  for row in rows do
-    output := output.push row
-    if predicate row then output := output ++ extra
-  return output
+    (extra : Array (Array String)) : Array (Array String) :=
+  rows.foldl (fun output row =>
+    let output := output.push row
+    if predicate row then output ++ extra else output) #[]
 
 
 /-- Adapt only absent or empty old artifact schemas, preserving current-schema bytes. -/
@@ -109,12 +107,10 @@ def jsonString (value : Json) : IO String :=
 
 /-- Recursively collect generated UTF-8 output with deterministic path ordering. -/
 partial def publicText (root : FilePath) : IO String := do
-  let mut text := ""
   let entries := (← root.readDir).qsort (fun a b => a.fileName < b.fileName)
-  for entry in entries do
-    if ← entry.path.isDir then text := text ++ (← publicText entry.path)
-    else text := text ++ (← IO.FS.readFile entry.path)
-  pure text
+  entries.foldlM (fun text entry => do
+    let next ← if ← entry.path.isDir then publicText entry.path else IO.FS.readFile entry.path
+    pure (text ++ next)) ""
 
 
 /-- Run the canonical Lean publication generator. -/

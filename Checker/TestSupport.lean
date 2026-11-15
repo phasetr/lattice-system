@@ -234,35 +234,37 @@ def copyRegistry (ctx : Context) (source target : FilePath) : IO Unit := do
 def refresh (ctx : Context) (root : FilePath) : IO Unit := do
   let pages ← table root "pages.tsv"
   let claims ← table root "claims.tsv"
-  let mut invariants ← table root "source-invariants.tsv"
-  for index in [1:invariants.size] do
-    let mut row := invariants[index]!
+  let invariants ← table root "source-invariants.tsv"
+  let refreshed ← invariants.zipIdx |>.mapM fun (row,index) => do
+    if index == 0 then return row
     let source := row[0]!
     let active := claims.extract 1 claims.size |>.filter fun r =>
       r[1]?.getD "" == source && r[11]?.getD "" == "false"
     let sourcePages := pages.extract 1 pages.size |>.filter fun r => r[1]?.getD "" == source
-    row := row.set! 2 (toString active.size)
-    row := row.set! 3 (toString (active.filter fun r => r[5]?.getD "" != "out_of_scope").size)
-    row := row.set! 4 (toString (active.filter fun r => r[6]?.getD "" == "equation").size)
-    row := row.set! 5 (toString (sourcePages.filter fun p =>
+    let row := row.set! 2 (toString active.size)
+      |>.set! 3 (toString (active.filter fun r => r[5]?.getD "" != "out_of_scope").size)
+      |>.set! 4 (toString (active.filter fun r => r[6]?.getD "" == "equation").size)
+      |>.set! 5 (toString (sourcePages.filter fun p =>
       !active.any (fun r => r[3]?.getD "" == p[0]?.getD "")).size)
     let selected := (pages.extract 1 pages.size ++ claims.extract 1 claims.size).filter fun r =>
       r[1]?.getD "" == source
     let text := String.join <| selected.toList.map fun r => String.intercalate "\t" r.toList ++ "\n"
-    row := row.set! 6 (← blob ctx text)
-    invariants := invariants.set! index row
-  writeTable root "source-invariants.tsv" invariants
+    return row.set! 6 (← blob ctx text)
+  writeTable root "source-invariants.tsv" refreshed
+
+/-- Search a bounded identity space without materializing its indices or mutating a counter. -/
+def unusedIdentity (rows : Array (Array String)) (stem : String) : Nat → Nat → Except String String
+  | 0, _ => .error "fixture identifier space exhausted"
+  | fuel+1, index =>
+    let n := toString index
+    let id := stem ++ "-" ++ String.ofList (List.replicate (4-n.length) '0') ++ n
+    if rows.any (fun row => row[0]?.getD "" == id) then unusedIdentity rows stem fuel (index+1)
+    else .ok id
 
 /-- Find the first unused four-digit fixture identity with an explicit prefix. -/
 def unusedId (root : FilePath) (name stem : String) : IO String := do
   let rows ← if ← (root / "registry" / name).pathExists then table root name else pure #[]
-  let mut index := 1
-  while index < 1000000000 do
-    let n := toString index
-    let id := stem ++ "-" ++ String.ofList (List.replicate (4 - n.length) '0') ++ n
-    if !rows.any (fun r => r[0]?.getD "" == id) then return id
-    index := index + 1
-  throw <| IO.userError "fixture identifier space exhausted"
+  IO.ofExcept (unusedIdentity rows stem 999999999 1)
 
 /-- Initialize an independently retired external fixture context around a single suite. -/
 def withContext (project executable : FilePath) (body : Context → IO α) : IO α :=

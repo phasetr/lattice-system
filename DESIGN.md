@@ -226,6 +226,12 @@ OS launch and transfer are permitted; existing Git, HTTP, archive, filesystem
 and compiler operations remain thin IO primitives, with project decisions and
 contracts owned by the typed Lean implementation.
 
+Automation represents state with pure transformations, functional folds and
+explicit-state recursion. Local imperative updates are not moved into reference
+cells as a workaround. Ordered diagnostics, refusal conditions, fixture meaning
+and the complexity of indexed data structures are preserved; IO handles the
+necessary external effects.
+
 Current-tree checks, regression tests, Lean builds and source review have
 distinct scopes. Required checks use the shared `lake exe checker` entrypoint.
 Current registries, generation, applicable semantic inspection and the actual
