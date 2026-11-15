@@ -2,10 +2,14 @@ name: rewrite-ci
 
 on:
   pull_request:
+    branches: [rewrite-main]
   push:
+    branches: [rewrite-main]
 
 permissions:
   contents: read
+  actions: read
+  pull-requests: read
 
 jobs:
   verify:
@@ -173,16 +177,10 @@ jobs:
         with:
           path: .lake
           key: lake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lake-manifest.json') }}-${{ github.sha }}
-      - name: Verify rewrite trunk base is available
-        run: git rev-parse --verify 'origin/rewrite-main^{commit}'
-      - name: Structural checks and checker self-tests
+      - name: Current-tree gates and input-bound checker regressions
         env:
-          BASE_REF: origin/rewrite-main
-        run: scripts/check-all.sh
-      - name: Base-diff regression checks
-        run: scripts/check-base-diff-ci.sh . origin/rewrite-main
-      - name: Build production root
-        run: lake build
+          GH_TOKEN: ${{ github.token }}
+        run: lake env lean -DwarningAsError=true --run Checker/CheckAll.lean --ci
       - name: Remove job-local toolchain files
         if: ${{ always() }}
         shell: bash

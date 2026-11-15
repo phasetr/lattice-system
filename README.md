@@ -1,130 +1,71 @@
 # LatticeSystem
 
-LatticeSystem is a from-scratch, multi-source formalization of mathematical
-physics. The current production capability is `vocabulary`; the first source,
-Hal Tasaki's *Physics and Mathematics of Quantum Many-Body Systems*, is recorded
-as `vocabulary_reviewed`. The production Lean tree contains two partial-trace
-definitions and no source-claim statements, proofs or intentional project axioms.
+A from-scratch formalization of mathematical physics, organized by independently
+reviewed source claims. Registry records, implemented vocabulary, typed source
+statements and proofs have separate acceptance gates.
 
-The recorded census and R3 vocabulary review do not establish that every
-normalized claim faithfully represents the printed source. Bounded corrections
-have been integrated, but the full rendered-source audit, exact-statement
-skeleton and source-claim proofs remain incomplete.
+## Start and resume
 
-## Authority and current state
-
-[DESIGN.md](DESIGN.md) defines the contracts and acceptance boundaries.
-`registry/phase.tsv` records global checker capability;
-`registry/source-progress.tsv` records each source's lifecycle. Registries
-record identities, classifications, provenance and review relations. The Lean
-environment establishes which declarations exist and their types.
-
-The current work and single next action are maintained in
-[Issue #5479](https://github.com/phasetr/lattice-system/issues/5479), checked
-against the actual branch, commit and registries. Open PRs do not change the
-production contract until integrated. Completed correction details belong in
-the permanent correction ledgers and their reviewed evidence, rather than a
-second progress history here.
-
-The current TASAKI2020 registry records:
-
-| Measure | Count |
-| --- | ---: |
-| Physical PDF pages | 534 |
-| Active claim records | 3,250 |
-| Formalization targets | 3,224 |
-| Active `out_of_scope` records | 26 |
-| Historical tombstones | 23 |
-| Reviewed source items | 3,076 |
-| Distinct equation source-label/page pairs | 1,392 |
-| Pages with no active claim | 63 |
-| Mathlib-only formalization targets | 3,222 |
-| Targets requiring project vocabulary | 2 |
-| Registered vocabulary declarations | 2 |
-| Claim-to-vocabulary links | 4 |
-
-A formalization target is active and not `out_of_scope`. Equation-pair counts
-use active claims with subkind `equation`; classification repairs preserve the
-original equation source items. Per-source counts and census fingerprints are
-recorded in `registry/source-invariants.tsv`.
-
-## Implemented Lean vocabulary
-
-The three registered production modules are the root `LatticeSystem`, the
-`LatticeSystem.Vocabulary` umbrella, and
-[`LatticeSystem.Vocabulary.Quantum`](LatticeSystem/Vocabulary/Quantum.lean).
-The leaf defines exactly these operations on complex matrices:
-
-| Declaration | Finite index required | Input and result |
-| --- | --- | --- |
-| `LatticeSystem.partialTraceRight` | `[Fintype Right]` | `Matrix (Left × Right) (Left × Right) ℂ` → `Matrix Left Left ℂ` |
-| `LatticeSystem.partialTraceLeft` | `[Fintype Left]` | `Matrix (Left × Right) (Left × Right) ℂ` → `Matrix Right Right ℂ` |
-
-Each operation sums over the indicated index; the other index has no `Fintype`
-assumption. Their type and declaration OIDs and ordered direct imports are
-registered and checked against the elaborated environment. The two target
-claims requiring project vocabulary are `CL-TASAKI2020-2487` and
-`CL-TASAKI2020-2488`.
-
-R3 basis and use relations record the need for existing vocabulary. They do
-not certify a closed typed physics contract, source fidelity, statement binding
-or proof. Graph-based modeling is a design requirement for later work; no
-production graph, Hamiltonian or state API has been added. Production bindings,
-statement modules, contexts, axioms, dependencies and implementation slices
-remain header-only. The separate `Checker/` metaprograms and runtime fixtures
-exercise future skeleton contracts without adding production source claims.
-
-## Source corrections and public catalog
-
-The six permanent correction ledgers record reviewed events, normalization
-reviews, corrections, successors, item additions and content amendments.
-[DESIGN §7](DESIGN.md#7-atomic-claim-registry) defines their immutable history,
-source-atomic identity, item ownership and pre-R4 eligibility. Ordinary changes
-use the frozen base-diff path; a new correction event uses the dedicated guard
-only when its exact recorded base matches the verified merge base. A later
-change cannot reopen that exception. Each source correction needs its own
-source review and acceptance.
-
-The [public catalog](docs/index.md) is generated from stable source-item and
-claim metadata. It shows labels, locators, classifications, vocabulary use and
-binding/proof status. It omits normalized source claim text, private paths,
-source fingerprints and content OIDs. `vocabulary_ready`, `not_bound`,
-`not_recorded` and `not_assessed` are distinct from source or proof acceptance.
-Generate and check the complete catalog with
-`scripts/generate-public-docs.py`; generated files are not edited by hand.
-
-## Checks
-
-The current production full checker and build entrypoints are:
+Check the actual checkout before using a recorded result:
 
 ```sh
-BASE_REF=origin/rewrite-main scripts/check-all.sh
-lake build
+git status --short --branch
+git rev-parse HEAD rewrite-main origin/rewrite-main
 ```
 
-`check-all.sh` runs structural and registry checks, the applicable vocabulary
-and skeleton semantic gates, generator tests and drift checks, checker runtime
-fixtures, and the base-diff selector. The workflow `rewrite-ci` runs on pushes
-and pull requests, with required job context `verify`. Its existing hosted
-entrypoint and branch protection remain in force; unmerged CI changes are not
-the current production procedure.
+Read the project `AGENTS.md` instructions and [DESIGN.md](DESIGN.md). The current
+work and single next action are maintained in
+[Issue #5479](https://github.com/phasetr/lattice-system/issues/5479), rather than
+copied into progress histories here. An open PR is not an integrated change.
 
-These checks use the declared toolchain and dependencies. Structural checks,
-builds and OID comparisons do not prove source fidelity, absence of omissions
-or mathematical correctness. Source, implementation and verification reviews
-must state their exact revision, scope and any untested boundary.
+Use the existing authorities for current facts:
 
-## Reset boundary
+- [Public status and catalog](docs/index.md): generated counts, source items,
+  vocabulary and binding/proof metadata, without normalized source claim text.
+- [Checker capability](registry/phase.tsv) and
+  [source lifecycles](registry/source-progress.tsv): recorded acceptance stages.
+- [Registered production modules](registry/modules.tsv) and
+  [vocabulary](registry/vocabulary.tsv): source paths and declaration identities;
+  the Lean environment establishes their existence and types.
+- [Correction events](registry/correction-events.tsv): accepted registry
+  transitions and their exact bases and independent review references.
 
-The legacy anchor is `01bcb49d49db92c225cfa74b74d409dd0a9c4edc`.
-Legacy Lean, documentation, APIs, proofs and scripts are not reused. Only
-`lean-toolchain` and `lake-manifest.json` are byte-preserved from that anchor.
-Private reference material remains outside the tracked rewrite tree.
+A recorded census or `vocabulary_ready` status does not establish source
+fidelity, a closed typed physics contract, statement binding or proof.
+Structural success and empty production statement tables do not certify R4.
+The scope of an accepted review must be read before reusing it.
 
-## Hard merge gate
+## Checks and generated documentation
 
-Every rewrite PR requires the user's explicit permission to merge the exact PR
-number at its current exact head SHA. Green CI, review approval, prior consent,
-or permission for another SHA is not merge authority. Any head change expires
-permission. Auto-merge, merge queue, direct push to the protected trunk and
-force push are forbidden. Agents must leave the `USER ONLY` box unchecked.
+Use the same entrypoint locally and in CI:
+
+```sh
+lake env lean -DwarningAsError=true --run Checker/CheckAll.lean --current --base origin/rewrite-main
+```
+
+This runs current registry, semantic, generation, transition and production-build
+checks. It explicitly leaves checker regression acceptance to CI. Use `--full`
+in place of `--current` for a complete local regression run. CI uses `--ci` to
+select regression suites from their actual inputs and verified successful-run
+evidence; changed or unverified inputs cause execution. Current-tree and actual
+transition checks and the production build always run. A duplicate local full
+suite is not required when the final published head receives its official CI
+acceptance. The required workflow/job is `rewrite-ci` / `verify`.
+
+Regenerate the complete public catalog with the existing generator:
+
+```sh
+python3 scripts/generate-public-docs.py --write
+python3 scripts/generate-public-docs.py --check
+```
+
+Generated files are not edited by hand. Use the declared dependencies and
+pinned toolchain; a failed command is not permission to install or update them.
+
+## Review and merge
+
+Source review, implementation review and verification must identify their exact
+revision and scope. None substitutes for the others or proves mathematical
+truth outside its reviewed scope. Only the user can authorize merging
+the exact PR at its current exact head SHA under the project hard merge gate. Agents leave
+`USER ONLY` unchecked; CI success is not merge authority.
