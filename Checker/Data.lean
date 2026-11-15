@@ -1,3 +1,4 @@
+import Checker.Content
 import Checker.Support
 
 /-! Native registry, tree and policy validators. -/
@@ -19,7 +20,9 @@ def fixedTreePaths : Array String := #[
   "registry/claim-normalization-reviews.tsv", "registry/claim-corrections.tsv", "registry/claim-successors.tsv",
   "registry/source-item-additions.tsv", "registry/claim-content-amendments.tsv", "registry/claim-context.tsv",
   "registry/statement-modules.tsv", "registry/statement-imports.tsv",
-  "scripts/check-content-amendments.py", "scripts/generate-public-docs.py",
+  "Checker/Content.lean", "Checker/Publication.lean", "Checker/Bootstrap.lean", "Checker/Tests/Publication.lean",
+  "Checker/Text.lean", "Checker/Publication/Tabular.lean", "Checker/Publication/Items.lean",
+  "Checker/Publication/Catalog.lean", "Checker/Publication/Render.lean",
   "docs/index.md", "docs/generated/index.md", "docs/generated/catalog.json",
   "Checker/BaseDiff.lean",
   "Checker/CheckAll.lean",
@@ -899,7 +902,7 @@ def dataCore (project : System.FilePath) (d : Registry.Data) (gate : String)
     | "registry" =>
       Registry.registryCore d
       if d.multi then
-        runGate project ⟨"python3", #["scripts/check-content-amendments.py","--static",d.root.toString]⟩
+        discard <| Checker.Content.validateStatic d.root
     | "census" => Registry.census d fixture counts
     | "source-items" => Registry.items d
     | "policy" => Registry.policy d

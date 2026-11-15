@@ -12,8 +12,10 @@ def main (args : List String) : IO UInt32 := do
     let project := System.FilePath.mk ((← IO.getEnv "LATTICE_CHECK_ALL_PROJECT").getD root.toString)
     match args with
     | "--gate" :: gate :: rest => Checker.CheckAll.dataEntry project gate rest
+    | "--docs" :: rest => return ← Checker.Publication.cli project rest
     | "--check" :: route :: rest =>
       match route with
+      | "content" => return ← Checker.Content.cli project rest
       | "base-diff" => Checker.Transition.baseEntry project rest
       | "corrections" => Checker.Transition.correctionEntry project rest
       | "base-diff-ci" => Checker.Transition.selectorEntry project rest

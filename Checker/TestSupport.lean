@@ -113,10 +113,13 @@ def Context.command (ctx : Context) (route : String) (args : Array String := #[]
 def Context.gate (ctx : Context) (name : String) (root : FilePath) : Command :=
   ⟨ctx.executable.toString, #["--gate", name, root.toString], ctx.project, ctx.environment⟩
 
-/-- Invoke the existing Python content helper without moving any shell-embedded logic into Python. -/
+/-- Invoke the typed content contract on an explicit fixture dataset. -/
 def Context.content (ctx : Context) (args : Array String) : Command :=
-  ⟨"python3", #[ (ctx.project / "scripts/check-content-amendments.py").toString] ++ args,
-    ctx.project, ctx.environment⟩
+  ctx.command "content" args
+
+/-- Invoke the sole Lean publication generator on an explicit owned fixture. -/
+def Context.docs (ctx : Context) (args : Array String) : Command :=
+  ⟨ctx.executable.toString, #["--docs"] ++ args,ctx.project,ctx.environment⟩
 
 /-- Require the expected status and diagnostic and account for the executed case. -/
 def expect (ctx : Context) (label : String) (positive : Bool) (command : Command)
@@ -127,9 +130,10 @@ def expect (ctx : Context) (label : String) (positive : Bool) (command : Command
       (output.splitOn diagnostic).length > 1))
     s!"unexpected regression result {label} (exit {result.exitCode}):\n{output}"
   if positive then ctx.accepted.modify (· + 1) else ctx.rejected.modify (· + 1)
-  let route := if command.cmd == "python3" then
-    "content-helper:" ++ command.args[1]?.getD "" else
-    command.args[1]?.getD command.cmd
+  let route := if command.args[0]? == some "--check" && command.args[1]? == some "content" then
+    "content-helper:" ++ command.args[2]?.getD ""
+    else if command.args[0]? == some "--docs" then "publication:" ++ command.args[1]?.getD ""
+    else command.args[1]?.getD command.cmd
   ctx.roster.modify (·.push ⟨label,positive,route,diagnostic⟩)
   pure output
 

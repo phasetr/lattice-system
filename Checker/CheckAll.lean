@@ -1,3 +1,4 @@
+import Checker.Publication
 import Checker.Inputs
 import Checker.Transition
 import Checker.SemanticDriver
@@ -27,7 +28,7 @@ def environment (root : System.FilePath) : IO Json := do
   let mut fields := []
   for key in #["RUNNER_OS", "RUNNER_ARCH", "ImageOS", "ImageVersion"] do
     fields := (key, toJson (← env key)) :: fields
-  for (name, command) in #[("lean", "lean"), ("lake", "lake"), ("git", "git"), ("python", "python3"), ("curl", "curl")] do
+  for (name, command) in #[("lean", "lean"), ("lake", "lake"), ("git", "git"), ("curl", "curl")] do
     let text ← output root command #["--version"]
     fields := (name, toJson (split text "\n")[0]!) :: fields
   let sysroot ← toolchainRoot root
@@ -275,8 +276,8 @@ def currentAction (root : System.FilePath) (base action : String) : IO Unit := d
   match action with
   | "vocabulary" => Checker.SemanticDriver.vocabulary root []
   | "skeleton" => Checker.SemanticDriver.skeleton root []
-  | "generator-test" => runGate root ⟨"python3",#["scripts/generate-public-docs.py","--test","--root",root.toString]⟩
-  | "generator-check" => runGate root ⟨"python3",#["scripts/generate-public-docs.py","--check","--root",root.toString]⟩
+  | "generator-test" => Checker.Publication.entry root ["--test","--root",root.toString]
+  | "generator-check" => Checker.Publication.entry root ["--check","--root",root.toString]
   | "transition" => Checker.Transition.selectorEntry root [root.toString,base]
   | _ => throw <| IO.userError "unknown current action"
 

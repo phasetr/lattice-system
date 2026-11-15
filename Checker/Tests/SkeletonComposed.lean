@@ -15,8 +15,7 @@ def jsonRow (value : Json) : IO (Array String) := do
 /-- Run the generator's unchanged canonical inventory derivation through its read-only typed CLI. -/
 def deriveItems (ctx : Context) (root : FilePath) : IO Unit := do
   ctx.owned root
-  let output ← checked ⟨"python3", #[(ctx.project / "scripts/generate-public-docs.py").toString,
-    "--derive-source-items", "--root", root.toString], ctx.project, ctx.environment⟩
+  let output ← checked (ctx.docs #["--derive-source-items","--root",root.toString])
   let value ← match Json.parse output with | .ok value => pure value | .error error => throw <| IO.userError error
   ensure ((← property value "version") == toJson (1 : Nat)) "source-item derivation protocol version"
   for (key, name) in #[("source_items","source-items.tsv"),("item_claims","item-claims.tsv")] do
@@ -43,8 +42,7 @@ def refreshProduction (ctx : Context) (root : FilePath) : IO Unit := do
 
 /-- Invoke the unchanged public generator on the independently owned canonical fixture. -/
 def generator (ctx : Context) (root : FilePath) (mode : String) : IO String :=
-  checked ⟨"python3", #[(ctx.project / "scripts/generate-public-docs.py").toString, mode,
-    "--root",root.toString],ctx.project,ctx.environment⟩
+  checked (ctx.docs #[mode,"--root",root.toString])
 
 /-- Run the actual nine native gates, vocabulary, renderer, fixture build and skeleton in original order. -/
 def productionGates (ctx : Context) (root : FilePath) : IO Unit := do

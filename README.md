@@ -58,13 +58,17 @@ work with reasons before running. A duplicate local full suite is not required
 when the final published head receives its official CI acceptance. The required
 workflow/job remains `rewrite-ci` / `verify`.
 
-Regenerate the complete public catalog with the existing generator:
+Generate and check the complete public catalog through the Lean entrypoint:
 
 ```sh
-python3 scripts/generate-public-docs.py --write
-python3 scripts/generate-public-docs.py --check
+lake exe checker --docs --write
+lake exe checker --docs --check
 ```
 
+Repository-owned validation, derivation, generation, regression execution and CI
+control are implemented in Lean. External commands provide only necessary thin
+OS, Git, HTTP, archive, filesystem and compiler operations; no interpreted
+implementation or embedded Python or Shell body substitutes for the Lean logic.
 Generated files are not edited by hand. Use the declared dependencies and
 pinned toolchain; a failed command is not permission to install or update them.
 

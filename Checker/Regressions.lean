@@ -28,7 +28,12 @@ structure Group where
   mathlibImports : Array String := #[]
 
 /-- Native data validation also reaches the existing standalone content contract. -/
-def dataInputs : Array String := #["Checker/Data.lean","scripts/check-content-amendments.py"]
+def dataInputs : Array String := #["Checker/Data.lean","Checker/Content.lean","Checker/Text.lean"]
+
+/-- Generation callers reach the complete native table, derivation, projection and output implementation. -/
+def publicationInputs : Array String := #["Checker/Publication.lean","Checker/Publication/Tabular.lean",
+  "Checker/Publication/Items.lean","Checker/Publication/Catalog.lean","Checker/Publication/Render.lean",
+  "Checker/Tests/Publication.lean","Checker/Text.lean"]
 
 /-- Explicit transition callbacks read the full dedicated event and ordinary-history contracts. -/
 def transitionInputs : Array String := dataInputs ++ #["Checker/BaseDiff.lean","Checker/Corrections.lean",
@@ -58,13 +63,13 @@ def groups : Array Group := #[
   {name := "skeleton-pure", run := Checker.Tests.SkeletonPure.run,
     inputs := semanticInputs ++ #["Checker/Skeleton.lean","Checker/Tests/Fixtures.lean","Checker/Tests/SkeletonFixture.lean","Checker/Tests/SkeletonPure.lean"], mathlibImports := #["Mathlib.Init","Mathlib.LinearAlgebra.Matrix.Defs"]},
   {name := "skeleton-composed", run := Checker.Tests.SkeletonComposed.run,
-    inputs := dataInputs ++ semanticInputs ++ #["Checker/Skeleton.lean","Checker/Vocabulary.lean","Checker/Tests/Fixtures.lean",
+    inputs := dataInputs ++ semanticInputs ++ publicationInputs ++ #["Checker/Skeleton.lean","Checker/Vocabulary.lean","Checker/Tests/Fixtures.lean",
       "Checker/Tests/FixtureSupport.lean","Checker/Tests/SkeletonFixture.lean","Checker/Tests/SkeletonComposed.lean",
-      "scripts/generate-public-docs.py","LatticeSystem.lean",".gitignore"], headers := true, policy := true, layout := true, mathlibImports := #["Mathlib.Init"]},
+      "LatticeSystem.lean",".gitignore"], headers := true, policy := true, layout := true, mathlibImports := #["Mathlib.Init"]},
   {name := "corrections", run := Checker.Tests.Corrections.run,
-    inputs := transitionInputs ++ semanticInputs ++ #["Checker/Vocabulary.lean","Checker/Tests/FixtureSupport.lean","Checker/Tests/Corrections.lean","scripts/generate-public-docs.py"], corpus := true, history := true, production := true},
+    inputs := transitionInputs ++ semanticInputs ++ publicationInputs ++ #["Checker/Vocabulary.lean","Checker/Tests/FixtureSupport.lean","Checker/Tests/Corrections.lean"], corpus := true, history := true, production := true},
   {name := "content", run := Checker.Tests.Content.run,
-    inputs := transitionInputs ++ #["Checker/Tests/FixtureSupport.lean","Checker/Tests/Content.lean","scripts/generate-public-docs.py"], corpus := true, history := true},
+    inputs := transitionInputs ++ publicationInputs ++ #["Checker/Tests/FixtureSupport.lean","Checker/Tests/Content.lean"], corpus := true, history := true},
   {name := "selector", run := Checker.Tests.Selector.run,
     inputs := #["Checker/History.lean","Checker/Selector.lean","Checker/Tests/Fixtures.lean","Checker/Tests/Selector.lean"]}]
 

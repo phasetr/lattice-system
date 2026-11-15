@@ -1,3 +1,4 @@
+import Checker.Content
 import Checker.BaseDiff
 
 /-! Independently owned source-correction transitions and their immutable history. -/
@@ -439,7 +440,7 @@ def validate (project base target : FilePath) (requested : String := "") (record
     let selected := (rows current "correction-events").find? (col · 1 == event)
     require (col (selected.getD #[]) 4 == baseCommit) "correction event base commit mismatch"
   duplicateEligibility before current event source
-  runGate project ⟨"python3", #["scripts/check-content-amendments.py","--transition",base.toString,target.toString,event]⟩
+  Checker.Content.validateTransitionAt project base target event
   for stem in #["axioms","claim-axioms"] do
     require (sameArtifact before current stem) "correction event introduces an axiom artifact"
   for stem in #["bindings","claim-context","statement-modules","statement-imports"] do

@@ -117,10 +117,9 @@ partial def publicText (root : FilePath) : IO String := do
   pure text
 
 
-/-- Run the unchanged public generator without embedding any Python fixture program. -/
+/-- Run the canonical Lean publication generator. -/
 def generate (ctx : Context) (root : FilePath) (mode : String := "--write") : IO Unit := do
-  discard <| checked ⟨"python3", #[(ctx.project / "scripts/generate-public-docs.py").toString,
-    mode, "--root", root.toString], ctx.project, ctx.environment⟩
+  discard <| checked (ctx.docs #[mode,"--root",root.toString])
 
 
 /-- Parse the actual generated public catalog. -/

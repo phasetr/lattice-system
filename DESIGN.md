@@ -19,7 +19,7 @@ explicitly authorized.
 The tracked tree is closed by `Checker/CheckAll.lean`. Runtime fixtures belong
 only in isolated system temporary roots; they are test inputs, not project
 status. Public `docs/` are generated exclusively by
-`scripts/generate-public-docs.py` from registered metadata. They omit private
+`lake exe checker --docs` from registered metadata. They omit private
 source text, paths and fingerprints.
 
 ## 2. Mathematical representation and source review
@@ -103,7 +103,7 @@ corrections, successors, source-item additions and content amendments. Their
 headers and rows retain the exact previous bytes as a prefix; a later event
 appends its own contiguous positions without reopening historical ownership.
 The concrete schemas and allowed field changes are checked by
-the Lean correction checker and `scripts/check-content-amendments.py`.
+the Lean correction and content checkers.
 Their distinct mathematical meanings remain:
 
 | Action | Meaning and identity boundary |
@@ -217,6 +217,14 @@ and exact proof types; its direct-hole count cannot increase. A theorem deletion
 or weakened statement is not proof progress.
 
 ## 7. Verification and review authority
+
+Repository-owned validation, derivation, public generation, transition selection,
+regression execution and CI control have one Lean implementation. There is no
+Python or Shell implementation exception, embedded body, or indirect escape
+through a Lean wrapper. Before pinned Lean is available, only the minimal native
+OS launch and transfer are permitted; existing Git, HTTP, archive, filesystem
+and compiler operations remain thin IO primitives, with project decisions and
+contracts owned by the typed Lean implementation.
 
 Current-tree checks, regression tests, Lean builds and source review have
 distinct scopes. Required checks use the shared `lake exe checker` entrypoint.

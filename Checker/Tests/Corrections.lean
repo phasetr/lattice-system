@@ -878,8 +878,7 @@ def duplicateCensusCases (ctx : Context) (f : DuplicateFixtures) : IO Unit := do
 def duplicatePublicCases (ctx : Context) (f : DuplicateFixtures) : IO Unit := do
   let publicRoot ← dupClone ctx f.valid "public"
   for (label, mode) in #[("duplicate-public-write", "--write"), ("duplicate-public-no-drift", "--check")] do
-    discard <| expect ctx label true ⟨"python3", #[(ctx.project / "scripts/generate-public-docs.py").toString,
-      mode, "--root", publicRoot.toString], ctx.project, ctx.environment⟩
+    discard <| expect ctx label true (ctx.docs #[mode,"--root",publicRoot.toString])
   let value ← catalog publicRoot
   let oldItem ← catalogItem value "IT-SRD-0001"
   let canonicalItem ← catalogItem value "IT-SRD-0002"
