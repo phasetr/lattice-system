@@ -1,309 +1,130 @@
 # LatticeSystem
 
-This branch is a from-scratch, multi-source implementation of mathematical
-physics claims. R3 is complete for the first source, Hal Tasaki's quantum
-many-body systems book: the production tree contains
-the two partial-trace vocabulary definitions required by the frozen corpus,
-but **zero source-claim theorem statements or proofs**. The former
-implementation is not an API or source for this rewrite.
+LatticeSystem is a from-scratch, multi-source formalization of mathematical
+physics. The current production capability is `vocabulary`; the first source,
+Hal Tasaki's *Physics and Mathematics of Quantum Many-Body Systems*, is recorded
+as `vocabulary_reviewed`. The production Lean tree contains two partial-trace
+definitions and no source-claim statements, proofs or intentional project axioms.
 
-The recorded census, lifecycle, and vocabulary review do not certify that
-normalized claim statements match the printed source. The full rendered-source
-re-audit and reviewed content corrections remain incomplete.
+The recorded census and R3 vocabulary review do not establish that every
+normalized claim faithfully represents the printed source. Bounded corrections
+have been integrated, but the full rendered-source audit, exact-statement
+skeleton and source-claim proofs remain incomplete.
 
-The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
-progress begins in `registry/`. Its global checker capability is `vocabulary`,
-while each source advances independently through `source-progress.tsv`;
-`TASAKI2020` is `vocabulary_reviewed`. Its corrected corpus ledger contains all
-534 physical PDF pages, 3,250 active atomic claims, 3,224 formalization
-targets, 1,392 distinct source-label/page pairs among active claims with subkind
-`equation`, and 63 pages with no claim. Classification repairs preserve the
-original equation source items.
-Twenty-three superseded records preserve the provenance of compound or duplicate
-claims, while twenty-six active records are explicitly classified `out_of_scope`.
-The only production Lean tree is limited to the registered vocabulary modules and their
-root. Checker cases are generated only under isolated system temporary roots;
-the repository contains no tracked fixture tree.
+## Authority and current state
 
-The vocabulary reviews classify all 3,224 formalization targets: 3,222 are
-`mathlib_only`, while claims `CL-TASAKI2020-2487` and
-`CL-TASAKI2020-2488` require project vocabulary. The registered vocabulary is
-exactly `partialTraceRight` and `partialTraceLeft`, with four claim-to-vocabulary
-links recording the complete relation. Their type and declaration OIDs are
-frozen, and the static registry, import graph, and Lean-environment checks pass.
+[DESIGN.md](DESIGN.md) defines the contracts and acceptance boundaries.
+`registry/phase.tsv` records global checker capability;
+`registry/source-progress.tsv` records each source's lifecycle. Registries
+record identities, classifications, provenance and review relations. The Lean
+environment establishes which declarations exist and their types.
 
-Tracks and sources have stable positions, bibliographic metadata, fingerprints,
-independent lifecycle, and per-source frozen census invariants. Global claim
-order is `(track position, source position, claim order key)`, so additional
-books and papers can be registered without weakening completed-source gates.
-Reviewed correction events are recorded by permanent ledgers. The normalization
-event retains its 36 statement-readiness reviews, 22 corrective actions,
-23 ordered successor relations, and one event-owned source-item addition.
-A separate content-fidelity event records one review and one correction to
-equation (4.1.42), preserving its claim identity and the census counts. The dedicated
-transition checker derives the corrected counts and census OID from the corpus
-and rejects cross-source ownership, unmanifested registry drift, contentless
-surrogates, axiom or R4 artifacts, and incomplete successor propagation.
-Historical event-owned rows are frozen exactly, while a later independently
-reviewed event may append rows with its own contiguous positions.
-A setup-unit event records seven statement-readiness reviews, one amendment
-that makes the local model conditions explicit, and one previously omitted
-atomic claim about the sublattice cardinalities. It introduces a fresh claim and
-source item without a predecessor or successor, deriving the revised census
-invariants from the corpus. A symmetry/order-operator event records seven
-statement-readiness reviews and three identity-preserving amendments restoring
-the eigenphase factor, finite-system Taylor context, and distinct component
-conditions. A theorem-core event records six statement-readiness reviews,
-one amendment to the rotation conditions, and a separately omitted finite-volume
-positivity assertion. A ferrimagnetic statement/model event records ten
-statement-readiness reviews and adds the omitted squared-order symmetry
-assertion to an existing source item, preserving all nine existing claim records
-and the item's metadata and first relation. Its printed proof context remains
-outside that statement/model scope. A proof-context event records two local
-context normalizations. Its J>0 guard on the intermediate chain is interpretive
-and unprinted. The separate balanced case preserves the main theorem's range,
-and every original chain term remains unchanged. This scoped normalization
-does not certify the printed proof, a Lean proof, or the full source audit.
-An infrared-bound model/Fourier setup event records eleven statement-readiness
-outcomes: two context amendments, two omitted orthogonality assertions in one
-genuine named footnote item, and seven unchanged records. Each new assertion
-has its own creation correction and review; the first claim's correction owns
-the shared item. The unit includes the immediate explanation after equation
-(4.1.23) and ends before (4.1.24), without certifying the later bound or proofs.
-An infrared-bound statement/application event records fourteen statement-readiness
-outcomes: one context amendment, three previously omitted assertions, and ten
-unchanged records. It restores the bound's admissible energy constant and
-nonordering-momentum domain, and records full-integral finiteness, the reported
-numerical bound positivity, and the one-dimensional integral divergence. The
-three additions retain their separate sentence or named-footnote provenance.
-The unit includes the attached application footnotes and ends before the printed
-derivation; it does not certify numerical evaluation, proofs, or R4 readiness.
-An infrared-bound preliminary-derivation event records sixteen statement-readiness
-outcomes: two context amendments, one definition reclassification, four previously
-omitted assertions, and nine unchanged records. The amendments restore the
-excited-eigenbasis and neighboring-site context. Each addition has its own creation
-review and correction; the four additions share two genuine prose items. The unit
-includes the complete explanation after equation (4.1.36) and ends before the
-inverse-moment task paragraph and its attached footnote. It does not certify the
-full derivation, later bounds, external references, or R4 readiness.
-An inverse-moment completion event records sixteen statement-readiness outcomes:
-eleven identity-preserving content repairs, including one combined classification
-and content repair, one classification-only correction, one exclusion of a
-derivation pointer, one omitted zero-deformation operator identity in a new
-unlabeled source item, and two unchanged records. The unit begins with the
-inverse-moment task paragraph after the complete explanation following (4.1.36),
-includes footnotes 9 and 10, and ends with the complete sentence deriving the
-desired bound after (4.1.46). The following reflection section and (4.1.47) onward remain
-outside this unit. It does not certify proofs, external references, the full
-source corpus, or R4 readiness.
-A reflection-to-uniform-field event records thirty-eight statement-readiness
-outcomes: twenty identity-preserving content repairs, including six combined
-classification repairs, three exclusions of nonclaim prose, ten previously
-omitted atomic claims, and five unchanged records. Six genuine new prose
-items provide the additions' sentence or paragraph provenance; the graphic
-assertion in Figure 4.2 joins its existing whole-figure item while the
-identifying caption remains separately preserved and excluded. The unit runs
-from the reflection-to-uniform-field heading through the complete conclusion
-after (4.1.61), including Lemma 4.5 and its printed proof context, and ends
-before the following reflection-bound proof. It does not certify the printed
-proofs, unresolved source conventions, other source units, or R4 readiness.
-A reflection-bound proof-source event records thirty-eight statement-readiness
-outcomes: twenty-six identity-preserving content repairs, including eleven
-combined classification repairs, three compound-claim splits with eight new
-atomic successors and one unchanged canonical duplicate link, and nine
-previously omitted atomic claims. Eight genuine new source items preserve the
-additions' provenance; the scalar inequality joins its existing whole-Note item,
-and all split successors remain in their predecessor items. The unit begins at
-the reflection-bound proof heading after the complete conclusion following
-(4.1.61), includes (4.1.62)–(4.1.82), footnotes 12 and 13, and the full closing
-paragraph before section 4.2. A separately reviewed adjacent-Note addendum
-repairs the existing record for the repeated-layer configuration's x1 uniformity
-after (4.1.60), preserving its identity and stable metadata. Footnote 13 remains
-background with external conditions unresolved. This event does not certify
-the printed proof, unresolved source conventions, external references, other
-source units, or R4 readiness.
-A tower-introduction and setup subset records eight correction-owning
-statement-readiness reviews and nine active mathematical outcomes: one
-split into separate long-range-order and absence-of-symmetry-breaking recalls,
-one identity-preserving variance repair, two combined definition and content
-repairs, and four omitted assertions. The additions comprise separate
-vector-independence and local-energy outcomes in one genuine named footnote,
-plus sector placement and pairwise orthogonality in their shared prose unit.
-The accepted subset preserves its nine outcomes without adding the later
-tower-energy result. A separate event repairs the existing canonical
-energy-display record with its full source context, index domains, uniform
-positive constants, and explicit nonzero-numerator premise. A subsequent
-split retires the compound theorem record, adds one definedness successor in
-its existing theorem item, and reuses the corrected energy record unchanged
-as the canonical duplicate. The separate definedness and conditional-energy
-outcomes retain the original jointly witnessed statement through a common
-cutoff. The modal physical-state discussion remains coverage-only.
-A local-energy and spectral-consequence event records fifteen correction-owning
-statement-readiness reviews: five identity-preserving content repairs, one
-combined definition and content repair, two exclusions, and seven previously
-omitted atomic claims. Four new source items preserve the additions' provenance;
-the other three additions join their existing source items. The canonical
-spectral-equation record carries the repaired shared witness contract. A
-separate reviewed event retires the duplicate corollary record in favor of
-that unchanged canonical record, preserving both original source items and
-memberships. These events do not certify printed proofs, external-reference
-proofs, whole-source fidelity, or R4 readiness.
-A full-symmetry-breaking source unit records forty-one statement-readiness
-outcomes: twenty identity-preserving content repairs, including four combined
-classification repairs, six exclusions of nonclaim prose, seven previously
-omitted atomic claims, and eight unchanged records. Seven new source items
-preserve the additions' provenance, including one named footnote. Existing
-claim identities, locators, item metadata, and memberships remain fixed. The
-unit covers the full-symmetry-breaking section through the final proposition
-proof route. It does not certify printed proofs, unresolved source conventions,
-whole-source fidelity, or R4 readiness.
-The first order-parameter comparison core event records eight statement-readiness
-outcomes: one unchanged theorem, one duplicate retirement into that unchanged
-theorem, three nonclaim exclusions, one split into separate definition and
-conjecture records, one repair to definition content and classification,
-and one conjecture reclassification with unchanged text. The two fresh atomic
-records join the existing conjecture item; all original item metadata and
-memberships remain fixed, with no new source item. The separate duplicate-only
-event retires the two repaired historical records into the existing definition
-and conjecture records. The canonical records, vocabulary reviews and uses,
-and all source-item metadata and memberships remain fixed.
-Both ordered core transitions are independently accepted in production,
-including faithful integration and each new automatic production CI, and
-[Issue #5542](https://github.com/phasetr/lattice-system/issues/5542) is completed
-and closed. The footnote 25 source contract remains unresolved and tracked in
-[Issue #5541](https://github.com/phasetr/lattice-system/issues/5541). The
-independently reviewed bounded assessment retains the reported source assertion;
-its exact model, objects, parameter domain and relation to the ordered-moment
-definition are not fully resolved. No correction event or new formalization
-target is authorized.
-Neither event certifies whole-unit
-fidelity, absence of omissions, mathematical truth, printed-proof correctness,
-R4 readiness, or proof completion.
-An infinitesimal-field source event records six statement-readiness outcomes:
-three identity-preserving content repairs, including one combined definition
-reclassification, two compound splits, and one unchanged recalled bound.
-Each split creates its own first-relation successor in its existing source item
-and reuses the unchanged earlier bound for the second relation. The two new
-successors retain distinct theorem and equation provenance; no source item or
-vocabulary declaration is added. A separate duplicate-only event retires the
-atomic theorem successor into the unchanged equation successor, preserving
-both source items, all historical memberships and the original split relations.
-The equation remains the active canonical record, with its vocabulary review
-unchanged. The definition and conjecture in the Remark remain separate.
-The bounded source normalization explicitly retains
-the footnote-qualified limiting convention; it does not certify printed proofs,
-whole-unit fidelity, absence of omissions, mathematical truth, or R4 readiness.
-An XXZ local-description event records three active mathematical outcomes:
-one identity-preserving Hamiltonian definition repair and two independent
-ground-state consequences created by splitting the recalled compound record.
-The split preserves the historical predecessor and its source item; no source
-item or vocabulary declaration is added. A separate XXZ statement-omission event
-adds seven independently reviewed assertions: the transverse-moment equality,
-three positive-long-range-order regimes, the two theorem applications as stated,
-and the order-parameter comparison. Each addition has its own closed creation
-review and correction; two genuine prose paragraphs supply their shared source
-items. The theorem applications retain their source assumptions, states,
-components, common cutoff and limiting qualifications. No existing claim is
-changed or retired by the omission event. The separate duplicate-identity
-question remains tracked in
-[Issue #5553](https://github.com/phasetr/lattice-system/issues/5553).
-These events do not certify the whole XXZ unit, mathematical truth, printed
-proofs, whole-source fidelity, or R4 readiness.
-An order-parameter comparison context event repairs the existing equation
-record with its standing model and ground-state setting, long-range-order
-lower-bound witness, transverse high-moment parameter, and local limiting
-qualification. It preserves the claim identity, classification, source item and
-census counts; the seven XXZ omission bodies remain unchanged.
-A ferrimagnetism source-record event splits one compound Remark record into
-two mathematical successors and adds seven independent source omissions,
-including a conjecture in its genuine numbered footnote. Eight new bodies join
-the existing Remark item; the footnote receives one new item. The linked
-exercise remains unchanged. Attribution, conjectural status, order-operator
-qualifications and qualitative source wording are preserved. Explanatory
-and note context remain in the independently reviewed source evidence.
-The vocabulary reviews record uses of registered project vocabulary;
-they do not certify typed physics contracts or R4 readiness.
-These bounded registry corrections do not certify printed proofs,
-whole-source fidelity, or R4 readiness.
+The current work and single next action are maintained in
+[Issue #5479](https://github.com/phasetr/lattice-system/issues/5479), checked
+against the actual branch, commit and registries. Open PRs do not change the
+production contract until integrated. Completed correction details belong in
+the permanent correction ledgers and their reviewed evidence, rather than a
+second progress history here.
 
-The sixth ledger, `claim-content-amendments.tsv`, records one hundred and six
-reviewed pre-R4 amendments, including actual old and new content hashes, frozen
-source-page hashes, and event ownership. The reviewed units cover the
-complex spectral estimate, opening model setup, symmetry/order-operator unit,
-Theorem 4.1 core, ferrimagnetic statement/model block, the separately bounded
-ferrimagnetic proof-context unit, infrared-bound model/Fourier setup, the
-infrared-bound statement/application unit, the bounded infrared-bound
-preliminary-derivation unit, the bounded inverse-moment completion unit,
-the bounded reflection-to-uniform-field unit, and the bounded reflection-bound
-proof-source unit with its separately reviewed adjacent Note, and the bounded
-tower-introduction and setup subset, the canonical tower-energy display,
-the local-energy and spectral-consequence subset, the bounded
-full-symmetry-breaking unit, the order-parameter comparison core, and the
-infinitesimal-field unit, the local XXZ model and ground-state subset, and the
-order-parameter comparison context;
-they do not certify proofs, other source units, or the complete source corpus. The broader
-rendered-source re-audit and further corrections remain incomplete. The same
-permanent protocol supports independently reviewed additions with fresh IDs,
-frozen page provenance, and explicit item and vocabulary ownership.
-Multiple independently created omissions may share one genuinely new item:
-the position-1 claim's correction owns the item, while every member retains
-its own same-event creation review and unique item relation. Split-created
-items retain single-correction ownership, and historical metadata stays frozen.
-This capability does not add a production claim or certify another source unit.
-The permanent protocol also supports a reviewed `amend_and_reclassify` action
-that changes both content and the classification pair while preserving the same
-claim identity. It retains the content, provenance, pre-R4 and vocabulary gates,
-with exact historical ledger bytes and order preserved. Capability infrastructure
-and source corrections remain separate changes. Every source correction requires
-its own design, review and acceptance.
+The current TASAKI2020 registry records:
 
-The permanent protocol also supports reviewed `retire_duplicate` corrections
-for duplicate records of one source-atomic assertion. This initial capability
-is limited to active pre-R4 predecessors reviewed as `mathlib_only`, with no
-project-vocabulary uses. It preserves the original claim and item provenance,
-records one unchanged existing canonical target, and creates no new claim.
-The canonical target may use existing project vocabulary, whose declarations,
-reviews and uses remain unchanged. Duplicate identity requires independent
-source review. Capability infrastructure does not itself retire a production
-claim or certify a source unit.
+| Measure | Count |
+| --- | ---: |
+| Physical PDF pages | 534 |
+| Active claim records | 3,250 |
+| Formalization targets | 3,224 |
+| Active `out_of_scope` records | 26 |
+| Historical tombstones | 23 |
+| Reviewed source items | 3,076 |
+| Distinct equation source-label/page pairs | 1,392 |
+| Pages with no active claim | 63 |
+| Mathlib-only formalization targets | 3,222 |
+| Targets requiring project vocabulary | 2 |
+| Registered vocabulary declarations | 2 |
+| Claim-to-vocabulary links | 4 |
 
-CI selects this exceptional transition only while the event is new and its
-recorded base equals the actual merge base. Later pull requests automatically
-use the ordinary immutable base-diff path.
-R4 checker infrastructure registers statement-module imports and reviewed
-claim contexts, and compares typed declarations, proof-hole ownership and
-actual axiom use with their registries. Its runtime cases exercise these
-contracts without adding production statements. The production binding and
-statement tables are header-only; capability and source lifecycle remain at
-vocabulary, and source fidelity and skeleton construction remain incomplete.
-The public catalog at [docs/index.md](docs/index.md) is generated from reviewed
-source items and includes source/section labels, claim summaries, Lean binding
-status, vocabulary, axioms, and links without publishing private source data.
+A formalization target is active and not `out_of_scope`. Equation-pair counts
+use active claims with subkind `equation`; classification repairs preserve the
+original equation source items. Per-source counts and census fingerprints are
+recorded in `registry/source-invariants.tsv`.
 
-## Local checks
+## Implemented Lean vocabulary
+
+The three registered production modules are the root `LatticeSystem`, the
+`LatticeSystem.Vocabulary` umbrella, and
+[`LatticeSystem.Vocabulary.Quantum`](LatticeSystem/Vocabulary/Quantum.lean).
+The leaf defines exactly these operations on complex matrices:
+
+| Declaration | Finite index required | Input and result |
+| --- | --- | --- |
+| `LatticeSystem.partialTraceRight` | `[Fintype Right]` | `Matrix (Left × Right) (Left × Right) ℂ` → `Matrix Left Left ℂ` |
+| `LatticeSystem.partialTraceLeft` | `[Fintype Left]` | `Matrix (Left × Right) (Left × Right) ℂ` → `Matrix Right Right ℂ` |
+
+Each operation sums over the indicated index; the other index has no `Fintype`
+assumption. Their type and declaration OIDs and ordered direct imports are
+registered and checked against the elaborated environment. The two target
+claims requiring project vocabulary are `CL-TASAKI2020-2487` and
+`CL-TASAKI2020-2488`.
+
+R3 basis and use relations record the need for existing vocabulary. They do
+not certify a closed typed physics contract, source fidelity, statement binding
+or proof. Graph-based modeling is a design requirement for later work; no
+production graph, Hamiltonian or state API has been added. Production bindings,
+statement modules, contexts, axioms, dependencies and implementation slices
+remain header-only. The separate `Checker/` metaprograms and runtime fixtures
+exercise future skeleton contracts without adding production source claims.
+
+## Source corrections and public catalog
+
+The six permanent correction ledgers record reviewed events, normalization
+reviews, corrections, successors, item additions and content amendments.
+[DESIGN §7](DESIGN.md#7-atomic-claim-registry) defines their immutable history,
+source-atomic identity, item ownership and pre-R4 eligibility. Ordinary changes
+use the frozen base-diff path; a new correction event uses the dedicated guard
+only when its exact recorded base matches the verified merge base. A later
+change cannot reopen that exception. Each source correction needs its own
+source review and acceptance.
+
+The [public catalog](docs/index.md) is generated from stable source-item and
+claim metadata. It shows labels, locators, classifications, vocabulary use and
+binding/proof status. It omits normalized source claim text, private paths,
+source fingerprints and content OIDs. `vocabulary_ready`, `not_bound`,
+`not_recorded` and `not_assessed` are distinct from source or proof acceptance.
+Generate and check the complete catalog with
+`scripts/generate-public-docs.py`; generated files are not edited by hand.
+
+## Checks
+
+The current production full checker and build entrypoints are:
 
 ```sh
-scripts/check-all.sh
+BASE_REF=origin/rewrite-main scripts/check-all.sh
 lake build
 ```
 
-These commands use the already pinned toolchain and dependencies. They enforce
-the frozen census shape but cannot independently establish that human readers
-identified every mathematical claim or that a claim is mathematically correct.
+`check-all.sh` runs structural and registry checks, the applicable vocabulary
+and skeleton semantic gates, generator tests and drift checks, checker runtime
+fixtures, and the base-diff selector. The workflow `rewrite-ci` runs on pushes
+and pull requests, with required job context `verify`. Its existing hosted
+entrypoint and branch protection remain in force; unmerged CI changes are not
+the current production procedure.
+
+These checks use the declared toolchain and dependencies. Structural checks,
+builds and OID comparisons do not prove source fidelity, absence of omissions
+or mathematical correctness. Source, implementation and verification reviews
+must state their exact revision, scope and any untested boundary.
 
 ## Reset boundary
 
-The legacy anchor is
-`01bcb49d49db92c225cfa74b74d409dd0a9c4edc`. The rewrite excludes the old Lean,
-documentation, TeX, status data, scripts, and workflows, including archives
-and compatibility shims. Only `lean-toolchain` and `lake-manifest.json` are
-byte-preserved from that anchor. Private reference material remains outside
-the tracked rewrite tree.
+The legacy anchor is `01bcb49d49db92c225cfa74b74d409dd0a9c4edc`.
+Legacy Lean, documentation, APIs, proofs and scripts are not reused. Only
+`lean-toolchain` and `lake-manifest.json` are byte-preserved from that anchor.
+Private reference material remains outside the tracked rewrite tree.
 
 ## Hard merge gate
 
 Every rewrite PR requires the user's explicit permission to merge the exact PR
 number at its current exact head SHA. Green CI, review approval, prior consent,
 or permission for another SHA is not merge authority. Any head change expires
-permission. Auto-merge, merge queue, direct push to the protected trunk, and
-force push are forbidden. The agent must never check the `USER ONLY` box.
+permission. Auto-merge, merge queue, direct push to the protected trunk and
+force push are forbidden. Agents must leave the `USER ONLY` box unchecked.

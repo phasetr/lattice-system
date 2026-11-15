@@ -1,6 +1,6 @@
 ## Rewrite change
 
-- [ ] Checks and review evidence are attached.
+- [ ] Checks and independent review are complete at the current head.
 - [ ] Registry and phase claims match the actual tree.
 - [ ] No legacy implementation, documentation, or proof text was copied.
 
