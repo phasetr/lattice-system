@@ -804,9 +804,15 @@ python3 "$ROOT/scripts/generate-public-docs.py" --write --root "$PRODUCTION" >/d
 git -C "$PRODUCTION" add -- LatticeSystem.lean LatticeSystem registry docs scripts Checker
 production_gates() {
   local dir=$1 gate
-  for gate in tree schema sources order lifecycle registry census source-items policy vocabulary; do
-    "$dir/scripts/check-$gate.sh" "$dir" || return
+  local -a checker=(env "ELAN_TOOLCHAIN=$(<"$dir/lean-toolchain")" "LATTICE_CHECK_ALL_PROJECT=$dir"
+    lake -d "$dir" env lean -DwarningAsError=true --run "$dir/Checker/CheckAll.lean" --gate)
+  if [[ -n ${LATTICE_CHECK_ALL_EXEC:-} ]]; then
+    checker=(env "LATTICE_CHECK_ALL_PROJECT=$dir" "$LATTICE_CHECK_ALL_EXEC" --gate)
+  fi
+  for gate in tree schema sources order lifecycle registry census source-items policy; do
+    "${checker[@]}" "$gate" "$dir" || return
   done
+  "$dir/scripts/check-vocabulary.sh" "$dir" || return
   python3 "$dir/scripts/generate-public-docs.py" --check --root "$dir" || return
   (cd "$dir" && lake build) || return
   "$dir/scripts/check-skeleton.sh" "$dir"
