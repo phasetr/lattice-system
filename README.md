@@ -209,10 +209,15 @@ question remains tracked in
 [Issue #5553](https://github.com/phasetr/lattice-system/issues/5553).
 These events do not certify the whole XXZ unit, mathematical truth, printed
 proofs, whole-source fidelity, or R4 readiness.
+An order-parameter comparison context event repairs the existing equation
+record with its standing model and ground-state setting, long-range-order
+lower-bound witness, transverse high-moment parameter, and local limiting
+qualification. It preserves the claim identity, classification, source item and
+census counts; the seven XXZ omission bodies remain unchanged.
 These bounded registry corrections do not certify printed proofs,
 whole-source fidelity, or R4 readiness.
 
-The sixth ledger, `claim-content-amendments.tsv`, records one hundred and five
+The sixth ledger, `claim-content-amendments.tsv`, records one hundred and six
 reviewed pre-R4 amendments, including actual old and new content hashes, frozen
 source-page hashes, and event ownership. The reviewed units cover the
 complex spectral estimate, opening model setup, symmetry/order-operator unit,
@@ -225,7 +230,8 @@ proof-source unit with its separately reviewed adjacent Note, and the bounded
 tower-introduction and setup subset, the canonical tower-energy display,
 the local-energy and spectral-consequence subset, the bounded
 full-symmetry-breaking unit, the order-parameter comparison core, and the
-infinitesimal-field unit, and the local XXZ model and ground-state subset;
+infinitesimal-field unit, the local XXZ model and ground-state subset, and the
+order-parameter comparison context;
 they do not certify proofs, other source units, or the complete source corpus. The broader
 rendered-source re-audit and further corrections remain incomplete. The same
 permanent protocol supports independently reviewed additions with fresh IDs,
