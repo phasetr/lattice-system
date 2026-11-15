@@ -15,17 +15,17 @@ The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
 progress begins in `registry/`. Its global checker capability is `vocabulary`,
 while each source advances independently through `source-progress.tsv`;
 `TASAKI2020` is `vocabulary_reviewed`. Its corrected corpus ledger contains all
-534 physical PDF pages, 3,242 active atomic claims, 3,216 formalization
+534 physical PDF pages, 3,250 active atomic claims, 3,224 formalization
 targets, 1,392 distinct source-label/page pairs among active claims with subkind
 `equation`, and 63 pages with no claim. Classification repairs preserve the
 original equation source items.
-Twenty-two superseded records preserve the provenance of compound or duplicate
+Twenty-three superseded records preserve the provenance of compound or duplicate
 claims, while twenty-six active records are explicitly classified `out_of_scope`.
 The only production Lean tree is limited to the registered vocabulary modules and their
 root. Checker cases are generated only under isolated system temporary roots;
 the repository contains no tracked fixture tree.
 
-The vocabulary reviews classify all 3,216 formalization targets: 3,214 are
+The vocabulary reviews classify all 3,224 formalization targets: 3,222 are
 `mathlib_only`, while claims `CL-TASAKI2020-2487` and
 `CL-TASAKI2020-2488` require project vocabulary. The registered vocabulary is
 exactly `partialTraceRight` and `partialTraceLeft`, with four claim-to-vocabulary
@@ -214,6 +214,15 @@ record with its standing model and ground-state setting, long-range-order
 lower-bound witness, transverse high-moment parameter, and local limiting
 qualification. It preserves the claim identity, classification, source item and
 census counts; the seven XXZ omission bodies remain unchanged.
+A ferrimagnetism source-record event splits one compound Remark record into
+two mathematical successors and adds seven independent source omissions,
+including a conjecture in its genuine numbered footnote. Eight new bodies join
+the existing Remark item; the footnote receives one new item. The linked
+exercise remains unchanged. Attribution, conjectural status, order-operator
+qualifications and qualitative source wording are preserved. Explanatory
+and note context remain in the independently reviewed source evidence.
+The vocabulary reviews record uses of registered project vocabulary;
+they do not certify typed physics contracts or R4 readiness.
 These bounded registry corrections do not certify printed proofs,
 whole-source fidelity, or R4 readiness.
 
