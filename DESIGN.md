@@ -9,8 +9,8 @@ currently enabled production contract, independently of checker infrastructure
 available for later stages and of each source's frontier. Each source advances
 independently through `registry/source-progress.tsv`.
 `TASAKI2020` is currently `vocabulary_reviewed`; its corrected, reconciled, and
-frozen census contains 534 physical PDF pages, 3,235 active atomic claims,
-3,209 formalization targets, 1,392 distinct source-label/page pairs among active
+frozen census contains 534 physical PDF pages, 3,242 active atomic claims,
+3,216 formalization targets, 1,392 distinct source-label/page pairs among active
 claims with subkind `equation`, and 63 pages with no claim. Twenty-two additional
 rows are reviewed tombstones.
 The current tree has the two R3 vocabulary definitions required by that source.
@@ -111,12 +111,18 @@ An XXZ local-description event records three active mathematical outcomes:
 one identity-preserving Hamiltonian definition repair and two independent
 ground-state consequences created by splitting the recalled compound record.
 The split preserves the historical predecessor and its source item; no source
-item or vocabulary declaration is added. These local model and ground-state
-descriptions do not resolve the remaining XXZ long-range-order, theorem-transfer
-or order-parameter contracts and duplicate question tracked in
+item or vocabulary declaration is added. A separate XXZ statement-omission event
+adds seven independently reviewed assertions: the transverse-moment equality,
+three positive-long-range-order regimes, the two theorem applications as stated,
+and the order-parameter comparison. Each addition has its own closed creation
+review and correction; two genuine prose paragraphs supply their shared source
+items. The theorem applications retain their source assumptions, states,
+components, common cutoff and limiting qualifications. No existing claim is
+changed or retired by the omission event. The separate duplicate-identity
+question remains tracked in
 [Issue #5553](https://github.com/phasetr/lattice-system/issues/5553).
-They do not certify the whole XXZ unit, mathematical truth, printed proofs,
-whole-source fidelity, or R4 readiness.
+These events do not certify the whole XXZ unit, mathematical truth, printed
+proofs, whole-source fidelity, or R4 readiness.
 These bounded registry corrections do not certify printed proofs,
 whole-source fidelity, or R4 readiness.
 
@@ -859,8 +865,8 @@ they remain subject to the semantic vocabulary gate and contain no source-claim
 theorem, `sorry`, `admit`, `native_decide`, or axiom.
 A later lifecycle never disables that source's frozen identity, counts,
 census OID, active-state, source-order, page-coupling, or two-pass census
-invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,235 active
-claims, 3,209 formalization targets, and 1,392 distinct source-label/page pairs
+invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,242 active
+claims, 3,216 formalization targets, and 1,392 distinct source-label/page pairs
 among active claims with subkind `equation`. The census-capability requirement
 that slices, source-claim dependencies,
 bindings, contexts, axioms, claim-to-axiom relations, statement modules, and

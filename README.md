@@ -15,7 +15,7 @@ The canonical plan and gates are in [DESIGN.md](DESIGN.md). Machine-readable
 progress begins in `registry/`. Its global checker capability is `vocabulary`,
 while each source advances independently through `source-progress.tsv`;
 `TASAKI2020` is `vocabulary_reviewed`. Its corrected corpus ledger contains all
-534 physical PDF pages, 3,235 active atomic claims, 3,209 formalization
+534 physical PDF pages, 3,242 active atomic claims, 3,216 formalization
 targets, 1,392 distinct source-label/page pairs among active claims with subkind
 `equation`, and 63 pages with no claim. Classification repairs preserve the
 original equation source items.
@@ -25,7 +25,7 @@ The only production Lean tree is limited to the registered vocabulary modules an
 root. Checker cases are generated only under isolated system temporary roots;
 the repository contains no tracked fixture tree.
 
-The vocabulary reviews classify all 3,209 formalization targets: 3,207 are
+The vocabulary reviews classify all 3,216 formalization targets: 3,214 are
 `mathlib_only`, while claims `CL-TASAKI2020-2487` and
 `CL-TASAKI2020-2488` require project vocabulary. The registered vocabulary is
 exactly `partialTraceRight` and `partialTraceLeft`, with four claim-to-vocabulary
@@ -197,12 +197,18 @@ An XXZ local-description event records three active mathematical outcomes:
 one identity-preserving Hamiltonian definition repair and two independent
 ground-state consequences created by splitting the recalled compound record.
 The split preserves the historical predecessor and its source item; no source
-item or vocabulary declaration is added. These local model and ground-state
-descriptions do not resolve the remaining XXZ long-range-order, theorem-transfer
-or order-parameter contracts and duplicate question tracked in
+item or vocabulary declaration is added. A separate XXZ statement-omission event
+adds seven independently reviewed assertions: the transverse-moment equality,
+three positive-long-range-order regimes, the two theorem applications as stated,
+and the order-parameter comparison. Each addition has its own closed creation
+review and correction; two genuine prose paragraphs supply their shared source
+items. The theorem applications retain their source assumptions, states,
+components, common cutoff and limiting qualifications. No existing claim is
+changed or retired by the omission event. The separate duplicate-identity
+question remains tracked in
 [Issue #5553](https://github.com/phasetr/lattice-system/issues/5553).
-They do not certify the whole XXZ unit, mathematical truth, printed proofs,
-whole-source fidelity, or R4 readiness.
+These events do not certify the whole XXZ unit, mathematical truth, printed
+proofs, whole-source fidelity, or R4 readiness.
 These bounded registry corrections do not certify printed proofs,
 whole-source fidelity, or R4 readiness.
 
