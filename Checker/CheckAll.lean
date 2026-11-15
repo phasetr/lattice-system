@@ -380,19 +380,26 @@ def sources (d : Data) : IO Unit := do
     let r := tracks[i]!
     require ((col r 1).startsWith "TR-" && sourceId ((col r 1).drop 3).toString) "bad track ID"
     require (digits (col r 2) true && (col r 2).toNat? == some (i + 1)) "track positions are not contiguous"
-    require (!(col r 3).isEmpty && slug (col r 4)) "empty track title or bad track public slug"
+    require (!(col r 3).isEmpty) "empty track title"
+    require (slug (col r 4)) "bad track public slug"
   require (!ss.isEmpty) "no sources registered"
   unique ss #[1] "duplicate source ID"; unique ss #[5] "duplicate citation key"; unique ss #[13] "duplicate source public slug"
   contiguous ss 2 3 "source positions are not contiguous"
   let mut previous := ""
   for r in ss do
-    require (sourceId (col r 1) && d.has "tracks" (col r 2)) "bad source ID or unknown source track"
-    require (oneOf (col r 4) "book|paper|preprint|other" && token (col r 5)) "bad source kind or citation key"
-    require (!(col r 6).isEmpty && !(col r 7).isEmpty && digits (col r 8) && (col r 8).length == 4 && !(col r 9).isEmpty) "empty source identity or bad source year"
+    require (sourceId (col r 1)) "bad source ID"
+    require (d.has "tracks" (col r 2)) "unknown source track"
+    require (oneOf (col r 4) "book|paper|preprint|other") "bad source kind"
+    require (token (col r 5)) "bad citation key"
+    require (!(col r 6).isEmpty && !(col r 7).isEmpty) "empty source title or authors"
+    require (digits (col r 8) && (col r 8).length == 4) "bad source year"
+    require (!(col r 9).isEmpty) "empty source edition"
     require (oneOf (col r 10) "isbn|doi|arxiv|none") "bad identifier kind"
     require (if col r 10 == "none" then col r 11 == "NONE" && col r 12 == "NONE" else
-      !(col r 11).isEmpty && col r 11 != "NONE" && (col r 12).startsWith "https://") "bad source identifier or public URL"
-    require (slug (col r 13) && !(col r 14).isEmpty) "bad source slug or empty local reference key"
+      !(col r 11).isEmpty && col r 11 != "NONE" && (col r 12).startsWith "https://")
+      (if col r 10 == "none" then "none identifier requires NONE value and URL" else "identified source requires identifier and HTTPS public URL")
+    require (slug (col r 13)) "bad source public slug"
+    require (!(col r 14).isEmpty) "empty local reference key"
     require (((col r 15).isEmpty == (col r 16).isEmpty) && ((col r 15).isEmpty ||
       (oid (col r 15) && oid (col r 16) && (col r 15).length == (col r 16).length))) "source OIDs must transition atomically with equal width"
     require (oneOf (col r 17) "pending|pass1|pass2|reconciled|frozen") "bad source coverage"
@@ -402,14 +409,19 @@ def sources (d : Data) : IO Unit := do
   let progress := (d.table "source-progress").rows
   unique progress #[1] "duplicate source progress"
   for r in progress do
-    require (!(d.sourceRow (col r 1)).isEmpty && oneOf (col r 2) "registered|source_frozen|census_pass1|census_pass2|census_reconciled|vocabulary_reviewed|skeleton_frozen|proof_active|complete" && token (col r 3)) "bad source progress"
+    require (!(d.sourceRow (col r 1)).isEmpty) "unknown progress source"
+    require (oneOf (col r 2) "registered|source_frozen|census_pass1|census_pass2|census_reconciled|vocabulary_reviewed|skeleton_frozen|proof_active|complete") "bad source lifecycle"
+    require (token (col r 3)) "bad source progress review token"
   require (ss.all fun r => has progress (col r 1)) "source lacks progress row"
   let invariants := (d.table "source-invariants").rows
   unique invariants #[1] "duplicate source invariant"
   for r in invariants do
-    require (!(d.sourceRow (col r 1)).isEmpty && digits (col r 2) true && (#[3,4,5,6].all fun n => digits (col r n))) "bad source invariant count or source"
-    require ((col r 4).toNat! ≤ (col r 3).toNat! && (col r 6).toNat! ≤ (col r 2).toNat!) "source invariant count exceeds its domain"
-    require (oid (col r 7) && token (col r 8)) "bad census OID or invariant review token"
+    require (!(d.sourceRow (col r 1)).isEmpty) "unknown invariant source"
+    require (digits (col r 2) true && (#[3,4,5,6].all fun n => digits (col r n))) "bad source invariant count"
+    require ((col r 4).toNat! ≤ (col r 3).toNat!) "formalization target count exceeds active claim count"
+    require ((col r 6).toNat! ≤ (col r 2).toNat!) "no-claim page count exceeds physical page count"
+    require (oid (col r 7)) "bad census OID"
+    require (token (col r 8)) "bad invariant review token"
 
 /-- Dependency roles preserve the reviewed reverse-edge meaning of required_by. -/
 def dependencies (d : Data) : IO Unit := do
@@ -599,11 +611,14 @@ def bindings (d : Data) : IO Unit := do
     require (col (d.row "statement-modules" (col r 4)) 3 == "leaf") "binding needs a registered statement leaf module"
     require (oneOf (col r 5) "definition|abbrev") "bad statement kind"
     require (oneOf (col r 6) "proof_proposition|definition_value|definition_relation|notation_expansion|notation_relation|hypothesis_prop|domain_type|domain_predicate|domain_context") "bad statement shape"
-    require ((#[7,8].all fun n => col r n == "PENDING" || oid (col r n))) "bad statement type or value OID"
+    require (col r 7 == "PENDING" || oid (col r 7)) "bad statement type OID"
+    require (col r 8 == "PENDING" || oid (col r 8)) "bad statement value OID"
     require (oneOf (col r 9) "proof_stub|definitional") "bad implementation status"
     if proof then
       require (name (col r 3) && col r 10 == "theorem" && (col r 11 == "PENDING" || oid (col r 11))) "proof stub metadata is incomplete"
-      require (if phase d == "proof" then col r 12 == "NONE" || oid (col r 12) else col r 12 == "NONE") "R4/R5 proof value OID mismatch"
+      if phase d == "proof" then
+        require (col r 12 == "NONE" || oid (col r 12)) "bad R5 proof value OID"
+      else require (col r 12 == "NONE") "R4 proof stub value OID must be NONE"
       require (col r 6 == "proof_proposition") "proof claim has non-proposition shape"
     else require (#[3,10,11,12].all (col r · == "NONE")) "definitional binding has proof metadata"
     require ((oneOf (col c 6) "assertion|conjecture") == proof) "implementation status/disposition mismatch"
@@ -626,7 +641,8 @@ def bindings (d : Data) : IO Unit := do
     require (col r 1 != col r 3) "self claim-context"
     require ((cs.findIdx? (col · 1 == col r 3)).getD cs.size < (cs.findIdx? (col · 1 == col r 1)).getD 0) "claim-context target is not earlier"
     require (oneOf (col setup 6) "definition|notation|hypothesis|domain") "claim-context target is not a setup claim"
-    require (oneOf (col r 4) "assumption|term_reference" && oneOf (col r 5) "same_item|inherited") "bad claim-context use kind or scope"
+    require (oneOf (col r 4) "assumption|term_reference") "bad claim-context use kind"
+    require (oneOf (col r 5) "same_item|inherited") "bad claim-context scope"
     if col r 5 == "same_item" then
       let a := contextItems[col r 1]?.getD ""
       let b := contextItems[col r 3]?.getD ""
@@ -657,21 +673,26 @@ def vocabulary (d : Data) : IO Unit := do
     require (projectName (col r 2) && projectName (col r 3)) "vocabulary declaration and module must be below LatticeSystem"
     require (oneOf (col r 4) "definition|abbrev|inductive|structure|class|constructor|recursor|projection|instance") "bad vocabulary declaration kind"
     require (oneOf (col r 5) "primary|generated") "bad vocabulary origin"
-    require (#[7,8].all fun n => col r n == "PENDING" || oid (col r n)) "bad vocabulary type or declaration OID"
+    require (col r 7 == "PENDING" || oid (col r 7)) "bad vocabulary type OID"
+    require (col r 8 == "PENDING" || oid (col r 8)) "bad vocabulary declaration OID"
     require (oneOf (col r 9) "graph_core|finite_volume|linear_algebra|operator_algebra|quantum_state|stat_mech|fermion|generated") "bad vocabulary design role"
     require (oneOf (col r 10) "none|local_operation|explicit_finite_volume|inherited") "bad vocabulary finiteness scope"
     if col r 5 == "primary" then
-      require (col r 6 == "NONE" && col r 9 != "generated" && col r 10 != "inherited") "primary vocabulary cannot use generated metadata"
+      require (col r 6 == "NONE") "primary vocabulary must use parent NONE"
+      require (col r 9 != "generated" && col r 10 != "inherited") "primary vocabulary cannot use generated metadata"
     else
-      require (col r 6 != "NONE" && !(col r 6).isEmpty && col r 6 != id && col (d.row "vocabulary" (col r 6)) 5 == "primary") "unknown or non-primary vocabulary parent"
-      require (oneOf (col r 4) "constructor|recursor|projection" && col r 9 == "generated" && col r 10 == "inherited") "generated vocabulary needs generated/inherited metadata"
+      require (col r 6 != "NONE" && !(col r 6).isEmpty && col r 6 != id) "generated vocabulary needs a distinct parent"
+      require (col (d.row "vocabulary" (col r 6)) 5 == "primary") "unknown or non-primary vocabulary parent"
+      require (oneOf (col r 4) "constructor|recursor|projection") "generated vocabulary has a non-generated declaration kind"
+      require (col r 9 == "generated" && col r 10 == "inherited") "generated vocabulary needs generated/inherited metadata"
     require (previous.isEmpty || previous < id) "vocabulary IDs are not strictly increasing"
     previous := id
     require (col (d.row "modules" (col r 3)) 3 == "leaf") "vocabulary declaration needs a registered leaf module"
   for r in (d.table "claim-vocabulary-review").rows do
     require (d.has "claims" (col r 1)) "unknown vocabulary-review claim"
     require (col (d.row "claims" (col r 1)) 12 == "false") "tombstoned claim has vocabulary review"
-    require (oneOf (col r 2) "mathlib_only|project_vocabulary" && token (col r 3)) "bad vocabulary basis or review token"
+    require (oneOf (col r 2) "mathlib_only|project_vocabulary") "bad vocabulary basis"
+    require (token (col r 3)) "bad vocabulary review token"
   for r in (d.table "claim-vocabulary").rows do
     require (d.has "claims" (col r 1) && col (d.row "claims" (col r 1)) 12 == "false") "bad claim-vocabulary claim"
     require (d.has "vocabulary" (col r 2)) "unknown claim-vocabulary ID"
@@ -747,7 +768,8 @@ def items (d : Data) : IO Unit := do
     require (oneOf (col r 5) "theorem|lemma|corollary|proposition|definition|problem|conjecture|example|exercise|remark|note|equation|figure|footnote|table|unlabeled") "bad item kind"
     require ((col r 5 == "unlabeled") == (col r 6 == "NONE")) "item label/kind mismatch"
     require (col r 6 == "NONE" || (col r 6).isEmpty || ((col r 8).splitOn (col r 6)).length > 1) "item locator does not contain exact label"
-    require (!(col r 7).isEmpty && !(col r 8).isEmpty) "empty item title or locator"
+    require (!(col r 7).isEmpty) "empty item title"
+    require (!(col r 8).isEmpty) "empty item locator"
     if (col r 9).startsWith "Chapter " && digits ((col r 9).drop 8).toString then
       require (col r 9 == "Chapter " ++ pad 2 (toString (((col r 9).drop 8).toString.toNat!))) "numeric chapter group is not zero-padded"
     require (!(col r 9).isEmpty && col r 10 == slugify (col r 9)) "item public group/slug mismatch"
@@ -760,7 +782,8 @@ def items (d : Data) : IO Unit := do
   contiguous relations 1 2 "item relation positions are not contiguous"
   for r in relations do
     let item := d.row "source-items" (col r 1); let claim := d.row "claims" (col r 3)
-    require (!item.isEmpty && !claim.isEmpty) "unknown item or claim relation"
+    require (!item.isEmpty) "unknown item relation"
+    require (!claim.isEmpty) "unknown item claim"
     require (col item 2 == col claim 2 && col item 4 == col claim 4) "item/claim source or page mismatch"
     require (col r 2 != "1" || col item 3 == col claim 3) "item order does not match first claim"
   let usedItems := relations.foldl (fun m r => m.insert (col r 1)) ({} : Std.HashSet String)
@@ -1464,6 +1487,34 @@ def expect (counter : IO.Ref Nat) (b : Bool) (name : String) : IO Unit := do
 def reject (counter : IO.Ref Nat) (action : IO α) (name : String) : IO Unit := do
   let failed ← try let _ ← action; pure false catch _ => pure true
   expect counter failed name
+/-- A regression rejection must reach its original field-specific diagnostic. -/
+def rejectMessage (counter : IO.Ref Nat) (action : IO α) (needle : String) : IO Unit := do
+  let actual ← try let _ ← action; pure "" catch error => pure s!"{error}"
+  expect counter ((actual.splitOn needle).length > 1) ("missing diagnostic: " ++ needle)
+/-- Valid metadata isolates type and value diagnostics without relying on unrelated rejection. -/
+def selfTestDiagnostics (root : System.FilePath) (counter : IO.Ref Nat) : IO Unit := do
+  let id := String.ofList (List.replicate 40 'a')
+  let header := fun table => ((Registry.headers.find? (·.1 == table)).map (·.2)).get!
+  let table := fun name (rows : Array (Array String)) => Registry.tableFromText <|
+    header name ++ "\n" ++ String.join (rows.toList.map (fun row => String.intercalate "\t" row.toList ++ "\n"))
+  let claim := #["CL-FIX-0001","FIX","000001.0001","PG-FIX-0001","setup","definition","definition","Fixture setup.",id,"NONE","NONE","false","NONE","NONE","NONE"]
+  let binding := #["CL-FIX-0001","LatticeSystem.Claims.Front.Setup","NONE","LatticeSystem.Claims.Front","definition","definition_value",id,id,"definitional","NONE","NONE","NONE","NONE","NONE","review"]
+  let bindingData := fun row => Registry.Data.mk root #[
+    ("claims",table "claims" #[claim]),
+    ("statement-modules",table "statement-modules" #[#["LatticeSystem.Claims.Front","LatticeSystem/Claims/Front.lean","leaf"]]),
+    ("bindings",table "bindings" #[row])]
+  Registry.bindings (bindingData binding)
+  expect counter true "valid isolated binding metadata"
+  rejectMessage counter (Registry.bindings (bindingData (binding.set! 6 "ANY"))) "bad statement type OID"
+  rejectMessage counter (Registry.bindings (bindingData (binding.set! 7 "ANY"))) "bad statement value OID"
+  let vocabulary := #["VO-LS-9001","LatticeSystem.Fixture","LatticeSystem.Vocabulary.Fixture","definition","primary","NONE",id,id,"linear_algebra","none"]
+  let vocabularyData := fun row => Registry.Data.mk root #[
+    ("modules",table "modules" #[#["LatticeSystem.Vocabulary.Fixture","LatticeSystem/Vocabulary/Fixture.lean","leaf"]]),
+    ("vocabulary",table "vocabulary" #[row])]
+  Registry.vocabulary (vocabularyData vocabulary)
+  expect counter true "valid isolated vocabulary metadata"
+  rejectMessage counter (Registry.vocabulary (vocabularyData (vocabulary.set! 6 "ANY"))) "bad vocabulary type OID"
+  rejectMessage counter (Registry.vocabulary (vocabularyData (vocabulary.set! 7 "ANY"))) "bad vocabulary declaration OID"
 /-- Minimal valid synthetic receipt, independent of the actual mathematical corpus. -/
 def fixtureReceipt : Json := Json.mkObj [
   ("version", toJson version), ("run_id", toJson (7 : Nat)), ("run_attempt", toJson (2 : Nat)),
@@ -1538,6 +1589,7 @@ def selfTestData (root : System.FilePath) (count : IO.Ref Nat) : IO Unit := do
 /-- Fast negative and positive tests cover dispatch, schema, ancestry, scope and secrecy. -/
 def selfTest (root : System.FilePath) : IO Unit := do
   let count ← IO.mkRef 0
+  selfTestDiagnostics root count
   selfTestData root count
   expect count ((Json.mkObj [("z", toJson "last"), ("a", toJson "first")]).compress ==
     (Json.mkObj [("a", toJson "first"), ("z", toJson "last")]).compress) "canonical JSON key order"
