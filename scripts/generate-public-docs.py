@@ -5,6 +5,7 @@ import argparse
 import csv
 import html
 import json
+import os
 import re
 import sys
 import tempfile
@@ -1092,14 +1093,45 @@ def main(argv=None):
     mode.add_argument("--write", action="store_true")
     mode.add_argument("--check", action="store_true")
     mode.add_argument("--test", action="store_true")
-    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parent.parent)
+    mode.add_argument("--derive-source-items", action="store_true",
+                      help="read-only seed inventory for an explicitly owned external fixture")
+    parser.add_argument("--root", type=Path)
     args = parser.parse_args(argv)
     if args.test:
         suite = unittest.defaultTestLoader.loadTestsFromTestCase(GeneratorTests)
         result = unittest.TextTestRunner(verbosity=2).run(suite)
         return 0 if result.wasSuccessful() else 1
-    root = args.root.resolve()
+    project = Path(__file__).resolve().parent.parent
+    if args.derive_source_items and args.root is None:
+        parser.error("--derive-source-items requires explicit --root")
+    root = (args.root or project).resolve()
     try:
+        if args.derive_source_items:
+            owner_value = os.environ.get("LATTICE_TEST_ROOT")
+            if not owner_value:
+                raise CatalogError("seed derivation requires LATTICE_TEST_ROOT")
+            owner = Path(owner_value).resolve()
+            if (owner == Path("/") or owner == project or owner in project.parents
+                    or project in owner.parents or owner not in root.parents):
+                raise CatalogError("seed derivation requires an owned repository-external fixture")
+            tables = {
+                name: read_tsv(root / "registry" / (name + ".tsv"), HEADERS[name])
+                for name in ("claims", "pages", "sources", "tracks")
+            }
+            items, relations = derive_source_items(
+                tables["claims"], tables["pages"], tables["sources"], tables["tracks"])
+            print(json.dumps({
+                "version": 1,
+                "source_items": {
+                    "header": HEADERS["source_items"],
+                    "rows": [[row[field] for field in HEADERS["source_items"]] for row in items],
+                },
+                "item_claims": {
+                    "header": HEADERS["item_claims"],
+                    "rows": [[row[field] for field in HEADERS["item_claims"]] for row in relations],
+                },
+            }, ensure_ascii=False, sort_keys=True))
+            return 0
         data = load_registry(root)
         catalog = public_catalog(data)
         outputs = build_outputs(catalog)

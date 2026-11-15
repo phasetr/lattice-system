@@ -5,7 +5,7 @@ public meta import Checker.Semantic
 /-!
 Typed-skeleton environment dumper.
 
-The shell driver supplies the exact statement-module list and compares this
+The verification driver supplies the exact statement-module list and compares this
 semantic output with bindings, imports, dependencies, contexts, and axioms.
 -/
 

@@ -40,17 +40,23 @@ The scope of an accepted review must be read before reusing it.
 Use the same entrypoint locally and in CI:
 
 ```sh
-lake env lean -DwarningAsError=true --run Checker/CheckAll.lean --current --base origin/rewrite-main
+lake exe checker --current --base origin/rewrite-main
 ```
 
-This runs current registry, semantic, generation, transition and production-build
-checks. It explicitly leaves checker regression acceptance to CI. Use `--full`
-in place of `--current` for a complete local regression run. CI uses `--ci` to
-select regression suites from their actual inputs and verified successful-run
-evidence; changed or unverified inputs cause execution. Current-tree and actual
-transition checks and the production build always run. A duplicate local full
-suite is not required when the final published head receives its official CI
-acceptance. The required workflow/job is `rewrite-ci` / `verify`.
+This runs the current registry, semantic, generation and actual-transition
+checks through the same Lean executable used by CI. Its first invocation builds
+the checker infrastructure. Use `--full` in place of `--current` for every local
+regression group; `--current` leaves regression acceptance to CI.
+
+CI uses `--ci` to select independent regression groups from their actual reader
+inputs and verified successful-run evidence. Unknown or changed inputs run the
+affected groups. Mathematical production builds run when their own source,
+configuration or dependency inputs change; checker and documentation changes
+alone do not require that build. Required semantic imports and fixture builds
+remain separate checks. The plan prints execution, verified reuse and omitted
+work with reasons before running. A duplicate local full suite is not required
+when the final published head receives its official CI acceptance. The required
+workflow/job remains `rewrite-ci` / `verify`.
 
 Regenerate the complete public catalog with the existing generator:
 

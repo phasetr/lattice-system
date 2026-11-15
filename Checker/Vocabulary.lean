@@ -6,7 +6,7 @@ public meta import Checker.Semantic
 Vocabulary environment dumper.
 
 This checker deliberately reports kernel/environment facts instead of trying to
-recover declarations or imports from source text. The shell driver compares the
+recover declarations or imports from source text. The verification driver compares the
 resulting facts with the three vocabulary registry tables.
 -/
 
@@ -30,7 +30,7 @@ private meta def isStructureImplementationArtifact
       ".noConfusion", ".noConfusionType", ".recOn"].any fun suffix =>
         name == base ++ suffix
 
-/-- Inspect registered modules and write declaration/import facts for the shell driver. -/
+/-- Inspect registered modules and write declaration/import facts for the verification driver. -/
 private meta def dumpEnvironment (moduleListPath outputPath : String) : CommandElabM Unit := do
   let moduleText ← IO.FS.readFile moduleListPath
   let moduleNames := parseModuleList moduleText

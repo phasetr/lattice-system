@@ -103,7 +103,7 @@ corrections, successors, source-item additions and content amendments. Their
 headers and rows retain the exact previous bytes as a prefix; a later event
 appends its own contiguous positions without reopening historical ownership.
 The concrete schemas and allowed field changes are checked by
-`scripts/check-claim-corrections.sh` and `scripts/check-content-amendments.py`.
+the Lean correction checker and `scripts/check-content-amendments.py`.
 Their distinct mathematical meanings remain:
 
 | Action | Meaning and identity boundary |
@@ -204,7 +204,7 @@ A dedicated skeleton umbrella reaches every registered statement leaf; the
 production root reaches no unresolved statement. Its default Lake target must
 resolve only registered production vocabulary at the registered physical paths.
 The separate skeleton target must resolve all registered statements. Unsupported
-build hooks, providers or targets fail closed under `scripts/check-skeleton.sh`.
+build hooks, providers or targets fail closed under the Lean skeleton checker.
 
 Global warnings remain errors. A local warning exception belongs only to its
 exact registered unresolved proof stub, never a file, section or unrelated
@@ -219,14 +219,21 @@ or weakened statement is not proof progress.
 ## 7. Verification and review authority
 
 Current-tree checks, regression tests, Lean builds and source review have
-distinct scopes. Required checks run through the shared `Checker/CheckAll.lean`
-entrypoint. Current registries, generation, applicable semantic checks, the actual
-transition and production build are always fresh. Long checker regressions may
-reuse only verified successful-run evidence for identical actual inputs; unknown
-or changed inputs execute the required suites. Reuse never replaces an actual
-transition or source review. Failed, cancelled, skipped or missing selected
-verification is not success. Implementation details and negative cases live in
-the entrypoint and its built-in self-tests, not a duplicated execution specification here.
+distinct scopes. Required checks use the shared `lake exe checker` entrypoint.
+Current registries, generation, applicable semantic inspection and the actual
+transition are always fresh. Independent regression groups may reuse only
+verified successful-run evidence for identical actual reader inputs; unknown or
+changed inputs execute the required groups. A global dispatcher identity is
+separate from those input closures. Mathematical production builds depend on
+their own source, configuration and dependency inputs, not an unrelated checker
+change. Unchanged input evidence must cover the exact base and checkout;
+unknown mathematical inputs require the build. Necessary checker compilation,
+semantic imports and fixture builds are distinct work. Execution, verified reuse
+and work not required are reported separately before execution. Reuse replaces
+neither an actual transition nor source review. Failed, cancelled, skipped or
+missing selected verification is not success. Implementation details and
+negative cases live in the Lean checker and regression modules rather than a
+duplicated execution specification here.
 
 Source-claim fidelity, independent census observations, qualification strength,
 atomicity and axiom approval require independent mathematical review. A build,

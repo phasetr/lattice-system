@@ -163,24 +163,15 @@ jobs:
           path: .lake
           key: lake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lake-manifest.json') }}-${{ github.sha }}
           restore-keys: lake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lake-manifest.json') }}
-      - name: Get the existing Mathlib cache
-        shell: bash
-        run: |
-          if [ -z "${MATHLIB_CACHE_GET_URL+x}" ]; then
-            export MATHLIB_CACHE_GET_URL="https://cache.mathlib.org/mathlib4"
-          elif [ -z "$MATHLIB_CACHE_GET_URL" ]; then
-            unset MATHLIB_CACHE_GET_URL
-          fi
-          lake exe cache get
+      - name: Current-tree gates and input-bound checker regressions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: lake exe checker --ci
       - uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # same v5 used by lean-action
         if: ${{ success() && steps.cache-restore.outputs.cache-hit != 'true' }}
         with:
           path: .lake
           key: lake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lake-manifest.json') }}-${{ github.sha }}
-      - name: Current-tree gates and input-bound checker regressions
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: lake env lean -DwarningAsError=true --run Checker/CheckAll.lean --ci
       - name: Remove job-local toolchain files
         if: ${{ always() }}
         shell: bash

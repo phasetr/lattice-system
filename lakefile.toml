@@ -16,3 +16,11 @@ rev = "v4.29.0"
 
 [[lean_lib]]
 name = "LatticeSystem"
+
+# Verification infrastructure is an explicit target, separate from the mathematical default.
+[[lean_lib]]
+name = "Checker"
+
+[[lean_exe]]
+name = "checker"
+root = "Checker.Main"
