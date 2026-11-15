@@ -283,9 +283,26 @@ status, vocabulary, axioms, and links without publishing private source data.
 ## Local checks
 
 ```sh
-scripts/check-all.sh
-lake build
+python3 scripts/check-selected.py --current --base origin/rewrite-main
 ```
+
+This local command runs the actual current registry, generation, semantic,
+base-diff and production-build gates. It reports partial regression coverage;
+the required `verify` job completes checker regression acceptance at the
+published PR head. Run `python3 scripts/check-selected.py --full` when a complete
+local run is wanted; `scripts/check-all.sh`
+remains the full checker entrypoint without the production build. A local full
+run is not additionally required when the final PR receives the official full
+hosted run.
+
+The workflow runs for PRs targeting `rewrite-main` and pushes to `rewrite-main`,
+not feature pushes. `verify` always checks the current tree and actual transition,
+and builds production. Long checker suites run when their inputs change or
+accepted evidence is unavailable. Only exact input matches from a successful
+`rewrite-ci` `verify` job can be reused; the log identifies each executed or
+reused suite. A changed checker or workflow requires new PR regressions. Its
+postmerge tree may reuse that successful PR result while checking the actual
+production transition afresh. See DESIGN §3 for the input boundary.
 
 These commands use the already pinned toolchain and dependencies. They enforce
 the frozen census shape but cannot independently establish that human readers

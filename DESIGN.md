@@ -170,7 +170,62 @@ There is no `LatticeSystem/` source directory during R1 or R2.
 There is no tracked `tex/` or `formalization-status/` directory. The tracked
 `docs/` tree is generated public registry output and is drift-checked in CI.
 There is no compatibility shim or archived source subtree.
-There is one CI workflow for the rewrite.
+There is one CI workflow for the rewrite. Its required job remains `verify`,
+without workflow-level path skipping or conditional job success. It runs on PRs
+targeting `rewrite-main` and production pushes, avoiding duplicate feature-push
+runs. The branch protection and exact user merge gate are unchanged.
+
+`check-selected.py` is the shared local/CI entrypoint. Its current-tree lane
+runs all structural registry, source-item, policy, generator test/drift and
+applicable vocabulary/skeleton semantic gates, the actual base-diff selector,
+and `lake build`. These gates are fresh on every run. A production push binds
+its event `before` and `after` to the actual single-parent checkout; a PR binds
+base, source head and synthetic merge checkout separately. The current trunk
+ref is never used as the production push comparison base. The selector runs
+once, including its exact correction-event ownership check.
+
+Checker mutation suites have two conservative input signatures. All signatures
+include executable/configuration Git objects (all tracked files except registry,
+generated docs and the policy documents), tracked path/type/mode inventory,
+registry headers, runner image/OS/architecture and tool versions. README, DESIGN
+and PR-template inputs are exactly the presence of `exact PR` and `exact head SHA`,
+plus the template's unchecked/checked USER ONLY predicates, as read by
+`check-policy.sh`; changing that reader changes the executable signature.
+The synthetic skeleton suite replaces registry bodies with its own minimal
+fixture (`test-skeleton-semantic.sh`, composed production fixture). The selector
+suite owns its temporary history. Their signatures therefore exclude current
+corpus bodies and generated output bytes. The checkers, corrections and content
+suites copy current registry bodies, so their signatures additionally bind all
+registry objects and available immutable historical fixture registry objects.
+They run again when that corpus changes. No runtime fixture input is inferred
+from the directory containing its test alone.
+
+An added/deleted/renamed/type/mode/unknown path, a registry header or semantic
+infrastructure change, an empty diff or an unavailable input makes PR regression
+selection full. Ordinary edits to known corpus tables or documentation can
+reuse only suites with matching signatures. Missing or invalid base/checkout
+identity fails the job; unavailable or unmatched evidence runs the suites.
+CI forbids fixture/executable override environment variables. No receipt or
+skip result substitutes for current-data checks or source review.
+
+Reuse requires one versioned receipt in a completed successful `rewrite-ci`
+`verify` job from this repository and workflow, exact run attempt/job identity,
+verified checkout commit/parents/tree, independently checked executable tree,
+and equal suite/environment inputs. PR candidates come from the exact accepted
+base push. Postmerge candidates come from the exact merged PR, with matching
+production tree and event-before base, even when the new engine differs from
+that base. This avoids repeating the same newly tested engine after merge.
+Each reused suite names its original executed run/attempt/job, revalidated
+directly; recursive receipt chains are not accepted. API/parse/identity/evidence
+failure falls back to execution, never a successful skipped required job.
+The actual transition is always checked freshly; immutable historical fixtures
+are signature inputs, distinct from that transition.
+
+Local `--current` reports that checker regression acceptance remains required
+in CI. The final published revision receives the selected official hosted run;
+engine changes receive the full suite there, without a mandatory duplicate
+local full suite. `--full` and `check-all.sh` retain complete local regression
+execution. Fast classifier/evidence/failure counterfactuals run in both routes.
 The root README reports current facts only.
 Fixture data is test input, never project status.
 
@@ -879,8 +934,8 @@ they remain subject to the semantic vocabulary gate and contain no source-claim
 theorem, `sorry`, `admit`, `native_decide`, or axiom.
 A later lifecycle never disables that source's frozen identity, counts,
 census OID, active-state, source-order, page-coupling, or two-pass census
-invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,242 active
-claims, 3,216 formalization targets, and 1,392 distinct source-label/page pairs
+invariants. For `TASAKI2020`, those frozen counts are 534 pages, 3,250 active
+claims, 3,224 formalization targets, and 1,392 distinct source-label/page pairs
 among active claims with subkind `equation`. The census-capability requirement
 that slices, source-claim dependencies,
 bindings, contexts, axioms, claim-to-axiom relations, statement modules, and
