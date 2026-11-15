@@ -123,6 +123,11 @@ question remains tracked in
 [Issue #5553](https://github.com/phasetr/lattice-system/issues/5553).
 These events do not certify the whole XXZ unit, mathematical truth, printed
 proofs, whole-source fidelity, or R4 readiness.
+An order-parameter comparison context event repairs the existing equation
+record with its standing model and ground-state setting, long-range-order
+lower-bound witness, transverse high-moment parameter, and local limiting
+qualification. It preserves the claim identity, classification, source item and
+census counts; the seven XXZ omission bodies remain unchanged.
 These bounded registry corrections do not certify printed proofs,
 whole-source fidelity, or R4 readiness.
 
