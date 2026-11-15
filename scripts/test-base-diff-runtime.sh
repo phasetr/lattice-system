@@ -4,12 +4,19 @@ set -euo pipefail
 SCRIPT_DIR=${BASH_SOURCE[0]%/*}
 [[ "$SCRIPT_DIR" == "${BASH_SOURCE[0]}" ]] && SCRIPT_DIR=.
 PROJECT_ROOT=${1:-$(cd "$SCRIPT_DIR/.." && pwd)}
+CHECK_PROJECT=$(cd -P "$SCRIPT_DIR/.." && pwd)
+CHECK_ALL=(env "ELAN_TOOLCHAIN=$(<"$CHECK_PROJECT/lean-toolchain")" "LATTICE_CHECK_ALL_PROJECT=$CHECK_PROJECT"
+  lake -d "$CHECK_PROJECT" env lean -DwarningAsError=true --run "$CHECK_PROJECT/Checker/CheckAll.lean" --gate)
+if [[ -n ${LATTICE_CHECK_ALL_EXEC:-} ]]; then
+  CHECK_ALL=(env "LATTICE_CHECK_ALL_PROJECT=$CHECK_PROJECT" "$LATTICE_CHECK_ALL_EXEC" --gate)
+fi
+
 PROJECT_ROOT=$(cd "$PROJECT_ROOT" && pwd)
 TMP=$(mktemp -d "${TMPDIR:-/tmp}/lattice-system-tests.base-diff.XXXXXX")
 trap 'rm -rf "$TMP"' EXIT
 export LATTICE_TEST_ROOT=$TMP
 
-CHECK_REGISTRY="$PROJECT_ROOT/scripts/check-registry.sh"
+CHECK_REGISTRY=("${CHECK_ALL[@]}" registry)
 CHECK_BASE_DIFF="$PROJECT_ROOT/scripts/check-base-diff.sh"
 CASES="$TMP/base-diff"
 mkdir -p "$CASES" "$TMP/production"
@@ -251,17 +258,17 @@ clone_production "$CASES/review-ref-arbitrary"
 rewrite "$CASES/review-ref-arbitrary/registry/claim-vocabulary-review.tsv" \
   'NR==2 {$3="ARBITRARY-REVIEW-REF"} {print}'
 
-expect_pass base-snapshot-registry "$CHECK_REGISTRY" "$BASE"
-expect_pass good-snapshot-registry "$CHECK_REGISTRY" "$GOOD"
-expect_pass supersession-snapshot-registry "$CHECK_REGISTRY" "$SUPER_GOOD"
-expect_pass claim-oid-base-snapshot-registry "$CHECK_REGISTRY" "$CLAIM_OID_BASE"
-expect_pass claim-oid-good-snapshot-registry "$CHECK_REGISTRY" "$CLAIM_OID_GOOD"
-expect_pass lifecycle-base-snapshot-registry "$CHECK_REGISTRY" "$LIFECYCLE_BASE"
-expect_pass lifecycle-good-snapshot-registry "$CHECK_REGISTRY" "$LIFECYCLE_GOOD"
-expect_pass vocabulary-base-snapshot-registry "$CHECK_REGISTRY" "$VOCABULARY_BASE"
-expect_pass vocabulary-good-snapshot-registry "$CHECK_REGISTRY" "$VOCABULARY_GOOD"
+expect_pass base-snapshot-registry "${CHECK_REGISTRY[@]}" "$BASE"
+expect_pass good-snapshot-registry "${CHECK_REGISTRY[@]}" "$GOOD"
+expect_pass supersession-snapshot-registry "${CHECK_REGISTRY[@]}" "$SUPER_GOOD"
+expect_pass claim-oid-base-snapshot-registry "${CHECK_REGISTRY[@]}" "$CLAIM_OID_BASE"
+expect_pass claim-oid-good-snapshot-registry "${CHECK_REGISTRY[@]}" "$CLAIM_OID_GOOD"
+expect_pass lifecycle-base-snapshot-registry "${CHECK_REGISTRY[@]}" "$LIFECYCLE_BASE"
+expect_pass lifecycle-good-snapshot-registry "${CHECK_REGISTRY[@]}" "$LIFECYCLE_GOOD"
+expect_pass vocabulary-base-snapshot-registry "${CHECK_REGISTRY[@]}" "$VOCABULARY_BASE"
+expect_pass vocabulary-good-snapshot-registry "${CHECK_REGISTRY[@]}" "$VOCABULARY_GOOD"
 expect_pass vocabulary-type-regression-snapshot-registry \
-  "$CHECK_REGISTRY" "$CASES/vocabulary-type-regression"
+  "${CHECK_REGISTRY[@]}" "$CASES/vocabulary-type-regression"
 
 expect_pass base-good "$CHECK_BASE_DIFF" --fixture-dirs "$BASE" "$GOOD"
 expect_fail historical-fake-edge --diagnostic "correction ledger" \

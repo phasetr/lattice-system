@@ -16,7 +16,7 @@ byte-preserved `lean-toolchain` and `lake-manifest.json` pins. The package name
 and declared Mathlib revision remain fixed unless a dependency change is
 explicitly authorized.
 
-The tracked tree is closed by `scripts/check-tree.sh`. Runtime fixtures belong
+The tracked tree is closed by `Checker/CheckAll.lean`. Runtime fixtures belong
 only in isolated system temporary roots; they are test inputs, not project
 status. Public `docs/` are generated exclusively by
 `scripts/generate-public-docs.py` from registered metadata. They omit private

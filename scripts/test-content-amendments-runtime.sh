@@ -22,6 +22,16 @@ import sys
 import tempfile
 
 project = Path(sys.argv[1]).resolve()
+
+def data_gate(name):
+    executable = os.environ.get('LATTICE_CHECK_ALL_EXEC')
+    prefix = ['env', 'LATTICE_CHECK_ALL_PROJECT=' + str(project)]
+    if executable:
+        return prefix + [executable, '--gate', name]
+    return prefix + ['ELAN_TOOLCHAIN=' + (project / 'lean-toolchain').read_text().strip(),
+                     'lake', '-d', str(project), 'env', 'lean', '-DwarningAsError=true',
+                     '--run', str(project / 'Checker/CheckAll.lean'), '--gate', name]
+
 header = ['amendment_id', 'event_id', 'correction_id', 'claim_id',
           'old_content_oid', 'new_content_oid', 'page_source_oid', 'review_ref']
 claim = 'CL-TASAKI2020-0001'
@@ -369,7 +379,7 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     transition('two-omissions-one-named-item', base, grouped)
 
     static('pending-old-static', current)
-    expect('pending-old-registry', True, [str(project / 'scripts/check-registry.sh'), str(current)])
+    expect('pending-old-registry', True, [*data_gate('registry'), str(current)])
     base_diff('pending-old-dedicated-diff', base, current, event_id=event)
     base_diff('ordinary-content-change-rejected', base, current, False)
     base_diff('later-ordinary-after-event', current, current)
@@ -553,8 +563,8 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     # the same reviewed event and immutable-history boundaries as amendments.
     omission_start = count - 1
     static('omitted-claim-static', omitted)
-    expect('omitted-claim-registry', True, [str(project / 'scripts/check-registry.sh'), str(omitted)])
-    expect('omitted-claim-item-contract', True, [str(project / 'scripts/check-source-items.sh'), str(omitted)])
+    expect('omitted-claim-registry', True, [*data_gate('registry'), str(omitted)])
+    expect('omitted-claim-item-contract', True, [*data_gate('source-items'), str(omitted)])
     base_diff('omitted-claim-dedicated-route', base, omitted, event_id=omission_event)
     base_diff('omitted-claim-ordinary-rejected', base, omitted, False, diagnostic='frozen invariants regression')
     base_diff('omitted-claim-later-ordinary-freeze', omitted, omitted)
@@ -563,7 +573,7 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
     prepare_omission(base, existing_item, new_item=False)
     transition('omitted-claim-existing-item', base, existing_item)
     expect('omitted-existing-item-contract', True,
-           [str(project / 'scripts/check-source-items.sh'), str(existing_item)])
+           [*data_gate('source-items'), str(existing_item)])
 
     mixed = case('mixed-addition-amendment', omitted)
     nr = unused_id(mixed, 'claim-normalization-reviews.tsv', 'NR-RUNTIME')
@@ -1755,8 +1765,8 @@ with tempfile.TemporaryDirectory(prefix='lattice-content-amendments.') as tempor
                 'B':[base_checker,'--correction-event',event_id,'--fixture-dirs',str(before),str(after)],
                 'O':[base_checker,'--fixture-dirs',str(before),str(after)],
                 'E':[base_checker,'--correction-event',event_id,'--fixture-dirs',str(before),str(after)],
-                'C':[str(project/'scripts/check-registry.sh'),str(after)],
-                'I':[str(project/'scripts/check-source-items.sh'),str(after)]}
+                'C':[*data_gate('registry'),str(after)],
+                'I':[*data_gate('source-items'),str(after)]}
             expect(label,expected,commands[route],diagnostic)
     assert (count-combined_start[0],accepted-combined_start[1],rejected-combined_start[2]) == (212,58,154)
     print('test-content-amendments-runtime: combined cases 212 (58 positive, 154 rejection; 3 real selector positive chains)')

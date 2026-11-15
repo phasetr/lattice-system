@@ -4,6 +4,13 @@ set -euo pipefail
 SCRIPT_DIR=${BASH_SOURCE[0]%/*}
 [[ "$SCRIPT_DIR" == "${BASH_SOURCE[0]}" ]] && SCRIPT_DIR=.
 PROJECT_ROOT=${1:-$(cd "$SCRIPT_DIR/.." && pwd)}
+CHECK_PROJECT=$(cd -P "$SCRIPT_DIR/.." && pwd)
+CHECK_ALL=(env "ELAN_TOOLCHAIN=$(<"$CHECK_PROJECT/lean-toolchain")" "LATTICE_CHECK_ALL_PROJECT=$CHECK_PROJECT"
+  lake -d "$CHECK_PROJECT" env lean -DwarningAsError=true --run "$CHECK_PROJECT/Checker/CheckAll.lean" --gate)
+if [[ -n ${LATTICE_CHECK_ALL_EXEC:-} ]]; then
+  CHECK_ALL=(env "LATTICE_CHECK_ALL_PROJECT=$CHECK_PROJECT" "$LATTICE_CHECK_ALL_EXEC" --gate)
+fi
+
 PROJECT_ROOT=$(cd "$PROJECT_ROOT" && pwd)
 TMP=$(mktemp -d "${TMPDIR:-/tmp}/lattice-system-tests.checkers.XXXXXX")
 trap 'rm -rf "$TMP"' EXIT
@@ -63,7 +70,7 @@ make_legacy_base() {
 clone_case() { local from=$1 to=$2; mkdir -p "$(dirname "$to")"; cp -R "$from" "$to"; }
 
 GOOD="$ROOT/fixtures/registry-good"
-"$PROJECT_ROOT/scripts/check-registry.sh" "$TMP/production" >/dev/null
+"${CHECK_ALL[@]}" registry "$TMP/production" >/dev/null
 make_legacy_base "$GOOD"
 
 THREE="$TMP/legacy-three"
@@ -253,134 +260,134 @@ expect_fail() {
   fi
 }
 
-expect_pass registry-good "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-good"
-expect_fail duplicate-id "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-duplicate-id"
-expect_fail bad-foreign-key "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-bad-fk"
-expect_fail bad-enum "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-bad-enum"
-expect_fail bad-order "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-bad-order"
-expect_fail bad-header "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-bad-header"
-expect_fail bad-column "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-bad-column"
-expect_fail control-character "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-control-char"
-expect_fail bad-id "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-bad-id"
-expect_fail missing-page-coordinate "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-page-missing-coordinate"
-expect_fail slice-duplicate "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-slice-duplicate"
-expect_fail slice-position "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-slice-position"
-expect_fail dependency-role "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-dep-bad-role"
-expect_fail dependency-order "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-dep-order"
-expect_fail dependency-cycle "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-dep-cycle"
-expect_fail dependency-self "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-dep-self"
-expect_fail dependency-duplicate "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-dep-duplicate"
-expect_fail dependency-rationale "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-dep-rationale"
-expect_fail fk-slice "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-fk-slice"
-expect_fail fk-dependency "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-fk-dependency"
-expect_fail fk-binding "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-fk-binding"
-expect_fail fk-claim-axiom-claim "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-fk-claim-axiom-claim"
-expect_fail fk-claim-axiom-axiom "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-fk-claim-axiom-axiom"
-expect_pass supersession-registry-good "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-supersession-good"
-expect_fail supersession-self "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-supersession-self"
-expect_fail supersession-cycle "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-supersession-cycle"
-expect_fail supersession-incoherent "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-supersession-incoherent"
-expect_fail supersession-missing-rationale "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-supersession-missing-rationale"
-expect_fail supersession-missing-review "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-supersession-missing-review"
-expect_pass exclusion-good "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-exclusion-good"
-expect_fail binding-out-of-scope --diagnostic "out-of-scope claim has a binding" "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-binding-out-of-scope"
-expect_fail exclusion-missing-rationale "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-exclusion-missing-rationale"
-expect_fail exclusion-missing-review "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-exclusion-missing-review"
-expect_fail exclusion-incoherent "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-exclusion-incoherent"
-expect_fail required-by-whitespace "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-dep-whitespace"
-expect_fail required-by-em-whitespace "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-dep-whitespace-em"
-expect_pass remark-good "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-remark-good"
-expect_fail bad-subkind "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-bad-subkind"
-expect_fail axiom-bad-category "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-axiom-bad-category"
-expect_fail axiom-bad-path "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-axiom-bad-path"
-expect_pass axiom-categories-good "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-axiom-categories-good"
-expect_fail source-missing "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-source-missing"
-expect_fail source-duplicate "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-source-duplicate"
-expect_fail source-bad-identity "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-source-bad-identity"
-expect_fail post-source-missing "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-post-source-missing"
-expect_fail post-source-alternate "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-post-source-alternate"
-expect_fail bootstrap-pending-edition "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-bootstrap-edition-pending"
-expect_pass bootstrap-source-frozen "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-bootstrap-source-frozen"
+expect_pass registry-good "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-good"
+expect_fail duplicate-id "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-duplicate-id"
+expect_fail bad-foreign-key "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-bad-fk"
+expect_fail bad-enum "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-bad-enum"
+expect_fail bad-order "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-bad-order"
+expect_fail bad-header "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-bad-header"
+expect_fail bad-column "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-bad-column"
+expect_fail control-character "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-control-char"
+expect_fail bad-id "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-bad-id"
+expect_fail missing-page-coordinate "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-page-missing-coordinate"
+expect_fail slice-duplicate "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-slice-duplicate"
+expect_fail slice-position "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-slice-position"
+expect_fail dependency-role "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-dep-bad-role"
+expect_fail dependency-order "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-dep-order"
+expect_fail dependency-cycle "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-dep-cycle"
+expect_fail dependency-self "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-dep-self"
+expect_fail dependency-duplicate "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-dep-duplicate"
+expect_fail dependency-rationale "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-dep-rationale"
+expect_fail fk-slice "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-fk-slice"
+expect_fail fk-dependency "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-fk-dependency"
+expect_fail fk-binding "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-fk-binding"
+expect_fail fk-claim-axiom-claim "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-fk-claim-axiom-claim"
+expect_fail fk-claim-axiom-axiom "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-fk-claim-axiom-axiom"
+expect_pass supersession-registry-good "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-supersession-good"
+expect_fail supersession-self "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-supersession-self"
+expect_fail supersession-cycle "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-supersession-cycle"
+expect_fail supersession-incoherent "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-supersession-incoherent"
+expect_fail supersession-missing-rationale "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-supersession-missing-rationale"
+expect_fail supersession-missing-review "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-supersession-missing-review"
+expect_pass exclusion-good "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-exclusion-good"
+expect_fail binding-out-of-scope --diagnostic "out-of-scope claim has a binding" "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-binding-out-of-scope"
+expect_fail exclusion-missing-rationale "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-exclusion-missing-rationale"
+expect_fail exclusion-missing-review "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-exclusion-missing-review"
+expect_fail exclusion-incoherent "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-exclusion-incoherent"
+expect_fail required-by-whitespace "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-dep-whitespace"
+expect_fail required-by-em-whitespace "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-dep-whitespace-em"
+expect_pass remark-good "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-remark-good"
+expect_fail bad-subkind "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-bad-subkind"
+expect_fail axiom-bad-category "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-axiom-bad-category"
+expect_fail axiom-bad-path "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-axiom-bad-path"
+expect_pass axiom-categories-good "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-axiom-categories-good"
+expect_fail source-missing "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-source-missing"
+expect_fail source-duplicate "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-source-duplicate"
+expect_fail source-bad-identity "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-source-bad-identity"
+expect_fail post-source-missing "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-post-source-missing"
+expect_fail post-source-alternate "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-post-source-alternate"
+expect_fail bootstrap-pending-edition "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-bootstrap-edition-pending"
+expect_pass bootstrap-source-frozen "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-bootstrap-source-frozen"
 for spec in "${BOOTSTRAP_ROWS[@]}"; do
   table=${spec%%:*}
   expect_fail "bootstrap-$table" --diagnostic "bootstrap requires header-only $table.tsv" \
-    "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-bootstrap-$table"
+    "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-bootstrap-$table"
 done
-expect_fail post-pending-edition "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-post-edition-pending"
-expect_pass skeleton-frozen-oids "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-skeleton-frozen"
+expect_fail post-pending-edition "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-post-edition-pending"
+expect_pass skeleton-frozen-oids "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-skeleton-frozen"
 for column in type value proof nonvacuity; do
   expect_fail "skeleton-pending-$column" --diagnostic "skeleton capability forbids pending binding OIDs" \
-    "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-skeleton-pending-$column"
+    "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-skeleton-pending-$column"
 done
 expect_fail skeleton-pending-axiom --diagnostic "skeleton capability forbids pending axiom OIDs" \
-  "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-skeleton-pending-axiom"
+  "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-skeleton-pending-axiom"
 expect_fail skeleton-bad-axiom-oid --diagnostic "bad axiom type OID" \
-  "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-skeleton-bad-axiom-oid"
-expect_fail source-mixed-oid-width "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-source-mixed-width"
+  "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-skeleton-bad-axiom-oid"
+expect_fail source-mixed-oid-width "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-source-mixed-width"
 "$PROJECT_ROOT/scripts/test-tree-policy.sh" "$PROJECT_ROOT"
 census_source_diagnostic="check-census: fixture source is not verified and frozen"
 census_page_diagnostic="check-census: page census is not exact, contiguous, two-pass complete, and source-frozen"
 census_claim_diagnostic="check-census: claim count, active state, source order, page coupling, or equation label/page pairs are not exact"
 
-expect_pass census-complete-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-good"
-expect_pass census-complete "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-good" 2 2 1
-expect_fail census-page-count --diagnostic "$census_page_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-good" 3 2 1
-expect_fail census-equation-count --diagnostic "$census_claim_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-good" 2 2 2
-expect_fail census-source-identity --diagnostic "$census_source_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-source-identity" 2 2 1
-expect_fail census-source-bad-header --diagnostic "$census_source_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-source-bad-header" 2 2 1
-expect_fail census-source-header-only --diagnostic "$census_source_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-source-header-only" 2 2 1
-expect_fail census-source-extra-row --diagnostic "$census_source_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-source-extra-row" 2 2 1
-expect_fail census-source-malformed-column --diagnostic "$census_source_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-source-malformed-column" 2 2 1
-expect_fail census-source-reserved-edition --diagnostic "$census_source_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-source-reserved-edition" 2 2 1
-expect_pass census-claim-count-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-claim-count"
-expect_fail census-claim-count --diagnostic "$census_claim_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-claim-count" 2 2 1
-expect_pass census-claim-inactive-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-claim-inactive"
-expect_fail census-claim-inactive --diagnostic "$census_claim_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-claim-inactive" 2 3 1
-expect_fail census-claim-superseded --diagnostic "$census_claim_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-claim-superseded" 2 2 1
-expect_pass census-equation-duplicate-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-equation-duplicate"
-expect_fail census-equation-duplicate --diagnostic "$census_claim_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-equation-duplicate" 2 3 2
-expect_pass census-claims-empty-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-claims-empty"
-expect_fail census-claims-empty --diagnostic "$census_claim_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-claims-empty" 2 0 0
-expect_pass census-skeleton-slices-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-skeleton-slices"
-expect_fail census-skeleton-slices --diagnostic "check-census: census requires header-only slices.tsv" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-skeleton-slices" 2 2 1
-expect_pass census-skeleton-dependencies-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-skeleton-dependencies"
-expect_fail census-skeleton-dependencies --diagnostic "check-census: census requires header-only dependencies.tsv" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-skeleton-dependencies" 2 2 1
-expect_pass census-skeleton-bindings-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-skeleton-bindings"
-expect_fail census-skeleton-bindings --diagnostic "check-census: census requires header-only bindings.tsv" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-skeleton-bindings" 2 2 1
-expect_pass census-skeleton-axioms-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-skeleton-axioms"
-expect_fail census-skeleton-axioms --diagnostic "check-census: census requires header-only axioms.tsv" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-skeleton-axioms" 2 2 1
-expect_pass census-skeleton-statement-modules-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-skeleton-statement-modules"
-expect_fail census-skeleton-statement-modules --diagnostic "check-census: census requires header-only statement-modules.tsv" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-skeleton-statement-modules" 2 2 1
+expect_pass census-complete-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-good"
+expect_pass census-complete "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-good" 2 2 1
+expect_fail census-page-count --diagnostic "$census_page_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-good" 3 2 1
+expect_fail census-equation-count --diagnostic "$census_claim_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-good" 2 2 2
+expect_fail census-source-identity --diagnostic "$census_source_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-source-identity" 2 2 1
+expect_fail census-source-bad-header --diagnostic "$census_source_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-source-bad-header" 2 2 1
+expect_fail census-source-header-only --diagnostic "$census_source_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-source-header-only" 2 2 1
+expect_fail census-source-extra-row --diagnostic "$census_source_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-source-extra-row" 2 2 1
+expect_fail census-source-malformed-column --diagnostic "$census_source_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-source-malformed-column" 2 2 1
+expect_fail census-source-reserved-edition --diagnostic "$census_source_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-source-reserved-edition" 2 2 1
+expect_pass census-claim-count-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-claim-count"
+expect_fail census-claim-count --diagnostic "$census_claim_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-claim-count" 2 2 1
+expect_pass census-claim-inactive-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-claim-inactive"
+expect_fail census-claim-inactive --diagnostic "$census_claim_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-claim-inactive" 2 3 1
+expect_fail census-claim-superseded --diagnostic "$census_claim_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-claim-superseded" 2 2 1
+expect_pass census-equation-duplicate-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-equation-duplicate"
+expect_fail census-equation-duplicate --diagnostic "$census_claim_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-equation-duplicate" 2 3 2
+expect_pass census-claims-empty-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-claims-empty"
+expect_fail census-claims-empty --diagnostic "$census_claim_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-claims-empty" 2 0 0
+expect_pass census-skeleton-slices-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-skeleton-slices"
+expect_fail census-skeleton-slices --diagnostic "check-census: census requires header-only slices.tsv" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-skeleton-slices" 2 2 1
+expect_pass census-skeleton-dependencies-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-skeleton-dependencies"
+expect_fail census-skeleton-dependencies --diagnostic "check-census: census requires header-only dependencies.tsv" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-skeleton-dependencies" 2 2 1
+expect_pass census-skeleton-bindings-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-skeleton-bindings"
+expect_fail census-skeleton-bindings --diagnostic "check-census: census requires header-only bindings.tsv" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-skeleton-bindings" 2 2 1
+expect_pass census-skeleton-axioms-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-skeleton-axioms"
+expect_fail census-skeleton-axioms --diagnostic "check-census: census requires header-only axioms.tsv" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-skeleton-axioms" 2 2 1
+expect_pass census-skeleton-statement-modules-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-skeleton-statement-modules"
+expect_fail census-skeleton-statement-modules --diagnostic "check-census: census requires header-only statement-modules.tsv" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-skeleton-statement-modules" 2 2 1
 # A schema-valid claim-axiom relation necessarily carries its referenced axiom,
 # so the census gate reports the earlier axioms table first. The paired
 # diagnostic-only fixture omits that axiom solely to exercise the later
 # claim-axioms diagnostic; it cannot pass registry FK validation by design.
-expect_pass census-skeleton-claim-axioms-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-skeleton-claim-axioms"
-expect_fail census-skeleton-claim-axioms-coupled --diagnostic "check-census: census requires header-only axioms.tsv" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-skeleton-claim-axioms" 2 2 1
-expect_fail census-skeleton-claim-axioms-diagnostic --diagnostic "check-census: census requires header-only claim-axioms.tsv" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-skeleton-claim-axioms-diagnostic" 2 2 1
-expect_pass census-page-id-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-page-id"
-expect_fail census-page-id --diagnostic "$census_page_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-page-id" 2 2 1
-expect_fail census-page-source --diagnostic "$census_page_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-page-source" 2 2 1
-expect_pass census-page-order-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-page-order"
-expect_fail census-page-order --diagnostic "$census_page_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-page-order" 2 2 1
-expect_pass census-page-pdf-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-page-pdf"
-expect_fail census-page-pdf --diagnostic "$census_page_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-page-pdf" 2 2 1
-expect_fail census-page-printed --diagnostic "$census_page_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-page-printed" 2 2 1
-expect_fail census-page-section --diagnostic "$census_page_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-page-section" 2 2 1
-expect_fail census-page-kind --diagnostic "$census_page_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-page-kind" 2 2 1
-expect_pass census-page-pass1-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-page-pass1"
-expect_fail census-page-pass1 --diagnostic "$census_page_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-page-pass1" 2 2 1
-expect_pass census-page-pass2-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-page-pass2"
-expect_fail census-page-pass2 --diagnostic "$census_page_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-page-pass2" 2 2 1
-expect_fail census-page-oid --diagnostic "$census_page_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-page-oid" 2 2 1
-expect_fail census-claim-source --diagnostic "$census_claim_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-claim-source" 2 2 1
-expect_fail census-claim-locator --diagnostic "$census_claim_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-claim-locator" 2 2 1
-expect_fail census-claim-content --diagnostic "$census_claim_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-claim-content" 2 2 1
-expect_pass census-claim-page-order-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-claim-page-order"
-expect_fail census-claim-page-order --diagnostic "$census_claim_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-claim-page-order" 2 2 1
-expect_fail census-claim-source-order --diagnostic "$census_claim_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-claim-source-order" 2 2 1
-expect_pass census-equation-label-registry "$ROOT/scripts/check-registry.sh" "$ROOT/fixtures/registry-census-equation-label"
-expect_fail census-equation-label --diagnostic "$census_claim_diagnostic" "$ROOT/scripts/check-census.sh" --fixture "$ROOT/fixtures/registry-census-equation-label" 2 2 1
+expect_pass census-skeleton-claim-axioms-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-skeleton-claim-axioms"
+expect_fail census-skeleton-claim-axioms-coupled --diagnostic "check-census: census requires header-only axioms.tsv" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-skeleton-claim-axioms" 2 2 1
+expect_fail census-skeleton-claim-axioms-diagnostic --diagnostic "check-census: census requires header-only claim-axioms.tsv" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-skeleton-claim-axioms-diagnostic" 2 2 1
+expect_pass census-page-id-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-page-id"
+expect_fail census-page-id --diagnostic "$census_page_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-page-id" 2 2 1
+expect_fail census-page-source --diagnostic "$census_page_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-page-source" 2 2 1
+expect_pass census-page-order-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-page-order"
+expect_fail census-page-order --diagnostic "$census_page_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-page-order" 2 2 1
+expect_pass census-page-pdf-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-page-pdf"
+expect_fail census-page-pdf --diagnostic "$census_page_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-page-pdf" 2 2 1
+expect_fail census-page-printed --diagnostic "$census_page_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-page-printed" 2 2 1
+expect_fail census-page-section --diagnostic "$census_page_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-page-section" 2 2 1
+expect_fail census-page-kind --diagnostic "$census_page_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-page-kind" 2 2 1
+expect_pass census-page-pass1-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-page-pass1"
+expect_fail census-page-pass1 --diagnostic "$census_page_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-page-pass1" 2 2 1
+expect_pass census-page-pass2-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-page-pass2"
+expect_fail census-page-pass2 --diagnostic "$census_page_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-page-pass2" 2 2 1
+expect_fail census-page-oid --diagnostic "$census_page_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-page-oid" 2 2 1
+expect_fail census-claim-source --diagnostic "$census_claim_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-claim-source" 2 2 1
+expect_fail census-claim-locator --diagnostic "$census_claim_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-claim-locator" 2 2 1
+expect_fail census-claim-content --diagnostic "$census_claim_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-claim-content" 2 2 1
+expect_pass census-claim-page-order-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-claim-page-order"
+expect_fail census-claim-page-order --diagnostic "$census_claim_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-claim-page-order" 2 2 1
+expect_fail census-claim-source-order --diagnostic "$census_claim_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-claim-source-order" 2 2 1
+expect_pass census-equation-label-registry "${CHECK_ALL[@]}" registry "$ROOT/fixtures/registry-census-equation-label"
+expect_fail census-equation-label --diagnostic "$census_claim_diagnostic" "${CHECK_ALL[@]}" census --fixture "$ROOT/fixtures/registry-census-equation-label" 2 2 1
 "$PROJECT_ROOT/scripts/test-vocabulary-registry.sh" "$PROJECT_ROOT"
 "$PROJECT_ROOT/scripts/test-vocabulary-semantic.sh" "$PROJECT_ROOT"
 "$PROJECT_ROOT/scripts/test-base-diff-runtime.sh" "$PROJECT_ROOT"

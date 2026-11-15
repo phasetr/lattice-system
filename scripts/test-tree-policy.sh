@@ -4,6 +4,13 @@ set -euo pipefail
 SCRIPT_DIR=${BASH_SOURCE[0]%/*}
 [[ "$SCRIPT_DIR" == "${BASH_SOURCE[0]}" ]] && SCRIPT_DIR=.
 PROJECT_ROOT=${1:-$(cd "$SCRIPT_DIR/.." && pwd)}
+CHECK_PROJECT=$(cd -P "$SCRIPT_DIR/.." && pwd)
+CHECK_ALL=(env "ELAN_TOOLCHAIN=$(<"$CHECK_PROJECT/lean-toolchain")" "LATTICE_CHECK_ALL_PROJECT=$CHECK_PROJECT"
+  lake -d "$CHECK_PROJECT" env lean -DwarningAsError=true --run "$CHECK_PROJECT/Checker/CheckAll.lean" --gate)
+if [[ -n ${LATTICE_CHECK_ALL_EXEC:-} ]]; then
+  CHECK_ALL=(env "LATTICE_CHECK_ALL_PROJECT=$CHECK_PROJECT" "$LATTICE_CHECK_ALL_EXEC" --gate)
+fi
+
 PROJECT_ROOT=$(cd "$PROJECT_ROOT" && pwd)
 TMP=$(mktemp -d "${TMPDIR:-/tmp}/lattice-system-tests.tree-policy.XXXXXX")
 trap 'rm -rf "$TMP"' EXIT
@@ -54,17 +61,17 @@ make_tree_case tree-unexpected README.md unexpected.txt
 make_tree_case tree-unlisted fixtures/tree-ghost/tracked-files.txt
 
 expect_fail fake-tracked-files-bypass \
-  "$PROJECT_ROOT/scripts/check-tree.sh" "$TMP/tree-fake-bypass"
+  "${CHECK_ALL[@]}" tree "$TMP/tree-fake-bypass"
 expect_fail unexpected-path \
-  "$PROJECT_ROOT/scripts/check-tree.sh" --fixture "$TMP/tree-unexpected"
+  "${CHECK_ALL[@]}" tree --fixture "$TMP/tree-unexpected"
 expect_fail unlisted-fixture \
-  "$PROJECT_ROOT/scripts/check-tree.sh" --fixture "$TMP/tree-unlisted"
+  "${CHECK_ALL[@]}" tree --fixture "$TMP/tree-unlisted"
 expect_fail_diagnostic fixture-root-repository-reject "must be repository-external" \
   env LATTICE_TEST_ROOT="$PROJECT_ROOT" \
-  "$PROJECT_ROOT/scripts/check-tree.sh" --fixture "$PROJECT_ROOT"
+  "${CHECK_ALL[@]}" tree --fixture "$PROJECT_ROOT"
 expect_fail_diagnostic fixture-root-ancestor-census-reject "must not contain the repository" \
   env LATTICE_TEST_ROOT=/ \
-  "$PROJECT_ROOT/scripts/check-census.sh" --fixture "$TMP/tree-unexpected"
+  "${CHECK_ALL[@]}" census --fixture "$TMP/tree-unexpected"
 expect_fail_diagnostic fixture-root-ancestor-vocabulary-reject "must not contain the repository" \
   env LATTICE_TEST_ROOT=/ \
   "$PROJECT_ROOT/scripts/check-vocabulary.sh" --fixture "$TMP/tree-unexpected"
@@ -129,6 +136,9 @@ make_policy_repo() {
   git -C "$target" init --quiet
   git -C "$target" add -A
 }
+expect_fail_diagnostic vocabulary-policy-missing-index "external operation failed: git" \
+  "${CHECK_ALL[@]}" policy "$TMP/policy-future-phase"
+make_policy_repo "$TMP/policy-future-phase"
 make_skeleton_case() {
   local name=$1 registered_path=$2 vocabulary_body=$3
   local claim_body=${4:-'theorem stub : True := by sorry'}
@@ -172,35 +182,35 @@ printf '%s\n' $'module\tsource_path\trole' \
 git -C "$TMP/policy-skeleton-dual" add -A
 
 expect_pass skeleton-policy \
-  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-skeleton-good"
+  "${CHECK_ALL[@]}" policy "$TMP/policy-skeleton-good"
 expect_fail_diagnostic skeleton-policy-no-statement-modules "skeleton phase requires registered statement modules" \
-  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-skeleton-empty"
+  "${CHECK_ALL[@]}" policy "$TMP/policy-skeleton-empty"
 expect_fail_diagnostic skeleton-policy-unregistered-statement "forbidden token (nonsemantic check): LatticeSystem/Claims/Front.lean" \
-  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-skeleton-unregistered"
+  "${CHECK_ALL[@]}" policy "$TMP/policy-skeleton-unregistered"
 expect_fail_diagnostic skeleton-policy-hygiene "forbidden token (nonsemantic check): LatticeSystem/Vocabulary/Quantum.lean" \
-  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-skeleton-hygiene"
+  "${CHECK_ALL[@]}" policy "$TMP/policy-skeleton-hygiene"
 expect_pass skeleton-policy-registered-axiom \
-  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-skeleton-axiom"
+  "${CHECK_ALL[@]}" policy "$TMP/policy-skeleton-axiom"
 expect_fail_diagnostic skeleton-policy-native-decide "forbidden token (nonsemantic check): LatticeSystem/Claims/Front.lean" \
-  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-skeleton-native"
+  "${CHECK_ALL[@]}" policy "$TMP/policy-skeleton-native"
 expect_fail_diagnostic skeleton-policy-admit "forbidden token (nonsemantic check): LatticeSystem/Claims/Front.lean" \
-  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-skeleton-admit"
+  "${CHECK_ALL[@]}" policy "$TMP/policy-skeleton-admit"
 expect_fail_diagnostic skeleton-policy-dual-registration "registered as both a vocabulary and a statement module" \
-  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-skeleton-dual"
+  "${CHECK_ALL[@]}" policy "$TMP/policy-skeleton-dual"
 
 expect_fail forbidden-token \
-  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-forbidden"
+  "${CHECK_ALL[@]}" policy "$TMP/policy-forbidden"
 expect_fail root-check \
-  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-root-check"
+  "${CHECK_ALL[@]}" policy "$TMP/policy-root-check"
 expect_pass comment-theorem-allowed \
-  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-comment-allowed"
+  "${CHECK_ALL[@]}" policy "$TMP/policy-comment-allowed"
 expect_fail merge-gate-missing \
-  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-merge-missing"
+  "${CHECK_ALL[@]}" policy "$TMP/policy-merge-missing"
 expect_fail merge-gate-checked \
-  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-merge-checked"
+  "${CHECK_ALL[@]}" policy "$TMP/policy-merge-checked"
 expect_pass census-phase \
-  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-phase-advance"
+  "${CHECK_ALL[@]}" policy "$TMP/policy-phase-advance"
 expect_pass vocabulary-policy \
-  "$PROJECT_ROOT/scripts/check-policy.sh" "$TMP/policy-future-phase"
+  "${CHECK_ALL[@]}" policy "$TMP/policy-future-phase"
 
 echo "test-tree-policy: ok"

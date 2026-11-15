@@ -2,6 +2,13 @@
 set -euo pipefail
 SCRIPT_DIR=${BASH_SOURCE[0]%/*}; [[ "$SCRIPT_DIR" == "${BASH_SOURCE[0]}" ]] && SCRIPT_DIR=.
 PROJECT_ROOT=$(cd -P "$SCRIPT_DIR/.." && pwd)
+CHECK_PROJECT=$(cd -P "$SCRIPT_DIR/.." && pwd)
+CHECK_ALL=(env "ELAN_TOOLCHAIN=$(<"$CHECK_PROJECT/lean-toolchain")" "LATTICE_CHECK_ALL_PROJECT=$CHECK_PROJECT"
+  lake -d "$CHECK_PROJECT" env lean -DwarningAsError=true --run "$CHECK_PROJECT/Checker/CheckAll.lean" --gate)
+if [[ -n ${LATTICE_CHECK_ALL_EXEC:-} ]]; then
+  CHECK_ALL=(env "LATTICE_CHECK_ALL_PROJECT=$CHECK_PROJECT" "$LATTICE_CHECK_ALL_EXEC" --gate)
+fi
+
 fail(){ echo "check-claim-corrections: $*" >&2; exit 1; }
 
 PRODUCTION=0; EVENT=; TMP=
@@ -338,7 +345,7 @@ ao=$(LC_ALL=C awk -F '\t' -v s="$EVENT_SOURCE" 'FNR>1&&$2==s{print}' "$CURRENT_R
 if awk -F '\t' -v e="$EVENT" 'FNR>1&&$2==e&&$6=="add_omitted_claim"{found=1}END{exit !found}' "$CURRENT_REG/claim-corrections.tsv"; then
   # Reuse the canonical shape, order and item-relation contracts for creation.
   # Registry validation calls only the helper's static interface, not this gate.
-  "$SCRIPT_DIR/check-registry.sh" "$CURRENT" >/dev/null
-  "$SCRIPT_DIR/check-source-items.sh" "$CURRENT" >/dev/null
+  "${CHECK_ALL[@]}" registry "$CURRENT" >/dev/null
+  "${CHECK_ALL[@]}" source-items "$CURRENT" >/dev/null
 fi
 echo "check-claim-corrections: ok"

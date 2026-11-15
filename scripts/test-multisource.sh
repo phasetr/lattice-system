@@ -4,6 +4,13 @@ set -euo pipefail
 SCRIPT_DIR=${BASH_SOURCE[0]%/*}
 [[ "$SCRIPT_DIR" == "${BASH_SOURCE[0]}" ]] && SCRIPT_DIR=.
 ROOT=${1:-$(cd "$SCRIPT_DIR/.." && pwd)}
+CHECK_PROJECT=$(cd -P "$SCRIPT_DIR/.." && pwd)
+CHECK_ALL=(env "ELAN_TOOLCHAIN=$(<"$CHECK_PROJECT/lean-toolchain")" "LATTICE_CHECK_ALL_PROJECT=$CHECK_PROJECT"
+  lake -d "$CHECK_PROJECT" env lean -DwarningAsError=true --run "$CHECK_PROJECT/Checker/CheckAll.lean" --gate)
+if [[ -n ${LATTICE_CHECK_ALL_EXEC:-} ]]; then
+  CHECK_ALL=(env "LATTICE_CHECK_ALL_PROJECT=$CHECK_PROJECT" "$LATTICE_CHECK_ALL_EXEC" --gate)
+fi
+
 TMP=$(mktemp -d "${TMPDIR:-/tmp}/lattice-system-tests.multisource.XXXXXX")
 trap 'rm -rf "$TMP"' EXIT
 export LATTICE_TEST_ROOT=$TMP
@@ -87,9 +94,9 @@ mutate() {
   awk -F '\t' -v OFS='\t' "$awk_program" "$source" > "$target"
 }
 
-"$ROOT/scripts/check-registry.sh" "$BASE" >/dev/null
-"$ROOT/scripts/check-census.sh" --fixture "$BASE" >/dev/null
-"$ROOT/scripts/check-source-items.sh" "$BASE" >/dev/null
+"${CHECK_ALL[@]}" registry "$BASE" >/dev/null
+"${CHECK_ALL[@]}" census --fixture "$BASE" >/dev/null
+"${CHECK_ALL[@]}" source-items "$BASE" >/dev/null
 
 # The multi-source census path keeps the same header-only R4 tables as the
 # legacy fixture path.
@@ -103,36 +110,36 @@ for table in bindings claim-context statement-modules statement-imports; do
     statement-imports) printf '%s\n' $'LatticeSystem.Claims.Front\t1\tMathlib\ttrue\tfalse\tfalse' >> "$case_dir/registry/$table.tsv" ;;
   esac
   expect_fail "census-r4-$table" "census capability requires header-only $table.tsv" \
-    "$ROOT/scripts/check-census.sh" --fixture "$case_dir"
+    "${CHECK_ALL[@]}" census --fixture "$case_dir"
 done
 
 cp -R "$BASE" "$TMP/unpadded-chapter"
 mutate "$BASE/registry/source-items.tsv" "$TMP/unpadded-chapter/registry/source-items.tsv" 'NR==2 {$9="Chapter 1";$10="chapter-1"} {print}'
-expect_fail unpadded-chapter "numeric chapter group is not zero-padded" "$ROOT/scripts/check-source-items.sh" "$TMP/unpadded-chapter"
+expect_fail unpadded-chapter "numeric chapter group is not zero-padded" "${CHECK_ALL[@]}" source-items "$TMP/unpadded-chapter"
 
 cp -R "$BASE" "$TMP/id-mismatch"
 mutate "$BASE/registry/pages.tsv" "$TMP/id-mismatch/registry/pages.tsv" 'NR==2 {$1="PG-SRB-0002"} {print}'
-expect_fail id-source-mismatch "page ID/source mismatch" "$ROOT/scripts/check-order.sh" "$TMP/id-mismatch"
+expect_fail id-source-mismatch "page ID/source mismatch" "${CHECK_ALL[@]}" order "$TMP/id-mismatch"
 
 cp -R "$BASE" "$TMP/count"
 mutate "$BASE/registry/source-invariants.tsv" "$TMP/count/registry/source-invariants.tsv" 'NR==2 {$3=2} {print}'
-expect_fail per-source-count "claim census invariant failed for SRA" "$ROOT/scripts/check-census.sh" --fixture "$TMP/count"
+expect_fail per-source-count "claim census invariant failed for SRA" "${CHECK_ALL[@]}" census --fixture "$TMP/count"
 
 cp -R "$BASE" "$TMP/order"
 mutate "$BASE/registry/sources.tsv" "$TMP/order/registry/sources.tsv" 'NR==3 {$3=2} {print}'
-expect_fail per-source-order "source positions are not contiguous" "$ROOT/scripts/check-sources.sh" "$TMP/order"
+expect_fail per-source-order "source positions are not contiguous" "${CHECK_ALL[@]}" sources "$TMP/order"
 
 cp -R "$BASE" "$TMP/lifecycle"
 mutate "$BASE/registry/source-progress.tsv" "$TMP/lifecycle/registry/source-progress.tsv" 'NR==2 {$2="vocabulary_reviewed"} {print}'
-expect_fail lifecycle-mismatch "source lifecycle exceeds checker capability SRA" "$ROOT/scripts/check-lifecycle.sh" "$TMP/lifecycle"
+expect_fail lifecycle-mismatch "source lifecycle exceeds checker capability SRA" "${CHECK_ALL[@]}" lifecycle "$TMP/lifecycle"
 
 cp -R "$BASE" "$TMP/mixed-census"
 printf '%s\n' 'phase' 'vocabulary' > "$TMP/mixed-census/registry/phase.tsv"
 mutate "$BASE/registry/sources.tsv" "$TMP/mixed-census/registry/sources.tsv" 'NR==2 {$17="frozen"} {print}'
 mutate "$BASE/registry/source-progress.tsv" "$TMP/mixed-census/registry/source-progress.tsv" 'NR==2 {$2="vocabulary_reviewed"} {print}'
 printf '%s\n' $'claim_id\tbasis\treview_ref' $'CL-SRA-0001\tmathlib_only\tREVIEW-A' > "$TMP/mixed-census/registry/claim-vocabulary-review.tsv"
-"$ROOT/scripts/check-registry.sh" "$TMP/mixed-census" >/dev/null
-"$ROOT/scripts/check-census.sh" --fixture "$TMP/mixed-census" >/dev/null
+"${CHECK_ALL[@]}" registry "$TMP/mixed-census" >/dev/null
+"${CHECK_ALL[@]}" census --fixture "$TMP/mixed-census" >/dev/null
 
 cp -R "$TMP/mixed-census" "$TMP/mixed-registered"
 mutate "$TMP/mixed-census/registry/sources.tsv" "$TMP/mixed-registered/registry/sources.tsv" 'NR==3 {$15="";$16="";$17="pending"} {print}'
@@ -142,25 +149,25 @@ mutate "$TMP/mixed-census/registry/pages.tsv" "$TMP/mixed-registered/registry/pa
 mutate "$TMP/mixed-census/registry/claims.tsv" "$TMP/mixed-registered/registry/claims.tsv" 'NR==1 || $2!="SRB" {print}'
 mutate "$TMP/mixed-census/registry/source-items.tsv" "$TMP/mixed-registered/registry/source-items.tsv" 'NR==1 || $2!="SRB" {print}'
 mutate "$TMP/mixed-census/registry/item-claims.tsv" "$TMP/mixed-registered/registry/item-claims.tsv" 'NR==1 || $1!="IT-SRB-0001" {print}'
-"$ROOT/scripts/check-registry.sh" "$TMP/mixed-registered" >/dev/null
-"$ROOT/scripts/check-census.sh" --fixture "$TMP/mixed-registered" >/dev/null
-"$ROOT/scripts/check-source-items.sh" "$TMP/mixed-registered" >/dev/null
+"${CHECK_ALL[@]}" registry "$TMP/mixed-registered" >/dev/null
+"${CHECK_ALL[@]}" census --fixture "$TMP/mixed-registered" >/dev/null
+"${CHECK_ALL[@]}" source-items "$TMP/mixed-registered" >/dev/null
 
 cp -R "$BASE" "$TMP/dependency-good"
 printf '%s\n' $'CL-SRB-0001\trequires\tCL-SRA-0001\tCROSS-TRACK-REVIEW' >> "$TMP/dependency-good/registry/dependencies.tsv"
-"$ROOT/scripts/check-order.sh" "$TMP/dependency-good" >/dev/null
+"${CHECK_ALL[@]}" order "$TMP/dependency-good" >/dev/null
 
 cp -R "$BASE" "$TMP/dependency-required-by"
 printf '%s\n' $'CL-SRB-0001\trequired_by\tCL-SRA-0001\tNONE' >> "$TMP/dependency-required-by/registry/dependencies.tsv"
-expect_fail required-by-rationale "required_by needs review rationale" "$ROOT/scripts/check-order.sh" "$TMP/dependency-required-by"
+expect_fail required-by-rationale "required_by needs review rationale" "${CHECK_ALL[@]}" order "$TMP/dependency-required-by"
 
 cp -R "$BASE" "$TMP/dependency-cross-track-rationale"
 printf '%s\n' $'CL-SRB-0001\trequires\tCL-SRA-0001\tNONE' >> "$TMP/dependency-cross-track-rationale/registry/dependencies.tsv"
-expect_fail cross-track-rationale "cross-track dependency needs review rationale" "$ROOT/scripts/check-order.sh" "$TMP/dependency-cross-track-rationale"
+expect_fail cross-track-rationale "cross-track dependency needs review rationale" "${CHECK_ALL[@]}" order "$TMP/dependency-cross-track-rationale"
 
 cp -R "$BASE" "$TMP/dependency"
 printf '%s\n' $'CL-SRA-0001\trequires\tCL-SRB-0001\tCROSS-SOURCE-NEGATIVE' >> "$TMP/dependency/registry/dependencies.tsv"
-expect_fail cross-source-dependency "dependency target is not earlier in global source order" "$ROOT/scripts/check-order.sh" "$TMP/dependency"
+expect_fail cross-source-dependency "dependency target is not earlier in global source order" "${CHECK_ALL[@]}" order "$TMP/dependency"
 
 # Exercise every frozen through-vocabulary base-diff gate with a multi-source current tree.
 # These rows need not satisfy the census phase policy: they are a compact pair

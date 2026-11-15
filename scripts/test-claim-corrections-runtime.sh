@@ -1007,6 +1007,16 @@ import subprocess
 import sys
 
 project, temporary = map(Path, sys.argv[1:])
+
+def data_gate(name):
+    executable = os.environ.get('LATTICE_CHECK_ALL_EXEC')
+    prefix = ['env', 'LATTICE_CHECK_ALL_PROJECT=' + str(project)]
+    if executable:
+        return prefix + [executable, '--gate', name]
+    return prefix + ['ELAN_TOOLCHAIN=' + (project / 'lean-toolchain').read_text().strip(),
+                     'lake', '-d', str(project), 'env', 'lean', '-DwarningAsError=true',
+                     '--run', str(project / 'Checker/CheckAll.lean'), '--gate', name]
+
 retirement_root = temporary / 'duplicate-retirement'
 retirement_root.mkdir()
 passed = rejected = 0
@@ -1094,9 +1104,9 @@ def transition(label, before, after, expected=True, diagnostic='', both=False):
                [base_checker, '--correction-event', event, '--fixture-dirs', before, after], diagnostic)
 
 def static(label, root):
-    expect(label + '-registry', True, [project / 'scripts/check-registry.sh', root],
+    expect(label + '-registry', True, [*data_gate('registry'), root],
            'check-registry: ok')
-    expect(label + '-items', True, [project / 'scripts/check-source-items.sh', root],
+    expect(label + '-items', True, [*data_gate('source-items'), root],
            'check-source-items: ok')
 
 base = clone(project, 'base')
@@ -1393,7 +1403,7 @@ for identifier in ('IT-SRD-0001', 'IT-SRD-0002'):
 extra_member = clone(valid, 'canonical-in-predecessor-item')
 append(extra_member, 'item-claims.tsv', ['IT-SRD-0001', '2', canonical])
 transition('canonical-in-predecessor-item', base, extra_member, False, 'unrelated item-claim drift')
-expect('canonical-unique-item', False, [project / 'scripts/check-source-items.sh', extra_member],
+expect('canonical-unique-item', False, [*data_gate('source-items'), extra_member],
        'claim occurs in more than one item')
 
 # N11: eligibility sees relations already present in the base, using the actual
