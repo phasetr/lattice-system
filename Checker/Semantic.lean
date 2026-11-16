@@ -210,7 +210,7 @@ meta def importLine (moduleName : Name) (position : Nat) (imp : Import) : String
     "I", toString moduleName, toString position, toString imp.module,
     boolField imp.isExported, boolField imp.isMeta, boolField imp.importAll]
 
-/-- Parse a newline-delimited module list supplied by a shell driver. -/
+/-- Parse a newline-delimited module list supplied by a verification driver. -/
 meta def parseModuleList (contents : String) : Array Name :=
   (contents.splitOn "\n" |>.filterMap fun line =>
     let line := line.trimAscii
