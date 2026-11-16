@@ -5,7 +5,7 @@ namespace Checker.CheckAll
 open Lean System
 
 /-- Current receipt encoding; older dispatcher receipts are never cache evidence. -/
-def version : Nat := 4
+def version : Nat := 5
 /-- The sole regression-suite definition. -/
 def suites : Array (String × String) := Checker.Regressions.groups.map fun group => (group.name,group.name)
 /-- Registries whose semantic changes require fresh PR regressions. -/
@@ -46,6 +46,12 @@ def digest (root : System.FilePath) (j : Json) : IO String := do
   let hash := (split (trim result) " ")[0]!
   require (hex hash 64) "SHA256 operation failed"
   pure hash
+
+/-- Image build labels are audit provenance; actual runtime and compiler identities remain reader inputs. -/
+def environmentInputs (environment : Json) : Json :=
+  match environment with
+  | .obj fields => Json.mkObj <| fields.toList.filter fun (key,_) => key != "ImageVersion"
+  | _ => environment
 /-- Git inventory entry, independent of receipt claims. -/
 structure Entry where
   /-- Tracked path. -/
@@ -102,7 +108,8 @@ def historical (root : System.FilePath) (ref : String) : IO Json := do
 def knownPath (path : String) : Bool :=
   path == ".gitignore" || path.startsWith "docs/" || policyPaths.contains path ||
   path == "LatticeSystem.lean" || (path.startsWith "LatticeSystem/" && path.endsWith ".lean") ||
-  #[".github/CODEOWNERS",".github/workflows/rewrite-ci.yml","Checker/CheckAll.lean","Checker/Inputs.lean"].contains path ||
+  #[".github/CODEOWNERS",".github/workflows/rewrite-ci.yml","Checker/CheckAll.lean","Checker/Inputs.lean",
+    "Checker/Bootstrap.lean","Checker/RegressionPool.lean"].contains path ||
   Checker.Regressions.commonInputs.contains path ||
   Checker.Regressions.groups.any (fun group => group.inputs.contains path) ||
   (path.startsWith "registry/" && path.endsWith ".tsv" &&
@@ -150,7 +157,7 @@ def payloads (root : FilePath) (rows : Array Entry)
     let inputs := Json.mkObj <| paths.toList.map fun path =>
       (path, (rows.find? (·.path == path)).map entryValue |>.getD Json.null)
     let fields := [("version",toJson version),("group",toJson group.name),
-      ("environment",environment),("inputs",inputs)]
+      ("environment",environmentInputs environment),("inputs",inputs)]
     let fields := if group.corpus then ("registry",registry) :: fields else fields
     let fields := if group.headers then ("headers",headers) :: fields else fields
     let fields := if group.policy then ("policy",policy) :: fields else fields

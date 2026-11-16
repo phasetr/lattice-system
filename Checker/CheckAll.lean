@@ -2,6 +2,7 @@ import Checker.Publication
 import Checker.Inputs
 import Checker.Transition
 import Checker.SemanticDriver
+import Checker.RegressionPool
 
 /-!
 Shared current-tree and regression dispatcher. Source mathematics stays in the
@@ -23,13 +24,16 @@ def toolDigest (root path : System.FilePath) : IO String := do
   let hash := (split (trim result) " ")[0]!
   require (hex hash 64) "compiler identity unavailable"
   pure hash
-/-- Bind runner image and installed tool versions for reuse, not local paths or secrets. -/
+/-- Record image provenance and bind actual runtime/compiler identities independently of local paths. -/
 def environment (root : System.FilePath) : IO Json := do
   let fields ← #["RUNNER_OS", "RUNNER_ARCH", "ImageOS", "ImageVersion"].foldlM (fun fields key => do
     pure ((key,toJson (← env key)) :: fields)) []
   let fields ← #[("lean", "lean"), ("lake", "lake"), ("git", "git"), ("curl", "curl")].foldlM (fun fields (name,command) => do
     let text ← output root command #["--version"]
     pure ((name,toJson (split text "\n")[0]!) :: fields)) fields
+  let libc := (split (← output root "ldd" #["--version"]) "\n")[0]!
+  require (!libc.isEmpty) "native runtime ABI identity unavailable"
+  let fields := ("libc",toJson libc) :: fields
   let sysroot ← toolchainRoot root
   let nativeVersion ← output root (sysroot / "bin/leanc").toString #["--no-default-config","--version"]
   let fields := ("native_compiler", Json.mkObj [
@@ -227,14 +231,16 @@ def candidates (root : System.FilePath) (e : Evidence) (ctx : Json) : IO (Array 
 def lookupAllowed (full : Bool) (event : String) : Bool := !full || event == "push"
 /-- Every candidate is bound to its independently identified source, environment and checkout role. -/
 def candidateBound (receipt ctx : Json) (source : String) (environment : Json) : IO Bool := do
-  if (← field receipt "environment") != environment || (← str receipt "source_head") != source then return false
+  if environmentInputs (← field receipt "environment") != environmentInputs environment ||
+    (← str receipt "source_head") != source then return false
   if (← str ctx "event") == "pull_request" then
     return (← str receipt "head") == (← str ctx "base") && (← str receipt "event") == "push"
   return (← str receipt "event") == "pull_request" && (← str receipt "base") == (← str ctx "base") &&
     (← str receipt "tree") == (← str ctx "tree")
 /-- Only an exact directly executed origin is reusable; no recursive receipt chain is accepted. -/
 def originalBound (original : Loaded) (expected : Json) (name signature : String) (environment : Json) : IO Bool := do
-  if original.origin != expected || (← field original.receipt "environment") != environment then return false
+  if original.origin != expected ||
+    environmentInputs (← field original.receipt "environment") != environmentInputs environment then return false
   return (← field (← field original.receipt "suites") name) == Json.mkObj [
     ("input", toJson signature), ("result", toJson "executed"), ("origin", Json.null)]
 /-- Explicit full mode never reuses regressions; current mode never claims to have run them. -/
@@ -623,6 +629,14 @@ def selfTestReaderClosures (root : System.FilePath) (count : IO.Ref Nat) (envJso
   let compilerEnvironment := envJson.setObjVal! "native_compiler" (toJson "changed toolchain backend")
   let (compilerInputs, _) ← payloads root rows headers registryA policy (Json.mkObj []) compilerEnvironment
   expect count (suites.all fun (name, _) => before.getObjValD name != compilerInputs.getObjValD name) "native compiler identity changes every actual input"
+  let imageEnvironment := envJson.setObjVal! "ImageVersion" (toJson "new image build label")
+  let (imageInputs,_) ← payloads root rows headers registryA policy (Json.mkObj []) imageEnvironment
+  expect count (imageInputs == before) "runner image build label is audit provenance rather than a reader input"
+  for key in #["RUNNER_OS","RUNNER_ARCH","ImageOS","lean","lake","git","curl","libc"] do
+    let (changedInputs,_) ← payloads root rows headers registryA policy (Json.mkObj [])
+      (envJson.setObjVal! key (toJson "different required runtime"))
+    expect count (suites.all fun (name,_) => changedInputs.getObjValD name != before.getObjValD name)
+      ("required runtime identity changes every actual input: " ++ key)
   let changedRows := rows.set! 1 ⟨".gitignore", "100644", "blob", "changed"⟩
   let (changed, _) ← payloads root changedRows headers registryA policy (Json.mkObj []) envJson
   expect count ((before.getObjValD "skeleton-composed") != (changed.getObjValD "skeleton-composed")) "composed gitignore is executable fixture input"
@@ -666,7 +680,7 @@ def selfTest (root : System.FilePath) : IO Unit := do
     expect count (!(options args {}).isOk) "invalid CLI rejected"
   validReceipt fixtureReceipt
   expect count true "valid receipt"
-  reject count (validReceipt (fixtureReceipt.setObjVal! "version" (toJson (3 : Nat)))) "immediately prior v3 is not v4 evidence"
+  reject count (validReceipt (fixtureReceipt.setObjVal! "version" (toJson (4 : Nat)))) "prior v4 has a different runtime input recipe"
   reject count (validReceipt (fixtureReceipt.setObjVal! "version" (toJson (2 : Nat)) )) "previous v2 receipt cannot be current evidence"
   for fieldName in #["version", "head", "source_head", "base", "tree", "current", "transition", "build", "suites"] do
     reject count (validReceipt (fixtureReceipt.setObjVal! fieldName Json.null)) "missing or invalid receipt field"
@@ -727,6 +741,13 @@ def selfTest (root : System.FilePath) : IO Unit := do
   let original : Loaded := ⟨fixtureReceipt, origin⟩
   let signature := String.ofList (List.replicate 64 '1')
   expect count (← originalBound original origin "skeleton-pure" signature envJson) "direct executed original"
+  let imageEnvironment := envJson.setObjVal! "ImageVersion" (toJson "different image build label")
+  expect count (← candidateBound fixtureReceipt ctx source imageEnvironment) "image label alone preserves exact source-bound candidate"
+  expect count (← originalBound original origin "skeleton-pure" signature imageEnvironment) "image label alone preserves directly executed origin"
+  for key in #["RUNNER_OS","RUNNER_ARCH","ImageOS","lean","lake","git","curl","libc","native_compiler"] do
+    let changedEnvironment := envJson.setObjVal! key (toJson "different required runtime")
+    expect count (!(← candidateBound fixtureReceipt ctx source changedEnvironment)) ("candidate rejects required runtime change: " ++ key)
+    expect count (!(← originalBound original origin "skeleton-pure" signature changedEnvironment)) ("origin rejects required runtime change: " ++ key)
   for key in #["run_attempt", "job_id"] do
     expect count (!(← originalBound original (origin.setObjVal! key (toJson (99 : Nat))) "skeleton-pure" signature envJson)) "original job or attempt mismatch"
   let recursive := fixtureReceipt.setObjVal! "suites" <|
@@ -745,6 +766,7 @@ def selfTest (root : System.FilePath) : IO Unit := do
 
 /-- Describe each decision before any gate runs; skipped work is never reported as executed. -/
 def printPlan (mode : String) (selection : Selection) : IO Unit := do
+  IO.println s!"check-all: receipt recipe v{version}; maximum 2 independent regression children"
   IO.println "check-all: fresh current native data, required semantic imports, generator and actual transition"
   for (name,_) in suites do
     let origin := selection.accepted.getObjValD name
@@ -753,9 +775,23 @@ def printPlan (mode : String) (selection : Selection) : IO Unit := do
     else IO.println s!"check-all: plan {name}: reuse (exact reader inputs, successful run {← nat origin "run_id"}, job {← nat origin "job_id"})"
   IO.println s!"check-all: plan mathematical build: {if selection.build.required then "run" else "not_required"} ({selection.build.reason})"
 
-/-- The current lane and selected regressions share one fatal sequential interpreter. -/
+/-- Measure one existing verification phase, including failures, without affecting its acceptance result. -/
+def timed (label : String) (operation : IO α) : IO α := do
+  let started ← IO.monoMsNow
+  try operation
+  finally IO.println s!"check-all timing: {label} elapsed_ms={(← IO.monoMsNow)-started}"
+
+/-- Bind the immutable CI checkout, live index and canonical executable before and after child execution. -/
+def regressionFingerprint (root executable : System.FilePath) (expected : Json) : IO Json := do
+  let actual ← context root
+  require (actual == expected) "verification checkout changed during execution"
+  return Json.mkObj [("checkout",actual),
+    ("index",toJson (← digest root (toJson (← git root #["ls-files","--stage","-z"])))),
+    ("executable",toJson (← toolDigest root executable))]
+
+/-- Fresh current gates precede bounded isolated regression children; only fully joined success produces evidence. -/
 def dispatch (root : System.FilePath) (o : Options) : IO Unit := do
-  if o.mode == "--self-test" then selfTest root; return
+  if o.mode == "--self-test" then timed "control-self-test" (selfTest root); return
   let (ctx,base,selection) ← if o.mode == "--ci" then do
     validateOverrides root
     let ctx ← context root
@@ -768,26 +804,38 @@ def dispatch (root : System.FilePath) (o : Options) : IO Unit := do
       let selection : Selection := {build := ← selectLocalBuild root base (← commit root "HEAD")}
       pure (Json.null,base,selection)
   printPlan o.mode selection
-  selfTest root
-  let current ← currentData root
+  timed "control-self-test" (selfTest root)
+  let current ← timed "native-data" (currentData root)
   if o.mode == "--ci" then
-    prepareImports root current (suites.filterMap fun (name,_) => if regressionRequired o.mode selection.accepted name then some name else none)
+    timed "semantic-import-cache" <| prepareImports root current
+      (suites.filterMap fun (name,_) => if regressionRequired o.mode selection.accepted name then some name else none)
   let actions := (currentPlan (Registry.phase current) (current.table "modules").records.size).map fun action => (⟨action,#[]⟩ : Command)
   execute (fun action => do
     IO.println s!"check-all: current {action.cmd}"
-    currentAction root base action.cmd) actions
+    timed ("current:" ++ action.cmd) (currentAction root base action.cmd)) actions
+  let executable ← IO.FS.realPath (← IO.appPath)
+  if o.mode != "--current" then
+    require (executable == (← IO.FS.realPath (root / ".lake/build/bin/checker")))
+      "regressions require the canonical project-native checker"
+  let frozen ← if o.mode == "--ci" then some <$> regressionFingerprint root executable ctx else pure none
   let results ← if o.mode == "--current" then pure (Json.mkObj []) else
+    do
+    let selected := suites.filterMap fun (name,_) =>
+      if regressionRequired o.mode selection.accepted name then some name else none
+    timed "selected-regressions" <| Checker.RegressionPool.runRegressionGroups root executable selected
     suites.foldlM (fun results (name,_) => do
       let accepted := if o.mode == "--full" then Json.null else selection.accepted.getObjValD name
       if accepted.isNull then
-        IO.println s!"check-all: execute regression {name}"
-        Checker.Regressions.run root (← IO.appPath) name
+        IO.println s!"check-all: completed regression {name}"
       else IO.println s!"check-all: reused regression {name}"
       return results.setObjVal! name <| Json.mkObj [
         ("input",selection.sigs.getObjValD name),
         ("result",toJson (if accepted.isNull then "executed" else "reused")),("origin",accepted)]) (Json.mkObj [])
-  if selection.build.required then runGate root ⟨"lake",#["build"]⟩
+  if selection.build.required then timed "mathematical-build" (runGate root ⟨"lake",#["build"]⟩)
   else IO.println s!"check-all: mathematical build not_required: {selection.build.reason}"
+  if let some frozen := frozen then
+    require ((← regressionFingerprint root executable ctx) == frozen)
+      "verification index or executable changed during regression execution"
   if o.mode == "--ci" && !selection.sigs.isNull && !selection.runtime.isNull && !selection.executable.isEmpty then
     let build := Json.mkObj [
       ("result",toJson (if selection.build.required then "executed" else "not_required")),
