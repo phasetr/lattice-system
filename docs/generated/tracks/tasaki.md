@@ -2,9 +2,9 @@
 
 - Phase: `vocabulary`
 - Active claims: 3251
-- Formalization targets: 3202
+- Formalization targets: 3198
 - Superseded claim records: 23
-- Mathlib-only: 3200
+- Mathlib-only: 3196
 - Project vocabulary: 2
 - Complete claim-vocabulary links: 4
 

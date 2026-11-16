@@ -16,7 +16,7 @@ Generated from registered source-item metadata. Source claim text is not reprodu
 
 ### Atomic claims
 
-- `CL-TASAKI2020-0001` — notation / notation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-0001` — out_of_scope / notation; lifecycle `active`; Vocabulary `not_reviewed`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
 <a id="IT-TASAKI2020-0002"></a>
 
@@ -32,7 +32,7 @@ Generated from registered source-item metadata. Source claim text is not reprodu
 
 ### Atomic claims
 
-- `CL-TASAKI2020-0002` — notation / notation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-0002` — out_of_scope / notation; lifecycle `active`; Vocabulary `not_reviewed`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
 <a id="IT-TASAKI2020-0003"></a>
 
@@ -48,7 +48,7 @@ Generated from registered source-item metadata. Source claim text is not reprodu
 
 ### Atomic claims
 
-- `CL-TASAKI2020-0003` — notation / notation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-0003` — out_of_scope / notation; lifecycle `active`; Vocabulary `not_reviewed`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
 <a id="IT-TASAKI2020-0004"></a>
 
@@ -80,7 +80,7 @@ Generated from registered source-item metadata. Source claim text is not reprodu
 
 ### Atomic claims
 
-- `CL-TASAKI2020-0005` — notation / notation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-0005` — out_of_scope / notation; lifecycle `active`; Vocabulary `not_reviewed`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
 <a id="IT-TASAKI2020-0006"></a>
 

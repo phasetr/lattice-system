@@ -3197,7 +3197,7 @@
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-0001",
-          "disposition": "notation",
+          "disposition": "out_of_scope",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -3207,8 +3207,8 @@
           "statement_module": "NONE",
           "subkind": "notation",
           "successor_claim": "NONE",
-          "vocabulary_basis": "mathlib_only",
-          "vocabulary_status": "vocabulary_ready"
+          "vocabulary_basis": "not_reviewed",
+          "vocabulary_status": "not_reviewed"
         }
       ],
       "item_id": "IT-TASAKI2020-0001",
@@ -3228,7 +3228,7 @@
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-0002",
-          "disposition": "notation",
+          "disposition": "out_of_scope",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -3238,8 +3238,8 @@
           "statement_module": "NONE",
           "subkind": "notation",
           "successor_claim": "NONE",
-          "vocabulary_basis": "mathlib_only",
-          "vocabulary_status": "vocabulary_ready"
+          "vocabulary_basis": "not_reviewed",
+          "vocabulary_status": "not_reviewed"
         }
       ],
       "item_id": "IT-TASAKI2020-0002",
@@ -3259,7 +3259,7 @@
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-0003",
-          "disposition": "notation",
+          "disposition": "out_of_scope",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -3269,8 +3269,8 @@
           "statement_module": "NONE",
           "subkind": "notation",
           "successor_claim": "NONE",
-          "vocabulary_basis": "mathlib_only",
-          "vocabulary_status": "vocabulary_ready"
+          "vocabulary_basis": "not_reviewed",
+          "vocabulary_status": "not_reviewed"
         }
       ],
       "item_id": "IT-TASAKI2020-0003",
@@ -3321,7 +3321,7 @@
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-0005",
-          "disposition": "notation",
+          "disposition": "out_of_scope",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -3331,8 +3331,8 @@
           "statement_module": "NONE",
           "subkind": "notation",
           "successor_claim": "NONE",
-          "vocabulary_basis": "mathlib_only",
-          "vocabulary_status": "vocabulary_ready"
+          "vocabulary_basis": "not_reviewed",
+          "vocabulary_status": "not_reviewed"
         }
       ],
       "item_id": "IT-TASAKI2020-0005",
@@ -86608,7 +86608,7 @@
           "axiom_status": "not_assessed",
           "binding_status": "not_bound",
           "claim_id": "CL-TASAKI2020-2488",
-          "disposition": "assertion",
+          "disposition": "definition",
           "lifecycle": "active",
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
@@ -101976,8 +101976,8 @@
   "summary": {
     "active_claims": 3251,
     "claim_vocabulary_links": 4,
-    "formalization_target_claims": 3202,
-    "mathlib_only_claims": 3200,
+    "formalization_target_claims": 3198,
+    "mathlib_only_claims": 3196,
     "project_vocabulary_claims": 2,
     "source_items": 3077,
     "tombstoned_claims": 23,
