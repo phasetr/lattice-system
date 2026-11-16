@@ -50,7 +50,10 @@ truth, printed proofs or whole-source fidelity.
 ## 3. Capability, lifecycle and order
 
 Global checker capability and each source's lifecycle are distinct, monotone
-records. A new earlier-stage source may coexist with a completed later-stage
+facts. The capability is recorded once in `phase.tsv`; each source's lifecycle
+and its review reference live in that source's `sources.tsv` row. The source's
+coverage label is derived from its lifecycle, rather than independently edited.
+A new earlier-stage source may coexist with a completed later-stage
 source without weakening the latter's guarantees.
 
 | Stage | Acceptance meaning |
@@ -66,6 +69,14 @@ and types; well-definedness assertions remain explicit mathematical obligations
 subject to source, binding and proof gates, not exceptions authorizing early
 proofs or slices. Checker infrastructure and fixtures for a later stage do not
 advance a production source or certify its coverage.
+
+Pre-R4 empty relations do not need separate physical files. Their exact schemas
+are declared in `Checker/RegistryLayout.lean`: slices, dependencies, bindings,
+claim context, axioms, claim-to-axiom relations, statement modules and statement
+imports. Only bootstrap, census and vocabulary phases admit an absent table as
+an empty semantic view. If present, its schema and emptiness remain checked.
+Skeleton and proof phases require all eight physical tables and their existing
+membership, binding and semantic obligations. Absence never grants R4 acceptance.
 
 Global source order is `(track position, source position, claim order key)`.
 Front-to-back implementation cannot skip an unresolved logical prerequisite.
@@ -88,8 +99,21 @@ Source PDF/text fingerprints freeze atomically. Page fingerprints identify the
 frozen extracted page segment, including its terminal form-feed. Claim content
 OIDs identify exact UTF-8 field bytes without an appended newline. These bind
 observed bytes, not agreement with the original. Per-source invariant counts
-and census OIDs are derived from the actual canonical corpus. Classification
+are derived from the actual canonical corpus. The independently reviewed physical
+page count, census OID and review reference remain frozen anchors in `sources.tsv`;
+the checker recomputes the corpus digest and checks the page count against them.
+Active, target, equation and empty-page counts are views, not separately edited
+expectations. A source item's uniform publication format tag is supplied by its
+schema and is not an individual mathematical review attestation. Classification
 repairs do not rewrite original equation-item identity.
+
+Historical Git snapshots retain their original file names, bytes and genuine
+absence. Explicit historical readers preserve the older source state tables and
+recorded counts, including invalid values needed for rejection. Current readers
+require the compact source and item schemas and reject mixed old/new state.
+Semantic views do not assert physical historical existence or rewrite ledger
+prefixes. Only an explicitly owned regression-fixture factory may instantiate
+the older test schema; that does not migrate a historical Git tree.
 
 Ordinary changes freeze content, classification, identity, provenance and
 historical supersession, apart from explicitly staged OID finalization. A source

@@ -45,6 +45,7 @@ def semanticInputs : Array String := #["Checker/SemanticDriver.lean","Checker/Se
 
 /-- Every group uses this executable facade and the same non-optimizable process/fixture oracles. -/
 def commonInputs : Array String := #["Checker/Main.lean","Checker/Regressions.lean","Checker/Support.lean","Checker/TestSupport.lean",
+  "Checker/RegistryLayout.lean","Checker/RegistryIO.lean",
   "lean-toolchain","lake-manifest.json","lakefile.toml"]
 
 /-- Preserve the original correction roster and then run the independent locator contract cases. -/

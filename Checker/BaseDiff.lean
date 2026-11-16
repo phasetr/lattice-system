@@ -7,19 +7,32 @@ open Checker.CheckAll.Registry
 
 /-- Exact files of a registry revision, including the legacy reference table when present. -/
 structure Snapshot where
+  /-- Physical blobs and true absence are retained for immutable provenance and ledger prefixes. -/
   files : Std.HashMap String String := {}
+  /-- Explicit schema views never replace the observed physical blobs. -/
+  views : Std.HashMap String String := {}
   /-- Directory-base reads historically used line-printing AWK; Git-base reads used exact blobs. -/
   normalizeLines : Bool := false
 
 /-- Read a directory's table bytes without interpreting an absent table as an empty artifact. -/
-def snapshot (root : FilePath) : IO Snapshot := do
+def snapshot (root : FilePath) (profile : Checker.RegistryLayout.Profile := .historical) : IO Snapshot := do
   let result ← (← (root / "registry").readDir).foldlM (fun (result : Snapshot) entry => do
     if entry.path.extension == some "tsv" then
       return {files := result.files.insert ("registry/" ++ entry.fileName) (← IO.FS.readFile entry.path)}
     else return result) {}
-  if ← (root / "references/tasaki-2020.tsv").pathExists then
-    return {files := result.files.insert "references/tasaki-2020.tsv" (← IO.FS.readFile (root / "references/tasaki-2020.tsv"))}
-  return result
+  let result ← if ← (root / "references/tasaki-2020.tsv").pathExists then
+    pure {result with files := result.files.insert "references/tasaki-2020.tsv" (← IO.FS.readFile (root / "references/tasaki-2020.tsv"))}
+    else pure result
+  let view ← Checker.RegistryLayout.normalize result.files profile
+  return {result with views := view.files}
+
+/-- Read a semantic table while keeping physical membership separately available in `files`. -/
+def Snapshot.text (snapshot : Snapshot) (path : String) : Option String :=
+  snapshot.views[path]? <|> snapshot.files[path]?
+
+/-- A semantic schema view can be available without asserting physical historical existence. -/
+def Snapshot.hasTable (snapshot : Snapshot) (path : String) : Bool :=
+  (snapshot.text path).isSome
 
 /-- Extract data records using the old line-based TSV interpretation. -/
 def records (text : String) : Array Row := (tableFromText text).rows
@@ -42,7 +55,7 @@ def compatibilityDefault (path : String) : Option String :=
 
 /-- Resolve the finite set of old empty infrastructure tables, never arbitrary missing input. -/
 def baseline (before : Snapshot) (path : String) (modern : Bool) : IO String := do
-  let initial ← match before.files[path]? with
+  let initial ← match before.text path with
     | some text => pure text
     | none =>
       if let some text := compatibilityDefault path then return text
@@ -120,13 +133,13 @@ def validate (before current : Snapshot) (allowSupersession replay : Bool) (even
   let modern := current.files.contains "registry/sources.tsv"
   let readOld := fun path => baseline before path modern
   let readCurrent := fun path => do
-    let some text := current.files[path]? | throw <| IO.userError s!"current missing {path}"
+    let some text := current.text path | throw <| IO.userError s!"current missing {path}"
     pure text
   let rowsOld := fun path => records <$> readOld path
   let rowsCurrent := fun path => records <$> readCurrent path
   for path in #["registry/phase.tsv","registry/pages.tsv","registry/claims.tsv","registry/slices.tsv",
     "registry/dependencies.tsv","registry/bindings.tsv","registry/axioms.tsv","registry/claim-axioms.tsv"] do
-    require (before.files.contains path) s!"base missing {path}"
+    require (before.hasTable path) s!"base missing {path}"
     discard <| readCurrent path
   if !modern then
     require (before.files.contains "references/tasaki-2020.tsv") "base missing references/tasaki-2020.tsv"

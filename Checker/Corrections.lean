@@ -7,7 +7,7 @@ open Lean System Checker.CheckAll Checker.CheckAll.Registry Checker.BaseDiff
 
 /-- Read data rows while distinguishing required input from optional historical ledgers. -/
 def rows (snapshot : Snapshot) (stem : String) : Array Row :=
-  records (snapshot.files["registry/" ++ stem ++ ".tsv"]?.getD "")
+  records ((snapshot.text ("registry/" ++ stem ++ ".tsv")).getD "")
 
 /-- Read a ledger's exact bytes. -/
 def bytes (snapshot : Snapshot) (stem : String) : String :=
@@ -32,7 +32,8 @@ def additionId (value : String) : Bool :=
 /-- Exact current schema of an owned permanent ledger. -/
 def header (current : Snapshot) (stem : String) : IO Unit := do
   let some (_, expected) := headers.find? (·.1 == stem) | throw <| IO.userError "unknown correction table"
-  require ((tableFromText (bytes current stem)).records[0]?.getD "" == expected) s!"bad {stem}.tsv header"
+  require ((tableFromText ((current.text ("registry/" ++ stem ++ ".tsv")).getD "")).records[0]?.getD "" == expected)
+    s!"bad {stem}.tsv header"
 
 /-- Frozen records survive byte-for-byte and appended rows belong to the current event. -/
 def freezeLedger (before current : Snapshot) (stem event : String) (eventColumn : Nat) : IO Unit := do
@@ -108,8 +109,8 @@ def duplicateEligibility (before current : Snapshot) (event source : String) : I
 def ledgers (before current : Snapshot) (requested : String) : IO (String × String × String) := do
   for stem in #["claims","source-items","item-claims","claim-vocabulary-review","claim-vocabulary",
     "source-invariants","bindings","axioms","claim-axioms","pages","sources","tracks"] do
-    require (before.files.contains ("registry/" ++ stem ++ ".tsv") &&
-      current.files.contains ("registry/" ++ stem ++ ".tsv")) s!"missing registry/{stem}.tsv"
+    require (before.hasTable ("registry/" ++ stem ++ ".tsv") &&
+      current.hasTable ("registry/" ++ stem ++ ".tsv")) s!"missing registry/{stem}.tsv"
   for stem in ledgerNames do
     unless stem == "claim-location-amendments" && !before.files.contains "registry/claim-location-amendments.tsv" &&
         !current.files.contains "registry/claim-location-amendments.tsv" do
@@ -441,9 +442,17 @@ def invariants (project : FilePath) (before current : Snapshot) (event source re
   let text := String.join <| (pages ++ sourceClaims).toList.map fun r => String.intercalate "\t" r.toList ++ "\n"
   require (col invariant 7 == trim (← output project "git" #["hash-object","--stdin"] (some text))) "census OID is stale"
 
+/-- Source identities and lifecycle attestations are frozen independently of their physical layout. -/
+def frozenSourceState (before current : Snapshot) : IO Unit := do
+  for stem in #["sources", "source-progress"] do
+    let path := "registry/" ++ stem ++ ".tsv"
+    require (before.hasTable path && current.hasTable path && before.text path == current.text path)
+      "unrelated frozen registry drift"
+
 /-- Validate the complete source-correction contract against two concrete directory snapshots. -/
 def validate (project base target : FilePath) (requested : String := "") (recordedBase : Option String := none) : IO Unit := do
-  let before ← snapshot base; let current ← snapshot target
+  let before ← snapshot base
+  let current ← snapshot target (← Checker.RegistryIO.currentProfile project target)
   let (event,source,review) ← ledgers before current requested
   if let some baseCommit := recordedBase then
     let selected := (rows current "correction-events").find? (col · 1 == event)
@@ -454,12 +463,13 @@ def validate (project base target : FilePath) (requested : String := "") (record
     require (sameArtifact before current stem) "correction event introduces an axiom artifact"
   for stem in #["bindings","claim-context","statement-modules","statement-imports"] do
     require (sameArtifact before current stem) "correction event introduces an R4 artifact"
+  frozenSourceState before current
   for (path,text) in before.files do
     let stem := ((path.dropPrefix "registry/").dropSuffix ".tsv").toString
-    unless (#["claims","source-items","item-claims","claim-vocabulary-review","claim-vocabulary","source-invariants",
+    unless (#["sources","source-progress","claims","source-items","item-claims","claim-vocabulary-review","claim-vocabulary","source-invariants",
       "correction-events","claim-normalization-reviews","claim-corrections","claim-successors","source-item-additions",
       "claim-content-amendments","claim-location-amendments","bindings","claim-context","statement-modules","statement-imports","axioms","claim-axioms"].contains stem) do
-      require (current.files[path]? == some text) "unrelated frozen registry drift"
+      require (current.text path == some text) "unrelated frozen registry drift"
   claimActions before current event
   successorIdentities before current event source
   successors project before current event

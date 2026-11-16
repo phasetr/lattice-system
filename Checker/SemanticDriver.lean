@@ -22,7 +22,7 @@ def lines (text : String) : Array String :=
 
 /-- Read a semantic table's data records without Unicode whitespace normalization. -/
 def table (root : FilePath) (name : String) : IO (Array Row) := do
-  let text ← IO.FS.readFile (root / "registry" / (name ++ ".tsv"))
+  let text ← Checker.RegistryIO.read root name .historical
   let rows := lines text
   return (rows.extract 1 rows.size).map (split · "\t")
 
@@ -49,17 +49,19 @@ def validateRoot (project target : FilePath) (fixture : Bool) (alternate : Bool)
     require ((← IO.getEnv "LATTICE_SEMANTIC_CACHE").isNone) "production run cannot substitute semantic artifacts"
     if alternate then
       require ((← IO.getEnv "LATTICE_SKELETON_CHECKER_DIR").isNone) "production run cannot substitute the semantic checker"
+    discard <| Checker.RegistryIO.load target (← Checker.RegistryIO.currentProfile project target) #["sources"]
     pure project
   return (target,checker)
 
 /-- Validate a header before any declaration or module inspection. -/
 def header (root : FilePath) (name expected : String) : IO Unit := do
-  let text ← IO.FS.readFile (root / "registry" / (name ++ ".tsv"))
+  let text ← Checker.RegistryIO.read root name .historical
   require ((lines text)[0]?.getD "" == expected) s!"bad {name}.tsv header"
 
 /-- Inspect data only from the explicit required input collection. -/
-def required (root : FilePath) (names : Array String) : IO Unit :=
-  names.forM fun name => do require (← (root / "registry" / (name ++ ".tsv")).pathExists) s!"missing registry/{name}.tsv"
+def required (root : FilePath) (names : Array String) : IO Unit := do
+  let view ← Checker.RegistryIO.load root .historical names
+  names.forM fun name => require (view.files.contains (Checker.RegistryIO.tablePath name)) s!"missing registry/{name}.tsv"
 
 /-- One inspection shares its pinned compiler and canonical project import path as immutable inputs. -/
 private structure Runtime where

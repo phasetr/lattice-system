@@ -1,6 +1,7 @@
 import Checker.Content
 import Checker.Support
 import Checker.Locations
+import Checker.RegistryIO
 
 /-! Native registry, tree and policy validators. -/
 namespace Checker.CheckAll
@@ -21,6 +22,7 @@ def fixedTreePaths : Array String := #[
   "registry/claim-normalization-reviews.tsv", "registry/claim-corrections.tsv", "registry/claim-successors.tsv",
   "registry/source-item-additions.tsv", "registry/claim-content-amendments.tsv", "registry/claim-context.tsv",
   "registry/claim-location-amendments.tsv", "Checker/Locations.lean",
+  "Checker/RegistryLayout.lean", "Checker/RegistryIO.lean",
   "registry/statement-modules.tsv", "registry/statement-imports.tsv",
   "Checker/Content.lean", "Checker/Publication.lean", "Checker/Bootstrap.lean", "Checker/Tests/Publication.lean",
   "Checker/Text.lean", "Checker/Publication/Tabular.lean", "Checker/Publication/Items.lean",
@@ -50,6 +52,7 @@ def fixedTreePaths : Array String := #[
   "Checker/Tests/Fixtures.lean",
   "Checker/Tests/Multisource.lean",
   "Checker/Tests/Registry.lean",
+  "Checker/Tests/RegistryLayout.lean",
   "Checker/Tests/Selector.lean",
   "Checker/Tests/SkeletonComposed.lean",
   "Checker/Tests/SkeletonFixture.lean",
@@ -72,11 +75,12 @@ def validateTreeFixture (project root testRoot : String) : IO Unit := do
 /-- Read working registry paths, preserving the header-only bootstrap exception. -/
 def treeModules (root : System.FilePath) (fixture : Bool := false) : IO (Array String) := do
   if ← (root / "registry/modules.tsv").pathExists then
-    let hasStatements ← (root / "registry/statement-modules.tsv").pathExists
+    let view ← Checker.RegistryIO.load root .historical #["modules", "statement-modules"]
+    let hasStatements := view.files.contains "registry/statement-modules.tsv"
     if fixture && !hasStatements then return #[]
     require hasStatements "missing registry/statement-modules.tsv"
     return ← #["modules", "statement-modules"].foldlM (fun registered table => do
-      let text ← IO.FS.readFile (root / "registry" / (table ++ ".tsv"))
+      let text := view.files[Checker.RegistryIO.tablePath table]!
       let records := split text "\n"
       let records := if text.endsWith "\n" then records.pop else records
       ((records.extract 1 records.size)).foldlM (fun registered line => do
@@ -121,6 +125,8 @@ def checkTree (project target : System.FilePath) (fixture : Bool) : IO Unit := d
     return
   require (trim (← git root #["rev-parse", "--show-toplevel"]) == root.toString)
     "ROOT must be the repository top; fixture mode is explicit"
+  let profile ← Checker.RegistryIO.currentProfile project root
+  discard <| Checker.RegistryIO.load root profile #["sources"]
   let paths ← treeIndex (← git root #["ls-files", "--stage", "-z"])
   validateTreePaths paths (← treeModules root) true
   for pin in #["lean-toolchain", "lake-manifest.json"] do
@@ -130,7 +136,7 @@ def checkTree (project target : System.FilePath) (fixture : Bool) : IO Unit := d
 
 namespace Registry
 
-/-- Exact table headers are shared by all native data gates. -/
+/-- Logical table schemas; compact physical source metadata is projected by RegistryLayout. -/
 def headers : Array (String × String) := #[
   ("phase", "phase"),
   ("tracks", "track_id\tposition\ttitle\tpublic_slug"),
@@ -472,11 +478,13 @@ def lifecycle (d : Data) : IO Unit := do
   vocabularyCoverage d false
 
 /-- Load existing table bytes once; schema owners decide which tables are mandatory. -/
-def load (root : System.FilePath) (names : Array String := headers.map (·.1)) : IO Data := do
-  let tables ← headers.foldlM (fun tables (name,_) => do
+def load (root : System.FilePath) (names : Array String := headers.map (·.1))
+    (profile : Checker.RegistryLayout.Profile := .current) : IO Data := do
+  let view ← Checker.RegistryIO.load root profile names
+  let tables := headers.foldl (fun tables (name,_) => Id.run do
     if !names.contains name then return tables
-    let path := root / "registry" / (name ++ ".tsv")
-    if ← path.pathExists then return tables.push (name,tableFromText (← IO.FS.readFile path))
+    if let some text := view.files[Checker.RegistryIO.tablePath name]? then
+      return tables.push (name,tableFromText text)
     else return tables) #[]
   if names.contains "reference" && (← (root / "references/tasaki-2020.tsv").pathExists) then
     return ⟨root,tables.push ("reference",tableFromText (← IO.FS.readFile (root / "references/tasaki-2020.tsv")))⟩
@@ -918,6 +926,7 @@ def dataEntry (project : System.FilePath) (gate : String) (args : List String) :
   require (!fixture || gate == "tree" || gate == "census") "fixture mode is explicit only for tree/census"
   require (countStrings.isEmpty || gate == "census") "only census accepts fixture counts"
   let root ← IO.FS.realPath target
+  let profile ← Checker.RegistryIO.currentProfile project root
   let counts ← if countStrings.isEmpty then pure #[534,3172,1401] else do
     require (Registry.digits countStrings[0]! true && Registry.digits countStrings[1]! && Registry.digits countStrings[2]!)
       "fixture counts must be nonnegative integers and pages must be positive"
@@ -942,20 +951,20 @@ def dataEntry (project : System.FilePath) (gate : String) (args : List String) :
     | "registry" =>
       if modern then pure (Registry.headers.map (·.1))
       else
-        let preliminary ← Registry.load root (common.push "reference")
+        let preliminary ← Registry.load root (common.push "reference") profile
         pure (common ++ #["reference"] ++ (if (preliminary.table "claim-context").rows.isEmpty then #[] else #["item-claims"]))
     | "census" =>
-      let preliminary ← Registry.load root #["phase"]
+      let preliminary ← Registry.load root #["phase"] profile
       if Registry.phase preliminary == "bootstrap" then pure #["phase"]
       else if modern then pure (Registry.headers.map (·.1))
       else pure (#["phase","pages","claims","reference"] ++ (if Registry.phase preliminary == "census" then
         #["slices","dependencies","bindings","claim-context","axioms","claim-axioms","statement-modules","statement-imports"] else #[]))
     | "policy" =>
-      let preliminary ← Registry.load root #["phase"]
+      let preliminary ← Registry.load root #["phase"] profile
       pure (if Registry.oneOf (Registry.phase preliminary) "census|vocabulary|skeleton" then
         #["phase","modules","statement-modules"] else #["phase"])
     | _ => throw <| IO.userError "unknown data gate"
-  let d ← Registry.load root names
+  let d ← Registry.load root names profile
   if gate == "registry" && d.multi then
     Registry.schema d
     -- Bootstrap row rejection remains earlier than downstream foreign-key checks.

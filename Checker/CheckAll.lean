@@ -3,6 +3,7 @@ import Checker.Inputs
 import Checker.Transition
 import Checker.SemanticDriver
 import Checker.RegressionPool
+import Checker.Tests.RegistryLayout
 
 /-!
 Shared current-tree and regression dispatcher. Source mathematics stays in the
@@ -649,6 +650,22 @@ def selfTestReaderClosures (root : System.FilePath) (count : IO.Ref Nat) (envJso
   let badToken : Evidence := ⟨"owner/repo", "invalid\ncredential", (← IO.monoMsNow) + 45000, "engine", cache⟩
   reject count (http root badToken "/actions/runs/7") "credential config injection rejected before HTTP"
 
+/-- Compact physical metadata retains the correction freeze and the independent ordinary lifecycle rule. -/
+def selfTestSourceState (root : System.FilePath) (count : IO.Ref Nat) : IO Unit := do
+  let before ← Checker.BaseDiff.snapshot root .current
+  Checker.Corrections.frozenSourceState before before
+  expect count true "compact correction preserves source state"
+  let source := before.files["registry/sources.tsv"]!
+  let records := Registry.lines source
+  let changed := String.join <| records.zipIdx |>.toList.map fun (record,index) =>
+    (if index == 0 then record else String.intercalate "\t" ((split record "\t").set! 17 "OTHER-LIFECYCLE-REVIEW").toList) ++ "\n"
+  let files := before.files.insert "registry/sources.tsv" changed
+  let view ← Checker.RegistryLayout.normalize files .current
+  let after := {before with files := files, views := view.files}
+  reject count (Checker.Corrections.frozenSourceState before after) "compact correction freezes lifecycle review"
+  Checker.BaseDiff.validate before after false false ""
+  expect count true "ordinary lifecycle review remains governed by monotone progression"
+
 /-- Fast negative and positive tests cover dispatch, schema, ancestry, scope and secrecy. -/
 def selfTest (root : System.FilePath) : IO Unit := do
   let count ← IO.mkRef 0
@@ -762,6 +779,8 @@ def selfTest (root : System.FilePath) : IO Unit := do
   expect count (suites.all fun (name, _) => !regressionRequired "--current" allAccepted name) "current coverage stays partial"
   expect count (suites.all fun (name, _) => regressionRequired "--full" allAccepted name) "explicit full cannot reuse"
   selfTestReaderClosures root count envJson cache
+  Checker.Tests.RegistryLayout.run (expect count)
+  selfTestSourceState root count
   IO.println s!"check-all self-test: {(← count.get)} positive/negative assertions passed"
 
 /-- Describe each decision before any gate runs; skipped work is never reported as executed. -/

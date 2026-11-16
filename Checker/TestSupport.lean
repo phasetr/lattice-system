@@ -1,4 +1,5 @@
 import Lean
+import Checker.RegistryIO
 
 /-! Shared process, table and isolation operations for the infrastructure regression suites.
 The project supplying checker code and the owned fixture tree are separate identities.
@@ -76,7 +77,7 @@ def rowsOf (text : String) : Array (Array String) :=
 
 /-- Read a fixture table without stripping carriage returns or Unicode whitespace. -/
 def table (root : FilePath) (name : String) : IO (Array (Array String)) :=
-  rowsOf <$> IO.FS.readFile (root / "registry" / name)
+  rowsOf <$> Checker.RegistryIO.read root (name.dropEnd 4).toString .historical
 
 /-- Write complete TSV rows with the same single-LF record terminator as the original fixtures. -/
 def writeTable (root : FilePath) (name : String) (rows : Array (Array String)) : IO Unit := do
@@ -221,7 +222,20 @@ def copyCandidate (ctx : Context) (target : FilePath) : IO Unit := do
   ensure ((← git ctx.project #["ls-files","--stage","-z"]) == candidate &&
     (← git ctx.project #["diff","--name-only","-z"]).isEmpty) "candidate index changed during fixture construction"
 
-/-- Copy only the corpus, allowing the source project or an owned fixture as its origin. -/
+/-- Explicitly instantiate the existing regression schema inside a freshly owned fixture.
+This writes no historical Git tree and never changes the canonical production registry.
+-/
+def legacyRegistryFixture (ctx : Context) (root : FilePath) : IO Unit := do
+  ctx.owned root
+  let names := #["sources", "source-items", "source-progress", "source-invariants"] ++ Checker.RegistryIO.futureNames
+  let view ← Checker.RegistryIO.load root .historical names
+  if !view.compact then return
+  for name in names do
+    let path := Checker.RegistryIO.tablePath name
+    let some text := view.files[path]? | throw <| IO.userError s!"missing fixture schema {name}"
+    IO.FS.writeFile (root / path) text
+
+/-- Copy only the corpus, instantiating the explicitly owned legacy regression profile. -/
 def copyRegistry (ctx : Context) (source target : FilePath) : IO Unit := do
   let source ← IO.FS.realPath source
   if source != ctx.project then ctx.owned source
@@ -229,6 +243,7 @@ def copyRegistry (ctx : Context) (source target : FilePath) : IO Unit := do
   IO.FS.createDirAll target
   discard <| checked ⟨"cp", #["-RP", (source / "registry").toString,
     (target / "registry").toString], ctx.project, #[]⟩
+  legacyRegistryFixture ctx target
 
 /-- Refresh a synthetic corpus census with exact ordered row-plus-LF hashing. -/
 def refresh (ctx : Context) (root : FilePath) : IO Unit := do

@@ -27,7 +27,7 @@ def baseDirectories (project base target : FilePath) (event : String := "")
     (allowSupersession : Bool := false) (directoryMode : Bool := true)
     (actualCommit : Option String := none) : IO Unit := do
   let old ← Checker.BaseDiff.snapshot base
-  let current ← Checker.BaseDiff.snapshot target
+  let current ← Checker.BaseDiff.snapshot target (← Checker.RegistryIO.currentProfile project target)
   let replay := !event.isEmpty && !(Checker.Corrections.rows old "correction-events").any (col · 1 == event)
   if replay then Checker.Corrections.validate project base target event actualCommit
   Checker.BaseDiff.validate {old with normalizeLines := directoryMode} current (allowSupersession || replay) replay event

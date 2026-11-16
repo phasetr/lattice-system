@@ -49,13 +49,14 @@ def execute (project : FilePath) (value : Options) : IO Unit := do
   let project ← IO.FS.realPath project
   let requested := value.root.map (fun path => if path.isEmpty then "." else path)
   let root ← IO.FS.realPath (requested.getD project.toString)
+  let profile ← Checker.RegistryIO.currentProfile project root
   if value.mode == "--derive-source-items" then
     let some ownerText ← IO.getEnv "LATTICE_TEST_ROOT" | throw <| IO.userError "seed derivation requires LATTICE_TEST_ROOT"
     let owner ← IO.FS.realPath ownerText
     require (owner.toString != "/" && !pathWithin project.toString owner.toString &&
       !pathWithin owner.toString project.toString && root != owner && pathWithin root.toString owner.toString)
       "seed derivation requires an owned repository-external fixture"
-    let data ← load root #["claims","pages","sources","tracks"]
+    let data ← load root #["claims","pages","sources","tracks"] profile
     let (items,relations) ← derive (← data.rows "claims") (← data.rows "pages") (← data.rows "sources") (← data.rows "tracks")
     let table := fun (name : String) (rows : Array Row) => do
       let header ← headerFor name
@@ -64,7 +65,7 @@ def execute (project : FilePath) (value : Options) : IO Unit := do
     IO.println (Json.mkObj [("version",toJson (1 : Nat)),("source_items",← table "source_items" items),
       ("item_claims",← table "item_claims" relations)]).compress
     return
-  let outputs ← buildOutputs (← publicCatalog (← load root))
+  let outputs ← buildOutputs (← publicCatalog (← load root (headers.map Prod.fst) profile))
   if value.mode == "--write" then
     writeOutputs root outputs
     IO.println s!"generate-public-docs: wrote {outputs.size} files"

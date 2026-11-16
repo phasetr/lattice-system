@@ -8,11 +8,11 @@ open Lean System
 def version : Nat := 5
 /-- The sole regression-suite definition. -/
 def suites : Array (String × String) := Checker.Regressions.groups.map fun group => (group.name,group.name)
-/-- Registries whose semantic changes require fresh PR regressions. -/
+/-- Recognized semantic paths include historical physical schemas for immutable producer inputs. -/
 def semanticTables := #["phase", "source-progress", "bindings", "dependencies", "claim-context",
   "axioms", "claim-axioms", "vocabulary", "claim-vocabulary", "modules", "imports",
   "statement-modules", "statement-imports"]
-/-- Known corpus-only tables; unknown paths are never silently light. -/
+/-- Known corpus paths, including historical invariant tables; unknown paths are never silently light. -/
 def corpusTables := #["tracks", "sources", "source-invariants", "pages", "claims", "source-items",
   "item-claims", "slices", "claim-vocabulary-review", "correction-events",
   "claim-normalization-reviews", "claim-corrections", "claim-successors",
