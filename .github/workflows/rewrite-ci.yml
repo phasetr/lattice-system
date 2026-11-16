@@ -19,6 +19,8 @@ jobs:
         with:
           fetch-depth: 0
       - name: Prepare declared tools through the Lean bootstrap
+        env:
+          GH_TOKEN: ${{ github.token }}
         # Only native transfer, integrity assertions and extraction precede the typed Lean bootstrap.
         # This archive is the existing lean-toolchain release, not a second project toolchain.
         run: |

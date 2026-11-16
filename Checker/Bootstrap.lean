@@ -71,16 +71,30 @@ private def requestFailure (request : Request) (result : Option IO.Process.Outpu
     | none => "curl_exit=unavailable http=unavailable"
   s!"Official asset request failed: {request.label} {status}"
 
+/-- Only the exact GitHub repository API origin receives the job credential through stdin. -/
+private def credentialConfig (url : String) (token : Option String) : Except String (Option String) := do
+  if !url.startsWith "https://api.github.com/repos/" then return none
+  let some token := token | throw "Missing bootstrap API credential"
+  if token.isEmpty || !token.toList.all (fun c => 33 ≤ c.toNat && c.toNat ≤ 126 && c != '"' && c != '\\') then
+    throw "Invalid bootstrap API credential encoding"
+  return some s!"header = \"Authorization: Bearer {token}\"\n"
+
+/-- Curl retains HTTPS-only, credential-stripping redirects and never receives token bytes in argv. -/
+private def requestArguments (url : String) (target : FilePath) (binary authenticated : Bool) : Array String :=
+  #["--disable","--fail","--location","--silent","--show-error",
+    "--proto","=https","--proto-redir","=https","--connect-timeout","10","--max-time",
+    if binary then "300" else "30","--output",target.toString,"--write-out","%{http_code}"] ++
+    (if binary then #["--header","Accept: application/octet-stream"] else #[]) ++
+    (if authenticated then #["--config","-"] else #[]) ++ #[url]
+
 /-- Fetch official HTTPS data, discarding failed bodies and retaining the three-attempt retry budget. -/
 private def get (request : Request) (url : String) (target : FilePath) (binary : Bool := false) : IO Unit := do
+  let config ← IO.ofExcept (credentialConfig url (← IO.getEnv "GH_TOKEN"))
   for attempt in [:3] do
     if ← target.pathExists then IO.FS.removeFile target
-    let args := #["--disable","--fail","--location","--silent","--show-error",
-      "--proto","=https","--proto-redir","=https","--connect-timeout","10","--max-time",
-      if binary then "300" else "30","--output",target.toString,"--write-out","%{http_code}"] ++
-      (if binary then #["--header","Accept: application/octet-stream"] else #[]) ++ #[url]
+    let args := requestArguments url target binary config.isSome
     let result ← try
-      pure (some (← IO.Process.output {cmd := "curl",args}))
+      pure (some (← IO.Process.output {cmd := "curl",args} config))
     catch _ => pure none
     if result.any (fun output => output.exitCode == 0) then return
     let message := requestFailure request result
