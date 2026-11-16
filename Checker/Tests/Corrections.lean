@@ -165,7 +165,7 @@ def itemPublicContract (ctx : Context) (base current : FilePath) : IO Unit := do
   ensure (items.size == 3038 && (items.filter fun r => r[8]?.getD "" == "Chapter 08").size == 363 &&
     (← table current "item-claims.tsv").size == 3191) "historical source-item counts"
   for id in #["IT-TASAKI2020-3036", "IT-TASAKI2020-3037"] do discard <| record current "source-items.tsv" id
-  ensure (((← IO.FS.readFile (current / "docs/generated/sources/tasaki-2020.md")).splitOn "Reviewed source items: 3037").length > 1)
+  ensure (((← IO.FS.readFile (current / "docs/generated/sources/tasaki-2020.md")).splitOn "Registered source items: 3037").length > 1)
     "historical source-item source rendering"
   ensure (((← IO.FS.readFile (current / "docs/generated/groups/tasaki-2020/chapter-08.md")).splitOn "IT-TASAKI2020-3037").length > 1)
     "historical source-item group rendering"
