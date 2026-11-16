@@ -248,6 +248,7 @@ def prepare (ctx : Context) (goodRoot : FilePath) : IO FilePath := do
   let root := ctx.temporary / "production-composed"
   copyCandidate ctx root
   ctx.owned root
+  legacyRegistryFixture ctx root
   minimalLake ctx root
   IO.FS.removeDirAll (root / "LatticeSystem")
   IO.FS.createDirAll (root / "LatticeSystem/Claims")
