@@ -6,8 +6,8 @@
 - Edition: `2020.springer.ebook.9783030412654`
 - Identifier: `doi:10.1007/978-3-030-41265-4`
 - Public reference: [https://doi.org/10.1007/978-3-030-41265-4](https://doi.org/10.1007/978-3-030-41265-4)
-- Registry lifecycle: `frozen`
-- Formalization lifecycle: `vocabulary_reviewed`
+- Census coverage label: `frozen`
+- Source lifecycle: `vocabulary_reviewed`
 - Registered source items: 3077
 
 Private source paths and object identifiers are intentionally omitted.

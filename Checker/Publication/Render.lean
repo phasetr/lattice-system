@@ -14,7 +14,7 @@ def indexTemplate : String := "# Generated registry catalog\n\nGenerated from th
 def trackTemplate : String := "# Track: {title}\n\n- Phase: `{phase}`\n- Active claims: {active_claims}\n- Formalization targets: {formalization_target_claims}\n- Superseded claim records: {tombstoned_claims}\n- Mathlib-only: {mathlib_only_claims}\n- Project vocabulary: {project_vocabulary_claims}\n- Complete claim-vocabulary links: {claim_vocabulary_links}\n\n## Sources\n\n{sources}\n\n## Registered vocabulary\n\n{vocabulary}\n\n`vocabulary_ready` records only vocabulary readiness to state future claims. It is not\na statement binding or proof status.\n"
 
 /-- Byte-exact public sourceTemplate format. -/
-def sourceTemplate : String := "# {title}\n\n- Source ID: `{source_id}`\n- Authors: {authors}\n- Year: `{year}`\n- Edition: `{edition}`\n- Identifier: `{identifier_kind}:{identifier}`\n- Public reference: {public_reference}\n- Registry lifecycle: `{coverage}`\n- Formalization lifecycle: `{lifecycle}`\n- Registered source items: {count}\n\nPrivate source paths and object identifiers are intentionally omitted.\n\n## Groups\n\n{groups}\n"
+def sourceTemplate : String := "# {title}\n\n- Source ID: `{source_id}`\n- Authors: {authors}\n- Year: `{year}`\n- Edition: `{edition}`\n- Identifier: `{identifier_kind}:{identifier}`\n- Public reference: {public_reference}\n- Census coverage label: `{coverage}`\n- Source lifecycle: `{lifecycle}`\n- Registered source items: {count}\n\nPrivate source paths and object identifiers are intentionally omitted.\n\n## Groups\n\n{groups}\n"
 
 /-- Byte-exact public itemTemplate format. -/
 def itemTemplate : String := "<a id=\"{item_id}\"></a>\n\n## {heading}\n\n- Item ID: `{item_id}`\n- Source: `{source_id}`\n- Page ID: `{page_id}`\n- Kind: `{item_kind}`\n- Source label: `{source_label}`\n{title_line}- Locator: {locator}\n\n### Atomic claims\n\n{claims}\n"
@@ -230,6 +230,21 @@ def outputPath (root : FilePath) (relative : String) : IO FilePath := do
   discard <| outputDirectory root (relative.splitOn "/").dropLast true
   return path
 
+/-- Replace one output through a new inode, preserving any external hard link to its old bytes. -/
+private def replaceOutput (path : FilePath) (text : String) : IO Unit := do
+  let some parent := path.parent | throw <| IO.userError "generated output has no parent"
+  let temporary := parent / s!".publication-{← IO.monoNanosNow}.tmp"
+  let handle ← IO.FS.Handle.mk temporary .writeNew
+  try
+    handle.putStr text
+    handle.flush
+    IO.FS.rename temporary path
+  finally
+    try IO.FS.removeFile temporary
+    catch error => match error with
+      | .noFileOrDirectory .. => pure ()
+      | _ => throw error
+
 /-- Regenerate expected bytes and retire only stale managed files, then collect empty generated directories. -/
 def writeOutputs (root : FilePath) (outputs : Std.HashMap String String) : IO Unit := do
   for stale in ← managedPaths root do
@@ -240,8 +255,8 @@ def writeOutputs (root : FilePath) (outputs : Std.HashMap String String) : IO Un
     let text := outputs[relative]?.getD ""
     if let some metadata ← outputMetadata path then
       require (metadata.type == .file) "expected generated output is not a regular file"
-      if (← IO.FS.readFile path) != text then IO.FS.writeFile path text
-    else IO.FS.writeFile path text
+      if (← IO.FS.readFile path) != text then replaceOutput path text
+    else replaceOutput path text
   let generated := root / "docs/generated"
   if ← generated.isDir then
     let (_,directories) ← managedBelow root generated
