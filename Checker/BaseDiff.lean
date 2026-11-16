@@ -49,7 +49,8 @@ def baseline (before : Snapshot) (path : String) (modern : Bool) : IO String := 
       require (#["registry/claim-vocabulary-review.tsv", "registry/vocabulary.tsv",
         "registry/claim-vocabulary.tsv", "registry/modules.tsv", "registry/imports.tsv",
         "registry/claim-context.tsv", "registry/statement-modules.tsv",
-        "registry/statement-imports.tsv", "registry/claim-content-amendments.tsv"].contains path)
+        "registry/statement-imports.tsv", "registry/claim-content-amendments.tsv",
+        "registry/claim-location-amendments.tsv"].contains path)
         s!"base missing {path}"
       let some text := emptyHeader path | throw <| IO.userError s!"base missing {path}"
       pure text
@@ -171,7 +172,8 @@ def validate (before current : Snapshot) (allowSupersession replay : Bool) (even
     compare "registry/sources.tsv" #[2,3,4,5,6,7,8,9,10,11,12,13,14] "source identity/position/bibliography"
     if !replay then compare "registry/source-invariants.tsv" #[2,3,4,5,6,7,8] "source frozen invariants"
     if before.files.contains "registry/source-items.tsv" then
-      compare "registry/source-items.tsv" #[2,3,4,5,6,7,8,9,10,11] "source item identity/order/label"
+      compare "registry/source-items.tsv" (if replay then #[2,3,4,5,6,7,9,10,11] else #[2,3,4,5,6,7,8,9,10,11])
+        "source item identity/order/label"
       oldRows (← rowsOld "registry/item-claims.tsv") (← rowsCurrent "registry/item-claims.tsv") "registry/item-claims.tsv" "item-claim"
   else compare "references/tasaki-2020.tsv" #[2] "source identity"
   for (stem,label) in #[("dependencies","dependency"),("claim-axioms","claim-axiom"),
@@ -225,13 +227,14 @@ def validate (before current : Snapshot) (allowSupersession replay : Bool) (even
         claimsCurrent.contains (col row 13) && !claimsOld.contains (col row 13)
       require (unchanged || advanced) "invalid dedicated supersession transition; supersession transition regression"
   for stem in #["correction-events","claim-normalization-reviews","claim-corrections",
-    "claim-successors","source-item-additions","claim-content-amendments"] do
+    "claim-successors","source-item-additions","claim-content-amendments","claim-location-amendments"] do
     let path := "registry/" ++ stem ++ ".tsv"
     if before.files.contains path then
       let text ← readCurrent path
       unless replay do require (text == (← readOld path)) s!"{path} historical correction ledger drift"
-    else if stem == "claim-content-amendments" && !replay && current.files.contains path then
-      require ((← readCurrent path) == (← readOld path)) "unowned content amendment ledger addition"
+    else if (stem == "claim-content-amendments" || stem == "claim-location-amendments") && !replay && current.files.contains path then
+      require ((← readCurrent path) == (← readOld path))
+        (if stem == "claim-location-amendments" then "unowned location amendment ledger addition" else "unowned content amendment ledger addition")
   let oldBindingsText ← readOld "registry/bindings.tsv"
   unless (tableFromText oldBindingsText).records[0]?.getD "" == (headers.find? (·.1 == "bindings")).get!.2 do
     require ((tableFromText oldBindingsText).records.size == 1) "base bindings.tsv carries rows under an unsupported schema"

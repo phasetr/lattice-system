@@ -16,7 +16,7 @@ def semanticTables := #["phase", "source-progress", "bindings", "dependencies", 
 def corpusTables := #["tracks", "sources", "source-invariants", "pages", "claims", "source-items",
   "item-claims", "slices", "claim-vocabulary-review", "correction-events",
   "claim-normalization-reviews", "claim-corrections", "claim-successors",
-  "source-item-additions", "claim-content-amendments"]
+  "source-item-additions", "claim-content-amendments", "claim-location-amendments"]
 /-- Policy documents are projected through the exact predicates their checker reads. -/
 def policyPaths := #["README.md", "DESIGN.md", ".github/pull_request_template.md"]
 /-- Executable/fixture overrides are forbidden on the production CI route. -/

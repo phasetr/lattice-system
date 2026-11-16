@@ -1,6 +1,6 @@
 # Group TASAKI2020 / Front matter
 
-Generated from reviewed source-item metadata. Source claim text is not reproduced.
+Generated from registered source-item metadata. Source claim text is not reproduced.
 
 <a id="IT-TASAKI2020-0001"></a>
 

@@ -70,7 +70,7 @@ def twoSources : IO Unit := do
     check ((first.splitOn text).length > 1) "registered first-source display"
   check ((first.splitOn "CL-ASECOND-0001").length == 1) "source groups do not mix"
   for slug in #["first-source","second-source"] do
-    check (((outputs["docs/generated/sources/" ++ slug ++ ".md"]?.getD "").splitOn "Reviewed source items: 1").length > 1) "per-source item count"
+    check (((outputs["docs/generated/sources/" ++ slug ++ ".md"]?.getD "").splitOn "Registered source items: 1").length > 1) "per-source item count"
   let firstTrack := outputs["docs/generated/tracks/first-track.md"]?.getD ""
   let secondTrack := outputs["docs/generated/tracks/second-track.md"]?.getD ""
   for text in #[firstTrack,secondTrack] do check ((text.splitOn "Active claims: 1").length > 1) "per-track active count"

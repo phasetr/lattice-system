@@ -5,13 +5,14 @@ source-item and claim metadata. It does not reproduce source claim text or
 publish private source paths and object identifiers.
 
 - Current phase: `vocabulary`
-- Active atomic claims: 3250
-- Formalization targets: 3224
+- Active atomic claims: 3251
+- Formalization targets: 3202
 - Superseded claim records: 23
-- Reviewed source items: 3076
-- Mathlib-only claims: 3222
+- Registered source items: 3077
+- Mathlib-only claims: 3200
 - Project-vocabulary claims: 2
 
 See the [generated catalog](generated/index.md). Status values are deliberately
 conservative: `not_bound`, `not_recorded`, and `not_assessed` do not mean
-proved or axiom-free.
+proved or axiom-free. Vocabulary readiness concerns recorded basis/use reviews;
+it does not certify whole-source fidelity, a statement binding or a proof.

@@ -5,7 +5,7 @@ namespace Checker.Publication
 open Lean System Checker.CheckAll
 
 /-- Byte-exact public rootTemplate format. -/
-def rootTemplate : String := "# Formalization status\n\nThis public documentation is generated deterministically from the registered\nsource-item and claim metadata. It does not reproduce source claim text or\npublish private source paths and object identifiers.\n\n- Current phase: `{phase}`\n- Active atomic claims: {active_claims}\n- Formalization targets: {formalization_target_claims}\n- Superseded claim records: {tombstoned_claims}\n- Reviewed source items: {source_items}\n- Mathlib-only claims: {mathlib_only_claims}\n- Project-vocabulary claims: {project_vocabulary_claims}\n\nSee the [generated catalog](generated/index.md). Status values are deliberately\nconservative: `not_bound`, `not_recorded`, and `not_assessed` do not mean\nproved or axiom-free.\n"
+def rootTemplate : String := "# Formalization status\n\nThis public documentation is generated deterministically from the registered\nsource-item and claim metadata. It does not reproduce source claim text or\npublish private source paths and object identifiers.\n\n- Current phase: `{phase}`\n- Active atomic claims: {active_claims}\n- Formalization targets: {formalization_target_claims}\n- Superseded claim records: {tombstoned_claims}\n- Registered source items: {source_items}\n- Mathlib-only claims: {mathlib_only_claims}\n- Project-vocabulary claims: {project_vocabulary_claims}\n\nSee the [generated catalog](generated/index.md). Status values are deliberately\nconservative: `not_bound`, `not_recorded`, and `not_assessed` do not mean\nproved or axiom-free. Vocabulary readiness concerns recorded basis/use reviews;\nit does not certify whole-source fidelity, a statement binding or a proof.\n"
 
 /-- Byte-exact public indexTemplate format. -/
 def indexTemplate : String := "# Generated registry catalog\n\nGenerated from the checked registries; do not edit by hand.\n\n## Summary\n\n- Phase: `{phase}`\n- Source items: {source_items}\n- Active claims: {active_claims}\n- Formalization targets: {formalization_target_claims}\n- Superseded claim records: {tombstoned_claims}\n- Vocabulary declarations: {vocabulary_declarations}\n- Claim-vocabulary links: {claim_vocabulary_links}\n\n## Tracks\n\n{tracks}\n\n## Sources\n\n{sources}\n\n## Public groups\n\n{groups}\n\nMachine-readable data: [catalog.json](catalog.json).\n"
@@ -14,7 +14,7 @@ def indexTemplate : String := "# Generated registry catalog\n\nGenerated from th
 def trackTemplate : String := "# Track: {title}\n\n- Phase: `{phase}`\n- Active claims: {active_claims}\n- Formalization targets: {formalization_target_claims}\n- Superseded claim records: {tombstoned_claims}\n- Mathlib-only: {mathlib_only_claims}\n- Project vocabulary: {project_vocabulary_claims}\n- Complete claim-vocabulary links: {claim_vocabulary_links}\n\n## Sources\n\n{sources}\n\n## Registered vocabulary\n\n{vocabulary}\n\n`vocabulary_ready` records only vocabulary readiness to state future claims. It is not\na statement binding or proof status.\n"
 
 /-- Byte-exact public sourceTemplate format. -/
-def sourceTemplate : String := "# {title}\n\n- Source ID: `{source_id}`\n- Authors: {authors}\n- Year: `{year}`\n- Edition: `{edition}`\n- Identifier: `{identifier_kind}:{identifier}`\n- Public reference: {public_reference}\n- Registry lifecycle: `{coverage}`\n- Formalization lifecycle: `{lifecycle}`\n- Reviewed source items: {count}\n\nPrivate source paths and object identifiers are intentionally omitted.\n\n## Groups\n\n{groups}\n"
+def sourceTemplate : String := "# {title}\n\n- Source ID: `{source_id}`\n- Authors: {authors}\n- Year: `{year}`\n- Edition: `{edition}`\n- Identifier: `{identifier_kind}:{identifier}`\n- Public reference: {public_reference}\n- Registry lifecycle: `{coverage}`\n- Formalization lifecycle: `{lifecycle}`\n- Registered source items: {count}\n\nPrivate source paths and object identifiers are intentionally omitted.\n\n## Groups\n\n{groups}\n"
 
 /-- Byte-exact public itemTemplate format. -/
 def itemTemplate : String := "<a id=\"{item_id}\"></a>\n\n## {heading}\n\n- Item ID: `{item_id}`\n- Source: `{source_id}`\n- Page ID: `{page_id}`\n- Kind: `{item_kind}`\n- Source label: `{source_label}`\n{title_line}- Locator: {locator}\n\n### Atomic claims\n\n{claims}\n"
@@ -161,7 +161,7 @@ def buildOutputs (catalog : Json) : IO (Std.HashMap String String) := do
         ("locator",toJson (markdown (← str item "locator"))),("claims",toJson (String.intercalate "\n" lines.toList))])
       format itemTemplate values
     let text := "# Group " ++ source ++ " / " ++ markdown (← str group "public_group") ++ "\n\n" ++
-      "Generated from reviewed source-item metadata. Source claim text is not reproduced.\n\n" ++ String.intercalate "\n" blocks.toList
+      "Generated from registered source-item metadata. Source claim text is not reproduced.\n\n" ++ String.intercalate "\n" blocks.toList
     pure (outputs.insert ("docs/generated/groups/" ++ (← str group "source_public_slug") ++ "/" ++ slug ++ ".md") text)) outputs
   return outputs.insert "docs/generated/catalog.json" (prettyJson catalog ++ "\n")
 

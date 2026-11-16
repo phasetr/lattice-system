@@ -1,6 +1,6 @@
 # Group TASAKI2020 / Chapter 04
 
-Generated from reviewed source-item metadata. Source claim text is not reproduced.
+Generated from registered source-item metadata. Source claim text is not reproduced.
 
 <a id="IT-TASAKI2020-0405"></a>
 
@@ -3166,7 +3166,7 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 - Kind: `unlabeled`
 - Source label: `NONE`
 - Title: `NONE`
-- Locator: PDF p. 110; print p. 97; §4.2.1; paragraph 4, atom 4
+- Locator: PDF p. 110; print p. 97; §4.2.1; M(L) domain paragraph immediately before (4.2.10)
 
 ### Atomic claims
 
@@ -3441,7 +3441,7 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 - Kind: `unlabeled`
 - Source label: `NONE`
 - Title: `NONE`
-- Locator: PDF p. 112; print p. 99; §4.2.1; paragraph 5; audit split atom 2/2
+- Locator: PDF p. 112; print p. 99; §4.2.1; orthogonal-unit-vector paragraph after (4.2.17), before (4.2.18); audit split atom 2/2
 
 ### Atomic claims
 
@@ -3617,7 +3617,7 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 - Kind: `unlabeled`
 - Source label: `NONE`
 - Title: `NONE`
-- Locator: PDF p. 113; print p. 100; §4.2.1; paragraph 9
+- Locator: PDF p. 113; print p. 100; §4.2.1; proviso immediately after (4.2.22) in Proposition 4.10
 
 ### Atomic claims
 
@@ -3752,6 +3752,22 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 ### Atomic claims
 
 - `CL-TASAKI2020-0598` — out_of_scope / definition; lifecycle `active`; Vocabulary `not_reviewed`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+
+<a id="IT-TASAKI2020-3077"></a>
+
+## Footnote 25
+
+- Item ID: `IT-TASAKI2020-3077`
+- Source: `TASAKI2020`
+- Page ID: `PG-TASAKI2020-0115`
+- Kind: `footnote`
+- Source label: `Footnote 25`
+- Title: `NONE`
+- Locator: PDF p. 115; print p. 102; §4.2.1; Footnote 25
+
+### Atomic claims
+
+- `CL-TASAKI2020-3531` — assertion / remark; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
 <a id="IT-TASAKI2020-0601"></a>
 

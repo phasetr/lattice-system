@@ -1,6 +1,6 @@
 # Group TASAKI2020 / Appendix A
 
-Generated from reviewed source-item metadata. Source claim text is not reproduced.
+Generated from registered source-item metadata. Source claim text is not reproduced.
 
 <a id="IT-TASAKI2020-2505"></a>
 

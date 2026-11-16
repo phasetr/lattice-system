@@ -1,5 +1,6 @@
 import Checker.Content
 import Checker.Support
+import Checker.Locations
 
 /-! Native registry, tree and policy validators. -/
 namespace Checker.CheckAll
@@ -19,6 +20,7 @@ def fixedTreePaths : Array String := #[
   "registry/modules.tsv", "registry/imports.tsv", "registry/correction-events.tsv",
   "registry/claim-normalization-reviews.tsv", "registry/claim-corrections.tsv", "registry/claim-successors.tsv",
   "registry/source-item-additions.tsv", "registry/claim-content-amendments.tsv", "registry/claim-context.tsv",
+  "registry/claim-location-amendments.tsv", "Checker/Locations.lean",
   "registry/statement-modules.tsv", "registry/statement-imports.tsv",
   "Checker/Content.lean", "Checker/Publication.lean", "Checker/Bootstrap.lean", "Checker/Tests/Publication.lean",
   "Checker/Text.lean", "Checker/Publication/Tabular.lean", "Checker/Publication/Items.lean",
@@ -42,6 +44,7 @@ def fixedTreePaths : Array String := #[
   "Checker/TestSupport.lean",
   "Checker/Tests/BaseDiff.lean",
   "Checker/Tests/Content.lean",
+  "Checker/Tests/Locations.lean",
   "Checker/Tests/Corrections.lean",
   "Checker/Tests/FixtureSupport.lean",
   "Checker/Tests/Fixtures.lean",
@@ -155,6 +158,7 @@ def headers : Array (String × String) := #[
   ("claim-successors", "successor_edge_id\tevent_id\tcorrection_id\tpredecessor_claim_id\tsuccessor_position\trelation\tsuccessor_claim_id"),
   ("source-item-additions", "item_addition_id\tevent_id\tcorrection_id\taddition_position\titem_id\treview_ref"),
   ("claim-content-amendments", "amendment_id\tevent_id\tcorrection_id\tclaim_id\told_content_oid\tnew_content_oid\tpage_source_oid\treview_ref"),
+  ("claim-location-amendments", "location_amendment_id\tevent_id\tcorrection_id\tclaim_id\titem_id\told_claim_locator\tnew_claim_locator\told_item_locator\tnew_item_locator\treview_ref"),
   ("statement-modules", "module\tsource_path\trole"),
   ("statement-imports", "module\tposition\timported_module\tis_exported\tis_meta\timport_all")]
 
@@ -889,6 +893,10 @@ def dataCore (project : System.FilePath) (d : Registry.Data) (gate : String)
       Registry.registryCore d
       if d.multi then
         discard <| Checker.Content.validateStatic d.root
+        Checker.Locations.validateHistory (d.table "claims").rows (d.table "source-items").rows
+          (d.table "pages").rows (d.table "item-claims").rows (d.table "correction-events").rows
+          (d.table "claim-normalization-reviews").rows (d.table "claim-corrections").rows
+          (d.table "claim-location-amendments").rows
     | "census" => Registry.census d fixture counts
     | "source-items" => Registry.items d
     | "policy" => Registry.policy d

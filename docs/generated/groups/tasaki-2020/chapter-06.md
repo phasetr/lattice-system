@@ -1,6 +1,6 @@
 # Group TASAKI2020 / Chapter 06
 
-Generated from reviewed source-item metadata. Source claim text is not reproduced.
+Generated from registered source-item metadata. Source claim text is not reproduced.
 
 <a id="IT-TASAKI2020-0878"></a>
 

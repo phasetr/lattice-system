@@ -98,8 +98,9 @@ base and source. Its closed readiness review owns the corrective action;
 source, page and unrelated records stay fixed. Source corrections cannot create
 axioms, bindings or other R4 artifacts.
 
-The six permanent ledgers are correction events, normalization reviews,
-corrections, successors, source-item additions and content amendments. Their
+The seven permanent ledgers are correction events, normalization reviews,
+corrections, successors, source-item additions, content amendments and location
+amendments. Their
 headers and rows retain the exact previous bytes as a prefix; a later event
 appends its own contiguous positions without reopening historical ownership.
 The concrete schemas and allowed field changes are checked by
@@ -109,12 +110,27 @@ Their distinct mathematical meanings remain:
 | Action | Meaning and identity boundary |
 | --- | --- |
 | `reclassify` | Repair classification while retaining the same source assertion and content. |
-| `exclude_nonclaim` | Record reviewed exclusion and its rationale, without deleting the record. |
+| `exclude_nonclaim` | Record reviewed exclusion, including an author's withdrawal of a source strategy, without deleting the record or asserting that every retained step is false. |
 | `amend_content` | Repair the transcription of the same source-atomic assertion; classification is fixed. |
 | `amend_and_reclassify` | Repair both content and classification of that same assertion. |
+| `amend_location` | Refine an existing claim and its singleton item's locators on the same frozen page, preserving all other fields. |
 | `split` | Preserve a compound predecessor as history and create at least one new atomic successor. |
 | `retire_duplicate` | Preserve a second record of the same source-atomic assertion and link one unchanged existing canonical target. |
 | `add_omitted_claim` | Independently create a previously unrecorded assertion, with no fictitious predecessor. |
+
+Location maintenance requires a closed `source_location_readiness` review and
+one uniquely event-owned amendment for the existing claim/item pair. Physical
+and printed page, section, identities, source order, content and its OID,
+source/page fingerprints, item membership and classification remain fixed.
+Exact old/new locator chains end at the current rows; historical ledger prefixes
+remain unchanged. Ordinary transitions cannot alter locators. Earlier snapshots
+without this ledger retain their observed absence rather than acquiring a
+fabricated historical artifact.
+
+An author's withdrawal removes the reviewed unit from formalization-target
+scope while preserving its identities, wording and source history. It neither
+rejects all intermediate calculations as false nor changes unaffected adjacent
+material or creates a replacement mathematical model.
 
 Content repairs and additions require real recomputed content OIDs and agreement
 with the unchanged frozen page fingerprint, and
