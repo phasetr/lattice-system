@@ -6,5 +6,6 @@ public import LatticeSystem.Vocabulary.Spin
 /-!
 # Whole-corpus vocabulary
 
-Umbrella for the partial traces and finite-site spin operators required by the registered corpus.
+Umbrella for the partial traces, site-spin and total-spin operators required by
+the registered corpus.
 -/

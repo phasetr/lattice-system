@@ -338,6 +338,17 @@ spectral identities remain separately bound assertions; the R3 definition is
 not a proof of them. The informal introductory Hamiltonian sum does not fix
 ordered-pair multiplicity or coefficients for a later exact model.
 
+The source-order operation in 0015 is the total-spin triple. In the same
+finite system and product basis, `LatticeSystem.totalSpin n axis` is the sum
+`∑ site, spinAt n site axis`, as defined in (2.2.7). It is a sum rather than
+an average, with no nonempty-site assumption; the empty sum is zero. It belongs
+to the existing spin leaf and has its own reviewed vocabulary admission for
+0015. This composition does not implement the total-spin square, its spectrum,
+ladder operators or rotation operators, and does not certify their identities.
+Its `explicit_finite_volume` scope is witnessed by the finite model carrier
+`V` itself. That scope admits an explicit `Fintype` carrier or `Finset` volume
+data; it does not impose finiteness on the general graph abstraction.
+
 ### Partial traces and reduced-density definition
 
 The existing `LatticeSystem.partialTraceRight` sums the right coordinate and

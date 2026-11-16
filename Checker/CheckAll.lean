@@ -584,7 +584,9 @@ def selfTestInputs (_root : System.FilePath) (count : IO.Ref Nat) : IO Unit := d
     ("statement-imports",Registry.tableFromText "module\tposition\timported_module\tis_exported\tis_meta\timport_all\n") ]⟩
   expect count (importRoots imports #[] == some #["Mathlib.Init"]) "current semantic imports prepare exact roots"
   expect count (importRoots imports #["skeleton-pure"] == some #["Mathlib.Init","Mathlib.LinearAlgebra.Matrix.Defs"]) "selected pure fixtures retain notation imports"
-  expect count (importRoots imports #["vocabulary-semantic"] == some #["Mathlib.Data.Nat.Basic","Mathlib.Init"]) "selected vocabulary negative retains its real external import"
+  expect count (importRoots imports #["vocabulary-semantic"] == some
+    #["Mathlib.Data.Finset.Card","Mathlib.Data.Fintype.Card","Mathlib.Data.Nat.Basic","Mathlib.Init"])
+    "selected vocabulary fixtures retain their real external imports"
   expect count (importRoots ⟨_root,#[]⟩ #[] == some #[]) "known empty import roots skip cache preparation"
   expect count (importRoots imports #["unknown"] == none) "unknown fixture reader requests full cache"
   expect count (!cacheModule "Mathlib.Foo;bad" && !cacheModule "Mathlib..Foo" && cacheModule "Mathlib.Data.Nat.Basic") "cache module arguments are names rather than shell syntax"

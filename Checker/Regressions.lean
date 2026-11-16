@@ -68,7 +68,7 @@ def groups : Array Group := #[
   {name := "vocabulary-registry", run := Checker.Tests.Vocabulary.registry,
     inputs := dataInputs ++ #["Checker/Tests/Fixtures.lean","Checker/Tests/Vocabulary.lean"], corpus := true},
   {name := "vocabulary-semantic", run := Checker.Tests.Vocabulary.semantic,
-    inputs := semanticInputs ++ #["Checker/Vocabulary.lean","Checker/Tests/Fixtures.lean","Checker/Tests/Vocabulary.lean"], mathlibImports := #["Mathlib.Data.Nat.Basic"]},
+    inputs := semanticInputs ++ #["Checker/Vocabulary.lean","Checker/Tests/Fixtures.lean","Checker/Tests/Vocabulary.lean"], mathlibImports := #["Mathlib.Data.Nat.Basic","Mathlib.Data.Fintype.Card","Mathlib.Data.Finset.Card"]},
   {name := "base-diff", run := Checker.Tests.BaseDiff.run,
     inputs := transitionInputs ++ #["Checker/Tests/Fixtures.lean","Checker/Tests/BaseDiff.lean"], corpus := true},
   {name := "multisource", run := Checker.Tests.Multisource.run,

@@ -250,8 +250,8 @@ def validateVocabulary (modules imports vocabulary actual : Array Row) (environm
       let errors := record errors (col expected 9 != "graph_core" || col row 8 == "true") s!"graph_core declaration does not mention SimpleGraph: {name}"
       let errors := record errors (col expected 10 != "none" || col row 9 != "true") s!"global vocabulary declaration requires Fintype: {name}"
       let errors := record errors (col expected 10 != "local_operation" || col row 9 == "true") s!"local_operation declaration lacks Fintype: {name}"
-      let errors := record errors (col expected 10 != "explicit_finite_volume" || (col row 9 != "true" && col row 10 == "true"))
-        s!"explicit_finite_volume declaration is not explicit Finset data: {name}"
+      let errors := record errors (col expected 10 != "explicit_finite_volume" || (col row 9 == "true" || col row 10 == "true"))
+        s!"explicit_finite_volume declaration lacks a finite carrier or Finset data: {name}"
       if col row 4 == "NONE" then
         record errors (col expected 5 == "primary" && col expected 6 == "NONE") s!"unsubstantiated generated origin/parent: {name}"
       else

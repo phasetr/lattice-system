@@ -240,7 +240,7 @@ Generated from registered source-item metadata. Source claim text is not reprodu
 
 ### Atomic claims
 
-- `CL-TASAKI2020-0015` — notation / notation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-0015` — notation / notation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: `LatticeSystem.totalSpin`
 
 <a id="IT-TASAKI2020-0016"></a>
 

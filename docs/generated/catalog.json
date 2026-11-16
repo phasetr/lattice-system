@@ -3641,12 +3641,17 @@
           "proof_declaration": "NONE",
           "proof_status": "not_recorded",
           "registered_axioms": [],
-          "required_vocabulary": [],
+          "required_vocabulary": [
+            {
+              "declaration": "LatticeSystem.totalSpin",
+              "vocabulary_id": "VO-LS-0002"
+            }
+          ],
           "statement_declaration": "NONE",
           "statement_module": "NONE",
           "subkind": "notation",
           "successor_claim": "NONE",
-          "vocabulary_basis": "mathlib_only",
+          "vocabulary_basis": "project_vocabulary",
           "vocabulary_status": "vocabulary_ready"
         }
       ],
@@ -101980,13 +101985,13 @@
   },
   "summary": {
     "active_claims": 3251,
-    "claim_vocabulary_links": 5,
+    "claim_vocabulary_links": 6,
     "formalization_target_claims": 3198,
-    "mathlib_only_claims": 3195,
-    "project_vocabulary_claims": 3,
+    "mathlib_only_claims": 3194,
+    "project_vocabulary_claims": 4,
     "source_items": 3077,
     "tombstoned_claims": 23,
-    "vocabulary_declarations": 3
+    "vocabulary_declarations": 4
   },
   "tracks": [
     {
@@ -102005,6 +102010,15 @@
       "module": "LatticeSystem.Vocabulary.Spin",
       "origin": "primary",
       "vocabulary_id": "VO-LS-0001"
+    },
+    {
+      "declaration": "LatticeSystem.totalSpin",
+      "declaration_kind": "definition",
+      "design_role": "finite_volume",
+      "finiteness_scope": "explicit_finite_volume",
+      "module": "LatticeSystem.Vocabulary.Spin",
+      "origin": "primary",
+      "vocabulary_id": "VO-LS-0002"
     },
     {
       "declaration": "LatticeSystem.partialTraceRight",

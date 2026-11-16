@@ -51,6 +51,10 @@ def prepare (ctx : Context) (name : String) : IO FilePath := do
   writeTable target "vocabulary.tsv" #[vocabularyHeader,#["VO-FIXTURE-0001","Fixture.Item","Fixture.Subject",
     "abbrev","primary","NONE","eda6899694a1d94c33f3b10aa4e8e71fe7970cd3","eedad8e975235d5b3d0801932bc9e971a4c2a5a3","fixture","none"]]
   let body := match name with
+    | "volume-carrier" | "global-carrier" =>
+      "/-- Finite-carrier semantic fixture. -/\nabbrev Item (α : Type) [Fintype α] : Nat := Fintype.card α"
+    | "volume-finset" =>
+      "/-- Explicit-volume semantic fixture. -/\nabbrev Item (volume : Finset Nat) : Nat := volume.card"
     | "axiom" => "/-- Forbidden axiom fixture. -/\naxiom Item : Nat"
     | "body" => "/-- Body drift fixture. -/\nabbrev Item := Int"
     | "extra" => "/-- Registered fixture. -/\nabbrev Item := Nat\n/-- Unregistered fixture. -/\nabbrev Extra := Nat"
@@ -61,13 +65,21 @@ def prepare (ctx : Context) (name : String) : IO FilePath := do
     | _ => "/-- Harmless semantic-checker fixture. -/\nabbrev Item := Nat"
   if name == "transitive" then
     write target "Mathlib/FixtureDependency.lean" "module\n\n@[expose] public section\n\nnamespace Mathlib\n\n/-- Hidden unresolved dependency. -/\ndef hidden : Nat := by sorry\n\nend Mathlib\n"
-  let imported := if name == "import" then "Mathlib.Data.Nat.Basic" else if name == "transitive" then "Mathlib.FixtureDependency" else "Init"
+  let imported := if name == "import" then "Mathlib.Data.Nat.Basic"
+    else if name == "transitive" then "Mathlib.FixtureDependency"
+    else if name == "volume-carrier" || name == "global-carrier" then "Mathlib.Data.Fintype.Card"
+    else if name == "volume-finset" then "Mathlib.Data.Finset.Card"
+    else "Init"
+  if #["volume-carrier","global-carrier","volume-finset"].contains name then
+    writeTable target "imports.tsv" #[#["module","position","imported_module","is_exported","is_meta","import_all"],
+      #["Fixture.Subject","1",imported,"true","false","false"]]
   write target "Fixture/Subject.lean" ("module\n\npublic import " ++ imported ++ "\n\n@[expose] public section\n\nnamespace Fixture\n\n" ++ body ++ "\n\nend Fixture\n")
   return target
 
 /-- All positive and negative vocabulary environment cases use actual elaboration and the shared driver. -/
 def semantic (ctx : Context) : IO Unit := do
-  let names := #["good","structure","axiom","extra","import","sorry","theorem","type","body","missing","module","graph","finiteness","transitive"]
+  let names := #["good","structure","axiom","extra","import","sorry","theorem","type","body","missing","module","graph","finiteness","transitive",
+    "volume-carrier","volume-finset","volume-missing","global-carrier"]
   let fixtures ← names.foldlM (fun (fixtures : Std.HashMap String FilePath) name => do
     pure (fixtures.insert name (← prepare ctx name))) {}
   let get := fun name => fixtures[name]!
@@ -80,6 +92,13 @@ def semantic (ctx : Context) : IO Unit := do
   mutateLine (get "module") "vocabulary.tsv" 2 #[(2,"Fixture.Other")]
   mutateLine (get "graph") "vocabulary.tsv" 2 #[(8,"graph_core")]
   mutateLine (get "finiteness") "vocabulary.tsv" 2 #[(9,"local_operation")]
+  for name in #["volume-carrier","global-carrier"] do
+    mutateLine (get name) "vocabulary.tsv" 2
+      #[(6,"72698f08016cb7babfc35eda2e6c2a4ca31f5987"),(7,"657484c93956c2e375e29c45aee640adbc681554")]
+  mutateLine (get "volume-finset") "vocabulary.tsv" 2
+    #[(6,"d917bcc3f1884a0edb4311dcd2665b3f081f1da3"),(7,"c371c8ef0aa6a1b92ff451ea11e12be2cc36ae3f")]
+  for name in #["volume-carrier","volume-finset","volume-missing"] do
+    mutateLine (get name) "vocabulary.tsv" 2 #[(9,"explicit_finite_volume")]
   writeTable (get "structure") "vocabulary.tsv" #[vocabularyHeader,
     #["VO-FIXTURE-0001","Fixture.Pair","Fixture.Subject","structure","primary","NONE","eda6899694a1d94c33f3b10aa4e8e71fe7970cd3","0586bd493d684bcfdfadaa8ff4947f51eec7c48e","fixture","none"],
     #["VO-FIXTURE-0002","Fixture.Pair.left","Fixture.Subject","projection","generated","VO-FIXTURE-0001","09117ddb3ec4f41df783154859883a9de3d050e2","dd7d0075df1dd47237fddb4cca34b753916ce4bb","generated","inherited"],
@@ -91,12 +110,18 @@ def semantic (ctx : Context) : IO Unit := do
     #["Mathlib.FixtureDependency","Mathlib/FixtureDependency.lean","leaf"],#["Fixture.Subject","Fixture/Subject.lean","umbrella"]]
   writeTable (get "transitive") "imports.tsv" #[#["module","position","imported_module","is_exported","is_meta","import_all"],
     #["Fixture.Subject","1","Mathlib.FixtureDependency","true","false","false"]]
-  for name in #["good","structure"] do
+  for name in #["good","structure","volume-carrier","volume-finset"] do
     discard <| expect ctx name true (ctx.command "vocabulary" #["--fixture",(get name).toString])
   for name in #["axiom","extra","import","sorry","theorem","type","body","missing","module","graph","finiteness"] do
     discard <| expect ctx name false (ctx.command "vocabulary" #["--fixture",(get name).toString])
   discard <| expect ctx "transitive" false (ctx.command "vocabulary" #["--fixture",(get "transitive").toString])
     "transitive sorryAx dependency: Fixture.Item"
+  discard <| expect ctx "volume-missing" false
+    (ctx.command "vocabulary" #["--fixture",(get "volume-missing").toString])
+    "explicit_finite_volume declaration lacks a finite carrier or Finset data: Fixture.Item"
+  discard <| expect ctx "global-carrier" false
+    (ctx.command "vocabulary" #["--fixture",(get "global-carrier").toString])
+    "global vocabulary declaration requires Fintype: Fixture.Item"
   IO.println "test-vocabulary-semantic: ok"
 
 end Checker.Tests.Vocabulary
