@@ -61,18 +61,31 @@ def header (root : FilePath) (name expected : String) : IO Unit := do
 def required (root : FilePath) (names : Array String) : IO Unit :=
   names.forM fun name => do require (← (root / "registry" / (name ++ ".tsv")).pathExists) s!"missing registry/{name}.tsv"
 
-/-- Run a pinned Lean compiler with the inspection-specific output search path. -/
-def lean (project temporary compiler source : FilePath) (args : Array String := #[])
+/-- One inspection shares its pinned compiler and canonical project import path as immutable inputs. -/
+private structure Runtime where
+  compiler : FilePath
+  basePath : String
+
+/-- Resolve the project Lake environment once, after the entry route's ownership and input guards. -/
+private def loadRuntime (project compiler : FilePath) : IO Runtime := do
+  return ⟨compiler,trim (← output project "lake" #["env","printenv","LEAN_PATH"])⟩
+
+/-- Run a pinned compiler with an explicit inspection runtime and the same child-only path overrides. -/
+private def leanWith (runtime : Runtime) (project temporary source : FilePath) (args : Array String := #[])
     (additional : Array (String × Option String) := #[]) : IO Unit := do
-  let base := trim (← output project "lake" #["env","printenv","LEAN_PATH"])
-  let defaults := #[("LEAN_PATH",some (temporary.toString ++ ":" ++ base))]
+  let defaults := #[("LEAN_PATH",some (temporary.toString ++ ":" ++ runtime.basePath))]
   let environment := defaults.filter (fun pair => !additional.any (fun item => pair.1 == item.1)) ++ additional
   let result ← IO.Process.output {
-    cmd := compiler.toString
+    cmd := runtime.compiler.toString
     args := #[source.toString] ++ args
     cwd := some project
     env := environment }
   require (result.exitCode == 0) (result.stdout ++ result.stderr)
+
+/-- Retain the standalone helper API; entry routes share a runtime across all of their compiler calls. -/
+def lean (project temporary compiler source : FilePath) (args : Array String := #[])
+    (additional : Array (String × Option String) := #[]) : IO Unit := do
+  leanWith (← loadRuntime project compiler) project temporary source args additional
 
 /-- Bind the checker artifact cache to all source bytes, compiler bytes and the compile recipe. -/
 def checkerKey (project checker compiler : FilePath) (kind : String) : IO String := do
@@ -83,7 +96,8 @@ def checkerKey (project checker compiler : FilePath) (kind : String) : IO String
     (some (source ++ "\x00" ++ body ++ "\x00" ++ trim compilerOid ++ "\x00semantic-olean-v1:--root;-o")))
 
 /-- Compile one source-bound checker pair, sharing only completed artifacts in an owned suite cache. -/
-def prepareChecker (project checker temporary compiler : FilePath) (kind : String) : IO FilePath := do
+private def prepareCheckerWith (runtime : Runtime) (project checker temporary : FilePath) (kind : String) : IO FilePath := do
+  let compiler := runtime.compiler
   let before ← checkerKey project checker compiler kind
   let destination ← match ← IO.getEnv "LATTICE_SEMANTIC_CACHE" with
     | none => pure (temporary / "semantic")
@@ -117,15 +131,19 @@ def prepareChecker (project checker temporary compiler : FilePath) (kind : Strin
     return destination
   require (!(← destination.pathExists)) "incomplete semantic cache entry"
   IO.FS.createDirAll (destination / "Checker")
-  lean project destination compiler (checker / "Checker/Semantic.lean")
+  leanWith runtime project destination (checker / "Checker/Semantic.lean")
     #["--root=" ++ checker.toString,"-o",(destination / "Checker/Semantic.olean").toString]
-  lean project destination compiler (checker / "Checker" / (kind ++ ".lean"))
+  leanWith runtime project destination (checker / "Checker" / (kind ++ ".lean"))
     #["--root=" ++ checker.toString,"-o",(destination / "Checker" / (kind ++ ".olean")).toString]
   require ((← checkerKey project checker compiler kind) == before) "semantic checker source changed during compilation"
   let artifacts ← #["Semantic",kind].mapM fun name => do
     pure (name,toJson (trim (← git project #["hash-object",(destination / "Checker" / (name ++ ".olean")).toString])))
   IO.FS.writeFile marker (Json.mkObj [("source",toJson before),("artifacts",Json.mkObj artifacts.toList)]).compress
   return destination
+
+/-- Preserve the independent checker-preparation API without exposing a runtime substitution option. -/
+def prepareChecker (project checker temporary compiler : FilePath) (kind : String) : IO FilePath := do
+  prepareCheckerWith (← loadRuntime project compiler) project checker temporary kind
 
 /-- Thread successful compilations through each complete pass, rejecting only a pass with no progress. -/
 private partial def compilePending (modules : Array Row)
@@ -137,7 +155,8 @@ private partial def compilePending (modules : Array Row)
   compilePending modules compile next
 
 /-- Elaborate registered leaves in the exact direct-import dependency order. -/
-def compileModules (project target temporary compiler semantic : FilePath) (modules imports : Array Row) (strict : Bool := true) : IO Unit := do
+private def compileModulesWith (runtime : Runtime) (project target temporary semantic : FilePath)
+    (modules imports : Array Row) (strict : Bool := true) : IO Unit := do
   let names := modules.map (col · 1)
   let search := temporary.toString ++ ":" ++ semantic.toString
   let compile := fun (compiled : Std.HashSet String) (row : Row) => do
@@ -152,15 +171,18 @@ def compileModules (project target temporary compiler semantic : FilePath) (modu
       if blocked then return compiled
       let destination := temporary / ((name.replace "." "/") ++ ".olean")
       if let some parent := destination.parent then IO.FS.createDirAll parent
-      let base := trim (← output project "lake" #["env","printenv","LEAN_PATH"])
       let result ← IO.Process.output {
-        cmd := compiler.toString
+        cmd := runtime.compiler.toString
         args := (if strict then #["-DwarningAsError=true"] else #[]) ++ #["--root=" ++ target.toString,(target / source).toString,"-o",destination.toString]
         cwd := some project
-        env := #[("LEAN_PATH",some (search ++ ":" ++ base))] }
+        env := #[("LEAN_PATH",some (search ++ ":" ++ runtime.basePath))] }
       require (result.exitCode == 0) s!"failed to elaborate registered module {name}\n{result.stdout}{result.stderr}"
       pure (compiled.insert name)
   compilePending modules compile {}
+
+/-- Preserve standalone module compilation while entry routes reuse their already resolved project path. -/
+def compileModules (project target temporary compiler semantic : FilePath) (modules imports : Array Row) (strict : Bool := true) : IO Unit := do
+  compileModulesWith (← loadRuntime project compiler) project target temporary semantic modules imports strict
 
 /-- Reconstruct exact semantic hashes from the environment dumper's escaped single-line encodings. -/
 def declarationRows (project : FilePath) (environment : String) (skeleton : Bool) : IO (Array Row) :=
@@ -280,16 +302,17 @@ def vocabulary (project : FilePath) (args : List String) : IO Unit := do
     let modules ← table target "modules"; let imports ← table target "imports"
     IO.FS.withTempDir fun temporary => do
       let compiler := (← toolchainRoot project) / "bin/lean"
-      let semantic ← prepareChecker project checker temporary compiler "Vocabulary"
-      compileModules project target temporary compiler semantic modules imports false
+      let runtime ← loadRuntime project compiler
+      let semantic ← prepareCheckerWith runtime project checker temporary "Vocabulary"
+      compileModulesWith runtime project target temporary semantic modules imports false
       IO.FS.writeFile (temporary / "modules.list") (String.join (modules.toList.map fun r => col r 1 ++ "\n"))
       let source := "module\n" ++ String.join (modules.toList.map fun r => "public import " ++ col r 1 ++ "\n") ++
         "public meta import Checker.Vocabulary\n\n#vocabulary_dump " ++ (toJson (temporary / "modules.list").toString).compress ++
         " " ++ (toJson (temporary / "environment.tsv").toString).compress ++ "\n"
       IO.FS.writeFile (temporary / "VocabularyRun.lean") source
-      lean project temporary compiler (temporary / "VocabularyRun.lean")
+      leanWith runtime project temporary (temporary / "VocabularyRun.lean")
         #["--root=" ++ temporary.toString,"-o",(temporary / "VocabularyRun.olean").toString]
-        #[("LEAN_PATH",some (temporary.toString ++ ":" ++ semantic.toString ++ ":" ++ trim (← output project "lake" #["env","printenv","LEAN_PATH"])))]
+        #[("LEAN_PATH",some (temporary.toString ++ ":" ++ semantic.toString ++ ":" ++ runtime.basePath))]
       let environment ← IO.FS.readFile (temporary / "environment.tsv")
       let actual ← declarationRows project environment false
       if dump then
@@ -508,10 +531,11 @@ def skeleton (project : FilePath) (args : List String) : IO Unit := do
     skeletonCoverage (← table target "source-progress") (← table target "claims") bindings
     IO.FS.withTempDir fun temporary => do
       let compiler := (← toolchainRoot project) / "bin/lean"
-      let semantic ← prepareChecker project checker temporary compiler "Skeleton"
+      let runtime ← loadRuntime project compiler
+      let semantic ← prepareCheckerWith runtime project checker temporary "Skeleton"
       let vocabulary ← table target "modules"; let modules := vocabulary ++ statements
       let vocabularyImports ← table target "imports"; let statementImports ← table target "statement-imports"
-      compileModules project target temporary compiler semantic modules (vocabularyImports ++ statementImports)
+      compileModulesWith runtime project target temporary semantic modules (vocabularyImports ++ statementImports)
       for (file,rows) in #[("modules.list",modules),("statement-modules.list",statements)] do
         IO.FS.writeFile (temporary / file) (String.join (rows.toList.map fun r => col r 1 ++ "\n"))
       let imports := String.join (modules.toList.map fun row => "import " ++ col row 1 ++ "\n")
@@ -519,8 +543,8 @@ def skeleton (project : FilePath) (args : List String) : IO Unit := do
       IO.FS.writeFile (temporary / "SkeletonRun.lean") (imports ++ "import Checker.Skeleton\n\n#skeleton_dump " ++
         quoted (temporary / "statement-modules.list") ++ " " ++ quoted (temporary / "environment.tsv") ++
         " " ++ quoted target ++ " " ++ quoted (target / "registry/statement-modules.tsv") ++ "\n")
-      let search := temporary.toString ++ ":" ++ semantic.toString ++ ":" ++ trim (← output project "lake" #["env","printenv","LEAN_PATH"])
-      lean project temporary compiler (temporary / "SkeletonRun.lean")
+      let search := temporary.toString ++ ":" ++ semantic.toString ++ ":" ++ runtime.basePath
+      leanWith runtime project temporary (temporary / "SkeletonRun.lean")
         #["--root=" ++ temporary.toString,"-o",(temporary / "SkeletonRun.olean").toString]
         #[("LEAN_PATH",some search)]
       let environment ← IO.FS.readFile (temporary / "environment.tsv")
@@ -544,14 +568,14 @@ def skeleton (project : FilePath) (args : List String) : IO Unit := do
         IO.println "check-skeleton: prepare canonical Lake isolation checker for production inspection"
         let isolationSource := project / "Checker/LakeIsolation.lean"
         let isolationBefore := trim (← git project #["hash-object",isolationSource.toString])
-        lean project temporary compiler isolationSource
+        leanWith runtime project temporary isolationSource
           #["-DwarningAsError=true","--root=" ++ project.toString,"-o",(semantic / "Checker/LakeIsolation.olean").toString]
           #[("LEAN_PATH",some search)]
         require (trim (← git project #["hash-object",isolationSource.toString]) == isolationBefore)
           "Lake isolation checker source changed during compilation"
         IO.FS.writeFile (temporary / "LakeIsolationRun.lean") (imports ++
           "import Checker.LakeIsolation\n#eval Checker.LakeIsolation.check " ++ quoted target ++ "\n")
-        lean project temporary compiler (temporary / "LakeIsolationRun.lean") #[] #[("LEAN_PATH",some search)]
+        leanWith runtime project temporary (temporary / "LakeIsolationRun.lean") #[] #[("LEAN_PATH",some search)]
         runGate target ⟨"lake",#["build","+LatticeSystem.Skeleton"]⟩
       IO.println "check-skeleton: ok"
   catch error => throw <| IO.userError s!"check-skeleton: {error}"
