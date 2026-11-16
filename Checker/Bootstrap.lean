@@ -45,21 +45,49 @@ private def appendEnvironment (name text : String) : IO Unit := do
   let path ← envPath name
   IO.FS.withFile path .append fun handle => handle.putStr text
 
-/-- Fetch official HTTPS data, discarding every failed attempt's body and retaining the old retry budget. -/
-private def get (url : String) (target : FilePath) (binary : Bool := false) : IO Unit := do
+/-- Fixed request roles identify failures without revealing URLs or captured HTTP data. -/
+private inductive Request where
+  | mathlibSource | elanRelease | leanRelease | leantarRelease | elanAsset | leantarAsset
+
+/-- Only source-owned labels can appear in a request diagnostic. -/
+private def Request.label : Request → String
+  | .mathlibSource => "pinned-mathlib-source"
+  | .elanRelease => "elan-release-metadata"
+  | .leanRelease => "lean-release-metadata"
+  | .leantarRelease => "leantar-release-metadata"
+  | .elanAsset => "elan-official-asset"
+  | .leantarAsset => "leantar-official-asset"
+
+/-- Accept exactly curl's three ASCII status digits, never arbitrary captured output. -/
+private def httpStatus (output : String) : String :=
+  let code := trim output
+  if code.length == 3 && code.toList.all (fun c => '0' ≤ c && c ≤ '9') then code
+  else "unavailable"
+
+/-- Process-launch failure remains distinct from curl's HTTP 000 and transport exit statuses. -/
+private def requestFailure (request : Request) (result : Option IO.Process.Output) : String :=
+  let status := match result with
+    | some result => s!"curl_exit={result.exitCode} http={httpStatus result.stdout}"
+    | none => "curl_exit=unavailable http=unavailable"
+  s!"Official asset request failed: {request.label} {status}"
+
+/-- Fetch official HTTPS data, discarding failed bodies and retaining the three-attempt retry budget. -/
+private def get (request : Request) (url : String) (target : FilePath) (binary : Bool := false) : IO Unit := do
   for attempt in [:3] do
     if ← target.pathExists then IO.FS.removeFile target
     let args := #["--disable","--fail","--location","--silent","--show-error",
       "--proto","=https","--proto-redir","=https","--connect-timeout","10","--max-time",
-      if binary then "300" else "30","--output",target.toString] ++
+      if binary then "300" else "30","--output",target.toString,"--write-out","%{http_code}"] ++
       (if binary then #["--header","Accept: application/octet-stream"] else #[]) ++ #[url]
-    let success ← try
-      pure ((← IO.Process.output {cmd := "curl",args}).exitCode == 0)
-    catch _ => pure false
-    if success then return
+    let result ← try
+      pure (some (← IO.Process.output {cmd := "curl",args}))
+    catch _ => pure none
+    if result.any (fun output => output.exitCode == 0) then return
+    let message := requestFailure request result
     if attempt == 2 then
       if ← target.pathExists then IO.FS.removeFile target
-      throw <| IO.userError "Official asset request failed after 3 attempts"
+      throw <| IO.userError (message ++ " after 3 attempts")
+    IO.eprintln (message ++ s!" (attempt {attempt+1}/3)")
     IO.sleep 5000
 
 /-- Decode JSON without ever echoing an untrusted HTTP body. -/
@@ -100,8 +128,8 @@ private def version (value : String) : Bool :=
     !part.isEmpty && part.toList.all (fun c => '0' ≤ c && c ≤ '9')
 
 /-- Require stable, published release metadata and bind tagged requests to their exact declared version. -/
-private def metadata (repo selector : String) (target : FilePath) : IO Json := do
-  get ("https://api.github.com/repos/" ++ repo ++ "/releases/" ++ selector) target
+private def metadata (request : Request) (repo selector : String) (target : FilePath) : IO Json := do
+  get request ("https://api.github.com/repos/" ++ repo ++ "/releases/" ++ selector) target
   let release ← readJson target
   let draft := release.getObjValAs? Bool "draft"
   let prerelease := release.getObjValAs? Bool "prerelease"
@@ -150,9 +178,9 @@ private def verifyAsset (repo name : String) (asset : Asset) (target : FilePath)
   IO.println s!"Verified official asset {repo}:{asset.tag}/{name}"
 
 /-- Download and verify only official assets selected from the release metadata. -/
-private def asset (repo : String) (release : Json) (name : String) (target : FilePath) : IO Unit := do
+private def asset (request : Request) (repo : String) (release : Json) (name : String) (target : FilePath) : IO Unit := do
   let item ← assetMetadata repo release name
-  get item.url target true
+  get request item.url target true
   verifyAsset repo name item target
 
 /-- Decode the Contents API body as bytes, retaining the original non-strict base64 decoding behavior. -/
@@ -212,7 +240,7 @@ private def matchingVersions (source marker : ByteArray) : Nat → Nat → Array
 /-- Derive exactly one leantar version from the exact Contents API blob at the declared Mathlib commit. -/
 private def leantarVersion (revision : String) (work : FilePath) : IO String := do
   let sourceMetadata := work / "mathlib-io.json"
-  get ("https://api.github.com/repos/leanprover-community/mathlib4/contents/Cache/IO.lean?ref=" ++ revision) sourceMetadata
+  get .mathlibSource ("https://api.github.com/repos/leanprover-community/mathlib4/contents/Cache/IO.lean?ref=" ++ revision) sourceMetadata
   let data ← readJson sourceMetadata
   require ((← stringField data "encoding") == "base64") "Unexpected pinned Mathlib source encoding"
   let source ← decodeSource (← stringField data "content") work
@@ -297,15 +325,15 @@ def prepare (ownedRoot : FilePath) : IO Unit := do
   IO.FS.createDir work
   try
     let leantar ← leantarVersion revision work
-    let elanRelease ← metadata "leanprover/elan" "latest" (work / "elan.json")
-    let leanRelease ← metadata "leanprover/lean4" "tags/v4.29.0" (work / "lean.json")
-    let leantarRelease ← metadata "digama0/leangz" ("tags/v" ++ leantar) (work / "leantar.json")
+    let elanRelease ← metadata .elanRelease "leanprover/elan" "latest" (work / "elan.json")
+    let leanRelease ← metadata .leanRelease "leanprover/lean4" "tags/v4.29.0" (work / "lean.json")
+    let leantarRelease ← metadata .leantarRelease "digama0/leangz" ("tags/v" ++ leantar) (work / "leantar.json")
     let elanArchive := work / "elan.tar.gz"
     let leantarArchive := work / "leantar.tar.gz"
-    asset "leanprover/elan" elanRelease "elan-x86_64-unknown-linux-gnu.tar.gz" elanArchive
+    asset .elanAsset "leanprover/elan" elanRelease "elan-x86_64-unknown-linux-gnu.tar.gz" elanArchive
     let leanAsset ← assetMetadata "leanprover/lean4" leanRelease "lean-4.29.0-linux.tar.zst"
     verifyAsset "leanprover/lean4" "lean-4.29.0-linux.tar.zst" leanAsset (root / "lean.tar.zst")
-    asset "digama0/leangz" leantarRelease ("leantar-v" ++ leantar ++ "-x86_64-unknown-linux-musl.tar.gz") leantarArchive
+    asset .leantarAsset "digama0/leangz" leantarRelease ("leantar-v" ++ leantar ++ "-x86_64-unknown-linux-musl.tar.gz") leantarArchive
     install root work elanArchive leantarArchive leantar
   finally
     let current ← owner root
