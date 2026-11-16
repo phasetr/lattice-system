@@ -926,7 +926,6 @@ def dataEntry (project : System.FilePath) (gate : String) (args : List String) :
   require (!fixture || gate == "tree" || gate == "census") "fixture mode is explicit only for tree/census"
   require (countStrings.isEmpty || gate == "census") "only census accepts fixture counts"
   let root ← IO.FS.realPath target
-  let profile ← Checker.RegistryIO.currentProfile project root
   let counts ← if countStrings.isEmpty then pure #[534,3172,1401] else do
     require (Registry.digits countStrings[0]! true && Registry.digits countStrings[1]! && Registry.digits countStrings[2]!)
       "fixture counts must be nonnegative integers and pages must be positive"
@@ -940,6 +939,7 @@ def dataEntry (project : System.FilePath) (gate : String) (args : List String) :
   if gate == "tree" then
     checkTree project root fixture
     return
+  let profile ← Checker.RegistryIO.currentProfile project root
   let modern ← (root / "registry/sources.tsv").pathExists
   let common := #["phase","pages","claims","slices","dependencies","bindings","claim-context","axioms","claim-axioms","claim-vocabulary-review","vocabulary","claim-vocabulary","modules","imports","statement-modules","statement-imports"]
   let names ← match gate with
