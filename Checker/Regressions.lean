@@ -6,6 +6,7 @@ import Checker.Tests.Multisource
 import Checker.Tests.SkeletonPure
 import Checker.Tests.SkeletonComposed
 import Checker.Tests.Corrections
+import Checker.Tests.Locations
 import Checker.Tests.Content
 import Checker.Tests.Selector
 
@@ -28,7 +29,7 @@ structure Group where
   mathlibImports : Array String := #[]
 
 /-- Native data validation also reaches the existing standalone content contract. -/
-def dataInputs : Array String := #["Checker/Data.lean","Checker/Content.lean","Checker/Text.lean"]
+def dataInputs : Array String := #["Checker/Data.lean","Checker/Content.lean","Checker/Text.lean","Checker/Locations.lean"]
 
 /-- Generation callers reach the complete native table, derivation, projection and output implementation. -/
 def publicationInputs : Array String := #["Checker/Publication.lean","Checker/Publication/Tabular.lean",
@@ -37,16 +38,28 @@ def publicationInputs : Array String := #["Checker/Publication.lean","Checker/Pu
 
 /-- Explicit transition callbacks read the full dedicated event and ordinary-history contracts. -/
 def transitionInputs : Array String := dataInputs ++ #["Checker/BaseDiff.lean","Checker/Corrections.lean",
-  "Checker/History.lean","Checker/Selector.lean","Checker/Transition.lean"]
+  "Checker/History.lean","Checker/Selector.lean","Checker/Transition.lean",
+  "Checker/SemanticDriver.lean","Checker/Semantic.lean","Checker/LakeIsolation.lean","Checker/Vocabulary.lean"]
 
 /-- Shared semantic drivers read their real elaborators and effective Lake decoder. -/
 def semanticInputs : Array String := #["Checker/SemanticDriver.lean","Checker/Semantic.lean","Checker/LakeIsolation.lean"]
 
 /-- Every group uses this executable facade and the same non-optimizable process/fixture oracles. -/
 def commonInputs : Array String := #["Checker/Main.lean","Checker/Regressions.lean","Checker/Support.lean","Checker/TestSupport.lean",
+  "Checker/RegistryLayout.lean","Checker/RegistryIO.lean",
   "lean-toolchain","lake-manifest.json","lakefile.toml"]
 
-/-- Leaf groups preserve the union of all former harness cases without replaying an unrelated wrapper. -/
+/-- Preserve the original correction roster and then run the independent locator contract cases. -/
+def runCorrections (context : Context) : IO Unit := do
+  let accepted ← context.accepted.get
+  let rejected ← context.rejected.get
+  Checker.Tests.Corrections.run context
+  Checker.Tests.Locations.run context
+  ensure ((← context.accepted.get) - accepted == 60 && (← context.rejected.get) - rejected == 222)
+    "correction/location inventory differs from 282 cases"
+  IO.println "test-correction-and-location: ok (282 cases; 60 positive, 222 rejection cases)"
+
+/-- Leaf groups preserve the union of all former harness cases and the reviewed locator contract. -/
 def groups : Array Group := #[
   {name := "registry", run := fun ctx => Checker.Tests.Registry.run ctx,
     inputs := dataInputs ++ #["Checker/Tests/Fixtures.lean","Checker/Tests/Registry.lean"], corpus := true},
@@ -66,8 +79,8 @@ def groups : Array Group := #[
     inputs := dataInputs ++ semanticInputs ++ publicationInputs ++ #["Checker/Skeleton.lean","Checker/Vocabulary.lean","Checker/Tests/Fixtures.lean",
       "Checker/Tests/FixtureSupport.lean","Checker/Tests/SkeletonFixture.lean","Checker/Tests/SkeletonComposed.lean",
       "LatticeSystem.lean",".gitignore"], headers := true, policy := true, layout := true, mathlibImports := #["Mathlib.Init"]},
-  {name := "corrections", run := Checker.Tests.Corrections.run,
-    inputs := transitionInputs ++ semanticInputs ++ publicationInputs ++ #["Checker/Vocabulary.lean","Checker/Tests/FixtureSupport.lean","Checker/Tests/Corrections.lean"], corpus := true, history := true, production := true},
+  {name := "corrections", run := runCorrections,
+    inputs := transitionInputs ++ semanticInputs ++ publicationInputs ++ #["Checker/Vocabulary.lean","Checker/Tests/FixtureSupport.lean","Checker/Tests/Corrections.lean","Checker/Tests/Locations.lean"], corpus := true, history := true, production := true},
   {name := "content", run := Checker.Tests.Content.run,
     inputs := transitionInputs ++ publicationInputs ++ #["Checker/Tests/FixtureSupport.lean","Checker/Tests/Content.lean"], corpus := true, history := true},
   {name := "selector", run := Checker.Tests.Selector.run,

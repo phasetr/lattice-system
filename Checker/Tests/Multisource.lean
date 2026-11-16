@@ -27,6 +27,7 @@ def base (ctx : Context) : IO FilePath := do
   replace root "claim-successors.tsv" #["successor_edge_id\tevent_id\tcorrection_id\tpredecessor_claim_id\tsuccessor_position\trelation\tsuccessor_claim_id"]
   replace root "source-item-additions.tsv" #["item_addition_id\tevent_id\tcorrection_id\taddition_position\titem_id\treview_ref"]
   replace root "claim-content-amendments.tsv" #["amendment_id\tevent_id\tcorrection_id\tclaim_id\told_content_oid\tnew_content_oid\tpage_source_oid\treview_ref"]
+  replace root "claim-location-amendments.tsv" #["location_amendment_id\tevent_id\tcorrection_id\tclaim_id\titem_id\told_claim_locator\tnew_claim_locator\told_item_locator\tnew_item_locator\treview_ref"]
   replace root "phase.tsv" #[
     "phase",
     "census",

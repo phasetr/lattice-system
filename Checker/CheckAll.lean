@@ -3,6 +3,8 @@ import Checker.Inputs
 import Checker.Transition
 import Checker.SemanticDriver
 import Checker.RegressionPool
+import Checker.Tests.RegistryLayout
+import Checker.Tests.R3Vocabulary
 
 /-!
 Shared current-tree and regression dispatcher. Source mathematics stays in the
@@ -625,7 +627,11 @@ def selfTestReaderClosures (root : System.FilePath) (count : IO.Ref Nat) (envJso
   let (nativeInputs,_) ← payloads root (rows.push ⟨"Checker/Data.lean","100644","blob","data"⟩) headers registryA policy (Json.mkObj []) envJson
   expect count (nativeInputs.getObjValD "skeleton-pure" == before.getObjValD "skeleton-pure" && nativeInputs.getObjValD "registry" != before.getObjValD "registry") "native validators do not invalidate pure semantic cases"
   let (semanticInputs,_) ← payloads root (rows.push ⟨"Checker/SemanticDriver.lean","100644","blob","semantic"⟩) headers registryA policy (Json.mkObj []) envJson
-  expect count (semanticInputs.getObjValD "skeleton-pure" != before.getObjValD "skeleton-pure" && semanticInputs.getObjValD "content" == before.getObjValD "content") "semantic readers are separate from content transitions"
+  expect count (semanticInputs.getObjValD "skeleton-pure" != before.getObjValD "skeleton-pure" &&
+    semanticInputs.getObjValD "content" != before.getObjValD "content" &&
+    semanticInputs.getObjValD "base-diff" != before.getObjValD "base-diff" &&
+    semanticInputs.getObjValD "registry" == before.getObjValD "registry")
+    "R3 transitions read the semantic driver while static registry gates remain separate"
   let compilerEnvironment := envJson.setObjVal! "native_compiler" (toJson "changed toolchain backend")
   let (compilerInputs, _) ← payloads root rows headers registryA policy (Json.mkObj []) compilerEnvironment
   expect count (suites.all fun (name, _) => before.getObjValD name != compilerInputs.getObjValD name) "native compiler identity changes every actual input"
@@ -648,6 +654,22 @@ def selfTestReaderClosures (root : System.FilePath) (count : IO.Ref Nat) (envJso
     !transport.contains "--location-trusted" && !transport.any (fun x => (x.splitOn "Authorization").length > 1)) "curl configuration and credential boundary"
   let badToken : Evidence := ⟨"owner/repo", "invalid\ncredential", (← IO.monoMsNow) + 45000, "engine", cache⟩
   reject count (http root badToken "/actions/runs/7") "credential config injection rejected before HTTP"
+
+/-- Compact physical metadata retains the correction freeze and the independent ordinary lifecycle rule. -/
+def selfTestSourceState (root : System.FilePath) (count : IO.Ref Nat) : IO Unit := do
+  let before ← Checker.BaseDiff.snapshot root .current
+  Checker.Corrections.frozenSourceState before before
+  expect count true "compact correction preserves source state"
+  let source := before.files["registry/sources.tsv"]!
+  let records := Registry.lines source
+  let changed := String.join <| records.zipIdx |>.toList.map fun (record,index) =>
+    (if index == 0 then record else String.intercalate "\t" ((split record "\t").set! 17 "OTHER-LIFECYCLE-REVIEW").toList) ++ "\n"
+  let files := before.files.insert "registry/sources.tsv" changed
+  let view ← Checker.RegistryLayout.normalize files .current
+  let after := {before with files := files, views := view.files}
+  reject count (Checker.Corrections.frozenSourceState before after) "compact correction freezes lifecycle review"
+  Checker.BaseDiff.validate before after false false ""
+  expect count true "ordinary lifecycle review remains governed by monotone progression"
 
 /-- Fast negative and positive tests cover dispatch, schema, ancestry, scope and secrecy. -/
 def selfTest (root : System.FilePath) : IO Unit := do
@@ -762,6 +784,9 @@ def selfTest (root : System.FilePath) : IO Unit := do
   expect count (suites.all fun (name, _) => !regressionRequired "--current" allAccepted name) "current coverage stays partial"
   expect count (suites.all fun (name, _) => regressionRequired "--full" allAccepted name) "explicit full cannot reuse"
   selfTestReaderClosures root count envJson cache
+  Checker.Tests.RegistryLayout.run (expect count)
+  selfTestSourceState root count
+  Checker.Tests.R3Vocabulary.run (expect count)
   IO.println s!"check-all self-test: {(← count.get)} positive/negative assertions passed"
 
 /-- Describe each decision before any gate runs; skipped work is never reported as executed. -/

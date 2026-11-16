@@ -5,12 +5,16 @@ namespace Checker.Tests.FixtureSupport
 open System Lean Checker.TestSupport
 
 /-- The stable claim used by the production-derived amendment fixtures. -/
-def claim : String := "CL-TASAKI2020-0001"
+def claim : String := "CL-TASAKI2020-0004"
 
 
 /-- The permanent content provenance schema. -/
 def amendmentHeader : Array String := #["amendment_id", "event_id", "correction_id", "claim_id",
   "old_content_oid", "new_content_oid", "page_source_oid", "review_ref"]
+
+/-- Current fixtures can expose an empty locator ledger without attributing it to an old Git tree. -/
+def locationHeader : Array String := #["location_amendment_id", "event_id", "correction_id", "claim_id", "item_id",
+  "old_claim_locator", "new_claim_locator", "old_item_locator", "new_item_locator", "review_ref"]
 
 
 /-- The artifact tables whose empty historical schemas can be adapted. -/
@@ -18,7 +22,7 @@ def artifactNames : Array String := #["bindings.tsv", "axioms.tsv", "claim-conte
   "statement-modules.tsv", "statement-imports.tsv"]
 
 
-/-- The six append-only correction ledgers. -/
+/-- The original six-ledger fixture roster; the new locator ledger has its own focused history tests. -/
 def historyTables : Array String := #["correction-events.tsv", "claim-normalization-reviews.tsv",
   "claim-corrections.tsv", "claim-successors.tsv", "source-item-additions.tsv", "claim-content-amendments.tsv"]
 
@@ -81,6 +85,8 @@ def cloneCommit (ctx : Context) (commit : String) (target : FilePath) : IO Unit 
       IO.FS.writeFile (target / path) (← git ctx.project #["show", commit ++ ":" ++ path])
   unless ← (target / "registry/claim-content-amendments.tsv").pathExists do
     writeTable target "claim-content-amendments.tsv" #[amendmentHeader]
+  unless ← (target / "registry/claim-location-amendments.tsv").pathExists do
+    writeTable target "claim-location-amendments.tsv" #[locationHeader]
   adaptEmpty ctx target
 
 

@@ -7,7 +7,7 @@ open Lean System Checker.CheckAll Checker.CheckAll.Registry Checker.BaseDiff
 
 /-- Read data rows while distinguishing required input from optional historical ledgers. -/
 def rows (snapshot : Snapshot) (stem : String) : Array Row :=
-  records (snapshot.files["registry/" ++ stem ++ ".tsv"]?.getD "")
+  records ((snapshot.text ("registry/" ++ stem ++ ".tsv")).getD "")
 
 /-- Read a ledger's exact bytes. -/
 def bytes (snapshot : Snapshot) (stem : String) : String :=
@@ -15,7 +15,7 @@ def bytes (snapshot : Snapshot) (stem : String) : String :=
 
 /-- The known immutable prefix of each permanent source-correction ledger. -/
 def ledgerNames : Array String := #["correction-events", "claim-normalization-reviews", "claim-corrections",
-  "claim-successors", "source-item-additions", "claim-content-amendments"]
+  "claim-successors", "source-item-additions", "claim-content-amendments", "claim-location-amendments"]
 
 /-- Correction-ledger tokens have the historical ASCII grammar, which excludes slashes. -/
 def correctionToken (value : String) : Bool :=
@@ -32,11 +32,16 @@ def additionId (value : String) : Bool :=
 /-- Exact current schema of an owned permanent ledger. -/
 def header (current : Snapshot) (stem : String) : IO Unit := do
   let some (_, expected) := headers.find? (·.1 == stem) | throw <| IO.userError "unknown correction table"
-  require ((tableFromText (bytes current stem)).records[0]?.getD "" == expected) s!"bad {stem}.tsv header"
+  require ((tableFromText ((current.text ("registry/" ++ stem ++ ".tsv")).getD "")).records[0]?.getD "" == expected)
+    s!"bad {stem}.tsv header"
 
 /-- Frozen records survive byte-for-byte and appended rows belong to the current event. -/
 def freezeLedger (before current : Snapshot) (stem event : String) (eventColumn : Nat) : IO Unit := do
-  unless before.files.contains ("registry/" ++ stem ++ ".tsv") do return
+  unless before.files.contains ("registry/" ++ stem ++ ".tsv") do
+    if stem == "claim-location-amendments" then
+      for row in rows current stem do
+        require (col row eventColumn == event) "historical correction ledger drift"
+    return
   require ((bytes current stem).startsWith (bytes before stem)) "historical correction ledger drift"
   let old := index (rows before stem)
   let after := rows current stem
@@ -104,10 +109,13 @@ def duplicateEligibility (before current : Snapshot) (event source : String) : I
 def ledgers (before current : Snapshot) (requested : String) : IO (String × String × String) := do
   for stem in #["claims","source-items","item-claims","claim-vocabulary-review","claim-vocabulary",
     "source-invariants","bindings","axioms","claim-axioms","pages","sources","tracks"] do
-    require (before.files.contains ("registry/" ++ stem ++ ".tsv") &&
-      current.files.contains ("registry/" ++ stem ++ ".tsv")) s!"missing registry/{stem}.tsv"
+    require (before.hasTable ("registry/" ++ stem ++ ".tsv") &&
+      current.hasTable ("registry/" ++ stem ++ ".tsv")) s!"missing registry/{stem}.tsv"
   for stem in ledgerNames do
-    require (current.files.contains ("registry/" ++ stem ++ ".tsv")) s!"missing registry/{stem}.tsv"
+    unless stem == "claim-location-amendments" && !before.files.contains "registry/claim-location-amendments.tsv" &&
+        !current.files.contains "registry/claim-location-amendments.tsv" do
+      require (current.files.contains ("registry/" ++ stem ++ ".tsv")) s!"missing registry/{stem}.tsv"
+  if current.files.contains "registry/claim-location-amendments.tsv" then header current "claim-location-amendments"
   for stem in #["correction-events","claim-normalization-reviews","claim-corrections","claim-successors","source-item-additions"] do
     header current stem
   discard <| (rows current "source-item-additions").foldlM (fun (additionIds,additionItems) row => do
@@ -144,8 +152,8 @@ def ledgers (before current : Snapshot) (requested : String) : IO (String × Str
     let owner := col row 2; let position := reviewPositions[owner]?.getD 0 + 1
     require (row.size == 9 && !reviewIds.contains (col row 1) && eventIndex.contains owner &&
       col row 3 == toString position && !reviewed.contains (owner,col row 4) &&
-      col row 5 == "exact_statement_readiness" && oneOf (col row 6)
-        "unchanged|reclassify|exclude_nonclaim|split|amend_content|amend_and_reclassify|retire_duplicate|add_omitted_claim" &&
+      col row 5 == (if col row 6 == "amend_location" then "source_location_readiness" else "exact_statement_readiness") && oneOf (col row 6)
+        "unchanged|reclassify|exclude_nonclaim|split|amend_content|amend_and_reclassify|retire_duplicate|add_omitted_claim|amend_location" &&
       col row 7 == "closed" && correctionToken (col row 8) && col row 9 == col (eventIndex[owner]?.getD #[]) 5)
       "invalid claim normalization review ledger"
     pure (reviewIds.insert (col row 1),reviewPositions.insert owner position,reviewed.insert (owner,col row 4)))
@@ -158,7 +166,7 @@ def ledgers (before current : Snapshot) (requested : String) : IO (String × Str
       col row 3 == toString position && !readiness.isEmpty && col readiness 2 == owner &&
       col readiness 4 == col row 5 && col readiness 6 == col row 6 && !reviewUses.contains (col row 4) &&
       !claimUses.contains (owner,col row 5) && oneOf (col row 6)
-        "reclassify|exclude_nonclaim|split|amend_content|amend_and_reclassify|retire_duplicate|add_omitted_claim")
+        "reclassify|exclude_nonclaim|split|amend_content|amend_and_reclassify|retire_duplicate|add_omitted_claim|amend_location")
       "invalid claim correction ledger"
     pure (correctionIds.insert (col row 1),correctionPositions.insert owner position,
       reviewUses.insert (col row 4),claimUses.insert (owner,col row 5)))
@@ -196,11 +204,13 @@ def claimActions (before current : Snapshot) (event : String) : IO Unit := do
       require (col readiness 6 == kind) "correction lacks owning review"
       require (projection action #[7,8,9,10] == #[col prior 6,col prior 7,col row 6,col row 7])
         "correction ledger does not match claim transition"
-      let allowed := if kind == "reclassify" then #[6,7] else if kind == "amend_content" then #[8,9]
+      let allowed := if kind == "amend_location" then #[5] else if kind == "reclassify" then #[6,7] else if kind == "amend_content" then #[8,9]
         else if kind == "amend_and_reclassify" then #[6,7,8,9]
         else if kind == "exclude_nonclaim" then #[6,10,11] else #[12,13,14,15]
       for i in [:prior.size] do require (allowed.contains (i+1) || prior[i]! == row[i]?.getD "") "unmanifested claim drift"
-      if kind == "reclassify" then
+      if kind == "amend_location" then
+        require (col row 12 == "false" && col row 6 != "out_of_scope") "source-location amendment requires an active target"
+      else if kind == "reclassify" then
         require (projection row #[12,10,11] == #["false","NONE","NONE"]) "invalid reclassify transition"
       else if kind == "exclude_nonclaim" then
         require (col row 6 == "out_of_scope" && col row 7 == col prior 7 && col row 12 == "false" &&
@@ -299,8 +309,11 @@ def itemOwnership (before current : Snapshot) (event source review : String) : I
   let relatedItems : Std.HashSet String := (rows before "item-claims").foldl (fun result row =>
     if predecessors.contains (col row 3) then result.insert (col row 1) else result) {}
   let oldItems := index (rows before "source-items"); let items := index (rows current "source-items")
+  let locationRows := (rows current "claim-location-amendments").filter (col · 2 == event)
   let (relatedDrift,unrelatedDrift) := oldItems.fold (fun (relatedDrift,unrelatedDrift) id prior =>
-    if items[id]? != some prior then
+    let locationOwned := locationRows.any fun row => col row 5 == id && col row 8 == col prior 8 &&
+      items[id]? == some (prior.set! 7 (col row 9))
+    if items[id]? != some prior && !locationOwned then
       if relatedItems.contains id then (true,unrelatedDrift) else (relatedDrift,true)
     else (relatedDrift,unrelatedDrift)) (false,false)
   require (!relatedDrift) "historical source item drift"
@@ -386,7 +399,11 @@ def propagation (before current : Snapshot) (event : String) : IO Unit := do
   for action in actions do
     let claim := col action 5
     let reviews := vocabularyReviews.filter (col · 1 == claim)
-    if oneOf (col action 6) "reclassify|amend_content|amend_and_reclassify|add_omitted_claim" then
+    if col action 6 == "amend_location" then
+      require (reviews == (rows before "claim-vocabulary-review").filter (col · 1 == claim) &&
+        (vocabularyUses.filter (col · 1 == claim)) == (rows before "claim-vocabulary").filter (col · 1 == claim))
+        "source-location amendment changes vocabulary review or use"
+    else if oneOf (col action 6) "reclassify|amend_content|amend_and_reclassify|add_omitted_claim" then
       require (reviews.size == 1 && col reviews[0]! 3 == col (reviewIndex[col action 4]?.getD #[]) 9)
         "reclassified claim lacks correction vocabulary review; correction relation propagation failed"
     else
@@ -425,9 +442,17 @@ def invariants (project : FilePath) (before current : Snapshot) (event source re
   let text := String.join <| (pages ++ sourceClaims).toList.map fun r => String.intercalate "\t" r.toList ++ "\n"
   require (col invariant 7 == trim (← output project "git" #["hash-object","--stdin"] (some text))) "census OID is stale"
 
+/-- Source identities and lifecycle attestations are frozen independently of their physical layout. -/
+def frozenSourceState (before current : Snapshot) : IO Unit := do
+  for stem in #["sources", "source-progress"] do
+    let path := "registry/" ++ stem ++ ".tsv"
+    require (before.hasTable path && current.hasTable path && before.text path == current.text path)
+      "unrelated frozen registry drift"
+
 /-- Validate the complete source-correction contract against two concrete directory snapshots. -/
 def validate (project base target : FilePath) (requested : String := "") (recordedBase : Option String := none) : IO Unit := do
-  let before ← snapshot base; let current ← snapshot target
+  let before ← snapshot base
+  let current ← snapshot target (← Checker.RegistryIO.currentProfile project target)
   let (event,source,review) ← ledgers before current requested
   if let some baseCommit := recordedBase then
     let selected := (rows current "correction-events").find? (col · 1 == event)
@@ -438,16 +463,23 @@ def validate (project base target : FilePath) (requested : String := "") (record
     require (sameArtifact before current stem) "correction event introduces an axiom artifact"
   for stem in #["bindings","claim-context","statement-modules","statement-imports"] do
     require (sameArtifact before current stem) "correction event introduces an R4 artifact"
+  frozenSourceState before current
   for (path,text) in before.files do
     let stem := ((path.dropPrefix "registry/").dropSuffix ".tsv").toString
-    unless (#["claims","source-items","item-claims","claim-vocabulary-review","claim-vocabulary","source-invariants",
+    unless (#["sources","source-progress","claims","source-items","item-claims","claim-vocabulary-review","claim-vocabulary","source-invariants",
       "correction-events","claim-normalization-reviews","claim-corrections","claim-successors","source-item-additions",
-      "claim-content-amendments","bindings","claim-context","statement-modules","statement-imports","axioms","claim-axioms"].contains stem) do
-      require (current.files[path]? == some text) "unrelated frozen registry drift"
+      "claim-content-amendments","claim-location-amendments","bindings","claim-context","statement-modules","statement-imports","axioms","claim-axioms"].contains stem) do
+      require (current.text path == some text) "unrelated frozen registry drift"
   claimActions before current event
   successorIdentities before current event source
   successors project before current event
   itemOwnership before current event source review
+  Checker.Locations.validateHistory (rows current "claims") (rows current "source-items") (rows current "pages")
+    (rows current "item-claims") (rows current "correction-events") (rows current "claim-normalization-reviews")
+    (rows current "claim-corrections") (rows current "claim-location-amendments")
+  Checker.Locations.validateTransition (rows before "claims") (rows before "source-items") (rows before "item-claims")
+    (rows current "claims") (rows current "source-items") (rows current "item-claims")
+    (rows before "claim-location-amendments") (rows current "claim-location-amendments") event
   propagation before current event
   invariants project before current event source review
   if (rows current "claim-corrections").any (fun r => col r 2 == event && col r 6 == "add_omitted_claim") then

@@ -23,7 +23,8 @@ Use the existing authorities for current facts:
 - [Public status and catalog](docs/index.md): generated counts, source items,
   vocabulary and binding/proof metadata, without normalized source claim text.
 - [Checker capability](registry/phase.tsv) and
-  [source lifecycles](registry/source-progress.tsv): recorded acceptance stages.
+  [source metadata](registry/sources.tsv): the global capability and each source's
+  separate lifecycle, review reference and frozen census anchors.
 - [Registered production modules](registry/modules.tsv) and
   [vocabulary](registry/vocabulary.tsv): source paths and declaration identities;
   the Lean environment establishes their existence and types.
@@ -32,8 +33,21 @@ Use the existing authorities for current facts:
 
 A recorded census or `vocabulary_ready` status does not establish source
 fidelity, a closed typed physics contract, statement binding or proof.
-Structural success and empty production statement tables do not certify R4.
+Structural success and absent pre-R4 statement records do not certify R4.
 The scope of an accepted review must be read before reusing it.
+
+The mathematical interfaces and source conventions in [DESIGN.md](DESIGN.md)
+separate source-order spin construction from existing Mathlib reuse and the
+later reduced-density definition. Their R3 registration route preserves source
+claims and requires fresh environment checks; it is distinct from R4 statement
+freeze and proof implementation. It does not certify every future source contract.
+
+Source lifecycle and reviewed corpus anchors have one physical record per source.
+Counts and coverage are derived from those records and the corpus; public source
+item format tags are supplied by the schema. Future-stage relation schemas live
+in the typed checker until needed. Before R4 their files may be absent; a present
+file must still have its exact empty schema. Skeleton and proof phases require
+the physical statement, dependency and axiom relation tables and their normal gates.
 
 ## Checks and generated documentation
 

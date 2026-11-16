@@ -16,7 +16,7 @@ namespace SkeletonChecker
 
 @[expose] public section
 
-/-- Render names as a comma-separated field for the shell-side set checks. -/
+/-- Render names as a comma-separated field for the verification-driver set checks. -/
 private meta def namesField (names : Array Name) : String :=
   String.intercalate "," (names.toList.map toString)
 

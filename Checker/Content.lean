@@ -1,5 +1,6 @@
 import Checker.Text
 import Checker.Support
+import Checker.RegistryIO
 
 /-! Reviewed content amendments and omitted-claim creation provenance. -/
 namespace Checker.Content
@@ -47,7 +48,11 @@ private def readText (path : FilePath) : IO String := do
 private def rows (root : FilePath) (name : String) (optional : Bool := false) : IO (Array Row) := do
   let path := root / "registry" / name
   if optional && !(← path.pathExists) then return #[]
-  let data := parseRows (← readText path)
+  let text ← if name == "sources.tsv" || name == "source-items.tsv" || name == "source-progress.tsv" || name == "source-invariants.tsv" ||
+      Checker.RegistryIO.futureNames.contains (name.dropEnd 4).toString then
+      Checker.RegistryIO.read root (name.dropEnd 4).toString .historical
+    else readText path
+  let data := parseRows text
   if name == "claim-content-amendments.tsv" then
     require (data[0]? == some amendmentHeader) "bad claim-content-amendments.tsv header"
   return data.extract 1 data.size
@@ -513,9 +518,11 @@ def entry (project : FilePath) (args : List String) : IO Unit := do
     match ← IO.ofExcept (parseArgs args) with
     | .help => IO.println "usage: content (--static ROOT | --transition BASE CURRENT EVENT)\n\nValidate reviewed content amendments and omitted-claim creation provenance."
     | .static root =>
+      discard <| Checker.RegistryIO.load root (← Checker.RegistryIO.currentProfile project root) #["sources"]
       discard <| validateStatic root
       IO.println "check-content-amendments: ok"
     | .transition base current event =>
+      discard <| Checker.RegistryIO.load current (← Checker.RegistryIO.currentProfile project current) #["sources"]
       validateTransitionAt project base current event
       IO.println "check-content-amendments: ok"
   catch error => throw <| IO.userError s!"check-content-amendments: {error}"

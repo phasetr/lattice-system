@@ -5,9 +5,9 @@ Generated from the checked registries; do not edit by hand.
 ## Summary
 
 - Phase: `vocabulary`
-- Source items: 3076
-- Active claims: 3250
-- Formalization targets: 3224
+- Source items: 3077
+- Active claims: 3251
+- Formalization targets: 3198
 - Superseded claim records: 23
 - Vocabulary declarations: 2
 - Claim-vocabulary links: 4
@@ -26,7 +26,7 @@ Generated from the checked registries; do not edit by hand.
 - [TASAKI2020 / Chapter 01](groups/tasaki-2020/chapter-01.md) — 26 items
 - [TASAKI2020 / Chapter 02](groups/tasaki-2020/chapter-02.md) — 240 items
 - [TASAKI2020 / Chapter 03](groups/tasaki-2020/chapter-03.md) — 112 items
-- [TASAKI2020 / Chapter 04](groups/tasaki-2020/chapter-04.md) — 431 items
+- [TASAKI2020 / Chapter 04](groups/tasaki-2020/chapter-04.md) — 432 items
 - [TASAKI2020 / Chapter 05](groups/tasaki-2020/chapter-05.md) — 81 items
 - [TASAKI2020 / Chapter 06](groups/tasaki-2020/chapter-06.md) — 97 items
 - [TASAKI2020 / Chapter 07](groups/tasaki-2020/chapter-07.md) — 239 items

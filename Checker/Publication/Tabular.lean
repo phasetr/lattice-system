@@ -1,5 +1,6 @@
 import Checker.Text
 import Checker.Support
+import Checker.RegistryIO
 
 /-! The publication reader preserves the standard quoted TSV contract independently of native data gates. -/
 namespace Checker.Publication
@@ -59,13 +60,17 @@ private partial def scanCsv (chars : Array Char) (i : Nat) (state : CsvState) : 
 /-- Decode standard non-strict quoted TSV, including quoted tabs/newlines and missing fields. -/
 def csvRows (text : String) : Array (Array String) := scanCsv text.toList.toArray 0 {}
 
+/-- Parsed public fields retain quoted values and missing-field nulls without another TSV split. -/
+def publicRows (expected : Array String) (values : Array (Array String)) : Array Row :=
+  values.filterMap fun values =>
+    if values.isEmpty then none else some <| Json.mkObj <| (expected.zipIdx).toList.map fun (key,i) =>
+      (key,(values[i]?).map toJson |>.getD Json.null)
+
 /-- Read one known public schema; blank data records follow DictReader's skipped-row behavior. -/
 def readTsv (path : FilePath) (expected : Array String) : IO (Array Row) := do
   let parsed := csvRows (← IO.FS.readFile path)
   require (parsed[0]? == some expected) s!"bad header for {path}"
-  return (parsed.extract 1 parsed.size).filterMap fun values =>
-    if values.isEmpty then none else some <| Json.mkObj <| (expected.zipIdx).toList.map fun (key,i) =>
-      (key,(values[i]?).map toJson |>.getD Json.null)
+  return publicRows expected (parsed.extract 1 parsed.size)
 
 /-- Encode one standard TSV field with exactly the delimiter/newline/quote escaping rules. -/
 def csvField (text : String) : String :=
@@ -100,9 +105,45 @@ def Data.rows (data : Data) (name : String) : IO (Array Row) := do
   return rows
 
 /-- Load exactly the required publication tables, or an explicit derive-only subset. -/
-def load (root : FilePath) (names : Array String := headers.map Prod.fst) : IO Data := do
+def load (root : FilePath) (names : Array String := headers.map Prod.fst)
+    (profile : Checker.RegistryLayout.Profile := .current) : IO Data := do
+  let sourcePath := root / "registry/sources.tsv"
+  let sourceCsv := csvRows (← Checker.RegistryIO.readPhysical sourcePath)
+  let compact ← if sourceCsv[0]? == some (split Checker.RegistryLayout.sourceHeader "\t") then
+    pure (some (← Checker.RegistryLayout.projectSources sourceCsv[0]!
+      (sourceCsv.extract 1 sourceCsv.size) profile))
+    else
+      require (profile != .current) "current registry requires compact sources.tsv"
+      pure none
+  let future ← if compact.isSome then do
+    let phaseRows ← readTsv (root / "registry/phase.tsv") #["phase"]
+    require (phaseRows.size == 1) "invalid phase for registry layout"
+    let phase ← str phaseRows[0]! "phase"
+    let observed ← Checker.RegistryIO.readFiles root Checker.RegistryIO.futureNames
+    Checker.RegistryLayout.futureHeaders.foldlM (fun tables (stem,_) => do
+      let parsed := observed[Checker.RegistryIO.tablePath stem]?.map csvRows
+      let input := parsed.map fun rows => (rows[0]?.getD #[],rows.extract 1 rows.size)
+      pure (tables.insert stem (← Checker.RegistryLayout.projectFuture phase stem input)))
+      ({} : Std.HashMap String (Array (Array String)))
+    else pure {}
+  if compact.isSome then
+    require ((← Checker.RegistryIO.readFiles root #["source-progress", "source-invariants"]).isEmpty)
+      "compact sources cannot coexist with legacy source state tables"
   let tables ← names.foldlM (fun tables name => do
-    pure (tables.insert name (← readTsv (root / "registry" / (name.replace "_" "-" ++ ".tsv")) (← headerFor name))))
+    let expected ← headerFor name
+    let stem := name.replace "_" "-"
+    let rows ← if let some source := compact then
+        if name == "sources" then pure (publicRows source.header source.rows)
+        else if name == "source_progress" then pure (publicRows expected (source.progress.getD #[]))
+        else if name == "source_items" then do
+          let parsed := csvRows (← Checker.RegistryIO.readPhysical (root / "registry/source-items.tsv"))
+          let item ← Checker.RegistryLayout.projectItems (parsed[0]?.getD #[])
+            (parsed.extract 1 parsed.size) true
+          pure (publicRows item.header item.rows)
+        else if let some rows := future[stem]? then pure (publicRows expected rows)
+        else readTsv (root / "registry" / (stem ++ ".tsv")) expected
+      else readTsv (root / "registry" / (stem ++ ".tsv")) expected
+    pure (tables.insert name rows))
     ({} : Std.HashMap String (Array Row))
   return ⟨root,tables⟩
 

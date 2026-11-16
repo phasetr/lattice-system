@@ -1,6 +1,6 @@
 # Group TASAKI2020 / Appendix A
 
-Generated from reviewed source-item metadata. Source claim text is not reproduced.
+Generated from registered source-item metadata. Source claim text is not reproduced.
 
 <a id="IT-TASAKI2020-2505"></a>
 
@@ -640,7 +640,7 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 
 ### Atomic claims
 
-- `CL-TASAKI2020-2488` — assertion / equation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: `LatticeSystem.partialTraceRight`, `LatticeSystem.partialTraceLeft`
+- `CL-TASAKI2020-2488` — definition / equation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: `LatticeSystem.partialTraceRight`, `LatticeSystem.partialTraceLeft`
 
 <a id="IT-TASAKI2020-2545"></a>
 

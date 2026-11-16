@@ -7,19 +7,32 @@ open Checker.CheckAll.Registry
 
 /-- Exact files of a registry revision, including the legacy reference table when present. -/
 structure Snapshot where
+  /-- Physical blobs and true absence are retained for immutable provenance and ledger prefixes. -/
   files : Std.HashMap String String := {}
+  /-- Explicit schema views never replace the observed physical blobs. -/
+  views : Std.HashMap String String := {}
   /-- Directory-base reads historically used line-printing AWK; Git-base reads used exact blobs. -/
   normalizeLines : Bool := false
 
 /-- Read a directory's table bytes without interpreting an absent table as an empty artifact. -/
-def snapshot (root : FilePath) : IO Snapshot := do
+def snapshot (root : FilePath) (profile : Checker.RegistryLayout.Profile := .historical) : IO Snapshot := do
   let result ← (← (root / "registry").readDir).foldlM (fun (result : Snapshot) entry => do
     if entry.path.extension == some "tsv" then
       return {files := result.files.insert ("registry/" ++ entry.fileName) (← IO.FS.readFile entry.path)}
     else return result) {}
-  if ← (root / "references/tasaki-2020.tsv").pathExists then
-    return {files := result.files.insert "references/tasaki-2020.tsv" (← IO.FS.readFile (root / "references/tasaki-2020.tsv"))}
-  return result
+  let result ← if ← (root / "references/tasaki-2020.tsv").pathExists then
+    pure {result with files := result.files.insert "references/tasaki-2020.tsv" (← IO.FS.readFile (root / "references/tasaki-2020.tsv"))}
+    else pure result
+  let view ← Checker.RegistryLayout.normalize result.files profile
+  return {result with views := view.files}
+
+/-- Read a semantic table while keeping physical membership separately available in `files`. -/
+def Snapshot.text (snapshot : Snapshot) (path : String) : Option String :=
+  snapshot.views[path]? <|> snapshot.files[path]?
+
+/-- A semantic schema view can be available without asserting physical historical existence. -/
+def Snapshot.hasTable (snapshot : Snapshot) (path : String) : Bool :=
+  (snapshot.text path).isSome
 
 /-- Extract data records using the old line-based TSV interpretation. -/
 def records (text : String) : Array Row := (tableFromText text).rows
@@ -42,14 +55,15 @@ def compatibilityDefault (path : String) : Option String :=
 
 /-- Resolve the finite set of old empty infrastructure tables, never arbitrary missing input. -/
 def baseline (before : Snapshot) (path : String) (modern : Bool) : IO String := do
-  let initial ← match before.files[path]? with
+  let initial ← match before.text path with
     | some text => pure text
     | none =>
       if let some text := compatibilityDefault path then return text
       require (#["registry/claim-vocabulary-review.tsv", "registry/vocabulary.tsv",
         "registry/claim-vocabulary.tsv", "registry/modules.tsv", "registry/imports.tsv",
         "registry/claim-context.tsv", "registry/statement-modules.tsv",
-        "registry/statement-imports.tsv", "registry/claim-content-amendments.tsv"].contains path)
+        "registry/statement-imports.tsv", "registry/claim-content-amendments.tsv",
+        "registry/claim-location-amendments.tsv"].contains path)
         s!"base missing {path}"
       let some text := emptyHeader path | throw <| IO.userError s!"base missing {path}"
       pure text
@@ -114,18 +128,75 @@ def lifecycleRank (value : String) : Nat :=
   if oneOf value "registered|source_frozen|census_pass1|census_pass2|census_reconciled|vocabulary_reviewed|skeleton_frozen|proof_active|complete" then
     #["", "registered", "source_frozen", "census_pass1", "census_pass2", "census_reconciled", "vocabulary_reviewed", "skeleton_frozen", "proof_active", "complete"].idxOf value else 0
 
+/-- A pre-freeze R3 review may admit a genuinely new definition without changing its source claim.
+The fresh registry admission is not evidence that an unimplemented R4 primary consumes it;
+the entry route separately requires native coverage and the actual vocabulary environment.
+-/
+def vocabularyReviewAdvances (before current : Snapshot) : IO (Array String) := do
+  let modern := current.files.contains "registry/sources.tsv"
+  let oldReviews := index (records (← baseline before "registry/claim-vocabulary-review.tsv" modern))
+  let reviews := records ((current.text "registry/claim-vocabulary-review.tsv").getD "")
+  let changed := reviews.filter fun row => match oldReviews[col row 1]? with
+    | some old => projection old #[2,3] != projection row #[2,3]
+    | none => false
+  if changed.isEmpty then return #[]
+  let diagnostic := "invalid pre-freeze R3 vocabulary review advance"
+  let phase := fun snapshot =>
+    (tableFromText ((snapshot.text "registry/phase.tsv").getD "")).records == #["phase","vocabulary"]
+  require (phase before && phase current) diagnostic
+  for stem in #["slices", "dependencies", "bindings", "claim-context", "axioms", "claim-axioms",
+    "statement-modules", "statement-imports"] do
+    let path := "registry/" ++ stem ++ ".tsv"
+    require ((records ((before.text path).getD "")).isEmpty &&
+      (records ((current.text path).getD "")).isEmpty) diagnostic
+  for stem in #["correction-events", "claim-normalization-reviews", "claim-corrections",
+    "claim-successors", "source-item-additions", "claim-content-amendments", "claim-location-amendments"] do
+    let path := "registry/" ++ stem ++ ".tsv"
+    require (before.files[path]? == current.files[path]?) diagnostic
+  let rows := fun snapshot stem => records ((snapshot.text ("registry/" ++ stem ++ ".tsv")).getD "")
+  let oldClaims := index (rows before "claims"); let claims := index (rows current "claims")
+  let oldSources := index (rows before "sources"); let sources := index (rows current "sources")
+  let oldProgress := index (rows before "source-progress"); let progress := index (rows current "source-progress")
+  let oldVocabulary := index (rows before "vocabulary"); let vocabulary := index (rows current "vocabulary")
+  let oldUses := rows before "claim-vocabulary"; let uses := rows current "claim-vocabulary"
+  let useSet := uses.foldl (fun (result : Std.HashSet (String × String)) row =>
+    result.insert (col row 1,col row 2)) {}
+  require (oldUses.all fun row => useSet.contains (col row 1,col row 2)) diagnostic
+  let oldReferences := (oldReviews.toArray.map fun entry => col entry.2 3).toList
+  for review in changed do
+    let claim := col review 1; let old := oldReviews[claim]!
+    let prior := oldClaims[claim]?.getD #[]; let present := claims[claim]?.getD #[]
+    let source := col prior 2
+    let life := oldProgress[source]?.getD #[]
+    let rank := lifecycleRank (col life 2)
+    require (review.size == 3 && col old 2 == "mathlib_only" && col review 2 == "project_vocabulary" &&
+      token (col review 3) && !oneOf (col review 3) "NONE|PENDING|UNKNOWN" &&
+      !oldReferences.contains (col review 3)) diagnostic
+    require (!prior.isEmpty && prior == present && col prior 12 == "false" && col prior 6 != "out_of_scope" &&
+      !life.isEmpty && 1 ≤ rank && rank ≤ 6 && progress[source]? == some life &&
+      oldSources[source]?.isSome && sources[source]? == oldSources[source]?) diagnostic
+    let admitted := uses.filter (col · 1 == claim)
+    require (!(oldUses.any (col · 1 == claim)) && !admitted.isEmpty &&
+      admitted.all (fun edge => edge.size == 2 && vocabulary.contains (col edge 2))) diagnostic
+    require (admitted.any fun edge =>
+      let id := col edge 2; let declaration := vocabulary[id]?.getD #[]
+      !oldVocabulary.contains id && col declaration 4 == "definition" &&
+      col declaration 5 == "primary" && col declaration 6 == "NONE" &&
+      oid (col declaration 7) && oid (col declaration 8)) diagnostic
+  return changed.map (col · 1)
+
 /-- Ordinary history constraints, with the dedicated reviewed event owning its exception. -/
 def validate (before current : Snapshot) (allowSupersession replay : Bool) (event : String) : IO Unit := do
   let modern := current.files.contains "registry/sources.tsv"
   let readOld := fun path => baseline before path modern
   let readCurrent := fun path => do
-    let some text := current.files[path]? | throw <| IO.userError s!"current missing {path}"
+    let some text := current.text path | throw <| IO.userError s!"current missing {path}"
     pure text
   let rowsOld := fun path => records <$> readOld path
   let rowsCurrent := fun path => records <$> readCurrent path
   for path in #["registry/phase.tsv","registry/pages.tsv","registry/claims.tsv","registry/slices.tsv",
     "registry/dependencies.tsv","registry/bindings.tsv","registry/axioms.tsv","registry/claim-axioms.tsv"] do
-    require (before.files.contains path) s!"base missing {path}"
+    require (before.hasTable path) s!"base missing {path}"
     discard <| readCurrent path
   if !modern then
     require (before.files.contains "references/tasaki-2020.tsv") "base missing references/tasaki-2020.tsv"
@@ -162,7 +233,7 @@ def validate (before current : Snapshot) (allowSupersession replay : Bool) (even
     require ((← rowsCurrent "registry/axioms.tsv").all fun row => match prior[col row 1]? with
       | none => true | some rowOld => oidAdvance (col rowOld 8) (col row 8)) "axiom type OID regressed; axiom type OID regression"
   else require ((tableFromText oldAxioms).records.size == 1) "base axioms.tsv carries rows under an unsupported schema"
-  if !replay then compare "registry/claim-vocabulary-review.tsv" #[2,3] "vocabulary review"
+  if !replay then discard <| vocabularyReviewAdvances before current
   compare "registry/vocabulary.tsv" #[2,3,4,5,6,9,10] "declaration/module/kind/origin/parent/design/finiteness"
   compare "registry/modules.tsv" #[2,3] "source path/role"
   compare "registry/statement-modules.tsv" #[2,3] "statement source path/role"
@@ -171,7 +242,8 @@ def validate (before current : Snapshot) (allowSupersession replay : Bool) (even
     compare "registry/sources.tsv" #[2,3,4,5,6,7,8,9,10,11,12,13,14] "source identity/position/bibliography"
     if !replay then compare "registry/source-invariants.tsv" #[2,3,4,5,6,7,8] "source frozen invariants"
     if before.files.contains "registry/source-items.tsv" then
-      compare "registry/source-items.tsv" #[2,3,4,5,6,7,8,9,10,11] "source item identity/order/label"
+      compare "registry/source-items.tsv" (if replay then #[2,3,4,5,6,7,9,10,11] else #[2,3,4,5,6,7,8,9,10,11])
+        "source item identity/order/label"
       oldRows (← rowsOld "registry/item-claims.tsv") (← rowsCurrent "registry/item-claims.tsv") "registry/item-claims.tsv" "item-claim"
   else compare "references/tasaki-2020.tsv" #[2] "source identity"
   for (stem,label) in #[("dependencies","dependency"),("claim-axioms","claim-axiom"),
@@ -225,13 +297,14 @@ def validate (before current : Snapshot) (allowSupersession replay : Bool) (even
         claimsCurrent.contains (col row 13) && !claimsOld.contains (col row 13)
       require (unchanged || advanced) "invalid dedicated supersession transition; supersession transition regression"
   for stem in #["correction-events","claim-normalization-reviews","claim-corrections",
-    "claim-successors","source-item-additions","claim-content-amendments"] do
+    "claim-successors","source-item-additions","claim-content-amendments","claim-location-amendments"] do
     let path := "registry/" ++ stem ++ ".tsv"
     if before.files.contains path then
       let text ← readCurrent path
       unless replay do require (text == (← readOld path)) s!"{path} historical correction ledger drift"
-    else if stem == "claim-content-amendments" && !replay && current.files.contains path then
-      require ((← readCurrent path) == (← readOld path)) "unowned content amendment ledger addition"
+    else if (stem == "claim-content-amendments" || stem == "claim-location-amendments") && !replay && current.files.contains path then
+      require ((← readCurrent path) == (← readOld path))
+        (if stem == "claim-location-amendments" then "unowned location amendment ledger addition" else "unowned content amendment ledger addition")
   let oldBindingsText ← readOld "registry/bindings.tsv"
   unless (tableFromText oldBindingsText).records[0]?.getD "" == (headers.find? (·.1 == "bindings")).get!.2 do
     require ((tableFromText oldBindingsText).records.size == 1) "base bindings.tsv carries rows under an unsupported schema"

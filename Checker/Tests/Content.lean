@@ -97,7 +97,7 @@ def prepareOmission (ctx : Context) (before after : FilePath) (newItem : Bool :=
   let cc ← unusedId after "claim-corrections.tsv" "CC-RUNTIME"
   let id ← unusedId after "claims.tsv" "CL-TASAKI2020"
   let claims ← table after "claims.tsv"
-  let anchor := claims[1]!
+  let anchor ← record after "claims.tsv" claim
   let content := "The two finite parity classes have equal cardinality."
   let suffix := omissionSuffix claims anchor 1
   let order := anchor[2]! ++ "." ++ pad suffix
@@ -982,7 +982,9 @@ def mutateCombined (ctx : Context) (label : String) (before after : FilePath) (e
   let nr := cc[3]!
   let ref := (← record after "correction-events.tsv" event)[4]!
   let ca := ((← table after "claim-content-amendments.tsv").find? fun r => r[2]?.getD "" == cc[0]!).getD #[]
-  let other := ((← table before "claims.tsv").find? fun r => r[1]?.getD "" == "TASAKI2020" && r[0]?.getD "" != x).get![0]!
+  let other := ((← table before "claims.tsv").find? fun r =>
+    r[1]?.getD "" == "TASAKI2020" && r[0]?.getD "" != x &&
+      r[5]?.getD "" != "out_of_scope" && r[11]?.getD "" == "false").get![0]!
   let change := mutate after
   let caChange := mutate after "claim-content-amendments.tsv" (ca[0]?.getD "")
   let simple := #[

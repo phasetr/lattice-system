@@ -1,6 +1,6 @@
 # Group TASAKI2020 / Chapter 03
 
-Generated from reviewed source-item metadata. Source claim text is not reproduced.
+Generated from registered source-item metadata. Source claim text is not reproduced.
 
 <a id="IT-TASAKI2020-0293"></a>
 
@@ -850,7 +850,7 @@ Generated from reviewed source-item metadata. Source claim text is not reproduce
 
 ### Atomic claims
 
-- `CL-TASAKI2020-0339` — assertion / problem; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-0339` — out_of_scope / problem; lifecycle `active`; Vocabulary `not_reviewed`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
 
 <a id="IT-TASAKI2020-0346"></a>
 
