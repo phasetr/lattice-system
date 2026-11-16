@@ -77,11 +77,11 @@ def makeUnchanged (ctx : Context) (base : FilePath) : IO FilePath := do
 def makeOutOfScope (ctx : Context) (base : FilePath) : IO FilePath := do
   let target ← prepareEvent ctx base "out-of-scope"
   for (col, value) in #[(5, "out_of_scope"), (9, "not-a-formalizable-claim"), (10, shellReview)] do
-    mutate target "claims.tsv" "CL-TASAKI2020-0002" col value
-  remove target "claim-vocabulary-review.tsv" "CL-TASAKI2020-0002"
-  add target "claim-normalization-reviews.tsv" #["NR-RUNTIME-0002", shellEvent, "1", "CL-TASAKI2020-0002",
+    mutate target "claims.tsv" "CL-TASAKI2020-0006" col value
+  remove target "claim-vocabulary-review.tsv" "CL-TASAKI2020-0006"
+  add target "claim-normalization-reviews.tsv" #["NR-RUNTIME-0002", shellEvent, "1", "CL-TASAKI2020-0006",
     "exact_statement_readiness", "exclude_nonclaim", "closed", "not-a-formalizable-claim", shellReview]
-  add target "claim-corrections.tsv" #["CC-RUNTIME-0002", shellEvent, "1", "NR-RUNTIME-0002", "CL-TASAKI2020-0002",
+  add target "claim-corrections.tsv" #["CC-RUNTIME-0002", shellEvent, "1", "NR-RUNTIME-0002", "CL-TASAKI2020-0006",
     "exclude_nonclaim", "notation", "notation", "out_of_scope", "notation"]
   refresh ctx target
   pure target
@@ -358,7 +358,7 @@ def shellLedgerCases (ctx : Context) (base reclassify split : FilePath) : IO Uni
       remove r "claims.tsv" id
       remove r "item-claims.tsv" id 2
       remove r "claim-vocabulary-review.tsv" id
-    for (edge, target) in #[("SE-RUNTIME-0001", claim), ("SE-RUNTIME-0002", "CL-TASAKI2020-0002")] do
+    for (edge, target) in #[("SE-RUNTIME-0001", claim), ("SE-RUNTIME-0002", "CL-TASAKI2020-0006")] do
       mutate r "claim-successors.tsv" edge 5 "existing_duplicate"
       mutate r "claim-successors.tsv" edge 6 target
     refresh ctx r) "split requires a new successor"

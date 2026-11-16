@@ -53,6 +53,7 @@ def fixedTreePaths : Array String := #[
   "Checker/Tests/Multisource.lean",
   "Checker/Tests/Registry.lean",
   "Checker/Tests/RegistryLayout.lean",
+  "Checker/Tests/R3Vocabulary.lean",
   "Checker/Tests/Selector.lean",
   "Checker/Tests/SkeletonComposed.lean",
   "Checker/Tests/SkeletonFixture.lean",

@@ -38,7 +38,8 @@ def publicationInputs : Array String := #["Checker/Publication.lean","Checker/Pu
 
 /-- Explicit transition callbacks read the full dedicated event and ordinary-history contracts. -/
 def transitionInputs : Array String := dataInputs ++ #["Checker/BaseDiff.lean","Checker/Corrections.lean",
-  "Checker/History.lean","Checker/Selector.lean","Checker/Transition.lean"]
+  "Checker/History.lean","Checker/Selector.lean","Checker/Transition.lean",
+  "Checker/SemanticDriver.lean","Checker/Semantic.lean","Checker/LakeIsolation.lean","Checker/Vocabulary.lean"]
 
 /-- Shared semantic drivers read their real elaborators and effective Lake decoder. -/
 def semanticInputs : Array String := #["Checker/SemanticDriver.lean","Checker/Semantic.lean","Checker/LakeIsolation.lean"]

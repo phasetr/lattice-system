@@ -1,5 +1,6 @@
 import Checker.Corrections
 import Checker.Selector
+import Checker.SemanticDriver
 
 /-! Actual Git-base selection and directory fixture routes for permanent registry transitions. -/
 namespace Checker.Transition
@@ -31,6 +32,11 @@ def baseDirectories (project base target : FilePath) (event : String := "")
   let replay := !event.isEmpty && !(Checker.Corrections.rows old "correction-events").any (col · 1 == event)
   if replay then Checker.Corrections.validate project base target event actualCommit
   Checker.BaseDiff.validate {old with normalizeLines := directoryMode} current (allowSupersession || replay) replay event
+  unless replay do
+    unless (← Checker.BaseDiff.vocabularyReviewAdvances {old with normalizeLines := directoryMode} current).isEmpty do
+      dataEntry project "registry" [target.toString]
+      Checker.SemanticDriver.vocabulary project
+        (if directoryMode then ["--fixture",target.toString] else [target.toString])
   IO.println "check-base-diff: ok"
 
 /-- Parsed ordinary base-comparison options retain their original argument-vector contract. -/

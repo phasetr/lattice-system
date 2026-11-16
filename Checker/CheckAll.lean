@@ -4,6 +4,7 @@ import Checker.Transition
 import Checker.SemanticDriver
 import Checker.RegressionPool
 import Checker.Tests.RegistryLayout
+import Checker.Tests.R3Vocabulary
 
 /-!
 Shared current-tree and regression dispatcher. Source mathematics stays in the
@@ -626,7 +627,11 @@ def selfTestReaderClosures (root : System.FilePath) (count : IO.Ref Nat) (envJso
   let (nativeInputs,_) ← payloads root (rows.push ⟨"Checker/Data.lean","100644","blob","data"⟩) headers registryA policy (Json.mkObj []) envJson
   expect count (nativeInputs.getObjValD "skeleton-pure" == before.getObjValD "skeleton-pure" && nativeInputs.getObjValD "registry" != before.getObjValD "registry") "native validators do not invalidate pure semantic cases"
   let (semanticInputs,_) ← payloads root (rows.push ⟨"Checker/SemanticDriver.lean","100644","blob","semantic"⟩) headers registryA policy (Json.mkObj []) envJson
-  expect count (semanticInputs.getObjValD "skeleton-pure" != before.getObjValD "skeleton-pure" && semanticInputs.getObjValD "content" == before.getObjValD "content") "semantic readers are separate from content transitions"
+  expect count (semanticInputs.getObjValD "skeleton-pure" != before.getObjValD "skeleton-pure" &&
+    semanticInputs.getObjValD "content" != before.getObjValD "content" &&
+    semanticInputs.getObjValD "base-diff" != before.getObjValD "base-diff" &&
+    semanticInputs.getObjValD "registry" == before.getObjValD "registry")
+    "R3 transitions read the semantic driver while static registry gates remain separate"
   let compilerEnvironment := envJson.setObjVal! "native_compiler" (toJson "changed toolchain backend")
   let (compilerInputs, _) ← payloads root rows headers registryA policy (Json.mkObj []) compilerEnvironment
   expect count (suites.all fun (name, _) => before.getObjValD name != compilerInputs.getObjValD name) "native compiler identity changes every actual input"
@@ -781,6 +786,7 @@ def selfTest (root : System.FilePath) : IO Unit := do
   selfTestReaderClosures root count envJson cache
   Checker.Tests.RegistryLayout.run (expect count)
   selfTestSourceState root count
+  Checker.Tests.R3Vocabulary.run (expect count)
   IO.println s!"check-all self-test: {(← count.get)} positive/negative assertions passed"
 
 /-- Describe each decision before any gate runs; skipped work is never reported as executed. -/

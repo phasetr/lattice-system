@@ -36,6 +36,12 @@ fidelity, a closed typed physics contract, statement binding or proof.
 Structural success and absent pre-R4 statement records do not certify R4.
 The scope of an accepted review must be read before reusing it.
 
+The mathematical interfaces and source conventions in [DESIGN.md](DESIGN.md)
+separate source-order spin construction from existing Mathlib reuse and the
+later reduced-density definition. Their R3 registration route preserves source
+claims and requires fresh environment checks; it is distinct from R4 statement
+freeze and proof implementation. It does not certify every future source contract.
+
 Source lifecycle and reviewed corpus anchors have one physical record per source.
 Counts and coverage are derived from those records and the corpus; public source
 item format tags are supplied by the schema. Future-stage relation schemas live

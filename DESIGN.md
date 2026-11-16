@@ -47,6 +47,47 @@ OID agreement and machine success are not source-fidelity evidence. A bounded
 accepted correction does not certify whole-unit completeness, mathematical
 truth, printed proofs or whole-source fidelity.
 
+### Source notation and concrete mathematical types
+
+Source presentation is not automatically a primary mathematical object. The
+definition marker, context-dependent approximation signs, object-dependent
+isomorphism sign and summation-filter typography in TASAKI2020 claims
+0001/0002/0003/0005 are presentation conventions. Preserve their source records
+without inventing a universal approximation relation, an untyped isomorphism or
+a proposition whose only content is formatting. The vector, matrix, entry and
+identity conventions in 0020/0021/0023 also name mathematical objects; they are
+not excluded merely because typography helps identify those objects.
+
+The following choices fix the implementation meaning of the remaining Symbols
+entries. They specify source objects and usable interfaces, not the existence
+of production declarations or completed primary bindings.
+
+| Source claims | Mathematical interface |
+| --- | --- |
+| 0004 | Finite-set cardinality through `Finset.card`, or the cardinality of an explicitly finite subtype. The ambient vertex type need not be finite. |
+| 0006 | Complex conjugation is `star` on a complex scalar. |
+| 0007–0009 | A general site type `V`, a `SimpleGraph V`, its `edgeSet : Set (Sym2 V)` and `neighborSet`. Bonds are unordered distinct pairs; general graph vocabulary has no global `Fintype V` assumption. |
+| 0010–0011 | The finite periodic hypercube has positive dimension and positive even side length. `Fin d → ZMod L` supplies periodic coordinates; `ZMod.valMinAbs` supplies representatives in the source's half-open centered cell. Nearest neighbors change one coordinate by one modulo `L`; ordinary distances between representatives do not silently replace periodic adjacency. |
+| 0012 | Integer-coordinate length is the norm after embedding in `EuclideanSpace ℝ (Fin d)`, rather than the default norm on a function type. |
+| 0013, 0020–0026 | Use finite complex matrices and Euclidean column vectors. Adjoint, transpose and entrywise conjugation are respectively `Matrix.conjTranspose`, `Matrix.transpose` and `A.map star`. The last operation is not matrix `star`. An outer product is `Matrix.vecMulVec u (fun j => star (v j))`; inner products conjugate the first argument. Matrix action uses `Matrix.mulVec`; determinant uses `Matrix.det` with its finite-index assumptions. |
+| 0014–0015 | The spin construction below fixes positive half-integral spin, descending magnetic basis, local components and finite-site action. Total spin is the finite sum of site operators. Commutator, Casimir and spectral assertions retain their own source claims. |
+| 0016–0017 | Finite-lattice one-particle spaces use `EuclideanSpace ℂ V` and `EuclideanSpace ℂ (V × Fin 2)`, with the two spin labels fixed consistently. |
+| 0018–0019 | Creation and annihilation act on the full fermionic Fock space, including vacuum. Their restrictions change particle-number sectors; they are not endomorphisms of one fixed `H_N`. Number-preserving composites may restrict to a sector. The smeared creation operator is linear in the one-particle input, while annihilation is conjugate-linear. |
+
+The hypercube correspondence uses the stated representative and periodicity
+conditions; merely choosing `ZMod` does not prove the source equivalence.
+Likewise, a Fock coordinate realization must specify its occupation basis and
+sign convention before its CAR and sector maps are bound. A Clifford spin group
+or a bosonic construction is not a substitute for these quantum-spin or
+fermionic objects. Such subsequent constructions are not prerequisites for
+defining the earlier site-spin matrices.
+
+For the source's operator norm, use the Euclidean operator interpretation, such
+as `Matrix.toEuclideanCLM`, or the explicitly selected
+`Matrix.Norms.L2Operator` scope. An unspecified matrix norm can instead denote
+an elementwise or different induced norm. No theorem may identify those norms
+without the appropriate mathematical statement.
+
 ## 3. Capability, lifecycle and order
 
 Global checker capability and each source's lifecycle are distinct, monotone
@@ -210,6 +251,144 @@ vocabulary. Lexical inspection is defense in depth, not semantic evidence.
 Exact version-pinned encodings and compiler baselines belong to `Checker/` and
 the driver implementations; module paths and current type/value OIDs belong to
 the registries.
+
+### Reviewed R3 extensions before statement freeze
+
+An ordinary R3 change may replace an existing `mathlib_only` basis with
+`project_vocabulary` only while both revisions have vocabulary capability and
+the same valid pre-freeze source lifecycle. It retains the exact active source
+claim, source metadata, lifecycle attestation and all seven correction ledgers.
+The new independent review reference must be valid, fresh and non-placeholder.
+The previously unused claim must acquire valid vocabulary admissions, including
+a newly registered primary definition with exact type and value fingerprints.
+Existing declarations, admissions, modules and imports retain their normal
+monotonicity and identity checks. Review-reference-only changes, downgrades,
+frozen-source changes, removed uses and concurrent source events do not qualify.
+
+The actual ordinary transition runs native registry coverage and fresh semantic
+vocabulary inspection whenever this exception is used. A plausible fingerprint
+or a registry row alone is insufficient. This R3 admission records a reviewed
+need for an existing definition; it does not claim that an unimplemented R4
+primary already consumes that admission. R4 performs its separate actual-use
+checks. The exception neither permits a partial production binding in vocabulary
+phase nor changes any R4 freeze or proof rule.
+
+### Spin construction interface
+
+The first source-order need for a new spin operation is the site-spin notation
+in CL-TASAKI2020-0014, also used by the early Heisenberg expressions. The concrete
+construction is fixed by the single-spin basis and ladder formulas in
+0041/0042 and the product-basis site action in 0097/0102. These source locations
+supply the operator coefficients; they do not license importing a later
+commutator or Casimir proof as an unregistered assumption. When R4 records an
+actual later setup dependency, its independently reviewed `required_by` row
+belongs to that later setup and points to the earlier consumer. Do not reverse
+the row convention or add unused forward dependencies.
+
+Use positive doubled spin `n : {n : Nat // 0 < n}`, so
+`S = (n.val : ℝ) / 2`. The local coordinate space is
+`EuclideanSpace ℂ (Fin (n.val + 1))`, ordered by magnetic quantum number
+`σ_i = S - i.val`. For row `i` and column `j`, the raising matrix has entry
+
+```text
+P(i,j) = sqrt(S*(S+1) - σ_j*(σ_j+1))  if i.val + 1 = j.val,
+         0                            otherwise.
+```
+
+The lowering matrix is `P.conjTranspose`. The three local components, in axis
+order `0 ↔ 1`, `1 ↔ 2`, `2 ↔ 3`, are
+`(P + P.conjTranspose)/2`,
+`(P - P.conjTranspose)/(2*Complex.I)` and
+`Matrix.diagonal (fun i => (σ_i : ℂ))`, with the stated real magnetic values
+embedded in the complex scalars.
+Use scalar multiplication for these matrix quotients. The finite index bounds
+give the zero entries at the two ladder endpoints; spin zero is not admitted
+by the source parameter type.
+In the pinned Lean implementation, form the scalar two as `(1 + 1 : ℝ)` or
+`(1 + 1 : ℂ)`; the intended operator declaration then needs no compiler-created
+numeric proof declaration. This does not change the scalar or the source formula.
+
+A single necessary composition, rather than aliases of the existing graph or
+Euclidean APIs, has the following interface:
+
+```lean
+noncomputable def LatticeSystem.spinAt
+    {V : Type*} [Fintype V] [DecidableEq V]
+    (n : {n : Nat // 0 < n}) (x : V) :
+    Fin 3 → Matrix (V → Fin (n.val + 1)) (V → Fin (n.val + 1)) ℂ
+```
+
+For configurations `σ, τ`, its entry is the selected local component at
+`(σ x, τ x)`, multiplied by the Kronecker deltas
+`σ y = τ y` at all `y ≠ x`. This is the fixed product-basis coordinate
+construction. Finiteness is imposed on this finite quantum system, not on the
+general graph API. The corresponding Hilbert space is the Euclidean space on
+the same configuration index; a plain function-space norm is not its norm.
+
+The production implementation belongs in the separate registered leaf
+`LatticeSystem.Vocabulary.Spin`, importing the required pinned matrix and
+Euclidean APIs and reached by the vocabulary umbrella. Register the fresh
+`VO-LS-` identity in registry order, exact type/value OIDs, ordered direct
+imports and the reviewed use for 0014. Its old source disposition and wording
+remain fixed; the ordinary R3 review advance owns the changed basis and review
+reference. Inspect the actual environment and run the mathematical default
+build, current gates and ordinary transition. No-op source reclassification is
+not a registration route. Self-adjointness, spin commutation, Casimir and
+spectral identities remain separately bound assertions; the R3 definition is
+not a proof of them. The informal introductory Hamiltonian sum does not fix
+ordered-pair multiplicity or coefficients for a later exact model.
+
+### Partial traces and reduced-density definition
+
+The existing `LatticeSystem.partialTraceRight` sums the right coordinate and
+returns a left-coordinate matrix; `partialTraceLeft` does the converse. Only
+the traced index needs `Fintype` for each raw operation. Do not add global
+finiteness to the other coordinate merely because the source application uses
+two finite-dimensional factors.
+
+For CL-TASAKI2020-2487/2488, both source factors are finite complex Hilbert spaces.
+Choose their orthonormal bases explicitly; `OrthonormalBasis.tensorProduct`
+gives the product basis. `LinearMap.toMatrix` and `Matrix.toLin` are the
+coordinate/operator interfaces. The existing
+`InnerProductSpace.toMatrix_rankOne` and
+`InnerProductSpace.symm_toEuclideanLin_rankOne` give the rank-one matrix with
+entries `ψ p * star (ψ q)`. The source inner product is linear in its second
+argument.
+
+The source input is normalized in the Hilbert norm. A usable composition is
+
+```lean
+noncomputable def LatticeSystem.reducedDensityMatrices
+    {L R : Type*} [Fintype L] [Fintype R]
+    (ψ : {ψ : EuclideanSpace ℂ (L × R) // ‖ψ‖ = 1}) :
+    Matrix L L ℂ × Matrix R R ℂ
+```
+
+Its body uses a local
+`A := Matrix.vecMulVec (fun p => ψ.val p) (fun p => star (ψ.val p))`
+and returns `(partialTraceRight A, partialTraceLeft A)`, in that order.
+The matrix calculation also makes sense for an arbitrary vector; its use as
+the source's reduced-density pair retains the normalization subtype.
+Normalization of a plain `(L × R) → ℂ` by its default norm would select the
+wrong function-space norm. Coordinate normalization can instead be written
+explicitly as `∑ p, Complex.normSq (ψ p) = 1`.
+
+This one composed declaration may be placed in a registered reduced-density
+leaf importing the existing quantum vocabulary and Euclidean APIs. The pure
+outer product and coordinate conversions need no extra renamed wrappers.
+The existing project-vocabulary basis of 2487/2488 permits the required fresh
+admission through the ordinary registration rules after the source correction
+is in its base. Keep source correction and the new production definition as
+separate transitions.
+
+The two outputs in (A.1.19) are a definition, not an extra assertion requiring a
+new proof. Its future primary binding is a `definition_value` with no proof
+metadata. The normalized-domain claim retains its own setup role and required
+context. The definition alone does not certify basis independence, positivity,
+unit trace, entropy or Schmidt identities. Those properties must not be added
+as proof obligations of this definition or reported as already proved.
+Current vocabulary-phase acceptance is distinct from constructing and freezing
+the later R4 primary.
 
 Before source skeleton freeze, every target has exactly one primary statement
 binding and no excluded/historical claim has one. Freeze the primary type and

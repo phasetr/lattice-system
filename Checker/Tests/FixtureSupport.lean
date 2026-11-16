@@ -5,7 +5,7 @@ namespace Checker.Tests.FixtureSupport
 open System Lean Checker.TestSupport
 
 /-- The stable claim used by the production-derived amendment fixtures. -/
-def claim : String := "CL-TASAKI2020-0001"
+def claim : String := "CL-TASAKI2020-0004"
 
 
 /-- The permanent content provenance schema. -/
