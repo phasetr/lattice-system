@@ -50,7 +50,11 @@ regression group; `--current` leaves regression acceptance to CI.
 
 CI uses `--ci` to select independent regression groups from their actual reader
 inputs and verified successful-run evidence. Unknown or changed inputs run the
-affected groups. Mathematical production builds run when their own source,
+affected groups. Runner image build labels remain audit information; reuse
+still requires matching OS, architecture, native ABI, tools, compiler and reader
+inputs. Independent selected groups use bounded child processes with separate
+fixtures, and every child must finish before acceptance. Mathematical production
+builds run when their own source,
 configuration or dependency inputs change; checker and documentation changes
 alone do not require that build. Required semantic imports and fixture builds
 remain separate checks. The plan prints execution, verified reuse and omitted

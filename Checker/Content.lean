@@ -52,6 +52,13 @@ private def rows (root : FilePath) (name : String) (optional : Bool := false) : 
     require (data[0]? == some amendmentHeader) "bad claim-content-amendments.tsv header"
   return data.extract 1 data.size
 
+/-- Reuse one immutable pass's parsed rows, loading only at the original first-read position. -/
+private def cachedRows (root : FilePath) (name : String) (cached : Option (Array Row)) :
+    IO (Array Row × Option (Array Row)) := do
+  if let some data := cached then return (data,cached)
+  let data ← rows root name
+  return (data,some data)
+
 /-- Lookup and insertion order are both retained; diagnostics iterate the source records. -/
 private structure Keyed where
   data : Array Row
@@ -128,10 +135,10 @@ private def additionsStatic (root : FilePath) : IO (Array Row) := do
   let pages ← keyed root "pages.tsv"
   let items ← keyed root "source-items.tsv"
   let corrections ← keyed root "claim-corrections.tsv"
-  let (additions,_) ← corrections.data.foldlM (fun (additions,created) correction => do
+  let (additions,_,_,_) ← corrections.data.foldlM (fun (additions,created,successors,itemClaims) correction => do
     if (← cell correction 5) != "add_omitted_claim" then
       require (!(correction.extract 6 8).contains "NONE") "NONE old classification requires add_omitted_claim"
-      return (additions,created)
+      return (additions,created,successors,itemClaims)
     let eventId ← cell correction 1
     let reviewId ← cell correction 3
     let claimId ← cell correction 4
@@ -161,18 +168,21 @@ private def additionsStatic (root : FilePath) : IO (Array Row) := do
     let created := created.insert id
     let some page := pages.index[← cell claim 3]? | throw <| IO.userError "omitted claim source page mismatch"
     require ((← cell page 1) == (← cell event 2)) "omitted claim source page mismatch"
-    let hasSuccessor ← anyRow (← rows root "claim-successors.tsv") fun row => do
+    let (successorRows,successors) ← cachedRows root "claim-successors.tsv" successors
+    let hasSuccessor ← anyRow successorRows fun row => do
       if (← cell row 1) != (← cell event 0) then return false
       if (← cell row 2) == (← cell correction 0) then return true
       if (← cell row 3) == id then return true
       return (← cell row 6) == id
     require (!hasSuccessor) "omitted claim cannot have successor provenance"
-    let relations ← selectRows (← rows root "item-claims.tsv") fun row => return (← cell row 2) == id
+    let (itemRows,itemClaims) ← cachedRows root "item-claims.tsv" itemClaims
+    let relations ← selectRows itemRows fun row => return (← cell row 2) == id
     require (relations.size == 1) "omitted claim lacks exactly one source item"
     let some item := items.index[← cell relations[0]! 0]? | throw <| IO.userError "omitted claim source item mismatch"
     require ((← cell item 1) == (← cell event 2)) "omitted claim source item mismatch"
     require ((← cell item 3) == (← cell claim 3)) "omitted claim source item mismatch"
-    pure (additions.push correction,created)) ((#[],{}) : Array Row × Std.HashSet String)
+    pure (additions.push correction,created,successors,itemClaims))
+    ((#[],{},none,none) : Array Row × Std.HashSet String × Option (Array Row) × Option (Array Row))
   return additions
 
 /-- Reject an already bound source, using that snapshot's own claim-to-source lookup. -/
@@ -193,8 +203,9 @@ private def noRelations (base current : FilePath) (claim message : String) : IO 
         for column in columns do require ((← cell record column) != claim) message
 
 /-- Check omitted claims against their creation event, never retroactively against later corrections. -/
-private def additionsTransition (project base current : FilePath) (event : Row) : IO Unit := do
-  let additions ← selectRows (← additionsStatic current) fun row => return (← cell row 1) == (← cell event 0)
+private def additionsTransition (project base current : FilePath) (event : Row)
+    (validatedAdditions : Array Row) : IO Unit := do
+  let additions ← selectRows validatedAdditions fun row => return (← cell row 1) == (← cell event 0)
   if additions.isEmpty then return
   let oldClaims ← keyed base "claims.tsv"
   let claims ← keyed current "claims.tsv"
@@ -251,8 +262,8 @@ private def additionsTransition (project base current : FilePath) (event : Row) 
     require (used.size == uses.size) message
     for row in uses do require (vocabulary.index.contains (← cell row 1)) message
 
-/-- Check the static ownership, classification, frozen OIDs and ordered history of every amendment. -/
-def validateStatic (root : FilePath) : IO (Array Row) := do
+/-- Validate a single static snapshot and retain its omission results for the same transition invocation. -/
+private def validateContent (root : FilePath) : IO (Array Row × Array Row) := do
   let amendments ← rows root "claim-content-amendments.tsv"
   let events ← keyed root "correction-events.tsv"
   let corrections ← keyed root "claim-corrections.tsv"
@@ -329,8 +340,12 @@ def validateStatic (root : FilePath) : IO (Array Row) := do
     for i in [:entries.size-1] do
       let previous := entries[i]!; let current := entries[i+1]!
       require (previous.1 != current.1 && previous.2.2 == current.2.1) "content amendment history chain is stale"
-  discard <| additionsStatic root
-  return amendments
+  let additions ← additionsStatic root
+  return (amendments,additions)
+
+/-- Check static ownership, classification, frozen OIDs and ordered history, preserving the public result. -/
+def validateStatic (root : FilePath) : IO (Array Row) :=
+  Prod.fst <$> validateContent root
 
 /-- Validate one amended target, including its exact immutable metadata and refreshed vocabulary review. -/
 private def targetTransition (project base current : FilePath) (event row : Row)
@@ -407,7 +422,7 @@ private def targetTransition (project base current : FilePath) (event row : Row)
 
 /-- The explicit project preserves the original Git hash-object working directory for typed callers. -/
 def validateTransitionAt (project base current : FilePath) (eventId : String) : IO Unit := do
-  let amendments ← validateStatic current
+  let (amendments,additions) ← validateContent current
   let oldAmendments ← rows base "claim-content-amendments.tsv" true
   let oldById ← oldAmendments.foldlM (fun index row => do pure (index.insert (← cell row 0) row))
     ({} : Std.HashMap String Row)
@@ -432,7 +447,7 @@ def validateTransitionAt (project base current : FilePath) (eventId : String) : 
     ({} : Std.HashSet String)
   require (actual.size == expected.size && expected.toArray.all actual.contains)
     "content amendment provenance is not new for this event"
-  additionsTransition project base current event
+  additionsTransition project base current event additions
   if fresh.isEmpty then return
   let oldClaims ← keyed base "claims.tsv"
   let claims ← keyed current "claims.tsv"

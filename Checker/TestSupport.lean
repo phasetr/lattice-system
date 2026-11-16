@@ -241,11 +241,11 @@ def refresh (ctx : Context) (root : FilePath) : IO Unit := do
     let active := claims.extract 1 claims.size |>.filter fun r =>
       r[1]?.getD "" == source && r[11]?.getD "" == "false"
     let sourcePages := pages.extract 1 pages.size |>.filter fun r => r[1]?.getD "" == source
+    let activePages := active.foldl (fun (ids : Std.HashSet String) row => ids.insert (row[3]?.getD "")) {}
     let row := row.set! 2 (toString active.size)
       |>.set! 3 (toString (active.filter fun r => r[5]?.getD "" != "out_of_scope").size)
       |>.set! 4 (toString (active.filter fun r => r[6]?.getD "" == "equation").size)
-      |>.set! 5 (toString (sourcePages.filter fun p =>
-      !active.any (fun r => r[3]?.getD "" == p[0]?.getD "")).size)
+      |>.set! 5 (toString (sourcePages.filter fun p => !activePages.contains (p[0]?.getD "")).size)
     let selected := (pages.extract 1 pages.size ++ claims.extract 1 claims.size).filter fun r =>
       r[1]?.getD "" == source
     let text := String.join <| selected.toList.map fun r => String.intercalate "\t" r.toList ++ "\n"

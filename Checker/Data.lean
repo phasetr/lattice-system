@@ -33,6 +33,7 @@ def fixedTreePaths : Array String := #[
   "Checker/LakeIsolation.lean",
   "Checker/Main.lean",
   "Checker/Regressions.lean",
+  "Checker/RegressionPool.lean",
   "Checker/Selector.lean",
   "Checker/Semantic.lean",
   "Checker/SemanticDriver.lean",

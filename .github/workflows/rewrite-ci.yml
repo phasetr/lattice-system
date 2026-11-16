@@ -15,7 +15,7 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1; Node 24
         with:
           fetch-depth: 0
       - name: Prepare declared tools through the Lean bootstrap
@@ -35,7 +35,7 @@ jobs:
         id: cache-restore
         with:
           path: .lake
-          key: lake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lake-manifest.json') }}-${{ github.sha }}
+          key: lake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lake-manifest.json') }}-${{ hashFiles('lakefile.toml', 'Checker/**/*.lean', 'LatticeSystem.lean', 'LatticeSystem/**/*.lean') }}
           restore-keys: lake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lake-manifest.json') }}
       - name: Current-tree gates and input-bound checker regressions
         env:
@@ -45,7 +45,7 @@ jobs:
         if: ${{ success() && steps.cache-restore.outputs.cache-hit != 'true' }}
         with:
           path: .lake
-          key: lake-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lake-manifest.json') }}-${{ github.sha }}
+          key: ${{ steps.cache-restore.outputs.cache-primary-key }}
       - name: Remove owned job-local tools through the Lean bootstrap
         # A failed pre-verification transfer never authorizes execution of an incomplete runtime.
         if: ${{ always() && env.REWRITE_CI_BOOTSTRAP_READY == 'true' }}

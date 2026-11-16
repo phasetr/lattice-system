@@ -238,7 +238,11 @@ Current registries, generation, applicable semantic inspection and the actual
 transition are always fresh. Independent regression groups may reuse only
 verified successful-run evidence for identical actual reader inputs; unknown or
 changed inputs execute the required groups. A global dispatcher identity is
-separate from those input closures. Mathematical production builds depend on
+separate from those input closures. Image build labels are audit provenance;
+actual OS, architecture, native ABI, tool and compiler identities remain reuse
+inputs. Parallel groups retain separate owned fixtures, bounded concurrency and
+complete child cleanup; a failed group prevents acceptance and further batches.
+Mathematical production builds depend on
 their own source, configuration and dependency inputs, not an unrelated checker
 change. Unchanged input evidence must cover the exact base and checkout;
 unknown mathematical inputs require the build. Necessary checker compilation,
