@@ -36,6 +36,8 @@ fidelity, a closed typed physics contract, statement binding or proof.
 Structural success and absent pre-R4 statement records do not certify R4.
 The scope of an accepted review must be read before reusing it.
 
+The mathematical vocabulary includes partial traces and
+[finite-site spin operators](LatticeSystem/Vocabulary/Spin.lean).
 The mathematical interfaces and source conventions in [DESIGN.md](DESIGN.md)
 separate source-order spin construction from existing Mathlib reuse and the
 later reduced-density definition. Their R3 registration route preserves source

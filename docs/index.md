@@ -9,8 +9,8 @@ publish private source paths and object identifiers.
 - Formalization targets: 3198
 - Superseded claim records: 23
 - Registered source items: 3077
-- Mathlib-only claims: 3196
-- Project-vocabulary claims: 2
+- Mathlib-only claims: 3195
+- Project-vocabulary claims: 3
 
 See the [generated catalog](generated/index.md). Status values are deliberately
 conservative: `not_bound`, `not_recorded`, and `not_assessed` do not mean

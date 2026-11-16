@@ -1,5 +1,9 @@
 module	position	imported_module	is_exported	is_meta	import_all
 LatticeSystem.Vocabulary.Quantum	1	Mathlib.LinearAlgebra.Matrix.Trace	true	false	false
 LatticeSystem.Vocabulary.Quantum	2	Mathlib.Data.Complex.Basic	true	false	false
+LatticeSystem.Vocabulary.Spin	1	Mathlib.Data.Complex.Basic	true	false	false
+LatticeSystem.Vocabulary.Spin	2	Mathlib.Data.Real.Sqrt	true	false	false
+LatticeSystem.Vocabulary.Spin	3	Mathlib.LinearAlgebra.Matrix.ConjTranspose	true	false	false
 LatticeSystem.Vocabulary	1	LatticeSystem.Vocabulary.Quantum	true	false	false
+LatticeSystem.Vocabulary	2	LatticeSystem.Vocabulary.Spin	true	false	false
 LatticeSystem	1	LatticeSystem.Vocabulary	true	false	false
