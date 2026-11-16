@@ -863,8 +863,9 @@ partial def fixture (ctx : Context) (cache : FixtureCache) (legacy : FilePath) (
         refresh ctx before
       if kind == "V" then
         mutate before "claim-vocabulary-review.tsv" x 1 "project_vocabulary"
-        let vocabulary ← table ctx.project "vocabulary.tsv"
-        for vo in vocabulary.extract 1 vocabulary.size do add before "claim-vocabulary.tsv" #[x, vo[0]!]
+        for id in #["VO-TASAKI2020-0001", "VO-TASAKI2020-0002"] do
+          discard <| record ctx.project "vocabulary.tsv" id
+          add before "claim-vocabulary.tsv" #[x, id]
       let pair := if kind == "A" then none else if kind == "D" then some ("definition", "equation")
         else if kind == "K" then some ("assertion", "lemma") else some ("definition", "definition")
       pure (before, ← contentEvent ctx before after x pair,x)

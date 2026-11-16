@@ -326,8 +326,8 @@ general graph API. The corresponding Hilbert space is the Euclidean space on
 the same configuration index; a plain function-space norm is not its norm.
 
 The production implementation belongs in the separate registered leaf
-`LatticeSystem.Vocabulary.Spin`, importing the required pinned matrix and
-Euclidean APIs and reached by the vocabulary umbrella. Register the fresh
+`LatticeSystem.Vocabulary.Spin`, importing the required pinned complex,
+square-root and matrix APIs and reached by the vocabulary umbrella. Register the fresh
 `VO-LS-` identity in registry order, exact type/value OIDs, ordered direct
 imports and the reviewed use for 0014. Its old source disposition and wording
 remain fixed; the ordinary R3 review advance owns the changed basis and review

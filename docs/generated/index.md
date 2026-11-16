@@ -9,8 +9,8 @@ Generated from the checked registries; do not edit by hand.
 - Active claims: 3251
 - Formalization targets: 3198
 - Superseded claim records: 23
-- Vocabulary declarations: 2
-- Claim-vocabulary links: 4
+- Vocabulary declarations: 3
+- Claim-vocabulary links: 5
 
 ## Tracks
 
