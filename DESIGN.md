@@ -349,6 +349,66 @@ Its `explicit_finite_volume` scope is witnessed by the finite model carrier
 `V` itself. That scope admits an explicit `Fintype` carrier or `Finset` volume
 data; it does not impose finiteness on the general graph abstraction.
 
+### Fermionic full-Fock coordinate operators
+
+The one-particle spaces in 0016/0017 reuse `EuclideanSpace`; they do not
+require project aliases. For 0018/0019 the finite-mode Fock coordinate space is
+`EuclideanSpace ℂ (Finset M)`. In the spinful application `M = V × Fin 2`,
+with `0` for up and `1` for down. The empty occupation is the vacuum, represented
+by the existing `EuclideanSpace.single ∅ 1`. A fixed-particle sector uses the
+occupations of that cardinality. Creation and annihilation act on the full
+space, including the vacuum; they are not endomorphisms of one fixed sector.
+The Euclidean norm supplies the one-particle and Fock norms. Neither the default
+function-space norm nor an unspecified matrix norm is their substitute.
+
+Choose and retain a linear order on the modes. It is a coordinate choice, not
+an order prescribed by the source. The occupation vector for an increasing
+sequence `a₁ < … < aₖ` has the creation-product convention
+`c†(a₁) … c†(aₖ) |vac⟩`. The matrix row is the output occupation and the
+column is the input. With `S` the input and `a` the created mode,
+`fermionCreationAt a` has entry
+
+```text
+(-1) ^ #{b ∈ S | b < a}  if a ∉ S and row = insert a S,
+0                       otherwise.
+```
+
+`fermionAnnihilationAt a` is its conjugate transpose in this same basis.
+The two raw coefficient definitions need only `[LinearOrder M]`; the
+finite-occupation count does not require the whole mode type to be finite.
+Their use as full Euclidean Fock operators has the finite-carrier condition.
+The raw matrices alone make no claim about an infinite Hilbert completion,
+operator norm or basis independence.
+
+Finite matrix multiplication and summation use `[Fintype M]`.
+`fermionNumberAt a` is creation times annihilation, and
+`totalFermionNumber` sums these over all modes, as in (9.2.29)/(9.2.33).
+For arbitrary, unnormalized `φ : EuclideanSpace ℂ M`, the general smeared
+operators in (9.2.46) are
+`fermionCreation φ = ∑ a, φ a • fermionCreationAt a` and
+`fermionAnnihilation φ = ∑ a, star (φ a) • fermionAnnihilationAt a`.
+The complex conjugation on the latter coefficients is essential.
+
+The fixed-spin operations `spinFermionCreation σ φ` and
+`spinFermionAnnihilation σ φ` in (9.2.62) take
+`φ : EuclideanSpace ℂ V` and sum only modes `(site, σ)`.
+They require finite `V` and an explicitly chosen order on `V × Fin 2`,
+shared with the underlying mode operators. No normalization assumption is
+added, and no graph API acquires an order or global finiteness restriction.
+
+These eight operations belong in the registered `LatticeSystem.Vocabulary.Fermion`
+leaf. Reuse the pinned matrix, finite-set and Euclidean APIs. The raw creation
+and annihilation coefficients have finiteness scope `none`; finite products
+and sums have `explicit_finite_volume`.
+The three site-mode operations are admitted by 0018, the fixed-spin pair by
+0019, total number by 1617 and the general smeared pair by 1639.
+Each changed basis review owns a new definition it needs. These registrations
+do not reclassify those source records or constitute R4 dependency edges.
+General CAR, adjoint/linearity identities, particle-sector maps and equivalence
+with the antisymmetric wave-function representation retain their independent
+exact-statement and proof obligations. Concrete occupation-entry checks do not
+replace those obligations.
+
 ### Partial traces and reduced-density definition
 
 The existing `LatticeSystem.partialTraceRight` sums the right coordinate and

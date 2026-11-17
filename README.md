@@ -37,10 +37,13 @@ Structural success and absent pre-R4 statement records do not certify R4.
 The scope of an accepted review must be read before reusing it.
 
 The mathematical vocabulary includes partial traces and
-[finite-site and total-spin operators](LatticeSystem/Vocabulary/Spin.lean).
+[finite-site and total-spin operators](LatticeSystem/Vocabulary/Spin.lean), and
+[fermionic occupation-basis operators](LatticeSystem/Vocabulary/Fermion.lean).
 The mathematical interfaces and source conventions in [DESIGN.md](DESIGN.md)
 separate source-order spin construction from existing Mathlib reuse and the
-later reduced-density definition. Their R3 registration route preserves source
+later reduced-density definition. The fermionic interfaces distinguish the full
+Fock space from fixed-particle sectors and use the stated occupation-basis signs.
+Their R3 registration route preserves source
 claims and requires fresh environment checks; it is distinct from R4 statement
 freeze and proof implementation. It does not certify every future source contract.
 

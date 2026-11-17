@@ -898,7 +898,7 @@ Generated from registered source-item metadata. Source claim text is not reprodu
 
 ### Atomic claims
 
-- `CL-TASAKI2020-1617` — assertion / equation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-1617` — assertion / equation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: `LatticeSystem.totalFermionNumber`
 
 <a id="IT-TASAKI2020-1632"></a>
 
@@ -1266,7 +1266,7 @@ Generated from registered source-item metadata. Source claim text is not reprodu
 
 ### Atomic claims
 
-- `CL-TASAKI2020-1639` — assertion / equation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: none
+- `CL-TASAKI2020-1639` — assertion / equation; lifecycle `active`; Vocabulary `vocabulary_ready`; binding `not_bound`; Lean statement `NONE` in `NONE`; proof `not_recorded` as `NONE`; axioms `not_assessed`; required vocabulary: `LatticeSystem.fermionCreation`, `LatticeSystem.fermionAnnihilation`
 
 <a id="IT-TASAKI2020-1655"></a>
 

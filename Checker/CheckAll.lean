@@ -77,6 +77,8 @@ structure Loaded where
   receipt : Json
   /-- Producing run, attempt and job. -/
   origin : Json
+  /-- Immutable run identity and its server-side PR association, rechecked after discovery. -/
+  run : Json
 /-- Bounded repository-only API access; token is never an argument or log value. -/
 structure Evidence where
   /-- Exact repository scope. -/
@@ -205,11 +207,11 @@ def load (root : System.FilePath) (e : Evidence) (runId : Nat) : IO Loaded := do
     else return rows) #[]
   require ((← engine root rows) == (← str receipt "engine")) "producer executable bytes mismatch"
   let origin := Json.mkObj [("run_id", toJson runId), ("run_attempt", toJson attempt), ("job_id", toJson jobId)]
-  let value := Loaded.mk receipt origin
+  let value := Loaded.mk receipt origin run
   e.cache.modify (·.push (runId, value))
   pure value
 /-- Bind each API candidate explicitly to the independently identified source head. -/
-def candidates (root : System.FilePath) (e : Evidence) (ctx : Json) : IO (Array (Nat × String)) := do
+def baseCandidates (root : System.FilePath) (e : Evidence) (ctx : Json) : IO (Array (Nat × String)) := do
   let event ← str ctx "event"
   let source ← if event == "pull_request" then str ctx "base" else do
     let pulls ← api root e ("/commits/" ++ (← str ctx "head") ++ "/pulls?per_page=10")
@@ -229,14 +231,91 @@ def candidates (root : System.FilePath) (e : Evidence) (ctx : Json) : IO (Array 
       return found.push ((← nat run "id"), source)
     else return found) #[]
   pure <| found.extract 0 5
+
+/-- Lookup-only PR scope never enters the versioned producer context or receipt. -/
+structure PullRequestLookup where
+  number : Nat
+  repository : String
+  base : String
+  source : String
+
+/-- Bind the event payload's number and repository to the already authenticated checkout. -/
+def pullRequestLookup (ctx payload : Json) (repository : String) : IO PullRequestLookup := do
+  require ((← str ctx "event") == "pull_request") "ancestor lookup requires a PR event"
+  let number ← nat payload "number"
+  let pr ← field payload "pull_request"
+  let base ← field pr "base"; let head ← field pr "head"
+  require (number > 0 && (← str (← field base "repo") "full_name") == repository &&
+    (← str (← field head "repo") "full_name") == repository &&
+    (← str base "ref") == "rewrite-main" && (← str base "sha") == (← str ctx "base") &&
+    (← str head "sha") == (← str ctx "source_head")) "PR lookup payload differs from checkout scope"
+  return ⟨number,repository,← str ctx "base",← str ctx "source_head"⟩
+
+/-- PR associations identify the same repository/number, not a mutable branch head's historical SHA. -/
+def priorPullRequestSource (scope : PullRequestLookup) (run : Json) : IO (Option String) := do
+  let source ← str run "head_sha"
+  if !hex source 40 || source == scope.source || (← str run "event") != "pull_request" ||
+      (← str (← field run "repository") "full_name") != scope.repository ||
+      (← str (← field run "head_repository") "full_name") != scope.repository then return none
+  let matching ← (← arr run "pull_requests").foldlM (fun matching pr => do
+    if (← nat pr "number") == scope.number then return matching.push pr else return matching) #[]
+  if matching.size != 1 then return none
+  let pr := matching[0]!
+  let base ← field pr "base"; let head ← field pr "head"
+  let repositoryUrl := "https://api.github.com/repos/" ++ scope.repository
+  if (← str pr "url") != repositoryUrl ++ "/pulls/" ++ toString scope.number ||
+      (← str (← field base "repo") "url") != repositoryUrl ||
+      (← str (← field head "repo") "url") != repositoryUrl ||
+      (← str base "ref") != "rewrite-main" then return none
+  return some source
+
+/-- Equality and same-branch names never substitute for a real strict Git ancestor. -/
+def strictSourceAncestor (root : System.FilePath) (before current : String) : IO Bool := do
+  if !hex before 40 || !hex current 40 || before == current then return false
+  let result ← IO.Process.output {cmd := "git",args := #["merge-base","--is-ancestor",before,current],cwd := some root}
+  require (result.exitCode == 0 || result.exitCode == 1) "candidate source ancestry unavailable"
+  return result.exitCode == 0
+
+/-- Discovery records its immutable source and distinguishes prior PR runs from the existing base path. -/
+structure ReuseCandidate where
+  runId : Nat
+  source : String
+  priorPullRequest : Bool := false
+
+/-- Keep exact-base/postmerge candidates and add only bounded successful same-PR source ancestors. -/
+def candidates (root : System.FilePath) (e : Evidence) (ctx : Json)
+    (scope : Option PullRequestLookup) : IO (Array ReuseCandidate) := do
+  let exact ← try baseCandidates root e ctx catch _ => pure #[]
+  let prior ← match scope with
+    | none => pure #[]
+    | some scope => do
+      try
+        let result ← api root e "/actions/workflows/rewrite-ci.yml/runs?event=pull_request&per_page=20"
+        let found ← (← arr result "workflow_runs").foldlM (fun found run => do
+          try
+            if (← str run "status") != "completed" || (← str run "conclusion") != "success" then return found
+            let some source ← priorPullRequestSource scope run | return found
+            if !(← strictSourceAncestor root source scope.source) then return found
+            let id ← nat run "id"
+            if id == 0 then return found
+            return found.push (⟨id,source,true⟩ : ReuseCandidate)
+          catch _ => pure found) #[]
+        pure (found.extract 0 5)
+      catch _ => pure #[]
+  return exact.map (fun (id,source) => ⟨id,source,false⟩) ++ prior
 /-- Unknown differences require execution; an exact tested postmerge tree may still reuse. -/
 def lookupAllowed (full : Bool) (event : String) : Bool := !full || event == "push"
 /-- Every candidate is bound to its independently identified source, environment and checkout role. -/
-def candidateBound (receipt ctx : Json) (source : String) (environment : Json) : IO Bool := do
+def candidateBound (receipt ctx : Json) (source : String) (environment : Json)
+    (priorPullRequest : Bool := false) : IO Bool := do
   if environmentInputs (← field receipt "environment") != environmentInputs environment ||
     (← str receipt "source_head") != source then return false
   if (← str ctx "event") == "pull_request" then
+    if priorPullRequest then
+      return (← str receipt "event") == "pull_request" && (← str receipt "base") == (← str ctx "base") &&
+        source != (← str ctx "source_head")
     return (← str receipt "head") == (← str ctx "base") && (← str receipt "event") == "push"
+  if priorPullRequest then return false
   return (← str receipt "event") == "pull_request" && (← str receipt "base") == (← str ctx "base") &&
     (← str receipt "tree") == (← str ctx "tree")
 /-- Only an exact directly executed origin is reusable; no recursive receipt chain is accepted. -/
@@ -255,14 +334,20 @@ def settleCandidate (accepted : Json) : Except Unit Json → Json × Bool
   | .error _ => (accepted,false)
 
 /-- Visit the bounded candidate list, returning accepted origins and stopping once all readers are covered. -/
-def reuseCandidates (root : System.FilePath) (e : Evidence) (ctx sigs environment : Json) :
-    List (Nat × String) → Json → IO Json
+def reuseCandidates (root : System.FilePath) (e : Evidence) (ctx sigs environment : Json)
+    (scope : Option PullRequestLookup) : List ReuseCandidate → Json → IO Json
   | [], accepted => pure accepted
-  | (id,source) :: rest, accepted => do
+  | found :: rest, accepted => do
     let next ← try
-      let candidate ← load root e id
+      let candidate ← load root e found.runId
       let j := candidate.receipt
-      if !(← candidateBound j ctx source environment) then pure accepted else do
+      let priorBound ← if found.priorPullRequest then do
+        let some scope := scope | throw <| IO.userError "missing PR lookup scope"
+        require ((← priorPullRequestSource scope candidate.run) == some found.source)
+          "candidate PR association changed after discovery"
+        strictSourceAncestor root found.source scope.source
+        else pure true
+      if !priorBound || !(← candidateBound j ctx found.source environment found.priorPullRequest) then pure accepted else do
         let (completed,_) ← suites.foldlM (fun (accepted,active) (name,_) => do
           if !active then return (accepted,false)
           try
@@ -280,11 +365,15 @@ def reuseCandidates (root : System.FilePath) (e : Evidence) (ctx sigs environmen
         pure completed
       catch _ => pure accepted
     if (keys next).size == suites.size then pure next
-    else reuseCandidates root e ctx sigs environment rest next
+    else reuseCandidates root e ctx sigs environment scope rest next
 
 /-- Reuse only direct original executed results; malformed or unavailable evidence executes instead. -/
 def reuse (root : System.FilePath) (e : Evidence) (ctx sigs environment : Json) : IO Json := do
-  reuseCandidates root e ctx sigs environment (← candidates root e ctx).toList (Json.mkObj [])
+  let scope ← if (← str ctx "event") == "pull_request" then do
+    try some <$> pullRequestLookup ctx (← parse (← IO.FS.readFile (← env "GITHUB_EVENT_PATH"))) e.repository
+    catch _ => pure none
+    else pure none
+  reuseCandidates root e ctx sigs environment scope (← candidates root e ctx scope).toList (Json.mkObj [])
 
 /-- Semantic and publication checks are shared by all modes; data gates run natively before this plan. -/
 def currentPlan (phase : String) (moduleRows : Nat) : Array String :=
@@ -533,6 +622,24 @@ def selfTestInputs (_root : System.FilePath) (count : IO.Ref Nat) : IO Unit := d
   expect count ((← mathematicalLake (lake ++ checkerLakeSuffix)) == lake) "known checker targets are outside mathematical build"
   reject count (mathematicalLake (lake ++ checkerLakeSuffix ++ "# unknown\n")) "unknown Lake suffix cannot prove equality"
   reject count (mathematicalLake (lake ++ checkerLakeSuffix ++ checkerLakeSuffix)) "ambiguous Lake suffix cannot prove equality"
+  let leaf := "LatticeSystem/Vocabulary/NewLeaf.lean"
+  let moduleRow := "LatticeSystem.Vocabulary.NewLeaf\t" ++ leaf ++ "\tleaf\n"
+  let modules := "module\tsource_path\trole\n" ++ moduleRow
+  expect count (registeredLeafAddition leaf "blob" modules &&
+    !changeForcesFull leaf "A" "000000" "100644" false true) "registered regular mathematical addition preserves reader selection"
+  for bad in #["LatticeSystem/../NewLeaf.lean", "LatticeSystem//NewLeaf.lean", "LatticeSystem/Bad-name.lean", "LatticeSystem.lean", "unknown.lean"] do
+    expect count (!registeredLeafAddition bad "blob" modules &&
+      changeForcesFull bad "A" "000000" "100644" false true) "unsafe mathematical addition keeps full fallback"
+  for (kind,text) in #[("tree",modules),("blob","module\tsource_path\trole\n"),
+      ("blob",modules ++ moduleRow),("blob",modules.replace "\tleaf\n" "\tumbrella\n"),
+      ("blob",modules.replace "module\t" "unknown\t") ] do
+    expect count (!registeredLeafAddition leaf kind text) "new mathematical leaf requires exact unique schema registration"
+  for (status,oldMode,newMode,header) in #[("A","000000","100755",false),
+      ("A","100644","100644",false),("D","100644","000000",false),
+      ("T","100644","120000",false),("R100","100644","100644",false),
+      ("A","000000","100644",true)] do
+    expect count (changeForcesFull leaf status oldMode newMode header true) "registered addition does not waive status mode or header boundaries"
+  expect count (changeForcesFull leaf "A" "000000" "100644" false) "unproven mathematical addition keeps full fallback"
   IO.FS.withTempDir fun temporary => do
     let target := temporary / "mathematical-inputs"
     IO.FS.createDirAll (target / "registry")
@@ -579,6 +686,27 @@ def selfTestInputs (_root : System.FilePath) (count : IO.Ref Nat) : IO Unit := d
     discard <| git target #["mv","LatticeSystem/A.lean","LatticeSystem/B.lean"]
     discard <| git target #["-c","user.name=Fixture","-c","user.email=fixture@example.invalid","commit","--quiet","-m","rename"]
     expect count (← (·.required) <$> selectBuild target tooling (← commit target "HEAD")) "same-blob mathematical rename changes build inputs"
+    let prior ← commit target "HEAD"
+    IO.FS.writeFile (target / "LatticeSystem/Registered.lean") "/-! Registered mathematical leaf. -/\n"
+    IO.FS.writeFile (target / "registry/modules.tsv")
+      "module\tsource_path\trole\nLatticeSystem.Registered\tLatticeSystem/Registered.lean\tleaf\n"
+    discard <| git target #["add","--","LatticeSystem/Registered.lean","registry/modules.tsv"]
+    discard <| git target #["-c","user.name=Fixture","-c","user.email=fixture@example.invalid","commit","--quiet","-m","registered leaf"]
+    let addition ← commit target "HEAD"
+    expect count (!(← fullRequired target prior addition)) "actual registered leaf addition retains selective regressions"
+    let mathematical ← selectBuild target prior addition
+    expect count (mathematical.required && hex mathematical.before 64 && hex mathematical.after 64 &&
+      mathematical.before != mathematical.after) "new registered leaf remains in changed mathematical build projection"
+    expect count (← strictSourceAncestor target prior addition) "actual earlier source is a strict ancestor"
+    expect count (!(← strictSourceAncestor target addition prior) && !(← strictSourceAncestor target addition addition))
+      "reverse and identical sources are not prior PR ancestors"
+    let unrelated ← output target "git" #["-c","user.name=Fixture","-c","user.email=fixture@example.invalid",
+      "commit-tree",← tree target addition] (some "unrelated fixture history\n")
+    expect count (!(← strictSourceAncestor target (trim unrelated) addition)) "same-tree unrelated source is not an ancestor"
+    IO.FS.writeFile (target / "LatticeSystem/Unregistered.lean") "/-! Unregistered mathematical leaf. -/\n"
+    discard <| git target #["add","--","LatticeSystem/Unregistered.lean"]
+    discard <| git target #["-c","user.name=Fixture","-c","user.email=fixture@example.invalid","commit","--quiet","-m","unregistered leaf"]
+    expect count (← fullRequired target addition (← commit target "HEAD")) "actual unregistered mathematical addition keeps full fallback"
   let imports : Registry.Data := ⟨_root,#[
     ("imports",Registry.tableFromText "module\tposition\timported_module\tis_exported\tis_meta\timport_all\nFixture\t1\tMathlib.Init\ttrue\tfalse\tfalse\n"),
     ("statement-imports",Registry.tableFromText "module\tposition\timported_module\tis_exported\tis_meta\timport_all\n") ]⟩
@@ -607,12 +735,49 @@ def selfTestCandidate (count : IO.Ref Nat) : IO Unit := do
     "candidate exception retains accepted readers and stops remaining effects"
   expect count (settleCandidate priorAccepted (.ok priorAccepted) == (priorAccepted,true))
     "candidate mismatch skips only its reader and continues"
+  let base := String.ofList (List.replicate 40 'b')
+  let old := String.ofList (List.replicate 40 'c')
+  let current := String.ofList (List.replicate 40 'e')
+  let ctx := Json.mkObj [("event",toJson "pull_request"),("base",toJson base),("source_head",toJson current)]
+  let repository := Json.mkObj [("full_name",toJson "owner/repo")]
+  let payload := Json.mkObj [("number",toJson (5571 : Nat)),("pull_request",Json.mkObj [
+    ("base",Json.mkObj [("ref",toJson "rewrite-main"),("sha",toJson base),("repo",repository)]),
+    ("head",Json.mkObj [("sha",toJson current),("repo",repository)])])]
+  let scope ← pullRequestLookup ctx payload "owner/repo"
+  let nestedRepo := Json.mkObj [("id",toJson (1 : Nat)),("url",toJson "https://api.github.com/repos/owner/repo"),("name",toJson "repo")]
+  let association := Json.mkObj [("number",toJson (5571 : Nat)),("url",toJson "https://api.github.com/repos/owner/repo/pulls/5571"),
+    ("head",Json.mkObj [("ref",toJson "feature"),("sha",toJson current),("repo",nestedRepo)]),
+    ("base",Json.mkObj [("ref",toJson "rewrite-main"),("sha",toJson current),("repo",nestedRepo)])]
+  let run := Json.mkObj [("event",toJson "pull_request"),("head_sha",toJson old),
+    ("repository",repository),("head_repository",repository),("pull_requests",toJson #[association])]
+  expect count ((← priorPullRequestSource scope run) == some old) "actual nested API repo shape and mutable branch tips identify immutable prior source"
+  for changed in #[run.setObjVal! "head_sha" (toJson current),run.setObjVal! "event" (toJson "push"),
+      run.setObjVal! "repository" (Json.mkObj [("full_name",toJson "other/repo")]),
+      run.setObjVal! "head_repository" (Json.mkObj [("full_name",toJson "other/repo")]),
+      run.setObjVal! "pull_requests" (toJson #[association.setObjVal! "number" (toJson (1 : Nat))]),
+      run.setObjVal! "pull_requests" (toJson #[association,association])] do
+    expect count ((← priorPullRequestSource scope changed).isNone) "prior PR source requires exact event repository number and noncurrent source"
+  for changed in #[association.setObjVal! "url" (toJson "https://api.github.com/repos/other/repo/pulls/5571"),
+      association.setObjVal! "base" ((association.getObjValD "base").setObjVal! "ref" (toJson "main")),
+      association.setObjVal! "head" ((association.getObjValD "head").setObjVal! "repo"
+        (nestedRepo.setObjVal! "url" (toJson "https://api.github.com/repos/other/repo")))] do
+    expect count ((← priorPullRequestSource scope (run.setObjVal! "pull_requests" (toJson #[changed]))).isNone)
+      "same PR association cannot cross repository or base branch"
+  reject count (pullRequestLookup ctx (payload.setObjVal! "number" (toJson (0 : Nat))) "owner/repo") "lookup requires event payload PR number"
+  reject count (pullRequestLookup (ctx.setObjVal! "source_head" (toJson old)) payload "owner/repo") "lookup payload source cannot contradict actual checkout"
+  let environment := fixtureReceipt.getObjValD "environment"
+  expect count (← candidateBound fixtureReceipt ctx old environment true) "same-base prior PR receipt is separately eligible"
+  expect count (!(← candidateBound fixtureReceipt ctx old environment)) "prior PR receipt does not impersonate exact base push"
+  expect count (!(← candidateBound (fixtureReceipt.setObjVal! "base" (toJson old)) ctx old environment true)) "prior PR receipt must retain current actual base"
+  expect count (!(← candidateBound fixtureReceipt ctx base environment true)) "lookup immutable source cannot contradict loaded receipt source"
+  expect count (!(← candidateBound (fixtureReceipt.setObjVal! "source_head" (toJson current)) ctx current environment true)) "current PR source is not its own ancestor candidate"
 
 /-- Reader closure and compiler-input counterfactuals stay separate from producer transport tests. -/
 def selfTestReaderClosures (root : System.FilePath) (count : IO.Ref Nat) (envJson : Json)
     (cache : IO.Ref (Array (Nat × Loaded))) : IO Unit := do
   let rows : Array Entry := #[⟨"Checker/CheckAll.lean", "100644", "blob", "engine"⟩,
-    ⟨".gitignore", "100644", "blob", "ignore"⟩, ⟨"registry/claims.tsv", "100644", "blob", "old"⟩]
+    ⟨".gitignore", "100644", "blob", "ignore"⟩, ⟨"registry/claims.tsv", "100644", "blob", "old"⟩,
+    ⟨"Checker/Inputs.lean", "100644", "blob", "input-control"⟩]
   let headers := Json.mkObj [("registry/claims.tsv", toJson "header")]
   let policy := Json.mkObj [("README.md", policyProjection "README.md" "exact PR exact head SHA")]
   let registryA := Json.mkObj [("registry/claims.tsv", toJson "old")]
@@ -626,6 +791,11 @@ def selfTestReaderClosures (root : System.FilePath) (count : IO.Ref Nat) (envJso
   let (controlInputs,controlEngine) ← payloads root controlRows headers registryA policy (Json.mkObj []) envJson
   let (_,originalEngine) ← payloads root rows headers registryA policy (Json.mkObj []) envJson
   expect count (controlEngine != originalEngine && controlInputs == before) "global producer authenticity is separate from each actual reader closure"
+  let (inputControlSignatures,inputControlEngine) ← payloads root
+    (rows.set! 3 ⟨"Checker/Inputs.lean","100644","blob","new-input-control"⟩)
+    headers registryA policy (Json.mkObj []) envJson
+  expect count (inputControlEngine != originalEngine && inputControlSignatures == before && version == 5)
+    "input selection control changes preserve version-five reader keys while authenticating executable bytes"
   let (nativeInputs,_) ← payloads root (rows.push ⟨"Checker/Data.lean","100644","blob","data"⟩) headers registryA policy (Json.mkObj []) envJson
   expect count (nativeInputs.getObjValD "skeleton-pure" == before.getObjValD "skeleton-pure" && nativeInputs.getObjValD "registry" != before.getObjValD "registry") "native validators do not invalidate pure semantic cases"
   let (semanticInputs,_) ← payloads root (rows.push ⟨"Checker/SemanticDriver.lean","100644","blob","semantic"⟩) headers registryA policy (Json.mkObj []) envJson
@@ -762,7 +932,7 @@ def selfTest (root : System.FilePath) : IO Unit := do
   expect count (!(← candidateBound fixtureReceipt ctx base envJson)) "different source same tree rejected"
   expect count (!(← candidateBound fixtureReceipt (ctx.setObjVal! "base" (toJson source)) source envJson)) "actual before mismatch"
   let origin := Json.mkObj [("run_id", toJson (7 : Nat)), ("run_attempt", toJson (2 : Nat)), ("job_id", toJson (11 : Nat))]
-  let original : Loaded := ⟨fixtureReceipt, origin⟩
+  let original : Loaded := ⟨fixtureReceipt, origin, Json.null⟩
   let signature := String.ofList (List.replicate 64 '1')
   expect count (← originalBound original origin "skeleton-pure" signature envJson) "direct executed original"
   let imageEnvironment := envJson.setObjVal! "ImageVersion" (toJson "different image build label")
@@ -777,7 +947,7 @@ def selfTest (root : System.FilePath) : IO Unit := do
   let recursive := fixtureReceipt.setObjVal! "suites" <|
     (fixtureReceipt.getObjValD "suites").setObjVal! "skeleton-pure" <| Json.mkObj [
       ("input", toJson signature), ("result", toJson "reused"), ("origin", origin)]
-  expect count (!(← originalBound ⟨recursive, origin⟩ origin "skeleton-pure" signature envJson)) "recursive original rejected"
+  expect count (!(← originalBound ⟨recursive, origin, Json.null⟩ origin "skeleton-pure" signature envJson)) "recursive original rejected"
   expect count (!(← originalBound original origin "skeleton-pure" "other" envJson)) "original input mismatch"
   for label in #["API unavailable", "historical fixture unavailable"] do
     let selected ← orFull (throw <| IO.userError label)

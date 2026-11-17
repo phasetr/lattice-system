@@ -115,10 +115,29 @@ def knownPath (path : String) : Bool :=
   (path.startsWith "registry/" && path.endsWith ".tsv" &&
     (semanticTables ++ corpusTables).contains (((path.drop 9).toString.dropEnd 4).toString))
 
-/-- Destructive or unknown differences retain the conservative full-regression fallback. -/
-def changeForcesFull (path status oldMode newMode : String) (headerChanged : Bool) : Bool :=
-  status != "M" || oldMode != newMode || !#["100644","100755"].contains newMode ||
-    !knownPath path || headerChanged
+/-- New leaf admission uses ordinary ASCII module components, never traversal or a root replacement. -/
+def mathematicalLeafPath (path : String) : Bool :=
+  path.startsWith "LatticeSystem/" && path.endsWith ".lean" &&
+    (((path.dropEnd 5).toString.splitOn "/").all Registry.identifier)
+
+/-- Exactly one current module/path registration must identify the new, regular mathematical leaf. -/
+def registeredLeafAddition (path kind modules : String) : Bool :=
+  let lines := split modules "\n"
+  let lines := if modules.endsWith "\n" then lines.pop else lines
+  let rows := (lines.extract 1 lines.size).map (split · "\t")
+  let moduleName := (path.dropEnd 5).toString.replace "/" "."
+  mathematicalLeafPath path && kind == "blob" && modules.contains '\n' &&
+    lines[0]? == some "module\tsource_path\trole" && rows.all (fun row => row.size == 3) &&
+    (rows.filter (fun row => row[0]? == some moduleName || row[1]? == some path)) ==
+      #[#[moduleName,path,"leaf"]]
+
+/-- Destructive or unknown differences retain full fallback; only a proven regular new leaf is exempt. -/
+def changeForcesFull (path status oldMode newMode : String) (headerChanged : Bool)
+    (registeredAddition : Bool := false) : Bool :=
+  if status == "A" && oldMode == "000000" && newMode == "100644" &&
+    mathematicalLeafPath path && registeredAddition && !headerChanged then false else
+    status != "M" || oldMode != newMode || !#["100644","100755"].contains newMode ||
+      !knownPath path || headerChanged
 
 /-- Visit raw metadata/path pairs with explicit position and accumulated selection. -/
 def differenceSelection (root : FilePath) (base head : String) (raw : Array String) : Nat → Nat → Bool → IO Bool
@@ -131,8 +150,16 @@ def differenceSelection (root : FilePath) (base head : String) (raw : Array Stri
       pure ((split (← git root #["show",base ++ ":" ++ path]) "\n")[0]! !=
         (split (← git root #["show",head ++ ":" ++ path]) "\n")[0]!)
       else pure false
+    let registeredAddition ← if fields[4]! == "A" && fields[0]! == ":000000" &&
+        fields[1]! == "100644" && mathematicalLeafPath path then do
+      try
+        let kind ← git root #["cat-file","-t",head ++ ":" ++ path]
+        let modules ← git root #["show",head ++ ":registry/modules.tsv"]
+        pure (registeredLeafAddition path (trim kind) modules)
+      catch _ => pure false
+      else pure false
     differenceSelection root base head raw fuel (i+1)
-      (full || changeForcesFull path fields[4]! (fields[0]!.drop 1).toString fields[1]! changedHeader)
+      (full || changeForcesFull path fields[4]! (fields[0]!.drop 1).toString fields[1]! changedHeader registeredAddition)
 
 /-- Every raw NUL endpoint is inspected, including both sides of renames represented as delete/add. -/
 def fullRequired (root : FilePath) (base head : String) : IO Bool := do
