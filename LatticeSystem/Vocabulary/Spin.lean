@@ -42,4 +42,15 @@ noncomputable def spinAt {V : Type*} [Fintype V] [DecidableEq V]
   fun axis source target => components axis (source x) (target x) *
     ∏ site ∈ Finset.univ.erase x, if source site == target site then 1 else 0
 
+/-- The three total-spin components of a finite system with positive doubled spin `n`.
+
+Each component sums the site operators on the same descending magnetic product
+basis, following Tasaki's equation (2.2.7). This definition does not assert the
+spectral or Casimir identities of the total spin.
+-/
+noncomputable def totalSpin {V : Type*} [Fintype V] [DecidableEq V]
+    (n : {n : Nat // 0 < n}) :
+    Fin 3 → Matrix (V → Fin (n.val + 1)) (V → Fin (n.val + 1)) ℂ :=
+  fun axis => ∑ site, spinAt n site axis
+
 end LatticeSystem
